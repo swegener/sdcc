@@ -2,9 +2,9 @@
  * This declarations of the PIC18F47J53 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-10-01 20:26:54 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:57 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -29,7 +29,7 @@
 
 //==============================================================================
 //
-//      Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -8002,6 +8002,5 @@ extern __at(0x0FFF) __sfr TOSU;
 #define __CONFIG4H              0x01FFFF
 
 //==============================================================================
-
 
 #endif // #ifndef __PIC18F47J53_H__

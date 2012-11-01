@@ -93,7 +93,7 @@
    cases you can copy and paste another device's records and adjust
    them to the newly added device.
 
-    $Id$
+  $Id$
 =cut
 
 use strict;
@@ -1333,7 +1333,7 @@ sub print_license($)
  * This $_[0] of the $mcu MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7\@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly\@users.sf.net> 2012.
  *
  * This file is generated automatically by the $PROGRAM${time_str}.
  *

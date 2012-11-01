@@ -2,9 +2,9 @@
  * This declarations of the PIC16C925 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:19:48 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:29:55 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -27,86 +27,86 @@
 
 //==============================================================================
 //
-//      Register Addresses
+//	Register Addresses
 //
 //==============================================================================
 
 #ifndef NO_ADDR_DEFINES
 
-#define INDF_ADDR       0x0000
-#define TMR0_ADDR       0x0001
-#define PCL_ADDR        0x0002
-#define STATUS_ADDR     0x0003
-#define FSR_ADDR        0x0004
-#define PORTA_ADDR      0x0005
-#define PORTB_ADDR      0x0006
-#define PORTC_ADDR      0x0007
-#define PORTD_ADDR      0x0008
-#define PORTE_ADDR      0x0009
-#define PCLATH_ADDR     0x000A
-#define INTCON_ADDR     0x000B
-#define PIR1_ADDR       0x000C
-#define TMR1_ADDR       0x000E
-#define TMR1L_ADDR      0x000E
-#define TMR1H_ADDR      0x000F
-#define T1CON_ADDR      0x0010
-#define TMR2_ADDR       0x0011
-#define T2CON_ADDR      0x0012
-#define SSPBUF_ADDR     0x0013
-#define SSPCON_ADDR     0x0014
-#define CCPR1_ADDR      0x0015
-#define CCPR1L_ADDR     0x0015
-#define CCPR1H_ADDR     0x0016
-#define CCP1CON_ADDR    0x0017
-#define ADRESH_ADDR     0x001E
-#define ADCON0_ADDR     0x001F
-#define OPTION_REG_ADDR 0x0081
-#define TRISA_ADDR      0x0085
-#define TRISB_ADDR      0x0086
-#define TRISC_ADDR      0x0087
-#define TRISD_ADDR      0x0088
-#define TRISE_ADDR      0x0089
-#define PIE1_ADDR       0x008C
-#define PCON_ADDR       0x008E
-#define PR2_ADDR        0x0092
-#define SSPADD_ADDR     0x0093
-#define SSPSTAT_ADDR    0x0094
-#define ADRESL_ADDR     0x009E
-#define ADCON1_ADDR     0x009F
-#define PORTF_ADDR      0x0107
-#define PORTG_ADDR      0x0108
-#define PMCON1_ADDR     0x010C
-#define LCDSE_ADDR      0x010D
-#define LCDPS_ADDR      0x010E
-#define LCDCON_ADDR     0x010F
-#define LCDD00_ADDR     0x0110
-#define LCDD01_ADDR     0x0111
-#define LCDD02_ADDR     0x0112
-#define LCDD03_ADDR     0x0113
-#define LCDD04_ADDR     0x0114
-#define LCDD05_ADDR     0x0115
-#define LCDD06_ADDR     0x0116
-#define LCDD07_ADDR     0x0117
-#define LCDD08_ADDR     0x0118
-#define LCDD09_ADDR     0x0119
-#define LCDD10_ADDR     0x011A
-#define LCDD11_ADDR     0x011B
-#define LCDD12_ADDR     0x011C
-#define LCDD13_ADDR     0x011D
-#define LCDD14_ADDR     0x011E
-#define LCDD15_ADDR     0x011F
-#define TRISF_ADDR      0x0187
-#define TRISG_ADDR      0x0188
-#define PMDATA_ADDR     0x018C
-#define PMADR_ADDR      0x018D
-#define PMDATH_ADDR     0x018E
-#define PMADRH_ADDR     0x018F
+#define INDF_ADDR               0x0000
+#define TMR0_ADDR               0x0001
+#define PCL_ADDR                0x0002
+#define STATUS_ADDR             0x0003
+#define FSR_ADDR                0x0004
+#define PORTA_ADDR              0x0005
+#define PORTB_ADDR              0x0006
+#define PORTC_ADDR              0x0007
+#define PORTD_ADDR              0x0008
+#define PORTE_ADDR              0x0009
+#define PCLATH_ADDR             0x000A
+#define INTCON_ADDR             0x000B
+#define PIR1_ADDR               0x000C
+#define TMR1_ADDR               0x000E
+#define TMR1L_ADDR              0x000E
+#define TMR1H_ADDR              0x000F
+#define T1CON_ADDR              0x0010
+#define TMR2_ADDR               0x0011
+#define T2CON_ADDR              0x0012
+#define SSPBUF_ADDR             0x0013
+#define SSPCON_ADDR             0x0014
+#define CCPR1_ADDR              0x0015
+#define CCPR1L_ADDR             0x0015
+#define CCPR1H_ADDR             0x0016
+#define CCP1CON_ADDR            0x0017
+#define ADRESH_ADDR             0x001E
+#define ADCON0_ADDR             0x001F
+#define OPTION_REG_ADDR         0x0081
+#define TRISA_ADDR              0x0085
+#define TRISB_ADDR              0x0086
+#define TRISC_ADDR              0x0087
+#define TRISD_ADDR              0x0088
+#define TRISE_ADDR              0x0089
+#define PIE1_ADDR               0x008C
+#define PCON_ADDR               0x008E
+#define PR2_ADDR                0x0092
+#define SSPADD_ADDR             0x0093
+#define SSPSTAT_ADDR            0x0094
+#define ADRESL_ADDR             0x009E
+#define ADCON1_ADDR             0x009F
+#define PORTF_ADDR              0x0107
+#define PORTG_ADDR              0x0108
+#define PMCON1_ADDR             0x010C
+#define LCDSE_ADDR              0x010D
+#define LCDPS_ADDR              0x010E
+#define LCDCON_ADDR             0x010F
+#define LCDD00_ADDR             0x0110
+#define LCDD01_ADDR             0x0111
+#define LCDD02_ADDR             0x0112
+#define LCDD03_ADDR             0x0113
+#define LCDD04_ADDR             0x0114
+#define LCDD05_ADDR             0x0115
+#define LCDD06_ADDR             0x0116
+#define LCDD07_ADDR             0x0117
+#define LCDD08_ADDR             0x0118
+#define LCDD09_ADDR             0x0119
+#define LCDD10_ADDR             0x011A
+#define LCDD11_ADDR             0x011B
+#define LCDD12_ADDR             0x011C
+#define LCDD13_ADDR             0x011D
+#define LCDD14_ADDR             0x011E
+#define LCDD15_ADDR             0x011F
+#define TRISF_ADDR              0x0187
+#define TRISG_ADDR              0x0188
+#define PMDATA_ADDR             0x018C
+#define PMADR_ADDR              0x018D
+#define PMDATH_ADDR             0x018E
+#define PMADRH_ADDR             0x018F
 
 #endif // #ifndef NO_ADDR_DEFINES
 
 //==============================================================================
 //
-//       Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -1892,11 +1892,11 @@ extern __at(0x018F) __sfr PMADRH;
 
 //==============================================================================
 //
-//       Configuration Bits
+//        Configuration Bits
 //
 //==============================================================================
 
-#define _CONFIG1             0x2007
+#define _CONFIG1                0x2007
 
 //----------------------------- CONFIG1 Options -------------------------------
 
@@ -1925,12 +1925,12 @@ extern __at(0x018F) __sfr PMADRH;
 
 //==============================================================================
 
-#define _DEVID1              0x2006
+#define _DEVID1                 0x2006
 
-#define _IDLOC0              0x2000
-#define _IDLOC1              0x2001
-#define _IDLOC2              0x2002
-#define _IDLOC3              0x2003
+#define _IDLOC0                 0x2000
+#define _IDLOC1                 0x2001
+#define _IDLOC2                 0x2002
+#define _IDLOC3                 0x2003
 
 //==============================================================================
 

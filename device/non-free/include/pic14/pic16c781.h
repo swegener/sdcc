@@ -2,9 +2,9 @@
  * This declarations of the PIC16C781 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:19:48 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:29:54 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -27,59 +27,59 @@
 
 //==============================================================================
 //
-//      Register Addresses
+//	Register Addresses
 //
 //==============================================================================
 
 #ifndef NO_ADDR_DEFINES
 
-#define INDF_ADDR       0x0000
-#define TMR0_ADDR       0x0001
-#define PCL_ADDR        0x0002
-#define STATUS_ADDR     0x0003
-#define FSR_ADDR        0x0004
-#define PORTA_ADDR      0x0005
-#define PORTB_ADDR      0x0006
-#define PCLATH_ADDR     0x000A
-#define INTCON_ADDR     0x000B
-#define PIR1_ADDR       0x000C
-#define TMR1_ADDR       0x000E
-#define TMR1L_ADDR      0x000E
-#define TMR1H_ADDR      0x000F
-#define T1CON_ADDR      0x0010
-#define ADRES_ADDR      0x001E
-#define ADCON0_ADDR     0x001F
-#define OPTION_REG_ADDR 0x0081
-#define TRISA_ADDR      0x0085
-#define TRISB_ADDR      0x0086
-#define PIE1_ADDR       0x008C
-#define PCON_ADDR       0x008E
-#define WPUB_ADDR       0x0095
-#define IOCB_ADDR       0x0096
-#define REFCON_ADDR     0x009B
-#define LVDCON_ADDR     0x009C
-#define ANSEL_ADDR      0x009D
-#define ADCON1_ADDR     0x009F
-#define PMDATL_ADDR     0x010C
-#define PMADRL_ADDR     0x010D
-#define PMDATH_ADDR     0x010E
-#define PMADRH_ADDR     0x010F
-#define CALCON_ADDR     0x0110
-#define PSMCCON0_ADDR   0x0111
-#define PSMCCON1_ADDR   0x0112
-#define CM1CON0_ADDR    0x0119
-#define CM2CON0_ADDR    0x011A
-#define CM2CON1_ADDR    0x011B
-#define OPACON_ADDR     0x011C
-#define DAC_ADDR        0x011E
-#define DACON0_ADDR     0x011F
-#define PMCON1_ADDR     0x018C
+#define INDF_ADDR               0x0000
+#define TMR0_ADDR               0x0001
+#define PCL_ADDR                0x0002
+#define STATUS_ADDR             0x0003
+#define FSR_ADDR                0x0004
+#define PORTA_ADDR              0x0005
+#define PORTB_ADDR              0x0006
+#define PCLATH_ADDR             0x000A
+#define INTCON_ADDR             0x000B
+#define PIR1_ADDR               0x000C
+#define TMR1_ADDR               0x000E
+#define TMR1L_ADDR              0x000E
+#define TMR1H_ADDR              0x000F
+#define T1CON_ADDR              0x0010
+#define ADRES_ADDR              0x001E
+#define ADCON0_ADDR             0x001F
+#define OPTION_REG_ADDR         0x0081
+#define TRISA_ADDR              0x0085
+#define TRISB_ADDR              0x0086
+#define PIE1_ADDR               0x008C
+#define PCON_ADDR               0x008E
+#define WPUB_ADDR               0x0095
+#define IOCB_ADDR               0x0096
+#define REFCON_ADDR             0x009B
+#define LVDCON_ADDR             0x009C
+#define ANSEL_ADDR              0x009D
+#define ADCON1_ADDR             0x009F
+#define PMDATL_ADDR             0x010C
+#define PMADRL_ADDR             0x010D
+#define PMDATH_ADDR             0x010E
+#define PMADRH_ADDR             0x010F
+#define CALCON_ADDR             0x0110
+#define PSMCCON0_ADDR           0x0111
+#define PSMCCON1_ADDR           0x0112
+#define CM1CON0_ADDR            0x0119
+#define CM2CON0_ADDR            0x011A
+#define CM2CON1_ADDR            0x011B
+#define OPACON_ADDR             0x011C
+#define DAC_ADDR                0x011E
+#define DACON0_ADDR             0x011F
+#define PMCON1_ADDR             0x018C
 
 #endif // #ifndef NO_ADDR_DEFINES
 
 //==============================================================================
 //
-//       Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -1155,11 +1155,11 @@ extern __at(0x018C) volatile __PMCON1bits_t PMCON1bits;
 
 //==============================================================================
 //
-//       Configuration Bits
+//        Configuration Bits
 //
 //==============================================================================
 
-#define _CONFIG1             0x2007
+#define _CONFIG1                0x2007
 
 //----------------------------- CONFIG1 Options -------------------------------
 
@@ -1204,10 +1204,10 @@ extern __at(0x018C) volatile __PMCON1bits_t PMCON1bits;
 
 //==============================================================================
 
-#define _IDLOC0              0x2000
-#define _IDLOC1              0x2001
-#define _IDLOC2              0x2002
-#define _IDLOC3              0x2003
+#define _IDLOC0                 0x2000
+#define _IDLOC1                 0x2001
+#define _IDLOC2                 0x2002
+#define _IDLOC3                 0x2003
 
 //==============================================================================
 

@@ -2,9 +2,9 @@
  * This declarations of the PIC16F631 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:19:49 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:07 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -27,61 +27,61 @@
 
 //==============================================================================
 //
-//      Register Addresses
+//	Register Addresses
 //
 //==============================================================================
 
 #ifndef NO_ADDR_DEFINES
 
-#define INDF_ADDR       0x0000
-#define TMR0_ADDR       0x0001
-#define PCL_ADDR        0x0002
-#define STATUS_ADDR     0x0003
-#define FSR_ADDR        0x0004
-#define PORTA_ADDR      0x0005
-#define PORTB_ADDR      0x0006
-#define PORTC_ADDR      0x0007
-#define PCLATH_ADDR     0x000A
-#define INTCON_ADDR     0x000B
-#define PIR1_ADDR       0x000C
-#define PIR2_ADDR       0x000D
-#define TMR1_ADDR       0x000E
-#define TMR1L_ADDR      0x000E
-#define TMR1H_ADDR      0x000F
-#define T1CON_ADDR      0x0010
-#define OPTION_REG_ADDR 0x0081
-#define TRISA_ADDR      0x0085
-#define TRISB_ADDR      0x0086
-#define TRISC_ADDR      0x0087
-#define PIE1_ADDR       0x008C
-#define PIE2_ADDR       0x008D
-#define PCON_ADDR       0x008E
-#define OSCCON_ADDR     0x008F
-#define OSCTUNE_ADDR    0x0090
-#define WPU_ADDR        0x0095
-#define WPUA_ADDR       0x0095
-#define IOC_ADDR        0x0096
-#define IOCA_ADDR       0x0096
-#define WDTCON_ADDR     0x0097
-#define EEDAT_ADDR      0x010C
-#define EEDATA_ADDR     0x010C
-#define EEADR_ADDR      0x010D
-#define WPUB_ADDR       0x0115
-#define IOCB_ADDR       0x0116
-#define VRCON_ADDR      0x0118
-#define CM1CON0_ADDR    0x0119
-#define CM2CON0_ADDR    0x011A
-#define CM2CON1_ADDR    0x011B
-#define ANSEL_ADDR      0x011E
-#define EECON1_ADDR     0x018C
-#define EECON2_ADDR     0x018D
-#define SRCON_ADDR      0x019E
+#define INDF_ADDR               0x0000
+#define TMR0_ADDR               0x0001
+#define PCL_ADDR                0x0002
+#define STATUS_ADDR             0x0003
+#define FSR_ADDR                0x0004
+#define PORTA_ADDR              0x0005
+#define PORTB_ADDR              0x0006
+#define PORTC_ADDR              0x0007
+#define PCLATH_ADDR             0x000A
+#define INTCON_ADDR             0x000B
+#define PIR1_ADDR               0x000C
+#define PIR2_ADDR               0x000D
+#define TMR1_ADDR               0x000E
+#define TMR1L_ADDR              0x000E
+#define TMR1H_ADDR              0x000F
+#define T1CON_ADDR              0x0010
+#define OPTION_REG_ADDR         0x0081
+#define TRISA_ADDR              0x0085
+#define TRISB_ADDR              0x0086
+#define TRISC_ADDR              0x0087
+#define PIE1_ADDR               0x008C
+#define PIE2_ADDR               0x008D
+#define PCON_ADDR               0x008E
+#define OSCCON_ADDR             0x008F
+#define OSCTUNE_ADDR            0x0090
+#define WPU_ADDR                0x0095
+#define WPUA_ADDR               0x0095
+#define IOC_ADDR                0x0096
+#define IOCA_ADDR               0x0096
+#define WDTCON_ADDR             0x0097
+#define EEDAT_ADDR              0x010C
+#define EEDATA_ADDR             0x010C
+#define EEADR_ADDR              0x010D
+#define WPUB_ADDR               0x0115
+#define IOCB_ADDR               0x0116
+#define VRCON_ADDR              0x0118
+#define CM1CON0_ADDR            0x0119
+#define CM2CON0_ADDR            0x011A
+#define CM2CON1_ADDR            0x011B
+#define ANSEL_ADDR              0x011E
+#define EECON1_ADDR             0x018C
+#define EECON2_ADDR             0x018D
+#define SRCON_ADDR              0x019E
 
 #endif // #ifndef NO_ADDR_DEFINES
 
 //==============================================================================
 //
-//       Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -1251,11 +1251,11 @@ extern __at(0x019E) volatile __SRCONbits_t SRCONbits;
 
 //==============================================================================
 //
-//       Configuration Bits
+//        Configuration Bits
 //
 //==============================================================================
 
-#define _CONFIG              0x2007
+#define _CONFIG                 0x2007
 
 //----------------------------- CONFIG Options -------------------------------
 
@@ -1310,12 +1310,12 @@ extern __at(0x019E) volatile __SRCONbits_t SRCONbits;
 
 //==============================================================================
 
-#define _DEVID1              0x2006
+#define _DEVID1                 0x2006
 
-#define _IDLOC0              0x2000
-#define _IDLOC1              0x2001
-#define _IDLOC2              0x2002
-#define _IDLOC3              0x2003
+#define _IDLOC0                 0x2000
+#define _IDLOC1                 0x2001
+#define _IDLOC2                 0x2002
+#define _IDLOC3                 0x2003
 
 //==============================================================================
 

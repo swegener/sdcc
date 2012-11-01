@@ -2,7 +2,7 @@
  * This definitions of the PIC18F4220 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
  * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:20:13 UTC.
  *

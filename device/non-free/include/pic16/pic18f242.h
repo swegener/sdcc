@@ -2,9 +2,9 @@
  * This declarations of the PIC18F242 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:20:03 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:32 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -29,7 +29,7 @@
 
 //==============================================================================
 //
-//      Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -2333,17 +2333,17 @@ extern __at(0x0FFF) __sfr TOSU;
 //
 //==============================================================================
 
-#define __CONFIG1H      0x300001
-#define __CONFIG2L      0x300002
-#define __CONFIG2H      0x300003
-#define __CONFIG3H      0x300005
-#define __CONFIG4L      0x300006
-#define __CONFIG5L      0x300008
-#define __CONFIG5H      0x300009
-#define __CONFIG6L      0x30000A
-#define __CONFIG6H      0x30000B
-#define __CONFIG7L      0x30000C
-#define __CONFIG7H      0x30000D
+#define __CONFIG1H              0x300001
+#define __CONFIG2L              0x300002
+#define __CONFIG2H              0x300003
+#define __CONFIG3H              0x300005
+#define __CONFIG4L              0x300006
+#define __CONFIG5L              0x300008
+#define __CONFIG5H              0x300009
+#define __CONFIG6L              0x30000A
+#define __CONFIG6H              0x30000B
+#define __CONFIG7L              0x30000C
+#define __CONFIG7H              0x30000D
 
 //----------------------------- CONFIG1H Options -------------------------------
 
@@ -2454,14 +2454,13 @@ extern __at(0x0FFF) __sfr TOSU;
 #define __DEVID1                0x3FFFFE
 #define __DEVID2                0x3FFFFF
 
-#define __IDLOC0        0x200000
-#define __IDLOC1        0x200001
-#define __IDLOC2        0x200002
-#define __IDLOC3        0x200003
-#define __IDLOC4        0x200004
-#define __IDLOC5        0x200005
-#define __IDLOC6        0x200006
-#define __IDLOC7        0x200007
-
+#define __IDLOC0                0x200000
+#define __IDLOC1                0x200001
+#define __IDLOC2                0x200002
+#define __IDLOC3                0x200003
+#define __IDLOC4                0x200004
+#define __IDLOC5                0x200005
+#define __IDLOC6                0x200006
+#define __IDLOC7                0x200007
 
 #endif // #ifndef __PIC18F242_H__

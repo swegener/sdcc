@@ -2,9 +2,9 @@
  * This declarations of the PIC18F25K50 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-10-01 20:26:51 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:39 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -29,7 +29,7 @@
 
 //==============================================================================
 //
-//      Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -137,25 +137,16 @@ extern __at(0x0F5A) __sfr VREGCON;
 
 extern __at(0x0F5B) __sfr ANSELA;
 
-typedef union
+typedef struct
   {
-  struct
-    {
-    unsigned ANSA0              : 1;
-    unsigned ANSA1              : 1;
-    unsigned ANSA2              : 1;
-    unsigned ANSA3              : 1;
-    unsigned ANSA4              : 1;
-    unsigned ANSA5              : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-
-  struct
-    {
-    unsigned ANSA               : 6;
-    unsigned                    : 2;
-    };
+  unsigned ANSA0                : 1;
+  unsigned ANSA1                : 1;
+  unsigned ANSA2                : 1;
+  unsigned ANSA3                : 1;
+  unsigned                      : 1;
+  unsigned ANSA5                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __ANSELAbits_t;
 
 extern __at(0x0F5B) volatile __ANSELAbits_t ANSELAbits;
@@ -164,7 +155,6 @@ extern __at(0x0F5B) volatile __ANSELAbits_t ANSELAbits;
 #define _ANSA1                  0x02
 #define _ANSA2                  0x04
 #define _ANSA3                  0x08
-#define _ANSA4                  0x10
 #define _ANSA5                  0x20
 
 //==============================================================================
@@ -2999,6 +2989,53 @@ extern __at(0x0FA8) __sfr EEDATA;
 extern __at(0x0FA9) __sfr EEADR;
 
 //==============================================================================
+//        RCSTA Bits
+
+extern __at(0x0FAB) __sfr RCSTA;
+
+typedef union
+  {
+  struct
+    {
+    unsigned RX9D               : 1;
+    unsigned OERR               : 1;
+    unsigned FERR               : 1;
+    unsigned ADDEN              : 1;
+    unsigned CREN               : 1;
+    unsigned SREN               : 1;
+    unsigned RX9                : 1;
+    unsigned SPEN               : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned ADEN               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+  } __RCSTAbits_t;
+
+extern __at(0x0FAB) volatile __RCSTAbits_t RCSTAbits;
+
+#define _RX9D                   0x01
+#define _OERR                   0x02
+#define _FERR                   0x04
+#define _ADDEN                  0x08
+#define _ADEN                   0x08
+#define _CREN                   0x10
+#define _SREN                   0x20
+#define _RX9                    0x40
+#define _SPEN                   0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        RCSTA1 Bits
 
 extern __at(0x0FAB) __sfr RCSTA1;
@@ -3032,15 +3069,46 @@ typedef union
 
 extern __at(0x0FAB) volatile __RCSTA1bits_t RCSTA1bits;
 
-#define _RX9D                   0x01
-#define _OERR                   0x02
-#define _FERR                   0x04
-#define _ADDEN                  0x08
-#define _ADEN                   0x08
-#define _CREN                   0x10
-#define _SREN                   0x20
-#define _RX9                    0x40
-#define _SPEN                   0x80
+#define _RCSTA1_RX9D            0x01
+#define _RCSTA1_OERR            0x02
+#define _RCSTA1_FERR            0x04
+#define _RCSTA1_ADDEN           0x08
+#define _RCSTA1_ADEN            0x08
+#define _RCSTA1_CREN            0x10
+#define _RCSTA1_SREN            0x20
+#define _RCSTA1_RX9             0x40
+#define _RCSTA1_SPEN            0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        TXSTA Bits
+
+extern __at(0x0FAC) __sfr TXSTA;
+
+typedef struct
+  {
+  unsigned TX9D                 : 1;
+  unsigned TRMT                 : 1;
+  unsigned BRGH                 : 1;
+  unsigned SENDB                : 1;
+  unsigned SYNC                 : 1;
+  unsigned TXEN                 : 1;
+  unsigned TX9                  : 1;
+  unsigned CSRC                 : 1;
+  } __TXSTAbits_t;
+
+extern __at(0x0FAC) volatile __TXSTAbits_t TXSTAbits;
+
+#define _TX9D                   0x01
+#define _TRMT                   0x02
+#define _BRGH                   0x04
+#define _SENDB                  0x08
+#define _SYNC                   0x10
+#define _TXEN                   0x20
+#define _TX9                    0x40
+#define _CSRC                   0x80
 
 //==============================================================================
 
@@ -3064,19 +3132,52 @@ typedef struct
 
 extern __at(0x0FAC) volatile __TXSTA1bits_t TXSTA1bits;
 
-#define _TX9D                   0x01
-#define _TRMT                   0x02
-#define _BRGH                   0x04
-#define _SENDB                  0x08
-#define _SYNC                   0x10
-#define _TXEN                   0x20
-#define _TX9                    0x40
-#define _CSRC                   0x80
+#define _TXSTA1_TX9D            0x01
+#define _TXSTA1_TRMT            0x02
+#define _TXSTA1_BRGH            0x04
+#define _TXSTA1_SENDB           0x08
+#define _TXSTA1_SYNC            0x10
+#define _TXSTA1_TXEN            0x20
+#define _TXSTA1_TX9             0x40
+#define _TXSTA1_CSRC            0x80
 
 //==============================================================================
 
+extern __at(0x0FAD) __sfr TXREG;
 extern __at(0x0FAD) __sfr TXREG1;
+extern __at(0x0FAE) __sfr RCREG;
 extern __at(0x0FAE) __sfr RCREG1;
+
+//==============================================================================
+//        SPBRG Bits
+
+extern __at(0x0FAF) __sfr SPBRG;
+
+typedef struct
+  {
+  unsigned BRG0                 : 1;
+  unsigned BRG1                 : 1;
+  unsigned BRG2                 : 1;
+  unsigned BRG3                 : 1;
+  unsigned BRG4                 : 1;
+  unsigned BRG5                 : 1;
+  unsigned BRG6                 : 1;
+  unsigned BRG7                 : 1;
+  } __SPBRGbits_t;
+
+extern __at(0x0FAF) volatile __SPBRGbits_t SPBRGbits;
+
+#define _BRG0                   0x01
+#define _BRG1                   0x02
+#define _BRG2                   0x04
+#define _BRG3                   0x08
+#define _BRG4                   0x10
+#define _BRG5                   0x20
+#define _BRG6                   0x40
+#define _BRG7                   0x80
+
+//==============================================================================
+
 
 //==============================================================================
 //        SPBRG1 Bits
@@ -3097,14 +3198,45 @@ typedef struct
 
 extern __at(0x0FAF) volatile __SPBRG1bits_t SPBRG1bits;
 
-#define _BRG0                   0x01
-#define _BRG1                   0x02
-#define _BRG2                   0x04
-#define _BRG3                   0x08
-#define _BRG4                   0x10
-#define _BRG5                   0x20
-#define _BRG6                   0x40
-#define _BRG7                   0x80
+#define _SPBRG1_BRG0            0x01
+#define _SPBRG1_BRG1            0x02
+#define _SPBRG1_BRG2            0x04
+#define _SPBRG1_BRG3            0x08
+#define _SPBRG1_BRG4            0x10
+#define _SPBRG1_BRG5            0x20
+#define _SPBRG1_BRG6            0x40
+#define _SPBRG1_BRG7            0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        SPBRGH Bits
+
+extern __at(0x0FB0) __sfr SPBRGH;
+
+typedef struct
+  {
+  unsigned BRG8                 : 1;
+  unsigned BRG9                 : 1;
+  unsigned BRG10                : 1;
+  unsigned BRG11                : 1;
+  unsigned BRG12                : 1;
+  unsigned BRG13                : 1;
+  unsigned BRG14                : 1;
+  unsigned BRG15                : 1;
+  } __SPBRGHbits_t;
+
+extern __at(0x0FB0) volatile __SPBRGHbits_t SPBRGHbits;
+
+#define _BRG8                   0x01
+#define _BRG9                   0x02
+#define _BRG10                  0x04
+#define _BRG11                  0x08
+#define _BRG12                  0x10
+#define _BRG13                  0x20
+#define _BRG14                  0x40
+#define _BRG15                  0x80
 
 //==============================================================================
 
@@ -3128,14 +3260,14 @@ typedef struct
 
 extern __at(0x0FB0) volatile __SPBRGH1bits_t SPBRGH1bits;
 
-#define _BRG8                   0x01
-#define _BRG9                   0x02
-#define _BRG10                  0x04
-#define _BRG11                  0x08
-#define _BRG12                  0x10
-#define _BRG13                  0x20
-#define _BRG14                  0x40
-#define _BRG15                  0x80
+#define _SPBRGH1_BRG8           0x01
+#define _SPBRGH1_BRG9           0x02
+#define _SPBRGH1_BRG10          0x04
+#define _SPBRGH1_BRG11          0x08
+#define _SPBRGH1_BRG12          0x10
+#define _SPBRGH1_BRG13          0x20
+#define _SPBRGH1_BRG14          0x40
+#define _SPBRGH1_BRG15          0x80
 
 //==============================================================================
 
@@ -3627,6 +3759,67 @@ extern __at(0x0FB7) volatile __PWM1CONbits_t PWM1CONbits;
 
 
 //==============================================================================
+//        BAUDCON Bits
+
+extern __at(0x0FB8) __sfr BAUDCON;
+
+typedef union
+  {
+  struct
+    {
+    unsigned ABDEN              : 1;
+    unsigned WUE                : 1;
+    unsigned                    : 1;
+    unsigned BRG16              : 1;
+    unsigned TXCKP              : 1;
+    unsigned RXDTP              : 1;
+    unsigned RCIDL              : 1;
+    unsigned ABDOVF             : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned CKTXP              : 1;
+    unsigned DTRXP              : 1;
+    unsigned RCMT               : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned SCKP               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+  } __BAUDCONbits_t;
+
+extern __at(0x0FB8) volatile __BAUDCONbits_t BAUDCONbits;
+
+#define _ABDEN                  0x01
+#define _WUE                    0x02
+#define _BRG16                  0x08
+#define _TXCKP                  0x10
+#define _CKTXP                  0x10
+#define _SCKP                   0x10
+#define _RXDTP                  0x20
+#define _DTRXP                  0x20
+#define _RCIDL                  0x40
+#define _RCMT                   0x40
+#define _ABDOVF                 0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        BAUDCON1 Bits
 
 extern __at(0x0FB8) __sfr BAUDCON1;
@@ -3672,17 +3865,17 @@ typedef union
 
 extern __at(0x0FB8) volatile __BAUDCON1bits_t BAUDCON1bits;
 
-#define _ABDEN                  0x01
-#define _WUE                    0x02
-#define _BRG16                  0x08
-#define _TXCKP                  0x10
-#define _CKTXP                  0x10
-#define _SCKP                   0x10
-#define _RXDTP                  0x20
-#define _DTRXP                  0x20
-#define _RCIDL                  0x40
-#define _RCMT                   0x40
-#define _ABDOVF                 0x80
+#define _BAUDCON1_ABDEN         0x01
+#define _BAUDCON1_WUE           0x02
+#define _BAUDCON1_BRG16         0x08
+#define _BAUDCON1_TXCKP         0x10
+#define _BAUDCON1_CKTXP         0x10
+#define _BAUDCON1_SCKP          0x10
+#define _BAUDCON1_RXDTP         0x20
+#define _BAUDCON1_DTRXP         0x20
+#define _BAUDCON1_RCIDL         0x40
+#define _BAUDCON1_RCMT          0x40
+#define _BAUDCON1_ABDOVF        0x80
 
 //==============================================================================
 
@@ -5298,6 +5491,7 @@ extern __at(0x0FFF) __sfr TOSU;
 #define _STVREN_ON_4L           0xFF    // Stack full/underflow will cause Reset.
 #define _LVP_OFF_4L             0xFB    // Single-Supply ICSP disabled.
 #define _LVP_ON_4L              0xFF    // Single-Supply ICSP enabled if MCLRE is also 1.
+#define _ICPRT_OFF_4L           0xDF    // ICPORT disabled.
 #define _XINST_OFF_4L           0xBF    // Instruction set extension and Indexed Addressing mode disabled.
 #define _XINST_ON_4L            0xFF    // Instruction set extension and Indexed Addressing mode enabled.
 #define _DEBUG_ON_4L            0x7F    // Background debugger enabled, RB6 and RB7 are dedicated to In-Circuit Debug.
@@ -5370,6 +5564,5 @@ extern __at(0x0FFF) __sfr TOSU;
 #define __IDLOC5                0x200005
 #define __IDLOC6                0x200006
 #define __IDLOC7                0x200007
-
 
 #endif // #ifndef __PIC18F25K50_H__

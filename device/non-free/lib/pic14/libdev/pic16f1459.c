@@ -2,9 +2,9 @@
  * This definitions of the PIC16F1459 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:19:57 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:29:57 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -334,14 +334,6 @@ __at(0x0694) volatile __CWG1CON1bits_t CWG1CON1bits;
 __at(0x0695) __sfr CWG1CON2;
 __at(0x0695) volatile __CWG1CON2bits_t CWG1CON2bits;
 
-__at(0x0E10) __sfr CRRC;
-
-__at(0x0E10) __sfr TST_CRRCL;
-
-__at(0x0E11) __sfr TST_CRRCH;
-
-__at(0x0E12) __sfr TST_CRLT;
-
 __at(0x0E8E) __sfr UCON;
 __at(0x0E8E) volatile __UCONbits_t UCONbits;
 
@@ -397,35 +389,6 @@ __at(0x0E9E) volatile __UEP6bits_t UEP6bits;
 
 __at(0x0E9F) __sfr UEP7;
 __at(0x0E9F) volatile __UEP7bits_t UEP7bits;
-
-__at(0x0F8C) __sfr ICDIO;
-__at(0x0F8C) volatile __ICDIObits_t ICDIObits;
-
-__at(0x0F8D) __sfr ICDCON0;
-__at(0x0F8D) volatile __ICDCON0bits_t ICDCON0bits;
-
-__at(0x0F91) __sfr ICDSTAT;
-__at(0x0F91) volatile __ICDSTATbits_t ICDSTATbits;
-
-__at(0x0F95) __sfr DEVSEL;
-__at(0x0F95) volatile __DEVSELbits_t DEVSELbits;
-
-__at(0x0F96) __sfr ICDINSTL;
-__at(0x0F96) volatile __ICDINSTLbits_t ICDINSTLbits;
-
-__at(0x0F97) __sfr ICDINSTH;
-__at(0x0F97) volatile __ICDINSTHbits_t ICDINSTHbits;
-
-__at(0x0F9C) __sfr ICDBK0CON;
-__at(0x0F9C) volatile __ICDBK0CONbits_t ICDBK0CONbits;
-
-__at(0x0F9D) __sfr ICDBK0L;
-__at(0x0F9D) volatile __ICDBK0Lbits_t ICDBK0Lbits;
-
-__at(0x0F9E) __sfr ICDBK0H;
-__at(0x0F9E) volatile __ICDBK0Hbits_t ICDBK0Hbits;
-
-__at(0x0FE3) __sfr BSRICDSHAD;
 
 __at(0x0FE4) __sfr STATUS_SHAD;
 __at(0x0FE4) volatile __STATUS_SHADbits_t STATUS_SHADbits;

@@ -2,9 +2,9 @@
  * This declarations of the PIC16C711 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:19:46 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:29:51 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -27,34 +27,34 @@
 
 //==============================================================================
 //
-//      Register Addresses
+//	Register Addresses
 //
 //==============================================================================
 
 #ifndef NO_ADDR_DEFINES
 
-#define INDF_ADDR       0x0000
-#define TMR0_ADDR       0x0001
-#define PCL_ADDR        0x0002
-#define STATUS_ADDR     0x0003
-#define FSR_ADDR        0x0004
-#define PORTA_ADDR      0x0005
-#define PORTB_ADDR      0x0006
-#define ADCON0_ADDR     0x0008
-#define ADRES_ADDR      0x0009
-#define PCLATH_ADDR     0x000A
-#define INTCON_ADDR     0x000B
-#define OPTION_REG_ADDR 0x0081
-#define TRISA_ADDR      0x0085
-#define TRISB_ADDR      0x0086
-#define PCON_ADDR       0x0087
-#define ADCON1_ADDR     0x0088
+#define INDF_ADDR               0x0000
+#define TMR0_ADDR               0x0001
+#define PCL_ADDR                0x0002
+#define STATUS_ADDR             0x0003
+#define FSR_ADDR                0x0004
+#define PORTA_ADDR              0x0005
+#define PORTB_ADDR              0x0006
+#define ADCON0_ADDR             0x0008
+#define ADRES_ADDR              0x0009
+#define PCLATH_ADDR             0x000A
+#define INTCON_ADDR             0x000B
+#define OPTION_REG_ADDR         0x0081
+#define TRISA_ADDR              0x0085
+#define TRISB_ADDR              0x0086
+#define PCON_ADDR               0x0087
+#define ADCON1_ADDR             0x0088
 
 #endif // #ifndef NO_ADDR_DEFINES
 
 //==============================================================================
 //
-//       Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 

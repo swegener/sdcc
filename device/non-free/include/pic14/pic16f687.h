@@ -2,9 +2,9 @@
  * This declarations of the PIC16F687 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:19:50 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:08 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -27,79 +27,79 @@
 
 //==============================================================================
 //
-//      Register Addresses
+//	Register Addresses
 //
 //==============================================================================
 
 #ifndef NO_ADDR_DEFINES
 
-#define INDF_ADDR       0x0000
-#define TMR0_ADDR       0x0001
-#define PCL_ADDR        0x0002
-#define STATUS_ADDR     0x0003
-#define FSR_ADDR        0x0004
-#define PORTA_ADDR      0x0005
-#define PORTB_ADDR      0x0006
-#define PORTC_ADDR      0x0007
-#define PCLATH_ADDR     0x000A
-#define INTCON_ADDR     0x000B
-#define PIR1_ADDR       0x000C
-#define PIR2_ADDR       0x000D
+#define INDF_ADDR               0x0000
+#define TMR0_ADDR               0x0001
+#define PCL_ADDR                0x0002
+#define STATUS_ADDR             0x0003
+#define FSR_ADDR                0x0004
+#define PORTA_ADDR              0x0005
+#define PORTB_ADDR              0x0006
+#define PORTC_ADDR              0x0007
+#define PCLATH_ADDR             0x000A
+#define INTCON_ADDR             0x000B
+#define PIR1_ADDR               0x000C
+#define PIR2_ADDR               0x000D
 #define TMR1_ADDR               0x000E
-#define TMR1L_ADDR      0x000E
-#define TMR1H_ADDR      0x000F
-#define T1CON_ADDR      0x0010
-#define SSPBUF_ADDR     0x0013
-#define SSPCON_ADDR     0x0014
-#define RCSTA_ADDR      0x0018
-#define TXREG_ADDR      0x0019
-#define RCREG_ADDR      0x001A
-#define ADRESH_ADDR     0x001E
-#define ADCON0_ADDR     0x001F
-#define OPTION_REG_ADDR 0x0081
-#define TRISA_ADDR      0x0085
-#define TRISB_ADDR      0x0086
-#define TRISC_ADDR      0x0087
-#define PIE1_ADDR       0x008C
-#define PIE2_ADDR       0x008D
-#define PCON_ADDR       0x008E
-#define OSCCON_ADDR     0x008F
-#define OSCTUNE_ADDR    0x0090
-#define MSK_ADDR        0x0093
+#define TMR1L_ADDR              0x000E
+#define TMR1H_ADDR              0x000F
+#define T1CON_ADDR              0x0010
+#define SSPBUF_ADDR             0x0013
+#define SSPCON_ADDR             0x0014
+#define RCSTA_ADDR              0x0018
+#define TXREG_ADDR              0x0019
+#define RCREG_ADDR              0x001A
+#define ADRESH_ADDR             0x001E
+#define ADCON0_ADDR             0x001F
+#define OPTION_REG_ADDR         0x0081
+#define TRISA_ADDR              0x0085
+#define TRISB_ADDR              0x0086
+#define TRISC_ADDR              0x0087
+#define PIE1_ADDR               0x008C
+#define PIE2_ADDR               0x008D
+#define PCON_ADDR               0x008E
+#define OSCCON_ADDR             0x008F
+#define OSCTUNE_ADDR            0x0090
+#define MSK_ADDR                0x0093
 #define SSPADD_ADDR             0x0093
-#define SSPMSK_ADDR     0x0093
-#define SSPSTAT_ADDR    0x0094
-#define WPU_ADDR        0x0095
-#define WPUA_ADDR       0x0095
-#define IOC_ADDR        0x0096
-#define IOCA_ADDR       0x0096
-#define WDTCON_ADDR     0x0097
-#define TXSTA_ADDR      0x0098
-#define SPBRG_ADDR      0x0099
-#define SPBRGH_ADDR     0x009A
-#define BAUDCTL_ADDR    0x009B
-#define ADRESL_ADDR     0x009E
-#define ADCON1_ADDR     0x009F
-#define EEDAT_ADDR      0x010C
-#define EEDATA_ADDR     0x010C
-#define EEADR_ADDR      0x010D
-#define WPUB_ADDR       0x0115
-#define IOCB_ADDR       0x0116
-#define VRCON_ADDR      0x0118
-#define CM1CON0_ADDR    0x0119
-#define CM2CON0_ADDR    0x011A
-#define CM2CON1_ADDR    0x011B
-#define ANSEL_ADDR      0x011E
-#define ANSELH_ADDR     0x011F
-#define EECON1_ADDR     0x018C
-#define EECON2_ADDR     0x018D
-#define SRCON_ADDR      0x019E
+#define SSPMSK_ADDR             0x0093
+#define SSPSTAT_ADDR            0x0094
+#define WPU_ADDR                0x0095
+#define WPUA_ADDR               0x0095
+#define IOC_ADDR                0x0096
+#define IOCA_ADDR               0x0096
+#define WDTCON_ADDR             0x0097
+#define TXSTA_ADDR              0x0098
+#define SPBRG_ADDR              0x0099
+#define SPBRGH_ADDR             0x009A
+#define BAUDCTL_ADDR            0x009B
+#define ADRESL_ADDR             0x009E
+#define ADCON1_ADDR             0x009F
+#define EEDAT_ADDR              0x010C
+#define EEDATA_ADDR             0x010C
+#define EEADR_ADDR              0x010D
+#define WPUB_ADDR               0x0115
+#define IOCB_ADDR               0x0116
+#define VRCON_ADDR              0x0118
+#define CM1CON0_ADDR            0x0119
+#define CM2CON0_ADDR            0x011A
+#define CM2CON1_ADDR            0x011B
+#define ANSEL_ADDR              0x011E
+#define ANSELH_ADDR             0x011F
+#define EECON1_ADDR             0x018C
+#define EECON2_ADDR             0x018D
+#define SRCON_ADDR              0x019E
 
 #endif // #ifndef NO_ADDR_DEFINES
 
 //==============================================================================
 //
-//       Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 

@@ -2,9 +2,9 @@
  * This definitions of the PIC18F45K50 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-10-01 20:26:52 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:53 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -297,18 +297,34 @@ __at(0x0FA8) __sfr EEDATA;
 
 __at(0x0FA9) __sfr EEADR;
 
+__at(0x0FAB) __sfr RCSTA;
+__at(0x0FAB) volatile __RCSTAbits_t RCSTAbits;
+
 __at(0x0FAB) __sfr RCSTA1;
 __at(0x0FAB) volatile __RCSTA1bits_t RCSTA1bits;
+
+__at(0x0FAC) __sfr TXSTA;
+__at(0x0FAC) volatile __TXSTAbits_t TXSTAbits;
 
 __at(0x0FAC) __sfr TXSTA1;
 __at(0x0FAC) volatile __TXSTA1bits_t TXSTA1bits;
 
+__at(0x0FAD) __sfr TXREG;
+
 __at(0x0FAD) __sfr TXREG1;
+
+__at(0x0FAE) __sfr RCREG;
 
 __at(0x0FAE) __sfr RCREG1;
 
+__at(0x0FAF) __sfr SPBRG;
+__at(0x0FAF) volatile __SPBRGbits_t SPBRGbits;
+
 __at(0x0FAF) __sfr SPBRG1;
 __at(0x0FAF) volatile __SPBRG1bits_t SPBRG1bits;
+
+__at(0x0FB0) __sfr SPBRGH;
+__at(0x0FB0) volatile __SPBRGHbits_t SPBRGHbits;
 
 __at(0x0FB0) __sfr SPBRGH1;
 __at(0x0FB0) volatile __SPBRGH1bits_t SPBRGH1bits;
@@ -339,6 +355,9 @@ __at(0x0FB7) volatile __ECCP1DELbits_t ECCP1DELbits;
 
 __at(0x0FB7) __sfr PWM1CON;
 __at(0x0FB7) volatile __PWM1CONbits_t PWM1CONbits;
+
+__at(0x0FB8) __sfr BAUDCON;
+__at(0x0FB8) volatile __BAUDCONbits_t BAUDCONbits;
 
 __at(0x0FB8) __sfr BAUDCON1;
 __at(0x0FB8) volatile __BAUDCON1bits_t BAUDCON1bits;

@@ -2,9 +2,9 @@
  * This declarations of the PIC16F610 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:19:48 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:06 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -27,49 +27,49 @@
 
 //==============================================================================
 //
-//      Register Addresses
+//	Register Addresses
 //
 //==============================================================================
 
 #ifndef NO_ADDR_DEFINES
 
-#define INDF_ADDR       0x0000
-#define TMR0_ADDR       0x0001
-#define PCL_ADDR        0x0002
-#define STATUS_ADDR     0x0003
-#define FSR_ADDR        0x0004
-#define PORTA_ADDR      0x0005
-#define PORTC_ADDR      0x0007
-#define PCLATH_ADDR     0x000A
-#define INTCON_ADDR     0x000B
-#define PIR1_ADDR       0x000C
-#define TMR1_ADDR       0x000E
-#define TMR1L_ADDR      0x000E
-#define TMR1H_ADDR      0x000F
-#define T1CON_ADDR      0x0010
-#define VRCON_ADDR      0x0019
-#define CM1CON0_ADDR    0x001A
-#define CM2CON0_ADDR    0x001B
-#define CM2CON1_ADDR    0x001C
-#define OPTION_REG_ADDR 0x0081
-#define TRISA_ADDR      0x0085
-#define TRISC_ADDR      0x0087
-#define PIE1_ADDR       0x008C
-#define PCON_ADDR       0x008E
-#define OSCTUNE_ADDR    0x0090
-#define ANSEL_ADDR      0x0091
-#define WPU_ADDR        0x0095
-#define WPUA_ADDR       0x0095
-#define IOC_ADDR        0x0096
-#define IOCA_ADDR       0x0096
-#define SRCON0_ADDR     0x0099
-#define SRCON1_ADDR     0x009A
+#define INDF_ADDR               0x0000
+#define TMR0_ADDR               0x0001
+#define PCL_ADDR                0x0002
+#define STATUS_ADDR             0x0003
+#define FSR_ADDR                0x0004
+#define PORTA_ADDR              0x0005
+#define PORTC_ADDR              0x0007
+#define PCLATH_ADDR             0x000A
+#define INTCON_ADDR             0x000B
+#define PIR1_ADDR               0x000C
+#define TMR1_ADDR               0x000E
+#define TMR1L_ADDR              0x000E
+#define TMR1H_ADDR              0x000F
+#define T1CON_ADDR              0x0010
+#define VRCON_ADDR              0x0019
+#define CM1CON0_ADDR            0x001A
+#define CM2CON0_ADDR            0x001B
+#define CM2CON1_ADDR            0x001C
+#define OPTION_REG_ADDR         0x0081
+#define TRISA_ADDR              0x0085
+#define TRISC_ADDR              0x0087
+#define PIE1_ADDR               0x008C
+#define PCON_ADDR               0x008E
+#define OSCTUNE_ADDR            0x0090
+#define ANSEL_ADDR              0x0091
+#define WPU_ADDR                0x0095
+#define WPUA_ADDR               0x0095
+#define IOC_ADDR                0x0096
+#define IOCA_ADDR               0x0096
+#define SRCON0_ADDR             0x0099
+#define SRCON1_ADDR             0x009A
 
 #endif // #ifndef NO_ADDR_DEFINES
 
 //==============================================================================
 //
-//       Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -1051,11 +1051,11 @@ extern __at(0x009A) volatile __SRCON1bits_t SRCON1bits;
 
 //==============================================================================
 //
-//       Configuration Bits
+//        Configuration Bits
 //
 //==============================================================================
 
-#define _CONFIG              0x2007
+#define _CONFIG                 0x2007
 
 //----------------------------- CONFIG Options -------------------------------
 
@@ -1105,12 +1105,12 @@ extern __at(0x009A) volatile __SRCON1bits_t SRCON1bits;
 
 //==============================================================================
 
-#define _DEVID1              0x2006
+#define _DEVID1                 0x2006
 
-#define _IDLOC0              0x2000
-#define _IDLOC1              0x2001
-#define _IDLOC2              0x2002
-#define _IDLOC3              0x2003
+#define _IDLOC0                 0x2000
+#define _IDLOC1                 0x2001
+#define _IDLOC2                 0x2002
+#define _IDLOC3                 0x2003
 
 //==============================================================================
 

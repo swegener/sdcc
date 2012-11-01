@@ -2,9 +2,9 @@
  * This declarations of the PIC18F85K22 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-10-01 20:26:59 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:31:17 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -29,7 +29,7 @@
 
 //==============================================================================
 //
-//      Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -7178,8 +7178,8 @@ extern __at(0x0FFF) __sfr TOSU;
 #define _FOSC_RCIO_1H           0xF7    // External RC oscillator.
 #define _FOSC_INTIO2_1H         0xF8    // Internal RC oscillator.
 #define _FOSC_INTIO1_1H         0xF9    // Internal RC oscillator, CLKOUT function on OSC2.
-#define _FOSC_EC2IO_1H          0xFA    // EC oscillator, CLKOUT function on OSC2 (Medium power, 160 kHz - 4 MHz).
-#define _FOSC_EC2_1H            0xFB    // EC oscillator (Medium power, 160 kHz - 4 MHz).
+#define _FOSC_EC2IO_1H          0xFA    // EC oscillator, CLKOUT function on OSC2 (Medium power, 160 kHz - 16 MHz).
+#define _FOSC_EC2_1H            0xFB    // EC oscillator (Medium power, 160 kHz - 16 MHz).
 #define _FOSC_EC1IO_1H          0xFC    // EC oscillator, CLKOUT function on OSC2 (Low power, DC - 160 kHz).
 #define _FOSC_EC1_1H            0xFD    // EC oscillator (Low power, DC - 160 kHz).
 #define _PLLCFG_OFF_1H          0xEF    // Disabled.
@@ -7336,6 +7336,5 @@ extern __at(0x0FFF) __sfr TOSU;
 #define __IDLOC5                0x200005
 #define __IDLOC6                0x200006
 #define __IDLOC7                0x200007
-
 
 #endif // #ifndef __PIC18F85K22_H__

@@ -2,9 +2,9 @@
  * This declarations of the PIC18F14K50 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:20:05 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:30 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -29,7 +29,7 @@
 
 //==============================================================================
 //
-//      Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -41,14 +41,14 @@ extern __at(0x0F53) __sfr UEP0;
 
 typedef struct
   {
-                unsigned EPSTALL        : 1;
-                unsigned EPINEN         : 1;
-                unsigned EPOUTEN        : 1;
-                unsigned EPCONDIS       : 1;
-                unsigned EPHSHK         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned EPSTALL              : 1;
+  unsigned EPINEN               : 1;
+  unsigned EPOUTEN              : 1;
+  unsigned EPCONDIS             : 1;
+  unsigned EPHSHK               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UEP0bits_t;
 
 extern __at(0x0F53) volatile __UEP0bits_t UEP0bits;
@@ -69,14 +69,14 @@ extern __at(0x0F54) __sfr UEP1;
 
 typedef struct
   {
-                unsigned EPSTALL        : 1;
-                unsigned EPINEN         : 1;
-                unsigned EPOUTEN        : 1;
-                unsigned EPCONDIS       : 1;
-                unsigned EPHSHK         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned EPSTALL              : 1;
+  unsigned EPINEN               : 1;
+  unsigned EPOUTEN              : 1;
+  unsigned EPCONDIS             : 1;
+  unsigned EPHSHK               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UEP1bits_t;
 
 extern __at(0x0F54) volatile __UEP1bits_t UEP1bits;
@@ -97,14 +97,14 @@ extern __at(0x0F55) __sfr UEP2;
 
 typedef struct
   {
-                unsigned EPSTALL        : 1;
-                unsigned EPINEN         : 1;
-                unsigned EPOUTEN        : 1;
-                unsigned EPCONDIS       : 1;
-                unsigned EPHSHK         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned EPSTALL              : 1;
+  unsigned EPINEN               : 1;
+  unsigned EPOUTEN              : 1;
+  unsigned EPCONDIS             : 1;
+  unsigned EPHSHK               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UEP2bits_t;
 
 extern __at(0x0F55) volatile __UEP2bits_t UEP2bits;
@@ -125,14 +125,14 @@ extern __at(0x0F56) __sfr UEP3;
 
 typedef struct
   {
-                unsigned EPSTALL        : 1;
-                unsigned EPINEN         : 1;
-                unsigned EPOUTEN        : 1;
-                unsigned EPCONDIS       : 1;
-                unsigned EPHSHK         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned EPSTALL              : 1;
+  unsigned EPINEN               : 1;
+  unsigned EPOUTEN              : 1;
+  unsigned EPCONDIS             : 1;
+  unsigned EPHSHK               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UEP3bits_t;
 
 extern __at(0x0F56) volatile __UEP3bits_t UEP3bits;
@@ -153,14 +153,14 @@ extern __at(0x0F57) __sfr UEP4;
 
 typedef struct
   {
-                unsigned EPSTALL        : 1;
-                unsigned EPINEN         : 1;
-                unsigned EPOUTEN        : 1;
-                unsigned EPCONDIS       : 1;
-                unsigned EPHSHK         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned EPSTALL              : 1;
+  unsigned EPINEN               : 1;
+  unsigned EPOUTEN              : 1;
+  unsigned EPCONDIS             : 1;
+  unsigned EPHSHK               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UEP4bits_t;
 
 extern __at(0x0F57) volatile __UEP4bits_t UEP4bits;
@@ -181,14 +181,14 @@ extern __at(0x0F58) __sfr UEP5;
 
 typedef struct
   {
-                unsigned EPSTALL        : 1;
-                unsigned EPINEN         : 1;
-                unsigned EPOUTEN        : 1;
-                unsigned EPCONDIS       : 1;
-                unsigned EPHSHK         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned EPSTALL              : 1;
+  unsigned EPINEN               : 1;
+  unsigned EPOUTEN              : 1;
+  unsigned EPCONDIS             : 1;
+  unsigned EPHSHK               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UEP5bits_t;
 
 extern __at(0x0F58) volatile __UEP5bits_t UEP5bits;
@@ -209,14 +209,14 @@ extern __at(0x0F59) __sfr UEP6;
 
 typedef struct
   {
-                unsigned EPSTALL        : 1;
-                unsigned EPINEN         : 1;
-                unsigned EPOUTEN        : 1;
-                unsigned EPCONDIS       : 1;
-                unsigned EPHSHK         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned EPSTALL              : 1;
+  unsigned EPINEN               : 1;
+  unsigned EPOUTEN              : 1;
+  unsigned EPCONDIS             : 1;
+  unsigned EPHSHK               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UEP6bits_t;
 
 extern __at(0x0F59) volatile __UEP6bits_t UEP6bits;
@@ -237,14 +237,14 @@ extern __at(0x0F5A) __sfr UEP7;
 
 typedef struct
   {
-                unsigned EPSTALL        : 1;
-                unsigned EPINEN         : 1;
-                unsigned EPOUTEN        : 1;
-                unsigned EPCONDIS       : 1;
-                unsigned EPHSHK         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned EPSTALL              : 1;
+  unsigned EPINEN               : 1;
+  unsigned EPOUTEN              : 1;
+  unsigned EPCONDIS             : 1;
+  unsigned EPHSHK               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UEP7bits_t;
 
 extern __at(0x0F5A) volatile __UEP7bits_t UEP7bits;
@@ -265,14 +265,14 @@ extern __at(0x0F5B) __sfr UEIE;
 
 typedef struct
   {
-                unsigned PIDEE          : 1;
-                unsigned CRC5EE         : 1;
-                unsigned CRC16EE        : 1;
-                unsigned DFN8EE         : 1;
-                unsigned BTOEE          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned BTSEE          : 1;
+  unsigned PIDEE                : 1;
+  unsigned CRC5EE               : 1;
+  unsigned CRC16EE              : 1;
+  unsigned DFN8EE               : 1;
+  unsigned BTOEE                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned BTSEE                : 1;
   } __UEIEbits_t;
 
 extern __at(0x0F5B) volatile __UEIEbits_t UEIEbits;
@@ -296,15 +296,15 @@ typedef union
   {
   struct
     {
-                unsigned ADDR0          : 1;
-                unsigned ADDR1          : 1;
-                unsigned ADDR2          : 1;
-                unsigned ADDR3          : 1;
-                unsigned ADDR4          : 1;
-                unsigned ADDR5          : 1;
-                unsigned ADDR6          : 1;
-                unsigned                : 1;
-        };
+    unsigned ADDR0              : 1;
+    unsigned ADDR1              : 1;
+    unsigned ADDR2              : 1;
+    unsigned ADDR3              : 1;
+    unsigned ADDR4              : 1;
+    unsigned ADDR5              : 1;
+    unsigned ADDR6              : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -333,14 +333,14 @@ extern __at(0x0F5D) __sfr UFRML;
 
 typedef struct
   {
-                unsigned FRM0           : 1;
-                unsigned FRM1           : 1;
-                unsigned FRM2           : 1;
-                unsigned FRM3           : 1;
-                unsigned FRM4           : 1;
-                unsigned FRM5           : 1;
-                unsigned FRM6           : 1;
-                unsigned FRM7           : 1;
+  unsigned FRM0                 : 1;
+  unsigned FRM1                 : 1;
+  unsigned FRM2                 : 1;
+  unsigned FRM3                 : 1;
+  unsigned FRM4                 : 1;
+  unsigned FRM5                 : 1;
+  unsigned FRM6                 : 1;
+  unsigned FRM7                 : 1;
   } __UFRMLbits_t;
 
 extern __at(0x0F5D) volatile __UFRMLbits_t UFRMLbits;
@@ -364,14 +364,14 @@ extern __at(0x0F5E) __sfr UFRMH;
 
 typedef struct
   {
-                unsigned FRM8           : 1;
-                unsigned FRM9           : 1;
-                unsigned FRM10          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned FRM8                 : 1;
+  unsigned FRM9                 : 1;
+  unsigned FRM10                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __UFRMHbits_t;
 
 extern __at(0x0F5E) volatile __UFRMHbits_t UFRMHbits;
@@ -390,14 +390,14 @@ extern __at(0x0F5F) __sfr UEIR;
 
 typedef struct
   {
-                unsigned PIDEF          : 1;
-                unsigned CRC5EF         : 1;
-                unsigned CRC16EF        : 1;
-                unsigned DFN8EF         : 1;
-                unsigned BTOEF          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned BTSEF          : 1;
+  unsigned PIDEF                : 1;
+  unsigned CRC5EF               : 1;
+  unsigned CRC16EF              : 1;
+  unsigned DFN8EF               : 1;
+  unsigned BTOEF                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned BTSEF                : 1;
   } __UEIRbits_t;
 
 extern __at(0x0F5F) volatile __UEIRbits_t UEIRbits;
@@ -419,14 +419,14 @@ extern __at(0x0F60) __sfr UIE;
 
 typedef struct
   {
-                unsigned URSTIE         : 1;
-                unsigned UERRIE         : 1;
-                unsigned ACTVIE         : 1;
-                unsigned TRNIE          : 1;
-                unsigned IDLEIE         : 1;
-                unsigned STALLIE        : 1;
-                unsigned SOFIE          : 1;
-                unsigned                : 1;
+  unsigned URSTIE               : 1;
+  unsigned UERRIE               : 1;
+  unsigned ACTVIE               : 1;
+  unsigned TRNIE                : 1;
+  unsigned IDLEIE               : 1;
+  unsigned STALLIE              : 1;
+  unsigned SOFIE                : 1;
+  unsigned                      : 1;
   } __UIEbits_t;
 
 extern __at(0x0F60) volatile __UIEbits_t UIEbits;
@@ -451,15 +451,15 @@ typedef union
   {
   struct
     {
-                unsigned PPB0           : 1;
-                unsigned PPB1           : 1;
-                unsigned FSEN           : 1;
-                unsigned                : 1;
-                unsigned UPUEN          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned UTEYE          : 1;
-        };
+    unsigned PPB0               : 1;
+    unsigned PPB1               : 1;
+    unsigned FSEN               : 1;
+    unsigned                    : 1;
+    unsigned UPUEN              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned UTEYE              : 1;
+    };
 
   struct
     {
@@ -486,14 +486,14 @@ extern __at(0x0F62) __sfr UIR;
 
 typedef struct
   {
-                unsigned URSTIF         : 1;
-                unsigned UERRIF         : 1;
-                unsigned ACTVIF         : 1;
-                unsigned TRNIF          : 1;
-                unsigned IDLEIF         : 1;
-                unsigned STALLIF        : 1;
-                unsigned SOFIF          : 1;
-                unsigned                : 1;
+  unsigned URSTIF               : 1;
+  unsigned UERRIF               : 1;
+  unsigned ACTVIF               : 1;
+  unsigned TRNIF                : 1;
+  unsigned IDLEIF               : 1;
+  unsigned STALLIF              : 1;
+  unsigned SOFIF                : 1;
+  unsigned                      : 1;
   } __UIRbits_t;
 
 extern __at(0x0F62) volatile __UIRbits_t UIRbits;
@@ -518,22 +518,22 @@ typedef union
   {
   struct
     {
-                unsigned                : 1;
-                unsigned PPBI           : 1;
-                unsigned DIR            : 1;
-                unsigned ENDP0          : 1;
-                unsigned ENDP1          : 1;
-                unsigned ENDP2          : 1;
+    unsigned                    : 1;
+    unsigned PPBI               : 1;
+    unsigned DIR                : 1;
+    unsigned ENDP0              : 1;
+    unsigned ENDP1              : 1;
+    unsigned ENDP2              : 1;
     unsigned ENDP3              : 1;
-                unsigned                : 1;
+    unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 3;
     unsigned ENDP               : 4;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    };
   } __USTATbits_t;
 
 extern __at(0x0F63) volatile __USTATbits_t USTATbits;
@@ -555,14 +555,14 @@ extern __at(0x0F64) __sfr UCON;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned SUSPND         : 1;
-                unsigned RESUME         : 1;
-                unsigned USBEN          : 1;
-                unsigned PKTDIS         : 1;
-                unsigned SE0            : 1;
-                unsigned PPBRST         : 1;
-                unsigned                : 1;
+  unsigned                      : 1;
+  unsigned SUSPND               : 1;
+  unsigned RESUME               : 1;
+  unsigned USBEN                : 1;
+  unsigned PKTDIS               : 1;
+  unsigned SE0                  : 1;
+  unsigned PPBRST               : 1;
+  unsigned                      : 1;
   } __UCONbits_t;
 
 extern __at(0x0F64) volatile __UCONbits_t UCONbits;
@@ -586,15 +586,15 @@ typedef union
   {
   struct
     {
-                unsigned SRPR           : 1;
-                unsigned SRPS           : 1;
-                unsigned SRNQEN         : 1;
-                unsigned SRQEN          : 1;
-                unsigned SRCLK0         : 1;
-                unsigned SRCLK1         : 1;
-                unsigned SRCLK2         : 1;
-                unsigned SRLEN          : 1;
-        };
+    unsigned SRPR               : 1;
+    unsigned SRPS               : 1;
+    unsigned SRNQEN             : 1;
+    unsigned SRQEN              : 1;
+    unsigned SRCLK0             : 1;
+    unsigned SRCLK1             : 1;
+    unsigned SRCLK2             : 1;
+    unsigned SRLEN              : 1;
+    };
 
   struct
     {
@@ -625,14 +625,14 @@ extern __at(0x0F69) __sfr SRCON1;
 
 typedef struct
   {
-                unsigned SRRC1E         : 1;
-                unsigned SRRC2E         : 1;
-                unsigned SRRCKE         : 1;
-                unsigned SRRPE          : 1;
-                unsigned SRSC1E         : 1;
-                unsigned SRSC2E         : 1;
-                unsigned SRSCKE         : 1;
-                unsigned SRSPE          : 1;
+  unsigned SRRC1E               : 1;
+  unsigned SRRC2E               : 1;
+  unsigned SRRCKE               : 1;
+  unsigned SRRPE                : 1;
+  unsigned SRSC1E               : 1;
+  unsigned SRSC2E               : 1;
+  unsigned SRSCKE               : 1;
+  unsigned SRSPE                : 1;
   } __SRCON1bits_t;
 
 extern __at(0x0F69) volatile __SRCON1bits_t SRCON1bits;
@@ -658,15 +658,15 @@ typedef union
   {
   struct
     {
-                unsigned C2CH0          : 1;
-                unsigned C2CH1          : 1;
-                unsigned C2R            : 1;
-                unsigned C2SP           : 1;
-                unsigned C2POL          : 1;
-                unsigned C2OE           : 1;
-                unsigned C2OUT          : 1;
-                unsigned C2ON           : 1;
-        };
+    unsigned C2CH0              : 1;
+    unsigned C2CH1              : 1;
+    unsigned C2R                : 1;
+    unsigned C2SP               : 1;
+    unsigned C2POL              : 1;
+    unsigned C2OE               : 1;
+    unsigned C2OUT              : 1;
+    unsigned C2ON               : 1;
+    };
 
   struct
     {
@@ -696,14 +696,14 @@ extern __at(0x0F6C) __sfr CM2CON1;
 
 typedef struct
   {
-                unsigned C2SYNC         : 1;
-                unsigned C1SYNC         : 1;
-                unsigned C2HYS          : 1;
-                unsigned C1HYS          : 1;
-                unsigned C2RSEL         : 1;
-                unsigned C1RSEL         : 1;
-                unsigned MC2OUT         : 1;
-                unsigned MC1OUT         : 1;
+  unsigned C2SYNC               : 1;
+  unsigned C1SYNC               : 1;
+  unsigned C2HYS                : 1;
+  unsigned C1HYS                : 1;
+  unsigned C2RSEL               : 1;
+  unsigned C1RSEL               : 1;
+  unsigned MC2OUT               : 1;
+  unsigned MC1OUT               : 1;
   } __CM2CON1bits_t;
 
 extern __at(0x0F6C) volatile __CM2CON1bits_t CM2CON1bits;
@@ -729,15 +729,15 @@ typedef union
   {
   struct
     {
-                unsigned C1CH0          : 1;
-                unsigned C1CH1          : 1;
-                unsigned C1R            : 1;
-                unsigned C1SP           : 1;
-                unsigned C1POL          : 1;
-                unsigned C1OE           : 1;
-                unsigned C1OUT          : 1;
-                unsigned C1ON           : 1;
-        };
+    unsigned C1CH0              : 1;
+    unsigned C1CH1              : 1;
+    unsigned C1R                : 1;
+    unsigned C1SP               : 1;
+    unsigned C1POL              : 1;
+    unsigned C1OE               : 1;
+    unsigned C1OUT              : 1;
+    unsigned C1ON               : 1;
+    };
 
   struct
     {
@@ -767,14 +767,14 @@ extern __at(0x0F6F) __sfr SSPMSK;
 
 typedef struct
   {
-                unsigned MSK0           : 1;
-                unsigned MSK1           : 1;
-                unsigned MSK2           : 1;
-                unsigned MSK3           : 1;
-                unsigned MSK4           : 1;
-                unsigned MSK5           : 1;
-                unsigned MSK6           : 1;
-                unsigned MSK7           : 1;
+  unsigned MSK0                 : 1;
+  unsigned MSK1                 : 1;
+  unsigned MSK2                 : 1;
+  unsigned MSK3                 : 1;
+  unsigned MSK4                 : 1;
+  unsigned MSK5                 : 1;
+  unsigned MSK6                 : 1;
+  unsigned MSK7                 : 1;
   } __SSPMSKbits_t;
 
 extern __at(0x0F6F) volatile __SSPMSKbits_t SSPMSKbits;
@@ -798,14 +798,14 @@ extern __at(0x0F76) __sfr SLRCON;
 
 typedef struct
   {
-                unsigned SLRA           : 1;
-                unsigned SLRB           : 1;
-                unsigned SLRC           : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned SLRA                 : 1;
+  unsigned SLRB                 : 1;
+  unsigned SLRC                 : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __SLRCONbits_t;
 
 extern __at(0x0F76) volatile __SLRCONbits_t SLRCONbits;
@@ -824,14 +824,14 @@ extern __at(0x0F77) __sfr WPUA;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned WPUA3          : 1;
-                unsigned WPUA4          : 1;
-                unsigned WPUA5          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned WPUA3                : 1;
+  unsigned WPUA4                : 1;
+  unsigned WPUA5                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __WPUAbits_t;
 
 extern __at(0x0F77) volatile __WPUAbits_t WPUAbits;
@@ -850,14 +850,14 @@ extern __at(0x0F78) __sfr WPUB;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned WPUB4          : 1;
-                unsigned WPUB5          : 1;
-                unsigned WPUB6          : 1;
-                unsigned WPUB7          : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned WPUB4                : 1;
+  unsigned WPUB5                : 1;
+  unsigned WPUB6                : 1;
+  unsigned WPUB7                : 1;
   } __WPUBbits_t;
 
 extern __at(0x0F78) volatile __WPUBbits_t WPUBbits;
@@ -877,14 +877,14 @@ extern __at(0x0F79) __sfr IOCA;
 
 typedef struct
   {
-                unsigned IOCA0          : 1;
-                unsigned IOCA1          : 1;
-                unsigned                : 1;
-                unsigned IOCA3          : 1;
-                unsigned IOCA4          : 1;
-                unsigned IOCA5          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned IOCA0                : 1;
+  unsigned IOCA1                : 1;
+  unsigned                      : 1;
+  unsigned IOCA3                : 1;
+  unsigned IOCA4                : 1;
+  unsigned IOCA5                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __IOCAbits_t;
 
 extern __at(0x0F79) volatile __IOCAbits_t IOCAbits;
@@ -905,14 +905,14 @@ extern __at(0x0F7A) __sfr IOCB;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned IOCB4          : 1;
-                unsigned IOCB5          : 1;
-                unsigned IOCB6          : 1;
-                unsigned IOCB7          : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned IOCB4                : 1;
+  unsigned IOCB5                : 1;
+  unsigned IOCB6                : 1;
+  unsigned IOCB7                : 1;
   } __IOCBbits_t;
 
 extern __at(0x0F7A) volatile __IOCBbits_t IOCBbits;
@@ -932,14 +932,14 @@ extern __at(0x0F7E) __sfr ANSEL;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned ANS3           : 1;
-                unsigned ANS4           : 1;
-                unsigned ANS5           : 1;
-                unsigned ANS6           : 1;
-                unsigned ANS7           : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned ANS3                 : 1;
+  unsigned ANS4                 : 1;
+  unsigned ANS5                 : 1;
+  unsigned ANS6                 : 1;
+  unsigned ANS7                 : 1;
   } __ANSELbits_t;
 
 extern __at(0x0F7E) volatile __ANSELbits_t ANSELbits;
@@ -960,14 +960,14 @@ extern __at(0x0F7F) __sfr ANSELH;
 
 typedef struct
   {
-                unsigned ANS8           : 1;
-                unsigned ANS9           : 1;
-                unsigned ANS10          : 1;
-                unsigned ANS11          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned ANS8                 : 1;
+  unsigned ANS9                 : 1;
+  unsigned ANS10                : 1;
+  unsigned ANS11                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __ANSELHbits_t;
 
 extern __at(0x0F7F) volatile __ANSELHbits_t ANSELHbits;
@@ -989,51 +989,51 @@ typedef union
   {
   struct
     {
-                unsigned RA0            : 1;
-                unsigned RA1            : 1;
-                unsigned                : 1;
-                unsigned RA3            : 1;
-                unsigned RA4            : 1;
-                unsigned RA5            : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned RA0                : 1;
+    unsigned RA1                : 1;
+    unsigned                    : 1;
+    unsigned RA3                : 1;
+    unsigned RA4                : 1;
+    unsigned RA5                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned AN3            : 1;
-                unsigned OSC1           : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned AN3                : 1;
+    unsigned OSC1               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned OSC2           : 1;
-                unsigned CLKIN          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned OSC2               : 1;
+    unsigned CLKIN              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned CLKOUT         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned CLKOUT             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __PORTAbits_t;
 
 extern __at(0x0F80) volatile __PORTAbits_t PORTAbits;
@@ -1061,51 +1061,51 @@ typedef union
   {
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned RB4            : 1;
-                unsigned RB5            : 1;
-                unsigned RB6            : 1;
-                unsigned RB7            : 1;
-        };
-
-  struct
-    {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned SDI            : 1;
-                unsigned RX             : 1;
-                unsigned SCL            : 1;
-                unsigned TX             : 1;
-        };
-
-  struct
-    {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned SDA            : 1;
-    unsigned AN11               : 1;
-                unsigned SCK            : 1;
-                unsigned CK             : 1;
-        };
-
-  struct
-    {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned AN10           : 1;
     unsigned                    : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned RB4                : 1;
+    unsigned RB5                : 1;
+    unsigned RB6                : 1;
+    unsigned RB7                : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned SDI                : 1;
+    unsigned RX                 : 1;
+    unsigned SCL                : 1;
+    unsigned TX                 : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned SDA                : 1;
+    unsigned AN11               : 1;
+    unsigned SCK                : 1;
+    unsigned CK                 : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned AN10               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __PORTBbits_t;
 
 extern __at(0x0F81) volatile __PORTBbits_t PORTBbits;
@@ -1136,75 +1136,75 @@ typedef union
   {
   struct
     {
-                unsigned RC0            : 1;
-                unsigned RC1            : 1;
-                unsigned RC2            : 1;
-                unsigned RC3            : 1;
-                unsigned RC4            : 1;
-                unsigned RC5            : 1;
-                unsigned RC6            : 1;
-                unsigned RC7            : 1;
-        };
+    unsigned RC0                : 1;
+    unsigned RC1                : 1;
+    unsigned RC2                : 1;
+    unsigned RC3                : 1;
+    unsigned RC4                : 1;
+    unsigned RC5                : 1;
+    unsigned RC6                : 1;
+    unsigned RC7                : 1;
+    };
 
   struct
     {
-                unsigned AN4            : 1;
-                unsigned AN5            : 1;
-                unsigned AN6            : 1;
-                unsigned AN7            : 1;
-                unsigned C12OUT         : 1;
+    unsigned AN4                : 1;
+    unsigned AN5                : 1;
+    unsigned AN6                : 1;
+    unsigned AN7                : 1;
+    unsigned C12OUT             : 1;
     unsigned CCP1               : 1;
-                unsigned AN8            : 1;
-                unsigned AN9            : 1;
-        };
+    unsigned AN8                : 1;
+    unsigned AN9                : 1;
+    };
 
   struct
     {
-                unsigned C12INP         : 1;
-                unsigned C12IN1M        : 1;
-                unsigned C12IN2M        : 1;
-                unsigned C12IN3M        : 1;
-                unsigned SRQ            : 1;
+    unsigned C12INP             : 1;
+    unsigned C12IN1M            : 1;
+    unsigned C12IN2M            : 1;
+    unsigned C12IN3M            : 1;
+    unsigned SRQ                : 1;
     unsigned T0CKI              : 1;
     unsigned NOT_SS             : 1;
-                unsigned T1OSCO         : 1;
-        };
+    unsigned T1OSCO             : 1;
+    };
 
   struct
     {
-                unsigned INT0           : 1;
-                unsigned INT1           : 1;
-                unsigned INT2           : 1;
-                unsigned PGM            : 1;
-                unsigned P1B            : 1;
+    unsigned INT0               : 1;
+    unsigned INT1               : 1;
+    unsigned INT2               : 1;
+    unsigned PGM                : 1;
+    unsigned P1B                : 1;
     unsigned P1A                : 1;
     unsigned T13CKI             : 1;
-                unsigned SDO            : 1;
-        };
+    unsigned SDO                : 1;
+    };
 
   struct
     {
-                unsigned VREFP          : 1;
-                unsigned VREFM          : 1;
-                unsigned CVREF          : 1;
-                unsigned P1C            : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+    unsigned VREFP              : 1;
+    unsigned VREFM              : 1;
+    unsigned CVREF              : 1;
+    unsigned P1C                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
     unsigned T1OSCI             : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned P1D            : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned P1D                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
     unsigned SS                 : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -1267,12 +1267,12 @@ typedef struct
   {
   unsigned LATA0                : 1;
   unsigned LATA1                : 1;
-                unsigned                : 1;
+  unsigned                      : 1;
   unsigned LATA3                : 1;
-                unsigned LATA4          : 1;
-                unsigned LATA5          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned LATA4                : 1;
+  unsigned LATA5                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __LATAbits_t;
 
 extern __at(0x0F89) volatile __LATAbits_t LATAbits;
@@ -1293,14 +1293,14 @@ extern __at(0x0F8A) __sfr LATB;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned LATB4          : 1;
-                unsigned LATB5          : 1;
-                unsigned LATB6          : 1;
-                unsigned LATB7          : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned LATB4                : 1;
+  unsigned LATB5                : 1;
+  unsigned LATB6                : 1;
+  unsigned LATB7                : 1;
   } __LATBbits_t;
 
 extern __at(0x0F8A) volatile __LATBbits_t LATBbits;
@@ -1320,14 +1320,14 @@ extern __at(0x0F8B) __sfr LATC;
 
 typedef struct
   {
-                unsigned LATC0          : 1;
-                unsigned LATC1          : 1;
-                unsigned LATC2          : 1;
-                unsigned LATC3          : 1;
-                unsigned LATC4          : 1;
-                unsigned LATC5          : 1;
-                unsigned LATC6          : 1;
-                unsigned LATC7          : 1;
+  unsigned LATC0                : 1;
+  unsigned LATC1                : 1;
+  unsigned LATC2                : 1;
+  unsigned LATC3                : 1;
+  unsigned LATC4                : 1;
+  unsigned LATC5                : 1;
+  unsigned LATC6                : 1;
+  unsigned LATC7                : 1;
   } __LATCbits_t;
 
 extern __at(0x0F8B) volatile __LATCbits_t LATCbits;
@@ -1361,19 +1361,19 @@ typedef union
     unsigned TRISA5             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
-        };
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned RA4            : 1;
-                unsigned RA5            : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned RA4                : 1;
+    unsigned RA5                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __DDRAbits_t;
 
 extern __at(0x0F92) volatile __DDRAbits_t DDRAbits;
@@ -1395,15 +1395,15 @@ typedef union
   {
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned TRISA4         : 1;
-                unsigned TRISA5         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned TRISA4             : 1;
+    unsigned TRISA5             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -1449,15 +1449,15 @@ typedef union
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned RB4            : 1;
-                unsigned RB5            : 1;
-                unsigned RB6            : 1;
-                unsigned RB7            : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned RB4                : 1;
+    unsigned RB5                : 1;
+    unsigned RB6                : 1;
+    unsigned RB7                : 1;
+    };
   } __DDRBbits_t;
 
 extern __at(0x0F93) volatile __DDRBbits_t DDRBbits;
@@ -1483,15 +1483,15 @@ typedef union
   {
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned TRISB4         : 1;
-                unsigned TRISB5         : 1;
-                unsigned TRISB6         : 1;
-                unsigned TRISB7         : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned TRISB4             : 1;
+    unsigned TRISB5             : 1;
+    unsigned TRISB6             : 1;
+    unsigned TRISB7             : 1;
+    };
 
   struct
     {
@@ -1541,15 +1541,15 @@ typedef union
 
   struct
     {
-                unsigned RC0            : 1;
-                unsigned RC1            : 1;
-                unsigned RC2            : 1;
-                unsigned RC3            : 1;
-                unsigned RC4            : 1;
-                unsigned RC5            : 1;
-                unsigned RC6            : 1;
-                unsigned RC7            : 1;
-        };
+    unsigned RC0                : 1;
+    unsigned RC1                : 1;
+    unsigned RC2                : 1;
+    unsigned RC3                : 1;
+    unsigned RC4                : 1;
+    unsigned RC5                : 1;
+    unsigned RC6                : 1;
+    unsigned RC7                : 1;
+    };
   } __DDRCbits_t;
 
 extern __at(0x0F94) volatile __DDRCbits_t DDRCbits;
@@ -1583,15 +1583,15 @@ typedef union
   {
   struct
     {
-                unsigned TRISC0         : 1;
-                unsigned TRISC1         : 1;
-                unsigned TRISC2         : 1;
-                unsigned TRISC3         : 1;
-                unsigned TRISC4         : 1;
-                unsigned TRISC5         : 1;
-                unsigned TRISC6         : 1;
-                unsigned TRISC7         : 1;
-        };
+    unsigned TRISC0             : 1;
+    unsigned TRISC1             : 1;
+    unsigned TRISC2             : 1;
+    unsigned TRISC3             : 1;
+    unsigned TRISC4             : 1;
+    unsigned TRISC5             : 1;
+    unsigned TRISC6             : 1;
+    unsigned TRISC7             : 1;
+    };
 
   struct
     {
@@ -1637,15 +1637,15 @@ typedef union
   {
   struct
     {
-                unsigned TUN0           : 1;
-                unsigned TUN1           : 1;
-                unsigned TUN2           : 1;
-                unsigned TUN3           : 1;
-                unsigned TUN4           : 1;
-                unsigned TUN5           : 1;
-                unsigned SPLLEN         : 1;
-                unsigned INTSRC         : 1;
-        };
+    unsigned TUN0               : 1;
+    unsigned TUN1               : 1;
+    unsigned TUN2               : 1;
+    unsigned TUN3               : 1;
+    unsigned TUN4               : 1;
+    unsigned TUN5               : 1;
+    unsigned SPLLEN             : 1;
+    unsigned INTSRC             : 1;
+    };
 
   struct
     {
@@ -1675,14 +1675,14 @@ extern __at(0x0F9D) __sfr PIE1;
 
 typedef struct
   {
-                unsigned TMR1IE         : 1;
-                unsigned TMR2IE         : 1;
-                unsigned CCP1IE         : 1;
-                unsigned SSPIE          : 1;
-                unsigned TXIE           : 1;
-                unsigned RCIE           : 1;
-                unsigned ADIE           : 1;
-                unsigned                : 1;
+  unsigned TMR1IE               : 1;
+  unsigned TMR2IE               : 1;
+  unsigned CCP1IE               : 1;
+  unsigned SSPIE                : 1;
+  unsigned TXIE                 : 1;
+  unsigned RCIE                 : 1;
+  unsigned ADIE                 : 1;
+  unsigned                      : 1;
   } __PIE1bits_t;
 
 extern __at(0x0F9D) volatile __PIE1bits_t PIE1bits;
@@ -1705,14 +1705,14 @@ extern __at(0x0F9E) __sfr PIR1;
 
 typedef struct
   {
-                unsigned TMR1IF         : 1;
-                unsigned TMR2IF         : 1;
-                unsigned CCP1IF         : 1;
-                unsigned SSPIF          : 1;
-                unsigned TXIF           : 1;
-                unsigned RCIF           : 1;
-                unsigned ADIF           : 1;
-                unsigned                : 1;
+  unsigned TMR1IF               : 1;
+  unsigned TMR2IF               : 1;
+  unsigned CCP1IF               : 1;
+  unsigned SSPIF                : 1;
+  unsigned TXIF                 : 1;
+  unsigned RCIF                 : 1;
+  unsigned ADIF                 : 1;
+  unsigned                      : 1;
   } __PIR1bits_t;
 
 extern __at(0x0F9E) volatile __PIR1bits_t PIR1bits;
@@ -1735,14 +1735,14 @@ extern __at(0x0F9F) __sfr IPR1;
 
 typedef struct
   {
-                unsigned TMR1IP         : 1;
-                unsigned TMR2IP         : 1;
-                unsigned CCP1IP         : 1;
-                unsigned SSPIP          : 1;
-                unsigned TXIP           : 1;
-                unsigned RCIP           : 1;
-                unsigned ADIP           : 1;
-                unsigned                : 1;
+  unsigned TMR1IP               : 1;
+  unsigned TMR2IP               : 1;
+  unsigned CCP1IP               : 1;
+  unsigned SSPIP                : 1;
+  unsigned TXIP                 : 1;
+  unsigned RCIP                 : 1;
+  unsigned ADIP                 : 1;
+  unsigned                      : 1;
   } __IPR1bits_t;
 
 extern __at(0x0F9F) volatile __IPR1bits_t IPR1bits;
@@ -1765,14 +1765,14 @@ extern __at(0x0FA0) __sfr PIE2;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned TMR3IE         : 1;
-                unsigned USBIE          : 1;
-                unsigned BCLIE          : 1;
-                unsigned EEIE           : 1;
-                unsigned C2IE           : 1;
-                unsigned C1IE           : 1;
-                unsigned OSCFIE         : 1;
+  unsigned                      : 1;
+  unsigned TMR3IE               : 1;
+  unsigned USBIE                : 1;
+  unsigned BCLIE                : 1;
+  unsigned EEIE                 : 1;
+  unsigned C2IE                 : 1;
+  unsigned C1IE                 : 1;
+  unsigned OSCFIE               : 1;
   } __PIE2bits_t;
 
 extern __at(0x0FA0) volatile __PIE2bits_t PIE2bits;
@@ -1795,14 +1795,14 @@ extern __at(0x0FA1) __sfr PIR2;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned TMR3IF         : 1;
-                unsigned USBIF          : 1;
-                unsigned BCLIF          : 1;
-                unsigned EEIF           : 1;
-                unsigned C2IF           : 1;
-                unsigned C1IF           : 1;
-                unsigned OSCFIF         : 1;
+  unsigned                      : 1;
+  unsigned TMR3IF               : 1;
+  unsigned USBIF                : 1;
+  unsigned BCLIF                : 1;
+  unsigned EEIF                 : 1;
+  unsigned C2IF                 : 1;
+  unsigned C1IF                 : 1;
+  unsigned OSCFIF               : 1;
   } __PIR2bits_t;
 
 extern __at(0x0FA1) volatile __PIR2bits_t PIR2bits;
@@ -1825,14 +1825,14 @@ extern __at(0x0FA2) __sfr IPR2;
 
 typedef struct
   {
-                unsigned                : 1;
-                unsigned TMR3IP         : 1;
-                unsigned USBIP          : 1;
-                unsigned BCLIP          : 1;
-                unsigned EEIP           : 1;
-                unsigned C2IP           : 1;
-                unsigned C1IP           : 1;
-                unsigned OSCFIP         : 1;
+  unsigned                      : 1;
+  unsigned TMR3IP               : 1;
+  unsigned USBIP                : 1;
+  unsigned BCLIP                : 1;
+  unsigned EEIP                 : 1;
+  unsigned C2IP                 : 1;
+  unsigned C1IP                 : 1;
+  unsigned OSCFIP               : 1;
   } __IPR2bits_t;
 
 extern __at(0x0FA2) volatile __IPR2bits_t IPR2bits;
@@ -1855,14 +1855,14 @@ extern __at(0x0FA6) __sfr EECON1;
 
 typedef struct
   {
-                unsigned RD             : 1;
-                unsigned WR             : 1;
-                unsigned WREN           : 1;
-                unsigned WRERR          : 1;
-                unsigned FREE           : 1;
-                unsigned                : 1;
-                unsigned CFGS           : 1;
-                unsigned EEPGD          : 1;
+  unsigned RD                   : 1;
+  unsigned WR                   : 1;
+  unsigned WREN                 : 1;
+  unsigned WRERR                : 1;
+  unsigned FREE                 : 1;
+  unsigned                      : 1;
+  unsigned CFGS                 : 1;
+  unsigned EEPGD                : 1;
   } __EECON1bits_t;
 
 extern __at(0x0FA6) volatile __EECON1bits_t EECON1bits;
@@ -1887,14 +1887,14 @@ extern __at(0x0FA9) __sfr EEADR;
 
 typedef struct
   {
-                unsigned EEADR0         : 1;
-                unsigned EEADR1         : 1;
-                unsigned EEADR2         : 1;
-                unsigned EEADR3         : 1;
-                unsigned EEADR4         : 1;
-                unsigned EEADR5         : 1;
-                unsigned EEADR6         : 1;
-                unsigned EEADR7         : 1;
+  unsigned EEADR0               : 1;
+  unsigned EEADR1               : 1;
+  unsigned EEADR2               : 1;
+  unsigned EEADR3               : 1;
+  unsigned EEADR4               : 1;
+  unsigned EEADR5               : 1;
+  unsigned EEADR6               : 1;
+  unsigned EEADR7               : 1;
   } __EEADRbits_t;
 
 extern __at(0x0FA9) volatile __EEADRbits_t EEADRbits;
@@ -1920,27 +1920,27 @@ typedef union
   {
   struct
     {
-                unsigned RX9D           : 1;
-                unsigned OERR           : 1;
-                unsigned FERR           : 1;
-                unsigned ADDEN          : 1;
-                unsigned CREN           : 1;
-                unsigned SREN           : 1;
-                unsigned RX9            : 1;
-                unsigned SPEN           : 1;
-        };
+    unsigned RX9D               : 1;
+    unsigned OERR               : 1;
+    unsigned FERR               : 1;
+    unsigned ADDEN              : 1;
+    unsigned CREN               : 1;
+    unsigned SREN               : 1;
+    unsigned RX9                : 1;
+    unsigned SPEN               : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned ADEN           : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned ADEN               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __RCSTAbits_t;
 
 extern __at(0x0FAB) volatile __RCSTAbits_t RCSTAbits;
@@ -1965,14 +1965,14 @@ extern __at(0x0FAC) __sfr TXSTA;
 
 typedef struct
   {
-                unsigned TX9D           : 1;
-                unsigned TRMT           : 1;
-                unsigned BRGH           : 1;
-                unsigned SENDB          : 1;
-                unsigned SYNC           : 1;
-                unsigned TXEN           : 1;
-                unsigned TX9            : 1;
-                unsigned CSRC           : 1;
+  unsigned TX9D                 : 1;
+  unsigned TRMT                 : 1;
+  unsigned BRGH                 : 1;
+  unsigned SENDB                : 1;
+  unsigned SYNC                 : 1;
+  unsigned TXEN                 : 1;
+  unsigned TX9                  : 1;
+  unsigned CSRC                 : 1;
   } __TXSTAbits_t;
 
 extern __at(0x0FAC) volatile __TXSTAbits_t TXSTAbits;
@@ -2002,27 +2002,27 @@ typedef union
   {
   struct
     {
-                unsigned TMR3ON         : 1;
-                unsigned TMR3CS         : 1;
+    unsigned TMR3ON             : 1;
+    unsigned TMR3CS             : 1;
     unsigned NOT_T3SYNC         : 1;
-                unsigned T3CCP1         : 1;
-                unsigned T3CKPS0        : 1;
-                unsigned T3CKPS1        : 1;
-                unsigned                : 1;
-                unsigned RD16           : 1;
-        };
+    unsigned T3CCP1             : 1;
+    unsigned T3CKPS0            : 1;
+    unsigned T3CKPS1            : 1;
+    unsigned                    : 1;
+    unsigned RD16               : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
     unsigned T3SYNC             : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -2058,15 +2058,15 @@ typedef union
   {
   struct
     {
-                unsigned PSSBD0         : 1;
-                unsigned PSSBD1         : 1;
-                unsigned PSSAC0         : 1;
-                unsigned PSSAC1         : 1;
-                unsigned ECCPAS0        : 1;
-                unsigned ECCPAS1        : 1;
-                unsigned ECCPAS2        : 1;
-                unsigned ECCPASE        : 1;
-        };
+    unsigned PSSBD0             : 1;
+    unsigned PSSBD1             : 1;
+    unsigned PSSAC0             : 1;
+    unsigned PSSAC1             : 1;
+    unsigned ECCPAS0            : 1;
+    unsigned ECCPAS1            : 1;
+    unsigned ECCPAS2            : 1;
+    unsigned ECCPASE            : 1;
+    };
 
   struct
     {
@@ -2112,15 +2112,15 @@ typedef union
   {
   struct
     {
-                unsigned PDC0           : 1;
-                unsigned PDC1           : 1;
-                unsigned PDC2           : 1;
-                unsigned PDC3           : 1;
-                unsigned PDC4           : 1;
-                unsigned PDC5           : 1;
-                unsigned PDC6           : 1;
-                unsigned PRSEN          : 1;
-        };
+    unsigned PDC0               : 1;
+    unsigned PDC1               : 1;
+    unsigned PDC2               : 1;
+    unsigned PDC3               : 1;
+    unsigned PDC4               : 1;
+    unsigned PDC5               : 1;
+    unsigned PDC6               : 1;
+    unsigned PRSEN              : 1;
+    };
 
   struct
     {
@@ -2152,27 +2152,27 @@ typedef union
   {
   struct
     {
-                unsigned ABDEN          : 1;
-                unsigned WUE            : 1;
-                unsigned                : 1;
-                unsigned BRG16          : 1;
-                unsigned CKTXP          : 1;
-                unsigned DTRXP          : 1;
-                unsigned RCIDL          : 1;
-                unsigned ABDOVF         : 1;
-        };
+    unsigned ABDEN              : 1;
+    unsigned WUE                : 1;
+    unsigned                    : 1;
+    unsigned BRG16              : 1;
+    unsigned CKTXP              : 1;
+    unsigned DTRXP              : 1;
+    unsigned RCIDL              : 1;
+    unsigned ABDOVF             : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned SCKP           : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned SCKP               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __BAUDCONbits_t;
 
 extern __at(0x0FB8) volatile __BAUDCONbits_t BAUDCONbits;
@@ -2198,27 +2198,27 @@ typedef union
   {
   struct
     {
-                unsigned ABDEN          : 1;
-                unsigned WUE            : 1;
-                unsigned                : 1;
-                unsigned BRG16          : 1;
-                unsigned CKTXP          : 1;
-                unsigned DTRXP          : 1;
-                unsigned RCIDL          : 1;
-                unsigned ABDOVF         : 1;
-        };
+    unsigned ABDEN              : 1;
+    unsigned WUE                : 1;
+    unsigned                    : 1;
+    unsigned BRG16              : 1;
+    unsigned CKTXP              : 1;
+    unsigned DTRXP              : 1;
+    unsigned RCIDL              : 1;
+    unsigned ABDOVF             : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned SCKP           : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned SCKP               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __BAUDCTLbits_t;
 
 extern __at(0x0FB8) volatile __BAUDCTLbits_t BAUDCTLbits;
@@ -2242,14 +2242,14 @@ extern __at(0x0FB9) __sfr PSTRCON;
 
 typedef struct
   {
-                unsigned STRA           : 1;
-                unsigned STRB           : 1;
-                unsigned STRC           : 1;
-                unsigned STRD           : 1;
-                unsigned STRSYNC        : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned STRA                 : 1;
+  unsigned STRB                 : 1;
+  unsigned STRC                 : 1;
+  unsigned STRD                 : 1;
+  unsigned STRSYNC              : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __PSTRCONbits_t;
 
 extern __at(0x0FB9) volatile __PSTRCONbits_t PSTRCONbits;
@@ -2279,8 +2279,8 @@ typedef union
     unsigned FVR1S0             : 1;
     unsigned FVR1S1             : 1;
     unsigned FVR1ST             : 1;
-                unsigned FVR1EN         : 1;
-        };
+    unsigned FVR1EN             : 1;
+    };
 
   struct
     {
@@ -2311,13 +2311,13 @@ typedef union
     {
     unsigned                    : 1;
     unsigned                    : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned FVR1S0         : 1;
-                unsigned FVR1S1         : 1;
-                unsigned FVR1ST         : 1;
-                unsigned FVR1EN         : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned FVR1S0             : 1;
+    unsigned FVR1S1             : 1;
+    unsigned FVR1ST             : 1;
+    unsigned FVR1EN             : 1;
+    };
 
   struct
     {
@@ -2346,15 +2346,15 @@ typedef union
   {
   struct
     {
-                unsigned D1NSS          : 1;
-                unsigned                : 1;
-                unsigned D1PSS0         : 1;
-                unsigned D1PSS1         : 1;
-                unsigned                : 1;
-                unsigned DAC1OE         : 1;
-                unsigned D1LPS          : 1;
-                unsigned D1EN           : 1;
-        };
+    unsigned D1NSS              : 1;
+    unsigned                    : 1;
+    unsigned D1PSS0             : 1;
+    unsigned D1PSS1             : 1;
+    unsigned                    : 1;
+    unsigned DAC1OE             : 1;
+    unsigned D1LPS              : 1;
+    unsigned D1EN               : 1;
+    };
 
   struct
     {
@@ -2385,15 +2385,15 @@ typedef union
   {
   struct
     {
-                unsigned D1NSS          : 1;
-                unsigned                : 1;
-                unsigned D1PSS0         : 1;
-                unsigned D1PSS1         : 1;
-                unsigned                : 1;
-                unsigned DAC1OE         : 1;
-                unsigned D1LPS          : 1;
-                unsigned D1EN           : 1;
-        };
+    unsigned D1NSS              : 1;
+    unsigned                    : 1;
+    unsigned D1PSS0             : 1;
+    unsigned D1PSS1             : 1;
+    unsigned                    : 1;
+    unsigned DAC1OE             : 1;
+    unsigned D1LPS              : 1;
+    unsigned D1EN               : 1;
+    };
 
   struct
     {
@@ -2424,15 +2424,15 @@ typedef union
   {
   struct
     {
-                unsigned DAC1R0         : 1;
-                unsigned DAC1R1         : 1;
-                unsigned DAC1R2         : 1;
-                unsigned DAC1R3         : 1;
-                unsigned DAC1R4         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned DAC1R0             : 1;
+    unsigned DAC1R1             : 1;
+    unsigned DAC1R2             : 1;
+    unsigned DAC1R3             : 1;
+    unsigned DAC1R4             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -2461,15 +2461,15 @@ typedef union
   {
   struct
     {
-                unsigned DAC1R0         : 1;
-                unsigned DAC1R1         : 1;
-                unsigned DAC1R2         : 1;
-                unsigned DAC1R3         : 1;
-                unsigned DAC1R4         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned DAC1R0             : 1;
+    unsigned DAC1R1             : 1;
+    unsigned DAC1R2             : 1;
+    unsigned DAC1R3             : 1;
+    unsigned DAC1R4             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -2498,15 +2498,15 @@ typedef union
   {
   struct
     {
-                unsigned CCP1M0         : 1;
-                unsigned CCP1M1         : 1;
-                unsigned CCP1M2         : 1;
-                unsigned CCP1M3         : 1;
-                unsigned DC1B0          : 1;
-                unsigned DC1B1          : 1;
-                unsigned P1M0           : 1;
-                unsigned P1M1           : 1;
-        };
+    unsigned CCP1M0             : 1;
+    unsigned CCP1M1             : 1;
+    unsigned CCP1M2             : 1;
+    unsigned CCP1M3             : 1;
+    unsigned DC1B0              : 1;
+    unsigned DC1B1              : 1;
+    unsigned P1M0               : 1;
+    unsigned P1M1               : 1;
+    };
 
   struct
     {
@@ -2554,15 +2554,15 @@ typedef union
   {
   struct
     {
-                unsigned ADCS0          : 1;
-                unsigned ADCS1          : 1;
-                unsigned ADCS2          : 1;
-                unsigned ACQT0          : 1;
-                unsigned ACQT1          : 1;
-                unsigned ACQT2          : 1;
-                unsigned                : 1;
-                unsigned ADFM           : 1;
-        };
+    unsigned ADCS0              : 1;
+    unsigned ADCS1              : 1;
+    unsigned ADCS2              : 1;
+    unsigned ACQT0              : 1;
+    unsigned ACQT1              : 1;
+    unsigned ACQT2              : 1;
+    unsigned                    : 1;
+    unsigned ADFM               : 1;
+    };
 
   struct
     {
@@ -2600,15 +2600,15 @@ typedef union
   {
   struct
     {
-                unsigned NVCFG0         : 1;
-                unsigned NVCFG1         : 1;
-                unsigned PVCFG0         : 1;
-                unsigned PVCFG1         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned NVCFG0             : 1;
+    unsigned NVCFG1             : 1;
+    unsigned PVCFG0             : 1;
+    unsigned PVCFG1             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -2643,15 +2643,15 @@ typedef union
   {
   struct
     {
-                unsigned ADON           : 1;
+    unsigned ADON               : 1;
     unsigned GO_NOT_DONE        : 1;
-                unsigned CHS0           : 1;
-                unsigned CHS1           : 1;
-                unsigned CHS2           : 1;
-                unsigned CHS3           : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned CHS0               : 1;
+    unsigned CHS1               : 1;
+    unsigned CHS2               : 1;
+    unsigned CHS3               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -2667,39 +2667,39 @@ typedef union
 
   struct
     {
-                unsigned                : 1;
-                unsigned DONE           : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned DONE               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned NOT_DONE       : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned NOT_DONE           : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned GO_DONE        : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned GO_DONE            : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -2735,14 +2735,14 @@ extern __at(0x0FC5) __sfr SSPCON2;
 
 typedef struct
   {
-                unsigned SEN            : 1;
-                unsigned RSEN           : 1;
-                unsigned PEN            : 1;
-                unsigned RCEN           : 1;
-                unsigned ACKEN          : 1;
-                unsigned ACKDT          : 1;
-                unsigned ACKSTAT        : 1;
-                unsigned GCEN           : 1;
+  unsigned SEN                  : 1;
+  unsigned RSEN                 : 1;
+  unsigned PEN                  : 1;
+  unsigned RCEN                 : 1;
+  unsigned ACKEN                : 1;
+  unsigned ACKDT                : 1;
+  unsigned ACKSTAT              : 1;
+  unsigned GCEN                 : 1;
   } __SSPCON2bits_t;
 
 extern __at(0x0FC5) volatile __SSPCON2bits_t SSPCON2bits;
@@ -2768,15 +2768,15 @@ typedef union
   {
   struct
     {
-                unsigned SSPM0          : 1;
-                unsigned SSPM1          : 1;
-                unsigned SSPM2          : 1;
-                unsigned SSPM3          : 1;
-                unsigned CKP            : 1;
-                unsigned SSPEN          : 1;
-                unsigned SSPOV          : 1;
-                unsigned WCOL           : 1;
-        };
+    unsigned SSPM0              : 1;
+    unsigned SSPM1              : 1;
+    unsigned SSPM2              : 1;
+    unsigned SSPM3              : 1;
+    unsigned CKP                : 1;
+    unsigned SSPEN              : 1;
+    unsigned SSPOV              : 1;
+    unsigned WCOL               : 1;
+    };
 
   struct
     {
@@ -2808,15 +2808,15 @@ typedef union
   {
   struct
     {
-                unsigned BF             : 1;
-                unsigned UA             : 1;
+    unsigned BF                 : 1;
+    unsigned UA                 : 1;
     unsigned R_NOT_W            : 1;
-                unsigned S              : 1;
-                unsigned P              : 1;
+    unsigned S                  : 1;
+    unsigned P                  : 1;
     unsigned D_NOT_A            : 1;
-                unsigned CKE            : 1;
-                unsigned SMP            : 1;
-        };
+    unsigned CKE                : 1;
+    unsigned SMP                : 1;
+    };
 
   struct
     {
@@ -2832,39 +2832,39 @@ typedef union
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned NOT_W          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned NOT_A          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned NOT_W              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned NOT_A              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned R_W            : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned D_A            : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned R_W                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned D_A                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned NOT_WRITE      : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned NOT_ADDRESS    : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned NOT_WRITE          : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned NOT_ADDRESS        : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __SSPSTATbits_t;
 
 extern __at(0x0FC7) volatile __SSPSTATbits_t SSPSTATbits;
@@ -2900,15 +2900,15 @@ typedef union
   {
   struct
     {
-                unsigned T2CKPS0        : 1;
-                unsigned T2CKPS1        : 1;
-                unsigned TMR2ON         : 1;
-                unsigned T2OUTPS0       : 1;
-                unsigned T2OUTPS1       : 1;
-                unsigned T2OUTPS2       : 1;
-                unsigned T2OUTPS3       : 1;
-                unsigned                : 1;
-        };
+    unsigned T2CKPS0            : 1;
+    unsigned T2CKPS1            : 1;
+    unsigned TMR2ON             : 1;
+    unsigned T2OUTPS0           : 1;
+    unsigned T2OUTPS1           : 1;
+    unsigned T2OUTPS2           : 1;
+    unsigned T2OUTPS3           : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -2948,27 +2948,27 @@ typedef union
   {
   struct
     {
-                unsigned TMR1ON         : 1;
-                unsigned TMR1CS         : 1;
+    unsigned TMR1ON             : 1;
+    unsigned TMR1CS             : 1;
     unsigned NOT_T1SYNC         : 1;
-                unsigned T1OSCEN        : 1;
-                unsigned T1CKPS0        : 1;
-                unsigned T1CKPS1        : 1;
-                unsigned T1RUN          : 1;
-                unsigned RD16           : 1;
-        };
+    unsigned T1OSCEN            : 1;
+    unsigned T1CKPS0            : 1;
+    unsigned T1CKPS1            : 1;
+    unsigned T1RUN              : 1;
+    unsigned RD16               : 1;
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
     unsigned T1SYNC             : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
@@ -3017,15 +3017,15 @@ typedef union
 
   struct
     {
-                unsigned BOR            : 1;
-                unsigned POR            : 1;
-                unsigned PD             : 1;
-                unsigned TO             : 1;
-                unsigned RI             : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned BOR                : 1;
+    unsigned POR                : 1;
+    unsigned PD                 : 1;
+    unsigned TO                 : 1;
+    unsigned RI                 : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __RCONbits_t;
 
 extern __at(0x0FD0) volatile __RCONbits_t RCONbits;
@@ -3055,27 +3055,27 @@ typedef union
   {
   struct
     {
-                unsigned SWDTEN         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned SWDTEN             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
 
   struct
     {
-                unsigned SWDTE          : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-        };
+    unsigned SWDTE              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __WDTCONbits_t;
 
 extern __at(0x0FD1) volatile __WDTCONbits_t WDTCONbits;
@@ -3093,14 +3093,14 @@ extern __at(0x0FD2) __sfr OSCCON2;
 
 typedef struct
   {
-                unsigned LFIOFS         : 1;
-                unsigned HFIOFL         : 1;
-                unsigned PRI_SD         : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned LFIOFS               : 1;
+  unsigned HFIOFL               : 1;
+  unsigned PRI_SD               : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __OSCCON2bits_t;
 
 extern __at(0x0FD2) volatile __OSCCON2bits_t OSCCON2bits;
@@ -3121,15 +3121,15 @@ typedef union
   {
   struct
     {
-                unsigned SCS0           : 1;
-                unsigned SCS1           : 1;
-                unsigned IOFS           : 1;
-                unsigned OSTS           : 1;
-                unsigned IRCF0          : 1;
-                unsigned IRCF1          : 1;
-                unsigned IRCF2          : 1;
-                unsigned IDLEN          : 1;
-        };
+    unsigned SCS0               : 1;
+    unsigned SCS1               : 1;
+    unsigned IOFS               : 1;
+    unsigned OSTS               : 1;
+    unsigned IRCF0              : 1;
+    unsigned IRCF1              : 1;
+    unsigned IRCF2              : 1;
+    unsigned IDLEN              : 1;
+    };
 
   struct
     {
@@ -3168,15 +3168,15 @@ typedef union
   {
   struct
     {
-                unsigned T0PS0          : 1;
-                unsigned T0PS1          : 1;
-                unsigned T0PS2          : 1;
-                unsigned PSA            : 1;
-                unsigned T0SE           : 1;
-                unsigned T0CS           : 1;
-                unsigned T08BIT         : 1;
-                unsigned TMR0ON         : 1;
-        };
+    unsigned T0PS0              : 1;
+    unsigned T0PS1              : 1;
+    unsigned T0PS2              : 1;
+    unsigned PSA                : 1;
+    unsigned T0SE               : 1;
+    unsigned T0CS               : 1;
+    unsigned T08BIT             : 1;
+    unsigned TMR0ON             : 1;
+    };
 
   struct
     {
@@ -3209,14 +3209,14 @@ extern __at(0x0FD8) __sfr STATUS;
 
 typedef struct
   {
-                unsigned C              : 1;
-                unsigned DC             : 1;
-                unsigned Z              : 1;
-                unsigned OV             : 1;
-                unsigned N              : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+  unsigned C                    : 1;
+  unsigned DC                   : 1;
+  unsigned Z                    : 1;
+  unsigned OV                   : 1;
+  unsigned N                    : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __STATUSbits_t;
 
 extern __at(0x0FD8) volatile __STATUSbits_t STATUSbits;
@@ -3274,15 +3274,15 @@ typedef union
 
   struct
     {
-                unsigned INT1F          : 1;
-                unsigned INT2F          : 1;
-                unsigned                : 1;
-                unsigned INT1E          : 1;
-                unsigned INT2E          : 1;
-                unsigned                : 1;
-                unsigned INT1P          : 1;
-                unsigned INT2P          : 1;
-        };
+    unsigned INT1F              : 1;
+    unsigned INT2F              : 1;
+    unsigned                    : 1;
+    unsigned INT1E              : 1;
+    unsigned INT2E              : 1;
+    unsigned                    : 1;
+    unsigned INT1P              : 1;
+    unsigned INT2P              : 1;
+    };
   } __INTCON3bits_t;
 
 extern __at(0x0FF0) volatile __INTCON3bits_t INTCON3bits;
@@ -3312,27 +3312,27 @@ typedef union
   {
   struct
     {
-                unsigned RABIP          : 1;
-                unsigned                : 1;
-                unsigned TMR0IP         : 1;
-                unsigned                : 1;
-                unsigned INTEDG2        : 1;
-                unsigned INTEDG1        : 1;
-                unsigned INTEDG0        : 1;
+    unsigned RABIP              : 1;
+    unsigned                    : 1;
+    unsigned TMR0IP             : 1;
+    unsigned                    : 1;
+    unsigned INTEDG2            : 1;
+    unsigned INTEDG1            : 1;
+    unsigned INTEDG0            : 1;
     unsigned NOT_RABPU          : 1;
-        };
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
     unsigned RABPU              : 1;
-        };
+    };
   } __INTCON2bits_t;
 
 extern __at(0x0FF1) volatile __INTCON2bits_t INTCON2bits;
@@ -3357,24 +3357,24 @@ typedef union
   {
   struct
     {
-                unsigned RABIF          : 1;
+    unsigned RABIF              : 1;
     unsigned INT0IF             : 1;
-                unsigned TMR0IF         : 1;
-                unsigned RABIE          : 1;
+    unsigned TMR0IF             : 1;
+    unsigned RABIE              : 1;
     unsigned INT0IE             : 1;
-                unsigned TMR0IE         : 1;
+    unsigned TMR0IE             : 1;
     unsigned PEIE_GIEL          : 1;
     unsigned GIE_GIEH           : 1;
-        };
+    };
 
   struct
     {
-                unsigned                : 1;
+    unsigned                    : 1;
     unsigned INT0F              : 1;
-                unsigned T0IF           : 1;
-                unsigned                : 1;
+    unsigned T0IF               : 1;
+    unsigned                    : 1;
     unsigned INT0E              : 1;
-                unsigned T0IE           : 1;
+    unsigned T0IE               : 1;
     unsigned PEIE               : 1;
     unsigned GIE                : 1;
     };
@@ -3387,9 +3387,9 @@ typedef union
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
-                unsigned GIEL           : 1;
-                unsigned GIEH           : 1;
-        };
+    unsigned GIEL               : 1;
+    unsigned GIEH               : 1;
+    };
   } __INTCONbits_t;
 
 extern __at(0x0FF2) volatile __INTCONbits_t INTCONbits;
@@ -3435,27 +3435,27 @@ typedef union
   {
   struct
     {
-                unsigned SP0            : 1;
-                unsigned SP1            : 1;
-                unsigned SP2            : 1;
-                unsigned SP3            : 1;
-                unsigned SP4            : 1;
-                unsigned                : 1;
-                unsigned STKUNF         : 1;
+    unsigned SP0                : 1;
+    unsigned SP1                : 1;
+    unsigned SP2                : 1;
+    unsigned SP3                : 1;
+    unsigned SP4                : 1;
+    unsigned                    : 1;
+    unsigned STKUNF             : 1;
     unsigned STKFUL             : 1;
-        };
+    };
 
   struct
     {
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
-                unsigned                : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
     unsigned STKOVF             : 1;
-        };
+    };
 
   struct
     {
@@ -3643,6 +3643,5 @@ extern __at(0x0FFF) __sfr TOSU;
 #define __IDLOC5                0x200005
 #define __IDLOC6                0x200006
 #define __IDLOC7                0x200007
-
 
 #endif // #ifndef __PIC18F14K50_H__

@@ -2,9 +2,9 @@
  * This declarations of the PIC16C62 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <proton7@freemail.hu> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:19:45 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:29:50 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -27,48 +27,48 @@
 
 //==============================================================================
 //
-//      Register Addresses
+//	Register Addresses
 //
 //==============================================================================
 
 #ifndef NO_ADDR_DEFINES
 
-#define INDF_ADDR       0x0000
-#define TMR0_ADDR       0x0001
-#define PCL_ADDR        0x0002
-#define STATUS_ADDR     0x0003
-#define FSR_ADDR        0x0004
-#define PORTA_ADDR      0x0005
-#define PORTB_ADDR      0x0006
-#define PORTC_ADDR      0x0007
-#define PCLATH_ADDR     0x000A
-#define INTCON_ADDR     0x000B
-#define PIR1_ADDR       0x000C
-#define TMR1L_ADDR      0x000E
-#define TMR1H_ADDR      0x000F
-#define T1CON_ADDR      0x0010
-#define TMR2_ADDR       0x0011
-#define T2CON_ADDR      0x0012
-#define SSPBUF_ADDR     0x0013
-#define SSPCON_ADDR     0x0014
-#define CCPR1L_ADDR     0x0015
-#define CCPR1H_ADDR     0x0016
-#define CCP1CON_ADDR    0x0017
-#define OPTION_REG_ADDR 0x0081
-#define TRISA_ADDR      0x0085
-#define TRISB_ADDR      0x0086
-#define TRISC_ADDR      0x0087
-#define PIE1_ADDR       0x008C
-#define PCON_ADDR       0x008E
-#define PR2_ADDR        0x0092
-#define SSPADD_ADDR     0x0093
-#define SSPSTAT_ADDR    0x0094
+#define INDF_ADDR               0x0000
+#define TMR0_ADDR               0x0001
+#define PCL_ADDR                0x0002
+#define STATUS_ADDR             0x0003
+#define FSR_ADDR                0x0004
+#define PORTA_ADDR              0x0005
+#define PORTB_ADDR              0x0006
+#define PORTC_ADDR              0x0007
+#define PCLATH_ADDR             0x000A
+#define INTCON_ADDR             0x000B
+#define PIR1_ADDR               0x000C
+#define TMR1L_ADDR              0x000E
+#define TMR1H_ADDR              0x000F
+#define T1CON_ADDR              0x0010
+#define TMR2_ADDR               0x0011
+#define T2CON_ADDR              0x0012
+#define SSPBUF_ADDR             0x0013
+#define SSPCON_ADDR             0x0014
+#define CCPR1L_ADDR             0x0015
+#define CCPR1H_ADDR             0x0016
+#define CCP1CON_ADDR            0x0017
+#define OPTION_REG_ADDR         0x0081
+#define TRISA_ADDR              0x0085
+#define TRISB_ADDR              0x0086
+#define TRISC_ADDR              0x0087
+#define PIE1_ADDR               0x008C
+#define PCON_ADDR               0x008E
+#define PR2_ADDR                0x0092
+#define SSPADD_ADDR             0x0093
+#define SSPSTAT_ADDR            0x0094
 
 #endif // #ifndef NO_ADDR_DEFINES
 
 //==============================================================================
 //
-//       Register Definitions
+//	Register Definitions
 //
 //==============================================================================
 
@@ -559,18 +559,18 @@ extern __at(0x0094) volatile __SSPSTATbits_t SSPSTATbits;
 
 //----------------------------- CONFIG1 Options -------------------------------
 
-#define _CP_ALL              0x3F8F
-#define _CP_75               0x3F9F
-#define _CP_50               0x3FAF
-#define _CP_OFF              0x3FBF
-#define _PWRTE_ON            0x3FBF
-#define _PWRTE_OFF           0x3FB7
-#define _WDT_ON              0x3FBF
-#define _WDT_OFF             0x3FBB
-#define _LP_OSC              0x3FBC
-#define _XT_OSC              0x3FBD
-#define _HS_OSC              0x3FBE
-#define _RC_OSC              0x3FBF
+#define _CP_ALL                 0x3F8F  
+#define _CP_75                  0x3F9F  
+#define _CP_50                  0x3FAF  
+#define _CP_OFF                 0x3FBF  
+#define _PWRTE_ON               0x3FBF  
+#define _PWRTE_OFF              0x3FB7  
+#define _WDT_ON                 0x3FBF  
+#define _WDT_OFF                0x3FBB  
+#define _LP_OSC                 0x3FBC  
+#define _XT_OSC                 0x3FBD  
+#define _HS_OSC                 0x3FBE  
+#define _RC_OSC                 0x3FBF  
 
 //==============================================================================
 

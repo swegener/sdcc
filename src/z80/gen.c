@@ -11115,6 +11115,15 @@ setupForMemset (const iCode *ic, const operand *dst, const operand *c, bool dire
 
       regMove (larray, oparray, 3, FALSE);
     }
+  else if (AOP_TYPE (c) == AOP_REG && requiresHL (AOP (c)))
+    {
+      cheapMove (ASMOP_A, 0, AOP (c), 0);
+      if (AOP_TYPE (dst) == AOP_EXSTK)
+        _push (PAIR_AF);
+      fetchPair (PAIR_HL, AOP (dst));
+      if (AOP_TYPE (dst) == AOP_EXSTK)
+        _pop (PAIR_AF);
+    }
   else
     {
       fetchPair (PAIR_HL, AOP (dst));

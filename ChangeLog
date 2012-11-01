@@ -2,6 +2,8 @@
 
 	* src/z80/ralloc2.cc:
 	  Fix non-destructive bitwise and with single-bit literal for extended stack operands.
+	* src/z80/gen.c:
+	  Fix built-in memset() for argument c in register pair hl.
 
 2012-11-01 Molnar Karoly <molnarkaroly AT users.sf.net>
 

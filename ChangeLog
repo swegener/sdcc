@@ -1,3 +1,8 @@
+2012-11-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc2.cc:
+	  Fix non-destructive bitwise and with single-bit literal for extended stack operands.
+
 2012-11-01 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/non-free/include/pic14/pic1*.h,

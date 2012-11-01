@@ -483,6 +483,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
             }
           
           // Here, v is a variable that survives cfg[i].
+          // TODO: Check if we can use v, ++v2 instead of cfg[i].alive.begin() to speed things up.
           for (v2 = cfg[i].alive.begin(), v2_end = cfg[i].alive.end(); v2 != v2_end; ++v2)
             if(*v != *v2)
               boost::add_edge(*v, *v2, con);
@@ -491,7 +492,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
             ;
         }
     }
-  
+
   return(start_ic);
 }
 

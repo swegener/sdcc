@@ -1,3 +1,8 @@
+2012-11-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c:
+	  Fix long left shift for result in a permutation of left registers.
+
 2012-10-31 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asxxxsrc/asout.c (outdp): oops, forgot to commit this

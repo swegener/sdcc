@@ -561,7 +561,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
           if (byte != 0x00 && byte != 0x01 && byte != 0x02 && byte != 0x04 && byte != 0x08 && byte != 0x10 && byte != 0x20 && byte != 0x40 && byte != 0x80)
             goto nobit;
         }
-      //std::cout << "tst Accepting at " << i << ", " << ic->key << "(" << int(ic->op) << ")\n";
       return(true);
     }
   nobit:
@@ -572,7 +571,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     operand_in_reg(right, REG_A, ia, i, G) && (IS_OP_LITERAL(left) /*|| operand_in_reg(left, ia, i, G) && !operand_in_reg(left, REG_IYL, ia, i, G) && !operand_in_reg(left, REG_IYH, ia, i, G)*/)))
     {
       operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
-      //std::cout << "tst: Accepting at " << i << ", " << ic->key << "(" << int(ic->op) << ")\n";
       return(true);
     }
 

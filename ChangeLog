@@ -1,5 +1,9 @@
 2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
 
+	* doc/sdccman.lyx: Added new pic18f97j94 family.
+
+2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/cinc2h.pl,
 	  support/scripts/pic14-header-parser.pl,
 	  support/scripts/pic16-header-parser.pl: Toggle execution flag.

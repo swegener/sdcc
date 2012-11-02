@@ -7,7 +7,7 @@
 # style of ADC, USART and SSP programming for use in the SDCC PIC14 I/O library.
 #
 # Copyright 2010 Raphael Neider <rneider AT web.de>
-# Very modified and expanded to the pic14 series: Molnár Károly, 2012 <proton7@freemail.hu>
+# Very modified and expanded to the pic14 series: Molnár Károly, 2012 <molnarkaroly@users.sf.net>
 #
 # This file is part of SDCC.
 # 

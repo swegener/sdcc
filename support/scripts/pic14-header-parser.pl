@@ -2,7 +2,7 @@
 
 =back
 
-  Copyright (C) 2012, Molnar Karoly <proton7@freemail.hu>
+  Copyright (C) 2012 Molnar Karoly <molnarkaroly@users.sf.net>
 
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the

@@ -1,5 +1,12 @@
 2012-11-01 Molnar Karoly <molnarkaroly AT users.sf.net>
 
+	* support/scripts/cinc2h.pl: Changed option "-c" onto "-o".
+	* support/scripts/pic14-header-parser.pl,
+	  support/scripts/pic16-header-parser.pl,
+	  support/scripts/pic16fam-h-gen.pl: Updated my email address.
+
+2012-11-01 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/include/pic16/pic16devices.txt,
 	  device/include/pic16/pic18fregs.h,
 	  device/lib/pic16/libio/Makefile.am,
@@ -34,7 +41,6 @@
 	  device/non-free/lib/pic16/libdev/pic18f96j99.c,
 	  device/non-free/lib/pic16/libdev/pic18f97j94.c,
 	  device/non-free/lib/pic16/pics.all: Support for new devices.
-	* support/scripts/optimize_pic16devices.pl: Changed option "-c" to "-o".
 
 2012-11-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

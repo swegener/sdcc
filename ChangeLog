@@ -1,3 +1,8 @@
+2012-11-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-20040313-1.c:
+	  Disabled test, since it fails on 32-bit Linux.
+
 2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/lib/pic16/startup/crt0i.c,

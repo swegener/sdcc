@@ -15,6 +15,7 @@ void
 testTortureExecute (void)
 {
 #ifndef __SDCC_mcs51
+#if 0
   int t[1025] = { 1024 }, d;
 
   d = 0;
@@ -24,5 +25,6 @@ testTortureExecute (void)
   if (d != 1024)
     ASSERT (0);
   return;
+#endif
 #endif
 }

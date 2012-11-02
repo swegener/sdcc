@@ -1,5 +1,10 @@
 2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
 
+	* device/lib/pic16/startup/crt0i.c,
+	  device/lib/pic16/startup/crt0iz.c: Was reduced size of the code.
+
+2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* doc/sdccman.lyx: Added new pic18f97j94 family.
 
 2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>

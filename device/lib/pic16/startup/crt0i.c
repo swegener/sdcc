@@ -2,6 +2,7 @@
    crt0i.c - SDCC pic16 port runtime start code with initialisation
 
    Copyright (C) 2004, Vangelis Rokas <vrokas at otenet.gr>
+   Copyright (C) 2012, Molnár Károly <molnarkaroly@users.sf.net>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -24,7 +25,10 @@
    be covered by the GNU General Public License. This exception does
    not however invalidate any other reasons why the executable file
    might be covered by the GNU General Public License.
--------------------------------------------------------------------------*/
+-------------------------------------------------------------------------
+
+  $Id$
+*/
 
 /*
  * based on Microchip MPLAB-C18 startup files
@@ -41,23 +45,22 @@ extern POSTINC0;
 
 
 #if 1
-/* global variable for forcing gplink to add _cinit section */
+/* Global variable for forcing gplink to add _cinit section. */
 char __uflags = 0;
 #endif
 
-/* external reference to the user's main routine */
+/* External reference to the user's main routine. */
 extern void main (void);
 
 void _entry (void) __naked __interrupt 0;
 void _startup (void) __naked;
-void _do_cinit (void) __naked;
 
 /* Access bank selector. */
 #define a 0
 
 
 /*
- * entry function, placed at interrupt vector 0 (RESET)
+ * Entry function, placed at interrupt vector 0 (RESET).
  */
 void
 _entry (void) __naked __interrupt 0
@@ -66,6 +69,25 @@ _entry (void) __naked __interrupt 0
     goto    __startup
   __endasm;
 }
+
+/* The cinit table will be filled by the linker. */
+extern __code struct
+  {
+    unsigned short num_init;
+    struct
+      {
+        unsigned long from;
+        unsigned long to;
+        unsigned long size;
+      } entries[1];
+  } cinit;
+
+#define TBLRDPOSTINC	tblrd*+
+
+#define src_ptr		0x00		/* 0x00 0x01 0x02*/
+#define byte_count	0x03		/* 0x03 0x04 */
+#define entry_count	0x05		/* 0x05 0x06 */
+#define entry_ptr	0x07		/* 0x07 0x08 0x09 */
 
 void
 _startup (void) __naked
@@ -82,50 +104,12 @@ _startup (void) __naked
     ; This is harmless for non-flash devices, so we do it on all parts.
     bsf     0xa6, 7, a      ; EECON1.EEPGD = 1, TBLPTR accesses program memory
     bcf     0xa6, 6, a      ; EECON1.CFGS  = 0, TBLPTR accesses program memory
-  __endasm;
 
   /* Initialize global and/or static variables. */
-  _do_cinit ();
 
-  /* Call the main routine. */
-  main ();
-
-  __asm
-lockup:
-    ; Returning from main will lock up.
-    bra     lockup
-  __endasm;
-}
-
-
-/* the cinit table will be filled by the linker */
-extern __code struct
-  {
-    unsigned short num_init;
-    struct
-      {
-        unsigned long from;
-        unsigned long to;
-        unsigned long size;
-      } entries[1];
-  } cinit;
-
-
-#define TBLRDPOSTINC	tblrd*+
-
-#define prom		0x00		/* 0x00 0x01 0x02*/
-#define curr_byte	0x03		/* 0x03 0x04 */
-#define curr_entry	0x05		/* 0x05 0x06 */
-#define data_ptr	0x07		/* 0x07 0x08 0x09 */
-
-/* the variable initialisation routine */
-void
-_do_cinit (void) __naked
-{
   /*
-   * access registers 0x00 - 0x09 are not saved in this function
+   * Access registers 0x00 - 0x09 are not saved in this code.
    */
-  __asm
     ; TBLPTR = &cinit
     movlw   low(_cinit)
     movwf   _TBLPTRL, a
@@ -134,127 +118,130 @@ _do_cinit (void) __naked
     movlw   upper(_cinit)
     movwf   _TBLPTRU, a
 
-    ; curr_entry = cinit.num_init
+    ; entry_count = cinit.num_init
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   curr_entry, a
+    movff   _TABLAT, entry_count
 
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   curr_entry + 1, a
+    movff   _TABLAT, (entry_count + 1)
 
-    ; while (curr_entry)
-    movf    curr_entry, w, a
-test:
-    bnz     cont1
-    movf    curr_entry + 1, w, a
-    bz      done
+    ; while (entry_count)
 
-cont1:
+    bra	    entry_loop_dec
+
+entry_loop:
+
     ; Count down so we only have to look up the data in _cinit once.
 
     ; At this point we know that TBLPTR points to the top of the current
     ; entry in _cinit, so we can just start reading the from, to, and
     ; size values.
 
-    ; read the source address low
+    ; Read the source address low.
+
+    ; src_ptr = entry_ptr->from; 
+
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   prom, a
+    movff   _TABLAT, src_ptr
 
     ; source address high
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   prom + 1, a
+    movff   _TABLAT, (src_ptr + 1)
 
     ; source address upper
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   prom + 2, a
+    movff   _TABLAT, (src_ptr + 2)
 
-    ; skip a byte since it is stored as a 32bit int
+    ; Skip a byte since it is stored as a 32bit int.
     TBLRDPOSTINC
 
-    ; read the destination address directly into FSR0
-    ; destination address low
+    ; Read the destination address directly into FSR0
+    ; destination address low.
+
+    ; FSR0 = (unsigned short)entry_ptr->to; 
+
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   _FSR0L, a
+    movff   _TABLAT, _FSR0L
 
     ; destination address high
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   _FSR0H, a
+    movff   _TABLAT, _FSR0H
 
-    ; skip two bytes since it is stored as a 32bit int
+    ; Skip two bytes since it is stored as a 32bit int.
     TBLRDPOSTINC
     TBLRDPOSTINC
 
-    ; read the size of data to transfer to destination address
-    TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   curr_byte, a
+    ; Read the size of data to transfer to destination address.
+
+    ; byte_count = (unsigned short)entry_ptr->size; 
 
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   curr_byte + 1, a
+    movff   _TABLAT, byte_count
 
-    ; skip two bytes since it is stored as a 32bit int
+    TBLRDPOSTINC
+    movff   _TABLAT, (byte_count + 1)
+
+    ; Skip two bytes since it is stored as a 32bit int.
     TBLRDPOSTINC
     TBLRDPOSTINC
 
-    ;  prom = data_ptr->from;
-    ;  FSR0 = data_ptr->to;
-    ;  curr_byte = (unsigned short) data_ptr->size;
+    ; src_ptr = entry_ptr->from;
+    ; FSR0 = (unsigned short)entry_ptr->to;
+    ; byte_count = (unsigned short)entry_ptr->size;
 
-    ; the table pointer now points to the next entry. Save it
+    ; The table pointer now points to the next entry. Save it
     ; off since we will be using the table pointer to do the copying
-    ; for the entry
+    ; for the entry.
 
-    ; data_ptr = TBLPTR
-    movff   _TBLPTRL, data_ptr
-    movff   _TBLPTRH, data_ptr + 1
-    movff   _TBLPTRU, data_ptr + 2
+    ; entry_ptr = TBLPTR
+    movff   _TBLPTRL, entry_ptr
+    movff   _TBLPTRH, (entry_ptr + 1)
+    movff   _TBLPTRU, (entry_ptr + 2)
 
-    ; now assign the source address to the table pointer
-    ; TBLPTR = prom
-    movff   prom, _TBLPTRL
-    movff   prom + 1, _TBLPTRH
-    movff   prom + 2, _TBLPTRU
+    ; Now assign the source address to the table pointer.
+    ; TBLPTR = src_ptr
+    movff   src_ptr, _TBLPTRL
+    movff   (src_ptr + 1), _TBLPTRH
+    movff   (src_ptr + 2), _TBLPTRU
+    bra	    copy_loop_dec
 
-    ; while (curr_byte)
-    movf    curr_byte, w, a
 copy_loop:
-    bnz     copy_one_byte
-    movf    curr_byte + 1, w, a
-    bz      done_copying
-
-copy_one_byte:
     TBLRDPOSTINC
-    movf    _TABLAT, w, a
-    movwf   _POSTINC0, a
+    movff   _TABLAT, _POSTINC0
 
-    ; decrement byte counter
-    decf    curr_byte, f, a
+copy_loop_dec:
+    ; while (--byte_count);
+
+    ; Decrement and test the byte counter.
+    ; The cycle ends when the value of counter reaches the -1.
+    decf    byte_count, f, a
     bc      copy_loop
-    decf    curr_byte + 1, f, a
-    bra     copy_one_byte
+    decf    (byte_count + 1), f, a
+    bc      copy_loop
 
-done_copying:
-    ; restore the table pointer for the next entry
-    ; TBLPTR = data_ptr
-    movff   data_ptr, _TBLPTRL
-    movff   data_ptr + 1, _TBLPTRH
-    movff   data_ptr + 2, _TBLPTRU
+    ; Restore the table pointer for the next entry.
+    ; TBLPTR = entry_ptr
+    movff   entry_ptr, _TBLPTRL
+    movff   (entry_ptr + 1), _TBLPTRH
+    movff   (entry_ptr + 2), _TBLPTRU
 
-    ; decrement entry counter
-    decf    curr_entry, f, a
-    bc      test
-    decf    curr_entry + 1, f, a
-    bra     cont1
+entry_loop_dec:
+    ; while (--entry_count);
 
-    ; emit done label
-done:
-    return
+    ; Decrement and test the entry counter.
+    ; The cycle ends when the value of counter reaches the -1.
+    decf    entry_count, f, a
+    bc      entry_loop
+    decf    (entry_count + 1), f, a
+    bc      entry_loop
+  __endasm;
+
+  /* Call the main routine. */
+  main ();
+
+  __asm
+lockup:
+    ; Returning from main will lock up.
+    bra     lockup
   __endasm;
 }

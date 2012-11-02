@@ -1539,6 +1539,10 @@ lib_LIBRARIES += libio18f65j90.a
 libio18f65j90_a_SOURCES = dummy.c
 libio18f65j90_a_CFLAGS = -p18f65j90 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f65j94.a
+libio18f65j94_a_SOURCES = dummy.c
+libio18f65j94_a_CFLAGS = -p18f65j94 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f65k22.a
 libio18f65k22_a_SOURCES = dummy.c
 libio18f65k22_a_CFLAGS = -p18f65k22 $(AM_CFLAGS)
@@ -1703,6 +1707,14 @@ lib_LIBRARIES += libio18f66j93.a
 libio18f66j93_a_SOURCES = dummy.c
 libio18f66j93_a_CFLAGS = -p18f66j93 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f66j94.a
+libio18f66j94_a_SOURCES = dummy.c
+libio18f66j94_a_CFLAGS = -p18f66j94 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f66j99.a
+libio18f66j99_a_SOURCES = dummy.c
+libio18f66j99_a_CFLAGS = -p18f66j99 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f66k22.a
 libio18f66k22_a_SOURCES = dummy.c
 libio18f66k22_a_CFLAGS = -p18f66k22 $(AM_CFLAGS)
@@ -1794,6 +1806,10 @@ libio18f67j90_a_CFLAGS = -p18f67j90 $(AM_CFLAGS)
 lib_LIBRARIES += libio18f67j93.a
 libio18f67j93_a_SOURCES = dummy.c
 libio18f67j93_a_CFLAGS = -p18f67j93 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f67j94.a
+libio18f67j94_a_SOURCES = dummy.c
+libio18f67j94_a_CFLAGS = -p18f67j94 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f67k22.a
 libio18f67k22_a_SOURCES = dummy.c
@@ -1922,6 +1938,10 @@ libio18f85j50_a_CFLAGS = -p18f85j50 $(AM_CFLAGS)
 lib_LIBRARIES += libio18f85j90.a
 libio18f85j90_a_SOURCES = dummy.c
 libio18f85j90_a_CFLAGS = -p18f85j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f85j94.a
+libio18f85j94_a_SOURCES = dummy.c
+libio18f85j94_a_CFLAGS = -p18f85j94 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f85k22.a
 libio18f85k22_a_SOURCES = dummy.c
@@ -2087,6 +2107,14 @@ lib_LIBRARIES += libio18f86j93.a
 libio18f86j93_a_SOURCES = dummy.c
 libio18f86j93_a_CFLAGS = -p18f86j93 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f86j94.a
+libio18f86j94_a_SOURCES = dummy.c
+libio18f86j94_a_CFLAGS = -p18f86j94 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f86j99.a
+libio18f86j99_a_SOURCES = dummy.c
+libio18f86j99_a_CFLAGS = -p18f86j99 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f86k22.a
 libio18f86k22_a_SOURCES = dummy.c
 libio18f86k22_a_CFLAGS = -p18f86k22 $(AM_CFLAGS)
@@ -2179,6 +2207,10 @@ lib_LIBRARIES += libio18f87j93.a
 libio18f87j93_a_SOURCES = dummy.c
 libio18f87j93_a_CFLAGS = -p18f87j93 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f87j94.a
+libio18f87j94_a_SOURCES = dummy.c
+libio18f87j94_a_CFLAGS = -p18f87j94 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f87k22.a
 libio18f87k22_a_SOURCES = dummy.c
 libio18f87k22_a_CFLAGS = -p18f87k22 $(AM_CFLAGS)
@@ -2186,6 +2218,10 @@ libio18f87k22_a_CFLAGS = -p18f87k22 $(AM_CFLAGS)
 lib_LIBRARIES += libio18f87k90.a
 libio18f87k90_a_SOURCES = dummy.c
 libio18f87k90_a_CFLAGS = -p18f87k90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f95j94.a
+libio18f95j94_a_SOURCES = dummy.c
+libio18f95j94_a_CFLAGS = -p18f95j94 $(AM_CFLAGS)
 
 lib_LIBRARIES += libio18f96j60.a
 libio18f96j60_a_SOURCES = dummy.c
@@ -2217,6 +2253,14 @@ libio18f96j65_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f96j65_a_SOURCES += usart/usartd.c
 libio18f96j65_a_CFLAGS = -p18f96j65 $(AM_CFLAGS)
 
+lib_LIBRARIES += libio18f96j94.a
+libio18f96j94_a_SOURCES = dummy.c
+libio18f96j94_a_CFLAGS = -p18f96j94 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f96j99.a
+libio18f96j99_a_SOURCES = dummy.c
+libio18f96j99_a_CFLAGS = -p18f96j99 $(AM_CFLAGS)
+
 lib_LIBRARIES += libio18f97j60.a
 libio18f97j60_a_SOURCES = dummy.c
 libio18f97j60_a_SOURCES += adc/adcbusy.c adc/adcclose.c adc/adcconv.c
@@ -2231,6 +2275,10 @@ libio18f97j60_a_SOURCES += usart/udrdy.c usart/ugetc.c usart/ugets.c
 libio18f97j60_a_SOURCES += usart/uopen.c usart/uputc.c usart/uputs.c
 libio18f97j60_a_SOURCES += usart/usartd.c
 libio18f97j60_a_CFLAGS = -p18f97j60 $(AM_CFLAGS)
+
+lib_LIBRARIES += libio18f97j94.a
+libio18f97j94_a_SOURCES = dummy.c
+libio18f97j94_a_CFLAGS = -p18f97j94 $(AM_CFLAGS)
 
 include $(top_srcdir)/Makefile.common
 

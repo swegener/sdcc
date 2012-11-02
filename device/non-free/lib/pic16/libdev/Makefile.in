@@ -1438,6 +1438,11 @@ libdev18f65j90_a_LIBADD =
 am_libdev18f65j90_a_OBJECTS = libdev18f65j90_a-pic18f65j90.$(OBJEXT) \
 	dispatch.$(OBJEXT)
 libdev18f65j90_a_OBJECTS = $(am_libdev18f65j90_a_OBJECTS)
+libdev18f65j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f65j94_a_LIBADD =
+am_libdev18f65j94_a_OBJECTS = libdev18f65j94_a-pic18f65j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f65j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f65j94_a_OBJECTS = $(am_libdev18f65j94_a_OBJECTS)
 libdev18f65k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f65k22_a_LIBADD =
 am_libdev18f65k22_a_OBJECTS = libdev18f65k22_a-pic18f65k22.$(OBJEXT) \
@@ -1596,6 +1601,16 @@ libdev18f66j93_a_LIBADD =
 am_libdev18f66j93_a_OBJECTS = libdev18f66j93_a-pic18f66j93.$(OBJEXT) \
 	dispatch.$(OBJEXT)
 libdev18f66j93_a_OBJECTS = $(am_libdev18f66j93_a_OBJECTS)
+libdev18f66j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f66j94_a_LIBADD =
+am_libdev18f66j94_a_OBJECTS = libdev18f66j94_a-pic18f66j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f66j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f66j94_a_OBJECTS = $(am_libdev18f66j94_a_OBJECTS)
+libdev18f66j99_a_AR = $(AR) $(ARFLAGS)
+libdev18f66j99_a_LIBADD =
+am_libdev18f66j99_a_OBJECTS = libdev18f66j99_a-pic18f66j99.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f66j99_a-fake_sspbuf.$(OBJEXT)
+libdev18f66j99_a_OBJECTS = $(am_libdev18f66j99_a_OBJECTS)
 libdev18f66k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f66k22_a_LIBADD =
 am_libdev18f66k22_a_OBJECTS = libdev18f66k22_a-pic18f66k22.$(OBJEXT) \
@@ -1698,6 +1713,11 @@ libdev18f67j93_a_LIBADD =
 am_libdev18f67j93_a_OBJECTS = libdev18f67j93_a-pic18f67j93.$(OBJEXT) \
 	dispatch.$(OBJEXT)
 libdev18f67j93_a_OBJECTS = $(am_libdev18f67j93_a_OBJECTS)
+libdev18f67j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f67j94_a_LIBADD =
+am_libdev18f67j94_a_OBJECTS = libdev18f67j94_a-pic18f67j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f67j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f67j94_a_OBJECTS = $(am_libdev18f67j94_a_OBJECTS)
 libdev18f67k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f67k22_a_LIBADD =
 am_libdev18f67k22_a_OBJECTS = libdev18f67k22_a-pic18f67k22.$(OBJEXT) \
@@ -1845,6 +1865,11 @@ libdev18f85j90_a_LIBADD =
 am_libdev18f85j90_a_OBJECTS = libdev18f85j90_a-pic18f85j90.$(OBJEXT) \
 	dispatch.$(OBJEXT)
 libdev18f85j90_a_OBJECTS = $(am_libdev18f85j90_a_OBJECTS)
+libdev18f85j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f85j94_a_LIBADD =
+am_libdev18f85j94_a_OBJECTS = libdev18f85j94_a-pic18f85j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f85j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f85j94_a_OBJECTS = $(am_libdev18f85j94_a_OBJECTS)
 libdev18f85k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f85k22_a_LIBADD =
 am_libdev18f85k22_a_OBJECTS = libdev18f85k22_a-pic18f85k22.$(OBJEXT) \
@@ -1996,6 +2021,16 @@ libdev18f86j93_a_LIBADD =
 am_libdev18f86j93_a_OBJECTS = libdev18f86j93_a-pic18f86j93.$(OBJEXT) \
 	dispatch.$(OBJEXT)
 libdev18f86j93_a_OBJECTS = $(am_libdev18f86j93_a_OBJECTS)
+libdev18f86j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f86j94_a_LIBADD =
+am_libdev18f86j94_a_OBJECTS = libdev18f86j94_a-pic18f86j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f86j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f86j94_a_OBJECTS = $(am_libdev18f86j94_a_OBJECTS)
+libdev18f86j99_a_AR = $(AR) $(ARFLAGS)
+libdev18f86j99_a_LIBADD =
+am_libdev18f86j99_a_OBJECTS = libdev18f86j99_a-pic18f86j99.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f86j99_a-fake_sspbuf.$(OBJEXT)
+libdev18f86j99_a_OBJECTS = $(am_libdev18f86j99_a_OBJECTS)
 libdev18f86k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f86k22_a_LIBADD =
 am_libdev18f86k22_a_OBJECTS = libdev18f86k22_a-pic18f86k22.$(OBJEXT) \
@@ -2091,6 +2126,11 @@ libdev18f87j93_a_LIBADD =
 am_libdev18f87j93_a_OBJECTS = libdev18f87j93_a-pic18f87j93.$(OBJEXT) \
 	dispatch.$(OBJEXT)
 libdev18f87j93_a_OBJECTS = $(am_libdev18f87j93_a_OBJECTS)
+libdev18f87j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f87j94_a_LIBADD =
+am_libdev18f87j94_a_OBJECTS = libdev18f87j94_a-pic18f87j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f87j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f87j94_a_OBJECTS = $(am_libdev18f87j94_a_OBJECTS)
 libdev18f87k22_a_AR = $(AR) $(ARFLAGS)
 libdev18f87k22_a_LIBADD =
 am_libdev18f87k22_a_OBJECTS = libdev18f87k22_a-pic18f87k22.$(OBJEXT) \
@@ -2115,6 +2155,11 @@ am_libdev18f87k90_a_OBJECTS = libdev18f87k90_a-pic18f87k90.$(OBJEXT) \
 	eeprom16_gptrput3_dispatch.$(OBJEXT) \
 	eeprom16_gptrput4_dispatch.$(OBJEXT)
 libdev18f87k90_a_OBJECTS = $(am_libdev18f87k90_a_OBJECTS)
+libdev18f95j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f95j94_a_LIBADD =
+am_libdev18f95j94_a_OBJECTS = libdev18f95j94_a-pic18f95j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f95j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f95j94_a_OBJECTS = $(am_libdev18f95j94_a_OBJECTS)
 libdev18f96j60_a_AR = $(AR) $(ARFLAGS)
 libdev18f96j60_a_LIBADD =
 am_libdev18f96j60_a_OBJECTS = libdev18f96j60_a-pic18f96j60.$(OBJEXT) \
@@ -2125,11 +2170,26 @@ libdev18f96j65_a_LIBADD =
 am_libdev18f96j65_a_OBJECTS = libdev18f96j65_a-pic18f96j65.$(OBJEXT) \
 	dispatch.$(OBJEXT)
 libdev18f96j65_a_OBJECTS = $(am_libdev18f96j65_a_OBJECTS)
+libdev18f96j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f96j94_a_LIBADD =
+am_libdev18f96j94_a_OBJECTS = libdev18f96j94_a-pic18f96j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f96j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f96j94_a_OBJECTS = $(am_libdev18f96j94_a_OBJECTS)
+libdev18f96j99_a_AR = $(AR) $(ARFLAGS)
+libdev18f96j99_a_LIBADD =
+am_libdev18f96j99_a_OBJECTS = libdev18f96j99_a-pic18f96j99.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f96j99_a-fake_sspbuf.$(OBJEXT)
+libdev18f96j99_a_OBJECTS = $(am_libdev18f96j99_a_OBJECTS)
 libdev18f97j60_a_AR = $(AR) $(ARFLAGS)
 libdev18f97j60_a_LIBADD =
 am_libdev18f97j60_a_OBJECTS = libdev18f97j60_a-pic18f97j60.$(OBJEXT) \
 	dispatch.$(OBJEXT)
 libdev18f97j60_a_OBJECTS = $(am_libdev18f97j60_a_OBJECTS)
+libdev18f97j94_a_AR = $(AR) $(ARFLAGS)
+libdev18f97j94_a_LIBADD =
+am_libdev18f97j94_a_OBJECTS = libdev18f97j94_a-pic18f97j94.$(OBJEXT) \
+	dispatch.$(OBJEXT) libdev18f97j94_a-fake_sspbuf.$(OBJEXT)
+libdev18f97j94_a_OBJECTS = $(am_libdev18f97j94_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -2210,22 +2270,24 @@ SOURCES = $(libdev18f1220_a_SOURCES) $(libdev18f1230_a_SOURCES) \
 	$(libdev18f6585_a_SOURCES) $(libdev18f65j10_a_SOURCES) \
 	$(libdev18f65j11_a_SOURCES) $(libdev18f65j15_a_SOURCES) \
 	$(libdev18f65j50_a_SOURCES) $(libdev18f65j90_a_SOURCES) \
-	$(libdev18f65k22_a_SOURCES) $(libdev18f65k80_a_SOURCES) \
-	$(libdev18f65k90_a_SOURCES) $(libdev18f6620_a_SOURCES) \
-	$(libdev18f6621_a_SOURCES) $(libdev18f6622_a_SOURCES) \
-	$(libdev18f6627_a_SOURCES) $(libdev18f6628_a_SOURCES) \
-	$(libdev18f6680_a_SOURCES) $(libdev18f66j10_a_SOURCES) \
-	$(libdev18f66j11_a_SOURCES) $(libdev18f66j15_a_SOURCES) \
-	$(libdev18f66j16_a_SOURCES) $(libdev18f66j50_a_SOURCES) \
-	$(libdev18f66j55_a_SOURCES) $(libdev18f66j60_a_SOURCES) \
-	$(libdev18f66j65_a_SOURCES) $(libdev18f66j90_a_SOURCES) \
-	$(libdev18f66j93_a_SOURCES) $(libdev18f66k22_a_SOURCES) \
-	$(libdev18f66k80_a_SOURCES) $(libdev18f66k90_a_SOURCES) \
-	$(libdev18f6720_a_SOURCES) $(libdev18f6722_a_SOURCES) \
-	$(libdev18f6723_a_SOURCES) $(libdev18f67j10_a_SOURCES) \
-	$(libdev18f67j11_a_SOURCES) $(libdev18f67j50_a_SOURCES) \
-	$(libdev18f67j60_a_SOURCES) $(libdev18f67j90_a_SOURCES) \
-	$(libdev18f67j93_a_SOURCES) $(libdev18f67k22_a_SOURCES) \
+	$(libdev18f65j94_a_SOURCES) $(libdev18f65k22_a_SOURCES) \
+	$(libdev18f65k80_a_SOURCES) $(libdev18f65k90_a_SOURCES) \
+	$(libdev18f6620_a_SOURCES) $(libdev18f6621_a_SOURCES) \
+	$(libdev18f6622_a_SOURCES) $(libdev18f6627_a_SOURCES) \
+	$(libdev18f6628_a_SOURCES) $(libdev18f6680_a_SOURCES) \
+	$(libdev18f66j10_a_SOURCES) $(libdev18f66j11_a_SOURCES) \
+	$(libdev18f66j15_a_SOURCES) $(libdev18f66j16_a_SOURCES) \
+	$(libdev18f66j50_a_SOURCES) $(libdev18f66j55_a_SOURCES) \
+	$(libdev18f66j60_a_SOURCES) $(libdev18f66j65_a_SOURCES) \
+	$(libdev18f66j90_a_SOURCES) $(libdev18f66j93_a_SOURCES) \
+	$(libdev18f66j94_a_SOURCES) $(libdev18f66j99_a_SOURCES) \
+	$(libdev18f66k22_a_SOURCES) $(libdev18f66k80_a_SOURCES) \
+	$(libdev18f66k90_a_SOURCES) $(libdev18f6720_a_SOURCES) \
+	$(libdev18f6722_a_SOURCES) $(libdev18f6723_a_SOURCES) \
+	$(libdev18f67j10_a_SOURCES) $(libdev18f67j11_a_SOURCES) \
+	$(libdev18f67j50_a_SOURCES) $(libdev18f67j60_a_SOURCES) \
+	$(libdev18f67j90_a_SOURCES) $(libdev18f67j93_a_SOURCES) \
+	$(libdev18f67j94_a_SOURCES) $(libdev18f67k22_a_SOURCES) \
 	$(libdev18f67k90_a_SOURCES) $(libdev18f8310_a_SOURCES) \
 	$(libdev18f8390_a_SOURCES) $(libdev18f8393_a_SOURCES) \
 	$(libdev18f83j11_a_SOURCES) $(libdev18f83j90_a_SOURCES) \
@@ -2236,24 +2298,28 @@ SOURCES = $(libdev18f1220_a_SOURCES) $(libdev18f1230_a_SOURCES) \
 	$(libdev18f8585_a_SOURCES) $(libdev18f85j10_a_SOURCES) \
 	$(libdev18f85j11_a_SOURCES) $(libdev18f85j15_a_SOURCES) \
 	$(libdev18f85j50_a_SOURCES) $(libdev18f85j90_a_SOURCES) \
-	$(libdev18f85k22_a_SOURCES) $(libdev18f85k90_a_SOURCES) \
-	$(libdev18f8620_a_SOURCES) $(libdev18f8621_a_SOURCES) \
-	$(libdev18f8622_a_SOURCES) $(libdev18f8627_a_SOURCES) \
-	$(libdev18f8628_a_SOURCES) $(libdev18f8680_a_SOURCES) \
-	$(libdev18f86j10_a_SOURCES) $(libdev18f86j11_a_SOURCES) \
-	$(libdev18f86j15_a_SOURCES) $(libdev18f86j16_a_SOURCES) \
-	$(libdev18f86j50_a_SOURCES) $(libdev18f86j55_a_SOURCES) \
-	$(libdev18f86j60_a_SOURCES) $(libdev18f86j65_a_SOURCES) \
-	$(libdev18f86j72_a_SOURCES) $(libdev18f86j90_a_SOURCES) \
-	$(libdev18f86j93_a_SOURCES) $(libdev18f86k22_a_SOURCES) \
-	$(libdev18f86k90_a_SOURCES) $(libdev18f8720_a_SOURCES) \
-	$(libdev18f8722_a_SOURCES) $(libdev18f8723_a_SOURCES) \
-	$(libdev18f87j10_a_SOURCES) $(libdev18f87j11_a_SOURCES) \
-	$(libdev18f87j50_a_SOURCES) $(libdev18f87j60_a_SOURCES) \
-	$(libdev18f87j72_a_SOURCES) $(libdev18f87j90_a_SOURCES) \
-	$(libdev18f87j93_a_SOURCES) $(libdev18f87k22_a_SOURCES) \
-	$(libdev18f87k90_a_SOURCES) $(libdev18f96j60_a_SOURCES) \
-	$(libdev18f96j65_a_SOURCES) $(libdev18f97j60_a_SOURCES)
+	$(libdev18f85j94_a_SOURCES) $(libdev18f85k22_a_SOURCES) \
+	$(libdev18f85k90_a_SOURCES) $(libdev18f8620_a_SOURCES) \
+	$(libdev18f8621_a_SOURCES) $(libdev18f8622_a_SOURCES) \
+	$(libdev18f8627_a_SOURCES) $(libdev18f8628_a_SOURCES) \
+	$(libdev18f8680_a_SOURCES) $(libdev18f86j10_a_SOURCES) \
+	$(libdev18f86j11_a_SOURCES) $(libdev18f86j15_a_SOURCES) \
+	$(libdev18f86j16_a_SOURCES) $(libdev18f86j50_a_SOURCES) \
+	$(libdev18f86j55_a_SOURCES) $(libdev18f86j60_a_SOURCES) \
+	$(libdev18f86j65_a_SOURCES) $(libdev18f86j72_a_SOURCES) \
+	$(libdev18f86j90_a_SOURCES) $(libdev18f86j93_a_SOURCES) \
+	$(libdev18f86j94_a_SOURCES) $(libdev18f86j99_a_SOURCES) \
+	$(libdev18f86k22_a_SOURCES) $(libdev18f86k90_a_SOURCES) \
+	$(libdev18f8720_a_SOURCES) $(libdev18f8722_a_SOURCES) \
+	$(libdev18f8723_a_SOURCES) $(libdev18f87j10_a_SOURCES) \
+	$(libdev18f87j11_a_SOURCES) $(libdev18f87j50_a_SOURCES) \
+	$(libdev18f87j60_a_SOURCES) $(libdev18f87j72_a_SOURCES) \
+	$(libdev18f87j90_a_SOURCES) $(libdev18f87j93_a_SOURCES) \
+	$(libdev18f87j94_a_SOURCES) $(libdev18f87k22_a_SOURCES) \
+	$(libdev18f87k90_a_SOURCES) $(libdev18f95j94_a_SOURCES) \
+	$(libdev18f96j60_a_SOURCES) $(libdev18f96j65_a_SOURCES) \
+	$(libdev18f96j94_a_SOURCES) $(libdev18f96j99_a_SOURCES) \
+	$(libdev18f97j60_a_SOURCES) $(libdev18f97j94_a_SOURCES)
 DIST_SOURCES = $(libdev18f1220_a_SOURCES) $(libdev18f1230_a_SOURCES) \
 	$(libdev18f1320_a_SOURCES) $(libdev18f1330_a_SOURCES) \
 	$(libdev18f13k22_a_SOURCES) $(libdev18f13k50_a_SOURCES) \
@@ -2324,22 +2390,24 @@ DIST_SOURCES = $(libdev18f1220_a_SOURCES) $(libdev18f1230_a_SOURCES) \
 	$(libdev18f6585_a_SOURCES) $(libdev18f65j10_a_SOURCES) \
 	$(libdev18f65j11_a_SOURCES) $(libdev18f65j15_a_SOURCES) \
 	$(libdev18f65j50_a_SOURCES) $(libdev18f65j90_a_SOURCES) \
-	$(libdev18f65k22_a_SOURCES) $(libdev18f65k80_a_SOURCES) \
-	$(libdev18f65k90_a_SOURCES) $(libdev18f6620_a_SOURCES) \
-	$(libdev18f6621_a_SOURCES) $(libdev18f6622_a_SOURCES) \
-	$(libdev18f6627_a_SOURCES) $(libdev18f6628_a_SOURCES) \
-	$(libdev18f6680_a_SOURCES) $(libdev18f66j10_a_SOURCES) \
-	$(libdev18f66j11_a_SOURCES) $(libdev18f66j15_a_SOURCES) \
-	$(libdev18f66j16_a_SOURCES) $(libdev18f66j50_a_SOURCES) \
-	$(libdev18f66j55_a_SOURCES) $(libdev18f66j60_a_SOURCES) \
-	$(libdev18f66j65_a_SOURCES) $(libdev18f66j90_a_SOURCES) \
-	$(libdev18f66j93_a_SOURCES) $(libdev18f66k22_a_SOURCES) \
-	$(libdev18f66k80_a_SOURCES) $(libdev18f66k90_a_SOURCES) \
-	$(libdev18f6720_a_SOURCES) $(libdev18f6722_a_SOURCES) \
-	$(libdev18f6723_a_SOURCES) $(libdev18f67j10_a_SOURCES) \
-	$(libdev18f67j11_a_SOURCES) $(libdev18f67j50_a_SOURCES) \
-	$(libdev18f67j60_a_SOURCES) $(libdev18f67j90_a_SOURCES) \
-	$(libdev18f67j93_a_SOURCES) $(libdev18f67k22_a_SOURCES) \
+	$(libdev18f65j94_a_SOURCES) $(libdev18f65k22_a_SOURCES) \
+	$(libdev18f65k80_a_SOURCES) $(libdev18f65k90_a_SOURCES) \
+	$(libdev18f6620_a_SOURCES) $(libdev18f6621_a_SOURCES) \
+	$(libdev18f6622_a_SOURCES) $(libdev18f6627_a_SOURCES) \
+	$(libdev18f6628_a_SOURCES) $(libdev18f6680_a_SOURCES) \
+	$(libdev18f66j10_a_SOURCES) $(libdev18f66j11_a_SOURCES) \
+	$(libdev18f66j15_a_SOURCES) $(libdev18f66j16_a_SOURCES) \
+	$(libdev18f66j50_a_SOURCES) $(libdev18f66j55_a_SOURCES) \
+	$(libdev18f66j60_a_SOURCES) $(libdev18f66j65_a_SOURCES) \
+	$(libdev18f66j90_a_SOURCES) $(libdev18f66j93_a_SOURCES) \
+	$(libdev18f66j94_a_SOURCES) $(libdev18f66j99_a_SOURCES) \
+	$(libdev18f66k22_a_SOURCES) $(libdev18f66k80_a_SOURCES) \
+	$(libdev18f66k90_a_SOURCES) $(libdev18f6720_a_SOURCES) \
+	$(libdev18f6722_a_SOURCES) $(libdev18f6723_a_SOURCES) \
+	$(libdev18f67j10_a_SOURCES) $(libdev18f67j11_a_SOURCES) \
+	$(libdev18f67j50_a_SOURCES) $(libdev18f67j60_a_SOURCES) \
+	$(libdev18f67j90_a_SOURCES) $(libdev18f67j93_a_SOURCES) \
+	$(libdev18f67j94_a_SOURCES) $(libdev18f67k22_a_SOURCES) \
 	$(libdev18f67k90_a_SOURCES) $(libdev18f8310_a_SOURCES) \
 	$(libdev18f8390_a_SOURCES) $(libdev18f8393_a_SOURCES) \
 	$(libdev18f83j11_a_SOURCES) $(libdev18f83j90_a_SOURCES) \
@@ -2350,24 +2418,28 @@ DIST_SOURCES = $(libdev18f1220_a_SOURCES) $(libdev18f1230_a_SOURCES) \
 	$(libdev18f8585_a_SOURCES) $(libdev18f85j10_a_SOURCES) \
 	$(libdev18f85j11_a_SOURCES) $(libdev18f85j15_a_SOURCES) \
 	$(libdev18f85j50_a_SOURCES) $(libdev18f85j90_a_SOURCES) \
-	$(libdev18f85k22_a_SOURCES) $(libdev18f85k90_a_SOURCES) \
-	$(libdev18f8620_a_SOURCES) $(libdev18f8621_a_SOURCES) \
-	$(libdev18f8622_a_SOURCES) $(libdev18f8627_a_SOURCES) \
-	$(libdev18f8628_a_SOURCES) $(libdev18f8680_a_SOURCES) \
-	$(libdev18f86j10_a_SOURCES) $(libdev18f86j11_a_SOURCES) \
-	$(libdev18f86j15_a_SOURCES) $(libdev18f86j16_a_SOURCES) \
-	$(libdev18f86j50_a_SOURCES) $(libdev18f86j55_a_SOURCES) \
-	$(libdev18f86j60_a_SOURCES) $(libdev18f86j65_a_SOURCES) \
-	$(libdev18f86j72_a_SOURCES) $(libdev18f86j90_a_SOURCES) \
-	$(libdev18f86j93_a_SOURCES) $(libdev18f86k22_a_SOURCES) \
-	$(libdev18f86k90_a_SOURCES) $(libdev18f8720_a_SOURCES) \
-	$(libdev18f8722_a_SOURCES) $(libdev18f8723_a_SOURCES) \
-	$(libdev18f87j10_a_SOURCES) $(libdev18f87j11_a_SOURCES) \
-	$(libdev18f87j50_a_SOURCES) $(libdev18f87j60_a_SOURCES) \
-	$(libdev18f87j72_a_SOURCES) $(libdev18f87j90_a_SOURCES) \
-	$(libdev18f87j93_a_SOURCES) $(libdev18f87k22_a_SOURCES) \
-	$(libdev18f87k90_a_SOURCES) $(libdev18f96j60_a_SOURCES) \
-	$(libdev18f96j65_a_SOURCES) $(libdev18f97j60_a_SOURCES)
+	$(libdev18f85j94_a_SOURCES) $(libdev18f85k22_a_SOURCES) \
+	$(libdev18f85k90_a_SOURCES) $(libdev18f8620_a_SOURCES) \
+	$(libdev18f8621_a_SOURCES) $(libdev18f8622_a_SOURCES) \
+	$(libdev18f8627_a_SOURCES) $(libdev18f8628_a_SOURCES) \
+	$(libdev18f8680_a_SOURCES) $(libdev18f86j10_a_SOURCES) \
+	$(libdev18f86j11_a_SOURCES) $(libdev18f86j15_a_SOURCES) \
+	$(libdev18f86j16_a_SOURCES) $(libdev18f86j50_a_SOURCES) \
+	$(libdev18f86j55_a_SOURCES) $(libdev18f86j60_a_SOURCES) \
+	$(libdev18f86j65_a_SOURCES) $(libdev18f86j72_a_SOURCES) \
+	$(libdev18f86j90_a_SOURCES) $(libdev18f86j93_a_SOURCES) \
+	$(libdev18f86j94_a_SOURCES) $(libdev18f86j99_a_SOURCES) \
+	$(libdev18f86k22_a_SOURCES) $(libdev18f86k90_a_SOURCES) \
+	$(libdev18f8720_a_SOURCES) $(libdev18f8722_a_SOURCES) \
+	$(libdev18f8723_a_SOURCES) $(libdev18f87j10_a_SOURCES) \
+	$(libdev18f87j11_a_SOURCES) $(libdev18f87j50_a_SOURCES) \
+	$(libdev18f87j60_a_SOURCES) $(libdev18f87j72_a_SOURCES) \
+	$(libdev18f87j90_a_SOURCES) $(libdev18f87j93_a_SOURCES) \
+	$(libdev18f87j94_a_SOURCES) $(libdev18f87k22_a_SOURCES) \
+	$(libdev18f87k90_a_SOURCES) $(libdev18f95j94_a_SOURCES) \
+	$(libdev18f96j60_a_SOURCES) $(libdev18f96j65_a_SOURCES) \
+	$(libdev18f96j94_a_SOURCES) $(libdev18f96j99_a_SOURCES) \
+	$(libdev18f97j60_a_SOURCES) $(libdev18f97j94_a_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -2508,36 +2580,40 @@ lib_LIBRARIES = libdev18f1220.a libdev18f1230.a libdev18f1320.a \
 	libdev18f64j90.a libdev18f6520.a libdev18f6525.a \
 	libdev18f6527.a libdev18f6585.a libdev18f65j10.a \
 	libdev18f65j11.a libdev18f65j15.a libdev18f65j50.a \
-	libdev18f65j90.a libdev18f65k22.a libdev18f65k80.a \
-	libdev18f65k90.a libdev18f6620.a libdev18f6621.a \
-	libdev18f6622.a libdev18f6627.a libdev18f6628.a \
-	libdev18f6680.a libdev18f66j10.a libdev18f66j11.a \
-	libdev18f66j15.a libdev18f66j16.a libdev18f66j50.a \
-	libdev18f66j55.a libdev18f66j60.a libdev18f66j65.a \
-	libdev18f66j90.a libdev18f66j93.a libdev18f66k22.a \
+	libdev18f65j90.a libdev18f65j94.a libdev18f65k22.a \
+	libdev18f65k80.a libdev18f65k90.a libdev18f6620.a \
+	libdev18f6621.a libdev18f6622.a libdev18f6627.a \
+	libdev18f6628.a libdev18f6680.a libdev18f66j10.a \
+	libdev18f66j11.a libdev18f66j15.a libdev18f66j16.a \
+	libdev18f66j50.a libdev18f66j55.a libdev18f66j60.a \
+	libdev18f66j65.a libdev18f66j90.a libdev18f66j93.a \
+	libdev18f66j94.a libdev18f66j99.a libdev18f66k22.a \
 	libdev18f66k80.a libdev18f66k90.a libdev18f6720.a \
 	libdev18f6722.a libdev18f6723.a libdev18f67j10.a \
 	libdev18f67j11.a libdev18f67j50.a libdev18f67j60.a \
-	libdev18f67j90.a libdev18f67j93.a libdev18f67k22.a \
-	libdev18f67k90.a libdev18f8310.a libdev18f8390.a \
-	libdev18f8393.a libdev18f83j11.a libdev18f83j90.a \
-	libdev18f8410.a libdev18f8490.a libdev18f8493.a \
-	libdev18f84j11.a libdev18f84j90.a libdev18f8520.a \
-	libdev18f8525.a libdev18f8527.a libdev18f8585.a \
-	libdev18f85j10.a libdev18f85j11.a libdev18f85j15.a \
-	libdev18f85j50.a libdev18f85j90.a libdev18f85k22.a \
-	libdev18f85k90.a libdev18f8620.a libdev18f8621.a \
-	libdev18f8622.a libdev18f8627.a libdev18f8628.a \
-	libdev18f8680.a libdev18f86j10.a libdev18f86j11.a \
-	libdev18f86j15.a libdev18f86j16.a libdev18f86j50.a \
-	libdev18f86j55.a libdev18f86j60.a libdev18f86j65.a \
-	libdev18f86j72.a libdev18f86j90.a libdev18f86j93.a \
-	libdev18f86k22.a libdev18f86k90.a libdev18f8720.a \
-	libdev18f8722.a libdev18f8723.a libdev18f87j10.a \
-	libdev18f87j11.a libdev18f87j50.a libdev18f87j60.a \
-	libdev18f87j72.a libdev18f87j90.a libdev18f87j93.a \
-	libdev18f87k22.a libdev18f87k90.a libdev18f96j60.a \
-	libdev18f96j65.a libdev18f97j60.a
+	libdev18f67j90.a libdev18f67j93.a libdev18f67j94.a \
+	libdev18f67k22.a libdev18f67k90.a libdev18f8310.a \
+	libdev18f8390.a libdev18f8393.a libdev18f83j11.a \
+	libdev18f83j90.a libdev18f8410.a libdev18f8490.a \
+	libdev18f8493.a libdev18f84j11.a libdev18f84j90.a \
+	libdev18f8520.a libdev18f8525.a libdev18f8527.a \
+	libdev18f8585.a libdev18f85j10.a libdev18f85j11.a \
+	libdev18f85j15.a libdev18f85j50.a libdev18f85j90.a \
+	libdev18f85j94.a libdev18f85k22.a libdev18f85k90.a \
+	libdev18f8620.a libdev18f8621.a libdev18f8622.a \
+	libdev18f8627.a libdev18f8628.a libdev18f8680.a \
+	libdev18f86j10.a libdev18f86j11.a libdev18f86j15.a \
+	libdev18f86j16.a libdev18f86j50.a libdev18f86j55.a \
+	libdev18f86j60.a libdev18f86j65.a libdev18f86j72.a \
+	libdev18f86j90.a libdev18f86j93.a libdev18f86j94.a \
+	libdev18f86j99.a libdev18f86k22.a libdev18f86k90.a \
+	libdev18f8720.a libdev18f8722.a libdev18f8723.a \
+	libdev18f87j10.a libdev18f87j11.a libdev18f87j50.a \
+	libdev18f87j60.a libdev18f87j72.a libdev18f87j90.a \
+	libdev18f87j93.a libdev18f87j94.a libdev18f87k22.a \
+	libdev18f87k90.a libdev18f95j94.a libdev18f96j60.a \
+	libdev18f96j65.a libdev18f96j94.a libdev18f96j99.a \
+	libdev18f97j60.a libdev18f97j94.a
 libdev18f1220_a_SOURCES = pic18f1220.c \
 	gptr/eeprom8_gptrget1_dispatch.S \
 	gptr/eeprom8_gptrget2_dispatch.S \
@@ -3538,6 +3614,8 @@ libdev18f65j50_a_SOURCES = pic18f65j50.c gptr/dispatch.S
 libdev18f65j50_a_CFLAGS = -p18f65j50 $(AM_CFLAGS)
 libdev18f65j90_a_SOURCES = pic18f65j90.c gptr/dispatch.S
 libdev18f65j90_a_CFLAGS = -p18f65j90 $(AM_CFLAGS)
+libdev18f65j94_a_SOURCES = pic18f65j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f65j94_a_CFLAGS = -p18f65j94 $(AM_CFLAGS)
 libdev18f65k22_a_SOURCES = pic18f65k22.c \
 	gptr/eeprom16_gptrget1_dispatch.S \
 	gptr/eeprom16_gptrget2_dispatch.S \
@@ -3648,6 +3726,10 @@ libdev18f66j90_a_SOURCES = pic18f66j90.c gptr/dispatch.S
 libdev18f66j90_a_CFLAGS = -p18f66j90 $(AM_CFLAGS)
 libdev18f66j93_a_SOURCES = pic18f66j93.c gptr/dispatch.S
 libdev18f66j93_a_CFLAGS = -p18f66j93 $(AM_CFLAGS)
+libdev18f66j94_a_SOURCES = pic18f66j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f66j94_a_CFLAGS = -p18f66j94 $(AM_CFLAGS)
+libdev18f66j99_a_SOURCES = pic18f66j99.c gptr/dispatch.S fake_sspbuf.c
+libdev18f66j99_a_CFLAGS = -p18f66j99 $(AM_CFLAGS)
 libdev18f66k22_a_SOURCES = pic18f66k22.c \
 	gptr/eeprom16_gptrget1_dispatch.S \
 	gptr/eeprom16_gptrget2_dispatch.S \
@@ -3720,6 +3802,8 @@ libdev18f67j90_a_SOURCES = pic18f67j90.c gptr/dispatch.S
 libdev18f67j90_a_CFLAGS = -p18f67j90 $(AM_CFLAGS)
 libdev18f67j93_a_SOURCES = pic18f67j93.c gptr/dispatch.S
 libdev18f67j93_a_CFLAGS = -p18f67j93 $(AM_CFLAGS)
+libdev18f67j94_a_SOURCES = pic18f67j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f67j94_a_CFLAGS = -p18f67j94 $(AM_CFLAGS)
 libdev18f67k22_a_SOURCES = pic18f67k22.c \
 	gptr/eeprom16_gptrget1_dispatch.S \
 	gptr/eeprom16_gptrget2_dispatch.S \
@@ -3810,6 +3894,8 @@ libdev18f85j50_a_SOURCES = pic18f85j50.c gptr/dispatch.S
 libdev18f85j50_a_CFLAGS = -p18f85j50 $(AM_CFLAGS)
 libdev18f85j90_a_SOURCES = pic18f85j90.c gptr/dispatch.S
 libdev18f85j90_a_CFLAGS = -p18f85j90 $(AM_CFLAGS)
+libdev18f85j94_a_SOURCES = pic18f85j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f85j94_a_CFLAGS = -p18f85j94 $(AM_CFLAGS)
 libdev18f85k22_a_SOURCES = pic18f85k22.c \
 	gptr/eeprom16_gptrget1_dispatch.S \
 	gptr/eeprom16_gptrget2_dispatch.S \
@@ -3912,6 +3998,10 @@ libdev18f86j90_a_SOURCES = pic18f86j90.c gptr/dispatch.S
 libdev18f86j90_a_CFLAGS = -p18f86j90 $(AM_CFLAGS)
 libdev18f86j93_a_SOURCES = pic18f86j93.c gptr/dispatch.S
 libdev18f86j93_a_CFLAGS = -p18f86j93 $(AM_CFLAGS)
+libdev18f86j94_a_SOURCES = pic18f86j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f86j94_a_CFLAGS = -p18f86j94 $(AM_CFLAGS)
+libdev18f86j99_a_SOURCES = pic18f86j99.c gptr/dispatch.S fake_sspbuf.c
+libdev18f86j99_a_CFLAGS = -p18f86j99 $(AM_CFLAGS)
 libdev18f86k22_a_SOURCES = pic18f86k22.c \
 	gptr/eeprom16_gptrget1_dispatch.S \
 	gptr/eeprom16_gptrget2_dispatch.S \
@@ -3976,6 +4066,8 @@ libdev18f87j90_a_SOURCES = pic18f87j90.c gptr/dispatch.S
 libdev18f87j90_a_CFLAGS = -p18f87j90 $(AM_CFLAGS)
 libdev18f87j93_a_SOURCES = pic18f87j93.c gptr/dispatch.S
 libdev18f87j93_a_CFLAGS = -p18f87j93 $(AM_CFLAGS)
+libdev18f87j94_a_SOURCES = pic18f87j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f87j94_a_CFLAGS = -p18f87j94 $(AM_CFLAGS)
 libdev18f87k22_a_SOURCES = pic18f87k22.c \
 	gptr/eeprom16_gptrget1_dispatch.S \
 	gptr/eeprom16_gptrget2_dispatch.S \
@@ -3996,12 +4088,20 @@ libdev18f87k90_a_SOURCES = pic18f87k90.c \
 	gptr/eeprom16_gptrput3_dispatch.S \
 	gptr/eeprom16_gptrput4_dispatch.S
 libdev18f87k90_a_CFLAGS = -p18f87k90 $(AM_CFLAGS)
+libdev18f95j94_a_SOURCES = pic18f95j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f95j94_a_CFLAGS = -p18f95j94 $(AM_CFLAGS)
 libdev18f96j60_a_SOURCES = pic18f96j60.c gptr/dispatch.S
 libdev18f96j60_a_CFLAGS = -p18f96j60 $(AM_CFLAGS)
 libdev18f96j65_a_SOURCES = pic18f96j65.c gptr/dispatch.S
 libdev18f96j65_a_CFLAGS = -p18f96j65 $(AM_CFLAGS)
+libdev18f96j94_a_SOURCES = pic18f96j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f96j94_a_CFLAGS = -p18f96j94 $(AM_CFLAGS)
+libdev18f96j99_a_SOURCES = pic18f96j99.c gptr/dispatch.S fake_sspbuf.c
+libdev18f96j99_a_CFLAGS = -p18f96j99 $(AM_CFLAGS)
 libdev18f97j60_a_SOURCES = pic18f97j60.c gptr/dispatch.S
 libdev18f97j60_a_CFLAGS = -p18f97j60 $(AM_CFLAGS)
+libdev18f97j94_a_SOURCES = pic18f97j94.c gptr/dispatch.S fake_sspbuf.c
+libdev18f97j94_a_CFLAGS = -p18f97j94 $(AM_CFLAGS)
 AM_CPPFLAGS = -I. -I$(top_srcdir)/../../../include/pic16 \
 	-I$(top_srcdir)/../../../non-free/include/pic16
 #AM_CFLAGS += --no-optimize-goto
@@ -4648,6 +4748,10 @@ libdev18f65j90.a: $(libdev18f65j90_a_OBJECTS) $(libdev18f65j90_a_DEPENDENCIES) $
 	-rm -f libdev18f65j90.a
 	$(libdev18f65j90_a_AR) libdev18f65j90.a $(libdev18f65j90_a_OBJECTS) $(libdev18f65j90_a_LIBADD)
 	$(RANLIB) libdev18f65j90.a
+libdev18f65j94.a: $(libdev18f65j94_a_OBJECTS) $(libdev18f65j94_a_DEPENDENCIES) $(EXTRA_libdev18f65j94_a_DEPENDENCIES) 
+	-rm -f libdev18f65j94.a
+	$(libdev18f65j94_a_AR) libdev18f65j94.a $(libdev18f65j94_a_OBJECTS) $(libdev18f65j94_a_LIBADD)
+	$(RANLIB) libdev18f65j94.a
 libdev18f65k22.a: $(libdev18f65k22_a_OBJECTS) $(libdev18f65k22_a_DEPENDENCIES) $(EXTRA_libdev18f65k22_a_DEPENDENCIES) 
 	-rm -f libdev18f65k22.a
 	$(libdev18f65k22_a_AR) libdev18f65k22.a $(libdev18f65k22_a_OBJECTS) $(libdev18f65k22_a_LIBADD)
@@ -4724,6 +4828,14 @@ libdev18f66j93.a: $(libdev18f66j93_a_OBJECTS) $(libdev18f66j93_a_DEPENDENCIES) $
 	-rm -f libdev18f66j93.a
 	$(libdev18f66j93_a_AR) libdev18f66j93.a $(libdev18f66j93_a_OBJECTS) $(libdev18f66j93_a_LIBADD)
 	$(RANLIB) libdev18f66j93.a
+libdev18f66j94.a: $(libdev18f66j94_a_OBJECTS) $(libdev18f66j94_a_DEPENDENCIES) $(EXTRA_libdev18f66j94_a_DEPENDENCIES) 
+	-rm -f libdev18f66j94.a
+	$(libdev18f66j94_a_AR) libdev18f66j94.a $(libdev18f66j94_a_OBJECTS) $(libdev18f66j94_a_LIBADD)
+	$(RANLIB) libdev18f66j94.a
+libdev18f66j99.a: $(libdev18f66j99_a_OBJECTS) $(libdev18f66j99_a_DEPENDENCIES) $(EXTRA_libdev18f66j99_a_DEPENDENCIES) 
+	-rm -f libdev18f66j99.a
+	$(libdev18f66j99_a_AR) libdev18f66j99.a $(libdev18f66j99_a_OBJECTS) $(libdev18f66j99_a_LIBADD)
+	$(RANLIB) libdev18f66j99.a
 libdev18f66k22.a: $(libdev18f66k22_a_OBJECTS) $(libdev18f66k22_a_DEPENDENCIES) $(EXTRA_libdev18f66k22_a_DEPENDENCIES) 
 	-rm -f libdev18f66k22.a
 	$(libdev18f66k22_a_AR) libdev18f66k22.a $(libdev18f66k22_a_OBJECTS) $(libdev18f66k22_a_LIBADD)
@@ -4772,6 +4884,10 @@ libdev18f67j93.a: $(libdev18f67j93_a_OBJECTS) $(libdev18f67j93_a_DEPENDENCIES) $
 	-rm -f libdev18f67j93.a
 	$(libdev18f67j93_a_AR) libdev18f67j93.a $(libdev18f67j93_a_OBJECTS) $(libdev18f67j93_a_LIBADD)
 	$(RANLIB) libdev18f67j93.a
+libdev18f67j94.a: $(libdev18f67j94_a_OBJECTS) $(libdev18f67j94_a_DEPENDENCIES) $(EXTRA_libdev18f67j94_a_DEPENDENCIES) 
+	-rm -f libdev18f67j94.a
+	$(libdev18f67j94_a_AR) libdev18f67j94.a $(libdev18f67j94_a_OBJECTS) $(libdev18f67j94_a_LIBADD)
+	$(RANLIB) libdev18f67j94.a
 libdev18f67k22.a: $(libdev18f67k22_a_OBJECTS) $(libdev18f67k22_a_DEPENDENCIES) $(EXTRA_libdev18f67k22_a_DEPENDENCIES) 
 	-rm -f libdev18f67k22.a
 	$(libdev18f67k22_a_AR) libdev18f67k22.a $(libdev18f67k22_a_OBJECTS) $(libdev18f67k22_a_LIBADD)
@@ -4856,6 +4972,10 @@ libdev18f85j90.a: $(libdev18f85j90_a_OBJECTS) $(libdev18f85j90_a_DEPENDENCIES) $
 	-rm -f libdev18f85j90.a
 	$(libdev18f85j90_a_AR) libdev18f85j90.a $(libdev18f85j90_a_OBJECTS) $(libdev18f85j90_a_LIBADD)
 	$(RANLIB) libdev18f85j90.a
+libdev18f85j94.a: $(libdev18f85j94_a_OBJECTS) $(libdev18f85j94_a_DEPENDENCIES) $(EXTRA_libdev18f85j94_a_DEPENDENCIES) 
+	-rm -f libdev18f85j94.a
+	$(libdev18f85j94_a_AR) libdev18f85j94.a $(libdev18f85j94_a_OBJECTS) $(libdev18f85j94_a_LIBADD)
+	$(RANLIB) libdev18f85j94.a
 libdev18f85k22.a: $(libdev18f85k22_a_OBJECTS) $(libdev18f85k22_a_DEPENDENCIES) $(EXTRA_libdev18f85k22_a_DEPENDENCIES) 
 	-rm -f libdev18f85k22.a
 	$(libdev18f85k22_a_AR) libdev18f85k22.a $(libdev18f85k22_a_OBJECTS) $(libdev18f85k22_a_LIBADD)
@@ -4932,6 +5052,14 @@ libdev18f86j93.a: $(libdev18f86j93_a_OBJECTS) $(libdev18f86j93_a_DEPENDENCIES) $
 	-rm -f libdev18f86j93.a
 	$(libdev18f86j93_a_AR) libdev18f86j93.a $(libdev18f86j93_a_OBJECTS) $(libdev18f86j93_a_LIBADD)
 	$(RANLIB) libdev18f86j93.a
+libdev18f86j94.a: $(libdev18f86j94_a_OBJECTS) $(libdev18f86j94_a_DEPENDENCIES) $(EXTRA_libdev18f86j94_a_DEPENDENCIES) 
+	-rm -f libdev18f86j94.a
+	$(libdev18f86j94_a_AR) libdev18f86j94.a $(libdev18f86j94_a_OBJECTS) $(libdev18f86j94_a_LIBADD)
+	$(RANLIB) libdev18f86j94.a
+libdev18f86j99.a: $(libdev18f86j99_a_OBJECTS) $(libdev18f86j99_a_DEPENDENCIES) $(EXTRA_libdev18f86j99_a_DEPENDENCIES) 
+	-rm -f libdev18f86j99.a
+	$(libdev18f86j99_a_AR) libdev18f86j99.a $(libdev18f86j99_a_OBJECTS) $(libdev18f86j99_a_LIBADD)
+	$(RANLIB) libdev18f86j99.a
 libdev18f86k22.a: $(libdev18f86k22_a_OBJECTS) $(libdev18f86k22_a_DEPENDENCIES) $(EXTRA_libdev18f86k22_a_DEPENDENCIES) 
 	-rm -f libdev18f86k22.a
 	$(libdev18f86k22_a_AR) libdev18f86k22.a $(libdev18f86k22_a_OBJECTS) $(libdev18f86k22_a_LIBADD)
@@ -4980,6 +5108,10 @@ libdev18f87j93.a: $(libdev18f87j93_a_OBJECTS) $(libdev18f87j93_a_DEPENDENCIES) $
 	-rm -f libdev18f87j93.a
 	$(libdev18f87j93_a_AR) libdev18f87j93.a $(libdev18f87j93_a_OBJECTS) $(libdev18f87j93_a_LIBADD)
 	$(RANLIB) libdev18f87j93.a
+libdev18f87j94.a: $(libdev18f87j94_a_OBJECTS) $(libdev18f87j94_a_DEPENDENCIES) $(EXTRA_libdev18f87j94_a_DEPENDENCIES) 
+	-rm -f libdev18f87j94.a
+	$(libdev18f87j94_a_AR) libdev18f87j94.a $(libdev18f87j94_a_OBJECTS) $(libdev18f87j94_a_LIBADD)
+	$(RANLIB) libdev18f87j94.a
 libdev18f87k22.a: $(libdev18f87k22_a_OBJECTS) $(libdev18f87k22_a_DEPENDENCIES) $(EXTRA_libdev18f87k22_a_DEPENDENCIES) 
 	-rm -f libdev18f87k22.a
 	$(libdev18f87k22_a_AR) libdev18f87k22.a $(libdev18f87k22_a_OBJECTS) $(libdev18f87k22_a_LIBADD)
@@ -4988,6 +5120,10 @@ libdev18f87k90.a: $(libdev18f87k90_a_OBJECTS) $(libdev18f87k90_a_DEPENDENCIES) $
 	-rm -f libdev18f87k90.a
 	$(libdev18f87k90_a_AR) libdev18f87k90.a $(libdev18f87k90_a_OBJECTS) $(libdev18f87k90_a_LIBADD)
 	$(RANLIB) libdev18f87k90.a
+libdev18f95j94.a: $(libdev18f95j94_a_OBJECTS) $(libdev18f95j94_a_DEPENDENCIES) $(EXTRA_libdev18f95j94_a_DEPENDENCIES) 
+	-rm -f libdev18f95j94.a
+	$(libdev18f95j94_a_AR) libdev18f95j94.a $(libdev18f95j94_a_OBJECTS) $(libdev18f95j94_a_LIBADD)
+	$(RANLIB) libdev18f95j94.a
 libdev18f96j60.a: $(libdev18f96j60_a_OBJECTS) $(libdev18f96j60_a_DEPENDENCIES) $(EXTRA_libdev18f96j60_a_DEPENDENCIES) 
 	-rm -f libdev18f96j60.a
 	$(libdev18f96j60_a_AR) libdev18f96j60.a $(libdev18f96j60_a_OBJECTS) $(libdev18f96j60_a_LIBADD)
@@ -4996,10 +5132,22 @@ libdev18f96j65.a: $(libdev18f96j65_a_OBJECTS) $(libdev18f96j65_a_DEPENDENCIES) $
 	-rm -f libdev18f96j65.a
 	$(libdev18f96j65_a_AR) libdev18f96j65.a $(libdev18f96j65_a_OBJECTS) $(libdev18f96j65_a_LIBADD)
 	$(RANLIB) libdev18f96j65.a
+libdev18f96j94.a: $(libdev18f96j94_a_OBJECTS) $(libdev18f96j94_a_DEPENDENCIES) $(EXTRA_libdev18f96j94_a_DEPENDENCIES) 
+	-rm -f libdev18f96j94.a
+	$(libdev18f96j94_a_AR) libdev18f96j94.a $(libdev18f96j94_a_OBJECTS) $(libdev18f96j94_a_LIBADD)
+	$(RANLIB) libdev18f96j94.a
+libdev18f96j99.a: $(libdev18f96j99_a_OBJECTS) $(libdev18f96j99_a_DEPENDENCIES) $(EXTRA_libdev18f96j99_a_DEPENDENCIES) 
+	-rm -f libdev18f96j99.a
+	$(libdev18f96j99_a_AR) libdev18f96j99.a $(libdev18f96j99_a_OBJECTS) $(libdev18f96j99_a_LIBADD)
+	$(RANLIB) libdev18f96j99.a
 libdev18f97j60.a: $(libdev18f97j60_a_OBJECTS) $(libdev18f97j60_a_DEPENDENCIES) $(EXTRA_libdev18f97j60_a_DEPENDENCIES) 
 	-rm -f libdev18f97j60.a
 	$(libdev18f97j60_a_AR) libdev18f97j60.a $(libdev18f97j60_a_OBJECTS) $(libdev18f97j60_a_LIBADD)
 	$(RANLIB) libdev18f97j60.a
+libdev18f97j94.a: $(libdev18f97j94_a_OBJECTS) $(libdev18f97j94_a_DEPENDENCIES) $(EXTRA_libdev18f97j94_a_DEPENDENCIES) 
+	-rm -f libdev18f97j94.a
+	$(libdev18f97j94_a_AR) libdev18f97j94.a $(libdev18f97j94_a_OBJECTS) $(libdev18f97j94_a_LIBADD)
+	$(RANLIB) libdev18f97j94.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -5170,6 +5318,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f65j15_a-pic18f65j15.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f65j50_a-pic18f65j50.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f65j90_a-pic18f65j90.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f65j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f65j94_a-pic18f65j94.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f65k22_a-pic18f65k22.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f65k80_a-pic18f65k80.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f65k90_a-pic18f65k90.Po@am__quote@
@@ -5189,6 +5339,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66j65_a-pic18f66j65.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66j90_a-pic18f66j90.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66j93_a-pic18f66j93.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66j94_a-pic18f66j94.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66j99_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66j99_a-pic18f66j99.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66k22_a-pic18f66k22.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66k80_a-pic18f66k80.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f66k90_a-pic18f66k90.Po@am__quote@
@@ -5201,6 +5355,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f67j60_a-pic18f67j60.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f67j90_a-pic18f67j90.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f67j93_a-pic18f67j93.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f67j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f67j94_a-pic18f67j94.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f67k22_a-pic18f67k22.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f67k90_a-pic18f67k90.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f8310_a-pic18f8310.Po@am__quote@
@@ -5222,6 +5378,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f85j15_a-pic18f85j15.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f85j50_a-pic18f85j50.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f85j90_a-pic18f85j90.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f85j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f85j94_a-pic18f85j94.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f85k22_a-pic18f85k22.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f85k90_a-pic18f85k90.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f8620_a-pic18f8620.Po@am__quote@
@@ -5241,6 +5399,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86j72_a-pic18f86j72.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86j90_a-pic18f86j90.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86j93_a-pic18f86j93.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86j94_a-pic18f86j94.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86j99_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86j99_a-pic18f86j99.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86k22_a-pic18f86k22.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f86k90_a-pic18f86k90.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f8720_a-pic18f8720.Po@am__quote@
@@ -5253,11 +5415,21 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f87j72_a-pic18f87j72.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f87j90_a-pic18f87j90.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f87j93_a-pic18f87j93.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f87j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f87j94_a-pic18f87j94.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f87k22_a-pic18f87k22.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f87k90_a-pic18f87k90.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f95j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f95j94_a-pic18f95j94.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f96j60_a-pic18f96j60.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f96j65_a-pic18f96j65.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f96j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f96j94_a-pic18f96j94.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f96j99_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f96j99_a-pic18f96j99.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f97j60_a-pic18f97j60.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f97j94_a-fake_sspbuf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libdev18f97j94_a-pic18f97j94.Po@am__quote@
 
 .S.o:
 @am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -7569,6 +7741,34 @@ libdev18f65j90_a-pic18f65j90.obj: pic18f65j90.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j90_a_CFLAGS) $(CFLAGS) -c -o libdev18f65j90_a-pic18f65j90.obj `if test -f 'pic18f65j90.c'; then $(CYGPATH_W) 'pic18f65j90.c'; else $(CYGPATH_W) '$(srcdir)/pic18f65j90.c'; fi`
 
+libdev18f65j94_a-pic18f65j94.o: pic18f65j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j94_a_CFLAGS) $(CFLAGS) -MT libdev18f65j94_a-pic18f65j94.o -MD -MP -MF $(DEPDIR)/libdev18f65j94_a-pic18f65j94.Tpo -c -o libdev18f65j94_a-pic18f65j94.o `test -f 'pic18f65j94.c' || echo '$(srcdir)/'`pic18f65j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f65j94_a-pic18f65j94.Tpo $(DEPDIR)/libdev18f65j94_a-pic18f65j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f65j94.c' object='libdev18f65j94_a-pic18f65j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f65j94_a-pic18f65j94.o `test -f 'pic18f65j94.c' || echo '$(srcdir)/'`pic18f65j94.c
+
+libdev18f65j94_a-pic18f65j94.obj: pic18f65j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j94_a_CFLAGS) $(CFLAGS) -MT libdev18f65j94_a-pic18f65j94.obj -MD -MP -MF $(DEPDIR)/libdev18f65j94_a-pic18f65j94.Tpo -c -o libdev18f65j94_a-pic18f65j94.obj `if test -f 'pic18f65j94.c'; then $(CYGPATH_W) 'pic18f65j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f65j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f65j94_a-pic18f65j94.Tpo $(DEPDIR)/libdev18f65j94_a-pic18f65j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f65j94.c' object='libdev18f65j94_a-pic18f65j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f65j94_a-pic18f65j94.obj `if test -f 'pic18f65j94.c'; then $(CYGPATH_W) 'pic18f65j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f65j94.c'; fi`
+
+libdev18f65j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j94_a_CFLAGS) $(CFLAGS) -MT libdev18f65j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f65j94_a-fake_sspbuf.Tpo -c -o libdev18f65j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f65j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f65j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f65j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f65j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f65j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j94_a_CFLAGS) $(CFLAGS) -MT libdev18f65j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f65j94_a-fake_sspbuf.Tpo -c -o libdev18f65j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f65j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f65j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f65j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f65j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
 libdev18f65k22_a-pic18f65k22.o: pic18f65k22.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f65k22_a_CFLAGS) $(CFLAGS) -MT libdev18f65k22_a-pic18f65k22.o -MD -MP -MF $(DEPDIR)/libdev18f65k22_a-pic18f65k22.Tpo -c -o libdev18f65k22_a-pic18f65k22.o `test -f 'pic18f65k22.c' || echo '$(srcdir)/'`pic18f65k22.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f65k22_a-pic18f65k22.Tpo $(DEPDIR)/libdev18f65k22_a-pic18f65k22.Po
@@ -7835,6 +8035,62 @@ libdev18f66j93_a-pic18f66j93.obj: pic18f66j93.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j93_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j93_a-pic18f66j93.obj `if test -f 'pic18f66j93.c'; then $(CYGPATH_W) 'pic18f66j93.c'; else $(CYGPATH_W) '$(srcdir)/pic18f66j93.c'; fi`
 
+libdev18f66j94_a-pic18f66j94.o: pic18f66j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j94_a_CFLAGS) $(CFLAGS) -MT libdev18f66j94_a-pic18f66j94.o -MD -MP -MF $(DEPDIR)/libdev18f66j94_a-pic18f66j94.Tpo -c -o libdev18f66j94_a-pic18f66j94.o `test -f 'pic18f66j94.c' || echo '$(srcdir)/'`pic18f66j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66j94_a-pic18f66j94.Tpo $(DEPDIR)/libdev18f66j94_a-pic18f66j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f66j94.c' object='libdev18f66j94_a-pic18f66j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j94_a-pic18f66j94.o `test -f 'pic18f66j94.c' || echo '$(srcdir)/'`pic18f66j94.c
+
+libdev18f66j94_a-pic18f66j94.obj: pic18f66j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j94_a_CFLAGS) $(CFLAGS) -MT libdev18f66j94_a-pic18f66j94.obj -MD -MP -MF $(DEPDIR)/libdev18f66j94_a-pic18f66j94.Tpo -c -o libdev18f66j94_a-pic18f66j94.obj `if test -f 'pic18f66j94.c'; then $(CYGPATH_W) 'pic18f66j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f66j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66j94_a-pic18f66j94.Tpo $(DEPDIR)/libdev18f66j94_a-pic18f66j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f66j94.c' object='libdev18f66j94_a-pic18f66j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j94_a-pic18f66j94.obj `if test -f 'pic18f66j94.c'; then $(CYGPATH_W) 'pic18f66j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f66j94.c'; fi`
+
+libdev18f66j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j94_a_CFLAGS) $(CFLAGS) -MT libdev18f66j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f66j94_a-fake_sspbuf.Tpo -c -o libdev18f66j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f66j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f66j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f66j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j94_a_CFLAGS) $(CFLAGS) -MT libdev18f66j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f66j94_a-fake_sspbuf.Tpo -c -o libdev18f66j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f66j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f66j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
+libdev18f66j99_a-pic18f66j99.o: pic18f66j99.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j99_a_CFLAGS) $(CFLAGS) -MT libdev18f66j99_a-pic18f66j99.o -MD -MP -MF $(DEPDIR)/libdev18f66j99_a-pic18f66j99.Tpo -c -o libdev18f66j99_a-pic18f66j99.o `test -f 'pic18f66j99.c' || echo '$(srcdir)/'`pic18f66j99.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66j99_a-pic18f66j99.Tpo $(DEPDIR)/libdev18f66j99_a-pic18f66j99.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f66j99.c' object='libdev18f66j99_a-pic18f66j99.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j99_a-pic18f66j99.o `test -f 'pic18f66j99.c' || echo '$(srcdir)/'`pic18f66j99.c
+
+libdev18f66j99_a-pic18f66j99.obj: pic18f66j99.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j99_a_CFLAGS) $(CFLAGS) -MT libdev18f66j99_a-pic18f66j99.obj -MD -MP -MF $(DEPDIR)/libdev18f66j99_a-pic18f66j99.Tpo -c -o libdev18f66j99_a-pic18f66j99.obj `if test -f 'pic18f66j99.c'; then $(CYGPATH_W) 'pic18f66j99.c'; else $(CYGPATH_W) '$(srcdir)/pic18f66j99.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66j99_a-pic18f66j99.Tpo $(DEPDIR)/libdev18f66j99_a-pic18f66j99.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f66j99.c' object='libdev18f66j99_a-pic18f66j99.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j99_a-pic18f66j99.obj `if test -f 'pic18f66j99.c'; then $(CYGPATH_W) 'pic18f66j99.c'; else $(CYGPATH_W) '$(srcdir)/pic18f66j99.c'; fi`
+
+libdev18f66j99_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j99_a_CFLAGS) $(CFLAGS) -MT libdev18f66j99_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f66j99_a-fake_sspbuf.Tpo -c -o libdev18f66j99_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66j99_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f66j99_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f66j99_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j99_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f66j99_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j99_a_CFLAGS) $(CFLAGS) -MT libdev18f66j99_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f66j99_a-fake_sspbuf.Tpo -c -o libdev18f66j99_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66j99_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f66j99_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f66j99_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f66j99_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
 libdev18f66k22_a-pic18f66k22.o: pic18f66k22.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f66k22_a_CFLAGS) $(CFLAGS) -MT libdev18f66k22_a-pic18f66k22.o -MD -MP -MF $(DEPDIR)/libdev18f66k22_a-pic18f66k22.Tpo -c -o libdev18f66k22_a-pic18f66k22.o `test -f 'pic18f66k22.c' || echo '$(srcdir)/'`pic18f66k22.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f66k22_a-pic18f66k22.Tpo $(DEPDIR)/libdev18f66k22_a-pic18f66k22.Po
@@ -8002,6 +8258,34 @@ libdev18f67j93_a-pic18f67j93.obj: pic18f67j93.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f67j93.c' object='libdev18f67j93_a-pic18f67j93.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j93_a_CFLAGS) $(CFLAGS) -c -o libdev18f67j93_a-pic18f67j93.obj `if test -f 'pic18f67j93.c'; then $(CYGPATH_W) 'pic18f67j93.c'; else $(CYGPATH_W) '$(srcdir)/pic18f67j93.c'; fi`
+
+libdev18f67j94_a-pic18f67j94.o: pic18f67j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j94_a_CFLAGS) $(CFLAGS) -MT libdev18f67j94_a-pic18f67j94.o -MD -MP -MF $(DEPDIR)/libdev18f67j94_a-pic18f67j94.Tpo -c -o libdev18f67j94_a-pic18f67j94.o `test -f 'pic18f67j94.c' || echo '$(srcdir)/'`pic18f67j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f67j94_a-pic18f67j94.Tpo $(DEPDIR)/libdev18f67j94_a-pic18f67j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f67j94.c' object='libdev18f67j94_a-pic18f67j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f67j94_a-pic18f67j94.o `test -f 'pic18f67j94.c' || echo '$(srcdir)/'`pic18f67j94.c
+
+libdev18f67j94_a-pic18f67j94.obj: pic18f67j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j94_a_CFLAGS) $(CFLAGS) -MT libdev18f67j94_a-pic18f67j94.obj -MD -MP -MF $(DEPDIR)/libdev18f67j94_a-pic18f67j94.Tpo -c -o libdev18f67j94_a-pic18f67j94.obj `if test -f 'pic18f67j94.c'; then $(CYGPATH_W) 'pic18f67j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f67j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f67j94_a-pic18f67j94.Tpo $(DEPDIR)/libdev18f67j94_a-pic18f67j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f67j94.c' object='libdev18f67j94_a-pic18f67j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f67j94_a-pic18f67j94.obj `if test -f 'pic18f67j94.c'; then $(CYGPATH_W) 'pic18f67j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f67j94.c'; fi`
+
+libdev18f67j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j94_a_CFLAGS) $(CFLAGS) -MT libdev18f67j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f67j94_a-fake_sspbuf.Tpo -c -o libdev18f67j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f67j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f67j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f67j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f67j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f67j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j94_a_CFLAGS) $(CFLAGS) -MT libdev18f67j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f67j94_a-fake_sspbuf.Tpo -c -o libdev18f67j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f67j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f67j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f67j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f67j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
 
 libdev18f67k22_a-pic18f67k22.o: pic18f67k22.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f67k22_a_CFLAGS) $(CFLAGS) -MT libdev18f67k22_a-pic18f67k22.o -MD -MP -MF $(DEPDIR)/libdev18f67k22_a-pic18f67k22.Tpo -c -o libdev18f67k22_a-pic18f67k22.o `test -f 'pic18f67k22.c' || echo '$(srcdir)/'`pic18f67k22.c
@@ -8297,6 +8581,34 @@ libdev18f85j90_a-pic18f85j90.obj: pic18f85j90.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j90_a_CFLAGS) $(CFLAGS) -c -o libdev18f85j90_a-pic18f85j90.obj `if test -f 'pic18f85j90.c'; then $(CYGPATH_W) 'pic18f85j90.c'; else $(CYGPATH_W) '$(srcdir)/pic18f85j90.c'; fi`
 
+libdev18f85j94_a-pic18f85j94.o: pic18f85j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j94_a_CFLAGS) $(CFLAGS) -MT libdev18f85j94_a-pic18f85j94.o -MD -MP -MF $(DEPDIR)/libdev18f85j94_a-pic18f85j94.Tpo -c -o libdev18f85j94_a-pic18f85j94.o `test -f 'pic18f85j94.c' || echo '$(srcdir)/'`pic18f85j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f85j94_a-pic18f85j94.Tpo $(DEPDIR)/libdev18f85j94_a-pic18f85j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f85j94.c' object='libdev18f85j94_a-pic18f85j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f85j94_a-pic18f85j94.o `test -f 'pic18f85j94.c' || echo '$(srcdir)/'`pic18f85j94.c
+
+libdev18f85j94_a-pic18f85j94.obj: pic18f85j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j94_a_CFLAGS) $(CFLAGS) -MT libdev18f85j94_a-pic18f85j94.obj -MD -MP -MF $(DEPDIR)/libdev18f85j94_a-pic18f85j94.Tpo -c -o libdev18f85j94_a-pic18f85j94.obj `if test -f 'pic18f85j94.c'; then $(CYGPATH_W) 'pic18f85j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f85j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f85j94_a-pic18f85j94.Tpo $(DEPDIR)/libdev18f85j94_a-pic18f85j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f85j94.c' object='libdev18f85j94_a-pic18f85j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f85j94_a-pic18f85j94.obj `if test -f 'pic18f85j94.c'; then $(CYGPATH_W) 'pic18f85j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f85j94.c'; fi`
+
+libdev18f85j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j94_a_CFLAGS) $(CFLAGS) -MT libdev18f85j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f85j94_a-fake_sspbuf.Tpo -c -o libdev18f85j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f85j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f85j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f85j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f85j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f85j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j94_a_CFLAGS) $(CFLAGS) -MT libdev18f85j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f85j94_a-fake_sspbuf.Tpo -c -o libdev18f85j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f85j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f85j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f85j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f85j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
 libdev18f85k22_a-pic18f85k22.o: pic18f85k22.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f85k22_a_CFLAGS) $(CFLAGS) -MT libdev18f85k22_a-pic18f85k22.o -MD -MP -MF $(DEPDIR)/libdev18f85k22_a-pic18f85k22.Tpo -c -o libdev18f85k22_a-pic18f85k22.o `test -f 'pic18f85k22.c' || echo '$(srcdir)/'`pic18f85k22.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f85k22_a-pic18f85k22.Tpo $(DEPDIR)/libdev18f85k22_a-pic18f85k22.Po
@@ -8563,6 +8875,62 @@ libdev18f86j93_a-pic18f86j93.obj: pic18f86j93.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j93_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j93_a-pic18f86j93.obj `if test -f 'pic18f86j93.c'; then $(CYGPATH_W) 'pic18f86j93.c'; else $(CYGPATH_W) '$(srcdir)/pic18f86j93.c'; fi`
 
+libdev18f86j94_a-pic18f86j94.o: pic18f86j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j94_a_CFLAGS) $(CFLAGS) -MT libdev18f86j94_a-pic18f86j94.o -MD -MP -MF $(DEPDIR)/libdev18f86j94_a-pic18f86j94.Tpo -c -o libdev18f86j94_a-pic18f86j94.o `test -f 'pic18f86j94.c' || echo '$(srcdir)/'`pic18f86j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86j94_a-pic18f86j94.Tpo $(DEPDIR)/libdev18f86j94_a-pic18f86j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f86j94.c' object='libdev18f86j94_a-pic18f86j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j94_a-pic18f86j94.o `test -f 'pic18f86j94.c' || echo '$(srcdir)/'`pic18f86j94.c
+
+libdev18f86j94_a-pic18f86j94.obj: pic18f86j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j94_a_CFLAGS) $(CFLAGS) -MT libdev18f86j94_a-pic18f86j94.obj -MD -MP -MF $(DEPDIR)/libdev18f86j94_a-pic18f86j94.Tpo -c -o libdev18f86j94_a-pic18f86j94.obj `if test -f 'pic18f86j94.c'; then $(CYGPATH_W) 'pic18f86j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f86j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86j94_a-pic18f86j94.Tpo $(DEPDIR)/libdev18f86j94_a-pic18f86j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f86j94.c' object='libdev18f86j94_a-pic18f86j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j94_a-pic18f86j94.obj `if test -f 'pic18f86j94.c'; then $(CYGPATH_W) 'pic18f86j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f86j94.c'; fi`
+
+libdev18f86j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j94_a_CFLAGS) $(CFLAGS) -MT libdev18f86j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f86j94_a-fake_sspbuf.Tpo -c -o libdev18f86j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f86j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f86j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f86j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j94_a_CFLAGS) $(CFLAGS) -MT libdev18f86j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f86j94_a-fake_sspbuf.Tpo -c -o libdev18f86j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f86j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f86j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
+libdev18f86j99_a-pic18f86j99.o: pic18f86j99.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j99_a_CFLAGS) $(CFLAGS) -MT libdev18f86j99_a-pic18f86j99.o -MD -MP -MF $(DEPDIR)/libdev18f86j99_a-pic18f86j99.Tpo -c -o libdev18f86j99_a-pic18f86j99.o `test -f 'pic18f86j99.c' || echo '$(srcdir)/'`pic18f86j99.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86j99_a-pic18f86j99.Tpo $(DEPDIR)/libdev18f86j99_a-pic18f86j99.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f86j99.c' object='libdev18f86j99_a-pic18f86j99.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j99_a-pic18f86j99.o `test -f 'pic18f86j99.c' || echo '$(srcdir)/'`pic18f86j99.c
+
+libdev18f86j99_a-pic18f86j99.obj: pic18f86j99.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j99_a_CFLAGS) $(CFLAGS) -MT libdev18f86j99_a-pic18f86j99.obj -MD -MP -MF $(DEPDIR)/libdev18f86j99_a-pic18f86j99.Tpo -c -o libdev18f86j99_a-pic18f86j99.obj `if test -f 'pic18f86j99.c'; then $(CYGPATH_W) 'pic18f86j99.c'; else $(CYGPATH_W) '$(srcdir)/pic18f86j99.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86j99_a-pic18f86j99.Tpo $(DEPDIR)/libdev18f86j99_a-pic18f86j99.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f86j99.c' object='libdev18f86j99_a-pic18f86j99.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j99_a-pic18f86j99.obj `if test -f 'pic18f86j99.c'; then $(CYGPATH_W) 'pic18f86j99.c'; else $(CYGPATH_W) '$(srcdir)/pic18f86j99.c'; fi`
+
+libdev18f86j99_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j99_a_CFLAGS) $(CFLAGS) -MT libdev18f86j99_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f86j99_a-fake_sspbuf.Tpo -c -o libdev18f86j99_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86j99_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f86j99_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f86j99_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j99_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f86j99_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j99_a_CFLAGS) $(CFLAGS) -MT libdev18f86j99_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f86j99_a-fake_sspbuf.Tpo -c -o libdev18f86j99_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86j99_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f86j99_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f86j99_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f86j99_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
 libdev18f86k22_a-pic18f86k22.o: pic18f86k22.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f86k22_a_CFLAGS) $(CFLAGS) -MT libdev18f86k22_a-pic18f86k22.o -MD -MP -MF $(DEPDIR)/libdev18f86k22_a-pic18f86k22.Tpo -c -o libdev18f86k22_a-pic18f86k22.o `test -f 'pic18f86k22.c' || echo '$(srcdir)/'`pic18f86k22.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f86k22_a-pic18f86k22.Tpo $(DEPDIR)/libdev18f86k22_a-pic18f86k22.Po
@@ -8731,6 +9099,34 @@ libdev18f87j93_a-pic18f87j93.obj: pic18f87j93.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j93_a_CFLAGS) $(CFLAGS) -c -o libdev18f87j93_a-pic18f87j93.obj `if test -f 'pic18f87j93.c'; then $(CYGPATH_W) 'pic18f87j93.c'; else $(CYGPATH_W) '$(srcdir)/pic18f87j93.c'; fi`
 
+libdev18f87j94_a-pic18f87j94.o: pic18f87j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j94_a_CFLAGS) $(CFLAGS) -MT libdev18f87j94_a-pic18f87j94.o -MD -MP -MF $(DEPDIR)/libdev18f87j94_a-pic18f87j94.Tpo -c -o libdev18f87j94_a-pic18f87j94.o `test -f 'pic18f87j94.c' || echo '$(srcdir)/'`pic18f87j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f87j94_a-pic18f87j94.Tpo $(DEPDIR)/libdev18f87j94_a-pic18f87j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f87j94.c' object='libdev18f87j94_a-pic18f87j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f87j94_a-pic18f87j94.o `test -f 'pic18f87j94.c' || echo '$(srcdir)/'`pic18f87j94.c
+
+libdev18f87j94_a-pic18f87j94.obj: pic18f87j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j94_a_CFLAGS) $(CFLAGS) -MT libdev18f87j94_a-pic18f87j94.obj -MD -MP -MF $(DEPDIR)/libdev18f87j94_a-pic18f87j94.Tpo -c -o libdev18f87j94_a-pic18f87j94.obj `if test -f 'pic18f87j94.c'; then $(CYGPATH_W) 'pic18f87j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f87j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f87j94_a-pic18f87j94.Tpo $(DEPDIR)/libdev18f87j94_a-pic18f87j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f87j94.c' object='libdev18f87j94_a-pic18f87j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f87j94_a-pic18f87j94.obj `if test -f 'pic18f87j94.c'; then $(CYGPATH_W) 'pic18f87j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f87j94.c'; fi`
+
+libdev18f87j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j94_a_CFLAGS) $(CFLAGS) -MT libdev18f87j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f87j94_a-fake_sspbuf.Tpo -c -o libdev18f87j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f87j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f87j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f87j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f87j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f87j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j94_a_CFLAGS) $(CFLAGS) -MT libdev18f87j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f87j94_a-fake_sspbuf.Tpo -c -o libdev18f87j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f87j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f87j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f87j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f87j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
 libdev18f87k22_a-pic18f87k22.o: pic18f87k22.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87k22_a_CFLAGS) $(CFLAGS) -MT libdev18f87k22_a-pic18f87k22.o -MD -MP -MF $(DEPDIR)/libdev18f87k22_a-pic18f87k22.Tpo -c -o libdev18f87k22_a-pic18f87k22.o `test -f 'pic18f87k22.c' || echo '$(srcdir)/'`pic18f87k22.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f87k22_a-pic18f87k22.Tpo $(DEPDIR)/libdev18f87k22_a-pic18f87k22.Po
@@ -8758,6 +9154,34 @@ libdev18f87k90_a-pic18f87k90.obj: pic18f87k90.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f87k90.c' object='libdev18f87k90_a-pic18f87k90.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f87k90_a_CFLAGS) $(CFLAGS) -c -o libdev18f87k90_a-pic18f87k90.obj `if test -f 'pic18f87k90.c'; then $(CYGPATH_W) 'pic18f87k90.c'; else $(CYGPATH_W) '$(srcdir)/pic18f87k90.c'; fi`
+
+libdev18f95j94_a-pic18f95j94.o: pic18f95j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f95j94_a_CFLAGS) $(CFLAGS) -MT libdev18f95j94_a-pic18f95j94.o -MD -MP -MF $(DEPDIR)/libdev18f95j94_a-pic18f95j94.Tpo -c -o libdev18f95j94_a-pic18f95j94.o `test -f 'pic18f95j94.c' || echo '$(srcdir)/'`pic18f95j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f95j94_a-pic18f95j94.Tpo $(DEPDIR)/libdev18f95j94_a-pic18f95j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f95j94.c' object='libdev18f95j94_a-pic18f95j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f95j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f95j94_a-pic18f95j94.o `test -f 'pic18f95j94.c' || echo '$(srcdir)/'`pic18f95j94.c
+
+libdev18f95j94_a-pic18f95j94.obj: pic18f95j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f95j94_a_CFLAGS) $(CFLAGS) -MT libdev18f95j94_a-pic18f95j94.obj -MD -MP -MF $(DEPDIR)/libdev18f95j94_a-pic18f95j94.Tpo -c -o libdev18f95j94_a-pic18f95j94.obj `if test -f 'pic18f95j94.c'; then $(CYGPATH_W) 'pic18f95j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f95j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f95j94_a-pic18f95j94.Tpo $(DEPDIR)/libdev18f95j94_a-pic18f95j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f95j94.c' object='libdev18f95j94_a-pic18f95j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f95j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f95j94_a-pic18f95j94.obj `if test -f 'pic18f95j94.c'; then $(CYGPATH_W) 'pic18f95j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f95j94.c'; fi`
+
+libdev18f95j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f95j94_a_CFLAGS) $(CFLAGS) -MT libdev18f95j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f95j94_a-fake_sspbuf.Tpo -c -o libdev18f95j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f95j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f95j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f95j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f95j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f95j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f95j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f95j94_a_CFLAGS) $(CFLAGS) -MT libdev18f95j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f95j94_a-fake_sspbuf.Tpo -c -o libdev18f95j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f95j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f95j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f95j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f95j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f95j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
 
 libdev18f96j60_a-pic18f96j60.o: pic18f96j60.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j60_a_CFLAGS) $(CFLAGS) -MT libdev18f96j60_a-pic18f96j60.o -MD -MP -MF $(DEPDIR)/libdev18f96j60_a-pic18f96j60.Tpo -c -o libdev18f96j60_a-pic18f96j60.o `test -f 'pic18f96j60.c' || echo '$(srcdir)/'`pic18f96j60.c
@@ -8787,6 +9211,62 @@ libdev18f96j65_a-pic18f96j65.obj: pic18f96j65.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j65_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j65_a-pic18f96j65.obj `if test -f 'pic18f96j65.c'; then $(CYGPATH_W) 'pic18f96j65.c'; else $(CYGPATH_W) '$(srcdir)/pic18f96j65.c'; fi`
 
+libdev18f96j94_a-pic18f96j94.o: pic18f96j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j94_a_CFLAGS) $(CFLAGS) -MT libdev18f96j94_a-pic18f96j94.o -MD -MP -MF $(DEPDIR)/libdev18f96j94_a-pic18f96j94.Tpo -c -o libdev18f96j94_a-pic18f96j94.o `test -f 'pic18f96j94.c' || echo '$(srcdir)/'`pic18f96j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f96j94_a-pic18f96j94.Tpo $(DEPDIR)/libdev18f96j94_a-pic18f96j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f96j94.c' object='libdev18f96j94_a-pic18f96j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j94_a-pic18f96j94.o `test -f 'pic18f96j94.c' || echo '$(srcdir)/'`pic18f96j94.c
+
+libdev18f96j94_a-pic18f96j94.obj: pic18f96j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j94_a_CFLAGS) $(CFLAGS) -MT libdev18f96j94_a-pic18f96j94.obj -MD -MP -MF $(DEPDIR)/libdev18f96j94_a-pic18f96j94.Tpo -c -o libdev18f96j94_a-pic18f96j94.obj `if test -f 'pic18f96j94.c'; then $(CYGPATH_W) 'pic18f96j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f96j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f96j94_a-pic18f96j94.Tpo $(DEPDIR)/libdev18f96j94_a-pic18f96j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f96j94.c' object='libdev18f96j94_a-pic18f96j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j94_a-pic18f96j94.obj `if test -f 'pic18f96j94.c'; then $(CYGPATH_W) 'pic18f96j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f96j94.c'; fi`
+
+libdev18f96j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j94_a_CFLAGS) $(CFLAGS) -MT libdev18f96j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f96j94_a-fake_sspbuf.Tpo -c -o libdev18f96j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f96j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f96j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f96j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f96j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j94_a_CFLAGS) $(CFLAGS) -MT libdev18f96j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f96j94_a-fake_sspbuf.Tpo -c -o libdev18f96j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f96j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f96j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f96j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
+libdev18f96j99_a-pic18f96j99.o: pic18f96j99.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j99_a_CFLAGS) $(CFLAGS) -MT libdev18f96j99_a-pic18f96j99.o -MD -MP -MF $(DEPDIR)/libdev18f96j99_a-pic18f96j99.Tpo -c -o libdev18f96j99_a-pic18f96j99.o `test -f 'pic18f96j99.c' || echo '$(srcdir)/'`pic18f96j99.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f96j99_a-pic18f96j99.Tpo $(DEPDIR)/libdev18f96j99_a-pic18f96j99.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f96j99.c' object='libdev18f96j99_a-pic18f96j99.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j99_a-pic18f96j99.o `test -f 'pic18f96j99.c' || echo '$(srcdir)/'`pic18f96j99.c
+
+libdev18f96j99_a-pic18f96j99.obj: pic18f96j99.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j99_a_CFLAGS) $(CFLAGS) -MT libdev18f96j99_a-pic18f96j99.obj -MD -MP -MF $(DEPDIR)/libdev18f96j99_a-pic18f96j99.Tpo -c -o libdev18f96j99_a-pic18f96j99.obj `if test -f 'pic18f96j99.c'; then $(CYGPATH_W) 'pic18f96j99.c'; else $(CYGPATH_W) '$(srcdir)/pic18f96j99.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f96j99_a-pic18f96j99.Tpo $(DEPDIR)/libdev18f96j99_a-pic18f96j99.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f96j99.c' object='libdev18f96j99_a-pic18f96j99.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j99_a-pic18f96j99.obj `if test -f 'pic18f96j99.c'; then $(CYGPATH_W) 'pic18f96j99.c'; else $(CYGPATH_W) '$(srcdir)/pic18f96j99.c'; fi`
+
+libdev18f96j99_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j99_a_CFLAGS) $(CFLAGS) -MT libdev18f96j99_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f96j99_a-fake_sspbuf.Tpo -c -o libdev18f96j99_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f96j99_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f96j99_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f96j99_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j99_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f96j99_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j99_a_CFLAGS) $(CFLAGS) -MT libdev18f96j99_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f96j99_a-fake_sspbuf.Tpo -c -o libdev18f96j99_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f96j99_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f96j99_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f96j99_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f96j99_a_CFLAGS) $(CFLAGS) -c -o libdev18f96j99_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+
 libdev18f97j60_a-pic18f97j60.o: pic18f97j60.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j60_a_CFLAGS) $(CFLAGS) -MT libdev18f97j60_a-pic18f97j60.o -MD -MP -MF $(DEPDIR)/libdev18f97j60_a-pic18f97j60.Tpo -c -o libdev18f97j60_a-pic18f97j60.o `test -f 'pic18f97j60.c' || echo '$(srcdir)/'`pic18f97j60.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f97j60_a-pic18f97j60.Tpo $(DEPDIR)/libdev18f97j60_a-pic18f97j60.Po
@@ -8800,6 +9280,34 @@ libdev18f97j60_a-pic18f97j60.obj: pic18f97j60.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f97j60.c' object='libdev18f97j60_a-pic18f97j60.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j60_a_CFLAGS) $(CFLAGS) -c -o libdev18f97j60_a-pic18f97j60.obj `if test -f 'pic18f97j60.c'; then $(CYGPATH_W) 'pic18f97j60.c'; else $(CYGPATH_W) '$(srcdir)/pic18f97j60.c'; fi`
+
+libdev18f97j94_a-pic18f97j94.o: pic18f97j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j94_a_CFLAGS) $(CFLAGS) -MT libdev18f97j94_a-pic18f97j94.o -MD -MP -MF $(DEPDIR)/libdev18f97j94_a-pic18f97j94.Tpo -c -o libdev18f97j94_a-pic18f97j94.o `test -f 'pic18f97j94.c' || echo '$(srcdir)/'`pic18f97j94.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f97j94_a-pic18f97j94.Tpo $(DEPDIR)/libdev18f97j94_a-pic18f97j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f97j94.c' object='libdev18f97j94_a-pic18f97j94.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f97j94_a-pic18f97j94.o `test -f 'pic18f97j94.c' || echo '$(srcdir)/'`pic18f97j94.c
+
+libdev18f97j94_a-pic18f97j94.obj: pic18f97j94.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j94_a_CFLAGS) $(CFLAGS) -MT libdev18f97j94_a-pic18f97j94.obj -MD -MP -MF $(DEPDIR)/libdev18f97j94_a-pic18f97j94.Tpo -c -o libdev18f97j94_a-pic18f97j94.obj `if test -f 'pic18f97j94.c'; then $(CYGPATH_W) 'pic18f97j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f97j94.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f97j94_a-pic18f97j94.Tpo $(DEPDIR)/libdev18f97j94_a-pic18f97j94.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pic18f97j94.c' object='libdev18f97j94_a-pic18f97j94.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f97j94_a-pic18f97j94.obj `if test -f 'pic18f97j94.c'; then $(CYGPATH_W) 'pic18f97j94.c'; else $(CYGPATH_W) '$(srcdir)/pic18f97j94.c'; fi`
+
+libdev18f97j94_a-fake_sspbuf.o: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j94_a_CFLAGS) $(CFLAGS) -MT libdev18f97j94_a-fake_sspbuf.o -MD -MP -MF $(DEPDIR)/libdev18f97j94_a-fake_sspbuf.Tpo -c -o libdev18f97j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f97j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f97j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f97j94_a-fake_sspbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f97j94_a-fake_sspbuf.o `test -f 'fake_sspbuf.c' || echo '$(srcdir)/'`fake_sspbuf.c
+
+libdev18f97j94_a-fake_sspbuf.obj: fake_sspbuf.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j94_a_CFLAGS) $(CFLAGS) -MT libdev18f97j94_a-fake_sspbuf.obj -MD -MP -MF $(DEPDIR)/libdev18f97j94_a-fake_sspbuf.Tpo -c -o libdev18f97j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libdev18f97j94_a-fake_sspbuf.Tpo $(DEPDIR)/libdev18f97j94_a-fake_sspbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fake_sspbuf.c' object='libdev18f97j94_a-fake_sspbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libdev18f97j94_a_CFLAGS) $(CFLAGS) -c -o libdev18f97j94_a-fake_sspbuf.obj `if test -f 'fake_sspbuf.c'; then $(CYGPATH_W) 'fake_sspbuf.c'; else $(CYGPATH_W) '$(srcdir)/fake_sspbuf.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -8901,8 +9409,8 @@ install-am: all-am
 installcheck: installcheck-am
 install-strip:
 	if test -z '$(STRIP)'; then \
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
-	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
+	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
+	    install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
 	      install; \
 	else \
 	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \

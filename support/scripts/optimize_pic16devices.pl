@@ -2,7 +2,7 @@
 
 =back
 
-  Copyright (C) 2012 Molnar Karoly <proton7@freemail.hu>
+  Copyright (C) 2012 Molnar Karoly <molnarkaroly@users.sf.net>
 
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -23,6 +23,8 @@
 
     This program optimizes or unoptimizes the pic16devices.txt file.
     For more explanation: optimize_pic16devices.pl -h
+
+  $Id$
 
 =cut
 
@@ -626,7 +628,7 @@ for (my $i = 0; $i < @ARGV; )
 
   given ($opt)
     {
-    when (/^-(c|-optimize)$/o)   { $operation = OP_OPTIMIZE; }
+    when (/^-(o|-optimize)$/o)   { $operation = OP_OPTIMIZE; }
 
     when (/^-(u|-unoptimize)$/o) { $operation = OP_UNOPTIMIZE; }
 

@@ -1362,6 +1362,12 @@ libdev18f65j90_a_SOURCES = pic18f65j90.c
 libdev18f65j90_a_SOURCES += gptr/dispatch.S
 libdev18f65j90_a_CFLAGS = -p18f65j90 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f65j94.a
+libdev18f65j94_a_SOURCES = pic18f65j94.c
+libdev18f65j94_a_SOURCES += gptr/dispatch.S
+libdev18f65j94_a_SOURCES += fake_sspbuf.c
+libdev18f65j94_a_CFLAGS = -p18f65j94 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f65k22.a
 libdev18f65k22_a_SOURCES = pic18f65k22.c
 libdev18f65k22_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
@@ -1520,6 +1526,18 @@ libdev18f66j93_a_SOURCES = pic18f66j93.c
 libdev18f66j93_a_SOURCES += gptr/dispatch.S
 libdev18f66j93_a_CFLAGS = -p18f66j93 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f66j94.a
+libdev18f66j94_a_SOURCES = pic18f66j94.c
+libdev18f66j94_a_SOURCES += gptr/dispatch.S
+libdev18f66j94_a_SOURCES += fake_sspbuf.c
+libdev18f66j94_a_CFLAGS = -p18f66j94 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f66j99.a
+libdev18f66j99_a_SOURCES = pic18f66j99.c
+libdev18f66j99_a_SOURCES += gptr/dispatch.S
+libdev18f66j99_a_SOURCES += fake_sspbuf.c
+libdev18f66j99_a_CFLAGS = -p18f66j99 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f66k22.a
 libdev18f66k22_a_SOURCES = pic18f66k22.c
 libdev18f66k22_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
@@ -1621,6 +1639,12 @@ lib_LIBRARIES += libdev18f67j93.a
 libdev18f67j93_a_SOURCES = pic18f67j93.c
 libdev18f67j93_a_SOURCES += gptr/dispatch.S
 libdev18f67j93_a_CFLAGS = -p18f67j93 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f67j94.a
+libdev18f67j94_a_SOURCES = pic18f67j94.c
+libdev18f67j94_a_SOURCES += gptr/dispatch.S
+libdev18f67j94_a_SOURCES += fake_sspbuf.c
+libdev18f67j94_a_CFLAGS = -p18f67j94 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f67k22.a
 libdev18f67k22_a_SOURCES = pic18f67k22.c
@@ -1768,6 +1792,12 @@ lib_LIBRARIES += libdev18f85j90.a
 libdev18f85j90_a_SOURCES = pic18f85j90.c
 libdev18f85j90_a_SOURCES += gptr/dispatch.S
 libdev18f85j90_a_CFLAGS = -p18f85j90 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f85j94.a
+libdev18f85j94_a_SOURCES = pic18f85j94.c
+libdev18f85j94_a_SOURCES += gptr/dispatch.S
+libdev18f85j94_a_SOURCES += fake_sspbuf.c
+libdev18f85j94_a_CFLAGS = -p18f85j94 $(AM_CFLAGS)
 
 lib_LIBRARIES += libdev18f85k22.a
 libdev18f85k22_a_SOURCES = pic18f85k22.c
@@ -1920,6 +1950,18 @@ libdev18f86j93_a_SOURCES = pic18f86j93.c
 libdev18f86j93_a_SOURCES += gptr/dispatch.S
 libdev18f86j93_a_CFLAGS = -p18f86j93 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f86j94.a
+libdev18f86j94_a_SOURCES = pic18f86j94.c
+libdev18f86j94_a_SOURCES += gptr/dispatch.S
+libdev18f86j94_a_SOURCES += fake_sspbuf.c
+libdev18f86j94_a_CFLAGS = -p18f86j94 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f86j99.a
+libdev18f86j99_a_SOURCES = pic18f86j99.c
+libdev18f86j99_a_SOURCES += gptr/dispatch.S
+libdev18f86j99_a_SOURCES += fake_sspbuf.c
+libdev18f86j99_a_CFLAGS = -p18f86j99 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f86k22.a
 libdev18f86k22_a_SOURCES = pic18f86k22.c
 libdev18f86k22_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
@@ -2015,6 +2057,12 @@ libdev18f87j93_a_SOURCES = pic18f87j93.c
 libdev18f87j93_a_SOURCES += gptr/dispatch.S
 libdev18f87j93_a_CFLAGS = -p18f87j93 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f87j94.a
+libdev18f87j94_a_SOURCES = pic18f87j94.c
+libdev18f87j94_a_SOURCES += gptr/dispatch.S
+libdev18f87j94_a_SOURCES += fake_sspbuf.c
+libdev18f87j94_a_CFLAGS = -p18f87j94 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f87k22.a
 libdev18f87k22_a_SOURCES = pic18f87k22.c
 libdev18f87k22_a_SOURCES += gptr/eeprom16_gptrget1_dispatch.S
@@ -2039,6 +2087,12 @@ libdev18f87k90_a_SOURCES += gptr/eeprom16_gptrput3_dispatch.S
 libdev18f87k90_a_SOURCES += gptr/eeprom16_gptrput4_dispatch.S
 libdev18f87k90_a_CFLAGS = -p18f87k90 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f95j94.a
+libdev18f95j94_a_SOURCES = pic18f95j94.c
+libdev18f95j94_a_SOURCES += gptr/dispatch.S
+libdev18f95j94_a_SOURCES += fake_sspbuf.c
+libdev18f95j94_a_CFLAGS = -p18f95j94 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f96j60.a
 libdev18f96j60_a_SOURCES = pic18f96j60.c
 libdev18f96j60_a_SOURCES += gptr/dispatch.S
@@ -2049,10 +2103,28 @@ libdev18f96j65_a_SOURCES = pic18f96j65.c
 libdev18f96j65_a_SOURCES += gptr/dispatch.S
 libdev18f96j65_a_CFLAGS = -p18f96j65 $(AM_CFLAGS)
 
+lib_LIBRARIES += libdev18f96j94.a
+libdev18f96j94_a_SOURCES = pic18f96j94.c
+libdev18f96j94_a_SOURCES += gptr/dispatch.S
+libdev18f96j94_a_SOURCES += fake_sspbuf.c
+libdev18f96j94_a_CFLAGS = -p18f96j94 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f96j99.a
+libdev18f96j99_a_SOURCES = pic18f96j99.c
+libdev18f96j99_a_SOURCES += gptr/dispatch.S
+libdev18f96j99_a_SOURCES += fake_sspbuf.c
+libdev18f96j99_a_CFLAGS = -p18f96j99 $(AM_CFLAGS)
+
 lib_LIBRARIES += libdev18f97j60.a
 libdev18f97j60_a_SOURCES = pic18f97j60.c
 libdev18f97j60_a_SOURCES += gptr/dispatch.S
 libdev18f97j60_a_CFLAGS = -p18f97j60 $(AM_CFLAGS)
+
+lib_LIBRARIES += libdev18f97j94.a
+libdev18f97j94_a_SOURCES = pic18f97j94.c
+libdev18f97j94_a_SOURCES += gptr/dispatch.S
+libdev18f97j94_a_SOURCES += fake_sspbuf.c
+libdev18f97j94_a_CFLAGS = -p18f97j94 $(AM_CFLAGS)
 
 include $(top_srcdir)/Makefile.common
 

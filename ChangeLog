@@ -1,3 +1,41 @@
+2012-11-01 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/include/pic16/pic16devices.txt,
+	  device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/libio/adc.ignore,
+	  device/lib/pic16/libio/i2c.ignore,
+	  device/lib/pic16/libio/usart.ignore,
+	  device/non-free/include/pic16/pic18f65j94.h,
+	  device/non-free/include/pic16/pic18f66j94.h,
+	  device/non-free/include/pic16/pic18f66j99.h,
+	  device/non-free/include/pic16/pic18f67j94.h,
+	  device/non-free/include/pic16/pic18f85j94.h,
+	  device/non-free/include/pic16/pic18f86j94.h,
+	  device/non-free/include/pic16/pic18f86j99.h,
+	  device/non-free/include/pic16/pic18f87j94.h,
+	  device/non-free/include/pic16/pic18f95j94.h,
+	  device/non-free/include/pic16/pic18f96j94.h,
+	  device/non-free/include/pic16/pic18f96j99.h,
+	  device/non-free/include/pic16/pic18f97j94.h,
+	  device/non-free/lib/pic16/libdev/Makefile.am,
+	  device/non-free/lib/pic16/libdev/Makefile.in,
+	  device/non-free/lib/pic16/libdev/pic18f65j94.c,
+	  device/non-free/lib/pic16/libdev/pic18f66j94.c,
+	  device/non-free/lib/pic16/libdev/pic18f66j99.c,
+	  device/non-free/lib/pic16/libdev/pic18f67j94.c,
+	  device/non-free/lib/pic16/libdev/pic18f85j94.c,
+	  device/non-free/lib/pic16/libdev/pic18f86j94.c,
+	  device/non-free/lib/pic16/libdev/pic18f86j99.c,
+	  device/non-free/lib/pic16/libdev/pic18f87j94.c,
+	  device/non-free/lib/pic16/libdev/pic18f95j94.c,
+	  device/non-free/lib/pic16/libdev/pic18f96j94.c,
+	  device/non-free/lib/pic16/libdev/pic18f96j99.c,
+	  device/non-free/lib/pic16/libdev/pic18f97j94.c,
+	  device/non-free/lib/pic16/pics.all: Support for new devices.
+	* support/scripts/optimize_pic16devices.pl: Changed option "-c" to "-o".
+
 2012-11-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc2.cc:

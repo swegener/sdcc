@@ -1,8 +1,8 @@
 /*
  *
- * This file is generated automatically, 2012-10-01 15:31:28 UTC.
+ * This file is generated automatically by the device-manager.pl program.
  *
- * Copyright (C) 2012, Molnar Karoly <proton7@freemail.hu>
+ * Copyright (C) 2012, Molnár Károly <molnarkaroly@users.sf.net>
  *
  */
 
@@ -189,6 +189,9 @@
 #elif defined(__SDCC_PIC18F65J90)
   #include <pic18f65j90.h>
 
+#elif defined(__SDCC_PIC18F65J94)
+  #include <pic18f65j94.h>
+
 #elif defined(__SDCC_PIC18F65K22)
   #include <pic18f65k22.h>
 
@@ -228,6 +231,12 @@
 #elif defined(__SDCC_PIC18F66J93)
   #include <pic18f66j93.h>
 
+#elif defined(__SDCC_PIC18F66J94)
+  #include <pic18f66j94.h>
+
+#elif defined(__SDCC_PIC18F66J99)
+  #include <pic18f66j99.h>
+
 #elif defined(__SDCC_PIC18F66K22)
   #include <pic18f66k22.h>
 
@@ -254,6 +263,9 @@
 
 #elif defined(__SDCC_PIC18F67J93)
   #include <pic18f67j93.h>
+
+#elif defined(__SDCC_PIC18F67J94)
+  #include <pic18f67j94.h>
 
 #elif defined(__SDCC_PIC18F67K22)
   #include <pic18f67k22.h>
@@ -287,6 +299,9 @@
 
 #elif defined(__SDCC_PIC18F85J90)
   #include <pic18f85j90.h>
+
+#elif defined(__SDCC_PIC18F85J94)
+  #include <pic18f85j94.h>
 
 #elif defined(__SDCC_PIC18F85K22)
   #include <pic18f85k22.h>
@@ -327,6 +342,12 @@
 #elif defined(__SDCC_PIC18F86J93)
   #include <pic18f86j93.h>
 
+#elif defined(__SDCC_PIC18F86J94)
+  #include <pic18f86j94.h>
+
+#elif defined(__SDCC_PIC18F86J99)
+  #include <pic18f86j99.h>
+
 #elif defined(__SDCC_PIC18F86K22)
   #include <pic18f86k22.h>
 
@@ -354,11 +375,17 @@
 #elif defined(__SDCC_PIC18F87J93)
   #include <pic18f87j93.h>
 
+#elif defined(__SDCC_PIC18F87J94)
+  #include <pic18f87j94.h>
+
 #elif defined(__SDCC_PIC18F87K22)
   #include <pic18f87k22.h>
 
 #elif defined(__SDCC_PIC18F87K90)
   #include <pic18f87k90.h>
+
+#elif defined(__SDCC_PIC18F95J94)
+  #include <pic18f95j94.h>
 
 #elif defined(__SDCC_PIC18F96J60)
   #include <pic18f96j60.h>
@@ -366,8 +393,17 @@
 #elif defined(__SDCC_PIC18F96J65)
   #include <pic18f96j65.h>
 
+#elif defined(__SDCC_PIC18F96J94)
+  #include <pic18f96j94.h>
+
+#elif defined(__SDCC_PIC18F96J99)
+  #include <pic18f96j99.h>
+
 #elif defined(__SDCC_PIC18F97J60)
   #include <pic18f97j60.h>
+
+#elif defined(__SDCC_PIC18F97J94)
+  #include <pic18f97j94.h>
 
 #elif defined(__SDCC_PIC18F242)
   #include <pic18f242.h>

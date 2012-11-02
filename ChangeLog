@@ -1,16 +1,22 @@
+2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/cinc2h.pl,
+	  support/scripts/pic14-header-parser.pl,
+	  support/scripts/pic16-header-parser.pl: Toggle execution flag.
+
 2012-11-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
 	  Fixed bug in assignment from register pair iy to extended stack, fix #3582658.
 
-2012-11-01 Molnar Karoly <molnarkaroly AT users.sf.net>
+2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/cinc2h.pl: Changed option "-c" onto "-o".
 	* support/scripts/pic14-header-parser.pl,
 	  support/scripts/pic16-header-parser.pl,
 	  support/scripts/pic16fam-h-gen.pl: Updated my email address.
 
-2012-11-01 Molnar Karoly <molnarkaroly AT users.sf.net>
+2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic16/pic16devices.txt,
 	  device/include/pic16/pic18fregs.h,

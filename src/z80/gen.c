@@ -396,7 +396,7 @@ isPairDead (PAIR_ID id, const iCode * ic)
 }
 
 static PAIR_ID
-getDeadPairId (const iCode * ic)
+getDeadPairId (const iCode *ic)
 {
   if (isPairDead (PAIR_BC, ic))
     {
@@ -413,7 +413,7 @@ getDeadPairId (const iCode * ic)
 }
 
 static PAIR_ID
-getFreePairId (const iCode * ic)        // Todo: Cost
+getFreePairId (const iCode *ic)        // Todo: Cost
 {
   if (!isPairInUse (PAIR_BC, ic))
     {
@@ -10138,7 +10138,7 @@ genAssign (const iCode * ic)
               emit2 ("pop af");
               emit2 ("inc sp");
               regalloc_dry_run_cost += 5;
-              if (AOP_TYPE (result) == AOP_IY)  /* Take care not to overwrite iy */
+              if (AOP_TYPE (result) == AOP_IY) /* Take care not to overwrite iy */
                 {
                   emit2 ("ld (%s+%d), a", AOP (result)->aopu.aop_dir, size);
                   regalloc_dry_run_cost += 3;
@@ -10148,10 +10148,26 @@ genAssign (const iCode * ic)
             }
           else if (size == 1)
             {
-              if (AOP_TYPE (result) == AOP_IY)  /* Take care not to overwrite iy */
+              if (AOP_TYPE (result) == AOP_IY) /* Take care not to overwrite iy */
                 {
                   emit2 ("ld (%s), iy", AOP (result)->aopu.aop_dir);
                   regalloc_dry_run_cost += 4;
+                  size--;
+                }
+              else if (AOP_TYPE (result) == AOP_EXSTK) /* Take care not to overwrite iy */
+                {
+                  bool pushed_pair = FALSE;
+                  PAIR_ID pair = getDeadPairId (ic);
+                  if (pair == PAIR_INVALID)
+                  {
+                    pair = PAIR_HL;
+                    _push(pair);
+                    pushed_pair= TRUE;
+                  }
+                  fetchPair (pair, AOP (right));
+                  commitPair (AOP (result), pair, ic, FALSE);
+                  if (pushed_pair)
+                    _pop (pair);
                   size--;
                 }
               else
@@ -10164,7 +10180,7 @@ genAssign (const iCode * ic)
             }
           else
             {
-              if (AOP_TYPE (result) == AOP_IY)  /* Take care not to overwrite iy */
+              if (AOP_TYPE (result) == AOP_IY) /* Take care not to overwrite iy */
                 {
                   cheapMove (ASMOP_A, 0, ASMOP_ZERO, 0);
                   emit2 ("ld (%s+%d), a", AOP (result)->aopu.aop_dir, size);

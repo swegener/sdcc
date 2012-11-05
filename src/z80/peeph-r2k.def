@@ -1680,7 +1680,7 @@ replace restart {
 	add	hl, bc
 	; peephole 132 used 16 bit addition by moving push bc
 	ld	a, h
-}
+} if notUsed('bc')
 
 replace restart {
 	pop	af

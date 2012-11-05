@@ -1,3 +1,9 @@
+2012-11-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Fix condition on bc in peephole rule.
+
 2012-11-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-20040313-1.c:

@@ -771,10 +771,12 @@ enable_fast_install
 with_gnu_ld
 enable_libtool_lock
 enable_targets
+enable_deterministic_archives
 enable_werror
 enable_build_warnings
 enable_nls
 enable_maintainer_mode
+with_zlib
 enable_rpath
 with_libiconv_prefix
 '
@@ -1417,6 +1419,8 @@ Optional Features:
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --enable-targets        alternative target configurations
+  --enable-deterministic-archives
+                          ar and ranlib default to -D behavior
   --enable-werror         treat compile warnings as errors
   --enable-build-warnings enable build-time compiler warnings
   --disable-nls           do not use Native Language Support
@@ -1430,6 +1434,7 @@ Optional Packages:
   --with-pic              try to use only PIC/non-PIC objects [default=use
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
+  --with-zlib             include zlib support (auto/yes/no) default=auto
   --with-gnu-ld           assume the C compiler uses GNU ld default=no
   --with-libiconv-prefix[=DIR]  search for libiconv in DIR/include and DIR/lib
   --without-libiconv-prefix     don't search for libiconv in includedir and libdir
@@ -11199,7 +11204,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11202 "configure"
+#line 11207 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11305,7 +11310,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11308 "configure"
+#line 11313 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11553,6 +11558,25 @@ if test "${enable_targets+set}" = set; then :
 esac
 fi
 
+# Check whether --enable-deterministic-archives was given.
+if test "${enable_deterministic_archives+set}" = set; then :
+  enableval=$enable_deterministic_archives;
+if test "${enableval}" = no; then
+  default_ar_deterministic=0
+else
+  default_ar_deterministic=1
+fi
+else
+  default_ar_deterministic=0
+fi
+
+
+
+cat >>confdefs.h <<_ACEOF
+#define DEFAULT_AR_DETERMINISTIC $default_ar_deterministic
+_ACEOF
+
+
 
 GCC_WARN_CFLAGS="-W -Wall -Wstrict-prototypes -Wmissing-prototypes"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -11628,6 +11652,8 @@ fi
 
 
 ac_config_headers="$ac_config_headers config.h:config.in"
+
+
 
 
 if test -z "$target" ; then
@@ -11841,7 +11867,7 @@ if test "$LEX" = :; then
   LEX=${am_missing_run}flex
 fi
 
-ALL_LINGUAS="da es fi fr id ja ro ru rw sk sv tr uk vi zh_CN zh_TW bg"
+ALL_LINGUAS="bg da es fi fr id it ja ro ru rw sk sv tr uk vi zh_CN zh_TW"
 # If we haven't got the data from the intl directory,
 # assume NLS is disabled.
 USE_NLS=no
@@ -12412,7 +12438,7 @@ case "${host}" in
 esac
 
 
-for ac_header in string.h strings.h stdlib.h unistd.h fcntl.h sys/file.h limits.h sys/param.h
+for ac_header in string.h strings.h stdlib.h unistd.h fcntl.h sys/file.h limits.h locale.h sys/param.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -12464,6 +12490,38 @@ $as_echo "$ac_cv_header_sys_wait_h" >&6; }
 if test $ac_cv_header_sys_wait_h = yes; then
 
 $as_echo "#define HAVE_SYS_WAIT_H 1" >>confdefs.h
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether string.h and strings.h may both be included" >&5
+$as_echo_n "checking whether string.h and strings.h may both be included... " >&6; }
+if test "${gcc_cv_header_string+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <string.h>
+#include <strings.h>
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  gcc_cv_header_string=yes
+else
+  gcc_cv_header_string=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $gcc_cv_header_string" >&5
+$as_echo "$gcc_cv_header_string" >&6; }
+if test $gcc_cv_header_string = yes; then
+
+$as_echo "#define STRING_WITH_STRINGS 1" >>confdefs.h
 
 fi
 
@@ -12657,7 +12715,7 @@ _ACEOF
 
 fi
 
-for ac_func in sbrk utimes setmode getc_unlocked strcoll
+for ac_func in sbrk utimes setmode getc_unlocked strcoll setlocale
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -12741,6 +12799,40 @@ if test "$ac_res" != no; then :
   test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
 
 fi
+
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for LC_MESSAGES" >&5
+$as_echo_n "checking for LC_MESSAGES... " >&6; }
+if test "${am_cv_val_LC_MESSAGES+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <locale.h>
+int
+main ()
+{
+return LC_MESSAGES
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  am_cv_val_LC_MESSAGES=yes
+else
+  am_cv_val_LC_MESSAGES=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_val_LC_MESSAGES" >&5
+$as_echo "$am_cv_val_LC_MESSAGES" >&6; }
+  if test $am_cv_val_LC_MESSAGES = yes; then
+
+$as_echo "#define HAVE_LC_MESSAGES 1" >>confdefs.h
+
+  fi
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for time_t in time.h" >&5
@@ -12972,7 +13064,19 @@ _ACEOF
 # Link in zlib if we can.  This allows us to read compressed debug
 # sections.  This is used only by readelf.c (objdump uses bfd for
 # reading compressed sections).
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing zlibVersion" >&5
+
+  # See if the user specified whether he wants zlib support or not.
+
+# Check whether --with-zlib was given.
+if test "${with_zlib+set}" = set; then :
+  withval=$with_zlib;
+else
+  with_zlib=auto
+fi
+
+
+  if test "$with_zlib" != "no"; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing zlibVersion" >&5
 $as_echo_n "checking for library containing zlibVersion... " >&6; }
 if test "${ac_cv_search_zlibVersion+set}" = set; then :
   $as_echo_n "(cached) " >&6
@@ -13038,6 +13142,11 @@ fi
 done
 
 fi
+
+    if test "$with_zlib" = "yes" -a "$ac_cv_header_zlib_h" != "yes"; then
+      as_fn_error "zlib (libz) library was explicitly requested but not found" "$LINENO" 5
+    fi
+  fi
 
 
 
@@ -13894,6 +14003,12 @@ do
 	  BUILD_WINDRES='$(WINDRES_PROG)$(EXEEXT)'
 	  BUILD_WINDMC='$(WINDMC_PROG)$(EXEEXT)'
 	  ;;
+	powerpc*-*-linux* | powerpc*-*-elf* | powerpc*-*-eabi*)
+	  case "$BUILD_INSTALL_MISC" in
+	    *embedspu*) ;;
+	    *) BUILD_INSTALL_MISC="${BUILD_INSTALL_MISC} embedspu"
+	  esac
+	  ;;
 	sh*-*-pe)
   	  BUILD_DLLTOOL='$(DLLTOOL_PROG)$(EXEEXT)'
 	  if test -z "$DLLTOOL_DEFAULT"; then
@@ -13939,7 +14054,10 @@ do
 	# Add objdump private vectors.
 	case $targ in
 	powerpc-*-aix*)
-	od_vectors="$od_vectors objdump_private_desc_xcoff"
+	  od_vectors="$od_vectors objdump_private_desc_xcoff"
+	  ;;
+        *-*-darwin*)
+	  od_vectors="$od_vectors objdump_private_desc_mach_o"
 	  ;;
 	esac
     fi
@@ -13957,6 +14075,8 @@ for i in $od_vectors ; do
 	case $i in
 	objdump_private_desc_xcoff)
 	    od_files="$od_files od-xcoff" ;;
+	objdump_private_desc_mach_o)
+	    od_files="$od_files od-macho" ;;
 	*) as_fn_error "*** unknown private vector $i" "$LINENO" 5 ;;
 	esac
 	;;

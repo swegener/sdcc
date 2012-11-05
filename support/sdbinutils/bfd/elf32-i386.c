@@ -1,6 +1,6 @@
 /* Intel 80386/80486-specific support for 32-bit ELF
    Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-   2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
+   2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -25,6 +25,7 @@
 #include "bfdlink.h"
 #include "libbfd.h"
 #include "elf-bfd.h"
+#include "elf-nacl.h"
 #include "elf-vxworks.h"
 #include "bfd_stdint.h"
 #include "objalloc.h"
@@ -806,6 +807,12 @@ struct elf_i386_link_hash_table
 
   /* The index of the next unused R_386_TLS_DESC slot in .rel.plt.  */
   bfd_vma next_tls_desc_index;
+
+  /* The index of the next unused R_386_JUMP_SLOT slot in .rel.plt.  */
+  bfd_vma next_jump_slot_index;
+
+  /* The index of the next unused R_386_IRELATIVE slot in .rel.plt.  */
+  bfd_vma next_irelative_index;
 };
 
 /* Get the i386 ELF linker hash table from a link_info structure.  */
@@ -946,6 +953,8 @@ elf_i386_link_hash_table_create (bfd *abfd)
   ret->sym_cache.abfd = NULL;
   ret->srelplt2 = NULL;
   ret->tls_module_base = NULL;
+  ret->next_jump_slot_index = 0;
+  ret->next_irelative_index = 0;
 
   ret->loc_hash_table = htab_try_create (1024,
 					 elf_i386_local_htab_hash,
@@ -992,9 +1001,9 @@ elf_i386_create_dynamic_sections (bfd *dynobj, struct bfd_link_info *info)
   if (htab == NULL)
     return FALSE;
 
-  htab->sdynbss = bfd_get_section_by_name (dynobj, ".dynbss");
+  htab->sdynbss = bfd_get_linker_section (dynobj, ".dynbss");
   if (!info->shared)
-    htab->srelbss = bfd_get_section_by_name (dynobj, ".rel.bss");
+    htab->srelbss = bfd_get_linker_section (dynobj, ".rel.bss");
 
   if (!htab->sdynbss
       || (!info->shared && !htab->srelbss))
@@ -1006,22 +1015,17 @@ elf_i386_create_dynamic_sections (bfd *dynobj, struct bfd_link_info *info)
     return FALSE;
 
   if (!info->no_ld_generated_unwind_info
-      && bfd_get_section_by_name (dynobj, ".eh_frame") == NULL
+      && htab->plt_eh_frame == NULL
       && htab->elf.splt != NULL)
     {
-      flagword flags = get_elf_backend_data (dynobj)->dynamic_sec_flags;
+      flagword flags = (SEC_ALLOC | SEC_LOAD | SEC_READONLY
+			| SEC_HAS_CONTENTS | SEC_IN_MEMORY
+			| SEC_LINKER_CREATED);
       htab->plt_eh_frame
-	= bfd_make_section_with_flags (dynobj, ".eh_frame",
-				       flags | SEC_READONLY);
+	= bfd_make_section_anyway_with_flags (dynobj, ".eh_frame", flags);
       if (htab->plt_eh_frame == NULL
 	  || !bfd_set_section_alignment (dynobj, htab->plt_eh_frame, 2))
 	return FALSE;
-
-      htab->plt_eh_frame->size = sizeof (elf_i386_eh_frame_plt);
-      htab->plt_eh_frame->contents
-	= bfd_alloc (dynobj, htab->plt_eh_frame->size);
-      memcpy (htab->plt_eh_frame->contents, elf_i386_eh_frame_plt,
-	      sizeof (elf_i386_eh_frame_plt));
     }
 
   return TRUE;
@@ -2169,13 +2173,6 @@ elf_i386_adjust_dynamic_symbol (struct bfd_link_info *info,
 	}
     }
 
-  if (h->size == 0)
-    {
-      (*_bfd_error_handler) (_("dynamic variable `%s' is zero size"),
-			     h->root.root.string);
-      return TRUE;
-    }
-
   /* We must allocate the symbol in our .dynbss section, which will
      become part of the .bss section of the executable.  There will be
      an entry for this symbol in the .dynsym section.  The dynamic
@@ -2189,7 +2186,7 @@ elf_i386_adjust_dynamic_symbol (struct bfd_link_info *info,
   /* We must generate a R_386_COPY reloc to tell the dynamic linker to
      copy the initial value out of the dynamic object and into the
      runtime process image.  */
-  if ((h->root.u.def.section->flags & SEC_ALLOC) != 0)
+  if ((h->root.u.def.section->flags & SEC_ALLOC) != 0 && h->size != 0)
     {
       htab->srelbss->size += sizeof (Elf32_External_Rel);
       h->needs_copy = 1;
@@ -2275,7 +2272,7 @@ elf_i386_allocate_dynrelocs (struct elf_link_hash_entry *h, void *inf)
 
 	  /* We also need to make an entry in the .rel.plt section.  */
 	  htab->elf.srelplt->size += sizeof (Elf32_External_Rel);
-	  htab->next_tls_desc_index++;
+	  htab->elf.srelplt->reloc_count++;
 
 	  if (get_elf_i386_backend_data (info->output_bfd)->is_vxworks
               && !info->shared)
@@ -2562,7 +2559,7 @@ elf_i386_size_dynamic_sections (bfd *output_bfd, struct bfd_link_info *info)
       /* Set the contents of the .interp section to the interpreter.  */
       if (info->executable)
 	{
-	  s = bfd_get_section_by_name (dynobj, ".interp");
+	  s = bfd_get_linker_section (dynobj, ".interp");
 	  if (s == NULL)
 	    abort ();
 	  s->size = sizeof ELF_DYNAMIC_INTERPRETER;
@@ -2700,9 +2697,19 @@ elf_i386_size_dynamic_sections (bfd *output_bfd, struct bfd_link_info *info)
      incremented.  However, when we reserve space for TLS descriptors,
      it's not incremented, so in order to compute the space reserved
      for them, it suffices to multiply the reloc count by the jump
-     slot size.  */
+     slot size.
+
+     PR ld/13302: We start next_irelative_index at the end of .rela.plt
+     so that R_386_IRELATIVE entries come last.  */
   if (htab->elf.srelplt)
-    htab->sgotplt_jump_table_size = htab->next_tls_desc_index * 4;
+    {
+      htab->next_tls_desc_index = htab->elf.srelplt->reloc_count;
+      htab->sgotplt_jump_table_size = htab->next_tls_desc_index * 4;
+      htab->next_irelative_index = htab->elf.srelplt->reloc_count - 1;
+    }
+  else if (htab->elf.irelplt)
+    htab->next_irelative_index = htab->elf.irelplt->reloc_count - 1;
+
 
   if (htab->elf.sgotplt)
     {
@@ -2712,7 +2719,7 @@ elf_i386_size_dynamic_sections (bfd *output_bfd, struct bfd_link_info *info)
 				  FALSE, FALSE, FALSE);
 
       /* Don't allocate .got.plt section if there are no GOT nor PLT
-         entries and there is no refeence to _GLOBAL_OFFSET_TABLE_.  */
+         entries and there is no reference to _GLOBAL_OFFSET_TABLE_.  */
       if ((got == NULL
 	   || !got->ref_regular_nonweak)
 	  && (htab->elf.sgotplt->size
@@ -2728,6 +2735,14 @@ elf_i386_size_dynamic_sections (bfd *output_bfd, struct bfd_link_info *info)
 	htab->elf.sgotplt->size = 0;
     }
 
+
+  if (htab->plt_eh_frame != NULL
+      && htab->elf.splt != NULL
+      && htab->elf.splt->size != 0
+      && !bfd_is_abs_section (htab->elf.splt->output_section)
+      && _bfd_elf_eh_frame_present (info))
+    htab->plt_eh_frame->size = sizeof (elf_i386_eh_frame_plt);
+
   /* We now have determined the sizes of the various dynamic sections.
      Allocate memory for them.  */
   relocs = FALSE;
@@ -2739,11 +2754,7 @@ elf_i386_size_dynamic_sections (bfd *output_bfd, struct bfd_link_info *info)
 	continue;
 
       if (s == htab->elf.splt
-	  || s == htab->elf.sgot
-	  || s == htab->elf.sgotplt
-	  || s == htab->elf.iplt
-	  || s == htab->elf.igotplt
-	  || s == htab->sdynbss)
+	  || s == htab->elf.sgot)
 	{
 	  /* Strip this section if we don't need it; see the
 	     comment below.  */
@@ -2753,6 +2764,14 @@ elf_i386_size_dynamic_sections (bfd *output_bfd, struct bfd_link_info *info)
 
 	  if (htab->elf.hplt != NULL)
 	    strip_section = FALSE;
+	}
+      else if (s == htab->elf.sgotplt
+	       || s == htab->elf.iplt
+	       || s == htab->elf.igotplt
+	       || s == htab->plt_eh_frame
+	       || s == htab->sdynbss)
+	{
+	  /* Strip these too.  */
 	}
       else if (CONST_STRNEQ (bfd_get_section_name (dynobj, s), ".rel"))
 	{
@@ -2801,11 +2820,13 @@ elf_i386_size_dynamic_sections (bfd *output_bfd, struct bfd_link_info *info)
     }
 
   if (htab->plt_eh_frame != NULL
-      && htab->elf.splt != NULL
-      && htab->elf.splt->size != 0
-      && (htab->elf.splt->flags & SEC_EXCLUDE) == 0)
-    bfd_put_32 (dynobj, htab->elf.splt->size,
-		htab->plt_eh_frame->contents + PLT_FDE_LEN_OFFSET);
+      && htab->plt_eh_frame->contents != NULL)
+    {
+      memcpy (htab->plt_eh_frame->contents, elf_i386_eh_frame_plt,
+	      sizeof (elf_i386_eh_frame_plt));
+      bfd_put_32 (dynobj, htab->elf.splt->size,
+		  htab->plt_eh_frame->contents + PLT_FDE_LEN_OFFSET);
+    }
 
   if (htab->elf.dynamic_sections_created)
     {
@@ -3178,9 +3199,9 @@ elf_i386_relocate_section (bfd *output_bfd,
 				   unresolved_reloc, warned);
 	}
 
-      if (sec != NULL && elf_discarded_section (sec))
+      if (sec != NULL && discarded_section (sec))
 	RELOC_AGAINST_DISCARDED_SECTION (info, input_bfd, input_section,
-					 rel, relend, howto, contents);
+					 rel, 1, relend, howto, 0, contents);
 
       if (info->relocatable)
 	continue;
@@ -3232,7 +3253,7 @@ elf_i386_relocate_section (bfd *output_bfd,
 
 	    case R_386_32:
 	      /* Generate dynamic relcoation only when there is a
-		 non-GOF reference in a shared object.  */
+		 non-GOT reference in a shared object.  */
 	      if (info->shared && h->non_got_ref)
 		{
 		  Elf_Internal_Rela outrel;
@@ -3492,6 +3513,7 @@ elf_i386_relocate_section (bfd *output_bfd,
 		  return FALSE;
 		}
 	      else if (!info->executable
+		       && !SYMBOLIC_BIND (info, h)
 		       && h->type == STT_FUNC
 		       && ELF_ST_VISIBILITY (h->other) == STV_PROTECTED)
 		{
@@ -4237,7 +4259,9 @@ elf_i386_relocate_section (bfd *output_bfd,
 	 not process them.  */
       if (unresolved_reloc
 	  && !((input_section->flags & SEC_DEBUGGING) != 0
-	       && h->def_dynamic))
+	       && h->def_dynamic)
+	  && _bfd_elf_section_offset (output_bfd, info, input_section,
+				      rel->r_offset) != (bfd_vma) -1)
 	{
 	  (*_bfd_error_handler)
 	    (_("%B(%A+0x%lx): unresolvable %s relocation against symbol `%s'"),
@@ -4362,13 +4386,13 @@ elf_i386_finish_dynamic_symbol (bfd *output_bfd,
 
       if (plt == htab->elf.splt)
 	{
-	  plt_index = h->plt.offset / plt_entry_size - 1;
-	  got_offset = (plt_index + 3) * 4;
+	  got_offset = h->plt.offset / plt_entry_size - 1;
+	  got_offset = (got_offset + 3) * 4;
 	}
       else
 	{
-	  plt_index = h->plt.offset / plt_entry_size;
-	  got_offset = plt_index * 4;
+	  got_offset = h->plt.offset / plt_entry_size;
+	  got_offset = got_offset * 4;
 	}
 
       /* Fill in the entry in the procedure linkage table.  */
@@ -4429,18 +4453,6 @@ elf_i386_finish_dynamic_symbol (bfd *output_bfd,
                       + abed->plt->plt_got_offset);
 	}
 
-      /* Don't fill PLT entry for static executables.  */
-      if (plt == htab->elf.splt)
-	{
-	  bfd_put_32 (output_bfd, plt_index * sizeof (Elf32_External_Rel),
-		      plt->contents + h->plt.offset
-                      + abed->plt->plt_reloc_offset);
-	  bfd_put_32 (output_bfd, - (h->plt.offset
-                                     + abed->plt->plt_plt_offset + 4),
-		      plt->contents + h->plt.offset
-                      + abed->plt->plt_plt_offset);
-	}
-
       /* Fill in the entry in the global offset table.  */
       bfd_put_32 (output_bfd,
 		  (plt->output_section->vma
@@ -4468,11 +4480,28 @@ elf_i386_finish_dynamic_symbol (bfd *output_bfd,
 		       + h->root.u.def.section->output_offset),
 		      gotplt->contents + got_offset);
 	  rel.r_info = ELF32_R_INFO (0, R_386_IRELATIVE);
+	  /* R_386_IRELATIVE comes last.  */
+	  plt_index = htab->next_irelative_index--;
 	}
       else
-	rel.r_info = ELF32_R_INFO (h->dynindx, R_386_JUMP_SLOT);
+	{
+	  rel.r_info = ELF32_R_INFO (h->dynindx, R_386_JUMP_SLOT);
+	  plt_index = htab->next_jump_slot_index++;
+	}
       loc = relplt->contents + plt_index * sizeof (Elf32_External_Rel);
       bfd_elf32_swap_reloc_out (output_bfd, &rel, loc);
+
+      /* Don't fill PLT entry for static executables.  */
+      if (plt == htab->elf.splt)
+	{
+	  bfd_put_32 (output_bfd, plt_index * sizeof (Elf32_External_Rel),
+		      plt->contents + h->plt.offset
+                      + abed->plt->plt_reloc_offset);
+	  bfd_put_32 (output_bfd, - (h->plt.offset
+                                     + abed->plt->plt_plt_offset + 4),
+		      plt->contents + h->plt.offset
+                      + abed->plt->plt_plt_offset);
+	}
 
       if (!h->def_regular)
 	{
@@ -4580,17 +4609,6 @@ do_glob_dat:
       bfd_elf32_swap_reloc_out (output_bfd, &rel, loc);
     }
 
-  /* Mark _DYNAMIC and _GLOBAL_OFFSET_TABLE_ as absolute.  SYM may
-     be NULL for local symbols.
-
-     On VxWorks, the _GLOBAL_OFFSET_TABLE_ symbol is not absolute: it
-     is relative to the ".got" section.  */
-  if (sym != NULL
-      && (strcmp (h->root.root.string, "_DYNAMIC") == 0
-	  || (!abed->is_vxworks
-              && h == htab->elf.hgot)))
-    sym->st_shndx = SHN_ABS;
-
   return TRUE;
 }
 
@@ -4644,7 +4662,7 @@ elf_i386_finish_dynamic_sections (bfd *output_bfd,
     return FALSE;
 
   dynobj = htab->elf.dynobj;
-  sdyn = bfd_get_section_by_name (dynobj, ".dynamic");
+  sdyn = bfd_get_linker_section (dynobj, ".dynamic");
   abed = get_elf_i386_backend_data (output_bfd);
 
   if (htab->elf.dynamic_sections_created)
@@ -4829,7 +4847,8 @@ elf_i386_finish_dynamic_sections (bfd *output_bfd,
     }
 
   /* Adjust .eh_frame for .plt section.  */
-  if (htab->plt_eh_frame != NULL)
+  if (htab->plt_eh_frame != NULL
+      && htab->plt_eh_frame->contents != NULL)
     {
       if (htab->elf.splt != NULL
 	  && htab->elf.splt->size != 0
@@ -4846,7 +4865,7 @@ elf_i386_finish_dynamic_sections (bfd *output_bfd,
 			     + PLT_FDE_START_OFFSET);
 	}
       if (htab->plt_eh_frame->sec_info_type
-	  == ELF_INFO_TYPE_EH_FRAME)
+	  == SEC_INFO_TYPE_EH_FRAME)
 	{
 	  if (! _bfd_elf_write_section_eh_frame (output_bfd, info,
 						 htab->plt_eh_frame,
@@ -5091,7 +5110,10 @@ elf_i386_nacl_pic_plt0_entry[sizeof (elf_i386_nacl_plt0_entry)] =
     0x8b, 0x4b, 0x08,		/* mov 0x8(%ebx), %ecx */
     0x83, 0xe1, 0xe0,		/* and $NACLMASK, %ecx */
     0xff, 0xe1,			/* jmp *%ecx */
-    0x90                        /* nop */
+
+    /* This is expected to be the same size as elf_i386_nacl_plt0_entry,
+       so pad to that size with nop instructions.  */
+    0x90, 0x90, 0x90, 0x90, 0x90, 0x90
   };
 
 static const bfd_byte elf_i386_nacl_pic_plt_entry[NACL_PLT_ENTRY_SIZE] =
@@ -5185,7 +5207,16 @@ static const struct elf_i386_backend_data elf_i386_nacl_arch_bed =
 #undef	elf_backend_arch_data
 #define elf_backend_arch_data	&elf_i386_nacl_arch_bed
 
+#undef	elf_backend_modify_segment_map
+#define	elf_backend_modify_segment_map		nacl_modify_segment_map
+#undef	elf_backend_modify_program_headers
+#define	elf_backend_modify_program_headers	nacl_modify_program_headers
+
 #include "elf32-target.h"
+
+/* Restore defaults.  */
+#undef	elf_backend_modify_segment_map
+#undef	elf_backend_modify_program_headers
 
 /* VxWorks support.  */
 

@@ -1,3 +1,8 @@
+2012-11-05 Borut Razem <borut.razem AT gmail.com>
+
+	* support/sdbinutils/*:
+	  sdbinutils synced with binutils-2.23
+
 2012-11-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/peeph-z80.def,

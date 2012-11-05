@@ -1,5 +1,5 @@
 /* Mach-O support for BFD.
-   Copyright 2011
+   Copyright 2011, 2012
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -56,7 +56,16 @@ bfd_mach_o_cpu_type;
 
 typedef enum bfd_mach_o_cpu_subtype
 {
-  BFD_MACH_O_CPU_SUBTYPE_X86_ALL = 3
+  /* i386.  */
+  BFD_MACH_O_CPU_SUBTYPE_X86_ALL = 3,
+
+  /* arm.  */
+  BFD_MACH_O_CPU_SUBTYPE_ARM_ALL = 0,
+  BFD_MACH_O_CPU_SUBTYPE_ARM_V4T = 5,
+  BFD_MACH_O_CPU_SUBTYPE_ARM_V6 = 6,
+  BFD_MACH_O_CPU_SUBTYPE_ARM_V5TEJ = 7,
+  BFD_MACH_O_CPU_SUBTYPE_ARM_XSCALE = 8,
+  BFD_MACH_O_CPU_SUBTYPE_ARM_V7 = 9
 }
 bfd_mach_o_cpu_subtype;
 
@@ -246,6 +255,9 @@ bfd_mach_o_section_type;
 
 typedef enum bfd_mach_o_section_attribute
 {
+  /* Section has no specified attibutes.  */
+  BFD_MACH_O_S_ATTR_NONE              = 0,
+
   /* Section has local relocation entries.  */
   BFD_MACH_O_S_ATTR_LOC_RELOC         = 0x00000100,
 
@@ -308,6 +320,9 @@ bfd_mach_o_section_attribute;
 #define BFD_MACH_O_N_NO_DEAD_STRIP				0x20
 #define BFD_MACH_O_N_WEAK_REF					0x40
 #define BFD_MACH_O_N_WEAK_DEF					0x80
+
+#define BFD_MACH_O_INDIRECT_SYM_LOCAL			0x80000000
+#define BFD_MACH_O_INDIRECT_SYM_ABS			0x40000000
 
 /* Thread constants.  */
 

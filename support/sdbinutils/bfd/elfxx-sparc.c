@@ -1,5 +1,5 @@
 /* SPARC-specific support for ELF
-   Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011
+   Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -53,7 +53,7 @@
 
 static bfd_reloc_status_type
 init_insn_reloc (bfd *abfd, arelent *reloc_entry, asymbol *symbol,
-		 PTR data, asection *input_section, bfd *output_bfd,
+		 void * data, asection *input_section, bfd *output_bfd,
 		 bfd_vma *prelocation, bfd_vma *pinsn)
 {
   bfd_vma relocation;
@@ -97,7 +97,7 @@ static bfd_reloc_status_type
 sparc_elf_notsup_reloc (bfd *abfd ATTRIBUTE_UNUSED,
 			arelent *reloc_entry ATTRIBUTE_UNUSED,
 			asymbol *symbol ATTRIBUTE_UNUSED,
-			PTR data ATTRIBUTE_UNUSED,
+			void * data ATTRIBUTE_UNUSED,
 			asection *input_section ATTRIBUTE_UNUSED,
 			bfd *output_bfd ATTRIBUTE_UNUSED,
 			char **error_message ATTRIBUTE_UNUSED)
@@ -109,7 +109,7 @@ sparc_elf_notsup_reloc (bfd *abfd ATTRIBUTE_UNUSED,
 
 static bfd_reloc_status_type
 sparc_elf_wdisp16_reloc (bfd *abfd, arelent *reloc_entry, asymbol *symbol,
-			 PTR data, asection *input_section, bfd *output_bfd,
+			 void * data, asection *input_section, bfd *output_bfd,
 			 char **error_message ATTRIBUTE_UNUSED)
 {
   bfd_vma relocation;
@@ -132,11 +132,39 @@ sparc_elf_wdisp16_reloc (bfd *abfd, arelent *reloc_entry, asymbol *symbol,
     return bfd_reloc_ok;
 }
 
+/* Handle the WDISP10 reloc.  */
+
+static bfd_reloc_status_type
+sparc_elf_wdisp10_reloc (bfd *abfd, arelent *reloc_entry, asymbol *symbol,
+			 void * data, asection *input_section, bfd *output_bfd,
+			 char **error_message ATTRIBUTE_UNUSED)
+{
+  bfd_vma relocation;
+  bfd_vma insn;
+  bfd_reloc_status_type status;
+
+  status = init_insn_reloc (abfd, reloc_entry, symbol, data,
+			    input_section, output_bfd, &relocation, &insn);
+  if (status != bfd_reloc_other)
+    return status;
+
+  insn &= ~ (bfd_vma) 0x181fe0;
+  insn |= (((relocation >> 2) & 0x300) << 11)
+	  | (((relocation >> 2) & 0xff) << 5);
+  bfd_put_32 (abfd, insn, (bfd_byte *) data + reloc_entry->address);
+
+  if ((bfd_signed_vma) relocation < - 0x1000
+      || (bfd_signed_vma) relocation > 0xfff)
+    return bfd_reloc_overflow;
+  else
+    return bfd_reloc_ok;
+}
+
 /* Handle the HIX22 reloc.  */
 
 static bfd_reloc_status_type
 sparc_elf_hix22_reloc (bfd *abfd, arelent *reloc_entry, asymbol *symbol,
-		       PTR data, asection *input_section, bfd *output_bfd,
+		       void * data, asection *input_section, bfd *output_bfd,
 		       char **error_message ATTRIBUTE_UNUSED)
 {
   bfd_vma relocation;
@@ -162,7 +190,7 @@ sparc_elf_hix22_reloc (bfd *abfd, arelent *reloc_entry, asymbol *symbol,
 
 static bfd_reloc_status_type
 sparc_elf_lox10_reloc (bfd *abfd, arelent *reloc_entry, asymbol *symbol,
-		       PTR data, asection *input_section, bfd *output_bfd,
+		       void * data, asection *input_section, bfd *output_bfd,
 		       char **error_message ATTRIBUTE_UNUSED)
 {
   bfd_vma relocation;
@@ -267,6 +295,10 @@ static reloc_howto_type _bfd_sparc_elf_howto_table[] =
   HOWTO(R_SPARC_GOTDATA_OP_HIX22,0,2,0,FALSE,0,complain_overflow_bitfield,sparc_elf_hix22_reloc,"R_SPARC_GOTDATA_OP_HIX22",FALSE,0,0x003fffff, FALSE),
   HOWTO(R_SPARC_GOTDATA_OP_LOX10,0,2,0,FALSE,0,complain_overflow_dont,  sparc_elf_lox10_reloc,  "R_SPARC_GOTDATA_OP_LOX10",FALSE,0,0x000003ff, FALSE),
   HOWTO(R_SPARC_GOTDATA_OP,0,0, 0,FALSE,0,complain_overflow_dont,   bfd_elf_generic_reloc,  "R_SPARC_GOTDATA_OP",FALSE,0,0x00000000,TRUE),
+  HOWTO(R_SPARC_H34,12,2,22,FALSE,0,complain_overflow_unsigned,bfd_elf_generic_reloc,"R_SPARC_H34",FALSE,0,0x003fffff,FALSE),
+  HOWTO(R_SPARC_SIZE32,0,2,32,FALSE,0,complain_overflow_bitfield,bfd_elf_generic_reloc,"R_SPARC_SIZE32",FALSE,0,0xffffffff,TRUE),
+  HOWTO(R_SPARC_SIZE64,0,4,64,FALSE,0,complain_overflow_bitfield,bfd_elf_generic_reloc,"R_SPARC_SIZE64",FALSE,0,MINUS_ONE, TRUE),
+  HOWTO(R_SPARC_WDISP10,2,2,10,TRUE, 0,complain_overflow_signed,sparc_elf_wdisp10_reloc,"R_SPARC_WDISP10",FALSE,0,0x00000000,TRUE),
 };
 static reloc_howto_type sparc_jmp_irel_howto =
   HOWTO(R_SPARC_JMP_IREL,  0,0,00,FALSE,0,complain_overflow_dont,    bfd_elf_generic_reloc,  "R_SPARC_JMP_IREL",FALSE,0,0x00000000,TRUE);
@@ -523,6 +555,18 @@ _bfd_sparc_elf_reloc_type_lookup (bfd *abfd ATTRIBUTE_UNUSED,
 
     case BFD_RELOC_SPARC_GOTDATA_OP:
       return &_bfd_sparc_elf_howto_table[R_SPARC_GOTDATA_OP];
+
+    case BFD_RELOC_SPARC_H34:
+      return &_bfd_sparc_elf_howto_table[R_SPARC_H34];
+
+    case BFD_RELOC_SPARC_SIZE32:
+      return &_bfd_sparc_elf_howto_table[R_SPARC_SIZE32];
+
+    case BFD_RELOC_SPARC_SIZE64:
+      return &_bfd_sparc_elf_howto_table[R_SPARC_SIZE64];
+
+    case BFD_RELOC_SPARC_WDISP10:
+      return &_bfd_sparc_elf_howto_table[R_SPARC_WDISP10];
 
     case BFD_RELOC_SPARC_JMP_IREL:
       return &sparc_jmp_irel_howto;
@@ -1163,9 +1207,9 @@ _bfd_sparc_elf_create_dynamic_sections (bfd *dynobj,
   if (!_bfd_elf_create_dynamic_sections (dynobj, info))
     return FALSE;
 
-  htab->sdynbss = bfd_get_section_by_name (dynobj, ".dynbss");
+  htab->sdynbss = bfd_get_linker_section (dynobj, ".dynbss");
   if (!info->shared)
-    htab->srelbss = bfd_get_section_by_name (dynobj, ".rela.bss");
+    htab->srelbss = bfd_get_linker_section (dynobj, ".rela.bss");
 
   if (htab->is_vxworks)
     {
@@ -1656,6 +1700,7 @@ _bfd_sparc_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	case R_SPARC_WDISP22:
 	case R_SPARC_WDISP19:
 	case R_SPARC_WDISP16:
+	case R_SPARC_WDISP10:
 	case R_SPARC_8:
 	case R_SPARC_16:
 	case R_SPARC_32:
@@ -1680,6 +1725,7 @@ _bfd_sparc_elf_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	case R_SPARC_H44:
 	case R_SPARC_M44:
 	case R_SPARC_L44:
+	case R_SPARC_H34:
 	case R_SPARC_UA64:
 	  if (h != NULL)
 	    h->non_got_ref = 1;
@@ -1956,6 +2002,7 @@ _bfd_sparc_elf_gc_sweep_hook (bfd *abfd, struct bfd_link_info *info,
 	case R_SPARC_WDISP22:
 	case R_SPARC_WDISP19:
 	case R_SPARC_WDISP16:
+	case R_SPARC_WDISP10:
 	case R_SPARC_8:
 	case R_SPARC_16:
 	case R_SPARC_32:
@@ -1981,6 +2028,7 @@ _bfd_sparc_elf_gc_sweep_hook (bfd *abfd, struct bfd_link_info *info,
 	case R_SPARC_H44:
 	case R_SPARC_M44:
 	case R_SPARC_L44:
+	case R_SPARC_H34:
 	case R_SPARC_UA64:
 	  if (info->shared)
 	    break;
@@ -2114,13 +2162,6 @@ _bfd_sparc_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
       return TRUE;
     }
 
-  if (h->size == 0)
-    {
-      (*_bfd_error_handler) (_("dynamic variable `%s' is zero size"),
-			     h->root.root.string);
-      return TRUE;
-    }
-
   /* We must allocate the symbol in our .dynbss section, which will
      become part of the .bss section of the executable.  There will be
      an entry for this symbol in the .dynsym section.  The dynamic
@@ -2135,7 +2176,7 @@ _bfd_sparc_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
      to copy the initial value out of the dynamic object and into the
      runtime process image.  We need to remember the offset into the
      .rel.bss section we are going to use.  */
-  if ((h->root.u.def.section->flags & SEC_ALLOC) != 0)
+  if ((h->root.u.def.section->flags & SEC_ALLOC) != 0 && h->size != 0)
     {
       htab->srelbss->size += SPARC_ELF_RELA_BYTES (htab);
       h->needs_copy = 1;
@@ -2150,7 +2191,7 @@ _bfd_sparc_elf_adjust_dynamic_symbol (struct bfd_link_info *info,
    dynamic relocs.  */
 
 static bfd_boolean
-allocate_dynrelocs (struct elf_link_hash_entry *h, PTR inf)
+allocate_dynrelocs (struct elf_link_hash_entry *h, void * inf)
 {
   struct bfd_link_info *info;
   struct _bfd_sparc_elf_link_hash_table *htab;
@@ -2430,7 +2471,7 @@ allocate_local_dynrelocs (void **slot, void *inf)
 /* Find any dynamic relocs that apply to read-only sections.  */
 
 static bfd_boolean
-readonly_dynrelocs (struct elf_link_hash_entry *h, PTR inf)
+readonly_dynrelocs (struct elf_link_hash_entry *h, void * inf)
 {
   struct _bfd_sparc_elf_link_hash_entry *eh;
   struct _bfd_sparc_elf_dyn_relocs *p;
@@ -2491,7 +2532,7 @@ _bfd_sparc_elf_size_dynamic_sections (bfd *output_bfd,
       /* Set the contents of the .interp section to the interpreter.  */
       if (info->executable)
 	{
-	  s = bfd_get_section_by_name (dynobj, ".interp");
+	  s = bfd_get_linker_section (dynobj, ".interp");
 	  BFD_ASSERT (s != NULL);
 	  s->size = htab->dynamic_interpreter_size;
 	  s->contents = (unsigned char *) htab->dynamic_interpreter;
@@ -2586,7 +2627,7 @@ _bfd_sparc_elf_size_dynamic_sections (bfd *output_bfd,
 
   /* Allocate global sym .plt and .got entries, and space for global
      sym dynamic relocs.  */
-  elf_link_hash_traverse (&htab->elf, allocate_dynrelocs, (PTR) info);
+  elf_link_hash_traverse (&htab->elf, allocate_dynrelocs, info);
 
   /* Allocate .plt and .got entries, and space for local symbols.  */
   htab_traverse (htab->loc_hash_table, allocate_local_dynrelocs, info);
@@ -2701,8 +2742,7 @@ _bfd_sparc_elf_size_dynamic_sections (bfd *output_bfd,
       /* If any dynamic relocs apply to a read-only section,
 	 then we need a DT_TEXTREL entry.  */
       if ((info->flags & DF_TEXTREL) == 0)
-	elf_link_hash_traverse (&htab->elf, readonly_dynrelocs,
-				(PTR) info);
+	elf_link_hash_traverse (&htab->elf, readonly_dynrelocs, info);
 
       if (info->flags & DF_TEXTREL)
 	{
@@ -2970,9 +3010,9 @@ _bfd_sparc_elf_relocate_section (bfd *output_bfd,
 	    }
 	}
 
-      if (sec != NULL && elf_discarded_section (sec))
+      if (sec != NULL && discarded_section (sec))
 	RELOC_AGAINST_DISCARDED_SECTION (info, input_bfd, input_section,
-					 rel, relend, howto, contents);
+					 rel, 1, relend, howto, 0, contents);
 
       if (info->relocatable)
 	continue;
@@ -3283,6 +3323,7 @@ _bfd_sparc_elf_relocate_section (bfd *output_bfd,
 	case R_SPARC_WDISP22:
 	case R_SPARC_WDISP19:
 	case R_SPARC_WDISP16:
+	case R_SPARC_WDISP10:
 	case R_SPARC_8:
 	case R_SPARC_16:
 	case R_SPARC_32:
@@ -3307,6 +3348,7 @@ _bfd_sparc_elf_relocate_section (bfd *output_bfd,
 	case R_SPARC_H44:
 	case R_SPARC_M44:
 	case R_SPARC_L44:
+	case R_SPARC_H34:
 	case R_SPARC_UA64:
 	r_sparc_plt32:
 	  if ((input_section->flags & SEC_ALLOC) == 0
@@ -3828,7 +3870,9 @@ _bfd_sparc_elf_relocate_section (bfd *output_bfd,
 	 not process them.  */
       if (unresolved_reloc
 	  && !((input_section->flags & SEC_DEBUGGING) != 0
-	       && h->def_dynamic))
+	       && h->def_dynamic)
+	  && _bfd_elf_section_offset (output_bfd, info, input_section,
+				      rel->r_offset) != (bfd_vma) -1)
 	(*_bfd_error_handler)
 	  (_("%B(%A+0x%lx): unresolvable %s relocation against symbol `%s'"),
 	   input_bfd,
@@ -3869,6 +3913,25 @@ _bfd_sparc_elf_relocate_section (bfd *output_bfd,
 	  x = bfd_get_32 (input_bfd, contents + rel->r_offset);
 	  x |= ((((relocation >> 2) & 0xc000) << 6)
 		| ((relocation >> 2) & 0x3fff));
+	  bfd_put_32 (input_bfd, x, contents + rel->r_offset);
+
+	  r = bfd_check_overflow (howto->complain_on_overflow,
+				  howto->bitsize, howto->rightshift,
+				  bfd_arch_bits_per_address (input_bfd),
+				  relocation);
+	}
+      else if (r_type == R_SPARC_WDISP10)
+	{
+	  bfd_vma x;
+
+	  relocation += rel->r_addend;
+	  relocation -= (input_section->output_section->vma
+			 + input_section->output_offset);
+	  relocation -= rel->r_offset;
+
+	  x = bfd_get_32 (input_bfd, contents + rel->r_offset);
+	  x |= ((((relocation >> 2) & 0x300) << 11)
+		| (((relocation >> 2) & 0xff) << 5));
 	  bfd_put_32 (input_bfd, x, contents + rel->r_offset);
 
 	  r = bfd_check_overflow (howto->complain_on_overflow,
@@ -4067,7 +4130,9 @@ do_relocation:
 		   We don't, but this breaks stabs debugging info, whose
 		   relocations are only 32-bits wide.  Ignore overflows in
 		   this case and also for discarded entries.  */
-		if ((r_type == R_SPARC_32 || r_type == R_SPARC_DISP32)
+		if ((r_type == R_SPARC_32
+		     || r_type == R_SPARC_UA32
+		     || r_type == R_SPARC_DISP32)
 		    && (((input_section->flags & SEC_DEBUGGING) != 0
 			 && strcmp (bfd_section_name (input_bfd,
 						      input_section),
@@ -4430,8 +4495,8 @@ _bfd_sparc_elf_finish_dynamic_symbol (bfd *output_bfd,
       /* This symbols needs a copy reloc.  Set it up.  */
       BFD_ASSERT (h->dynindx != -1);
 
-      s = bfd_get_section_by_name (h->root.u.def.section->owner,
-				   ".rela.bss");
+      s = bfd_get_linker_section (h->root.u.def.section->owner,
+				  ".rela.bss");
       BFD_ASSERT (s != NULL);
 
       rela.r_offset = (h->root.u.def.value
@@ -4670,13 +4735,13 @@ _bfd_sparc_elf_finish_dynamic_sections (bfd *output_bfd, struct bfd_link_info *i
   BFD_ASSERT (htab != NULL);
   dynobj = htab->elf.dynobj;
 
-  sdyn = bfd_get_section_by_name (dynobj, ".dynamic");
+  sdyn = bfd_get_linker_section (dynobj, ".dynamic");
 
   if (elf_hash_table (info)->dynamic_sections_created)
     {
       asection *splt;
 
-      splt = bfd_get_section_by_name (dynobj, ".plt");
+      splt = htab->elf.splt;
       BFD_ASSERT (splt != NULL && sdyn != NULL);
 
       if (!sparc_finish_dyn (output_bfd, info, dynobj, sdyn, splt))

@@ -1,8 +1,8 @@
 /* Main header file for the bfd library -- portable access to object files.
 
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
-   Free Software Foundation, Inc.
+   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+   2012 Free Software Foundation, Inc.
 
    Contributed by Cygnus Support.
 
@@ -25,12 +25,19 @@
 #ifndef __BFD_H_SEEN__
 #define __BFD_H_SEEN__
 
+/* PR 14072: Ensure that config.h is included first.  */
+#if !defined PACKAGE && !defined PACKAGE_VERSION
+#error config.h must be included before this header
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "ansidecl.h"
 #include "symcat.h"
+#include <sys/stat.h>
+
 #if defined (__STDC__) || defined (ALMOST_STDC) || defined (HAVE_STRINGIZE)
 #ifndef SABER
 /* This hack is to avoid a problem with some strict ANSI C preprocessors.
@@ -271,18 +278,19 @@ alent;
 
 typedef struct bfd_section *sec_ptr;
 
-#define bfd_get_section_name(bfd, ptr) ((ptr)->name + 0)
-#define bfd_get_section_vma(bfd, ptr) ((ptr)->vma + 0)
-#define bfd_get_section_lma(bfd, ptr) ((ptr)->lma + 0)
-#define bfd_get_section_alignment(bfd, ptr) ((ptr)->alignment_power + 0)
+#define bfd_get_section_name(bfd, ptr) ((void) bfd, (ptr)->name)
+#define bfd_get_section_vma(bfd, ptr) ((void) bfd, (ptr)->vma)
+#define bfd_get_section_lma(bfd, ptr) ((void) bfd, (ptr)->lma)
+#define bfd_get_section_alignment(bfd, ptr) ((void) bfd, \
+					     (ptr)->alignment_power)
 #define bfd_section_name(bfd, ptr) ((ptr)->name)
 #define bfd_section_size(bfd, ptr) ((ptr)->size)
 #define bfd_get_section_size(ptr) ((ptr)->size)
 #define bfd_section_vma(bfd, ptr) ((ptr)->vma)
 #define bfd_section_lma(bfd, ptr) ((ptr)->lma)
 #define bfd_section_alignment(bfd, ptr) ((ptr)->alignment_power)
-#define bfd_get_section_flags(bfd, ptr) ((ptr)->flags + 0)
-#define bfd_get_section_userdata(bfd, ptr) ((ptr)->userdata)
+#define bfd_get_section_flags(bfd, ptr) ((void) bfd, (ptr)->flags)
+#define bfd_get_section_userdata(bfd, ptr) ((void) bfd, (ptr)->userdata)
 
 #define bfd_is_com_section(ptr) (((ptr)->flags & SEC_IS_COMMON) != 0)
 
@@ -295,14 +303,11 @@ typedef struct bfd_section *sec_ptr;
     ? (sec)->rawsize : (sec)->size) / bfd_octets_per_byte (bfd))
 
 /* Return TRUE if input section SEC has been discarded.  */
-#define elf_discarded_section(sec)				\
+#define discarded_section(sec)				\
   (!bfd_is_abs_section (sec)					\
    && bfd_is_abs_section ((sec)->output_section)		\
-   && (sec)->sec_info_type != ELF_INFO_TYPE_MERGE		\
-   && (sec)->sec_info_type != ELF_INFO_TYPE_JUST_SYMS)
-
-/* Forward define.  */
-struct stat;
+   && (sec)->sec_info_type != SEC_INFO_TYPE_MERGE		\
+   && (sec)->sec_info_type != SEC_INFO_TYPE_JUST_SYMS)
 
 typedef enum bfd_print_symbol
 {
@@ -693,18 +698,14 @@ extern int bfd_get_elf_phdrs
    the remote memory.  */
 extern bfd *bfd_elf_bfd_from_remote_memory
   (bfd *templ, bfd_vma ehdr_vma, bfd_vma *loadbasep,
-   int (*target_read_memory) (bfd_vma vma, bfd_byte *myaddr, int len));
-
-/* Return the arch_size field of an elf bfd, or -1 if not elf.  */
-extern int bfd_get_arch_size
-  (bfd *);
-
-/* Return TRUE if address "naturally" sign extends, or -1 if not elf.  */
-extern int bfd_get_sign_extend_vma
-  (bfd *);
+   int (*target_read_memory) (bfd_vma vma, bfd_byte *myaddr,
+			      bfd_size_type len));
 
 extern struct bfd_section *_bfd_elf_tls_setup
   (bfd *, struct bfd_link_info *);
+
+extern struct bfd_section *
+_bfd_nearby_section (bfd *, struct bfd_section *, bfd_vma);
 
 extern void _bfd_fix_excluded_sec_syms
   (bfd *, struct bfd_link_info *);
@@ -927,6 +928,32 @@ extern unsigned int _bfd_elf_ppc_at_tls_transform
 extern unsigned int _bfd_elf_ppc_at_tprel_transform
   (unsigned int, unsigned int);
 
+extern void bfd_elf64_aarch64_init_maps
+  (bfd *);
+
+void bfd_elf64_aarch64_set_options
+  (bfd *, struct bfd_link_info *, int, int, int);
+
+/* ELF AArch64 mapping symbol support.  */
+#define BFD_AARCH64_SPECIAL_SYM_TYPE_MAP	(1 << 0)
+#define BFD_AARCH64_SPECIAL_SYM_TYPE_TAG	(1 << 1)
+#define BFD_AARCH64_SPECIAL_SYM_TYPE_OTHER	(1 << 2)
+#define BFD_AARCH64_SPECIAL_SYM_TYPE_ANY	(~0)
+extern bfd_boolean bfd_is_aarch64_special_symbol_name
+  (const char * name, int type);
+
+/* AArch64 stub generation support.  Called from the linker.  */
+extern int elf64_aarch64_setup_section_lists
+  (bfd *, struct bfd_link_info *);
+extern void elf64_aarch64_next_input_section
+  (struct bfd_link_info *, struct bfd_section *);
+extern bfd_boolean elf64_aarch64_size_stubs
+  (bfd *, bfd *, struct bfd_link_info *, bfd_signed_vma,
+   struct bfd_section * (*) (const char *, struct bfd_section *),
+   void (*) (void));
+extern bfd_boolean elf64_aarch64_build_stubs
+  (struct bfd_link_info *);
+  
 /* TI COFF load page support.  */
 extern void bfd_ticoff_set_section_load_page
   (struct bfd_section *, int);

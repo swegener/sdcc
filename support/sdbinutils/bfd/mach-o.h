@@ -1,5 +1,6 @@
 /* Mach-O support for BFD.
-   Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2007, 2008, 2009
+   Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2007, 2008, 2009, 2011,
+   2012
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -41,6 +42,18 @@ typedef struct bfd_mach_o_header
 }
 bfd_mach_o_header;
 
+typedef struct bfd_mach_o_asymbol
+{
+  /* The actual symbol which the rest of BFD works with.  */
+  asymbol symbol;
+
+  /* Mach-O symbol fields.  */
+  unsigned char n_type;
+  unsigned char n_sect;
+  unsigned short n_desc;
+}
+bfd_mach_o_asymbol;
+
 #define BFD_MACH_O_SEGNAME_SIZE 16
 #define BFD_MACH_O_SECTNAME_SIZE 16
 
@@ -63,6 +76,12 @@ typedef struct bfd_mach_o_section
   /* Corresponding bfd section.  */
   asection *bfdsection;
 
+  /* An array holding the indirect symbols for this section.
+     NULL values indicate local symbols.
+     The number of symbols is determined from the section size and type.  */
+
+  bfd_mach_o_asymbol **indirect_syms;
+
   /* Simply linked list.  */
   struct bfd_mach_o_section *next;
 }
@@ -70,7 +89,7 @@ bfd_mach_o_section;
 
 typedef struct bfd_mach_o_segment_command
 {
-  char segname[16 + 1];
+  char segname[BFD_MACH_O_SEGNAME_SIZE + 1];
   bfd_vma vmaddr;
   bfd_vma vmsize;
   bfd_vma fileoff;
@@ -104,17 +123,14 @@ typedef struct bfd_mach_o_reloc_info
 }
 bfd_mach_o_reloc_info;
 
-typedef struct bfd_mach_o_asymbol
-{
-  /* The actual symbol which the rest of BFD works with.  */
-  asymbol symbol;
-
-  /* Fields from Mach-O symbol.  */
-  unsigned char n_type;
-  unsigned char n_sect;
-  unsigned short n_desc;
-}
-bfd_mach_o_asymbol;
+/* The symbol table is sorted like this:
+ (1) local.
+	(otherwise in order of generation)
+ (2) external defined
+	(sorted by name)
+ (3) external undefined / common
+	(sorted by name)
+*/
 
 typedef struct bfd_mach_o_symtab_command
 {
@@ -438,6 +454,16 @@ typedef struct bfd_mach_o_str_command
 }
 bfd_mach_o_str_command;
 
+typedef struct bfd_mach_o_fvmlib_command
+{
+  unsigned int name_offset;
+  unsigned int name_len;
+  char *name_str;
+  unsigned int minor_version;
+  unsigned int header_addr;
+}
+bfd_mach_o_fvmlib_command;
+
 typedef struct bfd_mach_o_dyld_info_command
 {
   /* File offset and size to rebase info.  */
@@ -471,6 +497,14 @@ typedef struct bfd_mach_o_version_min_command
 }
 bfd_mach_o_version_min_command;
 
+typedef struct bfd_mach_o_encryption_info_command
+{
+  unsigned int cryptoff;
+  unsigned int cryptsize;
+  unsigned int cryptid;
+}
+bfd_mach_o_encryption_info_command;
+
 typedef struct bfd_mach_o_load_command
 {
   bfd_mach_o_load_command_type type;
@@ -491,6 +525,8 @@ typedef struct bfd_mach_o_load_command
     bfd_mach_o_str_command str;
     bfd_mach_o_dyld_info_command dyld_info;
     bfd_mach_o_version_min_command version_min;
+    bfd_mach_o_encryption_info_command encryption_info;
+    bfd_mach_o_fvmlib_command fvmlib;
   }
   command;
 }
@@ -507,7 +543,7 @@ typedef struct mach_o_data_struct
   unsigned long nsects;
   bfd_mach_o_section **sections;
 
-  /* Used while writting: current length of the output file.  This is used
+  /* Used while writing: current length of the output file.  This is used
      to allocate space in the file.  */
   ufile_ptr filelen;
 
@@ -516,19 +552,26 @@ typedef struct mach_o_data_struct
      is expected.  */
   bfd_mach_o_symtab_command *symtab;
   bfd_mach_o_dysymtab_command *dysymtab;
+
+  /* A place to stash dwarf2 info for this bfd.  */
+  void *dwarf2_find_line_info;
+
+  /* BFD of .dSYM file. */
+  bfd *dsym_bfd;
+
+  /* Cache of dynamic relocs. */
+  arelent *dyn_reloc_cache;
 }
 bfd_mach_o_data_struct;
 
-/* Target specific routines.  */
-typedef struct bfd_mach_o_backend_data
+typedef struct bfd_mach_o_xlat_name
 {
-  enum bfd_architecture arch;
-  bfd_boolean (*_bfd_mach_o_swap_reloc_in)(arelent *, bfd_mach_o_reloc_info *);
-  bfd_boolean (*_bfd_mach_o_swap_reloc_out)(arelent *, bfd_mach_o_reloc_info *);
-  bfd_boolean (*_bfd_mach_o_print_thread)(bfd *, bfd_mach_o_thread_flavour *,
-                                          void *, char *);
+  const char *name;
+  unsigned long val;
 }
-bfd_mach_o_backend_data;
+bfd_mach_o_xlat_name;
+
+/* Target specific routines.  */
 
 #define bfd_mach_o_get_data(abfd) ((abfd)->tdata.mach_o_data)
 #define bfd_mach_o_get_backend_data(abfd) \
@@ -539,9 +582,6 @@ bfd_mach_o_backend_data;
   ((bfd_mach_o_section *)(sec)->used_by_bfd)
 
 bfd_boolean bfd_mach_o_valid (bfd *);
-int bfd_mach_o_read_dysymtab_symbol (bfd *, bfd_mach_o_dysymtab_command *, bfd_mach_o_symtab_command *, bfd_mach_o_asymbol *, unsigned long);
-int bfd_mach_o_scan_start_address (bfd *);
-int bfd_mach_o_scan (bfd *, bfd_mach_o_header *, bfd_mach_o_data_struct *);
 bfd_boolean bfd_mach_o_mkobject_init (bfd *);
 const bfd_target *bfd_mach_o_object_p (bfd *);
 const bfd_target *bfd_mach_o_core_p (bfd *);
@@ -557,6 +597,7 @@ bfd_boolean bfd_mach_o_bfd_copy_private_symbol_data (bfd *, asymbol *,
 bfd_boolean bfd_mach_o_bfd_copy_private_section_data (bfd *, asection *,
                                                       bfd *, asection *);
 bfd_boolean bfd_mach_o_bfd_copy_private_bfd_data (bfd *, bfd *);
+bfd_boolean bfd_mach_o_bfd_set_private_flags (bfd *, flagword);
 long bfd_mach_o_get_symtab_upper_bound (bfd *);
 long bfd_mach_o_canonicalize_symtab (bfd *, asymbol **);
 long bfd_mach_o_get_synthetic_symtab (bfd *, long, asymbol **, long, 
@@ -567,8 +608,7 @@ long bfd_mach_o_get_dynamic_reloc_upper_bound (bfd *);
 long bfd_mach_o_canonicalize_dynamic_reloc (bfd *, arelent **, asymbol **);
 asymbol *bfd_mach_o_make_empty_symbol (bfd *);
 void bfd_mach_o_get_symbol_info (bfd *, asymbol *, symbol_info *);
-void bfd_mach_o_print_symbol (bfd *, PTR, asymbol *, bfd_print_symbol_type);
-bfd_boolean bfd_mach_o_bfd_print_private_bfd_data (bfd *, PTR);
+void bfd_mach_o_print_symbol (bfd *, void *, asymbol *, bfd_print_symbol_type);
 int bfd_mach_o_sizeof_headers (bfd *, struct bfd_link_info *);
 unsigned long bfd_mach_o_stack_addr (enum bfd_mach_o_cpu_type);
 int bfd_mach_o_core_fetch_environment (bfd *, unsigned char **, unsigned int *);
@@ -583,11 +623,70 @@ bfd_boolean bfd_mach_o_set_section_contents (bfd *, asection *, const void *,
                                              file_ptr, bfd_size_type);
 unsigned int bfd_mach_o_version (bfd *);
 
-unsigned int bfd_mach_o_get_section_type_from_name (const char *);
+unsigned int bfd_mach_o_get_section_type_from_name (bfd *, const char *);
 unsigned int bfd_mach_o_get_section_attribute_from_name (const char *);
-void bfd_mach_o_normalize_section_name (const char *, const char *,
-                                        const char **, flagword *);
+
+void bfd_mach_o_convert_section_name_to_bfd (bfd *, const char *, const char *,
+					     const char **, flagword *);
+bfd_boolean bfd_mach_o_find_nearest_line (bfd *, asection *, asymbol **,
+                                          bfd_vma, const char **,
+                                          const char **, unsigned int *);
+bfd_boolean bfd_mach_o_close_and_cleanup (bfd *);
+bfd_boolean bfd_mach_o_free_cached_info (bfd *);
+
+unsigned int bfd_mach_o_section_get_nbr_indirect (bfd *, bfd_mach_o_section *);
+unsigned int bfd_mach_o_section_get_entry_size (bfd *, bfd_mach_o_section *);
+bfd_boolean bfd_mach_o_read_symtab_symbols (bfd *);
+bfd_boolean bfd_mach_o_read_symtab_strtab (bfd *abfd);
+
+/* A placeholder in case we need to suppress emitting the dysymtab for some
+   reason (e.g. compatibility with older system versions).  */
+#define bfd_mach_o_should_emit_dysymtab(x) TRUE
+
+extern const bfd_mach_o_xlat_name bfd_mach_o_section_attribute_name[];
+extern const bfd_mach_o_xlat_name bfd_mach_o_section_type_name[];
 
 extern const bfd_target mach_o_fat_vec;
+
+/* Interfaces between BFD names and Mach-O names.  */
+
+typedef struct mach_o_section_name_xlat
+{
+  const char *bfd_name;
+  const char *mach_o_name;
+  flagword bfd_flags;
+  unsigned int macho_sectype;
+  unsigned int macho_secattr;
+  unsigned int sectalign;
+} mach_o_section_name_xlat;
+
+typedef struct mach_o_segment_name_xlat
+{
+  const char *segname;
+  const mach_o_section_name_xlat *sections;
+} mach_o_segment_name_xlat;
+
+const mach_o_section_name_xlat *
+bfd_mach_o_section_data_for_mach_sect (bfd *, const char *, const char *);
+const mach_o_section_name_xlat *
+bfd_mach_o_section_data_for_bfd_name (bfd *, const char *, const char **);
+
+typedef struct bfd_mach_o_backend_data
+{
+  enum bfd_architecture arch;
+  bfd_boolean (*_bfd_mach_o_swap_reloc_in)(arelent *, bfd_mach_o_reloc_info *);
+  bfd_boolean (*_bfd_mach_o_swap_reloc_out)(arelent *, bfd_mach_o_reloc_info *);
+  bfd_boolean (*_bfd_mach_o_print_thread)(bfd *, bfd_mach_o_thread_flavour *,
+                                          void *, char *);
+  const mach_o_segment_name_xlat *segsec_names_xlat;
+  bfd_boolean (*bfd_mach_o_section_type_valid_for_target) (unsigned long);
+}
+bfd_mach_o_backend_data;
+
+/* Values used in symbol.udata.i, to signal that the mach-o-specific data in the
+   symbol are not yet set, or need validation (where this is possible).  */
+
+#define SYM_MACHO_FIELDS_UNSET ((bfd_vma) -1)
+#define SYM_MACHO_FIELDS_NOT_VALIDATED ((bfd_vma) -2)
 
 #endif /* _BFD_MACH_O_H_ */

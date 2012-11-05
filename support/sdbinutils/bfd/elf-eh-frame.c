@@ -1,6 +1,6 @@
 /* .eh_frame section optimization.
-   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
-   Free Software Foundation, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+   2012 Free Software Foundation, Inc.
    Written by Jakub Jelinek <jakub@redhat.com>.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -491,7 +491,7 @@ _bfd_elf_parse_eh_frame (bfd *abfd, struct bfd_link_info *info,
     return;
 
   if (sec->size == 0
-      || sec->sec_info_type != ELF_INFO_TYPE_NONE)
+      || sec->sec_info_type != SEC_INFO_TYPE_NONE)
     {
       /* This file does not contain .eh_frame information.  */
       return;
@@ -904,7 +904,7 @@ _bfd_elf_parse_eh_frame (bfd *abfd, struct bfd_link_info *info,
   BFD_ASSERT (cie_count == num_cies);
 
   elf_section_data (sec)->sec_info = sec_info;
-  sec->sec_info_type = ELF_INFO_TYPE_EH_FRAME;
+  sec->sec_info_type = SEC_INFO_TYPE_EH_FRAME;
   if (hdr_info->merge_cies)
     {
       sec_info->cies = local_cies;
@@ -1137,7 +1137,7 @@ _bfd_elf_discard_section_eh_frame
   struct eh_frame_hdr_info *hdr_info;
   unsigned int ptr_size, offset;
 
-  if (sec->sec_info_type != ELF_INFO_TYPE_EH_FRAME)
+  if (sec->sec_info_type != SEC_INFO_TYPE_EH_FRAME)
     return FALSE;
 
   sec_info = (struct eh_frame_sec_info *) elf_section_data (sec)->sec_info;
@@ -1247,6 +1247,26 @@ _bfd_elf_discard_section_eh_frame_hdr (bfd *abfd, struct bfd_link_info *info)
   return TRUE;
 }
 
+/* Return true if there is at least one non-empty .eh_frame section in
+   input files.  Can only be called after ld has mapped input to
+   output sections, and before sections are stripped.  */
+bfd_boolean
+_bfd_elf_eh_frame_present (struct bfd_link_info *info)
+{
+  asection *eh = bfd_get_section_by_name (info->output_bfd, ".eh_frame");
+
+  if (eh == NULL)
+    return FALSE;
+
+  /* Count only sections which have at least a single CIE or FDE.
+     There cannot be any CIE or FDE <= 8 bytes.  */
+  for (eh = eh->map_head.s; eh != NULL; eh = eh->map_head.s)
+    if (eh->size > 8)
+      return TRUE;
+
+  return FALSE;
+}
+
 /* This function is called from size_dynamic_sections.
    It needs to decide whether .eh_frame_hdr should be output or not,
    because when the dynamic symbol table has been sized it is too late
@@ -1255,8 +1275,6 @@ _bfd_elf_discard_section_eh_frame_hdr (bfd *abfd, struct bfd_link_info *info)
 bfd_boolean
 _bfd_elf_maybe_strip_eh_frame_hdr (struct bfd_link_info *info)
 {
-  asection *o;
-  bfd *abfd;
   struct elf_link_hash_table *htab;
   struct eh_frame_hdr_info *hdr_info;
 
@@ -1265,24 +1283,9 @@ _bfd_elf_maybe_strip_eh_frame_hdr (struct bfd_link_info *info)
   if (hdr_info->hdr_sec == NULL)
     return TRUE;
 
-  if (bfd_is_abs_section (hdr_info->hdr_sec->output_section))
-    {
-      hdr_info->hdr_sec = NULL;
-      return TRUE;
-    }
-
-  abfd = NULL;
-  if (info->eh_frame_hdr)
-    for (abfd = info->input_bfds; abfd != NULL; abfd = abfd->link_next)
-      {
-	/* Count only sections which have at least a single CIE or FDE.
-	   There cannot be any CIE or FDE <= 8 bytes.  */
-	o = bfd_get_section_by_name (abfd, ".eh_frame");
-	if (o && o->size > 8 && !bfd_is_abs_section (o->output_section))
-	  break;
-      }
-
-  if (abfd == NULL)
+  if (bfd_is_abs_section (hdr_info->hdr_sec->output_section)
+      || !info->eh_frame_hdr
+      || !_bfd_elf_eh_frame_present (info))
     {
       hdr_info->hdr_sec->flags |= SEC_EXCLUDE;
       hdr_info->hdr_sec = NULL;
@@ -1307,7 +1310,7 @@ _bfd_elf_eh_frame_section_offset (bfd *output_bfd ATTRIBUTE_UNUSED,
   struct eh_frame_sec_info *sec_info;
   unsigned int lo, hi, mid;
 
-  if (sec->sec_info_type != ELF_INFO_TYPE_EH_FRAME)
+  if (sec->sec_info_type != SEC_INFO_TYPE_EH_FRAME)
     return offset;
   sec_info = (struct eh_frame_sec_info *) elf_section_data (sec)->sec_info;
 
@@ -1395,7 +1398,7 @@ _bfd_elf_write_section_eh_frame (bfd *abfd,
   unsigned int ptr_size;
   struct eh_cie_fde *ent;
 
-  if (sec->sec_info_type != ELF_INFO_TYPE_EH_FRAME)
+  if (sec->sec_info_type != SEC_INFO_TYPE_EH_FRAME)
     /* FIXME: octets_per_byte.  */
     return bfd_set_section_contents (abfd, sec->output_section, contents,
 				     sec->output_offset, sec->size);

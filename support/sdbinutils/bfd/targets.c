@@ -1,6 +1,6 @@
 /* Generic target-file-type support for the BFD library.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
+   2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
    Free Software Foundation, Inc.
    Written by Cygnus Support.
 
@@ -147,9 +147,29 @@ DESCRIPTION
 .enum bfd_flavour
 .{
 .  bfd_target_unknown_flavour,
+.  bfd_target_aout_flavour,
+.  bfd_target_coff_flavour,
+.  bfd_target_ecoff_flavour,
+.  bfd_target_xcoff_flavour,
+.  bfd_target_elf_flavour,
+.  bfd_target_ieee_flavour,
+.  bfd_target_nlm_flavour,
+.  bfd_target_oasys_flavour,
+.  bfd_target_tekhex_flavour,
 .  bfd_target_srec_flavour,
+.  bfd_target_verilog_flavour,
 .  bfd_target_ihex_flavour,
-.  bfd_target_asxxxx_flavour
+.  bfd_target_som_flavour,
+.  bfd_target_os9k_flavour,
+.  bfd_target_versados_flavour,
+.  bfd_target_msdos_flavour,
+.  bfd_target_ovax_flavour,
+.  bfd_target_evax_flavour,
+.  bfd_target_mmo_flavour,
+.  bfd_target_mach_o_flavour,
+.  bfd_target_pef_flavour,
+.  bfd_target_pef_xlib_flavour,
+.  bfd_target_sym_flavour
 .};
 .
 .enum bfd_endian { BFD_ENDIAN_BIG, BFD_ENDIAN_LITTLE, BFD_ENDIAN_UNKNOWN };
@@ -349,6 +369,7 @@ BFD_JUMP_TABLE macros.
 .  NAME##_bfd_is_target_special_symbol, \
 .  NAME##_get_lineno, \
 .  NAME##_find_nearest_line, \
+.  _bfd_generic_find_nearest_line_discriminator, \
 .  _bfd_generic_find_line, \
 .  NAME##_find_inliner_info, \
 .  NAME##_bfd_make_debug_symbol, \
@@ -372,6 +393,9 @@ BFD_JUMP_TABLE macros.
 .  bfd_boolean (*_bfd_find_nearest_line)
 .    (bfd *, struct bfd_section *, struct bfd_symbol **, bfd_vma,
 .     const char **, const char **, unsigned int *);
+.  bfd_boolean (*_bfd_find_nearest_line_discriminator)
+.    (bfd *, struct bfd_section *, struct bfd_symbol **, bfd_vma,
+.     const char **, const char **, unsigned int *, unsigned int *);
 .  bfd_boolean (*_bfd_find_line)
 .    (bfd *, struct bfd_symbol **, struct bfd_symbol *,
 .     const char **, unsigned int *);
@@ -477,8 +501,9 @@ BFD_JUMP_TABLE macros.
 .  bfd_boolean (*_bfd_gc_sections) (bfd *, struct bfd_link_info *);
 .
 .  {* Sets the bitmask of allowed and disallowed section flags.  *}
-.  void (*_bfd_lookup_section_flags) (struct bfd_link_info *,
-.				      struct flag_info *);
+.  bfd_boolean (*_bfd_lookup_section_flags) (struct bfd_link_info *,
+.					     struct flag_info *,
+.					     asection *);
 .
 .  {* Attempt to merge SEC_MERGE sections.  *}
 .  bfd_boolean (*_bfd_merge_sections) (bfd *, struct bfd_link_info *);
@@ -567,7 +592,6 @@ extern const bfd_target armpe_big_vec;
 extern const bfd_target armpe_little_vec;
 extern const bfd_target armpei_big_vec;
 extern const bfd_target armpei_little_vec;
-extern const bfd_target asxxxx_vec;
 extern const bfd_target b_out_vec_big_host;
 extern const bfd_target b_out_vec_little_host;
 extern const bfd_target bfd_pei_ia64_vec;
@@ -577,6 +601,7 @@ extern const bfd_target bfd_elf32_bfinfdpic_vec;
 extern const bfd_target bfd_elf32_big_generic_vec;
 extern const bfd_target bfd_elf32_bigarc_vec;
 extern const bfd_target bfd_elf32_bigarm_vec;
+extern const bfd_target bfd_elf32_bigarm_nacl_vec;
 extern const bfd_target bfd_elf32_bigarm_symbian_vec;
 extern const bfd_target bfd_elf32_bigarm_vxworks_vec;
 extern const bfd_target bfd_elf32_bigmips_vec;
@@ -588,6 +613,7 @@ extern const bfd_target bfd_elf32_crx_vec;
 extern const bfd_target bfd_elf32_d10v_vec;
 extern const bfd_target bfd_elf32_d30v_vec;
 extern const bfd_target bfd_elf32_dlx_big_vec;
+extern const bfd_target bfd_elf32_epiphany_vec;
 extern const bfd_target bfd_elf32_fr30_vec;
 extern const bfd_target bfd_elf32_frv_vec;
 extern const bfd_target bfd_elf32_frvfdpic_vec;
@@ -614,6 +640,7 @@ extern const bfd_target bfd_elf32_lm32fdpic_vec;
 extern const bfd_target bfd_elf32_little_generic_vec;
 extern const bfd_target bfd_elf32_littlearc_vec;
 extern const bfd_target bfd_elf32_littlearm_vec;
+extern const bfd_target bfd_elf32_littlearm_nacl_vec;
 extern const bfd_target bfd_elf32_littlearm_symbian_vec;
 extern const bfd_target bfd_elf32_littlearm_vxworks_vec;
 extern const bfd_target bfd_elf32_littlemips_vec;
@@ -648,7 +675,9 @@ extern const bfd_target bfd_elf32_pj_vec;
 extern const bfd_target bfd_elf32_pjl_vec;
 extern const bfd_target bfd_elf32_powerpc_vec;
 extern const bfd_target bfd_elf32_powerpcle_vec;
+extern const bfd_target bfd_elf32_powerpc_freebsd_vec;
 extern const bfd_target bfd_elf32_powerpc_vxworks_vec;
+extern const bfd_target bfd_elf32_rl78_vec;
 extern const bfd_target bfd_elf32_rx_le_vec;
 extern const bfd_target bfd_elf32_rx_be_vec;
 extern const bfd_target bfd_elf32_rx_be_ns_vec;
@@ -682,7 +711,8 @@ extern const bfd_target bfd_elf32_tic6x_elf_be_vec;
 extern const bfd_target bfd_elf32_tic6x_elf_le_vec;
 extern const bfd_target bfd_elf32_tic6x_linux_be_vec;
 extern const bfd_target bfd_elf32_tic6x_linux_le_vec;
-extern const bfd_target bfd_elf32_tilegx_vec;
+extern const bfd_target bfd_elf32_tilegx_be_vec;
+extern const bfd_target bfd_elf32_tilegx_le_vec;
 extern const bfd_target bfd_elf32_tilepro_vec;
 extern const bfd_target bfd_elf32_tradbigmips_vec;
 extern const bfd_target bfd_elf32_tradlittlemips_vec;
@@ -692,6 +722,7 @@ extern const bfd_target bfd_elf32_us_cris_vec;
 extern const bfd_target bfd_elf32_v850_vec;
 extern const bfd_target bfd_elf32_vax_vec;
 extern const bfd_target bfd_elf32_xc16x_vec;
+extern const bfd_target bfd_elf32_xgate_vec;
 extern const bfd_target bfd_elf32_xstormy16_vec;
 extern const bfd_target bfd_elf32_xtensa_be_vec;
 extern const bfd_target bfd_elf32_xtensa_le_vec;
@@ -699,6 +730,7 @@ extern const bfd_target bfd_elf64_alpha_freebsd_vec;
 extern const bfd_target bfd_elf64_alpha_vec;
 extern const bfd_target bfd_elf64_big_generic_vec;
 extern const bfd_target bfd_elf64_bigmips_vec;
+extern const bfd_target bfd_elf64_bigaarch64_vec;
 extern const bfd_target bfd_elf64_hppa_linux_vec;
 extern const bfd_target bfd_elf64_hppa_vec;
 extern const bfd_target bfd_elf64_ia64_big_vec;
@@ -707,9 +739,11 @@ extern const bfd_target bfd_elf64_ia64_little_vec;
 extern const bfd_target bfd_elf64_ia64_vms_vec;
 extern const bfd_target bfd_elf64_little_generic_vec;
 extern const bfd_target bfd_elf64_littlemips_vec;
+extern const bfd_target bfd_elf64_littleaarch64_vec;
 extern const bfd_target bfd_elf64_mmix_vec;
 extern const bfd_target bfd_elf64_powerpc_vec;
 extern const bfd_target bfd_elf64_powerpcle_vec;
+extern const bfd_target bfd_elf64_powerpc_freebsd_vec;
 extern const bfd_target bfd_elf64_s390_vec;
 extern const bfd_target bfd_elf64_sh64_vec;
 extern const bfd_target bfd_elf64_sh64l_vec;
@@ -720,14 +754,17 @@ extern const bfd_target bfd_elf64_sh64nbsd_vec;
 extern const bfd_target bfd_elf64_sparc_vec;
 extern const bfd_target bfd_elf64_sparc_freebsd_vec;
 extern const bfd_target bfd_elf64_sparc_sol2_vec;
-extern const bfd_target bfd_elf64_tilegx_vec;
+extern const bfd_target bfd_elf64_tilegx_be_vec;
+extern const bfd_target bfd_elf64_tilegx_le_vec;
 extern const bfd_target bfd_elf64_tradbigmips_vec;
 extern const bfd_target bfd_elf64_tradlittlemips_vec;
 extern const bfd_target bfd_elf64_tradbigmips_freebsd_vec;
 extern const bfd_target bfd_elf64_tradlittlemips_freebsd_vec;
 extern const bfd_target bfd_elf64_x86_64_freebsd_vec;
+extern const bfd_target bfd_elf64_x86_64_nacl_vec;
 extern const bfd_target bfd_elf64_x86_64_sol2_vec;
 extern const bfd_target bfd_elf64_x86_64_vec;
+extern const bfd_target bfd_elf32_x86_64_nacl_vec;
 extern const bfd_target bfd_elf32_x86_64_vec;
 extern const bfd_target bfd_elf64_l1om_freebsd_vec;
 extern const bfd_target bfd_elf64_l1om_vec;
@@ -876,33 +913,465 @@ extern const bfd_target trad_core_vec;
 extern const bfd_target bfd_elf32_am33lin_vec;
 static const bfd_target * const _bfd_target_vector[] =
 {
-//#ifdef SELECT_VECS
-#if 0
+#ifdef SELECT_VECS
 
 	SELECT_VECS,
 
 #else /* not SELECT_VECS */
 
-//#ifdef DEFAULT_VECTOR
-#if 0
+#ifdef DEFAULT_VECTOR
 	&DEFAULT_VECTOR,
 #endif
-        &asxxxx_vec,
-        &srec_vec,
-        &symbolsrec_vec,
-        &ihex_vec,
+	/* This list is alphabetized to make it easy to compare
+	   with other vector lists -- the decls above and
+	   the case statement in configure.in.
+	   Vectors that don't compile on all systems, or aren't finished,
+	   should have an entry here with #if 0 around it, to show that
+	   it wasn't omitted by mistake.  */
+	&a_out_adobe_vec,
+#ifdef BFD64
+	&aix5coff64_vec,
 #endif
-        NULL /* end of list marker */
-};
+	&aout0_big_vec,
+#if 0
+	/* We have no way of distinguishing these from other a.out variants.  */
+	&aout_arm_big_vec,
+	&aout_arm_little_vec,
+	/* No one seems to use this.  */
+	&aout_mips_big_vec,
+#endif
+	&aout_mips_little_vec,
+#if 0
+	&apollocoff_vec,
+#endif
+	&arm_epoc_pe_big_vec,
+	&arm_epoc_pe_little_vec,
+	&arm_epoc_pei_big_vec,
+	&arm_epoc_pei_little_vec,
+	&arm_wince_pe_big_vec,
+	&arm_wince_pe_little_vec,
+	&arm_wince_pei_big_vec,
+	&arm_wince_pei_little_vec,
+	&armcoff_big_vec,
+	&armcoff_little_vec,
+	&armnetbsd_vec,
+	&armpe_big_vec,
+	&armpe_little_vec,
+	&armpei_big_vec,
+	&armpei_little_vec,
+	&b_out_vec_big_host,
+	&b_out_vec_little_host,
+#ifdef BFD64
+	&bfd_pei_ia64_vec,
+#endif
+	&bfd_elf32_avr_vec,
+	&bfd_elf32_bfin_vec,
+	&bfd_elf32_bfinfdpic_vec,
 
+	/* This, and other vectors, may not be used in any *.mt configuration.
+	   But that does not mean they are unnecessary.  If configured with
+	   --enable-targets=all, objdump or gdb should be able to examine
+	   the file even if we don't recognize the machine type.  */
+	&bfd_elf32_big_generic_vec,
+	&bfd_elf32_bigarc_vec,
+	&bfd_elf32_bigarm_vec,
+	&bfd_elf32_bigarm_symbian_vec,
+	&bfd_elf32_bigarm_vxworks_vec,
+	&bfd_elf32_bigmips_vec,
+	&bfd_elf32_bigmips_vxworks_vec,
+	&bfd_elf32_cr16_vec,
+	&bfd_elf32_cr16c_vec,
+	&bfd_elf32_cris_vec,
+	&bfd_elf32_crx_vec,
+	&bfd_elf32_d10v_vec,
+	&bfd_elf32_d30v_vec,
+	&bfd_elf32_dlx_big_vec,
+	&bfd_elf32_epiphany_vec,
+	&bfd_elf32_fr30_vec,
+	&bfd_elf32_frv_vec,
+	&bfd_elf32_frvfdpic_vec,
+ 	&bfd_elf32_moxie_vec,
+	&bfd_elf32_h8300_vec,
+	&bfd_elf32_hppa_linux_vec,
+	&bfd_elf32_hppa_nbsd_vec,
+	&bfd_elf32_hppa_vec,
+	&bfd_elf32_i370_vec,
+	&bfd_elf32_i386_freebsd_vec,
+	&bfd_elf32_i386_nacl_vec,
+	&bfd_elf32_i386_sol2_vec,
+	&bfd_elf32_i386_vxworks_vec,
+	&bfd_elf32_i386_vec,
+	&bfd_elf32_i860_little_vec,
+	&bfd_elf32_i860_vec,
+	&bfd_elf32_i960_vec,
+#if 0
+	&bfd_elf32_ia64_big_vec,
+#endif
+#ifdef BFD64
+	&bfd_elf32_ia64_hpux_big_vec,
+#endif
+	&bfd_elf32_ip2k_vec,
+	&bfd_elf32_iq2000_vec,
+	&bfd_elf32_lm32_vec,
+	&bfd_elf32_little_generic_vec,
+	&bfd_elf32_littlearc_vec,
+	&bfd_elf32_littlearm_vec,
+	&bfd_elf32_littlearm_symbian_vec,
+	&bfd_elf32_littlearm_vxworks_vec,
+	&bfd_elf32_littlemips_vec,
+	&bfd_elf32_littlemips_vxworks_vec,
+	&bfd_elf32_m32c_vec,
+	&bfd_elf32_m32r_vec,
+        &bfd_elf32_m32rle_vec,
+        &bfd_elf32_m32rlin_vec,
+        &bfd_elf32_m32rlelin_vec,
+	&bfd_elf32_m68hc11_vec,
+	&bfd_elf32_m68hc12_vec,
+	&bfd_elf32_m68k_vec,
+	&bfd_elf32_m88k_vec,
+	&bfd_elf32_mcore_big_vec,
+	&bfd_elf32_mcore_little_vec,
+	&bfd_elf32_mep_vec,
+	&bfd_elf32_microblaze_vec,
+	&bfd_elf32_mn10200_vec,
+	&bfd_elf32_mn10300_vec,
+	&bfd_elf32_mt_vec,
+	&bfd_elf32_msp430_vec,
+#ifdef BFD64
+	&bfd_elf32_nbigmips_vec,
+	&bfd_elf32_nlittlemips_vec,
+	&bfd_elf32_ntradbigmips_vec,
+	&bfd_elf32_ntradlittlemips_vec,
+	&bfd_elf32_ntradbigmips_freebsd_vec,
+	&bfd_elf32_ntradlittlemips_freebsd_vec,
+#endif
+	&bfd_elf32_openrisc_vec,
+	&bfd_elf32_or32_big_vec,
+	&bfd_elf32_pj_vec,
+	&bfd_elf32_pjl_vec,
+	&bfd_elf32_powerpc_vec,
+	&bfd_elf32_powerpc_vxworks_vec,
+	&bfd_elf32_powerpcle_vec,
+	&bfd_elf32_powerpc_freebsd_vec,
+	&bfd_elf32_rl78_vec,
+	&bfd_elf32_rx_be_vec,
+	&bfd_elf32_rx_be_ns_vec,
+	&bfd_elf32_rx_le_vec,
+	&bfd_elf32_s390_vec,
+#ifdef BFD64
+	&bfd_elf32_bigscore_vec,
+	&bfd_elf32_littlescore_vec,
+#endif
+        &bfd_elf32_sh_vec,
+        &bfd_elf32_shbfd_vec,
+        &bfd_elf32_shblin_vec,
+        &bfd_elf32_shfd_vec,
+        &bfd_elf32_shl_vec,
+        &bfd_elf32_shl_symbian_vec,
+        &bfd_elf32_shlin_vec,
+	&bfd_elf32_shlnbsd_vec,
+	&bfd_elf32_shlvxworks_vec,
+	&bfd_elf32_shnbsd_vec,
+	&bfd_elf32_shvxworks_vec,
+#ifdef BFD64
+	&bfd_elf32_sh64_vec,
+	&bfd_elf32_sh64l_vec,
+	&bfd_elf32_sh64lnbsd_vec,
+	&bfd_elf32_sh64nbsd_vec,
+	&bfd_elf32_sh64lin_vec,
+	&bfd_elf32_sh64blin_vec,
+#endif
+	&bfd_elf32_sparc_vec,
+	&bfd_elf32_sparc_sol2_vec,
+	&bfd_elf32_sparc_vxworks_vec,
+	&bfd_elf32_spu_vec,
+	&bfd_elf32_tic6x_be_vec,
+	&bfd_elf32_tic6x_le_vec,
+	&bfd_elf32_tilegx_be_vec,
+	&bfd_elf32_tilegx_le_vec,
+	&bfd_elf32_tilepro_vec,
+	&bfd_elf32_tradbigmips_vec,
+	&bfd_elf32_tradlittlemips_vec,
+	&bfd_elf32_tradbigmips_freebsd_vec,
+	&bfd_elf32_tradlittlemips_freebsd_vec,
+	&bfd_elf32_us_cris_vec,
+	&bfd_elf32_v850_vec,
+	&bfd_elf32_vax_vec,
+	&bfd_elf32_xc16x_vec,
+	&bfd_elf32_xgate_vec,
+	&bfd_elf32_xstormy16_vec,
+	&bfd_elf32_xtensa_be_vec,
+	&bfd_elf32_xtensa_le_vec,
+#ifdef BFD64
+	&bfd_elf64_alpha_freebsd_vec,
+	&bfd_elf64_alpha_vec,
+	&bfd_elf64_big_generic_vec,
+	&bfd_elf64_bigmips_vec,
+	&bfd_elf64_bigaarch64_vec,
+	&bfd_elf64_hppa_linux_vec,
+	&bfd_elf64_hppa_vec,
+	&bfd_elf64_ia64_big_vec,
+	&bfd_elf64_ia64_hpux_big_vec,
+	&bfd_elf64_ia64_little_vec,
+	&bfd_elf64_ia64_vms_vec,
+	&bfd_elf64_little_generic_vec,
+	&bfd_elf64_littlemips_vec,
+	&bfd_elf64_littleaarch64_vec,
+	&bfd_elf64_mmix_vec,
+	&bfd_elf64_powerpc_vec,
+	&bfd_elf64_powerpcle_vec,
+	&bfd_elf64_powerpc_freebsd_vec,
+	&bfd_elf64_s390_vec,
+	&bfd_elf64_sh64_vec,
+	&bfd_elf64_sh64l_vec,
+	&bfd_elf64_sh64lnbsd_vec,
+	&bfd_elf64_sh64nbsd_vec,
+	&bfd_elf64_sh64lin_vec,
+	&bfd_elf64_sh64blin_vec,
+	&bfd_elf64_sparc_vec,
+	&bfd_elf64_sparc_freebsd_vec,
+	&bfd_elf64_sparc_sol2_vec,
+	&bfd_elf64_tilegx_be_vec,
+	&bfd_elf64_tilegx_le_vec,
+	&bfd_elf64_tradbigmips_vec,
+	&bfd_elf64_tradlittlemips_vec,
+	&bfd_elf64_tradbigmips_freebsd_vec,
+	&bfd_elf64_tradlittlemips_freebsd_vec,
+	&bfd_elf64_x86_64_freebsd_vec,
+	&bfd_elf64_x86_64_nacl_vec,
+	&bfd_elf64_x86_64_sol2_vec,
+	&bfd_elf64_x86_64_vec,
+	&bfd_elf32_x86_64_nacl_vec,
+	&bfd_elf32_x86_64_vec,
+	&bfd_elf64_l1om_freebsd_vec,
+	&bfd_elf64_l1om_vec,
+	&bfd_elf64_k1om_freebsd_vec,
+	&bfd_elf64_k1om_vec,
+	&bfd_mmo_vec,
+#endif
+	&bfd_powerpc_pe_vec,
+	&bfd_powerpc_pei_vec,
+	&bfd_powerpcle_pe_vec,
+	&bfd_powerpcle_pei_vec,
+	&cris_aout_vec,
+#ifdef BFD64
+	&demo_64_vec,	/* Only compiled if host has long-long support.  */
+#endif
+	&ecoff_big_vec,
+	&ecoff_biglittle_vec,
+	&ecoff_little_vec,
+#ifdef BFD64
+	&ecoffalpha_little_vec,
+#endif
+	&go32coff_vec,
+	&go32stubbedcoff_vec,
+	&h8300coff_vec,
+	&h8500coff_vec,
+#if 0
+	/* Since a.out files lack decent magic numbers, no way to recognize
+	   which kind of a.out file it is.  */
+	&host_aout_vec,
+	/* Clashes with sunos_big_vec magic no.  */
+	&hp300bsd_vec,
+#endif
+	&hp300hpux_vec,
+	&i386aout_vec,
+	&i386bsd_vec,
+	&i386coff_vec,
+#if 0
+	&i386dynix_vec,
+#endif
+	&i386freebsd_vec,
+#if 0
+	/* Since a.out files lack decent magic numbers, no way to recognize
+	   which kind of a.out file it is.  */
+	&i386linux_vec,
+#endif
+	&i386lynx_aout_vec,
+	&i386lynx_coff_vec,
+#if 0
+	/* No distinguishing features for Mach 3 executables.  */
+	&i386mach3_vec,
+#endif
+	&i386msdos_vec,
+	&i386netbsd_vec,
+	&i386os9k_vec,
+	&i386pe_vec,
+	&i386pei_vec,
+#ifdef BFD64
+	&x86_64coff_vec,
+	&x86_64pe_vec,
+	&x86_64pei_vec,
+#endif
+	&i860coff_vec,
+	&icoff_big_vec,
+	&icoff_little_vec,
+	&ieee_vec,
+#if 0
+	&m68k4knetbsd_vec,
+	&m68kaux_coff_vec,
+#endif
+	&m68kcoff_vec,
+	&m68kcoffun_vec,
+#if 0
+	/* Since a.out files lack decent magic numbers, no way to recognize
+	   which kind of a.out file it is.  */
+	&m68klinux_vec,
+#endif
+	&m68knetbsd_vec,
+	&m68ksysvcoff_vec,
+	&m88kbcs_vec,
+	&m88kmach3_vec,
+	&m88kopenbsd_vec,
+	&mach_o_be_vec,
+	&mach_o_le_vec,
+	&mach_o_fat_vec,
+	&mach_o_i386_vec,
+#ifdef BFD64
+	&mach_o_x86_64_vec,
+#endif
+	&mcore_pe_big_vec,
+	&mcore_pe_little_vec,
+	&mcore_pei_big_vec,
+	&mcore_pei_little_vec,
+	&mipslpe_vec,
+	&mipslpei_vec,
+	&newsos3_vec,
+#ifdef BFD64
+	&nlm32_alpha_vec,
+#endif
+	&nlm32_i386_vec,
+	&nlm32_powerpc_vec,
+	&nlm32_sparc_vec,
+#if 0
+	/* We have no oasys tools anymore, so we can't test any of this
+	   anymore. If you want to test the stuff yourself, go ahead...
+	   steve@cygnus.com
+	   Worse, since there is no magic number for archives, there
+	   can be annoying target mis-matches.  */
+	&oasys_vec,
+#endif
+	/* Entry for the OpenRISC family.  */
+	&or32coff_big_vec,
+
+	&pc532machaout_vec,
+	&pc532netbsd_vec,
+	&pdp11_aout_vec,
+	&pef_vec,
+	&pef_xlib_vec,
+#if BFD_SUPPORTS_PLUGINS
+	&plugin_vec,
+#endif
+#if 0
+	/* This has the same magic number as RS/6000.  */
+	&pmac_xcoff_vec,
+#endif
+	&ppcboot_vec,
+#if 0
+	/* We have no way of distinguishing these from other a.out variants.  */
+	&riscix_vec,
+#endif
+#ifdef BFD64
+	&rs6000coff64_vec,
+#endif
+	&rs6000coff_vec,
+	&shcoff_small_vec,
+	&shcoff_vec,
+	&shlcoff_small_vec,
+	&shlcoff_vec,
+	&shlpe_vec,
+	&shlpei_vec,
+	&som_vec,
+	&sparccoff_vec,
+	&sparcle_aout_vec,
+	&sparclinux_vec,
+	&sparclynx_aout_vec,
+	&sparclynx_coff_vec,
+	&sparcnetbsd_vec,
+	&sunos_big_vec,
+	&sym_vec,
+	&tic30_aout_vec,
+	&tic30_coff_vec,
+	&tic54x_coff0_beh_vec,
+	&tic54x_coff0_vec,
+	&tic54x_coff1_beh_vec,
+	&tic54x_coff1_vec,
+	&tic54x_coff2_beh_vec,
+	&tic54x_coff2_vec,
+	&tic80coff_vec,
+	&vaxbsd_vec,
+	&vaxnetbsd_vec,
+	&vax1knetbsd_vec,
+	&versados_vec,
+#ifdef BFD64
+	&vms_alpha_vec,
+#endif
+        &vms_lib_txt_vec,
+	&w65_vec,
+	&we32kcoff_vec,
+	&z80coff_vec,
+	&z8kcoff_vec,
+	&bfd_elf32_am33lin_vec,
+#endif /* not SELECT_VECS */
+
+/* Always support S-records, for convenience.  */
+	&srec_vec,
+	&symbolsrec_vec,
+/* And verilog.  */
+	&verilog_vec,
+/* And tekhex */
+	&tekhex_vec,
+/* Likewise for binary output.  */
+	&binary_vec,
+/* Likewise for ihex.  */
+	&ihex_vec,
+
+/* Add any required traditional-core-file-handler.  */
+
+#ifdef AIX386_CORE
+	&aix386_core_vec,
+#endif
+#if 0
+	/* We don't include cisco_core_*_vec.  Although it has a magic number,
+	   the magic number isn't at the beginning of the file, and thus
+	   might spuriously match other kinds of files.  */
+	&cisco_core_big_vec,
+	&cisco_core_little_vec,
+#endif
+#ifdef HPPABSD_CORE
+	&hppabsd_core_vec,
+#endif
+#ifdef HPUX_CORE
+	&hpux_core_vec,
+#endif
+#ifdef IRIX_CORE
+	&irix_core_vec,
+#endif
+#ifdef NETBSD_CORE
+	&netbsd_core_vec,
+#endif
+#ifdef OSF_CORE
+	&osf_core_vec,
+#endif
+#ifdef PTRACE_CORE
+	&ptrace_core_vec,
+#endif
+#ifdef SCO5_CORE
+	&sco5_core_vec,
+#endif
+#ifdef TRAD_CORE
+	&trad_core_vec,
+#endif
+
+	NULL /* end of list marker */
+};
 const bfd_target * const *bfd_target_vector = _bfd_target_vector;
 
 /* bfd_default_vector[0] contains either the address of the default vector,
    if there is one, or zero if there isn't.  */
 
 const bfd_target *bfd_default_vector[] = {
-//#ifdef DEFAULT_VECTOR
-#if 0
+#ifdef DEFAULT_VECTOR
 	&DEFAULT_VECTOR,
 #endif
 	NULL
@@ -912,8 +1381,7 @@ const bfd_target *bfd_default_vector[] = {
    to reduce the ambiguity in bfd_check_format_matches.  */
 
 static const bfd_target *_bfd_associated_vector[] = {
-//#ifdef ASSOCIATED_VECS
-#if 0
+#ifdef ASSOCIATED_VECS
 	ASSOCIATED_VECS,
 #endif
 	NULL

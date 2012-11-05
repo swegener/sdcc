@@ -1,5 +1,5 @@
 /* 32-bit ELF support for TI C6X
-   Copyright 2010, 2011
+   Copyright 2010, 2011, 2012
    Free Software Foundation, Inc.
    Contributed by Joseph Myers <joseph@codesourcery.com>
    		  Bernd Schmidt  <bernds@codesourcery.com>
@@ -1670,9 +1670,9 @@ elf32_tic6x_create_dynamic_sections (bfd *dynobj, struct bfd_link_info *info)
       || ! bfd_set_section_alignment (dynobj, htab->elf.splt, 5))
     return FALSE;
 
-  htab->sdynbss = bfd_get_section_by_name (dynobj, ".dynbss");
+  htab->sdynbss = bfd_get_linker_section (dynobj, ".dynbss");
   if (!info->shared)
-    htab->srelbss = bfd_get_section_by_name (dynobj, ".rela.bss");
+    htab->srelbss = bfd_get_linker_section (dynobj, ".rela.bss");
 
   if (!htab->sdynbss
       || (!info->shared && !htab->srelbss))
@@ -1849,8 +1849,8 @@ elf32_tic6x_finish_dynamic_symbol (bfd * output_bfd,
       /* This symbol has an entry in the global offset table.
          Set it up.  */
 
-      sgot = bfd_get_section_by_name (dynobj, ".got");
-      srela = bfd_get_section_by_name (dynobj, ".rela.got");
+      sgot = bfd_get_linker_section (dynobj, ".got");
+      srela = bfd_get_linker_section (dynobj, ".rela.got");
       BFD_ASSERT (sgot != NULL && srela != NULL);
 
       /* If this is a -Bsymbolic link, and the symbol is defined
@@ -2157,13 +2157,6 @@ elf32_tic6x_adjust_dynamic_symbol (struct bfd_link_info *info,
   if (htab == NULL)
     return FALSE;
 
-  if (h->size == 0)
-    {
-      (*_bfd_error_handler) (_("dynamic variable `%s' is zero size"),
-			     h->root.root.string);
-      return TRUE;
-    }
-
   /* We must allocate the symbol in our .dynbss section, which will
      become part of the .bss section of the executable.  There will be
      an entry for this symbol in the .dynsym section.  The dynamic
@@ -2177,7 +2170,7 @@ elf32_tic6x_adjust_dynamic_symbol (struct bfd_link_info *info,
   /* We must generate a R_C6000_COPY reloc to tell the dynamic linker to
      copy the initial value out of the dynamic object and into the
      runtime process image.  */
-  if ((h->root.u.def.section->flags & SEC_ALLOC) != 0)
+  if ((h->root.u.def.section->flags & SEC_ALLOC) != 0 && h->size != 0)
     {
       htab->srelbss->size += sizeof (Elf32_External_Rela);
       h->needs_copy = 1;
@@ -2334,9 +2327,9 @@ elf32_tic6x_relocate_section (bfd *output_bfd,
 				   unresolved_reloc, warned);
 	}
 
-      if (sec != NULL && elf_discarded_section (sec))
+      if (sec != NULL && discarded_section (sec))
 	RELOC_AGAINST_DISCARDED_SECTION (info, input_bfd, input_section,
-					 rel, relend, howto, contents);
+					 rel, 1, relend, howto, 0, contents);
 
       if (info->relocatable)
 	{
@@ -3312,7 +3305,7 @@ elf32_tic6x_size_dynamic_sections (bfd *output_bfd, struct bfd_link_info *info)
       /* Set the contents of the .interp section to the interpreter.  */
       if (info->executable)
 	{
-	  s = bfd_get_section_by_name (dynobj, ".interp");
+	  s = bfd_get_linker_section (dynobj, ".interp");
 	  if (s == NULL)
 	    abort ();
 	  s->size = sizeof ELF_DYNAMIC_INTERPRETER;
@@ -3614,7 +3607,7 @@ elf32_tic6x_finish_dynamic_sections (bfd *output_bfd ATTRIBUTE_UNUSED,
 
   htab = elf32_tic6x_hash_table (info);
   dynobj = htab->elf.dynobj;
-  sdyn = bfd_get_section_by_name (dynobj, ".dynamic");
+  sdyn = bfd_get_linker_section (dynobj, ".dynamic");
 
   if (elf_hash_table (info)->dynamic_sections_created)
     {
@@ -4017,6 +4010,9 @@ elf32_tic6x_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
 {
   if (!_bfd_generic_verify_endian_match (ibfd, obfd))
     return FALSE;
+
+  if (! is_tic6x_elf (ibfd) || ! is_tic6x_elf (obfd))
+    return TRUE;
 
   if (!elf32_tic6x_merge_attributes (ibfd, obfd))
     return FALSE;

@@ -117,11 +117,11 @@ BUILT_SOURCES = $(GENERATED_HFILES)
 ####	ieee.c is-ranlib.c is-strip.c maybe-ranlib.c maybe-strip.c \
 ####	nlmconv.c nm.c not-ranlib.c not-strip.c \
 ####	objcopy.c objdump.c prdbg.c \
-####	od-xcoff.c \
+####	od-xcoff.c od-macho.c \
 ####	rclex.c rdcoff.c rddbg.c readelf.c rename.c \
 ####	resbin.c rescoff.c resrc.c resres.c \
 ####	size.c srconv.c stabs.c strings.c sysdump.c \
-####	unwind-ia64.c elfedit.c version.c \
+####	syslex_wrap.c unwind-ia64.c elfedit.c version.c \
 ####	windres.c winduni.c wrstabs.c \
 ####	windmc.c mclex.c
 
@@ -180,6 +180,7 @@ CC_FOR_TARGET = ` \
 ####check-DEJAGNU: site.exp
 ####	srcdir=`cd $(srcdir) && pwd`; export srcdir; \
 ####	r=`pwd`; export r; \
+####	LC_ALL=C; export LC_ALL; \
 ####	EXPECT=$(EXPECT); export EXPECT; \
 ####	runtest=$(RUNTEST); \
 ####	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
@@ -298,15 +299,11 @@ sdranlib_LDADD = $(BFDLIB) $(LIBIBERTY) @LEXLIB@ $(LIBINTL)
 ####sysroff.h: sysinfo$(EXEEXT_FOR_BUILD) sysroff.info
 ####	./sysinfo$(EXEEXT_FOR_BUILD) -d <$(srcdir)/sysroff.info >sysroff.h
 
-####sysinfo$(EXEEXT_FOR_BUILD): sysinfo.@OBJEXT@ syslex.@OBJEXT@
+####sysinfo$(EXEEXT_FOR_BUILD): sysinfo.@OBJEXT@ syslex_wrap.@OBJEXT@
 ####	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) $(LDFLAGS_FOR_BUILD) -o $@ sysinfo.@OBJEXT@ syslex.@OBJEXT@
 
-####syslex.@OBJEXT@: syslex.c sysinfo.h config.h
-####	if [ -r syslex.c ]; then \
-####	  $(CC_FOR_BUILD) -c -I. $(AM_CFLAGS) $(CFLAGS_FOR_BUILD) $(NO_WERROR) syslex.c ; \
-####	else \
-####	  $(CC_FOR_BUILD) -c -I. -I$(srcdir) $(AM_CFLAGS) $(CFLAGS_FOR_BUILD) $(NO_WERROR) $(srcdir)/syslex.c ;\
-####	fi
+####syslex_wrap.@OBJEXT@: syslex_wrap.c syslex.c sysinfo.h config.h
+####	$(CC_FOR_BUILD) -c -I. -I$(srcdir) $(AM_CFLAGS) $(CFLAGS_FOR_BUILD) $(NO_WERROR) $(srcdir)/syslex_wrap.c
 
 ####sysinfo.@OBJEXT@: sysinfo.c
 ####	if [ -r sysinfo.c ]; then \

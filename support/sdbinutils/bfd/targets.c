@@ -169,7 +169,8 @@ DESCRIPTION
 .  bfd_target_mach_o_flavour,
 .  bfd_target_pef_flavour,
 .  bfd_target_pef_xlib_flavour,
-.  bfd_target_sym_flavour
+.  bfd_target_sym_flavour,
+.  bfd_target_asxxxx_flavour
 .};
 .
 .enum bfd_endian { BFD_ENDIAN_BIG, BFD_ENDIAN_LITTLE, BFD_ENDIAN_UNKNOWN };
@@ -592,6 +593,7 @@ extern const bfd_target armpe_big_vec;
 extern const bfd_target armpe_little_vec;
 extern const bfd_target armpei_big_vec;
 extern const bfd_target armpei_little_vec;
+extern const bfd_target asxxxx_vec;
 extern const bfd_target b_out_vec_big_host;
 extern const bfd_target b_out_vec_little_host;
 extern const bfd_target bfd_pei_ia64_vec;
@@ -913,6 +915,7 @@ extern const bfd_target trad_core_vec;
 extern const bfd_target bfd_elf32_am33lin_vec;
 static const bfd_target * const _bfd_target_vector[] =
 {
+#if 0
 #ifdef SELECT_VECS
 
 	SELECT_VECS,
@@ -1313,6 +1316,9 @@ static const bfd_target * const _bfd_target_vector[] =
 	&z8kcoff_vec,
 	&bfd_elf32_am33lin_vec,
 #endif /* not SELECT_VECS */
+#endif /* 0 */
+
+	&asxxxx_vec,
 
 /* Always support S-records, for convenience.  */
 	&srec_vec,
@@ -1371,7 +1377,8 @@ const bfd_target * const *bfd_target_vector = _bfd_target_vector;
    if there is one, or zero if there isn't.  */
 
 const bfd_target *bfd_default_vector[] = {
-#ifdef DEFAULT_VECTOR
+//#ifdef DEFAULT_VECTOR
+#if 0
 	&DEFAULT_VECTOR,
 #endif
 	NULL
@@ -1381,7 +1388,8 @@ const bfd_target *bfd_default_vector[] = {
    to reduce the ambiguity in bfd_check_format_matches.  */
 
 static const bfd_target *_bfd_associated_vector[] = {
-#ifdef ASSOCIATED_VECS
+//#ifdef ASSOCIATED_VECS
+#if 0
 	ASSOCIATED_VECS,
 #endif
 	NULL

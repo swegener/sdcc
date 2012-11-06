@@ -1,3 +1,7 @@
+2012-11-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/sdbinutils/bfd/targets.c: reenable asxxxx
+
 2012-11-05 Borut Razem <borut.razem AT gmail.com>
 
 	* support/sdbinutils/*:

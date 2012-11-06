@@ -14120,9 +14120,10 @@ OBJDUMP_DEFS="${OBJDUMP_DEFS} -DOBJDUMP_PRIVATE_VECTORS=\"${OBJDUMP_PRIVATE_VECT
 
 
 
+####AC_DEFINE_UNQUOTED(TARGET, "${target}", [Configured target name.])
 
 cat >>confdefs.h <<_ACEOF
-#define TARGET "${target}"
+#define TARGET "asxxxx"
 _ACEOF
 
 

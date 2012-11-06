@@ -442,7 +442,8 @@ AC_SUBST(BUILD_INSTALL_MISC)
 AC_SUBST(OBJDUMP_DEFS)
 AC_SUBST(OBJDUMP_PRIVATE_OFILES)
 
-AC_DEFINE_UNQUOTED(TARGET, "${target}", [Configured target name.])
+####AC_DEFINE_UNQUOTED(TARGET, "${target}", [Configured target name.])
+AC_DEFINE_UNQUOTED(TARGET, "asxxxx", [Configured target name.])
 
 targ=$target
 . $srcdir/../bfd/config.bfd

@@ -2,6 +2,11 @@
 
 	* support/sdbinutils/bfd/targets.c:
 	  removed unneeded vectors and flavours
+	* support/sdbinutils/bfd/targets.c,
+	  support/sdbinutils/bfd/config.bfd:
+	  support/sdbinutils/binutils/configure.in,
+	  support/sdbinutils/binutils/configure,
+	  removed all unused vectors; hardcode default target to asxxxx
 
 2012-11-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

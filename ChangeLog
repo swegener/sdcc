@@ -1,3 +1,8 @@
+2012-11-06 Borut Razem <borut.razem AT gmail.com>
+
+	* support/sdbinutils/bfd/targets.c:
+	  removed unneeded vectors and flavours
+
 2012-11-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/sdbinutils/bfd/targets.c: reenable asxxxx

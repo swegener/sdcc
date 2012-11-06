@@ -109,6 +109,7 @@ xtensa*)	 targ_archs=bfd_xtensa_arch ;;
 xgate)		 targ_archs=bfd_xgate_arch ;;
 z80|r800)	 targ_archs=bfd_z80_arch ;;
 z8k*)		 targ_archs=bfd_z8k_arch ;;
+asxxxx*)	 targ_archs=bfd_z80_arch ;;
 *)		 targ_archs=bfd_${targ_cpu}_arch ;;
 esac
 
@@ -1642,6 +1643,9 @@ case "${targ}" in
   *-tandem-*)
     targ_defvec=m68kcoff_vec
     targ_selvecs=ieee_vec
+    ;;
+  asxxxx-*-*)
+    targ_defvec=asxxxx_vec
     ;;
   *)
     echo 1>&2 "*** BFD does not support target ${targ}."

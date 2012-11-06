@@ -7,6 +7,13 @@
 	  support/sdbinutils/binutils/configure.in,
 	  support/sdbinutils/binutils/configure,
 	  removed all unused vectors; hardcode default target to asxxxx
+	* support/sdbinutils/bfd/configure.in,
+	  support/sdbinutils/bfd/configure,
+	  support/sdbinutils/bfd/Makefile.in,
+	  support/sdbinutils/bfd/archures.c,
+	  support/sdbinutils/bfd/Makefile.am,
+	  support/sdbinutils/bfd/config.bfd:
+	  removed all unused architectures
 
 2012-11-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

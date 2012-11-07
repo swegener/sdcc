@@ -1,3 +1,9 @@
+2012-11-07 Borut Razem <borut.razem AT gmail.com>
+
+	* support/sdbinutils/bfd/Makefile.am,
+	  support/sdbinutils/bfd/*.c:
+	  removed unused machine an backend files
+
 2012-11-06 Borut Razem <borut.razem AT gmail.com>
 
 	* support/sdbinutils/bfd/targets.c:

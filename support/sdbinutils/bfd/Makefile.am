@@ -72,7 +72,7 @@ BFD64_LIBS_CFILES = archive64.c
 
 # This list is alphabetized to make it easier to keep in sync
 # with the decls and initializer in archures.c.
-ALL_MACHINES =
+ALL_MACHINES = cpu-z80.lo
 ####ALL_MACHINES = \
 ####	cpu-aarch64.lo \
 ####	cpu-alpha.lo \
@@ -154,7 +154,7 @@ ALL_MACHINES =
 ####	cpu-z80.lo \
 ####	cpu-z8k.lo
 
-ALL_MACHINES_CFILES =
+ALL_MACHINES_CFILES = cpu-z80.c
 ####ALL_MACHINES_CFILES = \
 ####	cpu-aarch64.c \
 ####	cpu-alpha.c \

@@ -1021,7 +1021,7 @@ status collapsed
 \end_layout
 
 \begin_layout Itemize
-sdbinutils utilities (sdar, sdranlib, sdnm):
+sdbinutils utilities (sdar, sdranlib, sdnm, sdobjcopy):
 \begin_inset Newline newline
 \end_inset
 
@@ -2487,6 +2487,11 @@ reference "sec:Inline-Assembler-Code"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Itemize
+sdobjcopy utility was introduced in version 3.3.0.
+ It is derived from GNU Binutils package.
 \end_layout
 
 \begin_layout Section
@@ -8545,7 +8550,8 @@ sdcclib - A tool for creating sdcc libraries (deprecated)
 \end_layout
 
 \begin_layout Itemize
-sdar, sdranlib, sdnm - The sdcc archive managing and indexing utilites.
+sdar, sdranlib, sdnm, sdobjcopy - The sdcc archive managing and indexing
+ utilites.
 \end_layout
 
 \begin_layout Itemize
@@ -43031,9 +43037,11 @@ PIC14
 Currently supported devices include:
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -43100,9 +43108,11 @@ Currently supported devices include:
 16HV: 610, 616, 785
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -43111,9 +43121,11 @@ Currently supported devices include:
 Supported devices with enhanced cores:
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -43150,9 +43162,11 @@ Supported devices with enhanced cores:
 16LF: 1902, 1903, 1904, 1906, 1907
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -44410,9 +44424,11 @@ PIC
 ; devices supported by the port include:
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -44575,9 +44591,11 @@ PIC
 18f8627  18f8628  18f8680  18f8720  18f8722  18f8723
 \end_layout
 
-\begin_layout Plain Layout
+\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
+
+
 \end_layout
 
 \begin_layout Standard

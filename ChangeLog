@@ -16,7 +16,7 @@
 	  support/sdbinutils/opcodes,
 	  support/sdbinutils/opcodes/ia64-opc.h:
 	  removed unused files
-	* Makefile.in, support/scripts/sdcc.nsi,
+	* Makefile.in, support/scripts/sdcc.nsi, doc/sdccman.lyx,
 	  support/sdbinutils/binutils/Makefile.am,
 	  support/sdbinutils/binutils/Makefile.in,
 	  support/sdbinutils/bfd/targets.c,

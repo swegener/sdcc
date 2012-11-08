@@ -54,8 +54,15 @@ BFD32_LIBS = \
 	cache.lo coffgen.lo corefile.lo \
 	format.lo init.lo libbfd.lo opncls.lo reloc.lo \
 	section.lo syms.lo targets.lo hash.lo linker.lo \
-	srec.lo binary.lo tekhex.lo ihex.lo stabs.lo stab-syms.lo \
-	merge.lo dwarf2.lo simple.lo compress.lo verilog.lo
+	srec.lo binary.lo ihex.lo stabs.lo stab-syms.lo \
+	merge.lo dwarf2.lo simple.lo compress.lo
+####BFD32_LIBS = \
+####	archive.lo archures.lo asxxxx.lo bfd.lo bfdio.lo bfdwin.lo \
+####	cache.lo coffgen.lo corefile.lo \
+####	format.lo init.lo libbfd.lo opncls.lo reloc.lo \
+####	section.lo syms.lo targets.lo hash.lo linker.lo \
+####	srec.lo binary.lo tekhex.lo ihex.lo stabs.lo stab-syms.lo \
+####	merge.lo dwarf2.lo simple.lo compress.lo verilog.lo
 
 BFD64_LIBS =
 ####BFD64_LIBS = archive64.lo
@@ -65,10 +72,18 @@ BFD32_LIBS_CFILES = \
 	cache.c coffgen.c corefile.c \
 	format.c init.c libbfd.c opncls.c reloc.c \
 	section.c syms.c targets.c hash.c linker.c \
-	srec.c binary.c tekhex.c ihex.c stabs.c stab-syms.c \
-	merge.c dwarf2.c simple.c compress.c verilog.c
+	srec.c binary.c ihex.c stabs.c stab-syms.c \
+	merge.c dwarf2.c simple.c compress.c
+####BFD32_LIBS_CFILES = \
+####	archive.c archures.c asxxxx.c bfd.c bfdio.c bfdwin.c \
+####	cache.c coffgen.c corefile.c \
+####	format.c init.c libbfd.c opncls.c reloc.c \
+####	section.c syms.c targets.c hash.c linker.c \
+####	srec.c binary.c tekhex.c ihex.c stabs.c stab-syms.c \
+####	merge.c dwarf2.c simple.c compress.c verilog.c
 
-BFD64_LIBS_CFILES = archive64.c
+BFD64_LIBS_CFILES =
+####BFD64_LIBS_CFILES = archive64.c
 
 # This list is alphabetized to make it easier to keep in sync
 # with the decls and initializer in archures.c.
@@ -748,8 +763,9 @@ SOURCE_CFILES = \
 	$(BFD64_BACKENDS_CFILES) \
 	$(OPTIONAL_BACKENDS_CFILES)
 
-BUILD_CFILES = \
-	elf32-ia64.c elf64-ia64.c peigen.c pepigen.c pex64igen.c
+BUILD_CFILES =
+####BUILD_CFILES = \
+####	elf32-ia64.c elf64-ia64.c peigen.c pepigen.c pex64igen.c
 
 CFILES = $(SOURCE_CFILES) $(BUILD_CFILES)
 
@@ -767,7 +783,9 @@ SOURCE_HFILES = \
 
 ## ... and all .h files which are in the build tree.
 BUILD_HFILES = \
-	bfdver.h elf32-target.h elf64-target.h targmatch.h bfd_stdint.h
+	bfdver.h targmatch.h bfd_stdint.h
+####BUILD_HFILES = \
+####	bfdver.h elf32-target.h elf64-target.h targmatch.h bfd_stdint.h
 
 # Ensure they are built early:
 BUILT_SOURCES = $(BUILD_HFILES)
@@ -887,40 +905,40 @@ endif
 	$(LTCOMPILE) -c -o $@ -DDEBUGDIR=\"$(DEBUGDIR)\" $(srcdir)/dwarf2.c
 endif
 
-elf32-target.h : elfxx-target.h
-	rm -f elf32-target.h
-	sed -e s/NN/32/g < $(srcdir)/elfxx-target.h > elf32-target.new
-	mv -f elf32-target.new elf32-target.h
+####elf32-target.h : elfxx-target.h
+####	rm -f elf32-target.h
+####	sed -e s/NN/32/g < $(srcdir)/elfxx-target.h > elf32-target.new
+####	mv -f elf32-target.new elf32-target.h
 
-elf64-target.h : elfxx-target.h
-	rm -f elf64-target.h
-	sed -e s/NN/64/g < $(srcdir)/elfxx-target.h > elf64-target.new
-	mv -f elf64-target.new elf64-target.h
+####elf64-target.h : elfxx-target.h
+####	rm -f elf64-target.h
+####	sed -e s/NN/64/g < $(srcdir)/elfxx-target.h > elf64-target.new
+####	mv -f elf64-target.new elf64-target.h
 
-elf32-ia64.c : elfnn-ia64.c
-	rm -f elf32-ia64.c
-	sed -e s/NN/32/g < $(srcdir)/elfnn-ia64.c > elf32-ia64.new
-	mv -f elf32-ia64.new elf32-ia64.c
+####elf32-ia64.c : elfnn-ia64.c
+####	rm -f elf32-ia64.c
+####	sed -e s/NN/32/g < $(srcdir)/elfnn-ia64.c > elf32-ia64.new
+####	mv -f elf32-ia64.new elf32-ia64.c
 
-elf64-ia64.c : elfnn-ia64.c
-	rm -f elf64-ia64.c
-	sed -e s/NN/64/g < $(srcdir)/elfnn-ia64.c > elf64-ia64.new
-	mv -f elf64-ia64.new elf64-ia64.c
+####elf64-ia64.c : elfnn-ia64.c
+####	rm -f elf64-ia64.c
+####	sed -e s/NN/64/g < $(srcdir)/elfnn-ia64.c > elf64-ia64.new
+####	mv -f elf64-ia64.new elf64-ia64.c
 
-peigen.c : peXXigen.c
-	rm -f peigen.c
-	sed -e s/XX/pe/g < $(srcdir)/peXXigen.c > peigen.new
-	mv -f peigen.new peigen.c
+####peigen.c : peXXigen.c
+####	rm -f peigen.c
+####	sed -e s/XX/pe/g < $(srcdir)/peXXigen.c > peigen.new
+####	mv -f peigen.new peigen.c
 
-pepigen.c : peXXigen.c
-	rm -f pepigen.c
-	sed -e s/XX/pep/g < $(srcdir)/peXXigen.c > pepigen.new
-	mv -f pepigen.new pepigen.c
+####pepigen.c : peXXigen.c
+####	rm -f pepigen.c
+####	sed -e s/XX/pep/g < $(srcdir)/peXXigen.c > pepigen.new
+####	mv -f pepigen.new pepigen.c
 
-pex64igen.c: peXXigen.c
-	rm -f pex64igen.c
-	sed -e s/XX/pex64/g < $(srcdir)/peXXigen.c > pex64igen.new
-	mv -f pex64igen.new pex64igen.c
+####pex64igen.c: peXXigen.c
+####	rm -f pex64igen.c
+####	sed -e s/XX/pex64/g < $(srcdir)/peXXigen.c > pex64igen.new
+####	mv -f pex64igen.new pex64igen.c
 
 BFD_H_DEPS= $(INCDIR)/ansidecl.h $(INCDIR)/symcat.h
 LOCAL_H_DEPS= libbfd.h sysdep.h config.h
@@ -1019,16 +1037,16 @@ bfdver.h: $(srcdir)/version.h $(srcdir)/Makefile.in
 
 # Disable -Werror, if it has been enabled, since coffswap.h won't
 # compile with gcc 4.5 and above.
-coff-tic4x.lo: coff-tic4x.c
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< $(NO_WERROR)
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $< $(NO_WERROR)
+####coff-tic4x.lo: coff-tic4x.c
+####@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< $(NO_WERROR)
+####@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+####@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+####@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+####@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $< $(NO_WERROR)
 
-coff-tic54x.lo: coff-tic54x.c
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< $(NO_WERROR)
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $< $(NO_WERROR)
+####coff-tic54x.lo: coff-tic54x.c
+####@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< $(NO_WERROR)
+####@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+####@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+####@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+####@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $< $(NO_WERROR)

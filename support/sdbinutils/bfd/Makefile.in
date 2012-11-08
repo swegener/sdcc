@@ -104,9 +104,8 @@ am__DEPENDENCIES_1 =
 am__objects_1 = archive.lo archures.lo asxxxx.lo bfd.lo bfdio.lo \
 	bfdwin.lo cache.lo coffgen.lo corefile.lo format.lo init.lo \
 	libbfd.lo opncls.lo reloc.lo section.lo syms.lo targets.lo \
-	hash.lo linker.lo srec.lo binary.lo tekhex.lo ihex.lo stabs.lo \
-	stab-syms.lo merge.lo dwarf2.lo simple.lo compress.lo \
-	verilog.lo
+	hash.lo linker.lo srec.lo binary.lo ihex.lo stabs.lo \
+	stab-syms.lo merge.lo dwarf2.lo simple.lo compress.lo
 am_libbfd_la_OBJECTS = $(am__objects_1)
 libbfd_la_OBJECTS = $(am_libbfd_la_OBJECTS)
 libbfd_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -354,9 +353,16 @@ BFD32_LIBS = \
 	cache.lo coffgen.lo corefile.lo \
 	format.lo init.lo libbfd.lo opncls.lo reloc.lo \
 	section.lo syms.lo targets.lo hash.lo linker.lo \
-	srec.lo binary.lo tekhex.lo ihex.lo stabs.lo stab-syms.lo \
-	merge.lo dwarf2.lo simple.lo compress.lo verilog.lo
+	srec.lo binary.lo ihex.lo stabs.lo stab-syms.lo \
+	merge.lo dwarf2.lo simple.lo compress.lo
 
+####BFD32_LIBS = \
+####	archive.lo archures.lo asxxxx.lo bfd.lo bfdio.lo bfdwin.lo \
+####	cache.lo coffgen.lo corefile.lo \
+####	format.lo init.lo libbfd.lo opncls.lo reloc.lo \
+####	section.lo syms.lo targets.lo hash.lo linker.lo \
+####	srec.lo binary.lo tekhex.lo ihex.lo stabs.lo stab-syms.lo \
+####	merge.lo dwarf2.lo simple.lo compress.lo verilog.lo
 BFD64_LIBS = 
 ####BFD64_LIBS = archive64.lo
 BFD32_LIBS_CFILES = \
@@ -364,10 +370,18 @@ BFD32_LIBS_CFILES = \
 	cache.c coffgen.c corefile.c \
 	format.c init.c libbfd.c opncls.c reloc.c \
 	section.c syms.c targets.c hash.c linker.c \
-	srec.c binary.c tekhex.c ihex.c stabs.c stab-syms.c \
-	merge.c dwarf2.c simple.c compress.c verilog.c
+	srec.c binary.c ihex.c stabs.c stab-syms.c \
+	merge.c dwarf2.c simple.c compress.c
 
-BFD64_LIBS_CFILES = archive64.c
+####BFD32_LIBS_CFILES = \
+####	archive.c archures.c asxxxx.c bfd.c bfdio.c bfdwin.c \
+####	cache.c coffgen.c corefile.c \
+####	format.c init.c libbfd.c opncls.c reloc.c \
+####	section.c syms.c targets.c hash.c linker.c \
+####	srec.c binary.c tekhex.c ihex.c stabs.c stab-syms.c \
+####	merge.c dwarf2.c simple.c compress.c verilog.c
+BFD64_LIBS_CFILES = 
+####BFD64_LIBS_CFILES = archive64.c
 
 # This list is alphabetized to make it easier to keep in sync
 # with the decls and initializer in archures.c.
@@ -1043,9 +1057,9 @@ SOURCE_CFILES = \
 	$(BFD64_BACKENDS_CFILES) \
 	$(OPTIONAL_BACKENDS_CFILES)
 
-BUILD_CFILES = \
-	elf32-ia64.c elf64-ia64.c peigen.c pepigen.c pex64igen.c
-
+BUILD_CFILES = 
+####BUILD_CFILES = \
+####	elf32-ia64.c elf64-ia64.c peigen.c pepigen.c pex64igen.c
 CFILES = $(SOURCE_CFILES) $(BUILD_CFILES)
 SOURCE_HFILES = \
 	aout-target.h aoutf1.h aoutx.h coffcode.h coffswap.h ecoffswap.h \
@@ -1059,8 +1073,10 @@ SOURCE_HFILES = \
 	vms.h xsym.h
 
 BUILD_HFILES = \
-	bfdver.h elf32-target.h elf64-target.h targmatch.h bfd_stdint.h
+	bfdver.h targmatch.h bfd_stdint.h
 
+####BUILD_HFILES = \
+####	bfdver.h elf32-target.h elf64-target.h targmatch.h bfd_stdint.h
 
 # Ensure they are built early:
 BUILT_SOURCES = $(BUILD_HFILES)
@@ -1088,6 +1104,41 @@ libbfd_la_LIBADD = `cat ofiles` @SHARED_LIBADD@ $(LIBDL)
 # everything else starts using libtool.  FIXME.
 noinst_LIBRARIES = libbfd.a
 libbfd_a_SOURCES = 
+
+####elf32-target.h : elfxx-target.h
+####	rm -f elf32-target.h
+####	sed -e s/NN/32/g < $(srcdir)/elfxx-target.h > elf32-target.new
+####	mv -f elf32-target.new elf32-target.h
+
+####elf64-target.h : elfxx-target.h
+####	rm -f elf64-target.h
+####	sed -e s/NN/64/g < $(srcdir)/elfxx-target.h > elf64-target.new
+####	mv -f elf64-target.new elf64-target.h
+
+####elf32-ia64.c : elfnn-ia64.c
+####	rm -f elf32-ia64.c
+####	sed -e s/NN/32/g < $(srcdir)/elfnn-ia64.c > elf32-ia64.new
+####	mv -f elf32-ia64.new elf32-ia64.c
+
+####elf64-ia64.c : elfnn-ia64.c
+####	rm -f elf64-ia64.c
+####	sed -e s/NN/64/g < $(srcdir)/elfnn-ia64.c > elf64-ia64.new
+####	mv -f elf64-ia64.new elf64-ia64.c
+
+####peigen.c : peXXigen.c
+####	rm -f peigen.c
+####	sed -e s/XX/pe/g < $(srcdir)/peXXigen.c > peigen.new
+####	mv -f peigen.new peigen.c
+
+####pepigen.c : peXXigen.c
+####	rm -f pepigen.c
+####	sed -e s/XX/pep/g < $(srcdir)/peXXigen.c > pepigen.new
+####	mv -f pepigen.new pepigen.c
+
+####pex64igen.c: peXXigen.c
+####	rm -f pex64igen.c
+####	sed -e s/XX/pex64/g < $(srcdir)/peXXigen.c > pex64igen.new
+####	mv -f pex64igen.new pex64igen.c
 BFD_H_DEPS = $(INCDIR)/ansidecl.h $(INCDIR)/symcat.h
 LOCAL_H_DEPS = libbfd.h sysdep.h config.h
 BFD_H_FILES = bfd-in.h init.c opncls.c libbfd.c section.c archures.c \
@@ -1215,7 +1266,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/archive.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/archive64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/archures.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/asxxxx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfd.Plo@am__quote@
@@ -1228,8 +1278,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/corefile.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cpu-z80.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dwarf2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf32-ia64.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-ia64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/format.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ihex.Plo@am__quote@
@@ -1238,9 +1286,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/linker.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/merge.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/opncls.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/peigen.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pepigen.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pex64igen.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/section.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple.Plo@am__quote@
@@ -1249,8 +1294,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/stabs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/syms.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/targets.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tekhex.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/verilog.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1644,41 +1687,6 @@ dwarf2.lo: dwarf2.c Makefile
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='dwarf2.c' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ -DDEBUGDIR=\"$(DEBUGDIR)\" $(srcdir)/dwarf2.c
-
-elf32-target.h : elfxx-target.h
-	rm -f elf32-target.h
-	sed -e s/NN/32/g < $(srcdir)/elfxx-target.h > elf32-target.new
-	mv -f elf32-target.new elf32-target.h
-
-elf64-target.h : elfxx-target.h
-	rm -f elf64-target.h
-	sed -e s/NN/64/g < $(srcdir)/elfxx-target.h > elf64-target.new
-	mv -f elf64-target.new elf64-target.h
-
-elf32-ia64.c : elfnn-ia64.c
-	rm -f elf32-ia64.c
-	sed -e s/NN/32/g < $(srcdir)/elfnn-ia64.c > elf32-ia64.new
-	mv -f elf32-ia64.new elf32-ia64.c
-
-elf64-ia64.c : elfnn-ia64.c
-	rm -f elf64-ia64.c
-	sed -e s/NN/64/g < $(srcdir)/elfnn-ia64.c > elf64-ia64.new
-	mv -f elf64-ia64.new elf64-ia64.c
-
-peigen.c : peXXigen.c
-	rm -f peigen.c
-	sed -e s/XX/pe/g < $(srcdir)/peXXigen.c > peigen.new
-	mv -f peigen.new peigen.c
-
-pepigen.c : peXXigen.c
-	rm -f pepigen.c
-	sed -e s/XX/pep/g < $(srcdir)/peXXigen.c > pepigen.new
-	mv -f pepigen.new pepigen.c
-
-pex64igen.c: peXXigen.c
-	rm -f pex64igen.c
-	sed -e s/XX/pex64/g < $(srcdir)/peXXigen.c > pex64igen.new
-	mv -f pex64igen.new pex64igen.c
 $(BFD32_LIBS) \
  $(BFD64_LIBS) \
  $(ALL_MACHINES) \
@@ -1759,19 +1767,19 @@ bfdver.h: $(srcdir)/version.h $(srcdir)/Makefile.in
 
 # Disable -Werror, if it has been enabled, since coffswap.h won't
 # compile with gcc 4.5 and above.
-coff-tic4x.lo: coff-tic4x.c
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< $(NO_WERROR)
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $< $(NO_WERROR)
+####coff-tic4x.lo: coff-tic4x.c
+####@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< $(NO_WERROR)
+####@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+####@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+####@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+####@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $< $(NO_WERROR)
 
-coff-tic54x.lo: coff-tic54x.c
-@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< $(NO_WERROR)
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $< $(NO_WERROR)
+####coff-tic54x.lo: coff-tic54x.c
+####@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< $(NO_WERROR)
+####@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+####@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+####@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+####@am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $< $(NO_WERROR)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

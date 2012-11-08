@@ -1,3 +1,21 @@
+2012-11-08 Borut Razem <borut.razem AT gmail.com>
+
+	* support/sdbinutils/bfd/Makefile.am,
+	  support/sdbinutils/bfd/Makefile.in,
+	  support/sdbinutils/include/opcode,
+	  support/sdbinutils/include/opcode/ia64.h, 
+	  support/sdbinutils/include/opcode/sparc.h,
+	  support/sdbinutils/include/mach-o/x86-64.h, 
+	  support/sdbinutils/bfd/verilog.c,
+	  support/sdbinutils/bfd/tekhex.c,
+	  support/sdbinutils/bfd/cpu-ia64-opc.c,
+	  support/sdbinutils/bfd/coff-ia64.c,
+	  support/sdbinutils/bfd/peXXigen.c,
+	  support/sdbinutils/bfd/elfnn-ia64.c,
+	  support/sdbinutils/opcodes,
+	  support/sdbinutils/opcodes/ia64-opc.h:
+	  removed unused files
+
 2012-11-07 Borut Razem <borut.razem AT gmail.com>
 
 	* support/sdbinutils/bfd/Makefile.am,

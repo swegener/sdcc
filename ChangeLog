@@ -12,6 +12,7 @@
 	  support/sdbinutils/bfd/coff-ia64.c,
 	  support/sdbinutils/bfd/peXXigen.c,
 	  support/sdbinutils/bfd/elfnn-ia64.c,
+	  support/sdbinutils/bfd/bdfwin.c,
 	  support/sdbinutils/opcodes,
 	  support/sdbinutils/opcodes/ia64-opc.h:
 	  removed unused files

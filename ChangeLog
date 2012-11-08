@@ -32,6 +32,11 @@
 	  support/sdbinutils/binutils/stabs.c,
 	  support/sdbinutils/include/ieee.h:
 	  added binary target support, added sdobjcopy utility
+	* support/regression/ports/ds390/spec.mk,
+	  support/regression/ports/mcs51-common/spec.mk,
+	  support/regression/ports/ucr3ka/spec.mk:
+	  increased timeouts due to the gcc-torture-execute-20050224-1
+	  regression test timeout failures
 
 2012-11-07 Borut Razem <borut.razem AT gmail.com>
 

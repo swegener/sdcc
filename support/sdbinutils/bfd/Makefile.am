@@ -50,7 +50,7 @@ BFD_H = bfd.h
 # need two copies of the executable, one to download and one for the
 # debugger).
 BFD32_LIBS = \
-	archive.lo archures.lo asxxxx.lo bfd.lo bfdio.lo bfdwin.lo \
+	archive.lo archures.lo asxxxx.lo bfd.lo bfdio.lo \
 	cache.lo coffgen.lo corefile.lo \
 	format.lo init.lo libbfd.lo opncls.lo reloc.lo \
 	section.lo syms.lo targets.lo hash.lo linker.lo \
@@ -68,7 +68,7 @@ BFD64_LIBS =
 ####BFD64_LIBS = archive64.lo
 
 BFD32_LIBS_CFILES = \
-	archive.c archures.c asxxxx.c bfd.c bfdio.c bfdwin.c \
+	archive.c archures.c asxxxx.c bfd.c bfdio.c \
 	cache.c coffgen.c corefile.c \
 	format.c init.c libbfd.c opncls.c reloc.c \
 	section.c syms.c targets.c hash.c linker.c \

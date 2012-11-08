@@ -549,6 +549,7 @@ extern const bfd_target asxxxx_vec;
 /* These are always included.  */
 extern const bfd_target srec_vec;
 extern const bfd_target symbolsrec_vec;
+extern const bfd_target binary_vec;
 extern const bfd_target ihex_vec;
 static const bfd_target * const _bfd_target_vector[] =
 {
@@ -567,6 +568,8 @@ static const bfd_target * const _bfd_target_vector[] =
 /* Always support S-records, for convenience.  */
 	&srec_vec,
 	&symbolsrec_vec,
+/* Likewise for binary output.  */
+	&binary_vec,
 /* Likewise for ihex.  */
 	&ihex_vec,
 #endif

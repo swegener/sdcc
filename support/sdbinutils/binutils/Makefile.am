@@ -37,6 +37,7 @@ SDRANLIB_PROG=sdranlib
 # objcopy and strip should be the same program
 ####OBJCOPY_PROG=objcopy
 ####STRIP_PROG=strip-new
+OBJCOPY_PROG=sdobjcopy
 
 ####STRINGS_PROG=strings
 
@@ -63,9 +64,8 @@ SDNM_PROG=sdnm
 
 ####SRCONV_PROG=srconv$(EXEEXT) sysdump$(EXEEXT) coffdump$(EXEEXT)
 
-#bin_PROGRAMS = $(SIZE_PROG) $(OBJDUMP_PROG) $(AR_PROG) $(STRINGS_PROG) $(RANLIB_PROG) $(OBJCOPY_PROG) @BUILD_NLMCONV@ @BUILD_SRCONV@ @BUILD_DLLTOOL@ @BUILD_WINDRES@ @BUILD_WINDMC@ $(ADDR2LINE_PROG) $(READELF_PROG) $(ELFEDIT_PROG) @BUILD_DLLWRAP@
-####bin_PROGRAMS = $(AR_PROG) $(RANLIB_PROG)
-bin_PROGRAMS = $(SDAR_PROG) $(SDRANLIB_PROG)
+####bin_PROGRAMS = $(SIZE_PROG) $(OBJDUMP_PROG) $(AR_PROG) $(STRINGS_PROG) $(RANLIB_PROG) $(OBJCOPY_PROG) @BUILD_NLMCONV@ @BUILD_SRCONV@ @BUILD_DLLTOOL@ @BUILD_WINDRES@ @BUILD_WINDMC@ $(ADDR2LINE_PROG) $(READELF_PROG) $(ELFEDIT_PROG) @BUILD_DLLWRAP@
+bin_PROGRAMS = $(SDAR_PROG) $(SDRANLIB_PROG) $(OBJCOPY_PROG)
 
 bin_SCRIPTS = @BUILD_INSTALL_MISC@
 EXTRA_SCRIPTS = embedspu
@@ -81,7 +81,7 @@ EXTRA_PROGRAMS =
 
 # Stuff that goes in tooldir/ if appropriate.
 ####TOOL_PROGS = nm-new strip-new ar ranlib dlltool objdump objcopy
-TOOL_PROGS = sdnm ar ranlib
+TOOL_PROGS = sdnm sdar sdranlib sdobjcopy
 
 BASEDIR = $(srcdir)/..
 BFDDIR = $(BASEDIR)/bfd
@@ -126,8 +126,9 @@ BUILT_SOURCES = $(GENERATED_HFILES)
 ####	windmc.c mclex.c
 
 CFILES = \
-	ar.c arsup.c binemul.c bucomm.c emul_vanilla.c filemode.c nm.c \
-	not-ranlib.c rename.c version.c 
+	ar.c arsup.c binemul.c bucomm.c debug.c emul_vanilla.c filemode.c \
+	ieee.c nm.c not-ranlib.c not-strip.c objcopy.c rdcoff.c rddbg.c rename.c \
+	stabs.c version.c 
 
 ####++GENERATED_CFILES = \
 ####	arparse.c arlex.c sysroff.c sysinfo.c syslex.c \
@@ -136,8 +137,8 @@ CFILES = \
 GENERATED_CFILES = \
 	arparse.c arlex.c
 
-####DEBUG_SRCS = rddbg.c debug.c stabs.c ieee.c rdcoff.c
-####WRITE_DEBUG_SRCS = $(DEBUG_SRCS) wrstabs.c
+DEBUG_SRCS = rddbg.c debug.c stabs.c ieee.c rdcoff.c
+WRITE_DEBUG_SRCS = $(DEBUG_SRCS) wrstabs.c
 
 ##### Extra object files for objdump
 ####OBJDUMP_PRIVATE_OFILES = @OBJDUMP_PRIVATE_OFILES@
@@ -207,6 +208,7 @@ sdar_DEPENDENCIES =      $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 sdranlib_DEPENDENCIES =  $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####cxxfilt_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####objcopy_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
+sdobjcopy_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####nlmconv_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####srconv_DEPENDENCIES =    $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
 ####sysdump_DEPENDENCIES =   $(LIBINTL_DEP) $(LIBIBERTY) $(BFDLIB)
@@ -224,6 +226,7 @@ LDADD = $(BFDLIB) $(LIBIBERTY) $(LIBINTL)
 ####size_SOURCES = size.c $(BULIBS)
 
 ####objcopy_SOURCES = objcopy.c not-strip.c rename.c $(WRITE_DEBUG_SRCS) $(BULIBS)
+sdobjcopy_SOURCES = objcopy.c not-strip.c rename.c $(WRITE_DEBUG_SRCS) $(BULIBS)
 
 ####strings_SOURCES = strings.c $(BULIBS)
 
@@ -235,6 +238,7 @@ LDADD = $(BFDLIB) $(LIBIBERTY) $(LIBINTL)
 
 ####strip_new_SOURCES = objcopy.c is-strip.c rename.c $(WRITE_DEBUG_SRCS) $(BULIBS)
 
+####nm_new_SOURCES = nm.c $(BULIBS)
 sdnm_SOURCES = nm.c $(BULIBS)
 
 ####objdump_SOURCES = objdump.c dwarf.c prdbg.c $(DEBUG_SRCS) $(BULIBS) $(ELFLIBS)

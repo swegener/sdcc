@@ -62,7 +62,7 @@ SDCC_BINUTILS   =
 ifeq ($(OPT_DISABLE_SDBINUTILS), 0)
 TARGETS        += sdcc-sdbinutils
 PKGS           += $(SDCC_SDBINUTILS)
-SDBINUTILS_BINS = sdar$(EXEEXT) sdranlib$(EXEEXT) sdnm$(EXEEXT)
+SDBINUTILS_BINS = sdar$(EXEEXT) sdranlib$(EXEEXT) sdnm$(EXEEXT) sdobjcopy$(EXEEXT)
 SDCC_BINUTILS   = sdcc-sdbinutils
 endif
 

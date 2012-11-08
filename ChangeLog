@@ -16,6 +16,22 @@
 	  support/sdbinutils/opcodes,
 	  support/sdbinutils/opcodes/ia64-opc.h:
 	  removed unused files
+	* Makefile.in, support/scripts/sdcc.nsi,
+	  support/sdbinutils/binutils/Makefile.am,
+	  support/sdbinutils/binutils/Makefile.in,
+	  support/sdbinutils/bfd/targets.c,
+	  support/sdbinutils/binutils/ieee.c,
+	  support/sdbinutils/binutils/rddbg.c,
+	  support/sdbinutils/binutils/not-strip.c,
+	  support/sdbinutils/binutils/objcopy.c,
+	  support/sdbinutils/binutils/budbg.h,
+	  support/sdbinutils/binutils/rdcoff.c,
+	  support/sdbinutils/binutils/wrstabs.c,
+	  support/sdbinutils/binutils/debug.c,
+	  support/sdbinutils/binutils/debug.h,
+	  support/sdbinutils/binutils/stabs.c,
+	  support/sdbinutils/include/ieee.h:
+	  added binary target support, added sdobjcopy utility
 
 2012-11-07 Borut Razem <borut.razem AT gmail.com>
 

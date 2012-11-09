@@ -1,3 +1,8 @@
+2012-11-09 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/fwk/lib/testfwk.c:
+	  "code" substituted with "__code"
+
 2012-11-08 Borut Razem <borut.razem AT gmail.com>
 
 	* support/sdbinutils/bfd/Makefile.am,

@@ -147,7 +147,7 @@ __printf (const char *szFormat, ...)
 }
 
 void
-__fail (code const char *szMsg, code const char *szCond, code const char *szFile, int line)
+__fail (__code const char *szMsg, __code const char *szCond, __code const char *szFile, int line)
 {
   __printf("--- FAIL: \"%s\" on %s at %s:%u\n", szMsg, szCond, szFile, line);
   __numFailures++;

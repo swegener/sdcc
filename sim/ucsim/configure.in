@@ -79,7 +79,7 @@ if test $enable_xa != "no"; then
     enable_xa="yes"
 fi,
 enable_xa="no")
-AC_ARG_ENABLE(portmon,
+AC_ARG_ENABLE(serio,
 [  --enable-serio          compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then
     enable_serio="yes"

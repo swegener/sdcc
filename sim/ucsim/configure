@@ -754,7 +754,7 @@ enable_avr
 enable_z80
 enable_hc08
 enable_xa
-enable_portmon
+enable_serio
 enable_statistic
 enable_shared
 enable_static
@@ -2786,9 +2786,9 @@ else
   enable_xa="no"
 fi
 
-# Check whether --enable-portmon was given.
-if test "${enable_portmon+set}" = set; then :
-  enableval=$enable_portmon; if test $enable_serio != "no"; then
+# Check whether --enable-serio was given.
+if test "${enable_serio+set}" = set; then :
+  enableval=$enable_serio; if test $enable_serio != "no"; then
     enable_serio="yes"
 fi
 else

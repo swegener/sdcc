@@ -1,3 +1,9 @@
+2012-11-10 Borut Razem <borut.razem AT gmail.com>
+
+	* support/regression/ports/ds390/spec.mk:
+	  doubled timeout since the gcc-torture-execute-20050224-1
+	  regression test stil fails with timeout on i586-mingw32msvc
+
 2012-11-09 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/fwk/lib/testfwk.c:

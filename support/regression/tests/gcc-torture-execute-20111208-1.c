@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#if !(defined (__GNUC__) && __GNUC__ < 5)
 /* PR tree-optimization/51315 */
 /* Reported by Jurij Smakov <jurij@wooyd.org> */
 
@@ -82,13 +83,16 @@ pack_unpack (char *s, char *p)
     }
   return (int) *s;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && __GNUC__ < 5)
   int n = pack_unpack ("\200\001\377\376\035\300", "sl");
   if (n != 0)
     ASSERT (0);
   return;
+#endif
 }
 

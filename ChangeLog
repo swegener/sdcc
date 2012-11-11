@@ -1,3 +1,10 @@
+2012-11-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/ports/ucr2k/spec.mk:
+	  Make ucr2k timeout the same as ucr3ka.
+	* support/regression/tests/gcc-torture-execute-20111208-1.c:
+	  Disable test for gcc older than 5.0.
+
 2012-11-10 Borut Razem <borut.razem AT gmail.com>
 
 	* support/regression/ports/ds390/spec.mk:

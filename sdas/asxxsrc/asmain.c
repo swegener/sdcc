@@ -1715,44 +1715,6 @@ loop:
                 }
                 break;
 
-        /* sdas hc08 specific */
-        case S_FLAT24:
-                if (more()) {
-                        getst(id, -1);
-
-                        if (!as_strcmpi(id, "on")) {
-                                /* Quick sanity check: size of
-                                * a_uint must be at least 24 bits.
-                                */
-                                if (sizeof(a_uint) < 3) {
-                                        warnBanner();
-                                        fprintf(stderr,
-                                                "Cannot enable Flat24 mode: "
-                                                "host system must have 24 bit "
-                                                "or greater integers.\n");
-                                }
-                                else {
-                                        flat24Mode = 1;
-                                }
-                        }
-                        else if (!as_strcmpi(id, "off")) {
-                                flat24Mode = 0;
-                        }
-                        else {
-                                qerr();
-                        }
-                }
-                else {
-                        qerr();
-                }
-                lmode = SLIST;
-                #if 0
-                printf("as8051: ds390 flat mode %sabled.\n",
-                        flat24Mode ? "en" : "dis");
-                #endif
-                break;
-        /* end sdas hc08 specific */
-
         case S_MACRO:
                 lmode = SLIST;
                 mcrprc((int) mp->m_valu);

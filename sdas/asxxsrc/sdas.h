@@ -23,6 +23,7 @@ enum sdas_target_e {
   TARGET_ID_GB,
   TARGET_ID_Z80,
   TARGET_ID_8051,
+  TARGET_ID_DS390,
   TARGET_ID_6808,
 };
 

@@ -71,7 +71,7 @@
  * Local Definitions
  */
 
-#define VERSION "V02.00 + NoICE + SDCC mods + Flat24"
+#define VERSION "V02.00 + NoICE + SDCC mods"
 #define COPYRIGHT "2012"
 
 /*
@@ -420,7 +420,16 @@ struct  area
  * Basic Relocation Modes
  */
 
-#define R_NORM  0x0000          /* PC adjust */
+#define R_NORM  0x0000          /* No Bit Positioning */
+
+/*
+ * Extended Relocation Modes are defined in
+ * the ___pst.c files.
+ *
+ *      #define R_0100  0x0100  Extended mode 1
+ *      ...
+ *      #define R_0F00  0x0F00  Extended mode 15
+ */
 
 #define R_ESCAPE_MASK   0xf0    /* Used to escape relocation modes
                                                                  * greater than 0xff in the .rel
@@ -563,6 +572,12 @@ struct  sym
 #define   O_EVEN     0          /* .even */
 #define   O_ODD      1          /* .odd */
 #define   O_BNDRY    2          /* .bndry */
+#define S_BITS          26      /* .8bit, .16bit, .24bit, .32bit */
+/*        O_1BYTE    1  */      /* .8bit */
+/*        O_2BYTE    2  */      /* .16bit */
+/*        O_3BYTE    3  */      /* .24bit */
+/*        O_4BYTE    4  */      /* .32bit */
+#define S_END           27      /* .end */
 #define S_MACRO         28      /* .macro, .endm, .mexit, ... */
 #define   O_MACRO    0          /* .macro */
 #define   O_ENDM     1          /* .endm */
@@ -580,7 +595,6 @@ struct  sym
 #define S_DIREOL        30      /* Assembler Directive End Of List */
 
 /* sdas specific */
-#define S_FLAT24        31      /* .flat24 */
 #define S_FLOAT         32      /* .df */
 #define S_ULEB128       33      /* .uleb128 */
 #define S_SLEB128       34      /* .sleb128 */
@@ -605,6 +619,72 @@ struct  tsym
         int     t_flg;          /* flags */
         struct  area *t_area;   /* Area */
         a_uint  t_addr;         /* Address */
+};
+
+/*
+ *      The def structure is used by the .define assembler
+ *      directive to define a substitution string for a
+ *      single word.  The def structure contains the
+ *      string being defined, the string to substitute
+ *      for the defined string, and a link to the next
+ *      def structure.  The defined string is a sequence
+ *      of characters not containing any white space
+ *      (i.e. NO SPACEs or TABs).  The substitution string
+ *      may contain SPACES and/or TABs.
+ */
+struct def
+{
+        struct def      *d_dp;          /* link to next define */
+        char            *d_id;          /* defined string */
+        char            *d_define;      /* string to substitute for defined string */
+        int             d_dflag;        /* (1) .defined / (0) .undefined */
+};
+
+/*
+ *      The mode structure contains the specification of one of the
+ *      assemblers' merge modes.  Each assembler must specify
+ *      at least one merge mode.  The merging specification
+ *      allows arbitrarily defined active bits and bit positions.
+ *      The 32 element arrays are indexed from 0 to 31.
+ *      Index 0 corresponds to bit 0, ..., and 31 corresponds to bit 31
+ *      of a normal integer value.
+ *
+ *      The value of the element specifies if the normal integer bit
+ *      is active (bit <7> is set, 0x80) and what destination bit
+ *      (bits <4:0>, 0 - 31) should be loaded with this normal
+ *      integer bit.
+ *
+ *      The specification for a 32-bit integer:
+ *
+ *      char mode_[32] = {
+ *              '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
+ *              '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
+ *              '\220', '\221', '\222', '\223', '\224', '\225', '\226', '\227',
+ *              '\230', '\231', '\232', '\233', '\234', '\235', '\236', '\237'
+ *      };
+ *
+ *
+ *      The specification for the 11-bit 8051 addressing mode:
+ *
+ *      char mode_[32] = {
+ *              '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
+ *              '\215', '\216', '\217', '\013', '\014', '\015', '\016', '\017',
+ *              '\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
+ *              '\030', '\031', '\032', '\033', '\034', '\035', '\036', '\037'
+ *      };
+ *
+ *
+ *     *m_def is a pointer to the bit relocation definition.
+ *      m_flag indicates that bit position swapping is required.
+ *      m_dbits contains the active bit positions for the output.
+ *      m_sbits contains the active bit positions for the input.
+ */
+struct  mode
+{
+        char *  m_def;          /* Bit Relocation Definition */
+        a_uint  m_flag;         /* Bit Swapping Flag */
+        a_uint  m_dbits;        /* Destination Bit Mask */
+        a_uint  m_sbits;        /* Source Bit Mask */
 };
 
 /*
@@ -996,9 +1076,6 @@ extern  int     org_cnt;        /*      .org directive counter
                                  */
 extern  char    *optsdcc;       /*      sdcc compile options
                                  */
-extern  int     flat24Mode;     /*      non-zero if we are using DS390 24 bit
-                                 *      flat mode (via .flat24 directive).
-                                 */
 /*end sdas specific */
 
 /* C Library functions */
@@ -1097,6 +1174,7 @@ extern  VOID            abscheck(struct expr *esp);
 extern  a_uint          absexpr(void);
 extern  VOID            clrexpr(struct expr *esp);
 extern  int             digit(int c, int r);
+extern  VOID            exprmasks(int n);
 extern  VOID            expr(struct expr *esp, int n);
 extern  int             is_abs(struct expr *esp);
 extern  int             oprio(int c);
@@ -1137,6 +1215,10 @@ extern  VOID            outaxb(int i, a_uint v);
 extern  VOID            outatxb(int i, a_uint v);
 extern  VOID            outrb(struct expr *esp, int r);
 extern  VOID            outrw(struct expr *esp, int r);
+extern  VOID            outr3b(struct expr *esp, int r);
+extern  VOID            outrxb(int i, struct expr *esp, int r);
+extern  VOID            outrwm(struct expr *esp, int r, a_uint v);
+extern  VOID            outr3bm(struct expr *esp, int r, a_uint v);
 extern  VOID            out_lb(a_uint v, int t);
 extern  VOID            out_lw(a_uint v, int t);
 extern  VOID            out_l3b(a_uint v, int t);
@@ -1144,11 +1226,6 @@ extern  VOID            out_l4b(a_uint v, int t);
 extern  VOID            out_lxb(int i, a_uint v, int t);
 extern  VOID            out_rw(a_uint v);
 extern  VOID            out_txb(int i, a_uint v);
-/* sdas specific */
-extern  VOID            outr11();       /* JLH */
-extern  VOID            outr24(struct expr *, int);
-extern  VOID            outr19(struct expr *, int, int);
-/* end sdas specific */
 
 /* Machine dependent variables */
 
@@ -1227,9 +1304,11 @@ extern  VOID            abscheck();
 extern  a_uint          absexpr();
 extern  VOID            clrexpr();
 extern  int             digit();
+extern  VOID            exprmasks();
 extern  VOID            expr();
 extern  int             is_abs();
 extern  int             oprio();
+extern  a_uint          rngchk();
 extern  VOID            term();
 
 /* asdbg */
@@ -1266,11 +1345,10 @@ extern  VOID            outaxb();
 extern  VOID            outatxb();
 extern  VOID            outrb();
 extern  VOID            outrw();
-/* sdas specific */
-extern  VOID            outr11();       /* JLH */
-extern  VOID            outr24();
-extern  VOID            outr19(t);
-/* end sdas specific */
+extern  VOID            outr3b();
+extern  VOID            outrxb();
+extern  VOID            outrwm();
+extern  VOID            outr3bm();
 extern  VOID            out_lb();
 extern  VOID            out_lw();
 extern  VOID            out_rw();

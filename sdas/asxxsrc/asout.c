@@ -393,7 +393,35 @@ outatxb(int i, a_uint v)
  *              expr *  esp             pointer to expr structure
  *              int     r               relocation mode
  *
- *      The function outrb() processes a byte of generated code
+ *      Dispatch functions for processing relocatable data.
+ *
+ *      local variables:
+ *              none
+ *
+ *      global variables:
+ *              none
+ *
+ *      functions called:
+ *              int     outrxb()        asout.c
+ *
+ *      side effects:
+ *              relocatable data processed
+ */
+
+VOID
+outrb(struct expr *esp, int r)
+{
+        outrxb(1, esp, r);
+}
+
+
+/*)Function     VOID    outrxb(i, esp, r)
+ *
+ *              int     i               output byte count
+ *              expr *  esp             pointer to expr structure
+ *              int     r               relocation mode
+ *
+ *      The function outrxb() processes 1 to 4 bytes of generated code
  *      in either absolute or relocatable format dependent upon
  *      the data contained in the expr structure esp.  If the
  *      .REL output is enabled then the appropriate information
@@ -418,13 +446,15 @@ outatxb(int i, a_uint v)
  *              VOID    out_tb()        asout.c
  *
  *      side effects:
- *              The current assembly address is incremented by 1.
+ *              R and T Lines updated.  Listing updated.
+ *              The current assembly address is incremented by i.
  */
 
 VOID
-outrb(struct expr *esp, int r)
+outrxb(int i, struct expr *esp, int r)
 {
-        a_uint n;
+        a_uint m, n;
+        int p_bytes;
 
         if (pass == 2) {
                 if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
@@ -432,7 +462,26 @@ outrb(struct expr *esp, int r)
                          * const byte to the T line and don't
                          * generate any relocation info.
                          */
-                        n = (a_uint) ~0x000000FF;               /* 1 byte  */
+                        /*
+                         * Mask Value Selection
+                         */
+#ifdef  LONGINT
+                        switch(i) {
+                        default:
+                        case 1: m = (a_uint) ~0x0000007Fl;      n = (a_uint) ~0x000000FFl;      break;  /* 1 byte  */
+                        case 2: m = (a_uint) ~0x00007FFFl;      n = (a_uint) ~0x0000FFFFl;      break;  /* 2 bytes */
+                        case 3: m = (a_uint) ~0x007FFFFFl;      n = (a_uint) ~0x00FFFFFFl;      break;  /* 3 bytes */
+                        case 4: m = (a_uint) ~0x7FFFFFFFl;      n = (a_uint) ~0xFFFFFFFFl;      break;  /* 4 bytes */
+                        }
+#else
+                        switch(i) {
+                        default:
+                        case 1: m = (a_uint) ~0x0000007F;       n = (a_uint) ~0x000000FF;       break;  /* 1 byte  */
+                        case 2: m = (a_uint) ~0x00007FFF;       n = (a_uint) ~0x0000FFFF;       break;  /* 2 bytes */
+                        case 3: m = (a_uint) ~0x007FFFFF;       n = (a_uint) ~0x00FFFFFF;       break;  /* 3 bytes */
+                        case 4: m = (a_uint) ~0x7FFFFFFF;       n = (a_uint) ~0xFFFFFFFF;       break;  /* 4 bytes */
+                        }
+#endif
 
                         /*
                          * Page0 Range Check
@@ -441,13 +490,13 @@ outrb(struct expr *esp, int r)
                            ((n & esp->e_addr) != 0))
                                 err('d');
 
-                        out_lxb(1,esp->e_addr,0);
+                        out_lxb(i,esp->e_addr,0);
                         if (oflag) {
-                                outchk(1,0);
-                                outatxb(1,esp->e_addr);
+                                outchk(i,0);
+                                outatxb(i,esp->e_addr);
                         }
                 } else {
-                        if (!is_sdas() || !is_sdas_target_8051_like()) {
+                        if ((i == 1) && (!is_sdas() || !is_sdas_target_8051_like())) {
                                 r |= R_BYTE | R_BYTX | esp->e_rlcf;
                                 if (r & R_MSB) {
                                         out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);
@@ -510,7 +559,8 @@ outrb(struct expr *esp, int r)
         /*
          * Update the Program Counter
          */
-        dot.s_addr += 1;
+        p_bytes = 1;
+        dot.s_addr += (i/p_bytes) + (i % p_bytes ? 1 : 0);
 }
 
 /*)Function     VOID    outrw(esp, r)
@@ -620,13 +670,12 @@ outrw(struct expr *esp, int r)
         dot.s_addr += 2;
 }
 
-/* sdas specific */
-/*)Function     VOID    outr24(esp, r)
+/*)Function     VOID    outr3b(esp, r)
  *
  *              expr *  esp             pointer to expr structure
  *              int     r               relocation mode
  *
- *      The function outr24() processes 24 bits of generated code
+ *      The function outr3b() processes 24 bits of generated code
  *      in either absolute or relocatable format dependent upon
  *      the data contained in the expr structure esp.  If the
  *      .REL output is enabled then the appropriate information
@@ -634,7 +683,8 @@ outrw(struct expr *esp, int r)
  *
  *      local variables:
  *              int     n               symbol/area reference number
-
+ *              int     esprv           merged value
+ *              int     p_bytes         program counter update temporary
  *
  *      global variables:
  *              sym     dot             defined as sym[0]
@@ -645,26 +695,30 @@ outrw(struct expr *esp, int r)
  *
  *      functions called:
  *              VOID    outchk()        asout.c
- *              VOID    out_l3b()       asout.c
+ *              VOID    out_lxb()       asout.c
  *              VOID    out_rw()        asout.c
  *              VOID    out_txb()       asout.c
  *
  *      side effects:
- *              The current assembly address is incremented by 3.
+ *              R and T Lines updated.  Listing updated.
+ *              The current assembly address is incremented by i.
  */
 
 VOID
-outr24(struct expr *esp, int r)
+outr3b(struct expr *esp, int r)
 {
-        int n;
+        int i = 3;
+        a_uint esprv;
+        int n, p_bytes;
 
         if (pass == 2) {
+                esprv = esp->e_addr;
                 if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
                         /* This is a constant expression. */
-                        out_l3b(esp->e_addr,0);
+                        out_lxb(i,esprv,0);
                         if (oflag) {
-                                outchk(3, 0);
-                                out_txb(3, esp->e_addr);
+                                outchk(i,0);
+                                out_txb(i,esprv);
                         }
                 } else {
                         /* This is a symbol. */
@@ -673,12 +727,12 @@ outr24(struct expr *esp, int r)
                                 /* I have no idea what this case is. */
                                 rerr();
                                 if (r & R_MSB) {
-                                        out_lw(hibyte(esp->e_addr),r|R_RELOC);
+                                        out_lw(hibyte(esprv),r|R_RELOC);
                                 } else {
-                                        out_lw(lobyte(esp->e_addr),r|R_RELOC);
+                                        out_lw(lobyte(esprv),r|R_RELOC);
                                 }
                         } else {
-                                out_l3b(esp->e_addr,r|R_RELOC);
+                                out_lxb(i,esprv,r|R_RELOC);
                         }
                         if (oflag) {
                                 outchk(3, 5);
@@ -713,9 +767,10 @@ outr24(struct expr *esp, int r)
         /*
          * Update the Program Counter
          */
-        dot.s_addr += 3;
+        p_bytes = 1;
+        dot.s_addr += (i/p_bytes) + (i % p_bytes ? 1 : 0);
 }
-/* end sdas specific */
+
 
 /*)Function     VOID    outdp(carea, esp, r)
  *
@@ -1448,13 +1503,13 @@ frthbyte(a_uint v)
  * This function is derived from outrw(), adding the parameter for the
  * 11 bit address.  This form of address is used only on the 8051 and 8048.
  */
-/*)Function     VOID    outr11(esp, op, r)
+/*)Function     VOID    outrwm(esp, r, v)
  *
  *              expr *  esp             pointer to expr structure
- *              int     op              opcode
  *              int     r               relocation mode
+ *              int     v               opcode
  *
- *      The function outr11() processes a word of generated code
+ *      The function outrwm() processes a word of generated code
  *      in either absolute or relocatable format dependent upon
  *      the data contained in the expr structure esp.  If the
  *      .REL output is enabled then the appropriate information
@@ -1487,7 +1542,7 @@ frthbyte(a_uint v)
  *              The current assembly address is incremented by 2.
  */
 VOID
-outr11(struct expr *esp, int op, int r)
+outrwm(struct expr *esp, int r, a_uint v)
 {
         int n;
 
@@ -1511,13 +1566,13 @@ outr11(struct expr *esp, int op, int r)
                          * by op-code.  Linker will combine them.
                          */
                         r |= R_WORD | esp->e_rlcf;
-                        n = ((esp->e_addr & 0x0700) >> 3) | op;
+                        n = ((esp->e_addr & 0x0700) >> 3) | v;
                         n = (n << 8) | (esp->e_addr & 0xFF);
                         out_lw(n,r|R_RELOC);
                         if (oflag) {
                                 outchk(3, 4);
                                 out_txb(2, esp->e_addr);
-                                *txtp++ = op;
+                                *txtp++ = v;
 
                                 if (esp->e_flag) {
                                         n = esp->e_base.e_sp->s_ref;
@@ -1538,7 +1593,7 @@ outr11(struct expr *esp, int op, int r)
                                 if (oflag) {
                                         outchk(3, 0);
                                         out_txb(2, esp->e_addr);
-                                        *txtp++ = op;
+                                        *txtp++ = v;
 
                                         write_rmode(r);
                                         *relp++ = txtp - txt - 3;
@@ -1555,7 +1610,7 @@ outr11(struct expr *esp, int op, int r)
                                 if (oflag) {
                                         outchk(3, 5);
                                         out_txb(2, esp->e_addr);
-                                        *txtp++ = op;
+                                        *txtp++ = v;
 
                                         if (esp->e_flag) {
                                                 n = esp->e_base.e_sp->s_ref;
@@ -1573,16 +1628,14 @@ outr11(struct expr *esp, int op, int r)
         dot.s_addr += 2;
 }
 
-/* sdas specific */
 /*
  * Output relocatable 19 bit jump/call
  *
  * This function is derived from outrw(), adding the parameter for the
- * 19 bit address.  This form of address is used only in the DS80C390
- * Flat24 mode.
+ * 19 bit address.  This form of address is used only in the DS80C390.
  */
 VOID
-outr19(struct expr * esp, int op, int r)
+outr3bm(struct expr * esp, int r, a_uint v)
 {
         int n;
 
@@ -1595,7 +1648,7 @@ outr19(struct expr * esp, int op, int r)
                         if (oflag) {
                                 outchk(4, 0);
                                 out_txb(3, esp->e_addr);
-                                *txtp++ = op;
+                                *txtp++ = v;
 
                                 write_rmode(r);
                                 *relp++ = txtp - txt - 4;
@@ -1612,7 +1665,7 @@ outr19(struct expr * esp, int op, int r)
                         if (oflag) {
                                 outchk(4, 5);
                                 out_txb(3, esp->e_addr);
-                                *txtp++ = op;
+                                *txtp++ = v;
 
                                 if (esp->e_flag) {
                                         n = esp->e_base.e_sp->s_ref;
@@ -1628,4 +1681,3 @@ outr19(struct expr * esp, int op, int r)
         }
         dot.s_addr += 3;
 }
-/* end sdas specific */

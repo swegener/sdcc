@@ -297,9 +297,6 @@ int     org_cnt;        /*      .org directive counter
                          */
 char    *optsdcc;       /*      sdcc compile options
                          */
-int     flat24Mode;     /*      non-zero if we are using DS390 24 bit
-                         *      flat mode (via .flat24 directive).
-                         */
 /* end sdas specific */
 
 /*

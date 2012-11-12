@@ -1,7 +1,7 @@
-/* i51mch.c */
+/* ds8mch.c */
 
 /*
- *  Copyright (C) 1998-2011  Alan R. Baldwin
+ *  Copyright (C) 1998-2009  Alan R. Baldwin
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,20 +22,25 @@
  * Kent, Ohio  44240
  *
  *   This Assember Ported by
- *      John L. Hartman (JLH)
  *      jhartman at compuserve dot com
  *      noice at noicedebugger dot com
  *
- *  Benny Kim (2011/07/21)
- *  bennykim at coreriver dot com
- *  Fixed bugs in relative address with "."
+ *   Modified from i51pst.c
+ *      Bill McKinnon
+ *      w_mckinnon at conknet dot com
+ *
  */
 
 #include "asxxxx.h"
-#include "i8051.h"
+#include "ds8.h"
 
-char    *cpu    = "Intel 8051";
+char    *cpu    = "Dallas Semiconductor [User Defined]";
 char    *dsft   = "asm";
+
+static int amode;
+static char buff[80];
+static int ds8_bytes;
+static int mchtyp;
 
 /*
  * Opcode Cycle Definitions
@@ -46,32 +51,37 @@ char    *dsft   = "asm";
 /*      OPCY_NONE       ((char) (0x80)) */
 /*      OPCY_MASK       ((char) (0x7F)) */
 
+#define OPCY_CPU        ((char) (0xFD))
+#define OPCY_AMODE      ((char) (0xFC))
+#define OPCY_BITS       ((char) (0xFB))
+
+
 #define UN      ((char) (OPCY_NONE | 0x00))
 
 /*
- * 8051 Cycle Count
+ * ds8xcxxx Cycle Count
  *
- *      opcycles = i51pg1[opcode]
+ *      opcycles = ds8pg1[opcode]
  */
-static char i51pg1[256] = {
+static char ds8pg1[256] = {
 /*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 /*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
-/*00*/  12,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
-/*10*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
-/*20*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
-/*30*/  24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,
-/*40*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
-/*50*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
-/*60*/  24,24,12,24,12,12,12,12,12,12,12,12,12,12,12,12,
-/*70*/  24,24,24,24,12,24,12,12,12,12,12,12,12,12,12,12,
-/*80*/  24,24,24,24,48,24,24,24,24,24,24,24,24,24,24,24,
-/*90*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,
-/*A0*/  24,24,12,24,48,UN,24,24,24,24,24,24,24,24,24,24,
-/*B0*/  24,24,12,12,24,24,24,24,24,24,24,24,24,24,24,24,
-/*C0*/  24,24,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
-/*D0*/  24,24,12,12,12,24,12,12,24,24,24,24,24,24,24,24,
-/*E0*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12,
-/*F0*/  24,24,24,24,12,12,12,12,12,12,12,12,12,12,12,12
+/*00*/   4,12,16, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*10*/  12,12,16, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*20*/  12,12,16, 4, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*30*/  12,12,16, 4, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*40*/  12,12, 8,12, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*50*/  12,12, 8,12, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*60*/  12,12, 8,12, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*70*/  12,12, 8,12, 8,12, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+/*80*/  12,12, 8,12,20,12, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+/*90*/  12,12, 8,12, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*A0*/   8,12, 8,12,20,UN, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+/*B0*/   8,12, 8, 4,16,16,16,16,16,16,16,16,16,16,16,16,
+/*C0*/   8,12, 8, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*D0*/   8,12, 8, 4, 4,16, 4, 4,12,12,12,12,12,12,12,12,
+/*E0*/   8,12, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+/*F0*/   8,12, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
 };
 
 /*
@@ -80,8 +90,11 @@ static char i51pg1[256] = {
 VOID
 machine(struct mne *mp)
 {
+        char *p, *str;
+        char pid[NINPUT], id[NINPUT];
+        int c, d, t, t1, v1;
         a_uint op;
-        int t, t1, v1;
+        struct sym *sp;
         struct expr e, e1, e2;
 
         clrexpr(&e);
@@ -91,23 +104,136 @@ machine(struct mne *mp)
         op = mp->m_valu;
         switch (mp->m_type) {
 
+        case S_CPU:
+                opcycles = OPCY_CPU;
+                lmode = SLIST;
+                switch(op) {
+                default: op = DS8XCXXX;
+                case DS8XCXXX: v1 = 2; str = "DS8XCXXX"; sym[2].s_addr = X_DS8XCXXX; break;
+                case DS80C310: v1 = 2; str = "DS80C310"; sym[2].s_addr = X_DS80C310; break;
+                case DS80C320: v1 = 2; str = "DS80C320"; sym[2].s_addr = X_DS80C320; break;
+                case DS80C323: v1 = 2; str = "DS80C323"; sym[2].s_addr = X_DS80C323; break;
+                case DS80C390: v1 = 3; str = "DS80C390"; sym[2].s_addr = X_DS80C390; break;
+                case DS83C520: v1 = 2; str = "DS83C520"; sym[2].s_addr = X_DS83C520; break;
+                case DS83C530: v1 = 2; str = "DS83C530"; sym[2].s_addr = X_DS83C530; break;
+                case DS83C550: v1 = 2; str = "DS83C550"; sym[2].s_addr = X_DS83C550; break;
+                case DS87C520: v1 = 2; str = "DS87C520"; sym[2].s_addr = X_DS87C520; break;
+                case DS87C530: v1 = 2; str = "DS87C530"; sym[2].s_addr = X_DS87C530; break;
+                case DS87C550: v1 = 2; str = "DS87C550"; sym[2].s_addr = X_DS87C550; break;
+                case DS______: v1 = 2; str = "DS______"; sym[2].s_addr = X_DS______;
+                        if (more()) {
+                                str = p = pid;
+                                d = getnb();
+                                while ((c = get()) != d) {
+                                        if (c == '\0') {
+                                                qerr();
+                                        }
+                                        if (p < &pid[sizeof(pid)-3]) {
+                                                *p++ = c;
+                                        } else {
+                                                break;
+                                        }
+                                }
+                                *p = 0;
+                        }
+                        break;
+                }
+                if (op != 0) {
+                        ds8_bytes = v1;
+                        exprmasks(v1);
+                }
+                mchtyp = (int) op;
+
+                sprintf(id, "__%s", str);
+                sp = lookup(id);
+                if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
+                        err('m');
+                }
+                sp->s_type = S_USER;
+                sp->s_addr = 1;
+                sp->s_flag |= S_ASG;
+
+                sprintf(buff, "%s %s", DS_CPU, str);
+                cpu = buff;
+
+                sp = lookup("__SFR_BITS");
+                if (sp->s_type != S_NEW && (sp->s_flag & S_ASG) == 0) {
+                        err('m');
+                }
+                sp->s_type = S_USER;
+                sp->s_flag |= S_ASG;
+
+                if (more()) {
+                        expr(&e, 0);
+                        abscheck(&e);
+                        sp->s_addr = e.e_addr;
+                } else {
+                        sp->s_addr = 1;
+                }
+                break;
+
+        case S_AMODE:
+                opcycles = OPCY_AMODE;
+                if ((mchtyp != 0) && (mchtyp != DS80C390)) {
+                        err('o');
+                        break;
+                }
+                expr(&e, 0);
+                abscheck(&e);
+                amode = (int) e.e_addr;
+                if ((amode < 0) || (amode > 2)) {
+                        amode = 0;
+                        err('o');
+                }
+                if ((c = getnb()) == ',') {
+                        expr(&e1, 0);
+                        abscheck(&e1);
+                        if (e1.e_addr != 0) {
+/* mov  ta,#0aah */             outab(0x075);   outab(0x0C7);   outab(0x0AA);
+/* mov  ta,#055h */             outab(0x075);   outab(0x0C7);   outab(0x055);
+/* mov  acon,#amode */          outab(0x075);   outab(0x09D);   outab(amode);
+                        } else {
+                                lmode = SLIST;
+                        }
+                } else {
+                        unget(c);
+                        lmode = SLIST;
+                }
+                break;
+
+        case S_BITS:
+                if (ds8_bytes == 0) {
+                        ds8_bytes = (int) op;
+                        exprmasks(ds8_bytes);
+                } else
+                if (ds8_bytes != (int) op) {
+                        err('m');
+                }
+                opcycles = OPCY_BITS;
+                lmode = SLIST;
+                break;
+
         case S_INH:
                 outab(op);
                 break;
 
         case S_JMP11:
-                /*
-                 * 11 bit destination.
-                 * Top 3 bits become the MSBs of the op-code.
-                 */
                 expr(&e, 0);
-                outrwm(&e, R_J11, op);
+                if (amode == 2) {
+                        outr3bm(&e, R_J19, op);
+                } else {
+                        outrwm(&e, R_J11, op);
+                }
                 break;
 
         case S_JMP16:
                 expr(&e, 0);
                 outab(op);
-                outrw(&e, R_NORM);
+                if (amode == 2) {
+                        outr3b(&e, R_NORM);
+                } else {
+                        outrw(&e, R_NORM);
+                }
                 break;
 
         case S_ACC:
@@ -426,7 +552,10 @@ machine(struct mne *mp)
                         if (t1 != S_IMMED)
                                 aerr();
                         outab(0x90);
-                        outrw(&e1, R_NORM);
+                        if (amode == 2)
+                                outr3b(&e1, R_NORM);
+                        else
+                                outrw(&e1, R_NORM);
                         break;
 
                 default:
@@ -727,7 +856,7 @@ machine(struct mne *mp)
                 break;
         }
         if (opcycles == OPCY_NONE) {
-                opcycles = i51pg1[cb[0] & 0xFF];
+                opcycles = ds8pg1[cb[0] & 0xFF];
         }
 }
 
@@ -759,8 +888,6 @@ mchpcr(struct expr *esp)
  * Machine specific initialization
  */
 
-static int beenHere = 0;        /* set non-zero if we have done that... */
-
 VOID
 minit(void)
 {
@@ -775,12 +902,17 @@ minit(void)
          */
         hilo = 1;
 
+        amode = 0;
         /*
          * First time only:
          *      add the pre-defined symbols to the table
          *      as local symbols.
          */
-        if (beenHere == 0) {
+        if (pass == 0) {
+                ds8_bytes = 0;
+                mchtyp = X_DS8XCXXX;
+                sym[2].s_addr = X_DS8XCXXX;
+
                 pd = preDef;
                 while (pd->id) {
                         strcpy(pid, pd->id);
@@ -805,6 +937,5 @@ minit(void)
                         }
                         pd++;
                 }
-                beenHere = 1;
         }
 }

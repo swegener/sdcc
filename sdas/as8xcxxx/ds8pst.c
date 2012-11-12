@@ -1,4 +1,4 @@
-/* i51pst.c */
+/* ds8pst.c */
 
 /*
  *  Copyright (C) 1998-2009  Alan R. Baldwin
@@ -22,14 +22,89 @@
  * Kent, Ohio  44240
  *
  *   This Assembler Ported by
- *      John L. Hartman (JLH)
  *      jhartman at compuserve dot com
  *      noice at noicedebugger dot com
+ *
+ *   Modified from i51pst.c
+ *      Bill McKinnon
+ *      w_mckinnon at conknet dot com
  *
  */
 
 #include "asxxxx.h"
-#include "i8051.h"
+#include "ds8.h"
+
+/*
+ * Basic Relocation Mode Definition
+ *
+ *      #define         R_NORM  0000            No Bit Positioning
+ */
+char    mode0[32] = {   /* R_NORM */
+        '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
+        '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
+        '\220', '\221', '\222', '\223', '\224', '\225', '\226', '\227',
+        '\230', '\231', '\232', '\233', '\234', '\235', '\236', '\237'
+};
+
+/*
+ * Additional Relocation Mode Definitions
+ *
+ * Specification for the 11-bit addressing mode:
+ */
+char    mode1[32] = {   /* R_J11 */
+        '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
+        '\215', '\216', '\217', '\013', '\014', '\015', '\016', '\017',
+        '\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
+        '\030', '\031', '\032', '\033', '\034', '\035', '\036', '\037'
+};
+
+/*
+ * Specification for the 19-bit addressing mode:
+ */
+char    mode2[32] = {   /* R_J19 */
+        '\200', '\201', '\202', '\203', '\204', '\205', '\206', '\207',
+        '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
+        '\225', '\226', '\227', '\023', '\024', '\025', '\026', '\027',
+        '\030', '\031', '\032', '\033', '\034', '\035', '\036', '\037'
+};
+
+/*
+ *     *m_def is a pointer to the bit relocation definition.
+ *      m_flag indicates that bit position swapping is required.
+ *      m_dbits contains the active bit positions for the output.
+ *      m_sbits contains the active bit positions for the input.
+ *
+ *      struct  mode
+ *      {
+ *              char *  m_def;          Bit Relocation Definition
+ *              a_uint  m_flag;         Bit Swapping Flag
+ *              a_uint  m_dbits;        Destination Bit Mask
+ *              a_uint  m_sbits;        Source Bit Mask
+ *      };
+ */
+#ifdef  LONGINT
+struct  mode    mode[3] = {
+    {   &mode0[0],      0,      0x0000FFFFl,    0x0000FFFFl     },
+    {   &mode1[0],      1,      0x0000E0FFl,    0x000007FFl     },
+    {   &mode2[0],      1,      0x00E0FFFFl,    0x0007FFFFl     }
+};
+#else
+struct  mode    mode[3] = {
+    {   &mode0[0],      0,      0x0000FFFF,     0x0000FFFF      },
+    {   &mode1[0],      1,      0x0000E0FF,     0x000007FF      },
+    {   &mode2[0],      1,      0x00E0FFFF,     0x0007FFFF      }
+};
+#endif
+
+/*
+ * Array of Pointers to mode Structures
+ */
+struct  mode    *modep[16] = {
+        &mode[0],       &mode[1],       &mode[2],       NULL,
+        NULL,           NULL,           NULL,           NULL,
+        NULL,           NULL,           NULL,           NULL,
+        NULL,           NULL,           NULL,           NULL
+};
 
 /*
  * Mnemonic Structure
@@ -37,6 +112,21 @@
 struct  mne     mne[] = {
 
         /* machine */
+
+    {   NULL,   ".amode",       S_AMODE,        0,      0       },
+
+    {   NULL,   ".cpu",         S_CPU,          0,      DS______        },
+    {   NULL,   ".DS8XCXXX",    S_CPU,          0,      DS8XCXXX        },
+    {   NULL,   ".DS80C310",    S_CPU,          0,      DS80C310        },
+    {   NULL,   ".DS80C320",    S_CPU,          0,      DS80C320        },
+    {   NULL,   ".DS80C323",    S_CPU,          0,      DS80C323        },
+    {   NULL,   ".DS80C390",    S_CPU,          0,      DS80C390        },
+    {   NULL,   ".DS83C520",    S_CPU,          0,      DS83C520        },
+    {   NULL,   ".DS83C530",    S_CPU,          0,      DS83C530        },
+    {   NULL,   ".DS83C550",    S_CPU,          0,      DS83C550        },
+    {   NULL,   ".DS87C520",    S_CPU,          0,      DS87C520        },
+    {   NULL,   ".DS87C530",    S_CPU,          0,      DS87C530        },
+    {   NULL,   ".DS87C550",    S_CPU,          0,      DS87C550        },
 
         /* system */
 
@@ -99,8 +189,8 @@ struct  mne     mne[] = {
     {   NULL,   ".word",        S_DATA,         0,      O_2BYTE },
     {   NULL,   ".dw",          S_DATA,         0,      O_2BYTE },
     {   NULL,   ".fdb",         S_DATA,         0,      O_2BYTE },
-/*    { NULL,   ".3byte",       S_DATA,         0,      O_3BYTE },      */
-/*    { NULL,   ".triple",      S_DATA,         0,      O_3BYTE },      */
+    {   NULL,   ".3byte",       S_DATA,         0,      O_3BYTE },
+    {   NULL,   ".triple",      S_DATA,         0,      O_3BYTE },
 /*    { NULL,   ".4byte",       S_DATA,         0,      O_4BYTE },      */
 /*    { NULL,   ".quad",        S_DATA,         0,      O_4BYTE },      */
     {   NULL,   ".blkb",        S_BLK,          0,      O_1BYTE },
@@ -108,7 +198,7 @@ struct  mne     mne[] = {
     {   NULL,   ".rmb",         S_BLK,          0,      O_1BYTE },
     {   NULL,   ".rs",          S_BLK,          0,      O_1BYTE },
     {   NULL,   ".blkw",        S_BLK,          0,      O_2BYTE },
-/*    { NULL,   ".blk3",        S_BLK,          0,      O_3BYTE },      */
+    {   NULL,   ".blk3",        S_BLK,          0,      O_3BYTE },
 /*    { NULL,   ".blk4",        S_BLK,          0,      O_4BYTE },      */
     {   NULL,   ".ascii",       S_ASCIX,        0,      O_ASCII },
     {   NULL,   ".ascis",       S_ASCIX,        0,      O_ASCIS },
@@ -120,6 +210,8 @@ struct  mne     mne[] = {
     {   NULL,   ".even",        S_BOUNDARY,     0,      O_EVEN  },
     {   NULL,   ".odd",         S_BOUNDARY,     0,      O_ODD   },
     {   NULL,   ".bndry",       S_BOUNDARY,     0,      O_BNDRY },
+    {   NULL,   ".16bit",       S_BITS,         0,      O_2BYTE },
+    {   NULL,   ".24bit",       S_BITS,         0,      O_3BYTE },
 
         /* Macro Processor */
 
@@ -221,15 +313,6 @@ struct PreDef preDef[] = {
     {   "ACC.5",        0x00E5  },
     {   "ACC.6",        0x00E6  },
     {   "ACC.7",        0x00E7  },
-    {   "A",            0x00E0  },
-    {   "A.0",          0x00E0  },
-    {   "A.1",          0x00E1  },
-    {   "A.2",          0x00E2  },
-    {   "A.3",          0x00E3  },
-    {   "A.4",          0x00E4  },
-    {   "A.5",          0x00E5  },
-    {   "A.6",          0x00E6  },
-    {   "A.7",          0x00E7  },
     {   "B",            0x00F0  },
     {   "B.0",          0x00F0  },
     {   "B.1",          0x00F1  },
@@ -239,153 +322,23 @@ struct PreDef preDef[] = {
     {   "B.5",          0x00F5  },
     {   "B.6",          0x00F6  },
     {   "B.7",          0x00F7  },
-    {   "CPRL2",        0x00C8  },
-    {   "CT2",          0x00C9  },
     {   "CY",           0x00D7  },
     {   "DPH",          0x0083  },
     {   "DPL",          0x0082  },
     {   "EA",           0x00AF  },
-    {   "ES",           0x00AC  },
-    {   "ET0",          0x00A9  },
-    {   "ET1",          0x00AB  },
-    {   "ET2",          0x00AD  },
-    {   "EX0",          0x00A8  },
-    {   "EX1",          0x00AA  },
-    {   "EXEN2",        0x00CB  },
-    {   "EXF2",         0x00CE  },
     {   "F0",           0x00D5  },
     {   "IE",           0x00A8  },
-    {   "IE.0",         0x00A8  },
-    {   "IE.1",         0x00A9  },
-    {   "IE.2",         0x00AA  },
-    {   "IE.3",         0x00AB  },
-    {   "IE.4",         0x00AC  },
-    {   "IE.5",         0x00AD  },
-    {   "IE.7",         0x00AF  },
-    {   "IE0",          0x0089  },
-    {   "IE1",          0x008B  },
-    {   "INT0",         0x00B2  },
-    {   "INT1",         0x00B3  },
     {   "IP",           0x00B8  },
-    {   "IP.0",         0x00B8  },
-    {   "IP.1",         0x00B9  },
-    {   "IP.2",         0x00BA  },
-    {   "IP.3",         0x00BB  },
-    {   "IP.4",         0x00BC  },
-    {   "IP.5",         0x00BD  },
-    {   "IT0",          0x0088  },
-    {   "IT1",          0x008A  },
     {   "OV",           0x00D2  },
     {   "P",            0x00D0  },
-    {   "P0",           0x0080  },
-    {   "P0.0",         0x0080  },
-    {   "P0.1",         0x0081  },
-    {   "P0.2",         0x0082  },
-    {   "P0.3",         0x0083  },
-    {   "P0.4",         0x0084  },
-    {   "P0.5",         0x0085  },
-    {   "P0.6",         0x0086  },
-    {   "P0.7",         0x0087  },
-    {   "P1",           0x0090  },
-    {   "P1.0",         0x0090  },
-    {   "P1.1",         0x0091  },
-    {   "P1.2",         0x0092  },
-    {   "P1.3",         0x0093  },
-    {   "P1.4",         0x0094  },
-    {   "P1.5",         0x0095  },
-    {   "P1.6",         0x0096  },
-    {   "P1.7",         0x0097  },
-    {   "P2",           0x00A0  },
-    {   "P2.0",         0x00A0  },
-    {   "P2.1",         0x00A1  },
-    {   "P2.2",         0x00A2  },
-    {   "P2.3",         0x00A3  },
-    {   "P2.4",         0x00A4  },
-    {   "P2.5",         0x00A5  },
-    {   "P2.6",         0x00A6  },
-    {   "P2.7",         0x00A7  },
-    {   "P3",           0x00B0  },
-    {   "P3.0",         0x00B0  },
-    {   "P3.1",         0x00B1  },
-    {   "P3.2",         0x00B2  },
-    {   "P3.3",         0x00B3  },
-    {   "P3.4",         0x00B4  },
-    {   "P3.5",         0x00B5  },
-    {   "P3.6",         0x00B6  },
-    {   "P3.7",         0x00B7  },
-    {   "PCON",         0x0087  },
+   {   "PCON",         0x0087  },
     {   "PS",           0x00BC  },
     {   "PSW",          0x00D0  },
-    {   "PSW.0",        0x00D0  },
-    {   "PSW.1",        0x00D1  },
-    {   "PSW.2",        0x00D2  },
-    {   "PSW.3",        0x00D3  },
-    {   "PSW.4",        0x00D4  },
-    {   "PSW.5",        0x00D5  },
-    {   "PSW.6",        0x00D6  },
-    {   "PSW.7",        0x00D7  },
-    {   "PT0",          0x00B9  },
-    {   "PT1",          0x00BB  },
-    {   "PT2",          0x00BD  },
-    {   "PX0",          0x00B8  },
-    {   "PX1",          0x00BA  },
-    {   "RB8",          0x009A  },
-    {   "RCAP2H",       0x00CB  },
-    {   "RCAP2L",       0x00CA  },
-    {   "RCLK",         0x00CD  },
-    {   "REN",          0x009C  },
-    {   "RI",           0x0098  },
     {   "RS0",          0x00D3  },
     {   "RS1",          0x00D4  },
-    {   "RXD",          0x00B0  },
-    {   "SBUF",         0x0099  },
-    {   "SCON",         0x0098  },
-    {   "SCON.0",       0x0098  },
-    {   "SCON.1",       0x0099  },
-    {   "SCON.2",       0x009A  },
-    {   "SCON.3",       0x009B  },
-    {   "SCON.4",       0x009C  },
-    {   "SCON.5",       0x009D  },
-    {   "SCON.6",       0x009E  },
-    {   "SCON.7",       0x009F  },
     {   "SM0",          0x009F  },
     {   "SM1",          0x009E  },
     {   "SM2",          0x009D  },
     {   "SP",           0x0081  },
-    {   "T2CON",        0x00C8  },
-    {   "T2CON.0",      0x00C8  },
-    {   "T2CON.1",      0x00C9  },
-    {   "T2CON.2",      0x00CA  },
-    {   "T2CON.3",      0x00CB  },
-    {   "T2CON.4",      0x00CC  },
-    {   "T2CON.5",      0x00CD  },
-    {   "T2CON.6",      0x00CE  },
-    {   "T2CON.7",      0x00CF  },
-    {   "TB8",          0x009B  },
-    {   "TCLK",         0x00CC  },
-    {   "TCON",         0x0088  },
-    {   "TCON.0",       0x0088  },
-    {   "TCON.1",       0x0089  },
-    {   "TCON.2",       0x008A  },
-    {   "TCON.3",       0x008B  },
-    {   "TCON.4",       0x008C  },
-    {   "TCON.5",       0x008D  },
-    {   "TCON.6",       0x008E  },
-    {   "TCON.7",       0x008F  },
-    {   "TF0",          0x008D  },
-    {   "TF1",          0x008F  },
-    {   "TF2",          0x00CF  },
-    {   "TH0",          0x008C  },
-    {   "TH1",          0x008D  },
-    {   "TH2",          0x00CD  },
-    {   "TI",           0x0099  },
-    {   "TL0",          0x008A  },
-    {   "TL1",          0x008B  },
-    {   "TL2",          0x00CC  },
-    {   "TMOD",         0x0089  },
-    {   "TR0",          0x008C  },
-    {   "TR1",          0x008E  },
-    {   "TR2",          0x00CA  },
-    {   "TXD",          0x00B1  },
     {   NULL,           0x0000  }
 };

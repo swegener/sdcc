@@ -47,6 +47,7 @@
  *              VOID    clrexpr()
  *              int     digit()
  *              VOID    expr()
+ *              VOID    exprmasks()
  *              int     oprio()
  *              VOID    term()
  *              a_uint  rngchk()
@@ -777,4 +778,30 @@ a_uint
 rngchk(a_uint n)
 {
         return n;
+}
+
+/*)Function     VOID    exprmasks(esp)
+ *
+ *              int     n               T Line Bytes in Address
+ *
+ *      The function exprmasks() configures the assembler
+ *      for 16, 24, or 32-Bit Data/Addresses.
+ *
+ *      local variables:
+ *              none
+ *
+ *      global variables:
+ *              none
+ *
+ *      functions called:
+ *              none
+ *
+ *      side effects:
+ *              none
+ */
+ 
+VOID
+exprmasks(int n)
+{
+        (void)n;
 }

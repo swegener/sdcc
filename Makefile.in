@@ -31,6 +31,10 @@ SDCC_AS        += sdas/as6808
 SDCC_LD        += sdcc-ld6808
 endif
 
+ifeq ($(OPT_DISABLE_DS390), 0)
+SDCC_AS        += sdas/as8xcxxx
+endif
+
 ifeq ($(OPT_DISABLE_MCS51), 0)
 SDCC_AS        += sdas/as8051
 SDCC_LD        += sdcc-ld8051

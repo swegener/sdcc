@@ -854,7 +854,8 @@ AC_CONFIG_FILES([doc/Makefile])
 ####test $OPT_DISABLE_AVR = 0 && AC_CONFIG_FILES([src/avr/Makefile])
 
 if test $OPT_DISABLE_DS390 = 0; then
-  AC_CONFIG_FILES([src/ds390/Makefile])
+  AC_CONFIG_FILES([src/ds390/Makefile
+                   sdas/as8xcxxx/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/ds390/Makefile])
 fi
 

@@ -1,3 +1,31 @@
+2012-11-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* configure,
+	* configure.in,
+	* Makefile.in: added as8xcxxx
+	* Makefile.common.in: fixed OPT_DISABLE_DS390
+	* sdas/as8051/i51mch.c,
+	* sdas/as8051/i51pst.c: removed flat24
+	* sdas/as8xcxxx/,
+	* sdas/as8xcxxx/clean.mk,
+	* sdas/as8xcxxx/ds8.h,
+	* sdas/as8xcxxx/ds8adr.c,
+	* sdas/as8xcxxx/ds8mch.c,
+	* sdas/as8xcxxx/ds8pst.c,
+	* sdas/as8xcxxx/Makefile.in,
+	* sdas/as8xcxxx/sdas390.vcxproj,
+	* sdas/as8xcxxx/sdas390.vcxproj.filters: new, added sdas390
+	* sdas/asxxsrc/asdata.c: removed flat24Mode
+	* sdas/asxxsrc/asexpr.c: added exprmasks()
+	* sdas/asxxsrc/asmain.c: removed S_FLAT24 case
+	* sdas/asxxsrc/asout.c: outr*() synced with ASxxxx v5
+	* sdas/asxxsrc/asxxxx.h: next step to ASxxxx v5
+	* sdas/asxxsrc/sdas.c,
+	* sdas/asxxsrc/sdas.h: added TARGET_ID_DS390
+	* src/ds390/gen.c: replaced ACC.x with ACC[x]
+	* src/ds390/main.c: issue .DS80C390 and .amode instead of .flat24,
+	  and use sdas390
+
 2012-11-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/ports/ucr2k/spec.mk:

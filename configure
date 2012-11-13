@@ -8141,6 +8141,7 @@ do
     "sdas/linksrc/asxxxx_config.h") CONFIG_HEADERS="$CONFIG_HEADERS sdas/linksrc/asxxxx_config.h" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
     "src/ds390/Makefile") CONFIG_FILES="$CONFIG_FILES src/ds390/Makefile" ;;
+    "sdas/as8xcxxx/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/as8xcxxx/Makefile" ;;
     "device/lib/ds390/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/ds390/Makefile" ;;
     "src/ds400/Makefile") CONFIG_FILES="$CONFIG_FILES src/ds400/Makefile" ;;
     "device/lib/ds400/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/ds400/Makefile" ;;

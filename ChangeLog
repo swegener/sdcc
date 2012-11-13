@@ -1,3 +1,8 @@
+2012-11-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/mappings.i:
+	  Fix use of and macro for z80asm assembler.
+
 2012-11-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* configure,

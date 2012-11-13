@@ -412,7 +412,7 @@ static const ASM_MAPPING _z80asm_mapping[] = {
     { "immedword", "$%04X" },
     { "immedbyte", "$%02X" },
     { "hashedstr", "%s" },
-    { "lsbimmeds", "%s & $FF" },
+    { "lsbimmeds", "%s ~ $FF" },
     { "msbimmeds", "%s / 256" },
 
     { "bankimmeds", "BANK(%s)" },

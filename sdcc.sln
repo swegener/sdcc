@@ -3,6 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C++ Express 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "all", "all.vcxproj", "{5339F39B-0A44-4248-972C-F8833B0F5537}"
 	ProjectSection(ProjectDependencies) = postProject
+		{13410A29-B3A6-4F10-8345-39D5293F3D9A} = {13410A29-B3A6-4F10-8345-39D5293F3D9A}
 		{B823D5B9-6B5A-4CC8-AF07-DDFE8C8E3488} = {B823D5B9-6B5A-4CC8-AF07-DDFE8C8E3488}
 		{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877} = {F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}
 	EndProjectSection
@@ -82,6 +83,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yacc", "src\yacc.vcxproj", "{EA40C4BB-7537-4422-AE03-629A05F3D4C5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdasrab", "sdas\asrab\asrab.vcxproj", "{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdas390", "sdas\as8xcxxx\sdas390.vcxproj", "{13410A29-B3A6-4F10-8345-39D5293F3D9A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1} = {2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -173,6 +179,10 @@ Global
 		{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}.Debug|Win32.Build.0 = Debug|Win32
 		{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}.Release|Win32.ActiveCfg = Release|Win32
 		{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}.Release|Win32.Build.0 = Release|Win32
+		{13410A29-B3A6-4F10-8345-39D5293F3D9A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{13410A29-B3A6-4F10-8345-39D5293F3D9A}.Debug|Win32.Build.0 = Debug|Win32
+		{13410A29-B3A6-4F10-8345-39D5293F3D9A}.Release|Win32.ActiveCfg = Release|Win32
+		{13410A29-B3A6-4F10-8345-39D5293F3D9A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,3 +1,8 @@
+2012-11-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdcc.sln,
+	* support/scripts/sdcc.nsi: added sdas390
+
 2012-11-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType): fixed bug #3577669

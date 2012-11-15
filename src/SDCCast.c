@@ -3396,6 +3396,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /* if right is a literal and */
       /* left is also a division by a literal then */
       /* rearrange the tree */
+#if 0
+      /* This converts (a/b)/c into a/(b*c)/1, where b and c are literals. */
+      /* Algebraically, this is fine, but may fail as an optimization if  */
+      /* b*c overflows or causes the expression to have a different resultant */
+      /* type. I don't think it's worth the effort to sort out the cases of */
+      /* when this is safe or not safe, so I am just going to leave this */
+      /* disabled. -- EEP -- 15 Nov 2012 */
       if (IS_LITERAL (RTYPE (tree))
           /* avoid infinite loop */
           && (TYPE_TARGET_ULONG) ulFromVal (tree->right->opval.val) != 1)
@@ -3424,6 +3431,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
                 }
             }
         }
+#endif
 
       return tree;
 

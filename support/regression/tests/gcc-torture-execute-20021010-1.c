@@ -24,10 +24,8 @@ sub ()
 void
 testTortureExecute (void)
 {
-#if 0 // Broken
   if (sub () != 0)
     ASSERT (0);
 
   return;
-#endif
 }

@@ -2827,6 +2827,22 @@ popForBranch (iCode * ic, bool markGenerated)
 }
 
 /*-----------------------------------------------------------------*/
+/* emitDummyCall - emit a dummy call for --no-ret-without-call     */
+/*-----------------------------------------------------------------*/
+static void
+emitDummyCall(void)
+{
+  if (!options.no_ret_without_call)
+    return;
+  if (options.acall_ajmp)
+    emitcode ("acall", ".+2");
+  else
+    emitcode ("lcall", ".+3");
+  emitcode ("dec", "sp");
+  emitcode ("dec", "sp");
+}
+
+/*-----------------------------------------------------------------*/
 /* saveRBank - saves an entire register bank on the stack          */
 /*-----------------------------------------------------------------*/
 static void
@@ -3399,6 +3415,7 @@ genPcall (iCode * ic)
               emitcode ("mov", "psw,#0x%02x", ((FUNC_REGBANK (dtype)) << 3) & 0xff);
             }
 
+          emitDummyCall();
           /* make the call */
           emitcode ("ret", "");
           _G.stack.pushed -= 4;
@@ -11390,6 +11407,7 @@ genJumpTab (iCode * ic)
           emitpush ("acc");
         }
 
+      emitDummyCall();
       emitcode ("ret", "");
       _G.stack.pushed -= 2;
 

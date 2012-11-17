@@ -45,6 +45,7 @@ static OPTION _mcs51_options[] =
     { 0, "--pack-iram",      NULL, "Tells the linker to pack variables in internal ram (default)"},
     { 0, "--no-pack-iram",   &options.no_pack_iram, "Deprecated: Tells the linker not to pack variables in internal ram"},
     { 0, "--acall-ajmp",     &options.acall_ajmp, "Use acall/ajmp instead of lcall/ljmp" },
+    { 0, "--no-ret-without-call", &options.no_ret_without_call, "Do not use ret independent of acall/lcall" },
     { 0, NULL }
   };
 

@@ -1,3 +1,11 @@
+2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/pic16-header-parser.pl:
+          New capability: Handling of I/O pins of the peripheral.
+          The program creates six files in the actual directory:
+                adc.tables, ccp.tables, pwm.tables, i2c.tables,
+                spi.tables, usart.tables
+
 2012-11-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCglobl.h,

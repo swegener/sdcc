@@ -113,7 +113,7 @@ allocReg (short type)
             currFunc->regsUsed = bitVectSetBit (currFunc->regsUsed, i);
           return &regs8051[i];
         }
-      /* other wise look for specific type
+      /* otherwise look for specific type
          of register */
       if (regs8051[i].isFree && regs8051[i].type == type)
         {
@@ -278,8 +278,8 @@ directSpilLoc (symbol * sym, eBBlock * ebp, iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* hasSpilLocnoUptr - will return 1 if the symbol has spil location */
-/*                    but is not used as a pointer                 */
+/* hasSpilLocnoUptr - will return 1 if the symbol has spil         */
+/*                    location but is not used as a pointer        */
 /*-----------------------------------------------------------------*/
 static int
 hasSpilLocnoUptr (symbol * sym, eBBlock * ebp, iCode * ic)
@@ -830,7 +830,7 @@ tryAgain:
       sym->regs[j]->isFree = 0;
 
   /* this looks like an infinite loop but
-     in really selectSpil will abort  */
+     in reality selectSpil will abort  */
   goto tryAgain;
 }
 
@@ -862,7 +862,7 @@ tryAgain:
       sym->regs[j]->isFree = 0;
 
   /* this looks like an infinite loop but
-     in really selectSpil will abort  */
+     in reality selectSpil will abort  */
   goto tryAgain;
 }
 
@@ -1113,7 +1113,7 @@ willCauseSpill (int nr, int rt)
   if (rt == REG_PTR)
     {
       /* special case for pointer type
-         if pointer type not avlb then
+         if pointer type not available then
          check for type gpr */
       if (nFreeRegs (rt) >= nr)
         return 0;
@@ -1144,9 +1144,9 @@ willCauseSpill (int nr, int rt)
 }
 
 /*-----------------------------------------------------------------*/
-/* positionRegs - the allocator can allocate same registers to res- */
-/* ult and operand, if this happens make sure they are in the same */
-/* position as the operand otherwise chaos results                 */
+/* positionRegs - the allocator can allocate same registers to     */
+/* result and operand, if this happens make sure they are in the   */
+/* same position as the operand otherwise chaos results            */
 /*-----------------------------------------------------------------*/
 static int
 positionRegs (symbol * result, symbol * opsym)
@@ -1492,7 +1492,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
 /* fillGaps - Try to fill in the Gaps left by Pass1                */
 /*-----------------------------------------------------------------*/
 static void
-fillGaps ()
+fillGaps (void)
 {
   symbol *sym = NULL;
   int key = 0;
@@ -3001,7 +3001,9 @@ packRegisters (eBBlock ** ebpp, int blockno)
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF &&
           IS_ITEMP (IC_RESULT (ic)) &&
-          IS_TRUE_SYMOP (IC_LEFT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !OP_SYMBOL (IC_LEFT (ic))->onStack)
+          IS_TRUE_SYMOP (IC_LEFT (ic)) &&
+          bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
+          !OP_SYMBOL (IC_LEFT (ic))->onStack)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = 1;
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
@@ -3010,7 +3012,12 @@ packRegisters (eBBlock ** ebpp, int blockno)
 
       /* if straight assignment then carry remat flag if
          this is the only definition */
-      if (ic->op == '=' && !POINTER_SET (ic) && IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat && !IS_CAST_ICODE (OP_SYMBOL (IC_RIGHT (ic))->rematiCode) && !isOperandGlobal (IC_RESULT (ic)) &&  /* due to bug 1618050 */
+      if (ic->op == '=' &&
+          !POINTER_SET (ic) &&
+          IS_SYMOP (IC_RIGHT (ic)) &&
+          OP_SYMBOL (IC_RIGHT (ic))->remat &&
+          !IS_CAST_ICODE (OP_SYMBOL (IC_RIGHT (ic))->rematiCode) &&
+          !isOperandGlobal (IC_RESULT (ic)) &&  /* due to bug 1618050 */
           bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
@@ -3020,7 +3027,9 @@ packRegisters (eBBlock ** ebpp, int blockno)
       /* if cast to a generic pointer & the pointer being
          cast is remat, then we can remat this cast as well */
       if (ic->op == CAST &&
-          IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
+          IS_SYMOP (IC_RIGHT (ic)) &&
+          OP_SYMBOL (IC_RIGHT (ic))->remat &&
+          bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
         {
           sym_link *to_type = operandType (IC_LEFT (ic));
           sym_link *from_type = operandType (IC_RIGHT (ic));
@@ -3032,12 +3041,12 @@ packRegisters (eBBlock ** ebpp, int blockno)
             }
         }
 
-      /* if this is a +/- operation with a rematerizable
+      /* if this is a +/- operation with a rematerializable
          then mark this as rematerializable as well */
       if ((ic->op == '+' || ic->op == '-') &&
-          (IS_SYMOP (IC_LEFT (ic)) &&
-           IS_ITEMP (IC_RESULT (ic)) &&
-           IS_OP_LITERAL (IC_RIGHT (ic))) &&
+          IS_SYMOP (IC_LEFT (ic)) &&
+          IS_ITEMP (IC_RESULT (ic)) &&
+          IS_OP_LITERAL (IC_RIGHT (ic)) &&
           OP_SYMBOL (IC_LEFT (ic))->remat &&
           (!IS_SYMOP (IC_RIGHT (ic)) || !IS_CAST_ICODE (OP_SYMBOL (IC_RIGHT (ic))->rematiCode)) &&
           bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
@@ -3146,7 +3155,8 @@ packRegisters (eBBlock ** ebpp, int blockno)
           IS_SYMOP (IC_LEFT (ic)) &&
           !isOperandInFarSpace (IC_RESULT (ic)) &&
           !OP_SYMBOL (IC_LEFT (ic))->remat &&
-          !IS_OP_RUONLY (IC_RESULT (ic)) && getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)
+          !IS_OP_RUONLY (IC_RESULT (ic)) &&
+          getSize (aggrToPtr (operandType (IC_LEFT (ic)), FALSE)) > 1)
         {
           packRegsForOneuse (ic, IC_LEFT (ic), ebp);
         }

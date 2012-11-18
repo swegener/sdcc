@@ -2621,7 +2621,7 @@ pushSide (operand * oper, int size, iCode * ic)
   while (size--)
     {
       const char *l = aopGet (oper, offset++, FALSE, TRUE);
-      if (AOP_TYPE (oper) != AOP_REG && AOP_TYPE (oper) != AOP_DIR && !EQ (l, "a"))
+      if (AOP_TYPE (oper) != AOP_REG && AOP_TYPE (oper) != AOP_DIR)
         {
           MOVA (l);
           emitpush ("acc");
@@ -2832,12 +2832,13 @@ popForBranch (iCode * ic, bool markGenerated)
 static void
 emitDummyCall(void)
 {
+  symbol *dummyLabel;
+
   if (!options.no_ret_without_call)
     return;
-  if (options.acall_ajmp)
-    emitcode ("acall", ".+2");
-  else
-    emitcode ("lcall", ".+3");
+  dummyLabel = newiTempLabel (NULL);
+  emitcode ("lcall", "!tlabel", labelKey2num (dummyLabel->key));
+  emitLabel (dummyLabel);
   emitcode ("dec", "sp");
   emitcode ("dec", "sp");
 }
@@ -3100,7 +3101,6 @@ genCall (iCode * ic)
 {
   sym_link *dtype;
   sym_link *etype;
-//  bool restoreBank = FALSE;
   bool swapBanks = FALSE;
   bool accuse = FALSE;
   bool accPushed = FALSE;
@@ -3261,10 +3261,6 @@ genCall (iCode * ic)
       unsaveRegisters (ic);
     }
 
-//  /* if register bank was saved then pop them */
-//  if (restoreBank)
-//    unsaveRBank (FUNC_REGBANK (dtype), ic, FALSE);
-
   if (IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) && !assignResultGenerated)
     {
       if (resultInF0)
@@ -3287,8 +3283,6 @@ genPcall (iCode * ic)
 {
   sym_link *dtype;
   sym_link *etype;
-  symbol *rlbl = newiTempLabel (NULL);
-//  bool restoreBank=FALSE;
   bool swapBanks = FALSE;
   bool resultInF0 = FALSE;
 
@@ -3306,8 +3300,6 @@ genPcall (iCode * ic)
   if (currFunc && dtype && !IFFUNC_ISNAKED (dtype) &&
       (FUNC_REGBANK (currFunc->type) != FUNC_REGBANK (dtype)) && !IFFUNC_ISISR (dtype))
     {
-//    saveRBank (FUNC_REGBANK (dtype), ic, TRUE);
-//    restoreBank=TRUE;
       swapBanks = TRUE;
       // need caution message to user here
     }
@@ -3392,51 +3384,49 @@ genPcall (iCode * ic)
               emitcode ("lcall", "__sdcc_banked_call");
             }
         }
-      else if (_G.sendSet)
+      else if (_G.sendSet)      /* the send set is not empty */
         {
-          /* push the return address on to the stack */
-          emitcode ("mov", "a,#!tlabel", labelKey2num (rlbl->key));
-          emitpush ("acc");
-          emitcode ("mov", "a,#(!tlabel >> 8)", labelKey2num (rlbl->key));
-          emitpush ("acc");
+          symbol *callLabel = newiTempLabel (NULL);
+          symbol *returnLabel = newiTempLabel (NULL);
 
+          /* create the return address on the stack */
+          emitcode ("lcall", "!tlabel", labelKey2num (callLabel->key));
+          emitcode ("ljmp", "!tlabel", labelKey2num (returnLabel->key));
+          emitLabel (callLabel);
+          _G.stack.pushed += 2;
+
+          emitDummyCall();
           /* now push the function address */
           pushSide (IC_LEFT (ic), FPTRSIZE, ic);
 
-          /* if send set is not empty then assign */
-          if (_G.sendSet)
-            {
-              genSend (reverseSet (_G.sendSet));
-              _G.sendSet = NULL;
-            }
+          /* send set is not empty: assign */
+          genSend (reverseSet (_G.sendSet));
+          _G.sendSet = NULL;
 
           if (swapBanks)
             {
               emitcode ("mov", "psw,#0x%02x", ((FUNC_REGBANK (dtype)) << 3) & 0xff);
             }
 
-          emitDummyCall();
           /* make the call */
           emitcode ("ret", "");
           _G.stack.pushed -= 4;
-          emitLabel (rlbl);
+          emitLabel (returnLabel);
         }
       else                      /* the send set is empty */
         {
-          const char *l;
-          /* now get the calling address into dptr */
+          /* now get the called address into dptr */
           aopOp (IC_LEFT (ic), ic, FALSE);
 
-          l = aopGet (IC_LEFT (ic), 0, FALSE, FALSE);
           if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
             {
-              emitcode ("mov", "r0,%s", l);
+              emitcode ("mov", "r0,%s", aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
               emitcode ("mov", "dph,%s", aopGet (IC_LEFT (ic), 1, FALSE, FALSE));
               emitcode ("mov", "dpl,r0");
             }
           else
             {
-              emitcode ("mov", "dpl,%s", l);
+              emitcode ("mov", "dpl,%s", aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
               emitcode ("mov", "dph,%s", aopGet (IC_LEFT (ic), 1, FALSE, FALSE));
             }
 
@@ -3500,10 +3490,6 @@ genPcall (iCode * ic)
             _G.stack.pushed -= ic->parmBytes;
         }
     }
-
-//  /* if register bank was saved then unsave them */
-//  if (restoreBank)
-//    unsaveRBank (FUNC_REGBANK (dtype), ic, TRUE);
 
   /* if we had saved some registers then unsave them */
   if (ic->regsSaved && !IFFUNC_CALLEESAVES (dtype))
@@ -11313,12 +11299,13 @@ genJumpTab (iCode * ic)
   symbol *jtab, *jtablo, *jtabhi;
   unsigned int count;
   const char *l;
+  bool useB = FALSE;
 
   D (emitcode (";", "genJumpTab"));
 
   count = elementsInSet (IC_JTLABELS (ic));
 
-  if (count <= 16)
+  if (count <= 7)
     {
       /* this algorithm needs 9 cycles and 7 + 3*n bytes
          if the switch argument is in a register.
@@ -11342,7 +11329,7 @@ genJumpTab (iCode * ic)
         {
           if (options.acall_ajmp == 0)
             {
-              emitcode ("mov", "b,#0x03");
+              MOVB ("#0x03");
               emitcode ("mul", "ab");
             }
           else
@@ -11362,9 +11349,9 @@ genJumpTab (iCode * ic)
     }
   else
     {
-      /* this algorithm needs 14 cycles and 13 + 2*n bytes
+      /* this algorithm needs 14 cycles and 14 + 2*n bytes
          if the switch argument is in a register.
-         For n>6 this algorithm may be more compact */
+         For n>7 this algorithm may be more compact */
       jtablo = newiTempLabel (NULL);
       jtabhi = newiTempLabel (NULL);
 
@@ -11373,43 +11360,62 @@ genJumpTab (iCode * ic)
       aopOp (cond, ic, FALSE);
       l = aopGet (cond, 0, FALSE, FALSE);
       if ((AOP_TYPE (cond) == AOP_R0 && _G.r0Pushed) ||
-          (AOP_TYPE (cond) == AOP_R1 && _G.r1Pushed) || EQ (l, "a") || EQ (l, "acc") || IS_VOLATILE (operandType (cond)))
+          (AOP_TYPE (cond) == AOP_R1 && _G.r1Pushed) ||
+          EQ (l, "a") || EQ (l, "acc") ||
+          (count > 125 && EQ (l, "dpl")) ||
+          IS_VOLATILE (operandType (cond)))
         {
           // (MB) what if B is in use???
           wassertl (!BINUSE, "B was in use");
-          emitcode ("mov", "b,%s", l);
+          MOVB (l);
           l = "b";
+          useB = TRUE;
         }
       freeAsmop (cond, NULL, ic, TRUE);
       MOVA (l);
-      if (count <= 112)
+      if (count <= 125)
         {
           emitcode ("add", "a,#(!tlabel-3-.)", labelKey2num (jtablo->key));
           emitcode ("movc", "a,@a+pc");
-          emitpush ("acc");
-
-          MOVA (l);
+          if (EQ (l, "dpl"))
+            {
+              emitcode ("xch", "a,dpl");
+            }
+          else
+            {
+              emitcode ("mov", "dpl,a");
+              MOVA (l);
+            }
           emitcode ("add", "a,#(!tlabel-3-.)", labelKey2num (jtabhi->key));
           emitcode ("movc", "a,@a+pc");
-          emitpush ("acc");
+          emitcode ("mov", "dph,a");
         }
       else
         {
-          /* this scales up to n<=255, but needs two more bytes
+          /* this scales up to n<=255, but needs four more bytes
              and changes dptr */
           emitcode ("mov", "dptr,#!tlabel", labelKey2num (jtablo->key));
           emitcode ("movc", "a,@a+dptr");
-          emitpush ("acc");
-
-          MOVA (l);
+          if (useB)
+            {
+              emitcode ("xch", "a,b");
+            }
+          else
+            {
+              emitpush ("acc");
+              MOVA (l);
+            }
           emitcode ("mov", "dptr,#!tlabel", labelKey2num (jtabhi->key));
           emitcode ("movc", "a,@a+dptr");
-          emitpush ("acc");
+          emitcode ("mov", "dph,a");
+          if (useB)
+            emitcode ("mov", "dpl,b");
+          else
+            emitpop ("dpl");
         }
 
-      emitDummyCall();
-      emitcode ("ret", "");
-      _G.stack.pushed -= 2;
+      emitcode ("clr", "a");
+      emitcode ("jmp", "@a+dptr");
 
       /* now generate jump table, LSB */
       emitLabel (jtablo);

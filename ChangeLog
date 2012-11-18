@@ -1,4 +1,12 @@
-2012-11-02 Molnar Karoly <molnarkaroly AT users.sf.net>
+2012-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (emitDummyCall): use temporary label,
+	  (genPcall): use temporary label call instead of pushes,
+	  (genJumpTab): optimized thresholds and always use jmp @a+dptr
+	* src/mcs51/peep.c (scan4op): detect lcall temporary label
+	* src/mcs51/ralloc.c: cosmetics
+
+2012-11-18 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/pic16-header-parser.pl:
           New capability: Handling of I/O pins of the peripheral.

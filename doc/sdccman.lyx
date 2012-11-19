@@ -1,9 +1,17 @@
-#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+#LyX 2.0.4 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
 \textclass book
 \begin_preamble
+% Added by lyx2lyx
+%  for proper underlining
+\PassOptionsToPackage{normalem}{ulem}
+\usepackage{ulem}
+\let\cite@rig\cite
+\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
+  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
+\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 % Added by lyx2lyx
 %  for proper underlining
 \PassOptionsToPackage{normalem}{ulem}
@@ -39,7 +47,6 @@
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \paperfontsize default
 \spacing single
@@ -58,15 +65,12 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\defskip medskip
 \quotes_language swedish
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
 \tracking_changes false
 \output_changes false
-\author "" 
-\author "" 
 \end_header
 
 \begin_body
@@ -10618,7 +10622,7 @@ status collapsed
 
 
 \series default
- Generate code for the Freescale/Motorola HC08 (aks 68HC08) 
+ Generate code for the Freescale/Motorola HC08 (aka 68HC08) 
 \begin_inset Index
 status collapsed
 
@@ -10647,7 +10651,7 @@ status collapsed
 
 
 \series default
- Generate code for the Freescale/Motorola S08 (aks 68HCS08, HCS08, CS08)
+ Generate code for the Freescale/Motorola S08 (aka 68HCS08, HCS08, CS08)
  
 \begin_inset Index
 status collapsed
@@ -13105,7 +13109,69 @@ status collapsed
  acall/ajmp.
  Only use this option if your code is in the same 2k block of memory.
  You may need to use this option for some 8051 derivatives which lack the
- lcall/ljmp instructions..
+ lcall/ljmp instructions.
+\end_layout
+
+\begin_layout List
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-ret-without-call
+\series default
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Index
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-ret-without-call
+\end_layout
+
+\end_inset
+
+ Causes the code generator to insert an extra lcall or acall instruction
+ whenever it needs to use a ret instruction in a context other than a function
+ returning.
+ This option is needed when using the Infineon
+\begin_inset Index
+status open
+
+\begin_layout Plain Layout
+Infineon
+\end_layout
+
+\end_inset
+
+ XC800 series microcontrollers to keep its Memory Extension Stack balanced.
 \end_layout
 
 \begin_layout Subsection
@@ -25585,7 +25651,7 @@ __endasm;
 \end_layout
 
 \begin_layout Verse
-or gor SDCC version 3.2.0 or newer:
+or for SDCC version 3.2.0 or newer:
 \end_layout
 
 \begin_layout Verse

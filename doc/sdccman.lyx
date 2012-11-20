@@ -12,14 +12,6 @@
 \newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
   \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
 \renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
-% Added by lyx2lyx
-%  for proper underlining
-\PassOptionsToPackage{normalem}{ulem}
-\usepackage{ulem}
-\let\cite@rig\cite
-\newcommand{\b@xcite}[2][\%]{\def\def@pt{\%}\def\pas@pt{#1}
-  \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
-\renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 \pdfoptionpdfminorversion=3
 \usepackage[
   pdftitle={SDCC Compiler User Guide},

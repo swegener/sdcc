@@ -469,6 +469,14 @@ void nicify(T_t &T)
 
   t = find_root(T);
 
+  // Ensure we have an empty bag at the root.
+  if(T[t].bag.size())
+  {
+    typename boost::graph_traits<T_t>::vertex_descriptor d = t;
+    t = add_vertex(T);
+    boost::add_edge(t, d, T);
+  }
+
   nicify_joins(T, t);
   nicify_diffs(T, t);
   nicify_diffs_more(T, t);

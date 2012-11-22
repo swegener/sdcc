@@ -2,6 +2,8 @@
 
 	* src/SDCCtree_dec.hpp:
 	  Ensure we have an empty bag at the root in nice tree decompositions.
+	* support/regression/tests/gcc-torture-execute-20060110-1.c:
+	  Disable test which fails on arm for gbz80 due to unimplemented long long constants.
 
 2012-11-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

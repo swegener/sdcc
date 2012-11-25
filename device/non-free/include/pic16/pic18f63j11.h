@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:58 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-25 18:48:09 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -2631,6 +2631,57 @@ extern __at(0x0FAC) volatile __TXSTA1bits_t TXSTA1bits;
 
 extern __at(0x0FAD) __sfr TXREG;
 extern __at(0x0FAD) __sfr TXREG1;
+
+//==============================================================================
+//        RCREG Bits
+
+extern __at(0x0FAE) __sfr RCREG;
+
+typedef union
+  {
+  struct
+    {
+    unsigned NOT_BOR            : 1;
+    unsigned NOT_POR            : 1;
+    unsigned NOT_PD             : 1;
+    unsigned NOT_TO             : 1;
+    unsigned NOT_RI             : 1;
+    unsigned NOT_CM             : 1;
+    unsigned                    : 1;
+    unsigned IPEN               : 1;
+    };
+
+  struct
+    {
+    unsigned BOR                : 1;
+    unsigned POR                : 1;
+    unsigned PD                 : 1;
+    unsigned TO                 : 1;
+    unsigned RI                 : 1;
+    unsigned CM                 : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+  } __RCREGbits_t;
+
+extern __at(0x0FAE) volatile __RCREGbits_t RCREGbits;
+
+#define _RCREG_NOT_BOR          0x01
+#define _RCREG_BOR              0x01
+#define _RCREG_NOT_POR          0x02
+#define _RCREG_POR              0x02
+#define _RCREG_NOT_PD           0x04
+#define _RCREG_PD               0x04
+#define _RCREG_NOT_TO           0x08
+#define _RCREG_TO               0x08
+#define _RCREG_NOT_RI           0x10
+#define _RCREG_RI               0x10
+#define _RCREG_NOT_CM           0x20
+#define _RCREG_CM               0x20
+#define _RCREG_IPEN             0x80
+
+//==============================================================================
+
 extern __at(0x0FAE) __sfr RCREG1;
 extern __at(0x0FAF) __sfr SPBRG;
 extern __at(0x0FAF) __sfr SPBRG1;
@@ -3589,57 +3640,6 @@ extern __at(0x0FD0) volatile __RCONbits_t RCONbits;
 #define _NOT_CM                 0x20
 #define _CM                     0x20
 #define _IPEN                   0x80
-
-//==============================================================================
-
-
-//==============================================================================
-//        RCREG Bits
-
-extern __at(0x0FD0) __sfr RCREG;
-
-typedef union
-  {
-  struct
-    {
-    unsigned NOT_BOR            : 1;
-    unsigned NOT_POR            : 1;
-    unsigned NOT_PD             : 1;
-    unsigned NOT_TO             : 1;
-    unsigned NOT_RI             : 1;
-    unsigned NOT_CM             : 1;
-    unsigned                    : 1;
-    unsigned IPEN               : 1;
-    };
-
-  struct
-    {
-    unsigned BOR                : 1;
-    unsigned POR                : 1;
-    unsigned PD                 : 1;
-    unsigned TO                 : 1;
-    unsigned RI                 : 1;
-    unsigned CM                 : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-  } __RCREGbits_t;
-
-extern __at(0x0FD0) volatile __RCREGbits_t RCREGbits;
-
-#define _RCREG_NOT_BOR          0x01
-#define _RCREG_BOR              0x01
-#define _RCREG_NOT_POR          0x02
-#define _RCREG_POR              0x02
-#define _RCREG_NOT_PD           0x04
-#define _RCREG_PD               0x04
-#define _RCREG_NOT_TO           0x08
-#define _RCREG_TO               0x08
-#define _RCREG_NOT_RI           0x10
-#define _RCREG_RI               0x10
-#define _RCREG_NOT_CM           0x20
-#define _RCREG_CM               0x20
-#define _RCREG_IPEN             0x80
 
 //==============================================================================
 

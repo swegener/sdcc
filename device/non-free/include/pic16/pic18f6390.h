@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:58 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-11-25 20:06:28 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -3850,51 +3850,6 @@ extern __at(0x0FA0) volatile __PIE2bits_t PIE2bits;
 
 
 //==============================================================================
-//        RCREG Bits
-
-extern __at(0x0FA0) __sfr RCREG;
-
-typedef union
-  {
-  struct
-    {
-    unsigned CCP2IE             : 1;
-    unsigned TMR3IE             : 1;
-    unsigned HLVDIE             : 1;
-    unsigned BCLIE              : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned CMIE               : 1;
-    unsigned OSCFIE             : 1;
-    };
-
-  struct
-    {
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned LVDIE              : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-  } __RCREGbits_t;
-
-extern __at(0x0FA0) volatile __RCREGbits_t RCREGbits;
-
-#define _RCREG_CCP2IE           0x01
-#define _RCREG_TMR3IE           0x02
-#define _RCREG_HLVDIE           0x04
-#define _RCREG_LVDIE            0x04
-#define _RCREG_BCLIE            0x08
-#define _RCREG_CMIE             0x40
-#define _RCREG_OSCFIE           0x80
-
-//==============================================================================
-
-
-//==============================================================================
 //        PIR2 Bits
 
 extern __at(0x0FA1) __sfr PIR2;
@@ -4305,6 +4260,51 @@ extern __at(0x0FAC) volatile __TXSTA1bits_t TXSTA1bits;
 
 extern __at(0x0FAD) __sfr TXREG;
 extern __at(0x0FAD) __sfr TXREG1;
+
+//==============================================================================
+//        RCREG Bits
+
+extern __at(0x0FAE) __sfr RCREG;
+
+typedef union
+  {
+  struct
+    {
+    unsigned CCP2IE             : 1;
+    unsigned TMR3IE             : 1;
+    unsigned HLVDIE             : 1;
+    unsigned BCLIE              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned CMIE               : 1;
+    unsigned OSCFIE             : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned LVDIE              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+  } __RCREGbits_t;
+
+extern __at(0x0FAE) volatile __RCREGbits_t RCREGbits;
+
+#define _RCREG_CCP2IE           0x01
+#define _RCREG_TMR3IE           0x02
+#define _RCREG_HLVDIE           0x04
+#define _RCREG_LVDIE            0x04
+#define _RCREG_BCLIE            0x08
+#define _RCREG_CMIE             0x40
+#define _RCREG_OSCFIE           0x80
+
+//==============================================================================
+
 extern __at(0x0FAE) __sfr RCREG1;
 extern __at(0x0FAF) __sfr SPBRG;
 extern __at(0x0FAF) __sfr SPBRG1;

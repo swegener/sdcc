@@ -1,4 +1,9 @@
 2012-11-25 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/non-free/include/pic16/pic18f6390.h,
+	  device/non-free/lib/pic16/libdev/pic18f6390.c:
+	  Repaired wrong address of RCREG, 0x0FA0 --> 0x0FAE.
+
+2012-11-25 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/non-free/include/pic16/pic18f63j11.h,
 	  device/non-free/lib/pic16/libdev/pic18f63j11.c:
 	  Repaired wrong address of RCREG, 0x0FD0 --> 0x0FAE.

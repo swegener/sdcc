@@ -166,4 +166,8 @@ bool convertIListToConstList (initList * src, literalList ** lList, int size);
 literalList *copyLiteralList (literalList * src);
 unsigned long double2ul (double val);
 unsigned char byteOfVal (value *, int);
+int isEqualVal (value *, int);
+TYPE_TARGET_ULONGLONG ullFromLit (sym_link * lit);
+value * valRecastLitVal (sym_link * dtype, value * val);
+
 #endif

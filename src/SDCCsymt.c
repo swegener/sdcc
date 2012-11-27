@@ -1117,7 +1117,11 @@ bitsForType (sym_link * p)
       switch (SPEC_NOUN (p))
         {                       /* depending on the specifier type */
         case V_INT:
-          return (IS_LONG (p) ? LONGSIZE * 8 : INTSIZE * 8);
+          if (IS_LONGLONG (p))
+            return LONGLONGSIZE * 8;
+          if (IS_LONG (p))
+            return LONGSIZE * 8;
+          return INTSIZE * 8;
         case V_FLOAT:
           return FLOATSIZE * 8;
         case V_FIXED16X16:

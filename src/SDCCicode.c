@@ -1189,6 +1189,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
       ret = getSpec (operandType (right));
     }
 
+  /* FIXME: most of these are not long long safe yet */
   switch (op)
     {
     case '+':
@@ -1295,16 +1296,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
     case RIGHT_OP:
       /* The number of right shifts is always unsigned. Signed doesn't make
          sense here. Shifting by a negative number is impossible. */
-      if (IS_UNSIGNED (let))
-        /* unsigned: logic shift right */
-        retval = operandFromValue (valCastLiteral (type,
-                                                   ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) >>
-                                                    (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)))));
-      else
-        /* signed: arithmetic shift right */
-        retval = operandFromValue (valCastLiteral (type,
-                                                   ((TYPE_TARGET_LONG) operandLitValue (left) >>
-                                                    (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)))));
+      retval = operandFromValue (valRecastLitVal (type, valShift (OP_VALUE (left), OP_VALUE (right), 0)));
       break;
     case EQ_OP:
       if (IS_FLOAT (let) || IS_FLOAT (ret))

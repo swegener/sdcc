@@ -1,3 +1,11 @@
+2012-11-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (algebraicOpts),
+	* src/SDCCicode.c (operandOperation),
+	* src/SDCCsymt.c (bitsForType),
+	* src/SDCCval.h,
+	* src/SDCCval.c: working towards long long constant support
+
 2012-11-25 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/non-free/include/pic16/pic18f6390.h,
 	  device/non-free/lib/pic16/libdev/pic18f6390.c:

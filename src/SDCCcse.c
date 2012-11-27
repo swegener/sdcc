@@ -956,7 +956,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       /* if addition then check if one of them is a zero */
       /* if yes turn it into assignment or cast */
       if (IS_OP_LITERAL (IC_LEFT (ic)) &&
-          operandLitValue (IC_LEFT (ic)) == 0.0)
+          isEqualVal (OP_VALUE (IC_LEFT (ic)), 0))
         {
           int typematch;
           typematch = compareType (operandType (IC_RESULT (ic)),
@@ -982,7 +982,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           return;
         }
       if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
-          operandLitValue (IC_RIGHT (ic)) == 0.0)
+          isEqualVal (OP_VALUE (IC_RIGHT (ic)), 0))
         {
           int typematch;
           typematch = compareType (operandType (IC_RESULT (ic)),
@@ -1026,7 +1026,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       /* is zero then depending on which operand change  */
       /* to assignment or unary minus                    */
       if (IS_OP_LITERAL (IC_RIGHT (ic)) &&
-          operandLitValue (IC_RIGHT (ic)) == 0.0)
+          isEqualVal (OP_VALUE (IC_RIGHT (ic)), 0))
         {
           /* right size zero change to assignment */
           ic->op = '=';
@@ -1037,7 +1037,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           return;
         }
       if (IS_OP_LITERAL (IC_LEFT (ic)) &&
-          operandLitValue (IC_LEFT (ic)) == 0.0)
+          isEqualVal (OP_VALUE (IC_LEFT (ic)), 0))
         {
           /* left zero turn into an unary minus */
           ic->op = UNARYMINUS;
@@ -1053,9 +1053,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
     case '*':
       if (IS_OP_LITERAL (IC_LEFT (ic)))
         {
-          double leftValue = operandLitValue (IC_LEFT (ic));
-
-          if (leftValue == 0.0)
+          if (isEqualVal (OP_VALUE (IC_LEFT (ic)), 0))
             {
               ic->op = '=';
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -1063,7 +1061,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               SET_RESULT_RIGHT (ic);
               return;
             }
-          if (leftValue == 1.0)
+          if (isEqualVal (OP_VALUE (IC_LEFT (ic)), 1))
             {
               /* '*' can have two unsigned chars as operands */
               /* and an unsigned int as result.              */
@@ -1084,7 +1082,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                 }
               return;
             }
-          if (leftValue == -1.0)
+          if (isEqualVal (OP_VALUE (IC_LEFT (ic)), -1))
             {
               /* convert -1 * x to -x */
               ic->op = UNARYMINUS;
@@ -1096,9 +1094,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 
       if (IS_OP_LITERAL (IC_RIGHT (ic)))
         {
-          double rightValue = operandLitValue (IC_RIGHT (ic));
-
-          if (rightValue == 0.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), 0))
             {
               ic->op = '=';
               IC_LEFT (ic) = NULL;
@@ -1106,7 +1102,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               return;
             }
 
-          if (rightValue == 1.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), 1))
             {
               /* '*' can have two unsigned chars as operands */
               /* and an unsigned int as result.              */
@@ -1132,7 +1128,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                 }
               return;
             }
-          if (rightValue == -1.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), -1))
             {
               /* '*' can have two unsigned chars as operands */
               /* and an unsigned int as result.              */
@@ -1173,7 +1169,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
         }
       /* if this is a division then check if left is zero */
       /* then change it to an assignment */
-      if (IS_OP_LITERAL (IC_LEFT (ic)) &&  (operandLitValue (IC_LEFT (ic)) == 0.0))
+      if (IS_OP_LITERAL (IC_LEFT (ic)) && isEqualVal (OP_VALUE (IC_LEFT (ic)), 0))
         {
           ic->op = '=';
           IC_RIGHT (ic) = IC_LEFT (ic);
@@ -1185,8 +1181,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       /* is one then change it to an assignment    */
       if (IS_OP_LITERAL (IC_RIGHT (ic)))
         {
-          double rightValue = operandLitValue (IC_RIGHT (ic));
-          if (rightValue == 1.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), 1))
             {
               ic->op = '=';
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -1194,7 +1189,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
               SET_RESULT_RIGHT (ic);
               return;
             }
-          if (rightValue == -1.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), -1))
             {
               /* '/' can have two unsigned chars as operands */
               /* and an unsigned int as result.              */
@@ -1284,7 +1279,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
         {
           ic->op = '=';
           IC_RIGHT (ic) =
-            (operandLitValue (IC_LEFT (ic)) == 0 ?
+            (isEqualVal (OP_VALUE (IC_LEFT (ic)), 0) ?
              operandFromLit (1) : operandFromLit (0));
           IC_LEFT (ic) = NULL;
           SET_ISADDR (IC_RESULT (ic), 0);
@@ -1323,7 +1318,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 
           /* if BITWISEAND then check if one of them is a zero */
           /* if yes turn it into 0 assignment */
-          if (operandLitValue (IC_RIGHT (ic)) == 0.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), 0))
             {
               if (IS_OP_VOLATILE (IC_LEFT (ic)))
                 {
@@ -1400,7 +1395,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 
           /* if BITWISEOR then check if one of them is a zero */
           /* if yes turn it into assignment */
-          if (operandLitValue (IC_RIGHT (ic)) == 0.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), 0))
             {
               ic->op = '=';
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -1482,7 +1477,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       /* if yes turn it into assignment */
       if (IS_OP_LITERAL (IC_RIGHT (ic)))
         {
-          if (operandLitValue (IC_RIGHT (ic)) == 0.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), 0))
             {
               ic->op = '=';
               IC_RIGHT (ic) = IC_LEFT (ic);
@@ -1498,8 +1493,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
           IS_BOOLEAN (operandType (IC_RESULT (ic)))
          )
         {
-          double litval = operandLitValue (IC_RIGHT (ic));
-          if (litval == 1.0)
+          if (isEqualVal (OP_VALUE (IC_RIGHT (ic)), 1))
             {
               ic->op = '!';
               IC_RIGHT (ic) = NULL;

@@ -1,3 +1,7 @@
+2012-12-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCC.y (labeled_statement): fixed bug #3590884
+
 2012-11-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (algebraicOpts),

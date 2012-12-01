@@ -127,7 +127,7 @@ bool uselessDecl = TRUE;
 %type <asts> statement_list statement labeled_statement compound_statement
 %type <asts> expression_statement selection_statement iteration_statement
 %type <asts> jump_statement function_body else_statement string_literal_val
-%type <asts> critical_statement asm_statement
+%type <asts> critical_statement asm_statement label
 %type <dsgn> designator designator_list designation designation_opt
 %type <ilist> initializer initializer_list
 %type <yyint> unary_operator assignment_operator struct_or_union
@@ -1603,7 +1603,19 @@ critical_statement
    ;
 
 labeled_statement
-//   : identifier ':' statement          {  $$ = createLabel($1,$3);  }
+   : label statement  { $$ = $1; $1->right = $2; }
+   | label '}'
+     { /* Support a label without a statement at the end of a */
+       /* compound statement as a SDCC extension. Include the */
+       /* closing brace as part of the rule to avoid an */
+       /* unacceptably large number of shift/reduce conflicts */
+       /* and then reinsert it to be parsed a second time. */
+       $$ = $1;
+       yychar = '}';
+     };
+    ;
+
+label
    : identifier ':'                    {  $$ = createLabel($1,NULL);
                                           $1->isitmp = 0;  }
    | CASE constant_expr ':'

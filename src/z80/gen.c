@@ -1907,7 +1907,7 @@ makeFreePairId (const iCode * ic, bool * pisUsed)
 
 /* If ic != 0, we can safely use isPairDead(). */
 static void
-fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
+fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
 {
   emitDebug (";fetchPairLong");
 
@@ -2068,9 +2068,8 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
                   regalloc_dry_run_cost += 1;
                 }
             }
-
           /* Operand resides (partially) in the pair */
-          else if (!regalloc_dry_run && !strcmp (aopGet (aop, offset + 1, FALSE), _pairs[pairId].l))    // aopGet (aop, offset + 1, FALSE) is problematic: It prevents calcualtion of exact cost, and results in redundatn code being generated. Todo: Exact cost
+          else if (!regalloc_dry_run && !strcmp (aopGet (aop, offset + 1, FALSE), _pairs[pairId].l))    // aopGet (aop, offset + 1, FALSE) is problematic: It prevents calculation of exact cost, and results in redundant code being generated. Todo: Exact cost
             {
               _moveA3 (aop, offset + 1);
               if (!regalloc_dry_run)
@@ -2087,6 +2086,51 @@ fetchPairLong (PAIR_ID pairId, asmop * aop, const iCode * ic, int offset)
               if (!regalloc_dry_run)
                 emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
               regalloc_dry_run_cost += ld_cost (ASMOP_L, aop);
+            }
+          else if (pairId == PAIR_HL && aop->type == AOP_REG && aop->size - offset >= 2 && aop->aopu.aop_reg[offset]->rIdx != H_IDX && aop->aopu.aop_reg[offset + 1]->rIdx != L_IDX)
+            {
+              if (aop->aopu.aop_reg[offset + 0]->rIdx != L_IDX)
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("ld l, %s", aopGet (aop, offset + 0, FALSE));
+                  regalloc_dry_run_cost++;
+                }
+              if (aop->aopu.aop_reg[offset + 1]->rIdx != H_IDX)
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("ld h, %s", aopGet (aop, offset + 1, FALSE));
+                  regalloc_dry_run_cost++;
+                }
+            }
+          else if (pairId == PAIR_DE && aop->type == AOP_REG && aop->size - offset >= 2 && aop->aopu.aop_reg[offset]->rIdx != D_IDX && aop->aopu.aop_reg[offset + 1]->rIdx != E_IDX)
+            {
+              if (aop->aopu.aop_reg[offset + 0]->rIdx != E_IDX)
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("ld e, %s", aopGet (aop, offset + 0, FALSE));
+                  regalloc_dry_run_cost++;
+                }
+              if (aop->aopu.aop_reg[offset + 1]->rIdx != D_IDX)
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("ld d, %s", aopGet (aop, offset + 1, FALSE));
+                  regalloc_dry_run_cost++;
+                }
+            }
+          else if (pairId == PAIR_BC && aop->type == AOP_REG && aop->size - offset >= 2 && aop->aopu.aop_reg[offset]->rIdx != B_IDX && aop->aopu.aop_reg[offset + 1]->rIdx != C_IDX)
+            {
+              if (aop->aopu.aop_reg[offset + 0]->rIdx != C_IDX)
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("ld c, %s", aopGet (aop, offset + 0, FALSE));
+                  regalloc_dry_run_cost++;
+                }
+              if (aop->aopu.aop_reg[offset + 1]->rIdx != B_IDX)
+                {
+                  if (!regalloc_dry_run)
+                    emit2 ("ld b, %s", aopGet (aop, offset + 1, FALSE));
+                  regalloc_dry_run_cost++;
+                }
             }
           else
             {

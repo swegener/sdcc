@@ -1,3 +1,8 @@
+2012-12-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Do not generate redundant loads when fetching pair from regs.
+
 2012-12-02 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* support/scripts/cinc2h.pl,
 	  support/scripts/pic14-header-parser.pl,

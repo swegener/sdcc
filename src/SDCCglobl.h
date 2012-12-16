@@ -163,7 +163,7 @@ typedef unsigned char bool;
     int   type##StackPtr = 0      ;
 
 #define PUSH(x,y)   x##FreeStack[x##StackPtr++] = y
-#define PEEK(x)     x##FreeStack[x##StackPtr-1]
+#define PEEK(x)     x##FreeStack[x##StackPtr - 1]
 #define POP(type)   type##FreeStack[--type##StackPtr]
 /* #define POP(x)    (x##StackPtr ? x##FreeStack[--x##StackPtr] :       \
    (assert(x##StackPtr),0)) */
@@ -314,7 +314,7 @@ struct options
     int stack_size;             /* MCS51/DS390 - Tells the linker to allocate this space for stack */
     int no_pack_iram;           /* MCS51/DS390 - Deprecated: Tells the linker not to pack variables in internal ram */
     int acall_ajmp;             /* MCS51 - Use acall/ajmp instead of lcall/ljmp */
-    int no_ret_without_call;	/* MCS51 - Do not use ret independent of acall/lcall */
+    int no_ret_without_call;    /* MCS51 - Do not use ret independent of acall/lcall */
     int use_non_free;           /* Search / include non-free licensed libraries and header files */
     /* starting address of the segments */
     int xstack_loc;             /* initial location of external stack */
@@ -344,6 +344,7 @@ struct options
     int unsigned_char;          /* use unsigned for char without signed/unsigned modifier */
     char *code_seg;             /* segment name to use instead of CSEG */
     char *const_seg;            /* segment name to use instead of CONST */
+    int trigraphs;              /* sdcpp replaces ISO C trigraphs by their single-character equivalents */
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */
@@ -399,23 +400,25 @@ void setParseWithComma (set **, const char *);
     system.
 */
 #define wassertl(a,s)   ((a) ? 0 : \
-        (werror (E_INTERNAL_ERROR,__FILE__,__LINE__, s), 0))
+        (werror (E_INTERNAL_ERROR, __FILE__, __LINE__, s), 0))
 
 #define wassert(a)    wassertl(a,"code generator internal error")
 
-#define DUMP_RAW0     1
-#define DUMP_RAW1     DUMP_RAW0+1
-#define DUMP_CSE      DUMP_RAW1+1
-#define DUMP_DFLOW    DUMP_CSE+1
-#define DUMP_GCSE     DUMP_DFLOW+1
-#define DUMP_DEADCODE DUMP_GCSE+1
-#define DUMP_LOOP     DUMP_DEADCODE+1
-#define DUMP_LOOPG    DUMP_LOOP+1
-#define DUMP_LOOPD    DUMP_LOOPG+1
-#define DUMP_RANGE    DUMP_LOOPD+1
-#define DUMP_PACK     DUMP_RANGE+1
-#define DUMP_RASSGN   DUMP_PACK+1
-#define DUMP_LRANGE   DUMP_RASSGN+1
+enum {
+  DUMP_RAW0 = 1,
+  DUMP_RAW1,
+  DUMP_CSE,
+  DUMP_DFLOW,
+  DUMP_GCSE,
+  DUMP_DEADCODE,
+  DUMP_LOOP,
+  DUMP_LOOPG,
+  DUMP_LOOPD,
+  DUMP_RANGE,
+  DUMP_PACK,
+  DUMP_RASSGN,
+  DUMP_LRANGE
+};
 
 struct _dumpFiles {
   int id;

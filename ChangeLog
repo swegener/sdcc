@@ -1,3 +1,8 @@
+2012-12-16 Borut Razem <borut.razem AT gmail.com>
+
+	* src/SDCCglobl.h, src/SDCCmain.c:
+	  fixed bug 3572584 - "Trigraphs don't work"
+
 2012-12-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

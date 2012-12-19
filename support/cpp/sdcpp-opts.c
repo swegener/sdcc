@@ -206,7 +206,7 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       result = 0;
       break;
 
-#if 0 // pch not supported by sdcpp
+#if 0 /* pch not supported by sdcpp */
     case OPT__output_pch_:
       pch_file = arg;
       break;
@@ -496,8 +496,9 @@ sdcpp_common_handle_option (size_t scode, const char *arg, int value)
       set_std_c99 (true /* ISO */);
       break;
 
-    case OPT_trigraphs:
-      cpp_opts->trigraphs = 1;
+    case OPT_no_trigraphs:
+      /* trigraphs enabled by default on sdcpp, -no-trgraphs disables them */
+      cpp_opts->trigraphs = 0;
       break;
 
     case OPT_traditional_cpp:

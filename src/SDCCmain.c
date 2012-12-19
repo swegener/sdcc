@@ -150,7 +150,6 @@ char buffer[PATH_MAX * 2];
 #define OPTION_MAX_ALLOCS_PER_NODE  "--max-allocs-per-node"
 #define OPTION_NO_LOSPRE        "--nolospre"
 #define OPTION_LOSPRE_UNSAFE_READ "--lospre-unsafe-read"
-#define OPTION_TRIGRAPHS        "--trigraphs"
 
 static const OPTION optionsTable[] = {
   {0,   NULL, NULL, "General options"},
@@ -188,7 +187,6 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
   {0,   OPTION_UNSIGNED_CHAR, &options.unsigned_char, "Make \"char\" unsigned by default"},
   {0,   OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
-  {0,   OPTION_TRIGRAPHS, &options.trigraphs, "Support ISO C trigraphs"},
 
   {0,   NULL, NULL, "Code generation options"},
   {'m', NULL, NULL, "Set the port to use e.g. -mz80."},
@@ -1954,10 +1952,6 @@ preProcess (char **envp)
       /* if using dollar signs in identifiers */
       if (options.dollars_in_ident)
         addSet (&preArgvSet, Safe_strdup ("-fdollars-in-identifiers"));
-
-      /* if using dollar signs in identifiers */
-      if (options.trigraphs)
-        addSet (&preArgvSet, Safe_strdup ("-trigraphs"));
 
       /* if using external stack define the macro */
       if (options.useXstack)

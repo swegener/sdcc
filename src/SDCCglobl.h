@@ -344,7 +344,6 @@ struct options
     int unsigned_char;          /* use unsigned for char without signed/unsigned modifier */
     char *code_seg;             /* segment name to use instead of CSEG */
     char *const_seg;            /* segment name to use instead of CONST */
-    int trigraphs;              /* sdcpp replaces ISO C trigraphs by their single-character equivalents */
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */

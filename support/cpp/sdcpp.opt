@@ -312,9 +312,10 @@ traditional-cpp
 SDCPP
 Enable traditional preprocessing
 
-trigraphs
+;*** ISO C trigraphs are enabled by default on sdcpp
+no-trigraphs
 SDCPP
--trigraphs	Support ISO C trigraphs
+-no-trigraphs	Disble ISO C trigraphs support
 
 v
 SDCPP

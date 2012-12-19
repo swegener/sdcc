@@ -1037,7 +1037,7 @@ static void good_re_root(T_t &T)
 
   if (T[t].alive.size())
     {
-      std::cout << "Error: Invalid root.\n";
+      std::cerr << "Error: Invalid root.\n";
       return;
     }
 

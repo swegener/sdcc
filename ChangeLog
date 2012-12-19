@@ -1,3 +1,8 @@
+2012-12-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCralloc.hpp:
+	  Send error message about invalid root to crr instead of cout.
+
 2012-12-19 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCmain.c, src/SDCCglobl.h, support/cpp/sdcpp.opt,

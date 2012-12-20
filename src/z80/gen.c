@@ -9464,7 +9464,7 @@ genPointerGet (const iCode *ic)
             }
         }
       /* Fixup HL back down */
-      if (getPairId (AOP (left)) == pair && !isPairDead (pair, ic))
+      if (getPairId (AOP (left)) == pair && !isPairDead (pair, ic) && !pushed_pair)
         for (size = AOP_SIZE (result) - 1; size; size--)
           {
             emit2 ("dec %s", _pairs[pair].name);

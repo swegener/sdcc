@@ -775,6 +775,7 @@ loop:   if (asmc == NULL) return(0);
                 break;
 
         default:
+                len = 0;
                 fprintf(stderr, "?ASxxxx-Internal-nxtline(objtyp)-Error.\n\n");
                 asexit(ER_FATAL);
                 break;

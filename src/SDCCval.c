@@ -1247,7 +1247,7 @@ constVal (const char *s)
               else
                 {
                   SPEC_LONGLONG (val->type) = 1;
-                  if (is_integral && (llval & 0x8000000000000000))
+                  if (is_integral && (llval & 0x8000000000000000ull))
                     SPEC_USIGN (val->type) = 1;
                   werror (W_LONGLONG_LITERAL, p); 
                 }

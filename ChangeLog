@@ -1,3 +1,8 @@
+2012-12-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCval.c (constVal),
+	* sdas/asxxsrc/aslex.c (nxtline): fixed warnings
+
 2012-12-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCralloc.hpp:

@@ -55,6 +55,7 @@ static char *_pic14_keywords[] =
   "far",
   "idata",
   "interrupt",
+  "naked",
   "near",
   "pdata",
   "reentrant",
@@ -62,13 +63,6 @@ static char *_pic14_keywords[] =
   //"sbit",
   "using",
   "xdata",
-  "_data",
-  "_code",
-  "_generic",
-  "_near",
-  "_xdata",
-  "_pdata",
-  "_idata",
   NULL
 };
 

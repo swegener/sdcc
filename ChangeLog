@@ -5,7 +5,7 @@
 	* src/SDCCsymt.h,
 	* src/SDCCast.c,
 	* src/SDCCast.h: Fixed some scope related bugs including
-	  #319029 (improved previous fix), #3513308, and #3511513
+	  #3190029 (improved previous fix), #3513308, and #3511513
 	* support/regression/tests/gcc-torture-execute-960116-1.c:
 	  re-enabled test
 

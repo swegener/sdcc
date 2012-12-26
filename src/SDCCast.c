@@ -6626,33 +6626,27 @@ expandInlineFuncs (ast * tree, ast * block)
     }
 }
 
-/*-----------------------------------------------------------------*/
-/* createFunction - This is the key node that calls the iCode for  */
-/*                  generating the code for a function. Note code  */
-/*                  is generated function by function, later when  */
-/*                  add inter-procedural analysis this will change */
-/*-----------------------------------------------------------------*/
-ast *
-createFunction (symbol * name, ast * body)
+/*------------------------------------------------------------*/
+/* createFunctionDecl - Handle all of a function declaration  */
+/*                      except for the function body.         */
+/*------------------------------------------------------------*/
+symbol *
+createFunctionDecl (symbol * name)
 {
-  ast *ex;
   symbol *csym;
-  int stack = 0;
-  sym_link *fetype;
-  iCode *piCode = NULL;
-
-  if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
-    fprintf (stderr, "SDCCast.c:createFunction(%s)\n", name->name);
+  value *args;
+  sym_link *type;
 
   /* if check function return 0 then some problem */
   if (checkFunction (name, NULL) == 0)
     return NULL;
 
-  /* create a dummy block if none exists */
-  if (!body)
-    body = newNode (BLOCK, NULL, NULL);
-
-  noLineno++;
+  /* Find the arguments in this declaration, if any */
+  type = name->type;
+  while (type && !IS_FUNC(type))
+    type = type->next;
+  assert (type);
+  args = FUNC_ARGS (type);
 
   /* check if the function name already in the symbol table */
   if ((csym = findSym (SymbolTab, NULL, name->name)))
@@ -6672,6 +6666,46 @@ createFunction (symbol * name, ast * body)
       addSymChain (&name);
       allocVariables (name);
     }
+
+  /* Now that the function name is in the symbol table, */
+  /* add the names of the arguments */
+  while (args)
+    {
+      if (args->sym)
+        addSymChain (&args->sym);
+      args = args->next;
+    }
+
+  return name;
+}
+
+/*-----------------------------------------------------------------*/
+/* createFunction - This is the key node that calls the iCode for  */
+/*                  generating the code for a function. Note code  */
+/*                  is generated function by function, later when  */
+/*                  add inter-procedural analysis this will change */
+/*-----------------------------------------------------------------*/
+ast *
+createFunction (symbol * name, ast * body)
+{
+  ast *ex;
+  symbol *csym;
+  int stack = 0;
+  sym_link *fetype;
+  iCode *piCode = NULL;
+
+  if (!name)
+    return NULL;
+
+  if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
+    fprintf (stderr, "SDCCast.c:createFunction(%s)\n", name->name);
+
+  /* create a dummy block if none exists */
+  if (!body)
+    body = newNode (BLOCK, NULL, NULL);
+
+  noLineno++;
+
   name->lastLine = lexLineno;
   currFunc = name;
 

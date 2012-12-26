@@ -285,6 +285,7 @@ typedef struct symbol
 
   short level;                      /* declaration lev,fld offset */
   short block;                      /* sequential block # of definition */
+  int seqPoint;                     /* sequence point defined or, if unbound, used */
   int key;
   unsigned flexArrayLength;         /* if the symbol specifies a struct
                                        with a "flexible array member", then the additional length in bytes for

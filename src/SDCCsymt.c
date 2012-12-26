@@ -271,11 +271,13 @@ findSymWithLevel (bucket ** stab, symbol * sym)
           if (((symbol *) (bp->sym))->_isparm)
             return (bp->sym);
           /* if levels match then block numbers should also match */
-          if (bp->level && bp->level == sym->level && bp->block == sym->block)
+          if (bp->level && bp->level == sym->level && bp->block == sym->block
+              && ((symbol *)(bp->sym))->seqPoint <= sym->seqPoint)
             return (bp->sym);
           /* if levels don't match then we are okay if the symbol is in scope */
           if (bp->level && bp->level != sym->level && bp->block <= sym->block
-              && ((symbol *) (bp->sym))->isinscope)
+              && ((symbol *) (bp->sym))->isinscope
+              && (stab == LabelTab || ((symbol *)(bp->sym))->seqPoint <= sym->seqPoint))
             return (bp->sym);
           /* if this is a global variable then we are ok too */
           if (bp->level == 0)
@@ -323,6 +325,7 @@ newSymbol (const char *name, int scope)
   strncpyz (sym->name, name, sizeof (sym->name));       /* copy the name */
   sym->level = scope;           /* set the level */
   sym->block = currBlockno;
+  sym->seqPoint = seqPointNo;
   sym->lineDef = lexLineno;     /* set the line number */
   sym->fileDef = lexFilename;
   sym->for_newralloc = 0;
@@ -2960,7 +2963,7 @@ checkFunction (symbol * sym, symbol * csym)
   /*JCF: Mark the register bank as used */
   RegBankUsed[FUNC_REGBANK (sym->type)] = 1;
 
-  if (!csym && !(csym = findSym (SymbolTab, sym, sym->name)))
+  if (!csym && !(csym = findSymWithLevel (SymbolTab, sym)))
     return 1;                   /* not defined nothing more to check  */
 
   /* check if body already present */

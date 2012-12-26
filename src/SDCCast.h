@@ -200,6 +200,7 @@ value *sizeofOp (sym_link *);
 ast *offsetofOp (sym_link * type, ast * snd);
 value *evalStmnt (ast *);
 ast *createRMW (ast *, unsigned, ast *);
+symbol * createFunctionDecl (symbol *);
 ast *createFunction (symbol *, ast *);
 ast *createBlock (symbol *, ast *);
 ast *createLabel (symbol *, ast *);

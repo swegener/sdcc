@@ -8,7 +8,6 @@
 #pragma std_c99
 #endif
 
-#if 0
 static inline int
 p (int *p)
 {
@@ -22,15 +21,12 @@ f (int *q)
     return 1;
   return 0;
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if 0
   if (f ((int*) 0xffffffff) != 0)
     ASSERT (0);
   return;
-#endif
 }
 

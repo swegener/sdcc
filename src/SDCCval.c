@@ -31,6 +31,12 @@
 #include "newalloc.h"
 #include "dbuf_string.h"
 
+// See http://connect.microsoft.com/VisualStudio/feedback/details/758053/missing-strtold-strtoll-strtoull-functions-from-stdlib-h
+#ifdef _MSC_VER
+#define strtoll     _strtoi64
+#define strtoull    _strtoui64
+#endif
+
 int cNestLevel;
 
 

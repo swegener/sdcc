@@ -8,7 +8,10 @@
 #pragma std_c99
 #endif
 
-#if 0 // Broken
+/* Since these tests use function pointers with multiple parameters */
+/* we can only proceed if we are compiling reentrant functions. */
+
+#ifdef __SDCC_STACK_AUTO
 
 /* Originally added to test SH constant pool layout.  t1() failed for
    non-PIC and t2() failed for PIC.  */
@@ -55,7 +58,7 @@ void f3 (float f)
 void
 testTortureExecute (void)
 {
-#if 0
+#if __SDCC_STACK_AUTO
   float f[3] = { 2.0f, 3.0f, 4.0f };
   t1 (f, 0, f1, f2);
   t2 (f, 1, f1, f2, f3);

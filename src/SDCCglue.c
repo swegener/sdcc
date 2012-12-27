@@ -1745,7 +1745,7 @@ emitOverlay (struct dbuf_s *aBuf)
 
               if (size == 0)
                 {
-                  werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE);
+                  werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
                 }
               if (options.debug)
                 dbuf_printf (aBuf, "==.\n");

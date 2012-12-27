@@ -35,6 +35,7 @@
 #include "newalloc.h"
 #include "SDCCerr.h"
 #include "SDCCutil.h"
+#include "SDCCbtree.h"
 
 extern int yyerror (char *);
 extern FILE     *yyin;
@@ -1284,7 +1285,8 @@ function_declarator2
         {
           NestLevel++;
           STACK_PUSH(blockNum, currBlockno);
-          currBlockno = ++blockNo;
+          btree_add_child(currBlockno, ++blockNo);
+          currBlockno = blockNo;
           seqPointNo++; /* not a true sequence point, but helps resolve scope */
         }
      parameter_type_list ')'
@@ -1538,7 +1540,8 @@ abstract_declarator2
         {
           NestLevel++;
           STACK_PUSH(blockNum, currBlockno);
-          currBlockno = ++blockNo;
+          btree_add_child(currBlockno, ++blockNo);
+          currBlockno = blockNo;
         }
      parameter_type_list ')'
         {
@@ -1644,7 +1647,8 @@ start_block
         {
           NestLevel++;
           STACK_PUSH(blockNum, currBlockno);
-          currBlockno = ++blockNo;
+          btree_add_child(currBlockno, ++blockNo);
+          currBlockno = blockNo;
           ignoreTypedefType = 0;
         }
    ;

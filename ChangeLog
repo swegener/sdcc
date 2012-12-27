@@ -1,5 +1,9 @@
 2012-12-27 Philipp Klaus Krause <pkk AT spth.de>
 
+	* Merged blocktree branch.
+
+2012-12-27 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCglue.c:
 	  Handle emission of long long constants.
 	  Emit error message for unknown sizes instead of failing silently.
@@ -45,6 +49,11 @@
 
 2012-12-20 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCbtree.cc:
+	  BTREE_DEBUG macro for enabling debub messages in blocktree-based allocator.
+
+2012-12-20 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/frexpf.c:
 	  Test for frexpf().
 	* src/z80/gen.c:
@@ -57,8 +66,13 @@
 
 2012-12-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCCbtree.cc:
+	  Special handling for parameters in btree-based stack allocation.
+
+2012-12-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCralloc.hpp:
-	  Send error message about invalid root to crr instead of cout.
+	  Send error message about invalid root to cerr instead of cout.
 
 2012-12-19 Borut Razem <borut.razem AT gmail.com>
 
@@ -71,6 +85,29 @@
 
 	* src/SDCCglobl.h, src/SDCCmain.c:
 	  fixed bug 3572584 - "Trigraphs don't work"
+
+2012-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCbtree.cc,
+	  src/SDCCast.c:
+	  Fixes for block-based stack allocation.
+
+2012-12-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCC.y
+	  src/SDCCbtree.h,
+	  src/SDCCbtree.cc,
+	  src/SDCCast.c,
+	  src/SDCCmem.c:
+	  Fixes for block-based stack allocation.
+
+2012-12-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCC.y
+	  src/SDCCbtree.h,
+	  src/SDCCbtree.cc,
+	  src/SDCCmem.c:
+	  Infrastructure for block-based stack allocation.
 
 2012-12-09 Philipp Klaus Krause <pkk AT spth.de>
 

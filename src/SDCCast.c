@@ -26,6 +26,7 @@
 
 #include "common.h"
 #include "dbuf_string.h"
+#include "SDCCbtree.h"
 
 int currLineno = 0;
 set *astList = NULL;
@@ -6204,7 +6205,10 @@ fixupInline (ast * tree, int level)
     {
       symbol *decls;
 
-      int thisBlockBlockno = ++blockNo;
+      int thisBlockBlockno;
+
+      btree_add_child(currBlockno, ++blockNo);
+      thisBlockBlockno = blockNo;
 
       level++;
 
@@ -6462,6 +6466,8 @@ expandInlineFuncs (ast * tree, ast * block)
 {
   if (IS_AST_OP (tree) && (tree->opval.op == CALL) && tree->left && IS_AST_VALUE (tree->left) && tree->left->opval.val->sym)
     {
+      int savedBlockno = currBlockno;
+      currBlockno = tree->block;
       symbol *func = tree->left->opval.val->sym;
       symbol *csym;
 
@@ -6601,6 +6607,7 @@ expandInlineFuncs (ast * tree, ast * block)
           fixupInline (inlinetree, inlinetree->level);
           inlineState.count++;
         }
+      currBlockno = savedBlockno;
     }
 
   /* Recursively continue to search for functions to inline. */

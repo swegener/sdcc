@@ -24,6 +24,7 @@
 
 #include "common.h"
 #include "dbuf_string.h"
+#include "SDCCbtree.h"
 
 /* memory segments */
 memmap *xstack = NULL;          /* xternal stack data          */
@@ -1006,6 +1007,8 @@ allocVariables (symbol * symChain)
   return stack;
 }
 
+#define BTREE_STACK 1
+
 /*-----------------------------------------------------------------*/
 /* redoStackOffsets :- will reassign the values for stack offsets  */
 /*-----------------------------------------------------------------*/
@@ -1028,8 +1031,28 @@ redoStackOffsets (void)
       if ((sym->_isparm && !IS_REGPARM (sym->etype)))
         continue;
 
-      if (IS_AGGREGATE (sym->type))
+      if (BTREE_STACK)
         {
+          /* Remove them all, and let btree_alloc() below put them back in more efficiently. */
+          currFunc->stack -= size;
+          SPEC_STAK (currFunc->etype) -= size;
+      
+          if(IS_AGGREGATE (sym->type) || sym->allocreq)
+            btree_add_symbol (sym);
+        }
+       /* Do it the old way - compared to the btree approach we waste space when allocating
+          variables that had their address taken, unions and aggregates. */
+       else
+        {
+          /* if allocation not required then subtract
+             size from overall stack size & continue */
+          if (!IS_AGGREGATE (sym->type) && !sym->allocreq)
+            {
+              currFunc->stack -= size;
+              SPEC_STAK (currFunc->etype) -= size;
+              continue;
+            }
+
           if (port->stack.direction > 0)
             {
               SPEC_STAK (sym->etype) = sym->stack = (sPtr + 1);
@@ -1040,28 +1063,13 @@ redoStackOffsets (void)
               sPtr -= size;
               SPEC_STAK (sym->etype) = sym->stack = sPtr;
             }
-          continue;
         }
+    }
 
-      /* if allocation not required then subtract
-         size from overall stack size & continue */
-      if (!sym->allocreq)
-        {
-          currFunc->stack -= size;
-          SPEC_STAK (currFunc->etype) -= size;
-          continue;
-        }
-
-      if (port->stack.direction > 0)
-        {
-          SPEC_STAK (sym->etype) = sym->stack = (sPtr + 1);
-          sPtr += size;
-        }
-      else
-        {
-          sPtr -= size;
-          SPEC_STAK (sym->etype) = sym->stack = sPtr;
-        }
+  if (BTREE_STACK && elementsInSet (istack->syms))
+    {
+      btree_alloc ();
+      btree_clear ();
     }
 
   /* do the same for the external stack */

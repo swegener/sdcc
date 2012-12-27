@@ -776,6 +776,22 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
             }
         }
       break;
+    case 8:
+      if (port->little_endian)
+        {
+          dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s,%s,%s,%s,%s",
+            aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2), aopLiteral (val, 3), aopLiteral (val, 4), aopLiteral (val, 5), aopLiteral (val, 6), aopLiteral (val, 7));
+        }
+      else
+        {
+          dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s,%s,%s,%s,%s",
+            aopLiteral (val, 7), aopLiteral (val, 6), aopLiteral (val, 5), aopLiteral (val, 4), aopLiteral (val, 3), aopLiteral (val, 2), aopLiteral (val, 1), aopLiteral (val, 0));
+        }
+      // TODO: Print value as comment. Does dbuf_printf support long long even on MSVC?
+      dbuf_printf (oBuf, "\n");
+      break;
+	default:
+	  wassertl (0, "Attempting to initialize integer of non-handled size.");
     }
 }
 

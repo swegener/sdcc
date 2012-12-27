@@ -31,18 +31,12 @@
 #include "newalloc.h"
 #include "dbuf_string.h"
 
-// See http://connect.microsoft.com/VisualStudio/feedback/details/758053/missing-strtold-strtoll-strtoull-functions-from-stdlib-h
-#ifdef _MSC_VER
-#define strtoll     _strtoi64
-#define strtoull    _strtoui64
-#endif
 
 int cNestLevel;
 
 
-
 /*-----------------------------------------------------------------*/
-/* newValue - allocates and returns a new value        */
+/* newValue - allocates and returns a new value                    */
 /*-----------------------------------------------------------------*/
 value *
 newValue (void)
@@ -1144,7 +1138,7 @@ constVal (const char *s)
         llval = strtoull (s + 2, &p, 2);
       else
         llval = strtoull (s, &p, 0);
-      dval = (unsigned long long int) llval;
+      dval = (double)(unsigned long long int) llval;
       is_integral = 1;
     }
   else
@@ -1176,7 +1170,7 @@ constVal (const char *s)
     {
       SPEC_NOUN (val->type) = V_INT;
       SPEC_LONGLONG (val->type) = 1;
-      werror (W_LONGLONG_LITERAL, p); 
+      werror (W_LONGLONG_LITERAL, p);
       p2 += 2;
       if (strchr (p2, 'l') || strchr (p2, 'L'))
         werror (E_INTEGERSUFFIX, p); 
@@ -1201,10 +1195,12 @@ constVal (const char *s)
             {                   /* check if we have to promote to int */
               SPEC_NOUN (val->type) = V_INT;
             }
-          if (dval < -32768) /* check if we have to promote to long int */              
-            SPEC_LONG (val->type) = 1;
-          if (dval < -2147483648.0) /* check if we have to promote to long long int */
-            {
+          if (dval < -32768)
+            {                   /* check if we have to promote to long int */              
+              SPEC_LONG (val->type) = 1;
+            }
+          if (dval < -2147483648.0)
+            {                   /* check if we have to promote to long long int */
               SPEC_LONGLONG (val->type) = 1;
               werror (W_LONGLONG_LITERAL, p); 
             }
@@ -1213,10 +1209,9 @@ constVal (const char *s)
         {                       /* >=0 */
           if (dval > 0xff ||    /* check if we have to promote to int */
               SPEC_USIGN (val->type))
-            {                   /* if it's unsigned, we can't use unsigned
-                                   char. After an integral promotion it will
-                                   be a signed int; this certainly isn't what
-                                   the programer wants */
+            {                   /* If it's unsigned, we can't use unsigned char.
+                                   After an integral promotion it will be a signed int;
+                                   this certainly isn't what the programer wants */
               SPEC_NOUN (val->type) = V_INT;
             }
           else
@@ -1229,9 +1224,8 @@ constVal (const char *s)
             }
           else if (dval > 0x7fff && !SPEC_USIGN (val->type))
             {                   /* check if we have to promote to long int */
-              if (is_integral &&        /* integral (hex, octal and binary)  constants may be stored in unsigned type */
-                  dval <= 0xffff)
-                {
+              if (is_integral && dval <= 0xffff)
+                {               /* integral (hex, octal and binary) constants may be stored in unsigned type */
                   SPEC_USIGN (val->type) = 1;
                 }
               else
@@ -1249,7 +1243,9 @@ constVal (const char *s)
               /* integral constants can be unsigned long. */
               /* c89 also allows unsigned long decimal constants without explicit suffix */
               if ((is_integral || !options.std_c99) && dval <= 0xffffffff)
-                SPEC_USIGN (val->type) = 1;
+                {
+                  SPEC_USIGN (val->type) = 1;
+                }
               else
                 {
                   SPEC_LONGLONG (val->type) = 1;
@@ -1577,9 +1573,9 @@ floatFromVal (value * val)
   if (SPEC_LONGLONG (val->etype))
     {
       if (SPEC_USIGN (val->etype))
-        return SPEC_CVAL (val->etype).v_ulonglong;
+        return (double)SPEC_CVAL (val->etype).v_ulonglong;
       else
-        return SPEC_CVAL (val->etype).v_longlong;
+        return (double)SPEC_CVAL (val->etype).v_longlong;
     }
 
   if (SPEC_LONG (val->etype))
@@ -1649,9 +1645,9 @@ ulFromVal (value * val)
   if (SPEC_LONGLONG (val->etype))
     {
       if (SPEC_USIGN (val->etype))
-        return SPEC_CVAL (val->etype).v_ulonglong;
+        return (unsigned long)SPEC_CVAL (val->etype).v_ulonglong;
       else
-        return SPEC_CVAL (val->etype).v_longlong;
+        return (unsigned long)SPEC_CVAL (val->etype).v_longlong;
     }
 
   if (SPEC_LONG (val->etype))
@@ -1782,7 +1778,7 @@ byteOfVal (value * val, int offset)
 }
 
 /*------------------------------------------------------------------*/
-/* ullFromLit - literal to unsigned long conversion                   */
+/* ullFromLit - literal to unsigned long conversion                 */
 /*------------------------------------------------------------------*/
 TYPE_TARGET_ULONGLONG
 ullFromLit (sym_link * lit)
@@ -2685,12 +2681,12 @@ valRecastLitVal (sym_link * dtype, value * val)
   if (IS_SPEC (otype) && (SPEC_NOUN (otype) == V_FIXED16X16 || SPEC_NOUN (otype) == V_FLOAT))
     {
       fval = floatFromVal (val);
-      ull = fval;
+      ull = (TYPE_TARGET_ULONGLONG)fval;
     }
   else
     {
       ull = ullFromVal (val);
-      fval = ull;
+      fval = (double)ull;
     }
 
   if (dtype)

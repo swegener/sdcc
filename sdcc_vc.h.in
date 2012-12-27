@@ -13,28 +13,28 @@
 
 #define __func__      __FUNCTION__
 
-#define DIR_SEPARATOR_STRING "\\"
-#define DIR_SEPARATOR_CHAR   '\\'
+#define DIR_SEPARATOR_STRING		"\\"
+#define DIR_SEPARATOR_CHAR			'\\'
 
-#define PREFIX                "\\sdcc"
-#define EXEC_PREFIX           "\\sdcc"
-#define BIN_PREFIX            "\\sdcc\\bin"
-#define DATADIR               "\\sdcc"
+#define PREFIX						"\\sdcc"
+#define EXEC_PREFIX					"\\sdcc"
+#define BIN_PREFIX					"\\sdcc\\bin"
+#define DATADIR						"\\sdcc"
 
-#define INCLUDE_DIR_SUFFIX    "\\include"
-#define LIB_DIR_SUFFIX        "\\lib"
-#define NON_FREE_INCLUDE_DIR_SUFFIX   "\\non-free\\include"
-#define NON_FREE_LIB_DIR_SUFFIX       "\\non-free\\lib"
+#define INCLUDE_DIR_SUFFIX			"\\include"
+#define LIB_DIR_SUFFIX				"\\lib"
+#define NON_FREE_INCLUDE_DIR_SUFFIX	"\\non-free\\include"
+#define NON_FREE_LIB_DIR_SUFFIX     "\\non-free\\lib"
 
-#define BIN2DATA_DIR          "\\.."
-#define PREFIX2BIN_DIR        "\\bin"
-#define PREFIX2DATA_DIR       ""
-#define BINDIR PREFIX         "\\bin"
+#define BIN2DATA_DIR				"\\.."
+#define PREFIX2BIN_DIR				"\\bin"
+#define PREFIX2DATA_DIR				""
+#define BINDIR PREFIX				"\\bin"
 
 /* environment variables */
-#define SDCC_DIR_NAME "SDCC_HOME"
-#define SDCC_INCLUDE_NAME "SDCC_INCLUDE"
-#define SDCC_LIB_NAME "SDCC_LIB"
+#define SDCC_DIR_NAME				"SDCC_HOME"
+#define SDCC_INCLUDE_NAME			"SDCC_INCLUDE"
+#define SDCC_LIB_NAME				"SDCC_LIB"
 
 /* standard libraries */
 #define STD_LIB               "libsdcc"
@@ -53,7 +53,11 @@
 #undef HAVE_SPRINTF
 #undef HAVE_VSPRINTF
 #undef HAVE_MKSTEMP
-#define pclose  _pclose
+#define pclose      _pclose
+
+// See http://connect.microsoft.com/VisualStudio/feedback/details/758053/missing-strtold-strtoll-strtoull-functions-from-stdlib-h
+#define strtoll     _strtoi64
+#define strtoull    _strtoui64
 
 #define RETSIGTYPE void
 

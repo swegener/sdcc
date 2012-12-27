@@ -1,3 +1,8 @@
+2012-12-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCval.c,
+	* sdcc_vc.h.in: moved strto(u)ll macros and fixed warnings
+
 2012-12-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCglue.c (emitOverlay): fixed bug #3596899

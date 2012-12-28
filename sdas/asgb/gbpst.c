@@ -112,6 +112,24 @@ struct  mne     mne[] = {
     {   NULL,   ".optsdcc",     S_OPTSDCC,      0,      0 },
 /* end sdas specific */
 
+        /* Macro Processor */
+
+    {   NULL,   ".macro",       S_MACRO,        0,      O_MACRO },
+    {   NULL,   ".endm",        S_MACRO,        0,      O_ENDM  },
+    {   NULL,   ".mexit",       S_MACRO,        0,      O_MEXIT },
+
+    {   NULL,   ".narg",        S_MACRO,        0,      O_NARG  },
+    {   NULL,   ".nchr",        S_MACRO,        0,      O_NCHR  },
+    {   NULL,   ".ntyp",        S_MACRO,        0,      O_NTYP  },
+
+    {   NULL,   ".irp",         S_MACRO,        0,      O_IRP   },
+    {   NULL,   ".irpc",        S_MACRO,        0,      O_IRPC  },
+    {   NULL,   ".rept",        S_MACRO,        0,      O_REPT  },
+
+    {   NULL,   ".nval",        S_MACRO,        0,      O_NVAL  },
+
+    {   NULL,   ".mdelete",     S_MACRO,        0,      O_MDEL  },
+
         /* Gameboy, a modified Z80 */
 
     {   NULL,   "ld",           S_LD,           0,      0x40    },

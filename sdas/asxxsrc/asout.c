@@ -147,11 +147,11 @@
  *              7.  bit 6 normal(0x00)/page 'nnn'(0x40) reference
  *              8.  bit 7 normal(0x00)/MSB of value
  *
- *      2.  n2  is  a byte index into the corresponding (i.e.  pre-
- *              ceeding) T line data (i.e.  a pointer to the data to be
- *              updated  by  the  relocation).   The T line data may be
- *              1-byte or  2-byte  byte  data  format  or  2-byte  word
- *              format.
+ *      2.  n2  is  a byte index into the corresponding
+ *              (i.e.  preceeding) T line data (i.e.  a pointer to
+ *              the data to be updated  by  the  relocation).
+ *              The T line data may be 1-byte or 2-byte byte data
+ *              format or 2-byte word format.
  *
  *      3.  xx xx  is the area/symbol index for the area/symbol be-
  *              ing referenced.  the corresponding area/symbol is found
@@ -270,6 +270,7 @@ outa4b(a_uint v)
  *      assembled data in absolute format.
  *
  *      local variables:
+ *              int p_bytes
  *
  *      global variables:
  *              sym     dot             defined as sym[0]
@@ -288,6 +289,8 @@ outa4b(a_uint v)
 VOID
 outaxb(int i, a_uint v)
 {
+        int p_bytes;
+
         if (pass == 2) {
                 out_lxb(i, v, 0);
                 if (oflag) {
@@ -298,13 +301,15 @@ outaxb(int i, a_uint v)
         /*
          * Update the Program Counter
          */
-        dot.s_addr += i;
+        p_bytes = 1;
+        dot.s_addr += (i/p_bytes) + (i % p_bytes ? 1 : 0);
 }
 
 /* sdas specific */
-/*)Function     VOID    write_rmode(r)
+/*)Function     VOID    write_rmode(r, n)
  *
  *              int     r               relocation mode
+ *              int     n               byte index
  *
  *      write_rmode puts the passed relocation mode into the
  *      output relp buffer, escaping it if necessary.
@@ -319,7 +324,7 @@ outaxb(int i, a_uint v)
  *              relp is incremented appropriately.
  */
 VOID
-write_rmode(int r)
+write_rmode(int r, int n)
 {
     /* We need to escape the relocation mode if it is greater
      * than a byte, or if it happens to look like an escape.
@@ -345,6 +350,7 @@ write_rmode(int r)
     {
         *relp++ = r;
     }
+    *relp++ = n;
 }
 /* end sdas specific */
 
@@ -548,8 +554,7 @@ outrxb(int i, struct expr *esp, int r)
                                     } else {
                                             n = esp->e_base.e_ap->a_ref;
                                     }
-                                    write_rmode(r);
-                                    *relp++ = txtp - txt - 3;
+                                    write_rmode(r, txtp - txt - 3);
                                     out_rw(n);
                                 }
                                 /* end sdas mcs51 specific */
@@ -660,8 +665,7 @@ outrw(struct expr *esp, int r)
                                                     "outrw()\n");
                                             rerr();
                                         }
-                                        write_rmode(r);
-                                        *relp++ = txtp - txt - 2;
+                                        write_rmode(r, txtp - txt - 2);
                                         out_rw(n);
                                 }
                         }
@@ -758,8 +762,8 @@ outr3b(struct expr *esp, int r)
                                     rerr();
                                 }
 
-                                write_rmode(r | R_C24);
-                                *relp++ = txtp - txt - 3;
+                                write_rmode(r | R_C24, txtp - txt - 3);
+
                                 out_rw(n);
                         }
                 }
@@ -823,8 +827,7 @@ outdp(struct area *carea, struct expr *esp, int r)
                                 n = esp->e_base.e_ap->a_ref;
                                 r |= R_AREA;
                         }
-                        write_rmode(r);
-                        *relp++ = txtp - txt - 2;
+                        write_rmode(r, txtp - txt - 2);
                         out_rw(n);
                 }
                 outbuf("P");
@@ -938,8 +941,7 @@ outchk(int nt, int nr)
         if (txtp == txt) {
                 out_txb(2, dot.s_addr);
                 if ((ap = dot.s_area) != NULL) {
-                        write_rmode(R_WORD|R_AREA);
-                        *relp++ = 0;
+                        write_rmode(R_WORD|R_AREA, 0);
                         out_rw(ap->a_ref);
                 }
         }
@@ -1595,8 +1597,7 @@ outrwm(struct expr *esp, int r, a_uint v)
                                         out_txb(2, esp->e_addr);
                                         *txtp++ = v;
 
-                                        write_rmode(r);
-                                        *relp++ = txtp - txt - 3;
+                                        write_rmode(r, txtp - txt - 3);
                                         out_rw(0xFFFF);
                                 }
                         } else {
@@ -1618,8 +1619,7 @@ outrwm(struct expr *esp, int r, a_uint v)
                                         } else {
                                                 n = esp->e_base.e_ap->a_ref;
                                         }
-                                        write_rmode(r);
-                                        *relp++ = txtp - txt - 3;
+                                        write_rmode(r, txtp - txt - 3);
                                         out_rw(n);
                                 }
                         }
@@ -1650,8 +1650,7 @@ outr3bm(struct expr * esp, int r, a_uint v)
                                 out_txb(3, esp->e_addr);
                                 *txtp++ = v;
 
-                                write_rmode(r);
-                                *relp++ = txtp - txt - 4;
+                                write_rmode(r, txtp - txt - 4);
                                 out_rw(0xFFFF);
                         }
                 } else {
@@ -1673,8 +1672,7 @@ outr3bm(struct expr * esp, int r, a_uint v)
                                 } else {
                                         n = esp->e_base.e_ap->a_ref;
                                 }
-                                write_rmode(r);
-                                *relp++ = txtp - txt - 4;
+                                write_rmode(r, txtp - txt - 4);
                                 out_rw(n);
                         }
                 }

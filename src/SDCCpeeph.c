@@ -2054,7 +2054,7 @@ isLabelDefinition (const char *line, const char **start, int *len,
 {
   const char *cp = line;
 
-  /* This line is a label if if consists of:
+  /* This line is a label if it consists of:
    * [optional whitespace] followed by identifier chars
    * (alnum | $ | _ ) followed by a colon.
    */

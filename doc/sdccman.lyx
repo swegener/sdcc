@@ -8520,6 +8520,10 @@ sdas8051 - The assembler for 8051 type processors.
 \end_layout
 
 \begin_layout Itemize
+sdas390 - The assembler for DS80C390 processor.
+\end_layout
+
+\begin_layout Itemize
 sdasz80
 \series bold
 ,
@@ -8716,7 +8720,7 @@ This is a set of retargettable assemblers and linkage editors, which was
 \end_layout
 
 \begin_layout Standard
-SDCC uses an about 1998 branch of asxxxx version 2.0 which unfortunately
+SDCC used an about 1998 branch of asxxxx version 2.0 which unfortunately
  is not compatible with the more advanced (f.e.
  macros, more targets) ASxxxx Cross Assemblers nowadays available from Alan
  Baldwin 
@@ -8732,7 +8736,7 @@ http://shop-pdp.kent.edu/
 
 .
  In 2009 Alan made his ASxxxx Cross Assemblers version 5.0 available under
- the GPL licence (GPLv3 or later), so a reunion could be possible.
+ the GPL licence (GPLv3 or later), so a reunion is now a work in progress.
  Thanks Alan!
 \end_layout
 
@@ -55032,6 +55036,44 @@ sdcc/bin
 
 \begin_layout Plain Layout
 sdas8051
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Assembler
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\noun off
+\color none
+sdcc/bin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sdas390
 \end_layout
 
 \end_inset

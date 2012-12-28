@@ -6696,7 +6696,6 @@ ast *
 createFunction (symbol * name, ast * body)
 {
   ast *ex;
-  symbol *csym;
   int stack = 0;
   sym_link *fetype;
   iCode *piCode = NULL;

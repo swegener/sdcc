@@ -732,6 +732,11 @@ struct mcrdef * np;
         struct strlst *xrg;
         char xrgstr[NINPUT];
 
+        if (++mcrfil > MAXMCR) {
+                --mcrfil;
+                err('m');
+                return;
+        }
         if (mcrfil > maxmcr) {
                 maxmcr = mcrfil;
         }
@@ -1039,7 +1044,7 @@ FILE *fp;
         return(ptr);
 }
 
-/*)Function     VOID    mcroscn(nfp)
+/*)Function     VOID    macroscn(nfp)
  *
  *              struct  macrofp * nfp   a Macro 'FILE Handle'
  *

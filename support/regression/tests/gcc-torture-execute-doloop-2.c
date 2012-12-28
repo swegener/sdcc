@@ -19,8 +19,5 @@ testTortureExecute (void)
 
   do ++i;
   while (--z > 0);
-  if (i != USHRT_MAX + 1U)
-    ASSERT (0);
-  return;
+  ASSERT (!(i != USHRT_MAX + 1U));
 }
-

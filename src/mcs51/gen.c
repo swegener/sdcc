@@ -11305,12 +11305,13 @@ genJumpTab (iCode * ic)
 
   count = elementsInSet (IC_JTLABELS (ic));
 
-  if (count <= 7)
+  if ((count <= 7) ||
+      (count <= 16 && optimize.codeSpeed) ||
+      options.acall_ajmp)
     {
-      /* this algorithm needs 9 cycles and 7 + 3*n bytes
+      /* This algorithm needs 9 cycles and 7 + 3*n bytes
          if the switch argument is in a register.
-         (5 + 2*n bytes when options.acall_ajmp is set)
-         (8 cycles and 6+2*n bytes if peepholes can change ljmp to sjmp) */
+         (6 + 2*n bytes when options.acall_ajmp is set) */
       /* Peephole may not convert ljmp to sjmp or ret
          labelIsReturnOnly & labelInRange must check
          currPl->ic->op != JUMPTABLE */

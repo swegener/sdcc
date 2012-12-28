@@ -1,3 +1,24 @@
+2012-12-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: small update about sdas390
+	* sdas/asgb/gbpst.c: enable macros
+	* sdas/asxxsrc/aslex.c (nxtline): also fix macro case
+	* sdas/asxxsrc/asmcro.c,
+	* sdas/asxxsrc/asout.c,
+	* sdas/asxxsrc/asxxxx.h: small step to ASxxxx v5
+	* src/mcs51/gen.c(genJumpTab): use optimize.codeSpeed and options.acall_ajmp
+	* src/SDCCast.c(createFunction): fixed warning
+	* src/SDCCpeeph.c: cosmetics
+	* support/regression/tests/bug3467508.c: suppress warnings
+	* support/regression/tests/gcc-torture-execute-20050125-1.c: fixed warning
+	* support/regression/tests/gcc-torture-execute-20050224-1.c: shortened test,
+	  always perform ASSERT for correct statistics
+	* support/regression/tests/gcc-torture-execute-20051104-1.c: added comments
+	* support/regression/tests/gcc-torture-execute-doloop-2.c: always ASSERT
+	* support/regression/tests/key.c,
+	* support/regression/tests/long_asm_line.c,
+	* support/regression/tests/macro.c: use at least one ASSERT
+
 2012-12-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merged blocktree branch.
@@ -115,6 +136,7 @@
 	  Do not generate redundant loads when fetching pair from regs.
 
 2012-12-02 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/cinc2h.pl,
 	  support/scripts/pic14-header-parser.pl,
 	  support/scripts/pic16-header-parser.pl: I changed the copyright.
@@ -132,11 +154,13 @@
 	* src/SDCCval.c: working towards long long constant support
 
 2012-11-25 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/non-free/include/pic16/pic18f6390.h,
 	  device/non-free/lib/pic16/libdev/pic18f6390.c:
 	  Repaired wrong address of RCREG, 0x0FA0 --> 0x0FAE.
 
 2012-11-25 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/non-free/include/pic16/pic18f63j11.h,
 	  device/non-free/lib/pic16/libdev/pic18f63j11.c:
 	  Repaired wrong address of RCREG, 0x0FD0 --> 0x0FAE.

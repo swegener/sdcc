@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-/* Verify that the CALL sideeffect isn't optimized away.  */
+/* Verify that the CALL side effect isn't optimized away.  */
 /* Contributed by Greg Parker  25 Jan 2005  <gparker@apple.com> */
 
 #include <stdlib.h>
@@ -34,7 +34,8 @@ void bracket_empty(struct parse *p)
 void testTortureExecute(void)
 {
   struct parse p;
-  p.next = p.end = (char *)0x12345;
+  char x;
+  p.next = p.end = &x;
 
   p.error = 0;
   bracket_empty(&p);

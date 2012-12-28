@@ -11,5 +11,5 @@ using, _naked, xdata, _overlay;
 
 void testBug(void)
 {
+  ASSERT(1);
 }
-

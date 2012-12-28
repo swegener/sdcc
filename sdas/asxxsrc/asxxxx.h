@@ -208,6 +208,7 @@
 #define NHASH       (1 << 6)    /* Buckets in hash table */
 #define HMASK       (NHASH - 1) /* Hash mask */
 #define NLPP        60          /* Lines per page */
+#define MAXMCR      20          /* Maximum nesting of macro expansions */
 #define MAXIF       10          /* Maximum nesting of if/else/endif */
 #define FILSPC      PATH_MAX    /* Chars. in filespec */
 
@@ -313,10 +314,10 @@ struct  area
 {
         struct  area *a_ap;     /* Area link */
         char *  a_id;           /* Area Name */
-        int     a_ref;                  /* Ref. number */
+        int     a_ref;          /* Ref. number */
         a_uint  a_size;         /* Area size */
         a_uint  a_fuzz;         /* Area fuzz */
-        int     a_flag;                 /* Area flags */
+        int     a_flag;         /* Area flags */
 /* sdas specific */
         a_uint  a_addr;         /* Area address */
 /* end sdas specific */
@@ -432,9 +433,9 @@ struct  area
  */
 
 #define R_ESCAPE_MASK   0xf0    /* Used to escape relocation modes
-                                                                 * greater than 0xff in the .rel
-                                                                 * file.
-                                                                 */
+                                 * greater than 0xff in the .rel
+                                 * file.
+                                 */
 
 /*
  * Listing Control Flags
@@ -497,7 +498,7 @@ struct  sym
         char    s_type;         /* Symbol subtype */
         char    s_flag;         /* Symbol flags */
         struct  area *s_area;   /* Area line, 0 if absolute */
-        int     s_ref;                  /* Ref. number */
+        int     s_ref;          /* Ref. number */
         a_uint  s_addr;         /* Address */
 /* sdas specific */
         a_uint  s_org;          /* Start Address if absolute */
@@ -511,7 +512,7 @@ struct  sym
 #define S_ASG           004     /* Assigned Value */
 #define S_MDF           010     /* Multiple Definition */
 
-#define S_NEW           0       /* New Name (External) */
+#define S_NEW           0       /* New  Name (External) */
 #define S_USER          1       /* User Name (Assigned) */
 #define S_SPARE         2       /* Spare Definition */
 #define S_PAGE          3       /* .page */
@@ -907,7 +908,7 @@ extern  int     maxinc;         /*      maximum include file nesting encountered
                                  */
 extern  int     mcrfil;         /*      macro nesting counter
                                  */
-extern  int     maxmcr;         /*      maximum macro nesting emcountered
+extern  int     maxmcr;         /*      maximum macro nesting encountered
                                  */
 extern  int     flevel;         /*      IF-ELSE-ENDIF flag will be non
                                  *      zero for false conditional case
@@ -1012,7 +1013,7 @@ extern  struct  area    area[]; /*      array of 1 area
                                  */
 extern  struct  sym     sym[];  /*      array of 1 symbol
                                  */
-extern  struct  sym *symp;      /*      pointer to a symbol structure
+extern  struct  sym     *symp;  /*      pointer to a symbol structure
                                  */
 extern  struct  sym *symhash[NHASH]; /* array of pointers to NHASH
                                       * linked symbol lists
@@ -1259,6 +1260,22 @@ extern  int             main();
 extern  VOID            newdot();
 extern  VOID            phase();
 extern  VOID            usage();
+
+/* asmcro.c */
+extern  char *          fgetm();
+extern  VOID            getdarg();
+extern  VOID            getxarg();
+extern  VOID            getxstr();
+extern  VOID            macro();
+extern  VOID            macroscn();
+extern  int             macrosub();
+extern  VOID            mcrinit();
+extern  int             mcrprc();
+extern  VOID *          mhunk();
+extern  char *          mstring();
+extern  char *          mstruct();
+extern  struct mcrdef * newdef();
+extern  struct mcrdef * nlookup();
 
 /* aslex.c */
 extern  int             comma();

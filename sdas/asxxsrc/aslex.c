@@ -649,7 +649,7 @@ nxtline(void)
 {
         static struct dbuf_s dbuf_ib;
         static struct dbuf_s dbuf_ic;
-        size_t len;
+        size_t len = 0;
         struct asmf *asmt;
 
         if (!dbuf_is_initialized (&dbuf_ib))
@@ -775,7 +775,6 @@ loop:   if (asmc == NULL) return(0);
                 break;
 
         default:
-                len = 0;
                 fprintf(stderr, "?ASxxxx-Internal-nxtline(objtyp)-Error.\n\n");
                 asexit(ER_FATAL);
                 break;

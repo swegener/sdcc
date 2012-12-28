@@ -1,3 +1,11 @@
+2012-12-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20011126-1.c,
+	  support/regression/tests/gcc-torture-execute-20000717-2.c,
+	  support/regression/tests/gcc-torture-execute-921202-2.c,
+	  support/regression/tests/gcc-torture-execute-20050104-1.c:
+	  Enable some long long regression tests, that now seem to work even on 32-bit systems.
+
 2012-12-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: small update about sdas390

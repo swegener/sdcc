@@ -8,8 +8,8 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long constants!
-#if 0
+// Some ports do not support long long yet.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
 int
 f(long long x)
 {
@@ -21,7 +21,8 @@ f(long long x)
 void
 testTortureExecute (void)
 {
-#if 0
+// Some ports do not support long long yet.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
   if (f(0x0123456789ABCDEFLL) != 0xCD)
     ASSERT(0);
   return;

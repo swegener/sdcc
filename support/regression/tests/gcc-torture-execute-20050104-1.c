@@ -10,7 +10,9 @@
 
 #include <limits.h>
 
-#if 0 // TODO: Enable when long long literals are supported!
+// Some ports do not support long long yet.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
+
 /* PR tree-optimization/19060 */
 
 static
@@ -30,7 +32,8 @@ foo (long long j)
 void
 testTortureExecute (void)
 {
-#if 0
+// Some ports do not support long long yet.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
   foo (10);
   return;
 #endif

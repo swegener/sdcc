@@ -17,6 +17,7 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <set>
+#include <map>
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -33,7 +34,7 @@ extern "C"
 #undef BTREE_DEBUG
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, std::pair<std::set<symbol *>, int> > btree_t;
-/*#ifdef HAVE_STX_BTREE_MAP_H TODO: MAKE THIS WORK!
+/*#ifdef HAVE_STX_BTREE_MAP_H
 typedef stx::btree_map<int, btree_t::vertex_descriptor> bmap_t;
 typedef stx::btree_map<btree_t::vertex_descriptor, int> bmaprev_t;
 #else*/

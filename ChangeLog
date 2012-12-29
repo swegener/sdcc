@@ -1,3 +1,8 @@
+2012-12-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCbtree.cc:
+	  Always use stl map for now.
+
 2012-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdcc_vc.h.in: converted TABs to spaces

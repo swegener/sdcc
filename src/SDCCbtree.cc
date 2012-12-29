@@ -21,6 +21,8 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
+#include "common.h"
+
 #ifdef HAVE_STX_BTREE_MAP_H
 #include <stx/btree_map.h>
 #endif
@@ -28,19 +30,18 @@
 extern "C"
 {
 #include "SDCCbtree.h"
-#include "common.h"
 }
 
 #undef BTREE_DEBUG
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, std::pair<std::set<symbol *>, int> > btree_t;
-/*#ifdef HAVE_STX_BTREE_MAP_H
+#ifdef HAVE_STX_BTREE_MAP_H
 typedef stx::btree_map<int, btree_t::vertex_descriptor> bmap_t;
 typedef stx::btree_map<btree_t::vertex_descriptor, int> bmaprev_t;
-#else*/
+#else
 typedef std::map<int, btree_t::vertex_descriptor> bmap_t;
 typedef std::map<btree_t::vertex_descriptor, int> bmaprev_t;
-//#endif
+#endif
 
 static btree_t btree;
 static bmap_t bmap;

@@ -1,7 +1,7 @@
 2012-12-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCbtree.cc:
-	  Always use stl map for now.
+	  Fix bug #3598841.
 
 2012-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
 

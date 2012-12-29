@@ -182,6 +182,7 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="SDCCbtree.cc" />
     <ClCompile Include="SDCCcflow.c">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -462,6 +463,7 @@
     <ClInclude Include="SDCCast.h" />
     <ClInclude Include="SDCCBBlock.h" />
     <ClInclude Include="SDCCbitv.h" />
+    <ClInclude Include="SDCCbtree.h" />
     <ClInclude Include="SDCCcflow.h" />
     <ClInclude Include="SDCCcse.h" />
     <ClInclude Include="SDCCdebug.h" />

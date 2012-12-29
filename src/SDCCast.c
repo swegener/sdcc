@@ -6467,9 +6467,10 @@ expandInlineFuncs (ast * tree, ast * block)
   if (IS_AST_OP (tree) && (tree->opval.op == CALL) && tree->left && IS_AST_VALUE (tree->left) && tree->left->opval.val->sym)
     {
       int savedBlockno = currBlockno;
-      currBlockno = tree->block;
       symbol *func = tree->left->opval.val->sym;
       symbol *csym;
+
+      currBlockno = tree->block;
 
       /* The symbol is probably not bound yet, so find the real one */
       csym = findSymWithLevel (SymbolTab, func);

@@ -161,6 +161,9 @@
     <ClCompile Include="SDCClospre.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SDCCbtree.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\support\scripts\resource.rc">
@@ -295,6 +298,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDCClospre.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCCbtree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

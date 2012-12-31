@@ -78,7 +78,7 @@ extern int hc08_nRegs;
 extern struct dbuf_s *codeOutBuf;
 //static void saveRBank (int, iCode *, bool);
 static bool operandsEqu (operand * op1, operand * op2);
-static void loadRegFromConst (reg_info * reg, char *c);
+static void loadRegFromConst (reg_info * reg, int c);
 static asmop *newAsmop (short type);
 static char *aopAdrStr (asmop * aop, int loffset, bool bit16);
 #define RESULTONSTACK(x) \
@@ -293,6 +293,7 @@ transferRegReg (reg_info *sreg, reg_info *dreg, bool freesrc)
   dreg->aop = sreg->aop;
   dreg->aopofs = sreg->aopofs;
   dreg->isFree = FALSE;
+  hc08_dirtyReg (dreg, FALSE);
   hc08_useReg (dreg);
 }
 
@@ -437,7 +438,7 @@ pullNull (int n)
 /* pushConst - Push a constant byte value onto stack                        */
 /*--------------------------------------------------------------------------*/
 static void
-pushConst (char * c)
+pushConst (int c)
 {
   if (hc08_reg_a->isFree)
     {
@@ -449,12 +450,12 @@ pushConst (char * c)
       loadRegFromConst (hc08_reg_x, c);
       pushReg (hc08_reg_x, TRUE);
     }
-  else if (hc08_reg_h->isFree && !strcmp (c, zero))
+  else if (hc08_reg_h->isFree && !c)
     {
       loadRegFromConst (hc08_reg_h, c);
       pushReg (hc08_reg_h, TRUE);
     }
-  else if (!strcmp (c,zero))
+  else if (!c)
     {
       adjustStack (-1);
       emitcode ("clr", "1,s");
@@ -627,34 +628,9 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
       return;
     }
 
-#if 0
-  printf ("loadRegFromAop called\n");
-  if (!reg)
-    {
-      printf (" reg = NULL\n");
-      return;
-    }
-  printf (" reg = %s\n", reg->name);
-  if (!aop)
-    {
-      printf (" aop = NULL\n");
-      return;
-    }
-  printf (" aop->type = %d\n", aop->type);
-  printf (" loffset = %d\n", loffset);
-
-  if (aop->op)
-    printf (" aop has operand link\n");
-  else
-    printf (" aop missing operand link\n");
-  if (reg->aop)
-    printf (" reg has operand link\n");
-  else
-    printf (" reg missing operand link\n");
-#endif
-
   DD (emitcode ("", ";     loadRegFromAop (%s, %s, %d)", reg->name, aopName (aop), loffset));
 
+#if 0
   /* If operand is volatile, we cannot optimize. */
   if (!aop->op || isOperandVolatile (aop->op, FALSE))
     goto forceload;
@@ -700,6 +676,8 @@ loadRegFromAop (reg_info * reg, asmop * aop, int loffset)
     }
 
 forceload:
+#endif
+
   switch (regidx)
     {
     case A_IDX:
@@ -708,23 +686,20 @@ forceload:
           if (loffset < aop->size)
             transferRegReg (aop->aopu.aop_reg[loffset], reg, FALSE);
           else
-            {
-              emitcode ("clra", "");      /* TODO: handle sign extension */
-              regalloc_dry_run_cost++;
-            }
+            loadRegFromConst (reg, 0); /* TODO: handle sign extension */
         }
       else
         {
-          char *l = aopAdrStr (aop, loffset, FALSE);
-          if (!strcmp (l, zero))
+          if (aop->type == AOP_LIT)
             {
-              emitcode ("clra", "");
-              regalloc_dry_run_cost++;
+              loadRegFromConst (reg, byteOfVal (aop->aopu.aop_lit, loffset));
             }
           else
             {
+              char *l = aopAdrStr (aop, loffset, FALSE);
               emitcode ("lda", "%s", l);
               regalloc_dry_run_cost += ((aop->type == AOP_DIR || aop->type == AOP_IMMD || aop->type == AOP_LIT) ? 2 : 3);
+              hc08_dirtyReg (reg, FALSE);
             }
         }
       break;
@@ -734,37 +709,30 @@ forceload:
           if (loffset < aop->size)
             transferRegReg (aop->aopu.aop_reg[loffset], reg, FALSE);
           else
-            {
-              emitcode ("clrx", "");      /* TODO: handle sign extension */
-              regalloc_dry_run_cost++;
-            }
+            loadRegFromConst (reg, 0); /* TODO: handle sign extension */
         }
       else
         {
-          char *l = aopAdrStr (aop, loffset, FALSE);
-          if (!strcmp (l, zero))
+          if (aop->type == AOP_LIT)
             {
-              emitcode ("clrx", "");
-              regalloc_dry_run_cost++;
+              loadRegFromConst (reg, byteOfVal (aop->aopu.aop_lit, loffset));
             }
           else
             {
+              char *l = aopAdrStr (aop, loffset, FALSE);
               emitcode ("ldx", "%s", l);
               regalloc_dry_run_cost += ((aop->type == AOP_DIR || aop->type == AOP_IMMD || aop->type == AOP_LIT) ? 2 : 3);
+              hc08_dirtyReg (reg, FALSE);
             }
         }
       break;
     case H_IDX:
-      {
-        char *l = aopAdrStr (aop, loffset, FALSE);
-        if (!strcmp (l, zero))
+       if (aop->type == AOP_LIT)
          {
-            emitcode ("clrh", "");
-            regalloc_dry_run_cost++;
-            break;
-          }
-      }
-      if (aop->type == AOP_SOF && !(_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 1))
+           loadRegFromConst (reg, byteOfVal (aop->aopu.aop_lit, loffset));
+           break;
+         }
+       if (aop->type == AOP_SOF && !(_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 1))
         {
           pullReg (hc08_reg_h);
           pushReg (hc08_reg_h, FALSE);
@@ -780,13 +748,7 @@ forceload:
               pushReg (hc08_reg_x, TRUE);
               pushedx = TRUE;
             }
-          if (aop->type == AOP_LIT && loffset == 0) /* Workaround for other things not supporting negative offsets */
-            {
-              emitcode ("ldhx", "#0x%04x", ulFromVal (aop->aopu.aop_lit) << 8);
-              regalloc_dry_run_cost += 3;
-            }
-          else
-            loadRegFromAop (hc08_reg_hx, aop, loffset - 1);
+          loadRegFromAop (hc08_reg_hx, aop, loffset - 1);
           pullOrFreeReg (hc08_reg_x, pushedx);
         }
       else if (hc08_reg_a->isFree)
@@ -808,6 +770,12 @@ forceload:
         }
       break;
     case HX_IDX:
+       if (aop->type == AOP_LIT)
+         {
+           loadRegFromConst (reg, byteOfVal (aop->aopu.aop_lit, loffset) |
+                                  (byteOfVal (aop->aopu.aop_lit, loffset+1) << 8));
+           break;
+         }
       if (aop->type == AOP_SOF && !(_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 2))
         {
           pullReg (hc08_reg_h);
@@ -826,10 +794,11 @@ forceload:
             {
               emitcode ("ldhx", "%s", aopAdrStr (aop, loffset, TRUE));
               regalloc_dry_run_cost += (aop->type == AOP_DIR ? 2 : 3);
+              hc08_dirtyReg (reg, FALSE);
             }
           else 
             {
-              loadRegFromConst (hc08_reg_h, zero);
+              loadRegFromConst (hc08_reg_h, 0);
               loadRegFromAop (hc08_reg_x, aop, loffset);
             }
         }
@@ -837,6 +806,7 @@ forceload:
         {
           emitcode ("ldhx", "%s", aopAdrStr (aop, loffset, TRUE));
           regalloc_dry_run_cost += 3;
+          hc08_dirtyReg (reg, FALSE);
         }
       else
         {
@@ -863,8 +833,6 @@ forceload:
       break;
     }
 
-// ignore caching for now
-  hc08_dirtyReg (reg, FALSE);
   hc08_useReg (reg);
 }
 
@@ -1083,40 +1051,90 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
 /* loadRegFromConst - Load register reg from constant c.                    */
 /*--------------------------------------------------------------------------*/
 static void
-loadRegFromConst (reg_info * reg, char *c)
+loadRegFromConst (reg_info * reg, int c)
 {
   switch (reg->rIdx)
     {
     case A_IDX:
-      if (!strcmp (c, zero))
+      c &= 0xff;
+      if (reg->isLitConst)
+        {
+          if (reg->litConst == c)
+            break;
+          if (((reg->litConst + 1) & 0xff) == c)
+            {
+              emitcode ("inca", "");
+              regalloc_dry_run_cost++;
+              break;
+            }
+          if (((reg->litConst - 1) & 0xff) == c)
+            {
+              emitcode ("deca", "");
+              regalloc_dry_run_cost++;
+              break;
+            }
+        }
+
+      if (hc08_reg_x->isLitConst && hc08_reg_x->litConst == c)
+        transferRegReg (hc08_reg_x, reg, FALSE);
+      else if (!c)
         {
           emitcode ("clra", "");
           regalloc_dry_run_cost++;
         }
       else
         {
-          emitcode ("lda", "%s", c);
+          emitcode ("lda", "!immedbyte", c);
           regalloc_dry_run_cost += 2;
         }
       break;
     case X_IDX:
-      if (!strcmp (c, zero))
+      c &= 0xff;
+      if (reg->isLitConst)
+        {
+          if (reg->litConst == c)
+            break;
+          if (((reg->litConst + 1) & 0xff) == c)
+            {
+              emitcode ("incx", "");
+              regalloc_dry_run_cost++;
+              break;
+            }
+          if (((reg->litConst - 1) & 0xff) == c)
+            {
+              emitcode ("decx", "");
+              regalloc_dry_run_cost++;
+              break;
+            }
+        }
+
+      if (hc08_reg_a->isLitConst && hc08_reg_a->litConst == c)
+        transferRegReg (hc08_reg_a, reg, FALSE);
+      else if (!c)
         {
           emitcode ("clrx", "");
           regalloc_dry_run_cost++;
         }
       else
         {
-          emitcode ("ldx", "%s", c);
+          emitcode ("ldx", "!immedbyte", c);
           regalloc_dry_run_cost += 2;
         }
       break;
     case H_IDX:
-      if (!strcmp (c, zero))
+      c &= 0xff;
+      if (reg->isLitConst && reg->litConst == c)
+	break;
+
+      if (!c)
         {
           emitcode ("clrh", "");
           regalloc_dry_run_cost++;
         }
+      else if (hc08_reg_a->isLitConst && hc08_reg_a->litConst == c)
+        transferRegReg (hc08_reg_a, reg, FALSE);
+      else if (hc08_reg_x->isLitConst && hc08_reg_x->litConst == c)
+        transferRegReg (hc08_reg_x, reg, FALSE);
       else if (hc08_reg_a->isFree)
         {
           loadRegFromConst (hc08_reg_a, c);
@@ -1124,13 +1142,100 @@ loadRegFromConst (reg_info * reg, char *c)
         }
       else if (hc08_reg_x->isFree)
         {
-          loadRegFromConst (hc08_reg_x, c);
+          loadRegFromConst (hc08_reg_hx, c << 8);
+        }
+      else
+        {
+          pushReg (hc08_reg_x, TRUE);
+          loadRegFromConst (hc08_reg_hx, c << 8);
+          pullReg (hc08_reg_x);
+        }
+      break;
+    case HX_IDX:
+      c &= 0xffff;
+      if (reg->isLitConst)
+        {
+          int delta = (c - reg->litConst) & 0xffff;
+          if (delta & 0x8000)
+            delta = -0x8000 + (delta & 0x7fff);
+          if (reg->litConst == c)
+            break;
+          if ((reg->litConst & 0xff) == c)
+            {
+              loadRegFromConst (hc08_reg_h, 0);
+              break;
+            }
+          if ((reg->litConst & 0xff00) == (c & 0xff00))
+            {
+              loadRegFromConst (hc08_reg_x, c & 0xff);
+              break;
+            }
+          if ((delta <= 127) && (delta >= -128))
+            {
+              emitcode ("aix","#%d", delta);
+              regalloc_dry_run_cost += 2;
+              break;
+            }
+        }
+      emitcode ("ldhx", "!immedword", c);
+      regalloc_dry_run_cost += 3;
+      break;
+    case XA_IDX:
+      c &= 0xffff;
+      if (reg->isLitConst && reg->litConst == c)
+	break;
+      loadRegFromConst (hc08_reg_a, c);
+      loadRegFromConst (hc08_reg_x, c >> 8);
+      break;
+    default:
+      werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "Bad rIdx in loadRegFromConst");
+      return;
+    }
+
+  hc08_dirtyReg (reg, FALSE);
+  reg->isLitConst = 1;
+  reg->litConst = c;
+  if (reg->rIdx == HX_IDX)
+    {
+      hc08_reg_x->isLitConst = 1;
+      hc08_reg_x->litConst = c & 0xff;
+      hc08_reg_h->isLitConst = 1;
+      hc08_reg_h->litConst = (c >> 8) & 0xff;
+    }
+  hc08_useReg (reg);
+}
+
+/*--------------------------------------------------------------------------*/
+/* loadRegFromImm - Load register reg from immediate value c.               */
+/*--------------------------------------------------------------------------*/
+static void
+loadRegFromImm (reg_info * reg, char * c)
+{
+  switch (reg->rIdx)
+    {
+    case A_IDX:
+      emitcode ("lda", "%s", c);
+      regalloc_dry_run_cost += 2;
+      break;
+    case X_IDX:
+      emitcode ("ldx", "%s", c);
+      regalloc_dry_run_cost += 2;
+      break;
+    case H_IDX:
+      if (hc08_reg_a->isFree)
+        {
+          loadRegFromImm (hc08_reg_a, c);
+          transferRegReg (hc08_reg_a, hc08_reg_h, TRUE);
+        }
+      else if (hc08_reg_x->isFree)
+        {
+          loadRegFromImm (hc08_reg_x, c);
           transferRegReg (hc08_reg_x, hc08_reg_h, TRUE);
         }
       else
         {
           pushReg (hc08_reg_a, TRUE);
-          loadRegFromConst (hc08_reg_a, c);
+          loadRegFromImm (hc08_reg_a, c);
           transferRegReg (hc08_reg_a, hc08_reg_h, TRUE);
           pullReg (hc08_reg_a);
         }
@@ -1148,19 +1253,31 @@ loadRegFromConst (reg_info * reg, char *c)
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "Bad rIdx in loadRegFromConst");
       return;
     }
+  hc08_dirtyReg (reg, FALSE);
   hc08_useReg (reg);
 }
-
 
 /*--------------------------------------------------------------------------*/
 /* storeConstToAop- Store constant c to logical offset loffset of asmop aop.*/
 /*--------------------------------------------------------------------------*/
 static void
-storeConstToAop (char *c, asmop * aop, int loffset)
+storeConstToAop (int c, asmop * aop, int loffset)
 {
   if (aop->stacked && aop->stk_aop[loffset])
     {
       storeConstToAop (c, aop->stk_aop[loffset], 0);
+      return;
+    }
+
+  /* If the value needed is already in A or X, just store it */
+  if (hc08_reg_a->isLitConst && hc08_reg_a->litConst == c)
+    {
+      storeRegToAop (hc08_reg_a, aop, loffset);
+      return;
+    }
+  if (hc08_reg_x->isLitConst && hc08_reg_x->litConst == c)
+    {
+      storeRegToAop (hc08_reg_x, aop, loffset);
       return;
     }
 
@@ -1169,7 +1286,7 @@ storeConstToAop (char *c, asmop * aop, int loffset)
     case AOP_DIR:
       /* clr operates with read-modify-write cycles, so don't use if the */
       /* destination is volatile to avoid the read side-effect. */
-      if (!strcmp (c, zero) && !(aop->op && isOperandVolatile (aop->op, FALSE)) && optimize.codeSize)
+      if (!c && !(aop->op && isOperandVolatile (aop->op, FALSE)) && optimize.codeSize)
         {
           /* clr dst : 2 bytes, 5 cycles */
           emitcode ("clr", "%s", aopAdrStr (aop, loffset, FALSE));
@@ -1178,7 +1295,7 @@ storeConstToAop (char *c, asmop * aop, int loffset)
       else
         {
           /* mov #0,dst : 3 bytes, 4 cycles */
-          emitcode ("mov", "%s,%s", c, aopAdrStr (aop, loffset, FALSE));
+          emitcode ("mov", "!immedbyte,%s", c, aopAdrStr (aop, loffset, FALSE));
           regalloc_dry_run_cost += 3;
         }
       break;
@@ -1212,6 +1329,66 @@ storeConstToAop (char *c, asmop * aop, int loffset)
     }
 }
 
+/*--------------------------------------------------------------------------*/
+/* storeImmToAop- Store immediate value c to logical offset loffset of asmop aop.*/
+/*--------------------------------------------------------------------------*/
+static void
+storeImmToAop (char *c, asmop * aop, int loffset)
+{
+  if (aop->stacked && aop->stk_aop[loffset])
+    {
+      storeImmToAop (c, aop->stk_aop[loffset], 0);
+      return;
+    }
+
+  switch (aop->type)
+    {
+    case AOP_DIR:
+      /* clr operates with read-modify-write cycles, so don't use if the */
+      /* destination is volatile to avoid the read side-effect. */
+      if (!strcmp (c, zero) && !(aop->op && isOperandVolatile (aop->op, FALSE)) && optimize.codeSize)
+        {
+          /* clr dst : 2 bytes, 5 cycles */
+          emitcode ("clr", "%s", aopAdrStr (aop, loffset, FALSE));
+          regalloc_dry_run_cost += 2;
+        }
+      else
+        {
+          /* mov #0,dst : 3 bytes, 4 cycles */
+          emitcode ("mov", "%s,%s", c, aopAdrStr (aop, loffset, FALSE));
+          regalloc_dry_run_cost += 3;
+        }
+      break;
+    case AOP_REG:
+      if (loffset > (aop->size - 1))
+        break;
+      loadRegFromImm (aop->aopu.aop_reg[loffset], c);
+      break;
+    case AOP_DUMMY:
+      break;
+    default:
+      if (hc08_reg_a->isFree)
+        {
+          loadRegFromImm (hc08_reg_a, c);
+          storeRegToAop (hc08_reg_a, aop, loffset);
+          hc08_freeReg (hc08_reg_a);
+        }
+      else if (hc08_reg_x->isFree)
+        {
+          loadRegFromImm (hc08_reg_x, c);
+          storeRegToAop (hc08_reg_x, aop, loffset);
+          hc08_freeReg (hc08_reg_x);
+        }
+      else
+        {
+          pushReg (hc08_reg_a, TRUE);
+          loadRegFromImm (hc08_reg_a, c);
+          storeRegToAop (hc08_reg_a, aop, loffset);
+          pullReg (hc08_reg_a);
+        }
+    }
+}
+
 
 /*--------------------------------------------------------------------------*/
 /* storeRegSignToUpperAop - If isSigned is true, the sign bit of register   */
@@ -1233,7 +1410,7 @@ storeRegSignToUpperAop (reg_info * reg, asmop * aop, int loffset, bool isSigned)
     {
       /* Unsigned case */
       while (loffset < size)
-        storeConstToAop (zero, aop, loffset++);
+        storeConstToAop (0, aop, loffset++);
     }
   else
     {
@@ -1340,23 +1517,18 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
   if (dstofs >= dstaop->size)
     return;
 
-  if ((dstaop->type == AOP_DIR) && ((srcaop->type == AOP_DIR) || (srcaop->type == AOP_LIT)))
+  if (srcaop->type == AOP_LIT)
+    {
+      storeConstToAop (byteOfVal (srcaop->aopu.aop_lit, srcofs), dstaop, dstofs);
+      return;
+    }
+    
+  if ((dstaop->type == AOP_DIR) && (srcaop->type == AOP_DIR))
     {
       char *src = aopAdrStr (srcaop, srcofs, FALSE);
-      /* clr operates with read-modify-write cycles, so don't use if the */
-      /* destination is volatile to avoid the read side-effect. */
-      if (!strcmp (src, zero) && !(dstaop->op && isOperandVolatile (dstaop->op, FALSE)) && optimize.codeSize)
-        {
-          /* clr dst : 2 bytes, 5 cycles */
-          emitcode ("clr", "%s", aopAdrStr (dstaop, dstofs, FALSE));
-          regalloc_dry_run_cost += 2;
-        }
-      else
-        {
-          /* mov #0,dst : 3 bytes, 4 cycles */
-          emitcode ("mov", "%s,%s", src, aopAdrStr (dstaop, dstofs, FALSE));
-          regalloc_dry_run_cost += 3;
-        }
+      /* mov src,dst : 3 bytes, 5 cycles */
+      emitcode ("mov", "%s,%s", src, aopAdrStr (dstaop, dstofs, FALSE));
+      regalloc_dry_run_cost += 3;
       return;
     }
 
@@ -2649,7 +2821,7 @@ asmopToBool (asmop *aop, bool resultInA)
     {
       loadRegFromAop (hc08_reg_a, aop, 0);
       rmwWithReg ("neg", hc08_reg_a);
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       rmwWithReg ("rol", hc08_reg_a);
       return;
     }
@@ -2682,6 +2854,7 @@ asmopToBool (asmop *aop, bool resultInA)
             {
               transferRegReg (hc08_reg_h, hc08_reg_x, FALSE);
               emitcode ("tstx", "");
+              regalloc_dry_run_cost++;
               hc08_freeReg (hc08_reg_x);
             }
           else
@@ -2695,6 +2868,7 @@ asmopToBool (asmop *aop, bool resultInA)
       else if (IS_AOP_HX (aop))
         {
           emitcode ("cphx", zero);
+          regalloc_dry_run_cost += 3;
         }
       else if (IS_AOP_XA (aop) || IS_AOP_AX (aop))
         {
@@ -2737,9 +2911,9 @@ asmopToBool (asmop *aop, bool resultInA)
     case AOP_LIT:
       /* Higher levels should optimize this case away but let's be safe */
       if (ulFromVal (aop->aopu.aop_lit))
-        loadRegFromConst (hc08_reg_a, one);
+        loadRegFromConst (hc08_reg_a, 1);
       else
-        loadRegFromConst (hc08_reg_a, zero);
+        loadRegFromConst (hc08_reg_a, 0);
       hc08_freeReg (hc08_reg_a);
       break;
     default:
@@ -2809,19 +2983,21 @@ asmopToBool (asmop *aop, bool resultInA)
         {
           tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
           emitBranch ("bne", tlbl1);
-          loadRegFromConst (hc08_reg_a, zero);
+          loadRegFromConst (hc08_reg_a, 0);
           emitBranch ("bra", tlbl);
           if (!regalloc_dry_run)
             emitLabel (tlbl1);
-          loadRegFromConst (hc08_reg_a, one);
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+          loadRegFromConst (hc08_reg_a, 1);
         }
       else
         {
           emitBranch ("beq", tlbl);
-          loadRegFromConst (hc08_reg_a, one);
+          loadRegFromConst (hc08_reg_a, 1);
         }
       if (!regalloc_dry_run)
         emitLabel (tlbl);
+      hc08_dirtyReg (hc08_reg_a, FALSE);
       hc08_useReg (hc08_reg_a);
     }
 }
@@ -2881,7 +3057,7 @@ genCopy (operand * result, operand * source)
     }
 
   /* general case */
-  /* Copy in msb tot lsb order, since some multi-byte hardware registers */
+  /* Copy in msb to lsb order, since some multi-byte hardware registers */
   /* expect this order. */
   size = AOP_SIZE (result);
   offset = size - 1;
@@ -3106,14 +3282,14 @@ genUminus (iCode * ic)
         rmwWithReg ("neg", hc08_reg_a);
       else
         {
-          loadRegFromConst (hc08_reg_a, zero);
+          loadRegFromConst (hc08_reg_a, 0);
           accopWithAop ("sub", AOP (IC_LEFT (ic)), 0);
         }
       if (result0 == hc08_reg_a || (result0 && result0 == left1))
         pushReg (hc08_reg_a, TRUE);
       else
         storeRegToAop (hc08_reg_a, AOP (IC_RESULT (ic)), 0);
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       if (left1 == hc08_reg_a)
         {
           emitcode ("sbc","%d,s", (result0 == hc08_reg_a || (result0 && result0 == left1)) ? 2 : 1);
@@ -3139,7 +3315,7 @@ genUminus (iCode * ic)
   sub = "sub";
   while (size--)
     {
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       accopWithAop (sub, AOP (IC_LEFT (ic)), offset);
       storeRegToAop (hc08_reg_a, result, offset++);
       sub = "sbc";
@@ -3875,23 +4051,38 @@ genRet (iCode * ic)
   aopOp (IC_LEFT (ic), ic, FALSE);
   size = AOP_SIZE (IC_LEFT (ic));
 
-  /* Take care when swapping a and x */
-  if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && size > 1 && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == X_IDX)
+  if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
     {
-      delayed_x = TRUE;
-      pushReg (hc08_reg_x, TRUE);
+      /* If returning a literal, we can load the bytes of the return value */
+      /* in any order. By loading A and X first, any other bytes that match */
+      /* can use the shorter sta and stx instructions. */
+      offset = 0;
+      while (size--)
+        {
+          transferAopAop (AOP (IC_LEFT (ic)), offset, hc08_aop_pass[offset], 0);
+          offset++;
+        }
     }
-
-  offset = size - 1;
-  while (size--)
+  else
     {
-      if (!(delayed_x && !offset))
-      transferAopAop (AOP (IC_LEFT (ic)), offset, hc08_aop_pass[offset], 0);
-      offset--;
-    }
+      /* Take care when swapping a and x */
+      if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && size > 1 && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == X_IDX)
+        {
+          delayed_x = TRUE;
+          pushReg (hc08_reg_x, TRUE);
+        }
 
-  if (delayed_x)
-    pullReg (hc08_reg_a);
+      offset = size - 1;
+      while (size--)
+        {
+          if (!(delayed_x && !offset))
+            transferAopAop (AOP (IC_LEFT (ic)), offset, hc08_aop_pass[offset], 0);
+          offset--;
+        }
+
+      if (delayed_x)
+        pullReg (hc08_reg_a);
+    }
 
   freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 
@@ -3920,7 +4111,10 @@ genLabel (iCode * ic)
     {
       reg = hc08_regWithIdx (i);
       if (reg)
-        reg->aop = NULL;
+        {
+          reg->aop = NULL;
+          reg->isLitConst = 0;
+        }
     }
 
   /* special case never generate */
@@ -4231,7 +4425,7 @@ addSign (operand * result, int offset, int sign)
         }
       else
         while (size--)
-          storeConstToAop (zero, AOP (result), offset++);
+          storeConstToAop (0, AOP (result), offset++);
     }
 }
 
@@ -4624,7 +4818,7 @@ genDivOneByte (operand * left, operand * right, operand * result)
           loadRegFromAop (hc08_reg_a, AOP (left), 0);
           loadRegFromAop (hc08_reg_x, AOP (right), 0);
         }
-      loadRegFromConst (hc08_reg_h, zero);
+      loadRegFromConst (hc08_reg_h, 0);
       emitcode ("div", "");
       regalloc_dry_run_cost++;
       hc08_dirtyReg (hc08_reg_a, FALSE);
@@ -4678,9 +4872,9 @@ genDivOneByte (operand * left, operand * right, operand * result)
   if (runtimeSign)
     {
       if (compiletimeSign)
-        pushConst (one);    /* set sign flag */
+        pushConst (1);    /* set sign flag */
       else
-        pushConst (zero);    /* reset sign flag */
+        pushConst (0);    /* reset sign flag */
     }
 
   if (IS_AOP_X (AOP (left)))
@@ -4759,7 +4953,7 @@ genDivOneByte (operand * left, operand * right, operand * result)
         }
     }
 
-  loadRegFromConst (hc08_reg_h, zero);
+  loadRegFromConst (hc08_reg_h, 0);
   emitcode ("div", "");
   regalloc_dry_run_cost++;
   hc08_dirtyReg (hc08_reg_x, FALSE);
@@ -4774,7 +4968,7 @@ genDivOneByte (operand * left, operand * right, operand * result)
           pullReg (hc08_reg_x);
           rmwWithReg ("lsr", hc08_reg_x);
           if (size > 1)
-            loadRegFromConst (hc08_reg_x, zero);
+            loadRegFromConst (hc08_reg_x, 0);
           emitBranch ("bcc", tlbl3);
           rmwWithReg ("neg", hc08_reg_a);
           if (size > 1)
@@ -4793,7 +4987,7 @@ genDivOneByte (operand * left, operand * right, operand * result)
           rmwWithReg ("neg", hc08_reg_a);
           storeRegToAop (hc08_reg_a, AOP (result), 0);
           if (size > 1)
-            storeConstToAop ("#0xff", AOP (result), 1);
+            storeConstToAop (0xff, AOP (result), 1);
         }
     }
   else
@@ -4890,7 +5084,7 @@ genModOneByte (operand * left, operand * right, operand * result)
           loadRegFromAop (hc08_reg_a, AOP (left), 0);
           loadRegFromAop (hc08_reg_x, AOP (right), 0);
         }
-      loadRegFromConst (hc08_reg_h, zero);
+      loadRegFromConst (hc08_reg_h, 0);
       emitcode ("div", "");
       regalloc_dry_run_cost++;
       hc08_freeReg (hc08_reg_x);
@@ -4977,7 +5171,7 @@ genModOneByte (operand * left, operand * right, operand * result)
       else
         {
           runtimeSign = TRUE;
-          pushConst (zero);
+          pushConst (0);
 
           if (!preload_a)
             loadRegFromAop (hc08_reg_a, AOP (left), 0);
@@ -4993,7 +5187,7 @@ genModOneByte (operand * left, operand * right, operand * result)
         }
     }
 
-  loadRegFromConst (hc08_reg_h, zero);
+  loadRegFromConst (hc08_reg_h, 0);
   emitcode ("div", "");
   regalloc_dry_run_cost++;
   hc08_freeReg (hc08_reg_x);
@@ -5009,7 +5203,7 @@ genModOneByte (operand * left, operand * right, operand * result)
           pullReg (hc08_reg_x);
           rmwWithReg ("lsr", hc08_reg_x);
           if (size > 1)
-            loadRegFromConst (hc08_reg_x, zero);
+            loadRegFromConst (hc08_reg_x, 0);
           emitBranch ("bcc", tlbl3);
           rmwWithReg ("neg", hc08_reg_a);
           if (size > 1)
@@ -5028,7 +5222,7 @@ genModOneByte (operand * left, operand * right, operand * result)
           rmwWithReg ("neg", hc08_reg_a);
           storeRegToAop (hc08_reg_a, AOP (result), 0);
           if (size > 1)
-            storeConstToAop ("#0xff", AOP (result), 1);
+            storeConstToAop (0xff, AOP (result), 1);
         }
     }
   else
@@ -5401,13 +5595,15 @@ genCmp (iCode * ic, iCode * ifx)
         needpulla = pushRegIfSurv (hc08_reg_a);
 
       emitBranch (branchInstCmp (opcode, sign), tlbl1);
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       emitBranch ("bra", tlbl2);
       if (!regalloc_dry_run)
         emitLabel (tlbl1);
-      loadRegFromConst (hc08_reg_a, one);
+      hc08_dirtyReg (hc08_reg_a, FALSE);
+      loadRegFromConst (hc08_reg_a, 1);
       if (!regalloc_dry_run)
         emitLabel (tlbl2);
+      hc08_dirtyReg (hc08_reg_a, FALSE);
       storeRegToFullAop (hc08_reg_a, AOP (result), FALSE);
       pullOrFreeReg (hc08_reg_a, needpulla);
       freeAsmop (result, NULL, ic, TRUE);
@@ -5551,26 +5747,30 @@ genCmpEQorNE (iCode * ic, iCode * ifx)
           emitBranch ("beq", tlbl_EQ);
           if (tlbl_NE)
             emitLabel (tlbl_NE);
-          loadRegFromConst (hc08_reg_a, zero);
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+          loadRegFromConst (hc08_reg_a, 0);
           emitBranch ("bra", tlbl);
           if (!regalloc_dry_run)
             emitLabel (tlbl_EQ);
-          loadRegFromConst (hc08_reg_a, one);
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+          loadRegFromConst (hc08_reg_a, 1);
         }
       else
         {
           if (!tlbl_NE && !regalloc_dry_run)
             tlbl_NE = newiTempLabel (NULL);
           emitBranch ("bne", tlbl_NE);
-          loadRegFromConst (hc08_reg_a, zero);
+          loadRegFromConst (hc08_reg_a, 0);
           emitBranch ("bra", tlbl);
           if (!regalloc_dry_run)
             emitLabel (tlbl_NE);
-          loadRegFromConst (hc08_reg_a, one);
+          hc08_dirtyReg (hc08_reg_a, FALSE);
+          loadRegFromConst (hc08_reg_a, 1);
         }
 
       if (!regalloc_dry_run)
         emitLabel (tlbl);
+      hc08_dirtyReg (hc08_reg_a, FALSE);
       storeRegToFullAop (hc08_reg_a, AOP (result), FALSE);
       pullOrFreeReg (hc08_reg_a, needpulla);
       freeAsmop (result, NULL, ic, TRUE);
@@ -5648,13 +5848,15 @@ genAndOp (iCode * ic)
   emitBranch ("beq", tlbl0);
   asmopToBool (AOP (right), FALSE);
   emitBranch ("beq", tlbl0);
-  loadRegFromConst (hc08_reg_a, one);
+  loadRegFromConst (hc08_reg_a, 1);
   emitBranch ("bra", tlbl);
   if (!regalloc_dry_run)
     emitLabel (tlbl0);
-  loadRegFromConst (hc08_reg_a, zero);
+  hc08_dirtyReg (hc08_reg_a, FALSE);
+  loadRegFromConst (hc08_reg_a, 0);
   if (!regalloc_dry_run)
     emitLabel (tlbl);
+  hc08_dirtyReg (hc08_reg_a, FALSE);
 
   hc08_useReg (hc08_reg_a);
   hc08_freeReg (hc08_reg_a);
@@ -5695,13 +5897,15 @@ genOrOp (iCode * ic)
   emitBranch ("bne", tlbl0);
   asmopToBool (AOP (right), FALSE);
   emitBranch ("bne", tlbl0);
-  loadRegFromConst (hc08_reg_a, zero);
+  loadRegFromConst (hc08_reg_a, 0);
   emitBranch ("bra", tlbl);
   if (!regalloc_dry_run)
     emitLabel (tlbl0);
-  loadRegFromConst (hc08_reg_a, one);
+  hc08_dirtyReg (hc08_reg_a, FALSE);
+  loadRegFromConst (hc08_reg_a, 1);
   if (!regalloc_dry_run)
     emitLabel (tlbl);
+  hc08_dirtyReg (hc08_reg_a, FALSE);
 
   hc08_useReg (hc08_reg_a);
   hc08_freeReg (hc08_reg_a);
@@ -5832,7 +6036,7 @@ genAnd (iCode * ic, iCode * ifx)
       needpulla = pushRegIfSurv (hc08_reg_a);
 
       /* this generates ugly code, but meets volatility requirements */
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       pushReg (hc08_reg_a, TRUE);
 
       offset = 0;
@@ -5961,7 +6165,7 @@ genAnd (iCode * ic, iCode * ifx)
               loadRegFromAop (hc08_reg_a, AOP (left), offset);
               hc08_freeReg (hc08_reg_a);
             }
-          storeConstToAop (zero, AOP (result), offset);
+          storeConstToAop (0, AOP (result), offset);
         }
       else if (AOP_TYPE (right) == AOP_LIT && bytemask == 0xff)
         {
@@ -6040,7 +6244,7 @@ genOr (iCode * ic, iCode * ifx)
       needpulla = pushRegIfSurv (hc08_reg_a);
 
       /* this generates ugly code, but meets volatility requirements */
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       pushReg (hc08_reg_a, TRUE);
 
       offset = 0;
@@ -7006,7 +7210,7 @@ XAccLsh (int shCount)
     {
       AccLsh (shCount - 8);
       transferRegReg (hc08_reg_a, hc08_reg_x, FALSE);
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       return;
     }
 
@@ -7026,7 +7230,7 @@ XAccLsh (int shCount)
       rmwWithReg ("lsr", hc08_reg_x);
       rmwWithReg ("ror", hc08_reg_a);
       transferRegReg (hc08_reg_a, hc08_reg_x, FALSE);
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       rmwWithReg ("ror", hc08_reg_a);
       return;
 
@@ -7067,7 +7271,7 @@ XAccSRsh (int shCount)
        ** total: 5 cycles, 5 bytes
        */
       rmwWithReg ("lsl", hc08_reg_x);
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       rmwWithReg ("rol", hc08_reg_a);
       rmwWithReg ("neg", hc08_reg_a);
       transferRegReg (hc08_reg_a, hc08_reg_x, FALSE);
@@ -7094,7 +7298,7 @@ XAccSRsh (int shCount)
       transferRegReg (hc08_reg_x, hc08_reg_a, FALSE);
       AccSRsh (shCount - 8);
       rmwWithReg ("lsl", hc08_reg_a);
-      loadRegFromConst (hc08_reg_x, zero);
+      loadRegFromConst (hc08_reg_x, 0);
       rmwWithReg ("rol", hc08_reg_x);
       rmwWithReg ("neg", hc08_reg_x);
       rmwWithReg ("ror", hc08_reg_a);
@@ -7141,10 +7345,10 @@ XAccRsh (int shCount, bool sign)
        **   clrx       1  1        0000 0000  0000 000a   0
        ** total: 4 cycles, 4 bytes
        */
-      loadRegFromConst (hc08_reg_x, zero);
+      loadRegFromConst (hc08_reg_x, 0);
       rmwWithReg ("lsl", hc08_reg_x);
       rmwWithReg ("rol", hc08_reg_a);
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       return;
 
     case 14:
@@ -7158,12 +7362,12 @@ XAccRsh (int shCount, bool sign)
        **   clrx       1  1        0000 0000  0000 00ab   0
        ** total: 6 cycles, 6 bytes
        */
-      loadRegFromConst (hc08_reg_x, zero);
+      loadRegFromConst (hc08_reg_x, 0);
       rmwWithReg ("lsl", hc08_reg_x);
       rmwWithReg ("rol", hc08_reg_a);
       rmwWithReg ("lsl", hc08_reg_x);
       rmwWithReg ("rol", hc08_reg_a);
-      loadRegFromConst (hc08_reg_a, zero);
+      loadRegFromConst (hc08_reg_a, 0);
       return;
 
     case 13:
@@ -7174,7 +7378,7 @@ XAccRsh (int shCount, bool sign)
     case 8:
       transferRegReg (hc08_reg_x, hc08_reg_a, FALSE);
       AccRsh (shCount - 8, FALSE);
-      loadRegFromConst (hc08_reg_x, zero);
+      loadRegFromConst (hc08_reg_x, 0);
       return;
 
     case 7:
@@ -7190,7 +7394,7 @@ XAccRsh (int shCount, bool sign)
       rmwWithReg ("lsl", hc08_reg_a);
       transferRegReg (hc08_reg_x, hc08_reg_a, FALSE);
       rmwWithReg ("rol", hc08_reg_a);
-      loadRegFromConst (hc08_reg_x, zero);
+      loadRegFromConst (hc08_reg_x, 0);
       rmwWithReg ("rol", hc08_reg_x);
       return;
     case 6:
@@ -7348,7 +7552,7 @@ genlshTwo (operand * result, operand * left, int shCount)
           AccLsh (shCount);
           storeRegToAop (hc08_reg_a, AOP (result), 1);
         }
-      storeConstToAop (zero, AOP (result), LSB);
+      storeConstToAop (0, AOP (result), LSB);
       pullOrFreeReg (hc08_reg_a, needpulla);
     }
 
@@ -7400,7 +7604,7 @@ shiftLLong (operand * left, operand * result, int offr)
       storeRegToAop (hc08_reg_x, AOP (result), offr + 1);
       rmwWithReg ("rol", hc08_reg_a);
       storeRegToAop (hc08_reg_a, AOP (result), offr + 2);
-      storeConstToAop (zero, AOP (result), 0);
+      storeConstToAop (0, AOP (result), 0);
     }
 
   pullOrFreeReg (hc08_reg_x, needpulx);
@@ -7431,9 +7635,9 @@ genlshFour (operand * result, operand * left, int shCount)
         shiftL1Left2Result (left, LSB, result, MSB32, shCount);
       else
         movLeft2Result (left, LSB, result, MSB32, 0);
-      storeConstToAop (zero, AOP (result), LSB);
-      storeConstToAop (zero, AOP (result), MSB16);
-      storeConstToAop (zero, AOP (result), MSB24);
+      storeConstToAop (0, AOP (result), LSB);
+      storeConstToAop (0, AOP (result), MSB16);
+      storeConstToAop (0, AOP (result), MSB24);
       return;
     }
 
@@ -7450,8 +7654,8 @@ genlshFour (operand * result, operand * left, int shCount)
           movLeft2Result (left, MSB16, result, MSB32, 0);
           movLeft2Result (left, LSB, result, MSB24, 0);
         }
-      storeConstToAop (zero, AOP (result), LSB);
-      storeConstToAop (zero, AOP (result), MSB16);
+      storeConstToAop (0, AOP (result), LSB);
+      storeConstToAop (0, AOP (result), MSB16);
       return;
     }
 
@@ -7475,7 +7679,7 @@ genlshFour (operand * result, operand * left, int shCount)
               movLeft2Result (left, MSB24, result, MSB32, 0);
               movLeft2Result (left, MSB16, result, MSB24, 0);
               movLeft2Result (left, LSB, result, MSB16, 0);
-              storeConstToAop (zero, AOP (result), LSB);
+              storeConstToAop (0, AOP (result), LSB);
             }
           else if (shCount == 1)
             shiftLLong (left, result, MSB16);
@@ -7484,7 +7688,7 @@ genlshFour (operand * result, operand * left, int shCount)
               shiftL2Left2Result (left, MSB16, result, MSB24, shCount);
               shiftL1Left2Result (left, LSB, result, MSB16, shCount);
               shiftRLeftOrResult (left, LSB, result, MSB24, 8 - shCount);
-              storeConstToAop (zero, AOP (result), LSB);
+              storeConstToAop (0, AOP (result), LSB);
             }
         }
     }
@@ -7535,7 +7739,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
   else if (shCount >= (size * 8))
     {
       while (size--)
-        storeConstToAop (zero, AOP (result), size);
+        storeConstToAop (0, AOP (result), size);
     }
   else
     {
@@ -7723,7 +7927,7 @@ genrshTwo (operand * result, operand * left, int shCount, int sign)
       else
         {
           transferAopAop (AOP (left), 1, AOP (result), 0);
-          storeConstToAop (zero, AOP (result), 1);
+          storeConstToAop (0, AOP (result), 1);
         }
     }
 
@@ -7786,7 +7990,7 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
         }
       else
         {
-          storeConstToAop (zero, AOP (result), MSB32);
+          storeConstToAop (0, AOP (result), MSB32);
         }
     }
 
@@ -7852,7 +8056,7 @@ genrshFour (operand * result, operand * left, int shCount, int sign)
           XAccRsh (shCount - 8, FALSE);
           storeRegToAop (hc08_reg_xa, AOP (result), 0);
           loadRegFromAop (hc08_reg_x, AOP (left), 3);
-          loadRegFromConst (hc08_reg_a, zero);
+          loadRegFromConst (hc08_reg_a, 0);
           XAccRsh (shCount - 8, sign);
           accopWithAop ("ora", AOP (result), 1);
           storeRegToAop (hc08_reg_xa, AOP (result), 1);
@@ -8235,7 +8439,7 @@ finish:
       if (SPEC_USIGN (etype))
         {
           while (rsize--)
-            storeConstToAop (zero, AOP (result), offset++);
+            storeConstToAop (0, AOP (result), offset++);
         }
       else
         {
@@ -8299,7 +8503,7 @@ genUnpackBitsImmed (operand * left, operand *right, operand * result, iCode * ic
         {
           symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
 
-          loadRegFromConst (hc08_reg_a, zero);
+          loadRegFromConst (hc08_reg_a, 0);
           if (!regalloc_dry_run)
             emitcode ("brclr", "#%d,%s,%05d$", bstr, aopAdrStr (derefaop, 0, FALSE), labelKey2num ((tlbl->key)));
           regalloc_dry_run_cost += 3;
@@ -8442,7 +8646,7 @@ finish:
       if (SPEC_USIGN (etype))
         {
           while (rsize--)
-            storeConstToAop (zero, AOP (result), offset++);
+            storeConstToAop (0, AOP (result), offset++);
         }
       else
         {
@@ -9203,8 +9407,11 @@ genAddrOf (iCode * ic)
           regalloc_dry_run_cost += 2;
           offset += 128;
         }
-      emitcode ("aix", "#%d", offset);
-      regalloc_dry_run_cost += 2;
+      if (offset)
+        {
+          emitcode ("aix", "#%d", offset);
+          regalloc_dry_run_cost += 2;
+        }
       storeRegToFullAop (hc08_reg_hx, AOP (IC_RESULT (ic)), FALSE);
       pullOrFreeReg (hc08_reg_h, needpullh);
       pullOrFreeReg (hc08_reg_x, needpullx);
@@ -9229,7 +9436,7 @@ genAddrOf (iCode * ic)
         default:
           sprintf (s, "#(%s >> %d)", sym->rname, offset * 8);
         }
-      storeConstToAop (s, AOP (IC_RESULT (ic)), offset++);
+      storeImmToAop (s, AOP (IC_RESULT (ic)), offset++);
     }
 
 release:
@@ -9277,7 +9484,7 @@ genJumpTab (iCode * ic)
       /* get the condition into x */
       loadRegFromAop (hc08_reg_x, AOP (IC_JTCOND (ic)), 0);
       freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
-      loadRegFromConst (hc08_reg_h, zero);
+      loadRegFromConst (hc08_reg_h, 0);
 
       if (!regalloc_dry_run)
         {
@@ -9300,7 +9507,7 @@ genJumpTab (iCode * ic)
       /* get the condition into x */
       loadRegFromAop (hc08_reg_x, AOP (IC_JTCOND (ic)), 0);
       freeAsmop (IC_JTCOND (ic), NULL, ic, TRUE);
-      loadRegFromConst (hc08_reg_h, zero);
+      loadRegFromConst (hc08_reg_h, 0);
 
       if (!regalloc_dry_run)
         emitcode ("lda", "%05d$,x", labelKey2num (jtabhi->key));
@@ -9389,7 +9596,7 @@ genCast (iCode * ic)
         {
           transferAopAop (AOP (right), 0, AOP (result), 0);
           if (!signExtend)
-            storeConstToAop (zero, AOP (result), 1);
+            storeConstToAop (0, AOP (result), 1);
           else
             {
               save_a = (AOP (result)->aopu.aop_reg[0] == hc08_reg_a || !hc08_reg_a->isDead);
@@ -9477,7 +9684,7 @@ genCast (iCode * ic)
   if (size && !signExtend)
     {
       while (size--)
-        storeConstToAop (zero, AOP (result), offset++);
+        storeConstToAop (0, AOP (result), offset++);
     }
   else if (size)
     {
@@ -9770,6 +9977,8 @@ genhc08iCode (iCode *ic)
         //if (reg->aop)
         //  emitcode ("", "; %s = %s offset %d", reg->name, aopName (reg->aop), reg->aopofs);
         reg->isFree = TRUE;
+        if (regalloc_dry_run)
+          reg->isLitConst = 0;
       }
 
     if (ic->op == IFX)
@@ -10065,6 +10274,10 @@ genhc08Code (iCode *lic)
   int cblock = 0;
 
   regalloc_dry_run = FALSE;
+
+  hc08_dirtyReg (hc08_reg_a, FALSE);
+  hc08_dirtyReg (hc08_reg_h, FALSE);
+  hc08_dirtyReg (hc08_reg_x, FALSE);
 
   /* print the allocation information */
   if (allocInfo && currFunc)

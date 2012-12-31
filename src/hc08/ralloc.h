@@ -55,6 +55,8 @@ typedef struct reg_info
     int aopofs;			/* last operand offset */
     unsigned isFree:1;		/* is currently unassigned */
     unsigned isDead:1;      /* does not need to survive current instruction */
+    unsigned isLitConst:1;      /* has an literal constant loaded */
+    int litConst;		/* last literal constant */
   }
 reg_info;
 extern reg_info regshc08[];

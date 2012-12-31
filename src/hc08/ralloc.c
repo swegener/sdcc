@@ -257,21 +257,39 @@ hc08_dirtyReg (reg_info * reg, bool freereg)
     {
       case A_IDX:
         hc08_reg_xa->aop = NULL;
+	hc08_reg_xa->isLitConst = 0;
+	hc08_reg_a->aop = NULL;
+	hc08_reg_a->isLitConst = 0;
         break;
       case X_IDX:
         hc08_reg_xa->aop = NULL;
+	hc08_reg_xa->isLitConst = 0;
         hc08_reg_hx->aop = NULL;
+	hc08_reg_hx->isLitConst = 0;
+	hc08_reg_x->aop = NULL;
+	hc08_reg_x->isLitConst = 0;
         break;
       case H_IDX:
         hc08_reg_hx->aop = NULL;
+	hc08_reg_hx->isLitConst = 0;
+	hc08_reg_h->aop = NULL;
+	hc08_reg_h->isLitConst = 0;
         break;
       case HX_IDX:
+        hc08_reg_hx->aop = NULL;
+	hc08_reg_hx->isLitConst = 0;
         hc08_reg_h->aop = NULL;
+	hc08_reg_h->isLitConst = 0;
         hc08_reg_x->aop = NULL;
+	hc08_reg_x->isLitConst = 0;
         break;
       case XA_IDX:
+        hc08_reg_xa->aop = NULL;
+	hc08_reg_xa->isLitConst = 0;
         hc08_reg_x->aop = NULL;
+	hc08_reg_x->isLitConst = 0;
         hc08_reg_a->aop = NULL;
+	hc08_reg_a->isLitConst = 0;
         break;
       default:
         break;

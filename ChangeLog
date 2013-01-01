@@ -1,3 +1,10 @@
+2013-01-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/peeph.def: Removed peephole rule #8 since it is handled
+	  in code generator now. Added rules for dbnz.
+	* src/hc08/gen.c:  Rewrote genDbnz(). Minor improvements to genCmp()
+	  and asmopToBool(). Removed some totally wrong code from genIfx().
+
 2012-12-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.h,

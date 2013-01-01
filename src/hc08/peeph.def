@@ -205,95 +205,6 @@ replace {
 	ldx	%1,s
 }
 
-replace {
-	clra
-	sta	%1
-	clra
-	sta	%2
-	clra
-	sta	%3
-	clra
-	sta	%4
-} by {
-	; Peephole 5a   - eliminated redundant clra
-	clra
-	sta	%1
-	sta	%2
-	sta	%3
-	sta	%4
-}
-
-replace {
-	clra
-	sta	%1
-	clra
-	sta	%2
-	clra
-	sta	%3
-} by {
-	; Peephole 5b   - eliminated redundant clra
-	clra
-	sta	%1
-	sta	%2
-	sta	%3
-}
-
-replace {
-	clra
-	sta	%1
-	clra
-	sta	%2
-} by {
-	; Peephole 5c   - eliminated redundant clra
-	clra
-	sta	%1
-	sta	%2
-}
-
-replace {
-	lda	#%9
-	sta	%1
-	lda	#%9
-	sta	%2
-	lda	#%9
-	sta	%3
-	lda	#%9
-	sta	%4
-} by {
-	; Peephole 5d   - eliminated redundant lda
-	lda	#%9
-	sta	%1
-	sta	%2
-	sta	%3
-	sta	%4
-}
-
-replace {
-	lda	#%9
-	sta	%1
-	lda	#%9
-	sta	%2
-	lda	#%9
-	sta	%3
-} by {
-	; Peephole 5e   - eliminated redundant lda
-	lda	#%9
-	sta	%1
-	sta	%2
-	sta	%3
-}
-
-replace {
-	lda	#%9
-	sta	%1
-	lda	#%9
-	sta	%2
-} by {
-	; Peephole 5f   - eliminated redundant lda
-	lda	#%9
-	sta	%1
-	sta	%2
-}
 
 replace {
 	jmp	%5
@@ -393,6 +304,38 @@ replace {
 } by {
 	; Peephole 10c   - combined cmp/beq
 	cbeq	%2,s,%1
+}
+
+replace {
+        deca
+        bne     %1
+} by {
+        ; Peephole 11a   - combined deca/bne
+        dbnza   %1
+}
+
+replace {
+        decx
+        bne     %1
+} by {
+        ; Peephole 11b   - combined decx/bne
+        dbnzx   %1
+}
+
+replace {
+        dec     *%2
+        bne     %1
+} by {
+        ; Peephole 10c   - combined dec/bne
+        dbnz    *%2,%1
+}
+
+replace {
+        dec     %2,s
+        bne     %1
+} by {
+        ; Peephole 10d   - combined dec/bne
+        dbnz    %2,s,%1
 }
 
 // should be one of the last peepholes

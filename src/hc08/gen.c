@@ -2888,6 +2888,11 @@ asmopToBool (asmop *aop, bool resultInA)
         }
       break;
     case AOP_EXT:
+      if (!resultInA && (size == 1) && !IS_AOP_A (aop) && !hc08_reg_a->isFree && hc08_reg_x->isFree)
+        {
+          loadRegFromAop (hc08_reg_x, aop, 0);
+          break;
+        }
       if (resultInA)
         needpula = FALSE;
       else
@@ -5501,6 +5506,10 @@ genCmp (iCode * ic, iCode * ifx)
   if (size == 1 && IS_AOP_X (AOP (left)))
     {
       accopWithAop ("cpx", AOP (right), offset);
+    }
+  else if (size == 1 && IS_AOP_A (AOP (left)))
+    {
+      accopWithAop ("cmp", AOP (right), offset);
     }
   else if ((size == 2)
       && ((AOP_TYPE (left) == AOP_DIR || IS_AOP_HX (AOP (left))) && (AOP_SIZE (left) == 2))
@@ -9315,8 +9324,7 @@ static void
 genIfx (iCode * ic, iCode * popIc)
 {
   operand *cond = IC_COND (ic);
-  int isbit = 0;
-
+  
   D (emitcode (";     genIfx", ""));
 
   aopOp (cond, ic, FALSE);
@@ -9348,8 +9356,6 @@ genIfx (iCode * ic, iCode * popIc)
   /* get the value into acc */
   if (AOP_TYPE (cond) != AOP_CRY)
     asmopToBool (AOP (cond), FALSE);
-  else
-    isbit = 1;
   /* the result is now in the accumulator */
   freeAsmop (cond, NULL, ic, TRUE);
 
@@ -9357,13 +9363,7 @@ genIfx (iCode * ic, iCode * popIc)
   if (popIc)
     genIpop (popIc);
 
-  /* if the condition is  a bit variable */
-  if (isbit && IS_ITEMP (cond) && SPIL_LOC (cond))
-    genIfxJump (ic, SPIL_LOC (cond)->rname);
-  else if (isbit && !IS_ITEMP (cond))
-    genIfxJump (ic, OP_SYMBOL (cond)->rname);
-  else
-    genIfxJump (ic, "a");
+  genIfxJump (ic, "a");
 
   ic->generated = 1;
 }
@@ -9712,16 +9712,10 @@ release:
 static int
 genDjnz (iCode * ic, iCode * ifx)
 {
-  symbol *lbl, *lbl1;
   if (!ifx)
     return 0;
 
   D (emitcode (";     genDjnz", ""));
-
-  /* if the if condition has a false label
-     then we cannot save */
-  if (IC_FALSE (ifx))
-    return 0;
 
   /* if the minus is not of the form
      a = a - 1 */
@@ -9731,53 +9725,33 @@ genDjnz (iCode * ic, iCode * ifx)
   if (operandLitValue (IC_RIGHT (ic)) != 1)
     return 0;
 
-  /* dbnz doesn't support extended mode */
-  if (isOperandInFarSpace (IC_RESULT (ic)))
-    return 0;
-
   /* if the size of this greater than one then no
-     saving */
-//  if (getSize (operandType (IC_RESULT (ic))) > 1)
-//    return 0;
+     saving, unless it's already in HX  */
   aopOp (IC_RESULT (ic), ic, FALSE);
-  if (AOP_SIZE (IC_RESULT (ic)) > 1 || IS_AOP_H (AOP (IC_RESULT (ic))))
+  if (AOP_SIZE (IC_RESULT (ic)) > 1 && !IS_AOP_HX (AOP (IC_RESULT (ic))))
     {
       freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
       return 0;
     }
 
-  /* otherwise we can save BIG */
-  lbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-  lbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-
-  if (IS_AOP_A (AOP (IC_RESULT (ic))))
+  /* Trying to use dbnz directly requires some convoluted branch/jumps */
+  /* to handle the cases where the target is far away. The peepholer   */
+  /* is left to clean it up for the simple cases. However, this leaves */
+  /* a needlessly high dry run cost. So we do not use dbnz and instead */
+  /* generate simpler (and less constly) code that the peepholer can   */
+  /* easily transform to dbnz if the target is close enough. Thus the  */
+  /* register allocator gets a better idea of the true cost. */
+  if (IS_AOP_HX (AOP (IC_RESULT (ic))))
     {
-      if (!regalloc_dry_run)
-        emitcode ("dbnza", "%05d$", labelKey2num (lbl->key));
-      regalloc_dry_run_cost += 2;
-    }
-  else if (IS_AOP_X (AOP (IC_RESULT (ic))))
-    {
-      if (!regalloc_dry_run)
-        emitcode ("dbnzx", "%05d$", labelKey2num (lbl->key));
-      regalloc_dry_run_cost += 2;
+      emitcode ("aix", "#-1");
+      hc08_dirtyReg (hc08_reg_hx, FALSE);
+      emitcode ("cphx", "#0");
+      regalloc_dry_run_cost += 5;
     }
   else
-    {
-      if (!regalloc_dry_run)
-        emitcode ("dbnz", "%s,%05d$", aopAdrStr (AOP (IC_RESULT (ic)), 0, FALSE), labelKey2num (lbl->key));
-      regalloc_dry_run_cost += 3; // TODO: Stack aop cost.
-    }
-
-  emitBranch ("bra", lbl1);
-  if (!regalloc_dry_run)
-    emitLabel (lbl);
-  emitBranch ("jmp", IC_TRUE (ifx));
-  if (!regalloc_dry_run)
-    emitLabel (lbl1);
-
+    rmwWithAop ("dec", AOP (IC_RESULT (ic)), 0);
+  genIfxJump (ifx, "a");
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
-  ifx->generated = 1;
   return 1;
 }
 

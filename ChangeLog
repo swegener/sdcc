@@ -1,3 +1,7 @@
+2013-01-01 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm: Disassembler for the mcs51 family.
+
 2013-01-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/peeph.def: Removed peephole rule #8 since it is handled

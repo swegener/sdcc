@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-  SDCCgen51.h - header file for code generation for 8051
+  gen.h - header file for code generation for hc(s)08
 
              Written By -  Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
@@ -22,8 +22,8 @@
    what you give them.   Help stamp out software-hoarding!  
 -------------------------------------------------------------------------*/
 
-#ifndef SDCCGEN51_H
-#define SDCCGEN51_H
+#ifndef SDCCGENHC08_H
+#define SDCCGENHC08_H
 
 enum
   {
@@ -31,7 +31,7 @@ enum
     AOP_REG, AOP_DIR,
     AOP_STK, AOP_IMMD, AOP_STR,
     AOP_CRY, 
-    AOP_EXT, AOP_SOF, AOP_DUMMY
+    AOP_EXT, AOP_SOF, AOP_DUMMY, AOP_IDX
   };
 
 enum
@@ -58,6 +58,7 @@ typedef struct asmop
        AOP_STR    -  array of strings
        AOP_SOF    -  operand at an offset on the stack
        AOP_EXT    -  operand using extended addressing mode
+       AOP_IDX    -  operand using indexed addressing mode
     */
     short coff;			/* current offset */
     short size;			/* total size */
@@ -90,9 +91,7 @@ asmop;
 void genhc08Code (iCode *);
 void hc08_emitDebuggerSymbol (const char *);
 
-//extern char *fReturn8051[];
 extern unsigned fReturnSizeHC08;
-//extern char **fReturn;
 
 iCode *hasInchc08 (operand *op, const iCode *ic, int osize);
 extern bool hc08_assignment_optimal;

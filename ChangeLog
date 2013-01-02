@@ -1,3 +1,9 @@
+2013-01-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.h,
+	* src/hc08/gen.c: More optimization of literal constant assignments.
+	  Use indexed addressing mode in place of extended in some contexts.
+
 2013-01-01 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm: Disassembler for the mcs51 family.

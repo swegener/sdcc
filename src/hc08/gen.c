@@ -123,6 +123,15 @@ static char *aopAdrStr (asmop * aop, int loffset, bool bit16);
          && (((x)->aopu.aop_reg[0] == hc08_reg_a) \
             || ((x)->aopu.aop_reg[1] == hc08_reg_a)))
 
+#define IS_AOP_WITH_X(x) \
+        (((x)->type == AOP_REG) \
+         && (((x)->aopu.aop_reg[0] == hc08_reg_x) \
+            || ((x)->aopu.aop_reg[1] == hc08_reg_x)))
+
+#define IS_AOP_WITH_H(x) \
+        (((x)->type == AOP_REG) \
+         && (((x)->aopu.aop_reg[0] == hc08_reg_h) \
+            || ((x)->aopu.aop_reg[1] == hc08_reg_h)))
 
 #define CLRC    emitcode("clc","")
 
@@ -1170,12 +1179,18 @@ loadRegFromConst (reg_info * reg, int c)
               loadRegFromConst (hc08_reg_x, c & 0xff);
               break;
             }
-          if ((delta <= 127) && (delta >= -128))
+          if (reg->litConst && (delta <= 127) && (delta >= -128))
             {
               emitcode ("aix","#%d", delta);
               regalloc_dry_run_cost += 2;
               break;
             }
+        }
+      if (!c)
+        {
+          loadRegFromConst (hc08_reg_h, 0);
+          loadRegFromConst (hc08_reg_x, 0);
+          break;
         }
       emitcode ("ldhx", "!immedword", c);
       regalloc_dry_run_cost += 3;
@@ -1211,14 +1226,16 @@ loadRegFromConst (reg_info * reg, int c)
 static void
 loadRegFromImm (reg_info * reg, char * c)
 {
+  if (*c == '#')
+    c++;
   switch (reg->rIdx)
     {
     case A_IDX:
-      emitcode ("lda", "%s", c);
+      emitcode ("lda", "#%s", c);
       regalloc_dry_run_cost += 2;
       break;
     case X_IDX:
-      emitcode ("ldx", "%s", c);
+      emitcode ("ldx", "#%s", c);
       regalloc_dry_run_cost += 2;
       break;
     case H_IDX:
@@ -1241,12 +1258,12 @@ loadRegFromImm (reg_info * reg, char * c)
         }
       break;
     case HX_IDX:
-      emitcode ("ldhx", "%s", c);
+      emitcode ("ldhx", "#%s", c);
       regalloc_dry_run_cost += 3;
       break;
     case XA_IDX:
-      emitcode ("lda", "%s", c);
-      emitcode ("ldx", "%s >> 8", c);
+      emitcode ("lda", "#%s", c);
+      emitcode ("ldx", "#%s >> 8", c);
       regalloc_dry_run_cost += 4;
       break;
     default:
@@ -2663,6 +2680,88 @@ aopDerefAop (asmop * aop, int offset)
 }
 
 
+/*-----------------------------------------------------------------*/
+/* aopOpExtToIdx - attempt to convert AOP_EXT to AOP_IDX           */
+/*-----------------------------------------------------------------*/
+static void
+aopOpExtToIdx(asmop * result, asmop *left, asmop *right)
+{
+  int accesses=0;
+  int resultAccesses=0;
+  int leftAccesses=0;
+  int rightAccesses=0;
+  asmop * winner;
+  int winnerAccesses;
+
+  if (!hc08_reg_x->isFree || !hc08_reg_h->isFree)
+    return;
+
+  /* Need to replace at least two extended mode accesses with indexed */
+  /* to break even with the extra cost of loading HX. Do a quick check */
+  /* to see if anything is using extended mode at all. */
+  if (result && result->type == AOP_EXT)
+    accesses += result->size;
+  if (left && left->type == AOP_EXT)
+    accesses += left->size;
+  if (right && right->type == AOP_EXT)
+    accesses += right->size;
+  if (accesses<2)
+    return;
+  
+  /* If an operand is already using or going to H or X then we cannot */
+  /* use indexed addressing mode at the same time. */
+  if (result && (IS_AOP_WITH_H (result) || IS_AOP_WITH_X (result)))
+    return;
+  if (left && (IS_AOP_WITH_H (left) || IS_AOP_WITH_X (left)))
+    return;
+  if (right && (IS_AOP_WITH_H (right) || IS_AOP_WITH_X (right)))
+    return;
+
+  /* Decide which is the best asmop to make indexed. */
+  if (result && result->type == AOP_EXT)
+    {
+      resultAccesses = result->size;
+      if (result->op && left && left->op && result->op->key == left->op->key)
+        resultAccesses += result->size;
+      if (result->op && right && right->op && result->op->key == right->op->key)
+        resultAccesses += result->size;
+    }
+  if (left && left->type == AOP_EXT)
+    {
+      leftAccesses = left->size;
+      if (left->op && right && right->op && left->op->key == right->op->key)
+        leftAccesses += left->size;
+    }
+  if (right && right->type == AOP_EXT)
+    {
+      rightAccesses = right->size;
+    }
+
+  winner = result; winnerAccesses = resultAccesses;
+  if (leftAccesses > winnerAccesses)
+    {
+      winnerAccesses = leftAccesses;
+      winner = left;
+    }
+  if (rightAccesses > winnerAccesses)
+    {
+      winnerAccesses = rightAccesses;
+      winner = right;
+    }
+
+  /* Make sure there were enough accesses of a single variable to be worthwhile. */ 
+  if (winnerAccesses < 2)
+    return;
+
+  if (winner->op && result && result->op && winner->op->key == result->op->key)
+    result->type = AOP_IDX;
+  if (winner->op && left && left->op && winner->op->key == left->op->key)
+    left->type = AOP_IDX;
+  if (winner->op && right && right->op && winner->op->key == right->op->key)
+    right->type = AOP_IDX;
+  loadRegFromImm (hc08_reg_hx, winner->aopu.aop_dir);
+}
+
 
 /*-----------------------------------------------------------------*/
 /* aopAdrStr - for referencing the address of the aop              */
@@ -2674,6 +2773,7 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
   char *s = buffer;
   char *rs;
   int offset = aop->size - 1 - loffset - (bit16 ? 1 : 0);
+  int xofs;
 
   /* offset is greater than
      size then zero */
@@ -2734,7 +2834,7 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
     case AOP_SOF:
       if (!regalloc_dry_run && hc08_reg_hx->aop == &tsxaop)
         {
-          int xofs = _G.stackOfs + _G.tsxStackPushes + aop->aopu.aop_stk + offset;
+          xofs = _G.stackOfs + _G.tsxStackPushes + aop->aopu.aop_stk + offset;
           if (xofs)
             sprintf (s, "%d,x", xofs);
           else
@@ -2745,6 +2845,19 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
       rs = Safe_calloc (1, strlen (s) + 1);
       strcpy (rs, s);
       return rs;
+    case AOP_IDX:
+      xofs = offset; /* For now, assume hx points to the base address of operand */
+      if (xofs)
+        {
+          if (regalloc_dry_run) /* Don't worry about the exact offset during the dry run */
+            return "1,x";
+          sprintf (s, "%d,x", xofs);
+          rs = Safe_calloc (1, strlen (s) + 1);
+          strcpy (rs, s);
+          return rs;
+        }
+      else
+        return ",x";
     }
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopAdrStr got unsupported aop->type");
@@ -3061,6 +3174,7 @@ genCopy (operand * result, operand * source)
       return;
     }
 
+    
   /* general case */
   /* Copy in msb to lsb order, since some multi-byte hardware registers */
   /* expect this order. */
@@ -3077,9 +3191,21 @@ genCopy (operand * result, operand * source)
           offset -= 2;
           size -= 2;
         }
+
       else
         {
-          transferAopAop (AOP (source), offset, AOP (result), offset);
+          if (AOP_TYPE (source) == AOP_IDX && AOP_TYPE (result) == AOP_DIR)
+            {
+              emitcode ("mov", ",x+,%s", aopAdrStr (AOP (result), offset, FALSE));
+              regalloc_dry_run_cost += 2;
+            }
+          else if (AOP_TYPE (source) == AOP_DIR && AOP_TYPE (result) == AOP_IDX)
+            {
+              emitcode ("mov", "%s,x+", aopAdrStr (AOP (source), offset, FALSE));
+              regalloc_dry_run_cost += 2;
+            }
+          else
+            transferAopAop (AOP (source), offset, AOP (result), offset);
           offset--;
           size--;
         }
@@ -4277,6 +4403,8 @@ genPlus (iCode * ic)
   aopOp (IC_RIGHT (ic), ic, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE);
 
+  aopOpExtToIdx (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
+
   /* we want registers on the left and literals on the right */
   if ((AOP_TYPE (IC_LEFT (ic)) == AOP_LIT) || (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && !IS_AOP_WITH_A (AOP (IC_LEFT (ic)))))
     {
@@ -4454,6 +4582,8 @@ genMinus (iCode * ic)
   aopOp (IC_LEFT (ic), ic, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE);
+
+  aopOpExtToIdx (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
 
   /* special cases :- */
   /* if I can do an decrement instead
@@ -9444,6 +9574,124 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
+/* genAssignLit - Try to generate code for literal assignment.     */
+/*                result and right should already be asmOped       */
+/*-----------------------------------------------------------------*/
+static bool
+genAssignLit (operand * result, operand * right)
+{
+  char assigned[8];
+  char value[sizeof(assigned)];
+  char dup[sizeof(assigned)];
+  int size;
+  int offset,offset2;
+  int dups,multiples;
+  bool needpula = FALSE;
+
+  /* Make sure this is a literal assignment */
+  if (AOP_TYPE (right) != AOP_LIT)
+    return FALSE;
+
+  /* Some hardware registers require MSB to LSB assignment order */
+  /* so don't optimize the assignment order if volatile */
+  if (isOperandVolatile (result, FALSE))
+    return FALSE;
+
+  /* Make sure the assignment is not larger than we can handle */
+  size = AOP_SIZE (result);
+  if (size > sizeof(assigned))
+    return FALSE;
+
+  for (offset=0; offset<size; offset++)
+    {
+      assigned[offset] = 0;
+      value[offset] = byteOfVal (AOP (right)->aopu.aop_lit, offset);
+    }
+
+  /* Assign words that are already in HX */
+  if ((AOP_TYPE (result) == AOP_DIR) || IS_S08)
+    {
+      for (offset=size-2; offset>=0; offset--)
+        {
+          if (assigned[offset] || assigned[offset+1])
+            continue;
+          if (hc08_reg_hx->isLitConst && hc08_reg_hx->litConst == ((value[offset+1] << 8) + value[offset]))
+            {
+              storeRegToAop (hc08_reg_hx, AOP (result), offset);
+              assigned[offset] = 1;
+              assigned[offset+1] = 1;
+            }
+        }
+    }
+
+  /* Assign bytes that are already in A and/or X */
+  for (offset=size-1; offset>=0; offset--)
+    {
+      if (assigned[offset])
+        continue;
+      if ((hc08_reg_a->isLitConst && hc08_reg_a->litConst == value[offset]) ||
+          (hc08_reg_x->isLitConst && hc08_reg_x->litConst == value[offset]))
+        {
+          storeConstToAop (value[offset], AOP (result), offset);
+          assigned[offset] = 1;
+        }
+    }
+
+  /* Consider bytes that appear multiple times */
+  multiples = 0;
+  for (offset=size-1; offset>=0; offset--)
+    {
+      if (assigned[offset] || dup[offset])
+        continue;
+      dups = 0;
+      for (offset2=offset-1; offset2>=0; offset2--)
+        if (value[offset2] == value[offset])
+          {
+            dup[offset] = 1;
+            dups++;
+          }
+      if (dups)
+        multiples += (dups+1);
+    }
+
+  /* Assign bytes that appear multiple times if the register cost */
+  /* isn't too high. */
+  if (multiples > 2 || (multiples && !hc08_reg_a->isDead))
+    {
+      needpula = pushRegIfSurv (hc08_reg_a);
+      for (offset=size-1; offset>=0; offset--)
+        {
+          if (assigned[offset])
+            continue;
+          if (dup[offset])
+            {
+              loadRegFromConst (hc08_reg_a, value[offset]);
+              for (offset2=offset; offset2>=0; offset2--)
+                if (!assigned[offset2] && value[offset2] == value[offset])
+                  {
+                    storeRegToAop (hc08_reg_a, AOP (result), offset2);
+                    assigned[offset2] = 1;
+                  }
+              hc08_freeReg (hc08_reg_a);
+            }
+        }
+    }
+    
+  /* Assign whatever remains to be assigned */
+  for (offset=size-1; offset>=0; offset--)
+    {
+      if (assigned[offset])
+        continue;
+      storeConstToAop (value[offset], AOP (result), offset);
+    }
+
+  if (needpula)
+    pullReg (hc08_reg_a);
+  return TRUE;
+}
+
+
+/*-----------------------------------------------------------------*/
 /* genAssign - generate code for assignment                        */
 /*-----------------------------------------------------------------*/
 static void
@@ -9459,7 +9707,10 @@ genAssign (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
 
-  genCopy (result, right);
+  aopOpExtToIdx (AOP (result), NULL, AOP (right));
+  
+  if (!genAssignLit (result, right))
+    genCopy (result, right);
 
   freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);

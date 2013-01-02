@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-02 10:19:13 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2013-01-02 20:00:03 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -6955,16 +6955,31 @@ extern __at(0x0EF0) volatile __PMD4bits_t PMD4bits;
 
 extern __at(0x0EF1) __sfr PMD3;
 
-typedef struct
+typedef union
   {
-  unsigned REFO2MD              : 1;
-  unsigned REFO1MD              : 1;
-  unsigned PSPMD                : 1;
-  unsigned LCDMD                : 1;
-  unsigned RTCCMD               : 1;
-  unsigned ADCMD                : 1;
-  unsigned CTMUMD               : 1;
-  unsigned TXMMD                : 1;
+  struct
+    {
+    unsigned REFO2MD            : 1;
+    unsigned REFO1MD            : 1;
+    unsigned PSPMD              : 1;
+    unsigned LCDMD              : 1;
+    unsigned RTCCMD             : 1;
+    unsigned ADCMD              : 1;
+    unsigned CTMUMD             : 1;
+    unsigned MODMD              : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned TXMMD              : 1;
+    };
   } __PMD3bits_t;
 
 extern __at(0x0EF1) volatile __PMD3bits_t PMD3bits;
@@ -6976,6 +6991,7 @@ extern __at(0x0EF1) volatile __PMD3bits_t PMD3bits;
 #define _RTCCMD                 0x10
 #define _ADCMD                  0x20
 #define _CTMUMD                 0x40
+#define _MODMD                  0x80
 #define _TXMMD                  0x80
 
 //==============================================================================
@@ -13967,30 +13983,4 @@ extern __at(0x0FFD) __sfr TOS;
 extern __at(0x0FFD) __sfr TOSL;
 extern __at(0x0FFE) __sfr TOSH;
 extern __at(0x0FFF) __sfr TOSU;
-
-//==============================================================================
-//
-//        Configuration Addresses
-//
-//==============================================================================
-
-#define __CONFIG1L              0x007FF0
-#define __CONFIG1H              0x007FF1
-#define __CONFIG2L              0x007FF2
-#define __CONFIG2H              0x007FF3
-#define __CONFIG3L              0x007FF4
-#define __CONFIG3H              0x007FF5
-#define __CONFIG4L              0x007FF6
-#define __CONFIG4H              0x007FF7
-#define __CONFIG5L              0x007FF8
-#define __CONFIG5H              0x007FF9
-#define __CONFIG6L              0x007FFA
-#define __CONFIG6H              0x007FFB
-#define __CONFIG7L              0x007FFC
-#define __CONFIG7H              0x007FFD
-#define __CONFIG8L              0x007FFE
-#define __CONFIG8H              0x007FFF
-
-//==============================================================================
-
 #endif // #ifndef __PIC18F95J94_H__

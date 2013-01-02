@@ -1,3 +1,36 @@
+2013-01-02 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/non-free/include/pic14/pic16f720.h,
+	  device/non-free/include/pic14/pic16f721.h,
+	  device/non-free/include/pic14/pic16lf1902.h,
+	  device/non-free/include/pic14/pic16lf1903.h,
+	  device/non-free/include/pic16/pic18f65j94.h,
+	  device/non-free/include/pic16/pic18f66j60.h,
+	  device/non-free/include/pic16/pic18f66j65.h,
+	  device/non-free/include/pic16/pic18f66j94.h,
+	  device/non-free/include/pic16/pic18f66j99.h,
+	  device/non-free/include/pic16/pic18f67j60.h,
+	  device/non-free/include/pic16/pic18f67j94.h,
+	  device/non-free/include/pic16/pic18f85j94.h,
+	  device/non-free/include/pic16/pic18f86j60.h,
+	  device/non-free/include/pic16/pic18f86j65.h,
+	  device/non-free/include/pic16/pic18f86j94.h,
+	  device/non-free/include/pic16/pic18f86j99.h,
+	  device/non-free/include/pic16/pic18f87j60.h,
+	  device/non-free/include/pic16/pic18f87j94.h,
+	  device/non-free/include/pic16/pic18f95j94.h,
+	  device/non-free/include/pic16/pic18f96j60.h,
+	  device/non-free/include/pic16/pic18f96j65.h,
+	  device/non-free/include/pic16/pic18f96j94.h,
+	  device/non-free/include/pic16/pic18f96j99.h,
+	  device/non-free/include/pic16/pic18f97j60.h,
+	  device/non-free/include/pic16/pic18f97j94.h,
+	  device/non-free/lib/pic14/libdev/pic16f720.c,
+	  device/non-free/lib/pic14/libdev/pic16f721.c,
+	  device/non-free/lib/pic14/libdev/pic16lf1902.c,
+	  device/non-free/lib/pic14/libdev/pic16lf1903.c:
+	  Updated based on the gputils.
+
 2013-01-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.h,

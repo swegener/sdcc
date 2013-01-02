@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:09 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2013-01-02 19:59:58 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -892,7 +892,37 @@ extern __at(0x0091) volatile __OSCTUNEbits_t OSCTUNEbits;
 //==============================================================================
 
 extern __at(0x0092) __sfr PR2;
+
+//==============================================================================
+//        SSPADD Bits
+
 extern __at(0x0093) __sfr SSPADD;
+
+typedef struct
+  {
+  unsigned ADD0                 : 1;
+  unsigned ADD1                 : 1;
+  unsigned ADD2                 : 1;
+  unsigned ADD3                 : 1;
+  unsigned ADD4                 : 1;
+  unsigned ADD5                 : 1;
+  unsigned ADD6                 : 1;
+  unsigned ADD7                 : 1;
+  } __SSPADDbits_t;
+
+extern __at(0x0093) volatile __SSPADDbits_t SSPADDbits;
+
+#define _ADD0                   0x01
+#define _ADD1                   0x02
+#define _ADD2                   0x04
+#define _ADD3                   0x08
+#define _ADD4                   0x10
+#define _ADD5                   0x20
+#define _ADD6                   0x40
+#define _ADD7                   0x80
+
+//==============================================================================
+
 
 //==============================================================================
 //        SSPMSK Bits
@@ -1504,6 +1534,15 @@ extern __at(0x018D) __sfr PMCON2;
 #define SREN                    RCSTAbits.SREN                  // bit 5
 #define RX9                     RCSTAbits.RX9                   // bit 6
 #define SPEN                    RCSTAbits.SPEN                  // bit 7
+
+#define ADD0                    SSPADDbits.ADD0                 // bit 0
+#define ADD1                    SSPADDbits.ADD1                 // bit 1
+#define ADD2                    SSPADDbits.ADD2                 // bit 2
+#define ADD3                    SSPADDbits.ADD3                 // bit 3
+#define ADD4                    SSPADDbits.ADD4                 // bit 4
+#define ADD5                    SSPADDbits.ADD5                 // bit 5
+#define ADD6                    SSPADDbits.ADD6                 // bit 6
+#define ADD7                    SSPADDbits.ADD7                 // bit 7
 
 #define SSPM0                   SSPCONbits.SSPM0                // bit 0
 #define SSPM1                   SSPCONbits.SSPM1                // bit 1

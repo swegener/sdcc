@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:24 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2013-01-02 19:59:59 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -102,6 +102,7 @@
 #define LCDRL_ADDR              0x0795
 #define LCDSE0_ADDR             0x0798
 #define LCDSE1_ADDR             0x0799
+#define LCDSE3_ADDR             0x079B
 #define LCDDATA0_ADDR           0x07A0
 #define LCDDATA1_ADDR           0x07A1
 #define LCDDATA3_ADDR           0x07A3
@@ -1670,6 +1671,32 @@ extern __at(0x0799) volatile __LCDSE1bits_t LCDSE1bits;
 
 
 //==============================================================================
+//        LCDSE3 Bits
+
+extern __at(0x079B) __sfr LCDSE3;
+
+typedef struct
+  {
+  unsigned SE24                 : 1;
+  unsigned SE25                 : 1;
+  unsigned SE26                 : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  } __LCDSE3bits_t;
+
+extern __at(0x079B) volatile __LCDSE3bits_t LCDSE3bits;
+
+#define _SE24                   0x01
+#define _SE25                   0x02
+#define _SE26                   0x04
+
+//==============================================================================
+
+
+//==============================================================================
 //        LCDDATA0 Bits
 
 extern __at(0x07A0) __sfr LCDDATA0;
@@ -2371,6 +2398,10 @@ extern __at(0x0FEF) __sfr TOSH;
 #define SE13                    LCDSE1bits.SE13                 // bit 5
 #define SE14                    LCDSE1bits.SE14                 // bit 6
 #define SE15                    LCDSE1bits.SE15                 // bit 7
+
+#define SE24                    LCDSE3bits.SE24                 // bit 0
+#define SE25                    LCDSE3bits.SE25                 // bit 1
+#define SE26                    LCDSE3bits.SE26                 // bit 2
 
 #define PS0                     OPTION_REGbits.PS0              // bit 0
 #define PS1                     OPTION_REGbits.PS1              // bit 1

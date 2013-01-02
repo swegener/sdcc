@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:20:02 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2013-01-02 19:59:59 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -206,6 +206,9 @@ __at(0x0798) volatile __LCDSE0bits_t LCDSE0bits;
 
 __at(0x0799) __sfr LCDSE1;
 __at(0x0799) volatile __LCDSE1bits_t LCDSE1bits;
+
+__at(0x079B) __sfr LCDSE3;
+__at(0x079B) volatile __LCDSE3bits_t LCDSE3bits;
 
 __at(0x07A0) __sfr LCDDATA0;
 __at(0x07A0) volatile __LCDDATA0bits_t LCDDATA0bits;

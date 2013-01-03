@@ -1609,7 +1609,10 @@ accopWithAop (char *accop, asmop *aop, int loffset)
   else
     {
       emitcode (accop, "%s", aopAdrStr (aop, loffset, FALSE));
-      regalloc_dry_run_cost += 3;
+      if (aop->type == AOP_DIR || aop->type == AOP_LIT)
+        regalloc_dry_run_cost +=2;
+      else
+        regalloc_dry_run_cost += 3;
     }
 
   if (strcmp (accop, "bit") && strcmp (accop, "cmp") && strcmp (accop, "cpx"))
@@ -4262,10 +4265,7 @@ genPlusIncr (iCode * ic)
     }
   if (size == 1 && (IS_AOP_X (AOP (result)) && (!IS_AOP_A (AOP (left)) || hc08_reg_h->isDead) || IS_AOP_X (AOP (left)) && !IS_AOP_A (AOP (result)) && hc08_reg_x->isDead && hc08_reg_h->isDead))
     {
-      while (icount < -128)
-        icount += 256;
-      while (icount > 127)
-        icount -= 256;
+      icount = (int)(char) icount; /* truncate to a signed single byte value */
       needpulh = pushRegIfSurv (hc08_reg_h);
       loadRegFromAop (hc08_reg_x, AOP (left), 0);
       emitcode ("aix", "#%d", icount);
@@ -4284,6 +4284,8 @@ genPlusIncr (iCode * ic)
     return FALSE;
 
   D (emitcode (";     genPlusIncr", ""));
+
+  aopOpExtToIdx (AOP (result), AOP (left), NULL);
 
   if (size > 1)
     tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
@@ -4349,8 +4351,6 @@ genPlus (iCode * ic)
   aopOp (IC_RIGHT (ic), ic, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE);
 
-  aopOpExtToIdx (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
-
   /* we want registers on the left and literals on the right */
   if ((AOP_TYPE (IC_LEFT (ic)) == AOP_LIT) || (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && !IS_AOP_WITH_A (AOP (IC_LEFT (ic)))))
     {
@@ -4369,6 +4369,8 @@ genPlus (iCode * ic)
   DD (emitcode ("", ";  left size = %d", getDataSize (IC_LEFT (ic))));
   DD (emitcode ("", ";  right size = %d", getDataSize (IC_RIGHT (ic))));
   DD (emitcode ("", ";  result size = %d", getDataSize (IC_RESULT (ic))));
+
+  aopOpExtToIdx (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
 
   size = getDataSize (IC_RESULT (ic));
 
@@ -4391,7 +4393,7 @@ genPlus (iCode * ic)
         pullReg (hc08_reg_a);
       else
         loadRegFromAop (hc08_reg_a, leftOp, offset);
-      if (!mayskip || AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT || (((ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) >> (offset * 8)) & 0xff) != 0x00))
+      if (!mayskip || AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT || (byteOfVal (AOP (IC_RIGHT (ic))->aopu.aop_lit, offset) != 0x00) )
         {
           accopWithAop (add, rightOp, offset);
           mayskip = FALSE;
@@ -4416,7 +4418,6 @@ genPlus (iCode * ic)
  pullOrFreeReg (hc08_reg_a, needpulla);
 
  wassert (!earlystore || !delayedstore);
-//  adjustArithmeticResult (ic);
 
 release:
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
@@ -4430,7 +4431,7 @@ release:
 static bool
 genMinusDec (iCode * ic)
 {
-  unsigned int icount;
+  int icount;
   operand *left;
   operand *result;
   bool needpulx;
@@ -4449,10 +4450,9 @@ genMinusDec (iCode * ic)
     return FALSE;
 
   icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
-
-  if (((AOP_TYPE (left) == AOP_DIR) && (AOP_TYPE (result) == AOP_DIR) && (size == 2) ||
-    (IS_AOP_HX (AOP (left)) || IS_AOP_X (AOP (left))) && (IS_AOP_HX (AOP (result)) || IS_AOP_X (AOP (result)))) &&
-    (icount >= -127) && (icount <= 128))
+  if ((IS_AOP_HX (AOP (left)) || IS_AOP_HX (AOP (result)) ||
+    ((AOP_TYPE (left) == AOP_DIR || IS_S08 && AOP_TYPE (left) == AOP_EXT) && (AOP_TYPE (result) == AOP_DIR || IS_S08 && AOP_TYPE (result) == AOP_EXT))) &&
+    (icount >= -127) && (icount <= 128) && (size == 2))
     {
       needpulx = pushRegIfSurv (hc08_reg_x);
       needpulh = pushRegIfSurv (hc08_reg_h);
@@ -4477,6 +4477,8 @@ genMinusDec (iCode * ic)
     return FALSE;
 
   D (emitcode (";     genMinusDec", ""));
+
+  aopOpExtToIdx (AOP (result), AOP (left), NULL);
 
   rmwWithAop ("dec", AOP (result), 0);
 
@@ -4529,13 +4531,13 @@ genMinus (iCode * ic)
   aopOp (IC_RIGHT (ic), ic, FALSE);
   aopOp (IC_RESULT (ic), ic, TRUE);
 
-  aopOpExtToIdx (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
-
   /* special cases :- */
   /* if I can do an decrement instead
      of subtract then GOOD for ME */
   if (genMinusDec (ic) == TRUE)
     goto release;
+
+  aopOpExtToIdx (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic)), AOP (IC_RIGHT (ic)));
 
   size = getDataSize (IC_RESULT (ic));
 
@@ -4597,8 +4599,6 @@ genMinus (iCode * ic)
   pullOrFreeReg (hc08_reg_a, needpulla);
 
   wassert (!earlystore || !delayedstore);
-
-//  adjustArithmeticResult (ic);
 
 release:
   freeAsmop (IC_LEFT (ic), NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
@@ -9357,7 +9357,7 @@ genPointerSet (iCode * ic, iCode * pi)
   aopOp (right, ic, FALSE);
   size = AOP_SIZE (right);
 
-  /* if bit then unpack */
+  /* if bit then pack */
   if (IS_BITVAR (retype) || IS_BITVAR (letype))
     genPackBits (left, (IS_BITVAR (retype) ? retype : letype), right);
   else

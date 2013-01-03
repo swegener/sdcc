@@ -2,7 +2,9 @@
 
 	* src/hc08/gen.c: Fixed code size regression on s08 from overuse
 	  of indexed addressing mode. Clean out some old, unused source.
-	  Initialize hc08_aop_pass[] only once.
+	  Initialize hc08_aop_pass[] only once. Correct costs in
+	  accopWithAop() for 2 byte instructions. Small improvements
+	  to addition and subtraction.
 
 2013-01-02 Molnar Karoly <molnarkaroly AT users.sf.net>
 

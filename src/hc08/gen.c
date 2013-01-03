@@ -49,12 +49,8 @@ static void adjustStack (int n);
 
 static char *zero = "#0x00";
 static char *one = "#0x01";
-static char *spname;
-
-char *fReturnhc08[] = { "a", "x", "_ret2", "_ret3" };
 
 unsigned fReturnSizeHC08 = 4;   /* shared with ralloc.c */
-char **fReturn2 = fReturnhc08;
 
 
 static struct
@@ -133,21 +129,7 @@ static char *aopAdrStr (asmop * aop, int loffset, bool bit16);
          && (((x)->aopu.aop_reg[0] == hc08_reg_h) \
             || ((x)->aopu.aop_reg[1] == hc08_reg_h)))
 
-#define CLRC    emitcode("clc","")
 
-#if 0
-static unsigned char SLMask[] =
-{
-  0xFF, 0xFE, 0xFC, 0xF8, 0xF0,
-  0xE0, 0xC0, 0x80, 0x00
-};
-
-static unsigned char SRMask[] =
-{
-  0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
-  0x07, 0x03, 0x01, 0x00
-};
-#endif
 
 #define LSB     0
 #define MSB16   1
@@ -906,10 +888,6 @@ static void
 storeRegToAop (reg_info *reg, asmop * aop, int loffset)
 {
   int regidx = reg->rIdx;
-#if 0
-  regs *otherreg;
-  int otheridx;
-#endif
 
   DD (emitcode ("", ";     storeRegToAop (%s, %s, %d), stacked=%d, isaddr=%d",
                 reg->name, aopName (aop), loffset, aop->stacked, aop->isaddr));
@@ -1179,7 +1157,7 @@ loadRegFromConst (reg_info * reg, int c)
               loadRegFromConst (hc08_reg_x, c & 0xff);
               break;
             }
-          if (reg->litConst && (delta <= 127) && (delta >= -128))
+          if ((delta <= 127) && (delta >= -128))
             {
               emitcode ("aix","#%d", delta);
               regalloc_dry_run_cost += 2;
@@ -1962,18 +1940,6 @@ newAsmop (short type)
   return aop;
 }
 
-#if 0
-/*-----------------------------------------------------------------*/
-/* pointerCode - returns the code for a pointer type               */
-/*-----------------------------------------------------------------*/
-static int
-pointerCode (sym_link * etype)
-{
-
-  return PTR_TYPE (SPEC_OCLS (etype));
-
-}
-#endif
 
 /*-----------------------------------------------------------------*/
 /* operandConflictsWithHX - true if operand in h and/or x register */
@@ -2865,27 +2831,6 @@ aopAdrStr (asmop * aop, int loffset, bool bit16)
 }
 
 
-
-
-
-#if 0
-/*-----------------------------------------------------------------*/
-/* opIsGptr: returns non-zero if the passed operand is       */
-/* a generic pointer type.             */
-/*-----------------------------------------------------------------*/
-static int
-opIsGptr (operand * op)
-{
-  sym_link *type = operandType (op);
-
-  if ((AOP_SIZE (op) == GPTRSIZE) && IS_GENPTR (type))
-    {
-      return 1;
-    }
-  return 0;
-}
-#endif
-
 /*-----------------------------------------------------------------*/
 /* getDataSize - get the operand data size                         */
 /*-----------------------------------------------------------------*/
@@ -3127,7 +3072,7 @@ asmopToBool (asmop *aop, bool resultInA)
 static void
 genCopy (operand * result, operand * source)
 {
-  int size;
+  int size = AOP_SIZE (result);
   int offset = 0;
 
   /* if they are the same and not volatile */
@@ -3174,11 +3119,12 @@ genCopy (operand * result, operand * source)
       return;
     }
 
+   if (IS_HC08 && (size > 2))
+     aopOpExtToIdx (AOP (result), NULL, AOP (source));
     
   /* general case */
   /* Copy in msb to lsb order, since some multi-byte hardware registers */
   /* expect this order. */
-  size = AOP_SIZE (result);
   offset = size - 1;
   while (size)
     {
@@ -6096,9 +6042,6 @@ genAnd (iCode * ic, iCode * ifx)
   unsigned char bytemask;
   bool needpulla = FALSE;
   bool earlystore = FALSE;
-
-//  int bytelit = 0;
-//  char buffer[10];
 
   D (emitcode (";     genAnd", ""));
 
@@ -9587,9 +9530,15 @@ genAssignLit (operand * result, operand * right)
   int offset,offset2;
   int dups,multiples;
   bool needpula = FALSE;
+  bool canUseHX = TRUE;
+  int remaining;
 
   /* Make sure this is a literal assignment */
   if (AOP_TYPE (right) != AOP_LIT)
+    return FALSE;
+
+  /* The general case already handles register assignment well */
+  if (AOP_TYPE (result) == AOP_REG)
     return FALSE;
 
   /* Some hardware registers require MSB to LSB assignment order */
@@ -9608,10 +9557,13 @@ genAssignLit (operand * result, operand * right)
       value[offset] = byteOfVal (AOP (right)->aopu.aop_lit, offset);
     }
 
-  /* Assign words that are already in HX */
-  if ((AOP_TYPE (result) == AOP_DIR) || IS_S08)
+  if ((AOP_TYPE (result) == AOP_EXT) && IS_HC08)
+    canUseHX = FALSE;
+    
+  if (canUseHX)
     {
-      for (offset=size-2; offset>=0; offset--)
+      /* Assign words that are already in HX */
+      for (offset=size-2; offset>=0; offset -= 2)
         {
           if (assigned[offset] || assigned[offset+1])
             continue;
@@ -9624,6 +9576,33 @@ genAssignLit (operand * result, operand * right)
         }
     }
 
+  if (!(hc08_reg_h->isDead && hc08_reg_x->isDead))
+    canUseHX = FALSE;
+
+  if (canUseHX && (size>=2))
+    {
+      /* Assign whatever reamains to be assigned */
+      for (offset=size-2; offset>=0; offset -= 2)
+        {
+          if (assigned[offset] && assigned[offset+1])
+            continue;
+          loadRegFromConst (hc08_reg_hx, (value[offset+1] << 8) + value[offset]);
+          storeRegToAop (hc08_reg_hx, AOP (result), offset);
+          assigned[offset] = 1;
+          assigned[offset+1] = 1;
+        }
+      return TRUE;
+    }
+
+  remaining = size;
+  for (offset=0; offset<size; offset++)
+    remaining -= assigned[offset];
+  if (!remaining)
+    return TRUE;
+
+  if (remaining > 2)
+    aopOpExtToIdx (AOP (result), NULL, NULL);
+  
   /* Assign bytes that are already in A and/or X */
   for (offset=size-1; offset>=0; offset--)
     {
@@ -9707,8 +9686,6 @@ genAssign (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
 
-  aopOpExtToIdx (AOP (result), NULL, AOP (right));
-  
   if (!genAssignLit (result, right))
     genCopy (result, right);
 
@@ -10448,11 +10425,11 @@ genhc08iCode (iCode *ic)
     }
 }
 
-unsigned char
-dryhc08iCode (iCode *ic)
+static void
+init_aop_pass(void)
 {
-  regalloc_dry_run = TRUE;
-  regalloc_dry_run_cost = 0;
+  if (hc08_aop_pass[0])
+    return;
 
   hc08_aop_pass[0] = newAsmop (AOP_REG);
   hc08_aop_pass[0]->size = 1;
@@ -10478,7 +10455,16 @@ dryhc08iCode (iCode *ic)
   hc08_aop_pass[7] = newAsmop (AOP_DIR);
   hc08_aop_pass[7]->size = 1;
   hc08_aop_pass[7]->aopu.aop_dir = "___SDCC_hc08_ret7";
+}
 
+unsigned char
+dryhc08iCode (iCode *ic)
+{
+  regalloc_dry_run = TRUE;
+  regalloc_dry_run_cost = 0;
+
+  init_aop_pass();
+  
   genhc08iCode (ic);
 
   destroy_line_list ();
@@ -10511,48 +10497,12 @@ genhc08Code (iCode *lic)
   if (options.debug && currFunc)
     {
       debugFile->writeFunction (currFunc, lic);
-#if 0
-      genLine.lineElement.isDebug = 1;
-      if (IS_STATIC (currFunc->etype))
-        emitcode ("", "F%s$%s$0$0 ==.", moduleName, currFunc->name);
-      else
-        emitcode ("", "G$%s$0$0 ==.", currFunc->name);
-      genLine.lineElement.isDebug = 0;
-#endif
     }
-  /* stack pointer name */
-  if (options.useXstack)
-    spname = "_spx";
-  else
-    spname = "sp";
 
   if (options.debug)
     debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
 
-  hc08_aop_pass[0] = newAsmop (AOP_REG);
-  hc08_aop_pass[0]->size = 1;
-  hc08_aop_pass[0]->aopu.aop_reg[0] = hc08_reg_a;
-  hc08_aop_pass[1] = newAsmop (AOP_REG);
-  hc08_aop_pass[1]->size = 1;
-  hc08_aop_pass[1]->aopu.aop_reg[0] = hc08_reg_x;
-  hc08_aop_pass[2] = newAsmop (AOP_DIR);
-  hc08_aop_pass[2]->size = 1;
-  hc08_aop_pass[2]->aopu.aop_dir = "___SDCC_hc08_ret2";
-  hc08_aop_pass[3] = newAsmop (AOP_DIR);
-  hc08_aop_pass[3]->size = 1;
-  hc08_aop_pass[3]->aopu.aop_dir = "___SDCC_hc08_ret3";
-  hc08_aop_pass[4] = newAsmop (AOP_DIR);
-  hc08_aop_pass[4]->size = 1;
-  hc08_aop_pass[4]->aopu.aop_dir = "___SDCC_hc08_ret4";
-  hc08_aop_pass[5] = newAsmop (AOP_DIR);
-  hc08_aop_pass[5]->size = 1;
-  hc08_aop_pass[5]->aopu.aop_dir = "___SDCC_hc08_ret5";
-  hc08_aop_pass[6] = newAsmop (AOP_DIR);
-  hc08_aop_pass[6]->size = 1;
-  hc08_aop_pass[6]->aopu.aop_dir = "___SDCC_hc08_ret6";
-  hc08_aop_pass[7] = newAsmop (AOP_DIR);
-  hc08_aop_pass[7]->size = 1;
-  hc08_aop_pass[7]->aopu.aop_dir = "___SDCC_hc08_ret7";
+  init_aop_pass();
 
   for (ic = lic; ic; ic = ic->next)
     ic->generated = FALSE;
@@ -10578,11 +10528,6 @@ genhc08Code (iCode *lic)
           if (options.debug)
             {
               debugFile->writeCLine (ic);
-#if 0
-              genLine.lineElement.isDebug = 1;
-              emitcode ("", "C$%s$%d$%d$%d ==.", FileBaseName (ic->filename), ic->lineno, ic->level, ic->block);
-              genLine.lineElement.isDebug = 0;
-#endif
             }
           if (!options.noCcodeInAsm)
             {

@@ -1,3 +1,9 @@
+2013-01-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: Fixed code size regression on s08 from overuse
+	  of indexed addressing mode. Clean out some old, unused source.
+	  Initialize hc08_aop_pass[] only once.
+
 2013-01-02 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/non-free/include/pic14/pic16f720.h,

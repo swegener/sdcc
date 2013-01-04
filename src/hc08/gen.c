@@ -767,13 +767,24 @@ forceload:
                                   (byteOfVal (aop->aopu.aop_lit, loffset+1) << 8));
            break;
          }
-      if (aop->type == AOP_SOF && !(_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 2))
+      if (aop->type == AOP_SOF)
         {
-          pullReg (hc08_reg_h);
-          pullReg (hc08_reg_x);
-          pushReg (hc08_reg_x, FALSE);
-          pushReg (hc08_reg_h, FALSE);
-          break;
+          int offset = (_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 1);
+          if (IS_S08 && offset >= 0 && offset <= 0xff)
+            {
+              emitcode ("ldhx", "%s", aopAdrStr (aop, loffset, TRUE));
+              regalloc_dry_run_cost += 2;
+              hc08_dirtyReg (reg, FALSE);
+              break;
+            }
+          else if (offset == 1)
+            {
+              pullReg (hc08_reg_h);
+              pullReg (hc08_reg_x);
+              pushReg (hc08_reg_x, FALSE);
+              pushReg (hc08_reg_h, FALSE);
+              break;
+            }
         }
       if (IS_AOP_HX (aop))
         break;
@@ -962,6 +973,16 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
         }
       break;
     case HX_IDX:
+      if (aop->type == AOP_SOF)
+        {
+          int offset = (_G.stackOfs + _G.stackPushes + aop->aopu.aop_stk + aop->size - loffset - 1);
+          if (IS_S08 && offset >= 0 && offset <= 0xff)
+            {
+              emitcode ("sthx", "%s", aopAdrStr (aop, loffset, TRUE));
+              regalloc_dry_run_cost += 2;
+              break;
+            }
+        }
       if (aop->type == AOP_DIR || IS_S08 && aop->type == AOP_EXT)
         {
           emitcode ("sthx", "%s", aopAdrStr (aop, loffset, TRUE));
@@ -2116,6 +2137,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
           if (!tsxUseful (ic))
             return aop;
           emitcode ("tsx", "");
+          hc08_dirtyReg (hc08_reg_hx, FALSE);
           hc08_reg_hx->aop = &tsxaop;
           _G.tsxStackPushes = _G.stackPushes;
         }
@@ -9557,7 +9579,7 @@ genAssignLit (operand * result, operand * right)
       value[offset] = byteOfVal (AOP (right)->aopu.aop_lit, offset);
     }
 
-  if ((AOP_TYPE (result) == AOP_EXT) && IS_HC08)
+  if ((AOP_TYPE (result) != AOP_DIR ) && IS_HC08)
     canUseHX = FALSE;
     
   if (canUseHX)

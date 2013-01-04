@@ -1,5 +1,13 @@
 2013-01-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/hc08/ralloc.c: Removd old code from the original fork
+	  from mcs51 that was not being used. Brought the old register
+	  allocator up to date with the current code generator.
+	* src/hc08/gen.c: Support ldhx/sthx with stack operands on s08.
+	  Avoid using hx to assign literals to stack operands on hc08.
+
+2013-01-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/hc08/gen.c (genAssignLit): fixed bug on systems that default
 	  to signed char.
 

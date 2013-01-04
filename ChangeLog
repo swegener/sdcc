@@ -1,3 +1,8 @@
+2013-01-04 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm: New commandline option: --code-size
+	  In addition, limited tracking of some register (Rx, DPTR).
+
 2013-01-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c: Removd old code from the original fork

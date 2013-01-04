@@ -9524,7 +9524,7 @@ static bool
 genAssignLit (operand * result, operand * right)
 {
   char assigned[8];
-  char value[sizeof(assigned)];
+  unsigned char value[sizeof(assigned)];
   char dup[sizeof(assigned)];
   int size;
   int offset,offset2;

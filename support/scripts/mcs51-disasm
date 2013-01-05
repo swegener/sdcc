@@ -88,6 +88,7 @@ my $mem_start;
 my $mem_end;
 my $mem_ptr = 0;
 my $code_size = MCS51_CODE_SIZE;
+my $last_instr_address = MCS51_CODE_SIZE - 1;
 
 =back
 	Structure of one element of %labels:
@@ -108,6 +109,8 @@ my $max_label_addr = 0;
 my %sfrs_by_address = ();
 my %sfrs_by_names   = ();
 my %bits_by_address = ();
+
+my %data_by_address = ();
 
 	# Sizes of the instructions.
 
@@ -139,6 +142,8 @@ my $DPTR;
 my @R_regs;
 
 my $prev_is_jump;
+
+use constant ALIGN_SIZE => 5;
 
 ################################################################################
 ################################################################################
@@ -647,73 +652,137 @@ sub add_jump_label($$)
 use constant MAP_NULL   => 0;
 use constant MAP_BORDER => 1;
 use constant MAP_AREA   => 2;
-use constant MAP_CSEG   => 3;
+use constant MAP_CABS   => 3;
+use constant MAP_CODE0  => 4;
+use constant MAP_CODE1  => 5;
+use constant MAP_DATA   => 6;
 
-	#
-	# Adds names to the labels.
-	#
+        #
+        # If exists the map file, then extracts out of it
+        # the name of labels and variables.
+        #
 
-sub add_names_labels()
+sub read_map_file()
   {
-  my ($addr, $fidx, $label, $lidx);
-  my ($name, $state);
+  my ($addr, $name, $state, $label);
 
-  if ($map_file ne '')
+  return if ($map_file eq '');
+
+  $state = MAP_NULL;
+
+  if (! open(MAP, '<', $map_file))
     {
-        #
-        # If exists the map file, then extracts out of it the name of labels.
-        #
+    print STDERR "$PROGRAM : Could not open. -> \"$map_file\"\n";
+    exit(1);
+    }
 
-    $state = MAP_NULL;
+  while (<MAP>)
+    {
+    chomp;
+    s/\r$//o;
 
-    if (! open(MAP, '<', $map_file))
+    if ($state == MAP_NULL)
       {
-      print STDERR "$PROGRAM : Could not open. -> \"$map_file\"\n";
-      exit(1);
+      $state = MAP_BORDER if (/^Area\s+/io);
       }
-
-    while (<MAP>)
+    elsif ($state == MAP_BORDER)
       {
-      chomp;
-      s/\r$//o;
+      $state = MAP_AREA if (/^-+\s+/o);
+      }
+    elsif ($state == MAP_AREA)
+      {
+      if (/^CABS\s+/o)
+	{
+	$state = MAP_CABS;
+	}
+      elsif (/^(CSEG|HOME)\s+/o)
+	{
+	$state = MAP_CODE0;
+	}
+      elsif (/^GSINIT\d+\s+/o)
+	{
+	$state = MAP_CODE1;
+	}
+      elsif (/^DSEG\s+/o)
+	{
+	$state = MAP_DATA;
+	}
+      else
+	{
+	$state = MAP_NULL;
+	}
+      }
+    elsif ($state == MAP_CABS)
+      {
+      if (/^.ASxxxx Linker\s+/io)
+        {
+        $state = MAP_NULL;
+        }
+      elsif (/^C:\s+([[:xdigit:]]+)\s+(\S+)/o)
+	{
+	($addr, $name) = (hex($1), $2);
 
-      if ($state == MAP_NULL)
-	{
-	$state = MAP_BORDER if (/^Area\s+/io);
-	}
-      elsif ($state == MAP_BORDER)
-	{
-	$state = MAP_AREA if (/^-+\s+/o);
-	}
-      elsif ($state == MAP_AREA)
-	{
-	$state = (/^CSEG\s+/o) ? MAP_CSEG : MAP_NULL;
-	}
-      elsif ($state == MAP_CSEG)
-	{
-	if (/^.ASxxxx Linker\s+/io)
-          {
-          $state = MAP_NULL;
-          }
-	elsif (/^C:\s+([[:xdigit:]]+)\s+(\S+)\s+\S+\s*$/)
+	if ($name eq 's_CONST' || $name eq 's_XINIT')
 	  {
+	# C:   000001E8  s_CONST
+	# C:   00000215  s_XINIT
+
+	  $label = \%{$labels_by_address{$addr}};
+	  $label->{NAME} = $name;
+	  $label->{TYPE} = LABEL;
+	  }
+
+	$last_instr_address = ($addr - 1) if ($name eq 's_CONST');
+	}
+      } # elsif ($state == MAP_CABS)
+    elsif ($state == MAP_CODE0 || $state == MAP_CODE1)
+      {
+      if (/^.ASxxxx Linker\s+/io)
+        {
+        $state = MAP_NULL;
+        }
+      elsif (/^C:\s+([[:xdigit:]]+)\s+(\S+)/o)
+	{
+	# C:   00000040  __mcs51_genXINIT
+	# C:   00000061  __mcs51_genRAMCLEAR
+	# C:   00000067  __mcs51_genXRAMCLEAR
 	# C:   00000086  _Uart_int                          main
 	# C:   000000CE  _toHexChar                         main
 	# C:   000001E4  __sdcc_external_startup            _startup
 
-	  ($addr, $name) = (hex($1), $2);
+	($addr, $name) = (hex($1), $2);
 
-	  if (defined($labels_by_address{$addr}))
-	    {
-	    $label = \%{$labels_by_address{$addr}};
-	    $label->{NAME} = $name;
-	    }
-	  }
-	} # elsif ($state == MAP_CSEG)
-      } # while (<MAP>)
+	$label = \%{$labels_by_address{$addr}};
+	$label->{NAME} = $name;
+	$label->{TYPE} = ($state == MAP_CODE0) ? SUB : LABEL;
+	}
+      } # elsif ($state == MAP_CODE0 || $state == MAP_CODE1)
+    elsif ($state == MAP_DATA)
+      {
+      if (/^.ASxxxx Linker\s+/io)
+        {
+        $state = MAP_NULL;
+        }
+      elsif (/^\s*([[:xdigit:]]+)\s+(\S+)/o)
+	{
+	# 00000039  _counter                           data
+	# 0000004C  _flash_read_PARM_2                 flash
 
-    close(MAP);
-    } # if ($map_file ne '')
+	($addr, $name) = (hex($1), $2);
+
+	$data_by_address{$addr} = $name if (! defined($data_by_address{$addr}));
+	}
+      } # elsif ($state == MAP_DATA)
+    } # while (<MAP>)
+
+  close(MAP);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub add_names_labels()
+  {
+  my ($addr, $fidx, $label, $lidx);
 
         #
         # If there is left in yet so label that has no name, this here get one.
@@ -985,6 +1054,12 @@ sub regname($$)
     $str = $sfrs_by_address{$Address};
     $$StrRef = $str;
     }
+  elsif (defined($data_by_address{$Address}))
+    {
+    $str = sprintf "0x%02X", $Address;
+    $$StrRef = "[$str]";
+    $str = $data_by_address{$Address};
+    }
   else
     {
     $str = sprintf "0x%02X", $Address;
@@ -1028,7 +1103,7 @@ sub labelname($)
 
 sub print_3($$$)
   {
-  print "\t\t$_[0]\t" . align($_[1], 4) . "; $_[2]\n";
+  print "\t\t$_[0]\t" . align($_[1], ALIGN_SIZE) . "; $_[2]\n";
   }
 
 #-------------------------------------------------------------------------------
@@ -1167,8 +1242,10 @@ sub instruction_decoder($$)
     $rb1   = (($Instruction & 0xE0) << 3) | $parm0;
     $addr  = (($Address + $instr_size) & 0xF800) | $rb1;
     $rb0   = labelname($addr);
+    $name0 = sprintf "0x%04X", $rb1;
     $str   = ($Address == $addr) ? ' (endless loop)' : '';
-    printf " %02X\t\tajmp\t" . align($rb0, 4) . "; Jumps hither: 0x%04X$str\n", $parm0, $addr;
+    printf " %02X\t\tajmp\t" . align($rb0, ALIGN_SIZE) . "; Jumps hither: 0x%04X (PC += $instr_size, PC(10-0) = $name0)$str\n",
+	    $parm0, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1181,7 +1258,8 @@ sub instruction_decoder($$)
     $addr  = (($Address + $instr_size) & 0xF800) | $rb1;
     $rb0   = labelname($addr);
     $str   = sprintf "0x%04X", $rb1;
-    printf " %02X\t\tacall\t" . align($rb0, 4) . "; Calls this: 0x%04X (PC += $instr_size, [++SP] = PCL, [++SP] = PCH, PC(10-0) = $str)\n", $parm0, $addr;
+    printf " %02X\t\tacall\t" . align($rb0, ALIGN_SIZE) . "; Calls this: 0x%04X (PC += $instr_size, [++SP] = PCL, [++SP] = PCH, PC(10-0) = $str)\n",
+	    $parm0, $addr;
     invalidate_DPTR_Rx();
     }
   elsif ($instr_mask1 == 0x06)
@@ -1235,7 +1313,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
-    print " $rb0\t\tmov\t" . align("\@$ri_name, #0x$rb0", 4) . "; [$ri_name] = 0x$rb0$str\n";
+    print " $rb0\t\tmov\t" . align("\@$ri_name, #0x$rb0", ALIGN_SIZE) . "; [$ri_name] = 0x$rb0$str\n";
     invalidate_DPTR_Rx();
     }
   elsif ($instr_mask1 == 0x86)
@@ -1244,7 +1322,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tmov\t" . align("$rb0, \@$ri_name", 4) . "; $name0 = [$ri_name]\n", $parm0;
+    printf " %02X\t\tmov\t" . align("$rb0, \@$ri_name", ALIGN_SIZE) . "; $name0 = [$ri_name]\n", $parm0;
     invalidate_DPTR_Rx();
     }
   elsif ($instr_mask1 == 0x96)
@@ -1259,7 +1337,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tmov\t" . align("\@$ri_name, $rb0", 4) . "; [$ri_name] = $name0\n", $parm0;
+    printf " %02X\t\tmov\t" . align("\@$ri_name, $rb0", ALIGN_SIZE) . "; [$ri_name] = $name0\n", $parm0;
     invalidate_DPTR_Rx();
     }
   elsif ($instr_mask1 == 0xB6)
@@ -1271,7 +1349,7 @@ sub instruction_decoder($$)
     $addr  = $Address + $instr_size + expand_offset($parm1);
     $rb0   = labelname($addr);
     $str   = sprintf "%02X", $parm0;
-    printf " $str %02X\tcjne\t" . align("\@$ri_name, #0x$str, $rb0", 4) . "; If ([$ri_name] != 0x$str) then jumps hither: 0x%04X\n",
+    printf " $str %02X\tcjne\t" . align("\@$ri_name, #0x$str, $rb0", ALIGN_SIZE) . "; If ([$ri_name] != 0x$str) then jumps hither: 0x%04X\n",
 	    $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1322,7 +1400,7 @@ sub instruction_decoder($$)
 
     if (operation_R_reg($rn_regs, Rx_INC))
       {
-      printf "\t\tinc\t" . align($rn_name, 4) . "; ++$rn_name (0x%02X)\n", $R_regs[$rn_regs];
+      printf "\t\tinc\t" . align($rn_name, ALIGN_SIZE) . "; ++$rn_name (0x%02X)\n", $R_regs[$rn_regs];
       }
     else
       {
@@ -1335,7 +1413,7 @@ sub instruction_decoder($$)
 
     if (operation_R_reg($rn_regs, Rx_DEC))
       {
-      printf "\t\tdec\t" . align($rn_name, 4) . "; --$rn_name (0x%02X)\n", $R_regs[$rn_regs];
+      printf "\t\tdec\t" . align($rn_name, ALIGN_SIZE) . "; --$rn_name (0x%02X)\n", $R_regs[$rn_regs];
       }
     else
       {
@@ -1380,7 +1458,7 @@ sub instruction_decoder($$)
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
     operation_R_reg($rn_regs, Rx_MOV, $parm0);
-    print " $rb0\t\tmov\t" . align("$rn_name, #0x$rb0", 4) . "; $rn_name = 0x$rb0$str\n";
+    print " $rb0\t\tmov\t" . align("$rn_name, #0x$rb0", ALIGN_SIZE) . "; $rn_name = 0x$rb0$str\n";
     }
   elsif ($instr_mask2 == 0x88)
     {
@@ -1388,7 +1466,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tmov\t" . align("$rb0, $rn_name", 4) . "; $name0 = $rn_name\n", $parm0;
+    printf " %02X\t\tmov\t" . align("$rb0, $rn_name", ALIGN_SIZE) . "; $name0 = $rn_name\n", $parm0;
     invalidate_DPTR_Rx();
     }
   elsif ($instr_mask2 == 0x98)
@@ -1404,7 +1482,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
     operation_R_reg($rn_regs, Rx_INV);
-    printf " %02X\t\tmov\t" . align("$rn_name, $rb0", 4) . "; $rn_name = $name0\n", $parm0;
+    printf " %02X\t\tmov\t" . align("$rn_name, $rb0", ALIGN_SIZE) . "; $rn_name = $name0\n", $parm0;
     }
   elsif ($instr_mask2 == 0xB8)
     {
@@ -1415,7 +1493,7 @@ sub instruction_decoder($$)
     $addr  = $Address + $instr_size + expand_offset($parm1);
     $rb0   = labelname($addr);
     $str   = sprintf "%02X", $parm0;
-    printf " $str %02X\tcjne\t" . align("$rn_name, #0x$str, $rb0", 4) . "; If ($rn_name != 0x$str) then jumps hither: 0x%04X\n",
+    printf " $str %02X\tcjne\t" . align("$rn_name, #0x$str, $rb0", ALIGN_SIZE) . "; If ($rn_name != 0x$str) then jumps hither: 0x%04X\n",
 	    $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1435,7 +1513,7 @@ sub instruction_decoder($$)
     $addr  = $Address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
     $str   = ($Address == $addr) ? ' (waiting loop)' : '';
-    printf " %02X\t\tdjnz\t" . align("$rn_name, $rb0", 4) . "; If (--$rn_name != 0) then jumps hither: 0x%04X$str\n",
+    printf " %02X\t\tdjnz\t" . align("$rn_name, $rb0", ALIGN_SIZE) . "; If (--$rn_name != 0) then jumps hither: 0x%04X$str\n",
 	    $parm0, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1468,7 +1546,7 @@ sub instruction_decoder($$)
     $addr  = ($parm0 << 8) | $parm1;
     $rb0   = labelname($addr);
     $str   = ($Address == $addr) ? ' (endless loop)' : '';
-    printf " %02X %02X\tljmp\t" . align($rb0, 4) . "; Jumps hither: 0x%04X$str\n", $parm0, $parm1, $addr;
+    printf " %02X %02X\tljmp\t" . align($rb0, ALIGN_SIZE) . "; Jumps hither: 0x%04X$str\n", $parm0, $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1490,7 +1568,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tinc\t" . align($rb0, 4) . "; ++$name0\n", $parm0;
+    printf " %02X\t\tinc\t" . align($rb0, ALIGN_SIZE) . "; ++$name0\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x10)
@@ -1502,7 +1580,7 @@ sub instruction_decoder($$)
     $addr  = $Address + $instr_size + expand_offset($parm1);
     $rb0   = bitname($parm0, \$name0);
     $rb1   = labelname($addr);
-    printf " %02X %02X\tjbc\t" . align("$rb0, $rb1", 4) . "; If ($name0 == H) then $name0 = L and jumps hither: 0x%04X\n",
+    printf " %02X %02X\tjbc\t" . align("$rb0, $rb1", ALIGN_SIZE) . "; If ($name0 == H) then $name0 = L and jumps hither: 0x%04X\n",
 	    $parm0, $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1516,7 +1594,7 @@ sub instruction_decoder($$)
     $addr  = ($parm0 << 8) | $parm1;
     $rb0   = labelname($addr);
     $str   = sprintf "0x%04X", $addr;
-    printf " %02X %02X\tlcall\t" . align($rb0, 4) . "; Calls this: $str (PC += $instr_size, [++SP] = PCL, [++SP] = PCH, PC = $str)\n",
+    printf " %02X %02X\tlcall\t" . align($rb0, ALIGN_SIZE) . "; Calls this: $str (PC += $instr_size, [++SP] = PCL, [++SP] = PCH, PC = $str)\n",
 	    $parm0, $parm1;
     invalidate_DPTR_Rx();
     }
@@ -1538,7 +1616,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tdec\t" . align($rb0, 4) . "; --$name0\n", $parm0;
+    printf " %02X\t\tdec\t" . align($rb0, ALIGN_SIZE) . "; --$name0\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x20)
@@ -1551,7 +1629,7 @@ sub instruction_decoder($$)
     $rb0   = bitname($parm0, \$name0);
     $rb1   = labelname($addr);
     $str   = ($Address == $addr) ? ' (waiting loop)' : '';
-    printf " %02X %02X\tjb\t" . align("$rb0, $rb1", 4) . "; If ($name0 == H) then jumps hither: 0x%04X$str\n",
+    printf " %02X %02X\tjb\t" . align("$rb0, $rb1", ALIGN_SIZE) . "; If ($name0 == H) then jumps hither: 0x%04X$str\n",
 	    $parm0, $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1560,7 +1638,7 @@ sub instruction_decoder($$)
     {
 	# RET				00100010
 
-    print "\t\tret\t" . align('', 4) . "; PCH = [SP--], PCL = [SP--]\n";
+    print "\t\tret\t" . align('', ALIGN_SIZE) . "; PCH = [SP--], PCL = [SP--]\n";
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1577,7 +1655,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
-    print " $rb0\t\tadd\t" . align("A, #0x$rb0", 4) . "; ACC += 0x$rb0$str\n";
+    print " $rb0\t\tadd\t" . align("A, #0x$rb0", ALIGN_SIZE) . "; ACC += 0x$rb0$str\n";
     }
   elsif ($Instruction == 0x25)
     {
@@ -1585,7 +1663,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tadd\t" . align("A, $rb0", 4) . "; ACC += $name0\n", $parm0;
+    printf " %02X\t\tadd\t" . align("A, $rb0", ALIGN_SIZE) . "; ACC += $name0\n", $parm0;
     }
   elsif ($Instruction == 0x30)
     {
@@ -1597,7 +1675,7 @@ sub instruction_decoder($$)
     $rb0   = bitname($parm0, \$name0);
     $rb1   = labelname($addr);
     $str   = ($Address == $addr) ? ' (waiting loop)' : '';
-    printf " %02X %02X\tjnb\t" . align("$rb0, $rb1", 4) . "; If ($name0 == L) then jumps hither: 0x%04X$str\n",
+    printf " %02X %02X\tjnb\t" . align("$rb0, $rb1", ALIGN_SIZE) . "; If ($name0 == L) then jumps hither: 0x%04X$str\n",
 	    $parm0, $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1606,7 +1684,7 @@ sub instruction_decoder($$)
     {
 	# RETI				00110010
 
-    print "\t\treti\t" . align('', 4) . "; PCH = [SP--], PCL = [SP--]\n";
+    print "\t\treti\t" . align('', ALIGN_SIZE) . "; PCH = [SP--], PCL = [SP--]\n";
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1623,7 +1701,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
-    print " $rb0\t\taddc\t" . align("A, #0x$rb0", 4) . "; ACC += 0x$rb0 + CY$str\n";
+    print " $rb0\t\taddc\t" . align("A, #0x$rb0", ALIGN_SIZE) . "; ACC += 0x$rb0 + CY$str\n";
     }
   elsif ($Instruction == 0x35)
     {
@@ -1631,7 +1709,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\taddc\t" . align("A, $rb0", 4) . "; ACC += $name0 + CY\n", $parm0;
+    printf " %02X\t\taddc\t" . align("A, $rb0", ALIGN_SIZE) . "; ACC += $name0 + CY\n", $parm0;
     }
   elsif ($Instruction == 0x40)
     {
@@ -1640,7 +1718,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $addr  = $Address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
-    printf " %02X\t\tjc\t" . align($rb0, 4) . "; If (CY == H) then jumps hither: 0x%04X\n",
+    printf " %02X\t\tjc\t" . align($rb0, ALIGN_SIZE) . "; If (CY == H) then jumps hither: 0x%04X\n",
 	    $parm0, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1651,7 +1729,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\torl\t" . align("$rb0, A", 4) . "; $name0 |= ACC\n", $parm0;
+    printf " %02X\t\torl\t" . align("$rb0, A", ALIGN_SIZE) . "; $name0 |= ACC\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x43)
@@ -1663,7 +1741,7 @@ sub instruction_decoder($$)
     $rb0   = regname($parm0, \$name0);
     $rb1   = sprintf "%02X", $parm1;
     $str   = present_char($parm1);
-    printf " %02X $rb1\torl\t" . align("$rb0, #0x$rb1", 4) . "; $name0 |= 0x$rb1$str\n", $parm0;
+    printf " %02X $rb1\torl\t" . align("$rb0, #0x$rb1", ALIGN_SIZE) . "; $name0 |= 0x$rb1$str\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x44)
@@ -1673,7 +1751,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
-    print " $rb0\t\torl\t" . align("A, #0x$rb0", 4) . "; ACC |= 0x$rb0$str\n";
+    print " $rb0\t\torl\t" . align("A, #0x$rb0", ALIGN_SIZE) . "; ACC |= 0x$rb0$str\n";
     }
   elsif ($Instruction == 0x45)
     {
@@ -1681,7 +1759,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\torl\t" . align("A, $rb0", 4) . "; ACC |= $name0\n", $parm0;
+    printf " %02X\t\torl\t" . align("A, $rb0", ALIGN_SIZE) . "; ACC |= $name0\n", $parm0;
     }
   elsif ($Instruction == 0x50)
     {
@@ -1690,7 +1768,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $addr  = $Address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
-    printf " %02X\t\tjnc\t" . align($rb0, 4) . "; If (CY == L) then jumps hither: 0x%04X\n",
+    printf " %02X\t\tjnc\t" . align($rb0, ALIGN_SIZE) . "; If (CY == L) then jumps hither: 0x%04X\n",
 	    $parm0, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1701,7 +1779,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tanl\t" . align("$rb0, A", 4) . "; $name0 &= ACC\n", $parm0;
+    printf " %02X\t\tanl\t" . align("$rb0, A", ALIGN_SIZE) . "; $name0 &= ACC\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x53)
@@ -1713,7 +1791,7 @@ sub instruction_decoder($$)
     $rb0   = regname($parm0, \$name0);
     $rb1   = sprintf "%02X", $parm1;
     $str   = present_char($parm1);
-    printf " %02X $rb1\tanl\t" . align("$rb0, #0x$rb1", 4) . "; $name0 &= 0x$rb1$str\n", $parm0;
+    printf " %02X $rb1\tanl\t" . align("$rb0, #0x$rb1", ALIGN_SIZE) . "; $name0 &= 0x$rb1$str\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x54)
@@ -1723,7 +1801,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
-    print " $rb0\t\tanl\t" . align("A, #0x$rb0", 4) . "; ACC &= 0x$rb0$str\n";
+    print " $rb0\t\tanl\t" . align("A, #0x$rb0", ALIGN_SIZE) . "; ACC &= 0x$rb0$str\n";
     }
   elsif ($Instruction == 0x55)
     {
@@ -1731,7 +1809,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tanl\t" . align("A, $rb0", 4) . "; ACC &= $name0\n", $parm0;
+    printf " %02X\t\tanl\t" . align("A, $rb0", ALIGN_SIZE) . "; ACC &= $name0\n", $parm0;
     }
   elsif ($Instruction == 0x60)
     {
@@ -1740,7 +1818,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $addr  = $Address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
-    printf " %02X\t\tjz\t" . align($rb0, 4) . "; If (ACC == 0) then jumps hither: 0x%04X\n",
+    printf " %02X\t\tjz\t" . align($rb0, ALIGN_SIZE) . "; If (ACC == 0) then jumps hither: 0x%04X\n",
 	    $parm0, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1751,7 +1829,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\txrl\t" . align("$rb0, A", 4) . "; $name0 ^= ACC\n", $parm0;
+    printf " %02X\t\txrl\t" . align("$rb0, A", ALIGN_SIZE) . "; $name0 ^= ACC\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x63)
@@ -1763,7 +1841,7 @@ sub instruction_decoder($$)
     $rb0   = regname($parm0, \$name0);
     $rb1   = sprintf "%02X", $parm1;
     $str   = present_char($parm1);
-    printf " %02X $rb1\txrl\t" . align("$rb0, #0x$rb1", 4) . "; $name0 |= 0x$rb1$str\n", $parm0;
+    printf " %02X $rb1\txrl\t" . align("$rb0, #0x$rb1", ALIGN_SIZE) . "; $name0 |= 0x$rb1$str\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x64)
@@ -1773,7 +1851,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
-    print " $rb0\t\txrl\t" . align("A, #0x$rb0", 4) . "; ACC ^= 0x$rb0$str\n";
+    print " $rb0\t\txrl\t" . align("A, #0x$rb0", ALIGN_SIZE) . "; ACC ^= 0x$rb0$str\n";
     }
   elsif ($Instruction == 0x65)
     {
@@ -1781,7 +1859,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\txrl\t" . align("A, $rb0", 4) . "; ACC |= $name0\n", $parm0;
+    printf " %02X\t\txrl\t" . align("A, $rb0", ALIGN_SIZE) . "; ACC |= $name0\n", $parm0;
     }
   elsif ($Instruction == 0x70)
     {
@@ -1790,7 +1868,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $addr  = $Address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
-    printf " %02X\t\tjnz\t" . align($rb0, 4) . "; If (ACC != 0) then jumps hither: 0x%04X\n",
+    printf " %02X\t\tjnz\t" . align($rb0, ALIGN_SIZE) . "; If (ACC != 0) then jumps hither: 0x%04X\n",
 	    $parm0, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -1801,7 +1879,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\torl\t" . align("C, $rb0", 4) . "; CY |= $name0\n", $parm0;
+    printf " %02X\t\torl\t" . align("C, $rb0", ALIGN_SIZE) . "; CY |= $name0\n", $parm0;
     }
   elsif ($Instruction == 0x73)
     {
@@ -1818,7 +1896,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
-    print " $rb0\t\tmov\t" . align("A, #0x$rb0", 4) . "; ACC = 0x$rb0$str\n";
+    print " $rb0\t\tmov\t" . align("A, #0x$rb0", ALIGN_SIZE) . "; ACC = 0x$rb0$str\n";
     }
   elsif ($Instruction == 0x75)
     {
@@ -1839,7 +1917,7 @@ sub instruction_decoder($$)
       $str = present_char($parm1);
       }
 
-    printf " %02X $rb1\tmov\t" . align("$rb0, #0x$rb1", 4) . "; $name0 = 0x$rb1$str\n", $parm0;
+    printf " %02X $rb1\tmov\t" . align("$rb0, #0x$rb1", ALIGN_SIZE) . "; $name0 = 0x$rb1$str\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x80)
@@ -1850,7 +1928,7 @@ sub instruction_decoder($$)
     $addr  = $Address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
     $str   = ($Address == $addr) ? ' (endless loop)' : '';
-    printf " %02X\t\tsjmp\t" . align($rb0, 4) . "; Jumps hither: 0x%04X$str\n", $parm0, $addr;
+    printf " %02X\t\tsjmp\t" . align($rb0, ALIGN_SIZE) . "; Jumps hither: 0x%04X$str\n", $parm0, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1860,7 +1938,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\tanl\t" . align("C, $rb0", 4) . "; CY &= $name0\n", $parm0;
+    printf " %02X\t\tanl\t" . align("C, $rb0", ALIGN_SIZE) . "; CY &= $name0\n", $parm0;
     }
   elsif ($Instruction == 0x83)
     {
@@ -1882,7 +1960,7 @@ sub instruction_decoder($$)
     $parm1 = $mem[$Address + 2];
     $rb0   = regname($parm0, \$name0);
     $rb1   = regname($parm1, \$name1);
-    printf " %02X %02X\tmov\t" . align("$rb1, $rb0", 4) . "; $name1 = $name0\n", $parm0, $parm1;
+    printf " %02X %02X\tmov\t" . align("$rb1, $rb0", ALIGN_SIZE) . "; $name1 = $name0\n", $parm0, $parm1;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0x90)
@@ -1893,7 +1971,7 @@ sub instruction_decoder($$)
     $parm1 = $mem[$Address + 2];
     $addr  = ($parm0 << 8) | $parm1;
     $rb0   = sprintf "%04X", $addr;
-    printf " %02X %02X\tmov\t" . align("DPTR, #0x$rb0", 4) . "; DPTR = 0x$rb0\n", $parm0, $parm1;
+    printf " %02X %02X\tmov\t" . align("DPTR, #0x$rb0", ALIGN_SIZE) . "; DPTR = 0x$rb0\n", $parm0, $parm1;
     $DPTR = $addr;
     }
   elsif ($Instruction == 0x92)
@@ -1902,7 +1980,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\tmov\t" . align("$rb0, C", 4) . "; $name0 = CY\n", $parm0;
+    printf " %02X\t\tmov\t" . align("$rb0, C", ALIGN_SIZE) . "; $name0 = CY\n", $parm0;
     }
   elsif ($Instruction == 0x93)
     {
@@ -1917,7 +1995,7 @@ sub instruction_decoder($$)
     $parm0 = $mem[$Address + 1];
     $rb0   = sprintf "%02X", $parm0;
     $str   = present_char($parm0);
-    print " $rb0\t\tsubb\t" . align("A, #0x$rb0", 4) . "; ACC -= 0x$rb0 + CY$str\n";
+    print " $rb0\t\tsubb\t" . align("A, #0x$rb0", ALIGN_SIZE) . "; ACC -= 0x$rb0 + CY$str\n";
     }
   elsif ($Instruction == 0x95)
     {
@@ -1925,7 +2003,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tsubb\t" . align("A, $rb0", 4) . "; ACC -= $name0 + CY\n", $parm0;
+    printf " %02X\t\tsubb\t" . align("A, $rb0", ALIGN_SIZE) . "; ACC -= $name0 + CY\n", $parm0;
     }
   elsif ($Instruction == 0xA0)
     {
@@ -1933,7 +2011,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\torl\t" . align("C, /$rb0", 4) . "; CY = ~$name0\n", $parm0;
+    printf " %02X\t\torl\t" . align("C, /$rb0", ALIGN_SIZE) . "; CY = ~$name0\n", $parm0;
     }
   elsif ($Instruction == 0xA2)
     {
@@ -1941,7 +2019,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\tmov\t" . align("C, $rb0", 4) . "; CY = $name0\n", $parm0;
+    printf " %02X\t\tmov\t" . align("C, $rb0", ALIGN_SIZE) . "; CY = $name0\n", $parm0;
     }
   elsif ($Instruction == 0xA3)
     {
@@ -1950,7 +2028,7 @@ sub instruction_decoder($$)
     if ($DPTR != -1)
       {
       ++$DPTR;
-      printf "\t\tinc\t" . align('DPTR', 4) . "; ++DPTR (0x%04X)\n", $DPTR;
+      printf "\t\tinc\t" . align('DPTR', ALIGN_SIZE) . "; ++DPTR (0x%04X)\n", $DPTR;
       }
     else
       {
@@ -1969,7 +2047,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\tanl\t" . align("C, /$rb0", 4) . "; CY &= ~$name0\n", $parm0;
+    printf " %02X\t\tanl\t" . align("C, /$rb0", ALIGN_SIZE) . "; CY &= ~$name0\n", $parm0;
     }
   elsif ($Instruction == 0xB2)
     {
@@ -1977,7 +2055,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\tcpl\t" . align($rb0, 4) . "; $name0 = ~$name0\n", $parm0;
+    printf " %02X\t\tcpl\t" . align($rb0, ALIGN_SIZE) . "; $name0 = ~$name0\n", $parm0;
     }
   elsif ($Instruction == 0xB3)
     {
@@ -1994,7 +2072,7 @@ sub instruction_decoder($$)
     $addr  = $Address + $instr_size + expand_offset($parm1);
     $rb0   = labelname($addr);
     $rb1   = sprintf "%02X", $parm0;
-    printf " $rb1 %02X\tcjne\t" . align("A, #0x$rb1, $rb0", 4) . "; If (ACC != 0x$rb1) then jumps hither: 0x%04X\n",
+    printf " $rb1 %02X\tcjne\t" . align("A, #0x$rb1, $rb0", ALIGN_SIZE) . "; If (ACC != 0x$rb1) then jumps hither: 0x%04X\n",
 	    $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -2008,7 +2086,7 @@ sub instruction_decoder($$)
     $addr  = $Address + $instr_size + expand_offset($parm1);
     $rb0   = regname($parm0, \$name0);
     $rb1   = labelname($addr);
-    printf " %02X %02X\tcjne\t" . align("A, $rb0, $rb1", 4) . "; If (ACC != $name0) then jumps hither: 0x%04X\n",
+    printf " %02X %02X\tcjne\t" . align("A, $rb0, $rb1", ALIGN_SIZE) . "; If (ACC != $name0) then jumps hither: 0x%04X\n",
 	    $parm0, $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -2019,7 +2097,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tpush\t" . align($rb0, 4) . "; ++SP, [SP] = $name0\n", $parm0;
+    printf " %02X\t\tpush\t" . align($rb0, ALIGN_SIZE) . "; ++SP, [SP] = $name0\n", $parm0;
     }
   elsif ($Instruction == 0xC2)
     {
@@ -2027,7 +2105,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\tclr\t" . align($rb0, 4) . "; $name0 = L\n", $parm0;
+    printf " %02X\t\tclr\t" . align($rb0, ALIGN_SIZE) . "; $name0 = L\n", $parm0;
     }
   elsif ($Instruction == 0xC3)
     {
@@ -2047,7 +2125,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\txch\t" . align("A, $rb0", 4) . "; ACC <-> $name0\n", $parm0;
+    printf " %02X\t\txch\t" . align("A, $rb0", ALIGN_SIZE) . "; ACC <-> $name0\n", $parm0;
     invalidate_DPTR_Rx();
     }
   elsif ($Instruction == 0xD0)
@@ -2056,7 +2134,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tpop\t" . align($rb0, 4) . "; $name0 = [SP], --SP\n", $parm0;
+    printf " %02X\t\tpop\t" . align($rb0, ALIGN_SIZE) . "; $name0 = [SP], --SP\n", $parm0;
     invalidate_reg($parm0);
     }
   elsif ($Instruction == 0xD2)
@@ -2065,7 +2143,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = bitname($parm0, \$name0);
-    printf " %02X\t\tsetb\t" . align($rb0, 4) . "; $name0 = H\n", $parm0;
+    printf " %02X\t\tsetb\t" . align($rb0, ALIGN_SIZE) . "; $name0 = H\n", $parm0;
     }
   elsif ($Instruction == 0xD3)
     {
@@ -2089,7 +2167,7 @@ sub instruction_decoder($$)
     $rb0   = regname($parm0, \$name0);
     $rb1   = labelname($addr);
     $str   = ($Address == $addr) ? ' (waiting loop)' : '';
-    printf " %02X %02X\tdjnz\t" . align("$rb0, $rb1", 4) . "; If (--$name0 != 0) then jumps hither: 0x%04X$str\n",
+    printf " %02X %02X\tdjnz\t" . align("$rb0, $rb1", ALIGN_SIZE) . "; If (--$name0 != 0) then jumps hither: 0x%04X$str\n",
 	    $parm0, $parm1, $addr;
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
@@ -2112,7 +2190,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tmov\t" . align("A, $rb0", 4) . "; ACC = $name0\n", $parm0;
+    printf " %02X\t\tmov\t" . align("A, $rb0", ALIGN_SIZE) . "; ACC = $name0\n", $parm0;
     }
   elsif ($Instruction == 0xF0)
     {
@@ -2132,7 +2210,7 @@ sub instruction_decoder($$)
 
     $parm0 = $mem[$Address + 1];
     $rb0   = regname($parm0, \$name0);
-    printf " %02X\t\tmov\t" . align("$rb0, A", 4) . "; $name0 = ACC\n", $parm0;
+    printf " %02X\t\tmov\t" . align("$rb0, A", ALIGN_SIZE) . "; $name0 = ACC\n", $parm0;
     invalidate_reg($parm0);
     }
   else
@@ -2141,7 +2219,7 @@ sub instruction_decoder($$)
 
     $rb0   = sprintf "0x%02X", $Instruction;
     $str   = present_char($Instruction);
-    printf "\t\t.db\t" . align($rb0, 4) . "; 0x%04X: $rb0$str\n", $Address;
+    printf "\t\t.db\t" . align($rb0, ALIGN_SIZE) . "; 0x%04X: $rb0$str\n", $Address;
     }
 
   return $instr_size;
@@ -2354,7 +2432,7 @@ sub find_all_labels()
   {
   my ($i, $instr, $size);
 
-  for ($i = 0; $i < $code_size; )
+  for ($i = 0; $i <= $last_instr_address; )
     {
     $instr = $mem[$i];
 
@@ -2372,9 +2450,35 @@ sub find_all_labels()
 
 #-------------------------------------------------------------------------------
 
+sub decode_char($)
+  {
+  my $Ch = $_[0];
+
+  if ($Ch >= ord(' ') && $Ch < 0x7F)
+    {
+    return sprintf "'%c'", $Ch;
+    }
+  elsif ($Ch == 0x09)
+    {
+    return "'\\t'";
+    }
+  elsif ($Ch == 0x0A)
+    {
+    return "'\\n'";
+    }
+  elsif ($Ch == 0x0D)
+    {
+    return "'\\r'";
+    }
+
+  return sprintf "0x%02X", $Ch;
+  }
+
+#-------------------------------------------------------------------------------
+
 sub disassembler()
   {
-  my ($i, $instr);
+  my ($i, $instr, $str);
   my $blank = FALSE;
 
   print "\n;$border1\n;$border1\n;$border1\n\n" if ($debug);
@@ -2399,7 +2503,16 @@ sub disassembler()
 
       print "\n" if ($prev_is_jump);
 
-      $i += instruction_decoder($i, $instr);
+      if ($i <= $last_instr_address)
+	{
+	$i += instruction_decoder($i, $instr);
+	}
+      else
+	{
+	$str = decode_char($instr);
+	printf "0x%04X: %02X\t.db\t$str\n", $i, $instr;
+	++$i;
+	}
       }
     else
       {
@@ -2505,11 +2618,18 @@ for (my $i = 0; $i < @ARGV; )
       param_exist($opt, $i);
       $code_size = $ARGV[$i++];
 
-      if ($code_size > MCS51_CODE_SIZE)
+      if ($code_size < 1024)
+	{
+	printf STDERR "$PROGRAM: Code size of the MCS51 family greater than 1024 bytes!\n";
+	exit(1);
+	}
+      elsif ($code_size > MCS51_CODE_SIZE)
 	{
 	printf STDERR "$PROGRAM: Code size of the MCS51 family not greater %u bytes!\n", MCS51_CODE_SIZE;
 	exit(1);
 	}
+
+      $last_instr_address = $code_size - 1;
       }
 
     when (/^-(I|-include)$/o)
@@ -2581,6 +2701,7 @@ if ($header_file ne '')
   read_header("$include_path/$header_file");
   }
 
+read_map_file();
 find_all_labels();
 add_names_labels();
 disassembler();

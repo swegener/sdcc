@@ -1,5 +1,9 @@
 2013-01-05 Molnar Karoly <molnarkaroly AT users.sf.net>
 
+	* support/scripts/mcs51-disasm: More informations from map file.
+
+2013-01-05 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/mcs51-disasm: The required perl version: 5.12.0
           One repair: The unknown instruction is actually simple embedded
           data in the code.

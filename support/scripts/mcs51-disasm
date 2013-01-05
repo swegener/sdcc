@@ -34,7 +34,7 @@
 
 use strict;
 use warnings;
-use 5.10.1;			# Because of her need: ~~
+use 5.12.0;                     # when (regex)
 
 use constant FALSE	=> 0;
 use constant TRUE	=> 1;
@@ -885,8 +885,6 @@ sub label_finder($$)
   my ($addr, $instr_mask0, $instr_mask1, $instr_mask2);
   my $instr_size = $instruction_sizes[$Instruction];
 
-  printf STDERR ("UNKNOWN INSTRUCTION: 0x%04X: %02X\n", $Address, $Instruction) if (! $instr_size);
-
   $instr_mask0 = $Instruction & 0x1F;
   $instr_mask1 = $Instruction & 0xFE;
   $instr_mask2 = $Instruction & 0xF8;
@@ -1147,8 +1145,6 @@ sub instruction_decoder($$)
   my ($rb0, $rb1, $name0, $name1, $str);
   my $instr_size = $instruction_sizes[$Instruction];
 
-  printf STDERR ("UNKNOWN INSTRUCTION: 0x%04X: %02X\n", $Address, $Instruction) if (! $instr_size);
-
   printf "0x%04X: %02X", $Address, $Instruction;
 
   $instr_mask0 = $Instruction & 0x1F;
@@ -1185,7 +1181,7 @@ sub instruction_decoder($$)
     $addr  = (($Address + $instr_size) & 0xF800) | $rb1;
     $rb0   = labelname($addr);
     $str   = sprintf "0x%04X", $rb1;
-    printf " %02X\t\tacall\t" . align($rb0, 4) . "; Calls this: 0x%04X (PC += 2, [++SP] = PCL, [++SP] = PCH, PC(10-0) = $str)\n", $parm0, $addr;
+    printf " %02X\t\tacall\t" . align($rb0, 4) . "; Calls this: 0x%04X (PC += $instr_size, [++SP] = PCL, [++SP] = PCH, PC(10-0) = $str)\n", $parm0, $addr;
     invalidate_DPTR_Rx();
     }
   elsif ($instr_mask1 == 0x06)
@@ -1520,7 +1516,7 @@ sub instruction_decoder($$)
     $addr  = ($parm0 << 8) | $parm1;
     $rb0   = labelname($addr);
     $str   = sprintf "0x%04X", $addr;
-    printf " %02X %02X\tlcall\t" . align($rb0, 4) . "; Calls this: $str (PC += 3, [++SP] = PCL, [++SP] = PCH, PC = $str)\n",
+    printf " %02X %02X\tlcall\t" . align($rb0, 4) . "; Calls this: $str (PC += $instr_size, [++SP] = PCL, [++SP] = PCH, PC = $str)\n",
 	    $parm0, $parm1;
     invalidate_DPTR_Rx();
     }
@@ -1870,7 +1866,7 @@ sub instruction_decoder($$)
     {
 	# MOVC	A, @A+PC		10000011
 
-    print_3('movc', 'A, @A+PC', 'ACC = ROM[PC + ACC]');
+    print_3('movc', 'A, @A+PC', "ACC = ROM[PC + $instr_size + ACC]");
     }
   elsif ($Instruction == 0x84)
     {
@@ -2139,6 +2135,14 @@ sub instruction_decoder($$)
     printf " %02X\t\tmov\t" . align("$rb0, A", 4) . "; $name0 = ACC\n", $parm0;
     invalidate_reg($parm0);
     }
+  else
+    {
+	# The unknown instruction is actually simple embedded data in the code.
+
+    $rb0   = sprintf "0x%02X", $Instruction;
+    $str   = present_char($Instruction);
+    printf "\t\t.db\t" . align($rb0, 4) . "; 0x%04X: $rb0$str\n", $Address;
+    }
 
   return $instr_size;
   }
@@ -2348,7 +2352,7 @@ sub read_header($)
 
 sub find_all_labels()
   {
-  my ($i, $instr);
+  my ($i, $instr, $size);
 
   for ($i = 0; $i < $code_size; )
     {
@@ -2356,7 +2360,8 @@ sub find_all_labels()
 
     if ($instr != EMPTY)
       {
-      $i += label_finder($i, $instr);
+      $size = label_finder($i, $instr);
+      $i += ($size > 0) ? $size : 1;
       }
     else
       {

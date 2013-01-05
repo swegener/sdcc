@@ -72,7 +72,6 @@ static asmop tsxaop;
 extern int hc08_ptrRegReq;
 extern int hc08_nRegs;
 extern struct dbuf_s *codeOutBuf;
-//static void saveRBank (int, iCode *, bool);
 static bool operandsEqu (operand * op1, operand * op2);
 static void loadRegFromConst (reg_info * reg, int c);
 static asmop *newAsmop (short type);
@@ -80,55 +79,15 @@ static char *aopAdrStr (asmop * aop, int loffset, bool bit16);
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
-
-#define IS_AOP_HX(x) \
-        (((x)->type == AOP_REG) \
-         && ((x)->aopu.aop_reg[0] == hc08_reg_x) \
-         && ((x)->aopu.aop_reg[1] == hc08_reg_h) \
-         && ((x)->size == 2) )
-
-#define IS_AOP_XA(x) \
-        (((x)->type == AOP_REG) \
-         && ((x)->aopu.aop_reg[0] == hc08_reg_a) \
-         && ((x)->aopu.aop_reg[1] == hc08_reg_x) \
-         && ((x)->size == 2) )
-
-#define IS_AOP_AX(x) \
-        (((x)->type == AOP_REG) \
-         && ((x)->aopu.aop_reg[0] == hc08_reg_x) \
-         && ((x)->aopu.aop_reg[1] == hc08_reg_a) \
-         && ((x)->size == 2) )
-
-#define IS_AOP_A(x) \
-        (((x)->type == AOP_REG) \
-         && ((x)->aopu.aop_reg[0] == hc08_reg_a) \
-         && ((x)->size == 1) )
-
-#define IS_AOP_X(x) \
-        (((x)->type == AOP_REG) \
-         && ((x)->aopu.aop_reg[0] == hc08_reg_x) \
-         && ((x)->size == 1) )
-
-#define IS_AOP_H(x) \
-        (((x)->type == AOP_REG) \
-         && ((x)->aopu.aop_reg[0] == hc08_reg_h) \
-         && ((x)->size == 1) )
-
-#define IS_AOP_WITH_A(x) \
-        (((x)->type == AOP_REG) \
-         && (((x)->aopu.aop_reg[0] == hc08_reg_a) \
-            || ((x)->aopu.aop_reg[1] == hc08_reg_a)))
-
-#define IS_AOP_WITH_X(x) \
-        (((x)->type == AOP_REG) \
-         && (((x)->aopu.aop_reg[0] == hc08_reg_x) \
-            || ((x)->aopu.aop_reg[1] == hc08_reg_x)))
-
-#define IS_AOP_WITH_H(x) \
-        (((x)->type == AOP_REG) \
-         && (((x)->aopu.aop_reg[0] == hc08_reg_h) \
-            || ((x)->aopu.aop_reg[1] == hc08_reg_h)))
-
+#define IS_AOP_HX(x) ((x)->regmask == HC08MASK_HX)
+#define IS_AOP_XA(x) ((x)->regmask == HC08MASK_XA)
+#define IS_AOP_AX(x) ((x)->regmask == HC08MASK_AX)
+#define IS_AOP_A(x) ((x)->regmask == HC08MASK_A)
+#define IS_AOP_X(x) ((x)->regmask == HC08MASK_X)
+#define IS_AOP_H(x) ((x)->regmask == HC08MASK_H)
+#define IS_AOP_WITH_A(x) (((x)->regmask & HC08MASK_A) != 0)
+#define IS_AOP_WITH_X(x) (((x)->regmask & HC08MASK_X) != 0)
+#define IS_AOP_WITH_H(x) (((x)->regmask & HC08MASK_H) != 0)
 
 
 #define LSB     0
@@ -900,8 +859,8 @@ storeRegToAop (reg_info *reg, asmop * aop, int loffset)
 {
   int regidx = reg->rIdx;
 
-  DD (emitcode ("", ";     storeRegToAop (%s, %s, %d), stacked=%d, isaddr=%d",
-                reg->name, aopName (aop), loffset, aop->stacked, aop->isaddr));
+  DD (emitcode ("", ";     storeRegToAop (%s, %s, %d), stacked=%d",
+                reg->name, aopName (aop), loffset, aop->stacked));
 
   if ((reg->rIdx == HX_IDX) && aop->stacked && (aop->stk_aop[loffset] || aop->stk_aop[loffset + 1]))
     {
@@ -2387,7 +2346,6 @@ aopOp (operand *op, iCode * ic, bool result)
       aop->aopu.aop_lit = OP_VALUE (op);
       aop->size = getSize (operandType (op));
       aop->op = op;
-      aop->isaddr = op->isaddr;
       return;
     }
 
@@ -2396,7 +2354,6 @@ aopOp (operand *op, iCode * ic, bool result)
   if (op->aop)
     {
       op->aop->op = op;
-      op->aop->isaddr = op->isaddr;
       return;
     }
 
@@ -2412,12 +2369,6 @@ aopOp (operand *op, iCode * ic, bool result)
       //printf (" with size = %d\n", aop->size);
 
       aop->op = op;
-      aop->isaddr = op->isaddr;
-      /* if (aop->isaddr & IS_ITEMP (op))
-         {
-         aop->psize=aop->size;
-         aop->size = getSize( operandType (op)->next);
-         } */
       return;
     }
 
@@ -2427,7 +2378,6 @@ aopOp (operand *op, iCode * ic, bool result)
     {
       op->aop = aop = aopForSym (ic, OP_SYMBOL (op), result);
       aop->op = op;
-      aop->isaddr = op->isaddr;
       //printf ("new symbol %s\n", OP_SYMBOL (op)->name);
       //printf (" with size = %d\n", aop->size);
       return;
@@ -2452,7 +2402,6 @@ aopOp (operand *op, iCode * ic, bool result)
       sym->aop = op->aop = aop = newAsmop (AOP_CRY);
       aop->size = 0;
       aop->op = op;
-      aop->isaddr = op->isaddr;
       return;
     }
 
@@ -2469,12 +2418,6 @@ aopOp (operand *op, iCode * ic, bool result)
           sym->aop = op->aop = aop = aopForRemat (sym);
           aop->size = getSize (sym->type);
           aop->op = op;
-          aop->isaddr = op->isaddr;
-          /* if (aop->isaddr & IS_ITEMP (op))
-             {
-             aop->psize=aop->size;
-             aop->size = getSize( operandType (op)->next);
-             } */
           return;
         }
 
@@ -2514,7 +2457,6 @@ aopOp (operand *op, iCode * ic, bool result)
             }
           aop->size = getSize (sym->type);
           aop->op = op;
-          aop->isaddr = op->isaddr;
           //printf ("spill symbol %s\n", OP_SYMBOL (op)->name);
           //printf (" with size = %d\n", aop->size);
           return;
@@ -2536,9 +2478,11 @@ aopOp (operand *op, iCode * ic, bool result)
     {
        wassert (sym->regs[i] < regshc08 + 3);
        aop->aopu.aop_reg[i] = sym->regs[i];
+       aop->regmask |= sym->regs[i]->mask;
     }
+  if ((sym->nRegs > 1) && (sym->regs[0]->mask > sym->regs[1]->mask))
+    aop->regmask |= HC08MASK_REV;
   aop->op = op;
-  aop->isaddr = op->isaddr;
 }
 
 /*-----------------------------------------------------------------*/

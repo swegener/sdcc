@@ -65,11 +65,11 @@ int hc08_ptrRegReq;             /* one byte pointer register required */
 reg_info regshc08[] =
 {
 
-  {REG_GPR, A_IDX,   "a",  1, NULL, 0, 1},
-  {REG_GPR, X_IDX,   "x",  2, NULL, 0, 1},
-  {REG_GPR, H_IDX,   "h",  4, NULL, 0, 1},
-  {REG_PTR, HX_IDX,  "hx", 6, NULL, 0, 1},
-  {REG_GPR, XA_IDX,  "xa", 3, NULL, 0, 1},
+  {REG_GPR, A_IDX,   "a",  HC08MASK_A,  NULL, 0, 1},
+  {REG_GPR, X_IDX,   "x",  HC08MASK_X,  NULL, 0, 1},
+  {REG_GPR, H_IDX,   "h",  HC08MASK_H,  NULL, 0, 1},
+  {REG_PTR, HX_IDX,  "hx", HC08MASK_HX, NULL, 0, 1},
+  {REG_GPR, XA_IDX,  "xa", HC08MASK_XA, NULL, 0, 1},
 
   {REG_CND, CND_IDX, "C",  0, NULL, 0, 1},
   {0,       SP_IDX,  "sp", 0, NULL, 0, 1},

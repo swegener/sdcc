@@ -1,3 +1,11 @@
+2013-01-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/ralloc.h,
+	* src/hc08/ralloc.c,
+	* src/hc08/gen.h,
+	* src/hc08/gen.c: Removed some unused fields of the asmop
+	  struct. Made checking asmops for registers more efficient.
+
 2013-01-04 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm: New commandline option: --code-size
@@ -5,7 +13,7 @@
 
 2013-01-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
-	* src/hc08/ralloc.c: Removd old code from the original fork
+	* src/hc08/ralloc.c: Removed old code from the original fork
 	  from mcs51 that was not being used. Brought the old register
 	  allocator up to date with the current code generator.
 	* src/hc08/gen.c: Support ldhx/sthx with stack operands on s08.

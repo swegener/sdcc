@@ -60,14 +60,12 @@ typedef struct asmop
        AOP_EXT    -  operand using extended addressing mode
        AOP_IDX    -  operand using indexed addressing mode
     */
+    short regmask;              /* register mask if AOP_REG */
     short coff;			/* current offset */
     short size;			/* total size */
-    short psize;		/* pointer size */
     operand *op;		/* originating operand */
     unsigned code:1;		/* is in Code space */
-    unsigned paged:1;		/* in paged memory  */
     unsigned freed:1;		/* already freed    */
-    unsigned isaddr:1;		/* is an address to actual operand */
     unsigned stacked:1;		/* partial results stored on stack */
     struct asmop *stk_aop[4];	/* asmops for the results on the stack */
     union
@@ -75,14 +73,11 @@ typedef struct asmop
 	value *aop_lit;		/* if literal */
 	reg_info *aop_reg[4];	/* array of registers */
 	char *aop_dir;		/* if direct  */
-	reg_info *aop_ptr;		/* either -> to r0 or r1 */
 	struct {
-		int  from_cast_remat;   /* cast remat created this : immd2 field used for highest order*/
 		char *aop_immd1;	/* if immediate others are implied */
 		char *aop_immd2;	/* cast remat will generate this   */
 	} aop_immd;
 	int aop_stk;		/* stack offset when AOP_STK */
-	char *aop_str[4];	/* just a string array containing the location */
       }
     aopu;
   }

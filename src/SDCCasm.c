@@ -449,6 +449,8 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
   {NULL, NULL}
 };
 
+#if 0
+/* not used */
 static const ASM_MAPPING _gas_mapping[] = {
   {"labeldef", "%s::"},
   {"slabeldef", "%s:"},
@@ -486,6 +488,7 @@ static const ASM_MAPPING _gas_mapping[] = {
   {"bankimmeds", "0     ; PENDING: bank support"},
   {NULL, NULL}
 };
+#endif
 
 static const ASM_MAPPING _a390_mapping[] = {
   {"labeldef", "%s:"},
@@ -538,6 +541,7 @@ static const ASM_MAPPING _a390_mapping[] = {
   {NULL, NULL}
 };
 
+#if !OPT_DISABLE_XA51
 static const ASM_MAPPING _xa_asm_mapping[] = {
   {"labeldef", "%s:"},
   {"slabeldef", "%s:"},
@@ -587,23 +591,29 @@ static const ASM_MAPPING _xa_asm_mapping[] = {
   {"equ", " equ"},
   {NULL, NULL}
 };
+#endif
 
 const ASM_MAPPINGS asm_asxxxx_mapping = {
   NULL,
   _asxxxx_mapping
 };
 
+#if 0
+/* not used */
 const ASM_MAPPINGS asm_gas_mapping = {
   NULL,
   _gas_mapping
 };
+#endif
 
 const ASM_MAPPINGS asm_a390_mapping = {
   NULL,
   _a390_mapping
 };
 
+#if !OPT_DISABLE_XA51
 const ASM_MAPPINGS asm_xa_asm_mapping = {
   NULL,
   _xa_asm_mapping
 };
+#endif

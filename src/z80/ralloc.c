@@ -3147,8 +3147,6 @@ z80_ralloc (ebbIndex * ebbi)
 
   RegFix (ebbs, count);
 
-  /* New register allcoator here. */
-
   /* if stack was extended then tell the user */
   if (_G.stackExtend)
     {

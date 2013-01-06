@@ -154,7 +154,7 @@ enum asminst
   A_SWAP
 };
 
-const char *asminstnames[] =
+static const char *asminstnames[] =
 {
   "add",
   "adc",
@@ -242,18 +242,18 @@ static struct
 
 static const char *aopGet (asmop * aop, int offset, bool bit16);
 
-struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_zero, asmop_one;
-struct asmop *const ASMOP_A = &asmop_a;
-struct asmop *const ASMOP_B = &asmop_b;
-struct asmop *const ASMOP_C = &asmop_c;
-struct asmop *const ASMOP_D = &asmop_d;
-struct asmop *const ASMOP_E = &asmop_e;
-struct asmop *const ASMOP_H = &asmop_h;
-struct asmop *const ASMOP_L = &asmop_l;
-struct asmop *const ASMOP_IYH = &asmop_iyh;
-struct asmop *const ASMOP_IYL = &asmop_iyl;
-struct asmop *const ASMOP_ZERO = &asmop_zero;
-struct asmop *const ASMOP_ONE = &asmop_one;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_zero, asmop_one;
+static struct asmop *const ASMOP_A = &asmop_a;
+static struct asmop *const ASMOP_B = &asmop_b;
+static struct asmop *const ASMOP_C = &asmop_c;
+static struct asmop *const ASMOP_D = &asmop_d;
+static struct asmop *const ASMOP_E = &asmop_e;
+static struct asmop *const ASMOP_H = &asmop_h;
+static struct asmop *const ASMOP_L = &asmop_l;
+static struct asmop *const ASMOP_IYH = &asmop_iyh;
+static struct asmop *const ASMOP_IYL = &asmop_iyl;
+static struct asmop *const ASMOP_ZERO = &asmop_zero;
+static struct asmop *const ASMOP_ONE = &asmop_one;
 
 static asmop *_z80_return3[] = { &asmop_l, &asmop_h, &asmop_e, &asmop_d };
 static asmop *_gbz80_return3[] = { &asmop_e, &asmop_d, &asmop_l, &asmop_h };
@@ -806,7 +806,6 @@ emit3Cost (enum asminst inst, asmop * op1, int offset1, asmop * op2, int offset2
       return (1);
     case A_LD:
       return (ld_cost (op1, op2));
-      break;
     case A_ADD:
     case A_ADC:
     case A_AND:
@@ -1514,13 +1513,15 @@ aopOp (operand * op, const iCode * ic, bool result, bool requires_a)
           return;
         }
 
-      if (regalloc_dry_run)     // Todo: Handle dummy iTemp correctly
+      /* On-stack for dry run. */
+      if (sym->nRegs && regalloc_dry_run)
         {
           sym->aop = op->aop = aop = newAsmop (AOP_STK);
           aop->size = getSize (sym->type);
           return;
         }
 
+      /* On stack. */
       if (sym->usl.spillLoc)
         {
           asmop *oldAsmOp = NULL;

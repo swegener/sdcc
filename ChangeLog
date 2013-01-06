@@ -1,3 +1,12 @@
+2013-01-06 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm:
+	  Changes in the commandline options:
+	    Renamed --code-size to --rom-size.
+	    Removed: --debug
+	    New: --verbose, --const-area
+	  Extracts more informations from map file.
+
 2013-01-06 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCasm.c, src/SDCCasm.h: excluded unused asm mappings

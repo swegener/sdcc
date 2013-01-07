@@ -27,7 +27,7 @@
     This program disassembles the hex files. It assumes that the hex file
     contains MCS51 instructions.
 
-    Proposal for use: ./mcs51-disasm -M 8052.h program.hex
+    Proposal for use: ./mcs51-disasm.pl -M 8052.h program.hex
 
   $Id$
 =cut
@@ -64,7 +64,7 @@ use constant MCS51_ROM_SIZE		=> 0x10000;
 
 ################################################################################
 
-my $PROGRAM = 'mcs51-disasm';
+my $PROGRAM = 'mcs51-disasm.pl';
 
 my $border0 = ('-' x 79);
 my $border1 = ('#' x 79);

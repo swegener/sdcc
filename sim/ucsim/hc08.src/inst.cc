@@ -1091,7 +1091,7 @@ cl_hc08::inst_cbeq(t_mem code, bool prefix)
   if (operand1==operand2)
     PC += ofs;  
 
-  if (code == 0x71 || code == 0x61)
+  if (code == 0x71 || (!prefix && code == 0x61))
     incx();
   tick(1); // extra cycle to reload pipeline
 

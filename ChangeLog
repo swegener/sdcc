@@ -1,4 +1,13 @@
-2012-01-06 Philipp Klaus Krause <pkk AT spth.de>
+2013-01-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c,
+	* src/hc08/ralloc2.cc: Support more register combinations
+	  with pointer get/set and ifx iCodes. Allow rmw instructions to
+	  use X as a scratch register.
+	* sim/ucsim/hc08.src/inst.cc: Fixed bug with cbeq using stack operand
+	  modifying hx
+
+2013-01-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  src/z80/ralloc.c:

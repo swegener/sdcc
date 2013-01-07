@@ -188,6 +188,7 @@ static bool XAinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     ic->op == RETURN ||
     ic->op == LABEL ||
     ic->op == GOTO ||
+    ic->op == IFX ||
     ic->op == '+' ||
     ic->op == '-' ||
     ic->op == '*' ||
@@ -206,7 +207,8 @@ static bool XAinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     ic->op == GETWORD ||
     ic->op == LEFT_OP ||
     ic->op == RIGHT_OP ||
-    ic->op == '=' && !POINTER_SET(ic) ||
+    ic->op == '=' ||  /* both regular assignment and POINTER_SET safe */
+    ic->op == GET_VALUE_AT_ADDRESS ||
     ic->op == ADDRESS_OF ||
     ic->op == CAST ||
     ic->op == DUMMY_READ_VOLATILE ||
@@ -247,16 +249,10 @@ static bool XAinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   bool result_only_XA = (result_in_X || unused_X || dying_X) && (result_in_A || unused_A || dying_A);
 
-  if((ic->op == IFX || ic->op == JUMPTABLE) && (unused_A || dying_A))
+  if(ic->op == JUMPTABLE && (unused_A || dying_A))
     return(true);
 
   if(ic->op == IPUSH && (unused_A || dying_A || left_in_A || operand_in_reg(left, REG_H, ia, i, G) || left_in_X))
-    return(true);
-
-  if(ic->op == GET_VALUE_AT_ADDRESS && (unused_X || dying_X) && (unused_H || dying_H))
-	return(true);
-
-  if(ic->op == '=' && POINTER_SET(ic) && (unused_A || dying_A) && !operand_in_reg(right, REG_H, ia, i, G) && !operand_in_reg(right, REG_X, ia, i, G))
     return(true);
 
   if(ic->op == RECEIVE && (!ic->next || !(ic->next->op == RECEIVE) || !result_in_X || getSize(operandType(result)) >= 2))

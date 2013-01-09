@@ -1,3 +1,7 @@
+2013-01-09 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl: Internal restructuring an bug fixes.
+
 2013-01-08 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Prints in table the embedded constants.

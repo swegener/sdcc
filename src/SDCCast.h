@@ -215,7 +215,7 @@ ast *decorateType (ast *, RESULT_TYPE);
 ast *createWhile (symbol *, symbol *, symbol *, ast *, ast *);
 ast *createIf (ast *, ast *, ast *);
 ast *createDo (symbol *, symbol *, symbol *, ast *, ast *);
-ast *createFor (symbol *, symbol *, symbol *, symbol *, ast *, ast *, ast *, ast *);
+ast *createFor (symbol *, symbol *, symbol *, symbol *, ast *, ast *, ast *, ast *, ast *);
 void eval2icode (ast *);
 value *constExprValue (ast *, int);
 bool constExprTree (ast *);

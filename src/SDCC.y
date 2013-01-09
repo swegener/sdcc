@@ -1839,25 +1839,22 @@ iteration_statement
                         {
                           noLineno++;
 
-                          /* if break or continue statement present
-                             then create a general case loop */
-                          if (STACK_PEEK(continueStack)->isref ||
-                              STACK_PEEK(breakStack)->isref) {
-                              $$ = createFor ($1, STACK_POP(continueStack),
-                                              STACK_POP(breakStack) ,
-                                              STACK_POP(forStack)   ,
-                                              $3 , $5 , $7, $9 );
-                          } else {
-                              $$ = newNode(FOR,$9,NULL);
-                              AST_FOR($$,trueLabel) = $1;
-                              AST_FOR($$,continueLabel) =  STACK_POP(continueStack);
-                              AST_FOR($$,falseLabel) = STACK_POP(breakStack);
-                              AST_FOR($$,condLabel)  = STACK_POP(forStack);
-                              AST_FOR($$,initExpr)   = $3;
-                              AST_FOR($$,condExpr)   = $5;
-                              AST_FOR($$,loopExpr)   = $7;
-                          }
-
+                          $$ = newNode(FOR,$9,NULL);
+                          AST_FOR($$,trueLabel) = $1;
+                          AST_FOR($$,continueLabel) =  STACK_POP(continueStack);
+                          AST_FOR($$,falseLabel) = STACK_POP(breakStack);
+                          AST_FOR($$,condLabel)  = STACK_POP(forStack);
+                          AST_FOR($$,initExpr)   = $3;
+                          AST_FOR($$,condExpr)   = $5;
+                          AST_FOR($$,loopExpr)   = $7;
+                          
+                          /* This continue label is not at the correct location, */
+                          /* but we need to create it now for proper binding. The */
+                          /* code that handles the FOR node will move it to the */
+                          /* proper location inside the for loop. */
+                          if (AST_FOR($$,continueLabel)->isref)
+                            $$->right = createLabel(AST_FOR($$,continueLabel),NULL);
+                          $$ = newNode(NULLOP,$$,createLabel(AST_FOR($$,falseLabel),NULL));
                           noLineno--;
                         }
 ;

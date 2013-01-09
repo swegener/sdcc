@@ -55,6 +55,14 @@ static struct
 #define ALLOCATE 1
 #define DEALLOCATE 2
 
+#define IS_AND(ex) (ex->type == EX_OP && ex->opval.op == AND_OP )
+#define IS_OR(ex)  (ex->type == EX_OP && ex->opval.op == OR_OP )
+#define IS_NOT(ex) (ex->type == EX_OP && ex->opval.op == '!' )
+#define IS_ANDORNOT(ex) (IS_AND(ex) || IS_OR(ex) || IS_NOT(ex))
+#define IS_IFX(ex) (ex->type == EX_OP && ex->opval.op == IFX )
+#define IS_LT(ex)  (ex->type == EX_OP && ex->opval.op == '<' )
+#define IS_GT(ex)  (ex->type == EX_OP && ex->opval.op == '>')
+
 int noLineno = 0;
 int noAlloc = 0;
 symbol *currFunc = NULL;
@@ -546,6 +554,28 @@ resolveSymbols (ast * tree)
 
   if (tree->type == EX_OP && tree->opval.op == FOR)
     {
+      symbol *csym;
+
+      if (AST_FOR (tree, trueLabel))
+        {
+          if ((csym = findSym (LabelTab, AST_FOR (tree, trueLabel), AST_FOR (tree, trueLabel)->name)))
+            AST_FOR (tree, trueLabel) = csym;
+        }
+      if (AST_FOR (tree, falseLabel))
+        {
+          if ((csym = findSym (LabelTab, AST_FOR (tree, falseLabel), AST_FOR (tree, falseLabel)->name)))
+            AST_FOR (tree, falseLabel) = csym;
+        }
+      if (AST_FOR (tree, continueLabel))
+        {
+          if ((csym = findSym (LabelTab, AST_FOR (tree, continueLabel), AST_FOR (tree, continueLabel)->name)))
+            AST_FOR (tree, continueLabel) = csym;
+        }
+      if (AST_FOR (tree, condLabel))
+        {
+          if ((csym = findSym (LabelTab, AST_FOR (tree, condLabel), AST_FOR (tree, condLabel)->name)))
+            AST_FOR (tree, condLabel) = csym;
+        }
       AST_FOR (tree, initExpr) = resolveSymbols (AST_FOR (tree, initExpr));
       AST_FOR (tree, condExpr) = resolveSymbols (AST_FOR (tree, condExpr));
       AST_FOR (tree, loopExpr) = resolveSymbols (AST_FOR (tree, loopExpr));
@@ -2289,6 +2319,150 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
 
   rloop->lineno = init->lineno;
   return decorateType (rloop, RESULT_TYPE_NONE);
+}
+
+/*-----------------------------------------------------------------*/
+/* replLoopSymByVal - replace the loop sym by a value              */
+/*-----------------------------------------------------------------*/
+static int
+replLoopSymByVal (ast * body, symbol * sym, value * val)
+{
+  int changed;
+  /* reached end */
+  if (!body || IS_AST_LINK (body))
+    return 0;
+
+  if (IS_AST_SYM_VALUE (body))
+    {
+      if (isSymbolEqual (AST_SYMBOL (body), sym))
+        {
+
+          body->type = EX_VALUE;
+          AST_VALUE (body) = copyValue (val);
+          body->decorated = 0;
+          return 1;
+        }
+      return 0;
+    }
+
+  changed = replLoopSymByVal (body->left, sym, val);
+  changed |= replLoopSymByVal (body->right, sym, val);
+  if (changed)
+    body->decorated = 0;
+  return changed;
+}
+
+/*-----------------------------------------------------------------*/
+/* isInitiallyTrue - check if a for loop's condition is true for   */
+/*                   the initial iteration                         */
+/*-----------------------------------------------------------------*/
+static bool
+isInitiallyTrue (ast *initExpr, ast * condExpr)
+{
+  symbol * sym;
+  ast * init;
+
+  if (!condExpr)
+    return TRUE;
+  if (!initExpr)
+    return FALSE;
+  
+  /* first check the initExpr */
+  if (IS_AST_OP (initExpr) && initExpr->opval.op == '=' &&      /* is assignment */
+      IS_AST_SYM_VALUE (initExpr->left))
+    {                           /* left is a symbol */
+
+      sym = AST_SYMBOL (initExpr->left);
+      init = initExpr->right;
+    }
+  else
+    return FALSE;
+
+  /* don't defer condition test if volatile */
+  if (IS_VOLATILE ((sym)->type))
+    return FALSE;
+
+  if (!IS_AST_LIT_VALUE (init))
+    return FALSE;
+
+  /* Cannot move the condition if the condition has side-effects */
+  if (hasSEFcalls (condExpr))
+    return FALSE;
+
+  /* Cast the initial value to the type of the loop symbol so that  */
+  /* we have the actual value that we would read out of that symbol */
+  /* rather than just the value assigned to it. */
+  initExpr = copyAst (initExpr);
+  initExpr->opval.op = CAST;
+  initExpr->left = newAst_LINK (LTYPE (initExpr));
+  initExpr->decorated = 0;
+  decorateType (initExpr, RESULT_TYPE_NONE);
+  if (!IS_AST_LIT_VALUE (initExpr))
+    return FALSE;
+
+  /* Replace the symbol with its initial value and see if the condition */
+  /* simplifies to a non-zero (TRUE) literal value */      
+  condExpr = copyAst (condExpr);
+  if (replLoopSymByVal (condExpr, sym, AST_VALUE (initExpr)))
+    condExpr = decorateType (condExpr, RESULT_TYPE_NONE);
+  if (!IS_AST_LIT_VALUE (condExpr))
+    return FALSE;
+  return !isEqualVal (AST_VALUE (condExpr), 0);
+}
+
+/*-----------------------------------------------------------------*/
+/* createDoFor - creates parse tree for 'for' statement            */
+/*                                                                 */
+/* When we know that the condition is always true for the initial  */
+/* iteration, we can build a more optimal tree by testing the      */
+/* condition at the end of the loop (like do-while).               */
+/*                                                                 */
+/*        initExpr                                                 */
+/*   _forbody_n:                                                   */
+/*        statements                                               */
+/*   _forcontinue_n:                                               */
+/*        loopExpr                                                 */
+/*        condExpr  +-> trueLabel -> _forbody_n                    */
+/*                  |                                              */
+/*                  +-> falseLabel-> _forbreak_n                   */
+/*   _forbreak_n:                                                  */
+/*-----------------------------------------------------------------*/
+ast *
+createDoFor (symbol * trueLabel, symbol * continueLabel, symbol * falseLabel,
+             symbol * condLabel, ast * initExpr, ast * condExpr,
+             ast * loopExpr, ast * forBody, ast * continueLabelAst)
+{
+  ast *forTree;
+
+  if (condExpr)
+    {
+      condExpr = backPatchLabels (condExpr, trueLabel, falseLabel);
+      if (condExpr && !IS_IFX (condExpr))
+        condExpr = newIfxNode (condExpr, trueLabel, falseLabel);
+    }
+  else /* if no condition specified, it is considered always TRUE */
+    condExpr = newNode (GOTO, newAst_VALUE (symbolVal (trueLabel)), NULL);
+
+  /* attach body label to body */
+  forBody = createLabel (trueLabel, forBody);
+
+  /* attach continue to forLoop expression and condition */
+  loopExpr = newNode (NULLOP, loopExpr, condExpr);
+  if (continueLabelAst)
+    {
+      continueLabelAst->right = loopExpr;
+      loopExpr = continueLabelAst;
+    }
+  else
+    loopExpr = createLabel (continueLabel, loopExpr);
+   
+  /* now start putting them together */
+  forTree = newNode (NULLOP, initExpr, forBody);
+  forTree = newNode (NULLOP, forTree, loopExpr);
+
+  /* the break label is already in the tree as a sibling */
+  /* to the original FOR node this tree is replacing */
+  return forTree;
 }
 
 /*-----------------------------------------------------------------*/
@@ -5041,15 +5215,36 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         symbol *sym;
         ast *init, *end;
 
-        if (isLoopReversible (tree, &sym, &init, &end))
+        if (!AST_FOR (tree, continueLabel)->isref &&
+            !AST_FOR (tree, falseLabel)->isref &&
+            isLoopReversible (tree, &sym, &init, &end))
           return reverseLoop (tree, sym, init, end);
+        else if (isInitiallyTrue (AST_FOR (tree, initExpr), AST_FOR (tree, condExpr)))
+          {
+            tree = createDoFor (AST_FOR (tree, trueLabel),
+                                AST_FOR (tree, continueLabel),
+                                AST_FOR (tree, falseLabel),
+                                AST_FOR (tree, condLabel),
+                                AST_FOR (tree, initExpr),
+                                AST_FOR (tree, condExpr),
+                                AST_FOR (tree, loopExpr),
+                                tree->left,
+                                tree->right);
+            return decorateType (tree, RESULT_TYPE_NONE);
+          }
         else
-          return decorateType (createFor (AST_FOR (tree, trueLabel),
-                                          AST_FOR (tree, continueLabel),
-                                          AST_FOR (tree, falseLabel),
-                                          AST_FOR (tree, condLabel),
-                                          AST_FOR (tree, initExpr),
-                                          AST_FOR (tree, condExpr), AST_FOR (tree, loopExpr), tree->left), RESULT_TYPE_NONE);
+          {
+            tree = createFor (AST_FOR (tree, trueLabel),
+                              AST_FOR (tree, continueLabel),
+                              AST_FOR (tree, falseLabel),
+                              AST_FOR (tree, condLabel),
+                              AST_FOR (tree, initExpr),
+                              AST_FOR (tree, condExpr),
+                              AST_FOR (tree, loopExpr),
+                              tree->left,
+                              tree->right);
+            return decorateType (tree, RESULT_TYPE_NONE);
+          }
       }
     case PARAM:
       werrorfl (tree->filename, tree->lineno, E_INTERNAL_ERROR, __FILE__, __LINE__, "node PARAM shouldn't be processed here");
@@ -5093,14 +5288,6 @@ sizeofOp (sym_link * type)
   dbuf_destroy (&dbuf);
   return val;
 }
-
-#define IS_AND(ex) (ex->type == EX_OP && ex->opval.op == AND_OP )
-#define IS_OR(ex)  (ex->type == EX_OP && ex->opval.op == OR_OP )
-#define IS_NOT(ex) (ex->type == EX_OP && ex->opval.op == '!' )
-#define IS_ANDORNOT(ex) (IS_AND(ex) || IS_OR(ex) || IS_NOT(ex))
-#define IS_IFX(ex) (ex->type == EX_OP && ex->opval.op == IFX )
-#define IS_LT(ex)  (ex->type == EX_OP && ex->opval.op == '<' )
-#define IS_GT(ex)  (ex->type == EX_OP && ex->opval.op == '>')
 
 /*-----------------------------------------------------------------*/
 /* backPatchLabels - change and or not operators to flow control    */
@@ -5512,37 +5699,42 @@ createDo (symbol * trueLabel, symbol * continueLabel, symbol * falseLabel, ast *
 /*   _forbreak_n:                                                  */
 /*-----------------------------------------------------------------*/
 ast *
-createFor (symbol * trueLabel, symbol * continueLabel,
-           symbol * falseLabel, symbol * condLabel, ast * initExpr, ast * condExpr, ast * loopExpr, ast * forBody)
+createFor (symbol * trueLabel, symbol * continueLabel, symbol * falseLabel,
+           symbol * condLabel, ast * initExpr, ast * condExpr, ast * loopExpr,
+           ast * forBody, ast * continueLabelAst)
 {
   ast *forTree;
 
-  /* if loopexpression not present then we can generate it */
-  /* the same way as a while */
-  if (!loopExpr)
-    return newNode (NULLOP, initExpr, createWhile (trueLabel, continueLabel, falseLabel, condExpr, forBody));
   /* vanilla for statement */
   condExpr = backPatchLabels (condExpr, trueLabel, falseLabel);
 
   if (condExpr && !IS_IFX (condExpr))
     condExpr = newIfxNode (condExpr, trueLabel, falseLabel);
 
-  /* attach condition label to condition */
-  condExpr = createLabel (condLabel, condExpr);
-
   /* attach body label to body */
   forBody = createLabel (trueLabel, forBody);
 
+  /* attach condition label to condition */
+  condExpr = createLabel (condLabel, condExpr);
+  
   /* attach continue to forLoop expression & attach */
   /* goto the forcond @ and of loopExpression       */
-  loopExpr = createLabel (continueLabel,
-                          newNode (NULLOP, loopExpr, newNode (GOTO, newAst_VALUE (symbolVal (condLabel)), NULL)));
+  loopExpr = newNode (NULLOP, loopExpr, newNode (GOTO, newAst_VALUE (symbolVal (condLabel)), NULL));
+  if (continueLabelAst)
+    {
+      continueLabelAst->right = loopExpr;
+      loopExpr = continueLabelAst;
+    }
+  else
+    loopExpr = createLabel (continueLabel, loopExpr);
+
   /* now start putting them together */
   forTree = newNode (NULLOP, initExpr, condExpr);
   forTree = newNode (NULLOP, forTree, forBody);
   forTree = newNode (NULLOP, forTree, loopExpr);
-  /* finally add the break label */
-  forTree = newNode (NULLOP, forTree, createLabel (falseLabel, NULL));
+  
+  /* the break label is already in the tree as a sibling */
+  /* to the original FOR node this tree is replacing */
   return forTree;
 }
 

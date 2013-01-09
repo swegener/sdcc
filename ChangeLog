@@ -1,3 +1,11 @@
+2013-01-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCC.y,
+	* src/SDCCast.h,
+	* src/SDCCast.c: Move the test condition of a for-loop to the end of
+	  the loop if it is always true for the first iteration of the loop
+	  and has no side-effects.
+
 2013-01-09 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Internal restructuring an bug fixes.

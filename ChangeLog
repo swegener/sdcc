@@ -1,3 +1,7 @@
+2013-01-10 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* doc/sdccman.lyx: Expanded the 6.2 (Tools) table.
+
 2013-01-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c (packRegisters),

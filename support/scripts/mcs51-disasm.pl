@@ -1071,7 +1071,7 @@ sub label_finder($)
   {
   my $BlockRef = $_[0];
   my ($block, $instr_size, $address, $instr);
-  my ($addr, $parm0, $parm1, $instr_mask0, $instr_mask1, $instr_mask2);
+  my ($addr, $instr_mask0, $instr_mask1, $instr_mask2);
 
   $address     = $BlockRef->{ADDR};
   $instr_size  = $BlockRef->{SIZE};
@@ -1085,16 +1085,14 @@ sub label_finder($)
     {
         # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
 
-    $parm0 = $rom[$address + 1];
-    $addr  = (($address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $parm0;
+    $addr = (($address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $rom[$address + 1];
     add_jump_label($addr, $address);
     }
   elsif ($instr_mask0 == 0x11)
     {
 	# ACALL	addr11			aaa10001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
 
-    $parm0 = $rom[$address + 1];
-    $addr  = (($address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $parm0;
+    $addr = (($address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $rom[$address + 1];
     add_func_label($addr);
     }
   elsif ($instr_mask1 == 0xB6 || $instr_mask2 == 0xB8)
@@ -1102,35 +1100,28 @@ sub label_finder($)
 	# CJNE	@Ri, #data, rel		1011011i dddddddd rrrrrrrr	R0 .. R1 	data		relative address
 	# CJNE	Rn, #data, rel		10111rrr dddddddd rrrrrrrr	R0 .. R7 	data		relative address
 
-    $parm0 = $rom[$address + 1];
-    $parm1 = $rom[$address + 2];
-    $addr  = $address + $instr_size + expand_offset($parm1);
+    $addr = $address + $instr_size + expand_offset($rom[$address + 2]);
     add_jump_label($addr, -1);
     }
   elsif ($instr_mask2 == 0xD8)
     {
 	# DJNZ	Rn, rel			11011rrr rrrrrrrr		R0 .. R7	relative address
 
-    $parm0 = $rom[$address + 1];
-    $addr  = $address + $instr_size + expand_offset($parm0);
+    $addr = $address + $instr_size + expand_offset($rom[$address + 1]);
     add_jump_label($addr, -1);
     }
   elsif ($instr == 0x02)
     {
 	# LJMP	addr16			00000010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
-    $parm0 = $rom[$address + 1];
-    $parm1 = $rom[$address + 2];
-    $addr  = ($parm0 << 8) | $parm1;
+    $addr = ($rom[$address + 1] << 8) | $rom[$address + 2];
     add_jump_label($addr, $address);
     }
   elsif ($instr == 0x12)
     {
 	# LCALL	addr16			00010010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
-    $parm0 = $rom[$address + 1];
-    $parm1 = $rom[$address + 2];
-    $addr  = ($parm0 << 8) | $parm1;
+    $addr = ($rom[$address + 1] << 8) | $rom[$address + 2];
     add_func_label($addr);
     }
   elsif ($instr == 0x10 || $instr == 0x20 ||
@@ -1144,9 +1135,7 @@ sub label_finder($)
 	# CJNE	A, direct, rel		10110101 aaaaaaaa rrrrrrrr	register address	relative address
 	# DJNZ	direct, rel		11010101 aaaaaaaa rrrrrrrr	register address	relative address
 
-    $parm0 = $rom[$address + 1];
-    $parm1 = $rom[$address + 2];
-    $addr  = $address + $instr_size + expand_offset($parm1);
+    $addr = $address + $instr_size + expand_offset($rom[$address + 2]);
     add_jump_label($addr, -1);
     }
   elsif ($instr == 0x40 || $instr == 0x50 ||
@@ -1159,8 +1148,7 @@ sub label_finder($)
 	# JNZ	rel			01110000 rrrrrrrr 		relative address
 	# SJMP	rel			10000000 rrrrrrrr		relative address
 
-    $parm0 = $rom[$address + 1];
-    $addr  = $address + $instr_size + expand_offset($parm0);
+    $addr = $address + $instr_size + expand_offset($rom[$address + 1]);
     add_jump_label($addr, -1);
     }
   }
@@ -1677,10 +1665,10 @@ sub instruction_decoder($)
     {
 	# MOV	Rn, #data		01111rrr dddddddd		R0 .. R7	data
 
-    $rb0   = sprintf "%02X", $parm0;
+    $rb0   = sprintf "0x%02X", $parm0;
     $str0  = present_char($parm0);
     operation_R_reg($rn_regs, Rx_MOV, $parm0);
-    print_3('mov', "$rn_name, #0x$rb0", "$rn_name = 0x$rb0$str0");
+    print_3('mov', "$rn_name, #$rb0", "$rn_name = $rb0$str0");
     }
   elsif ($instr_mask2 == 0x88)
     {
@@ -1710,8 +1698,9 @@ sub instruction_decoder($)
 
     $addr  = $address + $instr_size + expand_offset($parm1);
     $rb0   = labelname($addr);
-    $str0  = sprintf "%02X", $parm0;
-    printf "cjne\t" . align("$rn_name, #0x$str0, $rb0", ALIGN_SIZE) . "; If ($rn_name != 0x$str0) then jumps hither: 0x%04X\n", $addr;
+    $str0  = sprintf "0x%02X", $parm0;
+    $str1  = sprintf "0x%04X", $addr;
+    print_3('cjne', "$rn_name, #$str0, $rb0", "If ($rn_name != $str0) then jumps hither: $str1");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1729,7 +1718,8 @@ sub instruction_decoder($)
     $addr  = $address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
     $str0  = ($address == $addr) ? ' (waiting loop)' : '';
-    printf "djnz\t" . align("$rn_name, $rb0", ALIGN_SIZE) . "; If (--$rn_name != 0) then jumps hither: 0x%04X$str0\n", $addr;
+    $str1  = sprintf "0x%04X", $addr;
+    print_3('djnz', "$rn_name, $rb0", "If (--$rn_name != 0) then jumps hither: $str1$str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1759,7 +1749,8 @@ sub instruction_decoder($)
     $addr  = ($parm0 << 8) | $parm1;
     $rb0   = labelname($addr);
     $str0  = ($address == $addr) ? ' (endless loop)' : '';
-    printf "ljmp\t" . align($rb0, ALIGN_SIZE) . "; Jumps hither: 0x%04X$str0\n", $addr;
+    $str1  = sprintf "0x%04X", $addr;
+    print_3('ljmp', $rb0, "Jumps hither: $str1$str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1790,7 +1781,8 @@ sub instruction_decoder($)
     $addr  = $address + $instr_size + expand_offset($parm1);
     $rb0   = bitname($parm0, \$name0);
     $rb1   = labelname($addr);
-    printf "jbc\t" . align("$rb0, $rb1", ALIGN_SIZE) . "; If ($name0 == H) then $name0 = L and jumps hither: 0x%04X\n", $addr;
+    $str0  = sprintf "0x%04X", $addr;
+    print_3('jbc', "$rb0, $rb1", "If ($name0 == H) then $name0 = L and jumps hither: $str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1832,7 +1824,8 @@ sub instruction_decoder($)
     $rb0   = bitname($parm0, \$name0);
     $rb1   = labelname($addr);
     $str0  = ($address == $addr) ? ' (waiting loop)' : '';
-    printf "jb\t" . align("$rb0, $rb1", ALIGN_SIZE) . "; If ($name0 == H) then jumps hither: 0x%04X$str0\n", $addr;
+    $str1  = sprintf "0x%04X", $addr;
+    print_3('jb', "$rb0, $rb1", "If ($name0 == H) then jumps hither: $str1$str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1873,7 +1866,8 @@ sub instruction_decoder($)
     $rb0   = bitname($parm0, \$name0);
     $rb1   = labelname($addr);
     $str0  = ($address == $addr) ? ' (waiting loop)' : '';
-    printf "jnb\t" . align("$rb0, $rb1", ALIGN_SIZE) . "; If ($name0 == L) then jumps hither: 0x%04X$str0\n", $addr;
+    $str1  = sprintf "0x%04X", $addr;
+    print_3('jnb', "$rb0, $rb1", "If ($name0 == L) then jumps hither: $str1$str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1912,7 +1906,8 @@ sub instruction_decoder($)
 
     $addr  = $address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
-    printf "jc\t" . align($rb0, ALIGN_SIZE) . "; If (CY == H) then jumps hither: 0x%04X\n", $addr;
+    $str0  = sprintf "0x%04X", $addr;
+    print_3('jc', $rb0, "If (CY == H) then jumps hither: $str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1955,7 +1950,8 @@ sub instruction_decoder($)
 
     $addr  = $address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
-    printf "jnc\t" . align($rb0, ALIGN_SIZE) . "; If (CY == L) then jumps hither: 0x%04X\n", $addr;
+    $str0  = sprintf "0x%04X", $addr;
+    print_3('jnc', $rb0, "If (CY == L) then jumps hither: $str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -1998,7 +1994,8 @@ sub instruction_decoder($)
 
     $addr  = $address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
-    printf "jz\t" . align($rb0, ALIGN_SIZE) . "; If (ACC == 0) then jumps hither: 0x%04X\n", $addr;
+    $str0  = sprintf "0x%04X", $addr;
+    print_3('jz', $rb0, "If (ACC == 0) then jumps hither: $str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -2041,7 +2038,8 @@ sub instruction_decoder($)
 
     $addr  = $address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
-    printf "jnz\t" . align($rb0, ALIGN_SIZE) . "; If (ACC != 0) then jumps hither: 0x%04X\n", $addr;
+    $str0  = sprintf "0x%04X", $addr;
+    print_3('jnz', $rb0, "If (ACC != 0) then jumps hither: $str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -2096,7 +2094,8 @@ sub instruction_decoder($)
     $addr  = $address + $instr_size + expand_offset($parm0);
     $rb0   = labelname($addr);
     $str0  = ($address == $addr) ? ' (endless loop)' : '';
-    printf "sjmp\t" . align($rb0, ALIGN_SIZE) . "; Jumps hither: 0x%04X$str0\n", $addr;
+    $str1  = sprintf "0x%04X", $addr;
+    print_3('sjmp', $rb0, "Jumps hither: $str1$str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -2133,8 +2132,8 @@ sub instruction_decoder($)
 	# MOV	DPTR, #data16		10010000 dddddddd dddddddd	d15-d8 d7-d0
 
     $addr  = ($parm0 << 8) | $parm1;
-    $rb0   = sprintf "0x%04X", $addr;
-    print_3('mov', "DPTR, #$rb0", "DPTR = $rb0");
+    $str0  = sprintf "0x%04X", $addr;
+    print_3('mov', "DPTR, #$str0", "DPTR = $str0");
     $DPTR = $addr;
     }
   elsif ($instr == 0x92)
@@ -2186,12 +2185,14 @@ sub instruction_decoder($)
     if ($DPTR != -1)
       {
       ++$DPTR;
-      printf "inc\t" . align('DPTR', ALIGN_SIZE) . "; ++DPTR (0x%04X)\n", $DPTR;
+      $str0 = sprintf " (0x%04X)", $DPTR;
       }
     else
       {
-      print_3('inc', 'DPTR', '++DPTR');
+      $str0 = '';
       }
+
+    print_3('inc', 'DPTR', "++DPTR$str0");
     }
   elsif ($instr == 0xA4)
     {
@@ -2225,8 +2226,9 @@ sub instruction_decoder($)
 
     $addr  = $address + $instr_size + expand_offset($parm1);
     $rb0   = labelname($addr);
-    $rb1   = sprintf "%02X", $parm0;
-    printf "cjne\t" . align("A, #0x$rb1, $rb0", ALIGN_SIZE) . "; If (ACC != 0x$rb1) then jumps hither: 0x%04X\n", $addr;
+    $rb1   = sprintf "0x%02X", $parm0;
+    $str0  = sprintf "0x%04X", $addr;
+    print_3('cjne', "A, #$rb1, $rb0", "If (ACC != $rb1) then jumps hither: $str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -2237,7 +2239,9 @@ sub instruction_decoder($)
     $addr  = $address + $instr_size + expand_offset($parm1);
     $rb0   = regname($parm0, \$name0);
     $rb1   = labelname($addr);
-    printf "cjne\t" . align("A, $rb0, $rb1", ALIGN_SIZE) . "; If (ACC != $name0) then jumps hither: 0x%04X\n", $addr;
+    $str0  = sprintf "0x%04X", $addr;
+    $str1  = ($address == $addr) ? ' (waiting loop)' : '';
+    print_3('cjne', "A, $rb0, $rb1", "If (ACC != $name0) then jumps hither: $str0$str1");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -2310,7 +2314,8 @@ sub instruction_decoder($)
     $rb0   = regname($parm0, \$name0);
     $rb1   = labelname($addr);
     $str0  = ($address == $addr) ? ' (waiting loop)' : '';
-    printf "djnz\t" . align("$rb0, $rb1", ALIGN_SIZE) . "; If (--$name0 != 0) then jumps hither: 0x%04X$str0\n", $addr;
+    $str1  = sprintf "0x%04X", $addr;
+    print_3('djnz', "$rb0, $rb1", "If (--$name0 != 0) then jumps hither: $str1$str0");
     invalidate_DPTR_Rx();
     $prev_is_jump = TRUE;
     }
@@ -2359,7 +2364,8 @@ sub instruction_decoder($)
 
     $rb0   = sprintf "0x%02X", $instr;
     $str0  = present_char($instr);
-    printf ".db\t" . align($rb0, ALIGN_SIZE) . "; 0x%04X: $rb0$str0\n", $address;
+    $str1  = sprintf "0x%04X", $address;
+    print_3('.db', $rb0, "$str1: $rb0$str0");
     }
   }
 

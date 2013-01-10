@@ -1986,7 +1986,6 @@ packRegisters (eBBlock ** ebpp, int blockno)
           !POINTER_SET (ic) &&
           IS_SYMOP (IC_RIGHT (ic)) &&
           OP_SYMBOL (IC_RIGHT (ic))->remat &&
-          !IS_CAST_ICODE(OP_SYMBOL (IC_RIGHT (ic))->rematiCode) &&
           bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
@@ -2002,7 +2001,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
         {
           sym_link *to_type = operandType(IC_LEFT(ic));
           sym_link *from_type = operandType(IC_RIGHT(ic));
-          if (IS_GENPTR(to_type) && IS_PTR(from_type))
+          if (IS_PTR(to_type) && IS_PTR(from_type))
             {
               OP_SYMBOL (IC_RESULT (ic))->remat = 1;
               OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;

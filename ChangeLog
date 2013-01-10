@@ -1,3 +1,11 @@
+2013-01-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/ralloc.c (packRegisters),
+	* src/hc08/gen.c (aopForRemat): allow more rematerializations of
+	  cast pointers
+	* src/hc08/ralloc2.cc (operand_is_ax): fixed bug that misidentified
+	  some register assignments as the register pair AX
+
 2013-01-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCC.y,

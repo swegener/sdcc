@@ -2259,7 +2259,6 @@ aopForRemat (symbol * sym)
 {
   iCode *ic = sym->rematiCode;
   asmop *aop = NULL;
-  int ptr_type = 0;
   int val = 0;
 
   if (!ic)
@@ -2276,14 +2275,7 @@ aopForRemat (symbol * sym)
         val -= (int) operandLitValue (IC_RIGHT (ic));
       else if (IS_CAST_ICODE (ic))
         {
-          sym_link *from_type = operandType (IC_RIGHT (ic));
           ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-          ptr_type = DCL_TYPE (from_type);
-          if (ptr_type == IPOINTER)
-            {
-              // bug #481053
-              ptr_type = POINTER;
-            }
           continue;
         }
       else

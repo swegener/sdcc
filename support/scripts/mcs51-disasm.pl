@@ -27,7 +27,7 @@
     This program disassembles the hex files. It assumes that the hex file
     contains MCS51 instructions.
 
-    Proposal for use: ./mcs51-disasm.pl -M 8052.h program.hex
+    Proposal for use: ./mcs51-disasm.pl -M 8052.h program.hex > program.asm
 
   $Id$
 =cut
@@ -175,6 +175,19 @@ my %interrupts_by_address =
   0x002B => 'Timer2_interrupt',
   0x0033 => 'Int2_interrupt',
   0x003B => 'Int3_interrupt'
+  );
+
+my %control_characters =
+  (
+  0x00 => '\0',
+  0x07 => '\a',
+  0x08 => '\b',
+  0x09 => '\t',
+  0x0A => '\n',
+  0x0C => '\f',
+  0x0D => '\r',
+  0x1B => '\e',
+  0x7F => '^?'
   );
 
 ################################################################################
@@ -406,10 +419,15 @@ sub align($$)
   my $Text = $_[0];
   my $al   = $_[1] - int(length($Text) / TAB_LENGTH);
 
-	# One tab will surely becomes behind it.
-  $al = 1 if ($al < 1);
-
-  return ($Text . "\t" x $al);
+	# One space will surely becomes behind it.
+  if ($al < 1)
+    {
+    return "$Text ";
+    }
+  else
+    {
+    return ($Text . "\t" x $al);
+    }
   }
 
 #-------------------------------------------------------------------------------
@@ -1351,17 +1369,9 @@ sub present_char($)
     {
     return sprintf " ('%c')", $Ch;
     }
-  elsif ($Ch == 0x09)
+  elsif (defined($control_characters{$Ch}))
     {
-    return " ('\\t')";
-    }
-  elsif ($Ch == 0x0A)
-    {
-    return " ('\\n')";
-    }
-  elsif ($Ch == 0x0D)
-    {
-    return " ('\\r')";
+    return " ('" . $control_characters{$Ch} . "')";
     }
 
   return '';
@@ -1381,17 +1391,9 @@ sub decode_char($)
     {
     return sprintf "'%c'", $Ch;
     }
-  elsif ($Ch == 0x09)
+  elsif (defined($control_characters{$Ch}))
     {
-    return "'\\t'";
-    }
-  elsif ($Ch == 0x0A)
-    {
-    return "'\\n'";
-    }
-  elsif ($Ch == 0x0D)
-    {
-    return "'\\r'";
+    return "'" . $control_characters{$Ch} . "'";
     }
 
   return sprintf "0x%02X", $Ch;

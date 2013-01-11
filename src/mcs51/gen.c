@@ -3051,14 +3051,40 @@ genSend (set * sendSet)
 
           if (sic->argreg == 1)
             {
-              while (size--)
+              if (AOP_TYPE (IC_LEFT (sic)) != AOP_DPTR)
                 {
-                  const char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
-                  if (!EQ (l, fReturn[offset]))
+                  while (size--)
                     {
-                      emitcode ("mov", "%s,%s", fReturn[offset], l);
+                      const char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
+                      if (!EQ (l, fReturn[offset]))
+                        {
+                          emitcode ("mov", "%s,%s", fReturn[offset], l);
+                        }
+                      offset++;
                     }
-                  offset++;
+                }
+              else /* need to load dpl, dph, etc from @dptr */
+                {
+                  while (size--)
+                    {
+                      const char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
+                      emitcode ("mov", "a,%s", l);
+                      emitpush ("acc");
+                      offset++;
+                    }
+                  size = AOP_SIZE (IC_LEFT (sic));
+                  while (size--)
+                    {
+                      offset--;
+                      if (!EQ ("a", fReturn[offset]))
+                        {
+                          emitpop (fReturn[offset]);
+                        }
+                      else
+                        {
+                          emitpop ("acc");
+                        }
+                    }
                 }
             }
           else

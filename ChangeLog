@@ -1,3 +1,7 @@
+2013-01-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c (genSend): "fix" for bug #3600343
+
 2013-01-10 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Simplified the code.

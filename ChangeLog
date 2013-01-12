@@ -1,5 +1,9 @@
 2013-01-12 Molnar Karoly <molnarkaroly AT users.sf.net>
 
+	* support/scripts/mcs51-disasm.pl: New command option: --no-explanations
+
+2013-01-12 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/mcs51-disasm.pl: New command option: --hex-constant
 
 2013-01-12 Molnar Karoly <molnarkaroly AT users.sf.net>

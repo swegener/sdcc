@@ -81,8 +81,9 @@ my $hex_file = '';
 my $map_file = '';
 my $header_file = '';
 
-my $verbose = 0;
-my $hex_constant = FALSE;
+my $verbose         = 0;
+my $hex_constant    = FALSE;
+my $no_explanations = FALSE;
 
 my @rom = ();
 my $rom_size = MCS51_ROM_SIZE;
@@ -1280,7 +1281,14 @@ sub labelname($)
 
 sub print_3($$$)
   {
-  print "$_[0]\t" . align($_[1], ALIGN_SIZE) . "; $_[2]\n";
+  if ($no_explanations)
+    {
+    print "$_[0]\t$_[1]\n";
+    }
+  else
+    {
+    print "$_[0]\t" . align($_[1], ALIGN_SIZE) . "; $_[2]\n";
+    }
   }
 
 #-------------------------------------------------------------------------------
@@ -3488,7 +3496,7 @@ sub print_constants($)
 
   return if (! $size);
 
-  print "\n";
+  $prev_is_jump = FALSE;
 
   $addr = $BlockRef->{ADDR};
   @constants = @rom[$addr .. ($addr + $size - 1)];
@@ -3524,8 +3532,7 @@ sub print_constants($)
 
     print "\n";
     } # while (TRUE)
-
-  print "\n";
+  $prev_is_jump = FALSE;
   }
 
 #-------------------------------------------------------------------------------
@@ -3540,6 +3547,7 @@ sub disassembler()
 
   $prev_is_jump = FALSE;
   invalidate_DPTR_Rx();
+  print "\n";
 
   foreach (sort {$a <=> $b} keys(%blocks_by_address))
     {
@@ -3548,7 +3556,6 @@ sub disassembler()
     if ($ref->{TYPE} == BLOCK_INSTR)
       {
       invalidate_DPTR_Rx() if (print_label($_));
-
       print "\n" if ($prev_is_jump);
 
       instruction_decoder($ref);
@@ -3556,12 +3563,14 @@ sub disassembler()
     elsif ($ref->{TYPE} == BLOCK_CONST)
       {
       print_label($_);
+      print "\n" if ($prev_is_jump);
+
       print_constants($ref);
       }
     elsif ($ref->{TYPE} == BLOCK_EMPTY)
       {
-      printf("0x%04X: -- -- --\n", $_);
-      printf("  ....  -- -- --\n0x%04X: -- -- --\n", $_ + $ref->{SIZE} - 1);
+      printf("\n0x%04X: -- -- --\n  ....  -- -- --\n0x%04X: -- -- --\n",
+	     $_, $_ + $ref->{SIZE} - 1);
       }
     }
   }
@@ -3622,6 +3631,10 @@ EOT
 	--map-file <file.map>
 
 	    The map file belonging to the input hex file. (optional)
+
+	-ne|--no-explanations
+
+	    Eliminates after the instructions visible explaining texts.
 
 	-v <level> or --verbose <level>
 
@@ -3724,6 +3737,11 @@ for (my $i = 0; $i < @ARGV; )
       {
       param_exist($opt, $i);
       $map_file = $ARGV[$i++];
+      }
+
+    when (/^-(ne|-no-explanations)$/o)
+      {
+      $no_explanations = TRUE;
       }
 
     when (/^-(v|-verbose)$/o)

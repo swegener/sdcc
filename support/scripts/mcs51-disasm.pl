@@ -82,6 +82,7 @@ my $map_file = '';
 my $header_file = '';
 
 my $verbose = 0;
+my $hex_constant = FALSE;
 
 my @rom = ();
 my $rom_size = MCS51_ROM_SIZE;
@@ -141,7 +142,8 @@ my @R_regs;
 
 my $prev_is_jump;
 
-use constant ALIGN_SIZE => 5;
+use constant ALIGN_SIZE  => 5;
+use constant TBL_COLUMNS => 8;
 
 =back
 	The structure of one element of the %blocks_by_address hash:
@@ -199,8 +201,6 @@ my $dcd_Ri_regs    = 0;
 my $dcd_Ri_name    = '';
 my $dcd_Rn_regs    = 0;
 my $dcd_Rn_name    = '';
-
-my ($addr, $rb0, $rb1, $name0, $name1, $str0, $str1);
 
 ################################################################################
 ################################################################################
@@ -1100,7 +1100,7 @@ sub expand_offset($)
 sub label_finder($)
   {
   my $BlockRef = $_[0];
-  my ($block, $instr_size, $address, $instr);
+  my ($instr_size, $address, $instr);
   my ($addr, $instr_mask0, $instr_mask1, $instr_mask2);
 
   $address     = $BlockRef->{ADDR};
@@ -1113,7 +1113,7 @@ sub label_finder($)
 
   if ($instr_mask0 == 0x01)
     {
-        # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
+        # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 0 0 0 0 1	a7-a0
 
     $addr = (($address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $rom[$address + 1];
     add_jump_label($addr, $address);
@@ -1131,14 +1131,14 @@ sub label_finder($)
 	# CJNE	Rn, #data, rel		10111rrr dddddddd rrrrrrrr	R0 .. R7 	data		relative address
 
     $addr = $address + $instr_size + expand_offset($rom[$address + 2]);
-    add_jump_label($addr, -1);
+    add_jump_label($addr, EMPTY);
     }
   elsif ($instr_mask2 == 0xD8)
     {
 	# DJNZ	Rn, rel			11011rrr rrrrrrrr		R0 .. R7	relative address
 
     $addr = $address + $instr_size + expand_offset($rom[$address + 1]);
-    add_jump_label($addr, -1);
+    add_jump_label($addr, EMPTY);
     }
   elsif ($instr == 0x02)
     {
@@ -1166,7 +1166,7 @@ sub label_finder($)
 	# DJNZ	direct, rel		11010101 aaaaaaaa rrrrrrrr	register address	relative address
 
     $addr = $address + $instr_size + expand_offset($rom[$address + 2]);
-    add_jump_label($addr, -1);
+    add_jump_label($addr, EMPTY);
     }
   elsif ($instr == 0x40 || $instr == 0x50 ||
 	 $instr == 0x60 || $instr == 0x70 ||
@@ -1179,7 +1179,7 @@ sub label_finder($)
 	# SJMP	rel			10000000 rrrrrrrr		relative address
 
     $addr = $address + $instr_size + expand_offset($rom[$address + 1]);
-    add_jump_label($addr, -1);
+    add_jump_label($addr, EMPTY);
     }
   }
 
@@ -1421,7 +1421,9 @@ sub decode_char($)
 
 sub ajmp()
   {
-        # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+
+        # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 0 0 0 0 1	a7-a0
 
   $rb1   = (($dcd_instr & 0xE0) << 3) | $dcd_parm0;
   $addr  = (($dcd_address + $dcd_instr_size) & 0xF800) | $rb1;
@@ -1438,6 +1440,8 @@ sub ajmp()
 
 sub acall()
   {
+  my ($addr, $rb0, $rb1, $str0, $str1);
+
 	# ACALL	addr11			aaa10001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
 
   $rb1   = (($dcd_instr & 0xE0) << 3) | $dcd_parm0;
@@ -1518,6 +1522,8 @@ sub xrl_A_ind_Ri()
 
 sub mov_ind_Ri_data()
   {
+  my ($rb0, $str0);
+
 	# MOV	@Ri, #data		0111011i dddddddd		data
 
   $rb0  = sprintf "0x%02X", $dcd_parm0;
@@ -1530,6 +1536,8 @@ sub mov_ind_Ri_data()
 
 sub mov_direct_ind_Ri()
   {
+  my ($rb0, $name0);
+
 	# MOV	direct, @Ri		1000011i aaaaaaaa		R0 .. R1	register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -1550,6 +1558,8 @@ sub subb_A_ind_Ri()
 
 sub mov_ind_Ri_direct()
   {
+  my ($rb0, $name0);
+
 	# MOV	@Ri, direct		1010011i aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -1561,6 +1571,8 @@ sub mov_ind_Ri_direct()
 
 sub cjne_ind_Ri_data()
   {
+  my ($addr, $rb0, $str0, $str1);
+
 	# CJNE	@Ri, #data, rel		1011011i dddddddd rrrrrrrr	R0 .. R1 	data		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
@@ -1634,6 +1646,8 @@ sub mov_ind_Ri_A()
 
 sub inc_Rn()
   {
+  my $str0;
+
 	# INC	Rn			00001rrr			R0 .. R7
 
   if (operation_R_reg($dcd_Rn_regs, Rx_INC))
@@ -1651,6 +1665,8 @@ sub inc_Rn()
 
 sub dec_Rn()
   {
+  my $str0;
+
 	# DEC	Rn			00011rrr			R0 .. R7
 
   if (operation_R_reg($dcd_Rn_regs, Rx_DEC))
@@ -1713,6 +1729,8 @@ sub xrl_A_Rn()
 
 sub mov_Rn_data()
   {
+  my ($rb0, $str0);
+
 	# MOV	Rn, #data		01111rrr dddddddd		R0 .. R7	data
 
   $rb0  = sprintf "0x%02X", $dcd_parm0;
@@ -1725,6 +1743,8 @@ sub mov_Rn_data()
 
 sub mov_direct_Rn()
   {
+  my ($rb0, $name0);
+
 	# MOV	direct, Rn		10001rrr aaaaaaaa		R0 .. R7	register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -1745,6 +1765,8 @@ sub subb_A_Rn()
 
 sub mov_Rn_direct()
   {
+  my ($rb0, $name0);
+
 	# MOV	Rn, direct		10101rrr aaaaaaaa		R0 .. R7	register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -1756,6 +1778,8 @@ sub mov_Rn_direct()
 
 sub cjne_Rn_data()
   {
+  my ($addr, $rb0, $str0, $str1);
+
 	# CJNE	Rn, #data, rel		10111rrr dddddddd rrrrrrrr	R0 .. R7 	data		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
@@ -1781,6 +1805,8 @@ sub xch_A_Rn()
 
 sub djnz_Rn()
   {
+  my ($addr, $rb0, $str0, $str1);
+
 	# DJNZ	Rn, rel			11011rrr rrrrrrrr		R0 .. R7	relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
@@ -1823,6 +1849,8 @@ sub nop()
 
 sub ljmp()
   {
+  my ($addr, $rb0, $str0, $str1);
+
 	# LJMP	addr16			00000010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
   $addr = ($dcd_parm0 << 8) | $dcd_parm1;
@@ -1856,6 +1884,8 @@ sub inc_A()
 
 sub inc_direct()
   {
+  my ($rb0, $name0);
+
 	# INC	direct			00000101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -1867,6 +1897,8 @@ sub inc_direct()
 
 sub jbc_bit()
   {
+  my ($addr, $rb0, $rb1, $name0, $str0);
+
 	# JBC	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
@@ -1882,6 +1914,8 @@ sub jbc_bit()
 
 sub lcall()
   {
+  my ($addr, $rb0, $str0);
+
 	# LCALL	addr16			00010010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
   $addr = ($dcd_parm0 << 8) | $dcd_parm1;
@@ -1913,6 +1947,8 @@ sub dec_A()
 
 sub dec_direct()
   {
+  my ($rb0, $name0);
+
 	# DEC	direct			00010101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -1924,6 +1960,8 @@ sub dec_direct()
 
 sub jb_bit()
   {
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+
 	# JB	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
@@ -1942,7 +1980,7 @@ sub ret()
   {
 	# RET				00100010
 
-  print_3('ret', '', "PCH = [SP--], PCL = [SP--]");
+  print_3('ret', '', 'PCH = [SP--], PCL = [SP--]');
   invalidate_DPTR_Rx();
   $prev_is_jump = TRUE;
   }
@@ -1960,6 +1998,8 @@ sub rl_A()
 
 sub add_A_data()
   {
+  my ($rb0, $str0);
+
 	# ADD	A, #data		00100100 dddddddd		data
 
   $rb0  = sprintf "0x%02X", $dcd_parm0;
@@ -1971,6 +2011,8 @@ sub add_A_data()
 
 sub add_A_direct()
   {
+  my ($rb0, $name0);
+
 	# ADD	A, direct		00100101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -1981,6 +2023,8 @@ sub add_A_direct()
 
 sub jnb_bit()
   {
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+
 	# JNB	bit, rel		00110000 bbbbbbbb rrrrrrrr	bit address		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
@@ -2017,6 +2061,8 @@ sub rcl_A()
 
 sub addc_A_data()
   {
+  my ($rb0, $str0);
+
 	# ADDC	A, #data		00110100 dddddddd		data
 
   $rb0  = sprintf "0x%02X", $dcd_parm0;
@@ -2028,6 +2074,8 @@ sub addc_A_data()
 
 sub addc_A_direct()
   {
+  my ($rb0, $name0);
+
 	# ADDC	A, direct		00110101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2038,6 +2086,8 @@ sub addc_A_direct()
 
 sub jc()
   {
+  my ($addr, $rb0, $str0);
+
 	# JC	rel			01000000 rrrrrrrr 		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
@@ -2052,6 +2102,8 @@ sub jc()
 
 sub orl_direct_A()
   {
+  my ($rb0, $name0);
+
 	# ORL	direct, A		01000010 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2063,6 +2115,8 @@ sub orl_direct_A()
 
 sub orl_direct_data()
   {
+  my ($rb0, $rb1, $name0, $str0);
+
 	# ORL	direct, #data		01000011 aaaaaaaa dddddddd	register address	data
 
   $rb0  = regname($dcd_parm0, \$name0);
@@ -2076,6 +2130,8 @@ sub orl_direct_data()
 
 sub orl_A_data()
   {
+  my ($rb0, $str0);
+
 	# ORL	A, #data		01000100 dddddddd		data
 
   $rb0  = sprintf "0x%02X", $dcd_parm0;
@@ -2087,6 +2143,8 @@ sub orl_A_data()
 
 sub orl_A_direct()
   {
+  my ($rb0, $name0);
+
 	# ORL	A, direct		01000101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2097,6 +2155,8 @@ sub orl_A_direct()
 
 sub jnc()
   {
+  my ($addr, $rb0, $str0);
+
 	# JNC	rel			01010000 rrrrrrrr 		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
@@ -2111,6 +2171,8 @@ sub jnc()
 
 sub anl_direct_A()
   {
+  my ($rb0, $name0);
+
 	# ANL	direct, A		01010010 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2122,6 +2184,8 @@ sub anl_direct_A()
 
 sub anl_direct_data()
   {
+  my ($rb0, $rb1, $name0, $str0);
+
 	# ANL	direct, #data		01010011 aaaaaaaa dddddddd	register address	data
 
   $rb0  = regname($dcd_parm0, \$name0);
@@ -2135,6 +2199,8 @@ sub anl_direct_data()
 
 sub anl_A_data()
   {
+  my ($rb0, $str0);
+
 	# ANL	A, #data		01010100 dddddddd		data
 
   $rb0  = sprintf "0x%02X", $dcd_parm0;
@@ -2146,6 +2212,8 @@ sub anl_A_data()
 
 sub anl_A_direct()
   {
+  my ($rb0, $name0);
+
 	# ANL	A, direct		01010101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2156,6 +2224,8 @@ sub anl_A_direct()
 
 sub jz()
   {
+  my ($addr, $rb0, $str0);
+
 	# JZ	rel			01100000 rrrrrrrr 		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
@@ -2170,6 +2240,8 @@ sub jz()
 
 sub xrl_direct_A()
   {
+  my ($rb0, $name0);
+
 	# XRL	direct, A		01100010 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2181,6 +2253,8 @@ sub xrl_direct_A()
 
 sub xrl_direct_data()
   {
+  my ($rb0, $rb1, $name0, $str0);
+
 	# XRL	direct, #data		01100011 aaaaaaaa dddddddd	register address	data
 
   $rb0  = regname($dcd_parm0, \$name0);
@@ -2194,6 +2268,8 @@ sub xrl_direct_data()
 
 sub xrl_A_data()
   {
+  my ($rb0, $str0);
+
 	# XRL	A, #data		01100100 dddddddd		data
 
   $rb0  = sprintf "0x%02X", $dcd_parm0;
@@ -2205,6 +2281,8 @@ sub xrl_A_data()
 
 sub xrl_A_direct()
   {
+  my ($rb0, $name0);
+
 	# XRL	A, direct		01100101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2215,6 +2293,8 @@ sub xrl_A_direct()
 
 sub jnz()
   {
+  my ($addr, $rb0, $str0);
+
 	# JNZ	rel			01110000 rrrrrrrr 		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
@@ -2229,9 +2309,11 @@ sub jnz()
 
 sub orl_C_bit()
   {
+  my ($rb0, $name0);
+
 	# ORL	C, bit			01110010 bbbbbbbb		bit address
 
-  $rb0   = bitname($dcd_parm0, \$name0);
+  $rb0 = bitname($dcd_parm0, \$name0);
   print_3('orl', "C, $rb0", "CY |= $name0");
   }
 
@@ -2250,10 +2332,12 @@ sub jmp_A_DPTR()
 
 sub mov_A_data()
   {
+  my ($rb0, $str0);
+
 	# MOV	A, #data		01110100 dddddddd		data
 
-  $rb0   = sprintf "0x%02X", $dcd_parm0;
-  $str0  = present_char($dcd_parm0);
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
   print_3('mov', "A, #$rb0", "ACC = $rb0$str0");
   }
 
@@ -2261,12 +2345,14 @@ sub mov_A_data()
 
 sub mov_direct_data()
   {
+  my ($rb0, $rb1, $name0, $str0, $str1);
+
 	# MOV	direct, #data		01110101 aaaaaaaa dddddddd	register address	data
 
-  $rb0   = regname($dcd_parm0, \$name0);
-  $rb1   = sprintf "0x%02X", $dcd_parm1;
-  $str0  = '';
-  $str1  = sprintf "%02X", $dcd_parm0;
+  $rb0  = regname($dcd_parm0, \$name0);
+  $rb1  = sprintf "0x%02X", $dcd_parm1;
+  $str0 = '';
+  $str1 = sprintf "%02X", $dcd_parm0;
 
   if ($dcd_parm0 == PSW)
     {
@@ -2285,12 +2371,14 @@ sub mov_direct_data()
 
 sub sjmp()
   {
+  my ($addr, $rb0, $rb1, $name0, $name1, $str0, $str1);
+
 	# SJMP	rel			10000000 rrrrrrrr		relative address
 
-  $addr  = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
-  $rb0   = labelname($addr);
-  $str0  = ($dcd_address == $addr) ? ' (endless loop)' : '';
-  $str1  = sprintf "0x%04X", $addr;
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
+  $rb0  = labelname($addr);
+  $str0 = ($dcd_address == $addr) ? ' (endless loop)' : '';
+  $str1 = sprintf "0x%04X", $addr;
   print_3('sjmp', $rb0, "Jumps hither: $str1$str0");
   invalidate_DPTR_Rx();
   $prev_is_jump = TRUE;
@@ -2300,6 +2388,8 @@ sub sjmp()
 
 sub anl_C_bit()
   {
+  my ($rb0, $name0);
+
 	# ANL	C, bit			10000010 bbbbbbbb		bit address
 
   $rb0 = bitname($dcd_parm0, \$name0);
@@ -2328,6 +2418,8 @@ sub div_AB()
 
 sub mov_direct_direct()
   {
+  my ($rb0, $rb1, $name0, $name1);
+
 	# MOV	direct, direct		10000101 aaaaaaaa aaaaaaaa	forrás reg.	cél reg.
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2340,6 +2432,8 @@ sub mov_direct_direct()
 
 sub mov_DPTR_data()
   {
+  my ($addr, $str0);
+
 	# MOV	DPTR, #data16		10010000 dddddddd dddddddd	d15-d8 d7-d0
 
   $addr = ($dcd_parm0 << 8) | $dcd_parm1;
@@ -2352,6 +2446,8 @@ sub mov_DPTR_data()
 
 sub mov_bit_C()
   {
+  my ($rb0, $name0);
+
 	# MOV	bit, C			10010010 bbbbbbbb		bit address
 
   $rb0 = bitname($dcd_parm0, \$name0);
@@ -2371,6 +2467,8 @@ sub movc_A_A_DPTR()
 
 sub subb_A_data()
   {
+  my ($rb0, $str0);
+
 	# SUBB	A, #data		10010100 dddddddd		data
 
   $rb0  = sprintf "0x%02X", $dcd_parm0;
@@ -2382,6 +2480,8 @@ sub subb_A_data()
 
 sub subb_A_direct()
   {
+  my ($rb0, $name0);
+
 	# SUBB	A, direct		10010101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2392,9 +2492,11 @@ sub subb_A_direct()
 
 sub orl_C__bit()
   {
+  my ($rb0, $name0);
+
 	# ORL	C, /bit			10100000 bbbbbbbb		bit address
 
-  $rb0   = bitname($dcd_parm0, \$name0);
+  $rb0 = bitname($dcd_parm0, \$name0);
   print_3('orl', "C, /$rb0", "CY = ~$name0");
   }
 
@@ -2402,6 +2504,8 @@ sub orl_C__bit()
 
 sub mov_C_bit()
   {
+  my ($rb0, $name0);
+
 	# MOV	C, bit			10100010 bbbbbbbb		bit address
 
   $rb0 = bitname($dcd_parm0, \$name0);
@@ -2412,6 +2516,8 @@ sub mov_C_bit()
 
 sub inc_DPTR()
   {
+  my $str0;
+
 	# INC	DPTR			10100011
 
   if ($DPTR != EMPTY)
@@ -2440,6 +2546,8 @@ sub mul_AB()
 
 sub unknown()
   {
+  my ($rb0, $str0, $str1);
+
 	# The unknown instruction is actually simple embedded data in the code.
 
   $rb0  = sprintf "0x%02X", $dcd_instr;
@@ -2452,9 +2560,11 @@ sub unknown()
 
 sub anl_C__bit()
   {
+  my ($rb0, $name0);
+
 	# ANL	C, /bit			10110000 bbbbbbbb		bit address
 
-  $rb0   = bitname($dcd_parm0, \$name0);
+  $rb0 = bitname($dcd_parm0, \$name0);
   print_3('anl', "C, /$rb0", "CY &= ~$name0");
   }
 
@@ -2462,6 +2572,8 @@ sub anl_C__bit()
 
 sub cpl_bit()
   {
+  my ($rb0, $name0);
+
 	# CPL	bit			10110010 bbbbbbbb		bit address
 
   $rb0 = bitname($dcd_parm0, \$name0);
@@ -2481,6 +2593,8 @@ sub cpl_C()
 
 sub cjne_A_data()
   {
+  my ($addr, $rb0, $rb1, $str0);
+
 	# CJNE	A, #data, rel		10110100 dddddddd rrrrrrrr	data		relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
@@ -2496,6 +2610,8 @@ sub cjne_A_data()
 
 sub cjne_A_direct()
   {
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+
 	# CJNE	A, direct, rel		10110101 aaaaaaaa rrrrrrrr	register address	relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
@@ -2512,6 +2628,8 @@ sub cjne_A_direct()
 
 sub push_direct()
   {
+  my ($rb0, $name0);
+
 	# PUSH	direct			11000000 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2522,6 +2640,8 @@ sub push_direct()
 
 sub clr_bit()
   {
+  my ($rb0, $name0);
+
 	# CLR	bit			11000010 bbbbbbbb		bit address
 
   $rb0 = bitname($dcd_parm0, \$name0);
@@ -2550,6 +2670,8 @@ sub swap_A()
 
 sub xch_A_direct()
   {
+  my ($rb0, $name0);
+
 	# XCH	A, direct		11000101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2561,9 +2683,11 @@ sub xch_A_direct()
 
 sub pop_direct()
   {
+  my ($rb0, $name0);
+
 	# POP	direct			11010000 aaaaaaaa		register address
 
-  $rb0   = regname($dcd_parm0, \$name0);
+  $rb0 = regname($dcd_parm0, \$name0);
   print_3('pop', $rb0, "$name0 = [SP], --SP");
   invalidate_reg($dcd_parm0);
   }
@@ -2572,6 +2696,8 @@ sub pop_direct()
 
 sub setb_bit()
   {
+  my ($rb0, $name0);
+
 	# SETB	bit			11010010 bbbbbbbb		bit address
 
   $rb0 = bitname($dcd_parm0, \$name0);
@@ -2600,6 +2726,8 @@ sub da_A()
 
 sub djnz_direct()
   {
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+
 	# DJNZ	direct, rel		11010101 aaaaaaaa rrrrrrrr	register address	relative address
 
   $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
@@ -2634,6 +2762,8 @@ sub clr_A()
 
 sub mov_A_direct()
   {
+  my ($rb0, $name0);
+
 	# MOV	A, direct		11100101 aaaaaaaa		register address	The "MOV A, ACC" invalid instruction.
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -2662,6 +2792,8 @@ sub cpl_A()
 
 sub mov_direct_A()
   {
+  my ($rb0, $name0);
+
 	# MOV	direct, A		11110101 aaaaaaaa		register address
 
   $rb0 = regname($dcd_parm0, \$name0);
@@ -3343,13 +3475,13 @@ sub find_labels_in_code()
 #-------------------------------------------------------------------------------
 
 	#
-	# Prints an table of constants.
+	# Prints a table of constants.
 	#
 
 sub print_constants($)
   {
   my $BlockRef = $_[0];
-  my ($address, $size, $data, $i, $addr, $count);
+  my ($size, $addr, $i, $len, $frag, $byte, $spc);
   my @constants;
 
   $size = $BlockRef->{SIZE};
@@ -3358,34 +3490,35 @@ sub print_constants($)
 
   print "\n";
 
-  $address = $BlockRef->{ADDR};
-  @constants = @rom[$address .. ($address + $size - 1)];
+  $addr = $BlockRef->{ADDR};
+  @constants = @rom[$addr .. ($addr + $size - 1)];
   $i = 0;
   while (TRUE)
     {
-    my $len = $size - $i;
+    $len = $size - $i;
 
     last if (! $len);
 
-    $len = 8 if ($len > 8);
+    $len = TBL_COLUMNS if ($len > TBL_COLUMNS);
 
-    printf "0x%04X\t.db\t", $address;
-    $address += $len;
+    printf "0x%04X:\t\t.db\t", $addr;
+
+    if (($spc = $addr % TBL_COLUMNS))
+      {
+      print ('    ' x $spc);
+      $frag = TBL_COLUMNS - $spc;
+      $len  = $frag if ($len > $frag);
+      }
+
+    $addr += $len;
     while (TRUE)
       {
-      my $byte = $constants[$i++];
+      $byte = $constants[$i++];
+      $spc  = (--$len) ? ' ' : '';
 
-      if ($byte < ord(' ') || $byte >= 0x7F)
-	{
-	$byte = sprintf "%02X ", $byte;
-	}
-      else
-	{
-	$byte = "'" . chr($byte) . "'";
-	}
+      printf((($hex_constant || $byte < ord(' ') || $byte >= 0x7F) ? "%02X$spc" : "'%c'"), $byte);
 
-      print $byte;
-      last if (! --$len);
+      last if (! $len);
       print ' ';
       }
 
@@ -3472,6 +3605,11 @@ EOT
 
 	    Designates a constant area, where data is stored happen. The option
 	    may be given more times, that to select more areas at the same time.
+
+	-hc|--hex-constant
+
+	    The constants only shows in hexadecimal form. Otherwise if possible,
+	    then shows all in character form.
 
 	-I|--include <path to headers>
 
@@ -3564,6 +3702,11 @@ for (my $i = 0; $i < @ARGV; )
 
       $const_areas_by_address{$start} = $end if ($start < $end);
       } # when (/^--const-area$/o)
+
+    when (/^-(hc|-hex-constant)$/o)
+      {
+      $hex_constant = TRUE;
+      }
 
     when (/^-(I|-include)$/o)
       {

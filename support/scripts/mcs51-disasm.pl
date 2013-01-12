@@ -190,6 +190,18 @@ my %control_characters =
   0x7F => '^?'
   );
 
+my $dcd_address    = 0;
+my $dcd_instr_size = 0;
+my $dcd_instr	   = 0;
+my $dcd_parm0	   = 0;
+my $dcd_parm1	   = 0;
+my $dcd_Ri_regs    = 0;
+my $dcd_Ri_name    = '';
+my $dcd_Rn_regs    = 0;
+my $dcd_Rn_name    = '';
+
+my ($addr, $rb0, $rb1, $name0, $name1, $str0, $str1);
+
 ################################################################################
 ################################################################################
 
@@ -1055,7 +1067,7 @@ sub add_names_labels()
 	MOVX	A, @DPTR		11100000
 	MOVX	A, @Ri			1110001i			R0 .. R1
 	CLR	A			11100100
-	MOV	A, direct		11100101 aaaaaaaa		register address	The "MOV A, ACC" invalid intruction.
+	MOV	A, direct		11100101 aaaaaaaa		register address	The "MOV A, ACC" invalid instruction.
 	MOV	A, @Ri			1110011i			R0 .. R1
 	MOV	A, Rn			11101rrr			R0 .. R7
 	MOVX	@DPTR, A		11110000
@@ -1399,6 +1411,1557 @@ sub decode_char($)
   return sprintf "0x%02X", $Ch;
   }
 
+#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@                                   @@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@   These the instruction decoders.   @@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@                                   @@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+
+sub ajmp()
+  {
+        # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
+
+  $rb1   = (($dcd_instr & 0xE0) << 3) | $dcd_parm0;
+  $addr  = (($dcd_address + $dcd_instr_size) & 0xF800) | $rb1;
+  $rb0   = labelname($addr);
+  $name0 = sprintf "0x%04X", $rb1;
+  $str0  = ($dcd_address == $addr) ? ' (endless loop)' : '';
+  $str1  = sprintf "0x%04X", $addr;
+  print_3('ajmp', $rb0, "Jumps hither: $str1 (PC += $dcd_instr_size, PC(10-0) = $name0)$str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub acall()
+  {
+	# ACALL	addr11			aaa10001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
+
+  $rb1   = (($dcd_instr & 0xE0) << 3) | $dcd_parm0;
+  $addr  = (($dcd_address + $dcd_instr_size) & 0xF800) | $rb1;
+  $rb0   = labelname($addr);
+  $str0  = sprintf "0x%04X", $rb1;
+  $str1  = sprintf "0x%04X", $addr;
+  print_3('acall', $rb0, "Calls this: $str1 (PC += $dcd_instr_size, [++SP] = PCL, [++SP] = PCH, PC(10-0) = $str0)");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub inc_ind_Ri()
+  {
+	# INC	@Ri			0000011i			R0 .. R1
+
+  print_3('inc', "\@$dcd_Ri_name", "++[$dcd_Ri_name]");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub dec_ind_Ri()
+  {
+	# DEC	@Ri			0001011i			R0 .. R1
+
+  print_3('dec', "\@$dcd_Ri_name", "--[$dcd_Ri_name]");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub add_A_ind_Ri()
+  {
+	# ADD	A, @Ri			0010011i			R0 .. R1
+
+  print_3('add', "A, \@$dcd_Ri_name", "ACC += [$dcd_Ri_name]");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub addc_A_ind_Ri()
+  {
+	# ADDC	A, @Ri			0011011i			R0 .. R1
+
+  print_3('addc', "A, \@$dcd_Ri_name", "ACC += [$dcd_Ri_name] + CY");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub orl_A_ind_Ri()
+  {
+	# ORL	A, @Ri			0100011i			R0 .. R1
+
+  print_3('orl', "A, \@$dcd_Ri_name", "ACC |= [$dcd_Ri_name]");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub anl_A_ind_Ri()
+  {
+	# ANL	A, @Ri			0101011i			R0 .. R1
+
+  print_3('anl', "A, \@$dcd_Ri_name", "ACC &= [$dcd_Ri_name]");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xrl_A_ind_Ri()
+  {
+	# XRL	A, @Ri			0110011i			R0 .. R1
+
+  print_3('xrl', "A, \@$dcd_Ri_name", "ACC ^= [$dcd_Ri_name]");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_ind_Ri_data()
+  {
+	# MOV	@Ri, #data		0111011i dddddddd		data
+
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
+  print_3('mov', "\@$dcd_Ri_name, #$rb0", "[$dcd_Ri_name] = $rb0$str0");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_direct_ind_Ri()
+  {
+	# MOV	direct, @Ri		1000011i aaaaaaaa		R0 .. R1	register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('mov', "$rb0, \@$dcd_Ri_name", "$name0 = [$dcd_Ri_name]");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub subb_A_ind_Ri()
+  {
+	# SUBB	A, @Ri			1001011i			R0 .. R1
+
+  print_3('subb', "A, \@$dcd_Ri_name", "ACC -= [$dcd_Ri_name] + CY");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_ind_Ri_direct()
+  {
+	# MOV	@Ri, direct		1010011i aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('mov', "\@$dcd_Ri_name, $rb0", "[$dcd_Ri_name] = $name0");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub cjne_ind_Ri_data()
+  {
+	# CJNE	@Ri, #data, rel		1011011i dddddddd rrrrrrrr	R0 .. R1 	data		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
+  $rb0  = labelname($addr);
+  $str0 = sprintf "0x%02X", $dcd_parm0;
+  $str1 = sprintf "0x%04X", $addr;
+  print_3('cjne', "\@$dcd_Ri_name, #$str0, $rb0", "If ([$dcd_Ri_name] != $str0) then jumps hither: $str1");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xch_A_ind_Ri()
+  {
+	# XCH	A, @Ri			1100011i			R0 .. R1
+
+  print_3('xch', "A, \@$dcd_Ri_name", "ACC <-> [$dcd_Ri_name]");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xchd_A_ind_Ri()
+  {
+	# XCHD	A, @Ri			1101011i			R0 .. R1
+
+  print_3('xchd', "A, \@$dcd_Ri_name", "ACC(3-0) <-> [$dcd_Ri_name](3-0)");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub movx_A_ind_Ri()
+  {
+	# MOVX	A, @Ri			1110001i			R0 .. R1
+
+  print_3('movx', "A, \@$dcd_Ri_name", "ACC = XRAM[$dcd_Ri_name]");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_A_ind_Ri()
+  {
+	# MOV	A, @Ri			1110011i			R0 .. R1
+
+  print_3('mov', "A, \@$dcd_Ri_name", "ACC = [$dcd_Ri_name]");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub movx_ind_Ri_A()
+  {
+	# MOVX	@Ri, A			1111001i			R0 .. R1
+
+  print_3('movx', "\@$dcd_Ri_name, A", "XRAM[$dcd_Ri_name] = ACC");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_ind_Ri_A()
+  {
+	# MOV	@Ri, A			1111011i			R0 .. R1
+
+  print_3('mov', "\@$dcd_Ri_name, A", "[$dcd_Ri_name] = ACC");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub inc_Rn()
+  {
+	# INC	Rn			00001rrr			R0 .. R7
+
+  if (operation_R_reg($dcd_Rn_regs, Rx_INC))
+    {
+    $str0 = sprintf "0x%02X", $R_regs[$dcd_Rn_regs];
+    print_3('inc', $dcd_Rn_name, "++$dcd_Rn_name ($str0)");
+    }
+  else
+    {
+    print_3('inc', $dcd_Rn_name, "++$dcd_Rn_name");
+    }
+  }
+
+#-------------------------------------------------------------------------------
+
+sub dec_Rn()
+  {
+	# DEC	Rn			00011rrr			R0 .. R7
+
+  if (operation_R_reg($dcd_Rn_regs, Rx_DEC))
+    {
+    $str0 = sprintf "0x%02X", $R_regs[$dcd_Rn_regs];
+    print_3('dec', $dcd_Rn_name, "--$dcd_Rn_name ($str0)");
+    }
+  else
+    {
+    print_3('dec', $dcd_Rn_name, "--$dcd_Rn_name");
+    }
+  }
+
+#-------------------------------------------------------------------------------
+
+sub add_A_Rn()
+  {
+	# ADD	A, Rn			00101rrr			R0 .. R7
+
+  print_3('add', "A, $dcd_Rn_name", "ACC += $dcd_Rn_name");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub addc_A_Rn()
+  {
+	# ADDC	A, Rn			00111rrr			R0 .. R7
+
+  print_3('addc', "A, $dcd_Rn_name", "ACC += $dcd_Rn_name + CY");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub orl_A_Rn()
+  {
+	# ORL	A, Rn			01001rrr		        R0 .. R7
+
+  print_3('orl', "A, $dcd_Rn_name", "ACC |= $dcd_Rn_name");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub anl_A_Rn()
+  {
+	# ANL	A, Rn			01011rrr			R0 .. R7
+
+  print_3('anl', "A, $dcd_Rn_name", "ACC &= $dcd_Rn_name");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xrl_A_Rn()
+  {
+	# XRL	A, Rn			01101rrr			R0 .. R7
+
+  print_3('xrl', "A, $dcd_Rn_name", "ACC ^= $dcd_Rn_name");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_Rn_data()
+  {
+	# MOV	Rn, #data		01111rrr dddddddd		R0 .. R7	data
+
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
+  operation_R_reg($dcd_Rn_regs, Rx_MOV, $dcd_parm0);
+  print_3('mov', "$dcd_Rn_name, #$rb0", "$dcd_Rn_name = $rb0$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_direct_Rn()
+  {
+	# MOV	direct, Rn		10001rrr aaaaaaaa		R0 .. R7	register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('mov', "$rb0, $dcd_Rn_name", "$name0 = $dcd_Rn_name");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub subb_A_Rn()
+  {
+	# SUBB	A, Rn			10011rrr			R0 .. R7
+
+  print_3('subb', "A, $dcd_Rn_name", "ACC -= $dcd_Rn_name + CY");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_Rn_direct()
+  {
+	# MOV	Rn, direct		10101rrr aaaaaaaa		R0 .. R7	register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  operation_R_reg($dcd_Rn_regs, Rx_INV);
+  print_3('mov', "$dcd_Rn_name, $rb0", "$dcd_Rn_name = $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub cjne_Rn_data()
+  {
+	# CJNE	Rn, #data, rel		10111rrr dddddddd rrrrrrrr	R0 .. R7 	data		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
+  $rb0  = labelname($addr);
+  $str0 = sprintf "0x%02X", $dcd_parm0;
+  $str1 = sprintf "0x%04X", $addr;
+  print_3('cjne', "$dcd_Rn_name, #$str0, $rb0", "If ($dcd_Rn_name != $str0) then jumps hither: $str1");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xch_A_Rn()
+  {
+	# XCH	A, Rn			11001rrr			R0 .. R7
+
+  operation_R_reg($dcd_Rn_regs, Rx_INV);
+  print_3('xch', "A, $dcd_Rn_name", "ACC <-> $dcd_Rn_name");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub djnz_Rn()
+  {
+	# DJNZ	Rn, rel			11011rrr rrrrrrrr		R0 .. R7	relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
+  $rb0  = labelname($addr);
+  $str0 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
+  $str1 = sprintf "0x%04X", $addr;
+  print_3('djnz', "$dcd_Rn_name, $rb0", "If (--$dcd_Rn_name != 0) then jumps hither: $str1$str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_A_Rn()
+  {
+	# MOV	A, Rn			11101rrr			R0 .. R7
+
+  print_3('mov', "A, $dcd_Rn_name", "ACC = $dcd_Rn_name");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_Rn_A()
+  {
+	# MOV	Rn, A			11111rrr			R0 .. R7
+
+  operation_R_reg($dcd_Rn_regs, Rx_INV);
+  print_3('mov', "$dcd_Rn_name, A", "$dcd_Rn_name = ACC");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub nop()
+  {
+	# NOP				00000000
+  print "nop\n";
+  }
+
+#-------------------------------------------------------------------------------
+
+sub ljmp()
+  {
+	# LJMP	addr16			00000010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
+
+  $addr = ($dcd_parm0 << 8) | $dcd_parm1;
+  $rb0  = labelname($addr);
+  $str0 = ($dcd_address == $addr) ? ' (endless loop)' : '';
+  $str1 = sprintf "0x%04X", $addr;
+  print_3('ljmp', $rb0, "Jumps hither: $str1$str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub rr_A()
+  {
+	# RR	A			00000011
+
+  print_3('rr', 'A', 'ACC[76543210] = ACC[07654321]');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub inc_A()
+  {
+	# INC	A			00000100
+
+  print_3('inc', 'A', '++ACC');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub inc_direct()
+  {
+	# INC	direct			00000101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('inc', $rb0, "++$name0");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub jbc_bit()
+  {
+	# JBC	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
+  $rb0  = bitname($dcd_parm0, \$name0);
+  $rb1  = labelname($addr);
+  $str0 = sprintf "0x%04X", $addr;
+  print_3('jbc', "$rb0, $rb1", "If ($name0 == H) then $name0 = L and jumps hither: $str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub lcall()
+  {
+	# LCALL	addr16			00010010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
+
+  $addr = ($dcd_parm0 << 8) | $dcd_parm1;
+  $rb0  = labelname($addr);
+  $str0 = sprintf "0x%04X", $addr;
+  print_3('lcall', $rb0, "Calls this: $str0 (PC += $dcd_instr_size, [++SP] = PCL, [++SP] = PCH, PC = $str0)");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub rrc_A()
+  {
+	# RRC	A			00010011
+
+  print_3('rrc', 'A', 'ACC[76543210] = ACC[C7654321], CY = ACC[0]');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub dec_A()
+  {
+	# DEC	A			00010100
+
+  print_3('dec', 'A', '--ACC');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub dec_direct()
+  {
+	# DEC	direct			00010101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('dec', $rb0, "--$name0");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub jb_bit()
+  {
+	# JB	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
+  $rb0  = bitname($dcd_parm0, \$name0);
+  $rb1  = labelname($addr);
+  $str0 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
+  $str1 = sprintf "0x%04X", $addr;
+  print_3('jb', "$rb0, $rb1", "If ($name0 == H) then jumps hither: $str1$str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub ret()
+  {
+	# RET				00100010
+
+  print_3('ret', '', "PCH = [SP--], PCL = [SP--]");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub rl_A()
+  {
+	# RL	A			00100011
+
+  print_3('rl', 'A', 'ACC[76543210] = ACC[65432107]');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub add_A_data()
+  {
+	# ADD	A, #data		00100100 dddddddd		data
+
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
+  print_3('add', "A, #$rb0", "ACC += $rb0$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub add_A_direct()
+  {
+	# ADD	A, direct		00100101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('add', "A, $rb0", "ACC += $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub jnb_bit()
+  {
+	# JNB	bit, rel		00110000 bbbbbbbb rrrrrrrr	bit address		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
+  $rb0  = bitname($dcd_parm0, \$name0);
+  $rb1  = labelname($addr);
+  $str0 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
+  $str1 = sprintf "0x%04X", $addr;
+  print_3('jnb', "$rb0, $rb1", "If ($name0 == L) then jumps hither: $str1$str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub reti()
+  {
+	# RETI				00110010
+
+  print_3('reti', '', 'PCH = [SP--], PCL = [SP--]');
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub rcl_A()
+  {
+	# RLC	A			00110011
+
+  print_3('rlc', 'A', 'ACC[76543210] = ACC[6543210C], CY = ACC[7]');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub addc_A_data()
+  {
+	# ADDC	A, #data		00110100 dddddddd		data
+
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
+  print_3('addc', "A, #$rb0", "ACC += $rb0 + CY$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub addc_A_direct()
+  {
+	# ADDC	A, direct		00110101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('addc', "A, $rb0", "ACC += $name0 + CY");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub jc()
+  {
+	# JC	rel			01000000 rrrrrrrr 		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
+  $rb0  = labelname($addr);
+  $str0 = sprintf "0x%04X", $addr;
+  print_3('jc', $rb0, "If (CY == H) then jumps hither: $str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub orl_direct_A()
+  {
+	# ORL	direct, A		01000010 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('orl', "$rb0, A", "$name0 |= ACC");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub orl_direct_data()
+  {
+	# ORL	direct, #data		01000011 aaaaaaaa dddddddd	register address	data
+
+  $rb0  = regname($dcd_parm0, \$name0);
+  $rb1  = sprintf "0x%02X", $dcd_parm1;
+  $str0 = present_char($dcd_parm1);
+  print_3('orl', "$rb0, #$rb1", "$name0 |= $rb1$str0");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub orl_A_data()
+  {
+	# ORL	A, #data		01000100 dddddddd		data
+
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
+  print_3('orl', "A, #$rb0", "ACC |= $rb0$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub orl_A_direct()
+  {
+	# ORL	A, direct		01000101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('orl', "A, $rb0", "ACC |= $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub jnc()
+  {
+	# JNC	rel			01010000 rrrrrrrr 		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
+  $rb0  = labelname($addr);
+  $str0 = sprintf "0x%04X", $addr;
+  print_3('jnc', $rb0, "If (CY == L) then jumps hither: $str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub anl_direct_A()
+  {
+	# ANL	direct, A		01010010 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('anl', "$rb0, A", "$name0 &= ACC");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub anl_direct_data()
+  {
+	# ANL	direct, #data		01010011 aaaaaaaa dddddddd	register address	data
+
+  $rb0  = regname($dcd_parm0, \$name0);
+  $rb1  = sprintf "0x%02X", $dcd_parm1;
+  $str0 = present_char($dcd_parm1);
+  print_3('anl', "$rb0, #$rb1", "$name0 &= $rb1$str0");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub anl_A_data()
+  {
+	# ANL	A, #data		01010100 dddddddd		data
+
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
+  print_3('anl', "A, #$rb0", "ACC &= $rb0$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub anl_A_direct()
+  {
+	# ANL	A, direct		01010101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('anl', "A, $rb0", "ACC &= $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub jz()
+  {
+	# JZ	rel			01100000 rrrrrrrr 		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
+  $rb0  = labelname($addr);
+  $str0 = sprintf "0x%04X", $addr;
+  print_3('jz', $rb0, "If (ACC == 0) then jumps hither: $str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xrl_direct_A()
+  {
+	# XRL	direct, A		01100010 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('xrl', "$rb0, A", "$name0 ^= ACC");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xrl_direct_data()
+  {
+	# XRL	direct, #data		01100011 aaaaaaaa dddddddd	register address	data
+
+  $rb0  = regname($dcd_parm0, \$name0);
+  $rb1  = sprintf "0x%02X", $dcd_parm1;
+  $str0 = present_char($dcd_parm1);
+  print_3('xrl', "$rb0, #$rb1", "$name0 |= $rb1$str0");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xrl_A_data()
+  {
+	# XRL	A, #data		01100100 dddddddd		data
+
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
+  print_3('xrl', "A, #$rb0", "ACC ^= $rb0$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xrl_A_direct()
+  {
+	# XRL	A, direct		01100101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('xrl', "A, $rb0", "ACC |= $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub jnz()
+  {
+	# JNZ	rel			01110000 rrrrrrrr 		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
+  $rb0  = labelname($addr);
+  $str0 = sprintf "0x%04X", $addr;
+  print_3('jnz', $rb0, "If (ACC != 0) then jumps hither: $str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub orl_C_bit()
+  {
+	# ORL	C, bit			01110010 bbbbbbbb		bit address
+
+  $rb0   = bitname($dcd_parm0, \$name0);
+  print_3('orl', "C, $rb0", "CY |= $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub jmp_A_DPTR()
+  {
+	# JMP	@A+DPTR			01110011
+
+  print_3('jmp', '@A+DPTR', "Jumps hither: [DPTR + ACC]\n");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_A_data()
+  {
+	# MOV	A, #data		01110100 dddddddd		data
+
+  $rb0   = sprintf "0x%02X", $dcd_parm0;
+  $str0  = present_char($dcd_parm0);
+  print_3('mov', "A, #$rb0", "ACC = $rb0$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_direct_data()
+  {
+	# MOV	direct, #data		01110101 aaaaaaaa dddddddd	register address	data
+
+  $rb0   = regname($dcd_parm0, \$name0);
+  $rb1   = sprintf "0x%02X", $dcd_parm1;
+  $str0  = '';
+  $str1  = sprintf "%02X", $dcd_parm0;
+
+  if ($dcd_parm0 == PSW)
+    {
+    $str0 = sprintf(" (select bank #%u)", ($dcd_parm1 >> 3) & 0x03) if (($dcd_parm1 & ~0x18) == 0x00);
+    }
+  else
+    {
+    $str0 = present_char($dcd_parm1);
+    }
+
+  print_3('mov', "$rb0, #$rb1", "$name0 = $rb1$str0");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub sjmp()
+  {
+	# SJMP	rel			10000000 rrrrrrrr		relative address
+
+  $addr  = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
+  $rb0   = labelname($addr);
+  $str0  = ($dcd_address == $addr) ? ' (endless loop)' : '';
+  $str1  = sprintf "0x%04X", $addr;
+  print_3('sjmp', $rb0, "Jumps hither: $str1$str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub anl_C_bit()
+  {
+	# ANL	C, bit			10000010 bbbbbbbb		bit address
+
+  $rb0 = bitname($dcd_parm0, \$name0);
+  print_3('anl', "C, $rb0", "CY &= $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub movc_A_A_PC()
+  {
+	# MOVC	A, @A+PC		10000011
+
+  print_3('movc', 'A, @A+PC', "ACC = ROM[PC + $dcd_instr_size + ACC]");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub div_AB()
+  {
+	# DIV	AB			10000100
+
+  print_3('div', 'AB', 'ACC = ACC / B, B = ACC % B');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_direct_direct()
+  {
+	# MOV	direct, direct		10000101 aaaaaaaa aaaaaaaa	forrás reg.	cél reg.
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  $rb1 = regname($dcd_parm1, \$name1);
+  print_3('mov', "$rb1, $rb0", "$name1 = $name0");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_DPTR_data()
+  {
+	# MOV	DPTR, #data16		10010000 dddddddd dddddddd	d15-d8 d7-d0
+
+  $addr = ($dcd_parm0 << 8) | $dcd_parm1;
+  $str0 = sprintf "0x%04X", $addr;
+  print_3('mov', "DPTR, #$str0", "DPTR = $str0");
+  $DPTR = $addr;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_bit_C()
+  {
+	# MOV	bit, C			10010010 bbbbbbbb		bit address
+
+  $rb0 = bitname($dcd_parm0, \$name0);
+  print_3('mov', "$rb0, C", "$name0 = CY");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub movc_A_A_DPTR()
+  {
+	# MOVC	A, @A+DPTR		10010011
+
+  print_3('movc', 'A, @A+DPTR', 'ACC = ROM[DPTR + ACC]');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub subb_A_data()
+  {
+	# SUBB	A, #data		10010100 dddddddd		data
+
+  $rb0  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = present_char($dcd_parm0);
+  print_3('subb', "A, #$rb0", "ACC -= $rb0 + CY$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub subb_A_direct()
+  {
+	# SUBB	A, direct		10010101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('subb', "A, $rb0", "ACC -= $name0 + CY");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub orl_C__bit()
+  {
+	# ORL	C, /bit			10100000 bbbbbbbb		bit address
+
+  $rb0   = bitname($dcd_parm0, \$name0);
+  print_3('orl', "C, /$rb0", "CY = ~$name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_C_bit()
+  {
+	# MOV	C, bit			10100010 bbbbbbbb		bit address
+
+  $rb0 = bitname($dcd_parm0, \$name0);
+  print_3('mov', "C, $rb0", "CY = $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub inc_DPTR()
+  {
+	# INC	DPTR			10100011
+
+  if ($DPTR != EMPTY)
+    {
+    ++$DPTR;
+    $str0 = sprintf " (0x%04X)", $DPTR;
+    }
+  else
+    {
+    $str0 = '';
+    }
+
+  print_3('inc', 'DPTR', "++DPTR$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mul_AB()
+  {
+	# MUL	AB			10100100
+
+  print_3('mul', 'AB', 'B:ACC = ACC * B');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub unknown()
+  {
+	# The unknown instruction is actually simple embedded data in the code.
+
+  $rb0  = sprintf "0x%02X", $dcd_instr;
+  $str0 = present_char($dcd_instr);
+  $str1 = sprintf "0x%04X", $dcd_address;
+  print_3('.db', $rb0, "$str1: $rb0$str0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub anl_C__bit()
+  {
+	# ANL	C, /bit			10110000 bbbbbbbb		bit address
+
+  $rb0   = bitname($dcd_parm0, \$name0);
+  print_3('anl', "C, /$rb0", "CY &= ~$name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub cpl_bit()
+  {
+	# CPL	bit			10110010 bbbbbbbb		bit address
+
+  $rb0 = bitname($dcd_parm0, \$name0);
+  print_3('cpl', $rb0, "$name0 = ~$name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub cpl_C()
+  {
+	# CPL	C			10110011
+
+  print_3('cpl', 'C', 'CY = ~CY');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub cjne_A_data()
+  {
+	# CJNE	A, #data, rel		10110100 dddddddd rrrrrrrr	data		relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
+  $rb0  = labelname($addr);
+  $rb1  = sprintf "0x%02X", $dcd_parm0;
+  $str0 = sprintf "0x%04X", $addr;
+  print_3('cjne', "A, #$rb1, $rb0", "If (ACC != $rb1) then jumps hither: $str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub cjne_A_direct()
+  {
+	# CJNE	A, direct, rel		10110101 aaaaaaaa rrrrrrrr	register address	relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
+  $rb0  = regname($dcd_parm0, \$name0);
+  $rb1  = labelname($addr);
+  $str0 = sprintf "0x%04X", $addr;
+  $str1 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
+  print_3('cjne', "A, $rb0, $rb1", "If (ACC != $name0) then jumps hither: $str0$str1");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub push_direct()
+  {
+	# PUSH	direct			11000000 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('push', $rb0, "++SP, [SP] = $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub clr_bit()
+  {
+	# CLR	bit			11000010 bbbbbbbb		bit address
+
+  $rb0 = bitname($dcd_parm0, \$name0);
+  print_3('clr', $rb0, "$name0 = L");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub clr_C()
+  {
+	# CLR	C			11000011
+
+  print_3('clr', 'C', 'CY = L');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub swap_A()
+  {
+	# SWAP	A			11000100
+
+  print_3('swap', 'A', 'ACC[76543210] = ACC[32107654]');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub xch_A_direct()
+  {
+	# XCH	A, direct		11000101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('xch', "A, $rb0", "ACC <-> $name0");
+  invalidate_DPTR_Rx();
+  }
+
+#-------------------------------------------------------------------------------
+
+sub pop_direct()
+  {
+	# POP	direct			11010000 aaaaaaaa		register address
+
+  $rb0   = regname($dcd_parm0, \$name0);
+  print_3('pop', $rb0, "$name0 = [SP], --SP");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+sub setb_bit()
+  {
+	# SETB	bit			11010010 bbbbbbbb		bit address
+
+  $rb0 = bitname($dcd_parm0, \$name0);
+  print_3('setb', $rb0, "$name0 = H");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub setb_C()
+  {
+	# SETB	C			11010011
+
+  print_3('setb', 'C', 'CY = H');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub da_A()
+  {
+	# DA	A			11010100
+
+  print_3('da', 'A', 'Decimal adjust the ACC.');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub djnz_direct()
+  {
+	# DJNZ	direct, rel		11010101 aaaaaaaa rrrrrrrr	register address	relative address
+
+  $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm1);
+  $rb0  = regname($dcd_parm0, \$name0);
+  $rb1  = labelname($addr);
+  $str0 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
+  $str1 = sprintf "0x%04X", $addr;
+  print_3('djnz', "$rb0, $rb1", "If (--$name0 != 0) then jumps hither: $str1$str0");
+  invalidate_DPTR_Rx();
+  $prev_is_jump = TRUE;
+  }
+
+#-------------------------------------------------------------------------------
+
+sub movx_A_DPTR()
+  {
+	# MOVX	A, @DPTR		11100000
+
+  print_3('movx', 'A, @DPTR', 'ACC = XRAM[DPTR]');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub clr_A()
+  {
+	# CLR	A			11100100
+
+  print_3('clr', 'A', 'ACC = 0');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_A_direct()
+  {
+	# MOV	A, direct		11100101 aaaaaaaa		register address	The "MOV A, ACC" invalid instruction.
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('mov', "A, $rb0", "ACC = $name0");
+  }
+
+#-------------------------------------------------------------------------------
+
+sub movx_DPTR_A()
+  {
+	# MOVX	@DPTR, A		11110000
+
+  print_3('movx', '@DPTR, A', 'XRAM[DPTR] = ACC');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub cpl_A()
+  {
+	# CPL	A			11110100
+
+  print_3('cpl', 'A', 'ACC = ~ACC');
+  }
+
+#-------------------------------------------------------------------------------
+
+sub mov_direct_A()
+  {
+	# MOV	direct, A		11110101 aaaaaaaa		register address
+
+  $rb0 = regname($dcd_parm0, \$name0);
+  print_3('mov', "$rb0, A", "$name0 = ACC");
+  invalidate_reg($dcd_parm0);
+  }
+
+#-------------------------------------------------------------------------------
+
+my @instr_decoders =
+  (
+	# 0x00 - 0x0F
+  \&nop,
+  \&ajmp,
+  \&ljmp,
+  \&rr_A,
+  \&inc_A,
+  \&inc_direct,
+  \&inc_ind_Ri,
+  \&inc_ind_Ri,
+  \&inc_Rn,
+  \&inc_Rn,
+  \&inc_Rn,
+  \&inc_Rn,
+  \&inc_Rn,
+  \&inc_Rn,
+  \&inc_Rn,
+  \&inc_Rn,
+
+	# 0x10 - 0x1F
+  \&jbc_bit,
+  \&acall,
+  \&lcall,
+  \&rrc_A,
+  \&dec_A,
+  \&dec_direct,
+  \&dec_ind_Ri,
+  \&dec_ind_Ri,
+  \&dec_Rn,
+  \&dec_Rn,
+  \&dec_Rn,
+  \&dec_Rn,
+  \&dec_Rn,
+  \&dec_Rn,
+  \&dec_Rn,
+  \&dec_Rn,
+
+	# 0x20 - 0x2F
+  \&jb_bit,
+  \&ajmp,
+  \&ret,
+  \&rl_A,
+  \&add_A_data,
+  \&add_A_direct,
+  \&add_A_ind_Ri,
+  \&add_A_ind_Ri,
+  \&add_A_Rn,
+  \&add_A_Rn,
+  \&add_A_Rn,
+  \&add_A_Rn,
+  \&add_A_Rn,
+  \&add_A_Rn,
+  \&add_A_Rn,
+  \&add_A_Rn,
+
+	# 0x30 - 0x3F
+  \&jnb_bit,
+  \&acall,
+  \&reti,
+  \&rcl_A,
+  \&addc_A_data,
+  \&addc_A_direct,
+  \&addc_A_ind_Ri,
+  \&addc_A_ind_Ri,
+  \&addc_A_Rn,
+  \&addc_A_Rn,
+  \&addc_A_Rn,
+  \&addc_A_Rn,
+  \&addc_A_Rn,
+  \&addc_A_Rn,
+  \&addc_A_Rn,
+  \&addc_A_Rn,
+
+	# 0x40 - 0x4F
+  \&jc,
+  \&ajmp,
+  \&orl_direct_A,
+  \&orl_direct_data,
+  \&orl_A_data,
+  \&orl_A_direct,
+  \&orl_A_ind_Ri,
+  \&orl_A_ind_Ri,
+  \&orl_A_Rn,
+  \&orl_A_Rn,
+  \&orl_A_Rn,
+  \&orl_A_Rn,
+  \&orl_A_Rn,
+  \&orl_A_Rn,
+  \&orl_A_Rn,
+  \&orl_A_Rn,
+
+	# 0x50 - 0x5F
+  \&jnc,
+  \&acall,
+  \&anl_direct_A,
+  \&anl_direct_data,
+  \&anl_A_data,
+  \&anl_A_direct,
+  \&anl_A_ind_Ri,
+  \&anl_A_ind_Ri,
+  \&anl_A_Rn,
+  \&anl_A_Rn,
+  \&anl_A_Rn,
+  \&anl_A_Rn,
+  \&anl_A_Rn,
+  \&anl_A_Rn,
+  \&anl_A_Rn,
+  \&anl_A_Rn,
+
+	# 0x60 - 0x6F
+  \&jz,
+  \&ajmp,
+  \&xrl_direct_A,
+  \&xrl_direct_data,
+  \&xrl_A_data,
+  \&xrl_A_direct,
+  \&xrl_A_ind_Ri,
+  \&xrl_A_ind_Ri,
+  \&xrl_A_Rn,
+  \&xrl_A_Rn,
+  \&xrl_A_Rn,
+  \&xrl_A_Rn,
+  \&xrl_A_Rn,
+  \&xrl_A_Rn,
+  \&xrl_A_Rn,
+  \&xrl_A_Rn,
+
+	# 0x70 - 0x7F
+  \&jnz,
+  \&acall,
+  \&orl_C_bit,
+  \&jmp_A_DPTR,
+  \&mov_A_data,
+  \&mov_direct_data,
+  \&mov_ind_Ri_data,
+  \&mov_ind_Ri_data,
+  \&mov_Rn_data,
+  \&mov_Rn_data,
+  \&mov_Rn_data,
+  \&mov_Rn_data,
+  \&mov_Rn_data,
+  \&mov_Rn_data,
+  \&mov_Rn_data,
+  \&mov_Rn_data,
+
+	# 0x80 - 0x8F
+  \&sjmp,
+  \&ajmp,
+  \&anl_C_bit,
+  \&movc_A_A_PC,
+  \&div_AB,
+  \&mov_direct_direct,
+  \&mov_direct_ind_Ri,
+  \&mov_direct_ind_Ri,
+  \&mov_direct_Rn,
+  \&mov_direct_Rn,
+  \&mov_direct_Rn,
+  \&mov_direct_Rn,
+  \&mov_direct_Rn,
+  \&mov_direct_Rn,
+  \&mov_direct_Rn,
+  \&mov_direct_Rn,
+
+	# 0x90 - 0x9F
+  \&mov_DPTR_data,
+  \&acall,
+  \&mov_bit_C,
+  \&movc_A_A_DPTR,
+  \&subb_A_data,
+  \&subb_A_direct,
+  \&subb_A_ind_Ri,
+  \&subb_A_ind_Ri,
+  \&subb_A_Rn,
+  \&subb_A_Rn,
+  \&subb_A_Rn,
+  \&subb_A_Rn,
+  \&subb_A_Rn,
+  \&subb_A_Rn,
+  \&subb_A_Rn,
+  \&subb_A_Rn,
+
+	# 0xA0 - 0xAF
+  \&orl_C__bit,
+  \&ajmp,
+  \&mov_C_bit,
+  \&inc_DPTR,
+  \&mul_AB,
+  \&unknown,
+  \&mov_ind_Ri_direct,
+  \&mov_ind_Ri_direct,
+  \&mov_Rn_direct,
+  \&mov_Rn_direct,
+  \&mov_Rn_direct,
+  \&mov_Rn_direct,
+  \&mov_Rn_direct,
+  \&mov_Rn_direct,
+  \&mov_Rn_direct,
+  \&mov_Rn_direct,
+
+	# 0xB0 - 0xBF
+  \&anl_C__bit,
+  \&acall,
+  \&cpl_bit,
+  \&cpl_C,
+  \&cjne_A_data,
+  \&cjne_A_direct,
+  \&cjne_ind_Ri_data,
+  \&cjne_ind_Ri_data,
+  \&cjne_Rn_data,
+  \&cjne_Rn_data,
+  \&cjne_Rn_data,
+  \&cjne_Rn_data,
+  \&cjne_Rn_data,
+  \&cjne_Rn_data,
+  \&cjne_Rn_data,
+  \&cjne_Rn_data,
+
+	# 0xC0 - 0xCF
+  \&push_direct,
+  \&ajmp,
+  \&clr_bit,
+  \&clr_C,
+  \&swap_A,
+  \&xch_A_direct,
+  \&xch_A_ind_Ri,
+  \&xch_A_ind_Ri,
+  \&xch_A_Rn,
+  \&xch_A_Rn,
+  \&xch_A_Rn,
+  \&xch_A_Rn,
+  \&xch_A_Rn,
+  \&xch_A_Rn,
+  \&xch_A_Rn,
+  \&xch_A_Rn,
+
+	# 0xD0 - 0xDF
+  \&pop_direct,
+  \&acall,
+  \&setb_bit,
+  \&setb_C,
+  \&da_A,
+  \&djnz_direct,
+  \&xchd_A_ind_Ri,
+  \&xchd_A_ind_Ri,
+  \&djnz_Rn,
+  \&djnz_Rn,
+  \&djnz_Rn,
+  \&djnz_Rn,
+  \&djnz_Rn,
+  \&djnz_Rn,
+  \&djnz_Rn,
+  \&djnz_Rn,
+
+	# 0xE0 - 0xEF
+  \&movx_A_DPTR,
+  \&ajmp,
+  \&movx_A_ind_Ri,
+  \&movx_A_ind_Ri,
+  \&clr_A,
+  \&mov_A_direct,
+  \&mov_A_ind_Ri,
+  \&mov_A_ind_Ri,
+  \&mov_A_Rn,
+  \&mov_A_Rn,
+  \&mov_A_Rn,
+  \&mov_A_Rn,
+  \&mov_A_Rn,
+  \&mov_A_Rn,
+  \&mov_A_Rn,
+  \&mov_A_Rn,
+
+	# 0xF0 - 0xFF
+  \&movx_DPTR_A,
+  \&acall,
+  \&movx_ind_Ri_A,
+  \&movx_ind_Ri_A,
+  \&cpl_A,
+  \&mov_direct_A,
+  \&mov_ind_Ri_A,
+  \&mov_ind_Ri_A,
+  \&mov_Rn_A,
+  \&mov_Rn_A,
+  \&mov_Rn_A,
+  \&mov_Rn_A,
+  \&mov_Rn_A,
+  \&mov_Rn_A,
+  \&mov_Rn_A,
+  \&mov_Rn_A
+  );
+
 #-------------------------------------------------------------------------------
 
         #
@@ -1408,966 +2971,48 @@ sub decode_char($)
 sub instruction_decoder($)
   {
   my $BlockRef = $_[0];
-  my ($block, $instr_size, $address, $instr, $parm0, $parm1, $addr);
-  my ($instr_mask0, $instr_mask1, $instr_mask2);
-  my ($ri_regs, $rn_regs);
-  my ($ri_name, $rn_name);
-  my ($rb0, $rb1, $name0, $name1, $str0, $str1);
 
-  $address    = $BlockRef->{ADDR};
-  $instr_size = $BlockRef->{SIZE};
-  $instr      = $rom[$address];
+  $dcd_address    = $BlockRef->{ADDR};
+  $dcd_instr_size = $BlockRef->{SIZE};
+  $dcd_instr      = $rom[$dcd_address];
 
-  printf "0x%04X: %02X", $address, $instr;
+  printf "0x%04X: %02X", $dcd_address, $dcd_instr;
 
-  if ($instr_size == 1)
+  if ($dcd_instr_size == 1)
     {
     print "\t\t";
     }
-  elsif ($instr_size == 2)
+  elsif ($dcd_instr_size == 2)
     {
-    $parm0 = $rom[$address + 1];
-    printf " %02X\t\t", $parm0;
+    $dcd_parm0 = $rom[$dcd_address + 1];
+    printf " %02X\t\t", $dcd_parm0;
     }
-  elsif ($instr_size == 3)
+  elsif ($dcd_instr_size == 3)
     {
-    $parm0 = $rom[$address + 1];
-    $parm1 = $rom[$address + 2];
-    printf " %02X %02X\t", $parm0, $parm1;
+    $dcd_parm0 = $rom[$dcd_address + 1];
+    $dcd_parm1 = $rom[$dcd_address + 2];
+    printf " %02X %02X\t", $dcd_parm0, $dcd_parm1;
     }
   else
     {
     print "\t";
     }
 
-  $instr_mask0 = $instr & 0x1F;
+  $dcd_Ri_regs = $dcd_instr & 0x01;
+  $dcd_Ri_name = "R$dcd_Ri_regs";
 
-  $instr_mask1 = $instr & 0xFE;
-  $ri_regs     = $instr & 0x01;
-  $ri_name     = "R$ri_regs";
-
-  $instr_mask2 = $instr & 0xF8;
-  $rn_regs     = $instr & 0x07;
-  $rn_name     = "R$rn_regs";
+  $dcd_Rn_regs = $dcd_instr & 0x07;
+  $dcd_Rn_name = "R$dcd_Rn_regs";
 
   $prev_is_jump = FALSE;
 
-  if ($instr_mask0 == 0x01)
+  if ($dcd_instr != EMPTY)
     {
-        # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
-
-    $rb1   = (($instr & 0xE0) << 3) | $parm0;
-    $addr  = (($address + $instr_size) & 0xF800) | $rb1;
-    $rb0   = labelname($addr);
-    $name0 = sprintf "0x%04X", $rb1;
-    $str0  = ($address == $addr) ? ' (endless loop)' : '';
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('ajmp', $rb0, "Jumps hither: $str1 (PC += $instr_size, PC(10-0) = $name0)$str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr_mask0 == 0x11)
-    {
-	# ACALL	addr11			aaa10001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
-
-    $rb1   = (($instr & 0xE0) << 3) | $parm0;
-    $addr  = (($address + $instr_size) & 0xF800) | $rb1;
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%04X", $rb1;
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('acall', $rb0, "Calls this: $str1 (PC += $instr_size, [++SP] = PCL, [++SP] = PCH, PC(10-0) = $str0)");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0x06)
-    {
-	# INC	@Ri			0000011i			R0 .. R1
-
-    print_3('inc', "\@$ri_name", "++[$ri_name]");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0x16)
-    {
-	# DEC	@Ri			0001011i			R0 .. R1
-
-    print_3('dec', "\@$ri_name", "--[$ri_name]");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0x26)
-    {
-	# ADD	A, @Ri			0010011i			R0 .. R1
-
-    print_3('add', "A, \@$ri_name", "ACC += [$ri_name]");
-    }
-  elsif ($instr_mask1 == 0x36)
-    {
-	# ADDC	A, @Ri			0011011i			R0 .. R1
-
-    print_3('addc', "A, \@$ri_name", "ACC += [$ri_name] + CY");
-    }
-  elsif ($instr_mask1 == 0x46)
-    {
-	# ORL	A, @Ri			0100011i			R0 .. R1
-
-    print_3('orl', "A, \@$ri_name", "ACC |= [$ri_name]");
-    }
-  elsif ($instr_mask1 == 0x56)
-    {
-	# ANL	A, @Ri			0101011i			R0 .. R1
-
-    print_3('anl', "A, \@$ri_name", "ACC &= [$ri_name]");
-    }
-  elsif ($instr_mask1 == 0x66)
-    {
-	# XRL	A, @Ri			0110011i			R0 .. R1
-
-    print_3('xrl', "A, \@$ri_name", "ACC ^= [$ri_name]");
-    }
-  elsif ($instr_mask1 == 0x76)
-    {
-	# MOV	@Ri, #data		0111011i dddddddd		data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    print_3('mov', "\@$ri_name, #$rb0", "[$ri_name] = $rb0$str0");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0x86)
-    {
-	# MOV	direct, @Ri		1000011i aaaaaaaa		R0 .. R1	register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('mov', "$rb0, \@$ri_name", "$name0 = [$ri_name]");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0x96)
-    {
-	# SUBB	A, @Ri			1001011i			R0 .. R1
-
-    print_3('subb', "A, \@$ri_name", "ACC -= [$ri_name] + CY");
-    }
-  elsif ($instr_mask1 == 0xA6)
-    {
-	# MOV	@Ri, direct		1010011i aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('mov', "\@$ri_name, $rb0", "[$ri_name] = $name0");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0xB6)
-    {
-	# CJNE	@Ri, #data, rel		1011011i dddddddd rrrrrrrr	R0 .. R1 	data		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm1);
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%02X", $parm0;
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('cjne', "\@$ri_name, #$str0, $rb0", "If ([$ri_name] != $str0) then jumps hither: $str1");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr_mask1 == 0xC6)
-    {
-	# XCH	A, @Ri			1100011i			R0 .. R1
-
-    print_3('xch', "A, \@$ri_name", "ACC <-> [$ri_name]");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0xD6)
-    {
-	# XCHD	A, @Ri			1101011i			R0 .. R1
-
-    print_3('xchd', "A, \@$ri_name", "ACC(3-0) <-> [$ri_name](3-0)");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0xE2)
-    {
-	# MOVX	A, @Ri			1110001i			R0 .. R1
-
-    print_3('movx', "A, \@$ri_name", "ACC = XRAM[$ri_name]");
-    }
-  elsif ($instr_mask1 == 0xE6)
-    {
-	# MOV	A, @Ri			1110011i			R0 .. R1
-
-    print_3('mov', "A, \@$ri_name", "ACC = [$ri_name]");
-    }
-  elsif ($instr_mask1 == 0xF2)
-    {
-	# MOVX	@Ri, A			1111001i			R0 .. R1
-
-    print_3('movx', "\@$ri_name, A", "XRAM[$ri_name] = ACC");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask1 == 0xF6)
-    {
-	# MOV	@Ri, A			1111011i			R0 .. R1
-
-    print_3('mov', "\@$ri_name, A", "[$ri_name] = ACC");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask2 == 0x08)
-    {
-	# INC	Rn			00001rrr			R0 .. R7
-
-    if (operation_R_reg($rn_regs, Rx_INC))
-      {
-      $str0 = sprintf "0x%02X", $R_regs[$rn_regs];
-      print_3('inc', $rn_name, "++$rn_name ($str0)");
-      }
-    else
-      {
-      print_3('inc', $rn_name, "++$rn_name");
-      }
-    }
-  elsif ($instr_mask2 == 0x18)
-    {
-	# DEC	Rn			00011rrr			R0 .. R7
-
-    if (operation_R_reg($rn_regs, Rx_DEC))
-      {
-      $str0 = sprintf "0x%02X", $R_regs[$rn_regs];
-      print_3('dec', $rn_name, "--$rn_name ($str0)");
-      }
-    else
-      {
-      print_3('dec', $rn_name, "--$rn_name");
-      }
-    }
-  elsif ($instr_mask2 == 0x28)
-    {
-	# ADD	A, Rn			00101rrr			R0 .. R7
-
-    print_3('add', "A, $rn_name", "ACC += $rn_name");
-    }
-  elsif ($instr_mask2 == 0x38)
-    {
-	# ADDC	A, Rn			00111rrr			R0 .. R7
-
-    print_3('addc', "A, $rn_name", "ACC += $rn_name + CY");
-    }
-  elsif ($instr_mask2 == 0x48)
-    {
-	# ORL	A, Rn			01001rrr		        R0 .. R7
-
-    print_3('orl', "A, $rn_name", "ACC |= $rn_name");
-    }
-  elsif ($instr_mask2 == 0x58)
-    {
-	# ANL	A, Rn			01011rrr			R0 .. R7
-
-    print_3('anl', "A, $rn_name", "ACC &= $rn_name");
-    }
-  elsif ($instr_mask2 == 0x68)
-    {
-	# XRL	A, Rn			01101rrr			R0 .. R7
-
-    print_3('xrl', "A, $rn_name", "ACC ^= $rn_name");
-    }
-  elsif ($instr_mask2 == 0x78)
-    {
-	# MOV	Rn, #data		01111rrr dddddddd		R0 .. R7	data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    operation_R_reg($rn_regs, Rx_MOV, $parm0);
-    print_3('mov', "$rn_name, #$rb0", "$rn_name = $rb0$str0");
-    }
-  elsif ($instr_mask2 == 0x88)
-    {
-	# MOV	direct, Rn		10001rrr aaaaaaaa		R0 .. R7	register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('mov', "$rb0, $rn_name", "$name0 = $rn_name");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr_mask2 == 0x98)
-    {
-	# SUBB	A, Rn			10011rrr			R0 .. R7
-
-    print_3('subb', "A, $rn_name", "ACC -= $rn_name + CY");
-    }
-  elsif ($instr_mask2 == 0xA8)
-    {
-	# MOV	Rn, direct		10101rrr aaaaaaaa		R0 .. R7	register address
-
-    $rb0   = regname($parm0, \$name0);
-    operation_R_reg($rn_regs, Rx_INV);
-    print_3('mov', "$rn_name, $rb0", "$rn_name = $name0");
-    }
-  elsif ($instr_mask2 == 0xB8)
-    {
-	# CJNE	Rn, #data, rel		10111rrr dddddddd rrrrrrrr	R0 .. R7 	data		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm1);
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%02X", $parm0;
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('cjne', "$rn_name, #$str0, $rb0", "If ($rn_name != $str0) then jumps hither: $str1");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr_mask2 == 0xC8)
-    {
-	# XCH	A, Rn			11001rrr			R0 .. R7
-
-    operation_R_reg($rn_regs, Rx_INV);
-    print_3('xch', "A, $rn_name", "ACC <-> $rn_name");
-    }
-  elsif ($instr_mask2 == 0xD8)
-    {
-	# DJNZ	Rn, rel			11011rrr rrrrrrrr		R0 .. R7	relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm0);
-    $rb0   = labelname($addr);
-    $str0  = ($address == $addr) ? ' (waiting loop)' : '';
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('djnz', "$rn_name, $rb0", "If (--$rn_name != 0) then jumps hither: $str1$str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr_mask2 == 0xE8)
-    {
-	# MOV	A, Rn			11101rrr			R0 .. R7
-
-    print_3('mov', "A, $rn_name", "ACC = $rn_name");
-    }
-  elsif ($instr_mask2 == 0xF8)
-    {
-	# MOV	Rn, A			11111rrr			R0 .. R7
-
-    operation_R_reg($rn_regs, Rx_INV);
-    print_3('mov', "$rn_name, A", "$rn_name = ACC");
-    }
-  elsif ($instr == 0x00)
-    {
-	# NOP				00000000
-
-    print "nop\n";
-    }
-  elsif ($instr == 0x02)
-    {
-	# LJMP	addr16			00000010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
-
-    $addr  = ($parm0 << 8) | $parm1;
-    $rb0   = labelname($addr);
-    $str0  = ($address == $addr) ? ' (endless loop)' : '';
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('ljmp', $rb0, "Jumps hither: $str1$str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x03)
-    {
-	# RR	A			00000011
-
-    print_3('rr', 'A', 'ACC[76543210] = ACC[07654321]');
-    }
-  elsif ($instr == 0x04)
-    {
-	# INC	A			00000100
-
-    print_3('inc', 'A', '++ACC');
-    }
-  elsif ($instr == 0x05)
-    {
-	# INC	direct			00000101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('inc', $rb0, "++$name0");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x10)
-    {
-	# JBC	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm1);
-    $rb0   = bitname($parm0, \$name0);
-    $rb1   = labelname($addr);
-    $str0  = sprintf "0x%04X", $addr;
-    print_3('jbc', "$rb0, $rb1", "If ($name0 == H) then $name0 = L and jumps hither: $str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x12)
-    {
-	# LCALL	addr16			00010010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
-
-    $addr  = ($parm0 << 8) | $parm1;
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%04X", $addr;
-    print_3('lcall', $rb0, "Calls this: $str0 (PC += $instr_size, [++SP] = PCL, [++SP] = PCH, PC = $str0)");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr == 0x13)
-    {
-	# RRC	A			00010011
-
-    print_3('rrc', 'A', 'ACC[76543210] = ACC[C7654321], CY = ACC[0]');
-    }
-  elsif ($instr == 0x14)
-    {
-	# DEC	A			00010100
-
-    print_3('dec', 'A', '--ACC');
-    }
-  elsif ($instr == 0x15)
-    {
-	# DEC	direct			00010101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('dec', $rb0, "--$name0");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x20)
-    {
-	# JB	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm1);
-    $rb0   = bitname($parm0, \$name0);
-    $rb1   = labelname($addr);
-    $str0  = ($address == $addr) ? ' (waiting loop)' : '';
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('jb', "$rb0, $rb1", "If ($name0 == H) then jumps hither: $str1$str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x22)
-    {
-	# RET				00100010
-
-    print_3('ret', '', "PCH = [SP--], PCL = [SP--]");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x23)
-    {
-	# RL	A			00100011
-
-    print_3('rl', 'A', 'ACC[76543210] = ACC[65432107]');
-    }
-  elsif ($instr == 0x24)
-    {
-	# ADD	A, #data		00100100 dddddddd		data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    print_3('add', "A, #$rb0", "ACC += $rb0$str0");
-    }
-  elsif ($instr == 0x25)
-    {
-	# ADD	A, direct		00100101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('add', "A, $rb0", "ACC += $name0");
-    }
-  elsif ($instr == 0x30)
-    {
-	# JNB	bit, rel		00110000 bbbbbbbb rrrrrrrr	bit address		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm1);
-    $rb0   = bitname($parm0, \$name0);
-    $rb1   = labelname($addr);
-    $str0  = ($address == $addr) ? ' (waiting loop)' : '';
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('jnb', "$rb0, $rb1", "If ($name0 == L) then jumps hither: $str1$str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x32)
-    {
-	# RETI				00110010
-
-    print_3('reti', '', "PCH = [SP--], PCL = [SP--]");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x33)
-    {
-	# RLC	A			00110011
-
-    print_3('rlc', 'A', 'ACC[76543210] = ACC[6543210C], CY = ACC[7]');
-    }
-  elsif ($instr == 0x34)
-    {
-	# ADDC	A, #data		00110100 dddddddd		data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    print_3('addc', "A, #$rb0", "ACC += $rb0 + CY$str0");
-    }
-  elsif ($instr == 0x35)
-    {
-	# ADDC	A, direct		00110101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('addc', "A, $rb0", "ACC += $name0 + CY");
-    }
-  elsif ($instr == 0x40)
-    {
-	# JC	rel			01000000 rrrrrrrr 		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm0);
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%04X", $addr;
-    print_3('jc', $rb0, "If (CY == H) then jumps hither: $str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x42)
-    {
-	# ORL	direct, A		01000010 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('orl', "$rb0, A", "$name0 |= ACC");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x43)
-    {
-	# ORL	direct, #data		01000011 aaaaaaaa dddddddd	register address	data
-
-    $rb0   = regname($parm0, \$name0);
-    $rb1   = sprintf "0x%02X", $parm1;
-    $str0  = present_char($parm1);
-    print_3('orl', "$rb0, #$rb1", "$name0 |= $rb1$str0");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x44)
-    {
-	# ORL	A, #data		01000100 dddddddd		data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    print_3('orl', "A, #$rb0", "ACC |= $rb0$str0");
-    }
-  elsif ($instr == 0x45)
-    {
-	# ORL	A, direct		01000101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('orl', "A, $rb0", "ACC |= $name0");
-    }
-  elsif ($instr == 0x50)
-    {
-	# JNC	rel			01010000 rrrrrrrr 		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm0);
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%04X", $addr;
-    print_3('jnc', $rb0, "If (CY == L) then jumps hither: $str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x52)
-    {
-	# ANL	direct, A		01010010 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('anl', "$rb0, A", "$name0 &= ACC");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x53)
-    {
-	# ANL	direct, #data		01010011 aaaaaaaa dddddddd	register address	data
-
-    $rb0   = regname($parm0, \$name0);
-    $rb1   = sprintf "0x%02X", $parm1;
-    $str0  = present_char($parm1);
-    print_3('anl', "$rb0, #$rb1", "$name0 &= $rb1$str0");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x54)
-    {
-	# ANL	A, #data		01010100 dddddddd		data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    print_3('anl', "A, #$rb0", "ACC &= $rb0$str0");
-    }
-  elsif ($instr == 0x55)
-    {
-	# ANL	A, direct		01010101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('anl', "A, $rb0", "ACC &= $name0");
-    }
-  elsif ($instr == 0x60)
-    {
-	# JZ	rel			01100000 rrrrrrrr 		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm0);
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%04X", $addr;
-    print_3('jz', $rb0, "If (ACC == 0) then jumps hither: $str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x62)
-    {
-	# XRL	direct, A		01100010 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('xrl', "$rb0, A", "$name0 ^= ACC");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x63)
-    {
-	# XRL	direct, #data		01100011 aaaaaaaa dddddddd	register address	data
-
-    $rb0   = regname($parm0, \$name0);
-    $rb1   = sprintf "0x%02X", $parm1;
-    $str0  = present_char($parm1);
-    print_3('xrl', "$rb0, #$rb1", "$name0 |= $rb1$str0");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x64)
-    {
-	# XRL	A, #data		01100100 dddddddd		data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    print_3('xrl', "A, #$rb0", "ACC ^= $rb0$str0");
-    }
-  elsif ($instr == 0x65)
-    {
-	# XRL	A, direct		01100101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('xrl', "A, $rb0", "ACC |= $name0");
-    }
-  elsif ($instr == 0x70)
-    {
-	# JNZ	rel			01110000 rrrrrrrr 		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm0);
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%04X", $addr;
-    print_3('jnz', $rb0, "If (ACC != 0) then jumps hither: $str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x72)
-    {
-	# ORL	C, bit			01110010 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('orl', "C, $rb0", "CY |= $name0");
-    }
-  elsif ($instr == 0x73)
-    {
-	# JMP	@A+DPTR			01110011
-
-    print_3('jmp', '@A+DPTR', "Jumps hither: [DPTR + ACC]\n");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x74)
-    {
-	# MOV	A, #data		01110100 dddddddd		data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    print_3('mov', "A, #$rb0", "ACC = $rb0$str0");
-    }
-  elsif ($instr == 0x75)
-    {
-	# MOV	direct, #data		01110101 aaaaaaaa dddddddd	register address	data
-
-    $rb0   = regname($parm0, \$name0);
-    $rb1   = sprintf "0x%02X", $parm1;
-    $str0  = '';
-    $str1  = sprintf "%02X", $parm0;
-
-    if ($parm0 == PSW)
-      {
-      $str0 = sprintf(" (select bank #%u)", ($parm1 >> 3) & 0x03) if (($parm1 & ~0x18) == 0x00);
-      }
-    else
-      {
-      $str0 = present_char($parm1);
-      }
-
-    print_3('mov', "$rb0, #$rb1", "$name0 = $rb1$str0");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x80)
-    {
-	# SJMP	rel			10000000 rrrrrrrr		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm0);
-    $rb0   = labelname($addr);
-    $str0  = ($address == $addr) ? ' (endless loop)' : '';
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('sjmp', $rb0, "Jumps hither: $str1$str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0x82)
-    {
-	# ANL	C, bit			10000010 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('anl', "C, $rb0", "CY &= $name0");
-    }
-  elsif ($instr == 0x83)
-    {
-	# MOVC	A, @A+PC		10000011
-
-    print_3('movc', 'A, @A+PC', "ACC = ROM[PC + $instr_size + ACC]");
-    }
-  elsif ($instr == 0x84)
-    {
-	# DIV	AB			10000100
-
-    print_3('div', 'AB', 'ACC = ACC / B, B = ACC % B');
-    }
-  elsif ($instr == 0x85)
-    {
-	# MOV	direct, direct		10000101 aaaaaaaa aaaaaaaa	forrás reg.	cél reg.
-
-    $rb0   = regname($parm0, \$name0);
-    $rb1   = regname($parm1, \$name1);
-    print_3('mov', "$rb1, $rb0", "$name1 = $name0");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0x90)
-    {
-	# MOV	DPTR, #data16		10010000 dddddddd dddddddd	d15-d8 d7-d0
-
-    $addr  = ($parm0 << 8) | $parm1;
-    $str0  = sprintf "0x%04X", $addr;
-    print_3('mov', "DPTR, #$str0", "DPTR = $str0");
-    $DPTR = $addr;
-    }
-  elsif ($instr == 0x92)
-    {
-	# MOV	bit, C			10010010 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('mov', "$rb0, C", "$name0 = CY");
-    }
-  elsif ($instr == 0x93)
-    {
-	# MOVC	A, @A+DPTR		10010011
-
-    print_3('movc', 'A, @A+DPTR', 'ACC = ROM[DPTR + ACC]');
-    }
-  elsif ($instr == 0x94)
-    {
-	# SUBB	A, #data		10010100 dddddddd		data
-
-    $rb0   = sprintf "0x%02X", $parm0;
-    $str0  = present_char($parm0);
-    print_3('subb', "A, #$rb0", "ACC -= $rb0 + CY$str0");
-    }
-  elsif ($instr == 0x95)
-    {
-	# SUBB	A, direct		10010101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('subb', "A, $rb0", "ACC -= $name0 + CY");
-    }
-  elsif ($instr == 0xA0)
-    {
-	# ORL	C, /bit			10100000 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('orl', "C, /$rb0", "CY = ~$name0");
-    }
-  elsif ($instr == 0xA2)
-    {
-	# MOV	C, bit			10100010 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('mov', "C, $rb0", "CY = $name0");
-    }
-  elsif ($instr == 0xA3)
-    {
-	# INC	DPTR			10100011
-
-    if ($DPTR != -1)
-      {
-      ++$DPTR;
-      $str0 = sprintf " (0x%04X)", $DPTR;
-      }
-    else
-      {
-      $str0 = '';
-      }
-
-    print_3('inc', 'DPTR', "++DPTR$str0");
-    }
-  elsif ($instr == 0xA4)
-    {
-	# MUL	AB			10100100
-
-    print_3('mul', 'AB', 'B:ACC = ACC * B');
-    }
-  elsif ($instr == 0xB0)
-    {
-	# ANL	C, /bit			10110000 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('anl', "C, /$rb0", "CY &= ~$name0");
-    }
-  elsif ($instr == 0xB2)
-    {
-	# CPL	bit			10110010 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('cpl', $rb0, "$name0 = ~$name0");
-    }
-  elsif ($instr == 0xB3)
-    {
-	# CPL	C			10110011
-
-    print_3('cpl', 'C', 'CY = ~CY');
-    }
-  elsif ($instr == 0xB4)
-    {
-	# CJNE	A, #data, rel		10110100 dddddddd rrrrrrrr	data		relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm1);
-    $rb0   = labelname($addr);
-    $rb1   = sprintf "0x%02X", $parm0;
-    $str0  = sprintf "0x%04X", $addr;
-    print_3('cjne', "A, #$rb1, $rb0", "If (ACC != $rb1) then jumps hither: $str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0xB5)
-    {
-	# CJNE	A, direct, rel		10110101 aaaaaaaa rrrrrrrr	register address	relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm1);
-    $rb0   = regname($parm0, \$name0);
-    $rb1   = labelname($addr);
-    $str0  = sprintf "0x%04X", $addr;
-    $str1  = ($address == $addr) ? ' (waiting loop)' : '';
-    print_3('cjne', "A, $rb0, $rb1", "If (ACC != $name0) then jumps hither: $str0$str1");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0xC0)
-    {
-	# PUSH	direct			11000000 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('push', $rb0, "++SP, [SP] = $name0");
-    }
-  elsif ($instr == 0xC2)
-    {
-	# CLR	bit			11000010 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('clr', $rb0, "$name0 = L");
-    }
-  elsif ($instr == 0xC3)
-    {
-	# CLR	C			11000011
-
-    print_3('clr', 'C', 'CY = L');
-    }
-  elsif ($instr == 0xC4)
-    {
-	# SWAP	A			11000100
-
-    print_3('swap', 'A', 'ACC[76543210] = ACC[32107654]');
-    }
-  elsif ($instr == 0xC5)
-    {
-	# XCH	A, direct		11000101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('xch', "A, $rb0", "ACC <-> $name0");
-    invalidate_DPTR_Rx();
-    }
-  elsif ($instr == 0xD0)
-    {
-	# POP	direct			11010000 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('pop', $rb0, "$name0 = [SP], --SP");
-    invalidate_reg($parm0);
-    }
-  elsif ($instr == 0xD2)
-    {
-	# SETB	bit			11010010 bbbbbbbb		bit address
-
-    $rb0   = bitname($parm0, \$name0);
-    print_3('setb', $rb0, "$name0 = H");
-    }
-  elsif ($instr == 0xD3)
-    {
-	# SETB	C			11010011
-
-    print_3('setb', 'C', 'CY = H');
-    }
-  elsif ($instr == 0xD4)
-    {
-	# DA	A			11010100
-
-    print_3('da', 'A', 'Decimal adjust the ACC.');
-    }
-  elsif ($instr == 0xD5)
-    {
-	# DJNZ	direct, rel		11010101 aaaaaaaa rrrrrrrr	register address	relative address
-
-    $addr  = $address + $instr_size + expand_offset($parm1);
-    $rb0   = regname($parm0, \$name0);
-    $rb1   = labelname($addr);
-    $str0  = ($address == $addr) ? ' (waiting loop)' : '';
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('djnz', "$rb0, $rb1", "If (--$name0 != 0) then jumps hither: $str1$str0");
-    invalidate_DPTR_Rx();
-    $prev_is_jump = TRUE;
-    }
-  elsif ($instr == 0xE0)
-    {
-	# MOVX	A, @DPTR		11100000
-
-    print_3('movx', 'A, @DPTR', 'ACC = XRAM[DPTR]');
-    }
-  elsif ($instr == 0xE4)
-    {
-	# CLR	A			11100100
-
-    print_3('clr', 'A', 'ACC = 0');
-    }
-  elsif ($instr == 0xE5)
-    {
-	# MOV	A, direct		11100101 aaaaaaaa		register address	The "MOV A, ACC" invalid instruction.
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('mov', "A, $rb0", "ACC = $name0");
-    }
-  elsif ($instr == 0xF0)
-    {
-	# MOVX	@DPTR, A		11110000
-
-    print_3('movx', '@DPTR, A', 'XRAM[DPTR] = ACC');
-    }
-  elsif ($instr == 0xF4)
-    {
-	# CPL	A			11110100
-
-    print_3('cpl', 'A', 'ACC = ~ACC');
-    }
-  elsif ($instr == 0xF5)
-    {
-	# MOV	direct, A		11110101 aaaaaaaa		register address
-
-    $rb0   = regname($parm0, \$name0);
-    print_3('mov', "$rb0, A", "$name0 = ACC");
-    invalidate_reg($parm0);
+    $instr_decoders[$dcd_instr]();
     }
   else
     {
-	# The unknown instruction is actually simple embedded data in the code.
-
-    $rb0   = sprintf "0x%02X", $instr;
-    $str0  = present_char($instr);
-    $str1  = sprintf "0x%04X", $address;
-    print_3('.db', $rb0, "$str1: $rb0$str0");
+    unknown();
     }
   }
 

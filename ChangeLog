@@ -1,5 +1,11 @@
 2013-01-13 Molnar Karoly <molnarkaroly AT users.sf.net>
 
+	* support/scripts/cinc2h.pl: Canceled the command option: --create-sfr16
+	* device/non-free/include/pic16/pic18*.h,
+	  device/non-free/lib/pic16/libdev/pic18*.c: Canceled the __sfr16 type.
+
+2013-01-13 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/mcs51-disasm.pl: New command option: --assembly-source
 
 2013-01-13 Molnar Karoly <molnarkaroly AT users.sf.net>

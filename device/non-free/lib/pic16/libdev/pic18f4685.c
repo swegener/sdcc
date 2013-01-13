@@ -2,9 +2,9 @@
  * This definitions of the PIC18F4685 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2013-01-13 11:08:09 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:20:19 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -1005,7 +1005,6 @@ __at(0x0FBD) volatile __CCP1CONbits_t CCP1CONbits;
 __at(0x0FBE) __sfr CCPR1;
 
 __at(0x0FBE) __sfr CCPR1L;
-__at(0x0FBE) __sfr16 CCPR1w;
 
 __at(0x0FBF) __sfr CCPR1H;
 
@@ -1021,7 +1020,6 @@ __at(0x0FC2) volatile __ADCON0bits_t ADCON0bits;
 __at(0x0FC3) __sfr ADRES;
 
 __at(0x0FC3) __sfr ADRESL;
-__at(0x0FC3) __sfr16 ADRESw;
 
 __at(0x0FC4) __sfr ADRESH;
 
@@ -1082,7 +1080,6 @@ __at(0x0FD8) __sfr STATUS;
 __at(0x0FD8) volatile __STATUSbits_t STATUSbits;
 
 __at(0x0FD9) __sfr FSR2L;
-__at(0x0FD9) __sfr16 FSR2w;
 
 __at(0x0FDA) __sfr FSR2H;
 
@@ -1099,7 +1096,6 @@ __at(0x0FDF) __sfr INDF2;
 __at(0x0FE0) __sfr BSR;
 
 __at(0x0FE1) __sfr FSR1L;
-__at(0x0FE1) __sfr16 FSR1w;
 
 __at(0x0FE2) __sfr FSR1H;
 
@@ -1116,7 +1112,6 @@ __at(0x0FE7) __sfr INDF1;
 __at(0x0FE8) __sfr WREG;
 
 __at(0x0FE9) __sfr FSR0L;
-__at(0x0FE9) __sfr16 FSR0w;
 
 __at(0x0FEA) __sfr FSR0H;
 
@@ -1142,7 +1137,6 @@ __at(0x0FF2) volatile __INTCONbits_t INTCONbits;
 __at(0x0FF3) __sfr PROD;
 
 __at(0x0FF3) __sfr PRODL;
-__at(0x0FF3) __sfr16 PRODw;
 
 __at(0x0FF4) __sfr PRODH;
 

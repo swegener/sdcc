@@ -2,29 +2,27 @@
 
 =back
 
-   Copyright (C) 2012-2013, Molnar Karoly <molnarkaroly@users.sf.net>
+  Copyright (C) 2012, Molnar Karoly <molnarkaroly@users.sf.net>
 
-   This library is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any
-   later version.
+    This file is part of SDCC. 
 
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-   GNU General Public License for more details.
+    This software is provided 'as-is', without any express or implied
+    warranty.  In no event will the authors be held liable for any damages
+    arising from the use of this software.
 
-   You should have received a copy of the GNU General Public License
-   along with this library; see the file COPYING. If not, write to the
-   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
-   MA 02110-1301, USA.
+    Permission is granted to anyone to use this software for any purpose,
+    including commercial applications, and to alter it and redistribute it
+    freely, subject to the following restrictions:
 
-   As a special exception, if you link this library with other files,
-   some of which are compiled with SDCC, to produce an executable,
-   this library does not by itself cause the resulting executable to
-   be covered by the GNU General Public License. This exception does
-   not however invalidate any other reasons why the executable file
-   might be covered by the GNU General Public License.
+    1. The origin of this software must not be misrepresented; you must not
+       claim that you wrote the original software. If you use this software
+       in a product, an acknowledgment in the product documentation would be
+       appreciated but is not required.
+
+    2. Altered source versions must be plainly marked as such, and must not be
+       misrepresented as being the original software.
+
+    3. This notice may not be removed or altered from any source distribution.
 
 ================================================================================
 
@@ -120,9 +118,9 @@ use constant DIST_BITSIZE  => 32;
 use constant DIST_DEFSIZE  => 32;
 use constant DIST_COMSIZE  => 32;
 
-my $PROGRAM = 'cinc2h.pl';
-my $year     = '';
+my $PROGRAM  = 'cinc2h.pl';
 my $time_str = '';
+my $year     = '';
 
 my $gputils_path   = "$ENV{HOME}/svn_snapshots/gputils/gputils";
 my $gp_header_path = '';
@@ -144,7 +142,6 @@ my $conf_head  = '_';
 my $verbose    = 0;
 
 my $create_bitfields  = FALSE;
-my $create_sfr16      = FALSE;
 my $emit_legacy_names = FALSE;
 my $no_timestamp      = FALSE;
 
@@ -167,40 +164,6 @@ my %correction_of_names =
 my %register_aliases =
   (
   BAUDCTL => 'BAUDCON'
-  );
-
-#-----------------------------------------------
-
-        # The TMRx register pairs require special handling (different the reading and
-        # writing sequence) so they can not be adding to the list.
-
-my %sfr16 =
-  (
-  CCPR1L     => 'CCPR1H',
-  CCPR2L     => 'CCPR2H',
-  CCPR3L     => 'CCPR3H',
-  CCPR4L     => 'CCPR4H',
-  CCPR5L     => 'CCPR5H',
-  CCPR6L     => 'CCPR6H',
-  CCPR7L     => 'CCPR7H',
-  CCPR8L     => 'CCPR8H',
-  CCPR9L     => 'CCPR9H',
-  CCPR10L    => 'CCPR10H',
-  PWM1DCL    => 'PWM1DCH',
-  PWM2DCL    => 'PWM2DCH',
-  PWM3DCL    => 'PWM3DCH',
-  PWM4DCL    => 'PWM4DCH',
-  FSR0L      => 'FSR0H',
-  FSR1L      => 'FSR1H',
-  FSR2L      => 'FSR2H',
-  FSR0L_SHAD => 'FSR0H_SHAD',
-  FSR1L_SHAD => 'FSR1H_SHAD',
-  PMADRL     => 'PMADRH',
-  PMDATL     => 'PMDATH',
-  PRODL      => 'PRODH',
-  ADRESL     => 'ADRESH',
-  EEADRL     => 'EEADRH',
-  EEDATL     => 'EEDATH'
   );
 
 #-----------------------------------------------
@@ -1171,32 +1134,6 @@ sub print_bitfield($$$)
 
 #-------------------------------------------------------------------------------
 
-        # Some registers are in pairs. For example: FSR0L and FSR0H
-        # If these are, by address next to each other there are and
-        # address of 'H' marked is higher, then will want to create
-        # a 16-bit pseudo-register. This register is of course there
-        # is in the lower address.
-
-sub create_sfr16_registers($$)
-  {
-  my ($Register, $Address) = @_;
-  my $pair_h = $sfr16{$Register};
-  my ($reg, $text);
-
-  if (defined($pair_h) &&
-      defined($reg = $reg_refs_by_names{$pair_h}) &&
-      $reg->{ADDRESS} == ($Address + 1))
-    {
-    $Register =~ s/L$//io;              # ADRESL, FSRxL, etc
-    $Register =~ s/L_(\w+)$/_$1/io;     # FSRxL_SHAD
-    $text = sprintf("__at(0x%04X)", $Address);
-    Outl("extern $text __sfr16 ${Register}w;");
-    $device_registers .= "$text __sfr16 ${Register}w;\n";
-    }
-  }
-
-#-------------------------------------------------------------------------------
-
         # Prints all bits of all registers.
 
 sub print_all_registers()
@@ -1220,8 +1157,6 @@ sub print_all_registers()
 
       $text = sprintf("__at(0x%04X)", $addr);
       $device_registers .= "$text __sfr $name;\n";
-
-      create_sfr16_registers($name, $addr) if ($is_pic16 && $create_sfr16);
 
       $alias = $register_aliases{$name};
       $alias = undef if (defined($alias) && defined($reg_refs_by_names{$alias}));
@@ -1568,15 +1503,6 @@ Usage: $PROGRAM [options]
             These may be useful, to merge during a common field name: CVR
             The compiler helps handle these bit fields. (default: no)
 
-        -cs or --create-sfr16
-
-            Create __sfr16 registers. Some registers are in pairs.
-            For example: FSR0L and FSR0H
-            If these are, by address next to each other there are and address of 'H'
-            marked is higher, then will want to create a __sfr16 register.
-            This register is of course there is in the lower address. (default: no)
-            (This option is for the time being operates only at the pic16 series.)
-
         -e or --emit-legacy-names
 
             Creates the legacy names also. (default: no)
@@ -1647,11 +1573,6 @@ for (my $i = 0; $i < @ARGV; )
     when (/^-(cb|-create-bitfields)$/o)
       {
       $create_bitfields = TRUE;
-      }
-
-    when (/^-(cs|-create-sfr16)$/o)
-      {
-      $create_sfr16 = TRUE;
       }
 
     when (/^-(e|-emit-legacy-names)$/o)

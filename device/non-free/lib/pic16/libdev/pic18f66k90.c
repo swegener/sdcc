@@ -2,9 +2,9 @@
  * This definitions of the PIC18F66K90 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
  *
- * This file is generated automatically by the cinc2h.pl, 2013-01-13 11:07:42 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2012-10-01 20:26:57 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -80,7 +80,6 @@ __at(0x0F06) volatile __CCP7CONbits_t CCP7CONbits;
 __at(0x0F07) __sfr CCPR7;
 
 __at(0x0F07) __sfr CCPR7L;
-__at(0x0F07) __sfr16 CCPR7w;
 
 __at(0x0F08) __sfr CCPR7H;
 
@@ -90,7 +89,6 @@ __at(0x0F09) volatile __CCP6CONbits_t CCP6CONbits;
 __at(0x0F0A) __sfr CCPR6;
 
 __at(0x0F0A) __sfr CCPR6L;
-__at(0x0F0A) __sfr16 CCPR6w;
 
 __at(0x0F0B) __sfr CCPR6H;
 
@@ -100,7 +98,6 @@ __at(0x0F0C) volatile __CCP5CONbits_t CCP5CONbits;
 __at(0x0F0D) __sfr CCPR5;
 
 __at(0x0F0D) __sfr CCPR5L;
-__at(0x0F0D) __sfr16 CCPR5w;
 
 __at(0x0F0E) __sfr CCPR5H;
 
@@ -110,7 +107,6 @@ __at(0x0F0F) volatile __CCP4CONbits_t CCP4CONbits;
 __at(0x0F10) __sfr CCPR4;
 
 __at(0x0F10) __sfr CCPR4L;
-__at(0x0F10) __sfr16 CCPR4w;
 
 __at(0x0F11) __sfr CCPR4H;
 
@@ -249,7 +245,6 @@ __at(0x0F40) volatile __CCP10CONbits_t CCP10CONbits;
 __at(0x0F41) __sfr CCPR10;
 
 __at(0x0F41) __sfr CCPR10L;
-__at(0x0F41) __sfr16 CCPR10w;
 
 __at(0x0F42) __sfr CCPR10H;
 
@@ -259,7 +254,6 @@ __at(0x0F43) volatile __CCP9CONbits_t CCP9CONbits;
 __at(0x0F44) __sfr CCPR9;
 
 __at(0x0F44) __sfr CCPR9L;
-__at(0x0F44) __sfr16 CCPR9w;
 
 __at(0x0F45) __sfr CCPR9H;
 
@@ -269,7 +263,6 @@ __at(0x0F46) volatile __CCP8CONbits_t CCP8CONbits;
 __at(0x0F47) __sfr CCPR8;
 
 __at(0x0F47) __sfr CCPR8L;
-__at(0x0F47) __sfr16 CCPR8w;
 
 __at(0x0F48) __sfr CCPR8H;
 
@@ -279,7 +272,6 @@ __at(0x0F49) volatile __CCP3CONbits_t CCP3CONbits;
 __at(0x0F4A) __sfr CCPR3;
 
 __at(0x0F4A) __sfr CCPR3L;
-__at(0x0F4A) __sfr16 CCPR3w;
 
 __at(0x0F4B) __sfr CCPR3H;
 
@@ -301,7 +293,6 @@ __at(0x0F4E) volatile __ECCP2CONbits_t ECCP2CONbits;
 __at(0x0F4F) __sfr CCPR2;
 
 __at(0x0F4F) __sfr CCPR2L;
-__at(0x0F4F) __sfr16 CCPR2w;
 
 __at(0x0F50) __sfr CCPR2H;
 
@@ -620,7 +611,6 @@ __at(0x0FBB) volatile __ECCP1CONbits_t ECCP1CONbits;
 __at(0x0FBC) __sfr CCPR1;
 
 __at(0x0FBC) __sfr CCPR1L;
-__at(0x0FBC) __sfr16 CCPR1w;
 
 __at(0x0FBD) __sfr CCPR1H;
 
@@ -645,7 +635,6 @@ __at(0x0FC2) volatile __ADCON0bits_t ADCON0bits;
 __at(0x0FC3) __sfr ADRES;
 
 __at(0x0FC3) __sfr ADRESL;
-__at(0x0FC3) __sfr16 ADRESw;
 
 __at(0x0FC4) __sfr ADRESH;
 
@@ -720,7 +709,6 @@ __at(0x0FD8) __sfr STATUS;
 __at(0x0FD8) volatile __STATUSbits_t STATUSbits;
 
 __at(0x0FD9) __sfr FSR2L;
-__at(0x0FD9) __sfr16 FSR2w;
 
 __at(0x0FDA) __sfr FSR2H;
 
@@ -737,7 +725,6 @@ __at(0x0FDF) __sfr INDF2;
 __at(0x0FE0) __sfr BSR;
 
 __at(0x0FE1) __sfr FSR1L;
-__at(0x0FE1) __sfr16 FSR1w;
 
 __at(0x0FE2) __sfr FSR1H;
 
@@ -754,7 +741,6 @@ __at(0x0FE7) __sfr INDF1;
 __at(0x0FE8) __sfr WREG;
 
 __at(0x0FE9) __sfr FSR0L;
-__at(0x0FE9) __sfr16 FSR0w;
 
 __at(0x0FEA) __sfr FSR0H;
 
@@ -780,7 +766,6 @@ __at(0x0FF2) volatile __INTCONbits_t INTCONbits;
 __at(0x0FF3) __sfr PROD;
 
 __at(0x0FF3) __sfr PRODL;
-__at(0x0FF3) __sfr16 PRODw;
 
 __at(0x0FF4) __sfr PRODH;
 

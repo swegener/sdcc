@@ -81,9 +81,10 @@ my $hex_file = '';
 my $map_file = '';
 my $header_file = '';
 
-my $verbose         = 0;
-my $hex_constant    = FALSE;
-my $no_explanations = FALSE;
+my $verbose           = 0;
+my $hex_constant      = FALSE;
+my $gen_assembly_code = FALSE;
+my $no_explanations   = FALSE;
 
 my @rom = ();
 my $rom_size = MCS51_ROM_SIZE;
@@ -1203,7 +1204,7 @@ sub regname($$)
     my $bank = ($Address >> 3) & 3;
     my $reg  = $Address & 7;
 
-    $str = "R${reg}<#$bank>";
+    $str = ($gen_assembly_code) ? sprintf("0x%02X", $Address) : "R${reg}<#$bank>";
     $$StrRef = $str;
 
     if (defined($variables_by_address{$Address}))
@@ -1283,7 +1284,7 @@ sub print_3($$$)
   {
   if ($no_explanations)
     {
-    print "$_[0]\t$_[1]\n";
+    print(($_[1] ne '') ? "$_[0]\t$_[1]\n" : "$_[0]\n");
     }
   else
     {
@@ -3116,22 +3117,38 @@ sub instruction_decoder($)
   $dcd_instr_size = $BlockRef->{SIZE};
   $dcd_instr      = $rom[$dcd_address];
 
-  printf "0x%04X: %02X", $dcd_address, $dcd_instr;
+  printf("0x%04X: %02X", $dcd_address, $dcd_instr) if (! $gen_assembly_code);
 
   if ($dcd_instr_size == 1)
     {
-    print "\t\t";
+    print(($gen_assembly_code) ? "\t" : "\t\t");
     }
   elsif ($dcd_instr_size == 2)
     {
     $dcd_parm0 = $rom[$dcd_address + 1];
-    printf " %02X\t\t", $dcd_parm0;
+
+    if ($gen_assembly_code)
+      {
+      print "\t";
+      }
+    else
+      {
+      printf " %02X\t\t", $dcd_parm0;
+      }
     }
   elsif ($dcd_instr_size == 3)
     {
     $dcd_parm0 = $rom[$dcd_address + 1];
     $dcd_parm1 = $rom[$dcd_address + 2];
-    printf " %02X %02X\t", $dcd_parm0, $dcd_parm1;
+
+    if ($gen_assembly_code)
+      {
+      print "\t";
+      }
+    else
+      {
+      printf " %02X %02X\t", $dcd_parm0, $dcd_parm1;
+      }
     }
   else
     {
@@ -3489,7 +3506,7 @@ sub find_labels_in_code()
 sub print_constants($)
   {
   my $BlockRef = $_[0];
-  my ($size, $addr, $i, $len, $frag, $byte, $spc);
+  my ($size, $addr, $i, $len, $frag, $byte, $spc, $col);
   my @constants;
 
   $size = $BlockRef->{SIZE};
@@ -3498,6 +3515,7 @@ sub print_constants($)
 
   $prev_is_jump = FALSE;
 
+  $col  = ($gen_assembly_code) ? '      ' : '    ';
   $addr = $BlockRef->{ADDR};
   @constants = @rom[$addr .. ($addr + $size - 1)];
   $i = 0;
@@ -3509,11 +3527,18 @@ sub print_constants($)
 
     $len = TBL_COLUMNS if ($len > TBL_COLUMNS);
 
-    printf "0x%04X:\t\t.db\t", $addr;
+    if ($gen_assembly_code)
+      {
+      print "\t.db\t";
+      }
+    else
+      {
+      printf "0x%04X:\t\t.db\t", $addr;
+      }
 
     if (($spc = $addr % TBL_COLUMNS))
       {
-      print ('    ' x $spc);
+      print ($col x $spc);
       $frag = TBL_COLUMNS - $spc;
       $len  = $frag if ($len > $frag);
       }
@@ -3524,10 +3549,20 @@ sub print_constants($)
       $byte = $constants[$i++];
       $spc  = (--$len) ? ' ' : '';
 
-      printf((($hex_constant || $byte < ord(' ') || $byte >= 0x7F) ? "%02X$spc" : "'%c'"), $byte);
+      if ($gen_assembly_code)
+	{
+	printf((($hex_constant || $byte < ord(' ') || $byte >= 0x7F) ? "0x%02X" : "'%c'$spc"), $byte);
 
-      last if (! $len);
-      print ' ';
+	last if (! $len);
+	print ', ';
+	}
+      else
+	{
+	printf((($hex_constant || $byte < ord(' ') || $byte >= 0x7F) ? "%02X$spc" : "'%c'"), $byte);
+
+	last if (! $len);
+	print ' ';
+	}
       }
 
     print "\n";
@@ -3569,8 +3604,19 @@ sub disassembler()
       }
     elsif ($ref->{TYPE} == BLOCK_EMPTY)
       {
-      printf("\n0x%04X: -- -- --\n  ....  -- -- --\n0x%04X: -- -- --\n",
-	     $_, $_ + $ref->{SIZE} - 1);
+      my $next_block = $_ + $ref->{SIZE};
+
+      if (! $gen_assembly_code)
+	{
+	printf("\n0x%04X: -- -- --\n  ....  -- -- --\n0x%04X: -- -- --\n",
+		$_, $next_block - 1);
+	}
+      elsif ($next_block < $rom_size)
+	{
+	# Skip the empty code space.
+
+	printf "\n\t.ds\t%u\n", $ref->{SIZE};
+	}
       }
     }
   }
@@ -3631,6 +3677,12 @@ EOT
 	--map-file <file.map>
 
 	    The map file belonging to the input hex file. (optional)
+
+	-as|--assembly-source
+
+	    Generates the assembly source file. (Eliminates before the instructions
+	    visible address, hex codes and besides replaces the pseudo Rn<#x>
+	    register names.)
 
 	-ne|--no-explanations
 
@@ -3737,6 +3789,11 @@ for (my $i = 0; $i < @ARGV; )
       {
       param_exist($opt, $i);
       $map_file = $ARGV[$i++];
+      }
+
+    when (/^-(as|-assembly-source)$/o)
+      {
+      $gen_assembly_code = TRUE;
       }
 
     when (/^-(ne|-no-explanations)$/o)

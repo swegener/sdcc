@@ -1,3 +1,10 @@
+2013-01-13 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/cinc2h.pl: New command option: --create-sfr16
+          (This option is for the time being operates only at the pic16 series.)
+	* device/non-free/include/pic16/pic18*.h,
+	  device/non-free/lib/pic16/libdev/pic18*.c: Implementation of the __sfr16 type.
+
 2013-01-12 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: New command option: --no-explanations

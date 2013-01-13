@@ -2,9 +2,9 @@
  * This declarations of the PIC18F65J11 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:31:01 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2013-01-13 11:07:37 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -270,6 +270,7 @@ extern __at(0x0F65) volatile __CCP2CONbits_t CCP2CONbits;
 //==============================================================================
 
 extern __at(0x0F66) __sfr CCPR2;
+extern __at(0x0F66) __sfr16 CCPR2w;
 extern __at(0x0F66) __sfr CCPR2L;
 extern __at(0x0F67) __sfr CCPR2H;
 
@@ -332,6 +333,7 @@ extern __at(0x0F68) volatile __CCP1CONbits_t CCP1CONbits;
 //==============================================================================
 
 extern __at(0x0F69) __sfr CCPR1;
+extern __at(0x0F69) __sfr16 CCPR1w;
 extern __at(0x0F69) __sfr CCPR1L;
 extern __at(0x0F6A) __sfr CCPR1H;
 
@@ -2996,6 +2998,7 @@ extern __at(0x0FC2) volatile __ADCON0bits_t ADCON0bits;
 //==============================================================================
 
 extern __at(0x0FC3) __sfr ADRES;
+extern __at(0x0FC3) __sfr16 ADRESw;
 extern __at(0x0FC3) __sfr ADRESL;
 extern __at(0x0FC4) __sfr ADRESH;
 
@@ -3765,6 +3768,7 @@ extern __at(0x0FD8) volatile __STATUSbits_t STATUSbits;
 
 //==============================================================================
 
+extern __at(0x0FD9) __sfr16 FSR2w;
 extern __at(0x0FD9) __sfr FSR2L;
 extern __at(0x0FDA) __sfr FSR2H;
 extern __at(0x0FDB) __sfr PLUSW2;
@@ -3773,6 +3777,7 @@ extern __at(0x0FDD) __sfr POSTDEC2;
 extern __at(0x0FDE) __sfr POSTINC2;
 extern __at(0x0FDF) __sfr INDF2;
 extern __at(0x0FE0) __sfr BSR;
+extern __at(0x0FE1) __sfr16 FSR1w;
 extern __at(0x0FE1) __sfr FSR1L;
 extern __at(0x0FE2) __sfr FSR1H;
 extern __at(0x0FE3) __sfr PLUSW1;
@@ -3781,6 +3786,7 @@ extern __at(0x0FE5) __sfr POSTDEC1;
 extern __at(0x0FE6) __sfr POSTINC1;
 extern __at(0x0FE7) __sfr INDF1;
 extern __at(0x0FE8) __sfr WREG;
+extern __at(0x0FE9) __sfr16 FSR0w;
 extern __at(0x0FE9) __sfr FSR0L;
 extern __at(0x0FEA) __sfr FSR0H;
 extern __at(0x0FEB) __sfr PLUSW0;
@@ -3958,6 +3964,7 @@ extern __at(0x0FF2) volatile __INTCONbits_t INTCONbits;
 //==============================================================================
 
 extern __at(0x0FF3) __sfr PROD;
+extern __at(0x0FF3) __sfr16 PRODw;
 extern __at(0x0FF3) __sfr PRODL;
 extern __at(0x0FF4) __sfr PRODH;
 extern __at(0x0FF5) __sfr TABLAT;
@@ -4036,20 +4043,4 @@ extern __at(0x0FFD) __sfr TOS;
 extern __at(0x0FFD) __sfr TOSL;
 extern __at(0x0FFE) __sfr TOSH;
 extern __at(0x0FFF) __sfr TOSU;
-
-//==============================================================================
-//
-//        Configuration Addresses
-//
-//==============================================================================
-
-#define __CONFIG1L              0x007FF8
-#define __CONFIG1H              0x007FF9
-#define __CONFIG2L              0x007FFA
-#define __CONFIG2H              0x007FFB
-#define __CONFIG3L              0x007FFC
-#define __CONFIG3H              0x007FFD
-
-//==============================================================================
-
 #endif // #ifndef __PIC18F65J11_H__

@@ -6404,7 +6404,6 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
 {
   int size = 0;
   int offset = 0;
-  int ressize;
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
@@ -6419,29 +6418,12 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
    * The result might be a rematerialized pointer to (the first field in) a struct,
    * which then assumes the type (and size) of the struct rather than the first field.
    */
-  if (IS_SYMOP (right))
-    size = getSize (OP_SYM_ETYPE (right));
-  else if (IS_VALOP (right))
-    size = getSize (OP_VALUE (right)->type);
-  else
-    assert (!"Invalid operand.");
-
-  ressize = getSize (OP_SYM_ETYPE (result));
-
-  //assert( !"what's going on here?" );
-
-  /*
-     if ( AOP_TYPE(result) == AOP_PCODE) {
-     fprintf(stderr,"genDataPointerSet   %s, %d\n",
-     AOP(result)->aopu.pcop->name,
-     PCOI(AOP(result)->aopu.pcop)->offset);
-     }
-   */
+  size = AOP_SIZE(right);
 
   // tsd, was l+1 - the underline `_' prefix was being stripped
   while (size--)
     {
-      emitpComment ("%s:%u: size=%d/%d, offset=%d, AOP_TYPE(res)=%d", __FILE__, __LINE__, size, ressize, offset,
+      emitpComment ("%s:%u: size=%d/%d, offset=%d, AOP_TYPE(res)=%d", __FILE__, __LINE__, size, offset,
                     AOP_TYPE (result));
 
       if (AOP_TYPE (right) == AOP_LIT)

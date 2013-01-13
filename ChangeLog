@@ -1,3 +1,8 @@
+2013-01-13 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/gen.c (genDataPointerSet): 
+	  fix and simplify operand size detection, fixes #3600361
+
 2013-01-13 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/cinc2h.pl: Canceled the command option: --create-sfr16
@@ -11,7 +16,7 @@
 2013-01-13 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/cinc2h.pl: New command option: --create-sfr16
-          (This option is for the time being operates only at the pic16 series.)
+	  (This option is for the time being operates only at the pic16 series.)
 	* device/non-free/include/pic16/pic18*.h,
 	  device/non-free/lib/pic16/libdev/pic18*.c: Implementation of the __sfr16 type.
 
@@ -112,8 +117,8 @@
 2013-01-05 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm: The required perl version: 5.12.0
-          One repair: The unknown instruction is actually simple embedded
-          data in the code.
+	  One repair: The unknown instruction is actually simple embedded
+	  data in the code.
 
 2013-01-05 Molnar Karoly <molnarkaroly AT users.sf.net>
 
@@ -437,10 +442,10 @@
 2012-11-18 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/pic16-header-parser.pl:
-          New capability: Handling of I/O pins of the peripheral.
-          The program creates six files in the actual directory:
-                adc.tables, ccp.tables, pwm.tables, i2c.tables,
-                spi.tables, usart.tables
+	  New capability: Handling of I/O pins of the peripheral.
+	  The program creates six files in the actual directory:
+		adc.tables, ccp.tables, pwm.tables, i2c.tables,
+		spi.tables, usart.tables
 
 2012-11-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -816,16 +821,16 @@
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 
-        * device/lib/pic16/libio/i2c/i2copen.c:
-          Bugfix: TRISCbits.TRISC2 --> TRISCbits.TRISC4
+	* device/lib/pic16/libio/i2c/i2copen.c:
+	  Bugfix: TRISCbits.TRISC2 --> TRISCbits.TRISC4
 
 2012-10-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic16/usart.h: Supplement to "USART styles".
 	* device/lib/pic16/libio/usart/uopen.c:
 	  Use the (__SDCC_USART_STYLE == 1865850) condition.
-        * doc/README.txt:
-          New line at the end of the "Authors and interested persons" section.
+	* doc/README.txt:
+	  New line at the end of the "Authors and interested persons" section.
 
 2012-10-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -2314,7 +2319,7 @@
 
 2012-06-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
- 	* support/regression/tests/and_survive.c:
+	* support/regression/tests/and_survive.c:
 	  Test non-destructive and, regression test for #3534833.
 	* support/regression/tests/gcc-torture-execute-980707-1.c:
 	  Adapted and enabled test for mcs51.

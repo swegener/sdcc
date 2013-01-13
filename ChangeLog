@@ -2,6 +2,8 @@
 
 	* src/pic14/gen.c (genDataPointerSet): 
 	  fix and simplify operand size detection, fixes #3600361
+	* src/pic14/main.c (keywords[]):
+	  remove unsupported "pdata", fixes #3600724
 
 2013-01-13 Molnar Karoly <molnarkaroly AT users.sf.net>
 

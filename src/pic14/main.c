@@ -57,7 +57,7 @@ static char *_pic14_keywords[] =
   "interrupt",
   "naked",
   "near",
-  "pdata",
+  //"pdata",
   "reentrant",
   "sfr",
   //"sbit",

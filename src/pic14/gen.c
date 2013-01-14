@@ -6423,7 +6423,7 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
   // tsd, was l+1 - the underline `_' prefix was being stripped
   while (size--)
     {
-      emitpComment ("%s:%u: size=%d/%d, offset=%d, AOP_TYPE(res)=%d", __FILE__, __LINE__, size, offset,
+      emitpComment ("%s:%u: size=%d, offset=%d, AOP_TYPE(res)=%d", __FILE__, __LINE__, size, offset,
                     AOP_TYPE (result));
 
       if (AOP_TYPE (right) == AOP_LIT)

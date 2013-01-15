@@ -1,3 +1,9 @@
+2013-01-15 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic16/libsdcc/long/modulong.c:
+	  return ~0UL instead of looping endlessly on divide-by-0,
+	  addresses #3600983
+
 2013-01-13 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/gen.c (genDataPointerSet): 

@@ -35,6 +35,12 @@ unsigned long _modulong (unsigned long a, unsigned long b) _IL_REENTRANT
 {
   unsigned char count = 0;
 
+  if (!b)
+    {
+      /* Prevent endless loop in case of division by 0. */
+      return ~0UL;
+    } // if
+
   while (!MSB_SET(b))
   {
      b <<= 1;

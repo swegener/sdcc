@@ -4005,7 +4005,7 @@ sub emit_globals($)
 
   return if (! scalar(keys(%labels_by_address)));
 
-  print ";$border0\n;\tPublic variables\n;$border0\n\n";
+  print ";$border0\n;\tPublic labels\n;$border0\n\n";
 
   if ($Assembly_mode)
     {

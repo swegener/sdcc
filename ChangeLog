@@ -1,5 +1,9 @@
 2013-01-20 Molnar Karoly <molnarkaroly AT users.sf.net>
 
+	* support/scripts/mcs51-disasm.pl: "Public variables" -> "Public labels"
+
+2013-01-20 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/mcs51-disasm.pl: Improved handling of blocks and
 	  lists of labels and variables.
 

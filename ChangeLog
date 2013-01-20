@@ -1,3 +1,8 @@
+2013-01-20 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl: Improved handling of blocks and
+	  lists of labels and variables.
+
 2013-01-19 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Expanded assembly mode and nicer tables.

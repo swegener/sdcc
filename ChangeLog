@@ -1,5 +1,10 @@
 2013-01-20 Molnar Karoly <molnarkaroly AT users.sf.net>
 
+	* support/scripts/mcs51-disasm.pl: Additional informations about direction
+          of the jumps.
+
+2013-01-20 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/mcs51-disasm.pl: "Public variables" -> "Public labels"
 
 2013-01-20 Molnar Karoly <molnarkaroly AT users.sf.net>

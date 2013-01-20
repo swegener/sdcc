@@ -170,11 +170,19 @@ use constant BLOCK_INSTR => 0;
 use constant BLOCK_CONST => 1;
 use constant BLOCK_EMPTY => 2;
 
-use constant BL_TYPE_NONE   => 0;
-use constant BL_TYPE_SUB    => 1;
-use constant BL_TYPE_LABEL  => 2;
-use constant BL_TYPE_JTABLE => 3;
-use constant BL_TYPE_CONST  => 3;
+use constant BL_TYPE_NONE   => -1;
+use constant BL_TYPE_SUB    =>  0;
+use constant BL_TYPE_LABEL  =>  1;
+use constant BL_TYPE_JTABLE =>  2;
+use constant BL_TYPE_CONST  =>  3;
+
+my @label_names =
+  (
+  'Function_',
+  'Label_',
+  'Jumptable_',
+  'Constant_'
+  );
 
 my %empty_blocks_by_address = ();
 my %blocks_by_address = ();
@@ -1062,19 +1070,19 @@ sub add_names_labels()
 
     if ($type == BL_TYPE_SUB)
       {
-      $label->{NAME} = sprintf("Function_%03u", $fidx++);
+      $label->{NAME} = sprintf("%s%03u", $label_names[$type], $fidx++);
       }
     elsif ($type == BL_TYPE_LABEL)
       {
-      $label->{NAME} = sprintf("Label_%03u", $lidx++);
+      $label->{NAME} = sprintf("%s%03u", $label_names[$type], $lidx++);
       }
     elsif ($type == BL_TYPE_JTABLE)
       {
-      $label->{NAME} = sprintf("Jumptable_%03u", $jidx++);
+      $label->{NAME} = sprintf("%s%03u", $label_names[$type], $jidx++);
       }
     elsif ($type == BL_TYPE_CONST)
       {
-      $label->{NAME} = sprintf("Constant_%03u", $cidx++);
+      $label->{NAME} = sprintf("%s%03u", $label_names[$type], $cidx++);
       }
     }
   }
@@ -1540,6 +1548,30 @@ sub decode_char($)
   return sprintf "0x%02X", $Ch;
   }
 
+#-------------------------------------------------------------------------------
+
+	#
+	# Determines direction of jump.
+	#
+
+sub jump_direction($)
+  {
+  my $TargetAddr = $_[0];
+
+  if ($dcd_address < $TargetAddr)
+    {
+    return ' (forward)';
+    }
+  elsif ($dcd_address == $TargetAddr)
+    {
+    return '';
+    }
+  else
+    {
+    return ' (backward)';
+    }
+  }
+
 #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #@@@@@@@@@@@@@@@@@@@@@@                                   @@@@@@@@@@@@@@@@@@@@@@
@@ -1550,19 +1582,35 @@ sub decode_char($)
 
 sub ajmp()
   {
-  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+  my ($addr, $a11, $rb0, $rb1, $str0, $str1, $str2);
 
         # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 0 0 0 0 1	a7-a0
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb1   = (($dcd_instr & 0xE0) << 3) | $dcd_parm0;
-    $addr  = (($dcd_address + $dcd_instr_size) & 0xF800) | $rb1;
-    $rb0   = labelname($addr);
-    $name0 = sprintf "0x%04X", $rb1;
-    $str0  = ($dcd_address == $addr) ? ' (endless loop)' : '';
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('ajmp', $rb0, "Jumps hither: $str1 (PC += $dcd_instr_size, PC(10-0) = $name0)$str0");
+    $rb1  = (($dcd_instr & 0xE0) << 3) | $dcd_parm0;
+    $addr = (($dcd_address + $dcd_instr_size) & 0xF800) | $rb1;
+    $rb0  = labelname($addr);
+    $a11  = sprintf "0x%04X", $rb1;
+    $str0 = sprintf "0x%04X", $addr;
+
+    if ($dcd_address < $addr)
+      {
+      $str1 = '';
+      $str2 = ' (forward)';
+      }
+    elsif ($dcd_address == $addr)
+      {
+      $str1 = ' (endless loop)';
+      $str2 = '';
+      }
+    else
+      {
+      $str1 = '';
+      $str2 = ' (backward)';
+      }
+
+    print_3('ajmp', $rb0, "Jumps$str2 hither: $str0 (PC += $dcd_instr_size, PC(10-0) = $a11)$str1");
     }
 
   invalidate_DPTR_Rx();
@@ -1573,18 +1621,19 @@ sub ajmp()
 
 sub acall()
   {
-  my ($addr, $rb0, $rb1, $str0, $str1);
+  my ($addr, $rb0, $rb1, $str0, $str1, $str2);
 
 	# ACALL	addr11			aaa10001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb1   = (($dcd_instr & 0xE0) << 3) | $dcd_parm0;
-    $addr  = (($dcd_address + $dcd_instr_size) & 0xF800) | $rb1;
-    $rb0   = labelname($addr);
-    $str0  = sprintf "0x%04X", $rb1;
-    $str1  = sprintf "0x%04X", $addr;
-    print_3('acall', $rb0, "Calls this: $str1 (PC += $dcd_instr_size, [++SP] = PCL, [++SP] = PCH, PC(10-0) = $str0)");
+    $rb1  = (($dcd_instr & 0xE0) << 3) | $dcd_parm0;
+    $addr = (($dcd_address + $dcd_instr_size) & 0xF800) | $rb1;
+    $rb0  = labelname($addr);
+    $str0 = sprintf "0x%04X", $rb1;
+    $str1 = sprintf "0x%04X", $addr;
+    $str2 = jump_direction($addr);
+    print_3('acall', $rb0, "Calls$str2 this: $str1 (PC += $dcd_instr_size, [++SP] = PCL, [++SP] = PCH, PC(10-0) = $str0)");
     }
 
   invalidate_DPTR_Rx();
@@ -1766,7 +1815,7 @@ sub mov_ind_Ri_direct()
 
 sub cjne_ind_Ri_data()
   {
-  my ($addr, $rb0, $str0, $str1);
+  my ($addr, $rb0, $str0, $str1, $str2);
 
 	# CJNE	@Ri, #data, rel		1011011i dddddddd rrrrrrrr	R0 .. R1 	data		relative address
 
@@ -1780,7 +1829,8 @@ sub cjne_ind_Ri_data()
     $rb0  = labelname($addr);
     $str0 = sprintf "0x%02X", $dcd_parm0;
     $str1 = sprintf "0x%04X", $addr;
-    print_3('cjne', "\@$dcd_Ri_name, #$str0, $rb0", "If ([$dcd_Ri_name] != $str0) then jumps hither: $str1");
+    $str2 = jump_direction($addr);
+    print_3('cjne', "\@$dcd_Ri_name, #$str0, $rb0", "If ([$dcd_Ri_name] != $str0) then jumps$str2 hither: $str1");
     }
 
   invalidate_DPTR_Rx();
@@ -2019,7 +2069,7 @@ sub mov_Rn_direct()
 
 sub cjne_Rn_data()
   {
-  my ($addr, $rb0, $str0, $str1);
+  my ($addr, $rb0, $str0, $str1, $str2);
 
 	# CJNE	Rn, #data, rel		10111rrr dddddddd rrrrrrrr	R0 .. R7 	data		relative address
 
@@ -2029,7 +2079,8 @@ sub cjne_Rn_data()
     $rb0  = labelname($addr);
     $str0 = sprintf "0x%02X", $dcd_parm0;
     $str1 = sprintf "0x%04X", $addr;
-    print_3('cjne', "$dcd_Rn_name, #$str0, $rb0", "If ($dcd_Rn_name != $str0) then jumps hither: $str1");
+    $str2 = jump_direction($addr);
+    print_3('cjne', "$dcd_Rn_name, #$str0, $rb0", "If ($dcd_Rn_name != $str0) then jumps$str2 hither: $str1");
     }
 
   invalidate_DPTR_Rx();
@@ -2050,7 +2101,7 @@ sub xch_A_Rn()
 
 sub djnz_Rn()
   {
-  my ($addr, $rb0, $str0, $str1);
+  my ($addr, $rb0, $str0, $str1, $str2);
 
 	# DJNZ	Rn, rel			11011rrr rrrrrrrr		R0 .. R7	relative address
 
@@ -2060,7 +2111,8 @@ sub djnz_Rn()
     $rb0  = labelname($addr);
     $str0 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
     $str1 = sprintf "0x%04X", $addr;
-    print_3('djnz', "$dcd_Rn_name, $rb0", "If (--$dcd_Rn_name != 0) then jumps hither: $str1$str0");
+    $str2 = jump_direction($addr);
+    print_3('djnz', "$dcd_Rn_name, $rb0", "If (--$dcd_Rn_name != 0) then jumps$str2 hither: $str1$str0");
     }
 
   invalidate_DPTR_Rx();
@@ -2098,7 +2150,7 @@ sub nop()
 
 sub ljmp()
   {
-  my ($addr, $rb0, $str0, $str1);
+  my ($addr, $rb0, $str0, $str1, $str2);
 
 	# LJMP	addr16			00000010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
@@ -2106,10 +2158,27 @@ sub ljmp()
     {
     $addr = ($dcd_parm0 << 8) | $dcd_parm1;
     $rb0  = labelname($addr);
-    $str0 = ($dcd_address == $addr) ? ' (endless loop)' : '';
-    $str1 = sprintf "0x%04X", $addr;
-    print_3('ljmp', $rb0, "Jumps hither: $str1$str0");
+    $str0 = sprintf "0x%04X", $addr;
+
+    if ($dcd_address < $addr)
+      {
+      $str1 = '';
+      $str2 = ' (forward)';
+      }
+    elsif ($dcd_address == $addr)
+      {
+      $str1 = ' (endless loop)';
+      $str2 = '';
+      }
+    else
+      {
+      $str1 = '';
+      $str2 = ' (backward)';
+      }
+
+    print_3('ljmp', $rb0, "Jumps$str2 hither: $str0$str1");
     }
+
   invalidate_DPTR_Rx();
   $prev_is_jump = TRUE;
   }
@@ -2154,7 +2223,7 @@ sub inc_direct()
 
 sub jbc_bit()
   {
-  my ($addr, $rb0, $rb1, $name0, $str0);
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
 
 	# JBC	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
 
@@ -2164,7 +2233,8 @@ sub jbc_bit()
     $rb0  = bitname($dcd_parm0, \$name0);
     $rb1  = labelname($addr);
     $str0 = sprintf "0x%04X", $addr;
-    print_3('jbc', "$rb0, $rb1", "If ($name0 == H) then $name0 = L and jumps hither: $str0");
+    $str1 = jump_direction($addr);
+    print_3('jbc', "$rb0, $rb1", "If ($name0 == H) then $name0 = L and jumps$str1 hither: $str0");
     }
 
   invalidate_DPTR_Rx();
@@ -2175,7 +2245,7 @@ sub jbc_bit()
 
 sub lcall()
   {
-  my ($addr, $rb0, $str0);
+  my ($addr, $rb0, $str0, $str1);
 
 	# LCALL	addr16			00010010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
@@ -2184,7 +2254,8 @@ sub lcall()
     $addr = ($dcd_parm0 << 8) | $dcd_parm1;
     $rb0  = labelname($addr);
     $str0 = sprintf "0x%04X", $addr;
-    print_3('lcall', $rb0, "Calls this: $str0 (PC += $dcd_instr_size, [++SP] = PCL, [++SP] = PCH, PC = $str0)");
+    $str1 = jump_direction($addr);
+    print_3('lcall', $rb0, "Calls$str1 this: $str0 (PC += $dcd_instr_size, [++SP] = PCL, [++SP] = PCH, PC = $str0)");
     }
 
   invalidate_DPTR_Rx();
@@ -2230,7 +2301,7 @@ sub dec_direct()
 
 sub jb_bit()
   {
-  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1, $str2);
 
 	# JB	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
 
@@ -2241,7 +2312,8 @@ sub jb_bit()
     $rb1  = labelname($addr);
     $str0 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
     $str1 = sprintf "0x%04X", $addr;
-    print_3('jb', "$rb0, $rb1", "If ($name0 == H) then jumps hither: $str1$str0");
+    $str2 = jump_direction($addr);
+    print_3('jb', "$rb0, $rb1", "If ($name0 == H) then jumps$str2 hither: $str1$str0");
     }
 
   invalidate_DPTR_Rx();
@@ -2305,7 +2377,7 @@ sub add_A_direct()
 
 sub jnb_bit()
   {
-  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1, $str2);
 
 	# JNB	bit, rel		00110000 bbbbbbbb rrrrrrrr	bit address		relative address
 
@@ -2316,7 +2388,8 @@ sub jnb_bit()
     $rb1  = labelname($addr);
     $str0 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
     $str1 = sprintf "0x%04X", $addr;
-    print_3('jnb', "$rb0, $rb1", "If ($name0 == L) then jumps hither: $str1$str0");
+    $str2 = jump_direction($addr);
+    print_3('jnb', "$rb0, $rb1", "If ($name0 == L) then jumps$str2 hither: $str1$str0");
     }
 
   invalidate_DPTR_Rx();
@@ -2380,7 +2453,7 @@ sub addc_A_direct()
 
 sub jc()
   {
-  my ($addr, $rb0, $str0);
+  my ($addr, $rb0, $str0, $str1);
 
 	# JC	rel			01000000 rrrrrrrr 		relative address
 
@@ -2389,7 +2462,8 @@ sub jc()
     $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
     $rb0  = labelname($addr);
     $str0 = sprintf "0x%04X", $addr;
-    print_3('jc', $rb0, "If (CY == H) then jumps hither: $str0");
+    $str1 = jump_direction($addr);
+    print_3('jc', $rb0, "If (CY == H) then jumps$str1 hither: $str0");
     }
 
   invalidate_DPTR_Rx();
@@ -2471,7 +2545,7 @@ sub orl_A_direct()
 
 sub jnc()
   {
-  my ($addr, $rb0, $str0);
+  my ($addr, $rb0, $str0, $str1);
 
 	# JNC	rel			01010000 rrrrrrrr 		relative address
 
@@ -2480,7 +2554,8 @@ sub jnc()
     $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
     $rb0  = labelname($addr);
     $str0 = sprintf "0x%04X", $addr;
-    print_3('jnc', $rb0, "If (CY == L) then jumps hither: $str0");
+    $str1 = jump_direction($addr);
+    print_3('jnc', $rb0, "If (CY == L) then jumps$str1 hither: $str0");
     }
 
   invalidate_DPTR_Rx();
@@ -2562,7 +2637,7 @@ sub anl_A_direct()
 
 sub jz()
   {
-  my ($addr, $rb0, $str0);
+  my ($addr, $rb0, $str0, $str1);
 
 	# JZ	rel			01100000 rrrrrrrr 		relative address
 
@@ -2571,7 +2646,8 @@ sub jz()
     $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
     $rb0  = labelname($addr);
     $str0 = sprintf "0x%04X", $addr;
-    print_3('jz', $rb0, "If (ACC == 0) then jumps hither: $str0");
+    $str1 = jump_direction($addr);
+    print_3('jz', $rb0, "If (ACC == 0) then jumps$str1 hither: $str0");
     }
 
   invalidate_DPTR_Rx();
@@ -2653,7 +2729,7 @@ sub xrl_A_direct()
 
 sub jnz()
   {
-  my ($addr, $rb0, $str0);
+  my ($addr, $rb0, $str0, $str1);
 
 	# JNZ	rel			01110000 rrrrrrrr 		relative address
 
@@ -2662,7 +2738,8 @@ sub jnz()
     $addr = $dcd_address + $dcd_instr_size + expand_offset($dcd_parm0);
     $rb0  = labelname($addr);
     $str0 = sprintf "0x%04X", $addr;
-    print_3('jnz', $rb0, "If (ACC != 0) then jumps hither: $str0");
+    $str1 = jump_direction($addr);
+    print_3('jnz', $rb0, "If (ACC != 0) then jumps$str1 hither: $str0");
     }
 
   invalidate_DPTR_Rx();
@@ -2688,11 +2765,21 @@ sub orl_C_bit()
 
 sub jmp_A_DPTR()
   {
+  my $str0;
+
 	# JMP	@A+DPTR			01110011
 
-  add_jump_label($DPTR, '', BL_TYPE_JTABLE, EMPTY) if ($DPTR != EMPTY);
+  if ($DPTR != EMPTY)
+    {
+    add_jump_label($DPTR, '', BL_TYPE_JTABLE, EMPTY);
+    $str0 = jump_direction($DPTR);
+    }
+  else
+    {
+    $str0 = '';
+    }
 
-  print_3('jmp', '@A+DPTR', "Jumps hither: [DPTR + ACC]\n");
+  print_3('jmp', '@A+DPTR', "Jumps$str0 hither: [DPTR + ACC]\n");
   invalidate_DPTR_Rx();
   $prev_is_jump = TRUE;
   }
@@ -2762,7 +2849,7 @@ sub mov_direct_data()
 
 sub sjmp()
   {
-  my ($addr, $rb0, $rb1, $name0, $name1, $str0, $str1);
+  my ($addr, $rb0, $rb1, $name0, $name1, $str0, $str1, $str2);
 
 	# SJMP	rel			10000000 rrrrrrrr		relative address
 
@@ -2772,7 +2859,8 @@ sub sjmp()
     $rb0  = labelname($addr);
     $str0 = ($dcd_address == $addr) ? ' (endless loop)' : '';
     $str1 = sprintf "0x%04X", $addr;
-    print_3('sjmp', $rb0, "Jumps hither: $str1$str0");
+    $str2 = jump_direction($addr);
+    print_3('sjmp', $rb0, "Jumps$str2 hither: $str1$str0");
     }
 
   invalidate_DPTR_Rx();
@@ -3030,7 +3118,7 @@ sub cpl_C()
 
 sub cjne_A_data()
   {
-  my ($addr, $rb0, $rb1, $str0);
+  my ($addr, $rb0, $rb1, $str0, $str1);
 
 	# CJNE	A, #data, rel		10110100 dddddddd rrrrrrrr	data		relative address
 
@@ -3040,7 +3128,8 @@ sub cjne_A_data()
     $rb0  = labelname($addr);
     $rb1  = sprintf "0x%02X", $dcd_parm0;
     $str0 = sprintf "0x%04X", $addr;
-    print_3('cjne', "A, #$rb1, $rb0", "If (ACC != $rb1) then jumps hither: $str0");
+    $str1 = jump_direction($addr);
+    print_3('cjne', "A, #$rb1, $rb0", "If (ACC != $rb1) then jumps$str1 hither: $str0");
     }
 
   invalidate_DPTR_Rx();
@@ -3051,7 +3140,7 @@ sub cjne_A_data()
 
 sub cjne_A_direct()
   {
-  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1, $str2);
 
 	# CJNE	A, direct, rel		10110101 aaaaaaaa rrrrrrrr	register address	relative address
 
@@ -3062,7 +3151,8 @@ sub cjne_A_direct()
     $rb1  = labelname($addr);
     $str0 = sprintf "0x%04X", $addr;
     $str1 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
-    print_3('cjne', "A, $rb0, $rb1", "If (ACC != $name0) then jumps hither: $str0$str1");
+    $str2 = jump_direction($addr);
+    print_3('cjne', "A, $rb0, $rb1", "If (ACC != $name0) then jumps$str2 hither: $str0$str1");
     }
 
   $registers_by_address{$dcd_parm0} = TRUE;
@@ -3193,7 +3283,7 @@ sub da_A()
 
 sub djnz_direct()
   {
-  my ($addr, $rb0, $rb1, $name0, $str0, $str1);
+  my ($addr, $rb0, $rb1, $name0, $str0, $str1, $str2);
 
 	# DJNZ	direct, rel		11010101 aaaaaaaa rrrrrrrr	register address	relative address
 
@@ -3204,7 +3294,8 @@ sub djnz_direct()
     $rb1  = labelname($addr);
     $str0 = ($dcd_address == $addr) ? ' (waiting loop)' : '';
     $str1 = sprintf "0x%04X", $addr;
-    print_3('djnz', "$rb0, $rb1", "If (--$name0 != 0) then jumps hither: $str1$str0");
+    $str2 = jump_direction($addr);
+    print_3('djnz', "$rb0, $rb1", "If (--$name0 != 0) then jumps$str2 hither: $str1$str0");
     }
 
   $registers_by_address{$dcd_parm0} = TRUE;
@@ -4199,11 +4290,11 @@ sub emit_ram_data($)
 
       if (defined($size))
 	{
-	printf "0x%02X:\t$variables_by_address{$_} (%u bytes)\n", $_, $size;
+	printf "0x%02X:\t$variables_by_address{$_}\t(%u bytes)\n", $_, $size;
 	}
       else
 	{
-	printf "0x%02X:\tvariable_0x%02X (1 bytes)\n", $_, $_;
+	printf "0x%02X:\tvariable_0x%02X\t(1 bytes)\n", $_, $_;
 	}
       }
     }

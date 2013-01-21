@@ -27,7 +27,11 @@
     This program disassembles the hex files. It assumes that the hex file
     contains MCS51 instructions.
 
-    Proposal for use: ./mcs51-disasm.pl -M 8052.h program.hex > program.asm
+    Proposal for use: ./mcs51-disasm.pl -M 8052.h program.hex > program.dasm
+
+	or	./mcs51-disasm.pl -M 8052.h -as program.hex > program.asm
+
+	or	./mcs51-disasm.pl -M 8052.h -as -hc program.hex > program.asm
 
   $Id$
 =cut
@@ -660,7 +664,7 @@ sub is_constant($)
 
   foreach (sort {$a <=> $b} keys(%const_blocks_by_address))
     {
-    return TRUE if ($_ <= $Address && $Address <= $const_areas_by_address{$_});
+    return TRUE if ($_ <= $Address && $Address <= $const_blocks_by_address{$_});
     last if ($_ > $Address);
     }
 
@@ -787,9 +791,9 @@ sub add_block($$$$$)
 	# Store address entry of a procedure.
 	#
 
-sub add_func_label($$)
+sub add_func_label($$$)
   {
-  my ($Address, $Name) = @_;
+  my ($Address, $Name, $Map_mode) = @_;
 
   if ($Address < 0)
     {
@@ -797,11 +801,14 @@ sub add_func_label($$)
     return;
     }
 
-#  if (! defined($blocks_by_address{$Address}))
-#    {
-#    Log(sprintf("add_func_label(): This address (0x%04X) does not shows an instruction!", $Address), 2);
-#    return;
-#    }
+  if (! $Map_mode)
+    {
+    if (! defined($blocks_by_address{$Address}))
+      {
+      Log(sprintf("add_func_label(): This address (0x%04X) does not shows an instruction!", $Address), 2);
+      return;
+      }
+    }
 
   if (is_constant($Address) || is_empty($Address))
     {
@@ -818,9 +825,9 @@ sub add_func_label($$)
 	# Store a label.
 	#
 
-sub add_jump_label($$$$)
+sub add_jump_label($$$$$)
   {
-  my ($TargetAddr, $Name, $Type, $SourceAddr) = @_;
+  my ($TargetAddr, $Name, $Type, $SourceAddr, $Map_mode) = @_;
   my $type;
 
   if ($TargetAddr < 0)
@@ -829,11 +836,14 @@ sub add_jump_label($$$$)
     return;
     }
 
-#  if (! defined($blocks_by_address{$TargetAddr}))
-#    {
-#    Log(sprintf("add_jump_label(): This address (0x%04X) does not shows an instruction!", $TargetAddr), 2);
-#    return;
-#    }
+  if (! $Map_mode)
+    {
+    if (! defined($blocks_by_address{$TargetAddr}))
+      {
+      Log(sprintf("add_jump_label(): This address (0x%04X) does not shows an instruction!", $TargetAddr), 2);
+      return;
+      }
+    }
 
   if (is_constant($TargetAddr) || is_empty($TargetAddr))
     {
@@ -966,11 +976,11 @@ sub read_map_file()
 
 	if ($state == MAP_CODE0)
 	  {
-	  add_func_label($addr, $name);
+	  add_func_label($addr, $name, TRUE);
 	  }
 	else
 	  {
-	  add_jump_label($addr, $name, BL_TYPE_LABEL, EMPTY);
+	  add_jump_label($addr, $name, BL_TYPE_LABEL, EMPTY, TRUE);
 	  }
 	}
       } # elsif ($state == MAP_CODE0 || $state == MAP_CODE1)
@@ -1243,14 +1253,14 @@ sub label_finder($$)
         # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 0 0 0 0 1	a7-a0
 
     $addr = (($Address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $rom[$Address + 1];
-    add_jump_label($addr, '', BL_TYPE_LABEL, $Address);
+    add_jump_label($addr, '', BL_TYPE_LABEL, $Address, FALSE);
     }
   elsif ($instr_mask0 == 0x11)
     {
 	# ACALL	addr11			aaa10001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
 
     $addr = (($Address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $rom[$Address + 1];
-    add_func_label($addr, '');
+    add_func_label($addr, '', FALSE);
     }
   elsif ($instr_mask1 == 0xB6 || $instr_mask2 == 0xB8)
     {
@@ -1258,28 +1268,28 @@ sub label_finder($$)
 	# CJNE	Rn, #data, rel		10111rrr dddddddd rrrrrrrr	R0 .. R7 	data		relative address
 
     $addr = $Address + $instr_size + expand_offset($rom[$Address + 2]);
-    add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY);
+    add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY, FALSE);
     }
   elsif ($instr_mask2 == 0xD8)
     {
 	# DJNZ	Rn, rel			11011rrr rrrrrrrr		R0 .. R7	relative address
 
     $addr = $Address + $instr_size + expand_offset($rom[$Address + 1]);
-    add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY);
+    add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY, FALSE);
     }
   elsif ($instr == 0x02)
     {
 	# LJMP	addr16			00000010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
     $addr = ($rom[$Address + 1] << 8) | $rom[$Address + 2];
-    add_jump_label($addr, '', BL_TYPE_LABEL, $Address);
+    add_jump_label($addr, '', BL_TYPE_LABEL, $Address, FALSE);
     }
   elsif ($instr == 0x12)
     {
 	# LCALL	addr16			00010010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
     $addr = ($rom[$Address + 1] << 8) | $rom[$Address + 2];
-    add_func_label($addr, '');
+    add_func_label($addr, '', FALSE);
     }
   elsif ($instr == 0x10 || $instr == 0x20 ||
 	 $instr == 0x30 || $instr == 0xB4 ||
@@ -1293,7 +1303,7 @@ sub label_finder($$)
 	# DJNZ	direct, rel		11010101 aaaaaaaa rrrrrrrr	register address	relative address
 
     $addr = $Address + $instr_size + expand_offset($rom[$Address + 2]);
-    add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY);
+    add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY, FALSE);
     }
   elsif ($instr == 0x40 || $instr == 0x50 ||
 	 $instr == 0x60 || $instr == 0x70 ||
@@ -1306,7 +1316,7 @@ sub label_finder($$)
 	# SJMP	rel			10000000 rrrrrrrr		relative address
 
     $addr = $Address + $instr_size + expand_offset($rom[$Address + 1]);
-    add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY);
+    add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY, FALSE);
     }
   }
 
@@ -2771,7 +2781,7 @@ sub jmp_A_DPTR()
 
   if ($DPTR != EMPTY)
     {
-    add_jump_label($DPTR, '', BL_TYPE_JTABLE, EMPTY);
+    add_jump_label($DPTR, '', BL_TYPE_JTABLE, EMPTY, FALSE);
     $str0 = jump_direction($DPTR);
     }
   else
@@ -2960,7 +2970,7 @@ sub movc_A_A_DPTR()
   {
 	# MOVC	A, @A+DPTR		10010011
 
-  add_jump_label($DPTR, '', BL_TYPE_LABEL, EMPTY) if ($DPTR != EMPTY);
+  add_jump_label($DPTR, '', BL_TYPE_LABEL, EMPTY, FALSE) if ($DPTR != EMPTY);
 
   print_3('movc', 'A, @A+DPTR', 'ACC = ROM[DPTR + ACC]');
   }
@@ -3734,7 +3744,8 @@ sub instruction_decoder($$)
     }
   else
     {
-    print "\t" if ($decoder_silent_level == SILENT0);
+    print STDERR "Internal error: The size of intruction (addr:0x%04X) is zero!", $dcd_address;
+    exit(1);
     }
 
   $dcd_Ri_regs = $dcd_instr & 0x01;
@@ -4443,11 +4454,11 @@ sub print_constants($$)
 
   $prev_is_jump = FALSE;
 
-  $col = ($gen_assembly_code) ? '     ' : '    ';
+  $col = ($gen_assembly_code) ? '      ' : '    ';
 
   if ($gen_assembly_code)
     {
-    print ";$table_border\n;\t\t$table_header |\n;$table_border\n";
+    print ";$table_border\n;\t\t$table_header  |\n;$table_border\n";
     }
   else
     {
@@ -4488,9 +4499,9 @@ sub print_constants($$)
     if ($gen_assembly_code)
       {
       print $left_align .
-	    join(' ', map {
-			  $spc = (--$len) ? ', ' : '';
-			  sprintf((($hex_constant || $_ < ord(' ') || $_ >= 0x7F) ? "%02X$spc" : "'%c'"), $_);
+	    join(', ', map {
+			  $spc = (--$len) ? ' ' : '';
+			  sprintf((($hex_constant || $_ < ord(' ') || $_ >= 0x7F) ? "0x%02X" : "'%c'$spc"), $_);
 			  } @line) . "\n";
       }
     else
@@ -4524,8 +4535,8 @@ sub disassembler()
 
   if ($gen_assembly_code)
     {
-    $table_header = join('   ', map { sprintf '%02X', $_ } (0 .. (TBL_COLUMNS - 1)));
-    $table_border = ('-' x (TBL_COLUMNS * 5 + 13)) . '+';
+    $table_header = join('    ', map { sprintf '%02X', $_ } (0 .. (TBL_COLUMNS - 1)));
+    $table_border = ('-' x (TBL_COLUMNS * 6 + 13)) . '+';
     }
   else
     {

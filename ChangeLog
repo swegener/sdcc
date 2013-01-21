@@ -1,3 +1,7 @@
+2013-01-21 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl: Bugfix and more proposal for use.
+
 2013-01-20 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Additional informations about direction

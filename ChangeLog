@@ -1,3 +1,9 @@
+2013-01-23 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl:
+	  New feature in "Public labels" section: (calls: ..., jumps: ...)
+	  ("number of calls" and "number of jumps")
+
 2013-01-21 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Bugfix and more proposal for use.

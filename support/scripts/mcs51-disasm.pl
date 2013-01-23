@@ -106,7 +106,7 @@ my %xram_by_address	 = ();
 my $stack_start		 = -1;
 my $stack_size		 = 0;
 
-my %variables_by_address      = ();
+my %variable_names_by_address = ();
 my %variable_sizes_by_address = ();
 my $max_variable_addr = 0;
 
@@ -163,9 +163,11 @@ use constant TBL_COLUMNS => 8;
 	TYPE  => 0,
 	SIZE  => 0,
 	LABEL => {
-		 TYPE    => 0,
-		 NAME    => '',
-		 PRINTED => FALSE
+		 TYPE       => 0,
+		 NAME       => '',
+		 PRINTED    => FALSE,
+		 CALL_COUNT => 0,
+		 JUMP_COUNT => 0
 		 }
 	}
 =cut
@@ -180,12 +182,12 @@ use constant BL_TYPE_LABEL  =>  1;
 use constant BL_TYPE_JTABLE =>  2;
 use constant BL_TYPE_CONST  =>  3;
 
-my @label_names =
+my %label_names =
   (
-  'Function_',
-  'Label_',
-  'Jumptable_',
-  'Constant_'
+  eval BL_TYPE_SUB    => 'Function_',
+  eval BL_TYPE_LABEL  => 'Label_',
+  eval BL_TYPE_JTABLE => 'Jumptable_',
+  eval BL_TYPE_CONST  => 'Constant_'
   );
 
 my %empty_blocks_by_address = ();
@@ -704,9 +706,11 @@ sub add_block($$$$$)
   if (! defined($blocks_by_address{$Address}))
     {
     $label = {
-	     TYPE    => $LabelType,
-	     NAME    => $LabelName,
-	     PRINTED => FALSE
+	     TYPE       => $LabelType,
+	     NAME       => $LabelName,
+	     PRINTED    => FALSE,
+	     CALL_COUNT => 0,
+	     JUMP_COUNT => 0
 	     };
 
     $blocks_by_address{$Address} = {
@@ -783,6 +787,8 @@ sub add_block($$$$$)
       $empty_blocks_by_address{$Address} = ($Address + $Size - 1) if ($Size > 0);
       }
     }
+
+  return $label;
   }
 
 #-------------------------------------------------------------------------------
@@ -794,6 +800,7 @@ sub add_block($$$$$)
 sub add_func_label($$$)
   {
   my ($Address, $Name, $Map_mode) = @_;
+  my $label;
 
   if ($Address < 0)
     {
@@ -816,7 +823,8 @@ sub add_func_label($$$)
     return;
     }
 
-  add_block($Address, BLOCK_INSTR, 0, BL_TYPE_SUB, $Name);
+  $label = add_block($Address, BLOCK_INSTR, 0, BL_TYPE_SUB, $Name);
+  ++$label->{CALL_COUNT} if (! $Map_mode);
   }
 
 #-------------------------------------------------------------------------------
@@ -828,7 +836,7 @@ sub add_func_label($$$)
 sub add_jump_label($$$$$)
   {
   my ($TargetAddr, $Name, $Type, $SourceAddr, $Map_mode) = @_;
-  my $type;
+  my ($label, $type);
 
   if ($TargetAddr < 0)
     {
@@ -857,7 +865,8 @@ sub add_jump_label($$$$$)
     $Name = $interrupts_by_address{$SourceAddr} if ($Name eq '');
     }
 
-  add_block($TargetAddr, BLOCK_INSTR, 0, $Type, $Name);
+  $label = add_block($TargetAddr, BLOCK_INSTR, 0, $Type, $Name);
+  ++$label->{JUMP_COUNT} if (! $Map_mode);
   }
 
 ################################################################################
@@ -997,9 +1006,9 @@ sub read_map_file()
 
 	($addr, $name) = (hex($1), $2);
 
-	if (! defined($variables_by_address{$addr}))
+	if (! defined($variable_names_by_address{$addr}))
 	  {
-	  $variables_by_address{$addr}      = $name;
+	  $variable_names_by_address{$addr}      = $name;
 	  $variable_sizes_by_address{$addr} = 1;
 	  }
 
@@ -1029,7 +1038,7 @@ sub fix_multi_byte_variables()
   my $prev_name = '';
   my ($i, $var_size);
 
-  foreach (sort {$a <=> $b} keys(%variables_by_address))
+  foreach (sort {$a <=> $b} keys(%variable_names_by_address))
     {
     if ($prev_addr > EMPTY)
       {
@@ -1041,7 +1050,7 @@ sub fix_multi_byte_variables()
 
 	for ($i = 1; $i < $var_size; ++$i)
 	  {
-	  $variables_by_address{$prev_addr + $i} = "($prev_name + $i)";
+	  $variable_names_by_address{$prev_addr + $i} = "($prev_name + $i)";
 	  }
 
 	$variable_sizes_by_address{$prev_addr} = $var_size;
@@ -1049,7 +1058,7 @@ sub fix_multi_byte_variables()
       }
 
     $prev_addr = $_;
-    $prev_name = $variables_by_address{$_};
+    $prev_name = $variable_names_by_address{$_};
     }
   }
 
@@ -1080,19 +1089,19 @@ sub add_names_labels()
 
     if ($type == BL_TYPE_SUB)
       {
-      $label->{NAME} = sprintf("%s%03u", $label_names[$type], $fidx++);
+      $label->{NAME} = sprintf("$label_names{$type}%03u", $fidx++);
       }
     elsif ($type == BL_TYPE_LABEL)
       {
-      $label->{NAME} = sprintf("%s%03u", $label_names[$type], $lidx++);
+      $label->{NAME} = sprintf("$label_names{$type}%03u", $lidx++);
       }
     elsif ($type == BL_TYPE_JTABLE)
       {
-      $label->{NAME} = sprintf("%s%03u", $label_names[$type], $jidx++);
+      $label->{NAME} = sprintf("$label_names{$type}%03u", $jidx++);
       }
     elsif ($type == BL_TYPE_CONST)
       {
-      $label->{NAME} = sprintf("%s%03u", $label_names[$type], $cidx++);
+      $label->{NAME} = sprintf("$label_names{$type}%03u", $cidx++);
       }
     }
   }
@@ -1342,9 +1351,9 @@ sub regname($$)
     $str = ($gen_assembly_code) ? sprintf("0x%02X", $Address) : "R${reg}<#$bank>";
     $$StrRef = $str;
 
-    if (defined($variables_by_address{$Address}))
+    if (defined($variable_names_by_address{$Address}))
       {
-      my $var = $variables_by_address{$Address};
+      my $var = $variable_names_by_address{$Address};
 
       printf STDERR ("This address (0x%02X) belongs to two names: \"$str\" and \"$var\"\n", $Address);
       }
@@ -1354,11 +1363,11 @@ sub regname($$)
     $str = $sfrs_by_address{$Address};
     $$StrRef = $str;
     }
-  elsif (defined($variables_by_address{$Address}))
+  elsif (defined($variable_names_by_address{$Address}))
     {
     $str = sprintf "0x%02X", $Address;
     $$StrRef = "[$str]";
-    $str = $variables_by_address{$Address};
+    $str = $variable_names_by_address{$Address};
     }
   else
     {
@@ -4128,7 +4137,10 @@ sub emit_globals($)
 
       next if ($label->{TYPE} != BL_TYPE_SUB);
 
-      printf "0x%04X:\t$label->{NAME}\n", $_;
+      my $str = sprintf "0x%04X", $_;
+      my $cnt1 = sprintf "%3u", $label->{CALL_COUNT};
+      my $cnt2 = sprintf "%3u", $label->{JUMP_COUNT};
+      print "$str:\t" . align($label->{NAME}, ALIGN_SIZE) . "(calls: $cnt1, jumps: $cnt2)\n";
       }
     }
 
@@ -4279,7 +4291,7 @@ sub emit_ram_data($)
 
       if (defined($size))
 	{
-	print "$variables_by_address{$_}::\n\t.ds $size\n";
+	print "$variable_names_by_address{$_}::\n\t.ds $size\n";
 	$next_addr = $_ + $size;
 	}
       else
@@ -4301,7 +4313,7 @@ sub emit_ram_data($)
 
       if (defined($size))
 	{
-	printf "0x%02X:\t$variables_by_address{$_}\t(%u bytes)\n", $_, $size;
+	printf "0x%02X:\t$variable_names_by_address{$_}\t(%u bytes)\n", $_, $size;
 	}
       else
 	{

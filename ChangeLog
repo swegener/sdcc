@@ -1,3 +1,7 @@
+2013-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl: New command option: --find-lost-labels
+
 2013-01-23 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl:

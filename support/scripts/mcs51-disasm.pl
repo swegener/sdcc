@@ -80,15 +80,17 @@ my @default_paths =
   );
 
 my $default_include_path = '';
-my $include_path = '';
-my $hex_file = '';
-my $map_file = '';
-my $header_file = '';
+my $include_path	 = '';
+my $hex_file		 = '';
+my $map_file 		 = '';
+my $map_readed		 = FALSE;
+my $header_file		 = '';
 
 my $verbose           = 0;
 my $hex_constant      = FALSE;
 my $gen_assembly_code = FALSE;
 my $no_explanations   = FALSE;
+my $find_lost_labels  = FALSE;
 
 my @rom = ();
 my $rom_size = MCS51_ROM_SIZE;
@@ -139,7 +141,12 @@ use constant DPL => 0x82;
 use constant DPH => 0x83;
 use constant PSW => 0xD0;
 
-use constant MOV_DIRECT_DATA => 0x75;
+use constant INST_AJMP => 0x01;
+use constant INST_LJMP => 0x02;
+use constant INST_SJMP => 0x80;
+use constant INST_RET  => 0x22;
+use constant INST_RETI => 0x32;
+
 use constant LJMP_SIZE => 3;
 
 my $DPTR;
@@ -153,8 +160,9 @@ use constant SILENT2 => 2;
 
 my $decoder_silent_level;
 
-use constant ALIGN_SIZE  => 5;
-use constant TBL_COLUMNS => 8;
+use constant EXPL_ALIGN_SIZE => 5;
+use constant STAT_ALIGN_SIZE => 6;
+use constant TBL_COLUMNS     => 8;
 
 =back
 	The structure of one element of the %blocks_by_address hash:
@@ -1021,6 +1029,7 @@ sub read_map_file()
       }
     } # while (<MAP>)
 
+  $map_readed = TRUE;
   close(MAP);
   }
 
@@ -1435,7 +1444,7 @@ sub print_3($$$)
     }
   else
     {
-    print "$_[0]\t" . align($_[1], ALIGN_SIZE) . "; $_[2]\n";
+    print "$_[0]\t" . align($_[1], EXPL_ALIGN_SIZE) . "; $_[2]\n";
     }
   }
 
@@ -4107,6 +4116,49 @@ sub find_labels_in_code()
 #-------------------------------------------------------------------------------
 
 	#
+	# Finds lost address of branchs and procedures.
+	#
+
+sub find_lost_labels_in_code()
+  {
+  my ($block, $prev_block, $prev_addr, $label, $instr);
+
+  $prev_addr  = EMPTY;
+  $prev_block = undef;
+  foreach (sort {$a <=> $b} keys(%blocks_by_address))
+    {
+    $block = \%{$blocks_by_address{$_}};
+
+    next if ($block->{TYPE} != BLOCK_INSTR);
+
+    if ($prev_addr != EMPTY)
+      {
+      $instr = $rom[$prev_addr];
+      $label = $block->{LABEL};
+
+      if (defined($label) && $label->{TYPE} == BL_TYPE_NONE)
+	{
+	if ($instr == INST_RET || $instr == INST_RETI)
+	  {
+	  Log(sprintf("Lost function label at the 0x%04X address.", $_), 5);
+	  add_func_label($_, '', TRUE);
+	  }
+	elsif ($instr == INST_LJMP || $instr == INST_SJMP || ($instr & 0x1F) == INST_AJMP)
+	  {
+	  Log(sprintf("Lost jump label at the 0x%04X address.", $_), 5);
+	  add_jump_label($_, '', BL_TYPE_LABEL, EMPTY, TRUE);
+	  }
+	}
+      }
+
+    $prev_addr  = $_;
+    $prev_block = $block;
+    }
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
 	# Prints the global symbols.
 	#
 
@@ -4137,10 +4189,11 @@ sub emit_globals($)
 
       next if ($label->{TYPE} != BL_TYPE_SUB);
 
-      my $str = sprintf "0x%04X", $_;
+      my $str1 = sprintf "0x%04X", $_;
       my $cnt1 = sprintf "%3u", $label->{CALL_COUNT};
       my $cnt2 = sprintf "%3u", $label->{JUMP_COUNT};
-      print "$str:\t" . align($label->{NAME}, ALIGN_SIZE) . "(calls: $cnt1, jumps: $cnt2)\n";
+      my $str2 = ($label->{CALL_COUNT} || $label->{JUMP_COUNT}) ? "calls: $cnt1, jumps: $cnt2" : 'not used';
+      print "$str1:\t" . align($label->{NAME}, STAT_ALIGN_SIZE) . "($str2)\n";
       }
     }
 
@@ -4311,13 +4364,24 @@ sub emit_ram_data($)
 
       $size = $variable_sizes_by_address{$_};
 
+      my $str = sprintf "0x%02X", $_;
+
       if (defined($size))
 	{
-	printf "0x%02X:\t$variable_names_by_address{$_}\t(%u bytes)\n", $_, $size;
+        my $cnt = sprintf "%3u", $size;
+
+	print "$str:\t" . align($variable_names_by_address{$_}, STAT_ALIGN_SIZE) . "($cnt bytes)\n";
 	}
       else
 	{
-	printf "0x%02X:\tvariable_0x%02X\t(1 bytes)\n", $_, $_;
+	if ($map_readed)
+	  {
+	  print "$str:\t" . align("variable_$str", STAT_ALIGN_SIZE) . "(  1 bytes)\n";
+	  }
+	else
+	  {
+	  print "$str:\tvariable_$str\n";
+	  }
 	}
       }
     }
@@ -4470,11 +4534,11 @@ sub print_constants($$)
 
   if ($gen_assembly_code)
     {
-    print ";$table_border\n;\t\t$table_header  |\n;$table_border\n";
+    print ";$table_border\n;\t\t $table_header  |\n;$table_border\n";
     }
   else
     {
-    print "$table_border\n|          |  $table_header  |  $table_header   |\n$table_border\n";
+    print "$table_border\n|          |  $table_header  |  $table_header  |\n$table_border\n";
     }
 
   @constants = @rom[$Address .. ($Address + $size - 1)];
@@ -4514,7 +4578,7 @@ sub print_constants($$)
 	    join(', ', map {
 			  $spc = (--$len) ? ' ' : '';
 			  sprintf((($hex_constant || $_ < ord(' ') || $_ >= 0x7F) ? "0x%02X" : "'%c'$spc"), $_);
-			  } @line) . "\n";
+			  } @line) . "$right_align ;\n";
       }
     else
       {
@@ -4523,7 +4587,7 @@ sub print_constants($$)
       print "$right_align | $left_align " .
 	    join(' ', map {
 			  sprintf((($_ < ord(' ') || $_ >= 0x7F) ? "%02X " : "'%c'"), $_);
-			  } @line) . "$right_align  |\n";
+			  } @line) . "$right_align |\n";
       }
     } # while (TRUE)
 
@@ -4548,12 +4612,12 @@ sub disassembler()
   if ($gen_assembly_code)
     {
     $table_header = join('    ', map { sprintf '%02X', $_ } (0 .. (TBL_COLUMNS - 1)));
-    $table_border = ('-' x (TBL_COLUMNS * 6 + 13)) . '+';
+    $table_border = ('-' x (TBL_COLUMNS * 6 + 14)) . '+';
     }
   else
     {
     $table_header = join('  ', map { sprintf '%02X', $_ } (0 .. (TBL_COLUMNS - 1)));
-    $table_border = '+' . ('-' x 10) . '+' . ('-' x (TBL_COLUMNS * 4 + 2)) . '+' . ('-' x (TBL_COLUMNS * 4 + 3)) . '+';
+    $table_border = '+' . ('-' x 10) . '+' . ('-' x (TBL_COLUMNS * 4 + 2)) . '+' . ('-' x (TBL_COLUMNS * 4 + 2)) . '+';
     }
 
   invalidate_DPTR_Rx();
@@ -4697,6 +4761,11 @@ EOT
 	    visible address, hex codes and besides replaces the pseudo Rn<#x>
 	    register names.) Emits global symbol table, SFR table, Bits table, etc.
 
+	-fl|--find-lost-labels
+
+	    Finds the "lost" labels. These may be found such in program parts,
+	    which are directly not get call.
+
 	-ne|--no-explanations
 
 	    Eliminates after the instructions visible explaining texts.
@@ -4809,6 +4878,11 @@ for (my $i = 0; $i < @ARGV; )
       $gen_assembly_code = TRUE;
       }
 
+    when (/^-(fl|-find-lost-labels)$/o)
+      {
+      $find_lost_labels = TRUE;
+      }
+
     when (/^-(ne|-no-explanations)$/o)
       {
       $no_explanations = TRUE;
@@ -4878,6 +4952,7 @@ split_code_to_blocks();
 preliminary_survey(SILENT2);
 preliminary_survey(SILENT1);
 find_labels_in_code();
+find_lost_labels_in_code() if ($find_lost_labels);
 add_names_labels();
 disassembler();
 print_hidden_labels() if ($verbose > 2);

@@ -27,11 +27,11 @@
     This program disassembles the hex files. It assumes that the hex file
     contains MCS51 instructions.
 
-    Proposal for use: ./mcs51-disasm.pl -M 8052.h program.hex > program.dasm
+    Proposal for use: ./mcs51-disasm.pl -M 8052.h -fl -rj program.hex > program.dasm
 
-	or	./mcs51-disasm.pl -M 8052.h -as program.hex > program.asm
+	or	./mcs51-disasm.pl -M 8052.h -fl -rj -as program.hex > program.asm
 
-	or	./mcs51-disasm.pl -M 8052.h -as -hc program.hex > program.asm
+	or	./mcs51-disasm.pl -M 8052.h -fl -rj -as -hc program.hex > program.asm
 
   $Id$
 =cut
@@ -86,11 +86,12 @@ my $map_file 		 = '';
 my $map_readed		 = FALSE;
 my $header_file		 = '';
 
-my $verbose           = 0;
-my $hex_constant      = FALSE;
-my $gen_assembly_code = FALSE;
-my $no_explanations   = FALSE;
-my $find_lost_labels  = FALSE;
+my $verbose		  = 0;
+my $hex_constant	  = FALSE;
+my $gen_assembly_code	  = FALSE;
+my $no_explanations	  = FALSE;
+my $recognize_jump_tables = FALSE;
+my $find_lost_labels	  = FALSE;
 
 my @rom = ();
 my $rom_size = MCS51_ROM_SIZE;
@@ -141,11 +142,18 @@ use constant DPL => 0x82;
 use constant DPH => 0x83;
 use constant PSW => 0xD0;
 
-use constant INST_AJMP => 0x01;
-use constant INST_LJMP => 0x02;
-use constant INST_SJMP => 0x80;
-use constant INST_RET  => 0x22;
-use constant INST_RETI => 0x32;
+use constant INST_AJMP		=> 0x01;
+use constant INST_LJMP		=> 0x02;
+use constant INST_SJMP		=> 0x80;
+use constant INST_RET		=> 0x22;
+use constant INST_RETI		=> 0x32;
+use constant INST_ADD_A_DATA	=> 0x24;
+use constant INST_JMP_A_DPTR	=> 0x73;
+use constant INST_MOVC_A_APC	=> 0x83;
+use constant INST_CLR_A		=> 0xE4;
+use constant INST_MOV_A_DIRECT	=> 0xE5;
+use constant INST_MOV_A_Rn	=> 0xE8;
+use constant INST_MOV_DIRECT_A	=> 0xF5;
 
 use constant LJMP_SIZE => 3;
 
@@ -169,6 +177,7 @@ use constant TBL_COLUMNS     => 8;
 
 	{
 	TYPE  => 0,
+	ADDR  => 0,
 	SIZE  => 0,
 	LABEL => {
 		 TYPE       => 0,
@@ -180,21 +189,25 @@ use constant TBL_COLUMNS     => 8;
 	}
 =cut
 
-use constant BLOCK_INSTR => 0;
-use constant BLOCK_CONST => 1;
-use constant BLOCK_EMPTY => 2;
+use constant BLOCK_INSTR    => 0;
+use constant BLOCK_CONST    => 1;
+use constant BLOCK_JTABLE   => 1;
+use constant BLOCK_EMPTY    => 2;
+use constant BLOCK_DISABLED => 3;
 
 use constant BL_TYPE_NONE   => -1;
 use constant BL_TYPE_SUB    =>  0;
 use constant BL_TYPE_LABEL  =>  1;
 use constant BL_TYPE_JTABLE =>  2;
-use constant BL_TYPE_CONST  =>  3;
+use constant BL_TYPE_JLABEL =>  3;
+use constant BL_TYPE_CONST  =>  4;
 
 my %label_names =
   (
   eval BL_TYPE_SUB    => 'Function_',
   eval BL_TYPE_LABEL  => 'Label_',
   eval BL_TYPE_JTABLE => 'Jumptable_',
+  eval BL_TYPE_JLABEL => 'JTlabel_',
   eval BL_TYPE_CONST  => 'Constant_'
   );
 
@@ -723,6 +736,7 @@ sub add_block($$$$$)
 
     $blocks_by_address{$Address} = {
 				   TYPE  => $Type,
+				   ADDR  => $Address,
 				   SIZE  => $Size,
 				   LABEL => $label
 				   };
@@ -780,6 +794,7 @@ sub add_block($$$$$)
       {
       if ($LabelType != BL_TYPE_NONE)
 	{
+	$label->{TYPE} = $LabelType;
 	$labels_by_address{$Address} = $label;
 	$max_label_addr = $Address if ($max_label_addr < $Address);
 	}
@@ -1079,11 +1094,12 @@ sub fix_multi_byte_variables()
 
 sub add_names_labels()
   {
-  my ($addr, $label, $fidx, $lidx, $jidx, $cidx, $type);
+  my ($addr, $label, $fidx, $lidx, $jidx, $jtidx, $cidx, $type);
 
   $fidx = 0;
   $lidx = 0;
   $jidx = 0;
+  $jtidx = 0;
   $cidx = 0;
 
   for ($addr = 0; $addr <= $max_label_addr; ++$addr)
@@ -1107,6 +1123,10 @@ sub add_names_labels()
     elsif ($type == BL_TYPE_JTABLE)
       {
       $label->{NAME} = sprintf("$label_names{$type}%03u", $jidx++);
+      }
+    elsif ($type == BL_TYPE_JLABEL)
+      {
+      $label->{NAME} = sprintf("$label_names{$type}%03u", $jtidx++);
       }
     elsif ($type == BL_TYPE_CONST)
       {
@@ -4159,6 +4179,119 @@ sub find_lost_labels_in_code()
 #-------------------------------------------------------------------------------
 
 	#
+	# Turns off the has become redundant blocks.
+	#
+
+sub disable_instruction_blocks($$)
+  {
+  my ($Start, $End) = @_;
+
+  foreach (sort {$a <=> $b} keys(%blocks_by_address))
+    {
+    next if ($Start > $_);
+    last if ($End < $_);
+
+    $blocks_by_address{$_}->{TYPE} = BLOCK_DISABLED;
+    }
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
+	# Adds the jump addresses from a jump table.
+	#
+
+sub add_jump_address_in_table($$$)
+  {
+  my ($AddrLow, $AddrHigh, $Size) = @_;
+  my ($end, $addr);
+
+  $end = $AddrLow + $Size;
+  while ($AddrLow < $end)
+    {
+    $addr = $rom[$AddrLow] | ($rom[$AddrHigh] << 8);
+    add_jump_label($addr, '', BL_TYPE_JLABEL, EMPTY, FALSE);
+    ++$AddrLow;
+    ++$AddrHigh;
+    }
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
+	# Jump tables looking for in the code.
+	#
+
+sub recognize_jump_tables_in_code()
+  {
+  my @blocks = ((undef) x 9);
+  my @instrs = ((EMPTY) x 9);
+  my ($parm, $data1, $data2, $addrL, $addrH, $size);
+
+  foreach (sort {$a <=> $b} keys(%blocks_by_address))
+    {
+    shift(@instrs);
+    push(@instrs, $rom[$_]);
+
+    shift(@blocks);
+    push(@blocks, \%{$blocks_by_address{$_}});
+
+    next if (! defined($blocks[0]) || ! defined($blocks[8]));
+    next if ($blocks[0]->{TYPE} != BLOCK_INSTR);
+    next if ($blocks[1]->{TYPE} != BLOCK_INSTR);
+    next if ($blocks[2]->{TYPE} != BLOCK_INSTR);
+    next if ($blocks[3]->{TYPE} != BLOCK_INSTR);
+    next if ($blocks[4]->{TYPE} != BLOCK_INSTR);
+    next if ($blocks[5]->{TYPE} != BLOCK_INSTR);
+    next if ($blocks[6]->{TYPE} != BLOCK_INSTR);
+    next if ($blocks[7]->{TYPE} != BLOCK_INSTR);
+    next if ($blocks[8]->{TYPE} != BLOCK_INSTR);
+
+=back
+
+0x0109: 24 0B		add	A, #0x0B				; ACC += 0x0B
+0x010B: 83		movc	A, @A+PC				; ACC = ROM[PC + 1 + ACC]
+0x010C: F5 82		mov	DPL, A					; DPL = ACC
+
+0x010E: E5 F0		mov	A, B					; ACC = B
+0x010E: ED		mov	A, R5					; ACC = R5
+
+0x0110: 24 25		add	A, #0x25				; ACC += 0x25 ('%')
+0x0112: 83		movc	A, @A+PC				; ACC = ROM[PC + 1 + ACC]
+0x0113: F5 83		mov	DPH, A					; DPH = ACC
+0x0115: E4		clr	A					; ACC = 0
+0x0116: 73		jmp	@A+DPTR					; Jumps hither: [DPTR + ACC]
+
+=cut
+
+    next if ($blocks[0]->{SIZE} != 2 || $instrs[0] != INST_ADD_A_DATA);		# add	A, #0xZZ
+    next if ($blocks[1]->{SIZE} != 1 || $instrs[1] != INST_MOVC_A_APC);		# movc	A, @A+PC
+    next if ($blocks[2]->{SIZE} != 2 || $instrs[2] != INST_MOV_DIRECT_A);	# mov	DPL, A
+    next if ($rom[$blocks[2]->{ADDR} + 1] != DPL);
+    next if (($blocks[3]->{SIZE} != 2 || $instrs[3] != INST_MOV_A_DIRECT) &&	# mov	A, direct
+	     ($blocks[3]->{SIZE} != 1 || ($instrs[3] & 0xF8) != INST_MOV_A_Rn)); # mov	A, Rn
+
+    next if ($blocks[4]->{SIZE} != 2 || $instrs[4] != INST_ADD_A_DATA);		# add	A, #0xZZ
+    next if ($blocks[5]->{SIZE} != 1 || $instrs[5] != INST_MOVC_A_APC);		# movc	A, @A+PC
+    next if ($blocks[6]->{SIZE} != 2 || $instrs[6] != INST_MOV_DIRECT_A);	# mov	DPH, A
+    next if ($rom[$blocks[6]->{ADDR} + 1] != DPH);
+    next if ($blocks[7]->{SIZE} != 1 || $instrs[7] != INST_CLR_A);		# clr	A
+    next if ($blocks[8]->{SIZE} != 1 || $instrs[8] != INST_JMP_A_DPTR);		# jmp	@A+DPTR
+
+    $addrL = $blocks[2]->{ADDR} + $rom[$blocks[0]->{ADDR} + 1];
+    $addrH = $blocks[6]->{ADDR} + $rom[$blocks[4]->{ADDR} + 1];
+    $size  = $addrH - $addrL;
+
+    disable_instruction_blocks($addrL, $addrH + $size - 1);
+    add_block($addrL, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+    add_block($addrH, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+    add_jump_address_in_table($addrL, $addrH, $size);
+    }
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
 	# Prints the global symbols.
 	#
 
@@ -4520,13 +4653,15 @@ sub print_constants($$)
   {
   my ($Address, $BlockRef) = @_;
   my ($size, $i, $len, $frag, $byte, $spc, $col);
-  my ($left_align, $right_align);
+  my ($left_align, $right_align, $hc);
   my @constants;
   my @line;
 
   $size = $BlockRef->{SIZE};
 
   return if (! $size);
+
+  $hc = ($BlockRef->{TYPE} == BLOCK_JTABLE) || $hex_constant;
 
   $prev_is_jump = FALSE;
 
@@ -4576,9 +4711,8 @@ sub print_constants($$)
       {
       print $left_align .
 	    join(', ', map {
-			  $spc = (--$len) ? ' ' : '';
-			  sprintf((($hex_constant || $_ < ord(' ') || $_ >= 0x7F) ? "0x%02X" : "'%c'$spc"), $_);
-			  } @line) . "$right_align ;\n";
+			   sprintf((($hc || $_ < ord(' ') || $_ >= 0x7F) ? "0x%02X" : "'%c' "), $_);
+			   } @line) . "$right_align ;\n";
       }
     else
       {
@@ -4673,7 +4807,7 @@ sub disassembler()
 
       instruction_decoder($_, $ref);
       }
-    elsif ($ref->{TYPE} == BLOCK_CONST)
+    elsif ($ref->{TYPE} == BLOCK_CONST || $ref->{TYPE} == BLOCK_JTABLE)
       {
       print_label($_);
       print "\n" if ($prev_is_jump);
@@ -4760,6 +4894,10 @@ EOT
 	    Generates the assembly source file. (Eliminates before the instructions
 	    visible address, hex codes and besides replaces the pseudo Rn<#x>
 	    register names.) Emits global symbol table, SFR table, Bits table, etc.
+
+	-rj|--recognize-jump-tables
+
+	    Recognizes the jump tables.
 
 	-fl|--find-lost-labels
 
@@ -4878,6 +5016,11 @@ for (my $i = 0; $i < @ARGV; )
       $gen_assembly_code = TRUE;
       }
 
+    when (/^-(rj|-recognize-jump-tables)$/o)
+      {
+      $recognize_jump_tables = TRUE;
+      }
+
     when (/^-(fl|-find-lost-labels)$/o)
       {
       $find_lost_labels = TRUE;
@@ -4952,6 +5095,7 @@ split_code_to_blocks();
 preliminary_survey(SILENT2);
 preliminary_survey(SILENT1);
 find_labels_in_code();
+recognize_jump_tables_in_code() if ($recognize_jump_tables);
 find_lost_labels_in_code() if ($find_lost_labels);
 add_names_labels();
 disassembler();

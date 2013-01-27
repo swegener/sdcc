@@ -103,6 +103,7 @@ my %sfrs_by_address	 = ();
 my %sfrs_by_names	 = ();
 my %used_banks		 = ();
 my %registers_by_address = ();
+my %sfr_bits_by_address	 = ();
 my %bits_by_address	 = ();
 my %iram_by_address	 = ();
 my %xram_by_address	 = ();
@@ -136,6 +137,7 @@ my @instruction_sizes =
   );
 
 use constant BANK_LAST_ADDR => 0x1F;
+use constant BIT_LAST_ADDR  => 0x7F;
 
 use constant SP  => 0x81;
 use constant DPL => 0x82;
@@ -150,6 +152,7 @@ use constant INST_RET			=> 0x22;
 use constant INST_RETI			=> 0x32;
 use constant INST_ADD_A_DATA		=> 0x24;
 use constant INST_JMP_A_DPTR		=> 0x73;
+use constant INST_MOV_DIRECT_DATA	=> 0x75;
 use constant INST_MOVC_A_APC		=> 0x83;
 use constant INST_MOV_DIRECT_DIRECT	=> 0x85;
 use constant INST_MOV_DPTR_DATA 	=> 0x90;
@@ -1426,9 +1429,9 @@ sub bitname($$)
   my ($Address, $StrRef) = @_;
   my $str;
 
-  if (defined($bits_by_address{$Address}))
+  if (defined($sfr_bits_by_address{$Address}))
     {
-    $str = $bits_by_address{$Address};
+    $str = $sfr_bits_by_address{$Address};
     $$StrRef = $str;
     }
   else
@@ -2292,6 +2295,7 @@ sub jbc_bit()
     print_3('jbc', "$rb0, $rb1", "If ($name0 == H) then $name0 = L and jumps$str1 hither: $str0");
     }
 
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   invalidate_DPTR_Rx();
   $prev_is_jump = TRUE;
   }
@@ -2371,6 +2375,7 @@ sub jb_bit()
     print_3('jb', "$rb0, $rb1", "If ($name0 == H) then jumps$str2 hither: $str1$str0");
     }
 
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   invalidate_DPTR_Rx();
   $prev_is_jump = TRUE;
   }
@@ -2447,6 +2452,7 @@ sub jnb_bit()
     print_3('jnb', "$rb0, $rb1", "If ($name0 == L) then jumps$str2 hither: $str1$str0");
     }
 
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   invalidate_DPTR_Rx();
   $prev_is_jump = TRUE;
   }
@@ -2830,6 +2836,8 @@ sub orl_C_bit()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('orl', "C, $rb0", "CY |= $name0");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -2897,10 +2905,6 @@ sub mov_direct_data()
       $str0 = " (select bank #$bank)" if (($dcd_parm1 & ~0x18) == 0x00);
       }
     }
-  elsif ($dcd_parm0 == SP)
-    {
-    $stack_start = $dcd_parm1 + 1;
-    }
   else
     {
     $str0 = present_char($dcd_parm1);
@@ -2950,6 +2954,8 @@ sub anl_C_bit()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('anl', "C, $rb0", "CY &= $name0");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -3022,6 +3028,8 @@ sub mov_bit_C()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('mov', "$rb0, C", "$name0 = CY");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -3081,6 +3089,8 @@ sub orl_C__bit()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('orl', "C, /$rb0", "CY = ~$name0");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -3096,6 +3106,8 @@ sub mov_C_bit()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('mov', "C, $rb0", "CY = $name0");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -3158,6 +3170,8 @@ sub anl_C__bit()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('anl', "C, /$rb0", "CY &= ~$name0");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -3173,6 +3187,8 @@ sub cpl_bit()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('cpl', $rb0, "$name0 = ~$name0");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -3260,6 +3276,8 @@ sub clr_bit()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('clr', $rb0, "$name0 = L");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -3329,6 +3347,8 @@ sub setb_bit()
     $rb0 = bitname($dcd_parm0, \$name0);
     print_3('setb', $rb0, "$name0 = H");
     }
+
+  $bits_by_address{$dcd_parm0} = TRUE if ($dcd_parm0 <= BIT_LAST_ADDR);
   }
 
 #-------------------------------------------------------------------------------
@@ -3861,13 +3881,13 @@ sub bit_add_to_list($$)
   {
   my ($Address, $Name) = @_;
 
-  if (! defined($bits_by_address{$Address}))
+  if (! defined($sfr_bits_by_address{$Address}))
     {
-    $bits_by_address{$Address} = $Name;
+    $sfr_bits_by_address{$Address} = $Name;
     }
   else
     {
-    Log(sprintf("Warning, the address: 0x%03X already busy by the $bits_by_address{$Address} bit.", $Address), 2);
+    Log(sprintf("Warning, the address: 0x%03X already busy by the $sfr_bits_by_address{$Address} bit.", $Address), 2);
     }
   }
 
@@ -4135,6 +4155,58 @@ sub preliminary_survey($)
 
     instruction_decoder($_, $block);
     }
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
+	# Determine the start of stack.
+	#
+
+sub determine_stack()
+  {
+  my ($block, $instr, $addr);
+
+  return if (! defined($blocks_by_address{0}));
+
+  $block = \%{$blocks_by_address{0}};
+  return if ($block->{TYPE} != BLOCK_INSTR);
+
+  $instr = $rom[$block->{ADDR}];
+
+  if ($block->{SIZE} == 3 && $instr == INST_LJMP)
+    {
+	# ljmp	#0xTTTT
+
+    $addr = ($rom[$block->{ADDR} + 1] << 8) | $rom[$block->{ADDR} + 2];
+    }
+  elsif ($block->{SIZE} == 2 && ($instr & 0x1F) == INST_AJMP)
+    {
+	# ajmp	#0xTTTT
+
+    $addr = (($block->{ADDR} + 2) & 0xF800) | ((($instr & 0xE0) << 3) | $rom[$block->{ADDR} + 1]);
+    }
+  elsif ($block->{SIZE} == 2 && $instr == INST_SJMP)
+    {
+	# sjmp	#0xTTTT
+
+    $addr = $block->{ADDR} + 2 + expand_offset($rom[$block->{ADDR} + 1]);
+    }
+  else
+    {
+    return;
+    }
+
+  return if (! defined($blocks_by_address{$addr}));
+
+  $block = \%{$blocks_by_address{$addr}};
+  return if ($block->{TYPE} != BLOCK_INSTR);
+
+  $instr = $rom[$block->{ADDR}];
+  return if ($block->{SIZE} != 3 || $instr != INST_MOV_DIRECT_DATA || $rom[$block->{ADDR} + 1] != SP);
+
+  $stack_start = $rom[$block->{ADDR} + 2] + 1;
+  $stack_size  = 0x100 - $stack_start;
   }
 
 #-------------------------------------------------------------------------------
@@ -4419,7 +4491,7 @@ sub emit_globals($)
 #-------------------------------------------------------------------------------
 
 	#
-	# Prints the sfrs.
+	# Prints the SFRs.
 	#
 
 sub emit_sfrs($)
@@ -4454,32 +4526,32 @@ sub emit_sfrs($)
 #-------------------------------------------------------------------------------
 
 	#
-	# Prints the bits.
+	# Prints the SFR bits.
 	#
 
-sub emit_bits($)
+sub emit_sfr_bits($)
   {
   my $Assembly_mode = $_[0];
 
-  return if (! scalar(keys(%bits_by_address)));
+  return if (! scalar(keys(%sfr_bits_by_address)));
 
   if ($Assembly_mode)
     {
     print ";$border0\n;\tSpecial function bits\n;$border0\n\n" .
 	  "\t.area\tRSEG\t(ABS,DATA)\n\t.org\t0x0000\n\n";
 
-    foreach (sort {$a <=> $b} keys(%bits_by_address))
+    foreach (sort {$a <=> $b} keys(%sfr_bits_by_address))
       {
-      printf "$bits_by_address{$_}\t=\t0x%02X\n", $_;
+      printf "$sfr_bits_by_address{$_}\t=\t0x%02X\n", $_;
       }
     }
   else
     {
     print ";$border0\n;\tSpecial function bits\n;$border0\n\n";
 
-    foreach (sort {$a <=> $b} keys(%bits_by_address))
+    foreach (sort {$a <=> $b} keys(%sfr_bits_by_address))
       {
-      printf "0x%02X:\t$bits_by_address{$_}\n", $_;
+      printf "0x%02X:\t$sfr_bits_by_address{$_}\n", $_;
       }
     }
 
@@ -4603,6 +4675,97 @@ sub emit_ram_data($)
     }
 
   print "\n";
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
+	# Prints the bits.
+	#
+
+sub emit_bits($)
+  {
+  my $Assembly_mode = $_[0];
+  my $str;
+
+  return if (! scalar(keys(%bits_by_address)));
+
+  if ($Assembly_mode)
+    {
+    print ";$border0\n;\tbit data\n;$border0\n\n" .
+	  "\t.area\tBSEG\t(BIT)\n\n";
+
+    foreach (sort {$a <=> $b} keys(%bits_by_address))
+      {
+      $str = sprintf "%02X", $_;
+      print "bit_0x${str}::\n\t.ds 1\n";
+      }
+    }
+  else
+    {
+    print ";$border0\n;\tbit data\n;$border0\n\n";
+
+    foreach (sort {$a <=> $b} keys(%bits_by_address))
+      {
+      $str = sprintf "%02X", $_;
+      print "0x${str}:\tbit_0x$str\n";
+      }
+    }
+
+  print "\n";
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
+	# Prints a map from the RAM.
+	#
+
+sub emit_ram_map()
+  {
+  my @ram = ();
+  my ($i, $v);
+
+  for ($i = 0; $i < 256; ++$i)
+    {
+    $ram[$i] = ((defined($registers_by_address{$i})) ? 'd' : ' ');
+    }
+
+  $used_banks{0} = TRUE;
+  foreach (sort {$a <=> $b} keys(%used_banks))
+    {
+    $i = $_ * 8;
+    $v = $i + 7;
+    do
+      {
+      $ram[$i] = "$_";
+      ++$i;
+      }
+    while ($i <= $v);
+    }
+
+  foreach (sort {$a <=> $b} keys(%bits_by_address))
+    {
+    $ram[0x20 + int($_ / 8)] = 'B';
+    }
+
+  if ($stack_start > 0)
+    {
+    for ($i = $stack_start; $i < 256; ++$i)
+      {
+      $ram[$i] = 'S';
+      }
+    }
+
+  print ";$border0\n;\tInternal RAM layout\n;$border0\n\n";
+
+  for ($i = 0; $i < 256; $i += 16)
+    {
+    printf "0x%02X: |", $i & 0xF0;
+    print join('|', @ram[$i .. ($i + 15)]) . "|\n";
+    }
+
+  print "\n0-3:Register Banks, B:Bits, d:Data, S:Stack\n\n";
   }
 
 #-------------------------------------------------------------------------------
@@ -4844,11 +5007,12 @@ sub disassembler()
     {
     emit_globals(TRUE);
     emit_sfrs(TRUE);
-    emit_bits(TRUE);
+    emit_sfr_bits(TRUE);
     emit_banks(TRUE);
     emit_ram_data(TRUE);
+    emit_bits(TRUE);
 
-    if ($stack_start)
+    if ($stack_start > 0)
       {
       print ";$border0\n;\tStack segment\n;$border0\n\n\t.area\tSSEG\t(DATA)\n" .
 	    "__start__stack:\n\t.ds 1\n\n";
@@ -4863,11 +5027,19 @@ sub disassembler()
     }
   else
     {
+    emit_ram_map();
     emit_globals(FALSE);
     emit_sfrs(FALSE);
-    emit_bits(FALSE);
+    emit_sfr_bits(FALSE);
     emit_banks(FALSE);
     emit_ram_data(FALSE);
+    emit_bits(FALSE);
+
+    if ($stack_start > 0)
+      {
+      printf ";$border0\n;\tStack: start=0x%02X, size=%u bytes\n;$border0\n\n", $stack_start, $stack_size;
+      }
+
     emit_indirect_ram(FALSE);
     emit_external_ram(FALSE);
     print ";$border0\n\n";
@@ -5178,6 +5350,7 @@ split_code_to_blocks();
 preliminary_survey(SILENT2);
 preliminary_survey(SILENT1);
 find_labels_in_code();
+determine_stack();
 recognize_jump_tables_in_code() if ($recognize_jump_tables);
 find_lost_labels_in_code() if ($find_lost_labels);
 add_names_labels();

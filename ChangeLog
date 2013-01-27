@@ -1,3 +1,7 @@
+2013-01-27 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl: Improved recognition of jump tables.
+
 2013-01-26 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: New command option: --recognize-jump-tables

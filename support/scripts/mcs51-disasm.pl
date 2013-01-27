@@ -141,19 +141,26 @@ use constant SP  => 0x81;
 use constant DPL => 0x82;
 use constant DPH => 0x83;
 use constant PSW => 0xD0;
+use constant ACC => 0xE0;
 
-use constant INST_AJMP		=> 0x01;
-use constant INST_LJMP		=> 0x02;
-use constant INST_SJMP		=> 0x80;
-use constant INST_RET		=> 0x22;
-use constant INST_RETI		=> 0x32;
-use constant INST_ADD_A_DATA	=> 0x24;
-use constant INST_JMP_A_DPTR	=> 0x73;
-use constant INST_MOVC_A_APC	=> 0x83;
-use constant INST_CLR_A		=> 0xE4;
-use constant INST_MOV_A_DIRECT	=> 0xE5;
-use constant INST_MOV_A_Rn	=> 0xE8;
-use constant INST_MOV_DIRECT_A	=> 0xF5;
+use constant INST_AJMP			=> 0x01;
+use constant INST_LJMP			=> 0x02;
+use constant INST_SJMP			=> 0x80;
+use constant INST_RET			=> 0x22;
+use constant INST_RETI			=> 0x32;
+use constant INST_ADD_A_DATA		=> 0x24;
+use constant INST_JMP_A_DPTR		=> 0x73;
+use constant INST_MOVC_A_APC		=> 0x83;
+use constant INST_MOV_DIRECT_DIRECT	=> 0x85;
+use constant INST_MOV_DPTR_DATA 	=> 0x90;
+use constant INST_MOVC_A_DPTR		=> 0x93;
+use constant INST_PUSH_DIRECT		=> 0xC0;
+use constant INST_XCH_A_DIRECT		=> 0xC5;
+use constant INST_POP_DIRECT		=> 0xD0;
+use constant INST_CLR_A			=> 0xE4;
+use constant INST_MOV_A_DIRECT		=> 0xE5;
+use constant INST_MOV_A_Rn		=> 0xE8;
+use constant INST_MOV_DIRECT_A		=> 0xF5;
 
 use constant LJMP_SIZE => 3;
 
@@ -2549,6 +2556,22 @@ sub orl_direct_data()
     $rb0  = regname($dcd_parm0, \$name0);
     $rb1  = sprintf "0x%02X", $dcd_parm1;
     $str0 = present_char($dcd_parm1);
+    }
+
+  if ($dcd_parm0 == PSW)
+    {
+    my $bank = ($dcd_parm1 >> 3) & 0x03;
+
+    $used_banks{$bank} = TRUE;
+
+    if ($decoder_silent_level == SILENT0)
+      {
+      $str0 = " (select bank #$bank)" if (($dcd_parm1 & ~0x18) == 0x00);
+      }
+    }
+
+  if ($decoder_silent_level == SILENT0)
+    {
     print_3('orl', "$rb0, #$rb1", "$name0 |= $rb1$str0");
     }
 
@@ -2852,7 +2875,7 @@ sub mov_A_data()
 
 sub mov_direct_data()
   {
-  my ($rb0, $rb1, $name0, $str0, $str1);
+  my ($rb0, $rb1, $name0, $str0);
 
 	# MOV	direct, #data		01110101 aaaaaaaa dddddddd	register address	data
 
@@ -2861,7 +2884,6 @@ sub mov_direct_data()
     $rb0  = regname($dcd_parm0, \$name0);
     $rb1  = sprintf "0x%02X", $dcd_parm1;
     $str0 = '';
-    $str1 = sprintf "%02X", $dcd_parm0;
     }
 
   if ($dcd_parm0 == PSW)
@@ -4247,45 +4269,106 @@ sub recognize_jump_tables_in_code()
     next if ($blocks[7]->{TYPE} != BLOCK_INSTR);
     next if ($blocks[8]->{TYPE} != BLOCK_INSTR);
 
+    if ($blocks[0]->{SIZE} == 2 && $instrs[0] == INST_ADD_A_DATA &&		# add	A, #0xZZ
+
+	$blocks[1]->{SIZE} == 1 && $instrs[1] == INST_MOVC_A_APC &&		# movc	A, @A+PC
+
+	$blocks[2]->{SIZE} == 2 && $rom[$blocks[2]->{ADDR} + 1] == DPL &&
+	($instrs[2] == INST_XCH_A_DIRECT ||					# xch	A, DPL
+	 $instrs[2] == INST_MOV_DIRECT_A) &&					# mov	DPL, A
+
+	(($blocks[3]->{SIZE} == 2 && $instrs[3] == INST_MOV_A_DIRECT) ||	# mov	A, direct
+	 ($blocks[3]->{SIZE} == 1 && ($instrs[3] & 0xF8) == INST_MOV_A_Rn)) &&	# mov	A, Rn
+
+	$blocks[4]->{SIZE} == 2 && $instrs[4] == INST_ADD_A_DATA &&		# add	A, #0xZZ
+
+	$blocks[5]->{SIZE} == 1 && $instrs[5] == INST_MOVC_A_APC &&		# movc	A, @A+PC
+
+	$blocks[6]->{SIZE} == 2 && $instrs[6] == INST_MOV_DIRECT_A &&		# mov	DPH, A
+	$rom[$blocks[6]->{ADDR} + 1] == DPH &&
+
+	$blocks[7]->{SIZE} == 1 && $instrs[7] == INST_CLR_A &&			# clr	A
+
+	$blocks[8]->{SIZE} == 1 && $instrs[8] == INST_JMP_A_DPTR)		# jmp	@A+DPTR
+      {
 =back
+	24 0B		add	A, #0x0B
+	83		movc	A, @A+PC
+	F5 82		mov	DPL, A
 
-0x0109: 24 0B		add	A, #0x0B				; ACC += 0x0B
-0x010B: 83		movc	A, @A+PC				; ACC = ROM[PC + 1 + ACC]
-0x010C: F5 82		mov	DPL, A					; DPL = ACC
+	E5 F0		mov	A, B
+	    or
+	ED		mov	A, R5
 
-0x010E: E5 F0		mov	A, B					; ACC = B
-0x010E: ED		mov	A, R5					; ACC = R5
-
-0x0110: 24 25		add	A, #0x25				; ACC += 0x25 ('%')
-0x0112: 83		movc	A, @A+PC				; ACC = ROM[PC + 1 + ACC]
-0x0113: F5 83		mov	DPH, A					; DPH = ACC
-0x0115: E4		clr	A					; ACC = 0
-0x0116: 73		jmp	@A+DPTR					; Jumps hither: [DPTR + ACC]
-
+	24 25		add	A, #0x25
+	83		movc	A, @A+PC
+	F5 83		mov	DPH, A
+	E4		clr	A
+	73		jmp	@A+DPTR
 =cut
 
-    next if ($blocks[0]->{SIZE} != 2 || $instrs[0] != INST_ADD_A_DATA);		# add	A, #0xZZ
-    next if ($blocks[1]->{SIZE} != 1 || $instrs[1] != INST_MOVC_A_APC);		# movc	A, @A+PC
-    next if ($blocks[2]->{SIZE} != 2 || $instrs[2] != INST_MOV_DIRECT_A);	# mov	DPL, A
-    next if ($rom[$blocks[2]->{ADDR} + 1] != DPL);
-    next if (($blocks[3]->{SIZE} != 2 || $instrs[3] != INST_MOV_A_DIRECT) &&	# mov	A, direct
-	     ($blocks[3]->{SIZE} != 1 || ($instrs[3] & 0xF8) != INST_MOV_A_Rn)); # mov	A, Rn
+      $addrL = $blocks[2]->{ADDR} + $rom[$blocks[0]->{ADDR} + 1];
+      $addrH = $blocks[6]->{ADDR} + $rom[$blocks[4]->{ADDR} + 1];
+      $size  = $addrH - $addrL;
 
-    next if ($blocks[4]->{SIZE} != 2 || $instrs[4] != INST_ADD_A_DATA);		# add	A, #0xZZ
-    next if ($blocks[5]->{SIZE} != 1 || $instrs[5] != INST_MOVC_A_APC);		# movc	A, @A+PC
-    next if ($blocks[6]->{SIZE} != 2 || $instrs[6] != INST_MOV_DIRECT_A);	# mov	DPH, A
-    next if ($rom[$blocks[6]->{ADDR} + 1] != DPH);
-    next if ($blocks[7]->{SIZE} != 1 || $instrs[7] != INST_CLR_A);		# clr	A
-    next if ($blocks[8]->{SIZE} != 1 || $instrs[8] != INST_JMP_A_DPTR);		# jmp	@A+DPTR
+      disable_instruction_blocks($addrL, $addrH + $size - 1);
+      add_block($addrL, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+      add_block($addrH, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+      add_jump_address_in_table($addrL, $addrH, $size);
+      }
+    elsif ($blocks[0]->{SIZE} == 3 && $instrs[0] == INST_MOV_DPTR_DATA &&	# mov	DPTR, #tLow
 
-    $addrL = $blocks[2]->{ADDR} + $rom[$blocks[0]->{ADDR} + 1];
-    $addrH = $blocks[6]->{ADDR} + $rom[$blocks[4]->{ADDR} + 1];
-    $size  = $addrH - $addrL;
+	   $blocks[1]->{SIZE} == 1 && $instrs[1] == INST_MOVC_A_DPTR &&		# movc	A, @A+DPTR
 
-    disable_instruction_blocks($addrL, $addrH + $size - 1);
-    add_block($addrL, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
-    add_block($addrH, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
-    add_jump_address_in_table($addrL, $addrH, $size);
+	   (($blocks[2]->{SIZE} == 2 && $instrs[2] == INST_XCH_A_DIRECT) ||	# xch	A, XX
+	    ($blocks[2]->{SIZE} == 2 && $instrs[2] == INST_PUSH_DIRECT &&	# push	ACC
+	     $rom[$blocks[2]->{ADDR} + 1] == ACC)) &&
+
+	   $blocks[3]->{SIZE} == 3 && $instrs[3] == INST_MOV_DPTR_DATA &&	# mov	DPTR, #tHigh
+
+	   $blocks[4]->{SIZE} == 1 && $instrs[4] == INST_MOVC_A_DPTR &&		# movc	A, @A+DPTR
+
+	   $blocks[5]->{SIZE} == 2 && $instrs[5] == INST_MOV_DIRECT_A &&	# mov	DPH, A
+	   $rom[$blocks[5]->{ADDR} + 1] == DPH &&
+
+	   (($blocks[6]->{SIZE} == 3 && $instrs[6] == INST_MOV_DIRECT_DIRECT &&	# mov	DPL, XX
+	     $rom[$blocks[6]->{ADDR} + 2] == DPL) ||
+	    ($blocks[6]->{SIZE} == 2 && $instrs[6] == INST_POP_DIRECT &&	# pop	DPL
+	     $rom[$blocks[6]->{ADDR} + 1] == DPL)) &&
+
+	   $blocks[7]->{SIZE} == 1 && $instrs[7] == INST_CLR_A &&		# clr	A
+
+	   $blocks[8]->{SIZE} == 1 && $instrs[8] == INST_JMP_A_DPTR)		# jmp	@A+DPTR
+      {
+=back
+	90 00 79	mov	DPTR, #0x0079
+	93		movc	A, @A+DPTR
+
+	C5 F0		xch	A, B
+	    or
+	C0 E0		push	ACC
+
+	90 01 79	mov	DPTR, #0x0179
+	93		movc	A, @A+DPTR
+	F5 83		mov	DPH, A
+
+	85 F0 82	mov	DPL, B
+	    or
+	D0 82		pop	DPL
+
+	E4		clr	A
+	73		jmp	@A+DPTR
+=cut
+
+      $addrL = ($rom[$blocks[0]->{ADDR} + 1] << 8) | $rom[$blocks[0]->{ADDR} + 2];
+      $addrH = ($rom[$blocks[3]->{ADDR} + 1] << 8) | $rom[$blocks[3]->{ADDR} + 2];
+      $size  = $addrH - $addrL;
+
+      disable_instruction_blocks($addrL, $addrH + $size - 1);
+      add_block($addrL, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+      add_block($addrH, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+      add_jump_address_in_table($addrL, $addrH, $size);
+      }
     }
   }
 

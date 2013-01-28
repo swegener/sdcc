@@ -1,3 +1,8 @@
+2013-01-28 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl: Improved finds of stack. Prints into
+	  map the iRAM.
+
 2013-01-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,

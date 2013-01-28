@@ -33,6 +33,10 @@
 
 	or	./mcs51-disasm.pl -M 8052.h -fl -rj -as -hc program.hex > program.asm
 
+
+    Warning! This program is not able to find all variable. Especially them not, whose
+    can be found in the indirect or external RAM.
+
   $Id$
 =cut
 
@@ -147,6 +151,8 @@ use constant ACC => 0xE0;
 
 use constant INST_AJMP			=> 0x01;
 use constant INST_LJMP			=> 0x02;
+use constant INST_ACALL			=> 0x11;
+use constant INST_LCALL			=> 0x12;
 use constant INST_SJMP			=> 0x80;
 use constant INST_RET			=> 0x22;
 use constant INST_RETI			=> 0x32;
@@ -164,6 +170,19 @@ use constant INST_CLR_A			=> 0xE4;
 use constant INST_MOV_A_DIRECT		=> 0xE5;
 use constant INST_MOV_A_Rn		=> 0xE8;
 use constant INST_MOV_DIRECT_A		=> 0xF5;
+use constant INST_CJNE_A_DATA		=> 0xB4;
+use constant INST_CJNE_A_DIRECT		=> 0xB5;
+use constant INST_CJNE__Ri_DATA		=> 0xB6;
+use constant INST_CJNE_Rn_DATA		=> 0xB8;
+use constant INST_DJNZ_Rn		=> 0xD8;
+use constant INST_DJNZ_DIRECT		=> 0xD5;
+use constant INST_JBC_BIT		=> 0x10;
+use constant INST_JB_BIT		=> 0x20;
+use constant INST_JNB_BIT		=> 0x30;
+use constant INST_JC			=> 0x40;
+use constant INST_JNC			=> 0x50;
+use constant INST_JZ			=> 0x60;
+use constant INST_JNZ			=> 0x70;
 
 use constant LJMP_SIZE => 3;
 
@@ -1296,21 +1315,22 @@ sub label_finder($$)
   $instr_mask1 = $instr & 0xFE;
   $instr_mask2 = $instr & 0xF8;
 
-  if ($instr_mask0 == 0x01)
+  if ($instr_mask0 == INST_AJMP)
     {
         # AJMP	addr11			aaa00001 aaaaaaaa		a10 a9 a8 0 0 0 0 1	a7-a0
 
     $addr = (($Address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $rom[$Address + 1];
     add_jump_label($addr, '', BL_TYPE_LABEL, $Address, FALSE);
     }
-  elsif ($instr_mask0 == 0x11)
+  elsif ($instr_mask0 == INST_ACALL)
     {
 	# ACALL	addr11			aaa10001 aaaaaaaa		a10 a9 a8 1 0 0 0 1	a7-a0
 
     $addr = (($Address + $instr_size) & 0xF800) | (($instr & 0xE0) << 3) | $rom[$Address + 1];
     add_func_label($addr, '', FALSE);
     }
-  elsif ($instr_mask1 == 0xB6 || $instr_mask2 == 0xB8)
+  elsif ($instr_mask1 == INST_CJNE__Ri_DATA ||
+	 $instr_mask2 == INST_CJNE_Rn_DATA)
     {
 	# CJNE	@Ri, #data, rel		1011011i dddddddd rrrrrrrr	R0 .. R1 	data		relative address
 	# CJNE	Rn, #data, rel		10111rrr dddddddd rrrrrrrr	R0 .. R7 	data		relative address
@@ -1318,30 +1338,33 @@ sub label_finder($$)
     $addr = $Address + $instr_size + expand_offset($rom[$Address + 2]);
     add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY, FALSE);
     }
-  elsif ($instr_mask2 == 0xD8)
+  elsif ($instr_mask2 == INST_DJNZ_Rn)
     {
 	# DJNZ	Rn, rel			11011rrr rrrrrrrr		R0 .. R7	relative address
 
     $addr = $Address + $instr_size + expand_offset($rom[$Address + 1]);
     add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY, FALSE);
     }
-  elsif ($instr == 0x02)
+  elsif ($instr == INST_LJMP)
     {
 	# LJMP	addr16			00000010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
     $addr = ($rom[$Address + 1] << 8) | $rom[$Address + 2];
     add_jump_label($addr, '', BL_TYPE_LABEL, $Address, FALSE);
     }
-  elsif ($instr == 0x12)
+  elsif ($instr == INST_LCALL)
     {
 	# LCALL	addr16			00010010 aaaaaaaa aaaaaaaa	a15-a8 a7-a0	absolute address
 
     $addr = ($rom[$Address + 1] << 8) | $rom[$Address + 2];
     add_func_label($addr, '', FALSE);
     }
-  elsif ($instr == 0x10 || $instr == 0x20 ||
-	 $instr == 0x30 || $instr == 0xB4 ||
-	 $instr == 0xB5 || $instr == 0xD5)
+  elsif ($instr == INST_JBC_BIT ||
+	 $instr == INST_JB_BIT ||
+	 $instr == INST_JNB_BIT ||
+	 $instr == INST_CJNE_A_DATA ||
+	 $instr == INST_CJNE_A_DIRECT ||
+	 $instr == INST_DJNZ_DIRECT)
     {
 	# JBC	bit, rel		00010000 bbbbbbbb rrrrrrrr	bit address		relative address
 	# JB	bit, rel		00100000 bbbbbbbb rrrrrrrr	bit address		relative address
@@ -1353,9 +1376,11 @@ sub label_finder($$)
     $addr = $Address + $instr_size + expand_offset($rom[$Address + 2]);
     add_jump_label($addr, '', BL_TYPE_LABEL, EMPTY, FALSE);
     }
-  elsif ($instr == 0x40 || $instr == 0x50 ||
-	 $instr == 0x60 || $instr == 0x70 ||
-	 $instr == 0x80)
+  elsif ($instr == INST_JC ||
+	 $instr == INST_JNC ||
+	 $instr == INST_JZ ||
+	 $instr == INST_JNZ ||
+	 $instr == INST_SJMP)
     {
 	# JC	rel			01000000 rrrrrrrr 		relative address
 	# JNC	rel			01010000 rrrrrrrr 		relative address
@@ -2905,6 +2930,10 @@ sub mov_direct_data()
       $str0 = " (select bank #$bank)" if (($dcd_parm1 & ~0x18) == 0x00);
       }
     }
+#  elsif ($dcd_parm0 == SP)
+#    {
+#    $stack_start = ($dcd_parm1 + 1) if ($stack_start < 0);
+#    }
   else
     {
     $str0 = present_char($dcd_parm1);
@@ -4140,6 +4169,166 @@ sub split_code_to_blocks()
 
 #-------------------------------------------------------------------------------
 
+        #
+	# If the $BlockRef a call, then follows.
+        #
+
+sub follow_call($)
+  {
+  my $BlockRef = $_[0];
+  my ($addr, $size, $instr);
+
+  $addr  = $BlockRef->{ADDR};
+  $size  = $BlockRef->{SIZE};
+  $instr = $rom[$addr];
+
+  if ($instr == INST_LCALL)
+    {
+    return (($rom[$addr + 1] << 8) | $rom[$addr + 2]);
+    }
+  elsif (($instr & 0x1F) == INST_ACALL)
+    {
+    return ((($addr + $size) & 0xF800) | (($instr & 0xE0) << 3) | $rom[$addr + 1]);
+    }
+
+  return EMPTY;
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
+	# If the $BlockRef a unconditional jump, then follows.
+	#
+
+sub follow_unconditional_jump($)
+  {
+  my $BlockRef = $_[0];
+  my ($addr, $size, $instr);
+
+  $addr  = $BlockRef->{ADDR};
+  $size  = $BlockRef->{SIZE};
+  $instr = $rom[$addr];
+
+  if ($size == 3 && $instr == INST_LJMP)
+    {
+    return (($rom[$addr + 1] << 8) | $rom[$addr + 2]);
+    }
+  elsif ($size == 2)
+    {
+    if (($instr & 0x1F) == INST_AJMP)
+      {
+      return ((($addr + $size) & 0xF800) | ((($instr & 0xE0) << 3) | $rom[$addr + 1]));
+      }
+    elsif ($instr == INST_SJMP)
+      {
+      return ($addr + $size + expand_offset($rom[$addr + 1]));
+      }
+    }
+
+  return EMPTY;
+  }
+
+#-------------------------------------------------------------------------------
+
+        #
+	# If the $BlockRef a conditional jump, then follows.
+        #
+
+sub follow_conditional_jump($)
+  {
+  my $BlockRef = $_[0];
+  my ($addr, $size, $instr, $instr_mask1, $instr_mask2);
+
+  return EMPTY if ($BlockRef->{TYPE} != BLOCK_INSTR);
+
+  $addr  = $BlockRef->{ADDR};
+  $size  = $BlockRef->{SIZE};
+  $instr = $rom[$addr];
+
+  $instr_mask1 = $instr & 0xFE;
+  $instr_mask2 = $instr & 0xF8;
+
+  if ($instr_mask1 == INST_CJNE__Ri_DATA ||
+      $instr_mask2 == INST_CJNE_Rn_DATA)
+    {
+    return ($addr + $size + expand_offset($rom[$addr + 2]));
+    }
+  elsif ($instr_mask2 == INST_DJNZ_Rn)
+    {
+    return ($addr + $size + expand_offset($rom[$addr + 1]));
+    }
+  elsif ($instr == INST_JBC_BIT ||
+	 $instr == INST_JB_BIT ||
+	 $instr == INST_JNB_BIT ||
+	 $instr == INST_CJNE_A_DATA ||
+	 $instr == INST_CJNE_A_DIRECT ||
+	 $instr == INST_DJNZ_DIRECT)
+    {
+    return ($addr + $size + expand_offset($rom[$addr + 2]));
+    }
+  elsif ($instr == INST_JC ||
+	 $instr == INST_JNC ||
+	 $instr == INST_JZ ||
+	 $instr == INST_JNZ ||
+	 $instr == INST_SJMP)
+    {
+    return ($addr + $size + expand_offset($rom[$addr + 1]));
+    }
+
+  return EMPTY;
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
+	# Determine the start of stack.
+	#
+
+sub determine_stack()
+  {
+  my ($block, $instr, $addr, $count, $size, $t);
+
+  return if (! defined($blocks_by_address{0}));
+
+  $addr = follow_unconditional_jump(\%{$blocks_by_address{0}});
+  return if ($addr == EMPTY);
+
+  return if (! defined($blocks_by_address{$addr}));
+
+	# At most so much block looks through.
+  $count = 30;
+  do
+    {
+    $block = \%{$blocks_by_address{$addr}};
+
+    return if ($block->{TYPE} != BLOCK_INSTR);
+    return if (follow_unconditional_jump($block) != EMPTY);
+    return if (follow_call($block) != EMPTY);
+
+    $addr  = $block->{ADDR};
+    $size  = $block->{SIZE};
+    $instr = $rom[$addr];
+
+    return if ($size == 2 && ($instr == INST_PUSH_DIRECT || $instr == INST_POP_DIRECT));
+
+    $t = follow_conditional_jump($block);
+
+    return if ($t != EMPTY && $t > $addr);
+
+    if ($size == 3 && $instr == INST_MOV_DIRECT_DATA && $rom[$addr + 1] == SP)
+      {
+      $stack_start = $rom[$addr + 2] + 1;
+      $stack_size  = 0x100 - $stack_start;
+      return;
+      }
+
+    $addr += $size;	# Compute the address of next block.
+    }
+  while (--$count);
+  }
+
+#-------------------------------------------------------------------------------
+
 	#
 	# Previously assess the code.
 	#
@@ -4155,58 +4344,6 @@ sub preliminary_survey($)
 
     instruction_decoder($_, $block);
     }
-  }
-
-#-------------------------------------------------------------------------------
-
-	#
-	# Determine the start of stack.
-	#
-
-sub determine_stack()
-  {
-  my ($block, $instr, $addr);
-
-  return if (! defined($blocks_by_address{0}));
-
-  $block = \%{$blocks_by_address{0}};
-  return if ($block->{TYPE} != BLOCK_INSTR);
-
-  $instr = $rom[$block->{ADDR}];
-
-  if ($block->{SIZE} == 3 && $instr == INST_LJMP)
-    {
-	# ljmp	#0xTTTT
-
-    $addr = ($rom[$block->{ADDR} + 1] << 8) | $rom[$block->{ADDR} + 2];
-    }
-  elsif ($block->{SIZE} == 2 && ($instr & 0x1F) == INST_AJMP)
-    {
-	# ajmp	#0xTTTT
-
-    $addr = (($block->{ADDR} + 2) & 0xF800) | ((($instr & 0xE0) << 3) | $rom[$block->{ADDR} + 1]);
-    }
-  elsif ($block->{SIZE} == 2 && $instr == INST_SJMP)
-    {
-	# sjmp	#0xTTTT
-
-    $addr = $block->{ADDR} + 2 + expand_offset($rom[$block->{ADDR} + 1]);
-    }
-  else
-    {
-    return;
-    }
-
-  return if (! defined($blocks_by_address{$addr}));
-
-  $block = \%{$blocks_by_address{$addr}};
-  return if ($block->{TYPE} != BLOCK_INSTR);
-
-  $instr = $rom[$block->{ADDR}];
-  return if ($block->{SIZE} != 3 || $instr != INST_MOV_DIRECT_DATA || $rom[$block->{ADDR} + 1] != SP);
-
-  $stack_start = $rom[$block->{ADDR} + 2] + 1;
-  $stack_size  = 0x100 - $stack_start;
   }
 
 #-------------------------------------------------------------------------------
@@ -4718,7 +4855,7 @@ sub emit_bits($)
 #-------------------------------------------------------------------------------
 
 	#
-	# Prints a map from the RAM.
+	# Prints the map from the RAM.
 	#
 
 sub emit_ram_map()
@@ -4729,6 +4866,7 @@ sub emit_ram_map()
   for ($i = 0; $i < 256; ++$i)
     {
     $ram[$i] = ((defined($registers_by_address{$i})) ? 'd' : ' ');
+    $ram[$i] = 'I' if (defined($iram_by_address{$i}));
     }
 
   $used_banks{0} = TRUE;
@@ -4765,7 +4903,7 @@ sub emit_ram_map()
     print join('|', @ram[$i .. ($i + 15)]) . "|\n";
     }
 
-  print "\n0-3:Register Banks, B:Bits, d:Data, S:Stack\n\n";
+  print "\n0-3:Register Banks, B:Bits, d:Data, I:iRAM, S:Stack\n\n";
   }
 
 #-------------------------------------------------------------------------------
@@ -5347,10 +5485,10 @@ if ($header_file ne '')
 read_map_file();
 fix_multi_byte_variables();
 split_code_to_blocks();
+determine_stack();
 preliminary_survey(SILENT2);
 preliminary_survey(SILENT1);
 find_labels_in_code();
-determine_stack();
 recognize_jump_tables_in_code() if ($recognize_jump_tables);
 find_lost_labels_in_code() if ($find_lost_labels);
 add_names_labels();

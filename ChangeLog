@@ -1,3 +1,8 @@
+2013-01-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/hc08/gen.c,
+	  More efficient calls to _Noreturn functions.
+
 2013-01-28 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Improved finds of stack. Prints into
@@ -6,7 +11,7 @@
 2013-01-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,
-	  src/z80/gen.c:
+	  src/z80/gen.c,
 	  More efficient calls to _Noreturn functions.
 
 2013-01-27 Molnar Karoly <molnarkaroly AT users.sf.net>

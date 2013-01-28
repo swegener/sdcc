@@ -89,6 +89,7 @@ my $hex_file		 = '';
 my $map_file 		 = '';
 my $map_readed		 = FALSE;
 my $header_file		 = '';
+my $name_list		 = '';
 
 my $verbose		  = 0;
 my $hex_constant	  = FALSE;
@@ -103,20 +104,23 @@ my %const_areas_by_address  = ();	# From the command line parameters.
 
 my %const_blocks_by_address = ();
 
-my %sfrs_by_address	 = ();
-my %sfrs_by_names	 = ();
-my %used_banks		 = ();
-my %registers_by_address = ();
-my %sfr_bits_by_address	 = ();
-my %bits_by_address	 = ();
-my %iram_by_address	 = ();
-my %xram_by_address	 = ();
-my $stack_start		 = -1;
-my $stack_size		 = 0;
+my %sfrs_by_address	  = ();
+my %sfrs_by_names	  = ();
+my %used_banks		  = ();
+my %registers_by_address  = ();
+my %sfr_bits_by_address	  = ();
+my %bits_by_address	  = ();
+my %bit_names_by_address  = ();
+my %iram_by_address	  = ();
+my %xram_by_address	  = ();
+my %xram_names_by_address = ();
+my $stack_start		  = -1;
+my $stack_size		  = 0;
 
-my %variable_names_by_address = ();
-my %variable_sizes_by_address = ();
-my $max_variable_addr = 0;
+my %ram_names_by_address  = ();
+my %ram_sizes_by_address  = ();
+my $max_variable_addr     = 0;
+
 
 	# Sizes of the instructions.
 
@@ -921,6 +925,25 @@ sub add_jump_label($$$$$)
   ++$label->{JUMP_COUNT} if (! $Map_mode);
   }
 
+#-------------------------------------------------------------------------------
+
+	#
+	# Store a variable name.
+	#
+
+sub add_variable($$)
+  {
+  my ($Address, $Name) = @_;
+
+  if (! defined($ram_names_by_address{$Address}))
+    {
+    $ram_names_by_address{$Address} = $Name;
+    $ram_sizes_by_address{$Address} = 1;
+    }
+
+  $max_variable_addr = $Address if ($max_variable_addr < $Address);
+  }
+
 ################################################################################
 ################################################################################
 
@@ -1056,15 +1079,7 @@ sub read_map_file()
 	# 00000039  _counter                           data
 	# 0000004C  _flash_read_PARM_2                 flash
 
-	($addr, $name) = (hex($1), $2);
-
-	if (! defined($variable_names_by_address{$addr}))
-	  {
-	  $variable_names_by_address{$addr}      = $name;
-	  $variable_sizes_by_address{$addr} = 1;
-	  }
-
-	$max_variable_addr = $addr if ($max_variable_addr < $addr);
+	add_variable(hex($1), $2);
 	}
       } # elsif ($state == MAP_DATA)
     elsif ($state == MAP_CONST)
@@ -1075,6 +1090,96 @@ sub read_map_file()
 
   $map_readed = TRUE;
   close(MAP);
+  }
+
+#-------------------------------------------------------------------------------
+
+use constant NAMES_NULL => 0;
+use constant NAMES_BIT  => 1;
+use constant NAMES_RAM  => 2;
+use constant NAMES_XRAM => 3;
+use constant NAMES_ROM  => 4;
+
+sub read_name_list()
+  {
+  my ($line, $addr, $name, $state);
+
+  return if ($name_list eq '');
+
+  if (! open(NAMES, '<', $name_list))
+    {
+    print STDERR "$PROGRAM : Could not open. -> \"$name_list\"\n";
+    exit(1);
+    }
+
+  $state = NAMES_NULL;
+
+  foreach (grep(! /^\s*$/o, <NAMES>))
+    {
+    chomp;
+    s/\r$//o;
+    s/^\s*|\s*$//go;
+
+    if (/^\[BIT\]$/io)
+      {
+      $state = NAMES_BIT;
+      next;
+      }
+    elsif (/^\[RAM\]$/io)
+      {
+      $state = NAMES_RAM;
+      next;
+      }
+    elsif (/^\[XRAM\]$/io)
+      {
+      $state = NAMES_XRAM;
+      next;
+      }
+    elsif (/^\[ROM\]$/io)
+      {
+      $state = NAMES_ROM;
+      next;
+      }
+
+    $line = $_;
+
+    given ($state)
+      {
+      when (NAMES_BIT)
+	{
+	if ($line =~ /^0x([[:xdigit:]]+)\s*:\s*(\S+)$/io)
+	  {
+	  $bit_names_by_address{hex($1)} = $2;
+	  }
+	}
+
+      when (NAMES_RAM)
+	{
+	if ($line =~ /^0x([[:xdigit:]]+)\s*:\s*(\S+)$/io)
+	  {
+	  add_variable(hex($1), $2);
+	  }
+	}
+
+      when (NAMES_XRAM)
+	{
+	if ($line =~ /^0x([[:xdigit:]]+)\s*:\s*(\S+)$/io)
+	  {
+	  $xram_names_by_address{hex($1)} = $2;
+	  }
+	}
+
+      when (NAMES_ROM)
+	{
+	if ($line =~ /^0x([[:xdigit:]]+)\s*:\s*(\S+)$/io)
+	  {
+	  add_jump_label(hex($1), $2, BL_TYPE_LABEL, EMPTY, TRUE);
+	  }
+	}
+      } # given ($state)
+    } # foreach (grep(! /^\s*$/o, <NAMES>))
+
+  close(NAMES);
   }
 
 #-------------------------------------------------------------------------------
@@ -1091,7 +1196,7 @@ sub fix_multi_byte_variables()
   my $prev_name = '';
   my ($i, $var_size);
 
-  foreach (sort {$a <=> $b} keys(%variable_names_by_address))
+  foreach (sort {$a <=> $b} keys(%ram_names_by_address))
     {
     if ($prev_addr > EMPTY)
       {
@@ -1103,15 +1208,15 @@ sub fix_multi_byte_variables()
 
 	for ($i = 1; $i < $var_size; ++$i)
 	  {
-	  $variable_names_by_address{$prev_addr + $i} = "($prev_name + $i)";
+	  $ram_names_by_address{$prev_addr + $i} = "($prev_name + $i)";
 	  }
 
-	$variable_sizes_by_address{$prev_addr} = $var_size;
+	$ram_sizes_by_address{$prev_addr} = $var_size;
 	}
       }
 
     $prev_addr = $_;
-    $prev_name = $variable_names_by_address{$_};
+    $prev_name = $ram_names_by_address{$_};
     }
   }
 
@@ -1415,9 +1520,9 @@ sub regname($$)
     $str = ($gen_assembly_code) ? sprintf("0x%02X", $Address) : "R${reg}<#$bank>";
     $$StrRef = $str;
 
-    if (defined($variable_names_by_address{$Address}))
+    if (defined($ram_names_by_address{$Address}))
       {
-      my $var = $variable_names_by_address{$Address};
+      my $var = $ram_names_by_address{$Address};
 
       printf STDERR ("This address (0x%02X) belongs to two names: \"$str\" and \"$var\"\n", $Address);
       }
@@ -1427,11 +1532,11 @@ sub regname($$)
     $str = $sfrs_by_address{$Address};
     $$StrRef = $str;
     }
-  elsif (defined($variable_names_by_address{$Address}))
+  elsif (defined($ram_names_by_address{$Address}))
     {
     $str = sprintf "0x%02X", $Address;
     $$StrRef = "[$str]";
-    $str = $variable_names_by_address{$Address};
+    $str = $ram_names_by_address{$Address};
     }
   else
     {
@@ -4765,11 +4870,11 @@ sub emit_ram_data($)
 	printf("\t.ds 0x%02X\n", $_ - $next_addr) if ($_ > $next_addr);
 	}
 
-      $size = $variable_sizes_by_address{$_};
+      $size = $ram_sizes_by_address{$_};
 
       if (defined($size))
 	{
-	print "$variable_names_by_address{$_}::\n\t.ds $size\n";
+	print "$ram_names_by_address{$_}::\n\t.ds $size\n";
 	$next_addr = $_ + $size;
 	}
       else
@@ -4787,7 +4892,7 @@ sub emit_ram_data($)
       {
       last if ($_ > 0x7F);
 
-      $size = $variable_sizes_by_address{$_};
+      $size = $ram_sizes_by_address{$_};
 
       my $str = sprintf "0x%02X", $_;
 
@@ -4795,7 +4900,7 @@ sub emit_ram_data($)
 	{
         my $cnt = sprintf "%3u", $size;
 
-	print "$str:\t" . align($variable_names_by_address{$_}, STAT_ALIGN_SIZE) . "($cnt bytes)\n";
+	print "$str:\t" . align($ram_names_by_address{$_}, STAT_ALIGN_SIZE) . "($cnt bytes)\n";
 	}
       else
 	{
@@ -4823,7 +4928,7 @@ sub emit_ram_data($)
 sub emit_bits($)
   {
   my $Assembly_mode = $_[0];
-  my $str;
+  my ($name, $str);
 
   return if (! scalar(keys(%bits_by_address)));
 
@@ -4834,8 +4939,9 @@ sub emit_bits($)
 
     foreach (sort {$a <=> $b} keys(%bits_by_address))
       {
-      $str = sprintf "%02X", $_;
-      print "bit_0x${str}::\n\t.ds 1\n";
+      $name = $bit_names_by_address{$_};
+      $str  = (defined($name)) ? $name : (sprintf "bit_0x%02X", $_);
+      print "${str}::\n\t.ds 1\n";
       }
     }
   else
@@ -4844,8 +4950,9 @@ sub emit_bits($)
 
     foreach (sort {$a <=> $b} keys(%bits_by_address))
       {
-      $str = sprintf "%02X", $_;
-      print "0x${str}:\tbit_0x$str\n";
+      $name = $bit_names_by_address{$_};
+      $str  = (defined($name)) ? $name : (sprintf "bit_0x%02X", $_);
+      printf "0x%02X:\t$str\n", $_;
       }
     }
 
@@ -4915,6 +5022,7 @@ sub emit_ram_map()
 sub emit_indirect_ram($)
   {
   my $Assembly_mode = $_[0];
+  my ($name, $str);
 
   return if (! scalar(keys(%iram_by_address)));
 
@@ -4925,7 +5033,9 @@ sub emit_indirect_ram($)
 
     foreach (sort {$a <=> $b} keys(%iram_by_address))
       {
-      printf "iram_0x%02X::\n\t.ds 1\n", $_;
+      $name = $ram_names_by_address{$_};
+      $str  = (defined($name)) ? $name : (sprintf "iram_0x%02X", $_);
+      printf "${str}::\n\t.ds 1\n", $_;
       }
     }
   else
@@ -4934,7 +5044,9 @@ sub emit_indirect_ram($)
 
     foreach (sort {$a <=> $b} keys(%iram_by_address))
       {
-      printf "0x%02X:\tiram_0x%02X\n", $_, $_;
+      $name = $ram_names_by_address{$_};
+      $str  = (defined($name)) ? $name : (sprintf "iram_0x%02X", $_);
+      printf "0x%02X:\t$str\n", $_;
       }
     }
 
@@ -4950,6 +5062,7 @@ sub emit_indirect_ram($)
 sub emit_external_ram($)
   {
   my $Assembly_mode = $_[0];
+  my ($name, $str);
 
   return if (! scalar(keys(%xram_by_address)));
 
@@ -4959,7 +5072,9 @@ sub emit_external_ram($)
 
     foreach (sort {$a <=> $b} keys(%xram_by_address))
       {
-      printf "xram_0x%04X\t=\t0x%04X\n", $_, $_;
+      $name = $xram_names_by_address{$_};
+      $str  = (defined($name)) ? $name : (sprintf "xram_0x%04X", $_);
+      printf "$str\t=\t0x%04X\n", $_;
       }
     }
   else
@@ -4968,7 +5083,9 @@ sub emit_external_ram($)
 
     foreach (sort {$a <=> $b} keys(%xram_by_address))
       {
-      printf "0x%04X:\txram_0x%04X\n", $_, $_;
+      $name = $xram_names_by_address{$_};
+      $str  = (defined($name)) ? $name : (sprintf "xram_0x%04X", $_);
+      printf "0x%04X:\t$str\n", $_;
       }
     }
 
@@ -5297,6 +5414,34 @@ EOT
 	    Finds the "lost" labels. These may be found such in program parts,
 	    which are directly not get call.
 
+	--name-list <list_file>
+
+	    The file contains list of names. They may be: Names of variables and
+	    names of labels. For example:
+
+		[BIT]
+		0x07:flag
+		..
+		..
+		..
+		[RAM]
+		0x31:counter
+		..
+		..
+		..
+		[XRAM]
+		0x208:pressure
+		..
+		..
+		..
+		[ROM]
+		0x05FC: UART_interrupt
+		..
+		..
+		..
+
+	    The contents of list override the names from map file.
+
 	-ne|--no-explanations
 
 	    Eliminates after the instructions visible explaining texts.
@@ -5419,6 +5564,12 @@ for (my $i = 0; $i < @ARGV; )
       $find_lost_labels = TRUE;
       }
 
+    when (/^--name-list$/o)
+      {
+      param_exist($opt, $i);
+      $name_list = $ARGV[$i++];
+      }
+
     when (/^-(ne|-no-explanations)$/o)
       {
       $no_explanations = TRUE;
@@ -5482,7 +5633,13 @@ if ($header_file ne '')
   read_header("$include_path/$header_file");
   }
 
+if ($name_list ne '')
+  {
+  is_file_ok($name_list);
+  }
+
 read_map_file();
+read_name_list();
 fix_multi_byte_variables();
 split_code_to_blocks();
 determine_stack();

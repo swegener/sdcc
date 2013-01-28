@@ -4131,8 +4131,9 @@ emitCall (const iCode *ic, bool ispcall)
             }
           else
             {
-              emit2 ("call %s", (OP_SYMBOL (IC_LEFT (ic))->rname[0] ?
-                                 OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
+              bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
+              emit2 ("%s %s", jump ? "jp" : "call",
+                (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
               regalloc_dry_run_cost += 3;
             }
         }

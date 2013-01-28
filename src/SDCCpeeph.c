@@ -514,9 +514,8 @@ FBYNAME (labelRefCount)
             }
           else
             {
-              fprintf (stderr, "*** internal error: no label has entry for"
-                       " %s in labelRefCount peephole.\n",
-                       label);
+              // Not a local label. We do not know how often it might be referenced.
+              rc = FALSE;
             }
         }
       else
@@ -591,9 +590,8 @@ FBYNAME (labelRefCountChange)
             }
             else
             {
-              fprintf (stderr, "*** internal error: no label has entry for"
-                       " %s in %s peephole.\n",
-                       label, __FUNCTION__);
+              // Not a local label. We do not know how often it might be referenced.
+              return TRUE;
             }
         }
       else

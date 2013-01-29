@@ -1002,7 +1002,7 @@ sub read_map_file()
 	{
 	$state = MAP_CODE1;
 	}
-      elsif (/^DSEG\s+/o)
+      elsif (/^(D|O)SEG\s+/o)
 	{
 	$state = MAP_DATA;
 	}

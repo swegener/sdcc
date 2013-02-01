@@ -156,6 +156,7 @@ my @instruction_sizes =
 
 use constant BANK_LAST_ADDR => 0x1F;
 use constant BIT_LAST_ADDR  => 0x7F;
+use constant RAM_MAX_ADDR   => 0xFF;
 
 use constant SP  => 0x81;
 use constant DPL => 0x82;
@@ -963,7 +964,7 @@ sub add_variable($$$)
   {
   my ($Address, $Name, $Type) = @_;
 
-  return if ($Address == EMPTY || $Address == 0xFF);
+  return if ($Address == EMPTY || $Address == RAM_MAX_ADDR);
 
   if (! defined($ram_by_address{$Address}))
     {
@@ -1091,10 +1092,7 @@ sub read_map_file()
 
 	($addr, $name) = (hex($1), $2);
 
-	if ($addr >= 0x100)
-	  {
-	  add_xram(hex($1), $2);
-	  }
+	add_xram(hex($1), $2) if ($addr > RAM_MAX_ADDR);
 	}
       }
     elsif ($state == MAP_CABS)
@@ -2132,7 +2130,7 @@ sub mov_ind_Ri_data()
 
 sub mov_direct_ind_Ri()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# MOV	direct, @Ri		1000011i aaaaaaaa		R0 .. R1	register address
 
@@ -2140,8 +2138,8 @@ sub mov_direct_ind_Ri()
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('mov', "$rb0, \@$dcd_Ri_name", "$name0 = [$dcd_Ri_name]");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('mov', "$rb, \@$dcd_Ri_name", "$name = [$dcd_Ri_name]");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2169,7 +2167,7 @@ sub subb_A_ind_Ri()
 
 sub mov_ind_Ri_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# MOV	@Ri, direct		1010011i aaaaaaaa		register address
 
@@ -2177,8 +2175,8 @@ sub mov_ind_Ri_direct()
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('mov', "\@$dcd_Ri_name, $rb0", "[$dcd_Ri_name] = $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('mov', "\@$dcd_Ri_name, $rb", "[$dcd_Ri_name] = $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2303,38 +2301,32 @@ sub mov_ind_Ri_A()
 
 sub inc_Rn()
   {
-  my $str0;
+  my $str = '';
 
 	# INC	Rn			00001rrr			R0 .. R7
 
   if (operation_R_reg($dcd_Rn_regs, Rx_INC))
     {
-    $str0 = sprintf "0x%02X", $R_regs[$dcd_Rn_regs];
-    print_3('inc', $dcd_Rn_name, "++$dcd_Rn_name ($str0)");
+    $str = sprintf " (0x%02X)", $R_regs[$dcd_Rn_regs];
     }
-  else
-    {
-    print_3('inc', $dcd_Rn_name, "++$dcd_Rn_name");
-    }
+
+  print_3('inc', $dcd_Rn_name, "++$dcd_Rn_name$str");
   }
 
 #-------------------------------------------------------------------------------
 
 sub dec_Rn()
   {
-  my $str0;
+  my $str = '';
 
 	# DEC	Rn			00011rrr			R0 .. R7
 
   if (operation_R_reg($dcd_Rn_regs, Rx_DEC))
     {
-    $str0 = sprintf "0x%02X", $R_regs[$dcd_Rn_regs];
-    print_3('dec', $dcd_Rn_name, "--$dcd_Rn_name ($str0)");
+    $str = sprintf " (0x%02X)", $R_regs[$dcd_Rn_regs];
     }
-  else
-    {
-    print_3('dec', $dcd_Rn_name, "--$dcd_Rn_name");
-    }
+
+  print_3('dec', $dcd_Rn_name, "--$dcd_Rn_name$str");
   }
 
 #-------------------------------------------------------------------------------
@@ -2412,14 +2404,14 @@ sub mov_Rn_data()
 
 sub mov_direct_Rn()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# MOV	direct, Rn		10001rrr aaaaaaaa		R0 .. R7	register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('mov', "$rb0, $dcd_Rn_name", "$name0 = $dcd_Rn_name");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('mov', "$rb, $dcd_Rn_name", "$name = $dcd_Rn_name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2442,14 +2434,14 @@ sub subb_A_Rn()
 
 sub mov_Rn_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# MOV	Rn, direct		10101rrr aaaaaaaa		R0 .. R7	register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('mov', "$dcd_Rn_name, $rb0", "$dcd_Rn_name = $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('mov', "$dcd_Rn_name, $rb", "$dcd_Rn_name = $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2599,14 +2591,14 @@ sub inc_A()
 
 sub inc_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# INC	direct			00000101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('inc', $rb0, "++$name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('inc', $rb, "++$name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2684,14 +2676,14 @@ sub dec_A()
 
 sub dec_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# DEC	direct			00010101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('dec', $rb0, "--$name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('dec', $rb, "--$name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2752,15 +2744,15 @@ sub rl_A()
 
 sub add_A_data()
   {
-  my ($rb0, $str0);
+  my ($rb, $str);
 
 	# ADD	A, #data		00100100 dddddddd		data
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0  = sprintf "0x%02X", $dcd_parm0;
-    $str0 = present_char($dcd_parm0);
-    print_3('add', "A, #$rb0", "ACC += $rb0$str0");
+    $rb  = sprintf "0x%02X", $dcd_parm0;
+    $str = present_char($dcd_parm0);
+    print_3('add', "A, #$rb", "ACC += $rb$str");
     }
   }
 
@@ -2768,14 +2760,14 @@ sub add_A_data()
 
 sub add_A_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ADD	A, direct		00100101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('add', "A, $rb0", "ACC += $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('add', "A, $rb", "ACC += $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2834,15 +2826,15 @@ sub rcl_A()
 
 sub addc_A_data()
   {
-  my ($rb0, $str0);
+  my ($rb, $str);
 
 	# ADDC	A, #data		00110100 dddddddd		data
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0  = sprintf "0x%02X", $dcd_parm0;
-    $str0 = present_char($dcd_parm0);
-    print_3('addc', "A, #$rb0", "ACC += $rb0 + CY$str0");
+    $rb  = sprintf "0x%02X", $dcd_parm0;
+    $str = present_char($dcd_parm0);
+    print_3('addc', "A, #$rb", "ACC += $rb + CY$str");
     }
   }
 
@@ -2850,14 +2842,14 @@ sub addc_A_data()
 
 sub addc_A_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ADDC	A, direct		00110101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('addc', "A, $rb0", "ACC += $name0 + CY");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('addc', "A, $rb", "ACC += $name + CY");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2890,14 +2882,14 @@ sub jc()
 
 sub orl_direct_A()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ORL	direct, A		01000010 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('orl', "$rb0, A", "$name0 |= ACC");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('orl', "$rb, A", "$name |= ACC");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -2950,15 +2942,15 @@ sub orl_direct_data()
 
 sub orl_A_data()
   {
-  my ($rb0, $str0);
+  my ($rb, $str);
 
 	# ORL	A, #data		01000100 dddddddd		data
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0  = sprintf "0x%02X", $dcd_parm0;
-    $str0 = present_char($dcd_parm0);
-    print_3('orl', "A, #$rb0", "ACC |= $rb0$str0");
+    $rb  = sprintf "0x%02X", $dcd_parm0;
+    $str = present_char($dcd_parm0);
+    print_3('orl', "A, #$rb", "ACC |= $rb$str");
     }
   }
 
@@ -2966,14 +2958,14 @@ sub orl_A_data()
 
 sub orl_A_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ORL	A, direct		01000101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('orl', "A, $rb0", "ACC |= $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('orl', "A, $rb", "ACC |= $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3006,14 +2998,14 @@ sub jnc()
 
 sub anl_direct_A()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ANL	direct, A		01010010 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('anl', "$rb0, A", "$name0 &= ACC");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('anl', "$rb, A", "$name &= ACC");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3050,15 +3042,15 @@ sub anl_direct_data()
 
 sub anl_A_data()
   {
-  my ($rb0, $str0);
+  my ($rb, $str);
 
 	# ANL	A, #data		01010100 dddddddd		data
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0  = sprintf "0x%02X", $dcd_parm0;
-    $str0 = present_char($dcd_parm0);
-    print_3('anl', "A, #$rb0", "ACC &= $rb0$str0");
+    $rb  = sprintf "0x%02X", $dcd_parm0;
+    $str = present_char($dcd_parm0);
+    print_3('anl', "A, #$rb", "ACC &= $rb$str");
     }
   }
 
@@ -3066,14 +3058,14 @@ sub anl_A_data()
 
 sub anl_A_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ANL	A, direct		01010101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('anl', "A, $rb0", "ACC &= $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('anl', "A, $rb", "ACC &= $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3106,14 +3098,14 @@ sub jz()
 
 sub xrl_direct_A()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# XRL	direct, A		01100010 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('xrl', "$rb0, A", "$name0 ^= ACC");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('xrl', "$rb, A", "$name ^= ACC");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3150,15 +3142,15 @@ sub xrl_direct_data()
 
 sub xrl_A_data()
   {
-  my ($rb0, $str0);
+  my ($rb, $str);
 
 	# XRL	A, #data		01100100 dddddddd		data
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0  = sprintf "0x%02X", $dcd_parm0;
-    $str0 = present_char($dcd_parm0);
-    print_3('xrl', "A, #$rb0", "ACC ^= $rb0$str0");
+    $rb  = sprintf "0x%02X", $dcd_parm0;
+    $str = present_char($dcd_parm0);
+    print_3('xrl', "A, #$rb", "ACC ^= $rb$str");
     }
   }
 
@@ -3166,14 +3158,14 @@ sub xrl_A_data()
 
 sub xrl_A_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# XRL	A, direct		01100101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('xrl', "A, $rb0", "ACC |= $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('xrl', "A, $rb", "ACC |= $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3206,14 +3198,14 @@ sub jnz()
 
 sub orl_C_bit()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ORL	C, bit			01110010 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('orl', "C, $rb0", "CY |= $name0");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('orl', "C, $rb", "CY |= $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3225,21 +3217,21 @@ sub orl_C_bit()
 
 sub jmp_A_DPTR()
   {
-  my $str0;
+  my $str;
 
 	# JMP	@A+DPTR			01110011
 
   if ($DPTR != EMPTY)
     {
     add_jump_label($DPTR, '', BL_TYPE_JTABLE, EMPTY, FALSE);
-    $str0 = jump_direction($DPTR);
+    $str = jump_direction($DPTR);
     }
   else
     {
-    $str0 = '';
+    $str = '';
     }
 
-  print_3('jmp', '@A+DPTR', "Jumps$str0 hither: [DPTR + ACC]\n");
+  print_3('jmp', '@A+DPTR', "Jumps$str hither: [DPTR + ACC]");
   invalidate_DPTR_Rx();
   $prev_is_jump = TRUE;
   }
@@ -3248,15 +3240,15 @@ sub jmp_A_DPTR()
 
 sub mov_A_data()
   {
-  my ($rb0, $str0);
+  my ($rb, $str);
 
 	# MOV	A, #data		01110100 dddddddd		data
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0  = sprintf "0x%02X", $dcd_parm0;
-    $str0 = present_char($dcd_parm0);
-    print_3('mov', "A, #$rb0", "ACC = $rb0$str0");
+    $rb  = sprintf "0x%02X", $dcd_parm0;
+    $str = present_char($dcd_parm0);
+    print_3('mov', "A, #$rb", "ACC = $rb$str");
     }
   }
 
@@ -3333,14 +3325,14 @@ sub sjmp()
 
 sub anl_C_bit()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ANL	C, bit			10000010 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('anl', "C, $rb0", "CY &= $name0");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('anl', "C, $rb", "CY &= $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3412,14 +3404,14 @@ sub mov_DPTR_data()
 
 sub mov_bit_C()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# MOV	bit, C			10010010 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('mov', "$rb0, C", "$name0 = CY");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('mov', "$rb, C", "$name = CY");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3442,15 +3434,15 @@ sub movc_A_A_DPTR()
 
 sub subb_A_data()
   {
-  my ($rb0, $str0);
+  my ($rb, $str);
 
 	# SUBB	A, #data		10010100 dddddddd		data
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0  = sprintf "0x%02X", $dcd_parm0;
-    $str0 = present_char($dcd_parm0);
-    print_3('subb', "A, #$rb0", "ACC -= $rb0 + CY$str0");
+    $rb  = sprintf "0x%02X", $dcd_parm0;
+    $str = present_char($dcd_parm0);
+    print_3('subb', "A, #$rb", "ACC -= $rb + CY$str");
     }
   }
 
@@ -3458,14 +3450,14 @@ sub subb_A_data()
 
 sub subb_A_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# SUBB	A, direct		10010101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('subb', "A, $rb0", "ACC -= $name0 + CY");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('subb', "A, $rb", "ACC -= $name + CY");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3477,14 +3469,14 @@ sub subb_A_direct()
 
 sub orl_C__bit()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ORL	C, /bit			10100000 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('orl', "C, /$rb0", "CY = ~$name0");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('orl', "C, /$rb", "CY = ~$name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3496,14 +3488,14 @@ sub orl_C__bit()
 
 sub mov_C_bit()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# MOV	C, bit			10100010 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('mov', "C, $rb0", "CY = $name0");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('mov', "C, $rb", "CY = $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3515,21 +3507,21 @@ sub mov_C_bit()
 
 sub inc_DPTR()
   {
-  my $str0;
+  my $str;
 
 	# INC	DPTR			10100011
 
   if ($DPTR != EMPTY)
     {
     ++$DPTR;
-    $str0 = sprintf " (0x%04X)", $DPTR;
+    $str = sprintf " (0x%04X)", $DPTR;
     }
   else
     {
-    $str0 = '';
+    $str = '';
     }
 
-  print_3('inc', 'DPTR', "++DPTR$str0");
+  print_3('inc', 'DPTR', "++DPTR$str");
   }
 
 #-------------------------------------------------------------------------------
@@ -3545,16 +3537,16 @@ sub mul_AB()
 
 sub unknown()
   {
-  my ($rb0, $str0, $str1);
+  my ($rb, $str0, $str1);
 
 	# The unknown instruction is actually simple embedded data in the code.
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0  = sprintf "0x%02X", $dcd_instr;
+    $rb  = sprintf "0x%02X", $dcd_instr;
     $str0 = present_char($dcd_instr);
     $str1 = sprintf "0x%04X", $dcd_address;
-    print_3('.db', $rb0, "$str1: $rb0$str0");
+    print_3('.db', $rb, "$str1: $rb$str0");
     }
   }
 
@@ -3562,14 +3554,14 @@ sub unknown()
 
 sub anl_C__bit()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# ANL	C, /bit			10110000 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('anl', "C, /$rb0", "CY &= ~$name0");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('anl', "C, /$rb", "CY &= ~$name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3581,14 +3573,14 @@ sub anl_C__bit()
 
 sub cpl_bit()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# CPL	bit			10110010 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('cpl', $rb0, "$name0 = ~$name0");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('cpl', $rb, "$name = ~$name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3658,14 +3650,14 @@ sub cjne_A_direct()
 
 sub push_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# PUSH	direct			11000000 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('push', $rb0, "++SP, [SP] = $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('push', $rb, "++SP, [SP] = $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3677,14 +3669,14 @@ sub push_direct()
 
 sub clr_bit()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# CLR	bit			11000010 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('clr', $rb0, "$name0 = L");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('clr', $rb, "$name = L");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3714,14 +3706,14 @@ sub swap_A()
 
 sub xch_A_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# XCH	A, direct		11000101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('xch', "A, $rb0", "ACC <-> $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('xch', "A, $rb", "ACC <-> $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3735,14 +3727,14 @@ sub xch_A_direct()
 
 sub pop_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# POP	direct			11010000 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('pop', $rb0, "$name0 = [SP], --SP");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('pop', $rb, "$name = [SP], --SP");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3756,14 +3748,14 @@ sub pop_direct()
 
 sub setb_bit()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# SETB	bit			11010010 bbbbbbbb		bit address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = bit_name($dcd_parm0, \$name0);
-    print_3('setb', $rb0, "$name0 = H");
+    $rb = bit_name($dcd_parm0, \$name);
+    print_3('setb', $rb, "$name = H");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3840,14 +3832,14 @@ sub clr_A()
 
 sub mov_A_direct()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# MOV	A, direct		11100101 aaaaaaaa		register address	The "MOV A, ACC" invalid instruction.
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('mov', "A, $rb0", "ACC = $name0");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('mov', "A, $rb", "ACC = $name");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -3879,14 +3871,14 @@ sub cpl_A()
 
 sub mov_direct_A()
   {
-  my ($rb0, $name0);
+  my ($rb, $name);
 
 	# MOV	direct, A		11110101 aaaaaaaa		register address
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb0 = reg_name($dcd_parm0, \$name0);
-    print_3('mov', "$rb0, A", "$name0 = ACC");
+    $rb = reg_name($dcd_parm0, \$name);
+    print_3('mov', "$rb, A", "$name = ACC");
     }
   elsif ($decoder_silent_level == SILENT1)
     {
@@ -4717,7 +4709,7 @@ sub determine_stack()
     if ($size == 3 && $instr == INST_MOV_DIRECT_DATA && $rom[$addr + 1] == SP)
       {
       $stack_start = $rom[$addr + 2] + 1;
-      $stack_size  = 0x100 - $stack_start;
+      $stack_size  = RAM_MAX_ADDR - $stack_start + 1;
       return;
       }
 
@@ -5232,7 +5224,7 @@ sub emit_ram_data($)
 sub emit_indirect_ram($)
   {
   my $Assembly_mode = $_[0];
-  my ($ram, $name, $str);
+  my ($ram, $name, $str0, $str1);
 
   return if (! scalar(keys(%ram_by_address)));
 
@@ -5248,8 +5240,9 @@ sub emit_indirect_ram($)
       next if ($ram->{TYPE} != RAM_TYPE_IND);
 
       $name = $ram->{NAME};
-      $str  = ($name ne '') ? $name : (sprintf "iram_0x%02X", $_);
-      printf "${str}::\n\t.ds 1\n", $_;
+      $str0 = sprintf "0x%02X", $_;
+      $str1 = ($name ne '') ? $name : "iram_$str0";
+      printf "${str1}::\n\t.ds 1\n", $_;
       }
     }
   else
@@ -5263,8 +5256,9 @@ sub emit_indirect_ram($)
       next if ($ram->{TYPE} != RAM_TYPE_IND);
 
       $name = $ram->{NAME};
-      $str  = ($name ne '') ? $name : (sprintf "iram_0x%02X", $_);
-      printf "0x%02X:\t$str\n", $_;
+      $str0 = sprintf "0x%02X", $_;
+      $str1 = ($name ne '') ? $name : "iram_$str0";
+      printf "${str0}:\t$str1\n", $_;
       }
     }
 
@@ -5280,7 +5274,7 @@ sub emit_indirect_ram($)
 sub emit_external_ram($)
   {
   my $Assembly_mode = $_[0];
-  my ($name, $str);
+  my ($name, $str0, $str1);
 
   return if (! scalar(keys(%xram_by_address)));
 
@@ -5291,8 +5285,9 @@ sub emit_external_ram($)
     foreach (sort {$a <=> $b} keys(%xram_by_address))
       {
       $name = $xram_by_address{$_};
-      $str  = ($name ne '') ? $name : (sprintf "xram_0x%04X", $_);
-      printf "$str\t=\t0x%04X\n", $_;
+      $str0 = sprintf "0x%04X", $_;
+      $str1 = ($name ne '') ? $name : "xram_$str0";
+      print "$str1\t=\t$str0\n";
       }
     }
   else
@@ -5302,8 +5297,9 @@ sub emit_external_ram($)
     foreach (sort {$a <=> $b} keys(%xram_by_address))
       {
       $name = $xram_by_address{$_};
-      $str  = ($name ne '') ? $name : (sprintf "xram_0x%04X", $_);
-      printf "0x%04X:\t$str\n", $_;
+      $str0 = sprintf "0x%04X", $_;
+      $str1 = ($name ne '') ? $name : "xram_$str0";
+      print "${str0}:\t$str1\n";
       }
     }
 
@@ -5319,7 +5315,7 @@ sub emit_external_ram($)
 sub emit_bits($)
   {
   my $Assembly_mode = $_[0];
-  my ($name, $str);
+  my ($name, $str0, $str1);
 
   return if (! scalar(keys(%bit_by_address)));
 
@@ -5331,8 +5327,8 @@ sub emit_bits($)
     foreach (sort {$a <=> $b} keys(%bit_by_address))
       {
       $name = $bit_by_address{$_};
-      $str  = ($name ne '') ? $name : (sprintf "bit_0x%02X", $_);
-      print "${str}::\n\t.ds 1\n";
+      $str0 = ($name ne '') ? $name : (sprintf "bit_0x%02X", $_);
+      print "${str0}::\n\t.ds 1\n";
       }
     }
   else
@@ -5342,8 +5338,9 @@ sub emit_bits($)
     foreach (sort {$a <=> $b} keys(%bit_by_address))
       {
       $name = $bit_by_address{$_};
-      $str  = ($name ne '') ? $name : (sprintf "bit_0x%02X", $_);
-      printf "0x%02X:\t$str\n", $_;
+      $str0 = sprintf "0x%02X", $_;
+      $str1 = ($name ne '') ? $name : "bit_$str0";
+      print "${str0}:\t$str1\n";
       }
     }
 
@@ -5361,7 +5358,7 @@ sub emit_ram_map()
   my @map = ();
   my ($ram, $i, $v);
 
-  for ($i = 0; $i < 256; ++$i)
+  for ($i = 0; $i <= RAM_MAX_ADDR; ++$i)
     {
     $ram = $ram_by_address{$i};
 
@@ -5376,26 +5373,26 @@ sub emit_ram_map()
     }
 
   $used_banks{0} = TRUE;
-  foreach (sort {$a <=> $b} keys(%used_banks))
+  foreach (keys(%used_banks))
     {
     $i = $_ * 8;
     $v = $i + 7;
     do
       {
-      $map[$i] = "$_";
+      $map[$i] = $_;
       ++$i;
       }
     while ($i <= $v);
     }
 
-  foreach (sort {$a <=> $b} keys(%bit_by_address))
+  foreach (keys(%bit_by_address))
     {
     $map[0x20 + int($_ / 8)] = 'B';
     }
 
   if ($stack_start > 0)
     {
-    for ($i = $stack_start; $i < 256; ++$i)
+    for ($i = $stack_start; $i <= RAM_MAX_ADDR; ++$i)
       {
       $map[$i] = 'S';
       }
@@ -5403,7 +5400,7 @@ sub emit_ram_map()
 
   print ";$border0\n;\tInternal RAM layout\n;$border0\n\n";
 
-  for ($i = 0; $i < 256; $i += 16)
+  for ($i = 0; $i <= RAM_MAX_ADDR; $i += 16)
     {
     printf "0x%02X: |", $i & 0xF0;
     print join('|', @map[$i .. ($i + 15)]) . "|\n";
@@ -5967,10 +5964,7 @@ if ($header_file ne '')
   read_header("$include_path/$header_file");
   }
 
-if ($name_list ne '')
-  {
-  is_file_ok($name_list);
-  }
+is_file_ok($name_list) if ($name_list ne '');
 
 read_map_file();
 read_name_list();

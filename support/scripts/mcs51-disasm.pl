@@ -773,6 +773,17 @@ sub is_empty($)
 #-------------------------------------------------------------------------------
 
 	#
+	# Creates a const block.
+	#
+
+sub add_const_area($$)
+  {
+  $const_areas_by_address{$_[0]} = $_[1];
+  }
+
+#-------------------------------------------------------------------------------
+
+	#
 	# Creates a new block, or modifies one.
 	#
 
@@ -1098,7 +1109,7 @@ sub read_map_file()
 	{
 	my ($start, $size) = (hex($1), hex($2));
 
-        $const_areas_by_address{$start} = $start + $size - 1;
+        add_const_area($start, $start + $size - 1);
 	$state = MAP_CONST;
 	}
       elsif (/^SSEG\s+([[:xdigit:]]+)\s+([[:xdigit:]]+)/o)
@@ -1694,8 +1705,9 @@ sub xram_name($$)
 
   $str = sprintf "0x%04X", $Address;
   ${$StrRef} = $str;
+  $xram = $xram_by_address{$Address};
 
-  $str = $xram->{NAME} if (defined($xram = $xram_by_address{$Address}) && $xram->{NAME} ne '');
+  $str = $xram->{NAME} if (defined($xram) && $xram->{NAME} ne '');
 
   return $str;
   }
@@ -1714,8 +1726,9 @@ sub iram_name($$)
 
   $str = sprintf "0x%02X", $Address;
   ${$StrRef} = $str;
+  $ram = $ram_names_by_address{$Address};
 
-  $str = $ram if (defined($ram = $ram_names_by_address{$Address}));
+  $str = $ram if (defined($ram));
 
   return $str;
   }
@@ -4875,11 +4888,12 @@ sub add_jump_address_in_table($$$)
 	# Jump tables looking for in the code.
 	#
 
-sub recognize_jump_tables_in_code()
+sub recognize_jump_tables_in_code($)
   {
+  my $Survey = $_[0];
   my @blocks = ((undef) x 9);
   my @instrs = ((EMPTY) x 9);
-  my ($parm, $data1, $data2, $addrL, $addrH, $size);
+  my ($parm, $data1, $data2, $addrL, $addrH, $end, $size);
 
   foreach (sort {$a <=> $b} keys(%blocks_by_address))
     {
@@ -4942,11 +4956,20 @@ sub recognize_jump_tables_in_code()
       $addrL = $blocks[2]->{ADDR} + $rom[$blocks[0]->{ADDR} + 1];
       $addrH = $blocks[6]->{ADDR} + $rom[$blocks[4]->{ADDR} + 1];
       $size  = $addrH - $addrL;
+      $end   = $addrH + $size - 1;
 
-      disable_instruction_blocks($addrL, $addrH + $size - 1);
-      add_block($addrL, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
-      add_block($addrH, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
-      add_jump_address_in_table($addrL, $addrH, $size);
+      if ($Survey)
+	{
+	$const_areas_by_address{$addrL} = $end;
+	add_const_area($addrL, $end);
+	}
+      else
+	{
+	disable_instruction_blocks($addrL, $end);
+	add_block($addrL, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+	add_block($addrH, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+	add_jump_address_in_table($addrL, $addrH, $size);
+	}
       }
     elsif ($blocks[0]->{SIZE} == 3 && $instrs[0] == INST_MOV_DPTR_DATA &&	# mov	DPTR, #tLow
 
@@ -4995,11 +5018,19 @@ sub recognize_jump_tables_in_code()
       $addrL = ($rom[$blocks[0]->{ADDR} + 1] << 8) | $rom[$blocks[0]->{ADDR} + 2];
       $addrH = ($rom[$blocks[3]->{ADDR} + 1] << 8) | $rom[$blocks[3]->{ADDR} + 2];
       $size  = $addrH - $addrL;
+      $end   = $addrH + $size - 1;
 
-      disable_instruction_blocks($addrL, $addrH + $size - 1);
-      add_block($addrL, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
-      add_block($addrH, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
-      add_jump_address_in_table($addrL, $addrH, $size);
+      if ($Survey)
+	{
+	add_const_area($addrL, $end);
+	}
+      else
+	{
+	disable_instruction_blocks($addrL, $end);
+	add_block($addrL, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+	add_block($addrH, BLOCK_JTABLE, $size, BL_TYPE_JTABLE, '');
+	add_jump_address_in_table($addrL, $addrH, $size);
+	}
       }
     }
   }
@@ -5894,7 +5925,7 @@ for (my $i = 0; $i < @ARGV; )
 	$end   = MCS51_ROM_SIZE - 1;
 	}
 
-      $const_areas_by_address{$start} = $end if ($start < $end);
+      add_const_area($start, $end) if ($start < $end);
       } # when (/^--const-area$/o)
 
     when (/^-(hc|-hex-constant)$/o)
@@ -6010,11 +6041,20 @@ read_map_file();
 read_name_list();
 fix_multi_byte_variables();
 split_code_to_blocks();
+
+if ($recognize_jump_tables)
+  {
+  recognize_jump_tables_in_code(TRUE);
+  %blocks_by_address = ();
+  %labels_by_address = ();
+  split_code_to_blocks();
+  recognize_jump_tables_in_code(FALSE);
+  }
+
 determine_stack();
 preliminary_survey(SILENT2);
 preliminary_survey(SILENT1);
 find_labels_in_code();
-recognize_jump_tables_in_code() if ($recognize_jump_tables);
 find_lost_labels_in_code() if ($find_lost_labels);
 add_names_labels();
 disassembler();

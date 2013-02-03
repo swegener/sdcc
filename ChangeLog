@@ -1,3 +1,7 @@
+2013-02-03 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl: Bugfix and count of references in the RAM.
+
 2013-02-01 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Small refinements.

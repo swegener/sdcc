@@ -195,6 +195,7 @@ use constant INST_XCH_A_DIRECT		=> 0xC5;
 use constant INST_POP_DIRECT		=> 0xD0;
 use constant INST_CLR_A			=> 0xE4;
 use constant INST_MOV_A_DIRECT		=> 0xE5;
+use constant INST_MOV_A_Ri		=> 0xE6;
 use constant INST_MOV_A_Rn		=> 0xE8;
 use constant INST_MOV_DIRECT_A		=> 0xF5;
 use constant INST_CJNE_A_DATA		=> 0xB4;
@@ -1694,7 +1695,7 @@ sub xram_name($$)
   $str = sprintf "0x%04X", $Address;
   ${$StrRef} = $str;
 
-  $str = $xram if (defined($xram = $xram_by_address{$Address}) && $xram ne '');
+  $str = $xram->{NAME} if (defined($xram = $xram_by_address{$Address}) && $xram->{NAME} ne '');
 
   return $str;
   }
@@ -4839,7 +4840,8 @@ sub disable_instruction_blocks($$)
 
   foreach (sort {$a <=> $b} keys(%blocks_by_address))
     {
-    next if ($Start > $_);
+    next if ($_< $Start);
+
     last if ($End < $_);
 
     $blocks_by_address{$_}->{TYPE} = BLOCK_DISABLED;
@@ -4907,7 +4909,8 @@ sub recognize_jump_tables_in_code()
 	 $instrs[2] == INST_MOV_DIRECT_A) &&					# mov	DPL, A
 
 	(($blocks[3]->{SIZE} == 2 && $instrs[3] == INST_MOV_A_DIRECT) ||	# mov	A, direct
-	 ($blocks[3]->{SIZE} == 1 && ($instrs[3] & 0xF8) == INST_MOV_A_Rn)) &&	# mov	A, Rn
+	 ($blocks[3]->{SIZE} == 1 && (($instrs[3] & 0xF8) == INST_MOV_A_Rn || 	# mov	A, Rn
+				      ($instrs[3] & 0xFE) == INST_MOV_A_Ri))) && # mov	A, @Ri
 
 	$blocks[4]->{SIZE} == 2 && $instrs[4] == INST_ADD_A_DATA &&		# add	A, #0xZZ
 

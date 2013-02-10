@@ -1,3 +1,7 @@
+2013-02-10 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl: Adds used count to sfr, sbit and bit lists.
+
 2013-02-08 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: bugfix

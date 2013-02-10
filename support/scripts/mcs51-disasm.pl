@@ -106,10 +106,39 @@ my %const_areas_by_address  = ();	# From the command line parameters.
 
 my %const_blocks_by_address = ();
 
+=back
+	The structure of one element of the %sfr_by_address hash:
+
+	{
+	NAME	  => '',
+	REF_COUNT => 0
+	}
+=cut
+
 my %sfr_by_address	  = ();
 my %sfr_by_names	  = ();
+
+=back
+	The structure of one element of the %sfr_bit_by_address hash:
+
+	{
+	NAME	  => '',
+	REF_COUNT => 0
+	}
+=cut
+
 my %sfr_bit_by_address	  = ();
+
 my %used_banks		  = ();
+
+=back
+	The structure of one element of the %bit_by_address hash:
+
+	{
+	NAME	  => '',
+	REF_COUNT => 0
+	}
+=cut
 
 my %bit_by_address	  = ();
 
@@ -986,45 +1015,108 @@ sub add_jump_label($$$$$)
 #-------------------------------------------------------------------------------
 
 	#
-	# Store a variable name from bit area.
+	# Store a bit or sbit name from bit area.
 	#
 
-sub add_bit($$)
+sub add_bit($$$)
   {
-  my ($Address, $Name) = @_;
+  my ($Address, $Name, $Map_mode) = @_;
 
-  return if ($Address > BIT_LAST_ADDR);
+  if ($Address > BIT_LAST_ADDR)
+    {
+    if (! defined($sfr_bit_by_address{$Address}))
+      {
+      $sfr_bit_by_address{$Address} = {
+				      NAME	=> $Name,
+				      REF_COUNT => ($Map_mode) ? 0 : 1
+				      };
+      }
+    else
+      {
+      my $sbit = $sfr_bit_by_address{$Address};
 
-  $bit_by_address{$Address} = $Name if (! defined($bit_by_address{$Address}));
+      if ($Name ne '' && $sbit->{NAME} ne $Name)
+	{
+	Log(sprintf("Warning, the address: 0x%02X already busy by the $sbit->{NAME} bit.", $Address), 2);
+	}
+      else
+	{
+	++$sbit->{REF_COUNT} if (! $Map_mode);
+	}
+      }
+    }
+  else
+    {
+    if (! defined($bit_by_address{$Address}))
+      {
+      $bit_by_address{$Address} = {
+				  NAME	    => $Name,
+				  REF_COUNT => ($Map_mode) ? 0 : 1
+				  };
+      }
+    else
+      {
+      my $bit = $bit_by_address{$Address};
+
+      ++$bit->{REF_COUNT} if (! $Map_mode);
+      }
+    }
   }
 
 #-------------------------------------------------------------------------------
 
 	#
-	# Store a variable name.
+	# Store a sfr or variable name.
 	#
 
 sub add_ram($$$$)
   {
   my ($Address, $Name, $Type, $Map_mode) = @_;
 
-  return if ($Address == EMPTY || $Address == RAM_MAX_ADDR);
-  return if ($Address > RAM_LAST_DIR_ADDR && $Type == RAM_TYPE_DIR);
+  return if ($Address == EMPTY);
 
-  if (! defined($ram_by_address{$Address}))
+  if ($Address > RAM_LAST_DIR_ADDR && $Type == RAM_TYPE_DIR)
     {
-    $ram_by_address{$Address} = {
+    if (! defined($sfr_by_address{$Address}))
+      {
+      $sfr_by_address{$Address} = {
+				  NAME      => $Name,
+				  REF_COUNT => ($Map_mode) ? 0 : 1
+				  };
+      }
+    else
+      {
+      my $sfr = $sfr_by_address{$Address};
+
+      if ($Name ne '' && $sfr->{NAME} ne $Name)
+	{
+	Log(sprintf("Warning, the address: 0x%02X already busy by the $sfr->{NAME} register.", $Address), 2);
+	}
+      else
+	{
+	++$sfr->{REF_COUNT} if (! $Map_mode);
+	}
+      }
+
+    $sfr_by_names{$Name} = $Address;
+    }
+  else
+    {
+    if (! defined($ram_by_address{$Address}))
+      {
+      $ram_by_address{$Address} = {
 				TYPE	  => $Type,
 				NAME	  => $Name,
 				SIZE	  => 1,
 				REF_COUNT => ($Map_mode) ? 0 : 1
 				};
-    }
-  else
-    {
-    my $ram = $ram_by_address{$Address};
+      }
+    else
+      {
+      my $ram = $ram_by_address{$Address};
 
-    ++$ram->{REF_COUNT} if (! $Map_mode);
+      ++$ram->{REF_COUNT} if (! $Map_mode);
+      }
     }
   }
 
@@ -1302,7 +1394,7 @@ sub read_name_list()
 	{
 	if ($line =~ /^0x([[:xdigit:]]+)\s*:\s*(\S+)$/io)
 	  {
-	  add_bit(hex($1), $2);
+	  add_bit(hex($1), $2, TRUE);
 	  }
 	}
 
@@ -1693,7 +1785,7 @@ sub reg_name($$)
     }
   elsif (defined($sfr_by_address{$Address}))
     {
-    $str = $sfr_by_address{$Address};
+    $str = $sfr_by_address{$Address}->{NAME};
     ${$StrRef} = $str;
     }
   elsif (defined($ram = $ram_names_by_address{$Address}))
@@ -1765,16 +1857,16 @@ sub bit_name($$)
   my ($Address, $StrRef) = @_;
   my ($bit, $str);
 
-  if (defined($bit = $sfr_bit_by_address{$Address}))
+  if (defined($bit = $sfr_bit_by_address{$Address}) && $bit->{NAME} ne '')
     {
-    $str = $bit;
+    $str = $bit->{NAME};
     ${$StrRef} = $str;
     }
-  elsif (defined($bit = $bit_by_address{$Address}) && $bit ne '')
+  elsif (defined($bit = $bit_by_address{$Address}) && $bit->{NAME} ne '')
     {
     $str = sprintf "0x%02X", $Address;
     ${$StrRef} = "[$str]";
-    $str = $bit;
+    $str = $bit->{NAME};
     }
   else
     {
@@ -2680,7 +2772,7 @@ sub jbc_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
 
   invalidate_DPTR_Rx();
@@ -2766,7 +2858,7 @@ sub jb_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
 
   invalidate_DPTR_Rx();
@@ -2848,7 +2940,7 @@ sub jnb_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
 
   invalidate_DPTR_Rx();
@@ -3262,7 +3354,7 @@ sub orl_C_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -3389,7 +3481,7 @@ sub anl_C_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -3468,7 +3560,7 @@ sub mov_bit_C()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -3533,7 +3625,7 @@ sub orl_C__bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -3552,7 +3644,7 @@ sub mov_C_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -3618,7 +3710,7 @@ sub anl_C__bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -3637,7 +3729,7 @@ sub cpl_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -3734,7 +3826,7 @@ sub clr_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -3813,7 +3905,7 @@ sub setb_bit()
     }
   elsif ($decoder_silent_level == SILENT1)
     {
-    add_bit($dcd_parm0, '');
+    add_bit($dcd_parm0, '', FALSE);
     }
   }
 
@@ -4326,48 +4418,6 @@ sub instruction_decoder($$)
 ################################################################################
 
 	#
-	# Auxiliary procedure. Adds a register to the sfrs list.
-	#
-
-sub reg_add_to_list($$)
-  {
-  my ($Address, $Name) = @_;
-
-  if (! defined($sfr_by_address{$Address}))
-    {
-    $sfr_by_address{$Address} = $Name;
-    }
-  else
-    {
-    Log(sprintf("Warning, the address: 0x%02X already busy by the $sfr_by_address{$Address} register.", $Address), 2);
-    }
-
-  $sfr_by_names{$Name} = $Address;
-  }
-
-#-------------------------------------------------------------------------------
-
-	#
-	# Auxiliary procedure. Adds a bit to the bits list.
-	#
-
-sub bit_add_to_list($$)
-  {
-  my ($Address, $Name) = @_;
-
-  if (! defined($sfr_bit_by_address{$Address}))
-    {
-    $sfr_bit_by_address{$Address} = $Name;
-    }
-  else
-    {
-    Log(sprintf("Warning, the address: 0x%02X already busy by the $sfr_bit_by_address{$Address} bit.", $Address), 2);
-    }
-  }
-
-#-------------------------------------------------------------------------------
-
-	#
 	# Reads the sfrs and bits from the $Line.
 	#
 
@@ -4387,37 +4437,37 @@ sub process_header_line($)
     {
 	# __sfr __at (0x80) P0 ;  /* PORT 0 */
 
-    reg_add_to_list(hex($1), $2);
+    add_ram(hex($1), $2, RAM_TYPE_DIR, TRUE);
     }
   elsif ($Line =~ /^SFR\s*\(\s*([\w_]+)\s*,\s*0x([[:xdigit:]]+)\s*\)/io)
     {
 	# SFR(P0, 0x80); // Port 0
 
-    reg_add_to_list(hex($2), $1);
+    add_ram(hex($2), $1, RAM_TYPE_DIR, TRUE);
     }
   elsif ($Line =~ /^sfr\s+([\w_]+)\s*=\s*0x([[:xdigit:]]+)/io)
     {
 	# sfr P1  = 0x90;
 
-    reg_add_to_list(hex($2), $1);
+    add_ram(hex($2), $1, RAM_TYPE_DIR, TRUE);
     }
   elsif ($Line =~ /^__sbit\s+__at\s*(?:\(\s*)?0x([[:xdigit:]]+)(?:\s*\))?\s+([\w_]+)/io)
     {
 	# __sbit __at (0x86) P0_6  ;
 
-    bit_add_to_list(hex($1), $2);
+    add_bit(hex($1), $2, TRUE);
     }
   elsif ($Line =~ /^SBIT\s*\(\s*([\w_]+)\s*,\s*0x([[:xdigit:]]+)\s*,\s*(\d)\s*\)/io)
     {
 	# SBIT(P0_0, 0x80, 0); // Port 0 bit 0
 
-    bit_add_to_list(hex($2) + int($3), $1);
+    add_bit(hex($2) + int($3), $1, TRUE);
     }
   elsif ($Line =~ /^sbit\s+([\w_]+)\s*=\s*0x([[:xdigit:]]+)/io)
     {
 	# sbit P3_1 = 0xB1;
 
-    bit_add_to_list(hex($2), $1);
+    add_bit(hex($2), $1, TRUE);
     }
   elsif ($Line =~ /^sbit\s+([\w_]+)\s*=\s*([\w_]+)\s*\^\s*(\d)/io)
     {
@@ -4425,7 +4475,7 @@ sub process_header_line($)
 
     my ($name, $reg, $bit) = ($1, $2, $3);
 
-    bit_add_to_list($sfr_by_names{$reg} + $bit, $name) if (defined($sfr_by_names{$reg}));
+    add_bit($sfr_by_names{$reg} + $bit, $name, TRUE) if (defined($sfr_by_names{$reg}));
     }
   }
 
@@ -5032,6 +5082,7 @@ sub recognize_jump_tables_in_code($)
 sub emit_globals($)
   {
   my $Assembly_mode = $_[0];
+  my ($label, $cnt0, $cnt1, $str0, $str1);
 
   return if (! scalar(keys(%labels_by_address)));
 
@@ -5041,7 +5092,7 @@ sub emit_globals($)
     {
     foreach (sort {$a <=> $b} keys(%labels_by_address))
       {
-      my $label = $labels_by_address{$_};
+      $label = $labels_by_address{$_};
 
       next if ($label->{TYPE} != BL_TYPE_SUB);
 
@@ -5052,15 +5103,15 @@ sub emit_globals($)
     {
     foreach (sort {$a <=> $b} keys(%labels_by_address))
       {
-      my $label = $labels_by_address{$_};
+      $label = $labels_by_address{$_};
 
       next if ($label->{TYPE} != BL_TYPE_SUB);
 
-      my $str1 = sprintf "0x%04X", $_;
-      my $cnt1 = sprintf "%3u", $label->{CALL_COUNT};
-      my $cnt2 = sprintf "%3u", $label->{JUMP_COUNT};
-      my $str2 = ($label->{CALL_COUNT} || $label->{JUMP_COUNT}) ? "calls: $cnt1, jumps: $cnt2" : 'not used';
-      print "$str1:\t" . align($label->{NAME}, STAT_ALIGN_SIZE) . "($str2)\n";
+      $str0 = sprintf "0x%04X", $_;
+      $cnt0 = sprintf "%3u", $label->{CALL_COUNT};
+      $cnt1 = sprintf "%3u", $label->{JUMP_COUNT};
+      $str1 = ($label->{CALL_COUNT} || $label->{JUMP_COUNT}) ? "calls: $cnt0, jumps: $cnt1" : 'not used';
+      print "${str0}:\t" . align($label->{NAME}, STAT_ALIGN_SIZE) . "($str1)\n";
       }
     }
 
@@ -5076,6 +5127,7 @@ sub emit_globals($)
 sub emit_sfrs($)
   {
   my $Assembly_mode = $_[0];
+  my ($sfr, $cnt, $str0, $str1);
 
   return if (! scalar(keys(%sfr_by_address)));
 
@@ -5086,7 +5138,7 @@ sub emit_sfrs($)
 
     foreach (sort {$a <=> $b} keys(%sfr_by_address))
       {
-      printf "$sfr_by_address{$_}\t=\t0x%02X\n", $_;
+      printf "$sfr_by_address{$_}->{NAME}\t=\t0x%02X\n", $_;
       }
     }
   else
@@ -5095,7 +5147,11 @@ sub emit_sfrs($)
 
     foreach (sort {$a <=> $b} keys(%sfr_by_address))
       {
-      printf "0x%02X:\t$sfr_by_address{$_}\n", $_;
+      $sfr  = $sfr_by_address{$_};
+      $str0 = sprintf "0x%02X", $_;
+      $cnt  = sprintf "%3u", $sfr->{REF_COUNT};
+      $str1 = ($sfr->{REF_COUNT}) ? "used $cnt times" : 'not used';
+      print "${str0}:\t" . align($sfr->{NAME}, STAT_ALIGN_SIZE) . "($str1)\n";
       }
     }
 
@@ -5111,6 +5167,7 @@ sub emit_sfrs($)
 sub emit_sfr_bits($)
   {
   my $Assembly_mode = $_[0];
+  my ($sbit, $cnt, $str0, $str1);
 
   return if (! scalar(keys(%sfr_bit_by_address)));
 
@@ -5121,7 +5178,7 @@ sub emit_sfr_bits($)
 
     foreach (sort {$a <=> $b} keys(%sfr_bit_by_address))
       {
-      printf "$sfr_bit_by_address{$_}\t=\t0x%02X\n", $_;
+      printf "$sfr_bit_by_address{$_}->{NAME}\t=\t0x%02X\n", $_;
       }
     }
   else
@@ -5130,7 +5187,11 @@ sub emit_sfr_bits($)
 
     foreach (sort {$a <=> $b} keys(%sfr_bit_by_address))
       {
-      printf "0x%02X:\t$sfr_bit_by_address{$_}\n", $_;
+      $sbit = $sfr_bit_by_address{$_};
+      $str0 = sprintf "0x%02X", $_;
+      $cnt  = sprintf "%3u", $sbit->{REF_COUNT};
+      $str1 = ($sbit->{REF_COUNT}) ? "used $cnt times" : 'not used';
+      print "${str0}:\t" . align($sbit->{NAME}, STAT_ALIGN_SIZE) . "($str1)\n";
       }
     }
 
@@ -5180,6 +5241,7 @@ sub emit_ram_data($)
   {
   my $Assembly_mode = $_[0];
   my ($ram, $first, $next_addr, $size);
+  my ($cnt, $str0, $str1);
 
   return if (! scalar(keys(%ram_by_address)));
 
@@ -5238,14 +5300,13 @@ sub emit_ram_data($)
 
       next if ($next_addr != EMPTY && $_ < $next_addr);
 
-      my $str0 = sprintf "0x%02X", $_;
-      my $cnt0 = sprintf "%3u", $ram->{REF_COUNT};
-      my $str1 = ($ram->{REF_COUNT}) ? "used $cnt0 times" : 'not used';
+      $str0 = sprintf "0x%02X", $_;
+      $cnt  = sprintf "%3u", $ram->{REF_COUNT};
+      $str1 = ($ram->{REF_COUNT}) ? "used $cnt times" : 'not used';
 
       if ($ram->{NAME} ne '')
 	{
-        my $cnt = sprintf "%3u", $ram->{SIZE};
-
+        $cnt = sprintf "%3u", $ram->{SIZE};
 	print "${str0}:\t" . align($ram->{NAME}, STAT_ALIGN_SIZE) . "($cnt bytes) ($str1)\n";
 	$next_addr = $_ + $ram->{SIZE};
 	}
@@ -5277,7 +5338,7 @@ sub emit_ram_data($)
 sub emit_indirect_ram($)
   {
   my $Assembly_mode = $_[0];
-  my ($ram, $name, $cnt0, $str0, $str1, $str2);
+  my ($ram, $name, $cnt, $str0, $str1, $str2);
 
   return if (! scalar(keys(%ram_by_address)));
 
@@ -5311,8 +5372,8 @@ sub emit_indirect_ram($)
       $name = $ram->{NAME};
       $str0 = sprintf "0x%02X", $_;
       $str1 = ($name ne '') ? $name : "iram_$str0";
-      $cnt0 = sprintf "%3u", $ram->{REF_COUNT};
-      $str2 = ($ram->{REF_COUNT}) ? "used $cnt0 times" : 'not used';
+      $cnt  = sprintf "%3u", $ram->{REF_COUNT};
+      $str2 = ($ram->{REF_COUNT}) ? "used $cnt times" : 'not used';
       print "${str0}:\t" . align($str1, STAT_ALIGN_SIZE) . "($str2)\n";
       }
     }
@@ -5329,7 +5390,7 @@ sub emit_indirect_ram($)
 sub emit_external_ram($)
   {
   my $Assembly_mode = $_[0];
-  my ($xram, $name, $str0, $cnt0, $str1, $str2);
+  my ($xram, $name, $cnt, $str0, $str1, $str2);
 
   return if (! scalar(keys(%xram_by_address)));
 
@@ -5355,9 +5416,9 @@ sub emit_external_ram($)
       $xram = $xram_by_address{$_};
       $name = $xram->{NAME};
       $str0 = sprintf "0x%04X", $_;
-      $cnt0 = sprintf "%3u", $xram->{REF_COUNT};
       $str1 = ($name ne '') ? $name : "xram_$str0";
-      $str2 = ($xram->{REF_COUNT}) ? "used $cnt0 times" : 'not used';
+      $cnt  = sprintf "%3u", $xram->{REF_COUNT};
+      $str2 = ($xram->{REF_COUNT}) ? "used $cnt times" : 'not used';
       print "${str0}:\t" . align($str1, STAT_ALIGN_SIZE) . "($str2)\n";
       }
     }
@@ -5374,7 +5435,7 @@ sub emit_external_ram($)
 sub emit_bits($)
   {
   my $Assembly_mode = $_[0];
-  my ($name, $str0, $str1);
+  my ($bit, $name, $cnt, $str0, $str1, $str2);
 
   return if (! scalar(keys(%bit_by_address)));
 
@@ -5385,7 +5446,8 @@ sub emit_bits($)
 
     foreach (sort {$a <=> $b} keys(%bit_by_address))
       {
-      $name = $bit_by_address{$_};
+      $bit  = $bit_by_address{$_};
+      $name = $bit->{NAME};
       $str0 = ($name ne '') ? $name : (sprintf "bit_0x%02X", $_);
       print "${str0}::\n\t.ds 1\n";
       }
@@ -5396,10 +5458,13 @@ sub emit_bits($)
 
     foreach (sort {$a <=> $b} keys(%bit_by_address))
       {
-      $name = $bit_by_address{$_};
+      $bit  = $bit_by_address{$_};
+      $name = $bit->{NAME};
       $str0 = sprintf "0x%02X", $_;
       $str1 = ($name ne '') ? $name : "bit_$str0";
-      print "${str0}:\t$str1\n";
+      $cnt  = sprintf "%3u", $bit->{REF_COUNT};
+      $str2 = ($bit->{REF_COUNT}) ? "used $cnt times" : 'not used';
+      print "${str0}:\t" . align($str1, STAT_ALIGN_SIZE) . "($str2)\n";
       }
     }
 

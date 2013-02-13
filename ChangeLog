@@ -1,3 +1,8 @@
+2013-02-13 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl:
+	  Use default sfr and sbit names if no header file.
+
 2013-02-10 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Adds used count to sfr, sbit and bit lists.

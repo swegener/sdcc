@@ -2759,11 +2759,13 @@ fi
 $as_echo_n "checking devices supported by gputils... " >&6; }
 good_pics="";
 bad_pics="";
-echo "  END" > /tmp/check.asm;
+CHECK=".checkdevices/check.asm";
+mkdir -p ".checkdevices";
+echo "  END" > "$CHECK";
 for i in "${srcdir}/libdev/pic1"*.c; do
   p="${i##*pic}";
   p="${p%.c}";
-  if $mCCAS -p "$p" /tmp/check.asm >/dev/null 2>&1; then
+  if $mCCAS -p "$p" "$CHECK" >/dev/null 2>&1; then
     good_pics="$good_pics $p";
   else
     bad_pics="$bad_pics $p";

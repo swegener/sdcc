@@ -1,3 +1,13 @@
+2013-02-17 Raphael Neider <rneider AT web.de>
+
+	* device/non-free/lib/pic14/configure.in,
+	  device/non-free/lib/pic16/configure.ac:
+	  Check and display devices missing in gputils before proceeding
+	  and request updating gputils if any to-be-supported is missing
+	* device/non-free/lib/pic14/configure,
+	  device/non-free/lib/pic16/configure:
+	  regenerated
+
 2013-02-13 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl:

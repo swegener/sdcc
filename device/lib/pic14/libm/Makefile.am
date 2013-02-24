@@ -35,7 +35,7 @@ libm_a_CFLAGS = -p$(ARCH) $(AM_CFLAGS)
 
 libme_a_SOURCES = $(libm_a_SOURCES)
 
-limbe_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
+libme_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
 
 if HAVE_NEW_PICS
 # add new pics libraries to be built here

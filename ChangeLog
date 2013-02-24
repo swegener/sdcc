@@ -3,7 +3,9 @@
 	* device/lib/pic14/libsdcc/ulong2fs.c:
 	  prefer 'while (COND) {}' over 'if (COND) do {} while (COND)'
 	* src/pic14/gen.c (genAnd):
-	  fix for loop condition in ulong2fs.c (#3605855)
+	  fix for loop condition in ulong2fs.c (fixes #3605855)
+	* device/lib/pic14/libm/Makefile.am:
+	  fix typo in CFLAGS for libme (fixes #3605860)
 
 2013-02-17 Raphael Neider <rneider AT web.de>
 

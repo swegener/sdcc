@@ -1,3 +1,10 @@
+2013-02-24 Raphael Neider <rneider AT web.de>
+
+	* device/lib/pic14/libsdcc/ulong2fs.c:
+	  prefer 'while (COND) {}' over 'if (COND) do {} while (COND)'
+	* src/pic14/gen.c (genAnd):
+	  fix for loop condition in ulong2fs.c (#3605855)
+
 2013-02-17 Raphael Neider <rneider AT web.de>
 
 	* device/non-free/lib/pic14/configure.in,

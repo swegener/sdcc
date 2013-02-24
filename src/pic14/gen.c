@@ -4053,35 +4053,29 @@ genAnd (iCode * ic, iCode * ifx)
             {
               if ((bytelit = ((lit >> (offset * 8)) & 0x0FFL)) != 0x0L)
                 {
-                  mov2w (AOP (left), offset);
                   // byte ==  2^n ?
                   if ((posbit = isLiteralBit (bytelit)) != 0)
                     {
-                      emitpcode (rIfx.condition ? POC_BTFSC : POC_BTFSS,        // XXX: or the other way round?
+                      emitpcode (POC_BTFSC,
                                  newpCodeOpBit (aopGet (AOP (left), offset, FALSE, FALSE), posbit - 1, 0));
-                      pic14_emitcode ("jb", "acc.%d,%05d_DS_", (posbit - 1) & 0x07, labelKey2num (tlbl->key));
                     }
                   else
                     {
+                      mov2w (AOP (left), offset);
                       emitpcode (POC_ANDLW, newpCodeOpLit (bytelit & 0x0ff));
-                      if (rIfx.condition)
-                        emitSKPZ;
-                      else
-                        emitSKPNZ;
-
-                      if (bytelit != 0x0FFL)
-                        {
-                          pic14_emitcode ("anl", "a,%s", aopGet (AOP (right), offset, FALSE, TRUE));
-                        }
-                      pic14_emitcode ("jnz", "%05d_DS_", labelKey2num (tlbl->key));
+                      emitSKPZ;
                     }
-
-                  emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
-                  ifx->generated = 1;
-
+                  emitpcode (POC_GOTO, popGetLabel (rIfx.condition ?
+                                                    rIfx.lbl->key : tlbl->key));
                 }
-              offset++;
+                offset++;
             }
+          if (!rIfx.condition)
+            {
+              emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
+            }
+          emitpLabel(tlbl->key);
+          ifx->generated = 1;
           // bit = left & literal
           if (size)
             {

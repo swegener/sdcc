@@ -65,28 +65,19 @@ float __ulong2fs (unsigned long a ) _FS_REENTRANT
     {
       // we lose accuracy here
       a >>= 1;
-      exp++;
+      ++exp;
     }
   
 
-  if(a < HIDDEN) {
-  	do {
-  		a<<=1;
-  		exp--;
-  	} while (a < HIDDEN);
-  }
-
-#if 0
   while (a < HIDDEN) {
       a <<= 1;
-      exp--;
+      --exp;
     }
-#endif
 
 #if 1
   if ((a&0x7fffff)==0x7fffff) {
     a=0;
-    exp++;
+    ++exp;
   }
 #endif
 

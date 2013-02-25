@@ -1,3 +1,8 @@
+2013-02-25 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/ralloc.c (packRegsForOneuse):
+	  prevent NULL ptr dereference (fixes bug #3605966)
+
 2013-02-24 Raphael Neider <rneider AT web.de>
 
 	* device/lib/pic14/libsdcc/ulong2fs.c:

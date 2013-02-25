@@ -3069,6 +3069,13 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
                         return dic;
                 }
                 dic = dic->next;
+
+                if (!dic)
+                  {
+                    /* Not sure why we advance dic ... Make sure that we do
+                     * not SEGFAULT by dereferencing a NULL pitr later on. */
+                    return NULL;
+                  } // if
         }
 
 

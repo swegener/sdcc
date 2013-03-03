@@ -6108,7 +6108,7 @@ genConstPointerGet (operand * left, operand * result, iCode * ic)
 
   {
     char *func[] = { NULL, "__gptrget1", "__gptrget2", "__gptrget3", "__gptrget4" };
-    int size = min ((int)getSize (OP_SYM_ETYPE (left)), AOP_SIZE (result));
+    int size = AOP_SIZE (result);
     assert (size > 0 && size <= 4);
 
     mov2w_op (left, 0);

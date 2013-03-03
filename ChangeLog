@@ -5,6 +5,8 @@
 	  (genUnpackBits): handle dummy reads w/o result correctly,
 	  (genNearPointerGet): handle dummy reads w/o result efficiently,
 	  together this fixes #3606703
+	* src/pic14/gen.c (genConstPointerGet):
+	  read AOP_SIZE(result) bytes from source, fixes #3606709
 
 2013-02-25 Raphael Neider <rneider AT web.de>
 

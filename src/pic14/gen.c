@@ -1073,9 +1073,10 @@ popGet (asmop * aop, int offset)        //, bool bit16, bool dname)
 
 
   /* XXX: still needed for BIT operands (AOP_CRY) */
-  if (offset > (aop->size - 1) && aop->type != AOP_LIT && aop->type != AOP_PCODE)
+  if ((offset >= aop->size) && (aop->type != AOP_LIT) && (aop->type != AOP_PCODE))
     {
-      printf ("%s: (offset[%d] > AOP_SIZE(op)[%d]-1) && AOP_TYPE(op) != AOP_LIT)\n", __FUNCTION__, offset, aop->size);
+      printf ("%s: (offset[%d] >= AOP_SIZE(op)[%d]) && (AOP_TYPE(op)[%d] != { AOP_LIT, AOP_PCODE })\n",
+              __FUNCTION__, offset, aop->size, aop->type);
       return NULL;              //zero;
     }
 
@@ -5558,24 +5559,29 @@ SetIrp (operand * result)
       else
         emitCLRIRP;
     }
+  else if ((AOP_TYPE (result) == AOP_PCODE) && (AOP (result)->aopu.pcop->type == PO_LITERAL))
+    {
+      int addrs = PCOL (AOP (result)->aopu.pcop)->lit;
+      if (addrs & 0x100)
+        emitSETIRP;
+      else
+        emitCLRIRP;
+    }
+  else if ((AOP_TYPE (result) == AOP_PCODE) && (AOP (result)->aopu.pcop->type == PO_IMMEDIATE))
+    {
+      emitCLRIRP;           /* always ensure this is clear as it may have previously been set */
+      emitpcode (POC_MOVLW, popGetAddr (AOP (result), 1, 0));
+      emitpcode (POC_ANDLW, popGetLit (0x01));
+      emitSKPZ;
+      emitSETIRP;
+    }
   else
     {
-      if ((AOP_TYPE (result) == AOP_PCODE) && (AOP (result)->aopu.pcop->type == PO_LITERAL))
+      emitCLRIRP;           /* always ensure this is clear as it may have previouly been set */
+      if (AOP_SIZE (result) > 1)
         {
-          int addrs = PCOL (AOP (result)->aopu.pcop)->lit;
-          if (addrs & 0x100)
-            emitSETIRP;
-          else
-            emitCLRIRP;
-        }
-      else
-        {
-          emitCLRIRP;           /* always ensure this is clear as it may have previouly been set */
-          if (AOP_SIZE (result) > 1)
-            {
-              emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (result), 1, FALSE, FALSE), 0, 0));
-              emitSETIRP;
-            }
+          emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (result), 1, FALSE, FALSE), 0, 0));
+          emitSETIRP;
         }
     }
 }
@@ -5763,17 +5769,29 @@ genUnpackBits (operand * result, operand * left, int ptype, iCode * ifx)
         }
       else
         {
-          int i;
+          /*
+           * In case of a volatile bitfield read such as
+           * (void)PORTCbits.RC3;
+           * we end up having no result ...
+           */
+          int haveResult = !!AOP_SIZE(result);
 
-          assert (!pic14_sameRegs (AOP (result), AOP (left)));
-          for (i = 0; i < AOP_SIZE (result); i++)
-            emitpcode (POC_CLRF, popGet (AOP (result), i));
+          if (haveResult)
+            {
+              assert (!pic14_sameRegs (AOP (result), AOP (left)));
+              emitpcode (POC_CLRF, popGet (AOP (result), 0));
+            } // if
 
           switch (ptype)
             {
             case -1:
-              emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (left), 0, FALSE, FALSE), bstr, 0));
-              /* adjust result below */
+                emitpcode (POC_BTFSC, newpCodeOpBit (aopGet (AOP (left), 0, FALSE, FALSE), bstr, 0));
+                /* If haveResult, adjust result below, otherwise: */
+                if (!haveResult)
+                  {
+                    /* Dummy instruction to allow bit-test above (volatile dummy bitfield read). */
+                    emitpcode (POC_MOVLW, popGetLit (0));
+                  } // if
               break;
 
             case POINTER:
@@ -5781,9 +5799,12 @@ genUnpackBits (operand * result, operand * left, int ptype, iCode * ifx)
             case GPOINTER:
             case CPOINTER:
               emitPtrByteGet (left, ptype, FALSE);
-              emitpcode (POC_ANDLW, popGetLit (1UL << bstr));
-              emitSKPZ;
-              /* adjust result below */
+              if (haveResult)
+                {
+                  emitpcode (POC_ANDLW, popGetLit (1UL << bstr));
+                  emitSKPZ;
+                  /* adjust result below */
+                } // if
               break;
 
             default:
@@ -5791,11 +5812,14 @@ genUnpackBits (operand * result, operand * left, int ptype, iCode * ifx)
             }                   // switch
 
           /* move sign-/zero extended bit to result */
-          if (SPEC_USIGN (OP_SYM_ETYPE (left)))
-            emitpcode (POC_INCF, popGet (AOP (result), 0));
-          else
-            emitpcode (POC_DECF, popGet (AOP (result), 0));
-          addSign (result, 1, !SPEC_USIGN (OP_SYM_ETYPE (left)));
+          if (haveResult)
+            {
+              if (SPEC_USIGN (OP_SYM_ETYPE (left)))
+                emitpcode (POC_INCF, popGet (AOP (result), 0));
+              else
+                emitpcode (POC_DECF, popGet (AOP (result), 0));
+              addSign (result, 1, !SPEC_USIGN (OP_SYM_ETYPE (left)));
+            } // if
         }
       return;
     }
@@ -5921,7 +5945,7 @@ genNearPointerGet (operand * left, operand * result, iCode * ic)
   aopOp (result, ic, FALSE);
 
   /* Check if can access directly instead of via a pointer */
-  if ((AOP_TYPE (left) == AOP_PCODE) && (AOP (left)->aopu.pcop->type == PO_IMMEDIATE) && (AOP_SIZE (result) == 1))
+  if ((AOP_TYPE (left) == AOP_PCODE) && (AOP (left)->aopu.pcop->type == PO_IMMEDIATE) && (AOP_SIZE (result) <= 1))
     {
       direct = 1;
     }

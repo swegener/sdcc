@@ -1,3 +1,11 @@
+2013-03-03 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/gen.c (popGet): improve debugging output,
+	  (SetIrp): handle PO_IMMEDIATES correctly, restructure code,
+	  (genUnpackBits): handle dummy reads w/o result correctly,
+	  (genNearPointerGet): handle dummy reads w/o result efficiently,
+	  together this fixes #3606703
+
 2013-02-25 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/ralloc.c (packRegsForOneuse):

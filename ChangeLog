@@ -1,3 +1,31 @@
+2013-03-05 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/non-free/include/pic14/pic16f1784.h,
+	  device/non-free/include/pic14/pic16f1786.h,
+	  device/non-free/include/pic14/pic16f1787.h,
+	  device/non-free/include/pic16/pic18f65j94.h,
+	  device/non-free/include/pic16/pic18f66j60.h,
+	  device/non-free/include/pic16/pic18f66j65.h,
+	  device/non-free/include/pic16/pic18f66j94.h,
+	  device/non-free/include/pic16/pic18f66j99.h,
+	  device/non-free/include/pic16/pic18f67j60.h,
+	  device/non-free/include/pic16/pic18f67j94.h,
+	  device/non-free/include/pic16/pic18f85j94.h,
+	  device/non-free/include/pic16/pic18f86j60.h,
+	  device/non-free/include/pic16/pic18f86j65.h,
+	  device/non-free/include/pic16/pic18f86j94.h,
+	  device/non-free/include/pic16/pic18f86j99.h,
+	  device/non-free/include/pic16/pic18f87j60.h,
+	  device/non-free/include/pic16/pic18f87j94.h,
+	  device/non-free/include/pic16/pic18f95j94.h,
+	  device/non-free/include/pic16/pic18f96j60.h,
+	  device/non-free/include/pic16/pic18f96j65.h,
+	  device/non-free/include/pic16/pic18f96j94.h,
+	  device/non-free/include/pic16/pic18f96j99.h,
+	  device/non-free/include/pic16/pic18f97j60.h,
+	  device/non-free/include/pic16/pic18f97j94.h,
+	  support/scripts/cinc2h.pl:
+	  Updated based on the gputils.
+
 2013-03-03 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/gen.c (popGet): improve debugging output,

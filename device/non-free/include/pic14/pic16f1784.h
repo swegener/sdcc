@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1784 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:01 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2013-03-05 18:28:13 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -3025,28 +3025,51 @@ extern __at(0x0210) volatile __WPUEbits_t WPUEbits;
 
 extern __at(0x0211) __sfr SSP1BUF;
 
-typedef struct
+typedef union
   {
-  unsigned SSP1BUF0             : 1;
-  unsigned SSP1BUF1             : 1;
-  unsigned SSP1BUF2             : 1;
-  unsigned SSP1BUF3             : 1;
-  unsigned SSP1BUF4             : 1;
-  unsigned SSP1BUF5             : 1;
-  unsigned SSP1BUF6             : 1;
-  unsigned SSP1BUF7             : 1;
+  struct
+    {
+    unsigned SSP1BUF0           : 1;
+    unsigned SSP1BUF1           : 1;
+    unsigned SSP1BUF2           : 1;
+    unsigned SSP1BUF3           : 1;
+    unsigned SSP1BUF4           : 1;
+    unsigned SSP1BUF5           : 1;
+    unsigned SSP1BUF6           : 1;
+    unsigned SSP1BUF7           : 1;
+    };
+
+  struct
+    {
+    unsigned BUF0               : 1;
+    unsigned BUF1               : 1;
+    unsigned BUF2               : 1;
+    unsigned BUF3               : 1;
+    unsigned BUF4               : 1;
+    unsigned BUF5               : 1;
+    unsigned BUF6               : 1;
+    unsigned BUF7               : 1;
+    };
   } __SSP1BUFbits_t;
 
 extern __at(0x0211) volatile __SSP1BUFbits_t SSP1BUFbits;
 
 #define _SSP1BUF0               0x01
+#define _BUF0                   0x01
 #define _SSP1BUF1               0x02
+#define _BUF1                   0x02
 #define _SSP1BUF2               0x04
+#define _BUF2                   0x04
 #define _SSP1BUF3               0x08
+#define _BUF3                   0x08
 #define _SSP1BUF4               0x10
+#define _BUF4                   0x10
 #define _SSP1BUF5               0x20
+#define _BUF5                   0x20
 #define _SSP1BUF6               0x40
+#define _BUF6                   0x40
 #define _SSP1BUF7               0x80
+#define _BUF7                   0x80
 
 //==============================================================================
 
@@ -3056,28 +3079,51 @@ extern __at(0x0211) volatile __SSP1BUFbits_t SSP1BUFbits;
 
 extern __at(0x0211) __sfr SSPBUF;
 
-typedef struct
+typedef union
   {
-  unsigned SSP1BUF0             : 1;
-  unsigned SSP1BUF1             : 1;
-  unsigned SSP1BUF2             : 1;
-  unsigned SSP1BUF3             : 1;
-  unsigned SSP1BUF4             : 1;
-  unsigned SSP1BUF5             : 1;
-  unsigned SSP1BUF6             : 1;
-  unsigned SSP1BUF7             : 1;
+  struct
+    {
+    unsigned SSP1BUF0           : 1;
+    unsigned SSP1BUF1           : 1;
+    unsigned SSP1BUF2           : 1;
+    unsigned SSP1BUF3           : 1;
+    unsigned SSP1BUF4           : 1;
+    unsigned SSP1BUF5           : 1;
+    unsigned SSP1BUF6           : 1;
+    unsigned SSP1BUF7           : 1;
+    };
+
+  struct
+    {
+    unsigned BUF0               : 1;
+    unsigned BUF1               : 1;
+    unsigned BUF2               : 1;
+    unsigned BUF3               : 1;
+    unsigned BUF4               : 1;
+    unsigned BUF5               : 1;
+    unsigned BUF6               : 1;
+    unsigned BUF7               : 1;
+    };
   } __SSPBUFbits_t;
 
 extern __at(0x0211) volatile __SSPBUFbits_t SSPBUFbits;
 
 #define _SSPBUF_SSP1BUF0        0x01
+#define _SSPBUF_BUF0            0x01
 #define _SSPBUF_SSP1BUF1        0x02
+#define _SSPBUF_BUF1            0x02
 #define _SSPBUF_SSP1BUF2        0x04
+#define _SSPBUF_BUF2            0x04
 #define _SSPBUF_SSP1BUF3        0x08
+#define _SSPBUF_BUF3            0x08
 #define _SSPBUF_SSP1BUF4        0x10
+#define _SSPBUF_BUF4            0x10
 #define _SSPBUF_SSP1BUF5        0x20
+#define _SSPBUF_BUF5            0x20
 #define _SSPBUF_SSP1BUF6        0x40
+#define _SSPBUF_BUF6            0x40
 #define _SSPBUF_SSP1BUF7        0x80
+#define _SSPBUF_BUF7            0x80
 
 //==============================================================================
 
@@ -3087,28 +3133,51 @@ extern __at(0x0211) volatile __SSPBUFbits_t SSPBUFbits;
 
 extern __at(0x0212) __sfr SSP1ADD;
 
-typedef struct
+typedef union
   {
-  unsigned SSP1ADD0             : 1;
-  unsigned SSP1ADD1             : 1;
-  unsigned SSP1ADD2             : 1;
-  unsigned SSP1ADD3             : 1;
-  unsigned SSP1ADD4             : 1;
-  unsigned SSP1ADD5             : 1;
-  unsigned SSP1ADD6             : 1;
-  unsigned SSP1ADD7             : 1;
+  struct
+    {
+    unsigned SSP1ADD0           : 1;
+    unsigned SSP1ADD1           : 1;
+    unsigned SSP1ADD2           : 1;
+    unsigned SSP1ADD3           : 1;
+    unsigned SSP1ADD4           : 1;
+    unsigned SSP1ADD5           : 1;
+    unsigned SSP1ADD6           : 1;
+    unsigned SSP1ADD7           : 1;
+    };
+
+  struct
+    {
+    unsigned ADD0               : 1;
+    unsigned ADD1               : 1;
+    unsigned ADD2               : 1;
+    unsigned ADD3               : 1;
+    unsigned ADD4               : 1;
+    unsigned ADD5               : 1;
+    unsigned ADD6               : 1;
+    unsigned ADD7               : 1;
+    };
   } __SSP1ADDbits_t;
 
 extern __at(0x0212) volatile __SSP1ADDbits_t SSP1ADDbits;
 
 #define _SSP1ADD0               0x01
+#define _ADD0                   0x01
 #define _SSP1ADD1               0x02
+#define _ADD1                   0x02
 #define _SSP1ADD2               0x04
+#define _ADD2                   0x04
 #define _SSP1ADD3               0x08
+#define _ADD3                   0x08
 #define _SSP1ADD4               0x10
+#define _ADD4                   0x10
 #define _SSP1ADD5               0x20
+#define _ADD5                   0x20
 #define _SSP1ADD6               0x40
+#define _ADD6                   0x40
 #define _SSP1ADD7               0x80
+#define _ADD7                   0x80
 
 //==============================================================================
 
@@ -3118,28 +3187,51 @@ extern __at(0x0212) volatile __SSP1ADDbits_t SSP1ADDbits;
 
 extern __at(0x0212) __sfr SSPADD;
 
-typedef struct
+typedef union
   {
-  unsigned SSP1ADD0             : 1;
-  unsigned SSP1ADD1             : 1;
-  unsigned SSP1ADD2             : 1;
-  unsigned SSP1ADD3             : 1;
-  unsigned SSP1ADD4             : 1;
-  unsigned SSP1ADD5             : 1;
-  unsigned SSP1ADD6             : 1;
-  unsigned SSP1ADD7             : 1;
+  struct
+    {
+    unsigned SSP1ADD0           : 1;
+    unsigned SSP1ADD1           : 1;
+    unsigned SSP1ADD2           : 1;
+    unsigned SSP1ADD3           : 1;
+    unsigned SSP1ADD4           : 1;
+    unsigned SSP1ADD5           : 1;
+    unsigned SSP1ADD6           : 1;
+    unsigned SSP1ADD7           : 1;
+    };
+
+  struct
+    {
+    unsigned ADD0               : 1;
+    unsigned ADD1               : 1;
+    unsigned ADD2               : 1;
+    unsigned ADD3               : 1;
+    unsigned ADD4               : 1;
+    unsigned ADD5               : 1;
+    unsigned ADD6               : 1;
+    unsigned ADD7               : 1;
+    };
   } __SSPADDbits_t;
 
 extern __at(0x0212) volatile __SSPADDbits_t SSPADDbits;
 
 #define _SSPADD_SSP1ADD0        0x01
+#define _SSPADD_ADD0            0x01
 #define _SSPADD_SSP1ADD1        0x02
+#define _SSPADD_ADD1            0x02
 #define _SSPADD_SSP1ADD2        0x04
+#define _SSPADD_ADD2            0x04
 #define _SSPADD_SSP1ADD3        0x08
+#define _SSPADD_ADD3            0x08
 #define _SSPADD_SSP1ADD4        0x10
+#define _SSPADD_ADD4            0x10
 #define _SSPADD_SSP1ADD5        0x20
+#define _SSPADD_ADD5            0x20
 #define _SSPADD_SSP1ADD6        0x40
+#define _SSPADD_ADD6            0x40
 #define _SSPADD_SSP1ADD7        0x80
+#define _SSPADD_ADD7            0x80
 
 //==============================================================================
 
@@ -3149,28 +3241,51 @@ extern __at(0x0212) volatile __SSPADDbits_t SSPADDbits;
 
 extern __at(0x0213) __sfr SSP1MSK;
 
-typedef struct
+typedef union
   {
-  unsigned SSP1MSK0             : 1;
-  unsigned SSP1MSK1             : 1;
-  unsigned SSP1MSK2             : 1;
-  unsigned SSP1MSK3             : 1;
-  unsigned SSP1MSK4             : 1;
-  unsigned SSP1MSK5             : 1;
-  unsigned SSP1MSK6             : 1;
-  unsigned SSP1MSK7             : 1;
+  struct
+    {
+    unsigned SSP1MSK0           : 1;
+    unsigned SSP1MSK1           : 1;
+    unsigned SSP1MSK2           : 1;
+    unsigned SSP1MSK3           : 1;
+    unsigned SSP1MSK4           : 1;
+    unsigned SSP1MSK5           : 1;
+    unsigned SSP1MSK6           : 1;
+    unsigned SSP1MSK7           : 1;
+    };
+
+  struct
+    {
+    unsigned MSK0               : 1;
+    unsigned MSK1               : 1;
+    unsigned MSK2               : 1;
+    unsigned MSK3               : 1;
+    unsigned MSK4               : 1;
+    unsigned MSK5               : 1;
+    unsigned MSK6               : 1;
+    unsigned MSK7               : 1;
+    };
   } __SSP1MSKbits_t;
 
 extern __at(0x0213) volatile __SSP1MSKbits_t SSP1MSKbits;
 
 #define _SSP1MSK0               0x01
+#define _MSK0                   0x01
 #define _SSP1MSK1               0x02
+#define _MSK1                   0x02
 #define _SSP1MSK2               0x04
+#define _MSK2                   0x04
 #define _SSP1MSK3               0x08
+#define _MSK3                   0x08
 #define _SSP1MSK4               0x10
+#define _MSK4                   0x10
 #define _SSP1MSK5               0x20
+#define _MSK5                   0x20
 #define _SSP1MSK6               0x40
+#define _MSK6                   0x40
 #define _SSP1MSK7               0x80
+#define _MSK7                   0x80
 
 //==============================================================================
 
@@ -3180,28 +3295,51 @@ extern __at(0x0213) volatile __SSP1MSKbits_t SSP1MSKbits;
 
 extern __at(0x0213) __sfr SSPMSK;
 
-typedef struct
+typedef union
   {
-  unsigned SSP1MSK0             : 1;
-  unsigned SSP1MSK1             : 1;
-  unsigned SSP1MSK2             : 1;
-  unsigned SSP1MSK3             : 1;
-  unsigned SSP1MSK4             : 1;
-  unsigned SSP1MSK5             : 1;
-  unsigned SSP1MSK6             : 1;
-  unsigned SSP1MSK7             : 1;
+  struct
+    {
+    unsigned SSP1MSK0           : 1;
+    unsigned SSP1MSK1           : 1;
+    unsigned SSP1MSK2           : 1;
+    unsigned SSP1MSK3           : 1;
+    unsigned SSP1MSK4           : 1;
+    unsigned SSP1MSK5           : 1;
+    unsigned SSP1MSK6           : 1;
+    unsigned SSP1MSK7           : 1;
+    };
+
+  struct
+    {
+    unsigned MSK0               : 1;
+    unsigned MSK1               : 1;
+    unsigned MSK2               : 1;
+    unsigned MSK3               : 1;
+    unsigned MSK4               : 1;
+    unsigned MSK5               : 1;
+    unsigned MSK6               : 1;
+    unsigned MSK7               : 1;
+    };
   } __SSPMSKbits_t;
 
 extern __at(0x0213) volatile __SSPMSKbits_t SSPMSKbits;
 
 #define _SSPMSK_SSP1MSK0        0x01
+#define _SSPMSK_MSK0            0x01
 #define _SSPMSK_SSP1MSK1        0x02
+#define _SSPMSK_MSK1            0x02
 #define _SSPMSK_SSP1MSK2        0x04
+#define _SSPMSK_MSK2            0x04
 #define _SSPMSK_SSP1MSK3        0x08
+#define _SSPMSK_MSK3            0x08
 #define _SSPMSK_SSP1MSK4        0x10
+#define _SSPMSK_MSK4            0x10
 #define _SSPMSK_SSP1MSK5        0x20
+#define _SSPMSK_MSK5            0x20
 #define _SSPMSK_SSP1MSK6        0x40
+#define _SSPMSK_MSK6            0x40
 #define _SSPMSK_SSP1MSK7        0x80
+#define _SSPMSK_MSK7            0x80
 
 //==============================================================================
 
@@ -8938,23 +9076,39 @@ extern __at(0x0FEF) __sfr TOSH;
 #define SLRCONE1                SLRCONEbits.SLRCONE1            // bit 1
 #define SLRCONE2                SLRCONEbits.SLRCONE2            // bit 2
 
-#define SSP1ADD0                SSP1ADDbits.SSP1ADD0            // bit 0
-#define SSP1ADD1                SSP1ADDbits.SSP1ADD1            // bit 1
-#define SSP1ADD2                SSP1ADDbits.SSP1ADD2            // bit 2
-#define SSP1ADD3                SSP1ADDbits.SSP1ADD3            // bit 3
-#define SSP1ADD4                SSP1ADDbits.SSP1ADD4            // bit 4
-#define SSP1ADD5                SSP1ADDbits.SSP1ADD5            // bit 5
-#define SSP1ADD6                SSP1ADDbits.SSP1ADD6            // bit 6
-#define SSP1ADD7                SSP1ADDbits.SSP1ADD7            // bit 7
+#define SSP1ADD0                SSP1ADDbits.SSP1ADD0            // bit 0, shadows bit in SSP1ADDbits
+#define ADD0                    SSP1ADDbits.ADD0                // bit 0, shadows bit in SSP1ADDbits
+#define SSP1ADD1                SSP1ADDbits.SSP1ADD1            // bit 1, shadows bit in SSP1ADDbits
+#define ADD1                    SSP1ADDbits.ADD1                // bit 1, shadows bit in SSP1ADDbits
+#define SSP1ADD2                SSP1ADDbits.SSP1ADD2            // bit 2, shadows bit in SSP1ADDbits
+#define ADD2                    SSP1ADDbits.ADD2                // bit 2, shadows bit in SSP1ADDbits
+#define SSP1ADD3                SSP1ADDbits.SSP1ADD3            // bit 3, shadows bit in SSP1ADDbits
+#define ADD3                    SSP1ADDbits.ADD3                // bit 3, shadows bit in SSP1ADDbits
+#define SSP1ADD4                SSP1ADDbits.SSP1ADD4            // bit 4, shadows bit in SSP1ADDbits
+#define ADD4                    SSP1ADDbits.ADD4                // bit 4, shadows bit in SSP1ADDbits
+#define SSP1ADD5                SSP1ADDbits.SSP1ADD5            // bit 5, shadows bit in SSP1ADDbits
+#define ADD5                    SSP1ADDbits.ADD5                // bit 5, shadows bit in SSP1ADDbits
+#define SSP1ADD6                SSP1ADDbits.SSP1ADD6            // bit 6, shadows bit in SSP1ADDbits
+#define ADD6                    SSP1ADDbits.ADD6                // bit 6, shadows bit in SSP1ADDbits
+#define SSP1ADD7                SSP1ADDbits.SSP1ADD7            // bit 7, shadows bit in SSP1ADDbits
+#define ADD7                    SSP1ADDbits.ADD7                // bit 7, shadows bit in SSP1ADDbits
 
-#define SSP1BUF0                SSP1BUFbits.SSP1BUF0            // bit 0
-#define SSP1BUF1                SSP1BUFbits.SSP1BUF1            // bit 1
-#define SSP1BUF2                SSP1BUFbits.SSP1BUF2            // bit 2
-#define SSP1BUF3                SSP1BUFbits.SSP1BUF3            // bit 3
-#define SSP1BUF4                SSP1BUFbits.SSP1BUF4            // bit 4
-#define SSP1BUF5                SSP1BUFbits.SSP1BUF5            // bit 5
-#define SSP1BUF6                SSP1BUFbits.SSP1BUF6            // bit 6
-#define SSP1BUF7                SSP1BUFbits.SSP1BUF7            // bit 7
+#define SSP1BUF0                SSP1BUFbits.SSP1BUF0            // bit 0, shadows bit in SSP1BUFbits
+#define BUF0                    SSP1BUFbits.BUF0                // bit 0, shadows bit in SSP1BUFbits
+#define SSP1BUF1                SSP1BUFbits.SSP1BUF1            // bit 1, shadows bit in SSP1BUFbits
+#define BUF1                    SSP1BUFbits.BUF1                // bit 1, shadows bit in SSP1BUFbits
+#define SSP1BUF2                SSP1BUFbits.SSP1BUF2            // bit 2, shadows bit in SSP1BUFbits
+#define BUF2                    SSP1BUFbits.BUF2                // bit 2, shadows bit in SSP1BUFbits
+#define SSP1BUF3                SSP1BUFbits.SSP1BUF3            // bit 3, shadows bit in SSP1BUFbits
+#define BUF3                    SSP1BUFbits.BUF3                // bit 3, shadows bit in SSP1BUFbits
+#define SSP1BUF4                SSP1BUFbits.SSP1BUF4            // bit 4, shadows bit in SSP1BUFbits
+#define BUF4                    SSP1BUFbits.BUF4                // bit 4, shadows bit in SSP1BUFbits
+#define SSP1BUF5                SSP1BUFbits.SSP1BUF5            // bit 5, shadows bit in SSP1BUFbits
+#define BUF5                    SSP1BUFbits.BUF5                // bit 5, shadows bit in SSP1BUFbits
+#define SSP1BUF6                SSP1BUFbits.SSP1BUF6            // bit 6, shadows bit in SSP1BUFbits
+#define BUF6                    SSP1BUFbits.BUF6                // bit 6, shadows bit in SSP1BUFbits
+#define SSP1BUF7                SSP1BUFbits.SSP1BUF7            // bit 7, shadows bit in SSP1BUFbits
+#define BUF7                    SSP1BUFbits.BUF7                // bit 7, shadows bit in SSP1BUFbits
 
 #define SSPM0                   SSP1CONbits.SSPM0               // bit 0
 #define SSPM1                   SSP1CONbits.SSPM1               // bit 1
@@ -8983,14 +9137,22 @@ extern __at(0x0FEF) __sfr TOSH;
 #define PCIE                    SSP1CON3bits.PCIE               // bit 6
 #define ACKTIM                  SSP1CON3bits.ACKTIM             // bit 7
 
-#define SSP1MSK0                SSP1MSKbits.SSP1MSK0            // bit 0
-#define SSP1MSK1                SSP1MSKbits.SSP1MSK1            // bit 1
-#define SSP1MSK2                SSP1MSKbits.SSP1MSK2            // bit 2
-#define SSP1MSK3                SSP1MSKbits.SSP1MSK3            // bit 3
-#define SSP1MSK4                SSP1MSKbits.SSP1MSK4            // bit 4
-#define SSP1MSK5                SSP1MSKbits.SSP1MSK5            // bit 5
-#define SSP1MSK6                SSP1MSKbits.SSP1MSK6            // bit 6
-#define SSP1MSK7                SSP1MSKbits.SSP1MSK7            // bit 7
+#define SSP1MSK0                SSP1MSKbits.SSP1MSK0            // bit 0, shadows bit in SSP1MSKbits
+#define MSK0                    SSP1MSKbits.MSK0                // bit 0, shadows bit in SSP1MSKbits
+#define SSP1MSK1                SSP1MSKbits.SSP1MSK1            // bit 1, shadows bit in SSP1MSKbits
+#define MSK1                    SSP1MSKbits.MSK1                // bit 1, shadows bit in SSP1MSKbits
+#define SSP1MSK2                SSP1MSKbits.SSP1MSK2            // bit 2, shadows bit in SSP1MSKbits
+#define MSK2                    SSP1MSKbits.MSK2                // bit 2, shadows bit in SSP1MSKbits
+#define SSP1MSK3                SSP1MSKbits.SSP1MSK3            // bit 3, shadows bit in SSP1MSKbits
+#define MSK3                    SSP1MSKbits.MSK3                // bit 3, shadows bit in SSP1MSKbits
+#define SSP1MSK4                SSP1MSKbits.SSP1MSK4            // bit 4, shadows bit in SSP1MSKbits
+#define MSK4                    SSP1MSKbits.MSK4                // bit 4, shadows bit in SSP1MSKbits
+#define SSP1MSK5                SSP1MSKbits.SSP1MSK5            // bit 5, shadows bit in SSP1MSKbits
+#define MSK5                    SSP1MSKbits.MSK5                // bit 5, shadows bit in SSP1MSKbits
+#define SSP1MSK6                SSP1MSKbits.SSP1MSK6            // bit 6, shadows bit in SSP1MSKbits
+#define MSK6                    SSP1MSKbits.MSK6                // bit 6, shadows bit in SSP1MSKbits
+#define SSP1MSK7                SSP1MSKbits.SSP1MSK7            // bit 7, shadows bit in SSP1MSKbits
+#define MSK7                    SSP1MSKbits.MSK7                // bit 7, shadows bit in SSP1MSKbits
 
 #define BF                      SSP1STATbits.BF                 // bit 0
 #define UA                      SSP1STATbits.UA                 // bit 1

@@ -893,9 +893,8 @@ sub extract_config_area($$)
   open(LIB, '<', $gpproc_path) || die "extract_config_area(): Can not open. -> \"$gpproc_path\"\n";
 
         # static struct px pics[] = {
-        # { PROC_CLASS_PIC14E   , "__16F1526"     , { "pic16f1526"     , "p16f1526"       , "16f1526"         }, 0x1526,  4,   32, 0x001FFF, {       -1,       -1 }, { 0x008007, 0x008008 }, "16f1526_g.lkr"      },
-        # { PROC_CLASS_EEPROM8  , "__EEPROM8"     , { "eeprom8"        , "eeprom8"        , "eeprom8"         }, 0x1FFF,  0,    0, 0x0000FF, {       -1,       -1 }, {       -1,       -1 }, NULL                 },
-        # { PROC_CLASS_PIC14    , "__RF675H"      , { "rf675h"         , "rf675h"         , "rf675h"          }, 0x4675,  1,    2, 0x00217F, { 0x0003FF, 0x0020FF }, { 0x002007, 0x002007 }, "rf675h_g.lkr"       },
+        #   { PROC_CLASS_PIC12E   , "__12F529T39A"  , { "pic12f529t39a"  , "p12f529t39a"    , "12f529t39a"      }, 0xE529,  3,    8, 0x0005FF, 0x000600, {       -1,       -1 }, { 0x000FFF, 0x000FFF }, "12f529t39a_g.lkr"  , 0 },
+        #   { PROC_CLASS_PIC14E   , "__16LF1517"    , { "pic16lf1517"    , "p16lf1517"      , "16lf1517"        }, 0xA517,  4,   32, 0x001FFF, 0x002000, {       -1,       -1 }, { 0x008007, 0x008008 }, "16lf1517_g.lkr"    , 0 },
 
   my $in_table = FALSE;
 
@@ -907,7 +906,7 @@ sub extract_config_area($$)
       {
       $in_table = TRUE if ($_ =~ /^\s*static\s+struct\s+px\s+pics\[\s*\]\s*=\s*\{\s*$/io);
       }
-    elsif ($_ =~ /\{\s*PROC_CLASS_\w+\s*,\s*"\w+"\s*,\s*\{\s*"\w+"\s*,\s*"\w+"\s*,\s*"(\w+)"\s*}\s*,\s*[\w-]+\s*,\s*[\w-]+\s*,\s*[\w-]+\s*,\s*\S+\s*,\s*\{\s*\S+\s*,\s*\S+\s*\}\s*,\s*{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*"?[\.\w]+"?\s*\}/io)
+    elsif ($_ =~ /\{\s*PROC_CLASS_\w+\s*,\s*"\w+"\s*,\s*\{\s*"\w+"\s*,\s*"\w+"\s*,\s*"(\S+)"\s*}\s*,\s*[\w-]+\s*,\s*[\w-]+\s*,\s*[\w-]+\s*,\s*\S+\s*,\s*\S+\s*,\s*\{\s*\S+\s*,\s*\S+\s*\}\s*,\s*{\s*(\S+)\s*,\s*(\S+)\s*\}\s*,\s*\"?[\.\w]+\"?\s*,\s*\d+\s*\}/io)
       {
       my ($name, $c_start, $c_end) = ($1, $2, $3);
 

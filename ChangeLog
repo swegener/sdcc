@@ -1,3 +1,8 @@
+2013-03-12 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/mcs51-disasm.pl:
+	  Filters the invalid instructions and code cleaning.
+
 2013-03-05 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/non-free/include/pic14/pic16f1784.h,
 	  device/non-free/include/pic14/pic16f1786.h,

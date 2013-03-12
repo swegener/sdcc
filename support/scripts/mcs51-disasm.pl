@@ -40,7 +40,6 @@
   $Id$
 =cut
 
-use Data::Dumper;
 use strict;
 use warnings;
 use 5.12.0;                     # when (regex)
@@ -164,11 +163,13 @@ my %ram_names_by_address  = ();
 
 	{
 	NAME	  => '',
+	SIZE	  => 0,
 	REF_COUNT => 0
 	}
 =cut
 
 my %xram_by_address	  = ();
+my %xram_names_by_address = ();
 
 my $stack_start		  = -1;
 my $stack_size		  = 0;
@@ -680,6 +681,7 @@ sub read_hex($)
   my $Hex    = $_[0];
   my $addr_H = 0;
   my $format = INHX32;
+  my $line_num = 0;
 
   if (! open(IN, '<', $Hex))
     {
@@ -691,13 +693,14 @@ sub read_hex($)
     {
     chomp;
     s/\r$//o;
+    ++$line_num;
 
     my $len = length() - 1;
 
     if ($len < MIN_LINE_LENGTH)
       {
       close(IN);
-      print STDERR "$PROGRAM: ${.}th line <- Shorter than %u character.\n", MIN_LINE_LENGTH;
+      print STDERR "$PROGRAM: ${line_num}th line <- Shorter than %u character.\n", MIN_LINE_LENGTH;
       exit(1);
       }
 
@@ -710,7 +713,7 @@ sub read_hex($)
     if (unpack('%8C*', $binrec) != 0)
       {
       close(IN);
-      print STDERR "$PROGRAM: $Hex <- Crc error. (${.}th line \"$_\").\n";
+      print STDERR "$PROGRAM: $Hex <- Crc error. (${line_num}th line \"$_\").\n";
       exit(1);
       }
 
@@ -737,7 +740,7 @@ sub read_hex($)
     elsif ($type != INHX_DATA_REC)
       {
       close(IN);
-      printf STDERR "$PROGRAM: $Hex <- Unknown type of record: 0x%02X (${.}th line \"$_\").\n", $type;
+      printf STDERR "$PROGRAM: $Hex <- Unknown type of record: 0x%02X (${line_num}th line \"$_\").\n", $type;
       exit(1);
       }
 
@@ -746,7 +749,7 @@ sub read_hex($)
       if ($format == INHX8M)
 	{
 	close(IN);
-	print STDERR "$PROGRAM: $Hex <- Mixed format of file (${.}th line \"$_\").\n";
+	print STDERR "$PROGRAM: $Hex <- Mixed format of file (${line_num}th line \"$_\").\n";
 	exit(1);
 	}
 
@@ -759,7 +762,7 @@ sub read_hex($)
       if ($format == INHX32)
 	{
 	close(IN);
-	print STDERR "$PROGRAM: $Hex <- Mixed format of file (${.}th line \"$_\").\n";
+	print STDERR "$PROGRAM: $Hex <- Mixed format of file (${line_num}th line \"$_\").\n";
 	exit(1);
 	}
 
@@ -768,7 +771,7 @@ sub read_hex($)
     else
       {
       close(IN);
-      print STDERR "$PROGRAM: $Hex <- Wrong format of file (${.}th line \"$_\").\n";
+      print STDERR "$PROGRAM: $Hex <- Wrong format of file (${line_num}th line \"$_\").\n";
       exit(1);
       }
     } # while (<IN>)
@@ -1021,10 +1024,11 @@ sub add_jump_label($$$$$)
 sub add_bit($$$)
   {
   my ($Address, $Name, $Map_mode) = @_;
+  my $bit;
 
   if ($Address > BIT_LAST_ADDR)
     {
-    if (! defined($sfr_bit_by_address{$Address}))
+    if (! defined($bit = $sfr_bit_by_address{$Address}))
       {
       $sfr_bit_by_address{$Address} = {
 				      NAME	=> $Name,
@@ -1033,21 +1037,19 @@ sub add_bit($$$)
       }
     else
       {
-      my $sbit = $sfr_bit_by_address{$Address};
-
-      if ($Name ne '' && $sbit->{NAME} ne $Name)
+      if ($Name ne '' && $bit->{NAME} ne $Name)
 	{
-	Log(sprintf("Warning, the address: 0x%02X already busy by the $sbit->{NAME} bit.", $Address), 2);
+	Log(sprintf("Warning, the address: 0x%02X already busy by the $bit->{NAME} bit.", $Address), 2);
 	}
       else
 	{
-	++$sbit->{REF_COUNT} if (! $Map_mode);
+	++$bit->{REF_COUNT} if (! $Map_mode);
 	}
       }
     }
   else
     {
-    if (! defined($bit_by_address{$Address}))
+    if (! defined($bit = $bit_by_address{$Address}))
       {
       $bit_by_address{$Address} = {
 				  NAME	    => $Name,
@@ -1056,8 +1058,6 @@ sub add_bit($$$)
       }
     else
       {
-      my $bit = $bit_by_address{$Address};
-
       ++$bit->{REF_COUNT} if (! $Map_mode);
       }
     }
@@ -1072,12 +1072,13 @@ sub add_bit($$$)
 sub add_ram($$$$)
   {
   my ($Address, $Name, $Type, $Map_mode) = @_;
+  my $ram;
 
   return if ($Address == EMPTY);
 
   if ($Address > RAM_LAST_DIR_ADDR && $Type == RAM_TYPE_DIR)
     {
-    if (! defined($sfr_by_address{$Address}))
+    if (! defined($ram = $sfr_by_address{$Address}))
       {
       $sfr_by_address{$Address} = {
 				  NAME      => $Name,
@@ -1086,15 +1087,13 @@ sub add_ram($$$$)
       }
     else
       {
-      my $sfr = $sfr_by_address{$Address};
-
-      if ($Name ne '' && $sfr->{NAME} ne $Name)
+      if ($Name ne '' && $ram->{NAME} ne $Name)
 	{
-	Log(sprintf("Warning, the address: 0x%02X already busy by the $sfr->{NAME} register.", $Address), 2);
+	Log(sprintf("Warning, the address: 0x%02X already busy by the $ram->{NAME} register.", $Address), 2);
 	}
       else
 	{
-	++$sfr->{REF_COUNT} if (! $Map_mode);
+	++$ram->{REF_COUNT} if (! $Map_mode);
 	}
       }
 
@@ -1102,19 +1101,17 @@ sub add_ram($$$$)
     }
   else
     {
-    if (! defined($ram_by_address{$Address}))
+    if (! defined($ram = $ram_by_address{$Address}))
       {
       $ram_by_address{$Address} = {
-				TYPE	  => $Type,
-				NAME	  => $Name,
-				SIZE	  => 1,
-				REF_COUNT => ($Map_mode) ? 0 : 1
-				};
+				  TYPE	    => $Type,
+				  NAME	    => $Name,
+				  SIZE	    => 1,
+				  REF_COUNT => ($Map_mode) ? 0 : 1
+				  };
       }
     else
       {
-      my $ram = $ram_by_address{$Address};
-
       ++$ram->{REF_COUNT} if (! $Map_mode);
       }
     }
@@ -1129,18 +1126,18 @@ sub add_ram($$$$)
 sub add_xram($$$)
   {
   my ($Address, $Name, $Map_mode) = @_;
+  my $xram;
 
-  if (! defined($xram_by_address{$Address}))
+  if (! defined($xram = $xram_by_address{$Address}))
     {
     $xram_by_address{$Address} = {
 				 NAME	   => $Name,
+				 SIZE	   => 1,
 				 REF_COUNT => ($Map_mode) ? 0 : 1
 				 };
     }
   else
     {
-    my $xram = $xram_by_address{$Address};
-
     ++$xram->{REF_COUNT} if (! $Map_mode);
     }
   }
@@ -1468,6 +1465,34 @@ sub fix_multi_byte_variables()
 	  }
 
 	$ram_by_address{$prev_addr}->{SIZE} = $var_size;
+	}
+      }
+
+    $prev_addr = $_;
+    $prev_name = $name;
+    }
+
+  $prev_addr = EMPTY;
+  $prev_name = '';
+  foreach (sort {$a <=> $b} keys(%xram_by_address))
+    {
+    $name = $xram_by_address{$_}->{NAME};
+    $xram_names_by_address{$_} = $name;
+
+    if ($prev_addr != EMPTY)
+      {
+      $var_size = $_ - $prev_addr;
+
+      if ($var_size > 1)
+	{
+	# This is a multi-byte variable. Make the aliases.
+
+	for ($i = 1; $i < $var_size; ++$i)
+	  {
+	  $xram_names_by_address{$prev_addr + $i} = "($prev_name + $i)";
+	  }
+
+	$xram_by_address{$prev_addr}->{SIZE} = $var_size;
 	}
       }
 
@@ -1817,9 +1842,8 @@ sub xram_name($$)
 
   $str = sprintf "0x%04X", $Address;
   ${$StrRef} = $str;
-  $xram = $xram_by_address{$Address};
 
-  $str = $xram->{NAME} if (defined($xram) && $xram->{NAME} ne '');
+  $str = $xram if (defined($xram = $xram_names_by_address{$Address}));
 
   return $str;
   }
@@ -3688,10 +3712,25 @@ sub unknown()
 
   if ($decoder_silent_level == SILENT0)
     {
-    $rb  = sprintf "0x%02X", $dcd_instr;
+    $rb   = sprintf "0x%02X", $dcd_instr & 0xFF;
     $str0 = present_char($dcd_instr);
     $str1 = sprintf "0x%04X", $dcd_address;
     print_3('.db', $rb, "$str1: $rb$str0");
+
+    if ($dcd_instr_size == 2)
+      {
+      $rb   = sprintf "0x%02X", $dcd_parm0 & 0xFF;
+      $str0 = present_char($dcd_parm0);
+      $str1 = sprintf "0x%04X", $dcd_address;
+      print_3('.db', $rb, "$str1: $rb$str0");
+      }
+    elsif ($dcd_instr_size == 3)
+      {
+      $rb   = sprintf "0x%02X", $dcd_parm1 & 0xFF;
+      $str0 = present_char($dcd_parm1);
+      $str1 = sprintf "0x%04X", $dcd_address;
+      print_3('.db', $rb, "$str1: $rb$str0");
+      }
     }
   }
 
@@ -4336,7 +4375,7 @@ my @instr_decoders =
 sub instruction_decoder($$)
   {
   my ($Address, $BlockRef) = @_;
-  my $label;
+  my ($label, $invalid);
 
   $dcd_address	  = $Address;
   $dcd_instr_size = $BlockRef->{SIZE};
@@ -4348,6 +4387,8 @@ sub instruction_decoder($$)
     printf("0x%04X: %02X", $dcd_address, $dcd_instr) if (! $gen_assembly_code);
     }
 
+  $invalid = FALSE;
+
   if ($dcd_instr_size == 1)
     {
     if ($decoder_silent_level == SILENT0)
@@ -4358,6 +4399,7 @@ sub instruction_decoder($$)
   elsif ($dcd_instr_size == 2)
     {
     $dcd_parm0 = $rom[$dcd_address + 1];
+    $invalid = TRUE if ($dcd_parm0 == EMPTY);
 
     if ($decoder_silent_level == SILENT0)
       {
@@ -4375,6 +4417,7 @@ sub instruction_decoder($$)
     {
     $dcd_parm0 = $rom[$dcd_address + 1];
     $dcd_parm1 = $rom[$dcd_address + 2];
+    $invalid = TRUE if ($dcd_parm0 == EMPTY || $dcd_parm1 == EMPTY);
 
     if ($decoder_silent_level == SILENT0)
       {
@@ -4404,7 +4447,7 @@ sub instruction_decoder($$)
 
   invalidate_DPTR_Rx() if ($label->{TYPE} != BL_TYPE_NONE);
 
-  if ($dcd_instr != EMPTY)
+  if ($dcd_instr != EMPTY && ! $invalid)
     {
     $instr_decoders[$dcd_instr]();
     }
@@ -4558,6 +4601,11 @@ sub add_instr_block($$)
   {
   my ($Address, $Instruction) = @_;
   my $instr_size = $instruction_sizes[$Instruction];
+  my $invalid;
+
+  $dcd_address = $Address;
+  $dcd_instr   = $rom[$dcd_address];
+  $invalid     = FALSE;
 
   if (! $instr_size)
     {
@@ -4566,7 +4614,31 @@ sub add_instr_block($$)
     }
   else
     {
-    add_block($Address, BLOCK_INSTR, $instr_size, BL_TYPE_NONE, '');
+    if ($instr_size == 1)
+      {
+      $invalid = TRUE if ($dcd_instr == EMPTY);
+      }
+
+    if ($instr_size == 2)
+      {
+      $dcd_parm0 = $rom[$dcd_address + 1];
+      $invalid = TRUE if ($dcd_parm0 == EMPTY);
+      }
+
+    if ($instr_size == 3)
+      {
+      $dcd_parm1 = $rom[$dcd_address + 2];
+      $invalid = TRUE if ($dcd_parm1 == EMPTY);
+      }
+
+    if ($invalid)
+      {
+      add_block($Address, BLOCK_CONST, $instr_size, BL_TYPE_NONE, '');
+      }
+    else
+      {
+      add_block($Address, BLOCK_INSTR, $instr_size, BL_TYPE_NONE, '');
+      }
     }
 
   return $instr_size;
@@ -5254,7 +5326,7 @@ sub emit_ram_data($)
     $next_addr = EMPTY;
     foreach (sort {$a <=> $b} keys(%ram_by_address))
       {
-      last if ($_ > 0x7F);
+      last if ($_ > RAM_LAST_DIR_ADDR);
 
       $ram = $ram_by_address{$_};
 
@@ -5292,7 +5364,7 @@ sub emit_ram_data($)
     $next_addr = EMPTY;
     foreach (sort {$a <=> $b} keys(%ram_by_address))
       {
-      last if ($_ > 0x7F);
+      last if ($_ > RAM_LAST_DIR_ADDR);
 
       $ram = $ram_by_address{$_};
 
@@ -5390,7 +5462,7 @@ sub emit_indirect_ram($)
 sub emit_external_ram($)
   {
   my $Assembly_mode = $_[0];
-  my ($xram, $name, $cnt, $str0, $str1, $str2);
+  my ($xram, $name, $next_addr, $cnt, $str0, $str1, $str2);
 
   return if (! scalar(keys(%xram_by_address)));
 
@@ -5411,15 +5483,28 @@ sub emit_external_ram($)
     {
     print ";$border0\n;\tExternal RAM data\n;$border0\n\n";
 
+    $next_addr = EMPTY;
     foreach (sort {$a <=> $b} keys(%xram_by_address))
       {
+      next if ($next_addr != EMPTY && $_ < $next_addr);
+
       $xram = $xram_by_address{$_};
-      $name = $xram->{NAME};
       $str0 = sprintf "0x%04X", $_;
-      $str1 = ($name ne '') ? $name : "xram_$str0";
       $cnt  = sprintf "%3u", $xram->{REF_COUNT};
-      $str2 = ($xram->{REF_COUNT}) ? "used $cnt times" : 'not used';
-      print "${str0}:\t" . align($str1, STAT_ALIGN_SIZE) . "($str2)\n";
+      $str1 = ($xram->{REF_COUNT}) ? "used $cnt times" : 'not used';
+
+      if ($xram->{NAME} ne '')
+	{
+        $cnt = sprintf "%3u", $xram->{SIZE};
+	print "${str0}:\t" . align($xram->{NAME}, STAT_ALIGN_SIZE) . "($cnt bytes) ($str1)\n";
+	$next_addr = $_ + $xram->{SIZE};
+	}
+      else
+	{
+	$str2 = "xram_$str0";
+	print "${str0}:\t" . align($str2, STAT_ALIGN_SIZE) . "($str1)\n";
+	$next_addr = $_ + 1;
+	}
       }
     }
 
@@ -5662,16 +5747,16 @@ sub print_constants($$)
       {
       print $left_align .
 	    join(', ', map {
-			   sprintf((($hc || $_ < ord(' ') || $_ >= 0x7F) ? "0x%02X" : "'%c' "), $_);
+			   sprintf((($hc || $_ < ord(' ') || $_ >= 0x7F) ? "0x%02X" : "'%c' "), $_ & 0xFF);
 			   } @line) . "$right_align ;\n";
       }
     else
       {
-      print " $left_align" . join(' ', map { sprintf("%02X ", $_); } @line);
+      print " $left_align" . join(' ', map { sprintf("%02X ", $_ & 0xFF); } @line);
 
       print "$right_align | $left_align " .
 	    join(' ', map {
-			  sprintf((($_ < ord(' ') || $_ >= 0x7F) ? "%02X " : "'%c'"), $_);
+			  sprintf((($_ < ord(' ') || $_ >= 0x7F) ? "%02X " : "'%c'"), $_ & 0xFF);
 			  } @line) . "$right_align |\n";
       }
     } # while (TRUE)

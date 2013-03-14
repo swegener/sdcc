@@ -1,6 +1,6 @@
 # gen_known_bugs.pl - generate knownbugs.html
 #
-# Copyright (c) 2007-2011 Borut Razem
+# Copyright (c) 2007-2013 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -40,7 +40,8 @@ sub trim($)
 }
 
 
-my @headerList = ('ID', 'Summary', 'Status', 'Opened', 'Assignee', 'Submitter', 'Resolution', 'Priority');
+my @headerList = ('#', 'Summary', 'Owner', 'Creator', 'Created', 'Priority');
+my $nFields = $#headerList + 1; # Number of colums is number of header fields + 1 for "Select Columns" icon
 
 # check if the line is a correct header
 sub is_header($)
@@ -74,9 +75,32 @@ sub has_all_fields($)
   my ($line) = @_;
  
   my @len = $line->look_down('_tag', 'td');
-  return $#len == $#headerList;
+  return $#len == $nFields;
 }
 
+# convert to ISO date
+sub date_to_iso($)
+{
+  my %months = (
+    'Jan', '01',
+    'Feb', '02',
+    'Mar', '03',
+    'Apr', '04',
+    'May', '05',
+    'Jun', '06',
+    'Jul', '07',
+    'Aug', '08',
+    'Sep', '09',
+    'Oct', '10',
+    'Nov', '11',
+    'Dec', '12'
+  );
+
+  my ($date) = @_; #Mon Mar 14, 2011 10:42 AM UTC
+  my (undef, $month, $day, $year) = split(' ' , $date);
+  $day =~ s/^(\d+),$/$1/;
+  return $year . '-' . $months{$month} . '-' . sprintf('%02d', $day);
+}
 
 # process a line
 sub process_line($)
@@ -85,35 +109,32 @@ sub process_line($)
 
   my $i = 0;
   foreach ($line->look_down('_tag', 'td')) {
-    #if ($headerList[$i] == 'ID') {
-    #  # remove nowrap attribute from 'Request ID' field
-    #  $_->attr('nowrap', undef);
-    #}
-    if ($headerList[$i] eq 'Summary') {
+    if (!defined($headerList[$i])) {
+      # don't print columns which are not in the header list
+      $_->delete();
+    }
+    elsif ($headerList[$i] eq 'Summary') {
       # convert relative to absolute href in the 'Summary' field
       foreach ($_->look_down('_tag', 'a')) {
         my $attr = $_->attr('href');
-        if (defined($attr) && $attr =~ m!^/tracker/?!) {
-          $_->attr('href', 'http://sourceforge.net' . $attr);
+        if (defined($attr)) {
+          $_->attr('href', 'https://sourceforge.net' . $attr);
         }
       }
     }
-    #elsif ($headerList[$i] == 'Opened') {
-    #  # remove text formatting from 'Open Date' field
-    #  my $text = $_->as_text();
-    #  $text =~ s/^\W*\**\W//;
-    #  $_->delete_content();
-    #  $_->push_content($text);
-    #}
-    elsif ($headerList[$i] eq 'Status' || $headerList[$i] eq 'Resolution') {
-      # don't print Status and Resolution columns
-      $_->delete();
+    elsif ($headerList[$i] eq 'Owner' || $headerList[$i] eq 'Creator') {
+      $_->normalize_content();
     }
-    elsif ($headerList[$i] eq 'Assignee' || $headerList[$i] eq 'Submitter') {
-      # remove hrefs in 'Assigned To' and 'Submitted By' fields
-      foreach ($_->look_down('_tag', 'a')) {
-       $_->replace_with($_->as_text());
-      }
+    elsif ($headerList[$i] eq 'Created') {
+      my $date = $_->look_down('_tag', 'span')->attr('title');
+      $_->delete_content();
+      $_->push_content(date_to_iso($date));
+    }
+    elsif ($headerList[$i] eq 'Priority') {
+      my @content = $_->content_list();
+      my $v = 0;
+      $v = $content[0] if (0 == $#content);
+      $_->{'_parent'}->{'class'} = 'p' . $v;
     }
     ++$i;
   }
@@ -188,8 +209,8 @@ This file is generated automagicaly by gen_known_bugs.pl script.
   <body>
     <h2>Small Device C Compiler - Release $version Known Bug List</h2>
     <ul>
-      <li><a href="http://sdcc.sourceforge.net" >Home&nbsp;Page</a></li>
-      <li class="selected"><a href="http://sourceforge.net/tracker/?group_id=599&amp;atid=100599" >Current Bugs</a></li>
+      <li><a href="http://sdcc.sourceforge.net">Home&nbsp;Page</a></li>
+      <li class="selected"><a href="http://sourceforge.net/p/sdcc/bugs/">Current Bugs</a></li>
     </ul>
     <table width="100%" border="0" cellspacing="2" cellpadding="3">
       <tr bgcolor="#ffffff">
@@ -227,7 +248,7 @@ sub print_footer($)
       </tr>
     </table>
   </body>
-<p><b>Number of open bugs: $lines</b></p>
+ <p><b>Number of open bugs: $lines</b></p>
 </html>
 EOF
 }
@@ -235,8 +256,7 @@ EOF
 
 # main procedure
 {
-  my $firstUrl = "http://sourceforge.net/tracker/?func=&group_id=599&atid=100599&assignee=&status=Open&category=&artgroup=&keyword=&submitter=&artifact_id=&assignee=&status=1&category=&artgroup=&submitter=&keyword=&artifact_id=&submit=Filter&limit=%d";
-  my $nextUrl = "http://sourceforge.net/tracker/?words=tracker_browse&group_id=599&atid=100599&assignee=&status=1&category=&artgroup=&keyword=&submitter=&artifact_id=&offset=%d";
+  my $url = "https://sourceforge.net/p/sdcc/bugs/?limit=%d&page=%d&sort=ticket_num+desc&q=%%7B%%22status%%22%%3A+%%7B%%22%%24nin%%22%%3A+%%5B%%22closed-invalid%%22%%2C+%%22closed-later%%22%%2C+%%22closed-accepted%%22%%2C+%%22closed-duplicate%%22%%2C+%%22closed-out-of-date%%22%%2C+%%22closed-fixed%%22%%2C+%%22closed-rejected%%22%%2C+%%22closed-remind%%22%%2C+%%22closed-works-for-me%%22%%2C+%%22closed%%22%%2C+%%22closed-wont-fix%%22%%2C+%%22closed-postponed%%22%%5D%%7D%%7D&columns-0.name=ticket_num&columns-0.sort_name=ticket_num&columns-0.label=Ticket+Number&columns-0.active=on&columns-1.name=summary&columns-1.sort_name=summary&columns-1.label=Summary&columns-1.active=on&columns-2.name=_milestone&columns-2.sort_name=custom_fields._milestone&columns-2.label=Milestone&columns-3.name=status&columns-3.sort_name=status&columns-3.label=Status&columns-4.name=assigned_to&columns-4.sort_name=assigned_to_username&columns-4.label=Owner&columns-4.active=on&columns-5.name=reported_by&columns-5.sort_name=reported_by&columns-5.label=Creator&columns-5.active=on&columns-6.name=created_date&columns-6.sort_name=created_date&columns-6.label=Created&columns-6.active=on&columns-7.name=mod_date&columns-7.sort_name=mod_date&columns-7.label=Updated&columns-8.name=labels&columns-8.sort_name=labels&columns-8.label=Labels&columns-9.name=_priority&columns-9.sort_name=_priority&columns-9.label=Priority&columns-9.active=on";
 
   if ($#ARGV != 0) {
     printf("Usage: gen_known_bugs.pl <version>\n");
@@ -253,9 +273,11 @@ EOF
 
   # get pages from SF bug tracker
   # and process them
-  my $lines = 0;
-  while (my $linesRead = process_page(get(($lines == 0) ? sprintf($firstUrl, $limit) : sprintf($nextUrl, $lines)))) {
+  my $page = 0;
+  my $lines;
+  while (my $linesRead = process_page(get(sprintf($url, $limit, $page)))) {
     $lines += $linesRead;
+    ++$page;
   }
 
   # print HTML footer

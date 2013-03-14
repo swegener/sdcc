@@ -1,3 +1,7 @@
+2013-03-15 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/gen_known_bugs.pl: adapted for Allura bug tracker
+
 2013-03-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:

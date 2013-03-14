@@ -744,7 +744,7 @@ int z80instructionSize(lineNode *pl)
     op2start = NULL;
 
   /* All ld instructions */
-  if(ISINST(pl->line, "ld\t"))
+  if(ISINST(pl->line, "ld\t") || ISINST(pl->line, "ld "))
     {
       /* These 3 are the only cases of 4 byte long ld instructions. */
       if(!strncmp(op1start, "ix", 2) || !strncmp(op1start, "iy", 2))

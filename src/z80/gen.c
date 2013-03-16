@@ -4455,12 +4455,8 @@ genFunction (const iCode * ic)
 
   _G.omitFramePtr = options.oldralloc ? (!IS_GB && options.omitFramePtr) : should_omit_frame_ptr;
 
-  if (!IS_GB && !IY_RESERVED && !stackParm && !sym->stack)
+  if (!IS_GB && !z80_opts.noOmitFramePtr && !stackParm && !sym->stack)
     {
-      /* When the conflicts between AOP_EXSTK && AOP_HLREG are fixed, */
-      /* the above !sym->stack condition can be removed. -- EEP       */
-      if (sym->stack)
-        emit2 ("!ldaspsp", -sym->stack);
       if (!regalloc_dry_run)
         _G.omitFramePtr = TRUE;
     }

@@ -1,3 +1,8 @@
+2013-03-18 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/gen_known_bugs.pl: use http instead https since the
+	  LWP::Protocol::https perl module seems not to be installed by default
+
 2013-03-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic14/pic14devices.txt,

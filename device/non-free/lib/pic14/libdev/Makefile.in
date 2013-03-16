@@ -17,9 +17,9 @@ NEW_PICS_yes =
 
 PIC14_ENHANCED = \
     pic12f1501.c \
-    pic12lf1552.c \
     pic12f1822.c \
     pic12f1840.c \
+    pic12lf1552.c \
     pic16f1454.c \
     pic16f1455.c \
     pic16f1458.c \
@@ -41,6 +41,8 @@ PIC14_ENHANCED = \
     pic16f1784.c \
     pic16f1786.c \
     pic16f1787.c \
+    pic16f1788.c \
+    pic16f1789.c \
     pic16f1823.c \
     pic16f1824.c \
     pic16f1825.c \
@@ -74,31 +76,29 @@ C_SRC = \
     pic12f675.c \
     pic12f683.c \
     pic12f752.c \
+    pic16c62.c \
+    pic16c63a.c \
+    pic16c65b.c \
+    pic16c71.c \
+    pic16c72.c \
+    pic16c73b.c \
+    pic16c74b.c \
     pic16c432.c \
     pic16c433.c \
     pic16c554.c \
     pic16c557.c \
     pic16c558.c \
-    pic16c62.c \
     pic16c620.c \
     pic16c620a.c \
     pic16c621.c \
     pic16c621a.c \
     pic16c622.c \
     pic16c622a.c \
-    pic16c63a.c \
-    pic16c65b.c \
-    pic16c71.c \
     pic16c710.c \
     pic16c711.c \
     pic16c715.c \
     pic16c717.c \
-    pic16c72.c \
-    pic16f720.c \
-    pic16f721.c \
-    pic16c73b.c \
     pic16c745.c \
-    pic16c74b.c \
     pic16c765.c \
     pic16c770.c \
     pic16c771.c \
@@ -108,14 +108,23 @@ C_SRC = \
     pic16c782.c \
     pic16c925.c \
     pic16c926.c \
+    pic16f72.c \
+    pic16f73.c \
+    pic16f74.c \
+    pic16f76.c \
+    pic16f77.c \
+    pic16f84.c \
+    pic16f84a.c \
+    pic16f87.c \
+    pic16f88.c \
     pic16f610.c \
     pic16f616.c \
     pic16f627.c \
     pic16f627a.c \
     pic16f628.c \
     pic16f628a.c \
-    pic16f631.c \
     pic16f630.c \
+    pic16f631.c \
     pic16f636.c \
     pic16f639.c \
     pic16f648a.c \
@@ -129,6 +138,8 @@ C_SRC = \
     pic16f690.c \
     pic16f707.c \
     pic16f716.c \
+    pic16f720.c \
+    pic16f721.c \
     pic16f722.c \
     pic16f722a.c \
     pic16f723.c \
@@ -136,21 +147,13 @@ C_SRC = \
     pic16f724.c \
     pic16f726.c \
     pic16f727.c \
-    pic16f72.c \
-    pic16f73.c \
     pic16f737.c \
-    pic16f74.c \
     pic16f747.c \
-    pic16f76.c \
     pic16f767.c \
-    pic16f77.c \
     pic16f777.c \
     pic16f785.c \
     pic16f818.c \
     pic16f819.c \
-    pic16f84.c \
-    pic16f84a.c \
-    pic16f87.c \
     pic16f870.c \
     pic16f871.c \
     pic16f872.c \
@@ -162,7 +165,6 @@ C_SRC = \
     pic16f876a.c \
     pic16f877.c \
     pic16f877a.c \
-    pic16f88.c \
     pic16f882.c \
     pic16f883.c \
     pic16f884.c \

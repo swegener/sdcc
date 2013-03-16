@@ -1,3 +1,15 @@
+2013-03-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/include/pic14/pic14devices.txt,
+	  device/non-free/include/pic14/pic16f1788.h,
+	  device/non-free/include/pic14/pic16f1789.h,
+	  device/non-free/lib/pic14/libdev/Makefile.in,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/pic16f1788.c,
+	  device/non-free/lib/pic14/libdev/pic16f1789.c,
+	  doc/sdccman.lyx:
+	  New devices: PIC16F1788, PIC16F1789
+
 2013-03-15 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/gen_known_bugs.pl: adapted for Allura bug tracker

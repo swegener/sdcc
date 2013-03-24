@@ -6113,8 +6113,93 @@ genMult (iCode * ic)
   wassertl (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT, "Right must be a literal.");
 
   val = (int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
-  //  wassertl (val > 0, "Multiply must be positive");
   wassertl (val != 1, "Can't multiply by 1");
+
+  // Try to use mlt.
+  if (IS_Z180 && AOP_SIZE (IC_LEFT (ic)) == 1 && AOP_SIZE (IC_RIGHT (ic)) == 1 &&
+    (byteResult || SPEC_USIGN (getSpec (operandType (IC_LEFT (ic)))) && SPEC_USIGN (getSpec (operandType (IC_RIGHT (ic))))))
+    {
+      pair = getPairId (AOP (IC_RESULT (ic)));
+      if (pair == PAIR_INVALID && AOP_TYPE (IC_RESULT (ic)) == AOP_REG)
+        {
+          if (!bitVectBitValue (ic->rSurv, H_IDX) && AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == L_IDX)
+            pair = PAIR_HL;
+          else if (!bitVectBitValue (ic->rSurv, D_IDX) && AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == E_IDX)
+            pair = PAIR_HL;
+          else if (!bitVectBitValue (ic->rSurv, B_IDX) && AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == C_IDX)
+            pair = PAIR_HL;
+        }
+      else if (pair == PAIR_INVALID)
+        pair = getDeadPairId (ic);
+
+      if (pair == PAIR_INVALID)
+        {
+          if (!(AOP_TYPE (IC_RESULT (ic)) == AOP_REG &&
+            (AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == L_IDX || AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == H_IDX ||
+            !byteResult && (AOP (IC_RESULT (ic))->aopu.aop_reg[1]->rIdx == L_IDX || AOP (IC_RESULT (ic))->aopu.aop_reg[1]->rIdx == H_IDX))))
+            pair = PAIR_HL;
+          else if (!(AOP_TYPE (IC_RESULT (ic)) == AOP_REG &&
+            (AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == E_IDX || AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == D_IDX ||
+            !byteResult && (AOP (IC_RESULT (ic))->aopu.aop_reg[1]->rIdx == E_IDX || AOP (IC_RESULT (ic))->aopu.aop_reg[1]->rIdx == D_IDX))))
+            pair = PAIR_DE;
+          else
+            pair = PAIR_BC;
+        }
+
+      // For small operands under low register pressure, the standard approach is better than the mlt one.
+      if (byteResult && val <= 6 && isPairDead (PAIR_HL, ic) && (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) &&
+        !(AOP_TYPE (IC_RESULT (ic)) == AOP_REG && (AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == E_IDX || AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx == C_IDX)))
+        goto no_mlt;
+
+      if (!isPairDead (pair, ic))
+        _push (pair);
+
+      switch (pair)
+        {
+        case PAIR_HL:
+          if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == H_IDX)
+            cheapMove (ASMOP_L, 0, AOP (IC_RIGHT (ic)), 0);
+          else
+            {
+              cheapMove (ASMOP_L, 0, AOP (IC_LEFT (ic)), 0);
+              cheapMove (ASMOP_H, 0, AOP (IC_RIGHT (ic)), 0);
+            }
+          break;
+        case PAIR_DE:
+          if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == D_IDX)
+            cheapMove (ASMOP_E, 0, AOP (IC_RIGHT (ic)), 0);
+          else
+            {
+              cheapMove (ASMOP_E, 0, AOP (IC_LEFT (ic)), 0);
+              cheapMove (ASMOP_D, 0, AOP (IC_RIGHT (ic)), 0);
+            }
+          break;
+        default:
+          wassert (pair == PAIR_BC);
+          if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == B_IDX)
+            cheapMove (ASMOP_C, 0, AOP (IC_RIGHT (ic)), 0);
+          else
+            {
+              cheapMove (ASMOP_C, 0, AOP (IC_LEFT (ic)), 0);
+              cheapMove (ASMOP_B, 0, AOP (IC_RIGHT (ic)), 0);
+            }
+          break;
+        }
+
+      emit2 ("mlt %s", _pairs[pair].name);
+      regalloc_dry_run_cost += 2;
+
+      if (byteResult)
+        cheapMove (AOP (IC_RESULT (ic)), 0, pair == PAIR_HL ? ASMOP_L : (pair == PAIR_DE ? ASMOP_E : ASMOP_C), 0);
+      else
+        commitPair (AOP (IC_RESULT (ic)), pair, ic, FALSE);
+
+      if (!isPairDead (pair, ic))
+        _pop (pair);
+
+      goto release;
+    }
+no_mlt:
 
   pair = PAIR_DE;
   if (getPairId (AOP (IC_LEFT (ic))) == PAIR_BC ||

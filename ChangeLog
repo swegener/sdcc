@@ -1,7 +1,9 @@
-2013-03-23 Philipp Klaus Krause <pkk AT spth.de>
+2013-03-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Use mlt for multiplication by constant in z180 port.
+	* src/SDCCralloc.hpp:
+	  Add comment to reference the paper on the register allocator.
 
 2013-03-16 Philipp Klaus Krause <pkk AT spth.de>
 

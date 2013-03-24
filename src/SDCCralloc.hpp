@@ -1,4 +1,4 @@
-// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2011
+// Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de, pkk@spth.de, 2010 - 2013
 //
 // (c) 2010-2012 Goethe-Universität Frankfurt
 //
@@ -17,6 +17,15 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 // An optimal, polynomial-time register allocator.
+//
+// For details, see:
+//
+// Philipp Klaus Krause,
+// "Optimal Register Allocation in Polynomial Time",
+// Compiler Construction - 22nd International Conference, CC 2013, Held as Part of the European Joint Conferences on Theory and Practice of Software, ETAPS 2013. Proceedings,
+// Lecture Notes in Computer Science, volume 7791, pp. 1-20.
+// Springer,
+// 2013.
 //
 // To use this from a port do the following:
 //

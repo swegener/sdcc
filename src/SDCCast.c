@@ -5268,7 +5268,7 @@ errorTreeReturn:
 /* sizeofOp - processes size of operation                          */
 /*-----------------------------------------------------------------*/
 value *
-sizeofOp (sym_link * type)
+sizeofOp (sym_link *type)
 {
   struct dbuf_s dbuf;
   value *val;
@@ -5286,6 +5286,22 @@ sizeofOp (sym_link * type)
   /* now convert into value  */
   val = constVal (dbuf_c_str (&dbuf));
   dbuf_destroy (&dbuf);
+  return val;
+}
+
+/*-----------------------------------------------------------------*/
+/* sizeofOp - processes alignment of operation                     */
+/*-----------------------------------------------------------------*/
+value *
+alignofOp (sym_link *type)
+{
+  value *val;
+
+  /* make sure the type is complete and sane */
+  checkTypeSanity (type, "(_Alignof)");
+
+  val = constVal ("1");
+
   return val;
 }
 

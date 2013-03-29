@@ -1,3 +1,15 @@
+2013-03-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCCast.c,
+	  src/SDCCast.h,
+	  src/SDCC.y,
+	  device/include/stdalign.h,
+	  device/include/stddef.h,
+	  device/include/stdnoreturn.h,
+	  support/regression/tests/align.c:
+	  Support for C11 _Alignof operator.
+
 2013-03-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

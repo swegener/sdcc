@@ -143,6 +143,7 @@ static void checkCurrFile (const char *s);
 "short"                 { count (); return SD_SHORT; }
 "signed"                { count (); return SIGNED; }
 "sizeof"                { count (); return SIZEOF; }
+"_Alignof"              { count (); return ALIGNOF; }
 "__builtin_offsetof"    { count (); return OFFSETOF; }
 "__sram"                { count (); TKEYWORD (XDATA); }
 "static"                { count (); return STATIC; }

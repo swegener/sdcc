@@ -17,7 +17,7 @@
   pdftitle={SDCC Compiler User Guide},
   pdfauthor={SDCC development team},
   pdfsubject={installation, user manual},
-  pdfkeywords={68hc08 8032 8051 ansi c compiler assembler CPU DS390 embedded development free Floating Point Arithmetic Freescale GPL HC08 inline Intel ISO/IEC 9899:1990 Linux MAC OS X manual Maxim mcs51 Microchip microcontroller open source PIC Unix Windows Z80 Zilog},
+  pdfkeywords={68hc08 8032 8051 ansi iso c compiler assembler CPU DS390 embedded development free Floating Point Arithmetic Freescale GPL HC08 S08 inline Intel ISO/IEC 9899:1990 Linux MAC OS X manual Maxim mcs51 Microchip microcontroller open source PIC Unix Windows Z80 Z180 Zilog Rabbit},
   pdfpagemode=UseOutlines,
   colorlinks=true,
   linkcolor=blue] {hyperref}
@@ -64,6 +64,11 @@
 \paperorientation portrait
 \suppress_date false
 \use_refstyle 0
+\branch test
+\selected 0
+\filename_suffix 0
+\color #faf0e6
+\end_branch
 \index Index
 \shortcut idx
 \color #008000
@@ -269,7 +274,7 @@ rollers and underlying hardware effectively.
 
 
 \emph on
-Warning: Large parts of this manual apply to the mc51 port only
+Warning: Parts of this manual apply to the mc51 port only
 \emph default
 .
  Further information on the z80, z180, r2k, r3ka and gbz80 ports and standard
@@ -412,7 +417,17 @@ unsigned range
 \begin_inset Text
 
 \begin_layout Plain Layout
-bool
+_Bool / bool
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Incomplete support in the mcs51 and ds390 ports.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -421,7 +436,17 @@ bool
 \begin_inset Text
 
 \begin_layout Plain Layout
-1 bit
+8 bits, 1 byte
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+1 bit in the mcs51 and ds390 ports.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -649,11 +674,10 @@ signed
 \begin_layout Plain Layout
 long long
 \begin_inset Foot
-status collapsed
+status open
 
 \begin_layout Plain Layout
-only supported in the hc08, s08, z80, z180, r2k, r3ka and gbz80 ports as
- of sdcc 3.2.0
+Incomplete support in the mcs51, ds390, ds400, pic14, pic16 and xa51 ports.
 \end_layout
 
 \end_inset
@@ -1373,7 +1397,7 @@ Newer versions have usually numerous bug fixes compared with the previous
 status collapsed
 
 \begin_layout Plain Layout
-ANSI-compliance
+Standard-compliance
 \end_layout
 
 \end_inset
@@ -1381,11 +1405,11 @@ ANSI-compliance
  (see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:ANSI-Compliance"
+reference "sub:Standard-Compliance"
 
 \end_inset
 
- for ANSI-Compliance).
+ for Standard-Compliance).
  
 \begin_inset Note Note
 status collapsed
@@ -2448,11 +2472,11 @@ special sdcc keywords which are not preceded by a double underscore are
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:ANSI-Compliance"
+reference "sub:Standard-Compliance"
 
 \end_inset
 
- ANSI-Compliance.
+ Standard-Compliance.
 \end_layout
 
 \begin_layout Itemize
@@ -2561,7 +2585,7 @@ http://sdcc.sourceforge.net/doc/sdccman.pdf
 
 .
  Some of the other tools (simulator and assembler) included with SDCC contain
- their own documentation and can be found in the source distribution.
+ their own documentation and can be found in the source distribution.
  If you want the latest unreleased software, the complete source package
  is available directly from Subversion on https://sdcc.svn.sourceforge.net/svnroot/
 sdcc/trunk/sdcc.
@@ -8835,6 +8859,664 @@ Using SDCC
 \end_layout
 
 \begin_layout Section
+Standard-Compliance
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+Standard-compliance
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Standard-Compliance"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+sdcc aims to be a free-standing implementation of the C programming language.
+ 
+\end_layout
+
+\begin_layout Subsection
+ISO C90 and ANSI C89
+\end_layout
+
+\begin_layout Standard
+Use 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\end_layout
+
+\end_inset
+
+
+\series default
+ to compile in this mode.
+\end_layout
+
+\begin_layout Standard
+The latest publicly available version of the standard 
+\emph on
+ISO/IEC 9899 - Programming languages - C
+\emph default
+ should be available at: 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899
+\end_layout
+
+\end_inset
+
+.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Deviations from standard compliance:
+\end_layout
+
+\begin_layout Itemize
+structures
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+struct
+\end_layout
+
+\end_inset
+
+ and unions
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+union
+\end_layout
+
+\end_inset
+
+ cannot be assigned values directly, cannot be passed as function parameters
+ or assigned to each other and cannot be a return value
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+return value
+\end_layout
+
+\end_inset
+
+ from a function, e.g.:
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+struct s { ...
+ };
+\begin_inset Newline newline
+\end_inset
+
+struct s s1, s2;
+\begin_inset Newline newline
+\end_inset
+
+foo()
+\begin_inset Newline newline
+\end_inset
+
+{
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\begin_inset Newline newline
+\end_inset
+
+}
+\begin_inset Newline newline
+\end_inset
+
+
+\series bold
+struct
+\family default
+\series default
+ 
+\family typewriter
+s foo1 (
+\series bold
+struct
+\family default
+\series default
+ 
+\family typewriter
+s parms) /* invalid in SDCC although allowed in ANSI */
+\begin_inset Newline newline
+\end_inset
+
+{
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+struct s rets;
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return rets; /* is invalid in SDCC although allowed in ANSI */
+\begin_inset Newline newline
+\end_inset
+
+}
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+initialization of structure arrays must be fully braced.
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+struct s { char x } a[] = {1, 2};
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+/* invalid in SDCC */
+\begin_inset Newline newline
+\end_inset
+
+struct s { char x } a[] = {{1}, {2}}; /* OK */
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+'double
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+double (not supported)
+\end_layout
+
+\end_inset
+
+' precision floating point 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Floating point support
+\end_layout
+
+\end_inset
+
+not supported.
+ Instead a warning is emitted, and float is used instead.
+\end_layout
+
+\begin_layout Itemize
+Old K&R style
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+K
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+&
+\end_layout
+
+\end_inset
+
+R style
+\end_layout
+
+\end_inset
+
+ function declarations are NOT allowed.
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+foo(i,j) /* this old style of function declarations */
+\begin_inset Newline newline
+\end_inset
+
+int i,j; /* is valid in ANSI but not valid in SDCC */
+\begin_inset Newline newline
+\end_inset
+
+{ 
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+ 
+\begin_inset Newline newline
+\end_inset
+
+}
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Warning for qualifiers occuring multiple times in qualifier-specifier lists
+ is not emitted (sdcc always behaves according to the ISO C99 / ISO C11
+ standard in this respect).
+ 
+\end_layout
+
+\begin_layout Standard
+Some features of this standard are not supported in some ports:
+\end_layout
+
+\begin_layout Itemize
+Functions are not reentrant unless explicitly declared as such or --stack-auto
+ is specified in the mcs51, hc08 and s08 ports.
+\end_layout
+
+\begin_layout Subsection
+ISO C99
+\end_layout
+
+\begin_layout Standard
+Use 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\end_layout
+
+\end_inset
+
+
+\series default
+ to compile in this mode.
+\end_layout
+
+\begin_layout Standard
+In addition to what is mentioned in the section above, the following features
+ of this standard are not supported by sdcc:
+\end_layout
+
+\begin_layout Itemize
+Declarations in placer other than those where ISO C90 allows them, e.g.:
+\end_layout
+
+\begin_deeper
+\begin_layout Verse
+
+\family typewriter
+for (
+\series bold
+int
+\family default
+\series default
+ 
+\family typewriter
+i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Data type long double.
+\end_layout
+
+\begin_layout Itemize
+Compound literals.
+ 
+\end_layout
+
+\begin_layout Itemize
+Variable-length arrays.
+\end_layout
+
+\begin_layout Itemize
+Integer constants and modulo for long long, unsigned long long, int_fast64_t,
+ int_least64_t, int64_t, uint_fast64_t, uint_least64_t, uint64_t.
+ 
+\end_layout
+
+\begin_layout Itemize
+Float classification macros in float.h.
+ 
+\end_layout
+
+\begin_layout Standard
+Some features of this standard are not supported in some ports:
+\end_layout
+
+\begin_layout Itemize
+Support for _Bool / bool is incomplete (no pointers to bool, or bool inside
+ a struct) in the mcs51, ds390 and xa51 ports.
+\end_layout
+
+\begin_layout Itemize
+There is no support for data types long long, unsigned long long, int_fast64_t,
+ int_least64_t, int64_t, uint_fast64_t, uint_least64_t, uint64_t in the
+ mcs51, ds390, ds400, pic14, pic16 and xa51 ports.
+ 
+\end_layout
+
+\begin_layout Subsection
+ISO C11
+\end_layout
+
+\begin_layout Standard
+Use 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c11
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c11
+\end_layout
+
+\end_inset
+
+
+\series default
+ to compile in this mode.
+\end_layout
+
+\begin_layout Standard
+In addition to what is mentioned in the section above, the following features
+ of this standard are not supported by sdcc:
+\end_layout
+
+\begin_layout Itemize
+Float classification macros in float.h (C11 requires more than C99).
+ 
+\end_layout
+
+\begin_layout Itemize
+_Alignas Alignment specification.
+ 
+\end_layout
+
+\begin_layout Itemize
+Type-generic expressions.
+\end_layout
+
+\begin_layout Itemize
+Improved Unicode support.
+ 
+\end_layout
+
+\begin_layout Itemize
+gets_s().
+\end_layout
+
+\begin_layout Itemize
+Static assertions.
+\end_layout
+
+\begin_layout Itemize
+quick_exit().
+\end_layout
+
+\begin_layout Subsection
+Embedded C
+\end_layout
+
+\begin_layout Standard
+sdcc has some support for named address spaces.
+ The support for fixed-point math in sdcc is inconsistent with this standard.
+ Other parts of the standard are not supported.
+\end_layout
+
+\begin_layout Section
 Compiling
 \end_layout
 
@@ -10795,7 +11477,7 @@ status collapsed
 
 
 \series default
- Generate code for the GameBoy Z80
+ Generate code for the LR35902 GameBoy Z80
 \begin_inset Index idx
 status collapsed
 
@@ -10805,7 +11487,7 @@ gbz80 (GameBoy Z80)
 
 \end_inset
 
- processor (Not actively maintained).
+ processor.
 \end_layout
 
 \begin_layout Labeling
@@ -10879,54 +11561,6 @@ PIC16
 
 -bit processors (p18f452 and variants.
  In development, not complete).
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--mtlcs900h
-\series default
- Generate code for the Toshiba TLCS-900H
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-TLCS-900H
-\end_layout
-
-\end_inset
-
- processor (Not maintained, not complete).
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--mxa51
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--mxa51
-\end_layout
-
-\end_inset
-
-
-\series default
- Generate code for the Phillips XA51
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-XA51
-\end_layout
-
-\end_inset
-
- processor (Not maintained, not complete).
 \end_layout
 
 \begin_layout Standard
@@ -11394,6 +12028,3709 @@ sdcpp (preprocessor)
 
 .
  
+\end_layout
+
+\begin_layout Subsection
+Optimization Options
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Options optimization
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Optimization options
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nogcse
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nogcse
+\end_layout
+
+\end_inset
+
+
+\series default
+ Will not do global common subexpression elimination, this option may be
+ used when the compiler creates undesirably large stack/data spaces to store
+ compiler temporaries (
+\emph on
+s
+\emph default
+pill 
+\emph on
+loc
+\emph default
+ations, sloc
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+sloc (spill location)
+\end_layout
+
+\end_inset
+
+).
+ A warning message will be generated when this happens and the compiler
+ will indicate the number of extra bytes it allocated.
+ It is recommended that this option NOT be used, #pragma
+\begin_inset space ~
+\end_inset
+
+nogcse
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma nogcse
+\end_layout
+
+\end_inset
+
+ can be used to turn off global subexpression elimination
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Subexpression elimination
+\end_layout
+
+\end_inset
+
+ for a given function only.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-noinvariant
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-noinvariant
+\end_layout
+
+\end_inset
+
+
+\series default
+ Will not do loop invariant optimizations, this may be turned off for reasons
+ explained for the previous option.
+ For more details of loop optimizations performed see Loop Invariants in
+ section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Loop-Optimizations"
+
+\end_inset
+
+.
+ It is recommended that this option NOT be used, #pragma
+\begin_inset space ~
+\end_inset
+
+noinvariant
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma noinvariant
+\end_layout
+
+\end_inset
+
+ can be used to turn off invariant optimizations for a given function only.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-noinduction
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-noinduction
+\end_layout
+
+\end_inset
+
+
+\series default
+ Will not do loop induction optimizations, see section strength reduction
+ for more details.
+ It is recommended that this option is NOT used, #pragma
+\begin_inset space ~
+\end_inset
+
+noinduction
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma noinduction
+\end_layout
+
+\end_inset
+
+ can be used to turn off induction optimizations for a given function only.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nojtbound
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nojtbound
+\end_layout
+
+\end_inset
+
+
+\size large
+ 
+\series default
+\size default
+ Will not generate boundary condition check when switch statements
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+switch statement
+\end_layout
+
+\end_inset
+
+ are implemented using jump-tables.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:'switch'-Statements"
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Switch Statements for more details.
+ It is recommended that this option is NOT used, #pragma
+\begin_inset space ~
+\end_inset
+
+nojtbound
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma nojtbound
+\end_layout
+
+\end_inset
+
+ can be used to turn off boundary checking for jump tables for a given function
+ only.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-noloopreverse
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-noloopreverse
+\end_layout
+
+\end_inset
+
+
+\series default
+\size large
+ 
+\size default
+Will not do loop reversal 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Loop reversing
+\end_layout
+
+\end_inset
+
+optimization.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series bold
+nolabelopt
+\series default
+ 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nolabelopt 
+\end_layout
+
+\end_inset
+
+Will not optimize labels (makes the dumpfiles more readable).
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-xinit-opt
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-xinit-opt
+\end_layout
+
+\end_inset
+
+
+\series default
+ Will not memcpy initialized data from code space into xdata space.
+ This saves a few bytes in code space if you don't have initialized data
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Variable initialization
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nooverlay
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nooverlay
+\end_layout
+
+\end_inset
+
+
+\series default
+  The compiler will not overlay parameters and local variables of any function,
+ see section Parameters and local variables for more details.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-peep
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-peep
+\end_layout
+
+\end_inset
+
+
+\series default
+ Disable peep-hole optimization with built-in rules.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-peep-file
+\series default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-peep-file
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+<filename> This option can be used to use additional rules to be used by
+ the peep hole optimizer.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Peephole-Optimizer"
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Peep Hole optimizations for details on how to write these rules.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-peep-asm
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-peep-asm
+\end_layout
+
+\end_inset
+
+
+\series default
+ Pass the inline assembler code through the peep hole optimizer.
+ This can cause unexpected changes to inline assembler code, please go through
+ the peephole optimizer
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Peephole optimizer
+\end_layout
+
+\end_inset
+
+ rules defined in the source file tree '<target>/peeph.def' before using
+ this option.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-peep-return
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-peep-return
+\end_layout
+
+\end_inset
+
+
+\series default
+ Let the peep hole optimizer do return optimizations.
+ This is the default without 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series default
+debug
+\series bold
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-debug
+\end_layout
+
+\end_inset
+
+
+\series default
+.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-peep-return
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-peep-return
+\end_layout
+
+\end_inset
+
+
+\series default
+ Do not let the peep hole optimizer do return optimizations.
+ This is the default with 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series default
+debug
+\series bold
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-debug
+\end_layout
+
+\end_inset
+
+
+\series default
+.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-opt-code-speed
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-opt-code-speed
+\end_layout
+
+\end_inset
+
+
+\series default
+ The compiler will optimize code generation towards fast code, possibly
+ at the expense of code size.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-opt-code-size
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-opt-code-size
+\end_layout
+
+\end_inset
+
+
+\series default
+ The compiler will optimize code generation towards compact code, possibly
+ at the expense of code speed.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series bold
+fomit-frame-pointer
+\series default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fomit-frame-pointer
+\end_layout
+
+\end_inset
+
+ Frame pointer will be omitted when the function uses no local variables.
+ On the z80-related ports this option will result in the frame pointer always
+ being omitted.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series bold
+max-allocs-per-node
+\series default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-max-allocs-per-node
+\end_layout
+
+\end_inset
+
+ Setting this to a high value will result in increased compilation time
+ and more optimized code being generated.
+ Setting it to lower values speed up compilation, but does not optimize
+ as much.
+ The default value is 3000.
+ This option currently only affects the hc08, s08, z80, z180, r2k, r3ka
+ and gbz80 ports.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series bold
+nolospre
+\series default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nolospre
+\end_layout
+
+\end_inset
+
+ Disable lospre.
+ lospre is an advanced redundancy elimination technique, essentially an
+ improved variant of global subexpression elimination.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series bold
+lospre-unsafe-read
+\series default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-losrpe-unsafe-read
+\end_layout
+
+\end_inset
+
+ Allow unsafe reads in lospre.
+ This will enable additional optimizations, but can result in spurious reads
+ from undefined memory addresses, which can be harmful if the target system
+ uses certain ways of doing memory-mapped I/O.
+\end_layout
+
+\begin_layout Subsection
+Other Options
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Options other
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-v
+\begin_inset space ~
+\end_inset
+
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-version
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-version
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-v
+\end_layout
+
+\end_inset
+
+
+\series default
+ displays the sdcc version.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-c
+\begin_inset space ~
+\end_inset
+
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-compile-only
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-compile-only
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-c
+\end_layout
+
+\end_inset
+
+
+\series default
+ will compile and assemble the source, but will not call the linkage editor.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\series default
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series bold
+-c1mode
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-c1mode
+\end_layout
+
+\end_inset
+
+
+\series default
+ reads the preprocessed source from standard input and compiles it.
+ The file name for the assembler output must be specified using the -o option.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-E
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-E
+\end_layout
+
+\end_inset
+
+
+\series default
+ Run only the C preprocessor
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Preprocessor
+\end_layout
+
+\end_inset
+
+.
+ Preprocess all the C source files specified and output the results to standard
+ output.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-o
+\begin_inset space ~
+\end_inset
+
+<path/file>
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-o <path/file>
+\end_layout
+
+\end_inset
+
+
+\series default
+ The output path where everything will be placed or the file name used for
+ all generated output files.
+ If the parameter is a path, it must have a trailing slash (or backslash
+ for the Windows binaries) to be recognized as a path.
+ Note for Windows users: if the path contains spaces, it should be surrounded
+ by quotes.
+ The trailing backslash should be doubled in order to prevent escaping the
+ final quote, for example: 
+\emph on
+-o 
+\begin_inset Quotes sld
+\end_inset
+
+F:
+\backslash
+Projects
+\backslash
+test3
+\backslash
+output 1
+\backslash
+
+\backslash
+
+\begin_inset Quotes srd
+\end_inset
+
+
+\emph default
+ or put after the final quote, for example: 
+\emph on
+-o 
+\begin_inset Quotes sld
+\end_inset
+
+F:
+\backslash
+Projects
+\backslash
+test3
+\backslash
+output 1
+\begin_inset Quotes srd
+\end_inset
+
+
+\backslash
+
+\emph default
+.
+ The path using slashes for directory delimiters can be used too, for example:
+ 
+\emph on
+-o 
+\begin_inset Quotes sld
+\end_inset
+
+F:/Projects/test3/output 1/
+\begin_inset Quotes srd
+\end_inset
+
+
+\emph default
+.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-stack-auto
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-stack-auto
+\end_layout
+
+\end_inset
+
+
+\series default
+\size large
+ 
+\size default
+All functions in the source file will be compiled as 
+\emph on
+reentrant
+\emph default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+reentrant
+\end_layout
+
+\end_inset
+
+, i.e.
+ the parameters and local variables will be allocated on the stack
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+stack
+\end_layout
+
+\end_inset
+
+.
+ See section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Parameters-and-Local-Variables"
+
+\end_inset
+
+ Parameters and Local Variables for more details.
+ If this option is used all source files in the project should be compiled
+ with this option.
+ It automatically implies -
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-int-long-reent and -
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-float-reent.
+ 
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-callee-saves
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-callee-saves
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset label
+LatexCommand label
+name "lyx:--callee-saves-function1[,function2][,function3]..."
+
+\end_inset
+
+function1[,function2][,function3]....
+
+\series default
+ The compiler by default uses a caller saves convention for register saving
+ across function calls, however this can cause unnecessary register pushing
+ and popping when calling small functions from larger functions.
+ This option can be used to switch the register saving convention for the
+ function names specified.
+ The compiler will not save registers when calling these functions, no extra
+ code will be generated at the entry and exit (function prologue
+\series bold
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+function prologue
+\end_layout
+
+\end_inset
+
+
+\series default
+ and epilogue
+\series bold
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+function epilogue
+\end_layout
+
+\end_inset
+
+
+\series default
+) for these functions to save and restore the registers used by these functions,
+ this can SUBSTANTIALLY reduce code and improve run time performance of
+ the generated code.
+ In the future the compiler (with inter procedural analysis) will be able
+ to determine the appropriate scheme to use for each function call.
+ DO NOT use this option for built-in functions such as _mulint..., if this
+ option is used for a library function the appropriate library function
+ needs to be recompiled with the same option.
+ If the project consists of multiple source files then all the source file
+ should be compiled with the same -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-callee-saves option string.
+ Also see #pragma
+\begin_inset space ~
+\end_inset
+
+callee_saves 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+#
+\end_layout
+
+\end_inset
+
+pragma callee
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+saves
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "ite:callee_saves-function1[,function2[,function3...]]--"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-all-callee-saves
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-all-callee-saves
+\end_layout
+
+\end_inset
+
+
+\series default
+ Function of -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-callee-saves will be applied to all functions by default.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-debug
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-debug
+\end_layout
+
+\end_inset
+
+ 
+\series default
+When this option is used the compiler will generate debug information.
+ The debug information collected in a file with .cdb extension can be used
+ with the SDCDB.
+ For more information see documentation for SDCDB.
+ Another file with a .omf extension contains debug information in AOMF or
+ AOMF51
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+AOMF, AOMF51
+\end_layout
+
+\end_inset
+
+ format which is commonly used by third party tools.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-S
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-S
+\end_layout
+
+\end_inset
+
+
+\series default
+\size large
+ 
+\size default
+Stop after the stage of compilation proper; do not assemble.
+ The output is an assembler code file for the input file specified.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-int-long-reent
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-int-long-reent
+\end_layout
+
+\end_inset
+
+
+\series default
+ Integer (16 bit) and long (32 bit) libraries have been compiled as reentrant.
+ Note by default these libraries are compiled as non-reentrant.
+ See section Installation for more details.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-cyclomatic
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-cyclomatic
+\end_layout
+
+\end_inset
+
+ 
+\series default
+This option will cause the compiler to generate an information message for
+ each function in the source file.
+ The message contains some 
+\emph on
+important
+\emph default
+ information about the function.
+ The number of edges and nodes the compiler detected in the control flow
+ graph of the function, and most importantly the 
+\emph on
+cyclomatic complexity
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Cyclomatic complexity
+\end_layout
+
+\end_inset
+
+
+\emph default
+ see section on Cyclomatic Complexity for more details.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-float-reent
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-float-reent
+\end_layout
+
+\end_inset
+
+
+\series default
+ Floating point library is compiled as reentrant
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+reentrant
+\end_layout
+
+\end_inset
+
+.
+ See section Installation for more details.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-funsigned-char
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-funsigned-char
+\end_layout
+
+\end_inset
+
+
+\series default
+ The default signedness for every type is 
+\family typewriter
+signed
+\family default
+.
+ In some embedded environments the default signedness of 
+\family typewriter
+char
+\family default
+ is 
+\family typewriter
+unsigned
+\family default
+.
+ To set the signess for characters to unsigned, use the option -
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-funsigned-char.
+ If this option is set and no signedness keyword (unsigned/signed) is given,
+ a char will be signed.
+ All other types are unaffected.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-main-return
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-main-return
+\end_layout
+
+\end_inset
+
+
+\series default
+ This option can be used if the code generated is called by a monitor program
+ or if the main routine includes an endless loop.
+ This option results in slightly smaller code and saves two bytes of stack
+ space.
+ The return from the 'main'
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+main return
+\end_layout
+
+\end_inset
+
+ function will return to the function calling main.
+ The default setting is to lock up i.e.
+ generate a '
+\family typewriter
+sjmp .
+\family default
+'.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nostdinc
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nostdinc
+\end_layout
+
+\end_inset
+
+
+\series default
+ This will prevent the compiler from passing on the default include path
+ to the preprocessor.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nostdlib
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nostdlib
+\end_layout
+
+\end_inset
+
+
+\series default
+ This will prevent the compiler from passing on the default library
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Libraries
+\end_layout
+
+\end_inset
+
+ path to the linker.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-verbose
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-verbose
+\end_layout
+
+\end_inset
+
+
+\series default
+ Shows the various actions the compiler is performing.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-V
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-V
+\end_layout
+
+\end_inset
+
+
+\series default
+ Shows the actual commands the compiler is executing.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-c-code-in-asm
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-c-code-in-asm
+\end_layout
+
+\end_inset
+
+
+\series default
+ Hides your ugly and inefficient c-code from the asm file, so you can always
+ blame the compiler :)
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fverbose-asm
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-gen-comments
+\end_layout
+
+\end_inset
+
+
+\series default
+ Include code generator and peep-hole comments in the generated asm files.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-peep-comments
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-peep-comments
+\end_layout
+
+\end_inset
+
+
+\series default
+ Don't include peep-hole comments in the generated asm files even if -
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-fverbose-asm option is specified.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-i-code-in-asm
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-i-code-in-asm
+\end_layout
+
+\end_inset
+
+
+\series default
+ Include i-codes in the asm file.
+ Sounds like noise but is helpful for debugging the compiler itself.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-less-pedantic
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+pedantic
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-less-pedantic
+\end_layout
+
+\end_inset
+
+
+\series default
+
+\begin_inset CommandInset label
+LatexCommand label
+name "lyx:--less-pedantic"
+
+\end_inset
+
+ Disable some of the more pedantic warnings
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Warnings
+\end_layout
+
+\end_inset
+
+.
+ For more details, see the less_pedantic pragma 
+\begin_inset CommandInset ref
+LatexCommand vpageref
+reference "ite:less_pedantic"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-warning
+\begin_inset space ~
+\end_inset
+
+<nnnn>
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-warning
+\end_layout
+
+\end_inset
+
+
+\series default
+ Disable specific warning with number <nnnn>.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-Werror
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-Werror
+\end_layout
+
+\end_inset
+
+
+\series default
+ Treat all warnings as errors.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-print-search-dirs
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-print-search-dirs
+\end_layout
+
+\end_inset
+
+
+\series default
+ Display the directories in the compiler's search path
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-vc
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-vc
+\end_layout
+
+\end_inset
+
+
+\series default
+ Display errors and warnings using MSVC style, so you can use SDCC with
+ the visual studio IDE
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+IDE
+\end_layout
+
+\end_inset
+
+.
+ With SDCC both offering a GCC-like (the default) and a MSVC-like
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+MSVC output style
+\end_layout
+
+\end_inset
+
+ output style, integration into most programming editors should be straightforwa
+rd.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-stdout
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-stdout
+\end_layout
+
+\end_inset
+
+
+\series default
+ Send errors and warnings to stdout instead of stderr.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-Wa
+\begin_inset space ~
+\end_inset
+
+asmOption[,asmOption]
+\series default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-Wa asmOption[,asmOption]
+\end_layout
+
+\end_inset
+
+...
+ Pass the asmOption to the assembler
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Options assembler
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Assembler options
+\end_layout
+
+\end_inset
+
+.
+ See file sdcc/sdas/doc/asxhtm.html for assembler options.cd
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc89
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc89
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generally follow the ANSI C89 / ISO C90 standard, but allow some SDCC behaviour
+ that conflicts with the standard (default).
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c89
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ANSI C89 / ISO C90 standard.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc99
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc99
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generally follow the ISO C99 standard, but allow some SDCC behaviour that
+ conflicts with the standard.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c99
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc99
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ISO C99 standard.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c11
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc11
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ISO C11 standard.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-codeseg
+\series default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-codeseg <Value>
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "lyx:-codeseg"
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+<Name> The name to be used for the code
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+code
+\end_layout
+
+\end_inset
+
+ segment, default CSEG.
+ This is useful if you need to tell the compiler to put the code in a special
+ segment so you can later on tell the linker to put this segment in a special
+ place in memory.
+ Can be used for instance when using bank switching to put the code in a
+ bank.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-constseg
+\series default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-constseg <Value>
+\end_layout
+
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+<Name> The name to be used for the const
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+const
+\end_layout
+
+\end_inset
+
+ segment, default CONST.
+ This is useful if you need to tell the compiler to put the const data in
+ a special segment so you can later on tell the linker to put this segment
+ in a special place in memory.
+ Can be used for instance when using bank switching to put the const data
+ in a bank.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fdollars-in-identifiers
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fdollars-in-identifiers
+\end_layout
+
+\end_inset
+
+
+\series default
+ Permit '$' as an identifier character.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-more-pedantic
+\series default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-more-pedantic
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+pedantic
+\end_layout
+
+\end_inset
+
+ Actually this is 
+\series bold
+\emph on
+not
+\series default
+\emph default
+ a SDCC compiler option but if you want 
+\emph on
+more
+\emph default
+ warnings you can use a separate tool dedicated to syntax checking like
+ splint
+\begin_inset CommandInset label
+LatexCommand label
+name "lyx:more-pedantic-SPLINT"
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+lint (syntax checking tool)
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.splint.org
+\end_layout
+
+\end_inset
+
+.
+ To make your source files parseable by splint you will have to include
+ 
+\family sans
+lint.h
+\family default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+splint (syntax checking tool)
+\end_layout
+
+\end_inset
+
+ in your source file and add brackets around extended keywords (like 
+\family sans
+
+\begin_inset Quotes sld
+\end_inset
+
+__at
+\begin_inset space ~
+\end_inset
+
+
+\series bold
+(
+\series default
+0xab
+\series bold
+)
+\series default
+
+\begin_inset Quotes srd
+\end_inset
+
+
+\family default
+ and 
+\family sans
+
+\begin_inset Quotes sld
+\end_inset
+
+__interrupt
+\begin_inset space ~
+\end_inset
+
+(2)
+\begin_inset Quotes srd
+\end_inset
+
+
+\family default
+).
+ 
+\begin_inset Newline newline
+\end_inset
+
+Splint has an excellent on line manual at 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.splint.org/manual/
+\end_layout
+
+\end_inset
+
+ and it's capabilities go beyond pure syntax checking.
+ You'll need to tell splint the location of SDCC's include files so a typical
+ command line could look like this: 
+\begin_inset Newline newline
+\end_inset
+
+
+\family sans
+splint
+\begin_inset space ~
+\end_inset
+
+-I
+\begin_inset space ~
+\end_inset
+
+/usr/local/share/sdcc/include/mcs51/
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+myprogram.c
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-short-is-8bits
+\series default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-short-is-8bits
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "lyx:--short-is-8bits"
+
+\end_inset
+
+ Treat short as 8-bit (for backward compatibility with older versions of
+ compiler - see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Compatibility-with-previous"
+
+\end_inset
+
+)
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\series default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-use-non-free
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "lyx:--use-non-free"
+
+\end_inset
+
+ Search / include non-free licensed libraries and header files, located
+ under the non-free directory - see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Search-Paths"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -13647,27 +17984,53 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-Z80 Options
-\begin_inset Index idx
+Options common to all z80-related ports (z80, z180, r2k, r3ka, gbz80)
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-Options Z80
+
+
+\backslash
+/
 \end_layout
 
 \end_inset
 
+-no-std-crt0
+\series default
 
 \begin_inset Index idx
 status collapsed
 
 \begin_layout Plain Layout
-Z80
+Z80!Options!-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
 \end_layout
 
 \end_inset
 
+-no-std-crt0
+\end_layout
 
+\end_inset
+
+ When linking, skip the standard crt0.rel object file.
+ You must provide your own crt0.rel for your system when linking.
 \end_layout
 
 \begin_layout Labeling
@@ -13736,9 +18099,13 @@ status collapsed
 
 \end_inset
 
--no-std-crt0
+-codeseg
 \series default
 
+\begin_inset space ~
+\end_inset
+
+<Value>
 \begin_inset Index idx
 status collapsed
 
@@ -13756,13 +18123,85 @@ status collapsed
 
 \end_inset
 
--no-std-crt0
+-codeseg <Value>
 \end_layout
 
 \end_inset
 
- When linking, skip the standard crt0.rel object file.
- You must provide your own crt0.rel for your system when linking.
+ Use <Value> for the code segment name.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-constseg
+\series default
+
+\begin_inset space ~
+\end_inset
+
+<Value>
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Z80!Options!-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-constseg <Value>
+\end_layout
+
+\end_inset
+
+ Use <Value> for the const segment name.
+\end_layout
+
+\begin_layout Subsection
+Z80 Options
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Options Z80
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Z80
+\end_layout
+
+\end_inset
+
+ (apply to z80, z180, r2k and r3ka port)
 \end_layout
 
 \begin_layout Labeling
@@ -13872,104 +18311,6 @@ status collapsed
 
 \end_inset
 
--codeseg
-\series default
-
-\begin_inset space ~
-\end_inset
-
-<Value>
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Z80!Options!-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--codeseg <Value>
-\end_layout
-
-\end_inset
-
- Use <Value> for the code segment name.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--constseg
-\series default
-
-\begin_inset space ~
-\end_inset
-
-<Value>
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Z80!Options!-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--constseg <Value>
-\end_layout
-
-\end_inset
-
- Use <Value> for the const segment name.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
 -reserve-regs-iy
 \series default
 
@@ -14002,7 +18343,134 @@ status collapsed
 This option tells the compiler that it is not allowed to use register pair
  iy.
  The option can be useful for systems where iy is reserved for the OS.
+ This option is incompatible with -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fomit-frame-pointer.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-oldralloc
+\series default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+Z80!Options!-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-oldralloc
+\end_layout
+
+\end_inset
+
+
+\size large
  
+\size default
+Use old register allocator.
+ The old register allocator typically is faster than the current one, but
+ the current one generates better code.
+ This differences are the strongest, when a high value for -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-max-allocs-per-node is used.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fno-omit-frame-pointer
+\series default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+Z80!Options!-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fno-omit-frame-pointer
+\end_layout
+
+\end_inset
+
+
+\size large
+ 
+\size default
+Never omit the frame pointer.
 \end_layout
 
 \begin_layout Subsection
@@ -14027,101 +18495,6 @@ GBZ80
 \end_inset
 
 
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--callee-saves-bc
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-GBZ80!Options!-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--callee-saves-bc
-\end_layout
-
-\end_inset
-
-
-\size large
- 
-\size default
-Force a called function to always save BC.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-std-crt0
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Z80!Options!-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-std-crt0
-\end_layout
-
-\end_inset
-
- When linking, skip the standard crt0.rel object file.
- You must provide your own crt0.rel for your system when linking.
 \end_layout
 
 \begin_layout Labeling
@@ -14168,3667 +18541,6 @@ GBZ80!Options!-ba <Num>
 \end_inset
 
  Use data bank <Num>.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--codeseg
-\series default
-
-\begin_inset space ~
-\end_inset
-
-<Value>
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-GBZ80!Options!-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--codeseg <Value>
-\end_layout
-
-\end_inset
-
- Use <Value> for the code segment name.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--constseg
-\series default
-
-\begin_inset space ~
-\end_inset
-
-<Value>
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-GBZ80!Options!-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--constseg <Value>
-\end_layout
-
-\end_inset
-
- Use <Value> for the const segment name.
-\end_layout
-
-\begin_layout Subsection
-Optimization Options
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Options optimization
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Optimization options
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nogcse
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nogcse
-\end_layout
-
-\end_inset
-
-
-\series default
- Will not do global subexpression elimination, this option may be used when
- the compiler creates undesirably large stack/data spaces to store compiler
- temporaries (
-\emph on
-s
-\emph default
-pill 
-\emph on
-loc
-\emph default
-ations, sloc
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-sloc (spill location)
-\end_layout
-
-\end_inset
-
-).
- A warning message will be generated when this happens and the compiler
- will indicate the number of extra bytes it allocated.
- It is recommended that this option NOT be used, #pragma
-\begin_inset space ~
-\end_inset
-
-nogcse
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-#
-\end_layout
-
-\end_inset
-
-pragma nogcse
-\end_layout
-
-\end_inset
-
- can be used to turn off global subexpression elimination
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Subexpression elimination
-\end_layout
-
-\end_inset
-
- for a given function only.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--noinvariant
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--noinvariant
-\end_layout
-
-\end_inset
-
-
-\series default
- Will not do loop invariant optimizations, this may be turned off for reasons
- explained for the previous option.
- For more details of loop optimizations performed see Loop Invariants in
- section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Loop-Optimizations"
-
-\end_inset
-
-.
- It is recommended that this option NOT be used, #pragma
-\begin_inset space ~
-\end_inset
-
-noinvariant
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-#
-\end_layout
-
-\end_inset
-
-pragma noinvariant
-\end_layout
-
-\end_inset
-
- can be used to turn off invariant optimizations for a given function only.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--noinduction
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--noinduction
-\end_layout
-
-\end_inset
-
-
-\series default
- Will not do loop induction optimizations, see section strength reduction
- for more details.
- It is recommended that this option is NOT used, #pragma
-\begin_inset space ~
-\end_inset
-
-noinduction
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-#
-\end_layout
-
-\end_inset
-
-pragma noinduction
-\end_layout
-
-\end_inset
-
- can be used to turn off induction optimizations for a given function only.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nojtbound
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nojtbound
-\end_layout
-
-\end_inset
-
-
-\size large
- 
-\series default
-\size default
- Will not generate boundary condition check when switch statements
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-switch statement
-\end_layout
-
-\end_inset
-
- are implemented using jump-tables.
- See section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:'switch'-Statements"
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-Switch Statements for more details.
- It is recommended that this option is NOT used, #pragma
-\begin_inset space ~
-\end_inset
-
-nojtbound
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-#
-\end_layout
-
-\end_inset
-
-pragma nojtbound
-\end_layout
-
-\end_inset
-
- can be used to turn off boundary checking for jump tables for a given function
- only.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--noloopreverse
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--noloopreverse
-\end_layout
-
-\end_inset
-
-
-\series default
-\size large
- 
-\size default
-Will not do loop reversal 
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Loop reversing
-\end_layout
-
-\end_inset
-
-optimization.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--
-\series bold
-nolabelopt
-\series default
- 
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nolabelopt 
-\end_layout
-
-\end_inset
-
-Will not optimize labels (makes the dumpfiles more readable).
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-xinit-opt
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-xinit-opt
-\end_layout
-
-\end_inset
-
-
-\series default
- Will not memcpy initialized data from code space into xdata space.
- This saves a few bytes in code space if you don't have initialized data
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Variable initialization
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nooverlay
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nooverlay
-\end_layout
-
-\end_inset
-
-
-\series default
-  The compiler will not overlay parameters and local variables of any function,
- see section Parameters and local variables for more details.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-peep
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-peep
-\end_layout
-
-\end_inset
-
-
-\series default
- Disable peep-hole optimization with built-in rules.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--peep-file
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--peep-file
-\end_layout
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-<filename> This option can be used to use additional rules to be used by
- the peep hole optimizer.
- See section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Peephole-Optimizer"
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-Peep Hole optimizations for details on how to write these rules.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--peep-asm
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--peep-asm
-\end_layout
-
-\end_inset
-
-
-\series default
- Pass the inline assembler code through the peep hole optimizer.
- This can cause unexpected changes to inline assembler code, please go through
- the peephole optimizer
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Peephole optimizer
-\end_layout
-
-\end_inset
-
- rules defined in the source file tree '<target>/peeph.def' before using
- this option.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--peep-return
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--peep-return
-\end_layout
-
-\end_inset
-
-
-\series default
- Let the peep hole optimizer do return optimizations.
- This is the default without 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--
-\series default
-debug
-\series bold
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--debug
-\end_layout
-
-\end_inset
-
-
-\series default
-.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-peep-return
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-peep-return
-\end_layout
-
-\end_inset
-
-
-\series default
- Do not let the peep hole optimizer do return optimizations.
- This is the default with 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--
-\series default
-debug
-\series bold
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--debug
-\end_layout
-
-\end_inset
-
-
-\series default
-.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--opt-code-speed
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--opt-code-speed
-\end_layout
-
-\end_inset
-
-
-\series default
- The compiler will optimize code generation towards fast code, possibly
- at the expense of code size.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--opt-code-size
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--opt-code-size
-\end_layout
-
-\end_inset
-
-
-\series default
- The compiler will optimize code generation towards compact code, possibly
- at the expense of code speed.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--
-\series bold
-fomit-frame-pointer
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--fomit-frame-pointer
-\end_layout
-
-\end_inset
-
- Frame pointer will be omitted when the function uses no local variables.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--
-\series bold
-max-allocs-per-node
-\series default
-
-\begin_inset Index idx
-status open
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--max-allocs-per-node
-\end_layout
-
-\end_inset
-
- Setting this to a high value will result in increased compilation time
- and more optimized code being generated.
- Setting it to lower valeus speed up compilation, but does not optimize
- as much.
- The default value is 3000.
- This option currently only affects the hc08, s08, z80, z180, r2k, r3ka
- and gbz80 ports.
-\end_layout
-
-\begin_layout Subsection
-Other Options
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Options other
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--v
-\begin_inset space ~
-\end_inset
-
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--version
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--version
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--v
-\end_layout
-
-\end_inset
-
-
-\series default
- displays the sdcc version.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--c
-\begin_inset space ~
-\end_inset
-
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--compile-only
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--compile-only
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--c
-\end_layout
-
-\end_inset
-
-
-\series default
- will compile and assemble the source, but will not call the linkage editor.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\series default
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\series bold
--c1mode
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--c1mode
-\end_layout
-
-\end_inset
-
-
-\series default
- reads the preprocessed source from standard input and compiles it.
- The file name for the assembler output must be specified using the -o option.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--E
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--E
-\end_layout
-
-\end_inset
-
-
-\series default
- Run only the C preprocessor
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Preprocessor
-\end_layout
-
-\end_inset
-
-.
- Preprocess all the C source files specified and output the results to standard
- output.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--o
-\begin_inset space ~
-\end_inset
-
-<path/file>
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--o <path/file>
-\end_layout
-
-\end_inset
-
-
-\series default
- The output path where everything will be placed or the file name used for
- all generated output files.
- If the parameter is a path, it must have a trailing slash (or backslash
- for the Windows binaries) to be recognized as a path.
- Note for Windows users: if the path contains spaces, it should be surrounded
- by quotes.
- The trailing backslash should be doubled in order to prevent escaping the
- final quote, for example: 
-\emph on
--o 
-\begin_inset Quotes sld
-\end_inset
-
-F:
-\backslash
-Projects
-\backslash
-test3
-\backslash
-output 1
-\backslash
-
-\backslash
-
-\begin_inset Quotes srd
-\end_inset
-
-
-\emph default
- or put after the final quote, for example: 
-\emph on
--o 
-\begin_inset Quotes sld
-\end_inset
-
-F:
-\backslash
-Projects
-\backslash
-test3
-\backslash
-output 1
-\begin_inset Quotes srd
-\end_inset
-
-
-\backslash
-
-\emph default
-.
- The path using slashes for directory delimiters can be used too, for example:
- 
-\emph on
--o 
-\begin_inset Quotes sld
-\end_inset
-
-F:/Projects/test3/output 1/
-\begin_inset Quotes srd
-\end_inset
-
-
-\emph default
-.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--stack-auto
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--stack-auto
-\end_layout
-
-\end_inset
-
-
-\series default
-\size large
- 
-\size default
-All functions in the source file will be compiled as 
-\emph on
-reentrant
-\emph default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-reentrant
-\end_layout
-
-\end_inset
-
-, i.e.
- the parameters and local variables will be allocated on the stack
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-stack
-\end_layout
-
-\end_inset
-
-.
- See section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Parameters-and-Local-Variables"
-
-\end_inset
-
- Parameters and Local Variables for more details.
- If this option is used all source files in the project should be compiled
- with this option.
- It automatically implies -
-\series bold
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\series default
--int-long-reent and -
-\series bold
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\series default
--float-reent.
- 
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--callee-saves
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--callee-saves
-\end_layout
-
-\end_inset
-
- 
-\begin_inset CommandInset label
-LatexCommand label
-name "lyx:--callee-saves-function1[,function2][,function3]..."
-
-\end_inset
-
-function1[,function2][,function3]....
-
-\series default
- The compiler by default uses a caller saves convention for register saving
- across function calls, however this can cause unnecessary register pushing
- and popping when calling small functions from larger functions.
- This option can be used to switch the register saving convention for the
- function names specified.
- The compiler will not save registers when calling these functions, no extra
- code will be generated at the entry and exit (function prologue
-\series bold
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-function prologue
-\end_layout
-
-\end_inset
-
-
-\series default
- and epilogue
-\series bold
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-function epilogue
-\end_layout
-
-\end_inset
-
-
-\series default
-) for these functions to save and restore the registers used by these functions,
- this can SUBSTANTIALLY reduce code and improve run time performance of
- the generated code.
- In the future the compiler (with inter procedural analysis) will be able
- to determine the appropriate scheme to use for each function call.
- DO NOT use this option for built-in functions such as _mulint..., if this
- option is used for a library function the appropriate library function
- needs to be recompiled with the same option.
- If the project consists of multiple source files then all the source file
- should be compiled with the same -
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--callee-saves option string.
- Also see #pragma
-\begin_inset space ~
-\end_inset
-
-callee_saves 
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-#
-\end_layout
-
-\end_inset
-
-pragma callee
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-saves
-\end_layout
-
-\end_inset
-
- 
-\begin_inset CommandInset ref
-LatexCommand vpageref
-reference "ite:callee_saves-function1[,function2[,function3...]]--"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--all-callee-saves
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--all-callee-saves
-\end_layout
-
-\end_inset
-
-
-\series default
- Function of -
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--callee-saves will be applied to all functions by default.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--debug
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--debug
-\end_layout
-
-\end_inset
-
- 
-\series default
-When this option is used the compiler will generate debug information.
- The debug information collected in a file with .cdb extension can be used
- with the SDCDB.
- For more information see documentation for SDCDB.
- Another file with a .omf extension contains debug information in AOMF or
- AOMF51
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-AOMF, AOMF51
-\end_layout
-
-\end_inset
-
- format which is commonly used by third party tools.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--S
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--S
-\end_layout
-
-\end_inset
-
-
-\series default
-\size large
- 
-\size default
-Stop after the stage of compilation proper; do not assemble.
- The output is an assembler code file for the input file specified.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--int-long-reent
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--int-long-reent
-\end_layout
-
-\end_inset
-
-
-\series default
- Integer (16 bit) and long (32 bit) libraries have been compiled as reentrant.
- Note by default these libraries are compiled as non-reentrant.
- See section Installation for more details.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--cyclomatic
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--cyclomatic
-\end_layout
-
-\end_inset
-
- 
-\series default
-This option will cause the compiler to generate an information message for
- each function in the source file.
- The message contains some 
-\emph on
-important
-\emph default
- information about the function.
- The number of edges and nodes the compiler detected in the control flow
- graph of the function, and most importantly the 
-\emph on
-cyclomatic complexity
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Cyclomatic complexity
-\end_layout
-
-\end_inset
-
-
-\emph default
- see section on Cyclomatic Complexity for more details.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--float-reent
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--float-reent
-\end_layout
-
-\end_inset
-
-
-\series default
- Floating point library is compiled as reentrant
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-reentrant
-\end_layout
-
-\end_inset
-
-.
- See section Installation for more details.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--funsigned-char
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--funsigned-char
-\end_layout
-
-\end_inset
-
-
-\series default
- The default signedness for every type is 
-\family typewriter
-signed
-\family default
-.
- In some embedded environments the default signedness of 
-\family typewriter
-char
-\family default
- is 
-\family typewriter
-unsigned
-\family default
-.
- To set the signess for characters to unsigned, use the option -
-\series bold
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\series default
--funsigned-char.
- If this option is set and no signedness keyword (unsigned/signed) is given,
- a char will be signed.
- All other types are unaffected.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--main-return
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--main-return
-\end_layout
-
-\end_inset
-
-
-\series default
- This option can be used if the code generated is called by a monitor program
- or if the main routine includes an endless loop.
- This option results in slightly smaller code and saves two bytes of stack
- space.
- The return from the 'main'
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-main return
-\end_layout
-
-\end_inset
-
- function will return to the function calling main.
- The default setting is to lock up i.e.
- generate a '
-\family typewriter
-sjmp .
-\family default
-'.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nostdinc
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nostdinc
-\end_layout
-
-\end_inset
-
-
-\series default
- This will prevent the compiler from passing on the default include path
- to the preprocessor.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nostdlib
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nostdlib
-\end_layout
-
-\end_inset
-
-
-\series default
- This will prevent the compiler from passing on the default library
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Libraries
-\end_layout
-
-\end_inset
-
- path to the linker.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--verbose
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--verbose
-\end_layout
-
-\end_inset
-
-
-\series default
- Shows the various actions the compiler is performing.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--V
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--V
-\end_layout
-
-\end_inset
-
-
-\series default
- Shows the actual commands the compiler is executing.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-c-code-in-asm
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-c-code-in-asm
-\end_layout
-
-\end_inset
-
-
-\series default
- Hides your ugly and inefficient c-code from the asm file, so you can always
- blame the compiler :)
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--fverbose-asm
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-gen-comments
-\end_layout
-
-\end_inset
-
-
-\series default
- Include code generator and peep-hole comments in the generated asm files.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-peep-comments
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-peep-comments
-\end_layout
-
-\end_inset
-
-
-\series default
- Don't include peep-hole comments in the generated asm files even if -
-\series bold
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\series default
--fverbose-asm option is specified.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--i-code-in-asm
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--i-code-in-asm
-\end_layout
-
-\end_inset
-
-
-\series default
- Include i-codes in the asm file.
- Sounds like noise but is most helpful for debugging the compiler itself.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--less-pedantic
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-pedantic
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--less-pedantic
-\end_layout
-
-\end_inset
-
-
-\series default
-
-\begin_inset CommandInset label
-LatexCommand label
-name "lyx:--less-pedantic"
-
-\end_inset
-
- Disable some of the more pedantic warnings
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Warnings
-\end_layout
-
-\end_inset
-
-.
- For more details, see the less_pedantic pragma 
-\begin_inset CommandInset ref
-LatexCommand vpageref
-reference "ite:less_pedantic"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--disable-warning
-\begin_inset space ~
-\end_inset
-
-<nnnn>
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--disable-warning
-\end_layout
-
-\end_inset
-
-
-\series default
- Disable specific warning with number <nnnn>.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--Werror
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--Werror
-\end_layout
-
-\end_inset
-
-
-\series default
- Treat all warnings as errors.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--print-search-dirs
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--print-search-dirs
-\end_layout
-
-\end_inset
-
-
-\series default
- Display the directories in the compiler's search path
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--vc
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--vc
-\end_layout
-
-\end_inset
-
-
-\series default
- Display errors and warnings using MSVC style, so you can use SDCC with
- the visual studio IDE
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-IDE
-\end_layout
-
-\end_inset
-
-.
- With SDCC both offering a GCC-like (the default) and a MSVC-like
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-MSVC output style
-\end_layout
-
-\end_inset
-
- output style, integration into most programming editors should be straightforwa
-rd.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--use-stdout
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--use-stdout
-\end_layout
-
-\end_inset
-
-
-\series default
- Send errors and warnings to stdout instead of stderr.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--Wa
-\begin_inset space ~
-\end_inset
-
-asmOption[,asmOption]
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--Wa asmOption[,asmOption]
-\end_layout
-
-\end_inset
-
-...
- Pass the asmOption to the assembler
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Options assembler
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Assembler options
-\end_layout
-
-\end_inset
-
-.
- See file sdcc/sdas/doc/asxhtm.html for assembler options.cd
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc89
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc89
-\end_layout
-
-\end_inset
-
-
-\series default
- Generally follow the C89 standard, but allow SDCC features that conflict
- with the standard (default).
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\end_layout
-
-\end_inset
-
-
-\series default
- Follow the C89 standard and disable SDCC features that conflict with the
- standard.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc99
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc99
-\end_layout
-
-\end_inset
-
-
-\series default
- Generally follow the C99 standard, but allow SDCC features that conflict
- with the standard (incomplete support).
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-sdcc99
-\end_layout
-
-\end_inset
-
-
-\series default
- Follow the C99 standard and disable SDCC features that conflict with the
- standard (incomplete support).
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--codeseg
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--codeseg <Value>
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "lyx:-codeseg"
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-<Name> The name to be used for the code
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-code
-\end_layout
-
-\end_inset
-
- segment, default CSEG.
- This is useful if you need to tell the compiler to put the code in a special
- segment so you can later on tell the linker to put this segment in a special
- place in memory.
- Can be used for instance when using bank switching to put the code in a
- bank.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--constseg
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--constseg <Value>
-\end_layout
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-<Name> The name to be used for the const
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-const
-\end_layout
-
-\end_inset
-
- segment, default CONST.
- This is useful if you need to tell the compiler to put the const data in
- a special segment so you can later on tell the linker to put this segment
- in a special place in memory.
- Can be used for instance when using bank switching to put the const data
- in a bank.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--fdollars-in-identifiers
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--fdollars-in-identifiers
-\end_layout
-
-\end_inset
-
-
-\series default
- Permit '$' as an identifier character.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--more-pedantic
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--more-pedantic
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-pedantic
-\end_layout
-
-\end_inset
-
- Actually this is 
-\series bold
-\emph on
-not
-\series default
-\emph default
- a SDCC compiler option but if you want 
-\emph on
-more
-\emph default
- warnings you can use a separate tool dedicated to syntax checking like
- splint
-\begin_inset CommandInset label
-LatexCommand label
-name "lyx:more-pedantic-SPLINT"
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-lint (syntax checking tool)
-\end_layout
-
-\end_inset
-
- 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.splint.org
-\end_layout
-
-\end_inset
-
-.
- To make your source files parseable by splint you will have to include
- 
-\family sans
-lint.h
-\family default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-splint (syntax checking tool)
-\end_layout
-
-\end_inset
-
- in your source file and add brackets around extended keywords (like 
-\family sans
-
-\begin_inset Quotes sld
-\end_inset
-
-__at
-\begin_inset space ~
-\end_inset
-
-
-\series bold
-(
-\series default
-0xab
-\series bold
-)
-\series default
-
-\begin_inset Quotes srd
-\end_inset
-
-
-\family default
- and 
-\family sans
-
-\begin_inset Quotes sld
-\end_inset
-
-__interrupt
-\begin_inset space ~
-\end_inset
-
-(2)
-\begin_inset Quotes srd
-\end_inset
-
-
-\family default
-).
- 
-\begin_inset Newline newline
-\end_inset
-
-Splint has an excellent on line manual at 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.splint.org/manual/
-\end_layout
-
-\end_inset
-
- and it's capabilities go beyond pure syntax checking.
- You'll need to tell splint the location of SDCC's include files so a typical
- command line could look like this: 
-\begin_inset Newline newline
-\end_inset
-
-
-\family sans
-splint
-\begin_inset space ~
-\end_inset
-
--I
-\begin_inset space ~
-\end_inset
-
-/usr/local/share/sdcc/include/mcs51/
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-myprogram.c
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--short-is-8bits
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--short-is-8bits
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "lyx:--short-is-8bits"
-
-\end_inset
-
- Treat short as 8-bit (for backward compatibility with older versions of
- compiler - see section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Compatibility-with-previous"
-
-\end_inset
-
-)
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--use-non-free
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--use-non-free
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "lyx:--use-non-free"
-
-\end_inset
-
- Search / include non-free licensed libraries and header files, located
- under the non-free directory - see section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Search-Paths"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Subsection
@@ -18395,6 +19107,57 @@ status collapsed
 \series default
 \size default
 Will cause all the above mentioned dumps to be created.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-dump-graphs
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-dump-graphs
+\end_layout
+
+\end_inset
+
+
+\size large
+ 
+\series default
+\size default
+Will dump internal representations as graphviz .dot files.
+ Depending on other options, this can include the control-flow graph at
+ lospre, insertion of bank selection instructions or register allcoation
+ and the conflict graph and tree-decomposition at register allocation.
 \end_layout
 
 \begin_layout Subsection
@@ -20094,7 +20857,7 @@ sbit
 \end_layout
 
 \begin_layout Standard
-Like the bit keyword, 
+Like the __bit keyword, 
 \emph on
 __sfr / __sfr16 / __sfr32 / __sbit
 \emph default
@@ -42949,30 +43712,6 @@ gbz80 (GameBoy Z80)
 \end_inset
 
 .
- These ports passed through the same 
-\emph on
-regressions tests
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Regression test
-\end_layout
-
-\end_inset
-
-
-\emph default
- (see section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Quality-control"
-
-\end_inset
-
-) as the MCS51 and DS390 ports, so floating point support, support for long
- variables and bitfield support is fine.
- See mailing lists and forums about interrupt routines.
 \end_layout
 
 \begin_layout Standard
@@ -43011,7 +43750,7 @@ Z80!return value
 \begin_layout Standard
 When enabling optimizations using --opt-code size and a sufficiently high
  value for --max-allocs-per-node sdcc typically generates much better code
- for these architectures than any other compiler.
+ for these architectures than many other compilers.
  A comparison of compilers for these architecture can be found at 
 \begin_inset Flex URL
 status collapsed
@@ -43055,17 +43794,6 @@ https://sourceforge.net/apps/trac/sdcc/wiki/hc08%20code%20size
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Standard
-The HC08 and S08 ports pass the regression test suite (see section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Quality-control"
-
-\end_inset
-
-).
 \end_layout
 
 \begin_layout Section
@@ -44504,6 +45232,8 @@ PIC
 \end_inset
 
  MCUs with 16 bit wide instructions.
+ This port is not yet mature and still lacks many features.
+ However, it can work for simple code.
  Currently this family of microcontrollers contains the PIC18Fxxx and PIC18Fxxxx
 ; devices supported by the port include:
 \end_layout
@@ -59100,7 +59830,7 @@ Historically there often were long delays between official releases and
 
 \begin_layout Standard
 The last digit of an official release is zero.
- Additionally there are daily snapshots available at snap 
+ Additionally there are daily snapshots available at 
 \begin_inset Flex URL
 status collapsed
 
@@ -59203,8 +59933,9 @@ Regression test
  Opteron, 64 bit Alpha, ppc64, Mac OS X on ppc and i386, Solaris on Sparc)
  and checks the quality of the code generated by SDCC by running the code
  for several target platforms through simulators.
- The regression test suite comprises more than 100 files which expand to
- more than 500 test cases which include more than 4500 tests.
+ The regression test suite comprises about 1000 files which expand to more
+ than 1500 test cases which include about 7000 tests.
+ A large number of tests from the gcc test suite is included in this.
  The results of these tests are published daily on SDCC's snapshot page
  (click on the red or green symbols on the right side of 
 \begin_inset Flex URL
@@ -66988,6 +67719,66 @@ will still be recognized.
 \end_layout
 
 \begin_layout Subsection
+Register Allocation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Register-Allocation"
+
+\end_inset
+
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+Register-Allocation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+sdcc currently has two register allocators.
+ One of them is optimal when optimizing for code size.
+ This register allocator is used by default on the hc08, s08, z80, z180,
+ r2k, r3ka and gbz80 ports.
+ Even though is runs in polynomial time, it can be quite slow; therefore
+ the --max-allos-per-node command line option can be used for a trade-off
+ between compilation speed and quality of the genrated result: Lower values
+ result in faster compilation, higher values can result in better code being
+ generated.
+\end_layout
+
+\begin_layout Standard
+It first creates a tree-decomposition of the control-flow graph, and then
+ uses dynamic programming bottom-up along the tree-decomposition.
+ Optimality is achieved through the use of a cost function, which gives
+ cost for instructions under register assignments.
+ The cost function is MCU-specific and has to be implemented for each port;
+ in all current sdcc ports the cost function is integrated into code generation.
+\end_layout
+
+\begin_layout Standard
+For more details on how this register allocator works, see: Philipp Klaus
+ Krause, 
+\begin_inset Quotes sld
+\end_inset
+
+Optimal Register Allocation in Polynomial Time
+\begin_inset Quotes srd
+\end_inset
+
+, Compiler Construction - 22nd International Conference, CC 2013, Held as
+ Part of the European Joint Conferences on Theory and Practice of Software,
+ ETAPS 2013.
+ Proceedings, Lecture Notes in Computer Science, volume 7791, pp.
+ 1-20.
+ Springer, 2013.
+\end_layout
+
+\begin_layout Subsection
 Peephole Optimizer
 \begin_inset CommandInset label
 LatexCommand label
@@ -67773,834 +68564,6 @@ status collapsed
 \end_layout
 
 \begin_layout Section
-ANSI-Compliance
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-ANSI-compliance
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:ANSI-Compliance"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The latest publicly available version of the standard 
-\emph on
-ISO/IEC 9899 - Programming languages - C
-\emph default
- should be available at: 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.open-std.org/jtc1/sc22/wg14/www/standards.html#9899
-\end_layout
-
-\end_inset
-
-.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Deviations from the compliance:
-\end_layout
-
-\begin_layout Itemize
-in some ports (e.
- g.
- mcs51) functions are not reentrant
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-reentrant
-\end_layout
-
-\end_inset
-
- unless explicitly declared as such or the 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--stack-auto
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--stack-auto
-\end_layout
-
-\end_inset
-
-
-\series default
- command line option is specified.
-\end_layout
-
-\begin_layout Itemize
-structures
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-struct
-\end_layout
-
-\end_inset
-
- and unions
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-union
-\end_layout
-
-\end_inset
-
- cannot be assigned values directly, cannot be passed as function parameters
- or assigned to each other and cannot be a return value
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-return value
-\end_layout
-
-\end_inset
-
- from a function, e.g.:
-\end_layout
-
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-struct s { ...
- };
-\begin_inset Newline newline
-\end_inset
-
-struct s s1, s2;
-\begin_inset Newline newline
-\end_inset
-
-foo()
-\begin_inset Newline newline
-\end_inset
-
-{
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
-\begin_inset Newline newline
-\end_inset
-
-}
-\begin_inset Newline newline
-\end_inset
-
-
-\series bold
-struct
-\family default
-\series default
- 
-\family typewriter
-s foo1 (
-\series bold
-struct
-\family default
-\series default
- 
-\family typewriter
-s parms) /* invalid in SDCC although allowed in ANSI */
-\begin_inset Newline newline
-\end_inset
-
-{
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-struct s rets;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-return rets; /* is invalid in SDCC although allowed in ANSI */
-\begin_inset Newline newline
-\end_inset
-
-}
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-initialization of structure arrays must be fully braced.
-\end_layout
-
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-struct s { char x } a[] = {1, 2};
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-/* invalid in SDCC */
-\begin_inset Newline newline
-\end_inset
-
-struct s { char x } a[] = {{1}, {2}}; /* OK */
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-'long long
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-long long (not supported)
-\end_layout
-
-\end_inset
-
-' (64 bit integers
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-int (64 bit) (not supported)
-\end_layout
-
-\end_inset
-
-) not supported.
-\end_layout
-
-\begin_layout Itemize
-'double
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-double (not supported)
-\end_layout
-
-\end_inset
-
-' precision floating point 
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Floating point support
-\end_layout
-
-\end_inset
-
-not supported.
-\end_layout
-
-\begin_layout Itemize
-Old K&R style
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-K
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-&
-\end_layout
-
-\end_inset
-
-R style
-\end_layout
-
-\end_inset
-
- function declarations are NOT allowed.
-\end_layout
-
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-foo(i,j) /* this old style of function declarations */
-\begin_inset Newline newline
-\end_inset
-
-int i,j; /* is valid in ANSI but not valid in SDCC */
-\begin_inset Newline newline
-\end_inset
-
-{ 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
- 
-\begin_inset Newline newline
-\end_inset
-
-}
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Some enhancements in C99 are not supported, e.g.:
-\end_layout
-
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-for (
-\series bold
-int
-\family default
-\series default
- 
-\family typewriter
-i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Certain words that are valid identifiers in the standard may be reserved
- words in SDCC unless the 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\end_layout
-
-\end_inset
-
-
-\series default
- or 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\end_layout
-
-\end_inset
-
-
-\series default
- command line options are used.
- These may include (depending on the selected processor): '__at', '__banked',
- '__bit', '__code', '__critical', '__data', '__eeprom', '__far', '__flash',
- '__idata', '__interrupt', '__near', '__nonbanked', '__pdata', '__reentrant',
- '__sbit', '__sfr', '__shadowregs', '__sram', '__using', '__wparam', '__xdata',
- '__overlay', '__asm', '__endasm', and '__naked'.
-\end_layout
-
-\begin_layout Itemize
-Integer promotion of variable arguments is not performed if the argument
- is explicitly typecasted unless the 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\end_layout
-
-\end_inset
-
-
-\series default
- or 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\end_layout
-
-\end_inset
-
-
-\series default
- command line options are used.
-\end_layout
-
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-void vararg_func (char *str, ...) { str; }
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-void main (void)
-\begin_inset Newline newline
-\end_inset
-
-{
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-char c = 10;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-/* argument u is promoted to int before
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-* passing to function */
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-vararg_func ("%c", c);
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-/* argument u is not promoted to int,
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-* it is passed as char to function
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-* if --std-cXX is not defined;
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-* is promoted to int before passing
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-* to function if --std-cXX is defined */
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-vararg_func ("%bc", (char)u);
-\begin_inset Newline newline
-\end_inset
-
-}
-\end_layout
-
-\end_deeper
-\begin_layout Section
 Cyclomatic Complexity
 \begin_inset Index idx
 status collapsed
@@ -68668,8 +68631,8 @@ Retargetting for other Processors
 \begin_layout Standard
 The issues for retargetting the compiler are far too numerous to be covered
  by this document.
- What follows is a brief description of each of the seven phases of the
- compiler and its MCU dependency.
+ What follows is a brief description of each of the phases of the compiler
+ and its MCU dependency.
 \end_layout
 
 \begin_layout Itemize
@@ -68758,7 +68721,16 @@ Live range analysis
 
 \begin_layout Itemize
 Phase five is register allocation.
- There are two parts to this process.
+ For new ports register allocator described above in 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Register-Allocation"
+
+\end_inset
+
+ should be used in most cases, since it can result in substancially better
+ code.
+ In the old register allocator, there are two parts to register allocation.
 \begin_inset Newline newline
 \end_inset
 

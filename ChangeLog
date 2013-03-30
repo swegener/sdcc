@@ -1,3 +1,10 @@
+2013-03-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update and reorganize manual.
+	* src/izt:
+	  Kill i186 and tcls900h ports.
+
 2013-03-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,

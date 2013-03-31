@@ -6,6 +6,8 @@
 	  Deprecation warning for --small-is-8bits.
 	* device/include/assert.h:
 	  Prepare for static assertions.
+	* src/SDCCast.h:
+	  Fix warning.
 
 2013-03-30 Philipp Klaus Krause <pkk AT spth.de>
 

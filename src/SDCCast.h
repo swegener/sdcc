@@ -197,7 +197,7 @@ ast *removeIncDecOps (ast *);
 ast *removePreIncDecOps (ast *);
 ast *removePostIncDecOps (ast *);
 value *sizeofOp (sym_link *);
-value *alignasOp (sym_link *);
+value *alignofOp (sym_link *);
 ast *offsetofOp (sym_link * type, ast * snd);
 value *evalStmnt (ast *);
 ast *createRMW (ast *, unsigned, ast *);

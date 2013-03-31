@@ -1,3 +1,12 @@
+2013-03-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update manual.
+	* src/SDCCmain.c:
+	  Deprecation warning for --small-is-8bits.
+	* device/include/assert.h:
+	  Prepare for static assertions.
+
 2013-03-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

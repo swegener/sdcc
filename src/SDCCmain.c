@@ -1124,6 +1124,7 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_SHORT_IS_8BITS) == 0)
             {
+              printf ("Option %s is deprecated and will be removed in the future.\n", OPTION_SHORT_IS_8BITS);
               options.shortis8bits = 1;
               continue;
             }

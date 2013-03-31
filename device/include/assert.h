@@ -39,4 +39,8 @@
 void _assert(char *, const char *, unsigned int);
 #define assert(x) ((x) == 0 ? _assert(#x, __FILE__, __LINE__):(void)0)
 
+#if __STDC_VERSION__ >= 201112L
+#define static_assert _Static_assert
+#endif
+
 #endif

@@ -165,6 +165,7 @@ typedef struct specifier
   unsigned b_extern:1;              /* 1=extern found             */
   unsigned b_inline:1;              /* inline function requested  */
   unsigned b_noreturn:1;            /* promised not to return     */
+  unsigned b_alignas:1;             /* alignment                  */
   unsigned b_absadr:1;              /* absolute address specfied  */
   unsigned b_volatile:1;            /* is marked as volatile      */
   unsigned b_const:1;               /* is a constant              */
@@ -484,6 +485,7 @@ extern sym_link *validateLink (sym_link * l,
 #define SPEC_ARGREG(x) validateLink(x, "SPEC_NOUN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.argreg
 #define SPEC_INLINE(x) validateLink(x, "SPEC_INLINE", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_inline
 #define SPEC_NORETURN(x) validateLink(x, "SPEC_NORETURN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_noreturn
+#define SPEC_ALIGNAS(x) validateLink(x, "SPEC_ALIGNAS", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_alignas
 
 /* type check macros */
 #define IS_DECL(x)       ( x && x->xclass == DECLARATOR )

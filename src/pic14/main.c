@@ -383,15 +383,16 @@ PORT pic_port =
     "HOME        (CODE)",
     NULL, // xidata
     NULL, // xinit
-    "CONST   (CODE)",   // const_name - const data (code or not)
-    "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
+    "CONST   (CODE)",       // const_name - const data (code or not)
+    "CABS    (ABS,CODE)",   // cabs_name - const absolute data (code or not)
     "XABS    (ABS,XDATA)",  // xabs_name - absolute xdata
-    "IABS    (ABS,DATA)", // iabs_name - absolute data
-    NULL,                       // name of segment for initialized variables
-    NULL,                       // name of segment for copies of initialized variables in code space
+    "IABS    (ABS,DATA)",   // iabs_name - absolute data
+    NULL,                   // name of segment for initialized variables
+    NULL,                   // name of segment for copies of initialized variables in code space
     NULL,
     NULL,
-    1        // code is read only
+    1,                      // code is read only
+    1                       // No fancy alignments supported.
   },
   { NULL, NULL },
   {

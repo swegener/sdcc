@@ -1140,7 +1140,7 @@ convertToFcall (eBBlock ** ebbs, int count)
 /*-----------------------------------------------------------------*/
 /* isPowerOf2 - test if val is power of 2                          */
 /*-----------------------------------------------------------------*/
-static bool
+bool
 isPowerOf2 (unsigned long val)
 {
   while (val && !(val & 1))
@@ -2052,7 +2052,7 @@ offsetFold (eBBlock **ebbs, int count)
               if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
                 continue;
 
-              /* This use must be a GET_VALUE_TA_DDRESS */
+              /* This use must be a GET_VALUE_AT_DDRESS */
               uic = hTabItemWithKey (iCodehTab,
                         bitVectFirstBit (OP_USES (IC_RESULT (ic))));
               if (!POINTER_GET (uic))

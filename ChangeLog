@@ -1,3 +1,21 @@
+2013-04-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCCicode.c,
+	  src/SDCCval.h,
+	  src/SDCCval.c,
+	  src/port.h:
+	  src/*/main.c:
+	  doc/sdccman.lyx,
+	  support/regression/tests/assert.c,
+	  support/regression/tests/align.c:
+	  Support for C11 _Static_assert static assertions and _Alignas alignment specifiers.
+
 2013-03-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

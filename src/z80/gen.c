@@ -4152,7 +4152,7 @@ emitCall (const iCode *ic, bool ispcall)
   if ((ic->parmBytes || bigreturn) && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type))
     {
       /* This is just a workaround to not confuse the peephole optimizer too much. */
-      /* Todo: Check fo _Noreturn in the peephole optimizer and do not emit the inc sp here. */
+      /* Todo: Check for _Noreturn in the peephole optimizer and do not emit the inc sp here. */
       emit2 ("inc sp");
       regalloc_dry_run_cost += 1;
       if (!regalloc_dry_run)

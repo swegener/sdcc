@@ -167,6 +167,8 @@ static void checkCurrFile (const char *s);
 "restrict"              { count (); TKEYWORD99 (RESTRICT); }
 "__smallc"              { count (); return SMALLC; }
 "__addressmod"          { count (); return ADDRESSMOD; }
+"_Static_assert"        { count (); return STATIC_ASSERT; }
+"_Alignas"              { count (); return ALIGNAS; }
 {L}({L}|{D})*           {
   if (!options.dollars_in_ident && strchr (yytext, '$'))
     {

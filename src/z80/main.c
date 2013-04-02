@@ -852,7 +852,8 @@ PORT z80_port = {
    "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
    NULL,
    NULL,
-   1                            /* CODE  is read-only */
+   1,                           /* CODE  is read-only */
+   1                            /* No fancy alignments supported. */
    },
   {NULL, NULL},
   {
@@ -979,7 +980,8 @@ PORT z180_port = {
    "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
    NULL,
    NULL,
-   1                            /* CODE  is read-only */
+   1,                           /* CODE  is read-only */
+   1                            /* No fancy alignments supported. */
    },
   {NULL, NULL},
   {
@@ -1106,7 +1108,8 @@ PORT r2k_port = {
    "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
    NULL,
    NULL,
-   1                            /* CODE  is read-only */
+   1,                           /* CODE  is read-only */
+   1                            /* No fancy alignments supported. */
    },
   {NULL, NULL},
   {
@@ -1233,7 +1236,8 @@ PORT r3ka_port = {
    "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
    NULL,
    NULL,
-   1                            /* CODE  is read-only */
+   1,                           /* CODE  is read-only */
+   1                            /* No fancy alignments supported. */
    },
   {NULL, NULL},
   {
@@ -1362,7 +1366,8 @@ PORT gbz80_port = {
    NULL,                        /* name of segment for copies of initialized variables in code space */
    NULL,
    NULL,
-   1                            /* CODE is read-only */
+   1,                           /* CODE is read-only */
+   1                            /* No fancy alignments supported. */
    },
   {NULL, NULL},
   {

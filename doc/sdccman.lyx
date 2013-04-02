@@ -9365,7 +9365,7 @@ In addition to what is mentioned in the section above, the following features
 \end_layout
 
 \begin_layout Itemize
-Declarations in placer other than those where ISO C90 allows them, e.g.:
+Declarations in places other than those where ISO C90 allows them, e.g.:
 \end_layout
 
 \begin_deeper
@@ -9481,19 +9481,11 @@ Float classification macros in math.h (C11 requires more than C99).
 \end_layout
 
 \begin_layout Itemize
-_Alignas Alignment specification.
-\end_layout
-
-\begin_layout Itemize
 Type-generic expressions.
 \end_layout
 
 \begin_layout Itemize
 Improved Unicode support.
-\end_layout
-
-\begin_layout Itemize
-Static assertions.
 \end_layout
 
 \begin_layout Subsection

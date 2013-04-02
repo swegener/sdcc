@@ -241,6 +241,8 @@ enum {
   W_LONGLONG_LITERAL            = 212, /* long long literal */
   S_SYNTAX_ERROR                = 213, /* syntax error */
   E_MIXING_CONFIG               = 214, /* mixing __CONFIG and CONFIG directives */
+  W_STATIC_ASSERTION            = 215, /* static assertion failed */
+  E_ALIGNAS                     = 216, /* invalid alignment specified */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

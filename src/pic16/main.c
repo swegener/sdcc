@@ -1358,7 +1358,8 @@ PORT pic16_port =
     NULL,                   // name of segment for copies of initialized variables in code space
     NULL,                   // default location for auto vars
     NULL,                   // default location for global vars
-    1                       // code is read only 1=yes
+    1,                      // code is read only 1=yes
+    1                       // No fancy alignments supported.
   },
   {
     NULL,       /* genExtraAreaDeclaration */

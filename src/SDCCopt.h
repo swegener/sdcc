@@ -37,5 +37,6 @@ void lospre (iCode *ic, ebbIndex *ebbi);
 int switchAddressSpacesOptimally (iCode *ic, ebbIndex *ebbi);
 const symbol *getAddrspaceiCode (const iCode *ic);
 void switchAddressSpaceAt (iCode *ic, const symbol *const addrspace);
+bool isPowerOf2 (unsigned long val);
 
 #endif

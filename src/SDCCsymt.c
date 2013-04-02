@@ -790,6 +790,11 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   if (SPEC_ADDRSPACE (src))
     SPEC_ADDRSPACE (dest) = SPEC_ADDRSPACE (src);
 
+  if (SPEC_ALIGNAS (src) > SPEC_ALIGNAS (dest))
+    SPEC_ALIGNAS (dest) = SPEC_ALIGNAS (src);
+  if (SPEC_SCLS (dest) == S_REGISTER && SPEC_ALIGNAS (dest))
+    werror (E_ALIGNAS, SPEC_ALIGNAS (dest));
+
   return dest;
 }
 

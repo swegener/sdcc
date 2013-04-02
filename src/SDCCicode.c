@@ -2119,7 +2119,6 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType)
   /* if the right is a literal & power of 2
      and left is signed then make it a conditional addition
      followed by right shift */
-#if 1
   if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
       !IS_FIXED (letype) && !IS_UNSIGNED (letype) && ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0) &&
@@ -2142,7 +2141,6 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType)
      and left is unsigned then make it a
      right shift */
   else
-#endif
        if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
       !IS_FIXED (letype) && IS_UNSIGNED (letype) && ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0))

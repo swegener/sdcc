@@ -484,6 +484,10 @@ struct
     "token -> '%s' ; column %d", 0 },
   { E_MIXING_CONFIG, ERROR_LEVEL_ERROR,
     "mixing __CONFIG and CONFIG directives", 0 },
+  { W_STATIC_ASSERTION, ERROR_LEVEL_WARNING,
+    "static assertion failed: %s", 0 },
+  { E_ALIGNAS, ERROR_LEVEL_ERROR,
+    "invalid alignment specified: %d", 0 },
 };
 
 /* -------------------------------------------------------------------------------

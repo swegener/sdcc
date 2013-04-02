@@ -9,16 +9,22 @@
 #include <stddef.h>
 #include <stdalign.h>
 
+#if defined (__SDCC) || __STDC_VERSION__ >= 201112L
+char alignas (0) alignas({sign} {type}) a;
+char alignas (int) alignas({sign} {type}) alignas(long) b;
+char alignas ({sign} {type}) alignas(0) c;
+#endif
+
 void
 testAlignof(void)
 {
+#if defined (__SDCC) || __STDC_VERSION__ >= 201112L
   ASSERT(alignof(char)  <= alignof({sign} {type}));
-  /*ASSERT(alignof({sign} {type})  <= alignof(max_align_t)); #pragma std_c11 support incomplete */
+  /*ASSERT(alignof({sign} {type})  <= alignof(max_align_t)); #pragma std_c11 support incomplete  - maxalign_t */
 
   /* sdcc currently only architectures that do not have alignment restrictions. */
-#ifndef PORT_HOST
   ASSERT(alignof({sign} {type})  == 1);
-  /*ASSERT(alignof(max_align_t)  == 1); #pragma std_c11 support incomplete */
+  /*ASSERT(alignof(max_align_t)  == 1); #pragma std_c11 support incomplete - maxalign_t */
 #endif
 }
 

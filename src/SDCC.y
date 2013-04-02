@@ -36,6 +36,7 @@
 #include "SDCCerr.h"
 #include "SDCCutil.h"
 #include "SDCCbtree.h"
+#include "SDCCopt.h"
 
 extern int yyerror (char *);
 extern FILE     *yyin;
@@ -89,7 +90,7 @@ bool uselessDecl = TRUE;
 %token <yyint> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token <yyint> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token <yyint> XOR_ASSIGN OR_ASSIGN
-%token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32 ADDRESSMOD
+%token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32 ADDRESSMOD STATIC_ASSERT
 %token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
 %token NONBANKED BANKED SHADOWREGS SD_WPARAM
 %token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT
@@ -101,7 +102,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC ALIGNAS
 %token ASM
 
 %type <yyint> Interrupt_storage
@@ -113,7 +114,7 @@ bool uselessDecl = TRUE;
 %type <sym> declarator2_function_attributes while do for critical
 %type <sym> addressmod
 %type <lnk> pointer type_specifier_list type_specifier_list_ type_specifier type_name
-%type <lnk> storage_class_specifier struct_or_union_specifier function_specifier
+%type <lnk> storage_class_specifier struct_or_union_specifier function_specifier alignment_specifier
 %type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
 %type <lnk> function_attribute function_attributes enum_specifier
 %type <lnk> abstract_declarator abstract_declarator2 unqualified_pointer
@@ -529,12 +530,16 @@ declaration
          uselessDecl = TRUE;
          $$ = sym1;
       }
+    | static_assert_declaration ';'
+      {
+         $$ = NULL;
+      }
    ;
 
 declaration_specifiers : declaration_specifiers_ { $$ = finalizeSpec($1); };
 
 declaration_specifiers_
-   : storage_class_specifier                                            { $$ = $1; }
+   : storage_class_specifier                         { $$ = $1; }
    | storage_class_specifier declaration_specifiers_ {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
@@ -551,6 +556,12 @@ declaration_specifiers_
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      $$ = mergeDeclSpec($1, $2, "function_specifier declaration_specifiers - skipped");
+   }
+   | alignment_specifier                            { $$ = $1; }
+   | alignment_specifier declaration_specifiers_    {
+     /* if the decl $2 is not a specifier */
+     /* find the spec and replace it      */
+     $$ = mergeDeclSpec($1, $2, "alignment_specifier declaration_specifiers - skipped");
    }
    ;
 
@@ -636,6 +647,27 @@ function_specifier
                   $$ = newLink (SPECIFIER);
                   SPEC_NORETURN($$) = 1;
                }
+   ;
+
+alignment_specifier
+   : ALIGNAS '(' type_name ')'
+              {
+                 checkTypeSanity ($3, "(_Alignas)");
+                 $$ = newLink (SPECIFIER);
+                 SPEC_ALIGNAS($$) = 1;
+              }
+   | ALIGNAS '(' constant_expr ')'
+              {
+                 value *val = constExprValue ($3, TRUE);
+                 $$ = newLink (SPECIFIER);
+                 SPEC_ALIGNAS($$) = 0;
+                 if (!val)
+                   werror (E_CONST_EXPECTED);
+                 else if (ulFromVal (val) == 0 || isPowerOf2 (ulFromVal (val)) && ulFromVal (val) <= port->mem.maxextalign)
+                   SPEC_ALIGNAS($$) = ulFromVal(val);
+                 else
+                   werror (E_ALIGNAS, ulFromVal(val));
+              }
    ;
 
 Interrupt_storage
@@ -1579,6 +1611,17 @@ initializer_list
                                        $4->designation = $3;
                                        $4->next = $1;
                                        $$ = $4;
+                                    }
+   ;
+
+static_assert_declaration
+   : STATIC_ASSERT '(' constant_expr ',' STRING_LITERAL ')'
+                                    {
+                                       value *val = constExprValue ($3, TRUE);
+                                       if (!val)
+                                         werror (E_CONST_EXPECTED);
+                                       else if (!ulFromVal(val))
+                                         werror (W_STATIC_ASSERTION, $5);
                                     }
    ;
 

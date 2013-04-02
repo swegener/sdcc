@@ -854,7 +854,8 @@ PORT mcs51_port =
     NULL,                       // name of segment for copies of initialized variables in code space
     NULL,
     NULL,
-    1
+    1,
+    1                           // No fancy alignments supported.
   },
   { _mcs51_genExtraAreas, NULL },
   {

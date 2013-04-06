@@ -1,3 +1,9 @@
+2013-04-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/literalop.c,
+	  support/regression/tests/bitwise.c: Fix host regression failues on
+	  64-bit PowerPC
+
 2013-04-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,

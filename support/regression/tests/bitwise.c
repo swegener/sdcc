@@ -29,7 +29,7 @@ testTwoOpBitwise(void)
   ASSERT(({type})(left ^ 0xc1ec) == ({type})0xFC1B);
   ASSERT(({type})(0x3df7 ^ right) == ({type})0xFC1B);
 
-#if defined (__alpha__) || defined (__x86_64__) || defined(__sparc64__)
+#if defined (__alpha__) || defined (__x86_64__) || defined(__sparc64__) || defined(__PPC64__)
   /* long is 64 bits on 64 bit machines */
   ASSERT(({type})(~left) == ({type})0xFFFFFFFFFFFFC208);
 #else

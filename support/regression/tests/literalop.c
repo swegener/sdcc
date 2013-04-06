@@ -5,7 +5,7 @@
 #include <testfwk.h>
 
 /* 64 bit hosts */
-#if defined(__alpha__) || defined(__x86_64__) || defined(__sparc64__)
+#if defined(__alpha__) || defined(__x86_64__) || defined(__sparc64__) || defined(__PPC64__)
 #  define LONG int
 #else
 #  define LONG long

@@ -3,6 +3,8 @@
 	* support/regression/tests/literalop.c,
 	  support/regression/tests/bitwise.c: Fix host regression failues on
 	  64-bit PowerPC
+	* support/regression/tests/align.c: do not include stdalign.h on
+	  hosts that do not support it
 
 2013-04-02 Philipp Klaus Krause <pkk AT spth.de>
 

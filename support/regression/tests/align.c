@@ -7,9 +7,9 @@
 #include <testfwk.h>
 
 #include <stddef.h>
-#include <stdalign.h>
 
 #if defined (__SDCC) || __STDC_VERSION__ >= 201112L
+#include <stdalign.h>
 char alignas (0) alignas({sign} {type}) a;
 char alignas (int) alignas({sign} {type}) alignas(long) b;
 char alignas ({sign} {type}) alignas(0) c;

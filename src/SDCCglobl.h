@@ -288,7 +288,6 @@ struct options
     int out_fmt;                /* 0 = undefined, 'i' = intel Hex format, 's' = motorola S19 format, 'E' = elf format, 'Z' = gb format */
     int cyclomatic;             /* print cyclomatic information */
     int noOverlay;              /* don't overlay local variables & parameters */
-    int mainreturn;             /* issue a return after main */
     int xram_movc;              /* use movc instead of movx to read xram (mcs51) */
     int nopeep;                 /* no peep hole optimization */
     int asmpeep;                /* pass inline assembler thru peep hole */

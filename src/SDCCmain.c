@@ -199,7 +199,6 @@ static const OPTION optionsTable[] = {
   {0,   "--xstack", &options.useXstack, "Use external stack"},
   {0,   "--int-long-reent", &options.intlong_rent, "Use reentrant calls on the int and long support functions"},
   {0,   "--float-reent", &options.float_rent, "Use reentrant calls on the float support functions"},
-  {0,   "--main-return", &options.mainreturn, "Issue a return after main()"},
   {0,   "--xram-movc", &options.xram_movc, "Use movc instead of movx to read xram (xdata)"},
   {0,   OPTION_CALLEE_SAVES, &options.calleeSavesSet, "<func[,func,...]> Cause the called function to save registers instead of the caller", CLAT_SET},
   {0,   "--profile", &options.profile, "On supported ports, generate extra profiling information"},

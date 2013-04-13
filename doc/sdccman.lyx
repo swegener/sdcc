@@ -14209,71 +14209,6 @@ status collapsed
 
 \end_inset
 
--main-return
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--main-return
-\end_layout
-
-\end_inset
-
-
-\series default
- This option can be used if the code generated is called by a monitor program
- or if the main routine includes an endless loop.
- This option results in slightly smaller code and saves two bytes of stack
- space.
- The return from the 'main'
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-main return
-\end_layout
-
-\end_inset
-
- function will return to the function calling main.
- The default setting is to lock up i.e.
- generate a '
-\family typewriter
-sjmp .
-\family default
-'.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
 -nostdinc
 \begin_inset Index idx
 status collapsed
@@ -29631,7 +29566,7 @@ n
 \end_layout
 
 \begin_layout Standard
-See also the compiler options 
+See also the compiler option 
 \emph on
 -
 \begin_inset ERT
@@ -29671,46 +29606,6 @@ status collapsed
 \end_inset
 
 -no-xinit-opt
-\end_layout
-
-\end_inset
-
-, 
-\emph on
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--main-return
-\emph default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--main-return
 \end_layout
 
 \end_inset

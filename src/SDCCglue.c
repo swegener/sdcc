@@ -2167,17 +2167,8 @@ glue (void)
       fprintf (asmFile, "__sdcc_program_startup:\n");
 
       /* put in jump or call to main */
-      if (options.mainreturn)
-        {
-          fprintf (asmFile, "\t%cjmp\t_main\n", options.acall_ajmp ? 'a' : 'l');        /* needed? */
-          fprintf (asmFile, ";\treturn from main will return to caller\n");
-        }
-      else
-        {
-          fprintf (asmFile, "\t%ccall\t_main\n", options.acall_ajmp ? 'a' : 'l');
-          fprintf (asmFile, ";\treturn from main will lock up\n");
-          fprintf (asmFile, "\tsjmp .\n");
-        }
+      fprintf (asmFile, "\t%cjmp\t_main\n", options.acall_ajmp ? 'a' : 'l');        /* needed? */
+      fprintf (asmFile, ";\treturn from main will return to caller\n");
     }
   /* copy over code */
   fprintf (asmFile, "%s", iComments2);

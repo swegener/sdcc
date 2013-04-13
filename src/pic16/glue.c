@@ -1781,13 +1781,9 @@ pic16glue ()
         /* put in the call to main */
         pic16_addpCode2pBlock(pb,pic16_newpCode(POC_CALL,pic16_newpCodeOp("_main",PO_STR)));
 
-        if (options.mainreturn) {
-          pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";\treturn from main will return to caller\n"));
-          pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETURN,NULL));
-        } else {
-          pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";\treturn from main will lock up\n"));
-          pic16_addpCode2pBlock(pb,pic16_newpCode(POC_GOTO,pic16_newpCodeOp("$",PO_STR)));
-        }
+        
+        pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(";\treturn from main will return to caller\n"));
+        pic16_addpCode2pBlock(pb,pic16_newpCode(POC_RETURN,NULL));
     }
 
     /* At this point we've got all the code in the form of pCode structures */

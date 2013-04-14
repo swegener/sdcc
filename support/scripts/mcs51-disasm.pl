@@ -4433,8 +4433,7 @@ sub instruction_decoder($$)
     }
   else
     {
-    print STDERR "Internal error: The size of intruction (addr:0x%04X) is zero!", $dcd_address;
-    exit(1);
+    printf STDERR "An instruction and a block overlapped with each other at this address: 0x%04X!\n", $dcd_address;
     }
 
   $dcd_Ri_regs = $dcd_instr & 0x01;
@@ -4633,7 +4632,7 @@ sub add_instr_block($$)
 
     if ($invalid)
       {
-      add_block($Address, BLOCK_CONST, $instr_size, BL_TYPE_NONE, '');
+      add_block($Address, BLOCK_CONST, $instr_size, BL_TYPE_NONE, '') if ($instr_size);
       }
     else
       {
@@ -4657,7 +4656,9 @@ sub split_code_to_blocks()
   my ($is_const, $const_begin);
 
   $is_empty = FALSE;
+  $empty_begin = 0;
   $is_const = FALSE;
+  $const_begin = 0;
 
   for ($i = 0; $i < $rom_size; )
     {

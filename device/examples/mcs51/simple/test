@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Try out the simulator.  Route serial port output to a text file.
 # After simulator is started, you need to type:
@@ -7,4 +7,3 @@
 # quit
 
 s51 -Sout=serial.txt hi.ihx
-

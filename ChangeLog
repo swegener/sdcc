@@ -1,3 +1,13 @@
+2013-04-18 Borut Razem <borut.razem AT gmail.com>
+
+	* device/non-free/lib/pic14/libdev/mkall.sh,
+	  device/examples/mcs51/simple/test,
+	  device/examples/mcs51/simple/go,
+	  device/examples/mcs51/simple2/go,
+	  device/examples/mcs51/simple2/test,
+	  sim/ucsim/conf:
+	  use /bin/sh instead of /bin/bash to enable compilation on OpenBSD
+
 2013-04-14 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl:

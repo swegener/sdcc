@@ -1158,7 +1158,7 @@ replace restart {
 	jp	%3,%4
 	ld	a,%1
 } by {
-	cp	a,#%2
+	cp	a,%2
 	jp	%3,%4
 	; peephole 83 removed load by replacing sub with cp
 	assert	a=%1

@@ -1,3 +1,9 @@
+2013-05-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Fix generation of extra # in peephole.
+
 2013-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic14/pic16regs.h:

@@ -489,6 +489,8 @@ outrxb(int i, struct expr *esp, int r)
                         }
 #endif
 
+                        (void)m;
+
                         /*
                          * Page0 Range Check
                          */

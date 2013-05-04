@@ -1,3 +1,11 @@
+2013-05-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* .version,
+	* doc/INSTALL.txt,
+	* doc/sdccman.lyx: version 3.3.0 rc1
+	* sdcc.spec: version 3.3.0
+	* sdas/asxxsrc/asout.c: suppress warning
+
 2013-05-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def,

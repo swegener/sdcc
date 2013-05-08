@@ -1,3 +1,8 @@
+2013-05-07 Borut Razem <borut.razem AT gmail.com>
+
+	* support/scripts/sdcc.nsi: removed dedication to Dennis M. Ritchie,
+	  corrected ChangeLog path
+
 2013-05-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* .version,

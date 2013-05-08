@@ -1,6 +1,6 @@
 # sdcc.nsi - NSIS installer script for SDCC
 #
-# Copyright (c) 2003-2011 Borut Razem
+# Copyright (c) 2003-2013 Borut Razem
 #
 # This file is part of sdcc.
 #
@@ -214,7 +214,6 @@ Var SDCC.PathToRemove
 !define MUI_ICON ".\sdcc.ico"
 
 ; Welcome page
-!define MUI_WELCOMEPAGE_TEXT "$(^NameDA) release is dedicated to the memory of Dennis M. Ritchie, father of the C programming language.$\r$\n$\r$\nThis wizard will guide you through the installation of $(^NameDA).$\r$\n$\r$\nIt is recommended that you close all other applications before starting Setup. This will make it possible to update relevant system files without having to reboot your computer.$\r$\n$\r$\n$_CLICK"
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page
@@ -849,7 +848,7 @@ ${SectionEnd}
 ${Section} -INI SECINI
   WriteIniStr "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\SDCC on the Web.url" "InternetShortcut" "URL" "http://sdcc.sourceforge.net/"
 !ifdef FULL_DOC
-  WriteIniStr "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Latest Changes.url" "InternetShortcut" "URL" "http://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc/ChangeLog"
+  WriteIniStr "$SMPROGRAMS\$MUI_STARTMENUPAGE_VARIABLE\Latest Changes.url" "InternetShortcut" "URL" "http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/ChangeLog"
 !endif
 ${SectionEnd}
 

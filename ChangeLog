@@ -2,6 +2,9 @@
 
 	* sdas/doc/asmlnk.txt: updated for all steps towards ASxxxx v5
 	* sdas/doc/asxhtm.html: removed
+	* .version,
+	* doc/INSTALL.txt,
+	* doc/sdccman.lyx: version 3.3.0
 
 2013-05-07 Borut Razem <borut.razem AT gmail.com>
 

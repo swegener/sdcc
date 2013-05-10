@@ -1,3 +1,8 @@
+2013-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/doc/asmlnk.txt: updated for all steps towards ASxxxx v5
+	* sdas/doc/asxhtm.html: removed
+
 2013-05-07 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi: removed dedication to Dennis M. Ritchie,

@@ -1,3 +1,15 @@
+2013-05-11 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/include/pic14/pic14devices.txt,
+	  device/include/pic14/pic16regs.h,
+	  device/non-free/include/pic14/pic16f753.h,
+	  device/non-free/include/pic14/pic16hv753.h,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/pic16f753.c,
+	  device/non-free/lib/pic14/libdev/pic16hv753.c,
+	  doc/sdccman.lyx:
+	  New devices.
+
 2013-05-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/doc/asmlnk.txt: updated for all steps towards ASxxxx v5

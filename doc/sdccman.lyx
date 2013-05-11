@@ -43776,7 +43776,7 @@ Currently supported devices include:
 
 \begin_layout Standard
 16F: 707, 716, 72, 720, 721, 722, 722a, 723, 723a, 724, 726, 727, 73, 737,
- 74, 747, 76, 767, 77, 777, 785
+ 74, 747, 753, 76, 767, 77, 777, 785
 \end_layout
 
 \begin_layout Standard
@@ -43793,7 +43793,7 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
-16HV: 610, 616, 785
+16HV: 610, 616, 753, 785
 \end_layout
 
 \begin_layout Standard

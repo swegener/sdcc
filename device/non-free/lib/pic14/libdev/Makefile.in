@@ -149,6 +149,7 @@ C_SRC = \
     pic16f727.c \
     pic16f737.c \
     pic16f747.c \
+    pic16f753.c \
     pic16f767.c \
     pic16f777.c \
     pic16f785.c \
@@ -176,6 +177,7 @@ C_SRC = \
     pic16f917.c \
     pic16f946.c \
     pic16hv616.c \
+    pic16hv753.c \
     $(PIC14_ENHANCED) \
     $(NEW_PICS_@HAVE_NEW_PICS@)
 OBJS = $(C_SRC:.c=.o)

@@ -1,3 +1,8 @@
+2013-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/INSTALL.txt: small update
+	* support/scripts/repack_release.sh: added windows x64 setup
+
 2013-05-11 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic14/pic14devices.txt,

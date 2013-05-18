@@ -31,6 +31,9 @@
 # ./repack_release.sh -dl -pr -ul 20090314 5413 2.9.0-rc1
 
 
+# Uncomment next line to debug this script
+#set -vx
+
 function fatal_error()
 {
   echo "repack_release: $1" 1>&2
@@ -65,7 +68,7 @@ function download()
 
   if ! pushd dl
   then
-    fatal_error "Can't cd to dl!"
+    fatal_error "Cannot cd to dl!"
   else
     ( \
     wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/sdcc-src/sdcc-src-${date}-${revision}.tar.bz2 && \
@@ -73,9 +76,9 @@ function download()
     wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/docs/sdcc-doc-${date}-${revision}.zip && \
     wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i386-unknown-linux2.5/sdcc-snapshot-i386-unknown-linux2.5-${date}-${revision}.tar.bz2 && \
     wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i586-mingw32msvc/sdcc-snapshot-i586-mingw32msvc-${date}-${revision}.zip && \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i586-mingw32msvc-setup/sdcc-${date}-${revision}-setup.exe && \
+    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/x86_64-w64-mingw32/sdcc-snapshot-x86_64-w64-mingw32-${date}-${revision}.zip && \
     wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i386_universal-apple-macosx/sdcc-snapshot-i386_universal-apple-macosx-${date}-${revision}.tar.bz2 \
-    ) || fatal_error "Can't download snapshot build packages!"
+    ) || fatal_error "Cannot download snapshot build packages!"
 
     mv sdcc-snapshot-i386_universal-apple-macosx-${date}-${revision}.tar.bz2 sdcc-snapshot-universal-apple-macosx-${date}-${revision}.tar.bz2
 
@@ -98,7 +101,7 @@ function unpack()
     fatal_error "Directory sdcc already exists!"
   fi
 
-  tar -xjvf ${bin_pkg} || fatal_error "Can't unpack $bin_pkg!"
+  tar -xjvf ${bin_pkg} || fatal_error "Cannot unpack $bin_pkg!"
   
   # remove unneeded directories produced by sdbinutils
   rm -rf ./sdcc/include
@@ -107,7 +110,7 @@ function unpack()
   rm -rf ./sdcc/share/doc
   rm -rf ./sdcc/share/sdcc/doc
 
-  tar -xjvf ${doc_pkg} -C ./sdcc/share/sdcc || fatal_error "Can't unpack $doc_pkg!"
+  tar -xjvf ${doc_pkg} -C ./sdcc/share/sdcc || fatal_error "Cannot unpack $doc_pkg!"
 }
 
 
@@ -121,7 +124,7 @@ function pack()
   mkdir -p ul
 
   mv sdcc sdcc-${ver}
-  tar -cjvf ul/sdcc-${ver}-${arch}.tar.bz2 sdcc-${ver} || fatal_error "Can't pack ul/sdcc-${ver}-${arch}.tar.bz2!"
+  tar -cjvf ul/sdcc-${ver}-${arch}.tar.bz2 sdcc-${ver} || fatal_error "Cannot pack ul/sdcc-${ver}-${arch}.tar.bz2!"
   mv sdcc-${ver} ${arch}
 }
 
@@ -135,27 +138,36 @@ function repack_src()
   mv sdcc sdcc-${ver} && \
   tar -cjvf ul/sdcc-src-${ver}.tar.bz2 sdcc-${ver} && \
   mv sdcc-${ver} sdcc-src-${ver} \
-  ) || fatal_error "Can't repack the source package!"
+  ) || fatal_error "Cannot repack the source package!"
 }
 
 
 function repack_win()
 {
-  local date=$1 revision=$2 ver=$3
+  local date=$1 revision=$2 ver=$3 arch=$4
 
-  snapshot=~/svn_snapshots/sdcc/sdcc
+  snapshot=../sdcc-src-${ver}
   ver_maj=$(expr $ver : '\([0-9]*\)\.')
   ver_min=$(expr $ver : '[0-9]*\.\([0-9]*\)\.')
   ver_rev=$(expr $ver : '[0-9]*\.[0-9]*\.\([0-9]*\)')
 
+  if [[ ${arch} == *64* ]]
+  then
+    win="-DWIN64"
+    setup="x64-setup"
+  else
+    win=
+    setup="setup"
+  fi
+
   # - unpack WIN32 mingw daily snapshot sdcc-snapshot-i586-mingw32msvc-yyyymmdd-rrrr.zip
   #   to a clean directory (the option to create directories should be enabled).
   #   A sub directory sdcc is created (referenced as PKGDIR in continuation).
-  unzip dl/sdcc-snapshot-i586-mingw32msvc-${date}-${revision}.zip
+  unzip dl/sdcc-snapshot-${arch}-${date}-${revision}.zip
 
   if ! pushd sdcc
   then
-    fatal_error "Can't cd to sdcc!"
+    fatal_error "Cannot cd to sdcc!"
   else
     # - remove the PKGDIR/doc/ directory
     rm -rf doc/
@@ -175,50 +187,55 @@ function repack_win()
     todos COPYING3.txt
     cp ${snapshot}/ChangeLog doc/ChangeLog.txt
     todos doc/ChangeLog.txt
-    cp ${snapshot}/README doc/README.txt
+    cp ${snapshot}/doc/README.txt doc/README.txt
     todos doc/README.txt
 
     # - run NSIS installer from PKGDIR directory:
-    #   Define -DWIN64 if createing a 64bit package.
-    makensis -DFULL_DOC -DVER_MAJOR=${ver_maj} -DVER_MINOR=${ver_min} -DVER_REVISION=${ver_rev} -DVER_BUILD=${revision} sdcc.nsi
+    #   Define -DWIN64 if creating a 64bit package.
+    makensis -DFULL_DOC -DVER_MAJOR=${ver_maj} -DVER_MINOR=${ver_min} -DVER_REVISION=${ver_rev} -DVER_BUILD=${revision} ${win} sdcc.nsi
 
     # - A setup file setup.exe is created in PKGDIR directory.
     #   Rename it to sdcc-x.x.x-setup.exe and upload it
     #   to sdcc download repository at sourceforge.net
-    cp setup.exe ../ul/sdcc-${ver}-setup.exe
+    cp setup.exe ../ul/sdcc-${ver}-${setup}.exe
 
     popd
+
+    mv sdcc ${arch}
   fi
 }
 
 
 function upload()
 {
-  local ver=$1
+  local ver=$1 user=$2
 
   raw_ver=$(expr $ver : '\([0-9]*\.[0-9]*\.[0-9]*\)')
 
-  echo uploading ul/sdcc-src-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
-  rsync -e ssh ul/sdcc-src-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
+  echo uploading ul/sdcc-src-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
+  rsync -v --progress -e ssh ul/sdcc-src-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
 
-  echo uploading ul/sdcc-doc-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
-  rsync -e ssh ul/sdcc-doc-${ver}.tar.bz2  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
+  echo uploading ul/sdcc-doc-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
+  rsync -v --progress -e ssh ul/sdcc-doc-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
 
-  echo uploading ul/sdcc-doc-${ver}.zip  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
-  rsync -e ssh ul/sdcc-doc-${ver}.zip  sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
+  echo uploading ul/sdcc-doc-${ver}.zip ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
+  rsync -v --progress -e ssh ul/sdcc-doc-${ver}.zip ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
 
-  echo uploading ul/sdcc-${ver}-setup.exe sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
-  rsync -e ssh ul/sdcc-${ver}-setup.exe sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
+  echo uploading ul/sdcc-${ver}-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
+  rsync -v --progress -e ssh ul/sdcc-${ver}-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
 
-  echo uploading ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
-  rsync -e ssh ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
+  echo uploading ul/sdcc-${ver}-x64-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win64/${raw_ver}
+  rsync -v --progress -e ssh ul/sdcc-${ver}-x64-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win64/${raw_ver}
 
-  echo uploading ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
-  rsync -e ssh ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 sdcc-builder@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
+  echo uploading ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
+  rsync -v --progress -e ssh ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
+
+  echo uploading ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
+  rsync -v --progress -e ssh ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
 }
 
 
-# main procdure
+# main procedure
 {
   while [ -n "$1" ]
   do
@@ -246,24 +263,32 @@ function upload()
 
   mkdir -p ul
 
+  # download the snapshots
   test -n "$dl" &&  download ${date} ${revision}
 
   if [ -n "$pr" ]
   then
+    # repack the sources
     repack_src ${date} ${revision} ${ver}
+
+    # repack the documentation
     cp dl/sdcc-doc-${date}-${revision}.tar.bz2 ul/sdcc-doc-${ver}.tar.bz2
     cp dl/sdcc-doc-${date}-${revision}.zip ul/sdcc-doc-${ver}.zip
 
+    # repack the *nix-like binaries
     for arch in i386-unknown-linux2.5 universal-apple-macosx
     do
       unpack dl/sdcc-snapshot-${arch}-${date}-${revision}.tar.bz2 dl/sdcc-doc-${date}-${revision}.tar.bz2
       pack ${arch} ${ver}
     done
 
-    repack_win ${date} ${revision} ${ver}
+    # repack the windows binaries
+    repack_win ${date} ${revision} ${ver} i586-mingw32msvc
+    repack_win ${date} ${revision} ${ver} x86_64-w64-mingw32
   fi
 
-  test -n "$ul" && upload ${ver}
+  # upload the release packages
+  test -n "$ul" && upload ${ver} sdcc-builder
 
   exit 0
 }

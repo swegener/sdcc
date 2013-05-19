@@ -1,3 +1,8 @@
+2013-05-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* Small Device C Compiler 3.3.0 released
+	* .version, doc/sdccman.lyx: changed sdcc version to 3.3.1
+
 2013-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/INSTALL.txt: small update

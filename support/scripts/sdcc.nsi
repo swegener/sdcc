@@ -282,6 +282,7 @@ ${FunctionEnd}
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 BrandingText ""
 OutFile "setup.exe"
+RequestExecutionLevel admin ;Require admin rights on NT6+ (When UAC is turned on)
 ;;;;ShowInstDetails show
 ;;;;ShowUnInstDetails show
 

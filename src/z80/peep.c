@@ -372,7 +372,7 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
     what = "ix";
 
-  if(strcmp(pl->line, "xor\ta,a") == 0 && strcmp(what, "a") == 0)
+  if(ISINST(pl->line, "xor\t") && strcmp(what, "a") == 0)
     return TRUE;
   if(ISINST(pl->line, "ld\t") && strncmp(pl->line + 3, "hl", 2) == 0 && (what[0] == 'h' || what[0] == 'l'))
     return TRUE;

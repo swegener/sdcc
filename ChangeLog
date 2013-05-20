@@ -1,3 +1,10 @@
+2013-05-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  More efficient cast from _Bool,
+	* src/z80/peep.c:
+	  Fix recognition of xor as writing a in peepholes.
+
 2013-05-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* Small Device C Compiler 3.3.0 released

@@ -6092,9 +6092,7 @@ genMult (iCode * ic)
   byteResult = (AOP_SIZE (IC_RESULT (ic)) == 1);
 
   if (AOP_SIZE (IC_LEFT (ic)) > 2 || AOP_SIZE (IC_RIGHT (ic)) > 2 || AOP_SIZE (IC_RESULT (ic)) > 2)
-    {
-      wassertl (0, "Multiplication is handled through support function calls.");
-    }
+    wassertl (0, "Large multiplication is handled through support function calls.");
 
   /* Swap left and right such that right is a literal */
   if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
@@ -10657,7 +10655,7 @@ genCast (const iCode * ic)
   /* now depending on the sign of the destination */
   size = AOP_SIZE (result) - AOP_SIZE (right);
   /* Unsigned or not an integral type - right fill with zeros */
-  if (!IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE (right) == AOP_CRY)
+  if (IS_BOOL (rtype) || !IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE (right) == AOP_CRY)
     {
       while (size--)
         aopPut3 (AOP (result), offset++, ASMOP_ZERO, 0);
@@ -12162,3 +12160,4 @@ genZ80Code (iCode * lic)
   destroy_line_list ();
   freeTrace (&_G.trace.aops);
 }
+

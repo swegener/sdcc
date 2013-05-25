@@ -38,6 +38,7 @@
 /*-----------------------------------------------------------------*/
 
 extern void genhc08Code (iCode *);
+
 #define D(x)
 
 // Build the old allocator. It can be used by command-line options

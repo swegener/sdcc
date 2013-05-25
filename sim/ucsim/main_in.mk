@@ -77,6 +77,8 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/savr$(EXEEXT)
 	rm -f $(DESTDIR)$(bindir)/serialview$(EXEEXT)
 	rm -f $(DESTDIR)$(bindir)/portmon$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sstm8$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sst7$(EXEEXT)
 
 
 # Performing self-test

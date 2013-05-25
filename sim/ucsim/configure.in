@@ -79,6 +79,18 @@ if test $enable_xa != "no"; then
     enable_xa="yes"
 fi,
 enable_xa="no")
+AC_ARG_ENABLE(stm8,
+[  --disable-stm8          do not compile simulator for stm8],
+if test $enable_stm8 != "no"; then
+    enable_stm8="yes"
+fi,
+enable_stm8="yes")
+AC_ARG_ENABLE(st7,
+[  --disable-st7          do not compile simulator for st7],
+if test $enable_st7 != "no"; then
+    enable_st7="yes"
+fi,
+enable_st7="yes")
 AC_ARG_ENABLE(serio,
 [  --enable-serio          compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then
@@ -92,6 +104,8 @@ AC_SUBST(enable_avr)
 AC_SUBST(enable_z80)
 AC_SUBST(enable_hc08)
 AC_SUBST(enable_xa)
+AC_SUBST(enable_stm8)
+AC_SUBST(enable_st7)
 AC_SUBST(enable_serio)
 
 AC_ARG_ENABLE(statistic,
@@ -591,6 +605,8 @@ avr.src/Makefile
 z80.src/Makefile
 hc08.src/Makefile
 xa.src/Makefile
+stm8.src/Makefile
+st7.src/Makefile
 gui.src/Makefile
 gui.src/serio.src/Makefile
 doc/Makefile

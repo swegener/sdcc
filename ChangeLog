@@ -1,7 +1,60 @@
+2013-05-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merged stm8 branch.
+
+2013-05-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/float_single.c,
+	  support/regression/tests/gcc-torture-execute-20030714-1.c,
+	  support/regression/tests/gcc-torture-execute-20050826-1.c:
+	  STM8: Disable failing tests.
+
 2013-05-25 Borut Razem <borut.razem AT gmail.com>
 
 	* Makefile.in: applied patch #211 - "sdbinutils is installed twice",
 	  thanks to Tijl Coosemans
+
+2013-05-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20010224-1.c:
+	  STM8: Disable test that fails due to known CSE bug #1968.
+	* support/regression/ports/stm8/spec.mk:
+	  STM8: Remove definition for __reentrant.
+	* src/stm8/gen.c:
+	  STM8: Fix handling of out-of-range offsets.
+
+2013-05-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix float negation, fix large stack-to-stack copy under high register pressure, fix handling of immediate operands.
+	* support/regression/tests/gcc-torture-execute-20030408-1.c:
+	  STM8: Disable test for known front-end bug.
+	* sim/ucsim/stm8.src/inst.cc:
+	  STM8: Fix handling of V and H flags in cpw.
+	* sim/ucsim/stm8.src/inst.cc:
+	  STM8: Silence some warnings.
+	* src/stm8/ralloc.c:
+	  STM8: Fix missing include.
+	* support/regression/tests/gcc-torture-execute-20050613-1.c:
+	  STM8: Disable regression test that fails due to front-end bug.
+
+2013-05-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: More efficient xor, or, and. Fix overwriting of shift count in shifts, fix comparison with upper byte in a, fix long comparison stacked offset, fix unsigned long / unsigned long long comparison.
+
+2013-05-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  STM8: Disable broken optimization of comparisons into and.
+	* src/stm8/gen.c:
+	  STM8: Slightly more efficient shifts, fix long ifx, fix use of word rotation in copy, fix handling of a in signed cast.
+
+2013-05-21 Valentin Dudouyt <valentin dudouyt AT gmail.com>
+
+	* src/stm8/main.c,
+	* src/SDCCglue.c:
+	STM8: Fixed init code: some of GSINIT parts aren't executed under certain linking conditions.
 
 2013-05-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -19,10 +72,99 @@
 	* Small Device C Compiler 3.3.0 released
 	* .version, doc/sdccman.lyx: changed sdcc version to 3.3.1
 
+2013-05-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix long and long long comparison.
+
+2013-05-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  STM8: Give up trying to fix big-endian bit-fields. Make bit-fields little-endian.
+
+2013-05-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* sim/ucsim/stm8.src/instcl.h,
+	  sim/ucsim/stm8.src/inst.cc,
+	  sim/ucsim/stm8.src/stm8mac.h,
+	  sim/ucsim/stm8.src/glob.cc,
+	  sim/ucsim/stm8.src/stm8.cc,
+	  sdas/asstm8/stm8mch.c:
+	  STM8: Patches by Valentin Dudouyt to fix simulator.
+	* src/stm8/gen.c:
+	  STM8: Fix conditional jump, address generation for on-stack variables.
+	* device/lib/_mullong.c,
+	  device/lib/_mulint.c,
+	  device/lib/stm8/Makefile.in,
+	  device/lib/_mulschar.c,
+	  device/lib/_modschar.c,
+	  device/lib/_divschar.c,
+	  src/SDCCsymt.c,
+	  src/stm8/main.c:
+	  STM8: Multiplication and division fixes.
+
+2013-05-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix offset in wide addition, fix handling of a in copy from registers to global, fix stack adjustment for large variables, fix large arithmetic signed right shift.
+
 2013-05-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/INSTALL.txt: small update
 	* support/scripts/repack_release.sh: added windows x64 setup
+
+2013-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix bit-field access.
+	* sim/ucsim/stm8.src/inst.cc:
+	  STM8: Fix handling of carry bit in negation in simulator.
+
+2013-05-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  STM8: Fix endianness for initializers.
+
+2013-05-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/ports/stm8/support.c:
+	  STM8: Remove unneeded global variable that clashes with identifiers in regression tests.
+	* support/regression/tests/malloc.c,
+	  support/regression/tests/gcc-torture-execute-920810-1.c:
+	  STM8: Disable regression tests for unimplemented malloc().
+	* src/stm8/gen.c:
+	  STM8: Fix saving of a in early stack-to-stack copy, fix offset in stacked register operand, fix handling of operand in wide register in pointer set, fix endless loop in shifts.
+
+2013-05-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  STM8: Fix clr, partially by patch by Valentin Dudouyt.
+	* src/stm8/main.c:
+	  STM8:  Patch by Valentin Dudouyt to initialize global and static variables to zero.
+
+2013-05-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  STM8: Patch by Valentin Dudouyt to fix ldw.
+	* src/stm8/main.c:
+	  STM8: Patches by Valentin Dudouyt to fix handling of global variables and startup.
+
+2013-05-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/stm8.src/inst.cc,
+	  sim/ucsim/stm8.src/instcl.h,
+	  sim/ucsim/stm8.src/stm8.cc,
+	  sim/ucsim/stm8.src/stm8mac.h,
+	  support/regression/ports/stm8/support.c:
+	  STM8: Patches by Valentin Dudouyt: The last bits to enable regression testing, fix bug in wide addition.
+	* support/regression/tests/0fail.c,
+	  support/regression/tests/0pass.c:
+	  Removed dummy tests.
+	* src/stm8/gen.c:
+	  STM8: Fix handling of large operands partially in x in comparison for equality, be more careful in partial move for cast, fix signed cast.
+	* src/hc08/gen.c,
+	  src/z80/gen.c:
+	  More efficient cast from _Bool.
 
 2013-05-11 Molnar Karoly <molnarkaroly AT users.sf.net>
 
@@ -44,10 +186,25 @@
 	* doc/INSTALL.txt,
 	* doc/sdccman.lyx: version 3.3.0
 
+2013-05-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix endianness in stack / stack copy.
+
+2013-05-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix multibyte false Ifx.
+
 2013-05-07 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi: removed dedication to Dennis M. Ritchie,
 	  corrected ChangeLog path
+
+2013-05-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix endianness in register / stack copy.
 
 2013-05-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -57,16 +214,217 @@
 	* sdcc.spec: version 3.3.0
 	* sdas/asxxsrc/asout.c: suppress warning
 
+2013-05-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix stack variable offset.
+
+2013-05-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  More accurately model behaviour of xor for peepholes.
+	* sdas/asstm8/stm8mch.c,
+	  sdas/asxxsrc/asout.c:
+	  Applied patch from Valentin Dudouyt to make range check stm8-specific.
+
 2013-05-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def,
 	  src/z80/peeph-r2k.def:
 	  Fix generation of extra # in peephole.
 
+2013-04-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix memory leak in conditional jump.
+
+2013-04-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20000314-3.c:
+	  STM8: Removed regression test, since it tests for non-standard gcc behaviour.
+	* src/stm8/gen.c:
+	  STM8: Fix saving of a on stack in binary complement.
+
+2013-04-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  src/stm8/main.c,
+	  src/stm8/ralloc2.cc:
+	  STM8: Implement unsigned division.
+
+2013-04-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bp.c,
+	  support/regression/tests/bug2094505.c,
+	  support/regression/tests/bug3475630.c,
+	  support/regression/tests/gcc-torture-execute-20010129-1.c,
+	  support/regression/tests/gcc-torture-execute-20021120-1.c,
+	  support/regression/tests/gcc-torture-execute-20030916-1.c,
+	  support/regression/tests/gcc-torture-execute-pr28982a.c,
+	  support/regression/tests/gcc-torture-execute-20031012-1.c,
+	  support/regression/tests/gcc-torture-execute-20071030-1.c,
+	  support/regression/tests/gcc-torture-execute-930614-2.c,
+	  support/regression/tests/gcc-torture-execute-930628-1.c,
+	  support/regression/tests/gcc-torture-execute-980707-1.c,
+	  support/regression/tests/gcc-torture-execute-990513-1.c:
+	  STM8: Disable some regression tests that need support for extended stack operands.
+	* src/stm8/gen.c:
+	  STM8: Improve error reporting for unimplemented extended stack operands, fix pointer write.
+	* device/lib/_divschar.c,
+	  device/lib/_modschar.c,
+	  device/lib/stm8/Makefile.in:
+	  STM8: Support routines for signed char divide and modulo.
+
+2013-04-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix stack handling in equality comparison, handle dead code, fix shift to zero.
+
+2013-04-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Implement DUMMY_READ_VOLATILE.
+
+2013-04-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Implement read from signed bit-field.
+
+2013-04-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asxxsrc/asout.c,
+	  src/stm8/main.c:
+	  STM8: Applied patched from Valentin Dudouyt to improve error checking in assembler, implement initialization of globals, __interrupt.
+
+2013-04-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  STM8: Implement multiplication.
+
+2013-04-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix asmop freeing for GET_VALUE_AT_ADDRESS, do not share symbol aops to fix double free, fix large comparison, implement bit-field writes.
+
+2013-04-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix unsigned cast, implement read from unsigned bit-field.
+	* support/regression/tests/0fail.c,
+	  support/regression/tests/0pass.c:
+	  Dummy tests for debugging regression testing.
+
+2013-04-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix in handling of result in a in addition, minor improvements.
+
+2013-04-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix stack handling in signed cast, fix wide right shift, minor refactoring.
+
+2013-04-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix handling of a in addition, subtraction and negation, more flexible copy, fix comparison.
+
+2013-04-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Update TODO/todo comments to reflect known bug vs optimization potential.
+
+2013-04-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Various fixes.
+
+2013-04-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Make lack of support for bit-fields explicit, implement binary complement, minor improvements.
+
+2013-04-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix large operands in equality comparison of register with literal or stack op.
+	* src/stm8/ralloc2.cc:
+	  STM8: Fix liveness of registers at parameter pushes.
+
+2013-04-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix parameter stack offset, fix handling of a in GET_VALUE_AT_ADDRESS.
+
+2013-04-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix returning 4-byte values, fix saving of x, y over call, fix handling of registers in stack-to-stack copy.
+
 2013-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic14/pic16regs.h:
 	  New common header for the pic14 family.
+
+2013-04-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/stm8/Makefile.in:
+	  STM8: Add missing integer support functions.
+	* src/stm8/gen.c:
+	  STM8: Enable inline asm.
+
+2013-04-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/Makefile.in,
+	  support/regression/ports/stm8/spec.mk,
+	  support/regression/ports/stm8/support.c,
+	  support/regression/ports/stm8/uCsim.cmd:
+	  STM8: Basic infrastructure for regression tests, partially from a patch by Valentin Dudouyt.
+	* src/stm8/gen.c:
+	  STM8: Name mangling for address generation.
+
+2013-04-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/Makefile.in:
+	  STM8: Enable building standard library.
+
+2013-04-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  src/stm8/main.c:
+	  STM8: Applied patch from Valentin Dudouyt to implement __critical.
+
+2013-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/stm8/Makefile.in:
+	  STM8: Disable building some library files.
+	* src/stm8/gen.c:
+	  STM8: Fix comparison.
+	* src/stm8/main.c:
+	  STM8: Disable some annoying debug output.
+
+2013-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  sdas/asstm8/stm8mch.c:
+	  STM8: Applied patch from Valentin Dudouyt to support addw sp, #byte.
+	* src/stm8/ralloc2.cc:
+	  STM8: Enabled cost function for more iCodes.
+	* src/stm8/gen.c:
+	  STM8: Fixes for logic ops, RETURN, '-', stack-to-stack copy, implement more operands for comparison.
+
+2013-04-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  STM8: Disable generation of jump tables.
+	* src/stm8/gen.c:
+	  STM8: Implement more comparison operands, fix for stack-to-stack temporary assignment.
+
+2013-04-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Endianness fixes, implement dummy pointer reads, implement '!', implement more operands in logic ops, implement more return operands, implement more operands for cast to _Bool, implement more operands for subtraction.
 
 2013-04-18 Borut Razem <borut.razem AT gmail.com>
 
@@ -78,10 +436,42 @@
 	  sim/ucsim/conf:
 	  use /bin/sh instead of /bin/bash to enable compilation on OpenBSD
 
+2013-04-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix for cast to bool.
+
+2013-04-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Implement more shifts, unary minus for float, implement large return values, save regs over calls, coalescing.
+
+2013-04-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix emission of rlwa, fix 16-bit increment with result in x, operand not in x.
+
+2013-04-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fixes for reading / writing through pointer, implement more IFX, fix wide subtraction and compariosn.
+
+2013-04-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Now that we know more about sp-manipulation, we can do it smarter.
+
 2013-04-14 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl:
 	  The overlapped block and instruction it is no longer a fatal error.
+
+2013-04-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  STM8: Applied patch from Valentin Dudouyt to set default code loc.
+	* src/stm8/gen.c:
+	  STM8: Be more cautious about arithmetic on stack pointer.
 
 2013-04-13 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -90,8 +480,83 @@
 	  src/SDCCmain.c,
 	  src/pic16/glue.c,
 	  src/z80/main.c,
-	  doc/sdccman.lyx:
+	  doc/sdccman.lyx,
+	  src/stm8/main.c:
 	  Remove option --main-return, make the behaviour previously invoked by --main-return the default.
+
+2013-04-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asstm8/stm8.h,
+	  sdas/asstm8/stm8mch.c,
+	  sdas/asstm8/stm8pst.c,
+	  src/SDCCglue.c,
+	  src/stm8/gen.c,
+	  src/stm8/main.c:
+	  STM8: Applied patches from Valentin Dudouyt containing various fixes.
+
+2013-04-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  src/stm8/ralloc.c:
+	  Fix handling of stack part of local variables.
+
+2013-04-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Implement basic pointer writes, fix handling of 16-bit literals.
+
+2013-04-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: END_FUNCTION stack adjustment fix, more efficient zeroing, addition fix, return value use.
+
+2013-04-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fix for GET_VALUE_AT_ADDRESS, fixes for shift by literal, implement call by pointer, minor improvements.
+
+2013-04-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Allow more operands in xor, and, or.
+
+2013-04-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Implement integer unary minus, or fix.
+
+2013-04-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Implement more comparisons, stack handling fix.
+	* src/SDCCsymt.c:
+	  STM8: Allow returning long long (not implemented in code genration yet).
+
+2013-04-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Stack adjustment fixes, signed cast fix, ifx fix, GET_VALUE_AT_ADDRESS fix.
+
+2013-04-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Implement cast to _Bool.
+	* device/include/sdcc-lib.h,
+	  device/include/asm/stm8/features.h:
+	  STM8: Port feature header.
+	* device/include/math.h,
+	  device/include/stdarg.h:
+	  STM8: Port feature configuration.
+
+2013-04-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Allow more operand types in Ifx, implement more casts.
+
+2013-04-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Fixes for stack pointer handling.
 
 2013-04-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -100,6 +565,11 @@
 	  64-bit PowerPC
 	* support/regression/tests/align.c: do not include stdalign.h on
 	  hosts that do not support it
+
+2013-04-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  STM8: Implement comparison for more operand types.
 
 2013-04-02 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -118,6 +588,13 @@
 	  support/regression/tests/assert.c,
 	  support/regression/tests/align.c:
 	  Support for C11 _Static_assert static assertions and _Alignas alignment specifiers.
+
+2013-04-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  src/stm8/gen.c,
+	  src/stm8/main.c:
+	  STM8: Implement on-stack register passing, taking addresses of on-stack variables, handling of on-stack parameter operands.
 
 2013-03-31 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -265,9 +742,31 @@
 	* support/scripts/mcs51-disasm.pl:
 	  Use default sfr and sbit names if no header file.
 
+2013-02-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  Code generation fixes and refactoring, implement ^, CALL.
+	* src/SDCCopt.c:
+	  Enable lospre for stm8.
+	* src/stm8/main.c:
+	  Correctly announce lack of multiplication support.
+
+2013-02-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  Basic code generation infrastructure for &, |, RETURN, <, >.
+
 2013-02-10 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Adds used count to sfr, sbit and bit lists.
+
+2013-02-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c,
+	  src/stm8/main.c:
+	  Various code generation fixes, improvements, debug messages.
+	* device/lib/stm8/Makefile.in:
+	  Fix some hc08 leftovers.
 
 2013-02-08 Molnar Karoly <molnarkaroly AT users.sf.net>
 
@@ -293,6 +792,11 @@
 2013-01-31 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/mcs51-disasm.pl: Use IRAM key in name-list file.
+
+2013-01-29 Philipp Klaus Krause <philipp AT colecovision.eu>
+
+	* src/stm8/gen.c:
+	  Use clr for more efficient zeroing.
 
 2013-01-29 Molnar Karoly <molnarkaroly AT users.sf.net>
 
@@ -464,6 +968,16 @@
 	* sim/ucsim/hc08.src/inst.cc: Fixed bug with cbeq using stack operand
 	  modifying hx
 
+2012-01-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Infrastructure for the stm8 port.
+
+2012-01-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Infrastructure for the stm8 port.
+
 2013-01-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
@@ -479,9 +993,23 @@
 	    New: --verbose, --const-area
 	  Extracts more informations from map file.
 
+2012-01-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc.c,
+	  src/stm8/gen.c:
+	  Infrastructure for the stm8 port.
+
 2013-01-06 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCasm.c, src/SDCCasm.h: excluded unused asm mappings
+
+2012-01-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc.c,
+	  src/stm8/ralloc2.cc:
+	  Register allocation infrastructure for the stm8 port.
+	* src/stm8/gen.c:
+	  Code generation infrastructure for the stm8 port.
 
 2013-01-05 Molnar Karoly <molnarkaroly AT users.sf.net>
 
@@ -596,6 +1124,12 @@
 
 2012-12-29 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  src/stm8/ralloc2.cc:
+	  Infrastructure for STM8 port.
+
+2012-12-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCbtree.cc:
 	  Fix bug #3598841.
 
@@ -608,6 +1142,20 @@
 	* src/sdcc.vcxproj,
 	* src/sdcc.vcxproj.filters: added SDCCbtree.cc and SDCCbtree.h
 	* src/SDCCbtree.cc: fixed STX usage
+
+2012-12-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc2.cc,
+	  src/stm8/gen.c,
+	  src/stm8/ralloc.c:
+	  Infrastructure for STM8 port.
+
+2012-12-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc2.cc,
+	  src/stm8/gen.c,
+	  src/stm8/gen.h:
+	  Infrastructure for STM8 port.
 
 2012-12-28 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -638,6 +1186,16 @@
 	* support/regression/tests/key.c,
 	* support/regression/tests/long_asm_line.c,
 	* support/regression/tests/macro.c: use at least one ASSERT
+
+2012-12-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc2.cc,
+	  src/stm8/gen.h,
+	  src/stm8/main.c,
+	  src/stm8/gen.c,
+	  src/stm8/ralloc.h,
+	  src/stm8/ralloc.c:
+	  Infrastructure for STM8 port.
 
 2012-12-27 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -687,6 +1245,71 @@
 	  applied patch #3193179 - "pic14 naked ISR handler"
 	  implementing RFE #1432077 - "naked for pic14",
 	  thanks to Wolfgang Jung
+
+2012-12-23 Vaclav Peroutka <vaclavpe AT seznam.cz>
+
+   * sim/ucsim/configure
+     sim/ucsim/configure.in
+     sim/ucsim/main_in.mk
+     sim/ucsim/packages_in.mk
+     sim/ucsim/stypes.h
+     sim/ucsim/st7.src/(c).1
+     sim/ucsim/st7.src/Makefile.in
+     sim/ucsim/st7.src/clean.mk
+     sim/ucsim/st7.src/conf.mk
+     sim/ucsim/st7.src/glob.cc
+     sim/ucsim/st7.src/glob.h
+     sim/ucsim/st7.src/inst.cc
+     sim/ucsim/st7.src/instcl.h
+     sim/ucsim/st7.src/regsst7.h
+     sim/ucsim/st7.src/simst7.cc
+     sim/ucsim/st7.src/simst7cl.h
+     sim/ucsim/st7.src/sst7.cc
+     sim/ucsim/st7.src/st7.cc
+     sim/ucsim/st7.src/st7cl.h
+     sim/ucsim/st7.src/st7mac.h
+     sim/ucsim/stm8.src/inst.cc
+     sim/ucsim/stm8.src/instcl.h
+     sim/ucsim/stm8.src/stm8.cc
+     sim/ucsim/stm8.src/stm8mac.h
+
+2012-12-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  src/stm8/ralloc.h,
+	  src/stm8/ralloc2.cc,
+	  src/stm8/ralloc.c:
+	  Infrastructure for STM8 port.
+
+2012-12-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  src/stm8/gen.c,
+	  src/stm8/gen.h,
+	  src/stm8/ralloc.h,
+	  src/port.h,
+	  src/SDCCmain.c,
+	  src/stm8/ralloc.c:
+	  Basic infrastructure for STM8 port.
+
+2012-12-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Makefile.common.in,
+	  Makefile.in,
+	  configure.in,
+	  sim/ucsim/aclocal.m4,
+	  sim/ucsim/configure,
+	  configure,
+	  debugger/mcs51/aclocal.m4,
+	  src/port.h,
+	  src/stm8,
+	  src/stm8/Makefile.in,
+	  src/stm8/main.c,
+	  src/stm8/peeph.def,
+	  device/lib/stm8,
+	  device/lib/stm8/Makefile.in,
+	  src/stm8/ralloc.h:
+	  Basic build infrastructure for STM8 port.
 
 2012-12-20 Philipp Klaus Krause <pkk AT spth.de>
 

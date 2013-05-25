@@ -793,7 +793,8 @@ AC_DO_PORT(ds400, ds400, DS400, [Excludes the DS400 port])
 AC_DO_PORT(pic14, pic14, PIC14, [Excludes the PIC14 port])
 AC_DO_PORT(pic16, pic16, PIC16, [Excludes the PIC16 port])
 AC_DO_PORT(hc08,  hc08,  HC08,  [Excludes the HC08 port])
-AC_DO_PORT(s08,   hc08,  S08,  [Excludes the S08 port])
+AC_DO_PORT(s08,   hc08,  S08,   [Excludes the S08 port])
+AC_DO_PORT(stm8,  stm8,  STM8,  [Excludes the STM8 port])
 
 # Unsupported targets
 ####AC_DO_PORT_ENABLER(avr,   avr,   AVR,   [Includes the AVR port (disabled by default)])
@@ -913,6 +914,12 @@ if test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0; then
                                                        device/lib/r3ka/Makefile])
 fi
 
+if test $OPT_DISABLE_STM8 = 0; then
+  AC_CONFIG_FILES([src/stm8/Makefile
+                   sdas/asstm8/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/stm8/Makefile])
+fi
+
 test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile device/non-free/lib/Makefile])
 
 AC_CONFIG_FILES([main.mk:main_in.mk
@@ -983,6 +990,7 @@ sdcc ${VERSION} is now configured for
     r2k                 ${enable_r2k_port}
     r3ka                ${enable_r3ka_port}
     gbz80               ${enable_gbz80_port}
+    stm8                ${enable_stm8_port}
 
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}

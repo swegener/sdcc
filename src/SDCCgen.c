@@ -188,8 +188,10 @@ emitcode (const char *inst, const char *fmt, ...)
 }
 
 void
-emitLabel (symbol * tlbl)
+emitLabel (symbol *tlbl)
 {
+  if (!tlbl)
+    return;
   emitcode ("", "!tlabeldef", labelKey2num (tlbl->key));
   genLine.lineCurr->isLabel = 1;
 }

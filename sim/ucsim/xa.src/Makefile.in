@@ -27,6 +27,7 @@ CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 CFLAGS          = @CFLAGS@ @WALL_FLAG@
 CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
 LDFLAGS         = @LDFLAGS@
+PICOPT		= @PICOPT@
 
 LIBS		= @LIBS@ -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim
 
@@ -113,7 +114,7 @@ otherlibs:
 	$(MAKE) -C $(top_builddir)/sim.src all
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
 .asm.hex:
 	$(XAASM) -l $< -o $@ -e $<.lst

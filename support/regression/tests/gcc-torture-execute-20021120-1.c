@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined (__SDCC_stm8)
 
 /* Macros to emit "L Nxx R" for each octal number xx between 000 and 037.  */
 #define OP1(L, N, R, I, J) L N##I##J R
@@ -60,7 +60,7 @@ void foo (int n)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined (__SDCC_stm8)
   int i;
 
   for (i = 0; i < 32; i++)

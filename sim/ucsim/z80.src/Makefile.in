@@ -142,7 +142,7 @@ otherlibs:
 	$(MAKE) -C $(top_builddir)/sim.src all
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
 .asm.hex:
 	$(Z80ASM) -l $< -o $@ -e $<.lst

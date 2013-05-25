@@ -2810,7 +2810,7 @@ aopOpExtToIdx(asmop * result, asmop *left, asmop *right)
 /*-----------------------------------------------------------------*/
 /* aopAdrStr - for referencing the address of the aop              */
 /*-----------------------------------------------------------------*/
-/* loffset seems to have a weird meaning here. It seems to be nonzero in some places where one would expect an offset ot be zero */
+/* loffset seems to have a weird meaning here. It seems to be nonzero in some places where one would expect an offset to be zero */
 static char *
 aopAdrStr (asmop * aop, int loffset, bool bit16)
 {
@@ -10055,7 +10055,7 @@ genCast (iCode * ic)
       goto release;
     }
 
-  signExtend = AOP_SIZE (result) > AOP_SIZE (right) && IS_SPEC (rtype) && !SPEC_USIGN (rtype);
+  signExtend = AOP_SIZE (result) > AOP_SIZE (right) && !IS_BOOL (rtype) && IS_SPEC (rtype) && !SPEC_USIGN (rtype);
 
   /* If the result is 2 bytes and in registers, we have to be careful */
   /* to make sure the registers are not overwritten prematurely. */

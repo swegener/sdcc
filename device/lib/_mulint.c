@@ -208,10 +208,19 @@ __mulint_PARM_2:
 
 #else
 
+#if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8)
+// Big-endian
+union uu {
+	struct { unsigned char hi, lo ;} s;
+        unsigned int t;
+};
+#else
+// Little-endian
 union uu {
 	struct { unsigned char lo,hi ;} s;
         unsigned int t;
-} ;
+};
+#endif
 
 int
 _mulint (int a, int b)

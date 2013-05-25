@@ -51,6 +51,9 @@
 #elif defined(__SDCC_ds390)
 #include <asm/ds390/features.h>
 
+#elif defined(__SDCC_stm8)
+#include <asm/stm8/features.h>
+
 #else
 /* PENDING */
 #include <asm/default/features.h>

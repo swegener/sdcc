@@ -13,6 +13,7 @@ __xdata char heap[100];
 void
 testMalloc (void)
 {
+#ifndef __SDCC_stm8
   void __xdata *p1, *p2, *p3;
   char *p;
   unsigned char i;
@@ -84,6 +85,7 @@ testMalloc (void)
   LOG (("p3, after freeing p2: %p\n", p3));
 #else
   LOG (("p3, after freeing p2: %u\n", (unsigned) p3));
+#endif
 #endif
 }
 

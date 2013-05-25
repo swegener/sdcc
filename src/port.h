@@ -24,6 +24,7 @@
 #define TARGET_ID_R2K      13
 #define TARGET_ID_R3KA     14
 #define TARGET_ID_S08      15
+#define TARGET_ID_STM8     16
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
@@ -42,6 +43,7 @@
 #define TARGET_IS_GBZ80    (port->id == TARGET_ID_GBZ80)
 #define TARGET_IS_HC08     (port->id == TARGET_ID_HC08)
 #define TARGET_IS_S08      (port->id == TARGET_ID_S08)
+#define TARGET_IS_STM8     (port->id == TARGET_ID_STM8)
 
 #define TARGET_MCS51_LIKE  (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
 #define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GBZ80 || TARGET_IS_R2K || TARGET_IS_R3KA)
@@ -441,6 +443,9 @@ extern PORT hc08_port;
 #endif
 #if !OPT_DISABLE_S08
 extern PORT s08_port;
+#endif
+#if !OPT_DISABLE_STM8
+extern PORT stm8_port;
 #endif
 
 #endif /* PORT_INCLUDE */

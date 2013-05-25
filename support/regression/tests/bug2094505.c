@@ -7,7 +7,7 @@
 void
 testBug(void)
 {
-#if !defined(__SDCC) || !defined(__SDCC_mcs51) || defined(__SDCC_MODEL_LARGE)
+#if !defined(__SDCC) || (!defined(__SDCC_mcs51) && !defined (__SDCC_stm8)) || defined(__SDCC_MODEL_LARGE)
     // varA has to be declared for the bug to manifest itself
     volatile char varA[256] = {0};
     volatile unsigned int varB = 0x1;

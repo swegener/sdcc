@@ -11,7 +11,7 @@
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined (__SDCC_stm8)
   int i, j, k, l;
   float x[8][2][8][2];
 

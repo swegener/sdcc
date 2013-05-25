@@ -629,7 +629,7 @@ struct some_struct {
 	short a ;
 	char b;
 	long c ;};
-#if defined(__SDCC_hc08) || defined(__SDCC_s08)
+#if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8)
 /* big endian order */
 union bil {
         struct {unsigned char b3,b2,b1,b0 ;} b;

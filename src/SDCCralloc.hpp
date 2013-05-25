@@ -637,7 +637,7 @@ float compability_cost(const assignment& a, const assignment& ac, const I_t &I)
         c += 1000.0f;
         continue;
       }
-        
+#if 0 // This improves the quality of assignments, but it has a big runtime overhead for some cases.
       adjacency_iter_t j, j_end;
       for (boost::tie(j, j_end) = adjacent_vertices(v, I); j != j_end; ++j)
         if(ac.global[v] != -1 && a.global[*j] == ac.global[v])
@@ -645,6 +645,7 @@ float compability_cost(const assignment& a, const assignment& ac, const I_t &I)
           c += 1000.0f;
           break;
         }
+#endif
     }
   
   return(c);

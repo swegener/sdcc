@@ -29,7 +29,7 @@ int baz3 (int i)
 
 void **bar;
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined (__SDCC_stm8)
 int foo (void *a, long b, int c)
 {
   int d = 0, e, f = 0, i;
@@ -71,7 +71,7 @@ int foo (void *a, long b, int c)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined (__SDCC_stm8)
   void *n = 0;
   bar = &n;
   foo (&n, 1, 0xc811);

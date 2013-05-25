@@ -370,7 +370,7 @@ static void unset_surviving_regs(unsigned short int i, const G_t &G)
 }
 
 template <class G_t, class I_t>
-void assign_operand_for_cost(operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+static void assign_operand_for_cost(operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   if(!o || !IS_SYMOP(o))
     return;
@@ -581,6 +581,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
   tree_dec_ralloc_nodes(T, find_root(T), G, I2, ac, &assignment_optimal);
 
   const assignment &winner = *(T[find_root(T)].assignments.begin());
+
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Winner: ";
   for(unsigned int i = 0; i < boost::num_vertices(I); i++)
@@ -591,6 +592,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
   std::cout << "Cost: " << winner.s << "\n";
   std::cout.flush();
 #endif
+
   // Todo: Make this an assertion
   if(winner.global.size() != boost::num_vertices(I))
     {

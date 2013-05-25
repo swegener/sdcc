@@ -42,7 +42,7 @@
 #define LOOP(INDEX) result##INDEX += *ptr##INDEX, ptr##INDEX += inc##INDEX
 #define COPYOUT(INDEX) results[INDEX] = result##INDEX
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined (__SDCC_stm8)
 float *ptrs[NVARS];
 float results[NVARS];
 int incs[NVARS];
@@ -63,7 +63,7 @@ float input[NITER * NVARS];
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_r2k) && !defined(__SDCC_r3ka)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_r2k) && !defined(__SDCC_r3ka) && !defined(__SDCC_stm8)
   int i;
 
   for (i = 0; i < NVARS; i++)

@@ -1994,7 +1994,7 @@ glue (void)
       fprintf (asmFile, "%s", iComments2);
       fprintf (asmFile, "; Stack segment in internal ram \n");
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "\t.area\tSSEG\t(DATA)\n" "__start__stack:\n\t.ds\t1\n\n");
+      fprintf (asmFile, "\t.area\tSSEG\n" "__start__stack:\n\t.ds\t1\n\n");
     }
 
   /* create the idata segment */
@@ -2147,6 +2147,8 @@ glue (void)
     }
   dbuf_write_and_destroy (&statsg->oBuf, asmFile);
 
+  /* STM8 note: there are no such instructions supported.
+     Also, we don't need this logic as well. */
   if (port->general.glue_up_main && mainf && IFFUNC_HASBODY (mainf->type))
     {
       /* This code is generated in the post-static area.
@@ -2154,7 +2156,10 @@ glue (void)
        * by the ugly shucking and jiving about 20 lines ago.
        */
       tfprintf (asmFile, "\t!area\n", port->mem.post_static_name);
-      fprintf (asmFile, "\t%cjmp\t__sdcc_program_startup\n", options.acall_ajmp ? 'a' : 'l');
+      if(TARGET_IS_STM8)
+        fprintf (asmFile, "\tjp\t__sdcc_program_startup\n");
+      else
+        fprintf (asmFile, "\t%cjmp\t__sdcc_program_startup\n", options.acall_ajmp ? 'a' : 'l');
     }
 
   fprintf (asmFile, "%s" "; Home\n" "%s", iComments2, iComments2);
@@ -2163,11 +2168,18 @@ glue (void)
 
   if (mainf && IFFUNC_HASBODY (mainf->type))
     {
+      /* STM8 note: there is no need to call main().
+         Instead of that, it's address is specified in the 
+	 interrupts table and always equals to 0x8080.
+	*/
       /* entry point @ start of HOME */
       fprintf (asmFile, "__sdcc_program_startup:\n");
 
       /* put in jump or call to main */
-      fprintf (asmFile, "\t%cjmp\t_main\n", options.acall_ajmp ? 'a' : 'l');        /* needed? */
+      if(TARGET_IS_STM8)
+        fprintf (asmFile, "\tjp\t_main\n");
+      else
+        fprintf (asmFile, "\t%cjmp\t_main\n", options.acall_ajmp ? 'a' : 'l');        /* needed? */
       fprintf (asmFile, ";\treturn from main will return to caller\n");
     }
   /* copy over code */

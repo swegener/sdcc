@@ -28,7 +28,7 @@ testTortureExecute (void)
   struct B b = { .a.j = 5 };
   struct C c = { .a.j = 5 };
   struct D d = { .a.j = 5 };
-#ifndef __SDCC_mcs51
+#if 0 // sdcc bug #2167
   foo (&b.a);
   foo (&c.a);
   foo (&d.a);

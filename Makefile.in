@@ -56,6 +56,10 @@ SDCC_AS        += sdas/asgb
 SDCC_LD        += sdcc-ldgb
 endif
 
+ifeq ($(OPT_DISABLE_STM8), 0)
+SDCC_AS        += sdas/asstm8
+endif
+
 ifeq ($(OPT_DISABLE_UCSIM), 0)
 TARGETS        += sdcc-misc
 SDCC_MISC      += sim/ucsim

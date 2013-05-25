@@ -2,6 +2,7 @@
 
 	* src/SDCCopt.c: fixed bug #2165 - "Broken comparison" by disableing
 	  optimization of comparision unsigned with 2^n literal since it is broken
+	* support/regression/test/compare_2_n.c: added test for bug #2165
 
 2013-05-25 Philipp Klaus Krause <pkk AT spth.de>
 

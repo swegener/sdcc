@@ -125,7 +125,7 @@ long_lwr (unsigned long left)
 
 #define LONG_RIGHT_GTR 0x7fffffff
 int
-long long_gtr (unsigned long left)
+long_gtr (unsigned long left)
 {
   if (left > LONG_RIGHT_GTR)
     return 1;
@@ -143,4 +143,24 @@ test_lwr_gtr (void)
   ASSERT (long_gtr (LONG_RIGHT_GTR + 1));
   ASSERT (!long_gtr (LONG_RIGHT_GTR));
   ASSERT (!long_gtr (LONG_RIGHT_GTR - 1));
+}
+
+/* Test for bug #2165 Broken comparison */
+char c;
+
+int
+bug_2165 (unsigned i)
+{ 
+  if (i < 0x0100)
+    return 1;
+  else
+    {c = i < 0x0100; return 0;}
+}
+
+void
+test_bug_bug_2165 (void)
+{
+  ASSERT (bug_2165 (254));
+  ASSERT (bug_2165 (255));
+  ASSERT (!bug_2165 (256));
 }

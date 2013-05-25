@@ -93,8 +93,7 @@ endif
 TARGETS        += sdcc-libs sdcc-cc sdcc-device-inc sdcc-as sdcc-ld sdcc-scripts
 
 PKGS           += $(SDCC_LIBS) src device/include device/non-free/include \
-                  $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) \
-                  $(SDCC_SDBINUTILS) $(SDCC_SCRIPTS)
+                  $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_SCRIPTS)
 
 PORTS           = $(shell cat ports.build)
 ALLPORTS        = $(shell cat ports.all)

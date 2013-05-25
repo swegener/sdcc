@@ -1,3 +1,8 @@
+2013-05-25 Borut Razem <borut.razem AT gmail.com>
+
+	* Makefile.in: applied patch #211 - "sdbinutils is installed twice",
+	  thanks to Tijl Coosemans
+
 2013-05-20 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/scripts/sdcc.nsi: added RequestExecutionLevel admin

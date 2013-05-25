@@ -1,3 +1,8 @@
+2013-05-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  More efficient addition.
+
 2013-05-25 Borut Razem <borut.razem AT gmail.com>
 
 	* src/SDCCopt.c: fixed bug #2165 - "Broken comparison" by disableing

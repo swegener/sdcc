@@ -1661,7 +1661,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i++;
         }
       else if (i + 1 < size && aopInReg (result, roffset + i, X_IDX) && (source->type == AOP_LIT || aopOnStack (source, soffset + i, 2) || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
-        {emitcode(";", "type %d", source->type);
+        {
           emitcode ("ldw", "x, %s", aopGet2 (source, soffset + i));
           cost (3, 2);
           i += 2;
@@ -2501,7 +2501,7 @@ genPlus (const iCode *ic)
   operand *result = IC_RESULT (ic);
   operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
-  int size, i;
+  int size, i, j;
   bool started;
   bool pushed_a = FALSE;
   int left_in_a = -1;
@@ -2531,16 +2531,23 @@ genPlus (const iCode *ic)
       }
   
   for(i = 0, started = FALSE; i < size;)
-    {// Todo: incw /decw x twice is cheaper than addw x, #2 / addw x, #254. 16-bit operation in dead source might be cheaper than add.
+    {// Todo: 16-bit operation in dead source might be cheaper than add.
       // We can use incw / decw only for the only, top non-zero word, since it neither takes into account an existing carry nor does it update the carry.
       if (!started && i == size - 2 &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
-        right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) == 1 && byteOfVal (right->aop->aopu.aop_lit, i + 1) == 0)
+        right->aop->type == AOP_LIT && !byteOfVal (right->aop->aopu.aop_lit, i + 1) &&
+        byteOfVal (right->aop->aopu.aop_lit, i) <= 1 + aopInReg (result->aop, i, X_IDX) ||
+        !started && i == size - 1 &&
+        !(aopInReg (left->aop, i, A_IDX) && regDead (A_IDX, ic)) &&
+        (aopInReg (result->aop, i, XL_IDX) && regDead (XH_IDX, ic) && left->aop->regs[XH_IDX] < 0 && result->aop->regs[XH_IDX] < 0 || aopInReg (result->aop, i, YL_IDX) && regDead (YH_IDX, ic) && left->aop->regs[YH_IDX] < 0 && result->aop->regs[YH_IDX] < 0) &&
+        right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) <= 1 + aopInReg (result->aop, i, XL_IDX))
         {
-          bool x = aopInReg (result->aop, i, X_IDX);
-          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2,
+          bool half = (i == size - 1);
+          bool x = aopInReg (result->aop, i, half ? XL_IDX : X_IDX) ;
+          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2 - half,
             pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, x, !x);
-          emit3w (A_INCW, x ? ASMOP_X : ASMOP_Y, 0);
+          for (j = 0; j < byteOfVal (right->aop->aopu.aop_lit, i); j++)
+            emit3w (A_INCW, x ? ASMOP_X : ASMOP_Y, 0);
           cost (x ? 1 : 2, 1);
           started = TRUE;
           i += 2;
@@ -2558,7 +2565,7 @@ genPlus (const iCode *ic)
         }
       else if (!started &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
-        (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || aopOnStack (right->aop, i, 2)))
+        (right->aop->type == AOP_LIT || (right->aop->type == AOP_IMMD || aopOnStack (right->aop, i, 2)) && i + 1 < right->aop->size))
         {
           bool x = aopInReg (result->aop, i, X_IDX);
           genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2,
@@ -2569,6 +2576,45 @@ genPlus (const iCode *ic)
               cost ((x || aopOnStack (right->aop, 0, 2)) ? 3 : 4, 2);
               started = TRUE;
             }
+          started = TRUE;
+          i += 2;
+        }
+      else if (!started && i == size - 1 &&
+        aopOnStack (result->aop, i, 1) && aopOnStack (left->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk &&
+        right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) <= 2)
+        {
+          for (j = 0; j < byteOfVal (right->aop->aopu.aop_lit, i); j++)
+            {
+              emitcode ("inc", "%s", aopGet(result->aop, i));
+              cost (2, 1);
+            }
+          i++;
+        }
+      else if (!started && i == size - 1 &&
+        aopOnStack (result->aop, i, 1) && aopOnStack (left->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk &&
+        right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) == 255)
+        {
+          emitcode ("dec", "%s", aopGet(result->aop, i));
+          cost (2, 1);
+          i++;
+        }
+      else if (!started &&
+        regDead (X_IDX, ic) && result->aop->regs[XL_IDX] < i && result->aop->regs[XH_IDX] < i && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] < i && right->aop->regs[XH_IDX] < i && 
+        (aopOnStack (result->aop, i, 2) || result->aop->type == AOP_DIR) &&
+        (aopRS (left->aop) && !aopInReg(left->aop, i, A_IDX) && !aopInReg(left->aop, i + 1, A_IDX) || left->aop->type == AOP_DIR) &&
+        (aopOnStack (right->aop, i, 2) || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
+        {
+          genMove_o (ASMOP_X, 0, left->aop, i, 2, pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, TRUE, FALSE);
+          if (i == size - 2 && right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) <= 2 && !byteOfVal (right->aop->aopu.aop_lit, i + 1))
+            for (j = 0; j < byteOfVal (right->aop->aopu.aop_lit, i); j++)
+              emit3w (A_INCW, ASMOP_X, 0);
+          else
+            {
+              emitcode ("addw", "x, %s", aopGet2 (right->aop, i));
+              cost (3 + (right->aop->type == AOP_DIR), 2);
+            }
+          genMove_o (result->aop, i, ASMOP_X, 0, 2, pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, TRUE, FALSE);
+          started = TRUE;
           i += 2;
         }
       else if (right->aop->type == AOP_REG || right->aop->type == AOP_REGSTK && !aopOnStack (right->aop, i, 1)) //todo: Implement handling of right operands that can't be directly added to a.

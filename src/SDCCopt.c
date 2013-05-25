@@ -1156,6 +1156,9 @@ isPowerOf2 (unsigned long val)
 static void
 miscOpt (eBBlock ** ebbs, int count)
 {
+/* Borut: disabled optimization of comparision unsigned with 2^n literal
+ * since it is broken; see bug #2165 Broken comparison */
+#if 0
   int i;
 
   /* for all blocks do */
@@ -1192,7 +1195,7 @@ miscOpt (eBBlock ** ebbs, int count)
                   unsigned litVal = ulFromVal (OP_VALUE (IC_RIGHT (ic)));
 
                   /* Only if the literal value is greater than 255 and a power of 2 */
-                  if (!TARGET_IS_STM8 && litVal >= 255 && /* Bug #2165 is so bad, I really don't want to see it on stm8. */
+                  if (litVal >= 255 &&
                     (isPowerOf2 (litVal) && (ic->op == '<' || ic->op == GE_OP) ||
                     isPowerOf2 (litVal + 1) && (ic->op == '>' || ic->op == LE_OP)))
                     {
@@ -1239,6 +1242,7 @@ miscOpt (eBBlock ** ebbs, int count)
             } /* switch */
         } /* for */
     } /* for */
+#endif
 }
 
 /*-----------------------------------------------------------------*/

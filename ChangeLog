@@ -1,3 +1,8 @@
+2013-05-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  More efficient zeroing by pointer, more efficient unsigned cast, allow offset in pointer read, preparations for more efficient pointer access.
+
 2013-05-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

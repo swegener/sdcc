@@ -1210,6 +1210,24 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
         size--;
       }
 
+  // Use clrw to clear upper half of 16-bit register.
+  if (n == 1 && sizex == 2 &&
+    aopInReg (result, roffset + n, XH_IDX) && aopInReg (result, roffset, XL_IDX) &&
+    source->regs[XL_IDX] < 0 && source->regs[XH_IDX] < 0)
+    {
+      emitcode ("clrw", "x");
+      cost (1, 1);
+      assigned[1] = TRUE;
+    }
+  if (n == 1 && sizex == 2 &&
+    aopInReg (result, roffset + n, YH_IDX) && aopInReg (result, roffset, YL_IDX) &&
+    source->regs[YL_IDX] < 0 && source->regs[YH_IDX] < 0)
+    {
+      emitcode ("clrw", "y");
+      cost (2, 1);
+      assigned[1] = TRUE;
+    }
+
   // Move everything from registers to the stack.
   for (i = 0; i < n;)
     {
@@ -1597,10 +1615,15 @@ skip_byte:
 
   wassertl (size >= 0, "genCopy() copied more than there is to be copied.");
 
+  a_free = a_dead && (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= roffset + source->size);
+
   // Place leading zeroes.
   for (i = source->size; i < sizex - soffset; i++)
     {
+      if (assigned[i])
+        continue;
       cheapMove (result, roffset + i, ASMOP_ZERO, 0, !a_free);
+      assigned[i] = TRUE;
       if (aopInReg (result, roffset + i, A_IDX))
         a_free = FALSE;
     }
@@ -4041,8 +4064,10 @@ genPointerGet (const iCode *ic)
   wassertl (right, "GET_VALUE_AT_ADDRESS without right operand");
   wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "GET_VALUE_AT_ADDRESS with non-literal right operand");
 
-  // todo: Handle this more gracefully, save x instead of using y, when doing so is more efficient, use ldw, etc.
-  use_y = !regDead (X_IDX, ic);
+  size = result->aop->size;
+
+  // todo: Handle this more gracefully, save x instead of using y.
+  use_y = (aopInReg (left->aop, 0, Y_IDX) && size <= 1 + aopInReg (result->aop, 0, Y_IDX)) || !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX));
   if (use_y && !regDead (Y_IDX, ic))
     {
       if (!regalloc_dry_run)
@@ -4051,21 +4076,37 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 
-  if (!regDead (A_IDX, ic))
-    {
-      push (ASMOP_A, 0, 1);
-      pushed_a = TRUE;
-    }
-
-  genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, TRUE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
   // todo: What if right operand is negative?
-  offset = byteOfVal (right->aop->aopu.aop_lit, 0) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
+  offset = byteOfVal (right->aop->aopu.aop_lit, 1) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
 
   // Get all the bytes. todo: Get the byte in a last (if not a bit-field), so we do not need to save a.
-  size = result->aop->size;
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {
+#if 0 // Results in some regression failures. Enable once these are sorted out.
+      if (!bit_field && i + 2 == size && !aopInReg (result->aop, i, A_IDX) && !aopInReg (result->aop, i + 1, A_IDX) &&
+        (result->aop->regs[use_y ? YL_IDX : XL_IDX] < 0 || result->aop->regs[use_y ? YL_IDX : XL_IDX] >= i) && (result->aop->regs[use_y ? YH_IDX : XH_IDX] < 0 || result->aop->regs[use_y ? YH_IDX : XH_IDX] >= i) && regDead (use_y ? Y_IDX : X_IDX, ic))
+        {
+          if (!(size - 2 - i))
+            emitcode ("ldw", use_y ? "y, (y)" : "x, (x)");
+          else
+            emitcode ("ldw", use_y ? "y, (0x%x, y)" : "x, (0x%x, x)", size - 2 - i);
+          cost (1 + use_y + ((size - 2 - i) > 0) + ((size - 2 - i) > 256), 2);
+
+          genMove_o (result->aop, i, use_y ? ASMOP_Y : ASMOP_X, 0, 2, regDead (A_IDX, ic) && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= i) || pushed_a, TRUE, FALSE);
+
+          i++, blen -= 8;
+          continue;
+        }
+#endif
+
+      if (!pushed_a && (!regDead (A_IDX, ic) || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < i))
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = TRUE;
+        }
+
       if (!((bit_field ? i : size - 1 - i) + offset))
         {
           emitcode ("ld", use_y ? "a, (y)" : "a, (x)");
@@ -4101,13 +4142,7 @@ genPointerGet (const iCode *ic)
       if (result->aop->type == AOP_DUMMY)
         continue;
 
-      else if ((!bit_field ? i < size - 1 : blen > 8) && aopInReg (result->aop, i, A_IDX))
-        {
-          push (ASMOP_A, 0, 1);
-          pushed_a = TRUE;
-        }
-      else
-        cheapMove (result->aop, i, ASMOP_A, 0, FALSE);
+      cheapMove (result->aop, i, ASMOP_A, 0, FALSE);
 
       if (i < size - 1 && (use_y ? aopInReg (result->aop, i, YL_IDX) || aopInReg (result->aop, i, YH_IDX) : aopInReg (result->aop, i, XL_IDX) || aopInReg (result->aop, i, XH_IDX)))
         {
@@ -4200,9 +4235,10 @@ genPointerSet (iCode * ic)
 
   size = right->aop->size;
 
-  // todo: Handle this more gracefully, save x instead of using y, when doing so is more efficient, use ldw, etc.
-  use_y = !regDead (X_IDX, ic);
-  if (use_y && !regDead (Y_IDX, ic))
+  // todo: Handle this more gracefully, save x instead of using y, when doing so is more efficient.
+  use_y = (aopInReg (result->aop, 0, Y_IDX) && size <= 1 + aopInReg (right->aop, 0, X_IDX)) || !(regDead (X_IDX, ic) || aopInReg (result->aop, 0, X_IDX)) || right->aop->regs[XL_IDX] >= 0 || right->aop->regs[XH_IDX] >= 0;
+
+  if (use_y && (!(regDead (Y_IDX, ic) || aopInReg (result->aop, 0, Y_IDX)) || right->aop->regs[YL_IDX] >= 0 || right->aop->regs[YH_IDX] >= 0))
     {
       if (!regalloc_dry_run)
         wassertl (0, "No free reg for pointer.");
@@ -4210,24 +4246,43 @@ genPointerSet (iCode * ic)
       goto release;
     }
 
-  for(i = 1; i < size; i++)
-    if (aopInReg (right->aop, i, A_IDX))
-      {
-        push (ASMOP_A, 0, 1);
-        pushed_a = 1;
-        break;
-      }
-
-  if (!regDead (A_IDX, ic) && !pushed_a)
-    {
-      push (ASMOP_A, 0, 1);
-      pushed_a = TRUE;
-    }
-
   genMove (use_y ? ASMOP_Y : ASMOP_X, result->aop, !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {
+      if (!bit_field && right->aop->type == AOP_LIT && !byteOfVal (right->aop->aopu.aop_lit, i))
+        {
+          if (!(size - 1 - i))
+            emitcode ("clr", use_y ? "(y)" : "(x)");
+          else
+            emitcode ("clr", use_y ? "(0x%x, y)" : "(0x%x, x)", size - 1 - i);
+          cost (1 + use_y + ((size - 1 - i) > 0) + ((size - 1 - i) > 256) + (!use_y && ((size - 1 - i) > 256)), 2);
+
+          continue;
+        }
+#if 0 // ldw (y), x etc are broken in the simulator.
+      if (!bit_field && i + 1 < size && !aopInReg (right->aop, i, A_IDX) && !aopInReg (right->aop, i + 1, A_IDX) &&
+        (aopInReg(right->aop, i, use_y ? X_IDX : Y_IDX) || regDead (use_y ? X_IDX : Y_IDX, ic) && right->aop->regs[use_y ? XL_IDX : YL_IDX] <= i + 1 && right->aop->regs[use_y ? XH_IDX : YH_IDX] <= i + 1))
+        {
+          genMove_o (use_y ? ASMOP_X : ASMOP_Y, 0, right->aop, i, 2, FALSE, FALSE, FALSE);
+
+          if (!(size - 2 - i))
+            emitcode ("ldw", use_y ? "(y), x" : "(x), y");
+          else
+            emitcode ("ldw", use_y ? "(0x%x, y), x" : "(0x%x, x), y", size - 2 - i);
+          cost (1 + use_y + ((size - 2 - i) > 0) + ((size - 2 - i) > 256), 2);
+
+          i++, blen -= 8;
+          continue;
+        }
+#endif
+      // todo: handle byte in a first, if dead, so we do not need to save it.
+      if ((!regDead (A_IDX, ic) && !(aopInReg (right->aop, i, A_IDX) && !bit_field) || right->aop->regs[A_IDX] > i) && !pushed_a)
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = TRUE;
+        }
+
       if (use_y ? aopInReg (right->aop, i, YL_IDX) || aopInReg (right->aop, i, YH_IDX) : aopInReg (right->aop, i, XL_IDX) || aopInReg (right->aop, i, XH_IDX))
         {
           if (!regalloc_dry_run)
@@ -4235,7 +4290,7 @@ genPointerSet (iCode * ic)
           cost (80, 80);
         }
 
-      if (i && aopInReg (right->aop, i, A_IDX))
+      if (pushed_a && aopInReg (right->aop, i, A_IDX))
         {
           emitcode ("ld", "a, (1, sp)");
           cost (2, 1);
@@ -4594,59 +4649,41 @@ genCast (const iCode *ic)
       else if (pushed_a)
         adjustStack (1);
     }
-  else
+  else if (IS_BOOL (rtype) || !IS_SPEC (rtype) || SPEC_USIGN (rtype)) // Cast to unsigned type
+    genMove_o (result->aop, 0, right->aop, 0, result->aop->size, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  else // Cast to signed type
     {
-      bool result_in_a = FALSE;
-      bool result_in_x = FALSE;
-      bool result_in_y = FALSE;
-      int i;
-
       genMove_o (result->aop, 0, right->aop, 0, right->aop->size, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
-      for (i = 0; i < right->aop->size; i++)
-        if (aopInReg (result->aop, i, A_IDX))
-          result_in_a = TRUE;
-        else if (aopInReg (result->aop, i, XL_IDX) || aopInReg (result->aop, i, XH_IDX))
-          result_in_x = TRUE;
-        else if (aopInReg (result->aop, i, YL_IDX) || aopInReg (result->aop, i, YH_IDX))
-          result_in_y = TRUE;
-
-      /* now depending on the sign of the destination */
       size = result->aop->size - right->aop->size;
       offset = right->aop->size;
 
-      /* Unsigned or not an integral type - fill with zeros */
-      if (IS_BOOL (rtype) || !IS_SPEC (rtype) || SPEC_USIGN (rtype))
-        genMove_o (result->aop, offset, ASMOP_ZERO, 0, size, regDead (A_IDX, ic) && !result_in_a, regDead (X_IDX, ic) && !result_in_x, regDead (Y_IDX, ic) && !result_in_y);
-      else
-        {
-          bool pushed_a = FALSE;
+      bool pushed_a = FALSE;
 
-          if (result_in_a || !regDead (A_IDX, ic))
+      if (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < right->aop->size || !regDead (A_IDX, ic))
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = TRUE;
+        }
+
+      cheapMove (ASMOP_A, 0, result->aop, right->aop->size - 1, FALSE);
+      emit3 (A_RLC, ASMOP_A, 0);
+      emit3 (A_CLR, ASMOP_A, 0);
+      emit3 (A_SBC, ASMOP_A, ASMOP_ZERO);
+      while (size--)
+        {
+          if (size && aopInReg (result->aop, offset, A_IDX))
             {
               push (ASMOP_A, 0, 1);
               pushed_a = TRUE;
             }
-
-          cheapMove (ASMOP_A, 0, result->aop, right->aop->size - 1, FALSE);
-          emit3 (A_RLC, ASMOP_A, 0);
-          emit3 (A_CLR, ASMOP_A, 0);
-          emit3 (A_SBC, ASMOP_A, ASMOP_ZERO);
-          while (size--)
-            {
-              if (size && aopInReg (result->aop, offset, A_IDX))
-                {
-                  push (ASMOP_A, 0, 1);
-                  pushed_a = TRUE;
-                }
-              else
-                cheapMove (result->aop, offset, ASMOP_A, 0, FALSE);
-              offset++;
-            }
-
-          if (pushed_a)
-            pop (ASMOP_A, 0, 1);
+          else
+            cheapMove (result->aop, offset, ASMOP_A, 0, FALSE);
+          offset++;
         }
+
+      if (pushed_a)
+        pop (ASMOP_A, 0, 1);
     }
 
   freeAsmop (right);

@@ -1,7 +1,13 @@
 2013-05-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  More efficient zeroing by pointer, more efficient unsigned cast, allow offset in pointer read, preparations for more efficient pointer access.
+	  More efficient zeroing by pointer, more efficient unsigned cast, preparations for more efficient pointer access.
+	* src/SDCCopt.c:
+	  Allow offset in pointer read.
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix handling of N and Z flag in ldw.
+	* src/stm8/main.c:
+	  More efficient initialization.
 
 2013-05-25 Philipp Klaus Krause <pkk AT spth.de>
 

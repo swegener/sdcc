@@ -767,10 +767,11 @@ cl_stm8::inst_ldxy(t_mem code, unsigned char prefix)
      default:  return(resHALT);
   }
 
-//  FLAG_ASSIGN (BIT_Z, (result & 0xff) == 0);
-//  FLAG_ASSIGN (BIT_C, 0x100 & result);
-//  FLAG_ASSIGN (BIT_N, 0x80 & result);
-//  FLAG_ASSIGN (BIT_H, 0x10 & (operand1 ^ operand2 ^ result));
+  if ((code & 0xf0) != 0x90)
+    {
+      FLAG_ASSIGN (BIT_Z, !operand);
+      FLAG_ASSIGN (BIT_N, 0x8000 & operand);
+    }
 
   *dest_ptr = operand;
    

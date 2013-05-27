@@ -4086,8 +4086,7 @@ genPointerGet (const iCode *ic)
     {
       int o = (bit_field ? i : size - 1 - i) + offset;
 
-      // Removing the use_y condition shouldn't do anything bad, but it makes two regression tests fail. todo: Check what goes wrong, fix it, and remove the condition.
-      if (use_y && !bit_field && i + 2 == size && !aopInReg (result->aop, i, A_IDX) && !aopInReg (result->aop, i + 1, A_IDX) &&
+      if (!bit_field && i + 2 == size && !aopInReg (result->aop, i, A_IDX) && !aopInReg (result->aop, i + 1, A_IDX) &&
         (result->aop->regs[use_y ? YL_IDX : XL_IDX] < 0 || result->aop->regs[use_y ? YL_IDX : XL_IDX] >= i) && (result->aop->regs[use_y ? YH_IDX : XH_IDX] < 0 || result->aop->regs[use_y ? YH_IDX : XH_IDX] >= i) && regDead (use_y ? Y_IDX : X_IDX, ic))
         {
           o--;
@@ -4262,7 +4261,7 @@ genPointerSet (iCode * ic)
 
           continue;
         }
-#if 0 // ldw (y), x etc are broken in the simulator.
+
       if (!bit_field && i + 1 < size && !aopInReg (right->aop, i, A_IDX) && !aopInReg (right->aop, i + 1, A_IDX) &&
         (aopInReg(right->aop, i, use_y ? X_IDX : Y_IDX) || regDead (use_y ? X_IDX : Y_IDX, ic) && right->aop->regs[use_y ? XL_IDX : YL_IDX] <= i + 1 && right->aop->regs[use_y ? XH_IDX : YH_IDX] <= i + 1))
         {
@@ -4277,7 +4276,7 @@ genPointerSet (iCode * ic)
           i++, blen -= 8;
           continue;
         }
-#endif
+
       // todo: handle byte in a first, if dead, so we do not need to save it.
       if ((!regDead (A_IDX, ic) && !(aopInReg (right->aop, i, A_IDX) && !bit_field) || right->aop->regs[A_IDX] > i) && !pushed_a)
         {

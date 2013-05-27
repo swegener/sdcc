@@ -1,9 +1,11 @@
 2013-05-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  More efficient pointer read.
+	  More efficient pointer access.
 	* sim/ucsim/stm8.src/inst.cc:
 	  Fix ldw pointer write (bug #2174).
+	* support/regression/tests/gcc-torture-execute-pr47538.c:
+	  Disable volatile test affected by bug #2171.
 
 2013-05-26 Philipp Klaus Krause <pkk AT spth.de>
 

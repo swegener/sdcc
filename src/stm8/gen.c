@@ -4068,7 +4068,7 @@ genPointerGet (const iCode *ic)
 
   // todo: Handle this more gracefully, save x instead of using y.
   use_y = (aopInReg (left->aop, 0, Y_IDX) && size <= 1 + aopInReg (result->aop, 0, Y_IDX)) || !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX));
-  if (use_y && !regDead (Y_IDX, ic))
+  if (use_y ? !(regDead (Y_IDX, ic) || aopInReg (left->aop, 0, Y_IDX)) : !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX)))
     {
       if (!regalloc_dry_run)
         wassertl (0, "No free reg for pointer.");
@@ -4084,22 +4084,24 @@ genPointerGet (const iCode *ic)
   // Get all the bytes. todo: Get the byte in a last (if not a bit-field), so we do not need to save a.
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {
-#if 0 // Results in some regression failures. Enable once these are sorted out.
-      if (!bit_field && i + 2 == size && !aopInReg (result->aop, i, A_IDX) && !aopInReg (result->aop, i + 1, A_IDX) &&
+      int o = (bit_field ? i : size - 1 - i) + offset;
+
+      // Removing the use_y condition shouldn't do anything bad, but it makes two regression tests fail. todo: Check what goes wrong, fix it, and remove the condition.
+      if (use_y && !bit_field && i + 2 == size && !aopInReg (result->aop, i, A_IDX) && !aopInReg (result->aop, i + 1, A_IDX) &&
         (result->aop->regs[use_y ? YL_IDX : XL_IDX] < 0 || result->aop->regs[use_y ? YL_IDX : XL_IDX] >= i) && (result->aop->regs[use_y ? YH_IDX : XH_IDX] < 0 || result->aop->regs[use_y ? YH_IDX : XH_IDX] >= i) && regDead (use_y ? Y_IDX : X_IDX, ic))
         {
-          if (!(size - 2 - i))
+          o--;
+          if (!o)
             emitcode ("ldw", use_y ? "y, (y)" : "x, (x)");
           else
-            emitcode ("ldw", use_y ? "y, (0x%x, y)" : "x, (0x%x, x)", size - 2 - i);
-          cost (1 + use_y + ((size - 2 - i) > 0) + ((size - 2 - i) > 256), 2);
+            emitcode ("ldw", use_y ? "y, (0x%x, y)" : "x, (0x%x, x)", o);
+          cost (1 + use_y + (o > 0) + (o > 256), 2);
 
-          genMove_o (result->aop, i, use_y ? ASMOP_Y : ASMOP_X, 0, 2, regDead (A_IDX, ic) && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= i) || pushed_a, TRUE, FALSE);
+          genMove_o (result->aop, i, use_y ? ASMOP_Y : ASMOP_X, 0, 2, regDead (A_IDX, ic) && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= i) || pushed_a, FALSE, FALSE); // todo: Allow more.
 
           i++, blen -= 8;
           continue;
         }
-#endif
 
       if (!pushed_a && (!regDead (A_IDX, ic) || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < i))
         {
@@ -4107,15 +4109,15 @@ genPointerGet (const iCode *ic)
           pushed_a = TRUE;
         }
 
-      if (!((bit_field ? i : size - 1 - i) + offset))
+      if (!o)
         {
           emitcode ("ld", use_y ? "a, (y)" : "a, (x)");
           cost (1 + use_y, 1);
         }
       else
         {
-          emitcode ("ld", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", (bit_field ? i : size - 1 - i) + offset);
-          cost ((size - 1 - i + offset < 256 ? 2 : 3) + use_y, 1);
+          emitcode ("ld", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", o);
+          cost ((o < 256 ? 2 : 3) + use_y, 1);
         }
 
       if (bit_field && blen < 8 && !i) // The only byte might need shifting.

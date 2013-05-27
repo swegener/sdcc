@@ -32,6 +32,10 @@ extern "C"
 };
 
 #define REG_A 0
+#define REG_XL 1
+#define REG_XH 2
+#define REG_YL 3
+#define REG_YH 4
 #define REG_C 5
 
 template <class I_t>
@@ -308,11 +312,27 @@ static void get_best_local_assignment_biased(assignment &a, typename boost::grap
     a.local.insert(*vi);
 }
 
-// This is just a dummy for now.
+// Suggest to honor register keyword and to not reverse bytes and prefer use of a.
 template <class G_t, class I_t>
 static float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
-  return(0.0f);
+  const i_assignment_t &ia = a.i_assignment;
+  float c = 0.0f;
+
+  if(ia.registers[REG_A][1] < 0)
+    c += 0.1f;
+
+  varset_t::const_iterator v, v_end;
+  for(v = a.local.begin(), v_end = a.local.end(); v != v_end; ++v)
+    {
+      const symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
+      if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // When in doubt, try to honour register keyword.
+        c += 4.0f;
+      if((I[*v].byte % 2) ^ (a.global[*v] == REG_XH || a.global[*v] == REG_XH)) // Try not to reverse bytes.
+        c += 0.2f;
+    }
+
+  return(c);
 }
 
 // Code for another ic is generated when generating this one. Mark the other as generated.

@@ -1337,7 +1337,6 @@ template <class G_t, class I_t>
 static float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   const i_assignment_t &ia = a.i_assignment;
-    
   float c = 0.0f;
 
   c += weird_byte_order(a, I);
@@ -1376,9 +1375,8 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
   for(v = a.local.begin(), v_end = a.local.end(); v != v_end; ++v)
     {
       const symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
-      if(IS_REGISTER(sym->type)) // When in doubt, try to honour register keyword.
-        c += 4.0f;
-      c -= *v * 0.01f;
+      if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // When in doubt, try to honour register keyword.
+        c += 8.0f;
     }
 
   c -= a.local.size() * 0.2f;

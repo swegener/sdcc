@@ -1683,30 +1683,48 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           emit3_o (A_CLR, result, roffset + i, 0, 0);
           i++;
         }
-      else if (i + 1 < size && aopInReg (result, roffset + i, X_IDX) && (source->type == AOP_LIT || aopOnStack (source, soffset + i, 2) || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
+      else if (i + 1 < size && aopInReg (result, roffset + i, X_IDX) &&
+        (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           emitcode ("ldw", "x, %s", aopGet2 (source, soffset + i));
           cost (3, 2);
           i += 2;
         }
-      else if (i + 1 < size && aopInReg (result, roffset + i, Y_IDX) && (source->type == AOP_LIT || aopOnStack (source, soffset + i, 2) || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
+      else if (i + 1 < size && aopInReg (result, roffset + i, Y_IDX) &&
+        (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           emitcode ("ldw", "y, %s", aopGet2 (source, soffset + i));
           cost (4, 2);
           i += 2;
         }
-      else if (i + 1 < size && (aopOnStack (result, roffset + i, 2) || result->type == AOP_DIR) && aopInReg (source, soffset + i, X_IDX))
+      else if (i + 1 < size && result->type == AOP_DIR && aopInReg (source, soffset + i, X_IDX))
         {
           emitcode ("ldw", "%s, x", aopGet2 (result, roffset + i));
           cost (3, 2);
           i += 2;
         }
-      else if (i + 1 < size && (aopOnStack (result, roffset + i, 2) || result->type == AOP_DIR) && aopInReg (source, soffset + i, Y_IDX))
+      else if (i + 1 < size && result->type == AOP_DIR && aopInReg (source, soffset + i, Y_IDX))
         {
           emitcode ("ldw", "%s, y", aopGet2 (result, roffset + i));
           cost (4, 2);
           i += 2;
         }
+      /*else if (x_dead && result->regs[XL_IDX] < 0 && result->regs[XH_IDX] < 0 && aopOnStack (result, roffset + i, 2) &&
+        (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
+        {
+          emitcode ("ldw", "x, %s", aopGet2 (source, soffset + i));
+          emitcode ("ldw", "%s, x", aopGet2 (result, roffset + i));
+          cost (5, 4);
+          i += 2;
+        }
+      else if (y_dead && result->regs[YL_IDX] < 0 && result->regs[YH_IDX] < 0 && aopOnStack (result, roffset + i, 2) &&
+        (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
+        {
+          emitcode ("ldw", "y, %s", aopGet2 (source, soffset + i));
+          emitcode ("ldw", "%s, y", aopGet2 (result, roffset + i));
+          cost (6, 4);
+          i += 2;
+        }*/
       else
         {
           cheapMove (result, roffset + i, source, soffset + i, !(a_dead && (result->regs[A_IDX] >= i || result->regs[A_IDX] == -1) && source->regs[A_IDX] <= i));
@@ -3767,7 +3785,7 @@ genLeftShift (const iCode *ic)
   aopOp (result, ic);
   aopOp (left, ic);
 
-  genMove (result->aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  genMove (result->aop, left->aop, regDead (A_IDX, ic) && right->aop->regs[A_IDX], regDead (X_IDX, ic) && right->aop->regs[XL_IDX] && right->aop->regs[XH_IDX],  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] && right->aop->regs[YH_IDX]);
 
   size = result->aop->size;
 
@@ -3952,7 +3970,7 @@ genRightShift (const iCode *ic)
   aopOp (result, ic);
   aopOp (left, ic);
 
-  genMove (result->aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  genMove (result->aop, left->aop, regDead (A_IDX, ic) && right->aop->regs[A_IDX], regDead (X_IDX, ic) && right->aop->regs[XL_IDX] && right->aop->regs[XH_IDX],  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] && right->aop->regs[YH_IDX]);
 
   size = result->aop->size;
 

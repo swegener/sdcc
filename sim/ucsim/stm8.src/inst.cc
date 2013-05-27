@@ -798,16 +798,17 @@ cl_stm8::inst_ldxydst(t_mem code, unsigned char prefix)
 {
   /* ldw dst, REG */
   unsigned int opaddr, operand;
-  operand = prefix == 0x90 ? regs.Y : regs.X;
+  bool inv = (code == 0xdf || code == 0xef || code == 0xff);
+  operand = ((prefix == 0x90) ^ inv) ? regs.Y : regs.X;
   if(code == 0x17) operand = regs.Y;
 
   switch((code & 0xf0) >> 4) {
     case 0x1: opaddr = regs.SP + fetch(); break;
     case 0xb: opaddr = fetch(); break;
     case 0xc: opaddr = fetch2(); break;
-    case 0xf: opaddr = regs.X; break;
-    case 0xe: opaddr = regs.X + fetch(); break;
-    case 0xd: opaddr = regs.X + fetch2(); break;
+    case 0xf: opaddr = (prefix == 0x90) ? regs.Y : regs.X; break;
+    case 0xe: opaddr = ((prefix == 0x90) ? regs.Y : regs.X) + fetch(); break;
+    case 0xd: opaddr = ((prefix == 0x90) ? regs.Y : regs.X)+ fetch2(); break;
     default: return(resHALT);
   }
 

@@ -2,6 +2,8 @@
 
 	* src/stm8/gen.c:
 	  More efficient pointer read.
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix ldw pointer write (bug #2174).
 
 2013-05-26 Philipp Klaus Krause <pkk AT spth.de>
 

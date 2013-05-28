@@ -49,7 +49,7 @@ typedef struct asmop_byte
   union
   {
     reg_info *reg;    /* Register this byte is in. */
-    unsigned int stk; /* Stack offset for this byte. */
+    int stk; /* Stack offset for this byte. */
   } byteu;
 } asmop_byte;
 
@@ -74,7 +74,8 @@ void genSTM8Code (iCode *);
 void stm8_emitDebuggerSymbol (const char *);
 
 extern bool stm8_assignment_optimal;
-extern long stm8_stack_size;
+extern long int stm8_call_stack_size;
+extern bool stm8_extend_stack;
 
 #endif
 

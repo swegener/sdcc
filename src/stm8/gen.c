@@ -35,6 +35,7 @@ static struct
   struct
     {
       int pushed;
+      int size;
     } stack;
   bool saved;
 }
@@ -258,17 +259,17 @@ aopGet(const asmop *aop, int offset)
 
       if (soffset > 255)
         {
-          unsigned int eoffset = aop->aopu.bytes[offset].byteu.stk + stm8_stack_size - 256;
-          if (!regalloc_dry_run && stm8_stack_size <= 255)
-            {
-              fprintf (stderr, "stm8_stack_size %ld.\n", stm8_stack_size);
-              wassertl (0, "Extended stack access, but y not prepared for extended stack access.");
-            }
-          wassertl (eoffset <= 0xffff, "Unimplemented stack access beyond extended stack."); // Stack > 64K, probably not even possible on the hardware.
-          snprintf (buffer, 256, "(0x%x, y)", eoffset);
+          long int eoffset = (long int)(aop->aopu.bytes[offset].byteu.stk) + _G.stack.size - 256l;
+          if (!regalloc_dry_run && _G.stack.size <= 255)
+            wassertl (0, "Extended stack access, but y not prepared for extended stack access.");
+
+          if (!regalloc_dry_run && (eoffset < 0l || eoffset > 0xffffl))
+            wassertl (0, "Unimplemented stack access out of extended stack range."); // Stack > 64K, probably not even possible on the hardware.
+
+          snprintf (buffer, 256, "(0x%x, y)", (unsigned)eoffset);
         }
       else
-        snprintf (buffer, 256, "(0x%02x, sp)", soffset);
+        snprintf (buffer, 256, "(0x%02x, sp)", (unsigned)soffset);
       return (buffer);
     }
 
@@ -699,7 +700,7 @@ regDead (int idx, const iCode *ic)
   if (idx == Y_IDX)
     return (regDead (YL_IDX, ic) && regDead (YH_IDX, ic));
 
-  if ((idx == YL_IDX || idx == YH_IDX) && stm8_stack_size > 255)
+  if ((idx == YL_IDX || idx == YH_IDX) && stm8_extend_stack)
     return FALSE;
 
   return (!bitVectBitValue (ic->rSurv, idx));
@@ -852,7 +853,11 @@ aopOp (operand *op, const iCode *ic)
             if (!regalloc_dry_run)
               {
                 aop->aopu.bytes[i].byteu.stk = sym->usl.spillLoc->stack + aop->size - i;
-                wassertl (sym->usl.spillLoc->stack + i < 200, "Unimplemented EXSTK.");
+                if (sym->usl.spillLoc->stack + aop->size - i <= -_G.stack.pushed)
+                  {
+                    fprintf (stderr, "%d %d %d %d", (int)(sym->usl.spillLoc->stack), (int)(aop->size), (int)(i), (int)(_G.stack.pushed));
+                    wassertl (0, "Invalid stack offset.");
+                  }
               }
           }
         else // Dummy iTemp.
@@ -2243,6 +2248,8 @@ emitCall (const iCode *ic, bool ispcall)
     {
       aopOp (IC_RESULT (ic), ic);
 
+      wassertl (!stm8_extend_stack || getSize (ftype->next) <= 2, "Unimplemented call to function with long return value in extended stack function.");
+
       wassert (getSize (ftype->next) == 1 || getSize (ftype->next) == 2 || getSize (ftype->next) == 4);
 
       genMove (IC_RESULT (ic)->aop, getSize (ftype->next) == 1 ? ASMOP_A : (getSize (ftype->next) == 2 ? ASMOP_X : ASMOP_XY), TRUE, TRUE, TRUE);
@@ -2370,11 +2377,12 @@ genFunction (iCode *ic)
   if (IFFUNC_ISCRITICAL (ftype))
       genCritical (NULL);
 
-  if (stm8_stack_size > 255) // Setup for extended stack access.
+  if (stm8_extend_stack) // Setup for extended stack access.
     {
+      _G.stack.size = stm8_call_stack_size + (sym->stack ? sym->stack : 0);
       D (emitcode(";", "Setup y for extended stack access."));
       emitcode("ldw", "y, sp");
-      emitcode("subw", "y, #%ld", stm8_stack_size - 256);
+      emitcode("subw", "y, #%ld", _G.stack.size - 256);
       cost (6, 3);
     }
 
@@ -2465,7 +2473,7 @@ genReturn (const iCode *ic)
       genMove (ASMOP_X, left->aop, TRUE, TRUE, TRUE);
       break;
     case 4:
-      wassertl (regalloc_dry_run || stm8_stack_size <= 255, "Unimplemented long return in function with extended stack access.");
+      wassertl (regalloc_dry_run || !stm8_extend_stack, "Unimplemented long return in function with extended stack access.");
       genMove (ASMOP_XY, left->aop, TRUE, TRUE, TRUE);
       break;
     default:
@@ -4543,6 +4551,7 @@ genAddrOf (const iCode *ic)
         }
       else
         {
+          wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 > 0);
           emitcode ("ldw", "y, sp");
           emitcode ("addw", "y, #%d", sym->stack + _G.stack.pushed + 1);
           cost (6, 3);
@@ -4559,7 +4568,8 @@ genAddrOf (const iCode *ic)
         }
       else
         {
-          emitcode ("ldw", "x, sp");
+          wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 > 0);
+          emitcode ("ldw", "x, sp");  
           emitcode ("addw", "x, #%d", sym->stack + _G.stack.pushed + 1);
           cost (4, 3);
         }

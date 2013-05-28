@@ -270,7 +270,7 @@ serialRegMark (eBBlock ** ebbs, int count)
   int i;
   short int max_alloc_bytes = SHRT_MAX; // Byte limit. Set this to a low value to pass only few variables to the register allocator. This can be useful for debugging.
 
-  stm8_stack_size = 0;
+  stm8_call_stack_size = 0;
 
   /* for all blocks */
   for (i = 0; i < count; i++)
@@ -283,8 +283,8 @@ serialRegMark (eBBlock ** ebbs, int count)
       /* for all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == CALL || ic->op == PCALL) && ic->parmBytes > stm8_stack_size)
-            stm8_stack_size = ic->parmBytes;
+          if ((ic->op == CALL || ic->op == PCALL) && ic->parmBytes > stm8_call_stack_size)
+            stm8_call_stack_size = ic->parmBytes;
 
           if (ic->op == IPOP)
             wassert (0);
@@ -305,11 +305,15 @@ serialRegMark (eBBlock ** ebbs, int count)
 
               D (D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
 
+              if (sym->isspilt && sym->usl.spillLoc && sym->for_newralloc && !sym->remat) // todo: Remove once remat is supported!
+                {
+                  sym->usl.spillLoc->allocreq--;
+                  sym->isspilt = FALSE;
+                }
+
               /* Make sure any spill location is definately allocated */
               if (sym->isspilt && !sym->remat && sym->usl.spillLoc && !sym->usl.spillLoc->allocreq)
-                {
-                  sym->usl.spillLoc->allocreq++;
-                }
+                sym->usl.spillLoc->allocreq++;
 
               /* if it does not need or is spilt
                  or is already marked for the new allocator
@@ -334,12 +338,6 @@ serialRegMark (eBBlock ** ebbs, int count)
             }
         }
     }
-
-  if (currFunc)
-    {
-      stm8_stack_size += currFunc->stack;
-      ;
-    }
 }
 
 /*------------------------------------------------------------------*/
@@ -361,6 +359,10 @@ verifyRegsAssigned (operand * op, iCode * ic)
     return;
 
   sym = OP_SYMBOL (op);
+
+  if (sym->isspilt && !sym->remat && sym->usl.spillLoc && !sym->usl.spillLoc->allocreq)
+    sym->usl.spillLoc->allocreq++;
+
   if (sym->isspilt)
     return;
 
@@ -440,21 +442,46 @@ stm8_assignRegisters (ebbIndex * ebbi)
   /* Mark variables for assignment by the new allocator */
   serialRegMark (ebbs, count);
 
+  stm8_extend_stack = stm8_call_stack_size > 255;
+
   /* Invoke optimal register allocator */
   ic = stm8_ralloc2_cc (ebbi);
 
   /* Get spilllocs for all variables that have not been placed completly in regs */
   RegFix (ebbs, count);
 
+  /* redo the offsets for stacked automatic variables */
+  if (currFunc)
+    {
+      long b = currFunc->stack;
+
+      redoStackOffsets ();
+
+      /* Try again, using an extended stack this time. */
+      if (!stm8_extend_stack && currFunc->stack + stm8_call_stack_size > 255)
+        {
+          currFunc->stack = b;
+
+          /* Mark variables for assignment by the new allocator */
+          serialRegMark (ebbs, count);
+
+          stm8_extend_stack = TRUE;
+
+          /* Invoke optimal register allocator */
+          ic = stm8_ralloc2_cc (ebbi);
+
+          /* Get spilllocs for all variables that have not been placed completly in regs */
+          RegFix (ebbs, count);
+
+          redoStackOffsets ();
+        }
+    }
+
   if (options.dump_rassgn)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);
     }
-
-  /* redo the offsets for stacked automatic variables */
-  if (currFunc)
-    redoStackOffsets ();
 
   genSTM8Code (ic);
 }

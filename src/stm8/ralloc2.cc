@@ -29,7 +29,8 @@ extern "C"
   #include "gen.h"
   unsigned int drySTM8iCode (iCode *ic);
   bool stm8_assignment_optimal;
-  long stm8_stack_size;
+  long int stm8_call_stack_size;
+  bool stm8_extend_stack;
 };
 
 #define REG_A 0
@@ -138,10 +139,13 @@ static bool Yinst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   const i_assignment_t &ia = a.i_assignment;
 
+  if(!stm8_extend_stack)
+    return(true);   // Only an extended stack can make Y unavailable.
+
   if(ia.registers[REG_YL][1] < 0 && ia.registers[REG_YH][1] < 0)
     return(true);	// Register Y not in use.
 
-  return(stm8_stack_size <= 255); // Y is used as stack / frame pointer for extended stack access.
+  return(false);
 }
 
 template <class G_t, class I_t>

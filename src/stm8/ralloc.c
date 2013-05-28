@@ -270,6 +270,8 @@ serialRegMark (eBBlock ** ebbs, int count)
   int i;
   short int max_alloc_bytes = SHRT_MAX; // Byte limit. Set this to a low value to pass only few variables to the register allocator. This can be useful for debugging.
 
+  stm8_stack_size = 0;
+
   /* for all blocks */
   for (i = 0; i < count; i++)
     {
@@ -281,6 +283,9 @@ serialRegMark (eBBlock ** ebbs, int count)
       /* for all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
+          if ((ic->op == CALL || ic->op == PCALL) && ic->parmBytes > stm8_stack_size)
+            stm8_stack_size = ic->parmBytes;
+
           if (ic->op == IPOP)
             wassert (0);
 
@@ -328,6 +333,12 @@ serialRegMark (eBBlock ** ebbs, int count)
                 }
             }
         }
+    }
+
+  if (currFunc)
+    {
+      stm8_stack_size += currFunc->stack;
+      ;
     }
 }
 
@@ -443,9 +454,7 @@ stm8_assignRegisters (ebbIndex * ebbi)
 
   /* redo the offsets for stacked automatic variables */
   if (currFunc)
-    {
-      redoStackOffsets ();
-    }
+    redoStackOffsets ();
 
   genSTM8Code (ic);
 }

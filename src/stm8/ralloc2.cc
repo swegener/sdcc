@@ -29,6 +29,7 @@ extern "C"
   #include "gen.h"
   unsigned int drySTM8iCode (iCode *ic);
   bool stm8_assignment_optimal;
+  long stm8_stack_size;
 };
 
 #define REG_A 0
@@ -130,6 +131,20 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 }
 
 template <class G_t, class I_t>
+static bool Yinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+{
+  const iCode *ic = G[i].ic;
+  const operand *const left = IC_LEFT(ic);
+
+  const i_assignment_t &ia = a.i_assignment;
+
+  if(ia.registers[REG_YL][1] < 0 && ia.registers[REG_YH][1] < 0)
+    return(true);	// Register Y not in use.
+
+  return(stm8_stack_size <= 255); // Y is used as stack / frame pointer for extended stack access.
+}
+
+template <class G_t, class I_t>
 static void set_surviving_regs(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   iCode *ic = G[i].ic;
@@ -225,6 +240,9 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     }
 
   if(!Ainst_ok(a, i, G, I))
+    return(std::numeric_limits<float>::infinity());
+
+  if(!Yinst_ok(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
 
   switch(ic->op)

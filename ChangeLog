@@ -1,3 +1,16 @@
+2013-05-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc2.cc,
+	  src/stm8/ralloc.c,
+	  src/stm8/gen.h,
+	  src/stm8/gen.c,
+	  support/regression/tests/bp.c,
+	  support/regression/tests/gcc-torture-execute-20071030-1.c,
+	  support/regression/tests/gcc-torture-execute-930614-2.c,
+	  support/regression/tests/gcc-torture-execute-990513-1.c,
+	  support/regression/tests/gcc-torture-execute-pr47538.c:
+	  Basic support for extended stack on stm8.
+
 2013-05-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

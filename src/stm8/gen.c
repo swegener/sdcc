@@ -195,7 +195,7 @@ aopInReg (const asmop *aop, int offset, short rIdx)
 }
 
 /*-----------------------------------------------------------------*/
-/* aopInREg - asmop from offset on stack                           */
+/* aopOnStack - asmop from offset on stack                         */
 /*-----------------------------------------------------------------*/
 static bool
 aopOnStack (const asmop *aop, int offset, int size)
@@ -213,6 +213,15 @@ aopOnStack (const asmop *aop, int offset, int size)
       return (FALSE);
 
   return (TRUE);
+}
+
+/*-----------------------------------------------------------------*/
+/* aopOnStack - asmop from offset on stack (excl. extended stack)  */
+/*-----------------------------------------------------------------*/
+static bool
+aopOnStackNotExt (const asmop *aop, int offset, int size)
+{
+  return (aopOnStack (aop, offset, size) && aop->aopu.bytes[offset].byteu.stk + _G.stack.pushed <= 255);
 }
 
 static void
@@ -249,12 +258,17 @@ aopGet(const asmop *aop, int offset)
 
       if (soffset > 255)
         {
-          if (!regalloc_dry_run)
-            wassertl (0, "Unimplemented extended stack access.");
-          cost (80, 80);
+          unsigned int eoffset = aop->aopu.bytes[offset].byteu.stk + stm8_stack_size - 256;
+          if (!regalloc_dry_run && stm8_stack_size <= 255)
+            {
+              fprintf (stderr, "stm8_stack_size %ld.\n", stm8_stack_size);
+              wassertl (0, "Extended stack access, but y not prepared for extended stack access.");
+            }
+          wassertl (eoffset <= 0xffff, "Unimplemented stack access beyond extended stack."); // Stack > 64K, probably not even possible on the hardware.
+          snprintf (buffer, 256, "(0x%x, y)", eoffset);
         }
-
-      snprintf (buffer, 256, "(0x%02x, sp)", soffset);
+      else
+        snprintf (buffer, 256, "(0x%02x, sp)", soffset);
       return (buffer);
     }
 
@@ -684,6 +698,10 @@ regDead (int idx, const iCode *ic)
     return (regDead (XL_IDX, ic) && regDead (XH_IDX, ic));
   if (idx == Y_IDX)
     return (regDead (YL_IDX, ic) && regDead (YH_IDX, ic));
+
+  if ((idx == YL_IDX || idx == YH_IDX) && stm8_stack_size > 255)
+    return FALSE;
+
   return (!bitVectBitValue (ic->rSurv, idx));
 }
 
@@ -1116,8 +1134,14 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
 
   for (i = 0; i < n;)
     {
+      if (!aopOnStack (result, roffset + i, 1) || !aopOnStack (source, soffset + i, 1))
+        {
+          i++;
+          continue;
+        }
+
       // Same location.
-      if (!assigned[i] && !result->aopu.bytes[roffset + i].in_reg && !source->aopu.bytes[soffset + i].in_reg &&
+      if (!assigned[i] &&
         result->aopu.bytes[roffset + i].byteu.stk == source->aopu.bytes[soffset + i].byteu.stk)
         {
           wassert (*size >= 1);
@@ -1129,8 +1153,7 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
       // Could transfer two bytes at a time now.
       if (i + 1 < n &&
         !assigned[i] && !assigned[i + 1] &&
-        !result->aopu.bytes[roffset + i].in_reg && !result->aopu.bytes[roffset + i + 1].in_reg &&
-        !source->aopu.bytes[soffset + i].in_reg && !source->aopu.bytes[soffset + i + 1].in_reg)
+        aopOnStackNotExt (result, roffset + i, 2) && aopOnStackNotExt (source, soffset + i, 2))
         {
           wassert(*size >= 2);
 
@@ -1159,21 +1182,20 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
         i++;
     }
 
-  for (i = 0; i < n;)
+  for (i = 0; i < n; i++)
     {
+      if (!aopOnStack (result, roffset + i, 1) || !aopOnStack (source, soffset + i, 1))
+        continue;
+
       // Just one byte to transfer.
       if ((a_free || really_do_it_now) && !assigned[i] &&
-        (i + 1 >= n || assigned[i + 1] || really_do_it_now) &&
-        !result->aopu.bytes[roffset + i].in_reg && !source->aopu.bytes[soffset + i].in_reg)
+        (i + 1 >= n || assigned[i + 1] || really_do_it_now))
         {
           wassert(*size >= 1);
           cheapMove (result, roffset + i, source, soffset + i, !a_free);
           assigned[i] = TRUE;
           (*size)--;
-          i++;
         }
-      else
-        i++;
     }
 
   wassertl (*size >= 0, "genCopyStack() copied more than there is to be copied.");
@@ -1578,7 +1600,7 @@ skip_byte:
   // Last, move everything from stack to registers.
   for (i = 0; i < n;)
     {
-      if (i < n - 1 && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && aopOnStack (source, soffset + i, 2))
+      if (i < n - 1 && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && aopOnStackNotExt (source, soffset + i, 2))
         {
           wassert (size >= 2);
           emitcode ("ldw", aopInReg (result, roffset + i, X_IDX) ? "x, %s" : "y, %s", aopGet2 (source, soffset + i));
@@ -2339,7 +2361,6 @@ genFunction (iCode *ic)
   emitcode ("", "%s:", sym->rname);
   genLine.lineCurr->isLabel = 1;
 
-
   if (IFFUNC_ISNAKED(ftype))
   {
       emitcode(";", "naked function: no prologue.");
@@ -2348,6 +2369,14 @@ genFunction (iCode *ic)
 
   if (IFFUNC_ISCRITICAL (ftype))
       genCritical (NULL);
+
+  if (stm8_stack_size > 255) // Setup for extended stack access.
+    {
+      D (emitcode(";", "Setup y for extended stack access."));
+      emitcode("ldw", "y, sp");
+      emitcode("subw", "y, #%ld", stm8_stack_size - 256);
+      cost (6, 3);
+    }
 
   /* adjust the stack for the function */
   if (sym->stack)
@@ -2436,6 +2465,7 @@ genReturn (const iCode *ic)
       genMove (ASMOP_X, left->aop, TRUE, TRUE, TRUE);
       break;
     case 4:
+      wassertl (regalloc_dry_run || stm8_stack_size <= 255, "Unimplemented long return in function with extended stack access.");
       genMove (ASMOP_XY, left->aop, TRUE, TRUE, TRUE);
       break;
     default:
@@ -2606,7 +2636,7 @@ genPlus (const iCode *ic)
         }
       else if (!started &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
-        (right->aop->type == AOP_LIT || (right->aop->type == AOP_IMMD || aopOnStack (right->aop, i, 2)) && i + 1 < right->aop->size))
+        (right->aop->type == AOP_LIT || (right->aop->type == AOP_IMMD || aopOnStackNotExt (right->aop, i, 2)) && i + 1 < right->aop->size))
         {
           bool x = aopInReg (result->aop, i, X_IDX);
           genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2,
@@ -2643,7 +2673,7 @@ genPlus (const iCode *ic)
         regDead (X_IDX, ic) && result->aop->regs[XL_IDX] < i && result->aop->regs[XH_IDX] < i && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] < i && right->aop->regs[XH_IDX] < i && 
         (aopOnStack (result->aop, i, 2) || result->aop->type == AOP_DIR) &&
         (aopRS (left->aop) && !aopInReg(left->aop, i, A_IDX) && !aopInReg(left->aop, i + 1, A_IDX) || left->aop->type == AOP_DIR) &&
-        (aopOnStack (right->aop, i, 2) || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
+        (aopOnStackNotExt (right->aop, i, 2) || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
         {
           genMove_o (ASMOP_X, 0, left->aop, i, 2, pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, TRUE, FALSE);
           if (i == size - 2 && right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) <= 2 && !byteOfVal (right->aop->aopu.aop_lit, i + 1))

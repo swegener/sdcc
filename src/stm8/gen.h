@@ -32,8 +32,6 @@ typedef enum
   AOP_REGSTK,
   /* Is on the stack */
   AOP_STK,
-  /* Is in the extended stack pointer (IY on the Z80) */
-  AOP_EXSTK,
   /* Is an immediate value */
   AOP_IMMD,
   /* Is in direct space */
@@ -76,6 +74,7 @@ void genSTM8Code (iCode *);
 void stm8_emitDebuggerSymbol (const char *);
 
 extern bool stm8_assignment_optimal;
+extern long stm8_stack_size;
 
 #endif
 

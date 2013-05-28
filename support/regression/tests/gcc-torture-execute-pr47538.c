@@ -57,7 +57,7 @@ foo (struct S *x, const struct S *y)
 void
 testTortureExecute (void)
 {
-#if !(defined __SDCC_mcs51) && !(defined __SDCC_stm8)
+#if !(defined __SDCC_mcs51)
   struct S x, y;
   double c[4] = { 10, 20, 30, 40 }, d[4], e[4] = { 118, 118, 118, 118 };
 

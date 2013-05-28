@@ -27,7 +27,6 @@ static void foo ()
 {
 #ifndef __SDCC_gbz80
 #ifndef __SDCC_mcs51
-#ifndef __SDCC_stm8
     char a[ARRAY_SIZE]; /* Too big for mcs51 and gbz80. */
 
     a[0]=0;
@@ -35,7 +34,6 @@ static void foo ()
     a[STRLEN]=0;
     if (strlen(a) != STRLEN)
       ASSERT (0);
-#endif
 #endif
 #endif
 }

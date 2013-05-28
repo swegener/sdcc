@@ -4293,12 +4293,13 @@ genPointerSet (iCode * ic)
   size = right->aop->size;
 
   // todo: Handle this more gracefully, save x instead of using y, when doing so is more efficient.
-  use_y = (aopInReg (result->aop, 0, Y_IDX) && size <= 1 + aopInReg (right->aop, 0, X_IDX)) || !(regDead (X_IDX, ic) || aopInReg (result->aop, 0, X_IDX)) || right->aop->regs[XL_IDX] >= 0 || right->aop->regs[XH_IDX] >= 0;
+  use_y = (aopInReg (result->aop, 0, Y_IDX) && size <= 1 + aopInReg (right->aop, 0, X_IDX)) || regDead (Y_IDX, ic) && (!(regDead (X_IDX, ic) || aopInReg (result->aop, 0, X_IDX)) || right->aop->regs[XL_IDX] >= 0 || right->aop->regs[XH_IDX] >= 0);
 
-  if (use_y && (!(regDead (Y_IDX, ic) || aopInReg (result->aop, 0, Y_IDX)) || right->aop->regs[YL_IDX] >= 0 || right->aop->regs[YH_IDX] >= 0))
+  if (!(regDead (use_y ? Y_IDX : X_IDX, ic) || aopInReg (result->aop, 0, use_y ? Y_IDX : X_IDX)) || right->aop->regs[use_y ? YL_IDX : XL_IDX] >= 0 || right->aop->regs[use_y ? YH_IDX : XH_IDX] >= 0)
     {
       if (!regalloc_dry_run)
         wassertl (0, "No free reg for pointer.");
+
       cost (80, 80);
       goto release;
     }
@@ -4553,8 +4554,14 @@ genAddrOf (const iCode *ic)
         {
           wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 > 0);
           emitcode ("ldw", "y, sp");
-          emitcode ("addw", "y, #%d", sym->stack + _G.stack.pushed + 1);
-          cost (6, 3);
+          cost (2, 1);
+          if (sym->stack + _G.stack.pushed + 1 > 2)
+            {
+              emitcode ("addw", "y, #%d", sym->stack + _G.stack.pushed + 1);
+              cost (4, 2);
+            }
+          else
+            emit3w (A_INCW, ASMOP_Y, 0);
         }
       genMove (result->aop, ASMOP_Y, regDead (A_IDX, ic), FALSE, regDead (X_IDX, ic));
     }
@@ -4569,16 +4576,26 @@ genAddrOf (const iCode *ic)
       else
         {
           wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 > 0);
-          emitcode ("ldw", "x, sp");  
-          emitcode ("addw", "x, #%d", sym->stack + _G.stack.pushed + 1);
-          cost (4, 3);
+          emitcode ("ldw", "x, sp");
+          cost (1, 1);
+          if (sym->stack + _G.stack.pushed + 1 > 2)
+            {
+              emitcode ("addw", "x, #%d", sym->stack + _G.stack.pushed + 1);
+              cost (3, 2);
+            }
+          else
+            {
+              emit3w (A_INCW, ASMOP_X, 0);
+              if (sym->stack + _G.stack.pushed + 1 > 1)
+                emit3w (A_INCW, ASMOP_X, 0);
+            }
         }
       genMove (result->aop, ASMOP_X, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
     }
   else // todo: Handle case of both X and Y alive; todo: Use mov when destination is a global variable.
     {
       if (!regalloc_dry_run)
-        wassertl (0, "Unimplemented GET_VALUE_AT_ADDRESS deadness");
+        wassertl (0, "Unimplemented genAddrOf deadness");
       cost (80, 80);
     }
 

@@ -305,7 +305,7 @@ serialRegMark (eBBlock ** ebbs, int count)
 
               D (D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
 
-              if (sym->isspilt && sym->usl.spillLoc && sym->for_newralloc && !sym->remat) // todo: Remove once remat is supported!
+              if (sym->isspilt && sym->usl.spillLoc) // todo: Remove once remat is supported!
                 {
                   sym->usl.spillLoc->allocreq--;
                   sym->isspilt = FALSE;
@@ -460,6 +460,8 @@ stm8_assignRegisters (ebbIndex * ebbi)
       /* Try again, using an extended stack this time. */
       if (!stm8_extend_stack && currFunc->stack + stm8_call_stack_size > 255)
         {
+          fprintf (stderr, "Second try for %s\n", currFunc->name);
+
           currFunc->stack = b;
 
           /* Mark variables for assignment by the new allocator */

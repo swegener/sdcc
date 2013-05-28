@@ -9,8 +9,10 @@
 	  support/regression/tests/gcc-torture-execute-990513-1.c,
 	  support/regression/tests/gcc-torture-execute-pr47538.c,
 	  support/regression/tests/gcc-torture-execute-980707-1.c,
-	  support/regression/tests/bug2094505.c:
-	  Support for extended stack on stm8.
+	  support/regression/tests/bug2094505.c,
+	  support/regression/tests/gcc-torture-execute-20031012-1.c,
+	  support/regression/tests/gcc-torture-execute-20030916-1.c:
+	  Support for extended stack on stm8, more efficient ADDRESS_OF.
 
 2013-05-27 Philipp Klaus Krause <pkk AT spth.de>
 

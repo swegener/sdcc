@@ -208,9 +208,8 @@ _divsint (int x, int y)
 {
   register int r;
 
-  r = _divuint((x < 0 ? -x : x),
-               (y < 0 ? -y : y));
-  if ( (x < 0) ^ (y < 0))
+  r = (unsigned int)(x < 0 ? -x : x) / (unsigned int)(y < 0 ? -y : y);
+  if ((x < 0) ^ (y < 0))
     return -r;
   else
     return r;

@@ -202,15 +202,14 @@ not_negative:
 
 int _modsint (int a, int b)
 {
-       register int r;
+  register int r;
        
-       r = _moduint((a < 0 ? -a : a),
-	            (b < 0 ? -b : b));
+  r = (unsigned)(a < 0 ? -a : a) % (unsigned)(b < 0 ? -b : b);
 
-       if (a < 0)
-	    return -r;
-	else
-	    return r;
+  if (a < 0)
+    return -r;
+  else
+    return r;
 }        	
 
 #endif  // _MODSINT_ASM_

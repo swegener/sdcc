@@ -1,5 +1,13 @@
 2013-05-29 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/lib/_divsint.c,
+	  device/lib/_divslong.c,
+	  device/lib/_modsint.c,
+	  device/lib/_modslong.c:
+	  Remove dependencies of signed division support functions on unsigned division support functions.
+
+2013-05-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/gen.c,
 	  src/stm8/ralloc.c,
 	  support/regression/tests/gcc-torture-execute-20010129-1.c,

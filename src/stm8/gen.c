@@ -130,6 +130,8 @@ stm8_init_asmops (void)
   asmop_a.size = 1;
   asmop_a.aopu.bytes[0].in_reg = TRUE;
   asmop_a.aopu.bytes[0].byteu.reg = stm8_regs + A_IDX;
+  asmop_a.regs[A_IDX] = 0;
+  asmop_a.regs[C_IDX] = -1;
 
   asmop_x.type = AOP_REG;
   asmop_x.size = 2;
@@ -137,6 +139,8 @@ stm8_init_asmops (void)
   asmop_x.aopu.bytes[0].byteu.reg = stm8_regs + XL_IDX;
   asmop_x.aopu.bytes[1].in_reg = TRUE;
   asmop_x.aopu.bytes[1].byteu.reg = stm8_regs + XH_IDX;
+  asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[C_IDX] = -1;
 
   asmop_y.type = AOP_REG;
   asmop_y.size = 2;
@@ -144,6 +148,8 @@ stm8_init_asmops (void)
   asmop_y.aopu.bytes[0].byteu.reg = stm8_regs + YL_IDX;
   asmop_y.aopu.bytes[1].in_reg = TRUE;
   asmop_y.aopu.bytes[1].byteu.reg = stm8_regs + YH_IDX;
+  asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[C_IDX] = -1;
 
   asmop_xy.type = AOP_REG;
   asmop_xy.size = 4;
@@ -155,14 +161,20 @@ stm8_init_asmops (void)
   asmop_xy.aopu.bytes[2].byteu.reg = stm8_regs + YL_IDX;
   asmop_xy.aopu.bytes[3].in_reg = TRUE;
   asmop_xy.aopu.bytes[3].byteu.reg = stm8_regs + YH_IDX;
+  asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[C_IDX] = -1;
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.size = 1;
   asmop_zero.aopu.aop_lit = constVal ("0");
+  asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[C_IDX] = -1;
 
   asmop_one.type = AOP_LIT;
   asmop_one.size = 1;
   asmop_one.aopu.aop_lit = constVal ("1");
+  asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[C_IDX] = -1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2839,18 +2851,18 @@ genMult (const iCode *ic)
     pop (ASMOP_A, 0, 1);
   if (!regDead (use_y ? Y_IDX : X_IDX, ic))
     {
-      if (regDead (XH_IDX, ic))
+      if (regDead (use_y ? YH_IDX : XH_IDX, ic))
         {
           adjustStack (1);
-          swap_to_a (XL_IDX);
+          swap_to_a (use_y ? YL_IDX : XL_IDX);
           pop (ASMOP_A, 0, 1);
-          swap_from_a(XL_IDX);
+          swap_from_a(use_y ? YL_IDX : XL_IDX);
         }
-      else if (regDead (XL_IDX, ic))
+      else if (regDead (use_y ? YL_IDX : XL_IDX, ic))
         {
-          swap_to_a (XH_IDX);
+          swap_to_a (use_y ? YH_IDX : XH_IDX);
           pop (ASMOP_A, 0, 1);
-          swap_from_a(XH_IDX);
+          swap_from_a(use_y ? YH_IDX : XH_IDX);
           adjustStack (1);
         }
       pop (use_y ? ASMOP_Y : ASMOP_X, 0, 2);
@@ -2868,9 +2880,132 @@ genMult (const iCode *ic)
 static void
 genDivMod2 (const iCode *ic)
 {
+#if 0
   D (emitcode ("; genDivMod2", ""));
+#endif
 
-  wassertl (0, "Unimplemented");
+  operand *result = IC_RESULT (ic);
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+
+  if (!regDead (X_IDX, ic))
+    push (ASMOP_X, 0, 2);
+  if (!regDead (Y_IDX, ic))
+    push (ASMOP_Y, 0, 2);
+
+  if (stm8_extend_stack)
+    {
+      if (left->aop->regs[XL_IDX] >= 0 || left->aop->regs[XH_IDX] >= 0 || right->aop->regs[A_IDX] >= 1)
+        {
+          wassert (regalloc_dry_run);
+          cost (80, 80);
+        }
+
+      if (!regDead (A_IDX, ic))
+        push (ASMOP_A, 0, 1);
+
+      cheapMove (ASMOP_A, 0, right->aop, 0, TRUE);
+      push (ASMOP_A, 0, 1);
+      cheapMove (ASMOP_A, 0, right->aop, 1, TRUE);
+      push (ASMOP_A, 0, 1);
+      if (left->aop->regs[XL_IDX] >= 0 || left->aop->regs[XH_IDX] >= 0)
+        {
+          wassert (regalloc_dry_run);
+          cost (80, 80);
+        }
+      genMove (ASMOP_X, right->aop, TRUE, TRUE, FALSE);
+      pop (ASMOP_Y, 0, 2);
+
+      if (!regDead (A_IDX, ic))
+        pop (ASMOP_A, 0, 1);
+    }
+  else if (aopRS (left->aop) && left->aop->size >= 2 && aopRS (right->aop) && right->aop->size >= 2)
+    {
+      int i;
+      struct asmop cop;
+      cop.type = AOP_REGSTK;
+      cop.size = 4;
+      for (i = A_IDX; i <= C_IDX; i++)
+        cop.regs[i] = (left->aop->regs[i] >= right->aop->regs[i] + 2 ? left->aop->regs[i] : right->aop->regs[i] + 2);
+      cop.aopu.bytes[0] = left->aop->aopu.bytes[0];
+      cop.aopu.bytes[1] = left->aop->aopu.bytes[1];
+      cop.aopu.bytes[2] = right->aop->aopu.bytes[0];
+      cop.aopu.bytes[3] = right->aop->aopu.bytes[1];
+      genMove (ASMOP_XY, &cop, regDead (A_IDX, ic), TRUE, TRUE);
+    }
+  else if (aopRS (right->aop))
+    {
+      if (left->aop->regs[YL_IDX] >= 0 || left->aop->regs[YH_IDX] >= 0)
+        {
+          wassert (regalloc_dry_run);
+          cost (80, 80);
+        }
+      genMove (ASMOP_Y, right->aop, regDead (A_IDX, ic), TRUE, TRUE);
+      genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), TRUE, FALSE);
+    }
+  else
+    {
+      if (right->aop->regs[XL_IDX] >= 0 || right->aop->regs[XH_IDX] >= 0)
+        {
+          wassert (regalloc_dry_run);
+          cost (80, 80);
+        }
+      genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), TRUE, TRUE);
+      genMove (ASMOP_Y, right->aop, regDead (A_IDX, ic), FALSE, TRUE);
+    }
+
+  emitcode ("divw", "x, y");
+  cost (1, 17);
+
+  if (!stm8_extend_stack)
+    genMove (result->aop, ic->op == '/' ? ASMOP_X : ASMOP_Y, regDead (A_IDX, ic), TRUE,  TRUE);
+
+  if (ic->op == '%' && stm8_extend_stack)
+    {
+      emitcode ("exgw", "x, y");
+      cost (1, 1);
+    }
+
+  if (!regDead (Y_IDX, ic))
+    {
+      if (regDead (YH_IDX, ic))
+        {
+          adjustStack (1);
+          swap_to_a (YL_IDX);
+          pop (ASMOP_A, 0, 1);
+          swap_from_a(YL_IDX);
+        }
+      else if (regDead (YL_IDX, ic))
+        {
+          swap_to_a (YH_IDX);
+          pop (ASMOP_A, 0, 1);
+          swap_from_a(YH_IDX);
+          adjustStack (1);
+        }
+      pop (ASMOP_Y, 0, 2);
+    }
+
+  if (stm8_extend_stack)
+    genMove (result->aop, ASMOP_X, regDead (A_IDX, ic), TRUE,  FALSE);
+
+  if (!regDead (X_IDX, ic))
+    {
+      if (regDead (XH_IDX, ic))
+        {
+          adjustStack (1);
+          swap_to_a (XL_IDX);
+          pop (ASMOP_A, 0, 1);
+          swap_from_a(XL_IDX);
+        }
+      else if (regDead (XL_IDX, ic))
+        {
+          swap_to_a (XH_IDX);
+          pop (ASMOP_A, 0, 1);
+          swap_from_a(XH_IDX);
+          adjustStack (1);
+        }
+      pop (ASMOP_X, 0, 2);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -2906,18 +3041,18 @@ genDivMod1 (const iCode *ic)
     pop (ASMOP_A, 0, 1);
   if (!regDead (use_y ? Y_IDX : X_IDX, ic))
     {
-      if (regDead (XH_IDX, ic))
+      if (regDead (use_y ? YH_IDX : XH_IDX, ic))
         {
           adjustStack (1);
-          swap_to_a (XL_IDX);
+          swap_to_a (use_y ? YL_IDX : XL_IDX);
           pop (ASMOP_A, 0, 1);
-          swap_from_a(XL_IDX);
+          swap_from_a(use_y ? YL_IDX : XL_IDX);
         }
-      else if (regDead (XL_IDX, ic))
+      else if (regDead (use_y ? YL_IDX : XL_IDX, ic))
         {
-          swap_to_a (XH_IDX);
+          swap_to_a (use_y ? YH_IDX : XH_IDX);
           pop (ASMOP_A, 0, 1);
-          swap_from_a(XH_IDX);
+          swap_from_a(use_y ? YH_IDX : XH_IDX);
           adjustStack (1);
         }
       pop (use_y ? ASMOP_Y : ASMOP_X, 0, 2);

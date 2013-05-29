@@ -5,6 +5,9 @@
 	  device/lib/_modsint.c,
 	  device/lib/_modslong.c:
 	  Remove dependencies of signed division support functions on unsigned division support functions.
+	* src/stm8/gen.c,
+	  src/stm8/main.c:
+	  Fix partial saving of Y in division and multiplication, implement unsigned int division.
 
 2013-05-29 Philipp Klaus Krause <pkk AT spth.de>
 

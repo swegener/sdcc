@@ -270,7 +270,7 @@ serialRegMark (eBBlock ** ebbs, int count)
   int i;
   short int max_alloc_bytes = SHRT_MAX; // Byte limit. Set this to a low value to pass only few variables to the register allocator. This can be useful for debugging.
 
-  stm8_call_stack_size = 0;
+  stm8_call_stack_size = 2; // Saving of register to stack temporarily.
 
   /* for all blocks */
   for (i = 0; i < count; i++)
@@ -283,8 +283,14 @@ serialRegMark (eBBlock ** ebbs, int count)
       /* for all instructions do */
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == CALL || ic->op == PCALL) && ic->parmBytes > stm8_call_stack_size)
-            stm8_call_stack_size = ic->parmBytes;
+          if ((ic->op == CALL || ic->op == PCALL) && ic->parmBytes + 5 > stm8_call_stack_size)
+            {
+              sym_link *dtype = operandType (IC_LEFT (ic));
+              sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
+
+              /* 5 for saving all registers at call site + 2 for big return value */
+              stm8_call_stack_size = ic->parmBytes + 5 + 2 * (getSize (ftype->next) > 4);
+            }
 
           if (ic->op == IPOP)
             wassert (0);
@@ -460,8 +466,6 @@ stm8_assignRegisters (ebbIndex * ebbi)
       /* Try again, using an extended stack this time. */
       if (!stm8_extend_stack && currFunc->stack + stm8_call_stack_size > 255)
         {
-          fprintf (stderr, "Second try for %s\n", currFunc->name);
-
           currFunc->stack = b;
 
           /* Mark variables for assignment by the new allocator */

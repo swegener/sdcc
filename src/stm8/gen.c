@@ -260,11 +260,9 @@ aopGet(const asmop *aop, int offset)
       if (soffset > 255)
         {
           long int eoffset = (long int)(aop->aopu.bytes[offset].byteu.stk) + _G.stack.size - 256l;
-          if (!regalloc_dry_run && _G.stack.size <= 255)
-            wassertl (0, "Extended stack access, but y not prepared for extended stack access.");
 
-          if (!regalloc_dry_run && (eoffset < 0l || eoffset > 0xffffl))
-            wassertl (0, "Unimplemented stack access out of extended stack range."); // Stack > 64K, probably not even possible on the hardware.
+          wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
+          wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
 
           snprintf (buffer, 256, "(0x%x, y)", (unsigned)eoffset);
         }
@@ -2164,7 +2162,7 @@ genIpush (const iCode * ic)
 static void
 emitCall (const iCode *ic, bool ispcall)
 {
-  bool SomethingReturned, bigreturn;
+  bool SomethingReturned, bigreturn, half;
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
@@ -2243,22 +2241,57 @@ emitCall (const iCode *ic, bool ispcall)
   if (ic->parmBytes || bigreturn)
     adjustStack (ic->parmBytes + bigreturn * 2);
 
+  half = stm8_extend_stack && SomethingReturned && getSize (ftype->next) == 4;
+
+  /* Todo: More efficient handling of long return value for function with extendeds stack when the result value does not use the extended stack. */
+
+  /* Special handling of assignment of long result value when using extended stack. */
+  if (half)
+    {
+      aopOp (IC_RESULT (ic), ic);
+
+      push (ASMOP_Y, 0, 2);
+      emitcode ("ldw", "y, (3, sp)");
+      cost (2, 2);
+
+      emitcode ("ld", "a, (2, sp)");
+      cost (2, 1);
+      if (IC_RESULT (ic)->aop->size > 2)
+        cheapMove (IC_RESULT (ic)->aop, 2, ASMOP_A, 0, TRUE);
+      emitcode ("ld", "a, (1, sp)");
+      cost (2, 1);
+      if (IC_RESULT (ic)->aop->size > 3)
+        cheapMove (IC_RESULT (ic)->aop, 3, ASMOP_A, 0, TRUE);
+
+      adjustStack (4);
+
+      if (IC_RESULT (ic)->aop->regs[XL_IDX] >= 2 || IC_RESULT (ic)->aop->regs[XH_IDX] >= 2)
+        {
+          wassert (regalloc_dry_run);
+          cost (80, 80);
+        }
+
+      freeAsmop (IC_RESULT (ic));
+    }
+  else if (stm8_extend_stack)
+    pop (ASMOP_Y, 0, 2);
+
   /* if we need assign a result value */
   if (SomethingReturned && !bigreturn)
     {
       aopOp (IC_RESULT (ic), ic);
 
-      wassertl (!stm8_extend_stack || getSize (ftype->next) <= 2, "Unimplemented call to function with long return value in extended stack function.");
+      int size = !half ? IC_RESULT (ic)->aop->size : (IC_RESULT (ic)->aop->size > 2 ? 2 : IC_RESULT (ic)->aop->size);   
 
       wassert (getSize (ftype->next) == 1 || getSize (ftype->next) == 2 || getSize (ftype->next) == 4);
 
-      genMove (IC_RESULT (ic)->aop, getSize (ftype->next) == 1 ? ASMOP_A : (getSize (ftype->next) == 2 ? ASMOP_X : ASMOP_XY), TRUE, TRUE, TRUE);
+      genMove_o (IC_RESULT (ic)->aop, 0, getSize (ftype->next) == 1 ? ASMOP_A : ASMOP_XY, 0, size, TRUE, TRUE, !stm8_extend_stack);
 
       freeAsmop (IC_RESULT (ic));
     }
 
   // Restore regs.
-  if (!regDead (Y_IDX, ic))
+  if (!regDead (Y_IDX, ic) && !stm8_extend_stack)
     if (regDead (YH_IDX, ic))
         {
           adjustStack (1);

@@ -1,3 +1,13 @@
+2013-05-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  src/stm8/ralloc.c,
+	  support/regression/tests/gcc-torture-execute-20010129-1.c,
+	  support/regression/tests/gcc-torture-execute-pr28982a.c,
+	  support/regression/tests/gcc-torture-execute-930614-2.c,
+	  support/regression/tests/gcc-torture-execute-20021120-1.c:
+	  Support for calls to functions returning long from functions that use extended stack.
+
 2013-05-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/ralloc2.cc,

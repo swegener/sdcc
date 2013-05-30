@@ -1,5 +1,35 @@
 2013-05-30 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic14/configure.in: remove now obsolete --enable-new-pics,
+	  check support for enhanced cores and extended instruction set,
+	* device/lib/pic14/Makefile.am: build libsdcce.a iff enhanced cores
+	  are supported, use special version avoiding extended instructions
+	  if those are not supported by gputils
+	* device/lib/pic14/libm/Makefile.am: build libme.a iff enhanced cores
+	  are supported, avoid extended instructions if not supported by
+	  gputils (0.13.5-6)
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.am,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.in,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/_gptrget1.S,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/_gptrget2.S,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/_gptrget3.S,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/_gptrget4.S,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/_gptrput1.S,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/_gptrput2.S,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/_gptrput3.S,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/_gptrput4.S,
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/macros.inc:
+	  special version of gptr* for enhanced cores without using extended
+	  instructions
+	* device/non-free/lib/pic14/configure.in: remove now obsolete option
+	  --enable-new-pics, improve gputils device support detection support
+	  by also performing linking, export list of supported devices to
+	  libdev/Makefile.in
+	* device/non-free/lib/pic14/libdev/Makefile.in: accept list of devices
+	  to build from configure
+
+2013-05-30 Raphael Neider <rneider AT web.de>
+
 	* src/pic14/main.c, src/pic14/main.h: add option to avoid generating
 	  instructions from the extended instruction set in order to work
 	  around issues with gputils-0.13.6

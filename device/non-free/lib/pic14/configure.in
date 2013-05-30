@@ -43,43 +43,35 @@ esac;
 
 AC_PROG_MAKE_SET
 
-NEWPICS=no;
-AC_ARG_ENABLE(
-    [new-pics],
-    AS_HELP_STRING([--enable-new-pics], [Enable use of PIC devices added to gputils after the 0.13.7 release. Requires custom-built gputils obtained from their SVN repository!]),
-    [ case "x$enableval" in
-      xyes) NEWPICS=yes;
-            AC_MSG_NOTICE([Enabling support for PICs from unreleased gputils -- make sure you have up-to-date gputils from SVN.]);;
-      xno) NEWPICS=no;;
-      *) AC_MSG_ERROR([bad value "${enableval}" for --enable-new-pics]);;
-      esac],
-    [ NEWPICS=no ]
-)
-
-# Substitute HAVE_NEW_PICS with 'yes' to include new PICs.
-AC_SUBST(HAVE_NEW_PICS, $NEWPICS)
-
-## More or less the same using Automake:
-# AM_CONDITIONAL([HAVE_NEW_PICS], [ test x$NEWPICS = xyes ])
-
 mCCAS=$GPASM;
+mLD=$GPLINK;
 AC_MSG_CHECKING([devices supported by gputils])
-good_pics="";
-bad_pics="";
-CHECK=".checkdevices/check.asm";
+GOOD_PICS="";
+BAD_PICS="";
+CHECK=".checkdevices/check";
+RESULT="pics.supported";
+N_GOOD=0
+N_BAD=0
 mkdir -p ".checkdevices";
-echo "  END" > "$CHECK";
+rm -f "$RESULT";
 for i in "${srcdir}/libdev/pic1"*.c; do
   p="${i##*pic}";
   p="${p%.c}";
-  if $mCCAS -p "$p" "$CHECK" >/dev/null 2>&1; then
-    good_pics="$good_pics $p";
+  P=$(echo "$p" | tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ);
+  printf "  include \"p%s.inc\"\n  END" "$p" > "${CHECK}.asm";
+  if $mCCAS -p "$p" -o "${CHECK}.o" -c "${CHECK}.asm" >/dev/null 2>&1 && $mLD "${CHECK}.o" >/dev/null 2>&1; then
+    GOOD_PICS="$GOOD_PICS $p";
+    N_GOOD=$((N_GOOD + 1));
+    echo "$P" >> "$RESULT";
   else
-    bad_pics="$bad_pics $p";
+    BAD_PICS="$BAD_PICS $p";
+    N_BAD=$((N_BAD + 1));
   fi;
 done;
-AC_MSG_RESULT([[$good_pics]])
-if test -n "$bad_pics"; then
+AC_MSG_RESULT([[$N_GOOD devices ($GOOD_PICS)]])
+AC_SUBST([GOOD_PICS])
+
+if test -n "$BAD_PICS"; then
   AC_MSG_WARN([[
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!
@@ -90,7 +82,9 @@ if test -n "$bad_pics"; then
 !!! not be able to compile any projects for these devices:
 !!!
 
-$bad_pics
+$BAD_PICS
+==> $N_BAD devices are *not* supported
+    $N_GOOD devices are supported
 
 !!!
 !!! Please update your gputils to a recent snapshot and

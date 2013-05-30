@@ -20,22 +20,6 @@ AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([libsdcc/idata.c])
 AC_CONFIG_HEADER([config.h])
 
-
-NEWPICS=no;
-AC_ARG_ENABLE(
-    [new-pics],
-    AS_HELP_STRING([--enable-new-pics], [Enable use of PIC devices added to gputils after the 0.14.1 release. Requires custom-built gputils obtained from their SVN repository!]),
-    [ case "x$enableval" in
-      xyes) NEWPICS=yes;
-            AC_MSG_NOTICE([Enabling support for PICs from unreleased gputils -- make sure you have up-to-date gputils from SVN.]);;
-      xno) NEWPICS=no;;
-      *) AC_MSG_ERROR([bad value "${enableval}" for --enable-new-pics]);;
-      esac],
-    [ NEWPICS=no ]
-)
-
-AM_CONDITIONAL([HAVE_NEW_PICS], [ test x$NEWPICS = xyes ])
-
 # SDCC setup
 case $srcdir in
     [\\/]*|?:[\\/]*) abs_srcdir="$srcdir";
@@ -73,6 +57,8 @@ Either install gputils or reconfigure with --disable-pic14-port and --disable-pi
         ;;
 esac;
 
+mCCAS="$CCAS"
+mLD="$LD"
 AC_SUBST(CFLAGS, [""])
 AC_SUBST(CCASFLAGS, [""])
 AC_SUBST(LDFLAGS, ["-m -l -w"])
@@ -88,6 +74,27 @@ AC_SUBST(OBJEXT, [o])
 _AM_DEPENDENCIES(CC)
 _AM_DEPENDENCIES(CCAS)
 
+AC_MSG_CHECKING([whether gputils support enhanced cores])
+# Check support for enhanced pic cores.
+ENABLE_ENHANCED_PICS="no"
+CHECK=".checksupport/check"
+mkdir -p .checksupport
+printf '  include "p%s.inc"\n  END\n' "${EARCH}" > "${CHECK}.asm"
+if "$mCCAS" -p${EARCH} -o "${CHECK}.o" -c "${CHECK}.asm" >/dev/null 2>&1 && "$mLD" "${CHECK}.o" >/dev/null 2>&1; then
+  ENABLE_ENHANCED_PICS="yes"
+fi;
+AC_MSG_RESULT([$ENABLE_ENHANCED_PICS])
+AM_CONDITIONAL([ENABLE_ENHANCED_PICS], [ test x$ENABLE_ENHANCED_PICS = xyes ])
+
+AC_MSG_CHECKING([wheter gputils support the extended instruction set])
+ENABLE_EXTENDED_INSTRUCTIONS="no"
+printf '  include "p%s.inc"\n  CODE\n  ADDFSR FSR0, 4\n  MOVIW FSR0++\n  END\n' "${EARCH}" > "${CHECK}.asm"
+if "$mCCAS" -p${EARCH} -o "${CHECK}.o" -c "${CHECK}.asm" >/dev/null 2>&1 && "$mLD" "${CHECK}.o" >/dev/null 2>&1; then
+  ENABLE_EXTENDED_INSTRUCTIONS="yes"
+fi;
+AC_MSG_RESULT([$ENABLE_EXTENDED_INSTRUCTIONS])
+AM_CONDITIONAL([ENABLE_EXTENDED_INSTRUCTIONS], [ test x$ENABLE_EXTENDED_INSTRUCTIONS = xyes ])
+
 # Checks for libraries.
 
 # Checks for header files.
@@ -98,6 +105,7 @@ _AM_DEPENDENCIES(CCAS)
 
 AC_CONFIG_FILES([Makefile
                  libsdcc/enhanced/Makefile
+                 libsdcc/enhanced-no-xinst/Makefile
                  libsdcc/regular/Makefile
 		 libm/Makefile])
 AC_OUTPUT

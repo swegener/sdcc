@@ -1,3 +1,9 @@
+2013-05-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2175.c:
+	  Fix bug #2175.
+
 2013-05-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

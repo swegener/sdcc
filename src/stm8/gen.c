@@ -4041,7 +4041,7 @@ genLeftShift (const iCode *ic)
 {
   operand *left, *right, *result;
   int i, size;
-  bool save_a;
+  bool pushed_a = FALSE;
   symbol *tlbl1, *tlbl2;
 
   right = IC_RIGHT (ic);
@@ -4064,26 +4064,31 @@ genLeftShift (const iCode *ic)
   aopOp (result, ic);
   aopOp (left, ic);
 
+  if (!regDead (A_IDX, ic))
+    {
+      push (ASMOP_A, 0, 1);
+      pushed_a = TRUE;
+    }
+
   genMove (result->aop, left->aop, regDead (A_IDX, ic) && right->aop->regs[A_IDX], regDead (X_IDX, ic) && right->aop->regs[XL_IDX] && right->aop->regs[XH_IDX],  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] && right->aop->regs[YH_IDX]);
 
   size = result->aop->size;
 
-  save_a = !regDead (A_IDX, ic);
   for (i = 0; i < size; i++)
     {
-      if (aopInReg (result->aop, i, A_IDX))
-        save_a = TRUE;
-      if (aopRS (result->aop) && !aopInReg (result->aop, i, A_IDX) && result->aop->aopu.bytes[i].in_reg &&
+      if (aopRS (result->aop) && (!aopInReg (result->aop, i, A_IDX) || aopInReg (right->aop, i, A_IDX)) && result->aop->aopu.bytes[i].in_reg &&
         right->aop->regs[result->aop->aopu.bytes[i].byteu.reg->rIdx] == 0)
         {
           if (!regalloc_dry_run)
             wassertl (0, "Overwriting shift count");
           cost (80, 80);
         }
+      if (aopInReg (result->aop, i, A_IDX) && !pushed_a)
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = TRUE;
+        }
     }
-
-  if (save_a)
-    push (ASMOP_A, 0, 1);
 
   tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
@@ -4138,7 +4143,7 @@ genLeftShift (const iCode *ic)
   cost (2, 0);
   emitLabel (tlbl2);
 
-  if (save_a)
+  if (pushed_a)
     pop (ASMOP_A, 0, 1);
 
   freeAsmop (left);
@@ -4223,7 +4228,7 @@ genRightShift (const iCode *ic)
 {
   operand *left, *right, *result;
   int i, size;
-  bool save_a;
+  bool pushed_a = FALSE;
   symbol *tlbl1, *tlbl2;
   bool sign;
 
@@ -4249,25 +4254,31 @@ genRightShift (const iCode *ic)
   aopOp (result, ic);
   aopOp (left, ic);
 
+  if (!regDead (A_IDX, ic))
+    {
+      push (ASMOP_A, 0, 1);
+      pushed_a = TRUE;
+    }
+
   genMove (result->aop, left->aop, regDead (A_IDX, ic) && right->aop->regs[A_IDX], regDead (X_IDX, ic) && right->aop->regs[XL_IDX] && right->aop->regs[XH_IDX],  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] && right->aop->regs[YH_IDX]);
 
   size = result->aop->size;
 
-  save_a = !regDead (A_IDX, ic);
   for (i = 0; i < size; i++)
     {
-      if (aopInReg (result->aop, i, A_IDX))
-        save_a = TRUE;
-      if (aopRS (result->aop) && !aopInReg (result->aop, i, A_IDX) && result->aop->aopu.bytes[i].in_reg &&
+      if (aopRS (result->aop) && (!aopInReg (result->aop, i, A_IDX) || aopInReg (right->aop, i, A_IDX)) && result->aop->aopu.bytes[i].in_reg &&
         right->aop->regs[result->aop->aopu.bytes[i].byteu.reg->rIdx] == 0)
         {
           if (!regalloc_dry_run)
             wassertl (0, "Overwriting shift count");
           cost (80, 80);
         }
+      if (aopInReg (result->aop, i, A_IDX) && !pushed_a)
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = TRUE;
+        }
     }
-  if (save_a)
-    push (ASMOP_A, 0, 1);
 
   tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
@@ -4321,7 +4332,7 @@ genRightShift (const iCode *ic)
   cost (2, 0);
   emitLabel (tlbl2);
 
-  if (save_a)
+  if (pushed_a)
     pop (ASMOP_A, 0, 1);
 
   freeAsmop (left);

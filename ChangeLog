@@ -28,6 +28,14 @@
 	* device/non-free/lib/pic14/libdev/Makefile.in: accept list of devices
 	  to build from configure
 
+	* device/lib/pic14/Makefile.in,
+	* device/lib/pic14/aclocal.m4,
+	* device/lib/pic14/configure,
+	* device/lib/pic14/libm/Makefile.in,
+	* device/lib/pic14/libsdcc/enhanced/Makefile.in,
+	* device/lib/pic14/libsdcc/regular/Makefile.in:
+	  regenerated
+
 2013-05-30 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/main.c, src/pic14/main.h: add option to avoid generating

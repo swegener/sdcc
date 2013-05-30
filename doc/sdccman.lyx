@@ -3203,25 +3203,6 @@ status collapsed
 
 \end_inset
 
--enable-new-pics Enables support for PIC devices that are not supported
- by the current 0.14.2 release of gputils
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
 -enable-doc Build pdf, html and txt files from the lyx sources
 \end_layout
 
@@ -44695,6 +44676,24 @@ status collapsed
  search paths (implicit -I and -L options)
 \end_layout
 
+\begin_layout Description
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-extended-instructions forbid use of the extended instruction set (e.g.,
+ ADDFSR)
+\end_layout
+
 \begin_layout Subsection
 Environment Variables
 \end_layout
@@ -47871,25 +47870,13 @@ perl /path/to/sdcc/support/scripts/inc2h-pic16.pl
 \begin_layout Enumerate
 
 \family typewriter
-mv picDEVICE.h /path/to/sdcc/device/include/pic16
+mv picDEVICE.h /path/to/sdcc/device/non-free/include/pic16
 \end_layout
 
 \begin_layout Enumerate
 
 \family typewriter
-mv picDEVICE.c /path/to/sdcc/device/lib/pic16/libdev
-\end_layout
-
-\begin_layout Enumerate
-Add DEVICE to 
-\family typewriter
-/path/to/sdcc/device/lib/pic16/pics.all
-\family default
-
-\begin_inset Newline newline
-\end_inset
-
-Note: No 18f prefix here!
+mv picDEVICE.c /path/to/sdcc/device/non-free/lib/pic16/libdev
 \end_layout
 
 \begin_layout Enumerate
@@ -47915,42 +47902,11 @@ In fact, the
 \family typewriter
 Makefile.am
 \family default
- from steps 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "enu:pic16-edit-makefile-am"
-
-\end_inset
-
-f using the 
+ using the 
 \family typewriter
 .../libio/mkmk.sh
 \family default
- script; to actually suppress building the I/O library, you must not include
- the 
-\family typewriter
-adc/
-\family default
-, 
-\family typewriter
-i2c/
-\family default
- and 
-\family typewriter
-usart/
-\family default
- sources in the 
-\family typewriter
-Makefile.am
-\family default
- in step 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "enu:pic16-edit-libio-makefile-am"
-
-\end_inset
-
-.
+ script.
 \end_layout
 
 \end_inset
@@ -48043,92 +47999,9 @@ Copy and modify an existing entry or create a new one and insert it at the
 \end_layout
 
 \begin_layout Enumerate
-\begin_inset CommandInset label
-LatexCommand label
-name "enu:pic16-edit-makefile-am"
-
-\end_inset
-
-Add the device to 
-\family typewriter
-/path/to/sdcc/device/lib/pic16/libdev/Makefile.am
-\family default
-
-\begin_inset Newline newline
-\end_inset
-
-Copy an existing entry and adjust the device name.
-\end_layout
-
-\begin_layout Enumerate
-\begin_inset CommandInset label
-LatexCommand label
-name "enu:pic16-edit-libio-makefile-am"
-
-\end_inset
-
-Add the device to 
-\family typewriter
-/path/to/sdcc/device/lib/pic16/libio/Makefile.am
-\family default
-
-\begin_inset Newline newline
-\end_inset
-
-Copy the record from the 18f2220 and adjust the device name.
-\begin_inset Newline newline
-\end_inset
-
-If the new device does not offer ADC, I
-\begin_inset Formula $^{\text{2}}$
-\end_inset
-
-C, and/or (E)USART functionality as assumed by the library, or if you added
- the new device to 
-\family typewriter
-.../libio/{adc,i2c,usart}.ignore
-\family default
-, remove the lines with references to 
-\family typewriter
-adc/*.c
-\family default
-, 
-\family typewriter
-i2c/*.c
-\family default
-, or 
-\family typewriter
-usart/*.c
-\family default
-, respectively.
-\end_layout
-
-\begin_layout Enumerate
-Update 
-\family typewriter
-libdev/Makefile.in
-\family default
- and 
-\family typewriter
-libio/Makefile.in
-\family default
- using
-\begin_inset Newline newline
-\end_inset
-
 
 \family typewriter
-./bootstrap.sh
-\family default
-
-\begin_inset Newline newline
-\end_inset
-
-in 
-\family typewriter
-/path/to/sdcc/device/lib/pic16
-\family default
-.
+( cd /path/to/sdcc/device/non-free/lib/pic16 && sh update.sh )
 \end_layout
 
 \begin_layout Enumerate
@@ -48139,7 +48012,7 @@ reference "sub:pic16Libraries"
 
 \end_inset
 
-.
+ or just configure and build sdcc again from scratch (recommended).
 \end_layout
 
 \begin_layout Subsection

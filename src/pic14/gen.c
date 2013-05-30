@@ -5613,41 +5613,58 @@ inc_fsr (int delta)
     {
       /* Nothing to do. */
       return;
-    }                           // if
+    } // if
 
   if (pic14_getPIC ()->isEnhancedCore)
     {
-      assert (delta >= -32);
-      assert (delta < 32);
-      /* Hack: Turn this into a PCI (not that easy due to the argument structure). */
-      addpCode2pBlock (pb, newpCodeAsmDir ("ADDFSR", "FSR0, %d", delta));
+      if (pic14_options.no_ext_instr)
+        {
+          /*
+           * Not sure if we may modify W here, so implement this without
+           * touching W.
+           *
+           * Efficiency is not too important here, as enhanced cores
+           * will most likely use extended instructions here. This is
+           * only a workaround for gputils 0.13.7, which supports the
+           * 16f1934 enhanced core, but fails to assemble ADDFSR.
+           */
+          while (delta > 0)
+            {
+              emitpcode (POC_INCFSZ, popCopyReg (&pc_fsr0l));
+              emitpcode (POC_DECF, popCopyReg (&pc_fsr0h));
+              emitpcode (POC_INCF, popCopyReg (&pc_fsr0h));
+              --delta;
+            } // while
+          while (delta < 0)
+            {
+              addpCode2pBlock (pb, newpCodeAsmDir("MOVF", "FSR0L, 1"));
+              emitSKPNZ;
+              emitpcode (POC_DECF, popCopyReg (&pc_fsr0h));
+              emitpcode (POC_DECF, popCopyReg (&pc_fsr0l));
+              ++delta;
+            } // while
+        }
+      else
+        {
+          assert (delta >= -32);
+          assert (delta < 32);
+          /* Hack: Turn this into a PCI (not that easy due to the argument structure). */
+          addpCode2pBlock (pb, newpCodeAsmDir ("ADDFSR", "FSR0, %d", delta));
+        } // if
     }
   else
     {
-      switch (delta)
+      while (delta > 0)
         {
-        case 1:
           emitpcode (POC_INCF, popCopyReg (&pc_fsr));
-          break;
-        case -1:
+          --delta;
+        } // while
+      while (delta < 0)
+        {
           emitpcode (POC_DECF, popCopyReg (&pc_fsr));
-          break;
-        case 0:
-          break;
-        default:
-          while (delta > 0)
-            {
-              inc_fsr (1);
-              --delta;
-            }
-          while (delta < 0)
-            {
-              inc_fsr (-1);
-              ++delta;
-            }
-          break;
-        }                       // switch
-    }                           // if
+          ++delta;
+        } // while
+    } // if
 }
 
 /*-----------------------------------------------------------------*/

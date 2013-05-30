@@ -41,6 +41,7 @@ static OPTION _pic14_poptions[] =
     { 0, "--debug-xtra",   &debug_verbose, "show more debug info in assembly output" },
     { 0, "--no-pcode-opt", &pic14_options.disable_df, "disable (slightly faulty) optimization on pCode" },
     { 0, OPTION_STACK_SIZE, &options.stack_size, "sets the size if the argument passing stack (default: 16, minimum: 4)", CLAT_INTEGER },
+    { 0, "--no-extended-instructions", &pic14_options.no_ext_instr, "forbid use of the extended instruction set (e.g., ADDFSR)" },
     { 0, NULL, NULL, NULL }
   };
 

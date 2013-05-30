@@ -1,3 +1,11 @@
+2013-05-30 Raphael Neider <rneider AT web.de>
+
+	* src/pic14/main.c, src/pic14/main.h: add option to avoid generating
+	  instructions from the extended instruction set in order to work
+	  around issues with gputils-0.13.6
+	* src/pic14/gen.c (inc_fsr): avoid generating ADDFSR if
+	  --no-extended-instructions is specified
+
 2013-05-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

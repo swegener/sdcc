@@ -1,5 +1,55 @@
 2013-05-30 Raphael Neider <rneider AT web.de>
 
+	* device/lib/pic16/configure.ac,
+	* device/non-free/lib/pic16/configure.ac: remove obsolete option
+	  --enable-new-pics, use common device support detection from
+	  supported-devices.ac and the generated processors.ac
+	* device/non-free/lib/pic16/supported-devices.ac: fragment from
+	  configure.ac performing detection of devices supported by gputils;
+	  device detection also performs linking step for robustness
+
+	* device/lib/pic16/libio/adc.ignore,
+	* device/lib/pic16/libio/i2c.ignore,
+	* device/lib/pic16/libio/usart.ignore: use full device id (18fxxxx)
+
+	* device/lib/pic16/libio/mkmk.sh,
+	* device/non-free/lib/pic16/libdev/mkmk.sh,
+	* device/non-free/lib/pic16/libdev/testall.sh:
+	  derive device list from files in non-free/lib/pic16/libdev rather
+	  than the manually maintained pics.all, enclose each device in
+	  ENABLE_<DEVICE> conditionals
+
+	* device/non-free/lib/pic16/update.sh: script to update the build
+	  system to be run whenever the set of devices supported by sdcc
+	  changed; generates processor.ac and reconfigures all PIC16 libs
+
+	* support/scripts/cinc2h.pl: update instructions regarding adding
+	  support for new devices
+
+	* device/lib/pic16/libio/Makefile.am: regenerated from mkmk.sh
+	* device/non-free/lib/pic16/libdev/Makefile.am:
+	  regenerated from mkmk.sh
+	* device/non-free/lib/pic16/pics.all: removed (no longer used)
+	* device/non-free/lib/pic16/processors.ac: added, list of automake
+	  conditionals for automatic detection of devices supported by
+	  gputils, generated from update.sh
+
+	* device/lib/pic16/Makefile.in,
+	* device/lib/pic16/aclocal.m4,
+	* device/lib/pic16/configure,
+	* device/lib/pic16/debug/Makefile.in,
+	* device/lib/pic16/libc/Makefile.in,
+	* device/lib/pic16/libio/Makefile.in,
+	* device/lib/pic16/libm/Makefile.in,
+	* device/lib/pic16/libsdcc/Makefile.in,
+	* device/lib/pic16/startup/Makefile.in,
+	* device/non-free/lib/pic16/Makefile.in,
+	* device/non-free/lib/pic16/aclocal.m4,
+	* device/non-free/lib/pic16/configure,
+	* device/non-free/lib/pic16/libdev/Makefile.in: regenerated
+
+2013-05-30 Raphael Neider <rneider AT web.de>
+
 	* device/lib/pic14/configure.in: remove now obsolete --enable-new-pics,
 	  check support for enhanced cores and extended instruction set,
 	* device/lib/pic14/Makefile.am: build libsdcce.a iff enhanced cores

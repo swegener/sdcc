@@ -1,5 +1,10 @@
 2013-05-29 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Fix ADDRESS_OF with result in y for variables at sp + 2, more efficient assignment to stack using ldw.
+
+2013-05-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/_divsint.c,
 	  device/lib/_divslong.c,
 	  device/lib/_modsint.c,

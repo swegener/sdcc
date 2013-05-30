@@ -2,7 +2,6 @@
   gen.c - code generator for STM8.
 
   Copyright (C) 2012 - 2013, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de)
-                2011, Vaclav Peroutka
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -47,6 +46,7 @@ enum asminst
   A_ADD,
   A_AND,
   A_CLR,
+  A_CLRW,
   A_CP,
   A_CPL,
   A_CPLW,
@@ -84,6 +84,7 @@ static const char *asminstnames[] =
   "add",
   "and",
   "clr",
+  "clrw",
   "cp",
   "cpl",
   "cplw",
@@ -131,6 +132,10 @@ stm8_init_asmops (void)
   asmop_a.aopu.bytes[0].in_reg = TRUE;
   asmop_a.aopu.bytes[0].byteu.reg = stm8_regs + A_IDX;
   asmop_a.regs[A_IDX] = 0;
+  asmop_a.regs[XL_IDX] = -1;
+  asmop_a.regs[XH_IDX] = -1;
+  asmop_a.regs[YL_IDX] = -1;
+  asmop_a.regs[YH_IDX] = -1;
   asmop_a.regs[C_IDX] = -1;
 
   asmop_x.type = AOP_REG;
@@ -140,6 +145,10 @@ stm8_init_asmops (void)
   asmop_x.aopu.bytes[1].in_reg = TRUE;
   asmop_x.aopu.bytes[1].byteu.reg = stm8_regs + XH_IDX;
   asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[XL_IDX] = 0;
+  asmop_a.regs[XH_IDX] = 1;
+  asmop_a.regs[YL_IDX] = -1;
+  asmop_a.regs[YH_IDX] = -1;
   asmop_a.regs[C_IDX] = -1;
 
   asmop_y.type = AOP_REG;
@@ -149,6 +158,10 @@ stm8_init_asmops (void)
   asmop_y.aopu.bytes[1].in_reg = TRUE;
   asmop_y.aopu.bytes[1].byteu.reg = stm8_regs + YH_IDX;
   asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[XL_IDX] = -1;
+  asmop_a.regs[XH_IDX] = -1;
+  asmop_a.regs[YL_IDX] = 0;
+  asmop_a.regs[YH_IDX] = 1;
   asmop_a.regs[C_IDX] = -1;
 
   asmop_xy.type = AOP_REG;
@@ -162,18 +175,30 @@ stm8_init_asmops (void)
   asmop_xy.aopu.bytes[3].in_reg = TRUE;
   asmop_xy.aopu.bytes[3].byteu.reg = stm8_regs + YH_IDX;
   asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[XL_IDX] = 0;
+  asmop_a.regs[XH_IDX] = 1;
+  asmop_a.regs[YL_IDX] = 2;
+  asmop_a.regs[YH_IDX] = 3;
   asmop_a.regs[C_IDX] = -1;
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.size = 1;
   asmop_zero.aopu.aop_lit = constVal ("0");
   asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[XL_IDX] = -1;
+  asmop_a.regs[XH_IDX] = -1;
+  asmop_a.regs[YL_IDX] = -1;
+  asmop_a.regs[YH_IDX] = -1;
   asmop_a.regs[C_IDX] = -1;
 
   asmop_one.type = AOP_LIT;
   asmop_one.size = 1;
   asmop_one.aopu.aop_lit = constVal ("1");
   asmop_a.regs[A_IDX] = -1;
+  asmop_a.regs[XL_IDX] = -1;
+  asmop_a.regs[XH_IDX] = -1;
+  asmop_a.regs[YL_IDX] = -1;
+  asmop_a.regs[YH_IDX] = -1;
   asmop_a.regs[C_IDX] = -1;
 }
 
@@ -615,6 +640,9 @@ emit3wcost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, 
 {
   switch (inst)
   {
+  case A_CLRW:
+    opw_cost (op1, offset1);
+    break;
   case A_CPLW:
     opw_cost2 (op1, offset1);
     break;
@@ -1252,16 +1280,14 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
     aopInReg (result, roffset + n, XH_IDX) && aopInReg (result, roffset, XL_IDX) &&
     source->regs[XL_IDX] < 0 && source->regs[XH_IDX] < 0)
     {
-      emitcode ("clrw", "x");
-      cost (1, 1);
+      emit3w (A_CLRW, ASMOP_X, 0);
       assigned[1] = TRUE;
     }
   if (n == 1 && sizex == 2 &&
     aopInReg (result, roffset + n, YH_IDX) && aopInReg (result, roffset, YL_IDX) &&
     source->regs[YL_IDX] < 0 && source->regs[YH_IDX] < 0)
     {
-      emitcode ("clrw", "y");
-      cost (2, 1);
+      emit3w (A_CLRW, ASMOP_Y, 0);
       assigned[1] = TRUE;
     }
 
@@ -1554,6 +1580,48 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           size -= 2;
         }
     }
+#if 0 // todo: enable when all regression tests pass
+  // Try to use ldw x, y
+  for (i = 0; i < n; i++)
+    if (!assigned[i] && source->regs[XL_IDX] < 0 && source->regs[XH_IDX] < 0 &&
+      (i + 1 < n && !assigned[i + 1] && aopInReg (result, roffset + i, X_IDX) && aopInReg (source, soffset + i, Y_IDX) ||
+      aopInReg (result, roffset + i, XL_IDX) && aopInReg (source, soffset + i, YL_IDX) && x_dead && result->regs[XH_IDX] < 0 ||
+      aopInReg (result, roffset + i, XH_IDX) && aopInReg (source, soffset + i, YH_IDX) && x_dead && result->regs[XL_IDX] < 0))
+      {
+        emitcode ("ldw", "x, y");
+        cost (1, 1);
+        assigned[i] = TRUE;
+        regsize--;
+        size--;
+        if (aopInReg (result, roffset + i, X_IDX) && aopInReg (source, soffset + i, Y_IDX))
+          {
+            assigned[++i] = TRUE;
+            regsize--;
+            size--;
+          }
+      }
+#endif
+#if 0
+  // Try to use ldw y, x
+  for (i = 0; i < n; i++)
+    if (!assigned[i] && source->regs[YL_IDX] < 0 && source->regs[YH_IDX] < 0 &&
+      (i + 1 < n && !assigned[i + 1] && aopInReg (result, roffset + i, Y_IDX) && aopInReg (source, soffset + i, X_IDX) ||
+      aopInReg (result, roffset + i, YL_IDX) && aopInReg (source, soffset + i, XL_IDX) && y_dead && result->regs[YH_IDX] < 0 ||
+      aopInReg (result, roffset + i, YH_IDX) && aopInReg (source, soffset + i, XH_IDX) && y_dead && result->regs[YL_IDX] < 0))
+      {
+        emitcode ("ldw", "y, x");
+        cost (2, 1);
+        assigned[i] = TRUE;
+        regsize--;
+        size--;
+        if (aopInReg (result, roffset + i, Y_IDX) && aopInReg (source, soffset + i, X_IDX))
+          {
+            assigned[++i] = TRUE;
+            regsize--;
+            size--;
+          }
+      }
+#endif
 
   while (regsize)
     {
@@ -1703,16 +1771,9 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 
   for (i = 0; i < size;)
     {
-      if (i + 1 < size && aopInReg (result, roffset + i, X_IDX) && source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, soffset + i) && !byteOfVal (source->aopu.aop_lit, soffset + i + 1))
+      if (i + 1 < size && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, soffset + i) && !byteOfVal (source->aopu.aop_lit, soffset + i + 1))
         {
-          emitcode ("clrw", "x");
-          cost (1, 1);
-          i += 2;
-        }
-      else if (i + 1 < size && aopInReg (result, roffset + i, Y_IDX) && source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, soffset + i) && !byteOfVal (source->aopu.aop_lit, soffset + i + 1))
-        {
-          emitcode ("clrw", "y");
-          cost (2, 1);
+          emit3w_o (A_CLRW, result, roffset + i, 0, 0);
           i += 2;
         }
       else if ((!aopRS (result) || aopOnStack(result, roffset + i, 1) || aopInReg (result, roffset + i, A_IDX)) && source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, soffset + i))
@@ -1746,22 +1807,34 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           cost (4, 2);
           i += 2;
         }
-      /*else if (x_dead && result->regs[XL_IDX] < 0 && result->regs[XH_IDX] < 0 && aopOnStack (result, roffset + i, 2) &&
+      else if (x_dead && result->regs[XL_IDX] < 0 && result->regs[XH_IDX] < 0 && aopOnStack (result, roffset + i, 2) &&
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
-          emitcode ("ldw", "x, %s", aopGet2 (source, soffset + i));
+          if (source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, i) && !byteOfVal (source->aopu.aop_lit, i + 1))
+            emit3w (A_CLRW, ASMOP_Y, 0);
+          else
+            {
+              emitcode ("ldw", "x, %s", aopGet2 (source, soffset + i));
+              cost (3, 2);
+            }
           emitcode ("ldw", "%s, x", aopGet2 (result, roffset + i));
-          cost (5, 4);
+          cost (2, 2);
           i += 2;
         }
       else if (y_dead && result->regs[YL_IDX] < 0 && result->regs[YH_IDX] < 0 && aopOnStack (result, roffset + i, 2) &&
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
-          emitcode ("ldw", "y, %s", aopGet2 (source, soffset + i));
+          if (source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, i) && !byteOfVal (source->aopu.aop_lit, i + 1))
+            emit3w (A_CLRW, ASMOP_Y, 0);
+          else
+            {
+              emitcode ("ldw", "y, %s", aopGet2 (source, soffset + i));
+              cost (4, 2);
+            }
           emitcode ("ldw", "%s, y", aopGet2 (result, roffset + i));
-          cost (6, 4);
+          cost (2, 2);
           i += 2;
-        }*/
+        }
       else
         {
           cheapMove (result, roffset + i, source, soffset + i, !(a_dead && (result->regs[A_IDX] >= i || result->regs[A_IDX] == -1) && source->regs[A_IDX] <= i));
@@ -4723,7 +4796,7 @@ genAddrOf (const iCode *ic)
           wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 > 0);
           emitcode ("ldw", "y, sp");
           cost (2, 1);
-          if (sym->stack + _G.stack.pushed + 1 > 2)
+          if (sym->stack + _G.stack.pushed + 1 >= 2)
             {
               emitcode ("addw", "y, #%d", sym->stack + _G.stack.pushed + 1);
               cost (4, 2);

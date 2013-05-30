@@ -323,7 +323,7 @@ static bool assignment_hopeless(const assignment &a, unsigned short int i, const
   return(false);
 }
 
-// Increase chance of finding good compatible assignments at join nodes. This is just a dummy for now.
+// Increase chance of finding good compatible assignments at join nodes.
 template <class T_t>
 static void get_best_local_assignment_biased(assignment &a, typename boost::graph_traits<T_t>::vertex_descriptor t, const T_t &T)
 {
@@ -334,7 +334,7 @@ static void get_best_local_assignment_biased(assignment &a, typename boost::grap
     a.local.insert(*vi);
 }
 
-// Suggest to honor register keyword and to not reverse bytes and prefer use of a.
+// Suggest to honor register keyword and to not reverse bytes and prefer use of a. Prefer x over y.
 template <class G_t, class I_t>
 static float rough_cost_estimate(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
@@ -344,13 +344,16 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
   if(ia.registers[REG_A][1] < 0)
     c += 0.1f;
 
+  /*if(ia.registers[REG_XL][1] < 0 && ia.registers[REG_YL][1] >= 0)
+    c += 0.2f;*/
+
   varset_t::const_iterator v, v_end;
   for(v = a.local.begin(), v_end = a.local.end(); v != v_end; ++v)
     {
       const symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
       if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // When in doubt, try to honour register keyword.
         c += 4.0f;
-      if((I[*v].byte % 2) ^ (a.global[*v] == REG_XH || a.global[*v] == REG_XH)) // Try not to reverse bytes.
+      if((I[*v].byte % 2) ^ (a.global[*v] == REG_XH /*|| a.global[*v] == REG_YH*/)) // Try not to reverse bytes.
         c += 0.2f;
     }
 

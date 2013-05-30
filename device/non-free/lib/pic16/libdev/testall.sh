@@ -43,11 +43,14 @@ void main()
 }
 EOT
 
-sed -e 's/\s*#.*$//' ../../pics.all | grep -v '^\s*$' | while read PROC; do
-    printf "### Compiling for $PROC: ";
+for f in ./pic1*.c; do
+    p="${f##*/pic}";
+    p="${p%.c}";
+    
+    printf "### Compiling for $p: ";
     OK="FAILED";
-    echo "$CC" -V $CPPFLAGS $CFLAGS $LDFLAGS -mpic16 -p18f$PROC -o test-$PROC sample.c $LIBS > "$BUILD_LOG2";
-    "$CC" -V $CPPFLAGS $CFLAGS $LDFLAGS -mpic16 -p18f$PROC -o test-$PROC sample.c $LIBS >> "$BUILD_LOG2" 2>&1 && OK="ok";
+    echo "$CC" -V $CPPFLAGS $CFLAGS $LDFLAGS -mpic16 -p$p -o test-$p sample.c $LIBS > "$BUILD_LOG2";
+    "$CC" -V $CPPFLAGS $CFLAGS $LDFLAGS -mpic16 -p$p -o test-$p sample.c $LIBS >> "$BUILD_LOG2" 2>&1 && OK="ok";
     cat "$BUILD_LOG2" >> "$BUILD_LOG";
     printf "$OK\n";
     case "$OK" in

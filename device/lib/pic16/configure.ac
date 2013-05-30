@@ -32,21 +32,6 @@ AC_ARG_ENABLE(
     [if test "yes" = $enableval; then USE_FLOATS="-DUSE_FLOATS=1"; fi]
 )
 
-NEWPICS=no;
-AC_ARG_ENABLE(
-    [new-pics],
-    AS_HELP_STRING([--enable-new-pics], [Enable use of PIC devices added to gputils after the 0.13.7 release. Requires custom-built gputils obtained from their SVN repository!]),
-    [ case "x$enableval" in
-      xyes) NEWPICS=yes;
-            AC_MSG_NOTICE([Enabling support for PICs from unreleased gputils -- make sure you have up-to-date gputils from SVN.]);;
-      xno) NEWPICS=no;;
-      *) AC_MSG_ERROR([bad value "${enableval}" for --enable-new-pics]);;
-      esac],
-    [ NEWPICS=no ]
-)
-
-AM_CONDITIONAL([HAVE_NEW_PICS], [ test x$NEWPICS = xyes ])
-
 # Checks for programs.
 
 # The default architecture can be selected at configure time by setting the
@@ -66,6 +51,8 @@ Either install gputils or reconfigure with --disable-pic14-port and --disable-pi
         ;;
 esac;
 
+mCCAS="$CCAS";
+mLD="$LD";
 AC_SUBST(CFLAGS, ["-mpic16 -p$ARCH"])
 AC_SUBST(CCASFLAGS, ["-p$ARCH"])
 AC_SUBST(ARFLAGS, [-c])
@@ -79,6 +66,10 @@ AC_SUBST(OBJEXT, [o])
 
 _AM_DEPENDENCIES(CC)
 _AM_DEPENDENCIES(CCAS)
+
+LIBDEV="${srcdir}/../../non-free/lib/pic16/libdev"
+m4_include([../../non-free/lib/pic16/supported-devices.ac])
+m4_include([../../non-free/lib/pic16/processors.ac])
 
 # Checks for libraries.
 

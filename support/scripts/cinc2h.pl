@@ -47,8 +47,7 @@
 
    2. mv picDEVICE.h $SDCC/device/non-free/include/pic16
    3. mv picDEVICE.c $SDCC/device/non-free/lib/pic16/libdev
-   4. add DEVICE to $SDCC/device/non-free/lib/pic16/pics.all
-   5. either
+   4. either
 
       (a) adjust $SDCC/device/lib/pic16/libio/*.ignore
           if the device does not support ADC, I2C, or USART
@@ -67,6 +66,8 @@
           effect; see pic18fam-h-gen.pl for usage information.
    6. edit $SDCC/device/include/pic16/pic18fregs.h
    7. edit $SDCC/device/include/pic16/pic16devices.txt
+   8. run cd $SDCC/device/non-free/lib/pic16 && sh update.sh
+      to regenerate .../libdev/Makefile.am and processors.ac
 
    The file format of steps 6 and 7 is self explanatory, in most
    if not all cases you can copy and paste another device's records

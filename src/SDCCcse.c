@@ -2359,7 +2359,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       pdic = NULL;
       if (!(POINTER_GET (ic) &&
             (IS_BITFIELD (OP_SYMBOL (IC_RESULT (ic))->etype) ||
-             isOperandVolatile (IC_LEFT (ic), TRUE) ||
+             isOperandVolatile (IC_LEFT (ic), TRUE) || IS_VOLATILE (operandType (IC_LEFT (ic))->next) ||
              bitVectBitValue (ebb->ndompset, IC_LEFT (ic)->key))) &&
           !ASSIGNMENT (ic) &&
           IS_ITEMP (IC_RESULT (ic)) &&

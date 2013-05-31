@@ -108,6 +108,9 @@ candidate_expression (const iCode *const ic, int lkey)
   if(IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
     return (false);
 
+  if(POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
+    return (false);
+
   // Todo: Allow more operands!
   if (ic->op != CAST && left && !(IS_SYMOP (left) || IS_OP_LITERAL (left)) ||
     right && !(IS_SYMOP (right) || IS_OP_LITERAL (right)) ||
@@ -175,8 +178,8 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   // safety, since reading from an unknown location could result in making the device do something or in a SIGSEGV. 
   // On the other hand, addition is something that typically does not require safety, since adding two undefined
   // operands gives just another undefined (the C standard allows trap representations, which, could result
-  // in addition requiring safety though; AFAIK no of the targets currently supported by sdcc have trap representations).
-  // Philipp, 2012-7-6.
+  // in addition requiring safety though; AFAIK none of the targets currently supported by sdcc have trap representations).
+  // Philipp, 2012-07-06.
   //
   // For now we just always require safety for "dangerous" operations.
   //

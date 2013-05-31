@@ -1,3 +1,9 @@
+2013-05-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCcse.c,
+	  src/SDCClospre.cc:
+	  Fix bug #2167.
+
 2013-05-30 Raphael Neider <rneider AT web.de>
 
 	* doc/sdccman.lyx: remove --enable-new-pics, add

@@ -105,7 +105,6 @@ template <class I_t>
 void thorup_E(std::multimap<unsigned int, unsigned int> &M, const I_t &I)
 {
   typedef typename boost::graph_traits<I_t>::adjacency_iterator adjacency_iter_t;
-  typedef typename boost::graph_traits<I_t>::vertex_iterator vertex_iter_t;
   typedef typename boost::property_map<I_t, boost::vertex_index_t>::type index_map;
   index_map index = boost::get(boost::vertex_index, I);
 

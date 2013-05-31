@@ -262,7 +262,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
 #endif
       return(0.0f);
     case '!':
-    /*case '~':*/
+    case '~':
     case UNARYMINUS:
     case '+':
     case '-':
@@ -283,26 +283,26 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case GE_OP:
     case EQ_OP:
     case NE_OP:
-    /*case AND_OP:
+    case AND_OP:
     case OR_OP:
     case GETHBIT:
     case GETABIT:
     case GETBYTE:
-    case GETWORD:*/
+    case GETWORD:
     case LEFT_OP:
     case RIGHT_OP:
     case GET_VALUE_AT_ADDRESS:
     case '=':
     case IFX:
     case ADDRESS_OF:
-    /*case JUMPTABLE:*/
+    case JUMPTABLE:
     case CAST:
     /*case RECEIVE:
     case SEND:*/
     case DUMMY_READ_VOLATILE:
     /*case CRITICAL:
-    case ENDCRITICAL:
-    case SWAP:*/
+    case ENDCRITICAL:*/
+    case SWAP:
       assign_operands_for_cost(a, i, G, I);
       set_surviving_regs(a, i, G, I);
       c = drySTM8iCode(ic);
@@ -344,8 +344,8 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
   if(ia.registers[REG_A][1] < 0)
     c += 0.1f;
 
-  /*if(ia.registers[REG_XL][1] < 0 && ia.registers[REG_YL][1] >= 0)
-    c += 0.2f;*/
+  /*if(ia.registers[REG_XL][1] < 0 && ia.registers[REG_YL][1] >= 0) // Prefer X over Y.
+    c += 0.3f;*/
 
   varset_t::const_iterator v, v_end;
   for(v = a.local.begin(), v_end = a.local.end(); v != v_end; ++v)

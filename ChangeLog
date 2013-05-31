@@ -3,6 +3,9 @@
 	* src/SDCCcse.c,
 	  src/SDCClospre.cc:
 	  Fix bug #2167.
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Implement jump tables.
 
 2013-05-30 Raphael Neider <rneider AT web.de>
 

@@ -10557,7 +10557,7 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genJumpTab - genrates code for jump table                       */
+/* genJumpTab - generate code for jump table                       */
 /*-----------------------------------------------------------------*/
 static void
 genJumpTab (const iCode * ic)

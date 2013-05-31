@@ -4847,7 +4847,7 @@ genAddrOf (const iCode *ic)
   else // todo: Handle case of both X and Y alive; todo: Use mov when destination is a global variable.
     {
       if (!regalloc_dry_run)
-        wassertl (0, "Unimplemented genAddrOf deadness");
+        wassertl (0, "Unimplemented genAddrOf deadness.");
       cost (80, 80);
     }
 
@@ -4855,7 +4855,50 @@ genAddrOf (const iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genCast - gen code for casting                                  */
+/* genCast - generate code for jump table                          */
+/*-----------------------------------------------------------------*/
+static void
+genJumpTab (const iCode *ic)
+{
+  symbol *jtab = regalloc_dry_run ? 0 : newiTempLabel (0);
+  operand *cond;
+
+  D (emitcode ("; genJumpTab", ""));
+
+  cond = IC_JTCOND (ic);
+
+  aopOp (cond, ic);
+
+  if (!regDead (X_IDX, ic))
+    {
+      wassertl (regalloc_dry_run, "Need free X for jump table.");
+      cost (80, 80);
+    }
+
+  genMove (ASMOP_X, cond->aop, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+
+  emit3w (A_SLLW, ASMOP_X, 0);
+
+  if (!regalloc_dry_run)
+    {
+      emitcode ("ldw", "x, (#!tlabel, x)", labelKey2num (jtab->key));
+      emitcode ("jp", "(x)");
+    }
+  cost (4, 3);
+
+  emitLabel (jtab);
+  for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
+    {
+      if (!regalloc_dry_run)
+        emitcode (".dw", "#!tlabel", labelKey2num (jtab->key));
+      cost (2, 0);
+    }
+
+  freeAsmop (cond);
+}
+
+/*-----------------------------------------------------------------*/
+/* genCast - generate code for cast                                */
 /*-----------------------------------------------------------------*/
 static void
 genCast (const iCode *ic)
@@ -5216,7 +5259,7 @@ genSTM8iCode (iCode *ic)
       break;
 
     case JUMPTABLE:
-      wassertl (0, "Unimplemented iCode");
+      genJumpTab (ic);
       break;
 
     case CAST:

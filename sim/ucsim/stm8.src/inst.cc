@@ -246,13 +246,15 @@ cl_stm8::get3(unsigned int addr)
 int
 cl_stm8::inst_addw(t_mem code, unsigned char prefix)
 {
-  int result, operand1, operand2;
+  int result, operand1, operand2, nibble_high, nibble_low;
   short unsigned int *dest_ptr;
 
-  dest_ptr = (code & 0x0f) == 0x09 ? &regs.Y : &regs.X;
+  nibble_high = (code & 0xf0) >> 4;
+  nibble_low = code & 0x0f;
+  dest_ptr = nibble_low == 0x09 || nibble_low == 0x02 ? &regs.Y : &regs.X;
   operand1 = *dest_ptr;
 
-  switch((code & 0xf0) >> 4)
+  switch(nibble_high)
   {
     case 0x1:
     case 0xa: operand2 = fetch2(); break; // Immediate
@@ -261,7 +263,7 @@ cl_stm8::inst_addw(t_mem code, unsigned char prefix)
     default: return(resHALT);
   }
 
-  switch(code & 0xf) {
+  switch(nibble_low) {
     case 0x0:
     case 0xd: operand2 = -operand2;
     case 0xb:

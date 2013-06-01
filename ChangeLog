@@ -1,3 +1,8 @@
+2013-06-01 Valentin Dudouyt <valentin dudouyt AT gmail.com>
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fixed subw y.
+
 2013-05-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCcse.c,

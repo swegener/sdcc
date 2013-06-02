@@ -4,6 +4,10 @@
 	  Fix handling of N and Z flags in addw, subw.
 	* support/regression/tests/gcc-torture-execute-20021120-1.c:
 	  Disable failing test for stm8 (bug #2180).
+	* src/stm8/gen.c:
+	  More efficient subtraction.
+	* support/regression/tests/gcc-torture-execute-pr47337.c:
+	  Disable this very colatile test for stm8 for now. See bug #2172 for the longer justification.
 
 2013-06-01 Valentin Dudouyt <valentin dudouyt AT gmail.com>
 

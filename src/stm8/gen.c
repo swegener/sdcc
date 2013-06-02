@@ -434,12 +434,12 @@ opw_cost (const asmop *op1, int offset1)
 {
   wassert (op1);
 
-  if (aopInReg (op1, offset1, X_IDX))
+  if (aopInReg (op1, offset1, XL_IDX))
     {
       cost (1, 1);
       return;
     }
-  else if (aopInReg (op1, offset1, Y_IDX))
+  else if (aopInReg (op1, offset1, YL_IDX))
     {
       cost (2, 1);
       return;
@@ -455,12 +455,12 @@ opw_cost2 (const asmop *op1, int offset1)
 {
   wassert (op1);
 
-  if (aopInReg (op1, offset1, X_IDX))
+  if (aopInReg (op1, offset1, XL_IDX))
     {
       cost (1, 2);
       return;
     }
-  else if (aopInReg (op1, offset1, Y_IDX))
+  else if (aopInReg (op1, offset1, YL_IDX))
     {
       cost (2, 2);
       return;
@@ -2026,25 +2026,134 @@ genCpl (const iCode *ic)
 static void
 genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
 {
-  int size, i;
+  int size, i, j;
   bool started;
   bool pushed_a = FALSE;
-  int left_in_a = -1;
   bool result_in_a = FALSE;
 
   size = result_aop->size;
 
-  for (i = 0; i < size; i++)
-    if (aopInReg (left_aop, i, A_IDX))
-      {
-        left_in_a = i;
-        break;
-      }
-
   for (i = 0, started = FALSE; i < size;)
     {
-      if (0) // todo: Use subw, incw, decw where it provides an advantage.
-        ;
+      bool a_free = regDead (A_IDX, ic) && left_aop->regs[A_IDX] <= i && right_aop->regs[A_IDX] <= i && !result_in_a || pushed_a;
+      bool x_free = regDead (X_IDX, ic) && result_aop->regs[XL_IDX] < i && result_aop->regs[XH_IDX] < i && left_aop->regs[XL_IDX] <= i + 1 && left_aop->regs[XH_IDX] <= i + 1 && right_aop->regs[XL_IDX] < i && right_aop->regs[XH_IDX] < i;
+
+      if (!started && left_aop->type == AOP_LIT && !byteOfVal (left_aop->aopu.aop_lit, i) &&
+        (!byteOfVal (left_aop->aopu.aop_lit, i + 1) && (aopInReg (result_aop, i, X_IDX) || aopInReg (result_aop, i, Y_IDX)) ||
+        !started && i == size - 1 && (aopInReg (result_aop, i, XL_IDX) && regDead (XH_IDX, ic) && right_aop->regs[XH_IDX] < 0 && result_aop->regs[XH_IDX] < 0 || aopInReg (result_aop, i, YL_IDX) && regDead (YH_IDX, ic) && right_aop->regs[YH_IDX] < 0 && result_aop->regs[YH_IDX] < 0)))
+        {
+          bool half = (i == size - 1);
+          bool x = aopInReg (result_aop, i, half ? XL_IDX : X_IDX);
+          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, right_aop, i, 2 - half, a_free, x, !x);
+          emit3w (A_NEGW, x ? ASMOP_X : ASMOP_Y, 0);
+
+          started = TRUE;
+
+          i += 2;
+        }
+      else if (!started &&
+        aopOnStack (result_aop, i, 2) && aopOnStack (right_aop, i, 2) && result_aop->aopu.bytes[i].byteu.stk == right_aop->aopu.bytes[i].byteu.stk && result_aop->aopu.bytes[i + 1].byteu.stk == right_aop->aopu.bytes[i + 1].byteu.stk &&
+        right_aop->type == AOP_LIT && !byteOfVal (left_aop->aopu.aop_lit, i) && !byteOfVal (left_aop->aopu.aop_lit, i + 1))
+        {
+          emit3w_o (A_NEGW, result_aop, i, 0, 0);
+          started = TRUE;
+          i += 2;
+        }
+      // We can use incw / decw only for the only, top non-zero word, since it neither takes into account an existing carry nor does it update the carry.
+      else if (!started && i == size - 2 &&
+        (aopInReg (result_aop, i, X_IDX) || aopInReg (result_aop, i, Y_IDX)) &&
+        right_aop->type == AOP_LIT && !byteOfVal (right_aop->aopu.aop_lit, i + 1) &&
+        byteOfVal (right_aop->aopu.aop_lit, i) <= 1 + aopInReg (result_aop, i, X_IDX) ||
+        !started && i == size - 1 &&
+        !(aopInReg (left_aop, i, A_IDX) && regDead (A_IDX, ic)) &&
+        (aopInReg (result_aop, i, XL_IDX) && regDead (XH_IDX, ic) && left_aop->regs[XH_IDX] < 0 && result_aop->regs[XH_IDX] < 0 || aopInReg (result_aop, i, YL_IDX) && regDead (YH_IDX, ic) && left_aop->regs[YH_IDX] < 0 && result_aop->regs[YH_IDX] < 0) &&
+        right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) <= 1 + aopInReg (result_aop, i, XL_IDX))
+        {
+          bool half = (i == size - 1);
+          bool x = aopInReg (result_aop, i, half ? XL_IDX : X_IDX);emitcode(";X", "%d %d %d %d", x, half, byteOfVal (right_aop->aopu.aop_lit, i), byteOfVal (right_aop->aopu.aop_lit, i + 1));
+          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left_aop, i, 2 - half, a_free, x, !x);
+          for (j = 0; j < byteOfVal (right_aop->aopu.aop_lit, i); j++)
+            emit3w (A_DECW, x ? ASMOP_X : ASMOP_Y, 0);
+          cost (x ? 1 : 2, 1);
+          started = TRUE;
+          i += 2;
+        }
+      else if (!started &&
+        (aopInReg (result_aop, i, X_IDX) || aopInReg (result_aop, i, Y_IDX)) &&
+        (right_aop->type == AOP_LIT || (right_aop->type == AOP_IMMD || aopOnStackNotExt (right_aop, i, 2)) && i + 1 < right_aop->size))
+        {
+          bool x = aopInReg (result_aop, i, X_IDX);
+          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left_aop, i, 2, a_free, x, !x);
+          if (right_aop->type != AOP_LIT || byteOfVal (right_aop->aopu.aop_lit, i) || byteOfVal (right_aop->aopu.aop_lit, i + 1))
+            {
+              emitcode ("subw", x ? "x, %s" : "y, %s", aopGet2 (right_aop, i));
+              cost ((x || aopOnStack (right_aop, 0, 2)) ? 3 : 4, 2);
+              started = TRUE;
+            }
+          started = TRUE;
+          i += 2;
+        }
+      else if (!started && left_aop->type == AOP_LIT && !byteOfVal (left_aop->aopu.aop_lit, i) &&
+        aopOnStack (result_aop, i, 1) && aopOnStack (right_aop, i, 1) && result_aop->aopu.bytes[i].byteu.stk == right_aop->aopu.bytes[i].byteu.stk)
+        {
+          emit3_o (A_NEG, result_aop, i, 0, 0);
+          started = TRUE;
+          i++;
+        }
+      else if (!started && i == size - 1 &&
+        aopOnStack (result_aop, i, 1) && aopOnStack (left_aop, i, 1) && result_aop->aopu.bytes[i].byteu.stk == left_aop->aopu.bytes[i].byteu.stk &&
+        right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) <= 2 + !a_free)
+        {
+          for (j = 0; j < byteOfVal (right_aop->aopu.aop_lit, i); j++)
+            emit3_o (A_DEC, result_aop, i, 0, 0);
+          i++;
+        }
+      else if (!started && i == size - 1 &&
+        aopOnStack (result_aop, i, 1) && aopOnStack (left_aop, i, 1) && result_aop->aopu.bytes[i].byteu.stk == left_aop->aopu.bytes[i].byteu.stk &&
+        right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) >= 254 - !a_free)
+        {
+          for (j = byteOfVal (right_aop->aopu.aop_lit, i); j < 256; j++)
+            emit3_o (A_INC, result_aop, i, 0, 0);
+          i++;
+        }
+      else if (!started && x_free && 
+        (aopOnStack (result_aop, i, 2) || result_aop->type == AOP_DIR) &&
+        (aopRS (left_aop) && !aopInReg(left_aop, i, A_IDX) && !aopInReg(left_aop, i + 1, A_IDX) || left_aop->type == AOP_DIR) &&
+        (aopOnStackNotExt (right_aop, i, 2) || right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD))
+        {
+          genMove_o (ASMOP_X, 0, left_aop, i, 2, a_free, TRUE, FALSE);
+          if (i == size - 2 && right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) <= 2 && !byteOfVal (right_aop->aopu.aop_lit, i + 1))
+            for (j = 0; j < byteOfVal (right_aop->aopu.aop_lit, i); j++)
+              emit3w (A_DECW, ASMOP_X, 0);
+          else
+            {
+              emitcode ("subw", "x, %s", aopGet2 (right_aop, i));
+              cost (3 + (right_aop->type == AOP_DIR), 2);
+            }
+          genMove_o (result_aop, i, ASMOP_X, 0, 2, a_free, TRUE, FALSE);
+          started = TRUE;
+          i += 2;
+        }
+      else if (!started && left_aop->type == AOP_LIT && !byteOfVal (left_aop->aopu.aop_lit, i))
+        {
+          if (!a_free)
+            {
+              push (ASMOP_A, 0, 1);
+              pushed_a = TRUE;
+              result_in_a = FALSE;
+            }
+
+          cheapMove (ASMOP_A, 0, right_aop, i, FALSE);
+          emit3 (A_NEG, ASMOP_A, 0);
+          cheapMove (result_aop, i, ASMOP_A, 0, FALSE);
+
+          started = TRUE;
+
+          if (aopInReg (result_aop, i, A_IDX))
+            result_in_a = TRUE;
+            
+          i++;
+        }
       else if (aopInReg (right_aop, i, A_IDX)) // todo: Be more flexible and handle this.
         {
           if (!regalloc_dry_run)
@@ -2054,14 +2163,14 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         }
       else
         {
-          if ((!regDead (A_IDX, ic) || left_in_a > i || result_in_a) && !pushed_a)
+          if (!a_free)
             {
               push (ASMOP_A, 0, 1);
               pushed_a = TRUE;
               result_in_a = FALSE;
             }
 
-          if (left_in_a == i && pushed_a)
+          if (left_aop->regs[A_IDX] == i && pushed_a)
             {
               emitcode ("ld", "a, (1, sp)");
               cost (2, 1);
@@ -2070,10 +2179,10 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
             cheapMove (ASMOP_A, 0, left_aop, i, FALSE);
 
           if (!started && right_aop->type == AOP_LIT && !byteOfVal (right_aop->aopu.aop_lit, i))
-            {
-              // Skip over this byte.
-            }
-          else // todo: Use dec / inc.
+            ; // Skip over this byte.
+          else if (!started && i + 1 == size && right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) == 1)
+            emit3 (A_DEC, ASMOP_A, 0);
+          else
             {
               const asmop *right_stacked = NULL;
               int right_offset;
@@ -2701,7 +2810,6 @@ genPlus (const iCode *ic)
   int size, i, j;
   bool started;
   bool pushed_a = FALSE;
-  int left_in_a = -1;
   bool result_in_a = FALSE;
 
   D (emitcode ("; genPlus", ""));
@@ -2719,16 +2827,12 @@ genPlus (const iCode *ic)
       right = left;
       left = t;
     }
-
-  for (i = 0; i < size; i++)
-    if (aopInReg (left->aop, i, A_IDX))
-      {
-        left_in_a = i;
-        break;
-      }
   
-  for(i = 0, started = FALSE; i < size;)
-    {// Todo: 16-bit operation in dead source might be cheaper than add.
+  for(i = 0, started = FALSE; i < size;) // Todo: 16-bit operation in dead source might be cheaper than add.
+    {
+       bool a_free = regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] <= i && !result_in_a || pushed_a;
+       bool x_free = regDead (X_IDX, ic) && result->aop->regs[XL_IDX] < i && result->aop->regs[XH_IDX] < i && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] < i && right->aop->regs[XH_IDX] < i;
+
       // We can use incw / decw only for the only, top non-zero word, since it neither takes into account an existing carry nor does it update the carry.
       if (!started && i == size - 2 &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
@@ -2741,8 +2845,7 @@ genPlus (const iCode *ic)
         {
           bool half = (i == size - 1);
           bool x = aopInReg (result->aop, i, half ? XL_IDX : X_IDX) ;
-          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2 - half,
-            pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, x, !x);
+          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2 - half, a_free, x, !x);
           for (j = 0; j < byteOfVal (right->aop->aopu.aop_lit, i); j++)
             emit3w (A_INCW, x ? ASMOP_X : ASMOP_Y, 0);
           cost (x ? 1 : 2, 1);
@@ -2754,8 +2857,7 @@ genPlus (const iCode *ic)
         right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) == 255 && byteOfVal (right->aop->aopu.aop_lit, i + 1) == 0)
         {
           bool x = aopInReg (result->aop, i, X_IDX);
-          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2,
-            pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, x, !x);
+          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2, a_free, x, !x);
           emit3w (A_DECW, x ? ASMOP_X : ASMOP_Y, 0);
           started = TRUE;
           i += 2;
@@ -2765,8 +2867,7 @@ genPlus (const iCode *ic)
         (right->aop->type == AOP_LIT || (right->aop->type == AOP_IMMD || aopOnStackNotExt (right->aop, i, 2)) && i + 1 < right->aop->size))
         {
           bool x = aopInReg (result->aop, i, X_IDX);
-          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2,
-            pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, x, !x);
+          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left->aop, i, 2, a_free, x, !x);
           if (right->aop->type != AOP_LIT || byteOfVal (right->aop->aopu.aop_lit, i) || byteOfVal (right->aop->aopu.aop_lit, i + 1))
             {
               emitcode ("addw", x ? "x, %s" : "y, %s", aopGet2 (right->aop, i));
@@ -2778,30 +2879,26 @@ genPlus (const iCode *ic)
         }
       else if (!started && i == size - 1 &&
         aopOnStack (result->aop, i, 1) && aopOnStack (left->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk &&
-        right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) <= 2)
+        right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) <= 2 + !a_free)
         {
           for (j = 0; j < byteOfVal (right->aop->aopu.aop_lit, i); j++)
-            {
-              emitcode ("inc", "%s", aopGet(result->aop, i));
-              cost (2, 1);
-            }
+            emit3_o (A_INC, result->aop, i, 0, 0);
           i++;
         }
       else if (!started && i == size - 1 &&
         aopOnStack (result->aop, i, 1) && aopOnStack (left->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk &&
-        right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) == 255)
+        right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) >= 254 - !a_free)
         {
-          emitcode ("dec", "%s", aopGet(result->aop, i));
-          cost (2, 1);
+          for (j = byteOfVal (right->aop->aopu.aop_lit, i); j < 256; j++)
+            emit3_o (A_DEC, result->aop, i, 0, 0);
           i++;
         }
-      else if (!started &&
-        regDead (X_IDX, ic) && result->aop->regs[XL_IDX] < i && result->aop->regs[XH_IDX] < i && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] < i && right->aop->regs[XH_IDX] < i && 
+      else if (!started && x_free && 
         (aopOnStack (result->aop, i, 2) || result->aop->type == AOP_DIR) &&
         (aopRS (left->aop) && !aopInReg(left->aop, i, A_IDX) && !aopInReg(left->aop, i + 1, A_IDX) || left->aop->type == AOP_DIR) &&
         (aopOnStackNotExt (right->aop, i, 2) || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
         {
-          genMove_o (ASMOP_X, 0, left->aop, i, 2, pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, TRUE, FALSE);
+          genMove_o (ASMOP_X, 0, left->aop, i, 2, a_free, TRUE, FALSE);
           if (i == size - 2 && right->aop->type == AOP_LIT && byteOfVal (right->aop->aopu.aop_lit, i) <= 2 && !byteOfVal (right->aop->aopu.aop_lit, i + 1))
             for (j = 0; j < byteOfVal (right->aop->aopu.aop_lit, i); j++)
               emit3w (A_INCW, ASMOP_X, 0);
@@ -2810,7 +2907,7 @@ genPlus (const iCode *ic)
               emitcode ("addw", "x, %s", aopGet2 (right->aop, i));
               cost (3 + (right->aop->type == AOP_DIR), 2);
             }
-          genMove_o (result->aop, i, ASMOP_X, 0, 2, pushed_a || regDead (A_IDX, ic) && left_in_a <= i && !result_in_a, TRUE, FALSE);
+          genMove_o (result->aop, i, ASMOP_X, 0, 2, a_free, TRUE, FALSE);
           started = TRUE;
           i += 2;
         }
@@ -2823,14 +2920,14 @@ genPlus (const iCode *ic)
         }
       else
         {
-          if ((!regDead (A_IDX, ic) || left_in_a > i || result_in_a) && !pushed_a)
+          if (!a_free)
             {
               push (ASMOP_A, 0, 1);
               pushed_a = TRUE;
               result_in_a = FALSE;
             }
 
-          if (left_in_a == i && pushed_a)
+          if (left->aop->regs[A_IDX] == i && pushed_a)
             {
               emitcode ("ld", "a, (1, sp)");
               cost (2, 1);

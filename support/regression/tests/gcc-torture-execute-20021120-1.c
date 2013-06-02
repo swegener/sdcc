@@ -60,7 +60,7 @@ void foo (int n)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_stm8)
   int i;
 
   for (i = 0; i < 32; i++)

@@ -1,3 +1,10 @@
+2013-06-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix handling of N and Z flags in addw, subw.
+	* support/regression/tests/gcc-torture-execute-20021120-1.c:
+	  Disable failing test for stm8 (bug #2180).
+
 2013-06-01 Valentin Dudouyt <valentin dudouyt AT gmail.com>
 
 	* sim/ucsim/stm8.src/inst.cc:

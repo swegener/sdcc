@@ -510,7 +510,7 @@ cl_stm8::exec_inst(void)
    if (cprefix == 0x72) {
       switch (code) {
       	 // addw
-         case 0xa9:
+     case 0xa9:
 	 case 0xb9:
 	 case 0xbb:
 	 case 0xf9:
@@ -677,7 +677,7 @@ cl_stm8::exec_inst(void)
                return(resGO);
                break;            
             case 0x60: //div
-               return( inst_div( code, cprefix));
+               return(inst_div(code, cprefix));
                break;
             case 0x10: 
             case 0xA0:

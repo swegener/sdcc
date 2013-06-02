@@ -275,10 +275,11 @@ cl_stm8::inst_addw(t_mem code, unsigned char prefix)
 
   result = operand1 + operand2;
 
-  FLAG_NZ (result);
   FLAG_ASSIGN (BIT_V, 0x8000 & (operand1 ^ operand2 ^ result ^ (result >> 1)));
-  FLAG_ASSIGN (BIT_C, 0x10000 & result);
   FLAG_ASSIGN (BIT_H, 0x40 & (operand1 ^ operand2 ^ result));
+  FLAG_ASSIGN (BIT_N, 0x8000 & result);
+  FLAG_ASSIGN (BIT_Z, (result & 0xffff) == 0);
+  FLAG_ASSIGN (BIT_C, 0x10000 & result);
 
   *dest_ptr = result & 0xffff;
   return(resGO);

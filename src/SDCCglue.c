@@ -804,12 +804,12 @@ printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
   symbol *lsym = *sym;
   initList *lilist = *ilist;
   unsigned long ival = 0;
-  int size = 0;
-  int bit_start = 0;
+  unsigned size = 0;
+  unsigned bit_start = 0;
 
   while (lsym && IS_BITFIELD (lsym->type))
     {
-      int bit_length = SPEC_BLEN (lsym->etype);
+      unsigned bit_length = SPEC_BLEN (lsym->etype);
       if (0 == bit_length)
         {
           /* bit-field structure member with a width of 0 */
@@ -2111,38 +2111,7 @@ glue (void)
         }
       else
         {
-          assert (mcs51_like);
-          fprintf (asmFile, "__sdcc_gsinit_startup:\n");
-          /* if external stack is specified then the
-             higher order byte of the xdatalocation is
-             going into P2 and the lower order going into
-             spx */
-          if (options.useXstack)
-            {
-              fprintf (asmFile, "\tmov\tP2,#0x%02x\n", (((unsigned int) options.xdata_loc) >> 8) & 0xff);
-              fprintf (asmFile, "\tmov\t_spx,#0x%02x\n", (unsigned int) options.xdata_loc & 0xff);
-            }
-
-          // This should probably be a port option, but I'm being lazy.
-          // on the 400, the firmware boot loader gives us a valid stack
-          // (see '400 data sheet pg. 85 (TINI400 ROM Initialization code)
-          if (!TARGET_IS_DS400)
-            {
-              /* initialise the stack pointer.  JCF: aslink takes care of the location */
-              fprintf (asmFile, "\tmov\tsp,#__start__stack - 1\n");     /* MOF */
-            }
-
-          fprintf (asmFile, "\t%ccall\t__sdcc_external_startup\n", options.acall_ajmp ? 'a' : 'l');
-          fprintf (asmFile, "\tmov\ta,dpl\n");
-          fprintf (asmFile, "\tjz\t__sdcc_init_data\n");
-          fprintf (asmFile, "\t%cjmp\t__sdcc_program_startup\n", options.acall_ajmp ? 'a' : 'l');
-          fprintf (asmFile, "__sdcc_init_data:\n");
-
-          // if the port can copy the XINIT segment to XISEG
-          if (port->genXINIT)
-            {
-              port->genXINIT (asmFile);
-            }
+          assert (0);
         }
     }
   dbuf_write_and_destroy (&statsg->oBuf, asmFile);

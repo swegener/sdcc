@@ -10,7 +10,12 @@
 
 #include <string.h>
 
-#ifndef __SDCC_mcs51
+#if defined __SDCC_MODEL_SMALL || defined __SDCC_MODEL_MEDIUM
+#define SIZE 64     // the available memory is limited
+#else
+#define SIZE 2048
+#endif
+
 /* PR rtl-optimization/23561 */
 
 struct A
@@ -18,18 +23,16 @@ struct A
   char a1[1];
   char a2[5];
   char a3[1];
-  char a4[2048 - 7];
+  char a4[SIZE - 7];
 } a;
 
 void
 bar (struct A *x)
 {
   size_t i;
-  if (memcmp (x, "\1HELLO\1", sizeof "\1HELLO\1"))
-    ASSERT (0);
+  ASSERTFALSE (memcmp (x, "\1HELLO\1", sizeof "\1HELLO\1"));
   for (i = 0; i < sizeof (x->a4); i++)
-    if (x->a4[i])
-      ASSERT (0);
+    ASSERTFALSE (x->a4[i]);
 }
 
 int
@@ -42,13 +45,11 @@ foo (void)
   bar (&a);
   return 0;
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_stm8)
+#if !defined(__SDCC_stm8)
   foo ();
-  return;
 #endif
 }

@@ -305,7 +305,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case SWAP:
       assign_operands_for_cost(a, i, G, I);
       set_surviving_regs(a, i, G, I);
-      c = drySTM8iCode(ic);
+      c = (float)drySTM8iCode(ic);
       unset_surviving_regs(i, G);
 #if 0
       std::cout << "Got cost " << c << "\n";

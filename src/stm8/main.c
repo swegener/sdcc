@@ -31,6 +31,7 @@
 
 static char stm8_defaultRules[] = {
 #include "peeph.rul"
+  ""
 };
 
 

@@ -176,7 +176,7 @@ typedef struct specifier
   unsigned b_isenum:1;              /* is an enumerated type      */
   unsigned b_bitUnnamed:1;          /* is an unnamed bit-field    */
   unsigned _bitStart;               /* bit start position         */
-  int _bitLength;                   /* bit length                 */
+  unsigned _bitLength;              /* bit length                 */
   unsigned _addr;                   /* address of symbol          */
   unsigned _stack;                  /* stack offset for stacked v */
   int argreg;                       /* reg no for regparm         */

@@ -85,7 +85,7 @@ typedef struct specifier {
     unsigned   _addr        ;  /* address of symbol          */
     unsigned   _stack       ;  /* stack offset for stacked v */
     unsigned   _bitStart    ;  /* bit start position         */
-    int        _bitLength   ;  /* bit length                 */
+    unsigned   _bitLength   ;  /* bit length                 */
 
     struct structdef *v_struct; /* structure pointer      */
 } specifier ;

@@ -8370,7 +8370,7 @@ AccRol (int shCount)
 /* AccLsh - left shift accumulator by known count                  */
 /*-----------------------------------------------------------------*/
 static void
-AccLsh (int shCount)
+AccLsh (unsigned int shCount)
 {
   static const unsigned char SLMask[] =
   {
@@ -8403,7 +8403,7 @@ AccLsh (int shCount)
 /* shiftL1Left2Result - shift left one byte from left to result    */
 /*-----------------------------------------------------------------*/
 static void
-shiftL1Left2Result (operand * left, int offl, operand * result, int offr, int shCount)
+shiftL1Left2Result (operand * left, int offl, operand * result, int offr, unsigned int shCount)
 {
   /* If operand and result are the same we can shift in place.
      However shifting in acc using add is cheaper than shifting
@@ -8427,7 +8427,7 @@ shiftL1Left2Result (operand * left, int offl, operand * result, int offr, int sh
 /* genlshTwo - left shift two bytes by known amount                */
 /*-----------------------------------------------------------------*/
 static void
-genlshTwo (operand *result, operand *left, int shCount, const iCode *ic)
+genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic)
 {
   int size = AOP_SIZE (result);
 
@@ -8472,7 +8472,7 @@ genlshTwo (operand *result, operand *left, int shCount, const iCode *ic)
 /* genlshOne - left shift a one byte quantity by known count       */
 /*-----------------------------------------------------------------*/
 static void
-genlshOne (operand * result, operand * left, int shCount)
+genlshOne (operand * result, operand * left, unsigned int shCount)
 {
   shiftL1Left2Result (left, LSB, result, LSB, shCount);
 }
@@ -8483,8 +8483,8 @@ genlshOne (operand * result, operand * left, int shCount)
 static void
 genLeftShiftLiteral (operand * left, operand * right, operand * result, const iCode *ic)
 {
-  int shCount = (int) ulFromVal (AOP (right)->aopu.aop_lit);
-  int size;
+  unsigned int shCount = ulFromVal (AOP (right)->aopu.aop_lit);
+  unsigned int size;
 
   freeAsmop (right, NULL);
 
@@ -9043,8 +9043,8 @@ genUnpackBits (operand * result, int pair)
   int rsize;                    /* result size */
   int rlen = 0;                 /* remaining bit-field length */
   sym_link *etype;              /* bit-field type information */
-  int blen;                     /* bit-field length */
-  int bstr;                     /* bit-field starting bit within byte */
+  unsigned blen;                /* bit-field length */
+  unsigned bstr;                /* bit-field starting bit within byte */
 
   emitDebug ("; genUnpackBits");
 
@@ -9617,8 +9617,8 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
   int offset = 0;               /* source byte offset */
   int pair_offset = 0;
   int rlen = 0;                 /* remaining bit-field length */
-  int blen;                     /* bit-field length */
-  int bstr;                     /* bit-field starting bit within byte */
+  unsigned blen;                /* bit-field length */
+  unsigned bstr;                /* bit-field starting bit within byte */
   int litval;                   /* source literal value (if AOP_LIT) */
   unsigned char mask;           /* bitmask within current byte */
   int extraPair;                /* a tempory register */

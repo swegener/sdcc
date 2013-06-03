@@ -2287,8 +2287,8 @@ dwTagFromType (sym_link * type, dwtag * parent)
                                                           field->name));
                   if (IS_BITFIELD (field->type))
                     {
-                      int blen = SPEC_BLEN (field->type);
-                      int bstr = SPEC_BSTR (field->type);
+                      unsigned blen = SPEC_BLEN (field->type);
+                      unsigned bstr = SPEC_BSTR (field->type);
                       sym_link * type;
                       
                       dwAddTagAttr (memtp,

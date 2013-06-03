@@ -283,7 +283,7 @@ aopGet(const asmop *aop, int offset)
 
   if (aop->type == AOP_LIT)
     {
-      snprintf (buffer, 256, "#0x%02x", byteOfVal (aop->aopu.aop_lit, offset));
+      SNPRINTF (buffer, 256, "#0x%02x", byteOfVal (aop->aopu.aop_lit, offset));
       return (buffer);
     }
 
@@ -301,23 +301,23 @@ aopGet(const asmop *aop, int offset)
           wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
           wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
 
-          snprintf (buffer, 256, "(0x%x, y)", (unsigned)eoffset);
+          SNPRINTF (buffer, 256, "(0x%x, y)", (unsigned)eoffset);
         }
       else
-        snprintf (buffer, 256, "(0x%02x, sp)", (unsigned)soffset);
+        SNPRINTF (buffer, 256, "(0x%02x, sp)", (unsigned)soffset);
       return (buffer);
     }
 
   if (aop->type == AOP_IMMD)
     {
       wassertl (offset < 2, "Immediate operand out of range");
-      snprintf (buffer, 256, offset ? "#>%s" : "#<%s", aop->aopu.aop_immd);
+      SNPRINTF (buffer, 256, offset ? "#>%s" : "#<%s", aop->aopu.aop_immd);
       return (buffer);
     }
 
   if (aop->type == AOP_DIR)
     {
-      snprintf (buffer, 256, "%s+%d", aop->aopu.aop_dir, aop->size - 1 - offset);
+      SNPRINTF (buffer, 256, "%s+%d", aop->aopu.aop_dir, aop->size - 1 - offset);
       return (buffer);
     }
 
@@ -343,12 +343,12 @@ aopGet2(const asmop *aop, int offset)
 
   if (aop->type == AOP_LIT)
     {
-      snprintf (buffer, 256, "#0x%02x%02x", byteOfVal (aop->aopu.aop_lit, offset + 1), byteOfVal (aop->aopu.aop_lit, offset));
+      SNPRINTF (buffer, 256, "#0x%02x%02x", byteOfVal (aop->aopu.aop_lit, offset + 1), byteOfVal (aop->aopu.aop_lit, offset));
       return (buffer);
     }
   else if (aop->type == AOP_IMMD)
     {
-      snprintf (buffer, 256, "#%s", aop->aopu.aop_immd);
+      SNPRINTF (buffer, 256, "#%s", aop->aopu.aop_immd);
       return (buffer);
     }
 
@@ -473,6 +473,8 @@ opw_cost2 (const asmop *op1, int offset1)
 static void
 ld_cost (const asmop *op1, int offset1, const asmop *op2, int offset2)
 {
+  int r1Idx, r2Idx;
+
   AOP_TYPE op1type = op1->type;
   AOP_TYPE op2type = op2->type;
 
@@ -489,8 +491,8 @@ ld_cost (const asmop *op1, int offset1, const asmop *op2, int offset2)
       op2type = op2->type;
     }
 
-  int r1Idx = ((aopRS (op1) && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
-  int r2Idx = ((aopRS (op2) && op2->aopu.bytes[offset2].in_reg)) ? op2->aopu.bytes[offset2].byteu.reg->rIdx : -1;
+  r1Idx = ((aopRS (op1) && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
+  r2Idx = ((aopRS (op2) && op2->aopu.bytes[offset2].in_reg)) ? op2->aopu.bytes[offset2].byteu.reg->rIdx : -1;
 
   if (offset2 >= op2->size)
     op2type = AOP_LIT;
@@ -835,7 +837,7 @@ static void
 aopOp (operand *op, const iCode *ic)
 {
   symbol *sym;
-  int i;
+  unsigned int i;
 
   wassert (op);
 
@@ -891,7 +893,7 @@ aopOp (operand *op, const iCode *ic)
             if (!regalloc_dry_run)
               {
                 aop->aopu.bytes[i].byteu.stk = sym->usl.spillLoc->stack + aop->size - i;
-                if (sym->usl.spillLoc->stack + aop->size - i <= -_G.stack.pushed)
+                if (sym->usl.spillLoc->stack + aop->size - (int)(i) <= -_G.stack.pushed)
                   {
                     fprintf (stderr, "%d %d %d %d", (int)(sym->usl.spillLoc->stack), (int)(aop->size), (int)(i), (int)(_G.stack.pushed));
                     wassertl (0, "Invalid stack offset.");
@@ -1626,7 +1628,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       // Find lowest byte that can be assigned and needs to be assigned.
       for (i = 0; i < n; i++)
         {
-          size_t j;
+          int j;
 
           if (assigned[i] || !source->aopu.bytes[soffset + i].in_reg)
             continue;
@@ -2252,14 +2254,17 @@ genUminusFloat (const iCode *ic)
 static void
 genUminus (const iCode *ic)
 {
+  operand *result;
+  operand *left;
+
   if (IS_FLOAT (operandType (IC_LEFT (ic))))
     {
       genUminusFloat (ic);
       return;
     }
 
-  operand *result = IC_RESULT (ic);
-  operand *left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+  left = IC_LEFT (ic);
 
   D (emitcode ("; genUminus", ""));
 
@@ -2471,9 +2476,11 @@ emitCall (const iCode *ic, bool ispcall)
   /* if we need assign a result value */
   if (SomethingReturned && !bigreturn)
     {
+      int size;
+
       aopOp (IC_RESULT (ic), ic);
 
-      int size = !half ? IC_RESULT (ic)->aop->size : (IC_RESULT (ic)->aop->size > 2 ? 2 : IC_RESULT (ic)->aop->size);   
+      size = !half ? IC_RESULT (ic)->aop->size : (IC_RESULT (ic)->aop->size > 2 ? 2 : IC_RESULT (ic)->aop->size);   
 
       wassert (getSize (ftype->next) == 1 || getSize (ftype->next) == 2 || getSize (ftype->next) == 4);
 
@@ -4067,8 +4074,8 @@ genAnd (const iCode *ic)
 static void
 genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode *ic)
 {
-  int shCount = (int) ulFromVal (right->aop->aopu.aop_lit);
-  int size;
+  unsigned int shCount = ulFromVal (right->aop->aopu.aop_lit);
+  unsigned int size;
 
   D (emitcode ("; genLeftShiftLiteral", ""));
 
@@ -4087,7 +4094,7 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
     }
   else
     {
-      int i;
+      unsigned int i;
 
       wassertl (size <= 2, "Shifting of longs should be handled by generic function.");
 
@@ -4097,7 +4104,7 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
       genMove (result->aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
       while (shCount--)
-        for(i = 0; i < size;)
+        for (i = 0; i < size;)
           {
             if (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX))
               {
@@ -4263,7 +4270,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
   sign =  !SPEC_USIGN (getSpec (operandType (left)));
 
   /* I suppose that the left size >= result size */
-  wassert (getSize (operandType (left)) >= size);
+  wassert ((int) getSize (operandType (left)) >= size);
 
   if (!sign && shCount >= (size * 8))
     {
@@ -4284,7 +4291,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       genMove (result->aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
       while (shCount--)
-        for(i = size - 1; i >= 0;)
+        for (i = size - 1; i >= 0;)
           {
             if (i > 0 && (aopInReg (result->aop, i - 1, X_IDX) || aopInReg (result->aop, i - 1, Y_IDX)))
               {
@@ -4793,7 +4800,7 @@ genIfx (const iCode *ic)
       if(cond->aop->size > 1 && !IC_FALSE (ic))
         {
           tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-          inv = true;
+          inv = TRUE;
         }
 
       for (i = 0; i < cond->aop->size; i++) // todo: Use tnzw; test a first, if dead, to free a; use swapw followed by exg to test xh if xl is dead (same for yh), use tnzw independently of where in the operand xl and xh are.
@@ -5119,12 +5126,12 @@ genCast (const iCode *ic)
     genMove_o (result->aop, 0, right->aop, 0, result->aop->size, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
   else // Cast to signed type
     {
+      bool pushed_a = FALSE;
+
       genMove_o (result->aop, 0, right->aop, 0, right->aop->size, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
       size = result->aop->size - right->aop->size;
       offset = right->aop->size;
-
-      bool pushed_a = FALSE;
 
       if (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < right->aop->size || !regDead (A_IDX, ic))
         {

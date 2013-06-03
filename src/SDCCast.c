@@ -2537,7 +2537,7 @@ getResultTypeFromType (sym_link * type)
     return RESULT_TYPE_BOOL;
   if (IS_BITFIELD (type))
     {
-      int blen = SPEC_BLEN (type);
+      unsigned blen = SPEC_BLEN (type);
 
       if (blen <= 1)
         return RESULT_TYPE_BOOL;

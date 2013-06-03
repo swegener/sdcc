@@ -9062,7 +9062,7 @@ genUnpackBits (operand * result, operand * left, char *rname, int ptype)
 {
   int shCnt;
   sym_link *etype;
-  int blen = 0, bstr = 0;
+  unsigned blen = 0, bstr = 0;
   int same;
   pCodeOp *op;
 
@@ -9555,10 +9555,10 @@ genPointerGet (iCode * ic)
 static void
 genPackBits (sym_link * etype, operand * result, operand * right, char *rname, int p_type)
 {
-  int shCnt = 0;
+  unsigned shCnt = 0;
   int offset = 0;
   int rLen = 0;
-  int blen, bstr;
+  unsigned blen, bstr;
   int shifted_and_masked = 0;
   unsigned long lit = (unsigned long) - 1;
   sym_link *retype;

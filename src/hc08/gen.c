@@ -8495,8 +8495,8 @@ genUnpackBits (operand * result, operand * left, operand * right, iCode * ifx)
   int rsize;                    /* result size */
   int rlen = 0;                 /* remaining bitfield length */
   sym_link *etype;              /* bitfield type information */
-  int blen;                     /* bitfield length */
-  int bstr;                     /* bitfield starting bit within byte */
+  unsigned blen;                /* bitfield length */
+  unsigned bstr;                /* bitfield starting bit within byte */
   bool needpulla = FALSE;
   bool needpullh = FALSE;
   bool needpullx = FALSE;
@@ -8646,8 +8646,8 @@ genUnpackBitsImmed (operand * left, operand *right, operand * result, iCode * ic
   int rsize;                    /* result size */
   int rlen = 0;                 /* remaining bitfield length */
   sym_link *etype;              /* bitfield type information */
-  int blen;                     /* bitfield length */
-  int bstr;                     /* bitfield starting bit within byte */
+  unsigned blen;                /* bitfield length */
+  unsigned bstr;                /* bitfield starting bit within byte */
   asmop *derefaop;
   bool delayed_a = FALSE;
   bool assigned_a = FALSE;
@@ -9119,8 +9119,8 @@ genPackBits (operand * result, operand * left, sym_link * etype, operand * right
 {
   int offset = 0;               /* source byte offset */
   int rlen = 0;                 /* remaining bitfield length */
-  int blen;                     /* bitfield length */
-  int bstr;                     /* bitfield starting bit within byte */
+  unsigned blen;                /* bitfield length */
+  unsigned bstr;                /* bitfield starting bit within byte */
   int litval;                   /* source literal value (if AOP_LIT) */
   unsigned char mask;           /* bitmask within current byte */
   int litOffset = 0;
@@ -9284,8 +9284,8 @@ genPackBitsImmed (operand * result, operand * left, sym_link * etype, operand * 
   int size;
   int offset = 0;               /* source byte offset */
   int rlen = 0;                 /* remaining bitfield length */
-  int blen;                     /* bitfield length */
-  int bstr;                     /* bitfield starting bit within byte */
+  unsigned blen;                /* bitfield length */
+  unsigned bstr;                /* bitfield starting bit within byte */
   int litval;                   /* source literal value (if AOP_LIT) */
   unsigned char mask;           /* bitmask within current byte */
   bool needpulla;

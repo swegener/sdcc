@@ -792,9 +792,9 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
   symbol *lsym = *sym;
   initList *lilist = *ilist;
   unsigned long ival = 0;
-  int size = 0;
+  unsigned size = 0;
   int bit_start = 0;
-  int i;
+  unsigned i;
 
 
 #if DEBUG_PRINTIVAL
@@ -804,7 +804,7 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
 
   while (lsym && IS_BITFIELD (lsym->type))
     {
-      int bit_length = SPEC_BLEN (lsym->etype);
+      unsigned bit_length = SPEC_BLEN (lsym->etype);
       if (0 == bit_length)
         {
           /* bit-field structure member with a width of 0 */

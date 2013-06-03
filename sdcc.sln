@@ -61,6 +61,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdcpp", "support\cpp\sdcpp.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdcc", "src\sdcc.vcxproj", "{F9485499-151B-4886-935C-7D687C4A0549}"
 	ProjectSection(ProjectDependencies) = postProject
+		{0BA12B9F-BCD6-4C08-9992-69B4FB32D335} = {0BA12B9F-BCD6-4C08-9992-69B4FB32D335}
 		{EA40C4BB-7537-4422-AE03-629A05F3D4C5} = {EA40C4BB-7537-4422-AE03-629A05F3D4C5}
 	EndProjectSection
 EndProject
@@ -85,6 +86,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdasrab", "sdas\asrab\asrab.vcxproj", "{F47A26F0-2D57-4A1F-86CF-6E3F82D3E877}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdas390", "sdas\as8xcxxx\sdas390.vcxproj", "{13410A29-B3A6-4F10-8345-39D5293F3D9A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1} = {2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stm8", "src\stm8\stm8.vcxproj", "{0BA12B9F-BCD6-4C08-9992-69B4FB32D335}"
 	ProjectSection(ProjectDependencies) = postProject
 		{2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1} = {2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1}
 	EndProjectSection
@@ -183,6 +189,10 @@ Global
 		{13410A29-B3A6-4F10-8345-39D5293F3D9A}.Debug|Win32.Build.0 = Debug|Win32
 		{13410A29-B3A6-4F10-8345-39D5293F3D9A}.Release|Win32.ActiveCfg = Release|Win32
 		{13410A29-B3A6-4F10-8345-39D5293F3D9A}.Release|Win32.Build.0 = Release|Win32
+		{0BA12B9F-BCD6-4C08-9992-69B4FB32D335}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0BA12B9F-BCD6-4C08-9992-69B4FB32D335}.Debug|Win32.Build.0 = Debug|Win32
+		{0BA12B9F-BCD6-4C08-9992-69B4FB32D335}.Release|Win32.ActiveCfg = Release|Win32
+		{0BA12B9F-BCD6-4C08-9992-69B4FB32D335}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

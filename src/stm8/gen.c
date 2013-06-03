@@ -1580,7 +1580,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           size -= 2;
         }
     }
-#if 0 // todo: enable when all regression tests pass
+
   // Try to use ldw x, y
   for (i = 0; i < n; i++)
     if (!assigned[i] && source->regs[XL_IDX] < 0 && source->regs[XH_IDX] < 0 &&
@@ -1600,8 +1600,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
             size--;
           }
       }
-#endif
-#if 0
+
   // Try to use ldw y, x
   for (i = 0; i < n; i++)
     if (!assigned[i] && source->regs[YL_IDX] < 0 && source->regs[YH_IDX] < 0 &&
@@ -1621,7 +1620,6 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
             size--;
           }
       }
-#endif
 
   while (regsize)
     {

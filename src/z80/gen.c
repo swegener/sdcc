@@ -11248,13 +11248,20 @@ setupForMemset (const iCode *ic, const operand *dst, const operand *c, bool dire
   /* Both are in regs. Let regMove() do the shuffling. */
   if (AOP_TYPE (dst) == AOP_REG && !direct_c && AOP_TYPE (c) == AOP_REG)
     {
-      const short larray[3] = {C_IDX, L_IDX, H_IDX};
-      short oparray[3];
-      oparray[0] = AOP (c)->aopu.aop_reg[0]->rIdx;
-      oparray[1] = AOP (dst)->aopu.aop_reg[0]->rIdx;
-      oparray[2] = AOP (dst)->aopu.aop_reg[1]->rIdx;
+      const short larray[2] = {L_IDX, H_IDX};
+      short oparray[2];
+      bool early_a = AOP_TYPE (c) == AOP_REG && (AOP (c)->aopu.aop_reg[0]->rIdx == L_IDX || AOP (c)->aopu.aop_reg[0]->rIdx == H_IDX);
 
-      regMove (larray, oparray, 3, FALSE);
+      if (early_a)
+        cheapMove (ASMOP_A, 0, AOP (c), 0);
+
+      oparray[0] = AOP (dst)->aopu.aop_reg[0]->rIdx;
+      oparray[1] = AOP (dst)->aopu.aop_reg[1]->rIdx;
+
+      regMove (larray, oparray, 2, early_a);
+
+      if (!early_a)
+        cheapMove (ASMOP_A, 0, AOP (c), 0);
     }
   else if (AOP_TYPE (c) == AOP_REG && requiresHL (AOP (c)))
     {
@@ -11465,7 +11472,7 @@ genBuiltInStrcpy (const iCode *ic, int nParams, operand **pparams)
 
   wassertl (nParams == 2, "Built-in strcpy() must have two parameters.");
   wassertl (!IS_GB, "Built-in strcpy() not available for gbz80.");
-if(nParams != 2) printf("params: %d\n", nParams);
+
   dst = pparams[0];
   src = pparams[1];
 

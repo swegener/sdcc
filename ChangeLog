@@ -1,3 +1,8 @@
+2013-06-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp:
+	  Cleanup debugging code in lospre.
+
 2013-06-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

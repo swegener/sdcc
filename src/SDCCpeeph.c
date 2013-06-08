@@ -92,13 +92,13 @@ error:
 /*-----------------------------------------------------------------*/
 
 static int
-pcDistance (lineNode * cpos, char *lbl, bool back)
+pcDistance (lineNode *cpos, char *lbl, bool back)
 {
   lineNode *pl = cpos;
   char buff[MAX_PATTERN_LEN];
   int dist = 0;
 
-  SNPRINTF (buff, sizeof(buff), "%s:", lbl);
+  SNPRINTF (buff, sizeof(buff) - 1, "%s:", lbl);
   while (pl)
     {
       if (pl->line &&
@@ -109,7 +109,9 @@ pcDistance (lineNode * cpos, char *lbl, bool back)
           if (port->peep.getSize)
             {
               dist += port->peep.getSize(pl);
-/* printf("Line: %s, dist: %i, total: %i\n", pl->line, port->peep.getSize(pl), dist); */
+#if 0
+              fprintf(stderr, "Line: %s, dist: %i, total: %i\n", pl->line, port->peep.getSize(pl), dist);
+#endif
             }
           else
             {

@@ -99,6 +99,7 @@ stm8instructionSize(lineNode *pl)
 {
   char buf[32];
   strncpy(buf, pl->line, 32);
+  buf[31] = 0;
   char *operand = nextToken(buf);
   char *op1start = nextToken(NULL);
   char *op2start = nextToken(NULL);

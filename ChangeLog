@@ -1,8 +1,17 @@
+2013-06-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Prepare for replacing absolute jumps by relative jumps and inverting jump conditions.
+	* src/stm8/peep.c,
+	  src/SDCCpeeph.c:
+	  Fix buffer overflows.
+
 2013-06-08 Valentin Dudouyt <valentin dudouyt AT gmail.com>
+
 	* src/stm8/main.c,
 	* src/stm8/peep.h,
 	* src/stm8/peep.c:
-	Implemented stm8instructionSize.
+	  Implemented stm8instructionSize.
 
 2013-06-07 Philipp Klaus Krause <pkk AT spth.de>
 

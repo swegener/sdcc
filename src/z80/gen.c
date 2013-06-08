@@ -11747,7 +11747,7 @@ genBuiltIn (iCode *ic)
 }
 
 /*-------------------------------------------------------------------------------------*/
-/* genZ80Code - generate code for Z80 based controllers for a single iCode instruction */
+/* genZ80iCode - generate code for Z80 based controllers for a single iCode instruction*/
 /*-------------------------------------------------------------------------------------*/
 static void
 genZ80iCode (iCode * ic)

@@ -17,7 +17,11 @@ readint(const char *str)
     str++;
   if(sscanf(str, "0x%x", &ret))
     return(ret);
-  sscanf(str, "%d", &ret);
+  if(!sscanf(str, "%d", &ret))
+    {
+      wassertl (0, "readint() got non-integer argument.");
+      ret = -1;
+    }
   return(ret);
 }
 

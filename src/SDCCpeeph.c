@@ -1103,7 +1103,7 @@ FBYNAME (notSame)
 }
 
 /*-------------------------------------------------------------------*/
-/* operandsLiteral - returns true of the condition's operands are    */
+/* operandsLiteral - returns true if the condition's operands are    */
 /* literals.                                                         */
 /*-------------------------------------------------------------------*/
 FBYNAME (operandsLiteral)

@@ -4,7 +4,7 @@
 	  Prepare for replacing absolute jumps by relative jumps and inverting jump conditions.
 	* src/stm8/peep.c,
 	  src/SDCCpeeph.c:
-	  Fix buffer overflows.
+	  Fix buffer overflows, improve error detection.
 
 2013-06-08 Valentin Dudouyt <valentin dudouyt AT gmail.com>
 

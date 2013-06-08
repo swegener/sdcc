@@ -28,6 +28,7 @@
 #include "ralloc.h"
 #include "gen.h"
 #include "dbuf_string.h"
+#include "peep.h"
 
 static char stm8_defaultRules[] = {
 #include "peeph.rul"
@@ -215,7 +216,7 @@ PORT stm8_port = {
    },
   {                             /* Peephole optimizer */
    stm8_defaultRules,
-   0,
+   stm8instructionSize,
    0,
    0,
    0,

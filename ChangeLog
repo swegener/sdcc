@@ -1,3 +1,9 @@
+2013-06-08 Valentin Dudouyt <valentin dudouyt AT gmail.com>
+	* src/stm8/main.c,
+	* src/stm8/peep.h,
+	* src/stm8/peep.c:
+	Implemented stm8instructionSize.
+
 2013-06-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClospre.hpp:

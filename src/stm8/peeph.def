@@ -8,7 +8,7 @@
 //	jrnc	%5
 //	; peephole 1 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jreq	%1
@@ -28,7 +28,7 @@
 //	jrpl	%5
 //	; peephole 3 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jrnc	%1
@@ -48,7 +48,7 @@
 //	jreq	%5
 //	; peephole 5 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jrpl	%1
@@ -58,7 +58,7 @@
 //	jrmi	%5
 //	; peephole 6 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jrsge	%1
@@ -68,7 +68,7 @@
 //	jrslt	%5
 //	; peephole 7 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jrsgt	%1
@@ -78,7 +78,7 @@
 //	jrsle	%5
 //	; peephole 8 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jrsle	%1
@@ -88,7 +88,7 @@
 //	jrsgt	%5
 //	; peephole 9 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jrslt	%1
@@ -98,7 +98,7 @@
 //	jrsge	%5
 //	; peephole 10 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jrugt	%1
@@ -108,7 +108,7 @@
 //	jrule	%5
 //	; peephole 11 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jrule	%1
@@ -118,7 +118,7 @@
 //	jrugt	%5
 //	; peephole 12 removed jp by using inverse jump logic
 //%1:
-//} if labelRefCountChange(%1 -1), labelInRange()
+//} if labelInRange(),　labelRefCountChange(%1 -1)
 
 //replace restart {
 //	jp	%5

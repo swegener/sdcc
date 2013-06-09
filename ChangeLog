@@ -1,3 +1,11 @@
+2013-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/linksrc/lkaomf51.c (GetName, SaveLinkedFilePath): small optimization
+	  (OutputAOEMF51, CollectInfoFromCDB, ReadHexFile): fixed bug 2184
+	* sdas/linksrc/lkmain.c: cosmetics
+	* sdas/linksrc/lkout.c (ixx, iflush): fixed bug 1986
+	* sdas/linksrc/lksym.c: comments
+
 2013-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/sdcc.vcxproj: removed boost library path

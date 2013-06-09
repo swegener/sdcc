@@ -274,8 +274,7 @@ ixx(int i)
 {
         int k;
         struct sym *sp;
-        a_uint j, lo_addr, hi_addr, symadr, chksum;
-
+        a_uint j, symadr, chksum;
 
         if (i) {
                 if (TARGET_IS_6808 && ap->a_flag & A_NOLOAD)
@@ -330,27 +329,16 @@ ixx(int i)
                 sp = lkpsym(".__.END.", 0);
                 if (sp && (sp->s_axp->a_bap->a_ofp == ofp)) {
                         symadr = symval(sp);
-                        lo_addr = symadr & 0xffff;
-                        if (a_bytes > 2) {
-                                hi_addr = (symadr >> 16) & 0xffff;
-                                chksum =  0x00;
-                                chksum += hi_addr;
-                                chksum += hi_addr >> 8;
-                                chksum += 0x04;
+                        chksum =  0x04;
+                        chksum += 0x05;
+                        chksum += symadr;
+                        chksum += symadr >> 8;
+                        chksum += symadr >> 16;
+                        chksum += symadr >> 24;
 #ifdef  LONGINT
-                                fprintf(ofp, ":00%04lX04%02lX\n", hi_addr, (~chksum + 1) & 0x00ff);
+                        fprintf(ofp, ":04000005%08lX%02lX\n", symadr, (~chksum + 1) & 0x00ff);
 #else
-                                fprintf(ofp, ":00%04X04%02X\n", hi_addr, (~chksum + 1) & 0x00ff);
-#endif
-                        }
-                        chksum =  0x00;
-                        chksum += lo_addr;
-                        chksum += lo_addr >> 8;
-                        chksum += 0x03;
-#ifdef  LONGINT
-                        fprintf(ofp, ":00%04lX03%02lX\n", lo_addr, (~chksum + 1) & 0x00ff);
-#else
-                        fprintf(ofp, ":00%04X03%02X\n", lo_addr, (~chksum + 1) & 0x00ff);
+                        fprintf(ofp, ":04000005%08X%02X\n", symadr, (~chksum + 1) & 0x00ff);
 #endif
                 }
 
@@ -412,14 +400,14 @@ iflush()
 
                         hi_addr = (rtadr0 >> 16) & 0xffff;
                         if ((hi_addr != prev_hi_addr) || rtaflg) {
-                                chksum =  0x00;
+                                chksum =  0x02;
+                                chksum += 0x04;
                                 chksum += hi_addr;
                                 chksum += hi_addr >> 8;
-                                chksum += 0x04;
 #ifdef  LONGINT
-                                fprintf(ofp, ":00%04lX04%02lX\n", hi_addr, (~chksum + 1) & 0x00ff);
+                                fprintf(ofp, ":02000004%04lX%02lX\n", hi_addr, (~chksum + 1) & 0x00ff);
 #else
-                                fprintf(ofp, ":00%04X04%02X\n", hi_addr, (~chksum + 1) & 0x00ff);
+                                fprintf(ofp, ":02000004%04X%02X\n", hi_addr, (~chksum + 1) & 0x00ff);
 #endif
                                 prev_hi_addr = hi_addr;
                         }

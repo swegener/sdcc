@@ -221,7 +221,7 @@ main(int argc, char *argv[])
         /* sdas initialization */
         sdld_init(argv[0]);
 
-        /* use these defaults for parsing the .lk script */
+        /* use these defaults for parsing the .lnk script */
         a_bytes = 4;
         a_mask = 0xFFFFFFFF;
         s_mask = 0x80000000;
@@ -627,8 +627,8 @@ link_main()
                         a_mask = 0xFFFFFFFFl;
                         s_mask = 0x80000000l;
                         v_mask = 0x7FFFFFFFl;
-                                break;
-                        }
+                        break;
+                }
 #else
                 switch(a_bytes) {
                 default:

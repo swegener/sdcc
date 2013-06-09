@@ -220,6 +220,7 @@ newsym(void)
  *      global varaibles:
  *              sym * symhash[]         array of pointers to NHASH
  *                                      linked symbol lists
+ *              int     zflag           Disable symbol case sensitivity
  *
  *      functions called:
  *              int     hash()          lksym.c

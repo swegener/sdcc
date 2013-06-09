@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #include "aslink.h"
 
 #define EQ(A,B) !strcmp((A),(B))
-#define MEMSIZE 0x10000
+#define MEMSIZE 0x1000000
 #ifndef DODUMP
 #define DODUMP 0
 #endif
@@ -108,13 +108,13 @@ _UsageType UsageType[]=
 #endif
 char * UsageTypeName[]={"CODE", "XDATA", "DATA", "IDATA", "BIT", "NUMBER"};
 int AddNumber;
-unsigned char * ihxBuff=NULL;
+short * ihxBuff=NULL;
 FILE * aomf51out;
 int GlobalChkSum=0;
-int HexSize, HexBegin=0x10000;
+int HexSize, HexBegin=0x1000000;
 
 
-void GetName(char * filepath, char * name)
+int GetName(char * filepath, char * name)
 {
   int j, k;
   for(j=strlen(filepath); j>0; j--)
@@ -122,6 +122,7 @@ void GetName(char * filepath, char * name)
   for(k=0; (filepath[j]!=0)&&(filepath[j]!='.'); j++, k++)
       name[k]=filepath[j];
   name[k]=0;
+  return j;
 }
 
 void SaveLinkedFilePath(char * filepath)
@@ -130,35 +131,28 @@ void SaveLinkedFilePath(char * filepath)
 
   if((yflag) && (!rflag))
     {
-      char *p;
+      int ext;
 
-      infn=realloc(infn, sizeof(_infn)*(numin+1));
+      infn = realloc(infn, sizeof(_infn)*(numin+1));
+
+      /*Get the module name=filename, no drive, no dir, no ext*/
+      ext = GetName(filepath, infn[numin].ModuleName);
+      //printf("%s, %s\n", infn[numin].PathName, infn[numin].ModuleName);
 
       strcpy(infn[numin].PathName, filepath);
 
       /*If there is an extension remove it*/
-      for (p = &infn[numin].PathName[strlen(infn[numin].PathName) - 1]; p >= infn[numin].PathName; --p)
-        {
-          if (*p == '/' || *p == '\\')
-              break;
-
-          if (*p == '.')
-            {
-              *p = '\0';
-              break;
-            }
-        }
-
-      /*Get the module name=filename, no drive, no dir, no ext*/
-      GetName(infn[numin].PathName, infn[numin].ModuleName);
-      //printf("%s, %s\n", infn[numin].PathName, infn[numin].ModuleName);
+      if (infn[numin].PathName[ext] == '.')
+        infn[numin].PathName[ext] = '\0';
 
       /*Check if this filename is already in*/
-      for(j=0; j<numin; j++)
+      for (j=0; j<numin; j++)
         {
-          if(EQ(infn[numin].PathName, infn[j].PathName)) break;
+          if (EQ(infn[numin].PathName, infn[j].PathName))
+            break;
         }
-      if(j==numin) numin++;
+      if (j==numin)
+        numin++;
     }
 }
 
@@ -427,14 +421,17 @@ void OutputAOEMF51(void)
 
               /*Content Record*/
               OutputByte(0x06);/*REC TYPE*/
-              if(procedure[k].EndAdd==-1)
+              if (procedure[k].EndAdd==-1)
                   procedure[k].EndAdd=HexSize;
               recsize=procedure[k].EndAdd-procedure[k].BeginAdd+1+4;
               OutputWord(recsize);/*Record Length*/
               OutputByte(0x00);/*SEG ID*/
               OutputWord(procedure[k].BeginAdd); /*Offset*/
-              for(i=procedure[k].BeginAdd; i<=procedure[k].EndAdd; i++)
-                  OutputByte(ihxBuff[i]);
+              for (i=procedure[k].BeginAdd; i<=procedure[k].EndAdd; i++)
+                {
+                  OutputByte((unsigned char)ihxBuff[i]);
+                  ihxBuff[i] -= 0x200;
+                }
               OutputChkSum();
 
               /*Local Symbols*/
@@ -510,7 +507,7 @@ void OutputAOEMF51(void)
     }
 
   /*Content records for everything that is not in the above procedures*/
-  strcpy(Mname, "OTHER_SDCC_STUF");
+  strcpy(Mname, "OTHER_SDCC_STUFF");
 
   /*Scope Definition record: begin module block*/
   OutputByte(0x10);/*REC TYPE*/
@@ -519,44 +516,33 @@ void OutputAOEMF51(void)
   OutputName(Mname);/*Module Name*/
   OutputChkSum();
 
-  for(j=-1; j<numproc; j++)
+  for (i=HexBegin; i<HexSize; )
     {
-      if(numproc)
+      for (k=i; k<HexSize; k++)
         {
-          if(j==-1)
+          if (ihxBuff[k] < 0)
+            break;
+        }
+      if (k > i)
+        {
+          /*Content Record*/
+          OutputByte(0x06);/*REC TYPE*/
+          OutputWord(k-i+4);/*Record Length*/
+          OutputByte(0x00);/*SEG ID*/
+          OutputWord(i); /*Offset*/
+          for ( ; i<k; i++)
             {
-              i=HexBegin;
-              k=procedure[0].BeginAdd;
+              OutputByte((unsigned char)ihxBuff[i]);
+              ihxBuff[i] -= 0x200;
             }
-          else if(j==(numproc-1))
-            {
-              i=procedure[j].EndAdd+1;
-              k=HexSize;
-            }
-          else
-            {
-              i=procedure[j].EndAdd+1;
-              k=procedure[j+1].BeginAdd;
-            }
-          }
-        else /*What, no procedures??? Ok, here it is the whole hex file*/
-          {
-            i=HexBegin;
-            k=HexSize;
-          }
-
-        if(i<k)
-          {
-            /*Content Record*/
-            OutputByte(0x06);/*REC TYPE*/
-            OutputWord(k-i+4);/*Record Length*/
-            OutputByte(0x00);/*SEG ID*/
-            OutputWord(i); /*Offset*/
-            for(; i<k; i++)
-                OutputByte(ihxBuff[i]);
-            OutputChkSum();
-          }
-      }
+          OutputChkSum();
+        }
+      for ( ; i<HexSize; i++)
+        {
+          if (ihxBuff[i] >= 0)
+            break;
+        }
+    }
 
   /*Scope Definition record: end module block*/
   OutputByte(0x10);/*REC TYPE*/
@@ -840,14 +826,14 @@ void CollectInfoFromCDB(void)
 
                           /*If the symbol is the name of a procedure, the address is also
                           the begining of such procedure*/
-                          if((symbol[j].UsageType&0x0f)==0x00)
+                          if ((symbol[j].UsageType & 0x0f) == 0x00)
                             {
-                              for(k=0; k<numproc; k++)
+                              for (k=0; k<numproc; k++)
                                 {
-                                  if(EQ(symbol[j].name, procedure[k].name))
+                                  if (EQ(symbol[j].name, procedure[k].name))
                                     {
-                                      if(procedure[k].BeginAdd==-1)
-                                          procedure[k].BeginAdd=Address;
+                                      if (procedure[k].BeginAdd == -1)
+                                          procedure[k].BeginAdd = Address;
                                       break;
                                     }
                                 }
@@ -958,13 +944,14 @@ void CollectInfoFromCDB(void)
 
                 /*The end of a procedure*/
                 case 'X': /*Example L:XG$AsciiToHex$0$0:88*/
-                  sscanf(&buff[4], "%[^$] %c %[^$] %c %[^:] %c %x",
+                  sscanf(&buff[3], "%[^$] %c %[^$] %c %[^:] %c %x",
                          scope, &c, name, &c, level, &c, &Address);
 
                   for(k=0; k<numproc; k++)
                     {
                       if (EQ(procedure[k].name, name) &&
-                          EQ(infn[procedure[k].FileNameNumber].ModuleName, scope))
+                          (scope[0] == 'G' ||
+                           EQ(infn[procedure[k].FileNameNumber].ModuleName, &scope[1])))
                         {
                           if( (procedure[k].EndAdd == -1) )
                             {
@@ -1020,9 +1007,9 @@ unsigned char GetByte(char * buffer)
 unsigned short GetWord(char * buffer)
 {
   return  hex2dec(buffer[0])*0x1000+
-                  hex2dec(buffer[1])*0x100+
-                  hex2dec(buffer[2])*0x10+
-                  hex2dec(buffer[3]);
+          hex2dec(buffer[1])*0x100+
+          hex2dec(buffer[2])*0x10+
+          hex2dec(buffer[3]);
 }
 
 int ReadHexFile(int * Begin)
@@ -1032,8 +1019,8 @@ int ReadHexFile(int * Begin)
   FILE * filein;
   int j;
   unsigned char linesize, recordtype, rchksum, value;
-  unsigned short address;
-  int MaxAddress=0;
+  int address, hi_addr = 0;
+  int MaxAddress = 0;
   int chksum;
 
   /*If the hexfile is already open, close it*/
@@ -1052,15 +1039,15 @@ int ReadHexFile(int * Begin)
       return 0;
     }
 
-  ihxBuff=calloc(MEMSIZE, sizeof(unsigned char));
-  if(ihxBuff==NULL)
+  ihxBuff = calloc(MEMSIZE, sizeof(short));
+  if (ihxBuff==NULL)
     {
       printf("Insufficient memory\n");
       fclose(filein);
       return -1;
     }
 
-  for(j=0; j<MEMSIZE; j++) ihxBuff[j]=0xff;
+  for (j=0; j<MEMSIZE; j++) ihxBuff[j]=-1;
 
   while(1)
     {
@@ -1072,28 +1059,43 @@ int ReadHexFile(int * Begin)
       if(buffer[0]==':')
         {
           linesize = GetByte(&buffer[1]);
-          address = GetWord(&buffer[3]);
+          address = hi_addr | GetWord(&buffer[3]);
           recordtype = GetByte(&buffer[7]);
           rchksum = GetByte(&buffer[9]+(linesize*2));
           chksum=linesize+(address/0x100)+(address%0x100)+recordtype+rchksum;
 
-          if (recordtype==1) break; /*End of record*/
-
-          for(j=0; j<linesize; j++)
+          switch (recordtype)
             {
-                    value=GetByte(&buffer[9]+(j*2));
-                    chksum+=value;
-                    ihxBuff[address+j]=value;
-            }
-          if(MaxAddress<(address+linesize-1)) MaxAddress=(address+linesize-1);
-          if(address<*Begin) *Begin=address;
+              case 0:
+                for (j=0; j<linesize; j++)
+                  {
+                    value = GetByte(&buffer[9]+(j*2));
+                    chksum += value;
+                    ihxBuff[address+j] = value;
+                  }
+                if (MaxAddress < (address+linesize-1))
+                  MaxAddress = (address+linesize-1);
+                if (address < *Begin)
+                  *Begin = address;
+                break;
 
-          if((chksum%0x100)!=0)
+              case 4:
+                hi_addr = (GetWord(&buffer[9]) << 16) & 0x00FFFFFF; //upto 24 bit address space
+                break;
+
+              default:
+                break;
+            }
+
+          if ((chksum % 0x100) != 0)
             {
               printf("ERROR: Bad checksum in file %s\n", ihxFileName);
               fclose(filein);
               return -1;
             }
+
+          if (recordtype==1)  /*End of record*/
+            break;
         }
     }
   fclose(filein);

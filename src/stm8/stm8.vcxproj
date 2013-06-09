@@ -21,13 +21,15 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\sdcc_vc.h" />
+    <ClInclude Include="..\common.h" />
     <ClInclude Include="gen.h" />
+    <ClInclude Include="peep.h" />
     <ClInclude Include="ralloc.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gen.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="peep.c" />
     <ClCompile Include="ralloc.c" />
     <ClCompile Include="ralloc2.cc" />
   </ItemGroup>

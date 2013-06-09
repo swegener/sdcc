@@ -137,7 +137,7 @@ Line *readLine(FILE *inFile)
     
     if (getHexWord(bp, &line->offset))
     {
-	fprintf(stderr, "packihx: can't read line offset @ line %d\n",
+        fprintf(stderr, "packihx: can't read line offset @ line %d\n",
                 lineno);
         free(line);
         return NULL;        
@@ -266,29 +266,29 @@ static Uint8	pending[MAX_INPUT_COOKED + OUTPUT_CHUNK];
 /* Buffer up a data record. */
 int bufferOutput(Line *line)
 {
-   unsigned offset = 0;
-   int	    rc = 0;
+    unsigned offset = 0;
+    int	    rc = 0;
    
-   /* Stick the data onto any pending data. */
-   assert(pendingLen < OUTPUT_CHUNK);
-   memcpy(&pending[pendingLen], line->data, line->len);
-   pendingLen += line->len;
+    /* Stick the data onto any pending data. */
+    assert(pendingLen < OUTPUT_CHUNK);
+    memcpy(&pending[pendingLen], line->data, line->len);
+    pendingLen += line->len;
    
-   /* Write it out untill we have less than an OUTPUT_CHUNK left. */
-   while (!rc && pendingLen >= OUTPUT_CHUNK)
-   {
-       rc = writeRecord(OUTPUT_CHUNK, pendingOffset, 0, &pending[offset]);
-       offset += OUTPUT_CHUNK;
-       pendingOffset += OUTPUT_CHUNK;
-       pendingLen -= OUTPUT_CHUNK;
-   }
+    /* Write it out untill we have less than an OUTPUT_CHUNK left. */
+    while (!rc && pendingLen >= OUTPUT_CHUNK)
+    {
+        rc = writeRecord(OUTPUT_CHUNK, pendingOffset, 0, &pending[offset]);
+        offset += OUTPUT_CHUNK;
+        pendingOffset += OUTPUT_CHUNK;
+        pendingLen -= OUTPUT_CHUNK;
+    }
    
-   /* Copy any remaining bits back to the beginning of the buffer. */
-   if (pendingLen)
-   {
-   	memmove(pending, &pending[offset], pendingLen);
-   }
-   return rc;
+    /* Copy any remaining bits back to the beginning of the buffer. */
+    if (pendingLen)
+    {
+   	    memmove(pending, &pending[offset], pendingLen);
+    }
+    return rc;
 }
 
 /* Write out any pending data. */

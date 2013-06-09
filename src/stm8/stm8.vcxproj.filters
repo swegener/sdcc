@@ -20,7 +20,10 @@
     <ClInclude Include="gen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\sdcc_vc.h">
+    <ClInclude Include="..\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="peep.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,6 +38,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ralloc2.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="peep.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

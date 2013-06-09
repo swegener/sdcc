@@ -1,3 +1,13 @@
+2013-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/sdcc.vcxproj: removed boost library path
+	* src/stm8/stm8.vcxproj,
+	* src/stm8/stm8.vcxproj.filters: added peep.[ch]
+	* src/z80/z80.vcxproj: fixed message typo
+	* src/stm8/peep.c: fixed errors for MSVC (C89 compatible only):
+	  only declarations at start of block
+	* support/packihx/packihx.c: whitespace
+
 2013-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

@@ -102,14 +102,17 @@ int
 stm8instructionSize(lineNode *pl)
 {
   char buf[32];
+  char *operand;
+  char *op1start;
+  char *op2start;
+  int i = 0;
   strncpy(buf, pl->line, 32);
   buf[31] = 0;
-  char *operand = nextToken(buf);
-  char *op1start = nextToken(NULL);
-  char *op2start = nextToken(NULL);
+  operand = nextToken(buf);
+  op1start = nextToken(NULL);
+  op2start = nextToken(NULL);
   //fprintf(stderr, "op1start=%s op2start=%s\n", op1start, op2start);
   while(op2start && isspace(*op2start)) op2start++;
-  int i = 0;
   //printf("operand=%s op1start=%s op2start=%s\n", operand, op1start, op2start);
 
   /* arity=1 */
@@ -185,9 +188,11 @@ stm8instructionSize(lineNode *pl)
                 || EQUALS(operand, "sub")
                 || ISINST(operand, "xor"))
   {
+    char suffix;
+
     if(!op1start || !op2start)
       return(4);
-    char suffix = operand[strlen(operand)-1];
+    suffix = operand[strlen(operand)-1];
     if(suffix == 'w' && isImmediate(op2start))
       i++; // costs extra byte
     if(isSpIndexed(op1start) || isSpIndexed(op2start))

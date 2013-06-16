@@ -1,3 +1,11 @@
+2013-06-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Reorganize rules, disable rules depending on notUsed() or unimplemented ref count.
+	* src/stm8/peep.c,
+	  src/SDCCpeeph.c:
+	  Fix const, handling of relative jumps, read from uninitialized pointer.
+
 2013-06-16 Valentin Dudouyt <valentin dudouyt AT gmail.com>
 
 	* src/stm8/main.c,

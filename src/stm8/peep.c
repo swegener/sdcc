@@ -78,7 +78,7 @@ nextToken(char *p)
 }
 
 static int
-isRelativeAddr(char *what, const char *mode)
+isRelativeAddr(const char *what, const char *mode)
 {
   char buf[4];
   strcpy(buf, mode);
@@ -87,9 +87,9 @@ isRelativeAddr(char *what, const char *mode)
 }
 
 static int
-isLabel(char *what)
+isLabel(const char *what)
 {
-  char *end;	
+  const char *end;	
   end = strchr(what, '+');
   if(!end)
     end = what + strlen(what);
@@ -99,32 +99,32 @@ isLabel(char *what)
 }
 
 static int
-isImmediate(char *what)
+isImmediate(const char *what)
 {
   return(what[0] == '#');
 }
 
 static int
-isShortoff(char *what, const char *mode)
+isShortoff(const char *what, const char *mode)
 {
   return(isRelativeAddr(what, mode) && readint(what) <= 0xFF);
 }
 
 static int
-isLongoff(char *what, const char *mode)
+isLongoff(const char *what, const char *mode)
 {
   return(isRelativeAddr(what, mode) && readint(what) > 0xFF);
 }
 
 static int
-isSpIndexed(char *what)
+isSpIndexed(const char *what)
 {
   return isRelativeAddr(what, "sp");
 }
 
 
 int
-stm8instructionSize(lineNode *pl)
+stm8instructionSize(const lineNode *pl)
 {
   char *operand;
   char *op1start;
@@ -306,7 +306,7 @@ stm8instructionSize(lineNode *pl)
 static bool
 doTermScan (lineNode **pl, const char *what)
 {
-  char *operand, *op1start, *op2start;
+  const char *operand, *op1start, *op2start;
   for (; *pl; *pl = (*pl)->next)
   {
     operand = nextToken((*pl)->line);
@@ -321,14 +321,14 @@ doTermScan (lineNode **pl, const char *what)
     if(EQUALS(op1start, what))
       return(FALSE);
 
-    if(op2start && EQUALS(op2start, what))
-      return(FALSE);
+    /*if(op2start && EQUALS(op2start, what)) TODO: enable this (but make op2start point somewhere first)
+      return(FALSE);*/
 
     if(EQUALS(operand, "ret") || EQUALS(operand, "iret"))
       return(FALSE);
 
     /* TODO */
-    if(ISINST(operand, "jp"))
+    if(ISINST(operand, "jp") || ISINST(operand, "jr"))
       return(FALSE);
 
     if(ISINST(operand, "call"))
@@ -372,7 +372,7 @@ bool
 stm8canAssign (const char *op1, const char *op2, const char *exotic)
 {
   //fprintf(stderr, "op1=%s op2=%s exotic=%s\n", op1, op2, exotic);
-  char *reg, *payload;
+  const char *reg, *payload;
   reg = op1[0] == 'a' ? op1 : op2;
   payload = reg == op1 ? op2 : op1;
   if(isRelativeAddr(payload, "x")

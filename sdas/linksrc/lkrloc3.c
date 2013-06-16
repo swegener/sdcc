@@ -311,13 +311,13 @@ relr3(void)
         /*
          * Base values
          */
-        rtbase = adb_2b(0, 0);
-        rtofst = 2;
+        rtbase = adb_xb(0, 0);
+        rtofst = a_bytes;
 
         /*
          * Relocate address
          */
-        pc = adb_2b(a[aindex]->a_addr, 0);
+        pc = adb_xb(a[aindex]->a_addr, 0);
 
         /*
          * Number of 'bytes' per PC address

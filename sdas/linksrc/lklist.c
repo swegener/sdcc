@@ -766,7 +766,6 @@ lkulist(int i)
  *              int     gline           get a line from the LST file
  *                                      to translate for the RST file
  *              char    rb[]            read listing file text line
- *              char    *rp             pointer to listing file text line
  *              FILE    *rfp            The file handle to the current
  *                                      output RST file
  *              FILE    *tfp            The file handle to the current
@@ -861,7 +860,7 @@ lkalist(a_uint cpc)
 {
         char str[16];
         char *frmt;
-        int i, m, n, r;
+        int m, n, r;
 
         /*
          * Truncate (int) to N-Bytes
@@ -885,9 +884,7 @@ loop:   if (tfp == NULL)
         /*
          * Clear text line buffer
          */
-        for (i=0,rp=rb; i<sizeof(rb); i++) {
-                *rp++ = 0;
-        }
+        memset(rb, 0, sizeof(rb));
 
         /*
          * Get next LST text line
@@ -1126,7 +1123,7 @@ lkglist(a_uint cpc, int v, int err)
 {
         char str[16];
         char *afrmt, *frmt;
-        int a, i, n, m, r, s, u;
+        int a, n, m, r, s, u;
 
         /*
          * Truncate (int) to N-Bytes
@@ -1146,9 +1143,7 @@ loop:   if (tfp == NULL)
                 /*
                  * Clear text line buffer
                  */
-                for (i=0,rp=rb; i<sizeof(rb); i++) {
-                        *rp++ = 0;
-                }
+                memset(rb, 0, sizeof(rb));
 
                 /*
                  * Get next LST text line

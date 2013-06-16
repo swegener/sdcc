@@ -45,13 +45,17 @@
  *
  *      The object module contains the following designators:
  *
- *              [XDQ][HL]
+ *              [XDQ][HL][234]
  *                      X        Hexadecimal radix
  *                      D        Decimal radix
  *                      Q        Octal radix
  *
  *                      H        Most significant byte first
  *                      L        Least significant byte first
+ *
+ *                      2        16-Bit Relocatable Addresses/Data
+ *                      3        24-Bit Relocatable Addresses/Data
+ *                      4        32-Bit Relocatable Addresses/Data
  *
  *              H       Header
  *              M       Module
@@ -64,9 +68,9 @@
  *
  *      (1)     Radix Line
  *
- *      The  first  line  of  an object module contains the [XDQ][HL]
- *      format specifier (i.e.  XH indicates  a  hexadecimal  file  with
- *      most significant byte first) for the
+ *      The  first  line  of  an object module contains the [XDQ][HL][234]
+ *      format specifier (i.e.  XH2 indicates  a  hexadecimal  file  with
+ *      most significant byte first and 16-bit addresses) for the
  *      following designators.
  *
  *
@@ -439,6 +443,7 @@ outrb(struct expr *esp, int r)
  *                                      symbol/area reference number
  *
  *      global variables:
+ *              int     a_bytes         T Line byte count
  *              sym     dot             defined as sym[0]
  *              int     oflag           -o, generate relocatable output flag
  *              int     pass            assembler pass number
@@ -488,8 +493,10 @@ outrxb(int i, struct expr *esp, int r)
                         case 4: m = (a_uint) ~0x7FFFFFFF;       n = (a_uint) ~0xFFFFFFFF;       break;  /* 4 bytes */
                         }
 #endif
-
-                        (void)m;
+                        /*
+                         * Signed Range Check
+                         */
+                        (void)m; //temporary fix warning
 
                         /*
                          * Page0 Range Check
@@ -512,8 +519,8 @@ outrxb(int i, struct expr *esp, int r)
                                         out_lb(lobyte(esp->e_addr),r|R_RELOC);
                                 }
                                 if (oflag) {
-                                        outchk(2, 4);
-                                        out_txb(2, esp->e_addr);
+                                        outchk(a_bytes, 4);
+                                        out_txb(a_bytes, esp->e_addr);
                                         if (esp->e_flag) {
                                                 n = esp->e_base.e_sp->s_ref;
                                                 r |= R_SYM;
@@ -548,15 +555,15 @@ outrxb(int i, struct expr *esp, int r)
                                     out_lb(lobyte(esp->e_addr),r|R_RELOC);
                                 }
                                 if (oflag) {
-                                    outchk(3, 5);
-                                    out_txb(3, esp->e_addr);
+                                    outchk(a_bytes, 5);
+                                    out_txb(a_bytes, esp->e_addr);
                                     if (esp->e_flag) {
                                             n = esp->e_base.e_sp->s_ref;
                                             r |= R_SYM;
                                     } else {
                                             n = esp->e_base.e_ap->a_ref;
                                     }
-                                    write_rmode(r, txtp - txt - 3);
+                                    write_rmode(r, txtp - txt - a_bytes);
                                     out_rw(n);
                                 }
                                 /* end sdas mcs51 specific */
@@ -693,6 +700,7 @@ outrw(struct expr *esp, int r)
  *              int     p_bytes         program counter update temporary
  *
  *      global variables:
+ *              int     a_bytes         T Line byte count
  *              sym     dot             defined as sym[0]
  *              int     oflag           -o, generate relocatable output flag
  *              int     pass            assembler pass number
@@ -741,8 +749,8 @@ outr3b(struct expr *esp, int r)
                                 out_lxb(i,esprv,r|R_RELOC);
                         }
                         if (oflag) {
-                                outchk(3, 5);
-                                out_txb(3, esp->e_addr);
+                                outchk(2*a_bytes, 5);
+                                out_txb(a_bytes, esp->e_addr);
                                 if (esp->e_flag) {
                                         n = esp->e_base.e_sp->s_ref;
                                         r |= R_SYM;
@@ -764,7 +772,7 @@ outr3b(struct expr *esp, int r)
                                     rerr();
                                 }
 
-                                write_rmode(r | R_C24, txtp - txt - 3);
+                                write_rmode(r | R_C24, txtp - txt - a_bytes);
 
                                 out_rw(n);
                         }
@@ -791,6 +799,7 @@ outr3b(struct expr *esp, int r)
  *              int     n               symbol/area reference number
  *
  *      global variables:
+ *              int     a_bytes         T Line byte count
  *              int     oflag           -o, generate relocatable output flag
  *              int     pass            assembler pass number
  *              char *  relp            Pointer to R Line Values
@@ -814,8 +823,8 @@ outdp(struct area *carea, struct expr *esp, int r)
 
         if (oflag && pass==2) {
                 outchk(ASXHUGE, ASXHUGE);
-                out_txb(2, carea->a_ref);
-                out_txb(2, esp->e_addr);
+                out_txb(a_bytes, carea->a_ref);
+                out_txb(a_bytes, esp->e_addr);
                 if (esp->e_flag || esp->e_base.e_ap!=NULL) {
                         if (esp->e_base.e_ap == NULL) {
                                 n = area[1].a_ref;
@@ -829,7 +838,7 @@ outdp(struct area *carea, struct expr *esp, int r)
                                 n = esp->e_base.e_ap->a_ref;
                                 r |= R_AREA;
                         }
-                        write_rmode(r, txtp - txt - 2);
+                        write_rmode(r, txtp - txt - a_bytes);
                         out_rw(n);
                 }
                 outbuf("P");
@@ -917,6 +926,7 @@ outdot(void)
  *              area *  ap              pointer to an area structure
  *
  *      global variables:
+ *              int     a_bytes         T Line byte count
  *              sym     dot             defined as sym[0]
  *              char    rel[]           relocation data for code/data array
  *              char *  relp            Pointer to R Line Values
@@ -941,7 +951,7 @@ outchk(int nt, int nr)
                 outbuf("R");
         }
         if (txtp == txt) {
-                out_txb(2, dot.s_addr);
+                out_txb(a_bytes, dot.s_addr);
                 if ((ap = dot.s_area) != NULL) {
                         write_rmode(R_WORD|R_AREA, 0);
                         out_rw(ap->a_ref);
@@ -961,6 +971,7 @@ outchk(int nt, int nr)
  *              none
  *
  *      global variables:
+ *              int     a_bytes         T Line byte count
  *              FILE *  ofp             relocation output file handle
  *              char    rel[]           relocation data for code/data array
  *              char *  relp            Pointer to R Line Values
@@ -979,7 +990,7 @@ outchk(int nt, int nr)
 VOID
 outbuf(char *s)
 {
-        if (txtp > &txt[2]) {
+        if (txtp > &txt[a_bytes]) {
                 fprintf(ofp, "T");
                 out(txt,(int) (txtp-txt));
                 fprintf(ofp, "\n");
@@ -989,6 +1000,26 @@ outbuf(char *s)
         }
         txtp = txt;
         relp = rel;
+}
+
+VOID
+outradix()
+{
+        if (pass < 2)
+                return;
+
+        /*
+         * Output Radix
+         */
+        if (xflag == 0) {
+                fprintf(ofp, "X%c%d\n", (int) hilo ? 'H' : 'L', a_bytes);
+        } else
+        if (xflag == 1) {
+                fprintf(ofp, "Q%c%d\n", (int) hilo ? 'H' : 'L', a_bytes);
+        } else
+        if (xflag == 2) {
+                fprintf(ofp, "D%c%d\n", (int) hilo ? 'H' : 'L', a_bytes);
+        }
 }
 
 /*)Function     VOID    outgsd()
@@ -1016,6 +1047,7 @@ outbuf(char *s)
  *              int     rn              symbol reference number
  *
  *      global variables:
+ *              int     a_bytes         T Line byte count
  *              area *  areap           pointer to an area structure
  *              int     hilo            byte order
  *              char    module[]        module name string
@@ -1060,19 +1092,18 @@ outgsd(void)
                 }
         }
 
+        outradix();
+
         /*
-         * Output Radix and number of areas and symbols
+         * Output number of areas and symbols
          */
         if (xflag == 0) {
-                fprintf(ofp, "X%c\n", (int) hilo ? 'H' : 'L');
                 fprintf(ofp, "H %X areas %X global symbols\n", narea, nglob);
         } else
         if (xflag == 1) {
-                fprintf(ofp, "Q%c\n", (int) hilo ? 'H' : 'L');
                 fprintf(ofp, "H %o areas %o global symbols\n", narea, nglob);
         } else
         if (xflag == 2) {
-                fprintf(ofp, "D%c\n", (int) hilo ? 'H' : 'L');
                 fprintf(ofp, "H %u areas %u global symbols\n", narea, nglob);
         }
 
@@ -1195,6 +1226,7 @@ outarea(struct area *ap)
  *              int     s_addr          (int) truncated to 2-bytes
  *
  *      global variables:
+ *              int     a_bytes         argument size in bytes
  *              FILE *  ofp             relocation output file handle
  *              int     xflag           -x, listing radix flag
  *
@@ -1217,20 +1249,67 @@ outsym(struct sym *sp)
         fprintf(ofp, "%s", &sp->s_id[0]);
         fprintf(ofp, " %s", sp->s_type==S_NEW ? "Ref" : "Def");
 
+#ifdef  LONGINT
         switch(xflag) {
         default:
         case 0:
-                frmt = "%04X\n";
+                switch(a_bytes) {
+                default:
+                case 2: frmt = "%04lX\n"; break;
+                case 3: frmt = "%06lX\n"; break;
+                case 4: frmt = "%08lX\n"; break;
+                }
                 break;
 
         case 1:
-                frmt = "%06o\n";
+                switch(a_bytes) {
+                default:
+                case 2: frmt = "%06lo\n"; break;
+                case 3: frmt = "%08lo\n"; break;
+                case 4: frmt = "%011lo\n"; break;
+                }
                 break;
 
         case 2:
-                frmt = "%05u\n";
+                switch(a_bytes) {
+                default:
+                case 2: frmt = "%05lu\n"; break;
+                case 3: frmt = "%08lu\n"; break;
+                case 4: frmt = "%010lu\n"; break;
+                }
                 break;
         }
+#else
+        switch(xflag) {
+        default:
+        case 0:
+                switch(a_bytes) {
+                default:
+                case 2: frmt = "%04X\n"; break;
+                case 3: frmt = "%06X\n"; break;
+                case 4: frmt = "%08X\n"; break;
+                }
+                break;
+
+        case 1:
+                switch(a_bytes) {
+                default:
+                case 2: frmt = "%06o\n"; break;
+                case 3: frmt = "%08o\n"; break;
+                case 4: frmt = "%011o\n"; break;
+                }
+                break;
+
+        case 2:
+                switch(a_bytes) {
+                default:
+                case 2: frmt = "%05u\n"; break;
+                case 3: frmt = "%08u\n"; break;
+                case 4: frmt = "%010u\n"; break;
+                }
+                break;
+        }
+#endif
 
         fprintf(ofp, frmt, s_addr);
 }

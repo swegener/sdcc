@@ -338,7 +338,7 @@ setbank(void)
          * areas.  Set the area bank pointer to reference
          * bank[0] which has no file suffix.
          */
-         for (ap = areap; ap != NULL; ap = ap->a_ap) {
+        for (ap = areap; ap != NULL; ap = ap->a_ap) {
                 if ((ap->a_flag & A4_BNK) == 0) {
                         ap->a_bp = bankp;
                 }

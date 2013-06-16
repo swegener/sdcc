@@ -1,3 +1,26 @@
+2013-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_mullonglong.c,
+	* sdas/as8051/i51adr.c,
+	* sdas/linksrc/lkbank.c,
+	* sdas/linksrc/lklibr.c,
+	* sdas/linksrc/lkrloc.c,
+	* sdas/linksrc/aslink.h,
+	* src/mcs51/main.c: cosmetic changes
+	* sdas/asxxsrc/asmain.c (main): default to 16 bit address width
+	* sdas/as8051/i51mch.c (minit): set address width to 24 bit
+	* sdas/as8xcxxx/ds8mch.c (machine): validate address width
+	* sdas/asxxsrc/asdata.c,
+	* sdas/asxxsrc/asxxxx.h: added a_bytes, a_mask, s_mask, v_mask and outradix
+	* sdas/asxxsrc/asexpr.c (exprmasks): set a_bytes and masks
+	* sdas/asxxsrc/aslist.c: use a_bytes
+	* sdas/asxxsrc/asout.c: use a_bytes,
+	  (outradix, outgsd): added to output address width
+	* sdas/linksrc/lkarea.c,
+	* sdas/linksrc/lklist.c: small optimizations
+	* sdas/linksrc/lkrloc3.c (relr3): use a_bytes
+	* support/sdbinutils/bfd/asxxxx.c (asxxxx_is_rel): fixed get_eol
+
 2013-06-10 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/linksrc/lkaomf51.c (GetName, SaveLinkedFilePath): small optimization

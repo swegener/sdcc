@@ -177,6 +177,10 @@ machine(struct mne *mp)
                 if ((mchtyp != 0) && (mchtyp != DS80C390)) {
                         err('o');
                         break;
+                } else
+                if ((mchtyp == 0) && ((a_bytes < 2) || (a_bytes > 3))) {
+                        err('o');
+                        break;
                 }
                 expr(&e, 0);
                 abscheck(&e);

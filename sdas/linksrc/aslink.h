@@ -1113,7 +1113,7 @@ extern  char *sdld_output;      /*      output file name, --output argument
 extern char *optsdcc;
 extern char *optsdcc_module;
 /* sdld 8015 specific */
-extern  char idatamap[];        /* 0:not used, 1:used
+extern  char idatamap[256];     /*      space is unused
                                  */
 /* end sdld 8051 specific */
 /* end sdld specific */

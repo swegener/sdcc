@@ -791,17 +791,66 @@ rngchk(a_uint n)
  *              none
  *
  *      global variables:
- *              none
+ *              int     a_bytes         T Line Bytes in Address
+ *              a_uint  a_mask          Address mask
+ *              a_uint  s_mask          Sign mask
+ *              a_uint  v_mask          Value mask
  *
  *      functions called:
  *              none
  *
  *      side effects:
- *              none
+ *              The arithmetic precision parameters are set.
  */
  
 VOID
 exprmasks(int n)
 {
-        (void)n;
+        a_bytes = n;
+
+#ifdef  LONGINT
+        switch(a_bytes) {
+        default:
+                a_bytes = 2;
+        case 2:
+                a_mask = (a_uint) 0x0000FFFFl;
+                s_mask = (a_uint) 0x00008000l;
+                v_mask = (a_uint) 0x00007FFFl;
+                break;
+
+        case 3:
+                a_mask = (a_uint) 0x00FFFFFFl;
+                s_mask = (a_uint) 0x00800000l;
+                v_mask = (a_uint) 0x007FFFFFl;
+                break;
+
+        case 4:
+                a_mask = (a_uint) 0xFFFFFFFFl;
+                s_mask = (a_uint) 0x80000000l;
+                v_mask = (a_uint) 0x7FFFFFFFl;
+                break;
+        }
+#else
+        switch(a_bytes) {
+        default:
+                a_bytes = 2;
+        case 2:
+                a_mask = (a_uint) 0x0000FFFF;
+                s_mask = (a_uint) 0x00008000;
+                v_mask = (a_uint) 0x00007FFF;
+                break;
+
+        case 3:
+                a_mask = (a_uint) 0x00FFFFFF;
+                s_mask = (a_uint) 0x00800000;
+                v_mask = (a_uint) 0x007FFFFF;
+                break;
+
+        case 4:
+                a_mask = (a_uint) 0xFFFFFFFF;
+                s_mask = (a_uint) 0x80000000;
+                v_mask = (a_uint) 0x7FFFFFFF;
+                break;
+        }
+#endif
 }

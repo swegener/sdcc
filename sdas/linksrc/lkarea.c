@@ -778,7 +778,7 @@ VOID lnkarea2 (void)
         struct area *gs0_ap = NULL;
         struct sym *sp_dseg_s=NULL, *sp_dseg_l=NULL;
 
-        for(j=0; j<256; j++) idatamap[j]=' ';
+        memset(idatamap, ' ', 256);
         memset(codemap8051, 0, sizeof(codemap8051));
         memset(xdatamap, 0, sizeof(xdatamap));
 
@@ -836,9 +836,9 @@ VOID lnkarea2 (void)
                         for (axp=ap->a_axp; axp; axp=axp->a_axp)
                                 ap->a_size += axp->a_size;
                         bseg_ap->a_axp->a_size = ((ap->a_addr + ap->a_size + 7)/8); /*Bits to bytes*/
-                        ap->a_ap = bseg_ap->a_ap;          //removed BSEG_BYTES from list
+                        ap->a_ap = bseg_ap->a_ap;                  //removed BSEG_BYTES from list
                         bseg_ap->a_ap = abs_ap->a_ap;
-                        abs_ap->a_ap = bseg_ap;            //inserted BSEG_BYTES after abs
+                        abs_ap->a_ap = bseg_ap;                    //inserted BSEG_BYTES after abs
                         bseg_ap = ap;                              //BSEG
                 }
                 else if (!strcmp(ap->a_id, "DSEG"))
@@ -879,7 +879,7 @@ VOID lnkarea2 (void)
                         rloc[locIndex] = lnksect2(ap, locIndex);
                 }
 
-                if (!strcmp(ap->a_id, "BSEG_BYTES"))
+                if (!strcmp(ap->a_id, "BSEG_BYTES") && (ap->a_axp->a_addr >= 0x20))
                 {
                         bseg_ap->a_addr += (ap->a_axp->a_addr - 0x20) * 8; /*Bytes to bits*/
                 }
@@ -1166,9 +1166,9 @@ a_uint lnksect2 (struct area *tap, int locIndex)
                 }
                 while (taxp)
                 {
-                        if( (fchar=='D') || (fchar=='I') )
+                        if (taxp->a_size)
                         {
-                                if(taxp->a_size)
+                                if( (fchar=='D') || (fchar=='I') )
                                 {
                                         /*Search for a space large enough in internal RAM for this areax*/
                                         for(j=ramstart, k=0; j<ramlimit; j++)
@@ -1202,11 +1202,7 @@ a_uint lnksect2 (struct area *tap, int locIndex)
                                                 lkerr++;
                                         }
                                 }
-                                taxp = taxp->a_axp;
-                        }
-                        else if(fchar=='B')
-                        {
-                                if(taxp->a_size!=0)
+                                else if (fchar=='B')
                                 {
                                         /*Search for a space large enough in data memory for this areax*/
                                         for(j=0x20, k=0; j<0x30; j++)
@@ -1231,33 +1227,36 @@ a_uint lnksect2 (struct area *tap, int locIndex)
                                                 fprintf(stderr, ErrMsg, taxp->a_size, taxp->a_size>1?"s":"", tap->a_id);
                                                 lkerr++;
                                         }
+                                        size += taxp->a_size;
                                 }
-                                size += taxp->a_size;
-                                taxp = taxp->a_axp;
+                                else /*For concatenated BIT, CODE, and XRAM areax's*/
+                                {
+                                        //expand external stack
+                                        if((fchar=='K') && (taxp->a_size == 1))
+                                        {
+                                                taxp->a_size = 256-(addr & 0xFF);
+                                        }
+                                        //find next unused address now
+                                        if (locIndex == 1)
+                                        {
+                                                addr = find_empty_space(addr, taxp->a_size, tap->a_id, codemap8051, sizeof (codemap8051));
+                                                allocate_space(addr, taxp->a_size, tap->a_id, codemap8051, sizeof (codemap8051));
+                                        }
+                                        if (locIndex == 2)
+                                        {
+                                                addr = find_empty_space(addr, taxp->a_size, tap->a_id, xdatamap, sizeof (xdatamap));
+                                                allocate_space(addr, taxp->a_size, tap->a_id, xdatamap, sizeof (xdatamap));
+                                        }
+                                        taxp->a_addr = addr;
+                                        addr += taxp->a_size;
+                                        size += taxp->a_size;
+                                }
                         }
-                        else /*For concatenated BIT, CODE, and XRAM areax's*/
+                        else
                         {
-                                //expand external stack
-                                if((fchar=='K') && (taxp->a_size == 1))
-                                {
-                                        taxp->a_size = 256-(addr & 0xFF);
-                                }
-                                //find next unused address now
-                                if ((locIndex == 1) && taxp->a_size)
-                                {
-                                        addr = find_empty_space(addr, taxp->a_size, tap->a_id, codemap8051, sizeof (codemap8051));
-                                        allocate_space(addr, taxp->a_size, tap->a_id, codemap8051, sizeof (codemap8051));
-                                }
-                                if ((locIndex == 2) && taxp->a_size)
-                                {
-                                        addr = find_empty_space(addr, taxp->a_size, tap->a_id, xdatamap, sizeof (xdatamap));
-                                        allocate_space(addr, taxp->a_size, tap->a_id, xdatamap, sizeof (xdatamap));
-                                }
-                                taxp->a_addr = addr;
-                                addr += taxp->a_size;
-                                size += taxp->a_size;
-                                taxp = taxp->a_axp;
+                            taxp->a_addr = addr;
                         }
+                        taxp = taxp->a_axp;
                 }
         }
         tap->a_size = size;

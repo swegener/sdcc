@@ -379,9 +379,7 @@ adb_xb(a_uint v, int i)
  */
 
 VOID
-prntval(fptr, v)
-FILE *fptr;
-a_uint v;
+prntval(FILE *fptr, a_uint v)
 {
         char *frmt;
 

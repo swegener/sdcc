@@ -42,11 +42,10 @@ long long _mullonglong(long long ll, long long lr)
   for (i = 0; i < sizeof (long long); i++)
     {
       for(j = 0; (i + j) < sizeof (long long); j++)
-      ret += ((unsigned short)(l[i] * r [j])) << ((i + j) * 8);
+          ret += ((unsigned short)(l[i] * r [j])) << ((i + j) * 8);
     }
 
   return(ret);
 }
 
 #endif
-

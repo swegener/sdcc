@@ -166,6 +166,7 @@ admode(struct adsym *sp)
 {
         char *ptr;
         int i;
+
         unget(getnb());
         i = 0;
         while ( *(ptr = &sp[i].a_str[0]) ) {

@@ -246,6 +246,14 @@ int     yflag;          /*      -y, enable SDCC Debug Symbols
                          */
 int     zflag;          /*      -z, disable symbol case sensitivity
                          */
+int     a_bytes;        /*      REL file T Line address length
+                         */
+a_uint  a_mask;         /*      Address Mask
+                         */
+a_uint  s_mask;         /*      Sign Mask
+                         */
+a_uint  v_mask;         /*      Value Mask
+                         */
 a_uint  laddr;          /*      address of current assembler line
                          *      or value of .if argument
                          */

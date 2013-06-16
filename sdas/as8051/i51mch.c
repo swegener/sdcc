@@ -776,6 +776,11 @@ minit(void)
         hilo = 1;
 
         /*
+         * Address Space
+         */
+        exprmasks(3);
+
+        /*
          * First time only:
          *      add the pre-defined symbols to the table
          *      as local symbols.

@@ -990,6 +990,14 @@ extern  int     yflag;          /*      -y, enable SDCC Debug Symbols
 
 extern  int     zflag;          /*      -z, disable symbol case sensitivity
                                  */
+extern  int     a_bytes;        /*      REL file T Line address length
+                                 */
+extern  a_uint  a_mask;         /*      Address Mask
+                                 */
+extern  a_uint  s_mask;         /*      Sign Mask
+                                 */
+extern  a_uint  v_mask;         /*      Value Mask
+                                 */
 extern  a_uint  laddr;          /*      address of current assembler line,
                                  *      equate, or value of .if argument
                                  */
@@ -1206,6 +1214,7 @@ extern  VOID            outall(void);
 extern  VOID            outdot(void);
 extern  VOID            outbuf(char *s);
 extern  VOID            outchk(int nt, int nr);
+extern  VOID            outradix(void);
 extern  VOID            outgsd(void);
 extern  VOID            outsym(struct sym *sp);
 extern  VOID            outab(a_uint v);
@@ -1352,6 +1361,7 @@ extern  VOID            outall();
 extern  VOID            outdot();
 extern  VOID            outbuf();
 extern  VOID            outchk();
+extern  VOID            outradix();
 extern  VOID            outgsd();
 extern  VOID            outsym();
 extern  VOID            outab();

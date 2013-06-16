@@ -1,3 +1,11 @@
+2013-06-16 Valentin Dudouyt <valentin dudouyt AT gmail.com>
+
+	* src/stm8/main.c,
+	* src/stm8/peep.c: implemented stm8canAssign and stm8notUsed,
+	  fixed handling of label entities in stm8instructionSize,
+	  added internal buffer in nextToken.
+	* src/stm8/peeph.def: uncommented a few peephole rules.
+
 2013-06-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_mullonglong.c,

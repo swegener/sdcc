@@ -220,8 +220,8 @@ PORT stm8_port = {
    0,
    0,
    0,
-   0,
-   0,
+   stm8notUsed,
+   stm8canAssign,
    0,
    },
   {

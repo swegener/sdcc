@@ -18,6 +18,15 @@
 //
 //
 // Optimal placement of bank switching instructions for named address spaces.
+//
+// For details, see:
+//
+// Philipp Klaus Krause,
+// "Optimal Placement of Bank Selection Instructions in Polynomial Time",
+// Proceedings of the 16th International Workshop on Software and Compilers for Embedded Systems,
+// M-SCOPES '13, pp. 23-30.
+// Association for Computing Machinery,
+// 2013.
 
 #ifndef SDCCNADDR_HH
 #define SDCCNADDR_HH 1

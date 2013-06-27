@@ -1,3 +1,8 @@
+2013-06-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCnaddr.hpp:
+	  Add comment to reference the paper on bank selection.
+
 2013-06-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

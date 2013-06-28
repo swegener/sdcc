@@ -1,5 +1,10 @@
 2013-06-27 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCClospre.cc:
+	  Disable safety in division for stm8.
+
+2013-06-27 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCnaddr.hpp:
 	  Add comment to reference the paper on bank selection.
 

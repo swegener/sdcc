@@ -1,3 +1,8 @@
+2013-06-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdccconf_in.h:
+	  Regenerated to make --disable-stm8-port work.
+
 2013-06-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClospre.cc:

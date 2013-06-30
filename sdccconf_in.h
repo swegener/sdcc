@@ -152,6 +152,9 @@
 #undef OPT_DISABLE_SDCPP
 
 /* XXX */
+#undef OPT_DISABLE_STM8
+
+/* XXX */
 #undef OPT_DISABLE_TININative
 
 /* XXX */

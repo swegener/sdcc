@@ -212,7 +212,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
        if (IC_RESULT (ic) && !IS_OP_LITERAL (IC_RESULT (ic)) && !POINTER_SET(ic) &&
          (eleft && isOperandEqual (eleft, IC_RESULT (ic)) || eright && isOperandEqual (eright, IC_RESULT (ic))))
          (*cfg)[i].invalidates = true;
-       if (ic->op == FUNCTION || ic->op == ENDFUNCTION)
+       if (ic->op == FUNCTION || ic->op == ENDFUNCTION || ic->op == RECEIVE)
          (*cfg)[i].invalidates = true;
        if(uses_global && (ic->op == CALL || ic->op == PCALL))
          (*cfg)[i].invalidates = true;

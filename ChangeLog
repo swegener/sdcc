@@ -1,3 +1,8 @@
+2013-07-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.cc:
+	  Mark receive opcodes as invalidating for losrpe.
+
 2013-06-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdccconf_in.h:

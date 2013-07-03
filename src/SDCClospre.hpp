@@ -598,7 +598,7 @@ static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>:
           if(e != e_end)
             break;
         }
-      if (isOperandEqual(IC_RESULT (ic), IC_RESULT(nic)) && !POINTER_SET(nic))
+      if (isOperandEqual(IC_RESULT (ic), IC_RESULT(nic)) && !POINTER_SET(nic) || G[i].uses)
         break;  
       if ((nic->op == CALL || nic->op == PCALL || POINTER_SET(nic)) && IS_TRUE_SYMOP(IC_RESULT(ic)))
         break;

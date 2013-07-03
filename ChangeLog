@@ -1,3 +1,8 @@
+2013-07-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp:
+	  Fix invalidation in lospre forwarding.
+
 2013-07-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClospre.cc:

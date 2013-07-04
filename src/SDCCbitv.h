@@ -51,12 +51,12 @@ void bitVectUnSetBit (const bitVect *, int);
 int bitVectBitValue (const bitVect *, int);
 bitVect *bitVectUnion (bitVect *, bitVect *);
 bitVect *bitVectIntersect (bitVect *, bitVect *);
-int bitVectBitsInCommon (bitVect *, bitVect *);
+int bitVectBitsInCommon (const bitVect *, const bitVect *);
 bitVect *bitVectCplAnd (bitVect *, bitVect *);
 int bitVectEqual (bitVect *, bitVect *);
-bitVect *bitVectCopy (bitVect *);
-int bitVectIsZero (bitVect *);
-int bitVectnBitsOn (bitVect *);
-int bitVectFirstBit (bitVect *);
+bitVect *bitVectCopy (const bitVect *);
+int bitVectIsZero (const bitVect *);
+int bitVectnBitsOn (const bitVect *);
+int bitVectFirstBit (const bitVect *);
 void bitVectDebugOn (bitVect *, FILE *);
 #endif

@@ -43,6 +43,7 @@ struct _dumpFiles dumpFiles[] = {
   {DUMP_PACK, ".dumppack", NULL},
   {DUMP_RASSGN, ".dumprassgn", NULL},
   {DUMP_LRANGE, ".dumplrange", NULL},
+  {DUMP_LOSPRE, ".dumplospre", NULL},
   {0, NULL, NULL}
 };
 

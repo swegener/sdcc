@@ -415,7 +415,8 @@ enum {
   DUMP_RANGE,
   DUMP_PACK,
   DUMP_RASSGN,
-  DUMP_LRANGE
+  DUMP_LRANGE,
+  DUMP_LOSPRE
 };
 
 struct _dumpFiles {

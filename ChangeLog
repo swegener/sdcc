@@ -3,6 +3,10 @@
 	* src/SDCCset.h,
 	  src/SDCCset.c:
 	  Improve const use in sets.
+	* src/SDCCglobl.h,
+	  src/SDCCBBlock.c,
+	  src/SDCCopt.c:
+      Allow debug iCode dump after lospre.
 
 2013-07-04 Philipp Klaus Krause <pkk AT spth.de>
 

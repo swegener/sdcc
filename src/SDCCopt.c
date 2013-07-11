@@ -2217,7 +2217,6 @@ eBBlockFromiCode (iCode * ic)
       dumpEbbsToFileExt (DUMP_LOSPRE, ebbi);
 
       /* GCSE, lospre and maybe other optimizations sometimes create temporaries that have non-connected live ranges, which is bad. Split them. */
-#if 0
       ebbi = iCodeBreakDown (ic);
       computeControlFlow (ebbi);
       loops = createLoopRegions (ebbi);
@@ -2225,8 +2224,7 @@ eBBlockFromiCode (iCode * ic)
       recomputeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
       adjustIChain (ebbi->bbOrder, ebbi->count);
       ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
-      separateLiveRanges (ic, ebbi);
-#endif
+      //separateLiveRanges (ic, ebbi);
     }
 
   /* Break down again and redo some steps to not confuse live range analysis later. */

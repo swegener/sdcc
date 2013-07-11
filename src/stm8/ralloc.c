@@ -436,7 +436,7 @@ stm8_assignRegisters (ebbIndex * ebbi)
 
   /* liveranges probably changed by register packing
      so we compute them again */
-  recomputeLiveRanges (ebbs, count);
+  recomputeLiveRanges (ebbs, count, FALSE);
 
   if (options.dump_pack)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);

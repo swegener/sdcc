@@ -276,7 +276,6 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   std::map<std::pair<int, reg_t>, var_t> sym_to_index;
 
   start_ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbs, ebbi->count));
-  //start_ic = joinPushes(start_ic);
   {
     int i;
     var_t j;
@@ -448,7 +447,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 #ifdef DEBUG_RALLOC_DEC
           std::cerr << "Non-connected liverange found and extended to connected component of the CFG:" << con[i].name << "\n";
 #endif
-          // Non-connected CFGs shouldn't exist either. Another problem with dead code eliminarion.
+          // Non-connected CFGs were created by at least GCSE and lospre. Now we have a live-range splitter, so this should no longer be necessary, but it seems some still get through.
           cfg_sym_t cfg2;
           boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
           std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));

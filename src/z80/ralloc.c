@@ -3030,7 +3030,7 @@ z80_oldralloc (ebbIndex * ebbi)
 
   /* liveranges probably changed by register packing
      so we compute them again */
-  recomputeLiveRanges (ebbs, count);
+  recomputeLiveRanges (ebbs, count, FALSE);
 
   if (options.dump_pack)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);
@@ -3130,7 +3130,7 @@ z80_ralloc (ebbIndex * ebbi)
 
   /* liveranges probably changed by register packing
      so we compute them again */
-  recomputeLiveRanges (ebbs, count);
+  recomputeLiveRanges (ebbs, count, FALSE);
 
   if (options.dump_pack)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);

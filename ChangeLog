@@ -1,3 +1,13 @@
+2013-07-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCBBlock.c,
+	  src/SDCClrange.c,
+	  src/SDCClrange.h,
+	  src/SDCCopt.c,
+	  src/SDCCralloc.hpp,
+	  src/*/ralloc.c:
+	  Preparations for splitting non-connected live-ranges.
+
 2013-07-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCset.h,

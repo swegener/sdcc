@@ -1,5 +1,10 @@
 2013-07-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCClospre.hpp:
+	  Fix lospre forwarding.
+
+2013-07-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCBBlock.c,
 	  src/SDCClrange.c,
 	  src/SDCClrange.h,

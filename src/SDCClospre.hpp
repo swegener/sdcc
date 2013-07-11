@@ -507,6 +507,12 @@ static void split_edge(T_t &T, G_t &G, typename boost::graph_traits<G_t>::edge_d
   G[boost::source(e, G)].ic->next = newic;
   G[boost::target(e, G)].ic->prev = newic;
 
+  //if (ic->op != ADDRESS_OF && IC_LEFT (ic) && IS_ITEMP (IC_LEFT (ic)))
+  //  bitVectSetBit (OP_SYMBOL (IC_LEFT (ic))->uses, ic->key);
+  //if (IC_RIGHT (ic) && IS_ITEMP (IC_RIGHT (ic)))
+  //  bitVectSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
+  //bitVectSetBit (OP_SYMBOL (IC_RESULT (ic))->defs, ic->key);
+
   // Insert node into cfg.
   typename boost::graph_traits<G_t>::vertex_descriptor n = boost::add_vertex(G);
   // TODO: Exact cost.
@@ -543,7 +549,7 @@ static void split_edge(T_t &T, G_t &G, typename boost::graph_traits<G_t>::edge_d
 
 
 template <class G_t>
-static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>::vertex_descriptor i, const iCode *ic)
+static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>::vertex_descriptor i, const iCode *ic, const assignment_lospre& a)
 {
   typedef typename boost::graph_traits<G_t>::adjacency_iterator adjacency_iter_t;
 
@@ -562,30 +568,30 @@ static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>:
       if (isOperandEqual(IC_RESULT(ic), IC_LEFT(nic)) && nic->op != ADDRESS_OF && (!POINTER_GET(nic) || !IS_PTR(operandType(IC_RESULT(nic))) || !IS_BITFIELD(operandType(IC_LEFT(nic))->next) || compareType(operandType(IC_LEFT(nic)), operandType(tmpop)) == 1))
         {
 #ifdef DEBUG_LOSPRE
-          std::cout << "Forward substituted left operand at " << nic->key << "\n";
+          std::cout << "Forward substituted left operand " << OP_SYMBOL_CONST(IC_LEFT(nic))->name << " at " << nic->key << "\n";
 #endif
-          //const operand *const oldop = IC_LEFT(nic);
+          //bitVectUnSetBit (OP_SYMBOL (IC_LEFT (nic))->uses, nic->key);
           IC_LEFT(nic) = operandFromOperand (tmpop);
-          //setOperandType (IC_LEFT(nic), operandType (oldop));
+          //bitVectSetBit (OP_SYMBOL (IC_LEFT (nic))->uses, nic->key);
         }
       if (isOperandEqual(IC_RESULT(ic), IC_RIGHT(nic)))
         {
 #ifdef DEBUG_LOSPRE
-          std::cout << "Forward substituted right operand at " << nic->key << "\n";
+          std::cout << "Forward substituted right operand " << OP_SYMBOL_CONST(IC_RIGHT(nic))->name << " at " << nic->key << "\n";
 #endif
-          //const operand *const oldop = IC_RIGHT(nic);
+          //bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (nic))->uses, nic->key);
           IC_RIGHT(nic) = operandFromOperand (tmpop);
-          //setOperandType (IC_RIGHT(nic), operandType (oldop));
+          //bitVectSetBit (OP_SYMBOL (IC_RIGHT (nic))->uses, nic->key);
         }
       if (POINTER_SET(nic) && isOperandEqual(IC_RESULT(ic), IC_RESULT(nic)) && (!IS_PTR(operandType(IC_RESULT(nic))) || !IS_BITFIELD(operandType(IC_RESULT(nic))->next) || compareType(operandType(IC_RESULT(nic)), operandType(tmpop)) == 1))
         {
 #ifdef DEBUG_LOSPRE
-          std::cout << "Forward substituted result operand at " << nic->key << "\n";
+          std::cout << "Forward substituted result operand " << OP_SYMBOL_CONST(IC_RESULT(nic))->name << " at " << nic->key << "\n";
 #endif
-          //const operand *const oldop = IC_RESULT(nic);
+          //bitVectUnSetBit (OP_SYMBOL (IC_RESULT (nic))->uses, nic->key);
           IC_RESULT(nic) = operandFromOperand (tmpop);
-          //setOperandType(IC_RESULT(nic), operandType (oldop));
           IC_RESULT(nic)->isaddr = true;
+          //bitVectSetBit (OP_SYMBOL (IC_RESULT (nic))->uses, nic->key);
         }
 
       if (nic->op == LABEL) // Reached label. Continue only if all edges goining here are safe.
@@ -598,8 +604,8 @@ static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>:
           if(e != e_end)
             break;
         }
-      if (isOperandEqual(IC_RESULT (ic), IC_RESULT(nic)) && !POINTER_SET(nic) || G[i].uses)
-        break;  
+      if (isOperandEqual(IC_RESULT (ic), IC_RESULT(nic)) && !POINTER_SET(nic) /*|| G[i].uses*/)
+        break;
       if ((nic->op == CALL || nic->op == PCALL || POINTER_SET(nic)) && IS_TRUE_SYMOP(IC_RESULT(ic)))
         break;
 
@@ -608,13 +614,19 @@ static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>:
       if (nic->op == GOTO || nic->op == IFX || nic->op == JUMPTABLE)
         {
           adjacency_iter_t c, c_end;
-          for(boost::tie(c, c_end) = boost::adjacent_vertices(i, G); c != c_end; ++c) 
-            forward_lospre_assignment(G, *c, ic);
+          for(boost::tie(c, c_end) = boost::adjacent_vertices(i, G); c != c_end; ++c)
+            {
+              if(((a.global[i] & true) && !G[i].invalidates) < (a.global[*c] & true)) // Calculation edge
+                continue;
+              forward_lospre_assignment(G, *c, ic, a);
+            }
           break;
         }
 
       boost::tie(c, c_end) = adjacent_vertices(i, G);
-      if (c == c_end)
+      if(c == c_end)
+        break;
+      if(((a.global[i] & true) && !G[i].invalidates) < (a.global[*c] & true)) // Calculation edge
         break;
       i = *c;
     }
@@ -631,7 +643,7 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
   std::set<edge_desc_t> calculation_edges; // Use descriptor, not iterator due to possible invalidation of iterators when inserting vertices or edges.
   edge_iter_t e, e_end;
   for(boost::tie(e, e_end) = boost::edges(G); e != e_end; ++e)
-    if((a.global[boost::source(*e, G)] && !G[boost::source(*e, G)].invalidates) < a.global[boost::target(*e, G)])
+    if(((a.global[boost::source(*e, G)] & true) && !G[boost::source(*e, G)].invalidates) < (a.global[boost::target(*e, G)] & true))
       calculation_edges.insert(*e);
 
   if(!calculation_edges.size())
@@ -663,15 +675,20 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
       typename boost::graph_traits<G_t>::in_edge_iterator e = in_edges(*v, G).first;
       if (a.global.size() <= *v)
         continue;
-      if(!(a.global[*v] && !G[*v].invalidates || boost::source(*e, G) < a.global.size() && a.global[boost::source(*e, G)]))
+      if(!((a.global[*v] & true) && !G[*v].invalidates || boost::source(*e, G) < a.global.size() && (a.global[boost::source(*e, G)] & true)))
         continue;
 #ifdef DEBUG_LOSPRE
       std::cout << "Substituting ic " << G[*v].ic->key << "\n";
 #endif
       substituted++;
-      // Todo: split unconnected iTemps.
+
       iCode *ic = G[*v].ic;
+      //if (IC_LEFT (ic) && IS_ITEMP (IC_LEFT (ic)))
+      //  bitVectUnSetBit (OP_SYMBOL (IC_LEFT (ic))->uses, ic->key);
+      //if (IC_RIGHT (ic) && IS_ITEMP (IC_RIGHT (ic)))
+       // bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
       IC_RIGHT(ic) = tmpop;
+      //bitVectSetBit (OP_SYMBOL (IC_RIGHT(ic))->uses, ic->key);
       if (!POINTER_SET (ic))
         {
           IC_LEFT(ic) = 0;
@@ -687,7 +704,7 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
         adjacency_iter_t c, c_end;
         boost::tie(c, c_end) = adjacent_vertices(*v, G);
         if (c != c_end)
-          forward_lospre_assignment(G, *c, ic);
+          forward_lospre_assignment(G, *c, ic, a);
       }
     }
 
@@ -697,10 +714,7 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
       return (-1);
     }
 
-  if(substituted <= 1) // Todo: Remove this warning when optimization for speed instead of code size is implemented!
-    std::cout << "Introduced " << OP_SYMBOL_CONST(tmpop)->name << ", but did not substitute multiple calculations.\n"; std::cout.flush();
-
-  if(substituted <= split) // Todo: Remove this warning when optimization for speed instead of code size is implemented!
+  if(substituted < split) // Todo: Remove this warning when optimization for speed instead of code size is implemented!
     std::cout << "Introduced " << OP_SYMBOL_CONST(tmpop)->name << ", but did substitute only " << substituted << " calculations, while introducing "<< split << ".\n"; std::cout.flush();
 
   return(1);

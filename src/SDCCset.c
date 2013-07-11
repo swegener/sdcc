@@ -170,6 +170,8 @@ addSet (set ** list, void *item)
       for (lp = *list; lp->next; lp = lp->next);
       lp = lp->next = newSet ();
     }
+  if (!list)
+    werror (E_OUT_OF_MEM,__FILE__,__LINE__, "Can't add to set.");
 
   /* lp now all set */
   lp->item = item;
@@ -571,7 +573,7 @@ peekSet (const set *sp)
 /* setFirstItem - gets the first item in the set, begins iteration */
 /*-----------------------------------------------------------------*/
 void *
-setFirstItem (set * sset)
+setFirstItem (set *sset)
 {
   if (sset)
     {

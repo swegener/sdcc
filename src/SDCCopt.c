@@ -2224,7 +2224,7 @@ eBBlockFromiCode (iCode * ic)
       recomputeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
       adjustIChain (ebbi->bbOrder, ebbi->count);
       ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
-      //separateLiveRanges (ic, ebbi);
+      separateLiveRanges (ic, ebbi);
     }
 
   /* Break down again and redo some steps to not confuse live range analysis later. */

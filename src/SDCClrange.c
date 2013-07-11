@@ -1002,9 +1002,16 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
 
       for (i = 0; i < sym->defs->size; i++)
         if (bitVectBitValue (sym->defs, i))
-          addSet (&defs, hTabItemWithKey (iCodehTab, i));
-
-      wassert (defs);
+          {
+            iCode *dic;
+            if(dic = hTabItemWithKey (iCodehTab, i))
+              addSet (&defs, hTabItemWithKey (iCodehTab, i));
+            else
+              {
+                werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Definition not found");
+                return;
+              }
+          }
 
       do
         {
@@ -1012,7 +1019,16 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
           set *newdefs;
           int oldsize;
 
+          wassert (defs);
+          wassert (setFirstItem (defs));
+
           // printf("Looking at def at %d now\n", ((iCode *)(setFirstItem (defs)))->key);
+
+          if (!bitVectBitValue (((iCode *)(setFirstItem (defs)))->rlive, sym->key))
+            {
+              werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Variable is not alive at one of its definitions");
+              break;
+            }
 
           visit (&visited, setFirstItem (defs), sym->key);
 

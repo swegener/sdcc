@@ -243,6 +243,7 @@ enum {
   E_MIXING_CONFIG               = 214, /* mixing __CONFIG and CONFIG directives */
   W_STATIC_ASSERTION            = 215, /* static assertion failed */
   E_ALIGNAS                     = 216, /* invalid alignment specified */
+  W_INTERNAL_ERROR              = 217, /* warning for non-fatal internal errors - things that should not have happened, but can be handled */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

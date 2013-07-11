@@ -6,7 +6,7 @@
 	  src/SDCCopt.c,
 	  src/SDCCralloc.hpp,
 	  src/*/ralloc.c:
-	  Preparations for splitting non-connected live-ranges.
+	  Split non-connected live-ranges.
 
 2013-07-05 Philipp Klaus Krause <pkk AT spth.de>
 

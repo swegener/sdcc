@@ -489,7 +489,7 @@ struct
   { E_ALIGNAS, ERROR_LEVEL_ERROR,
     "invalid alignment specified: %d", 0 },
   { W_INTERNAL_ERROR, ERROR_LEVEL_WARNING,
-     "Non-fatal Compiler Internal Error in file '%s' line number '%d' : %s \n"
+     "Non-fatal Compiler Internal Problem in file '%s' line number '%d' : %s \n"
      "Contact Author with source code", 0 },
 };
 

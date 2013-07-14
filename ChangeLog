@@ -1,3 +1,8 @@
+2013-07-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.c:
+	  Change message text for warning on variables being dead at their definitions.
+
 2013-07-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCClospre.hpp:

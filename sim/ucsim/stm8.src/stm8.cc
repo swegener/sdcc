@@ -562,7 +562,7 @@ cl_stm8::exec_inst(void)
                return( inst_sub( code, cprefix));
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x1:
@@ -615,7 +615,7 @@ cl_stm8::exec_inst(void)
                   case 0xED: putchar(regs.A); fflush(stdout); return(resGO);
                   default:
                      printf("************* bad code !!!!\n");
-                     return(resHALT);
+                     return(resINV_INST);
                }
             case 0x80: // ret
                pop2( PC);
@@ -631,7 +631,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x2:
@@ -690,7 +690,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x3:
@@ -744,7 +744,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x4:
@@ -781,7 +781,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x5:
@@ -838,7 +838,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x6:
@@ -878,7 +878,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x7:
@@ -933,7 +933,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x8:
@@ -963,7 +963,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0x9:
@@ -1000,7 +1000,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
       
          break;
@@ -1032,7 +1032,7 @@ cl_stm8::exec_inst(void)
                break;
              default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0xb:
@@ -1070,7 +1070,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0xc:
@@ -1120,7 +1120,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0xd:
@@ -1173,7 +1173,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0xe:
@@ -1210,7 +1210,7 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       case 0xf:
@@ -1228,7 +1228,7 @@ cl_stm8::exec_inst(void)
                break;
             case 0x80: 
                printf("************* WFI/WFE instruction not implemented !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
             case 0x90:
                if(cprefix==0x90) {
                   regs.A = (regs.Y & 0xff);
@@ -1260,12 +1260,12 @@ cl_stm8::exec_inst(void)
                break;
             default: 
                printf("************* bad code !!!!\n");
-               return(resHALT);
+               return(resINV_INST);
          }
          break;
       default:
          printf("************* bad code !!!!\n");
-         return(resHALT);
+         return(resINV_INST);
       
    }
 

@@ -1,5 +1,8 @@
 2013-07-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* support/regression/compact-results.py,
+	* support/regression/collate-results.py: Also look for "unknown
+	   instruction"
 	* sim/ucsim/st7.src/st7.cc,
 	* sim/ucsim/hc08.src/hc08.cc,
 	* sim/ucsim/hc08.src/inst.cc: Change result code for invalid and

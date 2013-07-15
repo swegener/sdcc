@@ -50,7 +50,7 @@ for line in lines:
         ticks = ticks + string.atof(nticks)
 
     # Stop at 0x000228: (106) Invalid instruction 0x00fd
-    if (re.search(r'Invalid instruction', line)):
+    if (re.search(r'Invalid instruction', line) or re.search(r'unknown instruction', line)):
         invalid += 1
         messagelog.append("Invalid instruction: %s" % name)
 

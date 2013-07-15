@@ -513,7 +513,7 @@ cl_st7::exec_inst(void)
          case 0x90: // this is prefix, do not be mad ???
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 		
     case 0x1:      
@@ -547,7 +547,7 @@ cl_st7::exec_inst(void)
          case 0x90: // this is prefix, do not be mad ???
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0x2:      
@@ -591,7 +591,7 @@ cl_st7::exec_inst(void)
          case 0x90: // this is prefix, do not be mad ???
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0x3:      
@@ -614,7 +614,7 @@ cl_st7::exec_inst(void)
             break;
          case 0x80: // trap
             printf("************* TRAP instruction unimplemented !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
             break;
          case 0x90: // 
             if(cprefix==0) {
@@ -636,7 +636,7 @@ cl_st7::exec_inst(void)
             break;
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0x4:      
@@ -681,7 +681,7 @@ cl_st7::exec_inst(void)
             break;
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0x5:      
@@ -728,7 +728,7 @@ cl_st7::exec_inst(void)
          case 0x70: // 
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0x6:      
@@ -773,7 +773,7 @@ cl_st7::exec_inst(void)
             break;
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0x7:      
@@ -816,7 +816,7 @@ cl_st7::exec_inst(void)
          case 0x80: // 
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0x8:      
@@ -855,7 +855,7 @@ cl_st7::exec_inst(void)
             break;
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0x9:      
@@ -900,7 +900,7 @@ cl_st7::exec_inst(void)
             break;
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0xa:      
@@ -939,7 +939,7 @@ cl_st7::exec_inst(void)
             break;
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0xb:      
@@ -973,7 +973,7 @@ cl_st7::exec_inst(void)
          case 0x80: // 
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0xc:      
@@ -1011,7 +1011,7 @@ cl_st7::exec_inst(void)
          case 0x80: // 
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0xd:      
@@ -1048,7 +1048,7 @@ cl_st7::exec_inst(void)
          case 0x80: // 
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0xe:      
@@ -1092,7 +1092,7 @@ cl_st7::exec_inst(void)
             break;
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
     case 0xf:      
@@ -1138,13 +1138,13 @@ cl_st7::exec_inst(void)
          case 0xA0:
          default: 
             printf("************* bad code !!!!\n");
-            return(resHALT);
+            return(resINV_INST);
 		}
 
 
     default:
 		printf("************* bad code !!!!\n");
-		return(resHALT);
+		return(resINV_INST);
 	}
 	  
   /*if (PC)

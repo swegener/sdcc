@@ -352,13 +352,19 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
 {
   iCode *ic = G[i].ic;
   
+  ic->rMask = newBitVect(port->num_regs);
   ic->rSurv = newBitVect(port->num_regs);
   
   std::set<var_t>::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
-    if(a.global[*v] >= 0 && G[i].dying.find(*v) == G[i].dying.end())
-      if(!((IC_RESULT(ic) && !POINTER_SET(ic)) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
-        ic->rSurv = bitVectSetBit(ic->rSurv, a.global[*v]);
+    {
+      if(a.global[*v] < 0)
+        continue;
+      ic->rMask = bitVectSetBit(ic->rMask, a.global[*v]);
+      if(G[i].dying.find(*v) == G[i].dying.end())
+        if(!((IC_RESULT(ic) && !POINTER_SET(ic)) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
+          ic->rSurv = bitVectSetBit(ic->rSurv, a.global[*v]);
+    }
 }
 
 template<class G_t>
@@ -367,6 +373,7 @@ static void unset_surviving_regs(unsigned short int i, const G_t &G)
   iCode *ic = G[i].ic;
   
   freeBitVect(ic->rSurv);
+  freeBitVect(ic->rMask);
 }
 
 template <class G_t, class I_t>

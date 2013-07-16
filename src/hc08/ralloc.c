@@ -719,6 +719,7 @@ createRegMask (eBBlock ** ebbs, int count)
 
           /* first mark the registers used in this
              instruction */
+          ic->rSurv = newBitVect(port->num_regs);
           ic->rUsed = regsUsedIniCode (ic);
           _G.funcrUsed = bitVectUnion (_G.funcrUsed, ic->rUsed);
 
@@ -752,8 +753,13 @@ createRegMask (eBBlock ** ebbs, int count)
 
               /* for all the registers allocated to it */
               for (k = 0; k < sym->nRegs; k++)
-                if (sym->regs[k])
+                {
+                  if (!sym->regs[k])
+                    continue;
                   ic->rMask = bitVectSetBit (ic->rMask, sym->regs[k]->rIdx);
+                  if (sym->liveTo != ic->key)
+                    ic->rSurv = bitVectSetBit (ic->rSurv, sym->regs[k]->rIdx);
+                }
             }
         }
     }
@@ -2453,10 +2459,6 @@ hc08_ralloc (ebbIndex * ebbi)
 /*             _G.dataExtend,currFunc->name,""); */
       _G.dataExtend = 0;
     }
-
-  /* after that create the register mask
-     for each of the instruction */
-  createRegMask (ebbs, count);
 
   /* redo that offsets for stacked automatic variables */
   if (currFunc)

@@ -2,7 +2,9 @@
 
 	* src/z80/ralloc.c,
 	  src/z80/ralloc2.cc,
-	  support/regression/tests/bug-2195.c:
+	  support/regression/tests/bug-2195.c,
+	  src/hc08/ralloc.c,
+	  src/hc08/ralloc2.cc:
 	  Unify handling of register survival in old and new register allocator, fixing bug #2195.
 
 2013-07-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

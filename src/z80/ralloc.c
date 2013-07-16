@@ -1550,10 +1550,8 @@ createRegMask (eBBlock ** ebbs, int count)
                   if (!sym->regs[k])
                     continue;
                   ic->rMask = bitVectSetBit (ic->rMask, sym->regs[k]->rIdx);
-                  if (!ic->next)
-                    continue;
-                  if (sym->liveTo != ic->next->key)
-                    ic->rSurv = bitVectSetBit (ic->rMask, sym->regs[k]->rIdx);
+                  if (sym->liveTo != ic->key)
+                    ic->rSurv = bitVectSetBit (ic->rSurv, sym->regs[k]->rIdx);
                 }
             }
         }

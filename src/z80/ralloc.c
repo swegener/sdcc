@@ -1514,6 +1514,7 @@ createRegMask (eBBlock ** ebbs, int count)
           /* first mark the registers used in this
              instruction */
 
+          ic->rSurv = newBitVect(port->num_regs);
           ic->rUsed = regsUsedIniCode (ic);
           _G.funcrUsed = bitVectUnion (_G.funcrUsed, ic->rUsed);
 
@@ -1545,8 +1546,15 @@ createRegMask (eBBlock ** ebbs, int count)
 
               /* for all the registers allocated to it */
               for (k = 0; k < sym->nRegs; k++)
-                if (sym->regs[k])
+                {
+                  if (!sym->regs[k])
+                    continue;
                   ic->rMask = bitVectSetBit (ic->rMask, sym->regs[k]->rIdx);
+                  if (!ic->next)
+                    continue;
+                  if (sym->liveTo != ic->next->key)
+                    ic->rSurv = bitVectSetBit (ic->rMask, sym->regs[k]->rIdx);
+                }
             }
         }
     }
@@ -3167,10 +3175,6 @@ z80_ralloc (ebbIndex * ebbi)
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);
     }
-
-  /* after that create the register mask
-     for each of the instruction */
-  createRegMask (ebbs, count);
 
   ic = joinPushes (ic);
 

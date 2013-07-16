@@ -1,3 +1,10 @@
+2013-07-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c,
+	  src/z80/ralloc2.cc,
+	  support/regression/tests/bug-2195.c:
+	  Unify handling of register survival in old and new register allocator, fixing bug #2195.
+
 2013-07-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/compact-results.py,

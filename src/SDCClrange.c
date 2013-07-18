@@ -1064,8 +1064,9 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
                       IC_RIGHT (ic) = operandFromOperand (tmpop);
                   if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic)) == sym)
                     {
+                      bool pset = POINTER_SET(ic);
                       IC_RESULT (ic) = operandFromOperand (tmpop);
-                      if (POINTER_SET (ic))
+                      if (pset)
                         IC_RESULT(ic)->isaddr = TRUE;
                     }
                 }

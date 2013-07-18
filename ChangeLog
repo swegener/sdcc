@@ -1,3 +1,8 @@
+2013-07-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/_mullong.c:
+	  Use 16x16 multiplication instead of 8x8 where faster; patch #133 by Marco Bodrato.
+
 2013-07-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCClrange.c,

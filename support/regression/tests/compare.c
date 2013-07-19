@@ -101,6 +101,20 @@ testUnsignedCompare(void)
     ASSERT(right > left);
     ASSERT(right >= left);
 }
+
+void (*fptr)(void);
+int *volatile iptr;
+
+
+void testPointerCompare(void)
+{
+	int i;
+	fptr = &testPointerCompare;
+	iptr = &i;
+	ASSERT(iptr == &i);
+	ASSERT(fptr == &testPointerCompare);
+}
+
 /*
                 Common cases:
                         Around zero

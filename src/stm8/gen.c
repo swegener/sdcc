@@ -3545,8 +3545,8 @@ genCmpEQorNE (iCode *ic)
   for (i = 0; i < size;)
     {
       /* Prefer literal operand on right */
-      if (left->aop->type == AOP_LIT ||
-        right->aop->type != AOP_LIT && left->aop->type == AOP_DIR ||
+      if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD ||
+        right->aop->type != AOP_LIT && right->aop->type != AOP_IMMD && left->aop->type == AOP_DIR ||
         (aopInReg (right->aop, 0, A_IDX) || aopInReg (right->aop, 0, X_IDX) || aopInReg (right->aop, 0, Y_IDX)) && aopOnStack (right->aop, i, 1))
         {
           operand *temp = left;
@@ -3554,7 +3554,7 @@ genCmpEQorNE (iCode *ic)
           right = temp;
         }
 
-      if (i <= size - 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack (right->aop, i, 2)))
+      if (i <= size - 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || aopOnStack (right->aop, i, 2)))
         {
           bool x_dead = regDead (X_IDX, ic) && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] <= i + 1 && right->aop->regs[XH_IDX] <= i + 1;
           if (aopInReg (left->aop, i, Y_IDX) && aopOnStack (right->aop, i, 2))
@@ -3589,7 +3589,7 @@ genCmpEQorNE (iCode *ic)
 
           i += 2;
         }
-      else if (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack (right->aop, i, 1))
+      else if (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || aopOnStack (right->aop, i, 1))
         {
           if (!regDead (A_IDX, ic) && !aopInReg (left->aop, i, A_IDX) && !pushed_a)
             {

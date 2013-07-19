@@ -1,5 +1,10 @@
 2013-07-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/stm8/gen.c:
+	  More efficient long and long long shifts by small contants.
+
+2013-07-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/stm8/gen.c,
 	  support/regression/tests/compare.c:
 	  Fix handling of comparisons to immediates for stm8.

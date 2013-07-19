@@ -4096,7 +4096,7 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
     {
       unsigned int i;
 
-      wassertl (size <= 2, "Shifting of longs should be handled by generic function.");
+      wassertl (size <= 2 || shCount <= 1, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
 
       aopOp (left, ic);
       aopOp (result, ic);
@@ -4108,7 +4108,7 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
           {
             if (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX))
               {
-                emit3w (i ? A_RLCW : A_SLLW, result->aop, 0);
+                emit3w_o (i ? A_RLCW : A_SLLW, result->aop, i, 0, 0);
                 i += 2;
               }
             else
@@ -4154,7 +4154,7 @@ genLeftShift (const iCode *ic)
 
   /* if the shift count is known then do it
      as efficiently as possible */
-  if (right->aop->type == AOP_LIT && getSize (operandType (result)) <= 2)
+  if (right->aop->type == AOP_LIT && (getSize (operandType (result)) <= 2 || ulFromVal (right->aop->aopu.aop_lit) <= 1 || ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8))
     {
       genLeftShiftLiteral (left, right, result, ic);
       freeAsmop (right);
@@ -4283,7 +4283,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
     {
       int i;
 
-      wassertl (size <= 2, "Shifting of longs should be handled by generic function.");
+      wassertl (size <= 2 || shCount <= 1, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
 
       aopOp (left, ic);
       aopOp (result, ic);
@@ -4340,9 +4340,11 @@ genRightShift (const iCode *ic)
 
   aopOp (right, ic);
 
+  sign =  !SPEC_USIGN (getSpec (operandType (left)));
+
   /* if the shift count is known then do it
      as efficiently as possible */
-  if (right->aop->type == AOP_LIT && getSize (operandType (result)) <= 2)
+  if (right->aop->type == AOP_LIT && (getSize (operandType (result)) <= 2 || ulFromVal (right->aop->aopu.aop_lit) <= 1 || !sign && ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8))
     {
       genRightShiftLiteral (left, right, result, ic);
       freeAsmop (right);
@@ -4350,8 +4352,6 @@ genRightShift (const iCode *ic)
     }
 
   D (emitcode ("; genRightShift", ""));
-
-  sign =  !SPEC_USIGN (getSpec (operandType (left)));
 
   aopOp (result, ic);
   aopOp (left, ic);

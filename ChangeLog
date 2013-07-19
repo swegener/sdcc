@@ -1,5 +1,11 @@
 2013-07-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/stm8/gen.c,
+	  src/stm8/ralloc2.cc:
+	  Efficient pushes.
+
+2013-07-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/stm8/gen.c:
 	  More efficient long and long long shifts by small contants.
 

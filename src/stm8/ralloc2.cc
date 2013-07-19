@@ -111,10 +111,13 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   const i_assignment_t &ia = a.i_assignment;
 
   if(ia.registers[REG_A][1] < 0)
-    return(true);	// Register A not in use.
+    return(true);	// Register a not in use.
 
   if(ic->op == IPUSH)
     {
+      if (ia.registers[REG_XL][1] < 0 || ia.registers[REG_YL][1] < 0 && !stm8_extend_stack)
+        return(true);	// Register xl or yl free; code generation can use them when a is not available.
+
       // push a does not disturb a.
       if (getSize(operandType(IC_LEFT(ic))) <= 1 && operand_in_reg(left, REG_A, ia, i, G))
         return(true);
@@ -123,9 +126,30 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       if (IS_OP_LITERAL(left))
         return(true);
 
-      // TODO: Allow push longmem, allow any combination of push a, pushw x, pushw y.
+      // push longmem does not disturb a.
+      if (IS_OP_GLOBAL(left))
+        return(true);
 
-      return(false);
+      // Only look at itemp pushes below.
+      if (!IS_ITEMP(left))
+        return(false);
+
+      // Register pushes do not disturb a.
+      for (int i = 0; i < getSize(operandType(IC_LEFT(ic)));)
+        {
+          if(operand_in_reg(left, REG_A, ia, i, G))
+            i++;
+          else if(operand_in_reg(left, REG_XL, ia, i, G) && operand_in_reg(left, REG_XH, ia, i + 1, G))
+            i += 2;
+          else if(operand_in_reg(left, REG_YL, ia, i, G) && operand_in_reg(left, REG_YH, ia, i + 1, G))
+            i += 2;
+          else if(operand_in_reg(left, REG_XL, ia, i, G) || operand_in_reg(left, REG_YL, ia, i, G))
+            i++;
+          else
+            return(false);
+        }
+
+      return(true);
     }
 
   return(true);

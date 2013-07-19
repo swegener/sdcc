@@ -144,12 +144,12 @@ stm8_init_asmops (void)
   asmop_x.aopu.bytes[0].byteu.reg = stm8_regs + XL_IDX;
   asmop_x.aopu.bytes[1].in_reg = TRUE;
   asmop_x.aopu.bytes[1].byteu.reg = stm8_regs + XH_IDX;
-  asmop_a.regs[A_IDX] = -1;
-  asmop_a.regs[XL_IDX] = 0;
-  asmop_a.regs[XH_IDX] = 1;
-  asmop_a.regs[YL_IDX] = -1;
-  asmop_a.regs[YH_IDX] = -1;
-  asmop_a.regs[C_IDX] = -1;
+  asmop_x.regs[A_IDX] = -1;
+  asmop_x.regs[XL_IDX] = 0;
+  asmop_x.regs[XH_IDX] = 1;
+  asmop_x.regs[YL_IDX] = -1;
+  asmop_x.regs[YH_IDX] = -1;
+  asmop_x.regs[C_IDX] = -1;
 
   asmop_y.type = AOP_REG;
   asmop_y.size = 2;
@@ -157,12 +157,12 @@ stm8_init_asmops (void)
   asmop_y.aopu.bytes[0].byteu.reg = stm8_regs + YL_IDX;
   asmop_y.aopu.bytes[1].in_reg = TRUE;
   asmop_y.aopu.bytes[1].byteu.reg = stm8_regs + YH_IDX;
-  asmop_a.regs[A_IDX] = -1;
-  asmop_a.regs[XL_IDX] = -1;
-  asmop_a.regs[XH_IDX] = -1;
-  asmop_a.regs[YL_IDX] = 0;
-  asmop_a.regs[YH_IDX] = 1;
-  asmop_a.regs[C_IDX] = -1;
+  asmop_y.regs[A_IDX] = -1;
+  asmop_y.regs[XL_IDX] = -1;
+  asmop_y.regs[XH_IDX] = -1;
+  asmop_y.regs[YL_IDX] = 0;
+  asmop_y.regs[YH_IDX] = 1;
+  asmop_y.regs[C_IDX] = -1;
 
   asmop_xy.type = AOP_REG;
   asmop_xy.size = 4;
@@ -174,12 +174,12 @@ stm8_init_asmops (void)
   asmop_xy.aopu.bytes[2].byteu.reg = stm8_regs + YL_IDX;
   asmop_xy.aopu.bytes[3].in_reg = TRUE;
   asmop_xy.aopu.bytes[3].byteu.reg = stm8_regs + YH_IDX;
-  asmop_a.regs[A_IDX] = -1;
-  asmop_a.regs[XL_IDX] = 0;
-  asmop_a.regs[XH_IDX] = 1;
-  asmop_a.regs[YL_IDX] = 2;
-  asmop_a.regs[YH_IDX] = 3;
-  asmop_a.regs[C_IDX] = -1;
+  asmop_xy.regs[A_IDX] = -1;
+  asmop_xy.regs[XL_IDX] = 0;
+  asmop_xy.regs[XH_IDX] = 1;
+  asmop_xy.regs[YL_IDX] = 2;
+  asmop_xy.regs[YH_IDX] = 3;
+  asmop_xy.regs[C_IDX] = -1;
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.size = 1;
@@ -194,12 +194,12 @@ stm8_init_asmops (void)
   asmop_one.type = AOP_LIT;
   asmop_one.size = 1;
   asmop_one.aopu.aop_lit = constVal ("1");
-  asmop_a.regs[A_IDX] = -1;
-  asmop_a.regs[XL_IDX] = -1;
-  asmop_a.regs[XH_IDX] = -1;
-  asmop_a.regs[YL_IDX] = -1;
-  asmop_a.regs[YH_IDX] = -1;
-  asmop_a.regs[C_IDX] = -1;
+  asmop_one.regs[A_IDX] = -1;
+  asmop_one.regs[XL_IDX] = -1;
+  asmop_one.regs[XH_IDX] = -1;
+  asmop_one.regs[YL_IDX] = -1;
+  asmop_one.regs[YH_IDX] = -1;
+  asmop_one.regs[C_IDX] = -1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2070,7 +2070,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) <= 1 + aopInReg (result_aop, i, XL_IDX))
         {
           bool half = (i == size - 1);
-          bool x = aopInReg (result_aop, i, half ? XL_IDX : X_IDX);emitcode(";X", "%d %d %d %d", x, half, byteOfVal (right_aop->aopu.aop_lit, i), byteOfVal (right_aop->aopu.aop_lit, i + 1));
+          bool x = aopInReg (result_aop, i, half ? XL_IDX : X_IDX);
           genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left_aop, i, 2 - half, a_free, x, !x);
           for (j = 0; j < byteOfVal (right_aop->aopu.aop_lit, i); j++)
             emit3w (A_DECW, x ? ASMOP_X : ASMOP_Y, 0);
@@ -2329,18 +2329,51 @@ genIpush (const iCode * ic)
 
   for (size = IC_LEFT (ic)->aop->size, offset = 0; size;)
     {
-      // todo: For AOP_IMMD, if X is free, when optimizing for code size, ldw x, m  pushw x is better than push m push m+1.
-      // todo: Use x (or even y) when free for stack operands.
-
       if (aopInReg (IC_LEFT (ic)->aop, offset, X_IDX) || aopInReg (IC_LEFT (ic)->aop, offset, Y_IDX))
         {
           push (IC_LEFT (ic)->aop, offset, 2);
           offset += 2;
           size -= 2;
         }
+      // Going through x is more efficient than two individual pushes for some cases.
+      else if (size >= 2 && regDead (X_IDX, ic) && IC_LEFT (ic)->aop->regs[XL_IDX] < offset && IC_LEFT (ic)->aop->regs[XH_IDX] < offset &&
+        (IC_LEFT (ic)->aop->type == AOP_LIT && !byteOfVal (IC_LEFT (ic)->aop->aopu.aop_lit, offset) && !byteOfVal (IC_LEFT (ic)->aop->aopu.aop_lit, offset + 1) || IC_LEFT (ic)->aop->type == AOP_DIR && optimize.codeSize || aopOnStack (IC_LEFT (ic)->aop, offset, 2)))
+        {
+          genMove_o (ASMOP_X, 0, IC_LEFT (ic)->aop, offset, 2, regDead (A_IDX, ic) && IC_LEFT (ic)->aop->regs[A_IDX] < offset, TRUE, FALSE);
+          push (ASMOP_X, 0, 2);
+          offset += 2;
+          size -= 2;
+        }
+      // Going through y is more efficient than two individual pushes for stack operands only.
+      else if (size >= 2 && regDead (Y_IDX, ic) && IC_LEFT (ic)->aop->regs[YL_IDX] < offset && IC_LEFT (ic)->aop->regs[YH_IDX] < offset && aopOnStack (IC_LEFT (ic)->aop, offset, 2))
+        {
+          genMove_o (ASMOP_Y, 0, IC_LEFT (ic)->aop, offset, 2, regDead (A_IDX, ic) && IC_LEFT (ic)->aop->regs[A_IDX] < offset, FALSE, TRUE);
+          push (ASMOP_Y, 0, 2);
+          offset += 2;
+          size -= 2;
+        }
+      // Push directly.
       else if (IC_LEFT (ic)->aop->type == AOP_LIT || aopInReg (IC_LEFT (ic)->aop, offset, A_IDX) || IC_LEFT (ic)->aop->type == AOP_DIR || IC_LEFT (ic)->aop->type == AOP_IMMD)
         {
           push (IC_LEFT (ic)->aop, offset, 1);
+          offset++;
+          size--;
+        }
+      // a is not free. Try to use xl instead.
+      else if ((!regDead (A_IDX, ic) || IC_LEFT (ic)->aop->regs[A_IDX] > offset) && (regDead (XL_IDX, ic) && IC_LEFT (ic)->aop->regs[XL_IDX] <= offset || aopInReg (IC_LEFT (ic)->aop, offset, XL_IDX)))
+        {
+          genMove_o (ASMOP_X, 0, IC_LEFT (ic)->aop, offset, 1, FALSE, FALSE, FALSE);
+          push (ASMOP_X, 0, 2);
+          adjustStack (1);
+          offset++;
+          size--;
+        }
+      // Neither a nor xl is free. Allocator guarantees that yl is free then; use it.
+      else if (!regDead (A_IDX, ic) || IC_LEFT (ic)->aop->regs[A_IDX] > offset)
+        {
+          genMove_o (ASMOP_Y, 0, IC_LEFT (ic)->aop, offset, 1, FALSE, FALSE, FALSE);
+          push (ASMOP_Y, 0, 2);
+          adjustStack (1);
           offset++;
           size--;
         }

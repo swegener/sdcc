@@ -1776,11 +1776,6 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           emit3w_o (A_CLRW, result, roffset + i, 0, 0);
           i += 2;
         }
-      else if ((!aopRS (result) || aopOnStack(result, roffset + i, 1) || aopInReg (result, roffset + i, A_IDX)) && source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, soffset + i))
-        {
-          emit3_o (A_CLR, result, roffset + i, 0, 0);
-          i++;
-        }
       else if (i + 1 < size && aopInReg (result, roffset + i, X_IDX) &&
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
@@ -1811,7 +1806,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           if (source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, i) && !byteOfVal (source->aopu.aop_lit, i + 1))
-            emit3w (A_CLRW, ASMOP_Y, 0);
+            emit3w (A_CLRW, ASMOP_X, 0);
           else
             {
               emitcode ("ldw", "x, %s", aopGet2 (source, soffset + i));
@@ -1820,6 +1815,11 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           emitcode ("ldw", "%s, x", aopGet2 (result, roffset + i));
           cost (2, 2);
           i += 2;
+        }
+      else if ((!aopRS (result) || aopOnStack(result, roffset + i, 1) || aopInReg (result, roffset + i, A_IDX)) && source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, soffset + i))
+        {
+          emit3_o (A_CLR, result, roffset + i, 0, 0);
+          i++;
         }
       else if (y_dead && result->regs[YL_IDX] < 0 && result->regs[YH_IDX] < 0 && aopOnStack (result, roffset + i, 2) &&
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
@@ -3486,13 +3486,36 @@ genCmp (iCode *ic)
             break;
           }
 
-      if (!regDead (A_IDX, ic) && !pushed_a)
-        push (ASMOP_A, 0, 1);
-
       for (i = 0; i < size; i++)
         {
           const asmop *right_stacked = NULL;
           int right_offset;
+
+          if (!i && (aopInReg (left->aop, i, X_IDX) || aopInReg (left->aop, i, Y_IDX) && !aopOnStack(right->aop, 0, 2)) &&
+            (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack(right->aop, 0, 2)))
+            {
+              bool x = aopInReg (left->aop, i, X_IDX);
+              emitcode ("cpw", x ? "x, %s" : "y, %s", aopGet2 (right->aop, 0));
+              cost ((x ? 3 : 4) - aopOnStack(right->aop, 0, 2), 2);
+              i++;
+              continue;
+            }
+          else if (!i && i + 1 < size && regDead (X_IDX, ic) && left->aop->regs[XL_IDX] < i && left->aop->regs[XH_IDX] < i && right->aop->regs[XL_IDX] < i && right->aop->regs[XH_IDX] < i &&
+            (left->aop->type == AOP_LIT || left->aop->type == AOP_DIR || aopOnStack(left->aop, 0, 2)) &&
+            (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack(right->aop, 0, 2)))
+            {
+              genMove (ASMOP_X, left->aop, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] < i, TRUE, FALSE);
+              emitcode ("cpw", "x, %s", aopGet2 (right->aop, 0));
+              cost (3 - aopOnStack(right->aop, 0, 2), 2);
+              i++;
+              continue;
+            }
+
+          if (!regDead (A_IDX, ic) && !pushed_a && !aopInReg (left->aop, i, A_IDX))
+            {
+              push (ASMOP_A, 0, 1);
+              pushed_a = TRUE;
+            }
 
           right_stacked = stack_aop (right->aop, i, &right_offset);
 
@@ -3501,7 +3524,7 @@ genCmp (iCode *ic)
               pop (ASMOP_A, 0, 1);
               pushed_a = FALSE;
             }
-          else if (i && aopInReg (left->aop, i, A_IDX))
+          else if (i && aopInReg (left->aop, i, A_IDX) && pushed_a)
             {
               emitcode ("ld", "a, (1, sp)");
               cost (2, 1);
@@ -3511,17 +3534,17 @@ genCmp (iCode *ic)
           
           if (right_stacked || aopInReg (right->aop, i, A_IDX))
             {
-              emitcode (i ? "sbc" : "sub", "a, (%d, sp)", right_stacked ? right_offset : 1);
+              emitcode (i ? "sbc" : "cp", "a, (%d, sp)", right_stacked ? right_offset : 1);
               cost (2, 1);
             }
           else
-            emit3_o (i ? A_SBC : A_SUB, ASMOP_A, 0, right->aop, i);
+            emit3_o (i ? A_SBC : A_CP, ASMOP_A, 0, right->aop, i);
 
           if (right_stacked)
             pop (right_stacked, 0, 2);
         }
 
-      if (!regDead (A_IDX, ic))
+      if (!regDead (A_IDX, ic) && pushed_a)
         pop (ASMOP_A, 0, 1);
       else if (pushed_a)
         adjustStack (1);
@@ -4819,9 +4842,18 @@ genIfx (const iCode *ic)
     (aopInReg (cond->aop, 0, X_IDX) || aopInReg (cond->aop, 0, Y_IDX) ||
     (cond->aop->type == AOP_REG && (cond->aop->aopu.bytes[0].byteu.reg->rIdx == XH_IDX && cond->aop->aopu.bytes[1].byteu.reg->rIdx == XL_IDX || cond->aop->aopu.bytes[0].byteu.reg->rIdx == YH_IDX && cond->aop->aopu.bytes[1].byteu.reg->rIdx == YL_IDX))))
     {
-      bool in_x = (aopInReg (cond->aop, 0, X_IDX) || cond->aop->aopu.bytes[0].byteu.reg->rIdx == XH_IDX && cond->aop->aopu.bytes[1].byteu.reg->rIdx == XL_IDX);
+      bool in_y = (aopInReg (cond->aop, 0, Y_IDX) || aopInReg (cond->aop, 0, YH_IDX) && aopInReg (cond->aop, 0, YL_IDX));
 
-      emit3w (A_TNZW, in_x ? ASMOP_X : ASMOP_Y, 0);
+      emit3w (A_TNZW, in_y ? ASMOP_Y : ASMOP_X, 0);
+      if (tlbl)
+        emitcode (IC_FALSE (ic) ? "jrne" : "jreq", "!tlabel", labelKey2num (tlbl->key));
+      cost (2, 0);
+    }
+  else if (cond->aop->size == 2 &&
+    (aopOnStack (cond->aop, 0, 2) || cond->aop->type == AOP_DIR) && regDead(X_IDX, ic))
+    {
+      genMove (ASMOP_X, cond->aop, regDead (A_IDX, ic), TRUE, FALSE);
+      emit3w (A_TNZW, ASMOP_X, 0);
       if (tlbl)
         emitcode (IC_FALSE (ic) ? "jrne" : "jreq", "!tlabel", labelKey2num (tlbl->key));
       cost (2, 0);
@@ -4838,7 +4870,31 @@ genIfx (const iCode *ic)
 
       for (i = 0; i < cond->aop->size; i++) // todo: Use tnzw; test a first, if dead, to free a; use swapw followed by exg to test xh if xl is dead (same for yh), use tnzw independently of where in the operand xl and xh are.
         {
-          if ((aopInReg (cond->aop, i, XL_IDX) || aopInReg (cond->aop, i, XH_IDX) || aopInReg (cond->aop, i, YH_IDX)) && regDead (A_IDX, ic) && cond->aop->regs[A_IDX] <= i)
+          if (aopInReg (cond->aop, i, X_IDX) || aopInReg (cond->aop, i, XH_IDX) && aopInReg (cond->aop, i + 1, XL_IDX))
+            {
+              emit3w(A_TNZW, ASMOP_Y, 0);
+              i++;
+            }
+          else if (aopInReg (cond->aop, i, Y_IDX) || aopInReg (cond->aop, i, YH_IDX) && aopInReg (cond->aop, i + 1, YL_IDX))
+            {
+              emit3w(A_TNZW, ASMOP_Y, 0);
+              i++;
+            }
+          else if (i + 1 < cond->aop->size && regDead (X_IDX, ic) && cond->aop->regs[XL_IDX] < i && cond->aop->regs[XH_IDX] < i &&
+            (aopOnStack (cond->aop, i, 2) || cond->aop->type == AOP_DIR))
+            {
+              genMove_o (ASMOP_X, 0, cond->aop, i, 2, regDead (A_IDX, ic) && cond->aop->regs[A_IDX] < i, TRUE, FALSE);
+              emit3w(A_TNZW, ASMOP_X, 0);
+              i++;
+            }
+          else if (i + 1 < cond->aop->size && regDead (Y_IDX, ic) && cond->aop->regs[YL_IDX] < i && cond->aop->regs[YH_IDX] < i &&
+            (aopOnStack (cond->aop, i, 2) || cond->aop->type == AOP_DIR))
+            {
+              genMove_o (ASMOP_Y, 0, cond->aop, i, 2, regDead (A_IDX, ic) && cond->aop->regs[A_IDX] < i, FALSE, TRUE);
+              emit3w(A_TNZW, ASMOP_Y, 0);
+              i++;
+            }
+          else if ((aopInReg (cond->aop, i, XL_IDX) || aopInReg (cond->aop, i, XH_IDX) || aopInReg (cond->aop, i, YH_IDX)) && regDead (A_IDX, ic) && cond->aop->regs[A_IDX] <= i)
             {
               cheapMove (ASMOP_A, 0, cond->aop, i, FALSE);
               emit3(A_TNZ, ASMOP_A, 0);

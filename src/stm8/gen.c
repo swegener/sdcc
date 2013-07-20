@@ -4872,7 +4872,7 @@ genIfx (const iCode *ic)
         {
           if (aopInReg (cond->aop, i, X_IDX) || aopInReg (cond->aop, i, XH_IDX) && aopInReg (cond->aop, i + 1, XL_IDX))
             {
-              emit3w(A_TNZW, ASMOP_Y, 0);
+              emit3w(A_TNZW, ASMOP_X, 0);
               i++;
             }
           else if (aopInReg (cond->aop, i, Y_IDX) || aopInReg (cond->aop, i, YH_IDX) && aopInReg (cond->aop, i + 1, YL_IDX))

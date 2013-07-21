@@ -2076,7 +2076,7 @@ xa51_assignRegisters (ebbIndex * ebbi)
      so we compute them again */
   recomputeLiveRanges (ebbs, count);
 
-  if (options.dump_pack)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);
   
   /* first determine for each live range the number of 
@@ -2103,7 +2103,7 @@ xa51_assignRegisters (ebbIndex * ebbi)
   /* redo that offsets for stacked automatic variables */
   redoStackOffsets ();
   
-  if (options.dump_rassgn)
+  if (options.dump_i_code)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);

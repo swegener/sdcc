@@ -2220,7 +2220,7 @@ hc08_oldralloc (ebbIndex * ebbi)
      so we compute them again */
   recomputeLiveRanges (ebbs, count, FALSE);
 
-  if (options.dump_pack)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);
 
   /* first determine for each live range the number of
@@ -2265,7 +2265,7 @@ hc08_oldralloc (ebbIndex * ebbi)
       redoStackOffsets ();
     }
 
-  if (options.dump_rassgn)
+  if (options.dump_i_code)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);
@@ -2430,7 +2430,7 @@ hc08_ralloc (ebbIndex * ebbi)
      so we compute them again */
   recomputeLiveRanges (ebbs, count, FALSE);
 
-  if (options.dump_pack)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);
 
   /* first determine for each live range the number of
@@ -2466,7 +2466,7 @@ hc08_ralloc (ebbIndex * ebbi)
       redoStackOffsets ();
     }
 
-  if (options.dump_rassgn)
+  if (options.dump_i_code)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);

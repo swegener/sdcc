@@ -438,7 +438,7 @@ stm8_assignRegisters (ebbIndex * ebbi)
      so we compute them again */
   recomputeLiveRanges (ebbs, count, FALSE);
 
-  if (options.dump_pack)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);
 
   /* first determine for each live range the number of
@@ -483,7 +483,7 @@ stm8_assignRegisters (ebbIndex * ebbi)
         }
     }
 
-  if (options.dump_rassgn)
+  if (options.dump_i_code)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);

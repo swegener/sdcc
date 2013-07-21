@@ -6983,7 +6983,7 @@ createFunction (symbol * name, ast * body)
   ex = newNode (FUNCTION, ex, body);
   ex->values.args = FUNC_ARGS (name->type);
   ex->decorated = 1;
-  if (options.dump_tree)
+  if (options.dump_ast)
     PA (ex);
   if (fatalError)
     goto skipall;

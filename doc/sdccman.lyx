@@ -230,7 +230,7 @@ status collapsed
 \end_inset
 
 , etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 based
- (hc08, s08) and Zilog Z80 based MCUs (z80, z180, gbz80, Rabbit 2000/3000,
+ (hc08, s08), Zilog Z80 based MCUs (z80, z180, gbz80, Rabbit 2000/3000,
  Rabbit 3000A
 \begin_inset Index idx
 status collapsed
@@ -241,7 +241,17 @@ Z80, Z180, GBZ80, Rabbit 2000/3000, Rabbit 3000A CPU
 
 \end_inset
 
-).
+) and STMicroelectronics STM8 
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+STM8
+\end_layout
+
+\end_inset
+
+.
  It can be retargeted for other microprocessors, support for Microchip PIC
  is under development.
  The entire source code for the compiler is distributed under GPL.
@@ -9462,7 +9472,7 @@ Float classification macros in math.h (C11 requires more than C99).
 \end_layout
 
 \begin_layout Itemize
-Type-generic expressions.
+Type-generic expressions
 \end_layout
 
 \begin_layout Itemize
@@ -11451,6 +11461,25 @@ gbz80 (GameBoy Z80)
 \end_inset
 
  processor.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-mstm8
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-mstm8
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the STMicroelectronics STM8 family of processors.
 \end_layout
 
 \begin_layout Labeling
@@ -14382,51 +14411,6 @@ status collapsed
 \series default
  Hides your ugly and inefficient c-code from the asm file, so you can always
  blame the compiler :)
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--fverbose-asm
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-gen-comments
-\end_layout
-
-\end_inset
-
-
-\series default
- Include code generator and peep-hole comments in the generated asm files.
 \end_layout
 
 \begin_layout Labeling
@@ -18523,9 +18507,9 @@ status collapsed
 
 \end_inset
 
--dumpraw
+-dum-ast
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -18541,32 +18525,67 @@ status collapsed
 
 \end_inset
 
--dumpraw
+-dump-ast
 \end_layout
 
 \end_inset
 
 
 \series default
- This option will cause the compiler to dump the intermediate code into
- a file of named 
+ This option will cause the compiler to dump the abstract syntax tree to
+ the econsole.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-dump-i-code
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-dump-i-code
+\end_layout
+
+\end_inset
+
+
+\size large
+ 
+\series default
+\size default
+Will dump iCodes at various stages into files named 
 \emph on
-<source filename>.dumpraw
+<source filename>.dump<stage>
 \emph default
- just after the intermediate code has been generated for a function, i.e.
- before any optimizations are done.
- The basic blocks
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Basic blocks
-\end_layout
-
-\end_inset
-
- at this stage ordered in the depth first number, so they may not be in
- sequence of execution.
+.
 \end_layout
 
 \begin_layout Labeling
@@ -18575,446 +18594,7 @@ Basic blocks
 \series bold
 -
 \begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumpgcse
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumpgcse
-\end_layout
-
-\end_inset
-
-
-\series default
- Will create a dump of iCodes, after global subexpression elimination
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Global subexpression elimination
-\end_layout
-
-\end_inset
-
-, into a file named 
-\emph on
-<source filename>.dumpgcse.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumpdeadcode
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumpdeadcode
-\end_layout
-
-\end_inset
-
-
-\series default
- Will create a dump of iCodes, after deadcode elimination
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Dead-code elimination
-\end_layout
-
-\end_inset
-
-, into a file named 
-\emph on
-<source filename>.dumpdeadcode.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumploop
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumploop
-\end_layout
-
-\end_inset
-
-
-\series default
-\size large
- 
-\size default
-Will create a dump of iCodes, after loop optimizations
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Loop optimization
-\end_layout
-
-\end_inset
-
-, into a file named 
-\emph on
-<source filename>.dumploop.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumprange
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumprange
-\end_layout
-
-\end_inset
-
-
-\series default
-\size large
- 
-\size default
-Will create a dump of iCodes, after live range analysis
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Live range analysis
-\end_layout
-
-\end_inset
-
-, into a file named 
-\emph on
-<source filename>.dumprange.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumlrange
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumlrange
-\end_layout
-
-\end_inset
-
-
-\series default
- Will dump the life ranges
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Live range analysis
-\end_layout
-
-\end_inset
-
- for all symbols.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumpregassign
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumpregassign
-\end_layout
-
-\end_inset
-
- 
-\series default
-Will create a dump of iCodes, after register assignment
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Register assignment
-\end_layout
-
-\end_inset
-
-, into a file named 
-\emph on
-<source filename>.dumprassgn.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumplrange
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumplrange
-\end_layout
-
-\end_inset
-
-
-\series default
- Will create a dump of the live ranges of iTemp's
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumpall
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--dumpall
-\end_layout
-
-\end_inset
-
-
-\size large
- 
-\series default
-\size default
-Will cause all the above mentioned dumps to be created.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -19057,6 +18637,51 @@ Will dump internal representations as graphviz .dot files.
  Depending on other options, this can include the control-flow graph at
  lospre, insertion of bank selection instructions or register allcoation
  and the conflict graph and tree-decomposition at register allocation.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-fverbose-asm
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-gen-comments
+\end_layout
+
+\end_inset
+
+
+\series default
+ Include code generator and peep-hole comments in the generated asm files.
 \end_layout
 
 \begin_layout Subsection
@@ -67492,7 +67117,7 @@ Register-Allocation
 sdcc currently has two register allocators.
  One of them is optimal when optimizing for code size.
  This register allocator is used by default on the hc08, s08, z80, z180,
- r2k, r3ka and gbz80 ports.
+ r2k, r3ka, gbz80 and stm8 ports.
  Even though is runs in polynomial time, it can be quite slow; therefore
  the --max-allos-per-node command line option can be used for a trade-off
  between compilation speed and quality of the genrated result: Lower values
@@ -68638,8 +68263,8 @@ Annotated syntax tree
  while there may be a xdata storage class for 8051 there is no such storage
  class for z80.
  SDCC allows MCU specific storage class extensions, i.e.
- xdata will be treated as a storage class specifier when parsing 8051 C
- code but will be treated as a C identifier when parsing z80 code.
+ __xdata will be treated as a storage class specifier when parsing 8051
+ C code but will be treated as a C identifier when parsing z80 code.
 \end_layout
 
 \begin_layout Paragraph*

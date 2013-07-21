@@ -2116,7 +2116,7 @@ eBBlockFromiCode (iCode * ic)
   computeControlFlow (ebbi);
  
   /* dumpraw if asked for */
-  if (options.dump_raw)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_RAW0, ebbi);
 
   /* replace the local variables with their
@@ -2129,7 +2129,7 @@ eBBlockFromiCode (iCode * ic)
   loops = createLoopRegions (ebbi);
 
   /* dumpraw if asked for */
-  if (options.dump_raw)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_RAW1, ebbi);
 
   optimizeCastCast (ebbi->bbOrder, ebbi->count);
@@ -2143,21 +2143,21 @@ eBBlockFromiCode (iCode * ic)
   change = cseAllBlocks (ebbi, FALSE);
 
   /* dumpraw if asked for */
-  if (options.dump_raw)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_CSE, ebbi);
 
   /* compute the data flow */
   computeDataFlow (ebbi);
 
   /* dumpraw if asked for */
-  if (options.dump_raw)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_DFLOW, ebbi);
 
   /* global common subexpression elimination  */
   if (optimize.global_cse)
     {
       change += cseAllBlocks (ebbi, FALSE);
-      if (options.dump_gcse)
+      if (options.dump_i_code)
         dumpEbbsToFileExt (DUMP_GCSE, ebbi);
     }
   else
@@ -2170,12 +2170,12 @@ eBBlockFromiCode (iCode * ic)
   /* kill dead code */
   kchange = killDeadCode (ebbi);
 
-  if (options.dump_kill)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_DEADCODE, ebbi);
 
   /* do loop optimizations */
   change += (lchange = loopOptimizations (loops, ebbi));
-  if (options.dump_loop)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_LOOP, ebbi);
 
   /* recompute the data flow and apply global cse again
@@ -2189,7 +2189,7 @@ eBBlockFromiCode (iCode * ic)
     {
       computeDataFlow (ebbi);
       change += cseAllBlocks (ebbi, FALSE);
-      if (options.dump_loop)
+      if (options.dump_i_code)
         dumpEbbsToFileExt (DUMP_LOOPG, ebbi);
 
       /* if loop optimizations caused a change then do
@@ -2198,7 +2198,7 @@ eBBlockFromiCode (iCode * ic)
          variables created during loop optimizations */
       killDeadCode (ebbi);
 
-      if (options.dump_loop)
+      if (options.dump_i_code)
         dumpEbbsToFileExt (DUMP_LOOPD, ebbi);
     }
 
@@ -2214,7 +2214,8 @@ eBBlockFromiCode (iCode * ic)
   if (optimize.lospre && (TARGET_Z80_LIKE || TARGET_HC08_LIKE || TARGET_IS_STM8)) /* Todo: enable for other ports. */
     {
       lospre (ic, ebbi);
-      dumpEbbsToFileExt (DUMP_LOSPRE, ebbi);
+      if (options.dump_i_code)
+        dumpEbbsToFileExt (DUMP_LOSPRE, ebbi);
 
       /* GCSE, lospre and maybe other optimizations sometimes create temporaries that have non-connected live ranges, which is bad. Split them. */
       ebbi = iCodeBreakDown (ic);
@@ -2295,7 +2296,7 @@ eBBlockFromiCode (iCode * ic)
   /* compute the live ranges */
   recomputeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);
 
-  if (options.dump_range)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_RANGE, ebbi);
 
   /* Now that we have the live ranges, discard parameter

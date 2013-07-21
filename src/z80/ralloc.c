@@ -3038,7 +3038,7 @@ z80_oldralloc (ebbIndex * ebbi)
      so we compute them again */
   recomputeLiveRanges (ebbs, count, FALSE);
 
-  if (options.dump_pack)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);
 
   /* first determine for each live range the number of
@@ -3066,7 +3066,7 @@ z80_oldralloc (ebbIndex * ebbi)
       _G.dataExtend = 0;
     }
 
-  if (options.dump_rassgn)
+  if (options.dump_i_code)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);
@@ -3138,7 +3138,7 @@ z80_ralloc (ebbIndex * ebbi)
      so we compute them again */
   recomputeLiveRanges (ebbs, count, FALSE);
 
-  if (options.dump_pack)
+  if (options.dump_i_code)
     dumpEbbsToFileExt (DUMP_PACK, ebbi);
 
   /* first determine for each live range the number of
@@ -3168,7 +3168,7 @@ z80_ralloc (ebbIndex * ebbi)
       _G.dataExtend = 0;
     }
 
-  if (options.dump_rassgn)
+  if (options.dump_i_code)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);

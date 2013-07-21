@@ -100,7 +100,6 @@ char buffer[PATH_MAX * 2];
 #define OPTION_LARGE_MODEL      "--model-large"
 #define OPTION_MEDIUM_MODEL     "--model-medium"
 #define OPTION_SMALL_MODEL      "--model-small"
-#define OPTION_DUMP_ALL         "--dumpall"
 #define OPTION_PEEP_FILE        "--peep-file"
 #define OPTION_LIB_PATH         "--lib-path"
 #define OPTION_CALLEE_SAVES     "--callee-saves"
@@ -146,10 +145,12 @@ char buffer[PATH_MAX * 2];
 #define OPTION_PEEP_RETURN      "--peep-return"
 #define OPTION_NO_PEEP_RETURN   "--no-peep-return"
 #define OPTION_NO_OPTSDCC_IN_ASM "--no-optsdcc-in-asm"
-#define OPTION_DUMP_GRAPHS      "--dump-graphs"
 #define OPTION_MAX_ALLOCS_PER_NODE  "--max-allocs-per-node"
 #define OPTION_NO_LOSPRE        "--nolospre"
 #define OPTION_LOSPRE_UNSAFE_READ "--lospre-unsafe-read"
+#define OPTION_DUMP_AST         "--dump-ast"
+#define OPTION_DUMP_I_CODE      "--dump-i-code"
+#define OPTION_DUMP_GRAPHS      "--dump-graphs"
 
 static const OPTION optionsTable[] = {
   {0,   NULL, NULL, "General options"},
@@ -208,7 +209,6 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_NO_XINIT_OPT, &options.noXinitOpt, "don't memcpy initialized xram from code"},
   {0,   OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
   {0,   OPTION_NO_PEEP_COMMENTS, &options.noPeepComments, "don't include peephole optimizer comments"},
-  {0,   OPTION_VERBOSE_ASM, &options.verboseAsm, "include code generator comments"},
   {0,   OPTION_SHORT_IS_8BITS, NULL, "Make short 8 bits (for old times sake)"},
   {0,   OPTION_CODE_SEG, NULL, "<name> use this name for the code segment"},
   {0,   OPTION_CONST_SEG, NULL, "<name> use this name for the const segment"},
@@ -234,17 +234,11 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_LOSPRE_UNSAFE_READ, NULL, "Allow unsafe reads in lospre"},
 
   {0,   NULL, NULL, "Internal debugging options"},
-  {0,   "--dumpraw", &options.dump_raw, "Dump the internal structure after the initial parse"},
-  {0,   "--dumpgcse", &options.dump_gcse, NULL},
-  {0,   "--dumploop", &options.dump_loop, NULL},
-  {0,   "--dumpdeadcode", &options.dump_kill, NULL},
-  {0,   "--dumpliverange", &options.dump_range, NULL},
-  {0,   "--dumpregpack", &options.dump_pack, NULL},
-  {0,   "--dumpregassign", &options.dump_rassgn, NULL},
-  {0,   "--dumptree", &options.dump_tree, "dump front-end AST before generating iCode"},
-  {0,   OPTION_DUMP_ALL, NULL, "Dump the internal structure at all stages"},
-  {0,   OPTION_ICODE_IN_ASM, &options.iCodeInAsm, "include i-code as comments in the asm file"},
+  {0,   OPTION_DUMP_AST, &options.dump_ast, "Dump front-end AST before generating i-code"},
+  {0,   OPTION_DUMP_I_CODE, &options.dump_i_code, "Dump the i-code structure at all stages"},
   {0,   OPTION_DUMP_GRAPHS, &options.dump_graphs, "Dump graphs (control-flow, conflict, etc)"},
+  {0,   OPTION_ICODE_IN_ASM, &options.iCodeInAsm, "Include i-code as comments in the asm file"},
+  {0,   OPTION_VERBOSE_ASM, &options.verboseAsm, "Include code generator comments in the asm output"},
 
   {0,   NULL, NULL, "Linker options"},
   {'l', NULL, NULL, "Include the given library in the link"},
@@ -1023,18 +1017,6 @@ parseCmdLine (int argc, char **argv)
           if (strcmp (argv[i], OPTION_HUGE_MODEL) == 0)
             {
               _setModel (MODEL_HUGE, argv[i]);
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_DUMP_ALL) == 0)
-            {
-              options.dump_rassgn =
-              options.dump_pack =
-              options.dump_range =
-              options.dump_kill =
-              options.dump_loop =
-              options.dump_gcse =
-              options.dump_raw = 1;
               continue;
             }
 

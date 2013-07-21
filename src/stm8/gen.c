@@ -3047,7 +3047,7 @@ genMult (const iCode *ic)
   if (!regDead (A_IDX, ic))
     push (ASMOP_A, 0, 1);
 
-  cheapMove (use_y ? ASMOP_Y : ASMOP_X, 0, left->aop, 0, FALSE); // todo: Allow use of a.
+  cheapMove (use_y ? ASMOP_Y : ASMOP_X, 0, left->aop, 0, aopInReg (right->aop, 0, A_IDX));
   cheapMove (ASMOP_A, 0, right->aop, 0, TRUE);
 
   emitcode ("mul", use_y ? "y, a" : "x, a");
@@ -3348,8 +3348,33 @@ exchangedCmp (int opcode)
 /*                 will branch if the comparison is true            */
 /*------------------------------------------------------------------*/
 static char *
-branchInstCmp (int opcode, int sign)
+branchInstCmp (int opcode, int sign, bool negated)
 {
+  if (negated)
+    switch (opcode)
+      {
+      case '<':
+        opcode = GE_OP;
+        break;
+      case '>':
+        opcode = LE_OP;
+        break;
+      case LE_OP:
+        opcode = '>';
+        break;
+      case GE_OP:
+        opcode = '<';
+        break;
+      case NE_OP:
+        opcode = EQ_OP;
+        break;
+      case EQ_OP:
+        opcode = NE_OP;
+        break;
+      default:
+        werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "opcode not a comparison");
+      }
+
   switch (opcode)
     {
     case '<':
@@ -3386,7 +3411,7 @@ branchInstCmp (int opcode, int sign)
 /* genCmp :- greater or less than (and maybe with equal) comparison */
 /*------------------------------------------------------------------*/
 static void
-genCmp (iCode *ic)
+genCmp (const iCode *ic, iCode *ifx)
 {
   operand *result = IC_RESULT (ic);
   operand *left = IC_LEFT (ic);
@@ -3550,20 +3575,35 @@ genCmp (iCode *ic)
         adjustStack (1);
     }
 
-  {
-    symbol *tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-    symbol *tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+  if (!ifx)
+    {
+      symbol *tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+      symbol *tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
 
-    if (tlbl1)
-      emitcode (branchInstCmp (opcode, sign), "%05d$", labelKey2num (tlbl1->key));
-    cheapMove (result->aop, 0, ASMOP_ZERO, 0, !regDead (A_IDX, ic));
-    if (tlbl2)
-      emitcode ("jp", "%05d$", labelKey2num (tlbl2->key));
-    cost (3, 1);
-    emitLabel (tlbl1);
-    cheapMove (result->aop, 0, ASMOP_ONE, 0, !regDead (A_IDX, ic));
-    emitLabel (tlbl2);
-  }
+      if (tlbl1)
+        emitcode (branchInstCmp (opcode, sign, false), "%05d$", labelKey2num (tlbl1->key));
+      cost (2, 0);
+      cheapMove (result->aop, 0, ASMOP_ZERO, 0, !regDead (A_IDX, ic));
+      if (tlbl2)
+        emitcode ("jp", "%05d$", labelKey2num (tlbl2->key));
+      cost (3, 1);
+      emitLabel (tlbl1);
+      cheapMove (result->aop, 0, ASMOP_ONE, 0, !regDead (A_IDX, ic));
+      emitLabel (tlbl2);
+    }
+  else
+    {
+      symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+      if (tlbl)
+        emitcode (branchInstCmp (opcode, sign, IC_TRUE (ifx)), "%05d$", labelKey2num (tlbl->key));
+      cost (2, 0);
+      if (!regalloc_dry_run)
+        emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+      cost (3, 1);
+      emitLabel (tlbl);
+      if (!regalloc_dry_run)
+        ifx->generated = 1;
+    }
 
   freeAsmop (right);
   freeAsmop (left);
@@ -3574,7 +3614,7 @@ genCmp (iCode *ic)
 /* genCmpEQorNE - equal or not equal comparison                    */
 /*-----------------------------------------------------------------*/
 static void
-genCmpEQorNE (iCode *ic)
+genCmpEQorNE (const iCode *ic, iCode *ifx)
 {
   operand *left, *right, *result;
   int opcode;
@@ -3678,13 +3718,33 @@ genCmpEQorNE (iCode *ic)
 
   wassertl (result->aop->size == 1, "Unimplemented result size.");
 
-  cheapMove (result->aop, 0, opcode == EQ_OP ? ASMOP_ONE : ASMOP_ZERO, 0, !regDead (A_IDX, ic));
-  if (tlbl)
-    emitcode ("jp", "%05d$", labelKey2num (tlbl->key));
-  cost (3, 0);
-  emitLabel (tlbl_NE);
-  cheapMove (result->aop, 0, opcode == NE_OP ? ASMOP_ONE : ASMOP_ZERO, 0, !regDead (A_IDX, ic));
-  emitLabel (tlbl);
+  if (!ifx)
+    {
+      cheapMove (result->aop, 0, opcode == EQ_OP ? ASMOP_ONE : ASMOP_ZERO, 0, !regDead (A_IDX, ic));
+      if (tlbl)
+        emitcode ("jp", "%05d$", labelKey2num (tlbl->key));
+      cost (3, 0);
+      emitLabel (tlbl_NE);
+      cheapMove (result->aop, 0, opcode == NE_OP ? ASMOP_ONE : ASMOP_ZERO, 0, !regDead (A_IDX, ic));
+      emitLabel (tlbl);
+    }
+  else if (IC_TRUE (ifx) && opcode == EQ_OP || IC_FALSE (ifx) && opcode == NE_OP)
+    {
+      emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+      emitLabel (tlbl_NE);
+      if (!regalloc_dry_run)
+        ifx->generated = 1;
+    }
+  else
+    {
+      if (tlbl)
+        emitcode ("jp", "%05d$", labelKey2num (tlbl->key));
+      emitLabel (tlbl_NE);
+      emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+      emitLabel (tlbl);
+      if (!regalloc_dry_run)
+        ifx->generated = 1;
+    }
 
   freeAsmop (right);
   freeAsmop (left);
@@ -5308,6 +5368,9 @@ genSTM8iCode (iCode *ic)
   if (!regalloc_dry_run)
     printf ("ic %d op %d stack pushed %d\n", ic->key, ic->op, _G.stack.pushed);
 #endif
+if (ic->generated && !regalloc_dry_run) D (emitcode ("; alr. gen.", ""));
+  if (ic->generated)
+    return;
 
   switch (ic->op)
     {
@@ -5380,12 +5443,12 @@ genSTM8iCode (iCode *ic)
     case '<':
     case LE_OP:
     case GE_OP:
-      genCmp(ic);
+      genCmp(ic, ifxForOp (IC_RESULT (ic), ic));
       break;
 
     case NE_OP:
     case EQ_OP:
-      genCmpEQorNE (ic);
+      genCmpEQorNE (ic, ifxForOp (IC_RESULT (ic), ic));
       break;
 
     case AND_OP:

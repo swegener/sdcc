@@ -265,7 +265,7 @@ add_operand_to_cfg_node(cfg_node &n, operand *o, std::map<std::pair<int, reg_t>,
 }
 
 // A quick-and-dirty function to get the CFG from sdcc.
-inline iCode *
+static inline iCode *
 create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 {
   eBBlock **ebbs = ebbi->bbOrder;

@@ -331,6 +331,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
       set_surviving_regs(a, i, G, I);
       c = (float)drySTM8iCode(ic);
       unset_surviving_regs(i, G);
+      ic->generated = false;
 #if 0
       std::cout << "Got cost " << c << "\n";
 #endif
@@ -387,6 +388,12 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 // Code for another ic is generated when generating this one. Mark the other as generated.
 static void extra_ic_generated(iCode *ic)
 {
+  if(ic->op == '>' || ic->op == '<' || ic->op == LE_OP || ic->op == GE_OP || ic->op == EQ_OP || ic->op == NE_OP)
+    {
+      iCode *ifx;
+      if (ifx = ifxForOp (IC_RESULT (ic), ic))
+        ifx->generated = true;
+    }
 }
 
 template <class T_t, class G_t, class I_t>

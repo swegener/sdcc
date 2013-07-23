@@ -37,7 +37,9 @@ typedef enum
   /* Is in direct space */
   AOP_DIR,
   /* Read undefined, discard writes */
-  AOP_DUMMY
+  AOP_DUMMY,
+  /* Has been optimized by jumping directly (see ifxForOp) */
+  AOP_CND
 }
 AOP_TYPE;
 

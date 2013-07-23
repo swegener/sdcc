@@ -304,6 +304,9 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 
         cfg[i].ic = ic;
 
+        if (ic->generated)
+          continue;
+
         for (int j2 = 0; j2 <= operandKey; j2++)
           {
             if (bitVectBitValue(ic->rlive, j2))

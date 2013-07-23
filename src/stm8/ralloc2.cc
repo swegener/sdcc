@@ -392,7 +392,11 @@ static void extra_ic_generated(iCode *ic)
     {
       iCode *ifx;
       if (ifx = ifxForOp (IC_RESULT (ic), ic))
-        ifx->generated = true;
+        {
+          OP_SYMBOL (IC_RESULT (ic))->for_newralloc = false;
+          OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
+          ifx->generated = true;
+        }
     }
 }
 

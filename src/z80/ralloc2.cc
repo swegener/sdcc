@@ -1394,11 +1394,16 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 // Code for another ic is generated when generating this one. Mark the other as generated.
 static void extra_ic_generated(iCode *ic)
 {
-  if(ic->op == '>' || ic->op == '<' || ic->op == LE_OP || ic->op == GE_OP || ic->op == EQ_OP || ic->op == NE_OP || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND)
+  if(ic->op == '>' || ic->op == '<' || ic->op == LE_OP || ic->op == GE_OP || ic->op == EQ_OP || ic->op == NE_OP ||
+    (ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND) && (IS_OP_LITERAL (IC_LEFT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic))))
     {
       iCode *ifx;
       if (ifx = ifxForOp (IC_RESULT (ic), ic))
-        ifx->generated = true;
+        {
+          OP_SYMBOL (IC_RESULT (ic))->for_newralloc = false;
+          OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
+          ifx->generated = true;
+        }
     }
 
   if(ic->op == SEND && ic->builtinSEND && (!ic->prev || ic->prev->op != SEND || !ic->prev->builtinSEND))

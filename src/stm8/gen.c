@@ -864,6 +864,15 @@ aopOp (operand *op, const iCode *ic)
       return;
     }
 
+  /* if the type is a conditional */
+  if (sym->regType == REG_CND)
+    {
+      asmop *aop = newAsmop (AOP_CND);
+      op->aop = aop;
+      sym->aop = sym->aop;
+      return;
+    }
+
   if (sym->remat)
     {
       wassertl (0, "Unimplemented remat asmop.");
@@ -3716,7 +3725,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
   if (pushed_a)
     pop (ASMOP_A, 0 ,1);
 
-  wassertl (result->aop->size == 1, "Unimplemented result size.");
+  wassertl (result->aop->size == 1 || ifx, "Unimplemented result size.");
 
   if (!ifx)
     {
@@ -3731,6 +3740,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
   else if (IC_TRUE (ifx) && opcode == EQ_OP || IC_FALSE (ifx) && opcode == NE_OP)
     {
       emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+      cost (3, 0);
       emitLabel (tlbl_NE);
       if (!regalloc_dry_run)
         ifx->generated = 1;
@@ -3739,8 +3749,10 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
     {
       if (tlbl)
         emitcode ("jp", "%05d$", labelKey2num (tlbl->key));
+      cost (3, 0);
       emitLabel (tlbl_NE);
       emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+      cost (3, 0);
       emitLabel (tlbl);
       if (!regalloc_dry_run)
         ifx->generated = 1;
@@ -5368,9 +5380,13 @@ genSTM8iCode (iCode *ic)
   if (!regalloc_dry_run)
     printf ("ic %d op %d stack pushed %d\n", ic->key, ic->op, _G.stack.pushed);
 #endif
-if (ic->generated && !regalloc_dry_run) D (emitcode ("; alr. gen.", ""));
+
   if (ic->generated)
-    return;
+    {
+      if (!regalloc_dry_run)
+        D (emitcode ("; skipping generated iCode", ""));
+      return;
+    }
 
   switch (ic->op)
     {

@@ -550,19 +550,27 @@ static void extra_ic_generated(iCode *ic)
     {
       iCode *ifx;
       if (ifx = ifxForOp (IC_RESULT (ic), ic))
-      ifx->generated = 1;
+        {
+          OP_SYMBOL (IC_RESULT (ic))->for_newralloc = false;
+          OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
+          ifx->generated = true;
+        }
     }
   if(ic->op == '-' && IS_VALOP (IC_RIGHT (ic)) && operandLitValue (IC_RIGHT (ic)) == 1 && getSize(operandType(IC_RESULT (ic))) == 1 && !isOperandInFarSpace (IC_RESULT (ic)) && isOperandEqual (IC_RESULT (ic), IC_LEFT (ic)))
     {
       iCode *ifx;
       if (ifx = ifxForOp (IC_RESULT (ic), ic))
-      ifx->generated = 1;
+        {
+          OP_SYMBOL (IC_RESULT (ic))->for_newralloc = false;
+          OP_SYMBOL (IC_RESULT (ic))->regType == REG_CND;
+          ifx->generated = true;
+        }
     }
   if(ic->op == GET_VALUE_AT_ADDRESS)
     {
       iCode *inc;
       if (inc = hasInchc08 (IC_LEFT (ic), ic,  getSize (operandType (IC_RIGHT (ic)))))
-         inc->generated = 1;
+         inc->generated = true;
     }
 }
 

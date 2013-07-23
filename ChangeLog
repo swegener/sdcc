@@ -1,5 +1,10 @@
 2013-07-23 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  More efficient unsigned right shifts by more than 7 bits.
+
+2013-07-23 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCralloc.hpp,
 	  src/hc08/ralloc2.cc,
 	  src/stm8/ralloc2.cc

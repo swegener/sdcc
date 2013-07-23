@@ -1732,7 +1732,7 @@ skip_byte:
   a_free = a_dead && (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= roffset + source->size);
 
   // Place leading zeroes.
-  for (i = source->size; i < sizex - soffset; i++)
+  for (i = source->size - soffset; i < sizex; i++)
     {
       if (assigned[i])
         continue;
@@ -4416,7 +4416,15 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       aopOp (left, ic);
       aopOp (result, ic);
 
-      genMove (result->aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      
+      if (sign)
+        genMove (result->aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      else // Top bytes will be zero.
+        {
+          genMove_o (result->aop, 0, left->aop, shCount / 8, size, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+          size -= shCount / 8;
+          shCount %= 8;
+        }
 
       while (shCount--)
         for (i = size - 1; i >= 0;)
@@ -4424,6 +4432,12 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
             if (i > 0 && (aopInReg (result->aop, i - 1, X_IDX) || aopInReg (result->aop, i - 1, Y_IDX)))
               {
                 emit3w_o ((i != size - 1) ? A_RRCW : (sign ? A_SRAW : A_SRLW), result->aop, i - 1, 0, 0);
+                i -= 2;
+              }
+            else if (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) // Skipped top byte, but 16-bit shift is cheaper than going through a and doing 8-bit shift.
+              {
+                wassert (!sign);
+                emit3w_o (A_SRLW, result->aop, i, 0, 0);
                 i -= 2;
               }
             else
@@ -5118,7 +5132,7 @@ genAddrOf (const iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genCast - generate code for jump table                          */
+/* genJumpTab - generate code for jump table                       */
 /*-----------------------------------------------------------------*/
 static void
 genJumpTab (const iCode *ic)

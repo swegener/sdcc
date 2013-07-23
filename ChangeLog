@@ -1,3 +1,8 @@
+2013-07-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genLeftShift,genRightShift): fixed bug in shifting
+	  when result and shift count partially overlapped registers
+
 2013-07-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp,

@@ -7964,7 +7964,7 @@ genLeftShift (iCode * ic)
   aopOp (left, ic, FALSE);
   aopResult = AOP (result);
 
-  if (sameRegs (AOP (right), AOP (result)) || IS_AOP_XA (AOP (result)) || isOperandVolatile (result, FALSE))
+  if (sameRegs (AOP (right), AOP (result)) || regsInCommon (right, result) || IS_AOP_XA (AOP (result)) || isOperandVolatile (result, FALSE))
     aopResult = forceStackedAop (AOP (result), sameRegs (AOP (left), AOP (result)));
 
   /* now move the left to the result if they are not the
@@ -8369,7 +8369,7 @@ genRightShift (iCode * ic)
   aopOp (left, ic, FALSE);
   aopResult = AOP (result);
 
-  if (sameRegs (AOP (right), AOP (result)) || IS_AOP_XA (AOP (result)) || isOperandVolatile (result, FALSE))
+  if (sameRegs (AOP (right), AOP (result)) || regsInCommon (right, result) || IS_AOP_XA (AOP (result)) || isOperandVolatile (result, FALSE))
     aopResult = forceStackedAop (AOP (result), sameRegs (AOP (left), AOP (result)));
 
   /* now move the left to the result if they are not the

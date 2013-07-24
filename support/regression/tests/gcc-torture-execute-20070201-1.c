@@ -22,10 +22,12 @@ foo (char *buf, char *p)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_stm8 // See bug #2196, 2198.
 #if !(defined (__GNUC__) && (__GNUC__ < 5))
   char buf[6];
   if (foo (buf, &buf[2]) != &buf[3])
     ASSERT (0);
   return;
+#endif
 #endif
 }

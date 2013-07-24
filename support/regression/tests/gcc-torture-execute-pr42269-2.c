@@ -22,8 +22,10 @@ unsigned short s = 0xFFFF;
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_stm8 // See bug #2196, 2198.
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   ASSERT (!(foo (s) + 1 != 0));
+#endif
 #endif
 }
 

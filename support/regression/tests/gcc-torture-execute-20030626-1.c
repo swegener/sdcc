@@ -15,9 +15,11 @@ char buf[10];
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_stm8 // See bug #2196, 2198.
   int l = sprintf (buf, "foo\0bar");
   if (l != 3)
     ASSERT (0);
   return;
+#endif
 }
 

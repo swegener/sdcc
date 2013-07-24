@@ -37,6 +37,7 @@ f4 (unsigned long long diff)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_stm8 // See bug #2196, 2198.
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
   int i;
   for (i = 0; i <= 10; i++)
@@ -59,6 +60,7 @@ testTortureExecute (void)
 	ASSERT (0);
     }
   return;
+#endif
 #endif
 }
 

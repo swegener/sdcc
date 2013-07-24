@@ -37,6 +37,7 @@ testReverse(void)
 void
 testAddFunc(void)
 {
+#ifndef __SDCC_stm8 // See bug #2196, 2198.
   char buf[5];
   unsigned char count = 0;
 
@@ -44,4 +45,5 @@ testAddFunc(void)
   ASSERT(count == 1 &&
          buf[0] == '5' &&
          buf[1] == '\0');
+#endif
 }

@@ -1,3 +1,26 @@
+2013-07-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/bug-927659.c,
+	  support/regression/tests/bug1057979.c,
+	  support/regression/tests/bug2084206.c,
+	  support/regression/tests/funptrs.c,
+	  support/regression/tests/gcc-torture-execute-20020219-1.c,
+	  support/regression/tests/gcc-torture-execute-20021118-2.c,
+	  support/regression/tests/gcc-torture-execute-20021120-3.c,
+	  support/regression/tests/gcc-torture-execute-20030626-1.c,
+	  support/regression/tests/gcc-torture-execute-20030626-2.c,
+	  support/regression/tests/gcc-torture-execute-20050104-1.c,
+	  support/regression/tests/gcc-torture-execute-20070201-1.c,
+	  support/regression/tests/gcc-torture-execute-20080529-1.c,
+	  support/regression/tests/gcc-torture-execute-921208-1.c,
+	  support/regression/tests/gcc-torture-execute-930513-1.c,
+	  support/regression/tests/gcc-torture-execute-950612-1.c,
+	  support/regression/tests/gcc-torture-execute-950915-1.c,
+	  support/regression/tests/gcc-torture-execute-960327-1.c,
+	  support/regression/tests/gcc-torture-execute-pr42269-2.c,
+	  support/regression/tests/snprintf.c:
+	  Disabled tests that fail due to linker issue, bug #2196, 2198.
+
 2013-07-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

@@ -20,6 +20,8 @@
 	  support/regression/tests/gcc-torture-execute-pr42269-2.c,
 	  support/regression/tests/snprintf.c:
 	  Disabled tests that fail due to linker issue, bug #2196, 2198.
+	* support/regression/tests/gcc-torture-execute-20030916-1.c:
+	  Disable failing test, bug #2200.
 
 2013-07-24 Philipp Klaus Krause <pkk AT spth.de>
 

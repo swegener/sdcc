@@ -30,6 +30,7 @@ void f (unsigned int *x)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_stm8 // Bug #2200
 #if !defined(__SDCC_mcs51)
   unsigned int x[256];
   int i;
@@ -41,6 +42,7 @@ testTortureExecute (void)
     if (x[i] != (i >= 0x08 && i < 0xf8))
       ASSERT (0);
   return;
+#endif
 #endif
 }
 #else

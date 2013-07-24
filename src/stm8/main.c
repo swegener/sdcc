@@ -166,7 +166,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 static bool
 hasExtBitOp (int op, int size)
 {
-  return FALSE; /* None for now - some will be implemented later. */
+  return (op == GETABIT);
 }
 
 /** $1 is always the basename.

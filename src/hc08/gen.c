@@ -6947,38 +6947,6 @@ genRLC (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
-/* genGetHbit - generates code get highest order bit               */
-/*-----------------------------------------------------------------*/
-static void
-genGetHbit (iCode * ic)
-{
-  operand *left, *result;
-  bool needpulla;
-
-  D (emitcode (";     genGetHbit", ""));
-
-  left = IC_LEFT (ic);
-  result = IC_RESULT (ic);
-  aopOp (left, ic, FALSE);
-  aopOp (result, ic, FALSE);
-
-  /* get the highest order byte into a */
-  needpulla = pushRegIfSurv (hc08_reg_a);
-  loadRegFromAop (hc08_reg_a, AOP (left), AOP_SIZE (left) - 1);
-  emitcode ("rola", "");
-  emitcode ("clra", "");
-  emitcode ("rola", "");
-  regalloc_dry_run_cost += 3;
-  hc08_dirtyReg (hc08_reg_a, FALSE);
-  storeRegToFullAop (hc08_reg_a, AOP (result), FALSE);
-  pullOrFreeReg (hc08_reg_a, needpulla);
-
-  freeAsmop (left, NULL, ic, TRUE);
-  freeAsmop (result, NULL, ic, TRUE);
-}
-
-
-/*-----------------------------------------------------------------*/
 /* genGetAbit - generates code get a single bit                    */
 /*-----------------------------------------------------------------*/
 static void
@@ -10585,7 +10553,7 @@ genhc08iCode (iCode *ic)
       break;
 
     case GETHBIT:
-      genGetHbit (ic);
+      wassertl (0, "Unimplemented iCode");
       break;
 
     case GETABIT:

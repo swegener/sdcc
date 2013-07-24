@@ -45,6 +45,7 @@ enum asminst
   A_ADC,
   A_ADD,
   A_AND,
+  A_BCP,
   A_CLR,
   A_CLRW,
   A_CP,
@@ -73,6 +74,7 @@ enum asminst
   A_SRL,
   A_SRLW,
   A_SUB,
+  A_SWAP,
   A_TNZ,
   A_TNZW,
   A_XOR
@@ -83,6 +85,7 @@ static const char *asminstnames[] =
   "adc",
   "add",
   "and",
+  "bcp",
   "clr",
   "clrw",
   "cp",
@@ -111,6 +114,7 @@ static const char *asminstnames[] =
   "srl",
   "srlw",
   "sub",
+  "swap",
   "tnz",
   "tnzw",
   "xor"
@@ -584,6 +588,7 @@ emit3cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
   case A_ADC:
   case A_ADD:
   case A_AND:
+  case A_BCP:
     op8_cost (op2, offset2);
     break;
   case A_CLR:
@@ -626,6 +631,7 @@ emit3cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
   case A_SUB:
     op8_cost (op2, offset2);
     break;
+  case A_SWAP:
   case A_TNZ:
     op_cost (op1, offset1);
     break;
@@ -1008,6 +1014,8 @@ void swap_to_a(int idx)
 {
   switch (idx)
     {
+	case A_IDX:
+      break;
     case XL_IDX:
       emitcode ("exg", "a, xl");
       cost (1, 1);
@@ -1031,6 +1039,8 @@ void swap_from_a(int idx)
 {
   switch (idx)
     {
+    case A_IDX:
+      break;
     case XL_IDX:
       emitcode ("exg", "a, xl");
       cost (1, 1);
@@ -1871,6 +1881,30 @@ stm8_emitDebuggerSymbol (const char *debugSym)
   _G.debugLine = 1;
   emitcode ("", "%s ==.", debugSym);
   _G.debugLine = 0;
+}
+
+/*-----------------------------------------------------------------*/
+/* isLiteralBit - test if lit == 2^n                               */
+/*-----------------------------------------------------------------*/
+static int
+isLiteralBit (unsigned long lit)
+{
+  unsigned long pw[32] =
+  {
+    1L, 2L, 4L, 8L, 16L, 32L, 64L, 128L,
+    0x100L, 0x200L, 0x400L, 0x800L,
+    0x1000L, 0x2000L, 0x4000L, 0x8000L,
+    0x10000L, 0x20000L, 0x40000L, 0x80000L,
+    0x100000L, 0x200000L, 0x400000L, 0x800000L,
+    0x1000000L, 0x2000000L, 0x4000000L, 0x8000000L,
+    0x10000000L, 0x20000000L, 0x40000000L, 0x80000000L
+  };
+  int idx;
+
+  for (idx = 0; idx < 32; idx++)
+    if (lit == pw[idx])
+      return idx;
+  return -1;
 }
 
 /*-----------------------------------------------------------------*/
@@ -4050,7 +4084,7 @@ genOr (const iCode *ic)
 /* genAnd - code for and                                           */
 /*-----------------------------------------------------------------*/
 static void
-genAnd (const iCode *ic)
+genAnd (const iCode *ic, iCode *ifx)
 {
   operand *left, *right, *result;
   int size, i, j, omitbyte = -1;
@@ -4072,6 +4106,50 @@ genAnd (const iCode *ic)
       operand *temp = left;
       left = right;
       right = temp;
+    }
+
+  if (ifx && getSize (operandType (result)) <= 1 && right->aop->type == AOP_LIT && left->aop->type == AOP_DIR && isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)) >= 0)
+    {
+      if (!regalloc_dry_run)
+        {
+          symbol * tlbl = newiTempLabel (NULL);
+          emitcode (IC_TRUE (ifx) ? "btjf" : "btjt", "%s, #%d, !tlabel", aopGet (left->aop, 0), isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)), labelKey2num (tlbl->key));
+          emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+          cost (8, 4); // Hmm. Cost 2 or 3 for btjf?
+          emitLabel (tlbl);
+        }
+      goto release;
+    }
+  if (ifx && getSize (operandType (result)) <= 1 && right->aop->type == AOP_LIT) // TODO: USe 16-bit shifts. Allow non-literal (and enable in ralloc2.cc)
+    {
+      symbol * tlbl = newiTempLabel (NULL);
+
+      if ((ulFromVal (right->aop->aopu.aop_lit) == 0x01 || ulFromVal (right->aop->aopu.aop_lit) == 0x80) &&
+        (regDead (A_IDX, ic) || !aopInReg (left->aop, 0, A_IDX)))
+        {
+          if (!regDead (A_IDX, ic))
+            push (ASMOP_A, 0, 1);
+          cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
+          emit3 (ulFromVal (right->aop->aopu.aop_lit) == 0x01 ? A_SRL : A_SLL, ASMOP_A, 0);
+          if (!regDead (A_IDX, ic))
+            pop (ASMOP_A, 0, 1);
+          emitcode (IC_TRUE (ifx) ? "jrnc" : "jrc", "!tlabel", labelKey2num (tlbl->key));
+        }
+      else
+        {
+          if (!regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX))
+            push (ASMOP_A, 0, 1);
+          cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
+          emit3 (A_BCP, ASMOP_A, right->aop);
+          if (!regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX))
+            pop (ASMOP_A, 0, 1);
+          emitcode (IC_TRUE (ifx) ? "jreq" : "jrne", "!tlabel", labelKey2num (tlbl->key));
+        }
+
+      emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+          cost (3, 4); // Hmm. Cost 1 or 2 for jreq?
+          emitLabel (tlbl);
+      goto release;
     }
 
   // todo: Use bit reset instructions where it is faster.
@@ -4105,7 +4183,7 @@ genAnd (const iCode *ic)
         if (other_stacked)
           pop (other_stacked, 0, 2);
 
-       if (aopInReg (result->aop, i, A_IDX) && size > 1)
+        if (aopInReg (result->aop, i, A_IDX) && size > 1)
           {
             push (ASMOP_A, 0, 1); // todo: Do not push, if other bytes do not affect a (e.g. due to using clr).
             pushed_a = TRUE;
@@ -4191,6 +4269,7 @@ genAnd (const iCode *ic)
   if (pushed_a)
     pop (ASMOP_A, 0, 1);
 
+release:
   freeAsmop (left);
   freeAsmop (right);
   freeAsmop (result);
@@ -4382,7 +4461,72 @@ genLeftShift (const iCode *ic)
 }
 
 /*------------------------------------------------------------------*/
-/* genRightShiftLiteral - right shifting by known count for size <= 2*/
+/* genGetABit - get a bit                                           */
+/*------------------------------------------------------------------*/
+static void
+genGetABit (const iCode *ic)
+{
+  operand *left, *right, *result;
+  int shCount, leftcost, rightcost;
+
+  D (emitcode ("; genGetABit", ""));
+
+  right = IC_RIGHT (ic);
+  left = IC_LEFT (ic);
+  result = IC_RESULT (ic);
+
+  aopOp (right, ic);
+  aopOp (left, ic);
+  aopOp (result, ic);
+
+  shCount = (int) ulFromVal ((right->aop)->aopu.aop_lit);
+
+  if (!regDead (A_IDX, ic))
+    push (ASMOP_A, 0, 1);
+
+  genMove_o (ASMOP_A, 0, left->aop, shCount / 8, 1, TRUE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  shCount %= 8;
+
+  rightcost = 2 + (shCount > 4) + shCount % 4;
+  leftcost = 3 + (shCount <= 4) + (7 - shCount) % 4;
+
+  if (rightcost < leftcost)
+    {
+      if (shCount > 4)
+        {
+          emit3 (A_SWAP, ASMOP_A, 0);
+          shCount -= 4;
+        }
+      while (shCount--)
+        emit3 (A_SRL, ASMOP_A, 0);
+      emitcode ("and", "a, #0x01");
+      cost (2, 1);
+    }
+  else
+    {
+      if (shCount <= 4)
+        {
+          emit3 (A_SWAP, ASMOP_A, 0);
+          shCount += 4;
+        }
+      while (shCount++ < 8)
+        emit3 (A_SLL, ASMOP_A, 0);
+      emit3 (A_CLR, ASMOP_A, 0);
+      emit3 (A_RLC, ASMOP_A, 0);
+    }
+
+  genMove (result->aop, ASMOP_A, TRUE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
+
+  if (!regDead (A_IDX, ic))
+    pop (ASMOP_A, 0, 1);
+
+  freeAsmop (right);
+  freeAsmop (left);
+  freeAsmop (result);
+}
+
+/*------------------------------------------------------------------*/
+/* genRightShiftLiteral - right shifting by known count             */
 /*------------------------------------------------------------------*/
 static void
 genRightShiftLiteral (operand *left, operand *right, operand *result, const iCode *ic)
@@ -4426,6 +4570,31 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
           shCount %= 8;
         }
 
+      if (!sign && size == 1 && aopRS (result->aop) && !aopOnStack (result->aop, 0, 1)) // Use swap a where beneficial.
+        {
+          swap_to_a (result->aop->aopu.bytes[0].byteu.reg->rIdx);
+          if (shCount >= 4)
+            {
+              emit3 (A_SWAP, ASMOP_A, 0);
+              emitcode ("and", "a, #0x0f");
+              cost (2, 1);
+              shCount -= 4;
+            }
+          while (shCount--)
+            emit3 (A_SRL, ASMOP_A, 0);
+          swap_from_a (result->aop->aopu.bytes[0].byteu.reg->rIdx);
+          goto release;
+        }
+
+      if (!sign && size == 2 && shCount > 3 && aopInReg (result->aop, 0, X_IDX) && regDead (A_IDX, ic) && result->aop->regs[A_IDX] < 0)
+        {
+          emitcode ("ld", "a, #0x%02x", 1 << shCount);
+          cost (2, 1);
+          emitcode ("div", "x, a");
+          cost (1, 17); // TODO: replace 17 by exact value.
+          goto release;
+        }
+
       while (shCount--)
         for (i = size - 1; i >= 0;)
           {
@@ -4460,6 +4629,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
           }
     }
 
+release:
   freeAsmop (left);
   freeAsmop (result);
 }
@@ -5495,7 +5665,7 @@ genSTM8iCode (iCode *ic)
       break;
 
     case BITWISEAND:
-      genAnd (ic);
+      genAnd (ic, ifxForOp (IC_RESULT (ic), ic));
       break;
 
     case INLINEASM:
@@ -5512,7 +5682,7 @@ genSTM8iCode (iCode *ic)
       break;
 
     case GETABIT:
-      wassertl (0, "Unimplemented iCode");
+      genGetABit (ic);
       break;
 
     case LEFT_OP:

@@ -351,7 +351,6 @@ hasExtBitOp (int op, int size)
 {
   if (op == RRC
       || op == RLC
-      || op == GETHBIT
       || (op == SWAP && size <= 2)
       || op == GETABIT
       || op == GETBYTE

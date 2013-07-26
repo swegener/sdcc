@@ -143,7 +143,7 @@ stm8instructionSize(const lineNode *pl)
                 || EQUALS(operand, "inc")
                 || EQUALS(operand, "push")
                 || EQUALS(operand, "swap")
-                || EQUALS(operand, "jp")
+                //|| EQUALS(operand, "jp") disabled due to bug #2182.
                 || EQUALS(operand, "cpl")
                 || EQUALS(operand, "tnz"))
   {
@@ -300,7 +300,7 @@ stm8instructionSize(const lineNode *pl)
     else
       return(1);
   }
-  return(4);
+  return(5); // Maximum instruction size, e.g. btjt.
 }
 
 static bool

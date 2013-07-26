@@ -1,3 +1,9 @@
+2013-07-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peep.c,
+	  src/stm8/peeph.def:
+	  Enable peephole for jp to jra optimization.
+
 2013-07-24 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/bug-927659.c,

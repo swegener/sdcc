@@ -14,12 +14,44 @@
 //	ld	%3, %2
 //} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
 
-//replace restart {
+// replace restart {
 //	jp	%5
 //} by {
-//	jra	%5
-//	; peephole 1 changed absolute to relative unconditional jump.
-//} if labelInRange()
+//	jp	%6
+//	; peephole 64 jumped to %6 directly instead of via %5.
+//} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+// Ensure jump-to-jump optimiation is done before other jump-related optimizations.
+barrier
+
+replace restart {
+	ld	a, %1
+	srl	a
+	btjt	%1, #0, %2
+} by {
+	ld	a, %1
+	srl	a
+	; peephole 0 jumped by carry bit instead of testing bit explicitly.
+	jrc %2
+}
+
+replace restart {
+	ld	a, %1
+	srl	a
+	btjf	%1, #0, %2
+} by {
+	ld	a, %1
+	srl	a
+	; peephole 0' jumped by carry bit instead of testing bit explicitly.
+	jrnc %2
+}
+
+replace restart {
+	jp	%5
+} by {
+	jra	%5
+	; peephole 1 changed absolute to relative unconditional jump.
+} if labelInRange()
 
 //replace restart {
 //	jrc	%1

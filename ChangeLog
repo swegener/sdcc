@@ -1,3 +1,9 @@
+2013-07-27 Leland Morrison <enigmalee AT sourceforge.net>
+	* sdas/linksrc/lkrloc3.c:
+	  prevent NULL ptr dereference when generating error message
+	  (fixes bug #2076 core dump from sdldz80
+	   if relative jump exceeds range)
+
 2013-07-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c,

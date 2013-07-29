@@ -5560,6 +5560,8 @@ genDummyRead (const iCode *ic)
 static void
 genSTM8iCode (iCode *ic)
 {
+  genLine.lineElement.ic = ic;
+
 #if 0
   if (!regalloc_dry_run)
     printf ("ic %d op %d stack pushed %d\n", ic->key, ic->op, _G.stack.pushed);

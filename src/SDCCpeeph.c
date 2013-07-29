@@ -365,18 +365,23 @@ FBYNAME (labelIsUncondJump)
 
   if (TARGET_MCS51_LIKE)
     jpInst = "ljmp";
-  if (TARGET_HC08_LIKE)
+  else if (TARGET_HC08_LIKE)
     {
       jpInst = "jmp";
       jpInst2 = "bra";
     }
-  if (TARGET_Z80_LIKE)
+  else if (TARGET_Z80_LIKE)
     {
       jpInst = "jp";
       jpInst2 = "jr";
     }
+  else if (TARGET_IS_STM8)
+    {
+      jpInst = "jp";
+      jpInst2 = "jra";
+    }
   len = strlen(jpInst);
-  if (strncmp(p, jpInst, len)  && (!jpInst2 || strncmp(p, jpInst2, len)))
+  if (strncmp(p, jpInst, len) && (!jpInst2 || strncmp(p, jpInst2, len)))
     return FALSE; /* next line is no jump */
 
   p += len;
@@ -2092,7 +2097,7 @@ bool
 isLabelReference (const char *line, const char **start, int *len)
 {
   const char *s, *e;
-  if (!TARGET_Z80_LIKE)
+  if (!TARGET_Z80_LIKE && !TARGET_IS_STM8)
     return FALSE;
 
   s = line;
@@ -2161,7 +2166,7 @@ buildLabelRefCountHash (lineNode * head)
          - look for labels in inline assembler
          - calculate labelLen
       */ 
-      if ((line->isLabel  || line->isInline) && isLabelDefinition (line->line, &label, &labelLen, FALSE) ||
+      if ((line->isLabel || line->isInline) && isLabelDefinition (line->line, &label, &labelLen, FALSE) ||
         (ref = TRUE) && isLabelReference (line->line, &label, &labelLen))
         {
           labelHashEntry *entry, *e;
@@ -2173,7 +2178,7 @@ buildLabelRefCountHash (lineNode * head)
           memcpy (entry->name, label, labelLen);
           entry->name[labelLen] = 0;
           entry->refCount = -1;
-          
+     
           for (e = hTabFirstItemWK (labelHash, hashSymbolName (entry->name)); e; e = hTabNextItemWK (labelHash))
             if (!strcmp (entry->name, e->name))
               goto c;

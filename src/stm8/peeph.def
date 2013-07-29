@@ -14,14 +14,14 @@
 //	ld	%3, %2
 //} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
 
-// replace restart {
-//	jp	%5
-//} by {
-//	jp	%6
-//	; peephole 64 jumped to %6 directly instead of via %5.
-//} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+replace restart {
+	jp	%5
+} by {
+	jp	%6
+	; peephole 64 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
-// Ensure jump-to-jump optimiation is done before other jump-related optimizations.
+// Ensure jump-to-jump optimiation above is done before other jump-related optimizations.
 barrier
 
 replace restart {
@@ -61,8 +61,7 @@ replace restart {
 	jrnc	%5
 	; peephole 2 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jreq	%1
@@ -72,8 +71,7 @@ replace restart {
 	jrne	%5
 	; peephole 3 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrmi	%1
@@ -83,8 +81,7 @@ replace restart {
 	jrpl	%5
 	; peephole 4 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrnc	%1
@@ -94,8 +91,7 @@ replace restart {
 	jrc	%5
 	; peephole 5 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrne	%1
@@ -105,8 +101,7 @@ replace restart {
 	jreq	%5
 	; peephole 5 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrpl	%1
@@ -116,8 +111,7 @@ replace restart {
 	jrmi	%5
 	; peephole 6 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrsge	%1
@@ -127,8 +121,7 @@ replace restart {
 	jrslt	%5
 	; peephole 7 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrsgt	%1
@@ -138,8 +131,7 @@ replace restart {
 	jrsle	%5
 	; peephole 8 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrsle	%1
@@ -149,8 +141,7 @@ replace restart {
 	jrsgt	%5
 	; peephole 9 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrslt	%1
@@ -160,8 +151,7 @@ replace restart {
 	jrsge	%5
 	; peephole 10 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrugt	%1
@@ -171,8 +161,7 @@ replace restart {
 	jrule	%5
 	; peephole 11 removed jra by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 replace restart {
 	jrule	%1
@@ -182,13 +171,12 @@ replace restart {
 	jrugt	%5
 	; peephole 12 removed jp by using inverse jump logic
 %1:
-}
-// if labelRefCountChange(%1 -1)
+} if labelRefCountChange(%1 -1)
 
 // Should be one of the last ones. Opens the code to further peephole optimization.
-//replace restart {
-//%1:
-//} by {
-//	; peephole 13 removed unused label %1.
-//} if labelRefCount(%1 0)
+replace restart {
+%1:
+} by {
+	; peephole 13 removed unused label %1.
+} if labelRefCount(%1 0)
 

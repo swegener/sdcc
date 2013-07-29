@@ -1,6 +1,7 @@
 2013-07-29 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/stm8/peeph.def:
+	* src/stm8/peeph.def,
+	  src/stm8/gen.c:
 	  Enable peepholes for inverse jumps, and labels, fix label reference counting bug #2183.
 
 2013-07-29 Borut Razem <borut.razem AT gmail.com>

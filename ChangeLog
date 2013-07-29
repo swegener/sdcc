@@ -1,3 +1,8 @@
+2013-07-29 Borut Razem <borut.razem AT gmail.com>
+
+	* support/cpp/sdcpp-diagnostic.c, upport/cpp/sdcpp-opts.c: fixed bug
+	  #2194 Missing header file produces error, but still zero exit status
+
 2013-07-27 Leland Morrison <enigmalee AT sourceforge.net>
 	* sdas/linksrc/lkrloc3.c:
 	  prevent NULL ptr dereference when generating error message
@@ -534,9 +539,9 @@
 
 2013-05-25 Borut Razem <borut.razem AT gmail.com>
 
-	* src/SDCCopt.c: fixed bug #2165 - "Broken comparison" by disableing
-	  optimization of comparision unsigned with 2^n literal since it is broken
-	* support/regression/test/compare_2_n.c: added test for bug #2165
+	* src/SDCCopt.c: fixed bug #2165 - "Broken comparison" by disabling
+	  optimization of comparison unsigned with 2^n literal since it is broken
+	* support/regression/test/compare_2_n.m4: added test for bug #2165
 
 2013-05-25 Philipp Klaus Krause <pkk AT spth.de>
 

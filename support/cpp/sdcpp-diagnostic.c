@@ -161,11 +161,18 @@ c_cpp_error (cpp_reader *pfile ATTRIBUTE_UNUSED, int level, int reason ATTRIBUTE
     fputs (_("warning: "), stderr);
   else if (level == CPP_DL_ICE)
     fputs (_("internal error: "), stderr);
+  else if (level == CPP_DL_FATAL)
+    fputs (_("fatal error: "), stderr);
   else
     fputs (_("error: "), stderr);
 
   vfprintf (stderr, _(msg), *ap);
   putc ('\n', stderr);
+
+  if (level == CPP_DL_FATAL) {
+    fputs(_("compilation terminated.\n"), stderr);
+    exit (FATAL_EXIT_CODE);
+  }
 
   return true;
 }

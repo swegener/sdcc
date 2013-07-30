@@ -15,10 +15,18 @@
 //} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
 
 replace restart {
+	call	%1
+	ret
+} by {
+	jp	%1
+	; peephole j1 replaced call at end of function by jump (tail call optimization).
+}
+
+replace restart {
 	jp	%5
 } by {
 	jp	%6
-	; peephole 64 jumped to %6 directly instead of via %5.
+	; peephole j2 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 // Ensure jump-to-jump optimiation above is done before other jump-related optimizations.
@@ -31,7 +39,7 @@ replace restart {
 } by {
 	ld	a, %1
 	srl	a
-	; peephole 0 jumped by carry bit instead of testing bit explicitly.
+	; peephole j3 jumped by carry bit instead of testing bit explicitly.
 	jrc %2
 }
 
@@ -42,7 +50,7 @@ replace restart {
 } by {
 	ld	a, %1
 	srl	a
-	; peephole 0' jumped by carry bit instead of testing bit explicitly.
+	; peephole j4 jumped by carry bit instead of testing bit explicitly.
 	jrnc %2
 }
 
@@ -50,7 +58,7 @@ replace restart {
 	jp	%5
 } by {
 	jra	%5
-	; peephole 1 changed absolute to relative unconditional jump.
+	; peephole j5 changed absolute to relative unconditional jump.
 } if labelInRange()
 
 replace restart {
@@ -59,7 +67,7 @@ replace restart {
 %1:
 } by {
 	jrnc	%5
-	; peephole 2 removed jra by using inverse jump logic
+	; peephole j6 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -69,7 +77,7 @@ replace restart {
 %1:
 } by {
 	jrne	%5
-	; peephole 3 removed jra by using inverse jump logic
+	; peephole j7 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -79,7 +87,7 @@ replace restart {
 %1:
 } by {
 	jrpl	%5
-	; peephole 4 removed jra by using inverse jump logic
+	; peephole j8 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -89,7 +97,7 @@ replace restart {
 %1:
 } by {
 	jrc	%5
-	; peephole 5 removed jra by using inverse jump logic
+	; peephole j9 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -99,7 +107,7 @@ replace restart {
 %1:
 } by {
 	jreq	%5
-	; peephole 5 removed jra by using inverse jump logic
+	; peephole j10 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -109,7 +117,7 @@ replace restart {
 %1:
 } by {
 	jrmi	%5
-	; peephole 6 removed jra by using inverse jump logic
+	; peephole j11 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -119,7 +127,7 @@ replace restart {
 %1:
 } by {
 	jrslt	%5
-	; peephole 7 removed jra by using inverse jump logic
+	; peephole j12 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -129,7 +137,7 @@ replace restart {
 %1:
 } by {
 	jrsle	%5
-	; peephole 8 removed jra by using inverse jump logic
+	; peephole j13 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -139,7 +147,7 @@ replace restart {
 %1:
 } by {
 	jrsgt	%5
-	; peephole 9 removed jra by using inverse jump logic
+	; peephole j14 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -149,7 +157,7 @@ replace restart {
 %1:
 } by {
 	jrsge	%5
-	; peephole 10 removed jra by using inverse jump logic
+	; peephole j15 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -159,7 +167,7 @@ replace restart {
 %1:
 } by {
 	jrule	%5
-	; peephole 11 removed jra by using inverse jump logic
+	; peephole j16 removed jra by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -169,7 +177,7 @@ replace restart {
 %1:
 } by {
 	jrugt	%5
-	; peephole 12 removed jp by using inverse jump logic
+	; peephole j17 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -177,6 +185,6 @@ replace restart {
 replace restart {
 %1:
 } by {
-	; peephole 13 removed unused label %1.
+	; peephole j18 removed unused label %1.
 } if labelRefCount(%1 0)
 

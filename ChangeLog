@@ -8,6 +8,8 @@
 	  Disable tests affected by bug ##2196, 2198.
 	* support/regression/tests/float_single.c:
 	  Disable failing sinf, cosf tests.
+	* src/stm8/peeph.def:
+	  Tail call optimization.
 
 2013-07-30 Borut Razem <borut.razem AT gmail.com>
 

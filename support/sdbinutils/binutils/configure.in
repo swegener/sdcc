@@ -47,9 +47,10 @@ AC_CONFIG_HEADERS(config.h:config.in)
 AH_VERBATIM([00_CONFIG_H_CHECK],
 [/* Check that config.h is #included before system headers
    (this works only for glibc, but that should be enough).  */
-#if defined(__GLIBC__)
+#if defined(__GLIBC__) && !defined(__FreeBSD_kernel__) && !defined(__CONFIG_H__)
 #  error config.h must be #included before system headers
-#endif])
+#endif
+#define __CONFIG_H__ 1])
 
 if test -z "$target" ; then
     AC_MSG_ERROR(Unrecognized target system type; please check config.sub.)
@@ -96,7 +97,7 @@ case "${host}" in
 esac
 AC_SUBST(DEMANGLER_NAME)
 
-AC_CHECK_HEADERS(string.h strings.h stdlib.h unistd.h fcntl.h sys/file.h limits.h locale.h sys/param.h)
+AC_CHECK_HEADERS(string.h strings.h stdlib.h unistd.h fcntl.h sys/file.h limits.h locale.h sys/param.h wchar.h)
 AC_HEADER_SYS_WAIT
 ACX_HEADER_STRING
 AC_FUNC_ALLOCA
@@ -107,6 +108,14 @@ AC_CHECK_FUNC([mkstemp],
 AC_CHECK_FUNC([mkdtemp],
               AC_DEFINE([HAVE_MKDTEMP], 1,
               [Define to 1 if you have the `mkdtemp' function.]))
+  AC_MSG_CHECKING([for mbstate_t])
+  AC_TRY_COMPILE([#include <wchar.h>],
+  [mbstate_t teststate;],
+  have_mbstate_t=yes, have_mbstate_t=no)
+  AC_MSG_RESULT($have_mbstate_t)
+  if test x"$have_mbstate_t" = xyes; then
+    AC_DEFINE(HAVE_MBSTATE_T,1,[Define if mbstate_t exists in wchar.h.])
+  fi
 
 # Some systems have frexp only in -lm, not in -lc.
 AC_SEARCH_LIBS(frexp, m)

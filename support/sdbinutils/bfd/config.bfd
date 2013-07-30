@@ -144,7 +144,6 @@ case "${targ}" in
     ;;
 
 # START OF targmatch.h
-# END OF targmatch.h
 #ifdef BFD64
   aarch64-*-elf)
     targ_defvec=bfd_elf64_littleaarch64_vec
@@ -1647,6 +1646,7 @@ case "${targ}" in
   asxxxx-*-*)
     targ_defvec=asxxxx_vec
     ;;
+# END OF targmatch.h
   *)
     echo 1>&2 "*** BFD does not support target ${targ}."
     echo 1>&2 "*** Look in bfd/config.bfd for supported targets."

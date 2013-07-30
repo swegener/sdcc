@@ -191,8 +191,8 @@ struct elf_link_hash_entry
      FIXME: There is no real need for this field if def_dynamic is never
      cleared and all places that test def_dynamic also test def_regular.  */
   unsigned int dynamic_def : 1;
-  /* Symbol is weak in all shared objects.  */
-  unsigned int dynamic_weak : 1;
+  /* Symbol has a non-weak reference from a shared object.  */
+  unsigned int ref_dynamic_nonweak : 1;
   /* Symbol is referenced with a relocation where C/C++ pointer equality
      matters.  */
   unsigned int pointer_equality_needed : 1;
@@ -1590,6 +1590,9 @@ struct elf_obj_tdata
   /* A place to stash dwarf2 info for this bfd.  */
   void *dwarf2_find_line_info;
 
+  /* Stash away info for yet another find line/function variant.  */
+  void *elf_find_function_cache;
+
   /* An array of stub sections indexed by symbol number, used by the
      MIPS ELF linker.  FIXME: We should figure out some way to only
      include this field for a MIPS ELF target.  */
@@ -1931,8 +1934,12 @@ extern void _bfd_elf_strtab_addref
   (struct elf_strtab_hash *, bfd_size_type);
 extern void _bfd_elf_strtab_delref
   (struct elf_strtab_hash *, bfd_size_type);
+extern unsigned int _bfd_elf_strtab_refcount
+  (struct elf_strtab_hash *, bfd_size_type);
 extern void _bfd_elf_strtab_clear_all_refs
-  (struct elf_strtab_hash *);
+  (struct elf_strtab_hash *tab);
+extern void _bfd_elf_strtab_restore_size
+  (struct elf_strtab_hash *, bfd_size_type);
 extern bfd_size_type _bfd_elf_strtab_size
   (struct elf_strtab_hash *);
 extern bfd_size_type _bfd_elf_strtab_offset

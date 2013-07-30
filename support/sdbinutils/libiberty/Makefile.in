@@ -965,7 +965,7 @@ $(CONFIGURED_OFILES): stamp-picdir
 	else true; fi
 	$(COMPILE.c) $(srcdir)/partition.c $(OUTPUT_OPTION)
 
-####./pex-common.c config.h $(INCDIR)/ansidecl.h \
+####./pex-common.$(objext): $(srcdir)/pex-common.c config.h $(INCDIR)/ansidecl.h \
 ####	$(INCDIR)/libiberty.h $(srcdir)/pex-common.h
 ####	if [ x"$(PICFLAG)" != x ]; then \
 ####	  $(COMPILE.c) $(PICFLAG) $(srcdir)/pex-common.c -o pic/$@; \

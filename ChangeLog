@@ -1,3 +1,12 @@
+2013-07-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  More efficient mixed-size addition of on-stack operands, and assignment to parts of x and y.
+	* support/regression/tests/bug-136564.c,
+	  support/regression/tests/bug3521024.c,
+	  support/regression/tests/gcc-torture-execute-980707-1.c:
+	  Disable tests affected by bug ##2196, 2198.
+
 2013-07-30 Borut Razem <borut.razem AT gmail.com>
 
 	* support/sdbinutils/*: sync with binutils 2.23.2

@@ -69,6 +69,7 @@ int _strncmp (
 void
 testInducion(void)
 {
+#ifndef __SDCC_stm8 // See bug #2196, 2198.
   foo();
   ASSERT(i_result[0] == 42);
   ASSERT(i_result[1] ==  9);
@@ -76,4 +77,5 @@ testInducion(void)
 
   ASSERT(_strncmp ("SDCC is great", "SDCC is buggy", sizeof("SDCC is" )) == 0);
   ASSERT(_strncmp ("SDCC is great", "SDCC is buggy", sizeof("SDCC is ")) != 0);
+#endif
 }

@@ -1171,6 +1171,14 @@ cheapMove (asmop *result, int roffset, asmop *source, int soffset, bool save_a)
     emit3_o (A_LD, result, roffset, source, soffset);
   else if (result->type == AOP_DIR && (source->type == AOP_DIR || source->type == AOP_LIT))
     emit3_o (A_MOV, result, roffset, source, soffset);
+  else if (aopRS (result) && !aopOnStack (result, roffset, 1) && save_a)
+    {
+      if (!aopInReg (result, roffset, A_IDX))
+        swap_to_a (result->aopu.bytes[roffset].byteu.reg->rIdx);
+      emit3_o (A_LD, ASMOP_A, 0, source, soffset);
+      if (!aopInReg (result, roffset, A_IDX))
+        swap_from_a (result->aopu.bytes[roffset].byteu.reg->rIdx);
+    }
   else
     {
       if (save_a)
@@ -1709,6 +1717,8 @@ skip_byte:
           cost (2, 2);
           assigned[i] = TRUE;
           assigned[i + 1] = TRUE;
+          if (aopInReg (result, roffset + i, X_IDX))
+            x_free = FALSE;
           size -= 2;
           i += 2;
         }
@@ -1716,12 +1726,12 @@ skip_byte:
       else if (aopRS (result) && !aopOnStack (result, roffset + i, 1) && aopOnStack (source, soffset + i, 1))
         {
           wassert (size >= 1);
-          if (!aopInReg (result, roffset + i, A_IDX))
-            swap_to_a (result->aopu.bytes[roffset + i].byteu.reg->rIdx);
-          emit3_o (A_LD, ASMOP_A, 0, source, soffset + i);
-          if (!aopInReg (result, roffset + i, A_IDX))
-            swap_from_a (result->aopu.bytes[roffset + i].byteu.reg->rIdx);
+          cheapMove (result, roffset + i, source, soffset + i, !a_free);
           assigned[i] = TRUE;
+          if (aopInReg (result, roffset + i, A_IDX))
+            a_free = FALSE;
+          if (aopInReg (result, roffset + i, XL_IDX) || aopInReg (result, roffset + i, XH_IDX))
+            x_free = FALSE;
           size--;
           i++;
         }
@@ -2902,7 +2912,7 @@ genPlus (const iCode *ic)
   size = result->aop->size;
 
   /* Swap if left is literal or right is in A. */
-  if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD || aopInReg (right->aop, 0, A_IDX)) // todo: Swap in more cases when right in reg, left not. Swap individually per-byte.
+  if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD || aopInReg (right->aop, 0, A_IDX) || right->aop->size == 1 && aopOnStackNotExt (left->aop, 0, 2)) // todo: Swap in more cases when right in reg, left not. Swap individually per-byte.
     {
       operand *t = right;
       right = left;

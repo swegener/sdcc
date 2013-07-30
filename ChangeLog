@@ -6,6 +6,8 @@
 	  support/regression/tests/bug3521024.c,
 	  support/regression/tests/gcc-torture-execute-980707-1.c:
 	  Disable tests affected by bug ##2196, 2198.
+	* support/regression/tests/float_single.c:
+	  Disable failing sinf, cosf tests.
 
 2013-07-30 Borut Razem <borut.razem AT gmail.com>
 

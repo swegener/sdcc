@@ -1,3 +1,8 @@
+2013-08-01 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  Smaller code for GET_VALUE_AT_ADDRESS.
+
 2013-07-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

@@ -5512,6 +5512,23 @@ genCast (const iCode *ic)
 
       cheapMove (ASMOP_A, 0, result->aop, right->aop->size - 1, FALSE);
       emit3 (A_RLC, ASMOP_A, 0);
+
+      if (size == 2 && (aopInReg (result->aop, offset, X_IDX) || aopInReg (result->aop, offset, Y_IDX))) // Faster when just setting 16-bit reg.
+        {
+          symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
+          emit3w_o (A_CLRW, result->aop, offset, 0, 0);
+          if (!regalloc_dry_run)
+            emitcode ("jrnc", "!tlabel", labelKey2num (tlbl->key));
+          cost (2, 2); // 2 for cyscle cost is just an estimate; it also ignores pipelining.
+          emit3w_o (A_DECW, result->aop, offset, 0, 0);
+          emitLabel (tlbl);
+
+          if (pushed_a)
+            pop (ASMOP_A, 0, 1);
+
+          goto release;
+        }
+
       emit3 (A_CLR, ASMOP_A, 0);
       emit3 (A_SBC, ASMOP_A, ASMOP_ZERO);
       while (size--)
@@ -5530,6 +5547,7 @@ genCast (const iCode *ic)
         pop (ASMOP_A, 0, 1);
     }
 
+release:
   freeAsmop (right);
   freeAsmop (result);
 }

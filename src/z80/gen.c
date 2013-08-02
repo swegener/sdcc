@@ -1267,6 +1267,11 @@ aopForRemat (symbol * sym)
         {
           ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
         }
+      else if (ic->op == ADDRESS_OF)
+        {
+          val += (int) operandLitValue (IC_RIGHT (ic));
+          break;
+        }
       else
         break;
     }
@@ -10123,7 +10128,9 @@ static void
 genAddrOf (const iCode * ic)
 {
   symbol *sym;
+  operand *right = IC_RIGHT (ic);
   wassert (IS_TRUE_SYMOP (IC_LEFT (ic)));
+  wassert (right && IS_OP_LITERAL (IC_RIGHT (ic)));
   sym = OP_SYMBOL (IC_LEFT (ic));
 
   aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
@@ -10138,17 +10145,17 @@ genAddrOf (const iCode * ic)
           spillPair (PAIR_HL);
           if (sym->stack <= 0)
             {
-              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset);
+              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + operandLitValue (right));
             }
           else
             {
-              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
+              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset + operandLitValue (right));
             }
           commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
         }
       else
         {
-          emit2 ("ld de,!hashedstr", sym->rname);
+          emit2 ("ld de,!hashedstr+%ld", sym->rname, (long)(operandLitValue (right)));
           regalloc_dry_run_cost += 3;
           commitPair (AOP (IC_RESULT (ic)), PAIR_DE, ic, FALSE);
         }
@@ -10170,9 +10177,9 @@ genAddrOf (const iCode * ic)
           /* if it has an offset  then we need to compute it */
           if (sym->stack > 0)
             emit2 ("ld %s,!immedword", _pairs[pair].name,
-                   sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset);
+                   (int)(sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset + operandLitValue (right)));
           else
-            emit2 ("ld %s,!immedword", _pairs[pair].name, sym->stack + _G.stack.pushed + _G.stack.offset);
+            emit2 ("ld %s,!immedword", _pairs[pair].name, (int)(sym->stack + _G.stack.pushed + _G.stack.offset + operandLitValue (right)));
           regalloc_dry_run_cost += (pair == PAIR_IY ? 4 : 3);
           emit2 ("add %s,sp", _pairs[pair].name);
           regalloc_dry_run_cost += (pair == PAIR_IY ? 2 : 1);
@@ -10185,7 +10192,7 @@ genAddrOf (const iCode * ic)
               pair = PAIR_HL;
               spillPair (PAIR_HL);
             }
-          emit2 ("ld %s,!hashedstr", _pairs[pair].name, sym->rname);
+          emit2 ("ld %s,!hashedstr+%ld", _pairs[pair].name, sym->rname, (long)(operandLitValue (right)));
           regalloc_dry_run_cost += (pair == PAIR_IY ? 4 : 3);
         }
       commitPair (AOP (IC_RESULT (ic)), pair, ic, FALSE);

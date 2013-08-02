@@ -1653,7 +1653,7 @@ operandFromSymbol (symbol * sym)
   /* create :-                     */
   /*    itemp = &[_symbol]         */
 
-  ic = newiCode (ADDRESS_OF, newOperand (), NULL);
+  ic = newiCode (ADDRESS_OF, newOperand (), operandFromLit (0));
   IC_LEFT (ic)->type = SYMBOL;
   IC_LEFT (ic)->svt.symOperand = sym;
   IC_LEFT (ic)->key = sym->key;
@@ -2748,7 +2748,7 @@ geniCodeAddressOf (operand * op)
     }
 
   /* otherwise make this of the type coming in */
-  ic = newiCode (ADDRESS_OF, op, NULL);
+  ic = newiCode (ADDRESS_OF, op, operandFromLit (0));
   IC_RESULT (ic) = newiTempOperand (p, 1);
   IC_RESULT (ic)->isaddr = 0;
   ADDTOCHAIN (ic);

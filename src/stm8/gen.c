@@ -5251,16 +5251,19 @@ static void
 genAddrOf (const iCode *ic)
 {
   const symbol *sym;
-  operand *result, *left;
+  operand *result, *left, *right;
 
   D (emitcode ("; genAddrOf", ""));
 
   result = IC_RESULT (ic);
   left = IC_LEFT (ic);
+  right = IC_RIGHT (ic);
 
   wassert (result);
   wassert (left);
   wassert (IS_TRUE_SYMOP (left));
+  wassert (right && IS_OP_LITERAL (IC_RIGHT (ic)));
+
   sym = OP_SYMBOL_CONST (left);
   wassert (sym);
 
@@ -5272,17 +5275,16 @@ genAddrOf (const iCode *ic)
       if (!sym->onStack)
         {
           wassert (sym->name);
-          emitcode ("ldw", "y, #%s", sym->rname);
+          emitcode ("ldw", "y, #%s+%ld", sym->rname, (long)(operandLitValue (right)));
           cost (4, 2);
         }
       else
         {
-          wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 > 0);
           emitcode ("ldw", "y, sp");
           cost (2, 1);
-          if (sym->stack + _G.stack.pushed + 1 >= 2)
+          if (sym->stack + _G.stack.pushed + 1 + operandLitValue (right) != 1)
             {
-              emitcode ("addw", "y, #%d", sym->stack + _G.stack.pushed + 1);
+              emitcode ("addw", "y, #%ld", (long)(sym->stack + _G.stack.pushed + 1 + operandLitValue (right)));
               cost (4, 2);
             }
           else
@@ -5295,23 +5297,23 @@ genAddrOf (const iCode *ic)
       if (!sym->onStack)
         {
           wassert (sym->name);
-          emitcode ("ldw", "x, #%s", sym->rname);
+          emitcode ("ldw", "x, #%s+%ld", sym->rname, (long)(operandLitValue (right)));
           cost (3, 2);
         }
       else
         {
-          wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 > 0);
+          wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 + operandLitValue (right) > 0);
           emitcode ("ldw", "x, sp");
           cost (1, 1);
-          if (sym->stack + _G.stack.pushed + 1 > 2)
+          if (sym->stack + _G.stack.pushed + 1 + operandLitValue (right) > 2)
             {
-              emitcode ("addw", "x, #%d", sym->stack + _G.stack.pushed + 1);
+              emitcode ("addw", "x, #%ld", (long)(sym->stack + _G.stack.pushed + 1 + operandLitValue (right)));
               cost (3, 2);
             }
           else
             {
               emit3w (A_INCW, ASMOP_X, 0);
-              if (sym->stack + _G.stack.pushed + 1 > 1)
+              if (sym->stack + _G.stack.pushed + 1 + operandLitValue (right) > 1)
                 emit3w (A_INCW, ASMOP_X, 0);
             }
         }

@@ -2031,10 +2031,60 @@ optimizeCastCast (eBBlock ** ebbs, int count)
     }
 }
 
+/* Fold pointer addition into offset of ADDRESS_OF.                  */
+static void
+offsetFoldGet (eBBlock **ebbs, int count)
+{
+  int i;
+  iCode *ic;
+  iCode *uic;
+
+  if (!TARGET_Z80_LIKE && !TARGET_IS_STM8)
+    return;
+  
+  for (i = 0; i < count; i++)
+    {
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          if (ic->op == ADDRESS_OF && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+            {
+              /* There must be only one use of the result */
+              if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
+                continue;
+
+              /* This use must be an addition / subtraction */
+              uic = hTabItemWithKey (iCodehTab,
+                        bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+
+              if (uic->op != '+' && uic->op != '-' || !IS_OP_LITERAL (IC_RIGHT (uic)))
+                continue;
+
+              /* Historically ADDRESS_OF didn't have a right operand */
+              wassertl (IC_RIGHT (ic), "ADDRESS_OF without right operand");
+              wassertl (IS_OP_LITERAL (IC_RIGHT (ic)), "ADDRESS_OF with non-literal right operand");
+
+              bitVectUnSetBit (OP_SYMBOL (IC_RESULT (ic))->uses, uic->key);
+
+              if (uic->op == '+')
+                IC_RIGHT (uic) = operandFromLit (operandLitValue (IC_RIGHT (ic)) + operandLitValue (IC_RIGHT (uic)));
+              else
+                IC_RIGHT (uic) = operandFromLit (operandLitValue (IC_RIGHT (ic)) - operandLitValue (IC_RIGHT (uic)));
+              IC_LEFT (uic) = operandFromOperand (IC_LEFT(ic));
+              uic->op = ADDRESS_OF;
+
+              ic->op = '=';
+              IC_RIGHT (ic) = IC_RESULT (ic);
+              IC_LEFT (ic) = 0;
+              SET_ISADDR (IC_RESULT (ic), 0);
+            }
+        }
+    }
+}
+
 /* Fold pointer addition into offset of GET_VALUE_AT_ADDRESS.                  */
 /* The hc08-related ports do a similar thing in hc08/ralloc.c, packPointerOp() */
 static void
-offsetFold (eBBlock **ebbs, int count)
+offsetFoldUse (eBBlock **ebbs, int count)
 {
   int i;
   iCode *ic;
@@ -2042,7 +2092,7 @@ offsetFold (eBBlock **ebbs, int count)
 
   if (!TARGET_IS_Z80 && !TARGET_IS_Z180 && !TARGET_IS_RABBIT && !TARGET_IS_STM8)
     return;
-
+  
   for (i = 0; i < count; i++)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
@@ -2059,6 +2109,7 @@ offsetFold (eBBlock **ebbs, int count)
               /* This use must be a GET_VALUE_AT_ADDRESS */
               uic = hTabItemWithKey (iCodehTab,
                         bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+
               if (!POINTER_GET (uic))
                 continue;
 
@@ -2202,7 +2253,7 @@ eBBlockFromiCode (iCode * ic)
         dumpEbbsToFileExt (DUMP_LOOPD, ebbi);
     }
 
-  offsetFold (ebbi->bbOrder, ebbi->count);
+  offsetFoldGet (ebbi->bbOrder, ebbi->count);
 
   /* lospre */
   computeControlFlow (ebbi);
@@ -2233,6 +2284,8 @@ eBBlockFromiCode (iCode * ic)
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
   computeDataFlow (ebbi);
+
+  offsetFoldUse (ebbi->bbOrder, ebbi->count);
 
   killDeadCode (ebbi);
 

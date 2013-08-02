@@ -1175,7 +1175,7 @@ cheapMove (asmop *result, int roffset, asmop *source, int soffset, bool save_a)
     {
       if (!aopInReg (result, roffset, A_IDX))
         swap_to_a (result->aopu.bytes[roffset].byteu.reg->rIdx);
-      emit3_o (A_LD, ASMOP_A, 0, source, soffset);
+      cheapMove (ASMOP_A, 0, source, soffset, FALSE);
       if (!aopInReg (result, roffset, A_IDX))
         swap_from_a (result->aopu.bytes[roffset].byteu.reg->rIdx);
     }
@@ -1184,7 +1184,7 @@ cheapMove (asmop *result, int roffset, asmop *source, int soffset, bool save_a)
       if (save_a)
         push (ASMOP_A, 0, 1);
       if (!aopInReg (source, soffset, A_IDX) && source->type != AOP_DUMMY)
-        emit3_o (A_LD, ASMOP_A, 0, source, soffset);
+        cheapMove (ASMOP_A, 0, source, soffset, FALSE);
       if (!aopInReg (result, roffset, A_IDX) && result->type != AOP_DUMMY)
         emit3_o (A_LD, result, roffset, ASMOP_A, 0);
       if (save_a)
@@ -2912,7 +2912,7 @@ genPlus (const iCode *ic)
   size = result->aop->size;
 
   /* Swap if left is literal or right is in A. */
-  if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD || aopInReg (right->aop, 0, A_IDX) || right->aop->size == 1 && aopOnStackNotExt (left->aop, 0, 2)) // todo: Swap in more cases when right in reg, left not. Swap individually per-byte.
+  if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD || aopInReg (right->aop, 0, A_IDX) || right->aop->type != AOP_LIT && right->aop->size == 1 && aopOnStackNotExt (left->aop, 0, 2)) // todo: Swap in more cases when right in reg, left not. Swap individually per-byte.
     {
       operand *t = right;
       right = left;
@@ -4996,7 +4996,7 @@ genPointerSet (iCode * ic)
       goto release;
     }
 
-  genMove (use_y ? ASMOP_Y : ASMOP_X, result->aop, !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  genMove (use_y ? ASMOP_Y : ASMOP_X, result->aop, regDead (A_IDX, ic) && !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {

@@ -1,3 +1,8 @@
+2013-08-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  More efficient zeroing of bytes, more efficient addition of constants, fix handling of a in pointer set.
+
 2013-08-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: install/uninstall stm8 related files

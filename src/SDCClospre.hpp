@@ -567,12 +567,14 @@ static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>:
 
       if (isOperandEqual(IC_RESULT(ic), IC_LEFT(nic)) && nic->op != ADDRESS_OF && (!POINTER_GET(nic) || !IS_PTR(operandType(IC_RESULT(nic))) || !IS_BITFIELD(operandType(IC_LEFT(nic))->next) || compareType(operandType(IC_LEFT(nic)), operandType(tmpop)) == 1))
         {
+          bool isaddr = IC_LEFT (nic)->isaddr;
 #ifdef DEBUG_LOSPRE
           std::cout << "Forward substituted left operand " << OP_SYMBOL_CONST(IC_LEFT(nic))->name << " at " << nic->key << "\n";
 #endif
           //bitVectUnSetBit (OP_SYMBOL (IC_LEFT (nic))->uses, nic->key);
           IC_LEFT(nic) = operandFromOperand (tmpop);
           //bitVectSetBit (OP_SYMBOL (IC_LEFT (nic))->uses, nic->key);
+          IC_LEFT (nic)->isaddr = isaddr;
         }
       if (isOperandEqual(IC_RESULT(ic), IC_RIGHT(nic)))
         {

@@ -1,5 +1,11 @@
 2013-08-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/SDCClospre.hpp,
+	  src/SDCCopt.c:
+	  Fix handling of isaddr flag in optimizations.
+
+2013-08-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/SDCCopt.c,
 	  src/SDCCicode.c,
 	  src/stm8/gen.c,

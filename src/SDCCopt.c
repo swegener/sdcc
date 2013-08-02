@@ -2071,6 +2071,7 @@ offsetFoldGet (eBBlock **ebbs, int count)
                 IC_RIGHT (uic) = operandFromLit (operandLitValue (IC_RIGHT (ic)) - operandLitValue (IC_RIGHT (uic)));
               IC_LEFT (uic) = operandFromOperand (IC_LEFT(ic));
               uic->op = ADDRESS_OF;
+              IC_LEFT (uic)->isaddr = 1;
 
               ic->op = '=';
               IC_RIGHT (ic) = IC_RESULT (ic);
@@ -2285,8 +2286,9 @@ eBBlockFromiCode (iCode * ic)
   loops = createLoopRegions (ebbi);
   computeDataFlow (ebbi);
 
-  offsetFoldUse (ebbi->bbOrder, ebbi->count);
+  killDeadCode (ebbi);
 
+  offsetFoldUse (ebbi->bbOrder, ebbi->count);
   killDeadCode (ebbi);
 
   /* sort it back by block number */

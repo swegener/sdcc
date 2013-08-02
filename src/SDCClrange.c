@@ -1069,6 +1069,7 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
                       if (pset)
                         IC_RESULT(ic)->isaddr = TRUE;
                     }
+                  bitVectUnSetBit (sym->uses, ic->key);
                 }
             }
           deleteSet (&newdefs);

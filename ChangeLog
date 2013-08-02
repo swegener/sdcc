@@ -1,6 +1,7 @@
 2013-08-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCopt.c,
+	  src/SDCCicode.c,
 	  src/stm8/gen.c,
 	  src/z80/gen.c:
 	  Fold offset into ADDRESS_OF, RFE #393.

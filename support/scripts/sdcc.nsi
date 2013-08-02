@@ -380,6 +380,7 @@ ${Section} "SDCC application files" SEC01
   File "${SDCC_ROOT}\bin\sdas8051.exe"
   File "${SDCC_ROOT}\bin\sdas390.exe"
   File "${SDCC_ROOT}\bin\sdasrab.exe"
+  File "${SDCC_ROOT}\bin\sdasstm8.exe"
   File "${SDCC_ROOT}\bin\sdld.exe"
   File "${SDCC_ROOT}\bin\sdldgb.exe"
   File "${SDCC_ROOT}\bin\sdld6808.exe"
@@ -408,6 +409,7 @@ ${Section} "ucSim application files" SEC02
   File "${SDCC_ROOT}\bin\savr.exe"
   File "${SDCC_ROOT}\bin\shc08.exe"
   File "${SDCC_ROOT}\bin\sz80.exe"
+  File "${SDCC_ROOT}\bin\sstm8.exe"
 ${SectionEnd}
 
 ${Section} "SDCDB files" SEC03
@@ -450,6 +452,8 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\asm\r2k\features.h"
   SetOutPath "$INSTDIR\include\asm\r3ka"
   File "${DEV_ROOT}\include\asm\r3ka\features.h"
+  SetOutPath "$INSTDIR\include\asm\stm8"
+  File "${DEV_ROOT}\include\asm\stm8\features.h"
 
   SetOutPath "$INSTDIR\include\ds390"
   File "${DEV_ROOT}\include\ds390\*.h"
@@ -575,7 +579,13 @@ ${Section} "SDCC PIC14 library" SEC20
   File "${DEV_ROOT}\non-free\lib\pic14\*.lib"
 ${SectionEnd}
 
-${Section} "SDCC library sources" SEC21
+${Section} "SDCC STM8 library" SEC21
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\stm8"
+  File "${DEV_ROOT}\lib\stm8\*.*"
+${SectionEnd}
+
+${Section} "SDCC library sources" SEC22
   SectionIn 1
   SetOutPath "$INSTDIR\lib\src\ds390\examples"
   File "${DEV_ROOT}\lib\src\ds390\examples\MOVED"
@@ -615,6 +625,9 @@ ${Section} "SDCC library sources" SEC21
   SetOutPath "$INSTDIR\lib\src\s08"
   File "${DEV_ROOT}\lib\src\s08\*.c"
 #  File "${DEV_ROOT}\lib\src\s08\Makefile"
+
+  SetOutPath "$INSTDIR\lib\src\stm8"
+#  File "${DEV_ROOT}\lib\src\stm8\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\mcs51"
   File "${DEV_ROOT}\lib\src\mcs51\*.asm"
@@ -802,7 +815,8 @@ LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC HC08 library"
 LangString DESC_SEC18 ${LANG_ENGLISH} "SDCC S08 library"
 LangString DESC_SEC19 ${LANG_ENGLISH} "SDCC PIC16 library"
 LangString DESC_SEC20 ${LANG_ENGLISH} "SDCC PIC14 library"
-LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC library sources"
+LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC STM8 library"
+LangString DESC_SEC22 ${LANG_ENGLISH} "SDCC library sources"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -827,6 +841,7 @@ LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC library sources"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC19} $(DESC_SEC19)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC20} $(DESC_SEC20)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC21} $(DESC_SEC21)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC22} $(DESC_SEC22)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 ;--------------------------------
 
@@ -922,6 +937,9 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\s08\s08.lib"
   Delete "$INSTDIR\lib\src\s08\Makefile"
 
+  Delete "$INSTDIR\lib\src\stm8\stm8.lib"
+  Delete "$INSTDIR\lib\src\stm8\Makefile"
+
   Delete "$INSTDIR\lib\src\z80\*.s"
   Delete "$INSTDIR\lib\src\z80\z80.lib"
   Delete "$INSTDIR\lib\src\z80\README"
@@ -967,6 +985,8 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\s08\*.lib"
 
+  Delete "$INSTDIR\lib\stm8\*.lib"
+
   Delete "$INSTDIR\lib\z80\*.rel"
   Delete "$INSTDIR\lib\z80\*.lib"
 
@@ -1003,6 +1023,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\asm\mcs51\*.h"
   Delete "$INSTDIR\include\asm\gbz80\*.h"
   Delete "$INSTDIR\include\asm\ds390\*.h"
+  Delete "$INSTDIR\include\asm\stm8\*.h"
   Delete "$INSTDIR\include\asm\default\*.h"
   Delete "$INSTDIR\include\z180\*.h"
   Delete "$INSTDIR\include\pic14\*.h"
@@ -1029,6 +1050,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\sdas8051.exe"
   Delete "$INSTDIR\bin\sdas390.exe"
   Delete "$INSTDIR\bin\sdasrab.exe"
+  Delete "$INSTDIR\bin\sdasstm8.exe"
   Delete "$INSTDIR\bin\sdld.exe"
   Delete "$INSTDIR\bin\sdldgb.exe"
   Delete "$INSTDIR\bin\sdld6808.exe"
@@ -1054,6 +1076,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\savr.exe"
   Delete "$INSTDIR\bin\shc08.exe"
   Delete "$INSTDIR\bin\sz80.exe"
+  Delete "$INSTDIR\bin\sstm8.exe"
 
   Delete "$INSTDIR\bin\sdcdb.exe"
   Delete "$INSTDIR\bin\sdcdb.el"
@@ -1082,6 +1105,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\ds400"
   RMDir "$INSTDIR\lib\src\hc08"
   RMDir "$INSTDIR\lib\src\s08"
+  RMDir "$INSTDIR\lib\src\stm8"
   RMDir "$INSTDIR\lib\src"
   RMDir "$INSTDIR\non-free\lib\src"
 
@@ -1102,6 +1126,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\ds400"
   RMDir "$INSTDIR\lib\hc08"
   RMDir "$INSTDIR\lib\s08"
+  RMDir "$INSTDIR\lib\stm8"
   RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\non-free\lib"
 
@@ -1116,6 +1141,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\include\asm\mcs51"
   RMDir "$INSTDIR\include\asm\gbz80"
   RMDir "$INSTDIR\include\asm\ds390"
+  RMDir "$INSTDIR\include\asm\stm8"
   RMDir "$INSTDIR\include\asm\default"
   RMDir "$INSTDIR\include\asm"
   RMDir "$INSTDIR\include\z180"

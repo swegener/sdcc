@@ -1,3 +1,8 @@
+2013-08-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  More efficient pcall.
+
 2013-08-02 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCClospre.hpp,
@@ -37,7 +42,7 @@
 	* support/regression/tests/bug-136564.c,
 	  support/regression/tests/bug3521024.c,
 	  support/regression/tests/gcc-torture-execute-980707-1.c:
-	  Disable tests affected by bug ##2196, 2198.
+	  Disable tests affected by bug #2196, 2198.
 	* support/regression/tests/float_single.c:
 	  Disable failing sinf, cosf tests.
 	* src/stm8/peeph.def:

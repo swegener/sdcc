@@ -2492,9 +2492,14 @@ emitCall (const iCode *ic, bool ispcall)
           emitcode ("call", "%s", aopGet2 (left->aop, 0));
           cost (3, 4);
         }
+      else if (aopInReg (left->aop, 0, Y_IDX)) // Faster than ging through x.
+        {
+          emitcode ("call", "(y)");
+          cost (2, 4);
+        }
       else
         {
-          genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+          genMove (ASMOP_X, left->aop, TRUE, TRUE, TRUE);
           
           emitcode ("call", "(x)");
           cost (1, 4);

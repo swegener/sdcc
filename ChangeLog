@@ -2,6 +2,10 @@
 
 	* src/stm8/gen.c:
 	  More efficient zeroing of bytes, more efficient addition of constants, fix handling of a in pointer set.
+	* src/SDCCpeeph.c:
+	  Fix handling of architectures that have absolute jump instructions of different length.
+	* src/stm8/peeph.def:
+	  More jump-to-jump optimizations.
 
 2013-08-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

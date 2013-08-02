@@ -381,8 +381,12 @@ FBYNAME (labelIsUncondJump)
       jpInst2 = "jra";
     }
   len = strlen(jpInst);
-  if (strncmp(p, jpInst, len) && (!jpInst2 || strncmp(p, jpInst2, len)))
-    return FALSE; /* next line is no jump */
+  if (strncmp(p, jpInst, len))
+    {
+      len = jpInst2 ? strlen(jpInst2) : 0;
+      if(!jpInst2 || strncmp(p, jpInst2, len))
+        return FALSE; /* next line is no jump */
+    }
 
   p += len;
   while (*p && ISCHARSPACE(*p))
@@ -407,6 +411,7 @@ FBYNAME (labelIsUncondJump)
 
   /* now put the destination in %6 */
   bindVar (6, &p, &vars);
+
   return TRUE;
 }
 
@@ -1213,10 +1218,10 @@ ftab[] =                                            // sorted on the number of t
 /*-----------------------------------------------------------------*/
 static int
 callFuncByName (char *fname,
-                hTab * vars,
-                lineNode * currPl, /* first source line matched */
-                lineNode * endPl,  /* last source line matched */
-                lineNode * head)
+                hTab *vars,
+                lineNode *currPl, /* first source line matched */
+                lineNode *endPl,  /* last source line matched */
+                lineNode *head)
 {
   int   i;
   char  *cmdCopy, *funcName, *funcArgs, *cmdTerm;

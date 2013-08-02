@@ -29,7 +29,7 @@ replace restart {
 	; peephole j2 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
-// Ensure jump-to-jump optimiation above is done before other jump-related optimizations.
+// Ensure jump-to-jump optimiation of absolute jumps above is done before other jump-related optimizations.
 barrier
 
 replace restart {
@@ -59,7 +59,7 @@ replace restart {
 } by {
 	jra	%5
 	; peephole j5 changed absolute to relative unconditional jump.
-} if labelInRange()
+} if labelInRange(%5)
 
 replace restart {
 	jrc	%1
@@ -180,6 +180,90 @@ replace restart {
 	; peephole j17 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrc	%5
+} by {
+	jrc	%6
+	; peephole j18 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jreq	%5
+} by {
+	jreq	%6
+	; peephole j19 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrmi	%5
+} by {
+	jrmi	%6
+	; peephole j20 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrnc	%5
+} by {
+	jrnc	%6
+	; peephole j21 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrne	%5
+} by {
+	jrne	%6
+	; peephole j22 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrpl	%5
+} by {
+	jrpl	%6
+	; peephole j23 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrge	%5
+} by {
+	jrge	%6
+	; peephole j24 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrgt	%5
+} by {
+	jrgt	%6
+	; peephole j25 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrle	%5
+} by {
+	jrle	%6
+	; peephole j26 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrlt	%5
+} by {
+	jrlt	%6
+	; peephole j27 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrugt	%5
+} by {
+	jrugt	%6
+	; peephole j28 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jrule	%5
+} by {
+	jrule	%6
+	; peephole j29 jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 // Should be one of the last ones. Opens the code to further peephole optimization.
 replace restart {

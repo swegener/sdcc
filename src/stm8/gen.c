@@ -1193,12 +1193,13 @@ cheapMove (asmop *result, int roffset, asmop *source, int soffset, bool save_a)
 }
 
 /*-----------------------------------------------------------------*/
-/* genCopy - Copy the value - stack to stack only                  */
+/* genCopyStack - Copy the value - stack to stack only             */
 /*-----------------------------------------------------------------*/
 static void
 genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, bool *assigned, int *size, bool a_free, bool x_free, bool y_free, bool really_do_it_now)
 {
   int i;
+  bool pushed_x = FALSE;
 
 #if 0
   D (emitcode("; genCopyStack", "%d %d %d", a_free, x_free, y_free));
@@ -1228,6 +1229,14 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
         aopOnStackNotExt (result, roffset + i, 2) && aopOnStackNotExt (source, soffset + i, 2))
         {
           wassert(*size >= 2);
+
+          // Using ldw results in substancially shorter, but somewhat slower code.
+          if (!x_free && !y_free && really_do_it_now && (optimize.codeSize || !a_free && !optimize.codeSpeed))
+            {
+              push (ASMOP_X, 0, 2);
+              pushed_x = TRUE;
+              x_free = TRUE;
+            }
 
           if (y_free) // Unlike with other operations, loading between y and stk is as efficient as for x, so we try y first here.
             {
@@ -1269,6 +1278,9 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
           (*size)--;
         }
     }
+
+  if (pushed_x)
+    pop (ASMOP_X, 0, 2);
 
   wassertl (*size >= 0, "genCopyStack() copied more than there is to be copied.");
 }

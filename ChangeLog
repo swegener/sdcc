@@ -1,3 +1,11 @@
+2013-08-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peep.c,
+	  src/stm8/peeph.def:
+	  Infrastructure for notUsed().
+	* src/stm8/gen.c:
+	  More efficient stack-to-stack copy.
+
 2013-08-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

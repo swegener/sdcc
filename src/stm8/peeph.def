@@ -1,10 +1,28 @@
 // peeph.def - STM8 peephole rules
 
-//replace restart {
-//	ld	%1, %2
-//} by {
-//	; peephole -1 removed dead load.
-//} if notVolatile(%1), notVolatile(%2), notUsed(%1)
+replace restart {
+	ld	%1, %2
+} by {
+	; peephole 0 removed dead load.
+} if notVolatile(%1), notVolatile(%2), notUsed(%1)
+
+replace restart {
+	ld	a, %1
+	inc	a
+	ld	%1, a
+} by {
+	inc	%1
+	; peephole 1 incremented in %1 instead of a.
+} if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	dec	a
+	ld	%1, a
+} by {
+	dec	%1
+	; peephole 1 decremented in %1 instead of a.
+} if notUsed('a')
 
 //replace restart {
 //	ld	%1, %2

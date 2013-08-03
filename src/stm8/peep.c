@@ -3,11 +3,26 @@
 #include "SDCCglobl.h"
 #include "SDCCgen.h"
 
-#define D(_s) { printf _s; fflush(stdout); }
-/*#define D(_s)*/
+#define NOTUSEDERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");} while(0)
+
+//#define D(_s) { printf _s; fflush(stdout); }
+#define D(_s)
 
 #define EQUALS(l, i) (!strcmp((l), (i)))
 #define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1))
+
+#define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1))
+
+typedef enum
+{
+  S4O_CONDJMP,
+  S4O_WR_OP,
+  S4O_RD_OP,
+  S4O_TERM,
+  S4O_VISITED,
+  S4O_ABORT,
+  S4O_CONTINUE
+} S4O_RET;
 
 static struct
 {
@@ -303,38 +318,297 @@ stm8instructionSize(const lineNode *pl)
   return(5); // Maximum instruction size, e.g. btjt.
 }
 
+/*-----------------------------------------------------------------*/
+/* incLabelJmpToCount - increment counter "jmpToCount" in entry    */
+/* of the list labelHash                                           */
+/*-----------------------------------------------------------------*/
+static bool
+incLabelJmpToCount (const char *label)
+{
+  labelHashEntry *entry;
+
+  entry = getLabelRef (label, _G.head);
+  if (!entry)
+    return FALSE;
+  entry->jmpToCount++;
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
+/* findLabel -                                                     */
+/* 1. extracts label in the opcode pl                              */
+/* 2. increment "label jump-to count" in labelHash                 */
+/* 3. search lineNode with label definition and return it          */
+/*-----------------------------------------------------------------*/
+static lineNode *
+findLabel (const lineNode *pl)
+{
+  char *p;
+  lineNode *cpl;
+
+  /* 1. extract label in opcode */
+
+  /* In each mcs51 jumping opcode the label is at the end of the opcode */
+  p = strlen (pl->line) - 1 + pl->line;
+
+  /* scan backward until ',' or '\t' */
+  for (; p > pl->line; p--)
+    if (*p == ',' || *p == '\t')
+      break;
+
+  /* sanity check */
+  if (p == pl->line)
+    {
+      NOTUSEDERROR();
+      return NULL;
+    }
+
+  /* skip ',' resp. '\t' */
+  ++p;
+
+  /* 2. increment "label jump-to count" */
+  if (!incLabelJmpToCount (p))
+    return NULL;
+
+  /* 3. search lineNode with label definition and return it */
+  for (cpl = _G.head; cpl; cpl = cpl->next)
+    {
+      if (   cpl->isLabel
+          && strncmp (p, cpl->line, strlen(p)) == 0)
+        {
+          return cpl;
+        }
+    }
+  return NULL;
+}
+
+/* Check if reading arg implies reading what. */
+static bool argCont(const char *arg, const char *what)
+{
+  return (arg[0] == '#') ? FALSE : strstr(arg, what) != NULL;
+}
+
+/* Check if writing arg implies reading what. */
+static bool argCont2(const char *arg, const char *what)
+{
+  if (arg[0] != '(')
+    return FALSE;
+  return (strstr (arg + 1, what) && strstr (arg + 1, what) < strchr (arg + 1, ')'));
+}
+
+static bool
+z80MightRead(const lineNode *pl, const char *what)
+{
+  const char *extra = 0;
+  if (!strcmp (what, "xl") || !strcmp (what, "xh"))
+    extra = "x";
+  if (!strcmp (what, "yl") || !strcmp (what, "yh"))
+    extra = "y";
+
+  if (ISINST (pl->line, "ld\t"))
+    {
+      if (argCont (strchr (pl->line, ','), what))
+        return TRUE;
+      if (extra && argCont (strchr (pl->line, ','), extra))
+        return TRUE;
+      if (extra && argCont2 (pl->line + 3, extra))
+        return TRUE;
+      return FALSE;
+    }
+
+  if (ISINST (pl->line, "ldw\t"))
+    {
+      if (extra && argCont (strchr (pl->line, ','), extra))
+        return TRUE;
+      if (extra && argCont2 (pl->line + 4, extra))
+        return TRUE;
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static bool
+z80UncondJump(const lineNode *pl)
+{
+  return (ISINST(pl->line, "jp\t") || ISINST(pl->line, "jra\t") || ISINST(pl->line, "jpf\t"));
+}
+
+static bool
+z80CondJump(const lineNode *pl)
+{
+  return (!z80UncondJump(pl) && ISINST(pl->line, "jr") ||
+    ISINST(pl->line, "btjt\t") || ISINST(pl->line, "btjf\t"));
+}
+
+static bool
+z80SurelyWrites(const lineNode *pl, const char *what)
+{
+  char *extra = 0;
+  if (!strcmp (what, "xl") || !strcmp (what, "xh"))
+    extra = "x";
+  if (!strcmp (what, "yl") || !strcmp (what, "yh"))
+    extra = "y";
+
+  if (ISINST (pl->line, "ld\t"))
+    return (strncmp (pl->line + 3, what, strlen (what)) == 0);
+
+  if (ISINST (pl->line, "ldw\t"))
+    {
+      return (extra && strncmp (pl->line + 3, extra, strlen (extra)) == 0);
+    }
+
+  return FALSE;
+}
+
+static bool
+z80SurelyReturns(const lineNode *pl)
+{
+  if(strcmp(pl->line, "\tret") == 0)
+    return TRUE;
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* scan4op - "executes" and examines the assembler opcodes,        */
+/* follows conditional and un-conditional jumps.                   */
+/* Moreover it registers all passed labels.                        */
+/*                                                                 */
+/* Parameter:                                                      */
+/*    lineNode **pl                                                */
+/*       scanning starts from pl;                                  */
+/*       pl also returns the last scanned line                     */
+/*    const char *pReg                                             */
+/*       points to a register (e.g. "ar0"). scan4op() tests for    */
+/*       read or write operations with this register               */
+/*    const char *untilOp                                          */
+/*       points to NULL or a opcode (e.g. "push").                 */
+/*       scan4op() returns if it hits this opcode.                 */
+/*    lineNode **plCond                                            */
+/*       If a conditional branch is met plCond points to the       */
+/*       lineNode of the conditional branch                        */
+/*                                                                 */
+/* Returns:                                                        */
+/*    S4O_ABORT                                                    */
+/*       on error                                                  */
+/*    S4O_VISITED                                                  */
+/*       hit lineNode with "visited" flag set: scan4op() already   */
+/*       scanned this opcode.                                      */
+/*    S4O_FOUNDOPCODE                                              */
+/*       found opcode and operand, to which untilOp and pReg are   */
+/*       pointing to.                                              */
+/*    S4O_RD_OP, S4O_WR_OP                                         */
+/*       hit an opcode reading or writing from pReg                */
+/*    S4O_CONDJMP                                                  */
+/*       hit a conditional jump opcode. pl and plCond return the   */
+/*       two possible branches.                                    */
+/*    S4O_TERM                                                     */
+/*       acall, lcall, ret and reti "terminate" a scan.            */
+/*-----------------------------------------------------------------*/
+static S4O_RET
+scan4op (lineNode **pl, const char *what, const char *untilOp,
+         lineNode **plCond)
+{
+  for (; *pl; *pl = (*pl)->next)
+    {
+      if (!(*pl)->line || (*pl)->isDebug || (*pl)->isComment || (*pl)->isLabel)
+        continue;
+      D(("Scanning %s for %s\n", (*pl)->line, what));
+      /* don't optimize across inline assembler,
+         e.g. isLabel doesn't work there */
+      if ((*pl)->isInline)
+        {
+          D(("S4O_RD_OP: Inline asm\n"));
+          return S4O_ABORT;
+        }
+
+      if ((*pl)->visited)
+        {
+          D(("S4O_VISITED\n"));
+          return S4O_VISITED;
+        }
+
+      (*pl)->visited = TRUE;
+
+      if(z80MightRead(*pl, what))
+        {
+          D(("S4O_RD_OP\n"));
+          return S4O_RD_OP;
+        }
+
+      if(z80UncondJump(*pl))
+        {
+          *pl = findLabel (*pl);
+            if (!*pl)
+              {
+                D(("S4O_ABORT\n"));
+                return S4O_ABORT;
+              }
+        }
+      if(z80CondJump(*pl))
+        {
+          *plCond = findLabel (*pl);
+          if (!*plCond)
+            {
+              D(("S4O_ABORT\n"));
+              return S4O_ABORT;
+            }
+          D(("S4O_CONDJMP\n"));
+          return S4O_CONDJMP;
+        }
+
+      if(z80SurelyWrites(*pl, what))
+        {
+          D(("S4O_WR_OP\n"));
+          return S4O_WR_OP;
+        }
+
+      /* Don't need to check for de, hl since z80MightRead() does that */
+      if(z80SurelyReturns(*pl))
+        {
+          D(("S4O_TERM\n"));
+          return S4O_TERM;
+        }
+    }
+  D(("S4O_ABORT\n"));
+  return S4O_ABORT;
+}
+
+/*-----------------------------------------------------------------*/
+/* doTermScan - scan through area 2. This small wrapper handles:   */
+/* - action required on different return values                    */
+/* - recursion in case of conditional branches                     */
+/*-----------------------------------------------------------------*/
 static bool
 doTermScan (lineNode **pl, const char *what)
 {
-  const char *operand, *op1start, *op2start;
-  for (; *pl; *pl = (*pl)->next)
-  {
-    operand = nextToken((*pl)->line);
-    if(! (op1start = nextToken(NULL)) )
-      continue;
+  lineNode *plConditional;
 
-    if(EQUALS(operand, "ld")
-                || EQUALS(operand, "mov")
-                || EQUALS(operand, "clr"))
-      return(EQUALS(op1start, what));
-
-    if(EQUALS(op1start, what))
-      return(FALSE);
-
-    /*if(op2start && EQUALS(op2start, what)) TODO: enable this (but make op2start point somewhere first)
-      return(FALSE);*/
-
-    if(EQUALS(operand, "ret") || EQUALS(operand, "iret"))
-      return(FALSE);
-
-    /* TODO */
-    if(ISINST(operand, "jp") || ISINST(operand, "jr"))
-      return(FALSE);
-
-    if(ISINST(operand, "call"))
-      return(FALSE);
-  }
-  return(FALSE);
+  for (;; *pl = (*pl)->next)
+    {
+      switch (scan4op (pl, what, NULL, &plConditional))
+        {
+          case S4O_TERM:
+          case S4O_VISITED:
+          case S4O_WR_OP:
+            /* all these are terminating conditions */
+            return TRUE;
+          case S4O_CONDJMP:
+            /* two possible destinations: recurse */
+              {
+                lineNode *pl2 = plConditional;
+                D(("CONDJMP trying other branch first\n"));
+                if (!doTermScan (&pl2, what))
+                  return FALSE;
+                D(("Other branch OK.\n"));
+              }
+            continue;
+          case S4O_RD_OP:
+          default:
+            /* no go */
+            return FALSE;
+        }
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -353,10 +627,10 @@ stm8notUsed (const char *what, lineNode *endPl, lineNode *head)
   lineNode *pl;
   if(strcmp(what, "x") == 0)
     return(stm8notUsed("xl", endPl, head) && stm8notUsed("xh", endPl, head));
-  if(strcmp(what, "y") == 0)
+  else if(strcmp(what, "y") == 0)
     return(stm8notUsed("yl", endPl, head) && stm8notUsed("yh", endPl, head));
 
-  if(!isReg(what))
+  if(strcmp(what, "a") && strcmp(what, "xl") && strcmp(what, "xh") && strcmp(what, "yl") && strcmp(what, "yh"))
     return FALSE;
 
   _G.head = head;

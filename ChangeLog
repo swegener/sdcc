@@ -1,3 +1,10 @@
+2013-08-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Peepholes for in-place operations.
+	* src/stm8/gen.c:
+	  More efficient pointer write, fix handling of a in comparison for equality.
+
 2013-08-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c,

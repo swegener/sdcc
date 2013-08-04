@@ -3744,7 +3744,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
               if (!x_dead && !aopInReg (left->aop, i, X_IDX))
                 push (ASMOP_X, 0, 2);
 
-              genMove_o (ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+              genMove_o (ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i + 1 && right->aop->regs[A_IDX] <= i + 1, TRUE, FALSE);
 
               emitcode ("cpw", aopInReg (left->aop, i, Y_IDX) ? "y, %s" : "x, %s", aopGet2 (right->aop, i));
               cost (3 + aopInReg (left->aop, i, Y_IDX), 2);
@@ -4147,7 +4147,7 @@ genAnd (const iCode *ic, iCode *ifx)
         }
       goto release;
     }
-  if (ifx && getSize (operandType (result)) <= 1 && right->aop->type == AOP_LIT) // TODO: USe 16-bit shifts. Allow non-literal (and enable in ralloc2.cc)
+  if (ifx && getSize (operandType (result)) <= 1 && right->aop->type == AOP_LIT) // TODO: Use 16-bit shifts. Allow non-literal (and enable in ralloc2.cc)
     {
       symbol * tlbl = newiTempLabel (NULL);
 
@@ -4990,6 +4990,7 @@ genPointerSet (iCode * ic)
   int pushed_a = 0;
   int blen, bstr;
   bool bit_field = IS_BITVAR (getSpec (operandType (right))) || IS_BITVAR (getSpec (operandType (result)));
+  int cache_l = -1, cache_h = -1/*, cache_a = -1*/;
   
   blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : result)))) : 0;
   bstr = bit_field ? (SPEC_BSTR (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : result)))) : 0;
@@ -5017,7 +5018,8 @@ genPointerSet (iCode * ic)
 
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {
-      if (!bit_field && right->aop->type == AOP_LIT && !byteOfVal (right->aop->aopu.aop_lit, i))
+      if (!bit_field && right->aop->type == AOP_LIT && !byteOfVal (right->aop->aopu.aop_lit, i) &&
+        !(!use_y && i + 1 < size && optimize.codeSize && regDead (Y_IDX, ic) && right->aop->type == AOP_LIT && (size - 2 - i || !cache_l && !cache_h))) // clrw y, ldw (d, x), y is cheaper than this. ldw (x), y is cheaper than this if y is zero.
         {
           if (!(size - 1 - i))
             emitcode ("clr", use_y ? "(y)" : "(x)");
@@ -5031,7 +5033,17 @@ genPointerSet (iCode * ic)
       if (!bit_field && i + 1 < size && !aopInReg (right->aop, i, A_IDX) && !aopInReg (right->aop, i + 1, A_IDX) &&
         (aopInReg(right->aop, i, use_y ? X_IDX : Y_IDX) || regDead (use_y ? X_IDX : Y_IDX, ic) && right->aop->regs[use_y ? XL_IDX : YL_IDX] <= i + 1 && right->aop->regs[use_y ? XH_IDX : YH_IDX] <= i + 1))
         {
-          genMove_o (use_y ? ASMOP_X : ASMOP_Y, 0, right->aop, i, 2, FALSE, FALSE, FALSE);
+          if (right->aop->type == AOP_LIT)
+            {
+              if (cache_l != byteOfVal (right->aop->aopu.aop_lit, i) || cache_h != byteOfVal (right->aop->aopu.aop_lit, i + 1))
+                {
+                  genMove_o (use_y ? ASMOP_X : ASMOP_Y, 0, right->aop, i, 2, FALSE, FALSE, FALSE);
+                  cache_l = byteOfVal (right->aop->aopu.aop_lit, i);
+                  cache_h = byteOfVal (right->aop->aopu.aop_lit, i + 1);
+                }
+            }
+          else
+            genMove_o (use_y ? ASMOP_X : ASMOP_Y, 0, right->aop, i, 2, FALSE, FALSE, FALSE);
 
           if (!(size - 2 - i))
             emitcode ("ldw", use_y ? "(y), x" : "(x), y");

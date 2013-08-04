@@ -6,13 +6,28 @@ replace restart {
 	; peephole 0 removed dead load.
 } if notVolatile(%1), notVolatile(%2), notUsed(%1)
 
+//replace restart {
+//	ld	%1, %2
+//	ld	%3, %1
+//} by {
+//	; peephole 0' loaded %3 from %2 directly instead of going through %1.
+//	ld	%3, %2
+//} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
+
+replace restart {
+	pop	%1
+	push	%1
+} by {
+	; peephole 1 removed dead pop / push pair.
+} if notUsed(%1)
+
 replace restart {
 	ld	a, %1
-	inc	a
+	cpl	a
 	ld	%1, a
 } by {
-	inc	%1
-	; peephole 1 incremented in %1 instead of a.
+	cpl	%1
+	; peephole 2 complemented in %1 instead of a.
 } if notUsed('a')
 
 replace restart {
@@ -21,16 +36,79 @@ replace restart {
 	ld	%1, a
 } by {
 	dec	%1
-	; peephole 1 decremented in %1 instead of a.
+	; peephole 3 decremented in %1 instead of a.
 } if notUsed('a')
 
-//replace restart {
-//	ld	%1, %2
-//	ld	%3, %1
-//} by {
-//	; peephole 0 loaded %3 from %2 directly instead of going through %1.
-//	ld	%3, %2
-//} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
+replace restart {
+	ld	a, %1
+	inc	a
+	ld	%1, a
+} by {
+	inc	%1
+	; peephole 4 incremented in %1 instead of a.
+} if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	neg	a
+	ld	%1, a
+} by {
+	neg	%1
+	; peephole 5 negated in %1 instead of a.
+} if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	rlc	a
+	ld	%1, a
+} by {
+	rlc	%1
+	; peephole 6 rotated in %1 instead of a.
+} if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	rrc	a
+	ld	%1, a
+} by {
+	rrc	%1
+	; peephole 7 rotated in %1 instead of a.
+} if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	sll	a
+	ld	%1, a
+} by {
+	sll	%1
+	; peephole 8 shifted in %1 instead of a.
+} if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	sra	a
+	ld	%1, a
+} by {
+	sra	%1
+	; peephole 9 shifted in %1 instead of a.
+} if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	srl	a
+	ld	%1, a
+} by {
+	srl	%1
+	; peephole 10 shifted in %1 instead of a.
+} if notUsed('a')
+
+replace restart {
+	ld	a, %1
+	tst	a
+} by {
+	tst	%1
+	; peephole 11 tested in %1 instead of a.
+} if notUsed('a')
 
 replace restart {
 	call	%1

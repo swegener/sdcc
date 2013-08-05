@@ -1,3 +1,8 @@
+2013-08-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType): fixed bug 2201 (spurious limited
+	  range warning)
+
 2013-08-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

@@ -4543,9 +4543,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
         /* if left is integral and right is literal
            then check constant range */
-        if (IS_INTEGRAL (LTYPE (tree)) && IS_LITERAL (RTYPE (tree)))
+        if (IS_INTEGRAL (LTYPE (tree)) && !IS_LITERAL (LTYPE (tree)) && IS_LITERAL (RTYPE (tree)))
           ccr_result = checkConstantRange (LTYPE (tree), RTYPE (tree), tree->opval.op, FALSE);
-        if (ccr_result == CCR_OK && IS_INTEGRAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
+        if (ccr_result == CCR_OK && IS_INTEGRAL (RTYPE (tree)) && !IS_LITERAL (RTYPE (tree))  && IS_LITERAL (LTYPE (tree)))
           ccr_result = checkConstantRange (RTYPE (tree), LTYPE (tree), tree->opval.op, TRUE);
         switch (ccr_result)
           {

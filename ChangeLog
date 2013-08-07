@@ -1,3 +1,7 @@
+2013-08-07 Borut Razem <borut.razem AT gmail.com>
+
+	* doc/sdccman.lyx: updated Sourceforge URLs
+
 2013-08-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType): fixed bug 2201 (spurious limited

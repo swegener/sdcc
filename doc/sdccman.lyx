@@ -243,7 +243,7 @@ Z80, Z180, GBZ80, Rabbit 2000/3000, Rabbit 3000A CPU
 
 ) and STMicroelectronics STM8 
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 STM8
@@ -294,7 +294,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/apps/trac/sdcc/
+http://sdcc.sourceforge.net/wiki/
 \end_layout
 
 \end_inset
@@ -2580,9 +2580,9 @@ http://sdcc.sourceforge.net/
  You can also find links to the user mailing lists that offer help or discuss
  SDCC with other SDCC users.
  Web links to other SDCC related sites can also be found here.
- This document can be found in the DOC directory of the source package as
- a text or HTML file.
- A pdf version of this document is available at 
+ This document can be found in the doc directory of the source package.
+ The latest snapshot build version of this document in pdf format is available
+ at 
 \begin_inset Flex URL
 status collapsed
 
@@ -2597,8 +2597,18 @@ http://sdcc.sourceforge.net/doc/sdccman.pdf
  Some of the other tools (simulator and assembler) included with SDCC contain
  their own documentation and can be found in the source distribution.
  If you want the latest unreleased software, the complete source package
- is available directly from Subversion on https://sdcc.svn.sourceforge.net/svnroot/
-sdcc/trunk/sdcc.
+ is available directly from Subversion on 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://sourceforge.net/p/sdcc/code/8805/tree/trunk/sdcc/
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -7237,7 +7247,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sf.net/project/showfiles.php?group_id=599
+http://sourceforge.net/projects/sdcc/files/
 \end_layout
 
 \end_inset
@@ -7252,7 +7262,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.sf.net/snap.php
+http://sdcc.sourceforge.net/snap.php
 \end_layout
 
 \end_inset
@@ -7737,13 +7747,13 @@ http://www.lyx.org
 \end_inset
 
  as editor is straightforward.
- Prebuilt documentation in html and pdf format is available from 
+ Prebuilt documentation is available from 
 \begin_inset Flex URL
 status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.sf.net/snap.php
+http://sdcc.sourceforge.net/snap.php
 \end_layout
 
 \end_inset
@@ -7798,32 +7808,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.sf.net/doc/sdccman.pdf
-\end_layout
-
-\end_inset
-
-.
-\begin_inset Newline newline
-\end_inset
-
-A html version
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-HTML version of this document
-\end_layout
-
-\end_inset
-
- should be online at 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://sdcc.sf.net/doc/sdccman.html/index.html
+http://sdcc.sourceforge.net/doc/sdccman.pdf
 \end_layout
 
 \end_inset
@@ -7909,7 +7894,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sf.net/projects/fpgac
+http://sourceforge.net/projects/fpgac/
 \end_layout
 
 \end_inset
@@ -8852,7 +8837,7 @@ Using SDCC
 \begin_layout Section
 Standard-Compliance
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Standard-compliance
@@ -8931,7 +8916,7 @@ ISO/IEC 9899 - Programming languages - C
 \emph default
  should be available at: 
 \begin_inset Flex URL
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -10233,7 +10218,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sf.net/projects/srecord
+hhttp://sourceforge.net/projects/srecord/
 \end_layout
 
 \end_inset
@@ -14895,7 +14880,7 @@ Assembler options
 \end_inset
 
 .
- See file sdcc/sdas/doc/asxhtm.html for assembler options.cd
+ See file sdcc/sdas/doc/asmlnk.txt for assembler options.cd
 \end_layout
 
 \begin_layout Labeling
@@ -16691,7 +16676,7 @@ reference "sec:Pragmas"
 \end_inset
 
 .
- File sdcc/sdas/doc/asxhtm.html has more on linker options.
+ File sdcc/sdas/doc/asmlnk.txt has more on linker options.
 \end_layout
 
 \begin_layout Subsection
@@ -17401,7 +17386,7 @@ status collapsed
  returning.
  This option is needed when using the Infineon
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Infineon
@@ -18263,7 +18248,7 @@ status collapsed
 \series default
 
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Z80!Options!-
@@ -18328,7 +18313,7 @@ status collapsed
 \series default
 
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 Z80!Options!-
@@ -18509,7 +18494,7 @@ status collapsed
 
 -dum-ast
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -18555,7 +18540,7 @@ status collapsed
 
 -dump-i-code
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -18594,7 +18579,7 @@ Will dump iCodes at various stages into files named
 \series bold
 -
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -18607,7 +18592,7 @@ status open
 
 -dump-graphs
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -18645,7 +18630,7 @@ Will dump internal representations as graphviz .dot files.
 \series bold
 -
 \begin_inset ERT
-status open
+status collapsed
 
 \begin_layout Plain Layout
 
@@ -29257,8 +29242,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/device/lib/mcs51/
-crtstart.asm
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/device/lib/mcs51/crtstart.asm
 \end_layout
 
 \end_inset
@@ -31755,7 +31739,7 @@ endasm
 The inline assembler code can contain any valid code understood by the assembler
 , this includes any assembler directives and comment lines.
  The assembler does not like some characters like ':' or ''' in comments.
- You'll find an 100+ pages assembler manual in sdcc/sdas/doc/asxhtm.html
+ You'll find an 100+ pages assembler manual in sdcc/sdas/doc/asmlnk.txt
 \begin_inset Index idx
 status collapsed
 
@@ -31781,8 +31765,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/sdas/doc/asxhtm.ht
-ml
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/sdas/doc/asmlnk.txt
 \end_layout
 
 \end_inset
@@ -36792,7 +36775,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/apps/trac/sdcc/wiki/List%20of%20the%20SDCC%20library
+http://sdcc.sourceforge.net/wiki/index.php/List_of_the_SDCC_library
 \end_layout
 
 \end_inset
@@ -38575,7 +38558,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/mail/?group_id=599
+http://sourceforge.net/p/sdcc/mailman/sdcc-user/
 \end_layout
 
 \end_inset
@@ -43239,7 +43222,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-https://sourceforge.net/apps/trac/sdcc/wiki/z80%20code%20size
+http://sdcc.sourceforge.net/wiki/index.php/Z80_code_size
 \end_layout
 
 \end_inset
@@ -43270,7 +43253,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-https://sourceforge.net/apps/trac/sdcc/wiki/hc08%20code%20size
+http://sdcc.sourceforge.net/wiki/index.php/Hc08_code_size
 \end_layout
 
 \end_inset
@@ -43621,7 +43604,7 @@ __interrupt
 \emph default
 
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 PIC14!interrupt
@@ -50747,7 +50730,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://ec2drv.sf.net/
+http://ec2drv.sourceforge.net/
 \end_layout
 
 \end_inset
@@ -51154,8 +51137,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/doc/figures/ddd_e
-xample.png
+http://sdcc.sourceforge.net/wiki_images/ddd_example.png
 \end_layout
 
 \end_inset
@@ -54620,8 +54602,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/include/mcs51/compile
-r.h?view=markup
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/device/include/mcs51/compiler.h
 \end_layout
 
 \end_inset
@@ -54634,8 +54615,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/include/mcs51/cc2510f
-x.h?view=markup
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/device/include/mcs51/cc2510fx.h
 \end_layout
 
 \end_inset
@@ -56041,7 +56021,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/ChangeLog
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/ChangeLog
 \end_layout
 
 \end_inset
@@ -56110,7 +56090,7 @@ Linker documentation
 \begin_inset Text
 
 \begin_layout Plain Layout
-sdcc/sdas/doc/asxhtm.html 
+sdcc/sdas/doc/asmlnk.txt 
 \emph on
 
 \begin_inset space ~
@@ -56140,8 +56120,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/sdas/doc/asxhtm.ht
-ml
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/sdas/doc/asmlnk.txt
 \end_layout
 
 \end_inset
@@ -56176,7 +56155,7 @@ Regression test
 \begin_inset Text
 
 \begin_layout Plain Layout
-sdcc/doc/test_suite_spec.pdf 
+test_suite_spec
 \emph on
 
 \begin_inset space ~
@@ -56206,7 +56185,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.sourceforge.net/doc/test_suite_spec.pdf
+http://sdcc.sourceforge.net/wiki/index.php/Proposed_Test_Suite_Design
 \end_layout
 
 \end_inset
@@ -56261,7 +56240,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/doc/
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/doc/
 \end_layout
 
 \end_inset
@@ -56326,7 +56305,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/debugger/README
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/debugger/README
 \end_layout
 
 \end_inset
@@ -56408,8 +56387,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/sim/ucsim/doc/ind
-ex.html
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/sim/ucsim/doc/index.html
 \end_layout
 
 \end_inset
@@ -56474,7 +56452,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewvc/*checkout*/sdcc/trunk/sdcc/src/pic16/NOTES
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/src/pic16/NOTES
 \end_layout
 
 \end_inset
@@ -56550,7 +56528,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.sourceforge.net/doc/cdbfileformat.pdf
+http://sdcc.sourceforge.net/wiki/index.php/CDB_File_Format
 \end_layout
 
 \end_inset
@@ -56662,7 +56640,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.wiki.sourceforge.net/
+http://sdcc.sourceforge.net/wiki/
 \end_layout
 
 \end_inset
@@ -56809,7 +56787,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/forum/forum.php?forum_id=1865
+http://sourceforge.net/p/sdcc/discussion/1865
 \end_layout
 
 \end_inset
@@ -56848,7 +56826,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/forum/forum.php?forum_id=1864
+http://sourceforge.net/p/sdcc/discussion/1864
 \end_layout
 
 \end_inset
@@ -56897,7 +56875,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/tracker/?group_id=599
+http://sourceforge.net/p/sdcc/_list/tickets
 \end_layout
 
 \end_inset
@@ -58808,7 +58786,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/tracker/?group_id=599&atid=100599
+http://sourceforge.net/p/sdcc/bugs/
 \end_layout
 
 \end_inset
@@ -58895,7 +58873,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/tracker/?group_id=599&atid=350599
+http://sourceforge.net/p/sdcc/feature-requests/
 \end_layout
 
 \end_inset
@@ -58936,7 +58914,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/tracker/?group_id=599&atid=300599
+http://sourceforge.net/p/sdcc/patches/
 \end_layout
 
 \end_inset
@@ -58993,7 +58971,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/mail/?group_id=599
+http://sourceforge.net/p/sdcc/mailman/sdcc-user/
 \end_layout
 
 \end_inset
@@ -59015,7 +58993,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/forum/?group_id=599
+http://sourceforge.net/p/sdcc/discussion/
 \end_layout
 
 \end_inset
@@ -59080,7 +59058,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.svn.sourceforge.net/viewcvs.cgi/*checkout*/sdcc/trunk/sdcc/ChangeLog
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/ChangeLog
 \end_layout
 
 \end_inset
@@ -59135,49 +59113,12 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/svn/?group_id=599
+http://sourceforge.net/p/sdcc/code/8805/tree/
 \end_layout
 
 \end_inset
 
  (by number or by date).
- An on-line source code browser and detailled instructions are also available
- there.
- SDCC versions starting from 1999 up to now are available (currently the
- versions prior to the conversion from cvs
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-cvs|see
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\end_inset
-
-Subversion
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
- to Subversion (April 2006) are either by accessible by Subversion or by
- cvs).
 \end_layout
 
 \begin_layout Section
@@ -59254,7 +59195,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.wiki.sourceforge.net/
+http://sdcc.sourceforge.net/wiki/
 \end_layout
 
 \end_inset
@@ -59323,35 +59264,6 @@ http://sdcc.sourceforge.net/snap.php
 \end_inset
 
 ).
-\end_layout
-
-\begin_layout Standard
-There is a separate document 
-\shape italic
-test_suite.pdf 
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Test suite
-\end_layout
-
-\end_inset
-
-
-\shape default
- 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://sdcc.sourceforge.net/doc/test_suite_spec.pdf
-\end_layout
-
-\end_inset
-
- about the regression test suite.
 \end_layout
 
 \begin_layout Standard
@@ -59561,7 +59473,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sf.net/projects/fpgac
+http://sourceforge.net/projects/fpgac/
 \end_layout
 
 \end_inset
@@ -59578,7 +59490,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://www.sf.net
+http://sourceforge.net/
 \end_layout
 
 \end_inset
@@ -59617,7 +59529,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sourceforge.net/tracker/?group_id=599&atid=350599
+http://sourceforge.net/p/sdcc/feature-requests/
 \end_layout
 
 \end_inset
@@ -68157,7 +68069,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sdcc.wiki.sourceforge.net/SDCC+internals+and+porting
+http://sdcc.sourceforge.net/wiki/index.php/SDCC_internals_and_porting
 \end_layout
 
 \end_inset
@@ -68168,7 +68080,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://sf.net/mailarchive/message.php?msg_id=13954144
+http://sourceforge.net/mailarchive/message.php?msg_id=13954144
 \end_layout
 
 \end_inset
@@ -72417,7 +72329,7 @@ status collapsed
 
 \begin_layout Plain Layout
 
-http://www.sf.net
+http://sourceforge.net/
 \end_layout
 
 \end_inset
@@ -72444,7 +72356,7 @@ Also thanks to all SDCC Distributed Compile Farm members for donating CPU
 \end_layout
 
 \begin_layout Standard
-This document was initially written by Sandeep Dutta and updated bu SDCC
+This document was initially written by Sandeep Dutta and updated by SDCC
  developers.
 \end_layout
 

@@ -3115,6 +3115,24 @@ status collapsed
 
 \end_inset
 
+-disable-stm8-port Excludes the STM8 port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
 -disable-pic-port Excludes the PIC14 port
 \end_layout
 
@@ -8536,7 +8554,11 @@ sdas6808 - The 6808 assembler.
 \end_layout
 
 \begin_layout Itemize
-sdld -The linker for 8051 type processors.
+sdasstm8 - The STM8 assembler.
+\end_layout
+
+\begin_layout Itemize
+sdld -The linker for 8051 and STM8 type processors.
 \end_layout
 
 \begin_layout Itemize
@@ -8561,6 +8583,10 @@ sz80 - The ucSim Z80 simulator.
 
 \begin_layout Itemize
 shc08 - The ucSim 6808 simulator.
+\end_layout
+
+\begin_layout Itemize
+sstm8 - The ucSim STM8 simulator.
 \end_layout
 
 \begin_layout Itemize
@@ -8741,7 +8767,7 @@ http://shop-pdp.kent.edu/
 \end_layout
 
 \begin_layout Subsection
-s51, sz80, shc08 - The Simulators
+s51, sz80, shc08, sstm8 - The Simulators
 \end_layout
 
 \begin_layout Standard
@@ -8765,12 +8791,22 @@ sz80 (simulator)
 
 \end_inset
 
- and shc08
+ shc08
 \begin_inset Index idx
 status collapsed
 
 \begin_layout Plain Layout
 shc08 (simulator)
+\end_layout
+
+\end_inset
+
+ and sstm8 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+sstm8 (simulator)
 \end_layout
 
 \end_inset
@@ -8790,7 +8826,7 @@ http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/s51
 
 .
  It currently supports the core mcs51, the Dallas DS80C390, the Phillips
- XA51 family, the Z80 and the 6808.
+ XA51 family, the Z80, 6808 and the STM8.
 \end_layout
 
 \begin_layout Subsection
@@ -11582,7 +11618,11 @@ sdcpp (preprocessor)
 \end_layout
 
 \begin_layout Standard
-SDCC uses an adapted version of the GNU Compiler Collection
+SDCC uses 
+\shape italic
+sdcpp
+\shape default
+, an adapted version of the GNU Compiler Collection
 \begin_inset Index idx
 status collapsed
 
@@ -22159,60 +22199,39 @@ SDCC supports named address spaces.
  declare a corresponding named address space:
 \end_layout
 
-\begin_layout Standard
+\begin_layout Verse
 
 \family typewriter
-\begin_inset listings
-inline false
-status collapsed
-
-\begin_layout Plain Layout
-
 void setb0(void); // The function that sets the currently active memory
  bank to b0
-\end_layout
-
-\begin_layout Plain Layout
+\begin_inset Newline newline
+\end_inset
 
 void setb1(void); // The function that sets the currently active memory
  bank to b1
-\end_layout
-
-\begin_layout Plain Layout
+\begin_inset Newline newline
+\end_inset
 
 __addressmod setb0 spaceb0; // Declare a named address space called spaceb0
  that uses setb0()
-\end_layout
-
-\begin_layout Plain Layout
+\begin_inset Newline newline
+\end_inset
 
 __addressmod setb1 spaceb1; // Declare a named address space called spaceb1
  that uses setb1()
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
+\begin_inset Newline newline
+\end_inset
 
 spaceb0 int x; // An int in address space spaceb0
-\end_layout
-
-\begin_layout Plain Layout
+\begin_inset Newline newline
+\end_inset
 
 spaceb1 int *y; // A pointer to an int in address space spaceb1
-\end_layout
-
-\begin_layout Plain Layout
+\begin_inset Newline newline
+\end_inset
 
 spaceb0 int *spaceb1 z; //A pointer in address space sapceb1 that points
  to an int in address space spaceb0
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard

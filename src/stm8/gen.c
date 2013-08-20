@@ -4324,6 +4324,9 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
   unsigned int shCount = ulFromVal (right->aop->aopu.aop_lit);
   unsigned int size;
 
+  struct asmop shiftop_impl;
+  struct asmop *shiftop;
+
   D (emitcode ("; genLeftShiftLiteral", ""));
 
   size = getSize (operandType (result));
@@ -4331,53 +4334,123 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
   /* I suppose that the left size >= result size */
   wassert (getSize (operandType (left)) >= size);
 
+  aopOp (left, ic);
+  aopOp (result, ic);
+
   if (shCount >= (size * 8))
     {
-      aopOp (left, ic);
-      aopOp (result, ic);
-
       while (size--)
         emit3_o (A_CLR, result->aop, size, 0, 0);
+      goto release;
+    }
+
+  unsigned int i;
+
+  wassertl (size <= 2 || shCount <= 1, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
+
+  if (shCount < 8 && aopRS (left->aop) && aopRS (result->aop))
+    {
+      bool all_in_reg = TRUE;
+
+      shiftop_impl.size = result->aop->size;
+      shiftop_impl.regs[A_IDX] = -1;
+      shiftop_impl.regs[XL_IDX] = -1;
+      shiftop_impl.regs[XH_IDX] = -1;
+      shiftop_impl.regs[YL_IDX] = -1;
+      shiftop_impl.regs[YH_IDX] = -1;
+
+      shiftop = &shiftop_impl;
+
+      for (i = 0; i < size;)
+        {
+          if (aopInReg (left->aop, i, A_IDX) && regDead (A_IDX, ic) && result->aop->regs[A_IDX] == -1 && (size <= 1 || shCount >= 2))
+            {
+              shiftop_impl.aopu.bytes[i] = left->aop->aopu.bytes[i];
+              shiftop_impl.regs[A_IDX] = i;
+              i++;
+            }
+          else if (aopInReg (left->aop, i, X_IDX) && regDead (X_IDX, ic) && result->aop->regs[XL_IDX] == -1 && result->aop->regs[XH_IDX] == -1)
+            {
+              shiftop_impl.aopu.bytes[i] = left->aop->aopu.bytes[i];
+              shiftop_impl.aopu.bytes[i + 1] = left->aop->aopu.bytes[i + 1];
+              shiftop_impl.regs[XL_IDX] = i;
+              shiftop_impl.regs[XH_IDX] = i + 1;
+              i += 2;
+            }
+          else if (aopInReg (left->aop, i, Y_IDX) && regDead (Y_IDX, ic) && result->aop->regs[YL_IDX] == -1 && result->aop->regs[YH_IDX] == -1 && !aopInReg (result->aop, i, X_IDX))
+            {
+              shiftop_impl.aopu.bytes[i] = left->aop->aopu.bytes[i];
+              shiftop_impl.aopu.bytes[i + 1] = left->aop->aopu.bytes[i + 1];
+              shiftop_impl.regs[YL_IDX] = i;
+              shiftop_impl.regs[YH_IDX] = i + 1;
+              i += 2;
+            }
+          else if (aopOnStack (left->aop, 0, 2) && aopOnStack (result->aop, 0, 2) && regDead (X_IDX, ic) &&
+            shiftop->regs[XL_IDX] == -1 && shiftop->regs[XH_IDX] == -1 &&
+            left->aop->regs[XL_IDX] == -1 && left->aop->regs[XH_IDX] == -1 && result->aop->regs[XL_IDX] == -1 && result->aop->regs[XH_IDX] == -1)
+            {
+              shiftop_impl.aopu.bytes[i] = ASMOP_X->aopu.bytes[0];
+              shiftop_impl.aopu.bytes[i + 1] = ASMOP_X->aopu.bytes[1];
+              shiftop_impl.regs[XL_IDX] = i;
+              shiftop_impl.regs[XH_IDX] = i + 1;
+              i += 2;
+            }
+          else if (size == 1 && aopOnStack (left->aop, 0, 1) && aopOnStack (right->aop, 0, 1) && regDead (A_IDX, ic) && shiftop->regs[A_IDX] == -1 && result->aop->regs[A_IDX] == -1 && left->aop->regs[A_IDX] == -1) // TODO: More cases.
+            {
+              shiftop_impl.aopu.bytes[i] = ASMOP_A->aopu.bytes[0];
+              shiftop_impl.regs[A_IDX] = i;
+              i++;
+            }
+          else
+            {
+              shiftop_impl.aopu.bytes[i] = result->aop->aopu.bytes[i];
+              if (result->aop->aopu.bytes[i].in_reg)
+                shiftop_impl.regs[result->aop->aopu.bytes[i].byteu.reg->rIdx] = i;
+              i++;
+            }
+        }
+
+      for (i = 0; i < size; i++)
+        if (!shiftop_impl.aopu.bytes[i].in_reg)
+          all_in_reg = FALSE;
+      shiftop_impl.type = all_in_reg ? AOP_REG : AOP_REGSTK;
     }
   else
-    {
-      unsigned int i;
+    shiftop = result->aop;
 
-      wassertl (size <= 2 || shCount <= 1, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
+  genMove (shiftop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
-      aopOp (left, ic);
-      aopOp (result, ic);
-
-      genMove (result->aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
-
-      while (shCount--)
-        for (i = 0; i < size;)
+  while (shCount--)
+    for (i = 0; i < size;)
+      {
+        if (aopInReg (shiftop, i, X_IDX) || aopInReg (shiftop, i, Y_IDX))
           {
-            if (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX))
-              {
-                emit3w_o (i ? A_RLCW : A_SLLW, result->aop, i, 0, 0);
-                i += 2;
-              }
+            emit3w_o (i ? A_RLCW : A_SLLW, shiftop, i, 0, 0);
+            i += 2;
+          }
+        else
+          {
+            int swapidx = -1;
+            if (aopRS (shiftop) && !aopInReg (shiftop, i, A_IDX) && shiftop->aopu.bytes[i].in_reg)
+              swapidx = shiftop->aopu.bytes[i].byteu.reg->rIdx;
+
+            if (swapidx == -1)
+              emit3_o (i ? A_RLC : A_SLL, shiftop, i, 0, 0);
             else
               {
-                int swapidx = -1;
-                if (aopRS (result->aop) && !aopInReg (result->aop, i, A_IDX) && result->aop->aopu.bytes[i].in_reg)
-                  swapidx = result->aop->aopu.bytes[i].byteu.reg->rIdx;
-
-                if (swapidx == -1)
-                  emit3_o (i ? A_RLC : A_SLL, result->aop, i, 0, 0);
-                else
-                  {
-                    swap_to_a (swapidx);
-                    emit3 (i ? A_RLC : A_SLL, ASMOP_A, 0);
-                    swap_from_a (swapidx);
-                  }
-
-                i++;
+                swap_to_a (swapidx);
+                emit3 (i ? A_RLC : A_SLL, ASMOP_A, 0);
+                swap_from_a (swapidx);
               }
-          }
-    }
 
+            i++;
+          }
+      }
+ 
+
+  genMove (result->aop, shiftop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+
+release:
   freeAsmop (left);
   freeAsmop (result);
 }
@@ -4619,7 +4692,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
 
           for (i = 0; i < size;)
             {
-              if (aopInReg (left->aop, i, A_IDX) && regDead (A_IDX, ic) && result->aop->regs[A_IDX] == -1)
+              if (aopInReg (left->aop, i, A_IDX) && regDead (A_IDX, ic) && result->aop->regs[A_IDX] == -1 && (size <= 1 || shCount >= 2))
                 {
                   shiftop_impl.aopu.bytes[i] = left->aop->aopu.bytes[i];
                   shiftop_impl.regs[A_IDX] = i;

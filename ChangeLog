@@ -1,3 +1,8 @@
+2013-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  More efficient left shift by literal.
+
 2013-08-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType): fixed bug 2205 (return discarded if

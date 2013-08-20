@@ -5134,44 +5134,45 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*     return statement       */
       /*----------------------------*/
     case RETURN:
-      if (!tree->right)
-        goto voidcheck;
-
-      if (compareType (currFunc->type->next, RTYPE (tree)) == 0)
+      if (tree->right)
         {
-          werrorfl (tree->filename, tree->lineno, W_RETURN_MISMATCH);
-          printFromToType (RTYPE (tree), currFunc->type->next);
-          goto errorTreeReturn;
-        }
+          int typecompat;
 
-      if (IS_VOID (currFunc->type->next) && tree->right && !IS_VOID (RTYPE (tree)))
+          if (IS_VOID (currFunc->type->next) && tree->right && !IS_VOID (RTYPE (tree)))
+            {
+              werrorfl (tree->filename, tree->lineno, E_FUNC_VOID);
+              goto errorTreeReturn;
+            }
+
+          typecompat = compareType (currFunc->type->next, RTYPE (tree));
+
+          /* if there is going to be a casting required then add it */
+          if (typecompat == -1)
+            {
+              tree->right = newNode (CAST,
+                                     newAst_LINK (copyLinkChain (currFunc->type->next)),
+                                     tree->right);
+              tree->right->values.cast.implicitCast = 1;
+              tree->right = decorateType (tree->right, IS_GENPTR (currFunc->type->next) ? RESULT_TYPE_GPTR : RESULT_TYPE_NONE);
+            }
+          else if (!typecompat)
+            {
+              werrorfl (tree->filename, tree->lineno, W_RETURN_MISMATCH);
+              printFromToType (RTYPE (tree), currFunc->type->next);
+            }
+
+          RRVAL (tree) = 1;
+        }
+      else /* no return value specified */
         {
-          werrorfl (tree->filename, tree->lineno, E_FUNC_VOID);
-          goto errorTreeReturn;
+          if (!IS_VOID (currFunc->type->next) && tree->right == NULL)
+            {
+              werrorfl (tree->filename, tree->lineno, W_VOID_FUNC, currFunc->name);
+              /* We will return an undefined value */
+            }
+
+          TTYPE (tree) = TETYPE (tree) = NULL;
         }
-
-      /* if there is going to be a casting required then add it */
-      if (compareType (currFunc->type->next, RTYPE (tree)) == -1)
-        {
-          tree->right = newNode (CAST,
-                                 newAst_LINK (copyLinkChain (currFunc->type->next)),
-                                 tree->right);
-          tree->right->values.cast.implicitCast = 1;
-          tree->right = decorateType (tree->right, IS_GENPTR (currFunc->type->next) ? RESULT_TYPE_GPTR : RESULT_TYPE_NONE);
-        }
-
-      RRVAL (tree) = 1;
-      return tree;
-
-    voidcheck:
-
-      if (!IS_VOID (currFunc->type->next) && tree->right == NULL)
-        {
-          werrorfl (tree->filename, tree->lineno, W_VOID_FUNC, currFunc->name);
-          goto errorTreeReturn;
-        }
-
-      TTYPE (tree) = TETYPE (tree) = NULL;
       return tree;
 
       /*------------------------------------------------------------------*/

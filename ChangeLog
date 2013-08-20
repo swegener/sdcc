@@ -1,3 +1,8 @@
+2013-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  More efficient right shift by literal.
+
 2013-08-08 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: added some STM8 tools info, various fixes

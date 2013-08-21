@@ -1,3 +1,9 @@
+2013-08-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peep.c,
+	  src/stm8/peeph.def:
+	  Eliminate dead popw / pushw pairs.
+
 2013-08-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

@@ -385,14 +385,28 @@ findLabel (const lineNode *pl)
 /* Check if reading arg implies reading what. */
 static bool argCont(const char *arg, const char *what)
 {
-  return (arg[0] == '#') ? FALSE : strstr(arg, what) != NULL;
+  while (isblank (arg[0]))
+    arg++;
+
+  if (arg[0] == '#')
+    return FALSE;
+
+  if (arg[0] == '(' && arg[1] == '0' && arg[2] == 'x')
+    arg += 3; // Skip hex prefix to avoid false x positive.
+
+  return (strstr(arg, what) != NULL);
 }
 
 /* Check if writing arg implies reading what. */
 static bool argCont2(const char *arg, const char *what)
 {
+  while (isblank (arg[0]))
+    arg++;
+
   if (arg[0] != '(')
     return FALSE;
+  if (arg[1] == '0' && arg[2] == 'x')
+    arg += 2; // Skip hex prefix to avoid false x positive.
   return (strstr (arg + 1, what) && strstr (arg + 1, what) < strchr (arg + 1, ')'));
 }
 
@@ -407,9 +421,9 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if (ISINST (pl->line, "ld\t"))
     {
-      if (argCont (strchr (pl->line, ','), what))
+      if (argCont (strchr (pl->line, ',') + 2, what))
         return TRUE;
-      if (extra && argCont (strchr (pl->line, ','), extra))
+      if (extra && argCont (strchr (pl->line, ',') + 1, extra))
         return TRUE;
       if (extra && argCont2 (pl->line + 3, extra))
         return TRUE;
@@ -418,7 +432,7 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if (ISINST (pl->line, "ldw\t"))
     {
-      if (extra && argCont (strchr (pl->line, ','), extra))
+      if (extra && argCont (strchr (pl->line, ',') + 1, extra))
         return TRUE;
       if (extra && argCont2 (pl->line + 4, extra))
         return TRUE;
@@ -455,7 +469,7 @@ z80SurelyWrites(const lineNode *pl, const char *what)
 
   if (ISINST (pl->line, "ldw\t"))
     {
-      return (extra && strncmp (pl->line + 3, extra, strlen (extra)) == 0);
+      return (extra && strncmp (pl->line + 4, extra, strlen (extra)) == 0);
     }
 
   return FALSE;

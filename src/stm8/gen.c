@@ -2942,7 +2942,7 @@ genPlus (const iCode *ic)
   size = result->aop->size;
 
   /* Swap if left is literal or right is in A. */
-  if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD || aopInReg (right->aop, 0, A_IDX) || right->aop->type != AOP_LIT && right->aop->size == 1 && aopOnStackNotExt (left->aop, 0, 2)) // todo: Swap in more cases when right in reg, left not. Swap individually per-byte.
+  if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD || aopInReg (right->aop, 0, A_IDX) || right->aop->type != AOP_LIT && right->aop->size == 1 && aopOnStackNotExt (left->aop, 0, 2) || left->aop->type == AOP_STK && (right->aop->type == AOP_REG || right->aop->type == AOP_REGSTK)) // todo: Swap in more cases when right in reg, left not. Swap individually per-byte.
     {
       operand *t = right;
       right = left;
@@ -3034,8 +3034,8 @@ genPlus (const iCode *ic)
         }
       else if (right->aop->type == AOP_REG || right->aop->type == AOP_REGSTK && !aopOnStack (right->aop, i, 1)) //todo: Implement handling of right operands that can't be directly added to a.
         {
-          if (!regalloc_dry_run)
-            wassertl (0, "Unimplemented addition operand.");
+          if (!regalloc_dry_run){
+            wassertl (0, "Unimplemented addition operand.");printf("left %d right %d\n", left->aop->type, right->aop->type);}
           cost (80, 80);
           i++;
         }

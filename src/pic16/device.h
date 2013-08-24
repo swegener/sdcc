@@ -69,6 +69,7 @@ typedef struct PIC16_device {
   idBytesInfo_t idInfo;         /* ID Locations info */
   /* next *must* be the first field NOT being copied via 'using' */
   struct PIC16_device *next;    /* linked list */
+  int xinst;                    /* device supports XINST */
 } PIC16_device;
 
 extern PIC16_device *pic16;

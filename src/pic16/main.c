@@ -81,6 +81,7 @@ static char *_pic16_keywords[] =
 
 
 pic16_sectioninfo_t pic16_sectioninfo;
+int has_xinst_config = 0;
 
 extern char *pic16_processor_base_name(void);
 
@@ -471,6 +472,10 @@ do_pragma (int id, const char *name, const char *cp)
                 begin = cp++;
                 while (*cp == '_' || isalnum (*cp))
                   ++cp;
+                if (0 == strncmp("XINST", begin, cp-begin))
+                  {
+                    has_xinst_config = 1;
+                  } // if
                 dbuf_append (&dbuf, begin, cp - begin);
               }
             else

@@ -86,7 +86,8 @@ my @device_names = ();
                              {
                              }
                            ]
-                  }
+                  },
+        XINST  => 0
         }
 =cut
 
@@ -293,6 +294,7 @@ sub compare_devices($$)
   return FALSE if ($Dev1->{CONFIG}->{FIRST} != $Dev2->{CONFIG}->{FIRST});
   return FALSE if ($Dev1->{CONFIG}->{LAST}  != $Dev2->{CONFIG}->{LAST});
   return FALSE if (! compare_config_words(\@{$Dev1->{CONFIG}->{WORDS}}, \@{$Dev2->{CONFIG}->{WORDS}}));
+  return FALSE if ($Dev1->{XINST}           != $Dev2->{XINST});
 
   $m = defined($Dev1->{ID}) + defined($Dev2->{ID});
   return TRUE  if ($m == 0);
@@ -391,6 +393,11 @@ sub print_device($)
     printf "configrange 0x%06X 0x%06X\n", $ref->{FIRST}, $ref->{LAST};
     print_config_words(\@{$ref->{WORDS}});
 
+    if (defined($dev->{XINST}))
+      {
+      printf "XINST       %d\n", $dev->{XINST};
+      }
+
     $ref = $dev->{ID};
 
     if (defined($ref))
@@ -440,7 +447,8 @@ sub read_pic16devices_txt($)
                   COMMENTS => undef,
                   RAM      => {},
                   CONFIG   => {},
-                  ID       => undef
+                  ID       => undef,
+                  XINST    => undef,
                   };
 
         Log("name       : $1", 7);
@@ -464,6 +472,9 @@ sub read_pic16devices_txt($)
         $device->{CONFIG}->{FIRST} = $parent->{CONFIG}->{FIRST};
         $device->{CONFIG}->{LAST}  = $parent->{CONFIG}->{LAST};
         copy_words(\@{$device->{CONFIG}->{WORDS}}, \@{$parent->{CONFIG}->{WORDS}});
+        die "XINST overwritten for $device->{NAME}." if (defined($device->{XINST}) && $device->{XINST} != $parent->{XINST});
+        printf "XINST reset %d -> %d for %s\n", $device->{XINST}, $parent->{XINST}, $device->{NAME} if defined($device->{XINST});
+        $device->{XINST}           = $parent->{XINST};
 
         if (defined($parent->{ID}))
           {
@@ -540,6 +551,15 @@ sub read_pic16devices_txt($)
                                               VALUE    => str2int($3)
                                               });
           }
+        }
+
+      when (/^\s*XINST\s+(\w+)\s*$/io)
+        {
+          die "Device not exists." if (! defined($device));
+
+          Log("XINST    : $1", 7);
+          printf "XINST $device->{XINST} -> $1 for $device->{NAME}.\n" if (defined ($device->{XINST}));
+          $device->{XINST} = str2int($1);
         }
 
       when (/^\s*idlocrange\s+(\w+)\s+(\w+)$/io)

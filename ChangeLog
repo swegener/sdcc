@@ -1,16 +1,16 @@
 2013-08-25 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic16devices.txt:
-	  add flag indicating XINST support per device
+	  add flag indicating XINST availability per device
 	* src/pic16/device.c:
 	  parse XINST flag in pic16devices.txt
 	* src/pic16/device.h:
-	  add field to store XINST support availability per device
+	  add field to store XINST availability per device
 	* src/pic16/glue.c:
 	  emit warning on code breakage when XINST is supported and not
-	  explicitly configured (#pragma config XINST={ON|OFF}).
+	  explicitly disabled (#pragma config XINST=OFF).
 	* src/pic16/main.c:
-	  detect and remember occurrence of #pragma config XINST
+	  detect and remember occurrence of #pragma config XINST=OFF
 	* support/scripts/optimize_pic16devices.pl:
 	  support new XINST flag
 	* support/scripts/pic16_update_xinst.sh:

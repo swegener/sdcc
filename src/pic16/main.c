@@ -451,6 +451,8 @@ do_pragma (int id, const char *name, const char *cp)
 
         do
           {
+            int isXINST = 0;
+
             if (first)
               first = FALSE;
             else
@@ -472,9 +474,10 @@ do_pragma (int id, const char *name, const char *cp)
                 begin = cp++;
                 while (*cp == '_' || isalnum (*cp))
                   ++cp;
-                if (0 == strncmp("XINST", begin, cp-begin))
+                if ((5 == (cp - begin)) && (0 == strncmp("XINST", begin, 5)))
                   {
-                    has_xinst_config = 1;
+                    /* Keep warning if we have XINST=ON ... */
+                    isXINST = 1;
                   } // if
                 dbuf_append (&dbuf, begin, cp - begin);
               }
@@ -497,6 +500,11 @@ do_pragma (int id, const char *name, const char *cp)
                 begin = cp++;
                 while (*cp == '_' || isalnum (*cp))
                   ++cp;
+                if (isXINST && (3 == cp - begin) && (0 == strncmp("OFF", begin, 3)))
+                  {
+                    /* Suppress warning in glue.c if #pragma config XINST=OFF is present. */
+                    has_xinst_config = 1;
+                  } // if
                 dbuf_append (&dbuf, begin, cp - begin);
               }
             else

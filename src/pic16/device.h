@@ -67,9 +67,9 @@ typedef struct PIC16_device {
   unsigned int acsSplitOfs;     /* access bank split offset */
   configWordsInfo_t cwInfo;     /* configuration words info */
   idBytesInfo_t idInfo;         /* ID Locations info */
+  int xinst;                    /* device supports XINST */
   /* next *must* be the first field NOT being copied via 'using' */
   struct PIC16_device *next;    /* linked list */
-  int xinst;                    /* device supports XINST */
 } PIC16_device;
 
 extern PIC16_device *pic16;

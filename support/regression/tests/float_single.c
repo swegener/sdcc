@@ -30,13 +30,8 @@
 #endif
 
 #if defined(__SDCC_stm8)
-#   define ASINF_DISABLED  (1)
-#   define ATANF_DISABLED  (1)
-#   define COSF_DISABLED  (1)
 #   define FLOORF_DISABLED  (1)
 #   define NEG_DISABLED  (1)
-#   define SINF_DISABLED  (1)
-#   define SINHF_DISABLED  (1)
 #endif
 
 static float

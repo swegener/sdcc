@@ -237,6 +237,70 @@ static void assign_operands_for_cost(const assignment &a, unsigned short int i, 
     assign_operands_for_cost(a, *(adjacent_vertices(i, G).first), G, I);
 }
 
+template <class G_t, class I_t>
+static bool operand_sane(const operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+{
+#if 0
+  int v, byteregs[8];	// Todo: Change this when sdcc supports variables larger than 8 bytes.
+  unsigned short int size;
+
+  if(!o || !IS_SYMOP(o))
+    return(true);
+ 
+  operand_map_t::const_iterator oi, oi_end;
+  boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key);
+  
+  if(oi == oi_end)
+    return(true);
+  
+  // Ensure: Fully in registers or fully in mem.
+  if(a.local.find(oi->second) != a.local.end())
+    {
+      while(++oi != oi_end)
+        if(a.local.find(oi->second) == a.local.end())
+          return(false);
+    }
+  else
+    {
+       while(++oi != oi_end)
+        if(a.local.find(oi->second) != a.local.end())
+          return(false);
+    }
+
+  boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key);
+  v = oi->second;
+  byteregs[I[v].byte] = a.global[v];
+  size = 1;
+  while(++oi != oi_end)
+    {
+      v = oi->second;
+      byteregs[I[v].byte] = a.global[v];
+      size++;
+    }
+
+  if (byteregs[0] == -1)
+    return(true);
+
+  // Ensure: 8 bit only in A, 16 bit only in X or Y.
+  if (size == 1)
+    return(byteregs[0] == A_IDX);
+  if (size == 2)
+    return(byteregs[0] == XL_IDX && byteregs[1] == XH_IDX || byteregs[0] == YL_IDX && byteregs[1] == YH_IDX);
+  if (size > 2)
+    return(false);
+#endif
+
+  return(true);
+}
+
+template <class G_t, class I_t>
+static bool inst_sane(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
+{
+  const iCode *ic = G[i].ic;
+
+  return(operand_sane(IC_RESULT(ic), a, i, G, I) && operand_sane(IC_LEFT(ic), a, i, G, I) && operand_sane(IC_RIGHT(ic), a, i, G, I));
+}
+
 // Cost function.
 template <class G_t, class I_t>
 static float instruction_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
@@ -246,8 +310,8 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
 
   wassert (TARGET_IS_STM8);
 
-  /*if(!inst_sane(a, i, G, I))
-    return(std::numeric_limits<float>::infinity());*/
+  if(!inst_sane(a, i, G, I))
+    return(std::numeric_limits<float>::infinity());
 
 #if 0
   std::cout << "Calculating at cost at ic " << ic->key << ", op " << ic->op << " for: ";

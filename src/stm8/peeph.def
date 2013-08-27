@@ -35,7 +35,7 @@ replace restart {
 } by {
 	cpl	%1
 	; peephole 2 complemented in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -44,7 +44,7 @@ replace restart {
 } by {
 	dec	%1
 	; peephole 3 decremented in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -53,7 +53,7 @@ replace restart {
 } by {
 	inc	%1
 	; peephole 4 incremented in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -62,7 +62,7 @@ replace restart {
 } by {
 	neg	%1
 	; peephole 5 negated in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1, 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -71,7 +71,7 @@ replace restart {
 } by {
 	rlc	%1
 	; peephole 6 rotated in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -80,7 +80,7 @@ replace restart {
 } by {
 	rrc	%1
 	; peephole 7 rotated in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1, 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -89,7 +89,7 @@ replace restart {
 } by {
 	sll	%1
 	; peephole 8 shifted in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -98,7 +98,7 @@ replace restart {
 } by {
 	sra	%1
 	; peephole 9 shifted in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -107,7 +107,7 @@ replace restart {
 } by {
 	srl	%1
 	; peephole 10 shifted in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
@@ -115,7 +115,7 @@ replace restart {
 } by {
 	tst	%1
 	; peephole 11 tested in %1 instead of a.
-} if notUsed('a')
+} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	call	%1

@@ -48,7 +48,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
 
   operand_map_t::const_iterator oi, oi_end;
 
-  var_t byteregs[4];	// Todo: Change this when sdcc supports variables larger than 4 bytes.
+  var_t byteregs[4];	// Todo: Change this when sdcc supports variables larger than 4 bytes in registers.
   unsigned short int size;
 
   if(o && IS_SYMOP(o))

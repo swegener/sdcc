@@ -51,7 +51,7 @@ typedef struct asmop_byte
   union
   {
     reg_info *reg;    /* Register this byte is in. */
-    int stk; /* Stack offset for this byte. */
+    long int stk; /* Stack offset for this byte. */
   } byteu;
 } asmop_byte;
 

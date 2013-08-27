@@ -1,3 +1,10 @@
+2013-08-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Fix handling of A in float negation and equality comparison, more flexible addition and subtraction.
+	* support/regression/tests/float_single.c:
+	  Enable tests for asinf(), atanf(), cosf(), sinf(), sinhf().
+
 2013-08-25 Raphael Neider <rneider AT web.de>
 
 	* device/include/pic16/pic16devices.txt:

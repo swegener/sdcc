@@ -148,9 +148,9 @@ stm8instructionSize(const lineNode *pl)
   operand = nextToken(pl->line);
   op1start = nextToken(NULL);
   op2start = nextToken(NULL);
-  //fprintf(stderr, "op1start=%s op2start=%s\n", op1start, op2start);
+
   while(op2start && isspace(*op2start)) op2start++;
-  //printf("operand=%s op1start=%s op2start=%s\n", operand, op1start, op2start);
+  //printf("line=%s operand=%s op1start=%s op2start=%s\n", pl->line, operand, op1start, op2start);
 
   /* arity=1 */
   if(EQUALS(operand, "clr")

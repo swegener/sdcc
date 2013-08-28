@@ -431,7 +431,7 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
   float c = 0.0f;
 
   if(ia.registers[REG_A][1] < 0)
-    c += 0.1f;
+    c += 0.05f;
 
   /*if(ia.registers[REG_XL][1] < 0 && ia.registers[REG_YL][1] >= 0) // Prefer X over Y.
     c += 0.3f;*/
@@ -440,10 +440,14 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
   for(v = a.local.begin(), v_end = a.local.end(); v != v_end; ++v)
     {
       const symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
-      if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // When in doubt, try to honour register keyword.
+      if(a.global[*v] < 0) // Try to put variables into registers.
+        c += 0.1f;
+      if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // Try to honour register keyword.
         c += 4.0f;
-      if((I[*v].byte % 2) ^ (a.global[*v] == REG_XH /*|| a.global[*v] == REG_YH*/)) // Try not to reverse bytes.
-        c += 0.2f;
+      if((I[*v].byte % 2) && (a.global[*v] == REG_XL || a.global[*v] == REG_YL)) // Try not to reverse bytes.
+        c += 0.1f;
+      if(!(I[*v].byte % 2) && (a.global[*v] == REG_XH || a.global[*v] == REG_YH)) // Try not to reverse bytes.
+        c += 0.1f;
     }
 
   return(c);

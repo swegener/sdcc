@@ -132,6 +132,14 @@ replace restart {
 	; peephole j2 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
+replace restart {
+	jp	%1
+	jp	%2
+} by {
+	jp	%2
+	; peephole j2a removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
 // Ensure jump-to-jump optimiation of absolute jumps above is done before other jump-related optimizations.
 barrier
 

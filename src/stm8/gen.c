@@ -3168,8 +3168,8 @@ genPlus (const iCode *ic)
             emit3_o (A_DEC, result->aop, i, 0, 0);
           i++;
         }
-      else if (!started && (x_free || aopInReg(leftop, i, X_IDX) && regDead (X_IDX, ic)) && i + 1 < rightop->size &&
-        (aopOnStackNotExt (rightop, i, 2) || rightop->type == AOP_LIT || rightop->type == AOP_IMMD) &&
+      else if (!started && (x_free || aopInReg(leftop, i, X_IDX) && regDead (X_IDX, ic)) &&
+        (aopOnStackNotExt (rightop, i, 2) || rightop->type == AOP_LIT || rightop->type == AOP_IMMD && i + 1 < rightop->size) &&
         ((aopOnStack (result->aop, i, 2) || result->aop->type == AOP_DIR) && (aopRS (leftop) && !aopInReg(leftop, i, A_IDX) && !aopInReg(leftop, i + 1, A_IDX) || leftop->type == AOP_DIR) ||
         aopInReg(leftop, i, X_IDX) && aopInReg(result->aop, i, Y_IDX) ||
         aopInReg(leftop, i, X_IDX) && (result->aop->regs[XL_IDX] < 0 || result->aop->regs[XL_IDX] >= i) && (result->aop->regs[XH_IDX] < 0 || result->aop->regs[XH_IDX] >= i) && (aopInReg(leftop, i, XL_IDX) || aopInReg(leftop, i + 1, XH_IDX) || aopInReg(leftop, i, XH_IDX) && aopInReg(leftop, i + 1, XL_IDX))))
@@ -3190,7 +3190,7 @@ genPlus (const iCode *ic)
       else if (!started && (y_free || aopInReg(leftop, i, Y_IDX) && regDead (Y_IDX, ic)) && 
         (aopOnStack (result->aop, i, 2) || result->aop->type == AOP_DIR) &&
         (aopOnStack (leftop, i, 2) || aopInReg(leftop, i, Y_IDX) || leftop->type == AOP_DIR) &&
-        (aopOnStackNotExt (rightop, i, 2) || rightop->type == AOP_LIT || rightop->type == AOP_IMMD))
+        (aopOnStackNotExt (rightop, i, 2) || rightop->type == AOP_LIT || rightop->type == AOP_IMMD && i + 1 < rightop->size))
         {
           genMove_o (ASMOP_Y, 0, leftop, i, 2, a_free, TRUE, FALSE);
           if (i == size - 2 && rightop->type == AOP_LIT && byteOfVal (rightop->aopu.aop_lit, i) <= 2 && !byteOfVal (rightop->aopu.aop_lit, i + 1))

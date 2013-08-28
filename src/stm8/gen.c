@@ -258,8 +258,8 @@ aopOnStack (const asmop *aop, int offset, int size)
 
   // Consecutive?
   stk_base = aop->aopu.bytes[offset].byteu.stk;
-  for (i = offset + 1; i < offset + size; i++)
-    if (aop->aopu.bytes[i].byteu.stk != stk_base - i)
+  for (i = 1; i < size; i++)
+    if (!regalloc_dry_run && aop->aopu.bytes[offset + i].byteu.stk != stk_base - i) // Todo: Stack offsets might be unavailable during dry run (messes with addition costs, so we should have a mechanism to do it better).
       return (FALSE);
 
   return (TRUE);

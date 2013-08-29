@@ -29,6 +29,34 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
+	ld	a, (%1, y)
+	push	a
+	ld	a, (%2, x)
+	ld	(%3, sp), a
+	pop	a
+} by {
+	ld	a, (%2, x)
+	ld	(%3, sp), a
+	ld	a, (%1, y)
+	; peephole 1b changed order of memory accesses to avoid pushing a.
+}
+// TODO: Check for volatile (can't do it if both (%1, y) and (%2, x) are volatile)!
+
+replace restart {
+	ld	a, (%1, y)
+	push	a
+	ld	a, (x)
+	ld	(%3, sp), a
+	pop	a
+} by {
+	ld	a, (x)
+	ld	(%3, sp), a
+	ld	a, (%1, y)
+	; peephole 1c changed order of memory accesses to avoid pushing a.
+}
+// TODO: Check for volatile (can't do it if both (%1, y) and (%2, x) are volatile)!
+
+replace restart {
 	ld	a, %1
 	cpl	a
 	ld	%1, a
@@ -118,12 +146,15 @@ replace restart {
 } if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
-	call	%1
-	ret
+	ld	a, (x)
+	or	a, #0x80
+	ld	(x), a
 } by {
-	jp	%1
-	; peephole j1 replaced call at end of function by jump (tail call optimization).
-}
+	rlc	(x)
+	scf
+	rrc	(x)
+	; peephole 11a set msb in carry instead of a.
+} if notUsed('a')
 
 replace restart {
 	jp	%5
@@ -382,4 +413,14 @@ replace restart {
 } by {
 	; peephole j18 removed unused label %1.
 } if labelRefCount(%1 0)
+
+barrier
+
+replace restart {
+	call	%1
+	ret
+} by {
+	jp	%1
+	; peephole j1 replaced call at end of function by jump (tail call optimization).
+}
 

@@ -411,6 +411,64 @@ static bool argCont2(const char *arg, const char *what)
 }
 
 static bool
+isReturned(const char *what)
+{
+  symbol *sym;
+  sym_link *sym_lnk;
+  int size;
+  lineNode *l;
+
+  l = _G.head;
+  do
+  {
+    l = l->next;
+  } while(l->isComment || l->ic == NULL || l->ic->op != FUNCTION);
+
+  sym = OP_SYMBOL(IC_LEFT(l->ic));
+
+  if(sym && IS_DECL(sym->type))
+    {
+      // Find size of return value.
+      specifier *spec;
+      if(sym->type->select.d.dcl_type != FUNCTION)
+        NOTUSEDERROR();
+      spec = &(sym->etype->select.s);
+      if(spec->noun == V_VOID)
+        size = 0;
+      else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
+        size = 1;
+      else if(spec->noun == V_INT && !(spec->b_long))
+        size = 2;
+      else
+        size = 4;
+
+      // Check for returned pointer.
+      sym_lnk = sym->type;
+      while (sym_lnk && !IS_PTR (sym_lnk))
+        sym_lnk = sym_lnk->next;
+      if(IS_PTR(sym_lnk))
+        size = 2;
+    }
+  else
+    {
+      NOTUSEDERROR();
+      return TRUE;
+    }
+
+  switch(*what)
+    {
+    case 'a':
+      return(size == 1);
+    case 'x':
+      return(size > 1);
+    case 'y':
+      return(size > 2);
+    default:
+      return FALSE;
+    }
+}
+
+static bool
 z80MightRead(const lineNode *pl, const char *what)
 {
   const char *extra = 0;
@@ -418,6 +476,9 @@ z80MightRead(const lineNode *pl, const char *what)
     extra = "x";
   if (!strcmp (what, "yl") || !strcmp (what, "yh"))
     extra = "y";
+
+  if (ISINST (pl->line, "addw\t"))
+    return (extra && extra[0] == pl->line[5]);
 
   if (ISINST (pl->line, "ld\t"))
     {
@@ -438,6 +499,9 @@ z80MightRead(const lineNode *pl, const char *what)
         return TRUE;
       return FALSE;
     }
+
+  if(ISINST(pl->line, "ret"))
+    return(isReturned(what));
 
   return TRUE;
 }
@@ -472,15 +536,16 @@ z80SurelyWrites(const lineNode *pl, const char *what)
       return (extra && strncmp (pl->line + 4, extra, strlen (extra)) == 0);
     }
 
+  if(ISINST(pl->line, "ret"))
+    return TRUE;
+
   return FALSE;
 }
 
 static bool
 z80SurelyReturns(const lineNode *pl)
 {
-  if(strcmp(pl->line, "\tret") == 0)
-    return TRUE;
-  return FALSE;
+  return(ISINST(pl->line, "ret"));
 }
 
 /*-----------------------------------------------------------------*/

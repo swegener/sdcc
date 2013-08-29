@@ -1,3 +1,12 @@
+2013-08-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Rules for bit setting.
+	* src/stm8/peep.c:
+	  Implement more of register use check.
+	* src/stm8/gen.c:
+	  Fix byte skipping in subtraction.
+
 2013-08-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

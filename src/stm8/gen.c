@@ -2182,7 +2182,6 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
               cost ((x || aopOnStack (right_aop, 0, 2)) ? 3 : 4, 2);
               started = TRUE;
             }
-          started = TRUE;
           i += 2;
         }
       else if (!started && left_aop->type == AOP_LIT && !byteOfVal (left_aop->aopu.aop_lit, i) &&
@@ -2208,10 +2207,11 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
             emit3_o (A_INC, result_aop, i, 0, 0);
           i++;
         }
-      else if (!started && x_free && 
-        (aopOnStack (result_aop, i, 2) || result_aop->type == AOP_DIR) &&
-        (aopRS (left_aop) && !aopInReg(left_aop, i, A_IDX) && !aopInReg(left_aop, i + 1, A_IDX) || left_aop->type == AOP_DIR) &&
-        (aopOnStackNotExt (right_aop, i, 2) || right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD))
+      else if (!started && (x_free || aopInReg(left_aop, i, X_IDX) && regDead (X_IDX, ic)) &&
+        (aopOnStackNotExt (right_aop, i, 2) || right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD && i + 1 < right_aop->size) &&
+        ((aopOnStack (result_aop, i, 2) || result_aop->type == AOP_DIR) && (aopRS (left_aop) && !aopInReg(left_aop, i, A_IDX) && !aopInReg(left_aop, i + 1, A_IDX) || left_aop->type == AOP_DIR) ||
+        aopInReg(left_aop, i, X_IDX) && aopInReg(result_aop, i, Y_IDX) ||
+        aopInReg(left_aop, i, X_IDX) && (result_aop->regs[XL_IDX] < 0 || result_aop->regs[XL_IDX] >= i) && (result_aop->regs[XH_IDX] < 0 || result_aop->regs[XH_IDX] >= i) && (aopInReg(left_aop, i, XL_IDX) || aopInReg(left_aop, i + 1, XH_IDX) || aopInReg(left_aop, i, XH_IDX) && aopInReg(left_aop, i + 1, XL_IDX))))
         {
           genMove_o (ASMOP_X, 0, left_aop, i, 2, a_free, TRUE, FALSE);
           if (i == size - 2 && right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) <= 2 && !byteOfVal (right_aop->aopu.aop_lit, i + 1))
@@ -2227,7 +2227,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           i += 2;
         }
       else if (!started && left_aop->type == AOP_LIT && !byteOfVal (left_aop->aopu.aop_lit, i))
-        {
+        {emitcode(";", "F");
           if (!a_free)
             {
               push (ASMOP_A, 0, 1);
@@ -3213,7 +3213,7 @@ genPlus (const iCode *ic)
           started = TRUE;
           i++;
         }
-      else if (!started && i == size - 1 && rightop->type == AOP_LIT && // For yl, we only save a cycle comapred to the normal way.
+      else if (!started && i == size - 1 && rightop->type == AOP_LIT && // For yl, we only save a cycle compared to the normal way.
         (aopInReg (leftop, i, XL_IDX) && aopInReg (result->aop, i, XL_IDX) && xh_free || aopInReg (leftop, i, YL_IDX) && aopInReg (result->aop, i, YL_IDX) && yh_free))
         {
           emitcode ("addw", "%s, #%d", aopInReg (leftop, i, YL_IDX) ? "y" : "x", byteOfVal (rightop->aopu.aop_lit, i));

@@ -338,7 +338,7 @@ replace {
 	;	Peephole 108.a	removed ljmp by inverse jump logic
 	jnc	%5
 %1:
-} if labelInRange(), labelRefCountChange(%1 -1)
+} if labelInRange(%5), labelRefCountChange(%1 -1)
 
 replace {
 	jz	%1
@@ -348,7 +348,7 @@ replace {
 	;	Peephole 108.b	removed ljmp by inverse jump logic
 	jnz	%5
 %1:
-} if labelInRange(), labelRefCountChange(%1 -1)
+} if labelInRange(%5), labelRefCountChange(%1 -1)
 
 replace {
 	jnz	%1
@@ -358,7 +358,7 @@ replace {
 	;	Peephole 108.c	removed ljmp by inverse jump logic
 	jz	%5
 %1:
-} if labelInRange(), labelRefCountChange(%1 -1)
+} if labelInRange(%5), labelRefCountChange(%1 -1)
 
 replace {
 	jb	%1,%2
@@ -368,7 +368,7 @@ replace {
 	;	Peephole 108.d	removed ljmp by inverse jump logic
 	jnb	%1,%5
 %2:
-} if labelInRange(), labelRefCountChange(%2 -1)
+} if labelInRange(%5), labelRefCountChange(%2 -1)
 
 replace {
 	jnb	%1,%2
@@ -378,7 +378,7 @@ replace {
 	;	Peephole 108.e	removed ljmp by inverse jump logic
 	jb	%1,%5
 %2:
-} if labelInRange(), labelRefCountChange(%2 -1)
+} if labelInRange(%5), labelRefCountChange(%2 -1)
 
 replace {
 	ljmp	%5
@@ -387,7 +387,7 @@ replace {
 	;	Peephole 112.b	changed ljmp to sjmp
 	sjmp	%5
 %1:
-} if labelInRange
+} if labelInRange(%5)
 
 replace {
 	clr	a
@@ -3035,7 +3035,7 @@ replace {
 	inc	%4
 %3:
 	sjmp	%5
-} if labelInRange(), labelRefCountChange(%3 -1), labelRefCountChange(%5 1)
+} if labelInRange(%5), labelRefCountChange(%3 -1), labelRefCountChange(%5 1)
 
 // applies to f.e. simplefloat.c (saving 1 cycle)
 replace {
@@ -3862,7 +3862,7 @@ replace {
 } by {
 	;	Peephole 251.a	replaced ljmp %5 to ret with ret
 	ret
-} if optimizeReturn(), labelIsReturnOnly(), labelRefCountChange(%5 -1)
+} if optimizeReturn(), labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
 // not before peephole 250.b
 replace {
@@ -3870,7 +3870,7 @@ replace {
 } by {
 	;	Peephole 251.b	replaced sjmp %5 to ret with ret
 	ret
-} if optimizeReturn(), labelIsReturnOnly(), labelRefCountChange(%5 -1)
+} if optimizeReturn(), labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
 // applies to shifts.c and when accessing arrays with an unsigned integer index
 // saving 1 byte, 2 cycles

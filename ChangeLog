@@ -1,5 +1,17 @@
 2013-08-29 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCpeeph.c,
+	  src/ds390/peeph.def,
+	  src/hc08/peeph.def,
+	  src/mcs51/peeph.def,
+	  src/stm8/peeph.def,
+	  src/z80/peeph-gbz80.def,
+	  src/z80/peeph-r2k.def,
+	  src/z80/peeph-z80.def:
+	  Simplified peephole rules.
+
+2013-08-29 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/peeph.def:
 	  Rules for bit setting.
 	* src/stm8/peep.c:

@@ -185,7 +185,7 @@ replace {
         ; Peephole 108   removed ljmp by inverse jump logic
         jnc  %5
 %1:
-} if labelInRange
+} if labelInRange(%5)
 
 replace {
         jz   %1
@@ -195,7 +195,7 @@ replace {
         ; Peephole 109   removed ljmp by inverse jump logic
         jnz  %5
 %1:
-} if labelInRange
+} if labelInRange(%5)
 
 replace {
         jnz  %1
@@ -205,7 +205,7 @@ replace {
         ; Peephole 110   removed ljmp by inverse jump logic
         jz  %5
 %1:
-} if labelInRange
+} if labelInRange(%5)
 
 replace {
         jb   %1,%2
@@ -215,7 +215,7 @@ replace {
         ; Peephole 111   removed ljmp by inverse jump logic
         jnb  %1,%5
 %2:
-} if labelInRange
+} if labelInRange(%5)
 
 replace {
         jnb  %1,%2
@@ -225,7 +225,7 @@ replace {
        ; Peephole 112   removed ljmp by inverse jump logic
         jb   %1,%5
 %2:
-} if labelInRange
+} if labelInRange(%5)
 
 replace {
         ljmp %5
@@ -234,7 +234,7 @@ replace {
         ; Peephole 132   changed ljmp to sjmp
         sjmp %5
 %1:
-} if labelInRange
+} if labelInRange(%5)
 
 
 replace {

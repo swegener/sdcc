@@ -10,7 +10,7 @@ replace restart {
 //	ld	%1, %2
 //	ld	%3, %1
 //} by {
-//	; peephole 0' loaded %3 from %2 directly instead of going through %1.
+//	; peephole 1 loaded %3 from %2 directly instead of going through %1.
 //	ld	%3, %2
 //} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
 
@@ -18,14 +18,14 @@ replace restart {
 	pop	%1
 	push	%1
 } by {
-	; peephole 1 removed dead pop / push pair.
+	; peephole 2 removed dead pop / push pair.
 } if notUsed(%1)
 
 replace restart {
 	popw	%1
 	pushw	%1
 } by {
-	; peephole 1a removed dead popw / pushw pair.
+	; peephole 3 removed dead popw / pushw pair.
 } if notUsed(%1)
 
 replace restart {
@@ -38,7 +38,7 @@ replace restart {
 	ld	a, (%2, x)
 	ld	(%3, sp), a
 	ld	a, (%1, y)
-	; peephole 1b changed order of memory accesses to avoid pushing a.
+	; peephole 4 changed order of memory accesses to avoid pushing a.
 }
 // TODO: Check for volatile (can't do it if both (%1, y) and (%2, x) are volatile)!
 
@@ -52,97 +52,37 @@ replace restart {
 	ld	a, (x)
 	ld	(%3, sp), a
 	ld	a, (%1, y)
-	; peephole 1c changed order of memory accesses to avoid pushing a.
+	; peephole 5 changed order of memory accesses to avoid pushing a.
 }
 // TODO: Check for volatile (can't do it if both (%1, y) and (%2, x) are volatile)!
 
 replace restart {
-	ld	a, %1
-	cpl	a
-	ld	%1, a
+	ldw	%1, (%2, sp)
+	ld	a, (%1)
+	%3	a
+	ldw	%1, (%2, sp)
 } by {
-	cpl	%1
-	; peephole 2 complemented in %1 instead of a.
-} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
+	ldw	%1, (%2, sp)
+	ld	a, (%1)
+	%3	a
+	; peephole 6 removed redundant load from (%2, sp) into %1.
+} if notSame(%3 'push' 'pop')
 
 replace restart {
 	ld	a, %1
-	dec	a
+	%2	a
 	ld	%1, a
 } by {
-	dec	%1
-	; peephole 3 decremented in %1 instead of a.
-} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
-
-replace restart {
-	ld	a, %1
-	inc	a
-	ld	%1, a
-} by {
-	inc	%1
-	; peephole 4 incremented in %1 instead of a.
-} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
-
-replace restart {
-	ld	a, %1
-	neg	a
-	ld	%1, a
-} by {
-	neg	%1
-	; peephole 5 negated in %1 instead of a.
-} if notUsed('a'), notSame(%1, 'xl' 'xh' 'yl' 'yh')
-
-replace restart {
-	ld	a, %1
-	rlc	a
-	ld	%1, a
-} by {
-	rlc	%1
-	; peephole 6 rotated in %1 instead of a.
-} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
-
-replace restart {
-	ld	a, %1
-	rrc	a
-	ld	%1, a
-} by {
-	rrc	%1
-	; peephole 7 rotated in %1 instead of a.
-} if notUsed('a'), notSame(%1, 'xl' 'xh' 'yl' 'yh')
-
-replace restart {
-	ld	a, %1
-	sll	a
-	ld	%1, a
-} by {
-	sll	%1
-	; peephole 8 shifted in %1 instead of a.
-} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
-
-replace restart {
-	ld	a, %1
-	sra	a
-	ld	%1, a
-} by {
-	sra	%1
-	; peephole 9 shifted in %1 instead of a.
-} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
-
-replace restart {
-	ld	a, %1
-	srl	a
-	ld	%1, a
-} by {
-	srl	%1
-	; peephole 10 shifted in %1 instead of a.
-} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
+	%2	%1
+	; peephole 7 applied %2 on %1 instead of a.
+} if notUsed('a'), notSame(%2 'push' 'pop'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
 	ld	a, %1
 	tst	a
 } by {
 	tst	%1
-	; peephole 11 tested in %1 instead of a.
+	; peephole 8 tested in %1 instead of a.
 } if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
@@ -153,14 +93,14 @@ replace restart {
 	rlc	(x)
 	scf
 	rrc	(x)
-	; peephole 11a set msb in carry instead of a.
+	; peephole 9 set msb in carry instead of a.
 } if notUsed('a')
 
 replace restart {
 	jp	%5
 } by {
 	jp	%6
-	; peephole j2 jumped to %6 directly instead of via %5.
+	; peephole j1 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
@@ -168,7 +108,7 @@ replace restart {
 	jp	%2
 } by {
 	jp	%2
-	; peephole j2a removed unreachable jump to %2.
+	; peephole j2 removed unreachable jump to %2.
 } if labelRefCountChange(%2 -1)
 
 // Ensure jump-to-jump optimiation of absolute jumps above is done before other jump-related optimizations.
@@ -414,6 +354,7 @@ replace restart {
 	; peephole j18 removed unused label %1.
 } if labelRefCount(%1 0)
 
+// Barrier, since notUSed() is better at dealing with ret than with jp to unknown location.
 barrier
 
 replace restart {
@@ -421,6 +362,6 @@ replace restart {
 	ret
 } by {
 	jp	%1
-	; peephole j1 replaced call at end of function by jump (tail call optimization).
+	; peephole j19 replaced call at end of function by jump (tail call optimization).
 }
 

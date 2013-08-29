@@ -174,6 +174,10 @@ FBYNAME (labelInRange)
 
   if (!lbl)
     {
+      fprintf (stderr,
+             "*** internal error: labelInRange peephole restriction"
+             " malformed: %s\n", cmdLine);
+
       /* If no parameters given, assume that %5 pattern variable
          has the label name for backward compatibility */
       lbl = hTabItemWithKey (vars, 5);
@@ -264,7 +268,7 @@ FBYNAME (optimizeReturn)
 }
 
 /*-----------------------------------------------------------------*/
-/* labelIsReturnOnly - Check if label %5 is followed by RET        */
+/* labelIsReturnOnly - Check if label is followed by ret          */
 /*-----------------------------------------------------------------*/
 FBYNAME (labelIsReturnOnly)
 {
@@ -278,7 +282,17 @@ FBYNAME (labelIsReturnOnly)
   if (currPl->ic && currPl->ic->op == JUMPTABLE)
     return FALSE;
 
-  label = hTabItemWithKey (vars, 5);
+  if (!(label = getPatternVar (vars, &cmdLine)))
+    {
+      fprintf (stderr,
+             "*** internal error: labelIsReturnOnly peephole restriction"
+             " malformed: %s\n", cmdLine);
+
+      /* If no parameters given, assume that %5 pattern variable
+         has the label name for backward compatibility */
+      label = hTabItemWithKey (vars, 5);
+    }
+
   if (!label)
     return FALSE;
   len = strlen(label);

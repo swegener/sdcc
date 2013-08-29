@@ -2097,47 +2097,47 @@ replace restart {
 } by {
 	ret
 	; peephole 151 replaced jump by return.
-} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
+} if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
 replace restart {
 	jp	%1,%5
 } by {
 	ret	%1
 	; peephole 152 replaced jump by return.
-} if labelIsReturnOnly(), labelRefCountChange(%5 -1)
+} if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
 replace {
 	jp	%5
 } by {
 	jr	%5
 	; peephole 153 changed absolute to relative unconditional jump.
-} if labelInRange()
+} if labelInRange(%5)
 
 replace {
 	jp	Z,%5
 } by {
 	jr	Z,%5
 	; peephole 154 changed absolute to relative conditional jump.
-} if labelInRange()
+} if labelInRange(%5)
 
 replace {
 	jp	NZ,%5
 } by {
 	jr	NZ,%5
 	; peephole 155 changed absolute to relative conditional jump.
-} if labelInRange()
+} if labelInRange(%5)
 
 replace {
 	jp	C,%5
 } by {
 	jr	C,%5
 	; peephole 156 changed absolute to relative conditional jump.
-} if labelInRange()
+} if labelInRange(%5)
 
 replace {
 	jp	NC,%5
 } by {
 	jr	NC,%5
 	; peephole 157 changed absolute to relative conditional jump.
-} if labelInRange()
+} if labelInRange(%5)
 

@@ -1,3 +1,9 @@
+2013-08-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  support/regression/tests/bug-2208.c:
+	  Fix bug #2208.
+
 2013-08-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,

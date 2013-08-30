@@ -981,7 +981,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
 
   if(!result_in_IY && !input_in_IY &&
-    (ic->op == '=' || ic->op == CAST && (getSize(operandType(IC_RESULT (ic))) <= getSize(operandType(IC_RIGHT (ic))) || !IS_SPEC(operandType(IC_RIGHT (ic))) || SPEC_USIGN(operandType(IC_RIGHT(ic))))) &&
+    (ic->op == '=' || ic->op == CAST && getSize(operandType(IC_RIGHT (ic))) >= 2 && (getSize(operandType(IC_RESULT (ic))) <= getSize(operandType(IC_RIGHT (ic))) || !IS_SPEC(operandType(IC_RIGHT (ic))) || SPEC_USIGN(operandType(IC_RIGHT(ic))))) &&
     operand_is_pair(IC_RESULT(ic), a, i, G))	// DirSpace access won't use iy here.
     return(true);
 

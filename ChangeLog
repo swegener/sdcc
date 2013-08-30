@@ -1,3 +1,9 @@
+2013-08-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug-2205.c: new, added
+	* support/regression/tests/*: set svn properties eol and keywords
+	* device/lib/clean.mk: add stm8 port to cleaning
+
 2013-08-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,

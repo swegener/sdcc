@@ -1,3 +1,8 @@
+2013-08-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Slightly more efficient addition and loading through frame pointer.
+
 2013-08-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug-2205.c: new, added

@@ -1756,6 +1756,21 @@ skip_byte:
           size -= 2;
           i += 2;
         }
+      else if (i < n - 1 && aopInReg (result, roffset + i, X_IDX) && aopOnStack (source, soffset + i, 2))
+        {
+          long int eoffset = (long int)(source->aopu.bytes[i + 1].byteu.stk) + _G.stack.size - 256l;
+
+          wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
+          wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
+
+          emitcode ("ldw", "x, y");
+          cost (1, 1);
+          emitcode ("ldw", "x, (0x%x, x)", (unsigned)eoffset);
+          cost (2 + (eoffset > 255), 2);
+          x_free = FALSE;
+          size -= 2;
+          i += 2;
+        }
       // todo: Try to use ldw to load xl, xh, yl, yh when the other half is not in use.
       else if (aopRS (result) && !aopOnStack (result, roffset + i, 1) && aopOnStack (source, soffset + i, 1))
         {
@@ -3238,7 +3253,12 @@ genPlus (const iCode *ic)
         }
       else
         {
-          if (!a_free)
+          if (pushed_a && leftop->regs[A_IDX] == i && regDead (A_IDX, ic))
+            {
+              pop (ASMOP_A, 0, 1);
+              pushed_a = FALSE;
+            }
+          else if (!a_free)
             {
               push (ASMOP_A, 0, 1);
               pushed_a = TRUE;

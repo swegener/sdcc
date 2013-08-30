@@ -4,6 +4,7 @@
 
 #include <testfwk.h>
 
+#ifndef __SDCC_mcs51
 typedef
     struct SDCCBUG_Card {
         signed char suit, rank;
@@ -45,9 +46,11 @@ void SDCCBUG_DealCardsTo (unsigned char player)
         i += 1;
     }
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_mcs51
 	SDCCBUG_packN = 1;
 	SDCCBUG_skill = 1;
 	SDCCBUG_pack[SDCCBUG_packN].suit = 23;
@@ -59,5 +62,6 @@ void testBug(void)
 	ASSERT(SDCCBUG_hand[0][1].suit == 23);
 	ASSERT(SDCCBUG_hand[0][1].rank == 42);
 	ASSERT(!SDCCBUG_packN);
+#endif
 }
 

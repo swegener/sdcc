@@ -1758,7 +1758,7 @@ skip_byte:
         }
       else if (i < n - 1 && aopInReg (result, roffset + i, X_IDX) && aopOnStack (source, soffset + i, 2))
         {
-          long int eoffset = (long int)(source->aopu.bytes[i + 1].byteu.stk) + _G.stack.size - 256l;
+          long int eoffset = (long int)(source->aopu.bytes[soffset + i + 1].byteu.stk) + _G.stack.size - 256l;
 
           wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
           wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
@@ -1838,7 +1838,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
   wassertl (roffset + size <= result->size, "Trying to writer beyond end of operand");
 
 #if 0
-  D (emitcode(";  genMove_o", "%d %d %d", a_dead, x_dead, y_dead));
+  D (emitcode(";  genMove_o", "offset %d %d, deadness %d %d %d", roffset, soffset, a_dead, x_dead, y_dead));
 #endif
 
   if (aopRS (result) && aopRS (source))

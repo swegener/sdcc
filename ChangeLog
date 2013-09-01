@@ -1,3 +1,8 @@
+2013-09-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Fix loading of upper parts of large values through frame pointer, bug #2209.
+
 2013-08-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

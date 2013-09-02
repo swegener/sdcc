@@ -5231,6 +5231,17 @@ genPointerGet (const iCode *ic)
 
   size = result->aop->size;
 
+  // todo: What if right operand is negative?
+  offset = byteOfVal (right->aop->aopu.aop_lit, 1) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
+
+  // Long pointer indirect long addressing mode is useful only in one very specific case:
+  if (!bit_field && size == 1 && !offset && left->aop->type == AOP_DIR && !regDead (X_IDX, ic) && aopInReg(result->aop, 0, A_IDX))
+    {
+      emitcode("ld", "a, ((%s))", aopGet2(left->aop, 0));
+      cost (4, 4);
+      goto release;
+    }
+
   // todo: Handle this more gracefully, save x instead of using y.
   use_y = (aopInReg (left->aop, 0, Y_IDX) && size <= 1 + aopInReg (result->aop, 0, Y_IDX)) || !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX));
   if (use_y ? !(regDead (Y_IDX, ic) || aopInReg (left->aop, 0, Y_IDX)) : !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX)))
@@ -5242,9 +5253,6 @@ genPointerGet (const iCode *ic)
     }
 
   genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
-
-  // todo: What if right operand is negative?
-  offset = byteOfVal (right->aop->aopu.aop_lit, 1) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
 
   // Get all the bytes. todo: Get the byte in a last (if not a bit-field), so we do not need to save a.
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
@@ -5417,6 +5425,20 @@ genPointerSet (iCode * ic)
   aopOp (right, ic);
 
   size = right->aop->size;
+
+  // Long pointer indirect long addressing mode is useful only in two very specific cases:
+  if (!bit_field && size == 1 && result->aop->type == AOP_DIR && !regDead (X_IDX, ic) && aopInReg(right->aop, 0, A_IDX))
+    {
+      emitcode("ld", "((%s)), a", aopGet2(result->aop, 0));
+      cost (4, 4);
+      goto release;
+    }
+  else if (!bit_field && size == 2 && result->aop->type == AOP_DIR && (!regDead (Y_IDX, ic) || !optimize.codeSpeed) && aopInReg(right->aop, 0, X_IDX))
+    {
+      emitcode("ldw", "((%s)), x", aopGet2(result->aop, 0));
+      cost (4, 5);
+      goto release;
+    }
 
   // todo: Handle this more gracefully, save x instead of using y, when doing so is more efficient.
   use_y = (aopInReg (result->aop, 0, Y_IDX) && size <= 1 + aopInReg (right->aop, 0, X_IDX)) || regDead (Y_IDX, ic) && (!(regDead (X_IDX, ic) || aopInReg (result->aop, 0, X_IDX)) || right->aop->regs[XL_IDX] >= 0 || right->aop->regs[XH_IDX] >= 0);

@@ -1,7 +1,12 @@
 2013-09-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Pointer indirect long addressing mode.
+
+2013-09-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc2.cc:
-	  Tuned register allcoation heuristic.
+	  Tuned register allocation heuristic.
 
 2013-09-01 Philipp Klaus Krause <pkk AT spth.de>
 

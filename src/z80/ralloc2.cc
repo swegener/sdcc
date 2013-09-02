@@ -1383,7 +1383,30 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
     {
       const symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
       if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // When in doubt, try to honour register keyword.
+        c += 32.0f;
+      if((I[*v].byte % 2) && (a.global[*v] == REG_L || a.global[*v] == REG_E || a.global[*v] == REG_C)) // Try not to reverse bytes.
         c += 8.0f;
+      if(!(I[*v].byte % 2) && I[*v].size > 1 && (a.global[*v] == REG_H || a.global[*v] == REG_D || a.global[*v] == REG_B)) // Try not to reverse bytes.
+        c += 8.0f;
+      if(I[*v].byte == 0 && I[*v].size > 1 || I[*v].byte == 2 && I[*v].size > 3)
+        {
+          if (a.global[*v] == REG_L && a.global[*v + 1] >= 0 && a.global[*v + 1] != REG_H)
+            c += 16.0f;
+          if (a.global[*v] == REG_E && a.global[*v + 1] >= 0 && a.global[*v + 1] != REG_D)
+            c += 16.0f;
+          if (a.global[*v] == REG_C && a.global[*v + 1] >= 0 && a.global[*v + 1] != REG_B)
+            c += 16.0f;
+        }
+      else if(I[*v].byte == 1 || I[*v].byte == 3)
+        {
+          if (a.global[*v] == REG_H && a.global[*v - 1] >= 0 && a.global[*v - 1] != REG_L)
+            c += 16.0f;
+          if (a.global[*v] == REG_D && a.global[*v - 1] >= 0 && a.global[*v - 1] != REG_E)
+            c += 16.0f;
+          if (a.global[*v] == REG_B && a.global[*v - 1] >= 0 && a.global[*v - 1] != REG_C)
+            c += 16.0f;
+        }
+
     }
 
   c -= a.local.size() * 0.2f;

@@ -322,6 +322,10 @@ aopGet(const asmop *aop, int offset)
 
   if (aop->type == AOP_IMMD)
     {
+      if(!regalloc_dry_run)
+         wassertl(0, "Immediate operand handling is broken in linker, bug #2198");
+      cost (80, 80);
+
       wassertl (offset < 2, "Immediate operand out of range");
       SNPRINTF (buffer, 256, offset ? "#>%s" : "#<%s", aop->aopu.aop_immd);
       return (buffer);

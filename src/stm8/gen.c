@@ -2484,7 +2484,30 @@ genIpush (const iCode * ic)
 
   for (size = IC_LEFT (ic)->aop->size, offset = 0; size;)
     {
-      if (aopInReg (IC_LEFT (ic)->aop, offset, X_IDX) || aopInReg (IC_LEFT (ic)->aop, offset, Y_IDX))
+      if (IC_LEFT (ic)->aop->type == AOP_IMMD) // TODO: Remove this. It is an inefficient workaround for bug #2198!
+        {
+          if (!regDead (X_IDX, ic) && !regDead (Y_IDX, ic))
+            {
+              cost (180, 180);
+              if (!regalloc_dry_run)
+                wassertl (0, "Workaround for bug #2198 need free reg x or y!");
+            }
+          if (regDead (X_IDX, ic))
+            {
+              genMove_o (ASMOP_X, 0, IC_LEFT (ic)->aop, offset, 2, regDead (A_IDX, ic) && IC_LEFT (ic)->aop->regs[A_IDX] < offset, TRUE, FALSE);
+              push (ASMOP_X, 0, 2);
+              offset += 2;
+              size -= 2;
+            }
+          else
+            {
+              genMove_o (ASMOP_Y, 0, IC_LEFT (ic)->aop, offset, 2, regDead (A_IDX, ic) && IC_LEFT (ic)->aop->regs[A_IDX] < offset, FALSE, TRUE);
+              push (ASMOP_Y, 0, 2);
+              offset += 2;
+              size -= 2;
+            }
+        }
+      else if (aopInReg (IC_LEFT (ic)->aop, offset, X_IDX) || aopInReg (IC_LEFT (ic)->aop, offset, Y_IDX))
         {
           push (IC_LEFT (ic)->aop, offset, 2);
           offset += 2;

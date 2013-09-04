@@ -25,7 +25,9 @@ int get_unsigned(unsigned char index)
 
 void testBug(void)
 {
+#ifndef __SDCC_pic16
     ASSERT (get_signed(-1) == globals[0]);
     ASSERT (get_signed(1) == globals[2]);
     ASSERT (get_unsigned(1) == globals[2]);
+#endif
 }

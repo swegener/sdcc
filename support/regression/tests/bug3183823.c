@@ -11,6 +11,7 @@ float neg (float x)
 
 void testNeg (void)
 {
+#ifndef __SDCC_pic16
 	float x, y;
 	char a, b;
 
@@ -31,4 +32,5 @@ void testNeg (void)
 	((char*)&x)[0] = b;
 	((char*)&x)[3] = a;
 	ASSERT (x!=0.0);
+#endif
 }

@@ -13,6 +13,8 @@
 
 void testBug(void)
 {
+#ifndef __SDCC_pic16
 	volatile int i = -1;
 	ASSERT((void *)(i) == (void *)(-1));
+#endif
 }

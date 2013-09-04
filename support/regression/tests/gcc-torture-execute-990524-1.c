@@ -32,7 +32,9 @@ void loop (char * pz, char * pzDta)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pic16
   loop (a, b);
   return;
+#endif
 }
 

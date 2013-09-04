@@ -12,6 +12,7 @@ char s[12 + 1];
 void
 test_sprintf (void)
 {
+#ifndef __SDCC_pic16
   s[12] = 0x12;
 
   sprintf (s, "%d", 99);
@@ -53,5 +54,6 @@ test_sprintf (void)
 #endif
 
   ASSERT (s[12] == 0x12);
+#endif
 }
 

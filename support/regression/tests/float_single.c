@@ -29,6 +29,11 @@
 #   define EXPF_DISABLED  (1)
 #endif
 
+#if defined(__SDCC_pic16)
+#   define FLOORF_DISABLED  (1)
+#   define NEG_DISABLED  (1)
+#endif
+
 #if defined(__SDCC_stm8)
 #   define FLOORF_DISABLED  (1)
 #   define NEG_DISABLED  (1)

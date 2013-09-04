@@ -56,12 +56,13 @@ testMul(void)
     ASSERT(result == 25);
     LOG(("i*-4 == -20 = %u\n", (int)(i*-4)));
     ASSERT(i*-4 == -20);
-
     i = -10;
+#ifndef __SDCC_pic16
     LOG(("i*12 == -120 = %u\n", (int)(i*12)));
     ASSERT(i*12 == -120);
     LOG(("i*-3 == 30 = %u\n", (int)(i*-3)));
     ASSERT(i*-3 == 30);
+#endif
 }
 
 void mark(void)

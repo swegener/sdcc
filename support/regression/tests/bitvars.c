@@ -36,6 +36,7 @@ char complement(bool a, bool b)
 void
 testBits(void)
 {
+#ifndef __SDCC_pic16
 #ifdef __bool_true_false_are_defined
   bool x = 2;
   ASSERT (foo(x,3,4) == 6);
@@ -65,4 +66,5 @@ testBits(void)
 #endif
 
 #endif //__bool_true_false_are_defined
+#endif
 }

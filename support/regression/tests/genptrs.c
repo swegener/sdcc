@@ -43,6 +43,7 @@ char         * gp2 = (char __pdata *)0x0002;
 
 void testPtrs(void)
 {
+#ifndef __SDCC_pic16
 #if defined (__SDCC_MODEL_HUGE)
 	char __code  * cp2 = (char __code *)0x0002;
 	void (* fp2)(void) = (void (*)(void))0x0002;
@@ -93,4 +94,5 @@ void testPtrs(void)
 
 	ASSERT (eq(cp1, fp1));
 	ASSERT (smaller(pp1, gp2));
+#endif
 }

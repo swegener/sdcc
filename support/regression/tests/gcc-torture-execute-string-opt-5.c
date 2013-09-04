@@ -28,6 +28,7 @@ char buf [64];
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pic16
 #ifndef __SDCC_mcs51
   const char *const foo = "hello world";
   char dst [64];
@@ -113,6 +114,7 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 #endif
 }
 

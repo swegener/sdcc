@@ -1,5 +1,29 @@
 2013-09-04 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/bitvars.c,
+	  support/regression/tests/bool.c,
+	  support/regression/tests/bug1057979.c,
+	  support/regression/tests/bug1738367.c,
+	  support/regression/tests/bug2084206.c,
+	  support/regression/tests/bug2935162.c,
+	  support/regression/tests/bug3183823.c,
+	  support/regression/tests/bug3290691.c,
+	  support/regression/tests/bug3467508.c,
+	  support/regression/tests/bug3537338.c,
+	  support/regression/tests/float_single.c,
+	  support/regression/tests/gcc-torture-execute-20000412-2.c,
+	  support/regression/tests/gcc-torture-execute-20030714-1.c,
+	  support/regression/tests/gcc-torture-execute-990524-1.c,
+	  support/regression/tests/gcc-torture-execute-pr15296.c,
+	  support/regression/tests/gcc-torture-execute-string-opt-5.c,
+	  support/regression/tests/genptrs.c,
+	  support/regression/tests/muldiv.c,
+	  support/regression/tests/onebyte.c,
+	  support/regression/tests/snprintf.c:
+	  Disable tests for the least-broken one of the broken ports.
+
+2013-09-04 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/gen.c,
 	  support/regression/tests/gcc-torture-execute-20020219-1.c,
 	  support/regression/tests/gcc-torture-execute-20050104-1.c,

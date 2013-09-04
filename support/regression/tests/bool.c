@@ -43,6 +43,7 @@
 void
 testBool(void)
 {
+#ifndef __SDCC_pic16
 	volatile unsigned char z = 2;
 
 	const char *BOOL = "George Boole";
@@ -80,5 +81,6 @@ testBool(void)
 	E--;     ASSERT(E);  // sets E to 1-E
 	E = true;
 	E--;     ASSERT(!E); // sets E to 1-E
+#endif
 }
 

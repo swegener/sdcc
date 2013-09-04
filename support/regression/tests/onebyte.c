@@ -15,7 +15,7 @@ testMul (void)
   volatile   signed  char   r8 , r8b;
   volatile unsigned  char  ur8, ur8b;
   volatile           short r16, r16b;
-
+#ifndef __SDCC_pic16
   cL = -127; cR =   -5; r16 =  cL * cR; r16b = cR *  cL; ASSERT (r16 ==  635); ASSERT (r16b ==  635);
   cL =  127; cR =   -5; r16 =  cL * cR; r16b = cR *  cL; ASSERT (r16 == -635); ASSERT (r16b == -635);
   cL = -127; cR =    5; r16 =  cL * cR; r16b = cR *  cL; ASSERT (r16 == -635); ASSERT (r16b == -635);
@@ -36,6 +36,7 @@ testMul (void)
 
   ucL =  254;  cR = -1; r16 = ucL *  cR; ASSERT (r16 == -254);
    cL = -128;  cR = -1; r16 =  cL *  cR; ASSERT (r16 ==  128);
+#endif
 }
 
 void

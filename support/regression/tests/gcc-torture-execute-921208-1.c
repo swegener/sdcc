@@ -26,12 +26,10 @@ Int(double (*f)(double), double a)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
 #if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   if (Int(&f,2.0) != 4.0)
     ASSERT(0);
   return;
-#endif
 #endif
 }
 

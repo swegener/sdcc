@@ -15,9 +15,7 @@ void f (int (*fp)(char *, const char *, ...))
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
   f (&sprintf);
   ASSERT ((buf[0] == '<' && buf[1] == 'N') ||   // "<NO FLOAT>""
           (buf[0] == '5' && buf[1] == 0));      // "5"
-#endif
 }

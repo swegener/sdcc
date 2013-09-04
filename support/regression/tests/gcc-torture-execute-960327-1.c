@@ -36,9 +36,7 @@ void f ()
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
   f ();
   return;
-#endif
 }
 

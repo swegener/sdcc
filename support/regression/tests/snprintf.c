@@ -115,7 +115,6 @@ struct
 void
 test_snprintf (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
   unsigned char buf[32];
   unsigned char i;
 
@@ -135,6 +134,5 @@ test_snprintf (void)
     }
 
   ASSERT (buf[sizeof buf - 10] == 0xfe);        /* check for cookie */
-#endif
 }
 

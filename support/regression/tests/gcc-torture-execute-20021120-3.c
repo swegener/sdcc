@@ -22,11 +22,9 @@ unsigned int foo (char *c, unsigned int x, unsigned int y)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
   char c[16];
 
   if (foo (c, ~1U, 4) != (~0U / 5))
     ASSERT (0);
   return;
-#endif
 }

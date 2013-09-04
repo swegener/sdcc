@@ -392,7 +392,6 @@ void init_huffman(struct cvu_huffman_state *state, unsigned char (*input)(void),
 
 void testBug(void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
   unsigned char i;
   struct cvu_huffman_state state;
 
@@ -405,6 +404,5 @@ void testBug(void)
 
   for(i = 0; i < 15; i++)
     ASSERT(huffman_iterative(&state) == udata[i]);
-#endif
 }
 

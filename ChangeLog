@@ -2,6 +2,20 @@
 
 	* src/stm8/gen.c:
 	  Partial workaround for linker bug #2198.
+	* support/regression/tests/bug-136564.c,
+	  support/regression/tests/bug-927659.c,
+	  support/regression/tests/bug1057979.c,
+	  support/regression/tests/bug3521024.c,
+	  support/regression/tests/funptrs.c,
+	  support/regression/tests/gcc-torture-execute-20021120-3.c,
+	  support/regression/tests/gcc-torture-execute-20030626-1.c,
+	  support/regression/tests/gcc-torture-execute-20070201-1.c,
+	  support/regression/tests/gcc-torture-execute-921208-1.c,
+	  support/regression/tests/gcc-torture-execute-930513-1.c,
+	  support/regression/tests/gcc-torture-execute-960327-1.c,
+	  support/regression/tests/gcc-torture-execute-980707-1.c,
+	  support/regression/tests/snprintf.c:
+	  Enable tests that pass due to workaround for bug #2198.
 
 2013-09-03 Philipp Klaus Krause <pkk AT spth.de>
 

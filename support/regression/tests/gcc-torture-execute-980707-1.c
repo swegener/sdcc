@@ -42,7 +42,6 @@ buildargv (char *input)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
   char **args;
 #if !defined(__SDCC_mcs51)
   char input[256];
@@ -62,6 +61,5 @@ testTortureExecute (void)
     ASSERT (0);
   
   return;
-#endif
 }
 

@@ -14,8 +14,12 @@
 	  support/regression/tests/gcc-torture-execute-930513-1.c,
 	  support/regression/tests/gcc-torture-execute-960327-1.c,
 	  support/regression/tests/gcc-torture-execute-980707-1.c,
-	  support/regression/tests/snprintf.c:
+	  support/regression/tests/snprintf.c,
+	  support/regression/tests/gcc-torture-execute-20021118-2.c,
+	  support/regression/tests/gcc-torture-execute-20030626-2.c:
 	  Enable tests that pass due to workaround for bug #2198.
+	* support/regression/tests/gcc-torture-execute-20030916-1.c:
+	  Enable passing test.
 
 2013-09-03 Philipp Klaus Krause <pkk AT spth.de>
 

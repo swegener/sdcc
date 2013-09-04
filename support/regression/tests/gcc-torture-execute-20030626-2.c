@@ -15,12 +15,10 @@ char buf[40];
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
   int i = 0;
   int l = sprintf (buf, "%s", i++ ? "string" : "other string");
   if (l != sizeof ("other string") - 1 || i != 1)
     ASSERT (0);
   return;
-#endif
 }
 

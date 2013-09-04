@@ -58,7 +58,6 @@ void f3 (float f)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
 #if __SDCC_STACK_AUTO
   float f[3] = { 2.0f, 3.0f, 4.0f };
   t1 (f, 0, f1, f2);
@@ -66,6 +65,5 @@ testTortureExecute (void)
   if (f[0] != 3.0f && f[1] != 4.0f)
     ASSERT (0);
   return;
-#endif
 #endif
 }

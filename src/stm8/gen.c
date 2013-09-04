@@ -35,6 +35,7 @@ static struct
     {
       int pushed;
       int size;
+      int param_offset;
     } stack;
   bool saved;
 }
@@ -834,9 +835,9 @@ aopForSym (const iCode *ic, symbol *sym)
 
       aop = newAsmop (AOP_STK);
       aop->size = getSize (sym->type);
-      
+
       for(offset = 0; offset < aop->size; offset++)
-        aop->aopu.bytes[offset].byteu.stk = sym->stack + aop->size - offset;
+        aop->aopu.bytes[offset].byteu.stk = sym->stack + (sym->stack > 0 ? _G.stack.param_offset : 0) + aop->size - offset;
     }
   else
     {
@@ -2599,7 +2600,7 @@ emitCall (const iCode *ic, bool ispcall)
         }
 
       emitcode ("ldw", "x, sp");
-      emitcode ("addw", "x, #%d", sym->stack + _G.stack.pushed + 1);
+      emitcode ("addw", "x, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + _G.stack.pushed);
       cost (2 + 4, 1 + 2);
       push (ASMOP_X, 0, 2);
 
@@ -2802,8 +2803,10 @@ genFunction (iCode *ic)
 {
   const symbol *sym = OP_SYMBOL_CONST (IC_LEFT (ic));
   sym_link *ftype = operandType (IC_LEFT (ic));
+  bool bigreturn;
 
   _G.stack.pushed = 0;
+  _G.stack.param_offset = 0;
 
   /* create the function header */
   emitcode (";", "-----------------------------------------");
@@ -2833,6 +2836,9 @@ genFunction (iCode *ic)
       emitcode("subw", "y, #%ld", _G.stack.size - 256);
       cost (6, 3);
     }
+
+  bigreturn = (getSize (ftype->next) > 4);
+  _G.stack.param_offset += bigreturn * 2;
 
   /* adjust the stack for the function */
   if (sym->stack)
@@ -2935,10 +2941,20 @@ genReturn (const iCode *ic)
             break;
           }
 
-      emitcode ("ldw", "x, sp");
-      cost (1, 1);
-      emitcode ("addw", "x, #0x%04x", _G.stack.pushed);
-      cost (3, 2);
+      if (_G.stack.pushed + 3 <= 255)
+        {
+          emitcode ("ldw", "x, (0x%02x, sp)", _G.stack.pushed + 3);
+          cost (2, 2);
+        }
+      else
+        {
+          emitcode ("ldw", "x, sp");
+          cost (1, 1);
+          emitcode ("addw", "x, #0x%04x", _G.stack.pushed + 3);
+          cost (3, 2);
+          emitcode ("ldw", "x, (x)");
+          cost (1, 1);
+        }
 
       // Clear a first.
       for(i = 0; i < size; i++)
@@ -2951,15 +2967,24 @@ genReturn (const iCode *ic)
 
       for(i = 0; i < size;)
         {
-          if (aopInReg (left->aop, i, Y_IDX))
+          if (aopInReg (left->aop, i, Y_IDX) || size > 2 && left->aop->regs[YL_IDX] < i && left->aop->regs[YH_IDX] < i && (aopOnStackNotExt (left->aop, i, 2) || left->aop->type == AOP_LIT))
             {
-              emitcode ("ldw", "(#%d, x), y", size - 2 - i);
-              cost (2, 2);
+              genMove_o (ASMOP_Y, 0, left->aop, i, 2, TRUE, FALSE, TRUE);
+              if (size - 2 - i)
+                {
+                  emitcode ("ldw", "(#%d, x), y", size - 2 - i);
+                  cost (2, 2);
+                }
+              else
+                {
+                  emitcode ("ldw", "(x), y");
+                  cost (1, 2);
+                }
               i += 2;
             }
           else if (aopInReg (left->aop, i, XL_IDX) || aopInReg (left->aop, i, XH_IDX))
             {
-              emitcode ("ld", "a, (#%d, sp)", (int)(aopInReg (left->aop, i, XL_IDX)));
+              emitcode ("ld", "a, (#%d, sp)", (int)(aopInReg (left->aop, i, XL_IDX)) + 1);
               emitcode ("ld", "(#%d, x), a", size - 1 - i);
               cost (4, 2);
               i++;
@@ -2967,8 +2992,16 @@ genReturn (const iCode *ic)
           else if (!aopInReg (left->aop, i, A_IDX))
             {
               cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
-              emitcode ("ld", "(#%d, x), a", size - 1 - i);
-              cost (2, 1);
+              if (size - 1 - i)
+                {
+                  emitcode ("ld", "(#%d, x), a", size - 1 - i);
+                  cost (2, 1);
+                }
+              else
+                {
+                  emitcode ("ld", "(x), a");
+                  cost (1, 1);
+                }
               i++;
             }
           else
@@ -5776,9 +5809,9 @@ genAddrOf (const iCode *ic)
         {
           emitcode ("ldw", "y, sp");
           cost (2, 1);
-          if (sym->stack + _G.stack.pushed + 1 + operandLitValue (right) != 1)
+          if ((long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)) != 1l)
             {
-              emitcode ("addw", "y, #%ld", (long)(sym->stack + _G.stack.pushed + 1 + operandLitValue (right)));
+              emitcode ("addw", "y, #%ld", (long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)));
               cost (4, 2);
             }
           else
@@ -5796,18 +5829,18 @@ genAddrOf (const iCode *ic)
         }
       else
         {
-          wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 + operandLitValue (right) > 0);
+          wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 + (long)(operandLitValue (right)) > 0);
           emitcode ("ldw", "x, sp");
           cost (1, 1);
-          if (sym->stack + _G.stack.pushed + 1 + operandLitValue (right) > 2)
+          if ((long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)) > 2l)
             {
-              emitcode ("addw", "x, #%ld", (long)(sym->stack + _G.stack.pushed + 1 + operandLitValue (right)));
+              emitcode ("addw", "x, #%ld", (long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)));
               cost (3, 2);
             }
           else
             {
               emit3w (A_INCW, ASMOP_X, 0);
-              if (sym->stack + _G.stack.pushed + 1 + operandLitValue (right) > 1)
+              if ((long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)) > 1l)
                 emit3w (A_INCW, ASMOP_X, 0);
             }
         }

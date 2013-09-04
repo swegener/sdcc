@@ -29,7 +29,7 @@ t* f(t*clas, int size)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8
+#ifndef __SDCC_stm8 // malloc() no fully implemented.
   t foo, *bar;
   memset(&foo, 37, sizeof(t));
   foo.size=sizeof(t);

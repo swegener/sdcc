@@ -22,14 +22,12 @@ test (float c)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
 #if !(defined (__GNUC__) && __GNUC__ < 5)
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (test (1.0f) != 0)
     ASSERT (0);
 #endif
   return;
-#endif
 #endif
 }
 

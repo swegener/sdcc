@@ -39,7 +39,7 @@ static struct
     } stack;
   bool saved;
 }
-_G;
+G;
 
 enum asminst
 {
@@ -272,7 +272,7 @@ aopOnStack (const asmop *aop, int offset, int size)
 static bool
 aopOnStackNotExt (const asmop *aop, int offset, int size)
 {
-  return (aopOnStack (aop, offset, size) && aop->aopu.bytes[offset].byteu.stk + _G.stack.pushed <= 255);
+  return (aopOnStack (aop, offset, size) && aop->aopu.bytes[offset].byteu.stk + G.stack.pushed <= 255);
 }
 
 static void
@@ -305,11 +305,11 @@ aopGet(const asmop *aop, int offset)
 
   if (aopRS (aop) && !aop->aopu.bytes[offset].in_reg)
     {
-      int soffset = aop->aopu.bytes[offset].byteu.stk + _G.stack.pushed;
+      int soffset = aop->aopu.bytes[offset].byteu.stk + G.stack.pushed;
 
       if (soffset > 255)
         {
-          long int eoffset = (long int)(aop->aopu.bytes[offset].byteu.stk) + _G.stack.size - 256l;
+          long int eoffset = (long int)(aop->aopu.bytes[offset].byteu.stk) + G.stack.size - 256l;
 
           wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
           wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
@@ -837,7 +837,7 @@ aopForSym (const iCode *ic, symbol *sym)
       aop->size = getSize (sym->type);
 
       for(offset = 0; offset < aop->size; offset++)
-        aop->aopu.bytes[offset].byteu.stk = sym->stack + (sym->stack > 0 ? _G.stack.param_offset : 0) + aop->size - offset;
+        aop->aopu.bytes[offset].byteu.stk = sym->stack + (sym->stack > 0 ? G.stack.param_offset : 0) + aop->size - offset;
     }
   else
     {
@@ -922,9 +922,9 @@ aopOp (operand *op, const iCode *ic)
               {
                 aop->aopu.bytes[i].byteu.stk = (long int)(sym->usl.spillLoc->stack) + aop->size - i;
 
-                if (sym->usl.spillLoc->stack + aop->size - (int)(i) <= -_G.stack.pushed)
+                if (sym->usl.spillLoc->stack + aop->size - (int)(i) <= -G.stack.pushed)
                   {
-                    fprintf (stderr, "%d %d %d %d", (int)(sym->usl.spillLoc->stack), (int)(aop->size), (int)(i), (int)(_G.stack.pushed));
+                    fprintf (stderr, "%d %d %d %d", (int)(sym->usl.spillLoc->stack), (int)(aop->size), (int)(i), (int)(G.stack.pushed));
                     wassertl (0, "Invalid stack offset.");
                   }
               }
@@ -987,7 +987,7 @@ push (const asmop *op, int offset, int size)
   else
     wassertl (0, "Invalid size for push/pushw");
 
-  _G.stack.pushed += size;
+  G.stack.pushed += size;
 }
 
 static void
@@ -1021,7 +1021,7 @@ pop (const asmop *op, int offset, int size)
   else
     wassertl (0, "Invalid size for pop/popw");
 
-  _G.stack.pushed -= size;
+  G.stack.pushed -= size;
 }
 
 void swap_to_a(int idx)
@@ -1131,14 +1131,14 @@ adjustStack (int n)
           emitcode ("addw","sp, #127");
           cost (2, 1);
           n -= 127;
-          _G.stack.pushed -= 127;
+          G.stack.pushed -= 127;
         }
       else if (n < -255)
         {
           emitcode ("sub","sp, #255");
           cost (2, 1);
           n += 255;
-          _G.stack.pushed += 255;
+          G.stack.pushed += 255;
         }
       else if (n == -2  && optimize.codeSize)
         {
@@ -1154,14 +1154,14 @@ adjustStack (int n)
         {
           emitcode ("addw", "sp, #%d", n);
           cost (2, 1);
-          _G.stack.pushed -= n;
+          G.stack.pushed -= n;
           return;
         }
 	  else 
 	    {
 		  emitcode ("sub", "sp, #%d", -n);
           cost (2, 1);
-          _G.stack.pushed += -n;
+          G.stack.pushed += -n;
           return;
         }
     }
@@ -1763,7 +1763,7 @@ skip_byte:
         }
       else if (i < n - 1 && aopInReg (result, roffset + i, X_IDX) && aopOnStack (source, soffset + i, 2))
         {
-          long int eoffset = (long int)(source->aopu.bytes[soffset + i + 1].byteu.stk) + _G.stack.size - 256l;
+          long int eoffset = (long int)(source->aopu.bytes[soffset + i + 1].byteu.stk) + G.stack.size - 256l;
 
           wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
           wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
@@ -1942,9 +1942,9 @@ genMove (asmop *result, asmop *source, bool a_dead, bool x_dead, bool y_dead)
 void
 stm8_emitDebuggerSymbol (const char *debugSym)
 {
-  _G.debugLine = 1;
+  G.debugLine = 1;
   emitcode ("", "%s ==.", debugSym);
-  _G.debugLine = 0;
+  G.debugLine = 0;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2303,7 +2303,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
       else if (!started && i == size - 1 && aopOnStackNotExt (right_aop, i, 1) &&
         (aopInReg (left_aop, i, XL_IDX) && aopInReg (result_aop, i, XL_IDX) && xh_free || aopInReg (left_aop, i, YL_IDX) && aopInReg (result_aop, i, YL_IDX) && yh_free))
         {
-          emitcode ("subw", "%s, (%d, sp)", aopInReg (left_aop, i, YL_IDX) ? "y" : "x", right_aop->aopu.bytes[i].byteu.stk + _G.stack.pushed - 1);
+          emitcode ("subw", "%s, (%d, sp)", aopInReg (left_aop, i, YL_IDX) ? "y" : "x", right_aop->aopu.bytes[i].byteu.stk + G.stack.pushed - 1);
           cost (3, 2);
           started = TRUE;
           i++;
@@ -2436,7 +2436,7 @@ genUminus (const iCode *ic)
 static void
 saveRegsForCall (const iCode * ic)
 {
-  if (_G.saved && !regalloc_dry_run)
+  if (G.saved && !regalloc_dry_run)
     return;
 
   //if (!regDead (C_IDX, ic))
@@ -2451,7 +2451,7 @@ saveRegsForCall (const iCode * ic)
   if (!regDead (Y_IDX, ic))
     push (ASMOP_Y, 0, 2);
 
-  _G.saved = TRUE;
+  G.saved = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2477,7 +2477,7 @@ genIpush (const iCode * ic)
      are used in the send set.
    */
   for (walk = ic->next; walk->op != CALL && walk->op != PCALL; walk = walk->next);
-  if (!_G.saved  && !regalloc_dry_run /* Cost is counted at CALL or PCALL instead */ )
+  if (!G.saved  && !regalloc_dry_run /* Cost is counted at CALL or PCALL instead */ )
     saveRegsForCall (walk);
 
   /* then do the push */
@@ -2582,11 +2582,8 @@ emitCall (const iCode *ic, bool ispcall)
   bigreturn = (getSize (ftype->next) > 4);
   if (bigreturn)
     {
-      symbol *sym;
-
       wassertl (IC_RESULT (ic), "Unused return value in call to function returning large type.");
 
-      sym = OP_SYMBOL (IC_RESULT (ic));
       aopOp (IC_RESULT (ic), ic);
 
       if (IC_RESULT (ic)->aop->type != AOP_STK)
@@ -2600,7 +2597,7 @@ emitCall (const iCode *ic, bool ispcall)
         }
 
       emitcode ("ldw", "x, sp");
-      emitcode ("addw", "x, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + _G.stack.pushed);
+      emitcode ("addw", "x, #%d", IC_RESULT (ic)->aop->aopu.bytes[getSize (ftype->next) - 1].byteu.stk + G.stack.pushed);
       cost (2 + 4, 1 + 2);
       push (ASMOP_X, 0, 2);
 
@@ -2751,7 +2748,7 @@ emitCall (const iCode *ic, bool ispcall)
   //if (!regDead (C_IDX, ic))
   //  pop (ASMOP_C, 0, 1);
 
-  _G.saved = FALSE;
+  G.saved = FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2805,8 +2802,8 @@ genFunction (iCode *ic)
   sym_link *ftype = operandType (IC_LEFT (ic));
   bool bigreturn;
 
-  _G.stack.pushed = 0;
-  _G.stack.param_offset = 0;
+  G.stack.pushed = 0;
+  G.stack.param_offset = 0;
 
   /* create the function header */
   emitcode (";", "-----------------------------------------");
@@ -2830,15 +2827,15 @@ genFunction (iCode *ic)
 
   if (stm8_extend_stack) // Setup for extended stack access.
     {
-      _G.stack.size = stm8_call_stack_size + (sym->stack ? sym->stack : 0);
+      G.stack.size = stm8_call_stack_size + (sym->stack ? sym->stack : 0);
       D (emitcode(";", "Setup y for extended stack access."));
       emitcode("ldw", "y, sp");
-      emitcode("subw", "y, #%ld", _G.stack.size - 256);
+      emitcode("subw", "y, #%ld", G.stack.size - 256);
       cost (6, 3);
     }
 
   bigreturn = (getSize (ftype->next) > 4);
-  _G.stack.param_offset += bigreturn * 2;
+  G.stack.param_offset += bigreturn * 2;
 
   /* adjust the stack for the function */
   if (sym->stack)
@@ -2869,7 +2866,7 @@ genEndFunction (iCode *ic)
   if (sym->stack)
     adjustStack (sym->stack);
 
-  wassertl (!_G.stack.pushed, "Unbalanced stack.");
+  wassertl (!G.stack.pushed, "Unbalanced stack.");
 
   if (IFFUNC_ISCRITICAL (sym->type))
       genEndCritical (NULL);
@@ -2941,16 +2938,16 @@ genReturn (const iCode *ic)
             break;
           }
 
-      if (_G.stack.pushed + 3 <= 255)
+      if (G.stack.pushed + 3 <= 255)
         {
-          emitcode ("ldw", "x, (0x%02x, sp)", _G.stack.pushed + 3);
+          emitcode ("ldw", "x, (0x%02x, sp)", G.stack.pushed + 3);
           cost (2, 2);
         }
       else
         {
           emitcode ("ldw", "x, sp");
           cost (1, 1);
-          emitcode ("addw", "x, #0x%04x", _G.stack.pushed + 3);
+          emitcode ("addw", "x, #0x%04x", G.stack.pushed + 3);
           cost (3, 2);
           emitcode ("ldw", "x, (x)");
           cost (1, 1);
@@ -3299,7 +3296,7 @@ genPlus (const iCode *ic)
       else if (!started && i == size - 1 && aopOnStackNotExt (rightop, i, 1) &&
         (aopInReg (leftop, i, XL_IDX) && aopInReg (result->aop, i, XL_IDX) && xh_free || aopInReg (leftop, i, YL_IDX) && aopInReg (result->aop, i, YL_IDX) && yh_free))
         {
-          emitcode ("addw", "%s, (%d, sp)", aopInReg (leftop, i, YL_IDX) ? "y" : "x", rightop->aopu.bytes[i].byteu.stk + _G.stack.pushed - 1);
+          emitcode ("addw", "%s, (%d, sp)", aopInReg (leftop, i, YL_IDX) ? "y" : "x", rightop->aopu.bytes[i].byteu.stk + G.stack.pushed - 1);
           cost (3, 2);
           started = TRUE;
           i++;
@@ -3979,9 +3976,11 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
   operand *left, *right, *result;
   int opcode;
   int size, i;
+  symbol *tlbl_NE_pop = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   symbol *tlbl_NE = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-  bool pushed_a = FALSE;
+  bool pushed_a = FALSE, pop_a = FALSE;
+  int pushed;
 
   D (emitcode ("; genCmpEQorNE", ""));
 
@@ -3990,6 +3989,8 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
   right = IC_RIGHT (ic);
 
   opcode = ic->op;
+
+  pushed = G.stack.pushed;
 
   /* assign the amsops */
   aopOp (left, ic);
@@ -4074,7 +4075,20 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
 
           i++;
         }
-      if (tlbl_NE)
+
+      if (size == 1 && pushed_a) // Popping it here once now is cheaper than doing it in multiple places later.
+        {
+          pop (ASMOP_A, 0, 1);
+          pushed_a = FALSE;
+        }
+
+      if (pushed_a)
+        {
+          if (tlbl_NE_pop)
+            emitcode ("jrne", "%05d$", labelKey2num (tlbl_NE_pop->key));
+          pop_a = TRUE;
+        }
+      else if (tlbl_NE)
         emitcode ("jrne", "%05d$", labelKey2num (tlbl_NE->key));
       cost (2, 2); // Cycle cost is an estimate.
     }
@@ -4090,6 +4104,11 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
       if (tlbl)
         emitcode ("jp", "%05d$", labelKey2num (tlbl->key));
       cost (3, 0);
+      if (pop_a)
+        {
+          emitLabel (tlbl_NE_pop);
+          pop (ASMOP_A, 0, 1);
+        }
       emitLabel (tlbl_NE);
       cheapMove (result->aop, 0, opcode == NE_OP ? ASMOP_ONE : ASMOP_ZERO, 0, !regDead (A_IDX, ic));
       emitLabel (tlbl);
@@ -4098,6 +4117,11 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
     {
       emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
       cost (3, 0);
+      if (pop_a)
+        {
+          emitLabel (tlbl_NE_pop);
+          pop (ASMOP_A, 0, 1);
+        }
       emitLabel (tlbl_NE);
       if (!regalloc_dry_run)
         ifx->generated = 1;
@@ -4107,6 +4131,11 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
       if (tlbl)
         emitcode ("jp", "%05d$", labelKey2num (tlbl->key));
       cost (3, 0);
+      if (pop_a)
+        {
+          emitLabel (tlbl_NE_pop);
+          pop (ASMOP_A, 0, 1);
+        }
       emitLabel (tlbl_NE);
       emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
       cost (3, 0);
@@ -4114,6 +4143,8 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
       if (!regalloc_dry_run)
         ifx->generated = 1;
     }
+
+  G.stack.pushed = pushed;
 
   freeAsmop (right);
   freeAsmop (left);
@@ -5809,9 +5840,9 @@ genAddrOf (const iCode *ic)
         {
           emitcode ("ldw", "y, sp");
           cost (2, 1);
-          if ((long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)) != 1l)
+          if ((long)(sym->stack) + G.stack.pushed + 1 + (long)(operandLitValue (right)) != 1l)
             {
-              emitcode ("addw", "y, #%ld", (long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)));
+              emitcode ("addw", "y, #%ld", (long)(sym->stack) + G.stack.pushed + 1 + (long)(operandLitValue (right)));
               cost (4, 2);
             }
           else
@@ -5829,18 +5860,18 @@ genAddrOf (const iCode *ic)
         }
       else
         {
-          wassert (regalloc_dry_run || sym->stack + _G.stack.pushed + 1 + (long)(operandLitValue (right)) > 0);
+          wassert (regalloc_dry_run || sym->stack + G.stack.pushed + 1 + (long)(operandLitValue (right)) > 0);
           emitcode ("ldw", "x, sp");
           cost (1, 1);
-          if ((long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)) > 2l)
+          if ((long)(sym->stack) + G.stack.pushed + 1 + (long)(operandLitValue (right)) > 2l)
             {
-              emitcode ("addw", "x, #%ld", (long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)));
+              emitcode ("addw", "x, #%ld", (long)(sym->stack) + G.stack.pushed + 1 + (long)(operandLitValue (right)));
               cost (3, 2);
             }
           else
             {
               emit3w (A_INCW, ASMOP_X, 0);
-              if ((long)(sym->stack) + _G.stack.pushed + 1 + (long)(operandLitValue (right)) > 1l)
+              if ((long)(sym->stack) + G.stack.pushed + 1 + (long)(operandLitValue (right)) > 1l)
                 emit3w (A_INCW, ASMOP_X, 0);
             }
         }
@@ -6137,7 +6168,7 @@ genSTM8iCode (iCode *ic)
 
 #if 0
   if (!regalloc_dry_run)
-    printf ("ic %d op %d stack pushed %d\n", ic->key, ic->op, _G.stack.pushed);
+    printf ("ic %d op %d stack pushed %d\n", ic->key, ic->op, G.stack.pushed);
 #endif
 
   if (ic->generated)

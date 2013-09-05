@@ -1,3 +1,8 @@
+2013-09-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Fix bug #2211, fix name of codegen struct (_G vs. G).
+
 2013-09-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bitvars.c,

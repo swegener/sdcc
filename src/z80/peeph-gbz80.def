@@ -22,7 +22,7 @@
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 replace restart {
-	ld	%1,%1
+	ld	%1, %1
 } by {
 	; peephole 1 removed redundant load.
 } if notVolatile(%1)

@@ -2433,7 +2433,7 @@ compareFuncType (sym_link * dest, sym_link * src)
 }
 
 int
-comparePtrType (sym_link * dest, sym_link * src, bool bMustCast)
+comparePtrType (sym_link *dest, sym_link *src, bool bMustCast)
 {
   int res;
 
@@ -2458,7 +2458,7 @@ comparePtrType (sym_link * dest, sym_link * src, bool bMustCast)
 /*               -1 if castable, -2 if only signedness differs        */
 /*--------------------------------------------------------------------*/
 int
-compareType (sym_link * dest, sym_link * src)
+compareType (sym_link *dest, sym_link *src)
 {
   if (!dest && !src)
     return 1;

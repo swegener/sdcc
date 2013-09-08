@@ -34,6 +34,7 @@ memmap;
 typedef struct namedspacemap
   {
     char *name;
+    bool is_const;
     memmap *map;
     struct namedspacemap *next;
   }

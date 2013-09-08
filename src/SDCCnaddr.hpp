@@ -460,10 +460,7 @@ int tree_dec_address_switch(T_t &T, const G_t &G, const std::map<naddrspace_t, c
 // Dump cfg, with numbered nodes, show possible address spaces at each node.
 void dump_cfg_naddr(const cfg_t &cfg)
 {
-  if(!currFunc)
-    return;
-
-  std::ofstream dump_file((std::string(dstFileName) + ".dumpnaddrcfg" + currFunc->rname + ".dot").c_str());
+  std::ofstream dump_file((std::string(dstFileName) + ".dumpnaddrcfg" + (currFunc ? currFunc->rname : "__global") + ".dot").c_str());
 
   std::string *name = new std::string[num_vertices(cfg)];
   for (unsigned int i = 0; i < boost::num_vertices(cfg); i++)

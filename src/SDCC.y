@@ -1996,6 +1996,21 @@ addressmod
      sym->addressmod[0] = findSymWithLevel (SymbolTab, $2);
      sym->addressmod[1] = 0;
    }
+   | ADDRESSMOD identifier SD_CONST identifier ';' {
+     symbol *sym;
+     sym_link *type;
+     if ((sym = findSymWithLevel (AddrspaceTab, $4)) && sym->level == $4->level)
+       werrorfl (sym->fileDef, sym->lineDef, E_PREVIOUS_DEF);
+     if (!findSymWithLevel (SymbolTab, $2))
+       werror (E_ID_UNDEF, $2->name);
+     addSym (AddrspaceTab, $4, $4->name, $4->level, $4->block, 0);
+     sym = findSymWithLevel (AddrspaceTab, $4);
+     sym->addressmod[0] = findSymWithLevel (SymbolTab, $2);
+     sym->addressmod[1] = 0;
+     type = newLink (SPECIFIER);
+     SPEC_CONST(type) = 1;
+     sym->type = sym->etype = type;
+   }
    ;
 
 identifier

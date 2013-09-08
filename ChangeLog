@@ -1,3 +1,15 @@
+2013-09-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.y,
+	  src/SDCCmem.c,
+	  src/SDCCglue.c,
+	  doc/sdccman.lyx,
+	  support/regression/tests/addrspace.c:
+	  Support for const named address spaces (for variables in ROM).
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Check for volatile in peephole 1.
+
 2013-09-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

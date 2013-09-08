@@ -22235,9 +22235,63 @@ spaceb0 int *spaceb1 z; //A pointer in address space sapceb1 that points
 \end_layout
 
 \begin_layout Standard
-SDCC will automatically insert calls to the correspionding function before
+Named address spaces for data in ROM are declared using the const keyword:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+void setb0(void); // The function that sets the currently active memory
+ bank to b0
+\begin_inset Newline newline
+\end_inset
+
+void setb1(void); // The function that sets the currently active memory
+ bank to b1
+\begin_inset Newline newline
+\end_inset
+
+__addressmod const setb0 spaceb0; // Declare a named address space called
+ spaceb0 that uses setb0()
+\begin_inset Newline newline
+\end_inset
+
+__addressmod setb1 spaceb1; // Declare a named address space called spaceb1
+ that uses setb1() and resides in ROM
+\begin_inset Newline newline
+\end_inset
+
+const spaceb0 int x = 42; // An int in address space spaceb0
+\begin_inset Newline newline
+\end_inset
+
+spaceb1 int *y; // A pointer to an int in address space spaceb1
+\begin_inset Newline newline
+\end_inset
+
+const spaceb0 int *spaceb1 z; //A pointer in address space sapceb1 that
+ points to a constant int in address space spaceb0
+\end_layout
+
+\begin_layout Standard
+Variables in named address spaces will be placed in areas of the same name
+ (this can be used for the placement of named address spaces in memory by
+ the linker).
+\end_layout
+
+\begin_layout Standard
+SDCC will automatically insert calls to the corresponding function before
  accessing the variable.
  SDCC inserts the minimum possible number calls to the bank selection functions.
+ See Philipp Klaus Krause, 
+\begin_inset Quotes sld
+\end_inset
+
+Optimal Placement of Bank Selection Instructions in Polynomial Time
+\begin_inset Quotes srd
+\end_inset
+
+ for details on how this works.
 \end_layout
 
 \begin_layout Section

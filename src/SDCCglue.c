@@ -205,7 +205,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
          it is a global variable */
       if (sym->ival && sym->level == 0)
         {
-          if ((SPEC_OCLS (sym->etype) == xidata || SPEC_OCLS (sym->etype) == initialized) && !SPEC_ABSA (sym->etype))
+          if ((SPEC_OCLS (sym->etype) == xidata || SPEC_OCLS (sym->etype) == initialized) && !SPEC_ABSA (sym->etype) && !SPEC_ADDRSPACE (sym->etype))
             {
               sym_link *t;
               /* create a new "XINIT (CODE)" symbol, that will be emitted later
@@ -1556,7 +1556,13 @@ emitMaps (void)
   emitRegularMap (data, TRUE, TRUE);
   emitRegularMap (initialized, TRUE, TRUE);
   for (nm = namedspacemaps; nm; nm = nm->next)
-    emitRegularMap (nm->map, TRUE, TRUE);
+    if (nm->is_const)
+      {
+        dbuf_tprintf (&nm->map->oBuf, "\t!areacode\n", nm->map->sname);
+        emitStaticSeg (nm->map, &nm->map->oBuf);
+      }
+    else
+      emitRegularMap (nm->map, TRUE, TRUE);
   emitRegularMap (idata, TRUE, TRUE);
   emitRegularMap (d_abs, TRUE, TRUE);
   emitRegularMap (i_abs, TRUE, TRUE);
@@ -1974,7 +1980,7 @@ glue (void)
   for (nm = namedspacemaps; nm; nm = nm->next)
     {
       fprintf (asmFile, "%s", iComments2);
-      fprintf (asmFile, "; %s ram data\n", nm->name);
+      fprintf (asmFile, "; %s %s data\n", nm->name, nm->is_const ? "rom" : "ram");
       fprintf (asmFile, "%s", iComments2);
       dbuf_write_and_destroy (&nm->map->oBuf, asmFile);
     }

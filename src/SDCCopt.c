@@ -1252,9 +1252,8 @@ miscOpt (eBBlock ** ebbs, int count)
 /* to enforce the rule.                                            */
 /*-----------------------------------------------------------------*/
 static void
-separateAddressSpaces (eBBlock ** ebbs, int count)
+separateAddressSpaces (eBBlock **ebbs, int count)
 {
-  
   int i;
 
   /* for all blocks do */
@@ -1310,7 +1309,7 @@ separateAddressSpaces (eBBlock ** ebbs, int count)
                 resultaddrspace = getAddrspace (OP_SYMBOL (result)->type);
             }
             
-#if 0            
+#if 0           
           if (leftaddrspace)
             printf("ic %d (dcl? %d) leftaddrspace %s\n", ic->key, (int)(IS_DECL  (OP_SYMBOL (left)->type)), leftaddrspace->name);
           if (rightaddrspace)
@@ -1330,7 +1329,9 @@ separateAddressSpaces (eBBlock ** ebbs, int count)
               leftaddrspace = 0;
               for (iic = ic; iic->prev && iic->prev->op == IPUSH; iic = iic->prev);
             }
-          else if (leftaddrspace && rightaddrspace && leftaddrspace != rightaddrspace)
+          else if (leftaddrspace && rightaddrspace && leftaddrspace != rightaddrspace ||
+            resultaddrspace && rightaddrspace && resultaddrspace != rightaddrspace ||
+            resultaddrspace && leftaddrspace && resultaddrspace != leftaddrspace)
             {
               operand *newop;
               
@@ -2303,7 +2304,7 @@ eBBlockFromiCode (iCode * ic)
      (but assume that it can happen in other functions) */
   adjustIChain (ebbi->bbOrder, ebbi->count);
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
-  if (switchAddressSpacesOptimally (ic, ebbi))
+  if (!currFunc || switchAddressSpacesOptimally (ic, ebbi))
     switchAddressSpaces (ic); /* Fallback. Very unlikely to be triggered, unless --max-allocs-per-node is set to very small values or very weird control-flow graphs */
 
   /* Break down again and redo some steps to not confuse live range analysis. */

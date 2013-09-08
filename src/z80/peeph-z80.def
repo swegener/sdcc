@@ -29,8 +29,7 @@ replace restart {
 	ld	%1, %2
 } by {
 	; peephole 1 removed dead load from %2 into %1.
-} if notVolatile(%1), notUsed(%1)
-// Should probably check for notVolatile(%2), too, but gives many false positives and no regression tests fail.
+} if notVolatile(%1), notUsed(%1), notVolatile(%2)
 
 replace restart {
 	add	ix,sp

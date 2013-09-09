@@ -1,3 +1,8 @@
+2013-09-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/addrspace.c:
+	  Disable test for host regression tests.
+
 2013-09-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.y,

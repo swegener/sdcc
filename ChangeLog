@@ -2,6 +2,8 @@
 
 	* support/regression/tests/addrspace.c:
 	  Disable test for host regression tests.
+	* src/stm8/gen.c:
+	  Make it compile on compilers that lack C99 support.
 
 2013-09-08 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -3938,7 +3938,7 @@ genCmp (const iCode *ic, iCode *ifx)
       symbol *tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
 
       if (tlbl1)
-        emitcode (branchInstCmp (opcode, sign, false), "%05d$", labelKey2num (tlbl1->key));
+        emitcode (branchInstCmp (opcode, sign, FALSE), "%05d$", labelKey2num (tlbl1->key));
       cost (2, 0);
       cheapMove (result->aop, 0, ASMOP_ZERO, 0, !regDead (A_IDX, ic));
       if (tlbl2)
@@ -4641,7 +4641,7 @@ static void
 genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode *ic)
 {
   unsigned int shCount = ulFromVal (right->aop->aopu.aop_lit);
-  unsigned int size;
+  unsigned int size, i;
 
   struct asmop shiftop_impl;
   struct asmop *shiftop;
@@ -4662,8 +4662,6 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
         emit3_o (A_CLR, result->aop, size, 0, 0);
       goto release;
     }
-
-  unsigned int i;
 
   wassertl (size <= 2 || shCount <= 1, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
 

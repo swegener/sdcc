@@ -13,7 +13,8 @@ typedef enum
     SUB_Z180,
     SUB_R2K,
     SUB_R3KA,
-    SUB_GBZ80
+    SUB_GBZ80,
+    SUB_TLCS90
   }
 Z80_SUB_PORT;
 
@@ -32,10 +33,11 @@ extern Z80_OPTS z80_opts;
 
 #define IS_Z80 (z80_opts.sub == SUB_Z80)
 #define IS_Z180 (z80_opts.sub == SUB_Z180)
-#define IS_GB (z80_opts.sub == SUB_GBZ80)
 #define IS_R2K (z80_opts.sub == SUB_R2K)
 #define IS_R3KA (z80_opts.sub == SUB_R3KA)
 #define IS_RAB (IS_R2K || IS_R3KA)
+#define IS_GB (z80_opts.sub == SUB_GBZ80)
+#define IS_TLCS90 (z80_opts.sub == SUB_TLCS90)
 
 #define IY_RESERVED (z80_opts.reserveIY)
 

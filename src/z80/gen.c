@@ -4169,7 +4169,7 @@ emitCall (const iCode *ic, bool ispcall)
 
       if (!regalloc_dry_run)
         _G.stack.pushed -= i;
-      if (IS_GB && i > 2)
+      if ((IS_GB || IS_TLCS90) && i > 2)
         {
           emit2 ("add sp, #%d", i);
           regalloc_dry_run_cost += 3;

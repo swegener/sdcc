@@ -110,9 +110,9 @@ static char *_keywords[] = {
   NULL
 };
 
-extern PORT gbz80_port;
 extern PORT z80_port;
 extern PORT r2k_port;
+extern PORT gbz80_port;
 
 #include "mappings.i"
 
@@ -157,6 +157,13 @@ static void
 _gbz80_init (void)
 {
   z80_opts.sub = SUB_GBZ80;
+}
+
+static void
+_tlcs90_init (void)
+{
+  z80_opts.sub = SUB_TLCS90;
+  asm_addTree (&_asxxxx_z80);
 }
 
 static void
@@ -763,17 +770,25 @@ static const char *_gbLinkCmd[] = {
   "sdldgb", "-nf", "$1", NULL
 };
 
+static const char *_tlcs90LinkCmd[] = {
+  "sdldtlcs90", "-nf", "$1", NULL
+};
+
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_z80AsmCmd[] = {
   "sdasz80", "$l", "$3", "$2", "$1.asm", NULL
+};
+
+static const char *_r2kAsmCmd[] = {
+  "sdasrab", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char *_gbAsmCmd[] = {
   "sdasgb", "$l", "$3", "$2", "$1.asm", NULL
 };
 
-static const char *_r2kAsmCmd[] = {
-  "sdasrab", "$l", "$3", "$2", "$1.asm", NULL
+static const char *_tlcs90AsmCmd[] = {
+  "sdastlcs90", "$l", "$3", "$2", "$1.asm", NULL
 };
 
 static const char *const _crt[] = { "crt0.rel", NULL, };
@@ -1423,6 +1438,134 @@ PORT gbz80_port = {
   1,                            /* reset labelKey to 1 */
   1,                            /* globals & local statics allowed */
   5,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
+  PORT_MAGIC
+};
+
+PORT tlcs90_port = {
+  TARGET_ID_TLCS90,
+  "tlcs90",
+  "Toshiba TLCS-90",            /* Target name */
+  NULL,                         /* Processor name */
+  {
+   glue,
+   FALSE,
+   NO_MODEL,
+   NO_MODEL,
+   NULL,                        /* model == target */
+   },
+  {                             /* Assembler */
+   _tlcs90AsmCmd,
+   NULL,
+   "-plosgffwy",                /* Options with debug */
+   "-plosgffw",                 /* Options without debug */
+   0,
+   ".asm"},
+  {                             /* Linker */
+   _tlcs90LinkCmd,                 //NULL,
+   NULL,                        //LINKCMD,
+   NULL,
+   ".rel",
+   1,
+   _crt,                        /* crt */
+   _libs_z80,                   /* libs */
+   },
+  {                             /* Peephole optimizer */
+   _z80_defaultRules,
+   z80instructionSize,
+   0,
+   0,
+   0,
+   z80notUsed,
+   z80canAssign,
+   z80notUsedFrom,
+   },
+  {
+   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+   1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4},
+  /* tags for generic pointers */
+  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  {
+   "XSEG",
+   "STACK",
+   "CODE",
+   "DATA",
+   NULL,                        /* idata */
+   NULL,                        /* pdata */
+   NULL,                        /* xdata */
+   NULL,                        /* bit */
+   "RSEG (ABS)",
+   "GSINIT",                    /* static initialization */
+   NULL,                        /* overlay */
+   "GSFINAL",
+   "HOME",
+   NULL,                        /* xidata */
+   NULL,                        /* xinit */
+   NULL,                        /* const_name */
+   "CABS (ABS)",                /* cabs_name */
+   "DABS (ABS)",                /* xabs_name */
+   NULL,                        /* iabs_name */
+   "INITIALIZED",               /* name of segment for initialized variables */
+   "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
+   NULL,
+   NULL,
+   1,                           /* CODE  is read-only */
+   1                            /* No fancy alignments supported. */
+   },
+  {NULL, NULL},
+  {
+   -1, 0, 0, 4, 0, 2},
+  /* Z80 has no native mul/div commands */
+  {
+   0, -1},
+  {
+   z80_emitDebuggerSymbol},
+  {
+   255,                         /* maxCount */
+   3,                           /* sizeofElement */
+   /* The rest of these costs are bogus. They approximate */
+   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+   {4, 4, 4},                   /* sizeofMatchJump[] */
+   {0, 0, 0},                   /* sizeofRangeCompare[] */
+   0,                           /* sizeofSubtract */
+   3,                           /* sizeofDispatch */
+   },
+  "_",
+  _tlcs90_init,
+  _parseOptions,
+  _z80_options,
+  NULL,
+  _finaliseOptions,
+  _setDefaultOptions,
+  z80_assignRegisters,
+  _getRegName,
+  _keywords,
+  0,                            /* no assembler preamble */
+  NULL,                         /* no genAssemblerEnd */
+  0,                            /* no local IVT generation code */
+  0,                            /* no genXINIT code */
+  NULL,                         /* genInitStartup */
+  _reset_regparm,
+  _reg_parm,
+  _process_pragma,
+  _mangleSupportFunctionName,
+  _hasNativeMulFor,
+  hasExtBitOp,                  /* hasExtBitOp */
+  oclsExpense,                  /* oclsExpense */
+  TRUE,
+  TRUE,                         /* little endian */
+  0,                            /* leave lt */
+  0,                            /* leave gt */
+  1,                            /* transform <= to ! > */
+  1,                            /* transform >= to ! < */
+  1,                            /* transform != to !(a == b) */
+  0,                            /* leave == */
+  FALSE,                        /* Array initializer support. */
+  0,                            /* no CSE cost estimation yet */
+  _z80_builtins,                /* builtin functions */
+  GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
+  1,                            /* reset labelKey to 1 */
+  1,                            /* globals & local statics allowed */
+  9,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
 

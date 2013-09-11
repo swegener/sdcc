@@ -818,8 +818,12 @@ int z80instructionSize(lineNode *pl)
     return(2);
 
   /* signed 8 bit adjustment to stack pointer */
-  if( (IS_RAB) && ISINST(pl->line, "add") && !strncmp(op1start, "sp", 2))
+  if(IS_RAB && ISINST(pl->line, "add") && !strncmp(op1start, "sp", 2))
     return(2);
+
+  /* 16 bit adjustment to stack pointer */
+  if((IS_GB || IS_TLCS90) && ISINST(pl->line, "add") && !strncmp(op1start, "sp", 2))
+    return(3);
   
   /* 8 bit arithmetic, two operands */
   if(op2start &&  op1start[0] == 'a' && (ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sub") || ISINST(pl->line, "sbc") || ISINST(pl->line, "cp") || ISINST(pl->line, "and") || ISINST(pl->line, "or") || ISINST(pl->line, "xor")))

@@ -2958,13 +2958,13 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
 {
   _G.stack.pushed -= n;
 
-  if (IS_TLCS90 && n > (optimize.codeSize ? 2 + (af_free || bc_free || hl_free || iy_free || n < 0) : 1))
+  if (IS_TLCS90 && abs(n) > (optimize.codeSize ? 2 + (af_free || bc_free || hl_free || iy_free || n < 0) * 2: 1))
     {
       emit2 ("add sp, #%d", n);
       cost (3, 6);
       n -= n;
     }
-  else if (n > (IS_RAB ? 127 * 4 - 1 : (optimize.codeSize ? 8 : 5)) && hl_free)
+  else if (n > ((IS_RAB || IS_GB) ? 127 * 4 - 1 : (optimize.codeSize ? 8 : 5)) && hl_free)
     {
       spillCached ();
       emit2 ("ld hl,!immedword", n);
@@ -2973,7 +2973,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
       regalloc_dry_run_cost += 5;
       n -= n;
     }
-  else if (!IS_GB && n > (IS_RAB ? 127 * 4 - 1 : 8) && iy_free)
+  else if (!IS_GB && n > ((IS_RAB || IS_GB) ? 127 * 4 - 1 : 8) && iy_free)
     {
       spillCached ();
       emit2 ("ld iy,!immedword", n);
@@ -2982,7 +2982,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
       regalloc_dry_run_cost += 8;
       n -= n;
     }
-  else if (n > (IS_RAB ? 127 * 4 - 1 : 8) && bc_free)
+  else if (n > ((IS_RAB || IS_GB) ? 127 * 4 - 1 : 8) && bc_free)
     {
       emit2 ("ld c, l");
       emit2 ("ld b, h");

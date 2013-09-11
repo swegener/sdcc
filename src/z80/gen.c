@@ -308,6 +308,18 @@ z80_init_asmops (void)
 static bool regalloc_dry_run;
 static unsigned char regalloc_dry_run_cost;
 
+static void
+cost(unsigned int bytes, unsigned int cycles)
+{
+  regalloc_dry_run_cost += bytes;
+}
+
+static void
+cost2(unsigned int bytes, unsigned int cycles_z80, unsigned int cycles_z180, unsigned int cycles_rab, unsigned int cycles_gbz80, unsigned int cycles_tlcs90)
+{
+  regalloc_dry_run_cost += bytes;
+}
+
 /* WARNING: This function is dangerous to use. It works literally:
    It will return true if ic the the last use of op, even if ic might
    be executed again, e.g. due to a loop. Most of the time you will want
@@ -2938,6 +2950,128 @@ getDataSize (operand * op)
   return size;
 }
 
+/*--------------------------------------------------------------------------*/
+/* adjustStack - Adjust the stack pointer by n bytes.                       */
+/*--------------------------------------------------------------------------*/
+static void
+adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
+{
+  _G.stack.pushed -= n;
+
+  if (IS_TLCS90 && n > (optimize.codeSize ? 2 + (af_free || bc_free || hl_free || iy_free || n < 0) : 1))
+    {
+      emit2 ("add sp, #%d", n);
+      cost (3, 6);
+      n -= n;
+    }
+  else if (n > (IS_RAB ? 127 * 4 - 1 : (optimize.codeSize ? 8 : 5)) && hl_free)
+    {
+      spillCached ();
+      emit2 ("ld hl,!immedword", n);
+      emit2 ("add hl,sp");
+      emit2 ("ld sp,hl");
+      regalloc_dry_run_cost += 5;
+      n -= n;
+    }
+  else if (!IS_GB && n > (IS_RAB ? 127 * 4 - 1 : 8) && iy_free)
+    {
+      spillCached ();
+      emit2 ("ld iy,!immedword", n);
+      emit2 ("add iy,sp");
+      emit2 ("ld sp,iy");
+      regalloc_dry_run_cost += 8;
+      n -= n;
+    }
+  else if (n > (IS_RAB ? 127 * 4 - 1 : 8) && bc_free)
+    {
+      emit2 ("ld c, l");
+      emit2 ("ld b, h");
+      emit2 ("ld hl,!immedword", n);
+      emit2 ("add hl,sp");
+      emit2 ("ld sp,hl");
+      emit2 ("ld l, c");
+      emit2 ("ld h, b");
+      regalloc_dry_run_cost += 9;
+      n -= n;
+    }
+
+  while (abs(n) > 1)
+    {
+      if ((IS_RAB || IS_GB) && abs(n) > (optimize.codeSize ? 2 : 1))
+        {
+          int d;
+          if (n > 127)
+            d = 127;
+          else if (n < -128)
+            d = -128;
+          else
+            d = n;
+          emit2 ("add sp, #%d", d);
+          cost (2, IS_GB ? 16 : 4);
+          n -= d;
+        }
+      else if (n >= 2 && af_free && (IS_Z80 || optimize.codeSize))
+        {
+          emit2 ("pop af");
+          cost2 (1, 10, 9, 7, 12, 10);
+          n -= 2;
+        }
+      else if (n <= -2 && (IS_Z80 || optimize.codeSize))
+        {
+          emit2 ("push af");
+          cost2 (1, 10, 9, 7, 12, 10);
+          n += 2;
+        }
+      else if (n >= 2 && bc_free && (IS_Z80 || optimize.codeSize))
+        {
+          emit2 ("pop bc");
+          cost2 (1, 10, 9, 7, 12, 10);
+          n -= 2;
+        }
+      else if (n >= 2 && hl_free && (IS_Z80 || optimize.codeSize))
+        {
+          emit2 ("pop hl");
+          cost2 (1, 10, 9, 7, 12, 10);
+          n -= 2;
+        }
+      else if (IS_TLCS90 && n >= 2 && iy_free && optimize.codeSize)
+        {
+          emit2 ("pop iy");
+          cost (1, 10);
+          n -= 2;
+        }
+      else if (n >= 2)
+        {
+          emit2 ("inc sp");
+          emit2 ("inc sp");
+          cost2 (2, 12, 8, 4, 16, 8);
+          n -= 2;
+        }
+      else if (n <= -2)
+        {
+          emit2 ("dec sp");
+          emit2 ("dec sp");
+          cost2 (2, 12, 8, 4, 16, 8);
+          n += 2;
+        }
+    }
+
+  if (n == 1)
+    {
+      emit2 ("inc sp");
+      cost2 (1, 6, 4, 2, 8, 4);
+      n--;
+    }
+  else if (n == -1)
+    {
+      emit2 ("dec sp");
+      cost2 (1, 6, 4, 2, 8, 4);
+      n++;
+    }
+
+  wassert(!n);
+}
+
 /*-----------------------------------------------------------------*/
 /* movLeft2Result - move byte from left to result                  */
 /*-----------------------------------------------------------------*/
@@ -4165,72 +4299,11 @@ emitCall (const iCode *ic, bool ispcall)
     }
   else if (ic->parmBytes || bigreturn)
     {
+      adjustStack (ic->parmBytes + bigreturn * 2, !IS_TLCS90, TRUE, !SomethingReturned, !IY_RESERVED);
       int i = ic->parmBytes + bigreturn * 2;
 
-      if (!regalloc_dry_run)
-        _G.stack.pushed -= i;
-      if ((IS_GB || IS_TLCS90) && i > 2)
-        {
-          emit2 ("add sp, #%d", i);
-          regalloc_dry_run_cost += 3;
-        }
-      else
-        {
-          spillCached ();
-          if ((IS_RAB ? i > 127 * 4 - 1 : i > (optimize.codeSize ? 8 : 5)) && !SomethingReturned)
-            {
-              emit2 ("ld hl,!immedword", i);
-              emit2 ("add hl,sp");
-              emit2 ("ld sp,hl");
-              regalloc_dry_run_cost += 5;
-            }
-          else if (IS_RAB ? i > 127 * 4 - 1 : i > 8)
-            {
-              if (!IY_RESERVED)
-                {
-                  emit2 ("ld iy,!immedword", i);
-                  emit2 ("add iy,sp");
-                  emit2 ("ld sp,iy");
-                  regalloc_dry_run_cost += 8;
-                }
-              else
-                {
-                  emit2 ("ld c, l");
-                  emit2 ("ld b, h");
-                  emit2 ("ld hl,!immedword", i);
-                  emit2 ("add hl,sp");
-                  emit2 ("ld sp,hl");
-                  emit2 ("ld l, c");
-                  emit2 ("ld h, b");
-                  regalloc_dry_run_cost += 9;
-                }
-            }
-          else
-            {
-
-              while (i > 1)
-                {
-                  if (IS_RAB && (!optimize.codeSize || i > 2))
-                    {
-                      int d = (i < 127 ? i : 127);
-                      emit2 ("add sp, #%d", d);
-                      regalloc_dry_run_cost += 2;
-                      i -= d;
-                    }
-                  else
-                    {
-                      emit2 ("pop af");
-                      regalloc_dry_run_cost += 1;
-                      i -= 2;
-                    }
-                }
-              if (i)
-                {
-                  emit2 ("inc sp");
-                  regalloc_dry_run_cost += 1;
-                }
-            }
-        }
+      if (regalloc_dry_run)
+        _G.stack.pushed += i;
     }
 
   /* if we need assign a result value */
@@ -4465,41 +4538,12 @@ genFunction (const iCode * ic)
       if (!regalloc_dry_run)
         _G.omitFramePtr = TRUE;
     }
-  else if (sym->stack && IS_GB && sym->stack > -INT8MIN)
-    emit2 ("!enterxl", sym->stack);
-  else if (sym->stack && IY_RESERVED && sym->stack > -INT8MIN)
-    emit2 ("!enterx", sym->stack);
   else if (sym->stack)
     {
-      if ((optimize.codeSize && sym->stack <= 8) || sym->stack <= 4 || IS_RAB && sym->stack <= 254)
-        {
-          int stack = sym->stack;
-          if (!_G.omitFramePtr)
-            emit2 ("!enter");
-          while (stack > 1)
-            {
-              if (IS_RAB && (!optimize.codeSize || stack > 2))
-                {
-                  int d = (stack < 127 ? -stack : -127);
-                  emit2 ("add sp, #%d", d);
-                  stack += d;
-                }
-              else
-                {
-                  emit2 ("push af");
-                  stack -= 2;
-                }
-            }
-          if (stack > 0)
-            emit2 ("dec sp");
-        }
-      else
-        {
-          if (_G.omitFramePtr)
-            emit2 ("!ldaspsp", -sym->stack);
-          else
-            emit2 ("!enterx", sym->stack);
-        }
+      if (!_G.omitFramePtr)
+        emit2 ("!enter");
+      adjustStack (-sym->stack, !IS_TLCS90, TRUE, TRUE, !IY_RESERVED);
+      _G.stack.pushed = 0;
     }
   else if (!_G.omitFramePtr)
     {
@@ -4538,43 +4582,10 @@ genEndFunction (iCode * ic)
     }
 
   /* PENDING: calleeSave */
-  if (_G.stack.offset <= 1 ||
-    _G.stack.offset <= 2 && !IS_GB && optimize.codeSize ||
-    _G.stack.offset <= 7 && !IS_GB && _G.omitFramePtr ||
-    _G.stack.offset <= 14 && !IS_GB && _G.omitFramePtr && optimize.codeSize ||
-    _G.stack.offset <= 127 && IS_RAB ||
-    _G.stack.offset <= 763 && IS_RAB && _G.omitFramePtr)
-    {
-      int stack = _G.stack.offset;
+  adjustStack (_G.stack.offset, !IS_TLCS90, TRUE, FALSE /* TODO: Pass FALSE is function returns void */, !IY_RESERVED);
 
-      while (stack > 1)
-        {
-          if (IS_RAB && (!optimize.codeSize || stack > 2))
-            {
-              int d = (stack < 127 ? stack : 127);
-              emit2 ("add sp, #%d", d);
-              stack -= d;
-            }
-          else
-            {
-              emit2 ("pop af");
-              stack -= 2;
-            }
-        }
-      if (stack)
-        emit2 ("inc sp");
-
-      if(!IS_GB && !_G.omitFramePtr)
-        emit2 ("pop ix");
-    }
-  else if (!IS_GB && _G.omitFramePtr)
-    emit2 ("!ldaspsp", _G.stack.offset);
-  else if (_G.stack.offset && IS_GB && _G.stack.offset > INT8MAX)
-    emit2 ("!leavexl", _G.stack.offset);
-  else if (_G.stack.offset)
-    emit2 ("!leavex", _G.stack.offset);
-  else
-    emit2 ("!leave");
+  if(!IS_GB && !_G.omitFramePtr)
+    emit2 ("pop ix");
 
   if (_G.calleeSaves.pushedDE)
     {

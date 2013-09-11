@@ -16,20 +16,6 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "enter", "" },
     { "enterx", 
       "add sp, #-%d" },
-    { "enterxl",
-                "ld hl,#-%d\n"
-                "add\thl,sp\n"
-                "ld\tsp,hl"
-    },
-    { "leave", ""
-    },
-    { "leavex", "add\tsp,#%d"
-    },
-    { "leavexl",
-                "ld hl,#%d\n"
-                "add\thl,sp\n"
-                "ld\tsp,hl"
-    },
     { "pusha", 
       "push af\n"
       "push bc\n"
@@ -81,21 +67,6 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
 		"push\tix\n"
 		"ld\tix,#0\n"
 		"add\tix,sp" },
-    { "enterx", 
-		"push\tix\n"
-		"ld\tix,#0\n"
-		"add\tix,sp\n"
-		"ld\thl,#-%d\n"
-		"add\thl,sp\n"
-		"ld\tsp,hl" 
-        },
-    { "leave", 
-		"pop\tix"
-    },
-    { "leavex", 
-		"ld sp,ix\n"
-		"pop\tix"
-    },
     { "pusha", 
       		"push af\n"
       		"push\tbc\n"
@@ -148,21 +119,6 @@ static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
 		"push\tix\n"
 		"ld\tix,#0\n"
 		"add\tix,sp" },
-    { "enterx", 
-		"push\tix\n"
-		"ld\tix,#0\n"
-		"add\tix,sp\n"
-		"ld\thl,#-%d\n"
-		"add\thl,sp\n"
-		"ld\tsp,hl" 
-        },
-    { "leave", 
-		"pop\tix"
-    },
-    { "leavex", 
-		"ld sp,ix\n"
-		"pop\tix"
-    },
     { "pusha", 
       		"push af\n"
       		"push\tbc\n"
@@ -264,12 +220,6 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
     { "ei", "ei" },
     { "adjustsp", "add sp,-%d" },
     { "enter", "" },
-    { "enterx", "add sp,-%d"
-    },
-    { "leave", ""
-    },
-    { "leavex", "add sp,%d"
-    },
     { "ldahli", "ld a,[hl+]" },
     { "*hl", "[hl]" },
     { "ldahlsp", "ld hl,[sp+%d]" },
@@ -355,11 +305,6 @@ static const ASM_MAPPING _isas_gb_mapping[] = {
     { "ei", "ei" },
     { "adjustsp", "add sp,-%d" },
     { "enter", "" },
-    { "enterx", "add sp,-%d"
-    },
-    { "leave", ""
-    },
-    { "leavex", "add sp,%d\n" },
     { "ldahli", "ld a,(hli)" },
     { "*hl", "(hl)" },
     { "ldahlsp", "ldhl sp,%d" },
@@ -445,21 +390,6 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
 		"push\tix\n"
 		"ld\tix,0\n"
 		"add\tix,sp" },
-    { "enterx", 
-		"push\tix\n"
-		"ld\tix,0\n"
-		"add\tix,sp\n"
-		"ld\thl,-%d\n"
-		"add\thl,sp\n"
-		"ld\tsp,hl" 
-        },
-    { "leave", 
-		"pop\tix"
-    },
-    { "leavex", 
-		"ld sp,ix\n"
-		"pop\tix"
-    },
     { "pusha", 
       		"push af\n"
       		"push\tbc\n"

@@ -1403,7 +1403,7 @@ Optional Features:
   --disable-hc08          do not compile simulator for hc08
   --enable-xa             compile simulator for XA
   --disable-stm8          do not compile simulator for stm8
-  --disable-st7           do not compile simulator for st7
+  --disable-st7          do not compile simulator for st7
   --enable-serio          compile serio GUI tool (needs curses)
   --enable-statistic      compile statistical features (slower simulation)
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -2800,6 +2800,7 @@ fi
 else
   enable_stm8="yes"
 fi
+
 # Check whether --enable-st7 was given.
 if test "${enable_st7+set}" = set; then :
   enableval=$enable_st7; if test $enable_st7 != "no"; then
@@ -2808,6 +2809,7 @@ fi
 else
   enable_st7="yes"
 fi
+
 # Check whether --enable-serio was given.
 if test "${enable_serio+set}" = set; then :
   enableval=$enable_serio; if test $enable_serio != "no"; then
@@ -2816,6 +2818,7 @@ fi
 else
   enable_serio="no"
 fi
+
 
 
 

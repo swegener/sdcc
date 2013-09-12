@@ -1,5 +1,11 @@
 2013-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
+	* Makefile.common.in,
+	  configure.in:
+	  Preparations for TLCS-90 port.
+
+2013-09-12 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Negative stack adjustment efficiency, restore stack pointer from frame pointer.
 	* src/stm8/peep.c:

@@ -1,7 +1,7 @@
 2013-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Negative stack adjustment efficiency.
+	  Negative stack adjustment efficiency, restore stack pointer from frame pointer.
 	* src/stm8/peep.c:
 	  Provide our own isblank()-substitute for compilers that lack C99 support.
 

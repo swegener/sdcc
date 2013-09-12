@@ -13,6 +13,12 @@
 
 #define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1))
 
+// This function should behave just like C99 isblank(). Remove it, once MSVC supports isblank().
+static int _isblank(int c)
+{
+  return (c == ' ' || c == '\t');
+}
+
 typedef enum
 {
   S4O_CONDJMP,
@@ -385,7 +391,7 @@ findLabel (const lineNode *pl)
 /* Check if reading arg implies reading what. */
 static bool argCont(const char *arg, const char *what)
 {
-  while (isblank (arg[0]))
+  while (_isblank ((unsigned char)(arg[0])))
     arg++;
 
   if (arg[0] == '#')
@@ -400,7 +406,7 @@ static bool argCont(const char *arg, const char *what)
 /* Check if writing arg implies reading what. */
 static bool argCont2(const char *arg, const char *what)
 {
-  while (isblank (arg[0]))
+  while (_isblank ((unsigned char)(arg[0])))
     arg++;
 
   if (arg[0] != '(')

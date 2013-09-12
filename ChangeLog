@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Negative stack adjustment efficiency.
+	* src/stm8/peep.c:
+	  Provide our own isblank()-substitute for compilers that lack C99 support.
 
 2013-09-11 Philipp Klaus Krause <pkk AT spth.de>
 

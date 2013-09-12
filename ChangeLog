@@ -1,7 +1,8 @@
 2013-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Makefile.common.in,
-	  configure.in:
+	  configure.in,
+	  src/z80/gen.c:
 	  Preparations for TLCS-90 port.
 
 2013-09-12 Philipp Klaus Krause <pkk AT spth.de>

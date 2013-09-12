@@ -10283,11 +10283,22 @@ genAssign (const iCode * ic)
         {
           if (size == 0)
             {
-              emit2 ("push iy");
-              emit2 ("dec sp");
-              emit2 ("pop af");
-              emit2 ("inc sp");
-              regalloc_dry_run_cost += 5;
+              if (IS_TLCS90)
+                {
+                  emit2 ("push iy");
+                  emit2 ("ld a, 0(sp)");
+                  emit2 ("inc sp");
+                  emit2 ("inc sp");
+                  cost (5, 26);
+                }
+              else
+                {
+                  emit2 ("push iy");
+                  emit2 ("dec sp");
+                  emit2 ("pop af");
+                  emit2 ("inc sp");
+                  regalloc_dry_run_cost += 5;
+                }
               if (AOP_TYPE (result) == AOP_IY) /* Take care not to overwrite iy */
                 {
                   emit2 ("ld (%s+%d), a", AOP (result)->aopu.aop_dir, size);
@@ -10304,7 +10315,7 @@ genAssign (const iCode * ic)
                   regalloc_dry_run_cost += 4;
                   size--;
                 }
-              else if (AOP_TYPE (result) == AOP_EXSTK) /* Take care not to overwrite iy */
+              else if (AOP_TYPE (result) == AOP_EXSTK || IS_TLCS90) /* Take care not to overwrite iy */
                 {
                   bool pushed_pair = FALSE;
                   PAIR_ID pair = getDeadPairId (ic);

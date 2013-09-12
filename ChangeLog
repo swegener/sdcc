@@ -4,6 +4,8 @@
 	  configure.in,
 	  src/z80/gen.c:
 	  Preparations for TLCS-90 port.
+	* src/stm8/peeph.def:
+	  Peepholes to work around lack of RFE #357.
 
 2013-09-12 Philipp Klaus Krause <pkk AT spth.de>
 

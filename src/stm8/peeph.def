@@ -29,6 +29,42 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
+	addw	%1, #%2
+	ldw	(%1), a
+} by {
+	; peephole 3a moved addition of offset into storage instruction
+	ldw	(%2, %1), a
+} if notUsed(%1)
+
+replace restart {
+	addw	%1, #%2
+	ldw	(%1), %3
+} by {
+	; peephole 3b moved addition of offset into storage instruction
+	ldw	(%2, %1), %3
+} if notUsed(%1)
+
+replace restart {
+	addw	%1, #%2
+	ld	a, %4
+	ld	(%1), a
+} by {
+	; peephole 3c moved addition of offset into storage instruction
+	ld	a, %4
+	ld	(%2, %1), a
+} if notUsed(%1)
+
+replace restart {
+	addw	%1, #%2
+	ldw	%3, %4
+	ldw	(%1), %3
+} by {
+	; peephole 3d moved addition of offset into storage instruction
+	ldw	%3, %4
+	ldw	(%2, %1), %3
+} if notUsed(%1)
+
+replace restart {
 	ld	a, (%1, y)
 	push	a
 	ld	a, (%2, x)

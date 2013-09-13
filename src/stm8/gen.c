@@ -5676,66 +5676,37 @@ genIfx (const iCode *ic)
         emitcode (IC_FALSE (ic) ? "jrc" : "jrnc", "!tlabel", labelKey2num (tlbl->key));
       cost (2, 0);
     }
-  else if (cond->aop->size == 2 &&
-    (aopInReg (cond->aop, 0, X_IDX) || aopInReg (cond->aop, 0, Y_IDX) ||
-    (cond->aop->type == AOP_REG && (cond->aop->aopu.bytes[0].byteu.reg->rIdx == XH_IDX && cond->aop->aopu.bytes[1].byteu.reg->rIdx == XL_IDX || cond->aop->aopu.bytes[0].byteu.reg->rIdx == YH_IDX && cond->aop->aopu.bytes[1].byteu.reg->rIdx == YL_IDX))))
-    {
-      bool in_y = (aopInReg (cond->aop, 0, Y_IDX) || aopInReg (cond->aop, 0, YH_IDX) && aopInReg (cond->aop, 0, YL_IDX));
-
-      emit3w (A_TNZW, in_y ? ASMOP_Y : ASMOP_X, 0);
-      if (tlbl)
-        emitcode (IC_FALSE (ic) ? "jrne" : "jreq", "!tlabel", labelKey2num (tlbl->key));
-      cost (2, 0);
-    }
-  else if (cond->aop->size == 2 &&
-    (aopOnStack (cond->aop, 0, 2) || cond->aop->type == AOP_DIR) && regDead(X_IDX, ic))
-    {
-      genMove (ASMOP_X, cond->aop, regDead (A_IDX, ic), TRUE, FALSE);
-      emit3w (A_TNZW, ASMOP_X, 0);
-      if (tlbl)
-        emitcode (IC_FALSE (ic) ? "jrne" : "jreq", "!tlabel", labelKey2num (tlbl->key));
-      cost (2, 0);
-    }
   else if (aopRS (cond->aop) || cond->aop->type == AOP_DIR)
     {
       int i;
 
-      if(cond->aop->size > 1 && !IC_FALSE (ic))
+      for (i = 0; i < cond->aop->size;) // todo: Use tnzw; test a first, if dead, to free a; use swapw followed by exg to test xh if xl is dead (same for yh), use tnzw independently of where in the operand xl and xh are.
         {
-          tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-          inv = TRUE;
-        }
-
-      for (i = 0; i < cond->aop->size; i++) // todo: Use tnzw; test a first, if dead, to free a; use swapw followed by exg to test xh if xl is dead (same for yh), use tnzw independently of where in the operand xl and xh are.
-        {
-          if (aopInReg (cond->aop, i, X_IDX) || aopInReg (cond->aop, i, XH_IDX) && aopInReg (cond->aop, i + 1, XL_IDX))
+          if (i + 1 < cond->aop->size &&
+            (aopInReg (cond->aop, i, X_IDX) || aopInReg (cond->aop, i, Y_IDX) ||
+            (cond->aop->type == AOP_REG && (cond->aop->aopu.bytes[i].byteu.reg->rIdx == XH_IDX && cond->aop->aopu.bytes[i + 1].byteu.reg->rIdx == XL_IDX || cond->aop->aopu.bytes[i].byteu.reg->rIdx == YH_IDX && cond->aop->aopu.bytes[i + 1].byteu.reg->rIdx == YL_IDX))))
             {
-              emit3w(A_TNZW, ASMOP_X, 0);
-              i++;
-            }
-          else if (aopInReg (cond->aop, i, Y_IDX) || aopInReg (cond->aop, i, YH_IDX) && aopInReg (cond->aop, i + 1, YL_IDX))
-            {
-              emit3w(A_TNZW, ASMOP_Y, 0);
-              i++;
+              bool in_y = (aopInReg (cond->aop, i, Y_IDX) || aopInReg (cond->aop, i, YH_IDX) && aopInReg (cond->aop, i, YL_IDX));
+              emit3w (A_TNZW, in_y ? ASMOP_Y : ASMOP_X, 0);
+              i += 2;
             }
           else if (i + 1 < cond->aop->size && regDead (X_IDX, ic) && cond->aop->regs[XL_IDX] < i && cond->aop->regs[XH_IDX] < i &&
             (aopOnStack (cond->aop, i, 2) || cond->aop->type == AOP_DIR))
             {
               genMove_o (ASMOP_X, 0, cond->aop, i, 2, regDead (A_IDX, ic) && cond->aop->regs[A_IDX] < i, TRUE, FALSE);
-              emit3w(A_TNZW, ASMOP_X, 0);
-              i++;
+              i += 2;
             }
           else if (i + 1 < cond->aop->size && regDead (Y_IDX, ic) && cond->aop->regs[YL_IDX] < i && cond->aop->regs[YH_IDX] < i &&
             (aopOnStack (cond->aop, i, 2) || cond->aop->type == AOP_DIR))
             {
               genMove_o (ASMOP_Y, 0, cond->aop, i, 2, regDead (A_IDX, ic) && cond->aop->regs[A_IDX] < i, FALSE, TRUE);
-              emit3w(A_TNZW, ASMOP_Y, 0);
-              i++;
+              i += 2;
             }
           else if ((aopInReg (cond->aop, i, XL_IDX) || aopInReg (cond->aop, i, XH_IDX) || aopInReg (cond->aop, i, YH_IDX)) && regDead (A_IDX, ic) && cond->aop->regs[A_IDX] <= i)
             {
               cheapMove (ASMOP_A, 0, cond->aop, i, FALSE);
               emit3(A_TNZ, ASMOP_A, 0);
+              i++;
             }
           else if (aopInReg (cond->aop, i, XL_IDX))
             {
@@ -5744,6 +5715,7 @@ genIfx (const iCode *ic)
               emit3(A_TNZ, ASMOP_A, 0);
               emitcode ("exg", "a, xl");
               cost (1, 1);
+              i++;
             }
           else if (aopInReg (cond->aop, i, YL_IDX))
             {
@@ -5752,24 +5724,36 @@ genIfx (const iCode *ic)
               emit3(A_TNZ, ASMOP_A, 0);
               emitcode ("exg", "a, yl");
               cost (1, 1);
+              i++;
             }
           else if (aopInReg (cond->aop, i, XH_IDX))
             {
               push (ASMOP_X, 0, 2);
               emitcode ("tnz", "(1, sp)");
               adjustStack (2);
+              i++;
             }
           else if (aopInReg (cond->aop, i, YH_IDX))
             {
               push (ASMOP_Y, 0, 2);
               emitcode ("tnz", "(1, sp)");
               adjustStack (2);
+              i++;
             }
           else
-            emit3_o (A_TNZ, cond->aop , i, 0, 0);
+            {
+              emit3_o (A_TNZ, cond->aop, i, 0, 0);
+              i++;
+            }
+
+          if(!inv && i < cond->aop->size && !IC_FALSE (ic))
+            {
+              tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+              inv = TRUE;
+            }
 
           if (tlbl)
-            emitcode ((!!IC_FALSE (ic) ^ (inv && i != cond->aop->size - 1)) ? "jrne" : "jreq", "!tlabel", labelKey2num ((inv && i == cond->aop->size - 1) ? tlbl2->key : tlbl->key));
+            emitcode ((!!IC_FALSE (ic) ^ (inv && i != cond->aop->size)) ? "jrne" : "jreq", "!tlabel", labelKey2num ((inv && i == cond->aop->size) ? tlbl2->key : tlbl->key));
           cost (2, 0);
         }
     }

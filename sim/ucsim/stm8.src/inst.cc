@@ -744,7 +744,7 @@ cl_stm8::operandw(t_mem code, unsigned char prefix)
 int
 cl_stm8::inst_ldxy(t_mem code, unsigned char prefix)
 {
-  int operand;
+  unsigned int operand;
   short unsigned int *dest_ptr;
   dest_ptr = (prefix & 0x90) ? &regs.Y : &regs.X;
   if(code == 0x16) dest_ptr = &regs.Y; 
@@ -772,7 +772,7 @@ cl_stm8::inst_ldxy(t_mem code, unsigned char prefix)
 
   if ((code & 0xf0) != 0x90)
     {
-      FLAG_ASSIGN (BIT_Z, !operand);
+      FLAG_ASSIGN (BIT_Z, (operand & 0xffff) == 0);
       FLAG_ASSIGN (BIT_N, 0x8000 & operand);
     }
 
@@ -1197,7 +1197,7 @@ cl_stm8::inst_swap(t_mem code, unsigned char prefix)
 int
 cl_stm8::inst_tnz(t_mem code, unsigned char prefix)
 {
-  long int resval;
+  unsigned int resval;
   unsigned int opaddr = 0;
 
    if (((code&0xf0)==0x40) &&(prefix == 0x00)) {

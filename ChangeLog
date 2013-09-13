@@ -1,3 +1,9 @@
+2013-09-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  sim/ucsim/stm8.src/inst.cc:
+	  More efficient conditional jumps.
+
 2013-09-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

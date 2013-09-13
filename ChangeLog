@@ -1,3 +1,8 @@
+2013-09-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Assume spilt variables are on non-extended stack during dry runs.
+
 2013-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Makefile.common.in,

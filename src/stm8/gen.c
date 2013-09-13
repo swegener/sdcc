@@ -272,7 +272,7 @@ aopOnStack (const asmop *aop, int offset, int size)
 static bool
 aopOnStackNotExt (const asmop *aop, int offset, int size)
 {
-  return (aopOnStack (aop, offset, size) && aop->aopu.bytes[offset].byteu.stk + G.stack.pushed <= 255);
+  return (aopOnStack (aop, offset, size) && (aop->aopu.bytes[offset].byteu.stk + G.stack.pushed <= 255 || regalloc_dry_run));// Todo: Stack offsets might be unavailable during dry run (messes with addition costs, so we should have a mechanism to do it better).
 }
 
 static void

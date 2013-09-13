@@ -315,10 +315,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
 
 #if 0
   std::cout << "Calculating at cost at ic " << ic->key << ", op " << ic->op << " for: ";
-  for(unsigned int i = 0; i < boost::num_vertices(I); i++)
-  {
-  	std::cout << "(" << i << ", " << int(a.global[i]) << ") ";
-  }
+  print_assignment(a);
   std::cout << "\n";
   std::cout.flush();
 #endif
@@ -432,9 +429,6 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 
   if(ia.registers[REG_A][1] < 0)
     c += 0.05f;
-
-  /*if(ia.registers[REG_XL][1] < 0 && ia.registers[REG_YL][1] >= 0) // Prefer X over Y.
-    c += 0.3f;*/
 
   varset_t::const_iterator v, v_end;
   for(v = a.local.begin(), v_end = a.local.end(); v != v_end; ++v)

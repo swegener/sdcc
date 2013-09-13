@@ -707,7 +707,10 @@ static void tree_dec_ralloc_leaf(T_t &T, typename boost::graph_traits<T_t>::vert
 #ifdef DEBUG_RALLOC_DEC_ASS
   assignment_list_t::iterator ai;
   for(ai = alist.begin(); ai != alist.end(); ++ai)
-  	print_assignment(*ai);
+    {
+      print_assignment(*ai);
+      std::cout << "\n";
+    }
   assignment best;
   get_best_local_assignment(best, t, T);
   std::cout << "Best: "; print_assignment(best); std::cout << "\n";
@@ -763,8 +766,10 @@ static void tree_dec_ralloc_introduce(T_t &T, typename boost::graph_traits<T_t>:
 
 #ifdef DEBUG_RALLOC_DEC_ASS
   for(ai = alist.begin(); ai != alist.end(); ++ai)
-  	print_assignment(*ai);
-  std::cout << "\n";
+    {
+      print_assignment(*ai);
+      std::cout << "\n";
+    }
 
   assignment best;
   get_best_local_assignment(best, t, T);
@@ -855,8 +860,10 @@ static void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::ve
 
 #ifdef DEBUG_RALLOC_DEC_ASS
   for(ai = alist.begin(); ai != alist.end(); ++ai)
-  	print_assignment(*ai);
-  std::cout << "\n";
+    {
+      print_assignment(*ai);
+      std::cout << "\n";
+    }
   
   assignment best;
   get_best_local_assignment(best, t, T);
@@ -927,8 +934,10 @@ static void tree_dec_ralloc_join(T_t &T, typename boost::graph_traits<T_t>::vert
 #ifdef DEBUG_RALLOC_DEC_ASS
   std::list<assignment>::iterator ai;
   for(ai = alist1.begin(); ai != alist1.end(); ++ai)
-  	print_assignment(*ai);
-  std::cout << "\n";
+    {
+  	  print_assignment(*ai);
+      std::cout << "\n";
+    }
 #endif
 }
 

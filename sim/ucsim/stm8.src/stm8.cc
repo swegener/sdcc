@@ -852,8 +852,7 @@ cl_stm8::exec_inst(void)
                return( inst_rrc( code, cprefix));
                break;
             case 0x10:       
-               regs.Y = operandw(code, cprefix);
-               return(resGO);
+               return(inst_ldxy( code, cprefix));
                break;
             case 0x80: 
                pop1( regs.CC);

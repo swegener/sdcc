@@ -1,3 +1,8 @@
+2013-09-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sim/ucsim/stm8.src/stm8.cc: fix simulation of LDW Y,(n,SP)
+	  to properly update N & Z flag bits
+
 2013-09-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

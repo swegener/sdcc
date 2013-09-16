@@ -1,3 +1,8 @@
+2013-09-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc.c:
+	  Do not allocate spill locations for optimized-out jump conditions.
+
 2013-09-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

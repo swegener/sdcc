@@ -97,7 +97,7 @@ createStackSpil (symbol * sym)
   symbol *sloc = NULL;
   struct dbuf_s dbuf;
 
-  D (D_ALLOC, ("createStackSpil: for sym %p\n", sym));
+  D (D_ALLOC, ("createStackSpil: for sym %p %s\n", sym, sym->name));
 
   /* first go try and find a free one that is already
      existing on the stack */
@@ -365,6 +365,9 @@ verifyRegsAssigned (operand * op, iCode * ic)
     return;
 
   sym = OP_SYMBOL (op);
+
+  if (sym->regType == REG_CND)
+    return;
 
   if (sym->isspilt && !sym->remat && sym->usl.spillLoc && !sym->usl.spillLoc->allocreq)
     sym->usl.spillLoc->allocreq++;

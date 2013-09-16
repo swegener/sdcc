@@ -4821,7 +4821,7 @@ genLeftShift (const iCode *ic)
       pushed_a = TRUE;
     }
 
-  genMove (result->aop, left->aop, regDead (A_IDX, ic) && right->aop->regs[A_IDX], regDead (X_IDX, ic) && right->aop->regs[XL_IDX] && right->aop->regs[XH_IDX],  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] && right->aop->regs[YH_IDX]);
+  genMove (result->aop, left->aop, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0,  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
 
   size = result->aop->size;
 
@@ -5206,7 +5206,7 @@ genRightShift (const iCode *ic)
       pushed_a = TRUE;
     }
 
-  genMove (result->aop, left->aop, regDead (A_IDX, ic) && right->aop->regs[A_IDX], regDead (X_IDX, ic) && right->aop->regs[XL_IDX] && right->aop->regs[XH_IDX],  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] && right->aop->regs[YH_IDX]);
+  genMove (result->aop, left->aop, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0,  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
 
   size = result->aop->size;
 
@@ -6046,6 +6046,28 @@ genCast (const iCode *ic)
       size = result->aop->size - right->aop->size;
       offset = right->aop->size;
 
+      if (size == 2 && (aopInReg (result->aop, offset, X_IDX) || aopInReg (result->aop, offset, Y_IDX)) &&
+        (aopInReg (result->aop, right->aop->size - 1, XH_IDX) || aopInReg (result->aop, right->aop->size - 1, YH_IDX) || aopInReg (result->aop, right->aop->size - 1, A_IDX) || aopOnStack (result->aop, right->aop->size - 1, 1) || result->aop->type == AOP_DIR))
+        {
+          symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
+          emit3w_o (A_CLRW, result->aop, offset, 0, 0);
+
+          if (aopInReg (result->aop, right->aop->size - 1, XH_IDX))
+            emit3w (A_TNZW, ASMOP_X, 0);
+          else if (aopInReg (result->aop, right->aop->size - 1, YH_IDX))
+            emit3w (A_TNZW, ASMOP_Y, 0);
+          else
+            emit3_o (A_TNZ, result->aop, right->aop->size - 1, 0, 0);
+
+          if (!regalloc_dry_run)
+            emitcode ("jrpl", "!tlabel", labelKey2num (tlbl->key));
+          cost (2, 2); // 2 for cycle cost is just an estimate; it also ignores pipelining.
+          emit3w_o (A_DECW, result->aop, offset, 0, 0);
+          emitLabel (tlbl);
+          
+          goto release;
+        }
+
       if (result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < right->aop->size || !regDead (A_IDX, ic))
         {
           push (ASMOP_A, 0, 1);
@@ -6054,6 +6076,7 @@ genCast (const iCode *ic)
 
       cheapMove (ASMOP_A, 0, result->aop, right->aop->size - 1, FALSE);
       emit3 (A_RLC, ASMOP_A, 0);
+     
 
       if (size == 2 && (aopInReg (result->aop, offset, X_IDX) || aopInReg (result->aop, offset, Y_IDX))) // Faster when just setting 16-bit reg.
         {
@@ -6061,7 +6084,7 @@ genCast (const iCode *ic)
           emit3w_o (A_CLRW, result->aop, offset, 0, 0);
           if (!regalloc_dry_run)
             emitcode ("jrnc", "!tlabel", labelKey2num (tlbl->key));
-          cost (2, 2); // 2 for cyscle cost is just an estimate; it also ignores pipelining.
+          cost (2, 2); // 2 for cycle cost is just an estimate; it also ignores pipelining.
           emit3w_o (A_DECW, result->aop, offset, 0, 0);
           emitLabel (tlbl);
 

@@ -1838,6 +1838,8 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 {
   int i;
 
+  bool clr_x = FALSE, clr_y = FALSE;
+
   wassertl (result->type != AOP_LIT, "Trying to write to literal.");
   wassertl (result->type != AOP_IMMD, "Trying to write to immediate.");
   wassertl (roffset + size <= result->size, "Trying to writer beyond end of operand");
@@ -1856,7 +1858,16 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
     {
       if (i + 1 < size && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, soffset + i) && !byteOfVal (source->aopu.aop_lit, soffset + i + 1))
         {
-          emit3w_o (A_CLRW, result, roffset + i, 0, 0);
+          if (aopInReg (result, roffset + i, X_IDX) && !clr_x)
+            {
+              emit3w (A_CLRW, ASMOP_X, 0);
+              clr_x = TRUE;
+            }
+          else if (aopInReg (result, roffset + i, Y_IDX) && !clr_y)
+            {
+              emit3w (A_CLRW, ASMOP_Y, 0);
+              clr_y = TRUE;
+            }
           i += 2;
         }
       else if (i + 1 < size && aopInReg (result, roffset + i, X_IDX) &&
@@ -1864,6 +1875,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           emitcode ("ldw", "x, %s", aopGet2 (source, soffset + i));
           cost (3, 2);
+          clr_x = FALSE;
           i += 2;
         }
       else if (i + 1 < size && aopInReg (result, roffset + i, Y_IDX) &&
@@ -1871,6 +1883,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           emitcode ("ldw", "y, %s", aopGet2 (source, soffset + i));
           cost (4, 2);
+          clr_y = FALSE;
           i += 2;
         }
       else if (i + 1 < size && result->type == AOP_DIR && aopInReg (source, soffset + i, X_IDX))
@@ -1889,11 +1902,16 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           if (source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, i) && !byteOfVal (source->aopu.aop_lit, i + 1))
-            emit3w (A_CLRW, ASMOP_X, 0);
+            {
+              if (!clr_x)
+                emit3w (A_CLRW, ASMOP_X, 0);
+              clr_x = TRUE;
+            }
           else
             {
               emitcode ("ldw", "x, %s", aopGet2 (source, soffset + i));
               cost (3, 2);
+              clr_x = FALSE;
             }
           emitcode ("ldw", "%s, x", aopGet2 (result, roffset + i));
           cost (2, 2);
@@ -1908,11 +1926,16 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           if (source->type == AOP_LIT && !byteOfVal (source->aopu.aop_lit, i) && !byteOfVal (source->aopu.aop_lit, i + 1))
-            emit3w (A_CLRW, ASMOP_Y, 0);
+            {
+              if (!clr_y)
+                emit3w (A_CLRW, ASMOP_Y, 0);
+              clr_y = TRUE;
+            }
           else
             {
               emitcode ("ldw", "y, %s", aopGet2 (source, soffset + i));
               cost (4, 2);
+              clr_y = FALSE;
             }
           emitcode ("ldw", "%s, y", aopGet2 (result, roffset + i));
           cost (2, 2);

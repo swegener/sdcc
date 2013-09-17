@@ -4301,10 +4301,9 @@ emitCall (const iCode *ic, bool ispcall)
   else if (ic->parmBytes || bigreturn)
     {
       adjustStack (ic->parmBytes + bigreturn * 2, !IS_TLCS90, TRUE, !SomethingReturned, !IY_RESERVED);
-      int i = ic->parmBytes + bigreturn * 2;
 
       if (regalloc_dry_run)
-        _G.stack.pushed += i;
+        _G.stack.pushed += ic->parmBytes + bigreturn * 2;
     }
 
   /* if we need assign a result value */

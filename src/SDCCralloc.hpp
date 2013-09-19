@@ -189,6 +189,7 @@ struct tree_dec_node
   std::set<unsigned int> bag;
   std::set<var_t> alive;
   assignment_list_t assignments;
+  unsigned weight; // The weight is the number of nodes at which intermediate results need to be remembered. In general, to minimize memory consumption, at join nodes the child with maximum weight should be processed first.
 };
 
 typedef std::multimap<int, var_t> operand_map_t;
@@ -978,6 +979,10 @@ static void tree_dec_ralloc_nodes(T_t &T, typename boost::graph_traits<T_t>::ver
     case 2:
       c0 = *c++;
       c1 = *c;
+
+      if (T[c0].weight < T[c1].weight) // Minimize memory consumption.
+        /*std::swap (c0, c1)*/; /* Causes code size regressions - don't know why. */
+
       tree_dec_ralloc_nodes(T, c0, G, I, ac, assignment_optimal);
       {
         assignment *ac2 = new assignment;

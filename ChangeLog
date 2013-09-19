@@ -2,6 +2,11 @@
 
 	* src/z80/gen.c:
 	  Enable some Rabbit optimizations for the TLCS-90.
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/SDCCnaddr.hpp,
+	  src/SDCClospre.hpp:
+	  Reduce memory footprint in lospre and named address spaces, prepare for reducing memory footprint in register allocation.
 
 2013-09-17 Philipp Klaus Krause <pkk AT spth.de>
 

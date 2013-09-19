@@ -120,6 +120,7 @@ struct tree_dec_naddr_node
 {
   std::set<unsigned int> bag;
   assignment_list_naddr_t assignments;
+  unsigned weight; // The weight is the number of nodes at which intermediate results need to be remembered. In general, to minimize memory consumption, at join nodes the child with maximum weight should be processed first.
 };
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_naddr_node, float> cfg_t; // The edge property is the cost of subdividing the edge and inserting a bank switching instruction.
@@ -396,6 +397,10 @@ int tree_dec_naddrswitch_nodes(T_t &T, typename boost::graph_traits<T_t>::vertex
     case 2:
       c0 = *c++;
       c1 = *c;
+
+      if (T[c0].weight < T[c1].weight) // Minimize memory consumption.
+        std::swap (c0, c1);
+
       tree_dec_naddrswitch_nodes(T, c0, G);
       tree_dec_naddrswitch_nodes(T, c1, G);
       tree_dec_naddrswitch_join(T, t, G);

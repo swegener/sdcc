@@ -109,6 +109,7 @@ struct tree_dec_lospre_node
 {
   std::set<unsigned int> bag;
   assignment_list_lospre_t assignments;
+  unsigned weight; // The weight is the number of nodes at which intermediate results need to be remembered. In general, to minimize memory consumption, at join nodes the child with maximum weight should be processed first.
 };
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_lospre_node, float> cfg_lospre_t; // The edge property is the cost of subdividing the edge and inserting an instruction (for now we always use 1, optimizing for code size, but relative execution frequency could be used when optimizing for speed or total energy consumption; aggregates thereof can be a good idea as well).
@@ -478,6 +479,10 @@ int tree_dec_safety_nodes(T_t &T, typename boost::graph_traits<T_t>::vertex_desc
     case 2:
       c0 = *c++;
       c1 = *c;
+
+      if (T[c0].weight < T[c1].weight) // Minimize memory consumption.
+        std::swap (c0, c1);
+
       if(tree_dec_safety_nodes(T, c0, G) < 0)
         return(-1);
       if(tree_dec_safety_nodes(T, c1, G) < 0)

@@ -1975,7 +1975,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
               break;
             default:
               wassertl (aop->size - offset > 1, "Attempted to fetch no data into HL");
-              if (IS_RAB)
+              if (IS_RAB || IS_TLCS90)
                 {
                   emit2 ("ld hl, 0 (hl)");
                   regalloc_dry_run_cost += 3;
@@ -2009,15 +2009,15 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
           /* The Rabbit has the ld iy, n (sp) instruction. */
           int fp_offset = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
           int sp_offset = fp_offset + _G.stack.pushed;
-          if (IS_RAB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && abs (sp_offset) <= 127)
+          if ((IS_RAB || IS_TLCS90) && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && abs (sp_offset) <= 127)
             {
               emit2 ("ld iy, %d (sp)", sp_offset);
               regalloc_dry_run_cost += 3;
             }
-          else if (isPair (aop) && IS_RAB && getPairId (aop) == PAIR_HL)
+          else if (isPair (aop) && (IS_RAB || IS_TLCS90) && getPairId (aop) == PAIR_HL)
             {
               emit2 ("ld iy, hl");
-              regalloc_dry_run_cost += 2;
+              regalloc_dry_run_cost += (1 + IS_RAB);
             }
           else if (isPair (aop))
             {
@@ -2039,10 +2039,10 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                 }
               regalloc_dry_run_cost += ld_cost (ASMOP_L, aop) + ld_cost (ASMOP_H, aop);
 
-              if (IS_RAB && id == PAIR_HL)
+              if ((IS_RAB || IS_TLCS90) && id == PAIR_HL)
                 {
                   emit2 ("ld iy, hl");
-                  regalloc_dry_run_cost += 2;
+                  regalloc_dry_run_cost += (1 + IS_RAB);
                 }
               else
                 {
@@ -2065,7 +2065,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
           /* The Rabbit has the ld hl, n (sp) and ld hl, n (ix) instructions. */
           int fp_offset = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
           int sp_offset = fp_offset + _G.stack.pushed;
-          if (IS_RAB && aop->size - offset >= 2 && (aop->type == AOP_STK || aop->type == AOP_EXSTK)
+          if ((IS_RAB || IS_TLCS90) && aop->size - offset >= 2 && (aop->type == AOP_STK || aop->type == AOP_EXSTK)
               && (pairId == PAIR_HL || pairId == PAIR_IY || pairId == PAIR_DE) && (abs (fp_offset) <= 127 && pairId == PAIR_HL
                   && aop->type == AOP_STK
                   || abs (sp_offset) <= 127))
@@ -2853,7 +2853,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
       regalloc_dry_run_cost += ((id == PAIR_IY || IS_RAB) ? 2 : 1);
       spillPair (id);
     }
-  else if (IS_RAB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (id == PAIR_HL || id == PAIR_IY) &&
+  else if ((IS_RAB || IS_TLCS90) && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && (id == PAIR_HL || id == PAIR_IY) &&
            (id == PAIR_HL && abs (fp_offset) <= 127 && aop->type == AOP_STK || abs (sp_offset) <= 127))
     {
       if (abs (sp_offset) <= 127)
@@ -3261,7 +3261,7 @@ regMove (const short *dst, const short *src, size_t n, bool preserve_a)
       if (ex[0] >= 0 && ex[1] >= 0 && ex[2] >= 0 && ex[3] >= 0)
         {
           emit2 ("ex de, hl");
-          regalloc_dry_run_cost += IS_RAB ? 2 : 1;
+          regalloc_dry_run_cost++;
           assigned[ex[0]] = TRUE;
           assigned[ex[1]] = TRUE;
           assigned[ex[2]] = TRUE;
@@ -9331,7 +9331,7 @@ genPointerGet (const iCode *ic)
 
   if (getPairId (AOP (left)) == PAIR_IY && !IS_BITVAR (retype) && rightval_in_range)
     {
-      if (IS_RAB && getPairId (AOP (result)) == PAIR_HL)
+      if ((IS_RAB || IS_TLCS90) && getPairId (AOP (result)) == PAIR_HL)
         {
           emit2 ("ld hl, %d (iy)", rightval);
           regalloc_dry_run_cost += 3;
@@ -10267,7 +10267,7 @@ genAssign (const iCode * ic)
     (!IS_GB && (AOP_TYPE (right) == AOP_STK && !_G.omitFramePtr || AOP_TYPE (right) == AOP_IY) && AOP_TYPE (result) == AOP_IY || // Use ld (nn), hl
     !IS_GB && AOP_TYPE (right) == AOP_IY && (AOP_TYPE (result) == AOP_STK && !_G.omitFramePtr || AOP_TYPE (result) == AOP_IY) || // Use ld hl, (nn)
     !IS_GB && AOP_TYPE (right) == AOP_LIT && (AOP_TYPE(result) == AOP_STK || AOP_TYPE(result) == AOP_EXSTK) && (AOP(result)->aopu.aop_stk + offset + _G.stack.offset + (AOP(result)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed) == 0 || // Use ex (sp), hl
-    IS_RAB && (AOP_TYPE(result) == AOP_STK || AOP_TYPE(result) == AOP_EXSTK) && (AOP_TYPE(right) == AOP_LIT || AOP_TYPE (right) == AOP_IMMD))) // Use ld d(sp), hl
+    (IS_RAB || IS_TLCS90) && (AOP_TYPE(result) == AOP_STK || AOP_TYPE(result) == AOP_EXSTK) && (AOP_TYPE(right) == AOP_LIT || AOP_TYPE (right) == AOP_IMMD))) // Use ld d(sp), hl
     {
       fetchPair (PAIR_HL, AOP (right));
       commitPair (AOP (result), PAIR_HL, ic, FALSE);

@@ -1,3 +1,12 @@
+2013-09-20 Borut Razem <borut.razem AT gmail.com>
+
+	* device/non-free/lib/pic14/configure.in,
+	  device/non-free/lib/pic14/configure,
+	  device/non-free/lib/pic16/supported-devices.ac,
+	  device/non-free/lib/pic16/configure:
+	  fixed bug #2220 Detection of 16 bit pic devices supported by gputils
+	  is not working correctly on Cygwin environment
+
 2013-09-19 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic14/pic14devices.txt,

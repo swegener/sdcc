@@ -3244,7 +3244,7 @@ for i in "${LIBDEV}/pic1"*.c; do
   p="${p%.c}";
   P=$(echo "$p" | tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ);
   printf "  include \"p%s.inc\"\n  END" "$p" > "${CHECK}.asm";
-  if $mCCAS -p "$p" -o "${CHECK}.o" -c "${CHECK}.asm" >/dev/null 2>&1 && $mLD "${CHECK}.o" >/dev/null 2>&1; then
+  if "$mCCAS" -p "$p" -o "${CHECK}.o" -c "${CHECK}.asm" >/dev/null 2>&1 && "$mLD" "${CHECK}.o" >/dev/null 2>&1; then
     GOOD_PICS="$GOOD_PICS $p";
     N_GOOD=$((N_GOOD + 1));
     echo "$P" >> "$RESULT";

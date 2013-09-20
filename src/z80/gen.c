@@ -185,7 +185,7 @@ static const char *asminstnames[] =
  */
 static struct
 {
-  /** Used to optimised setting up of a pair by remebering what it
+  /** Used to optimise setting up of a pair by remembering what it
       contains and adjusting instead of reloading where possible.
   */
   struct

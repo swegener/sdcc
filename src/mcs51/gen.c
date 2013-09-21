@@ -4324,7 +4324,9 @@ genEndFunction (iCode * ic)
       /* Remove change of register bank if no registers used */
       if (lnp->ic && lnp->ic->op == FUNCTION &&
           !strncmp (lnp->line, "mov", 3) &&
-          bitVectFirstBit (port->peep.getRegsWritten (lnp)) == CND_IDX && !bitVectBitsInCommon (mcs51_allBankregs (), regsUsed))
+          bitVectFirstBit (port->peep.getRegsWritten (lnp)) == CND_IDX &&
+          !bitVectBitsInCommon (mcs51_allBankregs (), regsUsed) &&
+          !IFFUNC_HASFCALL (sym->type))
         {
           emitcode (";", "eliminated unneeded mov psw,# (no regs used in bank)");
           connectLine (lnp->prev, lnp->next);

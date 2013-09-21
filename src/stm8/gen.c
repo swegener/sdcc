@@ -2721,7 +2721,7 @@ emitCall (const iCode *ic, bool ispcall)
                        || IS_TRUE_SYMOP (IC_RESULT (ic));
 
   if (ic->parmBytes || bigreturn)
-    adjustStack (ic->parmBytes + bigreturn * 2, FALSE, FALSE, FALSE);
+    adjustStack (ic->parmBytes + bigreturn * 2, !(SomethingReturned && getSize (ftype->next) == 1), !(SomethingReturned && (getSize (ftype->next) == 2 || getSize (ftype->next) == 4)), !(SomethingReturned && getSize (ftype->next) == 4));
 
   half = stm8_extend_stack && SomethingReturned && getSize (ftype->next) == 4;
 
@@ -2910,7 +2910,7 @@ genFunction (iCode *ic)
 
   /* adjust the stack for the function */
   if (sym->stack)
-    adjustStack (-sym->stack, TRUE, FALSE, FALSE);
+    adjustStack (-sym->stack, TRUE, TRUE, !stm8_extend_stack);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2920,6 +2920,7 @@ static void
 genEndFunction (iCode *ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
+  int retsize = getSize (sym->type->next);
 
   D (emitcode ("; genEndFunction", ""));
 
@@ -2935,7 +2936,7 @@ genEndFunction (iCode *ic)
 
   /* adjust the stack for the function */
   if (sym->stack)
-    adjustStack (sym->stack, TRUE, FALSE, FALSE);
+    adjustStack (sym->stack, retsize != 1, retsize != 2 && retsize != 4, retsize != 4);
 
   wassertl (!G.stack.pushed, "Unbalanced stack.");
 
@@ -3077,7 +3078,7 @@ genReturn (const iCode *ic)
         }
 
       if (stacked)
-        adjustStack (2, TRUE, FALSE, FALSE);
+        adjustStack (2, TRUE, TRUE, TRUE);
     }
 
   freeAsmop (left);

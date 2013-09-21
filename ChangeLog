@@ -2,7 +2,7 @@
 
 	* src/mcs51/gen.c (genEndFunction): applied patch 207 to fix bug 2221,
 	  Thanks Alex Burton!
-	* support/regression/tests/bug2221.c: new, added
+	* support/regression/tests/bug-2221.c: new, added
 
 2013-09-20 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -3246,11 +3246,11 @@ for i in "${LIBDEV}/pic1"*.c; do
   printf "  include \"p%s.inc\"\n  END" "$p" > "${CHECK}.asm";
   if "$mCCAS" -p "$p" -o "${CHECK}.o" -c "${CHECK}.asm" >/dev/null 2>&1 && "$mLD" "${CHECK}.o" >/dev/null 2>&1; then
     GOOD_PICS="$GOOD_PICS $p";
-    N_GOOD=$((N_GOOD + 1));
+    N_GOOD=`expr $N_GOOD + 1`;
     echo "$P" >> "$RESULT";
   else
     BAD_PICS="$BAD_PICS $p";
-    N_BAD=$((N_BAD + 1));
+    N_BAD=`expr $N_BAD + 1`;
   fi;
 done;
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $N_GOOD devices ($GOOD_PICS)" >&5

@@ -141,9 +141,27 @@ replace restart {
 
 replace restart {
 	jp	%1
+%1:
+} by {
+%1:
+	; peephole j1a removed redundant jump.
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jp	%1
+%2:
+%1:
+} by {
+%2:
+%1:
+	; peephole j1b removed redundant jump.
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jp	%1
 	jp	%2
 } by {
-	jp	%2
+	jp	%1
 	; peephole j2 removed unreachable jump to %2.
 } if labelRefCountChange(%2 -1)
 

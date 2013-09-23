@@ -158,6 +158,9 @@
 #undef OPT_DISABLE_TININative
 
 /* XXX */
+#undef OPT_DISABLE_TLCS90
+
+/* XXX */
 #undef OPT_DISABLE_UCSIM
 
 /* Define to 1 to disable the XA51 port */

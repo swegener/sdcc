@@ -646,6 +646,7 @@ OPT_DISABLE_PIC16
 OPT_DISABLE_PIC14
 OPT_DISABLE_DS400
 OPT_DISABLE_DS390
+OPT_DISABLE_TLCS90
 OPT_DISABLE_GBZ80
 OPT_DISABLE_R3KA
 OPT_DISABLE_R2K
@@ -749,6 +750,7 @@ enable_z180_port
 enable_r2k_port
 enable_r3ka_port
 enable_gbz80_port
+enable_tlcs90_port
 enable_ds390_port
 enable_ds400_port
 enable_pic14_port
@@ -1408,11 +1410,12 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-mcs51-port    Excludes the Intel mcs51 port
-  --disable-z80-port      Excludes the z80 port
-  --disable-z180-port     Excludes the z180 port
-  --disable-r2k-port      Excludes the r2k port
-  --disable-r3ka-port     Excludes the r3ka port
+  --disable-z80-port      Excludes the Z80 port
+  --disable-z180-port     Excludes the Z180 port
+  --disable-r2k-port      Excludes the Rabbit 2000 port
+  --disable-r3ka-port     Excludes the Rabbit 3000A port
   --disable-gbz80-port    Excludes the Gameboy gbz80 port
+  --disable-tlcs90-port   Excludes the TLCS-90 port
   --disable-ds390-port    Excludes the DS390 port
   --disable-ds400-port    Excludes the DS400 port
   --disable-pic14-port    Excludes the PIC14 port
@@ -6742,6 +6745,32 @@ _ACEOF
   fi
 
 
+  # Check whether --enable-tlcs90-port was given.
+if test "${enable_tlcs90_port+set}" = set; then :
+  enableval=$enable_tlcs90_port;
+fi
+
+
+  if test "$enable_tlcs90_port" = "no"; then
+    OPT_DISABLE_TLCS90=1
+  else
+    enable_tlcs90_port="yes"
+    OPT_DISABLE_TLCS90=0
+  fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_TLCS90 $OPT_DISABLE_TLCS90
+_ACEOF
+
+
+
+  echo z80 >>ports.all
+  if test $OPT_DISABLE_TLCS90 = 0; then
+    echo z80 >>ports.build
+  fi
+
+
   # Check whether --enable-ds390-port was given.
 if test "${enable_ds390_port+set}" = set; then :
   enableval=$enable_ds390_port;
@@ -7454,7 +7483,7 @@ fi
 
 ####test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
 
-if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0; then
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0; then
   ac_config_files="$ac_config_files src/z80/Makefile"
 
 fi
@@ -7466,17 +7495,23 @@ if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0; then
 
 fi
 
-if test $OPT_DISABLE_GBZ80 = 0; then
-  ac_config_files="$ac_config_files sdas/asgb/Makefile"
-
-  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/gbz80/Makefile"
-
-fi
-
 if test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0; then
   ac_config_files="$ac_config_files sdas/asrab/Makefile"
 
   test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/r2k/Makefile device/lib/r3ka/Makefile"
+
+fi
+
+if test $OPT_DISABLE_TLCS90 = 0; then
+  ac_config_files="$ac_config_files sdas/astlcs90/Makefile"
+
+  #test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/tlcs90/Makefile])
+fi
+
+if test $OPT_DISABLE_GBZ80 = 0; then
+  ac_config_files="$ac_config_files sdas/asgb/Makefile"
+
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/gbz80/Makefile"
 
 fi
 
@@ -8209,11 +8244,12 @@ do
     "sdas/asz80/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asz80/Makefile" ;;
     "device/lib/z80/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/z80/Makefile" ;;
     "device/lib/z180/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/z180/Makefile" ;;
-    "sdas/asgb/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asgb/Makefile" ;;
-    "device/lib/gbz80/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/gbz80/Makefile" ;;
     "sdas/asrab/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asrab/Makefile" ;;
     "device/lib/r2k/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r2k/Makefile" ;;
     "device/lib/r3ka/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r3ka/Makefile" ;;
+    "sdas/astlcs90/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/astlcs90/Makefile" ;;
+    "sdas/asgb/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asgb/Makefile" ;;
+    "device/lib/gbz80/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/gbz80/Makefile" ;;
     "src/stm8/Makefile") CONFIG_FILES="$CONFIG_FILES src/stm8/Makefile" ;;
     "sdas/asstm8/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asstm8/Makefile" ;;
     "device/lib/stm8/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/stm8/Makefile" ;;
@@ -9211,6 +9247,7 @@ sdcc ${VERSION} is now configured for
     r2k                 ${enable_r2k_port}
     r3ka                ${enable_r3ka_port}
     gbz80               ${enable_gbz80_port}
+    tlcs90              ${enable_tlcs90_port}
     stm8                ${enable_stm8_port}
 
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
@@ -9275,6 +9312,7 @@ sdcc ${VERSION} is now configured for
     r2k                 ${enable_r2k_port}
     r3ka                ${enable_r3ka_port}
     gbz80               ${enable_gbz80_port}
+    tlcs90              ${enable_tlcs90_port}
     stm8                ${enable_stm8_port}
 
   Disable packihx:      ${OPT_DISABLE_PACKIHX}

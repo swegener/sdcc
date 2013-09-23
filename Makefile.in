@@ -51,6 +51,10 @@ SDCC_AS        += sdas/asrab
 SDCC_LD        += sdcc-ldz80
 endif
 
+ifeq ($(OPT_DISABLE_TLCS90), 0)
+SDCC_AS        += sdas/astlcs90
+endif
+
 ifeq ($(OPT_DISABLE_GBZ80), 0)
 SDCC_AS        += sdas/asgb
 SDCC_LD        += sdcc-ldgb

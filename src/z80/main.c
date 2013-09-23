@@ -770,10 +770,6 @@ static const char *_gbLinkCmd[] = {
   "sdldgb", "-nf", "$1", NULL
 };
 
-static const char *_tlcs90LinkCmd[] = {
-  "sdldtlcs90", "-nf", "$1", NULL
-};
-
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_z80AsmCmd[] = {
   "sdasz80", "$l", "$3", "$2", "$1.asm", NULL
@@ -1461,7 +1457,7 @@ PORT tlcs90_port = {
    0,
    ".asm"},
   {                             /* Linker */
-   _tlcs90LinkCmd,                 //NULL,
+   _z80LinkCmd,                 //NULL,
    NULL,                        //LINKCMD,
    NULL,
    ".rel",

@@ -37,6 +37,8 @@
 #   endif
 # else
 typedef unsigned char bool;
+#   define true     1
+#   define false    0
 #   ifndef TRUE
 #     define TRUE   1
 #   endif

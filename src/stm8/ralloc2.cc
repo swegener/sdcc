@@ -135,7 +135,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
         return(false);
 
       // Register pushes do not disturb a.
-      for (int i = 0; i < getSize(operandType(IC_LEFT(ic)));)
+      for (unsigned short i = 0; i < getSize(operandType(IC_LEFT(ic)));)
         {
           if(operand_in_reg(left, REG_A, ia, i, G))
             i++;

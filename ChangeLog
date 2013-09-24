@@ -1,3 +1,14 @@
+2013-09-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/reg51.h: fall back to 8052.h
+	* doc/sdccman.lyx: pragma exclude bits
+	* src/mcs51/gen.c (genFunction, genEndFunction): applied patch 193 for
+	  pragma exclude bits
+	* src/port.h: maxextalign warning fixed
+	* src/SDCCglobl.h: define true and false for MSVC
+	* src/stm8/gen.c (genCmp): fixed warning
+	* src/stm8/ralloc2.cc (Ainst_ok): fixed warning
+
 2013-09-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp:

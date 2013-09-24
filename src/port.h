@@ -222,8 +222,8 @@ typedef struct
     const char *const initializer_name; // A code copy of initialized_name (to be copied for fast initialization).
     struct memmap *default_local_map;   // default location for auto vars
     struct memmap *default_globl_map;   // default location for globl vars
-    int code_ro;                /* code space read-only 1=yes */
-    int maxextalign;                    // maximum extended alignment supported, nonnegative power of 2 (C11 standard, section 6.2.8).
+    int code_ro;                        // code space read-only 1=yes
+    unsigned int maxextalign;           // maximum extended alignment supported, nonnegative power of 2 (C11 standard, section 6.2.8).
   }
   mem;
 

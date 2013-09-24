@@ -4021,7 +4021,7 @@ genCmp (const iCode *ic, iCode *ifx)
     {
       symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
       if (tlbl)
-        emitcode (branchInstCmp (opcode, sign, IC_TRUE (ifx)), "%05d$", labelKey2num (tlbl->key));
+        emitcode (branchInstCmp (opcode, sign, IC_TRUE (ifx) ? TRUE : FALSE), "%05d$", labelKey2num (tlbl->key));
       cost (2, 0);
       if (!regalloc_dry_run)
         emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));

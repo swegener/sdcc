@@ -39346,8 +39346,8 @@ pragma exclude
 
 \end_inset
 
- none | {acc[,b[,dpl[,dph]]] - The exclude pragma disables the generation
- of pairs of push/pop
+ none | {acc[,b[,dpl[,dph[,bits]]]]} - The exclude pragma disables the
+ generation of pairs of push/pop
 \begin_inset Index idx
 status collapsed
 

@@ -1,5 +1,10 @@
 2013-09-24 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCralloc.hpp:
+	  Enable warning for non-connected live-ranges.
+
+2013-09-24 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/stm8/gen.c,
 	  support/regression/tests/bug-2222.c:

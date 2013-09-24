@@ -8606,18 +8606,22 @@ genLeftShift (const iCode * ic)
      same */
   if (!sameRegs (AOP (left), AOP (result)))
     {
-      size = AOP_SIZE (result);
+      int lsize = AOP_SIZE (left);
+      size = AOP_SIZE (result); 
       offset = 0;
       if (AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) == AOP_REG)
         {
           short src[8], dst[8];
-          while (size--)
+          while (size && lsize)
             {
               src[offset] = AOP (left)->aopu.aop_reg[offset]->rIdx;
               dst[offset] = AOP (result)->aopu.aop_reg[offset]->rIdx;
               offset++;
+              size--, lsize--;
             }
-          regMove (dst, src, AOP_SIZE (result), TRUE);
+          regMove (dst, src, AOP_SIZE (result) <= AOP_SIZE (left) ? AOP_SIZE (result) : AOP_SIZE (left), TRUE);
+          while (lsize--)
+            cheapMove (AOP (result), offset++, ASMOP_ZERO, 0);
         }
       else
         {

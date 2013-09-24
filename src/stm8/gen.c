@@ -4719,9 +4719,6 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
 
   size = getSize (operandType (result));
 
-  /* I suppose that the left size >= result size */
-  wassert (getSize (operandType (left)) >= size);
-
   aopOp (left, ic);
   aopOp (result, ic);
 

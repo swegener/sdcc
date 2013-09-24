@@ -480,7 +480,21 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
         {
           std::set<var_t>::const_iterator v, v_end;
           for (v = cfg[*j].alive.begin(), v_end = cfg[*j].alive.end(); v != v_end; ++v)
-            cfg[i].dying.erase(*v);
+            {
+              const symbol *const vsym = (symbol *)(hTabItemWithKey(liveRanges, con[*v].v));
+
+              const operand *const left = IC_LEFT(cfg[*j].ic);
+              const operand *const right = IC_RIGHT(cfg[*j].ic);
+              const operand *const result = IC_RESULT(cfg[*j].ic);
+
+              if (!POINTER_SET(cfg[*j].ic) && 
+                (!left || !IS_SYMOP(left) || OP_SYMBOL_CONST(left)->key != vsym->key) &&
+                (!right || !IS_SYMOP(right) || OP_SYMBOL_CONST(right)->key != vsym->key) &&
+                result && IS_SYMOP(result) && OP_SYMBOL_CONST(result)->key == vsym->key)
+                continue;
+
+              cfg[i].dying.erase(*v);
+            }
         }
     }
     
@@ -508,8 +522,14 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
           // Here, v is a variable that survives cfg[i].
           // TODO: Check if we can use v, ++v2 instead of cfg[i].alive.begin() to speed things up.
           for (v2 = cfg[i].alive.begin(), v2_end = cfg[i].alive.end(); v2 != v2_end; ++v2)
-            if(*v != *v2)
+            {
+              if(*v == *v2)
+                continue;
+              if (cfg[i].dying.find (*v2) != cfg[i].dying.end())
+                continue;
+
               boost::add_edge(*v, *v2, con);
+            }
           
           next_var:
             ;

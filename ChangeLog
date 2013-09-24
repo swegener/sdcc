@@ -1,3 +1,9 @@
+2013-09-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/SDCClrange.c:
+	  Check more carefully for undead hiding among the living variables.
+
 2013-09-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/astlcs90,

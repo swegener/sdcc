@@ -962,8 +962,15 @@ static void visit (set **visited, iCode *ic, const int key)
           break;
         case IFX:
           visit (visited, hTabItemWithKey (labelDef, (IC_TRUE(ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key), key);
+          ic = ic->next;
+          break;
         default:
           ic = ic->next;
+          if (!TARGET_HC08_LIKE && !POINTER_SET (ic) && IC_RESULT (ic) && IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL_CONST (IC_RESULT (ic))->key == key)
+            {
+              addSet (visited, ic);
+              return;
+            }
         }
     }
 }
@@ -971,7 +978,7 @@ static void visit (set **visited, iCode *ic, const int key)
 /*-----------------------------------------------------------------*/
 /* Split temporaries that have non-connected live ranges           */
 /* Such temporaries can result from GCSE and losrpe,               */
-/* And can confuse register allcoation and rematerialization.      */
+/* And can confuse register allocation and rematerialization.      */
 /*-----------------------------------------------------------------*/
 void
 separateLiveRanges (iCode *sic, ebbIndex *ebbi)
@@ -1016,7 +1023,7 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
       do
         {
           set *visited = 0;
-          set *newdefs;
+          set *newdefs = 0;
           int oldsize;
 
           wassert (defs);
@@ -1029,8 +1036,9 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
               werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Variable is not alive at one of its definitions");
               break;
             }
-
+ 
           visit (&visited, setFirstItem (defs), sym->key);
+          addSet (&newdefs, setFirstItem (defs));
 
           do
             {
@@ -1038,17 +1046,24 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
               ic = setFirstItem (defs);
               for(ic = setNextItem (defs); ic; ic = setNextItem (defs))
                 {
+                  // printf("Looking at other def at %d now\n", ic->key);
                   set *visited2 = 0;
+                  set *intersection = 0;
                   visit (&visited2, ic, sym->key);
-                  if (intersectSets (visited, visited2, THROW_NONE))
-                    visited = unionSets (visited, visited2, THROW_DEST);
+                  intersection = intersectSets (visited, visited2, THROW_NONE);
+                  intersection = subtractFromSet (intersection, defs, THROW_DEST);
+                  if (intersection)
+                    {
+                      visited = unionSets (visited, visited2, THROW_DEST);
+                      addSet (&newdefs, ic);
+                    }
+                  deleteSet (&intersection);
                   deleteSet (&visited2);
                 }
              }
           while (oldsize < elementsInSet(visited));
 
-          newdefs = intersectSets (defs, visited, THROW_NONE);
-          defs = subtractFromSet (defs, visited, THROW_DEST);
+          defs = subtractFromSet (defs, newdefs, THROW_DEST);
 
           if (newdefs && defs)
             {
@@ -1062,6 +1077,8 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
                     IC_LEFT (ic) = operandFromOperand (tmpop);
                   if (IC_RIGHT (ic) && IS_ITEMP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic)) == sym)
                       IC_RIGHT (ic) = operandFromOperand (tmpop);
+                  if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic)) == sym && !POINTER_SET(ic) && ic->next && !isinSet (visited, ic->next))
+                    continue;
                   if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)) && OP_SYMBOL (IC_RESULT (ic)) == sym)
                     {
                       bool pset = POINTER_SET(ic);

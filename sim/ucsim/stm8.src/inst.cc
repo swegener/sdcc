@@ -246,10 +246,10 @@ cl_stm8::get3(unsigned int addr)
 int
 cl_stm8::inst_addw(t_mem code, unsigned char prefix)
 {
-  int result, operand1, operand2, nibble_high, nibble_low;
-  short unsigned int *dest_ptr;
+  long int result, operand1, operand2, nibble_high, nibble_low;
+  UWORD *dest_ptr;
 
-  nibble_high = (code & 0xf0) >> 4;
+  nibble_high = (code >> 4) & 0x0f;
   nibble_low = code & 0x0f;
   dest_ptr = nibble_low == 0x09 || nibble_low == 0x02 ? &regs.Y : &regs.X;
   operand1 = *dest_ptr;
@@ -267,9 +267,9 @@ cl_stm8::inst_addw(t_mem code, unsigned char prefix)
     case 0x0:
     case 0xd: operand2 = -operand2;
     case 0xb:
-    case 0xc: dest_ptr = &regs.X; break;
+    case 0xc: break;
     case 0x2: operand2 = -operand2;
-    case 0x9: dest_ptr = &regs.Y; break;
+    case 0x9: break;
     default: return(resHALT);
   }
 
@@ -745,7 +745,7 @@ int
 cl_stm8::inst_ldxy(t_mem code, unsigned char prefix)
 {
   unsigned int operand;
-  short unsigned int *dest_ptr;
+  UWORD *dest_ptr;
   dest_ptr = (prefix & 0x90) ? &regs.Y : &regs.X;
   if(code == 0x16) dest_ptr = &regs.Y; 
 

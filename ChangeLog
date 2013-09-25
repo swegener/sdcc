@@ -1,3 +1,10 @@
+2013-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve handling of global variables in addition (and prepare for subtraction).
+	* sim/ucsim/stm8.src/inst.cc:
+	  Code cleanup.
+
 2013-09-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/reg51.h: fall back to 8052.h

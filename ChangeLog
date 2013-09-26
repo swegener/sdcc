@@ -7,6 +7,8 @@
 	  src/z80/peeph-z80.def,
 	  support/regression/tests/bug-2228.c:
 	  Fix bug #2228.
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix type name.
 
 2013-09-25 Philipp Klaus Krause <pkk AT spth.de>
 

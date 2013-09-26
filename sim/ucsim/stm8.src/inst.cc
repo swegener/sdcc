@@ -247,7 +247,7 @@ int
 cl_stm8::inst_addw(t_mem code, unsigned char prefix)
 {
   long int result, operand1, operand2, nibble_high, nibble_low;
-  UWORD *dest_ptr;
+  TYPE_UWORD *dest_ptr;
 
   nibble_high = (code >> 4) & 0x0f;
   nibble_low = code & 0x0f;
@@ -745,7 +745,7 @@ int
 cl_stm8::inst_ldxy(t_mem code, unsigned char prefix)
 {
   unsigned int operand;
-  UWORD *dest_ptr;
+  TYPE_UWORD *dest_ptr;
   dest_ptr = (prefix & 0x90) ? &regs.Y : &regs.X;
   if(code == 0x16) dest_ptr = &regs.Y; 
 

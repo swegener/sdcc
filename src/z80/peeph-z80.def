@@ -1147,9 +1147,9 @@ replace restart {
 	ld	a,%1
 	cp	a,%2
 	jp	%3,%4
-	; peephole 82 removed load by replacing sub with cp
+	; peephole 82 removed load from %1 into a by replacing sub with cp
 	assert	a=%1
-} if notVolatile(%1)
+} if notVolatile(%1), notUsedFrom(%4 'a')
 
 replace restart {
 	assert	a=%1
@@ -1159,9 +1159,9 @@ replace restart {
 } by {
 	cp	a,%2
 	jp	%3,%4
-	; peephole 83 removed load by replacing sub with cp
+	; peephole 83 removed load from %1 into a by replacing sub with cp
 	assert	a=%1
-}
+} if notUsedFrom(%4 'a')
 
 replace restart {
 	assert	a=%1

@@ -650,6 +650,7 @@ z80notUsedFrom (const char *what, const char *label, lineNode *head)
           return z80notUsed (what, cpl, head);
         }
     }
+
   return FALSE;
 }
 

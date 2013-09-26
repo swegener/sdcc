@@ -222,7 +222,7 @@ PORT stm8_port = {
    0,
    stm8notUsed,
    stm8canAssign,
-   0,
+   stm8notUsedFrom,
    },
   {
    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */

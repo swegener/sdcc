@@ -1,3 +1,13 @@
+2013-09-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  src/stm8/peep.c:
+	  notUsedFrom() for stm8.
+	* src/z80/peeph-r2k.def,
+	  src/z80/peeph-z80.def,
+	  support/regression/tests/bug-2228.c:
+	  Fix bug #2228.
+
 2013-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

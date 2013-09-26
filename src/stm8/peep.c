@@ -726,6 +726,18 @@ stm8notUsed (const char *what, lineNode *endPl, lineNode *head)
   return (doTermScan (&pl, what));
 }
 
+bool
+stm8notUsedFrom (const char *what, const char *label, lineNode *head)
+{
+  lineNode *cpl;
+
+  for (cpl = _G.head; cpl; cpl = cpl->next)
+    if (cpl->isLabel && !strncmp (label, cpl->line, strlen(label)))
+      return (stm8notUsed (what, cpl, head));
+
+  return FALSE;
+}
+
 /* can be directly assigned with ld */
 bool
 stm8canAssign (const char *op1, const char *op2, const char *exotic)

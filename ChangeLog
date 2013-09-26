@@ -9,6 +9,8 @@
 	  Fix bug #2228.
 	* sim/ucsim/stm8.src/inst.cc:
 	  Fix type name.
+	* support/regression/tests/bug-2222.c:
+	  Fix use of uninitialized memory.
 
 2013-09-25 Philipp Klaus Krause <pkk AT spth.de>
 

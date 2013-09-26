@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#include <string.h>
+
 typedef unsigned short u16;
 
 static u16 vn[20];
@@ -37,6 +39,8 @@ void crash2()
 
 void testBug(void)
 {
+	memset (vn, 0, sizeof(u16) * 20);
+	memset (un, 0, sizeof(u16) * 20);
 #ifndef __SDCC_pic16
 #ifndef __SDCC_mcs51
 	crash1();

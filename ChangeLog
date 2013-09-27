@@ -6,7 +6,8 @@
 	  More flexible unreachable jump elimination.
 	* configure.in,
 	  device/lib/Makefile.in,
-	  device/lib/tlcs90:
+	  device/lib/tlcs90,
+	  src/z80/main.c:
 	  Library for TLCS-90.
 
 2013-09-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

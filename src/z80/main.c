@@ -792,7 +792,7 @@ static const char *const _libs_z80[] = { "z80", NULL, };
 static const char *const _libs_z180[] = { "z180", NULL, };
 static const char *const _libs_r2k[] = { "r2k", NULL, };
 static const char *const _libs_r3ka[] = { "r3ka", NULL, };
-static const char *const _libs_tlcs90[] = { "z180", NULL, };
+static const char *const _libs_tlcs90[] = { "tlcs90", NULL, };
 static const char *const _libs_gb[] = { "gbz80", NULL, };
 
 /* Globals */

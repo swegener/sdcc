@@ -948,7 +948,7 @@ aopOp (operand *op, const iCode *ic)
 
                 if (sym->usl.spillLoc->stack + aop->size - (int)(i) <= -G.stack.pushed)
                   {
-                    fprintf (stderr, "%d %d %d %d", (int)(sym->usl.spillLoc->stack), (int)(aop->size), (int)(i), (int)(G.stack.pushed));
+                    fprintf (stderr, "%d %d %d %d\n", (int)(sym->usl.spillLoc->stack), (int)(aop->size), (int)(i), (int)(G.stack.pushed));
                     wassertl (0, "Invalid stack offset.");
                   }
               }
@@ -1149,53 +1149,64 @@ adjustStack (int n, bool a_free, bool x_free, bool y_free)
       // manual states, addw sp, #byte only takes 1 cycle.
 
       // todo: For big n, use addition in X or Y when free.
-      if (n > 127)
+      if (abs (n) > 255 * 2 + (n > 0 || a_free) + (optimize.codeSize ? x_free : 255) && x_free)
         {
-          emitcode ("addw","sp, #127");
+          emitcode ("ldw", "x, sp");
+          emitcode (n > 0 ? "addw" : "subw", "x, #%d", abs (n));
+          emitcode ("ldw", "sp, x");
+          cost (5, 4);
+          G.stack.pushed -= n;
+          n -= n;
+        }
+      else if (abs(n) > 255 * 3 + (n > 0 || a_free) + (optimize.codeSize && x_free) && y_free)
+        {
+          emitcode ("ldw", "y, sp");
+          emitcode (n > 0 ? "addw" : "subw", "y, #%d", abs (n));
+          emitcode ("ldw", "sp, y");
+          cost (5, 4);
+          G.stack.pushed -= n;
+          n -= n;
+        }
+      else if (n > 255)
+        {
+          emitcode ("addw", "sp, #255");
           cost (2, 1);
-          n -= 127;
-          G.stack.pushed -= 127;
+          G.stack.pushed -= 255;
+          n -= 255;
         }
       else if (n < -255)
         {
-          emitcode ("sub","sp, #255");
+          emitcode ("sub", "sp, #255");
           cost (2, 1);
-          n += 255;
           G.stack.pushed += 255;
+          n += 255;
         }
       else if (n == 2 && x_free && optimize.codeSize)
         {
           pop (ASMOP_X, 0, 2); // 1 Byte, 2 cycles - cheaper than addw sp, #byte when optimizing for code size.
           n -= 2;
         }
-      else if (n == -1 && a_free && optimize.codeSize)
+      else if (n == 1 && a_free)
         {
           pop (ASMOP_A, 0, 1); // 1 Byte, 1 cycle - cheaper than addw sp, #byte.
           n--;
         }
-      else if (n == -2  && optimize.codeSize)
+      else if (n == -2 && optimize.codeSize)
         {
           push (ASMOP_X, 0, 2); // 1 Byte, 2 cycles - cheaper than addw sp, #byte when optimizing for code size.
           n += 2;
         }
-      else if (n == -1 && optimize.codeSize)
+      else if (n == -1)
         {
           push (ASMOP_A, 0, 1); // 1 Byte, 1 cycle - cheaper than addw sp, #byte.
           n++;
         }
-      else if (n > 0)
+      else
         {
-          emitcode ("addw", "sp, #%d", n);
-          cost (2, 1);
+          emitcode (n > 0 ? "addw" : "sub", "sp, #%d", abs (n));
+          cost (2, 1);     
           G.stack.pushed -= n;
-          return;
-        }
-	  else 
-	    {
-		  emitcode ("sub", "sp, #%d", -n);
-          cost (2, 1);
-          G.stack.pushed += -n;
-          return;
+          n -= n;
         }
     }
 }
@@ -4104,7 +4115,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
               if (!x_dead && !aopInReg (left->aop, i, X_IDX))
                 push (ASMOP_X, 0, 2);
 
-              genMove_o (ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i + 1 && right->aop->regs[A_IDX] <= i + 1, TRUE, FALSE);
+              genMove_o (aopInReg (left->aop, i, Y_IDX) ? ASMOP_Y : ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i + 1 && right->aop->regs[A_IDX] <= i + 1, TRUE, FALSE);
 
               emitcode ("cpw", aopInReg (left->aop, i, Y_IDX) ? "y, %s" : "x, %s", aopGet2 (right->aop, i));
               cost (3 + aopInReg (left->aop, i, Y_IDX), 2);
@@ -5431,6 +5442,7 @@ genPointerGet (const iCode *ic)
         }
       else if (!bit_field && aopInReg (result->aop, i, Y_IDX) && !use_y && optimize.codeSize) // Short (4/5/6 bytes vs. 6/8/10 for assigning individual bytes), but slow (7 cycles vs. 4) due to push / pop.
         {
+          o--;
           push (ASMOP_X, 0, 2);
 
           if (!o)

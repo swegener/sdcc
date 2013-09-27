@@ -9,6 +9,8 @@
 	  device/lib/tlcs90,
 	  src/z80/main.c:
 	  Library for TLCS-90.
+	* src/stm8/gen.c:
+	  Fix comparisons with operand in y, fix offset in wide pointer read when optimizing for code size, fix and improve stack adjustment.
 
 2013-09-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

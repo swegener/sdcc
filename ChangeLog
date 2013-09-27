@@ -1,3 +1,9 @@
+2013-09-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (operandFromSymbol): don't allocate register
+	  equivalents for symbols that can't fit in HC08/S08 registers.
+	* src/SDCClrange.c (visit): remove TARGET_HC08_LIKE exception.
+
 2013-09-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c,

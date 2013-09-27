@@ -4,6 +4,10 @@
 	  Fix handling of 8-bit immediates, patch by Rainer Keuchel.
 	* src/stm8/peeph.def:
 	  More flexible unreachable jump elimination.
+	* configure.in,
+	  device/lib/Makefile.in,
+	  device/lib/tlcs90:
+	  Library for TLCS-90.
 
 2013-09-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

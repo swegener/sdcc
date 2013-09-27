@@ -912,7 +912,7 @@ fi
 
 if test $OPT_DISABLE_TLCS90 = 0; then
   AC_CONFIG_FILES([sdas/astlcs90/Makefile])
-  #test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/tlcs90/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/tlcs90/Makefile])
 fi
 
 if test $OPT_DISABLE_GBZ80 = 0; then

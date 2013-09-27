@@ -46,15 +46,22 @@ static char _z80_defaultRules[] = {
 #include "peeph-z80.rul"
 };
 
+static char _r2k_defaultRules[] = {
+#include "peeph.rul"
+#include "peeph-r2k.rul"
+};
+
+static char _tlcs90_defaultRules[] = {
+#include "peeph.rul"
+#include "peeph-tlcs90.rul"
+};
+
 static char _gbz80_defaultRules[] = {
 #include "peeph.rul"
 #include "peeph-gbz80.rul"
 };
 
-static char _r2k_defaultRules[] = {
-#include "peeph.rul"
-#include "peeph-r2k.rul"
-};
+
 
 Z80_OPTS z80_opts;
 
@@ -1467,7 +1474,7 @@ PORT tlcs90_port = {
    _libs_tlcs90,                /* libs */
    },
   {                             /* Peephole optimizer */
-   _z80_defaultRules,
+   _tlcs90_defaultRules,
    z80instructionSize,
    0,
    0,

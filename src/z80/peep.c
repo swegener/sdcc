@@ -744,6 +744,9 @@ int z80instructionSize(lineNode *pl)
   else
     op2start = NULL;
 
+  if(TARGET_IS_TLCS90) // Todo: More accurate estimate.
+    return(6);
+
   /* All ld instructions */
   if(ISINST(pl->line, "ld\t") || ISINST(pl->line, "ld "))
     {

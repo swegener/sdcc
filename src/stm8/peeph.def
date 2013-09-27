@@ -162,7 +162,31 @@ replace restart {
 	jp	%2
 } by {
 	jp	%1
-	; peephole j2 removed unreachable jump to %2.
+	; peephole j2a removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jra	%1
+	jp	%2
+} by {
+	jra	%1
+	; peephole j2b removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	%1
+	jra	%2
+} by {
+	jp	%1
+	; peephole jc2 removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jra	%1
+	jra	%2
+} by {
+	jra	%1
+	; peephole j2d removed unreachable jump to %2.
 } if labelRefCountChange(%2 -1)
 
 // Ensure jump-to-jump optimiation of absolute jumps above is done before other jump-related optimizations.

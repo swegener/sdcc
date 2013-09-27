@@ -1,3 +1,10 @@
+2013-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/astlcs90/t90mch.c:
+	  Fix handling of 8-bit immediates, patch by Rainer Keuchel.
+	* src/stm8/peeph.def:
+	  More flexible unreachable jump elimination.
+
 2013-09-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (operandFromSymbol): don't allocate register

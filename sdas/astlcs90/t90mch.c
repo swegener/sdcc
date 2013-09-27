@@ -1722,7 +1722,7 @@ machine(struct mne *mp)
       if(t1 == S_R8 && t2 == S_IMMED)
 	{
 	  outab(0x30 + v1);
-	  outab(v2 & 0xFF);
+	  outrb(&e2,0);
 	  break;
 	}
 

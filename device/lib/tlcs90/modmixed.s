@@ -50,7 +50,7 @@ __moduschar_rrx_s::
 
         ld      a,l             ; Sign extend
         rlca
-        sbc     a
+        sbc     a, a
         ld      h,a
 
 	call	__div16

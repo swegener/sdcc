@@ -4439,7 +4439,7 @@ genFunction (const iCode * ic)
          If critical function then turn interrupts off */
       if (IFFUNC_ISCRITICAL (sym->type))
         {
-          if (IS_GB || IS_RAB)
+          if (IS_GB || IS_RAB || IS_TLCS90)
             {
               emit2 ("!di");
             }
@@ -4629,7 +4629,7 @@ genEndFunction (iCode * ic)
          If critical function then turn interrupts back on */
       if (IFFUNC_ISCRITICAL (sym->type))
         {
-          if (IS_GB)
+          if (IS_GB || IS_TLCS90)
             emit2 ("!ei");
           else if (IS_RAB)
             emit2 ("ipres");
@@ -10802,7 +10802,7 @@ genCritical (const iCode * ic)
 {
   symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
 
-  if (IS_GB || IS_RAB)
+  if (IS_GB || IS_RAB || IS_TLCS90)
     {
       emit2 ("!di");
       regalloc_dry_run_cost += 1;
@@ -10854,7 +10854,7 @@ genEndCritical (const iCode * ic)
 {
   symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
 
-  if (IS_GB)
+  if (IS_GB || IS_TLCS90)
     {
       emit2 ("!ei");
       regalloc_dry_run_cost += 1;

@@ -1,3 +1,15 @@
+2013-09-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/asm/tlcs90,
+	  device/include/math.h,
+	  device/include/sdcc-lib.h,
+	  device/include/stdarg.h,
+	  device/lib/tlcs90/Makefile.in,
+	  device/lib/tlcs90/divmixed.s,
+	  device/lib/tlcs90/modmixed.s,
+	  src/z80/gen.c:
+	  TLCS-90 library.
+
 2013-09-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-gbz80.def:

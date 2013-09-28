@@ -1,3 +1,8 @@
+2013-09-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-gbz80.def:
+	  Remove broken peephole rule.
+
 2013-09-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/astlcs90/t90mch.c:

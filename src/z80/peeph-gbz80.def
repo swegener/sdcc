@@ -197,16 +197,6 @@ replace restart {
 
 replace restart {
 	ld	%1,a
-	ld	a,%2
-	or	a,%1
-} by {
-	ld	%1,a
-	or	a,%2
-	; peephole 17 removed load by reordering or arguments.
-} if notVolatile(%1)
-
-replace restart {
-	ld	%1,a
 	xor	a,a
 	or	a,%1
 } by {

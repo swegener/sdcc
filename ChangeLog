@@ -1,3 +1,9 @@
+2013-09-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/tlcs90/stubs.s,
+	  device/lib/tlcs90/Makefile.in:
+	  TLCS-90 library.
+
 2013-09-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/asm/tlcs90,

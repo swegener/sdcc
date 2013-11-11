@@ -112,6 +112,7 @@ _pic16_init (void)
   asm_addTree (&asm_asxxxx_mapping);
   pic16_pCodeInitRegisters();
   maxInterrupts = 2;
+  memset(&pic16_options, 0, sizeof(pic16_options));
 }
 
 static void
@@ -627,38 +628,39 @@ int pic16_enable_peeps = 0;
 
 OPTION pic16_optionsTable[]= {
     /* code generation options */
-    { 0, STACK_MODEL,        NULL, "use stack model 'small' (default) or 'large'"},
+    { 0, STACK_MODEL,           NULL, "use stack model 'small' (default) or 'large'"},
 #if XINST
-    { 'y', "--extended",     &pic16_options.xinst, "enable Extended Instruction Set/Literal Offset Addressing mode"},
+    { 'y', "--extended",        &pic16_options.xinst, "enable Extended Instruction Set/Literal Offset Addressing mode"},
 #endif
-    { 0, "--pno-banksel",    &pic16_options.no_banksel, "do not generate BANKSEL assembler directives"},
+    { 0, "--pno-banksel",       &pic16_options.no_banksel, "do not generate BANKSEL assembler directives"},
 
     /* optimization options */
-    { 0, OPT_BANKSEL,       &pic16_options.opt_banksel, "set banksel optimization level (default=0 no)", CLAT_INTEGER },
-    { 0, "--denable-peeps", &pic16_enable_peeps, "explicit enable of peepholes"},
-    { 0, NO_OPTIMIZE_GOTO,  NULL, "do NOT use (conditional) BRA instead of GOTO"},
-    { 0, OPTIMIZE_CMP,      NULL, "try to optimize some compares"},
-    { 0, OPTIMIZE_DF,       NULL, "thoroughly analyze data flow (memory and time intensive!)"},
+    { 0, OPT_BANKSEL,           &pic16_options.opt_banksel, "set banksel optimization level (default=0 no)", CLAT_INTEGER },
+    { 0, "--denable-peeps",     &pic16_enable_peeps, "explicit enable of peepholes"},
+    { 0, NO_OPTIMIZE_GOTO,      NULL, "do NOT use (conditional) BRA instead of GOTO"},
+    { 0, OPTIMIZE_CMP,          NULL, "try to optimize some compares"},
+    { 0, OPTIMIZE_DF,           NULL, "thoroughly analyze data flow (memory and time intensive!)"},
 
     /* assembling options */
-    { 0, ALT_ASM,           &alt_asm, "Use alternative assembler", CLAT_STRING},
-    { 0, MPLAB_COMPAT,      &pic16_mplab_comp, "enable compatibility mode for MPLAB utilities (MPASM/MPLINK)"},
+    { 0, ALT_ASM,               &alt_asm, "Use alternative assembler", CLAT_STRING},
+    { 0, MPLAB_COMPAT,          &pic16_mplab_comp, "enable compatibility mode for MPLAB utilities (MPASM/MPLINK)"},
 
     /* linking options */
-    { 0, ALT_LINK,          &alt_link, "Use alternative linker", CLAT_STRING },
-    { 0, REP_UDATA,         &pic16_sectioninfo.at_udata, "Place udata variables at another section: udata_acs, udata_ovr, udata_shr", CLAT_STRING },
-    { 0, IVT_LOC,           NULL, "Set address of interrupt vector table."},
-    { 0, NO_DEFLIBS,        &pic16_options.nodefaultlibs,   "do not link default libraries when linking"},
-    { 0, USE_CRT,           NULL, "use <crt-o> run-time initialization module"},
-    { 0, "--no-crt",        &pic16_options.no_crt, "do not link any default run-time initialization module"},
+    { 0, ALT_LINK,              &alt_link, "Use alternative linker", CLAT_STRING },
+    { 0, REP_UDATA,             &pic16_sectioninfo.at_udata, "Place udata variables at another section: udata_acs, udata_ovr, udata_shr", CLAT_STRING },
+    { 0, IVT_LOC,               NULL, "Set address of interrupt vector table."},
+    { 0, NO_DEFLIBS,            &pic16_options.nodefaultlibs,   "do not link default libraries when linking"},
+    { 0, USE_CRT,               NULL, "use <crt-o> run-time initialization module"},
+    { 0, "--no-crt",            &pic16_options.no_crt, "do not link any default run-time initialization module"},
 
     /* debugging options */
-    { 0, "--debug-xtra",    &pic16_debug_verbose, "show more debug info in assembly output"},
-    { 0, "--debug-ralloc",  &pic16_ralloc_debug, "dump register allocator debug file *.d"},
-    { 0, "--pcode-verbose", &pic16_pcode_verbose, "dump pcode related info"},
-    { 0, "--calltree",      &pic16_options.dumpcalltree, "dump call tree in .calltree file"},
-    { 0, "--gstack",        &pic16_options.gstack, "trace stack pointer push/pop to overflow"},
-    { 0, NULL,              NULL, NULL}
+    { 0, "--debug-xtra",        &pic16_debug_verbose, "show more debug info in assembly output"},
+    { 0, "--debug-ralloc",      &pic16_ralloc_debug, "dump register allocator debug file *.d"},
+    { 0, "--pcode-verbose",     &pic16_pcode_verbose, "dump pcode related info"},
+    { 0, "--calltree",          &pic16_options.dumpcalltree, "dump call tree in .calltree file"},
+    { 0, "--gstack",            &pic16_options.gstack, "trace stack pointer push/pop to overflow"},
+    { 0, "--no-warn-non-free",  &pic16_options.no_warn_non_free, "suppress warning on absent --use-non-free option" },
+    { 0, NULL,                  NULL, NULL}
 };
 
 
@@ -971,6 +973,16 @@ _pic16_finaliseOptions (void)
       addSet (&asmOptionsSet, Safe_strdup ("-D__STACK_MODEL_SMALL"));
     }
 
+  if (!pic16_options.no_warn_non_free && !options.use_non_free)
+    {
+      fprintf(stderr,
+              "WARNING: Command line option --use-non-free not present.\n"
+              "         When compiling for PIC14/PIC16, please provide --use-non-free\n"
+              "         to get access to device headers and libraries.\n"
+              "         If you do not use these, you may provide --no-warn-non-free\n"
+              "         to suppress this warning (not recommended).\n");
+    } // if
+
   dbuf_destroy (&dbuf);
 }
 
@@ -1000,6 +1012,7 @@ _pic16_setDefaultOptions (void)
   pic16_options.ip_stack = 1;       /* set to 1 to enable ipop/ipush for stack */
   pic16_options.gstack = 0;
   pic16_options.debgen = 0;
+  pic16_options.no_warn_non_free = 0;
 }
 
 static const char *

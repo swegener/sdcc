@@ -99,6 +99,7 @@ typedef struct {
   int gstack;
   unsigned int debgen;
   int xinst;
+  int no_warn_non_free;
 } pic16_options_t;
 
 extern pic16_options_t pic16_options;

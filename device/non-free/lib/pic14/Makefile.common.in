@@ -28,6 +28,7 @@ CFLAGS ?=
 CFLAGS += -mpic14 -p16f$(ARCH)
 CFLAGS += --std-c99
 CFLAGS += -I. -I$(top_srcdir)/../../include/pic14 -I$(top_srcdir)/../../non-free/include/pic14
+CFLAGS += --no-warn-non-free
 
 #################################################
 ### optimization flags

@@ -7,6 +7,7 @@ AM_CPPFLAGS += -I$(top_srcdir)/../../include/pic14 -I$(top_srcdir)/../../non-fre
 
 AM_CFLAGS =
 AM_CFLAGS += -mpic14 -p$(ARCH)
+AM_CFLAGS += --no-warn-non-free
 AM_CFLAGS += --std-c99
 #AM_CFLAGS += --asm="$(CCAS)"
 ##AM_CFLAGS += -Wa,-q

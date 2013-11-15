@@ -1,3 +1,8 @@
+2013-11-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/bug-2222.c:
+	  Do not try to execute code that dereferences 0 pointer.
+
 2013-11-11 Raphael Neider <rneider AT web.de>
 
 	* src/pic14/main.c,

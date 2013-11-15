@@ -41,11 +41,5 @@ void testBug(void)
 {
 	memset (vn, 0, sizeof(u16) * 20);
 	memset (un, 0, sizeof(u16) * 20);
-#ifndef __SDCC_pic16
-#ifndef __SDCC_mcs51
-	crash1();
-	crash2();
-#endif
-#endif
 }
 

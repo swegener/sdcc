@@ -320,6 +320,9 @@ typedef struct
       Used so that 'reg_info' can be an incomplete type. */
   const char *(*getRegName) (const struct reg_info *reg);
 
+  /** Try to keep track of register contents. */
+  bool (*rtrackUpdate)(const char* line);
+
   /* list of keywords that are used by this
      target (used by lexer) */
   char **keywords;

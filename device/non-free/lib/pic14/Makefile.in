@@ -43,11 +43,11 @@ OBJS = $(C_SRC:.c=.o) $(S_SRC:.S=.o)
 
 clean: recurse
 	$(Q)-$(RMDIR) "$(top_builddir)/$(builddir)"
-	$(Q)-$(RMDIR) bin
+	-if [ -d bin ]; then $(RMDIR) bin; fi
 
 distclean: clean
 	$(Q)-$(RM) config.cache config.log config.status Makefile Makefile.common
-	$(Q)-$(RMDIR) bin
+	-if [ -d bin ]; then $(RMDIR) bin; fi
 
 clean-intermediate: recurse
 

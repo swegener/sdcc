@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 -------------------------------------------------------------------------*/
 
-void rtrackUpdate (const char *line);
+bool _mcs51_rtrackUpdate (const char *line);
 
 char * rtrackGetLit(const char *x);
 

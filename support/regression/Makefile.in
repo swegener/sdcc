@@ -330,7 +330,10 @@ $(CASES_DIR)/timeout: $(srcdir)/fwk/lib/timeout.c $(CASES_DIR)/stamp
 
 clean:
 	rm -rf $(CASES_DIR) $(RESULTS_DIR) *.pyc
-	for i in $(CLEAN_PORTS); do $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i srcdir=$(srcdir); done
+	for i in $(CLEAN_PORTS); do \
+	  $(MAKE) -f $(PORTS_DIR)/$$i/spec.mk _clean PORTS_DIR=$(PORTS_DIR) PORT=$$i srcdir=$(srcdir); \
+	done
 
 distclean: clean
+	rm -f $(PORTS_DIR)/host/spec.mk
 	rm -f Makefile

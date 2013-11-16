@@ -12,7 +12,6 @@ static u16 vn[20];
 static u16 un[20];
 
 #ifndef __SDCC_pic16
-#ifndef __SDCC_mcs51
 void crash1()
 {
   int m = 4, n = 4;
@@ -35,11 +34,9 @@ void crash2()
   vn[0] = v[0] >> s;
 }
 #endif
-#endif
 
 void testBug(void)
 {
 	memset (vn, 0, sizeof(u16) * 20);
 	memset (un, 0, sizeof(u16) * 20);
 }
-

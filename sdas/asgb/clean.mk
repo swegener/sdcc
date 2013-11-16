@@ -5,7 +5,7 @@ include $(top_builddir)/Makefile.common
 clean: mostlyclean
 	rm -f *.dep
 	rm -f $(ASOBJECTS) $(OBJDIR)/.stamp
-	-rmdir $(OBJDIR)
+	if [ -d $(OBJDIR) ]; then rmdir $(OBJDIR); fi
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

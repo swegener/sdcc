@@ -354,8 +354,6 @@ PORT pic_port =
     NULL,
     "-g",           /* options with --debug */
     NULL,           /* options without --debug */
-    //"-plosgffc",  /* Options with debug */
-    //"-plosgff",   /* Options without debug */
     0,
     ".asm",
     NULL            /* no do_assemble function */
@@ -437,6 +435,7 @@ PORT pic_port =
   _pic14_setDefaultOptions,
   pic14_assignRegisters,
   _pic14_getRegName,
+  NULL,
   _pic14_keywords,
   _pic14_genAssemblerPreamble,
   NULL,         /* no genAssemblerEnd */

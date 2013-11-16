@@ -250,34 +250,38 @@ extern char * iComments2;
 static void
 _ds390_genAssemblerPreamble (FILE * of)
 {
-      fputs (iComments2, of);
-      fputs ("; CPU specific extensions\n",of);
-      fputs (iComments2, of);
+  fputs (iComments2, of);
+  fputs ("; CPU specific extensions\n",of);
+  fputs (iComments2, of);
 
-      fputs ("\t.DS80C390\n", of);
+  fputs ("\t.DS80C390\n", of);
 
-      if (options.model == MODEL_FLAT24)
-        fputs ("\t.amode\t2\t; 24 bit flat addressing\n", of);
+  if (options.model == MODEL_FLAT24)
+    fputs ("\t.amode\t2\t; 24 bit flat addressing\n", of);
 
-      fputs ("dpl1\t=\t0x84\n", of);
-      fputs ("dph1\t=\t0x85\n", of);
-      fputs ("dps\t=\t0x86\n", of);
-      fputs ("dpx\t=\t0x93\n", of);
-      fputs ("dpx1\t=\t0x95\n", of);
-      fputs ("esp\t=\t0x9B\n", of);
-      fputs ("ap\t=\t0x9C\n", of);
-      fputs ("_ap\t=\t0x9C\n", of);
-      fputs ("mcnt0\t=\t0xD1\n", of);
-      fputs ("mcnt1\t=\t0xD2\n", of);
-      fputs ("ma\t=\t0xD3\n", of);
-      fputs ("mb\t=\t0xD4\n", of);
-      fputs ("mc\t=\t0xD5\n", of);
-      fputs ("F1\t=\t0xD1\t; user flag\n", of);
-      if (options.parms_in_bank1) {
-          int i ;
-          for (i=0; i < 8 ; i++ )
-              fprintf (of,"b1_%d\t=\t0x%02X\n",i,8+i);
-      }
+  fputs ("dpl\t=\t0x82\n", of);
+  fputs ("dph\t=\t0x83\n", of);
+  fputs ("dpl1\t=\t0x84\n", of);
+  fputs ("dph1\t=\t0x85\n", of);
+  fputs ("dps\t=\t0x86\n", of);
+  fputs ("dpx\t=\t0x93\n", of);
+  fputs ("dpx1\t=\t0x95\n", of);
+  fputs ("esp\t=\t0x9B\n", of);
+  fputs ("ap\t=\t0x9C\n", of);
+  fputs ("_ap\t=\t0x9C\n", of);
+  fputs ("mcnt0\t=\t0xD1\n", of);
+  fputs ("mcnt1\t=\t0xD2\n", of);
+  fputs ("ma\t=\t0xD3\n", of);
+  fputs ("mb\t=\t0xD4\n", of);
+  fputs ("mc\t=\t0xD5\n", of);
+  fputs ("acon\t=\t0x9D\n", of);
+  fputs ("F1\t=\t0xD1\t; user flag\n", of);
+  if (options.parms_in_bank1)
+    {
+      int i ;
+      for (i=0; i < 8 ; i++ )
+          fprintf (of,"b1_%d\t=\t0x%02X\n",i,8+i);
+    }
 }
 
 /* Generate interrupt vector table. */
@@ -306,30 +310,41 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
                 dbuf_printf (oBuf, "\t.ds\t7\n");
             }
         }
-      return TRUE;
     }
-
-  dbuf_printf (oBuf, "\t.amode\t0\t; 16 bit addressing\n");
-  dbuf_printf (oBuf, "\tljmp\t__reset_vect\n");
-  dbuf_printf (oBuf, "\t.amode\t2\t; 24 bit flat addressing\n");
-
-  /* now for the other interrupts */
-  for (i = 0; i < maxInterrupts; i++)
+  else
     {
-      if (interrupts[i])
+      dbuf_printf (oBuf, "\t.amode\t0\t; 16 bit addressing\n");
+      dbuf_printf (oBuf, "\tljmp\t__reset_vect\n");
+      dbuf_printf (oBuf, "\t.amode\t2\t; 24 bit flat addressing\n");
+
+      /* now for the other interrupts */
+      for (i = 0; i < maxInterrupts; i++)
         {
-          dbuf_printf (oBuf, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
+          if (interrupts[i])
+            {
+              dbuf_printf (oBuf, "\tljmp\t%s\n\t.ds\t4\n", interrupts[i]->rname);
+            }
+          else
+            {
+              dbuf_printf (oBuf, "\treti\n\t.ds\t7\n");
+            }
+        }
+
+      dbuf_printf (oBuf, "__reset_vect:\n");
+      dbuf_printf (oBuf, "\tmov _TA,#0xAA\n");
+      dbuf_printf (oBuf, "\tmov _TA,#0x55\n");
+      if (options.stack10bit)
+        {
+          dbuf_printf (oBuf, "\tmov acon,#0x06\t;24 bit addresses, 10 bit stack at 0x400000\n");
+          dbuf_printf (oBuf, "\tmov _ESP,#0x00\t; reinitialize the stack\n");
+          dbuf_printf (oBuf, "\tmov _SP,#0x00\n");
         }
       else
         {
-          dbuf_printf (oBuf, "\treti\n\t.ds\t7\n");
+          dbuf_printf (oBuf, "\tmov acon,#0x02\t;24 bit addresses, default 8 bit stack\n");
         }
+      dbuf_printf (oBuf, "\tljmp\t__sdcc_gsinit_startup\n");
     }
-
-  dbuf_printf (oBuf, "\t.amode\t0\t; 16 bit addressing\n");
-  dbuf_printf (oBuf, "__reset_vect:\n\tljmp\t__sdcc_gsinit_startup\n");
-  dbuf_printf (oBuf, "\t.amode\t2\t; 24 bit flat addressing\n");
-
   return TRUE;
 }
 
@@ -338,7 +353,7 @@ _ds390_genInitStartup (FILE *of)
 {
   fprintf (of, "__sdcc_gsinit_startup:\n");
   /* if external stack is specified then the
-     higher order byte of the xdatalocation is
+     higher order byte of the xdata location is
      going into P2 and the lower order going into
      spx */
   if (options.useXstack)
@@ -352,22 +367,13 @@ _ds390_genInitStartup (FILE *of)
   // This should probably be a port option, but I'm being lazy.
   // on the 400, the firmware boot loader gives us a valid stack
   // (see '400 data sheet pg. 85 (TINI400 ROM Initialization code)
-  if (!TARGET_IS_DS400)
+  if (!TARGET_IS_DS400 && !options.stack10bit)
     {
       /* initialise the stack pointer.  JCF: sdld takes care of the location */
       fprintf (of, "\tmov\tsp,#__start__stack - 1\n");     /* MOF */
     }
 
-  if ((options.model == MODEL_FLAT24) && TARGET_IS_DS390)
-    {
-      fputs ("\t.amode\t0\t; 16 bit addressing\n", of);
-      fprintf (of, "\tlcall\t__sdcc_external_startup\n");
-      fputs ("\t.amode\t2\t; 24 bit flat addressing\n", of);
-    }
-  else
-    {
-      fprintf (of, "\tlcall\t__sdcc_external_startup\n");
-    }
+  fprintf (of, "\tlcall\t__sdcc_external_startup\n");
   fprintf (of, "\tmov\ta,dpl\n");
   fprintf (of, "\tjz\t__sdcc_init_data\n");
   fprintf (of, "\tljmp\t__sdcc_program_startup\n");
@@ -606,47 +612,47 @@ ds390operanddata;
 
 static ds390operanddata ds390operandDataTable[] =
   {
-    {"_ap", AP_IDX, -1},
-    {"a", A_IDX, -1},
-    {"ab", A_IDX, B_IDX},
-    {"ac", CND_IDX, -1},
-    {"ap", AP_IDX, -1},
-    {"acc", A_IDX, -1},
-    {"ar0", R0_IDX, -1},
-    {"ar1", R1_IDX, -1},
-    {"ar2", R2_IDX, -1},
-    {"ar3", R3_IDX, -1},
-    {"ar4", R4_IDX, -1},
-    {"ar5", R5_IDX, -1},
-    {"ar6", R6_IDX, -1},
-    {"ar7", R7_IDX, -1},
-    {"b", B_IDX, -1},
-    {"c", CND_IDX, -1},
-    {"cy", CND_IDX, -1},
-    {"dph", DPH_IDX, -1},
-    {"dph0", DPH_IDX, -1},
-    {"dph1", DPH1_IDX, -1},
-    {"dpl", DPL_IDX, -1},
-    {"dpl0", DPL_IDX, -1},
-    {"dpl1", DPL1_IDX, -1},
-/*  {"dptr", DPL_IDX, DPH_IDX}, */ /* dptr is special, based on currentDPS */
-    {"dps", DPS_IDX, -1},
-    {"dpx", DPX_IDX, -1},
-    {"dpx0", DPX_IDX, -1},
-    {"dpx1", DPX1_IDX, -1},
-    {"f0", CND_IDX, -1},
-    {"f1", CND_IDX, -1},
-    {"ov", CND_IDX, -1},
-    {"p", CND_IDX, -1},
-    {"psw", CND_IDX, -1},
-    {"r0", R0_IDX, -1},
-    {"r1", R1_IDX, -1},
-    {"r2", R2_IDX, -1},
-    {"r3", R3_IDX, -1},
-    {"r4", R4_IDX, -1},
-    {"r5", R5_IDX, -1},
-    {"r6", R6_IDX, -1},
-    {"r7", R7_IDX, -1},
+    {"_ap",   AP_IDX,   -1},
+    {"a",     A_IDX,    -1},
+    {"ab",    A_IDX,    B_IDX},
+    {"ac",    CND_IDX,  -1},
+    {"ap",    AP_IDX,   -1},
+    {"acc",   A_IDX,    -1},
+    {"ar0",   R0_IDX,   -1},
+    {"ar1",   R1_IDX,   -1},
+    {"ar2",   R2_IDX,   -1},
+    {"ar3",   R3_IDX,   -1},
+    {"ar4",   R4_IDX,   -1},
+    {"ar5",   R5_IDX,   -1},
+    {"ar6",   R6_IDX,   -1},
+    {"ar7",   R7_IDX,   -1},
+    {"b",     B_IDX,    -1},
+    {"c",     CND_IDX,  -1},
+    {"cy",    CND_IDX,  -1},
+    {"dph",   DPH_IDX,  -1},
+    {"dph0",  DPH_IDX,  -1},
+    {"dph1",  DPH1_IDX, -1},
+    {"dpl",   DPL_IDX,  -1},
+    {"dpl0",  DPL_IDX,  -1},
+    {"dpl1",  DPL1_IDX, -1},
+/*  {"dptr",  DPL_IDX,  DPH_IDX}, */ /* dptr is special, based on currentDPS */
+    {"dps",   DPS_IDX,  -1},
+    {"dpx",   DPX_IDX,  -1},
+    {"dpx0",  DPX_IDX,  -1},
+    {"dpx1",  DPX1_IDX, -1},
+    {"f0",    CND_IDX,  -1},
+    {"f1",    CND_IDX,  -1},
+    {"ov",    CND_IDX,  -1},
+    {"p",     CND_IDX,  -1},
+    {"psw",   CND_IDX,  -1},
+    {"r0",    R0_IDX,   -1},
+    {"r1",    R1_IDX,   -1},
+    {"r2",    R2_IDX,   -1},
+    {"r3",    R3_IDX,   -1},
+    {"r4",    R4_IDX,   -1},
+    {"r5",    R5_IDX,   -1},
+    {"r6",    R6_IDX,   -1},
+    {"r7",    R7_IDX,   -1},
   };
 
 static int
@@ -1050,6 +1056,7 @@ PORT ds390_port =
   _ds390_setDefaultOptions,
   ds390_assignRegisters,
   _ds390_getRegName,
+  NULL,
   _ds390_keywords,
   _ds390_genAssemblerPreamble,
   NULL,                         /* no genAssemblerEnd */
@@ -1395,6 +1402,7 @@ PORT tininative_port =
   _tininative_setDefaultOptions,
   ds390_assignRegisters,
   _ds390_getRegName,
+  NULL,
   _tininative_keywords,
   _tininative_genAssemblerPreamble,
   _tininative_genAssemblerEnd,
@@ -1660,6 +1668,7 @@ PORT ds400_port =
   _ds390_setDefaultOptions,
   ds390_assignRegisters,
   _ds390_getRegName,
+  NULL,
   _ds390_keywords,
   _ds390_genAssemblerPreamble,
   NULL,                         /* no genAssemblerEnd */

@@ -280,6 +280,7 @@ PORT stm8_port = {
   stm8_setDefaultOptions,
   stm8_assignRegisters,
   stm8_getRegName,
+  NULL,
   stm8_keywords,
   NULL,
   NULL,                         /* no genAssemblerEnd */

@@ -1426,6 +1426,7 @@ PORT pic16_port =
   _pic16_setDefaultOptions,
   pic16_assignRegisters,
   _pic16_getRegName,
+  NULL,
   _pic16_keywords,
   _pic16_genAssemblerPreamble,
   NULL,             /* no genAssemblerEnd */

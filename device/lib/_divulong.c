@@ -223,7 +223,7 @@ __divulong:
 __divlong:			; entry point for __divslong
 
 	mov	a,@r0		; load y0
-	mov	r1,a
+	mov	y0,a
 	inc	r0		; r0 points to y1
 
 	mov	count,#32

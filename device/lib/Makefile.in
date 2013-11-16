@@ -513,8 +513,8 @@ install: all installdirs
 	[ ! -d "$(BUILDDIR)" ] || $(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
 	$(CP_U) -r $(MODELS) $(srcdir)/mcs51 $(srcdir)/ds390 $(srcdir)/ds400 \
 	                     $(srcdir)/z80 $(srcdir)/z180 $(srcdir)/r2k $(srcdir)/r3ka $(srcdir)/tlcs90 $(srcdir)/gbz80 \
-                         $(srcdir)/hc08 $(srcdir)/s08 \
-                         $(srcdir)/stm8 \
+	                     $(srcdir)/hc08 $(srcdir)/s08 \
+	                     $(srcdir)/stm8 \
 	                     $(srcdir)/pic14 $(srcdir)/pic16 $(srcdir)/*.c $(sdcc_libdir)/src
 	$(CP_U) -r $(MODELS) mcs51 ds390 ds400 z80 z180 r2k r3ka tlcs90 gbz80 hc08 s08 stm8 $(sdcc_libdir)/src
 

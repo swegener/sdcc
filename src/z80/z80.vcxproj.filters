@@ -72,5 +72,8 @@
     <CustomBuild Include="peeph-r2k.def">
       <Filter>Custom Build</Filter>
     </CustomBuild>
+    <CustomBuild Include="peeph-tlcs90.def">
+      <Filter>Custom Build</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

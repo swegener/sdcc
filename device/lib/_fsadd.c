@@ -40,8 +40,8 @@ static void dummy(void) __naked
 	__asm
 
 	// extract the two inputs, placing them into:
-	//      sign     exponent   mantiassa
-	//      ----     --------   ---------
+	//      sign     exponent   mantissa
+	//      ----     --------   --------
 	//  a:  sign_a   exp_a      r4/r3/r2
 	//  b:  sign_b   exp_b      r7/r6/r5
 	//

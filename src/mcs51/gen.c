@@ -3067,8 +3067,7 @@ genSend (set * sendSet)
                 {
                   while (size--)
                     {
-                      const char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
-                      emitcode ("mov", "a,%s", l);
+                      MOVA (aopGet (IC_LEFT (sic), offset, FALSE, FALSE));
                       emitpush ("acc");
                       offset++;
                     }
@@ -9042,7 +9041,8 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
 #endif
 
   /* I suppose that the left size >= result size */
-  wassert (getSize (operandType (left)) >= size);
+  // MB: I have no idea why this would be necessary
+//  wassert (getSize (operandType (left)) >= size);
 
   if (shCount == 0)
     {
@@ -10115,10 +10115,15 @@ genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iC
      then don't need anything more */
   if (!AOP_INPREG (AOP (left)))
     {
+      const char *l;
       /* otherwise get a free pointer register */
       aop = newAsmop (0);
       preg = getFreePtr (ic, aop, FALSE);
-      emitcode ("mov", "%s,%s", preg->name, aopGet (left, 0, FALSE, TRUE));
+      l = aopGet (left, 0, FALSE, TRUE);
+      if (*l == '@')
+        emitcode ("mov", "a%s,%s", preg->name, l);
+      else
+        emitcode ("mov", "%s,%s", preg->name, l);
       rname = preg->name;
     }
   else
@@ -10135,7 +10140,7 @@ genPagedPointerGet (operand * left, operand * result, iCode * ic, iCode * pi, iC
     }
   else
     {
-      /* we have can just get the values */
+      /* we can just get the values */
       int size = AOP_SIZE (result);
       int offset = 0;
 

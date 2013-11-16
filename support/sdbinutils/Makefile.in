@@ -2141,10 +2141,19 @@ local-distclean:
 	else true; fi
 	-rm -f texinfo/po/Makefile texinfo/po/Makefile.in texinfo/info/Makefile
 	-rm -f texinfo/doc/Makefile texinfo/po/POTFILES
-	-rmdir texinfo/doc texinfo/info texinfo/intl texinfo/lib 2>/dev/null
-	-rmdir texinfo/makeinfo texinfo/po texinfo/util 2>/dev/null
-	-rmdir fastjar gcc libiberty texinfo zlib 2>/dev/null
-	-find . -name config.cache -exec rm -f {} \; \; 2>/dev/null
+	-if [ -d texinfo/doc ];      then rmdir texinfo/doc; fi
+	-if [ -d texinfo/info ];     then rmdir texinfo/info; fi
+	-if [ -d texinfo/intl ];     then rmdir texinfo/intl; fi
+	-if [ -d texinfo/lib ];      then rmdir texinfo/lib; fi
+	-if [ -d texinfo/makeinfo ]; then rmdir texinfo/makeinfo; fi
+	-if [ -d texinfo/po ];       then rmdir texinfo/po; fi
+	-if [ -d texinfo/util ];     then rmdir texinfo/util; fi
+	-if [ -d fastjar ];          then rmdir fastjar; fi
+	-if [ -d gcc ];              then rmdir gcc; fi
+#	-if [ -d libiberty ];        then rmdir libiberty; fi
+	-if [ -d texinfo ];          then rmdir texinfo; fi
+	-if [ -d zlib ];             then rmdir zlib; fi
+	-find . -name config.cache -exec rm -f {} \;
 
 local-maintainer-clean:
 	@echo "This command is intended for maintainers to use;"

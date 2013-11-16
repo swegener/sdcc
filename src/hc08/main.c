@@ -867,6 +867,7 @@ PORT hc08_port =
   _hc08_setDefaultOptions,
   hc08_assignRegisters,
   _hc08_getRegName,
+  NULL,
   _hc08_keywords,
   _hc08_genAssemblerPreamble,
   _hc08_genAssemblerEnd,        /* no genAssemblerEnd */
@@ -1010,6 +1011,7 @@ PORT s08_port =
   _hc08_setDefaultOptions,
   hc08_assignRegisters,
   _hc08_getRegName,
+  NULL,
   _hc08_keywords,
   _hc08_genAssemblerPreamble,
   _hc08_genAssemblerEnd,        /* no genAssemblerEnd */

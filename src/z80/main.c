@@ -900,6 +900,7 @@ PORT z80_port = {
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  NULL,
   _keywords,
   0,                            /* no assembler preamble */
   NULL,                         /* no genAssemblerEnd */
@@ -1028,6 +1029,7 @@ PORT z180_port = {
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  NULL,
   _keywords,
   0,                            /* no assembler preamble */
   NULL,                         /* no genAssemblerEnd */
@@ -1156,6 +1158,7 @@ PORT r2k_port = {
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  NULL,
   _keywords,
   0,                            /* no assembler preamble */
   NULL,                         /* no genAssemblerEnd */
@@ -1284,6 +1287,7 @@ PORT r3ka_port = {
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  NULL,
   _keywords,
   0,                            /* no assembler preamble */
   NULL,                         /* no genAssemblerEnd */
@@ -1414,6 +1418,7 @@ PORT gbz80_port = {
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  NULL,
   _keywords,
   0,                            /* no assembler preamble */
   NULL,                         /* no genAssemblerEnd */
@@ -1542,6 +1547,7 @@ PORT tlcs90_port = {
   _setDefaultOptions,
   z80_assignRegisters,
   _getRegName,
+  NULL,
   _keywords,
   0,                            /* no assembler preamble */
   NULL,                         /* no genAssemblerEnd */

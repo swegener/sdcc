@@ -1,4 +1,4 @@
-CLEANALLPORTS = ds390 ds400 gbz80 hc08 huge large mcs51 medium pic pic16 small z80
+CLEANALLPORTS = pic14 pic16
 include $(srcdir)/incl.mk
 
 # Deleting all files created by building the program

@@ -55,7 +55,7 @@
 void emitcode (const char *inst, const char *fmt,...);
 
 
-static int enable = -1;
+static int enable = +1;
 static int enableextraverbose = -1;
 
 
@@ -278,8 +278,10 @@ static int valuefromliteral (const char* const s)
 /* tracking values within registers by looking
    at the line passed to the assembler.
    Tries to keep regs8051[] up to date */
-void rtrackUpdate (const char *line)
+bool _mcs51_rtrackUpdate (const char *line)
 {
+  bool modified = false;
+
   if (enable == -1)
     enable = (NULL != getenv("SDCC_REGTRACK"));
 
@@ -289,9 +291,9 @@ void rtrackUpdate (const char *line)
   if (!enable ||
       *line == ';' ||                 /* comment */
       (NULL != strstr( line, "==."))) /* dirty check for _G.debugLine */
-    return;                           /* nothing to do */
+    return false;                     /* nothing to do */
 
-  DD ( dumpAll ());
+  dumpAll ();
 
   if (!strncmp (line, "mov", 3))
     {
@@ -299,7 +301,7 @@ void rtrackUpdate (const char *line)
           !strncmp (line, "movx\ta", 6))
         {
           rtrack_data_unset (A_IDX);
-          return;
+          return false;
         }
 
       /* mov to register (r0..r7, dpl, dph, a, b)*/
@@ -321,16 +323,34 @@ void rtrackUpdate (const char *line)
                   D
                   (
                     if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value))
-                      emitcode (";", "genFromRTrack suggests to remove\t%s", line);
+                      {
+                        emitcode (";", "genFromRTrack removed\t%s", line);
+                        modified = true;
+                      }
                     if (regs8051[A_IDX].rtrack.valueKnown && (value == regs8051[A_IDX].rtrack.value) &&
-                        (regIdx != A_IDX))
-                      emitcode (";", "genFromRTrack suggests\tmov\t%s,a", regs8051[regIdx].name);
+                        (regIdx != A_IDX) && (regIdx != DPL_IDX) && (regIdx != DPH_IDX))
+                        /* ignore DPL/DPH for now as peephole rule for MOV DPTR is much better */
+                      {
+                        emitcode (";", "genFromRTrack replaced\t%s", line);
+                        emitcode ("mov", "%s,a", regs8051[regIdx].name);
+                        modified = true;
+                      }
                     else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value + 1) &&
                              ((regIdx != A_IDX) || (0xff != regs8051[regIdx].rtrack.value)))
-                      emitcode (";", "genFromRTrack suggests\tinc\t%s", regs8051[regIdx].name);
+                      {
+                        /* does not occur in regression test mcs51-small */
+                        emitcode (";", "genFromRTrack replaced\t%s", line);
+                        emitcode ("inc", "%s", regs8051[regIdx].name);
+                        modified = true;
+                      }
                     else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value - 1) &&
                              ((regIdx != A_IDX) || (0x01 != regs8051[regIdx].rtrack.value)))
-                      emitcode (";", "genFromRTrack suggests\tdec\t%s", regs8051[regIdx].name);
+                      {
+                        /* does not occur in regression test mcs51-small */
+                        emitcode (";", "genFromRTrack replaced\t%s", line);
+                        emitcode ("dec", "%s", regs8051[regIdx].name);
+                        modified = true;
+                      }
                   );
 
                   rtrack_data_set_val (regIdx, (unsigned char) value);
@@ -350,7 +370,7 @@ void rtrackUpdate (const char *line)
                   /* mov acc.7,c and the likes */
                   rtrack_data_unset (regIdx);
                 }
-              return;
+              return modified;
             }
         }
 
@@ -358,7 +378,7 @@ void rtrackUpdate (const char *line)
       if (!strncmp (line, "mov\tpsw,", 8))
         {
           invalidateAllRx ();
-          return;
+          return false;
         }
 
       /* tracking dptr */
@@ -378,27 +398,29 @@ void rtrackUpdate (const char *line)
                       (regs8051[DPH_IDX].rtrack.value == (value >> 8)) &&
                       (regs8051[DPL_IDX].rtrack.value == (value & 0xff)))
                     {
-                      emitcode (";", "genFromRTrack suggests to remove\t%s", line);
+                      emitcode (";", "genFromRTrack removed\t%s", line);
                       foundshortcut = 1;
+                      modified = true;
                     }
 
                   if (!foundshortcut &&
                        regs8051[DPH_IDX].rtrack.valueKnown &&
                        regs8051[DPL_IDX].rtrack.valueKnown)
                     {
-                      /* some instructions are shorter than  mov dptr,#0xabcd */
+                      /* some instructions are shorter than mov dptr,#0xabcd */
                       const struct
                         {
                            int offset;
-                           char* opcode;
+                           const char* inst;
+                           const char* parm;
                         } reachable[6] =
                         {
-                          {   1, "inc\tdptr"},
-                          { 256, "inc\tdph"},
-                          {-256, "dec\tdph"},
-                          {-255, "inc\tdpl"},    /* if overflow */
-                          {  -1, "dec\tdpl"},    /* if no overflow */
-                          { 255, "dec\tdpl"}     /* if overflow */
+                          {   1, "inc", "dptr"},
+                          { 256, "inc", "dph"},
+                          {-256, "dec", "dph"},
+                          {-255, "inc", "dpl"},    /* if overflow */
+                          {  -1, "dec", "dpl"},    /* if no overflow */
+                          { 255, "dec", "dpl"}     /* if overflow */
                         };
 
                        unsigned int dptr = (regs8051[DPH_IDX].rtrack.value << 8 ) |
@@ -414,7 +436,10 @@ void rtrackUpdate (const char *line)
                                 if ((i == 4) && ((dptr & 0xff) == 0x00)) continue;
                                 if ((i == 5) && ((dptr & 0xff) != 0x00)) continue;
 
-                                emitcode (";", "genFromRTrack suggests\t%s", reachable[i].opcode);
+                                /* does not occur in regression test mcs51-small */
+                                emitcode (";", "genFromRTrack replaced\t%s", line);
+                                emitcode (reachable[i].inst, "%s", reachable[i].parm);
+                                modified = true;
                                 foundshortcut = 1;
 
                                 break;
@@ -431,7 +456,10 @@ void rtrackUpdate (const char *line)
 
                       if (s != rtrackGetLit(s))
                         {
-                          emitcode (";", "genFromRTrack suggests\tmov\tdpl,%s", rtrackGetLit (s));
+                          /* does not occur in regression test mcs51-small */
+                          emitcode (";", "genFromRTrack replaced\t%s", line);
+                          emitcode ("mov", "dpl,%s", rtrackGetLit (s));
+                          modified = true;
                           foundshortcut = 1;
                         }
                     }
@@ -444,7 +472,10 @@ void rtrackUpdate (const char *line)
 
                       if (s != rtrackGetLit (s))
                         {
-                          emitcode (";", "genFromRTrack suggests\tmov\tdph,%s", rtrackGetLit (s));
+                          /* does not occur in regression test mcs51-small */
+                          emitcode (";", "genFromRTrack replaced\t%s", line);
+                          emitcode ("mov", "dph,%s", rtrackGetLit (s));
+                          modified = true;
                           foundshortcut = 1;
                         }
                     }
@@ -452,31 +483,31 @@ void rtrackUpdate (const char *line)
 
               rtrack_data_set_val (DPH_IDX, (unsigned char) (value >> 8));
               rtrack_data_set_val (DPL_IDX, (unsigned char) value);
-              return;
+              return modified;
             }
-          }
-        /* literal symbol 16 bit */
-        else if (!strncmp (line, "mov\tdptr,#", 10))
-          {
-              char* s = Safe_alloc (strlen (line) + strlen ("( >> 8)"));
+        }
+      /* literal symbol 16 bit */
+      else if (!strncmp (line, "mov\tdptr,#", 10))
+        {
+          char* s = Safe_alloc (strlen (line) + strlen ("( >> 8)"));
 
-              strcat (s, "(");
-              strcat (s, &line[10]);
-              strcat (s, " >> 8)");
+          strcat (s, "(");
+          strcat (s, &line[10]);
+          strcat (s, " >> 8)");
 
-              rtrack_data_set_symbol (DPH_IDX, s);
-              rtrack_data_set_symbol (DPL_IDX, &line[10]);
+          rtrack_data_set_symbol (DPH_IDX, s);
+          rtrack_data_set_symbol (DPL_IDX, &line[10]);
 
-              Safe_free (s);
-              return;
-          }
-        else if (!strncmp (line, "mov\tdptr", 8))
-          {
-            /* unidentified */
-            rtrack_data_unset (DPH_IDX);
-            rtrack_data_unset (DPL_IDX);
-            return;
-          }
+          Safe_free (s);
+          return false;
+        }
+      else if (!strncmp (line, "mov\tdptr", 8))
+        {
+          /* unidentified */
+          rtrack_data_unset (DPH_IDX);
+          rtrack_data_unset (DPL_IDX);
+          return false;
+        }
 
       /* move direct to symbol */
       if (!strncmp (line, "mov\t_", 5) ||
@@ -486,46 +517,48 @@ void rtrackUpdate (const char *line)
 
           if (argument && !strncmp (argument, "#0x", 3))
             {
-              char s[8];
+              char s[8] = {0};
 
               strncpy ((void *)&s, argument, strlen ("#0xab"));
 
               /* could we get it from a, r0..r7? */
               if (s != rtrackGetLit (s))
                 {
-                  int lengthuptoargument = argument - line;
-                  D(emitcode (";", "genFromRTrack suggests\t%.*s%s",
-                                   lengthuptoargument,
-                                   line,
-                                   rtrackGetLit (s)));
+                  int lengthuptoargument = argument - (line + 4);
+                  emitcode (";", "1-genFromRTrack replaced\t%s", line);
+                  emitcode ("mov", "%.*s%s",
+                                  lengthuptoargument,
+                                  line + 4,
+                                  rtrackGetLit (s));
+                  modified = true;
                 }
           }
-          return;
+          return modified;
         }
 
       /* no tracking of SP, so we do not care */
       if (!strncmp (line, "mov\tsp,", 7))
-        return;
+        return false;
 
       /* mov to xdata or pdata memory does not change registers */
       if (!strncmp (line, "movx\t@", 6))
-        return;
+        return false;
 
       /* mov to idata memory might change registers r0..r7
-         but unless there is a stack problem compiler
+         but unless there is a stack problem
          compiler generated code does not do idata
          writes to 0x00..0x1f? */
       if (!strncmp (line, "mov\t@", 5))
         {
           /* a little too paranoid? */
           invalidateAllRx ();
-          return;
+          return false;
         }
     }
 
   /* no tracking of SP */
   if (!strncmp (line, "push", 4))
-    return;
+    return false;
 
   if (!strncmp (line, "pop\t", 4))
     {
@@ -534,7 +567,7 @@ void rtrackUpdate (const char *line)
         {
           rtrack_data_unset (regIdx);
         }
-      return;
+      return false;
     }
 
   if (!strncmp (line, "inc", 3))
@@ -560,7 +593,7 @@ void rtrackUpdate (const char *line)
               rtrack_data_unset (DPL_IDX);
               rtrack_data_unset (DPH_IDX);
             }
-          return;
+          return false;
         }
       if (!strncmp (line, "inc\t", 4))
         {
@@ -574,10 +607,10 @@ void rtrackUpdate (const char *line)
                    not yet handling offset to a symbol. (idata/pdata) */
                 rtrack_data_unset (regIdx);
 
-              return;
+              return false;
             }
         }
-      return;
+      return false;
     }
 
   /* some bit in acc is cleared
@@ -585,7 +618,7 @@ void rtrackUpdate (const char *line)
   if (!strncmp (line, "jbc\tacc", 7))
     {
       rtrack_data_unset (A_IDX);
-      return;
+      return false;
     }
 
   /* unfortunately the label typically following these
@@ -595,7 +628,7 @@ void rtrackUpdate (const char *line)
       !strncmp (line, "jb\t", 3) ||
       !strncmp (line, "jnb\t", 4) ||
       !strncmp (line, "jbc\t", 4))
-    return;
+    return false;
 
   /* if branch not taken in "cjne r2,#0x08,somewhere" 
      r2 is known to be 8 */
@@ -614,22 +647,22 @@ void rtrackUpdate (const char *line)
           if ((s != argument + 1) && !strncmp (argument, "#0x", 3))
             {
                rtrack_data_set_val (regIdx, (unsigned char) value);
-               return;
+               return false;
             }
           rtrack_data_unset (regIdx);
         }
-      return;
+      return false;
     }
 
   /* acc eventually known to be zero */
   if (!strncmp (line, "jz\t", 3))
-    return;
+    return false;
 
   /* acc eventually known to be zero */
   if (!strncmp (line, "jnz\t", 4))
     {
       rtrack_data_set_val (A_IDX, 0x00); // branch not taken
-      return;
+      return false;
     }
 
   if (!strncmp (line, "djnz\t", 5))
@@ -638,7 +671,7 @@ void rtrackUpdate (const char *line)
       if (0 <= regIdx)
         {
           rtrack_data_set_val (regIdx, 0x00); // branch not taken
-          return;
+          return false;
         }
     }
 
@@ -646,7 +679,7 @@ void rtrackUpdate (const char *line)
   if (!strncmp (line, "setb\tc", 6) ||
       !strncmp (line, "clr\tc", 5) ||
       !strncmp (line, "cpl\tc", 5))
-    return;
+    return false;
 
   /* operations on acc which depend on PSW */
   if (!strncmp (line, "addc\ta,", 7)||
@@ -656,7 +689,7 @@ void rtrackUpdate (const char *line)
       !strncmp (line, "rrc\ta", 5))
     {
       rtrack_data_unset (A_IDX);
-      return;
+      return false;
     }
 
   /* bitwise operations on acc */
@@ -664,7 +697,7 @@ void rtrackUpdate (const char *line)
       !strncmp (line, "clrb\ta", 6))
     {
       rtrack_data_unset (A_IDX);
-      return;
+      return false;
     }
 
   /* other operations on acc that can be tracked */
@@ -683,12 +716,12 @@ void rtrackUpdate (const char *line)
               if (0 <= regIdx && regs8051[regIdx].rtrack.valueKnown)
                 {
                   rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value + regs8051[regIdx].rtrack.value));
-                  return;
+                  return false;
                 }
               else if (('#' == line[6]) && (0 <= valuefromliteral (line + 7)))
                 {
                   rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value + valuefromliteral (line + 7)));
-                  return;
+                  return false;
                 }
             }
 
@@ -699,12 +732,12 @@ void rtrackUpdate (const char *line)
               if (0 <= regIdx && regs8051[regIdx].rtrack.valueKnown)
                 {
                   rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value & regs8051[regIdx].rtrack.value));
-                  return;
+                  return false;
                 }
               else if (('#' == line[6]) && (0 <= valuefromliteral (line + 7)))
                 {
                   rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value & valuefromliteral (line + 7)));
-                  return;
+                  return false;
                 }
             }
 
@@ -715,12 +748,12 @@ void rtrackUpdate (const char *line)
               if (0 <= regIdx && regs8051[regIdx].rtrack.valueKnown)
                 {
                   rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value | regs8051[regIdx].rtrack.value));
-                  return;
+                  return false;
                 }
               else if (('#' == line[6]) && (0 <= valuefromliteral (line + 7)))
                 {
                   rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value | valuefromliteral (line + 7)));
-                  return;
+                  return false;
                 }
             }
 
@@ -731,28 +764,28 @@ void rtrackUpdate (const char *line)
               if (0 <= regIdx && regs8051[regIdx].rtrack.valueKnown)
                 {
                   rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value ^ regs8051[regIdx].rtrack.value));
-                  return;
+                  return false;
                 }
               else if (('#' == line[6]) && (0 <= valuefromliteral (line + 7)))
                 {
                   rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value ^ valuefromliteral (line + 7)));
-                  return;
+                  return false;
                 }
             }
 
           if (!strcmp (line, "cpl\ta"))
             {
               rtrack_data_set_val (A_IDX, (unsigned char) (regs8051[A_IDX].rtrack.value ^ 0xff));
-              return;
+              return false;
             }
 
           rtrack_data_unset (A_IDX);
-          return;
+          return false;
         }
       else
         {
           rtrack_data_unset (A_IDX);
-          return;
+          return false;
         }
     }
 
@@ -768,19 +801,20 @@ void rtrackUpdate (const char *line)
           if (NULL != regs8051[regIdx].rtrack.symbol)
             rtrack_data_unset (regIdx);
 
-          return;
+          return false;
         }
-      return;
+      return false;
     }
 
   if (!strcmp (line, "clr\ta"))
     {
       if (regs8051[A_IDX].rtrack.valueKnown && (0 == regs8051[A_IDX].rtrack.value))
         {
-          D(emitcode (";", "genFromRTrack suggests to remove\t%s", line));
+          emitcode (";", "genFromRTrack removed\t%s", line);
+          modified = true;
         }
       rtrack_data_set_val (A_IDX, 0);
-      return;
+      return modified;
     }
 
   if (!strcmp (line, "cpl\ta"))
@@ -790,7 +824,7 @@ void rtrackUpdate (const char *line)
       else
         /* in case a holds a symbol */
         rtrack_data_unset (A_IDX);
-      return;
+      return false;
     }
   if (!strcmp (line, "rl\ta"))
     {
@@ -799,7 +833,7 @@ void rtrackUpdate (const char *line)
                                     (regs8051[A_IDX].rtrack.value>>7)));
       else
         rtrack_data_unset (A_IDX);
-      return;
+      return false;
     }
   if (!strcmp (line, "rr\ta"))
     {
@@ -808,7 +842,7 @@ void rtrackUpdate (const char *line)
                                     (regs8051[A_IDX].rtrack.value<<7)));
       else
         rtrack_data_unset (A_IDX);
-      return;
+      return false;
     }
   if (!strcmp (line, "swap\ta"))
     {
@@ -817,7 +851,7 @@ void rtrackUpdate (const char *line)
                                     (regs8051[A_IDX].rtrack.value<<4)));
       else
         rtrack_data_unset (A_IDX);
-      return;
+      return false;
     }
 
   if (!strncmp (line, "mul\t", 4))
@@ -835,7 +869,7 @@ void rtrackUpdate (const char *line)
           rtrack_data_unset (A_IDX);
           rtrack_data_unset (B_IDX);
         }
-      return;
+      return false;
     }
 
   if (!strncmp (line, "div\t", 4))
@@ -850,7 +884,7 @@ void rtrackUpdate (const char *line)
           rtrack_data_unset (A_IDX);
           rtrack_data_unset (B_IDX);
         }
-      return;
+      return false;
     }
 
   /* assuming these library functions have no side-effects */
@@ -861,12 +895,12 @@ void rtrackUpdate (const char *line)
           /* invalidate R0..R7 because they might have been changed */
           /* MB: too paranoid ? */
           //invalidateAllRx();
-          return;
+          return false;
         }
       if (!strcmp (line, "lcall\t__gptrget"))
         {
           rtrack_data_unset (A_IDX);
-          return;
+          return false;
         }
       if (!strcmp (line, "lcall\t__decdptr"))
         {
@@ -883,7 +917,7 @@ void rtrackUpdate (const char *line)
               rtrack_data_unset (DPL_IDX);
               rtrack_data_unset (DPH_IDX);
             }
-          return;
+          return false;
         }
        /* if callee_saves */
      }
@@ -901,12 +935,13 @@ void rtrackUpdate (const char *line)
           memcpy (&regs8051[regIdx].rtrack, swap,                     sizeof regs8051[A_IDX].rtrack);
 
           Safe_free (swap);
-          return;
+          return false;
         }
     }
 
   /* all others unrecognized, invalidate */
   invalidateAll();
+  return false;
 }
 
 

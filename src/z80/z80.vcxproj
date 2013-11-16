@@ -198,6 +198,16 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Peephole Rule: peeph-r2k.rul</Message>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="peeph-tlcs90.def">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gawk -f ../SDCCpeeph.awk %(Identity) &gt;peeph-tlcs90.rul</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gawk -f ../SDCCpeeph.awk %(Identity) &gt;peeph-tlcs90.rul</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Peephole Rule: peeph-tlcs90.rul</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Peephole Rule: peeph-tlcs90.rul</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">peeph-tlcs90.rul;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">peeph-tlcs90.rul;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

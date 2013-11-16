@@ -70,7 +70,7 @@ extern "C" {
 }
 #endif
 
-/* C++ compatible heared files */
+/* C++ compatible header files */
 #include "SDCCgen.h"
 
 #endif

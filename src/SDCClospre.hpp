@@ -522,6 +522,7 @@ static void split_edge(T_t &T, G_t &G, typename boost::graph_traits<G_t>::edge_d
   typename boost::graph_traits<G_t>::vertex_descriptor n = boost::add_vertex(G);
   // TODO: Exact cost.
   G[n].ic = newic;
+  G[n].uses = false;
   boost::add_edge(boost::source(e, G), n, G[e], G);
   boost::add_edge(n, boost::target(e, G), 3.0, G);
 

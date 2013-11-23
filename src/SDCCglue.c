@@ -224,6 +224,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
               else
                 DCL_PTR_CONST (t) = 1;
               SPEC_STAT (newSym->etype) = 1;
+
+              /* This results in unencessary calls to stringToSymbol() through decorateType(), which make strings take twice as much  space as they should */
               resolveIvalSym (newSym->ival, newSym->type);
 
               // add it to the "XINIT (CODE)" segment

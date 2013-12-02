@@ -951,10 +951,13 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(false);
 
 #if 0
-  std::cout << "IYinst_ok: Assignment: ";
-  print_assignment(a);
-  std::cout << "\n";
-  std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
+  if(ic->key == 99)
+    {
+      std::cout << "IYinst_ok: Assignment: ";
+      //print_assignment(a);
+      std::cout << "\n";
+      std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
+    }
 #endif
 
   if(result_in_IY &&
@@ -971,13 +974,23 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(ic->op == '-' && result_in_IY && input_in_IY && IS_VALOP (IC_RIGHT (ic)) && operandLitValue (IC_RIGHT (ic)) < 4)
     return(true);
 
+#if 0
+  if(ic->key == 99)
+    {
+      std::cout << "IYinst_ok: Assignment: ";
+      //print_assignment(a);
+      std::cout << "\n";
+      std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
+    }
+#endif
+
   if(SKIP_IC2(ic))
     return(true);
 
   if(!result_in_IY && !input_in_IY &&
     !(IC_RESULT(ic) && isOperandInDirSpace(IC_RESULT(ic))) &&
-    !(IC_RIGHT(ic) && isOperandInDirSpace(IC_RIGHT(ic))) &&
-    !(IC_LEFT(ic) && isOperandInDirSpace(IC_LEFT(ic))))
+    !(IC_RIGHT(ic) && IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
+    !(IC_LEFT(ic) && IS_TRUE_SYMOP(IC_LEFT(ic))))
     return(true);
 
   if(!result_in_IY && !input_in_IY &&
@@ -987,7 +1000,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   if(ic->op == IPUSH)	// todo: More instructions that can use IY.
     return(true);
-    
+
   if(ic->op == GET_VALUE_AT_ADDRESS && isOperandInDirSpace(IC_RESULT(ic)))
     return(false);
 
@@ -998,7 +1011,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
 
 #if 0
-  if(ic->key == 118)
+  if(ic->key == 99)
     {
       std::cout << "Default drop.\n";
       std::cout << "result is pair: " << operand_is_pair(IC_RESULT(ic), a, i, G) << "\n";

@@ -1,3 +1,8 @@
+2013-12-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Fix handling of IY during accesses to global variables.
+
 2013-11-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClospre.hpp:

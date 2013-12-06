@@ -41,6 +41,21 @@
 #endif
 
 void
+testBug2233(void)
+{
+#ifndef __SDCC_pic16
+	bool result;
+	volatile char test;
+
+	result = ret_true();
+
+	if (result == 1)
+		test = 1;
+	ASSERT(test);
+#endif
+}
+
+void
 testBool(void)
 {
 #ifndef __SDCC_pic16
@@ -83,4 +98,3 @@ testBool(void)
 	E--;     ASSERT(!E); // sets E to 1-E
 #endif
 }
-

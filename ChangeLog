@@ -1,3 +1,8 @@
+2013-12-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (outBitC, genIfx): fixed both parts of bug 2233
+	* support/regression/tests/bool.c: added test
+
 2013-12-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc:

@@ -1946,7 +1946,7 @@ outBitC (operand * result)
   /* if the result is bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      if (!IS_OP_RUONLY (result))
+      if (!IS_OP_RUONLY (result) && !IS_OP_ACCUSE (result))
         aopPut (result, "c", 0);
     }
   else if (AOP_TYPE (result) != AOP_DUMMY)
@@ -11131,6 +11131,8 @@ genIfx (iCode * ic, iCode * popIc)
   /* if the condition is a bit variable */
   if (isbit && dup)
     genIfxJump (ic, dup, NULL, NULL, NULL, popIc);
+  else if (isbit && IS_OP_ACCUSE (cond))
+    genIfxJump (ic, "c", NULL, NULL, NULL, popIc);
   else if (isbit && IS_ITEMP (cond) && SPIL_LOC (cond))
     genIfxJump (ic, SPIL_LOC (cond)->rname, NULL, NULL, NULL, popIc);
   else if (isbit && !IS_ITEMP (cond))

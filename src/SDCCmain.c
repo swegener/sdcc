@@ -493,6 +493,7 @@ printVersionInfo (FILE * stream)
            "/" SDCC_SUB_VERSION_STR
 #endif
            " #%s (%s) (%s)\n", getBuildNumber (), getBuildDate (), getBuildEnvironment ());
+  fprintf (stream, "published under GNU General Public License (GPL)\n");
 }
 
 static void

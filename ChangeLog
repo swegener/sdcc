@@ -1,3 +1,10 @@
+2013-12-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* .version, doc/sdccman.lyx: bumped version to 3.3.2
+	* src/SDCCast.c (decorateType, NOT): fixed bug 2232
+	* src/SDCCmain.c (printVersionInfo): mention GPL
+	* support/regression/tests/bool.c: fixed warning
+
 2013-12-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (outBitC, genIfx): fixed both parts of bug 2233

@@ -4116,6 +4116,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
       LRVAL (tree) = 1;
       TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
+      if (IS_BOOLEAN (LTYPE (tree)))
+        SPEC_USIGN (TTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
       return tree;
 
       /*------------------------------------------------------------------*/

@@ -45,7 +45,7 @@ testBug2233(void)
 {
 #ifndef __SDCC_pic16
 	bool result;
-	volatile char test;
+	volatile char test = 0;
 
 	result = ret_true();
 

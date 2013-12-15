@@ -2,6 +2,8 @@
 
 	* src/SDCCicode.c (newiTempOperand): fixed bug 2235
 	* support/regression/tests/bug-2235.c: new, added
+	* src/SDCCptropt.c (ptrPseudoSymSafe): fixed bug 2216
+	* support/regression/tests/bug-2216.c: new, added
 
 2013-12-07 Maarten Brock <sourceforge.brock AT dse.nl>
 

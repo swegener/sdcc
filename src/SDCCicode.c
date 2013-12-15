@@ -783,12 +783,9 @@ newiTempOperand (sym_link * type, char throwType)
   /* copy the type information */
   if (type)
     itmp->etype = getSpec (itmp->type = (throwType ? type : copyLinkChain (type)));
-  if (IS_LITERAL (itmp->etype))
-    {
-      SPEC_SCLS (itmp->etype) = S_REGISTER;
-      SPEC_OCLS (itmp->etype) = reg;
-    }
-    
+
+  SPEC_SCLS (itmp->etype) = S_FIXED;
+
   /* iTemps always live in the default address space */
   if (IS_DECL (itmp->type))
     DCL_PTR_ADDRSPACE (itmp->type) = 0;

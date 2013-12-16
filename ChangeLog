@@ -1,3 +1,7 @@
+2013-12-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (glue): fixed bug 2212
+
 2013-12-15 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCicode.c (newiTempOperand): fixed bug 2235

@@ -1748,19 +1748,16 @@ emitOverlay (struct dbuf_s *aBuf)
           if (IS_FUNC (sym->type))
             continue;
 
-          /* print extra debug info if required */
-          if (options.debug)
-            {
-              emitDebugSym (aBuf, sym);
-            }
-
           /* if is has an absolute address then generate
              an equate for this no need to allocate space */
           if (SPEC_ABSA (sym->etype))
             {
+              /* print extra debug info if required */
               if (options.debug)
-                dbuf_printf (aBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
-
+                {
+                  emitDebugSym (aBuf, sym);
+                  dbuf_printf (aBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
+                }
               dbuf_printf (aBuf, "%s\t=\t0x%04x\n", sym->rname, SPEC_ADDR (sym->etype));
             }
           else
@@ -1771,8 +1768,12 @@ emitOverlay (struct dbuf_s *aBuf)
                 {
                   werrorfl (sym->fileDef, sym->lineDef, E_UNKNOWN_SIZE, sym->name);
                 }
+              /* print extra debug info if required */
               if (options.debug)
-                dbuf_printf (aBuf, "==.\n");
+                {
+                  emitDebugSym (aBuf, sym);
+                  dbuf_printf (aBuf, "==.\n");
+                }
 
               /* allocate space */
               dbuf_tprintf (aBuf, "!slabeldef\n", sym->rname);
@@ -1798,7 +1799,8 @@ glue (void)
   dbuf_init (&vBuf, 4096);
   dbuf_init (&ovrBuf, 4096);
 
-  mcs51_like = (port->general.glue_up_main && (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400));
+  mcs51_like = (port->general.glue_up_main &&
+                (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400));
 
   /* print the global struct definitions */
   if (options.debug)
@@ -1895,7 +1897,7 @@ glue (void)
         fprintf (asmFile, " --parms-in-bank1");
       fprintf (asmFile, "\n");
     }
-  else if ((TARGET_Z80_LIKE || TARGET_HC08_LIKE) && !options.noOptsdccInAsm)
+  else if (!TARGET_PIC_LIKE && !options.noOptsdccInAsm)
     {
       fprintf (asmFile, "\t.optsdcc -m%s\n", port->target);
     }

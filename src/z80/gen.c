@@ -11637,7 +11637,7 @@ genBuiltInStrncpy (const iCode *ic, int nparams, operand **pparams)
       emit2 ("jp PE, !tlabel", labelKey2num (tlbl3->key));
       emitLabel (tlbl1);
     }
-  regalloc_dry_run_cost += 8;
+  regalloc_dry_run_cost += 14;
 
   spillPair (PAIR_HL);
 

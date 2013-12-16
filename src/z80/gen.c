@@ -10166,11 +10166,11 @@ genAddrOf (const iCode * ic)
           spillPair (PAIR_HL);
           if (sym->stack <= 0)
             {
-              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + operandLitValue (right));
+              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + (int)operandLitValue (right));
             }
           else
             {
-              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset + operandLitValue (right));
+              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset + (int)operandLitValue (right));
             }
           commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
         }
@@ -11625,11 +11625,16 @@ genBuiltInStrncpy (const iCode *ic, int nparams, operand **pparams)
     {
       symbol *tlbl1 = newiTempLabel (0);
       symbol *tlbl2 = newiTempLabel (0);
+      symbol *tlbl3 = newiTempLabel (0);
       emitLabel (tlbl2);
       emit2 ("cp a, (hl)");
       emit2 ("ldi");
-      emit2 ("jp PE, !tlabel", labelKey2num (tlbl1->key));
+      emit2 ("jp PO, !tlabel", labelKey2num (tlbl1->key));
       emit2 ("jr NZ, !tlabel", labelKey2num (tlbl2->key));
+      emitLabel (tlbl3);
+      emit2 ("dec hl");
+      emit2 ("ldi");
+      emit2 ("jp PE, !tlabel", labelKey2num (tlbl3->key));
       emitLabel (tlbl1);
     }
   regalloc_dry_run_cost += 8;

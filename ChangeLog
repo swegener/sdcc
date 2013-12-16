@@ -1,6 +1,8 @@
 2013-12-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c (glue): fixed bug 2212
+	* src/z80/gen.c (genBuiltInStrncpy): fixed bug 2231
+	* support/regression/tests/bug-2231.c: new, added
 
 2013-12-15 Maarten Brock <sourceforge.brock AT dse.nl>
 

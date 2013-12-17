@@ -164,15 +164,15 @@ stm8instructionSize(const lineNode *pl)
                 || EQUALS(operand, "inc")
                 || EQUALS(operand, "push")
                 || EQUALS(operand, "swap")
-                //|| EQUALS(operand, "jp") disabled due to bug #2182.
+                || EQUALS(operand, "jp")
                 || EQUALS(operand, "cpl")
                 || EQUALS(operand, "tnz"))
   {
     if(!op1start)
       return(3);
-    if(op1start[0] == 'a' || op1start[1] == 'x')
+    if(!strcmp(op1start, "a") || !strcmp(op1start, "(x)"))
       return(1);
-    if(op1start[1] == 'y')
+    if(!strcmp(op1start, "(y)"))
       return(2);
     if(op1start[0] == '(')
       op1start++;
@@ -196,6 +196,8 @@ stm8instructionSize(const lineNode *pl)
   }
   if(EQUALS(operand, "addw") || EQUALS(operand, "subw"))
   {
+    if(!strcmp(op1start, "sp"))
+      return(2);
     if(isImmediate(op2start) && op1start[0] == 'y')
       return(4);
     if(isImmediate(op2start))

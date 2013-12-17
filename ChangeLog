@@ -2,6 +2,8 @@
 
 	* src/stm8/peep.c:
 	  Fix bug #2182.
+	* src/SDCCralloc.hpp:
+	  Enable warning for non-connected live ranges for hc08 and s08.
 
 2013-12-16 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

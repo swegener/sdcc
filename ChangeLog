@@ -1,3 +1,9 @@
+2013-12-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/float_single.c:
+	  Fix float comparison, bug #2170.
+
 2013-12-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-20040313-1.c:

@@ -5735,13 +5735,14 @@ genIfx (const iCode *ic)
   // todo: This function currently reports code size costs only, other costs will depend on profiler information.
   bool inv = FALSE;
   operand *const cond = IC_COND (ic);
+  sym_link *type = operandType (cond);
   symbol *const tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   symbol *tlbl2 = NULL;
   aopOp (cond, ic);
 
   D (emitcode ("; genIfx", ""));
 
-  if (IS_BOOL (operandType (cond)) && cond->aop->type == AOP_DIR)
+  if (IS_BOOL (type) && cond->aop->type == AOP_DIR)
     {
       if (tlbl)
         emitcode (IC_FALSE (ic) ? "btjt" : "btjf", "%s, #0, !tlabel", aopGet (cond->aop, 0), labelKey2num (tlbl->key));
@@ -5749,7 +5750,7 @@ genIfx (const iCode *ic)
     }
   else if (aopInReg (cond->aop, 0, C_IDX))
     {
-      wassertl (IS_BOOL (operandType (cond)), "Variable of type other than _Bool in carry bit.");
+      wassertl (IS_BOOL (type), "Variable of type other than _Bool in carry bit.");
       if (tlbl)
         emitcode (IC_FALSE (ic) ? "jrc" : "jrnc", "!tlabel", labelKey2num (tlbl->key));
       cost (2, 0);
@@ -5760,7 +5761,10 @@ genIfx (const iCode *ic)
 
       for (i = 0; i < cond->aop->size;) // todo: Use tnzw; test a first, if dead, to free a; use swapw followed by exg to test xh if xl is dead (same for yh), use tnzw independently of where in the operand xl and xh are.
         {
-          if (i + 1 < cond->aop->size &&
+          bool floattopbyte = (i == cond->aop->size - 1) && IS_FLOAT(type);
+          bool floattopword = (i == cond->aop->size - 2) && IS_FLOAT(type);
+
+          if (!floattopword && i + 1 < cond->aop->size &&
             (aopInReg (cond->aop, i, X_IDX) || aopInReg (cond->aop, i, Y_IDX) ||
             (cond->aop->type == AOP_REG && (cond->aop->aopu.bytes[i].byteu.reg->rIdx == XH_IDX && cond->aop->aopu.bytes[i + 1].byteu.reg->rIdx == XL_IDX || cond->aop->aopu.bytes[i].byteu.reg->rIdx == YH_IDX && cond->aop->aopu.bytes[i + 1].byteu.reg->rIdx == YL_IDX))))
             {
@@ -5772,21 +5776,25 @@ genIfx (const iCode *ic)
             (aopOnStack (cond->aop, i, 2) || cond->aop->type == AOP_DIR))
             {
               genMove_o (ASMOP_X, 0, cond->aop, i, 2, regDead (A_IDX, ic) && cond->aop->regs[A_IDX] < i, TRUE, FALSE);
+              if (floattopword)
+                emit3w (A_SLLW, ASMOP_X, 0);
               i += 2;
             }
           else if (i + 1 < cond->aop->size && regDead (Y_IDX, ic) && cond->aop->regs[YL_IDX] < i && cond->aop->regs[YH_IDX] < i &&
             (aopOnStack (cond->aop, i, 2) || cond->aop->type == AOP_DIR))
             {
               genMove_o (ASMOP_Y, 0, cond->aop, i, 2, regDead (A_IDX, ic) && cond->aop->regs[A_IDX] < i, FALSE, TRUE);
+              if (floattopbyte)
+                emit3w (A_SLLW, ASMOP_Y, 0);
               i += 2;
             }
           else if ((aopInReg (cond->aop, i, XL_IDX) || aopInReg (cond->aop, i, XH_IDX) || aopInReg (cond->aop, i, YH_IDX)) && regDead (A_IDX, ic) && cond->aop->regs[A_IDX] <= i)
             {
               cheapMove (ASMOP_A, 0, cond->aop, i, FALSE);
-              emit3(A_TNZ, ASMOP_A, 0);
+              emit3 (floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
               i++;
             }
-          else if (aopInReg (cond->aop, i, XL_IDX))
+          else if (!floattopbyte && aopInReg (cond->aop, i, XL_IDX))
             {
               emitcode ("exg", "a, xl");
               cost (1, 1);
@@ -5795,7 +5803,7 @@ genIfx (const iCode *ic)
               cost (1, 1);
               i++;
             }
-          else if (aopInReg (cond->aop, i, YL_IDX))
+          else if (!floattopbyte && aopInReg (cond->aop, i, YL_IDX))
             {
               emitcode ("exg", "a, yl");
               cost (1, 1);
@@ -5804,23 +5812,31 @@ genIfx (const iCode *ic)
               cost (1, 1);
               i++;
             }
-          else if (aopInReg (cond->aop, i, XH_IDX))
+          else if (!floattopbyte && aopInReg (cond->aop, i, XH_IDX))
             {
               push (ASMOP_X, 0, 2);
               emitcode ("tnz", "(1, sp)");
               adjustStack (2, FALSE, FALSE, FALSE);
               i++;
             }
-          else if (aopInReg (cond->aop, i, YH_IDX))
+          else if (!floattopbyte && aopInReg (cond->aop, i, YH_IDX))
             {
               push (ASMOP_Y, 0, 2);
               emitcode ("tnz", "(1, sp)");
               adjustStack (2, FALSE, FALSE, FALSE);
               i++;
             }
-          else
+          else if(!floattopbyte)
             {
               emit3_o (A_TNZ, cond->aop, i, 0, 0);
+              i++;
+            }
+          else
+            {
+              push (ASMOP_A, 0, 1);
+              cheapMove (ASMOP_A, 0, cond->aop, i, FALSE);
+              emit3 (A_SLL, ASMOP_A, 0);
+              pop (ASMOP_A, 0, 1);
               i++;
             }
 

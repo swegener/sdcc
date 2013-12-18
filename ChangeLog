@@ -1,5 +1,17 @@
 2013-12-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* device/include/ctype.h,
+	  device/include/stdio.h,
+	  device/lib/incl.mk,
+	  device/lib/_is*.c,
+	  device/lib/is*.c,
+	  device/lib/tolower.c,
+	  device/lib/toupper.c,
+	  support/regression/tests/ctype.c:
+	  Fix ctype.h and anything in there.
+
+2013-12-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* device/lib/z80/crt0.s,
 	  device/lib/z180/crt0.s,
 	  device/lib/r3ka/crt0.s,

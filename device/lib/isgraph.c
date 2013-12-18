@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
-   _ispunct.c - part of ctype.h
+   isgraph.c
 
-   Copyright (c) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
+
+   (c) 2013 Goethe-Universität Frankfurt
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,13 +30,8 @@
 
 #include <ctype.h>
 
-char ispunct (unsigned char c)
+int isgraph (int c)
 {
-    if ( isprint (c) &&
-         !islower(c) &&
-         !isupper(c) &&
-         !isspace(c) &&
-         !isdigit(c) )
-        return 1;
-    return 0;
+  return (c > ' ' && c <= '~');
 }
+

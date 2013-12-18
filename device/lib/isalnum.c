@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
-   _isupper.c - part of ctype.h
+   isalnum.c
 
-   Copyright (c) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
+
+   (c) 2013 Goethe-Universität Frankfurt
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,11 +30,12 @@
 
 #include <ctype.h>
 
-#define UC(c)	((unsigned char)c)
+#ifdef isalnum
+#undef isalnum
+#endif
 
-char isupper (unsigned char c)
+int isalnum (int c)
 {
-    if ( c >= UC('A') && c <= UC('Z') )
-        return 1;
-    return 0;
+  return (isalpha (c) || isdigit (c));
 }
+

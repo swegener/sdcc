@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
-   _islower.c - part of ctype.h
+   isspace.c
 
-   Copyright (c) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
+
+   (c) 2013 Goethe-Universität Frankfurt
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,11 +30,12 @@
 
 #include <ctype.h>
 
-#define UC(c)	((unsigned char)c)
+#ifdef isspace
+#undef isspace
+#endif
 
-char islower (unsigned char c)
+int isspace (int c)
 {
-    if  ( c >= UC('a') && c <= UC('z') )
-        return 1;
-    return 0;
+  return (c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' || c == '\v');
 }
+

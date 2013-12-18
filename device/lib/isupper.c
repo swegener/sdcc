@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
-   _isgraph.c - part of ctype.h
+   isupper.c
 
-   Copyright (c) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
+
+   (c) 2013 Goethe-Universität Frankfurt
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,9 +30,12 @@
 
 #include <ctype.h>
 
-char isgraph (unsigned char c)
+#ifdef isupper
+#undef isupper
+#endif
+
+int isupper (int c)
 {
-    if ( c >= 0x21 && c <= 0x7e )
-        return 1;
-    return 0;
+  return (c >= 'A' && c <= 'Z');
 }
+

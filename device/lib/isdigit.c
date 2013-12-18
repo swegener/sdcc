@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   ctype.h
+   isdigit.c
 
    Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
 
@@ -28,28 +28,14 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __SDCC_CTYPE_H
-#define __SDCC_CTYPE_H 1
+#include <ctype.h>
 
-extern int isalnum (int c);
-extern int isalpha (int c);
-#if __STDC_VERSION__ >= 199901L
-extern int isblank (int c);
+#ifdef isdigit
+#undef isdigit
 #endif
-extern int iscntrl (int c);
-extern int isdigit (int c);
-extern int isgraph (int c);
-extern int islower (int c);
-extern int isprint (int c);
-extern int ispunct (int c);
-extern int isspace (int c);
-extern int isupper (int c);
-extern int isalnum (int c);
-extern int isalnum (int c);
-extern int isxdigit (int c);
 
-extern int tolower (int c);
-extern int toupper (int c);
-
-#endif
+int isdigit (int c)
+{
+  return (c >= '0' && c <= '9');
+}
 

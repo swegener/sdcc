@@ -54,20 +54,25 @@ COMMON_LONG = \
   _modulong.c
 
 COMMON_SDCC = \
+  isalnum.c \
+  isalpha.c \
+  isblank.c \
+  iscntrl.c \
+  isdigit.c \
+  isgraph.c \
+  islower.c \
+  isprint.c \
+  ispunct.c \
+  isspace.c \
+  isupper.c \
+  isxdigit.c \
+  tolower.c \
+  toupper.c \
   _atoi.c \
   _atol.c \
   abs.c \
   labs.c \
   rand.c \
-  _iscntrl.c \
-  _isdigit.c \
-  _isgraph.c \
-  _isprint.c \
-  _ispunct.c \
-  _isspace.c \
-  _islower.c \
-  _isupper.c \
-  _isxdigit.c \
   _strcat.c \
   _strchr.c \
   _strcmp.c \

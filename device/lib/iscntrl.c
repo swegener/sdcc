@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
-   _isdigit.c - part of ctype.h
+   iscntrl.c
 
-   Copyright (c) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
+
+   (c) 2013 Goethe-Universität Frankfurt
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,11 +30,8 @@
 
 #include <ctype.h>
 
-#define UC(c)	((unsigned char)c)
-
-char isdigit (unsigned char c)
+int iscntrl (int c)
 {
-    if ( c >= UC('0') && c <= UC('9') )
-        return 1;
-    return 0;
+  return (c < ' ' || c == 0x7f);
 }
+

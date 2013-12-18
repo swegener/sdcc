@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
-   _iscntrl.c - part of ctype.h
+   ispunct.c
 
-   Copyright (c) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
+
+   (c) 2013 Goethe-Universität Frankfurt
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,9 +30,8 @@
 
 #include <ctype.h>
 
-char iscntrl (unsigned char c)
+int ispunct (int c)
 {
-    if  ( c <= 0x1F || c == 0x7f )
-        return 1;
-    return 0;
+  return (isprint (c) && !isspace (c) && !isalnum (c));
 }
+

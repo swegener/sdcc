@@ -49,7 +49,6 @@ foo (void)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_stm8)
   foo ();
-#endif
 }
+

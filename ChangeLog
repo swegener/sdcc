@@ -3,6 +3,8 @@
 	* src/stm8/gen.c,
 	  support/regression/tests/float_single.c:
 	  Fix float comparison, bug #2170.
+	* support/regression/tests/gcc-torture-execute-20050826-1.c:
+	  Use smaller array for stm8.
 
 2013-12-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

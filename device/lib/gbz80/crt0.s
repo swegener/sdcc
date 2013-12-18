@@ -54,8 +54,8 @@
         .org    0x150
 init:
         di
-        ;; Stack at the top of memory.
-        ld      sp,#0xdfff
+        ;; Set stack pointer directly above top of memory.
+        ld      sp,#0xe000
 
         ;; Setup global data
         call    gsinit

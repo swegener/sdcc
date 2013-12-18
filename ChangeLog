@@ -1,5 +1,10 @@
 2013-12-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* support/regression/tests/gcc-torture-execute-20040313-1.c:
+	  Enabled test.
+
+2013-12-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* device/include/ctype.h,
 	  device/include/stdio.h,
 	  device/lib/incl.mk,

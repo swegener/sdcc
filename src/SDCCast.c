@@ -1595,7 +1595,7 @@ stringToSymbol (value * val)
     }
 
   dbuf_init (&dbuf, 128);
-  dbuf_printf (&dbuf, "_str_%d", charLbl++);
+  dbuf_printf (&dbuf, "__str_%d", charLbl++);
   sym = newSymbol (dbuf_c_str (&dbuf), 0);      /* make it @ level 0 */
   strncpyz (sym->rname, dbuf_c_str (&dbuf), SDCC_NAME_MAX);
   dbuf_destroy (&dbuf);
@@ -5606,22 +5606,24 @@ createIf (ast * condAst, ast * ifBody, ast * elseBody)
 
   /* create the labels */
   dbuf_init (&dbuf, 128);
-  dbuf_printf (&dbuf, "_iffalse_%d", Lblnum);
+  dbuf_printf (&dbuf, "__iffalse_%d", Lblnum);
   ifFalse = newSymbol (dbuf_c_str (&dbuf), NestLevel);
   dbuf_destroy (&dbuf);
   /* if no else body then end == false */
   if (!elseBody)
-    ifEnd = ifFalse;
+    {
+      ifEnd = ifFalse;
+    }
   else
     {
       dbuf_init (&dbuf, 128);
-      dbuf_printf (&dbuf, "_ifend_%d", Lblnum);
+      dbuf_printf (&dbuf, "__ifend_%d", Lblnum);
       ifEnd = newSymbol (dbuf_c_str (&dbuf), NestLevel);
       dbuf_destroy (&dbuf);
     }
 
   dbuf_init (&dbuf, 128);
-  dbuf_printf (&dbuf, "_iftrue_%d", Lblnum);
+  dbuf_printf (&dbuf, "__iftrue_%d", Lblnum);
   ifTrue = newSymbol (dbuf_c_str (&dbuf), NestLevel);
   dbuf_destroy (&dbuf);
 

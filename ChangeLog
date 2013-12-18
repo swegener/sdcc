@@ -1,3 +1,10 @@
+2013-12-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCast.c (stringToSymbol, createIf): fixed bug 2163
+	* support/regression/tests/gcc-torture-execute-string-opt-5.c: enabled for
+	  mcs51 with smaller buffer	
+	* support/regression/tests/bug-2163.c: new, added
+
 2013-12-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/lib/tlcs90/t90regs.s,

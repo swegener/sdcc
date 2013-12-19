@@ -2,6 +2,8 @@
 
 	* src/stm8/gen.c:
 	  Document subw uses that can be enabled once bug #2227 is fixed.
+	* device/include/ctype.h:
+	  Provide macros that use inline functions to improve efficiency of some common functions.
 
 2013-12-18 Philipp Klaus Krause <pkk AT spth.de>
 

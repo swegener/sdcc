@@ -51,5 +51,31 @@ extern int isxdigit (int c);
 extern int tolower (int c);
 extern int toupper (int c);
 
+/* Provide macros for the most used functions for efficiency */
+#if __STDC_VERSION__ >= 199901L
+static inline _Bool __sdcc_isdigit (unsigned char c);
+static inline _Bool __sdcc_islower (unsigned char c);
+static inline _Bool __sdcc_isupper (unsigned char c);
+
+inline _Bool __sdcc_isdigit (unsigned char c)
+{
+  return (c >= '0' && c <= '9');
+}
+
+inline _Bool __sdcc_islower (unsigned char c)
+{
+  return (c >= 'a' && c <= 'z');
+}
+
+inline _Bool __sdcc_isupper (unsigned char c)
+{
+  return (c >= 'A' && c <= 'Z');
+}
+
+#define isdigit(c) __sdcc_isdigit(c)
+#define islower(c) __sdcc_islower(c)
+#define isupper(c) __sdcc_isupper(c)
+#endif
+
 #endif
 

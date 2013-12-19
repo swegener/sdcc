@@ -1,3 +1,8 @@
+2013-12-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  Document subw uses that can be enabled once bug #2227 is fixed.
+
 2013-12-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

@@ -244,6 +244,7 @@ enum {
   W_STATIC_ASSERTION            = 215, /* static assertion failed */
   E_ALIGNAS                     = 216, /* invalid alignment specified */
   W_INTERNAL_ERROR              = 217, /* warning for non-fatal internal errors - things that should not have happened, but can be handled */
+  W_UNRECOGNIZED_ASM            = 218, /* unrecognized asm instruction in peephole optimizer */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

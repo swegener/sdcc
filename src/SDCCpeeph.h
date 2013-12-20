@@ -57,4 +57,6 @@ labelHashEntry *getLabelRef (const char *label, lineNode *head);
 void initPeepHole (void);
 void peepHole (lineNode **);
 
+const char * StrStr (const char * str1, const char * str2);
+
 #endif

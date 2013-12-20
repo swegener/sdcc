@@ -2502,8 +2502,8 @@ aopGet (asmop * aop, int offset, bool bit16)
 static bool
 isRegString (const char *s)
 {
-  if (!strcmp (s, "b") ||
-      !strcmp (s, "c") || !strcmp (s, "d") || !strcmp (s, "e") || !strcmp (s, "a") || !strcmp (s, "h") || !strcmp (s, "l"))
+  if (!strcmp (s, "b") || !strcmp (s, "c") || !strcmp (s, "d") || !strcmp (s, "e") ||
+      !strcmp (s, "a") || !strcmp (s, "h") || !strcmp (s, "l"))
     return TRUE;
   return FALSE;
 }

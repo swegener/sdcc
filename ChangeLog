@@ -1,9 +1,26 @@
+2013-12-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCerr.c,
+	* src/SDCCerr.h: added W_UNRECOGNIZED_ASM
+	* src/SDCCglobl.h,
+	* src/z80/gen.c: cosmetics
+	* src/SDCCpeeph.c (StrStr): added
+	  (pcDistance): largest instruction on any target is 4 bytes?
+	* src/z80/peep.c (ISINST): use STRNCASECMP,
+	  (argCont): use StrStr,
+	  (z80instructionSize): use STRNCASECMP, W_UNRECOGNIZED_ASM,
+	   fixed some bugs, return 999 when unrecognized
+	* support/regression/tests/bug-2222.c: removed memset and un
+	* support/regression/tests/gcc-torture-execute-20040313-1.c: enabled for all
+	  targets with reduced footprint
+
 2013-12-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/stm8/gen.c:
 	  Document subw uses that can be enabled once bug #2227 is fixed.
 	* device/include/ctype.h:
-	  Provide macros that use inline functions to improve efficiency of some common functions.
+	  Provide macros that use inline functions to improve efficiency of some
+	  common functions.
 
 2013-12-18 Philipp Klaus Krause <pkk AT spth.de>
 

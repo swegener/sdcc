@@ -115,7 +115,7 @@ pcDistance (lineNode *cpos, char *lbl, bool back)
             }
           else
             {
-              dist += 3;
+              dist += 4;    // maximum instruction size
             }
         }
 
@@ -268,7 +268,7 @@ FBYNAME (optimizeReturn)
 }
 
 /*-----------------------------------------------------------------*/
-/* labelIsReturnOnly - Check if label is followed by ret          */
+/* labelIsReturnOnly - Check if label is followed by ret           */
 /*-----------------------------------------------------------------*/
 FBYNAME (labelIsReturnOnly)
 {
@@ -855,7 +855,7 @@ error:
 /* setFromConditionArgs - parse a peephole condition's arguments    */
 /* to produce a set of strings, one per argument. Variables %x will */
 /* be replaced with their values. String literals (in single quotes)*/
-/* are accepted and return in unquoted form.                         */
+/* are accepted and return in unquoted form.                        */
 /*------------------------------------------------------------------*/
 static set *
 setFromConditionArgs (char *cmdLine, hTab * vars)
@@ -981,7 +981,8 @@ FBYNAME (notUsed)
 }
 
 /*-----------------------------------------------------------------*/
-/* notUsed - Check, if value in register is not read again starting from label */
+/* notUsed - Check, if value in register is not read again         */
+/*           starting from label                                   */
 /*-----------------------------------------------------------------*/
 FBYNAME (notUsedFrom)
 {
@@ -1050,11 +1051,11 @@ FBYNAME (canAssign)
   return FALSE;
 }
 
-/*-------------------------------------------------------------------*/
-/* operandsNotRelated - returns true if the condition's operands are */
-/* not related (taking into account register name aliases). N-way    */
-/* comparison performed between all operands.                        */
-/*-------------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+/* operandsNotRelated - returns true if the condition's operands   */
+/* are not related (taking into account register name aliases).    */
+/* N-way comparison performed between all operands.                */
+/*-----------------------------------------------------------------*/
 FBYNAME (operandsNotRelated)
 {
   set *operands;
@@ -1126,10 +1127,10 @@ FBYNAME (notSame)
   return TRUE;
 }
 
-/*-------------------------------------------------------------------*/
-/* operandsLiteral - returns true if the condition's operands are    */
-/* literals.                                                         */
-/*-------------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+/* operandsLiteral - returns true if the condition's operands are  */
+/* literals.                                                       */
+/*-----------------------------------------------------------------*/
 FBYNAME (operandsLiteral)
 {
   set *operands;
@@ -2073,8 +2074,7 @@ replaceRule (lineNode ** shead, lineNode * stail, peepRule * pr)
  * and len will be it's length.
  */
 bool
-isLabelDefinition (const char *line, const char **start, int *len,
-                   bool isPeepRule)
+isLabelDefinition (const char *line, const char **start, int *len, bool isPeepRule)
 {
   const char *cp = line;
 
@@ -2460,4 +2460,33 @@ initPeepHole (void)
     pic16_peepRules2pCode (rootRules);
 
 #endif
+}
+
+/*-----------------------------------------------------------------*/
+/* StrStr - case-insensitive strstr implementation                 */
+/*-----------------------------------------------------------------*/
+const char * StrStr (const char * str1, const char * str2)
+{
+	const char * cp = str1;
+	const char * s1;
+	const char * s2;
+
+	if ( !*str2 )
+	    return str1;
+
+	while (*cp)
+	{
+		s1 = cp;
+		s2 = str2;
+
+		while ( *s1 && *s2 && !(tolower(*s1)-tolower(*s2)) )
+			s1++, s2++;
+
+		if (!*s2)
+			return( cp );
+
+		cp++;
+	}
+
+	return (NULL) ;
 }

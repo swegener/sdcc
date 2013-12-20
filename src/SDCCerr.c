@@ -491,6 +491,8 @@ struct
   { W_INTERNAL_ERROR, ERROR_LEVEL_WARNING,
      "Non-fatal Compiler Internal Problem in file '%s' line number '%d' : %s \n"
      "Contact Author with source code", 0 },
+  { W_UNRECOGNIZED_ASM, ERROR_LEVEL_INFO,
+     "%s() failed to parse line node, assuming %d bytes\n'%s'\n", 0 },
 };
 
 /* -------------------------------------------------------------------------------

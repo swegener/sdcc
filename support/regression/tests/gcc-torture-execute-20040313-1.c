@@ -14,16 +14,11 @@
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_stm8)
-  int t[1025] = { 1024 }, d;
+  int t[4] = { 1 }, d;
 
   d = 0;
   d = t[d]++;
-  if (t[0] != 1025)
-    ASSERT (0);
-  if (d != 1024)
-    ASSERT (0);
+  ASSERT (t[0] == 2);
+  ASSERT (d == 1);
   return;
-#endif
 }
-

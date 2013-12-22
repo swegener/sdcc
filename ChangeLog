@@ -1,5 +1,9 @@
 2013-12-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCval.c (valForStructElem): fixed bug 2122
+
+2013-12-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/SDCCmain.c (setDefaultOptions): start xdata at 1 by default, fixes bug 2173
 	* src/SDCCast.c (decorateType, RETURN): error on returning void expression
 	  when not using sdcc extensions	

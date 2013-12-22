@@ -2917,7 +2917,7 @@ valForStructElem (ast * structT, ast * elemT)
   if (!IS_AST_SYM_VALUE (elemT))
     return NULL;
 
-  if (!IS_STRUCT (structT->etype))
+  if (!structT || !IS_STRUCT (structT->etype))
     return NULL;
 
   if ((sym = getStructElement (SPEC_STRUCT (structT->etype), AST_SYMBOL (elemT))) == NULL)

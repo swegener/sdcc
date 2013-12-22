@@ -1,5 +1,13 @@
 2013-12-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCmain.c (setDefaultOptions): start xdata at 1 by default, fixes bug 2173
+	* src/SDCCast.c (decorateType, RETURN): error on returning void expression
+	  when not using sdcc extensions	
+	* src/stm8/gen.c (genReturn): accept returning void, fixes bug 2158
+	* support/regression/tests/gcc-torture-execute-20000314-3.c: reintroduced
+
+2013-12-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/mcs51/gen.c (aopGet): fixed for remat non-generic pointers,
 	  (genPointerGet, genPointerSet): remat all cast remat pointers
 	* src/mcs51/ralloc.c (packRegisters): remat all cast of remat ptr

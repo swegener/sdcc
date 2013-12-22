@@ -3000,6 +3000,8 @@ genReturn (const iCode *ic)
 
   switch (size)
     {
+    case 0:
+      break;
     case 1:
       cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
       break;

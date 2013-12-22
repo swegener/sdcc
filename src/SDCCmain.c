@@ -587,7 +587,7 @@ setDefaultOptions (void)
   options.xstack_loc = 0;       /* xternal stack starts at 0 */
   options.code_loc = 0;         /* code starts at 0 */
   options.data_loc = 0;         /* JCF: By default let the linker locate data */
-  options.xdata_loc = 0;
+  options.xdata_loc = 1;        /* MB: Do not use address 0 by default as it equals NULL */
   options.idata_loc = 0;        /* MB: No need to limit idata to 0x80-0xFF */
   options.nopeep = 0;
   options.model = port->general.default_model;

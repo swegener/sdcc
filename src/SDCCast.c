@@ -5143,10 +5143,13 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           int typecompat;
 
-          if (IS_VOID (currFunc->type->next) && tree->right && !IS_VOID (RTYPE (tree)))
+          if (IS_VOID (currFunc->type->next) && tree->right)
             {
-              werrorfl (tree->filename, tree->lineno, E_FUNC_VOID);
-              goto errorTreeReturn;
+              if (!IS_VOID (RTYPE (tree)) || !options.std_sdcc)
+                {
+                  werrorfl (tree->filename, tree->lineno, E_FUNC_VOID);
+                  goto errorTreeReturn;
+                }
             }
 
           typecompat = compareType (currFunc->type->next, RTYPE (tree));

@@ -10,7 +10,7 @@
    regression test for #1864582:
    multiple definition of char cons w. --model-large
    compile-time test only */
-char *c = (char *) "Booting";
+const char *c = (const char *) "Booting";
 /*------------------------------------------------*/
 
 static {type} smallDense[] = {
@@ -29,7 +29,7 @@ testSmallDense (void)
 }
 
 #ifdef __SDCC_mcs51
-__idata  __at 0xa0	/* leave space for the stack */
+__idata
 #endif
 static {type} smallSparse[] = {
   1, 1, 1, 1, 1, 1, 1, 1, 1
@@ -50,7 +50,7 @@ testSmallSparse (void)
 }
 
 #ifdef __SDCC_mcs51
-__idata __at 0xd0
+__idata
 #endif
 static {type} smallSparseZero[] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -133,4 +133,3 @@ testLargeMixed (void)
   ASSERT (largeMixed[143+8+1] == 4);
   ASSERT (largeMixed[143+16+1] == 4);
 }
-

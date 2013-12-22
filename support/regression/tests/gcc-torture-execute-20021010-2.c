@@ -23,7 +23,7 @@ typedef struct {
 
 int expectedwidth = 50;
 
-unsigned int *global_vramPtr = (unsigned int *)0xa000;
+unsigned int *global_vramPtr = (unsigned int __xdata *)0xa000;
 
 IOGBounds global_bounds = { 100, 150, 100, 150 };
 IOGBounds global_saveRect = { 75, 175, 75, 175 };
@@ -43,8 +43,7 @@ testTortureExecute (void)
   vramPtr = global_vramPtr + (saveRect.miny - bounds.miny) ;
   width = saveRect.maxx - saveRect.minx;
 
-  if (width != expectedwidth)
-    ASSERT (0);
+  ASSERT (width == expectedwidth);
   return;
 #endif
 }

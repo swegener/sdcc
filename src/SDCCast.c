@@ -4434,9 +4434,12 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             }
         }
       checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast);
-      if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)) && (resultType != RESULT_TYPE_GPTR))
+      if (IS_GENPTR (LTYPE (tree)) && (resultType != RESULT_TYPE_GPTR))
         {
-          DCL_TYPE (LTYPE (tree)) = DCL_TYPE (RTYPE (tree));
+          if (IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))
+            DCL_TYPE (LTYPE (tree)) = DCL_TYPE (RTYPE (tree));
+          if (IS_ARRAY (RTYPE (tree)) && SPEC_OCLS (RETYPE (tree)))
+            DCL_TYPE (LTYPE (tree)) = PTR_TYPE (SPEC_OCLS (RETYPE (tree)));
         }
       TTYPE (tree) = LTYPE (tree);
       LRVAL (tree) = 1;

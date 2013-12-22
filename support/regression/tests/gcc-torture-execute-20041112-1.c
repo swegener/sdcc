@@ -23,7 +23,7 @@ static void *foo(int p)
       return &global;
    }
 
-  return (void *)(size_t)-1;
+  return (void __code *)(size_t)-1;
 }
 
 int bar(void)
@@ -31,7 +31,7 @@ int bar(void)
   void *p;
 
   p = foo(global);
-  if (p != (void *)(size_t)-1)
+  if (p != (void __code *)(size_t)-1)
     return 1;
 
   global++;
@@ -41,8 +41,7 @@ int bar(void)
 void testTortureExecute(void)
 {
   global = 1;
-  if (bar () != 0)
-    ASSERT (0);
-  
+  ASSERT (bar () == 0);
+
   return;
 }

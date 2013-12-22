@@ -201,13 +201,13 @@ specifier;
 /* types of declarators */
 typedef enum
 {
-  POINTER = 0,                      /* pointer to near data */
-  FPOINTER,                         /* pointer to far data  */
-  CPOINTER,                         /* pointer to code space */
-  GPOINTER,                         /* _generic pointer     */
-  PPOINTER,                         /* paged area pointer   */
+  UPOINTER = 0,                     /* unknown pointer used only when parsing */
+  POINTER,                          /* pointer to near data  */
   IPOINTER,                         /* pointer to upper 128 bytes */
-  UPOINTER,                         /* unknown pointer used only when parsing */
+  PPOINTER,                         /* paged area pointer    */
+  FPOINTER,                         /* pointer to far data   */
+  CPOINTER,                         /* pointer to code space */
+  GPOINTER,                         /* generic pointer       */
   EEPPOINTER,                       /* pointer to eeprom     */
   ARRAY,
   FUNCTION

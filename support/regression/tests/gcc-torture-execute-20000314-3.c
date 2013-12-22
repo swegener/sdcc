@@ -4,10 +4,6 @@
 
 #include <testfwk.h>
 
-#ifdef __SDCC
-//#pragma std_c99
-#endif
-
 static char arg0[] = "arg0";
 static char arg1[] = "arg1";
 

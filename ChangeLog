@@ -1,3 +1,9 @@
+2013-12-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/tlcs90/Makefile.in: fix assembler level .include
+	  when not building within source tree
+	* sim/ucsim/utils.cc: properly enable vasprintf() declaration
+
 2013-12-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCval.c (valForStructElem): fixed bug 2122

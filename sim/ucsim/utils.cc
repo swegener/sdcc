@@ -27,6 +27,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+#if defined(HAVE_VASPRINTF) && !defined(_GNU_SOURCE)
+  /* define before including stdio.h to enable vasprintf() declaration */
+  #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <ctype.h>
 #include <stdarg.h>

@@ -77,7 +77,7 @@ endif
 %.rel: %.s
 	@# TODO: sdas should place it\'s output in the current dir
 	test $(srcdir) = . || cp $< .
-	-$(AS) $(ASFLAGS) $(notdir $<)
+	-$(AS) $(ASFLAGS) -I$(dir $<) $(notdir $<)
 	test $(srcdir) = . || rm $(notdir $<)
 
 %.rel: ../%.c

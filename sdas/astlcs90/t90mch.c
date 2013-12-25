@@ -219,13 +219,13 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
       int r = GET_IND_REG(t1);
 
       if(e1->e_addr == 0)
-	{
-	  outab(0xe8 + r);
-	  outab(op);
-	  outab(v2);
-	}
+        {
+          outab(0xe8 + r);
+          outab(op);
+          outab(v2);
+        }
       else
-	{
+        {
           if(r == HL) // HL+A
             {
               outab(0xf0 + 7);
@@ -239,7 +239,7 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
               outab(op);
               outab(v2);
             }
-	}
+        }
 
       return 1;
     }
@@ -273,36 +273,36 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
       r = GET_IND_REG(t2);
 
       if(e2->e_addr == 0)
-	{
-	  outab(0xe0 + r);
+        {
+          outab(0xe0 + r);
 
-	  if(v1 == HL)
-	    outab(op);
-	  else
-	    outab(op + v1);
-	}
+          if(v1 == HL)
+            outab(op);
+          else
+            outab(op + v1);
+        }
       else
-	{
-	  if(r == HL)
+        {
+          if(r == HL)
             {
               if(v1 == HL)
-		{
-		  if(e2->e_addr == 0)
-		    {
-		      outab(0xf3);
-		      outab(op);
-		    }
-		  else
-		    {
-		      // HL+A
-		      outab(0xf3);
-		      outab(op);
-		    }
-		}
+                {
+                  if(e2->e_addr == 0)
+                    {
+                      outab(0xf3);
+                      outab(op);
+                    }
+                  else
+                    {
+                      // HL+A
+                      outab(0xf3);
+                      outab(op);
+                    }
+                }
               else
-		{
-		  aerr();
-		}
+                {
+                  aerr();
+                }
             }
           else
             {
@@ -310,11 +310,11 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
               outab(e2->e_addr);
 
               if(v1 == HL)
-		outab(op);
+                outab(op);
               else
-		outab(op + v1);
+                outab(op + v1);
             }
-	}
+        }
       return 1;
     }
 
@@ -323,13 +323,13 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
       outab(0xf8 + v2);
 
       if(v1 == HL)
-	outab(op + 0x10);
+        outab(op + 0x10);
       else if(v1 == IX)
-	outab(0x14);
+        outab(0x14);
       else if(v1 == IY)
-	outab(0x15);
+        outab(0x15);
       else
-	goto err;
+        goto err;
 
       return 1;
     }
@@ -337,23 +337,23 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
   if(t1 == S_R8 && t2 == S_INDM)
     {
       if(v1 == A)
-	{
-	  if(IS_DIRECT_MEM(v2))
-	    {
-	      outab(op);
-	      outab(e2->e_addr & 0xFF);
-	      return 1;
-	    }
-	  else
-	    {
-	      outab(0xe3);
-	      outrw(e2, 0); // reloc..
-	      outab(op);
-	      return 1;
-	    }
+        {
+          if(IS_DIRECT_MEM(v2))
+            {
+              outab(op);
+              outab(e2->e_addr & 0xFF);
+              return 1;
+            }
+          else
+            {
+              outab(0xe3);
+              outrw(e2, 0); // reloc..
+              outab(op);
+              return 1;
+            }
 
-	  goto err;
-	}
+          goto err;
+        }
 
       return 1;
     }
@@ -369,32 +369,32 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
   if(t1 == S_R16 && t2 == S_INDM)
     {
       if(IS_DIRECT_MEM(v2))
-	{
-	  if(v1 == HL)
-	    {
-	      outab(op);
-	      outab(v2 & 0xFF);
-	      return 1;
-	    }
-	  else
-	    {
-	      outab(0xE7);
-	      outab(v2 & 0xFF);
-	      outab(op + v1);
-	      return 1;
-	    }
-	}
+        {
+          if(v1 == HL)
+            {
+              outab(op);
+              outab(v2 & 0xFF);
+              return 1;
+            }
+          else
+            {
+              outab(0xE7);
+              outab(v2 & 0xFF);
+              outab(op + v1);
+              return 1;
+            }
+        }
       else
-	{
-	  outab(0xE3);
-	  outrw(e2, 0); // reloc..
+        {
+          outab(0xE3);
+          outrw(e2, 0); // reloc..
 
-	  if(v1 == HL)
-	    outab(op);
-	  else
-	    outab(op + v1);
-	  return 1;
-	}
+          if(v1 == HL)
+            outab(op);
+          else
+            outab(op + v1);
+          return 1;
+        }
 
       goto err;
     }
@@ -404,30 +404,30 @@ gen_xop_arith(int rf, int op, int t1, int t2, int v1, int v2, struct expr *e1, s
       outab(0xf8 + v2);
 
       if(v1 == A)
-	outab(op);
+        outab(op);
       else
-	outab(op + v1);
+        outab(op + v1);
       return 1;
     }
 
   if(t1 == S_INDM && t2 == S_IMMED)
     {
       if(IS_DIRECT_MEM(v1))
-	{
-	  outab(0xef);
-	  outab(v1 & 0xFF);
-	  outab(op);
-	  outab(v2);
-	  return 1;
-	}
+        {
+          outab(0xef);
+          outab(v1 & 0xFF);
+          outab(op);
+          outab(v2);
+          return 1;
+        }
       else
-	{
-	  outab(0xeb);
-	  outrw(e1, 0);
-	  outab(op);
-	  outab(v2);
-	  return 1;
-	}
+        {
+          outab(0xeb);
+          outrw(e1, 0);
+          outab(op);
+          outab(v2);
+          return 1;
+        }
     }
 
  err:
@@ -453,21 +453,21 @@ machine(struct mne *mp)
   rf = mp->m_type;
 
   // NOTE: S_CPU must be max!?
- 
+
   if(rf > S_CPU)
     rf = 0;
 
-  switch (rf) 
+  switch (rf)
     {
     case S_PUSH:
       t1 = addr(&e1);
       v1 = (int) e1.e_addr;
 
       if ((t1 == S_R16))
-	{
-	  outab(op | (v1 & 0x0F));
-	  break;
-	}
+        {
+          outab(op | (v1 & 0x0F));
+          break;
+        }
 
       aerr();
       break;
@@ -482,11 +482,11 @@ machine(struct mne *mp)
       // incx (0xff20)
       // decx (0xff20)
       if ((t1 == S_INDM) && (IS_DIRECT_MEM(v1)))
-	{
-	  outab(op);
-	  outab(v1 & 0xff);
-	  break;
-	}
+        {
+          outab(op);
+          outab(v1 & 0xff);
+          break;
+        }
 
       aerr();
       break;
@@ -494,27 +494,27 @@ machine(struct mne *mp)
       //////////////////////////////////////////////////////////////////////
 
     case S_RET:
-      if (more()) 
-	{
-	  // ret cc
-	  if ((v1 = admode(CND)) != 0) 
-	    {
-	      outab(0xFE);
+      if (more())
+        {
+          // ret cc
+          if ((v1 = admode(CND)) != 0)
+            {
+              outab(0xFE);
 
-	      outab(0xD0 | GET_COND_FROM_MODE(v1));
-	      break;
-	    } 
-	  else 
-	    {
-	      qerr();
-	    }
-	} 
-      else 
-	{
-	  // ret
-	  outab(0x1E);
-	  break;
-	}
+              outab(0xD0 | GET_COND_FROM_MODE(v1));
+              break;
+            }
+          else
+            {
+              qerr();
+            }
+        }
+      else
+        {
+          // ret
+          outab(0x1E);
+          break;
+        }
 
       aerr();
       break;
@@ -522,44 +522,44 @@ machine(struct mne *mp)
       //////////////////////////////////////////////////////////////////////
 
     case S_CALL:
-      if ((v1 = admode(CND)) != 0) 
-	{
-	  // call cc
+      if ((v1 = admode(CND)) != 0)
+        {
+          // call cc
 
-	  comma(1);
+          comma(1);
 
-	  t1 = addr(&e1);
+          t1 = addr(&e1);
 
-	  if (t1 == S_USER) 
-	    {
-	      outab(0xEB);
- 	      outrw(&e1, 0);
-	      outab(0xD0 + GET_COND_FROM_MODE(v1));
-	      break;
-	    }
-	} 
-      else 
-	{
-	  t1 = addr(&e1);
-	  
-	  op = 0x1C;
+          if (t1 == S_USER)
+            {
+              outab(0xEB);
+              outrw(&e1, 0);
+              outab(0xD0 + GET_COND_FROM_MODE(v1));
+              break;
+            }
+        }
+      else
+        {
+          t1 = addr(&e1);
 
-	  if (t1 == S_USER) 
-	    {
-	      outab(op);
-	      outrw(&e1, 0);
-	      break;
-	    }
-	  else if (IS_REG_INDIRECT(t1)) 
-	    {
+          op = 0x1C;
+
+          if (t1 == S_USER)
+            {
+              outab(op);
+              outrw(&e1, 0);
+              break;
+            }
+          else if (IS_REG_INDIRECT(t1))
+            {
               int r = GET_IND_REG(t1);
 
-	      outab(0xE8 + r);
-	      outab(0xD8);
+              outab(0xE8 + r);
+              outab(0xD8);
 
               break;
-	    }
-	}	 
+            }
+        }
 
       aerr();
       break;
@@ -574,54 +574,54 @@ machine(struct mne *mp)
       //////////////////////////////////////////////////////////////////////
 
     case S_JP:
-      if ((v1 = admode(CND)) != 0) 
-	{
-	  comma(1);
+      if ((v1 = admode(CND)) != 0)
+        {
+          comma(1);
 
           t1 = addr(&e1);
 
-	  if(t1 == S_R16) 
-	    {
-	      op = 0xC0;
+          if(t1 == S_R16)
+            {
+              op = 0xC0;
 
-	      // jp cc
-	      op |= GET_COND_FROM_MODE(v1);
+              // jp cc
+              op |= GET_COND_FROM_MODE(v1);
 
-	      aerr();
-	      break;
-	    }
-	  else if(t1 == S_USER) 
-	    {
-	      outab(0xEB);
-	      outrw(&e1, 0); // jmp, reloc
-	      outab(0xC0 | GET_COND_FROM_MODE(v1));
-	      break;
-	    }
-	  else
-	    {
-	      aerr();
-	    }
-	}
-      else
-	{
-	  t1 = addr(&e1);
-
-	  if (t1 == S_USER) 
-	    {
-	      outab(0x1A);
-	      outrw(&e1, 0); // jmp, reloc..
-	      break;
-	    }
-	  else if (IS_REG_INDIRECT(t1)) // also S_R16?
-	    {
-	      int r = GET_IND_REG(t1);
-
-	      outab(0xE8 + r);
-	      outab(0xC0 | 0x8);
+              aerr();
               break;
-	    }
-	}
-      
+            }
+          else if(t1 == S_USER)
+            {
+              outab(0xEB);
+              outrw(&e1, 0); // jmp, reloc
+              outab(0xC0 | GET_COND_FROM_MODE(v1));
+              break;
+            }
+          else
+            {
+              aerr();
+            }
+        }
+      else
+        {
+          t1 = addr(&e1);
+
+          if (t1 == S_USER)
+            {
+              outab(0x1A);
+              outrw(&e1, 0); // jmp, reloc..
+              break;
+            }
+          else if (IS_REG_INDIRECT(t1)) // also S_R16?
+            {
+              int r = GET_IND_REG(t1);
+
+              outab(0xE8 + r);
+              outab(0xC0 | 0x8);
+              break;
+            }
+        }
+
       aerr();
       break;
 
@@ -630,77 +630,77 @@ machine(struct mne *mp)
     case S_JR:
     case S_DJNZ:
     case S_CALLR:
-      if (rf == S_JR) 
-	{
-	  if((v1 = admode(CND)) != 0)
-	    {
-	      op = 0xC0 | GET_COND_FROM_MODE(v1);
+      if (rf == S_JR)
+        {
+          if((v1 = admode(CND)) != 0)
+            {
+              op = 0xC0 | GET_COND_FROM_MODE(v1);
 
-	      comma(1);
-	    }
-	  else
-	    {
-	      op = 0xC8;
-	    }
-	}
+              comma(1);
+            }
+          else
+            {
+              op = 0xC8;
+            }
+        }
       else if(rf == S_CALLR)
-	{
+        {
           t1 = addr(&e2);
 
-	  op = 0x1D;
-	  outab(op);
-          
+          op = 0x1D;
+          outab(op);
+
           e2.e_addr += 1;
 
           // signed 16-bit pcrel
-	  outrw(&e2, R_PCR);
+          outrw(&e2, R_PCR);
           break;
-	}
+        }
       else if(rf == S_DJNZ)
-	{
-	  op = 0x18;
-	}
+        {
+          op = 0x18;
+        }
 
       //expr(&e2, 0);
       t2 = addr(&e2);
 
       if(rf == S_DJNZ)
-	{
-	  // djnz bc, xxxx
-	  if(t2 == S_R16)
-	    {
-	      if(e2.e_addr != BC)
-		aerr();
+        {
+          // djnz bc, xxxx
+          if(t2 == S_R16)
+            {
+              if(e2.e_addr != BC)
+                aerr();
 
-	      op = 0x19;
-	      
-	      comma(1);
+              op = 0x19;
 
-	      expr(&e2, 0);
-	    }
-	}
-     
+              comma(1);
+
+              expr(&e2, 0);
+            }
+        }
+
       if (e2.e_mode != S_USER)
-	rerr();
+        rerr();
 
       outab(op);
 
-      if (mchpcr(&e2)) 
-	{
-	  v2 = (int) (e2.e_addr - dot.s_addr - 1);
+      if (mchpcr(&e2))
+        {
+          v2 = (int) (e2.e_addr - dot.s_addr - 1);
 
           // SDCC currently generates jr cc, xxxx calls that exceeds the pc rel limit, i.e. 132..
-	  if (pass == 2 && ((v2 < -128) || (v2 > 127)))
-	    aerr();
+          if (pass == 2 && ((v2 < -128) || (v2 > 127)))
+            aerr();
 
-	  outab(v2);
-	  break;
-	} 
-      else 
-	{
-	  outrb(&e2, R_PCR);
-	  break;
-	}
+          outab(v2);
+          break;
+        }
+      else
+        {
+          outrb(&e2, R_PCR);
+          break;
+        }
 
       aerr();
       break;
@@ -715,84 +715,84 @@ machine(struct mne *mp)
       v1 = (int) e1.e_addr;
       v2 = (int) e2.e_addr;
 
-      if (t1 == S_R16 && t2 == S_R16) 
-	{
-	  if ((v1 == DE) && (v2 == HL)) 
-	    {
-	      outab(0x08);
-	      break;
-	    }
-	  if ((v2 == DE) && (v1 == HL)) 
-	    {
-	      outab(0x08);
-	      break;
-	    }
+      if (t1 == S_R16 && t2 == S_R16)
+        {
+          if ((v1 == DE) && (v2 == HL))
+            {
+              outab(0x08);
+              break;
+            }
+          if ((v2 == DE) && (v1 == HL))
+            {
+              outab(0x08);
+              break;
+            }
 
-	  if((v1 & 0xF) == AF && (v2 & 0xF) == AF)
-	    {
-	      // ex af, af'
-	      outab(0x09);
-	      break;
-	    }
+          if((v1 & 0xF) == AF && (v2 & 0xF) == AF)
+            {
+              // ex af, af'
+              outab(0x09);
+              break;
+            }
 
-	  aerr();
-	}
+          aerr();
+        }
 
       if(IS_REG_INDIRECT(t1) && t2 == S_R16)
-	{
-	  int r = GET_IND_REG(t1);
+        {
+          int r = GET_IND_REG(t1);
 
-	  if(e1.e_addr == 0)
-	    {
-	      outab(0xE0 + r);
-	      outab(op + v2);
-	      break;
-	    }
-	  else
-	    {
-	      if(r == HL)
-		{
-		  outab(0xF3);
-		  outab(op + v2);
+          if(e1.e_addr == 0)
+            {
+              outab(0xE0 + r);
+              outab(op + v2);
+              break;
+            }
+          else
+            {
+              if(r == HL)
+                {
+                  outab(0xF3);
+                  outab(op + v2);
                   break;
-		}
-	      else
-		{
-		  outab(0xF0 + (r - IX));
-		  outab(e1.e_addr);
-		  outab(op + v2);
+                }
+              else
+                {
+                  outab(0xF0 + (r - IX));
+                  outab(e1.e_addr);
+                  outab(op + v2);
                   break;
-		}
-	    }
-	}
+                }
+            }
+        }
 
       if(t1 == S_R16 && IS_REG_INDIRECT(t2))
-	{
-	  int r = GET_IND_REG(t2);
+        {
+          int r = GET_IND_REG(t2);
 
-	  if(e2.e_addr == 0)
-	    {
-	      outab(0xE0 + r);
-	      outab(op + v1);
-	      break;
-	    }
-	  else
-	    {
-	      if(r == HL)
-		{
-		  outab(0xF3);
-		  outab(op + v1);
+          if(e2.e_addr == 0)
+            {
+              outab(0xE0 + r);
+              outab(op + v1);
+              break;
+            }
+          else
+            {
+              if(r == HL)
+                {
+                  outab(0xF3);
+                  outab(op + v1);
                   break;
-		}
-	      else
-		{
-		  outab(0xF0 + (r - IX));
-		  outab(e2.e_addr);
-		  outab(op + v1);
+                }
+              else
+                {
+                  outab(0xF0 + (r - IX));
+                  outab(e2.e_addr);
+                  outab(op + v1);
                   break;
-		}
-	    }
-	}
+                }
+            }
+        }
 
       aerr();
       break;
@@ -805,63 +805,63 @@ machine(struct mne *mp)
       v1 = (int) e1.e_addr;
 
       if(IS_REG_INDIRECT(t1))
-	{
-	  int r;
+        {
+          int r;
 
-	  r = GET_IND_REG(t1);
+          r = GET_IND_REG(t1);
 
-	  if(e1.e_addr == 0)
-	    {
-	      outab(0xe0 + r);
-	      outab(op + 7);
-	      break;
-	    }
-	  else
-	    {
+          if(e1.e_addr == 0)
+            {
+              outab(0xe0 + r);
+              outab(op + 7);
+              break;
+            }
+          else
+            {
               if(r == HL)
-		{
-		  outab(0xF3);
-		  outab(op + 7);
-		  break;
-		}
+                {
+                  outab(0xF3);
+                  outab(op + 7);
+                  break;
+                }
               else
-		{
-		  outab(0xec + r);
-		  outab(e1.e_addr);
-		  outab(op + 7);
-		  break;
-		}
-	    }
-	}
+                {
+                  outab(0xec + r);
+                  outab(e1.e_addr);
+                  outab(op + 7);
+                  break;
+                }
+            }
+        }
 
       if(t1 == S_R8)
-	{
-	  outab(op + v1);
-	  break;
-	}
-      
+        {
+          outab(op + v1);
+          break;
+        }
+
       if(t1 == S_R16)
-	{
-	  outab(op + 0x10 + v1);
-	  break;
-	}
+        {
+          outab(op + 0x10 + v1);
+          break;
+        }
 
       if ((t1 == S_INDM))
-	{
-	  if(IS_DIRECT_MEM(v1))
-	    {
-	      outab(op + 7);
-	      outab(v1 & 0xff);
-	      break;
-	    }
-	  else
-	    {
-	      outab(0xE3);
-	      outrw(&e1, 0); // reloc
-	      outab(op + 7);
-	      break;
-	    }
-	}
+        {
+          if(IS_DIRECT_MEM(v1))
+            {
+              outab(op + 7);
+              outab(v1 & 0xff);
+              break;
+            }
+          else
+            {
+              outab(0xE3);
+              outrw(&e1, 0); // reloc
+              outab(op + 7);
+              break;
+            }
+        }
 
       aerr();
       break;
@@ -874,48 +874,48 @@ machine(struct mne *mp)
       v1 = (int) e1.e_addr;
 
       if ((t1 == S_INDM))
-	{
-	  if((IS_DIRECT_MEM(v1)))
-	    {
-	      outab(op);
-	      outab(v1 & 0xff);
-	      break;
-	    }
-	  else
-	    {
-	      outab(0xE3);
-	      outrw(&e1, 0);
-	      outab(op);
+        {
+          if((IS_DIRECT_MEM(v1)))
+            {
+              outab(op);
+              outab(v1 & 0xff);
               break;
-	    }
-	}
+            }
+          else
+            {
+              outab(0xE3);
+              outrw(&e1, 0);
+              outab(op);
+              break;
+            }
+        }
       else if(IS_REG_INDIRECT(t1))
-	{
-	  int r = GET_IND_REG(t1);
+        {
+          int r = GET_IND_REG(t1);
 
-	  if(e1.e_addr == 0)
-	    {
-	      outab(0xe0 + r);
-	      outab(op);
+          if(e1.e_addr == 0)
+            {
+              outab(0xe0 + r);
+              outab(op);
               break;
-	    }
-	  else
-	    {
-	      if(r == HL) // HL+A
-		{
-		  outab(0xf0 + 3);
-		  outab(op);
+            }
+          else
+            {
+              if(r == HL) // HL+A
+                {
+                  outab(0xf0 + 3);
+                  outab(op);
                   break;
-		}
-	      else
-		{
-		  outab(0xf0 + (r - IX));
-		  outab(v1);
-		  outab(op);
+                }
+              else
+                {
+                  outab(0xf0 + (r - IX));
+                  outab(v1);
+                  outab(op);
                   break;
-		}
-	    }
-	}
+                }
+            }
+        }
 
       aerr();
       break;
@@ -931,69 +931,69 @@ machine(struct mne *mp)
       v2 = (int) e2.e_addr;
 
       if(t1 == S_R16 && t2 == S_R8)
-	{
-	  if(v1 != HL)
-	    aerr();
+        {
+          if(v1 != HL)
+            aerr();
 
-	  outab(0xF8 + v2);
-	  outab(op);
-	  break;
-	}
+          outab(0xF8 + v2);
+          outab(op);
+          break;
+        }
 
-      if(t1 == S_R16 && t2 == S_INDM) 
-	{
-	  if(v1 == HL && (IS_DIRECT_MEM(v2)))
-	    {
-	      outab(0xE7);
-	      outab(v2 & 0xFF);
-	      outab(op);
-	      break;
-	    }
+      if(t1 == S_R16 && t2 == S_INDM)
+        {
+          if(v1 == HL && (IS_DIRECT_MEM(v2)))
+            {
+              outab(0xE7);
+              outab(v2 & 0xFF);
+              outab(op);
+              break;
+            }
 
-	  aerr();
-	}
+          aerr();
+        }
 
-      if(t1 == S_R16 && t2 == S_IMMED) 
-	{
-	  if(v1 == HL && (IS_8BIT_IMMED(v2)))
-	    {
-	      outab(op);
-	      outab(v2);
-	      break;
-	    }
+      if(t1 == S_R16 && t2 == S_IMMED)
+        {
+          if(v1 == HL && (IS_8BIT_IMMED(v2)))
+            {
+              outab(op);
+              outab(v2);
+              break;
+            }
 
-	  aerr();
-	}
+          aerr();
+        }
 
-      if(t1 == S_R16 && IS_REG_INDIRECT(t2)) 
-	{
-	  int r = GET_IND_REG(t2);
+      if(t1 == S_R16 && IS_REG_INDIRECT(t2))
+        {
+          int r = GET_IND_REG(t2);
 
-	  if(v1 == HL)
-	    {
-	      if(e2.e_addr == 0)
-		{
-		  outab(0xE0 | r);
-		  outab(op);
-		}
-	      else 
-		{
-		  if(r == HL) // HL+A
-		    {
-		      outab(0xF3);
-		      outab(op);
-		    }
-		  else
-		    {
-		      outab(0xF0 + (r - IX));
-		      outab(e2.e_addr & 0xFF);
-		      outab(op);
-		    }
-		}
-	      break;
-	    }
-	}
-      
+          if(v1 == HL)
+            {
+              if(e2.e_addr == 0)
+                {
+                  outab(0xE0 | r);
+                  outab(op);
+                }
+              else
+                {
+                  if(r == HL) // HL+A
+                    {
+                      outab(0xF3);
+                      outab(op);
+                    }
+                  else
+                    {
+                      outab(0xF0 + (r - IX));
+                      outab(e2.e_addr & 0xFF);
+                      outab(op);
+                    }
+                }
+              break;
+            }
+        }
+
       aerr();
       break;
 
@@ -1009,70 +1009,70 @@ machine(struct mne *mp)
       v2 = (int) e2.e_addr;
 
       if(t1 == S_USER && t2 == S_R8)
-	{
-	  outab(0xF8 + v2);
-	  outab(op + v1);
-	  break;
-	}
+        {
+          outab(0xF8 + v2);
+          outab(op + v1);
+          break;
+        }
 
       if ((t1 == S_USER && t2 == S_INDM))
-	{
-	  if(v1 < 0 || v1 > 7)
-	    aerr();
+        {
+          if(v1 < 0 || v1 > 7)
+            aerr();
 
-	  if((IS_DIRECT_MEM(v2)))
-	    {
-	      outab(op + v1);
-	      outab(v2 & 0xff);
-	      break;
-	    }
-	  else
-	    {
-	      outab(0xe3);
-	      outrw(&e2, 0);
-	      outab(op + v1);
-	      outab(v2 & 0xff);
-	      break;
-	    }
-	}
+          if((IS_DIRECT_MEM(v2)))
+            {
+              outab(op + v1);
+              outab(v2 & 0xff);
+              break;
+            }
+          else
+            {
+              outab(0xe3);
+              outrw(&e2, 0);
+              outab(op + v1);
+              outab(v2 & 0xff);
+              break;
+            }
+        }
 
       if ((t1 == S_USER && IS_REG_INDIRECT(t2)))
-	{
-	  int r = GET_IND_REG(t2);
+        {
+          int r = GET_IND_REG(t2);
 
-	  if(v1 < 0 || v1 > 7)
-	    aerr();
+          if(v1 < 0 || v1 > 7)
+            aerr();
 
-	  if(e2.e_addr == 0)
-	    {
-	      outab(0xe0 + r);
-	      outab(op + v1);
-	      break;
-	    }
-	  else
-	    {
-	      if(r == HL) // HL+A
-		{
-		  outab(0xf3);
-		  outab(op + v1);
-		  break;
-		}
+          if(e2.e_addr == 0)
+            {
+              outab(0xe0 + r);
+              outab(op + v1);
+              break;
+            }
+          else
+            {
+              if(r == HL) // HL+A
+                {
+                  outab(0xf3);
+                  outab(op + v1);
+                  break;
+                }
 
-	      if(r == IX)
-		outab(0xF0);
-	      else if(r == IY)
-		outab(0xF1);
-	      else if(r == SP)
-		outab(0xF2);
-	      else
-		aerr();
+              if(r == IX)
+                outab(0xF0);
+              else if(r == IY)
+                outab(0xF1);
+              else if(r == SP)
+                outab(0xF2);
+              else
+                aerr();
 
-	      outab(e2.e_addr & 0xFF);
-	      outab(op + v1);
-	      break;
-	    }
-	}
-      
+              outab(e2.e_addr & 0xFF);
+              outab(op + v1);
+              break;
+            }
+        }
+
       aerr();
       break;
 
@@ -1094,213 +1094,211 @@ machine(struct mne *mp)
 
       // add r8, r8
       if(t1 == S_R8 && t2 == S_R8)
-	{
-	  gen_xop_arith(rf, op, t1, t2, v1, v2, &e1, &e2);
-	  break;
-	}
+        {
+          gen_xop_arith(rf, op, t1, t2, v1, v2, &e1, &e2);
+          break;
+        }
 
       // add (mm), imd
       if(t1 == S_INDM && t2 == S_IMMED)
-	{
-	  gen_xop_arith(rf, op + 0x8, t1, t2, v1, v2, &e1, &e2);
-	  break;
-	}
+        {
+          gen_xop_arith(rf, op + 0x8, t1, t2, v1, v2, &e1, &e2);
+          break;
+        }
 
       // add r, (mm)
       if(t1 == S_R8 && t2 == S_INDM)
-	{
-	  if(v1 == A)
-	    {
-	      if(IS_DIRECT_MEM(v2))
-		{
-		  outab(op);
-		  outab(v2 & 0xff);
-		  break;
-		}
-	      else
-		{
-		  gen_xop_arith(rf, op, t1, t2, v1, v2, &e1, &e2);
-		  break;
-		}
-	    }
-	  else
-	    {
-	      // only a allowed!?
-	      aerr();
-	    }
-	}
+        {
+          if(v1 == A)
+            {
+              if(IS_DIRECT_MEM(v2))
+                {
+                  outab(op);
+                  outab(v2 & 0xff);
+                  break;
+                }
+              else
+                {
+                  gen_xop_arith(rf, op, t1, t2, v1, v2, &e1, &e2);
+                  break;
+                }
+            }
+          else
+            {
+              // only a allowed!?
+              aerr();
+            }
+        }
 
       // add r, (rr)
       if(t1 == S_R8 && IS_REG_INDIRECT(t2))
-	{
-	  int r = GET_IND_REG(t2);
+        {
+          int r = GET_IND_REG(t2);
 
-	  if(v1 != A)
-	    {
-	      aerr();
-	      break;
-	    }
+          if(v1 != A)
+            {
+              aerr();
+              break;
+            }
 
-	  if(e2.e_addr == 0)
-	    {
-	      outab(0xE0 + r);
-	      outab((op - 6) + v1);
-	      break;
-	    }
-	  else
-	    {
-	      if(r == HL) // HL+A
-		{
-		  outab(0xF3);
-		  outab(op);
-		  break;
-		}
+          if(e2.e_addr == 0)
+            {
+              outab(0xE0 + r);
+              outab((op - 6) + v1);
+              break;
+            }
+          else
+            {
+              if(r == HL) // HL+A
+                {
+                  outab(0xF3);
+                  outab(op);
+                  break;
+                }
 
-	      outab(0xEC + r);
-	      outab(e2.e_addr & 0xFF);
-	      outab((op - 6) + v1);
-	      break;
-	    }
-	}
+              outab(0xEC + r);
+              outab(e2.e_addr & 0xFF);
+              outab((op - 6) + v1);
+              break;
+            }
+        }
 
       // add rr, (rr)
       if(t1 == S_R16 && IS_REG_INDIRECT(t2))
-	{
-	  int r = GET_IND_REG(t2);
+        {
+          // not allowed
+          if(v1 == BC || v1 == DE)
+            {
+              aerr();
+              break;
+            }
 
-	  // not allowed
-	  if(v1 == BC || v1 == DE)
-	    {
-	      aerr();
-	      break;
-	    }
+          if(rf != S_ADD && v1 != HL)
+            {
+              aerr();
+              break;
+            }
 
-	  if(rf != S_ADD && v1 != HL)
-	    {
-	      aerr();
-	      break;
-	    }
+          if(v1 == HL)
+            gen_xop_arith(rf, op + 0x10, t1, t2, v1, v2, &e1, &e2);
+          else
+            gen_xop_arith(rf, 0x10, t1, t2, v1, v2, &e1, &e2);
 
-	  if(v1 == HL)
-	    gen_xop_arith(rf, op + 0x10, t1, t2, v1, v2, &e1, &e2);
-	  else
-	    gen_xop_arith(rf, 0x10, t1, t2, v1, v2, &e1, &e2);
-
-	  break;
-	}
+          break;
+        }
 
       // add (rr), r
       if(IS_REG_INDIRECT(t1) && t2 == S_R8)
-	{
-	  gen_xop_arith(rf, op, t1, t2, v1, v2, &e1, &e2);
-	  break;
-	}
+        {
+          gen_xop_arith(rf, op, t1, t2, v1, v2, &e1, &e2);
+          break;
+        }
 
       // add (rr), imd
       if(IS_REG_INDIRECT(t1) && t2 == S_IMMED)
-	{
-	  gen_xop_arith(rf, op + 0x8, t1, t2, v1, v2, &e1, &e2);
-	  break;
-	}
-      
+        {
+          gen_xop_arith(rf, op + 0x8, t1, t2, v1, v2, &e1, &e2);
+          break;
+        }
+
       // add r, imm
       if(t1 == S_R8 && t2 == S_IMMED)
-	{
-	  if((v1 == A) && (IS_8BIT_IMMED(v2)))
-	    {
-	      outab(op + 8);
-	      outab(v2 & 0xff);
-	      break;
-	    }
-	  else
-	    {
-	      gen_xop_arith(rf, op + 8, t1, t2, v1, v2, &e1, &e2);
-	      break;
-	    }
-	}
-      
+        {
+          if((v1 == A) && (IS_8BIT_IMMED(v2)))
+            {
+              outab(op + 8);
+              outab(v2 & 0xff);
+              break;
+            }
+          else
+            {
+              gen_xop_arith(rf, op + 8, t1, t2, v1, v2, &e1, &e2);
+              break;
+            }
+        }
+
       // add rr, (mm)
       if(t1 == S_R16 && t2 == S_INDM)
-	{
-	  // bc, de not allowed..
-	  if(v1 == BC || v1 == DE)
-	    aerr();
+        {
+          // bc, de not allowed..
+          if(v1 == BC || v1 == DE)
+            aerr();
 
-	  if(v1 == HL)
-	    {
-	      if(IS_DIRECT_MEM(v2))
-		{
-		  outab(op + 0x10);
-		  outab(v2 & 0xff);
-		  break;
-		}
-	      else
-		{
-		  gen_xop_arith(rf, op + 0x10, t1, t2, v1, v2, &e1, &e2);
-		  break;
-		}
-	    }
-	  else
-	    {
-	      gen_xop_arith(rf, 0x10, t1, t2, v1, v2, &e1, &e2);
-	      break;
-	    }
-	}
+          if(v1 == HL)
+            {
+              if(IS_DIRECT_MEM(v2))
+                {
+                  outab(op + 0x10);
+                  outab(v2 & 0xff);
+                  break;
+                }
+              else
+                {
+                  gen_xop_arith(rf, op + 0x10, t1, t2, v1, v2, &e1, &e2);
+                  break;
+                }
+            }
+          else
+            {
+              gen_xop_arith(rf, 0x10, t1, t2, v1, v2, &e1, &e2);
+              break;
+            }
+        }
 
       // add rr, rr
       if(t1 == S_R16 && t2 == S_R16)
-	{
-	  gen_xop_arith(rf, op, t1, t2, v1, v2, &e1, &e2);
-	  break;
-	}
+        {
+          gen_xop_arith(rf, op, t1, t2, v1, v2, &e1, &e2);
+          break;
+        }
 
       // add rr, imd
       if(t1 == S_R16 && t2 == S_IMMED)
-	{
-	  // sub not allowed on sp, ix, iy
-	  // de, bc not allowed at all!?
+        {
+          // sub not allowed on sp, ix, iy
+          // de, bc not allowed at all!?
 
-	  if(v1 == IX)
-	    {
-	      if(rf == S_ADD)
-		{
-		  outab(0x14);
-		  outrw(&e2, 0);
-		  break;
-		}
-	      aerr();
-	    }
-	  else if(v1 == IY)
-	    {
-	      if(rf == S_ADD)
-		{
-		  outab(0x15);
-		  outrw(&e2, 0);
-		  break;
-		}
-	      aerr();
-	    }
-	  else if(v1 == SP)
-	    {
-	      if(rf == S_ADD)
-		{
-		  outab(0x16);
-		  outrw(&e2, 0);
-		  break;
-		}
-	      aerr();
-	    }
-	  else
-	    {
-	      // only hl allowed?
-	      if(v1 != HL)
-		aerr();
+          if(v1 == IX)
+            {
+              if(rf == S_ADD)
+                {
+                  outab(0x14);
+                  outrw(&e2, 0);
+                  break;
+                }
+              aerr();
+            }
+          else if(v1 == IY)
+            {
+              if(rf == S_ADD)
+                {
+                  outab(0x15);
+                  outrw(&e2, 0);
+                  break;
+                }
+              aerr();
+            }
+          else if(v1 == SP)
+            {
+              if(rf == S_ADD)
+                {
+                  outab(0x16);
+                  outrw(&e2, 0);
+                  break;
+                }
+              aerr();
+            }
+          else
+            {
+              // only hl allowed?
+              if(v1 != HL)
+                aerr();
 
-	      outab(op + 0x16 + v1);
-	      outrw(&e2, 0);
-	      break;
-	    }
-	}
+              outab(op + 0x16 + v1);
+              outrw(&e2, 0);
+              break;
+            }
+        }
 
       aerr();
       break;
@@ -1320,74 +1318,74 @@ machine(struct mne *mp)
 
       // can have a as first op or not..
       if(more())
-	{
-	  if(t1 == S_R8 && v1 == A)
-	    {
+        {
+          if(t1 == S_R8 && v1 == A)
+            {
               clrexpr(&e1);
 
-	      comma(1);
+              comma(1);
 
-	      t1 = addr(&e1);
-	      v1 = (int) e1.e_addr;
-	    }
-	  else
-	    {
-	      aerr();
-	      break;
-	    }
-	}
+              t1 = addr(&e1);
+              v1 = (int) e1.e_addr;
+            }
+          else
+            {
+              aerr();
+              break;
+            }
+        }
 
       if(IS_DIRECT_MEM(v1))
-	{
-	  outab(0xE7);
-	  outab(v1 & 0xFF);
-	  outab(0xA0 + (rf - S_RLC));
-	  break;
-	}
+        {
+          outab(0xE7);
+          outab(v1 & 0xFF);
+          outab(0xA0 + (rf - S_RLC));
+          break;
+        }
 
       if(IS_REG_INDIRECT(t1))
-	{
-	  int r = GET_IND_REG(t1);
+        {
+          int r = GET_IND_REG(t1);
 
-	  if(v1 == 0)
-	    {
-	      outab(0xE0 + r);
-	      outab(0xA0 + (rf - S_RLC));
-	      break;
-	    }
-	  else
-	    {
-	      if(r == HL) // HL+A
-		{
-		  outab(0xF3);
-		  outab(0xA0 + (rf - S_RLC));
-		  break;
-		}
+          if(v1 == 0)
+            {
+              outab(0xE0 + r);
+              outab(0xA0 + (rf - S_RLC));
+              break;
+            }
+          else
+            {
+              if(r == HL) // HL+A
+                {
+                  outab(0xF3);
+                  outab(0xA0 + (rf - S_RLC));
+                  break;
+                }
 
-	      outab(0xF0 + (r - IX));
-	      outab(v1 & 0xFF);
-	      outab(0xA0 + (rf - S_RLC));
-	      break;
-	    }
-	}
+              outab(0xF0 + (r - IX));
+              outab(v1 & 0xFF);
+              outab(0xA0 + (rf - S_RLC));
+              break;
+            }
+        }
 
       if(t1 == S_R8)
-	{
+        {
 #if 0
-	  // TODO: not used by asl assembler..
-	  if(v1 == A)
-	    {
-	      outab(0xA0 + (rf - S_RLC));
-	      break;
-	    }
-	  else
+          // TODO: not used by asl assembler..
+          if(v1 == A)
+            {
+              outab(0xA0 + (rf - S_RLC));
+              break;
+            }
+          else
 #endif
-	    {
-	      outab(0xF8 + v1);
-	      outab(0xA0 + (rf - S_RLC));
-	      break;
-	    }
-	}
+            {
+              outab(0xF8 + v1);
+              outab(0xA0 + (rf - S_RLC));
+              break;
+            }
+        }
 
       aerr();
       break;
@@ -1445,19 +1443,19 @@ machine(struct mne *mp)
       v2 = (int) e2.e_addr;
 
       if(t1 == S_R16 && t2 == S_USER)
-	{
-	  if(v1 == HL)
-	    {
-	      outab(op);
+        {
+          if(v1 == HL)
+            {
+              outab(op);
 
-	      e2.e_addr += 1;
+              e2.e_addr += 1;
 
-	      // signed 16-bit pcrel
-	      outrw(&e2, R_PCR);
+              // signed 16-bit pcrel
+              outrw(&e2, R_PCR);
 
-	      break;
-	    }
-	}
+              break;
+            }
+        }
 
       aerr();
       break;
@@ -1472,57 +1470,57 @@ machine(struct mne *mp)
       v2 = (int) e2.e_addr;
 
       if(t1 == S_INDM && t2 == S_IMMED)
-	{
-	  if(IS_DIRECT_MEM(v1))
-	    {
-	      outab(0x3F);
-	      outab(v1 & 0xff);
-	      outrw(&e2, 0);
-	      break;
-	    }
-	  else
-	    {
-	      outab(0xEB);
-	      outrw(&e2, 0); // addr
-	      outab(0x3F);
-	      outrw(&e2, 0); // immd
-	      break;
-	    }
+        {
+          if(IS_DIRECT_MEM(v1))
+            {
+              outab(0x3F);
+              outab(v1 & 0xff);
+              outrw(&e2, 0);
+              break;
+            }
+          else
+            {
+              outab(0xEB);
+              outrw(&e2, 0); // addr
+              outab(0x3F);
+              outrw(&e2, 0); // immd
+              break;
+            }
 
-	  aerr();
-	}
+          aerr();
+        }
 
       if(IS_REG_INDIRECT(t1) && t2 == S_IMMED)
-	{
-	  int r;
+        {
+          int r;
 
-	  r = GET_IND_REG(t1);
+          r = GET_IND_REG(t1);
 
-	  if(e1.e_addr == 0)
-	    {
-	      outab(0xe8 + r);
-	      outab(0x3F);
-	      outrw(&e2, 0);
-	      break;
-	    }
-	  else
-	    {
-	      if(r == HL)
-		{
-		  outab(0xF7);
-		  outab(0x3F);
-		  outrw(&e2, 0);
-		  break;
-		}
+          if(e1.e_addr == 0)
+            {
+              outab(0xe8 + r);
+              outab(0x3F);
+              outrw(&e2, 0);
+              break;
+            }
+          else
+            {
+              if(r == HL)
+                {
+                  outab(0xF7);
+                  outab(0x3F);
+                  outrw(&e2, 0);
+                  break;
+                }
 
-	      outab(0xF0 + r);
-	      outab(e1.e_addr & 0xFF);
-	      outab(0x3F);
-	      outrw(&e2, 0);
-	      break;
-	    }
-	}
-      
+              outab(0xF0 + r);
+              outab(e1.e_addr & 0xFF);
+              outab(0x3F);
+              outrw(&e2, 0);
+              break;
+            }
+        }
+
       aerr();
       break;
 
@@ -1536,387 +1534,387 @@ machine(struct mne *mp)
       v2 = (int) e2.e_addr;
 
       if(t1 == S_R8 && t2 == S_R8)
-	{
-	  if(v1 == A)
-	    {
-	      outab(0x20 + v2);
-	      break;
-	    }
-	  if(v2 == A)
-	    {
-	      outab(0x28 + v1);
-	      break;
-	    }
+        {
+          if(v1 == A)
+            {
+              outab(0x20 + v2);
+              break;
+            }
+          if(v2 == A)
+            {
+              outab(0x28 + v1);
+              break;
+            }
 
-	  outab(0xF8 + v2);
-	  outab(0x30 + v1);
-	  break;
+          outab(0xF8 + v2);
+          outab(0x30 + v1);
+          break;
 
-	  aerr();
-	}
+          aerr();
+        }
 
       if(IS_REG_INDIRECT(t1) && t2 == S_R8)
-	{
-	  int r;
+        {
+          int r;
 
-	  r = GET_IND_REG(t1);
+          r = GET_IND_REG(t1);
 
-	  if(e1.e_addr == 0)
-	    {
-	      outab(0xe8 + r);
-	      outab(0x20 + v2);
-	      break;
-	    }
-	  else
-	    {
-	      if(r == IX)
-		outab(0xf4);
-	      else if(r == IY)
-		outab(0xf5);
-	      else if(r == SP)
-		outab(0xf6);
-	      else if(r == HL)
-		{
-		  outab(0xf7); // HL+A
-		  outab(0x20 + v2);
-		  break;
-		}
-	      else
-		aerr();
+          if(e1.e_addr == 0)
+            {
+              outab(0xe8 + r);
+              outab(0x20 + v2);
+              break;
+            }
+          else
+            {
+              if(r == IX)
+                outab(0xf4);
+              else if(r == IY)
+                outab(0xf5);
+              else if(r == SP)
+                outab(0xf6);
+              else if(r == HL)
+                {
+                  outab(0xf7); // HL+A
+                  outab(0x20 + v2);
+                  break;
+                }
+              else
+                aerr();
 
-	      outab(e1.e_addr);
-	      outab(0x20 + v2);
-	      break;
-	    }
-	}
+              outab(e1.e_addr);
+              outab(0x20 + v2);
+              break;
+            }
+        }
 
       if(t1 == S_R8 && IS_REG_INDIRECT(t2))
-	{
-	  int r;
+        {
+          int r;
 
-	  r = GET_IND_REG(t2);
+          r = GET_IND_REG(t2);
 
-	  if(e2.e_addr == 0)
-	    {
-	      outab(0xe0 + r);
-	      outab(0x28 + v1);
-	    }
-	  else
-	    {
-	      if(r == IX)
-		outab(0xf0);
-	      else if(r == IY)
-		outab(0xf1);
-	      else if(r == SP)
-		outab(0xf2);
-	      else if(r == HL) // HL+A
-		{
-		  outab(0xf3);
-		  outab(0x28 + v1);
-		  break;
-		}
-	      else
-		aerr();
+          if(e2.e_addr == 0)
+            {
+              outab(0xe0 + r);
+              outab(0x28 + v1);
+            }
+          else
+            {
+              if(r == IX)
+                outab(0xf0);
+              else if(r == IY)
+                outab(0xf1);
+              else if(r == SP)
+                outab(0xf2);
+              else if(r == HL) // HL+A
+                {
+                  outab(0xf3);
+                  outab(0x28 + v1);
+                  break;
+                }
+              else
+                aerr();
 
-	      outab(e2.e_addr);
-	      outab(0x28 + v1);
-	    }
+              outab(e2.e_addr);
+              outab(0x28 + v1);
+            }
 
-	  break;
-	}
+          break;
+        }
 
       if(IS_REG_INDIRECT(t1) && t2 == S_R16)
-	{
-	  int r;
+        {
+          int r;
 
-	  r = GET_IND_REG(t1);
+          r = GET_IND_REG(t1);
 
-	  if(e1.e_addr == 0)
-	    {
-	      outab(0xe8 + r);
-	      outab(0x40 + v2);
-	      break;
-	    }
-	  else
-	    {
-	      if(r == HL) // HL+A
-		{
-		  outab(0xF7);
-		  outab(0x40 + v2);
-		  break;
-		}
+          if(e1.e_addr == 0)
+            {
+              outab(0xe8 + r);
+              outab(0x40 + v2);
+              break;
+            }
+          else
+            {
+              if(r == HL) // HL+A
+                {
+                  outab(0xF7);
+                  outab(0x40 + v2);
+                  break;
+                }
 
-	      outab(0xF0 + r);
-	      outab(e1.e_addr);
-	      outab(0x40 + v2);
-	      break;
-	    }
-	}
+              outab(0xF0 + r);
+              outab(e1.e_addr);
+              outab(0x40 + v2);
+              break;
+            }
+        }
 
       if(IS_REG_INDIRECT(t1) && t2 == S_IMMED)
-	{
-	  int r;
+        {
+          int r;
 
-	  r = GET_IND_REG(t1);
+          r = GET_IND_REG(t1);
 
-	  if(e1.e_addr == 0)
-	    {
-	      outab(0xe8 + r);
-	      outab(0x37);
-	      outab(v2);
-	      break;
-	    }
-	  else
-	    {
-	      if(r == HL) // HL+A
-		{
-		  outab(0xF7);
-		  outab(0x37);
-		  outab(v2);
-		  break;
-		}
+          if(e1.e_addr == 0)
+            {
+              outab(0xe8 + r);
+              outab(0x37);
+              outab(v2);
+              break;
+            }
+          else
+            {
+              if(r == HL) // HL+A
+                {
+                  outab(0xF7);
+                  outab(0x37);
+                  outab(v2);
+                  break;
+                }
 
-	      outab(0xF0 + r);
-	      outab(e1.e_addr);
-	      outab(0x37);
-	      outab(v2);
-	      break;
-	    }
-	}
+              outab(0xF0 + r);
+              outab(e1.e_addr);
+              outab(0x37);
+              outab(v2);
+              break;
+            }
+        }
 
       if(t1 == S_R16 && IS_REG_INDIRECT(t2))
-	{
-	  int r;
+        {
+          int r;
 
-	  r = GET_IND_REG(t2);
+          r = GET_IND_REG(t2);
 
-	  if(e2.e_addr == 0)
-	    {
-	      outab(0xe0 + r);
-	      outab(0x48 + v1);
-	    }
-	  else
-	    {
-	      if(r == IX)
-		outab(0xf0);
-	      else if(r == IY)
-		outab(0xf1);
-	      else if(r == SP)
-		outab(0xf2);
-	      else if(r == HL) // HL+A
-		{
-		  outab(0xf3);
-		  outab(0x48 + v1);
-		  break;
-		}
-	      else
-		aerr();
+          if(e2.e_addr == 0)
+            {
+              outab(0xe0 + r);
+              outab(0x48 + v1);
+            }
+          else
+            {
+              if(r == IX)
+                outab(0xf0);
+              else if(r == IY)
+                outab(0xf1);
+              else if(r == SP)
+                outab(0xf2);
+              else if(r == HL) // HL+A
+                {
+                  outab(0xf3);
+                  outab(0x48 + v1);
+                  break;
+                }
+              else
+                aerr();
 
-	      outab(e2.e_addr);
-	      outab(0x48 + v1);
-	    }
+              outab(e2.e_addr);
+              outab(0x48 + v1);
+            }
 
-	  break;
-	}
+          break;
+        }
 
       if(t1 == S_R8 && t2 == S_IMMED)
-	{
-	  outab(0x30 + v1);
-	  outrb(&e2,0);
-	  break;
-	}
+        {
+          outab(0x30 + v1);
+          outrb(&e2,0);
+          break;
+        }
 
       if(t1 == S_R8 && t2 == S_INDM)
-	{
-	  if(IS_DIRECT_MEM(v2) && v1 == A)
-	    {
-	      outab(0x27);
-	      outab(v2 & 0xff);
-	      break;
-	    }
+        {
+          if(IS_DIRECT_MEM(v2) && v1 == A)
+            {
+              outab(0x27);
+              outab(v2 & 0xff);
+              break;
+            }
 
-	  if(IS_DIRECT_MEM(v2))
-	    {
-	      outab(0xE7);
-	      outab(v2 & 0xff);
-	      outab(0x28 + v1);
-	      break;
-	    }
-	  else
-	    {
-	      // normal access
-	      outab(0xE3);
-	      outrw(&e2, 0); // reloc!?
-	      outab(0x28 + v1);
-	      break;
-	    }
+          if(IS_DIRECT_MEM(v2))
+            {
+              outab(0xE7);
+              outab(v2 & 0xff);
+              outab(0x28 + v1);
+              break;
+            }
+          else
+            {
+              // normal access
+              outab(0xE3);
+              outrw(&e2, 0); // reloc!?
+              outab(0x28 + v1);
+              break;
+            }
 
-	  aerr();
-	}
+          aerr();
+        }
 
 #if 0
       // alternate encodings or disassmbler bug?
       if(t1 == S_R8 && t2 == S_INDM)
-	{
-	  if(v1 == B)
-	    {
-	      outab(0xE3);
-	      outrw(&e2, 0);
-	      outab(0x28);
-	      break;
-	    }
-	  if(v1 == C)
-	    {
-	      outab(0xE3);
-	      outrw(&e2, 0);
-	      outab(0x29);
-	      break;
-	    }
-	  if(v1 == D)
-	    {
-	      outab(0xE3);
-	      outrw(&e2, 0);
-	      outab(0x2A);
-	      break;
-	    }
-	  if(v1 == A)
-	    {
-	      outab(0xE3);
-	      outrw(&e2, 0);
-	      outab(0x2E);
-	      break;
-	    }
-	}
+        {
+          if(v1 == B)
+            {
+              outab(0xE3);
+              outrw(&e2, 0);
+              outab(0x28);
+              break;
+            }
+          if(v1 == C)
+            {
+              outab(0xE3);
+              outrw(&e2, 0);
+              outab(0x29);
+              break;
+            }
+          if(v1 == D)
+            {
+              outab(0xE3);
+              outrw(&e2, 0);
+              outab(0x2A);
+              break;
+            }
+          if(v1 == A)
+            {
+              outab(0xE3);
+              outrw(&e2, 0);
+              outab(0x2E);
+              break;
+            }
+        }
 #endif
 
       if(t1 == S_R16 && t2 == S_R16)
-	{
-	  if(v1 == HL)
-	    {
-	      outab(0x40 + v2);
-	      break;
-	    }
-	  if(v2 == HL)
-	    {
-	      outab(0x48 + v1);
-	      break;
-	    }
+        {
+          if(v1 == HL)
+            {
+              outab(0x40 + v2);
+              break;
+            }
+          if(v2 == HL)
+            {
+              outab(0x48 + v1);
+              break;
+            }
 
-	  outab(0xF8 + v2);
-	  outab(0x38 + v1);
+          outab(0xF8 + v2);
+          outab(0x38 + v1);
 
-	  break;
-	}
+          break;
+        }
 
       if(t1 == S_R16 && t2 == S_IMMED)
-	{
-	  if(IS_16BIT_IMMED(v2))
-	    {
-	      outab(0x38 + v1);
-	      outrw(&e2, 0);
-	      break;
-	    }
-	}
+        {
+          if(IS_16BIT_IMMED(v2))
+            {
+              outab(0x38 + v1);
+              outrw(&e2, 0);
+              break;
+            }
+        }
 
       if(t1 == S_R16 && t2 == S_INDM)
-	{
-	  if(IS_DIRECT_MEM(v2))
-	    {
-	      if(v1 == HL)
-		{
-		  outab(0x47);
-		  outab(v2 & 0xFF);
-		  break;
-		}
-	      else
-		{
-		  outab(0xE7);
-		  outab(v2 & 0xFF);
-		  outab(0x48 + v1);
-		  break;
-		}
-	    }
-	  else
-	    {
-	      outab(0xE3);
-	      outrw(&e2, 0); // reloc!?
-	      outab(0x48 + v1);
-	      break;
-	    }
-	}
+        {
+          if(IS_DIRECT_MEM(v2))
+            {
+              if(v1 == HL)
+                {
+                  outab(0x47);
+                  outab(v2 & 0xFF);
+                  break;
+                }
+              else
+                {
+                  outab(0xE7);
+                  outab(v2 & 0xFF);
+                  outab(0x48 + v1);
+                  break;
+                }
+            }
+          else
+            {
+              outab(0xE3);
+              outrw(&e2, 0); // reloc!?
+              outab(0x48 + v1);
+              break;
+            }
+        }
 
       if(t1 == S_INDM && t2 == S_R8)
-	{
-	  if(IS_DIRECT_MEM(v1) && v2 == A)
-	    {
-	      outab(0x2F);
-	      outab(v1 & 0xff);
-	      break;
-	    }
-	  else if(IS_DIRECT_MEM(v1))
-	    {
-	      outab(0xEF);
-	      outab(v1 & 0xff);
-	      outab(0x20 + v2);
-	      break;
-	    }
-	  else
-	    {
-	      outab(0xEB);
-	      outrw(&e1, 0);
-	      outab(0x20 + v2);
-	      break;
-	    }
+        {
+          if(IS_DIRECT_MEM(v1) && v2 == A)
+            {
+              outab(0x2F);
+              outab(v1 & 0xff);
+              break;
+            }
+          else if(IS_DIRECT_MEM(v1))
+            {
+              outab(0xEF);
+              outab(v1 & 0xff);
+              outab(0x20 + v2);
+              break;
+            }
+          else
+            {
+              outab(0xEB);
+              outrw(&e1, 0);
+              outab(0x20 + v2);
+              break;
+            }
 
-	  aerr();
-	}
+          aerr();
+        }
 
       if(t1 == S_INDM && t2 == S_R16)
-	{
-	  if(IS_DIRECT_MEM(v1))
-	    {
-	      if(v2 == HL)
-		{
-		  outab(0x4F);
-		  outab(v1 & 0xFF);
-		  break;
-		}
-	      else
-		{
-		  outab(0xEF);
-		  outab(v1 & 0xFF);
-		  outab(0x40 + v2);
-		  break;
-		}
-	    }
-	  else
-	    {
-	      outab(0xEB);
-	      outrw(&e1, 0);
-	      outab(0x40 + v2);
-	      break;
-	    }
-	}
+        {
+          if(IS_DIRECT_MEM(v1))
+            {
+              if(v2 == HL)
+                {
+                  outab(0x4F);
+                  outab(v1 & 0xFF);
+                  break;
+                }
+              else
+                {
+                  outab(0xEF);
+                  outab(v1 & 0xFF);
+                  outab(0x40 + v2);
+                  break;
+                }
+            }
+          else
+            {
+              outab(0xEB);
+              outrw(&e1, 0);
+              outab(0x40 + v2);
+              break;
+            }
+        }
       if(t1 == S_INDM && t2 == S_IMMED)
-	{
-	  if(IS_DIRECT_MEM(v1))
-	    {
-	      outab(0x37);
-	      outab(v1 & 0xff);
-	      outab(v2 & 0xff);
-	      break;
-	    }
-	  else
-	    {
-	      outab(0xeb);
-	      outrw(&e1, 0);
-	      outab(0x37);
-	      outab(v2 & 0xff);
-	      break;
-	    }
+        {
+          if(IS_DIRECT_MEM(v1))
+            {
+              outab(0x37);
+              outab(v1 & 0xff);
+              outab(v2 & 0xff);
+              break;
+            }
+          else
+            {
+              outab(0xeb);
+              outrw(&e1, 0);
+              outab(0x37);
+              outab(v2 & 0xff);
+              break;
+            }
 
-	  aerr();
-	}
+          aerr();
+        }
 
       aerr();
       break;
@@ -1948,27 +1946,27 @@ machine(struct mne *mp)
       break;
     }
 
-  if (opcycles == OPCY_NONE) 
+  if (opcycles == OPCY_NONE)
     {
       opcycles = t90pg1[cb[0] & 0xFF];
-      while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) 
-	{
-	  switch (opcycles) {
-	  case P2:        /* CB xx        */
-	  case P3:        /* DD xx        */
-	  case P4:        /* ED xx        */
-	  case P5:        /* FD xx        */
-	    opcycles = t90Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
-	    break;
-	  case P6:        /* DD CB -- xx  */
-	  case P7:        /* FD CB -- xx  */
-	    opcycles = t90Page[opcycles & OPCY_MASK][cb[3] & 0xFF];
-	    break;
-	  default:
-	    opcycles = OPCY_NONE;
-	    break;
-	  }
-	}
+      while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK))
+        {
+          switch (opcycles) {
+          case P2:        /* CB xx        */
+          case P3:        /* DD xx        */
+          case P4:        /* ED xx        */
+          case P5:        /* FD xx        */
+            opcycles = t90Page[opcycles & OPCY_MASK][cb[1] & 0xFF];
+            break;
+          case P6:        /* DD CB -- xx  */
+          case P7:        /* FD CB -- xx  */
+            opcycles = t90Page[opcycles & OPCY_MASK][cb[3] & 0xFF];
+            break;
+          default:
+            opcycles = OPCY_NONE;
+            break;
+          }
+        }
     }
 }
 
@@ -1979,12 +1977,12 @@ machine(struct mne *mp)
 int
 mchpcr(struct expr *esp)
 {
-  if (esp->e_base.e_ap == dot.s_area) 
+  if (esp->e_base.e_ap == dot.s_area)
     {
       return(1);
     }
 
-  if (esp->e_flag==0 && esp->e_base.e_ap==NULL) 
+  if (esp->e_flag==0 && esp->e_base.e_ap==NULL)
     {
       /*
        * Absolute Destination
@@ -2013,7 +2011,7 @@ minit()
    */
   hilo = 0;
 
-  if (pass == 0) 
+  if (pass == 0)
     {
       sym[2].s_addr = X_T90;
     }

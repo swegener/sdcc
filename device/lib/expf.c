@@ -46,7 +46,6 @@ static __bit sign_bit;
 static __data unsigned char expf_y[4];
 static __data unsigned char n;
 
-
 float expf(float x)
 {
 	x;
@@ -328,7 +327,7 @@ fs_lshift_done:
 #define EXPEPS  1.0E-7       /* exp(1.0E-7)=0.0000001 */
 #define K1      1.4426950409 /* 1/ln(2) */
 
-float expf(const float x)
+float expf(float x) _FLOAT_FUNC_REENTRANT
 {
     int n;
     float xn, g, r, z, y;
@@ -375,4 +374,3 @@ float expf(const float x)
 }
 
 #endif
-

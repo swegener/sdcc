@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -29,16 +29,16 @@
 #include <string.h>
 
 int
-memcmp (void * buf1, void * buf2, size_t count) 
+memcmp (const void * buf1, const void * buf2, size_t count)
 {
   if (!count)
     return 0;
 
-  while (--count && (*((char *)buf1) == *((char *)buf2)))
+  while (--count && (*((const char *)buf1) == *((const char *)buf2)))
     {
-      buf1 = (char *)buf1 + 1;
-      buf2 = (char *)buf2 + 1;
+      buf1 = (const char *)buf1 + 1;
+      buf2 = (const char *)buf2 + 1;
     }
 
-  return *((unsigned char *)buf1) - *((unsigned char *)buf2);
+  return *((const unsigned char *)buf1) - *((const unsigned char *)buf2);
 }

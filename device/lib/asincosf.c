@@ -44,7 +44,7 @@
 #define P(g) (P2 * g + P1)
 #define Q(g) ((Q2 * g + Q1) * g + Q0)
 
-float asincosf(const float x, const bool isacos)
+float asincosf(float x, bool isacos)
 {
     float y, g, r;
     unsigned char i;

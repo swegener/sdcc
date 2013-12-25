@@ -32,9 +32,9 @@
 #include <errno.h>
 #include <stdbool.h>
 
-float tancotf(const float x, const bool iscotan);
+float tancotf(float x, bool iscotan);
 
-float cotf(const float x) _FLOAT_FUNC_REENTRANT
+float cotf(float x) _FLOAT_FUNC_REENTRANT
 {
     float y;
 

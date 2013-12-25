@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -30,10 +30,10 @@
 #include <string.h>
 
 void *
-memmove (void *dst, void *src, size_t acount) 
+memmove (void *dst, const void *src, size_t acount)
 {
   char *d;
-  char *s;
+  const char *s;
 
   if (((int)src < (int)dst) && ((((int)src) + acount) > (int)dst))
     {

@@ -1,3 +1,73 @@
+2013-12-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/abs.c,         device/lib/acosf.c,         device/lib/asincosf.c,
+	* device/lib/asinf.c,       device/lib/atan2f.c,        device/lib/atanf.c,
+	* device/lib/ceilf.c,       device/lib/cosf.c,          device/lib/coshf.c,
+	* device/lib/cotf.c,        device/lib/expf.c,          device/lib/fabsf.c,
+	* device/lib/floorf.c,      device/lib/frexpf.c,        device/lib/labs.c,
+	* device/lib/ldexpf.c,      device/lib/log10f.c,        device/lib/logf.c,
+	* device/lib/modff.c,       device/lib/powf.c,          device/lib/rand.c,
+	* device/lib/sincosf.c,     device/lib/sincoshf.c,      device/lib/sinf.c,
+	* device/lib/sinhf.c,       device/lib/sqrtf.c,         device/lib/tancotf.c,
+	* device/lib/tanf.c,        device/lib/tanhf.c,
+	* device/include/math.h: removed const from arguments
+
+	* device/lib/pic14/libm/acosf.c,    device/lib/pic14/libm/asincosf.c,
+	* device/lib/pic14/libm/asinf.c,    device/lib/pic14/libm/atan2f.c,
+	* device/lib/pic14/libm/atanf.c,    device/lib/pic14/libm/ceilf.c,
+	* device/lib/pic14/libm/cosf.c,     device/lib/pic14/libm/coshf.c,
+	* device/lib/pic14/libm/cotf.c,     device/lib/pic14/libm/errno.c,
+	* device/lib/pic14/libm/expf.c,     device/lib/pic14/libm/fabsf.c,
+	* device/lib/pic14/libm/floorf.c,   device/lib/pic14/libm/frexpf.c,
+	* device/lib/pic14/libm/ldexpf.c,   device/lib/pic14/libm/log10f.c,
+	* device/lib/pic14/libm/logf.c,     device/lib/pic14/libm/modff.c,
+	* device/lib/pic14/libm/powf.c,     device/lib/pic14/libm/sincosf.c,
+	* device/lib/pic14/libm/sincoshf.c, device/lib/pic14/libm/sinf.c,
+	* device/lib/pic14/libm/sinhf.c,    device/lib/pic14/libm/sqrtf.c,
+	* device/lib/pic14/libm/tancotf.c,  device/lib/pic14/libm/tanf.c,
+	* device/lib/pic14/libm/tanhf.c,
+	* device/include/pic14/math.h: removed const from arguments
+
+	* device/lib/pic16/libm/acosf.c,    device/lib/pic16/libm/asincosf.c,
+	* device/lib/pic16/libm/asinf.c,    device/lib/pic16/libm/atan2f.c,
+	* device/lib/pic16/libm/atanf.c,    device/lib/pic16/libm/ceilf.c,
+	* device/lib/pic16/libm/cosf.c,     device/lib/pic16/libm/coshf.c,
+	* device/lib/pic16/libm/cotf.c,     device/lib/pic16/libm/errno.c,
+	* device/lib/pic16/libm/expf.c,     device/lib/pic16/libm/fabsf.c,
+	* device/lib/pic16/libm/floorf.c,   device/lib/pic16/libm/frexpf.c,
+	* device/lib/pic16/libm/ldexpf.c,   device/lib/pic16/libm/log10f.c,
+	* device/lib/pic16/libm/logf.c,     device/lib/pic16/libm/modff.c,
+	* device/lib/pic16/libm/powf.c,     device/lib/pic16/libm/sincosf.c,
+	* device/lib/pic16/libm/sincoshf.c, device/lib/pic16/libm/sinf.c,
+	* device/lib/pic16/libm/sinhf.c,    device/lib/pic16/libm/sqrtf.c,
+	* device/lib/pic16/libm/tancotf.c,  device/lib/pic16/libm/tanf.c,
+	* device/lib/pic16/libm/tanhf.c,
+	* device/include/pic16/math.h: removed const from arguments
+
+	* device/lib/_memchr.c,     device/lib/_memcmp.c,       device/lib/_memcpy.c,
+	* device/lib/_memmove.c,    device/lib/_memset.c,       device/lib/_strcat.c,
+	* device/lib/_strchr.c,     device/lib/_strcmp.c,       device/lib/_strcpy.c,
+	* device/lib/_strcspn.c,    device/lib/_strlen.c,       device/lib/_strncat.c,
+	* device/lib/_strncmp.c,    device/lib/_strncpy.c,      device/lib/_strpbrk.c,
+	* device/lib/_strrchr.c,    device/lib/_strspn.c,       device/lib/_strstr.c,
+	* device/lib/_strtok.c,
+	* device/include/string.h: added const for const pointer arguments
+
+	* device/lib/pic16/libc/string/memchr.c,
+	* device/lib/pic16/libc/string/memcmp.c,
+	* device/lib/pic16/libc/string/memcpy.c,
+	* device/lib/pic16/libc/string/memmove.c,
+	* device/include/pic16/string.h: added const for const pointer arguments
+
+	* device/lib/_setjmp.c: small optimization
+	* sdas/linksrc/lkarea.c (lnksect2): fixed s_XISEG calculation
+	* sdas/linksrc/lkmem.c: cosmetics
+	* src/SDCCmain.c: place xstack_loc at same address as xdata_loc by default
+	* src/SDCCsymt.c (printFromToType): print in one go for make -j output,
+	  (compareFuncType): fixed bug 2134
+	* sdas/astlcs90/t90mch.c (machine, 16bit indirect op): fixed warning
+	* support/cpp/libiberty/md5.c: synced with support/sdbinutils/libiberty/md5.c
+
 2013-12-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/lib/tlcs90/Makefile.in: fix assembler level .include
@@ -6057,7 +6127,7 @@
 	  don't emit leading whitespaces in inline asm, 2nd try
 	  fixed bug #3515390 - asm with leading whitespace passed to backends
 	* src/z80/peep.c: made z80instructionSize() function more
-	  ropbust: accept arbitrary number of arbitrary space characters
+	  robust: accept arbitrary number of arbitrary space characters
 	  between mnemonic and the first operand
 
 2012-04-07 Philipp Klaus Krause <pkk AT spth.de>

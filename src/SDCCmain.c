@@ -246,7 +246,7 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_LIB_PATH, &libPathsSet, "<path> use this path to search for libraries", CLAT_ADD_SET},
   {0,   OPTION_OUT_FMT_IHX, NULL, "Output in Intel hex format"},
   {0,   OPTION_OUT_FMT_S19, NULL, "Output in S19 hex format"},
-  {0,   OPTION_XRAM_LOC, &options.xdata_loc, "<nnnn> External Ram start location", CLAT_INTEGER},
+  {0,   OPTION_XRAM_LOC, NULL, "<nnnn> External Ram start location", CLAT_INTEGER},
   {0,   OPTION_XRAM_SIZE, NULL, "<nnnn> External Ram size"},
   {0,   OPTION_IRAM_SIZE, &options.iram_size, "<nnnn> Internal Ram size", CLAT_INTEGER},
   {0,   OPTION_XSTACK_LOC, &options.xstack_loc, "<nnnn> External Stack start location", CLAT_INTEGER},
@@ -584,7 +584,7 @@ setDefaultOptions (void)
 {
   /* first the options part */
   options.stack_loc = 0;        /* stack pointer initialised to 0 */
-  options.xstack_loc = 0;       /* xternal stack starts at 0 */
+  options.xstack_loc = 1;       /* xternal stack starts at 1 */
   options.code_loc = 0;         /* code starts at 0 */
   options.data_loc = 0;         /* JCF: By default let the linker locate data */
   options.xdata_loc = 1;        /* MB: Do not use address 0 by default as it equals NULL */
@@ -1028,6 +1028,15 @@ parseCmdLine (int argc, char **argv)
             {
               printVersionInfo (stdout);
               exit (EXIT_SUCCESS);
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_XRAM_LOC) == 0)
+            {
+              int val = getIntArg (OPTION_XRAM_LOC, argv, &i, argc);
+              if (options.xdata_loc == options.xstack_loc)
+                options.xstack_loc = val;
+              options.xdata_loc = val;
               continue;
             }
 

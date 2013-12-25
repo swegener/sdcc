@@ -33,11 +33,14 @@ void printTypeChainRaw (sym_link * start, FILE * of);
 void
 printFromToType (sym_link * from, sym_link * to)
 {
-  fprintf (stderr, "from type '");
-  printTypeChain (from, stderr);
-  fprintf (stderr, "'\nto type '");
-  printTypeChain (to, stderr);
-  fprintf (stderr, "'\n");
+  struct dbuf_s dbuf;
+  dbuf_init (&dbuf, 1024);
+  dbuf_append_str (&dbuf, "from type '");
+  dbuf_printTypeChain (from, &dbuf);
+  dbuf_append_str (&dbuf, "'\n  to type '");
+  dbuf_printTypeChain (to, &dbuf);
+  dbuf_append_str (&dbuf, "'\n");
+  dbuf_write_and_destroy (&dbuf, stderr);
 }
 
 /* noun strings */
@@ -2416,8 +2419,11 @@ compareFuncType (sym_link * dest, sym_link * src)
         {
           checkValue = acargs;
         }
-
-      if (compareType (exargs->type, checkValue->type) <= 0)
+      if (IFFUNC_ISREENT (dest) && compareType (exargs->type, checkValue->type) <= 0)
+        {
+          return 0;
+        }
+      if (!IFFUNC_ISREENT (dest) && compareTypeExact (exargs->type, checkValue->type, 1) <= 0)
         {
           return 0;
         }

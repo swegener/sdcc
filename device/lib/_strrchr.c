@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -26,31 +26,24 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include "string.h"
+#include <string.h>
 
 #ifdef __SDCC_BROKEN_STRING_FUNCTIONS
-char * strrchr (
-	const char * string,
-	char ch
-	)
+char * strrchr ( const char * string, char ch )
 #else
-char * strrchr (
-	const char * string,
-	int ch
-	)
+char * strrchr ( const char * string, int ch )
 #endif
 {
-	const char * start = string;
+        const char * start = string;
 
-	while (*string++)                       /* find end of string */
-		;
-						/* search towards front */
-	while (--string != start && *string != ch)
-		;
+        while (*string++)                       /* find end of string */
+                ;
+                                                /* search towards front */
+        while (--string != start && *string != ch)
+                ;
 
-	if (*string == ch)                /* char found ? */
-		return( (char *)string );
+        if (*string == ch)                      /* char found ? */
+                return( (char *)string );
 
-	return (NULL) ;
+        return (NULL) ;
 }
-

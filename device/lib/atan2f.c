@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    atan2f.c - Computes atan2(x) where x is a 32-bit float.
 
-   Copyright (C) 2001, 2002, Jesus Calvino-Fraga, jesusc@ieee.org 
+   Copyright (C) 2001, 2002, Jesus Calvino-Fraga, jesusc@ieee.org
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -31,7 +31,7 @@
 #include <math.h>
 #include <errno.h>
 
-float atan2f(const float x, const float y)
+float atan2f(float x, float y)
 {
     float r;
 

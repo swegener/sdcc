@@ -31,9 +31,9 @@
 #include <math.h>
 #include <stdbool.h>
 
-float sincosf(const float x, const bool iscos);
+float sincosf(float x, bool iscos);
 
-float cosf(const float x) _FLOAT_FUNC_REENTRANT
+float cosf(float x) _FLOAT_FUNC_REENTRANT
 {
     if (x==0.0) return 1.0;
     return sincosf(x, 1);

@@ -211,7 +211,7 @@ _longjmp:
 	mov	a,r2
 	orl	a,r3
 	jnz	00001$
-	mov	dpl,#0x01
+	inc	dptr
 ;     genRet
 00001$:
 	_RETURN
@@ -387,7 +387,7 @@ _longjmp:
 	mov	a,r2
 	orl	a,r3
 	jnz	00001$
-	mov	dpl,#0x01
+	inc	dptr
 ;     genRet
 00001$:
 	_RETURN
@@ -440,4 +440,3 @@ int longjmp (jmp_buf buf, int rv)
 }
 
 #endif
-

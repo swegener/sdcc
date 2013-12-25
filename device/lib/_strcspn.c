@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -26,23 +26,20 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include "string.h"
+#include <string.h>
 
-size_t strcspn ( 
-	const char * string,
-	const char * control 
-	    ) 
+size_t strcspn ( const char * string, const char * control )
 {
-	register size_t count = 0 ;
-	register char ch ;
+	register size_t count = 0;
+	register char ch;
 
 	while (ch = *string) {
 		if (strchr(control,ch))
 			break;
 		else
-			count++ ;
-			string++ ;
+			count++;
+			string++;
 	}
 
-	return count ;
+	return count;
 }  

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -29,10 +29,11 @@
 /* Version 1.0 - Initial release */
 
 #include <math.h>
+#include <stdbool.h>
 
-float sincoshf(const float x, const int iscosh);
+float sincoshf(float x, bool iscosh);
 
-float sinhf(const float x) _FLOAT_FUNC_REENTRANT
+float sinhf(float x) _FLOAT_FUNC_REENTRANT
 {
     return sincoshf(x, 0);
 }

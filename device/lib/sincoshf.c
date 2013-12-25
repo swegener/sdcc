@@ -53,7 +53,7 @@
 #define WBAR 1.05
 #define YBAR 9.0 /*Works for me*/
 
-float sincoshf(const float x, const int iscosh)
+float sincoshf(float x, bool iscosh)
 {
     float y, w, z;
     bool sign;

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -26,23 +26,19 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include "string.h" 
+#include <string.h>
 #include <sdcc-lib.h>
 
 #if !_SDCC_PORT_PROVIDES_MEMCPY
 
 #undef memcpy /* Avoid conflict with builtin memcpy() in Z80 and some related ports */
 
-void * memcpy (
-	void * dst,
-	void * src,
-	size_t acount
-	) 
+void * memcpy (void * dst, const void * src, size_t acount)
 {
 	void * ret = dst;
 	char * d = dst;
-	char * s = src;
-	
+	const char * s = src;
+
 	/*
 	 * copy from lower addresses to higher addresses
 	 */
@@ -53,4 +49,3 @@ void * memcpy (
 	return(ret);
 }
 #endif
-

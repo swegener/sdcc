@@ -31,9 +31,9 @@
 #include <math.h>
 #include <stdbool.h>
 
-float tancotf(const float x, const bool iscotan);
+float tancotf(float x, bool iscotan);
 
-float tanf(const float x) _FLOAT_FUNC_REENTRANT
+float tanf(float x) _FLOAT_FUNC_REENTRANT
 {
     return tancotf(x, 0);
 }

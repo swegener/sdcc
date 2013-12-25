@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -47,7 +47,7 @@
 #define EXPEPS  1.0E-7       /* exp(1.0E-7)=0.0000001 */
 #define K1      1.4426950409 /* 1/ln(2) */
 
-float expf(const float x)
+float expf(float x)
 {
     int n;
     float xn, g, r, z, y;

@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -61,10 +61,10 @@ char *strtok (char *, char *);
 char *strupr (char *);
 
 void *memccpy(void *, void *, char, size_t);
-void *memchr(void *, char, size_t);
-int   memcmp (void *, void *, size_t);
-void *memcpy (void *, void *, size_t);
-void *memmove (void *, void *, size_t);
+void *memchr(const void *, char, size_t);
+int   memcmp (const void *, const void *, size_t);
+void *memcpy (void *, const void *, size_t);
+void *memmove (void *, const void *, size_t);
 void *memrchr(void *, char, size_t);
 void *memset (_STRING_SPEC void *, unsigned char, size_t );
 

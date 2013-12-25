@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -26,22 +26,20 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include "string.h" 
+#include <string.h>
 
 #if defined(__SDCC_MODEL_LARGE) || defined (__SDCC_MODEL_FLAT24)
 #pragma noinduction
 #pragma noinvariant
 #endif
 
-char * strtok (
-	char * str,
-	const char * control )
+char * strtok ( char * str, const char * control )
 {
 	static char * s;
 	register char * s1;
 
 	if ( str )
-		s = str ;
+		s = str;
 	if ( !s )
 		return NULL;
 
@@ -52,12 +50,12 @@ char * strtok (
 			break;
 	}
 
-	s1 = s ;
+	s1 = s;
 
 	while (*s) {
 		if (strchr(control,*s)) {
 			*s++ = '\0';
-			return s1 ;
+			return s1;
 		}
 		s++ ;
 	}
@@ -69,4 +67,3 @@ char * strtok (
 	else
 		return NULL;
 }
-

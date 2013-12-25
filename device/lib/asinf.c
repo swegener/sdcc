@@ -31,9 +31,9 @@
 #include <math.h>
 #include <stdbool.h>
 
-float asincosf(const float x, const bool isacos);
+float asincosf(float x, bool isacos);
 
-float asinf(const float x) _FLOAT_FUNC_REENTRANT
+float asinf(float x) _FLOAT_FUNC_REENTRANT
 {
          if (x == 1.0) return  HALF_PI;
     else if (x ==-1.0) return -HALF_PI;

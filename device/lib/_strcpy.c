@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -26,14 +26,12 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include "string.h"
+#include <string.h>
 #include <sdcc-lib.h>
 
 #if !_SDCC_PORT_PROVIDES_STRCPY
 
-char * strcpy (
-	char * d, 
-	const char * s) 
+char * strcpy ( char * d, const char * s )
 {
 #if _SDCC_Z80_STYLE_LIB_OPT
     register char * to = d;

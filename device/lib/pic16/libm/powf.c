@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -30,7 +30,7 @@
 #include <math.h>
 #include <errno.h>
 
-float powf(const float x, const float y)
+float powf(float x, float y)
 {
     if(y == 0.0) return 1.0;
     if(y==1.0) return x;

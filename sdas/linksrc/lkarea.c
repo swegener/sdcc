@@ -1261,6 +1261,13 @@ a_uint lnksect2 (struct area *tap, int locIndex)
         }
         tap->a_size = size;
         tap->a_addr = tap->a_axp->a_addr;
+        for (taxp = tap->a_axp; taxp && !taxp->a_size; taxp = taxp->a_axp)
+        {
+        }
+        if (taxp)
+        {
+                tap->a_addr = taxp->a_addr;
+        }
 
         if ((tap->a_flag & A3_PAG) && (size > 256))
         {

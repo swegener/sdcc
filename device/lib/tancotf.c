@@ -50,7 +50,7 @@
 //A reasonable choice for YMAX is the integer part of B**(t/2)*PI/2:
 #define YMAX 6433.0
 
-float tancotf(const float x, const bool iscotan)
+float tancotf(float x, bool iscotan)
 {
     float f, g, xn, xnum, xden;
     int n;

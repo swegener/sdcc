@@ -397,7 +397,7 @@ ${Section} "SDCC application files" SEC01
   File "${SDCC_ROOT}\bin\as2gbmap.cmd"
   File "${SDCC_ROOT}\bin\readline5.dll"
 !ifdef WIN64
-  File "${SDCC_ROOT}\bin\libgcc_s_sjlj-1.dll"
+  File "${SDCC_ROOT}\bin\libgcc_s_*-1.dll"
   File "${SDCC_ROOT}\bin\libstdc++-6.dll"
 !endif
 ${SectionEnd}

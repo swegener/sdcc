@@ -1,3 +1,7 @@
+2013-12-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/scripts/sdcc.nsi: copy either sjlj or seh support dll
+
 2013-12-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/abs.c,         device/lib/acosf.c,         device/lib/asincosf.c,

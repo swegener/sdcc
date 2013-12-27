@@ -2026,12 +2026,6 @@ preProcess (char **envp)
             addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_FLAT24"));
           break;
 
-        case MODEL_PAGE0:
-          addSet (&preArgvSet, Safe_strdup ("-D__SDCC_MODEL_PAGE0"));
-          if (options.std_sdcc)
-            addSet (&preArgvSet, Safe_strdup ("-DSDCC_MODEL_PAGE0"));
-          break;
-
         case NO_MODEL:
           break;
 
@@ -2051,6 +2045,9 @@ preProcess (char **envp)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_FLOAT_REENT"));
       if (options.std_sdcc && options.float_rent)
         addSet (&preArgvSet, Safe_strdup ("-DSDCC_FLOAT_REENT"));
+
+      if (options.all_callee_saves)
+        addSet(&preArgvSet, Safe_strdup("-D__SDCC_ALL_CALLEE_SAVES"));
 
       /* add SDCC version number */
       {

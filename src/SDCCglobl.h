@@ -252,7 +252,7 @@ enum
     MODEL_MEDIUM = 4,
     MODEL_LARGE = 8,
     MODEL_FLAT24 = 16,
-    MODEL_PAGE0 = 32, /* for the xa51 port */
+//  MODEL_PAGE0 = 32, /* disabled, was for the xa51 port */
     MODEL_HUGE = 64   /* for banked support */
   };
 

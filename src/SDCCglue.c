@@ -1877,9 +1877,6 @@ glue (void)
         case MODEL_FLAT24:
           fprintf (asmFile, " --model-flat24");
           break;
-        case MODEL_PAGE0:
-          fprintf (asmFile, " --model-page0");
-          break;
         case MODEL_HUGE:
           fprintf (asmFile, " --model-huge");
           break;
@@ -1895,6 +1892,8 @@ glue (void)
         fprintf (asmFile, " --no-reg-params");
       if (options.parms_in_bank1)
         fprintf (asmFile, " --parms-in-bank1");
+      if (options.all_callee_saves)
+        fprintf (asmFile, " --all-callee-saves");
       fprintf (asmFile, "\n");
     }
   else if (!TARGET_PIC_LIKE && !options.noOptsdccInAsm)

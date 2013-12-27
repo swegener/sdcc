@@ -1,3 +1,10 @@
+2013-12-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglue.c (glue): added .optsdcc --all-callee-saves, fixed bug 2090
+	* src/SDCCmain.c (preProcess): added -D__SDCC_ALL_CALLEE_SAVES
+	* src/SDCCglobl.h: removed xa51 MODEL_PAGE0
+	* doc/sdccman.lyx: documented predefined macro
+
 2013-12-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: copy either sjlj or seh support dll

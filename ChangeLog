@@ -1,3 +1,8 @@
+2013-12-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/is*.c
+	  Revert and redo commit #8912.
+
 2013-12-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCglue.c (glue): added .optsdcc --all-callee-saves, fixed bug 2090

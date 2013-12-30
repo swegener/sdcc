@@ -8041,39 +8041,6 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
-/* genGetHbit - generates code get highest order bit               */
-/*-----------------------------------------------------------------*/
-static void
-genGetHbit (iCode * ic)
-{
-  operand *left, *result;
-
-  D (emitcode (";", "genGetHbit"));
-
-  left = IC_LEFT (ic);
-  result = IC_RESULT (ic);
-  aopOp (left, ic, FALSE);
-  aopOp (result, ic, FALSE);
-
-  /* get the highest order byte into a */
-  MOVA (aopGet (left, AOP_SIZE (left) - 1, FALSE, FALSE));
-  if (AOP_TYPE (result) == AOP_CRY)
-    {
-      emitcode ("rlc", "a");
-      outBitC (result);
-    }
-  else
-    {
-      emitcode ("rl", "a");
-      emitcode ("anl", "a,#0x01");
-      outAcc (result);
-    }
-
-  freeAsmop (result, NULL, ic, TRUE);
-  freeAsmop (left, NULL, ic, TRUE);
-}
-
-/*-----------------------------------------------------------------*/
 /* genGetAbit - generates code get a single bit                    */
 /*-----------------------------------------------------------------*/
 static void
@@ -12179,7 +12146,7 @@ gen51Code (iCode * lic)
           break;
 
         case GETHBIT:
-          genGetHbit (ic);
+          assert (0);
           break;
 
         case GETABIT:

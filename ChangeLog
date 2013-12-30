@@ -1,3 +1,16 @@
+2013-12-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genGetHbit): removed
+	* src/mcs51/main.c (hasExtBitOp): removed GETHBIT
+	* src/SDCCast.c (optimizeGetByte, optimizeGetWord): do not use GETYBTE or
+	  GETWORD for byte or word sources
+	  (createFunction): allow xstack==NULL
+	* src/SDCCmem.c (redoStackOffsets): allow xstack==NULL
+	* src/SDCCerr.c (W_CONST_TOO_LARGE): fixed format bug
+	* src/SDCCerr.h: cosmetics
+	* src/SDCCsymt.c (mergeSpec, checkSClass): fixed bug 2068, loss of register
+	  storage class
+
 2013-12-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/is*.c
@@ -7124,7 +7137,8 @@
 	  src/z80/gen.h,
 	  src/z80/gen.c,
 	  src/z80/ralloc2.cc:
-	  Fixes for --fomit-frame-pointer, omit frame pointer by default for functions with low register pressure and few stack accesses.
+	  Fixes for --fomit-frame-pointer, omit frame pointer by default for
+	  functions with low register pressure and few stack accesses.
 
 2012-02-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

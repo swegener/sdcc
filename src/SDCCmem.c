@@ -970,7 +970,7 @@ allocVariables (symbol * symChain)
         csym = sym;
 
       /* check the declaration */
-      checkDecl (csym,0);
+      checkDecl (csym, 0);
 
       /* if this is a function or a pointer to a */
       /* function then do args processing        */
@@ -979,8 +979,8 @@ allocVariables (symbol * symChain)
           processFuncArgs (csym);
         }
 
-      /* if this is a extern variable then change the */
-      /* level to zero temporarily                    */
+      /* if this is an extern variable then change */
+      /* the level to zero temporarily             */
       if (IS_EXTERN (csym->etype) || IS_FUNC (csym->type))
         {
           saveLevel = csym->level;
@@ -1076,6 +1076,9 @@ redoStackOffsets (void)
     }
 
   /* do the same for the external stack */
+
+  if (!xstack)
+    return;
 
   for (sym = setFirstItem (xstack->syms); sym; sym = setNextItem (xstack->syms))
     {

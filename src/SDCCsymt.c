@@ -702,8 +702,8 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
         }
     }
 
-  if ((SPEC_SHORT (src) || SPEC_LONG (src) || SPEC_LONGLONG (src)) &&
-    (SPEC_SHORT (dest) || SPEC_LONG (dest) || SPEC_LONGLONG (dest)))
+  if ((SPEC_SHORT (src)  || SPEC_LONG (src)  || SPEC_LONGLONG (src)) &&
+      (SPEC_SHORT (dest) || SPEC_LONG (dest) || SPEC_LONGLONG (dest)))
     {
       if (!(options.std_c99 && SPEC_LONG (src) && SPEC_LONG (dest) && (TARGET_Z80_LIKE || TARGET_HC08_LIKE || TARGET_IS_STM8))) /* C99 has long long */
         werror (E_SHORTLONG, name);
@@ -712,7 +712,11 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   if (SPEC_SCLS (src))
     {
       /* if destination has no storage class */
-      if (!SPEC_SCLS (dest) || SPEC_SCLS (dest) == S_REGISTER)
+      if (!SPEC_SCLS (dest))
+        {
+          SPEC_SCLS (dest) = SPEC_SCLS (src);
+        }
+      else if (SPEC_SCLS (dest) == S_REGISTER && SPEC_SCLS (src) != S_AUTO)
         {
           SPEC_SCLS (dest) = SPEC_SCLS (src);
         }
@@ -1834,11 +1838,13 @@ checkSClass (symbol * sym, int isProto)
   /* if this is an automatic symbol */
   if (sym->level && (options.stackAuto || reentrant))
     {
-      if (SPEC_SCLS (sym->etype) != S_BIT)
+      if (SPEC_SCLS (sym->etype) != S_BIT &&
+          SPEC_SCLS (sym->etype) != S_REGISTER)
         {
-          if ((SPEC_SCLS (sym->etype) == S_AUTO ||
-               SPEC_SCLS (sym->etype) == S_FIXED ||
-               SPEC_SCLS (sym->etype) == S_REGISTER || SPEC_SCLS (sym->etype) == S_STACK || SPEC_SCLS (sym->etype) == S_XSTACK))
+          if ((SPEC_SCLS (sym->etype) == S_AUTO     ||
+               SPEC_SCLS (sym->etype) == S_FIXED    ||
+               SPEC_SCLS (sym->etype) == S_STACK    ||
+               SPEC_SCLS (sym->etype) == S_XSTACK))
             {
               SPEC_SCLS (sym->etype) = S_AUTO;
             }

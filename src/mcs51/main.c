@@ -327,7 +327,6 @@ hasExtBitOp (int op, int size)
 {
   if (op == RRC
       || op == RLC
-      || op == GETHBIT
       || op == GETABIT
       || op == GETBYTE
       || op == GETWORD
@@ -845,7 +844,7 @@ PORT mcs51_port =
     "OSEG    (OVR,DATA)",       // overlay_name
     "GSFINAL (CODE)",           // post_static_name
     "HOME    (CODE)",           // home_name
-    "XISEG   (XDATA)",          // xidata_name - initialized xdata   initialized xdata
+    "XISEG   (XDATA)",          // xidata_name - initialized xdata
     "XINIT   (CODE)",           // xinit_name - a code copy of xiseg
     "CONST   (CODE)",           // const_name - const data (code or not)
     "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)

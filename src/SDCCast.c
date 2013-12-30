@@ -1234,13 +1234,14 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
                 {
                   werrorfl (iloop->filename, iloop->lineno, E_BAD_DESIGNATOR);
                 }
-              else {
-                idx = iloop->designation->designator.elemno;
-                if (iloop->designation->next)
-                  {
-                    iloop = moveNestedInit(iloop);
-                  }
-              }
+              else
+                {
+                  idx = iloop->designation->designator.elemno;
+                  if (iloop->designation->next)
+                    {
+                      iloop = moveNestedInit(iloop);
+                    }
+                }
             }
           /* track array size based on the initializers seen */
           if (size <= idx)
@@ -1655,7 +1656,9 @@ processBlockVars (ast * tree, int *stack, int action)
             tree->left = newNode (NULLOP, autoInit, tree->left);
         }
       else                      /* action is deallocate */
-        deallocLocal (tree->values.sym);
+        {
+          deallocLocal (tree->values.sym);
+        }
     }
 
   processBlockVars (tree->left, stack, action);
@@ -5927,6 +5930,7 @@ ast *
 optimizeGetByte (ast * tree, RESULT_TYPE resultType)
 {
   unsigned int i = 1;
+  unsigned int size;
   ast *expr;
   ast *count = NULL;
 
@@ -5948,11 +5952,14 @@ optimizeGetByte (ast * tree, RESULT_TYPE resultType)
           expr = tree->left;
         }
     }
-  if (!expr || (i % 8) || (i >= getSize (TTYPE (expr)) * 8))
+  if (!expr || (i % 8))
+    return tree;
+  size = getSize (TTYPE (expr));
+  if ((i >= size * 8) || (size <= 1))
     return tree;
 
   /* make sure the port supports GETBYTE */
-  if (port->hasExtBitOp && !port->hasExtBitOp (GETBYTE, getSize (TTYPE (expr))))
+  if (port->hasExtBitOp && !port->hasExtBitOp (GETBYTE, size))
     return tree;
 
   return decorateType (newNode (GETBYTE, expr, count), RESULT_TYPE_NONE);
@@ -5965,6 +5972,7 @@ ast *
 optimizeGetWord (ast * tree, RESULT_TYPE resultType)
 {
   unsigned int i = 1;
+  unsigned int size;
   ast *expr;
   ast *count = NULL;
 
@@ -5986,11 +5994,14 @@ optimizeGetWord (ast * tree, RESULT_TYPE resultType)
           expr = tree->left;
         }
     }
-  if (!expr || (i % 8) || (i >= (getSize (TTYPE (expr)) - 1) * 8))
+  if (!expr || (i % 8))
+    return tree;
+  size = getSize (TTYPE (expr));
+  if ((i >= (size - 1) * 8) || (size <= 2))
     return tree;
 
   /* make sure the port supports GETWORD */
-  if (port->hasExtBitOp && !port->hasExtBitOp (GETWORD, getSize (TTYPE (expr))))
+  if (port->hasExtBitOp && !port->hasExtBitOp (GETWORD, size))
     return tree;
 
   return decorateType (newNode (GETWORD, expr, count), RESULT_TYPE_NONE);
@@ -7057,7 +7068,8 @@ skipall:
   cleanUpBlock (TypedefTab, 1);
   cleanUpBlock (AddrspaceTab, 1);
 
-  xstack->syms = NULL;
+  if (xstack)
+    xstack->syms = NULL;
   istack->syms = NULL;
   currFunc = NULL;
   return NULL;

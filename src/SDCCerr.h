@@ -128,7 +128,7 @@ enum {
   E_CODE_NO_INIT                =  99, /* vars in code space must have initializer */
   E_OPS_INTEGRAL                = 100, /* operans must be integral for certain assignments */
   E_TOO_MANY_PARMS              = 101, /* too many parameters */
-  E_TOO_FEW_PARMS               = 102, /* to few parameters   */
+  E_TOO_FEW_PARMS               = 102, /* too few parameters  */
   E_FUNC_NO_CODE                = 103, /* fatalError          */
   E_TYPE_MISMATCH_PARM          = 104, /* type mismatch for parameter */
   E_INVALID_FLOAT_CONST         = 105, /* invalid floating point literal string */
@@ -155,7 +155,7 @@ enum {
   W_CODE_UNREACH                = 126, /* unreachable code    */
   W_NONPTR2_GENPTR              = 127, /* non pointer cast to generic pointer */
   W_POSSBUG                     = 128, /* possible code generation error */
-  E_INCOMPAT_PTYPES             = 129, /* incampatible pointer assignment */
+  E_INCOMPAT_PTYPES             = 129, /* incompatible pointer assignment */
   W_UNKNOWN_MODEL               = 130, /* Unknown memory model */
   E_UNKNOWN_TARGET              = 131, /* target not defined  */
   W_INDIR_BANKED                = 132, /* Indirect call to a banked fun */

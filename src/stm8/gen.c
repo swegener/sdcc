@@ -6384,10 +6384,6 @@ genSTM8iCode (iCode *ic)
       wassertl (0, "Unimplemented iCode");
       break;
 
-    case GETHBIT:
-      wassertl (0, "Unimplemented iCode");
-      break;
-
     case GETABIT:
       genGetABit (ic);
       break;

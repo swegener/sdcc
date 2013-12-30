@@ -207,7 +207,6 @@ static bool XAinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     ic->op == '^' ||
     ic->op == '|' ||
     ic->op == BITWISEAND ||
-    ic->op == GETHBIT ||
     ic->op == GETABIT ||
     ic->op == GETBYTE ||
     ic->op == GETWORD ||
@@ -304,7 +303,6 @@ static bool AXinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     ic->op == '^' ||
     ic->op == '|' ||
     ic->op == BITWISEAND ||
-    ic->op == GETHBIT ||
     ic->op == GETABIT ||
     ic->op == GETBYTE ||
     ic->op == GETWORD ||
@@ -491,7 +489,6 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case NE_OP:
     case AND_OP:
     case OR_OP:
-    case GETHBIT:
     case GETABIT:
     case GETBYTE:
     case GETWORD:

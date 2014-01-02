@@ -1,6 +1,9 @@
 2014-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: applied patch 62
+	* sdas/linksrc/lkarea.c (lnksect): fixed bug 1805
+	* sdas/linksrc/lkmain.c (Areas51): use only for mcs51
+	* src/hc08/main.c: mark XINIT as (CODE)
 
 2013-12-30 Philipp Klaus Krause <pkk AT spth.de>
 

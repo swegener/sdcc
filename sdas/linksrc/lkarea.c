@@ -670,6 +670,15 @@ lnksect(struct area *tap)
                 }
         }
         tap->a_size = size;
+        tap->a_addr = tap->a_axp->a_addr;
+        for (taxp = tap->a_axp; taxp && !taxp->a_size; taxp = taxp->a_axp)
+        {
+        }
+        if (taxp)
+        {
+                tap->a_addr = taxp->a_addr;
+        }
+
         if ((tap->a_flag & A3_PAG) && (size > 256)) {
                 fprintf(stderr,
                         "\n?ASlink-Warning-Paged Area %s Length Error\n",

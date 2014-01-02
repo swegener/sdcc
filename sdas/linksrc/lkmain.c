@@ -54,7 +54,7 @@
  *
  */
 
-/* sdld 8051 & 6808 specific */
+/* sdld 8051 specific */
 /*JCF:  Creates some of the default areas so they are allocated in the right order.*/
 void Areas51 (void)
 {
@@ -116,14 +116,12 @@ void Areas51 (void)
                 }
         }
 
-        if (TARGET_IS_8051) {
-                sp = lkpsym("l_IRAM", 1);
-                sp->s_addr = ((iram_size>0) && (iram_size<=0x100)) ? iram_size : 0x0100;
-                sp->s_axp = NULL;
-                sp->s_type |= S_DEF;
-        }
+        sp = lkpsym("l_IRAM", 1);
+        sp->s_addr = ((iram_size>0) && (iram_size<=0x100)) ? iram_size : 0x0100;
+        sp->s_axp = NULL;
+        sp->s_type |= S_DEF;
 }
-/* end sdld 8051 & 6808 specific */
+/* end sdld 8051 specific */
 
 /*)Function     int     main(argc,argv)
  *
@@ -338,7 +336,7 @@ main(int argc, char *argv[])
                 radix = 10;
 
                 /* sdld specific */
-                if (TARGET_IS_8051 || TARGET_IS_6808)
+                if (TARGET_IS_8051)
                         Areas51(); /*JCF: Create the default 8051 areas in the right order*/
                 /* end sdld specific */
 

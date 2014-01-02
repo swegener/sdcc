@@ -811,7 +811,7 @@ PORT hc08_port =
     "GSFINAL (CODE)",
     "HOME    (CODE)",
     "XISEG",              // initialized xdata
-    "XINIT",              // a code copy of xiseg
+    "XINIT   (CODE)",     // a code copy of xiseg
     "CONST   (CODE)",     // const_name - const data (code or not)
     "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
     "XABS    (ABS)",      // xabs_name - absolute xdata
@@ -955,7 +955,7 @@ PORT s08_port =
     "GSFINAL (CODE)",
     "HOME    (CODE)",
     "XISEG",              // initialized xdata
-    "XINIT",              // a code copy of xiseg
+    "XINIT   (CODE)",     // a code copy of xiseg
     "CONST   (CODE)",     // const_name - const data (code or not)
     "CABS    (ABS,CODE)", // cabs_name - const absolute data (code or not)
     "XABS    (ABS)",      // xabs_name - absolute xdata

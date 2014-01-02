@@ -9902,18 +9902,17 @@ status collapsed
 \end_layout
 
 \begin_layout Itemize
-sourcefile.
- - (no extension)
+sourcefile.omf
 \begin_inset Index idx
 status collapsed
 
 \begin_layout Plain Layout
-<file> (no extension)
+<file>.omf
 \end_layout
 
 \end_inset
 
- An optional AOMF or AOMF51
+ - An optional AOMF or AOMF51
 \begin_inset Index idx
 status collapsed
 
@@ -39346,8 +39345,8 @@ pragma exclude
 
 \end_inset
 
- none | {acc[,b[,dpl[,dph[,bits]]]]} - The exclude pragma disables the
- generation of pairs of push/pop
+ none | {acc[,b[,dpl[,dph[,bits]]]]} - The exclude pragma disables the generatio
+n of pairs of push/pop
 \begin_inset Index idx
 status collapsed
 
@@ -41581,7 +41580,7 @@ Defines created by the compiler
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="16" columns="2">
+<lyxtabular version="3" rows="17" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top" width="3in">

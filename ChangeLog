@@ -1,3 +1,7 @@
+2014-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: applied patch 62
+
 2013-12-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/hc08/ralloc2.cc,

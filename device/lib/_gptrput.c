@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -220,7 +220,7 @@ _gptrputWord (int *gptr, int w) __naked
 ;
 ;       store into near space
 ;
-        mov     @r0,_ap
+        mov     @r0,acc1
         inc     r0
         mov     @r0,a
  dataptrrestore_w$:
@@ -237,20 +237,20 @@ _gptrputWord (int *gptr, int w) __naked
 ;       store into xstack space
 ;
  pdataptr_w$:
-        xch     a,_ap
+        xch     a,acc1
         movx    @r0,a
         inc     r0
-        xch     a,_ap
+        xch     a,acc1
         movx    @r0, a
         sjmp    dataptrrestore_w$
 ;
 ;       store into far space
 ;
  xdataptr_w$:
-        xch     a,_ap
+        xch     a,acc1
         movx    @dptr,a
         inc     dptr
-        xch     a,_ap
+        xch     a,acc1
         movx    @dptr,a
         ret
     __endasm;

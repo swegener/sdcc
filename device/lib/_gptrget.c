@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -217,7 +217,7 @@ _gptrget (char *gptr) __naked
 #endif
 
 #ifdef __SDCC_ds390
-/* the  return value is expected to be in acc/_ap, and not in the standard
+/* the  return value is expected to be in acc/acc1, and not in the standard
  * location dpl/dph. Therefore we choose return type void here: */
 
 void
@@ -239,7 +239,7 @@ _gptrgetWord (unsigned *gptr)
     ;
     ;   Pointer to data space
     ;
-        mov     _ap,@r0
+        mov     acc1,@r0
         inc     r0
         mov     a,@r0
         inc     dpl
@@ -249,7 +249,7 @@ _gptrgetWord (unsigned *gptr)
     ;
  00002$:
         movx    a,@dptr
-        mov     _ap,a
+        mov     acc1,a
         inc     dptr
         movx    a,@dptr
         sjmp    00006$
@@ -259,7 +259,7 @@ _gptrgetWord (unsigned *gptr)
  00003$:
         clr     a
         movc    a,@a+dptr
-        mov     _ap,a
+        mov     acc1,a
         clr     a
         inc     dptr
         movc    a,@a+dptr
@@ -269,7 +269,7 @@ _gptrgetWord (unsigned *gptr)
 ;
  00004$:
         movx    a,@r0
-        mov     _ap,a
+        mov     acc1,a
         inc     r0
         movx    a,@r0
         inc     dpl
@@ -280,7 +280,7 @@ _gptrgetWord (unsigned *gptr)
         mov     r0,dph ; restore r0
         mov     dph,#0 ; restore dph
  00006$:
-        xch     a,_ap
+        xch     a,acc1
     __endasm;
 
 }

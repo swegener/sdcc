@@ -1,3 +1,14 @@
+2014-01-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_gptrget.c,
+	* device/lib/_gptrput.c,
+	* src/ds390/main.c,
+	* src/ds390/gen.c: renamed _ap to acc1, fixed bug 1896
+	* support/regression/tests/gcc-torture-execute-loop-5.c: enabled for ds390
+	* sdas/asxxsrc/aslex.c (nxtline): fixed bug 2166 and 2206
+	* src/SDCClospre.hpp,
+	* src/SDCCralloc.hpp: fixed MSVC warnings
+
 2014-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: applied patch 62

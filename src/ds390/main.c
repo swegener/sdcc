@@ -268,7 +268,7 @@ _ds390_genAssemblerPreamble (FILE * of)
   fputs ("dpx1\t=\t0x95\n", of);
   fputs ("esp\t=\t0x9B\n", of);
   fputs ("ap\t=\t0x9C\n", of);
-  fputs ("_ap\t=\t0x9C\n", of);
+  fputs ("acc1\t=\t0x9C\n", of);
   fputs ("mcnt0\t=\t0xD1\n", of);
   fputs ("mcnt1\t=\t0xD2\n", of);
   fputs ("ma\t=\t0xD3\n", of);
@@ -612,7 +612,7 @@ ds390operanddata;
 
 static ds390operanddata ds390operandDataTable[] =
   {
-    {"_ap",   AP_IDX,   -1},
+    {"acc1",   AP_IDX,   -1},
     {"a",     A_IDX,    -1},
     {"ab",    A_IDX,    B_IDX},
     {"ac",    CND_IDX,  -1},
@@ -1176,8 +1176,8 @@ static void _tininative_genAssemblerPreamble (FILE * of)
     fputs("$include(ds80c390.inc)\n", of);
     fputs("$include(tinimacro.inc)\n", of);
     fputs("$include(apiequ.inc)\n", of);
-    fputs("_bpx EQU 01Eh \t\t; _bpx (frame pointer) mapped to R8_B3:R7_B3\n", of);
-    fputs("_ap  EQU 01Dh \t\t; _ap mapped to R6_B3\n", of);
+    fputs("_bpx EQU 01Eh \t\t; _bpx (frame pointer) mapped to R7_B3:R6_B3\n", of);
+    fputs("acc1  EQU 01Dh \t\t; acc1 mapped to R5_B3\n", of);
     /* Must be first and return 0 */
     fputs("Lib_Native_Init:\n",of);
     fputs("\tclr\ta\n",of);

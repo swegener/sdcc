@@ -1000,15 +1000,17 @@ static void tree_dec_ralloc_nodes(T_t &T, typename boost::graph_traits<T_t>::ver
       c1 = *c;
 
       if (T[c0].weight < T[c1].weight) // Minimize memory consumption.
-        /*std::swap (c0, c1)*/; /* Causes code size regressions - don't know why. */
+        {
+          /*std::swap (c0, c1)*/ /* Causes code size regressions - don't know why. */
+        }
 
       tree_dec_ralloc_nodes(T, c0, G, I, ac, assignment_optimal);
-      {
-        assignment *ac2 = new assignment;
-        get_best_local_assignment_biased(*ac2, c0, T);
-        tree_dec_ralloc_nodes(T, c1, G, I, *ac2, assignment_optimal);
-        delete ac2;
-      }
+        {
+          assignment *ac2 = new assignment;
+          get_best_local_assignment_biased(*ac2, c0, T);
+          tree_dec_ralloc_nodes(T, c1, G, I, *ac2, assignment_optimal);
+          delete ac2;
+        }
       tree_dec_ralloc_join(T, t, G, I);
       break;
     default:

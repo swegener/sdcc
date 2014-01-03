@@ -752,7 +752,11 @@ loop:   if (asmc == NULL) return(0);
                 break;
 
         case T_MACRO:
-                if (fgetm(ib, dbuf_ib.alloc, asmc->fp) == NULL) {
+                dbuf_append(&dbuf_ib, "\0", dbuf_ib.alloc - 1);
+                ib = (char *)dbuf_c_str (&dbuf_ib);
+                ib = fgetm(ib, dbuf_ib.alloc - 1, asmc->fp);
+                if (ib == NULL) {
+                        dbuf_set_length(&dbuf_ib, 0);
                         mcrfil -= 1;
                         srcline = asmc->line;
                         flevel = asmc->flevel;
@@ -767,6 +771,8 @@ loop:   if (asmc == NULL) return(0);
                         }
                         goto loop;
                 } else {
+                        len = strlen(ib);
+                        dbuf_set_length(&dbuf_ib, len);
                         if (mcrline++ == 0) {
                                 ;
                         }

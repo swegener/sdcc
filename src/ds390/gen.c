@@ -157,7 +157,7 @@ static void saveRBank (int, iCode *, bool);
 
 /* A scratch register which will be used to hold
  * result bytes from operands in far space via DPTR2. */
-#define DP2_RESULT_REG  "_ap"
+#define DP2_RESULT_REG  "acc1"
 
 static unsigned char SLMask[] = { 0xFF, 0xFE, 0xFC, 0xF8, 0xF0,
                                   0xE0, 0xC0, 0x80, 0x00
@@ -1554,9 +1554,9 @@ aopGet (operand * oper, int offset, bool bit16, bool dname, char *saveAcc)
             {
               TR_AP ("#2");
               emitcode ("xch", "a, %s", saveAcc);
-//        if (strcmp(saveAcc, "_ap"))
+//        if (strcmp(saveAcc, "acc1"))
 //          {
-//            emitcode(";", "spiffy: non _ap return from aopGet.");
+//            emitcode(";", "spiffy: non acc1 return from aopGet.");
 //          }
 
               dbuf_append_str (&dbuf, saveAcc);
@@ -11477,13 +11477,13 @@ genGenPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
         {
           if (size)
             {
-              // Set two bytes at a time, passed in _AP & A.
+              // Set two bytes at a time, passed in AP & A.
               // dptr will be incremented ONCE by __gptrputWord.
               //
               // Note: any change here must be coordinated
               // with the implementation of __gptrputWord
               // in device/lib/_gptrput.c
-              emitcode ("mov", "_ap, %s", aopGet (right, offset++, FALSE, FALSE, NULL));
+              emitcode ("mov", "acc1, %s", aopGet (right, offset++, FALSE, FALSE, NULL));
               MOVA (aopGet (right, offset++, FALSE, FALSE, NULL));
 
               genSetDPTR (0);
@@ -12372,7 +12372,7 @@ genMemcpyX2X (iCode * ic, int nparms, operand ** parms, int fromc)
       symbol *lbl1 = newiTempLabel (NULL);
 
       emitcode (";", " Auto increment but no djnz");
-      emitcode ("mov", "_ap,%s", aopGet (count, 0, FALSE, TRUE, NULL));
+      emitcode ("mov", "acc1,%s", aopGet (count, 0, FALSE, TRUE, NULL));
       emitcode ("mov", "b,%s", aopGet (count, 1, FALSE, TRUE, NULL));
       freeAsmop (count, NULL, ic, FALSE);
       emitcode ("mov", "dps,#!constbyte", 0x21);        /* Select DPTR2 & auto-toggle. */
@@ -12388,11 +12388,11 @@ genMemcpyX2X (iCode * ic, int nparms, operand ** parms, int fromc)
       emitcode ("inc", "dptr");
       emitcode ("inc", "dptr");
       emitcode ("mov", "a,b");
-      emitcode ("orl", "a,_ap");
+      emitcode ("orl", "a,acc1");
       emitcode ("jz", "!tlabel", labelKey2num (lbl1->key));
-      emitcode ("mov", "a,_ap");
+      emitcode ("mov", "a,acc1");
       emitcode ("add", "a,#!constbyte", 0xFF);
-      emitcode ("mov", "_ap,a");
+      emitcode ("mov", "acc1,a");
       emitcode ("mov", "a,b");
       emitcode ("addc", "a,#!constbyte", 0xFF);
       emitcode ("mov", "b,a");
@@ -12506,7 +12506,7 @@ genMemcmpX2X (iCode * ic, int nparms, operand ** parms, int fromc)
 
       emitcode ("push", "ar0");
       emitcode (";", " Auto increment but no djnz");
-      emitcode ("mov", "_ap,%s", aopGet (count, 0, FALSE, TRUE, NULL));
+      emitcode ("mov", "acc1,%s", aopGet (count, 0, FALSE, TRUE, NULL));
       emitcode ("mov", "b,%s", aopGet (count, 1, FALSE, TRUE, NULL));
       freeAsmop (count, NULL, ic, FALSE);
       emitcode ("mov", "dps,#!constbyte", 0x21);        /* Select DPTR2 & auto-toggle. */
@@ -12526,11 +12526,11 @@ genMemcmpX2X (iCode * ic, int nparms, operand ** parms, int fromc)
       emitcode ("inc", "dptr");
       emitcode ("inc", "dptr");
       emitcode ("mov", "a,b");
-      emitcode ("orl", "a,_ap");
+      emitcode ("orl", "a,acc1");
       emitcode ("jz", "!tlabel", labelKey2num (lbl1->key));
-      emitcode ("mov", "a,_ap");
+      emitcode ("mov", "a,acc1");
       emitcode ("add", "a,#!constbyte", 0xFF);
-      emitcode ("mov", "_ap,a");
+      emitcode ("mov", "acc1,a");
       emitcode ("mov", "a,b");
       emitcode ("addc", "a,#!constbyte", 0xFF);
       emitcode ("mov", "b,a");
@@ -12653,7 +12653,7 @@ genInp (iCode * ic, int nparms, operand ** parms)
       symbol *lbl1 = newiTempLabel (NULL);
 
       emitcode (";", " Auto increment but no djnz");
-      emitcode ("mov", "_ap,%s", aopGet (count, 0, FALSE, TRUE, NULL));
+      emitcode ("mov", "acc1,%s", aopGet (count, 0, FALSE, TRUE, NULL));
       emitcode ("mov", "b,%s", aopGet (count, 1, FALSE, TRUE, NULL));
       freeAsmop (count, NULL, ic, FALSE);
       emitcode ("mov", "dps,#!constbyte", 0x1); /* Select DPTR2 */
@@ -12664,13 +12664,13 @@ genInp (iCode * ic, int nparms, operand ** parms)
       emitcode ("inc", "dptr");
       emitcode ("inc", "dps");  /* switch to DPTR2 */
       /*      emitcode ("djnz","b,!tlabel",lbl->key+100); */
-      /*      emitcode ("djnz","_ap,!tlabel",lbl->key+100); */
+      /*      emitcode ("djnz","acc1,!tlabel",lbl->key+100); */
       emitcode ("mov", "a,b");
-      emitcode ("orl", "a,_ap");
+      emitcode ("orl", "a,acc1");
       emitcode ("jz", "!tlabel", labelKey2num (lbl1->key));
-      emitcode ("mov", "a,_ap");
+      emitcode ("mov", "a,acc1");
       emitcode ("add", "a,#!constbyte", 0xFF);
-      emitcode ("mov", "_ap,a");
+      emitcode ("mov", "acc1,a");
       emitcode ("mov", "a,b");
       emitcode ("addc", "a,#!constbyte", 0xFF);
       emitcode ("mov", "b,a");
@@ -12787,7 +12787,7 @@ genOutp (iCode * ic, int nparms, operand ** parms)
       symbol *lbl1 = newiTempLabel (NULL);
 
       emitcode (";", " Auto increment but no djnz");
-      emitcode ("mov", "_ap,%s", aopGet (count, 0, FALSE, TRUE, NULL));
+      emitcode ("mov", "acc1,%s", aopGet (count, 0, FALSE, TRUE, NULL));
       emitcode ("mov", "b,%s", aopGet (count, 1, FALSE, TRUE, NULL));
       freeAsmop (count, NULL, ic, FALSE);
       emitcode ("mov", "dps,#!constbyte", 0x0); /* Select DPTR */
@@ -12798,11 +12798,11 @@ genOutp (iCode * ic, int nparms, operand ** parms)
       emitcode ("movx", "@dptr,a");
       emitcode ("dec", "dps");  /* switch to DPTR */
       emitcode ("mov", "a,b");
-      emitcode ("orl", "a,_ap");
+      emitcode ("orl", "a,acc1");
       emitcode ("jz", "!tlabel", labelKey2num (lbl1->key));
-      emitcode ("mov", "a,_ap");
+      emitcode ("mov", "a,acc1");
       emitcode ("add", "a,#!constbyte", 0xFF);
-      emitcode ("mov", "_ap,a");
+      emitcode ("mov", "acc1,a");
       emitcode ("mov", "a,b");
       emitcode ("addc", "a,#!constbyte", 0xFF);
       emitcode ("mov", "b,a");
@@ -12929,18 +12929,18 @@ genMemsetX (iCode * ic, int nparms, operand ** parms)
     {
       symbol *lbl1 = newiTempLabel (NULL);
 
-      emitcode ("mov", "_ap,%s", aopGet (count, 0, FALSE, TRUE, NULL));
+      emitcode ("mov", "acc1,%s", aopGet (count, 0, FALSE, TRUE, NULL));
       emitcode ("mov", "b,%s", aopGet (count, 1, FALSE, TRUE, NULL));
       emitLabel (lbl);
       MOVA (aopGet (val, 0, FALSE, FALSE, NULL));
       emitcode ("movx", "@dptr,a");
       emitcode ("inc", "dptr");
       emitcode ("mov", "a,b");
-      emitcode ("orl", "a,_ap");
+      emitcode ("orl", "a,acc1");
       emitcode ("jz", "!tlabel", labelKey2num (lbl1->key));
-      emitcode ("mov", "a,_ap");
+      emitcode ("mov", "a,acc1");
       emitcode ("add", "a,#!constbyte", 0xFF);
-      emitcode ("mov", "_ap,a");
+      emitcode ("mov", "acc1,a");
       emitcode ("mov", "a,b");
       emitcode ("addc", "a,#!constbyte", 0xFF);
       emitcode ("mov", "b,a");

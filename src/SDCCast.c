@@ -7087,8 +7087,11 @@ ast_print (ast * tree, FILE * outfile, int indent)
     return;
 
   /* can print only decorated trees */
-  if (!tree->decorated && !(indent & 0x100))
-    return;
+  if (!tree->decorated)
+    {
+      fprintf (outfile, "tree (%p) not decorated\n", tree);
+      return;
+    }
 
   /* if any child is an error | this one is an error do nothing */
   if (tree->isError || (tree->left && tree->left->isError) || (tree->right && tree->right->isError))
@@ -7843,7 +7846,7 @@ ast_print (ast * tree, FILE * outfile, int indent)
     case GOTO:
       fprintf (outfile, "GOTO (%p) \n", tree);
       ast_print (tree->left, outfile, indent + 2);
-      fprintf (outfile, "\n");
+      ast_print (tree->right, outfile, indent + 2);
       return;
 
     /*------------------------------------------------------------------*/

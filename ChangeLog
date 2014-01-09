@@ -1,5 +1,9 @@
 2014-01-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/SDCCast.c (ast_print): fixed GOTO, warn for undecorated
+
+2014-01-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* device/lib/_gptrget.c,
 	* device/lib/_gptrput.c,
 	* src/ds390/main.c,

@@ -221,6 +221,9 @@ struct	mne	mne[] = {
 /*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
 /*    {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},	*/
     {	NULL,	".end",		S_END,		0,	0	},
+/* sdas specific */
+    {   NULL,   ".optsdcc",     S_OPTSDCC,      0,      0       },
+/* end sdas specific */
 
 	/* Macro Processor */
 

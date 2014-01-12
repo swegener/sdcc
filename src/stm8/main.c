@@ -83,7 +83,6 @@ stm8_setDefaultOptions (void)
   options.intlong_rent = 1;
   options.float_rent = 1;
   options.noRegParams = 0;
-  options.noOptsdccInAsm = 1;
   options.data_loc = 0x0001;
   options.code_loc = 0x8000;
 

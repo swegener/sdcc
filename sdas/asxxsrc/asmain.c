@@ -1674,12 +1674,14 @@ loop:
                                 qerr();
                         c = getmap(d);
                         while (c >= 0) {
-                                if ((n = getmap(d)) >= 0) {
+                                int n2;
+                                if ((n2 = getmap(d)) >= 0) {
                                         outab(c);
                                 } else {
                                         outab(c | 0x80);
                                 }
-                                c = n;
+                                n = n2;
+                                c = n2;
                         }
                         break;
                 default:

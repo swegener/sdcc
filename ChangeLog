@@ -3,6 +3,9 @@
 	* sdas/asstm8/stm8mch.c,
 	  src/stm8/gen.c:
 	  Apply patch #215 by Ben Shi to fix bug #2227.
+	* src/port.h,
+	  sdas/asxxsrc/asmain.c:
+	  Fix >= comparisons.
 
 2014-01-12 Philipp Klaus Krause <pkk AT spth.de>
 

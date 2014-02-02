@@ -2274,7 +2274,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         }
       else if (!started &&
         (aopInReg (result_aop, i, X_IDX) || aopInReg (result_aop, i, Y_IDX)) &&
-        (right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD || aopOnStackNotExt (right_aop, i, 2) /* Bug #2227 || right_aop->type == AOP_DIR && i + 1 < right_aop->size */))
+        (right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD || aopOnStackNotExt (right_aop, i, 2) || right_aop->type == AOP_DIR && i + 1 < right_aop->size))
         {
           bool x = aopInReg (result_aop, i, X_IDX);
           genMove_o (x ? ASMOP_X : ASMOP_Y, 0, left_aop, i, 2, a_free, x, !x);
@@ -2310,7 +2310,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           i++;
         }
       else if (!started && (x_free || aopInReg(left_aop, i, X_IDX) && regDead (X_IDX, ic)) &&
-        (aopOnStackNotExt (right_aop, i, 2) || right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD /* Bug #2227 || right_aop->type == AOP_DIR && i + 1 < right_aop->size*/) &&
+        (aopOnStackNotExt (right_aop, i, 2) || right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD || right_aop->type == AOP_DIR && i + 1 < right_aop->size) &&
         ((aopOnStack (result_aop, i, 2) || result_aop->type == AOP_DIR) && (aopRS (left_aop) && !aopInReg(left_aop, i, A_IDX) && !aopInReg(left_aop, i + 1, A_IDX) || left_aop->type == AOP_DIR) ||
         aopInReg(left_aop, i, X_IDX) && aopInReg(result_aop, i, Y_IDX) ||
         aopInReg(left_aop, i, X_IDX) && (result_aop->regs[XL_IDX] < 0 || result_aop->regs[XL_IDX] >= i) && (result_aop->regs[XH_IDX] < 0 || result_aop->regs[XH_IDX] >= i) && (aopInReg(left_aop, i, XL_IDX) || aopInReg(left_aop, i + 1, XH_IDX) || aopInReg(left_aop, i, XH_IDX) && aopInReg(left_aop, i + 1, XL_IDX))))
@@ -2351,7 +2351,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
       else if (!started && (y_free || aopInReg(left_aop, i, Y_IDX) && regDead (Y_IDX, ic)) && 
         (aopOnStack (result_aop, i, 2) || result_aop->type == AOP_DIR) &&
         (aopOnStack (left_aop, i, 2) || aopInReg(left_aop, i, Y_IDX) || left_aop->type == AOP_DIR) &&
-        (aopOnStackNotExt (right_aop, i, 2) || right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD /*Bug #2227 || right_aop->type == AOP_DIR && i + 1 < right_aop->size*/))
+        (aopOnStackNotExt (right_aop, i, 2) || right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD || right_aop->type == AOP_DIR && i + 1 < right_aop->size))
         {
           genMove_o (ASMOP_Y, 0, left_aop, i, 2, a_free, TRUE, FALSE);
           if (i == size - 2 && right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) <= 2 && !byteOfVal (right_aop->aopu.aop_lit, i + 1))

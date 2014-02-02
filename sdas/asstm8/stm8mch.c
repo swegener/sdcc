@@ -399,7 +399,7 @@ struct mne *mp;
 			case Y:		outab(0xB2);	break;
 			default:			break;
 			}
-			outrb(&e1, R_USGN);
+			outrw(&e1, R_USGN);
 			break;
 		case S_IMM:	/* #arg */
 			switch(v2) {

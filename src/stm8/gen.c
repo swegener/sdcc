@@ -2153,7 +2153,13 @@ genCpl (const iCode *ic)
       // todo: Complement in source where dead and more efficient.
       if (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX))
         {
-          genMove_o (result->aop, i, left->aop, i, 2, (regDead (A_IDX, ic) || pushed_a) && !result_in_a && !(left_in_a > i), regFree (X_IDX, ic), regFree (Y_IDX, ic)); // todo: More aggressively report state of X and Y.
+          const bool x_free = regDead (X_IDX, ic) &&
+            left->aop->regs[XL_IDX] < i && left->aop->regs[XH_IDX] < i &&
+            (result->aop->regs[XL_IDX] < 0 || result->aop->regs[XL_IDX] >= i) && (result->aop->regs[XH_IDX] < 0 || result->aop->regs[XH_IDX] >= i);
+          const bool y_free = regDead (Y_IDX, ic) &&
+            left->aop->regs[YL_IDX] < i && left->aop->regs[YH_IDX] < i &&
+            (result->aop->regs[YL_IDX] < 0 || result->aop->regs[YL_IDX] >= i) && (result->aop->regs[YH_IDX] < 0 || result->aop->regs[YH_IDX] >= i);
+          genMove_o (result->aop, i, left->aop, i, 2, (regDead (A_IDX, ic) || pushed_a) && !result_in_a && !(left_in_a > i), x_free, y_free);
 
           emit3w_o (A_CPLW, result->aop, i, 0, 0);
 

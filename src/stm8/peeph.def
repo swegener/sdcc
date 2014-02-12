@@ -6,11 +6,33 @@ replace restart {
 	; peephole 0 removed dead load.
 } if notVolatile(%1), notVolatile(%2), notUsed(%1)
 
+replace restart {
+	ldw	%1, %2
+} by {
+	; peephole 0w removed dead load.
+} if notVolatile(%1), notVolatile(%2), notUsed(%1)
+
+replace {
+	ld	%1, %2
+	ld	%2, %1
+} by {
+	ld	%1, %2
+	; peephole 1 removed redundant load from %1 into %2.
+} if notVolatile(%1), notVolatile(%2)
+
+replace {
+	ldw	%1, %2
+	ldw	%2, %1
+} by {
+ 	ldw	%1, %2
+	; peephole 1w removed redundant load from %1 into %2.
+} if notVolatile(%1), notVolatile(%2)
+
 //replace restart {
 //	ld	%1, %2
 //	ld	%3, %1
 //} by {
-//	; peephole 1 loaded %3 from %2 directly instead of going through %1.
+//	; peephole 1b loaded %3 from %2 directly instead of going through %1.
 //	ld	%3, %2
 //} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
 
@@ -432,7 +454,7 @@ replace restart {
 	; peephole j18 removed unused label %1.
 } if labelRefCount(%1 0)
 
-// Barrier, since notUSed() is better at dealing with ret than with jp to unknown location.
+// Barrier, since notUsed() is better at dealing with ret than with jp to unknown location.
 barrier
 
 replace restart {

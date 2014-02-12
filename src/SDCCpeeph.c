@@ -663,15 +663,31 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
     }
   if (TARGET_Z80_LIKE)
     {
-      if (strstr(var,"(bc)"))
+      if (strstr (var, "(bc)"))
         return FALSE;
-      if (strstr(var,"(de)"))
+      if (strstr (var, "(de)"))
         return FALSE;
-      if (strstr(var,"(hl)"))
+      if (strstr (var, "(hl)"))
         return FALSE;
-      if (strstr(var,"(ix"))
+      if (strstr (var, "(ix"))
         return FALSE;
-      if (strstr(var,"(iy"))
+      if (strstr (var, "(iy"))
+        return FALSE;
+    }
+
+  if (TARGET_IS_STM8)
+    {
+      if (strstr (var, "(x)"))
+        return FALSE;
+      if (strstr (var, "(y)"))
+        return FALSE;
+      if (strstr (var, ", x)"))
+        return FALSE;
+      if (strstr (var, ", y)"))
+        return FALSE;
+      if (strstr (var, ", sp)"))
+        return FALSE;
+      if (strchr (var, "[") && strchr (var, "]"))
         return FALSE;
     }
 

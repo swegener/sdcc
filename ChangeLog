@@ -3,6 +3,10 @@
 	* src/stm8/gen.c,
 	  support/regression/tests/bug-2252.c:
 	  Fix bug #2252.
+	* src/SDCCpeeph.c:
+	  Fix notVolatile() for stm8.
+	* src/stm8/peeph.def:
+	  Add some peephole rules to eliminate unnecessary loads.
 
 2014-02-09 Philipp Klaus Krause <pkk AT spth.de>
 

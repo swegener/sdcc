@@ -3291,7 +3291,7 @@ genPlus (const iCode *ic)
         }
       else if (!started && i == size - 2 &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
-        aopIsLitVal (rightop, i, 2, 0x00ff))
+        aopIsLitVal (rightop, i, 2, 0xffff))
         {
           bool x = aopInReg (result->aop, i, X_IDX);
           genMove_o (x ? ASMOP_X : ASMOP_Y, 0, leftop, i, 2, a_free, x, !x);

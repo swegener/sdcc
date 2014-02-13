@@ -3498,27 +3498,28 @@ genMult (const iCode *ic)
   emitcode ("mul", use_y ? "y, a" : "x, a");
   cost (1 + use_y, 4);
 
-  genMove (result->aop, use_y ? ASMOP_Y : ASMOP_X,  TRUE, !use_y || regDead (X_IDX, ic), use_y || regDead (Y_IDX, ic)); // todo: Allow use of x, y.
+  genMove (result->aop, use_y ? ASMOP_Y : ASMOP_X,  TRUE, !use_y || regDead (X_IDX, ic), use_y || regDead (Y_IDX, ic));
 
   if (!regDead (A_IDX, ic))
     pop (ASMOP_A, 0, 1);
   if (!regDead (use_y ? Y_IDX : X_IDX, ic))
     {
-      if (regDead (use_y ? YH_IDX : XH_IDX, ic))
+      if (result->aop->regs[use_y ? YH_IDX : XH_IDX] >= 0)
         {
           adjustStack (1, FALSE, FALSE, FALSE);
           swap_to_a (use_y ? YL_IDX : XL_IDX);
           pop (ASMOP_A, 0, 1);
           swap_from_a(use_y ? YL_IDX : XL_IDX);
         }
-      else if (regDead (use_y ? YL_IDX : XL_IDX, ic))
+      else if (result->aop->regs[use_y ? YL_IDX : XL_IDX] >= 0)
         {
           swap_to_a (use_y ? YH_IDX : XH_IDX);
           pop (ASMOP_A, 0, 1);
           swap_from_a(use_y ? YH_IDX : XH_IDX);
           adjustStack (1, FALSE, FALSE, FALSE);
         }
-      pop (use_y ? ASMOP_Y : ASMOP_X, 0, 2);
+      else
+        pop (use_y ? ASMOP_Y : ASMOP_X, 0, 2);
     }
 
   freeAsmop (right);
@@ -3566,7 +3567,7 @@ genDivMod2 (const iCode *ic)
           wassert (regalloc_dry_run);
           cost (180, 180);
         }
-      genMove (ASMOP_X, right->aop, TRUE, TRUE, FALSE);
+      genMove (ASMOP_X, left->aop, TRUE, TRUE, FALSE);
       pop (ASMOP_Y, 0, 2);
 
       if (!regDead (A_IDX, ic))
@@ -3621,21 +3622,22 @@ genDivMod2 (const iCode *ic)
 
   if (!regDead (Y_IDX, ic))
     {
-      if (regDead (YH_IDX, ic))
+      if (result->aop->regs[YH_IDX] >= 0)
         {
           adjustStack (1, FALSE, FALSE, FALSE);
           swap_to_a (YL_IDX);
           pop (ASMOP_A, 0, 1);
           swap_from_a(YL_IDX);
         }
-      else if (regDead (YL_IDX, ic))
+      else if (result->aop->regs[YL_IDX] >= 0)
         {
           swap_to_a (YH_IDX);
           pop (ASMOP_A, 0, 1);
           swap_from_a(YH_IDX);
           adjustStack (1, FALSE, FALSE, FALSE);
         }
-      pop (ASMOP_Y, 0, 2);
+      else
+        pop (ASMOP_Y, 0, 2);
     }
 
   if (stm8_extend_stack)
@@ -3643,21 +3645,22 @@ genDivMod2 (const iCode *ic)
 
   if (!regDead (X_IDX, ic))
     {
-      if (regDead (XH_IDX, ic))
+      if (result->aop->regs[XH_IDX] >= 0)
         {
           adjustStack (1, FALSE, FALSE, FALSE);
           swap_to_a (XL_IDX);
           pop (ASMOP_A, 0, 1);
           swap_from_a(XL_IDX);
         }
-      else if (regDead (XL_IDX, ic))
+      else if (result->aop->regs[XL_IDX] >= 0)
         {
           swap_to_a (XH_IDX);
           pop (ASMOP_A, 0, 1);
           swap_from_a(XH_IDX);
           adjustStack (1, FALSE, FALSE, FALSE);
         }
-      pop (ASMOP_X, 0, 2);
+      else
+        pop (ASMOP_X, 0, 2);
     }
 }
 
@@ -3682,33 +3685,34 @@ genDivMod1 (const iCode *ic)
   if (!regDead (A_IDX, ic))
     push (ASMOP_A, 0, 1);
 
-  genMove_o (use_y ? ASMOP_Y : ASMOP_X, 0, left->aop, 0, 2, FALSE, FALSE, FALSE); // todo: Allow more.
+  genMove_o (use_y ? ASMOP_Y : ASMOP_X, 0, left->aop, 0, 2, right->aop->regs[A_IDX] < 0, FALSE, FALSE);
   cheapMove (ASMOP_A, 0, right->aop, 0, TRUE);
 
   emitcode ("div", use_y ? "y, a" : "x, a");
   cost (1 + use_y, 17);
 
-  genMove_o (result->aop, 0, ic->op == '/' ? (use_y ? ASMOP_Y : ASMOP_X) : ASMOP_A, 0, result->aop->size, TRUE, FALSE, FALSE); // todo: Allow more.
+  genMove_o (result->aop, 0, ic->op == '/' ? (use_y ? ASMOP_Y : ASMOP_X) : ASMOP_A, 0, result->aop->size, TRUE, !use_y || regDead(X_IDX, ic), use_y || regDead(Y_IDX, ic));
 
   if (!regDead (A_IDX, ic))
     pop (ASMOP_A, 0, 1);
   if (!regDead (use_y ? Y_IDX : X_IDX, ic))
     {
-      if (regDead (use_y ? YH_IDX : XH_IDX, ic))
+      if (result->aop->regs[use_y ? YH_IDX : XH_IDX] >= 0)
         {
           adjustStack (1, FALSE, FALSE, FALSE);
           swap_to_a (use_y ? YL_IDX : XL_IDX);
           pop (ASMOP_A, 0, 1);
           swap_from_a(use_y ? YL_IDX : XL_IDX);
         }
-      else if (regDead (use_y ? YL_IDX : XL_IDX, ic))
+      else if (result->aop->regs[use_y ? YL_IDX : XL_IDX] >= 0)
         {
           swap_to_a (use_y ? YH_IDX : XH_IDX);
           pop (ASMOP_A, 0, 1);
           swap_from_a(use_y ? YH_IDX : XH_IDX);
           adjustStack (1, FALSE, FALSE, FALSE);
         }
-      pop (use_y ? ASMOP_Y : ASMOP_X, 0, 2);
+      else
+        pop (use_y ? ASMOP_Y : ASMOP_X, 0, 2);
     }
 }
 

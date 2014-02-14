@@ -2703,7 +2703,7 @@ emitCall (const iCode *ic, bool ispcall)
           emitcode ("call", "%s", aopGet2 (left->aop, 0));
           cost (3, 4);
         }
-      else if (aopInReg (left->aop, 0, Y_IDX)) // Faster than ging through x.
+      else if (aopInReg (left->aop, 0, Y_IDX)) // Faster than going through x.
         {
           emitcode ("call", "(y)");
           cost (2, 4);

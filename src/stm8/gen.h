@@ -38,7 +38,7 @@ typedef enum
   AOP_DIR,
   /* Read undefined, discard writes */
   AOP_DUMMY,
-  /* Has been optimized by jumping directly (see ifxForOp) */
+  /* Has been optimized out by jumping directly (see ifxForOp) */
   AOP_CND
 }
 AOP_TYPE;

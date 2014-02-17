@@ -4,6 +4,13 @@
 
 #include <testfwk.h>
 
+/* Reduce array size for ports that can't handle large local variables */
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic16)
+ #define ARRAYSIZE 255
+#else
+ #define ARRAYSIZE 2
+#endif
+
 char ad(char *p)
 {
   p;
@@ -11,7 +18,7 @@ char ad(char *p)
 
 unsigned int ss(unsigned int c, unsigned int d)
 {
-  char s1[255];
+  char s1[ARRAYSIZE];
   ad(s1);
   return c / d;
 }

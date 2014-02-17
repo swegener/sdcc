@@ -1,3 +1,8 @@
+2014-02-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug-2253.c: reduce array size for
+	  ports that do not support large local variables
+
 2014-02-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/stm8/gen.c,

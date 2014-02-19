@@ -4569,15 +4569,15 @@ genAnd (const iCode *ic, iCode *ifx)
     }
   if (ifx && getSize (operandType (result)) <= 1 && right->aop->type == AOP_LIT) // TODO: Use 16-bit shifts. Allow non-literal (and enable in ralloc2.cc)
     {
-      symbol * tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
+      symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
 
-      if ((ulFromVal (right->aop->aopu.aop_lit) == 0x01 || ulFromVal (right->aop->aopu.aop_lit) == 0x80) &&
+      if ((byteOfVal (right->aop->aopu.aop_lit, 0) == 0x01 || byteOfVal (right->aop->aopu.aop_lit, 0) == 0x80) &&
         (regDead (A_IDX, ic) || !aopInReg (left->aop, 0, A_IDX)))
         {
           if (!regDead (A_IDX, ic))
             push (ASMOP_A, 0, 1);
           cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
-          emit3 (ulFromVal (right->aop->aopu.aop_lit) == 0x01 ? A_SRL : A_SLL, ASMOP_A, 0);
+          emit3 (byteOfVal (right->aop->aopu.aop_lit, 0) == 0x01 ? A_SRL : A_SLL, ASMOP_A, 0);
           if (!regDead (A_IDX, ic))
             pop (ASMOP_A, 0, 1);
           if (!regalloc_dry_run)

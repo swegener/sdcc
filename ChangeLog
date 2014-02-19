@@ -1,6 +1,11 @@
 2014-02-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/stm8/gen.c:
+	  Fix condition for shifting stack operands in a.
+
+2014-02-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
 	  Handle signed and unsigned 8-bit operands the same in destructive ifx and.
 
 2014-02-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

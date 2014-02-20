@@ -2106,13 +2106,11 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType)
 {
   iCode *ic;
   int p2 = 0;
-  sym_link *resType;
+  sym_link *resType = usualBinaryConversions (&left, &right, resultType, '/');
   sym_link *rtype = operandType (right);
   sym_link *retype = getSpec (rtype);
   sym_link *ltype = operandType (left);
   sym_link *letype = getSpec (ltype);
-
-  resType = usualBinaryConversions (&left, &right, resultType, '/');
 
   /* if the right is a literal & power of 2
      and left is signed then make it a conditional addition

@@ -4809,8 +4809,8 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
             {
               shiftop_impl.aopu.bytes[i] = ASMOP_Y->aopu.bytes[0];
               shiftop_impl.aopu.bytes[i + 1] = ASMOP_Y->aopu.bytes[1];
-              shiftop_impl.regs[XL_IDX] = i;
-              shiftop_impl.regs[XH_IDX] = i + 1;
+              shiftop_impl.regs[YL_IDX] = i;
+              shiftop_impl.regs[YH_IDX] = i + 1;
               i += 2;
             }
           else if (size == 1 && aopOnStack (left->aop, 0, 1) && aopOnStack (result->aop, 0, 1) && regDead (A_IDX, ic) && shiftop->regs[A_IDX] == -1 && result->aop->regs[A_IDX] == -1 && left->aop->regs[A_IDX] == -1) // TODO: More cases.
@@ -5150,11 +5150,11 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
                 {
                   shiftop_impl.aopu.bytes[i] = ASMOP_Y->aopu.bytes[0];
                   shiftop_impl.aopu.bytes[i + 1] = ASMOP_Y->aopu.bytes[1];
-                  shiftop_impl.regs[XL_IDX] = i;
-                  shiftop_impl.regs[XH_IDX] = i + 1;
+                  shiftop_impl.regs[YL_IDX] = i;
+                  shiftop_impl.regs[YH_IDX] = i + 1;
                   i += 2;
                 }
-              else if (size == 1 && aopOnStack (left->aop, 0, 1) && aopOnStack (right->aop, 0, 1) && regDead (A_IDX, ic) && shiftop->regs[A_IDX] == -1 && result->aop->regs[A_IDX] == -1 && left->aop->regs[A_IDX] == -1) // TODO: More cases.
+              else if (size == 1 && aopOnStack (left->aop, 0, 1) && aopOnStack (result->aop, 0, 1) && regDead (A_IDX, ic) && shiftop->regs[A_IDX] == -1 && result->aop->regs[A_IDX] == -1 && left->aop->regs[A_IDX] == -1) // TODO: More cases.
                 {
                   shiftop_impl.aopu.bytes[i] = ASMOP_A->aopu.bytes[0];
                   shiftop_impl.regs[A_IDX] = i;

@@ -1,3 +1,10 @@
+2014-02-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/peeph.def:
+	  Applied patch #222 by Ben Shi (new peephole to make shifts slightly more efficient).
+	* src/stm8/gen.c:
+	  Applied patch #221 by Ben Shi (fix some bugs in shifts).
+
 2014-02-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeDivision): Fixed bug 2254

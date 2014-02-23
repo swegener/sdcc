@@ -5497,14 +5497,14 @@ genPointerGet (const iCode *ic)
         }
 
       if (bit_field && blen <= 8 && !SPEC_USIGN (getSpec (operandType (result)))) // Sign extension for partial byte of signed bit-field
-        {   
-          push (ASMOP_A, 0, 1);
-          emitcode ("and", "a, #0x%02x", 0x80 >> (8 - blen));
-          pop (ASMOP_A, 0, 1);
+        {  
+          emitcode ("bcp", "a, #0x%02x", 0x80 >> (8 - blen));
+          cost (2, 1);
           if (tlbl)
             emitcode ("jreq", "!tlabel", labelKey2num (tlbl->key));
           cost (2, 0);
           emitcode ("or", "a, #0x%02x", (0xff00 >> (8 - blen)) & 0xff);
+          cost (2, 1);
           emitLabel (tlbl);
         }
 

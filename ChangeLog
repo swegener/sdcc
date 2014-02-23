@@ -1,3 +1,10 @@
+2014-02-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Applied patch #223 by Ben Shi to improve code size for signed bit-fields on stm8.
+	* src/stm8/main.c:
+	  Applied patch #225 by Pascal S to enable naked functions for stm8.
+
 2014-02-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/stm8/peeph.def:

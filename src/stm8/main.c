@@ -40,6 +40,7 @@ static char *stm8_keywords[] = {
   "at",
   "critical",
   "interrupt",
+  "naked",
   NULL
 };
 

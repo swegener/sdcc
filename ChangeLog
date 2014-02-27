@@ -1,3 +1,8 @@
+2014-02-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Applied patch #227 by Ben Shi to fix jumping on float in y and to speed up jumping on byte in yl.
+
 2014-02-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

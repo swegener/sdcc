@@ -5806,36 +5806,12 @@ genIfx (const iCode *ic)
               emit3 (floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
               i++;
             }
-          else if (!floattopbyte && aopInReg (cond->aop, i, XL_IDX))
+          else if ((aopInReg (cond->aop, i, XL_IDX) || aopInReg (cond->aop, i, XH_IDX) || aopInReg (cond->aop, i, YL_IDX) || aopInReg (cond->aop, i, YH_IDX)) &&
+            (!floattopbyte || regDead (cond->aop->aopu.bytes[i].byteu.reg->rIdx, ic)))
             {
-              emitcode ("exg", "a, xl");
-              cost (1, 1);
-              emit3(A_TNZ, ASMOP_A, 0);
-              emitcode ("exg", "a, xl");
-              cost (1, 1);
-              i++;
-            }
-          else if (!floattopbyte && aopInReg (cond->aop, i, YL_IDX))
-            {
-              emitcode ("exg", "a, yl");
-              cost (1, 1);
-              emit3(A_TNZ, ASMOP_A, 0);
-              emitcode ("exg", "a, yl");
-              cost (1, 1);
-              i++;
-            }
-          else if (!floattopbyte && aopInReg (cond->aop, i, XH_IDX))
-            {
-              push (ASMOP_X, 0, 2);
-              emitcode ("tnz", "(1, sp)");
-              adjustStack (2, FALSE, FALSE, FALSE);
-              i++;
-            }
-          else if (!floattopbyte && aopInReg (cond->aop, i, YH_IDX))
-            {
-              push (ASMOP_Y, 0, 2);
-              emitcode ("tnz", "(1, sp)");
-              adjustStack (2, FALSE, FALSE, FALSE);
+              swap_to_a (cond->aop->aopu.bytes[i].byteu.reg->rIdx);
+              emit3 (floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
+              swap_from_a (cond->aop->aopu.bytes[i].byteu.reg->rIdx);
               i++;
             }
           else if(!floattopbyte)

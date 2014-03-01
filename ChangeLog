@@ -1,6 +1,10 @@
+2014-03-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/stm8/gen.c: retry to revert previous two changes
+
 2014-02-28 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* src/stm8/gen.c: reverted previous two changes
+	* src/stm8/gen.c: reverted previous two changes (not committed)
 	* .version,
 	* doc/INSTALL.txt,
 	* doc/sdccman.lyx: version 3.4.0 rc1

@@ -687,7 +687,7 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
         return FALSE;
       if (strstr (var, ", sp)"))
         return FALSE;
-      if (strchr (var, "[") && strchr (var, "]"))
+      if (strchr (var, '[') && strchr (var, ']'))
         return FALSE;
     }
 

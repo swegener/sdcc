@@ -1,3 +1,7 @@
+2014-03-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCpeeph.c (notVolatileVariable): fixed strchr params
+
 2014-03-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/stm8/gen.c: retry to revert previous two changes

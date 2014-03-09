@@ -2,9 +2,9 @@
  * This definitions of the PIC18F45K50 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:53 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:42 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -403,14 +403,14 @@ __at(0x0FC5) volatile __SSP1CON2bits_t SSP1CON2bits;
 __at(0x0FC5) __sfr SSPCON2;
 __at(0x0FC5) volatile __SSPCON2bits_t SSPCON2bits;
 
-__at(0x0FC6) __sfr SSP1CON;
-__at(0x0FC6) volatile __SSP1CONbits_t SSP1CONbits;
-
 __at(0x0FC6) __sfr SSP1CON1;
 __at(0x0FC6) volatile __SSP1CON1bits_t SSP1CON1bits;
 
 __at(0x0FC6) __sfr SSPCON;
 __at(0x0FC6) volatile __SSPCONbits_t SSPCONbits;
+
+__at(0x0FC6) __sfr SSPCON1;
+__at(0x0FC6) volatile __SSPCON1bits_t SSPCON1bits;
 
 __at(0x0FC7) __sfr SSP1STAT;
 __at(0x0FC7) volatile __SSP1STATbits_t SSP1STATbits;

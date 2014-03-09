@@ -2,9 +2,9 @@
  * This declarations of the PIC16HV753 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2013-05-11 12:31:38 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:06 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -70,8 +70,8 @@
 #define OSCCON_ADDR             0x008F
 #define FVR1CON0_ADDR           0x0090
 #define DAC1CON0_ADDR           0x0091
-#define DAC1CON1_ADDR           0x0092
-#define DAC1CON2_ADDR           0x0093
+#define DAC1REFL_ADDR           0x0092
+#define DAC1REFH_ADDR           0x0093
 #define OPA1CON_ADDR            0x0096
 #define C2CON0_ADDR             0x009B
 #define CM2CON0_ADDR            0x009B
@@ -94,15 +94,17 @@
 #define TMR2_ADDR               0x0110
 #define PR2_ADDR                0x0111
 #define T2CON_ADDR              0x0112
-#define TMR4A_ADDR              0x0113
-#define PR4A_ADDR               0x0114
-#define T4ACON0_ADDR            0x0115
-#define T4ACON1_ADDR            0x0116
-#define TMR6A_ADDR              0x0117
-#define PR6A_ADDR               0x0118
-#define T6ACON0_ADDR            0x0119
-#define T6ACON1_ADDR            0x011A
+#define HLTMR1_ADDR             0x0113
+#define HLTPR1_ADDR             0x0114
+#define HLT1CON0_ADDR           0x0115
+#define HLT1CON1_ADDR           0x0116
+#define HLTMR2_ADDR             0x0117
+#define HLTPR2_ADDR             0x0118
+#define HLT2CON0_ADDR           0x0119
+#define HLT2CON1_ADDR           0x011A
+#define SLPC1CON0_ADDR          0x011E
 #define SLPCCON0_ADDR           0x011E
+#define SLPC1CON1_ADDR          0x011F
 #define SLPCCON1_ADDR           0x011F
 #define ANSELA_ADDR             0x0185
 #define ANSELC_ADDR             0x0187
@@ -378,8 +380,8 @@ typedef struct
   {
   unsigned TMR1IF               : 1;
   unsigned TMR2IF               : 1;
-  unsigned TMR4AIF              : 1;
-  unsigned TMR6AIF              : 1;
+  unsigned HLTMR1IF             : 1;
+  unsigned HLTMR2IF             : 1;
   unsigned                      : 1;
   unsigned                      : 1;
   unsigned ADIF                 : 1;
@@ -390,8 +392,8 @@ extern __at(0x000C) volatile __PIR1bits_t PIR1bits;
 
 #define _TMR1IF                 0x01
 #define _TMR2IF                 0x02
-#define _TMR4AIF                0x04
-#define _TMR6AIF                0x08
+#define _HLTMR1IF               0x04
+#define _HLTMR2IF               0x08
 #define _ADIF                   0x40
 #define _TMR1GIF                0x80
 
@@ -855,8 +857,8 @@ typedef struct
   {
   unsigned TMR1IE               : 1;
   unsigned TMR2IE               : 1;
-  unsigned TMR4AIE              : 1;
-  unsigned TMR6AIE              : 1;
+  unsigned HLTMR1IE             : 1;
+  unsigned HLTMR2IE             : 1;
   unsigned                      : 1;
   unsigned                      : 1;
   unsigned ADIE                 : 1;
@@ -867,8 +869,8 @@ extern __at(0x008C) volatile __PIE1bits_t PIE1bits;
 
 #define _TMR1IE                 0x01
 #define _TMR2IE                 0x02
-#define _TMR4AIE                0x04
-#define _TMR6AIE                0x08
+#define _HLTMR1IE               0x04
+#define _HLTMR2IE               0x08
 #define _ADIE                   0x40
 #define _TMR1GIE                0x80
 
@@ -1015,8 +1017,8 @@ extern __at(0x0091) volatile __DAC1CON0bits_t DAC1CON0bits;
 
 //==============================================================================
 
-extern __at(0x0092) __sfr DAC1CON1;
-extern __at(0x0093) __sfr DAC1CON2;
+extern __at(0x0092) __sfr DAC1REFL;
+extern __at(0x0093) __sfr DAC1REFH;
 
 //==============================================================================
 //        OPA1CON Bits
@@ -1027,10 +1029,10 @@ typedef union
   {
   struct
     {
-    unsigned OPAPCH0            : 1;
-    unsigned OPAPCH1            : 1;
-    unsigned OPANCH0            : 1;
-    unsigned OPANCH1            : 1;
+    unsigned OPA1PCH0           : 1;
+    unsigned OPA1PCH1           : 1;
+    unsigned OPA1NCH0           : 1;
+    unsigned OPA1NCH1           : 1;
     unsigned OPAUGM             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -1039,24 +1041,24 @@ typedef union
 
   struct
     {
-    unsigned OPAPCH             : 2;
+    unsigned OPA1PCH            : 2;
     unsigned                    : 6;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned OPANCH             : 2;
+    unsigned OPA1NCH            : 2;
     unsigned                    : 4;
     };
   } __OPA1CONbits_t;
 
 extern __at(0x0096) volatile __OPA1CONbits_t OPA1CONbits;
 
-#define _OPAPCH0                0x01
-#define _OPAPCH1                0x02
-#define _OPANCH0                0x04
-#define _OPANCH1                0x08
+#define _OPA1PCH0               0x01
+#define _OPA1PCH1               0x02
+#define _OPA1NCH0               0x04
+#define _OPA1NCH1               0x08
 #define _OPAUGM                 0x10
 #define _OPAEN                  0x80
 
@@ -1740,179 +1742,218 @@ extern __at(0x0112) volatile __T2CONbits_t T2CONbits;
 
 //==============================================================================
 
-extern __at(0x0113) __sfr TMR4A;
-extern __at(0x0114) __sfr PR4A;
+extern __at(0x0113) __sfr HLTMR1;
+extern __at(0x0114) __sfr HLTPR1;
 
 //==============================================================================
-//        T4ACON0 Bits
+//        HLT1CON0 Bits
 
-extern __at(0x0115) __sfr T4ACON0;
+extern __at(0x0115) __sfr HLT1CON0;
 
 typedef union
   {
   struct
     {
-    unsigned T4ACKPS0           : 1;
-    unsigned T4ACKPS1           : 1;
-    unsigned TMR4AON            : 1;
-    unsigned T4OUTPS0           : 1;
-    unsigned T4OUTPS1           : 1;
-    unsigned T4OUTPS2           : 1;
-    unsigned T4OUTPS3           : 1;
+    unsigned H1CKPS0            : 1;
+    unsigned H1CKPS1            : 1;
+    unsigned H1ON               : 1;
+    unsigned H1OUTPS0           : 1;
+    unsigned H1OUTPS1           : 1;
+    unsigned H1OUTPS2           : 1;
+    unsigned H1OUTPS3           : 1;
     unsigned                    : 1;
     };
 
   struct
     {
-    unsigned T4ACKPS            : 2;
+    unsigned H1CKPS             : 2;
     unsigned                    : 6;
     };
 
   struct
     {
     unsigned                    : 3;
-    unsigned T4OUTPS            : 4;
+    unsigned H1OUTPS            : 4;
     unsigned                    : 1;
     };
-  } __T4ACON0bits_t;
+  } __HLT1CON0bits_t;
 
-extern __at(0x0115) volatile __T4ACON0bits_t T4ACON0bits;
+extern __at(0x0115) volatile __HLT1CON0bits_t HLT1CON0bits;
 
-#define _T4ACKPS0               0x01
-#define _T4ACKPS1               0x02
-#define _TMR4AON                0x04
-#define _T4OUTPS0               0x08
-#define _T4OUTPS1               0x10
-#define _T4OUTPS2               0x20
-#define _T4OUTPS3               0x40
-
-//==============================================================================
-
+#define _H1CKPS0                0x01
+#define _H1CKPS1                0x02
+#define _H1ON                   0x04
+#define _H1OUTPS0               0x08
+#define _H1OUTPS1               0x10
+#define _H1OUTPS2               0x20
+#define _H1OUTPS3               0x40
 
 //==============================================================================
-//        T4ACON1 Bits
 
-extern __at(0x0116) __sfr T4ACON1;
+
+//==============================================================================
+//        HLT1CON1 Bits
+
+extern __at(0x0116) __sfr HLT1CON1;
 
 typedef union
   {
   struct
     {
-    unsigned T4ARIREN           : 1;
-    unsigned T4AFIREN           : 1;
-    unsigned T4AERS0            : 1;
-    unsigned T4AERS1            : 1;
-    unsigned T4AERS2            : 1;
+    unsigned H1REREN            : 1;
+    unsigned H1FEREN            : 1;
+    unsigned H1ERS0             : 1;
+    unsigned H1ERS1             : 1;
+    unsigned H1ERS2             : 1;
     unsigned                    : 1;
-    unsigned T4ARIMS            : 1;
-    unsigned T4AFIMS            : 1;
+    unsigned H1RES              : 1;
+    unsigned H1FES              : 1;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned T4AERS             : 3;
+    unsigned H1ERS              : 3;
     unsigned                    : 3;
     };
-  } __T4ACON1bits_t;
+  } __HLT1CON1bits_t;
 
-extern __at(0x0116) volatile __T4ACON1bits_t T4ACON1bits;
+extern __at(0x0116) volatile __HLT1CON1bits_t HLT1CON1bits;
 
-#define _T4ARIREN               0x01
-#define _T4AFIREN               0x02
-#define _T4AERS0                0x04
-#define _T4AERS1                0x08
-#define _T4AERS2                0x10
-#define _T4ARIMS                0x40
-#define _T4AFIMS                0x80
-
-//==============================================================================
-
-extern __at(0x0117) __sfr TMR6A;
-extern __at(0x0118) __sfr PR6A;
+#define _H1REREN                0x01
+#define _H1FEREN                0x02
+#define _H1ERS0                 0x04
+#define _H1ERS1                 0x08
+#define _H1ERS2                 0x10
+#define _H1RES                  0x40
+#define _H1FES                  0x80
 
 //==============================================================================
-//        T6ACON0 Bits
 
-extern __at(0x0119) __sfr T6ACON0;
+extern __at(0x0117) __sfr HLTMR2;
+extern __at(0x0118) __sfr HLTPR2;
+
+//==============================================================================
+//        HLT2CON0 Bits
+
+extern __at(0x0119) __sfr HLT2CON0;
 
 typedef union
   {
   struct
     {
-    unsigned T6ACKPS0           : 1;
-    unsigned T6ACKPS1           : 1;
-    unsigned TMR6AON            : 1;
-    unsigned T6OUTPS0           : 1;
-    unsigned T6OUTPS1           : 1;
-    unsigned T6OUTPS2           : 1;
-    unsigned T6OUTPS3           : 1;
+    unsigned H2CKPS0            : 1;
+    unsigned H2CKPS1            : 1;
+    unsigned H2ON               : 1;
+    unsigned H2OUTPS0           : 1;
+    unsigned H2OUTPS1           : 1;
+    unsigned H2OUTPS2           : 1;
+    unsigned H2OUTPS3           : 1;
     unsigned                    : 1;
     };
 
   struct
     {
-    unsigned T6ACKPS            : 2;
+    unsigned H2CKPS             : 2;
     unsigned                    : 6;
     };
 
   struct
     {
     unsigned                    : 3;
-    unsigned T6OUTPS            : 4;
+    unsigned H2OUTPS            : 4;
     unsigned                    : 1;
     };
-  } __T6ACON0bits_t;
+  } __HLT2CON0bits_t;
 
-extern __at(0x0119) volatile __T6ACON0bits_t T6ACON0bits;
+extern __at(0x0119) volatile __HLT2CON0bits_t HLT2CON0bits;
 
-#define _T6ACKPS0               0x01
-#define _T6ACKPS1               0x02
-#define _TMR6AON                0x04
-#define _T6OUTPS0               0x08
-#define _T6OUTPS1               0x10
-#define _T6OUTPS2               0x20
-#define _T6OUTPS3               0x40
-
-//==============================================================================
-
+#define _H2CKPS0                0x01
+#define _H2CKPS1                0x02
+#define _H2ON                   0x04
+#define _H2OUTPS0               0x08
+#define _H2OUTPS1               0x10
+#define _H2OUTPS2               0x20
+#define _H2OUTPS3               0x40
 
 //==============================================================================
-//        T6ACON1 Bits
 
-extern __at(0x011A) __sfr T6ACON1;
+
+//==============================================================================
+//        HLT2CON1 Bits
+
+extern __at(0x011A) __sfr HLT2CON1;
 
 typedef union
   {
   struct
     {
-    unsigned T6ARIREN           : 1;
-    unsigned T6AFIREN           : 1;
-    unsigned T6ERS0             : 1;
-    unsigned T6ERS1             : 1;
-    unsigned T6ERS2             : 1;
+    unsigned H2REREN            : 1;
+    unsigned H2FEREN            : 1;
+    unsigned H2ERS0             : 1;
+    unsigned H2ERS1             : 1;
+    unsigned H2ERS2             : 1;
     unsigned                    : 1;
-    unsigned T6ARIMS            : 1;
-    unsigned T6AFIMS            : 1;
+    unsigned H2RES              : 1;
+    unsigned H2FES              : 1;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned T6ERS              : 3;
+    unsigned H2ERS              : 3;
     unsigned                    : 3;
     };
-  } __T6ACON1bits_t;
+  } __HLT2CON1bits_t;
 
-extern __at(0x011A) volatile __T6ACON1bits_t T6ACON1bits;
+extern __at(0x011A) volatile __HLT2CON1bits_t HLT2CON1bits;
 
-#define _T6ARIREN               0x01
-#define _T6AFIREN               0x02
-#define _T6ERS0                 0x04
-#define _T6ERS1                 0x08
-#define _T6ERS2                 0x10
-#define _T6ARIMS                0x40
-#define _T6AFIMS                0x80
+#define _H2REREN                0x01
+#define _H2FEREN                0x02
+#define _H2ERS0                 0x04
+#define _H2ERS1                 0x08
+#define _H2ERS2                 0x10
+#define _H2RES                  0x40
+#define _H2FES                  0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        SLPC1CON0 Bits
+
+extern __at(0x011E) __sfr SLPC1CON0;
+
+typedef union
+  {
+  struct
+    {
+    unsigned SC1INS             : 1;
+    unsigned                    : 1;
+    unsigned SCS1TSS0           : 1;
+    unsigned SCS1TSS1           : 1;
+    unsigned SC1POL             : 1;
+    unsigned SC1MRPE            : 1;
+    unsigned                    : 1;
+    unsigned SC1EN              : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned SCS1TSS            : 2;
+    unsigned                    : 4;
+    };
+  } __SLPC1CON0bits_t;
+
+extern __at(0x011E) volatile __SLPC1CON0bits_t SLPC1CON0bits;
+
+#define _SC1INS                 0x01
+#define _SCS1TSS0               0x04
+#define _SCS1TSS1               0x08
+#define _SC1POL                 0x10
+#define _SC1MRPE                0x20
+#define _SC1EN                  0x80
 
 //==============================================================================
 
@@ -1928,8 +1969,8 @@ typedef union
     {
     unsigned SC1INS             : 1;
     unsigned                    : 1;
-    unsigned SC1TSS0            : 1;
-    unsigned SC1TSS1            : 1;
+    unsigned SCS1TSS0           : 1;
+    unsigned SCS1TSS1           : 1;
     unsigned SC1POL             : 1;
     unsigned SC1MRPE            : 1;
     unsigned                    : 1;
@@ -1939,19 +1980,56 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned SC1TSS             : 2;
+    unsigned SCS1TSS            : 2;
     unsigned                    : 4;
     };
   } __SLPCCON0bits_t;
 
 extern __at(0x011E) volatile __SLPCCON0bits_t SLPCCON0bits;
 
-#define _SC1INS                 0x01
-#define _SC1TSS0                0x04
-#define _SC1TSS1                0x08
-#define _SC1POL                 0x10
-#define _SC1MRPE                0x20
-#define _SC1EN                  0x80
+#define _SLPCCON0_SC1INS        0x01
+#define _SLPCCON0_SCS1TSS0      0x04
+#define _SLPCCON0_SCS1TSS1      0x08
+#define _SLPCCON0_SC1POL        0x10
+#define _SLPCCON0_SC1MRPE       0x20
+#define _SLPCCON0_SC1EN         0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        SLPC1CON1 Bits
+
+extern __at(0x011F) __sfr SLPC1CON1;
+
+typedef union
+  {
+  struct
+    {
+    unsigned SC1ISET0           : 1;
+    unsigned SC1ISET1           : 1;
+    unsigned SC1ISET2           : 1;
+    unsigned SC1ISET3           : 1;
+    unsigned SC1RNG             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned SC1ISET            : 4;
+    unsigned                    : 4;
+    };
+  } __SLPC1CON1bits_t;
+
+extern __at(0x011F) volatile __SLPC1CON1bits_t SLPC1CON1bits;
+
+#define _SC1ISET0               0x01
+#define _SC1ISET1               0x02
+#define _SC1ISET2               0x04
+#define _SC1ISET3               0x08
+#define _SC1RNG                 0x10
 
 //==============================================================================
 
@@ -1969,7 +2047,7 @@ typedef union
     unsigned SC1ISET1           : 1;
     unsigned SC1ISET2           : 1;
     unsigned SC1ISET3           : 1;
-    unsigned SC1ISET4           : 1;
+    unsigned SC1RNG             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -1977,18 +2055,18 @@ typedef union
 
   struct
     {
-    unsigned SC1ISET            : 5;
-    unsigned                    : 3;
+    unsigned SC1ISET            : 4;
+    unsigned                    : 4;
     };
   } __SLPCCON1bits_t;
 
 extern __at(0x011F) volatile __SLPCCON1bits_t SLPCCON1bits;
 
-#define _SC1ISET0               0x01
-#define _SC1ISET1               0x02
-#define _SC1ISET2               0x04
-#define _SC1ISET3               0x08
-#define _SC1ISET4               0x10
+#define _SLPCCON1_SC1ISET0      0x01
+#define _SLPCCON1_SC1ISET1      0x02
+#define _SLPCCON1_SC1ISET2      0x04
+#define _SLPCCON1_SC1ISET3      0x08
+#define _SLPCCON1_SC1RNG        0x10
 
 //==============================================================================
 
@@ -2159,10 +2237,10 @@ typedef union
   {
   struct
     {
-    unsigned PHR0               : 1;
-    unsigned PHR1               : 1;
-    unsigned PHR2               : 1;
-    unsigned PHR3               : 1;
+    unsigned G1PHR0             : 1;
+    unsigned G1PHR1             : 1;
+    unsigned G1PHR2             : 1;
+    unsigned G1PHR3             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -2171,17 +2249,17 @@ typedef union
 
   struct
     {
-    unsigned PHR                : 4;
+    unsigned G1PHR              : 4;
     unsigned                    : 4;
     };
   } __COG1PHRbits_t;
 
 extern __at(0x0192) volatile __COG1PHRbits_t COG1PHRbits;
 
-#define _PHR0                   0x01
-#define _PHR1                   0x02
-#define _PHR2                   0x04
-#define _PHR3                   0x08
+#define _G1PHR0                 0x01
+#define _G1PHR1                 0x02
+#define _G1PHR2                 0x04
+#define _G1PHR3                 0x08
 
 //==============================================================================
 
@@ -2195,10 +2273,10 @@ typedef union
   {
   struct
     {
-    unsigned PHF0               : 1;
-    unsigned PHF1               : 1;
-    unsigned PHF2               : 1;
-    unsigned PHF3               : 1;
+    unsigned G1PHF0             : 1;
+    unsigned G1PHF1             : 1;
+    unsigned G1PHF2             : 1;
+    unsigned G1PHF3             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -2207,17 +2285,17 @@ typedef union
 
   struct
     {
-    unsigned PHF                : 4;
+    unsigned G1PHF              : 4;
     unsigned                    : 4;
     };
   } __COG1PHFbits_t;
 
 extern __at(0x0193) volatile __COG1PHFbits_t COG1PHFbits;
 
-#define _PHF0                   0x01
-#define _PHF1                   0x02
-#define _PHF2                   0x04
-#define _PHF3                   0x08
+#define _G1PHF0                 0x01
+#define _G1PHF1                 0x02
+#define _G1PHF2                 0x04
+#define _G1PHF3                 0x08
 
 //==============================================================================
 
@@ -2231,10 +2309,10 @@ typedef union
   {
   struct
     {
-    unsigned BKR0               : 1;
-    unsigned BKR1               : 1;
-    unsigned BKR2               : 1;
-    unsigned BKR3               : 1;
+    unsigned G1BKR0             : 1;
+    unsigned G1BKR1             : 1;
+    unsigned G1BKR2             : 1;
+    unsigned G1BKR3             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -2243,17 +2321,17 @@ typedef union
 
   struct
     {
-    unsigned BKR                : 4;
+    unsigned G1BKR              : 4;
     unsigned                    : 4;
     };
   } __COG1BKRbits_t;
 
 extern __at(0x0194) volatile __COG1BKRbits_t COG1BKRbits;
 
-#define _BKR0                   0x01
-#define _BKR1                   0x02
-#define _BKR2                   0x04
-#define _BKR3                   0x08
+#define _G1BKR0                 0x01
+#define _G1BKR1                 0x02
+#define _G1BKR2                 0x04
+#define _G1BKR3                 0x08
 
 //==============================================================================
 
@@ -2267,10 +2345,10 @@ typedef union
   {
   struct
     {
-    unsigned BKF0               : 1;
-    unsigned BKF1               : 1;
-    unsigned BKF2               : 1;
-    unsigned BKF3               : 1;
+    unsigned G1BKF0             : 1;
+    unsigned G1BKF1             : 1;
+    unsigned G1BKF2             : 1;
+    unsigned G1BKF3             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -2279,17 +2357,17 @@ typedef union
 
   struct
     {
-    unsigned BKF                : 4;
+    unsigned G1BKF              : 4;
     unsigned                    : 4;
     };
   } __COG1BKFbits_t;
 
 extern __at(0x0195) volatile __COG1BKFbits_t COG1BKFbits;
 
-#define _BKF0                   0x01
-#define _BKF1                   0x02
-#define _BKF2                   0x04
-#define _BKF3                   0x08
+#define _G1BKF0                 0x01
+#define _G1BKF1                 0x02
+#define _G1BKF2                 0x04
+#define _G1BKF3                 0x08
 
 //==============================================================================
 
@@ -2303,10 +2381,10 @@ typedef union
   {
   struct
     {
-    unsigned DBR0               : 1;
-    unsigned DBR1               : 1;
-    unsigned DBR2               : 1;
-    unsigned DBR3               : 1;
+    unsigned G1DBR0             : 1;
+    unsigned G1DBR1             : 1;
+    unsigned G1DBR2             : 1;
+    unsigned G1DBR3             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -2315,17 +2393,17 @@ typedef union
 
   struct
     {
-    unsigned DBR                : 4;
+    unsigned G1DBR              : 4;
     unsigned                    : 4;
     };
   } __COG1DBRbits_t;
 
 extern __at(0x0196) volatile __COG1DBRbits_t COG1DBRbits;
 
-#define _DBR0                   0x01
-#define _DBR1                   0x02
-#define _DBR2                   0x04
-#define _DBR3                   0x08
+#define _G1DBR0                 0x01
+#define _G1DBR1                 0x02
+#define _G1DBR2                 0x04
+#define _G1DBR3                 0x08
 
 //==============================================================================
 
@@ -2339,10 +2417,10 @@ typedef union
   {
   struct
     {
-    unsigned DBF0               : 1;
-    unsigned DBF1               : 1;
-    unsigned DBF2               : 1;
-    unsigned DBF3               : 1;
+    unsigned G1DBF0             : 1;
+    unsigned G1DBF1             : 1;
+    unsigned G1DBF2             : 1;
+    unsigned G1DBF3             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -2351,17 +2429,17 @@ typedef union
 
   struct
     {
-    unsigned DBF                : 4;
+    unsigned G1DBF              : 4;
     unsigned                    : 4;
     };
   } __COG1DBFbits_t;
 
 extern __at(0x0197) volatile __COG1DBFbits_t COG1DBFbits;
 
-#define _DBF0                   0x01
-#define _DBF1                   0x02
-#define _DBF2                   0x04
-#define _DBF3                   0x08
+#define _G1DBF0                 0x01
+#define _G1DBF1                 0x02
+#define _G1DBF2                 0x04
+#define _G1DBF3                 0x08
 
 //==============================================================================
 
@@ -2456,26 +2534,25 @@ extern __at(0x019A) __sfr COG1RIS;
 
 typedef struct
   {
-  unsigned G1RIS0               : 1;
-  unsigned G1RIS1               : 1;
-  unsigned G1RIS2               : 1;
-  unsigned G1RIS3               : 1;
-  unsigned G1RIS4               : 1;
-  unsigned G1RIS5               : 1;
-  unsigned G1RIS6               : 1;
-  unsigned G1RIS7               : 1;
+  unsigned G1RIC1               : 1;
+  unsigned G1RIC2               : 1;
+  unsigned C1RICCP1             : 1;
+  unsigned G1RIFLT              : 1;
+  unsigned G1RIT2M              : 1;
+  unsigned G1R1HLT1             : 1;
+  unsigned G1RIHLT2             : 1;
+  unsigned                      : 1;
   } __COG1RISbits_t;
 
 extern __at(0x019A) volatile __COG1RISbits_t COG1RISbits;
 
-#define _G1RIS0                 0x01
-#define _G1RIS1                 0x02
-#define _G1RIS2                 0x04
-#define _G1RIS3                 0x08
-#define _G1RIS4                 0x10
-#define _G1RIS5                 0x20
-#define _G1RIS6                 0x40
-#define _G1RIS7                 0x80
+#define _G1RIC1                 0x01
+#define _G1RIC2                 0x02
+#define _C1RICCP1               0x04
+#define _G1RIFLT                0x08
+#define _G1RIT2M                0x10
+#define _G1R1HLT1               0x20
+#define _G1RIHLT2               0x40
 
 //==============================================================================
 
@@ -2487,26 +2564,25 @@ extern __at(0x019B) __sfr COG1RSIM;
 
 typedef struct
   {
-  unsigned G1RSIM0              : 1;
-  unsigned G1RSIM1              : 1;
-  unsigned G1RSIM2              : 1;
-  unsigned G1RSIM3              : 1;
-  unsigned G1RSIM4              : 1;
-  unsigned G1RSIM5              : 1;
-  unsigned G1RSIM6              : 1;
-  unsigned G1RSIM7              : 1;
+  unsigned G1RMC1               : 1;
+  unsigned G1RMC2               : 1;
+  unsigned G1RMCCP1             : 1;
+  unsigned G1RMFLT              : 1;
+  unsigned G1RTM2M              : 1;
+  unsigned G1RMHLT1             : 1;
+  unsigned G1RMHLT2             : 1;
+  unsigned                      : 1;
   } __COG1RSIMbits_t;
 
 extern __at(0x019B) volatile __COG1RSIMbits_t COG1RSIMbits;
 
-#define _G1RSIM0                0x01
-#define _G1RSIM1                0x02
-#define _G1RSIM2                0x04
-#define _G1RSIM3                0x08
-#define _G1RSIM4                0x10
-#define _G1RSIM5                0x20
-#define _G1RSIM6                0x40
-#define _G1RSIM7                0x80
+#define _G1RMC1                 0x01
+#define _G1RMC2                 0x02
+#define _G1RMCCP1               0x04
+#define _G1RMFLT                0x08
+#define _G1RTM2M                0x10
+#define _G1RMHLT1               0x20
+#define _G1RMHLT2               0x40
 
 //==============================================================================
 
@@ -2518,26 +2594,25 @@ extern __at(0x019C) __sfr COG1FIS;
 
 typedef struct
   {
-  unsigned G1FIS0               : 1;
-  unsigned G1FIS1               : 1;
-  unsigned G1FIS2               : 1;
-  unsigned G1FIS3               : 1;
-  unsigned G1FIS4               : 1;
-  unsigned G1FIS5               : 1;
-  unsigned G1FIS6               : 1;
-  unsigned G1FIS7               : 1;
+  unsigned G1FIC1               : 1;
+  unsigned G1FIC2               : 1;
+  unsigned G1FICCP1             : 1;
+  unsigned G1FIFLT              : 1;
+  unsigned G1FIT2M              : 1;
+  unsigned G1FIHLT1             : 1;
+  unsigned G1FIHLT2             : 1;
+  unsigned                      : 1;
   } __COG1FISbits_t;
 
 extern __at(0x019C) volatile __COG1FISbits_t COG1FISbits;
 
-#define _G1FIS0                 0x01
-#define _G1FIS1                 0x02
-#define _G1FIS2                 0x04
-#define _G1FIS3                 0x08
-#define _G1FIS4                 0x10
-#define _G1FIS5                 0x20
-#define _G1FIS6                 0x40
-#define _G1FIS7                 0x80
+#define _G1FIC1                 0x01
+#define _G1FIC2                 0x02
+#define _G1FICCP1               0x04
+#define _G1FIFLT                0x08
+#define _G1FIT2M                0x10
+#define _G1FIHLT1               0x20
+#define _G1FIHLT2               0x40
 
 //==============================================================================
 
@@ -2549,26 +2624,25 @@ extern __at(0x019D) __sfr COG1FSIM;
 
 typedef struct
   {
-  unsigned G1FSM0               : 1;
-  unsigned G1FSM1               : 1;
-  unsigned G1FSM2               : 1;
-  unsigned G1FSM3               : 1;
-  unsigned G1FSM4               : 1;
-  unsigned G1FSM5               : 1;
-  unsigned G1FSM6               : 1;
-  unsigned G1FSM7               : 1;
+  unsigned G1FMC1               : 1;
+  unsigned G1FMC2               : 1;
+  unsigned G1FMCCP1             : 1;
+  unsigned G1FMFLT              : 1;
+  unsigned G1FMT2M              : 1;
+  unsigned G1FMHLT1             : 1;
+  unsigned G1FMHLT2             : 1;
+  unsigned                      : 1;
   } __COG1FSIMbits_t;
 
 extern __at(0x019D) volatile __COG1FSIMbits_t COG1FSIMbits;
 
-#define _G1FSM0                 0x01
-#define _G1FSM1                 0x02
-#define _G1FSM2                 0x04
-#define _G1FSM3                 0x08
-#define _G1FSM4                 0x10
-#define _G1FSM5                 0x20
-#define _G1FSM6                 0x40
-#define _G1FSM7                 0x80
+#define _G1FMC1                 0x01
+#define _G1FMC2                 0x02
+#define _G1FMCCP1               0x04
+#define _G1FMFLT                0x08
+#define _G1FMT2M                0x10
+#define _G1FMHLT1               0x20
+#define _G1FMHLT2               0x40
 
 //==============================================================================
 
@@ -2588,8 +2662,8 @@ typedef union
     unsigned G1ASD0L1           : 1;
     unsigned G1ASD1L0           : 1;
     unsigned G1ASD1L1           : 1;
-    unsigned C1ARSEN            : 1;
-    unsigned C1ASDE             : 1;
+    unsigned G1ARSEN            : 1;
+    unsigned G1ASDE             : 1;
     };
 
   struct
@@ -2613,8 +2687,8 @@ extern __at(0x019E) volatile __COG1ASD0bits_t COG1ASD0bits;
 #define _G1ASD0L1               0x08
 #define _G1ASD1L0               0x10
 #define _G1ASD1L1               0x20
-#define _C1ARSEN                0x40
-#define _C1ASDE                 0x80
+#define _G1ARSEN                0x40
+#define _G1ASDE                 0x80
 
 //==============================================================================
 
@@ -2626,26 +2700,23 @@ extern __at(0x019F) __sfr COG1ASD1;
 
 typedef struct
   {
-  unsigned G1AS0E               : 1;
-  unsigned G1AS1E               : 1;
-  unsigned G1AS2E               : 1;
-  unsigned G1AS3E               : 1;
-  unsigned G1AS4E               : 1;
-  unsigned G1AS5E               : 1;
-  unsigned G1AS6E               : 1;
-  unsigned G1AS7E               : 1;
+  unsigned G1ASDSFLT            : 1;
+  unsigned G1ASDSC1             : 1;
+  unsigned G1ASDSC2             : 1;
+  unsigned G1ASDSHLT1           : 1;
+  unsigned G1ASDSHLT2           : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
   } __COG1ASD1bits_t;
 
 extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 
-#define _G1AS0E                 0x01
-#define _G1AS1E                 0x02
-#define _G1AS2E                 0x04
-#define _G1AS3E                 0x08
-#define _G1AS4E                 0x10
-#define _G1AS5E                 0x20
-#define _G1AS6E                 0x40
-#define _G1AS7E                 0x80
+#define _G1ASDSFLT              0x01
+#define _G1ASDSC1               0x02
+#define _G1ASDSC2               0x04
+#define _G1ASDSHLT1             0x08
+#define _G1ASDSHLT2             0x10
 
 //==============================================================================
 
@@ -2768,27 +2839,24 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 #define G1ASD0L1                COG1ASD0bits.G1ASD0L1           // bit 3
 #define G1ASD1L0                COG1ASD0bits.G1ASD1L0           // bit 4
 #define G1ASD1L1                COG1ASD0bits.G1ASD1L1           // bit 5
-#define C1ARSEN                 COG1ASD0bits.C1ARSEN            // bit 6
-#define C1ASDE                  COG1ASD0bits.C1ASDE             // bit 7
+#define G1ARSEN                 COG1ASD0bits.G1ARSEN            // bit 6
+#define G1ASDE                  COG1ASD0bits.G1ASDE             // bit 7
 
-#define G1AS0E                  COG1ASD1bits.G1AS0E             // bit 0
-#define G1AS1E                  COG1ASD1bits.G1AS1E             // bit 1
-#define G1AS2E                  COG1ASD1bits.G1AS2E             // bit 2
-#define G1AS3E                  COG1ASD1bits.G1AS3E             // bit 3
-#define G1AS4E                  COG1ASD1bits.G1AS4E             // bit 4
-#define G1AS5E                  COG1ASD1bits.G1AS5E             // bit 5
-#define G1AS6E                  COG1ASD1bits.G1AS6E             // bit 6
-#define G1AS7E                  COG1ASD1bits.G1AS7E             // bit 7
+#define G1ASDSFLT               COG1ASD1bits.G1ASDSFLT          // bit 0
+#define G1ASDSC1                COG1ASD1bits.G1ASDSC1           // bit 1
+#define G1ASDSC2                COG1ASD1bits.G1ASDSC2           // bit 2
+#define G1ASDSHLT1              COG1ASD1bits.G1ASDSHLT1         // bit 3
+#define G1ASDSHLT2              COG1ASD1bits.G1ASDSHLT2         // bit 4
 
-#define BKF0                    COG1BKFbits.BKF0                // bit 0
-#define BKF1                    COG1BKFbits.BKF1                // bit 1
-#define BKF2                    COG1BKFbits.BKF2                // bit 2
-#define BKF3                    COG1BKFbits.BKF3                // bit 3
+#define G1BKF0                  COG1BKFbits.G1BKF0              // bit 0
+#define G1BKF1                  COG1BKFbits.G1BKF1              // bit 1
+#define G1BKF2                  COG1BKFbits.G1BKF2              // bit 2
+#define G1BKF3                  COG1BKFbits.G1BKF3              // bit 3
 
-#define BKR0                    COG1BKRbits.BKR0                // bit 0
-#define BKR1                    COG1BKRbits.BKR1                // bit 1
-#define BKR2                    COG1BKRbits.BKR2                // bit 2
-#define BKR3                    COG1BKRbits.BKR3                // bit 3
+#define G1BKR0                  COG1BKRbits.G1BKR0              // bit 0
+#define G1BKR1                  COG1BKRbits.G1BKR1              // bit 1
+#define G1BKR2                  COG1BKRbits.G1BKR2              // bit 2
+#define G1BKR3                  COG1BKRbits.G1BKR3              // bit 3
 
 #define G1MD                    COG1CON0bits.G1MD               // bit 0
 #define G1LD                    COG1CON0bits.G1LD               // bit 2
@@ -2803,61 +2871,57 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 #define G1FDBTS                 COG1CON1bits.G1FDBTS            // bit 6
 #define G1RDBTS                 COG1CON1bits.G1RDBTS            // bit 7
 
-#define DBF0                    COG1DBFbits.DBF0                // bit 0
-#define DBF1                    COG1DBFbits.DBF1                // bit 1
-#define DBF2                    COG1DBFbits.DBF2                // bit 2
-#define DBF3                    COG1DBFbits.DBF3                // bit 3
+#define G1DBF0                  COG1DBFbits.G1DBF0              // bit 0
+#define G1DBF1                  COG1DBFbits.G1DBF1              // bit 1
+#define G1DBF2                  COG1DBFbits.G1DBF2              // bit 2
+#define G1DBF3                  COG1DBFbits.G1DBF3              // bit 3
 
-#define DBR0                    COG1DBRbits.DBR0                // bit 0
-#define DBR1                    COG1DBRbits.DBR1                // bit 1
-#define DBR2                    COG1DBRbits.DBR2                // bit 2
-#define DBR3                    COG1DBRbits.DBR3                // bit 3
+#define G1DBR0                  COG1DBRbits.G1DBR0              // bit 0
+#define G1DBR1                  COG1DBRbits.G1DBR1              // bit 1
+#define G1DBR2                  COG1DBRbits.G1DBR2              // bit 2
+#define G1DBR3                  COG1DBRbits.G1DBR3              // bit 3
 
-#define G1FIS0                  COG1FISbits.G1FIS0              // bit 0
-#define G1FIS1                  COG1FISbits.G1FIS1              // bit 1
-#define G1FIS2                  COG1FISbits.G1FIS2              // bit 2
-#define G1FIS3                  COG1FISbits.G1FIS3              // bit 3
-#define G1FIS4                  COG1FISbits.G1FIS4              // bit 4
-#define G1FIS5                  COG1FISbits.G1FIS5              // bit 5
-#define G1FIS6                  COG1FISbits.G1FIS6              // bit 6
-#define G1FIS7                  COG1FISbits.G1FIS7              // bit 7
+#define G1FIC1                  COG1FISbits.G1FIC1              // bit 0
+#define G1FIC2                  COG1FISbits.G1FIC2              // bit 1
+#define G1FICCP1                COG1FISbits.G1FICCP1            // bit 2
+#define G1FIFLT                 COG1FISbits.G1FIFLT             // bit 3
+#define G1FIT2M                 COG1FISbits.G1FIT2M             // bit 4
+#define G1FIHLT1                COG1FISbits.G1FIHLT1            // bit 5
+#define G1FIHLT2                COG1FISbits.G1FIHLT2            // bit 6
 
-#define G1FSM0                  COG1FSIMbits.G1FSM0             // bit 0
-#define G1FSM1                  COG1FSIMbits.G1FSM1             // bit 1
-#define G1FSM2                  COG1FSIMbits.G1FSM2             // bit 2
-#define G1FSM3                  COG1FSIMbits.G1FSM3             // bit 3
-#define G1FSM4                  COG1FSIMbits.G1FSM4             // bit 4
-#define G1FSM5                  COG1FSIMbits.G1FSM5             // bit 5
-#define G1FSM6                  COG1FSIMbits.G1FSM6             // bit 6
-#define G1FSM7                  COG1FSIMbits.G1FSM7             // bit 7
+#define G1FMC1                  COG1FSIMbits.G1FMC1             // bit 0
+#define G1FMC2                  COG1FSIMbits.G1FMC2             // bit 1
+#define G1FMCCP1                COG1FSIMbits.G1FMCCP1           // bit 2
+#define G1FMFLT                 COG1FSIMbits.G1FMFLT            // bit 3
+#define G1FMT2M                 COG1FSIMbits.G1FMT2M            // bit 4
+#define G1FMHLT1                COG1FSIMbits.G1FMHLT1           // bit 5
+#define G1FMHLT2                COG1FSIMbits.G1FMHLT2           // bit 6
 
-#define PHF0                    COG1PHFbits.PHF0                // bit 0
-#define PHF1                    COG1PHFbits.PHF1                // bit 1
-#define PHF2                    COG1PHFbits.PHF2                // bit 2
-#define PHF3                    COG1PHFbits.PHF3                // bit 3
+#define G1PHF0                  COG1PHFbits.G1PHF0              // bit 0
+#define G1PHF1                  COG1PHFbits.G1PHF1              // bit 1
+#define G1PHF2                  COG1PHFbits.G1PHF2              // bit 2
+#define G1PHF3                  COG1PHFbits.G1PHF3              // bit 3
 
-#define PHR0                    COG1PHRbits.PHR0                // bit 0
-#define PHR1                    COG1PHRbits.PHR1                // bit 1
-#define PHR2                    COG1PHRbits.PHR2                // bit 2
-#define PHR3                    COG1PHRbits.PHR3                // bit 3
+#define G1PHR0                  COG1PHRbits.G1PHR0              // bit 0
+#define G1PHR1                  COG1PHRbits.G1PHR1              // bit 1
+#define G1PHR2                  COG1PHRbits.G1PHR2              // bit 2
+#define G1PHR3                  COG1PHRbits.G1PHR3              // bit 3
 
-#define G1RIS0                  COG1RISbits.G1RIS0              // bit 0
-#define G1RIS1                  COG1RISbits.G1RIS1              // bit 1
-#define G1RIS2                  COG1RISbits.G1RIS2              // bit 2
-#define G1RIS3                  COG1RISbits.G1RIS3              // bit 3
-#define G1RIS4                  COG1RISbits.G1RIS4              // bit 4
-#define G1RIS5                  COG1RISbits.G1RIS5              // bit 5
-#define G1RIS6                  COG1RISbits.G1RIS6              // bit 6
-#define G1RIS7                  COG1RISbits.G1RIS7              // bit 7
+#define G1RIC1                  COG1RISbits.G1RIC1              // bit 0
+#define G1RIC2                  COG1RISbits.G1RIC2              // bit 1
+#define C1RICCP1                COG1RISbits.C1RICCP1            // bit 2
+#define G1RIFLT                 COG1RISbits.G1RIFLT             // bit 3
+#define G1RIT2M                 COG1RISbits.G1RIT2M             // bit 4
+#define G1R1HLT1                COG1RISbits.G1R1HLT1            // bit 5
+#define G1RIHLT2                COG1RISbits.G1RIHLT2            // bit 6
 
-#define G1RSIM0                 COG1RSIMbits.G1RSIM0            // bit 0
-#define G1RSIM1                 COG1RSIMbits.G1RSIM1            // bit 1
-#define G1RSIM2                 COG1RSIMbits.G1RSIM2            // bit 2
-#define G1RSIM3                 COG1RSIMbits.G1RSIM3            // bit 3
-#define G1RSIM4                 COG1RSIMbits.G1RSIM4            // bit 4
-#define G1RSIM5                 COG1RSIMbits.G1RSIM5            // bit 5
-#define G1RSIM6                 COG1RSIMbits.G1RSIM6            // bit 6
-#define G1RSIM7                 COG1RSIMbits.G1RSIM7            // bit 7
+#define G1RMC1                  COG1RSIMbits.G1RMC1             // bit 0
+#define G1RMC2                  COG1RSIMbits.G1RMC2             // bit 1
+#define G1RMCCP1                COG1RSIMbits.G1RMCCP1           // bit 2
+#define G1RMFLT                 COG1RSIMbits.G1RMFLT            // bit 3
+#define G1RTM2M                 COG1RSIMbits.G1RTM2M            // bit 4
+#define G1RMHLT1                COG1RSIMbits.G1RMHLT1           // bit 5
+#define G1RMHLT2                COG1RSIMbits.G1RMHLT2           // bit 6
 
 #define DACPSS0                 DAC1CON0bits.DACPSS0            // bit 2
 #define DACPSS1                 DAC1CON0bits.DACPSS1            // bit 3
@@ -2871,6 +2935,38 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 #define FVROE                   FVR1CON0bits.FVROE              // bit 5
 #define FVRRDY                  FVR1CON0bits.FVRRDY             // bit 6
 #define FVREN                   FVR1CON0bits.FVREN              // bit 7
+
+#define H1CKPS0                 HLT1CON0bits.H1CKPS0            // bit 0
+#define H1CKPS1                 HLT1CON0bits.H1CKPS1            // bit 1
+#define H1ON                    HLT1CON0bits.H1ON               // bit 2
+#define H1OUTPS0                HLT1CON0bits.H1OUTPS0           // bit 3
+#define H1OUTPS1                HLT1CON0bits.H1OUTPS1           // bit 4
+#define H1OUTPS2                HLT1CON0bits.H1OUTPS2           // bit 5
+#define H1OUTPS3                HLT1CON0bits.H1OUTPS3           // bit 6
+
+#define H1REREN                 HLT1CON1bits.H1REREN            // bit 0
+#define H1FEREN                 HLT1CON1bits.H1FEREN            // bit 1
+#define H1ERS0                  HLT1CON1bits.H1ERS0             // bit 2
+#define H1ERS1                  HLT1CON1bits.H1ERS1             // bit 3
+#define H1ERS2                  HLT1CON1bits.H1ERS2             // bit 4
+#define H1RES                   HLT1CON1bits.H1RES              // bit 6
+#define H1FES                   HLT1CON1bits.H1FES              // bit 7
+
+#define H2CKPS0                 HLT2CON0bits.H2CKPS0            // bit 0
+#define H2CKPS1                 HLT2CON0bits.H2CKPS1            // bit 1
+#define H2ON                    HLT2CON0bits.H2ON               // bit 2
+#define H2OUTPS0                HLT2CON0bits.H2OUTPS0           // bit 3
+#define H2OUTPS1                HLT2CON0bits.H2OUTPS1           // bit 4
+#define H2OUTPS2                HLT2CON0bits.H2OUTPS2           // bit 5
+#define H2OUTPS3                HLT2CON0bits.H2OUTPS3           // bit 6
+
+#define H2REREN                 HLT2CON1bits.H2REREN            // bit 0
+#define H2FEREN                 HLT2CON1bits.H2FEREN            // bit 1
+#define H2ERS0                  HLT2CON1bits.H2ERS0             // bit 2
+#define H2ERS1                  HLT2CON1bits.H2ERS1             // bit 3
+#define H2ERS2                  HLT2CON1bits.H2ERS2             // bit 4
+#define H2RES                   HLT2CON1bits.H2RES              // bit 6
+#define H2FES                   HLT2CON1bits.H2FES              // bit 7
 
 #define IOCIF                   INTCONbits.IOCIF                // bit 0
 #define INTF                    INTCONbits.INTF                 // bit 1
@@ -2936,10 +3032,10 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 #define LATC4                   LATCbits.LATC4                  // bit 4
 #define LATC5                   LATCbits.LATC5                  // bit 5
 
-#define OPAPCH0                 OPA1CONbits.OPAPCH0             // bit 0
-#define OPAPCH1                 OPA1CONbits.OPAPCH1             // bit 1
-#define OPANCH0                 OPA1CONbits.OPANCH0             // bit 2
-#define OPANCH1                 OPA1CONbits.OPANCH1             // bit 3
+#define OPA1PCH0                OPA1CONbits.OPA1PCH0            // bit 0
+#define OPA1PCH1                OPA1CONbits.OPA1PCH1            // bit 1
+#define OPA1NCH0                OPA1CONbits.OPA1NCH0            // bit 2
+#define OPA1NCH1                OPA1CONbits.OPA1NCH1            // bit 3
 #define OPAUGM                  OPA1CONbits.OPAUGM              // bit 4
 #define OPAEN                   OPA1CONbits.OPAEN               // bit 7
 
@@ -2968,8 +3064,8 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 
 #define TMR1IE                  PIE1bits.TMR1IE                 // bit 0
 #define TMR2IE                  PIE1bits.TMR2IE                 // bit 1
-#define TMR4AIE                 PIE1bits.TMR4AIE                // bit 2
-#define TMR6AIE                 PIE1bits.TMR6AIE                // bit 3
+#define HLTMR1IE                PIE1bits.HLTMR1IE               // bit 2
+#define HLTMR2IE                PIE1bits.HLTMR2IE               // bit 3
 #define ADIE                    PIE1bits.ADIE                   // bit 6
 #define TMR1GIE                 PIE1bits.TMR1GIE                // bit 7
 
@@ -2980,8 +3076,8 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 
 #define TMR1IF                  PIR1bits.TMR1IF                 // bit 0
 #define TMR2IF                  PIR1bits.TMR2IF                 // bit 1
-#define TMR4AIF                 PIR1bits.TMR4AIF                // bit 2
-#define TMR6AIF                 PIR1bits.TMR6AIF                // bit 3
+#define HLTMR1IF                PIR1bits.HLTMR1IF               // bit 2
+#define HLTMR2IF                PIR1bits.HLTMR2IF               // bit 3
 #define ADIF                    PIR1bits.ADIF                   // bit 6
 #define TMR1GIF                 PIR1bits.TMR1GIF                // bit 7
 
@@ -3008,18 +3104,18 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 #define RC4                     PORTCbits.RC4                   // bit 4
 #define RC5                     PORTCbits.RC5                   // bit 5
 
-#define SC1INS                  SLPCCON0bits.SC1INS             // bit 0
-#define SC1TSS0                 SLPCCON0bits.SC1TSS0            // bit 2
-#define SC1TSS1                 SLPCCON0bits.SC1TSS1            // bit 3
-#define SC1POL                  SLPCCON0bits.SC1POL             // bit 4
-#define SC1MRPE                 SLPCCON0bits.SC1MRPE            // bit 5
-#define SC1EN                   SLPCCON0bits.SC1EN              // bit 7
+#define SC1INS                  SLPC1CON0bits.SC1INS            // bit 0
+#define SCS1TSS0                SLPC1CON0bits.SCS1TSS0          // bit 2
+#define SCS1TSS1                SLPC1CON0bits.SCS1TSS1          // bit 3
+#define SC1POL                  SLPC1CON0bits.SC1POL            // bit 4
+#define SC1MRPE                 SLPC1CON0bits.SC1MRPE           // bit 5
+#define SC1EN                   SLPC1CON0bits.SC1EN             // bit 7
 
-#define SC1ISET0                SLPCCON1bits.SC1ISET0           // bit 0
-#define SC1ISET1                SLPCCON1bits.SC1ISET1           // bit 1
-#define SC1ISET2                SLPCCON1bits.SC1ISET2           // bit 2
-#define SC1ISET3                SLPCCON1bits.SC1ISET3           // bit 3
-#define SC1ISET4                SLPCCON1bits.SC1ISET4           // bit 4
+#define SC1ISET0                SLPC1CON1bits.SC1ISET0          // bit 0
+#define SC1ISET1                SLPC1CON1bits.SC1ISET1          // bit 1
+#define SC1ISET2                SLPC1CON1bits.SC1ISET2          // bit 2
+#define SC1ISET3                SLPC1CON1bits.SC1ISET3          // bit 3
+#define SC1RNG                  SLPC1CON1bits.SC1RNG            // bit 4
 
 #define SLRC4                   SLRCONCbits.SLRC4               // bit 4
 #define SLRC5                   SLRCONCbits.SLRC5               // bit 5
@@ -3057,38 +3153,6 @@ extern __at(0x019F) volatile __COG1ASD1bits_t COG1ASD1bits;
 #define T2OUTPS1                T2CONbits.T2OUTPS1              // bit 4
 #define T2OUTPS2                T2CONbits.T2OUTPS2              // bit 5
 #define T2OUTPS3                T2CONbits.T2OUTPS3              // bit 6
-
-#define T4ACKPS0                T4ACON0bits.T4ACKPS0            // bit 0
-#define T4ACKPS1                T4ACON0bits.T4ACKPS1            // bit 1
-#define TMR4AON                 T4ACON0bits.TMR4AON             // bit 2
-#define T4OUTPS0                T4ACON0bits.T4OUTPS0            // bit 3
-#define T4OUTPS1                T4ACON0bits.T4OUTPS1            // bit 4
-#define T4OUTPS2                T4ACON0bits.T4OUTPS2            // bit 5
-#define T4OUTPS3                T4ACON0bits.T4OUTPS3            // bit 6
-
-#define T4ARIREN                T4ACON1bits.T4ARIREN            // bit 0
-#define T4AFIREN                T4ACON1bits.T4AFIREN            // bit 1
-#define T4AERS0                 T4ACON1bits.T4AERS0             // bit 2
-#define T4AERS1                 T4ACON1bits.T4AERS1             // bit 3
-#define T4AERS2                 T4ACON1bits.T4AERS2             // bit 4
-#define T4ARIMS                 T4ACON1bits.T4ARIMS             // bit 6
-#define T4AFIMS                 T4ACON1bits.T4AFIMS             // bit 7
-
-#define T6ACKPS0                T6ACON0bits.T6ACKPS0            // bit 0
-#define T6ACKPS1                T6ACON0bits.T6ACKPS1            // bit 1
-#define TMR6AON                 T6ACON0bits.TMR6AON             // bit 2
-#define T6OUTPS0                T6ACON0bits.T6OUTPS0            // bit 3
-#define T6OUTPS1                T6ACON0bits.T6OUTPS1            // bit 4
-#define T6OUTPS2                T6ACON0bits.T6OUTPS2            // bit 5
-#define T6OUTPS3                T6ACON0bits.T6OUTPS3            // bit 6
-
-#define T6ARIREN                T6ACON1bits.T6ARIREN            // bit 0
-#define T6AFIREN                T6ACON1bits.T6AFIREN            // bit 1
-#define T6ERS0                  T6ACON1bits.T6ERS0              // bit 2
-#define T6ERS1                  T6ACON1bits.T6ERS1              // bit 3
-#define T6ERS2                  T6ACON1bits.T6ERS2              // bit 4
-#define T6ARIMS                 T6ACON1bits.T6ARIMS             // bit 6
-#define T6AFIMS                 T6ACON1bits.T6AFIMS             // bit 7
 
 #define TRISA0                  TRISAbits.TRISA0                // bit 0
 #define TRISA1                  TRISAbits.TRISA1                // bit 1

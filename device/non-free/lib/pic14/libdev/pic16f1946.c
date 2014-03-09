@@ -2,9 +2,9 @@
  * This definitions of the PIC16F1946 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:20:03 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:31 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -256,6 +256,8 @@ __at(0x019A) __sfr TX1REG;
 
 __at(0x019A) __sfr TXREG;
 
+__at(0x019B) __sfr SP1BRG;
+
 __at(0x019B) __sfr SP1BRGL;
 
 __at(0x019B) __sfr SPBRG;
@@ -347,6 +349,8 @@ __at(0x028C) volatile __PORTFbits_t PORTFbits;
 __at(0x028D) __sfr PORTG;
 __at(0x028D) volatile __PORTGbits_t PORTGbits;
 
+__at(0x0291) __sfr CCPR1;
+
 __at(0x0291) __sfr CCPR1L;
 
 __at(0x0292) __sfr CCPR1H;
@@ -365,6 +369,8 @@ __at(0x0295) volatile __ECCP1ASbits_t ECCP1ASbits;
 
 __at(0x0296) __sfr PSTR1CON;
 __at(0x0296) volatile __PSTR1CONbits_t PSTR1CONbits;
+
+__at(0x0298) __sfr CCPR2;
 
 __at(0x0298) __sfr CCPR2L;
 
@@ -397,6 +403,8 @@ __at(0x030C) volatile __TRISFbits_t TRISFbits;
 __at(0x030D) __sfr TRISG;
 __at(0x030D) volatile __TRISGbits_t TRISGbits;
 
+__at(0x0311) __sfr CCPR3;
+
 __at(0x0311) __sfr CCPR3L;
 
 __at(0x0312) __sfr CCPR3H;
@@ -416,12 +424,16 @@ __at(0x0315) volatile __ECCP3ASbits_t ECCP3ASbits;
 __at(0x0316) __sfr PSTR3CON;
 __at(0x0316) volatile __PSTR3CONbits_t PSTR3CONbits;
 
+__at(0x0318) __sfr CCPR4;
+
 __at(0x0318) __sfr CCPR4L;
 
 __at(0x0319) __sfr CCPR4H;
 
 __at(0x031A) __sfr CCP4CON;
 __at(0x031A) volatile __CCP4CONbits_t CCP4CONbits;
+
+__at(0x031C) __sfr CCPR5;
 
 __at(0x031C) __sfr CCPR5L;
 

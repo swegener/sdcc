@@ -2,9 +2,9 @@
  * This definitions of the PIC16F753 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2013-05-11 12:07:12 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:05 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -123,9 +123,9 @@ __at(0x0090) volatile __FVR1CON0bits_t FVR1CON0bits;
 __at(0x0091) __sfr DAC1CON0;
 __at(0x0091) volatile __DAC1CON0bits_t DAC1CON0bits;
 
-__at(0x0092) __sfr DAC1CON1;
+__at(0x0092) __sfr DAC1REFL;
 
-__at(0x0093) __sfr DAC1CON2;
+__at(0x0093) __sfr DAC1REFH;
 
 __at(0x0096) __sfr OPA1CON;
 __at(0x0096) volatile __OPA1CONbits_t OPA1CONbits;
@@ -191,25 +191,25 @@ __at(0x0111) __sfr PR2;
 __at(0x0112) __sfr T2CON;
 __at(0x0112) volatile __T2CONbits_t T2CONbits;
 
-__at(0x0113) __sfr TMR4A;
+__at(0x0113) __sfr HLTMR1;
 
-__at(0x0114) __sfr PR4A;
+__at(0x0114) __sfr HLTPR1;
 
-__at(0x0115) __sfr T4ACON0;
-__at(0x0115) volatile __T4ACON0bits_t T4ACON0bits;
+__at(0x0115) __sfr HLT1CON0;
+__at(0x0115) volatile __HLT1CON0bits_t HLT1CON0bits;
 
-__at(0x0116) __sfr T4ACON1;
-__at(0x0116) volatile __T4ACON1bits_t T4ACON1bits;
+__at(0x0116) __sfr HLT1CON1;
+__at(0x0116) volatile __HLT1CON1bits_t HLT1CON1bits;
 
-__at(0x0117) __sfr TMR6A;
+__at(0x0117) __sfr HLTMR2;
 
-__at(0x0118) __sfr PR6A;
+__at(0x0118) __sfr HLTPR2;
 
-__at(0x0119) __sfr T6ACON0;
-__at(0x0119) volatile __T6ACON0bits_t T6ACON0bits;
+__at(0x0119) __sfr HLT2CON0;
+__at(0x0119) volatile __HLT2CON0bits_t HLT2CON0bits;
 
-__at(0x011A) __sfr T6ACON1;
-__at(0x011A) volatile __T6ACON1bits_t T6ACON1bits;
+__at(0x011A) __sfr HLT2CON1;
+__at(0x011A) volatile __HLT2CON1bits_t HLT2CON1bits;
 
 __at(0x011E) __sfr SLPC1CON0;
 __at(0x011E) volatile __SLPC1CON0bits_t SLPC1CON0bits;

@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1783 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:00 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:21 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -2935,8 +2935,8 @@ typedef union
     unsigned CCP1M3             : 1;
     unsigned DC1B0              : 1;
     unsigned DC1B1              : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned P1M0               : 1;
+    unsigned P1M1               : 1;
     };
 
   struct
@@ -2951,6 +2951,12 @@ typedef union
     unsigned DC1B               : 2;
     unsigned                    : 2;
     };
+
+  struct
+    {
+    unsigned                    : 6;
+    unsigned P1M                : 2;
+    };
   } __CCP1CONbits_t;
 
 extern __at(0x0293) volatile __CCP1CONbits_t CCP1CONbits;
@@ -2961,6 +2967,8 @@ extern __at(0x0293) volatile __CCP1CONbits_t CCP1CONbits;
 #define _CCP1M3                 0x08
 #define _DC1B0                  0x10
 #define _DC1B1                  0x20
+#define _P1M0                   0x40
+#define _P1M1                   0x80
 
 //==============================================================================
 
@@ -2983,8 +2991,8 @@ typedef union
     unsigned CCP2M3             : 1;
     unsigned DC2B0              : 1;
     unsigned DC2B1              : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned P2M0               : 1;
+    unsigned P2M1               : 1;
     };
 
   struct
@@ -2999,6 +3007,12 @@ typedef union
     unsigned DC2B               : 2;
     unsigned                    : 2;
     };
+
+  struct
+    {
+    unsigned                    : 6;
+    unsigned P2M                : 2;
+    };
   } __CCP2CONbits_t;
 
 extern __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
@@ -3009,6 +3023,8 @@ extern __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
 #define _CCP2M3                 0x08
 #define _DC2B0                  0x10
 #define _DC2B1                  0x20
+#define _P2M0                   0x40
+#define _P2M1                   0x80
 
 //==============================================================================
 
@@ -5817,6 +5833,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define CCP1M3                  CCP1CONbits.CCP1M3              // bit 3
 #define DC1B0                   CCP1CONbits.DC1B0               // bit 4
 #define DC1B1                   CCP1CONbits.DC1B1               // bit 5
+#define P1M0                    CCP1CONbits.P1M0                // bit 6
+#define P1M1                    CCP1CONbits.P1M1                // bit 7
 
 #define CCP2M0                  CCP2CONbits.CCP2M0              // bit 0
 #define CCP2M1                  CCP2CONbits.CCP2M1              // bit 1
@@ -5824,6 +5842,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define CCP2M3                  CCP2CONbits.CCP2M3              // bit 3
 #define DC2B0                   CCP2CONbits.DC2B0               // bit 4
 #define DC2B1                   CCP2CONbits.DC2B1               // bit 5
+#define P2M0                    CCP2CONbits.P2M0                // bit 6
+#define P2M1                    CCP2CONbits.P2M1                // bit 7
 
 #define CLKRDIV0                CLKRCONbits.CLKRDIV0            // bit 0
 #define CLKRDIV1                CLKRCONbits.CLKRDIV1            // bit 1

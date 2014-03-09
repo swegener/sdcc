@@ -2,9 +2,9 @@
  * This declarations of the PIC16LF1904 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:24 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:28 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -101,6 +101,7 @@
 #define TX1REG_ADDR             0x019A
 #define TXREG_ADDR              0x019A
 #define TXREG1_ADDR             0x019A
+#define SP1BRG_ADDR             0x019B
 #define SP1BRGL_ADDR            0x019B
 #define SPBRG_ADDR              0x019B
 #define SPBRGL_ADDR             0x019B
@@ -1507,6 +1508,7 @@ extern __at(0x0199) __sfr RCREG1;
 extern __at(0x019A) __sfr TX1REG;
 extern __at(0x019A) __sfr TXREG;
 extern __at(0x019A) __sfr TXREG1;
+extern __at(0x019B) __sfr SP1BRG;
 
 //==============================================================================
 //        SP1BRGL Bits

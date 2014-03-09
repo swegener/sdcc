@@ -2,9 +2,9 @@
  * This declarations of the PIC16F648A MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:08 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:01 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -820,9 +820,9 @@ extern __at(0x009F) volatile __VRCONbits_t VRCONbits;
 #define _LVP_OFF                0x3F7F  // RB4/PGM pin has digital I/O function, HV on MCLR must be used for programming.
 #define _LVP_ON                 0x3FFF  // RB4/PGM pin has PGM function, low-voltage programming enabled.
 #define _CPD_ON                 0x3EFF  // Data memory code-protected.
-#define DATA_CP_ON              0x3EFF  // Data memory code-protected.
+#define _DATA_CP_ON             0x3EFF  // Data memory code-protected.
 #define _CPD_OFF                0x3FFF  // Data memory code protection off.
-#define DATA_CP_OFF             0x3FFF  // Data memory code protection off.
+#define _DATA_CP_OFF            0x3FFF  // Data memory code protection off.
 #define _CP_ON                  0x1FFF  // 0000h to 0FFFh code-protected.
 #define _CP_OFF                 0x3FFF  // Code protection off.
 

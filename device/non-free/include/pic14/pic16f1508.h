@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1508 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:29:58 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:16 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -106,6 +106,7 @@
 #define VREGCON_ADDR            0x0197
 #define RCREG_ADDR              0x0199
 #define TXREG_ADDR              0x019A
+#define SPBRG_ADDR              0x019B
 #define SPBRGL_ADDR             0x019B
 #define SPBRGH_ADDR             0x019C
 #define RCSTA_ADDR              0x019D
@@ -1131,9 +1132,9 @@ typedef union
     unsigned ADPREF1            : 1;
     unsigned                    : 1;
     unsigned                    : 1;
-    unsigned ADCS0              : 1;
-    unsigned ADCS1              : 1;
-    unsigned ADCS2              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
     unsigned ADFM               : 1;
     };
 
@@ -1142,22 +1143,12 @@ typedef union
     unsigned ADPREF             : 2;
     unsigned                    : 6;
     };
-
-  struct
-    {
-    unsigned                    : 4;
-    unsigned ADCS               : 3;
-    unsigned                    : 1;
-    };
   } __ADCON1bits_t;
 
 extern __at(0x009E) volatile __ADCON1bits_t ADCON1bits;
 
 #define _ADPREF0                0x01
 #define _ADPREF1                0x02
-#define _ADCS0                  0x10
-#define _ADCS1                  0x20
-#define _ADCS2                  0x40
 #define _ADFM                   0x80
 
 //==============================================================================
@@ -1787,6 +1778,7 @@ extern __at(0x0197) volatile __VREGCONbits_t VREGCONbits;
 
 extern __at(0x0199) __sfr RCREG;
 extern __at(0x019A) __sfr TXREG;
+extern __at(0x019B) __sfr SPBRG;
 extern __at(0x019B) __sfr SPBRGL;
 extern __at(0x019C) __sfr SPBRGH;
 
@@ -5676,9 +5668,6 @@ extern __at(0x0FEF) __sfr TOSH;
 
 #define ADPREF0                 ADCON1bits.ADPREF0              // bit 0
 #define ADPREF1                 ADCON1bits.ADPREF1              // bit 1
-#define ADCS0                   ADCON1bits.ADCS0                // bit 4
-#define ADCS1                   ADCON1bits.ADCS1                // bit 5
-#define ADCS2                   ADCON1bits.ADCS2                // bit 6
 #define ADFM                    ADCON1bits.ADFM                 // bit 7
 
 #define TRIGSEL0                ADCON2bits.TRIGSEL0             // bit 4

@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1823 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:02 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:24 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -104,8 +104,11 @@
 #define EECON2_ADDR             0x0196
 #define RCREG_ADDR              0x0199
 #define TXREG_ADDR              0x019A
+#define SP1BRG_ADDR             0x019B
+#define SP1BRGL_ADDR            0x019B
 #define SPBRG_ADDR              0x019B
 #define SPBRGL_ADDR             0x019B
+#define SP1BRGH_ADDR            0x019C
 #define SPBRGH_ADDR             0x019C
 #define RCSTA_ADDR              0x019D
 #define TXSTA_ADDR              0x019E
@@ -127,6 +130,7 @@
 #define SSPCON2_ADDR            0x0216
 #define SSP1CON3_ADDR           0x0217
 #define SSPCON3_ADDR            0x0217
+#define CCPR1_ADDR              0x0291
 #define CCPR1L_ADDR             0x0291
 #define CCPR1H_ADDR             0x0292
 #define CCP1CON_ADDR            0x0293
@@ -2019,8 +2023,11 @@ extern __at(0x0195) volatile __EECON1bits_t EECON1bits;
 extern __at(0x0196) __sfr EECON2;
 extern __at(0x0199) __sfr RCREG;
 extern __at(0x019A) __sfr TXREG;
+extern __at(0x019B) __sfr SP1BRG;
+extern __at(0x019B) __sfr SP1BRGL;
 extern __at(0x019B) __sfr SPBRG;
 extern __at(0x019B) __sfr SPBRGL;
+extern __at(0x019C) __sfr SP1BRGH;
 extern __at(0x019C) __sfr SPBRGH;
 
 //==============================================================================
@@ -2501,6 +2508,7 @@ extern __at(0x0217) volatile __SSPCON3bits_t SSPCON3bits;
 
 //==============================================================================
 
+extern __at(0x0291) __sfr CCPR1;
 extern __at(0x0291) __sfr CCPR1L;
 extern __at(0x0292) __sfr CCPR1H;
 

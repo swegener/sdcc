@@ -2,9 +2,9 @@
  * This declarations of the PIC18F86J99 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2013-03-05 18:28:42 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:33:00 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,

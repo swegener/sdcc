@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1454 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:29:57 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:14 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -75,6 +75,7 @@
 #define BORCON_ADDR             0x0116
 #define FVRCON_ADDR             0x0117
 #define APFCON_ADDR             0x011D
+#define ANSELA_ADDR             0x018C
 #define ANSELC_ADDR             0x018E
 #define PMADR_ADDR              0x0191
 #define PMADRL_ADDR             0x0191
@@ -87,6 +88,7 @@
 #define VREGCON_ADDR            0x0197
 #define RCREG_ADDR              0x0199
 #define TXREG_ADDR              0x019A
+#define SPBRG_ADDR              0x019B
 #define SPBRGL_ADDR             0x019B
 #define SPBRGH_ADDR             0x019C
 #define RCSTA_ADDR              0x019D
@@ -1043,6 +1045,30 @@ extern __at(0x011D) volatile __APFCONbits_t APFCONbits;
 
 
 //==============================================================================
+//        ANSELA Bits
+
+extern __at(0x018C) __sfr ANSELA;
+
+typedef struct
+  {
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  unsigned ANSA4                : 1;
+  unsigned                      : 1;
+  unsigned                      : 1;
+  } __ANSELAbits_t;
+
+extern __at(0x018C) volatile __ANSELAbits_t ANSELAbits;
+
+#define _ANSA4                  0x20
+
+//==============================================================================
+
+
+//==============================================================================
 //        ANSELC Bits
 
 extern __at(0x018E) __sfr ANSELC;
@@ -1150,6 +1176,7 @@ extern __at(0x0197) volatile __VREGCONbits_t VREGCONbits;
 
 extern __at(0x0199) __sfr RCREG;
 extern __at(0x019A) __sfr TXREG;
+extern __at(0x019B) __sfr SPBRG;
 extern __at(0x019B) __sfr SPBRGL;
 extern __at(0x019C) __sfr SPBRGH;
 
@@ -2684,6 +2711,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define ACTSRC                  ACTCONbits.ACTSRC               // bit 4
 #define ACTUD                   ACTCONbits.ACTUD                // bit 6
 #define ACTEN                   ACTCONbits.ACTEN                // bit 7
+
+#define ANSA4                   ANSELAbits.ANSA4                // bit 5
 
 #define ANSC0                   ANSELCbits.ANSC0                // bit 0
 #define ANSC1                   ANSELCbits.ANSC1                // bit 1

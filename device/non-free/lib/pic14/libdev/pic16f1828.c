@@ -2,9 +2,9 @@
  * This definitions of the PIC16F1828 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-09-28 08:20:01 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:26 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -228,9 +228,15 @@ __at(0x0199) __sfr RCREG;
 
 __at(0x019A) __sfr TXREG;
 
+__at(0x019B) __sfr SP1BRG;
+
+__at(0x019B) __sfr SP1BRGL;
+
 __at(0x019B) __sfr SPBRG;
 
 __at(0x019B) __sfr SPBRGL;
+
+__at(0x019C) __sfr SP1BRGH;
 
 __at(0x019C) __sfr SPBRGH;
 
@@ -294,6 +300,8 @@ __at(0x0217) volatile __SSP1CON3bits_t SSP1CON3bits;
 __at(0x0217) __sfr SSPCON3;
 __at(0x0217) volatile __SSPCON3bits_t SSPCON3bits;
 
+__at(0x0291) __sfr CCPR1;
+
 __at(0x0291) __sfr CCPR1L;
 
 __at(0x0292) __sfr CCPR1H;
@@ -312,6 +320,8 @@ __at(0x0295) volatile __ECCP1ASbits_t ECCP1ASbits;
 
 __at(0x0296) __sfr PSTR1CON;
 __at(0x0296) volatile __PSTR1CONbits_t PSTR1CONbits;
+
+__at(0x0298) __sfr CCPR2;
 
 __at(0x0298) __sfr CCPR2L;
 
@@ -335,12 +345,16 @@ __at(0x029E) volatile __CCPTMRSbits_t CCPTMRSbits;
 __at(0x029E) __sfr CCPTMRS0;
 __at(0x029E) volatile __CCPTMRS0bits_t CCPTMRS0bits;
 
+__at(0x0311) __sfr CCPR3;
+
 __at(0x0311) __sfr CCPR3L;
 
 __at(0x0312) __sfr CCPR3H;
 
 __at(0x0313) __sfr CCP3CON;
 __at(0x0313) volatile __CCP3CONbits_t CCP3CONbits;
+
+__at(0x0318) __sfr CCPR4;
 
 __at(0x0318) __sfr CCPR4L;
 

@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1459 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:29:57 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:15 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -105,6 +105,7 @@
 #define VREGCON_ADDR            0x0197
 #define RCREG_ADDR              0x0199
 #define TXREG_ADDR              0x019A
+#define SPBRG_ADDR              0x019B
 #define SPBRGL_ADDR             0x019B
 #define SPBRGH_ADDR             0x019C
 #define RCSTA_ADDR              0x019D
@@ -1707,6 +1708,7 @@ extern __at(0x0197) volatile __VREGCONbits_t VREGCONbits;
 
 extern __at(0x0199) __sfr RCREG;
 extern __at(0x019A) __sfr TXREG;
+extern __at(0x019B) __sfr SPBRG;
 extern __at(0x019B) __sfr SPBRGL;
 extern __at(0x019C) __sfr SPBRGH;
 

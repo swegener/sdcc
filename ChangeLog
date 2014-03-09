@@ -1,3 +1,11 @@
+2014-03-09 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/non-free/include/pic14/pic*.h,
+	  device/non-free/include/pic16/pic18f*.h,
+	  device/non-free/lib/pic14/libdev/pic*.c,
+	  device/non-free/lib/pic16/libdev/pic18f*.c:
+	  Regenerate the DEVICE.[ch] files with the cinc2h.pl program.
+
 2014-03-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCpeeph.c (notVolatileVariable): fixed strchr params

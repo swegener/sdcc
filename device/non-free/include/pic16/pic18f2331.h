@@ -2,9 +2,9 @@
  * This declarations of the PIC18F2331 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:31 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:33:09 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -1267,13 +1267,13 @@ typedef union
 
   struct
     {
-    unsigned GASEL              : 2;
+    unsigned SASEL              : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned SASEL              : 2;
+    unsigned GASEL              : 2;
     unsigned                    : 6;
     };
 

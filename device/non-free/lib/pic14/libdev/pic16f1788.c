@@ -2,9 +2,9 @@
  * This definitions of the PIC16F1788 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2013-03-15 21:50:53 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:23 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -348,8 +348,14 @@ __at(0x0214) volatile __SSPSTATbits_t SSPSTATbits;
 __at(0x0215) __sfr SSP1CON;
 __at(0x0215) volatile __SSP1CONbits_t SSP1CONbits;
 
+__at(0x0215) __sfr SSP1CON1;
+__at(0x0215) volatile __SSP1CON1bits_t SSP1CON1bits;
+
 __at(0x0215) __sfr SSPCON;
 __at(0x0215) volatile __SSPCONbits_t SSPCONbits;
+
+__at(0x0215) __sfr SSPCON1;
+__at(0x0215) volatile __SSPCON1bits_t SSPCON1bits;
 
 __at(0x0216) __sfr SSP1CON2;
 __at(0x0216) volatile __SSP1CON2bits_t SSP1CON2bits;

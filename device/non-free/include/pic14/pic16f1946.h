@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1946 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-11-01 17:30:05 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:31 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -120,6 +120,7 @@
 #define RCREG_ADDR              0x0199
 #define TX1REG_ADDR             0x019A
 #define TXREG_ADDR              0x019A
+#define SP1BRG_ADDR             0x019B
 #define SP1BRGL_ADDR            0x019B
 #define SPBRG_ADDR              0x019B
 #define SPBRGL_ADDR             0x019B
@@ -155,6 +156,7 @@
 #define SSP2CON3_ADDR           0x021F
 #define PORTF_ADDR              0x028C
 #define PORTG_ADDR              0x028D
+#define CCPR1_ADDR              0x0291
 #define CCPR1L_ADDR             0x0291
 #define CCPR1H_ADDR             0x0292
 #define CCP1CON_ADDR            0x0293
@@ -162,6 +164,7 @@
 #define CCP1AS_ADDR             0x0295
 #define ECCP1AS_ADDR            0x0295
 #define PSTR1CON_ADDR           0x0296
+#define CCPR2_ADDR              0x0298
 #define CCPR2L_ADDR             0x0298
 #define CCPR2H_ADDR             0x0299
 #define CCP2CON_ADDR            0x029A
@@ -173,6 +176,7 @@
 #define CCPTMRS1_ADDR           0x029F
 #define TRISF_ADDR              0x030C
 #define TRISG_ADDR              0x030D
+#define CCPR3_ADDR              0x0311
 #define CCPR3L_ADDR             0x0311
 #define CCPR3H_ADDR             0x0312
 #define CCP3CON_ADDR            0x0313
@@ -180,9 +184,11 @@
 #define CCP3AS_ADDR             0x0315
 #define ECCP3AS_ADDR            0x0315
 #define PSTR3CON_ADDR           0x0316
+#define CCPR4_ADDR              0x0318
 #define CCPR4L_ADDR             0x0318
 #define CCPR4H_ADDR             0x0319
 #define CCP4CON_ADDR            0x031A
+#define CCPR5_ADDR              0x031C
 #define CCPR5L_ADDR             0x031C
 #define CCPR5H_ADDR             0x031D
 #define CCP5CON_ADDR            0x031E
@@ -2655,6 +2661,7 @@ extern __at(0x0199) __sfr RC1REG;
 extern __at(0x0199) __sfr RCREG;
 extern __at(0x019A) __sfr TX1REG;
 extern __at(0x019A) __sfr TXREG;
+extern __at(0x019B) __sfr SP1BRG;
 extern __at(0x019B) __sfr SP1BRGL;
 extern __at(0x019B) __sfr SPBRG;
 extern __at(0x019B) __sfr SPBRGL;
@@ -3577,6 +3584,7 @@ extern __at(0x028D) volatile __PORTGbits_t PORTGbits;
 
 //==============================================================================
 
+extern __at(0x0291) __sfr CCPR1;
 extern __at(0x0291) __sfr CCPR1L;
 extern __at(0x0292) __sfr CCPR1H;
 
@@ -3808,6 +3816,7 @@ extern __at(0x0296) volatile __PSTR1CONbits_t PSTR1CONbits;
 
 //==============================================================================
 
+extern __at(0x0298) __sfr CCPR2;
 extern __at(0x0298) __sfr CCPR2L;
 extern __at(0x0299) __sfr CCPR2H;
 
@@ -4202,6 +4211,7 @@ extern __at(0x030D) volatile __TRISGbits_t TRISGbits;
 
 //==============================================================================
 
+extern __at(0x0311) __sfr CCPR3;
 extern __at(0x0311) __sfr CCPR3L;
 extern __at(0x0312) __sfr CCPR3H;
 
@@ -4433,6 +4443,7 @@ extern __at(0x0316) volatile __PSTR3CONbits_t PSTR3CONbits;
 
 //==============================================================================
 
+extern __at(0x0318) __sfr CCPR4;
 extern __at(0x0318) __sfr CCPR4L;
 extern __at(0x0319) __sfr CCPR4H;
 
@@ -4480,6 +4491,7 @@ extern __at(0x031A) volatile __CCP4CONbits_t CCP4CONbits;
 
 //==============================================================================
 
+extern __at(0x031C) __sfr CCPR5;
 extern __at(0x031C) __sfr CCPR5L;
 extern __at(0x031D) __sfr CCPR5H;
 

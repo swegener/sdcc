@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1784 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2013.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2013-03-05 18:28:13 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:21 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -160,7 +160,9 @@
 #define SSP1STAT_ADDR           0x0214
 #define SSPSTAT_ADDR            0x0214
 #define SSP1CON_ADDR            0x0215
+#define SSP1CON1_ADDR           0x0215
 #define SSPCON_ADDR             0x0215
+#define SSPCON1_ADDR            0x0215
 #define SSP1CON2_ADDR           0x0216
 #define SSPCON2_ADDR            0x0216
 #define SSP1CON3_ADDR           0x0217
@@ -206,6 +208,7 @@
 #define IOCEF_ADDR              0x039F
 #define OPA1CON_ADDR            0x0511
 #define OPA2CON_ADDR            0x0513
+#define OPA3CON_ADDR            0x0515
 #define CLKRCON_ADDR            0x051A
 #define PSMC1CON_ADDR           0x0811
 #define PSMC1MDL_ADDR           0x0812
@@ -1121,16 +1124,31 @@ extern __at(0x0093) volatile __PIE3bits_t PIE3bits;
 
 extern __at(0x0094) __sfr PIE4;
 
-typedef struct
+typedef union
   {
-  unsigned PSMC1SIE             : 1;
-  unsigned PSMC2SIE             : 1;
-  unsigned PSMC3SIE             : 1;
-  unsigned                      : 1;
-  unsigned PSMC1TIE             : 1;
-  unsigned PSMC2TIE             : 1;
-  unsigned PMSC3TIE             : 1;
-  unsigned                      : 1;
+  struct
+    {
+    unsigned PSMC1SIE           : 1;
+    unsigned PSMC2SIE           : 1;
+    unsigned PSMC3SIE           : 1;
+    unsigned                    : 1;
+    unsigned PSMC1TIE           : 1;
+    unsigned PSMC2TIE           : 1;
+    unsigned PSMC3TIE           : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned PMSC3TIE           : 1;
+    unsigned                    : 1;
+    };
   } __PIE4bits_t;
 
 extern __at(0x0094) volatile __PIE4bits_t PIE4bits;
@@ -1140,6 +1158,7 @@ extern __at(0x0094) volatile __PIE4bits_t PIE4bits;
 #define _PSMC3SIE               0x04
 #define _PSMC1TIE               0x10
 #define _PSMC2TIE               0x20
+#define _PSMC3TIE               0x40
 #define _PMSC3TIE               0x40
 
 //==============================================================================
@@ -1939,8 +1958,8 @@ typedef union
     unsigned ADFVR1             : 1;
     unsigned CDAFVR0            : 1;
     unsigned CDAFVR1            : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned TSRNG              : 1;
+    unsigned TSEN               : 1;
     unsigned FVRRDY             : 1;
     unsigned FVREN              : 1;
     };
@@ -1965,6 +1984,8 @@ extern __at(0x0117) volatile __FVRCONbits_t FVRCONbits;
 #define _ADFVR1                 0x02
 #define _CDAFVR0                0x04
 #define _CDAFVR1                0x08
+#define _TSRNG                  0x10
+#define _TSEN                   0x20
 #define _FVRRDY                 0x40
 #define _FVREN                  0x80
 
@@ -3447,6 +3468,46 @@ extern __at(0x0215) volatile __SSP1CONbits_t SSP1CONbits;
 
 
 //==============================================================================
+//        SSP1CON1 Bits
+
+extern __at(0x0215) __sfr SSP1CON1;
+
+typedef union
+  {
+  struct
+    {
+    unsigned SSPM0              : 1;
+    unsigned SSPM1              : 1;
+    unsigned SSPM2              : 1;
+    unsigned SSPM3              : 1;
+    unsigned CKP                : 1;
+    unsigned SSPEN              : 1;
+    unsigned SSPOV              : 1;
+    unsigned WCOL               : 1;
+    };
+
+  struct
+    {
+    unsigned SSPM               : 4;
+    unsigned                    : 4;
+    };
+  } __SSP1CON1bits_t;
+
+extern __at(0x0215) volatile __SSP1CON1bits_t SSP1CON1bits;
+
+#define _SSP1CON1_SSPM0         0x01
+#define _SSP1CON1_SSPM1         0x02
+#define _SSP1CON1_SSPM2         0x04
+#define _SSP1CON1_SSPM3         0x08
+#define _SSP1CON1_CKP           0x10
+#define _SSP1CON1_SSPEN         0x20
+#define _SSP1CON1_SSPOV         0x40
+#define _SSP1CON1_WCOL          0x80
+
+//==============================================================================
+
+
+//==============================================================================
 //        SSPCON Bits
 
 extern __at(0x0215) __sfr SSPCON;
@@ -3482,6 +3543,46 @@ extern __at(0x0215) volatile __SSPCONbits_t SSPCONbits;
 #define _SSPCON_SSPEN           0x20
 #define _SSPCON_SSPOV           0x40
 #define _SSPCON_WCOL            0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        SSPCON1 Bits
+
+extern __at(0x0215) __sfr SSPCON1;
+
+typedef union
+  {
+  struct
+    {
+    unsigned SSPM0              : 1;
+    unsigned SSPM1              : 1;
+    unsigned SSPM2              : 1;
+    unsigned SSPM3              : 1;
+    unsigned CKP                : 1;
+    unsigned SSPEN              : 1;
+    unsigned SSPOV              : 1;
+    unsigned WCOL               : 1;
+    };
+
+  struct
+    {
+    unsigned SSPM               : 4;
+    unsigned                    : 4;
+    };
+  } __SSPCON1bits_t;
+
+extern __at(0x0215) volatile __SSPCON1bits_t SSPCON1bits;
+
+#define _SSPCON1_SSPM0          0x01
+#define _SSPCON1_SSPM1          0x02
+#define _SSPCON1_SSPM2          0x04
+#define _SSPCON1_SSPM3          0x08
+#define _SSPCON1_CKP            0x10
+#define _SSPCON1_SSPEN          0x20
+#define _SSPCON1_SSPOV          0x40
+#define _SSPCON1_WCOL           0x80
 
 //==============================================================================
 
@@ -4651,6 +4752,42 @@ extern __at(0x0513) volatile __OPA2CONbits_t OPA2CONbits;
 #define _OPA2PCH1               0x02
 #define _OPA2SP                 0x40
 #define _OPA2EN                 0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        OPA3CON Bits
+
+extern __at(0x0515) __sfr OPA3CON;
+
+typedef union
+  {
+  struct
+    {
+    unsigned OPA3PCH0           : 1;
+    unsigned OPA3PCH1           : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned OPA3SP             : 1;
+    unsigned OPA3EN             : 1;
+    };
+
+  struct
+    {
+    unsigned OPA3PCH            : 2;
+    unsigned                    : 6;
+    };
+  } __OPA3CONbits_t;
+
+extern __at(0x0515) volatile __OPA3CONbits_t OPA3CONbits;
+
+#define _OPA3PCH0               0x01
+#define _OPA3PCH1               0x02
+#define _OPA3SP                 0x40
+#define _OPA3EN                 0x80
 
 //==============================================================================
 
@@ -7974,6 +8111,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define ADFVR1                  FVRCONbits.ADFVR1               // bit 1
 #define CDAFVR0                 FVRCONbits.CDAFVR0              // bit 2
 #define CDAFVR1                 FVRCONbits.CDAFVR1              // bit 3
+#define TSRNG                   FVRCONbits.TSRNG                // bit 4
+#define TSEN                    FVRCONbits.TSEN                 // bit 5
 #define FVRRDY                  FVRCONbits.FVRRDY               // bit 6
 #define FVREN                   FVRCONbits.FVREN                // bit 7
 
@@ -8206,6 +8345,11 @@ extern __at(0x0FEF) __sfr TOSH;
 #define OPA2SP                  OPA2CONbits.OPA2SP              // bit 6
 #define OPA2EN                  OPA2CONbits.OPA2EN              // bit 7
 
+#define OPA3PCH0                OPA3CONbits.OPA3PCH0            // bit 0
+#define OPA3PCH1                OPA3CONbits.OPA3PCH1            // bit 1
+#define OPA3SP                  OPA3CONbits.OPA3SP              // bit 6
+#define OPA3EN                  OPA3CONbits.OPA3EN              // bit 7
+
 #define PS0                     OPTION_REGbits.PS0              // bit 0
 #define PS1                     OPTION_REGbits.PS1              // bit 1
 #define PS2                     OPTION_REGbits.PS2              // bit 2
@@ -8274,7 +8418,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define PSMC3SIE                PIE4bits.PSMC3SIE               // bit 2
 #define PSMC1TIE                PIE4bits.PSMC1TIE               // bit 4
 #define PSMC2TIE                PIE4bits.PSMC2TIE               // bit 5
-#define PMSC3TIE                PIE4bits.PMSC3TIE               // bit 6
+#define PSMC3TIE                PIE4bits.PSMC3TIE               // bit 6, shadows bit in PIE4bits
+#define PMSC3TIE                PIE4bits.PMSC3TIE               // bit 6, shadows bit in PIE4bits
 
 #define TMR1IF                  PIR1bits.TMR1IF                 // bit 0
 #define TMR2IF                  PIR1bits.TMR2IF                 // bit 1

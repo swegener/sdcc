@@ -2,9 +2,9 @@
  * This definitions of the PIC18F27J53 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2012.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2012-10-01 20:26:52 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:32:39 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,

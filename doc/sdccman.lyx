@@ -22250,13 +22250,13 @@ void setb1(void); // The function that sets the currently active memory
 \begin_inset Newline newline
 \end_inset
 
-__addressmod const setb0 spaceb0; // Declare a named address space called
- spaceb0 that uses setb0()
+__addressmod setb0 const spaceb0; // Declare a named address space called
+ spaceb0 that uses setb0() and resides in ROM
 \begin_inset Newline newline
 \end_inset
 
 __addressmod setb1 spaceb1; // Declare a named address space called spaceb1
- that uses setb1() and resides in ROM
+ that uses setb1() and resides in RAM
 \begin_inset Newline newline
 \end_inset
 

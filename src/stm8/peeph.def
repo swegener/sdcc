@@ -163,6 +163,58 @@ replace restart {
 } if notUsed('a')
 
 replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	%5	a, #%4
+	ldw	%1, #%2
+} by {
+	ldw	%1, #%2
+	ld	a, (%1)
+	%5	a, #%4
+	; peephole 10 removed redundant load of #%2 into %1
+}
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	or	a, #0x01
+	ld	(%1), a
+} by {
+	bset	%2, #0
+	; peephole 11-0 replaced or by bset.
+} if notUsed(%1)
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	or	a, #0x80
+	ld	(%1), a
+} by {
+	bset	%2, #7
+	; peephole 11-7 replaced or by bset.
+} if notUsed(%1)
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #0xfe
+	ld	(%1), a
+} by {
+	bres	%2, #0
+	; peephole 12-0 replaced and by bres.
+} if notUsed(%1)
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #0x7f
+	ld	(%1), a
+} by {
+	bres	%2, #7
+	; peephole 12-7 replaced and by bres.
+} if notUsed(%1)
+
+replace restart {
 	jp	%5
 } by {
 	jp	%6

@@ -275,10 +275,13 @@ aopOnStackNotExt (const asmop *aop, int offset, int size)
   return (aopOnStack (aop, offset, size) && (aop->aopu.bytes[offset].byteu.stk + G.stack.pushed <= 255 || regalloc_dry_run));// Todo: Stack offsets might be unavailable during dry run (messes with addition costs, so we should have a mechanism to do it better).
 }
 
+/*-----------------------------------------------------------------*/
+/* aopIsLitVal - asmop from offset is val                          */
+/*-----------------------------------------------------------------*/
 static bool
 aopIsLitVal (const asmop *aop, int offset, int size, unsigned long val)
 {
-  wassert (size <= sizeof (unsigned long));
+  wassert (size <= sizeof (unsigned long)); // Make sure we are not testing outside of argument val.
 
   for(; size; size--, offset++)
     {
@@ -320,7 +323,7 @@ aopGet(const asmop *aop, int offset)
 
   if (aop->type == AOP_LIT)
     {
-      SNPRINTF (buffer, 256, "#0x%02x", byteOfVal (aop->aopu.aop_lit, offset));
+      SNPRINTF (buffer, sizeof(buffer), "#0x%02x", byteOfVal (aop->aopu.aop_lit, offset));
       return (buffer);
     }
 
@@ -338,10 +341,10 @@ aopGet(const asmop *aop, int offset)
           wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
           wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
 
-          SNPRINTF (buffer, 256, "(0x%x, y)", (unsigned)eoffset);
+          SNPRINTF (buffer, sizeof(buffer), "(0x%x, y)", (unsigned)eoffset);
         }
       else
-        SNPRINTF (buffer, 256, "(0x%02x, sp)", (unsigned)soffset);
+        SNPRINTF (buffer, sizeof(buffer), "(0x%02x, sp)", (unsigned)soffset);
       return (buffer);
     }
 
@@ -352,13 +355,13 @@ aopGet(const asmop *aop, int offset)
       cost (80, 80);
 
       wassertl (offset < 2, "Immediate operand out of range");
-      SNPRINTF (buffer, 256, offset ? "#>%s" : "#<%s", aop->aopu.aop_immd);
+      SNPRINTF (buffer, sizeof(buffer), offset ? "#>%s" : "#<%s", aop->aopu.aop_immd);
       return (buffer);
     }
 
   if (aop->type == AOP_DIR)
     {
-      SNPRINTF (buffer, 256, "%s+%d", aop->aopu.aop_dir, aop->size - 1 - offset);
+      SNPRINTF (buffer, sizeof(buffer), "%s+%d", aop->aopu.aop_dir, aop->size - 1 - offset);
       return (buffer);
     }
 
@@ -384,12 +387,12 @@ aopGet2(const asmop *aop, int offset)
 
   if (aop->type == AOP_LIT)
     {
-      SNPRINTF (buffer, 256, "#0x%02x%02x", byteOfVal (aop->aopu.aop_lit, offset + 1), byteOfVal (aop->aopu.aop_lit, offset));
+      SNPRINTF (buffer, sizeof(buffer), "#0x%02x%02x", byteOfVal (aop->aopu.aop_lit, offset + 1), byteOfVal (aop->aopu.aop_lit, offset));
       return (buffer);
     }
   else if (aop->type == AOP_IMMD)
     {
-      SNPRINTF (buffer, 256, "#%s", aop->aopu.aop_immd);
+      SNPRINTF (buffer, sizeof(buffer), "#%s", aop->aopu.aop_immd);
       return (buffer);
     }
 
@@ -765,6 +768,7 @@ emit3w (enum asminst inst, asmop *op1, asmop *op2)
   emit3w_o (inst, op1, 0, op2, 0);
 }
 
+#if 0
 static bool
 regFree (int idx, const iCode *ic)
 {
@@ -774,6 +778,7 @@ regFree (int idx, const iCode *ic)
     return (regFree (YL_IDX, ic) && regFree (YH_IDX, ic));
   return (!bitVectBitValue (ic->rMask, idx));
 }
+#endif
 
 static bool
 regDead (int idx, const iCode *ic)
@@ -3858,6 +3863,16 @@ branchInstCmp (int opcode, int sign, bool negated)
 
 /*------------------------------------------------------------------*/
 /* genCmp :- greater or less than (and maybe with equal) comparison */
+/* Handles cases where the decision can be made based on top bytes. */
+/*------------------------------------------------------------------*/
+static bool
+genCmpTop (void)
+{
+  return FALSE;
+}
+
+/*------------------------------------------------------------------*/
+/* genCmp :- greater or less than (and maybe with equal) comparison */
 /*------------------------------------------------------------------*/
 static void
 genCmp (const iCode *ic, iCode *ifx)
@@ -3892,6 +3907,14 @@ genCmp (const iCode *ic, iCode *ifx)
     right->aop->type != AOP_LIT && left->aop->type == AOP_DIR ||
     (aopInReg (right->aop, 0, A_IDX) || aopInReg (right->aop, 0, X_IDX) || aopInReg (right->aop, 0, Y_IDX)) && left->aop->type == AOP_STK)
     exchange = TRUE;
+
+  if (genCmpTop())
+    {
+      freeAsmop (result);
+      freeAsmop (right);
+      freeAsmop (left);
+      return;
+    }
 
   /* Cannot do multibyte signed comparison, except for 2-byte using cpw */
   if (size > 1 && !(size == 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || right->aop->type == AOP_STK)))
@@ -5224,9 +5247,10 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
               }
             else if (aopInReg (shiftop, i, X_IDX) || aopInReg (shiftop, i, Y_IDX)) // Skipped top byte, but 16-bit shift is cheaper than going through a and doing 8-bit shift.
               {
+                wassert (i == size - 1);
                 wassert (!sign);
                 emit3w_o (A_SRLW, shiftop, i, 0, 0);
-                i -= 2;
+                i -= 1;
               }
             else
               {
@@ -5796,63 +5820,56 @@ genIfx (const iCode *ic)
             (aopOnStack (cond->aop, i, 2) || cond->aop->type == AOP_DIR))
             {
               genMove_o (ASMOP_Y, 0, cond->aop, i, 2, regDead (A_IDX, ic) && cond->aop->regs[A_IDX] < i, FALSE, TRUE);
-              if (floattopbyte)
+              if (floattopword)
                 emit3w (A_SLLW, ASMOP_Y, 0);
               i += 2;
             }
-          else if ((aopInReg (cond->aop, i, XL_IDX) || aopInReg (cond->aop, i, XH_IDX) || aopInReg (cond->aop, i, YH_IDX)) && regDead (A_IDX, ic) && cond->aop->regs[A_IDX] <= i)
+          else if ((aopInReg (cond->aop, i, XL_IDX) || aopInReg (cond->aop, i, XH_IDX) || aopInReg (cond->aop, i, YL_IDX) || aopInReg (cond->aop, i, YH_IDX)) && regDead (A_IDX, ic) && cond->aop->regs[A_IDX] <= i)
             {
               cheapMove (ASMOP_A, 0, cond->aop, i, FALSE);
               emit3 (floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
               i++;
             }
-          else if (!floattopbyte && aopInReg (cond->aop, i, XL_IDX))
+          // We can't just use swap_to_a() to improve the following four cases because it might use rrwa and rlwa which destroy the Z flag.
+          else if (aopInReg (cond->aop, i, XL_IDX) && (!floattopbyte || regDead (XL_IDX, ic)))
             {
               emitcode ("exg", "a, xl");
               cost (1, 1);
-              emit3(A_TNZ, ASMOP_A, 0);
+              emit3(floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
               emitcode ("exg", "a, xl");
               cost (1, 1);
               i++;
             }
-          else if (!floattopbyte && aopInReg (cond->aop, i, YL_IDX))
+          else if (aopInReg (cond->aop, i, YL_IDX) && (!floattopbyte || regDead (YL_IDX, ic)))
             {
               emitcode ("exg", "a, yl");
               cost (1, 1);
-              emit3(A_TNZ, ASMOP_A, 0);
+              emit3(floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
               emitcode ("exg", "a, yl");
               cost (1, 1);
               i++;
             }
-          else if (!floattopbyte && aopInReg (cond->aop, i, XH_IDX))
-            {
-              push (ASMOP_X, 0, 2);
-              emitcode ("tnz", "(1, sp)");
-              adjustStack (2, FALSE, FALSE, FALSE);
-              i++;
-            }
-          else if (!floattopbyte && aopInReg (cond->aop, i, YH_IDX))
-            {
-              push (ASMOP_Y, 0, 2);
-              emitcode ("tnz", "(1, sp)");
-              adjustStack (2, FALSE, FALSE, FALSE);
-              i++;
-            }
-          else if(!floattopbyte)
+          else if (!floattopbyte && !aopInReg (cond->aop, i, XH_IDX) && !aopInReg (cond->aop, i, YH_IDX))
             {
               emit3_o (A_TNZ, cond->aop, i, 0, 0);
+              i++;
+            }
+          else if (floattopbyte && aopInReg (cond->aop, i, A_IDX))
+            {
+              emitcode ("and", "a, 0x7f");
+              cost (2, 1);
               i++;
             }
           else
             {
               push (ASMOP_A, 0, 1);
               cheapMove (ASMOP_A, 0, cond->aop, i, FALSE);
-              emit3 (A_SLL, ASMOP_A, 0);
+              emit3(floattopbyte ? A_SLL : A_TNZ, ASMOP_A, 0);
               pop (ASMOP_A, 0, 1);
               i++;
             }
 
-          if(!inv && i < cond->aop->size && !IC_FALSE (ic))
+          if (!inv && i < cond->aop->size && !IC_FALSE (ic))
             {
               tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
               inv = TRUE;

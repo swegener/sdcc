@@ -17,7 +17,7 @@ T2_isr (void) __interrupt 5 //no using
 }
 #endif
 
-#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(PORT_HOST)
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_stm8) || defined(PORT_HOST)
 
 void
 try_fun (jmp_buf catch, int except)
@@ -50,7 +50,7 @@ void f1(void)
 void
 testJmp (void)
 {
-#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(PORT_HOST)
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_stm8) || defined(PORT_HOST)
   jmp_buf catch;
   int exception;
 

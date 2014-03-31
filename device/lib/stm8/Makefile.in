@@ -48,7 +48,7 @@ STM8_SDCC = $(COMMON_SDCC) \
 STM8SOURCES = $(addprefix ../,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 STM8OBJECTS = $(patsubst %.c,%.rel,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 
-OBJ = _divuint.rel _divulong.rel _mulint.rel _mullong.rel
+OBJ = _divuint.rel _divulong.rel _mulint.rel _mullong.rel setjmp.rel
 
 LIB = stm8.lib
 CC = $(SCC)
@@ -79,6 +79,12 @@ endif
 
 %.rel: %.c
 	$(CC) $(CFLAGS) -c $<
+
+%.rel: %.s
+	@# TODO: sdas should place it\'s output in the current dir
+	test $(srcdir) = . || cp $< .
+	-$(AS) $(ASFLAGS) $(notdir $<)
+	test $(srcdir) = . || rm $(notdir $<)
 
 %.rel: ../%.c
 	$(CC) $(CFLAGS) -c $<

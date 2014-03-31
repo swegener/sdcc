@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  setjmp.s
 ;
-;  Copyright (C) 2011, Philipp Klaus Krause
+;  Copyright (C) 2011-2014, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -70,7 +70,7 @@ _longjmp:
 	ld	a, e
 	or	a, d
 	jr	NZ, jump
-	ld	de, #1
+	inc	de
 jump:
 
 	; Restore frame pointer.

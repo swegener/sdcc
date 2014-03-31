@@ -1,8 +1,45 @@
+2014-03-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	  Merged sdcc-stm8 branch into trunk.
+
+2014-03-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Patch #233 by Pascal S, and further peepholes for improving io access.
+
+2014-03-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/patch-235.c:
+	  Fix a bug in long and long long right shift on stm8.
+
+2014-03-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Improve ifx code generation.
+
+2014-03-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Comment for range error check in aopIsLitVal(), improve range checks in snprintf() calls, prepare for refactored version of patch #232.
+
 2014-03-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* .version,
 	* doc/INSTALL.txt,
 	* doc/sdccman.lyx: version 3.4.0
+
+2014-03-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Applied patch #227 by Ben Shi to fix jumping on float in y and to speed up jumping on byte in yl.
+	* device/lib/z80/setjmp.s:
+	  Slightly more efficient longjmp().
+	* device/lib/stm8/setjmp.s,
+	  support/regression/tests/setjmp.c:
+	  Implement setjmp() / longjmp() for stm8.
+	* src/z80/ralloc2.cc:
+	  Allow use of hl in 16-bit additions with global variables as long as de or bc is free.
 
 2014-03-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

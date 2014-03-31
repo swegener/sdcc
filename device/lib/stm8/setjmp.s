@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  setjmp.s
 ;
-;  Copyright (C) 2011-2014, Philipp Klaus Krause
+;  Copyright (C) 2014, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,65 +31,43 @@
 	.globl ___setjmp
 
 ___setjmp:
-	pop	hl
-	pop	iy
-	push	af
-	push	hl
+	ldw	y, (3, sp)
 
-	; Store return address.
-	ld	0(iy), l
-	ld	1(iy), h
+	; store return address
+	ldw	x, (1, sp)
+	ldw	(y), x
 
-	; Store stack pointer.
-	xor	a, a
-	ld	l, a
-	ld	h, a
-	add	hl, sp
-	ld	2(iy), l
-	ld	3(iy), h
+	; store stack pointer
+	ldw	x, sp
+	ldw	(2, y), x
 
-	; Store frame pointer.
-	push	ix
-	pop	hl
-	ld	4(iy), l
-	ld	5(iy), h
+	; return 0
+	clrw	x
 
-	; Return 0.
-	ld	l, a
-	ld	h, a
 	ret
 
-.globl _longjmp
+	.globl _longjmp
 
 _longjmp:
-	pop	af
-	pop	iy
-	pop	de
+	ldw	x, (3, sp)
+	ldw	y, (5, sp)
 
-	; Ensure that return value is non-zero.
-	ld	a, e
-	or	a, d
-	jr	NZ, jump
-	inc	de
+	; Restore return address
+	pushw	x
+	ldw	x, (2, x)
+	ldw	(1, x), y
+	popw	y
+	ldw	sp, x
+
+	; Calculate return value
+	popw	x
+	tnzw	x
+	jrne	jump
+	incw	x
 jump:
+	; Return
+	ldw	y, (y)
+	jp	(y)
 
-	; Restore frame pointer.
-	ld	l, 4(iy)
-	ld	h, 5(iy)
-	push	hl
-	pop	ix
-
-	; Adjust stack pointer.
-	ld	l, 2(iy)
-	ld	h, 3(iy)
-	ld	sp, hl
-	pop	hl
-
-	; Move return value into hl.
-	ex	de, hl
-
-	; Jump.
-	ld	c, 0(iy)
-	ld	b, 1(iy)
-	push	bc
 	ret
+

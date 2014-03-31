@@ -53,6 +53,8 @@
 
 #if defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_r3ka)
 typedef unsigned char jmp_buf[6]; // 2 for the stack pointer, 2 for the return address, 2 for the frame pointer.
+#elif defined (__SDCC_stm8)
+typedef unsigned char jmp_buf[4]; // 2 for the stack pointer, 2 for the return address.
 #else
 typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE];
 #endif
@@ -60,6 +62,7 @@ typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE
 int __setjmp (jmp_buf);
 
 // C99 might require setjmp to be a macro. The standard seems self-contradicting on this issue.
+// However, it is clear that the standards allow setjmp to be a macro.
 #define setjmp(jump_buf) __setjmp(jump_buf)
 
 #ifndef __SDCC_HIDE_LONGJMP

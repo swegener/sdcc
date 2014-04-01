@@ -1,6 +1,12 @@
+2014-04-01 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/INSTALL.txt,
+	* support/scripts/sdcc.nsi: added dedication to Borut Razem
+	* doc/README.txt: added STM8 target support
+
 2014-03-31 Philipp Klaus Krause <pkk AT spth.de>
 
-	  Merged sdcc-stm8 branch into trunk.
+	* Merged sdcc-stm8 branch into trunk.
 
 2014-03-29 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -20,8 +26,9 @@
 
 2014-03-28 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/stm8/gen.c:
-	  Comment for range error check in aopIsLitVal(), improve range checks in snprintf() calls, prepare for refactored version of patch #232.
+	* src/stm8/gen.c: Comment for range error check in aopIsLitVal(),
+	  improve range checks in snprintf() calls,
+	  prepare for refactored version of patch #232.
 
 2014-03-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -31,15 +38,15 @@
 
 2014-03-21 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/stm8/gen.c:
-	  Applied patch #227 by Ben Shi to fix jumping on float in y and to speed up jumping on byte in yl.
+	* src/stm8/gen.c: Applied patch #227 by Ben Shi to fix jumping on float in y
+	  and to speed up jumping on byte in yl.
 	* device/lib/z80/setjmp.s:
 	  Slightly more efficient longjmp().
 	* device/lib/stm8/setjmp.s,
 	  support/regression/tests/setjmp.c:
 	  Implement setjmp() / longjmp() for stm8.
-	* src/z80/ralloc2.cc:
-	  Allow use of hl in 16-bit additions with global variables as long as de or bc is free.
+	* src/z80/ralloc2.cc: Allow use of hl in 16-bit additions with global
+	  variables as long as de or bc is free.
 
 2014-03-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -77,20 +84,20 @@
 
 2014-02-27 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/stm8/gen.c:
-	  Applied patch #227 by Ben Shi to fix jumping on float in y and to speed up jumping on byte in yl.
+	* src/stm8/gen.c: Applied patch #227 by Ben Shi to fix jumping on float in y
+	  and to speed up jumping on byte in yl.
 
 2014-02-23 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/stm8/gen.c:
-	  Applied patch #223 by Ben Shi to improve code size for signed bit-fields on stm8.
+	* src/stm8/gen.c: Applied patch #223 by Ben Shi to improve code size for
+	  signed bit-fields on stm8.
 	* src/stm8/main.c:
 	  Applied patch #225 by Pascal S to enable naked functions for stm8.
 
 2014-02-21 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* src/stm8/peeph.def:
-	  Applied patch #222 by Ben Shi (new peephole to make shifts slightly more efficient).
+	* src/stm8/peeph.def: Applied patch #222 by Ben Shi (new peephole to make
+	  shifts slightly more efficient).
 	* src/stm8/gen.c:
 	  Applied patch #221 by Ben Shi (fix some bugs in shifts).
 
@@ -136,8 +143,8 @@
 
 2014-02-08 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/stm8/gen.c
-	  Fix jump on condition that is stored in register y in reverse order (bug #2251).
+	* src/stm8/gen.c: Fix jump on condition that is stored in register y in
+	  reverse order (bug #2251).
 
 2014-02-02 Philipp Klaus Krause <pkk AT spth.de>
 

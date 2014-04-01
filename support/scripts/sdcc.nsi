@@ -214,6 +214,7 @@ Var SDCC.PathToRemove
 !define MUI_ICON ".\sdcc.ico"
 
 ; Welcome page
+!define MUI_WELCOMEPAGE_TEXT "$(^NameDA) release is dedicated to the memory of Borut Ražem. He was a highly active developer, release manager and administrator of the SDCC project. We will miss him dearly.$\r$\n$\r$\nThis wizard will guide you through the installation of $(^NameDA).$\r$\n$\r$\nIt is recommended that you close all other applications before starting Setup. This will make it possible to update relevant system files without having to reboot your computer.$\r$\n$\r$\n$_CLICK"
 !insertmacro MUI_PAGE_WELCOME
 
 ; License page

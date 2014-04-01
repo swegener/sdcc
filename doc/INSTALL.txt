@@ -1,6 +1,10 @@
 SDCC Binary Kit Install Help
 ----------------------------
 
+The SDCC 3.4.0 release is dedicated to the memory of Borut Ražem.
+He was a highly active developer, release manager and administrator
+of the SDCC project. We will miss him dearly.
+
 For Linux users:
 ================
 To install:

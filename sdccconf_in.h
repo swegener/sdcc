@@ -125,6 +125,9 @@
 #undef OPT_DISABLE_MCS51
 
 /* XXX */
+#undef OPT_DISABLE_NON_FREE
+
+/* XXX */
 #undef OPT_DISABLE_PACKIHX
 
 /* XXX */

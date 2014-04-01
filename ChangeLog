@@ -1,3 +1,8 @@
+2014-04-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* configure.in,
+	* Makefile.in: manual edit to support option --disable-non-free
+
 2014-04-01 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/INSTALL.txt,

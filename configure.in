@@ -814,6 +814,7 @@ AC_DO_DISABLER(packihx,    PACKIHX,    [Disables building packihx])
 AC_DO_DISABLER(sdcpp,      SDCPP,      [Disables building sdcpp])
 AC_DO_DISABLER(sdcdb,      SDCDB,      [Disables building sdcdb])
 AC_DO_DISABLER(sdbinutils, SDBINUTILS, [Disables configuring and building of sdbinutils])
+AC_DO_DISABLER(non-free,   NON_FREE,   [Disables non-free runtime library parts])
 
 AC_DO_ENABLER(doc,   DOC,   [Enables building the documentation])
 AC_CHECK_PROG([LYX],        [lyx],        [lyx],        [:])
@@ -885,11 +886,17 @@ fi
 
 if test $OPT_DISABLE_PIC14 = 0; then
   AC_CONFIG_FILES(src/pic14/Makefile)
-  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/lib/pic14 device/non-free/lib/pic14)
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/lib/pic14)
+fi
+if test $OPT_DISABLE_PIC14 = 0 && test $OPT_DISABLE_NON_FREE = 0; then
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/non-free/lib/pic14)
 fi
 if test $OPT_DISABLE_PIC16 = 0; then
   AC_CONFIG_FILES(src/pic16/Makefile)
-  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/lib/pic16 device/non-free/lib/pic16)
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/lib/pic16)
+fi
+if test $OPT_DISABLE_PIC16 = 0 && test $OPT_DISABLE_NON_FREE = 0; then
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/non-free/lib/pic16)
 fi
 
 ####test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
@@ -926,12 +933,12 @@ if test $OPT_DISABLE_STM8 = 0; then
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/stm8/Makefile])
 fi
 
-test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile device/non-free/lib/Makefile])
+test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile])
+test $OPT_DISABLE_DEVICE_LIB = 0 && test $OPT_DISABLE_NON_FREE = 0 && AC_CONFIG_FILES([device/non-free/lib/Makefile])
 
 AC_CONFIG_FILES([main.mk:main_in.mk
 src/Makefile
 device/include/Makefile
-device/non-free/include/Makefile
 sdas/linksrc/Makefile
 support/librarian/Makefile
 support/makebin/Makefile
@@ -942,6 +949,9 @@ support/regression/ports/host/spec.mk:support/regression/ports/host/spec.mk.in
 Makefile
 Makefile.common:Makefile.common.in
 ])
+if test $OPT_DISABLE_NON_FREE = 0; then
+  AC_CONFIG_FILES([device/non-free/include/Makefile])
+fi
 AC_OUTPUT
 
 # I found no better place
@@ -999,6 +1009,7 @@ sdcc ${VERSION} is now configured for
     tlcs90              ${enable_tlcs90_port}
     stm8                ${enable_stm8_port}
 
+  Disable non-free lib: ${OPT_DISABLE_NON_FREE}
   Disable packihx:      ${OPT_DISABLE_PACKIHX}
   Disable ucsim:        ${OPT_DISABLE_UCSIM}
   Disable device lib:   ${OPT_DISABLE_DEVICE_LIB}

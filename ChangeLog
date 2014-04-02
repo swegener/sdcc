@@ -1,5 +1,10 @@
 2014-04-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* Makefile.common.in,
+	* Makefile.in: manual edit
+
+2014-04-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* configure
 	* debugger/mcs51/aclocal.m4
 	* debugger/mcs51/configure

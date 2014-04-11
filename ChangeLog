@@ -1,3 +1,8 @@
+2014-04-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* Small Device C Compiler 3.4.0 released
+	* .version, doc/sdccman.lyx: changed sdcc version to 3.4.1
+
 2014-04-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/pic16/debug/Makefile.in: regenerated

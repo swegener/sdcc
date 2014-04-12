@@ -26,16 +26,14 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.area   _CODE
+.area   _CODE
 
-__mulint_rrx_s::
+.globl	__mulint
+
+__mulint:
 	ld	hl, 2 (sp)
 	ld	de, 4 (sp)
 
-	;; Fall through
-
-__muluchar_rrx_hds::
-__mulint_rrx_hds::
 	;; Parameters:
 	;;	hl, de (left, right irrelevant)
 	ld	b,h

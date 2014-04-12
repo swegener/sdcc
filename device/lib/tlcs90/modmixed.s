@@ -26,34 +26,37 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-__modsuchar_rrx_s::
-        ld      hl,#2+1
-        add     hl,sp
+.globl	__modsuchar
+.globl	__moduschar
 
-        ld      e,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,#0
+__modsuchar:
+	ld      hl,#2+1
+	add     hl,sp
 
-        call    __div_signexte
+	ld      e,(hl)
+	dec     hl
+	ld      l,(hl)
+	ld      h,#0
+
+	call    __div_signexte
 
 	jp	__get_remainder
 
-__moduschar_rrx_s::
-        ld      hl,#2+1
-        ld      d, h
-        add     hl,sp
+__moduschar:
+	ld      hl,#2+1
+	ld      d, h
+	add     hl,sp
 
-        ld      e,(hl)
-        dec     hl
-        ld      l,(hl)
+	ld      e,(hl)
+	dec     hl
+	ld      l,(hl)
 
-        ld      a,l             ; Sign extend
-        rlca
-        sbc     a, a
-        ld      h,a
+	ld      a,l	; Sign extend
+	rlca
+	sbc     a, a
+	ld      h, a
 
 	call	__div16
 
-        jp	__get_remainder
+	jp	__get_remainder
 

@@ -30,9 +30,15 @@
 
         .area   _CODE
 
+.globl	__mulsuchar
+.globl	__muluschar
+.globl	__mulschar
+.globl	__muluchar
+.globl	__mulint
+
 ; operands have different sign
 
-__mulsuchar_rrx_s::
+__mulsuchar:
         ld      hl,#2+1
         ld      b, h
         add     hl,sp
@@ -42,7 +48,7 @@ __mulsuchar_rrx_s::
         ld      c,(hl)
         jr      signexte
 
-__muluschar_rrx_s::
+__muluschar:
         ld      hl,#2
         ld      b, h
         add     hl,sp
@@ -52,7 +58,7 @@ __muluschar_rrx_s::
         ld      c,(hl)
         jr      signexte
 
-__mulschar_rrx_s::
+__mulschar:
         ld      hl,#2
         add     hl,sp
 
@@ -60,8 +66,6 @@ __mulschar_rrx_s::
         inc     hl
         ld      l,(hl)
 
-        ;; Fall through
-__mulschar_rrx_hds::
         ;; Need to sign extend before going in.
         ld      c,l
 
@@ -77,7 +81,7 @@ signexte:
 
         jp      .mul16
 
-__muluchar_rrx_s::
+__muluchar:
         ld      hl,#2
         add     hl,sp
 
@@ -93,7 +97,7 @@ __muluchar_rrx_s::
 
         jp      .mul16
 
-__mulint_rrx_s::
+__mulint:
         ld      hl,#2
         add     hl,sp
 
@@ -106,10 +110,6 @@ __mulint_rrx_s::
         ld      h,(hl)
         ld      l,a
 
-        ;; Fall through
-
-__muluchar_rrx_hds::
-__mulint_rrx_hds::
         ;; Parameters:
         ;;      HL, DE (left, right irrelivent)
         ld      b,h

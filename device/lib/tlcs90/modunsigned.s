@@ -26,9 +26,12 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-        .area   _CODE
+.area   _CODE
 
-__moduchar_rrx_s::
+.globl	__moduchar
+.globl	__moduint
+
+__moduchar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -36,20 +39,16 @@ __moduchar_rrx_s::
         dec     hl
         ld      l,(hl)
 
-        ;; Fall through
-__moduchar_rrx_hds::
         call    __divu8
 
 	ex	de,hl
 
         ret
 
-__moduint_rrx_s::
+__moduint:
         ld	hl, 2 (sp)
         ld	de, 4 (sp)
 
-        ;; Fall through
-__moduint_rrx_hds::
         call    __divu16
 
         ex      de,hl

@@ -28,9 +28,12 @@
 
         ;; Originally from GBDK by Pascal Felber.
 
-        .area   _CODE
+.area   _CODE
 
-__divuint_rrx_s::
+.globl	__divuint
+.globl	__divuchar
+
+__divuint:
         pop     af
         pop     hl
         pop     de
@@ -40,7 +43,7 @@ __divuint_rrx_s::
 
         jr      __divu16
 
-__divuchar_rrx_s::
+__divuchar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -49,7 +52,6 @@ __divuchar_rrx_s::
         ld      l,(hl)
 
         ;; Fall through
-__divuchar_rrx_hds::
 __divu8::
         ld      h,#0x00
         ld      d,h
@@ -68,7 +70,6 @@ __divu8::
         ;;   If divisor is 0, quotient is set to "infinity", i.e HL = 0xFFFF.
         ;;
         ;; Register used: AF,B,DE,HL
-__divuint_rrx_hds::
 __divu16::
         ;; Two algorithms: one assumes divisor <2^7, the second
         ;; assumes divisor >=2^7; choose the applicable one.

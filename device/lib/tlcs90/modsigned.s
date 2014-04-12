@@ -26,9 +26,12 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-        .area   _CODE
+.area   _CODE
 
-__modschar_rrx_s::
+.globl	__modschar
+.globl	__modsint
+
+__modschar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -36,18 +39,14 @@ __modschar_rrx_s::
         dec     hl
         ld      l,(hl)
 
-        ;; Fall through
-__modschar_rrx_hds::
         call    __div8
 
         jp	__get_remainder
 
-__modsint_rrx_s::
+__modsint:
         ld	hl, 2 (sp)
         ld	de, 4 (sp)
 
-        ;; Fall through
-__modsint_rrx_hds::
         call    __div16
 
         jp	__get_remainder

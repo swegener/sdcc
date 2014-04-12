@@ -29,7 +29,20 @@
         ;; Originally from GBDK by Pascal Felber.
         .area   _CODE
 
-__divsuchar_rrx_s::
+.globl	__divsuchar
+.globl	__modsuchar
+.globl	__divuschar
+.globl	__moduschar
+.globl	__divschar
+.globl	__modschar
+.globl	__divsint
+.globl	__modsint
+.globl	__divuchar
+.globl	__moduchar
+.globl	__divuint
+.globl	__moduint
+
+__divsuchar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -45,7 +58,7 @@ __divsuchar_rrx_s::
 
 	ret
 
-__modsuchar_rrx_s::
+__modsuchar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -56,7 +69,7 @@ __modsuchar_rrx_s::
 
         jp    signexte
 
-__divuschar_rrx_s::
+__divuschar:
         ld      hl,#2+1
         ld      d, h
         add     hl,sp
@@ -77,7 +90,7 @@ __divuschar_rrx_s::
 
 	ret
 
-__moduschar_rrx_s::
+__moduschar:
         ld      hl,#2+1
         ld      d, h
         add     hl,sp
@@ -95,7 +108,7 @@ __moduschar_rrx_s::
 
         ret
 
-__divschar_rrx_s::
+__divschar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -103,8 +116,6 @@ __divschar_rrx_s::
         dec     hl
         ld      l,(hl)
 
-        ;; Fall through
-__divschar_rrx_hds::
         ld      c,l
 
         call    .div8
@@ -114,7 +125,7 @@ __divschar_rrx_hds::
 
         ret
 
-__modschar_rrx_s::
+__modschar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -122,8 +133,6 @@ __modschar_rrx_s::
         dec     hl
         ld      l,(hl)
 
-        ;; Fall through
-__modschar_rrx_hds::
         ld      c,l
 
         call    .div8
@@ -132,7 +141,7 @@ __modschar_rrx_hds::
 
         ret
 
-__divsint_rrx_s::
+__divsint:
         ld      hl,#2+3
         add     hl,sp
 
@@ -145,8 +154,6 @@ __divsint_rrx_s::
         ld      l,(hl)
         ld      h,a
 
-        ;; Fall through
-__divsint_rrx_hds::
         ld      b,h
         ld      c,l
 
@@ -157,7 +164,7 @@ __divsint_rrx_hds::
 
         ret
 
-__modsint_rrx_s::
+__modsint:
         ld      hl,#2+3
         add     hl,sp
 
@@ -170,8 +177,6 @@ __modsint_rrx_s::
         ld      l,(hl)
         ld      h,a
 
-        ;; Fall through
-__modsint_rrx_hds::
         ld      b,h
         ld      c,l
 
@@ -182,7 +187,7 @@ __modsint_rrx_hds::
         ret
 
         ;; Unsigned
-__divuchar_rrx_s::
+__divuchar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -190,8 +195,6 @@ __divuchar_rrx_s::
         dec     hl
         ld      l,(hl)
 
-        ;; Fall through
-__divuchar_rrx_hds::
         ld      c,l
         call    .divu8
 
@@ -200,7 +203,7 @@ __divuchar_rrx_hds::
 
         ret
 
-__moduchar_rrx_s::
+__moduchar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -208,8 +211,6 @@ __moduchar_rrx_s::
         dec     hl
         ld      l,(hl)
 
-        ;; Fall through
-__moduchar_rrx_hds::
         ld      c,l
         call    .divu8
 
@@ -217,7 +218,7 @@ __moduchar_rrx_hds::
 
         ret
 
-__divuint_rrx_s::
+__divuint:
         ld      hl,#2+3
         add     hl,sp
 
@@ -230,8 +231,6 @@ __divuint_rrx_s::
         ld      l,(hl)
         ld      h,a
 
-        ;; Fall through
-__divuint_rrx_hds::
         ld      b,h
         ld      c,l
         call    .divu16
@@ -241,7 +240,7 @@ __divuint_rrx_hds::
 
         ret
 
-__moduint_rrx_s::
+__moduint:
         ld      hl,#2+3
         add     hl,sp
 
@@ -253,9 +252,7 @@ __moduint_rrx_s::
         dec     hl
         ld      l,(hl)
         ld      h,a
-        ;; Fall through
 
-__moduint_rrx_hds::
         ld      b,h
         ld      c,l
 

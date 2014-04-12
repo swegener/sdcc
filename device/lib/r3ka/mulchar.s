@@ -26,33 +26,17 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-        .area   _CODE
+.area   _CODE
 
-; This multiplication routine is similar to the one
-; from Rodnay Zaks, "Programming the Z80".
+; unsigned char x unsigned char multiplication is done by code generation.
 
-; Now replaced by a builtin for code generation, but
-; still called from some asm files in this directory.
-__muluchar_rrx_s::
-        ld      hl, #2+1
-        ld      d, h
-        add     hl, sp
-        ld      e, (hl)
-        dec     hl
-        ld      h, (hl)
-        ld      l, d
-        ld      b, #8
-muluchar_rrx_s_loop:
-        add     hl, hl
-        jr      nc, muluchar_rrx_s_noadd
-        add     hl, de
-muluchar_rrx_s_noadd:
-        djnz    muluchar_rrx_s_loop
-        ret
+.globl	__mulsuchar
+.globl	__muluschar
+.globl	__mulschar
 
 ; operands have different sign
 
-__mulsuchar_rrx_s::
+__mulsuchar:
         ld      hl,#2+1
         ld      b, h
         add     hl,sp
@@ -62,7 +46,7 @@ __mulsuchar_rrx_s::
         ld      c,(hl)
         jr      signexte
 
-__muluschar_rrx_s::
+__muluschar:
         ld      hl,#2
         ld      b, h
         add     hl,sp
@@ -74,7 +58,7 @@ __muluschar_rrx_s::
 
 ;; Originally from GBDK by Pascal Felber.
 
-__mulschar_rrx_s::
+__mulschar:
         ld      hl,#2+1
         add     hl,sp
 
@@ -82,8 +66,6 @@ __mulschar_rrx_s::
         dec     hl
         ld      l,(hl)
 
-        ;; Fall through
-__mulschar_rrx_hds::
         ;; Need to sign extend before going in.
         ld      c,l
 

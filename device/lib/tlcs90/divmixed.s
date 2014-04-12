@@ -26,30 +26,33 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-__divsuchar_rrx_s::
-        ld      hl,#2+1
-        add     hl,sp
+.globl	__divsuchar
+.globl	__divuschar
 
-        ld      e,(hl)
-        dec     hl
-        ld      l,(hl)
-        ld      h,#0
+__divsuchar:
+	ld	hl, #2+1
+	add	hl, sp
 
-        jp      __div_signexte
+	ld	e, (hl)
+	dec	hl
+	ld	l, (hl)
+	ld	h, #0
 
-__divuschar_rrx_s::
-        ld      hl,#2+1
-        ld      d, h
-        add     hl,sp
+	jp	__div_signexte
 
-        ld      e,(hl)
-        dec     hl
-        ld      l,(hl)
+__divuschar:
+	ld	hl, #2+1
+	ld	d, h
+	add	hl, sp
 
-        ld      a,l             ; Sign extend
-        rlca
-        sbc     a, a
-        ld      h,a
+	ld	e, (hl)
+	dec	hl
+	ld	l, (hl)
 
-        jp      __div16
+	ld 	a, l	; Sign extend
+	rlca
+	sbc	a, a
+	ld	h, a
+
+	jp	__div16
 

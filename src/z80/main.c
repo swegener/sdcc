@@ -651,6 +651,7 @@ _setDefaultOptions (void)
   options.out_fmt = 'i';        /* Default output format is ihx */
 }
 
+#if 0
 /* Mangling format:
     _fun_policy_params
     where:
@@ -685,6 +686,7 @@ _mangleSupportFunctionName (const char *original)
 
   return dbuf_detach_c_str (&dbuf);
 }
+#endif
 
 static const char *
 _getRegName (const struct reg_info *reg)
@@ -910,7 +912,7 @@ PORT z80_port = {
   _reset_regparm,
   _reg_parm,
   _process_pragma,
-  _mangleSupportFunctionName,
+  NULL,
   _hasNativeMulFor,
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
@@ -1039,7 +1041,7 @@ PORT z180_port = {
   _reset_regparm,
   _reg_parm,
   _process_pragma,
-  _mangleSupportFunctionName,
+  NULL,
   _hasNativeMulFor,
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
@@ -1168,7 +1170,7 @@ PORT r2k_port = {
   _reset_regparm,
   _reg_parm,
   _process_pragma,
-  _mangleSupportFunctionName,
+  NULL,
   _hasNativeMulFor,
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
@@ -1297,7 +1299,7 @@ PORT r3ka_port = {
   _reset_regparm,
   _reg_parm,
   _process_pragma,
-  _mangleSupportFunctionName,
+  NULL,
   _hasNativeMulFor,
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
@@ -1428,7 +1430,7 @@ PORT gbz80_port = {
   _reset_regparm,
   _reg_parm,
   _process_pragma,
-  _mangleSupportFunctionName,
+  NULL,
   _hasNativeMulFor,
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
@@ -1557,7 +1559,7 @@ PORT tlcs90_port = {
   _reset_regparm,
   _reg_parm,
   _process_pragma,
-  _mangleSupportFunctionName,
+  NULL,
   _hasNativeMulFor,
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */

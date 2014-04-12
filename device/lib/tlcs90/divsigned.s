@@ -26,15 +26,18 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-        .area   _CODE
+.area	_CODE
 
-__divsint_rrx_s::
+.globl	__divsint
+.globl	__divschar
+
+__divsint:
         ld	hl, 2 (sp)
         ld	de, 4 (sp)
 
         jp      __div16
 
-__divschar_rrx_s::
+__divschar:
         ld      hl, #2+1
         add     hl, sp
 
@@ -42,8 +45,6 @@ __divschar_rrx_s::
         dec     hl
         ld      l, (hl)
 
-        ;; Fall through
-__divschar_rrx_hds::
 __div8::
         ld      a, l            ; Sign extend
         rlca
@@ -67,7 +68,6 @@ __div_signexte::
         ;;   DE = remainder
         ;;
         ;; Register used: AF,B,DE,HL
-__divsint_rrx_hds::
 __div16::
         ;; Determine sign of quotient by xor-ing high bytes of dividend
         ;;  and divisor. Quotient is positive if signs are the same, negative

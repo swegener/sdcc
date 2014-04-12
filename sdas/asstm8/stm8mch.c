@@ -1760,7 +1760,7 @@ struct mne *mp;
 		default:			break;
 		}
 		//outrbm(&e2, R_BITS, op);
-                outab(op|v2); /* TODO: maybe fix outrb vs. outrbm */
+                outab(op|v2*2); /* TODO: maybe fix outrb vs. outrbm */
 		outrw(&e1, R_USGN);
 		break;
 

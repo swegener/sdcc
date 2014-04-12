@@ -4,6 +4,10 @@
 	  device/lib/*/*.s,
 	  src/z80/main.c:
 	  Do not mangle support function names. Implements RFE #405.
+	* src/stm8/gen.c:
+	  More efficient comparisons, a modified version of patch #232 by Ben Shi.
+	* sdas/asstm8/stm8mch.c:
+	  Fix bit handling instructions, patch #239 by Pascal S.
 
 2014-04-11 Maarten Brock <sourceforge.brock AT dse.nl>
 

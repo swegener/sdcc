@@ -3865,10 +3865,118 @@ branchInstCmp (int opcode, int sign, bool negated)
 /* genCmp :- greater or less than (and maybe with equal) comparison */
 /* Handles cases where the decision can be made based on top bytes. */
 /*------------------------------------------------------------------*/
-static bool
-genCmpTop (void)
+static int
+genCmpTop (operand *left, operand *right, operand *result, const iCode *ic)
 {
-  return FALSE;
+  sym_link *letype, *retype;
+  int sign, opcode;
+  int size;
+  int ret = 0;
+
+  D (emitcode ("; genCmpTop", ""));
+
+  if (left->aop->type != AOP_LIT && right->aop->type != AOP_LIT)
+    return 0;
+
+  opcode = ic->op;
+  sign = 0;
+  if (IS_SPEC (operandType (left)) && IS_SPEC (operandType (right)))
+    {
+      letype = getSpec (operandType (left));
+      retype = getSpec (operandType (right));
+      sign = !(SPEC_USIGN (letype) | SPEC_USIGN (retype));
+    }
+  size = max (left->aop->size, right->aop->size);
+
+  if (left->aop->type == AOP_LIT)
+    {
+      wassert (right->aop->type != AOP_LIT);
+      operand *temp = left;
+      left = right;
+      right = temp;
+      opcode = exchangedCmp (opcode);
+    }
+  wassert (right->aop->type == AOP_LIT);
+
+  if ((size >= 2 && !sign && aopIsLitVal (right->aop, 0, size - 1, ~0) && aopIsLitVal (right->aop, size - 1, 1, 0x00) && opcode == '>'))
+    {
+      if (aopInReg (left->aop, size - 1, A_IDX) || aopOnStack (left->aop, size - 1, 1) || left->aop->type == AOP_IMMD)
+        {
+          emit3_o (A_TNZ, left->aop, size - 1, 0, 0);
+          ret = 20;
+        }
+      else if (size > 2 ||
+	    (!aopInReg (left->aop, 0, X_IDX) && !aopInReg (left->aop, 0, Y_IDX) && (regDead (A_IDX, ic) || !regDead (X_IDX, ic))))	// When we can use tnzw moving to A costs more than we save by skipping a byte.
+        {
+          if (!regDead (A_IDX, ic))
+            push (ASMOP_A, 0, 1);
+
+          cheapMove (ASMOP_A, 0, left->aop, size - 1, FALSE);
+          emit3 (A_TNZ, ASMOP_A, NULL);
+          ret = 20;
+
+          if (!regDead (A_IDX, ic))
+            pop (ASMOP_A, 0, 1);
+        }
+    }
+  else if (size >= 3 && !sign && aopIsLitVal (right->aop, 0, size - 2, ~0) && aopIsLitVal (right->aop, size - 2, 2, 0x0000) && opcode == '>')
+    {
+      if (aopInReg (left->aop, 2, X_IDX) || aopInReg (left->aop, 2, XH_IDX) && aopInReg (left->aop, 3, XL_IDX))
+        emit3w (A_TNZW, ASMOP_X, NULL);
+      else if (aopInReg (left->aop, 2, Y_IDX) || aopInReg (left->aop, 2, YH_IDX) && aopInReg (left->aop, 3, YL_IDX))
+        emit3w (A_TNZW, ASMOP_Y, NULL);
+      else if (regDead (X_IDX, ic))
+        {
+          genMove_o (ASMOP_X, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+          emit3w (A_TNZW, ASMOP_X, NULL);
+        }
+      else if (regDead (Y_IDX, ic))
+        {
+          genMove_o (ASMOP_Y, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), regDead (X_IDX, ic), TRUE);
+          emit3w (A_TNZW, ASMOP_Y, NULL);
+        }
+      else
+        {
+          push (ASMOP_X, 0, 2);
+          genMove_o (ASMOP_X, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+          emit3w (A_TNZW, ASMOP_X, NULL);
+          pop (ASMOP_X, 0, 2);
+        }
+      ret = 20;
+    }
+  else if (sign && aopIsLitVal (right->aop, 0, size, 0) && opcode == '<')
+    {
+      if (aopInReg (left->aop, size - 1, A_IDX) || aopOnStack (left->aop, size - 1, 1) || left->aop->type == AOP_IMMD)
+        emit3_o (A_TNZ, left->aop, size - 1, 0, 0);
+      else if (size >= 2 && aopInReg (left->aop, size - 2, X_IDX))
+        emit3w (A_TNZW, ASMOP_X, NULL);
+      else if (size >= 2 && aopInReg (left->aop, size - 2, Y_IDX))
+        emit3w (A_TNZW, ASMOP_Y, NULL);
+      else if (size >= 2 && regDead (X_IDX, ic))
+        {
+          genMove_o (ASMOP_X, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+          emit3w (A_TNZW, ASMOP_X, NULL);
+        }
+      else if (size >= 2 && regDead (Y_IDX, ic))
+        {
+          genMove_o (ASMOP_Y, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), regDead (X_IDX, ic), TRUE);
+          emit3w (A_TNZW, ASMOP_Y, NULL);
+        }
+      else
+        {
+          if (!regDead (A_IDX, ic))
+            push (ASMOP_A, 0, 1);
+
+          cheapMove (ASMOP_A, 0, left->aop, size - 1, FALSE);
+          emit3 (A_TNZ, ASMOP_A, NULL);
+
+          if (!regDead (A_IDX, ic))
+            pop (ASMOP_A, 0, 1);
+        }
+      ret = 10;
+    }
+
+  return ret;
 }
 
 /*------------------------------------------------------------------*/
@@ -3884,6 +3992,7 @@ genCmp (const iCode *ic, iCode *ifx)
   int sign, opcode;
   int size, i;
   bool exchange = FALSE;
+  int special = 0;
 
   D (emitcode ("; genCmp", ""));
 
@@ -3908,13 +4017,9 @@ genCmp (const iCode *ic, iCode *ifx)
     (aopInReg (right->aop, 0, A_IDX) || aopInReg (right->aop, 0, X_IDX) || aopInReg (right->aop, 0, Y_IDX)) && left->aop->type == AOP_STK)
     exchange = TRUE;
 
-  if (genCmpTop())
-    {
-      freeAsmop (result);
-      freeAsmop (right);
-      freeAsmop (left);
-      return;
-    }
+  /* Right operand is a special literal */
+  if ((special = genCmpTop(left, right, result, ic)) > 0)
+    goto _genCmp_1;
 
   /* Cannot do multibyte signed comparison, except for 2-byte using cpw */
   if (size > 1 && !(size == 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || right->aop->type == AOP_STK)))
@@ -4047,13 +4152,24 @@ genCmp (const iCode *ic, iCode *ifx)
         adjustStack (1, FALSE, FALSE, FALSE);
     }
 
+_genCmp_1:
   if (!ifx)
     {
       symbol *tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
       symbol *tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-
       if (tlbl1)
-        emitcode (branchInstCmp (opcode, sign, FALSE), "%05d$", labelKey2num (tlbl1->key));
+        switch (special)
+          {
+          case 10: /* special cases by genCmpTop () */
+            emitcode ("jrmi", "%05d$", labelKey2num (tlbl1->key));
+            break;
+          case 20: /* special cases by genCmpTop () */
+            emitcode ("jrne", "%05d$", labelKey2num (tlbl1->key));
+            break;
+          default: /* normal cases */   
+            emitcode (branchInstCmp (opcode, sign, FALSE), "%05d$", labelKey2num (tlbl1->key));
+            break;
+          }
       cost (2, 0);
       cheapMove (result->aop, 0, ASMOP_ZERO, 0, !regDead (A_IDX, ic));
       if (tlbl2)
@@ -4067,7 +4183,18 @@ genCmp (const iCode *ic, iCode *ifx)
     {
       symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
       if (tlbl)
-        emitcode (branchInstCmp (opcode, sign, IC_TRUE (ifx) ? TRUE : FALSE), "%05d$", labelKey2num (tlbl->key));
+        switch (special)
+          {
+          case 10: /* special cases by genCmpTop () */
+            emitcode (IC_TRUE (ifx) ? "jrpl" : "jrmi", "%05d$", labelKey2num (tlbl->key));
+            break;
+          case 20: /* special cases by genCmpTop () */
+            emitcode (IC_TRUE (ifx) ? "jreq" : "jrne", "%05d$", labelKey2num (tlbl->key));
+            break;
+          default: /* normal cases */
+            emitcode (branchInstCmp (opcode, sign, IC_TRUE (ifx) ? TRUE : FALSE), "%05d$", labelKey2num (tlbl->key));
+            break;
+          }
       cost (2, 0);
       if (!regalloc_dry_run)
         emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));

@@ -279,9 +279,9 @@ aopOnStackNotExt (const asmop *aop, int offset, int size)
 /* aopIsLitVal - asmop from offset is val                          */
 /*-----------------------------------------------------------------*/
 static bool
-aopIsLitVal (const asmop *aop, int offset, int size, unsigned long val)
+aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
 {
-  wassert (size <= sizeof (unsigned long)); // Make sure we are not testing outside of argument val.
+  wassert (size <= sizeof (unsigned long long int)); // Make sure we are not testing outside of argument val.
 
   for(; size; size--, offset++)
     {

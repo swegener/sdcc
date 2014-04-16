@@ -2,7 +2,7 @@
 
 =back
 
-  Copyright (C) 2013, Molnar Karoly <molnarkaroly@users.sf.net>
+  Copyright (C) 2013-2014, Molnar Karoly <molnarkaroly@users.sf.net>
 
     This software is provided 'as-is', without any express or implied
     warranty.  In no event will the authors be held liable for any damages

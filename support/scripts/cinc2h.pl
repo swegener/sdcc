@@ -2,7 +2,7 @@
 
 =back
 
-  Copyright (C) 2012, Molnar Karoly <molnarkaroly@users.sf.net>
+  Copyright (C) 2012-2014, Molnar Karoly <molnarkaroly@users.sf.net>
 
     This file is part of SDCC. 
 

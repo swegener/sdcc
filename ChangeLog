@@ -1,3 +1,36 @@
+2014-04-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/include/pic14/pic14devices.txt,
+	  device/include/pic14/pic16regs.h,
+	  device/non-free/include/pic14/pic12f1571.h,
+	  device/non-free/include/pic14/pic12f1572.h,
+	  device/non-free/include/pic14/pic12f1612.h,
+	  device/non-free/include/pic14/pic16f1613.h,
+	  device/non-free/include/pic14/pic16f1703.h,
+	  device/non-free/include/pic14/pic16f1705.h,
+	  device/non-free/include/pic14/pic16f1707.h,
+	  device/non-free/include/pic14/pic16f1709.h,
+	  device/non-free/include/pic14/pic16f1713.h,
+	  device/non-free/include/pic14/pic16f1716.h,
+	  device/non-free/include/pic14/pic16f1717.h,
+	  device/non-free/include/pic14/pic16f1718.h,
+	  device/non-free/include/pic14/pic16f1719.h,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/pic12f1571.c,
+	  device/non-free/lib/pic14/libdev/pic12f1572.c,
+	  device/non-free/lib/pic14/libdev/pic12f1612.c,
+	  device/non-free/lib/pic14/libdev/pic16f1613.c,
+	  device/non-free/lib/pic14/libdev/pic16f1703.c,
+	  device/non-free/lib/pic14/libdev/pic16f1705.c,
+	  device/non-free/lib/pic14/libdev/pic16f1707.c,
+	  device/non-free/lib/pic14/libdev/pic16f1709.c,
+	  device/non-free/lib/pic14/libdev/pic16f1713.c,
+	  device/non-free/lib/pic14/libdev/pic16f1716.c,
+	  device/non-free/lib/pic14/libdev/pic16f1717.c,
+	  device/non-free/lib/pic14/libdev/pic16f1718.c,
+	  device/non-free/lib/pic14/libdev/pic16f1719.c,
+	  doc/sdccman.lyx:
+	  New devices.
+
 2014-04-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

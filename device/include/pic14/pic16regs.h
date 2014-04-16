@@ -2,7 +2,7 @@
  *
  * This file is generated automatically by the device-manager.pl program.
  *
- * Copyright (C) 2012, Molnar Karoly <molnarkaroly@users.sf.net>
+ * Copyright (C) 2012-2014, Molnar Karoly <molnarkaroly@users.sf.net>
  *
  */
 
@@ -348,6 +348,15 @@
 #elif defined(__SDCC_PIC12F1501)
   #include <pic12f1501.h>
 
+#elif defined(__SDCC_PIC12F1571)
+  #include <pic12f1571.h>
+
+#elif defined(__SDCC_PIC12F1572)
+  #include <pic12f1572.h>
+
+#elif defined(__SDCC_PIC12F1612)
+  #include <pic12f1612.h>
+
 #elif defined(__SDCC_PIC12F1822)
   #include <pic12f1822.h>
 
@@ -405,11 +414,41 @@
 #elif defined(__SDCC_PIC16F1527)
   #include <pic16f1527.h>
 
+#elif defined(__SDCC_PIC16F1613)
+  #include <pic16f1613.h>
+
+#elif defined(__SDCC_PIC16F1703)
+  #include <pic16f1703.h>
+
 #elif defined(__SDCC_PIC16F1704)
   #include <pic16f1704.h>
 
+#elif defined(__SDCC_PIC16F1705)
+  #include <pic16f1705.h>
+
+#elif defined(__SDCC_PIC16F1707)
+  #include <pic16f1707.h>
+
 #elif defined(__SDCC_PIC16F1708)
   #include <pic16f1708.h>
+
+#elif defined(__SDCC_PIC16F1709)
+  #include <pic16f1709.h>
+
+#elif defined(__SDCC_PIC16F1713)
+  #include <pic16f1713.h>
+
+#elif defined(__SDCC_PIC16F1716)
+  #include <pic16f1716.h>
+
+#elif defined(__SDCC_PIC16F1717)
+  #include <pic16f1717.h>
+
+#elif defined(__SDCC_PIC16F1718)
+  #include <pic16f1718.h>
+
+#elif defined(__SDCC_PIC16F1719)
+  #include <pic16f1719.h>
 
 #elif defined(__SDCC_PIC16F1782)
   #include <pic16f1782.h>

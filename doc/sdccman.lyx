@@ -43488,7 +43488,11 @@ Currently supported devices include:
 \end_layout
 
 \begin_layout Standard
-12F: 609, 615, 617, 629, 635, 675, 683, 752
+12F: 609, 615, 617, 629, 635, 675, 683
+\end_layout
+
+\begin_layout Standard
+12F: 752
 \end_layout
 
 \begin_layout Standard
@@ -43564,23 +43568,62 @@ Supported devices with enhanced cores:
 \end_layout
 
 \begin_layout Standard
-12F: 1501, 1822, 1840
+12F: 1501, 1571, 1572
 \end_layout
 
 \begin_layout Standard
-12LF: 1501, 1552, 1822, 1840
+12LF: 1501, 1552, 1571, 1572
 \end_layout
 
 \begin_layout Standard
-16F: 1454, 1455, 1458, 1459, 1503, 1507, 1508, 1509, 1512, 1513, 1516, 1517,
- 1518, 1519, 1526, 1527, 1704, 1708, 1782, 1783, 1784, 1786, 1787, 1788,
- 1789
+12F: 1612
 \end_layout
 
 \begin_layout Standard
-16LF: 1454, 1455, 1458, 1459, 1503, 1507, 1508, 1509, 1512, 1513, 1516,
- 1517, 1518, 1519, 1526, 1527, 1704, 1708, 1782, 1783, 1784, 1786, 1787,
- 1788, 1789
+12LF: 1612
+\end_layout
+
+\begin_layout Standard
+12F: 1822, 1840
+\end_layout
+
+\begin_layout Standard
+12LF: 1822, 1840
+\end_layout
+
+\begin_layout Standard
+16F: 1454, 1455, 1458, 1459
+\end_layout
+
+\begin_layout Standard
+16LF: 1454, 1455, 1458, 1459
+\end_layout
+
+\begin_layout Standard
+16F: 1503, 1507, 1508, 1509, 1512, 1513, 1516, 1517, 1518, 1519, 1526, 1527
+\end_layout
+
+\begin_layout Standard
+16LF: 1503, 1507, 1508, 1509, 1512, 1513, 1516, 1517, 1518, 1519, 1526,
+ 1527
+\end_layout
+
+\begin_layout Standard
+16F: 1613
+\end_layout
+
+\begin_layout Standard
+16LF: 1613
+\end_layout
+
+\begin_layout Standard
+16F: 1703, 1704, 1705, 1707, 1708, 1709, 1713, 1716, 1717, 1718, 1719, 1782,
+ 1783, 1784, 1786, 1787, 1788, 1789
+\end_layout
+
+\begin_layout Standard
+16LF: 1703, 1704, 1705, 1707, 1708, 1709, 1713, 1716, 1717, 1718, 1719,
+ 1782, 1783, 1784, 1786, 1787, 1788, 1789
 \end_layout
 
 \begin_layout Standard

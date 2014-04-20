@@ -1,3 +1,7 @@
+2014-04-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/non-free/include/pic14/pic16fam.h:
+	  Updated and moved here: device/include/pic14/pic16fam.h
+
 2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,

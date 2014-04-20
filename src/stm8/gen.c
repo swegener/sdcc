@@ -768,7 +768,6 @@ emit3w (enum asminst inst, asmop *op1, asmop *op2)
   emit3w_o (inst, op1, 0, op2, 0);
 }
 
-#if 0
 static bool
 regFree (int idx, const iCode *ic)
 {
@@ -778,7 +777,6 @@ regFree (int idx, const iCode *ic)
     return (regFree (YL_IDX, ic) && regFree (YH_IDX, ic));
   return (!bitVectBitValue (ic->rMask, idx));
 }
-#endif
 
 static bool
 regDead (int idx, const iCode *ic)
@@ -1845,9 +1843,12 @@ skip_byte:
   // Free a reg to copy (stack-to-stack) whatever is left.
   if (size)
     {
-      push (ASMOP_A, 0, 1);
+      a_free = a_dead && (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= roffset + source->size);
+      if (!a_free)
+        push (ASMOP_A, 0, 1);
       genCopyStack (result, roffset, source, soffset, n, assigned, &size, TRUE, x_free, y_free, TRUE);
-      pop (ASMOP_A, 0, 1);
+      if (!a_free)
+        pop (ASMOP_A, 0, 1);
     }
 
   wassertl (size >= 0, "genCopy() copied more than there is to be copied.");
@@ -4831,6 +4832,9 @@ genAnd (const iCode *ic, iCode *ifx)
         int other_offset;
         asmop *other = (aopInReg (left->aop, i, A_IDX) ? right : left)->aop;
 
+        if (aopInReg (left->aop, i, A_IDX) && aopIsLitVal (right->aop, i, 1, 0x00)) // A is dead, it just doesn't know it yet.
+          break;
+
         other_stacked = stack_aop (other, i, &other_offset);
 
         if (aopIsLitVal (right->aop, i, 1, 0xff))
@@ -4877,56 +4881,63 @@ genAnd (const iCode *ic, iCode *ifx)
         break;
       }
 
-  for (i = 0; i < size; i++)
+  for (i = 0; i < size;)
     {
-      const asmop *right_stacked = NULL;
-      int right_offset;
-
       if (omitbyte == i)
-        continue;
-
-      if (aopIsLitVal (right->aop, i, 1, 0xff))
-        {
-          cheapMove (result->aop, i, left->aop, i, FALSE);
-          if (aopInReg (result->aop, i, A_IDX) && i != size - 1)
-            {
-              push (ASMOP_A, 0, 1);
-              pushed_a = TRUE;
-            }
-          continue;
-        }
+        i++;
       else if (aopIsLitVal (right->aop, i, 1, 0x00))
         {
-          cheapMove (result->aop, i, ASMOP_ZERO, 0, FALSE);
-          if (aopInReg (result->aop, i, A_IDX) && i != size - 1)
+          for(j = i; j < size && j != omitbyte && aopIsLitVal (right->aop, j, 1, 0x00); j++);
+          genMove_o (result->aop, i, ASMOP_ZERO, 0, j - i, TRUE, regFree (X_IDX, ic), regFree (Y_IDX, ic));
+          i = j;
+        }
+      /*else if (aopIsLitVal (right->aop, i, 1, 0xff)) // ENABLING THIS SHOULD GAIN A LOT IN CODE QUALITY, BUT TWO REGRESSION TESTS FAIL (it seems printf_large.c, lines 731 to 743 is where the difference matters for the bug)
+        {
+          for(j = i; j < size && j != omitbyte && aopIsLitVal (right->aop, j, 1, 0xff); j++);
+          genMove_o (result->aop, i, left->aop, i, j - i, TRUE, regFree (X_IDX, ic), regFree (Y_IDX, ic));
+          i = j;
+        } */
+      else if (aopIsLitVal (right->aop, i, 1, 0x7f) && (aopInReg (result->aop, i, XH_IDX) && aopInReg (left->aop, i, XH_IDX) || aopInReg (result->aop, i, YH_IDX) && aopInReg (left->aop, i, YH_IDX)))
+        {
+          emit3w (A_SLLW, aopInReg (result->aop, i, XH_IDX) ? ASMOP_X : ASMOP_Y, 0);
+          emit3w (A_SRLW, aopInReg (result->aop, i, XH_IDX) ? ASMOP_X : ASMOP_Y, 0);
+          i++;
+        }
+      else if (aopIsLitVal (right->aop, i, 1, 0xfe) && (aopInReg (result->aop, i, XL_IDX) && aopInReg (left->aop, i, XL_IDX) || aopInReg (result->aop, i, YL_IDX) && aopInReg (left->aop, i, YL_IDX)))
+        {
+          emit3w (A_SRLW, aopInReg (result->aop, i, XL_IDX) ? ASMOP_X : ASMOP_Y, 0);
+          emit3w (A_SLLW, aopInReg (result->aop, i, XL_IDX) ? ASMOP_X : ASMOP_Y, 0);
+          i++;
+        }
+      else
+        {
+          const asmop *right_stacked = NULL;
+          int right_offset;
+
+          right_stacked = stack_aop (right->aop, i, &right_offset);
+
+          cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+
+          if (!right_stacked && !(i && aopInReg (right->aop, i, A_IDX)))
+            emit3_o (A_AND, ASMOP_A, 0, right->aop, i);
+          else
+            {
+              emitcode ("and", "a, (%d, sp)", right_offset);
+              cost (2, 1);
+            }
+
+          if (right_stacked)
+            pop (right_stacked, 0, 2);
+
+          if (!aopInReg (result->aop, i, A_IDX) || i == size - 1)
+            cheapMove (result->aop, i, ASMOP_A, 0, FALSE);
+          else
             {
               push (ASMOP_A, 0, 1);
               pushed_a = TRUE;
             }
-          continue;
-        }
 
-      right_stacked = stack_aop (right->aop, i, &right_offset);
-
-      cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
-
-      if (!right_stacked && !(i && aopInReg (right->aop, i, A_IDX)))
-        emit3_o (A_AND, ASMOP_A, 0, right->aop, i);
-      else
-        {
-          emitcode ("and", "a, (%d, sp)", right_offset);
-          cost (2, 1);
-        }
-
-      if (right_stacked)
-        pop (right_stacked, 0, 2);
-
-      if (!aopInReg (result->aop, i, A_IDX) || i == size - 1)
-        cheapMove (result->aop, i, ASMOP_A, 0, FALSE);
-      else
-        {
-          push (ASMOP_A, 0, 1);
-          pushed_a = TRUE;
+          i++;
         }
     }
 

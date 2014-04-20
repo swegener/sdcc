@@ -1173,13 +1173,13 @@ cl_stm8::inst_swap(t_mem code, unsigned char prefix)
    } else if (((code&0xf0)==0x50) &&(prefix == 0x00)) {
       operand = regs.X;
       resval = (operand << 8) | (operand >> 8);
-      regs.X = resval;
+      regs.X = resval&0xffff;
       FLAG_ASSIGN (BIT_Z, (resval & 0xffff) == 0);
       FLAG_ASSIGN (BIT_N, 0x8000 & resval);
    } else if (((code&0xf0)==0x50) &&(prefix == 0x90)) {
       operand = regs.Y;
       resval = (operand << 8) | (operand >> 8);
-      regs.Y = resval;
+      regs.Y = resval&0xffff;
       FLAG_ASSIGN (BIT_Z, (resval & 0xffff) == 0);
       FLAG_ASSIGN (BIT_N, 0x8000 & resval);
    } else {

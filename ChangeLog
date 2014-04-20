@@ -2,7 +2,7 @@
 
 	* src/stm8/gen.c,
 	  src/stm8/ralloc2.cc:
-	  Improve bitwise and.
+	  Improve bitwise and, improve choice of shift location.
 
 2014-04-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/non-free/include/pic14/pic16fam.h:

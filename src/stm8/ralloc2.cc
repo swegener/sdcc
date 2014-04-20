@@ -449,10 +449,27 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 // Code for another ic is generated when generating this one. Mark the other as generated.
 static void extra_ic_generated(iCode *ic)
 {
+  int i;
+
   if(ic->op == '>' || ic->op == '<' || ic->op == LE_OP || ic->op == GE_OP || ic->op == EQ_OP || ic->op == NE_OP ||
-    ic->op == BITWISEAND && (IS_OP_LITERAL (IC_LEFT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic)) && getSize(operandType(IC_RESULT(ic))) == 1))
+    ic->op == BITWISEAND && (IS_OP_LITERAL (IC_LEFT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic))))
     {
       iCode *ifx;
+
+      // Bitwise and code generation can only do the jump if one operand is a literal with at most one nonzero byte.
+      if (ic->op == BITWISEAND && getSize(operandType(IC_RESULT(ic))) > 1)
+        {
+          int nonzero = 0;
+          operand *const litop = IS_OP_LITERAL (IC_LEFT (ic)) ? IC_LEFT (ic) : IC_RIGHT (ic);
+
+          for(int i = 0; i < getSize(operandType(IC_LEFT (ic))) && i < getSize(operandType(IC_RIGHT (ic))) && i < getSize(operandType(IC_RESULT(ic))); i++)
+            if(byteOfVal (OP_VALUE (litop), i))
+              nonzero++;
+
+          if(nonzero > 1)
+            return;
+        }
+
       if (ifx = ifxForOp (IC_RESULT (ic), ic))
         {
           OP_SYMBOL (IC_RESULT (ic))->for_newralloc = false;

@@ -4704,43 +4704,107 @@ genAnd (const iCode *ic, iCode *ifx)
       right = temp;
     }
 
-  if (ifx && getSize (operandType (result)) <= 1 && right->aop->type == AOP_LIT && left->aop->type == AOP_DIR && isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)) >= 0)
+  if (ifx && result->aop->type == AOP_CND) // TODO: Use sll for 0x7f, srl for 0xfe, swap for 0x08, sll for 0x40. Allow non-literal (and enable in ralloc2.cc)
     {
-      if (!regalloc_dry_run)
+      int nonzero;
+      symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
+emitcode(";", "ifxand");
+
+      wassertl (right->aop->type == AOP_LIT, "Code generation for bitwise and can only jump on literal operands");
+
+      // Find the non-zero byte.
+      for (j = 0, nonzero = 0, i = -1; j < size; j++)
+        if (byteOfVal (right->aop->aopu.aop_lit, j))
+          {
+            i = j;
+            nonzero++;
+          }
+
+      wassertl (nonzero <= 1, "Code generation for bitwise and can handle at most one nonzero byte");
+
+      if (!nonzero)
+        goto release;
+
+      // Try to use btjt / btjf.
+      if (left->aop->type == AOP_DIR && isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)) >= 0)
         {
           symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
-          emitcode (IC_TRUE (ifx) ? "btjf" : "btjt", "%s, #%d, !tlabel", aopGet (left->aop, 0), isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)), labelKey2num (tlbl->key));
           if (tlbl)
-            emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+            {
+              emitcode (IC_TRUE (ifx) ? "btjf" : "btjt", "%s, #%d, !tlabel", aopGet (left->aop, i), isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)) - i * 8, labelKey2num (tlbl->key));
+              emitcode ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+              emitLabel (tlbl);
+            }
           cost (8, 4); // Hmm. Cost 2 or 3 for btjf?
-          emitLabel (tlbl);
+          goto release;
         }
-      goto release;
-    }
-  if (ifx && getSize (operandType (result)) <= 1 && right->aop->type == AOP_LIT) // TODO: Use 16-bit shifts. Allow non-literal (and enable in ralloc2.cc)
-    {
-      symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
 
-      if ((byteOfVal (right->aop->aopu.aop_lit, 0) == 0x01 || byteOfVal (right->aop->aopu.aop_lit, 0) == 0x80) &&
-        (regDead (A_IDX, ic) || !aopInReg (left->aop, 0, A_IDX)))
+      if (byteOfVal (right->aop->aopu.aop_lit, i) == 0x80)
+        {
+          if (aopInReg (left->aop, i, XH_IDX))
+            emit3w (A_TNZW, ASMOP_X, 0);
+          else if (aopInReg (left->aop, i, YH_IDX))
+            emit3w (A_TNZW, ASMOP_Y, 0);
+          else if (aopInReg (left->aop, i, A_IDX) || aopOnStack (left->aop, i, 1) || left->aop->type == AOP_DIR)
+            emit3_o (A_TNZ, left->aop, i, 0, 0);
+          else
+            {
+              if (!regDead (A_IDX, ic))
+                push (ASMOP_A, 0, 1);
+              cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+              emit3 (A_TNZ, ASMOP_A, 0);
+              if (!regDead (A_IDX, ic))
+                pop (ASMOP_A, 0, 1);
+            }
+          if (!regalloc_dry_run)
+            emitcode (IC_TRUE (ifx) ? "jrpl" : "jrmi", "!tlabel", labelKey2num (tlbl->key));
+          cost (2, 2); // Hmm. Cycle cost overestimate.
+        }
+      else if (byteOfVal (right->aop->aopu.aop_lit, i) == 0x01 &&
+        (aopInReg (left->aop, i, XL_IDX) && regDead (X_IDX, ic) || aopInReg (left->aop, i, YL_IDX) && regDead (Y_IDX, ic)))
+        {
+          emit3w (A_SRLW, aopInReg (left->aop, i, XL_IDX) ? ASMOP_X : ASMOP_Y, 0);
+          if (!regalloc_dry_run)
+            emitcode (IC_TRUE (ifx) ? "jrnc" : "jrc", "!tlabel", labelKey2num (tlbl->key));
+          cost (2, 2); // Hmm. Cycle cost overestimate.
+        }
+      else if (byteOfVal (right->aop->aopu.aop_lit, i) == 0x01 &&
+        (regDead (A_IDX, ic) || !aopInReg (left->aop, i, A_IDX)))
         {
           if (!regDead (A_IDX, ic))
             push (ASMOP_A, 0, 1);
-          cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
-          emit3 (byteOfVal (right->aop->aopu.aop_lit, 0) == 0x01 ? A_SRL : A_SLL, ASMOP_A, 0);
+          cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+          emit3 (A_SRL , ASMOP_A, 0);
           if (!regDead (A_IDX, ic))
             pop (ASMOP_A, 0, 1);
           if (!regalloc_dry_run)
             emitcode (IC_TRUE (ifx) ? "jrnc" : "jrc", "!tlabel", labelKey2num (tlbl->key));
           cost (2, 2); // Hmm. Cycle cost overestimate.
         }
+      else if (byteOfVal (right->aop->aopu.aop_lit, i) == 0xff)
+        {
+          if (aopInReg (left->aop, i, A_IDX) || aopOnStack (left->aop, i, 1) || left->aop->type == AOP_DIR)
+            emit3_o (A_TNZ, left->aop, i, 0, 0);
+          else
+            {
+              if (!regDead (A_IDX, ic))
+                push (ASMOP_A, 0, 1);
+              cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+              emit3 (A_TNZ, ASMOP_A, 0);
+              if (!regDead (A_IDX, ic))
+                pop (ASMOP_A, 0, 1);
+            }
+          if (!regalloc_dry_run)
+            emitcode (IC_TRUE (ifx) ? "jreq" : "jrne", "!tlabel", labelKey2num (tlbl->key));
+          cost (2, 2); // Hmm. Cycle cost overestimate.
+        }
       else
         {
-          if (!regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX))
+          if (!regDead (A_IDX, ic) && !aopInReg (left->aop, i, A_IDX))
             push (ASMOP_A, 0, 1);
-          cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
-          emit3 (A_BCP, ASMOP_A, right->aop);
-          if (!regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX))
+          cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+          emit3_o (A_BCP, ASMOP_A, 0, right->aop, i);
+          if (!regDead (A_IDX, ic) && !aopInReg (left->aop, i, A_IDX))
             pop (ASMOP_A, 0, 1);
           if (!regalloc_dry_run)
             emitcode (IC_TRUE (ifx) ? "jreq" : "jrne", "!tlabel", labelKey2num (tlbl->key));

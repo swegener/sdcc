@@ -1175,6 +1175,102 @@ FBYNAME (operandsLiteral)
   return TRUE;
 }
 
+static long *
+immdGet (const char *pc, long *pl)
+{
+  long s;
+
+  if (!pc || !pl)
+    return NULL;
+
+  while (ISCHARSPACE (*pc))
+    pc++;
+
+  if (*pc == '-')
+    s = -1;
+  else if (*pc == '+' || ISCHARDIGIT (*pc))
+    s = 1;
+  else
+    return NULL;
+
+  if (pc[0] == '0' && (pc[1] == 'x' || pc[1] == 'X'))
+    {
+      if (sscanf (pc + 2, "%lx", pl) != 1)
+        return NULL;
+    }
+  else
+    {
+      if (sscanf (pc, "%ld", pl) != 1)
+        return NULL;
+    }
+
+  *pl *= s;
+  return pl;
+}
+
+/*-----------------------------------------------------------------*/
+/* immdInRange - returns true if the sum or difference of two      */
+/* immediates is in a give range.                                  */
+/*-----------------------------------------------------------------*/
+FBYNAME (immdInRange)
+{
+  const char *left_str, *right_str;
+  char r[128], operator[8];
+  long i, low, high, left_l, right_l;
+
+  /* the low / upper bounds and the operator are expected to come first */
+  for (i = 0; i < sizeof (r) - 1 && cmdLine[i] != 0 && cmdLine[i] != '%'; i++)
+    r[i] = cmdLine[i];
+  r[i] = 0;
+  if (sscanf (r, "%ld%ld%s", &low, &high, operator) != 3)
+    {
+      fprintf (stderr, "*** internal error: immdInRange gets bad "
+               "lower / upper bound or operator: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  /* get the left operand and the right operand */
+  if (!(left_str = hTabItemWithKey (vars, 1)) || !(right_str = hTabItemWithKey (vars, 2)))
+    {
+      fprintf (stderr, "*** internal error: immdInRange needs %%1 to represent the left "
+               "operand and %%2 to represent the right operand: %s\n", cmdLine);
+      return FALSE;
+    }
+  if (!immdGet (left_str, &left_l))
+    return FALSE;
+  if (!immdGet (right_str, &right_l))
+    return FALSE;
+
+  /* calculate the result */
+  if (strcmp (operator, "'+'") == 0)
+    {
+      i = left_l + right_l;
+    }
+  else if (strcmp (operator, "'-'") == 0)
+    {
+      i = left_l - right_l;
+    }
+  else
+    {
+      fprintf (stderr, "*** internal error: immdInRange only supports operators '+' "
+               "and '-': %s\n", cmdLine);
+      return FALSE;
+    }
+
+  /* bind and return the result */
+  if ((low <= i && i <= high) || (high <= i && i <= low))
+    {
+      char *p[] = {r, NULL};
+      sprintf (r, "%ld", i);
+      bindVar (9, p, &vars);
+      return TRUE;
+    }
+  else
+    {
+      return FALSE;
+    }
+}
+
 static const struct ftab
 {
   char *fname;
@@ -1241,6 +1337,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "okToRemoveSLOC", okToRemoveSLOC                // 0
+  },
+  {
+    "immdInRange", immdInRange
   }
 };
 

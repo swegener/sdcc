@@ -215,6 +215,30 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
+	addw	sp, #%1
+	addw	sp, #%2
+} by {
+	addw	sp, #%9
+	; peephole 13 combined additions to sp.
+} if immdInRange(0 255 '+' %1 %2 %9)
+
+//replace restart {
+//	pop	a
+//	addw	sp, #%2
+//} by {
+//	addw	sp, #%9
+//	; peephole 13a merged pop a into addw.
+//} if notUsed('a'), immdInRange(0 255 '+' '1' %2 %9)
+
+//replace restart {
+//	popw	x
+//	addw	sp, #%2
+//} by {
+//	addw	sp, #%9
+//	; peephole 13b merged popw x into addw.
+//} if notUsed('x'), immdInRange(0 255 '+' '2' %2 %9)
+
+replace restart {
 	jp	%5
 } by {
 	jp	%6
@@ -511,7 +535,7 @@ replace restart {
 replace restart {
 %1:
 } by {
-	; peephole j18 removed unused label %1.
+	; peephole j30 removed unused label %1.
 } if labelRefCount(%1 0)
 
 // Barrier, since notUsed() is better at dealing with ret than with jp to unknown location.
@@ -522,6 +546,6 @@ replace restart {
 	ret
 } by {
 	jp	%1
-	; peephole j19 replaced call at end of function by jump (tail call optimization).
+	; peephole j31 replaced call at end of function by jump (tail call optimization).
 }
 

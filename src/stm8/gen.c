@@ -4891,7 +4891,7 @@ genAnd (const iCode *ic, iCode *ifx)
           genMove_o (result->aop, i, ASMOP_ZERO, 0, j - i, TRUE, regFree (X_IDX, ic), regFree (Y_IDX, ic));
           i = j;
         }
-      /*else if (aopIsLitVal (right->aop, i, 1, 0xff)) // ENABLING THIS SHOULD GAIN A LOT IN CODE QUALITY, BUT TWO REGRESSION TESTS FAIL (it seems printf_large.c, lines 731 to 743 is where the difference matters for the bug)
+      /*else if (aopIsLitVal (right->aop, i, 1, 0xff)) // ENABLING THIS SHOULD GAIN A LOT IN CODE QUALITY, BUT TWO REGRESSION TESTS FAIL (it seems printf_large.c, lines 731 to 743 is where the difference matters for the bug) See RFE #409
         {
           for(j = i; j < size && j != omitbyte && aopIsLitVal (right->aop, j, 1, 0xff); j++);
           genMove_o (result->aop, i, left->aop, i, j - i, TRUE, regFree (X_IDX, ic), regFree (Y_IDX, ic));

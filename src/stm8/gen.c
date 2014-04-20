@@ -4708,7 +4708,6 @@ genAnd (const iCode *ic, iCode *ifx)
     {
       int nonzero;
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
-emitcode(";", "ifxand");
 
       wassertl (right->aop->type == AOP_LIT, "Code generation for bitwise and can only jump on literal operands");
 

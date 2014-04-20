@@ -3,6 +3,8 @@
 	* src/SDCCpeeph.c,
 	  src/stm8/peeph.def:
 	  Applied a variant of patch #237 by Ben Shi, implementing RFE #400.
+	* src/stm8/gen.c:
+	  Use mov for POINTER_SET where it makes sense.
 
 2014-04-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* support/scripts/cinc2h.pl,

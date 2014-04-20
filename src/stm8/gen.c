@@ -5756,16 +5756,74 @@ genPointerSet (iCode * ic)
 
   size = right->aop->size;
 
+  // In some cases a sequence of mov instructions is more efficient.
+  if (!bit_field && (result->aop->type == AOP_LIT || result->aop->type == AOP_IMMD) && (right->aop->type == AOP_DIR || right->aop->type == AOP_LIT|| right->aop->type == AOP_IMMD))
+    {
+      // First, make an estimate to find out if it is worth it (estimate not exact, could be improved a bit, probably not worth it since result type is uncommon)
+      const int mov_size = size * (right->aop->type == AOP_DIR ? 3 : 4);
+      const int mov_cycles = size * 1;
+      int normal_size = 3;
+      int normal_cycles = 2;
+      bool needs_a = false;
+
+      for (i = 0; i < size;)
+        {
+          if (aopIsLitVal (right->aop, i, 1, 0)) // clr (x)
+            {
+              normal_size += i ? 2 : 1;
+              normal_cycles += 1;
+              i++;
+            }
+          else if (i + 1 < size) // ld y, . followed by ldw (x), y
+            {
+              normal_size += (i ? 6 : 5) - (right->aop->type == AOP_DIR);
+              normal_cycles += 3;
+              i += 2;
+            }
+          else // ld a, . followed by ldw (x), a
+            {
+              needs_a = true;
+              normal_size += i ? 4 : 3;
+              normal_cycles += 2;
+              i++;
+            }
+        }      
+
+      if (!regDead (X_IDX, ic))
+        {
+          normal_size += 2;
+          normal_cycles += 2;
+        }
+      if (needs_a && !regDead (A_IDX, ic))
+        {
+          normal_size += 2;
+          normal_cycles += 2;
+        }
+
+      if ((mov_size <= normal_size || optimize.codeSpeed) && (mov_cycles <= normal_cycles || optimize.codeSize))
+        {
+          for (i = 0; i < size; i++)
+            {
+              if (result->aop->type == AOP_LIT)
+                emitcode ("mov", "0x%02x%02x+%d, %s", byteOfVal (result->aop->aopu.aop_lit, 1), byteOfVal (result->aop->aopu.aop_lit, 0), i, aopGet (right->aop, i));
+              else
+                emitcode ("mov", "%s+%d, %s", result->aop->aopu.aop_immd, i, aopGet (right->aop, i));
+              cost (right->aop->type == AOP_DIR ? 3 : 4, 1);
+            }
+          goto release;
+        }
+    }
+
   // Long pointer indirect long addressing mode is useful only in two very specific cases:
   if (!bit_field && size == 1 && result->aop->type == AOP_DIR && !regDead (X_IDX, ic) && aopInReg(right->aop, 0, A_IDX))
     {
-      emitcode("ld", "((%s)), a", aopGet2(result->aop, 0));
+      emitcode("ld", "((%s)), a", aopGet2 (result->aop, 0));
       cost (4, 4);
       goto release;
     }
   else if (!bit_field && size == 2 && result->aop->type == AOP_DIR && (!regDead (Y_IDX, ic) || !optimize.codeSpeed) && aopInReg(right->aop, 0, X_IDX))
     {
-      emitcode("ldw", "((%s)), x", aopGet2(result->aop, 0));
+      emitcode("ldw", "((%s)), x", aopGet2 (result->aop, 0));
       cost (4, 5);
       goto release;
     }

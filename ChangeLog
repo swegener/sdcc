@@ -1,10 +1,13 @@
+2014-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* support/scripts/pic16fam-h-gen.pl: updated
+
 2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,
 	  src/stm8/ralloc2.cc:
 	  Improve bitwise and, improve choice of shift location.
 
-2014-04-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+2014-04-20 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/non-free/include/pic14/pic16fam.h:
 	  Updated and moved here: device/include/pic14/pic16fam.h
 

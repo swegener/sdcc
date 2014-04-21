@@ -1,7 +1,7 @@
 2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  Improve left shift by literal.
+	  Improve left shift by literal, preparations for patch #234.
 
 2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
 

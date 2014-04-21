@@ -1,9 +1,11 @@
-2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
+2014-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
 	  Improve left shift by literal, preparations for patch #234.
+	* device/lib/_mulint.c:
+	  Speed up integer multiplication by using casts.
 
-2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
+2014-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
 	  More efficient clearing of high bytes of x and y, more efficient right shift.

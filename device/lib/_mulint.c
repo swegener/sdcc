@@ -239,10 +239,11 @@ _mulint (int a, int b)
         y = (union uu *)&b;
 #endif
 
-        t.t = x->s.lo * y->s.lo;
-        t.s.hi += (x->s.lo * y->s.hi) + (x->s.hi * y->s.lo);
+  // sdcc is bad at handling union accesses. So we use (unsigned char)a instead of x->s.lo here.
+  t.t = (unsigned char)a * (unsigned char)b;
+  t.s.hi += ((unsigned char)a * y->s.hi) + (x->s.hi * (unsigned char)b);
 
-       return t.t;
+  return t.t;
 }
 
 #endif

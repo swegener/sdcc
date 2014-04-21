@@ -1390,20 +1390,23 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   x_dead |= (xl_dead && xh_dead);
   y_dead |= (yl_dead && yh_dead);
 
-  // Use clrw to clear upper half of 16-bit register.
-  if (n == 1 && sizex == 2 &&
-    aopInReg (result, roffset + n, XH_IDX) && aopInReg (result, roffset, XL_IDX) &&
-    source->regs[XL_IDX] < 0 && source->regs[XH_IDX] < 0)
+  // Clear registers now that would be more expensive to clear later.
+  if(n >= 1 && !assigned[n - 1] && sizex > n && !assigned[n] && (aopInReg (result, roffset + n - 1, X_IDX) || aopInReg (result, roffset + n - 1, Y_IDX)) && // We want to clear the high byte of x or y.
+    size - regsize <= 1) // We won't need x or y for stack-to-stack copies.
     {
-      emit3w (A_CLRW, ASMOP_X, 0);
-      assigned[1] = TRUE;
-    }
-  if (n == 1 && sizex == 2 &&
-    aopInReg (result, roffset + n, YH_IDX) && aopInReg (result, roffset, YL_IDX) &&
-    source->regs[YL_IDX] < 0 && source->regs[YH_IDX] < 0)
-    {
-      emit3w (A_CLRW, ASMOP_Y, 0);
-      assigned[1] = TRUE;
+      const bool in_y = aopInReg (result, roffset + n - 1, Y_IDX);
+      const bool yl_free = source->regs[YL_IDX] < soffset || assigned[source->regs[YL_IDX] - soffset];
+      const bool yh_free = source->regs[YH_IDX] < soffset || assigned[source->regs[YH_IDX] - soffset];
+      const bool xl_free = source->regs[XL_IDX] < soffset || assigned[source->regs[XL_IDX] - soffset];
+      const bool xh_free = source->regs[XH_IDX] < soffset || assigned[source->regs[XH_IDX] - soffset];
+      const bool y_free = yl_free && yh_free;
+      const bool x_free = xl_free && xh_free;
+
+      if (in_y ? y_free : x_free)
+        {
+          emit3w_o (A_CLRW, result, roffset + n - 1, 0, 0);
+          assigned[n] = TRUE;
+        }
     }
 
   // Move everything from registers to the stack.
@@ -1736,6 +1739,25 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           }
       }
 
+  // Clear registers now that would be more expensive to clear later.
+  if(n >= 1 && !assigned[n - 1] && sizex > n && !assigned[n] && (aopInReg (result, roffset + n - 1, X_IDX) || aopInReg (result, roffset + n - 1, Y_IDX)) && // We want to clear the high byte of x or y.
+    size - regsize <= 1) // We won't need x or y for stack-to-stack copies.
+    {
+      const bool in_y = aopInReg (result, roffset + n - 1, Y_IDX);
+      const bool yl_free = source->regs[YL_IDX] < soffset || assigned[source->regs[YL_IDX] - soffset];
+      const bool yh_free = source->regs[YH_IDX] < soffset || assigned[source->regs[YH_IDX] - soffset];
+      const bool xl_free = source->regs[XL_IDX] < soffset || assigned[source->regs[XL_IDX] - soffset];
+      const bool xh_free = source->regs[XH_IDX] < soffset || assigned[source->regs[XH_IDX] - soffset];
+      const bool y_free = yl_free && yh_free;
+      const bool x_free = xl_free && xh_free;
+
+      if (in_y ? y_free : x_free)
+        {
+          emit3w_o (A_CLRW, result, roffset + n - 1, 0, 0);
+          assigned[n] = TRUE;
+        }
+    }
+
   while (regsize)
     {
       // Find lowest byte that can be assigned and needs to be assigned.
@@ -1980,6 +2002,12 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             }
           emitcode ("ldw", "%s, x", aopGet2 (result, roffset + i));
           cost (2, 2);
+          i += 2;
+        }
+      else if (i + 1 < size && aopIsLitVal (source, soffset + i + 1, 1, 0x00) && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)))
+        {
+          emit3w_o (A_CLRW, result, roffset + i, 0, 0);
+          cheapMove (result, roffset + i, source, soffset + i, !(a_dead && (result->regs[A_IDX] >= i || result->regs[A_IDX] == -1) && source->regs[A_IDX] <= i));
           i += 2;
         }
       else if ((!aopRS (result) || aopOnStack(result, roffset + i, 1) || aopInReg (result, roffset + i, A_IDX)) && aopIsLitVal (source, soffset + i, 1, 0x00))
@@ -5312,6 +5340,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
   int shCount = (int) ulFromVal (right->aop->aopu.aop_lit);
   int size;
   bool sign;
+  bool xh_zero, yh_zero, xl_free, yl_free;
 
   struct asmop shiftop_impl;
   struct asmop *shiftop;
@@ -5346,7 +5375,8 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
 
       genMove (shiftop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
     }
-  else if (sign)
+  else if (sign ||
+    shCount >= 12 && aopInReg (result->aop, 0, X_IDX) && aopInReg (left->aop, 0, X_IDX) && regDead (Y_IDX, ic)) // Use divw, see below.
     {
       genMove (result->aop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
       shiftop = result->aop;
@@ -5359,7 +5389,15 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       shiftop = result->aop;
     }
 
-  if (!sign && size == 1 && aopRS (shiftop) && !aopOnStack (shiftop, 0, 1)) // Use swap a where beneficial.
+  xh_zero = shiftop->regs[XH_IDX] >= size;
+  yh_zero = shiftop->regs[YH_IDX] >= size;
+  xl_free = regDead (XL_IDX, ic) && shiftop->regs[XL_IDX] < 0;
+  yl_free = regDead (YL_IDX, ic) && shiftop->regs[YL_IDX] < 0;
+
+  // Use swap a where beneficial.
+  if (!sign && size == 1 && aopRS (shiftop) && !aopOnStack (shiftop, 0, 1) &&
+    !(aopInReg (shiftop, 0, XL_IDX) && xh_zero) &&
+    !(aopInReg (shiftop, 0, YL_IDX) && yh_zero && shCount <= 3)) 
     {
       swap_to_a (shiftop->aopu.bytes[0].byteu.reg->rIdx);
       if (shCount >= 4)
@@ -5375,12 +5413,30 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
-  if (!sign && size == 2 && shCount > 3 && aopInReg (shiftop, 0, X_IDX) && regDead (A_IDX, ic) && shiftop->regs[A_IDX] < 0)
+  // div can be cheper than a sequence of shifts.
+  if (!sign && shCount < 8 &&
+    (shCount > 3 + !regDead (A_IDX, ic) * 2 && (size == 2 && aopInReg (shiftop, 0, X_IDX) || size == 1 && aopInReg (shiftop, 0, XL_IDX) && xh_zero) ||
+    shCount * 2 > 4 + !regDead (A_IDX, ic) * 2 && (size == 2 && aopInReg (shiftop, 0, Y_IDX) || size == 1 && aopInReg (shiftop, 0, YL_IDX) && yh_zero)))
     {
+      const bool in_y = aopInReg (shiftop, 0, Y_IDX);
+      if (!regDead (A_IDX, ic))
+        push (ASMOP_A, 0, 1);
       emitcode ("ld", "a, #0x%02x", 1 << shCount);
       cost (2, 1);
-      emitcode ("div", "x, a");
-      cost (1, 17); // TODO: replace 17 by exact value.
+      emitcode ("div", in_y ? "y, a" : "x, a");
+      cost (1 + in_y, 17); // TODO: Find out exact value, replace 17 by exact value, and accordingly choose this optimization depending on optimization goal.
+      if (!regDead (A_IDX, ic))
+        pop (ASMOP_A, 0, 1);
+      goto release;
+    }
+
+  // divw can be cheper than a sequence of shifts.
+  if (!sign && size == 2 && shCount > 5 && regDead (Y_IDX, ic) && aopInReg (shiftop, 0, X_IDX))
+    {
+      emitcode ("ldw", "y, #0x%04x", 1 << shCount);
+      cost (4, 2);
+      emitcode ("divw", "x, y");
+      cost (1, 17); // TODO: Find out exact value, replace 17 by exact value, and accordingly choose this optimization depending on optimization goal.
       goto release;
     }
 
@@ -5392,12 +5448,16 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
             emit3w_o ((i != size - 1) ? A_RRCW : (sign ? A_SRAW : A_SRLW), shiftop, i - 1, 0, 0);
             i -= 2;
           }
-        else if (aopInReg (shiftop, i, X_IDX) || aopInReg (shiftop, i, Y_IDX)) // Skipped top byte, but 16-bit shift is cheaper than going through a and doing 8-bit shift.
+        else if (!sign && i == size - 1 && (aopInReg (shiftop, i, XL_IDX) && xh_zero || aopInReg (shiftop, i, YL_IDX) && yh_zero)) // Skipped top byte, but 16-bit shift is cheaper than going through a and doing an 8-bit shift there.
           {
-            wassert (i == size - 1);
-            wassert (!sign);
             emit3w_o (A_SRLW, shiftop, i, 0, 0);
-            i -= 1;
+            i--;
+          }
+        else if (i == 0 && aopInReg (shiftop, i, XH_IDX) && xl_free || aopInReg (shiftop, i, YH_IDX) && yl_free) // 16-bit shift is cheaper than going through a and doing an 8-bit shift there.
+          {
+            const bool in_x = aopInReg (shiftop, i, XH_IDX);
+            emit3w ((i != size - 1) ? A_RRCW : (sign ? A_SRAW : A_SRLW), in_x ? ASMOP_X : ASMOP_Y, 0);
+            i--;
           }
         else
           {
@@ -5510,7 +5570,7 @@ genRightShift (const iCode *ic)
     }
 
   emitLabel (tlbl1);
-  // todo: Shift in left if free and cheaper, use sllw.
+
   for (i = size - 1; i >= 0;)
      {
         int swapidx = -1;

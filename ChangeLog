@@ -1,3 +1,7 @@
+2014-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/z80-disasm.pl: Disassembler for the z80 family.
+
 2014-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

@@ -2,6 +2,10 @@
 
 	* src/stm8/gen.c:
 	  More efficient clearing of high bytes of x and y, more efficient right shift.
+	* src/SDCCpeeph.c:
+	  Better immdInRange, patch by Ben Shi.
+	* src/stm8/peeph.def:
+	  Peepholes to optimize stack adjustment.
 
 2014-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* support/scripts/pic16fam-h-gen.pl: updated

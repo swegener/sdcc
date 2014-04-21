@@ -182,7 +182,7 @@ replace restart {
 } by {
 	bset	%2, #0
 	; peephole 11-0 replaced or by bset.
-} if notUsed(%1)
+} if notUsed(%1), notUsed('a')
 
 replace restart {
 	ldw	%1, #%2
@@ -192,7 +192,7 @@ replace restart {
 } by {
 	bset	%2, #7
 	; peephole 11-7 replaced or by bset.
-} if notUsed(%1)
+} if notUsed(%1), notUsed('a')
 
 replace restart {
 	ldw	%1, #%2
@@ -202,7 +202,7 @@ replace restart {
 } by {
 	bres	%2, #0
 	; peephole 12-0 replaced and by bres.
-} if notUsed(%1)
+} if notUsed(%1), notUsed('a')
 
 replace restart {
 	ldw	%1, #%2
@@ -212,7 +212,7 @@ replace restart {
 } by {
 	bres	%2, #7
 	; peephole 12-7 replaced and by bres.
-} if notUsed(%1)
+} if notUsed(%1), notUsed('a')
 
 replace restart {
 	addw	sp, #%1
@@ -222,21 +222,69 @@ replace restart {
 	; peephole 13 combined additions to sp.
 } if immdInRange(0 255 '+' %1 %2 %9)
 
-//replace restart {
-//	pop	a
-//	addw	sp, #%2
-//} by {
-//	addw	sp, #%9
-//	; peephole 13a merged pop a into addw.
-//} if notUsed('a'), immdInRange(0 255 '+' '1' %2 %9)
+replace restart {
+	pop	a
+	addw	sp, #%2
+} by {
+	addw	sp, #%9
+	; peephole 13a merged pop a into addw.
+} if notUsed('a'), immdInRange(0 255 '+' 1 %2 %9)
 
-//replace restart {
-//	popw	x
-//	addw	sp, #%2
-//} by {
-//	addw	sp, #%9
-//	; peephole 13b merged popw x into addw.
-//} if notUsed('x'), immdInRange(0 255 '+' '2' %2 %9)
+replace restart {
+	addw	sp, #%2
+	pop	a
+} by {
+	addw	sp, #%9
+	; peephole 13c merged pop a into addw.
+} if notUsed('a'), immdInRange(0 255 '+' 1 %2 %9)
+
+replace restart {
+	popw	x
+	addw	sp, #%2
+} by {
+	addw	sp, #%9
+	; peephole 13c merged popw x into addw.
+} if notUsed('x'), immdInRange(0 255 '+' 2 %2 %9)
+
+replace restart {
+	addw	sp, #%2
+	popw	x
+} by {
+	addw	sp, #%9
+	; peephole 13d merged popw x into addw.
+} if notUsed('x'), immdInRange(0 255 '+' 2 %2 %9)
+
+replace restart {
+	popw	a
+	popw	a
+} by {
+	popw	x
+	; peephole 14a merged pop a into popw x
+} if notUsed('a'), notUsed('x')
+
+replace restart {
+	popw	a
+	popw	x
+} by {
+	addw	sp, #3
+	; peephole 14b merged popw x into addw.
+} if notUsed('a'), notUsed('x')
+
+replace restart {
+	popw	x
+	popw	a
+} by {
+	addw	sp, #3
+	; peephole 14c merged popw x into addw.
+} if notUsed('a'), notUsed('x')
+
+replace restart {
+	popw	x
+	popw	x
+} by {
+	addw	sp, #4
+	; peephole 14d merged popw x into addw.
+} if notUsed('x')
 
 replace restart {
 	jp	%5

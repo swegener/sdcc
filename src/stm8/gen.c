@@ -5093,11 +5093,108 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
     {
       shiftop = &shiftop_impl;
       init_shiftop (shiftop, result->aop, left->aop, right->aop, ic, FALSE);
+      genMove (shiftop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+    }
+  else if (size == 2 && shCount >= 8 && regDead (A_IDX, ic) && (aopInReg (left->aop, 0, X_IDX) && aopInReg (result->aop, 0, X_IDX) || aopInReg (left->aop, 0, Y_IDX) && aopInReg (result->aop, 0, Y_IDX)))
+    {
+      shiftop = result->aop;
+      emit3 (A_CLR, ASMOP_A, 0);
+      emit3w (A_RLWA, shiftop, 0);
+      shCount -= 8;
     }
   else
-    shiftop = result->aop;
+    {
+      shiftop = result->aop;
+      genMove_o (shiftop, shCount / 8, left->aop, 0, size - shCount / 8, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      genMove_o (shiftop, 0, ASMOP_ZERO, 0, shCount / 8, regDead (A_IDX, ic) && shiftop->regs[A_IDX] < 0, regDead (X_IDX, ic) && shiftop->regs[XL_IDX] < 0 && shiftop->regs[XH_IDX] < 0, regDead (Y_IDX, ic) && shiftop->regs[YL_IDX] < 0 && shiftop->regs[YH_IDX] < 0);
+      shCount %= 8;
+    }
 
-  genMove (shiftop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  if (size == 1 && aopRS (shiftop))
+    {
+      int std_bytes, swap_bytes, mul_bytes;
+      int std_cycles, swap_cycles, mul_cycles;
+      bool swap_possible = FALSE;
+      bool mul_possible = FALSE;
+
+      if (aopInReg (shiftop, 0, A_IDX) || aopInReg (shiftop, 0, XL_IDX) && regDead (XH_IDX, ic))
+        {
+          std_bytes = shCount;
+          std_cycles = shCount;
+        }
+      else if (aopOnStack (shiftop, 0, 1))
+        {
+          std_bytes = shCount * 2;
+          std_cycles = shCount;
+        } 
+      else if (aopInReg (shiftop, 0, YH_IDX))
+        {
+          std_bytes = shCount * 5;
+          std_cycles = shCount * 3;
+        }
+      else
+        {
+          std_bytes = shCount * 3;
+          std_cycles = shCount * 3;
+        }
+
+      if (!aopOnStack (shiftop, 0, 1))
+        {
+           swap_bytes = shCount + !aopInReg (shiftop, 0, A_IDX) * 2 + aopInReg (shiftop, 0, YH_IDX) * 2;
+           swap_cycles = shCount + !aopInReg (shiftop, 0, A_IDX) * 2;
+           if (shCount >= 4)
+             {
+               swap_bytes -= 1;
+               swap_cycles -= 2;
+             }
+           swap_possible = TRUE;
+        }
+
+      if (aopInReg (shiftop, 0, XL_IDX) && regDead (XH_IDX, ic) || aopInReg (shiftop, 0, YL_IDX) && regDead (YH_IDX, ic))
+        {
+          mul_bytes = 3 + aopInReg (shiftop, 0, YL_IDX) + !regDead (A_IDX, ic) * 2;
+          mul_cycles = 2 + !regDead (A_IDX, ic) * 2;
+          mul_possible = TRUE;
+        }
+
+      if (swap_possible && (swap_bytes <= std_bytes && swap_cycles <= std_cycles || swap_bytes < std_bytes && optimize.codeSize || swap_cycles < std_cycles && optimize.codeSpeed)) // swap better than std
+        {
+          if (mul_possible && (mul_bytes <= swap_bytes && mul_cycles <= swap_cycles || mul_bytes < swap_bytes && optimize.codeSize || mul_cycles < swap_cycles && optimize.codeSpeed)) // mul better than swap
+            goto mul;
+          goto swap;
+        }
+      if (mul_possible && (mul_bytes <= std_bytes && mul_cycles <= std_cycles || mul_bytes < std_bytes && optimize.codeSize || mul_cycles < std_cycles && optimize.codeSpeed)) // mul better than std
+        goto mul;
+      goto std;
+
+swap:
+      swap_to_a (shiftop->aopu.bytes[0].byteu.reg->rIdx);
+      if (shCount >= 4)
+        {
+          emit3 (A_SWAP, ASMOP_A, 0);
+          emitcode ("and", "a, #0xf0");
+          cost (2, 1);
+          shCount -= 4;
+        }
+      while (shCount--)
+        emit3 (A_SLL, ASMOP_A, 0);
+      swap_from_a (shiftop->aopu.bytes[0].byteu.reg->rIdx);
+      genMove (result->aop, shiftop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      goto release;
+
+mul:
+      if (!regDead (A_IDX, ic))
+        push (ASMOP_A, 0, 1);
+      emitcode ("ld", "a, #0x%02x", 1 << shCount);
+      cost (2, 1);
+      emitcode ("mul", aopInReg (shiftop, 0, YL_IDX) ? "y, a" : "x, a");
+      cost (4, 1 + aopInReg (shiftop, 0, YL_IDX));
+      if (!regDead (A_IDX, ic))
+        pop (ASMOP_A, 0, 1);
+      genMove (result->aop, shiftop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      goto release;
+    }
+std:
 
   while (shCount--)
     for (i = 0; i < size;)
@@ -5106,6 +5203,11 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
           {
             emit3w_o (i ? A_RLCW : A_SLLW, shiftop, i, 0, 0);
             i += 2;
+          }
+        else if (i == size - 1 && aopInReg (shiftop, i, XL_IDX) && regDead (XH_IDX, ic) && shiftop->regs[XH_IDX] < 0)
+          {
+            emit3w_o (i ? A_RLCW : A_SLLW, ASMOP_X, 0, 0, 0);
+            i++;
           }
         else
           {

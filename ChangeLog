@@ -1,6 +1,11 @@
 2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
+	  Improve left shift by literal.
+
+2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
 	  More efficient clearing of high bytes of x and y, more efficient right shift.
 	* src/SDCCpeeph.c:
 	  Better immdInRange, patch by Ben Shi.

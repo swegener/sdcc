@@ -1,6 +1,11 @@
 2014-04-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/stm8/gen.c:
+	  Improve arithmetic right shift.
+
+2014-04-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
 	  Various small fixes and improvements.
 	* src/stm8/ralloc.c
 	  Prepare for register packing for assignment.

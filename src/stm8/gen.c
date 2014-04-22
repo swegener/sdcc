@@ -5596,7 +5596,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
 
   int i;
 
-  wassertl (size <= 2 || shCount % 8 <= 1, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
+  wassertl (size <= 2 || shCount % 8 <= 1 + (size <= 4) || size == 4 && shCount <= 10, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
 
   if ((shCount < 8 || sign) && aopRS (left->aop) && aopRS (result->aop))
     {
@@ -5670,6 +5670,31 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
+  // Testing and rlwa is cheaper than 8 times sraw
+  if (sign && shCount >= 8 && size >= 2 && (aopInReg (shiftop, size - 2, X_IDX) || aopInReg (shiftop, size - 2, Y_IDX)) &&
+    (size == 2 || size == 3 && aopInReg (shiftop, 0, A_IDX) || size == 4 && (aopInReg (shiftop, 0, X_IDX) || aopInReg (shiftop, 0, Y_IDX))))
+    { 
+      if (!regDead (A_IDX, ic))
+        push (ASMOP_A, 0, 1);
+      while (shCount >= 8)
+        {
+          symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+          emit3 (A_CLR, ASMOP_A, 0);
+          emit3w_o (A_TNZW, shiftop, size - 2, 0, 0);
+          if (tlbl)
+            emitcode ("jrpl", "!tlabel", labelKey2num (tlbl->key));
+          emit3 (A_DEC, ASMOP_A, 0);
+          cost (2, 0);
+            emitLabel (tlbl);
+          emit3w_o (A_RRWA, shiftop, size - 2, 0, 0);
+          if (size >= 4)
+            emit3w_o (A_RRWA, shiftop, 0, 0, 0);
+          if (!regDead (A_IDX, ic))
+            pop (ASMOP_A, 0, 1);
+          shCount -= 8;
+        }
+    }
+
   while (shCount--)
     for (i = size - 1; i >= 0;)
       {
@@ -5740,7 +5765,7 @@ genRightShift (const iCode *ic)
 
   /* if the shift count is known then do it
      as efficiently as possible */
-  if (right->aop->type == AOP_LIT && (getSize (operandType (result)) <= 2 || ulFromVal (right->aop->aopu.aop_lit) % 8 <= 1 || !sign && ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8))
+  if (right->aop->type == AOP_LIT && (getSize (operandType (result)) <= 2 || !sign && ulFromVal (right->aop->aopu.aop_lit) % 8 <= (getSize (operandType (result)) <= 4 ? 2 : 1) || getSize (operandType (result)) <= 4 && ulFromVal (right->aop->aopu.aop_lit) <= 10 || !sign && ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8))
     {
       genRightShiftLiteral (left, right, result, ic);
       freeAsmop (right);

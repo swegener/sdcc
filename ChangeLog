@@ -1,3 +1,10 @@
+2014-04-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  Various small fixes and improvements.
+	* src/stm8/ralloc.c
+	  Prepare for register packing for assignment.
+
 2014-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/z80-disasm.pl: Disassembler for the z80 family.

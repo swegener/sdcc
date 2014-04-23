@@ -870,12 +870,15 @@ aopForSym (const iCode *ic, symbol *sym)
   else if (sym->onStack || sym->iaccess)
     {
       int offset;
+      int base;
 
       aop = newAsmop (AOP_STK);
       aop->size = getSize (sym->type);
 
+      base = sym->stack + (sym->stack > 0 ? G.stack.param_offset : 0);
+
       for(offset = 0; offset < aop->size; offset++)
-        aop->aopu.bytes[offset].byteu.stk = sym->stack + (sym->stack > 0 ? G.stack.param_offset : 0) + aop->size - offset;
+        aop->aopu.bytes[offset].byteu.stk = base + aop->size - offset;
     }
   else
     {
@@ -956,6 +959,7 @@ aopOp (operand *op, const iCode *ic)
         else if (sym->usl.spillLoc || sym->nRegs && regalloc_dry_run)
           {
             completly_in_regs = FALSE;
+
             if (!regalloc_dry_run)
               {
                 aop->aopu.bytes[i].byteu.stk = (long int)(sym->usl.spillLoc->stack) + aop->size - i;
@@ -965,6 +969,20 @@ aopOp (operand *op, const iCode *ic)
                     fprintf (stderr, "%d %d %d %d\n", (int)(sym->usl.spillLoc->stack), (int)(aop->size), (int)(i), (int)(G.stack.pushed));
                     wassertl (0, "Invalid stack offset.");
                   }
+              }
+            else
+              {
+                static long int old_base = -10;
+                static const symbol *old_sym = 0;
+                if (sym != old_sym)
+                  {
+                    old_base -= aop->size;
+                    if (old_base < -100)
+                      old_base = -10;
+                    old_sym = sym;
+                  }
+
+                aop->aopu.bytes[i].byteu.stk = old_base + aop->size - i;
               }
           }
         else // Dummy iTemp.
@@ -5209,6 +5227,9 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
   aopOp (left, ic);
   aopOp (result, ic);
 
+  if (shCount > (size * 8))
+    shCount = size * 8;
+
   if (shCount >= (size * 8))
     {
       genMove(result->aop, ASMOP_ZERO, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
@@ -5586,6 +5607,9 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
 
   aopOp (left, ic);
   aopOp (result, ic);
+
+  if (shCount > (size * 8))
+    shCount = size * 8;
 
   if (!sign && shCount >= (size * 8))
     {

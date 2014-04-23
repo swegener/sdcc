@@ -1,3 +1,8 @@
+2014-04-23 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  Fix overoptimistic stack coalescing estimate, clamp shifts.
+
 2014-04-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/stm8/gen.c:

@@ -2017,7 +2017,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           cost (4, 2);
           i += 2;
         }
-      else if (x_dead && i + 1 < size && result->regs[XL_IDX] < 0 && result->regs[XH_IDX] < 0 && aopOnStack (result, roffset + i, 2) &&
+      else if (x_dead && i + 1 < size && (result->regs[XL_IDX] < 0 && result->regs[XH_IDX] < 0 && aopOnStack (result, roffset + i, 2) || result->type == AOP_DIR) &&
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           if (aopIsLitVal (source, soffset + i, 2, 0x0000))

@@ -2553,21 +2553,34 @@ genUminusFloat (const iCode *ic)
   aopOp (IC_LEFT (ic), ic);
   aopOp (IC_RESULT (ic), ic);
 
-  move_all = aopRS(left->aop) && left->aop->regs[A_IDX] >= 0 && aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1;
+  move_all = aopRS(left->aop) && left->aop->regs[A_IDX] >= 0 && aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1 ||
+    (aopInReg (result->aop, result->aop->size - 2, X_IDX) || aopInReg (result->aop, result->aop->size - 2, Y_IDX)) && aopOnStack (left->aop, result->aop->size - 2, 2);
 
   genMove_o (result->aop, 0, left->aop, 0, result->aop->size - 1 + move_all, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
-  // todo: Use bcpl, rlcw with ccf.
-  if (!regDead(A_IDX, ic) || aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1)
-    push (ASMOP_A, 0, 1);
+  if (aopInReg (result->aop, result->aop->size - 1, YH_IDX) && (move_all || aopInReg (left->aop, result->aop->size - 1, YH_IDX)) ||
+    aopInReg (result->aop, result->aop->size - 1, XH_IDX) && (move_all || aopInReg (left->aop, result->aop->size - 1, XH_IDX)))
+    {
+      const bool use_y = aopInReg (result->aop, result->aop->size - 1, YH_IDX);
+      emit3w (A_SLLW, use_y ? ASMOP_Y : ASMOP_X, 0);
+      emitcode ("ccf", "");
+      cost (1, 1);
+      emit3w (A_RRCW, use_y ? ASMOP_Y : ASMOP_X, 0);
+    }
+  // todo: Use bcpl. use swap_to_a for left in same reg as right.
+  else
+    {
+      if (!regDead(A_IDX, ic) || aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1)
+        push (ASMOP_A, 0, 1);
 
-  cheapMove (ASMOP_A, 0, (move_all ? result: left)->aop, left->aop->size - 1, FALSE);
-  emitcode ("xor", "a, #0x80");
-  cost (2, 1);
-  cheapMove (result->aop, result->aop->size - 1, ASMOP_A, 0, FALSE);
+      cheapMove (ASMOP_A, 0, (move_all ? result: left)->aop, left->aop->size - 1, FALSE);
+      emitcode ("xor", "a, #0x80");
+      cost (2, 1);
+      cheapMove (result->aop, result->aop->size - 1, ASMOP_A, 0, FALSE);
 
-  if (!regDead(A_IDX, ic) || aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1)
-    pop (ASMOP_A, 0, 1);
+      if (!regDead(A_IDX, ic) || aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1)
+        pop (ASMOP_A, 0, 1);
+    }
 
   freeAsmop (left);
   freeAsmop (result);
@@ -5008,7 +5021,7 @@ genAnd (const iCode *ic, iCode *ifx)
       }
 
   for (i = 0; i < size;)
-    {
+    { 
       // Cases that don't need a free a.
       if (omitbyte == i)
         {
@@ -5043,11 +5056,13 @@ genAnd (const iCode *ic, iCode *ifx)
           i++;
           continue;
         }
-      else if (aopIsLitVal (right->aop, i, 1, 0xff) && (aopOnStack (left->aop, i, 1) && aopOnStack (result->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk && aopIsLitVal (right->aop, i, 1, 0xfe) || aopRS (left->aop) && aopRS (right->aop) && left->aop->aopu.bytes[i].in_reg && result->aop->aopu.bytes[i].in_reg && left->aop->aopu.bytes[i].byteu.reg == result->aop->aopu.bytes[i].byteu.reg)) // Same register or same stack location.
+#if 0 // ENABLING THIS SHOULD GAIN A LOT IN CODE QUALITY, BUT TWO REGRESSION TESTS FAIL (it seems printf_large.c, lines 731 to 743 is where the difference matters for the bug) See RFE #409
+      else if (aopIsLitVal (right->aop, i, 1, 0xff) && (aopOnStack (left->aop, i, 1) && aopOnStack (result->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk || aopRS (left->aop) && aopRS (result->aop) && left->aop->aopu.bytes[i].in_reg && result->aop->aopu.bytes[i].in_reg && left->aop->aopu.bytes[i].byteu.reg == result->aop->aopu.bytes[i].byteu.reg)) // Same register or same stack location.
         {
           i++;
           continue;
         }
+#endif
       else if (aopIsLitVal (right->aop, i, 2, 0x7fff) && aopInReg (result->aop, i, X_IDX) && (aopInReg (left->aop, i, X_IDX) || aopOnStack (left->aop, i, 2) || left->aop->type == AOP_IMMD))
         {
           genMove_o (ASMOP_X, 0, left->aop, i, 2, pushed_a || (regDead (A_IDX, ic) && !result_in_a), TRUE, regFree (Y_IDX, ic));

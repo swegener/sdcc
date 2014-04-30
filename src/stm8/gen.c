@@ -2546,24 +2546,27 @@ genUminusFloat (const iCode *ic)
 {
   operand *result = IC_RESULT (ic);
   operand *left = IC_LEFT (ic);
+  bool move_all;
 
   D (emitcode ("; genUminusFloat", ""));
 
   aopOp (IC_LEFT (ic), ic);
   aopOp (IC_RESULT (ic), ic);
 
-  genMove_o (result->aop, 0, left->aop, 0, result->aop->size - 1, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  move_all = aopRS(left->aop) && left->aop->regs[A_IDX] >= 0 && aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1;
 
-  // todo: Use bcpl, rlcw with ccf, only save A when necessary
-  if (!aopInReg (result->aop, left->aop->size - 1, A_IDX) /*&& !regFree (A_IDX, ic)*/) /* For some reason regFree() does not work correctly for tancotf(), resulting inr egression test failures. */
+  genMove_o (result->aop, 0, left->aop, 0, result->aop->size - 1 + move_all, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+
+  // todo: Use bcpl, rlcw with ccf.
+  if (!regDead(A_IDX, ic) || aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1)
     push (ASMOP_A, 0, 1);
 
-  cheapMove (ASMOP_A, 0, left->aop, left->aop->size - 1, FALSE);
+  cheapMove (ASMOP_A, 0, (move_all ? result: left)->aop, left->aop->size - 1, FALSE);
   emitcode ("xor", "a, #0x80");
   cost (2, 1);
   cheapMove (result->aop, result->aop->size - 1, ASMOP_A, 0, FALSE);
 
-  if (!aopInReg (result->aop, left->aop->size - 1, A_IDX) /*&& !regFree (A_IDX, ic)*/)
+  if (!regDead(A_IDX, ic) || aopRS(result->aop) && result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < result->aop->size - 1)
     pop (ASMOP_A, 0, 1);
 
   freeAsmop (left);

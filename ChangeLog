@@ -1,5 +1,10 @@
 2014-04-30 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  More efficient float negation.
+
+2014-04-30 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/ralloc2.cc,
 	  src/stm8/gen.c:
 	  More flexible register allocation of operands, fixed bug in intra-register assignment.

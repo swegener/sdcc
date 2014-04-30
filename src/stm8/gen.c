@@ -1268,7 +1268,15 @@ cheapMove (asmop *result, int roffset, asmop *source, int soffset, bool save_a)
     {
       if (!aopInReg (result, roffset, A_IDX))
         swap_to_a (result->aopu.bytes[roffset].byteu.reg->rIdx);
-      cheapMove (ASMOP_A, 0, source, soffset, FALSE);
+
+      // Some special cases where swap_to_a() changed the location of the source operand.
+      if (aopInReg (result, roffset, XH_IDX) && aopInReg (source, soffset, XL_IDX))
+        emit3_o (A_LD, ASMOP_A, 0, ASMOP_X, 1);
+      else if (aopInReg (result, roffset, YH_IDX) && aopInReg (source, soffset, YL_IDX))
+        emit3_o (A_LD, ASMOP_A, 0, ASMOP_Y, 1);
+      else
+        cheapMove (ASMOP_A, 0, source, soffset, FALSE);
+
       if (!aopInReg (result, roffset, A_IDX))
         swap_from_a (result->aopu.bytes[roffset].byteu.reg->rIdx);
     }
@@ -2547,7 +2555,7 @@ genUminusFloat (const iCode *ic)
   genMove_o (result->aop, 0, left->aop, 0, result->aop->size - 1, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
   // todo: Use bcpl, rlcw with ccf, only save A when necessary
-  if (!aopInReg (result->aop, left->aop->size - 1, A_IDX))
+  if (!aopInReg (result->aop, left->aop->size - 1, A_IDX) /*&& !regFree (A_IDX, ic)*/) /* For some reason regFree() does not work correctly for tancotf(), resulting inr egression test failures. */
     push (ASMOP_A, 0, 1);
 
   cheapMove (ASMOP_A, 0, left->aop, left->aop->size - 1, FALSE);
@@ -2555,7 +2563,7 @@ genUminusFloat (const iCode *ic)
   cost (2, 1);
   cheapMove (result->aop, result->aop->size - 1, ASMOP_A, 0, FALSE);
 
-  if (!aopInReg (result->aop, left->aop->size - 1, A_IDX))
+  if (!aopInReg (result->aop, left->aop->size - 1, A_IDX) /*&& !regFree (A_IDX, ic)*/)
     pop (ASMOP_A, 0, 1);
 
   freeAsmop (left);
@@ -5244,7 +5252,7 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
       init_shiftop (shiftop, result->aop, left->aop, right->aop, ic, FALSE);
       genMove (shiftop, left->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
     }
-  else if (size == 2 && shCount >= 8 && regDead (A_IDX, ic) && (aopInReg (left->aop, 0, X_IDX) && aopInReg (result->aop, 0, X_IDX) || aopInReg (left->aop, 0, Y_IDX) && aopInReg (result->aop, 0, Y_IDX)))
+  else if (size == 2 && shCount >= 8 && regDead (A_IDX, ic) && (aopInReg (left->aop, 0, XL_IDX) && aopInReg (result->aop, 0, X_IDX) || aopInReg (left->aop, 0, YL_IDX) && aopInReg (result->aop, 0, Y_IDX)))
     {
       shiftop = result->aop;
       emit3 (A_CLR, ASMOP_A, 0);
@@ -5259,7 +5267,7 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
       shCount %= 8;
     }
 
-  if (size == 1 && aopRS (shiftop))
+  if (size == 1 && aopRS (shiftop) && shCount)
     {
       int std_bytes, swap_bytes, mul_bytes;
       int std_cycles, swap_cycles, mul_cycles;
@@ -5642,6 +5650,9 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       shCount %= 8;
       shiftop = result->aop;
     }
+
+  if (!shCount)
+    goto release;
 
   xh_zero = shiftop->regs[XH_IDX] >= size;
   yh_zero = shiftop->regs[YH_IDX] >= size;

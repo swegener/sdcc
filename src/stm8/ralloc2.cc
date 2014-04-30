@@ -51,9 +51,11 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
 	
   if(!result || !IS_SYMOP(result))
     return;
-    
-  // Todo: Identify more operations that code generation can always handle and exclude them (as done for the z80-like ports).
-  if (ic->op == '=')
+
+  // Todo: More fine-grained control for these.
+  if (!(ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS && !IS_FLOAT (operandType (left)) ||
+    ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
+    ic->op == GET_VALUE_AT_ADDRESS))
     return;
 
   operand_map_t::const_iterator oir, oir_end, oirs; 

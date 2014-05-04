@@ -226,19 +226,19 @@ static S4O_RET
 termScanAtFunc (const lineNode *pl, int rIdx)
 {
   sym_link *ftype;
+  bool banked_reg = (rIdx == R0_IDX) || (rIdx == R1_IDX) || (rIdx == R2_IDX);
 
   if (!isFunc (pl))
     return S4O_CONTINUE;
   // let's assume calls to literally given locations use the default
   // most notably :  (*(void (*)()) 0) ();  see bug 1749275
   if (IS_VALOP (IC_LEFT (pl->ic)))
-    return !options.all_callee_saves;
+    return (options.model == MODEL_HUGE) && banked_reg ? S4O_ABORT : options.all_callee_saves ? S4O_CONTINUE : S4O_TERM;
 
   ftype = OP_SYM_TYPE(IC_LEFT(pl->ic));
   if (IS_FUNCPTR (ftype))
     ftype = ftype->next;
-  if (IFFUNC_ISBANKEDCALL(ftype) &&
-      ((rIdx == R0_IDX) || (rIdx == R1_IDX) || (rIdx == R2_IDX)))
+  if (IFFUNC_ISBANKEDCALL(ftype) && banked_reg)
     return S4O_ABORT;
   if (FUNC_CALLEESAVES(ftype))
     return S4O_CONTINUE;
@@ -505,7 +505,12 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
                   }
 
                 /* it's a normal function return */
-                return S4O_TERM;
+                if (IS_SYMOP (IC_LEFT ((*pl)->ic)) &&
+                    IS_FUNC (OP_SYM_TYPE(IC_LEFT ((*pl)->ic))) &&
+                    FUNC_CALLEESAVES (OP_SYM_TYPE(IC_LEFT ((*pl)->ic))))
+                  return S4O_ABORT;
+                else
+                  return S4O_TERM;
               }
             break;
           case 's':

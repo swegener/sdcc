@@ -2299,6 +2299,26 @@ release:
 }
 
 /*-----------------------------------------------------------------*/
+/* inExcludeList - return 1 if the string is in exclude Reg list   */
+/*-----------------------------------------------------------------*/
+static int
+regsCmp (void *p1, void *p2)
+{
+  return (STRCASECMP ((char *) p1, (char *) (p2)) == 0);
+}
+
+static bool
+inExcludeList (char *s)
+{
+  const char *p = setFirstItem (options.excludeRegsSet);
+
+  if (p == NULL || STRCASECMP (p, "none") == 0)
+    return FALSE;
+
+  return isinSetWith (options.excludeRegsSet, s, regsCmp);
+}
+
+/*-----------------------------------------------------------------*/
 /* xstackRegisters - create bitmask for registers on xstack        */
 /*-----------------------------------------------------------------*/
 static int
@@ -2371,9 +2391,21 @@ saveRegisters (iCode * lic)
         return;
     }
 
-  /* save the registers in use at this time but skip the
-     ones for the result */
-  rsave = bitVectCplAnd (bitVectCopy (ic->rMask), mcs51_rUmaskForOp (IC_RESULT (ic)));
+  if (IFFUNC_CALLEESAVES (_G.currentFunc->type))
+    {
+      /* save all registers if the caller is callee_saves and the callee is not */
+      rsave = bitVectCopy (mcs51_allBankregs ());
+      if (!inExcludeList ("bits"))
+        {
+          rsave = bitVectUnion (rsave, mcs51_allBitregs ());
+          BitBankUsed = 1;
+        }
+    }
+  else
+    /* save only the registers in use at this time */
+    rsave = bitVectCopy (ic->rMask);
+  /* but skip the ones for the result */
+  rsave = bitVectCplAnd (rsave, mcs51_rUmaskForOp (IC_RESULT (ic)));
 
   ic->regsSaved = 1;
   if (options.useXstack)
@@ -2432,9 +2464,17 @@ saveRegisters (iCode * lic)
             {
               emitpush (REG_WITH_INDEX (R0_IDX)->dname);
               emitcode ("mov", "r0,%s", spname);
-              MOVA ("r0");
-              emitcode ("add", "a,#0x%02x", count);
-              emitcode ("mov", "%s,a", spname);
+              if (count == 2)
+                {
+                  emitcode ("inc", "%s", spname);
+                  emitcode ("inc", "%s", spname);
+                }
+              else
+                {
+                  MOVA ("r0");
+                  emitcode ("add", "a,#0x%02x", count);
+                  emitcode ("mov", "%s,a", spname);
+                }
               for (i = 0; i < mcs51_nRegs; i++)
                 {
                   if (bitVectBitValue (rsave, i))
@@ -2488,9 +2528,21 @@ unsaveRegisters (iCode * ic)
   int i;
   bitVect *rsave;
 
-  /* restore the registers in use at this time but skip the
-     ones for the result */
-  rsave = bitVectCplAnd (bitVectCopy (ic->rMask), mcs51_rUmaskForOp (IC_RESULT (ic)));
+  if (IFFUNC_CALLEESAVES (_G.currentFunc->type))
+    {
+      /* restore all registers if the caller is callee_saves and the callee is not */
+      rsave = bitVectCopy (mcs51_allBankregs ());
+      if (!inExcludeList ("bits"))
+        {
+          rsave = bitVectUnion (rsave, mcs51_allBitregs ());
+          BitBankUsed = 1;
+        }
+    }
+  else
+    /* restore only the registers in use at this time */
+    rsave = bitVectCopy (ic->rMask);
+  /* but skip the ones for the result */
+  rsave = bitVectCplAnd (rsave, mcs51_rUmaskForOp (IC_RESULT (ic)));
 
   if (options.useXstack)
     {
@@ -2684,28 +2736,27 @@ genXpush (iCode * ic)
   r = getFreePtr (ic, aop, FALSE);
 
   size = AOP_SIZE (IC_LEFT (ic));
+  emitcode ("mov", "%s,%s", r->name, spname);
 
-  if (size == 1)
+  // allocate space first
+  if (size <= 2)
     {
-      MOVA (aopGet (IC_LEFT (ic), 0, FALSE, FALSE));
-      emitcode ("mov", "%s,%s", r->name, spname);
-      emitcode ("inc", "%s", spname);   // allocate space first
-      emitcode ("movx", "@%s,a", r->name);
+      emitcode ("inc", "%s", spname);
+      if (size == 2)
+        emitcode ("inc", "%s", spname);
     }
   else
     {
-      // allocate space first
-      emitcode ("mov", "%s,%s", r->name, spname);
       MOVA (r->name);
       emitcode ("add", "a,#0x%02x", size);
       emitcode ("mov", "%s,a", spname);
+    }
 
-      while (offset < size)
-        {
-          MOVA (aopGet (IC_LEFT (ic), offset++, FALSE, FALSE));
-          emitcode ("movx", "@%s,a", r->name);
-          emitcode ("inc", "%s", r->name);
-        }
+  while (offset < size)
+    {
+      MOVA (aopGet (IC_LEFT (ic), offset++, FALSE, FALSE));
+      emitcode ("movx", "@%s,a", r->name);
+      emitcode ("inc", "%s", r->name);
     }
   _G.stack.xpushed += size;
 
@@ -3548,26 +3599,6 @@ resultRemat (iCode * ic)
     }
 
   return 0;
-}
-
-/*-----------------------------------------------------------------*/
-/* inExcludeList - return 1 if the string is in exclude Reg list   */
-/*-----------------------------------------------------------------*/
-static int
-regsCmp (void *p1, void *p2)
-{
-  return (STRCASECMP ((char *) p1, (char *) (p2)) == 0);
-}
-
-static bool
-inExcludeList (char *s)
-{
-  const char *p = setFirstItem (options.excludeRegsSet);
-
-  if (p == NULL || STRCASECMP (p, "none") == 0)
-    return FALSE;
-
-  return isinSetWith (options.excludeRegsSet, s, regsCmp);
 }
 
 /*-----------------------------------------------------------------*/

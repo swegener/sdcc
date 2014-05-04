@@ -1,3 +1,12 @@
+2014-05-04 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (saveRegisters, unsaveRegisters): fixed bug 1928,
+	  (genXpush): small optimization
+	* src/mcs51/peep.c (termScanAtFunc): fixed return value,
+	  (scan4op: ret): fixed callee_saves
+	* src/stm8/gen.c: MSVC is not C99 compliant
+	* support/regression/tests/callee_saves.c: new, added
+
 2014-04-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
@@ -52,6 +61,7 @@
 	  Peepholes to optimize stack adjustment.
 
 2014-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/pic16fam-h-gen.pl: updated
 
 2014-04-20 Philipp Klaus Krause <pkk AT spth.de>
@@ -61,6 +71,7 @@
 	  Improve bitwise and, improve choice of shift location.
 
 2014-04-20 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/non-free/include/pic14/pic16fam.h:
 	  Updated and moved here: device/include/pic14/pic16fam.h
 
@@ -73,6 +84,7 @@
 	  Use mov for POINTER_SET where it makes sense.
 
 2014-04-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/cinc2h.pl,
 	  support/scripts/mcs51-disasm.pl,
 	  support/scripts/optimize_pic16devices.pl,
@@ -81,6 +93,7 @@
 	  Updated the copyright date.
 
 2014-04-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/include/pic14/pic14devices.txt,
 	  device/include/pic14/pic16regs.h,
 	  device/non-free/include/pic14/pic12f1571.h,

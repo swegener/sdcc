@@ -3984,8 +3984,8 @@ genCmpTop (operand *left, operand *right, operand *result, const iCode *ic)
 
   if (left->aop->type == AOP_LIT)
     {
-      wassert (right->aop->type != AOP_LIT);
       operand *temp = left;
+      wassert (right->aop->type != AOP_LIT);
       left = right;
       right = temp;
       opcode = exchangedCmp (opcode);
@@ -5615,7 +5615,7 @@ static void
 genRightShiftLiteral (operand *left, operand *right, operand *result, const iCode *ic)
 {
   int shCount = (int) ulFromVal (right->aop->aopu.aop_lit);
-  int size;
+  int size, i;
   bool sign;
   bool xh_zero, yh_zero, xl_free, yl_free;
 
@@ -5643,8 +5643,6 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       shiftop = result->aop;
       goto release;
     }
-
-  int i;
 
   wassertl (size <= 2 || shCount % 8 <= 1 + (size <= 4) || size == 4 && shCount <= 10, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
 
@@ -5818,7 +5816,11 @@ genRightShift (const iCode *ic)
 
   /* if the shift count is known then do it
      as efficiently as possible */
-  if (right->aop->type == AOP_LIT && (getSize (operandType (result)) <= 2 || !sign && ulFromVal (right->aop->aopu.aop_lit) % 8 <= (getSize (operandType (result)) <= 4 ? 2 : 1) || getSize (operandType (result)) <= 4 && ulFromVal (right->aop->aopu.aop_lit) <= 10 || !sign && ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8))
+  if ( right->aop->type == AOP_LIT &&
+       ( (getSize (operandType (result)) <= 2) ||
+         (!sign && ulFromVal (right->aop->aopu.aop_lit) % 8 <= (getSize (operandType (result)) <= 4 ? 2UL : 1UL)) ||
+         (getSize (operandType (result)) <= 4 && ulFromVal (right->aop->aopu.aop_lit) <= 10) ||
+         (!sign && ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8) ) )
     {
       genRightShiftLiteral (left, right, result, ic);
       freeAsmop (right);

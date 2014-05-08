@@ -1838,20 +1838,26 @@ boolCast (iCode * ic, set * cseSet)
     return 0;
 
   /* Check that this is a logic op. */
-  if (dic->op != '!' &&
-      dic->op != '<' &&
-      dic->op != '>' &&
-//      dic->op != LE_OP && why not these 3 ???
-//      dic->op != GE_OP &&
-      dic->op != EQ_OP &&
-//      dic->op != NE_OP &&
-      dic->op != AND_OP &&
-      dic->op != OR_OP &&
-      dic->op != GETHBIT &&
-      dic->op != GETABIT &&
-      !(dic->op == BITWISEAND && (IS_BOOL ( operandType (IC_LEFT (dic))) || IS_BOOL ( operandType (IC_RIGHT (dic)))))
-     )
+  switch (dic->op)
     {
+    case '!':
+    case '<':
+    case '>':
+    case LE_OP:
+    case GE_OP:
+    case EQ_OP:
+    case NE_OP:
+    case AND_OP:
+    case OR_OP:
+    case GETHBIT:
+    case GETABIT:
+      break;
+    case BITWISEAND:
+      if (IS_BOOL (operandType (IC_LEFT (dic))) || IS_BOOL (operandType (IC_RIGHT (dic))))
+        break;
+      if (IS_OP_LITERAL (IC_RIGHT (dic)) && operandLitValue (IC_RIGHT (dic)) == 1)
+        break;
+    default:
       return 0;
     }
 

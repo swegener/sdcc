@@ -1,3 +1,8 @@
+2014-05-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/SDCCcse.c:
+	  More aggressive optimization of casts to bool following logic operations.
+
 2014-05-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/mcs51/gen.c (saveRegisters, unsaveRegisters): fixed bug 1928,

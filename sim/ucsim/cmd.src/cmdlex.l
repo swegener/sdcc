@@ -50,6 +50,7 @@ void
 uc_yy_set_string_to_parse(const char *str)
 {
   string_to_parse = strdup(str);
+  YY_FLUSH_BUFFER;
 }
 
 static const char *string_ptr = NULL;

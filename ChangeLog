@@ -1,3 +1,10 @@
+2014-05-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/ralloc2.cc:
+	  Fix detection of free regs for stm8.
+	* src/stm8/gen.c:
+	  Enable optimizations for bitwise and.
+
 2014-05-08 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCcse.c:

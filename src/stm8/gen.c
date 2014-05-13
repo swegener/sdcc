@@ -5056,7 +5056,7 @@ genAnd (const iCode *ic, iCode *ifx)
           i++;
           continue;
         }
-#if 0 // ENABLING THIS SHOULD GAIN A LOT IN CODE QUALITY, BUT TWO REGRESSION TESTS FAIL (it seems printf_large.c, lines 731 to 743 is where the difference matters for the bug) See RFE #409
+#if 1 // ENABLING THIS SHOULD GAIN A LOT IN CODE QUALITY, BUT TWO REGRESSION TESTS FAIL (it seems printf_large.c, lines 731 to 743 is where the difference matters for the bug) See RFE #409
       else if (aopIsLitVal (right->aop, i, 1, 0xff) && (aopOnStack (left->aop, i, 1) && aopOnStack (result->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk || aopRS (left->aop) && aopRS (result->aop) && left->aop->aopu.bytes[i].in_reg && result->aop->aopu.bytes[i].in_reg && left->aop->aopu.bytes[i].byteu.reg == result->aop->aopu.bytes[i].byteu.reg)) // Same register or same stack location.
         {
           i++;
@@ -5098,7 +5098,7 @@ genAnd (const iCode *ic, iCode *ifx)
           result_in_a |= new_in_a;
           i = j;
         }
-#if 0 // ENABLING THIS SHOULD GAIN A LOT IN CODE QUALITY, BUT TWO REGRESSION TESTS FAIL (it seems printf_large.c, lines 731 to 743 is where the difference matters for the bug) See RFE #409
+#if 1 // ENABLING THIS SHOULD GAIN A LOT IN CODE QUALITY, BUT TWO REGRESSION TESTS FAIL (it seems printf_large.c, lines 731 to 743 is where the difference matters for the bug) See RFE #409
       else if (aopIsLitVal (right->aop, i, 1, 0xff)) 
         {
           bool new_in_a = FALSE;

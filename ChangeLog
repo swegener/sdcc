@@ -1,3 +1,10 @@
+2014-05-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* sim/ucsim/stm8.src/stm8.cc:
+	  Fix flag handling, patch by Ben Shi.
+	* src/stm8/gen.c:
+	  Enable some shift optimizations that need the flag handling fix.
+
 2014-05-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/stm8/ralloc2.cc:

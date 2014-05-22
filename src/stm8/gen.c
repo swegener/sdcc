@@ -5481,7 +5481,7 @@ genLeftShift (const iCode *ic)
 
   if (right->aop->type != AOP_LIT || aopIsLitVal (right->aop, 0, 1, 0))
     {
-      //if (!aopOnStack (right->aop, 0, 1) && right->aop->type != AOP_DIR) // TODO: Enable once the simulator correctly handles flags in ld a, (., sp)! See bug #2269.
+      if (!aopOnStack (right->aop, 0, 1) && right->aop->type != AOP_DIR)
         emit3 (A_TNZ, ASMOP_A, 0);
       if (tlbl2)
         emitcode ("jreq", "!tlabel", labelKey2num (tlbl2->key));
@@ -5868,7 +5868,7 @@ genRightShift (const iCode *ic)
 
   if (right->aop->type != AOP_LIT || aopIsLitVal (right->aop, 0, 1, 0))
     {
-      //if (!aopOnStack (right->aop, 0, 1) && right->aop->type != AOP_DIR) // TODO: Enable once the simulator correctly handles flags in ld a, (., sp)! See bug #2269.
+      if (!aopOnStack (right->aop, 0, 1) && right->aop->type != AOP_DIR)
         emit3 (A_TNZ, ASMOP_A, 0);
       if (tlbl2)
         emitcode ("jreq", "!tlabel", labelKey2num (tlbl2->key));

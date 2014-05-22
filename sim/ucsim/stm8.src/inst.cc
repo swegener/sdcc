@@ -359,21 +359,24 @@ cl_stm8::inst_btjfbtjt(t_mem code, unsigned char prefix)
   int ea = fetch2();
   unsigned char dbyte = get1( ea);
   char reljump = fetch();
-  
+  char pos;
+
   if (code & 0x01) { // btjf  
-	char pos = (code - 0x01) >> 1;
+	pos = (code - 0x01) >> 1;
 	if(!( dbyte & (1<<pos))) {
 		PC += reljump;
 	}
 	
   } else { // btjt
- 	char pos = (code - 0x00) >> 1;
+ 	pos = (code - 0x00) >> 1;
 	if ( dbyte & (1<<pos)) {
 		PC += reljump;
 	}
 	
   }
-  
+
+  FLAG_ASSIGN (BIT_C, !!(dbyte & (1<<pos)));
+
   return(resGO);
 }
 

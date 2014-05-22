@@ -893,6 +893,8 @@ cl_stm8::exec_inst(void)
             case 0x10:
                opaddr = fetch1()+regs.SP;
                store2(opaddr, regs.Y);
+               FLAG_ASSIGN (BIT_Z, (regs.Y & 0xffff) == 0x0000);
+               FLAG_ASSIGN (BIT_N, regs.Y & 0x8000);
                return(resGO);
                break;
             case 0x80: // RETF
@@ -1048,10 +1050,12 @@ cl_stm8::exec_inst(void)
                break;            
             case 0x60: // ld (shortoff,SP),A
                store1(fetch1()+regs.SP, regs.A);
+               FLAG_NZ(regs.A);
                return(resGO);
                break;            
             case 0x70: // ld A,(shortoff,SP)
                regs.A = get1(fetch1()+regs.SP);
+               FLAG_NZ(regs.A);
                return(resGO);
                break;            
             case 0x90: // SIM - disable INT

@@ -53,7 +53,7 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
     return;
 
   // Todo: More fine-grained control for these.
-  if (!(ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS && !IS_FLOAT (operandType (left)) ||
+  if (!(ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS && !IS_FLOAT (operandType (left)) || ic->op == '~' ||
     ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
     ic->op == GET_VALUE_AT_ADDRESS))
     return;

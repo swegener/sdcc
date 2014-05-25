@@ -5643,7 +5643,7 @@ genMinusDec (const iCode * ic)
   unsigned int icount;
   unsigned int size = getDataSize (IC_RESULT (ic));
 
-  /* will try to generate an increment */
+  /* will try to generate a decrement */
   /* if the right side is not a literal we cannot */
   if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
     return FALSE;

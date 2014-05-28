@@ -5755,7 +5755,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
             emit3w_o (A_SRLW, shiftop, i, 0, 0);
             i--;
           }
-        else if (i == 0 && aopInReg (shiftop, i, XH_IDX) && xl_free || aopInReg (shiftop, i, YH_IDX) && yl_free) // 16-bit shift is cheaper than going through a and doing an 8-bit shift there.
+        else if (i == 0 && (aopInReg (shiftop, i, XH_IDX) && xl_free || aopInReg (shiftop, i, YH_IDX) && yl_free)) // 16-bit shift is cheaper than going through a and doing an 8-bit shift there.
           {
             const bool in_x = aopInReg (shiftop, i, XH_IDX);
             emit3w ((i != size - 1) ? A_RRCW : (sign ? A_SRAW : A_SRLW), in_x ? ASMOP_X : ASMOP_Y, 0);

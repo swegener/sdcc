@@ -1,3 +1,8 @@
+2014-05-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Fix a bug in code generation for right shift by applying patch #243 by Ben Shi.
+
 2014-05-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/ralloc2.cc:

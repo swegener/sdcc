@@ -239,20 +239,20 @@ objects:
 	$(MAKE) clean_intermediate
 
 models:
-	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^mcs51$$' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    $(MAKE) MODELFLAGS="--model-$$model" PORT=$$model PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	  done \
 	fi
 
 small-mcs51-stack-auto:
-	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^mcs51$$' $(top_builddir)/ports.build > /dev/null; then \
 	  mkdir -p small-stack-auto; cp small/Makefile small-stack-auto; \
 	  $(MAKE) MODELFLAGS="--model-small --stack-auto" PORT=small-stack-auto PORTDIR=$(BUILDDIR)/small-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-mcs51-stack-auto:
-	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^mcs51$$' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    mkdir -p $${model}-stack-auto; cp $${model}/Makefile $${model}-stack-auto; \
 	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto" PORT=$${model}-stack-auto PORTDIR=$(BUILDDIR)/$${model}-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
@@ -260,7 +260,7 @@ model-mcs51-stack-auto:
 	fi
 
 model-mcs51-xstack-auto:
-	if grep '^mcs51\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^mcs51$$' $(top_builddir)/ports.build > /dev/null; then \
 	  for model in $(MODELS); do \
 	    mkdir -p $${model}-xstack-auto; cp $${model}/Makefile $${model}-xstack-auto; \
 	    $(MAKE) MODELFLAGS="--model-$$model --stack-auto --xstack" PORT=$${model}-xstack-auto PORTDIR=$(BUILDDIR)/$${model}-xstack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
@@ -268,17 +268,17 @@ model-mcs51-xstack-auto:
 	fi
 
 model-ds390:
-	if grep '^ds390\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^ds390$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mds390" PORT=ds390 PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-ds400:
-	if grep '^ds400\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^ds400$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mds400" PORT=ds400 PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-xa51:
-	if grep '^xa51\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^xa51$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mxa51" PORT=xa51 objects-xa51; \
 	fi
 
@@ -305,32 +305,32 @@ else
 endif
 
 model-z80:
-	if grep '^z80\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^z80$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mz80" PORT=z80 objects-z80 OEXT=.o; \
 	fi
 
 model-z180:
-	if grep '^z80\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^z80$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mz180" PORT=z180 objects-z80 OEXT=.o; \
 	fi
 
 model-r2k:
-	if grep '^z80\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^z80$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mr2k" PORT=r2k objects-z80 OEXT=.o; \
 	fi
 
 model-r3ka:
-	if grep '^z80\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^z80$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mr3ka" PORT=r3ka objects-z80 OEXT=.o; \
 	fi
 
 model-tlcs90:
-	if grep '^z80\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^z80$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mtlcs90" PORT=tlcs90 objects-z80 OEXT=.o; \
 	fi
 
 model-gbz80:
-	if grep '^z80\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^z80$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mgbz80" PORT=gbz80 objects-z80 OEXT=.o; \
 	fi
 
@@ -340,12 +340,12 @@ objects-z80:
 	$(MAKE) clean_intermediate
 
 model-hc08:
-	if grep '^hc08\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^hc08$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mhc08" PORT=hc08 objects-hc08; \
 	fi
 
 model-s08:
-	if grep '^hc08\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^hc08$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-ms08" PORT=s08 objects-hc08; \
 	fi
 
@@ -355,7 +355,7 @@ objects-hc08:
 	$(MAKE) clean_intermediate
 
 model-stm8:
-	if grep '^stm8\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^stm8$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mstm8" PORT=stm8 objects-stm8 OEXT=.o; \
 	fi
 
@@ -365,7 +365,7 @@ objects-stm8:
 	$(MAKE) clean_intermediate
 
 model-pic16:
-	if grep '^pic16\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^pic16$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) PORT=pic16 objects-pic16; \
 	fi
 
@@ -375,7 +375,7 @@ objects-pic16:
 	$(MAKE) clean_intermediate-pic16
 
 model-pic14:
-	if grep '^pic14\>' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^pic14$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) PORT=pic14 objects-pic14; \
 	fi
 

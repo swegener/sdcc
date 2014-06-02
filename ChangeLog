@@ -1,3 +1,8 @@
+2014-06-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/Makefile.in:
+	  Fix non-standard end-of-line matching (makes device libraries compile on OpenBSD).
+
 2014-05-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

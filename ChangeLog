@@ -1,3 +1,9 @@
+2014-06-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/stm8.src/inst.cc,
+	  support/regression/tests/gcc-torture-execute-20021120-1.c:
+	  Fix bug #2180 by applying patch #244 by Ben Shi.
+
 2014-06-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/Makefile.in:

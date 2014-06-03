@@ -439,6 +439,7 @@ int
 cl_stm8::inst_cpw(t_mem code, unsigned char prefix)
 {
   long int operand1, operand2, result;
+  int reversed = 0;
 
   operand1 = prefix == 0x90 ? regs.Y : regs.X;
   operand2 = prefix == 0x90 ? regs.X : regs.Y;
@@ -449,13 +450,16 @@ cl_stm8::inst_cpw(t_mem code, unsigned char prefix)
     case 0xb: operand2 = get2(fetch()); break; // Short
     case 0xc: operand2 = get2(fetch2()); break; // Long
     case 0x1: operand2 = get2(regs.SP + fetch()); break; // SP-indexed
-    case 0xf: operand1 = get2(operand1); break; // cpw X|Y, (Y|X)
-    case 0xe: operand1 = get2(operand1 + fetch()); break;
-    case 0xd: operand1 = get2(operand1 + fetch2()); break;
+    case 0xf: operand1 = get2(operand1); reversed = 1; break; // cpw X|Y, (Y|X)
+    case 0xe: operand1 = get2(operand1 + fetch()); reversed = 1; break;
+    case 0xd: operand1 = get2(operand1 + fetch2()); reversed = 1; break;
     default: return(resHALT);
   }
-   
-  result = operand1 - operand2;
+
+  if (!reversed)
+    result = operand1 - operand2;
+  else
+    result = operand2 - operand1;
 
   FLAG_ASSIGN (BIT_V, 0x8000 & (operand1 ^ operand2 ^ result ^ (result >> 1)));
   FLAG_ASSIGN (BIT_Z, (result & 0xffff) == 0);

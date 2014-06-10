@@ -106,8 +106,7 @@ cl_stm8::fetchea(t_mem code, unsigned char prefix)
 int
 cl_stm8::get_dest(t_mem code, unsigned char prefix)
 {
-   int resaddr, ftc;
-//  printf("******************** get_dest() start PC= 0x%04x, prefix = 0x%02x, code = 0x%02x \n", PC, prefix, code);
+  int resaddr, ftc;
 
   switch ((code >> 4) & 0x0f) {
     case 0x0:
@@ -125,7 +124,7 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
          ftc = fetch2();
        resaddr = get2(ftc);
      } else if ( 0x92 == prefix) {    // short indirect - pointer
-         ftc = fetch2();
+         ftc = fetch();
        resaddr = get2(ftc);
 	  } else {
 	    resaddr = ( resHALT);
@@ -135,10 +134,10 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
     case 0x4:
 	  if ( 0x72 == prefix) {           // long offset with X
          ftc = fetch2();
-         resaddr = get2(ftc);
+         resaddr = ftc + regs.X;
      } else if ( 0x90 == prefix) {    // long offset with Y
          ftc = fetch2();
-         resaddr = get2(ftc);
+         resaddr = ftc + regs.Y;
 	  } else {
          resaddr = ( resHALT);
 	  }
@@ -162,10 +161,10 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
 	    resaddr = (fetch()+regs.Y);
 	  } else if ( 0x91 == prefix) {    // short pointer to offset with Y
          ftc = fetch();
-	    resaddr = (get1(ftc)+regs.Y);
+	    resaddr = (get2(ftc)+regs.Y);
 	  } else if ( 0x92 == prefix) {    // short pointer to offset with X
          ftc = fetch();
-	    resaddr = (get1(ftc)+regs.X);
+	    resaddr = (get2(ftc)+regs.X);
 	  } else {
 	    resaddr =( resHALT);
 	  }
@@ -185,7 +184,7 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
       resaddr =(resHALT);
       break;
   }
-//  printf("******************** get_dest() end - resaddr=0x%04x, PC=0x%04x\n", resaddr, PC);
+
   return resaddr;
 }
 
@@ -410,6 +409,11 @@ cl_stm8::inst_clr(t_mem code, unsigned char prefix)
     case 0x906: opaddr = regs.Y + fetch(); break;
     case 0x904: opaddr = regs.Y + fetch2(); break;
     case 0x0: opaddr = regs.SP + fetch(); break;
+    case 0x923: opaddr = get2(fetch()); break; // short indirect
+    case 0x723: opaddr = get2(fetch2()); break; // long indirect
+    case 0x926: opaddr = get2(fetch()) + regs.X; break; // short x-indexed indirect
+    case 0x726: opaddr = get2(fetch2()) + regs.X; break; // long x-indexed indirect
+    case 0x916: opaddr = get2(fetch()) + regs.Y; break; // short y-indexed indirect
     /* clrw */
     case 0x5: regs.X = 0; return(resGO);
     case 0x905: regs.Y = 0; return(resGO);
@@ -448,11 +452,32 @@ cl_stm8::inst_cpw(t_mem code, unsigned char prefix)
   {
     case 0xa: operand2 = fetch2(); break; // Immediate
     case 0xb: operand2 = get2(fetch()); break; // Short
-    case 0xc: operand2 = get2(fetch2()); break; // Long
+    case 0xc:
+      switch (prefix)
+      {
+        case 0x00:
+        case 0x90: operand2 = get2(fetch2()); break; // Long direct
+        case 0x92: operand2 = get2(get2(fetch())); break; // short indirect
+        case 0x72: operand2 = get2(get2(fetch2())); break; // long indirect
+        case 0x91: operand2 = get2(get2(fetch())); operand1 = regs.Y; break; // short indirect
+        default: return(resHALT);
+      }
+      break;
     case 0x1: operand2 = get2(regs.SP + fetch()); break; // SP-indexed
     case 0xf: operand1 = get2(operand1); reversed = 1; break; // cpw X|Y, (Y|X)
-    case 0xe: operand1 = get2(operand1 + fetch()); reversed = 1; break;
-    case 0xd: operand1 = get2(operand1 + fetch2()); reversed = 1; break;
+    case 0xe: operand1 = get2(operand1 + fetch()); reversed = 1; break; // short indexed direct
+    case 0xd:
+      switch (prefix)
+      {
+        case 0x00:
+        case 0x90: operand1 = get2(operand1 + fetch2()); break; // short indexed direct
+        case 0x91: operand1 = get2(regs.Y + get2(fetch())); operand2 = regs.X; break; // short y-indexed indirect
+        case 0x92: operand1 = get2(operand1 + get2(fetch())); break; // short x-indexed indirect
+        case 0x72: operand1 = get2(operand1 + get2(fetch2())); break; // long x-indexed indirect
+        default: return(resHALT);
+      }
+      reversed = 1;
+      break;
     default: return(resHALT);
   }
 
@@ -753,16 +778,48 @@ cl_stm8::inst_ldxy(t_mem code, unsigned char prefix)
 {
   unsigned int operand;
   TYPE_UWORD *dest_ptr;
-  dest_ptr = (prefix & 0x90) ? &regs.Y : &regs.X;
-  if(code == 0x16) dest_ptr = &regs.Y; 
+  dest_ptr = (prefix == 0x90) ? &regs.Y : &regs.X;
+  if((prefix == 0x00 && code == 0x16) || (prefix == 0x91 && code == 0xce) || (prefix == 0x91 && code == 0xde)) dest_ptr = &regs.Y;
 
   switch((code & 0xf0) >> 4) {
      case 0xa: operand = fetch2(); break; // Immediate
      case 0xb: operand = get2(fetch()); break; // Short
-     case 0xc: operand = get2(fetch2()); break; // Long
+     case 0xc:
+       switch (prefix) {
+       case 0x90:
+       case 0x00:
+         operand = get2(fetch2()); // Long direct
+         break;
+       case 0x92:
+       case 0x91:
+         operand = get2(get2(fetch())); // short indirect
+         break;
+       case 0x72:
+         operand = get2(get2(fetch2())); // long indirect
+         break;
+       default:
+         return(resHALT);
+       }
+       break;
      case 0xf: operand = get2(*dest_ptr); break;
      case 0xe: operand = get2(*dest_ptr + fetch()); break;
-     case 0xd: operand = get2(*dest_ptr + fetch2()); break;
+     case 0xd:
+       switch (prefix) {
+       case 0x90:
+       case 0x00:
+         operand = get2(*dest_ptr + fetch2()); // Long x/y-indexed direct
+         break;
+       case 0x92:
+       case 0x91:
+         operand = get2(*dest_ptr + get2(fetch())); // short x/y-indexed indirect
+         break;
+       case 0x72:
+         operand = get2(*dest_ptr + get2(fetch2())); // long x-indexed indirect
+         break;
+       default:
+         return(resHALT);
+       }
+       break;
      case 0x1: operand = get2(regs.SP + fetch()); break;
      case 0x9: // Special cases
      	switch(code | (prefix << 8)) {
@@ -810,15 +867,52 @@ cl_stm8::inst_ldxydst(t_mem code, unsigned char prefix)
   unsigned int opaddr, operand;
   bool inv = (code == 0xdf || code == 0xef || code == 0xff);
   operand = ((prefix == 0x90) ^ inv) ? regs.Y : regs.X;
-  if(code == 0x17) operand = regs.Y;
+  if((prefix == 0x00 && code == 0x17) || (prefix == 0x91 && code == 0xcf)) operand = regs.Y;
+  else if (prefix == 0x91 && code == 0xdf) operand = regs.X;
 
   switch((code & 0xf0) >> 4) {
     case 0x1: opaddr = regs.SP + fetch(); break;
     case 0xb: opaddr = fetch(); break;
-    case 0xc: opaddr = fetch2(); break;
+    case 0xc:
+      switch (prefix) {
+      case 0x00:
+      case 0x90:
+        opaddr = fetch2(); // short direct
+        break;
+      case 0x91:
+      case 0x92:
+        opaddr = get2(fetch()); // short indirect
+        break;
+      case 0x72:
+        opaddr = get2(fetch2()); // long indirect
+        break;
+      default:
+        return (resHALT);
+      }
+      break;
     case 0xf: opaddr = (prefix == 0x90) ? regs.Y : regs.X; break;
     case 0xe: opaddr = ((prefix == 0x90) ? regs.Y : regs.X) + fetch(); break;
-    case 0xd: opaddr = ((prefix == 0x90) ? regs.Y : regs.X)+ fetch2(); break;
+    case 0xd:
+      switch (prefix) {
+      case 0x90:
+        opaddr = regs.Y + fetch2(); // long y-indexed direct
+        break;
+      case 0x00:
+        opaddr = regs.X + fetch2(); // long x-indexed direct
+        break;
+      case 0x92:
+        opaddr = regs.X + get2(fetch()); // short x-indexed indirect
+        break;
+      case 0x91:
+        opaddr = regs.Y + get2(fetch()); // short y-indexed indirect
+        break;
+      case 0x72:
+        opaddr = regs.X + get2(fetch2()); // long x-indexed indirect
+        break;
+      default:
+        return (resHALT);
+      }
+      break;
     default: return(resHALT);
   }
 

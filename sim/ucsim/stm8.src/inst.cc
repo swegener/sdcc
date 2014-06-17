@@ -686,35 +686,38 @@ cl_stm8::inst_jr(t_mem code, unsigned char prefix)
 {
   bool taken;
   signed char ofs;
-  unsigned char maskedP;
-  
+  unsigned char bz, bn, bv;
+
   if (prefix ==0x00) {
     switch ((code>>1) & 7) {
-      case 0: // JRA/JRT
+      case 0: // JRT - JRA (20) / JRF (21)
         taken = 1;
         break;
-      case 1: // JRUGT
+      case 1: // JRUGT (22) / JRULE (23)
         taken = !(regs.CC & (BIT_C | BIT_Z));
         break;
-      case 2: // JRUGE
+      case 2: // JRUGE (24) / JRULT (25)
         taken = !(regs.CC & BIT_C);
         break;
-      case 3: // JRNE
+      case 3: // JRNE (26) / JREQ (27)
         taken = !(regs.CC & BIT_Z);
         break;
-      case 4: // JRNV
+      case 4: // JRNV (28) / JRV (29)
         taken = !(regs.CC & BIT_V);
         break;
-      case 5: // JRPL
+      case 5: // JRPL (2A) / JRMI (2B)
         taken = !(regs.CC & BIT_N);
         break;
-      case 6: // JRSGT - Z or (N xor V) = 0
-        maskedP = regs.CC & (BIT_N | BIT_V | BIT_Z);
-        taken = !maskedP || (maskedP == (BIT_N | BIT_V));
+      case 6: // JRSGT (2C) - Z or (N xor V) = 0 / JRSLE (2D) - Z or (N xor V) = 1
+        bz = !!(regs.CC & BIT_Z);
+        bn = !!(regs.CC & BIT_N);
+        bv = !!(regs.CC & BIT_V);
+        taken = !(bz | (bn ^ bv));
         break;
-      case 7: // JRSGE - N xor V = 0
-        maskedP = regs.CC & (BIT_N | BIT_V);
-        taken = !maskedP || (maskedP == (BIT_N | BIT_V));
+      case 7: // JRSGE (2E) - N xor V = 0 / / JRSLT(2F) N xor V = 1
+        bn = !!(regs.CC & BIT_N);
+        bv = !!(regs.CC & BIT_V);
+        taken = !(bn ^ bv);
         break;
       default:
         return(resHALT);
@@ -722,13 +725,13 @@ cl_stm8::inst_jr(t_mem code, unsigned char prefix)
   }
   else if (prefix==0x90) {
     switch ((code>>1) & 7) {
-      case 4: // JRNH
+      case 4: // JRNH (28) / JRH (29)
          taken = !(regs.CC & BIT_H);
        break;
-      case 6: // JRNM - no int mask
+      case 6: // JRNM (2C) / JRM (2D)
         taken = !(regs.CC & (BIT_I1|BIT_I0));
         break;
-      case 7: // JRIL - interrupt low - no means to test this ???
+      case 7: // JRIL (2E) / JRIH (2F), no means to test this ???
         taken = 0; 
       default:
         return(resHALT);

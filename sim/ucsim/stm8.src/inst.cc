@@ -37,8 +37,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "regsstm8.h"
 #include "stm8mac.h"
 
-
-
 int
 cl_stm8::fetchea(t_mem code, unsigned char prefix)
 {
@@ -188,13 +186,6 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
   return resaddr;
 }
 
-/*****************************************************************************
- *
- *
- *
- *****************************************************************************
- */
-
 int
 cl_stm8::inst_adc(t_mem code, unsigned char prefix)
 {
@@ -247,6 +238,7 @@ cl_stm8::inst_addw(t_mem code, unsigned char prefix)
 {
   long int result, operand1, operand2, nibble_high, nibble_low;
   TYPE_UWORD *dest_ptr;
+  char x15, m15, r15, x14, m14, r14, x7, m7, r7;
 
   nibble_high = (code >> 4) & 0x0f;
   nibble_low = code & 0x0f;
@@ -274,8 +266,18 @@ cl_stm8::inst_addw(t_mem code, unsigned char prefix)
 
   result = operand1 + operand2;
 
-  FLAG_ASSIGN (BIT_V, 0x8000 & (operand1 ^ operand2 ^ result ^ (result >> 1)));
-  FLAG_ASSIGN (BIT_H, 0x40 & (operand1 ^ operand2 ^ result));
+  x15 = !!(operand1 & 0x8000);
+  m15 = !!(operand2 & 0x8000);
+  r15 = !!(result & 0x8000);
+  x14 = !!(operand1 & 0x4000);
+  m14 = !!(operand2 & 0x4000);
+  r14 = !!(result & 0x4000);
+  x7 = !!(operand1 & 0x0080);
+  m7 = !!(operand2 & 0x0080);
+  r7 = !!(result & 0x0080);
+
+  FLAG_ASSIGN (BIT_V, ((x15 & m15) | (m15 & !r15) | (!r15 & x15)) ^ ((x14 & m14) | (m14 & !r14) | (!r14 & x14)));
+  FLAG_ASSIGN (BIT_H, (x7 & m7) | (m7 & !r7) | (!r7 & x7));
   FLAG_ASSIGN (BIT_N, 0x8000 & result);
   FLAG_ASSIGN (BIT_Z, (result & 0xffff) == 0);
   FLAG_ASSIGN (BIT_C, 0x10000 & result);

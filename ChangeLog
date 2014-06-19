@@ -1,3 +1,7 @@
+2014-06-20 Ben Shi <powerstudio1st AT 163.com>
+        * sim/ucsim/stm8.src/inst.cc:
+          Fix potential bugs of flags affection in inst_addw().
+
 2014-06-17 Ben Shi <powerstudio1st AT 163.com>
         * sim/ucsim/stm8.src/inst.cc:
           Make the comment more understandable, fix potential bugs in inst_jr(). (JRSGT / JRSLE / JRSGE / JRSLT)

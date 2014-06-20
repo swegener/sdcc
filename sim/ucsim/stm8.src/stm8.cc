@@ -574,14 +574,14 @@ cl_stm8::exec_inst(void)
                   regs.X |= (regs.A << 8);
                   regs.A = tempi & 0xff;
                   FLAG_ASSIGN (BIT_N, 0x8000 & regs.X);
-                  FLAG_ASSIGN (BIT_Z, regs.X ^ 0xffff);
+                  FLAG_ASSIGN (BIT_Z, regs.X == 0x0000);
                } else if (cprefix == 0x90) { // rrwa Y,A
                   tempi = regs.Y;
                   regs.Y >>= 8;
                   regs.Y |= (regs.A << 8);
                   regs.A = tempi & 0xff;
                   FLAG_ASSIGN (BIT_N, 0x8000 & regs.Y);
-                  FLAG_ASSIGN (BIT_Z, regs.Y ^ 0xffff);
+                  FLAG_ASSIGN (BIT_Z, regs.Y == 0x0000);
                } else {
                   return(resHALT);
                }

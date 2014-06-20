@@ -1,3 +1,9 @@
+2014-06-21 Ben Shi <powerstudio1st AT 163.com>
+        * sim/ucsim/stm8.src/inst.cc:
+          Fix potential bugs of flags affection in inst_addw(), inst_sub() and inst_cp().
+        * sim/ucsim/stm8.src/stm8.cc:
+          Fix potential bugs of flags affection in simulation of RRWA.
+
 2014-06-20 Ben Shi <powerstudio1st AT 163.com>
         * sim/ucsim/stm8.src/inst.cc:
           Fix potential bugs of flags affection in inst_addw().

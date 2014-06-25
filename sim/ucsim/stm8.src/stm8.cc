@@ -643,14 +643,14 @@ cl_stm8::exec_inst(void)
                   regs.X |= regs.A ;
                   regs.A = tempi >> 8;
                   FLAG_ASSIGN (BIT_N, 0x8000 & regs.X);
-                  FLAG_ASSIGN (BIT_Z, regs.X ^ 0xffff);
+                  FLAG_ASSIGN (BIT_Z, regs.X == 0x0000);
                } else if (cprefix == 0x90) { // rlwa Y,A
                   tempi = regs.Y;
                   regs.Y <<= 8;
                   regs.Y |= regs.A ;
                   regs.A = tempi >> 8;
                   FLAG_ASSIGN (BIT_N, 0x8000 & regs.Y);
-                  FLAG_ASSIGN (BIT_Z, regs.Y ^ 0xffff);
+                  FLAG_ASSIGN (BIT_Z, regs.Y == 0x0000);
                } else {
                   return(resHALT);
                }
@@ -700,11 +700,12 @@ cl_stm8::exec_inst(void)
             case 0x40:
             case 0x50:
             case 0x60:
-            case 0x70: // CPL
+            case 0x70: // CPL, CPLW
                return( inst_cpl( code, cprefix));
                break;
-            case 0x80: 
+            case 0x80: // TRAP
                // store to stack
+               PC++;
                push2( PC & 0xffff);
                push1( PC >> 16); //extended PC
                push2( regs.Y);
@@ -718,8 +719,8 @@ cl_stm8::exec_inst(void)
                PC = get1(0x8004);
                if (PC == 0x82) { // this is reserved opcode for vector table
                   regs.VECTOR = 0;
-                  PC = get1(0x8005)*(1<<16);
-                  PC += get2(0x8006);
+                  PC = get1(0x8005) << 16;
+                  PC |= get2(0x8006);
                   return(resGO);
                }
                return(resHALT);

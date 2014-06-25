@@ -467,6 +467,7 @@ cl_stm8::inst_cpw(t_mem code, unsigned char prefix)
 {
   long int operand1, operand2, result;
   int reversed = 0;
+  char x15, x14, m15, m14, r15, r14;
 
   operand1 = prefix == 0x90 ? regs.Y : regs.X;
   operand2 = prefix == 0x90 ? regs.X : regs.Y;
@@ -505,14 +506,29 @@ cl_stm8::inst_cpw(t_mem code, unsigned char prefix)
   }
 
   if (!reversed)
-    result = operand1 - operand2;
+    {
+      x15 = !!(operand1 & 0x8000);
+      x14 = !!(operand1 & 0x4000);
+      m15 = !!(operand2 & 0x8000);
+      m14 = !!(operand2 & 0x4000);
+      result = (operand1 - operand2) & 0xffff;
+    }
   else
-    result = operand2 - operand1;
+    {
+      x15 = !!(operand2 & 0x8000);
+      x14 = !!(operand2 & 0x4000);
+      m15 = !!(operand1 & 0x8000);
+      m14 = !!(operand1 & 0x4000);
+      result = (operand2 - operand1) & 0xffff;
+    }
 
-  FLAG_ASSIGN (BIT_V, 0x8000 & (operand1 ^ operand2 ^ result ^ (result >> 1)));
+  r15 = !!(result & 0x8000);
+  r14 = !!(result & 0x4000);
+
   FLAG_ASSIGN (BIT_Z, (result & 0xffff) == 0);
-  FLAG_ASSIGN (BIT_C, 0x10000 & result);
   FLAG_ASSIGN (BIT_N, 0x8000 & result);
+  FLAG_ASSIGN (BIT_C, (!x15 & m15) | (!x15 & r15) | (x15 & m15 & r15));
+  FLAG_ASSIGN (BIT_V, ((!x15 & m15) | (!x15 & r15) | (x15 & m15 & r15)) ^ ((!x14 & m14) | (!x14 & r14) | (x14 & m14 & r14)));
 
   return(resGO);
 }
@@ -533,7 +549,7 @@ cl_stm8::inst_cpl(t_mem code, unsigned char prefix)
       opaddr = get_dest(code,prefix);
       operand = get1(opaddr);
    }
-   
+
    operand ^= 0xffff;
   
    FLAG_SET (BIT_C);
@@ -543,11 +559,11 @@ cl_stm8::inst_cpl(t_mem code, unsigned char prefix)
       FLAG_ASSIGN (BIT_Z, (operand & 0xff) == 0);
       FLAG_ASSIGN (BIT_N, 0x80 & operand);
    } else if (((code&0xf0)==0x50) &&(prefix == 0x00)) {
-      regs.X = operand;
+      regs.X = operand & 0xffff;
       FLAG_ASSIGN (BIT_Z, (operand & 0xffff) == 0);
       FLAG_ASSIGN (BIT_N, 0x8000 & operand);
    } else if (((code&0xf0)==0x50) &&(prefix == 0x90)) {
-      regs.Y = operand;
+      regs.Y = operand & 0xffff;
       FLAG_ASSIGN (BIT_Z, (operand & 0xffff) == 0);
       FLAG_ASSIGN (BIT_N, 0x8000 & operand);
    } else {
@@ -555,7 +571,7 @@ cl_stm8::inst_cpl(t_mem code, unsigned char prefix)
       FLAG_ASSIGN (BIT_Z, (operand & 0xff) == 0);
       FLAG_ASSIGN (BIT_N, 0x80 & operand);
    }
-  
+
    return(resGO);
 }
 
@@ -1114,13 +1130,23 @@ cl_stm8::inst_sbc(t_mem code, unsigned char prefix)
 {
   int result, operand1, operand2;
   int carryin = (regs.CC & BIT_C)!=0;
+  char a7, m7, r7, a6, m6, r6;
 
   operand1 = regs.A;
+  a7 = !!(operand1 & 0x80);
+  a6 = !!(operand1 & 0x40);
+  
   operand2 = OPERAND(code, prefix);
-  result = operand1 - operand2 - carryin;
+  m7 = !!(operand2 & 0x80);
+  m6 = !!(operand2 & 0x40);
+
+  result = (operand1 - operand2 - carryin) & 0xff;
+  r7 = !!(result & 0x80);
+  r6 = !!(result & 0x40);
+
   FLAG_NZ (result);
-  FLAG_ASSIGN (BIT_V, 0x80 & (operand1 ^ operand2 ^ result ^ (result >>1)));
-  FLAG_ASSIGN (BIT_C, 0x100 & result);
+  FLAG_ASSIGN (BIT_V, ((!a7 & m7) | (!a7 & r7) | (a7 & m7 & r7)) ^ ((!a6 & m6) | (!a6 & r6) | (a6 & m6 & r6)));
+  FLAG_ASSIGN (BIT_C, (!a7 & m7) | (!a7 & r7) | (a7 & m7 & r7));
 
   regs.A = result & 0xff;
   return(resGO);

@@ -1,3 +1,10 @@
+2014-06-30 Ben Shi <powerstudio1st AT 163.com>
+        * sim/ucsim/stm8.src/inst.cc:
+          Fix potential bugs in inst_adc() & inst_add() - flags affection.
+          Fix potential bugs in inst_sll() & inst_rlc() - reg.X & reg.Y might exceed 0xffff.
+        * sim/ucsim/stm8.src/stm8.cc:
+          Improve code quality.
+
 2014-06-25 Ben Shi <powerstudio1st AT 163.com>
         * sim/ucsim/stm8.src/inst.cc:
           Fix potential bugs of flags affection in inst_sbc() and inst_cpw().

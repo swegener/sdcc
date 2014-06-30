@@ -755,7 +755,7 @@ cl_stm8::exec_inst(void)
             case 0x40:
             case 0x50:
             case 0x60:
-            case 0x70: // SRl
+            case 0x70: // SRL
                return( inst_srl( code, cprefix));
                break;
             case 0x80: 
@@ -805,10 +805,10 @@ cl_stm8::exec_inst(void)
                store1(opaddr, tempi);
                return( resGO);
                break;
-            case 0x60: // divw
+            case 0x60: // DIVW
                return( inst_div( code, cprefix));
                break;
-            case 0x80: 
+            case 0x80:
                if(cprefix==0x90) {
                   pop2(regs.Y);
                } else if(cprefix==0x00) {
@@ -852,7 +852,7 @@ cl_stm8::exec_inst(void)
             case 0x70: // RRC
                return( inst_rrc( code, cprefix));
                break;
-            case 0x10:       
+            case 0x10:
                return(inst_ldxy( code, cprefix));
                break;
             case 0x80: 
@@ -921,8 +921,10 @@ cl_stm8::exec_inst(void)
                   store1(get3(opaddr)+regs.Y,regs.A);
                } else if(cprefix==0x90) {
                   store1((opaddr << 8) + fetch() + regs.Y, regs.A);
-               } else {
+               } else if(cprefix==0x00) {
                   store1((opaddr << 8) + fetch() + regs.X, regs.A);
+               } else {
+                  return(resHALT);
                }
                FLAG_NZ (regs.A);
                return(resGO);
@@ -1004,7 +1006,6 @@ cl_stm8::exec_inst(void)
                printf("************* bad code !!!!\n");
                return(resINV_INST);
          }
-      
          break;
       case 0xa:
          switch ( code & 0xf0) {

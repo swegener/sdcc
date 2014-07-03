@@ -1033,38 +1033,38 @@ cl_stm8::exec_inst(void)
             case 0xF0: // OR
                return( inst_or( code, cprefix));
                break;
-             default: 
+             default:
                printf("************* bad code !!!!\n");
                return(resINV_INST);
          }
          break;
       case 0xb:
          switch ( code & 0xf0) {
-            case 0x30: 
+            case 0x30: // push longmem
                push1( get1(fetch2()));
                return(resGO);
-            case 0x40: 
+            case 0x40: // push #byte
                push1( fetch1());
                return(resGO);
-            case 0x50: // add sp,#val
-               regs.SP += fetch();
+            case 0x50: // addw sp,#val
+               regs.SP += fetch1();
                return(resGO);
-               break;            
+               break;
             case 0x60: // ld (shortoff,SP),A
                store1(fetch1()+regs.SP, regs.A);
                FLAG_NZ(regs.A);
                return(resGO);
-               break;            
+               break;
             case 0x70: // ld A,(shortoff,SP)
                regs.A = get1(fetch1()+regs.SP);
                FLAG_NZ(regs.A);
                return(resGO);
-               break;            
+               break;
             case 0x90: // SIM - disable INT
                FLAG_SET(BIT_I0);
                FLAG_SET(BIT_I1);
                return(resGO);
-            case 0x10: 
+            case 0x10:
             case 0xA0:
             case 0xB0:
             case 0xC0:
@@ -1073,7 +1073,7 @@ cl_stm8::exec_inst(void)
             case 0xF0: // ADD
                return( inst_add( code, cprefix));
                break;
-            default: 
+            default:
                printf("************* bad code !!!!\n");
                return(resINV_INST);
          }
@@ -1143,12 +1143,15 @@ cl_stm8::exec_inst(void)
                break;
             case 0x80: // CALLF
                opaddr = fetch2();
-               push2(PC & 0xffff);
-               push1(PC>>16);
                if (cprefix == 0x92) {
-                  PC = get3(opaddr);
+                   push2(PC & 0xffff);
+                   push1(PC >> 16);
+                   PC = get3(opaddr);
                } else {
-                  PC = (opaddr << 8) + fetch();
+                   unsigned char c = fetch();
+                   push2(PC & 0xffff);
+                   push1(PC >> 16);
+                   PC = (opaddr << 8) + c;
                }
                return(resGO);
                break;
@@ -1156,9 +1159,12 @@ cl_stm8::exec_inst(void)
                return(resGO);
                break;
             case 0xA0: // CALLR
+             {
+               char c = (char) fetch1();
                push2(PC);
-               PC += (char) fetch1();
+               PC += c;
                return(resGO);
+             }
                break;            
             case 0xb0: // LDF
                opaddr = fetch2();
@@ -1194,11 +1200,11 @@ cl_stm8::exec_inst(void)
             case 0x80: 
                printf("************* HALT instruction reached !!!!\n");
                return(resHALT);
-            case 0x90:
+            case 0x90: // LD A, YH / XH
                if(cprefix==0x90) {
-                  regs.A = (regs.Y >> 8);
+                  regs.A = (regs.Y >> 8) & 0xff;
                } else if(cprefix==0x00) {
-                  regs.A = (regs.X >> 8);
+                  regs.A = (regs.X >> 8) & 0xff;
                } else {
                   return(resHALT);
                }
@@ -1213,7 +1219,7 @@ cl_stm8::exec_inst(void)
             case 0xF0: // LDXY
                return( inst_ldxy( code, cprefix));
                break;
-            default: 
+            default:
                printf("************* bad code !!!!\n");
                return(resINV_INST);
          }
@@ -1223,6 +1229,7 @@ cl_stm8::exec_inst(void)
             case 0x10:
                // ldw   (offset,SP),X
                return( inst_ldxydst( code, cprefix ) );
+               break;
             case 0x00: 
             case 0x30:
             case 0x40:
@@ -1251,8 +1258,10 @@ cl_stm8::exec_inst(void)
                   regs.A = get1(get3(opaddr)+regs.Y);
                } else if(cprefix==0x90) {
                   regs.A = get1((opaddr << 8) + fetch() + regs.Y);
-               } else {
+               } else if(cprefix==0x00) {
                   regs.A = get1((opaddr << 8) + fetch() + regs.X);
+               } else {
+                  return(resHALT);
                }
                FLAG_NZ (regs.A);
                return(resGO);

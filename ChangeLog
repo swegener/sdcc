@@ -1,3 +1,10 @@
+2014-07-03 Ben Shi <powerstudio1st AT 163.com>
+        * sim/ucsim/stm8.src/inst.cc:
+          Fix potential bugs in inst_dec(), inst_inc() & inst_ldxy(): flags affection.
+          Make inst_addw(), inst_clr() & inst_ldxydst() more understandable.
+        * sim/ucsim/stm8.src/stm8.cc:
+          Fix potential bugs in CALLR & CALLF: the stack saved PC value is not accurate.
+
 2014-06-30 Ben Shi <powerstudio1st AT 163.com>
         * sim/ucsim/stm8.src/inst.cc:
           Fix potential bugs in inst_adc() & inst_add() - flags affection.

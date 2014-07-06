@@ -1,3 +1,7 @@
+2014-07-06 Ben Shi <powerstudio1st AT 163.com>
+        * sim/ucsim/stm8.src/inst.cc:
+          Merge inst_sub() to inst_sbc().
+
 2014-07-03 Ben Shi <powerstudio1st AT 163.com>
         * sim/ucsim/stm8.src/inst.cc:
           Fix potential bugs in inst_dec(), inst_inc() & inst_ldxy(): flags affection.

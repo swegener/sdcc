@@ -1,3 +1,7 @@
+2014-07-07 Ben Shi <powerstudio1st AT 163.com>
+        * sim/ucsim/stm8.src/inst.cc:
+          Unify all flag affection code to flag_cvh().
+
 2014-07-06 Ben Shi <powerstudio1st AT 163.com>
         * sim/ucsim/stm8.src/inst.cc:
           Merge inst_sub() to inst_sbc().

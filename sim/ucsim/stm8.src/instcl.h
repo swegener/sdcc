@@ -6,7 +6,8 @@
    virtual int get3(unsigned int addr);
    virtual int get_dest(t_mem code, unsigned char prefix);
    virtual int operandw(t_mem code, unsigned char prefix);
-   
+   virtual void flag_cvh(int x, int m, int r, bool byte, bool add, int mask);
+  
    virtual int inst_adc(t_mem code, unsigned char prefix);
    virtual int inst_add(t_mem code, unsigned char prefix);
    virtual int inst_addw(t_mem code, unsigned char prefix);

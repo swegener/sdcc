@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-04-14 18:18:26 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:31 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -2426,8 +2426,8 @@ typedef union
     {
     unsigned                    : 1;
     unsigned                    : 1;
-    unsigned PWM1MOD0           : 1;
-    unsigned PWM1MOD1           : 1;
+    unsigned PWM1MODE0          : 1;
+    unsigned PWM1MODE1          : 1;
     unsigned POL                : 1;
     unsigned OUT                : 1;
     unsigned OE                 : 1;
@@ -2449,7 +2449,7 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PWM1MOD            : 2;
+    unsigned PWM1MODE           : 2;
     unsigned                    : 4;
     };
 
@@ -2463,9 +2463,9 @@ typedef union
 
 extern __at(0x0D9B) volatile __PWM1CONbits_t PWM1CONbits;
 
-#define _PWM1MOD0               0x04
+#define _PWM1MODE0              0x04
 #define _MODE0                  0x04
-#define _PWM1MOD1               0x08
+#define _PWM1MODE1              0x08
 #define _MODE1                  0x08
 #define _POL                    0x10
 #define _PWM1POL                0x10
@@ -3195,8 +3195,8 @@ typedef union
     {
     unsigned                    : 1;
     unsigned                    : 1;
-    unsigned PWM2MOD0           : 1;
-    unsigned PWM2MOD1           : 1;
+    unsigned PWM2MODE0          : 1;
+    unsigned PWM2MODE1          : 1;
     unsigned POL                : 1;
     unsigned OUT                : 1;
     unsigned OE                 : 1;
@@ -3218,7 +3218,7 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PWM2MOD            : 2;
+    unsigned PWM2MODE           : 2;
     unsigned                    : 4;
     };
 
@@ -3232,9 +3232,9 @@ typedef union
 
 extern __at(0x0DAB) volatile __PWM2CONbits_t PWM2CONbits;
 
-#define _PWM2CON_PWM2MOD0       0x04
+#define _PWM2CON_PWM2MODE0      0x04
 #define _PWM2CON_MODE0          0x04
-#define _PWM2CON_PWM2MOD1       0x08
+#define _PWM2CON_PWM2MODE1      0x08
 #define _PWM2CON_MODE1          0x08
 #define _PWM2CON_POL            0x10
 #define _PWM2CON_PWM2POL        0x10
@@ -3964,8 +3964,8 @@ typedef union
     {
     unsigned                    : 1;
     unsigned                    : 1;
-    unsigned PWM3MOD0           : 1;
-    unsigned PWM3MOD1           : 1;
+    unsigned PWM3MODE0          : 1;
+    unsigned PWM3MODE1          : 1;
     unsigned POL                : 1;
     unsigned OUT                : 1;
     unsigned OE                 : 1;
@@ -3987,7 +3987,7 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PWM3MOD            : 2;
+    unsigned PWM3MODE           : 2;
     unsigned                    : 4;
     };
 
@@ -4001,9 +4001,9 @@ typedef union
 
 extern __at(0x0DBB) volatile __PWM3CONbits_t PWM3CONbits;
 
-#define _PWM3CON_PWM3MOD0       0x04
+#define _PWM3CON_PWM3MODE0      0x04
 #define _PWM3CON_MODE0          0x04
-#define _PWM3CON_PWM3MOD1       0x08
+#define _PWM3CON_PWM3MODE1      0x08
 #define _PWM3CON_MODE1          0x08
 #define _PWM3CON_POL            0x10
 #define _PWM3CON_PWM3POL        0x10
@@ -4457,44 +4457,46 @@ extern __at(0x0FEF) __sfr TOSH;
 
 //----------------------------- CONFIG1 Options -------------------------------
 
-#define _FOSC_INTOSC            0xFFFC  // INTOSC oscillator; I/O function on CLKIN pin.
-#define _FOSC_ECL               0xFFFD  // ECL, External Clock, Low Power Mode (0-0.5 MHz); device clock supplied to CLKIN pin.
-#define _FOSC_ECM               0xFFFE  // ECM, External Clock, Medium Power Mode (0.5-4 MHz); device clock supplied to CLKIN pin.
-#define _FOSC_ECH               0xFFFF  // ECH, External Clock, High Power Mode (4-32 MHz); device clock supplied to CLKIN pin.
-#define _WDTE_OFF               0xFFE7  // WDT disabled.
-#define _WDTE_SWDTEN            0xFFEF  // WDT controlled by the SWDTEN bit in the WDTCON register.
-#define _WDTE_NSLEEP            0xFFF7  // WDT enabled while running and disabled in Sleep.
-#define _WDTE_ON                0xFFFF  // WDT enabled.
-#define _PWRTE_ON               0xFFDF  // PWRT enabled.
-#define _PWRTE_OFF              0xFFFF  // PWRT disabled.
-#define _MCLRE_OFF              0xFFBF  // MCLR/VPP pin function is digital input.
-#define _MCLRE_ON               0xFFFF  // MCLR/VPP pin function is MCLR.
-#define _CP_ON                  0xFF7F  // Program memory code protection is enabled.
-#define _CP_OFF                 0xFFFF  // Program memory code protection is disabled.
-#define _BOREN_OFF              0xF9FF  // Brown-out Reset disabled.
-#define _BOREN_SBODEN           0xFBFF  // Brown-out Reset controlled by the SBOREN bit in the BORCON register.
-#define _BOREN_NSLEEP           0xFDFF  // Brown-out Reset enabled while running and disabled in Sleep.
-#define _BOREN_ON               0xFFFF  // Brown-out Reset enabled.
-#define _CLKOUTEN_ON            0xF7FF  // CLKOUT function is enabled on the CLKOUT pin.
-#define _CLKOUTEN_OFF           0xFFFF  // CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin.
+#define _FOSC_INTOSC            0x3FFC  // INTOSC oscillator; I/O function on CLKIN pin.
+#define _FOSC_ECL               0x3FFD  // ECL, External Clock, Low Power Mode (0-0.5 MHz); device clock supplied to CLKIN pin.
+#define _FOSC_ECM               0x3FFE  // ECM, External Clock, Medium Power Mode (0.5-4 MHz); device clock supplied to CLKIN pin.
+#define _FOSC_ECH               0x3FFF  // ECH, External Clock, High Power Mode (4-32 MHz); device clock supplied to CLKIN pin.
+#define _WDTE_OFF               0x3FE7  // WDT disabled.
+#define _WDTE_SWDTEN            0x3FEF  // WDT controlled by the SWDTEN bit in the WDTCON register.
+#define _WDTE_NSLEEP            0x3FF7  // WDT enabled while running and disabled in Sleep.
+#define _WDTE_ON                0x3FFF  // WDT enabled.
+#define _PWRTE_ON               0x3FDF  // PWRT enabled.
+#define _PWRTE_OFF              0x3FFF  // PWRT disabled.
+#define _MCLRE_OFF              0x3FBF  // MCLR/VPP pin function is digital input.
+#define _MCLRE_ON               0x3FFF  // MCLR/VPP pin function is MCLR.
+#define _CP_ON                  0x3F7F  // Program memory code protection is enabled.
+#define _CP_OFF                 0x3FFF  // Program memory code protection is disabled.
+#define _BOREN_OFF              0x39FF  // Brown-out Reset disabled.
+#define _BOREN_SBODEN           0x3BFF  // Brown-out Reset controlled by the SBOREN bit in the BORCON register.
+#define _BOREN_NSLEEP           0x3DFF  // Brown-out Reset enabled while running and disabled in Sleep.
+#define _BOREN_ON               0x3FFF  // Brown-out Reset enabled.
+#define _CLKOUTEN_ON            0x37FF  // CLKOUT function is enabled on the CLKOUT pin.
+#define _CLKOUTEN_OFF           0x3FFF  // CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin.
 
 //----------------------------- CONFIG2 Options -------------------------------
 
-#define _WRT_ALL                0xFFFC  // 000h to 7FFh write protected, no addresses may be modified by EECON control.
-#define _WRT_HALF               0xFFFD  // 000h to 1FFh write protected, 200h to 3FFh may be modified by EECON control.
-#define _WRT_BOOT               0xFFFE  // 000h to 0FFh write protected, 100h to 3FFh may be modified by EECON control.
-#define _WRT_OFF                0xFFFF  // Write protection off.
-#define _PLLEN_OFF              0xFEFF  // 4x PLL disabled.
-#define _PLLEN_ON               0xFFFF  // 4x PLL enabled.
-#define _STVREN_OFF             0xFDFF  // Stack Overflow or Underflow will not cause a Reset.
-#define _STVREN_ON              0xFFFF  // Stack Overflow or Underflow will cause a Reset.
-#define _BORV_HI                0xFBFF  // Brown-out Reset Voltage (Vbor), high trip point selected.
-#define _BORV_LO                0xFFFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
-#define _BORV_19                0xFFFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
-#define _LPBOREN_ON             0xF7FF  // LPBOR is enabled.
-#define _LPBOREN_OFF            0xFFFF  // LPBOR is disabled.
-#define _LVP_OFF                0xDFFF  // High-voltage on MCLR/VPP must be used for programming.
-#define _LVP_ON                 0xFFFF  // Low-voltage programming enabled.
+#define _WRT_ALL                0x3FFC  // 000h to 7FFh write protected, no addresses may be modified by EECON control.
+#define _WRT_HALF               0x3FFD  // 000h to 1FFh write protected, 200h to 3FFh may be modified by EECON control.
+#define _WRT_BOOT               0x3FFE  // 000h to 0FFh write protected, 100h to 3FFh may be modified by EECON control.
+#define _WRT_OFF                0x3FFF  // Write protection off.
+#define _PLLEN_OFF              0x3EFF  // 4x PLL disabled.
+#define _PLLEN_ON               0x3FFF  // 4x PLL enabled.
+#define _STVREN_OFF             0x3DFF  // Stack Overflow or Underflow will not cause a Reset.
+#define _STVREN_ON              0x3FFF  // Stack Overflow or Underflow will cause a Reset.
+#define _BORV_HI                0x3BFF  // Brown-out Reset Voltage (Vbor), high trip point selected.
+#define _BORV_LO                0x3FFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
+#define _BORV_19                0x3FFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
+#define _LPBOREN_ON             0x37FF  // LPBOR is enabled.
+#define _LPBOREN_OFF            0x3FFF  // LPBOR is disabled.
+#define _DEBUG_ON               0x2FFF  // In-Circuit Debugger enabled, ICSPCLK and ICSPDAT are dedicated to the debugger.
+#define _DEBUG_OFF              0x3FFF  // In-Circuit Debugger disabled, ICSPCLK and ICSPDAT are general purpose I/O pins.
+#define _LVP_OFF                0x1FFF  // High-voltage on MCLR/VPP must be used for programming.
+#define _LVP_ON                 0x3FFF  // Low-voltage programming enabled.
 
 //==============================================================================
 
@@ -4756,9 +4758,9 @@ extern __at(0x0FEF) __sfr TOSH;
 #define RA4                     PORTAbits.RA4                   // bit 4
 #define RA5                     PORTAbits.RA5                   // bit 5
 
-#define PWM1MOD0                PWM1CONbits.PWM1MOD0            // bit 2, shadows bit in PWM1CONbits
+#define PWM1MODE0               PWM1CONbits.PWM1MODE0           // bit 2, shadows bit in PWM1CONbits
 #define MODE0                   PWM1CONbits.MODE0               // bit 2, shadows bit in PWM1CONbits
-#define PWM1MOD1                PWM1CONbits.PWM1MOD1            // bit 3, shadows bit in PWM1CONbits
+#define PWM1MODE1               PWM1CONbits.PWM1MODE1           // bit 3, shadows bit in PWM1CONbits
 #define MODE1                   PWM1CONbits.MODE1               // bit 3, shadows bit in PWM1CONbits
 #define POL                     PWM1CONbits.POL                 // bit 4, shadows bit in PWM1CONbits
 #define PWM1POL                 PWM1CONbits.PWM1POL             // bit 4, shadows bit in PWM1CONbits

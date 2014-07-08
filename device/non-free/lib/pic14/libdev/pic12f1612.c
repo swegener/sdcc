@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-04-14 18:18:26 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:31 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -372,11 +372,15 @@ __at(0x071C) volatile __SCANCON0bits_t SCANCON0bits;
 __at(0x071D) __sfr SCANTRIG;
 __at(0x071D) volatile __SCANTRIGbits_t SCANTRIGbits;
 
+__at(0x0791) __sfr CRCDAT;
+
 __at(0x0791) __sfr CRCDATL;
 __at(0x0791) volatile __CRCDATLbits_t CRCDATLbits;
 
 __at(0x0792) __sfr CRCDATH;
 __at(0x0792) volatile __CRCDATHbits_t CRCDATHbits;
+
+__at(0x0793) __sfr CRCACC;
 
 __at(0x0793) __sfr CRCACCL;
 __at(0x0793) volatile __CRCACCLbits_t CRCACCLbits;
@@ -384,11 +388,15 @@ __at(0x0793) volatile __CRCACCLbits_t CRCACCLbits;
 __at(0x0794) __sfr CRCACCH;
 __at(0x0794) volatile __CRCACCHbits_t CRCACCHbits;
 
+__at(0x0795) __sfr CRCSHIFT;
+
 __at(0x0795) __sfr CRCSHIFTL;
 __at(0x0795) volatile __CRCSHIFTLbits_t CRCSHIFTLbits;
 
 __at(0x0796) __sfr CRCSHIFTH;
 __at(0x0796) volatile __CRCSHIFTHbits_t CRCSHIFTHbits;
+
+__at(0x0797) __sfr CRCXOR;
 
 __at(0x0797) __sfr CRCXORL;
 __at(0x0797) volatile __CRCXORLbits_t CRCXORLbits;

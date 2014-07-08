@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-04-14 18:18:28 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:36 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -100,6 +100,7 @@
 #define DAC1CON1_ADDR           0x0119
 #define DAC2CON0_ADDR           0x011A
 #define DAC2CON1_ADDR           0x011B
+#define DAC2REF_ADDR            0x011B
 #define ZCD1CON_ADDR            0x011C
 #define ANSELA_ADDR             0x018C
 #define ANSELB_ADDR             0x018D
@@ -2042,14 +2043,14 @@ typedef union
   {
   struct
     {
-    unsigned DAC2NSS            : 1;
+    unsigned NSS                : 1;
     unsigned                    : 1;
-    unsigned DAC2PSS0           : 1;
-    unsigned DAC2PSS1           : 1;
-    unsigned DAC2OE2            : 1;
-    unsigned DAC2OE1            : 1;
+    unsigned PSS0               : 1;
+    unsigned PSS1               : 1;
+    unsigned OE2                : 1;
+    unsigned OE1                : 1;
     unsigned                    : 1;
-    unsigned DAC2EN             : 1;
+    unsigned EN                 : 1;
     };
 
   struct
@@ -2062,6 +2063,25 @@ typedef union
     unsigned DACOE1             : 1;
     unsigned                    : 1;
     unsigned DACEN              : 1;
+    };
+
+  struct
+    {
+    unsigned DAC2NSS            : 1;
+    unsigned                    : 1;
+    unsigned DAC2PSS0           : 1;
+    unsigned DAC2PSS1           : 1;
+    unsigned DAC2OE2            : 1;
+    unsigned DAC2OE1            : 1;
+    unsigned                    : 1;
+    unsigned DAC2EN             : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned PSS                : 2;
+    unsigned                    : 4;
     };
 
   struct
@@ -2081,18 +2101,24 @@ typedef union
 
 extern __at(0x011A) volatile __DAC2CON0bits_t DAC2CON0bits;
 
-#define _DAC2CON0_DAC2NSS       0x01
+#define _DAC2CON0_NSS           0x01
 #define _DAC2CON0_DACNSS        0x01
-#define _DAC2CON0_DAC2PSS0      0x04
+#define _DAC2CON0_DAC2NSS       0x01
+#define _DAC2CON0_PSS0          0x04
 #define _DAC2CON0_DACPSS0       0x04
-#define _DAC2CON0_DAC2PSS1      0x08
+#define _DAC2CON0_DAC2PSS0      0x04
+#define _DAC2CON0_PSS1          0x08
 #define _DAC2CON0_DACPSS1       0x08
-#define _DAC2CON0_DAC2OE2       0x10
+#define _DAC2CON0_DAC2PSS1      0x08
+#define _DAC2CON0_OE2           0x10
 #define _DAC2CON0_DACOE2        0x10
-#define _DAC2CON0_DAC2OE1       0x20
+#define _DAC2CON0_DAC2OE2       0x10
+#define _DAC2CON0_OE1           0x20
 #define _DAC2CON0_DACOE1        0x20
-#define _DAC2CON0_DAC2EN        0x80
+#define _DAC2CON0_DAC2OE1       0x20
+#define _DAC2CON0_EN            0x80
 #define _DAC2CON0_DACEN         0x80
+#define _DAC2CON0_DAC2EN        0x80
 
 //==============================================================================
 
@@ -2104,6 +2130,30 @@ extern __at(0x011B) __sfr DAC2CON1;
 
 typedef union
   {
+  struct
+    {
+    unsigned DACR0              : 1;
+    unsigned DACR1              : 1;
+    unsigned DACR2              : 1;
+    unsigned DACR3              : 1;
+    unsigned DACR4              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned R0                 : 1;
+    unsigned R1                 : 1;
+    unsigned R2                 : 1;
+    unsigned R3                 : 1;
+    unsigned R4                 : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
   struct
     {
     unsigned DAC2R0             : 1;
@@ -2118,14 +2168,8 @@ typedef union
 
   struct
     {
-    unsigned DACR0              : 1;
-    unsigned DACR1              : 1;
-    unsigned DACR2              : 1;
-    unsigned DACR3              : 1;
-    unsigned DACR4              : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned R                  : 5;
+    unsigned                    : 3;
     };
 
   struct
@@ -2143,16 +2187,104 @@ typedef union
 
 extern __at(0x011B) volatile __DAC2CON1bits_t DAC2CON1bits;
 
-#define _DAC2CON1_DAC2R0        0x01
 #define _DAC2CON1_DACR0         0x01
-#define _DAC2CON1_DAC2R1        0x02
+#define _DAC2CON1_R0            0x01
+#define _DAC2CON1_DAC2R0        0x01
 #define _DAC2CON1_DACR1         0x02
-#define _DAC2CON1_DAC2R2        0x04
+#define _DAC2CON1_R1            0x02
+#define _DAC2CON1_DAC2R1        0x02
 #define _DAC2CON1_DACR2         0x04
-#define _DAC2CON1_DAC2R3        0x08
+#define _DAC2CON1_R2            0x04
+#define _DAC2CON1_DAC2R2        0x04
 #define _DAC2CON1_DACR3         0x08
-#define _DAC2CON1_DAC2R4        0x10
+#define _DAC2CON1_R3            0x08
+#define _DAC2CON1_DAC2R3        0x08
 #define _DAC2CON1_DACR4         0x10
+#define _DAC2CON1_R4            0x10
+#define _DAC2CON1_DAC2R4        0x10
+
+//==============================================================================
+
+
+//==============================================================================
+//        DAC2REF Bits
+
+extern __at(0x011B) __sfr DAC2REF;
+
+typedef union
+  {
+  struct
+    {
+    unsigned DACR0              : 1;
+    unsigned DACR1              : 1;
+    unsigned DACR2              : 1;
+    unsigned DACR3              : 1;
+    unsigned DACR4              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned R0                 : 1;
+    unsigned R1                 : 1;
+    unsigned R2                 : 1;
+    unsigned R3                 : 1;
+    unsigned R4                 : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned DAC2R0             : 1;
+    unsigned DAC2R1             : 1;
+    unsigned DAC2R2             : 1;
+    unsigned DAC2R3             : 1;
+    unsigned DAC2R4             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned R                  : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
+    unsigned DACR               : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
+    unsigned DAC2R              : 5;
+    unsigned                    : 3;
+    };
+  } __DAC2REFbits_t;
+
+extern __at(0x011B) volatile __DAC2REFbits_t DAC2REFbits;
+
+#define _DAC2REF_DACR0          0x01
+#define _DAC2REF_R0             0x01
+#define _DAC2REF_DAC2R0         0x01
+#define _DAC2REF_DACR1          0x02
+#define _DAC2REF_R1             0x02
+#define _DAC2REF_DAC2R1         0x02
+#define _DAC2REF_DACR2          0x04
+#define _DAC2REF_R2             0x04
+#define _DAC2REF_DAC2R2         0x04
+#define _DAC2REF_DACR3          0x08
+#define _DAC2REF_R3             0x08
+#define _DAC2REF_DAC2R3         0x08
+#define _DAC2REF_DACR4          0x10
+#define _DAC2REF_R4             0x10
+#define _DAC2REF_DAC2R4         0x10
 
 //==============================================================================
 
@@ -7532,9 +7664,9 @@ typedef union
     unsigned LC3G1D2N           : 1;
     unsigned LC3G1D2T           : 1;
     unsigned LC3G1D3N           : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned LC3G1D3T           : 1;
+    unsigned LC3G1D4N           : 1;
+    unsigned LC3G1D4T           : 1;
     };
 
   struct
@@ -7544,9 +7676,9 @@ typedef union
     unsigned D2N                : 1;
     unsigned D2T                : 1;
     unsigned D3N                : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned D3T                : 1;
+    unsigned D4N                : 1;
+    unsigned D4T                : 1;
     };
   } __CLC3GLS0bits_t;
 
@@ -7562,6 +7694,12 @@ extern __at(0x0F2A) volatile __CLC3GLS0bits_t CLC3GLS0bits;
 #define _CLC3GLS0_D2T           0x08
 #define _CLC3GLS0_LC3G1D3N      0x10
 #define _CLC3GLS0_D3N           0x10
+#define _CLC3GLS0_LC3G1D3T      0x20
+#define _CLC3GLS0_D3T           0x20
+#define _CLC3GLS0_LC3G1D4N      0x40
+#define _CLC3GLS0_D4N           0x40
+#define _CLC3GLS0_LC3G1D4T      0x80
+#define _CLC3GLS0_D4T           0x80
 
 //==============================================================================
 
@@ -8034,9 +8172,9 @@ typedef union
     unsigned LC4D4S2            : 1;
     unsigned LC4D4S3            : 1;
     unsigned LC4D4S4            : 1;
-    unsigned LC4D4S5            : 1;
-    unsigned LC4D4S6            : 1;
-    unsigned LC4D4S7            : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
     };
 
   struct
@@ -8046,9 +8184,21 @@ typedef union
     unsigned D4S2               : 1;
     unsigned D4S3               : 1;
     unsigned D4S4               : 1;
-    unsigned D4S5               : 1;
-    unsigned D4S6               : 1;
-    unsigned D4S7               : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned D4S                : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
+    unsigned LC4D4S             : 5;
+    unsigned                    : 3;
     };
   } __CLC4SEL3bits_t;
 
@@ -8064,12 +8214,6 @@ extern __at(0x0F33) volatile __CLC4SEL3bits_t CLC4SEL3bits;
 #define _CLC4SEL3_D4S3          0x08
 #define _CLC4SEL3_LC4D4S4       0x10
 #define _CLC4SEL3_D4S4          0x10
-#define _CLC4SEL3_LC4D4S5       0x20
-#define _CLC4SEL3_D4S5          0x20
-#define _CLC4SEL3_LC4D4S6       0x40
-#define _CLC4SEL3_D4S6          0x40
-#define _CLC4SEL3_LC4D4S7       0x80
-#define _CLC4SEL3_D4S7          0x80
 
 //==============================================================================
 
@@ -8337,55 +8481,55 @@ extern __at(0x0FEF) __sfr TOSH;
 
 //----------------------------- CONFIG1 Options -------------------------------
 
-#define _FOSC_LP                0xFFF8  // LP Oscillator, Low-power crystal connected between OSC1 and OSC2 pins.
-#define _FOSC_XT                0xFFF9  // XT Oscillator, Crystal/resonator connected between OSC1 and OSC2 pins.
-#define _FOSC_HS                0xFFFA  // HS Oscillator, High-speed crystal/resonator connected between OSC1 and OSC2 pins.
-#define _FOSC_EXTRC             0xFFFB  // EXTRC oscillator: External RC circuit connected to CLKIN pin.
-#define _FOSC_INTOSC            0xFFFC  // INTOSC oscillator: I/O function on CLKIN pin.
-#define _FOSC_ECL               0xFFFD  // ECL, External Clock, Low Power Mode (0-0.5 MHz): device clock supplied to CLKIN pins.
-#define _FOSC_ECM               0xFFFE  // ECM, External Clock, Medium Power Mode (0.5-4 MHz): device clock supplied to CLKIN pins.
-#define _FOSC_ECH               0xFFFF  // ECH, External Clock, High Power Mode (4-20 MHz): device clock supplied to CLKIN pins.
-#define _WDTE_OFF               0xFFE7  // WDT disabled.
-#define _WDTE_SWDTEN            0xFFEF  // WDT controlled by the SWDTEN bit in the WDTCON register.
-#define _WDTE_NSLEEP            0xFFF7  // WDT enabled while running and disabled in Sleep.
-#define _WDTE_ON                0xFFFF  // WDT enabled.
-#define _PWRTE_ON               0xFFDF  // PWRT enabled.
-#define _PWRTE_OFF              0xFFFF  // PWRT disabled.
-#define _MCLRE_OFF              0xFFBF  // MCLR/VPP pin function is digital input if LVP bit is also 0.
-#define _MCLRE_ON               0xFFFF  // MCLR/VPP pin function is MCLR.
-#define _CP_ON                  0xFF7F  // Program memory code protection is enabled.
-#define _CP_OFF                 0xFFFF  // Program memory code protection is disabled.
-#define _BOREN_OFF              0xF9FF  // Brown-out Reset disabled.
-#define _BOREN_SBODEN           0xFBFF  // Brown-out Reset controlled by the SBOREN bit in the BORCON register.
-#define _BOREN_NSLEEP           0xFDFF  // Brown-out Reset enabled while running and disabled in Sleep.
-#define _BOREN_ON               0xFFFF  // Brown-out Reset enabled.
-#define _CLKOUTEN_ON            0xF7FF  // CLKOUT function is enabled on the CLKOUT pin.
-#define _CLKOUTEN_OFF           0xFFFF  // CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin.
-#define _IESO_OFF               0xEFFF  // Internal/External Switchover Mode is disabled.
-#define _IESO_ON                0xFFFF  // Internal/External Switchover Mode is enabled.
-#define _FCMEN_OFF              0xDFFF  // Fail-Safe Clock Monitor is disabled.
-#define _FCMEN_ON               0xFFFF  // Fail-Safe Clock Monitor is enabled.
+#define _FOSC_LP                0x3FF8  // LP Oscillator, Low-power crystal connected between OSC1 and OSC2 pins.
+#define _FOSC_XT                0x3FF9  // XT Oscillator, Crystal/resonator connected between OSC1 and OSC2 pins.
+#define _FOSC_HS                0x3FFA  // HS Oscillator, High-speed crystal/resonator connected between OSC1 and OSC2 pins.
+#define _FOSC_EXTRC             0x3FFB  // EXTRC oscillator: External RC circuit connected to CLKIN pin.
+#define _FOSC_INTOSC            0x3FFC  // INTOSC oscillator: I/O function on CLKIN pin.
+#define _FOSC_ECL               0x3FFD  // ECL, External Clock, Low Power Mode (0-0.5 MHz): device clock supplied to CLKIN pins.
+#define _FOSC_ECM               0x3FFE  // ECM, External Clock, Medium Power Mode (0.5-4 MHz): device clock supplied to CLKIN pins.
+#define _FOSC_ECH               0x3FFF  // ECH, External Clock, High Power Mode (4-20 MHz): device clock supplied to CLKIN pins.
+#define _WDTE_OFF               0x3FE7  // WDT disabled.
+#define _WDTE_SWDTEN            0x3FEF  // WDT controlled by the SWDTEN bit in the WDTCON register.
+#define _WDTE_NSLEEP            0x3FF7  // WDT enabled while running and disabled in Sleep.
+#define _WDTE_ON                0x3FFF  // WDT enabled.
+#define _PWRTE_ON               0x3FDF  // PWRT enabled.
+#define _PWRTE_OFF              0x3FFF  // PWRT disabled.
+#define _MCLRE_OFF              0x3FBF  // MCLR/VPP pin function is digital input if LVP bit is also 0.
+#define _MCLRE_ON               0x3FFF  // MCLR/VPP pin function is MCLR.
+#define _CP_ON                  0x3F7F  // Program memory code protection is enabled.
+#define _CP_OFF                 0x3FFF  // Program memory code protection is disabled.
+#define _BOREN_OFF              0x39FF  // Brown-out Reset disabled.
+#define _BOREN_SBODEN           0x3BFF  // Brown-out Reset controlled by the SBOREN bit in the BORCON register.
+#define _BOREN_NSLEEP           0x3DFF  // Brown-out Reset enabled while running and disabled in Sleep.
+#define _BOREN_ON               0x3FFF  // Brown-out Reset enabled.
+#define _CLKOUTEN_ON            0x37FF  // CLKOUT function is enabled on the CLKOUT pin.
+#define _CLKOUTEN_OFF           0x3FFF  // CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin.
+#define _IESO_OFF               0x2FFF  // Internal/External Switchover Mode is disabled.
+#define _IESO_ON                0x3FFF  // Internal/External Switchover Mode is enabled.
+#define _FCMEN_OFF              0x1FFF  // Fail-Safe Clock Monitor is disabled.
+#define _FCMEN_ON               0x3FFF  // Fail-Safe Clock Monitor is enabled.
 
 //----------------------------- CONFIG2 Options -------------------------------
 
-#define _WRT_ALL                0xFFFC  // 0000h to 1FFFh write protected, no addresses may be modified by EECON control.
-#define _WRT_HALF               0xFFFD  // 0000h to 0FFFh write protected, 1000h to 1FFFh may be modified by EECON control.
-#define _WRT_BOOT               0xFFFE  // 0000h to 03FFh write protected, 0400h to 1FFFh may be modified by EECON control.
-#define _WRT_OFF                0xFFFF  // Write protection off.
-#define _PPS1WAY_OFF            0xFFFB  // The PPSLOCK bit can be set and cleared repeatedly by software.
-#define _PPS1WAY_ON             0xFFFF  // The PPSLOCK bit cannot be cleared once it is set by software.
-#define _ZCDDIS_OFF             0xFF7F  // Zero-cross detect circuit is always enabled.
-#define _ZCDDIS_ON              0xFFFF  // Zero-cross detect circuit is disabled at POR and can be enabled with ZCDSEN bit.
-#define _PLLEN_OFF              0xFEFF  // 4x PLL is enabled when software sets the SPLLEN bit.
-#define _PLLEN_ON               0xFFFF  // 4x PLL is always enabled.
-#define _STVREN_OFF             0xFDFF  // Stack Overflow or Underflow will not cause a Reset.
-#define _STVREN_ON              0xFFFF  // Stack Overflow or Underflow will cause a Reset.
-#define _BORV_HI                0xFBFF  // Brown-out Reset Voltage (Vbor), high trip point selected.
-#define _BORV_LO                0xFFFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
-#define _LPBOR_ON               0xF7FF  // Low-Power BOR is enabled.
-#define _LPBOR_OFF              0xFFFF  // Low-Power BOR is disabled.
-#define _LVP_OFF                0xDFFF  // High-voltage on MCLR/VPP must be used for programming.
-#define _LVP_ON                 0xFFFF  // Low-voltage programming enabled.
+#define _WRT_ALL                0x3FFC  // 0000h to 1FFFh write protected, no addresses may be modified by EECON control.
+#define _WRT_HALF               0x3FFD  // 0000h to 0FFFh write protected, 1000h to 1FFFh may be modified by EECON control.
+#define _WRT_BOOT               0x3FFE  // 0000h to 03FFh write protected, 0400h to 1FFFh may be modified by EECON control.
+#define _WRT_OFF                0x3FFF  // Write protection off.
+#define _PPS1WAY_OFF            0x3FFB  // The PPSLOCK bit can be set and cleared repeatedly by software.
+#define _PPS1WAY_ON             0x3FFF  // The PPSLOCK bit cannot be cleared once it is set by software.
+#define _ZCDDIS_OFF             0x3F7F  // Zero-cross detect circuit is always enabled.
+#define _ZCDDIS_ON              0x3FFF  // Zero-cross detect circuit is disabled at POR and can be enabled with ZCDSEN bit.
+#define _PLLEN_OFF              0x3EFF  // 4x PLL is enabled when software sets the SPLLEN bit.
+#define _PLLEN_ON               0x3FFF  // 4x PLL is always enabled.
+#define _STVREN_OFF             0x3DFF  // Stack Overflow or Underflow will not cause a Reset.
+#define _STVREN_ON              0x3FFF  // Stack Overflow or Underflow will cause a Reset.
+#define _BORV_HI                0x3BFF  // Brown-out Reset Voltage (Vbor), high trip point selected.
+#define _BORV_LO                0x3FFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
+#define _LPBOR_ON               0x37FF  // Low-Power BOR is enabled.
+#define _LPBOR_OFF              0x3FFF  // Low-Power BOR is disabled.
+#define _LVP_OFF                0x1FFF  // High-voltage on MCLR/VPP must be used for programming.
+#define _LVP_ON                 0x3FFF  // Low-voltage programming enabled.
 
 //==============================================================================
 

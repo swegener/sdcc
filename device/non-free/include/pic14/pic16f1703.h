@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-04-14 18:18:26 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:34 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -1253,8 +1253,8 @@ typedef union
     {
     unsigned ADFVR0             : 1;
     unsigned ADFVR1             : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
+    unsigned CDAFVR0            : 1;
+    unsigned CDAFVR1            : 1;
     unsigned TSRNG              : 1;
     unsigned TSEN               : 1;
     unsigned FVRRDY             : 1;
@@ -1266,12 +1266,21 @@ typedef union
     unsigned ADFVR              : 2;
     unsigned                    : 6;
     };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned CDAFVR             : 2;
+    unsigned                    : 4;
+    };
   } __FVRCONbits_t;
 
 extern __at(0x0117) volatile __FVRCONbits_t FVRCONbits;
 
 #define _ADFVR0                 0x01
 #define _ADFVR1                 0x02
+#define _CDAFVR0                0x04
+#define _CDAFVR1                0x08
 #define _TSRNG                  0x10
 #define _TSEN                   0x20
 #define _FVRRDY                 0x40
@@ -3054,47 +3063,47 @@ extern __at(0x0FEF) __sfr TOSH;
 
 //----------------------------- CONFIG1 Options -------------------------------
 
-#define _FOSC_INTOSC            0xFFFC  // Internal HFINTOSC. I/O function on RA4 and RA5.
-#define _FOSC_ECL               0xFFFD  // External oscillator, low power. I/O function on RA4.
-#define _FOSC_ECM               0xFFFE  // External oscillator, medium power. I/O function on RA4.
-#define _FOSC_ECH               0xFFFF  // External oscillator, high power. I/O function on RA4.
-#define _WDTE_OFF               0xFFE7  // WDT disabled.
-#define _WDTE_SWDTEN            0xFFEF  // WDT controlled by the SWDTEN bit in the WDTCON register.
-#define _WDTE_NSLEEP            0xFFF7  // WDT enabled while running and disabled in Sleep.
-#define _WDTE_ON                0xFFFF  // WDT enabled.
-#define _PWRTE_ON               0xFFDF  // PWRT enabled.
-#define _PWRTE_OFF              0xFFFF  // PWRT disabled.
-#define _MCLRE_OFF              0xFFBF  // MCLR/VPP pin function is digital input.
-#define _MCLRE_ON               0xFFFF  // MCLR/VPP pin function is MCLR.
-#define _CP_ON                  0xFF7F  // Program memory code protection is enabled.
-#define _CP_OFF                 0xFFFF  // Program memory code protection is disabled.
-#define _BOREN_OFF              0xF9FF  // Brown-out Reset disabled.
-#define _BOREN_SBODEN           0xFBFF  // Brown-out Reset controlled by the SBOREN bit in the BORCON register.
-#define _BOREN_NSLEEP           0xFDFF  // Brown-out Reset enabled while running and disabled in Sleep.
-#define _BOREN_ON               0xFFFF  // Brown-out Reset enabled.
-#define _CLKOUTEN_ON            0xF7FF  // CLKOUT function is enabled on the CLKOUT pin.
-#define _CLKOUTEN_OFF           0xFFFF  // CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin.
+#define _FOSC_INTOSC            0x3FFC  // Internal HFINTOSC. I/O function on RA4 and RA5.
+#define _FOSC_ECL               0x3FFD  // External oscillator, low power. I/O function on RA4.
+#define _FOSC_ECM               0x3FFE  // External oscillator, medium power. I/O function on RA4.
+#define _FOSC_ECH               0x3FFF  // External oscillator, high power. I/O function on RA4.
+#define _WDTE_OFF               0x3FE7  // WDT disabled.
+#define _WDTE_SWDTEN            0x3FEF  // WDT controlled by the SWDTEN bit in the WDTCON register.
+#define _WDTE_NSLEEP            0x3FF7  // WDT enabled while running and disabled in Sleep.
+#define _WDTE_ON                0x3FFF  // WDT enabled.
+#define _PWRTE_ON               0x3FDF  // PWRT enabled.
+#define _PWRTE_OFF              0x3FFF  // PWRT disabled.
+#define _MCLRE_OFF              0x3FBF  // MCLR/VPP pin function is digital input.
+#define _MCLRE_ON               0x3FFF  // MCLR/VPP pin function is MCLR.
+#define _CP_ON                  0x3F7F  // Program memory code protection is enabled.
+#define _CP_OFF                 0x3FFF  // Program memory code protection is disabled.
+#define _BOREN_OFF              0x39FF  // Brown-out Reset disabled.
+#define _BOREN_SBODEN           0x3BFF  // Brown-out Reset controlled by the SBOREN bit in the BORCON register.
+#define _BOREN_NSLEEP           0x3DFF  // Brown-out Reset enabled while running and disabled in Sleep.
+#define _BOREN_ON               0x3FFF  // Brown-out Reset enabled.
+#define _CLKOUTEN_ON            0x37FF  // CLKOUT function is enabled on the CLKOUT pin.
+#define _CLKOUTEN_OFF           0x3FFF  // CLKOUT function is disabled. I/O or oscillator function on the CLKOUT pin.
 
 //----------------------------- CONFIG2 Options -------------------------------
 
-#define _WRT_ALL                0xFFFC  // 000h to 1FFFh write protected, no addresses may be modified by EECON control.
-#define _WRT_HALF               0xFFFD  // 000h to FFFh write protected, 1000h to 1FFFh may be modified by EECON control.
-#define _WRT_BOOT               0xFFFE  // 000h to 1FFh write protected, 200h to 1FFFh may be modified by EECON control.
-#define _WRT_OFF                0xFFFF  // Write protection off.
-#define _PPS1WAY_OFF            0xFFFB  // The PPSLOCK bit can be set and cleared repeatedly by software.
-#define _PPS1WAY_ON             0xFFFF  // The PPSLOCK bit cannot be cleared once it is set by software.
-#define _ZCDDIS_OFF             0xFF7F  // Zero-cross detect circuit is enabled at POR.
-#define _ZCDDIS_ON              0xFFFF  // Zero-cross detect circuit is disabled at POR.
-#define _PLLEN_OFF              0xFEFF  // 4x PLL is enabled when software sets the SPLLEN bit.
-#define _PLLEN_ON               0xFFFF  // 4x PLL is always enabled.
-#define _STVREN_OFF             0xFDFF  // Stack Overflow or Underflow will not cause a Reset.
-#define _STVREN_ON              0xFFFF  // Stack Overflow or Underflow will cause a Reset.
-#define _BORV_HI                0xFBFF  // Brown-out Reset Voltage (Vbor), high trip point selected.
-#define _BORV_LO                0xFFFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
-#define _LPBOR_ON               0xF7FF  // Low-Power BOR is enabled.
-#define _LPBOR_OFF              0xFFFF  // Low-Power BOR is disabled.
-#define _LVP_OFF                0xDFFF  // High-voltage on MCLR/VPP must be used for programming.
-#define _LVP_ON                 0xFFFF  // Low-voltage programming enabled.
+#define _WRT_ALL                0x3FFC  // 000h to 1FFFh write protected, no addresses may be modified by EECON control.
+#define _WRT_HALF               0x3FFD  // 000h to FFFh write protected, 1000h to 1FFFh may be modified by EECON control.
+#define _WRT_BOOT               0x3FFE  // 000h to 1FFh write protected, 200h to 1FFFh may be modified by EECON control.
+#define _WRT_OFF                0x3FFF  // Write protection off.
+#define _PPS1WAY_OFF            0x3FFB  // The PPSLOCK bit can be set and cleared repeatedly by software.
+#define _PPS1WAY_ON             0x3FFF  // The PPSLOCK bit cannot be cleared once it is set by software.
+#define _ZCDDIS_OFF             0x3F7F  // Zero-cross detect circuit is enabled at POR.
+#define _ZCDDIS_ON              0x3FFF  // Zero-cross detect circuit is disabled at POR.
+#define _PLLEN_OFF              0x3EFF  // 4x PLL is enabled when software sets the SPLLEN bit.
+#define _PLLEN_ON               0x3FFF  // 4x PLL is always enabled.
+#define _STVREN_OFF             0x3DFF  // Stack Overflow or Underflow will not cause a Reset.
+#define _STVREN_ON              0x3FFF  // Stack Overflow or Underflow will cause a Reset.
+#define _BORV_HI                0x3BFF  // Brown-out Reset Voltage (Vbor), high trip point selected.
+#define _BORV_LO                0x3FFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
+#define _LPBOR_ON               0x37FF  // Low-Power BOR is enabled.
+#define _LPBOR_OFF              0x3FFF  // Low-Power BOR is disabled.
+#define _LVP_OFF                0x1FFF  // High-voltage on MCLR/VPP must be used for programming.
+#define _LVP_ON                 0x3FFF  // Low-voltage programming enabled.
 
 //==============================================================================
 
@@ -3171,6 +3180,8 @@ extern __at(0x0FEF) __sfr TOSH;
 
 #define ADFVR0                  FVRCONbits.ADFVR0               // bit 0
 #define ADFVR1                  FVRCONbits.ADFVR1               // bit 1
+#define CDAFVR0                 FVRCONbits.CDAFVR0              // bit 2
+#define CDAFVR1                 FVRCONbits.CDAFVR1              // bit 3
 #define TSRNG                   FVRCONbits.TSRNG                // bit 4
 #define TSEN                    FVRCONbits.TSEN                 // bit 5
 #define FVRRDY                  FVRCONbits.FVRRDY               // bit 6

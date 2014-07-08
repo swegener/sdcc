@@ -1,3 +1,16 @@
+2014-07-08 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/non-free/include/pic14/pic1xxx.h,
+	  device/non-free/lib/pic14/libdev/pic1xxx.c,
+	  device/non-free/include/pic16/pic18fxxx.h,
+	  device/non-free/lib/pic16/libdev/pic18fxxx.c:
+	  updated
+
+	* device/non-free/include/pic14/pic12f1571.h,
+	  device/non-free/include/pic14/pic12f1572.h,
+	  device/non-free/include/pic14/pic12f1612.h:
+	  Added the missing _DEBUG_ON and _DEBUG_OFF config options.
+	  (These Microchip bugs in original mpasmx includes.)
+
 2014-07-07 Ben Shi <powerstudio1st AT 163.com>
         * sim/ucsim/stm8.src/inst.cc:
           Unify all flag affection code to flag_cvh().

@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-03-09 13:33:01 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:55 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -6775,20 +6775,4 @@ extern __at(0x0FFD) __sfr TOS;
 extern __at(0x0FFD) __sfr TOSL;
 extern __at(0x0FFE) __sfr TOSH;
 extern __at(0x0FFF) __sfr TOSU;
-
-//==============================================================================
-//
-//        Configuration Addresses
-//
-//==============================================================================
-
-#define __CONFIG1L              0x01FFF8
-#define __CONFIG1H              0x01FFF9
-#define __CONFIG2L              0x01FFFA
-#define __CONFIG2H              0x01FFFB
-#define __CONFIG3L              0x01FFFC
-#define __CONFIG3H              0x01FFFD
-
-//==============================================================================
-
 #endif // #ifndef __PIC18F87J11_H__

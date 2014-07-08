@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-04-14 18:18:26 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:34 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -414,11 +414,15 @@ __at(0x071C) volatile __SCANCON0bits_t SCANCON0bits;
 __at(0x071D) __sfr SCANTRIG;
 __at(0x071D) volatile __SCANTRIGbits_t SCANTRIGbits;
 
+__at(0x0791) __sfr CRCDAT;
+
 __at(0x0791) __sfr CRCDATL;
 __at(0x0791) volatile __CRCDATLbits_t CRCDATLbits;
 
 __at(0x0792) __sfr CRCDATH;
 __at(0x0792) volatile __CRCDATHbits_t CRCDATHbits;
+
+__at(0x0793) __sfr CRCACC;
 
 __at(0x0793) __sfr CRCACCL;
 __at(0x0793) volatile __CRCACCLbits_t CRCACCLbits;
@@ -426,11 +430,15 @@ __at(0x0793) volatile __CRCACCLbits_t CRCACCLbits;
 __at(0x0794) __sfr CRCACCH;
 __at(0x0794) volatile __CRCACCHbits_t CRCACCHbits;
 
+__at(0x0795) __sfr CRCSHIFT;
+
 __at(0x0795) __sfr CRCSHIFTL;
 __at(0x0795) volatile __CRCSHIFTLbits_t CRCSHIFTLbits;
 
 __at(0x0796) __sfr CRCSHIFTH;
 __at(0x0796) volatile __CRCSHIFTHbits_t CRCSHIFTHbits;
+
+__at(0x0797) __sfr CRCXOR;
 
 __at(0x0797) __sfr CRCXORL;
 __at(0x0797) volatile __CRCXORLbits_t CRCXORLbits;
@@ -567,32 +575,6 @@ __at(0x0DAE) volatile __SMT2SIGbits_t SMT2SIGbits;
 
 __at(0x0DAF) __sfr SMT2WIN;
 __at(0x0DAF) volatile __SMT2WINbits_t SMT2WINbits;
-
-__at(0x0F8C) __sfr ICDIO;
-__at(0x0F8C) volatile __ICDIObits_t ICDIObits;
-
-__at(0x0F8D) __sfr ICDCON0;
-__at(0x0F8D) volatile __ICDCON0bits_t ICDCON0bits;
-
-__at(0x0F91) __sfr ICDSTAT;
-__at(0x0F91) volatile __ICDSTATbits_t ICDSTATbits;
-
-__at(0x0F96) __sfr ICDINSTL;
-__at(0x0F96) volatile __ICDINSTLbits_t ICDINSTLbits;
-
-__at(0x0F97) __sfr ICDINSTH;
-__at(0x0F97) volatile __ICDINSTHbits_t ICDINSTHbits;
-
-__at(0x0F9C) __sfr ICDBK0CON;
-__at(0x0F9C) volatile __ICDBK0CONbits_t ICDBK0CONbits;
-
-__at(0x0F9D) __sfr ICDBK0L;
-__at(0x0F9D) volatile __ICDBK0Lbits_t ICDBK0Lbits;
-
-__at(0x0F9E) __sfr ICDBK0H;
-__at(0x0F9E) volatile __ICDBK0Hbits_t ICDBK0Hbits;
-
-__at(0x0FE3) __sfr BSRICDSHAD;
 
 __at(0x0FE4) __sfr STATUS_SHAD;
 __at(0x0FE4) volatile __STATUS_SHADbits_t STATUS_SHADbits;

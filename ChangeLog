@@ -1,3 +1,9 @@
+2014-07-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sdas/linksrc/lkrloc3.c (adb_hi, adb_lo, relr3),
+	  sdas/asxxsrc/asout.c (outrxb): back port some of ASxxxx 5.06 to
+	  fix bug 2198
+
 2014-07-08 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/non-free/include/pic14/pic1xxx.h,
 	  device/non-free/lib/pic14/libdev/pic1xxx.c,

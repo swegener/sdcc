@@ -519,7 +519,7 @@ relr3(void)
                  */
                 if (mode & R3_BYTE) {
                         if (mode & R3_BYTX) {
-                                rtofst += 1;
+                                rtofst += (a_bytes - 1);
                         }
                 }
 
@@ -1019,15 +1019,16 @@ adb_bit(a_uint v, int i)
 }
 /* end sdld specific */
 
-/*)Function a_uint              adb_lo(v, i)
+/*)Function     a_uint  adb_lo(v, i)
  *
- *              int v           value to add to byte
- *              int i           rtval[] index
+ *              int     v               value to add to byte
+ *              int     i               rtval[] index
  *
  *      The function adb_lo() adds the value of v to the
- *      double byte value contained in rtval[i] and rtval[i+1].
- *      The new value of rtval[i] / rtval[i+1] is returned.
- *      The MSB rtflg[] is cleared.
+ *      value contained in rtval[i] through rtval[i + a_bytes - 1].
+ *      The new value of rtval[i] ... is returned.
+ *      The rtflg[] flags are cleared for all rtval[i] ... except
+ *      the LSB.
  *
  *      local variable:
  *              a_uint  j               temporary evaluation variable
@@ -1040,39 +1041,39 @@ adb_bit(a_uint v, int i)
  *
  *      side effects:
  *              The value of rtval[] is changed.
- *              The rtflg[] value corresponding to the
- *              MSB of the word value is cleared to reflect
+ *              The rtflg[] values corresponding to all bytes
+ *              except the LSB of the value are cleared to reflect
  *              the fact that the LSB is the selected byte.
  *
  */
 
 a_uint
 adb_lo(v, i)
-a_uint v;
-int i;
+a_uint  v;
+int     i;
 {
         a_uint j;
+        int m, n;
 
-        j = adb_2b(v, i);
+        j = adb_xb(v, i);
         /*
-         * Remove Hi byte
+         * LSB is lowest order byte of data
          */
-        if (hilo) {
-                rtflg[i] = 0;
-        } else {
-                rtflg[i+1] = 0;
+        m = (hilo ? a_bytes-1 : 0);
+        for (n=0; n<a_bytes; n++) {
+                if(n != m) rtflg[i+n] = 0;
         }
         return (j);
 }
 
-/*)Function a_uint              adb_hi(v, i)
+/*)Function     a_uint  adb_hi(v, i)
  *
- *              int v           value to add to byte
- *              int i           rtval[] index
+ *              int     v               value to add to byte
+ *              int     i               rtval[] index
  *
  *      The function adb_hi() adds the value of v to the
- *      double byte value contained in rtval[i] and rtval[i+1].
- *      The new value of rtval[i] / rtval[i+1] is returned.
+ *      value contained in rtval[i] through rtval[i + a_bytes - 1].
+ *      The new value of rtval[i] .... is returned.
  *      The LSB rtflg[] is cleared.
  *
  *      local variable:
@@ -1086,27 +1087,27 @@ int i;
  *
  *      side effects:
  *              The value of rtval[] is changed.
- *              The rtflg[] value corresponding to the
- *              LSB of the word value is cleared to reflect
+ *              The rtflg[] values corresponding to all bytes
+ *              except the 2nd byte (MSB) are cleared to reflect
  *              the fact that the MSB is the selected byte.
  *
  */
 
 a_uint
 adb_hi(v, i)
-a_uint v;
-int i;
+a_uint  v;
+int     i;
 {
         a_uint j;
+        int m, n;
 
-        j = adb_2b(v, i);
+        j = adb_xb(v, i);
         /*
-         * Remove Lo byte
+         * MSB is next lowest order byte of data
          */
-        if (hilo) {
-                rtflg[i+1] = 0;
-        } else {
-                rtflg[i] = 0;
+        m = (hilo ? a_bytes-2 : 1);
+        for (n=0; n<a_bytes; n++) {
+                if(n != m) rtflg[i+n] = 0;
         }
         return (j);
 }

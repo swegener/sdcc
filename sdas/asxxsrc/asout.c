@@ -528,7 +528,7 @@ outrxb(int i, struct expr *esp, int r)
                                                 n = esp->e_base.e_ap->a_ref;
                                         }
                                         *relp++ = r;
-                                        *relp++ = txtp - txt - 2;
+                                        *relp++ = txtp - txt - a_bytes;
                                         out_rw(n);
                                 }
                         } else {

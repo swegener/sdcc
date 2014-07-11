@@ -1,3 +1,8 @@
+2014-07-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/stm8/gen.c:
+	  Remove workarounds for bug #2198.
+
 2014-07-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sdas/linksrc/lkrloc3.c (adb_hi, adb_lo, relr3),

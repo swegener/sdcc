@@ -1,3 +1,15 @@
+2014-04-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/include/pic14/pic14devices.txt,
+	  device/include/pic14/pic16regs.h,
+	  device/non-free/include/pic14/pic12lf1554.h,
+	  device/non-free/include/pic14/pic12lf1559.h,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/pic12lf1554.c,
+	  device/non-free/lib/pic14/libdev/pic12lf1559.c,
+	  doc/sdccman.lyx:
+	  New devices.
+
 2014-07-11 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/stm8/gen.c:

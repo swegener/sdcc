@@ -519,6 +519,12 @@
 #elif defined(__SDCC_PIC16F1947)
   #include <pic16f1947.h>
 
+#elif defined(__SDCC_PIC16LF1554)
+  #include <pic16lf1554.h>
+
+#elif defined(__SDCC_PIC16LF1559)
+  #include <pic16lf1559.h>
+
 #elif defined(__SDCC_PIC16LF1704)
   #include <pic16lf1704.h>
 

@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:39 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-07-14 12:13:43 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -3607,6 +3607,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define _BORV_HI                0xFBFF  // Brown-out Reset Voltage (Vbor), high trip point selected.
 #define _BORV_LO                0xFFFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
 #define _BORV_19                0xFFFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
+#define _DEBUG_ON               0x2FFF  // In-Circuit Debugger enabled, ICSPCLK and ICSPDAT are dedicated to the debugger.
+#define _DEBUG_OFF              0x3FFF  // In-Circuit Debugger disabled, ICSPCLK and ICSPDAT are general purpose I/O pins.
 #define _LVP_OFF                0xDFFF  // High-voltage on MCLR/VPP must be used for programming.
 #define _LVP_ON                 0xFFFF  // Low-voltage programming enabled.
 

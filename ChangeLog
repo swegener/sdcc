@@ -1,3 +1,8 @@
+2014-07-14 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/non-free/include/pic14/pic16f1yyy.h:
+	  Added the missing DEBUG config option to the enhanced midrange MCUs.
+
 2014-07-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/bug2084206.c:
@@ -34,6 +39,7 @@
 	  fix bug 2198
 
 2014-07-08 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/non-free/include/pic14/pic1xxx.h,
 	  device/non-free/lib/pic14/libdev/pic1xxx.c,
 	  device/non-free/include/pic16/pic18fxxx.h,

@@ -34,13 +34,11 @@ long varargs(char i, ...)
 void testBug(void)
 {
 #ifndef __SDCC_pic16
-#ifndef __SDCC_stm8 // See bug #2196, 2198.
 	void* ptr = testBug;
 	mydata.f = testBug;
 	ASSERT (varargs(1, mydata.f) == (long)ptr);
 	ASSERT (varargs(1, mydata.f) == (long)(void*)testBug);
 	ASSERT (varargs(2, (funp_t)mydata.f) == (long)mydata.f);
 	ASSERT (varargs(2, (void (*)(void))mydata.f) == (long)mydata.f);
-#endif
 #endif
 }

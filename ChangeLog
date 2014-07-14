@@ -1,3 +1,10 @@
+2014-07-14 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/bug2084206.c:
+	  Enable test, since #2198 is fixed.
+	* support/regression/tests/gcc-torture-execute-20030714-1.c:
+	  Reference bug #2285.
+
 2014-07-12 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* support/scripts/cinc2h.pl: Bugfix and update.
 

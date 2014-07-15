@@ -1,3 +1,7 @@
+2014-07-15 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* src/stm8/peep.c
+	  Make calculation of instructions' length more accurate.
+
 2014-07-14 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/non-free/include/pic14/pic16f1yyy.h:

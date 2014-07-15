@@ -146,7 +146,7 @@ isSpIndexed(const char *what)
 
 int
 stm8instructionSize(const lineNode *pl)
-{
+{ // this function is quite rough, it makes all indirect addressing cases to the longest.
   char *operand;
   char *op1start;
   char *op2start;
@@ -155,21 +155,91 @@ stm8instructionSize(const lineNode *pl)
   op1start = nextToken(NULL);
   op2start = nextToken(NULL);
 
+  while(op1start && isspace(*op1start)) op1start++;
   while(op2start && isspace(*op2start)) op2start++;
   //printf("line=%s operand=%s op1start=%s op2start=%s\n", pl->line, operand, op1start, op2start);
+
+  /* Operations that always costs 1 byte */
+  if (EQUALS(operand, "ccf")
+    || EQUALS(operand, "divw")
+    || EQUALS(operand, "exgw")
+    || EQUALS(operand, "iret")
+    || EQUALS(operand, "nop")
+    || EQUALS(operand, "rcf")
+    || EQUALS(operand, "ret")
+    || EQUALS(operand, "retf")
+    || EQUALS(operand, "rvf")
+    || EQUALS(operand, "break")
+    || EQUALS(operand, "halt")
+    || EQUALS(operand, "rim")
+    || EQUALS(operand, "trap")
+    || EQUALS(operand, "wfi")
+    || EQUALS(operand, "sim")
+    || EQUALS(operand, "scf"))
+      return 1;
+
+  /* Operations that always costs 3 byte */
+  if(EQUALS(operand, "jrh")
+    || EQUALS(operand, "jrnh")
+    || EQUALS(operand, "jril")
+    || EQUALS(operand, "jrih")
+    || EQUALS(operand, "jrm")
+    || EQUALS(operand, "jrnm"))
+      return 3;
+
+  /* Operations that always costs 2 byte */
+  if(ISINST(operand, "jr")
+    || EQUALS(operand, "callr")
+    || EQUALS(operand, "wfe"))
+      return 2;
+
+  /* Operations that always costs 4 byte */
+  if(EQUALS(operand, "bccm")
+    || EQUALS(operand, "bcpl")
+    || EQUALS(operand, "bres")
+    || EQUALS(operand, "bset")
+    || EQUALS(operand, "callf")
+    || EQUALS(operand, "int")
+    || EQUALS(operand, "jpf"))
+      return 4;
+
+  /* Operations that always costs 5 byte */
+  if(EQUALS(operand, "btjf")
+    || EQUALS(operand, "btjt"))
+      return 5;
+
+  if (EQUALS(operand, "push")
+    || EQUALS(operand, "pop"))
+  {
+    assert (op1start != NULL);
+    if (!strcmp(op1start, "a"))
+      return 1;
+    if (!strcmp(op1start, "cc"))
+      return 1;
+    if (isImmediate(op1start)) // immediate
+      return 2;
+    else // longmem
+      return 3;
+  }
 
   /* arity=1 */
   if(EQUALS(operand, "clr")
                 || EQUALS(operand, "dec")
                 || EQUALS(operand, "inc")
-                || EQUALS(operand, "push")
                 || EQUALS(operand, "swap")
                 || EQUALS(operand, "jp")
+                || EQUALS(operand, "call")
                 || EQUALS(operand, "cpl")
+                || EQUALS(operand, "neg")
+                || EQUALS(operand, "sll")
+                || EQUALS(operand, "sla")
+                || EQUALS(operand, "srl")
+                || EQUALS(operand, "sra")
+                || EQUALS(operand, "rlc")
+                || EQUALS(operand, "rrc")
                 || EQUALS(operand, "tnz"))
   {
-    if(!op1start)
-      return(3);
+    assert (op1start != NULL);
     if(!strcmp(op1start, "a") || !strcmp(op1start, "(x)"))
       return(1);
     if(!strcmp(op1start, "(y)"))
@@ -183,120 +253,115 @@ stm8instructionSize(const lineNode *pl)
     if(readint(op1start) <= 0xFF)
       return(2+i);
     /* op1 > 0xFF */
-    if(EQUALS(operand, "jp") && !strchr(op1start, 'y'))
+    if((EQUALS(operand, "jp") || EQUALS(operand, "call")) && !strchr(op1start, 'y'))
       return(3);
     return(4);
   }
+
   if(EQUALS(operand, "exg"))
   {
+    assert (!strcmp(op1start, "a") && op2start != NULL);
     if(isReg(op2start))
       return(1);
     else
       return(3);
   }
+
   if(EQUALS(operand, "addw") || EQUALS(operand, "subw"))
   {
+    assert (op1start != NULL);
     if(!strcmp(op1start, "sp"))
       return(2);
     if(isImmediate(op2start) && op1start[0] == 'y')
       return(4);
-    if(isImmediate(op2start))
+    if(isImmediate(op2start) && op1start[0] == 'x')
       return(3);
     if(isSpIndexed(op2start))
       return(3);
-    if(isLongoff(op2start, "x"))
-      return(4);
+    return(4);
   }
+
   if(EQUALS(operand, "cplw"))
   {
+    assert (op1start != NULL);
     if(op1start[0] == 'y')
       return(2);
     else
       return(1);
   }
+
   if(EQUALS(operand, "ldf"))
   {
+    assert (op1start != NULL);
     if(isRelativeAddr(op1start, "y") || isRelativeAddr(op2start, "y"))
       return(5);
     else
       return(4);
   }
+
   /* Operations that costs 2 or 3 bytes for immediate */
   if(ISINST(operand, "ld")
-                || EQUALS(operand, "cp")
-                || EQUALS(operand, "cpw")
-                || ISINST(operand, "adc")
+                || ISINST(operand, "cp")
+                || EQUALS(operand, "adc")
                 || EQUALS(operand, "add")
-                || ISINST(operand, "and")
-                || ISINST(operand, "bcp")
-                || ISINST(operand, "call")
-                || ISINST(operand, "callr")
-                || ISINST(operand, "jr")
-                || ISINST(operand, "or")
-                || ISINST(operand, "sbc")
+                || EQUALS(operand, "and")
+                || EQUALS(operand, "bcp")
+                || EQUALS(operand, "or")
+                || EQUALS(operand, "sbc")
                 || EQUALS(operand, "sub")
-                || ISINST(operand, "xor"))
+                || EQUALS(operand, "xor"))
   {
     char suffix;
-
-    if(!op1start || !op2start)
-      return(4);
+    assert (op1start != NULL && op2start != NULL);
     suffix = operand[strlen(operand)-1];
     if(suffix == 'w' && isImmediate(op2start))
-      i++; // costs extra byte
+      {
+        i++; // costs extra byte
+        if(!strcmp(op1start, "y"))
+          i++;
+      }
+    if(isImmediate(op2start))
+      return(2+i); // ld reg, #immd
     if(isSpIndexed(op1start) || isSpIndexed(op2start))
       return(2);
     if(!strcmp(op1start, "(x)") || !strcmp(op2start, "(x)"))
       return(1);
     if(!strcmp(op1start, "(y)") || !strcmp(op2start, "(y)"))
       return(2);
-    if(isLabel(op1start) || isLabel(op2start))
-      return(3+i);
     if(isShortoff(op1start, "x") || isShortoff(op2start, "x"))
       return(2);
     if(isShortoff(op1start, "y") || isShortoff(op2start, "y"))
       return(3);
     if(isLongoff(op1start, "x") || isLongoff(op2start, "x"))
       return(3);
-    if(isRelativeAddr(op1start, "y"))
+    if(isLongoff(op1start, "y") || isLongoff(op2start, "y"))
       return(4);
-    if(strchr(op1start, 'y') || (strchr(op2start, 'y') && !EQUALS(operand, "ldw")))
+    if(strchr(op1start, 'y') || strchr(op2start, 'y'))
       i++; // costs extra byte for operating with y
+    if(isLabel(op1start) || isLabel(op2start))
+      return(3+i);
     if(isReg(op1start) && isReg(op2start))
       return(1+i);
-    if(op2start[0] == '#')
-      return(2+i); // ld reg, #immd
     if(readint(op2start) <= 0xFF)
       return(2+i);
-    return(3+i);
+    else
+      return(3+i);
+    return 4;
   }
 
   /* mov costs 3, 4 or 5 bytes depending on it's addressing mode */
   if(EQUALS(operand, "mov")) {
-    if(op2start && op2start[0] == '#')
+    assert (op1start != NULL && op2start != NULL);
+    if(isImmediate(op2start))
       return(4);
-    if(op2start && isLabel(op2start))
+    if(isLabel(op2start))
       return(5);
-    if(op2start && readint(op2start) <= 0xFF)
+    if(readint(op2start) <= 0xFF)
       return(3);
-    if(op2start && readint(op2start) > 0xFF)
+    if(readint(op2start) > 0xFF)
       return(5);
   }
 
-  /* Operations that always costs 1 byte */
-  if(EQUALS(operand, "ccf")
-                || EQUALS(operand, "divw")
-                || EQUALS(operand, "exgw")
-                || EQUALS(operand, "iret")
-                || EQUALS(operand, "nop")
-                || EQUALS(operand, "rcf")
-                || EQUALS(operand, "ret")
-                || EQUALS(operand, "retf")
-                || EQUALS(operand, "rvf")
-                || EQUALS(operand, "scf"))
-  {
-    return(1);
-  }
   /* Operations that costs 2 or 1 bytes depending on 
      is the Y or X register used */
   if(EQUALS(operand, "clrw")
@@ -318,11 +383,13 @@ stm8instructionSize(const lineNode *pl)
                 || EQUALS(operand, "swapw")
                 || EQUALS(operand, "tnzw"))
   {
+    assert (op1start != NULL);
     if((op1start && !strcmp(op1start, "y")) || (op2start && !strcmp(op2start, "y")))
       return(2);
     else
       return(1);
   }
+
   return(5); // Maximum instruction size, e.g. btjt.
 }
 

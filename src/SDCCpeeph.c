@@ -203,6 +203,7 @@ FBYNAME (labelInRange)
          -127 to + 127 bytes, for Z80 -126 to +129 bytes.*/
       dist = (pcDistance (currPl, lbl, TRUE) +
               pcDistance (currPl, lbl, FALSE));
+
       /* Use 125 for now. Could be made more exact using port and
          exact jump location instead of currPl. */
       if (!dist || dist > 127)

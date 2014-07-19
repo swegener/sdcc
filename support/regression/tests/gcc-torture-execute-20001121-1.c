@@ -11,11 +11,13 @@
 
 double d;
 
+static
 inline double foo (void)
 {
   return d;
 }
 
+static
 inline int bar (void)
 {
   foo();

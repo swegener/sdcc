@@ -1,3 +1,7 @@
+2014-07-19 Ben Shi <powerstudio1st AT 163.com>
+	* support/regression/tests/gcc-torture-execute-20001121-1.c:
+	  Add "static" to fit the C99 standard.
+
 2014-07-15 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* src/stm8/peep.c
 	  Make calculation of instructions' length more accurate.

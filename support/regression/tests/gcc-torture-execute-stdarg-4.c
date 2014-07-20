@@ -14,6 +14,7 @@
 
 long x, y;
 
+static
 inline void
 f1i (va_list ap)
 {
@@ -31,6 +32,7 @@ f1 (int i, ...)
   va_end (ap);
 }
 
+static
 inline void
 f2i (va_list ap)
 {

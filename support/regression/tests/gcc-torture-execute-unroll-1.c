@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+static
 inline int
 f (int x)
 {

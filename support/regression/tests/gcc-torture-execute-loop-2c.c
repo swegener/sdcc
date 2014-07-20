@@ -10,6 +10,7 @@
 
 int a[2];
 
+static
 inline void f (int b, int o)
 {
   unsigned int i;

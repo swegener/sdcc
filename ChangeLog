@@ -1,3 +1,8 @@
+2014-07-21 Ben Shi <powerstudio1st AT 163.com>
+	* support/regression/tests/gcc-torture-execute-stdarg-4.c:
+	* support/regression/tests/gcc-torture-execute-stdarg-5.c:
+	  Split the original gcc-torture-execute-stdarg-4.c to inline / non-inline.
+
 2014-07-20 Ben Shi <powerstudio1st AT 163.com>
 	* support/regression/tests/gcc-torture-execute-stdarg-4.c:
 	* support/regression/tests/gcc-torture-execute-loop-2c.c:

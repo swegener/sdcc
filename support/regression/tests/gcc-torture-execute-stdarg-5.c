@@ -14,7 +14,7 @@
 
 long x, y;
 
-void
+static inline void
 f1i (va_list ap)
 {
   x = va_arg (ap, double);
@@ -31,7 +31,7 @@ f1 (int i, ...)
   va_end (ap);
 }
 
-void
+static inline void
 f2i (va_list ap)
 {
   y = va_arg (ap, int);
@@ -124,6 +124,7 @@ f4 (int i, ...)
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_mcs51)
   f1 (3, 16.0, 128L, 32.0);
   if (x != 176L)
     ASSERT (0);
@@ -148,7 +149,7 @@ testTortureExecute (void)
 // Fails on z80 and related
   if (x != 144L || y != 28L)
     ASSERT (0);
-
+#endif
   return;
 }
 

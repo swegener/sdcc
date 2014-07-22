@@ -25,15 +25,18 @@
     For more explanation: optimize_pic16devices.pl -h
 
   $Id$
-
 =cut
 
 use strict;
 use warnings;
 use 5.12.0;                     # when (regex)
+use POSIX 'ULONG_MAX';
 
 use constant FALSE => 0;
 use constant TRUE  => 1;
+
+use constant FNV1A32_INIT  => 0x811C9DC5;
+use constant FNV1A32_PRIME => 0x01000193;
 
 my $PROGRAM = '';
 my $verbose = 0;
@@ -54,42 +57,39 @@ my @device_names = ();
         The structure of one element of the %devices_by_name:
 
         {
-        NAME   => '',
-        RAM    => {
-                  SIZE  => 0,
-                  SPLIT => 0
-                  },
-        CONFIG => {
-                  FIRST => 0,
-                  LAST  => 0,
-                  WORDS => [
-                             {
-                             ADDRESS  => 0,
-                             MASK     => 0,
-                             VALUE    => 0,
-                             AND_MASK => 0
-                             },
-                             ...
-                             {
-                             }
-                           ]
-                  },
-        ID     => {
-                  FIRST => 0,
-                  LAST  => 0,
-                  WORDS => [
-                             {
-                             ADDRESS  => 0,
-                             VALUE    => 0
-                             },
-                             ...
-                             {
-                             }
-                           ]
-                  },
-        XINST  => 0
+        NAME     => '',
+        COMMENTS => '',
+        RAM      => {
+                    SIZE      => 0,
+                    SPLIT     => 0,
+                    HASH      => 0,
+                    DIFF      => 0
+                    },
+        CONFIG   => {
+                    FIRST     => 0,
+                    LAST      => 0,
+                    WORDS     => {},
+                    ORD_WORDS => [],
+                    HASH      => 0,
+                    DIFF      => 0
+                    },
+        ID       => {
+                    FIRST     => 0,
+                    LAST      => 0,
+                    WORDS     => {},
+                    ORD_WORDS => [],
+                    HASH      => 0,
+                    DIFF      => 0
+                    },
+        XINST    => 0
+        CHILD    => 0
         }
 =cut
+
+use constant RELEVANCE_RAM      => 2;
+use constant RELEVANCE_CONFWORD => 4;
+use constant RELEVANCE_IDWORD   => 2;
+use constant RELEVANCE_FATAL    => 1000;
 
 my %devices_by_name = ();
 
@@ -106,14 +106,14 @@ sub basename($)
   return ($_[0] =~ /([^\/]+)$/) ? $1 : '';
   }
 
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 sub param_exist($$)
   {
   die "This option \"$_[0]\" requires a parameter.\n" if ($_[1] > $#ARGV);
   }
 
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 sub str2int($)
   {
@@ -126,7 +126,7 @@ sub str2int($)
   die "This string not integer: \"$Str\"";
   }
 
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 sub Log
   {
@@ -135,7 +135,7 @@ sub Log
   print STDERR "\n";
   }
 
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 sub Open($$)
   {
@@ -146,7 +146,41 @@ sub Open($$)
   return $handle;
   }
 
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+sub fnv1a32_str($$)
+  {
+  my ($String, $Hash) = @_;
+
+  foreach (unpack('C*', $String))
+    {
+    $Hash ^= $_;
+    $Hash *= FNV1A32_PRIME;
+    $Hash &= 0xFFFFFFFF;
+    }
+
+  return $Hash;
+  }
+
+#---------------------------------------------------------------------------------------------------
+
+sub fnv1a32_int32($$)
+  {
+  my ($Int, $Hash) = @_;
+  my $i;
+
+  for ($i = 4; $i; --$i)
+    {
+    $Hash ^= $Int & 0xFF;
+    $Hash *= FNV1A32_PRIME;
+    $Hash &= 0xFFFFFFFF;
+    $Int >>= 8;
+    }
+
+  return $Hash;
+  }
+
+#---------------------------------------------------------------------------------------------------
 
 sub smartCompare($$)
   {
@@ -161,7 +195,7 @@ sub smartCompare($$)
   return (${$Str1} cmp ${$Str2});
   }
 
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
 
 sub smartSort($$)
   {
@@ -198,217 +232,13 @@ sub smartSort($$)
   return $ret;
   }
 
-#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@                             @@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@   The important procedures.   @@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@                             @@@@@@@@@@@@@@@@@@@@@@@@@@
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-sub copy_words($$)
-  {
-  my ($Dst, $Src) = @_;
-
-  return if (! defined(@{$Src}));
-
-  foreach (@{$Src})
-    {
-    push(@{$Dst}, { %{$_} });
-    }
-  }
-
-#-------------------------------------------------------------------------------
-
-        #
-        # Compares the config $Words1 and the config $Words2.
-        #
-
-sub compare_config_words($$)
-  {
-  my ($Words1, $Words2) = @_;
-  my $m = defined($Words1) + defined($Words2);
-  my ($i, $v);
-
-  return TRUE  if ($m == 0);
-  return FALSE if ($m == 1 || @{$Words1} != @{$Words2});
-
-  $v = @{$Words1};
-
-  for ($i = 0; $i < $v; ++$i)
-    {
-    return FALSE if ($Words1->[$i]->{ADDRESS} != $Words2->[$i]->{ADDRESS});
-    return FALSE if ($Words1->[$i]->{MASK}    != $Words2->[$i]->{MASK});
-    return FALSE if ($Words1->[$i]->{VALUE}   != $Words2->[$i]->{VALUE});
-
-    $m = defined($Words1->[$i]->{AND_MASK}) + defined($Words2->[$i]->{AND_MASK});
-
-    next if ($m == 0);
-
-    return FALSE if ($m == 1 || $Words1->[$i]->{AND_MASK} != $Words2->[$i]->{AND_MASK});
-    }
-
-  return TRUE;
-  }
-
-#-------------------------------------------------------------------------------
-
-        #
-        # Compares the id $Words1 and the id $Words2.
-        #
-
-sub compare_id_words($$)
-  {
-  my ($Words1, $Words2) = @_;
-  my $m = defined($Words1) + defined($Words2);
-  my ($i, $v);
-
-  return TRUE  if ($m == 0);
-  return FALSE if ($m == 1 || @{$Words1} != @{$Words2});
-
-  $v = @{$Words1};
-
-  for ($i = 0; $i < $v; ++$i)
-    {
-    return FALSE if ($Words1->[$i]->{ADDRESS} != $Words2->[$i]->{ADDRESS});
-    return FALSE if ($Words1->[$i]->{VALUE}   != $Words2->[$i]->{VALUE});
-    }
-
-  return TRUE;
-  }
-
-#-------------------------------------------------------------------------------
-
-        #
-        # Compares the $Dev1 and the $Dev2.
-        #
-
-sub compare_devices($$)
-  {
-  my ($Dev1, $Dev2) = @_;
-  my $m = defined($Dev1) + defined($Dev2);
-
-  return FALSE if ($m < 2);
-
-  return FALSE if ($Dev1->{RAM}->{SPLIT}    != $Dev2->{RAM}->{SPLIT});
-  return FALSE if ($Dev1->{CONFIG}->{FIRST} != $Dev2->{CONFIG}->{FIRST});
-  return FALSE if ($Dev1->{CONFIG}->{LAST}  != $Dev2->{CONFIG}->{LAST});
-  return FALSE if (! compare_config_words(\@{$Dev1->{CONFIG}->{WORDS}}, \@{$Dev2->{CONFIG}->{WORDS}}));
-  return FALSE if ($Dev1->{XINST}           != $Dev2->{XINST});
-
-  $m = defined($Dev1->{ID}) + defined($Dev2->{ID});
-  return TRUE  if ($m == 0);
-  return FALSE if ($m == 1 || $Dev1->{ID}->{FIRST} != $Dev2->{ID}->{FIRST});
-  return FALSE if ($Dev1->{ID}->{LAST} != $Dev2->{ID}->{LAST});
-  return FALSE if (! compare_id_words(\@{$Dev1->{ID}->{WORDS}}, \@{$Dev2->{ID}->{WORDS}}));
-  return TRUE;
-  }
-
-#-------------------------------------------------------------------------------
-
-sub print_config_words($)
-  {
-  my $Words = $_[0];
-
-  return if (! defined($Words));
-
-  foreach (@{$Words})
-    {
-    printf "configword  0x%06X 0x%02X 0x%02X", $_->{ADDRESS}, $_->{MASK}, $_->{VALUE};
-    printf " 0x%02X", $_->{AND_MASK} if (defined($_->{AND_MASK}));
-    print  "\n";
-    }
-  }
-
-#-------------------------------------------------------------------------------
-
-sub print_id_words($)
-  {
-  my $Words = $_[0];
-
-  return if (! defined($Words));
-
-  foreach (@{$Words})
-    {
-    printf "idword      0x%06X 0x%02X\n", $_->{ADDRESS}, $_->{VALUE};
-    }
-  }
-
-#-------------------------------------------------------------------------------
-
-sub print_device($)
-  {
-  my $Index = $_[0];
-  my $mcu = $device_names[$Index];
-  my $dev = $devices_by_name{$mcu};
-
-  return if (! defined($dev));
-
-  Log("Prints the $mcu MCU.", 4);
-
-  my $ancestor = undef;
-  my ($ac, $i, $ref);
-
-  if ($operation == OP_OPTIMIZE)
-    {
-        # Optinized writing is required.
-
-    for ($i = 0; $i < @device_names; ++$i)
-      {
-      last if ($Index == $i);
-
-      $ac = $devices_by_name{$device_names[$i]};
-
-      if (compare_devices($ac, $dev))
-        {
-        $ancestor = $ac;
-        last;
-        }
-      }
-    }
-
-  print "name        $dev->{NAME}\n";
-
-  if ($dev->{COMMENTS})
-    {
-    foreach (@{$dev->{COMMENTS}})
-      {
-      print "$_\n";
-      }
-    }
-
-  $ref = $dev->{RAM};
-
-  if (defined($ancestor))
-    {
-    print  "using       $ancestor->{NAME}\n";
-    print  "ramsize     $ref->{SIZE}\n" if ($ancestor->{RAM}->{SIZE} != $ref->{SIZE});
-    }
-  else
-    {
-    print  "ramsize     $ref->{SIZE}\n";
-    printf "split       0x%02X\n", $ref->{SPLIT};
-
-    $ref = $dev->{CONFIG};
-    printf "configrange 0x%06X 0x%06X\n", $ref->{FIRST}, $ref->{LAST};
-    print_config_words(\@{$ref->{WORDS}});
-
-    if (defined($dev->{XINST}))
-      {
-      printf "XINST       %d\n", $dev->{XINST};
-      }
-
-    $ref = $dev->{ID};
-
-    if (defined($ref))
-      {
-      printf "idlocrange  0x%06X 0x%06X\n", $ref->{FIRST}, $ref->{LAST};
-      print_id_words(\@{$ref->{WORDS}}) if (defined($ref->{WORDS}));
-      }
-    }
-  }
-
-#-------------------------------------------------------------------------------
+#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                             @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   The important procedures.   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                             @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
         #
         # Reads the entire pic16devices.txt file.
@@ -417,10 +247,10 @@ sub print_device($)
 sub read_pic16devices_txt($)
   {
   my $File = $_[0];
+  my ($parent, $first, $last, $txt, $ref, $is_using);
   my $in = Open($File, 'read_pic16devices_txt');
   my $header = TRUE;
   my $device = undef;
-  my ($first, $last, $txt);
 
   Log("Reads the $File file.", 4);
 
@@ -430,7 +260,7 @@ sub read_pic16devices_txt($)
     s/\r$//o;
     s/\s+$//o;
 
-    $header = FALSE if ($_ =~ /^\s*name\b/io);
+    $header = FALSE if (/^\s*name\b/io);
 
     if ($header)
       {
@@ -443,45 +273,59 @@ sub read_pic16devices_txt($)
       when (/^\s*name\s+(\w+)$/io)
         {
         $device = {
-                  NAME     => $1,
-                  COMMENTS => undef,
-                  RAM      => {},
-                  CONFIG   => {},
-                  ID       => undef,
-                  XINST    => undef,
+                  NAME      => $1,
+                  COMMENTS  => undef,
+                  RAM       => {
+                               SIZE  => -1,
+                               SPLIT => -1,
+                               HASH  => 0,
+                               DIFF  => 0
+                               },
+                  CONFIG    => {
+                               FIRST     => -1,
+                               LAST      => -1,
+                               WORDS     => {},
+                               ORD_WORDS => [],
+                               HASH      => 0,
+                               DIFF      => 0
+                               },
+                  ID        => {
+                               FIRST     => -1,
+                               LAST      => -1,
+                               WORDS     => {},
+                               ORD_WORDS => [],
+                               HASH      => 0,
+                               DIFF      => 0
+                               },
+                  XINST     => -1,
+                  CHILD     => FALSE
                   };
 
         Log("name       : $1", 7);
         $devices_by_name{$1} = $device;
+        $is_using = FALSE;
         }
 
       when (/^\s*using\s+(\w+)$/io)
         {
         die "Device not exists." if (! defined($device));
 
-        my $parent = $devices_by_name{$1};
+        $parent = $devices_by_name{$1};
 
         die "In device - \"$device->{NAME}\" - not exists the parent: \"$1\"\n" if (! defined($parent));
 
         # Unlock the "using" keyword.
 
         Log("using      : $1", 7);
-
         %{$device->{RAM}} = %{$parent->{RAM}};
-
         $device->{CONFIG}->{FIRST} = $parent->{CONFIG}->{FIRST};
         $device->{CONFIG}->{LAST}  = $parent->{CONFIG}->{LAST};
-        copy_words(\@{$device->{CONFIG}->{WORDS}}, \@{$parent->{CONFIG}->{WORDS}});
-        die "XINST overwritten for $device->{NAME}." if (defined($device->{XINST}) && $device->{XINST} != $parent->{XINST});
-        printf "XINST reset %d -> %d for %s\n", $device->{XINST}, $parent->{XINST}, $device->{NAME} if defined($device->{XINST});
-        $device->{XINST}           = $parent->{XINST};
-
-        if (defined($parent->{ID}))
-          {
-          $device->{ID}->{FIRST} = $parent->{ID}->{FIRST};
-          $device->{ID}->{LAST}  = $parent->{ID}->{LAST};
-          copy_words(\@{$device->{ID}->{WORDS}}, \@{$parent->{ID}->{WORDS}});
-          }
+        %{$device->{CONFIG}->{WORDS}} = %{$parent->{CONFIG}->{WORDS}};
+        $device->{ID}->{FIRST} = $parent->{ID}->{FIRST};
+        $device->{ID}->{LAST}  = $parent->{ID}->{LAST};
+        %{$device->{ID}->{WORDS}} = %{$parent->{ID}->{WORDS}};
+        $device->{XINST} = $parent->{XINST};
+        $is_using = TRUE;
         }
 
       when (/^\s*ramsize\s+(\w+)$/io)
@@ -505,9 +349,9 @@ sub read_pic16devices_txt($)
         die "Device not exists." if (! defined($device));
 
         ($first, $last) = (str2int($1), str2int($2));
-        Log("configrange: $1 $2", 7);
+        Log("configrange: $first, $last", 7);
 
-        if (defined($device->{CONFIG}->{FIRST}))
+        if ($device->{CONFIG}->{FIRST} >= 0 || $device->{CONFIG}->{LAST} >= 0)
           {
           Log("The configrange already exists in the \"$device->{NAME}\".", 0);
 
@@ -521,7 +365,7 @@ sub read_pic16devices_txt($)
 
         # The previous values invalid.
 
-          $device->{CONFIG}->{WORDS} = [];
+          $device->{CONFIG}->{WORDS} = {};
           }
 
         $device->{CONFIG}->{FIRST} = $first;
@@ -530,36 +374,50 @@ sub read_pic16devices_txt($)
 
       when (/^\s*configword\s+(\w+)\s+(\w+)\s+(\w+)(?:\s+(\w+))?$/io)
         {
+        my ($addr, $mask, $val, $amask, $hash);
+
         die "Device not exists." if (! defined($device));
+
+        ($addr, $mask, $val) = (str2int($1), str2int($2), str2int($3));
 
         if (defined($4))
           {
-          Log("configword : $1 $2 $3 $4", 7);
-          push(@{$device->{CONFIG}->{WORDS}}, {
-                                              ADDRESS  => str2int($1),
-                                              MASK     => str2int($2),
-                                              VALUE    => str2int($3),
-                                              AND_MASK => str2int($4)
-                                              });
+          $amask = str2int($4);
+          Log("configword : $addr, $mask, $val, $amask", 7);
           }
         else
           {
-          Log("configword : $1 $2 $3", 7);
-          push(@{$device->{CONFIG}->{WORDS}}, {
-                                              ADDRESS  => str2int($1),
-                                              MASK     => str2int($2),
-                                              VALUE    => str2int($3)
-                                              });
+          $amask = -1;
+          Log("configword : $addr, $mask, $val", 7);
           }
+
+        $hash = fnv1a32_int32($addr, FNV1A32_INIT);
+        $hash = fnv1a32_int32($mask, $hash);
+        $hash = fnv1a32_int32($val, $hash);
+        $hash = fnv1a32_int32($amask, $hash);
+        $ref  = {
+                ADDRESS  => $addr,
+                MASK     => $mask,
+                VALUE    => $val,
+                AND_MASK => $amask,
+                HASH     => $hash
+                };
+
+        if ($is_using && ! defined($device->{CONFIG}->{WORDS}->{$addr}))
+          {
+          printf STDERR "Database error: The 0x%06X config word not exist in the ancestor MCU!\n", $addr;
+          exit(1);
+          }
+
+        $device->{CONFIG}->{WORDS}->{$addr} = $ref;
         }
 
       when (/^\s*XINST\s+(\w+)\s*$/io)
         {
-          die "Device not exists." if (! defined($device));
+        die "Device not exists." if (! defined($device));
 
-          Log("XINST    : $1", 7);
-          printf "XINST $device->{XINST} -> $1 for $device->{NAME}.\n" if (defined ($device->{XINST}));
-          $device->{XINST} = str2int($1);
+        Log("XINST    : $1", 7);
+        $device->{XINST} = str2int($1);
         }
 
       when (/^\s*idlocrange\s+(\w+)\s+(\w+)$/io)
@@ -573,13 +431,27 @@ sub read_pic16devices_txt($)
 
       when (/^\s*idword\s+(\w+)\s+(\w+)$/io)
         {
+        my ($addr, $val, $hash);
+
         die "Device not exists." if (! defined($device));
 
+        ($addr, $val) = (str2int($1), str2int($2));
         Log("idword     : $1 $2", 7);
-        push(@{$device->{ID}->{WORDS}}, { 
-                                        ADDRESS => str2int($1),
-                                        VALUE   => str2int($2)
-                                        });
+        $hash = fnv1a32_int32($addr, FNV1A32_INIT);
+        $hash = fnv1a32_int32($val, $hash);
+        $ref  = {
+                ADDRESS  => $addr,
+                VALUE    => $val,
+                HASH     => $hash
+                };
+
+        if ($is_using && ! defined($device->{ID}->{WORDS}->{$addr}))
+          {
+          printf STDERR "Database error: The 0x%06X id word not exist in the ancestor MCU!\n", $addr;
+          exit(1);
+          }
+
+        $device->{ID}->{WORDS}->{$addr} = $ref;
         }
 
       when (/^\s*#/o)
@@ -600,7 +472,328 @@ sub read_pic16devices_txt($)
   close($in);
   }
 
-#-------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
+
+sub make_hashes($)
+  {
+  my $DevRef = $_[0];
+  my ($ref1, $ref2, $hash);
+
+  $ref1 = $DevRef->{RAM};
+  $hash = fnv1a32_int32($ref1->{SIZE}, FNV1A32_INIT);
+  $ref1->{HASH} = fnv1a32_int32($ref1->{SPLIT}, $hash);
+
+  #.................
+
+  $ref1 = $DevRef->{CONFIG};
+  $hash = fnv1a32_int32($ref1->{FIRST}, FNV1A32_INIT);
+  $hash = fnv1a32_int32($ref1->{LAST}, $hash);
+
+  @{$ref1->{ORD_WORDS}} = sort {$a->{ADDRESS} <=> $b->{ADDRESS}} values %{$ref1->{WORDS}};
+
+  foreach $ref2 (@{$ref1->{ORD_WORDS}})
+    {
+    $hash = fnv1a32_int32($ref2->{ADDRESS}, $hash);
+    $hash = fnv1a32_int32($ref2->{MASK}, $hash);
+    $hash = fnv1a32_int32($ref2->{VALUE}, $hash);
+    $hash = fnv1a32_int32($ref2->{AND_MASK}, $hash);
+    }
+
+  $ref1->{HASH} = $hash;
+
+  #.................
+
+  $ref1 = $DevRef->{ID};
+
+  if (defined($ref1))
+    {
+    $hash = fnv1a32_int32($ref1->{FIRST}, FNV1A32_INIT);
+    $hash = fnv1a32_int32($ref1->{LAST}, $hash);
+
+    if (defined($ref1->{WORDS}))
+      {
+      @{$ref1->{ORD_WORDS}} = sort {$a->{ADDRESS} <=> $b->{ADDRESS}} values %{$ref1->{WORDS}};
+
+      foreach $ref2 (@{$ref1->{ORD_WORDS}})
+        {
+        $hash = fnv1a32_int32($ref2->{ADDRESS}, $hash);
+        $hash = fnv1a32_int32($ref2->{VALUE}, $hash);
+        }
+      }
+
+    $ref1->{HASH} = $hash;
+    }
+  }
+
+#---------------------------------------------------------------------------------------------------
+
+sub difference_of_arrays($$)
+  {
+  my ($ArrayRef1, $ArrayRef2) = @_;
+  my ($diff, $len, $i);
+
+  $len = @{$ArrayRef1};
+  # The lenght of two arrays must be of equal.
+  return RELEVANCE_FATAL if ($len != scalar(@{$ArrayRef2}));
+
+  $diff = 0;
+  for ($i = 0; $i < $len; ++$i)
+    {
+    if ($ArrayRef1->[$i]->{ADDRESS} != $ArrayRef2->[$i]->{ADDRESS})
+      {
+      $diff += RELEVANCE_FATAL;
+      $ArrayRef1->[$i]->{DIFF} = TRUE;
+      }
+    elsif ($ArrayRef1->[$i]->{HASH} != $ArrayRef2->[$i]->{HASH})
+      {
+      $diff += RELEVANCE_CONFWORD;
+      $ArrayRef1->[$i]->{DIFF} = TRUE;
+      }
+    else
+      {
+      $ArrayRef1->[$i]->{DIFF} = FALSE;
+      }
+    }
+  
+  return $diff;
+  }
+
+#---------------------------------------------------------------------------------------------------
+
+        #
+        # Compares the $Dev1 and the $Dev2.
+        #
+
+sub difference_of_devices($$)
+  {
+  my ($DevRef1, $DevRef2) = @_;
+  my ($diff, $r1, $r2, $aref1, $aref2, $len1, $len2, $min, $i);
+
+  $i = defined($DevRef1) + defined($DevRef2);
+
+  return RELEVANCE_FATAL if ($i != 2);
+
+  $diff  = 0;
+  $r1 = $DevRef1->{RAM};
+  $r2 = $DevRef2->{RAM};
+
+  if ($r1->{HASH} != $r2->{HASH})
+    {
+    $diff += RELEVANCE_RAM;
+    $r1->{DIFF} = TRUE;
+    }
+  else
+    {
+    $r1->{DIFF} = FALSE;
+    }
+
+  $r1 = $DevRef1->{CONFIG};
+  $r2 = $DevRef2->{CONFIG};
+
+  if ($r1->{HASH} != $r2->{HASH})
+    {
+    $diff += RELEVANCE_FATAL if ($r1->{FIRST} != $r2->{FIRST});
+    $diff += RELEVANCE_FATAL if ($r1->{LAST}  != $r2->{LAST});
+    $diff += difference_of_arrays($r1->{ORD_WORDS}, $r2->{ORD_WORDS});
+    $r1->{DIFF} = TRUE;
+    }
+  else
+    {
+    $r1->{DIFF} = FALSE;
+    }
+
+  $r1 = $DevRef1->{ID};
+  $r2 = $DevRef2->{ID};
+
+  if ($r1->{HASH} != $r2->{HASH})
+    {
+    $diff += RELEVANCE_FATAL if ($r1->{FIRST} != $r2->{FIRST});
+    $diff += RELEVANCE_FATAL if ($r1->{LAST}  != $r2->{LAST});
+    $diff += difference_of_arrays($r1->{ORD_WORDS}, $r2->{ORD_WORDS});
+    $r1->{DIFF} = TRUE;
+    }
+  else
+    {
+    $r1->{DIFF} = FALSE;
+    }
+
+  # The value of two XINST elements must be of equal.
+  $diff += RELEVANCE_FATAL if ($DevRef1->{XINST} != $DevRef1->{XINST});
+  return $diff;
+  }
+
+#---------------------------------------------------------------------------------------------------
+
+sub print_config_words($)
+  {
+  my $Words = $_[0];
+
+  return if (! defined($Words));
+
+  foreach (@{$Words})
+    {
+    printf "configword  0x%06X 0x%02X 0x%02X", $_->{ADDRESS}, $_->{MASK}, $_->{VALUE};
+    printf " 0x%02X", $_->{AND_MASK} if ($_->{AND_MASK} > 0);
+    print  "\n";
+    }
+  }
+
+#---------------------------------------------------------------------------------------------------
+
+sub print_id_words($)
+  {
+  my $Words = $_[0];
+
+  return if (! defined($Words));
+
+  foreach (@{$Words})
+    {
+    printf "idword      0x%06X 0x%02X\n", $_->{ADDRESS}, $_->{VALUE};
+    }
+  }
+
+#---------------------------------------------------------------------------------------------------
+
+sub print_diff_config_words($)
+  {
+  my $ArrayRef = $_[0];
+
+  foreach (@{$ArrayRef})
+    {
+    next if (! $_->{DIFF});
+
+    printf "configword  0x%06X 0x%02X 0x%02X", $_->{ADDRESS}, $_->{MASK}, $_->{VALUE};
+    printf " 0x%02X", $_->{AND_MASK} if ($_->{AND_MASK} > 0);
+    print  "\n";
+    }
+  }
+
+#---------------------------------------------------------------------------------------------------
+
+sub print_diff_id_words($)
+  {
+  my $ArrayRef = $_[0];
+
+  foreach (@{$ArrayRef})
+    {
+    next if (! $_->{DIFF});
+
+    printf "idword      0x%06X 0x%02X\n", $_->{ADDRESS}, $_->{VALUE};
+    }
+  }
+
+#---------------------------------------------------------------------------------------------------
+
+sub print_device($)
+  {
+  my $Index = $_[0];
+  my $mcu = $device_names[$Index];
+  my $dev = $devices_by_name{$mcu};
+  my ($min_diff, $diff);
+  my ($ac, $ancestor, $i, $ref1, $ref2);
+
+  return if (! defined($dev));
+
+  Log("Prints the $mcu MCU.", 4);
+
+  $ancestor = undef;
+
+  if ($operation == OP_OPTIMIZE)
+    {
+        # Optimized writing is required.
+
+    $min_diff = ULONG_MAX;
+    for ($i = 0; $i < @device_names; ++$i)
+      {
+      $ac = $devices_by_name{$device_names[$i]};
+
+      last if ($Index == $i);
+      next if ($ac->{CHILD});
+
+      $diff = difference_of_devices($dev, $ac);
+
+      if ($min_diff > $diff)
+        {
+        $min_diff = $diff;
+        $ancestor = $ac;
+        }
+      }
+
+    $ancestor = undef if ($min_diff > 15);
+    }
+
+  print "name        $dev->{NAME}\n";
+
+  if ($dev->{COMMENTS})
+    {
+    foreach (@{$dev->{COMMENTS}})
+      {
+      print "$_\n";
+      }
+    }
+
+  $ref1 = $dev->{RAM};
+
+  if (defined($ancestor))
+    {
+    $dev->{CHILD} = TRUE;
+
+    print  "using       $ancestor->{NAME}\n";
+    difference_of_devices($dev, $ancestor);
+
+    if ($ref1->{DIFF})
+      {
+      $ref2 = $ancestor->{RAM};
+
+      if ($ref1->{SIZE} != $ref2->{SIZE})
+        {
+        print  "ramsize     $ref1->{SIZE}\n";
+        }
+
+      if ($ref1->{SPLIT} != $ref2->{SPLIT})
+        {
+        printf "split       0x%02X\n", $ref1->{SPLIT};
+        }
+      }
+
+    $ref1 = $dev->{CONFIG};
+
+    if ($ref1->{DIFF})
+      {
+      print_diff_config_words($ref1->{ORD_WORDS});
+      }
+
+    printf "XINST       $dev->{XINST}\n" if ($ancestor->{XINST} < 0 && $dev->{XINST} > 0);
+
+    $ref1 = $dev->{ID};
+
+    if ($ref1->{DIFF})
+      {
+      print_diff_id_words($ref1->{ORD_WORDS});
+      }
+    }
+  else
+    {
+    print  "ramsize     $ref1->{SIZE}\n";
+    printf "split       0x%02X\n", $ref1->{SPLIT};
+
+    $ref1 = $dev->{CONFIG};
+    printf "configrange 0x%06X 0x%06X\n", $ref1->{FIRST}, $ref1->{LAST};
+    print_config_words($ref1->{ORD_WORDS});
+
+    printf "XINST       $dev->{XINST}\n" if ($dev->{XINST} > 0);
+
+    $ref1 = $dev->{ID};
+
+    if ($ref1->{FIRST} > 0 && $ref1->{LAST} > 0)
+      {
+      printf "idlocrange  0x%06X 0x%06X\n", $ref1->{FIRST}, $ref1->{LAST};
+      print_id_words($ref1->{ORD_WORDS});
+      }
+    }
+  }
+
+#---------------------------------------------------------------------------------------------------
 
 sub usage()
   {
@@ -617,7 +810,7 @@ Usage: $PROGRAM <option> path/to/pic16devices.txt > output.txt
 
         -u or --unoptimize
 
-            Unlocks the "using" keywords and instead displays the original
+            Unlocks the "using" keywords and displays the full original
             content.
 
         -v <level> or --verbose <level>
@@ -632,13 +825,13 @@ EOT
 ;
   }
 
-#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@   The main program.   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#@@@@@@@@@@@@@@@@@@@@@@@@@@@@                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   The main program.   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 $PROGRAM = basename($0);
 
@@ -687,14 +880,7 @@ read_pic16devices_txt($file);
 
 foreach (@device_names)
   {
-  my $dev = $devices_by_name{$_};
-
-  @{$dev->{CONFIG}->{WORDS}} = sort {$a->{ADDRESS} <=> $b->{ADDRESS}} @{$dev->{CONFIG}->{WORDS}};
-
-  if (defined($dev->{ID}) && defined($dev->{ID}->{WORDS}))
-    {
-    @{$dev->{ID}->{WORDS}} = sort {$a->{ADDRESS} <=> $b->{ADDRESS}} @{$dev->{ID}->{WORDS}};
-    }
+  make_hashes($devices_by_name{$_});
   }
 
 print join("\n", @devices_header) . "\n";

@@ -182,7 +182,7 @@ void
 testTortureExecute (void)
 {
 #ifndef __SDCC_pic16
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5)) && !defined (__SDCC_stm8) // Disabled on stm8 due to bug #2285
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
   g_this.m_relPositioned = false;
   g_this.m_positioned = false;
   g_this.m_floating = false;

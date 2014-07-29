@@ -6659,6 +6659,7 @@ genCast (const iCode *ic)
     }
   else if (IS_BOOL (operandType (result)))
     {
+      bool a_need_clear = FALSE;
       bool pushed_a = FALSE;
       size = right->aop->size;
 
@@ -6698,15 +6699,19 @@ genCast (const iCode *ic)
             {
               emit3 (A_CLR, ASMOP_A, 0);
               emit3_o(offset ? A_SBC : A_SUB, ASMOP_A, 0, right->aop, offset);
+              a_need_clear = TRUE;
             }
           else
             {
               emit3 (A_CLR, ASMOP_A, 0);
               emitcode (offset ? "sbc" : "sub", "a, (%d, sp)", right_offset);
+              a_need_clear = TRUE;
               if (!aopInReg (right->aop, offset, A_IDX))
                 pop (right_stacked, 0, 2);
             }
         }
+      if (a_need_clear)
+        emit3 (A_CLR, ASMOP_A, 0);
       emit3 (A_RLC, ASMOP_A, 0);
       cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
 

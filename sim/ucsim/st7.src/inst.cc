@@ -322,7 +322,7 @@ int
 cl_st7::inst_clr(t_mem code, unsigned char prefix)
 {
   int operand;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -393,7 +393,7 @@ int
 cl_st7::inst_cpl(t_mem code, unsigned char prefix)
 {
   int operand;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -429,7 +429,7 @@ int
 cl_st7::inst_dec(t_mem code, unsigned char prefix)
 {
   int operand;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -464,7 +464,7 @@ int
 cl_st7::inst_inc(t_mem code, unsigned char prefix)
 {
   int operand;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -628,7 +628,7 @@ int
 cl_st7::inst_neg(t_mem code, unsigned char prefix)
 {
   int operand;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -688,7 +688,7 @@ int
 cl_st7::inst_rlc(t_mem code, unsigned char prefix)
 {
   int operand;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -732,7 +732,7 @@ int
 cl_st7::inst_rrc(t_mem code, unsigned char prefix)
 {
   int operand, opres;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -798,7 +798,7 @@ int
 cl_st7::inst_sll(t_mem code, unsigned char prefix)
 {
   int operand, opres;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -838,7 +838,7 @@ int
 cl_st7::inst_sra(t_mem code, unsigned char prefix)
 {
   int operand, opres;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -882,7 +882,7 @@ int
 cl_st7::inst_srl(t_mem code, unsigned char prefix)
 {
   int operand, opres;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -940,7 +940,7 @@ int
 cl_st7::inst_swap(t_mem code, unsigned char prefix)
 {
   int operand, opres;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;
@@ -981,7 +981,7 @@ int
 cl_st7::inst_tnz(t_mem code, unsigned char prefix)
 {
   int operand;
-  unsigned int opaddr;// = 0xffff;
+  unsigned int opaddr = 0xffff;
 
    if ((code&0xf0)==0x40) {
       operand = regs.A;

@@ -1,4 +1,12 @@
+2014-07-30 Ben Shi <powerstudio1st AT 163.com>
+	* sim/ucsim/st7.src/inst.cc:
+	  Eliminate warnings.
+	* support/regression/tests/gcc-torture-execute-930628-1.c:
+	  Enable this case for the stm8 port.
+
 2014-07-29 Ben Shi <powerstudio1st AT 163.com>
+	* support/regression/tests/gcc-torture-execute-20030714-1.c:
+	  Enable this case for the stm8 port.
 	* src/stm8/gen.c:
 	  Fix bug #2285: an error in genCast().
 

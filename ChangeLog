@@ -1,3 +1,7 @@
+2014-08-06 Ben Shi <powerstudio1st AT 163.com>
+	* sdas/linksrc/lkaomf51.c:
+	  Add array bound check to avoid crash.
+
 2014-07-30 Ben Shi <powerstudio1st AT 163.com>
 	* sim/ucsim/st7.src/inst.cc:
 	  Eliminate warnings.

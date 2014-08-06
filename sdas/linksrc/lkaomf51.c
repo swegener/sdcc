@@ -295,7 +295,8 @@ void ParseRegisters(_symbol * symbol, const char * Registers)
           return;
         }
     }
-  symbol->Address = address[0] + procedure[symbol->Procedure].RegBank * 8;
+  if (0 <= symbol->Procedure && symbol->Procedure < numproc)
+    symbol->Address = address[0] + procedure[symbol->Procedure].RegBank * 8;
 }
 
 void OutputAOEMF51(void)

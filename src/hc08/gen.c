@@ -76,6 +76,7 @@ static bool operandsEqu (operand * op1, operand * op2);
 static void loadRegFromConst (reg_info * reg, int c);
 static asmop *newAsmop (short type);
 static char *aopAdrStr (asmop * aop, int loffset, bool bit16);
+static void updateiTempRegisterUse (operand * op);
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
                          IC_RESULT(x)->aop->type == AOP_STK )
@@ -3550,15 +3551,36 @@ pushSide (operand *oper, int size, iCode *ic)
   hc08_useReg (hc08_reg_x);
   aopOp (oper, ic, FALSE);
 
-  while (size--)
+  if (AOP_TYPE (oper) == AOP_REG)
     {
-      if (AOP_TYPE (oper) == AOP_REG)
-        pushReg (AOP (oper)->aopu.aop_reg[offset++], TRUE);
-      else
+      /* The operand is in registers; we can push them directly */
+      while (size--)
+        {
+          pushReg (AOP (oper)->aopu.aop_reg[offset++], TRUE);
+        }
+    }
+  else if (hc08_reg_a->isFree)
+    {
+      /* A is free, so piecewise load operand into a and push A */
+      while (size--)
         {
           loadRegFromAop (hc08_reg_a, AOP (oper), offset++);
           pushReg (hc08_reg_a, TRUE);
         }
+    }
+  else
+    {
+      /* A is not free. Adjust stack, preserve A, copy operand */
+      /* into position on stack (using A), and restore original A */
+      adjustStack (-size);
+      pushReg (hc08_reg_a, TRUE);
+      while (size--)
+        {
+          loadRegFromAop (hc08_reg_a, AOP (oper), offset++);
+          emitcode ("sta", "%d,s", 2+size);
+          regalloc_dry_run_cost += 3;
+        }
+      pullReg (hc08_reg_a);
     }
 
   freeAsmop (oper, NULL, ic, TRUE);
@@ -3750,7 +3772,7 @@ genSend (set *sendSet)
       aopOp (IC_LEFT (send2), send2, FALSE);
       if (IS_AOP_X (AOP (IC_LEFT (send1))) && IS_AOP_A (AOP (IC_LEFT (send2))))
         {
-          /* If the parameters' register assignment is eactly backwards */
+          /* If the parameters' register assignment is exactly backwards */
           /* from what is needed, then swap the registers. */
           pushReg (hc08_reg_a, FALSE);
           transferRegReg (hc08_reg_x, hc08_reg_a, FALSE);
@@ -3856,32 +3878,39 @@ static void
 genPcall (iCode * ic)
 {
   sym_link *dtype;
+  sym_link *etype;
   symbol *rlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-//  bool restoreBank=FALSE;
-//  bool swapBanks = FALSE;
+  iCode * sendic;
 
   D (emitcode (";", "genPcall"));
 
   dtype = operandType (IC_LEFT (ic))->next;
+  etype = getSpec (dtype);
   /* if caller saves & we have not saved then */
   if (!ic->regsSaved)
     saveRegisters (ic);
 
-  /* if we are calling a not _naked function that is not using
-     the same register bank then we need to save the
-     destination registers on the stack */
+  /* Go through the send set and mark any registers used by iTemps as */
+  /* in use so we don't clobber them while setting up the return address */
+  for (sendic = setFirstItem (_G.sendSet); sendic; sendic = setNextItem (_G.sendSet))
+    {
+      updateiTempRegisterUse (IC_LEFT (sendic));
+    }
+  
+  if (!IS_LITERAL (etype))
+    {
+      /* push the return address on to the stack */
+      emitBranch ("bsr", tlbl);
+      emitBranch ("bra", rlbl);
+      if (!regalloc_dry_run)
+        emitLabel (tlbl);
+      _G.stackPushes += 2;          /* account for the bsr return address now on stack */
+      updateCFA ();
 
-  /* push the return address on to the stack */
-  emitBranch ("bsr", tlbl);
-  emitBranch ("bra", rlbl);
-  if (!regalloc_dry_run)
-    emitLabel (tlbl);
-  _G.stackPushes += 2;          /* account for the bsr return address now on stack */
-  updateCFA ();
-
-  /* now push the function address */
-  pushSide (IC_LEFT (ic), FPTRSIZE, ic);
+      /* now push the function address */
+      pushSide (IC_LEFT (ic), FPTRSIZE, ic);
+    }
 
   /* if send set is not empty then assign */
   if (_G.sendSet && !regalloc_dry_run)
@@ -3891,13 +3920,21 @@ genPcall (iCode * ic)
     }
 
   /* make the call */
-  emitcode ("rts", "");
-  regalloc_dry_run_cost++;
+  if (!IS_LITERAL (etype))
+    {
+      emitcode ("rts", "");
+      regalloc_dry_run_cost++;
 
-  if (!regalloc_dry_run)
-    emitLabel (rlbl);
-  _G.stackPushes -= 4;          /* account for rts here & in called function */
-  updateCFA ();
+      if (!regalloc_dry_run)
+        emitLabel (rlbl);
+      _G.stackPushes -= 4;          /* account for rts here & in called function */
+      updateCFA ();
+    }
+  else
+    {
+      emitcode ("jsr", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+      regalloc_dry_run_cost += 3;
+    }
 
   hc08_dirtyReg (hc08_reg_a, FALSE);
   hc08_dirtyReg (hc08_reg_hx, FALSE);

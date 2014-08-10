@@ -1,3 +1,9 @@
+2014-08-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (pushSide, genPcall): fixed bug with pointer
+	  function call overwriting register parameter with function
+	  address. Optimized constant function pointer case.
+
 2014-08-06 Ben Shi <powerstudio1st AT 163.com>
 	* sdas/linksrc/lkaomf51.c:
 	  Add array bound check to avoid crash.

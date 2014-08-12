@@ -10,7 +10,7 @@
 
 static char m = 2;
 
-void *two__init (void)
+void two__init (void)
 {
     if(m)
         return;

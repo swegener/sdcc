@@ -1,3 +1,9 @@
+2014-08-12 Ben Shi <powerstudio1st AT 163.com>
+        * sdcc/support/regression/tests/bug-2205.c:
+        * sdcc/support/regression/tests/bug-971834.c:
+        * sdcc/support/regression/tests/key.c:
+          Make Small changes to fit LLVM/CLANG for host test.
+
 2014-08-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (pushSide, genPcall): fixed bug with pointer

@@ -63,7 +63,7 @@ transform       = @program_transform_name@
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: sdcc-ld8051 sdcc-ldz80 sdcc-ldgb sdcc-ld6808
+all: sdcc-ld8051 sdcc-ldz80 sdcc-ldgb sdcc-ld6808 sdcc-ldstm8
 
 sdcc-ld8051: checkconf $(ASLINK)
 
@@ -73,7 +73,9 @@ sdcc-ldgb: checkconf $(top_builddir)/bin/sdldgb$(EXEEXT)
 
 sdcc-ld6808: checkconf $(top_builddir)/bin/sdld6808$(EXEEXT)
 
-$(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT): $(ASLINK)
+sdcc-ldstm8: checkconf $(top_builddir)/bin/sdldstm8$(EXEEXT)
+
+$(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdldstm8$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT): $(ASLINK)
 	cp -p $(ASLINK) $@
 
 $(ASLINK): $(LKOBJECTS)
@@ -82,7 +84,7 @@ $(ASLINK): $(LKOBJECTS)
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	for ld in $(ASLINK) $(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT); \
+	for ld in $(ASLINK) $(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldstm8$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT); \
 	do \
 	  $(INSTALL) $$ld `echo $(DESTDIR)$(bindir)/\`basename $$ld\` | sed '$(transform)'`; \
 	  $(STRIP) `echo $(DESTDIR)$(bindir)/\`basename $$ld\` | sed '$(transform)'`; \
@@ -91,7 +93,7 @@ install: all installdirs
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	for ld in $(ASLINK) $(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT); \
+	for ld in $(ASLINK) $(top_builddir)/bin/sdldz80$(EXEEXT) $(top_builddir)/bin/sdldgb$(EXEEXT) $(top_builddir)/bin/sdldstm8$(EXEEXT) $(top_builddir)/bin/sdld6808$(EXEEXT); \
 	do \
 	  rm -f $(DESTDIR)$(bindir)/`basename $$ld`; \
 	done

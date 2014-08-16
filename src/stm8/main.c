@@ -177,7 +177,7 @@ hasExtBitOp (int op, int size)
 */
 static const char *_linkCmd[] =
 {
-  "sdld", "-nf", "\"$1\"", NULL
+  "sdldstm8", "-nf", "\"$1\"", NULL
 };
 
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */

@@ -1,8 +1,13 @@
+2014-08-17 Ben Shi <powerstudio1st AT 163.com>
+	* support/regression/setjmp.c:
+	  Disabled for the stm8 port.
+
 2014-08-16 Ben Shi <powerstudio1st AT 163.com>
 	* all.vcxproj:
 	* support/scripts/sdcc.nsi:
 	  Create a new sdldstm8 on Windows.
 	* sdas/linksrc/Makefile.in:
+	* Makefile.in:
 	  Create a spereated sdldstm8 on Unix like.
 	* src/stm8/main.c:
 	* sdas/linksrc/sdld.c:

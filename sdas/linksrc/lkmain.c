@@ -111,7 +111,7 @@ void Areas51 (void)
                 else if (!strcmp(ap->a_id, "REG_BANK_2")) { ap->a_addr = 0x10; ap->a_bset = 1; }
                 else if (!strcmp(ap->a_id, "REG_BANK_3")) { ap->a_addr = 0x18; ap->a_bset = 1; }
                 else if (!strcmp(ap->a_id, "BSEG_BYTES")) { ap->a_addr = 0x20; ap->a_bset = 1; }
-                else if (TARGET_IS_8051 && !strcmp(ap->a_id, "SSEG")) {
+                else if ((TARGET_IS_8051 || TARGET_IS_STM8) && !strcmp(ap->a_id, "SSEG")) {
                         if (stacksize) ap->a_axp->a_size = stacksize;
                 }
         }
@@ -336,7 +336,7 @@ main(int argc, char *argv[])
                 radix = 10;
 
                 /* sdld specific */
-                if (TARGET_IS_8051)
+                if (TARGET_IS_8051 || TARGET_IS_STM8)
                         Areas51(); /*JCF: Create the default 8051 areas in the right order*/
                 /* end sdld specific */
 
@@ -969,7 +969,7 @@ parse()
                                         break;
 
                                 case 'S':
-                                        if (TARGET_IS_8051) {
+                                        if (TARGET_IS_8051 || TARGET_IS_STM8) {
                                                 unget(getnb());
                                                 if (ip && *ip)
                                                 {
@@ -1096,7 +1096,7 @@ parse()
 
 #if SDCDB
                                 case 'Y':
-                                        if (TARGET_IS_8051) {
+                                        if (TARGET_IS_8051 || TARGET_IS_STM8) {
                                                 unget(getnb());
                                                 packflag=1;
                                                 break;

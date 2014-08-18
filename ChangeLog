@@ -1,3 +1,9 @@
+2014-08-18 Ben Shi <powerstudio1st AT 163.com>
+	* support/regression/setjmp.c:
+	  Enabled for the stm8 port.
+	* sdas/linksrc/lkmain.c:
+	  Avoid generating invalid instructions on MacOS.
+
 2014-08-17 Ben Shi <powerstudio1st AT 163.com>
 	* support/regression/setjmp.c:
 	  Disabled for the stm8 port.

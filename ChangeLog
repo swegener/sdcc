@@ -1,5 +1,11 @@
+2014-08-20 Ben Shi <powerstudio1st AT 163.com>
+	* device/lib/stm8/setjmp.s:
+	  Substitute _CODE to CODE to conform with stm8's code generator.
+	* sdas/linksrc/lkmain.c:
+	  Revert to reversion 9059.
+
 2014-08-18 Ben Shi <powerstudio1st AT 163.com>
-	* support/regression/setjmp.c:
+	* support/regression/tests/setjmp.c:
 	  Enabled for the stm8 port.
 	* sdas/linksrc/lkmain.c:
 	  Avoid generating invalid instructions on MacOS.

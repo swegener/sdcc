@@ -26,7 +26,7 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.area   _CODE
+	.area   CODE
 
 	.globl ___setjmp
 

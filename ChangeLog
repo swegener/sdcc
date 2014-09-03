@@ -1,3 +1,7 @@
+2014-09-03 Ben Shi <powerstudio1st AT 163.com>
+	* sdas/asstm8/stm8mch.c:
+	  Fix the wrong code of the bit index in BTJF / BTJF.
+
 2014-09-01 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/include/pic14/pic14devices.txt: Minor bugfix.
 

@@ -1724,7 +1724,7 @@ struct mne *mp;
 		}
 		outab(0x72);
 		//outrbm(&e2, R_BITS, op);
-                outab(op|v2);  /* TODO: maybe fix outrb vs. outrbm */
+		outab(op|(v2 << 1));  /* TODO: maybe fix outrb vs. outrbm */
 		outrw(&e1, R_USGN);
 		if (mchpcr(&e3)) {
 			v3 = (int) (e3.e_addr - dot.s_addr - 1);

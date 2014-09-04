@@ -1,3 +1,7 @@
+2014-09-04 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* support/scripts/cinc2h.pl,
+	  Updated unto the Perl 5.16 version.
+
 2014-09-03 Ben Shi <powerstudio1st AT 163.com>
 	* sdas/asstm8/stm8mch.c:
 	  Fix the wrong code of the bit index in BTJF / BTJF.

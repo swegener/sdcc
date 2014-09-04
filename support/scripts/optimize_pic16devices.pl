@@ -29,6 +29,7 @@
 
 use strict;
 use warnings;
+no if $] >= 5.018, warnings => "experimental::smartmatch";        # perl 5.16
 use 5.12.0;                     # when (regex)
 use POSIX 'ULONG_MAX';
 

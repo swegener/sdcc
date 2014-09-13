@@ -1,3 +1,7 @@
+2014-09-13 Ben Shi <powerstudio1st AT 163.com>
+	* src/stm8/main.c:
+	  Make libstm8.lib is implicitly linked rather than explicitly designated.
+
 2014-09-04 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* support/scripts/mcs51-disasm.pl,
 	  support/scripts/optimize_pic16devices.pl:

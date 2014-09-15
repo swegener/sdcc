@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:31 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:45 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -87,10 +87,6 @@ __at(0x0019) __sfr T1GCON;
 __at(0x0019) volatile __T1GCONbits_t T1GCONbits;
 
 __at(0x001A) __sfr T2TMR;
-
-__at(0x001A) __sfr TMR2;
-
-__at(0x001B) __sfr PR2;
 
 __at(0x001B) __sfr T2PR;
 
@@ -235,14 +231,8 @@ __at(0x0298) volatile __CCP2RLbits_t CCP2RLbits;
 
 __at(0x0298) __sfr CCPR2;
 
-__at(0x0298) __sfr CCPR2L;
-__at(0x0298) volatile __CCPR2Lbits_t CCPR2Lbits;
-
 __at(0x0299) __sfr CCP2RH;
 __at(0x0299) volatile __CCP2RHbits_t CCP2RHbits;
-
-__at(0x0299) __sfr CCPR2H;
-__at(0x0299) volatile __CCPR2Hbits_t CCPR2Hbits;
 
 __at(0x029A) __sfr CCP2CON;
 __at(0x029A) volatile __CCP2CONbits_t CCP2CONbits;
@@ -267,10 +257,6 @@ __at(0x0393) __sfr IOCAF;
 
 __at(0x0413) __sfr T4TMR;
 
-__at(0x0413) __sfr TMR4;
-
-__at(0x0414) __sfr PR4;
-
 __at(0x0414) __sfr T4PR;
 
 __at(0x0415) __sfr T4CON;
@@ -286,10 +272,6 @@ __at(0x0418) __sfr T4RST;
 __at(0x0418) volatile __T4RSTbits_t T4RSTbits;
 
 __at(0x041A) __sfr T6TMR;
-
-__at(0x041A) __sfr TMR6;
-
-__at(0x041B) __sfr PR6;
 
 __at(0x041B) __sfr T6PR;
 

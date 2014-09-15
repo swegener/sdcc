@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:30 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:44 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -315,9 +315,6 @@ __at(0x0615) volatile __PWM2DCHbits_t PWM2DCHbits;
 
 __at(0x0616) __sfr PWM2CON;
 __at(0x0616) volatile __PWM2CONbits_t PWM2CONbits;
-
-__at(0x0616) __sfr PWM2CON0;
-__at(0x0616) volatile __PWM2CON0bits_t PWM2CON0bits;
 
 __at(0x0691) __sfr CWG1DBR;
 __at(0x0691) volatile __CWG1DBRbits_t CWG1DBRbits;

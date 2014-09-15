@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:31 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:45 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -158,10 +158,8 @@
 #define PWM2TMRL_ADDR           0x0DA9
 #define PWM2TMRH_ADDR           0x0DAA
 #define PWM2CON_ADDR            0x0DAB
-#define PWM2INTCON_ADDR         0x0DAC
 #define PWM2INTE_ADDR           0x0DAC
 #define PWM2INTF_ADDR           0x0DAD
-#define PWM2INTFLG_ADDR         0x0DAD
 #define PWM2CLKCON_ADDR         0x0DAE
 #define PWM2LDCON_ADDR          0x0DAF
 #define PWM2OFCON_ADDR          0x0DB0
@@ -181,10 +179,8 @@
 #define PWM3TMRL_ADDR           0x0DB9
 #define PWM3TMRH_ADDR           0x0DBA
 #define PWM3CON_ADDR            0x0DBB
-#define PWM3INTCON_ADDR         0x0DBC
 #define PWM3INTE_ADDR           0x0DBC
 #define PWM3INTF_ADDR           0x0DBD
-#define PWM3INTFLG_ADDR         0x0DBD
 #define PWM3CLKCON_ADDR         0x0DBE
 #define PWM3LDCON_ADDR          0x0DBF
 #define PWM3OFCON_ADDR          0x0DC0
@@ -2821,14 +2817,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned PWM1PS             : 3;
+    unsigned PS                 : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned PS                 : 3;
+    unsigned PWM1PS             : 3;
     unsigned                    : 1;
     };
   } __PWM1CLKCONbits_t;
@@ -2953,14 +2949,14 @@ typedef union
   struct
     {
     unsigned                    : 5;
-    unsigned PWM1OFM            : 2;
+    unsigned OFM                : 2;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 5;
-    unsigned OFM                : 2;
+    unsigned PWM1OFM            : 2;
     unsigned                    : 1;
     };
   } __PWM1OFCONbits_t;
@@ -3330,14 +3326,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PWM2MODE           : 2;
+    unsigned MODE               : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned MODE               : 2;
+    unsigned PWM2MODE           : 2;
     unsigned                    : 4;
     };
   } __PWM2CONbits_t;
@@ -3356,52 +3352,6 @@ extern __at(0x0DAB) volatile __PWM2CONbits_t PWM2CONbits;
 #define _PWM2CON_PWM2OE         0x40
 #define _PWM2CON_EN             0x80
 #define _PWM2CON_PWM2EN         0x80
-
-//==============================================================================
-
-
-//==============================================================================
-//        PWM2INTCON Bits
-
-extern __at(0x0DAC) __sfr PWM2INTCON;
-
-typedef union
-  {
-  struct
-    {
-    unsigned PRIE               : 1;
-    unsigned DCIE               : 1;
-    unsigned PHIE               : 1;
-    unsigned OFIE               : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-
-  struct
-    {
-    unsigned PWM2PRIE           : 1;
-    unsigned PWM2DCIE           : 1;
-    unsigned PWM2PHIE           : 1;
-    unsigned PWM2OFIE           : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-  } __PWM2INTCONbits_t;
-
-extern __at(0x0DAC) volatile __PWM2INTCONbits_t PWM2INTCONbits;
-
-#define _PWM2INTCON_PRIE        0x01
-#define _PWM2INTCON_PWM2PRIE    0x01
-#define _PWM2INTCON_DCIE        0x02
-#define _PWM2INTCON_PWM2DCIE    0x02
-#define _PWM2INTCON_PHIE        0x04
-#define _PWM2INTCON_PWM2PHIE    0x04
-#define _PWM2INTCON_OFIE        0x08
-#define _PWM2INTCON_PWM2OFIE    0x08
 
 //==============================================================================
 
@@ -3499,52 +3449,6 @@ extern __at(0x0DAD) volatile __PWM2INTFbits_t PWM2INTFbits;
 
 
 //==============================================================================
-//        PWM2INTFLG Bits
-
-extern __at(0x0DAD) __sfr PWM2INTFLG;
-
-typedef union
-  {
-  struct
-    {
-    unsigned PRIF               : 1;
-    unsigned DCIF               : 1;
-    unsigned PHIF               : 1;
-    unsigned OFIF               : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-
-  struct
-    {
-    unsigned PWM2PRIF           : 1;
-    unsigned PWM2DCIF           : 1;
-    unsigned PWM2PHIF           : 1;
-    unsigned PWM2OFIF           : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-  } __PWM2INTFLGbits_t;
-
-extern __at(0x0DAD) volatile __PWM2INTFLGbits_t PWM2INTFLGbits;
-
-#define _PWM2INTFLG_PRIF        0x01
-#define _PWM2INTFLG_PWM2PRIF    0x01
-#define _PWM2INTFLG_DCIF        0x02
-#define _PWM2INTFLG_PWM2DCIF    0x02
-#define _PWM2INTFLG_PHIF        0x04
-#define _PWM2INTFLG_PWM2PHIF    0x04
-#define _PWM2INTFLG_OFIF        0x08
-#define _PWM2INTFLG_PWM2OFIF    0x08
-
-//==============================================================================
-
-
-//==============================================================================
 //        PWM2CLKCON Bits
 
 extern __at(0x0DAE) __sfr PWM2CLKCON;
@@ -3590,14 +3494,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned PWM2PS             : 3;
+    unsigned PS                 : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned PS                 : 3;
+    unsigned PWM2PS             : 3;
     unsigned                    : 1;
     };
   } __PWM2CLKCONbits_t;
@@ -3651,13 +3555,13 @@ typedef union
 
   struct
     {
-    unsigned LDS                : 2;
+    unsigned PWM2LDS            : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned PWM2LDS            : 2;
+    unsigned LDS                : 2;
     unsigned                    : 6;
     };
   } __PWM2LDCONbits_t;
@@ -3709,13 +3613,13 @@ typedef union
 
   struct
     {
-    unsigned PWM2OFS            : 2;
+    unsigned OFS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned OFS                : 2;
+    unsigned PWM2OFS            : 2;
     unsigned                    : 6;
     };
 
@@ -4130,52 +4034,6 @@ extern __at(0x0DBB) volatile __PWM3CONbits_t PWM3CONbits;
 
 
 //==============================================================================
-//        PWM3INTCON Bits
-
-extern __at(0x0DBC) __sfr PWM3INTCON;
-
-typedef union
-  {
-  struct
-    {
-    unsigned PRIE               : 1;
-    unsigned DCIE               : 1;
-    unsigned PHIE               : 1;
-    unsigned OFIE               : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-
-  struct
-    {
-    unsigned PWM3PRIE           : 1;
-    unsigned PWM3DCIE           : 1;
-    unsigned PWM3PHIE           : 1;
-    unsigned PWM3OFIE           : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-  } __PWM3INTCONbits_t;
-
-extern __at(0x0DBC) volatile __PWM3INTCONbits_t PWM3INTCONbits;
-
-#define _PWM3INTCON_PRIE        0x01
-#define _PWM3INTCON_PWM3PRIE    0x01
-#define _PWM3INTCON_DCIE        0x02
-#define _PWM3INTCON_PWM3DCIE    0x02
-#define _PWM3INTCON_PHIE        0x04
-#define _PWM3INTCON_PWM3PHIE    0x04
-#define _PWM3INTCON_OFIE        0x08
-#define _PWM3INTCON_PWM3OFIE    0x08
-
-//==============================================================================
-
-
-//==============================================================================
 //        PWM3INTE Bits
 
 extern __at(0x0DBC) __sfr PWM3INTE;
@@ -4263,52 +4121,6 @@ extern __at(0x0DBD) volatile __PWM3INTFbits_t PWM3INTFbits;
 #define _PWM3INTF_PWM3PHIF      0x04
 #define _PWM3INTF_OFIF          0x08
 #define _PWM3INTF_PWM3OFIF      0x08
-
-//==============================================================================
-
-
-//==============================================================================
-//        PWM3INTFLG Bits
-
-extern __at(0x0DBD) __sfr PWM3INTFLG;
-
-typedef union
-  {
-  struct
-    {
-    unsigned PRIF               : 1;
-    unsigned DCIF               : 1;
-    unsigned PHIF               : 1;
-    unsigned OFIF               : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-
-  struct
-    {
-    unsigned PWM3PRIF           : 1;
-    unsigned PWM3DCIF           : 1;
-    unsigned PWM3PHIF           : 1;
-    unsigned PWM3OFIF           : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    unsigned                    : 1;
-    };
-  } __PWM3INTFLGbits_t;
-
-extern __at(0x0DBD) volatile __PWM3INTFLGbits_t PWM3INTFLGbits;
-
-#define _PWM3INTFLG_PRIF        0x01
-#define _PWM3INTFLG_PWM3PRIF    0x01
-#define _PWM3INTFLG_DCIF        0x02
-#define _PWM3INTFLG_PWM3DCIF    0x02
-#define _PWM3INTFLG_PHIF        0x04
-#define _PWM3INTFLG_PWM3PHIF    0x04
-#define _PWM3INTFLG_OFIF        0x08
-#define _PWM3INTFLG_PWM3OFIF    0x08
 
 //==============================================================================
 
@@ -4420,13 +4232,13 @@ typedef union
 
   struct
     {
-    unsigned LDS                : 2;
+    unsigned PWM3LDS            : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned PWM3LDS            : 2;
+    unsigned LDS                : 2;
     unsigned                    : 6;
     };
   } __PWM3LDCONbits_t;

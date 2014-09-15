@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:26 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:40 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -73,6 +73,7 @@
 #define DAC1REFL_ADDR           0x0092
 #define DAC1REFH_ADDR           0x0093
 #define OPA1CON_ADDR            0x0096
+#define OPA1CON0_ADDR           0x0096
 #define C2CON0_ADDR             0x009B
 #define CM2CON0_ADDR            0x009B
 #define C2CON1_ADDR             0x009C
@@ -1061,6 +1062,51 @@ extern __at(0x0096) volatile __OPA1CONbits_t OPA1CONbits;
 #define _OPA1NCH1               0x08
 #define _OPAUGM                 0x10
 #define _OPAEN                  0x80
+
+//==============================================================================
+
+
+//==============================================================================
+//        OPA1CON0 Bits
+
+extern __at(0x0096) __sfr OPA1CON0;
+
+typedef union
+  {
+  struct
+    {
+    unsigned OPA1PCH0           : 1;
+    unsigned OPA1PCH1           : 1;
+    unsigned OPA1NCH0           : 1;
+    unsigned OPA1NCH1           : 1;
+    unsigned OPAUGM             : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned OPAEN              : 1;
+    };
+
+  struct
+    {
+    unsigned OPA1PCH            : 2;
+    unsigned                    : 6;
+    };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned OPA1NCH            : 2;
+    unsigned                    : 4;
+    };
+  } __OPA1CON0bits_t;
+
+extern __at(0x0096) volatile __OPA1CON0bits_t OPA1CON0bits;
+
+#define _OPA1CON0_OPA1PCH0      0x01
+#define _OPA1CON0_OPA1PCH1      0x02
+#define _OPA1CON0_OPA1NCH0      0x04
+#define _OPA1CON0_OPA1NCH1      0x08
+#define _OPA1CON0_OPAUGM        0x10
+#define _OPA1CON0_OPAEN         0x80
 
 //==============================================================================
 

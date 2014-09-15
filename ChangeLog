@@ -1,3 +1,8 @@
+2014-09-15 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/non-free/include/pic14/*.inc,
+	  device/non-free/lib/pic14/libdev/*.c:
+	  updated
+
 2014-09-13 Ben Shi <powerstudio1st AT 163.com>
 	* src/stm8/main.c:
 	  Make libstm8.lib is implicitly linked rather than explicitly designated.

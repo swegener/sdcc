@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:30 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:44 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -142,7 +142,6 @@
 #define PWM2DCL_ADDR            0x0614
 #define PWM2DCH_ADDR            0x0615
 #define PWM2CON_ADDR            0x0616
-#define PWM2CON0_ADDR           0x0616
 #define CWG1DBR_ADDR            0x0691
 #define CWG1DBF_ADDR            0x0692
 #define CWG1CON0_ADDR           0x0693
@@ -2632,33 +2631,6 @@ extern __at(0x0616) volatile __PWM2CONbits_t PWM2CONbits;
 
 
 //==============================================================================
-//        PWM2CON0 Bits
-
-extern __at(0x0616) __sfr PWM2CON0;
-
-typedef struct
-  {
-  unsigned                      : 1;
-  unsigned                      : 1;
-  unsigned                      : 1;
-  unsigned                      : 1;
-  unsigned PWM2POL              : 1;
-  unsigned PWM2OUT              : 1;
-  unsigned PWM2OE               : 1;
-  unsigned PWM2EN               : 1;
-  } __PWM2CON0bits_t;
-
-extern __at(0x0616) volatile __PWM2CON0bits_t PWM2CON0bits;
-
-#define _PWM2CON0_PWM2POL       0x10
-#define _PWM2CON0_PWM2OUT       0x20
-#define _PWM2CON0_PWM2OE        0x40
-#define _PWM2CON0_PWM2EN        0x80
-
-//==============================================================================
-
-
-//==============================================================================
 //        CWG1DBR Bits
 
 extern __at(0x0691) __sfr CWG1DBR;
@@ -3753,6 +3725,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define _BORV_LO                0xFFFF  // Brown-out Reset Voltage (Vbor), low trip point selected.
 #define _LPBOR_ON               0xF7FF  // Low-Power BOR is enabled.
 #define _LPBOR_OFF              0xFFFF  // Low-Power BOR is disabled.
+#define _DEBUG_ON               0x2FFF  // In-Circuit Debugger enabled, ICSPCLK and ICSPDAT are dedicated to the debugger.
+#define _DEBUG_OFF              0x3FFF  // In-Circuit Debugger disabled, ICSPCLK and ICSPDAT are general purpose I/O pins.
 #define _LVP_OFF                0xDFFF  // High-voltage on MCLR/VPP must be used for programming.
 #define _LVP_ON                 0xFFFF  // Low-voltage programming enabled.
 

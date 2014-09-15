@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-12 07:13:25 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:42 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -106,6 +106,13 @@ typedef union
     unsigned LINRX              : 1;
     unsigned LINTX              : 1;
     };
+
+  struct
+    {
+    unsigned                    : 5;
+    unsigned RP                 : 2;
+    unsigned                    : 1;
+    };
   } __STATUSbits_t;
 
 extern __at(0x0003) volatile __STATUSbits_t STATUSbits;
@@ -130,16 +137,25 @@ extern __at(0x0004) __sfr FSR;
 
 extern __at(0x0005) __sfr GPIO;
 
-typedef struct
+typedef union
   {
-  unsigned GP0                  : 1;
-  unsigned GP1                  : 1;
-  unsigned GP2                  : 1;
-  unsigned GP3                  : 1;
-  unsigned GP4                  : 1;
-  unsigned GP5                  : 1;
-  unsigned LINRX                : 1;
-  unsigned LINTX                : 1;
+  struct
+    {
+    unsigned GP0                : 1;
+    unsigned GP1                : 1;
+    unsigned GP2                : 1;
+    unsigned GP3                : 1;
+    unsigned GP4                : 1;
+    unsigned GP5                : 1;
+    unsigned LINRX              : 1;
+    unsigned LINTX              : 1;
+    };
+
+  struct
+    {
+    unsigned GP                 : 6;
+    unsigned                    : 2;
+    };
   } __GPIObits_t;
 
 extern __at(0x0005) volatile __GPIObits_t GPIObits;
@@ -284,6 +300,19 @@ typedef union
     unsigned                    : 1;
     unsigned                    : 1;
     };
+
+  struct
+    {
+    unsigned                    : 3;
+    unsigned CHS                : 2;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
+    unsigned                    : 6;
+    unsigned ADCS               : 2;
+    };
   } __ADCON0bits_t;
 
 extern __at(0x001F) volatile __ADCON0bits_t ADCON0bits;
@@ -306,16 +335,25 @@ extern __at(0x001F) volatile __ADCON0bits_t ADCON0bits;
 
 extern __at(0x0081) __sfr OPTION_REG;
 
-typedef struct
+typedef union
   {
-  unsigned PS0                  : 1;
-  unsigned PS1                  : 1;
-  unsigned PS2                  : 1;
-  unsigned PSA                  : 1;
-  unsigned T0SE                 : 1;
-  unsigned T0CS                 : 1;
-  unsigned INTEDG               : 1;
-  unsigned NOT_GPPU             : 1;
+  struct
+    {
+    unsigned PS0                : 1;
+    unsigned PS1                : 1;
+    unsigned PS2                : 1;
+    unsigned PSA                : 1;
+    unsigned T0SE               : 1;
+    unsigned T0CS               : 1;
+    unsigned INTEDG             : 1;
+    unsigned NOT_GPPU           : 1;
+    };
+
+  struct
+    {
+    unsigned PS                 : 3;
+    unsigned                    : 5;
+    };
   } __OPTION_REGbits_t;
 
 extern __at(0x0081) volatile __OPTION_REGbits_t OPTION_REGbits;
@@ -337,16 +375,25 @@ extern __at(0x0081) volatile __OPTION_REGbits_t OPTION_REGbits;
 
 extern __at(0x0085) __sfr TRISIO;
 
-typedef struct
+typedef union
   {
-  unsigned TRIS0                : 1;
-  unsigned TRIS1                : 1;
-  unsigned TRIS2                : 1;
-  unsigned TRIS3                : 1;
-  unsigned TRIS4                : 1;
-  unsigned TRIS5                : 1;
-  unsigned                      : 1;
-  unsigned                      : 1;
+  struct
+    {
+    unsigned TRIS0              : 1;
+    unsigned TRIS1              : 1;
+    unsigned TRIS2              : 1;
+    unsigned TRIS3              : 1;
+    unsigned TRIS4              : 1;
+    unsigned TRIS5              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned TRIS               : 6;
+    unsigned                    : 2;
+    };
   } __TRISIObits_t;
 
 extern __at(0x0085) volatile __TRISIObits_t TRISIObits;
@@ -414,16 +461,25 @@ extern __at(0x008E) volatile __PCONbits_t PCONbits;
 
 extern __at(0x008F) __sfr OSCCAL;
 
-typedef struct
+typedef union
   {
-  unsigned                      : 1;
-  unsigned                      : 1;
-  unsigned CALSLW               : 1;
-  unsigned CALFST               : 1;
-  unsigned CAL0                 : 1;
-  unsigned CAL1                 : 1;
-  unsigned CAL2                 : 1;
-  unsigned CAL3                 : 1;
+  struct
+    {
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned CALSLW             : 1;
+    unsigned CALFST             : 1;
+    unsigned CAL0               : 1;
+    unsigned CAL1               : 1;
+    unsigned CAL2               : 1;
+    unsigned CAL3               : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned CAL                : 4;
+    };
   } __OSCCALbits_t;
 
 extern __at(0x008F) volatile __OSCCALbits_t OSCCALbits;
@@ -443,16 +499,25 @@ extern __at(0x008F) volatile __OSCCALbits_t OSCCALbits;
 
 extern __at(0x009F) __sfr ADCON1;
 
-typedef struct
+typedef union
   {
-  unsigned PCFG0                : 1;
-  unsigned PCFG1                : 1;
-  unsigned PCFG2                : 1;
-  unsigned                      : 1;
-  unsigned                      : 1;
-  unsigned                      : 1;
-  unsigned                      : 1;
-  unsigned                      : 1;
+  struct
+    {
+    unsigned PCFG0              : 1;
+    unsigned PCFG1              : 1;
+    unsigned PCFG2              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned PCFG               : 3;
+    unsigned                    : 5;
+    };
   } __ADCON1bits_t;
 
 extern __at(0x009F) volatile __ADCON1bits_t ADCON1bits;

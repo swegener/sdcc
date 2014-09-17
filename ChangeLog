@@ -1,3 +1,8 @@
+2014-09-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* support/scripts/pic14-header-parser.pl,
+	  support/scripts/pic16-header-parser.pl:
+	  updated
+
 2014-09-15 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/non-free/include/pic14/*.inc,
 	  device/non-free/lib/pic14/libdev/*.c:

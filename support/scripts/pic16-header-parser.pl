@@ -4,6 +4,8 @@
 
   Copyright (C) 2012-2014, Molnar Karoly <molnarkaroly@users.sf.net>
 
+    This file is part of SDCC.
+
     This software is provided 'as-is', without any express or implied
     warranty.  In no event will the authors be held liable for any damages
     arising from the use of this software.
@@ -26,25 +28,26 @@
 
     Proposal for use: ./pic16-header-parser.pl -gp
 
-    The program creates six files in the actual directory:
+    This program creates seven files in the current directory:
 
-        adc.tables
-        ccp.tables
-        pwm.tables
-        i2c.tables
-        spi.tables
-        usart.tables
+        adc.h.gen
+        ccp.h.gen
+        pwm.h.gen
+        i2c.h.gen
+        spi.h.gen
+        usart.h.gen
+        peripheral.groups
 
     In these the MCUs can be seen in groups, according to a periphery.
     These informations helps to realize the handling of periphery.
     Of course necessary to study the data sheets as well.
 
-  $Id$
+    $Id$
 =cut
 
-use Data::Dumper;
 use strict;
 use warnings;
+no if $] >= 5.018, warnings => "experimental::smartmatch";        # perl 5.16
 use 5.10.1;
 use feature 'switch';           # Starting from 5.10.1.
 use POSIX 'ULONG_MAX';
@@ -69,7 +72,8 @@ my $default_port = 'pic16';
 my $header_name_filter = 'pic18f\d+[a-z]*\d+\.h';
 
 my $include_path;
-my $out_tail = 'tables';
+my $out_tail = '.gen';
+my $peri_group = 'peripheral.groups';
 my $table_border = (' ' x 19) . '+' . ('---------+' x 8);
 
 my %reg_addresses = ();
@@ -167,19 +171,19 @@ my %io_dir_table_by_mcu = ();
                      },                                |   .
         REG_ARRAY => [      The array of registers.    |   .
                        {                A register. <--+
-		       NAME     => 'PIR1',  The name of register.
-		       ADDRESS  => 0,       The address of register.
-		       BITNAMES => [        The bits of register.
-		                     [],      The names of bit.
-		                     [],
-		                     [],
-		                     [],
-		                     [],
-		                     [],
-        	                     [],
-		                     []
-		                   ]
-		       },
+                       NAME     => 'PIR1',  The name of register.
+                       ADDRESS  => 0,       The address of register.
+                       BITNAMES => [        The bits of register.
+                                     [],      The names of bit.
+                                     [],
+                                     [],
+                                     [],
+                                     [],
+                                     [],
+                                     [],
+                                     []
+                                   ]
+                       },
 
                        ...
 
@@ -212,28 +216,28 @@ my @mcu_raw = ();
                         PRINT_MODE => 0,     The mode of print.            |
                         REG_ARRAY  => [      The array of registers.       |
                                         {                A register. <-----+
-		                        NAME     => 'PIR1',  The name of register.
-		                        ADDRESS  => 0,       The address of register.
-		                        GROUP    => undef,   Back reference of REG_GROUPS.
-		                        TOUCHED  => 0,       Touched register during the search.
-		                        EMPTY    => 0,       True if the register became empty after the filtering.
-		                        BITNAMES => [        The bits of register.
-		                                      [],      The names of bit.
-		                                      [],
-		                                      [],
-		                                      [],
-		                                      [],
-		                                      [],
-        		                              [],
-		                                      []
-		                                    ]
-		                        },
+                                        NAME     => 'PIR1',  The name of register.
+                                        ADDRESS  => 0,       The address of register.
+                                        GROUP    => undef,   Back reference of REG_GROUPS.
+                                        TOUCHED  => 0,       Touched register during the search.
+                                        EMPTY    => 0,       True if the register became empty after the filtering.
+                                        BITNAMES => [        The bits of register.
+                                                      [],      The names of bit.
+                                                      [],
+                                                      [],
+                                                      [],
+                                                      [],
+                                                      [],
+                                                      [],
+                                                      []
+                                                    ]
+                                        },
 
                                         ...
 
                                         {
-		                        }
-		                      ]
+                                        }
+                                      ]
                         },
 
                         ...
@@ -258,6 +262,8 @@ my $make_groups;
 my $only_prime;
 my $out_handler;
 my $initial_border;
+
+my $peri_groups = '';
 
 ################################################################################
 ################################################################################
@@ -316,7 +322,7 @@ sub smartCompare($$)
 
   if (${$Str1} =~ /^\d/o && ${$Str2} =~ /^\d/o)
     {
-	# $Str1 number and $Str2 number
+        # $Str1 number and $Str2 number
     return (int(${$Str1}) <=> int(${$Str2}));
     }
 
@@ -415,7 +421,7 @@ sub resolve_define($)
   my @array = ();
   my $r;
 
-  if (defined(@{$ig}))
+  if (defined($ig) && scalar(@{$ig}) > 0)
     {
     foreach (@{$ig})
       {
@@ -445,7 +451,7 @@ sub add_io_pins($$$)
     {
     if ($_ !~ /^(\w+):(\S+)$/o)
       {
-      print STDERR "The piece is wrong: \"$_\" (" . join(',', @{$Mcu_group}) . ")\n";
+      print STDERR "This piece is wrong: \"$_\" (" . join(',', @{$Mcu_group}) . ")\n";
       exit(1);
       }
 
@@ -505,7 +511,7 @@ sub add_io_dir($$$)
     {
     if ($_ !~ /^(\w+):([01])$/o)
       {
-      print STDERR "The piece is wrong: \"$_\" (" . join(',', @{$Mcu_group}) . ")\n";
+      print STDERR "This piece is wrong: \"$_\" (" . join(',', @{$Mcu_group}) . ")\n";
       exit(1);
       }
 
@@ -593,7 +599,7 @@ sub load_periphery_data()
       {
       $block = $1;
 
-      if (! @blocks || $blocks[$#blocks] ne $block)
+      if (scalar(@blocks) == 0 || $blocks[$#blocks] ne $block)
         {
         print STDERR "The \"$block\" block has no beginning!\n";
         exit(1);
@@ -611,7 +617,7 @@ sub load_periphery_data()
 
         #...................................
 
-    $block = (@blocks) ? $blocks[$#blocks] : '';
+    $block = (scalar(@blocks) > 0) ? $blocks[$#blocks] : '';
 
     given ($block)
       {
@@ -621,9 +627,9 @@ sub load_periphery_data()
           {
         # This a key -- value pair.
 
-          if (! scalar(@{$periphery}))
+          if (scalar(@{$periphery}) == 0)
             {
-            print STDERR "No entry of register table!\n";
+            print STDERR "No entry of the register table!\n";
             exit(1);
             }
 
@@ -719,7 +725,7 @@ sub load_periphery_data()
       } # given ($block)
     } # foreach (grep(! /^\s*$|^\s*#/o, <DATA>))
 
-  if (@blocks)
+  if (scalar(@blocks) > 0)
     {
     print STDERR "The \"$blocks[$#blocks]\" block has no ending!\n";
     exit(1);
@@ -736,8 +742,12 @@ sub load_periphery_data()
 
 sub add_mcu_raw($)
   {
+  my $Name = uc($_[0]);
+
+  Log("add_mcu_raw(): $Name", 9);
+
   my $mcu_ref = {
-                NAME      => uc($_[0]),
+                NAME      => $Name,
                 REG_REFS  => {},
                 REG_ARRAY => []
                 };
@@ -751,6 +761,8 @@ sub add_mcu_raw($)
 sub add_register_raw($$$)
   {
   my ($Mcu_raw, $Name, $Address) = @_;
+
+  Log(sprintf("add_register_raw(): $Name, 0x%04X", $Address), 9);
 
   my $reg = {
             NAME     => $Name,
@@ -768,11 +780,11 @@ sub read_regs_from_header($$)
   {
   my ($Mcu_ref, $Fname) = @_;
   my $path = "$include_path/$Fname";
-  my ($fh, $mcu_name, $name, $addr, $bit_addr, $bitnames, $width);
+  my ($fh, $name, $addr, $bit_addr, $bitnames, $width);
 
   if (! open($fh, '<', $path))
     {
-    print STDERR "$0 : Can not open the $path header file!\n";
+    print STDERR "\a\t$0 : Can not open the $path header file!\n";
     exit(1);
     }
 
@@ -787,7 +799,7 @@ sub read_regs_from_header($$)
 
     my $line = $_;
 
-    Log(">>>>: $line", 6);
+    Log(">>>>: $line", 7);
 
     if ($line =~ /^#include\s+"(\S+)"$/o)
       {
@@ -795,39 +807,37 @@ sub read_regs_from_header($$)
       }
     elsif ($line =~ /^#\s*define\s+(\w+_ADDR)\s+0[xX]([[:xdigit:]]+)$/o)
       {
-      Log("reg_addresses\{$1\} = hex($2)", 7);
+      Log("reg_addresses\{$1\} = hex($2)", 8);
       $reg_addresses{$1} = hex($2);
       }
     elsif ($line =~ /^extern\b/o &&
-	   $line =~ /\b__sfr\b/o &&
-	   (($addr) = ($line =~ /\b__at\s*\(\s*0[xX]([[:xdigit:]]+)\s*\)/o)) &&
-	   (($name) = ($line =~ /\b(\w+)\s*;$/o)))
+           $line =~ /\b__sfr\b/o &&
+           (($addr) = ($line =~ /\b__at\s*\(\s*0[xX]([[:xdigit:]]+)\s*\)/o)) &&
+           (($name) = ($line =~ /\b(\w+)\s*;$/o)))
       {
-	# extern __at(0x0000) __sfr INDF;
-	# extern __sfr __at(0x0003) STATUS;
-	#
+        # extern __at(0x0000) __sfr INDF;
+        # extern __sfr __at(0x0003) STATUS;
+        #
 
-      Log("\tadd_register_raw($Mcu_ref, $name, hex($addr))", 7);
       add_register_raw($Mcu_ref, $name, hex($addr));
       }
     elsif ($line =~ /^extern\s+__sfr\s+__at\s*\((\w+_ADDR)\)\s+(\w+);$/o)
       {
-	# extern __sfr  __at (EEDATA_ADDR)  EEDATA;
-	#
+        # extern __sfr  __at (EEDATA_ADDR)  EEDATA;
+        #
 
       if (! defined($reg_addresses{$1}))
-	{
-	print STDERR "This register: $2 not have address!\n";
-	exit(1);
-	}
+        {
+        print STDERR "This register: $2 not have address!\n";
+        exit(1);
+        }
 
-      Log("\tadd_register_raw($Mcu_ref, $2, reg_addresses\{$1\})", 7);
       add_register_raw($Mcu_ref, $2, $reg_addresses{$1});
       }
     elsif ($line =~ /\bstruct\b/o)
       {
+      Log("\tbit_addr = 0", 8);
       $bit_addr = 0;
-      Log("\tbit_addr = 0", 7);
       }
     elsif ($line =~ /^unsigned(?:\s+char|\s+int)?\s*:\s*(\d+)\s*;$/o)
       {
@@ -837,7 +847,7 @@ sub read_regs_from_header($$)
 
       $width = int($1);
       $bit_addr += $width;
-      Log("\tbit_addr += $width ($bit_addr)", 7);
+      Log("\tbit_addr += $width ($bit_addr)", 8);
       }
     elsif ($line =~ /^unsigned(?:\s+char|\s+int)?\s*(\w+)\s*:\s*(\d+)\s*;$/o)
       {
@@ -850,16 +860,16 @@ sub read_regs_from_header($$)
 
       if ($width == 1)
         {
-        Log("\tpush(bitnames->\[$bit_addr\], $name)", 7);
+        Log("\tpush(bitnames->\[$bit_addr\], $name)", 8);
         push(@{$bitnames->[$bit_addr]}, $name);
         }
       else
         {
-        Log("\t$name", 7);
+        Log("\t$name", 8);
         }
 
       $bit_addr += $width;
-      Log("\tbit_addr += $width ($bit_addr)", 7);
+      Log("\tbit_addr += $width ($bit_addr)", 8);
       }
     elsif ($line =~ /^\}\s*(?:__)?(\w+)bits_t\s*;$/o || $line =~ /^\}\s*(?:__)?(\w+)_t\s*;$/o)
       {
@@ -867,11 +877,11 @@ sub read_regs_from_header($$)
 
       if (! defined($reg_ref))
         {
-	print STDERR "This register: $1 not have data structure!\n";
-	exit(1);
+        print STDERR "This register: $1 not have data structure!\n";
+        exit(1);
         }
 
-      Log("\treg_ref : $reg_ref)", 7);
+      Log("\treg_ref : $reg_ref)", 8);
       $reg_ref->{BITNAMES} = $bitnames;
       $bitnames = [];
       }
@@ -881,7 +891,7 @@ sub read_regs_from_header($$)
 
   my $array = \@{$Mcu_ref->{REG_ARRAY}};
 
-  return if (! scalar(@{$array}));
+  return if (scalar(@{$array}) == 0);
 
         # Within the array sorts by name the registers.
 
@@ -906,6 +916,8 @@ sub add_mcu($$)
             IN_GROUP   => FALSE,
             REG_GROUPS => []
             };
+
+  Log("add_mcu($mcu->{NAME})", 8);
 
         # Copies the master periphery table.
 
@@ -932,18 +944,26 @@ sub add_register($$)
   my ($Mcu, $Reg_raw) = @_;
   my $name = $Reg_raw->{NAME};
 
+  Log("add_register($Mcu->{NAME}, $name)", 8);
+
   foreach (@{$Mcu->{REG_GROUPS}})
     {
     if ($name =~ /^$_->{VALID_REGS}$/)
       {
         # This register fits into this group.
 
+      if ($name =~ /^([\D_]+)1$/ && defined($Mcu->{REG_REFS}->{$1}))
+        {
+        # This register already exists. E.g.: RCREG1 --> RCREG
+        return undef;
+        }
+
       my $reg = {
                 NAME     => $name,
                 ADDRESS  => $Reg_raw->{ADDRESS},
                 GROUP    => $_,
-	        TOUCHED  => FALSE,
-	        EMPTY    => FALSE,
+                TOUCHED  => FALSE,
+                EMPTY    => FALSE,
                 BITNAMES => []
                 };
 
@@ -964,7 +984,7 @@ sub cut_frippery_from_bitnames($$)
   {
   my ($Regname, $Bits) = @_;
 
-  return if (! defined($Bits));
+  return if (! defined($Bits) || scalar(@{$Bits}) <= 0);
 
   my $changed = 0;
   my $new_bits = [];
@@ -1018,9 +1038,13 @@ sub filter_regs_from_raw($)
   foreach (@mcu_raw)
     {
     my $mcu       = lc($_->{NAME});
-    my $mcu_ref   = add_mcu($peri_regs, $_);
     my $io_ref    = \%{$io_table_by_mcu{$mcu}};
     my $peri_pins = (defined($io_ref)) ? $io_ref->{$peri_name} : undef;
+
+        # The MCU not have this periphery.
+    next if (! defined($peri_pins));
+
+    my $mcu_ref   = add_mcu($peri_regs, $_);
 
     foreach my $reg_raw (@{$_->{REG_ARRAY}})
       {
@@ -1050,7 +1074,7 @@ sub filter_regs_from_raw($)
                                        tris_ansel_filter($peri_pins, $_));
             }
 
-          if (@{$new_bits})
+          if (scalar(@{$new_bits}) > 0)
             {
             $bits_dst->[$i] = $new_bits;
             $empty = FALSE;
@@ -1134,14 +1158,21 @@ sub find_register($$)
 sub find_equivalent_bit($$)
   {
   my ($Bits1, $Bits2) = @_;
-  my $d = defined(@{$Bits1}) + defined(@{$Bits2});
+  my $d = (defined($Bits1) && scalar(@{$Bits1}) > 0) + (defined($Bits2) && scalar(@{$Bits2}) > 0);
 
-  return TRUE  if ($d == 0);
-  return FALSE if ($d != 2);
+  return TRUE if ($d == 0);
+
+  if ($d != 2)
+    {
+    Log("find_equivalent_bit(): Only one bits defined.", 6);
+    return FALSE;
+    }
 
   foreach (@{$Bits1})
     {
     return TRUE if (/^$_$/ ~~ @{$Bits2});
+
+    Log("find_equivalent_bit(): The $_ bit not defined.", 7);
     }
 
   return FALSE;
@@ -1151,24 +1182,32 @@ sub find_equivalent_bit($$)
 
 sub find_equivalent_register($$$)
   {
-  my $Prime_reg = $_[1];
+  my ($Candidate, $Prime_reg, $Print_mode) = @_;
   my ($cand_reg, $prime_bits, $cand_bits);
 
-  $cand_reg = find_register($_[0], $Prime_reg);
+  $cand_reg = find_register($Candidate, $Prime_reg);
 
-  return FALSE if (! defined($cand_reg));
+  if (! defined($cand_reg))
+    {
+    Log("find_equivalent_register(): Not exists candidate reg: $Prime_reg->{NAME} in $Candidate->{NAME} MCU", 5);
+    return FALSE;
+    }
 
   $cand_reg->{TOUCHED} = TRUE;
 
         # Not performs comparison, if the bits not must be displayed.
-  return TRUE if ($_[2] == P_SHOW_ONLY_NAME);
+  return TRUE if ($Print_mode == P_SHOW_ONLY_NAME);
 
   $prime_bits = \@{$Prime_reg->{BITNAMES}};
   $cand_bits  = \@{$cand_reg->{BITNAMES}};
 
   for (my $i = 0; $i < 8; ++$i)
     {
-    return FALSE if (! find_equivalent_bit(\@{$cand_bits->[$i]}, \@{$prime_bits->[$i]}));
+    if (! find_equivalent_bit(\@{$cand_bits->[$i]}, \@{$prime_bits->[$i]}))
+      {
+      Log("find_equivalent_register(): Not finds equivalent bit: $cand_reg->{NAME} != $Prime_reg->{NAME}", 5);
+      return FALSE;
+      }
     }
 
   return TRUE;
@@ -1196,8 +1235,17 @@ sub find_equivalent_mcu($$)
       }
     }
 
-  return FALSE if (find_not_touched_reg($Prime));
-  return FALSE if (find_not_touched_reg($Candidate));
+  if (find_not_touched_reg($Prime))
+    {
+    Log("find_equivalent_mcu(): Finds not touched register: $Prime->{NAME}", 5);
+    return FALSE;
+    }
+
+  if (find_not_touched_reg($Candidate))
+    {
+    Log("find_equivalent_mcu(): Finds not touched register: $Candidate->{NAME}", 5);
+    return FALSE;
+    }
 
   return TRUE;
   }
@@ -1209,14 +1257,14 @@ sub cmp_io_dirs($$$)
   my ($Prime, $Candidate, $Periphery) = @_;
   my $prime_io = $io_dir_table_by_mcu{lc($Prime->{NAME})};
   my $cand_io  = $io_dir_table_by_mcu{lc($Candidate->{NAME})};
-  my $d = defined($prime_io) + defined($cand_io);
+  my $d = (defined($prime_io) && scalar(keys %{$prime_io}) > 0) + (defined($cand_io) && scalar(keys %{$cand_io}) > 0);
 
   return TRUE  if ($d == 0);
   return FALSE if ($d != 2);
 
   my ($pr, $ca) = ($prime_io->{$Periphery}, $cand_io->{$Periphery});
 
-  $d = defined($pr) + defined($ca);
+  $d = (defined($pr) && scalar(keys %{$pr}) > 0) + (defined($ca) && scalar(keys %{$ca}) > 0);
 
   return TRUE  if ($d == 0);
   return FALSE if ($d != 2);
@@ -1255,6 +1303,7 @@ sub make_mcu_groups($)
 
       if (find_equivalent_mcu($prime, $_) && cmp_io_dirs($prime, $_, $Periphery))
         {
+        Log("make_mcu_groups(): $prime->{NAME} == $_->{NAME}\n", 5);
         push(@{$group}, $_);
         $_->{IN_GROUP} = TRUE;
         }
@@ -1299,7 +1348,7 @@ sub find_shortest_name($)
 
 #-------------------------------------------------------------------------------
 
-sub dump_registers($$$)
+sub print_registers($$$)
   {
   my ($Reg_array, $Print_mode, $No_ADC) = @_;
   my ($i, $bits);
@@ -1309,7 +1358,7 @@ sub dump_registers($$$)
     {
     next if ($No_ADC && exist_in_list(\@some_ADC_registers, $_->{NAME}));
 
-	# Sole bit not have name and the empty register is not must show.
+        # Sole bit not have name and the empty register is not must show.
     next if ($_->{EMPTY} && $Print_mode == P_NO_SHOW_IF_EMPTY);
 
     if ($Print_mode == P_SHOW_ONLY_NAME)
@@ -1331,13 +1380,13 @@ sub dump_registers($$$)
     for ($i = 7; $i >= 0; --$i)
       {
       if (defined($bits->[$i]) && $Print_mode != P_NO_SHOW_BITS)
-	{
-	Outf("%-9s|", find_shortest_name(\@{$bits->[$i]}));
-	}
+        {
+        Outf("%-9s|", find_shortest_name(\@{$bits->[$i]}));
+        }
       else
-	{
-	Out('         |');
-	}
+        {
+        Out('         |');
+        }
       }
 
     Outl();
@@ -1383,7 +1432,7 @@ sub filter_off_adc_inputs($$)
 
 #-------------------------------------------------------------------------------
 
-sub dump_mcu($$)
+sub print_mcu($$)
   {
   my ($Mcu, $Peri_name) = @_;
   my $name       = lc($Mcu->{NAME});
@@ -1403,7 +1452,7 @@ sub dump_mcu($$)
       $adc = \%{$io_ref->{'adc'}};
       $adc_pins = filter_off_adc_inputs($peri_pins, $adc);
 
-      if (@{$adc_pins})
+      if (scalar(@{$adc_pins}) > 0)
         {
         # Supplementary information: Displays inputs of the ADC periphery.
 
@@ -1441,6 +1490,10 @@ sub dump_mcu($$)
       $suppl_info .= "\n";
       }
     } # if (defined($peri_pins))
+  else
+    {
+    print STDERR "print_mcu(): This MCU $name not have $Peri_name pin!\n";
+    }
 
   if (defined($peri_dirs))
     {
@@ -1457,9 +1510,9 @@ sub dump_mcu($$)
 
   foreach (@{$Mcu->{REG_GROUPS}})
     {
-    next if (! scalar(@{$_->{REG_ARRAY}}));
+    next if (scalar(@{$_->{REG_ARRAY}}) == 0);
 
-    dump_registers(\@{$_->{REG_ARRAY}}, $_->{PRINT_MODE}, $drop_adc_pins);
+    print_registers(\@{$_->{REG_ARRAY}}, $_->{PRINT_MODE}, $drop_adc_pins);
     }
 
   Out($suppl_info);
@@ -1467,23 +1520,48 @@ sub dump_mcu($$)
 
 #-------------------------------------------------------------------------------
 
-sub dump_all_data($)
+sub print_all_data($$)
   {
-  my $Periphery = $_[0];
+  my ($Periphery, $Index) = @_;
   my $peri_name = $Periphery->{NAME};
+  my $lock = '__' . uc($peri_name) . '__H__';
+  my ($sidx, $group_index, $border, $group_name);
+
+  Outl("\n#ifndef $lock\n#define $lock\n\n#include \"pic18fam.h\"");
+
+  $peri_groups .= "\n    SECTION=" . uc($peri_name) . "\n\n";
 
   if ($make_groups)
     {
-    my $group_index = 1;
-    my $border = '#' x 45;
+    $group_index = 1;
+    $border = '#' x 45;
 
     make_mcu_groups($peri_name);
 
     foreach (@mcu_groups)
       {
-      next if (! scalar(@{$_}));
+      next if (scalar(@{$_}) == 0);
 
       Outl("\n//$border ${group_index}th group $border");
+
+      ($group_name) = ($_->[0]->{NAME} =~ /^18f(\w+)$/io);
+
+      given ($group_name)
+        {
+        # 18fxxJyy
+        when (/j/io) { $sidx = '1'; }
+
+        # 18fxxKyy
+        when (/k/io) { $sidx = '2'; }
+
+        # 18fxxxx
+        default      { $sidx = '0'; }
+        }
+
+      $group_name =~ s/\D//go;
+      $group_name = "0$group_name" if (length($group_name) < 4);
+
+      $peri_groups .= "18$group_name$Index$sidx:" . join(',', map { lc($_->{NAME}); } @{$_}) . "\n";
 
       if ($only_prime)
         {
@@ -1498,7 +1576,7 @@ sub dump_all_data($)
 
         # Only contents of the first it shows, because content of the others same.
 
-        dump_mcu($_->[0], $peri_name);
+        print_mcu($_->[0], $peri_name);
         Outl('*/');
         }
       else
@@ -1508,7 +1586,7 @@ sub dump_all_data($)
         foreach (@{$_})
           {
           Outl("\n\n/*\nPIC$_->{NAME}");
-          dump_mcu($_, $peri_name);
+          print_mcu($_, $peri_name);
           Outl('*/');
           }
         }
@@ -1523,10 +1601,12 @@ sub dump_all_data($)
     foreach (@mcu_filtered)
       {
       Outl("\n\n/*\nPIC$_->{NAME}");
-      dump_mcu($_, $peri_name);
+      print_mcu($_, $peri_name);
       Outl('*/');
       }
     }
+
+  Outl("\n#endif // $lock");
   }
 
 #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1538,8 +1618,6 @@ sub dump_all_data($)
 #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 load_periphery_data();
-#print Dumper(\%io_table_by_mcu);
-#print Dumper(\%io_dir_table_by_mcu);
 
 $include_path = '';
 $make_groups = FALSE;
@@ -1590,28 +1668,28 @@ Usage: $0 [options]
 
     Options are:
 
-	-I <path> or --include <path>
+        -I <path> or --include <path>
 
-	    The program on this path looks for the headers.
+            The program on this path looks for the headers.
             If this is not specified, then looking for a installed
             sdcc copy in the system.
 
-	-g or --make-groups
+        -g or --make-groups
 
-	    This command creates groups of MCUs.
+            This command creates groups of MCUs.
 
-	-p or --only-prime
+        -p or --only-prime
 
-	    Prints only the prime member of an MCU group.
+            Prints only the prime member of an MCU group.
 
         -v <level> or --verbose <level>
 
             It provides information on from the own operation.
             Possible value of the level between 0 and 10. (default: 0)
 
-	-h or --help
+        -h or --help
 
-	    This text.
+            This text.
 EOT
 ;
       exit(0);
@@ -1630,7 +1708,7 @@ if ($include_path eq '')
       }
     }
 
-  die "Can not find the directory of sdcc!" if ($include_path eq '');
+  die "Can not find the directory of sdcc headers!" if ($include_path eq '');
   }
 
 opendir(DIR, $include_path) || die "Can not open. -> \"$include_path\"";
@@ -1645,7 +1723,7 @@ foreach (sort {smartSort($a, $b)} @filelist)
   {
   my $name = $_;
 
-  print STDERR "Reading the registers from $_ header ...";
+  print STDERR "Reading the registers from the $_ header ...";
 
   $name =~ s/^pic//io;
   $name =~ s/\.\S+$//o;
@@ -1653,9 +1731,10 @@ foreach (sort {smartSort($a, $b)} @filelist)
   print STDERR " done.\n";
   }
 
+my $p_idx = 0;
 foreach (@periphery_table)
   {
-  my $out_name = "$_->{NAME}.$out_tail";
+  my $out_name = "$_->{NAME}.h$out_tail";
 
   open($out_handler, '>', $out_name) || die "Can not create the $out_name output!";
 
@@ -1666,20 +1745,25 @@ foreach (@periphery_table)
   print STDERR " done.\n";
 
   print STDERR "Creating the $out_name ...";
-  dump_all_data($_);
+  print_all_data($_, $p_idx);
   print STDERR " done.\n";
 
   close($out_handler);
+  ++$p_idx;
   }
+
+open(GR, '>', $peri_group) || die "Can not create the $peri_group output!";
+print GR $peri_groups;
+close(GR);
 
 __END__
 ################################################################################
 #
 #   The following rules determine to which registers belong to an peripheral.
-#   The description of a periphery is bounded by the SECTION=TABLE_XXX flags.
-#   The description of a register begin after the SECTION=REGISTER flag.
+#   The description of a periphery is bounded by the BEGIN=TABLE_XXX flags.
+#   The description of a register begin after the BEGIN=REGISTER flag.
 #
-#   SECTION=TABLE_BEGIN:ADC
+#   BEGIN=PERIPHERY:ADC
 #       The "ADC" effect of: An file will be created under the name "adc.tables".
 #
 #   VALID_REGS -- This a regular expression. Specifies which one a register
@@ -1707,7 +1791,7 @@ __END__
 #       (There is so, which only indirectly connected to the module.)
 #
 
-BEGIN=PERIPHERY:ADC     # ADC --> adc.tables
+BEGIN=PERIPHERY:ADC     # ADC --> adc.h.gen
 
   BEGIN=REGISTER
     VALID_REGS="ADCON\d+[HL]?"
@@ -1825,7 +1909,7 @@ END=PERIPHERY
 #       (There is so, which only indirectly connected to the module.)
 #
 
-BEGIN=PERIPHERY:CCP     # CCP --> ccp.tables
+BEGIN=PERIPHERY:CCP     # CCP --> ccp.h.gen
 
   BEGIN=REGISTER
     VALID_REGS="APFCON\d*"
@@ -1991,7 +2075,7 @@ END=PERIPHERY
 #       (There is so, which only indirectly connected to the module.)
 #
 
-BEGIN=PERIPHERY:PWM     # PWM --> pwm.tables
+BEGIN=PERIPHERY:PWM     # PWM --> pwm.h.gen
 
   BEGIN=REGISTER
     VALID_REGS="APFCON\d*"
@@ -2199,7 +2283,7 @@ END=PERIPHERY
 #       (There is so, which only indirectly connected to the module.)
 #
 
-BEGIN=PERIPHERY:I2C     # I2C --> i2c.tables
+BEGIN=PERIPHERY:I2C     # I2C --> i2c.h.gen
 
   BEGIN=REGISTER
     VALID_REGS="APFCON\d*"
@@ -2323,7 +2407,7 @@ END=PERIPHERY
 #       (There is so, which only indirectly connected to the module.)
 #
 
-BEGIN=PERIPHERY:SPI     # SPI --> spi.tables
+BEGIN=PERIPHERY:SPI     # SPI --> spi.h.gen
 
   BEGIN=REGISTER
     VALID_REGS="APFCON\d*"
@@ -2453,7 +2537,7 @@ END=PERIPHERY
 #       (There is so, which only indirectly connected to the module.)
 #
 
-BEGIN=PERIPHERY:USART   # USART --> usart.tables
+BEGIN=PERIPHERY:USART   # USART --> usart.h.gen
 
   BEGIN=REGISTER
     VALID_REGS="APFCON\d*"
@@ -3467,6 +3551,7 @@ BEGIN=IO_TABLE
 
   BEGIN=MCU:18f2439,18f2539
     ADC=AN0:RA0,AN1:RA1,AN2:RA2,AN3:RA3,AN4:RA5
+    PWM=PWM1:PWM1,PWM2:PWM2
     I2C=SDA:RC4,SCL:RC3
     SPI=SDI:RC4,SDO:RC5,SCK:RC3,SS:RA5
     USART=RX:RC7,TX:RC6
@@ -3475,6 +3560,7 @@ BEGIN=IO_TABLE
 
   BEGIN=MCU:18f4439,18f4539
     ADC=AN0:RA0,AN1:RA1,AN2:RA2,AN3:RA3,AN4:RA5,AN5:RE0,AN6:RE1,AN7:RE2
+    PWM=PWM1:PWM1,PWM2:PWM2
     I2C=SDA:RC4,SCL:RC3
     SPI=SDI:RC4,SDO:RC5,SCK:RC3,SS:RA5
     USART=RX:RC7,TX:RC6

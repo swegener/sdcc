@@ -263,6 +263,8 @@ my $only_prime;
 my $out_handler;
 my $initial_border;
 
+my @regular = ();
+my @enhanced = ();
 my $peri_groups = '';
 
 ################################################################################
@@ -891,6 +893,15 @@ sub read_regs_from_header($$)
     } # foreach (grep(! /^\s*$/o, <$fh>))
 
   close($fh);
+
+  if ($Mcu_ref->{ENHANCED})
+    {
+    push(@enhanced, lc($Mcu_ref->{NAME}));
+    }
+  else
+    {
+    push(@regular, lc($Mcu_ref->{NAME}));
+    }
 
   my $array = \@{$Mcu_ref->{REG_ARRAY}};
 
@@ -1624,6 +1635,33 @@ sub print_all_data($$)
   Outl("\n#endif // $lock");
   }
 
+#-------------------------------------------------------------------------------
+
+sub print_listing($$$)
+  {
+  my ($Out, $Device_per_line, $List_ref) = @_;
+  my ($i, $len);
+
+  $len = scalar(@{$List_ref});
+
+  return if ($len <= 0);
+
+  $i = 0;
+  while (1)
+    {
+    print $Out $List_ref->[$i];
+    ++$i;
+
+    if ($i >= $len)
+      {
+      print $Out "\n";
+      last;
+      }
+
+    print $Out ((($i % $Device_per_line) == 0) ? "\n" : ',');
+    }
+  }
+
 #   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1733,6 +1771,8 @@ print "Include path: \"$include_path\"\n";
 my @filelist = grep(-f "$include_path/$_" && /^$header_name_filter$/, readdir(DIR));
 closedir(DIR);
 
+@regular = ();
+@enhanced = ();
 @mcu_raw = ();
 foreach (sort {smartSort($a, $b)} @filelist)
   {
@@ -1768,6 +1808,19 @@ foreach (@periphery_table)
   }
 
 open(GR, '>', $peri_group) || die "Can not create the $peri_group output!";
+
+if (scalar(@regular) > 0)
+  {
+  print GR "\n    SECTION=REGULAR\n\n";
+  print_listing(*GR, 10, \@regular);
+  }
+
+if (scalar(@enhanced) > 0)
+  {
+  print GR "\n    SECTION=ENHANCED\n\n";
+  print_listing(*GR, 10, \@enhanced);
+  }
+
 print GR $peri_groups;
 close(GR);
 

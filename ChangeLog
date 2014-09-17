@@ -1,4 +1,12 @@
 2014-09-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* support/scripts/pic14-header-parser.pl:
+	  Creates two new groups: "regular", "enhanced"
+
+	* support/scripts/pic16fam-h-gen.pl:
+	  Divides into more groups the 14-bit processors:
+		"adc", "ccp", "pwm", "i2c", "spi", "usart"
+
+2014-09-17 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* support/scripts/pic14-header-parser.pl,
 	  support/scripts/pic16-header-parser.pl:
 	  updated

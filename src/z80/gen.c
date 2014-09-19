@@ -3976,7 +3976,7 @@ genIpush (const iCode * ic)
                 }
               else
                 {
-                  if (!AOP_TYPE (IC_LEFT (ic)) == AOP_SFR && !regalloc_dry_run && !strcmp (aopGet (AOP (IC_LEFT (ic)), offset, FALSE), "h"))   // todo: More exact cost!
+                  if (AOP_TYPE (IC_LEFT (ic)) != AOP_SFR && !regalloc_dry_run && !strcmp (aopGet (AOP (IC_LEFT (ic)), offset, FALSE), "h"))   // todo: More exact cost!
                     emit2 ("push hl");
                   else
                     {

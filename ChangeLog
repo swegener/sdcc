@@ -1,3 +1,8 @@
+2014-09-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fixed double read from __sfr function parameter.
+
 2014-09-17 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* support/scripts/pic14-header-parser.pl:
 	  Creates two new groups: "regular", "enhanced"

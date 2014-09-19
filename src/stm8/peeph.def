@@ -597,3 +597,38 @@ replace restart {
 	; peephole j31 replaced call at end of function by jump (tail call optimization).
 }
 
+replace restart {
+	call	__mulint
+} by {
+	call	__mulint_stm8
+}
+
+replace restart {
+	callf	__mulint
+} by {
+	callf	__mulint_stm8
+}
+
+replace restart {
+	callr	__mulint
+} by {
+	callr	__mulint_stm8
+}
+
+replace restart {
+	call	__divsint
+} by {
+	call	__divsint_stm8
+}
+
+replace restart {
+	callr	__divsint
+} by {
+	callr	__divsint_stm8
+}
+
+replace restart {
+	callf	__divsint
+} by {
+	callf	__divsint_stm8
+}

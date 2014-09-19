@@ -1,3 +1,11 @@
+2014-09-19 Ben Shi <powerstudio1st AT 163.com>
+	* device/lib/stm8/_divsint_stm8.s:
+	* device/lib/stm8/_mulint_stm8.s:
+	* device/lib/stm8/Makefile.in:
+	  stm8 optimized version of div / mul.
+	* src/stm8/peeph.def:
+	  add new rules to utilize the above optimized functions.
+
 2014-09-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

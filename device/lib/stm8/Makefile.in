@@ -48,7 +48,7 @@ STM8_SDCC = $(COMMON_SDCC) \
 STM8SOURCES = $(addprefix ../,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 STM8OBJECTS = $(patsubst %.c,%.rel,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 
-OBJ = _divuint.rel _divulong.rel _mulint.rel _mullong.rel setjmp.rel _divsint_stm8.rel _mulint_stm8.rel
+OBJ = _divuint.rel _divulong.rel _mulint.rel _mullong.rel setjmp.rel _divsint_stm8.rel _mulint_stm8.rel _modsint_stm8.rel
 
 LIB = stm8.lib
 CC = $(SCC)

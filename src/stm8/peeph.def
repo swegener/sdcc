@@ -604,31 +604,13 @@ replace restart {
 }
 
 replace restart {
-	callf	__mulint
-} by {
-	callf	__mulint_stm8
-}
-
-replace restart {
-	callr	__mulint
-} by {
-	callr	__mulint_stm8
-}
-
-replace restart {
 	call	__divsint
 } by {
 	call	__divsint_stm8
 }
 
 replace restart {
-	callr	__divsint
+	call	__modsint
 } by {
-	callr	__divsint_stm8
-}
-
-replace restart {
-	callf	__divsint
-} by {
-	callf	__divsint_stm8
+	call	__modsint_stm8
 }

@@ -4,6 +4,8 @@
 	  Remove negation by inverting jump condition.
 	* src/SDCCcse.c:
 	  Remove cast at conditional jump.
+	* device/include/ctype.h:
+	  Simplify classification functions.
 
 2014-09-24 Maarten Brock <sourceforge.brock AT dse.nl>
 

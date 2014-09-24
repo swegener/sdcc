@@ -52,32 +52,17 @@ extern int isblank (int c);
 
 inline int isdigit (int c)
 {
-  /* using local variable ret seems to give most optimal code */
-  unsigned char ret = 0;
-  /* we could additionally check (unsigned char)(c >> 8) == 0 */
-  if ((unsigned char)c >= '0' && (unsigned char)c <= '9')
-    ret = 1;
-  return ret;
+  return (c >= '0' && c <= '9');
 }
 
 inline int islower (int c)
 {
-  /* using local variable ret seems to give most optimal code */
-  unsigned char ret = 0;
-  /* we could additionally check (unsigned char)(c >> 8) == 0 */
-  if ((unsigned char)c >= 'a' && (unsigned char)c <= 'z')
-    ret = 1;
-  return ret;
+  return (c >= 'a' && c <= 'z');
 }
 
 inline int isupper (int c)
 {
-  /* using local variable ret seems to give most optimal code */
-  unsigned char ret = 0;
-  /* we could additionally check (unsigned char)(c >> 8) == 0 */
-  if ((unsigned char)c >= 'A' && (unsigned char)c <= 'Z')
-    ret = 1;
-  return ret;
+  return (c >= 'A' && c <= 'Z');
 }
 
 #else

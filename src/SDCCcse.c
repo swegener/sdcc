@@ -1659,6 +1659,17 @@ ifxOptimize (iCode * ic, set * cseSet,
           ReplaceOpWithCheaperOp(&IC_COND (ic), pdop);
           (*change)++;
         }
+      else if(ic->prev &&  /* Remove unnecessary casts */
+        (ic->prev->op == '=' || ic->prev->op == CAST) && IS_ITEMP (IC_RESULT (ic->prev)) &&
+        IC_RESULT (ic->prev)->key == IC_COND (ic)->key && bitVectnBitsOn (OP_USES (IC_RESULT (ic->prev))) <= 1)
+        {
+          sym_link *type = operandType (IC_RESULT (ic->prev));
+          if (ic->prev->op != CAST || SPEC_NOUN (type) == V_BOOL || bitsForType (operandType (IC_RIGHT (ic->prev))) < bitsForType (type))
+          {
+            ReplaceOpWithCheaperOp(&IC_COND (ic), IC_RIGHT (ic->prev));
+            (*change)++;
+          }
+        }
     }
 
   /* if the conditional is a literal then */

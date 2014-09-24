@@ -2032,6 +2032,55 @@ optimizeCastCast (eBBlock ** ebbs, int count)
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* optimizeNegation - remove unneeded intermediate negation        */
+/*-----------------------------------------------------------------*/
+static void
+optimizeNegation (eBBlock **ebbs, int count)
+{
+  int i;
+  iCode *ic;
+  iCode *uic;
+
+  for (i = 0; i < count; i++)
+    {
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          if (ic->op == '!' && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+            {
+              /* There must be only one use of this first result */
+              if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
+                continue;
+
+              /* This use must be an ifx */
+              uic = hTabItemWithKey (iCodehTab,
+                        bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+              if (!uic)
+                continue;
+              /* Todo: Optimize case where use is another negation */
+              else if(uic->op == IFX) /* Remove negation by inverting jump targets */
+                {
+                  IC_LEFT (uic) = IC_LEFT (ic);
+                  IC_LEFT (ic) = 0;
+                  IC_RIGHT (ic) = IC_RESULT (ic);
+                  ic->op = '=';
+
+                  if (IC_TRUE (uic))
+                    {
+                      IC_FALSE (uic) = IC_TRUE (uic);
+                      IC_TRUE (uic) = 0;
+                    }
+                  else
+                    {
+                      IC_TRUE (uic) = IC_FALSE (uic);
+                      IC_FALSE (uic) = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
 /* Fold pointer addition into offset of ADDRESS_OF.                  */
 static void
 offsetFoldGet (eBBlock **ebbs, int count)
@@ -2186,6 +2235,7 @@ eBBlockFromiCode (iCode * ic)
     dumpEbbsToFileExt (DUMP_RAW1, ebbi);
 
   optimizeCastCast (ebbi->bbOrder, ebbi->count);
+  optimizeNegation (ebbi->bbOrder, ebbi->count);
 
   /* Burn the corpses, so the dead may rest in peace,
      safe from cse necromancy */

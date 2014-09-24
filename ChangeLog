@@ -1,3 +1,8 @@
+2014-09-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  Remove negation by inverting jump condition.
+
 2014-09-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c (mergeSpec): added check for both static and extern

@@ -926,8 +926,6 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
 
       if (IS_ITEMP (IC_LEFT (ic)) &&
           IS_ITEMP (IC_RESULT (ic)) &&
-/*      !OP_SYMBOL(IC_RESULT(ic))->isreqv && */
-/*      !OP_SYMBOL(IC_LEFT(ic))->isreqv && */
           !IC_LEFT (ic)->isaddr)
         {
           ic->op = '=';

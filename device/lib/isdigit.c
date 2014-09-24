@@ -28,14 +28,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+/* it is important to declare this function extern before including
+   the inline definition to give it external linkage */
+extern int isdigit (int c);
+
 #include <ctype.h>
-
-#ifdef isdigit
-#undef isdigit
-#endif
-
-int isdigit (int c)
-{
-  return (c >= '0' && c <= '9');
-}
-

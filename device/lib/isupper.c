@@ -28,14 +28,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+/* it is important to declare this function extern before including
+   the inline definition to give it external linkage */
+extern int isupper (int c);
+
 #include <ctype.h>
-
-#ifdef isupper
-#undef isupper
-#endif
-
-int isupper (int c)
-{
-  return (c >= 'A' && c <= 'Z');
-}
-

@@ -773,6 +773,9 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   if (SPEC_ARGREG (src) && !SPEC_ARGREG (dest))
     SPEC_ARGREG (dest) = SPEC_ARGREG (src);
 
+  if (SPEC_STAT (dest) && SPEC_EXTR (dest))
+    werror (E_TWO_OR_MORE_STORAGE_CLASSES, name);
+
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);
 
@@ -3105,8 +3108,16 @@ checkFunction (symbol * sym, symbol * csym)
   addSym (SymbolTab, sym, sym->name, sym->level, sym->block, 1);
   if (IS_EXTERN (csym->etype) && !IS_EXTERN (sym->etype))
     {
+      SPEC_EXTR (sym->etype) = 1;
       addSet (&publics, sym);
     }
+
+  SPEC_STAT (sym->etype) |= SPEC_STAT (csym->etype);
+  if (SPEC_STAT (sym->etype) && SPEC_EXTR (sym->etype))
+    {
+      werror (E_TWO_OR_MORE_STORAGE_CLASSES, sym->name);
+    }
+
   return 1;
 }
 

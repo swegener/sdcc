@@ -1,4 +1,15 @@
+2014-09-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c (mergeSpec): added check for both static and extern
+	  (checkFunction): merge static or extern and check
+	* device/include/ctype.h: replaced macros with direct inline versions
+	* device/lib/isdigit.c,
+	* device/lib/islower.c,
+	* device/lib/isupper.c: replaced definitions with extern declaration to give
+	  inline versions external linkage
+
 2014-09-22 Ben Shi <powerstudio1st AT 163.com>
+
 	* device/lib/stm8/_modsint_stm8.s:
 	* device/lib/stm8/Makefile.in:
 	  stm8 optimized version of _modsint.
@@ -6,6 +17,7 @@
 	  add new rules to utilize the above optimized functions.
 
 2014-09-19 Ben Shi <powerstudio1st AT 163.com>
+
 	* device/lib/stm8/_divsint_stm8.s:
 	* device/lib/stm8/_mulint_stm8.s:
 	* device/lib/stm8/Makefile.in:
@@ -19,6 +31,7 @@
 	  Fixed double read from __sfr function parameter.
 
 2014-09-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/pic14-header-parser.pl:
 	  Creates two new groups: "regular", "enhanced"
 
@@ -27,61 +40,74 @@
 		"adc", "ccp", "pwm", "i2c", "spi", "usart"
 
 2014-09-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/pic14-header-parser.pl,
 	  support/scripts/pic16-header-parser.pl:
 	  updated
 
 2014-09-15 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/non-free/include/pic14/*.inc,
 	  device/non-free/lib/pic14/libdev/*.c:
 	  updated
 
 2014-09-13 Ben Shi <powerstudio1st AT 163.com>
+
 	* src/stm8/main.c:
 	  Make libstm8.lib is implicitly linked rather than explicitly designated.
 
 2014-09-04 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/mcs51-disasm.pl,
 	  support/scripts/optimize_pic16devices.pl:
 	  Updated unto the Perl 5.16 version.
 
 2014-09-04 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/cinc2h.pl:
 	  Updated unto the Perl 5.16 version.
 
 2014-09-03 Ben Shi <powerstudio1st AT 163.com>
+
 	* sdas/asstm8/stm8mch.c:
 	  Fix the wrong code of the bit index in BTJF / BTJF.
 
 2014-09-01 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/include/pic14/pic14devices.txt: Minor bugfix.
 
 2014-08-30 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/tests/gcc-torture-execute-pr28982a.c:
 	* support/regression/tests/bug3475630.c:
 	  Enabled on the stm8 port.
 
 2014-08-29 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/tests/gcc-torture-execute-pr47337.c:
 	  Enable this test case on the stm8 port.
 
 2014-08-20 Ben Shi <powerstudio1st AT 163.com>
+
 	* device/lib/stm8/setjmp.s:
 	  Substitute _CODE to CODE to conform with stm8's code generator.
 	* sdas/linksrc/lkmain.c:
 	  Revert to reversion 9059.
 
 2014-08-18 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/tests/setjmp.c:
 	  Enabled for the stm8 port.
 	* sdas/linksrc/lkmain.c:
 	  Avoid generating invalid instructions on MacOS.
 
 2014-08-17 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/setjmp.c:
 	  Disabled for the stm8 port.
 
 2014-08-16 Ben Shi <powerstudio1st AT 163.com>
+
 	* all.vcxproj:
 	* support/scripts/sdcc.nsi:
 	  Create a new sdldstm8 on Windows.
@@ -94,6 +120,7 @@
 	  Let the stm8 port use sdldstm8 instead of sdld.
 
 2014-08-12 Ben Shi <powerstudio1st AT 163.com>
+
 	* sdcc/support/regression/tests/bug-2205.c:
 	* sdcc/support/regression/tests/bug-971834.c:
 	* sdcc/support/regression/tests/key.c:
@@ -106,16 +133,19 @@
 	  address. Optimized constant function pointer case.
 
 2014-08-06 Ben Shi <powerstudio1st AT 163.com>
+
 	* sdas/linksrc/lkaomf51.c:
 	  Add array bound check to avoid crash.
 
 2014-07-30 Ben Shi <powerstudio1st AT 163.com>
+
 	* sim/ucsim/st7.src/inst.cc:
 	  Eliminate warnings.
 	* support/regression/tests/gcc-torture-execute-930628-1.c:
 	  Enable this case for the stm8 port.
 
 2014-07-29 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/tests/gcc-torture-execute-20030714-1.c:
 	  Enable this case for the stm8 port.
 	* src/stm8/gen.c:
@@ -128,21 +158,25 @@
 	  Stronger optimization.
 
 2014-07-21 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/tests/gcc-torture-execute-stdarg-4.c:
 	* support/regression/tests/gcc-torture-execute-stdarg-5.c:
 	  Split the original gcc-torture-execute-stdarg-4.c to inline / non-inline.
 
 2014-07-20 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/tests/gcc-torture-execute-stdarg-4.c:
 	* support/regression/tests/gcc-torture-execute-loop-2c.c:
 	* support/regression/tests/gcc-torture-execute-unroll-1.c:
 	  Add "static" to fit the C99 standard.
 
 2014-07-19 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/tests/gcc-torture-execute-20001121-1.c:
 	  Add "static" to fit the C99 standard.
 
 2014-07-15 Ben Shi <powerstudio1st AT 163.com>
+
 	* src/stm8/peep.c
 	  Make calculation of instructions' length more accurate.
 
@@ -159,6 +193,7 @@
 	  Reference bug #2285.
 
 2014-07-12 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* support/scripts/cinc2h.pl: Bugfix and update.
 
 	* device/non-free/include/pic14/pic16c433.h: bugfix
@@ -201,50 +236,61 @@
 	  (These Microchip bugs in original mpasmx includes.)
 
 2014-07-07 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Unify all flag affection code to flag_cvh().
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Unify all flag affection code to flag_cvh().
 
 2014-07-06 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Merge inst_sub() to inst_sbc().
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Merge inst_sub() to inst_sbc().
 
 2014-07-03 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Fix potential bugs in inst_dec(), inst_inc() & inst_ldxy(): flags affection.
-          Make inst_addw(), inst_clr() & inst_ldxydst() more understandable.
-        * sim/ucsim/stm8.src/stm8.cc:
-          Fix potential bugs in CALLR & CALLF: the stack saved PC value is not accurate.
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix potential bugs in inst_dec(), inst_inc() & inst_ldxy(): flags affection.
+	  Make inst_addw(), inst_clr() & inst_ldxydst() more understandable.
+	* sim/ucsim/stm8.src/stm8.cc:
+	  Fix potential bugs in CALLR & CALLF: the stack saved PC value is not accurate.
 
 2014-06-30 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Fix potential bugs in inst_adc() & inst_add() - flags affection.
-          Fix potential bugs in inst_sll() & inst_rlc() - reg.X & reg.Y might exceed 0xffff.
-        * sim/ucsim/stm8.src/stm8.cc:
-          Improve code quality.
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix potential bugs in inst_adc() & inst_add() - flags affection.
+	  Fix potential bugs in inst_sll() & inst_rlc() - reg.X & reg.Y might exceed 0xffff.
+	* sim/ucsim/stm8.src/stm8.cc:
+	  Improve code quality.
 
 2014-06-25 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Fix potential bugs of flags affection in inst_sbc() and inst_cpw().
-        * sim/ucsim/stm8.src/stm8.cc:
-          Fix potential bugs of flags affection in RLWA, and improve code quality of TRAP.
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix potential bugs of flags affection in inst_sbc() and inst_cpw().
+	* sim/ucsim/stm8.src/stm8.cc:
+	  Fix potential bugs of flags affection in RLWA, and improve code quality of TRAP.
 
 2014-06-21 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Fix potential bugs of flags affection in inst_addw(), inst_sub() and inst_cp().
-        * sim/ucsim/stm8.src/stm8.cc:
-          Fix potential bugs of flags affection in simulation of RRWA.
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix potential bugs of flags affection in inst_addw(), inst_sub() and inst_cp().
+	* sim/ucsim/stm8.src/stm8.cc:
+	  Fix potential bugs of flags affection in simulation of RRWA.
 
 2014-06-20 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Fix potential bugs of flags affection in inst_addw().
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Fix potential bugs of flags affection in inst_addw().
 
 2014-06-17 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Make the comment more understandable, fix potential bugs in inst_jr(). (JRSGT / JRSLE / JRSGE / JRSLT)
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Make the comment more understandable, fix potential bugs in inst_jr().
+	  (JRSGT / JRSLE / JRSGE / JRSLT)
 
 2014-06-10 Ben Shi <powerstudio1st AT 163.com>
-        * sim/ucsim/stm8.src/inst.cc:
-          Add indirect addressing handling in CLR, CPW & LD. Fix potential bugs in get_dest().
+
+	* sim/ucsim/stm8.src/inst.cc:
+	  Add indirect addressing handling in CLR, CPW & LD.
+	  Fix potential bugs in get_dest().
 
 2014-06-03 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -304,7 +350,8 @@
 
 	* src/stm8/ralloc2.cc,
 	  src/stm8/gen.c:
-	  More flexible register allocation of operands, fixed bug in intra-register assignment.
+	  More flexible register allocation of operands, fixed bug in intra-register
+	  assignment.
 
 2014-04-27 Philipp Klaus Krause <pkk AT spth.de>
 

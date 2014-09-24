@@ -28,14 +28,8 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+/* it is important to declare this function extern before including
+   the inline definition to give it external linkage */
+extern int islower (int c);
+
 #include <ctype.h>
-
-#ifdef islower
-#undef islower
-#endif
-
-int islower (int c)
-{
-  return (c >= 'a' && c <= 'z');
-}
-

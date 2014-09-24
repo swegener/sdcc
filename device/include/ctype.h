@@ -33,17 +33,11 @@
 
 extern int isalnum (int c);
 extern int isalpha (int c);
-#if __STDC_VERSION__ >= 199901L
-extern int isblank (int c);
-#endif
 extern int iscntrl (int c);
-extern int isdigit (int c);
 extern int isgraph (int c);
-extern int islower (int c);
 extern int isprint (int c);
 extern int ispunct (int c);
 extern int isspace (int c);
-extern int isupper (int c);
 extern int isalnum (int c);
 extern int isalnum (int c);
 extern int isxdigit (int c);
@@ -51,33 +45,47 @@ extern int isxdigit (int c);
 extern int tolower (int c);
 extern int toupper (int c);
 
-/* Provide macros for the most used functions for efficiency */
+/* Provide inline versions for the most used functions for efficiency */
 #if __STDC_VERSION__ >= 199901L
 
-static inline _Bool __sdcc_isdigit (unsigned char c);
-static inline _Bool __sdcc_islower (unsigned char c);
-static inline _Bool __sdcc_isupper (unsigned char c);
+extern int isblank (int c);
 
-inline _Bool __sdcc_isdigit (unsigned char c)
+inline int isdigit (int c)
 {
-  return (c >= '0' && c <= '9');
+  /* using local variable ret seems to give most optimal code */
+  unsigned char ret = 0;
+  /* we could additionally check (unsigned char)(c >> 8) == 0 */
+  if ((unsigned char)c >= '0' && (unsigned char)c <= '9')
+    ret = 1;
+  return ret;
 }
 
-inline _Bool __sdcc_islower (unsigned char c)
+inline int islower (int c)
 {
-  return (c >= 'a' && c <= 'z');
+  /* using local variable ret seems to give most optimal code */
+  unsigned char ret = 0;
+  /* we could additionally check (unsigned char)(c >> 8) == 0 */
+  if ((unsigned char)c >= 'a' && (unsigned char)c <= 'z')
+    ret = 1;
+  return ret;
 }
 
-inline _Bool __sdcc_isupper (unsigned char c)
+inline int isupper (int c)
 {
-  return (c >= 'A' && c <= 'Z');
+  /* using local variable ret seems to give most optimal code */
+  unsigned char ret = 0;
+  /* we could additionally check (unsigned char)(c >> 8) == 0 */
+  if ((unsigned char)c >= 'A' && (unsigned char)c <= 'Z')
+    ret = 1;
+  return ret;
 }
 
-#define isdigit(c) __sdcc_isdigit(c)
-#define islower(c) __sdcc_islower(c)
-#define isupper(c) __sdcc_isupper(c)
+#else
+
+extern int isdigit (int c);
+extern int islower (int c);
+extern int isupper (int c);
 
 #endif
 
 #endif
-

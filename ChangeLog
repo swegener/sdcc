@@ -1,3 +1,10 @@
+2014-09-29 Ben Shi <powerstudio1st AT 163.com>
+	* device/lib/stm8/_mullong_stm8.s:
+	* device/lib/stm8/Makefile.in:
+	  stm8 optimized version of _mullong.
+	* src/stm8/peeph.def:
+	  add new rules to utilize the above optimized functions.
+
 2014-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-gbz80.def:

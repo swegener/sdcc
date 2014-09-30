@@ -614,3 +614,9 @@ replace restart {
 } by {
 	call	__modsint_stm8
 }
+
+replace restart {
+	call	__mullong
+} by {
+	call	__mullong_stm8
+}

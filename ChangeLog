@@ -1,3 +1,7 @@
+2014-10-03 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/cinc2h.pl: Updated to the gputils-1.4.0 .
+
 2014-09-29 Ben Shi <powerstudio1st AT 163.com>
 	* device/lib/stm8/_mullong_stm8.s:
 	* device/lib/stm8/Makefile.in:

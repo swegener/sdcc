@@ -1,3 +1,9 @@
+2014-10-09 Ben Shi <powerstudio1st AT 163.com>
+	* src/stm8/gen.c:
+	  Add stm_sub_func() for future more stm8 optimized functions.
+	* src/stm8/peeph.def:
+	  Remove redundant rules.
+
 2014-10-03 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/cinc2h.pl: Updated to the gputils-1.4.0 .

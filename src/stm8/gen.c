@@ -2723,6 +2723,24 @@ genIpush (const iCode * ic)
   freeAsmop (IC_LEFT (ic));
 }
 
+/*------------------------------------------------------------------*/
+/* stm8_func_sub : return a stm8 optimized function if possible,    */
+/*                 else return the original function.               */
+/*------------------------------------------------------------------*/
+static const char *
+stm8_sub_func(const char *pf)
+{
+  const char *pof[] = {"__mulint", "__divsint", "__modsint", "__mullong"};
+  const char *psf[] = {"__mulint_stm8", "__divsint_stm8", "__modsint_stm8", "__mullong_stm8"};
+  int i;
+
+  for (i = 0; i < sizeof (pof) / sizeof (pof[0]); i++)
+    if (strncmp(pf, pof[i], strlen(pof[i])) == 0)
+      return psf[i];
+
+  return pf;
+}
+
 static void
 emitCall (const iCode *ic, bool ispcall)
 {
@@ -2795,7 +2813,7 @@ emitCall (const iCode *ic, bool ispcall)
         {
           bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
           emitcode (jump ? "jp" : "call", "%s",
-            (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
+            stm8_sub_func((OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name)));
           cost (3, jump ? 1 : 4);
         }
     }

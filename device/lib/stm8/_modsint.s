@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  _divsint_stm8.s
+;  _modsint.s
 ;
 ;  Copyright (C) 2014, Krzysztof Nikiel, Ben Shi
 ;
@@ -26,25 +26,25 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl __divsint_stm8
+	.globl __modsint
 
 	.area CODE
-__divsint_stm8:
+__modsint:
 	ldw	x, (#3, sp)
 	ldw	y, (#5, sp)
 	ld	a, xh
-	xor	a, (#5,sp)
 	cpw	x, #0x0000
-	jrsge	__divsint_stm8_1
+	jrsge	__modsint_1
 	negw	x
-__divsint_stm8_1:
+__modsint_1:
 	cpw	y, #0x0000
-	jrsge	__divsint_stm8_2
+	jrsge	__modsint_2
 	negw	y
-__divsint_stm8_2:
+__modsint_2:
 	divw	x, y
 	and	a, #0x80
-	jreq	__divsint_stm8_3
-	negw	x
-__divsint_stm8_3:
+	jreq	__modsint_3
+	negw	y
+__modsint_3:
+	ldw	x, y
 	ret

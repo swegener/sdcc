@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  _modsint_stm8.s
+;  _mulint.s
 ;
 ;  Copyright (C) 2014, Krzysztof Nikiel, Ben Shi
 ;
@@ -26,25 +26,29 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl __modsint_stm8
+	.globl __mulint
 
 	.area CODE
-__modsint_stm8:
-	ldw	x, (#3, sp)
-	ldw	y, (#5, sp)
-	ld	a, xh
-	cpw	x, #0x0000
-	jrsge	__modsint_stm8_1
-	negw	x
-__modsint_stm8_1:
-	cpw	y, #0x0000
-	jrsge	__modsint_stm8_2
-	negw	y
-__modsint_stm8_2:
-	divw	x, y
-	and	a, #0x80
-	jreq	__modsint_stm8_3
-	negw	y
-__modsint_stm8_3:
-	ldw	x, y
+__mulint:
+	pushw x
+	ld a, (#6,sp)
+	ld xl, a
+	ld a, (#8,sp)
+	mul x, a
+	ldw (#1,sp), x
+	ld a, (#6,sp)
+	ld xl, a
+	ld a, (#7,sp)
+	mul x, a
+	ld a, xl
+	add a, (#1,sp)
+	ld (#1,sp), a
+	ld a, (#5,sp)
+	ld xl, a
+	ld a, (#8,sp)
+	mul x, a
+	ld a, xl
+	add a, (#1,sp)
+	ld (#1,sp), a
+	popw x
 	ret

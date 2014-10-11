@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  _mulint_stm8.s
+;  _divsint.s
 ;
 ;  Copyright (C) 2014, Krzysztof Nikiel, Ben Shi
 ;
@@ -26,29 +26,25 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl __mulint_stm8
+	.globl __divsint
 
 	.area CODE
-__mulint_stm8:
-	pushw x
-	ld a, (#6,sp)
-	ld xl, a
-	ld a, (#8,sp)
-	mul x, a
-	ldw (#1,sp), x
-	ld a, (#6,sp)
-	ld xl, a
-	ld a, (#7,sp)
-	mul x, a
-	ld a, xl
-	add a, (#1,sp)
-	ld (#1,sp), a
-	ld a, (#5,sp)
-	ld xl, a
-	ld a, (#8,sp)
-	mul x, a
-	ld a, xl
-	add a, (#1,sp)
-	ld (#1,sp), a
-	popw x
+__divsint:
+	ldw	x, (#3, sp)
+	ldw	y, (#5, sp)
+	ld	a, xh
+	xor	a, (#5,sp)
+	cpw	x, #0x0000
+	jrsge	__divsint_1
+	negw	x
+__divsint_1:
+	cpw	y, #0x0000
+	jrsge	__divsint_2
+	negw	y
+__divsint_2:
+	divw	x, y
+	and	a, #0x80
+	jreq	__divsint_3
+	negw	x
+__divsint_3:
 	ret

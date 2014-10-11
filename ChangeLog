@@ -1,3 +1,19 @@
+2014-10-11 Ben Shi <powerstudio1st AT 163.com>
+	* src/stm8/gen.c:
+	  Delete temporary code stm_sub_func().
+	* device/stm8/_modsint_stm8.s:
+	* device/stm8/_mulint_stm8.s:
+	* device/stm8/_divsint_stm8.s:
+	* device/stm8/_mullong_stm8.s:
+	  Deleted.
+	* device/stm8/_modsint.s:
+	* device/stm8/_mulint.s:
+	* device/stm8/_divsint.s:
+	* device/stm8/_mullong.s:
+	  Added.
+	* device/stm8/Makefile.in:
+	  Use the above new added .s files.
+
 2014-10-09 Ben Shi <powerstudio1st AT 163.com>
 	* src/stm8/gen.c:
 	  Add stm_sub_func() for future more stm8 optimized functions.

@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  _divsint.s
 ;
-;  Copyright (C) 2014, Krzysztof Nikiel, Ben Shi
+;  Copyright (C) 2014, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -29,22 +29,23 @@
 	.globl __divsint
 
 	.area CODE
+
 __divsint:
 	ldw	x, (#3, sp)
-	ldw	y, (#5, sp)
 	ld	a, xh
-	xor	a, (#5,sp)
-	cpw	x, #0x0000
-	jrsge	__divsint_1
-	negw	x
-__divsint_1:
-	cpw	y, #0x0000
-	jrsge	__divsint_2
+	ldw	y, (#5, sp)
+	jrpl	y_nonnegative
+	cpl	a
 	negw	y
-__divsint_2:
-	divw	x, y
-	and	a, #0x80
-	jreq	__divsint_3
+y_nonnegative:
+	tnzw	x
+	jrpl	x_nonnegative
 	negw	x
-__divsint_3:
+x_nonnegative:
+	divw	x, y
+	tnz	a
+	jrpl	return_nonnegative
+	negw	x
+return_nonnegative:
 	ret
+

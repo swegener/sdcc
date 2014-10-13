@@ -1,3 +1,8 @@
+2014-10-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/stm8/_divsint.s:
+	  Optimized signed division.
+
 2014-10-11 Ben Shi <powerstudio1st AT 163.com>
 	* src/stm8/gen.c:
 	  Delete temporary code stm_sub_func().

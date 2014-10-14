@@ -4200,7 +4200,7 @@ emitCall (const iCode *ic, bool ispcall)
       if (ispcall && IS_GB)
         _push (PAIR_HL);
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-      wassertl (IC_RESULT (ic), "Unused return value in call to function returning large type.");
+      wassertl (IC_RESULT (ic) && AOP_TYPE (IC_RESULT (ic)) != AOP_DUMMY, "Unimplemented: Unused return value in call to function returning large type.");
       wassert (AOP_TYPE (IC_RESULT (ic)) == AOP_STK || AOP_TYPE (IC_RESULT (ic)) == AOP_EXSTK);
       fp_offset =
         AOP (IC_RESULT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_RESULT (ic))->aopu.aop_stk >

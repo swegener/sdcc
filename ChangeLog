@@ -1,3 +1,10 @@
+2014-10-14 Ben Shi <powerstudio1st AT 163.com>
+	* device/stm8/_modsint.s:
+	* device/stm8/_mullong.s:
+	  Optimized with more efficient instructions.
+	* device/stm8/_mulint.s:
+	  Reformat to more readable.
+
 2014-10-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/stm8/_divsint.s:

@@ -31,24 +31,28 @@
 	.area CODE
 __mulint:
 	pushw x
-	ld a, (#6,sp)
+__mulint_0:
+	ld a, (#6, sp)
 	ld xl, a
-	ld a, (#8,sp)
+	ld a, (#8, sp)
 	mul x, a
-	ldw (#1,sp), x
-	ld a, (#6,sp)
+	ldw (#1, sp), x
+__mulint_1:
+	ld a, (#6, sp)
 	ld xl, a
-	ld a, (#7,sp)
-	mul x, a
-	ld a, xl
-	add a, (#1,sp)
-	ld (#1,sp), a
-	ld a, (#5,sp)
-	ld xl, a
-	ld a, (#8,sp)
+	ld a, (#7, sp)
 	mul x, a
 	ld a, xl
-	add a, (#1,sp)
-	ld (#1,sp), a
+	add a, (#1, sp)
+	ld (#1, sp), a
+__mulint_2:
+	ld a, (#5, sp)
+	ld xl, a
+	ld a, (#8, sp)
+	mul x, a
+	ld a, xl
+	add a, (#1, sp)
+	ld (#1, sp), a
+__mulint_3:
 	popw x
 	ret

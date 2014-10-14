@@ -46,7 +46,7 @@ __mullong_1:
 	mul	x, a
 	addw	x, (#2, sp)
 	ldw	(#2, sp), x
-	ld	a, #0
+	clr	a
 	adc	a, #0
 	ld	(#1, sp), a
 
@@ -56,7 +56,7 @@ __mullong_1:
 	mul	x, a
 	addw	x, (#2, sp)
 	ldw	(#2, sp), x
-	ld	a, #0
+	clr	a
 	adc	a, (#1, sp)
 	ld	(#1, sp), a
 __mullong_2:

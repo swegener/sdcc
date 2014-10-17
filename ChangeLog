@@ -1,3 +1,9 @@
+2014-10-17 Ben Shi <powerstudio1st AT 163.com>
+	* device/lib/stm8/Makefile.in:
+	* device/stm8/_modulong.s:
+	* device/stm8/_divulong.s:
+	  Optimized according to their c origination.
+
 2014-10-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

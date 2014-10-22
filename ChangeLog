@@ -1,3 +1,9 @@
+2014-10-22 Ben Shi <powerstudio1st AT 163.com>
+	* device/lib/stm8/Makefile.in:
+	* device/stm8/_modslong.s:
+	* device/stm8/_divslong.s:
+	  Optimized mod & div of signed long.
+
 2014-10-17 Ben Shi <powerstudio1st AT 163.com>
 	* device/lib/stm8/Makefile.in:
 	* device/stm8/_modulong.s:

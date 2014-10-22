@@ -936,8 +936,8 @@ aopOp (operand *op, const iCode *ic)
 
   /* None of the above, which only leaves temporaries. */
   { 
-    bool completly_in_regs = TRUE;
-    bool completly_on_stack = TRUE;
+    bool completely_in_regs = TRUE;
+    bool completely_on_stack = TRUE;
     asmop *aop = newAsmop (AOP_REGSTK);
 
     aop->size = getSize (operandType (op));
@@ -948,13 +948,13 @@ aopOp (operand *op, const iCode *ic)
         aop->aopu.bytes[i].in_reg = !!sym->regs[i];
         if (sym->regs[i])
           {
-            completly_on_stack = FALSE;
+            completely_on_stack = FALSE;
             aop->aopu.bytes[i].byteu.reg = sym->regs[i];
             aop->regs[sym->regs[i]->rIdx] = i;
           }
         else if (sym->usl.spillLoc || sym->nRegs && regalloc_dry_run)
           {
-            completly_in_regs = FALSE;
+            completely_in_regs = FALSE;
 
             if (!regalloc_dry_run)
               {
@@ -987,7 +987,7 @@ aopOp (operand *op, const iCode *ic)
             return;
           }
 
-        if (!completly_in_regs && (!currFunc || GcurMemmap == statsg))
+        if (!completely_in_regs && (!currFunc || GcurMemmap == statsg))
           {
             if (!regalloc_dry_run)
               wassertl (0, "Stack asmop outside of function.");
@@ -995,9 +995,9 @@ aopOp (operand *op, const iCode *ic)
           }
       }
 
-    if (completly_in_regs)
+    if (completely_in_regs)
       aop->type = AOP_REG;
-    else if (completly_on_stack)
+    else if (completely_on_stack)
       aop->type = AOP_STK;
 
     return;
@@ -1943,7 +1943,7 @@ skip_byte:
     {
       if (!regalloc_dry_run)
         {
-          wassertl (0, "genCopy failed to completly copy operands.");
+          wassertl (0, "genCopy failed to completely copy operands.");
           fprintf (stderr, "%d bytes left.\n", size);
           fprintf (stderr, "left type %d source type %d\n", result->type, source->type);
           for (i = 0; i < n ; i++)

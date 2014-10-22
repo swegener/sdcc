@@ -1,3 +1,8 @@
+2014-10-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Spelling fix inspired by Debian patch 02_fix_spelling.
+
 2014-10-22 Ben Shi <powerstudio1st AT 163.com>
 	* device/lib/stm8/Makefile.in:
 	* device/stm8/_modslong.s:

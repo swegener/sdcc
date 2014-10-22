@@ -142,7 +142,7 @@ void thorup_E(std::multimap<unsigned int, unsigned int> &M, const I_t &I)
       s.push(std::pair<int, unsigned int>(i2, j));
     }
     
-    // Not in Thorup's paper, but without this the algorithm gives incorrect results.
+    // Thorup forgot this in his paper. Without it, some maximal chains are omitted.
     while(s.size() > 1)
     {
         M.insert(std::pair<unsigned int, unsigned int>(s.top().second, s.top().first));
@@ -157,7 +157,7 @@ void thorup_E(std::multimap<unsigned int, unsigned int> &M, const I_t &I)
 template <class l_t, class G_t>
 void thorup_elimination_ordering(l_t &l, const G_t &G)
 {
-  // Should we do this? Or just use G as J? The Thorup paper seems unclear, it speaks of statements that contain jumps to other statements, but does it count as a jump, when they're just subsequent?
+  // Remove edges to immediately following instruction. By "each statement can have at most obne jump" in the last paragraph of Appendix A it is clear that Thorup does not consider the implicit next-instruction-edges as jumps.
   boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> J;
   boost::copy_graph(G, J, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
   for (unsigned int i = 0; i < boost::num_vertices(J) - 1; i++)

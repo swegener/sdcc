@@ -638,7 +638,7 @@ ld_cost (asmop * op1, asmop * op2)
           if (op2->aopu.aop_pairId == PAIR_BC || op2->aopu.aop_pairId == PAIR_DE)
             return ((op1type == AOP_ACC || op1type == AOP_DUMMY) ? 1 : 2);
         default:
-          printf ("ld_cost op1: AOP_REG, op2: %d", (int) (op2type));
+          printf ("ld_cost op1: AOP_REG, op2: %d\n", (int) (op2type));
           wassert (0);
         }
     case AOP_SFR:              /* 2 from out (...), a */
@@ -663,7 +663,7 @@ ld_cost (asmop * op1, asmop * op2)
         case AOP_EXSTK:        /* 4 from ld iy, #... */
           return (9);
         default:
-          printf ("ld_cost op1: AOP_SFR, op2: %d", (int) (op2type));
+          printf ("ld_cost op1: AOP_SFR, op2: %d\n", (int) (op2type));
           wassert (0);
         }
     case AOP_IY:               /* 4 from ld iy, #... */
@@ -683,7 +683,7 @@ ld_cost (asmop * op1, asmop * op2)
         case AOP_EXSTK:
           return (16);
         default:
-          printf ("ld_cost op1: AOP_IY, op2: %d", (int) (op2type));
+          printf ("ld_cost op1: AOP_IY, op2: %d\n", (int) (op2type));
           wassert (0);
         }
     case AOP_STK:
@@ -708,7 +708,7 @@ ld_cost (asmop * op1, asmop * op2)
           if (op2->aopu.aop_pairId == PAIR_IY || op2->aopu.aop_pairId == PAIR_IX)
             return (6);
         default:
-          printf ("ld_cost op1: AOP_STK, op2: %d", (int) (op2type));
+          printf ("ld_cost op1: AOP_STK, op2: %d\n", (int) (op2type));
           wassert (0);
         }
     case AOP_HL:               /* 3 from ld hl, #... */
@@ -740,7 +740,7 @@ ld_cost (asmop * op1, asmop * op2)
       wassertl (0, "Trying to assign a value to a literal");
       break;
     default:
-      printf ("ld_cost op1: %d", (int) (op1type));
+      printf ("ld_cost op1: %d\n", (int) (op1type));
       wassert (0);
     }
   return (8);                   // Fallback
@@ -773,7 +773,7 @@ op8_cost (asmop * op2)
       if (op2->aopu.aop_pairId == PAIR_IY || op2->aopu.aop_pairId == PAIR_IX)
         return (3);
     default:
-      printf ("op8_cost op2: %d", (int) (op2->type));
+      printf ("op8_cost op2: %d\n", (int) (op2->type));
       wassert (0);
     }
   return (8);                   // Fallback
@@ -797,7 +797,7 @@ bit8_cost (asmop * op1)
     case AOP_EXSTK:            /* 4 from ld iy, #... */
       return (8);
     default:
-      printf ("bit8_cost op1: %d", (int) (op1->type));
+      printf ("bit8_cost op1: %d\n", (int) (op1->type));
       wassert (0);
     }
   return (8);                   //Fallback

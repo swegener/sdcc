@@ -3,6 +3,9 @@
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2304.c:
 	  Fix bug #2304.
+	* src/z80/ralloc.c,
+	  support/regression/tests/bug-2305.c:
+	  Fix bug #2305.
 
 2014-10-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

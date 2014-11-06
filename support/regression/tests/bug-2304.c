@@ -1,5 +1,5 @@
 /*
-   bug-2254.c a bug in compile-time evaluation of integer constant division.
+   bug-2304.c a literal address bug for operands bigger than 2 bytes.
  */
 
 #include <testfwk.h>

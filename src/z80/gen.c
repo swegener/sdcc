@@ -1203,7 +1203,7 @@ aopForSym (const iCode * ic, symbol * sym, bool result, bool requires_a)
               sym->aop = aop = newAsmop (AOP_SFR);
               aop->aopu.aop_dir = sym->rname;
               aop->size = getSize (sym->type);
-              emitDebug ("; AOP_SFR for %s", sym->rname);
+              /* emitDebug ("; AOP_SFR for %s", sym->rname); */
               return aop;
             }
         }
@@ -1216,7 +1216,7 @@ aopForSym (const iCode * ic, symbol * sym, bool result, bool requires_a)
           aop->size = getSize (sym->type);
           aop->paged = FUNC_REGBANK (sym->type);
           aop->bcInUse = isPairInUse (PAIR_BC, ic);
-          emitDebug (";Z80 AOP_SFR for %s banked:%d bc:%d", sym->rname, FUNC_REGBANK (sym->type), aop->bcInUse);
+          /* emitDebug (";Z80 AOP_SFR for %s banked:%d bc:%d", sym->rname, FUNC_REGBANK (sym->type), aop->bcInUse); */
 
           return (aop);
         }
@@ -1226,7 +1226,7 @@ aopForSym (const iCode * ic, symbol * sym, bool result, bool requires_a)
   /* in which case DPTR gets the address */
   if (IS_GB || IY_RESERVED)
     {
-      emitDebug ("; AOP_HL for %s", sym->rname);
+      /* emitDebug ("; AOP_HL for %s", sym->rname); */
       sym->aop = aop = newAsmop (AOP_HL);
     }
   else

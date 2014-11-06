@@ -3175,7 +3175,7 @@ outBitC (operand * result)
 /* toBoolean - emit code for or a,operator(sizeop)                 */
 /*-----------------------------------------------------------------*/
 static void
-_toBoolean (const operand * oper, bool needflag)
+_toBoolean (const operand *oper, bool needflag)
 {
   int size = AOP_SIZE (oper);
   sym_link *type = operandType (oper);
@@ -10263,7 +10263,7 @@ genAssign (const iCode * ic)
   else if (isPair (AOP (right)) && AOP_TYPE (result) == AOP_IY && size == 2)
     commitPair (AOP (result), getPairId (AOP (right)), ic, FALSE);
   else if (size == 2 && isPairDead (PAIR_HL, ic) &&
-    (!IS_GB && (AOP_TYPE (right) == AOP_STK && !_G.omitFramePtr || AOP_TYPE (right) == AOP_IY) && AOP_TYPE (result) == AOP_IY || // Use ld (nn), hl
+    (!IS_GB && (AOP_TYPE (right) == AOP_STK && !_G.omitFramePtr || AOP_TYPE (right) == AOP_IY || AOP_TYPE (right) == AOP_LIT) && AOP_TYPE (result) == AOP_IY || // Use ld (nn), hl
     !IS_GB && AOP_TYPE (right) == AOP_IY && (AOP_TYPE (result) == AOP_STK && !_G.omitFramePtr || AOP_TYPE (result) == AOP_IY) || // Use ld hl, (nn)
     !IS_GB && AOP_TYPE (right) == AOP_LIT && (AOP_TYPE(result) == AOP_STK || AOP_TYPE(result) == AOP_EXSTK) && (AOP(result)->aopu.aop_stk + offset + _G.stack.offset + (AOP(result)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed) == 0 || // Use ex (sp), hl
     (IS_RAB || IS_TLCS90) && (AOP_TYPE(result) == AOP_STK || AOP_TYPE(result) == AOP_EXSTK) && (AOP_TYPE(right) == AOP_LIT || AOP_TYPE (right) == AOP_IMMD))) // Use ld d(sp), hl

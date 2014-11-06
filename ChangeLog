@@ -1,5 +1,10 @@
 2014-11-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
+	* src/z80/gen.c:
+	  More efficient assignment of literals to 16-bit globals and statics.
+
+2014-11-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2306.c:
 	  Fixed bug #2306.

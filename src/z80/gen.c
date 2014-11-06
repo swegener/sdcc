@@ -1418,7 +1418,7 @@ aopOp (operand * op, const iCode * ic, bool result, bool requires_a)
     return;
 
   /* if this a literal */
-  if (IS_OP_LITERAL (op))
+  if (IS_OP_LITERAL (op)) /* TODO:  && !op->isaddr, handle address literals in a sane way */
     {
       op->aop = aop = newAsmop (AOP_LIT);
       aop->aopu.aop_lit = OP_VALUE (op);
@@ -10016,7 +10016,7 @@ genPointerSet (iCode * ic)
         }
       else
         pairId = getPartPairId (AOP (right), 2);
-      emit2 ("ld (%s), %s", aopGetLitWordLong (AOP (result), offset + 2, FALSE), _pairs[pairId].name);
+      emit2 ("ld (%s+%d), %s", aopGetLitWordLong (AOP (result), offset, FALSE),2,  _pairs[pairId].name); // Handling of literal addresses is somewhat broken, use explicit offset as workaround.
       regalloc_dry_run_cost += (pairId == PAIR_HL) ? 3 : 4;
       goto release;
     }

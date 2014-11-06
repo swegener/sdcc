@@ -1,3 +1,9 @@
+2014-11-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2304.c:
+	  Fix bug #2304.
+
 2014-10-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/bug-2254.c:

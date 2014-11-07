@@ -11,8 +11,8 @@
 void
 testTortureExecute (void)
 {
-// TODO: Enable when sdcc supports long long constants!
-#if 0
+// TODO: Enable when these orts better support long long!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_stm8) && !defined(__SDCC_gbz80)
   unsigned long long xx;
   unsigned long long *x = (unsigned long long *) &xx;
 

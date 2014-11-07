@@ -7,7 +7,7 @@ PDFLATEX   = @PDFLATEX@
 MAKEINDEX  = @MAKEINDEX@
 PDFOPT     = @PDFOPT@
 
-QUIET      = >/dev/null 2>/dev/null
+PDFLATEXARGS = -file-line-error -halt-on-error
 
 include ../Makefile.common
 
@@ -91,11 +91,11 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 #	# $(MAKEINDEX) -s l2hglo.ist -o $@ $<
 
 %.pdf %.aux: %.tex
-	$(PDFLATEX) $* $(QUIET)
+	$(PDFLATEX) $* $(PDFLATEXARGS)
 	[ ! -e "$*.idx" ] || $(MAKEINDEX) $* $(QUIET)
-	$(PDFLATEX) $* $(QUIET)
+	$(PDFLATEX) $* $(PDFLATEXARGS)
 	[ ! -e "$*.idx" ] || $(MAKEINDEX) $* $(QUIET)
-	$(PDFLATEX) $* $(QUIET)
+	$(PDFLATEX) $* $(PDFLATEXARGS)
 	$(PDFOPT) $*.pdf $*-tmp.pdf
 	rm $*.pdf
 	mv $*-tmp.pdf $*.pdf

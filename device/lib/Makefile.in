@@ -102,7 +102,9 @@ SOURCES_LONGLONG = $(COMMON_LONGLONG) \
   _rlslonglong.c \
   _mullonglong.c \
   _divslonglong.c \
-  _divulonglong.c
+  _divulonglong.c \
+  _modslonglong.c \
+  _modulonglong.c
 
 SOURCES_SDCC = $(COMMON_SDCC) \
   _autobaud.c \

@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   _mullonglong.c - routine for multiplication of 64 bit long long
+   _modslonglong.c - routine for modulo of 64 bit unsigned long long
 
-   Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
+   Copyright (C) 2014, Philipp Klaus Krause . pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -29,24 +29,24 @@
 #pragma std_c99
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __SDCC_LONGLONG
-
-long long _mullonglong(long long ll, long long lr)
+long long 
+_modslonglong (long long numerator, long long denominator)
 {
-  unsigned long long ret = 0ull;
-  unsigned char *l = (unsigned char *)(&ll);
-  unsigned char *r = (unsigned char *)(&lr);
-  unsigned char i, j;
+  bool numeratorneg = (numerator < 0);
+  bool denominatorneg = (denominator < 0);
+  long long r;
 
-  for (i = 0; i < sizeof (long long); i++)
-    {
-      for(j = 0; (i + j) < sizeof (long long); j++)
-          ret += (unsigned long long)((unsigned short)(l[i] * r [j])) << ((i + j) * 8);
-    }
+  if (numeratorneg)
+    numerator = -numerator;
+  if (denominatorneg)
+    denominator = -denominator;
 
-  return(ret);
+  r = (unsigned long long)numerator % (unsigned long long)denominator;
+
+  return ((numeratorneg ^ denominatorneg) ? -r : r);
 }
-
 #endif
 

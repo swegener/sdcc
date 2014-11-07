@@ -30,7 +30,9 @@ HC08_LONGLONG = $(COMMON_LONGLONG) \
   _rlslonglong.c \
   _mullonglong.c \
   _divslonglong.c \
-  _divulonglong.c
+  _divulonglong.c \
+  _modslonglong.c \
+  _modulonglong.c
 
 HC08_SDCC = $(COMMON_SDCC) \
   _itoa.c \

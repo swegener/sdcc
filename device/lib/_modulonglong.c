@@ -1,7 +1,9 @@
 /*-------------------------------------------------------------------------
-   _mullonglong.c - routine for multiplication of 64 bit long long
+   _modulonglong.c - routine for modulus of 64 bit unsigned long long
 
-   Copyright (C) 2012, Philipp Klaus Krause . philipp@informatik.uni-frankfurt.de
+   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Bug fixes by Martijn van Balen, aed@iae.nl
+   Copyright (C) 2014, Philipp Klaus Krause . pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -26,27 +28,36 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#pragma std_c99
-
 #include <stdint.h>
 
 #ifdef __SDCC_LONGLONG
 
-long long _mullonglong(long long ll, long long lr)
+#define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)
+
+unsigned long long
+_modulonglong (unsigned long long a, unsigned long long b)
 {
-  unsigned long long ret = 0ull;
-  unsigned char *l = (unsigned char *)(&ll);
-  unsigned char *r = (unsigned char *)(&lr);
-  unsigned char i, j;
+  unsigned char count = 0;
 
-  for (i = 0; i < sizeof (long long); i++)
-    {
-      for(j = 0; (i + j) < sizeof (long long); j++)
-          ret += (unsigned long long)((unsigned short)(l[i] * r [j])) << ((i + j) * 8);
-    }
+  while (!MSB_SET(b))
+  {
+     b <<= 1;
+     if (b > a)
+     {
+        b >>=1;
+        break;
+     }
+     count++;
+  }
+  do
+  {
+    if (a >= b)
+      a -= b;
+    b >>= 1;
+  }
+  while (count--);
 
-  return(ret);
+  return a;
 }
-
 #endif
 

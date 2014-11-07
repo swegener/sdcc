@@ -8,12 +8,12 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long constants!
-#if 0
+// TODO: Enable when long long comes to these ports!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 void t1 (int x)
 {
   if (x != 4100)
-    abort ();
+    ASSERT (0);
 }
 
 int t2 (void)
@@ -26,7 +26,7 @@ int t2 (void)
 void t3 (long long x)
 {
   if (x != 0x80000fffULL)
-    abort ();
+    ASSERT (0);
 }
 
 long long t4 (void)
@@ -40,7 +40,7 @@ long long t4 (void)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (t2 () != 4096)
     ASSERT (0);
   if (t4 () != 4096)

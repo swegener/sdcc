@@ -8,7 +8,7 @@
 #pragma disable_warning 85
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 long long x;
 unsigned long long y;
 int i;
@@ -41,9 +41,8 @@ void
 testLongLong (void)
 {
   volatile unsigned long tmp;
-// Test fils on 32-bit systems.
-//#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-#if 0
+
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   i = 42;
   ASSERT (g() == 43);
   i = 23;
@@ -55,15 +54,15 @@ testLongLong (void)
   ASSERT ((x >> 1) == 21);
   ASSERT ((x << 1) == 84);
   ASSERT (!(x >> 17));
-//  ASSERT ((x << 17) == (42l << 17)); sdcc has broken long long constants!
+  ASSERT ((x << 17) == (42l << 17));
   y = x;
   ASSERT (y == 42ull);
   ASSERT ((y >> 1) == 21);
   ASSERT ((y << 1) == 84);
   ASSERT ((y >> 17) == 0);
-//  ASSERT ((y << 17) == (42ul << 17));
-//  ASSERT ((y << 16) == (42ul << 16));
-
+  ASSERT ((y << 17) == (42ul << 17));
+  ASSERT ((y << 16) == (42ul << 16));
+#ifndef __SDCC_stm8 // Invalid instruction. Probably an stm8 assembler bug.
   tmp = 0xaaffaafful;
   y = tmp;
   ASSERT (c() == 12);
@@ -88,6 +87,17 @@ testLongLong (void)
   ASSERT (c() == 12);
   y >>= 31;
   ASSERT (y == 3);
+#endif
+  tmp = 23;
+  y = 42;
+  ASSERT (y / tmp == 42 / 23);
+  ASSERT (y % tmp == 42 % 23);
+
+  tmp = 42;
+  x = 42ll << 23;
+  ASSERT (x / tmp == (42ll << 23) / 42);
+  ASSERT (x % tmp == (42ll << 23) % 42);
+
 #endif
 }
 

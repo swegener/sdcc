@@ -1,3 +1,21 @@
+2014-11-07 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/lib/_modslonglong.c,
+	  device/lib/_modulonglong.c,
+	  device/lib/Makefile.in,
+	  device/lib/*/Makefile.in,
+	  doc/sdccman.lyx:
+	  Implement % for long long and unsigned long long.
+	* doc/Makefile.in:
+	  More sensible error behaviour when building documentation.
+	* src/SDCCval.c,
+	  src/SDCCerr.c:
+	  Only warn about long long constants for large values.
+	* device/lib/_mullonglong.c:
+	  Fix long long multiplication.
+	* support/regression/tests/*.c:
+	  Enable some long long regression test that pass now.
+
 2014-11-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:

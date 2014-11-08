@@ -1,9 +1,10 @@
 2014-11-08 Philipp Klaus Krause <pkk AT spth.de>
 
-	* support/regression/tests/longlong.c:
-	  Disable division test, since it fails on 32-bit hosts.
+	* support/regression/tests/longlong.c,
+	  support/regression/tests/gcc-torture-execute-950512-1.c:
+	  Disabled test, since it fails on 32-bit hosts.
 
-2014-11-07 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2014-11-07 Philipp Klaus Krause  <pkk AT spth.de>
 
 	* device/lib/_modslonglong.c,
 	  device/lib/_modulonglong.c,
@@ -21,18 +22,18 @@
 	* support/regression/tests/*.c:
 	  Enable some long long regression test that pass now.
 
-2014-11-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2014-11-06 Philipp Klaus Krause  <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  More efficient assignment of literals to 16-bit globals and statics.
 
-2014-11-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2014-11-06 Philipp Klaus Krause  <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2306.c:
 	  Fixed bug #2306.
 
-2014-11-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2014-11-06 Philipp Klaus Krause  <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2304.c:
@@ -41,7 +42,7 @@
 	  support/regression/tests/bug-2305.c:
 	  Fixed bug #2305.
 
-2014-10-29 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+2014-10-29 Philipp Klaus Krause  <pkk AT spth.de>
 
 	* support/regression/tests/bug-2254.c:
 	  Regression test for bug #2254.

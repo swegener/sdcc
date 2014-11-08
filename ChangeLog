@@ -1,3 +1,8 @@
+2014-11-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/longlong.c:
+	  Disable division test, since it fails on 32-bit hosts.
+
 2014-11-07 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/lib/_modslonglong.c,

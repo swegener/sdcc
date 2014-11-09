@@ -557,7 +557,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
       for(unsigned int i = 0; i < getSize(operandType(result)); i++)
         {
-          unsigned char byte = (ulFromVal (OP_VALUE (litop)) >> (i * 8) & 0xff);
+          unsigned char byte = byteOfVal (OP_VALUE (litop), i);
           if (byte != 0x00 && byte != 0x01 && byte != 0x02 && byte != 0x04 && byte != 0x08 && byte != 0x10 && byte != 0x20 && byte != 0x40 && byte != 0x80)
             goto nobit;
         }

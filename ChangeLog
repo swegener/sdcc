@@ -1,3 +1,10 @@
+2014-11-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Fix a long long register allcoation issue.
+	* support/regression/tests/gcc-torture-execute-950511-1.c:
+	  Disable test that fails on 32-bit hosts.
+
 2014-11-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/longlong.c,

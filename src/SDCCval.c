@@ -1779,7 +1779,7 @@ byteOfVal (value * val, int offset)
 }
 
 /*------------------------------------------------------------------*/
-/* ullFromLit - literal to unsigned long conversion                 */
+/* ullFromLit - literal to unsigned long long conversion            */
 /*------------------------------------------------------------------*/
 TYPE_TARGET_ULONGLONG
 ullFromLit (sym_link * lit)
@@ -1853,7 +1853,7 @@ ullFromLit (sym_link * lit)
 }
 
 /*------------------------------------------------------------------*/
-/* ullFromVal - value to unsigned long conversion                   */
+/* ullFromVal - value to unsigned long long conversion              */
 /*------------------------------------------------------------------*/
 TYPE_TARGET_ULONGLONG
 ullFromVal (value * val)

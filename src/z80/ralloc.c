@@ -1621,7 +1621,7 @@ regTypeNum (void)
   for (sym = hTabFirstItem (liveRanges, &k); sym; sym = hTabNextItem (liveRanges, &k))
     {
       /* if used zero times then no registers needed */
-      if ((sym->liveTo - sym->liveFrom) == 0)
+      if ((sym->liveTo - sym->liveFrom) == 0 && getSize (sym->type) <= 4)
         continue;
 
       D (D_ALLOC, ("regTypeNum: loop on sym %p\n", sym));
@@ -2931,7 +2931,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                  or is already assigned to registers (or marked for the new allocator)
                  or will not live beyond this instructions */
               if (!sym->nRegs ||
-                  sym->isspilt || bitVectBitValue (_G.regAssigned, sym->key) || sym->for_newralloc || sym->liveTo <= ic->seq)
+                  sym->isspilt || bitVectBitValue (_G.regAssigned, sym->key) || sym->for_newralloc || (sym->liveTo <= ic->seq && (sym->nRegs <= 4 || ic->op != CALL)))
                 {
                   D (D_ALLOC, ("serialRegAssign: won't live long enough.\n"));
                   continue;
@@ -2947,7 +2947,11 @@ serialRegMark (eBBlock ** ebbs, int count)
                   continue;
                 }
 
-              if (max_alloc_bytes >= sym->nRegs)
+              if (sym->nRegs > 4) /* TODO. Change this once we can allocate bigger variables (but still spill when its a big return value). */
+                {
+                  spillThis (sym);
+                }
+              else if (max_alloc_bytes >= sym->nRegs)
                 {
                   sym->for_newralloc = 1;
                   max_alloc_bytes -= sym->nRegs;

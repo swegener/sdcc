@@ -1,3 +1,12 @@
+2014-11-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c,
+	  src/z80/gen.c,
+	  src/stm8/ralloc.c,
+	  src/stm8/gen.c,
+	  support/regression/tests/longlong.c:
+	  Implement unused long long return values.
+
 2014-11-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc:

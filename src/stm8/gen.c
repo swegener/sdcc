@@ -2744,10 +2744,7 @@ emitCall (const iCode *ic, bool ispcall)
       if (IC_RESULT (ic)->aop->type != AOP_STK)
         {
           if (!regalloc_dry_run)
-            {
-              fprintf (stderr, "Type %d\n", IC_RESULT (ic)->aop->type);
-              wassertl (0, "Unimplemented return value size / type combination.");
-            }
+            wassertl (0, "Unimplemented return value size / type combination.");
           cost (180, 180);
         }
 

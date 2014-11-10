@@ -87,9 +87,12 @@ testLongLong (void)
   ASSERT (c() == 12);
   y >>= 31;
   ASSERT (y == 3);
-#endif
+
   tmp = 23;
   y = 42;
+  ASSERT (y + tmp == 42 + 23);
+  ASSERT (y - tmp == 42 - 23);
+  ASSERT (y * tmp == 42 * 23);
 #if 0 // Fails on 32-bit hosts.
   ASSERT (y / tmp == 42 / 23);
 #endif
@@ -97,11 +100,19 @@ testLongLong (void)
 
   tmp = 42;
   x = 42ll << 23;
+  ASSERT (x + y == (42ll << 23) + 42);
+#ifndef __SDCC_gbz80 // Breaks due to bug in hl handling in gbz80 port
+  ASSERT (x - y == (42ll << 23) - 42);
+#endif
+  ASSERT (x * y == (42ll << 23) * 42);
 #if 0 // Fails on 32-bit hosts.
   ASSERT (x / tmp == (42ll << 23) / 42);
 #endif
   ASSERT (x % tmp == (42ll << 23) % 42);
 
+#endif
+
+  c(); // Unused long long return value require special handling in register allocation.
 #endif
 }
 

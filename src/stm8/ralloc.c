@@ -208,7 +208,7 @@ regTypeNum (void)
   for (sym = hTabFirstItem (liveRanges, &k); sym; sym = hTabNextItem (liveRanges, &k))
     {
       /* if used zero times then no registers needed */
-      if ((sym->liveTo - sym->liveFrom) == 0)
+      if ((sym->liveTo - sym->liveFrom) == 0 && getSize (sym->type) <= 4)
         continue;
 
       D (D_ALLOC, ("regTypeNum: loop on sym %p\n", sym));
@@ -497,7 +497,11 @@ serialRegMark (eBBlock ** ebbs, int count)
                   continue;
                 }
 
-              if (max_alloc_bytes >= sym->nRegs)
+              if (sym->nRegs > 4 && ic->op == CALL)
+                {
+                  spillThis (sym, TRUE);
+                }
+              else if (max_alloc_bytes >= sym->nRegs)
                 {
                   sym->for_newralloc = 1;
                   max_alloc_bytes -= sym->nRegs;

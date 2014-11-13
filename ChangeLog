@@ -1,3 +1,8 @@
+2014-11-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* support/regression/tests/gcc-torture-execute-pr42544.c:
+	  Disable test for host, since it fails on Solaris.
+
 2014-11-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/longlong.c:

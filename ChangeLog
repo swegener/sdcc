@@ -1,3 +1,10 @@
+2014-11-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/sdbinutils/bfd/configure,
+	  support/sdbinutils/bfd/warning.m4,
+	  support/sdbinutils/binutils/configure:
+	  Fixed bug #2280 by disabling -Werror.
+
 2014-11-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/regression/tests/gcc-torture-execute-pr42544.c:

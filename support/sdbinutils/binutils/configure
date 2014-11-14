@@ -11612,10 +11612,10 @@ case "${host}" in
   *) ;;
 esac
 
-# Enable -Werror by default when using gcc
-if test "${GCC}" = yes -a -z "${ERROR_ON_WARNING}" ; then
-    ERROR_ON_WARNING=yes
-fi
+# Enable -Werror by default when using gcc - Disabled this bullshit - spth / Philipp
+#if test "${GCC}" = yes -a -z "${ERROR_ON_WARNING}" ; then
+#    ERROR_ON_WARNING=yes
+#fi
 
 NO_WERROR=
 if test "${ERROR_ON_WARNING}" = yes ; then

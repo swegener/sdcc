@@ -43,8 +43,10 @@ testTortureExecute (void)
 {
 #ifndef __SDCC_gbz80
 #ifndef __SDCC_mcs51
+#ifndef __SDCC_stm8 // Fails on MacOS
     foo();
     return;
+#endif
 #endif
 #endif
 }

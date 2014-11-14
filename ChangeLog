@@ -6,6 +6,8 @@
 	  Fixed bug #2280 by disabling -Werror.
 	* sdas/linksrc/Makefile.in:
 	  Fixed bugs #2310 and #2303.
+	* support/regression/tests/gcc-torture-execute-20031012-1.c:
+	  Disable test that fails on MacOS.
 
 2014-11-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

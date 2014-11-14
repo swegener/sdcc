@@ -4,6 +4,8 @@
 	  support/sdbinutils/bfd/warning.m4,
 	  support/sdbinutils/binutils/configure:
 	  Fixed bug #2280 by disabling -Werror.
+	* sdas/linksrc/Makefile.in:
+	  Fixed bugs #2310 and #2303.
 
 2014-11-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

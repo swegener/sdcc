@@ -35,7 +35,7 @@ EXEEXT          = @EXEEXT@
 VPATH           = @srcdir@
 
 CPPFLAGS        = @CPPFLAGS@ -I.. -I$(srcdir)/..
-CFLAGS          = @CFLAGS@ @WALL_FLAG@ -DINDEXLIB -DUNIX -I. -I$(srcdir)
+CFLAGS          = @CFLAGS@ @WALL_FLAG@ -DINDEXLIB -DUNIX -I. -I$(srcdir) --std=c99
 LDFLAGS         = @LDFLAGS@
 
 OBJDIR = obj

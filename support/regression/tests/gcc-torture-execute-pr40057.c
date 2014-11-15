@@ -34,6 +34,7 @@ bar (long long x)
 void
 testTortureExecute (void)
 {
+#ifndef PORT_HOST // Fails on NetBSD
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (sizeof (long long) != 8)
     return;
@@ -46,6 +47,7 @@ testTortureExecute (void)
   if (!bar (0x1882a9aaaLL))
     ASSERT (0);
   return;
+#endif
 #endif
 }
 

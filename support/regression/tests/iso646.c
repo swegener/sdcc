@@ -6,6 +6,7 @@
  */
 #include <testfwk.h>
 
+#include <float.h> /* bug #2314 was a conflict between iso646.h and float.h */
 #include <iso646.h>
 
 static void

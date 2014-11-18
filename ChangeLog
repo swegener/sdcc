@@ -1,3 +1,9 @@
+2014-11-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/iso646.h,
+	  support/regression/tests/iso646.c:
+	  Fixed bug #2314.
+
 2014-11-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-pr40057.c:

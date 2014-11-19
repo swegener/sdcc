@@ -1,3 +1,7 @@
+2014-11-19 Ben Shi <powerstudio1st AT 163.com>
+	* sdas/linksrc/aslink.h:
+	  Change PATH_MAX to a proper value on x86_64, for bug #2316.
+
 2014-11-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/iso646.h,

@@ -160,6 +160,8 @@
  #if defined(__BORLANDC__) || defined(_MSC_VER)
   #include <stdlib.h>
   #define PATH_MAX      _MAX_PATH
+ #elif defined(__x86_64__)
+  #define PATH_MAX      4096
  #else
   #define PATH_MAX      255     /* define a reasonable value */
  #endif

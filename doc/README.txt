@@ -100,6 +100,7 @@ Authors and interested persons:
 * Philipp Klaus Krause <pkk AT spth.de>
 * Leland Morrison      <enigmalee.AT.sourceforget.net>
 * Molnar Karoly        <molnarkaroly AT users.sf.net>
+* Ben Shi              <powerstudio1st AT 163.com>
 
 SDCC includes code from:
 * Alan Baldwin <baldwin AT shop-pdp.kent.edu>

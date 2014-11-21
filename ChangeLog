@@ -1,3 +1,11 @@
+2014-11-21 Ben Shi <powerstudio1st AT 163.com>
+	* device/lib/stm8/heap.s:
+	* device/lib/stm8/Makefile.in:
+	  Add support for heap operation.
+	* support/regression/tests/gcc-torture-execute-920810-1.c:
+	* support/regression/tests/malloc:
+	  enable test cases which use malloc().
+
 2014-11-19 Ben Shi <powerstudio1st AT 163.com>
 	* sdas/linksrc/aslink.h:
 	  Change PATH_MAX to a proper value on x86_64, for bug #2316.

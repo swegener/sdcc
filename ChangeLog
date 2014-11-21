@@ -1,3 +1,8 @@
+2014-11-21 Philipp Klaus Krause <philipp@informatik.uni-frankfurt.de>
+
+	* src/stm8/main.c:
+	  Comment expaining why we can't use the byte at 0 in C.
+
 2014-11-21 Ben Shi <powerstudio1st AT 163.com>
 	* device/lib/stm8/heap.s:
 	* device/lib/stm8/Makefile.in:

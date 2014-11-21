@@ -84,7 +84,7 @@ stm8_setDefaultOptions (void)
   options.intlong_rent = 1;
   options.float_rent = 1;
   options.noRegParams = 0;
-  options.data_loc = 0x0001;
+  options.data_loc = 0x0001; /* We can't use the byte at address zero in C, since NULL pointers have special meaning */
   options.code_loc = 0x8000;
 
   options.out_fmt = 'i';        /* Default output format is ihx */

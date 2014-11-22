@@ -1,4 +1,8 @@
 2014-11-22 Ben Shi <powerstudio1st AT 163.com>
+	* src/stm8/peep.c:
+	  Fix potential bugs.
+
+2014-11-22 Ben Shi <powerstudio1st AT 163.com>
 	* src/SDCCpeeph.c:
 	  Add function notSimilar().
 	* src/stm8/peep.c:

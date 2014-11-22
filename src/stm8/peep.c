@@ -596,7 +596,7 @@ stm8MightRead(const lineNode *pl, const char *what)
       if (ISINST (pl->line, "divw") || ISINST (pl->line, "exgw") || ISINST (pl->line, "trap"))
         return TRUE;
  
-      if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strchr(strchr(pl->line, ','), extra))
+      if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strstr (strchr(pl->line, ','), what))
         return TRUE;
 
       if (pl->line[4] == extra && (ISINST (pl->line, "div") && !ISINST (pl->line, "divw")))
@@ -760,7 +760,7 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
         && strncmp (pl->line + 3, what, strlen (what)) == 0)
         return TRUE;
 
-      if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strncmp (strstr (pl->line, ", "), what, strlen (what)) == 0)
+      if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strstr (strstr (pl->line, ","), what))
         return TRUE;
     }
 

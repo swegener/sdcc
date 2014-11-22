@@ -1109,6 +1109,42 @@ FBYNAME (operandsNotRelated)
 }
 
 /*-----------------------------------------------------------------*/
+/* notSimilar - Check, if one is another's substring               */
+/*-----------------------------------------------------------------*/
+FBYNAME (notSimilar)
+{
+  set *operands;
+  const char *op1, *op2;
+
+  operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands)
+    {
+      fprintf (stderr,
+               "*** internal error: notSame peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  while ((op1 = setFirstItem (operands)))
+    {
+      deleteSetItem (&operands, (void*)op1);
+
+      for (op2 = setFirstItem (operands); op2; op2 = setNextItem (operands))
+        {
+          if ((strstr (op1, op2) || strstr (op2, op1)) && strcmp (op1, op2) == 0)
+            {
+              deleteSet (&operands);
+              return FALSE;
+            }
+        }
+    }
+
+  deleteSet (&operands);
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------*/
 /* notSame - Check, that arguments are pairwise not the same       */
 /*-----------------------------------------------------------------*/
 FBYNAME (notSame)
@@ -1400,7 +1436,10 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "immdInRange", immdInRange
-  }
+  },
+  {
+    "notSimilar", notSimilar
+  },
 };
 
 /*-----------------------------------------------------------------*/

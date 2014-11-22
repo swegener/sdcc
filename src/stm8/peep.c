@@ -11,8 +11,6 @@
 #define EQUALS(l, i) (!strcmp((l), (i)))
 #define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1))
 
-#define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1))
-
 // This function should behave just like C99 isblank(). Remove it, once MSVC supports isblank().
 static int _isblank(int c)
 {
@@ -458,31 +456,30 @@ findLabel (const lineNode *pl)
 }
 
 /* Check if reading arg implies reading what. */
-static bool argCont(const char *arg, const char *what)
+static bool argCont(const char *arg, char what)
 {
+  if (arg == NULL || strlen (arg) == 0 || !(what == 'a' || what == 'x' || what == 'y'))
+    return FALSE;
+
+  while (_isblank ((unsigned char)(arg[0])))
+    arg++;
+
+  if (arg[0] == ',')
+    arg++;
+
   while (_isblank ((unsigned char)(arg[0])))
     arg++;
 
   if (arg[0] == '#')
     return FALSE;
 
-  if (arg[0] == '(' && arg[1] == '0' && arg[2] == 'x')
+  if (arg[0] == '(' && arg[1] == '0' && (tolower(arg[2])) == 'x') 
     arg += 3; // Skip hex prefix to avoid false x positive.
 
-  return (strstr(arg, what) != NULL);
-}
-
-/* Check if writing arg implies reading what. */
-static bool argCont2(const char *arg, const char *what)
-{
-  while (_isblank ((unsigned char)(arg[0])))
-    arg++;
-
-  if (arg[0] != '(')
+  if (strlen(arg) == 0)
     return FALSE;
-  if (arg[1] == '0' && arg[2] == 'x')
-    arg += 2; // Skip hex prefix to avoid false x positive.
-  return (strstr (arg + 1, what) && strstr (arg + 1, what) < strchr (arg + 1, ')'));
+
+  return (strchr(arg, what) != NULL);
 }
 
 static bool
@@ -544,81 +541,234 @@ isReturned(const char *what)
 }
 
 static bool
-z80MightRead(const lineNode *pl, const char *what)
+stm8MightRead(const lineNode *pl, const char *what)
 {
-  const char *extra = 0;
+  char extra = 0;
+
   if (!strcmp (what, "xl") || !strcmp (what, "xh"))
-    extra = "x";
-  if (!strcmp (what, "yl") || !strcmp (what, "yh"))
-    extra = "y";
+    extra = 'x';
+  else if (!strcmp (what, "yl") || !strcmp (what, "yh"))
+    extra = 'y';
+  else if (strcmp (what, "a") != 0)
+    return FALSE;
 
-  if (ISINST (pl->line, "addw\t"))
-    return (extra && extra[0] == pl->line[5]);
-
-  if (ISINST (pl->line, "ld\t"))
+  if (!extra)
     {
-      if (argCont (strchr (pl->line, ',') + 2, what))
-        return TRUE;
-      if (extra && argCont (strchr (pl->line, ',') + 1, extra))
-        return TRUE;
-      if (extra && argCont2 (pl->line + 3, extra))
-        return TRUE;
-      return FALSE;
+      if (ISINST (pl->line, "adc")
+        || ISINST (pl->line, "add")
+        || ISINST (pl->line, "and")
+        || ISINST (pl->line, "bcp")
+        || ISINST (pl->line, "cp")
+        || ISINST (pl->line, "div")
+        || ISINST (pl->line, "exg")
+        || ISINST (pl->line, "mul")
+        || ISINST (pl->line, "or")
+        || ISINST (pl->line, "rlwa")
+        || ISINST (pl->line, "rrwa")
+        || ISINST (pl->line, "sbc")
+        || ISINST (pl->line, "trap")
+        || ISINST (pl->line, "xor"))
+          return TRUE;
+
+      if (pl->line[4] == 'a' && (ISINST (pl->line, "cpl")
+        || ISINST (pl->line, "dec")
+        || ISINST (pl->line, "inc")
+        || ISINST (pl->line, "neg")
+        || ISINST (pl->line, "rlc")
+        || ISINST (pl->line, "rrc")
+        || ISINST (pl->line, "sll")
+        || ISINST (pl->line, "sla")
+        || ISINST (pl->line, "sra")
+        || ISINST (pl->line, "srl")
+        || ISINST (pl->line, "sub")
+        || ISINST (pl->line, "tnz")))
+          return TRUE;
+
+      if ((pl->line[5] == 'a') && (ISINST (pl->line, "push")
+        || ISINST (pl->line, "swap")))
+          return TRUE;
+
+      if ((ISINST (pl->line, "ld") || ISINST (pl->line, "ldf")) && argCont (strchr (pl->line, ','), 'a'))
+          return TRUE;
     }
-
-  if (ISINST (pl->line, "ldw\t"))
+  else
     {
-      if (extra && argCont (strchr (pl->line, ',') + 1, extra))
+      if (ISINST (pl->line, "divw") || ISINST (pl->line, "exgw") || ISINST (pl->line, "trap"))
         return TRUE;
-      if (extra && argCont2 (pl->line + 4, extra))
+ 
+      if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strchr(strchr(pl->line, ','), extra))
         return TRUE;
-      return FALSE;
+
+      if (pl->line[4] == extra && (ISINST (pl->line, "div") && !ISINST (pl->line, "divw")))
+        return TRUE;
+
+      if (pl->line[5] == extra && ISINST (pl->line, "addw")
+        || ISINST (pl->line, "cplw")
+        || ISINST (pl->line, "decw")
+        || ISINST (pl->line, "incw")
+        || ISINST (pl->line, "negw")
+        || ISINST (pl->line, "rlcw")
+        || ISINST (pl->line, "rlwa")
+        || ISINST (pl->line, "rrcw")
+        || ISINST (pl->line, "rrwa")
+        || ISINST (pl->line, "sllw")
+        || ISINST (pl->line, "slaw")
+        || ISINST (pl->line, "sraw")
+        || ISINST (pl->line, "srlw")
+        || ISINST (pl->line, "subw")
+        || ISINST (pl->line, "addw")
+        || ISINST (pl->line, "tnzw"))
+          return TRUE;
+
+      if (pl->line[6] == extra && ISINST (pl->line, "pushw")
+        || ISINST (pl->line, "swapw"))
+          return TRUE;
+
+      if (ISINST (pl->line, "cpw") && pl->line[4] == extra)
+        return TRUE;
+
+      if (argCont (strchr (pl->line, ','), extra) && (ISINST (pl->line, "adc")
+        || (ISINST (pl->line, "add") && !ISINST (pl->line, "addw"))
+        || ISINST (pl->line, "and")
+        || ISINST (pl->line, "bcp")
+        || ISINST (pl->line, "call")
+        || (ISINST (pl->line, "clr") && !ISINST (pl->line, "clrw"))
+        || (ISINST (pl->line, "cp") && !ISINST (pl->line, "cpw"))
+        || ISINST (pl->line, "cpl")
+        || (ISINST (pl->line, "dec") && !ISINST (pl->line, "decw"))
+        || (ISINST (pl->line, "inc") && !ISINST (pl->line, "incw"))
+        || ISINST (pl->line, "jp")
+        || (ISINST (pl->line, "neg") && !ISINST (pl->line, "negw"))
+        || ISINST (pl->line, "or")
+        || (ISINST (pl->line, "rlc") && !ISINST (pl->line, "rlcw"))
+        || (ISINST (pl->line, "rrc") && !ISINST (pl->line, "rrcw"))
+        || ISINST (pl->line, "sbc")
+        || (ISINST (pl->line, "sll") && !ISINST (pl->line, "sllw"))
+        || (ISINST (pl->line, "sla") && !ISINST (pl->line, "slaw"))
+        || (ISINST (pl->line, "sra") && !ISINST (pl->line, "sraw"))
+        || (ISINST (pl->line, "srl") && !ISINST (pl->line, "srlw"))
+        || (ISINST (pl->line, "sub") && !ISINST (pl->line, "subw"))
+        || (ISINST (pl->line, "swap") && !ISINST (pl->line, "swapw"))
+        || (ISINST (pl->line, "tnz") && !ISINST (pl->line, "tnzw"))
+        || ISINST (pl->line, "cpw")
+        || ISINST (pl->line, "ldf")
+        || ISINST (pl->line, "ldw")
+        || (ISINST (pl->line, "ld") && !ISINST (pl->line, "ldw"))
+        || ISINST (pl->line, "xor")))
+          return TRUE;
     }
 
   if(ISINST(pl->line, "ret"))
     return(isReturned(what));
-
-  return TRUE;
+  else
+    return FALSE;
 }
 
 static bool
-z80UncondJump(const lineNode *pl)
+stm8UncondJump(const lineNode *pl)
 {
   return (ISINST(pl->line, "jp\t") || ISINST(pl->line, "jra\t") || ISINST(pl->line, "jpf\t"));
 }
 
 static bool
-z80CondJump(const lineNode *pl)
+stm8CondJump(const lineNode *pl)
 {
-  return (!z80UncondJump(pl) && ISINST(pl->line, "jr") ||
+  return (!stm8UncondJump(pl) && ISINST(pl->line, "jr") ||
     ISINST(pl->line, "btjt\t") || ISINST(pl->line, "btjf\t"));
 }
 
 static bool
-z80SurelyWrites(const lineNode *pl, const char *what)
+stm8SurelyWrites(const lineNode *pl, const char *what)
 {
-  char *extra = 0;
+  char extra = 0;
   if (!strcmp (what, "xl") || !strcmp (what, "xh"))
-    extra = "x";
+    extra = 'x';
   if (!strcmp (what, "yl") || !strcmp (what, "yh"))
-    extra = "y";
+    extra = 'y';
 
-  if (ISINST (pl->line, "ld\t"))
-    return (strncmp (pl->line + 3, what, strlen (what)) == 0);
-
-  if (ISINST (pl->line, "ldw\t"))
+  if (!extra)
     {
-      return (extra && strncmp (pl->line + 4, extra, strlen (extra)) == 0);
-    }
+      if (ISINST (pl->line, "adc")
+        || ISINST (pl->line, "add")
+        || ISINST (pl->line, "and")
+        || ISINST (pl->line, "div")
+        || ISINST (pl->line, "exg")
+        || ISINST (pl->line, "iret")
+        || ISINST (pl->line, "or")
+        || ISINST (pl->line, "rlwa")
+        || ISINST (pl->line, "rrwa")
+        || ISINST (pl->line, "sbc")
+        || ISINST (pl->line, "xor"))
+          return TRUE;
 
-  if(ISINST(pl->line, "ret"))
-    return TRUE;
+      if (pl->line[4] == 'a' && (ISINST (pl->line, "clr")
+        || ISINST (pl->line, "cpl")
+        || ISINST (pl->line, "dec")
+        || ISINST (pl->line, "inc")
+        || ISINST (pl->line, "neg")
+        || ISINST (pl->line, "pop")
+        || ISINST (pl->line, "rlc")
+        || ISINST (pl->line, "rrc")
+        || ISINST (pl->line, "sll")
+        || ISINST (pl->line, "sla")
+        || ISINST (pl->line, "sra")
+        || ISINST (pl->line, "srl")
+        || ISINST (pl->line, "ldf")
+        || ISINST (pl->line, "sub")))
+          return TRUE;
+
+      if (pl->line[5] == 'a' && ISINST (pl->line, "swap"))
+        return TRUE;
+
+      if (pl->line[3] == 'a' && ISINST (pl->line, "ld"))
+        return TRUE;
+    }
+  else
+    {
+      if (ISINST (pl->line, "divw")
+        || ISINST (pl->line, "exgw")
+        || ISINST (pl->line, "iret"))
+          return TRUE;
+
+      if (pl->line[4] == extra && ((ISINST (pl->line, "div") && !ISINST (pl->line, "divw"))
+        || ISINST (pl->line, "ldw")
+        || ISINST (pl->line, "mul")))
+          return TRUE;
+
+      if (pl->line[5] == extra && (ISINST (pl->line, "addw")
+        || ISINST (pl->line, "clrw")
+        || ISINST (pl->line, "cplw")
+        || ISINST (pl->line, "decw")
+        || ISINST (pl->line, "incw")
+        || ISINST (pl->line, "negw")
+        || ISINST (pl->line, "popw")
+        || ISINST (pl->line, "rlcw")
+        || ISINST (pl->line, "rlwa")
+        || ISINST (pl->line, "rrcw")
+        || ISINST (pl->line, "rrwa")
+        || ISINST (pl->line, "sllw")
+        || ISINST (pl->line, "slaw")
+        || ISINST (pl->line, "sraw")
+        || ISINST (pl->line, "srlw")
+        || ISINST (pl->line, "subw")))
+          return TRUE;
+
+      if (pl->line[6] == extra && ISINST (pl->line, "swapw"))
+        return TRUE;
+
+      if ((ISINST (pl->line, "ld") && !ISINST (pl->line, "ldw") && !ISINST (pl->line, "ldf"))
+        && strncmp (pl->line + 3, what, strlen (what)) == 0)
+        return TRUE;
+
+      if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strncmp (strstr (pl->line, ", "), what, strlen (what)) == 0)
+        return TRUE;
+    }
 
   return FALSE;
 }
 
 static bool
-z80SurelyReturns(const lineNode *pl)
+stm8SurelyReturns(const lineNode *pl)
 {
   return(ISINST(pl->line, "ret"));
 }
@@ -684,13 +834,13 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
 
       (*pl)->visited = TRUE;
 
-      if(z80MightRead(*pl, what))
+      if(stm8MightRead(*pl, what))
         {
           D(("S4O_RD_OP\n"));
           return S4O_RD_OP;
         }
 
-      if(z80UncondJump(*pl))
+      if(stm8UncondJump(*pl))
         {
           *pl = findLabel (*pl);
             if (!*pl)
@@ -699,7 +849,7 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
                 return S4O_ABORT;
               }
         }
-      if(z80CondJump(*pl))
+      if(stm8CondJump(*pl))
         {
           *plCond = findLabel (*pl);
           if (!*plCond)
@@ -711,14 +861,14 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
           return S4O_CONDJMP;
         }
 
-      if(z80SurelyWrites(*pl, what))
+      if(stm8SurelyWrites(*pl, what))
         {
           D(("S4O_WR_OP\n"));
           return S4O_WR_OP;
         }
 
-      /* Don't need to check for de, hl since z80MightRead() does that */
-      if(z80SurelyReturns(*pl))
+      /* Don't need to check for de, hl since stm8MightRead() does that */
+      if(stm8SurelyReturns(*pl))
         {
           D(("S4O_TERM\n"));
           return S4O_TERM;
@@ -737,7 +887,6 @@ static bool
 doTermScan (lineNode **pl, const char *what)
 {
   lineNode *plConditional;
-
   for (;; *pl = (*pl)->next)
     {
       switch (scan4op (pl, what, NULL, &plConditional))

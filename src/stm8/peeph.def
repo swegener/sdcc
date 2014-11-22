@@ -2,15 +2,17 @@
 
 replace restart {
 	ld	%1, %2
+	%3
 } by {
 	; peephole 0 removed dead load.
-} if notVolatile(%1), notVolatile(%2), notUsed(%1)
+} if notVolatile(%1), notVolatile(%2), notUsed(%1), notSimilar(jr %3)
 
 replace restart {
 	ldw	%1, %2
+	%3
 } by {
 	; peephole 0w removed dead load.
-} if notVolatile(%1), notVolatile(%2), notUsed(%1)
+} if notVolatile(%1), notVolatile(%2), notUsed(%1), notSimilar(jr %3)
 
 replace restart {
 	ld	%1, %2
@@ -596,3 +598,31 @@ replace restart {
 	jp	%1
 	; peephole j31 replaced call at end of function by jump (tail call optimization).
 }
+
+replace restart {
+	ld	xl, a
+	ld	a, xh
+} by {
+	rlwa	x
+} if notUsed('xh')
+
+replace restart {
+	ld	yl, a
+	ld	a, yh
+} by {
+	rlwa	y
+} if notUsed('yh')
+
+replace restart {
+	ld	xh, a
+	ld	a, xl
+} by {
+	rrwa	x
+} if notUsed('xl')
+
+replace restart {
+	ld	yh, a
+	ld	a, yl
+} by {
+	rrwa	y
+} if notUsed('yl')

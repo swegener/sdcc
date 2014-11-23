@@ -9,9 +9,16 @@ void testBug(void)
 #ifdef __SDCC_pic16
 	signed long *l = (signed long *) 0x02b0;
 	float *f = (float *) 0x02b0;
-#else
+#elif defined (__SDCC_mcs51) || defined (__SDCC_ds390)
+	__xdata signed long *l = (__xdata signed long *) 0xcab0;
+	__xdata float *f = (__xdata float *) 0xcab0;
+#elif defined (__SDCC)
 	signed long *l = (signed long *) 0xcab0;
 	float *f = (float *) 0xcab0;
+#else // host test
+	char buf[16];
+	signed long *l = (signed long *) buf;
+	float *f = (float *) buf;
 #endif
 
 	*l++ = -2;	

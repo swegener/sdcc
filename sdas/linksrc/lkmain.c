@@ -267,9 +267,11 @@ main(int argc, char *argv[])
                                 case 'C':
                                 case 'S':
                                         strcat(ip, " ");
-                                        strcat(ip, argv[++i]);
+                                        if (i < argc - 1)
+                                                strcat(ip, argv[++i]);
+					else
+                                                strcpy(ip, "");
                                         break;
-
                                 /*
                                  * Preprocess these commands
                                  */

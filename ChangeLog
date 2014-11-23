@@ -1,3 +1,9 @@
+2014-11-23 Ben Shi <powerstudio1st AT 163.com>
+	* support/regression/tests/bug-2304.c:
+	  Improve this test case.
+	* sdas/linksrc/lkmain.c:
+	  Add bound check.
+
 2014-11-22 Ben Shi <powerstudio1st AT 163.com>
 	* src/stm8/peep.c:
 	  Fix potential bugs.

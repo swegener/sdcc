@@ -1,3 +1,8 @@
+2014-11-23 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/include/pic14/pic14devices.txt:
+	  Bugfix, thanks to Franz.
+
 2014-11-23 Ben Shi <powerstudio1st AT 163.com>
 	* support/regression/tests/bug-2304.c:
 	  Improve this test case.

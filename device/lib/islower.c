@@ -15,7 +15,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -31,5 +31,9 @@
 /* it is important to declare this function extern before including
    the inline definition to give it external linkage */
 extern int islower (int c);
+
+/* also include stdio.h before ctype.h here so ctype can perform a
+   _Static_assert on EOF */
+#include <stdio.h>
 
 #include <ctype.h>

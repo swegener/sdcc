@@ -1,19 +1,30 @@
+2014-11-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/ctype.h: compare as unsigned chars, added static asserts on EOF
+	* device/lib/isdigit.c,
+	* device/lib/islower.c,
+	* device/lib/isupper.c: include stdio.h to enable the static assert in ctype.h
+	* support/regression/tests/gcc-torture-execute-20050613-1.c: split up ASSERTs
+
 2014-11-23 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic14/pic14devices.txt:
 	  Bugfix, thanks to Franz.
 
 2014-11-23 Ben Shi <powerstudio1st AT 163.com>
+
 	* support/regression/tests/bug-2304.c:
 	  Improve this test case.
 	* sdas/linksrc/lkmain.c:
 	  Add bound check.
 
 2014-11-22 Ben Shi <powerstudio1st AT 163.com>
+
 	* src/stm8/peep.c:
 	  Fix potential bugs.
 
 2014-11-22 Ben Shi <powerstudio1st AT 163.com>
+
 	* src/SDCCpeeph.c:
 	  Add function notSimilar().
 	* src/stm8/peep.c:
@@ -27,6 +38,7 @@
 	  Comment expaining why we can't use the byte at 0 in C.
 
 2014-11-21 Ben Shi <powerstudio1st AT 163.com>
+
 	* device/lib/stm8/heap.s:
 	* device/lib/stm8/Makefile.in:
 	  Add support for heap operation.
@@ -35,6 +47,7 @@
 	  enable test cases which use malloc().
 
 2014-11-19 Ben Shi <powerstudio1st AT 163.com>
+
 	* sdas/linksrc/aslink.h:
 	  Change PATH_MAX to a proper value on x86_64, for bug #2316.
 
@@ -141,12 +154,14 @@
 	  Spelling fix inspired by Debian patch 02_fix_spelling.
 
 2014-10-22 Ben Shi <powerstudio1st AT 163.com>
+
 	* device/lib/stm8/Makefile.in:
 	* device/stm8/_modslong.s:
 	* device/stm8/_divslong.s:
 	  Optimized mod & div of signed long.
 
 2014-10-17 Ben Shi <powerstudio1st AT 163.com>
+
 	* device/lib/stm8/Makefile.in:
 	* device/stm8/_modulong.s:
 	* device/stm8/_divulong.s:
@@ -158,6 +173,7 @@
 	  Improve error messages for unimplemented unused return value.
 
 2014-10-14 Ben Shi <powerstudio1st AT 163.com>
+
 	* device/stm8/_modsint.s:
 	* device/stm8/_mullong.s:
 	  Optimized with more efficient instructions.
@@ -170,6 +186,7 @@
 	  Optimized signed division.
 
 2014-10-11 Ben Shi <powerstudio1st AT 163.com>
+
 	* src/stm8/gen.c:
 	  Delete temporary code stm_sub_func().
 	* device/stm8/_modsint_stm8.s:
@@ -186,6 +203,7 @@
 	  Use the above new added .s files.
 
 2014-10-09 Ben Shi <powerstudio1st AT 163.com>
+
 	* src/stm8/gen.c:
 	  Add stm_sub_func() for future more stm8 optimized functions.
 	* src/stm8/peeph.def:
@@ -196,6 +214,7 @@
 	* support/scripts/cinc2h.pl: Updated to the gputils-1.4.0 .
 
 2014-09-29 Ben Shi <powerstudio1st AT 163.com>
+
 	* device/lib/stm8/_mullong_stm8.s:
 	* device/lib/stm8/Makefile.in:
 	  stm8 optimized version of _mullong.

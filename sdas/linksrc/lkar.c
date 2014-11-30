@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <assert.h>
 
+#include "../../sdccconf.h"
 #include "aslink.h"
 #include "lklibr.h"
 #include "lkrel.h"
@@ -46,6 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 #endif
 
 
+#ifndef HAVE_STRNDUP
 char *
 strndup (const char *str, size_t len)
 {
@@ -54,6 +56,7 @@ strndup (const char *str, size_t len)
   s[len] = '\0';
   return s;
 }
+#endif
 
 static int
 is_ar (FILE * libfp)

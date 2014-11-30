@@ -1,3 +1,13 @@
+2014-11-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* configure.in,
+	* configure,
+	* sdccconf_h.in,
+	* sdas/linksrc/lkar.c: Use configure to detect system strndup()
+	  (alternate fix for bugs #2310 and #2303)
+	* sdas/linksrc/Makefile.in: Removed -std=c99; it caused problems with
+	  mingw32 build
+
 2014-11-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/ctype.h: compare as unsigned chars, added static asserts on EOF

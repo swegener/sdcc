@@ -168,7 +168,7 @@ spillThis (symbol *sym, bool force_spill)
 {
   int i;
 
-  D (D_ALLOC, ("spillThis: spilling %p\n", sym));
+  D (D_ALLOC, ("spillThis: spilling %p (%s)\n", sym, sym->name));
 
   sym->for_newralloc = 0;
 
@@ -207,7 +207,7 @@ regTypeNum (void)
   /* for each live range do */
   for (sym = hTabFirstItem (liveRanges, &k); sym; sym = hTabNextItem (liveRanges, &k))
     {
-      /* if used zero times then no registers needed */
+      /* if used zero times then no registers needed. Exception: Variables larger than 4 bytes - these might need a spill location when they are return values */
       if ((sym->liveTo - sym->liveFrom) == 0 && getSize (sym->type) <= 4)
         continue;
 
@@ -241,7 +241,7 @@ regTypeNum (void)
 
           if (sym->nRegs > 8)
             {
-              fprintf (stderr, "allocated more than 8 egisters for type ");
+              fprintf (stderr, "allocated more than 8 registers for type ");
               printTypeChain (sym->type, stderr);
               fprintf (stderr, "\n");
             }
@@ -602,7 +602,6 @@ stm8_assignRegisters (ebbIndex * ebbi)
   eBBlock **ebbs = ebbi->bbOrder;
   int count = ebbi->count;
   iCode *ic;
-  int i;
 
   stm8_init_asmops();
 

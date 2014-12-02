@@ -1,3 +1,7 @@
+2014-12-02 Ben Shi <powerstudio1st AT 163 DOT com>
+	* sim/ucsim/stm8.src/stm8.cc:
+	  Make stack larger, since some test cases cost large stack space.
+
 2014-12-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/ralloc.c,

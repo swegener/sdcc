@@ -90,13 +90,12 @@ cl_stm8::reset(void)
 {
   cl_uc::reset();
 
-  regs.SP = 0x7ff;
+  regs.SP = 0x17ff;
   regs.A = 0;
   regs.X = 0;
   regs.Y = 0;
   regs.CC = 0x00;
   regs.VECTOR = 1;
-
 }
 
 

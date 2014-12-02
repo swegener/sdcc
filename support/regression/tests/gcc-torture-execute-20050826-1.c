@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#if defined __SDCC_MODEL_SMALL || defined __SDCC_MODEL_MEDIUM || defined(__SDCC_stm8)
+#if defined __SDCC_MODEL_SMALL || defined __SDCC_MODEL_MEDIUM
 #define SIZE 64     // the available memory is limited
 #else
 #define SIZE 2048

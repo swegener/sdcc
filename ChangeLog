@@ -1,3 +1,8 @@
+2014-12-02 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/tests/gcc-torture-execute-20050826-1.c:
+	* support/regression/tests/gcc-torture-execute-950511-1.c:
+	  Enabled for stm8.
+
 2014-12-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/_mullonglong.c,

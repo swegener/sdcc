@@ -25,29 +25,20 @@
 
 static void foo ()
 {
-#ifndef __SDCC_gbz80
-#ifndef __SDCC_mcs51
-    char a[ARRAY_SIZE]; /* Too big for mcs51 and gbz80. */
-
+#if !defined (__SDCC_gbz80) && !defined (__SDCC_mcs51) && !defined (__SDCC_stm8)
+    char a[ARRAY_SIZE]; /* Too big for mcs51 and gbz80 and stm8. */
     a[0]=0;
     memset( &a[0], 0xCD, STRLEN );
     a[STRLEN]=0;
     if (strlen(a) != STRLEN)
       ASSERT (0);
 #endif
-#endif
 }
 
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_gbz80
-#ifndef __SDCC_mcs51
-#ifndef __SDCC_stm8 // Fails on MacOS
     foo();
     return;
-#endif
-#endif
-#endif
 }
 

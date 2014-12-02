@@ -87,7 +87,7 @@ testLongLong (void)
   ASSERT (c() == 12);
   y >>= 31;
   ASSERT (y == 3);
-#ifndef __SDCC_stm8 // Invalid instruction. Probably an stm8 assembler bug.
+#ifndef __SDCC_stm8
   tmp = 23;
   y = 42;
   ASSERT (y + tmp == 42 + 23);

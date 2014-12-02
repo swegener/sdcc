@@ -175,7 +175,7 @@ spillThis (symbol *sym, bool force_spill)
   /* if this is rematerializable or has a spillLocation
      we are okay, else we need to create a spillLocation
      for it */
-  if (!(sym->remat || sym->usl.spillLoc))
+  if (!(sym->remat || sym->usl.spillLoc) || (sym->usl.spillLoc && !sym->usl.spillLoc->onStack)) // stm8 port currently only supports on-stack spill locations in code generation.
     createStackSpil (sym);
 
   /* mark it has spilt & put it in the spilt set */

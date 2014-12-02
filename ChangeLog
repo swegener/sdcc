@@ -1,3 +1,9 @@
+2014-12-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc.c,
+	  src/z80/ralloc.c:
+	  Do not try to use spill locations that are not on the stack in ports that can't handle it.
+
 2014-12-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c:

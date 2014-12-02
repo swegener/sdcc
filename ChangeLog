@@ -3,6 +3,8 @@
 	* src/stm8/ralloc.c,
 	  src/z80/ralloc.c:
 	  Do not try to use spill locations that are not on the stack in ports that can't handle it.
+	* support/regression/tests/longlong.c:
+	  Enable some long long tests that pass for stm8 now.
 
 2014-12-01 Philipp Klaus Krause <pkk AT spth.de>
 

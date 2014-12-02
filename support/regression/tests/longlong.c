@@ -87,7 +87,7 @@ testLongLong (void)
   ASSERT (c() == 12);
   y >>= 31;
   ASSERT (y == 3);
-#ifndef __SDCC_stm8
+
   tmp = 23;
   y = 42;
   ASSERT (y + tmp == 42 + 23);
@@ -109,7 +109,6 @@ testLongLong (void)
   ASSERT (x / tmp == (42ll << 23) / 42);
 #endif
   ASSERT (x % tmp == (42ll << 23) % 42);
-#endif
 
   c(); // Unused long long return value require special handling in register allocation.
 #endif

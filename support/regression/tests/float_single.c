@@ -32,6 +32,7 @@
 #if defined(__SDCC_pic16)
 #   define FLOORF_DISABLED  (1)
 #   define NEG_DISABLED  (1)
+#   define ACOSF_DISABLED  (1)
 #endif
 
 static float

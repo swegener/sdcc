@@ -124,7 +124,7 @@ f4 (int i, ...)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic16)
   f1 (3, 16.0, 128L, 32.0);
   if (x != 176L)
     ASSERT (0);

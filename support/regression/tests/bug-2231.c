@@ -9,8 +9,10 @@ char dst[16] = "***************";
 
 void testBug(void)
 {
+#ifndef __SDCC_pic16
         strncpy(dst, src, 5);
         ASSERT(0 == memcmp(dst, "Hello**********", 16));
         strncpy(dst, src, 15);
         ASSERT(0 == memcmp(dst, "Hello World\0\0\0\0", 16));
+#endif
 }

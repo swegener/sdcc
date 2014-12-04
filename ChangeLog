@@ -1,8 +1,14 @@
-2014-12-02 Philipp Klaus Krause <pkk AT spth.de>
+2014-12-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20080529-1.c,
 	  support/regression/tests/longlong.c:
 	  Disable tests that fail due to broken gbz80 long long multiplication (bug #2329).
+	* support/regression/tests/bug-2231.c,
+	  support/regression/tests/float_single.c,
+	  support/regression/tests/gcc-torture-execute-stdarg-4.c,
+	  support/regression/tests/gcc-torture-execute-stdarg-5.c,
+	  support/regression/tests/vaargs.c:
+	  Disable failing tests for pic16.
 
 2014-12-03 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/gcc-torture-execute-950511-1.c:

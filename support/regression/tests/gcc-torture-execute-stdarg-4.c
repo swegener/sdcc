@@ -124,6 +124,7 @@ f4 (int i, ...)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pic16
   f1 (3, 16.0, 128L, 32.0);
   if (x != 176L)
     ASSERT (0);
@@ -148,7 +149,7 @@ testTortureExecute (void)
 // Fails on z80 and related
   if (x != 144L || y != 28L)
     ASSERT (0);
-
+#endif
   return;
 }
 

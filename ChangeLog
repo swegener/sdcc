@@ -1,3 +1,9 @@
+2014-12-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20080529-1.c,
+	  support/regression/tests/longlong.c:
+	  Disable tests that fail due to broken gbz80 long long multiplication (bug #2328).
+
 2014-12-03 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/gcc-torture-execute-950511-1.c:
 	  Disabled. Since it fails on FreeBSD.

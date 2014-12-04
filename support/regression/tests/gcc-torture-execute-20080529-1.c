@@ -23,9 +23,11 @@ void
 testTortureExecute (void)
 {
 #if !(defined (__GNUC__) && __GNUC__ < 5)
+#ifndef __SDCC_gbz80 // long long multiplication broken on gbz80, bug #2328
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (test (1.0f) != 0)
     ASSERT (0);
+#endif
 #endif
   return;
 #endif

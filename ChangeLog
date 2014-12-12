@@ -1,3 +1,7 @@
+2014-12-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (ifxOptimize): fixed bugs #2313/2330
+
 2014-12-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20080529-1.c,

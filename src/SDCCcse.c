@@ -1664,7 +1664,7 @@ ifxOptimize (iCode * ic, set * cseSet,
         IC_RESULT (ic->prev)->key == IC_COND (ic)->key && bitVectnBitsOn (OP_USES (IC_RESULT (ic->prev))) <= 1)
         {
           sym_link *type = operandType (IC_RESULT (ic->prev));
-          if (ic->prev->op != CAST || SPEC_NOUN (type) == V_BOOL || bitsForType (operandType (IC_RIGHT (ic->prev))) < bitsForType (type))
+          if (ic->prev->op != CAST || IS_BOOL (type) || bitsForType (operandType (IC_RIGHT (ic->prev))) < bitsForType (type))
           {
             ReplaceOpWithCheaperOp(&IC_COND (ic), IC_RIGHT (ic->prev));
             (*change)++;

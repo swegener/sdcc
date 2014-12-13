@@ -1,3 +1,9 @@
+2014-12-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pic16/libc/string/strncpy.c,
+	  support/regression/tests/bug-2231.c:
+	  Fix strncpy() in pic16. Patch by Diego Herranz.
+
 2014-12-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (ifxOptimize): fixed bugs #2313/2330

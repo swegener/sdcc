@@ -33,8 +33,16 @@ strncpy (char *d, char *s, size_t n)
 {
   register char *d1 = d;
 
-  while (n--)
+  while (n && *s)
+  {
+    n--;
     *d1++ = *s++;
-    
+  }
+
+  while (n--)
+  {
+    *d1++ = '\0';
+  }
+
   return d;
 }

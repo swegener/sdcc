@@ -5,7 +5,6 @@ LYX        = @LYX@
 LATEX2HTML = @LATEX2HTML@
 PDFLATEX   = @PDFLATEX@
 MAKEINDEX  = @MAKEINDEX@
-PDFOPT     = @PDFOPT@
 
 PDFLATEXARGS = -file-line-error -halt-on-error
 
@@ -96,9 +95,6 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	$(PDFLATEX) $* $(PDFLATEXARGS)
 	[ ! -e "$*.idx" ] || $(MAKEINDEX) $* $(QUIET)
 	$(PDFLATEX) $* $(PDFLATEXARGS)
-	$(PDFOPT) $*.pdf $*-tmp.pdf
-	rm $*.pdf
-	mv $*-tmp.pdf $*.pdf
 
 archive: all
 	rm -rf sdcc-doc sdcc-doc.tar.bz2

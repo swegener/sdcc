@@ -1,7 +1,8 @@
 2014-12-16 Philipp Klaus Krause <pkk AT spth.de>
 
-	* doc/Makefile.in:
-	  Do not use pdfopt, since it is deprecated and removed in gs 9.07.
+	* configure.in,
+	  doc/Makefile.in:
+	  Remove dependency on pdfopt.
 
 2014-12-13 Philipp Klaus Krause <pkk AT spth.de>
 

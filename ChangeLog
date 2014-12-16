@@ -3,6 +3,8 @@
 	* configure.in,
 	  doc/Makefile.in:
 	  Remove dependency on pdfopt.
+	* support/regression/tests/bug-2313.c:
+	  Regression test for bug #2313.
 
 2014-12-13 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -7186,6 +7186,14 @@ ast_print (ast * tree, FILE * outfile, int indent)
       if (IS_LITERAL (tree->opval.val->etype))
         {
           fprintf (outfile, "CONSTANT (%p) value = ", tree);
+          if (SPEC_LONGLONG (tree->opval.val->etype))
+            {
+              if (SPEC_USIGN (tree->opval.val->etype))
+                fprintf (outfile, "%llu, 0x%llx type (unsigned-long-long-int literal)\n", (TYPE_TARGET_ULONGLONG) SPEC_CVAL (tree->opval.val->etype).v_ulonglong, (TYPE_TARGET_ULONGLONG) SPEC_CVAL (tree->opval.val->etype).v_ulonglong);
+              else
+                fprintf (outfile, "%lld, 0x%llx type (signed-long-long-int literal)\n", (TYPE_TARGET_LONGLONG) SPEC_CVAL (tree->opval.val->etype).v_longlong, (TYPE_TARGET_LONGLONG) SPEC_CVAL (tree->opval.val->etype).v_longlong);
+              return;
+            }
           if (SPEC_USIGN (tree->opval.val->etype))
             fprintf (outfile, "%u", (TYPE_TARGET_ULONG) ulFromVal (tree->opval.val));
           else

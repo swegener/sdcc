@@ -2646,9 +2646,9 @@ valCastLiteral (sym_link * dtype, double fval)
       if (SPEC_LONGLONG (val->etype))
         {
           if (SPEC_USIGN (val->etype))
-            SPEC_CVAL (val->etype).v_ulonglong = (TYPE_TARGET_ULONGLONG) l;
+            SPEC_CVAL (val->etype).v_ulonglong = (TYPE_TARGET_ULONGLONG) fval;
           else
-            SPEC_CVAL (val->etype).v_longlong = (TYPE_TARGET_LONGLONG) l;
+            SPEC_CVAL (val->etype).v_longlong = (TYPE_TARGET_LONGLONG) fval;
         }
       else if (SPEC_LONG (val->etype))
         {

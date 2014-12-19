@@ -106,8 +106,10 @@ testLongLong (void)
 #ifndef __SDCC_gbz80 // Breaks due to bug in hl handling in gbz80 port
   ASSERT (x - y == (42ll << 23) - 42);
 #endif
-#if 0 // Fails on 32-bit hosts.
+#ifndef __SDCC_gbz80 // long long multiplication broken on gbz80, bug #2329
   ASSERT (x * y == (42ll << 23) * 42);
+#endif
+#if 0 // Fails on 32-bit hosts.
   ASSERT (x / tmp == (42ll << 23) / 42);
 #endif
   ASSERT (x % tmp == (42ll << 23) % 42);

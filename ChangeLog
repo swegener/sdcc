@@ -1,3 +1,12 @@
+2014-12-19 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/tests/longlong.c:
+	  Enable more test cases.
+	* src/SDCCast.c:
+	* src/SDCCicode.c:
+	  Fix a bug: higher 4 bytes of a longlong literal are missing while dumping.
+	* src/SDCCval.c:
+	  Fix a bug: higher 4 bytes of a longlong value are discarded while casting from a double value.
+
 2014-12-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* configure.in,

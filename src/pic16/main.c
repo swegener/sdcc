@@ -866,17 +866,6 @@ _pic16_finaliseOptions (void)
 
   dbuf_init (&dbuf, 128);
 
-/*
- * deprecated in sdcc 3.2.0
- * TODO: should be obsoleted in sdcc 3.3.0 or later
-  if (options.std_sdcc)
- */
-    {
-      dbuf_append (&dbuf, "-D", sizeof ("-D") - 1);
-      dbuf_append_str (&dbuf, pic16->name[2]);
-      addSet (&preArgvSet, Safe_strdup (dbuf_c_str (&dbuf)));
-    }
-
   dbuf_set_length (&dbuf, 0);
   dbuf_append (&dbuf, "-D__", sizeof ("-D__") - 1);
   dbuf_append_str (&dbuf, pic16->name[1]);
@@ -946,29 +935,11 @@ _pic16_finaliseOptions (void)
 
   if (STACK_MODEL_LARGE)
     {
-/*
- * deprecated in sdcc 3.2.0
- * TODO: should be obsoleted in sdcc 3.3.0 or later
-      if (options.std_sdcc)
- */
-        {
-          addSet (&preArgvSet, Safe_strdup ("-DSTACK_MODEL_LARGE"));
-          addSet (&asmOptionsSet, Safe_strdup ("-DSTACK_MODEL_LARGE"));
-        }
-        addSet (&preArgvSet, Safe_strdup ("-D__STACK_MODEL_LARGE"));
-        addSet (&asmOptionsSet, Safe_strdup ("-D__STACK_MODEL_LARGE"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STACK_MODEL_LARGE"));
+      addSet (&asmOptionsSet, Safe_strdup ("-D__STACK_MODEL_LARGE"));
     }
   else
     {
-/*
- * deprecated in sdcc 3.2.0
- * TODO: should be obsoleted in sdcc 3.3.0 or later
-      if (options.std_sdcc)
- */
-        {
-          addSet (&preArgvSet, Safe_strdup ("-DSTACK_MODEL_SMALL"));
-          addSet (&asmOptionsSet, Safe_strdup ("-DSTACK_MODEL_SMALL"));
-        }
       addSet (&preArgvSet, Safe_strdup ("-D__STACK_MODEL_SMALL"));
       addSet (&asmOptionsSet, Safe_strdup ("-D__STACK_MODEL_SMALL"));
     }

@@ -137,17 +137,6 @@ _pic14_finaliseOptions (void)
   dbuf_printf (&dbuf, "-D__SDCC_PROCESSOR=\"%s\"", port->processor);
   addSet (&preArgvSet, Safe_strdup (dbuf_detach_c_str (&dbuf)));
 
-/*
- * deprecated in sdcc 3.2.0
- * TODO: should be obsoleted in sdcc 3.3.0 or later
-  if (options.std_sdcc)
- */
-    {
-      dbuf_set_length (&dbuf, 0);
-      dbuf_printf (&dbuf, "-DSDCC_PROCESSOR=\"%s\"", port->processor);
-      addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
-    }
-
     {
       char *upperProc, *p1, *p2;
       int len;

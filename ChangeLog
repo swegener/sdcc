@@ -1,3 +1,12 @@
+2014-12-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c,
+	  src/pic14/main.c,
+	  src/pic16/main.c,
+	  doc/sdccman.lyx,
+	  .version:
+	  Remove obsolete feature macros.
+
 2014-12-21 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCast.c:
 	  Make AST dump more clear.

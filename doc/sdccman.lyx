@@ -1,5 +1,5 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
 \begin_document
 \begin_header
 \textclass book
@@ -37,13 +37,13 @@
 \font_roman times
 \font_sans helvet
 \font_typewriter courier
+\font_math auto
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -54,15 +54,24 @@
 \use_hyperref false
 \papersize letterpaper
 \use_geometry true
-\use_amsmath 1
-\use_esint 0
-\use_mhchem 1
-\use_mathdots 1
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
 \cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
+\justification true
 \use_refstyle 0
 \branch test
 \selected 0
@@ -212,8 +221,8 @@ C
 \emph on
 C
 \emph default
-ompiler) is free open source, retargettable, optimizing ANSI-C compiler
- suite by 
+ompiler) is free open source, retargettable, optimizing standard (ISO C90,
+ ISO C99, ISO C11) C compiler suite by 
 \series bold
 Sandeep Dutta
 \series default
@@ -230,8 +239,8 @@ status collapsed
 \end_inset
 
 , etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 based
- (hc08, s08), Zilog Z80 based MCUs (z80, z180, gbz80, Rabbit 2000/3000,
- Rabbit 3000A
+ (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, gbz80, Rabbit 2000/3000,
+ Rabbit 3000A 
 \begin_inset Index idx
 status collapsed
 
@@ -253,7 +262,7 @@ STM8
 
 .
  It can be retargeted for other microprocessors, support for Microchip PIC
- is under development.
+ and Toshiba TLCS-90 is under development.
  The entire source code for the compiler is distributed under GPL.
  SDCC uses a modified version of ASXXXX
 \begin_inset Index idx
@@ -369,11 +378,11 @@ Supported data-types are:
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="5">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <column alignment="block" valignment="top" width="20text%">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
@@ -2493,7 +2502,7 @@ reference "sub:Standard-Compliance"
 in sdcc version 3.2.0 compiler macro definitions not starting with double
  underscore characters are deprecated if --std-cXX command line option is
  defined.
- They will be oboleted (removed) in one of next sdcc releases.
+ They have been oboleted (removed) after the 3.4.0 release.
 \end_layout
 
 \begin_layout Itemize
@@ -2501,7 +2510,7 @@ in sdcc version 3.2.0 new compiler macros for processor definition were introduc
  for pic14 and pic16 targets: -D__SDCC_PIC16XXXX and -D__SDCC_PIC18FXXX
  respectively.
  The pic16 macro definition -D__18fXXX is deprecated.
- It will be obsoleted (removed) in one of next sdcc releases.
+ It was obsoleted (removed) after the 3.4.0 release.
 \end_layout
 
 \begin_layout Itemize
@@ -2604,82 +2613,6 @@ status collapsed
 \begin_layout Plain Layout
 
 http://sourceforge.net/p/sdcc/code/8805/tree/trunk/sdcc/
-\end_layout
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Section
-Wishes for the future
-\end_layout
-
-\begin_layout Standard
-There are (and always will be) some things that could be done.
- Here are some I can think of:
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-char KernelFunction3(char p) at 0x340;
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-better code banking
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-code banking (limited support)
-\end_layout
-
-\end_inset
-
- support for mcs51
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-
-\family default
-If you can think of some more, please see the section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Requesting-Features"
-
-\end_inset
-
- about filing feature requests
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Requesting features
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Feature request
 \end_layout
 
 \end_inset
@@ -3381,7 +3314,7 @@ These defaults are:
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
@@ -3786,7 +3719,7 @@ non-free/lib
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
@@ -4510,8 +4443,8 @@ Install paths
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="4">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="4.5cm">
 <column alignment="left" valignment="top" width="4cm">
 <column alignment="left" valignment="top" width="4cm">
@@ -4996,7 +4929,7 @@ The paths searched when running the compiler are as follows (the first catch
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
@@ -5145,7 +5078,7 @@ $PATH
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="4">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0.5cm">
 <column alignment="block" valignment="top" width="4.8cm">
 <column alignment="block" valignment="top" width="4.8cm">
@@ -5751,7 +5684,7 @@ model
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="4">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0.5cm">
 <column alignment="block" valignment="top" width="4.5cm">
 <column alignment="block" valignment="top" width="5cm">
@@ -9409,8 +9342,8 @@ Variable-length arrays.
 \end_layout
 
 \begin_layout Itemize
-Integer constants for long long, unsigned long long, int_fast64_t,
- int_least64_t, int64_t, uint_fast64_t, uint_least64_t, uint64_t.
+Integer constants for long long, unsigned long long, int_fast64_t, int_least64_t
+, int64_t, uint_fast64_t, uint_least64_t, uint64_t.
  
 \end_layout
 
@@ -15577,7 +15510,7 @@ reference "sec:Compatibility-with-previous"
 \end_inset
 
 ).
- This option is deprectaed.
+ This option is deprecated.
 \end_layout
 
 \begin_layout Labeling
@@ -24758,7 +24691,7 @@ interrupt vector table
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0in">
 <column alignment="left" valignment="top" width="0in">
 <column alignment="left" valignment="top" width="0in">
@@ -35755,9 +35688,9 @@ For signed & unsigned int (16 bit) and long (32 bit) variables, division,
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -36136,9 +36069,9 @@ SDCC supports IEEE (single precision 4 bytes) floating point numbers.
 \size footnotesize
 \begin_inset Tabular
 <lyxtabular version="3" rows="17" columns="2">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="left" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -37364,14 +37297,14 @@ printf
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="7">
-<features islongtable="true" longtabularalignment="center">
+<features rotate="0" islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="middle" width="14col%">
-<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top">
 <column alignment="center" valignment="top" width="12col%">
 <column alignment="center" valignment="top" width="10col%">
-<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top">
 <column alignment="center" valignment="top" width="12col%">
-<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top">
 <row endhead="true">
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -41581,7 +41514,7 @@ Defines created by the compiler
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="17" columns="2">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top" width="3in">
 <row>
@@ -42988,11 +42921,11 @@ Hardware
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="4">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell multicolumn="1" alignment="center" valignment="top" usebox="none">
 \begin_inset Text
@@ -45977,9 +45910,9 @@ PIC16
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -46220,9 +46153,9 @@ In addition the following macros are defined when calling assembler:
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -46343,11 +46276,11 @@ PIC16
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="4">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -46521,11 +46454,11 @@ status collapsed
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="4">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -46862,10 +46795,10 @@ module_name
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
 <column alignment="block" valignment="top" width="20page%">
-<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -47851,10 +47784,10 @@ Memory model affects the default size of pointers within the source.
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -48046,10 +47979,10 @@ large
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -48296,9 +48229,9 @@ Return values from functions are placed to the appropriate registers following
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -48478,10 +48411,10 @@ n
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -48753,12 +48686,12 @@ Generic pointers are implemented in PIC16 port as 3-byte (24-bit) types.
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="5">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -49164,14 +49097,14 @@ stream
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="7">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
@@ -49323,11 +49256,11 @@ Currently implemented there are 3 types of streams defined:
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="4">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -49713,11 +49646,11 @@ The PIC18F family of microcontrollers supports a number of interrupt sources.
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="4">
-<features tabularvalignment="middle">
-<column alignment="left" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<column alignment="left" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<features rotate="0" tabularvalignment="middle">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="left" valignment="top">
+<column alignment="center" valignment="top">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -55085,7 +55018,7 @@ Tools
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="28" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -56098,7 +56031,7 @@ Documentation
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="2">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="block" valignment="top" width="40col%">
 <column alignment="block" valignment="top" width="60col%">
 <row endhead="true">
@@ -56756,7 +56689,7 @@ Communication online at SourceForge
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="30col%">
 <column alignment="left" valignment="top" width="30col%">
 <column alignment="left" valignment="top" width="40col%">
@@ -57214,7 +57147,7 @@ Related tools
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="20col%">
 <column alignment="block" valignment="top" width="30col%">
 <column alignment="left" valignment="top" width="50col%">
@@ -58013,7 +57946,7 @@ Related documentation / recommended reading
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="20col%">
 <column alignment="left" valignment="top" width="30col%">
 <column alignment="left" valignment="top" width="50col%">
@@ -58345,7 +58278,7 @@ Application notes
 \size footnotesize
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="block" valignment="top" width="17col%">
 <column alignment="block" valignment="top" width="27col%">
 <column alignment="block" valignment="top" width="56col%">
@@ -68532,7 +68465,7 @@ iCode
 Figure II 
 \begin_inset Tabular
 <lyxtabular version="3" rows="39" columns="4">
-<features islongtable="true" headBottomDL="true" longtabularalignment="center">
+<features rotate="0" islongtable="true" headBottomDL="true" longtabularalignment="center">
 <column alignment="block" valignment="top" width="13col%">
 <column alignment="left" valignment="top" width="13col%">
 <column alignment="block" valignment="top" width="22col%">

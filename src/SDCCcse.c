@@ -1259,7 +1259,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
                   litval = gpVal;
                 }
               ic->op = '=';
-              IC_RIGHT (ic) = operandFromValue (valCastLiteral (operandType (IC_LEFT (ic)), litval));
+              IC_RIGHT (ic) = operandFromValue (valCastLiteral (operandType (IC_LEFT (ic)), litval, litval));
               IC_LEFT (ic) = NULL;
               SET_ISADDR (IC_RESULT (ic), 0);
             }

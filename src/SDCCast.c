@@ -1789,7 +1789,7 @@ constExprValue (ast * cexpr, int check)
       /* if we are casting a literal value then */
       if (IS_CAST_OP (cexpr) && IS_LITERAL (cexpr->right->ftype))
         {
-          return valCastLiteral (cexpr->ftype, floatFromVal (cexpr->right->opval.val));
+          return valCastLiteral (cexpr->ftype, floatFromVal (cexpr->right->opval.val), ullFromVal (cexpr->right->opval.val));
         }
 
       if (IS_AST_VALUE (cexpr))
@@ -4395,7 +4395,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           if (!IS_PTR (LTYPE (tree)))
             {
               tree->type = EX_VALUE;
-              tree->opval.val = valCastLiteral (LTYPE (tree), floatFromVal (valFromType (RTYPE (tree))));
+              tree->opval.val = valCastLiteral (LTYPE (tree), floatFromVal (valFromType (RTYPE (tree))), ullFromVal (valFromType (RTYPE (tree))));
               TTYPE (tree) = tree->opval.val->type;
               tree->left = NULL;
               tree->right = NULL;
@@ -4427,7 +4427,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast);
               LRVAL (tree) = 1;
               tree->type = EX_VALUE;
-              tree->opval.val = valCastLiteral (LTYPE (tree), gpVal | pVal);
+              tree->opval.val = valCastLiteral (LTYPE (tree), gpVal | pVal, gpVal | pVal);
               TTYPE (tree) = tree->opval.val->type;
               tree->left = NULL;
               tree->right = NULL;
@@ -7189,16 +7189,18 @@ ast_print (ast * tree, FILE * outfile, int indent)
           if (SPEC_LONGLONG (tree->opval.val->etype))
             {
               if (SPEC_USIGN (tree->opval.val->etype))
-                fprintf (outfile, "%llu, 0x%llx type (unsigned-long-long-int literal)\n", (TYPE_TARGET_ULONGLONG) SPEC_CVAL (tree->opval.val->etype).v_ulonglong, (TYPE_TARGET_ULONGLONG) SPEC_CVAL (tree->opval.val->etype).v_ulonglong);
+                fprintf (outfile, "%llu, 0x%llx", (TYPE_TARGET_ULONGLONG) ullFromVal (tree->opval.val), (TYPE_TARGET_ULONGLONG) ullFromVal (tree->opval.val));
               else
-                fprintf (outfile, "%lld, 0x%llx type (signed-long-long-int literal)\n", (TYPE_TARGET_LONGLONG) SPEC_CVAL (tree->opval.val->etype).v_longlong, (TYPE_TARGET_LONGLONG) SPEC_CVAL (tree->opval.val->etype).v_longlong);
-              return;
+                fprintf (outfile, "%lld, 0x%llx", (TYPE_TARGET_LONGLONG) ullFromVal (tree->opval.val), (TYPE_TARGET_LONGLONG) ullFromVal (tree->opval.val));
             }
-          if (SPEC_USIGN (tree->opval.val->etype))
-            fprintf (outfile, "%u", (TYPE_TARGET_ULONG) ulFromVal (tree->opval.val));
           else
-            fprintf (outfile, "%d", (TYPE_TARGET_LONG) ulFromVal (tree->opval.val));
-          fprintf (outfile, ", 0x%x, %f", (TYPE_TARGET_ULONG) ulFromVal (tree->opval.val), floatFromVal (tree->opval.val));
+            {
+              if (SPEC_USIGN (tree->opval.val->etype))
+                fprintf (outfile, "%u", (TYPE_TARGET_ULONG) ulFromVal (tree->opval.val));
+              else
+                fprintf (outfile, "%d", (TYPE_TARGET_LONG) ulFromVal (tree->opval.val));
+              fprintf (outfile, ", 0x%x, %f", (TYPE_TARGET_ULONG) ulFromVal (tree->opval.val), floatFromVal (tree->opval.val));
+            }
         }
       else if (tree->opval.val->sym)
         {

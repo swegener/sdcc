@@ -120,6 +120,7 @@ value *symbolVal (symbol *);
 void printVal (value *);
 double floatFromVal (value *);
 unsigned long ulFromVal (value *);
+TYPE_TARGET_ULONGLONG ullFromVal (value *);
 
 /* convert a fixed16x16 type to double */
 double doubleFromFixed16x16 (TYPE_TARGET_ULONG value);
@@ -141,7 +142,7 @@ value *valShift (value *, value *, int);
 value *valCompare (value *, value *, int);
 value *valBitwise (value *, value *, int);
 value *valLogicAndOr (value *, value *, int);
-value *valCastLiteral (sym_link *, double);
+value *valCastLiteral (sym_link *, double, TYPE_TARGET_ULONGLONG);
 value *valueFromLit (double);
 initList *newiList (int, void *);
 initList *revinit (initList *);

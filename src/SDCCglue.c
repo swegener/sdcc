@@ -470,7 +470,7 @@ initPointer (initList * ilist, sym_link * toType)
 
   if (!ilist)
     {
-      return valCastLiteral (toType, 0.0);
+      return valCastLiteral (toType, 0.0, 0);
     }
 
   expr = list2expr (ilist);
@@ -697,7 +697,7 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
 
   if (val->type != type)
     {
-      val = valCastLiteral (type, floatFromVal (val));
+      val = valCastLiteral (type, floatFromVal (val), ullFromVal (val));
     }
 
   if (IS_INTEGRAL (val->type))
@@ -1067,7 +1067,7 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
   if (ilist)
     val = list2val (ilist);
   else
-    val = valCastLiteral (type, 0.0);
+    val = valCastLiteral (type, 0.0, 0);
 
   if (!val)
     {

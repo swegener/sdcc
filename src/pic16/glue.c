@@ -379,7 +379,7 @@ pic16_initPointer (initList * ilist, sym_link *toType)
   ast *expr;
 
   if (!ilist) {
-      return valCastLiteral(toType, 0.0);
+      return valCastLiteral(toType, 0.0, 0);
   }
 
   expr = decorateType(resolveSymbols( list2expr (ilist) ), FALSE);
@@ -623,7 +623,7 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
   }
 
   if (val->type != type) {
-    val = valCastLiteral(type, floatFromVal(val));
+    val = valCastLiteral(type, floatFromVal (val), ullFromVal (val));
   }
 
   for (i = 0; i < (int)getSize (type); i++) {
@@ -1029,7 +1029,7 @@ pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void *p)
   if (ilist)
     val = list2val (ilist);
   else
-    val = valCastLiteral(type, 0.0);
+    val = valCastLiteral(type, 0.0, 0);
 
   if (!val) {
     // an error has been thrown already

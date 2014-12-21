@@ -2585,7 +2585,7 @@ valLogicAndOr (value * lval, value * rval, int op)
 /* valCastLiteral - casts a literal value to another type           */
 /*------------------------------------------------------------------*/
 value *
-valCastLiteral (sym_link * dtype, double fval)
+valCastLiteral (sym_link * dtype, double fval, TYPE_TARGET_ULONGLONG llval)
 {
   value *val;
   unsigned long l = double2ul (fval);
@@ -2646,9 +2646,9 @@ valCastLiteral (sym_link * dtype, double fval)
       if (SPEC_LONGLONG (val->etype))
         {
           if (SPEC_USIGN (val->etype))
-            SPEC_CVAL (val->etype).v_ulonglong = (TYPE_TARGET_ULONGLONG) fval;
+            SPEC_CVAL (val->etype).v_ulonglong = (TYPE_TARGET_ULONGLONG) llval;
           else
-            SPEC_CVAL (val->etype).v_longlong = (TYPE_TARGET_LONGLONG) fval;
+            SPEC_CVAL (val->etype).v_longlong = (TYPE_TARGET_LONGLONG) llval;
         }
       else if (SPEC_LONG (val->etype))
         {

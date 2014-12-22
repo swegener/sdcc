@@ -296,8 +296,7 @@ rollers and underlying hardware effectively.
 Warning: Parts of this manual apply to the mc51 port only
 \emph default
 .
- Further information on the z80, z180, r2k, r3ka and gbz80 ports and standard
- compliance can be found in the sdcc wiki 
+ You might also want to have a look at the wiki 
 \begin_inset Flex URL
 status collapsed
 
@@ -26463,2926 +26462,6 @@ It is most efficient if your ISR calls no other functions.
 \end_layout
 
 \begin_layout Section
-Startup Code
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Startup-Code"
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Startup code
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-MCS51/DS390 Startup Code
-\end_layout
-
-\begin_layout Standard
-The compiler triggers the linker to link certain initialization modules
- from the runtime library
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Runtime library
-\end_layout
-
-\end_inset
-
- called crt<something>.
- Only the necessary ones are linked, for instance crtxstack.asm (GSINIT1,
- GSINIT5) is not linked unless the -
-\series bold
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\series default
--xstack option is used.
- These modules are highly entangled by the use of special segments/areas,
- but a common layout is shown below:
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(main.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area HOME (CODE)
-\begin_inset Newline newline
-\end_inset
-
-__interrupt_vect:
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-ljmp __sdcc_gsinit_startup
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(crtstart.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSINIT0 (CODE)
-\begin_inset Newline newline
-\end_inset
-
-__sdcc_gsinit_startup::
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov sp,#__start__stack - 1
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(crtxstack.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSINIT1 (CODE)
-\begin_inset Newline newline
-\end_inset
-
-__sdcc_init_xstack::
-\begin_inset Newline newline
-\end_inset
-
-; Need to initialize in GSINIT1 in case the user's __sdcc_external_startup
- uses the xstack.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov __XPAGE,#(__start__xstack >> 8)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov _spx,#__start__xstack
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(crtstart.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSINIT2 (CODE)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-lcall __sdcc_external_startup
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov a,dpl
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-jz __sdcc_init_data
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-ljmp __sdcc_program_startup
-\begin_inset Newline newline
-\end_inset
-
-__sdcc_init_data:
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(crtxinit.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSINIT3 (CODE)
-\begin_inset Newline newline
-\end_inset
-
-__mcs51_genXINIT::
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov r1,#l_XINIT
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov a,r1
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-orl a,#(l_XINIT >> 8)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-jz 00003$
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov r2,#((l_XINIT+255) >> 8)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov dptr,#s_XINIT
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov r0,#s_XISEG
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov __XPAGE,#(s_XISEG >> 8)
-\begin_inset Newline newline
-\end_inset
-
-00001$:
-\begin_inset space ~
-\end_inset
-
-clr a
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-movc a,@a+dptr
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-movx @r0,a
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-inc dptr
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-inc r0
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-cjne r0,#0,00002$
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-inc __XPAGE
-\begin_inset Newline newline
-\end_inset
-
-00002$:
-\begin_inset space ~
-\end_inset
-
-djnz r1,00001$
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-djnz r2,00001$
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov __XPAGE,#0xFF
-\begin_inset Newline newline
-\end_inset
-
-00003$:
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(crtclear.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSINIT4 (CODE)
-\begin_inset Newline newline
-\end_inset
-
-__mcs51_genRAMCLEAR::
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-clr a
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov r0,#(l_IRAM-1)
-\begin_inset Newline newline
-\end_inset
-
-00004$:
-\begin_inset space ~
-\end_inset
-
-mov @r0,a
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-djnz r0,00004$
-\begin_inset Newline newline
-\end_inset
-
-; _mcs51_genRAMCLEAR() end
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(crtxclear.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSINIT4 (CODE)
-\begin_inset Newline newline
-\end_inset
-
-__mcs51_genXRAMCLEAR::
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov r0,#l_PSEG
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov a,r0
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-orl a,#(l_PSEG >> 8)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-jz 00006$
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov r1,#s_PSEG
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov __XPAGE,#(s_PSEG >> 8)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-clr a
-\begin_inset Newline newline
-\end_inset
-
-00005$:
-\begin_inset space ~
-\end_inset
-
-movx @r1,a
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-inc r1
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-djnz r0,00005$
-\begin_inset Newline newline
-\end_inset
-
-00006$:
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov r0,#l_XSEG
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov a,r0
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-orl a,#(l_XSEG >> 8)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-jz 00008$
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov r1,#((l_XSEG + 255) >> 8)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov dptr,#s_XSEG
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-clr a
-\begin_inset Newline newline
-\end_inset
-
-00007$:
-\begin_inset space ~
-\end_inset
-
-movx @dptr,a
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-inc dptr
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-djnz r0,00007$
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-djnz r1,00007$
-\begin_inset Newline newline
-\end_inset
-
-00008$:
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(crtxstack.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSINIT5 (CODE)
-\begin_inset Newline newline
-\end_inset
-
-; Need to initialize in GSINIT5 because __mcs51_genXINIT modifies __XPAGE
-\begin_inset Newline newline
-\end_inset
-
-; and __mcs51_genRAMCLEAR modifies _spx.
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov __XPAGE,#(__start__xstack >> 8)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-mov _spx,#__start__xstack
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(application modules)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSINIT (CODE)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\series bold
-\size footnotesize
-(main.asm)
-\end_layout
-
-\begin_layout Verse
-
-\family typewriter
-\size footnotesize
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area GSFINAL (CODE)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-ljmp __sdcc_program_startup
-\begin_inset Newline newline
-\end_inset
-
-;--------------------------------------------------------
-\begin_inset Newline newline
-\end_inset
-
-; Home
-\begin_inset Newline newline
-\end_inset
-
-;--------------------------------------------------------
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area HOME (CODE)
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-.area CSEG (CODE)
-\begin_inset Newline newline
-\end_inset
-
-__sdcc_program_startup:
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-lcall _main
-\begin_inset Newline newline
-\end_inset
-
-; return from main will lock up
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-sjmp .
-\end_layout
-
-\begin_layout Standard
-One of these modules (crtstart.asm) contains a call to the C routine 
-\emph on
-_sdcc_external_startup()
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-sdcc
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-external
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-startup()
-\end_layout
-
-\end_inset
-
-
-\emph default
- at the start of the CODE area.
- This routine is also in the runtime library
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Runtime library
-\end_layout
-
-\end_inset
-
- and returns 0 by default.
- If this routine returns a non-zero value, the static & global variable
- initialization will be skipped and the function main will be invoked.
- Otherwise static & global variables will be initialized before the function
- main is invoked.
- You could add an 
-\emph on
-_sdcc_external_startup()
-\emph default
- routine to your program to override the default if you need to setup hardware
- or perform some other critical operation prior to static & global variable
- initialization
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Variable initialization
-\end_layout
-
-\end_inset
-
-.
- On some mcs51 variants xdata
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-xdata (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
- memory has to be explicitly enabled before it can be accessed or if the
- watchdog
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-watchdog
-\end_layout
-
-\end_inset
-
- needs to be disabled, this is the place to do it.
- The startup code clears all internal data memory, 256 bytes by default,
- but from 0 to n-1 if 
-\emph on
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--iram-size
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--iram-size <Value>
-\end_layout
-
-\end_inset
-
-n
-\emph default
- is used.
- (recommended for Chipcon CC1010).
-\end_layout
-
-\begin_layout Standard
-See also the compiler option 
-\emph on
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-xinit
-\emph default
--
-\emph on
-opt
-\emph default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-xinit-opt
-\end_layout
-
-\end_inset
-
- and section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:MCS51-variants"
-
-\end_inset
-
- about MCS51-variants.
-\begin_inset Newline newline
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-While these initialization modules are meant as generic startup code there
- might be the need for customization.
- Let's assume the return value of 
-\emph on
-_sdcc_external_startup()
-\emph default
- in 
-\emph on
-crtstart.asm
-\emph default
- should not be checked (or 
-\emph on
-_sdcc_external_startup()
-\emph default
- should not be called at all).
- The recommended way would be to copy 
-\emph on
-crtstart.asm
-\emph default
- (f.e.
- from 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/device/lib/mcs51/crtstart.asm
-\end_layout
-
-\end_inset
-
-) into the source directory, adapt it there, then assemble it with 
-\emph on
-sdas8051 -plosgff
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset Quotes sld
-\end_inset
-
--plosgff
-\begin_inset Quotes srd
-\end_inset
-
- are the assembler options used in 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://sdcc.svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/lib/mcs51/Makefile.in?
-view=markup 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
- crtstart.asm
-\emph default
- and when linking your project explicitly specify 
-\emph on
-crtstart.rel
-\emph default
-.
- As a bonus a listing of the relocated object file 
-\emph on
-crtstart.rst
-\emph default
- is generated.
-\end_layout
-
-\begin_layout Subsection
-HC08 Startup Code
-\end_layout
-
-\begin_layout Standard
-The HC08
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-HC08
-\end_layout
-
-\end_inset
-
- startup code follows the same scheme as the MCS51 startup code.
-\end_layout
-
-\begin_layout Subsection
-Z80 Startup Code
-\end_layout
-
-\begin_layout Standard
-On the Z80
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Z80
-\end_layout
-
-\end_inset
-
- the startup code is inserted by linking with crt0.rel which is generated
- from sdcc/device/lib/z80/crt0.s.
- If you need a different startup code you can use the compiler option 
-\emph on
--
-\series bold
-\emph default
-
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
-
-\series default
-\emph on
--no-std-crt0
-\emph default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-std-crt0
-\end_layout
-
-\end_inset
-
- and provide your own crt0.rel.
- 
-\end_layout
-
-\begin_layout Section
 Inline Assembler Code
 \begin_inset CommandInset label
 LatexCommand label
@@ -35673,9 +32752,8 @@ long (32 bit)
 \begin_layout Standard
 For signed & unsigned int (16 bit) and long (32 bit) variables, division,
  multiplication and modulus operations are implemented by support routines.
- These support routines are all developed in ANSI-C to facilitate porting
- to other MCUs, although some model specific assembler optimizations are
- used.
+ These support routines are all developed in C to facilitate porting to
+ other MCUs, although some model specific assembler optimizations are used.
  The following files contain the described routines, all of them can be
  found in <installdir>/share/sdcc/lib.
 \begin_inset Newline newline
@@ -35927,7 +33005,8 @@ unsigned 32 bit modulus
 \end_layout
 
 \begin_layout Standard
-Since they are compiled as 
+In the mcs51, ds390, hc08, s08, pic14 and pic16 backends they are by default
+ compiled as 
 \emph on
 non-reentrant
 \emph default
@@ -35941,7 +33020,7 @@ reentrant
 
 \end_inset
 
-, interrupt
+; when targeting on of these architectures, interrupt
 \begin_inset Index idx
 status collapsed
 
@@ -36054,7 +33133,9 @@ Floating point support
 \end_layout
 
 \begin_layout Standard
-SDCC supports IEEE (single precision 4 bytes) floating point numbers.
+SDCC supports (single precision 4 bytes) floating point numbers; the format
+ is somewhat similar to IEEE, but it is not IEEE; in particular, denormalized
+ floating -point numbers are not supported.
  The floating point support routines are derived from gcc's floatlib.c and
  consist of the following routines:
 \begin_inset Newline newline
@@ -36729,24 +33810,7 @@ convert long to floating point number
 \end_layout
 
 \begin_layout Standard
-These support routines are developed in ANSI-C so there is room for space
- and speed improvement
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-These floating point routines (
-\emph on
-not
-\emph default
- sinf(), cosf(), ...) for the mcs51 are implemented in assembler.
- 
-\end_layout
-
-\end_inset
-
-.
- Note if all these routines are used simultaneously the data space might
+Note if all these routines are used simultaneously the data space might
  overflow.
  For serious floating point usage the large model might be needed.
  Also notice that you don't have to call this routines directly.
@@ -43197,6 +40261,2820 @@ reference "lyx:-Wl option"
  The linker will not check for overflows, again this is your responsibility.
 \end_layout
 
+\begin_layout Subsection
+MCS51/DS390 Startup Code
+\end_layout
+
+\begin_layout Standard
+The compiler triggers the linker to link certain initialization modules
+ from the runtime library
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Runtime library
+\end_layout
+
+\end_inset
+
+ called crt<something>.
+ Only the necessary ones are linked, for instance crtxstack.asm (GSINIT1,
+ GSINIT5) is not linked unless the -
+\series bold
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+-xstack option is used.
+ These modules are highly entangled by the use of special segments/areas,
+ but a common layout is shown below:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(main.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area HOME (CODE)
+\begin_inset Newline newline
+\end_inset
+
+__interrupt_vect:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+ljmp __sdcc_gsinit_startup
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(crtstart.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSINIT0 (CODE)
+\begin_inset Newline newline
+\end_inset
+
+__sdcc_gsinit_startup::
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov sp,#__start__stack - 1
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(crtxstack.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSINIT1 (CODE)
+\begin_inset Newline newline
+\end_inset
+
+__sdcc_init_xstack::
+\begin_inset Newline newline
+\end_inset
+
+; Need to initialize in GSINIT1 in case the user's __sdcc_external_startup
+ uses the xstack.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov __XPAGE,#(__start__xstack >> 8)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov _spx,#__start__xstack
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(crtstart.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSINIT2 (CODE)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+lcall __sdcc_external_startup
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov a,dpl
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+jz __sdcc_init_data
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+ljmp __sdcc_program_startup
+\begin_inset Newline newline
+\end_inset
+
+__sdcc_init_data:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(crtxinit.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSINIT3 (CODE)
+\begin_inset Newline newline
+\end_inset
+
+__mcs51_genXINIT::
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov r1,#l_XINIT
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov a,r1
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+orl a,#(l_XINIT >> 8)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+jz 00003$
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov r2,#((l_XINIT+255) >> 8)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov dptr,#s_XINIT
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov r0,#s_XISEG
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov __XPAGE,#(s_XISEG >> 8)
+\begin_inset Newline newline
+\end_inset
+
+00001$:
+\begin_inset space ~
+\end_inset
+
+clr a
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+movc a,@a+dptr
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+movx @r0,a
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+inc dptr
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+inc r0
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+cjne r0,#0,00002$
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+inc __XPAGE
+\begin_inset Newline newline
+\end_inset
+
+00002$:
+\begin_inset space ~
+\end_inset
+
+djnz r1,00001$
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+djnz r2,00001$
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov __XPAGE,#0xFF
+\begin_inset Newline newline
+\end_inset
+
+00003$:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(crtclear.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSINIT4 (CODE)
+\begin_inset Newline newline
+\end_inset
+
+__mcs51_genRAMCLEAR::
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+clr a
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov r0,#(l_IRAM-1)
+\begin_inset Newline newline
+\end_inset
+
+00004$:
+\begin_inset space ~
+\end_inset
+
+mov @r0,a
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+djnz r0,00004$
+\begin_inset Newline newline
+\end_inset
+
+; _mcs51_genRAMCLEAR() end
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(crtxclear.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSINIT4 (CODE)
+\begin_inset Newline newline
+\end_inset
+
+__mcs51_genXRAMCLEAR::
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov r0,#l_PSEG
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov a,r0
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+orl a,#(l_PSEG >> 8)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+jz 00006$
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov r1,#s_PSEG
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov __XPAGE,#(s_PSEG >> 8)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+clr a
+\begin_inset Newline newline
+\end_inset
+
+00005$:
+\begin_inset space ~
+\end_inset
+
+movx @r1,a
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+inc r1
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+djnz r0,00005$
+\begin_inset Newline newline
+\end_inset
+
+00006$:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov r0,#l_XSEG
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov a,r0
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+orl a,#(l_XSEG >> 8)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+jz 00008$
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov r1,#((l_XSEG + 255) >> 8)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov dptr,#s_XSEG
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+clr a
+\begin_inset Newline newline
+\end_inset
+
+00007$:
+\begin_inset space ~
+\end_inset
+
+movx @dptr,a
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+inc dptr
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+djnz r0,00007$
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+djnz r1,00007$
+\begin_inset Newline newline
+\end_inset
+
+00008$:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(crtxstack.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSINIT5 (CODE)
+\begin_inset Newline newline
+\end_inset
+
+; Need to initialize in GSINIT5 because __mcs51_genXINIT modifies __XPAGE
+\begin_inset Newline newline
+\end_inset
+
+; and __mcs51_genRAMCLEAR modifies _spx.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov __XPAGE,#(__start__xstack >> 8)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+mov _spx,#__start__xstack
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(application modules)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSINIT (CODE)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\series bold
+\size footnotesize
+(main.asm)
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\size footnotesize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area GSFINAL (CODE)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+ljmp __sdcc_program_startup
+\begin_inset Newline newline
+\end_inset
+
+;--------------------------------------------------------
+\begin_inset Newline newline
+\end_inset
+
+; Home
+\begin_inset Newline newline
+\end_inset
+
+;--------------------------------------------------------
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area HOME (CODE)
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+.area CSEG (CODE)
+\begin_inset Newline newline
+\end_inset
+
+__sdcc_program_startup:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+lcall _main
+\begin_inset Newline newline
+\end_inset
+
+; return from main will lock up
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+sjmp .
+\end_layout
+
+\begin_layout Standard
+One of these modules (crtstart.asm) contains a call to the C routine 
+\emph on
+_sdcc_external_startup()
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+sdcc
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+external
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+startup()
+\end_layout
+
+\end_inset
+
+
+\emph default
+ at the start of the CODE area.
+ This routine is also in the runtime library
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Runtime library
+\end_layout
+
+\end_inset
+
+ and returns 0 by default.
+ If this routine returns a non-zero value, the static & global variable
+ initialization will be skipped and the function main will be invoked.
+ Otherwise static & global variables will be initialized before the function
+ main is invoked.
+ You could add an 
+\emph on
+_sdcc_external_startup()
+\emph default
+ routine to your program to override the default if you need to setup hardware
+ or perform some other critical operation prior to static & global variable
+ initialization
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Variable initialization
+\end_layout
+
+\end_inset
+
+.
+ On some mcs51 variants xdata
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+xdata (mcs51, ds390 storage class)
+\end_layout
+
+\end_inset
+
+ memory has to be explicitly enabled before it can be accessed or if the
+ watchdog
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+watchdog
+\end_layout
+
+\end_inset
+
+ needs to be disabled, this is the place to do it.
+ The startup code clears all internal data memory, 256 bytes by default,
+ but from 0 to n-1 if 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-iram-size
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-iram-size <Value>
+\end_layout
+
+\end_inset
+
+n
+\emph default
+ is used.
+ (recommended for Chipcon CC1010).
+\end_layout
+
+\begin_layout Standard
+See also the compiler option 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-xinit
+\emph default
+-
+\emph on
+opt
+\emph default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-xinit-opt
+\end_layout
+
+\end_inset
+
+ and section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:MCS51-variants"
+
+\end_inset
+
+ about MCS51-variants.
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+While these initialization modules are meant as generic startup code there
+ might be the need for customization.
+ Let's assume the return value of 
+\emph on
+_sdcc_external_startup()
+\emph default
+ in 
+\emph on
+crtstart.asm
+\emph default
+ should not be checked (or 
+\emph on
+_sdcc_external_startup()
+\emph default
+ should not be called at all).
+ The recommended way would be to copy 
+\emph on
+crtstart.asm
+\emph default
+ (f.e.
+ from 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://svn.code.sf.net/p/sdcc/code/trunk/sdcc/device/lib/mcs51/crtstart.asm
+\end_layout
+
+\end_inset
+
+) into the source directory, adapt it there, then assemble it with 
+\emph on
+sdas8051 -plosgff
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset Quotes sld
+\end_inset
+
+-plosgff
+\begin_inset Quotes srd
+\end_inset
+
+ are the assembler options used in 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://sdcc.svn.sourceforge.net/viewvc/sdcc/trunk/sdcc/device/lib/mcs51/Makefile.in?
+view=markup 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+ crtstart.asm
+\emph default
+ and when linking your project explicitly specify 
+\emph on
+crtstart.rel
+\emph default
+.
+ As a bonus a listing of the relocated object file 
+\emph on
+crtstart.rst
+\emph default
+ is generated.
+\end_layout
+
 \begin_layout Section
 DS400 port
 \end_layout
@@ -43321,6 +43199,73 @@ http://sdcc.sourceforge.net/wiki/index.php/Z80_code_size
 .
 \end_layout
 
+\begin_layout Subsection
+Startup Code
+\end_layout
+
+\begin_layout Standard
+On the Z80
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Z80
+\end_layout
+
+\end_inset
+
+ the startup code is inserted by linking with crt0.rel which is generated
+ from sdcc/device/lib/z80/crt0.s.
+ If you need a different startup code you can use the compiler option 
+\emph on
+-
+\series bold
+\emph default
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+
+\series default
+\emph on
+-no-std-crt0
+\emph default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-no-std-crt0
+\end_layout
+
+\end_inset
+
+ and provide your own crt0.rel.
+ 
+\end_layout
+
 \begin_layout Section
 The HC08 and S08 ports
 \end_layout
@@ -43350,6 +43295,24 @@ http://sdcc.sourceforge.net/wiki/index.php/Hc08_code_size
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+Startup Code
+\end_layout
+
+\begin_layout Standard
+The HC08
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+HC08
+\end_layout
+
+\end_inset
+
+ startup code follows the same scheme as the MCS51 startup code.
 \end_layout
 
 \begin_layout Section
@@ -67166,8 +67129,8 @@ sdcc currently has two register allocators.
  One of them is optimal when optimizing for code size.
  This register allocator is used by default on the hc08, s08, z80, z180,
  r2k, r3ka, gbz80 and stm8 ports.
- Even though is runs in polynomial time, it can be quite slow; therefore
- the --max-allos-per-node command line option can be used for a trade-off
+ Even though it runs in polynomial time, it can be quite slow; therefore
+ the --max-allocs-per-node command line option can be used for a trade-off
  between compilation speed and quality of the genrated result: Lower values
  result in faster compilation, higher values can result in better code being
  generated.
@@ -67178,8 +67141,9 @@ It first creates a tree-decomposition of the control-flow graph, and then
  uses dynamic programming bottom-up along the tree-decomposition.
  Optimality is achieved through the use of a cost function, which gives
  cost for instructions under register assignments.
- The cost function is MCU-specific and has to be implemented for each port;
- in all current sdcc ports the cost function is integrated into code generation.
+ The cost function is target-specific and has to be implemented for each
+ port; in all current sdcc ports the cost function is integrated into code
+ generation.
 \end_layout
 
 \begin_layout Standard

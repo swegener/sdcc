@@ -1,3 +1,8 @@
+2014-12-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Cleanup manual.
+
 2014-12-22 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/longlong.c:
 	  Modify test cases for large signed / unsigned long long.

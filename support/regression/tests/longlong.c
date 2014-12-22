@@ -115,9 +115,17 @@ testLongLong (void)
   ASSERT (x % tmp == (42ll << 23) % 42);
 
   x = 0x1122334455667788ll;
-  y = 0x9988776655443322ll;
-  ASSERT (x + y == 0x1122334455667788ll + 0x9988776655443322ll);
-  ASSERT( y - x == 0x9988776655443322ll - 0x1122334455667788ll);
+  y = 0x9988776655443322ull;
+  ASSERT (y + x == 0x9988776655443322ull + 0x1122334455667788ll);
+  ASSERT (y - x == 0x9988776655443322ull - 0x1122334455667788ll);
+
+#if 0 // why fail? need investigation.
+  y = 0x55667788ull;
+  ASSERT (y * y == 0x55667788ull * 0x55667788ull);
+  y = 0x55667788ull;
+  x = 0x55667788ll;
+  ASSERT (y * x == 0x55667788ull * 0x55667788ll);
+#endif
 
   c(); // Unused long long return value require special handling in register allocation.
 #endif

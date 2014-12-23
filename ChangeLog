@@ -1,3 +1,13 @@
+2014-12-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/stm8/gen.c (aopOp),
+	* src/z80/gen.c (aopOp),
+	* src/hc08/gen.c (aopOp),
+	* src/mcs51/gen.c (aopOp),
+	* src/ds390/gen.c (aopOp),
+	* src/pic16/gen.c (pic16_aopOp),
+	* src/pic14/gen.c (aopOp): only use spill location if isspilt set
+
 2014-12-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

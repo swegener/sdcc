@@ -1169,7 +1169,7 @@ aopOp (operand * op, iCode * ic, bool result, bool useDP2)
           return;
         }
 
-      if (sym->usl.spillLoc)
+      if (sym->isspilt && sym->usl.spillLoc)
         {
           asmop *oldAsmOp = NULL;
 

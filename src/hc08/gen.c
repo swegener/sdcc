@@ -2548,7 +2548,7 @@ aopOp (operand *op, iCode * ic, bool result)
         }
 
       /* else spill location  */
-      if (sym->usl.spillLoc || regalloc_dry_run)
+      if (sym->isspilt && sym->usl.spillLoc || regalloc_dry_run)
         {
           asmop *oldAsmOp = NULL;
 

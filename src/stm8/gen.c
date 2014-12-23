@@ -952,7 +952,7 @@ aopOp (operand *op, const iCode *ic)
             aop->aopu.bytes[i].byteu.reg = sym->regs[i];
             aop->regs[sym->regs[i]->rIdx] = i;
           }
-        else if (sym->usl.spillLoc || sym->nRegs && regalloc_dry_run)
+        else if (sym->isspilt && sym->usl.spillLoc || sym->nRegs && regalloc_dry_run)
           {
             completely_in_regs = FALSE;
 

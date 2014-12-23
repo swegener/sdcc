@@ -1062,7 +1062,7 @@ aopOp (operand * op, iCode * ic, bool result)
           return;
         }
 
-      if (sym->usl.spillLoc)
+      if (sym->isspilt && sym->usl.spillLoc)
         {
           asmop *oldAsmOp = NULL;
 

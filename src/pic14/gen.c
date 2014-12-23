@@ -657,7 +657,7 @@ aopOp (operand * op, iCode * ic, bool result)
         }
 
       /* else spill location  */
-      if (sym->usl.spillLoc)
+      if (sym->issplit && sym->usl.spillLoc)
         {
           asmop *oldAsmOp = NULL;
 

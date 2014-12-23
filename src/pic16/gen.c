@@ -1092,7 +1092,7 @@ pic16_aopOp (operand * op, iCode * ic, bool result)
         }
 #endif
       /* else spill location  */
-      if (SYM_SPIL_LOC (sym) && getSize (sym->type) != getSize (SYM_SPIL_LOC (sym)->type))
+      if (sym->isspilt && SYM_SPIL_LOC (sym) && getSize (sym->type) != getSize (SYM_SPIL_LOC (sym)->type))
         {
           /* force a new aop if sizes differ */
           SYM_SPIL_LOC (sym)->aop = NULL;
@@ -1104,7 +1104,7 @@ pic16_aopOp (operand * op, iCode * ic, bool result)
 #endif
 
       //aop->aopu.pcop = pic16_popGetImmd(SYM_SPIL_LOC(sym)->rname,0,SYM_SPIL_LOC(sym)->offset);
-      if (SYM_SPIL_LOC (sym) && SYM_SPIL_LOC (sym)->rname)
+      if (sym->isspilt && SYM_SPIL_LOC (sym) && SYM_SPIL_LOC (sym)->rname)
         {
           sym->aop = op->aop = aop = newAsmop (AOP_PCODE);
           aop->aopu.pcop = pic16_popRegFromString (SYM_SPIL_LOC (sym)->rname,

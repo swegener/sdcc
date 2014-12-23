@@ -1539,7 +1539,7 @@ aopOp (operand * op, const iCode * ic, bool result, bool requires_a)
         }
 
       /* On stack. */
-      if (sym->usl.spillLoc)
+      if (sym->isspilt && sym->usl.spillLoc)
         {
           asmop *oldAsmOp = NULL;
 

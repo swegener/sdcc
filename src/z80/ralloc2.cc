@@ -746,9 +746,9 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(false);
   if(exstk && (operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)) && (ic->op == '>' || ic->op == '<'))
     return(false);
-  if(exstk && ic->op == '+' && getSize(operandType(result)) >= 2 && input_in_HL &&
-    (operand_on_stack(left, a, i, G) && (ia.registers[REG_L][1] > 0 || ia.registers[REG_H][1] > 0) ||
-    operand_on_stack(right, a, i, G) && (ia.registers[REG_L][1] > 0 || ia.registers[REG_H][1] > 0)))
+  if(ic->op == '+' && getSize(operandType(result)) >= 2 && input_in_HL &&
+    ((exstk ? operand_on_stack(left, a, i, G) : IS_TRUE_SYMOP (left)) && (ia.registers[REG_L][1] > 0 || ia.registers[REG_H][1] > 0) ||
+    (exstk ? operand_on_stack(right, a, i, G) : IS_TRUE_SYMOP (right)) && (ia.registers[REG_L][1] > 0 || ia.registers[REG_H][1] > 0)))
     return(false);
 
   if(ic->op == '+' && getSize(operandType(result)) == 2 && (IS_OP_LITERAL (right) && ulFromVal (OP_VALUE (IC_RIGHT(ic))) <= 3 || IS_OP_LITERAL (left) && ulFromVal (OP_VALUE (IC_LEFT(ic))) <= 3) && 

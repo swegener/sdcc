@@ -85,7 +85,7 @@ extern char *gets(char *);
 extern char getchar(void);
 extern void putchar(char);
 
-#if defined(SDCC_mcs51) && !defined(SDCC_USE_XSTACK)
+#if defined(__SDCC_mcs51) && !defined(__SDCC_USE_XSTACK)
 extern void printf_fast(__code const char *fmt, ...) _REENTRANT;
 extern void printf_fast_f(__code const char *fmt, ...) _REENTRANT;
 extern void printf_tiny(__code const char *fmt, ...) _REENTRANT;

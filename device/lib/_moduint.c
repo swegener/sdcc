@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -59,7 +59,7 @@ __moduint:
 	#define al      dpl
 	#define ah      dph
 
-#if defined(__SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_STACK_AUTO) && !defined(__SDCC_PARMS_IN_BANK1)
 
 	ar0 = 0			; BUG register set is not considered
 	ar1 = 1
@@ -79,9 +79,9 @@ __moduint:
 __modint:			; entry point for __modsint
 
 
-#else // SDCC_STACK_AUTO
+#else // __SDCC_STACK_AUTO
 
-#if !defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_PARMS_IN_BANK1)
 #if defined(__SDCC_NOOVERLAY)
 	.area DSEG    (DATA)
 #else
@@ -103,7 +103,7 @@ __modsint_PARM_2:
 	#define bl      (b1_0)
 	#define bh      (b1_1)
 #endif
-#endif // SDCC_STACK_AUTO
+#endif // __SDCC_STACK_AUTO
 
 	mov	a,bl		; avoid endless loop
 	orl	a,bh
@@ -167,14 +167,13 @@ div_by_0:
 
 #else  // defined _MODUINT_ASM_SMALL || defined _MODUINT_ASM_SMALL_AUTO
 
-#define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1) 
+#define MSB_SET(x) ((x >> (8*sizeof(x)-1)) & 1)
 
 unsigned int
 _moduint (unsigned int a, unsigned int b)
 {
   unsigned char count = 0;
-    
-    
+
   while (!MSB_SET(b))
   {
     b <<= 1;

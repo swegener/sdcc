@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -41,7 +41,7 @@ unsigned long _divulong (unsigned long x, unsigned long y);
 #if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(__SDCC_mcs51)
 #    if defined(__SDCC_MODEL_SMALL)
-#      if defined(__SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#      if defined(__SDCC_STACK_AUTO) && !defined(__SDCC_PARMS_IN_BANK1)
 #        define _DIVSLONG_ASM_SMALL_AUTO
 #      else
 #        define _DIVSLONG_ASM_SMALL
@@ -66,7 +66,7 @@ _divslong_dummy (void) __naked
 
 	// _divslong_PARM_2 shares the same memory with _divulong_PARM_2
 	// and is defined in _divulong.c
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	#define y0      (b1_0)
 	#define y1      (b1_1)
 	#define y2      (b1_2)

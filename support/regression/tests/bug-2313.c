@@ -24,7 +24,7 @@ usize_t valaddr(const char *base, usize_t size)
 
 struct u_data udata;
 
-#define statloc (int *)udata.u_argn1
+#define statloc (int __data *)udata.u_argn1
 
 void f(void)
 {
@@ -35,4 +35,3 @@ void testBug(void)
 {
 	f();
 }
-

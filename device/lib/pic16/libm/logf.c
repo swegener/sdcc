@@ -44,8 +44,8 @@
 
 float logf(float x) _MATH_REENTRANT
 {
-#if     defined(SDCC_mcs51) && defined(SDCC_MODEL_SMALL) \
-    && !defined(SDCC_NOOVERLAY)
+#if     defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL) \
+    && !defined(__SDCC_NOOVERLAY)
     volatile
 #endif
     float Rz;

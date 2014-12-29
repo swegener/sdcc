@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -38,7 +38,7 @@
 #if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(__SDCC_mcs51)
 #    if defined(__SDCC_MODEL_SMALL)
-#      if defined(__SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#      if defined(__SDCC_STACK_AUTO) && !defined(__SDCC_PARMS_IN_BANK1)
 #        define _MULLONG_ASM_SMALL_AUTO
 #      else
 #        define _MULLONG_ASM_SMALL
@@ -78,8 +78,8 @@ __mullong:
 	; c2  a2 * b0 + a1 * b1 + a0 * b2
 	; c3  a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3
 
-#if !defined(__SDCC_STACK_AUTO) || defined(SDCC_PARMS_IN_BANK1)
-#if defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_STACK_AUTO) || defined(__SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	#define b0  (b1_0)
 	#define b1  (b1_1)
 	#define b2  (b1_2)
@@ -195,7 +195,7 @@ __mullong_PARM_2:
 	mov	dpl,c0
 	ret
 
-#else // SDCC_STACK_AUTO
+#else // __SDCC_STACK_AUTO
 
 				; parameter a comes in a, b, dph, dpl
 	mov	r2,b		; save parameter a
@@ -305,7 +305,7 @@ __mullong_PARM_2:
 
 	ret
 
-#endif // SDCC_STACK_AUTO
+#endif // __SDCC_STACK_AUTO
 
 	__endasm;
 }
@@ -332,7 +332,7 @@ __mullong:
 	; c2  a2 * b0 + a1 * b1 + a0 * b2
 	; c3  a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3
 
-#if !defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_PARMS_IN_BANK1)
 	.area XSEG    (XDATA)
 
 __mullong_PARM_2:
@@ -356,7 +356,7 @@ __mullong_PARM_2:
 
 				;	Byte 0
 	mov	b,a0
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_0		; b0
 #else
 	mov	dptr,#__mullong_PARM_2
@@ -368,7 +368,7 @@ __mullong_PARM_2:
 
 				;	Byte 1
 	mov	b,a1
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_0		; b0
 #else
 	movx	a,@dptr		; b0
@@ -381,7 +381,7 @@ __mullong_PARM_2:
 	mov	c2,a
 
 	mov	b,a0
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_1		; b1
 #else
 	inc	dptr		; b1
@@ -399,7 +399,7 @@ __mullong_PARM_2:
 
 				;	Byte 2
 	mov	b,a1
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_1		; b1
 #else
 	movx	a,@dptr		; b1
@@ -412,7 +412,7 @@ __mullong_PARM_2:
 	mov	c3,a
 
 	mov	b,a0
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_2		; b2
 #else
 	inc	dptr		; b2
@@ -426,7 +426,7 @@ __mullong_PARM_2:
 	mov	c3,a
 
 	mov	b,a2
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_0		; b0
 #else
 	mov	dptr,#__mullong_PARM_2
@@ -441,7 +441,7 @@ __mullong_PARM_2:
 
 				;	Byte 3
 	mov	b,a3
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_0		; b0
 #else
 	movx	a,@dptr		; b0
@@ -451,7 +451,7 @@ __mullong_PARM_2:
 	mov	c3,a
 
 	mov	b,a2
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_1		; b1
 #else
 	inc	dptr		; b1
@@ -462,7 +462,7 @@ __mullong_PARM_2:
 	mov	c3,a
 
 	mov	b,a1
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_2		; b2
 #else
 	inc	dptr		; b2
@@ -473,7 +473,7 @@ __mullong_PARM_2:
 	mov	c3,a
 
 	mov	b,a0
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	mov	a,b1_3		; b3
 #else
 	inc	dptr		; b3

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -31,10 +31,10 @@
      mcs51 small stack-auto
 */
 
-#if !defined(SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
-#  if defined(SDCC_mcs51)
-#    if defined(SDCC_MODEL_SMALL)
-#      if defined(SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+#  if defined(__SDCC_mcs51)
+#    if defined(__SDCC_MODEL_SMALL)
+#      if defined(__SDCC_STACK_AUTO) && !defined(__SDCC_PARMS_IN_BANK1)
 #        define _DIVULONG_ASM_SMALL_AUTO
 #      else
 #        define _DIVULONG_ASM_SMALL
@@ -65,9 +65,9 @@ _divlong_dummy (void) _naked
     #define reste1  r5
     #define reste2  r6
     #define reste3  r7
-#if !defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_PARMS_IN_BANK1)
 
-#if defined(SDCC_NOOVERLAY)
+#if defined(__SDCC_NOOVERLAY)
     .area DSEG    (DATA)
 #else
     .area OSEG    (OVR,DATA)
@@ -91,7 +91,7 @@ _divlong_dummy (void) _naked
     #define b1      (b1_1)
     #define b2      (b1_2)
     #define b3      (b1_3)
-#endif // !SDCC_PARMS_IN_BANK1
+#endif // !__SDCC_PARMS_IN_BANK1
           ; parameter a comes in a, b, dph, dpl
     mov a3,a    ; save parameter a3
 

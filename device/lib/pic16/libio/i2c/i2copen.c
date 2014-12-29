@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -38,17 +38,17 @@ void i2c_open(unsigned char mode, unsigned char slew, unsigned char addr_brd)
   SSPSTAT |= slew;
 
 
-#if defined(pic18f2455) || defined (pic18f2550) \
-    || defined(pic18f4455) || defined (pic18f4550) \
-    || defined(pic18f66j60) || defined(pic18f66j65) || defined(pic18f67j60) \
-    || defined(pic18f86j60) || defined(pic18f86j65) || defined(pic18f87j60) \
-    || defined(pic18f96j60) || defined(pic18f96j65) || defined(pic18f97j60)
+#if    defined(__SDCC_PIC18F2455)  || defined(__SDCC_PIC18F2550) \
+    || defined(__SDCC_PIC18F4455)  || defined(__SDCC_PIC18F4550) \
+    || defined(__SDCC_PIC18F66J60) || defined(__SDCC_PIC18F66J65) || defined(__SDCC_PIC18F67J60) \
+    || defined(__SDCC_PIC18F86J60) || defined(__SDCC_PIC18F86J65) || defined(__SDCC_PIC18F87J60) \
+    || defined(__SDCC_PIC18F96J60) || defined(__SDCC_PIC18F96J65) || defined(__SDCC_PIC18F97J60)
 
   TRISBbits.TRISB1 = 1;
   TRISBbits.TRISB0 = 1;
 
-#elif  defined(pic18f24j50) || defined(pic18f25j50) || defined(pic18f26j50) \
-    || defined(pic18f44j50) || defined(pic18f45j50) || defined(pic18f46j50)
+#elif  defined(__SDCC_PIC18F24J50) || defined(__SDCC_PIC18F25J50) || defined(__SDCC_PIC18F26J50) \
+    || defined(__SDCC_PIC18F44J50) || defined(__SDCC_PIC18F45J50) || defined(__SDCC_PIC18F46J50)
 
   TRISBbits.TRISB4 = 1;
   TRISBbits.TRISB5 = 1;
@@ -64,4 +64,3 @@ void i2c_open(unsigned char mode, unsigned char slew, unsigned char addr_brd)
 
   SSPCON1 |= 0x20;
 }
-

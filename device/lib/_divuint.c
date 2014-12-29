@@ -62,10 +62,10 @@ __divuint:
 	#define xl      dpl
 	#define xh      dph
 
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	#define yl      (b1_0)
 	#define yh      (b1_1)
-#else // SDCC_PARMS_IN_BANK1
+#else // __SDCC_PARMS_IN_BANK1
   #if defined(__SDCC_STACK_AUTO)
 
 	.globl __divint
@@ -85,7 +85,7 @@ __divuint:
 __divint:			; entry point for __divsint
 
 
-  #else // SDCC_STACK_AUTO
+  #else // __SDCC_STACK_AUTO
 
     #if defined(__SDCC_NOOVERLAY)
 	.area DSEG    (DATA)
@@ -105,8 +105,8 @@ __divsint_PARM_2:
 	#define yl      (__divuint_PARM_2)
 	#define yh      (__divuint_PARM_2 + 1)
 
-  #endif // SDCC_STACK_AUTO
-#endif // SDCC_PARMS_IN_BANK1
+  #endif // __SDCC_STACK_AUTO
+#endif // __SDCC_PARMS_IN_BANK1
 
 	mov	count,#16
 	clr	a

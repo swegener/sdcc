@@ -41,19 +41,13 @@
 #define P(g) (P2*g+P1)
 #define Q(g) ((Q2*g+Q1)*g+Q0)
 
-#ifdef SDCC_mcs51
-   #define myconst code
-#else
-   #define myconst const
-#endif
-
 float asincosf(float x, int isacos)
 {
     float y, g, r;
     int i;
 
-    static myconst float a[2]={ 0.0, QUART_PI };
-    static myconst float b[2]={ HALF_PI, QUART_PI };
+    static const float a[2]={ 0.0, QUART_PI };
+    static const float b[2]={ HALF_PI, QUART_PI };
 
     y=fabsf(x);
     i=isacos;

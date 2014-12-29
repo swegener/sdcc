@@ -168,7 +168,7 @@ dbuf_printOperand (operand * op, struct dbuf_s *dbuf)
       else if (IS_FIXED16X16 (opetype))
         dbuf_printf (dbuf, "%g {", doubleFromFixed16x16 (SPEC_CVAL (opetype).v_fixed16x16));
       else if (IS_LONGLONG (opetype))
-        dbuf_printf (dbuf, "0x%llx {", SPEC_CVAL (OP_VALUE (op)->etype).v_ulonglong);
+        dbuf_printf (dbuf, "0x%llx {", (unsigned long long) SPEC_CVAL (OP_VALUE (op)->etype).v_ulonglong);
       else
         dbuf_printf (dbuf, "0x%x {", (unsigned int) ulFromVal (OP_VALUE (op)));
       dbuf_printTypeChain (operandType (op), dbuf);

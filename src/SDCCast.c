@@ -7188,18 +7188,22 @@ ast_print (ast * tree, FILE * outfile, int indent)
           fprintf (outfile, "CONSTANT (%p) value = ", tree);
           if (SPEC_LONGLONG (tree->opval.val->etype))
             {
+              unsigned long long ull = ullFromVal (tree->opval.val);
+
               if (SPEC_USIGN (tree->opval.val->etype))
-                fprintf (outfile, "%llu, 0x%llx", (TYPE_TARGET_ULONGLONG) ullFromVal (tree->opval.val), (TYPE_TARGET_ULONGLONG) ullFromVal (tree->opval.val));
+                fprintf (outfile, "%llu, 0x%llx", ull, ull);
               else
-                fprintf (outfile, "%lld, 0x%llx", (TYPE_TARGET_LONGLONG) ullFromVal (tree->opval.val), (TYPE_TARGET_LONGLONG) ullFromVal (tree->opval.val));
+                fprintf (outfile, "%lld, 0x%llx", (signed long long) ull, ull);
             }
           else
             {
+              unsigned long ul = ulFromVal (tree->opval.val);
+
               if (SPEC_USIGN (tree->opval.val->etype))
-                fprintf (outfile, "%u", (TYPE_TARGET_ULONG) ulFromVal (tree->opval.val));
+                fprintf (outfile, "%lu", ul);
               else
-                fprintf (outfile, "%d", (TYPE_TARGET_LONG) ulFromVal (tree->opval.val));
-              fprintf (outfile, ", 0x%x, %f", (TYPE_TARGET_ULONG) ulFromVal (tree->opval.val), floatFromVal (tree->opval.val));
+                fprintf (outfile, "%ld", (signed long) ul);
+              fprintf (outfile, ", 0x%lx, %f", ul, floatFromVal (tree->opval.val));
             }
         }
       else if (tree->opval.val->sym)

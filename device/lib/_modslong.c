@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -40,7 +40,7 @@ unsigned long _modulong (unsigned long a, unsigned long b);
 #if !defined(__SDCC_USE_XSTACK) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
 #  if defined(__SDCC_mcs51)
 #    if defined(__SDCC_MODEL_SMALL)
-#      if defined(__SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#      if defined(__SDCC_STACK_AUTO) && !defined(__SDCC_PARMS_IN_BANK1)
 #        define _MODSLONG_ASM_SMALL_AUTO
 #      else
 #        define _MODSLONG_ASM_SMALL
@@ -62,7 +62,7 @@ _modslong_dummy (void) __naked
 	#define a3	r1
 
 	.globl __modslong
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	#define b0      (b1_0)
 	#define b1      (b1_1)
 	#define b2      (b1_2)

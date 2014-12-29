@@ -1,3 +1,29 @@
+2014-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/pic16/limits.h,
+	* device/lib/_divsint.c,
+	* device/lib/_divslong.c,
+	* device/lib/_divuint.c,
+	* device/lib/_divulong.c,
+	* device/lib/_memset.c,
+	* device/lib/_modsint.c,
+	* device/lib/_modslong.c,
+	* device/lib/_moduint.c,
+	* device/lib/_modulong.c,
+	* device/lib/_mulint.c,
+	* device/lib/_mullong.c,
+	* device/lib/hc08/_divuint.c,
+	* device/lib/hc08/_divulong.c,
+	* device/lib/pic16/libm/asincosf.c,
+	* device/lib/pic16/libm/atanf.c,
+	* device/lib/pic16/libm/logf.c,
+	* device/lib/s08/_divuint.c,
+	* device/lib/s08/_divulong.c: replaced deprecated predefined macros
+	* device/lib/pic16/libio/i2c/i2copen.c: idem to fix bug 2336
+	* src/SDCCast.c (ast_print),
+	* src/SDCCicode.c (dbuf_printOperand): fixed warnings
+	* support/regression/tests/bug-2313.c: fixed warning
+
 2014-12-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2320.c:
@@ -34,6 +60,7 @@
 	  Cleanup manual.
 
 2014-12-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/longlong.c:
 	  Modify test cases for large signed / unsigned long long.
 
@@ -47,6 +74,7 @@
 	  Remove obsolete feature macros.
 
 2014-12-21 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCast.c:
 	  Make AST dump more clear.
 	* src/SDCCval.c:
@@ -61,6 +89,7 @@
 	  Add new test cases for large unsigned long long.
 
 2014-12-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/longlong.c:
 	  Enable more test cases.
 	* src/SDCCast.c:
@@ -100,10 +129,12 @@
 	  Disable failing tests for pic16.
 
 2014-12-03 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/gcc-torture-execute-950511-1.c:
 	  Disabled. Since it fails on FreeBSD.
 
 2014-12-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/gcc-torture-execute-20050826-1.c:
 	* support/regression/tests/gcc-torture-execute-950511-1.c:
 	  Enabled for stm8.
@@ -115,6 +146,7 @@
 	  Make long long multiplication independent of endianness.
 
 2014-12-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* sim/ucsim/stm8.src/stm8.cc:
 	  Make stack larger, since some test cases cost large stack space.
 

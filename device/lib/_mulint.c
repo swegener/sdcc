@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -43,12 +43,12 @@
 #    endif
 #  elif defined(__SDCC_mcs51)
 #    if defined(__SDCC_MODEL_SMALL)
-#      if defined(__SDCC_STACK_AUTO) && !defined(SDCC_PARMS_IN_BANK1)
+#      if defined(__SDCC_STACK_AUTO) && !defined(__SDCC_PARMS_IN_BANK1)
 #        define _MULINT_ASM_SMALL_AUTO
 #      else
 #        define _MULINT_ASM_SMALL
 #      endif
-#    else // must be SDCC_MODEL_LARGE
+#    else // must be __SDCC_MODEL_LARGE
 #      if !defined(__SDCC_STACK_AUTO)
 #        define _MULINT_ASM_LARGE
 #     endif
@@ -76,7 +76,7 @@ _mulint (int a, int b)
     mov r3,dpl ; lsb_a
 
     mov b,r3 ; lsb_a
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
     mov a,b1_0
 #else
     mov dptr,#__mulint_PARM_2
@@ -87,7 +87,7 @@ _mulint (int a, int b)
     mov r1,b
 
     mov b,r2 ; msb_a
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
     mov a,b1_0
 #else
     movx a,@dptr ; lsb_b
@@ -97,7 +97,7 @@ _mulint (int a, int b)
     mov r1,a
 
     mov b,r3 ; lsb_a
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
     mov a,b1_1
 #else
     inc dptr
@@ -126,14 +126,14 @@ __mulint:
 
 	.globl __mulint
 
-#if !defined(__SDCC_STACK_AUTO) || defined(SDCC_PARMS_IN_BANK1)
+#if !defined(__SDCC_STACK_AUTO) || defined(__SDCC_PARMS_IN_BANK1)
 
 #if defined(__SDCC_NOOVERLAY)
 	.area DSEG    (DATA)
 #else
 	.area OSEG    (OVR,DATA)
 #endif
-#if defined(SDCC_PARMS_IN_BANK1)
+#if defined(__SDCC_PARMS_IN_BANK1)
 	#define bl 	(b1_0)
 	#define bh 	(b1_1)
 #else
@@ -169,7 +169,7 @@ __mulint_PARM_2:
 	ret				;  2
 					; 30
 
-#else // SDCC_STACK_AUTO
+#else // __SDCC_STACK_AUTO
 
 	; globbered registers r0
 
@@ -200,7 +200,7 @@ __mulint_PARM_2:
 
 	ret
 
-#endif // SDCC_STACK_AUTO
+#endif // __SDCC_STACK_AUTO
 
 	__endasm;
 }
@@ -249,4 +249,3 @@ _mulint (int a, int b)
 #endif
 
 #undef _MULINT_ASM
-

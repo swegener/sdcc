@@ -1,3 +1,8 @@
+2014-12-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2320.c:
+	  Fix test for host.
+
 2014-12-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdio.h:

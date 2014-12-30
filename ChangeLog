@@ -1,3 +1,7 @@
+2014-12-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: fixed typo, webdoc #69, thanks Petr Petyovsky
+
 2014-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/pic16/limits.h,

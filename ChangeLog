@@ -1,6 +1,8 @@
 2014-12-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/sdccman.lyx: fixed typo, webdoc #69, thanks Petr Petyovsky
+	* sdas/linksrc/aslink.h: added include "sdccconf.h" or "sdcc_vc.h"
+	* sdas/linksrc/lkar.c: removed include "sdccconf.h"
 
 2014-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
 

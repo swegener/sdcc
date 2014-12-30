@@ -31,7 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 #include <assert.h>
 
-#include "../../sdccconf.h"
 #include "aslink.h"
 #include "lklibr.h"
 #include "lkrel.h"

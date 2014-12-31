@@ -749,7 +749,8 @@ checkConstantRange (sym_link * var, sym_link * lit, int op, bool exchangeLeftRig
       if (IS_BOOLEAN (var))
         return CCR_OK;
 
-      if (getenv ("SDCC_VERY_PEDANTIC"))
+      if (1) // Though the else branch is dead, I still would like to keep it.
+      //if (getenv ("SDCC_VERY_PEDANTIC"))
         {
           if (SPEC_USIGN (var))
             {

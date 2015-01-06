@@ -1080,6 +1080,8 @@ findStructField (symbol *fields, symbol *target)
   return NULL; /* not found */
 }
 
+static int aggregateIsAutoVar = 0;
+
 /*-----------------------------------------------------------------*/
 /* createIvalStruct - generates initial value for structures       */
 /*-----------------------------------------------------------------*/
@@ -1088,7 +1090,7 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
 {
   ast *rast = NULL;
   ast *lAst;
-  symbol *sflds;
+  symbol *sflds, *old_sflds, *ps;
   initList *iloop;
   sym_link *etype = getSpec (type);
 
@@ -1106,6 +1108,7 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
       if (sflds && IS_BITFIELD (sflds->type) && SPEC_BUNNAMED (sflds->etype))
         continue;
 
+      old_sflds = sflds;
       /* designated initializer? */
       if (iloop && iloop->designation)
         {
@@ -1138,6 +1141,15 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
         break;
       if (!iloop && (!AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
         break;
+
+      if (aggregateIsAutoVar)
+        for (ps = old_sflds; ps != sflds && ps != NULL; ps = ps->next)
+          {
+            ps->implicit = 1;
+            lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (ps)));
+            lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
+            rast = decorateType (resolveSymbols (createIval (lAst, ps->type, NULL, rast, rootValue)), RESULT_TYPE_NONE);          
+          }
 
       /* initialize this field */
       sflds->implicit = 1;
@@ -1526,7 +1538,9 @@ gatherAutoInit (symbol * autoChain)
 
           if (IS_AGGREGATE (sym->type))
             {
+              aggregateIsAutoVar = 1;
               work = initAggregates (sym, sym->ival, NULL);
+              aggregateIsAutoVar = 0;
             }
           else
             {

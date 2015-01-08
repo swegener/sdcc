@@ -1655,7 +1655,7 @@ critical_statement
    ;
 
 labeled_statement
-   : label statement  { $$ = $1; $1->right = $2; }
+   : label statement  { if ($1) {$$ = $1; $1->right = $2;} else $$ = newNode (BLOCK, NULL, NULL); }
    | label '}'
      { /* Support a label without a statement at the end of a */
        /* compound statement as a SDCC extension. Include the */

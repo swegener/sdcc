@@ -1,3 +1,9 @@
+2015-01-08 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCC.y:
+	  Fix a bug which might be a NULL pointer access.
+	* device/lib/time.c:
+	  Eliminate a warning. (overflow in implicit constant conversion)
+
 2015-01-06 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCast.c:
 	  Fix bug #2167 & #1967. (auto struct variables initialization)

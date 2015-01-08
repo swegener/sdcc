@@ -49,7 +49,7 @@ unsigned char RtcRead(struct tm *timeptr) {
 // return the calendar time, seconds since the Epoch (Jan 1 1970 00:00:00)
 time_t time(time_t *timeptr) {
   struct tm now;
-  time_t t=-1;
+  time_t t=(time_t) -1;
 
   if (RtcRead(&now)) {
     t=mktime(&now);

@@ -9346,11 +9346,6 @@ Integer constants for long long, unsigned long long, int_fast64_t, int_least64_t
  
 \end_layout
 
-\begin_layout Itemize
-Float classification macros in math.h.
- 
-\end_layout
-
 \begin_layout Standard
 Some features of this standard are not supported in some ports:
 \end_layout
@@ -9418,10 +9413,6 @@ status collapsed
 \begin_layout Standard
 In addition to what is mentioned in the section above, the following features
  of this standard are not supported by sdcc:
-\end_layout
-
-\begin_layout Itemize
-Float classification macros in math.h (C11 requires more than C99).
 \end_layout
 
 \begin_layout Itemize

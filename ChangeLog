@@ -1,3 +1,8 @@
+2015-01-09 <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Classification macros are not required in freestanding implementations.
+
 2015-01-08 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCC.y:
 	  Fix a bug which might be a NULL pointer access.

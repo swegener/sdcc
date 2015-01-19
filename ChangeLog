@@ -1,3 +1,9 @@
+2015-01-19 <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/ralloc.c,
+	  src/mcs51/ralloc.c:
+	  Fix register packing inline asm interaction bugs #2346, #2268.
+
 2015-01-09 <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

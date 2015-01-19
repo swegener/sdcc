@@ -1720,7 +1720,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
   for (dic = ic->prev; dic; dic = dic->prev)
     {
       /* PENDING: Don't pack across function calls. */
-      if (dic->op == CALL || dic->op == PCALL)
+      if (dic->op == CALL || dic->op == PCALL || dic->op == INLINEASM)
         {
           dic = NULL;
           break;
@@ -1809,7 +1809,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
     }
 
 pack:
-  /* Keep assignmnt if it is an sfr write  - not all of code generation can deal with result in sfr */
+  /* Keep assignment if it is an sfr write  - not all of code generation can deal with result in sfr */
   if (IC_RESULT (ic) && IS_TRUE_SYMOP (IC_RESULT (ic)) && SPEC_OCLS (OP_SYMBOL (IC_RESULT (ic))->etype) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (IC_RESULT (ic))->etype)) &&
     (dic->op == LEFT_OP || dic->op == RIGHT_OP))
     return 0;

@@ -2133,6 +2133,12 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
             }
         }
 
+      if (dic->op == INLINEASM)
+        {
+          dic = NULL;
+          break;
+        }
+
       /* Don't move an assignment out of a critical block */
       if (dic->op == CRITICAL)
         {

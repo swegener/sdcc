@@ -596,8 +596,8 @@ setDefaultOptions (void)
   options.verbose = 0;
   options.shortis8bits = 0;
   options.std_sdcc = 1;         /* enable SDCC language extensions */
-  options.std_c99 = 0;          /* default to C89 until more C99 support */
-  options.std_c11 = 0;          /* default to C89 until more C11 support */
+  options.std_c99 = 1;          /* default to C99, to enable inlining of standard functions */
+  options.std_c11 = 0;          /* default to C99 until more C11 support */
   options.code_seg = CODE_NAME ? Safe_strdup (CODE_NAME) : NULL;        /* default to CSEG for generated code */
   options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL;     /* default to CONST for generated code */
   options.stack10bit = 0;

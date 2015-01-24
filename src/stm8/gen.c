@@ -5955,6 +5955,7 @@ genPointerGet (const iCode *ic)
     {
       emitcode ("ADDW", use_y ? "y, #0x%x" : "x, #0x%x", offset);
       offset = 0;
+      cost (use_y ? 4 : 3, 2);
     }
 
   // Get all the bytes. todo: Get the byte in a last (if not a bit-field), so we do not need to save a.

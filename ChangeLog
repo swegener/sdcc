@@ -1,4 +1,10 @@
 2015-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/stm8/gen.c:
+	  Fix a bug in genPointerGet(): negative offset is not handled correctly.
+	* support/regression/test/bug-2239.c:
+	  More tests are added and enabled for stm8.
+
+2015-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCast.c:
 	  Fix bug #2239.
 	* support/regression/test/bug-2239.c:

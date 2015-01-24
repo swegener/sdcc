@@ -5951,6 +5951,11 @@ genPointerGet (const iCode *ic)
     }
 
   genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  if (floatFromVal (right->aop->aopu.aop_lit) < 0.0)
+    {
+      emitcode ("ADDW", use_y ? "y, #0x%x" : "x, #0x%x", offset);
+      offset = 0;
+    }
 
   // Get all the bytes. todo: Get the byte in a last (if not a bit-field), so we do not need to save a.
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)

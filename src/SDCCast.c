@@ -2606,6 +2606,7 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
       newLink = newCharLink ();
       break;
     case RESULT_TYPE_INT:
+    case RESULT_TYPE_GPTR:
 #if 0
       if (getSize (tree->etype) > INTSIZE)
         {

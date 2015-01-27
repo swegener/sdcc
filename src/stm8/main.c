@@ -40,6 +40,7 @@ static char *stm8_keywords[] = {
   "at",
   "critical",
   "interrupt",
+  "trap",
   "naked",
   NULL
 };
@@ -134,7 +135,12 @@ stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
   #define STM8_INTERRUPTS_COUNT 30
   int i;
   dbuf_tprintf (oBuf, "\tint s_GSINIT ;reset\n");
-  dbuf_tprintf (oBuf, "\tint 0x0000 ;trap\n");
+  
+  if(interrupts[INTNO_TRAP])
+	dbuf_printf (oBuf, "\tint %s ;trap\n", interrupts[INTNO_TRAP]->rname);
+  else
+	dbuf_tprintf (oBuf, "\tint 0x0000 ;trap\n");
+	
   for(i = 0; i < STM8_INTERRUPTS_COUNT; i++)
   {
       if (i < intCount && interrupts[i])

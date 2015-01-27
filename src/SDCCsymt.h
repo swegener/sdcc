@@ -29,7 +29,9 @@
 #include "dbuf.h"
 
 #define INTNO_MAX 255           /* maximum allowed interrupt number */
+#define INTNO_TRAP INTNO_MAX
 #define INTNO_UNSPEC (INTNO_MAX+1)      /* interrupt number unspecified */
+
 
 #define BITVAR_PAD -1
 

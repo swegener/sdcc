@@ -544,7 +544,7 @@ allocGlobal (symbol * sym)
             interrupts[FUNC_INTNO (sym->type)] = sym;
 
           /* automagically extend the maximum interrupts */
-          if (FUNC_INTNO (sym->type) >= maxInterrupts)
+          if (FUNC_INTNO (sym->type) >= maxInterrupts && FUNC_INTNO (sym->type)!=INTNO_TRAP)
             maxInterrupts = FUNC_INTNO (sym->type) + 1;
         }
       /* if it is not compiler defined */

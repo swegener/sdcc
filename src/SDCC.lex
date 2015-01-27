@@ -128,6 +128,7 @@ static void checkCurrFile (const char *s);
 "__interrupt"           { count (); TKEYWORD (INTERRUPT); }
 "__nonbanked"           { count (); TKEYWORD (NONBANKED); }
 "__banked"              { count (); TKEYWORD (BANKED); }
+"__trap"                { count (); TKEYWORD (TRAP); }
 "long"                  { count (); return SD_LONG; }
 "__near"                { count (); TKEYWORD (DATA); }
 "__pdata"               { count (); TKEYWORD (PDATA); }

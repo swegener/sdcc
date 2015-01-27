@@ -96,7 +96,7 @@ bool uselessDecl = TRUE;
 %token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT
 %token STRUCT UNION ENUM RANGE SD_FAR
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
-%token NAKED JAVANATIVE OVERLAY
+%token NAKED JAVANATIVE OVERLAY TRAP
 %token <yystr> STRING_LITERAL INLINEASM
 %token IFX ADDRESS_OF GET_VALUE_AT_ADDRESS SPIL UNSPIL GETHBIT GETABIT GETBYTE GETWORD
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
@@ -252,6 +252,12 @@ function_attributes
                         FUNC_INTNO($$) = $1;
                         FUNC_ISISR($$) = 1;
                      }
+   |  TRAP
+                     {
+					    $$ = newLink (SPECIFIER);
+                        FUNC_INTNO($$) = INTNO_TRAP;
+						FUNC_ISISR($$) = 1;
+				     }
    |  SMALLC         {  $$ = newLink (SPECIFIER);
                         FUNC_ISSMALLC($$)=1;
                      }

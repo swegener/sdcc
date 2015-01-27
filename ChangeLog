@@ -1,3 +1,12 @@
+2015-01-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCmem.c,
+	  src/SDCCsymt.h,
+	  src/stm8/main.c:
+	  Apply patch by Pascal for trap handlers.
+
 2015-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/stm8/gen.c:
 	  Fix a bug in genPointerGet(): negative offset is not handled correctly.

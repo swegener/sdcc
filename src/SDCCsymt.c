@@ -2754,7 +2754,7 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
           if (srcScls == S_FIXED)
             srcScls = (options.useXstack ? S_XSTACK : S_STACK);
         }
-      else if (TARGET_IS_DS390 || TARGET_IS_DS400 || options.useXstack)
+      else if (TARGET_IS_DS390 || TARGET_IS_DS400 || options.useXstack || TARGET_IS_HC08 || TARGET_IS_S08)
         {
           if (destScls == S_FIXED)
             destScls = S_XDATA;

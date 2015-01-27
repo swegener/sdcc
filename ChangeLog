@@ -1,3 +1,9 @@
+2015-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCsymt.c:
+	  Fix bug #2349.
+	* support/regression/test/bug-2349.c:
+	  Add a new test for bug #2349.
+
 2015-01-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,

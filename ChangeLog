@@ -1,3 +1,8 @@
+2015-01-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update documentation on C dialect selection.
+
 2015-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCsymt.c:
 	  Fix bug #2349.
@@ -31,13 +36,13 @@
 	  .version:
 	  Make sdcc dialect of C99 the default.
 
-2015-01-19 <philipp AT informatik.uni-frankfurt.de>
+2015-01-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/ralloc.c,
 	  src/mcs51/ralloc.c:
 	  Fix register packing inline asm interaction bugs #2346, #2268.
 
-2015-01-09 <pkk AT spth.de>
+2015-01-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:
 	  Classification macros are not required in freestanding implementations.

@@ -14888,7 +14888,7 @@ status collapsed
 
 \series default
  Generally follow the ANSI C89 / ISO C90 standard, but allow some SDCC behaviour
- that conflicts with the standard (default).
+ that conflicts with the standard.
 \end_layout
 
 \begin_layout Labeling
@@ -14979,7 +14979,7 @@ status collapsed
 
 \series default
  Generally follow the ISO C99 standard, but allow some SDCC behaviour that
- conflicts with the standard.
+ conflicts with the standard (default).
 \end_layout
 
 \begin_layout Labeling
@@ -37239,7 +37239,7 @@ sdcc89
 \end_inset
 
 - Generally follow the C89 standard, but allow SDCC features that conflict
- with the standard (default).
+ with the standard.
 \end_layout
 
 \begin_layout Itemize
@@ -37327,7 +37327,7 @@ sdcc99
 \end_inset
 
 - Generally follow the C99 standard, but allow SDCC features that conflict
- with the standard (incomplete support).
+ with the standard (default).
 \end_layout
 
 \begin_layout Itemize
@@ -37371,7 +37371,7 @@ c99
 \end_inset
 
 - Follow the C99 standard and disable SDCC features that conflict with the
- standard (incomplete support).
+ standard.
 \end_layout
 
 \begin_layout Itemize

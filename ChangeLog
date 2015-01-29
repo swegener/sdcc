@@ -1,3 +1,8 @@
+2015-01-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Reorganize documentation of language extensions, in particular named address spaces, separate mcs51isms, remove references to obsolete keywords.
+
 2015-01-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

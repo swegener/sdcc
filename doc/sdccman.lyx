@@ -291,12 +291,7 @@ rollers and underlying hardware effectively.
 \begin_inset Newline newline
 \end_inset
 
-
-\emph on
-Warning: Parts of this manual apply to the mc51 port only
-\emph default
-.
- You might also want to have a look at the wiki 
+You might also want to have a look at the wiki 
 \begin_inset Flex URL
 status collapsed
 
@@ -695,7 +690,7 @@ long long
 status open
 
 \begin_layout Plain Layout
-Incomplete support in the mcs51, ds390, ds400, pic14, pic16 and xa51 ports.
+Incomplete support in the mcs51, ds390, ds400, pic14 and pic16 ports.
 \end_layout
 
 \end_inset
@@ -756,7 +751,7 @@ float
 \begin_inset Text
 
 \begin_layout Plain Layout
-4 bytes IEEE 754
+4 bytes, similar to IEEE 754
 \end_layout
 
 \end_inset
@@ -9252,7 +9247,7 @@ Some features of this standard are not supported in some ports:
 
 \begin_layout Itemize
 Functions are not reentrant unless explicitly declared as such or --stack-auto
- is specified in the mcs51, hc08 and s08 ports.
+ is specified in the mcs51, ds390, hc08 and s08 ports.
 \end_layout
 
 \begin_layout Subsection
@@ -9352,13 +9347,13 @@ Some features of this standard are not supported in some ports:
 
 \begin_layout Itemize
 Support for _Bool / bool is incomplete (no pointers to bool, or bool inside
- a struct) in the mcs51, ds390 and xa51 ports.
+ a struct) in the mcs51 and ds390 ports.
 \end_layout
 
 \begin_layout Itemize
 There is no support for data types long long, unsigned long long, int_fast64_t,
  int_least64_t, int64_t, uint_fast64_t, uint_least64_t, uint64_t in the
- mcs51, ds390, ds400, pic14, pic16 and xa51 ports.
+ mcs51, ds390, ds400, pic14 and pic16 ports.
  
 \end_layout
 
@@ -9428,8 +9423,8 @@ Embedded C
 \end_layout
 
 \begin_layout Standard
-sdcc has some support for named address spaces.
- The support for fixed-point math in sdcc is inconsistent with this standard.
+SDCC supports named address spaces.
+ The support for fixed-point math in sdcc is inconsistent with the standard.
  Other parts of the standard are not supported.
 \end_layout
 
@@ -15716,10 +15711,35 @@ status collapsed
 
 <Value> The start location of the external ram
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-xdata (mcs51, ds390 storage class)
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+xdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -15802,7 +15822,7 @@ status collapsed
 
 <Value> The start location of the code
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 code
@@ -16091,12 +16111,37 @@ xstack
 
 \end_inset
 
- is placed after the pdata
+ is placed after the __pdata
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-pdata (mcs51, ds390 storage class)
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+pdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -16184,10 +16229,35 @@ status collapsed
 
 <Value> The start location of the internal ram data
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-data (mcs51, ds390 storage class)
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+data (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -16289,10 +16359,35 @@ status collapsed
 
 <Value> The start location of the indirectly addressable internal ram
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-idata (mcs51, ds390 storage class)
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+idata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -16904,12 +16999,37 @@ status collapsed
 
 
 \series default
- Uses a pseudo stack in the pdata
+ Uses a pseudo stack in the __pdata
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-pdata (mcs51, ds390 storage class)
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+pdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -19096,32 +19216,43 @@ SDCC!Environment variables!undocumented
 \end_layout
 
 \begin_layout Section
-Storage Class Language Extensions
-\end_layout
-
-\begin_layout Subsection
-MCS51/DS390 Storage Class
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Storage class
-\end_layout
-
-\end_inset
-
- Language Extensions
+SDCC Language Extensions
 \end_layout
 
 \begin_layout Standard
-In addition to the ANSI storage classes SDCC allows the following MCS51
- specific storage classes:
+SDCC supports some language extensions useful for embedded systems.
+ These include named address spaces (see also section 5.1 of the Embedded
+ C standard).
+ SDCC supports both intrinsic named address spaces (which ones are supported
+ depends on the target architecture) and non-intrinsic named address spaces
+ (defined by the user using the keyword __addressmod, they are particularly
+ useful with custom bank-switching hardware).
+ Unlike the Embedded C standard, sdcc allows local variables to have an
+ intrinsic named address space even when not explicitly declared as static
+ or extern.
+\end_layout
+
+\begin_layout Subsection
+MCS51/DS390 intrinsic named address spaces
+\end_layout
+
+\begin_layout Standard
+SDCC supports the following MCS51-specific intrinsic address spaces:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename MCS51_named.svg
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
 __data
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -19149,14 +19280,14 @@ _
 
 \end_inset
 
-data (mcs51, ds390 storage class)
+data (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
 
  / __near
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -19184,7 +19315,7 @@ _
 
 \end_inset
 
-near (storage class)
+near (named address space)
 \end_layout
 
 \end_inset
@@ -19197,9 +19328,9 @@ This is the
 \series bold
 default
 \series default
- storage class for the Small Memory model.
- Variables declared with this storage class will be allocated in the directly
- addressable portion of the internal RAM of a 8051, e.g.:
+ (generic) address space for the Small Memory model.
+ Variables in this address space will be allocated in the directly addressable
+ portion of the internal RAM of a 8051, e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -19241,7 +19372,7 @@ _test_data,#0x01
 \begin_layout Subsubsection
 __xdata
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -19269,14 +19400,14 @@ _
 
 \end_inset
 
-xdata (mcs51, ds390 storage class)
+xdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
 
  / __far
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -19304,7 +19435,7 @@ _
 
 \end_inset
 
-far (storage class)
+far (named address space)
 \end_layout
 
 \end_inset
@@ -19313,13 +19444,12 @@ far (storage class)
 \end_layout
 
 \begin_layout Standard
-Variables declared with this storage class will be placed in the external
- RAM.
+Variables in this address space will be placed in the external RAM.
  This is the 
 \series bold
 default
 \series default
- storage class for the Large Memory model, e.g.:
+ (generic) address space for the Large Memory model, e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -19445,7 +19575,7 @@ movx
 \begin_layout Subsubsection
 __idata
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -19473,7 +19603,7 @@ _
 
 \end_inset
 
-idata (mcs51, ds390 storage class)
+idata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -19482,8 +19612,8 @@ idata (mcs51, ds390 storage class)
 \end_layout
 
 \begin_layout Standard
-Variables declared with this storage class will be allocated into the indirectly
- addressable portion of the internal ram of a 8051, e.g.:
+Variables in this address spacewill be allocated into the indirectly addressable
+ portion of the internal ram of a 8051, e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -19597,13 +19727,13 @@ stack
 
 \end_inset
 
- is located in idata memory.
+ is located in idata memory (unless --xstack is specified).
 \end_layout
 
 \begin_layout Subsubsection
 __pdata
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -19631,7 +19761,7 @@ _
 
 \end_inset
 
-pdata (mcs51, ds390 storage class)
+pdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -19669,7 +19799,7 @@ reference "sub:MCS51-variants"
 \series bold
 default
 \series default
- storage class for the Medium Memory model, e.g.:
+ (generic) address space for the Medium Memory model, e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -19824,7 +19954,7 @@ status collapsed
 \begin_layout Subsubsection
 __code
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -19861,8 +19991,7 @@ code
 \end_layout
 
 \begin_layout Standard
-'Variables' declared with this storage class will be placed in the code
- memory:
+'Variables' in this address space will be placed in the code memory:
 \end_layout
 
 \begin_layout Verse
@@ -20122,7 +20251,7 @@ bit
 \end_layout
 
 \begin_layout Standard
-This is a data-type and a storage class specifier.
+This is a data-type and an address space.
  When a variable is declared as a bit, it is allocated into the bit addressable
  memory of 8051, e.g.:
 \end_layout
@@ -20181,8 +20310,8 @@ The bit addressable memory consists of 128 bits which are located from 0x20
 \begin_inset Newline newline
 \end_inset
 
-Apart from this 8051 specific storage class most architectures support ANSI-C
- bitfields
+Apart from this 8051 specific intrinsic named address space most architectures
+ support ANSI-C bitfields
 \begin_inset Index idx
 status collapsed
 
@@ -20332,8 +20461,8 @@ Like the __bit keyword,
 \emph on
 __sfr / __sfr16 / __sfr32 / __sbit
 \emph default
- signify both a data-type and storage class, they are used to describe the
- 
+ signify both a data-type and named address space, they are used to describe
+ the 
 \emph on
 s
 \emph default
@@ -20518,8 +20647,8 @@ __sfr32.
 
 \begin_layout Standard
 Please note, if you use a header file which was written for another compiler
- then the sfr / sfr16 / sfr32 / sbit Storage Class extensions will most
- likely be 
+ then the __sfr / __sfr16 / __sfr32 / __sbit intrinsic named address spaces
+ will most likely be 
 \emph on
 not
 \emph default
@@ -20623,7 +20752,7 @@ Pointer
 
 \begin_layout Standard
 SDCC allows (via language extensions) pointers to explicitly point to any
- of the memory spaces
+ of the address spaces
 \begin_inset Index idx
 status collapsed
 
@@ -20853,21 +20982,21 @@ bit
 Additionally some members of the MCS51 family may have up to 128 bytes of
  additional, indirectly addressable, internal RAM memory (
 \emph on
-idata
+__idata
 \emph default
 
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-idata (mcs51, ds390 storage class)
+idata (mcs51, ds390 named address pace)
 \end_layout
 
 \end_inset
 
 
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -20884,7 +21013,7 @@ _
 
 
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -20895,7 +21024,7 @@ _
 
 \end_inset
 
-idata (mcs51, ds390 storage class)
+idata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -20903,21 +21032,11 @@ idata (mcs51, ds390 storage class)
 ).
  Furthermore, some chips may have some built in external memory (
 \emph on
-xdata
+__xdata
 \emph default
 
 \begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-xdata (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -20945,7 +21064,7 @@ _
 
 \end_inset
 
-xdata (mcs51, ds390 storage class)
+xdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -20953,21 +21072,11 @@ xdata (mcs51, ds390 storage class)
 ) which should not be confused with the internal, directly addressable RAM
  memory (
 \emph on
-data
+__data
 \emph default
 
 \begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-data (mcs51, ds390 storage class)
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -20995,7 +21104,7 @@ _
 
 \end_inset
 
-data (mcs51, ds390 storage class)
+data (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -21003,7 +21112,7 @@ data (mcs51, ds390 storage class)
 ).
  Sometimes this built in 
 \emph on
-xdata
+__xdata
 \emph default
  memory has to be activated before using it (you can probably find this
  information on the datasheet of the microcontroller your are using, see
@@ -21024,7 +21133,7 @@ Startup-Code).
 \begin_layout Standard
 Normally SDCC will only use the first bank
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 register bank (mcs51, ds390)
@@ -21039,16 +21148,6 @@ __using
 \emph default
  
 \emph on
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-using (mcs51, ds390 register bank)
-\end_layout
-
-\end_inset
-
 
 \begin_inset Index idx
 status collapsed
@@ -21488,17 +21587,7 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-Z80/Z180 Storage Class
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Z80!Storage class
-\end_layout
-
-\end_inset
-
- Language Extensions
+Z80/Z180 intrinsic named address spaces
 \end_layout
 
 \begin_layout Subsubsection
@@ -21972,23 +22061,13 @@ in/out
 \end_layout
 
 \begin_layout Subsection
-HC08/S08 Storage Class
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-HC08!Storage class
-\end_layout
-
-\end_inset
-
- Language Extensions
+HC08/S08 intrinsic named address spaces
 \end_layout
 
 \begin_layout Subsubsection
 __data
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -22016,7 +22095,7 @@ _
 
 \end_inset
 
-data (hc08 storage class)
+data (hc08 named address space)
 \end_layout
 
 \end_inset
@@ -22025,8 +22104,8 @@ data (hc08 storage class)
 \end_layout
 
 \begin_layout Standard
-The __data storage class declares a variable that resides in the first 256
- bytes of memory (the direct page).
+Variables int the address space __data resides in the first 256 bytes of
+ memory (the direct page).
  The HC08
 \begin_inset Index idx
 status collapsed
@@ -22043,7 +22122,7 @@ HC08
 \begin_layout Subsubsection
 __xdata
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -22071,7 +22150,7 @@ _
 
 \end_inset
 
-xdata (hc08 storage class)
+xdata (hc08 named addres space)
 \end_layout
 
 \end_inset
@@ -22080,19 +22159,18 @@ xdata (hc08 storage class)
 \end_layout
 
 \begin_layout Standard
-The __xdata storage class declares a variable that can reside anywhere in
- memory.
- This is the default if no storage class is specified.
+Variables in the address space__xdata can reside anywhere in memory.
+ This is the default (generic address space).
  
 \end_layout
 
-\begin_layout Section
-Other SDCC language extensions
+\begin_layout Subsection
+Non-intrinsic named address spaces
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-Other SDCC language extensions
+Non-intrinsic named address spaces
 \end_layout
 
 \end_inset
@@ -22100,22 +22178,8 @@ Other SDCC language extensions
 
 \end_layout
 
-\begin_layout Subsection
-Binary constants
-\end_layout
-
 \begin_layout Standard
-SDCC supports the use of binary constants, such as 0b01100010.
- This feature is only enabled when the compiler is invoked using --std-sdccxx.
-\end_layout
-
-\begin_layout Subsection
-Named address spaces
-\end_layout
-
-\begin_layout Standard
-SDCC supports named address spaces.
- See the Embedded C standard for more information on them.
+SDCC supports user-defined non-intrinsic named address spaces.
  So far SDCC only supports them for bank-switching.
  You need to have a function that switches to the desired memory bank and
  declare a corresponding named address space:
@@ -22134,8 +22198,47 @@ void setb1(void); // The function that sets the currently active memory
 \begin_inset Newline newline
 \end_inset
 
-__addressmod setb0 spaceb0; // Declare a named address space called spaceb0
- that uses setb0()
+__addressmod
+\family default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+addressmod
+\end_layout
+
+\end_inset
+
+
+\family typewriter
+ setb0 spaceb0; // Declare a named address space called spaceb0 that uses
+ setb0()
 \begin_inset Newline newline
 \end_inset
 
@@ -22152,12 +22255,13 @@ spaceb1 int *y; // A pointer to an int in address space spaceb1
 \begin_inset Newline newline
 \end_inset
 
-spaceb0 int *spaceb1 z; //A pointer in address space sapceb1 that points
+spaceb0 int *spaceb1 z; // A pointer in address space sapceb1 that points
  to an int in address space spaceb0
 \end_layout
 
 \begin_layout Standard
-Named address spaces for data in ROM are declared using the const keyword:
+Non-intrinsic named address spaces for data in ROM are declared using the
+ const keyword:
 \end_layout
 
 \begin_layout Verse
@@ -22173,8 +22277,47 @@ void setb1(void); // The function that sets the currently active memory
 \begin_inset Newline newline
 \end_inset
 
-__addressmod setb0 const spaceb0; // Declare a named address space called
- spaceb0 that uses setb0() and resides in ROM
+__addressmod
+\family default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+addressmod
+\end_layout
+
+\end_inset
+
+
+\family typewriter
+ setb0 const spaceb0; // Declare a named address space called spaceb0 that
+ uses setb0() and resides in ROM
 \begin_inset Newline newline
 \end_inset
 
@@ -22191,14 +22334,14 @@ spaceb1 int *y; // A pointer to an int in address space spaceb1
 \begin_inset Newline newline
 \end_inset
 
-const spaceb0 int *spaceb1 z; //A pointer in address space sapceb1 that
+const spaceb0 int *spaceb1 z; // A pointer in address space spaceb1 that
  points to a constant int in address space spaceb0
 \end_layout
 
 \begin_layout Standard
-Variables in named address spaces will be placed in areas of the same name
- (this can be used for the placement of named address spaces in memory by
- the linker).
+Variables in non-intrinsic named address spaces will be placed in areas
+ of the same name (this can be used for the placement of named address spaces
+ in memory by the linker).
 \end_layout
 
 \begin_layout Standard
@@ -22216,10 +22359,10 @@ Optimal Placement of Bank Selection Instructions in Polynomial Time
  for details on how this works.
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Absolute Addressing
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 Absolute addressing
@@ -22235,17 +22378,7 @@ Data items can be assigned an absolute address with the
 \emph on
 __at
 \begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-at
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -22280,7 +22413,7 @@ at
 
  <address>
 \emph default
- keyword, in addition to a storage class, e.g.:
+ keyword, whch can also be used in addition to a named address space, e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -22405,19 +22538,69 @@ volatile
 
  __xdata
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-xdata (mcs51, ds390 storage class)
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+xdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
 
  __at
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
 at
 \end_layout
 
@@ -22465,7 +22648,7 @@ reference "sub:A-Step-by Assembler Introduction"
 \begin_inset Newline newline
 \end_inset
 
-Absolute addresses can be specified for variables in all storage classes,
+Absolute addresses can be specified for variables in all named address spaces,
  e.g.:
 \end_layout
 
@@ -22474,9 +22657,34 @@ Absolute addresses can be specified for variables in all storage classes,
 \family typewriter
 __bit
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
 bit
 \end_layout
 
@@ -22484,9 +22692,34 @@ bit
 
  __at
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
 at
 \end_layout
 
@@ -23011,17 +23244,7 @@ Then, someplace in the code for the first hardware you would use
 \family typewriter
 __bit __at
 \begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-at
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -23162,9 +23385,34 @@ __bit __at (0x91) MISO;
 
 __bit
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
 bit
 \end_layout
 
@@ -23196,6 +23444,46 @@ and you can use the same hardware dependent routine without changes, as
  specified in the whole project.
 \end_layout
 
+\begin_layout Subsection
+Binary constants
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+Binary constants
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SDCC supports the use of binary constants, such as 0b01100010.
+ This feature is only enabled when the compiler is invoked using --std-sdccxx.
+\end_layout
+
+\begin_layout Subsection
+Returning void
+\end_layout
+
+\begin_layout Standard
+SDCC allows functions to return expressions of type void.
+ This feature is only enabled when the compiler is invoked using --std-sdccxx.
+\end_layout
+
+\begin_layout Subsection
+Omitting promotion on arguments of vararg function
+\end_layout
+
+\begin_layout Standard
+Arguments to vararg functions are not promoted when explicitly cast.
+ This feature is only enabled when the compiler is invoked using --std-sdccxx.
+ This breaks compability with the C standards, so linking code compiled
+ with --std-sdccxx with code compiled using --std-cxx can result in failing
+ programs when arguments to vararg functions are explicitly cast.
+\end_layout
+
 \begin_layout Section
 Parameters
 \begin_inset Index idx
@@ -23217,7 +23505,7 @@ function parameter
 
 \end_inset
 
- & Local Variables
+ and Local Variables
 \begin_inset Index idx
 status collapsed
 
@@ -23238,8 +23526,10 @@ name "sec:Parameters-and-Local-Variables"
 \end_layout
 
 \begin_layout Standard
-Automatic (local) variables and parameters to functions can either be placed
- on the stack or in data-space.
+Automatic (local) variables and parameters to functions are placed on the
+ stack for most targets.
+ For MCS51/DS390/HC08/S08 they can either be placed on the stack or in data-spac
+e.
  The default action of the compiler is to place these variables in the internal
  RAM (for small model) or external RAM (for medium or large model).
  This in fact makes them similar to 
@@ -23463,7 +23753,7 @@ local variables
 
 \end_inset
 
- can be assigned storage classes and absolute
+ can be assigned intrinsic named address spaces and absolute
 \begin_inset Index idx
 status collapsed
 
@@ -23711,12 +24001,12 @@ Memory model
  is small.
 
 \emph default
- If an explicit storage class
+ If an explicit intrinsic named address space
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-Storage class
+intrinsic named address space
 \end_layout
 
 \end_inset
@@ -24053,7 +24343,7 @@ The optional number following the
 \emph on
 __interrupt
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 interrupt
@@ -24063,7 +24353,7 @@ interrupt
 
 
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -24121,16 +24411,6 @@ main
  The optional (8051 specific) keyword 
 \emph on
 __using
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-using (mcs51, ds390 register bank)
-\end_layout
-
-\end_inset
-
-
 \begin_inset Index idx
 status collapsed
 
@@ -25213,7 +25493,7 @@ stack
 \family typewriter
 int foo () __critical
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 critical
@@ -25223,7 +25503,7 @@ critical
 
 
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -25852,11 +26132,24 @@ HC08!interrupt
 \family typewriter
 #define CLI __asm
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
 status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
 
 \begin_layout Plain Layout
 
@@ -25890,11 +26183,24 @@ cli
 
 __endasm
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
 status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
 
 \begin_layout Plain Layout
 
@@ -26651,17 +26957,7 @@ Starting from a small snippet of c-code this example shows for the MCS51
 \size footnotesize
 unsigned char __far
 \begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-far (storage class)
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -26678,7 +26974,7 @@ _
 
 
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -26689,24 +26985,14 @@ _
 
 \end_inset
 
-far (storage class)
+far (named address space)
 \end_layout
 
 \end_inset
 
  __at
 \begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-at
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -27319,29 +27605,7 @@ void to_buffer_asm( unsigned char c )
 
 __asm
 \begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-asm
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -27831,28 +28095,6 @@ _
 
 \end_inset
 
-endasm
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
 
 \begin_inset ERT
 status collapsed
@@ -28039,29 +28281,7 @@ c; // to avoid warning: unreferenced function argument
 
 __asm
 \begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-asm
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -28759,28 +28979,6 @@ _
 
 \end_inset
 
-endasm
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
 
 \begin_inset ERT
 status collapsed
@@ -28868,28 +29066,6 @@ _
 
 \end_inset
 
-asm
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
 
 \begin_inset ERT
 status collapsed
@@ -28911,28 +29087,6 @@ asm
  ...
  __endasm
 \size footnotesize
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-endasm
-\end_layout
-
-\end_inset
-
 
 \begin_inset Index idx
 status collapsed
@@ -29538,28 +29692,6 @@ _
 
 \end_inset
 
-asm
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
 
 \begin_inset ERT
 status collapsed
@@ -29691,28 +29823,6 @@ reti
 \end_inset
 
 __endasm
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-endasm
-\end_layout
-
-\end_inset
-
-
 \begin_inset Index idx
 status collapsed
 
@@ -30506,28 +30616,6 @@ _
 
 \end_inset
 
-asm
-\end_layout
-
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
 
 \begin_inset ERT
 status collapsed
@@ -30631,28 +30719,6 @@ b,00001$
 \end_inset
 
 __endasm
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-endasm
-\end_layout
-
-\end_inset
-
-
 \begin_inset Index idx
 status collapsed
 
@@ -30932,28 +30998,6 @@ __asm
 \end_inset
 
 __endasm
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-_
-\end_layout
-
-\end_inset
-
-endasm
-\end_layout
-
-\end_inset
-
-
 \begin_inset Index idx
 status collapsed
 
@@ -35688,8 +35732,9 @@ never
 
 \begin_layout Standard
 When the medium, large or huge model is used all variables declared without
- a storage class will be allocated into the external ram, this includes
- all parameters and local variables (for non-reentrant
+ specifying an intrinsic named address space will be allocated into the
+ external ram, this includes all parameters and local variables (for non-reentra
+nt
 \begin_inset Index idx
 status collapsed
 
@@ -35701,8 +35746,8 @@ reentrant
 
  functions).
  Medium model uses pdata and large and huge models use xdata.
- When the small model is used variables without storage class are allocated
- in the internal ram.
+ When the small model is used variables without an explicitly specified
+ intrinsic named address space are allocated in the internal ram.
 \end_layout
 
 \begin_layout Standard
@@ -35722,12 +35767,12 @@ reference "sub:Bankswitching"
 \end_layout
 
 \begin_layout Standard
-Judicious usage of the processor specific storage classes
+Judicious usage of the processor specific intrinsic named address spaces
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-Storage class
+intrinsic named address space
 \end_layout
 
 \end_inset
@@ -35812,7 +35857,32 @@ status collapsed
 status collapsed
 
 \begin_layout Plain Layout
-pdata (mcs51, ds390 storage class)
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+pdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -39796,12 +39866,37 @@ P2 (mcs51 sfr)
 \end_inset
 
  as dedicated I/O port is becoming more popular.
- Switching the high byte for pdata
+ Switching the high byte for __pdata
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-pdata (mcs51, ds390 storage class)
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+pdata (mcs51, ds390 named address space)
 \end_layout
 
 \end_inset
@@ -42863,12 +42958,37 @@ Variable initialization
 \end_inset
 
 .
- On some mcs51 variants xdata
+ On some mcs51 variants __xdata
 \begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
 status collapsed
 
 \begin_layout Plain Layout
-xdata (mcs51, ds390 storage class)
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+xdata (mcs51, ds390 named address space
 \end_layout
 
 \end_inset
@@ -43142,19 +43262,9 @@ gbz80 (GameBoy Z80)
 \end_layout
 
 \begin_layout Standard
-The stack
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Z80!stack
-\end_layout
-
-\end_inset
-
- frame is similar to that generated by the IAR Z80 compiler.
- IX is used as the base pointer, HL and IY are used as a temporary registers,
- and BC and DE are available for holding variables.
+When a frame pointer is used, it resides in IX.
+ Register A, B, C, D, E, H, L and IY are used as a temporary registers for
+ holding variables.
  Return values
 \begin_inset Index idx
 status collapsed
@@ -43254,7 +43364,29 @@ status collapsed
 \end_inset
 
  and provide your own crt0.rel.
- 
+ When using a custom crt0.rel it needs to be listed first when linking.
+\end_layout
+
+\begin_layout Subsection
+Complex instructions
+\end_layout
+
+\begin_layout Standard
+The Z80 and some derivatives support complex instructions, such as ldir,
+ cpir, ...
+ .
+ SDCC only emits these instructions for functions in the standard library.
+ Thus, e.g.
+ copying one array into another is more efficient when using memcpy() than
+ by using a a user-written loop.
+\end_layout
+
+\begin_layout Standard
+Depending on the target, code generation options and the parameters to the
+ call, SDCC emits ldir for memcpy(), ldir or lsidr for memset(), ldi for
+ strcpy(), ldi for strncpy().
+ Other library functions use the complex instructions as well, but for those,
+ function calls are generated.
 \end_layout
 
 \begin_layout Section
@@ -59226,11 +59358,8 @@ Release policy
 \end_layout
 
 \begin_layout Standard
-Historically there often were long delays between official releases and
- the sourceforge download area tended to get not updated at all.
- Starting with version 2.4.0 SDCC in 2004 switched to a time-based release
- schedule with one official release usually during the first half of the
- year.
+Starting with version 2.4.0 SDCC in 2004 uses a time-based release schedule
+ with one official release usually during the first half of the year.
 \end_layout
 
 \begin_layout Standard
@@ -68262,12 +68391,12 @@ Annotated syntax tree
  This phase also involves propagating types (annotating each node of the
  parse tree with type information) and semantic analysis.
  There are some MCU specific parsing rules.
- For example the storage classes, the extended storage classes are MCU specific
- while there may be a xdata storage class for 8051 there is no such storage
- class for z80.
- SDCC allows MCU specific storage class extensions, i.e.
- __xdata will be treated as a storage class specifier when parsing 8051
- C code but will be treated as a C identifier when parsing z80 code.
+ For example the intrinsic named address spaces are MCU specific: While
+ there may be an __xdata intrinsic named address space for 8051 there none
+ for z80.
+ SDCC has MCU specific intrinsic named address spacess, i.e.
+ __xdata will be treated as a named address space when parsing 8051 C code
+ but will be treated as a C identifier when parsing z80 code.
 \end_layout
 
 \begin_layout Paragraph*

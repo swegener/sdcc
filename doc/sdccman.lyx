@@ -2549,6 +2549,18 @@ sdobjcopy utility was introduced in version 3.3.0.
  It is derived from GNU Binutils package.
 \end_layout
 
+\begin_layout Itemize
+Up to the sdcc 3.4.0 release, intrinsic named address spaces were called 
+\begin_inset Quotes sld
+\end_inset
+
+storage classes
+\begin_inset Quotes srd
+\end_inset
+
+ in this manual.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -8819,7 +8831,7 @@ name "sub:Standard-Compliance"
 \end_layout
 
 \begin_layout Standard
-sdcc aims to be a conforming freestanding implementation of the C programming
+SDCC aims to be a conforming freestanding implementation of the C programming
  language.
  
 \end_layout
@@ -20671,21 +20683,6 @@ without warning
 \emph default
  by SDCC to an assignment of 0x80 to a variable called P0
 \family typewriter
-
-\begin_inset Marginal
-status collapsed
-
-\begin_layout Plain Layout
-
-\series bold
-\begin_inset space ~
-\end_inset
-
-!
-\end_layout
-
-\end_inset
-
 .
 
 \family default
@@ -20747,12 +20744,12 @@ Pointer
 
 \end_inset
 
- to MCS51/DS390 specific memory spaces
+ to MCS51/DS390 intrinsic named address spaces
 \end_layout
 
 \begin_layout Standard
 SDCC allows (via language extensions) pointers to explicitly point to any
- of the address spaces
+ of the named address spaces
 \begin_inset Index idx
 status collapsed
 
@@ -20984,16 +20981,6 @@ Additionally some members of the MCS51 family may have up to 128 bytes of
 \emph on
 __idata
 \emph default
-
-\begin_inset Index idx
-status open
-
-\begin_layout Plain Layout
-idata (mcs51, ds390 named address pace)
-\end_layout
-
-\end_inset
-
 
 \begin_inset Index idx
 status open
@@ -21759,9 +21746,9 @@ out (_IoPort),a
 \end_layout
 
 \begin_layout Subsubsection
-banked sfr
+__banked __sfr
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -21810,7 +21797,7 @@ __banked
 \family typewriter
 __sfr __banked __at
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 \begin_inset ERT

@@ -27,6 +27,7 @@
 #include "common.h"
 #include "dbuf_string.h"
 #include "SDCCbtree.h"
+#include "SDCCset.h"
 
 int currLineno = 0;
 set *astList = NULL;
@@ -224,10 +225,22 @@ copyAstValues (ast * dest, ast * src)
 ast *
 copyAst (ast * src)
 {
-  ast *dest;
+  ast *dest = NULL;
+  static long level = -1;
+  static set *pset;
 
   if (!src)
     return NULL;
+
+  if (++level == 0)
+    if ((pset = newSet ()) == NULL)
+      goto exit_1;
+
+  /* check if it is a infinate recursive call */
+  if (isinSet (pset, src))
+    goto exit_1;
+  else
+    addSet (&pset, src);
 
   dest = Safe_alloc (sizeof (ast));
 
@@ -265,7 +278,14 @@ copyAst (ast * src)
   dest->falseLabel = copySymbol (src->falseLabel);
   dest->left = copyAst (src->left);
   dest->right = copyAst (src->right);
+
 exit:
+  if (pset != NULL && isinSet (pset, src))
+    deleteSetItem (&pset, src);
+exit_1:
+  if (level-- == 0)
+    if (pset != NULL)
+      deleteSet (&pset);
   return dest;
 }
 

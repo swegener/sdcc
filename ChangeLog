@@ -1,3 +1,7 @@
+2015-02-02 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCast.c:
+	  Add check for infinite recursive call of copyAst().
+
 2015-01-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:
@@ -13,7 +17,7 @@
 	* doc/sdccman.lyx:
 	  Update documentation on C dialect selection.
 
-2015-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
+2015-01-27 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCsymt.c:
 	  Fix bug #2349.
 	* support/regression/test/bug-2349.c:

@@ -4241,7 +4241,7 @@ emitCall (const iCode *ic, bool ispcall)
         {
           spillPair (PAIR_HL);
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
-          emit2 ("call __sdcc_call_hl");
+          emit2 ("call ___sdcc_call_hl");
         }
       freeAsmop (IC_LEFT (ic), NULL);
     }
@@ -4535,14 +4535,13 @@ genFunction (const iCode * ic)
   else if (sym->stack)
     {
       if (!_G.omitFramePtr)
-        emit2 ("!enter");
+        emit2 (optimize.codeSize ? "!enters" : "!enter");
       adjustStack (-sym->stack, !IS_TLCS90, TRUE, TRUE, !IY_RESERVED);
       _G.stack.pushed = 0;
     }
   else if (!_G.omitFramePtr)
     {
-      if (!_G.omitFramePtr)
-        emit2 ("!enter");
+      emit2 (optimize.codeSize ? "!enters" : "!enter");
     }
 
   _G.stack.offset = sym->stack;

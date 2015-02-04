@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  crtcall.s
+;  crtenter.s
 ;
-;  Copyright (C) 2011, Maarten Brock
+;  Copyright (C) 2015, Alan Cox, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -28,10 +28,14 @@
 
 	.area   _CODE
 
-	.globl ___sdcc_call_hl
+	.globl ___sdcc_enter_ix
 
-; The Z80 has the jp (hl) instruction, which is perfect for implementing function pointers.
+; Factor out some start of function code to reduce code size
 
-___sdcc_call_hl:
-	jp	(hl)
+___sdcc_enter_ix:
+	pop	hl	; return address
+	push	ix	; save frame pointer
+	ld	ix, #0
+	add	ix, sp	; set ix to the stack frame
+	jp	(hl)	; and return
 

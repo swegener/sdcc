@@ -1,3 +1,13 @@
+2015-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* device/lib/*/crtcall.s,
+	  device/lib/*/crtenters,
+	  device/lib/*/Makefile.in,
+	  src/z80/gen.c,
+	  src/z80/mappings.i,
+	  src/z80/peep.c:
+	  Fix name of helper function for function pointers, introduce Alan Cox' proposal for helper function for function header.
+
 2015-02-02 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCast.c:
 	  Add check for infinite recursive call of copyAst().

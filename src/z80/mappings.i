@@ -67,6 +67,8 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
 		"push\tix\n"
 		"ld\tix,#0\n"
 		"add\tix,sp" },
+    { "enters", 
+		"call\t___sdcc_enter_ix\n" },
     { "pusha", 
       		"push af\n"
       		"push\tbc\n"
@@ -119,6 +121,8 @@ static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
 		"push\tix\n"
 		"ld\tix,#0\n"
 		"add\tix,sp" },
+    { "enters", 
+		"call\t___sdcc_enter_ix\n" },
     { "pusha", 
       		"push af\n"
       		"push\tbc\n"
@@ -390,6 +394,8 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
 		"push\tix\n"
 		"ld\tix,0\n"
 		"add\tix,sp" },
+    { "enters", 
+		"call\t___sdcc_enter_ix\n" },
     { "pusha", 
       		"push af\n"
       		"push\tbc\n"

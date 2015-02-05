@@ -1,3 +1,8 @@
+2015-02-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
+
+	* src/z80/mappings.i:
+	  Fix gbz80 function entry helper.
+
 2015-02-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* doc/Makefile.in: copy *.svg graphic files when using VPATH too

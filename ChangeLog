@@ -1,3 +1,7 @@
+2015-02-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* doc/Makefile.in: copy *.svg graphic files when using VPATH too
+
 2015-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* device/lib/*/crtcall.s,

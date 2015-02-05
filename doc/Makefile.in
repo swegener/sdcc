@@ -52,7 +52,7 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	@# $(LYX) will export the file in the directory of the $(LYX) file
 	@# if VPATH is used the $(LYX) file is copied first
 	if [ "$(srcdir)" != "." ]; then \
-	  cp -f $(srcdir)/$(notdir $<) . ; \
+	  cp -f $(srcdir)/$(notdir $<) $(srcdir)/*.svg . ; \
 	fi
 	$(LYX) -e text $(notdir $<);
 
@@ -71,7 +71,7 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 
 %.tex: %.lyx
 	if [ "$(srcdir)" != "." ] ; then \
-	  cp -f $(srcdir)/$(notdir $<) . ; \
+	  cp -f $(srcdir)/$(notdir $<) $(srcdir)/*.svg . ; \
 	fi
 	$(LYX) -e latex $(notdir $<);
 

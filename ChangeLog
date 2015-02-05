@@ -2,6 +2,8 @@
 
 	* src/z80/mappings.i:
 	  Fix gbz80 function entry helper.
+	* src/SDCCralloc.hpp:
+	  Use weight machanism for deciding which subtree to process first - should reduce memory consumption and improve the heuristic in the register allocator.
 
 2015-02-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

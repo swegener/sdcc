@@ -999,10 +999,8 @@ static void tree_dec_ralloc_nodes(T_t &T, typename boost::graph_traits<T_t>::ver
       c0 = *c++;
       c1 = *c;
 
-      if (T[c0].weight < T[c1].weight) // Minimize memory consumption.
-        {
-          /*std::swap (c0, c1)*/ /* Causes code size regressions - don't know why. */
-        }
+      if (T[c0].weight > T[c1].weight) // Minimize memory consumption needed for keeping intermediate results. As a side effect, this also help the ac mechanism in the heuristic.
+        std::swap (c0, c1);
 
       tree_dec_ralloc_nodes(T, c0, G, I, ac, assignment_optimal);
         {

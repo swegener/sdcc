@@ -254,7 +254,7 @@ void add_vertices_to_tree_decomposition(T_t &T, const v_t v, const v_t v_end, G_
   T[s].bag.insert(*v);
 }
 
-// Create a tree decomposition from en elimination ordering.
+// Create a tree decomposition from an elimination ordering.
 template <class T_t, class G_t>
 void tree_decomposition_from_elimination_ordering(T_t &T, const std::list<unsigned int>& l, const G_t &G)
 {

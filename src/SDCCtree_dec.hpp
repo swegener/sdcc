@@ -419,7 +419,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
       nicify_diffs_more(T, c1);
       {
         const unsigned l = T[c0].weight;
-        const unsigned r = T[c0].weight;
+        const unsigned r = T[c1].weight;
         T[t].weight = (l == r) ? l + 1 : std::max(l , r);
       }
       return;

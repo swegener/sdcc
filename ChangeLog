@@ -2,6 +2,8 @@
 
 	* src/SDCCtree_dec.hpp:
 	  Fix bug in weight calculation that affected tree-decompoisitions with imbalanced nested branches.
+	* src/z80/peeph-gbz80.def:
+	  Fix handling of (hl-), (hl+) in peepholes.
 
 2015-02-05 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

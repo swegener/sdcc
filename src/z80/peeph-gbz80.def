@@ -712,81 +712,6 @@ replace restart {
 	; peephole 66 replaced call at end of function by jump moving call beyond pop ix.
 }
 
-replace {
-	ld	a,(hl)
-	inc	hl
-} by {
-	ld	a,(hl+)
-	; peephole GB1 used ldi to increment hl after load
-}
-
-replace {
-	ld	a,(hl)
-	dec	hl
-} by {
-	ld	a,(hl-)
-	; peephole GB2 used ldd to decrement hl after load
-}
-
-replace {
-	ld	(hl),a
-	inc	hl
-} by {
-	ld	(hl+),a
-	; peephole GB3 used ldi to increment hl after load
-}
-
-replace {
-	ld	(hl),a
-	dec	hl
-} by {
-	ld	(hl-),a
-	; peephole GB4 used ldd to decrement hl after load
-}
-
-replace {
-	inc hl
-	dec hl
-} by {
-	; peephole GB5 removed inc hl / dec hl pair
-}
-
-// Old gbz80 rules from here onward
-//}
-//replace {
-//	ldi	(hl),a
-//	ld	(hl),d
-//	dec	hl
-//	ld	e,(hl)
-//	inc	hl
-//	ld	d,(hl)
-//	ld	a,(de)
-//} by {
-//	ldi	(hl),a
-//	ld	(hl),d
-//	ld	e,a
-//	ld	a,(de)
-//}
-//replace {
-//	ld	(hl),a
-//	ld	%1,(hl)
-//} by {
-//	ld	(hl),a
-//	ld	%1,a
-//}
-
-replace {
-	ld	(hl),a
-	inc	de
-	ld	a,(de)
-	inc	hl
-} by {
-	ld	(hl+),a
-	; peephole E used ldi to increment hl
-	inc	de
-	ld	a,(de)
-}
-
 barrier
 
 // Should be one of the last ones. Opens the code to further peephole optimization.
@@ -1061,3 +986,57 @@ replace {
 	; peephole 154 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
+barrier
+
+// Do not trsy further peephole optimization after these, as other peepholes e.g. might try to generate add a, (hl-), etc otherwise.
+
+replace {
+	ld	a,(hl)
+	inc	hl
+} by {
+	ld	a,(hl+)
+	; peephole GB1 used ldi to increment hl after load
+}
+
+replace {
+	ld	a,(hl)
+	dec	hl
+} by {
+	ld	a,(hl-)
+	; peephole GB2 used ldd to decrement hl after load
+}
+
+replace {
+	ld	(hl),a
+	inc	hl
+} by {
+	ld	(hl+),a
+	; peephole GB3 used ldi to increment hl after load
+}
+
+replace {
+	ld	(hl),a
+	dec	hl
+} by {
+	ld	(hl-),a
+	; peephole GB4 used ldd to decrement hl after load
+}
+
+replace {
+	inc hl
+	dec hl
+} by {
+	; peephole GB5 removed inc hl / dec hl pair
+}
+
+replace {
+	ld	(hl),a
+	inc	de
+	ld	a,(de)
+	inc	hl
+} by {
+	ld	(hl+),a
+	; peephole GB6 used ldi to increment hl
+	inc	de
+	ld	a,(de)
+}

@@ -274,6 +274,9 @@ list2val (initList * val)
   if (val->type == INIT_DEEP)
     return list2val (val->init.deep);
 
+  if (val->type == INIT_NODE && val->init.node->opval.op == CAST)
+    return constExprValue (val->init.node->right, TRUE);
+
   return constExprValue (val->init.node, TRUE);
 }
 

@@ -1,3 +1,9 @@
+2015-02-08 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCval.c:
+	  Allow type cast in function pointer initialization.
+	* support/regression/tests/bug-2124.c:
+	  Add a new test case for bug #2124.
+
 2015-02-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCtree_dec.hpp:

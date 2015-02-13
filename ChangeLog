@@ -1,3 +1,9 @@
+2015-02-13 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCglue.c:
+	  Make pointers (of a struct) initialization more generaic.
+	* support/regression/tests/bug-2123.c:
+	  Add more tests.
+
 2015-02-11 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCglue.c:
 	  Improve pointer initialization.

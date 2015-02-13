@@ -453,9 +453,9 @@ initValPointer (ast * expr)
      some_struct->element */
   if (IS_AST_OP (expr) && expr->opval.op == PTR_OP)
     {
-      ast *t = NULL;
+      ast *t = expr->left;
 
-      if (expr->left->left)
+      /*if (expr->left->left)
         if (expr->left->left->left)
           if (expr->left->left->opval.op == '[')
             t = expr->left->left;
@@ -464,7 +464,11 @@ initValPointer (ast * expr)
         else
           t = expr->left->left;
       else
-        t = expr->left;
+        t = expr->left;*/
+
+      /* a more generic way of above code */
+      while (t->left != NULL && t->opval.op != '[')
+        t = t->left;
 
       return valForStructElem (t, expr->right); 
     }

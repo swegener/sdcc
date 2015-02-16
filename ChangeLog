@@ -1,3 +1,11 @@
+2015-02-16 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCast.c:
+	  Fix a bug in char array initialization with string.
+	* support/regression/tests/bug-1953.c:
+	  Add a new test case.
+	* support/regression/tests/gcc-torture-execute-20000801-4.c:
+	  Enabled.
+
 2015-02-13 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCglue.c:
 	  Make pointers (of a struct) initialization more generaic.

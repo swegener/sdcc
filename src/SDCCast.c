@@ -1383,6 +1383,16 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
                                             newAst_VALUE (valueFromLit ((float) i))), newAst_VALUE (valueFromLit (*s++))));
         }
 
+      /* assign zero to others */
+      for (i = size; i < symsize; i++)
+        {
+          rast = newNode (NULLOP,
+                          rast,
+                          newNode ('=',
+                                   newNode ('[', sym,
+                                            newAst_VALUE (valueFromLit ((float) i))), newAst_VALUE (valueFromLit (0))));
+        }
+
       // now WE don't need iexpr's symbol anymore
       freeStringSymbol (AST_SYMBOL (iexpr));
 
@@ -4250,8 +4260,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           if (tree->opval.op == LEFT_OP || (tree->opval.op == RIGHT_OP && SPEC_USIGN (LETYPE (tree))))
             {
               werrorfl (tree->filename, tree->lineno, W_SHIFT_CHANGED, (tree->opval.op == LEFT_OP ? "left" : "right"));
-	      /* Change shift op to comma op and replace the right operand with 0. */
-	      /* This preserves the left operand in case there were side-effects. */
+              /* Change shift op to comma op and replace the right operand with 0. */
+              /* This preserves the left operand in case there were side-effects. */
               tree->opval.op = ',';
               tree->right->opval.val = constCharVal (0);
               TETYPE (tree) = TTYPE (tree) = tree->right->opval.val->type;

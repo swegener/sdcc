@@ -28,7 +28,6 @@ char *t;
 void
 testTortureExecute (void)
 {
-#if 0
   {
     char s[] = "x";
     t = s;
@@ -37,6 +36,5 @@ testTortureExecute (void)
     return;
   else
     ASSERT (0);
-#endif
 }
 

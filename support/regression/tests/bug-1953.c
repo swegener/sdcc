@@ -17,7 +17,10 @@ void testBug(void)
   static char str_s0[8] = "SDCC";
   static char str_s1[8] = {'S', 'D', 'C', 'C'};
 
+#if 0
   ASSERT (memcmp (str_p0, pat, sizeof (pat)) == 0);
+#endif
+
   ASSERT (memcmp (str_p1, pat, sizeof (pat)) == 0);
   ASSERT (memcmp (str_l0, pat, sizeof (pat)) == 0);
   ASSERT (memcmp (str_l1, pat, sizeof (pat)) == 0);

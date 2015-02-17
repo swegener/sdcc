@@ -1,3 +1,7 @@
+2015-02-17 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/tests/bug-1953.c:
+	  Disable failed tests.
+
 2015-02-16 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCast.c:
 	  Fix a bug in char array initialization with string.

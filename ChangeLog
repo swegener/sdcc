@@ -1,3 +1,13 @@
+2015-02-20 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/tests/bug-2357.c:
+	  A new test case.
+	* support/regression/tests/gcc-torture-execute-20000412-1.c:
+	  Enabled.
+	* src/SDCCerr.c:
+	  Change E_CODE_NO_INIT from an error to a warning.
+	* src/SDCCast.c:
+	  Fix a bug in selecting type of an array index.
+
 2015-02-17 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/bug-1953.c:
 	  Disable failed tests.

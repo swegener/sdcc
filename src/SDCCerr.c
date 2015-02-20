@@ -249,7 +249,7 @@ struct
      "SDCC cannot pass structure '%s' as function argument", 0 },
   { E_PREV_DEF_CONFLICT, ERROR_LEVEL_ERROR,
      "conflict with previous definition of '%s' for attribute '%s'", 0 },
-  { E_CODE_NO_INIT, ERROR_LEVEL_ERROR,
+  { E_CODE_NO_INIT, ERROR_LEVEL_WARNING,
      "variable '%s' declared in code space must have initialiser", 0 },
   { E_OPS_INTEGRAL, ERROR_LEVEL_ERROR,
      "operands not integral for assignment operation", 0 },

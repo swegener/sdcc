@@ -2741,7 +2741,7 @@ getLeftResultType (ast * tree, RESULT_TYPE resultType)
     case '[':
       if (!IS_ARRAY (LTYPE (tree)))
         return resultType;
-      if (DCL_ELEM (LTYPE (tree)) > 0 && DCL_ELEM (LTYPE (tree)) <= 255)
+      if (DCL_ELEM (LTYPE (tree)) > 0 && getSize (tree->left->ftype) < 256)
         return RESULT_TYPE_CHAR;
       return resultType;
     default:

@@ -1,3 +1,10 @@
+2015-02-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCasm.c,
+	  src/z80/gen.c,
+	  src/z80/main.c:
+	  Improve z88dk compability (patch provided by z88dk).
+
 2015-02-20 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/bug-2357.c:
 	  A new test case.
@@ -41,7 +48,7 @@
 2015-02-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCtree_dec.hpp:
-	  Fix bug in weight calculation that affected tree-decompoisitions with imbalanced nested branches.
+	  Fix bug in weight calculation that affected tree-decompositions with imbalanced nested branches.
 	* src/z80/peeph-gbz80.def:
 	  Fix handling of (hl-), (hl+) in peepholes.
 

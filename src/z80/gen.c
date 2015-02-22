@@ -2329,7 +2329,7 @@ aopGet (asmop * aop, int offset, bool bit16)
         case AOP_IMMD:
           /* PENDING: re-target */
           if (bit16)
-            dbuf_tprintf (&dbuf, "!immedwords", aop->aopu.aop_immd);
+            dbuf_tprintf (&dbuf, "!immedword", aop->aopu.aop_immd);
           else
             {
               switch (offset)

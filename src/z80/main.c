@@ -40,6 +40,7 @@
 #define OPTION_RESERVE_IY      "--reserve-regs-iy"
 #define OPTION_OLDRALLOC       "--oldralloc"
 #define OPTION_FRAMEPOINTER    "--fno-omit-frame-pointer"
+#define OPTION_EMIT_EXTERNS    "--emit-externs"
 
 static char _z80_defaultRules[] = {
 #include "peeph.rul"
@@ -75,6 +76,7 @@ static OPTION _z80_options[] = {
   {0, OPTION_RESERVE_IY,      &z80_opts.reserveIY, "Do not use IY (incompatible with --fomit-frame-pointer)"},
   {0, OPTION_OLDRALLOC,       &options.oldralloc, "Use old register allocator"},
   {0, OPTION_FRAMEPOINTER,    &z80_opts.noOmitFramePtr, "Do not omit frame pointer"},
+  {0, OPTION_EMIT_EXTERNS,    NULL, "Emit externs list in generated asm"},
   {0, NULL}
 };
 
@@ -525,6 +527,11 @@ _parseOptions (int *pargc, char **argv, int *i)
               z80_opts.port_mode = 180;
               return TRUE;
             }
+        }
+	  else if (!strncmp (argv[*i], OPTION_EMIT_EXTERNS, sizeof (OPTION_EMIT_EXTERNS) - 1))
+        {
+          port->assembler.externGlobal = 1;
+          return TRUE;
         }
     }
   return FALSE;

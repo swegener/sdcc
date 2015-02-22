@@ -1,7 +1,6 @@
 2015-02-22 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/SDCCasm.c,
-	  src/z80/gen.c,
+	* src/z80/gen.c,
 	  src/z80/main.c:
 	  Improve z88dk compability (patch provided by z88dk).
 

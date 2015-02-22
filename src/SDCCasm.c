@@ -401,8 +401,8 @@ err_no_line:
 static const ASM_MAPPING _asxxxx_mapping[] = {
   {"labeldef", "%s::"},
   {"slabeldef", "%s:"},
-  {"tlabeldef", "l%N_%05d$:"},
-  {"tlabel", "l%N_%05d$"},
+  {"tlabeldef", "%05d$:"},
+  {"tlabel", "%05d$"},
   {"immed", "#"},
   {"zero", "#0x00"},
   {"one", "#0x01"},
@@ -425,7 +425,6 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
   {"msbimmeds", "#>(%s)"},
   {"module", ".module %s"},
   {"global", ".globl %s"},
-  {"extern", ".globl %s"},
   {"fileprelude", ""},
   {"functionheader",
    "; ---------------------------------\n"

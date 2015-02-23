@@ -9,22 +9,38 @@
 #pragma std_c99
 #endif
 
-#if !defined (__SDCC_mcs51) || (!defined (__SDCC_MODEL_SMALL) && !defined (__SDCC_MODEL_MEDIUM) && !defined (__SDCC_STACK_AUTO))
+#if defined (__SDCC) && (!defined (__SDCC_mcs51) || (!defined (__SDCC_MODEL_SMALL) && !defined (__SDCC_MODEL_MEDIUM) && !defined (__SDCC_STACK_AUTO)))
 
 short i = -1;
-short ww[127];
-short qq[128];
+union {
+  short sv0[126];
+  short sv1[132];
+  long lv0[63];
+  long lv1[66];
+} uv; 
 
 short
 foo2(void)
 {
-  return ww[117 + i];
+  return uv.sv1[132 + i];
+}
+
+long
+foo3(void)
+{
+  return uv.lv1[66 + i];
 }
 
 short
-foo3(void)
+foo4(void)
 {
-  return qq[117 + i];
+  return uv.sv0[126 + i];
+}
+
+long
+foo5(void)
+{
+  return uv.lv0[63 + i];
 }
 
 #endif
@@ -32,19 +48,18 @@ foo3(void)
 void
 testBug (void)
 {
-#if !defined (__SDCC_mcs51) || (!defined (__SDCC_MODEL_SMALL) && !defined (__SDCC_MODEL_MEDIUM) && !defined (__SDCC_STACK_AUTO))
+#if defined (__SDCC) && (!defined (__SDCC_mcs51) || (!defined (__SDCC_MODEL_SMALL) && !defined (__SDCC_MODEL_MEDIUM) && !defined (__SDCC_STACK_AUTO)))
 
-  char *p0 = (char *) ww;
-  char *p1 = (char *) qq;
-
-  memset(p0, 0x33, 128);
-  memset(p0 + 128, 0x55, 124);
-
-  memset(p1, 0x33, 128);
-  memset(p1 + 128, 0x55, 124);
+  memset(&uv, 0x33, 128);
+  memset((char *) &uv + 128, 0x55, 136);
 
   ASSERT (foo2() == 0x5555);
-  ASSERT (foo3() == 0x5555);
+  ASSERT (foo3() == 0x55555555L);
+
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+  ASSERT (foo4() == 0x5555);
+  ASSERT (foo5() == 0x55555555L);
+#endif
 
 #endif
 }

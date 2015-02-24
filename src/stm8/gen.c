@@ -4183,9 +4183,7 @@ genCmp (const iCode *ic, iCode *ifx)
               pushed_a = TRUE;
             }
 
-          right_stacked = stack_aop (right->aop, i, &right_offset);
-
-          if (i && aopInReg (left->aop, i, A_IDX) && regDead (A_IDX, ic))
+          if (i && aopInReg (left->aop, i, A_IDX) && regDead (A_IDX, ic) && pushed_a)
             {
               pop (ASMOP_A, 0, 1);
               pushed_a = FALSE;
@@ -4197,6 +4195,8 @@ genCmp (const iCode *ic, iCode *ifx)
             }
           else
             cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+
+          right_stacked = stack_aop (right->aop, i, &right_offset);
           
           if (right_stacked || aopInReg (right->aop, i, A_IDX))
             {

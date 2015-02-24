@@ -1,3 +1,8 @@
+2015-02-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Fix bug in stm8 comparison code generation.
+
 2015-02-23 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/bug-2357.c:
 	  Improve this test case.

@@ -263,7 +263,7 @@ list2int (initList * val)
 /* list2val - converts the first element of the list to value       */
 /*------------------------------------------------------------------*/
 value *
-list2val (initList * val)
+list2val (initList * val, int check)
 {
   if (!val)
     return NULL;
@@ -272,12 +272,12 @@ list2val (initList * val)
     return NULL;
 
   if (val->type == INIT_DEEP)
-    return list2val (val->init.deep);
+    return list2val (val->init.deep, check);
 
   if (val->type == INIT_NODE && val->init.node->opval.op == CAST)
-    return constExprValue (val->init.node->right, TRUE);
+    return constExprValue (val->init.node->right, check);
 
-  return constExprValue (val->init.node, TRUE);
+  return constExprValue (val->init.node, check);
 }
 
 /*------------------------------------------------------------------*/

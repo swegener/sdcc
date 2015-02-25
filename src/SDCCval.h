@@ -148,7 +148,7 @@ initList *newiList (int, void *);
 initList *revinit (initList *);
 initList *copyIlist (initList *);
 double list2int (initList *);
-value *list2val (initList *);
+value *list2val (initList *, int);
 struct ast *list2expr (initList *);
 void resolveIvalSym (initList *, sym_link *);
 designation *newDesignation(int, void *);

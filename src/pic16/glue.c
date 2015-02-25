@@ -617,7 +617,7 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
     werror (W_EXCESS_INITIALIZERS, "scalar", sym->name, sym->lineDef);
   }
 
-  if (!(val = list2val (ilist))) {
+  if (!(val = list2val (ilist, TRUE))) {
     // assuming a warning has been thrown
     val = constCharVal (0);
   }
@@ -649,7 +649,7 @@ pic16_printIvalChar (symbol *sym, sym_link * type, initList * ilist, const char 
 #endif
 
   if(!s) {
-    val = list2val (ilist);
+    val = list2val (ilist, TRUE);
 
     /* if the value is a character string  */
     if(IS_ARRAY (val->type) && IS_CHAR (val->etype)) {
@@ -731,7 +731,7 @@ pic16_printIvalArray (symbol * sym, sym_link * type, initList * ilist,
   /* by a string                      */
   if (IS_CHAR (type->next) &&
       ilist && ilist->type == INIT_NODE) {
-    if (!IS_LITERAL(list2val(ilist)->etype)) {
+    if (!IS_LITERAL(list2val(ilist, TRUE)->etype)) {
       werror (W_INIT_WRONG);
       return;
     }
@@ -815,7 +815,7 @@ pic16_printIvalBitFields (symbol **sym, initList **ilist, char ptype, void *p)
       else if (!SPEC_BUNNAMED (lsym->etype))
         {
           /* not an unnamed bit-field structure member */
-          value *val = list2val (lilist);
+          value *val = list2val (lilist, TRUE);
 
           if (size)
             {
@@ -1027,7 +1027,7 @@ pic16_printIvalFuncPtr (sym_link * type, initList * ilist, char ptype, void *p)
 #endif
 
   if (ilist)
-    val = list2val (ilist);
+    val = list2val (ilist, TRUE);
   else
     val = valCastLiteral(type, 0.0, 0);
 
@@ -1296,13 +1296,13 @@ CODESPACE: %d\tCONST: %d\tPTRCONST: %d\tSPEC_CONST: %d\n", __FUNCTION__, map->sn
 
       if (SPEC_ABSA (sym->etype) && PIC16_IS_CONFIG_ADDRESS (SPEC_ADDR (sym->etype)))
         {
-          pic16_assignConfigWordValue (SPEC_ADDR (sym->etype), (int) ulFromVal (list2val (sym->ival)));
+          pic16_assignConfigWordValue (SPEC_ADDR (sym->etype), (int) ulFromVal (list2val (sym->ival, TRUE)));
           continue;
         }
 
       if (SPEC_ABSA (sym->etype) && PIC16_IS_IDLOC_ADDRESS (SPEC_ADDR (sym->etype)))
         {
-          pic16_assignIdByteValue (SPEC_ADDR (sym->etype), (char) ulFromVal (list2val (sym->ival)));
+          pic16_assignIdByteValue (SPEC_ADDR (sym->etype), (char) ulFromVal (list2val (sym->ival, TRUE)));
           continue;
         }
 

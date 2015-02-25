@@ -1,3 +1,9 @@
+2015-02-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Speed up stm8 port by skipping output early in dry runs and making some aop tests more efficient,
+	  fix code generation bug in shifts.
+
 2015-02-25 Ben Shi <powerstudio1st AT 163 DOT com>
         * support/regression/tests/bug-2031.c:
           Add a new test case.

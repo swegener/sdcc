@@ -429,14 +429,14 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
     }
 #endif
 
-  // Check for unconnected live ranges, some might have survived dead code elimination.
-  // This is essentially a workaround for broken dead code alimination.
-  // Todo: Improve efficiency, e.g. using subgraph or filtered_graph.
-  // Todo: Split live ranges instead?
+  // Check for unconnected live ranges, some might have survived earlier stages.
+  // This check is too expensive - Profiling shows that compiling the Dhrystone benchmark for stm8 with default options, we spend about a quarter of compiler runtime in here!
+  // Profiling shows that we spend a significant amount of time on the first call to copy_graph()
+  // Todo: Improve efficiency, e.g. using subgraph or filtered_graph to avoid the costly first call to copy_graph()
   for (var_t i = boost::num_vertices(con) - 1; i >= 0; i--)
     {
       cfg_sym_t cfg2;
-      boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
+      boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties())); // This call to copy_graph is expensive!
       for (int j = boost::num_vertices(cfg) - 1; j >= 0; j--)
         {
           if (cfg[j].alive.find(i) == cfg[j].alive.end())

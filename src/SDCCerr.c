@@ -431,9 +431,9 @@ struct
   { W_C89_NO_FLEXARRAY, ERROR_LEVEL_PEDANTIC,
      "ISO C90 does not support flexible array members", 0 },
   { E_FLEXARRAY_NOTATEND, ERROR_LEVEL_ERROR,
-     "flexible array member not at end of struct", 0 },
+     "flexible array member '%s' not at end of struct", 0 },
   { E_FLEXARRAY_INEMPTYSTRCT, ERROR_LEVEL_ERROR,
-     "flexible array in otherwise empty struct", 0 },
+     "flexible array '%s' in otherwise empty struct", 0 },
   { W_EMPTY_SOURCE_FILE, ERROR_LEVEL_PEDANTIC,
      "ISO C forbids an empty source file", 0 },
   { W_BAD_PRAGMA_ARGUMENTS, ERROR_LEVEL_WARNING,
@@ -493,6 +493,8 @@ struct
      "Contact Author with source code", 0 },
   { W_UNRECOGNIZED_ASM, ERROR_LEVEL_INFO,
      "%s() failed to parse line node, assuming %d bytes\n'%s'\n", 0 },
+  { W_FLEXARRAY_INSTRUCT, ERROR_LEVEL_WARNING,
+     "using a flexible array '%s' in a struct", 0},
 };
 
 /* -------------------------------------------------------------------------------

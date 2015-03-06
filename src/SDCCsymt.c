@@ -1630,10 +1630,13 @@ compStructSize (int su, structdef * sdef)
                   sdef->b_flexArrayMember = TRUE;
                   /* is another struct-member following? */
                   if (loop->next)
-                    werror (E_FLEXARRAY_NOTATEND);
+                    werror (E_FLEXARRAY_NOTATEND, loop->name);
                   /* is it the first struct-member? */
                   else if (loop == sdef->fields)
-                    werror (E_FLEXARRAY_INEMPTYSTRCT);
+                    werror (E_FLEXARRAY_INEMPTYSTRCT, loop->name);
+                  /* always give a warning about flexible arrays */
+                  else
+                    werror (W_FLEXARRAY_INSTRUCT, loop->name);
                 }
               else if (ret == INCOMPLETE)
                 {

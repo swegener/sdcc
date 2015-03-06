@@ -1,3 +1,9 @@
+2015-03-26 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCsymt.c:
+	* src/SDCCerr.h:
+	* src/SDCCerr.c:
+	  Add a warning for a flexible array in a struct.
+
 2015-02-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

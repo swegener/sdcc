@@ -2900,12 +2900,39 @@ valForStructElem (ast * structT, ast * elemT)
 {
   value *val, *lval = NULL;
   symbol *sym;
+  int idxoff = 0;
+  ast *sast = NULL;
 
   /* left could be further derefed */
   if (IS_AST_OP (structT))
     {
       if (structT->opval.op == '[')
         lval = valForArray (structT);
+      else if (structT->opval.op == '+')
+        {
+          if (IS_AST_LIT_VALUE (structT->right) && !IS_AST_OP (structT->left))
+            {
+              idxoff = (int) (AST_ULONG_VALUE (structT->right) * getSize (structT->left->ftype->next));
+              sast = structT->left;
+            }
+          else if (IS_AST_LIT_VALUE (structT->left) && !IS_AST_OP (structT->right))
+            {
+              idxoff = (int) (AST_ULONG_VALUE (structT->left) * getSize (structT->right->ftype->next));
+              sast = structT->right;
+            }
+          else
+            return NULL;
+        }
+      else if (structT->opval.op == '-')
+        {
+          if (IS_AST_LIT_VALUE (structT->right) && !IS_AST_OP (structT->left))
+            {
+              idxoff = 0 - (int) (AST_ULONG_VALUE (structT->right) * getSize (structT->left->ftype->next));
+              sast = structT->left;
+            }
+          else
+            return NULL;
+        }
       else if (structT->opval.op == '.')
         lval = valForStructElem (structT->left, structT->right);
       else if (structT->opval.op == PTR_OP)
@@ -2944,7 +2971,11 @@ valForStructElem (ast * structT, ast * elemT)
     }
   else
     {
-      SNPRINTF (val->name, sizeof (val->name), "(%s + %d)", AST_SYMBOL (structT)->rname, (int) sym->offset);
+      if (sast)
+        SNPRINTF (val->name, sizeof (val->name), "(%s + (%d))", AST_SYMBOL (sast)->rname, ((int) sym->offset) + idxoff);
+      else
+        SNPRINTF (val->name, sizeof (val->name), "(%s + %d)", AST_SYMBOL (structT)->rname, (int) sym->offset);
+
       if (SPEC_SCLS (structT->etype) == S_CODE)
         DCL_TYPE (val->type) = CPOINTER;
       else if (SPEC_SCLS (structT->etype) == S_XDATA)

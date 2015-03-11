@@ -1,4 +1,13 @@
-2015-03-26 Ben Shi <powerstudio1st AT 163 DOT com>
+2015-03-11 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCval.c:
+	* src/SDCCglue.c:
+	  Add a new special case in pointer initialization.
+	* support/regression/tests/gcc-torture-execute-const-addr-expr-1.c:
+	  Enabled.
+	* support/regression/test-1898.c:
+	  Add a new test case.
+
+2015-03-06 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCsymt.c:
 	* src/SDCCerr.h:
 	* src/SDCCerr.c:

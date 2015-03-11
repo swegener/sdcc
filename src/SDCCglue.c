@@ -400,7 +400,14 @@ initValPointer (ast * expr)
         {
           return valForStructElem (expr->left->left->left, expr->left->right);
         }
+
+      /* case 2.1. a->b */
+      if (IS_AST_OP (expr->left) && expr->left->opval.op == PTR_OP)
+        {
+          return valForStructElem (expr->left->left, expr->left->right);
+        }
     }
+
   /* case 3. (((char *) &a) +/- constant) */
   if (IS_AST_OP (expr) &&
       (expr->opval.op == '+' || expr->opval.op == '-') &&
@@ -408,6 +415,7 @@ initValPointer (ast * expr)
     {
       return valForCastAggr (expr->left->right->left, expr->left->left->opval.lnk, expr->right, expr->opval.op);
     }
+
   /* case 4. (array type) */
   if (IS_AST_SYM_VALUE (expr) && IS_ARRAY (expr->ftype))
     {
@@ -531,6 +539,7 @@ initPointer (initList * ilist, sym_link * toType)
     {
       val = initValPointer (expr);
     }
+
   if (val)
     return val;
 

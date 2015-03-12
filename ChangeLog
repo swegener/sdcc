@@ -1,3 +1,9 @@
+2015-03-12 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCerr.c:
+	* src/SDCCerr.h:
+	* src/SDCC.y:
+	  Add a new warning: anonymous member in struct/union.
+
 2015-03-11 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCval.c:
 	* src/SDCCglue.c:
@@ -26,7 +32,7 @@
         * src/SDCCval.c:
         * src/SDCCval.h:
         * pic16/glue.c:
-          Enable a global char/int/long variable initialized by an address (const pointer).`
+          Enable a global char/int/long variable initialized by an address (const pointer).
 
 2015-02-24 Philipp Klaus Krause <pkk AT spth.de>
 

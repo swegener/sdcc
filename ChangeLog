@@ -1,3 +1,10 @@
+2015-03-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/z80/crt0.s: cosmetics
+	* sdas/asstm8/sdasstm8.vcxproj,
+	* sdas/asstm8/sdasstm8.vcxproj.filters: new, added
+	* sdcc.sln: added sdasstm8
+
 2015-03-12 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCerr.c:
 	* src/SDCCerr.h:
@@ -2319,7 +2326,7 @@
 	  src/SDCCopt.c,
 	  src/SDCCast.c,
 	  doc/sdccman.lyx:
-	  Reorganize debug output options.
+	  Reorganize debug output dump options.
 
 2013-07-20 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -8978,7 +8985,8 @@
 	  src/SDCCnaddr.hpp,
 	  src/SDCCmain.c,
 	  src/SDCCnaddr.cc:
-	  Make optimal placement of bank-selection instructions configurable using --max-allocs-per-node and --dump-graphs options.
+	   Make optimal placement of bank-selection instructions configurable using
+	   --max-allocs-per-node and --dump-graphs options.
 
 2012-01-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 

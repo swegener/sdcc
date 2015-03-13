@@ -95,6 +95,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stm8", "src\stm8\stm8.vcxpr
 		{2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1} = {2F87BA6F-8EE1-48D0-9817-6BA30BDDB3C1}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdasstm8", "sdas\asstm8\sdasstm8.vcxproj", "{BB1E28DD-A6B6-4C51-BA0E-CCFE0E10523D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -193,6 +195,10 @@ Global
 		{0BA12B9F-BCD6-4C08-9992-69B4FB32D335}.Debug|Win32.Build.0 = Debug|Win32
 		{0BA12B9F-BCD6-4C08-9992-69B4FB32D335}.Release|Win32.ActiveCfg = Release|Win32
 		{0BA12B9F-BCD6-4C08-9992-69B4FB32D335}.Release|Win32.Build.0 = Release|Win32
+		{BB1E28DD-A6B6-4C51-BA0E-CCFE0E10523D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BB1E28DD-A6B6-4C51-BA0E-CCFE0E10523D}.Debug|Win32.Build.0 = Debug|Win32
+		{BB1E28DD-A6B6-4C51-BA0E-CCFE0E10523D}.Release|Win32.ActiveCfg = Release|Win32
+		{BB1E28DD-A6B6-4C51-BA0E-CCFE0E10523D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

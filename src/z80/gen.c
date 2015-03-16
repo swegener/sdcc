@@ -4388,17 +4388,6 @@ genFunction (const iCode * ic)
   emitDebug (z80_assignment_optimal ? "; Register assignment is optimal." : "; Register assignment might be sub-optimal.");
   emitDebug ("; Stack space usage: %d bytes.", sym->stack);
 
-  if (!IS_STATIC (sym->etype))
-    {
-      struct dbuf_s dbuf;
-
-      dbuf_init (&dbuf, 128);
-      dbuf_printf (&dbuf, "%s_start", sym->rname);
-      emit2 ("!labeldef", dbuf_c_str (&dbuf));
-      dbuf_detach (&dbuf);
-      if (!regalloc_dry_run)
-        genLine.lineCurr->isLabel = 1;
-    }
   emit2 ("!functionlabeldef", sym->rname);
   if (!regalloc_dry_run)
     genLine.lineCurr->isLabel = 1;
@@ -4562,16 +4551,6 @@ genEndFunction (iCode * ic)
   if (IFFUNC_ISNAKED (sym->type) || IFFUNC_ISNORETURN (sym->type))
     {
       emitDebug (IFFUNC_ISNAKED (sym->type) ? "; naked function: No epilogue." : "; _Noreturn function: No epilogue.");
-      if (!IS_STATIC (sym->etype))
-        {
-          struct dbuf_s dbuf;
-
-          dbuf_init (&dbuf, 128);
-          dbuf_printf (&dbuf, "%s_end", sym->rname);
-          emit2 ("!labeldef", dbuf_c_str (&dbuf));
-          dbuf_destroy (&dbuf);
-          genLine.lineCurr->isLabel = 1;
-        }
       return;
     }
 
@@ -4665,17 +4644,6 @@ genEndFunction (iCode * ic)
     {
       /* Both banked and non-banked just ret */
       emit2 ("ret");
-    }
-
-  if (!IS_STATIC (sym->etype))
-    {
-      struct dbuf_s dbuf;
-
-      dbuf_init (&dbuf, 128);
-      dbuf_printf (&dbuf, "%s_end", sym->rname);
-      emit2 ("!labeldef", dbuf_c_str (&dbuf));
-      dbuf_destroy (&dbuf);
-      genLine.lineCurr->isLabel = 1;
     }
 
   _G.flushStatics = 1;

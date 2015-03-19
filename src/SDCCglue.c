@@ -562,6 +562,11 @@ printChar (struct dbuf_s *oBuf, const char *s, int plen)
   int pplen = 0;
   char buf[100];
   char *p = buf;
+  int strEnd = plen - 1;
+
+  if (s)
+    while (s[strEnd] != 0)
+      strEnd--;
 
   while (len && pplen < plen)
     {
@@ -573,7 +578,7 @@ printChar (struct dbuf_s *oBuf, const char *s, int plen)
               *p = '\0';
               if (p != buf)
                 dbuf_tprintf (oBuf, "\t!ascii\n", buf);
-              dbuf_tprintf (oBuf, "\t!db !constbyte\n", (unsigned char) *s);
+              dbuf_tprintf (oBuf, "\t!db !constbyte\n", pplen < strEnd ? ((unsigned char) *s) : 0x00);
               p = buf;
             }
           else

@@ -67,7 +67,7 @@ static struct
 int noLineno = 0;
 int noAlloc = 0;
 symbol *currFunc = NULL;
-static ast *createIval (ast *, sym_link *, initList *, ast *, ast *);
+static ast *createIval (ast *, sym_link *, initList *, ast *, ast *, int);
 static ast *createIvalCharPtr (ast *, sym_link *, ast *, ast *);
 static ast *optimizeCompare (ast *);
 ast *optimizeRRCRLC (ast *);
@@ -1168,14 +1168,14 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
             ps->implicit = 1;
             lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (ps)));
             lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
-            rast = decorateType (resolveSymbols (createIval (lAst, ps->type, NULL, rast, rootValue)), RESULT_TYPE_NONE);          
+            rast = decorateType (resolveSymbols (createIval (lAst, ps->type, NULL, rast, rootValue, 1)), RESULT_TYPE_NONE);          
           }
 
       /* initialize this field */
       sflds->implicit = 1;
       lAst = newNode (PTR_OP, newNode ('&', sym, NULL), newAst_VALUE (symbolVal (sflds)));
       lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
-      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast, rootValue)), RESULT_TYPE_NONE);
+      rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast, rootValue, 1)), RESULT_TYPE_NONE);
       iloop = iloop ? iloop->next : NULL;
     }
 
@@ -1254,8 +1254,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
       for (;;)
         {
           ast *aSym;
-
-          if (!iloop && ((lcnt && size >= lcnt) || !DCL_ELEM (type) || !AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
+          if (!iloop && ((lcnt && size >= lcnt) || !DCL_ELEM (type) || !AST_SYMBOL (rootValue)->islocal))
             {
               break;
             }
@@ -1292,7 +1291,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
 
           aSym = newNode ('[', sym, newAst_VALUE (valueFromLit ((float) (idx))));
           aSym = decorateType (resolveSymbols (aSym), RESULT_TYPE_NONE);
-          rast = createIval (aSym, type->next, iloop, rast, rootValue);
+          rast = createIval (aSym, type->next, iloop, rast, rootValue, 0);
           idx++;
           iloop = (iloop ? iloop->next : NULL);
         }
@@ -1442,11 +1441,11 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist, ast * rootVal)
 /* createIval - generates code for initial value                   */
 /*-----------------------------------------------------------------*/
 static ast *
-createIval (ast * sym, sym_link * type, initList * ilist, ast * wid, ast * rootValue)
+createIval (ast * sym, sym_link * type, initList * ilist, ast * wid, ast * rootValue, int omitStatic)
 {
   ast *rast = NULL;
 
-  if (!ilist && (!AST_SYMBOL (rootValue)->islocal || SPEC_STAT (getSpec (type))))
+  if (!ilist && (!AST_SYMBOL (rootValue)->islocal || (omitStatic && SPEC_STAT (getSpec (type)))))
     return NULL;
 
   /* if structure then    */
@@ -1478,7 +1477,7 @@ ast *
 initAggregates (symbol * sym, initList * ival, ast * wid)
 {
   ast *newAst = newAst_VALUE (symbolVal (sym));
-  return createIval (newAst, sym->type, ival, wid, newAst);
+  return createIval (newAst, sym->type, ival, wid, newAst, 1);
 }
 
 /*-----------------------------------------------------------------*/

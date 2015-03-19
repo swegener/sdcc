@@ -157,7 +157,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 3.4.1
+SDCC 3.4.3
 \size footnotesize
 
 \begin_inset Newline newline
@@ -6932,6 +6932,39 @@ http://unxutils.sourceforge.net
 \end_layout
 
 \end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+If UnxUtils didn't work well, 
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+msys
+\end_layout
+
+\end_inset
+
+tools (
+
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+http://www.mingw.org/wiki/msys
+\end_layout
+
+\end_inset
+
+) can be an alternative.
 
 
 \begin_inset Newline newline

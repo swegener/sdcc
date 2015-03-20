@@ -1,3 +1,7 @@
+2015-03-20 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCglue.c:
+	  Improve error messages.
+
 2015-03-19 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCglue.c:
 	  Fix a bug in a global char array initialized by a string.

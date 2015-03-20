@@ -488,7 +488,7 @@ initValPointer (ast * expr)
 /* initPointer - pointer initialization code massaging             */
 /*-----------------------------------------------------------------*/
 value *
-initPointer (initList * ilist, sym_link * toType)
+initPointer (initList * ilist, sym_link * toType, int showError)
 {
   value *val;
   ast *expr;
@@ -544,10 +544,11 @@ initPointer (initList * ilist, sym_link * toType)
     return val;
 
 wrong:
-  if (expr)
-    werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
-  else
-    werror (E_INCOMPAT_PTYPES);
+  if (showError)
+    if (expr)
+      werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
+    else
+      werror (E_INCOMPAT_PTYPES);
   return NULL;
 }
 
@@ -712,7 +713,7 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
 
   if (!(val = list2val (ilist, FALSE)))
     {
-      if (!!(val = initPointer (ilist, type)))
+      if (!!(val = initPointer (ilist, type, 0)))
         {
           int i, size = getSize (type), le = port->little_endian, top = (options.model == MODEL_FLAT24) ? 3 : 2;;         
           dbuf_printf (oBuf, "\t.byte ");
@@ -1345,7 +1346,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oB
       return;
     }
 
-  if (!(val = initPointer (ilist, type)))
+  if (!(val = initPointer (ilist, type, 1)))
     return;
 
   /* if character pointer */

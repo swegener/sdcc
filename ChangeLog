@@ -1,3 +1,8 @@
+2015-03-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Peepholes for optimizing jump on decrement.
+
 2015-03-20 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCglue.c:
 	  Improve error messages.

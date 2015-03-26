@@ -370,8 +370,6 @@ endif
 # --------------------------------
 uninstall:
 	rm -rf $(sdcc_libdir)
-	@echo $(DESTDIR)
-	@echo $(datadir)
 
 # Performing self-test
 # --------------------

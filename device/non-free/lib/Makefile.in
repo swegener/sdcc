@@ -111,6 +111,8 @@ ifeq ($(OPT_DISABLE_PIC16), 0)
 TARGETS        += model-pic16
 endif
 
+ENABLED_PORTS = $(TARGETS:model-%=%)
+
 # Compiling entire program or any subproject
 # ------------------------------------------
 all:
@@ -347,11 +349,13 @@ clean_intermediate-pic14:
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
-install: all installdirs
-	[ ! -d "$(BUILDDIR)" ] || $(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
-	$(CP_U) -r $(srcdir)/pic14 $(srcdir)/pic16 $(sdcc_libdir)/src
 
-	for src in pic14 pic16; do \
+install: all installdirs
+ifneq ($(TARGETS), )
+	[ ! -d "$(BUILDDIR)" ] || $(CP_U) -r $(BUILDDIR)/* $(sdcc_libdir)
+	$(CP_U) -r $(foreach p, $(ENABLED_PORTS), $(srcdir)/$(p)) $(sdcc_libdir)/src
+
+	for src in $(ENABLED_PORTS); do \
 	  find $(sdcc_libdir)/src/$$src -depth \
 	    \( -name '*.rel' -o -name '*.dump*' -o -name '*.sym' -o -name '*.o' -o -name '*.lib' -o \
 	    -name '*.lst' -o -name '*.asm' -o -name '.svn' -o -name 'autom4te.cache' -o \
@@ -360,11 +364,14 @@ install: all installdirs
 	    -name 'bootstrap.sh' \) \
 	    -exec rm -rf {} + ; \
 	done
+endif
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
 	rm -rf $(sdcc_libdir)
+	@echo $(DESTDIR)
+	@echo $(datadir)
 
 # Performing self-test
 # --------------------
@@ -379,10 +386,12 @@ installcheck:
 # Creating installation directories
 # ---------------------------------
 installdirs:
-	for libdir in pic16 pic14; do \
+ifneq ($(TARGETS), )
+	for libdir in $(ENABLED_PORTS); do \
 	  mkdir -p $(sdcc_libdir)/$$libdir; \
 	done
 	mkdir -p $(sdcc_libdir)/src
+endif
 
 # Creating dependencies
 # ---------------------

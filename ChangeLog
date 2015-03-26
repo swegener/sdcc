@@ -1,3 +1,12 @@
+2015-03-26 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/sdbinutils/libiberty/Makefile.in:
+	  Disable make install.
+	* support/sdbinutils/binutils/Makefile.in:
+	* support/sdbinutils/Makefile.in:
+	  Support make uninstall.
+	* device/non-free/lib/Makefile.in:
+	  Apply patch #245 by David Grayson.
+
 2015-03-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:

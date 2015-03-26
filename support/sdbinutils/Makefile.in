@@ -2390,7 +2390,13 @@ install-target:  \
     maybe-install-target-libgomp
 
 uninstall:
-	@echo "the uninstall target is not supported in this tree"
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(MAKE) $(RECURSE_FLAGS_TO_PASS) uninstall-host
+
+.PHONY: uninstall-host
+uninstall-host: maybe-uninstall-binutils
 
 .PHONY: install.all
 install.all: install-no-fixedincludes
@@ -5155,7 +5161,7 @@ check-binutils:
 
 @endif binutils
 
-.PHONY: install-binutils maybe-install-binutils
+.PHONY: install-binutils maybe-install-binutils uninstall-binutils maybe-uninstall-binutils
 maybe-install-binutils:
 @if binutils
 maybe-install-binutils: install-binutils
@@ -5168,6 +5174,18 @@ install-binutils: installdirs
 	(cd $(HOST_SUBDIR)/binutils && \
 	  $(MAKE) $(FLAGS_TO_PASS)  install)
 
+@endif binutils
+
+maybe-uninstall-binutils:
+@if binutils
+maybe-uninstall-binutils: uninstall-binutils
+uninstall-binutils:
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	(cd $(HOST_SUBDIR)/binutils && \
+	  $(MAKE) $(FLAGS_TO_PASS)  uninstall)
 @endif binutils
 
 .PHONY: install-strip-binutils maybe-install-strip-binutils

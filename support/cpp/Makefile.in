@@ -116,11 +116,11 @@ OBSTACK=obstack.o
 
 install: all
 	mkdir -p $(DESTDIR)$(bindir)
-	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/sdcpp$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/sdcpp$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo sdcpp$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sdcpp$(EXEEXT)|sed '$(transform)'`
 
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/sdcpp$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/`echo sdcpp$(EXEEXT)|sed '$(transform)'`
 clean:
 	-rm -f $(TARGET) *.o core libcpp.a
 	rm -f s-options optionlist options.h s-options-h options.c

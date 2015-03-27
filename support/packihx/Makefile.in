@@ -14,13 +14,13 @@ TARGET		= $(PRJDIR)/$(top_builddir)/bin/packihx$(EXEEXT)
 all: $(TARGET)
 
 install: all installdirs
-	$(INSTALL) $(TARGET) `echo $(DESTDIR)$(bindir)/packihx$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) `echo $(DESTDIR)$(bindir)/packihx$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo packihx$(EXEEXT)|sed '$(transform)'`
+	$(STRIP) $(DESTDIR)$(bindir)/`echo packihx$(EXEEXT)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/packihx$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/`echo packihx$(EXEEXT)|sed '$(transform)'`
 
 # Performing self-test
 # --------------------

@@ -57,7 +57,9 @@ ASSOURCES = $(SRC) $(ASXXLIBSRC:%.c=$(ASXXLIB)/%.c) $(UTILSRC:%.c=$(UTILLIB)/%.c
 ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
 ASX = $(top_builddir)/bin/sdas8051$(EXEEXT)
-DEST = $(DESTDIR)$(bindir)/sdas8051$(EXEEXT)
+#DEST = $(DESTDIR)$(bindir)/sdas8051$(EXEEXT)
+DEST = sdas8051$(EXEEXT)
+DESTPATH = $(DESTDIR)$(bindir)/
 
 transform       = @program_transform_name@
 
@@ -71,13 +73,13 @@ $(ASX): $(ASOBJECTS)
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASX) `echo $(DEST)|sed '$(transform)'`
-	$(STRIP) `echo $(DEST)|sed '$(transform)'`
+	$(INSTALL) $(ASX) $(DESTPATH)`echo $(DEST)|sed '$(transform)'`
+	$(STRIP) $(DESTPATH)`echo $(DEST)|sed '$(transform)'`
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DEST)
+	rm -f $(DESTPATH)`echo $(DEST)|sed '$(transform)'`
 
 
 # Performing self-test

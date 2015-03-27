@@ -1,3 +1,21 @@
+2015-03-27 Ben Shi <powerstudio1st AT 163 DOT com>
+	* sdas/as6808/Makefile.in:
+	* sdas/as8051/Makefile.in:
+	* sdas/as8xcxxx/Makefile.in:
+	* sdas/asgb/Makefile.in:
+	* sdas/asrab/Makefile.in:
+	* sdas/asstm8/Makefile.in:
+	* sdas/astlcs90/Makefile.in:
+	* sdas/asz80/Makefile.in:
+	* sdas/linksrc/Makefile.in:
+	* src/Makefile.in:
+	* support/cpp/Makefile.in:
+	* support/librarian/Makefile.in:
+	* support/makebin/Makefile.in:
+	* support/packihx/Makefile.in:
+	* support/scripts/Makefile.in:
+	  Support --program-prefix and --program-suffix.
+
 2015-03-26 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/sdbinutils/libiberty/Makefile.in:
 	  Disable make install.

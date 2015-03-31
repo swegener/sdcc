@@ -1,3 +1,9 @@
+2015-03-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2368.c:
+	  Fixed bug #2368.
+
 2015-03-27 Ben Shi <powerstudio1st AT 163 DOT com>
 	* sdas/as6808/Makefile.in:
 	* sdas/as8051/Makefile.in:

@@ -6213,9 +6213,9 @@ genPointerSet (iCode * ic)
           for (i = 0; i < size; i++)
             {
               if (result->aop->type == AOP_LIT)
-                emit2 ("mov", "0x%02x%02x+%d, %s", byteOfVal (result->aop->aopu.aop_lit, 1), byteOfVal (result->aop->aopu.aop_lit, 0), i, aopGet (right->aop, i));
+                emit2 ("mov", "0x%02x%02x+%d, %s", byteOfVal (result->aop->aopu.aop_lit, 1), byteOfVal (result->aop->aopu.aop_lit, 0), size - i - 1, aopGet (right->aop, i));
               else
-                emit2 ("mov", "%s+%d, %s", result->aop->aopu.aop_immd, i, aopGet (right->aop, i));
+                emit2 ("mov", "%s+%d, %s", result->aop->aopu.aop_immd, size - i - 1, aopGet (right->aop, i));
               cost (right->aop->type == AOP_DIR ? 3 : 4, 1);
             }
           goto release;

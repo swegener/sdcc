@@ -481,5 +481,28 @@ void dump_cfg_naddr(const cfg_t &cfg)
   delete[] name;
 }
 
+// Dump tree decomposition, show bag and live variables at each node.
+static void dump_tree_decomposition_naddr(const tree_dec_naddr_t &tree_dec)
+{
+  std::ofstream dump_file((std::string(dstFileName) + ".dumpnaddrdec" + currFunc->rname + ".dot").c_str());
+
+  unsigned int w = 0;
+
+  std::string *name = new std::string[num_vertices(tree_dec)];
+  for (unsigned int i = 0; i < boost::num_vertices(tree_dec); i++)
+    {
+      if (tree_dec[i].bag.size() > w)
+        w = tree_dec[i].bag.size();
+      std::ostringstream os;
+      std::set<unsigned int>::const_iterator v1;
+      os << i << " | ";
+      for (v1 = tree_dec[i].bag.begin(); v1 != tree_dec[i].bag.end(); ++v1)
+        os << *v1 << " ";
+      name[i] = os.str();
+    }
+  boost::write_graphviz(dump_file, tree_dec, boost::make_label_writer(name));
+  delete[] name;
+}
+
 #endif
 

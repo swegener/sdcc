@@ -68,14 +68,14 @@ $(top_builddir)/support/gc/libgc.a:
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo sdcc$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) $(DESTDIR)$(bindir)/`echo sdcc$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo sdcc|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sdcc|sed '$(transform)'`$(EXEEXT)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/`echo sdcc$(EXEEXT)|sed '$(transform)'`
+	rm -f $(DESTDIR)$(bindir)/`echo sdcc|sed '$(transform)'`$(EXEEXT)
 
 # Performing self-test
 # --------------------

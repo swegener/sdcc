@@ -1,4 +1,21 @@
-2015-03-24 Philipp Klaus Krause <pkk AT spth.de>
+2015-04-01 Ben Shi <powerstudio1st AT 163 DOT com>
+	* sdas/as6808/Makefile.in:
+	* sdas/as8051/Makefile.in:
+	* sdas/as8xcxxx/Makefile.in:
+	* sdas/asgb/Makefile.in:
+	* sdas/asrab/Makefile.in:
+	* sdas/asstm8/Makefile.in:
+	* sdas/astlcs90/Makefile.in:
+	* sdas/asz80/Makefile.in:
+	* sdas/linksrc/Makefile.in:
+	* src/Makefile.in:
+	* support/cpp/Makefile.in:
+	* support/librarian/Makefile.in:
+	* support/makebin/Makefile.in:
+	* support/packihx/Makefile.in:
+	  Fix a bug of --program-suffix on Win32 / Win64.
+
+2015-03-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,
 	  support/regression/tests/bug-2368.c:

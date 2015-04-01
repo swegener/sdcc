@@ -58,7 +58,7 @@ ASOBJECTS = $(OBJS) $(ASXXLIBOBJS) $(UTILLIBOBJS)
 
 ASX = $(top_builddir)/bin/sdas8051$(EXEEXT)
 #DEST = $(DESTDIR)$(bindir)/sdas8051$(EXEEXT)
-DEST = sdas8051$(EXEEXT)
+DEST = sdas8051
 DESTPATH = $(DESTDIR)$(bindir)/
 
 transform       = @program_transform_name@
@@ -73,13 +73,13 @@ $(ASX): $(ASOBJECTS)
 # Compiling and installing everything and running test
 # ----------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(ASX) $(DESTPATH)`echo $(DEST)|sed '$(transform)'`
-	$(STRIP) $(DESTPATH)`echo $(DEST)|sed '$(transform)'`
+	$(INSTALL) $(ASX) $(DESTPATH)`echo $(DEST)|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTPATH)`echo $(DEST)|sed '$(transform)'`$(EXEEXT)
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTPATH)`echo $(DEST)|sed '$(transform)'`
+	rm -f $(DESTPATH)`echo $(DEST)|sed '$(transform)'`$(EXEEXT)
 
 
 # Performing self-test

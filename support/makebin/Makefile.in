@@ -16,10 +16,10 @@ $(BIN): $(OBJ)
 
 install: all
 	mkdir -p $(DESTDIR)$(bindir)
-	$(INSTALL) $(BIN) $(DESTDIR)$(bindir)/`echo makebin$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) $(DESTDIR)$(bindir)/`echo makebin$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(BIN) $(DESTDIR)$(bindir)/`echo makebin|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo makebin|sed '$(transform)'`$(EXEEXT)
 
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/`echo makebin$(EXEEXT)|sed '$(transform)'`
+	rm -f $(DESTDIR)$(bindir)/`echo makebin|sed '$(transform)'`$(EXEEXT)
 
 include $(srcdir)/clean.mk

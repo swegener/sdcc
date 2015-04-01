@@ -13,13 +13,13 @@ TARGET		= $(top_builddir)/bin/sdcclib$(EXEEXT)
 all: $(TARGET)
 
 install: all installdirs
-	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo sdcclib$(EXEEXT)|sed '$(transform)'`
-	$(STRIP) $(DESTDIR)$(bindir)/`echo sdcclib$(EXEEXT)|sed '$(transform)'`
+	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo sdcclib|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sdcclib|sed '$(transform)'`$(EXEEXT)
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/`echo sdcclib$(EXEEXT)|sed '$(transform)'`
+	rm -f $(DESTDIR)$(bindir)/`echo sdcclib|sed '$(transform)'`$(EXEEXT)
 
 # Performing self-test
 # --------------------

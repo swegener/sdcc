@@ -1074,3 +1074,57 @@ copyStr (const char *src, size_t *size)
 
   return dbuf_detach_c_str (&dbuf);
 }
+
+static char prefix[256] = "";
+static char suffix[256] = "";
+static char cmd[4096] = "";
+
+void getPrefixSuffix(const char *arg)
+{
+  const char *p;
+  const char sdcc[] = "sdcc";
+
+  if (!arg)
+    return;
+
+  p = arg + strlen (arg);
+  while (p != arg && *(p - 1) != '\\' && *(p - 1) != '/')
+    p--;
+  arg = p;
+
+  /* found no "sdcc" in command line argv[0] */
+  if ((p = strstr (arg, sdcc)) == NULL)
+    return;
+
+  /* found more than one "sdcc" in command line argv[0] */
+  if (strstr (p + strlen (sdcc), sdcc) != NULL)
+    return;
+
+  /* copy prefix and suffix */
+  strncpy (prefix, arg, p - arg);
+  strcpy (suffix, p + strlen (sdcc));
+}
+
+char *setPrefixSuffix(const char *arg)
+{
+  const char *p;
+
+  if (!arg)
+    return NULL;
+  else
+    memset (cmd, 0x00, sizeof (cmd));
+
+  /* find the core name of command line */
+  for (p = arg; (*p) && isblank (*p); p++);
+  arg = p;
+  assert (strstr (arg, ".exe") == NULL);
+  for (p = arg; (*p) && !isblank (*p); p++);
+
+  /* compose new command line with prefix and suffix */
+  strcpy (cmd, prefix);
+  strncat (cmd, arg, p - arg);
+  strcat (cmd, suffix);
+  strcat (cmd, p);
+
+  return cmd;
+}

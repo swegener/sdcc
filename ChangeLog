@@ -1,3 +1,15 @@
+2015-04-02 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCutils.h:
+	* src/SDCCutils.c:
+	* src/SDCCmain.c:
+	  Support --program-prefix and --program-suffix while calling assembler and linker.
+	* src/z80/gen.c:
+	* src/z80/mapping.i:
+	* src/SDCCasm.c:
+	  Add new "globalfunctionlabel".
+	* sdas/linksrc/Makefile.in:
+	  Fix a spot in 'make install'.
+
 2015-04-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCnaddr.hpp,

@@ -1540,7 +1540,7 @@ linkEdit (char **envp)
   const char *s;
   struct dbuf_s linkerScriptFileName;
   struct dbuf_s binFileName;
-  char *buf;
+  char *buf, *tb;
 
   dbuf_init (&linkerScriptFileName, PATH_MAX);
   dbuf_init (&binFileName, PATH_MAX);
@@ -1797,9 +1797,6 @@ linkEdit (char **envp)
       fclose (lnkfile);
     }                           /* if(port->linker.needLinkerScript) */
 
-  if (options.verbose)
-    printf ("sdcc: Calling linker...\n");
-
   if (port->linker.cmd)
     {
       /* shell_escape file names */
@@ -1817,7 +1814,10 @@ linkEdit (char **envp)
 
   dbuf_destroy (&linkerScriptFileName);
 
-  system_ret = sdcc_system (buf);
+  tb = setPrefixSuffix (buf);
+  if (options.verbose)
+    printf ("sdcc: %s\n", tb);
+  system_ret = sdcc_system (tb);
 
   /* if the binary file name is defined,
      rename the linker output file name to binary file name */
@@ -1856,7 +1856,7 @@ assemble (char **envp)
     }
   else
     {
-      char *buf;
+      char *buf, *tb;
 
       /* build assembler output filename */
       dbuf_init (&asmName, PATH_MAX);
@@ -1889,8 +1889,11 @@ assemble (char **envp)
         }
 
       dbuf_destroy (&asmName);
+      tb = setPrefixSuffix (buf);
 
-      if (sdcc_system (buf))
+      if (options.verbose)
+        printf ("sdcc: %s\n", tb);
+      if (sdcc_system (tb))
         {
           Safe_free (buf);
           /* either system() or the assembler itself has reported an error */
@@ -2077,6 +2080,9 @@ preProcess (char **envp)
       if (options.verbose)
         printf ("sdcc: Calling preprocessor...\n");
       buf = buildMacros (_preCmd);
+      buf = setPrefixSuffix (buf);
+      if (options.verbose)
+        printf ("sdcc: %s\n", buf);
 
       if (preProcOnly)
         {
@@ -2391,6 +2397,8 @@ sig_handler (int signal)
 int
 main (int argc, char **argv, char **envp)
 {
+  getPrefixSuffix (argv[0]);
+
   /* turn all optimizations off by default */
   memset (&optimize, 0, sizeof (struct optimize));
 

@@ -5,6 +5,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "areadata", ".area _%s" },
     { "areahome", ".area _%s" },
     { "functionlabeldef", "%s:" },
+    { "globalfunctionlabeldef", "%s::" },
     { "*hl", "(hl)" },
     { "di", "di" },
     { "ei", "ei" },
@@ -183,6 +184,7 @@ static const ASM_MAPPING _rgbds_mapping[] = {
       "; ---------------------------------"
     },
     { "functionlabeldef", "%s:" },
+    { "globalfunctionlabeldef", "%s::" },
     { "zero", "$00" },
     { "one", "$01" },
     { "area", "SECTION \"%s\",CODE" },
@@ -269,6 +271,7 @@ static const ASM_MAPPING _isas_mapping[] = {
       "; ---------------------------------"
     },
     { "functionlabeldef", "%s:" },
+    { "globalfunctionlabeldef", "%s::" },
     { "zero", "$00" },
     { "one", "$01" },
     { "area", "%s\tGROUP" },
@@ -350,6 +353,7 @@ static const ASM_MAPPING _z80asm_mapping[] = {
       "; ---------------------------------"
     },
     { "functionlabeldef", ".%s" },
+    { "globalfunctionlabeldef", ".%s" },
     { "zero", "$00" },
     { "one", "$01" },
     { "ascii", "DEFM \"%s\"" },

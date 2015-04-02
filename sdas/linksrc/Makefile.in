@@ -86,7 +86,7 @@ $(ASLINK): $(LKOBJECTS)
 install: all installdirs
 	for ld in $(top_builddir)/bin/sdld $(top_builddir)/bin/sdldz80 $(top_builddir)/bin/sdldstm8 $(top_builddir)/bin/sdldgb $(top_builddir)/bin/sdld6808; \
 	do \
-	  $(INSTALL) $$ld $(DESTDIR)$(bindir)/`echo \`basename $$ld\` | sed '$(transform)'`$(EXEEXT); \
+	  $(INSTALL) $$ld$(EXEEXT) $(DESTDIR)$(bindir)/`echo \`basename $$ld\` | sed '$(transform)'`$(EXEEXT); \
 	  $(STRIP) $(DESTDIR)$(bindir)/`echo \`basename $$ld\` | sed '$(transform)'`$(EXEEXT); \
 	done
 

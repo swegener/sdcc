@@ -431,6 +431,7 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
    "; Function %s\n"
    "; ---------------------------------"},
   {"functionlabeldef", "%s:"},
+  {"globalfunctionlabeldef", "%s::"},
   {"bankimmeds", "0     ; PENDING: bank support"},
   {"los", "(%s & 0xFF)"},
   {"his", "(%s >> 8)"},
@@ -485,6 +486,7 @@ static const ASM_MAPPING _gas_mapping[] = {
    "; Function %s\n"
    "; ---------------------------------"},
   {"functionlabeldef", "%s:"},
+  {"globalfunctionlabeldef", "%s::"},
   {"bankimmeds", "0     ; PENDING: bank support"},
   {NULL, NULL}
 };
@@ -523,6 +525,7 @@ static const ASM_MAPPING _a390_mapping[] = {
    "; Function %s\n"
    "; ---------------------------------"},
   {"functionlabeldef", "%s:"},
+  {"globalfunctionlabeldef", "%s::"},
   {"bankimmeds", "0     ; PENDING: bank support"},
   {"los", "(%s & 0FFh)"},
   {"his", "((%s / 256) & 0FFh)"},
@@ -575,6 +578,7 @@ static const ASM_MAPPING _xa_asm_mapping[] = {
    "; Function %s\n"
    "; ---------------------------------"},
   {"functionlabeldef", "%s:"},
+  {"globalfunctionlabeldef", "%s::"},
   {"bankimmeds", "0     ; PENDING: bank support"},
   {"los", "(%s & 0FFh)"},
   {"his", "((%s / 256) & 0FFh)"},

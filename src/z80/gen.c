@@ -4388,7 +4388,11 @@ genFunction (const iCode * ic)
   emitDebug (z80_assignment_optimal ? "; Register assignment is optimal." : "; Register assignment might be sub-optimal.");
   emitDebug ("; Stack space usage: %d bytes.", sym->stack);
 
-  emit2 ("!functionlabeldef", sym->rname);
+  if (IS_STATIC (sym->etype))
+    emit2 ("!functionlabeldef", sym->rname);
+  else
+    emit2 ("!globalfunctionlabeldef", sym->rname);
+ 
   if (!regalloc_dry_run)
     genLine.lineCurr->isLabel = 1;
 

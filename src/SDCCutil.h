@@ -177,4 +177,7 @@ unsigned char universalEscape (const char **src, unsigned int n);
 unsigned char octalEscape (const char **src);
 const char *copyStr (const char *src, size_t *size);
 
+void getPrefixSuffix(const char *);
+char *setPrefixSuffix(const char *);
+
 #endif

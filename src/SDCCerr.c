@@ -497,6 +497,8 @@ struct
      "using a flexible array '%s' in a struct", 0},
   { W_ANONYMOUS_MEMBER, ERROR_LEVEL_WARNING,
      "anonymous member in struct/union", 0},
+  { W_INLINE_NAKED, ERROR_LEVEL_WARNING,
+     "inline function '%s' is __naked", 0},
 };
 
 /* -------------------------------------------------------------------------------

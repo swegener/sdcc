@@ -1,3 +1,9 @@
+2015-04-03 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCCerr.c:
+	* src/SDCCerr.h:
+	* src/SDCCast.c:
+	  Add a warning for inline __naked functions.
+
 2015-04-02 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCutils.h:
 	* src/SDCCutils.c:

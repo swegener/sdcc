@@ -7013,6 +7013,9 @@ createFunction (symbol * name, ast * body)
   if (IFFUNC_ISREENT (name->type))
     reentrant++;
 
+  if (FUNC_ISINLINE (name->type) && FUNC_ISNAKED (name->type))
+    werrorfl (name->fileDef, name->lineDef, W_INLINE_NAKED, name->name);
+
   inlineState.count = 0;
   expandInlineFuncs (body, NULL);
 

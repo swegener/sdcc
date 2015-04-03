@@ -247,6 +247,7 @@ enum {
   W_UNRECOGNIZED_ASM            = 218, /* unrecognized asm instruction in peephole optimizer */
   W_FLEXARRAY_INSTRUCT          = 219, /* using flexible arrays in a struct */
   W_ANONYMOUS_MEMBER            = 220, /* anonymous member in struct/union */
+  W_INLINE_NAKED                = 221, /* inline function is naked */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -1,3 +1,7 @@
+2015-04-06 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/bug-2368.c:
+	  Try to fix the failure in "make test-host" on sparc64-solaris.
+
 2015-04-03 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCCerr.c:
 	* src/SDCCerr.h:

@@ -92,7 +92,7 @@ _mcs51_init (void)
 }
 
 static void
-_mcs51_reset_regparm (void)
+_mcs51_reset_regparm (struct sym_link *funcType)
 {
   regParmFlg = 0;
   regBitParmFlg = 0;

@@ -94,7 +94,7 @@ _s08_init (void)
 }
 
 static void
-_hc08_reset_regparm (void)
+_hc08_reset_regparm (struct sym_link *funcType)
 {
   regParmFlg = 0;
 }

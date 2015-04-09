@@ -1,3 +1,30 @@
+2015-04-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/ctype.h,
+	  device/lib/isblank.c:
+	  Faster isblank().
+	* device/include/stdlib.h,
+	  device/lib/atoi.c,
+	  device/lib/atol.c,
+	  device/lib/atoll.c,
+	  device/lib/incl.mk,
+	  device/lib/make51lib.bat,
+	  support/regression/tests/ato.c:
+	  Faster and shorter atoi(), atol(), implemented atoll().
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCsymt.h,
+	  src/port.h,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/*/main.c,
+	  src/z80/gen.c,
+	  src/z80/ralloc2.cc,
+	  support/regression/tests/z88dk.c:
+	  Support for __z88dk_fastcall calling convention.
+	* src/stm8/peeph.def:
+	  Use relative jump on false instruction for optimizing jumps over 1-byte opcodes.
+
 2015-04-06 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/bug-2368.c:
 	  Try to fix the failure in "make test-host" on sparc64-solaris.

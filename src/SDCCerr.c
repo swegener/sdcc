@@ -499,6 +499,10 @@ struct
      "anonymous member in struct/union", 0},
   { W_INLINE_NAKED, ERROR_LEVEL_WARNING,
      "inline function '%s' is __naked", 0},
+  { E_Z88DK_FASTCALL_PARAMETERS, ERROR_LEVEL_ERROR,
+    "invalid number of parameters for __z88dk_fastcall", 0 },
+  { E_Z88DK_FASTCALL_PARAMETER, ERROR_LEVEL_ERROR,
+    "ivalid parameter type in __z88dk_fastcall", 0 },
 };
 
 /* -------------------------------------------------------------------------------

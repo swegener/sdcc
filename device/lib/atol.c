@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------
-   atoi - convert a string to an integer and return it
+   atol() - convert a string to a long integer and return it
 
-   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Copyright (C) 2015, Philipp Klaus Krause . pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -26,27 +26,27 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-int atoi(const char * s)
+#include <stdlib.h>
+
+#include <ctype.h>
+#include <stdbool.h>
+
+long int atol(const char *nptr)
 {
-    register int rv=0; 
-    register char sign = 0;
+  long int ret = 0;
+  bool neg;
 
-    /* skip till we find either a digit or '+' or '-' */
-    while (*s) {
-        if (*s <= '9' && *s >= '0')
-            break;
-        if (*s == '-' || *s == '+') 
-            break;
-        s++;
-    }    
+  while (isblank (*nptr))
+    nptr++;
 
-    sign = (*s == '-');
-    if (*s == '-' || *s == '+') s++;
+  neg = (*nptr == '-');
 
-    while (*s && *s >= '0' && *s <= '9') {
-        rv = (rv * 10) + (*s - '0');
-        s++;
-    }
+  if (*nptr == '-' || *nptr == '+')
+    nptr++;
 
-    return (sign ? -rv : rv);
+  while (isdigit (*nptr))
+    ret = ret * 10 + (*(nptr++) - '0');
+
+  return (neg ? -ret : ret); // Since -LONG_MIN is LONG_MIN in sdcc, the result value always turns out ok.
 }
+

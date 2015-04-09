@@ -1,9 +1,7 @@
-/*-------------------------------------------------------------------------
-   isalnum.c
+/*---------------------------------------------------------------------
+   atoll() - convert a string to a long long integer and return it
 
-   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
-
-   (c) 2013 Goethe-Universität Frankfurt
+   Copyright (C) 2015, Philipp Klaus Krause . pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,13 +26,29 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-/* it is important to declare this function extern before including
-   the inline definition to give it external linkage */
-extern int isblank (int c);
-
-/* also include stdio.h before ctype.h here so ctype can perform a
-   _Static_assert on EOF */
-#include <stdio.h>
+#include <stdlib.h>
 
 #include <ctype.h>
+#include <stdbool.h>
+
+#ifdef __SDCC_LONGLONG
+long long int atoll(const char *nptr)
+{
+  long long int ret = 0;
+  bool neg;
+
+  while (isblank (*nptr))
+    nptr++;
+
+  neg = (*nptr == '-');
+
+  if (*nptr == '-' || *nptr == '+')
+    nptr++;
+
+  while (isdigit (*nptr))
+    ret = ret * 10 + (*(nptr++) - '0');
+
+  return (neg ? -ret : ret); // Since -LLONG_MIN is LLONG_MIN in sdcc, the result value always turns out ok.
+}
+#endif
 

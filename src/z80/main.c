@@ -105,10 +105,23 @@ static struct
   ASM_TYPE asmType;
   /* determine if we can register a parameter */
   int regParams;
+  bool z88dk_fastcall;
 }
 _G;
 
 static char *_keywords[] = {
+  "sfr",
+  "nonbanked",
+  "banked",
+  "at",                         //.p.t.20030714 adding support for 'sfr at ADDR' construct
+  "_naked",                     //.p.t.20030714 adding support for '_naked' functions
+  "critical",
+  "interrupt",
+  "z88dk_fastcall",
+  NULL
+};
+
+static char *_keywordsgb[] = {
   "sfr",
   "nonbanked",
   "banked",
@@ -176,34 +189,27 @@ _tlcs90_init (void)
 }
 
 static void
-_reset_regparm (void)
+_reset_regparm (struct sym_link *funcType)
 {
   _G.regParams = 0;
+  _G.z88dk_fastcall = IFFUNC_ISZ88DK_FASTCALL (funcType);
+  if (_G.z88dk_fastcall && IFFUNC_HASVARARGS (funcType))
+    werror (E_Z88DK_FASTCALL_PARAMETERS);
 }
 
 static int
-_reg_parm (sym_link * l, bool reentrant)
+_reg_parm (sym_link *l, bool reentrant)
 {
-  if (options.noRegParams)
+  if (_G.z88dk_fastcall)
     {
-      return FALSE;
+      if (_G.regParams)
+        werror (E_Z88DK_FASTCALL_PARAMETERS);
+      if (getSize (l) > 4)
+        werror (E_Z88DK_FASTCALL_PARAMETER);
+      _G.regParams++;
+      return TRUE;
     }
-  else
-    {
-      if (!IS_REGISTER (l) || getSize (l) > 2)
-        {
-          return FALSE;
-        }
-      if (_G.regParams == 2)
-        {
-          return FALSE;
-        }
-      else
-        {
-          _G.regParams++;
-          return TRUE;
-        }
-    }
+ return FALSE;
 }
 
 enum
@@ -650,7 +656,7 @@ _setDefaultOptions (void)
   /* first the options part */
   options.intlong_rent = 1;
   options.float_rent = 1;
-  options.noRegParams = 1;
+  options.noRegParams = 0;
   /* Default code and data locations. */
   options.code_loc = 0x200;
 
@@ -1428,7 +1434,7 @@ PORT gbz80_port = {
   z80_assignRegisters,
   _getRegName,
   NULL,
-  _keywords,
+  _keywordsgb,
   0,                            /* no assembler preamble */
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */

@@ -107,7 +107,7 @@ _ds390_init (void)
 }
 
 static void
-_ds390_reset_regparm (void)
+_ds390_reset_regparm (struct sym_link *funcType)
 {
   regParmFlg = 0;
 }

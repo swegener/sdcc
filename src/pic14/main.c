@@ -97,7 +97,7 @@ _pic14_init (void)
 }
 
 static void
-_pic14_reset_regparm (void)
+_pic14_reset_regparm (struct sym_link *funcType)
 {
   regParmFlg = 0;
 }

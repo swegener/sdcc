@@ -6941,9 +6941,7 @@ http://unxutils.sourceforge.net
 \begin_inset Newline newline
 \end_inset
 
-
 If UnxUtils didn't work well, 
-
 \begin_inset Index idx
 status collapsed
 
@@ -6954,19 +6952,17 @@ msys
 \end_inset
 
 tools (
-
 \begin_inset Flex URL
 status collapsed
 
 \begin_layout Plain Layout
+
 http://www.mingw.org/wiki/msys
 \end_layout
 
 \end_inset
 
 ) can be an alternative.
-
-
 \begin_inset Newline newline
 \end_inset
 
@@ -43407,6 +43403,31 @@ Depending on the target, code generation options and the parameters to the
  strcpy(), ldi for strncpy().
  Other library functions use the complex instructions as well, but for those,
  function calls are generated.
+\end_layout
+
+\begin_layout Subsection
+Calling convention
+\end_layout
+
+\begin_layout Standard
+By default, all parameters are passed on the stack, right-to-left.
+ 8-bit return values are passed in l, 16-bit values in hl, 32-bit values
+ in dehl.
+ Except for the GBZ80, where 8-bit values are passed in e, 16-bit values
+ in de, 32-bit values in hlde.
+ Larger return values are passed in memory in a location specified by the
+ caller through a hidden pointer argument.
+\end_layout
+
+\begin_layout Standard
+There are two other calling conventions supported, which can be specified
+ using the keywords __smallc and __z88dk_fastcall (not on GBZ80).
+ They are primarily intended for compability with libraries written for
+ other compilers.
+ For __smallc, the parameters are passed on the stack, left-to-right, but
+ variable arguments are currently not supported.
+ For __z88dk_fastcall, there may be only one parameter of at most 32 bits,
+ which is passed the same way as the return value.
 \end_layout
 
 \begin_layout Section

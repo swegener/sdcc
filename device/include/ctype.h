@@ -48,7 +48,14 @@ extern int toupper (int c);
 /* Provide inline versions for the most used functions for efficiency */
 #if __STDC_VERSION__ >= 199901L
 
-extern int isblank (int c);
+inline int isblank (int c)
+{
+  return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+}
+
+#ifdef EOF
+_Static_assert(!((unsigned char)EOF == ' ' || (unsigned char)EOF == '\t'), "EOF out of range - ");
+#endif
 
 inline int isdigit (int c)
 {
@@ -79,6 +86,7 @@ _Static_assert(!((unsigned char)EOF >= 'A' && (unsigned char)EOF <= 'Z'), "EOF o
 
 #else
 
+extern int isblank (int c);
 extern int isdigit (int c);
 extern int islower (int c);
 extern int isupper (int c);

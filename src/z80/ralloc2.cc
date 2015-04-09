@@ -730,7 +730,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     }
 #endif
 
-  if(ic->op == RETURN || ic->op == SEND)
+  if(ic->op == RETURN || ic->op == SEND || ic->op == RECEIVE)
     return(true);
 
   if((IS_GB || IY_RESERVED) && (IS_TRUE_SYMOP(left) || IS_TRUE_SYMOP(right)))
@@ -1235,7 +1235,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case ADDRESS_OF:
     case JUMPTABLE:
     case CAST:
-    //case RECEIVE:
+    case RECEIVE:
     case SEND:
     case DUMMY_READ_VOLATILE:
     case CRITICAL:

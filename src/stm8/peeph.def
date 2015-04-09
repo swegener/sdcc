@@ -604,6 +604,7 @@ replace restart {
 	ld	a, xh
 } by {
 	rlwa	x
+	; peephole r1 used rlwa.
 } if notUsed('xh')
 
 replace restart {
@@ -611,6 +612,7 @@ replace restart {
 	ld	a, yh
 } by {
 	rlwa	y
+	; peephole r2 used rlwa.
 } if notUsed('yh')
 
 replace restart {
@@ -618,6 +620,7 @@ replace restart {
 	ld	a, xl
 } by {
 	rrwa	x
+	; peephole r3 used rlwa.
 } if notUsed('xl')
 
 replace restart {
@@ -625,4 +628,49 @@ replace restart {
 	ld	a, yl
 } by {
 	rrwa	y
+	; peephole r4 used rlwa.
 } if notUsed('yl')
+
+// Barrier, so nothing else ever sees the jump-on-false optmiization.
+barrier
+
+// The STM8 has a relative jump-on-false intruction, which never jumps to its target. This can be used to optimize jumps over 1-byte instructions as we can use the instruction we jump over as the offset for the jump.
+replace {
+	jra	%5
+%2:
+	clr	a
+%5:
+} by {
+	.byte 0x21
+	; peephole jrf1 used jump-on-false opcode to shorten jump over 1-byte instruction.
+	%2:
+	clr	a
+	%5:
+} if labelRefCountChange(%5 -1)
+
+replace {
+	jra	%5
+%2:
+	clrw	x
+%5:
+} by {
+	.byte 0x21
+	; peephole jrf2 used jump-on-false opcode to shorten jump over 1-byte instruction.
+	%2:
+	clrw	x
+	%5:
+} if labelRefCountChange(%5 -1)
+
+replace {
+	jra	%5
+%2:
+	ld	a, xl
+%5:
+} by {
+	.byte 0x21
+	; peephole jrf3 used jump-on-false opcode to shorten jump over 1-byte instruction.
+	%2:
+	ld	a, xl
+	%5:
+} if labelRefCountChange(%5 -1)
+

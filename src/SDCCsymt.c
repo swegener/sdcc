@@ -3203,7 +3203,7 @@ processFuncArgs (symbol * func)
     }
 
   /* reset regparm for the port */
-  (*port->reset_regparms) ();
+  (*port->reset_regparms) (funcType);
 
   /* if any of the arguments is an aggregate */
   /* change it to pointer to the same type */

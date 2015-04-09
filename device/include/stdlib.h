@@ -38,9 +38,12 @@
 int abs(int j);
 long int labs(long int j);
 
-extern float atof (const char *);
-extern int atoi (const char *);
-extern long atol (const char *);
+extern float atof (const char *nptr);
+extern int atoi (const char *nptr);
+extern long int atol (const char *nptr);
+#ifdef __SDCC_LONGLONG
+extern long long int atoll (const char *nptr);
+#endif
 
 extern void _uitoa(unsigned int, char*, unsigned char);
 extern void _itoa(int, char*, unsigned char);

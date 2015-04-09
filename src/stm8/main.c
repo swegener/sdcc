@@ -54,7 +54,7 @@ stm8_init (void)
 
 
 static void
-stm8_reset_regparm (void)
+stm8_reset_regparm (struct sym_link *funcType)
 {
 }
 

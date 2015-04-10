@@ -18,6 +18,8 @@ MAKEDEP         = @MAKEDEP@
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
+transform	= @program_transform_name@
+
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
@@ -72,14 +74,14 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) sstm8$(EXEEXT) $(DESTDIR)$(bindir)/sstm8$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/sstm8$(EXEEXT)
+	$(INSTALL) sstm8$(EXEEXT) $(DESTDIR)$(bindir)/`echo sstm8|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sstm8|sed '$(transform)'`$(EXEEXT)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/sstm8$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/`echo sstm8|sed '$(transform)'`$(EXEEXT)
 
 
 # Performing self-test

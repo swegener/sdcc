@@ -18,6 +18,8 @@ MAKEDEP		= @MAKEDEP@
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
+transform	= @program_transform_name@
+
 EXEEXT		= @EXEEXT@
 
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
@@ -64,14 +66,14 @@ tests: $(TEST_OBJ)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) sxa$(EXEEXT) $(DESTDIR)$(bindir)/sxa$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/sxa$(EXEEXT)
+	$(INSTALL) sxa$(EXEEXT) $(DESTDIR)$(bindir)/`echo sxa|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sxa|sed '$(transform)'`$(EXEEXT)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/sxa$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/`echo sxa|sed '$(transform)'`$(EXEEXT)
 
 
 # Performing self-test

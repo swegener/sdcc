@@ -1,3 +1,19 @@
+2015-04-10 Ben Shi <powerstudio1st AT 163 DOT com>
+	* debugger/mcs51/configure:
+	* debugger/mcs51/Makefile.in:
+	* debugger/mcs51/configure.in:
+	* sim/ucsim/st7.src/Makefile.in:
+	* sim/ucsim/z80.src/Makefile.in:
+	* sim/ucsim/stm8.src/Makefile.in:
+	* sim/ucsim/xa.src/Makefile.in:
+	* sim/ucsim/s51.src/Makefile.in:
+	* sim/ucsim/avr.src/Makefile.in:
+	* sim/ucsim/hc08.src/Makefile.in:
+	* sim/ucsim/configure:
+	* sim/ucsim/Makefile.in:
+	* sim/ucsim/configure.in:
+	  Support --program-prefix and --program-suffix.
+
 2015-04-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/ctype.h,

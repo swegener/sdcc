@@ -21,7 +21,7 @@ AC_CHECK_PROG(CP, cp, cp, :)
 
 AC_LANG_C
 
-
+AC_ARG_PROGRAM
 # Checking for header files.
 # ===========================================================================
 AC_CHECK_HEADERS(unistd.h sys/wait.h)

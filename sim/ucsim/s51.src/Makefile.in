@@ -18,6 +18,8 @@ MAKEDEP         = @MAKEDEP@
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
+transform	= @program_transform_name@
+
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
@@ -73,14 +75,14 @@ all: checkconf otherlibs s51.src
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) s51$(EXEEXT) $(DESTDIR)$(bindir)/s51$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/s51$(EXEEXT)
+	$(INSTALL) s51$(EXEEXT) $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/s51$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/`echo s51|sed '$(transform)'`$(EXEEXT)
 
 
 # Performing self-test

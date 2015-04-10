@@ -21,6 +21,8 @@ prefix		= @prefix@
 exec_prefix     = @exec_prefix@
 bindir          = @bindir@
 
+transform	= @program_transform_name@
+
 STD_INC		= @sdcc_include_dir@
 CPPFLAGS	= @CPPFLAGS@ -I. -I$(top_builddir) -I$(top_srcdir) -I$(SLIB) -DHAVE_CONFIG_H
 CFLAGS		= @CFLAGS@ @WALL_FLAG@
@@ -50,18 +52,18 @@ all: checkconf $(TARGET)
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/sdcdb$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/sdcdb$(EXEEXT)
-	cp $(srcdir)/sdcdb.el $(DESTDIR)$(bindir)/sdcdb.el
-	cp $(srcdir)/sdcdbsrc.el $(DESTDIR)$(bindir)/sdcdbsrc.el
+	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo sdcdb|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sdcdb|sed '$(transform)'`$(EXEEXT)
+	cp $(srcdir)/sdcdb.el $(DESTDIR)$(bindir)/`echo 'sdcdb'|sed '$(transform)'`.el
+	cp $(srcdir)/sdcdbsrc.el $(DESTDIR)$(bindir)/`echo 'sdcdbsrc'|sed '$(transform)'`.el
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/sdcdb$(EXEEXT)
-	rm -f $(DESTDIR)$(bindir)/sdcdb.el
-	rm -f $(DESTDIR)$(bindir)/sdcdbsrc.el
+	rm -f $(DESTDIR)$(bindir)/`echo sdcdb|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/`echo 'sdcdb'|sed '$(transform)'`.el
+	rm -f $(DESTDIR)$(bindir)/`echo 'sdcdbsrc'|sed '$(transform)'`.el
 
 # Performing self-test
 # --------------------

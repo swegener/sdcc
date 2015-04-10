@@ -26,7 +26,7 @@ AC_DEFINE_UNQUOTED(VERSIONSTR, "${VERSION}", [XXX])
 AC_DEFINE_UNQUOTED(VERSIONHI, $VERSIONHI, [XXX])
 AC_DEFINE_UNQUOTED(VERSIONLO, $VERSIONLO, [XXX])
 AC_DEFINE_UNQUOTED(VERSIONP, $VERSIONP, [XXX])
-
+AC_ARG_PROGRAM
 # Some options
 #==============
 # *nix default: "${datadir}/sdcc/doc"
@@ -60,7 +60,7 @@ AC_ARG_ENABLE(avr,
 if test $enable_avr != "no"; then
     enable_avr="yes"
 fi,
-enable_avr="yes")
+enable_avr="no")
 AC_ARG_ENABLE(z80,
 [  --disable-z80           do not compile simulator for Z80],
 if test $enable_z80 != "no"; then
@@ -90,7 +90,7 @@ AC_ARG_ENABLE(st7,
 if test $enable_st7 != "no"; then
     enable_st7="yes"
 fi,
-enable_st7="yes")
+enable_st7="no")
 AC_ARG_ENABLE(serio,
 [  --enable-serio          compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then

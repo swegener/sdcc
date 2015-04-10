@@ -17,6 +17,8 @@ srcdir		= @srcdir@
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
+transform	= @program_transform_name@
+
 # Compiling entire program or any subproject
 # ------------------------------------------
 all: checkconf

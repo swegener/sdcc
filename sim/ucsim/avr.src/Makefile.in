@@ -18,6 +18,8 @@ MAKEDEP         = @MAKEDEP@
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
+transform	= @program_transform_name@
+
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
@@ -70,14 +72,15 @@ all: checkconf otherlibs avr.src
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) savr$(EXEEXT) $(DESTDIR)$(bindir)/savr$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/savr$(EXEEXT)
+	$(INSTALL) savr$(EXEEXT) $(DESTDIR)$(bindir)/`echo savr|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo savr|sed '$(transform)'`$(EXEEXT)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
 	rm -f $(DESTDIR)$(bindir)/savr
+	rm -f $(DESTDIR)$(bindir)/`echo savr|sed '$(transform)'`$(EXEEXT)
 
 
 # Performing self-test

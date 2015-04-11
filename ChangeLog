@@ -1,3 +1,7 @@
+2015-04-11 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/scripts/sdcc.nsi:
+	  Remove savr which is disabled by default.
+
 2015-04-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/z88dk.c:

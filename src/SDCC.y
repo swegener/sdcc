@@ -259,10 +259,10 @@ function_attributes
 						FUNC_ISISR($$) = 1;
 				     }
    |  SMALLC         {  $$ = newLink (SPECIFIER);
-                        FUNC_ISSMALLC($$)=1;
+                        FUNC_ISSMALLC($$) = 1;
                      }
    |  Z88DK_FASTCALL {  $$ = newLink (SPECIFIER);
-                        FUNC_ISZ88DK_FASTCALL($$)=1;
+                        FUNC_ISZ88DK_FASTCALL($$) = 1;
                      }
    ;
 

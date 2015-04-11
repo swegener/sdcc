@@ -25,7 +25,7 @@ unsigned long int f4(unsigned long int c) __z88dk_fastcall
 void
 testZ88dk(void)
 {
-#if 0 // Some part of the rst 0x8 thing in regression testing seems to interfere with register contents
+#if 0 // Peephole optimizer bug #2371.
   ASSERT (f1 (23) == 24);
   ASSERT (f2 (23) == 24);
   ASSERT (f4 (23) == 24);

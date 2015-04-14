@@ -102,7 +102,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC Z88DK_FASTCALL ALIGNAS
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
 %token ASM
 
 %type <yyint> Interrupt_storage
@@ -263,6 +263,9 @@ function_attributes
                      }
    |  Z88DK_FASTCALL {  $$ = newLink (SPECIFIER);
                         FUNC_ISZ88DK_FASTCALL($$) = 1;
+                     }
+   |  Z88DK_CALLEE   {  $$ = newLink (SPECIFIER);
+                        FUNC_ISZ88DK_CALLEE($$) = 1;
                      }
    ;
 

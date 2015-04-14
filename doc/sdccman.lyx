@@ -43420,14 +43420,18 @@ By default, all parameters are passed on the stack, right-to-left.
 \end_layout
 
 \begin_layout Standard
-There are two other calling conventions supported, which can be specified
- using the keywords __smallc and __z88dk_fastcall (not on GBZ80).
+There are three other calling conventions supported, which can be specified
+ using the keywords __smallc, __z88dk_fastcall (not on GBZ80) and __z88dk_callee.
  They are primarily intended for compability with libraries written for
  other compilers.
  For __smallc, the parameters are passed on the stack, left-to-right, but
  variable arguments are currently not supported.
  For __z88dk_fastcall, there may be only one parameter of at most 32 bits,
  which is passed the same way as the return value.
+ For __z88dk_callee, parameters are passed on the stack, but the stack is
+ not adjusted for the parameters after the call (thus the callee has to
+ do this instead).
+ __zz8dk_callee can be combined with __smallc.
 \end_layout
 
 \begin_layout Section

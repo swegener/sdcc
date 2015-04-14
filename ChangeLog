@@ -1,3 +1,13 @@
+2015-04-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCsymt.h,
+	  src/z80/main.c,
+	  src/z80/gen.c,
+	  support/regression/tests/z88dk.c:
+	  Support for __z88dk_callee calling convention on the caller side.
+
 2015-04-11 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/scripts/sdcc.nsi:
 	  Remove savr which is disabled by default.

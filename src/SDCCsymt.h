@@ -270,6 +270,7 @@ typedef struct sym_link
     unsigned noreturn:1;            /* promised not to return               */
     unsigned smallc:1;              /* Parameters on stack are passed in reverse order */
     unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
+    unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
     unsigned intno;                 /* 1=Interrupt service routine          */
     short regbank;                  /* register bank 2b used                */
     unsigned builtin;               /* is a builtin function                */
@@ -447,6 +448,8 @@ extern sym_link *validateLink (sym_link * l,
 #define IFFUNC_ISSMALLC(x) (IS_FUNC(x) && FUNC_ISSMALLC(x))
 #define FUNC_ISZ88DK_FASTCALL(x) (x->funcAttrs.z88dk_fastcall)
 #define IFFUNC_ISZ88DK_FASTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_FASTCALL(x))
+#define FUNC_ISZ88DK_CALLEE(x) (x->funcAttrs.z88dk_callee)
+#define IFFUNC_ISZ88DK_CALLEE(x) (IS_FUNC(x) && FUNC_ISZ88DK_CALLEE(x))
 
 #define BANKED_FUNCTIONS        ( options.model == MODEL_HUGE || \
                                   ( (options.model == MODEL_LARGE || options.model == MODEL_MEDIUM) && \

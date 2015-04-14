@@ -4138,12 +4138,14 @@ static void genSend (const iCode *ic)
 static void
 emitCall (const iCode *ic, bool ispcall)
 {
-  bool SomethingReturned, bigreturn;
+  bool SomethingReturned, bigreturn, z88dk_callee;
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
 
   _saveRegsForCall (ic, FALSE);
+
+  z88dk_callee = !IS_LITERAL (etype) && OP_SYMBOL (IC_LEFT (ic)) && IFFUNC_ISZ88DK_CALLEE (OP_SYMBOL (IC_LEFT (ic))->type);
 
   /* Return value of big type or returning struct or union. */
   bigreturn = (getSize (ftype->next) > 4);
@@ -4238,7 +4240,7 @@ emitCall (const iCode *ic, bool ispcall)
                         OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (IC_RESULT (ic));
 
   /* adjust the stack for parameters if required */
-  if ((ic->parmBytes || bigreturn) && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type))
+  if ((ic->parmBytes || bigreturn) && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type) && !z88dk_callee)
     {
       /* This is just a workaround to not confuse the peephole optimizer too much. */
       /* Todo: Check for _Noreturn in the peephole optimizer and do not emit the inc sp here. */
@@ -4247,13 +4249,15 @@ emitCall (const iCode *ic, bool ispcall)
       if (!regalloc_dry_run)
         _G.stack.pushed -= (ic->parmBytes + bigreturn * 2);
     }
-  else if (ic->parmBytes || bigreturn)
+  else if ((ic->parmBytes || bigreturn) && !z88dk_callee)
     {
       adjustStack (ic->parmBytes + bigreturn * 2, !IS_TLCS90, TRUE, !SomethingReturned, !IY_RESERVED);
 
       if (regalloc_dry_run)
         _G.stack.pushed += ic->parmBytes + bigreturn * 2;
     }
+  else if (z88dk_callee && !regalloc_dry_run)
+    _G.stack.pushed -= (ic->parmBytes + bigreturn * 2);
 
   /* if we need assign a result value */
   if (SomethingReturned && !bigreturn)

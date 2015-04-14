@@ -796,6 +796,8 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   FUNC_REGBANK (dest) |= FUNC_REGBANK (src);
   FUNC_ISINLINE (dest) |= FUNC_ISINLINE (src);
   FUNC_ISNORETURN (dest) |= FUNC_ISNORETURN (src);
+  FUNC_ISSMALLC (dest) |= FUNC_ISSMALLC (src);
+  FUNC_ISZ88DK_CALLEE (dest) |= FUNC_ISZ88DK_CALLEE (src);
 
   if (SPEC_ADDRSPACE (src) && SPEC_ADDRSPACE (dest))
     werror (E_TWO_OR_MORE_STORAGE_CLASSES, name);

@@ -118,6 +118,7 @@ static char *_keywords[] = {
   "critical",
   "interrupt",
   "z88dk_fastcall",
+  "z88dk_callee",
   NULL
 };
 
@@ -129,6 +130,7 @@ static char *_keywordsgb[] = {
   "_naked",                     //.p.t.20030714 adding support for '_naked' functions
   "critical",
   "interrupt",
+  "z88dk_callee",
   NULL
 };
 

@@ -275,7 +275,7 @@ model-ds390:
 	fi
 
 model-ds400:
-	if grep '^ds400$$' $(top_builddir)/ports.build > /dev/null; then \
+	if grep '^ds390$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mds400" PORT=ds400 PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 

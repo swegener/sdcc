@@ -5,6 +5,8 @@
 
 #if !defined(__SDCC_z80) && !defined(__SDCC_z180) && !defined(__SDCC_r2k) && !defined(__SDCC_r3ka) && !defined(__SDCC_tlcs90)
 #define __z88dk_fastcall
+#define __z88dk_callee
+#define __smallc
 #endif
 
 /* __z88dk_fastcall is supported both on the caller and the callee side */
@@ -28,9 +30,9 @@ unsigned long int f4(unsigned long int c) __z88dk_fastcall
 
 void s1(int x, int y) __smallc;
 
-void s2(int x, int y) __z88dk;
+void s2(int x, int y) __z88dk_callee;
 
-void s3(int x, int y) __smallc __z88dk;
+void s3(int x, int y) __smallc __z88dk_callee;
 
 void
 testZ88dk(void)

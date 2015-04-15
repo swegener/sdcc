@@ -6837,9 +6837,9 @@ _ACEOF
 
 
 
-  echo ds400 >>ports.all
+  echo ds390 >>ports.all
   if test $OPT_DISABLE_DS400 = 0; then
-    echo ds400 >>ports.build
+    echo ds390 >>ports.build
   fi
 
 
@@ -7435,17 +7435,10 @@ ac_config_files="$ac_config_files doc/Makefile"
 
 ####test $OPT_DISABLE_AVR = 0 && AC_CONFIG_FILES([src/avr/Makefile])
 
-if test $OPT_DISABLE_DS390 = 0; then
+if test $OPT_DISABLE_DS390 = 0 || test $OPT_DISABLE_DS400; then
   ac_config_files="$ac_config_files src/ds390/Makefile sdas/as8xcxxx/Makefile"
 
-  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/ds390/Makefile"
-
-fi
-
-if test $OPT_DISABLE_DS400 = 0; then
-  ac_config_files="$ac_config_files src/ds400/Makefile"
-
-  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/ds400/Makefile"
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/ds390/Makefile device/lib/ds400/Makefile"
 
 fi
 
@@ -8235,7 +8228,6 @@ do
     "src/ds390/Makefile") CONFIG_FILES="$CONFIG_FILES src/ds390/Makefile" ;;
     "sdas/as8xcxxx/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/as8xcxxx/Makefile" ;;
     "device/lib/ds390/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/ds390/Makefile" ;;
-    "src/ds400/Makefile") CONFIG_FILES="$CONFIG_FILES src/ds400/Makefile" ;;
     "device/lib/ds400/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/ds400/Makefile" ;;
     "src/hc08/Makefile") CONFIG_FILES="$CONFIG_FILES src/hc08/Makefile" ;;
     "sdas/as6808/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/as6808/Makefile" ;;

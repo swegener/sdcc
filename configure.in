@@ -791,7 +791,7 @@ AC_DO_PORT(gbz80,  z80,    GBZ80,  [Excludes the Gameboy gbz80 port])
 AC_DO_PORT(tlcs90, z80,    TLCS90, [Excludes the TLCS-90 port])
 AC_DO_PORT(ds390,  ds390,  DS390,  [Excludes the DS390 port])
 AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390, [XXX])
-AC_DO_PORT(ds400,  ds400,  DS400,  [Excludes the DS400 port])
+AC_DO_PORT(ds400,  ds390,  DS400,  [Excludes the DS400 port])
 AC_DO_PORT(pic14,  pic14,  PIC14,  [Excludes the PIC14 port])
 AC_DO_PORT(pic16,  pic16,  PIC16,  [Excludes the PIC16 port])
 AC_DO_PORT(hc08,   hc08,   HC08,   [Excludes the HC08 port])
@@ -855,15 +855,11 @@ AC_CONFIG_FILES([doc/Makefile])
 
 ####test $OPT_DISABLE_AVR = 0 && AC_CONFIG_FILES([src/avr/Makefile])
 
-if test $OPT_DISABLE_DS390 = 0; then
+if test $OPT_DISABLE_DS390 = 0 || test $OPT_DISABLE_DS400; then
   AC_CONFIG_FILES([src/ds390/Makefile
                    sdas/as8xcxxx/Makefile])
-  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/ds390/Makefile])
-fi
-
-if test $OPT_DISABLE_DS400 = 0; then
-  AC_CONFIG_FILES([src/ds400/Makefile])
-  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/ds400/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/ds390/Makefile
+                                                       device/lib/ds400/Makefile])
 fi
 
 if test $OPT_DISABLE_HC08 = 0 || test $OPT_DISABLE_S08 = 0; then

@@ -1,3 +1,17 @@
+2015-04-15 Ben Shi <powerstudio1st AT 163 DOT com>
+	* Makefile.common.in:
+	* Makefile.in:
+	  Partially fix bug #2369.
+	* configure:
+	* configure.in:
+	* device/lib/Makefile.in:
+	* src/ds400/Makefile.in:
+	* src/ds400/main.c:
+	* src/ds400/main.h:
+	  Delete the empty stuff src/ds400/ .
+	* support/regression/tests/z88dk.c:
+	  Fix compiling errors.
+
 2015-04-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,

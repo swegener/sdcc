@@ -1,3 +1,7 @@
+2015-04-17 Ben Shi <powerstudio1st AT 163 DOT com>
+	* sdas/linksrc/Makefile.in:
+	  Fix the issue that "make install" of sdld* failed on Windows.
+
 2015-04-16 Ben Shi <powerstudio1st AT 163 DOT com>
 	* device/include/Makefile.in:
 	  Fix the problem that the header files of ds400 are not installed.

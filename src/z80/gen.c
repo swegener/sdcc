@@ -4143,9 +4143,9 @@ emitCall (const iCode *ic, bool ispcall)
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
 
-  _saveRegsForCall (ic, FALSE);
+  z88dk_callee = IFFUNC_ISZ88DK_CALLEE (ftype);
 
-  z88dk_callee = !IS_LITERAL (etype) && OP_SYMBOL (IC_LEFT (ic)) && IFFUNC_ISZ88DK_CALLEE (OP_SYMBOL (IC_LEFT (ic))->type);
+  _saveRegsForCall (ic, FALSE);
 
   /* Return value of big type or returning struct or union. */
   bigreturn = (getSize (ftype->next) > 4);
@@ -4194,11 +4194,19 @@ emitCall (const iCode *ic, bool ispcall)
           emit2 ("call %s", aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
           regalloc_dry_run_cost += 3;
         }
-      else
+      else if (!(isPair (AOP (IC_LEFT (ic))) && getPairId (AOP (IC_LEFT (ic))) == PAIR_IY) && !IFFUNC_ISZ88DK_FASTCALL (ftype))
         {
           spillPair (PAIR_HL);
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
           emit2 ("call ___sdcc_call_hl");
+        }
+      else
+        {
+          wassert (!IS_GB);
+          wassertl (!IY_RESERVED, "__z88dk_fastcall through function pointer for --reserve-regs-iy unimplemented");
+          spillPair (PAIR_IY);
+          fetchPairLong (PAIR_IY, AOP (IC_LEFT (ic)), ic, 0);
+          emit2 ("call ___sdcc_call_iy");
         }
       freeAsmop (IC_LEFT (ic), NULL);
     }
@@ -4222,7 +4230,7 @@ emitCall (const iCode *ic, bool ispcall)
             }
           else
             {
-              bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
+              bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (ftype));
               emit2 ("%s %s", jump ? "jp" : "call",
                 (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
               regalloc_dry_run_cost += 3;

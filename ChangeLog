@@ -1,3 +1,13 @@
+2015-04-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCglobl.h:
+	  Silence warning.
+	* src/z80/gen.c,
+	  device/lib/*/__sdcc_call_hl.s,
+	  device/lib/*/__sdcc_call_iy.s,
+	  src/SDCCsymt.c:
+	  Better handling of calls through function pointers.
+
 2015-04-18 Ben Shi <powerstudio1st AT 163 DOT com>
 	* sim/ucsim/configure.in:
 	* sim/ucsim/configure:

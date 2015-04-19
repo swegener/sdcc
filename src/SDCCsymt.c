@@ -2404,6 +2404,10 @@ compareFuncType (sym_link * dest, sym_link * src)
       return 0;
     }
 
+  if (IFFUNC_ISZ88DK_FASTCALL (dest) != IFFUNC_ISZ88DK_FASTCALL (src) ||
+    IFFUNC_ISZ88DK_CALLEE (dest) != IFFUNC_ISZ88DK_CALLEE (src))
+    return 0;
+
   /* compare register bank */
   if (FUNC_REGBANK (dest) != FUNC_REGBANK (src))
     { /* except for ISR's whose prototype need not match

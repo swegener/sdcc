@@ -1,3 +1,9 @@
+2015-04-18 Ben Shi <powerstudio1st AT 163 DOT com>
+	* sim/ucsim/configure.in:
+	* sim/ucsim/configure:
+	* sim/ucsim/packages_in.mk:
+	  Do not build disabled ports.
+
 2015-04-17 Ben Shi <powerstudio1st AT 163 DOT com>
 	* sdas/linksrc/Makefile.in:
 	  Fix the issue that "make install" of sdld* failed on Windows.

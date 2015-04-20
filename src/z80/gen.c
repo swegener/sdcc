@@ -239,6 +239,8 @@ static struct
   } trace;
 } _G;
 
+bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
+
 static const char *aopGet (asmop * aop, int offset, bool bit16);
 
 static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_zero, asmop_one;
@@ -4103,6 +4105,8 @@ static void genSend (const iCode *ic)
   if (size == 2)
     {
       fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
+      z80_regs_used_as_parms_in_calls_from_current_function[L_IDX] = true;
+      z80_regs_used_as_parms_in_calls_from_current_function[H_IDX] = true;
     }
   else if (size <= 4)
     {
@@ -4114,6 +4118,7 @@ static void genSend (const iCode *ic)
           for (i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
             {
               retarray[i] = _fReturn3[i]->aopu.aop_reg[0]->rIdx;
+              z80_regs_used_as_parms_in_calls_from_current_function[_fReturn3[i]->aopu.aop_reg[0]->rIdx] = true;
               oparray[i] = AOP (IC_LEFT (ic))->aopu.aop_reg[i]->rIdx;
             }
 
@@ -4125,6 +4130,7 @@ static void genSend (const iCode *ic)
           while (size--)
             {
               cheapMove (_fReturn3[offset], 0, AOP (IC_LEFT (ic)), offset);
+              z80_regs_used_as_parms_in_calls_from_current_function[_fReturn3[offset]->aopu.aop_reg[0]->rIdx] = true;
               offset++;
             }
         }
@@ -12070,6 +12076,9 @@ genZ80Code (iCode * lic)
     }
 
   initGenLineElement ();
+
+
+  memset(z80_regs_used_as_parms_in_calls_from_current_function, 0, sizeof(bool) * (IYH_IDX + 1));
 
   /* if debug information required */
   if (options.debug && currFunc)

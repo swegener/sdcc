@@ -52,6 +52,8 @@ static struct
   lineNode *head;
 } _G;
 
+extern bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
+
 /*-----------------------------------------------------------------*/
 /* univisitLines - clear "visited" flag in all lines               */
 /*-----------------------------------------------------------------*/
@@ -214,8 +216,27 @@ z80MightRead(const lineNode *pl, const char *what)
   if(strcmp(pl->line, "call\t___sdcc_call_hl") == 0 && (strchr(what, 'h') != 0 || strchr(what, 'l') != 0))
     return TRUE;
 
-  if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
-    return FALSE;
+  if(strcmp(pl->line, "call\t___sdcc_call_iy") == 0 && strstr(what, "iy") != 0)
+    return TRUE;
+
+  if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0) // TODO: Making this more accurate (i.e. finding out about the actual situation at _this_ call) could allow more optimization.
+    {
+      if (!strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
+        return TRUE;
+      if (!strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
+        return TRUE;
+      if (!strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
+        return TRUE;
+      if (!strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
+        return TRUE;
+      if (!strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
+        return TRUE;
+      if (!strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
+        return TRUE;
+      if (!strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
+        return TRUE;
+      return FALSE;
+    }
 
   if(ISINST(pl->line, "ret"))
     return(isReturned(what));

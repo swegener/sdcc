@@ -1596,7 +1596,7 @@ replace restart {
 	pop	ix
 	jp	%1
 	; peephole115 replaced call at end of function by jump moving call beyond pop ix (tail call optimization).
-}
+} if symmParmStack(%1)
 
 replace restart {
 	ld	%1,#%2

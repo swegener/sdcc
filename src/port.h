@@ -161,6 +161,7 @@ typedef struct
     bool (*notUsed) (const char *reg, lineNode * currPl, lineNode * head);
     bool (*canAssign) (const char *op1, const char *op2, const char *op3);
     bool (*notUsedFrom) (const char *reg, const char *label, lineNode *head);
+    bool (*symmParmStack) (void);
   }
   peep;
 

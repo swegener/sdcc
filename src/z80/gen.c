@@ -240,6 +240,7 @@ static struct
 } _G;
 
 bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
+bool z80_symmParm_in_calls_from_current_function;
 
 static const char *aopGet (asmop * aop, int offset, bool bit16);
 
@@ -4254,24 +4255,21 @@ emitCall (const iCode *ic, bool ispcall)
                         OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (IC_RESULT (ic));
 
   /* adjust the stack for parameters if required */
-  if ((ic->parmBytes || bigreturn) && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type) && !z88dk_callee)
+  if ((ic->parmBytes || bigreturn) && (IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type) || z88dk_callee))
     {
-      /* This is just a workaround to not confuse the peephole optimizer too much. */
-      /* Todo: Check for _Noreturn in the peephole optimizer and do not emit the inc sp here. */
-      emit2 ("inc sp");
-      regalloc_dry_run_cost += 1;
       if (!regalloc_dry_run)
-        _G.stack.pushed -= (ic->parmBytes + bigreturn * 2);
+        {
+          _G.stack.pushed -= (ic->parmBytes + bigreturn * 2);
+          z80_symmParm_in_calls_from_current_function = FALSE;
+        }
     }
-  else if ((ic->parmBytes || bigreturn) && !z88dk_callee)
+  else if ((ic->parmBytes || bigreturn))
     {
       adjustStack (ic->parmBytes + bigreturn * 2, !IS_TLCS90, TRUE, !SomethingReturned, !IY_RESERVED);
 
       if (regalloc_dry_run)
         _G.stack.pushed += ic->parmBytes + bigreturn * 2;
     }
-  else if (z88dk_callee && !regalloc_dry_run)
-    _G.stack.pushed -= (ic->parmBytes + bigreturn * 2);
 
   /* if we need assign a result value */
   if (SomethingReturned && !bigreturn)
@@ -12077,8 +12075,8 @@ genZ80Code (iCode * lic)
 
   initGenLineElement ();
 
-
   memset(z80_regs_used_as_parms_in_calls_from_current_function, 0, sizeof(bool) * (IYH_IDX + 1));
+  z80_symmParm_in_calls_from_current_function = TRUE;
 
   /* if debug information required */
   if (options.debug && currFunc)

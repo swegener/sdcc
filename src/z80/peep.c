@@ -53,6 +53,7 @@ static struct
 } _G;
 
 extern bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
+extern bool z80_symmParm_in_calls_from_current_function;
 
 /*-----------------------------------------------------------------*/
 /* univisitLines - clear "visited" flag in all lines               */
@@ -978,3 +979,9 @@ int z80instructionSize(lineNode *pl)
   werrorfl(pl->ic->filename, pl->ic->lineno, W_UNRECOGNIZED_ASM, __FUNCTION__, 999, pl->line);
   return(999);
 }
+
+bool z80symmParmStack (void)
+{
+  return z80_symmParm_in_calls_from_current_function;
+}
+

@@ -857,6 +857,7 @@ PORT z80_port = {
    z80notUsed,
    z80canAssign,
    z80notUsedFrom,
+   z80symmParmStack,
    },
   {
    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
@@ -986,6 +987,7 @@ PORT z180_port = {
    z80notUsed,
    z80canAssign,
    z80notUsedFrom,
+   z80symmParmStack,
    },
   {
    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
@@ -1115,6 +1117,7 @@ PORT r2k_port = {
    z80notUsed,
    z80canAssign,
    z80notUsedFrom,
+   z80symmParmStack,
    },
   {
    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
@@ -1244,6 +1247,7 @@ PORT r3ka_port = {
    z80notUsed,
    z80canAssign,
    z80notUsedFrom,
+   z80symmParmStack,
    },
   {
    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
@@ -1375,6 +1379,7 @@ PORT gbz80_port = {
    0,
    0,
    0,
+   z80symmParmStack,
    },
   {
    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
@@ -1504,6 +1509,7 @@ PORT tlcs90_port = {
    z80notUsed,
    z80canAssign,
    z80notUsedFrom,
+   z80symmParmStack,
    },
   {
    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */

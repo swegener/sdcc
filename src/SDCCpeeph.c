@@ -1145,6 +1145,17 @@ FBYNAME (notSimilar)
 }
 
 /*-----------------------------------------------------------------*/
+/* symmParmStack - Caller readjusts stack by the number of bytes
+   that were pushed in all calls to this function                  */
+/*-----------------------------------------------------------------*/
+FBYNAME (symmParmStack)
+{
+  if (port->peep.symmParmStack)
+    return port->peep.symmParmStack();
+  return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
 /* notSame - Check, that arguments are pairwise not the same       */
 /*-----------------------------------------------------------------*/
 FBYNAME (notSame)
@@ -1439,6 +1450,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "notSimilar", notSimilar
+  },
+  {
+    "symmParmStack", symmParmStack
   },
 };
 

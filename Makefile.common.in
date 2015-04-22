@@ -17,6 +17,7 @@ CXX             = @CCACHE@ @CXX@
 RANLIB          = @RANLIB@
 INSTALL         = @INSTALL@
 YACC            = @YACC@
+PYTHON          = @PYTHON@
 LEX             = @LEX@
 AWK             = @AWK@
 STRIP           = @STRIP@

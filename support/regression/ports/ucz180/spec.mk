@@ -66,7 +66,7 @@ $(PORT_CASES_DIR)/fwk.lib: $(srcdir)/fwk/lib/fwk.lib
 	mkdir -p $(dir $@)
 	-$(CASES_DIR)/timeout $(SIM_TIMEOUT) $(EMU) -tz180 $< < $(PORTS_DIR)/$(PORT)/uCsim.cmd > $@ \
 	  || echo -e --- FAIL: \"timeout, simulation killed\" in $(<:$(BINEXT)=.c)"\n"--- Summary: 1/1/1: timeout >> $@
-	python $(srcdir)/get_ticks.py < $@ >> $@
+	$(PYTHON) $(srcdir)/get_ticks.py < $@ >> $@
 	-grep -n FAIL $@ /dev/null || true
 
 _clean:

@@ -44,6 +44,7 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 CPPFLAGS = @CPPFLAGS@ -DNO_VARARGS
 EXEEXT = @EXEEXT@
+PYTHON = @PYTHON@
 
 srcdir       = @srcdir@
 top_srcdir   = @top_srcdir@
@@ -266,19 +267,19 @@ $(CASES_DIR)/%.c: $(TESTS_DIR)/%.m4 $(CASES_DIR)/stamp
 $(PORT_CASES_DIR)/%/iterations.stamp: %.c $(GENERATE_CASES)
 	rm -rf $(dir $@)
 	mkdir -p $(dir $@)
-	python $(GENERATE_CASES) $< $(dir $@)
+	$(PYTHON) $(GENERATE_CASES) $< $(dir $@)
 	touch $@
 
 # Rule linking the combined results log to all of the files in the
 # iteration directory.
 $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
 	$(MAKE) iterations PORT=$(PORT) CASES=$(dir $<)
-	python $(srcdir)/compact-results.py < $@
+	$(PYTHON) $(srcdir)/compact-results.py < $@
 
 # Rule to summarise the results for one port after all of the tests
 # have been run.
 port-results: $(PORT_RESULTS)
-	cat $(PORT_RESULTS) | python $(srcdir)/collate-results.py $(PORT)
+	cat $(PORT_RESULTS) | $(PYTHON) $(srcdir)/collate-results.py $(PORT)
 
 port-fwklib: $(EXTRAS) $(FWKLIB)
 

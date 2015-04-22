@@ -1,3 +1,25 @@
+2015-04-22 Ben Shi <powerstudio1st AT 163 DOT com>
+	* Makefile.common.in:
+	* configure:
+	* configure.in:
+	* support/regression/Makefile.in:
+	* support/regression/ports/ds390/spec.mk:
+	* support/regression/ports/hc08/spec.mk:
+	* support/regression/ports/mcs51-common/spec.mk:
+	* support/regression/ports/pic14/spec.mk:
+	* support/regression/ports/pic16/spec.mk:
+	* support/regression/ports/s08/spec.mk:
+	* support/regression/ports/stm8/spec.mk:
+	* support/regression/ports/ucgbz80/spec.mk:
+	* support/regression/ports/ucr2k/spec.mk:
+	* support/regression/ports/ucr3ka/spec.mk:
+	* support/regression/ports/ucz180/spec.mk:
+	* support/regression/ports/ucz80/spec.mk:
+	* support/valdiag/Makefile.in:
+	  Auto detect python in $PATH.
+	* support/regression/tests/z88dk.c:
+	  Fix build error in reversion #9218.
+
 2015-04-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,

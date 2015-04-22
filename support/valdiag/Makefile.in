@@ -1,5 +1,6 @@
 .SILENT:
 
+PYTHON       = @PYTHON@
 VPATH        = @srcdir@
 srcdir       = @srcdir@
 top_srcdir   = @top_srcdir@
@@ -41,11 +42,11 @@ clean-port:
 	rm -rf $(PORT_BUILD_DIR)
 
 $(PORT_RESULTS_DIR)/%.out: $(TESTS_DIR)/%.c
-	python $(srcdir)/valdiag.py $(PORT) $< $(PORT_BUILD_DIR)/$* $(srcdir)/../../device/include > $@
-	cat $@ | python $(srcdir)/../regression/compact-results.py
+	$(PYTHON) $(srcdir)/valdiag.py $(PORT) $< $(PORT_BUILD_DIR)/$* $(srcdir)/../../device/include > $@
+	cat $@ | $(PYTHON) $(srcdir)/../regression/compact-results.py
 
 port-results: port-dirs $(PORT_RESULTS)
-	cat $(PORT_RESULTS) | 	python $(srcdir)/../regression/collate-results.py $(PORT)
+	cat $(PORT_RESULTS) | $(PYTHON) $(srcdir)/../regression/collate-results.py $(PORT)
 
 port-dirs:
 	mkdir -p $(PORT_RESULTS_DIR)

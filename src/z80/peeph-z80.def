@@ -2253,6 +2253,9 @@ replace restart {
 	; peephole 152 replaced jump by return.
 } if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
+// Replace jp by ret before replacing jp by jr outside of jump tables, since using ret can reduce the number of references to jump labels.
+barrier
+
 replace {
 	jp	%5
 } by {

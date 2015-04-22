@@ -1,3 +1,8 @@
+2015-04-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Better peephole interaction for early ret statements in functions.
+
 2015-04-22 Ben Shi <powerstudio1st AT 163 DOT com>
 	* Makefile.common.in:
 	* configure:

@@ -1,3 +1,8 @@
+2015-04-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  Fix peephole optimizer bug #2376.
+
 2015-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,

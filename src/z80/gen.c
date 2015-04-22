@@ -4119,7 +4119,8 @@ static void genSend (const iCode *ic)
           for (i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
             {
               retarray[i] = _fReturn3[i]->aopu.aop_reg[0]->rIdx;
-              z80_regs_used_as_parms_in_calls_from_current_function[_fReturn3[i]->aopu.aop_reg[0]->rIdx] = true;
+              if (!regalloc_dry_run)
+                z80_regs_used_as_parms_in_calls_from_current_function[_fReturn3[i]->aopu.aop_reg[0]->rIdx] = true;
               oparray[i] = AOP (IC_LEFT (ic))->aopu.aop_reg[i]->rIdx;
             }
 
@@ -4131,7 +4132,8 @@ static void genSend (const iCode *ic)
           while (size--)
             {
               cheapMove (_fReturn3[offset], 0, AOP (IC_LEFT (ic)), offset);
-              z80_regs_used_as_parms_in_calls_from_current_function[_fReturn3[offset]->aopu.aop_reg[0]->rIdx] = true;
+              if (!regalloc_dry_run)
+                z80_regs_used_as_parms_in_calls_from_current_function[_fReturn3[offset]->aopu.aop_reg[0]->rIdx] = true;
               offset++;
             }
         }

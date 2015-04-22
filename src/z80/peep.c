@@ -222,19 +222,19 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0) // TODO: Making this more accurate (i.e. finding out about the actual situation at _this_ call) could allow more optimization.
     {
-      if (!strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
+      if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
         return TRUE;
-      if (!strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
+      if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
         return TRUE;
-      if (!strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
+      if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
         return TRUE;
-      if (!strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
+      if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
         return TRUE;
-      if (!strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
+      if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
         return TRUE;
-      if (!strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
+      if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
         return TRUE;
-      if (!strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
+      if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
         return TRUE;
       return FALSE;
     }

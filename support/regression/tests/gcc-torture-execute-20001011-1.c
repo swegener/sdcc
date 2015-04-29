@@ -18,10 +18,8 @@ int foo(const char *a)
 void
 testTortureExecute (void)
 {
-#if 0
     if(foo(__func__))
         ASSERT (0);
     return;
-#endif
 }
 

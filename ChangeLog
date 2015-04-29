@@ -1,3 +1,12 @@
+2015-04-29 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/tests/gcc-torture-execute-20001011-1.c:
+	  Enabled.
+	* support/cpp/libcpp/macro.c:
+	* support/cpp/libcpp/include/cpplib.h:
+	* support/cpp/libcpp/init.c:
+	* src/SDCC.y:
+	  Support macro __func__.
+
 2015-04-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:

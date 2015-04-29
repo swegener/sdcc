@@ -53,6 +53,7 @@ extern int yylex();
 int yyparse(void);
 extern int noLineno;
 char lbuff[1024];       /* local buffer */
+char function_name[256] = {0};
 
 /* break & continue stacks */
 STACK_DCL(continueStack  ,symbol *,MAX_NEST_LEVEL)
@@ -301,7 +302,24 @@ primary_expr
    ;
 
 string_literal_val
-    : STRING_LITERAL                    { $$ = newAst_VALUE (strVal ($1)); }
+    : STRING_LITERAL {
+                       int cnt;
+                       char fb[256];
+                       /* refer to support/cpp/libcpp/macro.c for details */
+                       for (cnt = 1; cnt < 254; cnt++)
+                         if (-1 != (int) (char) $1[cnt])
+                           break;
+                         if (cnt < 254)
+                           $$ = newAst_VALUE (strVal ($1));
+                         else
+                           {
+                             memset (fb, 0x00, sizeof (function_name));
+                             fb[0] = '"';
+                             strcpy (fb + 1, function_name);
+                             fb[strlen (fb)] = '"';
+                             $$ = newAst_VALUE (strVal (fb));
+                           }
+                     }
     ;
 
 postfix_expr
@@ -1240,11 +1258,18 @@ declarator3
    ;
 
 function_declarator
-   : declarator2_function_attributes    { $$ = $1; }
+   : declarator2_function_attributes
+         {
+             $$ = $1;
+             strncpy (function_name, $$->name, sizeof (function_name) - 4);
+             memset (function_name + sizeof (function_name) - 4, 0x00, 4);
+         }
    | pointer declarator2_function_attributes
          {
              addDecl ($2,0,reverseLink($1));
              $$ = $2;
+             strncpy (function_name, $$->name, sizeof (function_name) - 4);
+             memset (function_name + sizeof (function_name) - 4, 0x00, 4);
          }
    ;
 

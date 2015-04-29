@@ -165,6 +165,16 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node)
         result = pbuffer->timestamp;
       }
       break;
+    case BT_FUNCTION:
+      {
+        uchar *buf;
+        buf = _cpp_unaligned_alloc (pfile, 256);
+        memset (buf, 255, 256);
+        buf[0] = buf[254] = '"';
+        buf[255] = 0;
+        result = buf;
+      }
+      break;
     case BT_FILE:
     case BT_BASE_FILE:
       {

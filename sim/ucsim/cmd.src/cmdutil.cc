@@ -55,6 +55,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uccl.h"
 #include "cmdutil.h"
 
+#ifdef __CYGWIN__
+#include <sys/select.h>
+#endif
 
 /*
  * Making a socket which can be used to listen for a specified port

@@ -1,3 +1,13 @@
+2015-05-01 Ben Shi <powerstudio1st AT 163 DOT com>
+	* sdas/linksrc/lkar.c:
+	* sdas/linksrc/lklib.c:
+	* sdas/linksrc/lksdcclib.c:
+	* src/SDCCmain.c:
+	  Remove useless code for Cygwin.
+	* support/sdbinutils/bfd/config.bfd:
+	* sim/ucsim/cmd.src/cmdutil.cc:
+	  Support Cygwin64.
+
 2015-04-29 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/gcc-torture-execute-20001011-1.c:
 	  Enabled.

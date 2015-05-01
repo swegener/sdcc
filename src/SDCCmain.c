@@ -1733,18 +1733,6 @@ linkEdit (char **envp)
 
                       if (!access (dbuf_c_str (&crtpath), 0))   /* Found it! */
                         {
-#ifdef __CYGWIN__
-                          /* TODO: is this still needed? */
-                          /* The CYGWIN version of the z80-gbz80 linker is getting confused with
-                             windows paths, so convert them to the CYGWIN format */
-                          char posix_path[PATH_MAX];
-                          void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
-
-                          cygwin_conv_to_full_posix_path ((char *) dbuf_c_str (&crtpath), posix_path);
-                          dbuf_set_length (&crtpath, 0);
-                          dbuf_append_str (&crtpath, posix_path);
-#endif
-
                           /* append C runtime file to the crt list */
                           addSet (&crtSet, Safe_strdup (dbuf_c_str (&crtpath)));
                           break;
@@ -1761,18 +1749,6 @@ linkEdit (char **envp)
 
                           if (!access (dbuf_c_str (&crtpath), 0))       /* Found it! */
                             {
-#ifdef __CYGWIN__
-                              /* TODO: is this still needed? */
-                              /* The CYGWIN version of the z80-gbz80 linker is getting confused with
-                                 windows paths, so convert them to the CYGWIN format */
-                              char posix_path[PATH_MAX];
-                              void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
-
-                              cygwin_conv_to_full_posix_path ((char *) dbuf_c_str (&crtpath), posix_path);
-                              dbuf_set_length (&crtpath, 0);
-                              dbuf_append_str (&crtpath, posix_path);
-#endif
-
                               /* append C runtime file to the crt list */
                               addSet (&crtSet, Safe_strdup (dbuf_c_str (&crtpath)));
                               break;

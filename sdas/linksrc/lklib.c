@@ -220,15 +220,7 @@ static VOID
 loadfile_lib (struct lbfile *lbfh)
 {
   FILE *fp;
-#ifdef __CYGWIN__
-  char posix_path[PATH_MAX];
-  void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
-  cygwin_conv_to_full_posix_path (lbfh->filspc, posix_path);
-  fp = fopen (posix_path, "rb");
-#else
   fp = fopen (lbfh->filspc, "rb");
-#endif
-
   if (fp != NULL)
     {
       load_rel (fp, -1);

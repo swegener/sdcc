@@ -365,16 +365,7 @@ loadfile_sdcclib (struct lbfile *lbfh)
 {
   FILE *fp;
   int res;
-
-#ifdef __CYGWIN__
-  char posix_path[PATH_MAX];
-  void cygwin_conv_to_full_posix_path (char *win_path, char *posix_path);
-  cygwin_conv_to_full_posix_path (lbfh->libspc, posix_path);
-  fp = fopen (posix_path, "rb");
-#else
   fp = fopen (lbfh->libspc, "rb");
-#endif
-
   if (fp != NULL)
     {
       fseek (fp, lbfh->offset, SEEK_SET);

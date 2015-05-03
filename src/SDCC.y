@@ -1089,8 +1089,10 @@ struct_declaration
               /* make sure the type is complete and sane */
               checkTypeSanity(sym->etype, sym->name);
 
+              /* disabled, see bug 2378
               if (strlen (sym->name) == 0 && !options.std_c11)
                 werrorfl(sym->fileDef, sym->lineDef, W_ANONYMOUS_MEMBER);
+              */
             }
           ignoreTypedefType = 0;
           $$ = $2;

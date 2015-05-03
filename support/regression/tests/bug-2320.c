@@ -26,24 +26,23 @@ char *buffer_gap;
 
 void buffer_invariants()
 {
-    a(buffer_len <= buffer_size);
-    a(buffer_p <= buffer_len);
+	a(buffer_len <= buffer_size);
+	a(buffer_p <= buffer_len);
 
-    if (buffer_gap != buffer + buffer_size - buffer_len + buffer_p) {
-	p("%04x + %04x - %04x + %04x = %04x, not %04x\n",
-	       buffer, buffer_size, buffer_len, buffer_p,
-	       buffer + buffer_size - buffer_len + buffer_p,
-	       buffer_gap);
-	a(buffer_gap == buffer + buffer_size - buffer_len + buffer_p);
-    }
+	if (buffer_gap != buffer + buffer_size - buffer_len + buffer_p) {
+		p("%04x + %04x - %04x + %04x = %04x, not %04x\n",
+		  buffer, buffer_size, buffer_len, buffer_p,
+		  buffer + buffer_size - buffer_len + buffer_p,
+		  buffer_gap);
+		a(buffer_gap == buffer + buffer_size - buffer_len + buffer_p);
+	}
 }
 
 void testBug(void)
 {
-	buffer = (unsigned char *)(0xa5a5);
+	buffer = (unsigned char __xdata *)(0xa5a5);
 	buffer_len = 1;
 	buffer_p = 0;
 	buffer_gap = buffer + buffer_size - buffer_len + buffer_p;
 	buffer_invariants();
 }
-

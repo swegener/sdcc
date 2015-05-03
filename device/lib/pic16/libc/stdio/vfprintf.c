@@ -220,7 +220,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 #endif
 #ifdef PRECISION
           // precision == -1 is used as an "unlimited" precision marker
-          precision = -1;
+          precision = (unsigned char)-1;
 #endif
 #ifdef SIGN_MODIFIERS
           printsign = 0;
@@ -368,14 +368,14 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
               str = (char*)"<NO FLOAT>";
               va_arg (ap, float);
 #ifdef PRECISION
-              precision = -1;
+              precision = (unsigned char)-1;
 #endif /* PRECISION */
 #endif /* FLOAT_PLACEHOLDER */
             }
           else
             {
 #ifdef PRECISION
-              precision = -1; //FIXME: No support for the precision field on numerals
+              precision = (unsigned char)-1; //FIXME: No support for the precision field on numerals
 #endif
               val = 0;
               if (flong)

@@ -40,31 +40,6 @@
 
 #define __xdata
 
-typedef struct _MEMHEADER MEMHEADER;
-
-struct _MEMHEADER
-{
-  MEMHEADER *   next;
-  MEMHEADER *   prev;
-  unsigned int  len;
-  unsigned char mem;
-};
-
-#define HEADER_SIZE (sizeof(MEMHEADER)-sizeof(char))
-
-#else
-
-#define MEMHEADER   struct MAH// Memory Allocation Header
-
-MEMHEADER
-{
-  MEMHEADER __xdata *  next;
-  unsigned int         len;
-  unsigned char        mem[];
-};
-
-#define HEADER_SIZE sizeof(MEMHEADER)
-
 #endif
 
 void __xdata * calloc (size_t nmemb, size_t size)

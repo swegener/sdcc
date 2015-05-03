@@ -820,95 +820,93 @@ static const char *const _libs_tlcs90[] = { "tlcs90", NULL, };
 static const char *const _libs_gb[] = { "gbz80", NULL, };
 
 /* Globals */
-PORT z80_port = {
+PORT z80_port =
+{
   TARGET_ID_Z80,
   "z80",
   "Zilog Z80",                  /* Target name */
   NULL,                         /* Processor name */
   {
-   glue,
-   FALSE,
-   NO_MODEL,
-   NO_MODEL,
-   NULL,                        /* model == target */
-   },
+    glue,
+    FALSE,
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
+  },
   {                             /* Assembler */
-   _z80AsmCmd,
-   NULL,
-   "-plosgffwy",                /* Options with debug */
-   "-plosgffw",                 /* Options without debug */
-   0,
-   ".asm"},
+    _z80AsmCmd,
+    NULL,
+    "-plosgffwy",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
+    0,
+    ".asm"
+  },
   {                             /* Linker */
-   _z80LinkCmd,                 //NULL,
-   NULL,                        //LINKCMD,
-   NULL,
-   ".rel",
-   1,
-   _crt,                        /* crt */
-   _libs_z80,                   /* libs */
-   },
+    _z80LinkCmd,                //NULL,
+    NULL,                       //LINKCMD,
+    NULL,
+    ".rel",
+    1,
+    _crt,                       /* crt */
+    _libs_z80,                  /* libs */
+  },
   {                             /* Peephole optimizer */
-   _z80_defaultRules,
-   z80instructionSize,
-   0,
-   0,
-   0,
-   z80notUsed,
-   z80canAssign,
-   z80notUsedFrom,
-   z80symmParmStack,
-   },
-  {
-   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-   1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4},
+    _z80_defaultRules,
+    z80instructionSize,
+    0,
+    0,
+    0,
+    z80notUsed,
+    z80canAssign,
+    z80notUsedFrom,
+    z80symmParmStack,
+  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4 },
   /* tags for generic pointers */
-  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
-   "XSEG",
-   "STACK",
-   "CODE",
-   "DATA",
-   NULL,                        /* idata */
-   NULL,                        /* pdata */
-   NULL,                        /* xdata */
-   NULL,                        /* bit */
-   "RSEG (ABS)",
-   "GSINIT",                    /* static initialization */
-   NULL,                        /* overlay */
-   "GSFINAL",
-   "HOME",
-   NULL,                        /* xidata */
-   NULL,                        /* xinit */
-   NULL,                        /* const_name */
-   "CABS (ABS)",                /* cabs_name */
-   "DABS (ABS)",                /* xabs_name */
-   NULL,                        /* iabs_name */
-   "INITIALIZED",               /* name of segment for initialized variables */
-   "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
-   NULL,
-   NULL,
-   1,                           /* CODE  is read-only */
-   1                            /* No fancy alignments supported. */
-   },
-  {NULL, NULL},
-  {
-   -1, 0, 0, 4, 0, 2},
+    "XSEG",
+    "STACK",
+    "CODE",
+    "DATA",
+    NULL,                       /* idata */
+    NULL,                       /* pdata */
+    NULL,                       /* xdata */
+    NULL,                       /* bit */
+    "RSEG (ABS)",
+    "GSINIT",                   /* static initialization */
+    NULL,                       /* overlay */
+    "GSFINAL",
+    "HOME",
+    NULL,                       /* xidata */
+    NULL,                       /* xinit */
+    NULL,                       /* const_name */
+    "CABS (ABS)",               /* cabs_name */
+    "DABS (ABS)",               /* xabs_name */
+    NULL,                       /* iabs_name */
+    "INITIALIZED",              /* name of segment for initialized variables */
+    "INITIALIZER",              /* name of segment for copies of initialized variables in code space */
+    NULL,
+    NULL,
+    1,                          /* CODE  is read-only */
+    1                           /* No fancy alignments supported. */
+  },
+  { NULL, NULL },
+  { -1, 0, 0, 4, 0, 2 },
   /* Z80 has no native mul/div commands */
+  { 0, -1 },
+  { z80_emitDebuggerSymbol },
   {
-   0, -1},
-  {
-   z80_emitDebuggerSymbol},
-  {
-   255,                         /* maxCount */
-   3,                           /* sizeofElement */
-   /* The rest of these costs are bogus. They approximate */
-   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
-   {4, 4, 4},                   /* sizeofMatchJump[] */
-   {0, 0, 0},                   /* sizeofRangeCompare[] */
-   0,                           /* sizeofSubtract */
-   3,                           /* sizeofDispatch */
-   },
+    255,                        /* maxCount */
+    3,                          /* sizeofElement */
+    /* The rest of these costs are bogus. They approximate */
+    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+    {4, 4, 4},                  /* sizeofMatchJump[] */
+    {0, 0, 0},                  /* sizeofRangeCompare[] */
+    0,                          /* sizeofSubtract */
+    3,                          /* sizeofDispatch */
+  },
   "_",
   _z80_init,
   _parseOptions,
@@ -950,95 +948,93 @@ PORT z80_port = {
   PORT_MAGIC
 };
 
-PORT z180_port = {
+PORT z180_port =
+{
   TARGET_ID_Z180,
   "z180",
   "Zilog Z180",                  /* Target name */
   NULL,                         /* Processor name */
   {
-   glue,
-   FALSE,
-   NO_MODEL,
-   NO_MODEL,
-   NULL,                        /* model == target */
-   },
+    glue,
+    FALSE,
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
+  },
   {                             /* Assembler */
-   _z80AsmCmd,
-   NULL,
-   "-plosgffwy",                /* Options with debug */
-   "-plosgffw",                 /* Options without debug */
-   0,
-   ".asm"},
+    _z80AsmCmd,
+    NULL,
+    "-plosgffwy",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
+    0,
+    ".asm"
+  },
   {                             /* Linker */
-   _z80LinkCmd,                 //NULL,
-   NULL,                        //LINKCMD,
-   NULL,
-   ".rel",
-   1,
-   _crt,                        /* crt */
-   _libs_z180,                  /* libs */
-   },
+    _z80LinkCmd,                //NULL,
+    NULL,                       //LINKCMD,
+    NULL,
+    ".rel",
+    1,
+    _crt,                       /* crt */
+    _libs_z180,                 /* libs */
+  },
   {                             /* Peephole optimizer */
-   _z80_defaultRules,
-   z80instructionSize,
-   0,
-   0,
-   0,
-   z80notUsed,
-   z80canAssign,
-   z80notUsedFrom,
-   z80symmParmStack,
-   },
-  {
-   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-   1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4},
+    _z80_defaultRules,
+    z80instructionSize,
+    NULL,
+    NULL,
+    NULL,
+    z80notUsed,
+    z80canAssign,
+    z80notUsedFrom,
+    z80symmParmStack,
+  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4 },
   /* tags for generic pointers */
-  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
-   "XSEG",
-   "STACK",
-   "CODE",
-   "DATA",
-   NULL,                        /* idata */
-   NULL,                        /* pdata */
-   NULL,                        /* xdata */
-   NULL,                        /* bit */
-   "RSEG (ABS)",
-   "GSINIT",
-   NULL,                        /* overlay */
-   "GSFINAL",
-   "HOME",
-   NULL,                        /* xidata */
-   NULL,                        /* xinit */
-   NULL,                        /* const_name */
-   "CABS (ABS)",                /* cabs_name */
-   "DABS (ABS)",                /* xabs_name */
-   NULL,                        /* iabs_name */
-   "INITIALIZED",               /* name of segment for initialized variables */
-   "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
-   NULL,
-   NULL,
-   1,                           /* CODE  is read-only */
-   1                            /* No fancy alignments supported. */
-   },
-  {NULL, NULL},
-  {
-   -1, 0, 0, 4, 0, 2},
+    "XSEG",
+    "STACK",
+    "CODE",
+    "DATA",
+    NULL,                       /* idata */
+    NULL,                       /* pdata */
+    NULL,                       /* xdata */
+    NULL,                       /* bit */
+    "RSEG (ABS)",
+    "GSINIT",
+    NULL,                       /* overlay */
+    "GSFINAL",
+    "HOME",
+    NULL,                       /* xidata */
+    NULL,                       /* xinit */
+    NULL,                       /* const_name */
+    "CABS (ABS)",               /* cabs_name */
+    "DABS (ABS)",               /* xabs_name */
+    NULL,                       /* iabs_name */
+    "INITIALIZED",              /* name of segment for initialized variables */
+    "INITIALIZER",              /* name of segment for copies of initialized variables in code space */
+    NULL,
+    NULL,
+    1,                          /* CODE  is read-only */
+    1                           /* No fancy alignments supported. */
+  },
+  { NULL, NULL },
+  { -1, 0, 0, 4, 0, 2 },
   /* Z80 has no native mul/div commands */
+  { 0, -1 },
+  { z80_emitDebuggerSymbol },
   {
-   0, -1},
-  {
-   z80_emitDebuggerSymbol},
-  {
-   255,                         /* maxCount */
-   3,                           /* sizeofElement */
-   /* The rest of these costs are bogus. They approximate */
-   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
-   {4, 4, 4},                   /* sizeofMatchJump[] */
-   {0, 0, 0},                   /* sizeofRangeCompare[] */
-   0,                           /* sizeofSubtract */
-   3,                           /* sizeofDispatch */
-   },
+    255,                        /* maxCount */
+    3,                          /* sizeofElement */
+    /* The rest of these costs are bogus. They approximate */
+    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+    {4, 4, 4},                  /* sizeofMatchJump[] */
+    {0, 0, 0},                  /* sizeofRangeCompare[] */
+    0,                          /* sizeofSubtract */
+    3,                          /* sizeofDispatch */
+  },
   "_",
   _z180_init,
   _parseOptions,
@@ -1080,95 +1076,92 @@ PORT z180_port = {
   PORT_MAGIC
 };
 
-PORT r2k_port = {
+PORT r2k_port =
+{
   TARGET_ID_R2K,
   "r2k",
-  "Rabbit 2000",                  /* Target name */
+  "Rabbit 2000",                /* Target name */
   NULL,                         /* Processor name */
   {
-   glue,
-   FALSE,
-   NO_MODEL,
-   NO_MODEL,
-   NULL,                        /* model == target */
-   },
+    glue,
+    FALSE,
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
+  },
   {                             /* Assembler */
-   _r2kAsmCmd,
-   NULL,
-   "-plosgffwy",                /* Options with debug */
-   "-plosgffw",                 /* Options without debug */
-   0,
-   ".asm"},
+    _r2kAsmCmd,
+    NULL,
+    "-plosgffwy",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
+    0,
+    ".asm"},
   {                             /* Linker */
-   _z80LinkCmd,                 //NULL,
-   NULL,                        //LINKCMD,
-   NULL,
-   ".rel",
-   1,
-   _crt,                        /* crt */
-   _libs_r2k,                   /* libs */
-   },
+    _z80LinkCmd,                //NULL,
+    NULL,                       //LINKCMD,
+    NULL,
+    ".rel",
+    1,
+    _crt,                       /* crt */
+    _libs_r2k,                  /* libs */
+  },
   {                             /* Peephole optimizer */
-   _r2k_defaultRules,
-   z80instructionSize,
-   0,
-   0,
-   0,
-   z80notUsed,
-   z80canAssign,
-   z80notUsedFrom,
-   z80symmParmStack,
-   },
-  {
-   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-   1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4},
+    _r2k_defaultRules,
+    z80instructionSize,
+    NULL,
+    NULL,
+    NULL,
+    z80notUsed,
+    z80canAssign,
+    z80notUsedFrom,
+    z80symmParmStack,
+  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4 },
   /* tags for generic pointers */
-  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
-   "XSEG",
-   "STACK",
-   "CODE",
-   "DATA",
-   NULL,                        /* idata */
-   NULL,                        /* pdata */
-   NULL,                        /* xdata */
-   NULL,                        /* bit */
-   "RSEG (ABS)",
-   "GSINIT",
-   NULL,                        /* overlay */
-   "GSFINAL",
-   "HOME",
-   NULL,                        /* xidata */
-   NULL,                        /* xinit */
-   NULL,                        /* const_name */
-   "CABS (ABS)",                /* cabs_name */
-   "DABS (ABS)",                /* xabs_name */
-   NULL,                        /* iabs_name */
-   "INITIALIZED",               /* name of segment for initialized variables */
-   "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
-   NULL,
-   NULL,
-   1,                           /* CODE  is read-only */
-   1                            /* No fancy alignments supported. */
-   },
-  {NULL, NULL},
-  {
-   -1, 0, 0, 4, 0, 2},
+    "XSEG",
+    "STACK",
+    "CODE",
+    "DATA",
+    NULL,                       /* idata */
+    NULL,                       /* pdata */
+    NULL,                       /* xdata */
+    NULL,                       /* bit */
+    "RSEG (ABS)",
+    "GSINIT",
+    NULL,                       /* overlay */
+    "GSFINAL",
+    "HOME",
+    NULL,                       /* xidata */
+    NULL,                       /* xinit */
+    NULL,                       /* const_name */
+    "CABS (ABS)",               /* cabs_name */
+    "DABS (ABS)",               /* xabs_name */
+    NULL,                       /* iabs_name */
+    "INITIALIZED",              /* name of segment for initialized variables */
+    "INITIALIZER",              /* name of segment for copies of initialized variables in code space */
+    NULL,
+    NULL,
+    1,                          /* CODE  is read-only */
+    1                           /* No fancy alignments supported. */
+  },
+  { NULL, NULL },
+  { -1, 0, 0, 4, 0, 2 },
   /* Z80 has no native mul/div commands */
+  { 0, -1 },
+  { z80_emitDebuggerSymbol },
   {
-   0, -1},
-  {
-   z80_emitDebuggerSymbol},
-  {
-   255,                         /* maxCount */
-   3,                           /* sizeofElement */
-   /* The rest of these costs are bogus. They approximate */
-   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
-   {4, 4, 4},                   /* sizeofMatchJump[] */
-   {0, 0, 0},                   /* sizeofRangeCompare[] */
-   0,                           /* sizeofSubtract */
-   3,                           /* sizeofDispatch */
-   },
+    255,                        /* maxCount */
+    3,                          /* sizeofElement */
+    /* The rest of these costs are bogus. They approximate */
+    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+    {4, 4, 4},                  /* sizeofMatchJump[] */
+    {0, 0, 0},                  /* sizeofRangeCompare[] */
+    0,                          /* sizeofSubtract */
+    3,                          /* sizeofDispatch */
+  },
   "_",
   _r2k_init,
   _parseOptions,
@@ -1210,95 +1203,93 @@ PORT r2k_port = {
   PORT_MAGIC
 };
 
-PORT r3ka_port = {
+PORT r3ka_port =
+{
   TARGET_ID_R3KA,
   "r3ka",
   "Rabbit 3000A",               /* Target name */
   NULL,                         /* Processor name */
   {
-   glue,
-   FALSE,
-   NO_MODEL,
-   NO_MODEL,
-   NULL,                        /* model == target */
-   },
+    glue,
+    FALSE,
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
+  },
   {                             /* Assembler */
-   _r2kAsmCmd,
-   NULL,
-   "-plosgffwy",                /* Options with debug */
-   "-plosgffw",                 /* Options without debug */
-   0,
-   ".asm"},
+    _r2kAsmCmd,
+    NULL,
+    "-plosgffwy",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
+    0,
+    ".asm"
+  },
   {                             /* Linker */
-   _z80LinkCmd,                 //NULL,
-   NULL,                        //LINKCMD,
-   NULL,
-   ".rel",
-   1,
-   _crt,                        /* crt */
-   _libs_r3ka,                  /* libs */
-   },
+    _z80LinkCmd,                //NULL,
+    NULL,                       //LINKCMD,
+    NULL,
+    ".rel",
+    1,
+    _crt,                       /* crt */
+    _libs_r3ka,                 /* libs */
+  },
   {                             /* Peephole optimizer */
-   _r2k_defaultRules,
-   z80instructionSize,
-   0,
-   0,
-   0,
-   z80notUsed,
-   z80canAssign,
-   z80notUsedFrom,
-   z80symmParmStack,
-   },
-  {
-   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-   1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4},
+    _r2k_defaultRules,
+    z80instructionSize,
+    0,
+    0,
+    0,
+    z80notUsed,
+    z80canAssign,
+    z80notUsedFrom,
+    z80symmParmStack,
+  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4 },
   /* tags for generic pointers */
-  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
-   "XSEG",
-   "STACK",
-   "CODE",
-   "DATA",
-   NULL,                        /* idata */
-   NULL,                        /* pdata */
-   NULL,                        /* xdata */
-   NULL,                        /* bit */
-   "RSEG (ABS)",
-   "GSINIT",
-   NULL,                        /* overlay */
-   "GSFINAL",
-   "HOME",
-   NULL,                        /* xidata */
-   NULL,                        /* xinit */
-   NULL,                        /* const_name */
-   "CABS (ABS)",                /* cabs_name */
-   "DABS (ABS)",                /* xabs_name */
-   NULL,                        /* iabs_name */
-   "INITIALIZED",               /* name of segment for initialized variables */
-   "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
-   NULL,
-   NULL,
-   1,                           /* CODE  is read-only */
-   1                            /* No fancy alignments supported. */
-   },
-  {NULL, NULL},
-  {
-   -1, 0, 0, 4, 0, 2},
+    "XSEG",
+    "STACK",
+    "CODE",
+    "DATA",
+    NULL,                       /* idata */
+    NULL,                       /* pdata */
+    NULL,                       /* xdata */
+    NULL,                       /* bit */
+    "RSEG (ABS)",
+    "GSINIT",
+    NULL,                       /* overlay */
+    "GSFINAL",
+    "HOME",
+    NULL,                       /* xidata */
+    NULL,                       /* xinit */
+    NULL,                       /* const_name */
+    "CABS (ABS)",               /* cabs_name */
+    "DABS (ABS)",               /* xabs_name */
+    NULL,                       /* iabs_name */
+    "INITIALIZED",              /* name of segment for initialized variables */
+    "INITIALIZER",              /* name of segment for copies of initialized variables in code space */
+    NULL,
+    NULL,
+    1,                          /* CODE  is read-only */
+    1                           /* No fancy alignments supported. */
+  },
+  { NULL, NULL },
+  { -1, 0, 0, 4, 0, 2 },
   /* Z80 has no native mul/div commands */
+  { 0, -1 },
+  { z80_emitDebuggerSymbol },
   {
-   0, -1},
-  {
-   z80_emitDebuggerSymbol},
-  {
-   255,                         /* maxCount */
-   3,                           /* sizeofElement */
-   /* The rest of these costs are bogus. They approximate */
-   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
-   {4, 4, 4},                   /* sizeofMatchJump[] */
-   {0, 0, 0},                   /* sizeofRangeCompare[] */
-   0,                           /* sizeofSubtract */
-   3,                           /* sizeofDispatch */
-   },
+    255,                        /* maxCount */
+    3,                          /* sizeofElement */
+    /* The rest of these costs are bogus. They approximate */
+    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+    {4, 4, 4},                  /* sizeofMatchJump[] */
+    {0, 0, 0},                  /* sizeofRangeCompare[] */
+    0,                          /* sizeofSubtract */
+    3,                          /* sizeofDispatch */
+  },
   "_",
   _r3ka_init,
   _parseOptions,
@@ -1341,96 +1332,94 @@ PORT r3ka_port = {
 };
 
 /* Globals */
-PORT gbz80_port = {
+PORT gbz80_port =
+{
   TARGET_ID_GBZ80,
   "gbz80",
   "Gameboy Z80-like",           /* Target name */
   NULL,
   {
-   glue,
-   FALSE,
-   NO_MODEL,
-   NO_MODEL,
-   NULL,                        /* model == target */
-   },
+    glue,
+    FALSE,
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
+  },
   {                             /* Assembler */
-   _gbAsmCmd,
-   NULL,
-   "-plosgffwy",                /* Options with debug */
-   "-plosgffw",                 /* Options without debug */
-   0,
-   ".asm",
-   NULL                         /* no do_assemble function */
-   },
+    _gbAsmCmd,
+    NULL,
+    "-plosgffwy",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
+    0,
+    ".asm",
+    NULL                        /* no do_assemble function */
+  },
   {                             /* Linker */
-   _gbLinkCmd,                  //NULL,
-   NULL,                        //LINKCMD,
-   NULL,
-   ".rel",
-   1,
-   _crt,                        /* crt */
-   _libs_gb,                    /* libs */
-   },
+    _gbLinkCmd,                 //NULL,
+    NULL,                       //LINKCMD,
+    NULL,
+    ".rel",
+    1,
+    _crt,                       /* crt */
+    _libs_gb,                   /* libs */
+  },
   {                             /* Peephole optimizer */
-   _gbz80_defaultRules,
-   0,
-   0,
-   0,
-   0,
-   0,
-   0,
-   z80symmParmStack,
-   },
-  {
-   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-   1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4},
+    _gbz80_defaultRules,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    z80symmParmStack,
+  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4 },
   /* tags for generic pointers */
-  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
-   "XSEG",
-   "STACK",
-   "CODE",
-   "DATA",
-   NULL,                        /* idata */
-   NULL,                        /* pdata */
-   NULL,                        /* xdata */
-   NULL,                        /* bit */
-   "RSEG",
-   "GSINIT",
-   NULL,                        /* overlay */
-   "GSFINAL",
-   "HOME",
-   NULL,                        /* xidata */
-   NULL,                        /* xinit */
-   NULL,                        /* const_name */
-   "CABS (ABS)",                /* cabs_name */
-   "DABS (ABS)",                /* xabs_name */
-   NULL,                        /* iabs_name */
-   NULL,                        /* name of segment for initialized variables */
-   NULL,                        /* name of segment for copies of initialized variables in code space */
-   NULL,
-   NULL,
-   1,                           /* CODE is read-only */
-   1                            /* No fancy alignments supported. */
-   },
-  {NULL, NULL},
-  {
-   -1, 0, 0, 2, 0, 4},
+    "XSEG",
+    "STACK",
+    "CODE",
+    "DATA",
+    NULL,                       /* idata */
+    NULL,                       /* pdata */
+    NULL,                       /* xdata */
+    NULL,                       /* bit */
+    "RSEG",
+    "GSINIT",
+    NULL,                       /* overlay */
+    "GSFINAL",
+    "HOME",
+    NULL,                       /* xidata */
+    NULL,                       /* xinit */
+    NULL,                       /* const_name */
+    "CABS (ABS)",               /* cabs_name */
+    "DABS (ABS)",               /* xabs_name */
+    NULL,                       /* iabs_name */
+    NULL,                       /* name of segment for initialized variables */
+    NULL,                       /* name of segment for copies of initialized variables in code space */
+    NULL,
+    NULL,
+    1,                          /* CODE is read-only */
+    1                           /* No fancy alignments supported. */
+  },
+  { NULL, NULL },
+  { -1, 0, 0, 2, 0, 4 },
   /* gbZ80 has no native mul/div commands */
+  { 0, -1 },
+  { z80_emitDebuggerSymbol },
   {
-   0, -1},
-  {
-   z80_emitDebuggerSymbol},
-  {
-   255,                         /* maxCount */
-   3,                           /* sizeofElement */
-   /* The rest of these costs are bogus. They approximate */
-   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
-   {4, 4, 4},                   /* sizeofMatchJump[] */
-   {0, 0, 0},                   /* sizeofRangeCompare[] */
-   0,                           /* sizeofSubtract */
-   3,                           /* sizeofDispatch */
-   },
+    255,                        /* maxCount */
+    3,                          /* sizeofElement */
+    /* The rest of these costs are bogus. They approximate */
+    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+    {4, 4, 4},                  /* sizeofMatchJump[] */
+    {0, 0, 0},                  /* sizeofRangeCompare[] */
+    0,                          /* sizeofSubtract */
+    3,                          /* sizeofDispatch */
+  },
   "_",
   _gbz80_init,
   _parseOptions,
@@ -1472,95 +1461,93 @@ PORT gbz80_port = {
   PORT_MAGIC
 };
 
-PORT tlcs90_port = {
+PORT tlcs90_port =
+{
   TARGET_ID_TLCS90,
   "tlcs90",
   "Toshiba TLCS-90",            /* Target name */
   NULL,                         /* Processor name */
   {
-   glue,
-   FALSE,
-   NO_MODEL,
-   NO_MODEL,
-   NULL,                        /* model == target */
-   },
+    glue,
+    FALSE,
+    NO_MODEL,
+    NO_MODEL,
+    NULL,                       /* model == target */
+  },
   {                             /* Assembler */
-   _tlcs90AsmCmd,
-   NULL,
-   "-plosgffwy",                /* Options with debug */
-   "-plosgffw",                 /* Options without debug */
-   0,
-   ".asm"},
+    _tlcs90AsmCmd,
+    NULL,
+    "-plosgffwy",               /* Options with debug */
+    "-plosgffw",                /* Options without debug */
+    0,
+    ".asm"
+  },
   {                             /* Linker */
-   _z80LinkCmd,                 //NULL,
-   NULL,                        //LINKCMD,
-   NULL,
-   ".rel",
-   1,
-   _crt,                        /* crt */
-   _libs_tlcs90,                /* libs */
-   },
+    _z80LinkCmd,                //NULL,
+    NULL,                       //LINKCMD,
+    NULL,
+    ".rel",
+    1,
+    _crt,                       /* crt */
+    _libs_tlcs90,               /* libs */
+  },
   {                             /* Peephole optimizer */
-   _tlcs90_defaultRules,
-   z80instructionSize,
-   0,
-   0,
-   0,
-   z80notUsed,
-   z80canAssign,
-   z80notUsedFrom,
-   z80symmParmStack,
-   },
-  {
+    _tlcs90_defaultRules,
+    z80instructionSize,
+    NULL,
+    NULL,
+    NULL,
+    z80notUsed,
+    z80canAssign,
+    z80notUsedFrom,
+    z80symmParmStack,
+  },
    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-   1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4},
+  { 1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4 },
   /* tags for generic pointers */
-  {0x00, 0x40, 0x60, 0x80},     /* far, near, xstack, code */
+  { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
-   "XSEG",
-   "STACK",
-   "CODE",
-   "DATA",
-   NULL,                        /* idata */
-   NULL,                        /* pdata */
-   NULL,                        /* xdata */
-   NULL,                        /* bit */
-   "RSEG (ABS)",
-   "GSINIT",                    /* static initialization */
-   NULL,                        /* overlay */
-   "GSFINAL",
-   "HOME",
-   NULL,                        /* xidata */
-   NULL,                        /* xinit */
-   NULL,                        /* const_name */
-   "CABS (ABS)",                /* cabs_name */
-   "DABS (ABS)",                /* xabs_name */
-   NULL,                        /* iabs_name */
-   "INITIALIZED",               /* name of segment for initialized variables */
-   "INITIALIZER",               /* name of segment for copies of initialized variables in code space */
-   NULL,
-   NULL,
-   1,                           /* CODE  is read-only */
-   1                            /* No fancy alignments supported. */
+    "XSEG",
+    "STACK",
+    "CODE",
+    "DATA",
+    NULL,                       /* idata */
+    NULL,                       /* pdata */
+    NULL,                       /* xdata */
+    NULL,                       /* bit */
+    "RSEG (ABS)",
+    "GSINIT",                   /* static initialization */
+    NULL,                       /* overlay */
+    "GSFINAL",
+    "HOME",
+    NULL,                       /* xidata */
+    NULL,                       /* xinit */
+    NULL,                       /* const_name */
+    "CABS (ABS)",               /* cabs_name */
+    "DABS (ABS)",               /* xabs_name */
+    NULL,                       /* iabs_name */
+    "INITIALIZED",              /* name of segment for initialized variables */
+    "INITIALIZER",              /* name of segment for copies of initialized variables in code space */
+    NULL,
+    NULL,
+    1,                          /* CODE  is read-only */
+    1                           /* No fancy alignments supported. */
    },
-  {NULL, NULL},
-  {
-   -1, 0, 0, 4, 0, 2},
+  { NULL, NULL },
+  { -1, 0, 0, 4, 0, 2 },
   /* Z80 has no native mul/div commands */
+  { 0, -1 },
+  { z80_emitDebuggerSymbol },
   {
-   0, -1},
-  {
-   z80_emitDebuggerSymbol},
-  {
-   255,                         /* maxCount */
-   3,                           /* sizeofElement */
-   /* The rest of these costs are bogus. They approximate */
-   /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
-   {4, 4, 4},                   /* sizeofMatchJump[] */
-   {0, 0, 0},                   /* sizeofRangeCompare[] */
-   0,                           /* sizeofSubtract */
-   3,                           /* sizeofDispatch */
-   },
+    255,                        /* maxCount */
+    3,                          /* sizeofElement */
+    /* The rest of these costs are bogus. They approximate */
+    /* the behavior of src/SDCCicode.c 1.207 and earlier.  */
+    {4, 4, 4},                  /* sizeofMatchJump[] */
+    {0, 0, 0},                  /* sizeofRangeCompare[] */
+    0,                          /* sizeofSubtract */
+    3,                          /* sizeofDispatch */
+  },
   "_",
   _tlcs90_init,
   _parseOptions,
@@ -1601,4 +1588,3 @@ PORT tlcs90_port = {
   9,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
-

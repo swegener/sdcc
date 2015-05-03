@@ -602,6 +602,9 @@ stm8_assignRegisters (ebbIndex * ebbi)
   eBBlock **ebbs = ebbi->bbOrder;
   int count = ebbi->count;
   iCode *ic;
+#if 0 // ENABLE WHEN LINKER BUG #2198 IS FIXED
+  int i;
+#endif
 
   stm8_init_asmops();
 

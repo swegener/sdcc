@@ -972,7 +972,7 @@ PORT ds390_port =
   {
     _asmCmd,
     NULL,
-    "-plosgffwy",              /* Options with debug */
+    "-plosgffwy",               /* Options with debug */
     "-plosgffw",                /* Options without debug */
     0,
     ".asm",
@@ -991,12 +991,15 @@ PORT ds390_port =
     _defaultRules,
     getInstructionSize,
     getRegsRead,
-    getRegsWritten
+    getRegsWritten,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
   },
-  {
-        /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 8, 1, 2, 3, 1, 4, 4
-  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 1, 2, 3, 1, 4, 4 },
 
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
@@ -1029,16 +1032,10 @@ PORT ds390_port =
     1                           // No fancy alignments supported.
   },
   { NULL, NULL },
-  {
-    +1, 1, 4, 1, 1, 0
-  },
-    /* ds390 has an 16 bit mul & div */
-  {
-    2, -1
-  },
-  {
-    ds390_emitDebuggerSymbol
-  },
+  { +1, 1, 4, 1, 1, 0 },
+  /* ds390 has an 16 bit mul & div */
+  { 2, -1 },
+  { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */
     4,          /* sizeofElement */
@@ -1319,8 +1316,8 @@ PORT tininative_port =
   {
     _a390Cmd,
     NULL,
-    "-l",               /* Options with debug */
-    "-l",               /* Options without debug */
+    "-l",                       /* Options with debug */
+    "-l",                       /* Options without debug */
     0,
     ".a51",
     _tininative_do_assemble
@@ -1338,12 +1335,15 @@ PORT tininative_port =
     _defaultRules,
     getInstructionSize,
     getRegsRead,
-    getRegsWritten
+    getRegsWritten,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
   },
-  {
-        /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 8, 1, 3, 3, 1, 4, 4
-  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 1, 3, 3, 1, 4, 4 },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
 
@@ -1375,16 +1375,10 @@ PORT tininative_port =
     1                           // No fancy alignments supported.
   },
   { NULL, NULL },
-  {
-    +1, 1, 4, 1, 1, 0
-  },
-    /* ds390 has an 16 bit mul & div */
-  {
-    2, -1
-  },
-  {
-    ds390_emitDebuggerSymbol
-  },
+  { +1, 1, 4, 1, 1, 0 },
+  /* ds390 has an 16 bit mul & div */
+  { 2, -1 },
+  { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */
     4,          /* sizeofElement */
@@ -1602,14 +1596,14 @@ PORT ds400_port =
     getInstructionSize,
     getRegsRead,
     getRegsWritten,
-    0,
-    0,
-    0,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
   },
-  {
-        /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 8, 1, 2, 3, 1, 4, 4
-  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 1, 2, 3, 1, 4, 4 },
 
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
@@ -1628,8 +1622,8 @@ PORT ds400_port =
     "OSEG    (OVR,DATA)",
     "GSFINAL (CODE)",
     "HOME    (CODE)",
-    "XISEG   (XDATA)", // initialized xdata
-    "XINIT   (CODE)", // a code copy of xiseg
+    "XISEG   (XDATA)",          // initialized xdata
+    "XINIT   (CODE)",           // a code copy of xiseg
     "CONST   (CODE)",           // const_name - const data (code or not)
     "CABS    (ABS,CODE)",       // cabs_name - const absolute data (code or not)
     "XABS    (ABS,XDATA)",      // xabs_name - absolute xdata/pdata
@@ -1641,16 +1635,10 @@ PORT ds400_port =
     1
   },
   { _ds400_generateRomDataArea, _ds400_linkRomDataArea },
-  {
-    +1, 1, 4, 1, 1, 0
-  },
-    /* ds390 has an 16 bit mul & div */
-  {
-    2, -1
-  },
-  {
-    ds390_emitDebuggerSymbol
-  },
+  { +1, 1, 4, 1, 1, 0 },
+  /* ds390 has an 16 bit mul & div */
+  { 2, -1 },
+  { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */
     4,          /* sizeofElement */

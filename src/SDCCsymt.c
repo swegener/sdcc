@@ -1636,9 +1636,11 @@ compStructSize (int su, structdef * sdef)
                   /* is it the first struct-member? */
                   else if (loop == sdef->fields)
                     werror (E_FLEXARRAY_INEMPTYSTRCT, loop->name);
+#if 0 /* disabled, see bug 2102 */
                   /* always give a warning about flexible arrays */
                   else
                     werror (W_FLEXARRAY_INSTRUCT, loop->name);
+#endif
                 }
               else if (ret == INCOMPLETE)
                 {

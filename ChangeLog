@@ -1,4 +1,18 @@
+2015-03-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_calloc.c: removed unused struct declarations
+	* device/lib/pic16/libc/stdio/vfprintf.c: fixed warnings
+	* src/SDCC.y: disabled W_ANONYMOUS_MEMBER
+	* src/SDCCsymt.c (compStructSize): disabled W_FLEXARRAY_INSTRUCT
+	* src/z80/main.c: fixed gbz80_port peephole pointers, and
+	* src/ds390/main.c,
+	* src/mcs51/main.c,
+	* src/stm8/main.c: added peephole null-pointers, unified layout
+	* src/stm8/ralloc.c (stm8_assignRegisters): fixed warning
+	* support/regression/tests/bug-2320.c: fixed warning
+
 2015-05-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* sdas/linksrc/lkar.c:
 	* sdas/linksrc/lklib.c:
 	* sdas/linksrc/lksdcclib.c:
@@ -9,6 +23,7 @@
 	  Support Cygwin64.
 
 2015-04-29 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/gcc-torture-execute-20001011-1.c:
 	  Enabled.
 	* support/cpp/libcpp/macro.c:
@@ -23,6 +38,7 @@
 	  Better peephole interaction for early ret statements in functions.
 
 2015-04-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* Makefile.common.in:
 	* configure:
 	* configure.in:
@@ -79,22 +95,26 @@
 	  Better handling of calls through function pointers.
 
 2015-04-18 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* sim/ucsim/configure.in:
 	* sim/ucsim/configure:
 	* sim/ucsim/packages_in.mk:
 	  Do not build disabled ports.
 
 2015-04-17 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* sdas/linksrc/Makefile.in:
 	  Fix the issue that "make install" of sdld* failed on Windows.
 
 2015-04-16 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* device/include/Makefile.in:
 	  Fix the problem that the header files of ds400 are not installed.
 	* sdas/linksrc/Makefile.in:
 	  Do not install unnecessary sdld* for disabled ports.
 
 2015-04-15 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* Makefile.common.in:
 	* Makefile.in:
 	  Partially fix bug #2369.
@@ -119,6 +139,7 @@
 	  Support for __z88dk_callee calling convention on the caller side.
 
 2015-04-11 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/scripts/sdcc.nsi:
 	  Remove savr which is disabled by default.
 
@@ -128,6 +149,7 @@
 	  Fix bug number in comment.
 
 2015-04-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* debugger/mcs51/configure:
 	* debugger/mcs51/Makefile.in:
 	* debugger/mcs51/configure.in:
@@ -171,16 +193,19 @@
 	  Use relative jump on false instruction for optimizing jumps over 1-byte opcodes.
 
 2015-04-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/bug-2368.c:
 	  Try to fix the failure in "make test-host" on sparc64-solaris.
 
 2015-04-03 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCerr.c:
 	* src/SDCCerr.h:
 	* src/SDCCast.c:
 	  Add a warning for inline __naked functions.
 
 2015-04-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCutils.h:
 	* src/SDCCutils.c:
 	* src/SDCCmain.c:
@@ -199,6 +224,7 @@
 	  Dump tree decomposition used for address space switching on --dump-graphs.
 
 2015-04-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* sdas/as6808/Makefile.in:
 	* sdas/as8051/Makefile.in:
 	* sdas/as8xcxxx/Makefile.in:
@@ -222,6 +248,7 @@
 	  Fixed bug #2368.
 
 2015-03-27 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* sdas/as6808/Makefile.in:
 	* sdas/as8051/Makefile.in:
 	* sdas/as8xcxxx/Makefile.in:
@@ -240,6 +267,7 @@
 	  Support --program-prefix and --program-suffix.
 
 2015-03-26 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/sdbinutils/libiberty/Makefile.in:
 	  Disable make install.
 	* support/sdbinutils/binutils/Makefile.in:
@@ -254,10 +282,12 @@
 	  Peepholes for optimizing jump on decrement.
 
 2015-03-20 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCglue.c:
 	  Improve error messages.
 
 2015-03-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCglue.c:
 	  Fix a bug in a global char array initialized by a string.
 	* src/SDCCast.c:
@@ -280,12 +310,14 @@
 	* sdcc.sln: added sdasstm8
 
 2015-03-12 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCerr.c:
 	* src/SDCCerr.h:
 	* src/SDCC.y:
 	  Add a new warning: anonymous member in struct/union.
 
 2015-03-11 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCval.c:
 	* src/SDCCglue.c:
 	  Add a new special case in pointer initialization.
@@ -295,6 +327,7 @@
 	  Add a new test case.
 
 2015-03-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCsymt.c:
 	* src/SDCCerr.h:
 	* src/SDCCerr.c:
@@ -307,6 +340,7 @@
 	  fix code generation bug in shifts.
 
 2015-02-25 Ben Shi <powerstudio1st AT 163 DOT com>
+
         * support/regression/tests/bug-2031.c:
           Add a new test case.
         * src/SDCCglue.c:
@@ -321,6 +355,7 @@
 	  Fix bug in stm8 comparison code generation.
 
 2015-02-23 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/bug-2357.c:
 	  Improve this test case.
 
@@ -331,6 +366,7 @@
 	  Improve z88dk compability (patch provided by z88dk).
 
 2015-02-20 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/bug-2357.c:
 	  A new test case.
 	* support/regression/tests/gcc-torture-execute-20000412-1.c:
@@ -341,10 +377,12 @@
 	  Fix a bug in selecting type of an array index.
 
 2015-02-17 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/bug-1953.c:
 	  Disable failed tests.
 
 2015-02-16 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCast.c:
 	  Fix a bug in char array initialization with string.
 	* support/regression/tests/bug-1953.c:
@@ -353,18 +391,21 @@
 	  Enabled.
 
 2015-02-13 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCglue.c:
 	  Make pointers (of a struct) initialization more generaic.
 	* support/regression/tests/bug-2123.c:
 	  Add more tests.
 
 2015-02-11 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCglue.c:
 	  Improve pointer initialization.
 	* support/regression/tests/bug-2123.c:
 	  Add a new test case for bug #2123.
 
 2015-02-08 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCval.c:
 	  Allow type cast in function pointer initialization.
 	* support/regression/tests/bug-2124.c:
@@ -399,6 +440,7 @@
 	  Fix name of helper function for function pointers, introduce Alan Cox' proposal for helper function for function header.
 
 2015-02-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCast.c:
 	  Add check for infinite recursive call of copyAst().
 
@@ -418,6 +460,7 @@
 	  Update documentation on C dialect selection.
 
 2015-01-27 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCsymt.c:
 	  Fix bug #2349.
 	* support/regression/test/bug-2349.c:
@@ -433,12 +476,14 @@
 	  Apply patch by Pascal for trap handlers.
 
 2015-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/stm8/gen.c:
 	  Fix a bug in genPointerGet(): negative offset is not handled correctly.
 	* support/regression/test/bug-2239.c:
 	  More tests are added and enabled for stm8.
 
 2015-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCast.c:
 	  Fix bug #2239.
 	* support/regression/test/bug-2239.c:
@@ -462,12 +507,14 @@
 	  Classification macros are not required in freestanding implementations.
 
 2015-01-08 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCC.y:
 	  Fix a bug which might be a NULL pointer access.
 	* device/lib/time.c:
 	  Eliminate a warning. (overflow in implicit constant conversion)
 
 2015-01-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCast.c:
 	  Fix bug #2167 & #1967. (auto struct variables initialization)
 	* support/regression/tests/gcc-torture-execute-960326-1.c:
@@ -477,6 +524,7 @@
 	  Enable test.
 
 2015-01-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCCval.c:
 	  Make SDCC_VERY_PEDANTIC default, if --less-pedantic is not specified.
 

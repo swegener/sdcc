@@ -821,13 +821,13 @@ PORT mcs51_port =
     getRegsRead,
     getRegsWritten,
     mcs51DeadMove,
-    0,
-    0,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
   },
-  {
-    /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-    1, 2, 2, 4, 8, 1, 2, 3, 1, 4, 4
-  },
+  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
+  { 1, 2, 2, 4, 8, 1, 2, 3, 1, 4, 4 },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
@@ -866,13 +866,9 @@ PORT mcs51_port =
     1,          /* reent_overhead */
     1           /* banked_overhead (switch between code banks) */
   },
-  {
-    /* mcs51 has an 8 bit mul */
-    1, -1
-  },
-  {
-    mcs51_emitDebuggerSymbol
-  },
+  /* mcs51 has an 8 bit mul */
+  { 1, -1 },
+  { mcs51_emitDebuggerSymbol },
   {
     256,        /* maxCount */
     2,          /* sizeofElement */

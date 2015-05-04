@@ -1,5 +1,15 @@
 2015-05-04 Ben Shi <powerstudio1st AT 163 DOT com>
 
+	* support/regression/tests/bug-2102.c:
+	  Add a new test case.
+	* src/SDCCerr.c:
+	* src/SDCC.y:
+	  Rise warning 219 for creating an instance of a struct with a flexible array.
+	* src/SDCCsymt.c:
+	  Remove useless code.
+
+2015-05-04 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCC.y:
 	  Fix a bug in macro __func__ substitution.
 

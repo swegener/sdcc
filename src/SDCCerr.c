@@ -494,7 +494,7 @@ struct
   { W_UNRECOGNIZED_ASM, ERROR_LEVEL_INFO,
      "%s() failed to parse line node, assuming %d bytes\n'%s'\n", 0 },
   { W_FLEXARRAY_INSTRUCT, ERROR_LEVEL_WARNING,
-     "using a flexible array '%s' in a struct", 0},
+     "creating an instance '%s' of a struct with a flexible array", 0},
   { W_ANONYMOUS_MEMBER, ERROR_LEVEL_WARNING,
      "anonymous member in struct/union", 0},
   { W_INLINE_NAKED, ERROR_LEVEL_WARNING,

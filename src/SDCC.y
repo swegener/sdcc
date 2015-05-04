@@ -557,6 +557,16 @@ declaration
 
          for (sym1 = sym = reverseSyms($2);sym != NULL;sym = sym->next) {
              sym_link *lnk = copyLinkChain($1);
+             sym_link *l0 = NULL, *l1 = NULL;
+             /* check creating intances of structs with flexible arrays */
+             for (l0 = sym->type; l0 != NULL; l0 = l0->next)
+               if (IS_PTR (l0))
+                 break;
+             for (l1 = lnk; l1 != NULL; l1 = l1->next)
+               if (IS_STRUCT (l1) && SPEC_STRUCT (l1)->b_flexArrayMember)
+                 break;
+             if (l0 == NULL && l1 != NULL)
+               werror (W_FLEXARRAY_INSTRUCT, sym->name);
              /* do the pointer stuff */
              pointerTypes(sym->type,lnk);
              addDecl (sym,0,lnk);

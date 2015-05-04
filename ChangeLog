@@ -1,4 +1,9 @@
-2015-03-13 Maarten Brock <sourceforge.brock AT dse.nl>
+2015-05-04 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y:
+	  Fix a bug in macro __func__ substitution.
+
+2015-05-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_calloc.c: removed unused struct declarations
 	* device/lib/pic16/libc/stdio/vfprintf.c: fixed warnings

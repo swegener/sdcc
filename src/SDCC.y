@@ -303,22 +303,27 @@ primary_expr
 
 string_literal_val
     : STRING_LITERAL {
-                       int cnt;
+                       int cnt = 1;
+                       int max = 253, min = 1;
                        char fb[256];
                        /* refer to support/cpp/libcpp/macro.c for details */
-                       for (cnt = 1; cnt < 254; cnt++)
-                         if (-1 != (int) (char) $1[cnt])
-                           break;
-                         if (cnt < 254)
+                       while ((((int) ($1[cnt] & 0xff)) & 0xff) == 0xff)
+                         cnt++;
+                       if (cnt <= max)
+                         {
                            $$ = newAst_VALUE (strVal ($1));
-                         else
-                           {
-                             memset (fb, 0x00, sizeof (function_name));
-                             fb[0] = '"';
-                             strcpy (fb + 1, function_name);
-                             fb[strlen (fb)] = '"';
-                             $$ = newAst_VALUE (strVal (fb));
-                           }
+                         }
+                       else
+                         {
+                           memset (fb, 0x00, sizeof (fb));
+                           fb[0] = '"';
+                           strncpy (fb + 1, function_name, max - min + 1);
+                           fb[max + 1] = '"';
+                           fb[max + 2] = 0;
+                           fb[strlen (fb)] = '"';
+                           fb[strlen (fb) + 1] = 0;
+                           $$ = newAst_VALUE (strVal (fb));
+                         }
                      }
     ;
 

@@ -565,6 +565,8 @@ declaration
              for (l1 = lnk; l1 != NULL; l1 = l1->next)
                if (IS_STRUCT (l1) && SPEC_STRUCT (l1)->b_flexArrayMember)
                  break;
+             // uncertain about declaration with "extern" should warn or not
+             // if (l0 == NULL && l1 != NULL && SPEC_EXTR($1) != 1)
              if (l0 == NULL && l1 != NULL)
                werror (W_FLEXARRAY_INSTRUCT, sym->name);
              /* do the pointer stuff */

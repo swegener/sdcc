@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 84
+
 char func_0 (int i)
 {
   return i + 10;

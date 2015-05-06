@@ -1,3 +1,14 @@
+2015-05-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y:
+	  Do not warn if a variable of a struct with a flexible array is decleared with extern.
+	* src/SDCCerr.c:
+	  Change text message of warning 219.
+	* support/regression/tests/bug-2102.c:
+	  Supress warning 219 and improve test case.
+	* support/regression/tests/bug-2274.c:
+	  Supress warning 84.
+
 2015-05-04 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/bug-2102.c:

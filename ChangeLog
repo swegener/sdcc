@@ -1,3 +1,10 @@
+2015-05-08 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y:
+	  Turn off warning 219 for decleration (with extern) while keep for definition (without extern).
+	* support/regression/tests/bug-2102.c:
+	  Improve test case.
+
 2015-05-06 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y:

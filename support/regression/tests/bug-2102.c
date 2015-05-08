@@ -6,22 +6,18 @@
 #pragma disable_warning 219
 
 struct tst {
-  char a;
-  char b;
-  char c;
-  short p[0];
+  int a, b;
+  int p[0];
 };
 
 void
 testBug(void)
 {
-  struct tst w[2] = {{0x55, 0x33, 0x11}, {0x11, 0x22, 0x33}}; // will rise warning 219
+  struct tst w[2] = {{0x5555, 0x3333}, {0x1111, 0x2222}}; // will rise warning 219
   struct tst *p = w; // won't rise warning 219
-  ASSERT (w[1].a == 0x11);
-  ASSERT (w[1].b == 0x22);
-  ASSERT (w[1].c == 0x33);
+  ASSERT (w[1].a == 0x1111);
+  ASSERT (w[1].b == 0x2222);
   p->p[0] = 0x4444;
-  ASSERT (w[1].a == 0x44);
-  ASSERT (w[1].b == 0x44);
-  ASSERT (w[1].c == 0x33);
+  ASSERT (w[1].a == 0x4444);
+  ASSERT (w[1].b == 0x2222);
 }

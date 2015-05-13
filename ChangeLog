@@ -1,3 +1,11 @@
+2015-05-13 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCerr.c:
+	* src/SDCCerr.h:
+	* src/SDCCsymt.c:
+	* src/SDCCsymt.h:
+	  Add a new warning for duplicate specifiler in c89.
+
 2015-05-08 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y:

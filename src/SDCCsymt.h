@@ -462,6 +462,7 @@ extern sym_link *validateLink (sym_link * l,
 #define SPEC_LONGLONG(x) validateLink(x, "SPEC_LONGLONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_longlong
 #define SPEC_SHORT(x) validateLink(x, "SPEC_LONG", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_short
 #define SPEC_USIGN(x) validateLink(x, "SPEC_USIGN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_unsigned
+#define SPEC_SIGN(x) validateLink(x, "SPEC_USIGN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_signed
 #define SPEC_SCLS(x) validateLink(x, "SPEC_SCLS", #x, SPECIFIER, __FILE__, __LINE__)->select.s.sclass
 #define SPEC_ENUM(x) validateLink(x, "SPEC_ENUM", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_isenum
 #define SPEC_OCLS(x) validateLink(x, "SPEC_OCLS", #x, SPECIFIER, __FILE__, __LINE__)->select.s.oclass

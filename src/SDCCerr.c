@@ -503,6 +503,8 @@ struct
     "invalid number of parameters for __z88dk_fastcall", 0 },
   { E_Z88DK_FASTCALL_PARAMETER, ERROR_LEVEL_ERROR,
     "ivalid parameter type in __z88dk_fastcall", 0 },
+  { W_REPEAT_QUALIFIER, ERROR_LEVEL_WARNING,
+    "duplicate specifier '%s'", 0 },
 };
 
 /* -------------------------------------------------------------------------------

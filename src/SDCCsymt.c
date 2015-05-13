@@ -687,6 +687,28 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
 #endif
     }
 
+  if (!options.std_c11 && !options.std_c99)
+    {
+      if (SPEC_SIGN (dest) && SPEC_SIGN (src))
+        werror (W_REPEAT_QUALIFIER, "signed");
+      if (SPEC_USIGN (dest) && SPEC_USIGN (src))
+        werror (W_REPEAT_QUALIFIER, "unsigned");
+      if (SPEC_CONST (dest) && SPEC_CONST (src))
+        werror (W_REPEAT_QUALIFIER, "const");
+      if (SPEC_VOLATILE (dest) && SPEC_VOLATILE (src))
+        werror (W_REPEAT_QUALIFIER, "volatile");
+      if (SPEC_STAT (dest) && SPEC_STAT (src))
+        werror (W_REPEAT_QUALIFIER, "static");
+      if (SPEC_EXTR (dest) && SPEC_EXTR (src))
+        werror (W_REPEAT_QUALIFIER, "extern");
+      if (SPEC_TYPEDEF (dest) && SPEC_TYPEDEF (src))
+        werror (W_REPEAT_QUALIFIER, "typedef");
+      if (SPEC_SCLS (dest) == S_REGISTER && SPEC_SCLS (src) == S_REGISTER)
+        werror (W_REPEAT_QUALIFIER, "register");
+      if (SPEC_SCLS (dest) == S_AUTO && SPEC_SCLS (src) == S_AUTO)
+        werror (W_REPEAT_QUALIFIER, "auto");
+    }
+
   if (SPEC_NOUN (src))
     {
       if (!SPEC_NOUN (dest))

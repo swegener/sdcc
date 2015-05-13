@@ -250,6 +250,7 @@ enum {
   W_INLINE_NAKED                = 221, /* inline function is naked */
   E_Z88DK_FASTCALL_PARAMETERS   = 222, /* invalid number of parameters in __z88dk_fastcall */
   E_Z88DK_FASTCALL_PARAMETER    = 223, /* invalid parameter type in __z88dk_fastcall */
+  W_REPEAT_QUALIFIER            = 224, /* the same qualifier appears more than once */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

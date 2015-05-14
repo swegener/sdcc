@@ -365,7 +365,15 @@ unary_expr
    : postfix_expr
    | INC_OP unary_expr        { $$ = newNode (INC_OP, NULL, $2); }
    | DEC_OP unary_expr        { $$ = newNode (DEC_OP, NULL, $2); }
-   | unary_operator cast_expr { $$ = newNode ($1, $2, NULL); }
+   | unary_operator cast_expr
+       {
+         if ($1 == '&' && $2->opval.op == '*' && $2->right == NULL)
+           $$ = $2->left;
+         else if ($1 == '*' && $2->opval.op == '&' && $2->right == NULL)
+           $$ = $2->left;
+         else
+           $$ = newNode ($1, $2, NULL);
+       }
    | SIZEOF unary_expr        { $$ = newNode (SIZEOF, NULL, $2); }
    | SIZEOF '(' type_name ')' { $$ = newAst_VALUE (sizeofOp ($3)); }
    | ALIGNOF '(' type_name ')'{ $$ = newAst_VALUE (alignofOp ($3)); }

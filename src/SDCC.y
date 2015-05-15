@@ -367,9 +367,9 @@ unary_expr
    | DEC_OP unary_expr        { $$ = newNode (DEC_OP, NULL, $2); }
    | unary_operator cast_expr
        {
-         if ($1 == '&' && $2->opval.op == '*' && $2->right == NULL)
+         if ($1 == '&' && IS_AST_OP ($2) && $2->opval.op == '*' && $2->right == NULL)
            $$ = $2->left;
-         else if ($1 == '*' && $2->opval.op == '&' && $2->right == NULL)
+         else if ($1 == '*' && IS_AST_OP ($2) && $2->opval.op == '&' && $2->right == NULL)
            $$ = $2->left;
          else
            $$ = newNode ($1, $2, NULL);

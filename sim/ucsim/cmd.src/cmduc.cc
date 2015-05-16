@@ -427,8 +427,11 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
   
   while (lines)
     {
+      int len;
       uc->print_disass(realstart, con);
-      realstart= rom->inc_address(realstart, +1) + rom->start_address;
+      /* fix for #2383: start search next instruction after the actual one */
+      len= uc->inst_length(realstart);
+      realstart= rom->inc_address(realstart, /*+1*/len) + rom->start_address;
       while (!uc->inst_at(realstart))
         realstart= rom->inc_address(realstart, +1) + rom->start_address;
       lines--;

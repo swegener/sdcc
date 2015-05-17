@@ -6,7 +6,7 @@ LATEX      = @LATEX@
 LATEX2HTML = @LATEX2HTML@
 PDFLATEX   = @PDFLATEX@
 MAKEINDEX  = @MAKEINDEX@
-DVIPDF     = @DVIPDF@
+DVIPDFM    = @DVIPDFM@
 
 PDFLATEXARGS = -file-line-error -halt-on-error
 
@@ -59,9 +59,9 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	$(LYX) -e text $(notdir $<);
 
 %.pdf: %.tex %.dvi %.ind
-	$(DVIPDF) $*
+	$(DVIPDFM) $*
 # pdflatex creates documents for acrobat reader >= 5.0	
-#	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDF) $*
+#	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDFM) $*
 
 #%.ps:  %.pdf
 #	$(DVIPS) $*

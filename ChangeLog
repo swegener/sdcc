@@ -1,7 +1,9 @@
 2015-05-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* doc/clean.mk: remove *.eps
-	* doc/Makefile.in: use dvipdf instead of pdflatex to enable svg graphics
+	* doc/Makefile.in: use dvipdfm instead of pdflatex to enable svg graphics
+	* configure.in,
+	* configure: require latex and dvipdfm for building doc
 
 2015-05-17 Ben Shi <powerstudio1st AT 163 DOT com>
 

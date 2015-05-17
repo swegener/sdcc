@@ -2,7 +2,7 @@ clean:
 	rm -rf $(MANUAL).html $(TSS).html $(CDB).html
 	rm -rf $(MANUAL).txt $(TSS).txt $(CDB).txt \
 		*.pdf *.tex *.aux *.dvi *.idx *.ilg *.out\
-		*.ind *.log *.toc *~ \#* *.ps */*.css */*.pl *.gif core *.glo
+		*.ind *.log *.toc *~ \#* *.ps */*.css */*.pl *.gif core *.glo *.eps
 	rm -rf sdcc-doc sdcc-doc.tar.bz2
 	if [ "$(srcdir)" != "." ]; then rm -f *.lyx; fi
 

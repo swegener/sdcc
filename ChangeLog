@@ -1,3 +1,8 @@
+2015-05-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/clean.mk: remove *.eps
+	* doc/Makefile.in: use dvipdf instead of pdflatex to enable svg graphics
+
 2015-05-17 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sdas/linksrc/lklex.c:
@@ -25,15 +30,15 @@
 
 2015-05-08 Ben Shi <powerstudio1st AT 163 DOT com>
 
-	* src/SDCC.y:
-	  Turn off warning 219 for decleration (with extern) while keep for definition (without extern).
+	* src/SDCC.y: Turn off warning 219 for declaration (with extern) while keep
+	  for definition (without extern).
 	* support/regression/tests/bug-2102.c:
 	  Improve test case.
 
 2015-05-06 Ben Shi <powerstudio1st AT 163 DOT com>
 
-	* src/SDCC.y:
-	  Do not warn if a variable of a struct with a flexible array is decleared with extern.
+	* src/SDCC.y: Do not warn if a variable of a struct with a flexible array is
+	  declared with extern.
 	* src/SDCCerr.c:
 	  Change text message of warning 219.
 	* support/regression/tests/bug-2102.c:

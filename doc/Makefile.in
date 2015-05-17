@@ -2,9 +2,11 @@ VPATH  = @srcdir@
 srcdir = @srcdir@
 
 LYX        = @LYX@
+LATEX      = @LATEX@
 LATEX2HTML = @LATEX2HTML@
 PDFLATEX   = @PDFLATEX@
 MAKEINDEX  = @MAKEINDEX@
+DVIPDF     = @DVIPDF@
 
 PDFLATEXARGS = -file-line-error -halt-on-error
 
@@ -56,18 +58,18 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	fi
 	$(LYX) -e text $(notdir $<);
 
-#%.pdf: %.tex %.dvi %.ind
-#	$(DVIPDF) $*
-## pdflatex creates documents for acrobat reader >= 5.0	
-##	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDF) $*
+%.pdf: %.tex %.dvi %.ind
+	$(DVIPDF) $*
+# pdflatex creates documents for acrobat reader >= 5.0	
+#	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDF) $*
 
 #%.ps:  %.pdf
 #	$(DVIPS) $*
 
-#%.dvi: %.tex
-#	$(LATEX) $<
-#	@# rerun to in include aux
-#	$(LATEX) $<
+%.dvi: %.tex
+	$(LATEX) $<
+	@# rerun to in include aux
+	$(LATEX) $<
 
 %.tex: %.lyx
 	if [ "$(srcdir)" != "." ] ; then \
@@ -75,26 +77,26 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	fi
 	$(LYX) -e latex $(notdir $<);
 
-#%.ind: %.dvi
-#	$(LATEX) $*
-#	# is there an index?
-#	if [ -f $*.idx ] ; then \
-#	  $(MAKEINDEX) $*; \
-#	  $(LATEX) $*; \
-#	  $(LATEX) $*; \
-#	fi
-##	  -$(MAKEINDEX) -s l2hidx.ist $*; \
+%.ind: %.dvi
+	$(LATEX) $*
+	# is there an index?
+	if [ -f $*.idx ] ; then \
+	  $(MAKEINDEX) $*; \
+	  $(LATEX) $*; \
+	  $(LATEX) $*; \
+	fi
+#	  -$(MAKEINDEX) -s l2hidx.ist $*; \
 
 #%.glo: %.dvi
 #	# the glossary, not implemented yet
 #	# $(MAKEINDEX) -s l2hglo.ist -o $@ $<
 
-%.pdf %.aux: %.tex
-	$(PDFLATEX) $* $(PDFLATEXARGS)
-	[ ! -e "$*.idx" ] || $(MAKEINDEX) $* $(QUIET)
-	$(PDFLATEX) $* $(PDFLATEXARGS)
-	[ ! -e "$*.idx" ] || $(MAKEINDEX) $* $(QUIET)
-	$(PDFLATEX) $* $(PDFLATEXARGS)
+#%.pdf %.aux: %.tex
+#	$(PDFLATEX) $* $(PDFLATEXARGS)
+#	[ ! -e "$*.idx" ] || $(MAKEINDEX) $* $(QUIET)
+#	$(PDFLATEX) $* $(PDFLATEXARGS)
+#	[ ! -e "$*.idx" ] || $(MAKEINDEX) $* $(QUIET)
+#	$(PDFLATEX) $* $(PDFLATEXARGS)
 
 archive: all
 	rm -rf sdcc-doc sdcc-doc.tar.bz2

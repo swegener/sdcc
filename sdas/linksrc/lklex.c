@@ -596,12 +596,26 @@ loop:   if (pflag && cfp && cfp->f_type == F_STD)
  *              the position in the current input text line
  */
 
+static int isHex(int c)
+{
+  if ('0' <= c && c <= '9')
+    return 1;
+  else if ('A' <= c && c <= 'F')
+    return 1;
+  else if ('a' <= c && c <= 'f')
+    return 1;
+  else
+    return 0;
+}
+
 int
 more()
 {
         int c;
 
         c = getnb();
+        if (c != '\0' && c != ';' && !isHex (c))
+          lkexit (ER_FATAL);
         unget(c);
         return( (c == '\0' || c == ';') ? 0 : 1 );
 }

@@ -1,4 +1,11 @@
-2015-05-19 Maarten Brock <sourceforge.brock AT dse.nl>
+2015-05-21 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCsymt.c:
+	  Remove useless code.
+	* support/regression/tests/bug-2384.c:
+	  Add a new test case.
+
+2015-05-19 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/bug-1918.c:
 	  Add a new test case.

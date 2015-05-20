@@ -878,9 +878,6 @@ mergeDeclSpec (sym_link * dest, sym_link * src, const char *name)
   if (SPEC_ADDRSPACE (spec))
     DCL_PTR_ADDRSPACE (decl) = SPEC_ADDRSPACE (spec);
 
-  SPEC_CONST (spec) = SPEC_VOLATILE (spec) = SPEC_RESTRICT (spec) = 0;
-  SPEC_ADDRSPACE (spec) = 0;
-
   lnk = decl;
   while (lnk && !IS_SPEC (lnk->next))
     lnk = lnk->next;

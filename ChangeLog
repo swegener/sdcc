@@ -1,3 +1,11 @@
+2015-05-23 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c:
+	* src/SDCCglue.c:
+	  Support initialization of char array in form 'char arr[] = {"abc"};'.
+	* support/regression/tests/bug-2059.c:
+	  Add a new test case.
+
 2015-05-21 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCsymt.c:

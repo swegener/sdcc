@@ -1206,13 +1206,21 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
   /* take care of the special   case  */
   /* array of characters can be init  */
   /* by a string                      */
+  /* char *p = "abc";                 */
   if (IS_CHAR (type->next) &&
       ilist && ilist->type == INIT_NODE)
     if ((rast = createIvalCharPtr (sym,
                                    type,
                                    decorateType (resolveSymbols (list2expr (ilist)), RESULT_TYPE_NONE),
                                    rootValue)))
-
+      return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
+  /* char *p = {"abc"}; */
+  if (IS_CHAR (type->next) &&
+      ilist && ilist->type == INIT_DEEP && ilist->init.deep && ilist->init.deep->type == INIT_NODE)
+    if ((rast = createIvalCharPtr (sym,
+                                   type,
+                                   decorateType (resolveSymbols (list2expr (ilist->init.deep)), RESULT_TYPE_NONE),
+                                   rootValue)))
       return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
 
   /* not the special case */

@@ -1056,6 +1056,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
       /* take care of the special   case  */
       /* array of characters can be init  */
       /* by a string                      */
+      /* char *p = "abc";                 */
       if (IS_CHAR (type->next) && ilist->type == INIT_NODE)
         {
           val = list2val (ilist, TRUE);
@@ -1070,9 +1071,28 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
               return;
             }
           if (printIvalChar (sym, type,
-                             (ilist->type == INIT_DEEP ? ilist->init.deep : ilist), oBuf, SPEC_CVAL (sym->etype).v_char, check))
+                             ilist, oBuf, SPEC_CVAL (sym->etype).v_char, check))
             return;
         }
+      /* char *p = {"abc"}; */
+      if (IS_CHAR (type->next) && ilist->type == INIT_DEEP && ilist->init.deep && ilist->init.deep->type == INIT_NODE)
+        {
+          val = list2val (ilist->init.deep, TRUE);
+          if (!val)
+            {
+              werrorfl (ilist->init.deep->filename, ilist->init.deep->lineno, E_INIT_STRUCT, sym->name);
+              return;
+            }
+          if (!IS_LITERAL (val->etype))
+            {
+              werrorfl (ilist->init.deep->filename, ilist->init.deep->lineno, E_CONST_EXPECTED);
+              return;
+            }
+          if (printIvalChar (sym, type,
+                             ilist->init.deep, oBuf, SPEC_CVAL (sym->etype).v_char, check))
+            return;
+        }
+
       /* not the special case             */
       if (ilist->type != INIT_DEEP)
         {

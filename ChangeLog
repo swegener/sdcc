@@ -1,3 +1,11 @@
+2015-06-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx,
+	  src/SDCCglobl.h,
+	  src/SDCClospre.cc,
+	  src/SDCCmain.c:
+	  Use more generic name for option for unsafe reads.
+
 2015-05-23 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c:

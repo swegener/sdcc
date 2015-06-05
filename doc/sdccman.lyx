@@ -13190,7 +13190,7 @@ status collapsed
 
 -
 \series bold
-lospre-unsafe-read
+allow-unsafe-read
 \series default
 
 \begin_inset Index idx
@@ -13210,12 +13210,12 @@ status collapsed
 
 \end_inset
 
--losrpe-unsafe-read
+-allow-unsafe-read
 \end_layout
 
 \end_inset
 
- Allow unsafe reads in lospre.
+ Allow optimizations to generate unsafe reads.
  This will enable additional optimizations, but can result in spurious reads
  from undefined memory addresses, which can be harmful if the target system
  uses certain ways of doing memory-mapped I/O.

@@ -237,7 +237,7 @@ struct optimize
     int codeSpeed;
     int codeSize;
     int lospre;
-    int lospre_unsafe_read;
+    int allow_unsafe_read;
   };
 
 /** Build model.

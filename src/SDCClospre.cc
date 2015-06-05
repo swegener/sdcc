@@ -191,7 +191,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
     safety_required = true;
 
   // Reading from an invalid address might be dangerous, since there could be memory-mapped I/O.
-  if (eic->op == GET_VALUE_AT_ADDRESS && !optimize.lospre_unsafe_read)
+  if (eic->op == GET_VALUE_AT_ADDRESS && !optimize.allow_unsafe_read)
     safety_required = true;
 
   // The division routines for z80-like ports and the hc08/s08's and stm8's hardware division just give an undefined result

@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -28,7 +28,7 @@
 
 /*
  * This code fragment copies initialized data from ROM to their
- * assigned RAM locations. The requierd cinit structure is created
+ * assigned RAM locations. The required cinit structure is created
  * by gputils' linker and comprises initial values of all linked in
  * modules.
  */
@@ -71,23 +71,23 @@ _sdcc_gsinit_startup(void)
     __code cinit_t *cptr;
     __code char *src;
     __data char *dst;
-    
+
     num = cinit.records;
     cptr = &cinit.entry[0];
-    
+
     // iterate over all cinit entries
     while (num--) {
 	size = cptr->size;
 	src = (__code char *) cptr->src;
 	dst = (__data char *) cptr->dst;
-	
+
 	// copy data byte-wise from ROM to RAM
 	while (size--) {
 	    *dst = *src;
 	    src++;
 	    dst++;
 	} // while
-	
+
 	// XXX: might need to clear the watchdog timer here...
 	cptr++;
     } // while
@@ -98,4 +98,3 @@ _sdcc_gsinit_startup(void)
 	GOTO _main
     __endasm;
 }
-

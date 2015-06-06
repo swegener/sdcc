@@ -8,11 +8,11 @@ License:       GPL
 Group:         Applications/Engineering
 Summary:       Small Device C Compiler
 Requires:      sdcc-common
-Version:       3.4.0
+Version:       3.5.0
 Release:       2
 Source:        %{name}-src-%{version}.tar.gz
 URL:           http://sdcc.sourceforge.net/
-Packager:      Bernhard Held <bernhard AT bernhardheld.de>
+Packager:      Maarten Brock <sourceforge.brock AT dse.nl>
 BuildRoot:     %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -92,6 +92,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc %{_defaultdocdir}
 
 %changelog
+* Fri Jun 06 2015 - sourceforge.brock AT dse.nl
+- version updated to 3.5.0
 * Fri Feb 28 2014 - sourceforge.brock AT dse.nl
 - version updated to 3.4.0
 * Sat May 04 2013 - sourceforge.brock AT dse.nl

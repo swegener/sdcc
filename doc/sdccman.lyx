@@ -157,12 +157,11 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 3.4.3
-\size footnotesize
-
++SDCC 3.5.0-rc1
 \begin_inset Newline newline
 \end_inset
 
+\size footnotesize
 $Date::             $ 
 \begin_inset Newline newline
 \end_inset
@@ -22271,7 +22270,7 @@ spaceb1 int *y; // A pointer to an int in address space spaceb1
 \begin_inset Newline newline
 \end_inset
 
-spaceb0 int *spaceb1 z; // A pointer in address space sapceb1 that points
+spaceb0 int *spaceb1 z; // A pointer in address space spaceb1 that points
  to an int in address space spaceb0
 \end_layout
 

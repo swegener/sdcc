@@ -26,9 +26,9 @@ int func_3 (char i)
   return i + 40;
 }
 
-void testUndef (void) __reentrant
+void uninitialized (void) __reentrant
 {
-  /* SDCC should not crash, but only prints warning messages. */
+  /* SDCC should not crash, but only print warning messages. */
   char a = func_0 (a);
   char b = func_1 (b);
   int c = func_2 (c);
@@ -37,5 +37,5 @@ void testUndef (void) __reentrant
 
 void testBug (void)
 {
-  testUndef ();
+  uninitialized ();
 }

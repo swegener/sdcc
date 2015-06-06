@@ -1,3 +1,13 @@
+2015-06-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* .version,
+	* doc/INSTALL.txt,
+	* doc/sdccman.lyx: version 3.5.0 rc1
+	* sdcc.spec: version 3.5.0
+	* device/lib/pic14/libsdcc/idata.c: cosmetics
+	* support/regression/tests/bug-2274.c: prevented double testing by rename
+	* support/regression/tests/gcc-torture-execute-stdarg-5.c: no ASSERT(0)
+
 2015-06-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx,

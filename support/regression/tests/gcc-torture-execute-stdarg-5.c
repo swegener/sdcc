@@ -1,5 +1,6 @@
 /*
    stdarg-4.c from the execute part of the gcc torture tests.
+   inlined: yes, no
  */
 
 #include <testfwk.h>
@@ -14,7 +15,12 @@
 
 long x, y;
 
-static inline void
+#define INLINED_{inlined}
+
+#ifdef INLINED_yes
+static inline
+#endif
+void
 f1i (va_list ap)
 {
   x = va_arg (ap, double);
@@ -31,7 +37,10 @@ f1 (int i, ...)
   va_end (ap);
 }
 
-static inline void
+#ifdef INLINED_yes
+static inline
+#endif
+void
 f2i (va_list ap)
 {
   y = va_arg (ap, int);
@@ -124,32 +133,29 @@ f4 (int i, ...)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic16)
+#if defined(__SDCC_pic16)
+  //broken, skip
+#elif defined(__SDCC_mcs51) && defined(inlined_yes)
+  //broken, skip
+#else
   f1 (3, 16.0, 128L, 32.0);
-  if (x != 176L)
-    ASSERT (0);
+  ASSERT (x == 176L);
   f2 (6, 5, 7L, 18.0, 19.0, 17L, 64.0);
-  if (x != 100L || y != 30L)
-    ASSERT (0);
-  if (f3 (0) != 0)
-    ASSERT (0);
-  if (f3 (1, 18L) != 19L)
-    ASSERT (0);
-  if (f3 (2, 18L, 100L) != 120L)
-    ASSERT (0);
-  if (f3 (3, 18L, 100L, 300L) != 421L)
-    ASSERT (0);
-  if (f3 (4, 18L, 71L, 64L, 86L) != 243L)
-    ASSERT (0);
+  ASSERT (x == 100L);
+  ASSERT (y == 30L);
+  ASSERT (f3 (0) == 0);
+  ASSERT (f3 (1, 18L) == 19L);
+  ASSERT (f3 (2, 18L, 100L) == 120L);
+  ASSERT (f3 (3, 18L, 100L, 300L) == 421L);
+  ASSERT (f3 (4, 18L, 71L, 64L, 86L) == 243L);
   f4 (4, 6.0, 9.0, 16L, 18.0);
-  if (x != 43L || y != 6L)
-    ASSERT (0);
+  ASSERT (x == 43L);
+  ASSERT (y == 6L);
   f4 (5, 7.0, 21.0, 1.0, 17L, 126.0);
 
-// Fails on z80 and related
-  if (x != 144L || y != 28L)
-    ASSERT (0);
+// Failed on z80 and related
+  ASSERT (x == 144L);
+  ASSERT (y == 28L);
 #endif
   return;
 }
-

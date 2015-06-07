@@ -1,3 +1,8 @@
+2015-06-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Add section on the use of --allow-unsafe-reads on Z80-based systems.
+
 2015-06-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* .version,

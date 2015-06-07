@@ -161,6 +161,7 @@ SDCC 3.5.0-rc1
 \begin_inset Newline newline
 \end_inset
 
+
 \size footnotesize
 $Date::             $ 
 \begin_inset Newline newline
@@ -43430,7 +43431,18 @@ There are three other calling conventions supported, which can be specified
  For __z88dk_callee, parameters are passed on the stack, but the stack is
  not adjusted for the parameters after the call (thus the callee has to
  do this instead).
- __zz8dk_callee can be combined with __smallc.
+ __z88dk_callee can be combined with __smallc.
+\end_layout
+
+\begin_layout Subsection
+Unsafe reads
+\end_layout
+
+\begin_layout Standard
+Usually, Z80-based systems (except for the Gameboy) have separate I/O and
+ memory spaces, and any memory location can be read without side-effects.
+ For such systems, the option --allow-unsafe-reads can be used to enable
+ some extra optimizations.
 \end_layout
 
 \begin_layout Section

@@ -1,3 +1,8 @@
+2015-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/scripts/repack_release.sh: changed mac osx snapshot source,
+	  forced uploading to directories
+
 2015-06-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

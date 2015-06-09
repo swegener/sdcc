@@ -77,10 +77,11 @@ function download()
     wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i386-unknown-linux2.5/sdcc-snapshot-i386-unknown-linux2.5-${date}-${revision}.tar.bz2 && \
     wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i586-mingw32msvc/sdcc-snapshot-i586-mingw32msvc-${date}-${revision}.zip && \
     wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/x86_64-w64-mingw32/sdcc-snapshot-x86_64-w64-mingw32-${date}-${revision}.zip && \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i386_universal-apple-macosx/sdcc-snapshot-i386_universal-apple-macosx-${date}-${revision}.tar.bz2 \
+    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/universal-apple-macosx/sdcc-snapshot-universal-apple-macosx-${date}-${revision}.tar.bz2 \
     ) || fatal_error "Cannot download snapshot build packages!"
 
-    mv sdcc-snapshot-i386_universal-apple-macosx-${date}-${revision}.tar.bz2 sdcc-snapshot-universal-apple-macosx-${date}-${revision}.tar.bz2
+#    a rename is required when another snapshot is taken as the source for the release
+#    mv sdcc-snapshot-i386_universal-apple-macosx-${date}-${revision}.tar.bz2 sdcc-snapshot-universal-apple-macosx-${date}-${revision}.tar.bz2
 
     popd
   fi
@@ -212,26 +213,26 @@ function upload()
 
   raw_ver=$(expr $ver : '\([0-9]*\.[0-9]*\.[0-9]*\)')
 
-  echo uploading ul/sdcc-src-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
-  rsync -v --progress -e ssh ul/sdcc-src-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}
+  echo uploading ul/sdcc-src-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-src-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc/${raw_ver}/
 
-  echo uploading ul/sdcc-doc-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
-  rsync -v --progress -e ssh ul/sdcc-doc-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
+  echo uploading ul/sdcc-doc-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-doc-${ver}.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}/
 
-  echo uploading ul/sdcc-doc-${ver}.zip ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
-  rsync -v --progress -e ssh ul/sdcc-doc-${ver}.zip ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}
+  echo uploading ul/sdcc-doc-${ver}.zip ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-doc-${ver}.zip ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-doc/${raw_ver}/
 
-  echo uploading ul/sdcc-${ver}-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
-  rsync -v --progress -e ssh ul/sdcc-${ver}-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}
+  echo uploading ul/sdcc-${ver}-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-${ver}-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win32/${raw_ver}/
 
-  echo uploading ul/sdcc-${ver}-x64-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win64/${raw_ver}
-  rsync -v --progress -e ssh ul/sdcc-${ver}-x64-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win64/${raw_ver}
+  echo uploading ul/sdcc-${ver}-x64-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win64/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-${ver}-x64-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win64/${raw_ver}/
 
-  echo uploading ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
-  rsync -v --progress -e ssh ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}
+  echo uploading ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}/
 
-  echo uploading ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
-  rsync -v --progress -e ssh ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}
+  echo uploading ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}/
 }
 
 

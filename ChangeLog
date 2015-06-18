@@ -1,5 +1,11 @@
 2015-06-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* .version,
+	* doc/INSTALL.txt,
+	* doc/sdccman.lyx: version 3.5.0
+
+2015-06-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* src/SDCCmain.c (preProcess): reverted removal of SDCC macro
 	* src/stm8/gen.c (genLeftShiftLiteral): hushed a compiler warning
 	* support/regression/tests/gcc-torture-execute-960218-1.c,

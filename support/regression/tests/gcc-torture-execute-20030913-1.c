@@ -11,28 +11,27 @@
 /* Assignments via pointers pointing to global variables were being killed
    by SSA-DCE.  Test contributed by Paul Brook <paul@nowt.org>  */
 
-int glob; 
- 
-void 
-fn2(int ** q) 
-{ 
-  *q = &glob; 
-} 
- 
-void test() 
-{ 
-  int *p; 
- 
-  fn2(&p); 
- 
-  *p=42; 
-} 
- 
+int globl;
+
 void
-testTortureExecute (void)
-{ 
-  test(); 
-  if (glob != 42) ASSERT(0); 
-  return; 
+fn2(int ** q)
+{
+  *q = &globl;
 }
 
+void foo(void)
+{
+  int *p;
+
+  fn2(&p);
+
+  *p=42;
+}
+
+void
+testTortureExecute (void)
+{
+  foo();
+  ASSERT(globl == 42);
+  return;
+}

@@ -5269,8 +5269,8 @@ genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode
 
   if (size == 1 && aopRS (shiftop) && shCount)
     {
-      int std_bytes, swap_bytes, mul_bytes;
-      int std_cycles, swap_cycles, mul_cycles;
+      int std_bytes, swap_bytes = 0, mul_bytes = 0;
+      int std_cycles, swap_cycles = 0, mul_cycles = 0;
       bool swap_possible = FALSE;
       bool mul_possible = FALSE;
 

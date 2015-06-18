@@ -2009,6 +2009,15 @@ preProcess (char **envp)
         addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
 
+      if (options.std_sdcc)
+        {
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 20);
+          dbuf_printf (&dbuf, "-DSDCC=%d%d%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+        }
+
       /* add SDCC revision number */
       {
         struct dbuf_s dbuf;

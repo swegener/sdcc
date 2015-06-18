@@ -8,11 +8,11 @@
 #pragma std_c99
 #endif
 
-int glob;
+int globl;
 
 int g (int x)
 {
-  glob = x;
+  globl = x;
   return 0;
 }
 
@@ -27,8 +27,6 @@ void
 testTortureExecute (void)
 {
   f (3);
-  if (glob != -4)
-    ASSERT (0);
+  ASSERT (globl == -4);
   return;
 }
-

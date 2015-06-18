@@ -1,3 +1,12 @@
+2015-06-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCmain.c (preProcess): reverted removal of SDCC macro
+	* src/stm8/gen.c (genLeftShiftLiteral): hushed a compiler warning
+	* support/regression/tests/gcc-torture-execute-960218-1.c,
+	* support/regression/tests/gcc-torture-execute-20030913-1.c: renamed test()
+	  to prevent double testing, renamed glob to prevent name conflict	
+	* support/scripts/sdcc.nsi: removed dedication to Borut Razem
+
 2015-06-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/scripts/repack_release.sh: changed mac osx snapshot source,

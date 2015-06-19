@@ -54,7 +54,7 @@ sub is_header($)
       my $found = 0;
       foreach (@headers) {
         my $content = trim($_->as_text());
-        if ($content eq $header) {
+        if ($content =~ /\Q$header\E/i) {
           $found = 1;
           last;
         }

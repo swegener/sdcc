@@ -1,3 +1,8 @@
+2015-06-20 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/scripts/gen_known_bugs.pl: fixed by Raphael Neider for changed
+	  SourceForge pages
+
 2015-06-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* .version,

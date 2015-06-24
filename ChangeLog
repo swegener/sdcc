@@ -1,3 +1,13 @@
+2015-06-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc.c:
+	  Fix bug #2389.
+	* src/SDCCglue.c,
+	  src/SDCCmain.c,
+	  src/SDCCutil.c,
+	  src/SDCCutil.h:
+	  Remove build date from version string to make reproducible builds easier.
+
 2015-06-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* Small Device C Compiler 3.5.0 released

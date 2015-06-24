@@ -2008,6 +2008,20 @@ preProcess (char **envp)
         dbuf_printf (&dbuf, "-D__SDCC=%d_%d_%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
         addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
+      {
+        struct dbuf_s dbuf;
+
+        dbuf_init (&dbuf, 20);
+        dbuf_printf (&dbuf, "-D__SDCC_VERSION_MAJOR=%d", SDCC_VERSION_HI);
+        addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+      }
+      {
+        struct dbuf_s dbuf;
+
+        dbuf_init (&dbuf, 20);
+        dbuf_printf (&dbuf, "-D__SDCC_VERSION_MINOR=%d", SDCC_VERSION_LO);
+        addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+      }
 
       if (options.std_sdcc)
         {

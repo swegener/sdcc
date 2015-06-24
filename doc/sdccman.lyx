@@ -38654,7 +38654,7 @@ Defines created by the compiler
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="17" columns="2">
+<lyxtabular version="3" rows="19" columns="2">
 <features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top" width="3in">
@@ -39454,9 +39454,55 @@ when
 \begin_inset Text
 
 \begin_layout Plain Layout
+__SDCC_VERSION_MAJOR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Always defined.
+ SDCC major version number.
+ E.g.
+ 3 for SDCC 3.5.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+__SDCC_VERSION_MINOR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Always defined.
+ SDCC minor version number.
+ E.g.
+ 5 for SDCC 3.5.0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 __SDCC_REVISION
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 SDCC!Defines!SDCC

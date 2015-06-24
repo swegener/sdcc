@@ -1,3 +1,8 @@
+2015-06-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+        * support/regression/collate-results.py:
+          Fix the bug that an abnormal stop in reg-rest can not be detected.
+
 2015-06-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc.c:

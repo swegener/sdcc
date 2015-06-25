@@ -1,3 +1,14 @@
+2015-06-25 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure:
+	* configure.in:
+	* device/non-free/include/Makefile.in:
+	  Fix the bug "make uninstall" left empty directory. 
+	* src/SDCCBBlock.c:
+	  Apply patch #158 to fix bug #1693.
+	* support/regression/tests/version.c:
+	  Fix the failure in "make test-host".
+
 2015-06-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmain.c,
@@ -7,8 +18,8 @@
 
 2015-06-24 Ben Shi <powerstudio1st AT 163 DOT com>
 
-        * support/regression/collate-results.py:
-          Fix the bug that an abnormal stop in reg-rest can not be detected.
+	* support/regression/collate-results.py:
+	  Fix the bug that an abnormal stop in reg-rest can not be detected.
 
 2015-06-24 Philipp Klaus Krause <pkk AT spth.de>
 

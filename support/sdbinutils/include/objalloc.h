@@ -91,7 +91,7 @@ extern void *_objalloc_alloc (struct objalloc *, unsigned long);
      if (__len == 0)							\
        __len = 1;							\
      __len = (__len + OBJALLOC_ALIGN - 1) &~ (OBJALLOC_ALIGN - 1);	\
-     (__len <= __o->current_space					\
+     (__len != 0 && __len <= __o->current_space				\
       ? (__o->current_ptr += __len,					\
 	 __o->current_space -= __len,					\
 	 (void *) (__o->current_ptr - __len))				\

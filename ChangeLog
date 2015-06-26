@@ -1,3 +1,11 @@
+2015-06-26 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* device/include/float.h:
+	  Hide sdcc library private macros.
+	* support/sdbinutils/include/objalloc.h:
+	* support/sdbinutils/libiberty/objalloc.c:
+	  Apply patches from GNU.
+
 2015-06-25 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* configure:

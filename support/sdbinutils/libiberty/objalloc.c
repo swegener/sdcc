@@ -110,16 +110,22 @@ objalloc_create (void)
 }
 
 /* Allocate space from an objalloc structure.  */
-
 PTR
-_objalloc_alloc (struct objalloc *o, unsigned long len)
+_objalloc_alloc (struct objalloc *o, unsigned long original_len)
 {
+  unsigned long len = original_len;
+
   /* We avoid confusion from zero sized objects by always allocating
      at least 1 byte.  */
   if (len == 0)
     len = 1;
 
   len = (len + OBJALLOC_ALIGN - 1) &~ (OBJALLOC_ALIGN - 1);
+
+  /* Check for overflow in the alignment operation above and the
+     malloc argument below. */
+  if (len + CHUNK_HEADER_SIZE < original_len)
+    return NULL;
 
   if (len <= o->current_space)
     {

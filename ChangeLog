@@ -1,3 +1,10 @@
+2015-06-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c,
+	  doc/sdccman.lyx,
+	  support/regression/tests/version.c:
+	  Implement patchlevel macro RFE #441.
+
 2015-06-26 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* device/include/float.h:

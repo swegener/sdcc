@@ -1,3 +1,8 @@
+2015-06-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c:
+	  Adjust buffer sizes RFE #441.
+
 2015-06-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmain.c,

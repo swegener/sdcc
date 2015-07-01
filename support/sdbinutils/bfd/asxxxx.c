@@ -1058,6 +1058,7 @@ asxxxx_print_symbol (bfd *abfd,
     }
 }
 
+#define asxxxx_find_line                            _bfd_nosymbols_find_line
 #define asxxxx_close_and_cleanup                    _bfd_generic_close_and_cleanup
 #define asxxxx_bfd_free_cached_info                 _bfd_generic_bfd_free_cached_info
 #define asxxxx_new_section_hook                     _bfd_generic_new_section_hook

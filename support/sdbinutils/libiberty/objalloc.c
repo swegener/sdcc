@@ -1,5 +1,5 @@
 /* objalloc.c -- routines to allocate memory for objects
-   Copyright 1997 Free Software Foundation, Inc.
+   Copyright 1997-2012 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Solutions.
 
 This program is free software; you can redistribute it and/or modify it
@@ -110,6 +110,7 @@ objalloc_create (void)
 }
 
 /* Allocate space from an objalloc structure.  */
+
 PTR
 _objalloc_alloc (struct objalloc *o, unsigned long original_len)
 {

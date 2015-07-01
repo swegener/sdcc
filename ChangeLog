@@ -1,3 +1,8 @@
+2015-07-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/mcs51/peep.c:
+	  Add NULL pointer check.
+
 2015-06-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmain.c:

@@ -1,3 +1,8 @@
+2015-07-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c:
+	  Patch from z88dk to allow comments in between rule and condition.
+
 2015-07-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merge upstream binutils 2.25 by merging binutils branch into trunk.

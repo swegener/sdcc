@@ -471,7 +471,7 @@ EXTRA_SCRIPTS = embedspu
 BFDTEST1_PROG = bfdtest1
 BFDTEST2_PROG = bfdtest2
 TEST_PROGS = $(BFDTEST1_PROG) $(BFDTEST2_PROG)
-RENAMED_PROGS = $(NM_PROG) $(STRIP_PROG) $(DEMANGLER_PROG)
+RENAMED_PROGS = $(NM_PROG)
 
 # Stuff that goes in tooldir/ if appropriate.
 TOOL_PROGS = sdnm sdar sdranlib sdobjcopy

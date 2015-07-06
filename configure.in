@@ -563,9 +563,14 @@ fi
 # include_dir_suffix:
 # *nix default: "sdcc/include"
 
+AC_ARG_VAR([inclib_dir_suffix], [appended to datadir to define SDCC's include/lib directory])
+if test "${inclib_dir_suffix}" = ""; then
+    inclib_dir_suffix="sdcc"
+fi
+
 AC_ARG_VAR([include_dir_suffix], [appended to datadir to define SDCC's include directory])
 if test "${include_dir_suffix}" = ""; then
-    include_dir_suffix="sdcc/include"
+    include_dir_suffix="${inclib_dir_suffix}/include"
 fi
 
 AC_ARG_VAR([non_free_inclib_dir_suffix], [appended to datadir to define SDCC's non-free include/lib directory])
@@ -585,7 +590,7 @@ fi
 # *nix default: "sdcc/lib"
 AC_ARG_VAR([lib_dir_suffix], [appended to datadir to define SDCC's library root directory])
 if test "${lib_dir_suffix}" = ""; then
-    lib_dir_suffix="sdcc/lib"
+    lib_dir_suffix="${inclib_dir_suffix}/lib"
 fi
 
 # non_free_lib_dir_suffix:
@@ -1025,13 +1030,14 @@ sdcc ${VERSION} is now configured for
   Enable libgc:         ${OPT_ENABLE_LIBGC}
 
   Install paths:
-    binary files:       ${exec_prefix}
-    include files:      ${datadir}/${include_dir_suffix}
-    non-free files:     ${datadir}/${non_free_inclib_dir_suffix}
+    binary files:           ${exec_prefix}
+    include/library files:  ${datadir}/${inclib_dir_suffix}
+    include files:          ${datadir}/${include_dir_suffix}
+    library files:          ${datadir}/${lib_dir_suffix}
+    non-free files:         ${datadir}/${non_free_inclib_dir_suffix}
     non-free include files: ${datadir}/${non_free_include_dir_suffix}
-    library files:      ${datadir}/${lib_dir_suffix}
     non-free library files: ${datadir}/${non_free_lib_dir_suffix}
-    documentation:      ${docdir}
+    documentation:          ${docdir}
 
     prefix:             ${prefix}
     datadir:            ${datadir}

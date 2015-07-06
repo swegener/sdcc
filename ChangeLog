@@ -1,3 +1,12 @@
+2015-07-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure:
+	* configure.in:
+	* device/include/Makefile.in:
+	* support/sdbinutils/Makefile.in:
+	* support/sdbinutils/binutils/Makefile.in:
+	  Make "make install" and "make uninstall" more clear.
+
 2015-07-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/sdbinutils/binutils/*

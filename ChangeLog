@@ -1,3 +1,8 @@
+2015-07-08 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/sdbinutils/bfd/asxxxx.c:
+	  Fix a bug in check .rel format while there are comments.
+
 2015-07-06 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* configure:

@@ -1,3 +1,10 @@
+2015-07-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Fix comments.
+	* device/lib/stm8/_mulint.s:
+	  Faster, smaller integer multiplication.
+
 2015-07-08 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/sdbinutils/bfd/asxxxx.c:

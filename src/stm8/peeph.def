@@ -620,7 +620,7 @@ replace restart {
 	ld	a, xl
 } by {
 	rrwa	x
-	; peephole r3 used rlwa.
+	; peephole r3 used rrwa.
 } if notUsed('xl')
 
 replace restart {
@@ -628,7 +628,7 @@ replace restart {
 	ld	a, yl
 } by {
 	rrwa	y
-	; peephole r4 used rlwa.
+	; peephole r4 used rrwa.
 } if notUsed('yl')
 
 // Barrier, so nothing else ever sees the jump-on-false optmiization.

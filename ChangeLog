@@ -1,3 +1,25 @@
+2015-07-12 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure.in:
+	* debugger/mcs51/configure:
+	* debugger/mcs51/configure.in:
+	* device/lib/pic14/Makefile.in:
+	* device/lib/pic14/aclocal.m4:
+	* device/lib/pic14/config.h.in:
+	* device/lib/pic14/configure.in:
+	* device/lib/pic14/libm/Makefile.in:
+	* device/lib/pic14/libsdcc/enhanced/Makefile.in:
+	* device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.in:
+	* device/lib/pic14/libsdcc/regular/Makefile.in:
+	* device/non-free/lib/pic14/configure:
+	* device/non-free/lib/pic14/configure.in:
+	* sim/ucsim/configure.in:
+	* support/cpp/configure:
+	* support/cpp/configure.in:
+	* support/packihx/configure:
+	* support/packihx/configure.in:
+	  Move all configure.in to configure.ac and update with autoconf 2.69.
+
 2015-07-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

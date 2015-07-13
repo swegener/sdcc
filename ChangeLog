@@ -1,5 +1,13 @@
 2015-07-13 Ben Shi <powerstudio1st AT 163 DOT com>
 
+	* support/cpp/configure.ac:
+	* support/cpp/configure:
+	* support/cpp/Makefile.in:
+	* Makefile.common.in:
+	  Fix small spots.
+
+2015-07-13 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* sdas/linksrc/lklex.c:
 	  Support unicode character in sdld's command line.
 	* sdas/linksrc/lkbank.c:

@@ -199,6 +199,7 @@ AC_C_BIGENDIAN
 AC_CHECK_PROG(have_mktemp_command, mktemp, yes, no)
 
 AC_CHECK_PROG(STRIP, strip, strip, :)
+AC_CHECK_PROG(AR, ar, ar, :)
 
 # See if the stage1 system preprocessor understands the ANSI C
 # preprocessor stringification operator.  (Used by symcat.h.)

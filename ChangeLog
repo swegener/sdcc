@@ -1,3 +1,10 @@
+2015-07-13 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lklex.c:
+	  Support unicode character in sdld's command line.
+	* sdas/linksrc/lkbank.c:
+	  Remove unsupported ".s28" and ".s37" file extensions.
+
 2015-07-12 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* configure.in:

@@ -2996,7 +2996,7 @@ genFunction (iCode *ic)
   // Workaround for hardware bug: Undocumented bit 6 of the condition code register needs to be cleared before div/divw. It is set during div/divw execution, and then reset. Without the workaround, the div and divw inside interrupt routines will give wrong results when the interrupt itself occured while another div or divw was executed.
   // For more information see sections titled "Unexpected DIV/DIVW instruction result in ISR" in various STM8 errata notes (apparently all STM8 are affected).
   // The workaround here is the one recommended by STM in the erratum. There might be better ways to do it.
-  if (IFFUNC_ISISR (sym->type))
+  if (IFFUNC_ISISR (sym->type) && !sym->div_flag_safe)
     {
       D (emit2 (";", "Reset bit 6 of reg CC. Hardware bug workaround."));
       emit2 ("push", "cc");
@@ -5699,7 +5699,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
-  // div can be cheper than a sequence of shifts.
+  // div can be cheaper than a sequence of shifts.
   if (!sign && shCount < 8 &&
     (shCount > 3 + !regDead (A_IDX, ic) * 2 && (size == 2 && aopInReg (shiftop, 0, X_IDX) || size == 1 && aopInReg (shiftop, 0, XL_IDX) && xh_zero) ||
     shCount * 2 > 4 + !regDead (A_IDX, ic) * 2 && (size == 2 && aopInReg (shiftop, 0, Y_IDX) || size == 1 && aopInReg (shiftop, 0, YL_IDX) && yh_zero)))
@@ -5716,7 +5716,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
-  // divw can be cheper than a sequence of shifts.
+  // divw can be cheaper than a sequence of shifts.
   if (!sign && size == 2 && shCount > 5 && regDead (Y_IDX, ic) && aopInReg (shiftop, 0, X_IDX))
     {
       emit2 ("ldw", "y, #0x%04x", 1 << shCount);

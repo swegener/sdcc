@@ -1,3 +1,11 @@
+2015-08-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCCralloc.hpp,
+	  src/stm8/gen.c:
+	  Static code analysis to omit stm8 division workaround when safe to do so (RFE #448).
+
 2015-07-31 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/gcc-torture-execute-stdarg-5.c:

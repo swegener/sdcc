@@ -1,3 +1,8 @@
+2015-08-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Cheaper stm8 division workaround (RFE #449).
+
 2015-08-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.h,

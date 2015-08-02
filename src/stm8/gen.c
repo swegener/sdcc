@@ -2999,12 +2999,21 @@ genFunction (iCode *ic)
   if (IFFUNC_ISISR (sym->type) && !sym->div_flag_safe)
     {
       D (emit2 (";", "Reset bit 6 of reg CC. Hardware bug workaround."));
+#if 0
+      // The workaorund recommended by STM. 6 bytes, 7 cycles (5 nominally, two more due to pipeline stalls)
       emit2 ("push", "cc");
       emit2 ("pop", "a");
       emit2 ("and", "a, #0xbf");
       emit2 ("push", "a");
       emit2 ("pop", "cc");
       cost (6, 5);
+#else
+      // The workaround obtained by further investigation of RFE #449. 3 bytes, 3-4 cycles.
+      if (!optimize.codeSize)
+        emit3 (A_CLR, ASMOP_A, 0);	// Zero accumulator to reduce cycle cost in following division.
+      emit2 ("div", "x, a");	// According to measurements on the STM8S208MB and STM8L152C6, div takes 2-3 cycles for divisions by zero and 2-17 cycles in general.
+      cost (1, 3);
+#endif
     }
 
   if (stm8_extend_stack) // Setup for extended stack access.

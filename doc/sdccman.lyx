@@ -9275,13 +9275,6 @@ int i,j; /* is valid in ANSI but not valid in SDCC */
 \end_layout
 
 \end_deeper
-\begin_layout Itemize
-Warning for qualifiers occuring multiple times in qualifier-specifier lists
- is not emitted (sdcc always behaves according to the ISO C99 / ISO C11
- standard in this respect).
- 
-\end_layout
-
 \begin_layout Standard
 Some features of this standard are not supported in some ports:
 \end_layout

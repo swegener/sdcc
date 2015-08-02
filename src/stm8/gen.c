@@ -3008,7 +3008,7 @@ genFunction (iCode *ic)
       emit2 ("pop", "cc");
       cost (6, 5);
 #else
-      // The workaround obtained by further investigation of RFE #449. 3 bytes, 3-4 cycles.
+      // The workaround obtained by further investigation of RFE #449. Experiments on STM8S208MB and STM8L152C6 show that div resets bit 6 of cc.
       if (!optimize.codeSize)
         emit3 (A_CLR, ASMOP_A, 0);	// Zero accumulator to reduce cycle cost in following division.
       emit2 ("div", "x, a");	// According to measurements on the STM8S208MB and STM8L152C6, div takes 2-3 cycles for divisions by zero and 2-17 cycles in general.

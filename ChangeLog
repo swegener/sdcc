@@ -2,6 +2,8 @@
 
 	* src/stm8/gen.c:
 	  Cheaper stm8 division workaround (RFE #449).
+	* doc/sdccman.lyx:
+	  Update standard compliance documentation to reflect recently implemented feature.
 
 2015-08-01 Philipp Klaus Krause <pkk AT spth.de>
 

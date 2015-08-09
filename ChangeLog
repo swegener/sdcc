@@ -1,3 +1,8 @@
+2015-08-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Fix bug #2407 using fix suggested by alvin.
+
 2015-08-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

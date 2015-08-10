@@ -1,3 +1,11 @@
+2015-08-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Fix bug #2408.
+	* src/z80/peeph-r2k.def,
+	* src/z80/peeph-tlcs90.def:
+	  Synced with z80 peepholes.
+
 2015-08-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:

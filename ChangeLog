@@ -1,3 +1,13 @@
+2015-08-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  support/regression/tests/gcc-torture-execute-920721-3.c,
+	  support/regression/tests/gcc-torture-execute-pr34176.c,
+	  support/regression/tests/implicit_int.c:
+	  Diagnostic for implicit int.
+
 2015-08-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:

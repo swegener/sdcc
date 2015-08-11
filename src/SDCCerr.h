@@ -251,6 +251,8 @@ enum {
   E_Z88DK_FASTCALL_PARAMETERS   = 222, /* invalid number of parameters in __z88dk_fastcall */
   E_Z88DK_FASTCALL_PARAMETER    = 223, /* invalid parameter type in __z88dk_fastcall */
   W_REPEAT_QUALIFIER            = 224, /* the same qualifier appears more than once */
+  W_NO_TYPE_SPECIFIER           = 225, /* type specifier missing in declaration */
+  E_NO_TYPE_SPECIFIER           = 226, /* type specifier missing in declaration */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

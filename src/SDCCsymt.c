@@ -630,6 +630,8 @@ checkTypeSanity (sym_link * etype, const char *name)
   if (!SPEC_NOUN (etype))
     {
       SPEC_NOUN (etype) = V_INT;
+      if (!(SPEC_SHORT (etype) || SPEC_LONG (etype) || SPEC_LONGLONG (etype) || SPEC_SIGN (etype) || SPEC_USIGN (etype)))
+        werror (options.std_c99 ? E_NO_TYPE_SPECIFIER : W_NO_TYPE_SPECIFIER, name);
     }
 
   /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */

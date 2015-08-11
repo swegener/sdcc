@@ -505,6 +505,10 @@ struct
     "ivalid parameter type in __z88dk_fastcall", 0 },
   { W_REPEAT_QUALIFIER, ERROR_LEVEL_WARNING,
     "duplicate specifier '%s'", 0 },
+  { W_NO_TYPE_SPECIFIER, ERROR_LEVEL_WARNING,
+    "no type specifier for '%s'", 0 },
+  { E_NO_TYPE_SPECIFIER, ERROR_LEVEL_ERROR,
+    "no type specifier for '%s'", 0 },
 };
 
 /* -------------------------------------------------------------------------------

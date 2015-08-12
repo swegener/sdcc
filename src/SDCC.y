@@ -104,6 +104,7 @@ bool uselessDecl = TRUE;
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
 %token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
+%token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 %token ASM
 
 %type <yyint> Interrupt_storage
@@ -131,6 +132,7 @@ bool uselessDecl = TRUE;
 %type <asts> expression_statement selection_statement iteration_statement
 %type <asts> jump_statement function_body else_statement string_literal_val
 %type <asts> critical_statement asm_statement label
+%type <asts> generic_selection generic_assoc_list generic_association
 %type <dsgn> designator designator_list designation designation_opt
 %type <ilist> initializer initializer_list
 %type <yyint> unary_operator assignment_operator struct_or_union
@@ -299,10 +301,25 @@ primary_expr
    | CONSTANT        { $$ = newAst_VALUE ($1); }
    | string_literal_val
    | '(' expr ')'    { $$ = $2; }
+   | generic_selection
+   ;
+
+generic_selection
+   : GENERIC '(' assignment_expr ',' generic_assoc_list ')' { $$ = newNode (GENERIC, $3, $5); }
+   ;
+
+generic_assoc_list
+   : generic_association { $$ = newNode  (GENERIC_ASSOC_LIST, NULL, $1); }
+   | generic_assoc_list ',' generic_association { $$ = newNode  (GENERIC_ASSOC_LIST, $1, $3); }
+   ;
+
+generic_association
+   : type_name ':' assignment_expr { $$ = newNode  (GENERIC_ASSOCIATION, newAst_LINK($1), $3); }
+   | DEFAULT ':' assignment_expr { $$ = newNode  (GENERIC_ASSOCIATION,NULL,$3); }
    ;
 
 string_literal_val
-    : STRING_LITERAL {
+   : STRING_LITERAL {
                        int cnt = 1;
                        int max = 253, min = 1;
                        char fb[256];

@@ -509,6 +509,12 @@ struct
     "no type specifier for '%s'", 0 },
   { E_NO_TYPE_SPECIFIER, ERROR_LEVEL_ERROR,
     "no type specifier for '%s'", 0 },
+  { E_MULTIPLE_DEFAULT_IN_GENERIC, ERROR_LEVEL_ERROR,
+    "multiple default expressions in generic association", 0 },
+  { E_MULTIPLE_MATCHES_IN_GENERIC, ERROR_LEVEL_ERROR,
+    "multiple matching expressions in generic association", 0 },
+  { E_NO_MATCH_IN_GENERIC, ERROR_LEVEL_ERROR,
+    "no matching expression in generic association", 0 },
 };
 
 /* -------------------------------------------------------------------------------

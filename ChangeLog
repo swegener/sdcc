@@ -1,3 +1,14 @@
+2015-08-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  src/SDCC.y,
+	  src/SDCCast.c,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  support/regression/tests/generic.c,
+	  doc/sdccman.lyx:
+	  Implement C11 generic selections.
+
 2015-08-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c,

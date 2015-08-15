@@ -1744,6 +1744,7 @@ labeled_statement
        /* closing brace as part of the rule to avoid an */
        /* unacceptably large number of shift/reduce conflicts */
        /* and then reinsert it to be parsed a second time. */
+       werror(W_LABEL_WITHOUT_STATEMENT);
        $$ = $1;
        yychar = '}';
      };

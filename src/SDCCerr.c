@@ -515,6 +515,8 @@ struct
     "multiple matching expressions in generic association", 0 },
   { E_NO_MATCH_IN_GENERIC, ERROR_LEVEL_ERROR,
     "no matching expression in generic association", 0 },
+  { W_LABEL_WITHOUT_STATEMENT, ERROR_LEVEL_WARNING,
+    "label without statement", 0},
 };
 
 /* -------------------------------------------------------------------------------

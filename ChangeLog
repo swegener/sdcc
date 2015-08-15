@@ -3,6 +3,12 @@
 	* src/SDCCast.c,
 	  support/regression/tests/array.c:
 	  Implement RFE #454 for index[array] access.
+	* src/SDCC.y,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c:
+	  Emit warning for non-standard label without statement.
+	* support/regression/tests/generic.c:
+	  Disable est for host, since older host compilers are still in use.
 
 2015-08-12 Philipp Klaus Krause <pkk AT spth.de>
 

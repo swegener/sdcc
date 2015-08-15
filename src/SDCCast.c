@@ -1329,7 +1329,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
 
   /* if this is a pointer & right is a literal array then */
   /* just assignment will do                              */
-  if (IS_PTR (type) && ((IS_LITERAL (iexpr->etype) || SPEC_SCLS (iexpr->etype) == S_CODE) && IS_ARRAY (iexpr->ftype)))
+  if (IS_PTR (type) && ((IS_LITERAL (iexpr->etype) || (IS_SPEC (iexpr->etype) && SPEC_SCLS (iexpr->etype) == S_CODE)) && IS_ARRAY (iexpr->ftype)))
     return newNode ('=', sym, iexpr);
 
   /* left side is an array so we have to assign each element */
@@ -1355,7 +1355,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
       return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
     }
 
-  if ((IS_LITERAL (iexpr->etype) || SPEC_SCLS (iexpr->etype) == S_CODE) && IS_ARRAY (iexpr->ftype))
+  if ((IS_LITERAL (iexpr->etype) || (IS_SPEC (iexpr->etype) && SPEC_SCLS (iexpr->etype) == S_CODE)) && IS_ARRAY (iexpr->ftype))
     {
       /* for each character generate an assignment */
       /* to the array element */

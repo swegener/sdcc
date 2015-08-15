@@ -1,3 +1,9 @@
+2015-08-15 Ben Shi <powerstudio1st AT 163 DOT com>
+        * src/SDCCast.c:
+          Fix a bug in storage class check.
+        * support/regression/tests/gcc-torture-execute-20020402-3.c:
+          Enable test case.
+
 2015-08-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c,

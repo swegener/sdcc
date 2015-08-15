@@ -1,3 +1,9 @@
+2015-08-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  support/regression/tests/array.c:
+	  Implement RFE #454 for index[array] access.
+
 2015-08-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,

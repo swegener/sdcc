@@ -3146,7 +3146,15 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*        array node          */
       /*----------------------------*/
     case '[':
-      /* first check if this is an array or a pointer */
+      /* Swap trees if right side is array or a pointer */
+      if (IS_ARRAY (RTYPE (tree)) || IS_PTR (RTYPE (tree)))
+        {
+          ast *tTree = tree->left;
+          tree->left = tree->right;
+          tree->right = tTree;
+        }
+
+      /* check if this is an array or a pointer */
       if ((!IS_ARRAY (LTYPE (tree))) && (!IS_PTR (LTYPE (tree))))
         {
           werrorfl (tree->filename, tree->lineno, E_NEED_ARRAY_PTR, "[]");

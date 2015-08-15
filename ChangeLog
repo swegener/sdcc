@@ -8,7 +8,7 @@
 	  src/SDCCerr.c:
 	  Emit warning for non-standard label without statement.
 	* support/regression/tests/generic.c:
-	  Disable est for host, since older host compilers are still in use.
+	  Disable test for host, since older host compilers are still in use.
 
 2015-08-12 Philipp Klaus Krause <pkk AT spth.de>
 

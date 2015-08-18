@@ -5737,6 +5737,12 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+if test "x${ac_cv_sizeof_long}" = "x8"; then
+#ifdef __CYGWIN__
+  LDFLAGS="$LDFLAGS -Wl,--stack,4194304"
+#endif
+fi
+
 # Checking whether byte ordering is bigendian
 # ===========================================================================
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether byte ordering is bigendian" >&5

@@ -1,3 +1,8 @@
+2015-08-17 Ben Shi <powerstudio1st AT 163 DOT com>
+	* configure.ac:
+	* configure:
+	  Extend stack size on cygwin64.
+
 2015-08-15 Ben Shi <powerstudio1st AT 163 DOT com>
         * src/SDCCast.c:
           Fix a bug in storage class check.

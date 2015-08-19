@@ -1,4 +1,9 @@
 2015-08-19 Ben Shi <powerstudio1st AT 163 DOT com>
+	* configure.ac:
+	* configure:
+	  Correct build failure on sparc64-netbsd.
+
+2015-08-19 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/condopptr.c:
 	  Add more test.
 	* src/SDCC.y:

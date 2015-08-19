@@ -527,10 +527,10 @@ AC_DEFINE_UNQUOTED(TYPE_UWORD,  unsigned $TYPE_WORD,  [XXX])
 AC_DEFINE_UNQUOTED(TYPE_UDWORD, unsigned $TYPE_DWORD, [XXX])
 AC_DEFINE_UNQUOTED(TYPE_UQWORD, unsigned $TYPE_QWORD, [XXX])
 
-if [[[ $host =~ "x86_64" ]]] && [[[ $host =~ "cygwin" ]]]
-then
-  LDFLAGS="$LDFLAGS -Wl,--stack,4194304"
-fi
+case "${host}" in
+  *x86_64*cygwin*)
+    LDFLAGS="$LDFLAGS -Wl,--stack,4194304"
+esac
 
 # Checking whether byte ordering is bigendian
 # ===========================================================================

@@ -1,3 +1,12 @@
+2015-08-19 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/tests/condopptr.c:
+	  Add more test.
+	* src/SDCC.y:
+	  Improve conditional expression.
+	* configure.ac:
+	* configure:
+	  Correct spots in previous commit.
+
 2015-08-17 Ben Shi <powerstudio1st AT 163 DOT com>
 	* configure.ac:
 	* configure:

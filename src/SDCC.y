@@ -474,7 +474,7 @@ logical_or_expr
 
 conditional_expr
    : logical_or_expr
-   | logical_or_expr '?' { seqPointNo++;} logical_or_expr ':' conditional_expr
+   | logical_or_expr '?' { seqPointNo++;} expr ':' conditional_expr
                      {
                         $$ = newNode(':',$4,$6);
                         $$ = newNode('?',$1,$$);

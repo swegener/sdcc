@@ -639,7 +639,7 @@ resolveSymbols (ast * tree)
       /* if not found in the symbol table */
       /* mark it as undefined & assume it */
       /* is an integer in data space      */
-      if (!csym && !tree->opval.val->sym->implicit)
+      if (!csym && !tree->opval.val->sym->implicit && !tree->opval.val->type)
         {
           /* if this is a function name then */
           /* mark it as returning an int     */

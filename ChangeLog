@@ -1,4 +1,8 @@
 2015-08-22 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/stm8/peep.c:
+	  Fix a bug in peephole rule condition notUsed().
+
+2015-08-22 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/bug-2188.c:
 	* src/SDCCast.c:
 	  Apply patch #248 by Pavel Pisa <pisa@cmp.felk.cvut.cz>.

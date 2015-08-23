@@ -661,9 +661,9 @@ stm8MightRead(const lineNode *pl, const char *what)
         {
           char buf[64], *p;
           strcpy (buf, pl->line);
-          if ((p = strstr (buf, "0x")) != NULL || (p = strstr (buf, "0X")) != NULL)
+          if (!!(p = strstr (buf, "0x")) || !!(p = strstr (buf, "0X")))
             p[0] = p[1] = ' ';
-          if ((p = strchr (buf, '(')) != NULL && strchr (p, extra) != NULL)
+          if (!!(p = strchr (buf, '(')) && !!strchr (p, extra))
             return TRUE;
         }
     }

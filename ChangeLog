@@ -1,18 +1,27 @@
+2015-08-27 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sim/ucsim/packages_in.mk:
+	  Fix a bug: simulator sz80 is not built if only z80 port is enabled.
+
 2015-08-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/stm8/peep.c:
 	  Fix a bug in peephole rule condition notUsed().
 
 2015-08-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/bug-2188.c:
 	* src/SDCCast.c:
 	  Apply patch #248 by Pavel Pisa <pisa@cmp.felk.cvut.cz>.
 
 2015-08-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* configure.ac:
 	* configure:
 	  Correct build failure on sparc64-netbsd.
 
 2015-08-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/condopptr.c:
 	  Add more test.
 	* src/SDCC.y:
@@ -22,11 +31,13 @@
 	  Correct spots in previous commit.
 
 2015-08-17 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* configure.ac:
 	* configure:
 	  Extend stack size on cygwin64.
 
 2015-08-15 Ben Shi <powerstudio1st AT 163 DOT com>
+
         * src/SDCCast.c:
           Fix a bug in storage class check.
         * support/regression/tests/gcc-torture-execute-20020402-3.c:

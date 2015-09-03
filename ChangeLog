@@ -1,3 +1,8 @@
+2015-09-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pic14/peeph.def:
+	  Fix bug #2415.
+
 2015-08-27 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sim/ucsim/packages_in.mk:

@@ -4,6 +4,9 @@
 	  Fix bug #2415.
 	* src/stm8/peeph.def:
 	  Implement some rules for bit complement.
+	* src/SDCCval.c,
+	  support/regression/tests/generic.c:
+	  Fix bug #2411.
 
 2015-08-27 Ben Shi <powerstudio1st AT 163 DOT com>
 

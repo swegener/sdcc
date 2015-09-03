@@ -2,6 +2,8 @@
 
 	* src/pic14/peeph.def:
 	  Fix bug #2415.
+	* src/stm8/peeph.def:
+	  Implement some rules for bit complement.
 
 2015-08-27 Ben Shi <powerstudio1st AT 163 DOT com>
 

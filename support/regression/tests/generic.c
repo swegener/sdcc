@@ -6,6 +6,9 @@
 
 int i;
 long l;
+enum {e};
+typedef char t;
+t c;
 
 void testGeneric(void)
 {
@@ -14,6 +17,8 @@ void testGeneric(void)
   ASSERT (_Generic(l, default : 0, int : 1, long int : 2) == 2);
   ASSERT (_Generic(l, default : 0, int : 1, char : 2) == 0);
   ASSERT (_Generic('c', default : 0, int : 1, char : 2) == 1);
+  ASSERT (_Generic(e, default : 0, int : 1, char : 2) == 1);
+  ASSERT (_Generic(c, default : 0, int : 1, char : 2) == 2);
 #endif
 }
 

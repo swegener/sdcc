@@ -26,6 +26,14 @@ get_global (void) __critical
 }
 #endif
 
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_tlcs90)
+// Check that param offsets are correctly adjusted for critial functions
+long critical_function(long a, long b, long c) __critical
+{
+  return a + b + c;
+}
+#endif
+
 void
 testCritical (void)
 {
@@ -60,6 +68,10 @@ testCritical (void)
   ASSERT (EA);
 #else
   ASSERT (1);
+#endif
+
+#if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_tlcs90)
+  ASSERT(critical_function(1, 1, 1) == 3);
 #endif
 }
 

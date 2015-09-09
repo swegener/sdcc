@@ -4351,6 +4351,7 @@ genFunction (const iCode * ic)
      doesn't seem to get reset anywhere else.
    */
   _G.receiveOffset = 0;
+  _G.stack.param_offset = 0;
 
   /* Record the last function name for debugging. */
   _G.lastFunctionName = sym->rname;
@@ -4410,6 +4411,7 @@ genFunction (const iCode * ic)
               emit2 ("!di");
               //save P/O flag
               emit2 ("push af");
+              _G.stack.param_offset += 2;
             }
         }
     }
@@ -4418,10 +4420,6 @@ genFunction (const iCode * ic)
     {
       emit2 ("!profileenter");
     }
-
-  /* PENDING: callee-save etc */
-
-  _G.stack.param_offset = 0;
 
   if (z80_opts.calleeSavesBC)
     {

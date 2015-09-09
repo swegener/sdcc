@@ -2,6 +2,9 @@
 
 	* support/regression/tests/generic.c:
 	  More testcases for _Generic.
+	* src/z80/gen.c,
+	  support/regression/tests/critical.c:
+	  Fix bug #2416.
 
 2015-09-04 Philipp Klaus Krause <pkk AT spth.de>
 

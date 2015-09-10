@@ -1,3 +1,8 @@
+2015-09-10 Ben Shi Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2385.c:
+	  Regression test for bug #2385.
+
 2015-09-10 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/critical.c:

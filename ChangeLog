@@ -1,3 +1,10 @@
+2015-09-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/critical.c:
+	  Improve test case.
+	* src/SDCC.y:
+	  Fix a bug: inline critical functions are inlined as non-critical.
+
 2015-09-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/generic.c:

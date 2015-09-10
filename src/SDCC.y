@@ -190,8 +190,15 @@ function_definition
              /* assume it to be 'int'       */
              addDecl($1,0,newIntLink());
              $1 = createFunctionDecl($1);
+             if (FUNC_ISCRITICAL ($1->type) && FUNC_ISINLINE ($1->type))
+               inCritical++;
          }
       function_body  {
+                                   if (FUNC_ISCRITICAL ($1->type) && FUNC_ISINLINE ($1->type))
+                                     {
+                                       inCritical--;
+                                       $3->right = newNode (CRITICAL, $3->right, NULL);
+                                     }
                                    $$ = createFunction($1,$3);
                                }
    | declaration_specifiers function_declarator
@@ -199,9 +206,16 @@ function_definition
               pointerTypes($2->type,copyLinkChain($1));
               addDecl($2,0,$1);
               $2 = createFunctionDecl($2);
+              if (FUNC_ISCRITICAL ($2->type) && FUNC_ISINLINE ($2->type))
+                inCritical++;
          }
      function_body
                                 {
+                                    if (FUNC_ISCRITICAL ($2->type) && FUNC_ISINLINE ($2->type))
+                                      {
+                                        inCritical--;
+                                        $4->right = newNode (CRITICAL, $4->right, NULL);
+                                      }
                                     $$ = createFunction($2,$4);
                                 }
    ;
@@ -1993,9 +2007,14 @@ expr_opt
 
 jump_statement
    : GOTO identifier ';'   {
-                              $2->islbl = 1;
-                              $$ = newAst_VALUE(symbolVal($2));
-                              $$ = newNode(GOTO,$$,NULL);
+                              if (inCritical) {
+                                werror(E_INVALID_CRITICAL);
+                                $$ = NULL;
+                              } else {
+                                $2->islbl = 1;
+                                $$ = newAst_VALUE(symbolVal($2));
+                                $$ = newNode(GOTO,$$,NULL);
+                              }
                            }
    | CONTINUE ';'          {
        /* make sure continue is in context */

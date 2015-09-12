@@ -1,4 +1,9 @@
-2015-09-10 Ben Shi Philipp Klaus Krause <pkk AT spth.de>
+2015-09-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pic14/genarith.c:
+	  Fix bug #2417 by applying patch by Juho Salminen.
+
+2015-09-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2385.c:
 	  Regression test for bug #2385.

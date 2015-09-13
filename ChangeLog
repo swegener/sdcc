@@ -1,3 +1,8 @@
+2015-09-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pic16/*
+	  Fix delarations to make pic16 lib compile again.
+
 2015-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pic14/genarith.c:

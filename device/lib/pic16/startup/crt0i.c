@@ -34,14 +34,14 @@
  * based on Microchip MPLAB-C18 startup files
  */
 
-extern stack_end;
-extern TBLPTRU;
-extern TBLPTRH;
-extern TBLPTRL;
-extern FSR0L;
-extern FSR0H;
-extern TABLAT;
-extern POSTINC0;
+extern int stack_end;
+extern int TBLPTRU;
+extern int TBLPTRH;
+extern int TBLPTRL;
+extern int FSR0L;
+extern int FSR0H;
+extern int TABLAT;
+extern int POSTINC0;
 
 
 #if 1

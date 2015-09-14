@@ -1,3 +1,8 @@
+2015-09-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/malloc.c:
+	  More testing of memory management.
+
 2015-09-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/pic16/*

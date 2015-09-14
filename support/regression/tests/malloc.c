@@ -1,6 +1,7 @@
 /* Simple malloc tests.
  */
 #include <stdlib.h>
+#include <string.h>
 #if defined(__SDCC_pic16)
 #include <malloc.h>
 #endif
@@ -9,6 +10,61 @@
 #if defined(__SDCC_pic16)
 __xdata char heap[100];
 #endif
+
+void mallocfree(void)
+{
+	char *a, *b, *c;
+	char d[20];
+
+	a = malloc(16);
+	ASSERT(a);
+	memset(a, 2, 16);
+	b = malloc(16);
+	ASSERT(b);
+	memset(b, 1, 16);
+	c = calloc(16, 1);
+	ASSERT(c);
+
+	memset(d, 2, 16);
+	ASSERT(!memcmp(d, a, 16));
+	memset(d, 1, 16);
+	ASSERT(!memcmp(d, b, 16));
+	memset(d, 0, 16);
+	ASSERT(!memcmp(d, c, 16));
+
+	free(b);
+	b = malloc(20);
+	memset(b, 3, 20);
+
+	memset(d, 2, 16);
+	ASSERT(!memcmp(d, a, 16));
+	memset(d, 3, 20);
+	ASSERT(!memcmp(d, b, 20));
+	memset(d, 0, 16);
+	ASSERT(!memcmp(d, c, 16));
+
+	free(b);
+	b = malloc(10);
+	memset(b, 4, 20);
+
+	memset(d, 2, 16);
+	ASSERT(!memcmp(d, a, 16));
+	memset(d, 4, 20);
+	ASSERT(!memcmp(d, b, 20));
+	memset(d, 0, 16);
+	ASSERT(!memcmp(d, c, 16));
+
+	free(b);
+	b = malloc(8);
+	memset(b, 5, 8);
+	b = realloc(b, 4);
+	memset(d, 5, 8);
+	ASSERT(!memcmp(d, b, 4));
+
+	free(a);
+	b = realloc(b, 8);
+	ASSERT(!memcmp(d, b, 4));
+}
 
 void
 testMalloc (void)
@@ -85,5 +141,7 @@ testMalloc (void)
 #else
   LOG (("p3, after freeing p2: %u\n", (unsigned) p3));
 #endif
+
+  mallocfree();
 }
 

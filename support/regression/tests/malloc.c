@@ -14,7 +14,7 @@ __xdata char heap[100];
 void mallocfree(void)
 {
 	char *a, *b, *c;
-	char d[20];
+	char d[25];
 
 	a = malloc(16);
 	ASSERT(a);
@@ -64,6 +64,24 @@ void mallocfree(void)
 	free(a);
 	b = realloc(b, 8);
 	ASSERT(!memcmp(d, b, 4));
+
+	free(b);
+	free(c);
+
+	a = malloc(10);
+	memset(a, 6, 10);
+	b = malloc(10);
+	memset(b, 7, 10);
+	c = malloc(10);
+	memset(c, 8, 10);
+	free(b);
+	a = realloc(a, 25);
+	memset(a + 10, 6, 15);
+
+	memset(d, 6, 25);
+	ASSERT(!memcmp(d, a, 25));
+	memset(d, 8, 10);
+	ASSERT(!memcmp(d, c, 10));
 }
 
 void

@@ -81,6 +81,8 @@ void PA (ast * t);
 int inInitMode = 0;
 memmap *GcurMemmap = NULL;      /* points to the memmap that's currently active */
 struct dbuf_s *codeOutBuf;
+extern int inCriticalFunction;
+extern int inCriticalBlock;
 
 int
 ptt (ast * tree)
@@ -5206,6 +5208,8 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*       function call        */
       /*----------------------------*/
     case CALL:
+      if (IFFUNC_ISCRITICAL (LTYPE(tree)) && (inCriticalFunction || inCriticalBlock))
+        werror (E_INVALID_CRITICAL);
 
       /* undo any explicit pointer dereference; PCALL will handle it instead */
       if (IS_FUNC (LTYPE (tree)) && tree->left->type == EX_OP)
@@ -6822,6 +6826,9 @@ expandInlineFuncs (ast * tree, ast * block)
       if (csym)
         func = csym;
 
+      if ((inCriticalFunction || inCriticalBlock) && IFFUNC_ISCRITICAL (func->type))
+        werrorfl (tree->left->filename, tree->left->lineno, E_INVALID_CRITICAL);
+
       /* Is this an inline function that we can inline? */
       if (IFFUNC_ISINLINE (func->type) && func->funcTree)
         {
@@ -6934,12 +6941,16 @@ expandInlineFuncs (ast * tree, ast * block)
               /* {{inline_function_code}}, retsym                         */
 
               tree->opval.op = ',';
+              if (IFFUNC_ISCRITICAL (func->type))
+                inlinetree = newNode (CRITICAL, inlinetree, NULL);
               tree->left = inlinetree;
               tree->right = newAst_VALUE (symbolVal (retsym));
             }
           else
             {
               tree->opval.op = NULLOP;
+              if (IFFUNC_ISCRITICAL (func->type))
+                inlinetree = newNode (CRITICAL, inlinetree, NULL);
               tree->left = NULL;
               tree->right = inlinetree;
             }

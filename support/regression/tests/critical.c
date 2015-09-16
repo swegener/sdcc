@@ -30,12 +30,21 @@ get_global (void) __critical
 // Check that param offsets are correctly adjusted for critial functions
 long critical_function(long a, long b, long c) __critical
 {
-  return a + b + c;
+  if (a > 10L)
+    return a + b + c;
+  else if (b < 10L)
+    return a - b - c;
+  else
+    return a + b - c;
 }
-long fres;
-inline void critical_function_inline(long a, long b, long c) __critical
+inline long critical_function_inline(long a, long b, long c) __critical
 {
-  fres = a + b + c;
+  if (a > 10L)
+    return a + b + c;
+  else if (b < 10L)
+    return a - b - c;
+  else
+    return a + b - c;
 }
 #endif
 
@@ -76,9 +85,12 @@ testCritical (void)
 #endif
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_tlcs90) || defined(__SDCC_stm8)
-  ASSERT(critical_function(1, 1, 1) == 3);
-  critical_function_inline(10, 12, 41);
-  ASSERT(fres == 63);
+  ASSERT(critical_function(11, 1, 1) == 13);
+  ASSERT(critical_function(5, 1, 1) == 3);
+  ASSERT(critical_function(5, 11, 1) == 15);
+  ASSERT(critical_function_inline(11, 1, 1) == 13);
+  ASSERT(critical_function_inline(5, 1, 1) == 3);
+  ASSERT(critical_function_inline(5, 11, 1) == 15);
 #endif
 }
 

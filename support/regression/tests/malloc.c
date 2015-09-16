@@ -50,7 +50,7 @@ void mallocfree(void)
 	memset(d, 2, 16);
 	ASSERT(!memcmp(d, a, 16));
 	memset(d, 4, 20);
-	ASSERT(!memcmp(d, b, 20));
+	ASSERT(!memcmp(d, b, 10));
 	memset(d, 0, 16);
 	ASSERT(!memcmp(d, c, 16));
 

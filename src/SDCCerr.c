@@ -396,7 +396,7 @@ struct
   { W_SAVE_RESTORE, ERROR_LEVEL_PEDANTIC,
      "unmatched #pragma save and #pragma restore", 0 },
   { E_INVALID_CRITICAL, ERROR_LEVEL_ERROR,
-     "not allowed in a critical section", 0 },
+     "not allowed in a critical section or critical function", 0 },
   { E_NOT_ALLOWED, ERROR_LEVEL_ERROR,
      "%s not allowed here", 0 },
   { E_BAD_TAG, ERROR_LEVEL_ERROR,

@@ -46,7 +46,8 @@ int xstackPtr = 0;      /* xstack pointer          */
 int reentrant = 0;
 int blockNo   = 0;      /* sequential block number  */
 int currBlockno=0;
-int inCritical= 0;
+int inCriticalFunction = 0;
+int inCriticalBlock = 0;
 int seqPointNo= 1;      /* sequence point number */
 int ignoreTypedefType=0;
 extern int yylex();
@@ -190,33 +191,28 @@ function_definition
              /* assume it to be 'int'       */
              addDecl($1,0,newIntLink());
              $1 = createFunctionDecl($1);
-             if (FUNC_ISCRITICAL ($1->type) && FUNC_ISINLINE ($1->type))
-               inCritical++;
+             if (FUNC_ISCRITICAL ($1->type))
+               inCriticalFunction = 1;
          }
       function_body  {
-                                   if (FUNC_ISCRITICAL ($1->type) && FUNC_ISINLINE ($1->type))
-                                     {
-                                       inCritical--;
-                                       $3->right = newNode (CRITICAL, $3->right, NULL);
-                                     }
                                    $$ = createFunction($1,$3);
+                                   if (FUNC_ISCRITICAL ($1->type))
+                                     inCriticalFunction = 0;
+
                                }
    | declaration_specifiers function_declarator
          {
               pointerTypes($2->type,copyLinkChain($1));
               addDecl($2,0,$1);
               $2 = createFunctionDecl($2);
-              if (FUNC_ISCRITICAL ($2->type) && FUNC_ISINLINE ($2->type))
-                inCritical++;
+              if (FUNC_ISCRITICAL ($2->type))
+                inCriticalFunction = 1;
          }
      function_body
                                 {
-                                    if (FUNC_ISCRITICAL ($2->type) && FUNC_ISINLINE ($2->type))
-                                      {
-                                        inCritical--;
-                                        $4->right = newNode (CRITICAL, $4->right, NULL);
-                                      }
                                     $$ = createFunction($2,$4);
+                                    if (FUNC_ISCRITICAL ($2->type))
+                                      inCriticalFunction = 0;
                                 }
    ;
 
@@ -1734,7 +1730,9 @@ statement
 
 critical
    : CRITICAL   {
-                   inCritical++;
+                   if (inCriticalFunction || inCriticalBlock)
+                     werror(E_INVALID_CRITICAL);
+                   inCriticalBlock = 1;
                    STACK_PUSH(continueStack,NULL);
                    STACK_PUSH(breakStack,NULL);
                    $$ = NULL;
@@ -1745,8 +1743,8 @@ critical_statement
    : critical statement  {
                    STACK_POP(breakStack);
                    STACK_POP(continueStack);
-                   inCritical--;
                    $$ = newNode(CRITICAL,$2,NULL);
+                   inCriticalBlock = 0;
                 }
    ;
 
@@ -2007,7 +2005,7 @@ expr_opt
 
 jump_statement
    : GOTO identifier ';'   {
-                              if (inCritical) {
+                              if (inCriticalBlock) {
                                 werror(E_INVALID_CRITICAL);
                                 $$ = NULL;
                               } else {
@@ -2041,7 +2039,7 @@ jump_statement
    }
    | RETURN ';'            {
        seqPointNo++;
-       if (inCritical) {
+       if (inCriticalBlock) {
            werror(E_INVALID_CRITICAL);
            $$ = NULL;
        } else {
@@ -2050,7 +2048,7 @@ jump_statement
    }
    | RETURN expr ';'       {
        seqPointNo++;
-       if (inCritical) {
+       if (inCriticalBlock) {
            werror(E_INVALID_CRITICAL);
            $$ = NULL;
        } else {

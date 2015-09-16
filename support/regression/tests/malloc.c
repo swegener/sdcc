@@ -45,7 +45,7 @@ void mallocfree(void)
 
 	free(b);
 	b = malloc(10);
-	memset(b, 4, 20);
+	memset(b, 4, 10);
 
 	memset(d, 2, 16);
 	ASSERT(!memcmp(d, a, 16));

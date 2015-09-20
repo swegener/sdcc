@@ -7666,7 +7666,7 @@ genOr (const iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0;
   int bytelit = 0;
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
@@ -7697,7 +7697,7 @@ genOr (const iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -7835,7 +7835,7 @@ genXor (const iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0;
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
@@ -7865,7 +7865,7 @@ genXor (const iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 

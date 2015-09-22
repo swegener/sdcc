@@ -1,3 +1,15 @@
+2015-09-22 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/_calloc.c,
+	* device/lib/_free.c,
+	* device/lib/_heap.c,
+	* device/lib/_malloc.c,
+	* device/lib/_realloc.c: renamed all _sdcc_* to __sdcc_*,
+	  removed register keywords,
+	  changed _sdcc_heap_size to __sdcc_last_memheader,
+	  removed init_dynamic_memory() and other optimizations
+	* support/regression/tests/malloc.c: added test for size overflow
+
 2015-09-21 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/gcc-torture-execute-pr28982a.c:

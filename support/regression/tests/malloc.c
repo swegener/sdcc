@@ -96,6 +96,12 @@ testMalloc (void)
   _initHeap (heap, sizeof heap);
 #endif
 
+#ifndef PORT_HOST
+  p1 = malloc (0xFFFF);
+  ASSERT (p1 == NULL);
+  LOG (("p1 == NULL when out of memory\n"));
+#endif
+
   p1 = malloc (2000);
   ASSERT (p1 == NULL);
   LOG (("p1 == NULL when out of memory\n"));

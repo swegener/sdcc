@@ -30,6 +30,15 @@
 #include "dbuf_string.h"
 #include "peep.h"
 
+#define OPTION_CODE_SEG        "--codeseg"
+#define OPTION_CONST_SEG       "--constseg"
+
+static OPTION stm8_options[] = {
+  {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
+  {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
+  {0, NULL}
+};
+
 static char stm8_defaultRules[] = {
 #include "peeph.rul"
   ""
@@ -281,7 +290,7 @@ PORT stm8_port =
   "_",
   stm8_init,
   stm8_parseOptions,
-  NULL,
+  stm8_options,
   NULL,
   stm8_finaliseOptions,
   stm8_setDefaultOptions,

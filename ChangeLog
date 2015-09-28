@@ -1,3 +1,8 @@
+2015-09-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/main.c:
+	  Support "--codeseg" and "--constseg" on the stm8 port.
+
 2015-09-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/_calloc.c,

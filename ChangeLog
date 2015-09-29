@@ -1,3 +1,8 @@
+2015-09-29 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/main.c:
+	  Support "pragma codeseg" and "pragma constseg" in the stm8 port.
+
 2015-09-28 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/stm8/main.c:

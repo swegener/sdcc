@@ -39,6 +39,84 @@ static OPTION stm8_options[] = {
   {0, NULL}
 };
 
+enum
+{
+  P_CODESEG = 1,
+  P_CONSTSEG,
+};
+
+static int
+stm8_do_pragma (int id, const char *name, const char *cp)
+{
+  struct pragma_token_s token;
+  int processed = 1, error = 0;
+
+  init_pragma_token (&token);
+
+  switch (id)
+    {
+      case P_CODESEG:
+      case P_CONSTSEG:
+        {
+          char *segname;
+
+          cp = get_pragma_token (cp, &token);
+          if (token.type == TOKEN_EOL)
+            {
+              error = 1;
+              break;
+            }
+          else
+            segname = Safe_strdup (get_pragma_string (&token));
+
+          cp = get_pragma_token (cp, &token);
+          if (token.type != TOKEN_EOL)
+            {
+              Safe_free (segname);
+              error = 1;
+              break;
+            }
+          else
+            {
+              if (id == P_CODESEG)
+                {
+                  if (options.code_seg)
+                    Safe_free (options.code_seg);
+                  options.code_seg = segname;
+                } 
+              else
+                {
+                  if (options.const_seg)
+                    Safe_free (options.const_seg);
+                  options.const_seg = segname;
+                }
+            }
+        }
+        break;
+      default:
+        processed = 0;
+        break;
+    }
+
+  if (error)
+    werror (W_BAD_PRAGMA_ARGUMENTS, name);
+
+  free_pragma_token (&token);
+  return processed;
+}
+
+static struct pragma_s stm8_pragma_tbl[] = {
+  {"codeseg", P_CODESEG, 0, stm8_do_pragma},
+  {"constseg", P_CONSTSEG, 0, stm8_do_pragma},
+  {NULL, 0, 0, NULL},
+};
+
+static int
+stm8_process_pragma (const char *s)
+{
+  return process_pragma_tbl (stm8_pragma_tbl, s);
+}
+
 static char stm8_defaultRules[] = {
 #include "peeph.rul"
   ""
@@ -146,10 +224,10 @@ stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
   dbuf_tprintf (oBuf, "\tint s_GSINIT ;reset\n");
   
   if(interrupts[INTNO_TRAP])
-	dbuf_printf (oBuf, "\tint %s ;trap\n", interrupts[INTNO_TRAP]->rname);
+    dbuf_printf (oBuf, "\tint %s ;trap\n", interrupts[INTNO_TRAP]->rname);
   else
-	dbuf_tprintf (oBuf, "\tint 0x0000 ;trap\n");
-	
+    dbuf_tprintf (oBuf, "\tint 0x0000 ;trap\n");
+    
   for(i = 0; i < STM8_INTERRUPTS_COUNT; i++)
   {
       if (i < intCount && interrupts[i])
@@ -302,10 +380,10 @@ PORT stm8_port =
   NULL,                         /* no genAssemblerEnd */
   stm8_genIVT,
   0,                            /* no genXINIT code */
-  stm8_genInitStartup,                         /* genInitStartup */
+  stm8_genInitStartup,          /* genInitStartup */
   stm8_reset_regparm,
   stm8_reg_parm,
-  NULL,                         /* process_pragma */
+  stm8_process_pragma,          /* process_pragma */
   NULL,                         /* getMangledFunctionName */
   _hasNativeMulFor,             /* hasNativeMulFor */
   hasExtBitOp,                  /* hasExtBitOp */

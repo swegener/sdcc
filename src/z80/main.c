@@ -536,7 +536,7 @@ _parseOptions (int *pargc, char **argv, int *i)
               return TRUE;
             }
         }
-	  else if (!strncmp (argv[*i], OPTION_EMIT_EXTERNS, sizeof (OPTION_EMIT_EXTERNS) - 1))
+      else if (!strncmp (argv[*i], OPTION_EMIT_EXTERNS, sizeof (OPTION_EMIT_EXTERNS) - 1))
         {
           port->assembler.externGlobal = 1;
           return TRUE;

@@ -2294,7 +2294,8 @@ valShift (value * lval, value * rval, int lr)
       /* left shift */
       (lr ||
        /* right shift and unsigned */
-       (!lr && SPEC_USIGN (rval->type))))
+       (!lr && SPEC_USIGN (rval->type))) &&
+       ((TYPE_TARGET_ULONG) ulFromVal (lval) != (TYPE_TARGET_ULONG) 0))
     {
       werror (W_SHIFT_CHANGED, (lr ? "left" : "right"));
     }

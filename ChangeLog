@@ -1,3 +1,8 @@
+2015-10-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCval.c:
+	  Loose the condition of warning 116.
+
 2015-09-29 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/stm8/main.c:

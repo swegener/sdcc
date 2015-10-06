@@ -1337,6 +1337,7 @@ constCharacterVal (unsigned long v, unsigned char type)
       SPEC_NOUN (val->type) = V_INT;
       SPEC_USIGN (val->type) = 0;
       SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
+
       break;
     case 1: // wide character constant
       if (!options.std_c95)
@@ -1350,7 +1351,7 @@ constCharacterVal (unsigned long v, unsigned char type)
         werror (E_WCHAR_CONST_C11);
       SPEC_NOUN (val->type) = V_INT;
       SPEC_USIGN (val->type) = 1;
-      SPEC_CVAL (val->type).v_int = (TYPE_UWORD) v;
+      SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) v;
       break;
     case 3: // wide character constant
       if (!options.std_c11)
@@ -1358,7 +1359,7 @@ constCharacterVal (unsigned long v, unsigned char type)
       SPEC_NOUN (val->type) = V_INT;
       SPEC_USIGN (val->type) = 1;
       SPEC_LONG (val->etype) = 1;
-      SPEC_CVAL (val->type).v_int = (TYPE_UDWORD) v;
+      SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) v;
       break;
     default:
       wassert (0);

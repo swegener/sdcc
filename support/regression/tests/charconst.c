@@ -12,9 +12,11 @@
 void
 testCharConst(void)
 {
-  ASSERT (_Generic('c', default: 4, int: 0, wchar_t: 1, char16_t: 2, char32_t: 3) == 0);
-  ASSERT (_Generic(L'c', default: 4, int: 0, wchar_t: 1, char16_t: 2, char32_t: 3) == 1);
-  ASSERT (_Generic(u'c', default: 4, int: 0, wchar_t: 1, char16_t: 2, char32_t: 3) == 2);
-  ASSERT (_Generic(U'c', default: 4, int: 0, wchar_t: 1, char16_t: 2, char32_t: 3) == 3);
+#ifndef PORT_HOST // Too many old host compilers out there
+  ASSERT (_Generic('c', default: 1, int: 0) == 0);
+  ASSERT (_Generic(L'c', default: 1, wchar_t: 0) == 0);
+  ASSERT (_Generic(u'c', default: 1, char16_t: 0) == 0);
+  ASSERT (_Generic(U'c', default: 1, char32_t: 0) == 0);
+#endif
 }
 

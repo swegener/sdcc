@@ -823,7 +823,7 @@ free_pragma_token (struct pragma_token_s *token)
     /param src Pointer to 'x' from start of hex character value
 */
 
-unsigned char
+unsigned long int
 hexEscape (const char **src)
 {
   char *s;
@@ -838,16 +838,10 @@ hexEscape (const char **src)
       /* no valid hex found */
       werror (E_INVALID_HEX);
     }
-  else
-    {
-      if (value > 255)
-        {
-          werror (W_ESC_SEQ_OOR_FOR_CHAR);
-        }
-    }
+
   *src = s;
 
-  return (unsigned char) value;
+  return value;
 }
 
 /*------------------------------------------------------------------*/
@@ -856,7 +850,7 @@ hexEscape (const char **src)
 /* adjust src to point at the last proccesed char                   */
 /*------------------------------------------------------------------*/
 
-unsigned char
+unsigned long int
 universalEscape (const char **str, unsigned int n)
 {
   unsigned int digits;
@@ -879,19 +873,15 @@ universalEscape (const char **str, unsigned int n)
         }
       else if ((**str | 0x20) >= 'a' && (**str | 0x20) <= 'f')
         {
-          value = (value << 4) + (**str - ('a' + 10));
+          value = (value << 4) + (**str - 'a' + 10);
           ++*str;
         }
       else
           break;
     }
-  if (digits != n)
+  if (digits != n || value < 0x00a0 && value != 0x0024 && value != 0x0040 && value != 0x0060 || value >= 0xd800 && 0xdfff >= value)
     {
       werror (E_INVALID_UNIVERSAL, s);
-    }
-  else if (value > 255)
-    {
-      werror (W_ESC_SEQ_OOR_FOR_CHAR);
     }
 
   return value;
@@ -903,7 +893,7 @@ universalEscape (const char **str, unsigned int n)
 /* adjust src to point at the last proccesed char                   */
 /*------------------------------------------------------------------*/
 
-unsigned char
+unsigned long int
 octalEscape (const char **str)
 {
   int digits;
@@ -921,13 +911,7 @@ octalEscape (const char **str)
           break;
         }
     }
-  if (digits)
-    {
-      if (value > 255 /* || (**str>='0' && **str<='7') */ )
-        {
-          werror (W_ESC_SEQ_OOR_FOR_CHAR);
-        }
-    }
+
   return value;
 }
 

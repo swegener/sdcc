@@ -463,7 +463,7 @@ struct
   { W_DUPLICATE_INIT, ERROR_LEVEL_WARNING,
      "Duplicate initializer at position %d; ignoring previous.", 0 },
   { E_INVALID_UNIVERSAL, ERROR_LEVEL_ERROR,
-     "incomplete universal character name \\%s.", 0 },
+     "invalid universal character name \\%s.", 0 },
   { W_UNIVERSAL_C95, ERROR_LEVEL_WARNING,
      "universal character names are only valid in C95 or later", 0 },
   { E_SHORTLONG, ERROR_LEVEL_ERROR,

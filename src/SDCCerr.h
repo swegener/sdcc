@@ -230,7 +230,7 @@ enum {
   W_DEPRECATED_OPTION           = 201, /* deprecated compiler option '%s' */
   E_BAD_DESIGNATOR              = 202, /* Bad designated initializer */
   W_DUPLICATE_INIT              = 203, /* duplicate initializer */
-  E_INVALID_UNIVERSAL           = 204, /* incomplete universal character name %s. */
+  E_INVALID_UNIVERSAL           = 204, /* invalid universal character name %s. */
   W_UNIVERSAL_C95               = 205, /* universal character names are only valid in C95 or later */
   E_SHORTLONG                   = 206, /* Invalid combination of short / long */
   E_INTEGERSUFFIX               = 207, /* Invalid integer suffix */

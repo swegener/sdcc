@@ -596,6 +596,7 @@ setDefaultOptions (void)
   options.verbose = 0;
   options.shortis8bits = 0;
   options.std_sdcc = 1;         /* enable SDCC language extensions */
+  options.std_c95 = 1;
   options.std_c99 = 1;          /* default to C99, to enable inlining of standard functions */
   options.std_c11 = 0;          /* default to C99 until more C11 support */
   options.code_seg = CODE_NAME ? Safe_strdup (CODE_NAME) : NULL;        /* default to CSEG for generated code */
@@ -1128,6 +1129,7 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_STD_C89) == 0)
             {
+              options.std_c95 = 0;
               options.std_c99 = 0;
               options.std_sdcc = 0;
               continue;
@@ -1135,6 +1137,7 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_STD_C99) == 0)
             {
+              options.std_c95 = 1;
               options.std_c99 = 1;
               options.std_sdcc = 0;
               continue;
@@ -1142,6 +1145,7 @@ parseCmdLine (int argc, char **argv)
 
           if (strcmp (argv[i], OPTION_STD_C11) == 0)
             {
+              options.std_c95 = 1;
               options.std_c99 = 1;
               options.std_c11 = 1;
               options.std_sdcc = 0;

@@ -1320,10 +1320,10 @@ constVal (const char *s)
 }
 
 /*-----------------------------------------------------------------*/
-/* constCharVal - converts a CHAR constant to value                */
+/* constCharacterVal - converts a character constant to value      */
 /*-----------------------------------------------------------------*/
 value *
-constCharVal (unsigned char v)
+constCharacterVal (unsigned long v, unsigned char type)
 {
   value *val = newValue ();     /* alloc space for value   */
 
@@ -1331,12 +1331,49 @@ constCharVal (unsigned char v)
   SPEC_SCLS (val->type) = S_LITERAL;
   SPEC_CONST (val->type) = 1;
 
-  SPEC_NOUN (val->type) = V_INT;
-  SPEC_USIGN (val->type) = 0;
-
-  SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
+  switch (type)
+    {
+    case 0: // character constant
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 0;
+      SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
+      break;
+    case 1: // wide character constant
+      if (!options.std_c95)
+        werror (E_WCHAR_CONST_C95);
+      SPEC_NOUN (val->type) = V_CHAR;
+      SPEC_USIGN (val->type) = options.unsigned_char;
+      SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
+      break;
+    case 2: // wide character constant
+      if (!options.std_c11)
+        werror (E_WCHAR_CONST_C11);
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 1;
+      SPEC_CVAL (val->type).v_int = (TYPE_UWORD) v;
+      break;
+    case 3: // wide character constant
+      if (!options.std_c11)
+        werror (E_WCHAR_CONST_C11);
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 1;
+      SPEC_LONG (val->etype) = 1;
+      SPEC_CVAL (val->type).v_int = (TYPE_UDWORD) v;
+      break;
+    default:
+      wassert (0);
+    }
 
   return val;
+}
+
+/*-----------------------------------------------------------------*/
+/* constCharVal - converts a character constant to value           */
+/*-----------------------------------------------------------------*/
+value *
+constCharVal (unsigned char v)
+{
+  return constCharacterVal (v, 0);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1474,34 +1511,50 @@ copyValue (value * src)
 value *
 charVal (const char *s)
 {
-  /* get rid of quotation */
+  unsigned char type;
+  switch(*s)
+    {
+    case 'L':
+      type = 1; s++;
+      break;
+    case 'u':
+      type = 2; s++;
+      break;
+    case 'U':
+      type = 3; s++;
+      break;
+    default:
+      type = 0;
+    }
+  s++; // Get rid of quotation.
+
   /* if \ then special processing */
-  if (*++s == '\\')
+  if (*s == '\\')
     {
       switch (*++s)             /* go beyond the backslash  */
         {
         case 'n':
-          return constCharVal ('\n');
+          return constCharacterVal ('\n', type);
         case 't':
-          return constCharVal ('\t');
+          return constCharacterVal ('\t', type);
         case 'v':
-          return constCharVal ('\v');
+          return constCharacterVal ('\v', type);
         case 'b':
-          return constCharVal ('\b');
+          return constCharacterVal ('\b', type);
         case 'r':
-          return constCharVal ('\r');
+          return constCharacterVal ('\r', type);
         case 'f':
-          return constCharVal ('\f');
+          return constCharacterVal ('\f', type);
         case 'a':
-          return constCharVal ('\a');
+          return constCharacterVal ('\a', type);
         case '\\':
-          return constCharVal ('\\');
+          return constCharacterVal ('\\', type);
         case '\?':
-          return constCharVal ('\?');
+          return constCharacterVal ('\?', type);
         case '\'':
-          return constCharVal ('\'');
+          return constCharacterVal ('\'', type);
         case '\"':
-          return constCharVal ('\"');
+          return constCharacterVal ('\"', type);
 
         case '0':
         case '1':
@@ -1511,23 +1564,23 @@ charVal (const char *s)
         case '5':
         case '6':
         case '7':
-          return constCharVal (octalEscape (&s));
+          return constCharacterVal (octalEscape (&s), type);
 
         case 'x':
-          return constCharVal (hexEscape (&s));
+          return constCharacterVal (hexEscape (&s), type);
 
         case 'u':
-          return constCharVal (universalEscape (&s, 4));
+          return constCharacterVal (universalEscape (&s, 4), type);
 
         case 'U':
-          return constCharVal (universalEscape (&s, 8));
+          return constCharacterVal (universalEscape (&s, 8), type);
 
         default:
-          return constCharVal (*s);
+          return constCharacterVal (*s, type);
         }
     }
   else                          /* not a backslash */
-    return constCharVal (*s);
+    return constCharacterVal (*s, type);
 }
 
 /*------------------------------------------------------------------*/

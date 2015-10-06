@@ -1,3 +1,17 @@
+2015-10-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/uchar.h,
+	  src/SDCCval.h,
+	  src/SDCCval.c,
+	  src/SDCC.lex,
+	  src/SDCCutil.c,
+	  src/SDCCmain.c,
+	  src/SDCCglobl.h,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  support/regression/tests/charconst.c:
+	  Wide character constants.
+
 2015-10-02 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCval.c:

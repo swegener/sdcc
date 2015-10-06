@@ -464,8 +464,8 @@ struct
      "Duplicate initializer at position %d; ignoring previous.", 0 },
   { E_INVALID_UNIVERSAL, ERROR_LEVEL_ERROR,
      "incomplete universal character name \\%s.", 0 },
-  { W_UNIVERSAL_C99, ERROR_LEVEL_WARNING,
-     "universal character names are only valid in C99", 0 },
+  { W_UNIVERSAL_C95, ERROR_LEVEL_WARNING,
+     "universal character names are only valid in C95 or later", 0 },
   { E_SHORTLONG, ERROR_LEVEL_ERROR,
      "invalid combination of short / long", 0 },
   { E_INTEGERSUFFIX, ERROR_LEVEL_ERROR,
@@ -517,6 +517,10 @@ struct
     "no matching expression in generic association", 0 },
   { W_LABEL_WITHOUT_STATEMENT, ERROR_LEVEL_WARNING,
     "label without statement", 0},
+  { E_WCHAR_CONST_C95, ERROR_LEVEL_ERROR,
+    "character constant of type wchar_t requires C95 or later", 0},
+  { E_WCHAR_CONST_C11, ERROR_LEVEL_ERROR,
+    "character constant of type char16_t or char32_t requires C11 or later", 0},
 };
 
 /* -------------------------------------------------------------------------------

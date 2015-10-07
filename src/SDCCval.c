@@ -555,8 +555,8 @@ initList *reorderIlist (sym_link * type, initList * ilist)
         {
           if (nlistArray[idx] != NULL)
             werrorfl (iloop->filename, iloop->lineno, W_DUPLICATE_INIT, idx);
-
-          nlistArray[idx] = iloop;
+          if (idx < size)
+            nlistArray[idx] = iloop;
         }
     }
 

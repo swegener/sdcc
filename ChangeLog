@@ -1,3 +1,9 @@
+2015-10-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/charconst.c,
+	  support/regression/tests/escape.c:
+	  Disable some tests for host, so we don't need a C11 host.
+
 2015-10-07 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCval.c:

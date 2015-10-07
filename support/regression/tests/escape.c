@@ -7,7 +7,9 @@
 #endif
 
 #include <stddef.h> // For wchar_t
+#ifndef PORT_HOST // Too many old host compilers out there
 #include <uchar.h> // For char16_t, char32_t
+#endif
 
 void
 testEscape(void)

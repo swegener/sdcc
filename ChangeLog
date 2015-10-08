@@ -1,3 +1,8 @@
+2015-10-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/libcpp/files.c:
+	  Drop cpp support for Borland C.
+
 2015-10-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/charconst.c,

@@ -430,6 +430,8 @@ void OutputAOEMF51(void)
               OutputWord(procedure[k].BeginAdd); /*Offset*/
               for (i=procedure[k].BeginAdd; i<=procedure[k].EndAdd; i++)
                 {
+                  if (i < 0 || MEMSIZE <= i)
+                    continue;
                   OutputByte((unsigned char)ihxBuff[i]);
                   ihxBuff[i] -= 0x200;
                 }

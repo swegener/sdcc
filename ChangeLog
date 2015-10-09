@@ -1,3 +1,8 @@
+2015-10-09 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lkaomf51.c:
+	  Add bound check while accessing a buffer in the heap.
+
 2015-10-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/cpp/libcpp/files.c:

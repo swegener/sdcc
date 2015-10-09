@@ -1811,6 +1811,43 @@ requiresHL (const asmop * aop)
     }
 }
 
+/*----------------------------------------------------------*/
+/* strtoul_z80: a wrapper to strtoul, which can also handle */
+/* hex numbers with a $ prefix.                             */
+/*----------------------------------------------------------*/
+static unsigned long int 
+strtoul_z80asm (const char *nptr, char **endptr, int base)
+{
+  char *p = NULL;
+  int i, flag = 0, len;
+
+  if (nptr != NULL && (p = malloc ((len = strlen (nptr)) + 1 + 1)) != NULL)
+    {
+      memset (p, 0, len + 2);
+      for (i = 0; i < len; i++)
+        {
+          if (!flag)
+            if (isspace (nptr[i]))
+              p[i] = nptr[i];
+            else if (nptr[i] == '$')
+              {
+                p[i] = '0';
+                p[i + 1] = 'x';
+                flag = 1;
+              }
+            else
+              break;
+          else
+            p[i + 1] = nptr[i];
+        }
+    }
+
+  if (flag)
+    return strtoul (p, endptr, base);
+  else
+    return strtoul (nptr, endptr, base);
+}
+
 static void
 fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
 {
@@ -1857,7 +1894,7 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
         {
           unsigned new_low, new_high, old_low, old_high;
           unsigned long v_new = ulFromVal (left->aopu.aop_lit);
-          unsigned long v_old = strtoul (_G.pairs[pairId].base, NULL, 0);
+          unsigned long v_old = strtoul_z80asm (_G.pairs[pairId].base, NULL, 0);
           new_low = (v_new >> 0) & 0xff;
           new_high = (v_new >> 8) & 0xff;
           old_low = (v_old >> 0) & 0xff;

@@ -1,3 +1,8 @@
+2015-10-09 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/z80/gen.c:
+	  Wrap strtoul() to support $-prefix hex numbers.
+
 2015-10-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* New memory management by merging malloc branch into trunk.

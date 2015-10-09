@@ -15,7 +15,9 @@ void
 testEscape(void)
 {
   volatile char c;
+#ifndef PORT_HOST // Too many old host compilers out there
   volatile char16_t u;
+#endif
 
   ASSERT ('\x55' == 0x55);
   c = '\x55';

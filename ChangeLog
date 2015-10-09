@@ -1,3 +1,7 @@
+2015-10-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* New memory management by merging malloc branch into trunk.
+
 2015-10-09 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sdas/linksrc/lkaomf51.c:
@@ -46,6 +50,33 @@
 	  support/regression/tests/charconst.c:
 	  Wide character constants.
 
+2015-10-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/malloc.c:
+	  Improve comments on heap data structures.
+
+2015-10-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdlib.h,
+	  device/lib/aligned_alloc.c:
+	  Implement aligned_alloc().
+
+2015-10-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/realloc.c:
+	  Fix a bug in realloc() freeing.
+
+2015-10-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/free.c,
+	  device/lib/realloc.c,
+	  device/lib/malloc.c,
+	  device/lib/realloc.c,
+	  support/regression/tests/malloc.c:
+	  Simplify memory management, document search of free list.
+	* support/regression/fwk/lib/testfwk.c:
+	  Support printing unsigned in test logs
+
 2015-10-02 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCval.c:
@@ -77,6 +108,28 @@
 
 	* support/regression/tests/gcc-torture-execute-pr28982a.c:
 	  Enabled for the r2k and r3ka ports.
+
+2015-09-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/calloc.c,
+	  device/lib/malloc.c,
+	  device/lib/realloc.c,
+	  device/lib/free.c:
+	  Use typedefs for memory block header type, use more pointers to __xdata.
+	* device/include/stdlib.h,
+	  device/include/malloc.h:
+	  Move memory management to stdlib.h, fix stdlib.h inclusion.
+
+2015-09-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/asm/*/features.h,
+	  device/include/malloc.h,
+	  device/lib/calloc.c,
+	  device/lib/malloc.c,
+	  device/lib/realloc.c,
+	  device/lib/free.c,
+	  support/regression/tests/malloc.c:
+	  First version of new, more efficient memory management.
 
 2015-09-20 Ben Shi <powerstudio1st AT 163 DOT com>
 

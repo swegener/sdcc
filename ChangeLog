@@ -1,3 +1,8 @@
+2015-10-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/libcpp/include/*:
+	  Reformat to reduce diff to upstream version.
+
 2015-10-10 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/util/dbuf_string.c:

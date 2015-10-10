@@ -1820,6 +1820,7 @@ strtoul_z80asm (const char *nptr, char **endptr, int base)
 {
   char *p = NULL;
   int i, flag = 0, len;
+  unsigned long ret;
 
   if (nptr != NULL && (p = malloc ((len = strlen (nptr)) + 1 + 1)) != NULL)
     {
@@ -1843,9 +1844,13 @@ strtoul_z80asm (const char *nptr, char **endptr, int base)
     }
 
   if (flag)
-    return strtoul (p, endptr, base);
+    ret = strtoul (p, endptr, base);
   else
-    return strtoul (nptr, endptr, base);
+    ret = strtoul (nptr, endptr, base);
+
+  if (p)
+    free (p);
+  return ret;
 }
 
 static void

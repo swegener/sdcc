@@ -141,7 +141,10 @@ calc_result_length (const char *format, va_list args)
               total_width += 307;
               break;
             case 's':
-              total_width += strlen (va_arg (ap, char *));
+              {
+                const char *p = va_arg (ap, char *);
+                total_width += strlen (p ? p : "(null)");
+              }
               break;
             case 'p':
             case 'n':

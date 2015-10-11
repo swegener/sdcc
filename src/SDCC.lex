@@ -199,6 +199,7 @@ static void checkCurrFile (const char *s);
 {D}*"."{D}+({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}+"."{D}*({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 \"                      { count (); yylval.yystr = stringLiteral (); return STRING_LITERAL; }
+"L\""                   { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral (); return STRING_LITERAL; }
 ">>="                   { count (); yylval.yyint = RIGHT_ASSIGN; return RIGHT_ASSIGN; }
 "<<="                   { count (); yylval.yyint = LEFT_ASSIGN; return LEFT_ASSIGN; }
 "+="                    { count (); yylval.yyint = ADD_ASSIGN; return ADD_ASSIGN; }
@@ -508,6 +509,22 @@ stringLiteral (void)
           if (ch == EOF)
             goto out;
 
+          if (ch == 'L') /* Could be a wide string literal prefix */
+            {
+              if (!options.std_c95)
+                {
+                  werror (E_WCHAR_STRING_C95);
+                  unput(ch);
+                  goto out;
+                }
+              ch = input();
+              if (ch != '"')
+                {
+                  unput(ch);
+                  unput('L');
+                  goto out;
+                }
+            }
           if (ch != '"')
             {
               unput(ch);

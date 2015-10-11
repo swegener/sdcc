@@ -1,3 +1,10 @@
+2015-10-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCC.lex:
+	  Support C95 wide string literals.
+
 2015-10-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/cpp/libcpp/include/*:

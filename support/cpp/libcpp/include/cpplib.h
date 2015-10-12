@@ -136,7 +136,7 @@ struct _cpp_file;
   TK(MACRO_ARG,		NONE)	 /* Macro argument.  */			\
   TK(PRAGMA,		NONE)	 /* Only for deferred pragmas.  */	\
   TK(PRAGMA_EOL,	NONE)	 /* End-of-line for deferred pragmas.  */ \
-  TK(PADDING,		NONE)	 /* Whitespace for -E.	*/
+  TK(PADDING,		NONE)	 /* Whitespace for -E.	*/		\
 \
   /* SDCC _asm specific */                                              \
   TK(ASM,               LITERAL)   /* _asm ... _endasm ; */

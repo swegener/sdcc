@@ -59,7 +59,7 @@ static void lex_string (cpp_reader *, cpp_token *, const uchar *);
 static void save_comment (cpp_reader *, cpp_token *, const uchar *, cppchar_t);
 static void store_comment (cpp_reader *, cpp_token *);
 static void create_literal (cpp_reader *, cpp_token *, const uchar *,
-                            unsigned int, enum cpp_ttype);
+			    unsigned int, enum cpp_ttype);
 static bool warn_in_comment (cpp_reader *, _cpp_line_note *);
 static int name_p (cpp_reader *, const cpp_string *);
 static tokenrun *next_tokenrun (tokenrun *);
@@ -104,7 +104,7 @@ add_line_note (cpp_buffer *buffer, const uchar *pos, unsigned int type)
    path below.  Since this loop is very hot it's worth doing these kinds
    of optimizations.
 
-   One of the paths through the ifdefs should provide
+   One of the paths through the ifdefs should provide 
 
      const uchar *search_line_fast (const uchar *s, const uchar *end);
 
@@ -168,7 +168,7 @@ static inline word_type
 acc_char_cmp (word_type val, word_type c)
 {
 #if defined(__GNUC__) && defined(__alpha__)
-  /* We can get exact results using a compare-bytes instruction.
+  /* We can get exact results using a compare-bytes instruction.  
      Get (val == c) via (0 >= (val ^ c)).  */
   return __builtin_alpha_cmpbge (0, val ^ c);
 #else
@@ -187,7 +187,7 @@ acc_char_cmp (word_type val, word_type c)
 
 static inline int
 acc_char_index (word_type cmp ATTRIBUTE_UNUSED,
-                word_type val ATTRIBUTE_UNUSED)
+		word_type val ATTRIBUTE_UNUSED)
 {
 #if defined(__GNUC__) && defined(__alpha__) && !WORDS_BIGENDIAN
   /* The cmpbge instruction sets *bits* of the result corresponding to
@@ -202,12 +202,12 @@ acc_char_index (word_type cmp ATTRIBUTE_UNUSED,
     {
       uchar c;
       if (WORDS_BIGENDIAN)
-        c = (val >> (sizeof(word_type) - i - 1) * 8) & 0xff;
+	c = (val >> (sizeof(word_type) - i - 1) * 8) & 0xff;
       else
-        c = (val >> i * 8) & 0xff;
+	c = (val >> i * 8) & 0xff;
 
       if (c == '\n' || c == '\r' || c == '\\' || c == '?')
-        return i;
+	return i;
     }
 
   return -1;
@@ -215,7 +215,7 @@ acc_char_index (word_type cmp ATTRIBUTE_UNUSED,
 }
 
 /* A version of the fast scanner using bit fiddling techniques.
-
+ 
    For 32-bit words, one would normally perform 16 comparisons and
    16 branches.  With this algorithm one performs 24 arithmetic
    operations and one branch.  Whether this is faster with a 32-bit
@@ -239,7 +239,7 @@ search_line_acc_char (const uchar *s, const uchar *end ATTRIBUTE_UNUSED)
   unsigned int misalign;
   const word_type *p;
   word_type val, t;
-
+  
   /* Align the buffer.  Mask out any bytes from before the beginning.  */
   p = (word_type *)((uintptr_t)s & -sizeof(word_type));
   val = *p;
@@ -256,11 +256,11 @@ search_line_acc_char (const uchar *s, const uchar *end ATTRIBUTE_UNUSED)
       t |= acc_char_cmp (val, repl_qm);
 
       if (__builtin_expect (t != 0, 0))
-        {
-          int i = acc_char_index (t, val);
-          if (i >= 0)
-            return (const uchar *)p + i;
-        }
+	{
+	  int i = acc_char_index (t, val);
+	  if (i >= 0)
+	    return (const uchar *)p + i;
+	}
 
       val = *++p;
     }

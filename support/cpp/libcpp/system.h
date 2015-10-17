@@ -375,7 +375,7 @@ extern void abort (void);
 #endif
 
 #ifndef offsetof
-#define offsetof(TYPE, MEMBER)  ((size_t) &((TYPE *) 0)->MEMBER)
+#define offsetof(TYPE, MEMBER)	((size_t) &((TYPE *) 0)->MEMBER)
 #endif
 
 /* __builtin_expect(A, B) evaluates to A, but notifies the compiler that
@@ -387,7 +387,7 @@ extern void abort (void);
 
 /* Provide a fake boolean type.  We make no attempt to use the
    C99 _Bool, as it may not be available in the bootstrap compiler,
-   and even if it is, it is liable to be buggy.
+   and even if it is, it is liable to be buggy.  
    This must be after all inclusion of system headers, as some of
    them will mess us up.  */
 #undef bool

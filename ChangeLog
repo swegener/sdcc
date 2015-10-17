@@ -1,3 +1,8 @@
+2015-10-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/libcpp/*:
+	  Reformat to reduce diff to upstream cpp.
+
 2015-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCerr.h,

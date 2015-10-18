@@ -1627,32 +1627,32 @@ cpp_get_comments (cpp_reader *pfile)
 
 /* Append a comment to the end of the comment table. */
 static void
-store_comment (cpp_reader *pfile, cpp_token *token)
+store_comment (cpp_reader *pfile, cpp_token *token) 
 {
   int len;
 
   if (pfile->comments.allocated == 0)
     {
-      pfile->comments.allocated = 256;
+      pfile->comments.allocated = 256; 
       pfile->comments.entries = (cpp_comment *) xmalloc
-        (pfile->comments.allocated * sizeof (cpp_comment));
+	(pfile->comments.allocated * sizeof (cpp_comment));
     }
 
   if (pfile->comments.count == pfile->comments.allocated)
     {
       pfile->comments.allocated *= 2;
       pfile->comments.entries = (cpp_comment *) xrealloc
-        (pfile->comments.entries,
-         pfile->comments.allocated * sizeof (cpp_comment));
+	(pfile->comments.entries,
+	 pfile->comments.allocated * sizeof (cpp_comment));
     }
 
   len = token->val.str.len;
 
   /* Copy comment. Note, token may not be NULL terminated. */
-  pfile->comments.entries[pfile->comments.count].comment =
+  pfile->comments.entries[pfile->comments.count].comment = 
     (char *) xmalloc (sizeof (char) * (len + 1));
   memcpy (pfile->comments.entries[pfile->comments.count].comment,
-          token->val.str.text, len);
+	  token->val.str.text, len);
   pfile->comments.entries[pfile->comments.count].comment[len] = '\0';
 
   /* Set source location. */
@@ -1665,7 +1665,7 @@ store_comment (cpp_reader *pfile, cpp_token *token)
 /* The stored comment includes the comment start and any terminator.  */
 static void
 save_comment (cpp_reader *pfile, cpp_token *token, const unsigned char *from,
-              cppchar_t type)
+	      cppchar_t type)
 {
   unsigned char *buffer;
   unsigned int len, clen, i;
@@ -1678,13 +1678,13 @@ save_comment (cpp_reader *pfile, cpp_token *token, const unsigned char *from,
     len--;
 
   /* If we are currently in a directive or in argument parsing, then
-     C++ comments as C comments internally, and so we need to
-     allocate a little extra space in that case.
+     we need to store all C++ comments as C comments internally, and
+     so we need to allocate a little extra space in that case.
 
      Note that the only time we encounter a directive here is
      when we are saving comments in a "#define".  */
   clen = ((pfile->state.in_directive || pfile->state.parsing_args)
-          && type == '/') ? len + 2 : len;
+	  && type == '/') ? len + 2 : len;
 
   buffer = _cpp_unaligned_alloc (pfile, clen);
 
@@ -1832,59 +1832,59 @@ _cpp_lex_token (cpp_reader *pfile)
   for (;;)
     {
       if (pfile->cur_token == pfile->cur_run->limit)
-        {
-          pfile->cur_run = next_tokenrun (pfile->cur_run);
-          pfile->cur_token = pfile->cur_run->base;
-        }
+	{
+	  pfile->cur_run = next_tokenrun (pfile->cur_run);
+	  pfile->cur_token = pfile->cur_run->base;
+	}
       /* We assume that the current token is somewhere in the current
-         run.  */
+	 run.  */
       if (pfile->cur_token < pfile->cur_run->base
-          || pfile->cur_token >= pfile->cur_run->limit)
-        abort ();
+	  || pfile->cur_token >= pfile->cur_run->limit)
+	abort ();
 
       if (pfile->lookaheads)
-        {
-          pfile->lookaheads--;
-          result = pfile->cur_token++;
-        }
+	{
+	  pfile->lookaheads--;
+	  result = pfile->cur_token++;
+	}
       else
-        result = _cpp_lex_direct (pfile);
+	result = _cpp_lex_direct (pfile);
 
       if (result->flags & BOL)
-        {
-          /* Is this a directive.  If _cpp_handle_directive returns
-             false, it is an assembler #.  */
-          if (result->type == CPP_HASH
-              /* 6.10.3 p 11: Directives in a list of macro arguments
-                 gives undefined behavior.  This implementation
-                 handles the directive as normal.  */
-              && pfile->state.parsing_args != 1)
-            {
-              if (_cpp_handle_directive (pfile, result->flags & PREV_WHITE))
-                {
-                  if (pfile->directive_result.type == CPP_PADDING)
-                    continue;
-                  result = &pfile->directive_result;
-                }
-            }
-          else if (pfile->state.in_deferred_pragma)
-            result = &pfile->directive_result;
+	{
+	  /* Is this a directive.  If _cpp_handle_directive returns
+	     false, it is an assembler #.  */
+	  if (result->type == CPP_HASH
+	      /* 6.10.3 p 11: Directives in a list of macro arguments
+		 gives undefined behavior.  This implementation
+		 handles the directive as normal.  */
+	      && pfile->state.parsing_args != 1)
+	    {
+	      if (_cpp_handle_directive (pfile, result->flags & PREV_WHITE))
+		{
+		  if (pfile->directive_result.type == CPP_PADDING)
+		    continue;
+		  result = &pfile->directive_result;
+		}
+	    }
+	  else if (pfile->state.in_deferred_pragma)
+	    result = &pfile->directive_result;
 
-          if (pfile->cb.line_change && !pfile->state.skipping)
-            pfile->cb.line_change (pfile, result, pfile->state.parsing_args);
-        }
+	  if (pfile->cb.line_change && !pfile->state.skipping)
+	    pfile->cb.line_change (pfile, result, pfile->state.parsing_args);
+	}
 
       /* We don't skip tokens in directives.  */
       if (pfile->state.in_directive || pfile->state.in_deferred_pragma)
-        break;
+	break;
 
       /* Outside a directive, invalidate controlling macros.  At file
-         EOF, _cpp_lex_direct takes care of popping the buffer, so we never
-         get here and MI optimization works.  */
+	 EOF, _cpp_lex_direct takes care of popping the buffer, so we never
+	 get here and MI optimization works.  */
       pfile->mi_valid = false;
 
       if (!pfile->state.skipping || result->type == CPP_EOF)
-        break;
+	break;
     }
 
   return result;
@@ -1905,41 +1905,41 @@ _cpp_get_fresh_line (cpp_reader *pfile)
       cpp_buffer *buffer = pfile->buffer;
 
       if (!buffer->need_line)
-        return true;
+	return true;
 
       if (buffer->next_line < buffer->rlimit)
-        {
-          _cpp_clean_line (pfile);
-          return true;
-        }
+	{
+	  _cpp_clean_line (pfile);
+	  return true;
+	}
 
       /* First, get out of parsing arguments state.  */
       if (pfile->state.parsing_args)
-        return false;
+	return false;
 
       /* End of buffer.  Non-empty files should end in a newline.  */
       if (buffer->buf != buffer->rlimit
-          && buffer->next_line > buffer->rlimit
-          && !buffer->from_stage3)
-        {
-          /* Clip to buffer size.  */
-          buffer->next_line = buffer->rlimit;
-        }
+	  && buffer->next_line > buffer->rlimit
+	  && !buffer->from_stage3)
+	{
+	  /* Clip to buffer size.  */
+	  buffer->next_line = buffer->rlimit;
+	}
 
       return_at_eof = buffer->return_at_eof;
       _cpp_pop_buffer (pfile);
       if (pfile->buffer == NULL || return_at_eof)
-        return false;
+	return false;
     }
 }
 
-#define IF_NEXT_IS(CHAR, THEN_TYPE, ELSE_TYPE)          \
-  do                                                    \
-    {                                                   \
-      result->type = ELSE_TYPE;                         \
-      if (*buffer->cur == CHAR)                         \
-        buffer->cur++, result->type = THEN_TYPE;        \
-    }                                                   \
+#define IF_NEXT_IS(CHAR, THEN_TYPE, ELSE_TYPE)		\
+  do							\
+    {							\
+      result->type = ELSE_TYPE;				\
+      if (*buffer->cur == CHAR)				\
+	buffer->cur++, result->type = THEN_TYPE;	\
+    }							\
   while (0)
 
 /* Lex a token into pfile->cur_token, which is also incremented, to
@@ -1967,33 +1967,33 @@ _cpp_lex_direct (cpp_reader *pfile)
   if (buffer->need_line)
     {
       if (pfile->state.in_deferred_pragma)
-        {
-          result->type = CPP_PRAGMA_EOL;
-          pfile->state.in_deferred_pragma = false;
-          if (!pfile->state.pragma_allow_expansion)
-            pfile->state.prevent_expansion--;
-          return result;
-        }
+	{
+	  result->type = CPP_PRAGMA_EOL;
+	  pfile->state.in_deferred_pragma = false;
+	  if (!pfile->state.pragma_allow_expansion)
+	    pfile->state.prevent_expansion--;
+	  return result;
+	}
       if (!_cpp_get_fresh_line (pfile))
-        {
-          result->type = CPP_EOF;
-          if (!pfile->state.in_directive)
-            {
-              /* Tell the compiler the line number of the EOF token.  */
-              result->src_loc = pfile->line_table->highest_line;
-              result->flags = BOL;
-            }
-          return result;
-        }
+	{
+	  result->type = CPP_EOF;
+	  if (!pfile->state.in_directive)
+	    {
+	      /* Tell the compiler the line number of the EOF token.  */
+	      result->src_loc = pfile->line_table->highest_line;
+	      result->flags = BOL;
+	    }
+	  return result;
+	}
       if (!pfile->keep_tokens)
-        {
-          pfile->cur_run = &pfile->base_run;
-          result = pfile->base_run.base;
-          pfile->cur_token = result + 1;
-        }
+	{
+	  pfile->cur_run = &pfile->base_run;
+	  result = pfile->base_run.base;
+	  pfile->cur_token = result + 1;
+	}
       result->flags = BOL;
       if (pfile->state.parsing_args == 2)
-        result->flags |= PREV_WHITE;
+	result->flags |= PREV_WHITE;
     }
   buffer = pfile->buffer;
  update_tokens_line:
@@ -2020,22 +2020,22 @@ _cpp_lex_direct (cpp_reader *pfile)
 
     case '\n':
       if (buffer->cur < buffer->rlimit)
-        CPP_INCREMENT_LINE (pfile, 0);
+	CPP_INCREMENT_LINE (pfile, 0);
       buffer->need_line = true;
       goto fresh_line;
 
     case '0': case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
       {
-        struct normalize_state nst = INITIAL_NORMALIZE_STATE;
-        result->type = CPP_NUMBER;
+	struct normalize_state nst = INITIAL_NORMALIZE_STATE;
+	result->type = CPP_NUMBER;
         /* sdcpp specific */
         if (CPP_OPTION (pfile, pedantic_parse_number))
           pedantic_lex_number (pfile, &result->val.str);
         else
           lex_number (pfile, &result->val.str, &nst);
-        warn_about_normalization (pfile, result, &nst);
-        break;
+	warn_about_normalization (pfile, result, &nst);
+	break;
       }
 
     case 'L':
@@ -2043,24 +2043,24 @@ _cpp_lex_direct (cpp_reader *pfile)
     case 'U':
     case 'R':
       /* 'L', 'u', 'U', 'u8' or 'R' may introduce wide characters,
-         wide strings or raw strings.  */
+	 wide strings or raw strings.  */
       if (c == 'L' || CPP_OPTION (pfile, uliterals))
-        {
-          if ((*buffer->cur == '\'' && c != 'R')
-              || *buffer->cur == '"'
-              || (*buffer->cur == 'R'
-                  && c != 'R'
-                  && buffer->cur[1] == '"'
-                  && CPP_OPTION (pfile, uliterals))
-              || (*buffer->cur == '8'
-                  && c == 'u'
-                  && (buffer->cur[1] == '"'
-                      || (buffer->cur[1] == 'R' && buffer->cur[2] == '"'))))
-            {
-              lex_string (pfile, result, buffer->cur - 1);
-              break;
-            }
-        }
+	{
+	  if ((*buffer->cur == '\'' && c != 'R')
+	      || *buffer->cur == '"'
+	      || (*buffer->cur == 'R'
+		  && c != 'R'
+		  && buffer->cur[1] == '"'
+		  && CPP_OPTION (pfile, uliterals))
+	      || (*buffer->cur == '8'
+		  && c == 'u'
+		  && (buffer->cur[1] == '"'
+		      || (buffer->cur[1] == 'R' && buffer->cur[2] == '"'))))
+	    {
+	      lex_string (pfile, result, buffer->cur - 1);
+	      break;
+	    }
+	}
       /* Fall through.  */
 
     case '_':
@@ -2076,10 +2076,10 @@ _cpp_lex_direct (cpp_reader *pfile)
     case 'Y': case 'Z':
       result->type = CPP_NAME;
       {
-        struct normalize_state nst = INITIAL_NORMALIZE_STATE;
-        result->val.node.node = lex_identifier (pfile, buffer->cur - 1, false,
-                                                &nst);
-        warn_about_normalization (pfile, result, &nst);
+	struct normalize_state nst = INITIAL_NORMALIZE_STATE;
+	result->val.node.node = lex_identifier (pfile, buffer->cur - 1, false,
+						&nst);
+	warn_about_normalization (pfile, result, &nst);
       }
 
       /* SDCC __asm specific */
@@ -2102,10 +2102,10 @@ _cpp_lex_direct (cpp_reader *pfile)
         }
       /* Convert named operators to their proper types.  */
       else if (result->val.node.node->flags & NODE_OPERATOR)
-        {
-          result->flags |= NAMED_OP;
-          result->type = (enum cpp_ttype) result->val.node.node->directive_index;
-        }
+	{
+	  result->flags |= NAMED_OP;
+	  result->type = (enum cpp_ttype) result->val.node.node->directive_index;
+	}
       break;
 
     case '\'':

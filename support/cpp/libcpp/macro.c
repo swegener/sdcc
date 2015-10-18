@@ -231,55 +231,55 @@ _cpp_builtin_macro_text (cpp_reader *pfile, cpp_hashnode *node)
     case BT_DATE:
     case BT_TIME:
       if (pfile->date == NULL)
-        {
-          /* Allocate __DATE__ and __TIME__ strings from permanent
-             storage.  We only do this once, and don't generate them
-             at init time, because time() and localtime() are very
-             slow on some systems.  */
-          time_t tt;
-          struct tm *tb = NULL;
+	{
+	  /* Allocate __DATE__ and __TIME__ strings from permanent
+	     storage.  We only do this once, and don't generate them
+	     at init time, because time() and localtime() are very
+	     slow on some systems.  */
+	  time_t tt;
+	  struct tm *tb = NULL;
 
-          /* (time_t) -1 is a legitimate value for "number of seconds
-             since the Epoch", so we have to do a little dance to
-             distinguish that from a genuine error.  */
-          errno = 0;
-          tt = time(NULL);
-          if (tt != (time_t)-1 || errno == 0)
-            tb = localtime (&tt);
+	  /* (time_t) -1 is a legitimate value for "number of seconds
+	     since the Epoch", so we have to do a little dance to
+	     distinguish that from a genuine error.  */
+	  errno = 0;
+	  tt = time(NULL);
+	  if (tt != (time_t)-1 || errno == 0)
+	    tb = localtime (&tt);
 
-          if (tb)
-            {
-              pfile->date = _cpp_unaligned_alloc (pfile,
-                                                  sizeof ("\"Oct 11 1347\""));
-              sprintf ((char *) pfile->date, "\"%s %2d %4d\"",
-                       monthnames[tb->tm_mon], tb->tm_mday,
-                       tb->tm_year + 1900);
+	  if (tb)
+	    {
+	      pfile->date = _cpp_unaligned_alloc (pfile,
+						  sizeof ("\"Oct 11 1347\""));
+	      sprintf ((char *) pfile->date, "\"%s %2d %4d\"",
+		       monthnames[tb->tm_mon], tb->tm_mday,
+		       tb->tm_year + 1900);
 
-              pfile->time = _cpp_unaligned_alloc (pfile,
-                                                  sizeof ("\"12:34:56\""));
-              sprintf ((char *) pfile->time, "\"%02d:%02d:%02d\"",
-                       tb->tm_hour, tb->tm_min, tb->tm_sec);
-            }
-          else
-            {
-              cpp_errno (pfile, CPP_DL_WARNING,
-                         "could not determine date and time");
-                
-              pfile->date = UC"\"??? ?? ????\"";
-              pfile->time = UC"\"??:??:??\"";
-            }
-        }
+	      pfile->time = _cpp_unaligned_alloc (pfile,
+						  sizeof ("\"12:34:56\""));
+	      sprintf ((char *) pfile->time, "\"%02d:%02d:%02d\"",
+		       tb->tm_hour, tb->tm_min, tb->tm_sec);
+	    }
+	  else
+	    {
+	      cpp_errno (pfile, CPP_DL_WARNING,
+			 "could not determine date and time");
+		
+	      pfile->date = UC"\"??? ?? ????\"";
+	      pfile->time = UC"\"??:??:??\"";
+	    }
+	}
 
       if (node->value.builtin == BT_DATE)
-        result = pfile->date;
+	result = pfile->date;
       else
-        result = pfile->time;
+	result = pfile->time;
       break;
 
     case BT_COUNTER:
       if (CPP_OPTION (pfile, directives_only) && pfile->state.in_directive)
-        cpp_error (pfile, CPP_DL_ERROR,
-            "__COUNTER__ expanded inside directive with -fdirectives-only");
+	cpp_error (pfile, CPP_DL_ERROR,
+	    "__COUNTER__ expanded inside directive with -fdirectives-only");
       number = pfile->counter++;
       break;
     }
@@ -400,11 +400,11 @@ stringify_arg (cpp_reader *pfile, macro_arg *arg)
       len += 3;
 
       if ((size_t) (BUFF_LIMIT (pfile->u_buff) - dest) < len)
-        {
-          size_t len_so_far = dest - BUFF_FRONT (pfile->u_buff);
-          _cpp_extend_buff (pfile, &pfile->u_buff, len);
-          dest = BUFF_FRONT (pfile->u_buff) + len_so_far;
-        }
+	{
+	  size_t len_so_far = dest - BUFF_FRONT (pfile->u_buff);
+	  _cpp_extend_buff (pfile, &pfile->u_buff, len);
+	  dest = BUFF_FRONT (pfile->u_buff) + len_so_far;
+	}
 
       /* Leading white space?  */
       if (dest - 1 != BUFF_FRONT (pfile->u_buff))
@@ -437,7 +437,7 @@ stringify_arg (cpp_reader *pfile, macro_arg *arg)
   if (backslash_count & 1)
     {
       cpp_error (pfile, CPP_DL_WARNING,
-                 "invalid string literal, ignoring final '\\'");
+		 "invalid string literal, ignoring final '\\'");
       dest--;
     }
 
@@ -630,119 +630,119 @@ collect_args (cpp_reader *pfile, const cpp_hashnode *node,
       arg->first = (const cpp_token **) buff->cur;
 
       for (;;)
-        {
-          /* Require space for 2 new tokens (including a CPP_EOF).  */
-          if ((unsigned char *) &arg->first[ntokens + 2] > buff->limit)
-            {
-              buff = _cpp_append_extend_buff (pfile, buff,
-                                              1000 * sizeof (cpp_token *));
-              arg->first = (const cpp_token **) buff->cur;
-            }
+	{
+	  /* Require space for 2 new tokens (including a CPP_EOF).  */
+	  if ((unsigned char *) &arg->first[ntokens + 2] > buff->limit)
+	    {
+	      buff = _cpp_append_extend_buff (pfile, buff,
+					      1000 * sizeof (cpp_token *));
+	      arg->first = (const cpp_token **) buff->cur;
+	    }
 
-          token = cpp_get_token (pfile);
+	  token = cpp_get_token (pfile);
 
-          if (token->type == CPP_PADDING)
-            {
-              /* Drop leading padding.  */
-              if (ntokens == 0)
-                continue;
-            }
-          else if (token->type == CPP_OPEN_PAREN)
-            paren_depth++;
-          else if (token->type == CPP_CLOSE_PAREN)
-            {
-              if (paren_depth-- == 0)
-                break;
-            }
-          else if (token->type == CPP_COMMA)
-            {
-              /* A comma does not terminate an argument within
-                 parentheses or as part of a variable argument.  */
-              if (paren_depth == 0
-                  && ! (macro->variadic && argc == macro->paramc))
-                break;
-            }
-          else if (token->type == CPP_EOF
-                   || (token->type == CPP_HASH && token->flags & BOL))
-            break;
-          else if (token->type == CPP_PRAGMA)
-            {
-              cpp_token *newtok = _cpp_temp_token (pfile);
+	  if (token->type == CPP_PADDING)
+	    {
+	      /* Drop leading padding.  */
+	      if (ntokens == 0)
+		continue;
+	    }
+	  else if (token->type == CPP_OPEN_PAREN)
+	    paren_depth++;
+	  else if (token->type == CPP_CLOSE_PAREN)
+	    {
+	      if (paren_depth-- == 0)
+		break;
+	    }
+	  else if (token->type == CPP_COMMA)
+	    {
+	      /* A comma does not terminate an argument within
+		 parentheses or as part of a variable argument.  */
+	      if (paren_depth == 0
+		  && ! (macro->variadic && argc == macro->paramc))
+		break;
+	    }
+	  else if (token->type == CPP_EOF
+		   || (token->type == CPP_HASH && token->flags & BOL))
+	    break;
+	  else if (token->type == CPP_PRAGMA)
+	    {
+	      cpp_token *newtok = _cpp_temp_token (pfile);
 
-              /* CPP_PRAGMA token lives in directive_result, which will
-                 be overwritten on the next directive.  */
-              *newtok = *token;
-              token = newtok;
-              do
-                {
-                  if (*pragma_buff == NULL
-                      || BUFF_ROOM (*pragma_buff) < sizeof (cpp_token *))
-                    {
-                      _cpp_buff *next;
-                      if (*pragma_buff == NULL)
-                        *pragma_buff
-                          = _cpp_get_buff (pfile, 32 * sizeof (cpp_token *));
-                      else
-                        {
-                          next = *pragma_buff;
-                          *pragma_buff
-                            = _cpp_get_buff (pfile,
-                                             (BUFF_FRONT (*pragma_buff)
-                                              - (*pragma_buff)->base) * 2);
-                          (*pragma_buff)->next = next;
-                        }
-                    }
-                  *(const cpp_token **) BUFF_FRONT (*pragma_buff) = token;
-                  BUFF_FRONT (*pragma_buff) += sizeof (cpp_token *);
-                  if (token->type == CPP_PRAGMA_EOL)
-                    break;
-                  token = cpp_get_token (pfile);
-                }
-              while (token->type != CPP_EOF);
+	      /* CPP_PRAGMA token lives in directive_result, which will
+		 be overwritten on the next directive.  */
+	      *newtok = *token;
+	      token = newtok;
+	      do
+		{
+		  if (*pragma_buff == NULL
+		      || BUFF_ROOM (*pragma_buff) < sizeof (cpp_token *))
+		    {
+		      _cpp_buff *next;
+		      if (*pragma_buff == NULL)
+			*pragma_buff
+			  = _cpp_get_buff (pfile, 32 * sizeof (cpp_token *));
+		      else
+			{
+			  next = *pragma_buff;
+			  *pragma_buff
+			    = _cpp_get_buff (pfile,
+					     (BUFF_FRONT (*pragma_buff)
+					      - (*pragma_buff)->base) * 2);
+			  (*pragma_buff)->next = next;
+			}
+		    }
+		  *(const cpp_token **) BUFF_FRONT (*pragma_buff) = token;
+		  BUFF_FRONT (*pragma_buff) += sizeof (cpp_token *);
+		  if (token->type == CPP_PRAGMA_EOL)
+		    break;
+		  token = cpp_get_token (pfile);
+		}
+	      while (token->type != CPP_EOF);
 
-              /* In deferred pragmas parsing_args and prevent_expansion
-                 had been changed, reset it.  */
-              pfile->state.parsing_args = 2;
-              pfile->state.prevent_expansion = 1;
+	      /* In deferred pragmas parsing_args and prevent_expansion
+		 had been changed, reset it.  */
+	      pfile->state.parsing_args = 2;
+	      pfile->state.prevent_expansion = 1;
 
-              if (token->type == CPP_EOF)
-                break;
-              else
-                continue;
-            }
+	      if (token->type == CPP_EOF)
+		break;
+	      else
+		continue;
+	    }
 
-          arg->first[ntokens++] = token;
-        }
+	  arg->first[ntokens++] = token;
+	}
 
       /* Drop trailing padding.  */
       while (ntokens > 0 && arg->first[ntokens - 1]->type == CPP_PADDING)
-        ntokens--;
+	ntokens--;
 
       arg->count = ntokens;
       arg->first[ntokens] = &pfile->eof;
 
       /* Terminate the argument.  Excess arguments loop back and
-         overwrite the final legitimate argument, before failing.  */
+	 overwrite the final legitimate argument, before failing.  */
       if (argc <= macro->paramc)
-        {
-          buff->cur = (unsigned char *) &arg->first[ntokens + 1];
-          if (argc != macro->paramc)
-            arg++;
-        }
+	{
+	  buff->cur = (unsigned char *) &arg->first[ntokens + 1];
+	  if (argc != macro->paramc)
+	    arg++;
+	}
     }
   while (token->type != CPP_CLOSE_PAREN && token->type != CPP_EOF);
 
   if (token->type == CPP_EOF)
     {
       /* We still need the CPP_EOF to end directives, and to end
-         pre-expansion of a macro argument.  Step back is not
-         unconditional, since we don't want to return a CPP_EOF to our
-         callers at the end of an -include-d file.  */
+	 pre-expansion of a macro argument.  Step back is not
+	 unconditional, since we don't want to return a CPP_EOF to our
+	 callers at the end of an -include-d file.  */
       if (pfile->context->prev || pfile->state.in_directive)
-        _cpp_backup_tokens (pfile, 1);
+	_cpp_backup_tokens (pfile, 1);
       cpp_error (pfile, CPP_DL_ERROR,
-                 "unterminated argument list invoking macro \"%s\"",
-                 NODE_NAME (node));
+		 "unterminated argument list invoking macro \"%s\"",
+		 NODE_NAME (node));
     }
   else
     {

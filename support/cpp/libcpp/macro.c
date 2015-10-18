@@ -1741,7 +1741,7 @@ create_iso_definition (cpp_reader *pfile, cpp_macro *macro)
   for (;;)
     {
       /* Check the stringifying # constraint 6.10.3.2.1 of
-         function-like macros when lexing the subsequent token.  */
+	 function-like macros when lexing the subsequent token.  */
       if (macro->count > 1 && token[-1].type == CPP_HASH && macro->fun_like)
 	{
 	  if (token->type == CPP_MACRO_ARG)

@@ -288,121 +288,121 @@ _cpp_clean_line (cpp_reader *pfile)
       const uchar *pbackslash = NULL;
 
       /* Fast path.  This is the common case of an un-escaped line with
-         no trigraphs.  The primary win here is by not writing any
-         data back to memory until we have to.  */
+	 no trigraphs.  The primary win here is by not writing any
+	 data back to memory until we have to.  */
       while (1)
-        {
-          /* Perform an optimized search for \n, \r, \\, ?.  */
-          s = search_line_fast (s, buffer->rlimit);
+	{
+	  /* Perform an optimized search for \n, \r, \\, ?.  */
+	  s = search_line_fast (s, buffer->rlimit);
 
-          c = *s;
-          if (c == '\\')
-            {
-              /* Record the location of the backslash and continue.  */
-              pbackslash = s++;
-            }
-          else if (__builtin_expect (c == '?', 0))
-            {
-              if (__builtin_expect (s[1] == '?', false)
-                   && _cpp_trigraph_map[s[2]])
-                {
-                  /* Have a trigraph.  We may or may not have to convert
-                     it.  Add a line note regardless, for -Wtrigraphs.  */
-                  add_line_note (buffer, s, s[2]);
-                  if (CPP_OPTION (pfile, trigraphs))
-                    {
-                      /* We do, and that means we have to switch to the
-                         slow path.  */
-                      d = (uchar *) s;
-                      *d = _cpp_trigraph_map[s[2]];
-                      s += 2;
-                      goto slow_path;
-                    }
-                }
-              /* Not a trigraph.  Continue on fast-path.  */
-              s++;
-            }
-          else
-            break;
-        }
+	  c = *s;
+	  if (c == '\\')
+	    {
+	      /* Record the location of the backslash and continue.  */
+	      pbackslash = s++;
+	    }
+	  else if (__builtin_expect (c == '?', 0))
+	    {
+	      if (__builtin_expect (s[1] == '?', false)
+		   && _cpp_trigraph_map[s[2]])
+		{
+		  /* Have a trigraph.  We may or may not have to convert
+		     it.  Add a line note regardless, for -Wtrigraphs.  */
+		  add_line_note (buffer, s, s[2]);
+		  if (CPP_OPTION (pfile, trigraphs))
+		    {
+		      /* We do, and that means we have to switch to the
+		         slow path.  */
+		      d = (uchar *) s;
+		      *d = _cpp_trigraph_map[s[2]];
+		      s += 2;
+		      goto slow_path;
+		    }
+		}
+	      /* Not a trigraph.  Continue on fast-path.  */
+	      s++;
+	    }
+	  else
+	    break;
+	}
 
       /* This must be \r or \n.  We're either done, or we'll be forced
-         to write back to the buffer and continue on the slow path.  */
+	 to write back to the buffer and continue on the slow path.  */
       d = (uchar *) s;
 
       if (__builtin_expect (s == buffer->rlimit, false))
-        goto done;
+	goto done;
 
       /* DOS line ending? */
       if (__builtin_expect (c == '\r', false) && s[1] == '\n')
-        {
-          s++;
-          if (s == buffer->rlimit)
-            goto done;
-        }
+	{
+	  s++;
+	  if (s == buffer->rlimit)
+	    goto done;
+	}
 
       if (__builtin_expect (pbackslash == NULL, true))
-        goto done;
+	goto done;
 
       /* Check for escaped newline.  */
       p = d;
       while (is_nvspace (p[-1]))
-        p--;
+	p--;
       if (p - 1 != pbackslash)
-        goto done;
+	goto done;
 
       /* Have an escaped newline; process it and proceed to
-         the slow path.  */
+	 the slow path.  */
       add_line_note (buffer, p - 1, p != d ? ' ' : '\\');
       d = p - 2;
       buffer->next_line = p - 1;
 
     slow_path:
       while (1)
-        {
-          c = *++s;
-          *++d = c;
+	{
+	  c = *++s;
+	  *++d = c;
 
-          if (c == '\n' || c == '\r')
-            {
-              /* Handle DOS line endings.  */
-              if (c == '\r' && s != buffer->rlimit && s[1] == '\n')
-                s++;
-              if (s == buffer->rlimit)
-                break;
+	  if (c == '\n' || c == '\r')
+	    {
+	      /* Handle DOS line endings.  */
+	      if (c == '\r' && s != buffer->rlimit && s[1] == '\n')
+		s++;
+	      if (s == buffer->rlimit)
+		break;
 
-              /* Escaped?  */
-              p = d;
-              while (p != buffer->next_line && is_nvspace (p[-1]))
-                p--;
-              if (p == buffer->next_line || p[-1] != '\\')
-                break;
+	      /* Escaped?  */
+	      p = d;
+	      while (p != buffer->next_line && is_nvspace (p[-1]))
+		p--;
+	      if (p == buffer->next_line || p[-1] != '\\')
+		break;
 
-              add_line_note (buffer, p - 1, p != d ? ' ': '\\');
-              d = p - 2;
-              buffer->next_line = p - 1;
-            }
-          else if (c == '?' && s[1] == '?' && _cpp_trigraph_map[s[2]])
-            {
-              /* Add a note regardless, for the benefit of -Wtrigraphs.  */
-              add_line_note (buffer, d, s[2]);
-              if (CPP_OPTION (pfile, trigraphs))
-                {
-                  *d = _cpp_trigraph_map[s[2]];
-                  s += 2;
-                }
-            }
-        }
+	      add_line_note (buffer, p - 1, p != d ? ' ': '\\');
+	      d = p - 2;
+	      buffer->next_line = p - 1;
+	    }
+	  else if (c == '?' && s[1] == '?' && _cpp_trigraph_map[s[2]])
+	    {
+	      /* Add a note regardless, for the benefit of -Wtrigraphs.  */
+	      add_line_note (buffer, d, s[2]);
+	      if (CPP_OPTION (pfile, trigraphs))
+		{
+		  *d = _cpp_trigraph_map[s[2]];
+		  s += 2;
+		}
+	    }
+	}
     }
   else
     {
       while (*s != '\n' && *s != '\r')
-        s++;
+	s++;
       d = (uchar *) s;
 
       /* Handle DOS line endings.  */
       if (*s == '\r' && s != buffer->rlimit && s[1] == '\n')
-        s++;
+	s++;
     }
 
  done:
@@ -454,24 +454,24 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
       unsigned int col;
 
       if (note->pos > buffer->cur)
-        break;
+	break;
 
       buffer->cur_note++;
       col = CPP_BUF_COLUMN (buffer, note->pos + 1);
 
       if (note->type == '\\' || note->type == ' ')
-        {
-          if (note->type == ' ' && !in_comment)
-            cpp_error_with_line (pfile, CPP_DL_WARNING, pfile->line_table->highest_line, col,
-                                 "backslash and newline separated by space");
+	{
+	  if (note->type == ' ' && !in_comment)
+	    cpp_error_with_line (pfile, CPP_DL_WARNING, pfile->line_table->highest_line, col,
+				 "backslash and newline separated by space");
 
-          if (buffer->next_line > buffer->rlimit)
-            {
-              cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line_table->highest_line, col,
-                                   "backslash-newline at end of file");
-              /* Prevent "no newline at end of file" warning.  */
-              buffer->next_line = buffer->rlimit;
-            }
+	  if (buffer->next_line > buffer->rlimit)
+	    {
+	      cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line_table->highest_line, col,
+				   "backslash-newline at end of file");
+	      /* Prevent "no newline at end of file" warning.  */
+	      buffer->next_line = buffer->rlimit;
+	    }
 
           ret = PREV_NL;
 
@@ -574,7 +574,7 @@ _cpp_skip_block_comment (cpp_reader *pfile)
   for (;;)
     {
       /* People like decorating comments with '*', so check for '/'
-         instead for efficiency.  */
+	 instead for efficiency.  */
       c = *cur++;
 
       if (c == '/')
@@ -582,32 +582,33 @@ _cpp_skip_block_comment (cpp_reader *pfile)
 	  if (cur[-2] == '*')
 	    break;
 
-          /* Warn about potential nested comments, but not if the '/'
-             comes immediately before the true comment delimiter.
-             Don't bother to get it right across escaped newlines.  */
-          if (CPP_OPTION (pfile, warn_comments)
-              && cur[0] == '*' && cur[1] != '/')
-            {
-              buffer->cur = cur;
-              cpp_warning_with_line (pfile, CPP_W_COMMENTS,
-                                   pfile->line_table->highest_line, CPP_BUF_COL (buffer),
-                                   "\"/*\" within comment");
-            }
-        }
+	  /* Warn about potential nested comments, but not if the '/'
+	     comes immediately before the true comment delimiter.
+	     Don't bother to get it right across escaped newlines.  */
+	  if (CPP_OPTION (pfile, warn_comments)
+	      && cur[0] == '*' && cur[1] != '/')
+	    {
+	      buffer->cur = cur;
+	      cpp_warning_with_line (pfile, CPP_W_COMMENTS,
+				     pfile->line_table->highest_line,
+				     CPP_BUF_COL (buffer),
+				     "\"/*\" within comment");
+	    }
+	}
       else if (c == '\n')
-        {
-          unsigned int cols;
-          buffer->cur = cur - 1;
-          _cpp_process_line_notes (pfile, true);
-          if (buffer->next_line >= buffer->rlimit)
-            return true;
-          _cpp_clean_line (pfile);
+	{
+	  unsigned int cols;
+	  buffer->cur = cur - 1;
+	  _cpp_process_line_notes (pfile, true);
+	  if (buffer->next_line >= buffer->rlimit)
+	    return true;
+	  _cpp_clean_line (pfile);
 
-          cols = buffer->next_line - buffer->line_base;
-          CPP_INCREMENT_LINE (pfile, cols);
+	  cols = buffer->next_line - buffer->line_base;
+	  CPP_INCREMENT_LINE (pfile, cols);
 
-          cur = buffer->cur;
-        }
+	  cur = buffer->cur;
+	}
     }
 
   buffer->cur = cur;
@@ -642,15 +643,15 @@ skip_whitespace (cpp_reader *pfile, cppchar_t c)
     {
       /* Horizontal space always OK.  */
       if (c == ' ' || c == '\t')
-        ;
+	;
       /* Just \f \v or \0 left.  */
       else if (c == '\0')
-        saw_NUL = true;
+	saw_NUL = true;
       else if (pfile->state.in_directive && CPP_PEDANTIC (pfile))
-        cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line_table->highest_line,
-                             CPP_BUF_COL (buffer),
-                             "%s in preprocessing directive",
-                             c == '\f' ? "form feed" : "vertical tab");
+	cpp_error_with_line (pfile, CPP_DL_PEDWARN, pfile->line_table->highest_line,
+			     CPP_BUF_COL (buffer),
+			     "%s in preprocessing directive",
+			     c == '\f' ? "form feed" : "vertical tab");
 
       c = *buffer->cur++;
     }
@@ -680,25 +681,25 @@ name_p (cpp_reader *pfile, const cpp_string *string)
 /* After parsing an identifier or other sequence, produce a warning about
    sequences not in NFC/NFKC.  */
 static void
-warn_about_normalization (cpp_reader *pfile,
-                          const cpp_token *token,
-                          const struct normalize_state *s)
+warn_about_normalization (cpp_reader *pfile, 
+			  const cpp_token *token,
+			  const struct normalize_state *s)
 {
   if (CPP_OPTION (pfile, warn_normalize) < NORMALIZE_STATE_RESULT (s)
       && !pfile->state.skipping)
     {
       /* Make sure that the token is printed using UCNs, even
-         if we'd otherwise happily print UTF-8.  */
+	 if we'd otherwise happily print UTF-8.  */
       unsigned char *buf = XNEWVEC (unsigned char, cpp_token_len (token));
       size_t sz;
 
       sz = cpp_spell_token (pfile, token, buf, false) - buf;
       if (NORMALIZE_STATE_RESULT (s) == normalized_C)
-        cpp_warning_with_line (pfile, CPP_W_NORMALIZE, token->src_loc, 0,
-                             "`%.*s' is not in NFKC", (int) sz, buf);
+	cpp_warning_with_line (pfile, CPP_W_NORMALIZE, token->src_loc, 0,
+			       "`%.*s' is not in NFKC", (int) sz, buf);
       else
-        cpp_warning_with_line (pfile, CPP_W_NORMALIZE, token->src_loc, 0,
-                             "`%.*s' is not in NFC", (int) sz, buf);
+	cpp_warning_with_line (pfile, CPP_W_NORMALIZE, token->src_loc, 0,
+			       "`%.*s' is not in NFC", (int) sz, buf);
     }
 }
 
@@ -706,21 +707,21 @@ warn_about_normalization (cpp_reader *pfile,
    an identifier.  FIRST is TRUE if this starts an identifier.  */
 static bool
 forms_identifier_p (cpp_reader *pfile, int first,
-                    struct normalize_state *state)
+		    struct normalize_state *state)
 {
   cpp_buffer *buffer = pfile->buffer;
 
   if (*buffer->cur == '$')
     {
       if (!CPP_OPTION (pfile, dollars_in_ident))
-        return false;
+	return false;
 
       buffer->cur++;
       if (CPP_OPTION (pfile, warn_dollars) && !pfile->state.skipping)
-        {
-          CPP_OPTION (pfile, warn_dollars) = 0;
-          cpp_error (pfile, CPP_DL_PEDWARN, "'$' in identifier or number");
-        }
+	{
+	  CPP_OPTION (pfile, warn_dollars) = 0;
+	  cpp_error (pfile, CPP_DL_PEDWARN, "'$' in identifier or number");
+	}
 
       return true;
     }
@@ -732,8 +733,8 @@ forms_identifier_p (cpp_reader *pfile, int first,
     {
       buffer->cur += 2;
       if (_cpp_valid_ucn (pfile, &buffer->cur, buffer->rlimit, 1 + !first,
-                          state))
-        return true;
+			  state))
+	return true;
       buffer->cur -= 2;
     }
 
@@ -762,26 +763,26 @@ lex_identifier_intern (cpp_reader *pfile, const uchar *base)
 
   /* Rarely, identifiers require diagnostics when lexed.  */
   if (__builtin_expect ((result->flags & NODE_DIAGNOSTIC)
-                        && !pfile->state.skipping, 0))
+			&& !pfile->state.skipping, 0))
     {
       /* It is allowed to poison the same identifier twice.  */
       if ((result->flags & NODE_POISONED) && !pfile->state.poisoned_ok)
-        cpp_error (pfile, CPP_DL_ERROR, "attempt to use poisoned \"%s\"",
-                   NODE_NAME (result));
+	cpp_error (pfile, CPP_DL_ERROR, "attempt to use poisoned \"%s\"",
+		   NODE_NAME (result));
 
       /* Constraint 6.10.3.5: __VA_ARGS__ should only appear in the
-         replacement list of a variadic macro.  */
+	 replacement list of a variadic macro.  */
       if (result == pfile->spec_nodes.n__VA_ARGS__
-          && !pfile->state.va_args_ok)
-        cpp_error (pfile, CPP_DL_PEDWARN,
-                   "__VA_ARGS__ can only appear in the expansion"
-                   " of a C99 variadic macro");
+	  && !pfile->state.va_args_ok)
+	cpp_error (pfile, CPP_DL_PEDWARN,
+		   "__VA_ARGS__ can only appear in the expansion"
+		   " of a C99 variadic macro");
 
       /* For -Wc++-compat, warn about use of C++ named operators.  */
       if (result->flags & NODE_WARN_OPERATOR)
-        cpp_warning (pfile, CPP_W_CXX_OPERATOR_NAMES,
-                   "identifier \"%s\" is a special operator name in C++",
-                   NODE_NAME (result));
+	cpp_warning (pfile, CPP_W_CXX_OPERATOR_NAMES,
+		     "identifier \"%s\" is a special operator name in C++",
+		     NODE_NAME (result));
     }
 
   return result;
@@ -800,7 +801,7 @@ _cpp_lex_identifier (cpp_reader *pfile, const char *name)
 /* Lex an identifier starting at BUFFER->CUR - 1.  */
 static cpp_hashnode *
 lex_identifier (cpp_reader *pfile, const uchar *base, bool starts_ucn,
-                struct normalize_state *nst)
+		struct normalize_state *nst)
 {
   cpp_hashnode *result;
   const uchar *cur;
@@ -811,22 +812,22 @@ lex_identifier (cpp_reader *pfile, const uchar *base, bool starts_ucn,
   if (! starts_ucn)
     while (ISIDNUM (*cur))
       {
-        hash = HT_HASHSTEP (hash, *cur);
-        cur++;
+	hash = HT_HASHSTEP (hash, *cur);
+	cur++;
       }
   pfile->buffer->cur = cur;
   if (starts_ucn || forms_identifier_p (pfile, false, nst))
     {
       /* Slower version for identifiers containing UCNs (or $).  */
       do {
-        while (ISIDNUM (*pfile->buffer->cur))
-          {
-            pfile->buffer->cur++;
-            NORMALIZE_STATE_UPDATE_IDNUM (nst);
-          }
+	while (ISIDNUM (*pfile->buffer->cur))
+	  {
+	    pfile->buffer->cur++;
+	    NORMALIZE_STATE_UPDATE_IDNUM (nst);
+	  }
       } while (forms_identifier_p (pfile, false, nst));
       result = _cpp_interpret_identifier (pfile, base,
-                                          pfile->buffer->cur - base);
+					  pfile->buffer->cur - base);
     }
   else
     {
@@ -834,31 +835,31 @@ lex_identifier (cpp_reader *pfile, const uchar *base, bool starts_ucn,
       hash = HT_HASHFINISH (hash, len);
 
       result = CPP_HASHNODE (ht_lookup_with_hash (pfile->hash_table,
-                                                  base, len, hash, HT_ALLOC));
+						  base, len, hash, HT_ALLOC));
     }
 
   /* Rarely, identifiers require diagnostics when lexed.  */
   if (__builtin_expect ((result->flags & NODE_DIAGNOSTIC)
-                        && !pfile->state.skipping, 0))
+			&& !pfile->state.skipping, 0))
     {
       /* It is allowed to poison the same identifier twice.  */
       if ((result->flags & NODE_POISONED) && !pfile->state.poisoned_ok)
-        cpp_error (pfile, CPP_DL_ERROR, "attempt to use poisoned \"%s\"",
-                   NODE_NAME (result));
+	cpp_error (pfile, CPP_DL_ERROR, "attempt to use poisoned \"%s\"",
+		   NODE_NAME (result));
 
       /* Constraint 6.10.3.5: __VA_ARGS__ should only appear in the
-         replacement list of a variadic macro.  */
+	 replacement list of a variadic macro.  */
       if (result == pfile->spec_nodes.n__VA_ARGS__
-          && !pfile->state.va_args_ok)
-        cpp_error (pfile, CPP_DL_PEDWARN,
-                   "__VA_ARGS__ can only appear in the expansion"
-                   " of a C99 variadic macro");
+	  && !pfile->state.va_args_ok)
+	cpp_error (pfile, CPP_DL_PEDWARN,
+		   "__VA_ARGS__ can only appear in the expansion"
+		   " of a C99 variadic macro");
 
       /* For -Wc++-compat, warn about use of C++ named operators.  */
       if (result->flags & NODE_WARN_OPERATOR)
-        cpp_warning (pfile, CPP_W_CXX_OPERATOR_NAMES,
-                   "identifier \"%s\" is a special operator name in C++",
-                   NODE_NAME (result));
+	cpp_warning (pfile, CPP_W_CXX_OPERATOR_NAMES,
+		     "identifier \"%s\" is a special operator name in C++",
+		     NODE_NAME (result));
     }
 
   return result;
@@ -1152,7 +1153,7 @@ pedantic_lex_number (cpp_reader *pfile, cpp_string *number)
 /* Lex a number to NUMBER starting at BUFFER->CUR - 1.  */
 static void
 lex_number (cpp_reader *pfile, cpp_string *number,
-            struct normalize_state *nst)
+	    struct normalize_state *nst)
 {
   const uchar *cur;
   const uchar *base;
@@ -1184,7 +1185,7 @@ lex_number (cpp_reader *pfile, cpp_string *number,
 /* Create a token of type TYPE with a literal spelling.  */
 static void
 create_literal (cpp_reader *pfile, cpp_token *token, const uchar *base,
-                unsigned int len, enum cpp_ttype type)
+		unsigned int len, enum cpp_ttype type)
 {
   uchar *dest = _cpp_unaligned_alloc (pfile, len + 1);
 
@@ -1200,7 +1201,7 @@ create_literal (cpp_reader *pfile, cpp_token *token, const uchar *base,
 
 static void
 bufring_append (cpp_reader *pfile, const uchar *base, size_t len,
-                _cpp_buff **first_buff_p, _cpp_buff **last_buff_p)
+		_cpp_buff **first_buff_p, _cpp_buff **last_buff_p)
 {
   _cpp_buff *first_buff = *first_buff_p;
   _cpp_buff *last_buff = *last_buff_p;
@@ -1234,7 +1235,7 @@ bufring_append (cpp_reader *pfile, const uchar *base, size_t len,
 
 static void
 lex_raw_string (cpp_reader *pfile, cpp_token *token, const uchar *base,
-                const uchar *cur)
+		const uchar *cur)
 {
   source_location saw_NUL = 0;
   const uchar *raw_prefix;
@@ -1253,31 +1254,31 @@ lex_raw_string (cpp_reader *pfile, cpp_token *token, const uchar *base,
   while (raw_prefix_len < 16)
     {
       switch (raw_prefix[raw_prefix_len])
-        {
-        case ' ': case '(': case ')': case '\\': case '\t':
-        case '\v': case '\f': case '\n': default:
-          break;
-        /* Basic source charset except the above chars.  */
-        case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-        case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
-        case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
-        case 's': case 't': case 'u': case 'v': case 'w': case 'x':
-        case 'y': case 'z':
-        case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-        case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
-        case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
-        case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
-        case 'Y': case 'Z':
-        case '0': case '1': case '2': case '3': case '4': case '5':
-        case '6': case '7': case '8': case '9':
-        case '_': case '{': case '}': case '#': case '[': case ']':
-        case '<': case '>': case '%': case ':': case ';': case '.':
-        case '?': case '*': case '+': case '-': case '/': case '^':
-        case '&': case '|': case '~': case '!': case '=': case ',':
-        case '"': case '\'':
-          raw_prefix_len++;
-          continue;
-        }
+	{
+	case ' ': case '(': case ')': case '\\': case '\t':
+	case '\v': case '\f': case '\n': default:
+	  break;
+	/* Basic source charset except the above chars.  */
+	case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+	case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+	case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+	case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+	case 'y': case 'z':
+	case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+	case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+	case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+	case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+	case 'Y': case 'Z':
+	case '0': case '1': case '2': case '3': case '4': case '5':
+	case '6': case '7': case '8': case '9':
+	case '_': case '{': case '}': case '#': case '[': case ']':
+	case '<': case '>': case '%': case ':': case ';': case '.':
+	case '?': case '*': case '+': case '-': case '/': case '^':
+	case '&': case '|': case '~': case '!': case '=': case ',':
+	case '"': case '\'':
+	  raw_prefix_len++;
+	  continue;
+	}
       break;
     }
 
@@ -1300,151 +1301,151 @@ lex_raw_string (cpp_reader *pfile, cpp_token *token, const uchar *base,
   cur = raw_prefix + raw_prefix_len + 1;
   for (;;)
     {
-#define BUF_APPEND(STR,LEN)                                     \
-      do {                                                      \
-        bufring_append (pfile, (const uchar *)(STR), (LEN),     \
-                        &first_buff, &last_buff);               \
-        total_len += (LEN);                                     \
+#define BUF_APPEND(STR,LEN)					\
+      do {							\
+	bufring_append (pfile, (const uchar *)(STR), (LEN),	\
+			&first_buff, &last_buff);		\
+	total_len += (LEN);					\
       } while (0);
 
       cppchar_t c;
 
       /* If we previously performed any trigraph or line splicing
-         transformations, undo them within the body of the raw string.  */
+	 transformations, undo them within the body of the raw string.  */
       while (note->pos < cur)
-        ++note;
+	++note;
       for (; note->pos == cur; ++note)
-        {
-          switch (note->type)
-            {
-            case '\\':
-            case ' ':
-              /* Restore backslash followed by newline.  */
-              BUF_APPEND (base, cur - base);
-              base = cur;
-              BUF_APPEND ("\\", 1);
-            after_backslash:
-              if (note->type == ' ')
-                {
-                  /* GNU backslash whitespace newline extension.  FIXME
-                     could be any sequence of non-vertical space.  When we
-                     can properly restore any such sequence, we should mark
-                     this note as handled so _cpp_process_line_notes
-                     doesn't warn.  */
-                  BUF_APPEND (" ", 1);
-                }
+	{
+	  switch (note->type)
+	    {
+	    case '\\':
+	    case ' ':
+	      /* Restore backslash followed by newline.  */
+	      BUF_APPEND (base, cur - base);
+	      base = cur;
+	      BUF_APPEND ("\\", 1);
+	    after_backslash:
+	      if (note->type == ' ')
+		{
+		  /* GNU backslash whitespace newline extension.  FIXME
+		     could be any sequence of non-vertical space.  When we
+		     can properly restore any such sequence, we should mark
+		     this note as handled so _cpp_process_line_notes
+		     doesn't warn.  */
+		  BUF_APPEND (" ", 1);
+		}
 
-              BUF_APPEND ("\n", 1);
-              break;
+	      BUF_APPEND ("\n", 1);
+	      break;
 
-            case 0:
-              /* Already handled.  */
-              break;
+	    case 0:
+	      /* Already handled.  */
+	      break;
 
-            default:
-              if (_cpp_trigraph_map[note->type])
-                {
-                  /* Don't warn about this trigraph in
-                     _cpp_process_line_notes, since trigraphs show up as
-                     trigraphs in raw strings.  */
-                  uchar type = note->type;
-                  note->type = 0;
+	    default:
+	      if (_cpp_trigraph_map[note->type])
+		{
+		  /* Don't warn about this trigraph in
+		     _cpp_process_line_notes, since trigraphs show up as
+		     trigraphs in raw strings.  */
+		  uchar type = note->type;
+		  note->type = 0;
 
-                  if (!CPP_OPTION (pfile, trigraphs))
-                    /* If we didn't convert the trigraph in the first
-                       place, don't do anything now either.  */
-                    break;
+		  if (!CPP_OPTION (pfile, trigraphs))
+		    /* If we didn't convert the trigraph in the first
+		       place, don't do anything now either.  */
+		    break;
 
-                  BUF_APPEND (base, cur - base);
-                  base = cur;
-                  BUF_APPEND ("??", 2);
+		  BUF_APPEND (base, cur - base);
+		  base = cur;
+		  BUF_APPEND ("??", 2);
 
-                  /* ??/ followed by newline gets two line notes, one for
-                     the trigraph and one for the backslash/newline.  */
-                  if (type == '/' && note[1].pos == cur)
-                    {
-                      if (note[1].type != '\\'
-                          && note[1].type != ' ')
-                        abort ();
-                      BUF_APPEND ("/", 1);
-                      ++note;
-                      goto after_backslash;
-                    }
-                  /* The ) from ??) could be part of the suffix.  */
-                  else if (type == ')'
-                           && strncmp ((const char *) cur+1,
-                                       (const char *) raw_prefix,
-                                       raw_prefix_len) == 0
-                           && cur[raw_prefix_len+1] == '"')
-                    {
-                      BUF_APPEND (")", 1);
-                      base++;
-                      cur += raw_prefix_len + 2;
-                      goto break_outer_loop;
-                    }
-                  else
-                    {
-                      /* Skip the replacement character.  */
-                      base = ++cur;
-                      BUF_APPEND (&type, 1);
-                    }
-                }
-              else
-                abort ();
-              break;
-            }
-        }
+		  /* ??/ followed by newline gets two line notes, one for
+		     the trigraph and one for the backslash/newline.  */
+		  if (type == '/' && note[1].pos == cur)
+		    {
+		      if (note[1].type != '\\'
+			  && note[1].type != ' ')
+			abort ();
+		      BUF_APPEND ("/", 1);
+		      ++note;
+		      goto after_backslash;
+		    }
+		  /* The ) from ??) could be part of the suffix.  */
+		  else if (type == ')'
+			   && strncmp ((const char *) cur+1,
+				       (const char *) raw_prefix,
+				       raw_prefix_len) == 0
+			   && cur[raw_prefix_len+1] == '"')
+		    {
+		      BUF_APPEND (")", 1);
+		      base++;
+		      cur += raw_prefix_len + 2;
+		      goto break_outer_loop;
+		    }
+		  else
+		    {
+		      /* Skip the replacement character.  */
+		      base = ++cur;
+		      BUF_APPEND (&type, 1);
+		    }
+		}
+	      else
+		abort ();
+	      break;
+	    }
+	}
       c = *cur++;
 
       if (c == ')'
-          && strncmp ((const char *) cur, (const char *) raw_prefix,
-                      raw_prefix_len) == 0
-          && cur[raw_prefix_len] == '"')
-        {
-          cur += raw_prefix_len + 1;
-          break;
-        }
+	  && strncmp ((const char *) cur, (const char *) raw_prefix,
+		      raw_prefix_len) == 0
+	  && cur[raw_prefix_len] == '"')
+	{
+	  cur += raw_prefix_len + 1;
+	  break;
+	}
       else if (c == '\n')
-        {
-          if (pfile->state.in_directive
-              || pfile->state.parsing_args
-              || pfile->state.in_deferred_pragma)
-            {
-              cur--;
-              type = CPP_OTHER;
-              cpp_error_with_line (pfile, CPP_DL_ERROR, token->src_loc, 0,
-                                   "unterminated raw string");
-              break;
-            }
+	{
+	  if (pfile->state.in_directive
+	      || pfile->state.parsing_args
+	      || pfile->state.in_deferred_pragma)
+	    {
+	      cur--;
+	      type = CPP_OTHER;
+	      cpp_error_with_line (pfile, CPP_DL_ERROR, token->src_loc, 0,
+				   "unterminated raw string");
+	      break;
+	    }
 
-          BUF_APPEND (base, cur - base);
+	  BUF_APPEND (base, cur - base);
 
-          if (pfile->buffer->cur < pfile->buffer->rlimit)
-            CPP_INCREMENT_LINE (pfile, 0);
-          pfile->buffer->need_line = true;
+	  if (pfile->buffer->cur < pfile->buffer->rlimit)
+	    CPP_INCREMENT_LINE (pfile, 0);
+	  pfile->buffer->need_line = true;
 
-          pfile->buffer->cur = cur-1;
-          _cpp_process_line_notes (pfile, false);
-          if (!_cpp_get_fresh_line (pfile))
-            {
-              source_location src_loc = token->src_loc;
-              token->type = CPP_EOF;
-              /* Tell the compiler the line number of the EOF token.  */
-              token->src_loc = pfile->line_table->highest_line;
-              token->flags = BOL;
-              if (first_buff != NULL)
-                _cpp_release_buff (pfile, first_buff);
-              cpp_error_with_line (pfile, CPP_DL_ERROR, src_loc, 0,
-                                   "unterminated raw string");
-              return;
-            }
+	  pfile->buffer->cur = cur-1;
+	  _cpp_process_line_notes (pfile, false);
+	  if (!_cpp_get_fresh_line (pfile))
+	    {
+	      source_location src_loc = token->src_loc;
+	      token->type = CPP_EOF;
+	      /* Tell the compiler the line number of the EOF token.  */
+	      token->src_loc = pfile->line_table->highest_line;
+	      token->flags = BOL;
+	      if (first_buff != NULL)
+		_cpp_release_buff (pfile, first_buff);
+	      cpp_error_with_line (pfile, CPP_DL_ERROR, src_loc, 0,
+				   "unterminated raw string");
+	      return;
+	    }
 
-          cur = base = pfile->buffer->cur;
-          note = &pfile->buffer->notes[pfile->buffer->cur_note];
-        }
+	  cur = base = pfile->buffer->cur;
+	  note = &pfile->buffer->notes[pfile->buffer->cur_note];
+	}
       else if (c == '\0' && !saw_NUL)
-        LINEMAP_POSITION_FOR_COLUMN (saw_NUL, pfile->line_table,
-                                     CPP_BUF_COLUMN (pfile->buffer, cur));
+	LINEMAP_POSITION_FOR_COLUMN (saw_NUL, pfile->line_table,
+				     CPP_BUF_COLUMN (pfile->buffer, cur));
     }
  break_outer_loop:
 
@@ -1626,7 +1627,7 @@ cpp_get_comments (cpp_reader *pfile)
 }
 
 /* Append a comment to the end of the comment table. */
-static void
+static void 
 store_comment (cpp_reader *pfile, cpp_token *token) 
 {
   int len;
@@ -1769,7 +1770,7 @@ cpp_peek_token (cpp_reader *pfile, int index)
     {
       peektok = _cpp_lex_token (pfile);
       if (peektok->type == CPP_EOF)
-        return peektok;
+	return peektok;
     }
   while (index--);
 
@@ -2009,7 +2010,7 @@ _cpp_lex_direct (cpp_reader *pfile)
   c = *buffer->cur++;
 
   LINEMAP_POSITION_FOR_COLUMN (result->src_loc, pfile->line_table,
-                               CPP_BUF_COLUMN (buffer, buffer->cur));
+			       CPP_BUF_COLUMN (buffer, buffer->cur));
 
   switch (c)
     {
@@ -2117,47 +2118,47 @@ _cpp_lex_direct (cpp_reader *pfile)
       /* A potential block or line comment.  */
       comment_start = buffer->cur;
       c = *buffer->cur;
-
+      
       if (c == '*')
-        {
-          if (_cpp_skip_block_comment (pfile))
-            cpp_error (pfile, CPP_DL_ERROR, "unterminated comment");
-        }
+	{
+	  if (_cpp_skip_block_comment (pfile))
+	    cpp_error (pfile, CPP_DL_ERROR, "unterminated comment");
+	}
       else if (c == '/' && (CPP_OPTION (pfile, cplusplus_comments)
-                            || cpp_in_system_header (pfile)))
-        {
-          /* Warn about comments only if pedantically GNUC89, and not
-             in system headers.  */
-          if (CPP_OPTION (pfile, lang) == CLK_GNUC89 && CPP_PEDANTIC (pfile)
-              && ! buffer->warned_cplusplus_comments)
-            {
-              cpp_error (pfile, CPP_DL_PEDWARN,
-                         "C++ style comments are not allowed in ISO C90");
-              cpp_error (pfile, CPP_DL_PEDWARN,
-                         "(this will be reported only once per input file)");
-              buffer->warned_cplusplus_comments = 1;
-            }
+			    || cpp_in_system_header (pfile)))
+	{
+	  /* Warn about comments only if pedantically GNUC89, and not
+	     in system headers.  */
+	  if (CPP_OPTION (pfile, lang) == CLK_GNUC89 && CPP_PEDANTIC (pfile)
+	      && ! buffer->warned_cplusplus_comments)
+	    {
+	      cpp_error (pfile, CPP_DL_PEDWARN,
+			 "C++ style comments are not allowed in ISO C90");
+	      cpp_error (pfile, CPP_DL_PEDWARN,
+			 "(this will be reported only once per input file)");
+	      buffer->warned_cplusplus_comments = 1;
+	    }
 
-          if (skip_line_comment (pfile) && CPP_OPTION (pfile, warn_comments))
-            cpp_warning (pfile, CPP_W_COMMENTS, "multi-line comment");
-        }
+	  if (skip_line_comment (pfile) && CPP_OPTION (pfile, warn_comments))
+	    cpp_warning (pfile, CPP_W_COMMENTS, "multi-line comment");
+	}
       else if (c == '=')
-        {
-          buffer->cur++;
-          result->type = CPP_DIV_EQ;
-          break;
-        }
+	{
+	  buffer->cur++;
+	  result->type = CPP_DIV_EQ;
+	  break;
+	}
       else
-        {
-          result->type = CPP_DIV;
-          break;
-        }
+	{
+	  result->type = CPP_DIV;
+	  break;
+	}
 
       if (!pfile->state.save_comments)
-        {
-          result->flags |= PREV_WHITE;
-          goto update_tokens_line;
-        }
+	{
+	  result->flags |= PREV_WHITE;
+	  goto update_tokens_line;
+	}
 
       /* Save the comment as a token in its own right.  */
       save_comment (pfile, result, comment_start, c);
@@ -2165,139 +2166,139 @@ _cpp_lex_direct (cpp_reader *pfile)
 
     case '<':
       if (pfile->state.angled_headers)
-        {
-          lex_string (pfile, result, buffer->cur - 1);
-          if (result->type != CPP_LESS)
-            break;
-        }
+	{
+	  lex_string (pfile, result, buffer->cur - 1);
+	  if (result->type != CPP_LESS)
+	    break;
+	}
 
       result->type = CPP_LESS;
       if (*buffer->cur == '=')
-        buffer->cur++, result->type = CPP_LESS_EQ;
+	buffer->cur++, result->type = CPP_LESS_EQ;
       else if (*buffer->cur == '<')
-        {
-          buffer->cur++;
-          IF_NEXT_IS ('=', CPP_LSHIFT_EQ, CPP_LSHIFT);
-        }
+	{
+	  buffer->cur++;
+	  IF_NEXT_IS ('=', CPP_LSHIFT_EQ, CPP_LSHIFT);
+	}
       else if (CPP_OPTION (pfile, digraphs))
-        {
-          if (*buffer->cur == ':')
-            {
-              buffer->cur++;
-              result->flags |= DIGRAPH;
-              result->type = CPP_OPEN_SQUARE;
-            }
-          else if (*buffer->cur == '%')
-            {
-              buffer->cur++;
-              result->flags |= DIGRAPH;
-              result->type = CPP_OPEN_BRACE;
-            }
-        }
+	{
+	  if (*buffer->cur == ':')
+	    {
+	      buffer->cur++;
+	      result->flags |= DIGRAPH;
+	      result->type = CPP_OPEN_SQUARE;
+	    }
+	  else if (*buffer->cur == '%')
+	    {
+	      buffer->cur++;
+	      result->flags |= DIGRAPH;
+	      result->type = CPP_OPEN_BRACE;
+	    }
+	}
       break;
 
     case '>':
       result->type = CPP_GREATER;
       if (*buffer->cur == '=')
-        buffer->cur++, result->type = CPP_GREATER_EQ;
+	buffer->cur++, result->type = CPP_GREATER_EQ;
       else if (*buffer->cur == '>')
-        {
-          buffer->cur++;
-          IF_NEXT_IS ('=', CPP_RSHIFT_EQ, CPP_RSHIFT);
-        }
+	{
+	  buffer->cur++;
+	  IF_NEXT_IS ('=', CPP_RSHIFT_EQ, CPP_RSHIFT);
+	}
       break;
 
     case '%':
       result->type = CPP_MOD;
       if (*buffer->cur == '=')
-        buffer->cur++, result->type = CPP_MOD_EQ;
+	buffer->cur++, result->type = CPP_MOD_EQ;
       else if (CPP_OPTION (pfile, digraphs))
-        {
-          if (*buffer->cur == ':')
-            {
-              buffer->cur++;
-              result->flags |= DIGRAPH;
-              result->type = CPP_HASH;
-              if (*buffer->cur == '%' && buffer->cur[1] == ':')
-                buffer->cur += 2, result->type = CPP_PASTE, result->val.token_no = 0;
-            }
-          else if (*buffer->cur == '>')
-            {
-              buffer->cur++;
-              result->flags |= DIGRAPH;
-              result->type = CPP_CLOSE_BRACE;
-            }
-        }
+	{
+	  if (*buffer->cur == ':')
+	    {
+	      buffer->cur++;
+	      result->flags |= DIGRAPH;
+	      result->type = CPP_HASH;
+	      if (*buffer->cur == '%' && buffer->cur[1] == ':')
+		buffer->cur += 2, result->type = CPP_PASTE, result->val.token_no = 0;
+	    }
+	  else if (*buffer->cur == '>')
+	    {
+	      buffer->cur++;
+	      result->flags |= DIGRAPH;
+	      result->type = CPP_CLOSE_BRACE;
+	    }
+	}
       break;
 
     case '.':
       result->type = CPP_DOT;
       if (ISDIGIT (*buffer->cur))
-        {
-          struct normalize_state nst = INITIAL_NORMALIZE_STATE;
-          result->type = CPP_NUMBER;
+	{
+	  struct normalize_state nst = INITIAL_NORMALIZE_STATE;
+	  result->type = CPP_NUMBER;
           /* sdcpp specific */
           if (CPP_OPTION (pfile, pedantic_parse_number))
             pedantic_lex_number (pfile, &result->val.str);
           else
             lex_number (pfile, &result->val.str, &nst);
-          warn_about_normalization (pfile, result, &nst);
-        }
+	  warn_about_normalization (pfile, result, &nst);
+	}
       else if (*buffer->cur == '.' && buffer->cur[1] == '.')
-        buffer->cur += 2, result->type = CPP_ELLIPSIS;
+	buffer->cur += 2, result->type = CPP_ELLIPSIS;
       else if (*buffer->cur == '*' && CPP_OPTION (pfile, cplusplus))
-        buffer->cur++, result->type = CPP_DOT_STAR;
+	buffer->cur++, result->type = CPP_DOT_STAR;
       break;
 
     case '+':
       result->type = CPP_PLUS;
       if (*buffer->cur == '+')
-        buffer->cur++, result->type = CPP_PLUS_PLUS;
+	buffer->cur++, result->type = CPP_PLUS_PLUS;
       else if (*buffer->cur == '=')
-        buffer->cur++, result->type = CPP_PLUS_EQ;
+	buffer->cur++, result->type = CPP_PLUS_EQ;
       break;
 
     case '-':
       result->type = CPP_MINUS;
       if (*buffer->cur == '>')
-        {
-          buffer->cur++;
-          result->type = CPP_DEREF;
-          if (*buffer->cur == '*' && CPP_OPTION (pfile, cplusplus))
-            buffer->cur++, result->type = CPP_DEREF_STAR;
-        }
+	{
+	  buffer->cur++;
+	  result->type = CPP_DEREF;
+	  if (*buffer->cur == '*' && CPP_OPTION (pfile, cplusplus))
+	    buffer->cur++, result->type = CPP_DEREF_STAR;
+	}
       else if (*buffer->cur == '-')
-        buffer->cur++, result->type = CPP_MINUS_MINUS;
+	buffer->cur++, result->type = CPP_MINUS_MINUS;
       else if (*buffer->cur == '=')
-        buffer->cur++, result->type = CPP_MINUS_EQ;
+	buffer->cur++, result->type = CPP_MINUS_EQ;
       break;
 
     case '&':
       result->type = CPP_AND;
       if (*buffer->cur == '&')
-        buffer->cur++, result->type = CPP_AND_AND;
+	buffer->cur++, result->type = CPP_AND_AND;
       else if (*buffer->cur == '=')
-        buffer->cur++, result->type = CPP_AND_EQ;
+	buffer->cur++, result->type = CPP_AND_EQ;
       break;
 
     case '|':
       result->type = CPP_OR;
       if (*buffer->cur == '|')
-        buffer->cur++, result->type = CPP_OR_OR;
+	buffer->cur++, result->type = CPP_OR_OR;
       else if (*buffer->cur == '=')
-        buffer->cur++, result->type = CPP_OR_EQ;
+	buffer->cur++, result->type = CPP_OR_EQ;
       break;
 
     case ':':
       result->type = CPP_COLON;
       if (*buffer->cur == ':' && CPP_OPTION (pfile, cplusplus))
-        buffer->cur++, result->type = CPP_SCOPE;
+	buffer->cur++, result->type = CPP_SCOPE;
       else if (*buffer->cur == '>' && CPP_OPTION (pfile, digraphs))
-        {
-          buffer->cur++;
-          result->flags |= DIGRAPH;
-          result->type = CPP_CLOSE_SQUARE;
-        }
+	{
+	  buffer->cur++;
+	  result->flags |= DIGRAPH;
+	  result->type = CPP_CLOSE_SQUARE;
+	}
       break;
 
     case '*': IF_NEXT_IS ('=', CPP_MULT_EQ, CPP_MULT); break;
@@ -2323,17 +2324,17 @@ _cpp_lex_direct (cpp_reader *pfile)
     case '$':
     case '\\':
       {
-        const uchar *base = --buffer->cur;
-        struct normalize_state nst = INITIAL_NORMALIZE_STATE;
+	const uchar *base = --buffer->cur;
+	struct normalize_state nst = INITIAL_NORMALIZE_STATE;
 
-        if (forms_identifier_p (pfile, true, &nst))
-          {
-            result->type = CPP_NAME;
-            result->val.node.node = lex_identifier (pfile, base, true, &nst);
-            warn_about_normalization (pfile, result, &nst);
-            break;
-          }
-        buffer->cur++;
+	if (forms_identifier_p (pfile, true, &nst))
+	  {
+	    result->type = CPP_NAME;
+	    result->val.node.node = lex_identifier (pfile, base, true, &nst);
+	    warn_about_normalization (pfile, result, &nst);
+	    break;
+	  }
+	buffer->cur++;
       }
 
     default:
@@ -2353,9 +2354,9 @@ cpp_token_len (const cpp_token *token)
 
   switch (TOKEN_SPELL (token))
     {
-    default:            len = 6;                                break;
-    case SPELL_LITERAL: len = token->val.str.len;               break;
-    case SPELL_IDENT:   len = NODE_LEN (token->val.node.node) * 10;     break;
+    default:		len = 6;				break;
+    case SPELL_LITERAL:	len = token->val.str.len;		break;
+    case SPELL_IDENT:	len = NODE_LEN (token->val.node.node) * 10;	break;
     }
 
   return len;
@@ -2373,21 +2374,21 @@ utf8_to_ucn (unsigned char *buffer, const unsigned char *name)
   int ucn_len_c;
   unsigned t;
   unsigned long utf32;
-
+  
   /* Compute the length of the UTF-8 sequence.  */
   for (t = *name; t & 0x80; t <<= 1)
     ucn_len++;
-
+  
   utf32 = *name & (0x7F >> ucn_len);
   for (ucn_len_c = 1; ucn_len_c < ucn_len; ucn_len_c++)
     {
       utf32 = (utf32 << 6) | (*++name & 0x3F);
-
+      
       /* Ill-formed UTF-8.  */
       if ((*name & ~0x3F) != 0x80)
-        abort ();
+	abort ();
     }
-
+  
   *buffer++ = '\\';
   *buffer++ = 'U';
   for (j = 7; j >= 0; j--)
@@ -2411,49 +2412,49 @@ cpp_digraph2name (enum cpp_ttype type)
    FIXME: Would be nice if we didn't need the PFILE argument.  */
 unsigned char *
 cpp_spell_token (cpp_reader *pfile, const cpp_token *token,
-                 unsigned char *buffer, bool forstring)
+		 unsigned char *buffer, bool forstring)
 {
   switch (TOKEN_SPELL (token))
     {
     case SPELL_OPERATOR:
       {
-        const unsigned char *spelling;
-        unsigned char c;
+	const unsigned char *spelling;
+	unsigned char c;
 
-        if (token->flags & DIGRAPH)
-          spelling = cpp_digraph2name (token->type);
-        else if (token->flags & NAMED_OP)
-          goto spell_ident;
-        else
-          spelling = TOKEN_NAME (token);
+	if (token->flags & DIGRAPH)
+	  spelling = cpp_digraph2name (token->type);
+	else if (token->flags & NAMED_OP)
+	  goto spell_ident;
+	else
+	  spelling = TOKEN_NAME (token);
 
-        while ((c = *spelling++) != '\0')
-          *buffer++ = c;
+	while ((c = *spelling++) != '\0')
+	  *buffer++ = c;
       }
       break;
 
     spell_ident:
     case SPELL_IDENT:
       if (forstring)
-        {
-          memcpy (buffer, NODE_NAME (token->val.node.node),
-                  NODE_LEN (token->val.node.node));
-          buffer += NODE_LEN (token->val.node.node);
-        }
+	{
+	  memcpy (buffer, NODE_NAME (token->val.node.node),
+		  NODE_LEN (token->val.node.node));
+	  buffer += NODE_LEN (token->val.node.node);
+	}
       else
-        {
-          size_t i;
-          const unsigned char * name = NODE_NAME (token->val.node.node);
-
-          for (i = 0; i < NODE_LEN (token->val.node.node); i++)
-            if (name[i] & ~0x7F)
-              {
-                i += utf8_to_ucn (buffer, name + i) - 1;
-                buffer += 10;
-              }
-            else
-              *buffer++ = NODE_NAME (token->val.node.node)[i];
-        }
+	{
+	  size_t i;
+	  const unsigned char * name = NODE_NAME (token->val.node.node);
+	  
+	  for (i = 0; i < NODE_LEN (token->val.node.node); i++)
+	    if (name[i] & ~0x7F)
+	      {
+		i += utf8_to_ucn (buffer, name + i) - 1;
+		buffer += 10;
+	      }
+	    else
+	      *buffer++ = NODE_NAME (token->val.node.node)[i];
+	}
       break;
 
     case SPELL_LITERAL:
@@ -2463,7 +2464,7 @@ cpp_spell_token (cpp_reader *pfile, const cpp_token *token,
 
     case SPELL_NONE:
       cpp_error (pfile, CPP_DL_ICE,
-                 "unspellable token %s", TOKEN_NAME (token));
+		 "unspellable token %s", TOKEN_NAME (token));
       break;
     }
 
@@ -2474,7 +2475,7 @@ cpp_spell_token (cpp_reader *pfile, const cpp_token *token,
    freed when the reader is destroyed.  Useful for diagnostics.  */
 unsigned char *
 cpp_token_as_text (cpp_reader *pfile, const cpp_token *token)
-{
+{ 
   unsigned int len = cpp_token_len (token) + 1;
   unsigned char *start = _cpp_unaligned_alloc (pfile, len), *end;
 
@@ -2513,38 +2514,38 @@ cpp_output_token (const cpp_token *token, FILE *fp)
     {
     case SPELL_OPERATOR:
       {
-        const unsigned char *spelling;
-        int c;
+	const unsigned char *spelling;
+	int c;
 
-        if (token->flags & DIGRAPH)
-          spelling = cpp_digraph2name (token->type);
-        else if (token->flags & NAMED_OP)
-          goto spell_ident;
-        else
-          spelling = TOKEN_NAME (token);
+	if (token->flags & DIGRAPH)
+	  spelling = cpp_digraph2name (token->type);
+	else if (token->flags & NAMED_OP)
+	  goto spell_ident;
+	else
+	  spelling = TOKEN_NAME (token);
 
-        c = *spelling;
-        do
-          putc (c, fp);
-        while ((c = *++spelling) != '\0');
+	c = *spelling;
+	do
+	  putc (c, fp);
+	while ((c = *++spelling) != '\0');
       }
       break;
 
     spell_ident:
     case SPELL_IDENT:
       {
-        size_t i;
-        const unsigned char * name = NODE_NAME (token->val.node.node);
-
-        for (i = 0; i < NODE_LEN (token->val.node.node); i++)
-          if (name[i] & ~0x7F)
-            {
-              unsigned char buffer[10];
-              i += utf8_to_ucn (buffer, name + i) - 1;
-              fwrite (buffer, 1, 10, fp);
-            }
-          else
-            fputc (NODE_NAME (token->val.node.node)[i], fp);
+	size_t i;
+	const unsigned char * name = NODE_NAME (token->val.node.node);
+	
+	for (i = 0; i < NODE_LEN (token->val.node.node); i++)
+	  if (name[i] & ~0x7F)
+	    {
+	      unsigned char buffer[10];
+	      i += utf8_to_ucn (buffer, name + i) - 1;
+	      fwrite (buffer, 1, 10, fp);
+	    }
+	  else
+	    fputc (NODE_NAME (token->val.node.node)[i], fp);
       }
       break;
 
@@ -2565,20 +2566,20 @@ _cpp_equiv_tokens (const cpp_token *a, const cpp_token *b)
   if (a->type == b->type && a->flags == b->flags)
     switch (TOKEN_SPELL (a))
       {
-      default:                  /* Keep compiler happy.  */
+      default:			/* Keep compiler happy.  */
       case SPELL_OPERATOR:
-        /* token_no is used to track where multiple consecutive ##
-           tokens were originally located.  */
-        return (a->type != CPP_PASTE || a->val.token_no == b->val.token_no);
+	/* token_no is used to track where multiple consecutive ##
+	   tokens were originally located.  */
+	return (a->type != CPP_PASTE || a->val.token_no == b->val.token_no);
       case SPELL_NONE:
-        return (a->type != CPP_MACRO_ARG
-                || a->val.macro_arg.arg_no == b->val.macro_arg.arg_no);
+	return (a->type != CPP_MACRO_ARG
+		|| a->val.macro_arg.arg_no == b->val.macro_arg.arg_no);
       case SPELL_IDENT:
-        return a->val.node.node == b->val.node.node;
+	return a->val.node.node == b->val.node.node;
       case SPELL_LITERAL:
-        return (a->val.str.len == b->val.str.len
-                && !memcmp (a->val.str.text, b->val.str.text,
-                            a->val.str.len));
+	return (a->val.str.len == b->val.str.len
+		&& !memcmp (a->val.str.text, b->val.str.text,
+			    a->val.str.len));
       }
 
   return 0;
@@ -2590,7 +2591,7 @@ _cpp_equiv_tokens (const cpp_token *a, const cpp_token *b)
    needed, e.g. "." and ".2".  */
 int
 cpp_avoid_paste (cpp_reader *pfile, const cpp_token *token1,
-                 const cpp_token *token2)
+		 const cpp_token *token2)
 {
   enum cpp_ttype a = token1->type, b = token2->type;
   cppchar_t c;
@@ -2612,31 +2613,31 @@ cpp_avoid_paste (cpp_reader *pfile, const cpp_token *token1,
 
   switch (a)
     {
-    case CPP_GREATER:   return c == '>';
-    case CPP_LESS:      return c == '<' || c == '%' || c == ':';
-    case CPP_PLUS:      return c == '+';
-    case CPP_MINUS:     return c == '-' || c == '>';
-    case CPP_DIV:       return c == '/' || c == '*'; /* Comments.  */
-    case CPP_MOD:       return c == ':' || c == '>';
-    case CPP_AND:       return c == '&';
-    case CPP_OR:        return c == '|';
-    case CPP_COLON:     return c == ':' || c == '>';
-    case CPP_DEREF:     return c == '*';
-    case CPP_DOT:       return c == '.' || c == '%' || b == CPP_NUMBER;
-    case CPP_HASH:      return c == '#' || c == '%'; /* Digraph form.  */
-    case CPP_NAME:      return ((b == CPP_NUMBER
-                                 && name_p (pfile, &token2->val.str))
-                                || b == CPP_NAME
-                                || b == CPP_CHAR || b == CPP_STRING); /* L */
-    case CPP_NUMBER:    return (b == CPP_NUMBER || b == CPP_NAME
-                                || c == '.' || c == '+' || c == '-');
-                                      /* UCNs */
-    case CPP_OTHER:     return ((token1->val.str.text[0] == '\\'
-                                 && b == CPP_NAME)
-                                || (CPP_OPTION (pfile, objc)
-                                    && token1->val.str.text[0] == '@'
-                                    && (b == CPP_NAME || b == CPP_STRING)));
-    default:            break;
+    case CPP_GREATER:	return c == '>';
+    case CPP_LESS:	return c == '<' || c == '%' || c == ':';
+    case CPP_PLUS:	return c == '+';
+    case CPP_MINUS:	return c == '-' || c == '>';
+    case CPP_DIV:	return c == '/' || c == '*'; /* Comments.  */
+    case CPP_MOD:	return c == ':' || c == '>';
+    case CPP_AND:	return c == '&';
+    case CPP_OR:	return c == '|';
+    case CPP_COLON:	return c == ':' || c == '>';
+    case CPP_DEREF:	return c == '*';
+    case CPP_DOT:	return c == '.' || c == '%' || b == CPP_NUMBER;
+    case CPP_HASH:	return c == '#' || c == '%'; /* Digraph form.  */
+    case CPP_NAME:	return ((b == CPP_NUMBER
+				 && name_p (pfile, &token2->val.str))
+				|| b == CPP_NAME
+				|| b == CPP_CHAR || b == CPP_STRING); /* L */
+    case CPP_NUMBER:	return (b == CPP_NUMBER || b == CPP_NAME
+				|| c == '.' || c == '+' || c == '-');
+				      /* UCNs */
+    case CPP_OTHER:	return ((token1->val.str.text[0] == '\\'
+				 && b == CPP_NAME)
+				|| (CPP_OPTION (pfile, objc)
+				    && token1->val.str.text[0] == '@'
+				    && (b == CPP_NAME || b == CPP_STRING)));
+    default:		break;
     }
 
   return 0;
@@ -2656,7 +2657,7 @@ cpp_output_line (cpp_reader *pfile, FILE *fp)
       cpp_output_token (token, fp);
       token = cpp_get_token (pfile);
       if (token->flags & PREV_WHITE)
-        putc (' ', fp);
+	putc (' ', fp);
       if (in_asm && token->flags & PREV_NL)
         fputs ("\x87 ", fp);
     }
@@ -2690,19 +2691,19 @@ cpp_output_line_to_string (cpp_reader *pfile, const unsigned char *dir_name)
       unsigned int len = cpp_token_len (token) + 2;
 
       if (out + len > alloced)
-        {
-          alloced *= 2;
-          if (out + len > alloced)
-            alloced = out + len;
-          result = (unsigned char *) xrealloc (result, alloced);
-        }
+	{
+	  alloced *= 2;
+	  if (out + len > alloced)
+	    alloced = out + len;
+	  result = (unsigned char *) xrealloc (result, alloced);
+	}
 
       last = cpp_spell_token (pfile, token, &result[out], 0);
       out = last - result;
 
       token = cpp_get_token (pfile);
       if (token->flags & PREV_WHITE)
-        result[out++] = ' ';
+	result[out++] = ' ';
     }
 
   result[out] = '\0';
@@ -2718,7 +2719,7 @@ cpp_output_line_to_string (cpp_reader *pfile, const unsigned char *dir_name)
 #define MIN_BUFF_SIZE 8000
 #define BUFF_SIZE_UPPER_BOUND(MIN_SIZE) (MIN_BUFF_SIZE + (MIN_SIZE) * 3 / 2)
 #define EXTENDED_BUFF_SIZE(BUFF, MIN_EXTRA) \
-        (MIN_EXTRA + ((BUFF)->limit - (BUFF)->cur) * 2)
+	(MIN_EXTRA + ((BUFF)->limit - (BUFF)->cur) * 2)
 
 #if MIN_BUFF_SIZE > BUFF_SIZE_UPPER_BOUND (0)
   #error BUFF_SIZE_UPPER_BOUND must be at least as large as MIN_BUFF_SIZE!
@@ -2768,13 +2769,13 @@ _cpp_get_buff (cpp_reader *pfile, size_t min_size)
       size_t size;
 
       if (*p == NULL)
-        return new_buff (min_size);
+	return new_buff (min_size);
       result = *p;
       size = result->limit - result->base;
       /* Return a buffer that's big enough, but don't waste one that's
          way too big.  */
       if (size >= min_size && size <= BUFF_SIZE_UPPER_BOUND (min_size))
-        break;
+	break;
     }
 
   *p = result->next;
@@ -2888,16 +2889,16 @@ cpp_token_val_index (cpp_token *tok)
       return CPP_TOKEN_FLD_STR;
     case SPELL_OPERATOR:
       if (tok->type == CPP_PASTE)
-        return CPP_TOKEN_FLD_TOKEN_NO;
+	return CPP_TOKEN_FLD_TOKEN_NO;
       else
-        return CPP_TOKEN_FLD_NONE;
+	return CPP_TOKEN_FLD_NONE;
     case SPELL_NONE:
       if (tok->type == CPP_MACRO_ARG)
-        return CPP_TOKEN_FLD_ARG_NO;
+	return CPP_TOKEN_FLD_ARG_NO;
       else if (tok->type == CPP_PADDING)
-        return CPP_TOKEN_FLD_SOURCE;
+	return CPP_TOKEN_FLD_SOURCE;
       else if (tok->type == CPP_PRAGMA)
-        return CPP_TOKEN_FLD_PRAGMA;
+	return CPP_TOKEN_FLD_PRAGMA;
       /* else fall through */
     default:
       return CPP_TOKEN_FLD_NONE;

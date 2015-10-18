@@ -475,34 +475,34 @@ _cpp_process_line_notes (cpp_reader *pfile, int in_comment)
 
           ret = PREV_NL;
 
-          buffer->line_base = note->pos;
-          CPP_INCREMENT_LINE (pfile, 0);
-        }
+	  buffer->line_base = note->pos;
+	  CPP_INCREMENT_LINE (pfile, 0);
+	}
       else if (_cpp_trigraph_map[note->type])
-        {
-          if (CPP_OPTION (pfile, warn_trigraphs)
-              && (!in_comment || warn_in_comment (pfile, note)))
-            {
-              if (CPP_OPTION (pfile, trigraphs))
-                cpp_warning_with_line (pfile, CPP_W_TRIGRAPHS,
-                                     pfile->line_table->highest_line, col,
-                                     "trigraph ??%c converted to %c",
-                                     note->type,
-                                     (int) _cpp_trigraph_map[note->type]);
-              else
-                {
-                  cpp_warning_with_line
-                    (pfile, CPP_W_TRIGRAPHS,
+	{
+	  if (CPP_OPTION (pfile, warn_trigraphs)
+	      && (!in_comment || warn_in_comment (pfile, note)))
+	    {
+	      if (CPP_OPTION (pfile, trigraphs))
+		cpp_warning_with_line (pfile, CPP_W_TRIGRAPHS,
+                                       pfile->line_table->highest_line, col,
+				       "trigraph ??%c converted to %c",
+				       note->type,
+				       (int) _cpp_trigraph_map[note->type]);
+	      else
+		{
+		  cpp_warning_with_line 
+		    (pfile, CPP_W_TRIGRAPHS,
                      pfile->line_table->highest_line, col,
-                     "trigraph ??%c ignored, use -trigraphs to enable",
-                     note->type);
-                }
-            }
-        }
+		     "trigraph ??%c ignored, use -trigraphs to enable",
+		     note->type);
+		}
+	    }
+	}
       else if (note->type == 0)
-        /* Already processed in lex_raw_string.  */;
+	/* Already processed in lex_raw_string.  */;
       else
-        abort ();
+	abort ();
     }
   return ret;
 }
@@ -578,9 +578,9 @@ _cpp_skip_block_comment (cpp_reader *pfile)
       c = *cur++;
 
       if (c == '/')
-        {
-          if (cur[-2] == '*')
-            break;
+	{
+	  if (cur[-2] == '*')
+	    break;
 
           /* Warn about potential nested comments, but not if the '/'
              comes immediately before the true comment delimiter.
@@ -1165,10 +1165,10 @@ lex_number (cpp_reader *pfile, cpp_string *number,
 
       /* N.B. ISIDNUM does not include $.  */
       while (ISIDNUM (*cur) || *cur == '.' || VALID_SIGN (*cur, cur[-1]))
-        {
-          cur++;
-          NORMALIZE_STATE_UPDATE_IDNUM (nst);
-        }
+	{
+	  cur++;
+	  NORMALIZE_STATE_UPDATE_IDNUM (nst);
+	}
 
       pfile->buffer->cur = cur;
     }
@@ -1245,9 +1245,9 @@ lex_raw_string (cpp_reader *pfile, cpp_token *token, const uchar *base,
   _cpp_line_note *note = &pfile->buffer->notes[pfile->buffer->cur_note];
 
   type = (*base == 'L' ? CPP_WSTRING :
-          *base == 'U' ? CPP_STRING32 :
-          *base == 'u' ? (base[1] == '8' ? CPP_UTF8STRING : CPP_STRING16)
-          : CPP_STRING);
+	  *base == 'U' ? CPP_STRING32 :
+	  *base == 'u' ? (base[1] == '8' ? CPP_UTF8STRING : CPP_STRING16)
+	  : CPP_STRING);
 
   raw_prefix = cur + 1;
   while (raw_prefix_len < 16)
@@ -1284,14 +1284,14 @@ lex_raw_string (cpp_reader *pfile, cpp_token *token, const uchar *base,
   if (raw_prefix[raw_prefix_len] != '(')
     {
       int col = CPP_BUF_COLUMN (pfile->buffer, raw_prefix + raw_prefix_len)
-                + 1;
+		+ 1;
       if (raw_prefix_len == 16)
-        cpp_error_with_line (pfile, CPP_DL_ERROR, token->src_loc, col,
-                             "raw string delimiter longer than 16 characters");
+	cpp_error_with_line (pfile, CPP_DL_ERROR, token->src_loc, col,
+			     "raw string delimiter longer than 16 characters");
       else
-        cpp_error_with_line (pfile, CPP_DL_ERROR, token->src_loc, col,
-                             "invalid character '%c' in raw string delimiter",
-                             (int) raw_prefix[raw_prefix_len]);
+	cpp_error_with_line (pfile, CPP_DL_ERROR, token->src_loc, col,
+			     "invalid character '%c' in raw string delimiter",
+			     (int) raw_prefix[raw_prefix_len]);
       pfile->buffer->cur = raw_prefix - 1;
       create_literal (pfile, token, base, raw_prefix - 1 - base, CPP_OTHER);
       return;
@@ -1450,7 +1450,7 @@ lex_raw_string (cpp_reader *pfile, cpp_token *token, const uchar *base,
 
   if (saw_NUL && !pfile->state.skipping)
     cpp_error_with_line (pfile, CPP_DL_WARNING, saw_NUL, 0,
-               "null character(s) preserved in literal");
+	       "null character(s) preserved in literal");
 
   pfile->buffer->cur = cur;
   if (first_buff == NULL)
@@ -1464,12 +1464,12 @@ lex_raw_string (cpp_reader *pfile, cpp_token *token, const uchar *base,
       token->val.str.text = dest;
       last_buff = first_buff;
       while (last_buff != NULL)
-        {
-          memcpy (dest, last_buff->base,
-                  BUFF_FRONT (last_buff) - last_buff->base);
-          dest += BUFF_FRONT (last_buff) - last_buff->base;
-          last_buff = last_buff->next;
-        }
+	{
+	  memcpy (dest, last_buff->base,
+		  BUFF_FRONT (last_buff) - last_buff->base);
+	  dest += BUFF_FRONT (last_buff) - last_buff->base;
+	  last_buff = last_buff->next;
+	}
       _cpp_release_buff (pfile, first_buff);
       memcpy (dest, base, cur - base);
       dest[cur - base] = '\0';
@@ -1501,7 +1501,7 @@ lex_string (cpp_reader *pfile, cpp_token *token, const uchar *base)
     {
       terminator = *cur++;
       if (terminator == '8')
-        terminator = *cur++;
+	terminator = *cur++;
     }
   if (terminator == 'R')
     {
@@ -1510,13 +1510,13 @@ lex_string (cpp_reader *pfile, cpp_token *token, const uchar *base)
     }
   if (terminator == '"')
     type = (*base == 'L' ? CPP_WSTRING :
-            *base == 'U' ? CPP_STRING32 :
-            *base == 'u' ? (base[1] == '8' ? CPP_UTF8STRING : CPP_STRING16)
-                         : CPP_STRING);
+	    *base == 'U' ? CPP_STRING32 :
+	    *base == 'u' ? (base[1] == '8' ? CPP_UTF8STRING : CPP_STRING16)
+			 : CPP_STRING);
   else if (terminator == '\'')
     type = (*base == 'L' ? CPP_WCHAR :
-            *base == 'U' ? CPP_CHAR32 :
-            *base == 'u' ? CPP_CHAR16 : CPP_CHAR);
+	    *base == 'U' ? CPP_CHAR32 :
+	    *base == 'u' ? CPP_CHAR16 : CPP_CHAR);
   else
     terminator = '>', type = CPP_HEADER_NAME;
 
@@ -1526,34 +1526,34 @@ lex_string (cpp_reader *pfile, cpp_token *token, const uchar *base)
 
       /* In #include-style directives, terminators are not escapable.  */
       if (c == '\\' && !pfile->state.angled_headers && *cur != '\n')
-        cur++;
+	cur++;
       else if (c == terminator)
-        break;
+	break;
       else if (c == '\n')
-        {
-          cur--;
-          /* Unmatched quotes always yield undefined behavior, but
-             greedy lexing means that what appears to be an unterminated
-             header name may actually be a legitimate sequence of tokens.  */
-          if (terminator == '>')
-            {
-              token->type = CPP_LESS;
-              return;
-            }
-          type = CPP_OTHER;
-          break;
-        }
+	{
+	  cur--;
+	  /* Unmatched quotes always yield undefined behavior, but
+	     greedy lexing means that what appears to be an unterminated
+	     header name may actually be a legitimate sequence of tokens.  */
+	  if (terminator == '>')
+	    {
+	      token->type = CPP_LESS;
+	      return;
+	    }
+	  type = CPP_OTHER;
+	  break;
+	}
       else if (c == '\0')
-        saw_NUL = true;
+	saw_NUL = true;
     }
 
   if (saw_NUL && !pfile->state.skipping)
     cpp_error (pfile, CPP_DL_WARNING,
-               "null character(s) preserved in literal");
+	       "null character(s) preserved in literal");
 
   if (type == CPP_OTHER && CPP_OPTION (pfile, lang) != CLK_ASM)
     cpp_error (pfile, CPP_DL_PEDWARN, "missing terminating %c character",
-               (int) terminator);
+	       (int) terminator);
 
   pfile->buffer->cur = cur;
   create_literal (pfile, token, base, cur - base, type);

@@ -36,6 +36,7 @@ symbol *interrupts[INTNO_MAX + 1];
 void printIval (symbol *, sym_link *, initList *, struct dbuf_s *, bool check);
 set *publics = NULL;            /* public variables */
 set *externs = NULL;            /* Variables that are declared as extern */
+set *strSym = NULL;             /* string initializers */
 
 unsigned maxInterrupts = 0;
 int allocInfo = 1;
@@ -225,8 +226,10 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                 DCL_PTR_CONST (t) = 1;
               SPEC_STAT (newSym->etype) = 1;
 
-              /* This results in unencessary calls to stringToSymbol() through decorateType(), which make strings take twice as much  space as they should */
+              strSym = NULL;
+              ++noAlloc;
               resolveIvalSym (newSym->ival, newSym->type);
+              --noAlloc;
 
               // add it to the "XINIT (CODE)" segment
               addSet ((SPEC_OCLS (sym->etype) == xidata) ? &xinit->syms : &initializer->syms, newSym);
@@ -234,6 +237,8 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
               if (!SPEC_ABSA (sym->etype))
                 {
                   struct dbuf_s tmpBuf;
+                  symbol *ps = NULL;
+                  set *tmpSym = NULL;
 
                   dbuf_init (&tmpBuf, 4096);
                   // before allocation we must parse the sym->ival tree
@@ -244,8 +249,20 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                   printIval (sym, sym->type, sym->ival, &tmpBuf, TRUE);
                   --noInit;
                   --noAlloc;
+
+                  // delete redundant __str_%d symbols (initiailzer for char arrays)
+                  for (ps = setFirstItem (statsg->syms); ps; ps = setNextItem (statsg->syms))
+                    if (!strstr (tmpBuf.buf, ps->name) && isinSet (strSym, ps))
+                      addSet (&tmpSym, ps);
+                  for (ps = setFirstItem (tmpSym); ps; ps = setNextItem (tmpSym))
+                    deleteSetItem (&statsg->syms, ps);
+
+                  deleteSet (&tmpSym);
                   dbuf_destroy (&tmpBuf);
                 }
+
+              if (strSym)
+                deleteSet (&strSym);
             }
           else
             {

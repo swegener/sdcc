@@ -1672,6 +1672,11 @@ stringToSymbol (value * val)
       addSymChain (&sym);
       allocVariables (sym);
     }
+  else
+    {
+      addSet (&strSym, sym);
+      addSet (&statsg->syms, sym);	  
+    }
   sym->ival = NULL;
   return symbolVal (sym);
 }

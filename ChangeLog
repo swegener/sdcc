@@ -1,3 +1,8 @@
+2015-10-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* SDCC.y:
+	  Add checks for NULL pointers.
+
 2015-10-19 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c:

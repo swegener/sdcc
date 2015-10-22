@@ -191,27 +191,26 @@ function_definition
              /* assume it to be 'int'       */
              addDecl($1,0,newIntLink());
              $1 = createFunctionDecl($1);
-             if (FUNC_ISCRITICAL ($1->type))
+             if ($1 && FUNC_ISCRITICAL ($1->type))
                inCriticalFunction = 1;
          }
       function_body  {
                                    $$ = createFunction($1,$3);
-                                   if (FUNC_ISCRITICAL ($1->type))
+                                   if ($1 && FUNC_ISCRITICAL ($1->type))
                                      inCriticalFunction = 0;
-
                                }
    | declaration_specifiers function_declarator
          {
               pointerTypes($2->type,copyLinkChain($1));
               addDecl($2,0,$1);
               $2 = createFunctionDecl($2);
-              if (FUNC_ISCRITICAL ($2->type))
+              if ($2 && FUNC_ISCRITICAL ($2->type))
                 inCriticalFunction = 1;
          }
      function_body
                                 {
                                     $$ = createFunction($2,$4);
-                                    if (FUNC_ISCRITICAL ($2->type))
+                                    if ($2 && FUNC_ISCRITICAL ($2->type))
                                       inCriticalFunction = 0;
                                 }
    ;

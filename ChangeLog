@@ -1,8 +1,28 @@
+2015-10-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge cpp-merge-upstream branch to get improved standard support.
+
+2015-10-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* .version:
+	  Bump version due to improved standard support.
+
 2015-10-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/ralloc.c,
 	  src/port.h:
 	  Spelling fixes.
+
+2015-10-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/cpp/Makefile.in:
+	  Fix build-dependency of sdcpp on libiberty.
+	* support/cpp/sdcpp.opt,
+	  support/cpp/sdcpp-opts.c,
+	  support/cpp/libcpp/init.c:
+	  Support C11 in preprocessor.
+	* src/SDCCmain.c:
+	  Fix standard support, add support for c95 and sdcc11 dialects.
 
 2015-10-22 Ben Shi <powerstudio1st AT 163 DOT com>
 

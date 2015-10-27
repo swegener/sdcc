@@ -1025,6 +1025,8 @@ printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
 {
   value *val;
   unsigned int size = DCL_ELEM (type);
+  char *p;
+  long asz;
 
   if (!s)
     {
@@ -1046,7 +1048,15 @@ printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
           if (check && DCL_ELEM (val->type) > size)
             werror (W_EXCESS_INITIALIZERS, "array of chars", sym->name, sym->lineDef);
 
-          printChar (oBuf, SPEC_CVAL (val->etype).v_char, size);
+          if (size > (asz = DCL_ELEM (val->type)) && !!(p = malloc (size)))
+            {
+              memcpy (p, SPEC_CVAL (val->etype).v_char, asz);
+              memset (p + asz, 0x00, size - asz);
+              printChar (oBuf, p, size);
+              free (p);
+            }
+          else
+            printChar (oBuf, SPEC_CVAL (val->etype).v_char, size);
 
           return 1;
         }

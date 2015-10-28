@@ -1,3 +1,8 @@
+2015-10-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lkmem.c:
+	  Fix incorrect check of "--xram-size".
+
 2015-10-27 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCglue.c:

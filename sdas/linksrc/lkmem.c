@@ -679,7 +679,7 @@ int summary2(struct area * areap)
 
     /*Report any excess:*/
     if( ((XRam.End) > XRam.Max) ||
-        (((int)XRam.Size>xram_size)&&(xram_size>=0)) )
+        ((((int)XRam.Size+(int)Paged.Size)>xram_size)&&(xram_size>=0)) )
     {
         sprintf(buff, "Insufficient EXTERNAL RAM memory.\n");
         REPORT_ERROR(buff, 1);

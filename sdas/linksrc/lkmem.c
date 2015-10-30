@@ -596,7 +596,7 @@ int summary2(struct area * areap)
 
     for(j=Stack_Start, Stack_Size=0; j<((iram_size)?iram_size:256); j++)
     {
-        if((idatamap[j]=='S')||(idatamap[j]==' ')) Stack_Size++;
+        if(idatamap[j]=='S') Stack_Size++;
         else break;
     }
 
@@ -632,7 +632,7 @@ int summary2(struct area * areap)
         j = i + 1;
     }
     if (spare_size > 0)
-        fprintf(of, "\nThe largest spare internal RAM space starts from 0x%x with %d byte%s.", spare_begin, spare_size, spare_size > 1 ? "s" : "");
+        fprintf(of, "\nThe largest spare internal RAM space starts at 0x%x with %d byte%s available.", spare_begin, spare_size, spare_size > 1 ? "s" : "");
     else
         fprintf(of, "\nNo spare internal RAM space left.");
  

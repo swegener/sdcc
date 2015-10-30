@@ -1,5 +1,10 @@
 2015-10-30 Ben Shi <powerstudio1st AT 163 DOT com>
 
+	* sdas/linksrc/lkmem.c:
+	  Fix defects in previous commit.
+
+2015-10-30 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* sdas/linksrc/lkarea.c:
 	* sdas/linksrc/lkmem.c:
 	  Improve the error message in .mem when no enough space for the stack.

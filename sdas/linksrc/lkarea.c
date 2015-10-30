@@ -1078,6 +1078,10 @@ a_uint lnksect2 (struct area *tap, int locIndex)
                                                 fprintf(stderr, ErrMsg, taxp->a_size, taxp->a_size>1?"s":"", tap->a_id);
                                                 lkerr++;
                                         }
+
+                                        /* avoid redundant processing SSEG */
+                                        if (fchar == 'S')
+                                                break;
                                 }
                         }
                         else if (fchar=='T') /*Bit addressable bytes in internal RAM*/

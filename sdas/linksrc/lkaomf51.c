@@ -210,7 +210,16 @@ void OutputName(char * name)
   int k;
   OutputByte((unsigned char)strlen(name));
   for(k=0; name[k]!=0; k++)
-      OutputByte((unsigned char)toupper(name[k]));
+    {
+      if (zflag)
+        {
+          OutputByte((unsigned char)toupper(name[k]));
+        }
+      else
+        {
+          OutputByte((unsigned char)name[k]);
+        }
+    }
 }
 
 void OutputChkSum(void)

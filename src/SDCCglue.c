@@ -1024,9 +1024,9 @@ int
 printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf, const char *s, bool check)
 {
   value *val;
-  unsigned int size = DCL_ELEM (type);
+  size_t size = DCL_ELEM(type);
   char *p;
-  long asz;
+  size_t asz;
 
   if (!s)
     {

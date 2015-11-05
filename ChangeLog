@@ -1,3 +1,28 @@
+2015-11-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdcc.sln,
+	* src/yacc.vcxproj: deleted yacc project
+	* src/sdcc.vcxproj,
+	* src/sdcc.vcxproj.filters: moved SDCC.y here for better dependencies
+	* SDCC.props: new, added Visual C property sheet for generic settings like
+	  boost path (default: c:\local\boost_1_59_0\)
+	* src/hc08/hc08.vcxproj,
+	* src/sdcc.vcxproj,
+	* src/stm8/stm8.vcxproj,
+	* src/z80/z80.vcxproj: use SDCC.props
+	* sdas/linksrc/lkaomf51.c: output capitals depending on the zflag
+	* src/common.h
+	* src/stm8/ralloc2.cc (extra_ic_generated),
+	* src/z80/ralloc2.cc (default_operand_cost, assign_cost, Ainst_ok,
+	  rough_cost_estimate),
+	* src/SDCCglue.c (printIvalChar),
+	* src/SDCCopt.c (convertToFcall): fixed warnings
+	* src/SDCCutil.c (isblank): added for MSVC 2010
+	* support/cpp/ansidecl.h: deleted
+	* support/cpp/sdcpp.vcxproj,
+	* support/cpp/sdcpp.vcxproj.filters: use files in support/sdbinutils/
+	* support/sdbinutils/libiberty/getpwd.c: fixed for MSVC
+
 2015-10-30 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sdas/linksrc/lkmem.c:
@@ -10919,7 +10944,7 @@
 2011-10-18 Borut Razem <borut.razem AT gmail.com>
 
 	* doc/sdccman.lyx: changed MS Visual C++ 6.0 to MS Visual C++ 2010,
-	  reverted to LyX version 1.6.7 format, as prpbosed by Robert Larice
+	  reverted to LyX version 1.6.7 format, as proposed by Robert Larice
 	* support/cpp/sdcpp-opts.c: fixed bug #3388478:
 	  Preprocessor Error when Invoking sdcc with -E/-M/-MM and -o
 

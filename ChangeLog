@@ -1,5 +1,10 @@
 2015-11-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
+	* src/mcs51/ralloc.c (packRegsForOneuse): fixed bug 2373
+	* support/regression/tests/bug-2373.c: new, added
+
+2015-11-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
 	* sdcc.sln,
 	* src/yacc.vcxproj: deleted yacc project
 	* src/sdcc.vcxproj,

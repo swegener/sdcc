@@ -2569,6 +2569,9 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
         return NULL;
     }
 
+  if (ic->op == PCALL && !IS_SMALL_PTR(aggrToPtr(operandType(IC_LEFT(ic)), FALSE)))
+    return NULL;
+
   /* make sure the intervening instructions
      don't have anything in far space */
   for (dic = dic->next; dic && dic != ic && sic != ic; dic = dic->next)

@@ -3433,6 +3433,10 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                 }
               if (IFFUNC_ISBANKEDCALL (type))
                 dbuf_append_str (dbuf, " __banked");
+              if (IFFUNC_ISZ88DK_CALLEE (type))
+                dbuf_append_str (dbuf, " __z88dk_callee");
+              if (IFFUNC_ISZ88DK_FASTCALL (type))
+                dbuf_append_str (dbuf, " __z88dk_fastcall");
               break;
             case GPOINTER:
               dbuf_append_str (dbuf, "generic*");

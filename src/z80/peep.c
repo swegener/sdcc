@@ -220,23 +220,46 @@ z80MightRead(const lineNode *pl, const char *what)
   if(strcmp(pl->line, "call\t___sdcc_call_iy") == 0 && strstr(what, "iy") != 0)
     return TRUE;
 
-  if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0) // TODO: Making this more accurate (i.e. finding out about the actual situation at _this_ call) could allow more optimization.
+  if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
     {
-      if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
-        return TRUE;
-      if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
-        return TRUE;
-      if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
-        return TRUE;
-      if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
-        return TRUE;
-      if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
-        return TRUE;
-      if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
-        return TRUE;
-      if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
-        return TRUE;
-      return FALSE;
+      const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+      if (f)
+      {
+        const value *args = FUNC_ARGS (f->type);
+
+        if (IFFUNC_ISZ88DK_FASTCALL (f->type) && args) // Has one register argument of size up to 32 bit.
+          {
+            const unsigned int size = getSize (args->type);
+            wassert (!args->next); // Only one argment allowed in __z88dk_fastcall functions.
+            if (strchr(what, 'l') && size >= 1)
+              return TRUE;
+            if (strchr(what, 'h') && size >= 2)
+              return TRUE;
+            if (strchr(what, 'e') && size >= 3)
+              return TRUE;
+            if (strchr(what, 'd') && size >= 4)
+              return TRUE;
+          }
+        return FALSE;
+      }
+      else // Fallback needed for calls through function pointers and for calls to literal addresses.
+      {
+        if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
+          return TRUE;
+        if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
+          return TRUE;
+        if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
+          return TRUE;
+        if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
+          return TRUE;
+        if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
+          return TRUE;
+        if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
+          return TRUE;
+        if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
+          return TRUE;
+        return FALSE;
+      }
     }
 
   if(ISINST(pl->line, "ret"))

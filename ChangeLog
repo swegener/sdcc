@@ -1,3 +1,11 @@
+2015-11-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/util/dbuf.h,
+	  support/util/dbuf.c,
+	  support/util/dbuf_string.h,
+	  support/util/dbuf_string.c:
+	  Allow prepending to dynamic buffers.
+
 2015-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCC.y: only emit W_FLEXARRAY_INSTRUCT for c89

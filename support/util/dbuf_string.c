@@ -49,6 +49,20 @@ dbuf_append_str (struct dbuf_s *dbuf, const char *str)
     return 0;
 }
 
+/*
+ * Prepend string to the beginning of the buffer.
+ * The buffer is null terminated.
+ */
+
+int
+dbuf_prepend_str (struct dbuf_s *dbuf, const char *str)
+{
+  size_t len;
+  assert (str != NULL);
+
+  len = strlen (str);
+  return (dbuf_prepend (dbuf, str, len));
+}
 
 /*
  * Append single character to the end of the buffer.

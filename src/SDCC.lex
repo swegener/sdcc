@@ -526,6 +526,30 @@ stringLiteral (void)
                   goto out;
                 }
             }
+          if (ch == 'u') /* Could be a wide string literal prefix */
+            {
+              if (!options.std_c11)
+                {
+                  werror (E_WCHAR_STRING_C11);
+                  unput(ch);
+                  goto out;
+                }
+              ch = input();
+              if (ch != '8')
+                {
+                  unput(ch);
+                  unput('L');
+                  goto out;
+                }
+              ch = input();
+              if (ch != '"')
+                {
+                  unput(ch);
+                  unput('8');
+                  unput('u');
+                  goto out;
+                }
+            }
           if (ch != '"')
             {
               unput(ch);

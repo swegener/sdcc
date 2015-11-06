@@ -959,7 +959,8 @@ copyStr (const char *src, size_t *size)
         }
       else if (*src == '\\')
         {
-          int c;
+          unsigned long int c;
+          bool universal = FALSE;
 
           if (begin)
             {
@@ -1017,11 +1018,13 @@ copyStr (const char *src, size_t *size)
 
             case 'u':
               c = universalEscape (&src, 4);
+              universal = TRUE;
               --src;
               break;
 
             case 'U':
               c = universalEscape (&src, 8);
+              universal = TRUE;
               --src;
               break;
 
@@ -1033,7 +1036,36 @@ copyStr (const char *src, size_t *size)
               c = *src;
               break;
             }
-          dbuf_append_char (&dbuf, c);
+          if (universal) // Encode one utf-32 character to utf-8
+            {
+              char s[5] = "\0\0\0\0";
+              if (c < 0x80)
+                s[0] = c;
+              else if ( c < 0x800)
+                {
+                  s[0] = (c >> 6) & 0x1f | 0xc0;
+                  s[1] = (c >> 0) & 0x3f | 0x80;
+                }
+              else if ( c < 0x10000)
+                {
+                  s[0] = (c >> 12) & 0x0f | 0xe0;
+                  s[1] = (c >> 6) & 0x3f  | 0x80;
+                  s[2] = (c >> 0) & 0x3f  | 0x80;
+                }
+              else if ( c < 0x110000)
+                {
+                  s[0] = (c >> 18) & 0x07 | 0xf0;
+                  s[1] = (c >> 12) & 0x3f | 0x80;
+                  s[2] = (c >> 6) & 0x3f  | 0x80;
+                  s[3] = (c >> 0) & 0x3f  | 0x80;
+                }
+              else
+                wassert (0);
+              dbuf_append_str (&dbuf, s);
+            }
+          else
+            dbuf_append_char (&dbuf, c);
+
           ++src;
         }
       else

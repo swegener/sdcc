@@ -145,16 +145,23 @@ do_teststrtok (void)
 #endif
 }
 
-/** tests for multibyte character sets
- * related to bug #3506236
+/** tests for utf-8
 */
 static void
 do_multibyte (void)
 {
-  const char *str = "��";
+  const char *str1 = "Ä ä";
+  const char *str2 = "\u00c4 ä";
+  const char *str3 = u8"Ä " "ä";
+  const char *str4 = "Ä " L"ä";
+  const char *str5 = "Ä " u8"ä";
 
-  ASSERT (str[0] == '\xd4');
-  ASSERT (str[1] == '\xc2');
+  ASSERT (str1[0] == '\xc3');
+  ASSERT (str2[1] == '\x84');
+  ASSERT (!strcmp (str1, str2));
+  ASSERT (!strcmp (str1, str3));
+  ASSERT (!strcmp (str1, str4));
+  ASSERT (!strcmp (str1, str5));
 }
 
 static void

@@ -9,6 +9,11 @@
 	  src/SDCCerr.h,
 	  src/SDCCerr.c:
 	  Support C11 u8 prefix for UTF-8-encoded unicode string literals.
+	* src/SDCCutil.c,
+	  support/regression/tests/string.c:
+	  Fix handling of universal escape sequences in UTF-8-encoded strig literals.
+	* support/regression/tests/iso-8859-1.c:
+	  Test support for source encodings other than unicode.
 
 2015-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
 

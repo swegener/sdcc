@@ -1414,7 +1414,14 @@ strVal (const char *s)
   SPEC_SCLS (val->etype) = S_LITERAL;
   SPEC_CONST (val->etype) = 1;
 
-  SPEC_CVAL (val->etype).v_char = copyStr (s, &DCL_ELEM (val->type));
+  if (s[0] == '"')
+    SPEC_CVAL (val->etype).v_char = copyStr (s, &DCL_ELEM (val->type));
+  else if (s[0] == 'u')
+    wassertl (0, "C11 UTF-16 string literals not yet supported");
+  else if (s[0] == 'U')
+    wassertl (0, "C11 UTF-32 string literals not yet supported");
+  else
+    wassert (0);
 
   return val;
 }

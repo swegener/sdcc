@@ -335,6 +335,7 @@ string_literal_val
                        /* refer to support/cpp/libcpp/macro.c for details */
                        while ((((int) ($1[cnt] & 0xff)) & 0xff) == 0xff)
                          cnt++;
+
                        if (cnt <= max)
                          {
                            $$ = newAst_VALUE (strVal ($1));

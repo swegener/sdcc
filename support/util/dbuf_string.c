@@ -85,6 +85,20 @@ dbuf_append_char (struct dbuf_s *dbuf, char chr)
 }
 
 /*
+ * Prepend single character to the end of the buffer.
+ * The buffer is null terminated.
+ */
+
+int
+dbuf_prepend_char (struct dbuf_s *dbuf, char chr)
+{
+  char buf[2];
+  buf[0] = chr;
+  buf[1] = '\0';
+  return (dbuf_prepend_str (dbuf, buf));
+}
+
+/*
  * Calculate length of the resulting formatted string.
  *
  * Borrowed from vasprintf.c

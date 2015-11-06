@@ -64,7 +64,7 @@ static struct dbuf_s asmbuff; /* reusable _asm buffer */
 
 /* forward declarations */
 int yyerror (char *s);
-static const char *stringLiteral (void);
+static const char *stringLiteral (unsigned char);
 static void count (void);
 static void count_char (int);
 static int process_pragma (const char *);
@@ -198,9 +198,11 @@ static void checkCurrFile (const char *s);
 {D}+{E}{FS}?            { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}*"."{D}+({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}+"."{D}*({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
-\"                      { count (); yylval.yystr = stringLiteral (); return STRING_LITERAL; }
-"L\""                   { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral (); return STRING_LITERAL; }
-"u8\""                  { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (); return STRING_LITERAL; }
+\"                      { count (); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"L\""                   { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"u8\""                  { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"u\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (1); return STRING_LITERAL; }
+"U\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (2); return STRING_LITERAL; }
 ">>="                   { count (); yylval.yyint = RIGHT_ASSIGN; return RIGHT_ASSIGN; }
 "<<="                   { count (); yylval.yyint = LEFT_ASSIGN; return LEFT_ASSIGN; }
 "+="                    { count (); yylval.yyint = ADD_ASSIGN; return ADD_ASSIGN; }
@@ -389,7 +391,7 @@ check_type (void)
  */
 
 static const char *
-stringLiteral (void)
+stringLiteral (unsigned char enc)
 {
 #define STR_BUF_CHUNCK_LEN  1024
   int ch;
@@ -400,7 +402,17 @@ stringLiteral (void)
   else
     dbuf_set_length(&dbuf, 0);
 
-  dbuf_append_char(&dbuf, '"');
+  switch (enc)
+    {
+    case 1: // UTF-16
+      dbuf_append_str(&dbuf, "u\"");
+      break;
+    case 2: // UTF-32
+      dbuf_append_str(&dbuf, "U\"");
+      break;
+    default: // UTF-8 or whatever else the source character set is encoded in
+      dbuf_append_char(&dbuf, '"');
+    }
 
   /* put into the buffer till we hit the first \" */
 
@@ -526,7 +538,7 @@ stringLiteral (void)
                   goto out;
                 }
             }
-          if (ch == 'u') /* Could be a wide string literal prefix */
+          if (ch == 'u' || ch == 'U') /* Could be an utf-16 or utf-32 wide string literal prefix */
             {
               if (!options.std_c11)
                 {
@@ -534,11 +546,27 @@ stringLiteral (void)
                   unput(ch);
                   goto out;
                 }
+
+              int ch2 = input();
+              if (ch2 != '"')
+                unput (ch2);
+              else /* It is an utf-16 or utf-32 wide string literal prefix */
+                {
+                  if (!enc) 
+                    dbuf_prepend_char(&dbuf, ch);
+                  count_char(ch);
+                  count_char(ch2);
+                  break;
+                }
+            }
+
+          if (ch == 'u') /* Could be an utf-8 wide string literal prefix */
+            {
               ch = input();
               if (ch != '8')
                 {
                   unput(ch);
-                  unput('L');
+                  unput('u');
                   goto out;
                 }
               ch = input();

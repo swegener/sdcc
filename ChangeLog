@@ -1,3 +1,11 @@
+2015-11-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/util/dbuf_string.h,
+	  support/util/dbuf_string.c,
+	  src/SDCCval.c,
+	  src/SDCC.lex:
+	  Handling of UTF-16 and UTF-16 string literals in the frontend up to strVal().
+
 2015-11-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/util/dbuf.h,

@@ -522,7 +522,9 @@ struct
   { E_WCHAR_CONST_C11, ERROR_LEVEL_ERROR,
     "character constant of type char16_t or char32_t requires C11 or later", 0},
   { E_WCHAR_STRING_C95, ERROR_LEVEL_ERROR,
-    "wide character string requires C95 or later", 0},
+    "wide character string of type L requires C95 or later", 0},
+  { E_WCHAR_STRING_C11, ERROR_LEVEL_ERROR,
+    "wide character string of type u8, u, U requires C11 or later", 0},
 };
 
 /* -------------------------------------------------------------------------------

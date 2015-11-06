@@ -5,6 +5,10 @@
 	  support/util/dbuf_string.h,
 	  support/util/dbuf_string.c:
 	  Allow prepending to dynamic buffers.
+	* src/SDCC.lex,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c:
+	  Support C11 u8 prefix for UTF-8-encoded unicode string literals.
 
 2015-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
 

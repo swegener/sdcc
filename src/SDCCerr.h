@@ -260,6 +260,7 @@ enum {
   E_WCHAR_CONST_C95             = 231, /* character constant of type wchar_t requires ISO C 95 or later */
   E_WCHAR_CONST_C11             = 232, /* character constant of type char16_t or char32_t equires ISO C 11 or later */
   E_WCHAR_STRING_C95            = 233, /* wide character string literal requires ISO C 95 or later */
+  E_WCHAR_STRING_C11            = 234, /* wide character string literal requires ISO C 11 or later */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

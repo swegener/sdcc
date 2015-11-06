@@ -227,9 +227,6 @@ FBYNAME (labelJTInRange)
   char *lbl;
   int dist, count, i;
 
-  if (TARGET_IS_MCS51 && !getenv("SDCC_SJMP_JUMPTABLE"))
-    return FALSE;
-
   /* Only optimize within a jump table */
   if (currPl->ic && currPl->ic->op != JUMPTABLE)
     return FALSE;
@@ -1750,12 +1747,12 @@ top:
   if (strncmp (bp, "if", 2) == 0)
     {
       bp += 2;
-      while ((ISCHARSPACE (*bp) || *bp == '\n') && *bp)
-        bp++;
       while ((ISCHARSPACE (*bp) || *bp == '\n' || (*bp == '/' && *(bp+1) == '/')) && *bp)
       {
-        ++bp;
-	    if (*bp == '/') while (*bp && *bp != '\n') ++bp;
+        bp++;
+        if (*bp == '/')
+          while (*bp && *bp != '\n')
+            bp++;
       }
       if (!*bp)
         {

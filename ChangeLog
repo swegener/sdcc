@@ -1,3 +1,10 @@
+2015-11-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.y: only emit W_FLEXARRAY_INSTRUCT for c89
+	* src/SDCCpeeph.c (labelJTInRange): removed env SDCC_SJMP_JUMPTABLE check,
+	  closes patch #29,
+	  (readRules): clean up
+
 2015-11-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c:

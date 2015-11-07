@@ -150,6 +150,7 @@ do_teststrtok (void)
 static void
 do_multibyte (void)
 {
+#if defined (__SDCC)
   const char *str1 = "Ä ä";
   const char *str2 = "\u00c4 ä";
   const char *str3 = u8"Ä " "ä";
@@ -162,6 +163,7 @@ do_multibyte (void)
   ASSERT (!strcmp (str1, str3));
   ASSERT (!strcmp (str1, str4));
   ASSERT (!strcmp (str1, str5));
+#endif
 }
 
 static void

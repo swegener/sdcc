@@ -16,7 +16,10 @@ struct t1_t {
   char *p1;
   char v1[5];
   struct t0_t t;
-} ww = {"11", "22", "33", "44", {"55", "66"}};
+};
+
+struct t1_t w0 = {"11", "22", "33", "44", {"55", "66"}};
+const struct t1_t w1 = {"11", "22", "33", "44", {"55", "66"}};
 
 const char p0[] = {'1', '1', 0, 0, 0};
 const char v0[] = {'2', '2', 0, 0, 0};
@@ -27,11 +30,19 @@ const char v2[] = {'6', '6', 0, 0, 0};
 
 void testBug (void)
 {
-  ASSERT (strcmp (ww.p0, p0) == 0);
-  ASSERT (strcmp (ww.p1, p1) == 0);
-  ASSERT (strcmp (ww.t.p2, p2) == 0);
+  ASSERT (strcmp (w0.p0, p0) == 0);
+  ASSERT (strcmp (w0.p1, p1) == 0);
+  ASSERT (strcmp (w0.t.p2, p2) == 0);
 
-  ASSERT (memcmp (ww.v0, v0, sizeof (v0)) == 0);
-  ASSERT (memcmp (ww.v1, v1, sizeof (v1)) == 0);
-  ASSERT (memcmp (ww.t.v2, v2, sizeof (v2)) == 0);
+  ASSERT (memcmp (w0.v0, v0, sizeof (v0)) == 0);
+  ASSERT (memcmp (w0.v1, v1, sizeof (v1)) == 0);
+  ASSERT (memcmp (w0.t.v2, v2, sizeof (v2)) == 0);
+
+  ASSERT (strcmp (w1.p0, p0) == 0);
+  ASSERT (strcmp (w1.p1, p1) == 0);
+  ASSERT (strcmp (w1.t.p2, p2) == 0);
+
+  ASSERT (memcmp (w1.v0, v0, sizeof (v0)) == 0);
+  ASSERT (memcmp (w1.v1, v1, sizeof (v1)) == 0);
+  ASSERT (memcmp (w1.t.v2, v2, sizeof (v2)) == 0);
 }

@@ -1,3 +1,14 @@
+2015-11-07 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCglue.c:
+	  Eliminate unused static symbols. (__str_%d generated in stringToSymbol()).
+	* support/regression/tests/bug-2089.c:
+	  Improve test case.
+	* support/regression/ports/mcs51-xstack-auto/spec.mk:
+	  Use default sdcc11.
+	* support/regression/tests/string.c:
+	  Disabled for test-host.
+
 2015-11-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/util/dbuf_string.h,

@@ -37,6 +37,7 @@ void printIval (symbol *, sym_link *, initList *, struct dbuf_s *, bool check);
 set *publics = NULL;            /* public variables */
 set *externs = NULL;            /* Variables that are declared as extern */
 set *strSym = NULL;             /* string initializers */
+set *ccpStr = NULL;             /* char * const pointers with a string literal initializer */
 
 unsigned maxInterrupts = 0;
 int allocInfo = 1;
@@ -1237,6 +1238,13 @@ int
 printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s *oBuf)
 {
   int size = 0;
+  char *p;
+
+  if (val && !!(p = (char *) malloc (strlen (val->name) + 1)))
+    {
+      strcpy (p, val->name);
+      addSet (&ccpStr, p);
+    }
 
   /* PENDING: this is _very_ mcs51 specific, including a magic
      number...
@@ -1570,8 +1578,13 @@ void
 emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
 {
   symbol *sym;
+  set *tmpSet = NULL;
 
   /* fprintf(out, "\t.area\t%s\n", map->sname); */
+
+  /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
+  for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
+    addSet (&tmpSet, sym);
 
   /* for all variables in this segment do */
   for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
@@ -1579,6 +1592,19 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
       /* if it is "extern" then do nothing */
       if (IS_EXTERN (sym->etype) && !sym->ival)
         continue;
+
+      /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
+      if (!isinSet (tmpSet, sym))
+        {
+          const char *p;
+          if (!ccpStr)
+            continue;
+          for (p = setFirstItem (ccpStr); p; p = setNextItem (ccpStr))
+            if (strcmp (p, sym->name) == 0)
+              break;
+          if (!p)
+            continue;
+        }
 
       /* if it is not static add it to the public table */
       if (!IS_STATIC (sym->etype))
@@ -1649,6 +1675,17 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
                 }
             }
         }
+    }
+
+  if (!tmpSet)
+    deleteSet (&tmpSet);
+  if (!ccpStr)
+    {
+      char *p;
+      for (p = setFirstItem (ccpStr); p; p = setNextItem (ccpStr))
+        if (p)
+          free (p);
+      deleteSet (&ccpStr);
     }
 }
 

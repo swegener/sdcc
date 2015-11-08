@@ -1677,9 +1677,9 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
         }
     }
 
-  if (!tmpSet)
+  if (tmpSet)
     deleteSet (&tmpSet);
-  if (!ccpStr)
+  if (ccpStr)
     {
       char *p;
       for (p = setFirstItem (ccpStr); p; p = setNextItem (ccpStr))

@@ -31,7 +31,6 @@
 #include "newalloc.h"
 #include "dbuf_string.h"
 
-
 int cNestLevel;
 
 
@@ -1396,6 +1395,88 @@ constBoolVal (bool v)
   return val;
 }
 
+// TODO: Move this function to SDCCutil?
+static const TYPE_UDWORD *utf_32_from_utf_8 (size_t *utf_32_len, const char *utf_8, size_t utf_8_len)
+{
+  size_t allocated = 0;
+  TYPE_UDWORD *utf_32 = 0;
+  unsigned char first_byte;
+  TYPE_UDWORD codepoint;
+  size_t seqlen;
+
+  for (*utf_32_len = 0; utf_8_len; (*utf_32_len)++)
+    {
+      if (allocated == *utf_32_len)
+        {
+          utf_32 = realloc (utf_32, *utf_32_len + 16);
+          wassert (utf_32);
+        }
+
+      first_byte = *utf_8;
+      seqlen = 1;
+      if (first_byte & 0x80)
+        {
+          while (first_byte & (0x80 >> (seqlen + 1)))
+            seqlen++;
+          first_byte &= (0xff >> (seqlen + 1));
+        }
+      wassert (seqlen <= 6); // seqlen 5 and 6 are deprecated in current unicode standard, but for now, allow them.
+
+      codepoint = first_byte;
+      utf_8++;
+
+      for(; seqlen; seqlen--)
+        {
+          codepoint <<= 6;
+          codepoint |= (*utf_8 & 0xf);
+          utf_8++;
+        }
+
+      utf_32[*utf_32_len] = codepoint;
+
+      
+    }
+  return (utf_32);
+}
+
+// TODO: Move this function to SDCCutil?
+static const TYPE_UWORD *utf_16_from_utf_32 (size_t *utf_16_len, const TYPE_UDWORD *utf_32, size_t utf_32_len)
+{
+  size_t allocated = 0;
+  TYPE_UWORD *utf_16 = 0;
+  TYPE_UDWORD codepoint;
+
+  for (*utf_16_len = 0; utf_32_len; utf_32_len--, utf_32++)
+    {
+      if (allocated <= *utf_16_len + 2)
+        {
+          utf_32 = realloc (utf_16, *utf_16_len + 16);
+          wassert (utf_16);
+        }
+
+      codepoint = *utf_32;
+
+      if (codepoint < 0xd7ff || codepoint >= 0xe000 && codepoint <= 0xffff) // Code in basic multilingual plane.
+        {
+          *utf_16 = codepoint;
+          utf_16++;
+          (*utf_16_len)++;
+          continue;
+        }
+
+      // Code point in supplementary plane.
+      wassert (codepoint >= 0x100000 && codepoint <= 0x10ffff);
+      codepoint -= 0x100000;
+
+      utf_16[0] = ((codepoint >> 10) & 0x3ff) + 0xd800;
+      utf_16[1] = (codepoint & 0x3ff) + 0xdc00;
+      utf_16 += 2;
+      (*utf_16_len) += 2;
+    }
+
+  return (utf_16);
+}
+
 /*------------------------------------------------------------------*/
 /* strVal - converts a string constant to a value                   */
 /*------------------------------------------------------------------*/
@@ -1403,6 +1484,8 @@ value *
 strVal (const char *s)
 {
   value *val;
+  const char *utf_8;
+  size_t utf_8_size;
 
   val = newValue ();            /* get a new one */
 
@@ -1410,22 +1493,39 @@ strVal (const char *s)
   val->type = newLink (DECLARATOR);
   DCL_TYPE (val->type) = ARRAY;
   val->type->next = val->etype = newLink (SPECIFIER);
-  SPEC_NOUN (val->etype) = V_CHAR;
   SPEC_SCLS (val->etype) = S_LITERAL;
   SPEC_CONST (val->etype) = 1;
 
-  if (s[0] == '"')
-    SPEC_CVAL (val->etype).v_char = copyStr (s, &DCL_ELEM (val->type));
-  else if (s[0] == 'u')
-    wassertl (0, "C11 UTF-16 string literals not yet supported");
-  else if (s[0] == 'U')
-    wassertl (0, "C11 UTF-32 string literals not yet supported");
+  utf_8 = copyStr (s, &utf_8_size); // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 first (handling all escape sequences, etc).
+
+  if (s[0] == '"') // UTF-8 string literal (any prefix u8 or L in the source would already have been stripped by earlier stages)
+    {
+      SPEC_NOUN (val->etype) = V_CHAR;
+      SPEC_CVAL (val->etype).v_char = utf_8;
+      DCL_ELEM (val->type) = utf_8_size;
+    }
   else
-    wassert (0);
+    {
+      size_t utf_32_size;
+      const TYPE_UDWORD *utf_32 = utf_32_from_utf_8 (&utf_32_size, utf_8, utf_8_size); // Covert to UTF-32 next, since converting UTF-32 to UTF-16 is easier than UTF-8 to UTF-16.
+
+      // TODO: Should we free (utf_8) here, or do we need some other free function due to the dbuf stuff?
+
+      if (s[0] == 'U') // UTF-32 string literal
+        wassertl (0, "C11 UTF-32 string literals not yet supported");
+      else if (s[0] == 'u') // UTF-16 string literal
+        {
+          size_t utf_16_size;
+          const TYPE_UWORD *utf_16 = utf_16_from_utf_32 (&utf_16_size, utf_32, utf_32_size); 
+
+          wassertl (0, "C11 UTF-16 string literals not yet supported");
+        }
+      else
+        wassert (0);
+    }
 
   return val;
 }
-
 
 /*------------------------------------------------------------------*/
 /* reverseValWithType - reverses value chain with type & etype      */

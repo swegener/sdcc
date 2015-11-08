@@ -64,7 +64,7 @@ static struct dbuf_s asmbuff; /* reusable _asm buffer */
 
 /* forward declarations */
 int yyerror (char *s);
-static const char *stringLiteral (unsigned char);
+static const char *stringLiteral (char);
 static void count (void);
 static void count_char (int);
 static int process_pragma (const char *);
@@ -201,8 +201,8 @@ static void checkCurrFile (const char *s);
 \"                      { count (); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
 "L\""                   { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
 "u8\""                  { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
-"u\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (1); return STRING_LITERAL; }
-"U\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (2); return STRING_LITERAL; }
+"u\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('u'); return STRING_LITERAL; }
+"U\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('U'); return STRING_LITERAL; }
 ">>="                   { count (); yylval.yyint = RIGHT_ASSIGN; return RIGHT_ASSIGN; }
 "<<="                   { count (); yylval.yyint = LEFT_ASSIGN; return LEFT_ASSIGN; }
 "+="                    { count (); yylval.yyint = ADD_ASSIGN; return ADD_ASSIGN; }
@@ -391,7 +391,7 @@ check_type (void)
  */
 
 static const char *
-stringLiteral (unsigned char enc)
+stringLiteral (char enc)
 {
 #define STR_BUF_CHUNCK_LEN  1024
   int ch;
@@ -404,10 +404,10 @@ stringLiteral (unsigned char enc)
 
   switch (enc)
     {
-    case 1: // UTF-16
+    case 'u': // UTF-16
       dbuf_append_str(&dbuf, "u\"");
       break;
-    case 2: // UTF-32
+    case 'U': // UTF-32
       dbuf_append_str(&dbuf, "U\"");
       break;
     default: // UTF-8 or whatever else the source character set is encoded in
@@ -553,7 +553,10 @@ stringLiteral (unsigned char enc)
               else /* It is an utf-16 or utf-32 wide string literal prefix */
                 {
                   if (!enc) 
-                    dbuf_prepend_char(&dbuf, ch);
+                    {
+                      dbuf_prepend_char(&dbuf, ch);
+                      enc = ch;
+                    }
                   count_char(ch);
                   count_char(ch2);
                   break;

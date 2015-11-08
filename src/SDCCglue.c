@@ -1089,7 +1089,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
         {
           val = list2val (ilist, TRUE);
           if (!val)
-            {printf("HERE A\n");
+            {
               werrorfl (ilist->filename, ilist->lineno, E_INIT_STRUCT, sym->name);
               return;
             }
@@ -1107,7 +1107,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
         {
           val = list2val (ilist->init.deep, TRUE);
           if (!val)
-            {printf("HERE B\n");
+            {
               werrorfl (ilist->init.deep->filename, ilist->init.deep->lineno, E_INIT_STRUCT, sym->name);
               return;
             }
@@ -1123,7 +1123,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
 
       /* not the special case             */
       if (ilist->type != INIT_DEEP)
-        {printf("HERE C\n");
+        {
           werrorfl (ilist->filename, ilist->lineno, E_INIT_STRUCT, sym->name);
           return;
         }

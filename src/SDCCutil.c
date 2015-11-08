@@ -1041,18 +1041,18 @@ copyStr (const char *src, size_t *size)
               char s[5] = "\0\0\0\0";
               if (c < 0x80)
                 s[0] = c;
-              else if ( c < 0x800)
+              else if (c < 0x800)
                 {
                   s[0] = (c >> 6) & 0x1f | 0xc0;
                   s[1] = (c >> 0) & 0x3f | 0x80;
                 }
-              else if ( c < 0x10000)
+              else if (c < 0x10000)
                 {
                   s[0] = (c >> 12) & 0x0f | 0xe0;
                   s[1] = (c >> 6) & 0x3f  | 0x80;
                   s[2] = (c >> 0) & 0x3f  | 0x80;
                 }
-              else if ( c < 0x110000)
+              else if (c < 0x110000)
                 {
                   s[0] = (c >> 18) & 0x07 | 0xf0;
                   s[1] = (c >> 12) & 0x3f | 0x80;

@@ -145,17 +145,39 @@ do_teststrtok (void)
 #endif
 }
 
-/** tests for utf-8
-*/
+// Test C11 utf-8 behaviour.
 static void
-do_multibyte (void)
+do_multibyte_utf_8 (void)
+{
+#if defined(__STDC_VERSION) && __STDC_VERSION >= 201112L
+  const char *str1 = u8"Ä ä";
+  const char *str2 = u8"\u00c4 ä";
+  const char *str3 = u8"Ä " "ä";
+  const char *str4 = u8"Ä " u8"ä";
+  const char *str5 = "Ä " u8"ä";
+
+  ASSERT (str1[0] == '\xc3');
+  ASSERT (str2[1] == '\x84');
+  ASSERT (!strcmp (str1, str2));
+  ASSERT (!strcmp (str1, str3));
+  ASSERT (!strcmp (str1, str4));
+  ASSERT (!strcmp (str1, str5));
+#endif
+}
+
+// Test SDCC implementation-defined utf-8 behaviour
+// string literals are utf-8 (as nearly all implementations out there)
+// string literals sprefixed by L are utf-8 (as no other implementation I know of)
+// string literals prefixed by L can be concatenated with string literals prefixed by u8
+static void
+do_multibyte_utf_8_sdcc (void)
 {
 #if defined (__SDCC)
   const char *str1 = "Ä ä";
   const char *str2 = "\u00c4 ä";
   const char *str3 = u8"Ä " "ä";
   const char *str4 = "Ä " L"ä";
-  const char *str5 = "Ä " u8"ä";
+  const char *str5 = L"Ä " u8"ä";
 
   ASSERT (str1[0] == '\xc3');
   ASSERT (str2[1] == '\x84');
@@ -177,5 +199,7 @@ teststr (void)
   do_teststrstr ();
   do_teststrspn ();
   do_teststrtok ();
-  do_multibyte ();
+  do_multibyte_utf_8 ();
+  do_multibyte_utf_8_sdcc ();
 }
+

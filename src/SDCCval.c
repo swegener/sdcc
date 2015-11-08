@@ -1408,15 +1408,16 @@ static const TYPE_UDWORD *utf_32_from_utf_8 (size_t *utf_32_len, const char *utf
     {
       if (allocated == *utf_32_len)
         {
-          utf_32 = realloc (utf_32, *utf_32_len + 16);
+          utf_32 = realloc (utf_32, sizeof(TYPE_UDWORD) * (*utf_32_len + 16));
           wassert (utf_32);
+          allocated = *utf_32_len + 16;
         }
 
       first_byte = *utf_8;
       seqlen = 1;
       if (first_byte & 0x80)
         {
-          while (first_byte & (0x80 >> (seqlen + 1)))
+          while (first_byte & (0x80 >> seqlen))
             seqlen++;
           first_byte &= (0xff >> (seqlen + 1));
         }
@@ -1424,17 +1425,18 @@ static const TYPE_UDWORD *utf_32_from_utf_8 (size_t *utf_32_len, const char *utf
 
       codepoint = first_byte;
       utf_8++;
+      utf_8_len--;
+      seqlen--;
 
       for(; seqlen; seqlen--)
         {
           codepoint <<= 6;
           codepoint |= (*utf_8 & 0xf);
           utf_8++;
+          utf_8_len--;
         }
 
       utf_32[*utf_32_len] = codepoint;
-
-      
     }
   return (utf_32);
 }
@@ -1450,17 +1452,16 @@ static const TYPE_UWORD *utf_16_from_utf_32 (size_t *utf_16_len, const TYPE_UDWO
     {
       if (allocated <= *utf_16_len + 2)
         {
-          utf_32 = realloc (utf_16, *utf_16_len + 16);
+          utf_16 = realloc (utf_16, sizeof(TYPE_UWORD) * (*utf_16_len + 16));
           wassert (utf_16);
+          allocated = *utf_16_len + 16;
         }
 
       codepoint = *utf_32;
 
       if (codepoint < 0xd7ff || codepoint >= 0xe000 && codepoint <= 0xffff) // Code in basic multilingual plane.
         {
-          *utf_16 = codepoint;
-          utf_16++;
-          (*utf_16_len)++;
+          utf_16[(*utf_16_len)++] = codepoint;
           continue;
         }
 
@@ -1468,10 +1469,8 @@ static const TYPE_UWORD *utf_16_from_utf_32 (size_t *utf_16_len, const TYPE_UDWO
       wassert (codepoint >= 0x100000 && codepoint <= 0x10ffff);
       codepoint -= 0x100000;
 
-      utf_16[0] = ((codepoint >> 10) & 0x3ff) + 0xd800;
-      utf_16[1] = (codepoint & 0x3ff) + 0xdc00;
-      utf_16 += 2;
-      (*utf_16_len) += 2;
+      utf_16[(*utf_16_len)++] = ((codepoint >> 10) & 0x3ff) + 0xd800;
+      utf_16[(*utf_16_len)++] = (codepoint & 0x3ff) + 0xdc00;
     }
 
   return (utf_16);
@@ -1496,7 +1495,7 @@ strVal (const char *s)
   SPEC_SCLS (val->etype) = S_LITERAL;
   SPEC_CONST (val->etype) = 1;
 
-  utf_8 = copyStr (s, &utf_8_size); // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 first (handling all escape sequences, etc).
+  utf_8 = copyStr (s[0] == '"' ? s : s + 1, &utf_8_size); // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 first (handling all escape sequences, etc).
 
   if (s[0] == '"') // UTF-8 string literal (any prefix u8 or L in the source would already have been stripped by earlier stages)
     {

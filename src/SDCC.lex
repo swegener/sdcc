@@ -540,6 +540,8 @@ stringLiteral (char enc)
             }
           if (ch == 'u' || ch == 'U') /* Could be an utf-16 or utf-32 wide string literal prefix */
             {
+              int ch2;
+
               if (!options.std_c11)
                 {
                   werror (E_WCHAR_STRING_C11);
@@ -547,7 +549,7 @@ stringLiteral (char enc)
                   goto out;
                 }
 
-              int ch2 = input();
+              ch2 = input();
               if (ch2 != '"')
                 unput (ch2);
               else /* It is an utf-16 or utf-32 wide string literal prefix */

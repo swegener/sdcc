@@ -6525,8 +6525,8 @@ copyAstLoc (ast * dest, ast * src)
 static void fixupInline (ast * tree, int level);
 
 /*-----------------------------------------------------------------*/
-/* expandInlineFuncsInDeclarators - replace calls to inline        */
-/*                      functions with the function itself         */
+/* fixupInlineInDeclarators - recursively perform various fixups   */
+/*                            on an inline function tree           */
 /*-----------------------------------------------------------------*/
 static void
 fixupInlineInDeclarators (struct initList *ival, int level)
@@ -6791,8 +6791,8 @@ inlineFindParm (ast * parms, int index)
 static void expandInlineFuncs (ast * tree, ast * block);
 
 /*-----------------------------------------------------------------*/
-/* expandInlineFuncsInDeclarators - replace calls to inline        */
-/*                      functions with the function itself         */
+/* expandInlineFuncsInDeclarators - recursively replace calls to   */
+/*                                  inline functions               */
 /*-----------------------------------------------------------------*/
 static void
 expandInlineFuncsInDeclarators (struct initList *ival, ast * block)
@@ -6986,6 +6986,16 @@ expandInlineFuncs (ast * tree, ast * block)
               if (decls->ival)
                 expandInlineFuncsInDeclarators (decls->ival, block);
             }
+        }
+
+      if (tree->opval.op == FOR)
+        {
+          if (AST_FOR (tree, initExpr))
+            expandInlineFuncs (AST_FOR (tree, initExpr), block);
+          if (AST_FOR (tree, condExpr))
+            expandInlineFuncs (AST_FOR (tree, condExpr), block);
+          if (AST_FOR (tree, loopExpr))
+            expandInlineFuncs (AST_FOR (tree, loopExpr), block);
         }
 
       if (tree->left)

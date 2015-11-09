@@ -3,6 +3,9 @@
 	* device/include/mcs51/at89c51ed2.h: applied patch 247
 	* device/include/at89c51id2.h: new, added, thanks Victor Munoz
 	* src/SDCC.lex: it seems really hard not to declare vars amidst the code
+	* src/SDCCast.c (expandInlineFuncs): fix bug 2295: also expand for clauses
+	* support/regression/tests/ctype.c: warn about undefined __STDC_VERSION__
+	* support/regression/tests/inline.c (bug_2295): new test case
 
 2015-11-09 Philipp Klaus Krause <pkk AT spth.de>
 

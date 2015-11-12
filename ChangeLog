@@ -1,3 +1,7 @@
+2015-11-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/at89c51id2.h: moved
+
 2015-11-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

@@ -9205,6 +9205,7 @@ Floating point support
 
 not supported.
  Instead a warning is emitted, and float is used instead.
+ long double is not supported.
 \end_layout
 
 \begin_layout Itemize
@@ -9285,6 +9286,54 @@ Functions are not reentrant unless explicitly declared as such or --stack-auto
 \end_layout
 
 \begin_layout Subsection
+ISO C95
+\end_layout
+
+\begin_layout Standard
+Use 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c95
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c95
+\end_layout
+
+\end_inset
+
+
+\series default
+ to compile in this mode.
+\end_layout
+
+\begin_layout Subsection
 ISO C99
 \end_layout
 
@@ -9356,10 +9405,6 @@ i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
 \end_layout
 
 \end_deeper
-\begin_layout Itemize
-Data type long double.
-\end_layout
-
 \begin_layout Itemize
 Compound literals.
  
@@ -9445,7 +9490,7 @@ In addition to what is mentioned in the section above, the following features
 \end_layout
 
 \begin_layout Itemize
-Improved Unicode support.
+string literals prfixed by u or U.
 \end_layout
 
 \begin_layout Subsection

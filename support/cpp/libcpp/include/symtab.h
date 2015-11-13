@@ -19,11 +19,8 @@ along with this program; see the file COPYING3.  If not see
 #ifndef LIBCPP_SYMTAB_H
 #define LIBCPP_SYMTAB_H
 
-#if defined(__APPLE__) && defined(__MACH__)
-#include "libiberty/obstack.h"
-#else
 #include "obstack.h"
-#endif
+
 #ifndef GTY
 #define GTY(x) /* nothing */
 #endif

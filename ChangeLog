@@ -1,3 +1,12 @@
+2015-11-13 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/cpp/libcpp/include/symtab.h:
+	  Fix build failure on MacOS x86-64.
+	* support/regression/tests/inline.c:
+	  Fix failure in test-host in NetBSD.
+	* support/regression/tests/literalop.c:
+	  Disable some tests on MacOS x86-64.
+
 2015-11-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/at89c51id2.h: moved

@@ -230,5 +230,7 @@ testInline (void)
   bug_1767885 ();
   bug_1864577 ();
   bug_3564755 ();
+#ifndef SKIP_EXTERNAL
   bug_2295 ();
+#endif
 }

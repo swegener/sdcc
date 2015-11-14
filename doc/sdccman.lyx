@@ -13,18 +13,10 @@
   \mbox{\ifx\def@pt\pas@pt\cite@rig{#2}\else\cite@rig[#1]{#2}\fi}}
 \renewcommand{\underbar}[1]{{\let\cite\b@xcite\uline{#1}}}
 \pdfoptionpdfminorversion=3
-\usepackage[
-  pdftitle={SDCC Compiler User Guide},
-  pdfauthor={SDCC development team},
-  pdfsubject={installation, user manual},
-  pdfkeywords={68hc08 8032 8051 ansi iso c compiler assembler CPU DS390 embedded development free Floating Point Arithmetic Freescale GPL HC08 S08 inline Intel ISO/IEC 9899:1990 Linux MAC OS X manual Maxim mcs51 Microchip microcontroller open source PIC Unix Windows Z80 Z180 Zilog Rabbit},
-  pdfpagemode=UseOutlines,
-  colorlinks=true,
-  linkcolor=blue] {hyperref}
 %
 \sloppy
-\tolerance=500          
-\emergencystretch=30pt 
+\tolerance=500
+\emergencystretch=30pt
 %
 \date{}
 \end_preamble
@@ -51,7 +43,20 @@
 \index_command default
 \paperfontsize default
 \spacing single
-\use_hyperref false
+\use_hyperref true
+\pdf_title "SDCC Compiler User Guide"
+\pdf_author "SDCC development team"
+\pdf_subject "installation, user manual"
+\pdf_keywords "68hc08 8032 8051 ansi iso c compiler assembler CPU DS390 embedded development free Floating Point Arithmetic Freescale GPL HC08 S08 inline Intel ISO/IEC 9899:1990 Linux MAC OS X manual Maxim mcs51 Microchip microcontroller open source PIC Unix Windows Z80 Z180 Zilog Rabbit"
+\pdf_bookmarks true
+\pdf_bookmarksnumbered false
+\pdf_bookmarksopen false
+\pdf_bookmarksopenlevel 1
+\pdf_breaklinks false
+\pdf_pdfborder false
+\pdf_colorlinks false
+\pdf_backref false
+\pdf_pdfusetitle true
 \papersize letterpaper
 \use_geometry true
 \use_package amsmath 1

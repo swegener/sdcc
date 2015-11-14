@@ -1,3 +1,11 @@
+2015-11-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/Makefile.in,
+	  doc/sdccman.lyx:
+	  Fix bookmarks and hyperlinks in manual, bug #2405.
+	* src/SDCCglue.c:
+	  Drop build time in asm output to ease reproducible builds.
+
 2015-11-13 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/cpp/libcpp/include/symtab.h:

@@ -1812,11 +1812,8 @@ char *iComments2 = {
 void
 initialComments (FILE * afile)
 {
-  time_t t;
-  time (&t);
   fprintf (afile, "%s", iComments1);
   fprintf (afile, "; Version " SDCC_VERSION_STR " #%s (%s)\n", getBuildNumber (), getBuildEnvironment ());
-  fprintf (afile, "; This file was generated %s", asctime (localtime (&t)));
   fprintf (afile, "%s", iComments2);
 }
 

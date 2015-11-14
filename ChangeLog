@@ -5,6 +5,9 @@
 	  Fix bookmarks and hyperlinks in manual, bug #2405.
 	* src/SDCCglue.c:
 	  Drop build time in asm output to ease reproducible builds.
+	* device/lib/*/Makefile.in,
+	  device/lib/Makefile.in:
+	  Drop build time in sdar calls to make non-pic lib builds reproducible.
 
 2015-11-13 Ben Shi <powerstudio1st AT 163 DOT com>
 

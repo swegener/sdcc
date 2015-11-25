@@ -41,7 +41,7 @@ testTortureExecute (void)
 
   if (foo (0) != 0)
     ASSERT (0);
-#if 0 // TODO: Enable when long long literals are supported!
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   if (foo (0xffffffffULL) != 0)
     ASSERT (0);
   if (foo (0x25ff00ff00ULL) != 0x25)

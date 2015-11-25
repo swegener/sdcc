@@ -1,3 +1,14 @@
+2015-11-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	* src/SDCCval.c
+	* src/SDCCval.h
+	  Improve long long multiplication.
+	* support/regression/tests/gcc-torture-execute-20050111-1.c
+	* support/regression/tests/gcc-torture-execute-950511-1.c
+	* support/regression/tests/longlong.c
+	  Improve test cases.
+
 2015-11-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/Makefile.in,

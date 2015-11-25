@@ -1216,8 +1216,17 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
       /* it will be an unsigned long                      */
       if (IS_INT (type) || !IS_SPEC (type))
         {
+          /* long long is handled here, because it can overflow with double */
+          if (IS_LONGLONG (type) || !IS_SPEC (type))
+            /* signed and unsigned mul are the same, as long as the precision
+               of the result isn't bigger than the precision of the operands. */
+            retval = operandFromValue (valCastLiteral (type,
+                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (left)) *
+                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (right)),
+                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (left)) *
+                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (right))));
           /* long is handled here, because it can overflow with double */
-          if (IS_LONG (type) || !IS_SPEC (type))
+          else if (IS_LONG (type) || !IS_SPEC (type))
             /* signed and unsigned mul are the same, as long as the precision
                of the result isn't bigger than the precision of the operands. */
             retval = operandFromValue (valCastLiteral (type,
@@ -4435,10 +4444,10 @@ ast2iCode (ast * tree, int lvl)
       if (tree->right && tree->right->type == EX_VALUE)
         {
           geniCodeDummyRead (ast2iCode (tree->right, lvl + 1));
-	  return NULL;
-	}
+          return NULL;
+        }
       else
-	return ast2iCode (tree->right, lvl + 1);
+        return ast2iCode (tree->right, lvl + 1);
 
     case GOTO:
       geniCodeGoto (OP_SYMBOL (ast2iCode (tree->left, lvl + 1)));

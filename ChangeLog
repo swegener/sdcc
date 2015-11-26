@@ -1,3 +1,8 @@
+2015-11-26 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/tests/gcc-torture-execute-20050111-1.c
+	* support/regression/tests/gcc-torture-execute-950511-1.c
+	  Disable test cases.
+
 2015-11-24 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCicode.c

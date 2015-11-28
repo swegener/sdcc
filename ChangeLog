@@ -11,6 +11,8 @@
 	  support/regression/tests/charconst.c,
 	  support/regression/tests/string.c:
 	  Make wchar_t UTF-32.
+	* support/cpp/Makefile.in:
+	  Fix call to make.
 
 2015-11-26 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/gcc-torture-execute-20050111-1.c

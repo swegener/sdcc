@@ -280,7 +280,7 @@ traditional.o: $(LIBCPP_DIR)/traditional.c $(CONFIG_H) $(LIBCPP_DEPS)
 LIBIBERTY = ../sdbinutils/libiberty/libiberty.a
 
 $(LIBIBERTY):
-	cd ../sdbinutils/libiberty/ && if [ -e Makefile ]; then make; else ./configure && make; fi
+	cd ../sdbinutils/libiberty/ && if [ -e Makefile ]; then $(MAKE); else ./configure && $(MAKE); fi
 
 ##########################
 # Sdcpp

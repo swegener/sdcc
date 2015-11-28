@@ -956,6 +956,8 @@ operandBaseName (const char *op)
         return "iy";
       if (!strcmp (op, "ixh") || !strcmp (op, "ixl") || strstr (op, "ix"))
         return "ix";
+      if (!strcmp (op, "a"))
+        return "af";
     }
 
   return op;

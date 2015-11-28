@@ -36,7 +36,7 @@
 
 #ifndef __WCHAR_T_DEFINED
 #define __WCHAR_T_DEFINED
-  typedef char wchar_t;
+  typedef unsigned long int wchar_t;
 #endif
 
 #ifndef NULL

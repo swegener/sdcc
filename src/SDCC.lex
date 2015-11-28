@@ -199,7 +199,7 @@ static void checkCurrFile (const char *s);
 {D}*"."{D}+({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}+"."{D}*({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 \"                      { count (); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
-"L\""                   { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"L\""                   { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral ('L'); return STRING_LITERAL; }
 "u8\""                  { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
 "u\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('u'); return STRING_LITERAL; }
 "U\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('U'); return STRING_LITERAL; }
@@ -407,7 +407,9 @@ stringLiteral (char enc)
     case 'u': // UTF-16
       dbuf_append_str(&dbuf, "u\"");
       break;
+    case 'L':
     case 'U': // UTF-32
+      enc = 'U';
       dbuf_append_str(&dbuf, "U\"");
       break;
     default: // UTF-8 or whatever else the source character set is encoded in
@@ -522,29 +524,13 @@ stringLiteral (char enc)
           if (ch == EOF)
             goto out;
 
-          if (ch == 'L') /* Could be a wide string literal prefix */
-            {
-              if (!options.std_c95)
-                {
-                  werror (E_WCHAR_STRING_C95);
-                  unput(ch);
-                  goto out;
-                }
-              ch = input();
-              if (ch != '"')
-                {
-                  unput(ch);
-                  unput('L');
-                  goto out;
-                }
-            }
-          if (ch == 'u' || ch == 'U') /* Could be an utf-16 or utf-32 wide string literal prefix */
+          if (ch == 'u' || ch == 'U' || ch == 'L') /* Could be an utf-16 or utf-32 wide string literal prefix */
             {
               int ch2;
 
-              if (!options.std_c11)
+              if (!(options.std_c11 || options.std_c95 && ch == 'L'))
                 {
-                  werror (E_WCHAR_STRING_C11);
+                  werror (ch == 'L' ? E_WCHAR_STRING_C95 : E_WCHAR_STRING_C11);
                   unput(ch);
                   goto out;
                 }
@@ -556,7 +542,7 @@ stringLiteral (char enc)
                 {
                   if (!enc) 
                     {
-                      dbuf_prepend_char(&dbuf, ch);
+                      dbuf_prepend_char(&dbuf, ch == 'L' ? 'U' : ch);
                       enc = ch;
                     }
                   count_char(ch);

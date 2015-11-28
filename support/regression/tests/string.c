@@ -2,6 +2,7 @@
 */
 #include <testfwk.h>
 #include <string.h>
+#include <uchar.h>
 
 /** tests for strcmp
 */
@@ -167,8 +168,6 @@ do_multibyte_utf_8 (void)
 
 // Test SDCC implementation-defined utf-8 behaviour
 // string literals are utf-8 (as nearly all implementations out there)
-// string literals sprefixed by L are utf-8 (as no other implementation I know of)
-// string literals prefixed by L can be concatenated with string literals prefixed by u8
 static void
 do_multibyte_utf_8_sdcc (void)
 {
@@ -176,8 +175,8 @@ do_multibyte_utf_8_sdcc (void)
   const char *str1 = "Ä ä";
   const char *str2 = "\u00c4 ä";
   const char *str3 = u8"Ä " "ä";
-  const char *str4 = "Ä " L"ä";
-  const char *str5 = L"Ä " u8"ä";
+  const char *str4 = "Ä " "ä";
+  const char *str5 = u8"Ä " u8"ä";
 
   ASSERT (str1[0] == '\xc3');
   ASSERT (str2[1] == '\x84');

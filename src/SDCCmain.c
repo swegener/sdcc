@@ -2084,10 +2084,15 @@ preProcess (char **envp)
       addSet (&preArgvSet, Safe_strdup ("-D__SDCC_{port}"));
 
       /* Optinal C features not (yet) supported by sdcc */
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_COMPLEX__"));
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_THREADS__"));
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_ATOMICS__"));
-      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_VLA__"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_COMPLEX__=1"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_THREADS__=1"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_ATOMICS__=1"));
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_VLA__=1"));
+
+      /* Character encoding */
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_ISO_10646__=201409L")); // wchar_t is UTF-32
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_16__=1")); // char16_t is UTF-16
+      addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_32__=1")); // char32_t is UTF-32
 
       /* standard include path */
       if (!options.nostdinc)

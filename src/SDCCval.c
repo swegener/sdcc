@@ -1331,7 +1331,7 @@ constVal (const char *s)
 /* constCharacterVal - converts a character constant to value      */
 /*-----------------------------------------------------------------*/
 value *
-constCharacterVal (unsigned long v, unsigned char type)
+constCharacterVal (unsigned long v, char type)
 {
   value *val = newValue ();     /* alloc space for value   */
 
@@ -1345,23 +1345,23 @@ constCharacterVal (unsigned long v, unsigned char type)
       SPEC_NOUN (val->type) = V_INT;
       SPEC_USIGN (val->type) = 0;
       SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
-
       break;
-    case 1: // wide character constant
+    case 'L': // wide character constant
       if (!options.std_c95)
         werror (E_WCHAR_CONST_C95);
-      SPEC_NOUN (val->type) = V_CHAR;
-      SPEC_USIGN (val->type) = options.unsigned_char;
-      SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
+      SPEC_NOUN (val->type) = V_INT;
+      SPEC_USIGN (val->type) = 1;
+      SPEC_LONG (val->etype) = 1;
+      SPEC_CVAL (val->type).v_ulong = (TYPE_UDWORD) v;
       break;
-    case 2: // wide character constant
+    case 'u': // wide character constant
       if (!options.std_c11)
         werror (E_WCHAR_CONST_C11);
       SPEC_NOUN (val->type) = V_INT;
       SPEC_USIGN (val->type) = 1;
       SPEC_CVAL (val->type).v_uint = (TYPE_UWORD) v;
       break;
-    case 3: // wide character constant
+    case 'U': // wide character constant
       if (!options.std_c11)
         werror (E_WCHAR_CONST_C11);
       SPEC_NOUN (val->type) = V_INT;
@@ -1519,8 +1519,8 @@ strVal (const char *s)
 
       // TODO: Should we free (utf_8) here, or do we need some other free function due to the dbuf stuff?
 
-      if (s[0] == 'U') // UTF-32 string literal
-        wassertl (0, "C11 UTF-32 string literals not yet supported");
+      if (s[0] == 'U' || s[0] == 'L') // UTF-32 string literal
+        wassertl (0, "UTF-32 string literals not yet supported");
       else if (s[0] == 'u') // UTF-16 string literal
         {
           size_t utf_16_size;
@@ -1627,21 +1627,13 @@ copyValue (value * src)
 value *
 charVal (const char *s)
 {
-  unsigned char type;
-  switch(*s)
-    {
-    case 'L':
-      type = 1; s++;
-      break;
-    case 'u':
-      type = 2; s++;
-      break;
-    case 'U':
-      type = 3; s++;
-      break;
-    default:
-      type = 0;
-    }
+  char type;
+
+  if (*s == 'L' || *s == 'u' || *s == 'U')
+    type = *s++;
+  else
+    type = 0;
+
   s++; // Get rid of quotation.
 
   /* if \ then special processing */

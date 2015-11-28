@@ -2,6 +2,15 @@
 
 	* src/SDCCpeeph.c:
 	  Fix operandsNotRelated() bug #2435.
+	* device/include/stddef.h,
+	  device/include/stdlib.h,
+	  src/SDCC.lex,
+	  src/SDCCmain.c,
+	  src/SDCCval.c,
+	  src/SDCCval.h,
+	  support/regression/tests/charconst.c,
+	  support/regression/tests/string.c:
+	  Make wchar_t UTF-32.
 
 2015-11-26 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/gcc-torture-execute-20050111-1.c

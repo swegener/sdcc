@@ -2,7 +2,9 @@
 */
 #include <testfwk.h>
 #include <string.h>
+#if defined (__SDCC)
 #include <uchar.h>
+#endif
 
 /** tests for strcmp
 */

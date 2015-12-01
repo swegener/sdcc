@@ -1,3 +1,10 @@
+2015-12-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	  Remove warning #220 (W_ANONYMOUS_MEMBER).
+
 2015-11-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c:

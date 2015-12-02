@@ -246,7 +246,7 @@ enum {
   W_INTERNAL_ERROR              = 217, /* warning for non-fatal internal errors - things that should not have happened, but can be handled */
   W_UNRECOGNIZED_ASM            = 218, /* unrecognized asm instruction in peephole optimizer */
   W_FLEXARRAY_INSTRUCT          = 219, /* using flexible arrays in a struct */
-                                       /* No.220 is vacant */
+  W_ANONYMOUS_MEMBER            = 220, /* anonymous member in struct/union */
   W_INLINE_NAKED                = 221, /* inline function is naked */
   E_Z88DK_FASTCALL_PARAMETERS   = 222, /* invalid number of parameters in __z88dk_fastcall */
   E_Z88DK_FASTCALL_PARAMETER    = 223, /* invalid parameter type in __z88dk_fastcall */

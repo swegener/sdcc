@@ -1,3 +1,9 @@
+2015-12-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	  Fix defects in previous commit.
+
 2015-12-01 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y

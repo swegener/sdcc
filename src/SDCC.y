@@ -886,6 +886,9 @@ type_specifier
             symbol *sym;
             sym_link *p;
             sym = findSym(TypedefTab,NULL,$1);
+            if (sym != NULL)
+              if (IS_FUNC (sym->type))
+                werrorfl(sym->fileDef, sym->lineDef, E_TYPE_IS_FUNCTION, sym->name);
             $$ = p = copyLinkChain(sym ? sym->type : NULL);
             SPEC_TYPEDEF(getSpec(p)) = 0;
             ignoreTypedefType = 1;

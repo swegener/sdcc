@@ -1,3 +1,10 @@
+2015-12-05 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	  Fix a bug of type definition of a function by typedef.
+
 2015-12-02 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCerr.c

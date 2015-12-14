@@ -245,13 +245,13 @@ copyAst (ast * src)
     addSet (&pset, src);
 
   dest = Safe_alloc (sizeof (ast));
-
   dest->type = src->type;
   dest->filename = src->filename;
   dest->lineno = src->lineno;
   dest->level = src->level;
   dest->funcName = src->funcName;
   dest->reversed = src->reversed;
+  dest->parmProcessed = src->parmProcessed;
 
   if (src->ftype)
     dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
@@ -880,13 +880,21 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
       (*actParm)->decorated = 1;
       if ((*actParm)->reversed)
         {
-          return (processParms (func, defParm, &(*actParm)->right, parmNumber, FALSE) ||
-                  processParms (func, defParm ? defParm->next : NULL, &(*actParm)->left, parmNumber, rightmost));
+          int ret;
+          ret = (processParms (func, defParm, &(*actParm)->right, parmNumber, FALSE) ||
+                 processParms (func, defParm ? defParm->next : NULL, &(*actParm)->left, parmNumber, rightmost));
+          if (!ret)
+            (*actParm)->parmProcessed = 1;    
+          return ret;
         }
       else
         {
-          return (processParms (func, defParm, &(*actParm)->left, parmNumber, FALSE) ||
-                  processParms (func, defParm ? defParm->next : NULL, &(*actParm)->right, parmNumber, rightmost));
+          int ret;
+          ret = (processParms (func, defParm, &(*actParm)->left, parmNumber, FALSE) ||
+                 processParms (func, defParm ? defParm->next : NULL, &(*actParm)->right, parmNumber, rightmost));
+          if (!ret)
+            (*actParm)->parmProcessed = 1;
+          return ret;
         }
     }
   else if (defParm)             /* not vararg */
@@ -928,6 +936,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
            (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, cast.literalFromCast))))
         {
           /* Parameter was explicitly typecast; don't touch it. */
+         (*actParm)->parmProcessed = 1;
           return 0;
         }
 
@@ -972,14 +981,17 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
 
           *actParm = decorateType (*actParm, resultType);
         }
+      (*actParm)->parmProcessed = 1;
       return 0;
     }                           /* vararg */
 
   /* if defined parameters ended but actual has not & */
   /* reentrant */
   if (!defParm && *actParm && (options.stackAuto || IFFUNC_ISREENT (functype)))
-    return 0;
-
+    {
+      (*actParm)->parmProcessed = 1;
+      return 0;
+    }
   resolveSymbols (*actParm);
 
   /* the parameter type must be at least castable */
@@ -1033,6 +1045,7 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
     }
 
   (*parmNumber)++;
+  (*actParm)->parmProcessed = 1;
   return 0;
 }
 
@@ -1675,7 +1688,7 @@ stringToSymbol (value * val)
   else
     {
       addSet (&strSym, sym);
-      addSet (&statsg->syms, sym);	  
+      addSet (&statsg->syms, sym);      
     }
   sym->ival = NULL;
   return symbolVal (sym);
@@ -5245,7 +5258,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           else
             functype = LTYPE (tree);
 
-          if (processParms (tree->left, FUNC_ARGS (functype), &tree->right, &parmNumber, TRUE))
+          if ((tree->right && !tree->right->parmProcessed) && processParms (tree->left, FUNC_ARGS (functype), &tree->right, &parmNumber, TRUE))
             {
               goto errorTreeReturn;
             }

@@ -130,10 +130,17 @@ COMMAND_DO_WORK_SIM(cl_stop_cmd)
 //                   class cl_cmdline *cmdline, class cl_console_base *con)
 COMMAND_DO_WORK_UC(cl_step_cmd)
 {
-  //printf("step %x\n",uc->PC);
-  uc->do_inst(1);
-  //printf("step done %x\n",uc->PC);
-  uc->print_regs(con);
+  int instrs = 1, i;
+  class cl_cmd_arg *parm= cmdline->param(0);
+  if (parm != NULL)
+    instrs = parm->i_value;
+  if (instrs <= 0)
+    instrs = 1;
+  for (i = 0; i < instrs; i++)
+    {
+      uc->do_inst(1);
+      uc->print_regs(con);
+    }
   return(0);
 }
 

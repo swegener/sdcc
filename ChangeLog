@@ -1,3 +1,8 @@
+2015-12-17 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* Makefile.in
+	  Fix the conflict in parallel build caused by component dependency.
+
 2015-12-16 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sim/ucsim/cmd.src/cmdset.cc

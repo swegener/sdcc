@@ -2374,12 +2374,11 @@ initValues (void)
    * Make sure the preprocessor is called with the "-std" option
    * corresponding to the --std used to start sdcc
    */
-  if (!options.std_sdcc)
-    setMainValue ("cppstd",
-      options.std_c11 ? "-std=c11 " :
-     (options.std_c99 ? "-std=c99 " :
-     (options.std_c95 ? "-std=iso9899:199409 " :
-     "-std=c89 ")));
+  setMainValue ("cppstd",
+    options.std_c11 ? "-std=c11 " :
+    (options.std_c99 ? "-std=c99 " :
+    (options.std_c95 ? "-std=iso9899:199409 " :
+    "-std=c89 ")));
 }
 
 static void

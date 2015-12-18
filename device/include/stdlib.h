@@ -64,13 +64,6 @@ extern void _ltoa(long, char*, unsigned char);
 int rand(void);
 void srand(unsigned int seed);
 
-#if __STDC_VERSION__ >= 201112L
-extern void *aligned_alloc(size_t alignment, size_t size)
-{
-  return malloc(size);
-}
-#endif
-
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
 void __xdata *calloc (size_t nmemb, size_t size);
 void __xdata *malloc (size_t size);
@@ -79,6 +72,13 @@ void __xdata *realloc (void *ptr, size_t size);
 void *calloc (size_t nmemb, size_t size);
 void *malloc (size_t size);
 void *realloc (void *ptr, size_t size);
+#endif
+
+#if __STDC_VERSION__ >= 201112L
+extern void *aligned_alloc(size_t alignment, size_t size)
+{
+  return malloc(size);
+}
 #endif
 
 extern void free (void * ptr);

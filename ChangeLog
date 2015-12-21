@@ -1,3 +1,8 @@
+2015-12-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  Option for ELF output in STM8 backend.
+
 2015-12-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/linksrc/lkelf.c,

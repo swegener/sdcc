@@ -32,10 +32,14 @@
 
 #define OPTION_CODE_SEG        "--codeseg"
 #define OPTION_CONST_SEG       "--constseg"
+#define OPTION_ELF             "--out-fmt-elf"
+
+extern DEBUGFILE dwarf2DebugFile;
 
 static OPTION stm8_options[] = {
   {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
   {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
+  {0, OPTION_ELF,             NULL, "Output executable in ELF format"},
   {0, NULL}
 };
 
@@ -154,6 +158,12 @@ stm8_reg_parm (sym_link * l, bool reentrant)
 static bool
 stm8_parseOptions (int *pargc, char **argv, int *i)
 {
+  if (!strcmp (argv[*i], "--out-fmt-elf"))
+  {
+    options.out_fmt = 'E';
+    debugFile = &dwarf2DebugFile;
+    return TRUE;
+  }
   return FALSE;
 }
 

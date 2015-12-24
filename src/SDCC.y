@@ -1612,7 +1612,7 @@ type_name
 abstract_declarator
    : pointer { $$ = reverseLink($1); }
    | abstract_declarator2
-   | pointer abstract_declarator2   { $1 = reverseLink($1); $1->next = $2; $$ = $1;
+   | pointer abstract_declarator2   { $1 = reverseLink($1); $2->next = $1; $$ = $2;
           if (IS_PTR($1) && IS_FUNC($2))
             DCL_TYPE($1) = CPOINTER;
         }
@@ -1668,7 +1668,7 @@ abstract_declarator2
         }
      parameter_type_list ')'
         {
-          sym_link *p = newLink(DECLARATOR);
+          sym_link *p = newLink(DECLARATOR), *q;
           DCL_TYPE(p) = FUNCTION;
 
           FUNC_HASVARARGS(p) = IS_VARG($4);
@@ -1684,7 +1684,8 @@ abstract_declarator2
               DCL_TYPE($1) = CPOINTER;
               $$ = $1;
             }
-          $1->next = p;
+          for (q = $1; q && q->next; q = q->next);
+          q->next = p;
         }
    ;
 

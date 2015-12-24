@@ -1,3 +1,10 @@
+2015-12-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	  Fix a bug in the front end. (pointer array parameters)
+	* support/regression/tests/bug-2271.c
+	  Add a test case.
+
 2015-12-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c:

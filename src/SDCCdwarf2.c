@@ -2769,21 +2769,21 @@ dwWriteEndFunction (symbol *sym, iCode *ic, int offset)
   else
     sprintf (debugSym, "XG$%s$0$0", sym->name);
   emitDebuggerSymbol (debugSym);
-      
+
   dwAddTagAttr (dwFuncTag, dwNewAttrAddrLabel (DW_AT_high_pc,
                                                Safe_strdup(debugSym),
                                                offset));
-  
+
   if (dwFrameLocList)
     {
       dwAddTagAttr (dwFuncTag, dwNewAttrLocRef (DW_AT_frame_base,
                                                 dwFrameLocList));
-      
+
       dwFrameLocList->next = dwRootLocList;
       dwRootLocList = dwFrameLocList;
       dwFrameLocList = NULL;
     }
-    
+
   return 1;
 }
 

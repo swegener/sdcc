@@ -1,3 +1,8 @@
+2015-12-26 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/gen.c
+	  Add absent call to dwWriteFunction() while --debug is specified.
+  
 2015-12-24 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y

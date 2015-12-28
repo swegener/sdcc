@@ -6956,13 +6956,35 @@ msys
 
 \end_inset
 
-tools (
+msys (
 \begin_inset Flex URL
 status collapsed
 
 \begin_layout Plain Layout
 
 http://www.mingw.org/wiki/msys
+\end_layout
+
+\end_inset
+
+) or msys2
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+msys2
+\end_layout
+
+\end_inset
+
+(
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://msys2.github.io
 \end_layout
 
 \end_inset

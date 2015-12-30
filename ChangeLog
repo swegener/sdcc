@@ -1,3 +1,8 @@
+2015-12-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCdwarf2.c:
+	  Fix memory bug in DWARF output, patch by Peter Dons Tychsen.
+
 2015-12-30 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCsymt.c

@@ -2897,7 +2897,7 @@ int
 dwWriteModule (const char *name)
 {
   dwtag * tp;
-  char verid[125];
+  char *verid = (char*)Safe_alloc(125);
   
   dwModuleName = Safe_strdup (name);
   

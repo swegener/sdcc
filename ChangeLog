@@ -2,6 +2,8 @@
 
 	* src/SDCCdwarf2.c:
 	  Fix memory bug in DWARF output, patch by Peter Dons Tychsen.
+	* sdas/asxxsrc/asdbg.c:
+	  Fix 0 pointer access when specifying -y or -j without -o.
 
 2015-12-30 Ben Shi <powerstudio1st AT 163 DOT com>
 

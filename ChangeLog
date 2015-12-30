@@ -1,3 +1,10 @@
+2015-12-30 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCsymt.c
+	  Make comparePtrType() less strict.
+	* support/regression/tests/bug-2271.c
+	  Improve test case.
+
 2015-12-28 Ben Shi <powerstudio1st AT 163 DOT com>
 
         * Index: doc/sdccman.lyx

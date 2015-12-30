@@ -2495,7 +2495,7 @@ comparePtrType (sym_link *dest, sym_link *src, bool bMustCast)
   else if (res == -2)
     return bMustCast ? -1 : -2;
   else
-    return 0;
+    return res;
 }
 
 /*--------------------------------------------------------------------*/

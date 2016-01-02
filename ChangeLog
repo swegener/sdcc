@@ -1,3 +1,9 @@
+2016-01-02 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/sdbinutils/binutils/arparse.c
+	* support/sdbinutils/binutils/arparse.h
+	  Delete intermediate files.
+
 2016-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* all.vcxproj,
@@ -39,10 +45,10 @@
 
 2015-12-28 Ben Shi <powerstudio1st AT 163 DOT com>
 
-        * Index: doc/sdccman.lyx
-          Suggest msys2 along with msys while building wih MSVC.
-        * sdas/asxxsrc/assym.c
-          Apply patch #253.
+	* doc/sdccman.lyx
+	  Suggest msys2 along with msys while building wih MSVC.
+	* sdas/asxxsrc/assym.c
+	  Apply patch #253.
 
 2015-12-26 Ben Shi <powerstudio1st AT 163 DOT com>
 

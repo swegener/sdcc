@@ -1,3 +1,28 @@
+2016-01-02 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* all.vcxproj,
+	* config.vcxproj,
+	* sdas/as6808/as_hc08.vcxproj,
+	* sdas/as8051/asx8051.vcxproj,
+	* sdas/as8xcxxx/sdas390.vcxproj,
+	* sdas/asgb/asgb.vcxproj,
+	* sdas/linksrc/aslink.vcxproj,
+	* src/avr/avr.vcxproj,
+	* src/ds390/ds390.vcxproj,
+	* src/hc08/hc08.vcxproj,
+	* src/mcs51/mcs51.vcxproj,
+	* src/pic14/pic14.vcxproj,
+	* src/pic16/pic16.vcxproj,
+	* src/sdcc.vcxproj,
+	* src/xa51/xa51.vcxproj,
+	* src/z80/z80.vcxproj,
+	* src/z80/z80a.vcxproj,
+	* support/cpp/sdcpp.vcxproj,
+	* support/librarian/librarian.vcxproj,
+	* support/makebin/makebin.vcxproj,
+	* support/packihx/packihx.vcxproj: applied patch 252 by Peter Dons Tychsen
+	  to remove UpgradeFromVC60.props
+
 2015-12-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdwarf2.c:

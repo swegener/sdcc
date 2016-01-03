@@ -441,7 +441,7 @@ lnkarea(void)
                                         ap->a_addr = rloc[locIndex];
                         }
                         else if (ap->a_bset == 0) {
-                                if (TARGET_IS_6808 && ap->a_flag & A_NOLOAD) {
+                                if ((TARGET_IS_6808 || TARGET_IS_STM8) && ap->a_flag & A_NOLOAD) {
                                         locIndex = 2;
                                         ap->a_addr = 0;
                                 }

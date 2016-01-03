@@ -2,6 +2,8 @@
 
 	* sdas/linksrc/lkarea.c:
 	  Fix handling of NOLOAD for STM8 in linker, patch by Peter Dons Tychsen.
+	* src/SDCCralloc.hpp:
+	  Fix compare operator for register assignments.
 
 2016-01-02 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -34,7 +36,6 @@
 	* support/packihx/packihx.vcxproj: applied patch 252 by Peter Dons Tychsen
 	  to remove UpgradeFromVC60.props
 
->>>>>>> .r9438
 2015-12-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdwarf2.c:

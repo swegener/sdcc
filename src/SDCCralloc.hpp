@@ -163,6 +163,8 @@ struct assignment
 
     for (i = local.begin(), ai = a.local.begin();; ++i, ++ai)
       {
+        if (i == i_end && ai == ai_end)
+          return(false);
         if (i == i_end)
           return(true);
         if (ai == ai_end)

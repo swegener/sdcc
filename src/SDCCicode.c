@@ -2953,7 +2953,7 @@ geniCodeLogic (operand * left, operand * right, int op, ast * tree)
     }
 
   /* Avoid expensive comparisons when the type of the constant is bigger than the type of the non-const operand */
-  if (IS_INTEGRAL (ltype) && IS_LITERAL (rtype) && getSize (ltype) < getSize (rtype))
+  if (IS_INTEGRAL (ltype) && IS_LITERAL (rtype) && getSize (ltype) < getSize (rtype) && !TARGET_HC08_LIKE)
     right->svt.valOperand = valCastLiteral (ltype, operandLitValue (right), operandLitValue (right));
 
   /* if one operand is a pointer and the other is a literal generic void pointer,

@@ -1,3 +1,12 @@
+2016-01-05 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Fix bug: members of pointer arrays are always treated as r-values.
+	* support/regression/tests/gcc-torture-execute-930526-1.c
+	  Improve test case.
+	* support/sdbinutils/binutils/arlex.c
+	  Removed.
+
 2015-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:

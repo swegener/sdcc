@@ -4148,7 +4148,9 @@ ast2iCode (ast * tree, int lvl)
       if (IS_ASSIGN_OP (tree->opval.op) || IS_DEREF_OP (tree) || IS_ADDRESS_OF_OP (tree))
         {
           addLvaluereq (lvl);
-          if ((!IS_ADDRESS_OF_OP (tree) && IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left)) ||
+          if ((!IS_ADDRESS_OF_OP (tree) && IS_ARRAY_OP (tree->left) && IS_ARRAY_OP (tree->left->left) &&
+               tree->left->left->ftype && IS_ARRAY (tree->left->left->ftype) &&
+               tree->left->left->ftype->next && IS_ARRAY (tree->left->left->ftype->next)) || 
               (IS_DEREF_OP (tree) && IS_ARRAY_OP (tree->left)))
             clearLvaluereq ();
 

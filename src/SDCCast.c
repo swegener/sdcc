@@ -2344,7 +2344,7 @@ replLoopSym (ast * body, symbol * sym)
           body->type = EX_OP;
           body->opval.op = '-';
           body->left = newAst_VALUE (symbolVal (sym));
-          body->right = newAst_VALUE (constCharVal (1));
+          body->right = newAst_VALUE (constVal ("1"));
         }
       return;
     }
@@ -2389,7 +2389,7 @@ reverseLoop (ast * loop, symbol * sym, ast * init, ast * end)
                                          newNode (NULLOP,
                                                   newNode (SUB_ASSIGN,
                                                            newAst_VALUE (symbolVal (sym)),
-                                                           newAst_VALUE (constCharVal (1))), rloop))));
+                                                           newAst_VALUE (constVal ("1"))), rloop))));
 
   rloop->lineno = init->lineno;
   return decorateType (rloop, RESULT_TYPE_NONE);

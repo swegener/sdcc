@@ -8721,7 +8721,7 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed)
   if (!is_signed &&
     (AOP (result)->type == AOP_ACC ||
     AOP (result)->type != AOP_REG ||
-    (shCount >= 4 && !IS_GB || AOP (left)->type == AOP_ACC) /*&& !bitVectBitValue (ic->rSurv, A_IDX)*/))
+    (shCount >= 4 || AOP (left)->type == AOP_ACC) /*&& !bitVectBitValue (ic->rSurv, A_IDX)*/))
     {
       cheapMove (ASMOP_A, 0, AOP (left), 0);
       AccRsh (shCount);
@@ -8730,17 +8730,7 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed)
   else if (AOP (result)->type == AOP_REG) // Can shift in destination for register result.
     {
       cheapMove (AOP (result), 0, AOP (left), 0);
-      if (!is_signed && IS_GB && shCount >= 3)
-        {
-          if (shCount == 3)
-            {
-              emit3 (A_RLC, AOP (result), 0);
-              shCount++;
-            }
-          emit3 (A_SWAP, AOP (result), 0);
-          regalloc_dry_run_cost += 2;
-          shCount -= 4;
-        }
+
       while (shCount--)
         emit3 (is_signed ? A_SRA : A_SRL, AOP (result), 0);
     }

@@ -2,6 +2,9 @@
 
 	* src/SDCCast.c:
 	  Do not try to output debug info in case of fatal errors - patch #260 by Peter Dons Tychsen
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2452.c:
+	  Fix gbz80 right shift bug #2452.
 
 2016-01-05 Ben Shi <powerstudio1st AT 163 DOT com>
 

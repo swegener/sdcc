@@ -7201,7 +7201,8 @@ createFunction (symbol * name, ast * body)
 skipall:
   /* dealloc the block variables */
   processBlockVars (body, &stack, DEALLOCATE);
-  outputDebugStackSymbols ();
+  if (!fatalError)
+    outputDebugStackSymbols ();
   /* deallocate paramaters */
   deallocParms (FUNC_ARGS (name->type));
 

@@ -1953,7 +1953,7 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr, symbol ** sym, 
               IS_AST_SYM_VALUE (condExpr->left->left) && isSymbolEqual (*sym, AST_SYMBOL (condExpr->left->left)))
             {
 
-              *end = newNode ('+', condExpr->left->right, newAst_VALUE (constCharVal (1)));
+              *end = newNode ('+', condExpr->left->right, newAst_VALUE (constVal ("1")));
               break;
             }
           return FALSE;
@@ -4040,7 +4040,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         {
           tree->type = EX_VALUE;
           tree->left = tree->right = NULL;
-          tree->opval.val = constCharVal (0);
+          tree->opval.val = constVal ("0");
           TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
           return tree;
         }
@@ -4150,7 +4150,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
           /* optimize bit-result, even if we optimize a buggy source */
           tree->type = EX_VALUE;
-          tree->opval.val = constCharVal (1);
+          tree->opval.val = constBoolVal (1);
         }
       else
         tree->left = addCast (tree->left, resultTypeProp, TRUE);
@@ -4181,7 +4181,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           /* remove double '!!X' by 'X ? 1 : 0' */
           tree->opval.op = '?';
           tree->left = tree->left->left;
-          tree->right = newNode (':', newAst_VALUE (constCharVal (1)), newAst_VALUE (constCharVal (0)));
+          tree->right = newNode (':', newAst_VALUE (constBoolVal (1)), newAst_VALUE (constBoolVal (0)));
           tree->right->filename = tree->filename;
           tree->right->lineno = tree->lineno;
           tree->decorated = 0;
@@ -4298,7 +4298,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               /* Change shift op to comma op and replace the right operand with 0. */
               /* This preserves the left operand in case there were side-effects. */
               tree->opval.op = ',';
-              tree->right->opval.val = constCharVal (0);
+              tree->right->opval.val = constVal ("0");
               TETYPE (tree) = TTYPE (tree) = tree->right->opval.val->type;
               return tree;
             }
@@ -4640,7 +4640,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           case CCR_ALWAYS_TRUE:
           case CCR_ALWAYS_FALSE:
             werrorfl (tree->filename, tree->lineno, W_COMP_RANGE, ccr_result == CCR_ALWAYS_TRUE ? "true" : "false");
-            return decorateType (newAst_VALUE (constCharVal ((unsigned char) (ccr_result == CCR_ALWAYS_TRUE))), resultType);
+            return decorateType (newAst_VALUE (constBoolVal ((unsigned char) (ccr_result == CCR_ALWAYS_TRUE))), resultType);
           case CCR_OK:
           default:
             break;
@@ -4660,7 +4660,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
           /* (unsigned value) ? 1 : 0 */
           tree->opval.op = '?';
-          tree->right = newNode (':', newAst_VALUE (constCharVal (1)), tree->right);    /* val 0 */
+          tree->right = newNode (':', newAst_VALUE (constBoolVal (1)), tree->right);    /* val 0 */
           tree->right->filename = tree->filename;
           tree->right->lineno = tree->lineno;
           tree->right->left->filename = tree->filename;
@@ -4792,7 +4792,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       /*----------------------------*/
       /*             sizeof         */
       /*----------------------------*/
-    case SIZEOF:               /* evaluate wihout code generation */
+    case SIZEOF:               /* evaluate without code generation */
       {
         /* change the type to a integer */
         struct dbuf_s dbuf;
@@ -6369,12 +6369,12 @@ optimizeCompare (ast * root)
         case '>':
         case '<':
         case NE_OP:
-          optExpr = newAst_VALUE (constCharVal (0));
+          optExpr = newAst_VALUE (constBoolVal (0));
           break;
         case GE_OP:
         case LE_OP:
         case EQ_OP:
-          optExpr = newAst_VALUE (constCharVal (1));
+          optExpr = newAst_VALUE (constBoolVal (1));
           break;
         }
 

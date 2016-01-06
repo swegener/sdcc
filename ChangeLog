@@ -2,6 +2,8 @@
 
 	* src/SDCCicode.c:
 	  Optimize comparisons of cheap variables to expensive constants more.
+	* src/SDCCast.c:
+	  Use cheaper types for implicitly introduced constants.
 
 2015-01-05 Philipp Klaus Krause <pkk AT spth.de>
 

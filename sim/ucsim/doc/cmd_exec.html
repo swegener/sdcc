@@ -89,10 +89,14 @@ description of disassembled form.
 <hr>
 
 
-<a name="step"><h3>s,step</h3></a>
+<a name="step"><h3>s,step [steps]</h3></a>
 
 Step command. It executes one instruction without effect of
 breakpoints.
+
+<p>The optional parameter can be used to specify number of instuctions
+to execute. Note that breakpoints will stop the execution after the
+first instruction.
 
 <pre>
 $ <font color="#118811">s51 remoansi.hex</font>
@@ -108,7 +112,8 @@ under certain conditions; type `show c' for details.
    000160 c2 90    CLR   P1.0
 > </pre>
 
-After execution of actual instruction pointed by PC the <b>step</b>
+After execution of actual instruction pointed by PC (or all
+instructions specified by the optional parameter) the <b>step</b>
 command dumps out the register set.
 
 <hr>

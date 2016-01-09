@@ -2,9 +2,9 @@
  * This declarations of the PIC18F448 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:58 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:34 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -3343,14 +3343,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESB               : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESB               : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __RXB0DLCbits_t;
@@ -5224,13 +5224,13 @@ typedef union
 
   struct
     {
-    unsigned TRISE              : 3;
+    unsigned DDRE               : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned DDRE               : 3;
+    unsigned TRISE              : 3;
     unsigned                    : 5;
     };
   } __DDREbits_t;
@@ -5299,6 +5299,12 @@ typedef union
 
   struct
     {
+    unsigned DDRE               : 3;
+    unsigned                    : 5;
+    };
+
+  struct
+    {
     unsigned RE                 : 3;
     unsigned                    : 5;
     };
@@ -5306,12 +5312,6 @@ typedef union
   struct
     {
     unsigned TRISE              : 3;
-    unsigned                    : 5;
-    };
-
-  struct
-    {
-    unsigned DDRE               : 3;
     unsigned                    : 5;
     };
   } __TRISEbits_t;
@@ -6127,14 +6127,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned EDC2B              : 2;
+    unsigned EDC1B              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned EDC1B              : 2;
+    unsigned EDC2B              : 2;
     unsigned                    : 2;
     };
 
@@ -7220,13 +7220,13 @@ typedef union
 
   struct
     {
-    unsigned STKPTR             : 5;
+    unsigned SP                 : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned SP                 : 5;
+    unsigned STKPTR             : 5;
     unsigned                    : 3;
     };
   } __STKPTRbits_t;

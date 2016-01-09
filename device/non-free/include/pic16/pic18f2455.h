@@ -2,9 +2,9 @@
  * This declarations of the PIC18F2455 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:41:59 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:28 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -2986,7 +2986,7 @@ typedef union
 
   struct
     {
-    unsigned LVV                : 4;
+    unsigned LVDL               : 4;
     unsigned                    : 4;
     };
 
@@ -2998,7 +2998,7 @@ typedef union
 
   struct
     {
-    unsigned LVDL               : 4;
+    unsigned LVV                : 4;
     unsigned                    : 4;
     };
   } __HLVDCONbits_t;
@@ -3072,13 +3072,13 @@ typedef union
 
   struct
     {
-    unsigned LVV                : 4;
+    unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned HLVDL              : 4;
+    unsigned LVV                : 4;
     unsigned                    : 4;
     };
 
@@ -3560,10 +3560,10 @@ extern __at(0x0FFF) __sfr TOSU;
 #define _BOR_SOFT_2L            0xFB    // Brown-out Reset enabled and controlled by software (SBOREN is enabled).
 #define _BOR_ON_ACTIVE_2L       0xFD    // Brown-out Reset enabled in hardware only and disabled in Sleep mode (SBOREN is disabled).
 #define _BOR_ON_2L              0xFF    // Brown-out Reset enabled in hardware only (SBOREN is disabled).
-#define _BORV_0_2L              0xE7    // Maximum setting.
-#define _BORV_1_2L              0xEF    
-#define _BORV_2_2L              0xF7    
-#define _BORV_3_2L              0xFF    // Minimum setting.
+#define _BORV_0_2L              0xE7    // Maximum setting 4.59V.
+#define _BORV_1_2L              0xEF    // Setting 2 4.33V.
+#define _BORV_2_2L              0xF7    // Setting 1 2.79V.
+#define _BORV_3_2L              0xFF    // Minimum setting 2.05V.
 #define _VREGEN_OFF_2L          0xDF    // USB voltage regulator disabled.
 #define _VREGEN_ON_2L           0xFF    // USB voltage regulator enabled.
 

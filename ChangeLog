@@ -1,11 +1,42 @@
-2015-01-06 Philipp Klaus Krause <pkk AT spth.de>
+2016-01-09 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/scripts/cinc2h.pl,
+	  support/optimize_pic16devices.pl,
+	  support/z80-disasm.pl:
+	  Some minor repairs.
+
+	* device/include/pic14/pic14devices.txt,
+	  device/include/pic14/pic16regs.h,
+	  device/include/pic16/pic16devices.txt,
+	  device/include/pic16/pic18fregs.h,
+	  device/lib/pic16/configure,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/libio/adc.ignore,
+	  device/lib/pic16/libio/i2c.ignore,
+	  device/lib/pic16/libio/usart.ignore,
+	  device/non-free/include/pic14/*.h,
+	  device/non-free/include/pic16/*.h,
+	  device/non-free/lib/pic14/libdev/devices.txt,
+	  device/non-free/lib/pic14/libdev/*.c,
+	  device/non-free/lib/pic16/Makefile.in,
+	  device/non-free/lib/pic16/aclocal.m4,
+	  device/non-free/lib/pic16/configure,
+	  device/non-free/lib/pic16/processors.ac,
+	  device/non-free/lib/pic16/libdev/Makefile.am,
+	  device/non-free/lib/pic16/libdev/Makefile.in,
+	  device/non-free/lib/pic16/libdev/*.c,
+	  doc/sdccman.lyx:
+	  Updated to gputils-1.4.2-1
+
+2016-01-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c:
 	  Optimize comparisons of cheap variables to expensive constants more.
 	* src/SDCCast.c:
 	  Use cheaper types for implicitly introduced constants.
 
-2015-01-05 Philipp Klaus Krause <pkk AT spth.de>
+2016-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c:
 	  Do not try to output debug info in case of fatal errors - patch #260 by Peter Dons Tychsen
@@ -22,14 +53,14 @@
 	* support/sdbinutils/binutils/arlex.c
 	  Removed.
 
-2015-01-04 Philipp Klaus Krause <pkk AT spth.de>
+2016-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:
 	  Fix handling of nop in z80MightRead, patch #259 by alvin.
 	* src/SDCCicode.c:
 	  Optimize comparisons of cheap variables to expensive constants.
 
-2015-01-03 Philipp Klaus Krause <pkk AT spth.de>
+2016-01-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/linksrc/lkarea.c:
 	  Fix handling of NOLOAD for STM8 in linker, patch by Peter Dons Tychsen.

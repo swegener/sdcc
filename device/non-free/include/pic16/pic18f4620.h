@@ -2,9 +2,9 @@
  * This declarations of the PIC18F4620 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:42:05 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:36 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -1060,7 +1060,7 @@ typedef union
     unsigned TRISE0             : 1;
     unsigned TRISE1             : 1;
     unsigned TRISE2             : 1;
-    unsigned RE3                : 1;
+    unsigned                    : 1;
     unsigned PSPMODE            : 1;
     unsigned IBOV               : 1;
     unsigned OBF                : 1;
@@ -1081,13 +1081,13 @@ typedef union
 
   struct
     {
-    unsigned RE                 : 4;
-    unsigned                    : 4;
+    unsigned TRISE              : 3;
+    unsigned                    : 5;
     };
 
   struct
     {
-    unsigned TRISE              : 3;
+    unsigned RE                 : 3;
     unsigned                    : 5;
     };
   } __DDREbits_t;
@@ -1100,7 +1100,6 @@ extern __at(0x0F96) volatile __DDREbits_t DDREbits;
 #define _RE1                    0x02
 #define _TRISE2                 0x04
 #define _RE2                    0x04
-#define _RE3                    0x08
 #define _PSPMODE                0x10
 #define _IBOV                   0x20
 #define _OBF                    0x40
@@ -1121,7 +1120,7 @@ typedef union
     unsigned TRISE0             : 1;
     unsigned TRISE1             : 1;
     unsigned TRISE2             : 1;
-    unsigned RE3                : 1;
+    unsigned                    : 1;
     unsigned PSPMODE            : 1;
     unsigned IBOV               : 1;
     unsigned OBF                : 1;
@@ -1142,8 +1141,8 @@ typedef union
 
   struct
     {
-    unsigned RE                 : 4;
-    unsigned                    : 4;
+    unsigned RE                 : 3;
+    unsigned                    : 5;
     };
 
   struct
@@ -1161,7 +1160,6 @@ extern __at(0x0F96) volatile __TRISEbits_t TRISEbits;
 #define _TRISE_RE1              0x02
 #define _TRISE_TRISE2           0x04
 #define _TRISE_RE2              0x04
-#define _TRISE_RE3              0x08
 #define _TRISE_PSPMODE          0x10
 #define _TRISE_IBOV             0x20
 #define _TRISE_OBF              0x40
@@ -2603,12 +2601,6 @@ typedef union
 
   struct
     {
-    unsigned LVV                : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
     unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
@@ -2616,6 +2608,12 @@ typedef union
   struct
     {
     unsigned LVDL               : 4;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
+    unsigned LVV                : 4;
     unsigned                    : 4;
     };
   } __HLVDCONbits_t;
@@ -2695,13 +2693,13 @@ typedef union
 
   struct
     {
-    unsigned HLVDL              : 4;
+    unsigned LVDL               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned LVDL               : 4;
+    unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
   } __LVDCONbits_t;
@@ -3090,13 +3088,13 @@ typedef union
 
   struct
     {
-    unsigned STKPTR             : 5;
+    unsigned SP                 : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned SP                 : 5;
+    unsigned STKPTR             : 5;
     unsigned                    : 3;
     };
   } __STKPTRbits_t;

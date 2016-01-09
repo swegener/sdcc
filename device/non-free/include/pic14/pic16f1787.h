@@ -2,9 +2,9 @@
  * This declarations of the PIC16F1787 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-09-15 14:38:51 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:06 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -4833,13 +4833,13 @@ typedef union
 
   struct
     {
-    unsigned OPA3PCH            : 2;
+    unsigned PCH                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned PCH                : 2;
+    unsigned OPA3PCH            : 2;
     unsigned                    : 6;
     };
   } __OPA3CONbits_t;

@@ -2,9 +2,9 @@
  * This declarations of the PIC18F6627 MCU.
  *
  * This file is part of the GNU PIC library for SDCC, originally
- * created by Molnar Karoly <molnarkaroly@users.sf.net> 2014.
+ * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2014-07-08 08:42:07 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:41 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -396,28 +396,28 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PSSAC              : 2;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
-    unsigned                    : 2;
     unsigned PSS2AC             : 2;
     unsigned                    : 4;
     };
 
   struct
     {
+    unsigned                    : 2;
+    unsigned PSSAC              : 2;
     unsigned                    : 4;
-    unsigned ECCP2AS            : 3;
-    unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned ECCPAS             : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned ECCP2AS            : 3;
     unsigned                    : 1;
     };
   } __ECCP2ASbits_t;
@@ -556,14 +556,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PSSAC              : 2;
+    unsigned PSS3AC             : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned PSS3AC             : 2;
+    unsigned PSSAC              : 2;
     unsigned                    : 4;
     };
 
@@ -987,13 +987,13 @@ typedef union
 
   struct
     {
-    unsigned P1DC               : 7;
+    unsigned PDC                : 7;
     unsigned                    : 1;
     };
 
   struct
     {
-    unsigned PDC                : 7;
+    unsigned P1DC               : 7;
     unsigned                    : 1;
     };
   } __ECCP1DELbits_t;
@@ -2772,13 +2772,13 @@ typedef union
 
   struct
     {
-    unsigned TRISG              : 5;
+    unsigned RG                 : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned RG                 : 5;
+    unsigned TRISG              : 5;
     unsigned                    : 3;
     };
   } __TRISGbits_t;
@@ -3832,28 +3832,28 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PSS1AC             : 2;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
-    unsigned                    : 2;
     unsigned PSSAC              : 2;
     unsigned                    : 4;
     };
 
   struct
     {
+    unsigned                    : 2;
+    unsigned PSS1AC             : 2;
     unsigned                    : 4;
-    unsigned ECCPAS             : 3;
-    unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned ECCP1AS            : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned ECCPAS             : 3;
     unsigned                    : 1;
     };
   } __ECCP1ASbits_t;
@@ -5115,7 +5115,7 @@ typedef union
 
   struct
     {
-    unsigned LVV                : 4;
+    unsigned LVDL               : 4;
     unsigned                    : 4;
     };
 
@@ -5127,7 +5127,7 @@ typedef union
 
   struct
     {
-    unsigned LVDL               : 4;
+    unsigned LVV                : 4;
     unsigned                    : 4;
     };
   } __HLVDCONbits_t;
@@ -5201,6 +5201,12 @@ typedef union
 
   struct
     {
+    unsigned LVDL               : 4;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
     unsigned LVV                : 4;
     unsigned                    : 4;
     };
@@ -5208,12 +5214,6 @@ typedef union
   struct
     {
     unsigned HLVDL              : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
-    unsigned LVDL               : 4;
     unsigned                    : 4;
     };
   } __LVDCONbits_t;

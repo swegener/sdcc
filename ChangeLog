@@ -1,3 +1,10 @@
+2016-01-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
+        * src/mcs51/gen.c
+          Fix a bug in genOr() when all operands are in registers.
+        * support/regression/tests/bug-2448.c
+          Add a new test case.
+
 2016-01-09 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/scripts/cinc2h.pl,

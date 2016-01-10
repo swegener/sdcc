@@ -1203,7 +1203,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
           emitpop ("ar0");
           _G.r0Pushed--;
         }
-	  break;
+      break;
     }
 
 dealloc:
@@ -7332,6 +7332,11 @@ genOr (iCode * ic, iCode * ifx)
   int size, offset = 0;
   unsigned long lit = 0L;
   int bytelit = 0;
+  struct {
+    char dst[4];
+    char src[4];
+  } regMov[9]; // the largest type is long long
+  int regU = 0;
 
   D (emitcode (";", "genOr"));
 
@@ -7701,6 +7706,46 @@ genOr (iCode * ic, iCode * ifx)
                   MOVA (aopGet (left, offset, FALSE, FALSE));
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
                 }
+              else if (AOP_TYPE (result) == AOP_REG && AOP_TYPE (left) == AOP_REG && AOP_TYPE (right) == AOP_REG)
+                {
+                  int i;
+
+                  MOVA (aopGet (right, offset, FALSE, FALSE));
+                  emitcode ("orl", "a,%s", aopGet (left, offset, FALSE, FALSE));
+
+                  for (i = 1; i <= size; i++)
+                    {
+                      char rres[4] = "", rlft[4] = "";
+                      strcpy (rres, aopGet (result, offset, FALSE, FALSE));
+                      strcpy (rlft, aopGet (left, offset + i, FALSE, FALSE));
+                      if (!strcmp (rres, rlft))
+                        {
+                          aopPut (left, "a", offset);
+                          strcpy (regMov[regU].dst, rres);
+                          strcpy (regMov[regU].src, aopGet (left, offset, FALSE, FALSE));
+                          regU++;
+                          break;
+                        }
+                    }
+                  if (i <= size)
+                    continue;
+                  for (i = 1; i <= size; i++)
+                    {
+                      char rres[4] = "", rrgt[4] = "";
+                      strcpy (rres, aopGet (result, offset, FALSE, FALSE));
+                      strcpy (rrgt, aopGet (right, offset + i, FALSE, FALSE));
+                      if (!strcmp (rres, rrgt))
+                        {
+                          aopPut (right, "a", offset);
+                          strcpy (regMov[regU].dst, rres);
+                          strcpy (regMov[regU].src, aopGet (right, offset, FALSE, FALSE));
+                          regU++;
+                          break;
+                        }
+                    }
+                  if (i <= size)
+                    continue;
+                }
               else
                 {
                   MOVA (aopGet (right, offset, FALSE, FALSE));
@@ -7709,6 +7754,12 @@ genOr (iCode * ic, iCode * ifx)
               aopPut (result, "a", offset);
             }
         }
+    }
+
+  for (offset = 0; offset < regU; offset++)
+    {
+      emitcode ("mov", "a,%s", regMov[offset].src);
+      emitcode ("mov", "%s,a", regMov[offset].dst);
     }
 
 release:

@@ -364,11 +364,15 @@ z80MightRead(const lineNode *pl, const char *what)
   if(!IS_GB && ISINST(pl->line, "ldir"))
     return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e") || !strcmp(what, "h") || !strcmp(what, "l"));
 
-  /* TODO: There are out and in variants that do not read bc. */
-  if(!IS_GB && ISINST(pl->line, "out\t"))
-    return(strstr(strchr(pl->line + 4, ','), what) != 0 || !strcmp(what, "b") || !strcmp(what, "c"));
-  if(!IS_GB && ISINST(pl->line, "in\t"))
-    return(strstr(pl->line + 3, what) != 0 || !strcmp(what, "b") || !strcmp(what, "c"));
+  if(!IS_GB && IS_RAB && ISINST(pl->line, "out\t"))
+    return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
+  if(!IS_GB && IS_RAB && ISINST(pl->line, "in\t"))
+    return(strstr(pl->line + 3, what) != 0 || strstr(strchr(pl->line + 4, ','), "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
+
+  if(!IS_GB && !IS_RAB &&
+    (ISINST(pl->line, "ini\t") || ISINST(pl->line, "ind\t") || ISINST(pl->line, "inir\t") || ISINST(pl->line, "indr\t") ||
+    ISINST(pl->line, "outi\t") || ISINST(pl->line, "outd\t") || ISINST(pl->line, "otir\t") || ISINST(pl->line, "otdr\t")))
+    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "h") || !strcmp(what, "l"));
 
   if(IS_Z180 && ISINST(pl->line, "mlt\t"))
     return(argCont(pl->line + 4, what));
@@ -424,7 +428,8 @@ z80SurelyWrites(const lineNode *pl, const char *what)
     return TRUE;
   if(ISINST(pl->line, "ld\t") && strncmp(pl->line + 3, "bc", 2) == 0 && (what[0] == 'b' || what[0] == 'c'))
     return TRUE;
-  if(ISINST(pl->line, "ld\t") && strncmp(pl->line + 3, what, strlen(what)) == 0 && pl->line[3 + strlen(what)] == ',')
+  if((ISINST(pl->line, "ld\t") || ISINST(pl->line, "in\t"))
+    && strncmp(pl->line + 3, what, strlen(what)) == 0 && pl->line[3 + strlen(what)] == ',')
     return TRUE;
   if(ISINST(pl->line, "pop\t") && strstr(pl->line + 4, what))
     return TRUE;

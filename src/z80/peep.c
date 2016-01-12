@@ -31,8 +31,11 @@
 
 #define NOTUSEDERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");} while(0)
 
-/*#define D(_s) { printf _s; fflush(stdout); }*/
+#if 0
+#define D(_s) { printf _s; fflush(stdout); }
+#else
 #define D(_s)
+#endif
 
 #define ISINST(l, i) (!STRNCASECMP((l), (i), sizeof(i) - 1))
 
@@ -364,10 +367,10 @@ z80MightRead(const lineNode *pl, const char *what)
   if(!IS_GB && ISINST(pl->line, "ldir"))
     return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e") || !strcmp(what, "h") || !strcmp(what, "l"));
 
-  if(!IS_GB && IS_RAB && ISINST(pl->line, "out\t"))
+  if(!IS_GB && !IS_RAB && ISINST(pl->line, "out\t"))
     return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
-  if(!IS_GB && IS_RAB && ISINST(pl->line, "in\t"))
-    return(strstr(pl->line + 3, what) != 0 || strstr(strchr(pl->line + 4, ','), "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
+  if(!IS_GB && !IS_RAB && ISINST(pl->line, "in\t"))
+    return(!strstr(strchr(pl->line + 4, ','), "(c)") && !strcmp(what, "a") || strstr(strchr(pl->line + 4, ','), "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
 
   if(!IS_GB && !IS_RAB &&
     (ISINST(pl->line, "ini\t") || ISINST(pl->line, "ind\t") || ISINST(pl->line, "inir\t") || ISINST(pl->line, "indr\t") ||

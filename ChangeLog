@@ -1,3 +1,8 @@
+2016-01-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  More accurate handling of Z80/Z180 I/O in peepholes.
+
 2016-01-11 Ben Shi <powerstudio1st AT 163 DOT com>
         * src/ds390/ralloc.c
         * src/mcs51/ralloc.c

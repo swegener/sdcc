@@ -1,3 +1,29 @@
+2016-01-14 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/lib/pic14/configure,
+	  device/lib/pic14/configure.ac,
+	  device/lib/pic16/configure.ac:
+	  Do away with the automake warning:
+	  "option 'subdir-objects' is disabled"
+
+	* device/lib/pic16/Makefile.in,
+	  device/lib/pic16/aclocal.m4,
+	  device/lib/pic16/configure,
+	  device/lib/pic16/depcomp,
+	  device/lib/pic16/install-sh,
+	  device/lib/pic16/missing,
+	  device/lib/pic16/debug/Makefile.in,
+	  device/lib/pic16/libc/Makefile.in,
+	  device/lib/pic16/libio/Makefile.am,
+	  device/lib/pic16/libio/Makefile.in,
+	  device/lib/pic16/libio/adc.ignore,
+	  device/lib/pic16/libio/i2c.ignore,
+	  device/lib/pic16/libio/usart.ignore,
+	  device/lib/pic16/libm/Makefile.in,
+	  device/lib/pic16/libsdcc/Makefile.in,
+	  device/lib/pic16/startup/Makefile.in,
+	  device/non-free/include/pic16/pic18fam.h:
+	  Improve of update to gputils-1.4.2-1.
+
 2016-01-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:
@@ -54,7 +80,7 @@
 	  device/non-free/lib/pic16/libdev/Makefile.in,
 	  device/non-free/lib/pic16/libdev/*.c,
 	  doc/sdccman.lyx:
-	  Updated to gputils-1.4.2-1
+	  Updated to gputils-1.4.2-1.
 
 2016-01-06 Philipp Klaus Krause <pkk AT spth.de>
 

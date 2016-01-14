@@ -16,7 +16,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.60)
 AC_INIT([pic14lib], [0.1], [tecodev AT users sourceforge net])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([libsdcc/idata.c])
 AC_CONFIG_HEADER([config.h])
 

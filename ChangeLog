@@ -1,3 +1,10 @@
+2016-01-15 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Fix bug #2455.
+	* support/regression/bug-2455.c
+	  Add a new test case.
+
 2016-01-14 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* device/lib/pic14/configure,
 	  device/lib/pic14/configure.ac,

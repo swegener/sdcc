@@ -2466,9 +2466,8 @@ geniCodeArray (operand * left, operand * right, int lvl)
 
   ic = newiCode ('+', left, right);
 
-  IC_RESULT (ic) = newiTempOperand ((IS_PTR (ltype) &&
-                                     !IS_AGGREGATE (ltype->next) &&
-                                     !IS_PTR (ltype->next)) ? ltype : ltype->next, 0);
+  IC_RESULT (ic) = newiTempOperand (((IS_PTR (ltype) && !IS_AGGREGATE (ltype->next) && !IS_PTR (ltype->next)) ||
+                                    (IS_ARRAY (ltype) && IS_FUNCPTR (ltype->next))) ? ltype : ltype->next, 0);
 
   if (!IS_AGGREGATE (ltype->next))
     {
@@ -3393,6 +3392,19 @@ geniCodeCall (operand * left, ast * parms, int lvl)
   sym_link *ftype;
   int stack = 0;
   int iArg = 0;
+
+  if (IS_ARRAY (operandType (left)))
+    {
+      iCode *tic;
+      sym_link *ttype;
+
+      tic = newiCode (GET_VALUE_AT_ADDRESS, left, operandFromLit (0));
+      ttype = copyLinkChain (operandType (left)->next);
+      IC_RESULT (tic) = newiTempOperand (ttype, 1);
+      IC_RESULT (tic)->isaddr = IS_FUNCPTR (ttype) ? 1 : 0;
+      ADDTOCHAIN (tic);
+      left = IC_RESULT (tic);
+    }
 
   ftype = operandType (left);
   if (!IS_FUNC (ftype) && !IS_FUNCPTR (ftype))

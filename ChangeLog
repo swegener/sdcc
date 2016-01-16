@@ -1,3 +1,11 @@
+2016-01-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* src/pic14/gen.c,
+	  src/pic14/pcode.c:
+	  Each function has its own code section.
+
+	* src/pic16/pcode.c:
+	  Fix a gcc warning.
+
 2016-01-15 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCicode.c

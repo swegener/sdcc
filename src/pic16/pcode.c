@@ -11853,7 +11853,7 @@ static int pic16_removeUnusedRegistersDF () {
         for (i=0; i < 2; i++) {
           pc = (pCode *) indexSet(reg1->reglives.usedpCodes, i);
           if (!pc2) pc2 = pc;
-          if (!isPCI(pc) || !PCI(pc)->op == POC_MOVFF) continue;
+          if (!isPCI(pc) || !(PCI(pc)->op == POC_MOVFF)) continue;
           reg2 = pic16_getRegFromInstruction (pc);
           reg3 = pic16_getRegFromInstruction2 (pc);
           if (!reg2 || !reg3

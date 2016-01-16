@@ -1951,7 +1951,7 @@ pCode *newpCodeLabel(char *name, int key)
 	
 	pcl->label = NULL;
 	if(key>0) {
-		sprintf(s,"_%05d_DS_",key);
+		sprintf(s,"_%05d_DS_:",key);
 	} else
 		s = name;
 	
@@ -2403,6 +2403,9 @@ void printpBlock(FILE *of, pBlock *pb)
 		of = stderr;
 	
 	for(pc = pb->pcHead; pc; pc = pc->next) {
+                if(isPCF(pc) && PCF(pc)->fname) {
+			fprintf(of, "S_%s_%s\tcode\n", PCF(pc)->modname, PCF(pc)->fname);
+		}
 		printpCode(of,pc);
 
 		if (isPCI(pc))
@@ -3074,24 +3077,32 @@ static void genericPrint(FILE *of, pCode *pc)
 
 static void pCodePrintFunction(FILE *of, pCode *pc)
 {
-	
+
 	if(!pc || !of)
 		return;
-	
+
+#if 0
 	if( ((pCodeFunction *)pc)->modname) 
 		fprintf(of,"F_%s",((pCodeFunction *)pc)->modname);
-	
+#endif
 	if(PCF(pc)->fname) {
 		pBranch *exits = PCF(pc)->to;
 		int i=0;
-		fprintf(of,"%s\t;Function start\n",PCF(pc)->fname);
+
+		fprintf(of, "%s:", PCF(pc)->fname);
+
+		if(options.verbose)
+		    fprintf(of, "\t;Function start");
+
+		fprintf(of, "\n");
+
 		while(exits) {
 			i++;
 			exits = exits->next;
 		}
 		//if(i) i--;
 		fprintf(of,"; %d exit point%c\n",i, ((i==1) ? ' ':'s'));
-		
+
 	}else {
 		if((PCF(pc)->from && 
 			PCF(pc)->from->pc->type == PC_FUNCTION &&
@@ -5105,11 +5116,11 @@ static void pBlockStats(FILE *of, pBlock *pb)
 	fprintf(of,";***\n;  pBlock Stats: dbName = %c\n;***\n",getpBlock_dbName(pb));
 	
 	// for now just print the first element of each set
-	pc = setFirstItem(pb->function_entries);
+/*	pc = setFirstItem(pb->function_entries);
 	if(pc) {
 		fprintf(of,";entry:  ");
 		pc->print(of,pc);
-	}
+	}*/
 	pc = setFirstItem(pb->function_exits);
 	if(pc) {
 		fprintf(of,";has an exit\n");

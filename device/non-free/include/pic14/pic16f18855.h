@@ -18807,6 +18807,8 @@ extern __at(0x0FEF) __sfr TOSH;
 #define _PPS1WAY_ON             0x3FFF  // The PPSLOCK bit can be cleared and set only once in software.
 #define _STVREN_OFF             0x2FFF  // Stack Overflow or Underflow will not cause a reset.
 #define _STVREN_ON              0x3FFF  // Stack Overflow or Underflow will cause a reset.
+#define _DEBUG_ON               0x1FFF  // In-Circuit Debugger enabled, ICSPCLK and ICSPDAT are dedicated to the debugger.
+#define _DEBUG_OFF              0x3FFF  // In-Circuit Debugger disabled, ICSPCLK and ICSPDAT are general purpose I/O pins.
 
 //----------------------------- CONFIG3 Options -------------------------------
 

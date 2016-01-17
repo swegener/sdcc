@@ -1,3 +1,8 @@
+2016-01-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCicode.c:
+	  Fix pointer dereference issue, patch #261 by Peter Dons Tychsen.
+
 2016-01-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* src/pic14/gen.c,
 	  src/pic14/pcode.c:

@@ -1906,7 +1906,7 @@ usualBinaryConversions (operand ** op1, operand ** op2, RESULT_TYPE resultType, 
 }
 
 /*-----------------------------------------------------------------*/
-/* geniCodeValueAtAddress - generate intermeditate code for value  */
+/* geniCodeValueAtAddress - generate intermediate code for value   */
 /*                          at address                             */
 /*-----------------------------------------------------------------*/
 operand *
@@ -1917,8 +1917,9 @@ geniCodeRValue (operand * op, bool force)
   sym_link *etype = getSpec (type);
 
   /* if this is an array & already */
-  /* an address then return this   */
-  if (IS_AGGREGATE (type) || (IS_PTR (type) && !force && !op->isaddr))
+  /* a resolved address then return this   */
+  if ((IS_ARRAY (type) && !IS_PTR (type->next)) ||
+      IS_STRUCT (type) || (IS_PTR (type) && !force && !op->isaddr))
     return operandFromOperand (op);
 
   /* if this is not an address then must be */

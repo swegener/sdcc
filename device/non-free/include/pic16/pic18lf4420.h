@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:56 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:33 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -1120,13 +1120,13 @@ typedef union
 
   struct
     {
-    unsigned TRISE              : 3;
+    unsigned RE                 : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned RE                 : 3;
+    unsigned TRISE              : 3;
     unsigned                    : 5;
     };
   } __DDREbits_t;
@@ -1180,13 +1180,13 @@ typedef union
 
   struct
     {
-    unsigned RE                 : 3;
+    unsigned TRISE              : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned TRISE              : 3;
+    unsigned RE                 : 3;
     unsigned                    : 5;
     };
   } __TRISEbits_t;
@@ -2551,14 +2551,14 @@ typedef union
   struct
     {
     unsigned                    : 3;
-    unsigned TOUTPS             : 4;
+    unsigned T2OUTPS            : 4;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 3;
-    unsigned T2OUTPS            : 4;
+    unsigned TOUTPS             : 4;
     unsigned                    : 1;
     };
   } __T2CONbits_t;
@@ -2774,6 +2774,12 @@ typedef union
 
   struct
     {
+    unsigned LVV                : 4;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
     unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
@@ -2781,12 +2787,6 @@ typedef union
   struct
     {
     unsigned LVDL               : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
-    unsigned LVV                : 4;
     unsigned                    : 4;
     };
   } __HLVDCONbits_t;

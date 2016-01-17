@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:52 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:31 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -325,26 +325,26 @@ typedef union
 
   struct
     {
-    unsigned DT                 : 6;
-    unsigned                    : 2;
-    };
-
-  struct
-    {
     unsigned DTA                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned                    : 6;
-    unsigned DTAPS              : 2;
+    unsigned DT                 : 6;
+    unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 6;
     unsigned DTPS               : 2;
+    };
+
+  struct
+    {
+    unsigned                    : 6;
+    unsigned DTAPS              : 2;
     };
   } __DTCONbits_t;
 
@@ -1267,21 +1267,14 @@ typedef union
 
   struct
     {
-    unsigned SASEL              : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned GASEL              : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned                    : 2;
-    unsigned GCSEL              : 2;
-    unsigned                    : 4;
+    unsigned SASEL              : 2;
+    unsigned                    : 6;
     };
 
   struct
@@ -1293,15 +1286,22 @@ typedef union
 
   struct
     {
-    unsigned                    : 4;
-    unsigned SBSEL              : 2;
     unsigned                    : 2;
+    unsigned GCSEL              : 2;
+    unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned GBSEL              : 2;
+    unsigned                    : 2;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned SBSEL              : 2;
     unsigned                    : 2;
     };
 

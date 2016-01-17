@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:58 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:34 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -2347,14 +2347,14 @@ typedef union
 
   struct
     {
-    unsigned TXPRI              : 2;
-    unsigned                    : 6;
+    unsigned FILHIT             : 5;
+    unsigned                    : 3;
     };
 
   struct
     {
-    unsigned FILHIT             : 5;
-    unsigned                    : 3;
+    unsigned TXPRI              : 2;
+    unsigned                    : 6;
     };
   } __B0CONbits_t;
 
@@ -3982,14 +3982,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESRB              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESRB              : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __B2DLCbits_t;
@@ -4441,14 +4441,14 @@ typedef union
 
   struct
     {
-    unsigned FILHIT             : 5;
-    unsigned                    : 3;
+    unsigned TXPRI              : 2;
+    unsigned                    : 6;
     };
 
   struct
     {
-    unsigned TXPRI              : 2;
-    unsigned                    : 6;
+    unsigned FILHIT             : 5;
+    unsigned                    : 3;
     };
   } __B3CONbits_t;
 
@@ -4680,14 +4680,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESRB              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESRB              : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __B3DLCbits_t;
@@ -6093,14 +6093,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESRB              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESRB              : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __B5DLCbits_t;
@@ -10329,14 +10329,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned RB                 : 2;
+    unsigned RESRB              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned RESRB              : 2;
+    unsigned RB                 : 2;
     unsigned                    : 2;
     };
   } __RXB0DLCbits_t;
@@ -12220,13 +12220,13 @@ typedef union
 
   struct
     {
-    unsigned RE                 : 3;
+    unsigned TRISE              : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned TRISE              : 3;
+    unsigned RE                 : 3;
     unsigned                    : 5;
     };
   } __TRISEbits_t;
@@ -13992,7 +13992,7 @@ typedef union
 
   struct
     {
-    unsigned HLVDL              : 4;
+    unsigned LVDL               : 4;
     unsigned                    : 4;
     };
 
@@ -14004,7 +14004,7 @@ typedef union
 
   struct
     {
-    unsigned LVDL               : 4;
+    unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
   } __LVDCONbits_t;

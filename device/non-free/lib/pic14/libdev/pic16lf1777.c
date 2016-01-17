@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:19 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:56 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -473,17 +473,17 @@ __at(0x030F) volatile __SLRCONDbits_t SLRCONDbits;
 __at(0x0310) __sfr SLRCONE;
 __at(0x0310) volatile __SLRCONEbits_t SLRCONEbits;
 
-__at(0x0311) __sfr CCPR4;
+__at(0x0311) __sfr CCPR8;
 
-__at(0x0311) __sfr CCPR4L;
+__at(0x0311) __sfr CCPR8L;
 
-__at(0x0312) __sfr CCPR4H;
+__at(0x0312) __sfr CCPR8H;
 
-__at(0x0313) __sfr CCP4CON;
-__at(0x0313) volatile __CCP4CONbits_t CCP4CONbits;
+__at(0x0313) __sfr CCP8CON;
+__at(0x0313) volatile __CCP8CONbits_t CCP8CONbits;
 
-__at(0x0314) __sfr CCP4CAP;
-__at(0x0314) volatile __CCP4CAPbits_t CCP4CAPbits;
+__at(0x0314) __sfr CCP8CAP;
+__at(0x0314) volatile __CCP8CAPbits_t CCP8CAPbits;
 
 __at(0x0315) __sfr MD1CON0;
 __at(0x0315) volatile __MD1CON0bits_t MD1CON0bits;
@@ -816,23 +816,23 @@ __at(0x060D) volatile __DAC8CON1bits_t DAC8CON1bits;
 __at(0x060D) __sfr DAC8REF;
 __at(0x060D) volatile __DAC8REFbits_t DAC8REFbits;
 
-__at(0x060E) __sfr PRG8RTSS;
-__at(0x060E) volatile __PRG8RTSSbits_t PRG8RTSSbits;
+__at(0x060E) __sfr PRG4RTSS;
+__at(0x060E) volatile __PRG4RTSSbits_t PRG4RTSSbits;
 
-__at(0x060F) __sfr PRG8FTSS;
-__at(0x060F) volatile __PRG8FTSSbits_t PRG8FTSSbits;
+__at(0x060F) __sfr PRG4FTSS;
+__at(0x060F) volatile __PRG4FTSSbits_t PRG4FTSSbits;
 
-__at(0x0610) __sfr PRG8INS;
-__at(0x0610) volatile __PRG8INSbits_t PRG8INSbits;
+__at(0x0610) __sfr PRG4INS;
+__at(0x0610) volatile __PRG4INSbits_t PRG4INSbits;
 
-__at(0x0611) __sfr PRG8CON0;
-__at(0x0611) volatile __PRG8CON0bits_t PRG8CON0bits;
+__at(0x0611) __sfr PRG4CON0;
+__at(0x0611) volatile __PRG4CON0bits_t PRG4CON0bits;
 
-__at(0x0612) __sfr PRG8CON1;
-__at(0x0612) volatile __PRG8CON1bits_t PRG8CON1bits;
+__at(0x0612) __sfr PRG4CON1;
+__at(0x0612) volatile __PRG4CON1bits_t PRG4CON1bits;
 
-__at(0x0613) __sfr PRG8CON2;
-__at(0x0613) volatile __PRG8CON2bits_t PRG8CON2bits;
+__at(0x0613) __sfr PRG4CON2;
+__at(0x0613) volatile __PRG4CON2bits_t PRG4CON2bits;
 
 __at(0x0614) __sfr PWM3DCL;
 __at(0x0614) volatile __PWM3DCLbits_t PWM3DCLbits;

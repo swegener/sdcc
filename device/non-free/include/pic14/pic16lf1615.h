@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:16 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:53 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -969,14 +969,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned CKPS               : 3;
+    unsigned T2CKPS             : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned T2CKPS             : 3;
+    unsigned CKPS               : 3;
     unsigned                    : 1;
     };
   } __T2CONbits_t;
@@ -1037,13 +1037,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 5;
+    unsigned T2MODE             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned T2MODE             : 5;
+    unsigned MODE               : 5;
     unsigned                    : 3;
     };
   } __T2HLTbits_t;
@@ -1161,13 +1161,13 @@ typedef union
 
   struct
     {
-    unsigned RSEL               : 4;
+    unsigned T2RSEL             : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned T2RSEL             : 4;
+    unsigned RSEL               : 4;
     unsigned                    : 4;
     };
   } __T2RSTbits_t;
@@ -3539,13 +3539,13 @@ typedef union
 
   struct
     {
-    unsigned CCP1CTS            : 3;
+    unsigned CTS                : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned CTS                : 3;
+    unsigned CCP1CTS            : 3;
     unsigned                    : 5;
     };
   } __CCP1CAPbits_t;
@@ -3598,13 +3598,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned CCP2MODE           : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned CCP2MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
   } __CCP2CONbits_t;
@@ -4168,27 +4168,27 @@ typedef union
 
   struct
     {
-    unsigned OUTPS              : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
     unsigned T4OUTPS            : 4;
     unsigned                    : 4;
     };
 
   struct
     {
+    unsigned OUTPS              : 4;
     unsigned                    : 4;
-    unsigned T4CKPS             : 3;
-    unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned CKPS               : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned T4CKPS             : 3;
     unsigned                    : 1;
     };
   } __T4CONbits_t;
@@ -4315,13 +4315,13 @@ typedef union
 
   struct
     {
-    unsigned T4CS               : 4;
+    unsigned CS                 : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned CS                 : 4;
+    unsigned T4CS               : 4;
     unsigned                    : 4;
     };
   } __T4CLKCONbits_t;
@@ -4373,13 +4373,13 @@ typedef union
 
   struct
     {
-    unsigned T4RSEL             : 4;
+    unsigned RSEL               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned RSEL               : 4;
+    unsigned T4RSEL             : 4;
     unsigned                    : 4;
     };
   } __T4RSTbits_t;
@@ -4447,13 +4447,13 @@ typedef union
 
   struct
     {
-    unsigned OUTPS              : 4;
+    unsigned T6OUTPS            : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned T6OUTPS            : 4;
+    unsigned OUTPS              : 4;
     unsigned                    : 4;
     };
 
@@ -4594,13 +4594,13 @@ typedef union
 
   struct
     {
-    unsigned CS                 : 4;
+    unsigned T6CS               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned T6CS               : 4;
+    unsigned CS                 : 4;
     unsigned                    : 4;
     };
   } __T6CLKCONbits_t;
@@ -6251,13 +6251,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned PID1MODE           : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned PID1MODE           : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
   } __PID1CONbits_t;
@@ -6522,13 +6522,13 @@ typedef union
   struct
     {
     unsigned                    : 6;
-    unsigned PWM4DC             : 2;
+    unsigned DC                 : 2;
     };
 
   struct
     {
     unsigned                    : 6;
-    unsigned DC                 : 2;
+    unsigned PWM4DC             : 2;
     };
   } __PWM4DCLbits_t;
 
@@ -6757,13 +6757,13 @@ typedef union
 
   struct
     {
-    unsigned DBF                : 6;
+    unsigned CWG1DBF            : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned CWG1DBF            : 6;
+    unsigned DBF                : 6;
     unsigned                    : 2;
     };
   } __CWG1DBFbits_t;
@@ -6820,14 +6820,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned LSAC               : 2;
+    unsigned CWG1LSAC           : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned CWG1LSAC           : 2;
+    unsigned LSAC               : 2;
     unsigned                    : 4;
     };
 
@@ -7285,13 +7285,13 @@ typedef union
 
   struct
     {
-    unsigned WDTWINDOW          : 3;
+    unsigned WINDOW             : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned WINDOW             : 3;
+    unsigned WDTWINDOW          : 3;
     unsigned                    : 5;
     };
 
@@ -7738,13 +7738,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 2;
+    unsigned SCANMODE           : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned SCANMODE           : 2;
+    unsigned MODE               : 2;
     unsigned                    : 6;
     };
   } __SCANCON0bits_t;
@@ -8344,26 +8344,26 @@ typedef union
 
   struct
     {
-    unsigned CRCPLEN            : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
     unsigned PLEN               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
+    unsigned CRCPLEN            : 4;
     unsigned                    : 4;
-    unsigned DLEN               : 4;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned CRCDLEN            : 4;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned DLEN               : 4;
     };
   } __CRCCON1bits_t;
 
@@ -8626,26 +8626,46 @@ typedef union
     unsigned PER6               : 1;
     unsigned PER7               : 1;
     };
+
+  struct
+    {
+    unsigned PERL0              : 1;
+    unsigned PERL1              : 1;
+    unsigned PERL2              : 1;
+    unsigned PERL3              : 1;
+    unsigned PERL4              : 1;
+    unsigned PERL5              : 1;
+    unsigned PERL6              : 1;
+    unsigned PERL7              : 1;
+    };
   } __AT1PERLbits_t;
 
 extern __at(0x0810) volatile __AT1PERLbits_t AT1PERLbits;
 
 #define _AT1PER0                0x01
 #define _PER0                   0x01
+#define _PERL0                  0x01
 #define _AT1PER1                0x02
 #define _PER1                   0x02
+#define _PERL1                  0x02
 #define _AT1PER2                0x04
 #define _PER2                   0x04
+#define _PERL2                  0x04
 #define _AT1PER3                0x08
 #define _PER3                   0x08
+#define _PERL3                  0x08
 #define _AT1PER4                0x10
 #define _PER4                   0x10
+#define _PERL4                  0x10
 #define _AT1PER5                0x20
 #define _PER5                   0x20
+#define _PERL5                  0x20
 #define _AT1PER6                0x40
 #define _PER6                   0x40
+#define _PERL6                  0x40
 #define _AT1PER7                0x80
 #define _PER7                   0x80
+#define _PERL7                  0x80
 
 //==============================================================================
 
@@ -8680,26 +8700,46 @@ typedef union
     unsigned PER14              : 1;
     unsigned PER15              : 1;
     };
+
+  struct
+    {
+    unsigned PERH0              : 1;
+    unsigned PERH1              : 1;
+    unsigned PERH2              : 1;
+    unsigned PERH3              : 1;
+    unsigned PERH4              : 1;
+    unsigned PERH5              : 1;
+    unsigned PERH6              : 1;
+    unsigned PERH7              : 1;
+    };
   } __AT1PERHbits_t;
 
 extern __at(0x0811) volatile __AT1PERHbits_t AT1PERHbits;
 
 #define _AT1PER8                0x01
 #define _PER8                   0x01
+#define _PERH0                  0x01
 #define _AT1PER9                0x02
 #define _PER9                   0x02
+#define _PERH1                  0x02
 #define _AT1PER10               0x04
 #define _PER10                  0x04
+#define _PERH2                  0x04
 #define _AT1PER11               0x08
 #define _PER11                  0x08
+#define _PERH3                  0x08
 #define _AT1PER12               0x10
 #define _PER12                  0x10
+#define _PERH4                  0x10
 #define _AT1PER13               0x20
 #define _PER13                  0x20
+#define _PERH5                  0x20
 #define _AT1PER14               0x40
 #define _PER14                  0x40
+#define _PERH6                  0x40
 #define _AT1POV                 0x80
 #define _PER15                  0x80
+#define _PERH7                  0x80
 
 //==============================================================================
 
@@ -8789,14 +8829,28 @@ typedef union
     unsigned                    : 1;
     unsigned                    : 1;
     };
+
+  struct
+    {
+    unsigned PHSL8              : 1;
+    unsigned PHSL9              : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    unsigned                    : 1;
+    };
   } __AT1PHSHbits_t;
 
 extern __at(0x0813) volatile __AT1PHSHbits_t AT1PHSHbits;
 
 #define _AT1PHS8                0x01
 #define _PHS8                   0x01
+#define _PHSL8                  0x01
 #define _AT1PHS9                0x02
 #define _PHS9                   0x02
+#define _PHSL9                  0x02
 
 //==============================================================================
 
@@ -9157,26 +9211,46 @@ typedef union
     unsigned ERR6               : 1;
     unsigned ERR7               : 1;
     };
+
+  struct
+    {
+    unsigned ERRL0              : 1;
+    unsigned ERRL1              : 1;
+    unsigned ERRL2              : 1;
+    unsigned ERRL3              : 1;
+    unsigned ERRL4              : 1;
+    unsigned ERRL5              : 1;
+    unsigned ERRL6              : 1;
+    unsigned ERRL7              : 1;
+    };
   } __AT1ERRLbits_t;
 
 extern __at(0x081C) volatile __AT1ERRLbits_t AT1ERRLbits;
 
 #define _AT1ERR0                0x01
 #define _ERR0                   0x01
+#define _ERRL0                  0x01
 #define _AT1ERR1                0x02
 #define _ERR1                   0x02
+#define _ERRL1                  0x02
 #define _AT1ERR2                0x04
 #define _ERR2                   0x04
+#define _ERRL2                  0x04
 #define _AT1ERR3                0x08
 #define _ERR3                   0x08
+#define _ERRL3                  0x08
 #define _AT1ERR4                0x10
 #define _ERR4                   0x10
+#define _ERRL4                  0x10
 #define _AT1ERR5                0x20
 #define _ERR5                   0x20
+#define _ERRL5                  0x20
 #define _AT1ERR6                0x40
 #define _ERR6                   0x40
+#define _ERRL6                  0x40
 #define _AT1ERR7                0x80
 #define _ERR7                   0x80
+#define _ERRL7                  0x80
 
 //==============================================================================
 
@@ -9211,26 +9285,46 @@ typedef union
     unsigned ERR14              : 1;
     unsigned ERR15              : 1;
     };
+
+  struct
+    {
+    unsigned ERRH0              : 1;
+    unsigned ERRH1              : 1;
+    unsigned ERRH2              : 1;
+    unsigned ERRH3              : 1;
+    unsigned ERRH4              : 1;
+    unsigned ERRH5              : 1;
+    unsigned ERRH6              : 1;
+    unsigned ERRH7              : 1;
+    };
   } __AT1ERRHbits_t;
 
 extern __at(0x081D) volatile __AT1ERRHbits_t AT1ERRHbits;
 
 #define _AT1ERR8                0x01
 #define _ERR8                   0x01
+#define _ERRH0                  0x01
 #define _AT1ERR9                0x02
 #define _ERR9                   0x02
+#define _ERRH1                  0x02
 #define _AT1ERR10               0x04
 #define _ERR10                  0x04
+#define _ERRH2                  0x04
 #define _AT1ERR11               0x08
 #define _ERR11                  0x08
+#define _ERRH3                  0x08
 #define _AT1ERR12               0x10
 #define _ERR12                  0x10
+#define _ERRH4                  0x10
 #define _AT1ERR13               0x20
 #define _ERR13                  0x20
+#define _ERRH5                  0x20
 #define _AT1ERR14               0x40
 #define _ERR14                  0x40
+#define _ERRH6                  0x40
 #define _AT1ERR15               0x80
 #define _ERR15                  0x80
+#define _ERRH7                  0x80
 
 //==============================================================================
 
@@ -9334,13 +9428,13 @@ typedef union
 
   struct
     {
-    unsigned SSEL               : 3;
+    unsigned AT1SSEL            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned AT1SSEL            : 3;
+    unsigned SSEL               : 3;
     unsigned                    : 5;
     };
   } __AT1SIGbits_t;
@@ -9390,13 +9484,13 @@ typedef union
 
   struct
     {
-    unsigned CP1S               : 3;
+    unsigned AT1CP1S            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned AT1CP1S            : 3;
+    unsigned CP1S               : 3;
     unsigned                    : 5;
     };
   } __AT1CSEL1bits_t;
@@ -9589,13 +9683,13 @@ typedef union
 
   struct
     {
-    unsigned CP2S               : 3;
+    unsigned AT1CP2S            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned AT1CP2S            : 3;
+    unsigned CP2S               : 3;
     unsigned                    : 5;
     };
   } __AT1CSEL2bits_t;
@@ -9788,13 +9882,13 @@ typedef union
 
   struct
     {
-    unsigned CP3S               : 3;
+    unsigned AT1CP3S            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned AT1CP3S            : 3;
+    unsigned CP3S               : 3;
     unsigned                    : 5;
     };
   } __AT1CSEL3bits_t;
@@ -10402,13 +10496,13 @@ typedef union
 
   struct
     {
-    unsigned SMT1MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned SMT1MODE           : 4;
     unsigned                    : 4;
     };
   } __SMT1CON1bits_t;
@@ -10513,13 +10607,13 @@ typedef union
 
   struct
     {
-    unsigned SMT1CSEL           : 3;
+    unsigned CSEL               : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned CSEL               : 3;
+    unsigned SMT1CSEL           : 3;
     unsigned                    : 5;
     };
   } __SMT1CLKbits_t;
@@ -11215,13 +11309,13 @@ typedef union
 
   struct
     {
-    unsigned CSEL               : 3;
+    unsigned SMT2CSEL           : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned SMT2CSEL           : 3;
+    unsigned CSEL               : 3;
     unsigned                    : 5;
     };
   } __SMT2CLKbits_t;
@@ -11271,13 +11365,13 @@ typedef union
 
   struct
     {
-    unsigned SSEL               : 5;
+    unsigned SMT2SSEL           : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned SMT2SSEL           : 5;
+    unsigned SSEL               : 5;
     unsigned                    : 3;
     };
   } __SMT2SIGbits_t;
@@ -12996,13 +13090,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned LC1MODE            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC1MODE            : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
   } __CLC1CONbits_t;
@@ -13572,13 +13666,13 @@ typedef union
 
   struct
     {
-    unsigned LC2MODE            : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned LC2MODE            : 3;
     unsigned                    : 5;
     };
   } __CLC2CONbits_t;
@@ -13684,13 +13778,13 @@ typedef union
 
   struct
     {
-    unsigned LC2D1S             : 6;
+    unsigned D1S                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned D1S                : 6;
+    unsigned LC2D1S             : 6;
     unsigned                    : 2;
     };
   } __CLC2SEL0bits_t;
@@ -14384,13 +14478,13 @@ typedef union
 
   struct
     {
-    unsigned LC3D3S             : 6;
+    unsigned D3S                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned D3S                : 6;
+    unsigned LC3D3S             : 6;
     unsigned                    : 2;
     };
   } __CLC3SEL2bits_t;
@@ -14836,13 +14930,13 @@ typedef union
 
   struct
     {
-    unsigned LC4D1S             : 6;
+    unsigned D1S                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned D1S                : 6;
+    unsigned LC4D1S             : 6;
     unsigned                    : 2;
     };
   } __CLC4SEL0bits_t;
@@ -14898,13 +14992,13 @@ typedef union
 
   struct
     {
-    unsigned D2S                : 6;
+    unsigned LC4D2S             : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned LC4D2S             : 6;
+    unsigned D2S                : 6;
     unsigned                    : 2;
     };
   } __CLC4SEL1bits_t;
@@ -15022,13 +15116,13 @@ typedef union
 
   struct
     {
-    unsigned D4S                : 6;
+    unsigned LC4D4S             : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned LC4D4S             : 6;
+    unsigned D4S                : 6;
     unsigned                    : 2;
     };
   } __CLC4SEL3bits_t;
@@ -15573,37 +15667,53 @@ extern __at(0x0FEF) __sfr TOSH;
 
 #define AT1ERR8                 AT1ERRHbits.AT1ERR8             // bit 0, shadows bit in AT1ERRHbits
 #define ERR8                    AT1ERRHbits.ERR8                // bit 0, shadows bit in AT1ERRHbits
+#define ERRH0                   AT1ERRHbits.ERRH0               // bit 0, shadows bit in AT1ERRHbits
 #define AT1ERR9                 AT1ERRHbits.AT1ERR9             // bit 1, shadows bit in AT1ERRHbits
 #define ERR9                    AT1ERRHbits.ERR9                // bit 1, shadows bit in AT1ERRHbits
+#define ERRH1                   AT1ERRHbits.ERRH1               // bit 1, shadows bit in AT1ERRHbits
 #define AT1ERR10                AT1ERRHbits.AT1ERR10            // bit 2, shadows bit in AT1ERRHbits
 #define ERR10                   AT1ERRHbits.ERR10               // bit 2, shadows bit in AT1ERRHbits
+#define ERRH2                   AT1ERRHbits.ERRH2               // bit 2, shadows bit in AT1ERRHbits
 #define AT1ERR11                AT1ERRHbits.AT1ERR11            // bit 3, shadows bit in AT1ERRHbits
 #define ERR11                   AT1ERRHbits.ERR11               // bit 3, shadows bit in AT1ERRHbits
+#define ERRH3                   AT1ERRHbits.ERRH3               // bit 3, shadows bit in AT1ERRHbits
 #define AT1ERR12                AT1ERRHbits.AT1ERR12            // bit 4, shadows bit in AT1ERRHbits
 #define ERR12                   AT1ERRHbits.ERR12               // bit 4, shadows bit in AT1ERRHbits
+#define ERRH4                   AT1ERRHbits.ERRH4               // bit 4, shadows bit in AT1ERRHbits
 #define AT1ERR13                AT1ERRHbits.AT1ERR13            // bit 5, shadows bit in AT1ERRHbits
 #define ERR13                   AT1ERRHbits.ERR13               // bit 5, shadows bit in AT1ERRHbits
+#define ERRH5                   AT1ERRHbits.ERRH5               // bit 5, shadows bit in AT1ERRHbits
 #define AT1ERR14                AT1ERRHbits.AT1ERR14            // bit 6, shadows bit in AT1ERRHbits
 #define ERR14                   AT1ERRHbits.ERR14               // bit 6, shadows bit in AT1ERRHbits
+#define ERRH6                   AT1ERRHbits.ERRH6               // bit 6, shadows bit in AT1ERRHbits
 #define AT1ERR15                AT1ERRHbits.AT1ERR15            // bit 7, shadows bit in AT1ERRHbits
 #define ERR15                   AT1ERRHbits.ERR15               // bit 7, shadows bit in AT1ERRHbits
+#define ERRH7                   AT1ERRHbits.ERRH7               // bit 7, shadows bit in AT1ERRHbits
 
 #define AT1ERR0                 AT1ERRLbits.AT1ERR0             // bit 0, shadows bit in AT1ERRLbits
 #define ERR0                    AT1ERRLbits.ERR0                // bit 0, shadows bit in AT1ERRLbits
+#define ERRL0                   AT1ERRLbits.ERRL0               // bit 0, shadows bit in AT1ERRLbits
 #define AT1ERR1                 AT1ERRLbits.AT1ERR1             // bit 1, shadows bit in AT1ERRLbits
 #define ERR1                    AT1ERRLbits.ERR1                // bit 1, shadows bit in AT1ERRLbits
+#define ERRL1                   AT1ERRLbits.ERRL1               // bit 1, shadows bit in AT1ERRLbits
 #define AT1ERR2                 AT1ERRLbits.AT1ERR2             // bit 2, shadows bit in AT1ERRLbits
 #define ERR2                    AT1ERRLbits.ERR2                // bit 2, shadows bit in AT1ERRLbits
+#define ERRL2                   AT1ERRLbits.ERRL2               // bit 2, shadows bit in AT1ERRLbits
 #define AT1ERR3                 AT1ERRLbits.AT1ERR3             // bit 3, shadows bit in AT1ERRLbits
 #define ERR3                    AT1ERRLbits.ERR3                // bit 3, shadows bit in AT1ERRLbits
+#define ERRL3                   AT1ERRLbits.ERRL3               // bit 3, shadows bit in AT1ERRLbits
 #define AT1ERR4                 AT1ERRLbits.AT1ERR4             // bit 4, shadows bit in AT1ERRLbits
 #define ERR4                    AT1ERRLbits.ERR4                // bit 4, shadows bit in AT1ERRLbits
+#define ERRL4                   AT1ERRLbits.ERRL4               // bit 4, shadows bit in AT1ERRLbits
 #define AT1ERR5                 AT1ERRLbits.AT1ERR5             // bit 5, shadows bit in AT1ERRLbits
 #define ERR5                    AT1ERRLbits.ERR5                // bit 5, shadows bit in AT1ERRLbits
+#define ERRL5                   AT1ERRLbits.ERRL5               // bit 5, shadows bit in AT1ERRLbits
 #define AT1ERR6                 AT1ERRLbits.AT1ERR6             // bit 6, shadows bit in AT1ERRLbits
 #define ERR6                    AT1ERRLbits.ERR6                // bit 6, shadows bit in AT1ERRLbits
+#define ERRL6                   AT1ERRLbits.ERRL6               // bit 6, shadows bit in AT1ERRLbits
 #define AT1ERR7                 AT1ERRLbits.AT1ERR7             // bit 7, shadows bit in AT1ERRLbits
 #define ERR7                    AT1ERRLbits.ERR7                // bit 7, shadows bit in AT1ERRLbits
+#define ERRL7                   AT1ERRLbits.ERRL7               // bit 7, shadows bit in AT1ERRLbits
 
 #define AT1PERIE                AT1IE0bits.AT1PERIE             // bit 0
 #define AT1MISSIE               AT1IE0bits.AT1MISSIE            // bit 1
@@ -15657,42 +15767,60 @@ extern __at(0x0FEF) __sfr TOSH;
 
 #define AT1PER8                 AT1PERHbits.AT1PER8             // bit 0, shadows bit in AT1PERHbits
 #define PER8                    AT1PERHbits.PER8                // bit 0, shadows bit in AT1PERHbits
+#define PERH0                   AT1PERHbits.PERH0               // bit 0, shadows bit in AT1PERHbits
 #define AT1PER9                 AT1PERHbits.AT1PER9             // bit 1, shadows bit in AT1PERHbits
 #define PER9                    AT1PERHbits.PER9                // bit 1, shadows bit in AT1PERHbits
+#define PERH1                   AT1PERHbits.PERH1               // bit 1, shadows bit in AT1PERHbits
 #define AT1PER10                AT1PERHbits.AT1PER10            // bit 2, shadows bit in AT1PERHbits
 #define PER10                   AT1PERHbits.PER10               // bit 2, shadows bit in AT1PERHbits
+#define PERH2                   AT1PERHbits.PERH2               // bit 2, shadows bit in AT1PERHbits
 #define AT1PER11                AT1PERHbits.AT1PER11            // bit 3, shadows bit in AT1PERHbits
 #define PER11                   AT1PERHbits.PER11               // bit 3, shadows bit in AT1PERHbits
+#define PERH3                   AT1PERHbits.PERH3               // bit 3, shadows bit in AT1PERHbits
 #define AT1PER12                AT1PERHbits.AT1PER12            // bit 4, shadows bit in AT1PERHbits
 #define PER12                   AT1PERHbits.PER12               // bit 4, shadows bit in AT1PERHbits
+#define PERH4                   AT1PERHbits.PERH4               // bit 4, shadows bit in AT1PERHbits
 #define AT1PER13                AT1PERHbits.AT1PER13            // bit 5, shadows bit in AT1PERHbits
 #define PER13                   AT1PERHbits.PER13               // bit 5, shadows bit in AT1PERHbits
+#define PERH5                   AT1PERHbits.PERH5               // bit 5, shadows bit in AT1PERHbits
 #define AT1PER14                AT1PERHbits.AT1PER14            // bit 6, shadows bit in AT1PERHbits
 #define PER14                   AT1PERHbits.PER14               // bit 6, shadows bit in AT1PERHbits
+#define PERH6                   AT1PERHbits.PERH6               // bit 6, shadows bit in AT1PERHbits
 #define AT1POV                  AT1PERHbits.AT1POV              // bit 7, shadows bit in AT1PERHbits
 #define PER15                   AT1PERHbits.PER15               // bit 7, shadows bit in AT1PERHbits
+#define PERH7                   AT1PERHbits.PERH7               // bit 7, shadows bit in AT1PERHbits
 
 #define AT1PER0                 AT1PERLbits.AT1PER0             // bit 0, shadows bit in AT1PERLbits
 #define PER0                    AT1PERLbits.PER0                // bit 0, shadows bit in AT1PERLbits
+#define PERL0                   AT1PERLbits.PERL0               // bit 0, shadows bit in AT1PERLbits
 #define AT1PER1                 AT1PERLbits.AT1PER1             // bit 1, shadows bit in AT1PERLbits
 #define PER1                    AT1PERLbits.PER1                // bit 1, shadows bit in AT1PERLbits
+#define PERL1                   AT1PERLbits.PERL1               // bit 1, shadows bit in AT1PERLbits
 #define AT1PER2                 AT1PERLbits.AT1PER2             // bit 2, shadows bit in AT1PERLbits
 #define PER2                    AT1PERLbits.PER2                // bit 2, shadows bit in AT1PERLbits
+#define PERL2                   AT1PERLbits.PERL2               // bit 2, shadows bit in AT1PERLbits
 #define AT1PER3                 AT1PERLbits.AT1PER3             // bit 3, shadows bit in AT1PERLbits
 #define PER3                    AT1PERLbits.PER3                // bit 3, shadows bit in AT1PERLbits
+#define PERL3                   AT1PERLbits.PERL3               // bit 3, shadows bit in AT1PERLbits
 #define AT1PER4                 AT1PERLbits.AT1PER4             // bit 4, shadows bit in AT1PERLbits
 #define PER4                    AT1PERLbits.PER4                // bit 4, shadows bit in AT1PERLbits
+#define PERL4                   AT1PERLbits.PERL4               // bit 4, shadows bit in AT1PERLbits
 #define AT1PER5                 AT1PERLbits.AT1PER5             // bit 5, shadows bit in AT1PERLbits
 #define PER5                    AT1PERLbits.PER5                // bit 5, shadows bit in AT1PERLbits
+#define PERL5                   AT1PERLbits.PERL5               // bit 5, shadows bit in AT1PERLbits
 #define AT1PER6                 AT1PERLbits.AT1PER6             // bit 6, shadows bit in AT1PERLbits
 #define PER6                    AT1PERLbits.PER6                // bit 6, shadows bit in AT1PERLbits
+#define PERL6                   AT1PERLbits.PERL6               // bit 6, shadows bit in AT1PERLbits
 #define AT1PER7                 AT1PERLbits.AT1PER7             // bit 7, shadows bit in AT1PERLbits
 #define PER7                    AT1PERLbits.PER7                // bit 7, shadows bit in AT1PERLbits
+#define PERL7                   AT1PERLbits.PERL7               // bit 7, shadows bit in AT1PERLbits
 
 #define AT1PHS8                 AT1PHSHbits.AT1PHS8             // bit 0, shadows bit in AT1PHSHbits
 #define PHS8                    AT1PHSHbits.PHS8                // bit 0, shadows bit in AT1PHSHbits
+#define PHSL8                   AT1PHSHbits.PHSL8               // bit 0, shadows bit in AT1PHSHbits
 #define AT1PHS9                 AT1PHSHbits.AT1PHS9             // bit 1, shadows bit in AT1PHSHbits
 #define PHS9                    AT1PHSHbits.PHS9                // bit 1, shadows bit in AT1PHSHbits
+#define PHSL9                   AT1PHSHbits.PHSL9               // bit 1, shadows bit in AT1PHSHbits
 
 #define AT1PHS0                 AT1PHSLbits.AT1PHS0             // bit 0, shadows bit in AT1PHSLbits
 #define PHS0                    AT1PHSLbits.PHS0                // bit 0, shadows bit in AT1PHSLbits

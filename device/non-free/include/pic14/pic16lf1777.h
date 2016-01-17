@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:19 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:56 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -198,11 +198,11 @@
 #define SLRCONC_ADDR            0x030E
 #define SLRCOND_ADDR            0x030F
 #define SLRCONE_ADDR            0x0310
-#define CCPR4_ADDR              0x0311
-#define CCPR4L_ADDR             0x0311
-#define CCPR4H_ADDR             0x0312
-#define CCP4CON_ADDR            0x0313
-#define CCP4CAP_ADDR            0x0314
+#define CCPR8_ADDR              0x0311
+#define CCPR8L_ADDR             0x0311
+#define CCPR8H_ADDR             0x0312
+#define CCP8CON_ADDR            0x0313
+#define CCP8CAP_ADDR            0x0314
 #define MD1CON0_ADDR            0x0315
 #define MD1CON1_ADDR            0x0316
 #define MD1SRC_ADDR             0x0317
@@ -326,12 +326,12 @@
 #define DAC8CON0_ADDR           0x060C
 #define DAC8CON1_ADDR           0x060D
 #define DAC8REF_ADDR            0x060D
-#define PRG8RTSS_ADDR           0x060E
-#define PRG8FTSS_ADDR           0x060F
-#define PRG8INS_ADDR            0x0610
-#define PRG8CON0_ADDR           0x0611
-#define PRG8CON1_ADDR           0x0612
-#define PRG8CON2_ADDR           0x0613
+#define PRG4RTSS_ADDR           0x060E
+#define PRG4FTSS_ADDR           0x060F
+#define PRG4INS_ADDR            0x0610
+#define PRG4CON0_ADDR           0x0611
+#define PRG4CON1_ADDR           0x0612
+#define PRG4CON2_ADDR           0x0613
 #define PWM3DCL_ADDR            0x0614
 #define PWM3DCH_ADDR            0x0615
 #define PWM3CON_ADDR            0x0616
@@ -1443,14 +1443,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned T3CKPS             : 2;
+    unsigned CKPS               : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned CKPS               : 2;
+    unsigned T3CKPS             : 2;
     unsigned                    : 2;
     };
 
@@ -1463,13 +1463,13 @@ typedef union
   struct
     {
     unsigned                    : 6;
-    unsigned T3CS               : 2;
+    unsigned TMR3CS             : 2;
     };
 
   struct
     {
     unsigned                    : 6;
-    unsigned TMR3CS             : 2;
+    unsigned T3CS               : 2;
     };
   } __T3CONbits_t;
 
@@ -1544,13 +1544,13 @@ typedef union
 
   struct
     {
-    unsigned T3GSS              : 2;
+    unsigned GSS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned GSS                : 2;
+    unsigned T3GSS              : 2;
     unsigned                    : 6;
     };
   } __T3GCONbits_t;
@@ -4574,14 +4574,14 @@ typedef union
 
   struct
     {
-    unsigned CL                 : 5;
-    unsigned                    : 3;
+    unsigned MD3CL              : 4;
+    unsigned                    : 4;
     };
 
   struct
     {
-    unsigned MD3CL              : 4;
-    unsigned                    : 4;
+    unsigned CL                 : 5;
+    unsigned                    : 3;
     };
   } __MD3CARLbits_t;
 
@@ -4633,14 +4633,14 @@ typedef union
 
   struct
     {
-    unsigned MD3CH              : 4;
-    unsigned                    : 4;
+    unsigned CH                 : 5;
+    unsigned                    : 3;
     };
 
   struct
     {
-    unsigned CH                 : 5;
-    unsigned                    : 3;
+    unsigned MD3CH              : 4;
+    unsigned                    : 4;
     };
   } __MD3CARHbits_t;
 
@@ -4979,13 +4979,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned CCP2MODE           : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned CCP2MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
   } __CCP2CONbits_t;
@@ -5455,14 +5455,14 @@ extern __at(0x0310) volatile __SLRCONEbits_t SLRCONEbits;
 
 //==============================================================================
 
-extern __at(0x0311) __sfr CCPR4;
-extern __at(0x0311) __sfr CCPR4L;
-extern __at(0x0312) __sfr CCPR4H;
+extern __at(0x0311) __sfr CCPR8;
+extern __at(0x0311) __sfr CCPR8L;
+extern __at(0x0312) __sfr CCPR8H;
 
 //==============================================================================
-//        CCP4CON Bits
+//        CCP8CON Bits
 
-extern __at(0x0313) __sfr CCP4CON;
+extern __at(0x0313) __sfr CCP8CON;
 
 typedef union
   {
@@ -5480,19 +5480,19 @@ typedef union
 
   struct
     {
-    unsigned CCP4MODE0          : 1;
-    unsigned CCP4MODE1          : 1;
-    unsigned CCP4MODE2          : 1;
-    unsigned CCP4MODE3          : 1;
-    unsigned CCP4FMT            : 1;
-    unsigned CCP4OUT            : 1;
+    unsigned CCP8MODE0          : 1;
+    unsigned CCP8MODE1          : 1;
+    unsigned CCP8MODE2          : 1;
+    unsigned CCP8MODE3          : 1;
+    unsigned CCP8FMT            : 1;
+    unsigned CCP8OUT            : 1;
     unsigned                    : 1;
-    unsigned CCP4EN             : 1;
+    unsigned CCP8EN             : 1;
     };
 
   struct
     {
-    unsigned CCP4MODE           : 4;
+    unsigned CCP8MODE           : 4;
     unsigned                    : 4;
     };
 
@@ -5501,32 +5501,32 @@ typedef union
     unsigned MODE               : 4;
     unsigned                    : 4;
     };
-  } __CCP4CONbits_t;
+  } __CCP8CONbits_t;
 
-extern __at(0x0313) volatile __CCP4CONbits_t CCP4CONbits;
+extern __at(0x0313) volatile __CCP8CONbits_t CCP8CONbits;
 
-#define _CCP4CON_MODE0          0x01
-#define _CCP4CON_CCP4MODE0      0x01
-#define _CCP4CON_MODE1          0x02
-#define _CCP4CON_CCP4MODE1      0x02
-#define _CCP4CON_MODE2          0x04
-#define _CCP4CON_CCP4MODE2      0x04
-#define _CCP4CON_MODE3          0x08
-#define _CCP4CON_CCP4MODE3      0x08
-#define _CCP4CON_FMT            0x10
-#define _CCP4CON_CCP4FMT        0x10
-#define _CCP4CON_OUT            0x20
-#define _CCP4CON_CCP4OUT        0x20
-#define _CCP4CON_EN             0x80
-#define _CCP4CON_CCP4EN         0x80
-
-//==============================================================================
-
+#define _CCP8CON_MODE0          0x01
+#define _CCP8CON_CCP8MODE0      0x01
+#define _CCP8CON_MODE1          0x02
+#define _CCP8CON_CCP8MODE1      0x02
+#define _CCP8CON_MODE2          0x04
+#define _CCP8CON_CCP8MODE2      0x04
+#define _CCP8CON_MODE3          0x08
+#define _CCP8CON_CCP8MODE3      0x08
+#define _CCP8CON_FMT            0x10
+#define _CCP8CON_CCP8FMT        0x10
+#define _CCP8CON_OUT            0x20
+#define _CCP8CON_CCP8OUT        0x20
+#define _CCP8CON_EN             0x80
+#define _CCP8CON_CCP8EN         0x80
 
 //==============================================================================
-//        CCP4CAP Bits
 
-extern __at(0x0314) __sfr CCP4CAP;
+
+//==============================================================================
+//        CCP8CAP Bits
+
+extern __at(0x0314) __sfr CCP8CAP;
 
 typedef union
   {
@@ -5544,10 +5544,10 @@ typedef union
 
   struct
     {
-    unsigned CCP4CTS0           : 1;
-    unsigned CCP4CTS1           : 1;
-    unsigned CCP4CTS2           : 1;
-    unsigned CCP4CTS3           : 1;
+    unsigned CCP8CTS0           : 1;
+    unsigned CCP8CTS1           : 1;
+    unsigned CCP8CTS2           : 1;
+    unsigned CCP8CTS3           : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -5556,7 +5556,7 @@ typedef union
 
   struct
     {
-    unsigned CCP4CTS            : 4;
+    unsigned CCP8CTS            : 4;
     unsigned                    : 4;
     };
 
@@ -5565,18 +5565,18 @@ typedef union
     unsigned CTS                : 4;
     unsigned                    : 4;
     };
-  } __CCP4CAPbits_t;
+  } __CCP8CAPbits_t;
 
-extern __at(0x0314) volatile __CCP4CAPbits_t CCP4CAPbits;
+extern __at(0x0314) volatile __CCP8CAPbits_t CCP8CAPbits;
 
-#define _CCP4CAP_CTS0           0x01
-#define _CCP4CAP_CCP4CTS0       0x01
-#define _CCP4CAP_CTS1           0x02
-#define _CCP4CAP_CCP4CTS1       0x02
-#define _CCP4CAP_CTS2           0x04
-#define _CCP4CAP_CCP4CTS2       0x04
-#define _CCP4CAP_CTS3           0x08
-#define _CCP4CAP_CCP4CTS3       0x08
+#define _CCP8CAP_CTS0           0x01
+#define _CCP8CAP_CCP8CTS0       0x01
+#define _CCP8CAP_CTS1           0x02
+#define _CCP8CAP_CCP8CTS1       0x02
+#define _CCP8CAP_CTS2           0x04
+#define _CCP8CAP_CCP8CTS2       0x04
+#define _CCP8CAP_CTS3           0x08
+#define _CCP8CAP_CCP8CTS3       0x08
 
 //==============================================================================
 
@@ -5976,13 +5976,13 @@ typedef union
 
   struct
     {
-    unsigned MS                 : 5;
+    unsigned MD2MS              : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned MD2MS              : 5;
+    unsigned MS                 : 5;
     unsigned                    : 3;
     };
   } __MD2SRCbits_t;
@@ -6036,14 +6036,14 @@ typedef union
 
   struct
     {
-    unsigned CL                 : 5;
-    unsigned                    : 3;
+    unsigned MD2CL              : 4;
+    unsigned                    : 4;
     };
 
   struct
     {
-    unsigned MD2CL              : 4;
-    unsigned                    : 4;
+    unsigned CL                 : 5;
+    unsigned                    : 3;
     };
   } __MD2CARLbits_t;
 
@@ -6095,14 +6095,14 @@ typedef union
 
   struct
     {
-    unsigned MD2CH              : 4;
-    unsigned                    : 4;
+    unsigned CH                 : 5;
+    unsigned                    : 3;
     };
 
   struct
     {
-    unsigned CH                 : 5;
-    unsigned                    : 3;
+    unsigned MD2CH              : 4;
+    unsigned                    : 4;
     };
   } __MD2CARHbits_t;
 
@@ -6759,12 +6759,6 @@ typedef union
   struct
     {
     unsigned                    : 6;
-    unsigned CS                 : 2;
-    };
-
-  struct
-    {
-    unsigned                    : 6;
     unsigned T5CS               : 2;
     };
 
@@ -6772,6 +6766,12 @@ typedef union
     {
     unsigned                    : 6;
     unsigned TMR5CS             : 2;
+    };
+
+  struct
+    {
+    unsigned                    : 6;
+    unsigned CS                 : 2;
     };
   } __T5CONbits_t;
 
@@ -6846,13 +6846,13 @@ typedef union
 
   struct
     {
-    unsigned T5GSS              : 2;
+    unsigned GSS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned GSS                : 2;
+    unsigned T5GSS              : 2;
     unsigned                    : 6;
     };
   } __T5GCONbits_t;
@@ -6929,27 +6929,27 @@ typedef union
 
   struct
     {
-    unsigned T4OUTPS            : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
     unsigned OUTPS              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
+    unsigned T4OUTPS            : 4;
     unsigned                    : 4;
-    unsigned T4CKPS             : 3;
-    unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned CKPS               : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned T4CKPS             : 3;
     unsigned                    : 1;
     };
   } __T4CONbits_t;
@@ -7010,13 +7010,13 @@ typedef union
 
   struct
     {
-    unsigned T4MODE             : 5;
+    unsigned MODE               : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned MODE               : 5;
+    unsigned T4MODE             : 5;
     unsigned                    : 3;
     };
   } __T4HLTbits_t;
@@ -7076,13 +7076,13 @@ typedef union
 
   struct
     {
-    unsigned T4CS               : 4;
+    unsigned CS                 : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned CS                 : 4;
+    unsigned T4CS               : 4;
     unsigned                    : 4;
     };
   } __T4CLKCONbits_t;
@@ -7291,13 +7291,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 5;
+    unsigned T6MODE             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned T6MODE             : 5;
+    unsigned MODE               : 5;
     unsigned                    : 3;
     };
   } __T6HLTbits_t;
@@ -7544,13 +7544,13 @@ typedef union
 
   struct
     {
-    unsigned OUTPS              : 4;
+    unsigned T2OUTPS            : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned T2OUTPS            : 4;
+    unsigned OUTPS              : 4;
     unsigned                    : 4;
     };
 
@@ -7691,13 +7691,13 @@ typedef union
 
   struct
     {
-    unsigned T2CS               : 4;
+    unsigned CS                 : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned CS                 : 4;
+    unsigned T2CS               : 4;
     unsigned                    : 4;
     };
   } __T2CLKCONbits_t;
@@ -7749,13 +7749,13 @@ typedef union
 
   struct
     {
-    unsigned RSEL               : 5;
+    unsigned T2RSEL             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned T2RSEL             : 5;
+    unsigned RSEL               : 5;
     unsigned                    : 3;
     };
   } __T2RSTbits_t;
@@ -7838,14 +7838,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned T8CKPS             : 3;
+    unsigned CKPS               : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned CKPS               : 3;
+    unsigned T8CKPS             : 3;
     unsigned                    : 1;
     };
   } __T8CONbits_t;
@@ -7906,13 +7906,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 5;
+    unsigned T8MODE             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned T8MODE             : 5;
+    unsigned MODE               : 5;
     unsigned                    : 3;
     };
   } __T8HLTbits_t;
@@ -8030,13 +8030,13 @@ typedef union
 
   struct
     {
-    unsigned RSEL               : 5;
+    unsigned T8RSEL             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned T8RSEL             : 5;
+    unsigned RSEL               : 5;
     unsigned                    : 3;
     };
   } __T8RSTbits_t;
@@ -8155,13 +8155,13 @@ typedef union
 
   struct
     {
-    unsigned ORM                : 2;
+    unsigned OPA2ORM            : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned OPA2ORM            : 2;
+    unsigned ORM                : 2;
     unsigned                    : 6;
     };
   } __OPA2CONbits_t;
@@ -8283,13 +8283,13 @@ typedef union
 
   struct
     {
-    unsigned OPA4ORM            : 2;
+    unsigned ORM                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned ORM                : 2;
+    unsigned OPA4ORM            : 2;
     unsigned                    : 6;
     };
   } __OPA4CONbits_t;
@@ -8409,12 +8409,6 @@ typedef union
 
   struct
     {
-    unsigned DACNSS             : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned DAC1NSS            : 2;
     unsigned                    : 6;
     };
@@ -8422,6 +8416,12 @@ typedef union
   struct
     {
     unsigned NSS                : 2;
+    unsigned                    : 6;
+    };
+
+  struct
+    {
+    unsigned DACNSS             : 2;
     unsigned                    : 6;
     };
 
@@ -8925,13 +8925,13 @@ typedef union
 
   struct
     {
-    unsigned NSS                : 2;
+    unsigned DACNSS             : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned DACNSS             : 2;
+    unsigned NSS                : 2;
     unsigned                    : 6;
     };
 
@@ -9417,13 +9417,13 @@ typedef union
 
   struct
     {
-    unsigned DAC3NSS            : 2;
+    unsigned NSS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned NSS                : 2;
+    unsigned DAC3NSS            : 2;
     unsigned                    : 6;
     };
 
@@ -9436,14 +9436,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned DACPSS             : 2;
+    unsigned PSS                : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned PSS                : 2;
+    unsigned DACPSS             : 2;
     unsigned                    : 4;
     };
 
@@ -9551,12 +9551,6 @@ typedef union
 
   struct
     {
-    unsigned DACR               : 5;
-    unsigned                    : 3;
-    };
-
-  struct
-    {
     unsigned DAC3R              : 5;
     unsigned                    : 3;
     };
@@ -9569,13 +9563,19 @@ typedef union
 
   struct
     {
-    unsigned DAC3REF            : 5;
+    unsigned REF                : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned REF                : 5;
+    unsigned DACR               : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
+    unsigned DAC3REF            : 5;
     unsigned                    : 3;
     };
   } __DAC3CON1bits_t;
@@ -9686,7 +9686,7 @@ typedef union
 
   struct
     {
-    unsigned DACR               : 5;
+    unsigned R                  : 5;
     unsigned                    : 3;
     };
 
@@ -9698,13 +9698,13 @@ typedef union
 
   struct
     {
-    unsigned DAC3REF            : 5;
+    unsigned DACR               : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned R                  : 5;
+    unsigned DAC3REF            : 5;
     unsigned                    : 3;
     };
   } __DAC3REFbits_t;
@@ -9785,13 +9785,13 @@ typedef union
 
   struct
     {
-    unsigned NSS                : 2;
+    unsigned DAC4NSS            : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned DAC4NSS            : 2;
+    unsigned NSS                : 2;
     unsigned                    : 6;
     };
 
@@ -9804,7 +9804,7 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned DACPSS             : 2;
+    unsigned PSS                : 2;
     unsigned                    : 4;
     };
 
@@ -9818,7 +9818,7 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PSS                : 2;
+    unsigned DACPSS             : 2;
     unsigned                    : 4;
     };
   } __DAC4CON0bits_t;
@@ -9919,6 +9919,18 @@ typedef union
 
   struct
     {
+    unsigned DACR               : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
+    unsigned R                  : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
     unsigned REF                : 5;
     unsigned                    : 3;
     };
@@ -9931,19 +9943,7 @@ typedef union
 
   struct
     {
-    unsigned R                  : 5;
-    unsigned                    : 3;
-    };
-
-  struct
-    {
     unsigned DAC4R              : 5;
-    unsigned                    : 3;
-    };
-
-  struct
-    {
-    unsigned DACR               : 5;
     unsigned                    : 3;
     };
   } __DAC4CON1bits_t;
@@ -10054,12 +10054,6 @@ typedef union
 
   struct
     {
-    unsigned DAC4REF            : 5;
-    unsigned                    : 3;
-    };
-
-  struct
-    {
     unsigned R                  : 5;
     unsigned                    : 3;
     };
@@ -10073,6 +10067,12 @@ typedef union
   struct
     {
     unsigned DAC4R              : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
+    unsigned DAC4REF            : 5;
     unsigned                    : 3;
     };
   } __DAC4REFbits_t;
@@ -10177,7 +10177,7 @@ typedef union
 
   struct
     {
-    unsigned DACNSS             : 2;
+    unsigned NSS                : 2;
     unsigned                    : 6;
     };
 
@@ -10189,21 +10189,21 @@ typedef union
 
   struct
     {
-    unsigned NSS                : 2;
+    unsigned DACNSS             : 2;
     unsigned                    : 6;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned PSS                : 2;
+    unsigned DACPSS             : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned DACPSS             : 2;
+    unsigned PSS                : 2;
     unsigned                    : 4;
     };
 
@@ -10693,12 +10693,6 @@ typedef union
 
   struct
     {
-    unsigned NSS                : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned DAC6NSS            : 2;
     unsigned                    : 6;
     };
@@ -10707,6 +10701,19 @@ typedef union
     {
     unsigned DACNSS             : 2;
     unsigned                    : 6;
+    };
+
+  struct
+    {
+    unsigned NSS                : 2;
+    unsigned                    : 6;
+    };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned PSS                : 2;
+    unsigned                    : 4;
     };
 
   struct
@@ -10720,13 +10727,6 @@ typedef union
     {
     unsigned                    : 2;
     unsigned DAC6PSS            : 2;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
-    unsigned                    : 2;
-    unsigned PSS                : 2;
     unsigned                    : 4;
     };
   } __DAC6CON0bits_t;
@@ -11185,12 +11185,6 @@ typedef union
 
   struct
     {
-    unsigned DACNSS             : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned DAC7NSS            : 2;
     unsigned                    : 6;
     };
@@ -11203,9 +11197,8 @@ typedef union
 
   struct
     {
-    unsigned                    : 2;
-    unsigned DAC7PSS            : 2;
-    unsigned                    : 4;
+    unsigned DACNSS             : 2;
+    unsigned                    : 6;
     };
 
   struct
@@ -11219,6 +11212,13 @@ typedef union
     {
     unsigned                    : 2;
     unsigned DACPSS             : 2;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned DAC7PSS            : 2;
     unsigned                    : 4;
     };
   } __DAC7CON0bits_t;
@@ -11319,19 +11319,19 @@ typedef union
 
   struct
     {
+    unsigned R                  : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
     unsigned REF                : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned DAC7R              : 5;
-    unsigned                    : 3;
-    };
-
-  struct
-    {
-    unsigned R                  : 5;
+    unsigned DACR               : 5;
     unsigned                    : 3;
     };
 
@@ -11343,7 +11343,7 @@ typedef union
 
   struct
     {
-    unsigned DACR               : 5;
+    unsigned DAC7R              : 5;
     unsigned                    : 3;
     };
   } __DAC7CON1bits_t;
@@ -11448,7 +11448,7 @@ typedef union
 
   struct
     {
-    unsigned R                  : 5;
+    unsigned DAC7REF            : 5;
     unsigned                    : 3;
     };
 
@@ -11466,13 +11466,13 @@ typedef union
 
   struct
     {
-    unsigned DACR               : 5;
+    unsigned R                  : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned DAC7REF            : 5;
+    unsigned DACR               : 5;
     unsigned                    : 3;
     };
   } __DAC7REFbits_t;
@@ -11553,7 +11553,7 @@ typedef union
 
   struct
     {
-    unsigned DAC8NSS            : 2;
+    unsigned NSS                : 2;
     unsigned                    : 6;
     };
 
@@ -11565,8 +11565,15 @@ typedef union
 
   struct
     {
-    unsigned NSS                : 2;
+    unsigned DAC8NSS            : 2;
     unsigned                    : 6;
+    };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned DACPSS             : 2;
+    unsigned                    : 4;
     };
 
   struct
@@ -11580,13 +11587,6 @@ typedef union
     {
     unsigned                    : 2;
     unsigned DAC8PSS            : 2;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
-    unsigned                    : 2;
-    unsigned DACPSS             : 2;
     unsigned                    : 4;
     };
   } __DAC8CON0bits_t;
@@ -11687,13 +11687,7 @@ typedef union
 
   struct
     {
-    unsigned DAC8R              : 5;
-    unsigned                    : 3;
-    };
-
-  struct
-    {
-    unsigned DACR               : 5;
+    unsigned REF                : 5;
     unsigned                    : 3;
     };
 
@@ -11705,13 +11699,19 @@ typedef union
 
   struct
     {
-    unsigned REF                : 5;
+    unsigned R                  : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned R                  : 5;
+    unsigned DAC8R              : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
+    unsigned DACR               : 5;
     unsigned                    : 3;
     };
   } __DAC8CON1bits_t;
@@ -11816,6 +11816,12 @@ typedef union
 
   struct
     {
+    unsigned R                  : 5;
+    unsigned                    : 3;
+    };
+
+  struct
+    {
     unsigned DAC8REF            : 5;
     unsigned                    : 3;
     };
@@ -11828,19 +11834,13 @@ typedef union
 
   struct
     {
-    unsigned R                  : 5;
+    unsigned DACR               : 5;
     unsigned                    : 3;
     };
 
   struct
     {
     unsigned DAC8R              : 5;
-    unsigned                    : 3;
-    };
-
-  struct
-    {
-    unsigned DACR               : 5;
     unsigned                    : 3;
     };
   } __DAC8REFbits_t;
@@ -11877,9 +11877,9 @@ extern __at(0x060D) volatile __DAC8REFbits_t DAC8REFbits;
 
 
 //==============================================================================
-//        PRG8RTSS Bits
+//        PRG4RTSS Bits
 
-extern __at(0x060E) __sfr PRG8RTSS;
+extern __at(0x060E) __sfr PRG4RTSS;
 
 typedef union
   {
@@ -11897,10 +11897,10 @@ typedef union
 
   struct
     {
-    unsigned RG8RTSS0           : 1;
-    unsigned RG8RTSS1           : 1;
-    unsigned RG8RTSS2           : 1;
-    unsigned RG8RTSS3           : 1;
+    unsigned RG4RTSS0           : 1;
+    unsigned RG4RTSS1           : 1;
+    unsigned RG4RTSS2           : 1;
+    unsigned RG4RTSS3           : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
@@ -11909,7 +11909,7 @@ typedef union
 
   struct
     {
-    unsigned RG8RTSS            : 4;
+    unsigned RG4RTSS            : 4;
     unsigned                    : 4;
     };
 
@@ -11918,26 +11918,26 @@ typedef union
     unsigned RTSS               : 4;
     unsigned                    : 4;
     };
-  } __PRG8RTSSbits_t;
+  } __PRG4RTSSbits_t;
 
-extern __at(0x060E) volatile __PRG8RTSSbits_t PRG8RTSSbits;
+extern __at(0x060E) volatile __PRG4RTSSbits_t PRG4RTSSbits;
 
-#define _PRG8RTSS_RTSS0         0x01
-#define _PRG8RTSS_RG8RTSS0      0x01
-#define _PRG8RTSS_RTSS1         0x02
-#define _PRG8RTSS_RG8RTSS1      0x02
-#define _PRG8RTSS_RTSS2         0x04
-#define _PRG8RTSS_RG8RTSS2      0x04
-#define _PRG8RTSS_RTSS3         0x08
-#define _PRG8RTSS_RG8RTSS3      0x08
-
-//==============================================================================
-
+#define _PRG4RTSS_RTSS0         0x01
+#define _PRG4RTSS_RG4RTSS0      0x01
+#define _PRG4RTSS_RTSS1         0x02
+#define _PRG4RTSS_RG4RTSS1      0x02
+#define _PRG4RTSS_RTSS2         0x04
+#define _PRG4RTSS_RG4RTSS2      0x04
+#define _PRG4RTSS_RTSS3         0x08
+#define _PRG4RTSS_RG4RTSS3      0x08
 
 //==============================================================================
-//        PRG8FTSS Bits
 
-extern __at(0x060F) __sfr PRG8FTSS;
+
+//==============================================================================
+//        PRG4FTSS Bits
+
+extern __at(0x060F) __sfr PRG4FTSS;
 
 typedef union
   {
@@ -11955,14 +11955,20 @@ typedef union
 
   struct
     {
-    unsigned RG8FTSS0           : 1;
-    unsigned RG8FTSS1           : 1;
-    unsigned RG8FTSS2           : 1;
-    unsigned RG8FTSS3           : 1;
+    unsigned RG4FTSS0           : 1;
+    unsigned RG4FTSS1           : 1;
+    unsigned RG4FTSS2           : 1;
+    unsigned RG4FTSS3           : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned RG4FTSS            : 4;
+    unsigned                    : 4;
     };
 
   struct
@@ -11970,32 +11976,26 @@ typedef union
     unsigned FTSS               : 4;
     unsigned                    : 4;
     };
+  } __PRG4FTSSbits_t;
 
-  struct
-    {
-    unsigned RG8FTSS            : 4;
-    unsigned                    : 4;
-    };
-  } __PRG8FTSSbits_t;
+extern __at(0x060F) volatile __PRG4FTSSbits_t PRG4FTSSbits;
 
-extern __at(0x060F) volatile __PRG8FTSSbits_t PRG8FTSSbits;
-
-#define _PRG8FTSS_FTSS0         0x01
-#define _PRG8FTSS_RG8FTSS0      0x01
-#define _PRG8FTSS_FTSS1         0x02
-#define _PRG8FTSS_RG8FTSS1      0x02
-#define _PRG8FTSS_FTSS2         0x04
-#define _PRG8FTSS_RG8FTSS2      0x04
-#define _PRG8FTSS_FTSS3         0x08
-#define _PRG8FTSS_RG8FTSS3      0x08
+#define _PRG4FTSS_FTSS0         0x01
+#define _PRG4FTSS_RG4FTSS0      0x01
+#define _PRG4FTSS_FTSS1         0x02
+#define _PRG4FTSS_RG4FTSS1      0x02
+#define _PRG4FTSS_FTSS2         0x04
+#define _PRG4FTSS_RG4FTSS2      0x04
+#define _PRG4FTSS_FTSS3         0x08
+#define _PRG4FTSS_RG4FTSS3      0x08
 
 //==============================================================================
 
 
 //==============================================================================
-//        PRG8INS Bits
+//        PRG4INS Bits
 
-extern __at(0x0610) __sfr PRG8INS;
+extern __at(0x0610) __sfr PRG4INS;
 
 typedef union
   {
@@ -12013,14 +12013,20 @@ typedef union
 
   struct
     {
-    unsigned RG8INS0            : 1;
-    unsigned RG8INS1            : 1;
-    unsigned RG8INS2            : 1;
-    unsigned RG8INS3            : 1;
+    unsigned RG4INS0            : 1;
+    unsigned RG4INS1            : 1;
+    unsigned RG4INS2            : 1;
+    unsigned RG4INS3            : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned RG4INS             : 4;
+    unsigned                    : 4;
     };
 
   struct
@@ -12028,32 +12034,26 @@ typedef union
     unsigned INS                : 4;
     unsigned                    : 4;
     };
+  } __PRG4INSbits_t;
 
-  struct
-    {
-    unsigned RG8INS             : 4;
-    unsigned                    : 4;
-    };
-  } __PRG8INSbits_t;
+extern __at(0x0610) volatile __PRG4INSbits_t PRG4INSbits;
 
-extern __at(0x0610) volatile __PRG8INSbits_t PRG8INSbits;
-
-#define _PRG8INS_INS0           0x01
-#define _PRG8INS_RG8INS0        0x01
-#define _PRG8INS_INS1           0x02
-#define _PRG8INS_RG8INS1        0x02
-#define _PRG8INS_INS2           0x04
-#define _PRG8INS_RG8INS2        0x04
-#define _PRG8INS_INS3           0x08
-#define _PRG8INS_RG8INS3        0x08
+#define _PRG4INS_INS0           0x01
+#define _PRG4INS_RG4INS0        0x01
+#define _PRG4INS_INS1           0x02
+#define _PRG4INS_RG4INS1        0x02
+#define _PRG4INS_INS2           0x04
+#define _PRG4INS_RG4INS2        0x04
+#define _PRG4INS_INS3           0x08
+#define _PRG4INS_RG4INS3        0x08
 
 //==============================================================================
 
 
 //==============================================================================
-//        PRG8CON0 Bits
+//        PRG4CON0 Bits
 
-extern __at(0x0611) __sfr PRG8CON0;
+extern __at(0x0611) __sfr PRG4CON0;
 
 typedef union
   {
@@ -12071,14 +12071,21 @@ typedef union
 
   struct
     {
-    unsigned RG8GO              : 1;
-    unsigned RG8OS              : 1;
-    unsigned RG8MODE0           : 1;
-    unsigned RG8MODE1           : 1;
-    unsigned RG8REDG            : 1;
-    unsigned RG8FEDG            : 1;
+    unsigned RG4GO              : 1;
+    unsigned RG4OS              : 1;
+    unsigned RG4MODE0           : 1;
+    unsigned RG4MODE1           : 1;
+    unsigned RG4REDG            : 1;
+    unsigned RG4FEDG            : 1;
     unsigned                    : 1;
-    unsigned RG8EN              : 1;
+    unsigned RG4EN              : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned RG4MODE            : 2;
+    unsigned                    : 4;
     };
 
   struct
@@ -12087,39 +12094,32 @@ typedef union
     unsigned MODE               : 2;
     unsigned                    : 4;
     };
+  } __PRG4CON0bits_t;
 
-  struct
-    {
-    unsigned                    : 2;
-    unsigned RG8MODE            : 2;
-    unsigned                    : 4;
-    };
-  } __PRG8CON0bits_t;
+extern __at(0x0611) volatile __PRG4CON0bits_t PRG4CON0bits;
 
-extern __at(0x0611) volatile __PRG8CON0bits_t PRG8CON0bits;
-
-#define _PRG8CON0_GO            0x01
-#define _PRG8CON0_RG8GO         0x01
-#define _PRG8CON0_OS            0x02
-#define _PRG8CON0_RG8OS         0x02
-#define _PRG8CON0_MODE0         0x04
-#define _PRG8CON0_RG8MODE0      0x04
-#define _PRG8CON0_MODE1         0x08
-#define _PRG8CON0_RG8MODE1      0x08
-#define _PRG8CON0_REDG          0x10
-#define _PRG8CON0_RG8REDG       0x10
-#define _PRG8CON0_FEDG          0x20
-#define _PRG8CON0_RG8FEDG       0x20
-#define _PRG8CON0_EN            0x80
-#define _PRG8CON0_RG8EN         0x80
+#define _PRG4CON0_GO            0x01
+#define _PRG4CON0_RG4GO         0x01
+#define _PRG4CON0_OS            0x02
+#define _PRG4CON0_RG4OS         0x02
+#define _PRG4CON0_MODE0         0x04
+#define _PRG4CON0_RG4MODE0      0x04
+#define _PRG4CON0_MODE1         0x08
+#define _PRG4CON0_RG4MODE1      0x08
+#define _PRG4CON0_REDG          0x10
+#define _PRG4CON0_RG4REDG       0x10
+#define _PRG4CON0_FEDG          0x20
+#define _PRG4CON0_RG4FEDG       0x20
+#define _PRG4CON0_EN            0x80
+#define _PRG4CON0_RG4EN         0x80
 
 //==============================================================================
 
 
 //==============================================================================
-//        PRG8CON1 Bits
+//        PRG4CON1 Bits
 
-extern __at(0x0612) __sfr PRG8CON1;
+extern __at(0x0612) __sfr PRG4CON1;
 
 typedef union
   {
@@ -12137,33 +12137,33 @@ typedef union
 
   struct
     {
-    unsigned RG8RPOL            : 1;
-    unsigned RG8FPOL            : 1;
-    unsigned RG8RDY             : 1;
+    unsigned RG4RPOL            : 1;
+    unsigned RG4FPOL            : 1;
+    unsigned RG4RDY             : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     };
-  } __PRG8CON1bits_t;
+  } __PRG4CON1bits_t;
 
-extern __at(0x0612) volatile __PRG8CON1bits_t PRG8CON1bits;
+extern __at(0x0612) volatile __PRG4CON1bits_t PRG4CON1bits;
 
-#define _PRG8CON1_RPOL          0x01
-#define _PRG8CON1_RG8RPOL       0x01
-#define _PRG8CON1_FPOL          0x02
-#define _PRG8CON1_RG8FPOL       0x02
-#define _PRG8CON1_RDY           0x04
-#define _PRG8CON1_RG8RDY        0x04
-
-//==============================================================================
-
+#define _PRG4CON1_RPOL          0x01
+#define _PRG4CON1_RG4RPOL       0x01
+#define _PRG4CON1_FPOL          0x02
+#define _PRG4CON1_RG4FPOL       0x02
+#define _PRG4CON1_RDY           0x04
+#define _PRG4CON1_RG4RDY        0x04
 
 //==============================================================================
-//        PRG8CON2 Bits
 
-extern __at(0x0613) __sfr PRG8CON2;
+
+//==============================================================================
+//        PRG4CON2 Bits
+
+extern __at(0x0613) __sfr PRG4CON2;
 
 typedef union
   {
@@ -12181,14 +12181,20 @@ typedef union
 
   struct
     {
-    unsigned RG8ISET0           : 1;
-    unsigned RG8ISET1           : 1;
-    unsigned RG8ISET2           : 1;
-    unsigned RG8ISET3           : 1;
-    unsigned RG8ISET4           : 1;
+    unsigned RG4ISET0           : 1;
+    unsigned RG4ISET1           : 1;
+    unsigned RG4ISET2           : 1;
+    unsigned RG4ISET3           : 1;
+    unsigned RG4ISET4           : 1;
     unsigned                    : 1;
     unsigned                    : 1;
     unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned RG4ISET            : 5;
+    unsigned                    : 3;
     };
 
   struct
@@ -12196,26 +12202,20 @@ typedef union
     unsigned ISET               : 5;
     unsigned                    : 3;
     };
+  } __PRG4CON2bits_t;
 
-  struct
-    {
-    unsigned RG8ISET            : 5;
-    unsigned                    : 3;
-    };
-  } __PRG8CON2bits_t;
+extern __at(0x0613) volatile __PRG4CON2bits_t PRG4CON2bits;
 
-extern __at(0x0613) volatile __PRG8CON2bits_t PRG8CON2bits;
-
-#define _PRG8CON2_ISET0         0x01
-#define _PRG8CON2_RG8ISET0      0x01
-#define _PRG8CON2_ISET1         0x02
-#define _PRG8CON2_RG8ISET1      0x02
-#define _PRG8CON2_ISET2         0x04
-#define _PRG8CON2_RG8ISET2      0x04
-#define _PRG8CON2_ISET3         0x08
-#define _PRG8CON2_RG8ISET3      0x08
-#define _PRG8CON2_ISET4         0x10
-#define _PRG8CON2_RG8ISET4      0x10
+#define _PRG4CON2_ISET0         0x01
+#define _PRG4CON2_RG4ISET0      0x01
+#define _PRG4CON2_ISET1         0x02
+#define _PRG4CON2_RG4ISET1      0x02
+#define _PRG4CON2_ISET2         0x04
+#define _PRG4CON2_RG4ISET2      0x04
+#define _PRG4CON2_ISET3         0x08
+#define _PRG4CON2_RG4ISET3      0x08
+#define _PRG4CON2_ISET4         0x10
+#define _PRG4CON2_RG4ISET4      0x10
 
 //==============================================================================
 
@@ -12458,6 +12458,12 @@ typedef union
   struct
     {
     unsigned                    : 6;
+    unsigned DC                 : 2;
+    };
+
+  struct
+    {
+    unsigned                    : 6;
     unsigned PWMPW              : 2;
     };
 
@@ -12465,12 +12471,6 @@ typedef union
     {
     unsigned                    : 6;
     unsigned PWM4DC             : 2;
-    };
-
-  struct
-    {
-    unsigned                    : 6;
-    unsigned DC                 : 2;
     };
   } __PWM4DCLbits_t;
 
@@ -12650,13 +12650,13 @@ typedef union
   struct
     {
     unsigned                    : 6;
-    unsigned DC                 : 2;
+    unsigned PWM9DC             : 2;
     };
 
   struct
     {
     unsigned                    : 6;
-    unsigned PWM9DC             : 2;
+    unsigned DC                 : 2;
     };
 
   struct
@@ -12842,13 +12842,13 @@ typedef union
   struct
     {
     unsigned                    : 6;
-    unsigned DC                 : 2;
+    unsigned PWM10DC            : 2;
     };
 
   struct
     {
     unsigned                    : 6;
-    unsigned PWM10DC            : 2;
+    unsigned DC                 : 2;
     };
 
   struct
@@ -13269,13 +13269,13 @@ typedef union
 
   struct
     {
-    unsigned G1DBR              : 6;
+    unsigned DBR                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned DBR                : 6;
+    unsigned G1DBR              : 6;
     unsigned                    : 2;
     };
   } __COG1DBRbits_t;
@@ -13331,13 +13331,13 @@ typedef union
 
   struct
     {
-    unsigned G1DBF              : 6;
+    unsigned DBF                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned DBF                : 6;
+    unsigned G1DBF              : 6;
     unsigned                    : 2;
     };
   } __COG1DBFbits_t;
@@ -13406,14 +13406,14 @@ typedef union
   struct
     {
     unsigned                    : 3;
-    unsigned G1CS               : 2;
+    unsigned CS                 : 2;
     unsigned                    : 3;
     };
 
   struct
     {
     unsigned                    : 3;
-    unsigned CS                 : 2;
+    unsigned G1CS               : 2;
     unsigned                    : 3;
     };
   } __COG1CON0bits_t;
@@ -13992,14 +13992,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned ASDBD              : 2;
+    unsigned G1ASDBD            : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned G1ASDBD            : 2;
+    unsigned ASDBD              : 2;
     unsigned                    : 2;
     };
   } __COG1ASD0bits_t;
@@ -14165,13 +14165,13 @@ typedef union
 
   struct
     {
-    unsigned PHR                : 6;
+    unsigned G2PHR              : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned G2PHR              : 6;
+    unsigned PHR                : 6;
     unsigned                    : 2;
     };
   } __COG2PHRbits_t;
@@ -14227,13 +14227,13 @@ typedef union
 
   struct
     {
-    unsigned G2PHF              : 6;
+    unsigned PHF                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned PHF                : 6;
+    unsigned G2PHF              : 6;
     unsigned                    : 2;
     };
   } __COG2PHFbits_t;
@@ -14289,13 +14289,13 @@ typedef union
 
   struct
     {
-    unsigned BLKR               : 6;
+    unsigned G2BLKR             : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned G2BLKR             : 6;
+    unsigned BLKR               : 6;
     unsigned                    : 2;
     };
   } __COG2BLKRbits_t;
@@ -14413,13 +14413,13 @@ typedef union
 
   struct
     {
-    unsigned G2DBR              : 6;
+    unsigned DBR                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned DBR                : 6;
+    unsigned G2DBR              : 6;
     unsigned                    : 2;
     };
   } __COG2DBRbits_t;
@@ -14537,13 +14537,13 @@ typedef union
 
   struct
     {
-    unsigned G2MD               : 3;
+    unsigned MD                 : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned MD                 : 3;
+    unsigned G2MD               : 3;
     unsigned                    : 5;
     };
 
@@ -15136,14 +15136,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned ASDBD              : 2;
+    unsigned G2ASDBD            : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned G2ASDBD            : 2;
+    unsigned ASDBD              : 2;
     unsigned                    : 2;
     };
   } __COG2ASD0bits_t;
@@ -15593,13 +15593,13 @@ typedef union
 
   struct
     {
-    unsigned RG1ISET            : 5;
+    unsigned ISET               : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned ISET               : 5;
+    unsigned RG1ISET            : 5;
     unsigned                    : 3;
     };
   } __PRG1CON2bits_t;
@@ -15769,13 +15769,13 @@ typedef union
 
   struct
     {
-    unsigned RG2INS             : 4;
+    unsigned INS                : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned INS                : 4;
+    unsigned RG2INS             : 4;
     unsigned                    : 4;
     };
   } __PRG2INSbits_t;
@@ -15937,13 +15937,13 @@ typedef union
 
   struct
     {
-    unsigned RG2ISET            : 5;
+    unsigned ISET               : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned ISET               : 5;
+    unsigned RG2ISET            : 5;
     unsigned                    : 3;
     };
   } __PRG2CON2bits_t;
@@ -16055,13 +16055,13 @@ typedef union
 
   struct
     {
-    unsigned FTSS               : 4;
+    unsigned RG3FTSS            : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned RG3FTSS            : 4;
+    unsigned FTSS               : 4;
     unsigned                    : 4;
     };
   } __PRG3FTSSbits_t;
@@ -16113,13 +16113,13 @@ typedef union
 
   struct
     {
-    unsigned RG3INS             : 4;
+    unsigned INS                : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned INS                : 4;
+    unsigned RG3INS             : 4;
     unsigned                    : 4;
     };
   } __PRG3INSbits_t;
@@ -16172,14 +16172,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned RG3MODE            : 2;
+    unsigned MODE               : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned MODE               : 2;
+    unsigned RG3MODE            : 2;
     unsigned                    : 4;
     };
   } __PRG3CON0bits_t;
@@ -16281,13 +16281,13 @@ typedef union
 
   struct
     {
-    unsigned ISET               : 5;
+    unsigned RG3ISET            : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned RG3ISET            : 5;
+    unsigned ISET               : 5;
     unsigned                    : 3;
     };
   } __PRG3CON2bits_t;
@@ -16403,13 +16403,13 @@ typedef union
 
   struct
     {
-    unsigned G3PHF              : 6;
+    unsigned PHF                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned PHF                : 6;
+    unsigned G3PHF              : 6;
     unsigned                    : 2;
     };
   } __COG3PHFbits_t;
@@ -16465,13 +16465,13 @@ typedef union
 
   struct
     {
-    unsigned BLKR               : 6;
+    unsigned G3BLKR             : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned G3BLKR             : 6;
+    unsigned BLKR               : 6;
     unsigned                    : 2;
     };
   } __COG3BLKRbits_t;
@@ -16651,13 +16651,13 @@ typedef union
 
   struct
     {
-    unsigned DBF                : 6;
+    unsigned G3DBF              : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned G3DBF              : 6;
+    unsigned DBF                : 6;
     unsigned                    : 2;
     };
   } __COG3DBFbits_t;
@@ -16726,14 +16726,14 @@ typedef union
   struct
     {
     unsigned                    : 3;
-    unsigned G3CS               : 2;
+    unsigned CS                 : 2;
     unsigned                    : 3;
     };
 
   struct
     {
     unsigned                    : 3;
-    unsigned CS                 : 2;
+    unsigned G3CS               : 2;
     unsigned                    : 3;
     };
   } __COG3CON0bits_t;
@@ -17469,13 +17469,13 @@ typedef union
 
   struct
     {
-    unsigned G4PHR              : 6;
+    unsigned PHR                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned PHR                : 6;
+    unsigned G4PHR              : 6;
     unsigned                    : 2;
     };
   } __COG4PHRbits_t;
@@ -17779,13 +17779,13 @@ typedef union
 
   struct
     {
-    unsigned DBF                : 6;
+    unsigned G4DBF              : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned G4DBF              : 6;
+    unsigned DBF                : 6;
     unsigned                    : 2;
     };
   } __COG4DBFbits_t;
@@ -17841,13 +17841,13 @@ typedef union
 
   struct
     {
-    unsigned G4MD               : 3;
+    unsigned MD                 : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned MD                 : 3;
+    unsigned G4MD               : 3;
     unsigned                    : 5;
     };
 
@@ -18440,14 +18440,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned G4ASDBD            : 2;
+    unsigned ASDBD              : 2;
     unsigned                    : 2;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned ASDBD              : 2;
+    unsigned G4ASDBD            : 2;
     unsigned                    : 2;
     };
   } __COG4ASD0bits_t;
@@ -18743,13 +18743,13 @@ typedef union
 
   struct
     {
-    unsigned PCH                : 4;
+    unsigned C4PCH              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned C4PCH              : 4;
+    unsigned PCH                : 4;
     unsigned                    : 4;
     };
   } __CM4PSELbits_t;
@@ -18931,13 +18931,13 @@ typedef union
 
   struct
     {
-    unsigned PCH                : 4;
+    unsigned C5PCH              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned C5PCH              : 4;
+    unsigned PCH                : 4;
     unsigned                    : 4;
     };
   } __CM5PSELbits_t;
@@ -19119,13 +19119,13 @@ typedef union
 
   struct
     {
-    unsigned PCH                : 4;
+    unsigned C6PCH              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned C6PCH              : 4;
+    unsigned PCH                : 4;
     unsigned                    : 4;
     };
   } __CM6PSELbits_t;
@@ -19307,13 +19307,13 @@ typedef union
 
   struct
     {
-    unsigned PCH                : 4;
+    unsigned C7PCH              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned C7PCH              : 4;
+    unsigned PCH                : 4;
     unsigned                    : 4;
     };
   } __CM7PSELbits_t;
@@ -19764,14 +19764,14 @@ typedef union
 
   struct
     {
-    unsigned MD4CH              : 4;
-    unsigned                    : 4;
+    unsigned CH                 : 5;
+    unsigned                    : 3;
     };
 
   struct
     {
-    unsigned CH                 : 5;
-    unsigned                    : 3;
+    unsigned MD4CH              : 4;
+    unsigned                    : 4;
     };
   } __MD4CARHbits_t;
 
@@ -20220,14 +20220,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned MODE               : 2;
+    unsigned PWM5MODE           : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned PWM5MODE           : 2;
+    unsigned MODE               : 2;
     unsigned                    : 4;
     };
   } __PWM5CONbits_t;
@@ -20465,27 +20465,27 @@ typedef union
 
   struct
     {
-    unsigned PWM5CS             : 3;
-    unsigned                    : 5;
-    };
-
-  struct
-    {
     unsigned CS                 : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned                    : 4;
-    unsigned PWM5PS             : 3;
-    unsigned                    : 1;
+    unsigned PWM5CS             : 3;
+    unsigned                    : 5;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned PS                 : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned PWM5PS             : 3;
     unsigned                    : 1;
     };
   } __PWM5CLKCONbits_t;
@@ -21247,14 +21247,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned PS                 : 3;
+    unsigned PWM6PS             : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned PWM6PS             : 3;
+    unsigned PS                 : 3;
     unsigned                    : 1;
     };
   } __PWM6CLKCONbits_t;
@@ -21368,27 +21368,27 @@ typedef union
 
   struct
     {
-    unsigned PWM6OFS            : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned OFS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned                    : 5;
-    unsigned OFM                : 2;
-    unsigned                    : 1;
+    unsigned PWM6OFS            : 2;
+    unsigned                    : 6;
     };
 
   struct
     {
     unsigned                    : 5;
     unsigned PWM6OFM            : 2;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 5;
+    unsigned OFM                : 2;
     unsigned                    : 1;
     };
   } __PWM6OFCONbits_t;
@@ -22003,13 +22003,13 @@ typedef union
 
   struct
     {
-    unsigned PWM11CS            : 3;
+    unsigned CS                 : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned CS                 : 3;
+    unsigned PWM11CS            : 3;
     unsigned                    : 5;
     };
 
@@ -22079,13 +22079,13 @@ typedef union
 
   struct
     {
-    unsigned PWM11LDS           : 2;
+    unsigned LDS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned LDS                : 2;
+    unsigned PWM11LDS           : 2;
     unsigned                    : 6;
     };
   } __PWM11LDCONbits_t;
@@ -22137,13 +22137,13 @@ typedef union
 
   struct
     {
-    unsigned PWM11OFS           : 2;
+    unsigned OFS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned OFS                : 2;
+    unsigned PWM11OFS           : 2;
     unsigned                    : 6;
     };
 
@@ -22527,14 +22527,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PWM12MODE          : 2;
+    unsigned MODE               : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned MODE               : 2;
+    unsigned PWM12MODE          : 2;
     unsigned                    : 4;
     };
   } __PWM12CONbits_t;
@@ -22772,13 +22772,13 @@ typedef union
 
   struct
     {
-    unsigned PWM12CS            : 3;
+    unsigned CS                 : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned CS                 : 3;
+    unsigned PWM12CS            : 3;
     unsigned                    : 5;
     };
 
@@ -22906,13 +22906,13 @@ typedef union
 
   struct
     {
-    unsigned OFS                : 2;
+    unsigned PWM12OFS           : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned PWM12OFS           : 2;
+    unsigned OFS                : 2;
     unsigned                    : 6;
     };
 
@@ -23692,13 +23692,13 @@ typedef union
 
   struct
     {
-    unsigned LC2MODE            : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned LC2MODE            : 3;
     unsigned                    : 5;
     };
   } __CLC2CONbits_t;
@@ -23804,13 +23804,13 @@ typedef union
 
   struct
     {
-    unsigned D1S                : 6;
+    unsigned LC2D1S             : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned LC2D1S             : 6;
+    unsigned D1S                : 6;
     unsigned                    : 2;
     };
   } __CLC2SEL0bits_t;
@@ -23866,13 +23866,13 @@ typedef union
 
   struct
     {
-    unsigned LC2D2S             : 6;
+    unsigned D2S                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned D2S                : 6;
+    unsigned LC2D2S             : 6;
     unsigned                    : 2;
     };
   } __CLC2SEL1bits_t;
@@ -23928,13 +23928,13 @@ typedef union
 
   struct
     {
-    unsigned LC2D3S             : 6;
+    unsigned D3S                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned D3S                : 6;
+    unsigned LC2D3S             : 6;
     unsigned                    : 2;
     };
   } __CLC2SEL2bits_t;
@@ -23990,13 +23990,13 @@ typedef union
 
   struct
     {
-    unsigned LC2D4S             : 6;
+    unsigned D4S                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned D4S                : 6;
+    unsigned LC2D4S             : 6;
     unsigned                    : 2;
     };
   } __CLC2SEL3bits_t;
@@ -24268,13 +24268,13 @@ typedef union
 
   struct
     {
-    unsigned LC3MODE            : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned LC3MODE            : 3;
     unsigned                    : 5;
     };
   } __CLC3CONbits_t;
@@ -24442,13 +24442,13 @@ typedef union
 
   struct
     {
-    unsigned D2S                : 6;
+    unsigned LC3D2S             : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned LC3D2S             : 6;
+    unsigned D2S                : 6;
     unsigned                    : 2;
     };
   } __CLC3SEL1bits_t;
@@ -24504,13 +24504,13 @@ typedef union
 
   struct
     {
-    unsigned LC3D3S             : 6;
+    unsigned D3S                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned D3S                : 6;
+    unsigned LC3D3S             : 6;
     unsigned                    : 2;
     };
   } __CLC3SEL2bits_t;
@@ -25080,13 +25080,13 @@ typedef union
 
   struct
     {
-    unsigned D3S                : 6;
+    unsigned LC4D3S             : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned LC4D3S             : 6;
+    unsigned D3S                : 6;
     unsigned                    : 2;
     };
   } __CLC4SEL2bits_t;
@@ -25142,13 +25142,13 @@ typedef union
 
   struct
     {
-    unsigned D4S                : 6;
+    unsigned LC4D4S             : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned LC4D4S             : 6;
+    unsigned D4S                : 6;
     unsigned                    : 2;
     };
   } __CLC4SEL3bits_t;

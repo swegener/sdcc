@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:16 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:53 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -3257,14 +3257,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PWM1MODE           : 2;
+    unsigned MODE               : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned MODE               : 2;
+    unsigned PWM1MODE           : 2;
     unsigned                    : 4;
     };
   } __PWM1CONbits_t;
@@ -3649,14 +3649,14 @@ typedef union
   struct
     {
     unsigned                    : 5;
-    unsigned PWM1OFM            : 2;
+    unsigned OFM                : 2;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 5;
-    unsigned OFM                : 2;
+    unsigned PWM1OFM            : 2;
     unsigned                    : 1;
     };
   } __PWM1OFCONbits_t;
@@ -4273,13 +4273,13 @@ typedef union
 
   struct
     {
-    unsigned PWM2CS             : 2;
+    unsigned CS                 : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned CS                 : 2;
+    unsigned PWM2CS             : 2;
     unsigned                    : 6;
     };
 
@@ -4418,14 +4418,14 @@ typedef union
   struct
     {
     unsigned                    : 5;
-    unsigned OFM                : 2;
+    unsigned PWM2OFM            : 2;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 5;
-    unsigned PWM2OFM            : 2;
+    unsigned OFM                : 2;
     unsigned                    : 1;
     };
   } __PWM2OFCONbits_t;
@@ -4795,14 +4795,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PWM3MODE           : 2;
+    unsigned MODE               : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned MODE               : 2;
+    unsigned PWM3MODE           : 2;
     unsigned                    : 4;
     };
   } __PWM3CONbits_t;
@@ -5116,13 +5116,13 @@ typedef union
 
   struct
     {
-    unsigned PWM3LDS            : 2;
+    unsigned LDS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned LDS                : 2;
+    unsigned PWM3LDS            : 2;
     unsigned                    : 6;
     };
   } __PWM3LDCONbits_t;
@@ -5174,27 +5174,27 @@ typedef union
 
   struct
     {
-    unsigned PWM3OFS            : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned OFS                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned                    : 5;
-    unsigned PWM3OFM            : 2;
-    unsigned                    : 1;
+    unsigned PWM3OFS            : 2;
+    unsigned                    : 6;
     };
 
   struct
     {
     unsigned                    : 5;
     unsigned OFM                : 2;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 5;
+    unsigned PWM3OFM            : 2;
     unsigned                    : 1;
     };
   } __PWM3OFCONbits_t;
@@ -5564,14 +5564,14 @@ typedef union
   struct
     {
     unsigned                    : 2;
-    unsigned PWM4MODE           : 2;
+    unsigned MODE               : 2;
     unsigned                    : 4;
     };
 
   struct
     {
     unsigned                    : 2;
-    unsigned MODE               : 2;
+    unsigned PWM4MODE           : 2;
     unsigned                    : 4;
     };
   } __PWM4CONbits_t;
@@ -5811,27 +5811,27 @@ typedef union
 
   struct
     {
-    unsigned CS                 : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned PWM4CS             : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned                    : 4;
-    unsigned PS                 : 3;
-    unsigned                    : 1;
+    unsigned CS                 : 2;
+    unsigned                    : 6;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned PWM4PS             : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned PS                 : 3;
     unsigned                    : 1;
     };
   } __PWM4CLKCONbits_t;
@@ -5885,13 +5885,13 @@ typedef union
 
   struct
     {
-    unsigned LDS                : 2;
+    unsigned PWM4LDS            : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned PWM4LDS            : 2;
+    unsigned LDS                : 2;
     unsigned                    : 6;
     };
   } __PWM4LDCONbits_t;
@@ -5956,14 +5956,14 @@ typedef union
   struct
     {
     unsigned                    : 5;
-    unsigned PWM4OFM            : 2;
+    unsigned OFM                : 2;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 5;
-    unsigned OFM                : 2;
+    unsigned PWM4OFM            : 2;
     unsigned                    : 1;
     };
   } __PWM4OFCONbits_t;

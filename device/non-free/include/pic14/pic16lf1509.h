@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-09 15:09:15 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:51 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -3349,13 +3349,13 @@ typedef union
 
   struct
     {
-    unsigned LCMODE             : 3;
+    unsigned LC1MODE            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC1MODE            : 3;
+    unsigned LCMODE             : 3;
     unsigned                    : 5;
     };
   } __CLC1CONbits_t;
@@ -3476,14 +3476,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned D2S                : 3;
+    unsigned LC1D2S             : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned LC1D2S             : 3;
+    unsigned D2S                : 3;
     unsigned                    : 1;
     };
   } __CLC1SEL0bits_t;
@@ -3539,27 +3539,27 @@ typedef union
 
   struct
     {
-    unsigned D3S                : 3;
-    unsigned                    : 5;
-    };
-
-  struct
-    {
     unsigned LC1D3S             : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned                    : 4;
-    unsigned D4S                : 3;
-    unsigned                    : 1;
+    unsigned D3S                : 3;
+    unsigned                    : 5;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned LC1D4S             : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned D4S                : 3;
     unsigned                    : 1;
     };
   } __CLC1SEL1bits_t;
@@ -3945,13 +3945,13 @@ typedef union
 
   struct
     {
-    unsigned LC2D1S             : 3;
+    unsigned D1S                : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned D1S                : 3;
+    unsigned LC2D1S             : 3;
     unsigned                    : 5;
     };
 
@@ -4021,13 +4021,13 @@ typedef union
 
   struct
     {
-    unsigned D3S                : 3;
+    unsigned LC2D3S             : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC2D3S             : 3;
+    unsigned D3S                : 3;
     unsigned                    : 5;
     };
 
@@ -4503,13 +4503,13 @@ typedef union
 
   struct
     {
-    unsigned D3S                : 3;
+    unsigned LC3D3S             : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC3D3S             : 3;
+    unsigned D3S                : 3;
     unsigned                    : 5;
     };
 
@@ -4909,13 +4909,13 @@ typedef union
 
   struct
     {
-    unsigned D1S                : 3;
+    unsigned LC4D1S             : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC4D1S             : 3;
+    unsigned D1S                : 3;
     unsigned                    : 5;
     };
 
@@ -4985,13 +4985,13 @@ typedef union
 
   struct
     {
-    unsigned LC4D3S             : 3;
+    unsigned D3S                : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned D3S                : 3;
+    unsigned LC4D3S             : 3;
     unsigned                    : 5;
     };
 

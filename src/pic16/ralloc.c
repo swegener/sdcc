@@ -115,7 +115,7 @@ static FILE *debugF = NULL;
 /*-----------------------------------------------------------------*/
 //static void debugLog(char *inst,char *fmt, ...)
 static void
-debugLog (char *fmt,...)
+debugLog (const char *fmt,...)
 {
   static int append = 0;        // First time through, open the file without append.
 
@@ -317,7 +317,7 @@ pic16_decodeOp (unsigned int op)
 }
 
 #if 0
-static char *decodeRegType(short type)
+static const char *decodeRegType(short type)
 {
         switch(type) {
                 case REG_GPR: return "REG_GPR";
@@ -332,7 +332,7 @@ static char *decodeRegType(short type)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static char *
+static const char *
 debugLogRegType (short type)
 {
         if(!pic16_ralloc_debug)return NULL;
@@ -368,7 +368,7 @@ static int regname2key(char const *name)
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
-reg_info* newReg(int type, short pc_type, int rIdx, char *name, unsigned size, int alias, operand *refop)
+reg_info* newReg(int type, short pc_type, int rIdx, const char *name, unsigned size, int alias, operand *refop)
 {
 
   reg_info *dReg;
@@ -494,7 +494,7 @@ regFindFreeNext(set *dRegs, reg_info *creg)
 /*-----------------------------------------------------------------*
  *-----------------------------------------------------------------*/
 reg_info *
-pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
+pic16_allocProcessorRegister(int rIdx, const char * name, short po_type, int alias)
 {
   reg_info *reg = newReg(REG_SFR, po_type, rIdx, name, 1, alias, NULL);
 
@@ -512,15 +512,15 @@ pic16_allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
  *-----------------------------------------------------------------*/
 
 reg_info *
-pic16_allocInternalRegister(int rIdx, char * name, short po_type, int alias)
+pic16_allocInternalRegister(int rIdx, const char *name, short po_type, int alias)
 {
-  reg_info * reg = newReg(REG_GPR, po_type, rIdx, name,1,alias, NULL);
+  reg_info * reg = newReg(REG_GPR, po_type, rIdx, name, 1, alias, NULL);
 
 //  fprintf(stderr,"%s:%d: %s   %s addr =0x%x\n",__FILE__, __LINE__, __FUNCTION__, name, rIdx);
 
     if(reg) {
       reg->wasUsed = 0;
-      return addSet(&pic16_dynInternalRegs,reg);
+      return addSet(&pic16_dynInternalRegs, reg);
     }
 
   return NULL;
@@ -595,7 +595,7 @@ allocReg (short type)
 /* pic16_dirregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_dirregWithName (char *name)
+pic16_dirregWithName(const char *name)
 {
   int hkey;
   reg_info *reg;
@@ -629,7 +629,7 @@ pic16_dirregWithName (char *name)
 /* pic16_allocregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_allocregWithName (char *name)
+pic16_allocregWithName(const char *name)
 {
   int hkey;
   reg_info *reg;
@@ -664,7 +664,7 @@ pic16_allocregWithName (char *name)
 /* pic16_procregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_procregWithName (char *name)
+pic16_procregWithName(const char *name)
 {
   int hkey;
   reg_info *reg;
@@ -698,7 +698,7 @@ pic16_procregWithName (char *name)
 /* pic16_accessregWithName - search for register by name           */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_accessregWithName (char *name)
+pic16_accessregWithName(const char *name)
 {
   int hkey;
   reg_info *reg;
@@ -728,7 +728,7 @@ pic16_accessregWithName (char *name)
 
 }
 
-reg_info *pic16_regWithName(char *name)
+reg_info *pic16_regWithName(const char *name)
 {
   reg_info *reg;
 
@@ -951,7 +951,7 @@ pic16_allocDirReg (operand *op )
 /* pic16_allocRegByName - allocates register of given type                  */
 /*-----------------------------------------------------------------*/
 reg_info *
-pic16_allocRegByName (char *name, int size, operand *op)
+pic16_allocRegByName(const char *name, int size, operand *op)
 {
 
   reg_info *reg;

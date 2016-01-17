@@ -290,7 +290,7 @@ static int cvt_extract_destination(parsedPattern *pp)
 /*     containing the status register.                             */
 /*-----------------------------------------------------------------*/
 
-static pCodeOp *cvt_extract_status(char *reg, char *bit)
+static pCodeOp *cvt_extract_status(const char *reg, char *bit)
 {
   int len;
 
@@ -1075,7 +1075,7 @@ static void dump1Token(pCodeTokens tt)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-static int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
+static int pcComparePattern(pCodeToken *pct, const char *pat, int max_tokens)
 {
   int i=0;
 
@@ -1108,7 +1108,7 @@ static int pcComparePattern(pCodeToken *pct, char *pat, int max_tokens)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-static int altComparePattern( char *pct, parsedPattern *pat, int max_tokens)
+static int altComparePattern(const char *pct, parsedPattern *pat, int max_tokens)
 {
   int i=0;
 
@@ -1439,7 +1439,7 @@ pCode *pic16_AssembleLine(char *line, int peeps)
 /*-----------------------------------------------------------------*/
 /* peepRuleCondition                                               */
 /*-----------------------------------------------------------------*/
-static void   peepRuleCondition(char *cond, pCodePeep *pcp)
+static void peepRuleCondition(const char *cond, pCodePeep *pcp)
 {
   if(!cond || !pcp)
     return;

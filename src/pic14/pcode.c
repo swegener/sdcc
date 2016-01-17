@@ -87,7 +87,7 @@ static void genericDestruct(pCode *pc);
 static void genericPrint(FILE *of,pCode *pc);
 
 static void pBlockStats(FILE *of, pBlock *pb);
-static pCode *findFunction(char *fname);
+static pCode *findFunction(const char *fname);
 static void pCodePrintLabel(FILE *of, pCode *pc);
 static void pCodePrintFunction(FILE *of, pCode *pc);
 static void pCodeOpPrint(FILE *of, pCodeOp *pcop);
@@ -1352,11 +1352,11 @@ static void pic14initMnemonics(void)
 		mnemonics_initialized = 1;
 }
 
-int getpCode(char *mnem,unsigned dest)
+int getpCode(const char *mnem, unsigned dest)
 {
 	
 	pCodeInstruction *pci;
-	int key = mnem2key((unsigned char *)mnem);
+	int key = mnem2key((const unsigned char *)mnem);
 	
 	if(!mnemonics_initialized)
 		pic14initMnemonics();
@@ -1390,7 +1390,7 @@ void pic14initpCodePeepCommands(void)
 	i = 0;
 	do {
 		hTabAddItem(&pic14pCodePeepCommandsHash, 
-			mnem2key((unsigned char *)peepCommands[i].cmd), &peepCommands[i]);
+			mnem2key((const unsigned char *)peepCommands[i].cmd), &peepCommands[i]);
 		i++;
 	} while (peepCommands[i].cmd);
 	
@@ -1408,11 +1408,11 @@ void pic14initpCodePeepCommands(void)
 *
 *-----------------------------------------------------------------*/
 
-int getpCodePeepCommand(char *cmd)
+int getpCodePeepCommand(const char *cmd)
 {
 	
 	peepCommand *pcmd;
-	int key = mnem2key((unsigned char *)cmd);
+	int key = mnem2key((const unsigned char *)cmd);
 	
 	
 	pcmd = hTabFirstItemWK(pic14pCodePeepCommandsHash, key);
@@ -1581,7 +1581,7 @@ static int RegCond(pCodeOp *pcop)
 		return 0;
 	
 	if (pcop->type == PO_GPR_BIT) {
-		char *name = pcop->name;
+		const char *name = pcop->name;
 		if (!name) 
 			name = PCOR(pcop)->r->name;
 		if (strcmp(name, pc_status.pcop.name) == 0)
@@ -1700,7 +1700,7 @@ pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_la
 /* newPcodeCharP - create a new pCode from a char string           */
 /*-----------------------------------------------------------------*/
 
-pCode *newpCodeCharP(char *cP)
+pCode *newpCodeCharP(const char *cP)
 {
 	
 	pCodeComment *pcc ;
@@ -1730,7 +1730,7 @@ pCode *newpCodeCharP(char *cP)
 /*-----------------------------------------------------------------*/
 
 
-pCode *newpCodeFunction(char *mod,char *f,int isPublic)
+pCode *newpCodeFunction(const char *mod, const char *f, int isPublic)
 {
 	pCodeFunction *pcf;
 	
@@ -1842,7 +1842,7 @@ static pCodeFlowLink *newpCodeFlowLink(pCodeFlow *pcflow)
 /* newpCodeCSource - create a new pCode Source Symbol              */
 /*-----------------------------------------------------------------*/
 
-pCode *newpCodeCSource(int ln, char *f, const char *l)
+pCode *newpCodeCSource(int ln, const char *f, const char *l)
 {
 	
 	pCodeCSource *pccs;
@@ -1877,7 +1877,7 @@ pCode *newpCodeCSource(int ln, char *f, const char *l)
 /*                        added by VR 6-Jun-2003                   */
 /*******************************************************************/
 
-pCode *newpCodeAsmDir(char *asdir, char *argfmt, ...)
+pCode *newpCodeAsmDir(const char *asdir, const char *argfmt, ...)
 {
   pCodeAsmDir *pcad;
   va_list ap;
@@ -1930,37 +1930,37 @@ static void pCodeLabelDestruct(pCode *pc)
 	
 }
 
-pCode *newpCodeLabel(char *name, int key)
+pCode *newpCodeLabel(const char *name, int key)
 {
-	
-	char *s = buffer;
+	const char *s;
 	pCodeLabel *pcl;
-	
+
 	pcl = Safe_calloc(1,sizeof(pCodeLabel) );
-	
+
 	pcl->pc.type = PC_LABEL;
 	pcl->pc.prev = pcl->pc.next = NULL;
 	pcl->pc.id = PCodeID();
 	//pcl->pc.from = pcl->pc.to = pcl->pc.label = NULL;
 	pcl->pc.pb = NULL;
-	
+
 	pcl->pc.destruct = pCodeLabelDestruct;
 	pcl->pc.print = pCodePrintLabel;
-	
+
 	pcl->key = key;
-	
+
 	pcl->label = NULL;
 	if(key>0) {
-		sprintf(s,"_%05d_DS_:",key);
-	} else
+		sprintf(buffer, "_%05d_DS_:", key);
+		s = buffer;
+	} else {
 		s = name;
-	
+	}
+
 	if(s)
 		pcl->label = Safe_strdup(s);
-	
+
 	//fprintf(stderr,"newpCodeLabel: key=%d, name=%s\n",key, ((s)?s:""));
 	return ( (pCode *)pcl);
-	
 }
 
 
@@ -2012,29 +2012,33 @@ pBlock *newpCodeChain(memmap *cm,char c, pCode *pc)
 /*   optimizations).                                               */
 /*-----------------------------------------------------------------*/
 
-pCodeOp *newpCodeOpLabel(char *name, int key)
+pCodeOp *newpCodeOpLabel(const char *name, int key)
 {
-	char *s=NULL;
-	static int label_key=-1;
-	
+	const char *s;
+	static int label_key = -1;
+
 	pCodeOp *pcop;
-	
+
 	pcop = Safe_calloc(1,sizeof(pCodeOpLabel) );
 	pcop->type = PO_LABEL;
-	
+
 	pcop->name = NULL;
-	
-	if(key>0)
-		sprintf(s=buffer,"_%05d_DS_",key);
-	else 
-		s = name, key = label_key--;
-	
+
+	if(key>0) {
+		sprintf(buffer, "_%05d_DS_", key);
+		s = buffer;
+	}
+	else {
+		s = name;
+		key = label_key--;
+	}
+
 	PCOLAB(pcop)->offset = 0;
 	if(s)
 		pcop->name = Safe_strdup(s);
-	
+
 	((pCodeOpLabel *)pcop)->key = key;
-	
+
 	//fprintf(stderr,"newpCodeOpLabel: key=%d, name=%s\n",key,((s)?s:""));
 	return pcop;
 }
@@ -2064,19 +2068,19 @@ pCodeOp *newpCodeOpLit(int lit)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space, int is_func)
+pCodeOp *newpCodeOpImmd(const char *name, int offset, int index, int code_space, int is_func)
 {
 	pCodeOp *pcop;
-	
+
 	pcop = Safe_calloc(1,sizeof(pCodeOpImmd) );
 	pcop->type = PO_IMMEDIATE;
 	if(name) {
 		reg_info *r = NULL;
 		pcop->name = Safe_strdup(name);
-		
+
 		if(!is_func) 
 			r = dirregWithName(name);
-		
+
 		PCOI(pcop)->r = r;
 		if(r) {
 			//fprintf(stderr, " newpCodeOpImmd reg %s exists\n",name);
@@ -2089,12 +2093,12 @@ pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space, int i
 	} else {
 		pcop->name = NULL;
 	}
-	
+
 	PCOI(pcop)->index = index;
 	PCOI(pcop)->offset = offset;
 	PCOI(pcop)->_const = code_space;
 	PCOI(pcop)->_function = is_func;
-	
+
 	return pcop;
 }
 
@@ -2104,25 +2108,25 @@ pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
 {
 	char *s = buffer;
 	pCodeOp *pcop;
-	
-	
+
 	if(!pcwb || !subtype) {
 		fprintf(stderr, "Wild opcode declaration error: %s-%d\n",__FILE__,__LINE__);
 		exit(1);
 	}
-	
+
 	pcop = Safe_calloc(1,sizeof(pCodeOpWild));
 	pcop->type = PO_WILD;
 	sprintf(s,"%%%d",id);
 	pcop->name = Safe_strdup(s);
-	
+
 	PCOW(pcop)->id = id;
 	PCOW(pcop)->pcwb = pcwb;
 	PCOW(pcop)->subtype = subtype;
 	PCOW(pcop)->matched = NULL;
-	
+
 	return pcop;
 }
+
 /*-----------------------------------------------------------------*/
 /* Find a symbol with matching name                                */
 /*-----------------------------------------------------------------*/
@@ -2139,17 +2143,17 @@ static symbol *symFindWithName(memmap * map, const char *name)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *newpCodeOpBit(char *name, int ibit, int inBitSpace)
+pCodeOp *newpCodeOpBit(const char *name, int ibit, int inBitSpace)
 {
 	pCodeOp *pcop;
 	struct reg_info *r = 0;
-	
+
 	pcop = Safe_calloc(1,sizeof(pCodeOpRegBit) );
 	pcop->type = PO_GPR_BIT;
-	
+
 	PCORB(pcop)->bit = ibit;
 	PCORB(pcop)->inBitSpace = inBitSpace;
-	
+
         if (name) r = regFindWithName(name);
 	if (name && !r) {
 		// Register has not been allocated - check for symbol information
@@ -2212,7 +2216,7 @@ static pCodeOp *newpCodeOpReg(int rIdx)
 	return pcop;
 }
 
-pCodeOp *newpCodeOpRegFromStr(char *name)
+pCodeOp *newpCodeOpRegFromStr(const char *name)
 {
 	pCodeOp *pcop;
 	
@@ -2225,7 +2229,7 @@ pCodeOp *newpCodeOpRegFromStr(char *name)
 	return pcop;
 }
 
-static pCodeOp *newpCodeOpStr(char *name)
+static pCodeOp *newpCodeOpStr(const char *name)
 {
 	pCodeOp *pcop;
 	
@@ -2242,7 +2246,7 @@ static pCodeOp *newpCodeOpStr(char *name)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-pCodeOp *newpCodeOp(char *name, PIC_OPTYPE type)
+pCodeOp *newpCodeOp(const char *name, PIC_OPTYPE type)
 {
 	pCodeOp *pcop;
 	
@@ -5082,7 +5086,7 @@ void AnalyzepCode(char dbName)
 /* (note - I expect this to change because I'm planning to limit   */
 /*  pBlock's to just one function declaration                      */
 /*-----------------------------------------------------------------*/
-static pCode *findFunction(char *fname)
+static pCode *findFunction(const char *fname)
 {
 	pBlock *pb;
 	pCode *pc;

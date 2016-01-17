@@ -87,7 +87,7 @@ static FILE *debugF = NULL;
 /* debugLog - open a file for debugging information                */
 /*-----------------------------------------------------------------*/
 static void
-debugLog (char *fmt,...)
+debugLog (const char *fmt,...)
 {
         static int append = 0;  // First time through, open the file without append.
 
@@ -128,9 +128,9 @@ debugNewLine (void)
         if (debugF)
                 fputc ('\n', debugF);
 }
- /*-----------------------------------------------------------------*/
- /* pic14_debugLogClose - closes the debug log file (if opened)           */
- /*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+/* pic14_debugLogClose - closes the debug log file (if opened)     */
+/*-----------------------------------------------------------------*/
 void
 pic14_debugLogClose (void)
 {
@@ -142,7 +142,7 @@ pic14_debugLogClose (void)
 }
 
 static char *
-debugAopGet (char *str, operand * op)
+debugAopGet (const char *str, operand * op)
 {
         if (!debug) return NULL;
 
@@ -154,7 +154,7 @@ debugAopGet (char *str, operand * op)
         return NULL;
 }
 
-static char *
+static const char *
 decodeOp (unsigned int op)
 {
 
@@ -273,7 +273,7 @@ decodeOp (unsigned int op)
 }
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static char *
+static const char *
 debugLogRegType (short type)
 {
 
@@ -330,7 +330,7 @@ regWithIdx (set *dRegs, int idx, int fixed)
 /*-----------------------------------------------------------------*/
 /* newReg - allocate and init memory for a new register            */
 /*-----------------------------------------------------------------*/
-static reg_info* newReg(short type, PIC_OPTYPE pc_type, int rIdx, char *name, int size, int alias)
+static reg_info* newReg(short type, PIC_OPTYPE pc_type, int rIdx, const char *name, int size, int alias)
 {
 
         reg_info *dReg, *reg_alias;
@@ -486,7 +486,7 @@ void initStack(int base_address, int size, int shared)
 /*-----------------------------------------------------------------*
 *-----------------------------------------------------------------*/
 reg_info *
-allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
+allocProcessorRegister(int rIdx, const char *name, short po_type, int alias)
 {
 
         //fprintf(stderr,"allocProcessorRegister %s addr =0x%x\n",name,rIdx);
@@ -497,7 +497,7 @@ allocProcessorRegister(int rIdx, char * name, short po_type, int alias)
 *-----------------------------------------------------------------*/
 
 reg_info *
-allocInternalRegister(int rIdx, char * name, PIC_OPTYPE po_type, int alias)
+allocInternalRegister(int rIdx, const char *name, PIC_OPTYPE po_type, int alias)
 {
         reg_info *reg = newReg(REG_GPR, po_type, rIdx, name,1,alias);
 
@@ -537,7 +537,7 @@ allocReg (short type)
 /* dirregWithName - search for register by name                    */
 /*-----------------------------------------------------------------*/
 reg_info *
-dirregWithName (char *name)
+dirregWithName (const char *name)
 {
         int hkey;
         reg_info *reg;
@@ -765,7 +765,7 @@ allocDirReg (operand *op )
 /* allocRegByName - allocates register with given name             */
 /*-----------------------------------------------------------------*/
 reg_info *
-allocRegByName (char *name, int size)
+allocRegByName (const char *name, int size)
 {
 
         reg_info *reg;
@@ -2447,7 +2447,7 @@ createRegMask (eBBlock ** ebbs, int count)
 /* regTypeNum - computes the type & number of registers required   */
 /*-----------------------------------------------------------------*/
 static void
-regTypeNum ()
+regTypeNum (void)
 {
         symbol *sym;
         int k;

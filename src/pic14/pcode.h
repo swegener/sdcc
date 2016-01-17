@@ -796,11 +796,11 @@ typedef struct peepCommand {
  * pCode functions.
  *-----------------------------------------------------------------*/
 
-pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
-pCode *newpCodeCharP(char *cP);              // Create a new pCode given a char *
-pCode *newpCodeFunction(char *g, char *f,int); // Create a new function
-pCode *newpCodeLabel(char *name,int key);    // Create a new label given a key
-pCode *newpCodeCSource(int ln, char *f, const char *l); // Create a new symbol line 
+pCode *newpCode(PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
+pCode *newpCodeCharP(const char *cP);              // Create a new pCode given a char *
+pCode *newpCodeFunction(const char *g, const char *f, int); // Create a new function.
+pCode *newpCodeLabel(const char *name,int key);    // Create a new label given a key
+pCode *newpCodeCSource(int ln, const char *f, const char *l); // Create a new symbol line.
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label);
 pCode *findNextInstruction(pCode *pci);
 pCode *findPrevInstruction(pCode *pci);
@@ -827,15 +827,15 @@ void pCodeInsertAfter(pCode *pc1, pCode *pc2);
 void pCodeInsertBefore(pCode *pc1, pCode *pc2);
 void pCodeDeleteChain(pCode *f,pCode *t);
 
-pCode *newpCodeAsmDir(char *asdir, char *argfmt, ...); 
+pCode *newpCodeAsmDir(const char *asdir, const char *argfmt, ...); 
 
-pCodeOp *newpCodeOpLabel(char *name, int key);
-pCodeOp *newpCodeOpImmd(char *name, int offset, int index, int code_space,int is_func);
+pCodeOp *newpCodeOpLabel(const char *name, int key);
+pCodeOp *newpCodeOpImmd(const char *name, int offset, int index, int code_space,int is_func);
 pCodeOp *newpCodeOpLit(int lit);
-pCodeOp *newpCodeOpBit(char *name, int bit,int inBitSpace);
+pCodeOp *newpCodeOpBit(const char *name, int bit,int inBitSpace);
 pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype);
-pCodeOp *newpCodeOpRegFromStr(char *name);
-pCodeOp *newpCodeOp(char *name, PIC_OPTYPE p);
+pCodeOp *newpCodeOpRegFromStr(const char *name);
+pCodeOp *newpCodeOp(const char *name, PIC_OPTYPE p);
 pCodeOp *pCodeOpCopy(pCodeOp *pcop);
 pCodeOp *popCopyGPR2Bit(pCodeOp *pc, int bitval);
 pCodeOp *popCopyReg(pCodeOpReg *pc);
@@ -877,8 +877,8 @@ extern pCodeInstruction *pic14Mnemonics[MAX_PIC14MNEMONICS];
 /*
  * From pcodepeep.h:
  */
-int getpCode(char *mnem, unsigned dest);
-int getpCodePeepCommand(char *cmd);
+int getpCode(const char *mnem, unsigned dest);
+int getpCodePeepCommand(const char *cmd);
 int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip);
 
 #endif // __PCODE_H__

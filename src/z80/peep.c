@@ -99,7 +99,7 @@ isReturned(const char *what)
       if(sym->type->select.d.dcl_type != FUNCTION)
         NOTUSEDERROR();
       spec = &(sym->etype->select.s);
-      if(spec->noun == V_VOID)
+      if(spec->noun == V_VOID || spec->noun == V_INT && spec->b_longlong) // long long is not returned via registers for the Z80-related ports
         size = 0;
       else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
         size = 1;

@@ -4,6 +4,8 @@
 	  Debug info for block-copy-initialized global variables, patch #262 by Peter Dons Tychsen.
 	* src/SDCCdwarf2.c:
 	  Fix handling of declared, but unused global vairables in debug output, patch #263 by Peter Dons Tychsen.
+	* src/z80/peep.c:
+	  More accurate handling of functions returning long long for peephole optimizer.
 
 2016-01-18 Ben Shi <powerstudio1st AT 163 DOT com>
 

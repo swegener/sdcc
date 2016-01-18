@@ -10,6 +10,26 @@
 	* src/SDCCicode.c:
 	  Fix pointer dereference issue, patch #261 by Peter Dons Tychsen.
 
+2016-01-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* device/non-free/include/pic14/*.h,
+	  device/non-free/include/pic16/*.h,
+	  device/non-free/lib/pic14/libdev/*.c,
+	  device/non-free/lib/pic16/libdev/*.c:
+	  Updated the device files.
+
+2016-01-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* src/pic14/pcode.c,
+	  src/pic14/pcode.h,
+	  src/pic16/ralloc.c,
+	  src/pic16/ralloc.h,
+	  src/pic16/pcodepeep.c,
+	  src/pic16/ralloc.c,
+	  src/pic16/ralloc.h:
+	  On more place I exchanged the "char *" to "const char *".
+
+	* src/regression/Makefile:
+	  Added the option to CFLAGS: --no-warn-non-free
+
 2016-01-16 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* src/pic14/gen.c,
 	  src/pic14/pcode.c:

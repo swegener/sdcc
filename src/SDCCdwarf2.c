@@ -2866,8 +2866,12 @@ dwWriteSymbol (symbol *sym)
   if (IS_FUNC (sym->type))
     return 1;
 
-  /* If it is an iTemp, then it is not a C source symbol; ignore it */
+  /* If it is an iTemp, then it is a local variable; ignore it */
   if (sym->isitmp)
+    return 1;
+
+  /* If it is an unused extern ignore it, or it might produce link failure */
+  if (IS_EXTERN (sym->etype) && !sym->used)
     return 1;
 
   /* Ignore parameters; they must be handled specially so that they will */

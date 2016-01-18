@@ -1918,8 +1918,7 @@ geniCodeRValue (operand * op, bool force)
 
   /* if this is an array & already */
   /* a resolved address then return this   */
-  if ((IS_ARRAY (type) && !IS_PTR (type->next)) ||
-      IS_STRUCT (type) || (IS_PTR (type) && !force && !op->isaddr))
+  if ((IS_ARRAY (type) && !IS_FUNCPTR (type->next)) || IS_STRUCT (type) || (IS_PTR (type) && !force && !op->isaddr))
     return operandFromOperand (op);
 
   /* if this is not an address then must be */
@@ -1944,7 +1943,7 @@ geniCodeRValue (operand * op, bool force)
     }
 
   ic = newiCode (GET_VALUE_AT_ADDRESS, op, operandFromLit (0));
-  if (IS_PTR (type) && op->isaddr && force)
+  if ((IS_PTR (type) && op->isaddr && force) || IS_ARRAY (type))
     type = type->next;
 
   type = copyLinkChain (type);

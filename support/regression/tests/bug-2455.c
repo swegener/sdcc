@@ -40,4 +40,12 @@ void testBug (void)
   ASSERT (testS.fpa[0] (5) == -1);
   ASSERT (testS.fpa[1] (9) == 18);
   ASSERT (testS.fpb (5) == 7);
+
+  testS.fpb = testS.fpa[0];
+  testS.fpa[0] = testS.fpa[1];
+  testS.fpa[1] = foo0;
+
+  ASSERT (testS.fpa[0] (5) == 10);
+  ASSERT (testS.fpa[1] (9) == 11);
+  ASSERT (testS.fpb (5) == -1);
 }

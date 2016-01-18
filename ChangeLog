@@ -1,3 +1,8 @@
+2016-01-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCdebug.c:
+	  Debug info for block-copy-initialized global variables, patch #262 by Peter Dons Tychsen.
+
 2016-01-18 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCicode.c

@@ -525,10 +525,10 @@ printOptions (const OPTION * optionsTable, FILE * stream)
 /* printUsage - prints command line syntax         */
 /*-----------------------------------------------------------------*/
 static void
-printUsage (void)
+printUsage (bool err)
 {
   int i;
-  FILE *stream = stderr;
+  FILE *stream = err ? stderr : stdout;
 
   printVersionInfo (stream);
   fprintf (stream,
@@ -989,7 +989,7 @@ parseCmdLine (int argc, char **argv)
             }
           if (strcmp (argv[i], OPTION_HELP) == 0)
             {
-              printUsage ();
+              printUsage (FALSE);
               exit (EXIT_SUCCESS);
             }
 
@@ -1250,7 +1250,7 @@ parseCmdLine (int argc, char **argv)
             case 'h':
               verifyShortOption (argv[i]);
 
-              printUsage ();
+              printUsage (FALSE);
               exit (EXIT_SUCCESS);
               break;
 
@@ -2517,7 +2517,7 @@ main (int argc, char **argv, char **envp)
     {
       if (options.printSearchDirs)
         exit (EXIT_SUCCESS);
-      printUsage ();
+      printUsage (TRUE);
       exit (EXIT_FAILURE);
     }
 

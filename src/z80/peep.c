@@ -269,9 +269,9 @@ z80MightRead(const lineNode *pl, const char *what)
     return(isReturned(what));
 
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
-    return(!strchr(what, 'h') || !strchr(what, 'l'));
+    return(!strcmp(what, "h") || !strcmp(what, "l"));
   if(!strcmp(pl->line, "ex\tde, hl") || !strcmp(pl->line, "ex\tde,hl"))
-    return(!strchr(what, 'h') || !strchr(what, 'l') || !strchr(what, 'd') || !strchr(what, 'e'));
+    return(!strcmp(what, "h") || !strcmp(what, "l") || !strcmp(what, "d") || !strcmp(what, "e"));
   if(ISINST(pl->line, "ld\t"))
     {
       if(strstr(strchr(pl->line, ','), what) && strchr(pl->line, ',')[1] != '#' && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[2] == '#') && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[3] != ')' && strchr(pl->line, ',')[4] != ')'))
@@ -324,7 +324,7 @@ z80MightRead(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
     return(FALSE);
 
-  // Rotate and shift group (todo: rld rrd, maybe sll)
+  // Rotate and shift group
   if(ISINST(pl->line, "rlca") ||
      ISINST(pl->line, "rla")  ||
      ISINST(pl->line, "rrca") ||
@@ -344,6 +344,10 @@ z80MightRead(const lineNode *pl, const char *what)
     {
       return(argCont(pl->line + 4, what));
     }
+  if(!IS_GB && !IS_RAB &&
+    (ISINST(pl->line, "rld") ||
+     ISINST(pl->line, "rrd")))
+    return(strstr("ahl", what));
 
   // Bit set, reset and test group
   if(ISINST(pl->line, "bit\t") ||

@@ -191,7 +191,7 @@ findLabel (const lineNode *pl)
   /* 3. search lineNode with label definition and return it */
   for (cpl = _G.head; cpl; cpl = cpl->next)
     {
-      if (   cpl->isLabel
+      if (cpl->isLabel
           && strncmp (p, cpl->line, strlen(p)) == 0)
         {
           return cpl;
@@ -203,7 +203,9 @@ findLabel (const lineNode *pl)
 /* Check if reading arg implies reading what. */
 static bool argCont(const char *arg, const char *what)
 {
-  return (arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
+  while(isspace (*arg) || *arg == ',')
+    arg++;
+  return(arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
 }
 
 static bool

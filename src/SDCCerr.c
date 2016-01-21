@@ -525,6 +525,8 @@ struct
     "wide character string of type L requires C95 or later", 0},
   { E_WCHAR_STRING_C11, ERROR_LEVEL_ERROR,
     "wide character string of type u8, u, U requires C11 or later", 0},
+  { W_UNKNOWN_REG, ERROR_LEVEL_WARNING,
+    "unknown register specification", 0},
 };
 
 /* -------------------------------------------------------------------------------

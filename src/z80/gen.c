@@ -3803,6 +3803,9 @@ _saveRegsForCall (const iCode * ic, bool dontsaveIY)
      o ...
    */
 
+  sym_link *dtype = operandType (IC_LEFT (ic));
+  sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
+
   if (_G.saves.saved == FALSE)
     {
       bool push_bc, push_de, push_hl, push_iy;
@@ -3827,8 +3830,8 @@ _saveRegsForCall (const iCode * ic, bool dontsaveIY)
         }
       else
         {
-          push_bc = bitVectBitValue (ic->rSurv, B_IDX) || bitVectBitValue (ic->rSurv, C_IDX);
-          push_de = bitVectBitValue (ic->rSurv, D_IDX) || bitVectBitValue (ic->rSurv, E_IDX);
+          push_bc = bitVectBitValue (ic->rSurv, B_IDX) && !ftype->funcAttrs.preserved_regs[B_IDX] || bitVectBitValue (ic->rSurv, C_IDX) && !ftype->funcAttrs.preserved_regs[C_IDX];
+          push_de = bitVectBitValue (ic->rSurv, D_IDX) && !ftype->funcAttrs.preserved_regs[D_IDX] || bitVectBitValue (ic->rSurv, E_IDX) && !ftype->funcAttrs.preserved_regs[E_IDX];
           push_hl = bitVectBitValue (ic->rSurv, H_IDX) || bitVectBitValue (ic->rSurv, L_IDX);
           push_iy = !dontsaveIY && (bitVectBitValue (ic->rSurv, IYH_IDX) || bitVectBitValue (ic->rSurv, IYL_IDX));
         }

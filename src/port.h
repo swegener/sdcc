@@ -321,6 +321,8 @@ typedef struct
       Used so that 'reg_info' can be an incomplete type. */
   const char *(*getRegName) (const struct reg_info *reg);
 
+  int (*getRegByName) (const char *name);
+
   /** Try to keep track of register contents. */
   bool (*rtrackUpdate)(const char* line);
 

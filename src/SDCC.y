@@ -104,7 +104,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
 %token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 %token ASM
 
@@ -278,6 +278,22 @@ function_attributes
                      }
    |  Z88DK_CALLEE   {  $$ = newLink (SPECIFIER);
                         FUNC_ISZ88DK_CALLEE($$) = 1;
+                     }
+   |  PRESERVES_REGS '(' identifier_list ')'
+                     {
+                        $$ = newLink (SPECIFIER);
+
+                        for(const struct symbol *regsym = $3; regsym; regsym = regsym->next)
+                          {
+                            int regnum;
+
+                            if (!port->getRegByName || ((regnum = port->getRegByName(regsym->name)) < 0))
+                              {
+                                werror (W_UNKNOWN_REG);
+                                break;
+                              }
+                            $$->funcAttrs.preserved_regs[regnum] = TRUE;
+                          }
                      }
    ;
 

@@ -442,8 +442,35 @@ z80SurelyWrites(const lineNode *pl, const char *what)
     return TRUE;
   if(ISINST(pl->line, "pop\t") && strstr(pl->line + 4, what))
     return TRUE;
-  if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0  && strcmp(what, "ix"))
-    return TRUE;
+  if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0)
+    {
+      const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+
+      if(!strcmp(what, "ix"))
+        return FALSE;
+
+      if(f)
+        {
+          sym_link *ftype = f->type;
+
+          if(!strcmp(what, "c"))
+            return !ftype->funcAttrs.preserved_regs[C_IDX];
+          if(!strcmp(what, "b"))
+            return !ftype->funcAttrs.preserved_regs[B_IDX];
+          if(!strcmp(what, "e"))
+            return !ftype->funcAttrs.preserved_regs[E_IDX];
+          if(!strcmp(what, "d"))
+            return !ftype->funcAttrs.preserved_regs[D_IDX];
+          if(!strcmp(what, "l"))
+            return !ftype->funcAttrs.preserved_regs[L_IDX];
+          if(!strcmp(what, "h"))
+            return !ftype->funcAttrs.preserved_regs[H_IDX];
+          if(!strcmp(what, "iy"))
+            return !ftype->funcAttrs.preserved_regs[IYL_IDX] && !ftype->funcAttrs.preserved_regs[IYH_IDX];
+        }
+      else
+        return FALSE; // Err on the safe side. TODO: Make it more exact (similar to handling of reg parms in z80MightRead() above) to help with calls through function pointers.
+    }
   if(strcmp(pl->line, "ret") == 0)
     return TRUE;
   if(ISINST(pl->line, "ld\tiy") && strncmp(what, "iy", 2) == 0)

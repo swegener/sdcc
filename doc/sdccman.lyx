@@ -23521,6 +23521,23 @@ and you can use the same hardware dependent routine without changes, as
 \end_layout
 
 \begin_layout Subsection
+Preserved register specification
+\end_layout
+
+\begin_layout Standard
+SDCC allows to specify preserved registers in function declarations, to
+ enable further optimizations on calls to functions implemented in assembler.
+ Example for the Z80 architecture specifying that a function will preserve
+ register pairs bc and iy:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+void f(void) __preserves_regs(b, c, iyl, iyh);
+\end_layout
+
+\begin_layout Subsection
 Binary constants
 \begin_inset Index idx
 status open

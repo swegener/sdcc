@@ -13,6 +13,8 @@
 	* device/include/stdlib.h,
 	  device/include/string.h:
 	  Preserved register information on standard functions.
+	* doc/sdccman.lyx:
+	  Document syntax for specifying preserved registers.
 
 2016-01-20 Philipp Klaus Krause <pkk AT spth.de>
 

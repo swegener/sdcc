@@ -57,6 +57,7 @@ static struct
 
 extern bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
 extern bool z80_symmParm_in_calls_from_current_function;
+extern bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 /*-----------------------------------------------------------------*/
 /* univisitLines - clear "visited" flag in all lines               */
@@ -449,31 +450,30 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "call\t") && strchr(pl->line, ',') == 0)
     {
       const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
+      const bool *preserved_regs;
 
       if(!strcmp(what, "ix"))
         return FALSE;
 
       if(f)
-        {
-          sym_link *ftype = f->type;
+          preserved_regs = f->type->funcAttrs.preserved_regs;
+      else // Err on the safe side.
+        preserved_regs = z80_regs_preserved_in_calls_from_current_function;
 
-          if(!strcmp(what, "c"))
-            return !ftype->funcAttrs.preserved_regs[C_IDX];
-          if(!strcmp(what, "b"))
-            return !ftype->funcAttrs.preserved_regs[B_IDX];
-          if(!strcmp(what, "e"))
-            return !ftype->funcAttrs.preserved_regs[E_IDX];
-          if(!strcmp(what, "d"))
-            return !ftype->funcAttrs.preserved_regs[D_IDX];
-          if(!strcmp(what, "l"))
-            return !ftype->funcAttrs.preserved_regs[L_IDX];
-          if(!strcmp(what, "h"))
-            return !ftype->funcAttrs.preserved_regs[H_IDX];
-          if(!strcmp(what, "iy"))
-            return !ftype->funcAttrs.preserved_regs[IYL_IDX] && !ftype->funcAttrs.preserved_regs[IYH_IDX];
-        }
-      else
-        return FALSE; // Err on the safe side. TODO: Make it more exact (similar to handling of reg parms in z80MightRead() above) to help with calls through function pointers.
+      if(!strcmp(what, "c"))
+        return !preserved_regs[C_IDX];
+      if(!strcmp(what, "b"))
+        return !preserved_regs[B_IDX];
+      if(!strcmp(what, "e"))
+        return !preserved_regs[E_IDX];
+      if(!strcmp(what, "d"))
+        return !preserved_regs[D_IDX];
+      if(!strcmp(what, "l"))
+        return !preserved_regs[L_IDX];
+      if(!strcmp(what, "h"))
+        return !preserved_regs[H_IDX];
+      if(!strcmp(what, "iy"))
+        return !preserved_regs[IYL_IDX] && !preserved_regs[IYH_IDX];
     }
   if(strcmp(pl->line, "ret") == 0)
     return TRUE;

@@ -241,6 +241,7 @@ static struct
 
 bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
 bool z80_symmParm_in_calls_from_current_function;
+bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop * aop, int offset, bool bit16);
 
@@ -4196,8 +4197,12 @@ emitCall (const iCode *ic, bool ispcall)
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
+  int i;
 
   z88dk_callee = IFFUNC_ISZ88DK_CALLEE (ftype);
+
+  for (i = 0; i < IYH_IDX + 1; i++)
+    z80_regs_preserved_in_calls_from_current_function[i] |= ftype->funcAttrs.preserved_regs[i];
 
   _saveRegsForCall (ic, FALSE);
 
@@ -12112,6 +12117,7 @@ genZ80Code (iCode * lic)
 
   memset(z80_regs_used_as_parms_in_calls_from_current_function, 0, sizeof(bool) * (IYH_IDX + 1));
   z80_symmParm_in_calls_from_current_function = TRUE;
+  memset(z80_regs_preserved_in_calls_from_current_function, 0, sizeof(bool) * (IYH_IDX + 1));
 
   /* if debug information required */
   if (options.debug && currFunc)

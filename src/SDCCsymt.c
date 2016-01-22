@@ -2394,6 +2394,7 @@ compareFuncType (sym_link * dest, sym_link * src)
   value *exargs, *acargs;
   value *checkValue;
   int argCnt = 0;
+  int i;
 
   /* if not type then some kind of error */
   if (!dest || !src)
@@ -2426,6 +2427,10 @@ compareFuncType (sym_link * dest, sym_link * src)
   if (IFFUNC_ISZ88DK_FASTCALL (dest) != IFFUNC_ISZ88DK_FASTCALL (src) ||
     IFFUNC_ISZ88DK_CALLEE (dest) != IFFUNC_ISZ88DK_CALLEE (src))
     return 0;
+
+  for (i = 0; i < 9; i++)
+    if (dest->funcAttrs.preserved_regs[i] > src->funcAttrs.preserved_regs[i])
+      return 0;
 
   /* compare register bank */
   if (FUNC_REGBANK (dest) != FUNC_REGBANK (src))

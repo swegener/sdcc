@@ -3,6 +3,8 @@
 	* src/z80/gen.c,
 	  src/z80/peep.c:
 	  Make estimate for preserved regs on function pointers less conservative.
+	* src/SDCCsymt.c:
+	  Consider preserved regs for type of function pointer.
 
 2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
 

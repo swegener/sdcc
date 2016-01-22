@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   peep.c - source file for peephole optimizer helper functions
 
-  Written By -  Philipp Klaus Krause
+  Written By - Philipp Klaus Krause
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -166,12 +166,12 @@ findLabel (const lineNode *pl)
 
   /* 1. extract label in opcode */
 
-  /* In each mcs51 jumping opcode the label is at the end of the opcode */
+  /* In each z80 jumping opcode the label is at the end of the opcode */
   p = strlen (pl->line) - 1 + pl->line;
 
   /* scan backward until ',' or '\t' */
   for (; p > pl->line; p--)
-    if (*p == ',' || *p == '\t')
+    if (*p == ',' || isspace(*p))
       break;
 
   /* sanity check */
@@ -272,6 +272,10 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
     return(!strcmp(what, "h") || !strcmp(what, "l"));
+  if(!strcmp(pl->line, "ex\t(sp), ix") || !strcmp(pl->line, "ex\t(sp),ix"))
+    return(strstr(what, "ix"));
+  if(!strcmp(pl->line, "ex\t(sp), iy") || !strcmp(pl->line, "ex\t(sp),iy"))
+    return(strstr(what, "iy"));
   if(!strcmp(pl->line, "ex\tde, hl") || !strcmp(pl->line, "ex\tde,hl"))
     return(!strcmp(what, "h") || !strcmp(what, "l") || !strcmp(what, "d") || !strcmp(what, "e"));
   if(ISINST(pl->line, "ld\t"))

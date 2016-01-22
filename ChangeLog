@@ -1,3 +1,8 @@
+2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  More accurate handling of conditional jumps, handle ex (sp), ix and ex (sp), iy.
+
 2016-01-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.y:

@@ -2318,3 +2318,39 @@ glue (void)
     }
   fclose (asmFile);
 }
+
+/* will return 1 if the string is a part
+   of a target specific keyword */
+int
+isTargetKeyword (const char *s)
+{
+  int i;
+
+  if (port->keywords == NULL)
+    return 0;
+
+  if (s[0] == '_' && s[1] == '_')
+    {
+      /* Keywords in the port's array have either 0 or 1 underscore, */
+      /* so skip over the appropriate number of chars when comparing */
+      for (i = 0 ; port->keywords[i] ; i++ )
+        {
+          if (port->keywords[i][0] == '_' &&
+              strcmp(port->keywords[i],s+1) == 0)
+            return 1;
+          else if (strcmp(port->keywords[i],s+2) == 0)
+            return 1;
+        }
+    }
+  else
+    {
+      for (i = 0 ; port->keywords[i] ; i++ )
+        {
+          if (strcmp(port->keywords[i],s) == 0)
+            return 1;
+        }
+    }
+
+  return 0;
+}
+

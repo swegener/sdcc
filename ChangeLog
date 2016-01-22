@@ -1,5 +1,12 @@
 2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCsymt.c,
+	  src/SDCCglue.h,
+	  src/SDCCglue.c:
+	  Do not display meaningless __reentrent to users.
+
+2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/peep.c:
 	  Make estimate for preserved regs on function pointers less conservative.

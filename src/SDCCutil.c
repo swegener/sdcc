@@ -1146,3 +1146,4 @@ char *setPrefixSuffix(const char *arg)
 
   return cmd;
 }
+

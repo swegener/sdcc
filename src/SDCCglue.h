@@ -40,4 +40,6 @@ extern set *strSym;
 
 int pointerTypeToGPByte (const int p_type, const char *iname, const char *oname);
 
+int isTargetKeyword (const char *s);
+
 #endif

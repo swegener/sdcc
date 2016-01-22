@@ -3428,7 +3428,7 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                     dbuf_append_str (dbuf, ", ");
                 }
               dbuf_append_str (dbuf, ")");
-              if (IFFUNC_ISREENT (type))
+              if (IFFUNC_ISREENT (type) && isTargetKeyword("__reentrant"))
                 dbuf_append_str (dbuf, " __reentrant");
               if (FUNC_REGBANK (type))
                 {

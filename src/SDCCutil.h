@@ -177,3 +177,4 @@ void getPrefixSuffix(const char *);
 char *setPrefixSuffix(const char *);
 
 #endif
+

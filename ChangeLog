@@ -1,3 +1,19 @@
+2016-01-23 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure
+	* configure.ac
+	* debugger/mcs51/configure
+	* debugger/mcs51/configure.ac
+	* support/cpp/configure
+	* support/cpp/configure.ac
+	* support/packihx/configure
+	* support/packihx/configure.ac
+	  Try to use C99 first.
+	* src/SDCC.lex
+	  Remove a duplicate function definition.
+	* src/SDCC.y
+	  Change to C99 style.
+
 2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c,

@@ -227,13 +227,15 @@ pCodeInstruction pic16_pciADDWF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_STATUS), // outCond
@@ -255,13 +257,15 @@ pCodeInstruction pic16_pciADDFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_STATUS), // outCond
@@ -283,13 +287,15 @@ pCodeInstruction pic16_pciADDWFC = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_REGISTER | PCC_STATUS), // outCond
@@ -311,13 +317,15 @@ pCodeInstruction pic16_pciADDFWC = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_W | PCC_STATUS), // outCond
@@ -339,13 +347,15 @@ pCodeInstruction pic16_pciADDLW = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_STATUS), // outCond
@@ -367,13 +377,15 @@ pCodeInstruction pic16_pciANDLW = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_N), // outCond
@@ -395,13 +407,15 @@ pCodeInstruction pic16_pciANDWF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N), // outCond
@@ -423,13 +437,15 @@ pCodeInstruction pic16_pciANDFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_N), // outCond
@@ -451,13 +467,15 @@ pCodeInstruction pic16_pciBC = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_C),   // inCond
   PCC_NONE,    // outCond
@@ -479,13 +497,15 @@ pCodeInstruction pic16_pciBCF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,1,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  TRUE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_BSF,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_REGISTER, // outCond
@@ -507,13 +527,15 @@ pCodeInstruction pic16_pciBN = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_N),   // inCond
   PCC_NONE   , // outCond
@@ -535,13 +557,15 @@ pCodeInstruction pic16_pciBNC = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_C),   // inCond
   PCC_NONE   , // outCond
@@ -563,13 +587,15 @@ pCodeInstruction pic16_pciBNN = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_N),   // inCond
   PCC_NONE   , // outCond
@@ -591,13 +617,15 @@ pCodeInstruction pic16_pciBNOV = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_OV),   // inCond
   PCC_NONE   , // outCond
@@ -619,13 +647,15 @@ pCodeInstruction pic16_pciBNZ = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_Z),   // inCond
   PCC_NONE   , // outCond
@@ -647,13 +677,15 @@ pCodeInstruction pic16_pciBOV = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_OV),   // inCond
   PCC_NONE , // outCond
@@ -675,13 +707,15 @@ pCodeInstruction pic16_pciBRA = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REL_ADDR,   // inCond
   PCC_NONE   , // outCond
@@ -703,13 +737,15 @@ pCodeInstruction pic16_pciBSF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,1,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  TRUE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_BCF,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   (PCC_REGISTER | PCC_EXAMINE_PCOP), // outCond
@@ -731,13 +767,15 @@ pCodeInstruction pic16_pciBTFSC = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,1,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  TRUE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_BTFSS,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_EXAMINE_PCOP, // outCond
@@ -759,13 +797,15 @@ pCodeInstruction pic16_pciBTFSS = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,1,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  TRUE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_BTFSC,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   PCC_EXAMINE_PCOP, // outCond
@@ -787,13 +827,15 @@ pCodeInstruction pic16_pciBTG = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,1,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  TRUE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
   (PCC_REGISTER | PCC_EXAMINE_PCOP), // outCond
@@ -815,13 +857,15 @@ pCodeInstruction pic16_pciBZ = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REL_ADDR | PCC_Z),   // inCond
   PCC_NONE, // outCond
@@ -843,13 +887,15 @@ pCodeInstruction pic16_pciCALL = {
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  1,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  TRUE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE, // inCond
   PCC_NONE, // outCond
@@ -871,13 +917,15 @@ pCodeInstruction pic16_pciCOMF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,  // inCond
   (PCC_REGISTER | PCC_Z | PCC_N) , // outCond
@@ -899,13 +947,15 @@ pCodeInstruction pic16_pciCOMFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,  // inCond
   (PCC_W | PCC_Z | PCC_N) , // outCond
@@ -927,13 +977,15 @@ pCodeInstruction pic16_pciCLRF = {
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE, // inCond
   (PCC_REGISTER | PCC_Z), // outCond
@@ -955,13 +1007,15 @@ pCodeInstruction pic16_pciCLRWDT = {
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE, // inCond
   PCC_NONE , // outCond
@@ -983,13 +1037,15 @@ pCodeInstruction pic16_pciCPFSEQ = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER), // inCond
   PCC_NONE , // outCond
@@ -1011,13 +1067,15 @@ pCodeInstruction pic16_pciCPFSGT = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER), // inCond
   PCC_NONE , // outCond
@@ -1039,13 +1097,15 @@ pCodeInstruction pic16_pciCPFSLT = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  1,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER), // inCond
   PCC_NONE , // outCond
@@ -1066,14 +1126,16 @@ pCodeInstruction pic16_pciDAW = {
   NULL, // operand
   NULL, // flow block
   NULL, // C source
-  0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,    // num ops
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_W, // inCond
   (PCC_W | PCC_C), // outCond
@@ -1095,13 +1157,15 @@ pCodeInstruction pic16_pciDCFSNZ = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER, // inCond
   PCC_REGISTER , // outCond
@@ -1123,13 +1187,15 @@ pCodeInstruction pic16_pciDCFSNZW = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER, // inCond
   PCC_W , // outCond
@@ -1151,13 +1217,15 @@ pCodeInstruction pic16_pciDECF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_REGISTER | PCC_STATUS)  , // outCond
@@ -1179,13 +1247,15 @@ pCodeInstruction pic16_pciDECFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_STATUS)  , // outCond
@@ -1207,13 +1277,15 @@ pCodeInstruction pic16_pciDECFSZ = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER   , // outCond
@@ -1235,13 +1307,15 @@ pCodeInstruction pic16_pciDECFSZW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_W          , // outCond
@@ -1263,13 +1337,15 @@ pCodeInstruction pic16_pciGOTO = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REL_ADDR,   // inCond
   PCC_NONE   , // outCond
@@ -1291,13 +1367,15 @@ pCodeInstruction pic16_pciINCF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_REGISTER | PCC_STATUS), // outCond
@@ -1319,13 +1397,15 @@ pCodeInstruction pic16_pciINCFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_STATUS)  , // outCond
@@ -1347,13 +1427,15 @@ pCodeInstruction pic16_pciINCFSZ = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_INFSNZ,
   PCC_REGISTER,   // inCond
   PCC_REGISTER   , // outCond
@@ -1375,13 +1457,15 @@ pCodeInstruction pic16_pciINCFSZW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_INFSNZW,
   PCC_REGISTER,   // inCond
   PCC_W          , // outCond
@@ -1403,13 +1487,15 @@ pCodeInstruction pic16_pciINFSNZ = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_INCFSZ,
   PCC_REGISTER,   // inCond
   PCC_REGISTER   , // outCond
@@ -1431,13 +1517,15 @@ pCodeInstruction pic16_pciINFSNZW = { // vrokas - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_INCFSZW,
   PCC_REGISTER,   // inCond
   PCC_W          , // outCond
@@ -1459,13 +1547,15 @@ pCodeInstruction pic16_pciIORWF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N), // outCond
@@ -1487,13 +1577,15 @@ pCodeInstruction pic16_pciIORFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_N), // outCond
@@ -1515,13 +1607,15 @@ pCodeInstruction pic16_pciIORLW = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_N), // outCond
@@ -1543,13 +1637,15 @@ pCodeInstruction pic16_pciLFSR = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  1,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  TRUE,    // second literal operand
   POC_NOP,
   PCC_LITERAL, // inCond
   PCC_NONE, // outCond
@@ -1571,13 +1667,15 @@ pCodeInstruction pic16_pciMOVF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_Z | PCC_N), // outCond
@@ -1599,13 +1697,15 @@ pCodeInstruction pic16_pciMOVFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_N | PCC_Z), // outCond
@@ -1627,13 +1727,15 @@ pCodeInstruction pic16_pciMOVFF = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  1,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  TRUE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_REGISTER2, // outCond
@@ -1654,13 +1756,15 @@ pCodeInstruction pic16_pciMOVLB = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_NONE | PCC_LITERAL),   // inCond
   PCC_REGISTER, // outCond - BSR
@@ -1681,13 +1785,15 @@ pCodeInstruction pic16_pciMOVLW = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_NONE | PCC_LITERAL),   // inCond
   PCC_W, // outCond
@@ -1709,13 +1815,15 @@ pCodeInstruction pic16_pciMOVWF = {
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_W,   // inCond
   PCC_REGISTER, // outCond
@@ -1736,13 +1844,15 @@ pCodeInstruction pic16_pciMULLW = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   PCC_NONE, // outCond - PROD
@@ -1763,13 +1873,15 @@ pCodeInstruction pic16_pciMULWF = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   PCC_REGISTER, // outCond - PROD
@@ -1790,13 +1902,15 @@ pCodeInstruction pic16_pciNEGF = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER, // inCond
   (PCC_REGISTER | PCC_STATUS), // outCond
@@ -1817,13 +1931,15 @@ pCodeInstruction pic16_pciNOP = {
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE, // outCond
@@ -1844,13 +1960,15 @@ pCodeInstruction pic16_pciPOP = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -1871,13 +1989,15 @@ pCodeInstruction pic16_pciPUSH = {
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -1898,13 +2018,15 @@ pCodeInstruction pic16_pciRCALL = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REL_ADDR,  // inCond
   PCC_NONE  , // outCond
@@ -1926,13 +2048,15 @@ pCodeInstruction pic16_pciRETFIE = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  1,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  TRUE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE,    // outCond (not true... affects the GIE bit too)
@@ -1954,13 +2078,15 @@ pCodeInstruction pic16_pciRETLW = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_LITERAL,   // inCond
   PCC_W, // outCond
@@ -1982,13 +2108,15 @@ pCodeInstruction pic16_pciRETURN = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  1,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  1,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  TRUE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE, // outCond
@@ -2009,13 +2137,15 @@ pCodeInstruction pic16_pciRLCF = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_C | PCC_Z | PCC_N), // outCond
@@ -2037,13 +2167,15 @@ pCodeInstruction pic16_pciRLCFW = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_W | PCC_C | PCC_Z | PCC_N), // outCond
@@ -2065,13 +2197,15 @@ pCodeInstruction pic16_pciRLNCF = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N), // outCond
@@ -2092,13 +2226,15 @@ pCodeInstruction pic16_pciRLNCFW = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_Z | PCC_N), // outCond
@@ -2119,13 +2255,15 @@ pCodeInstruction pic16_pciRRCF = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_C | PCC_Z | PCC_N), // outCond
@@ -2146,13 +2284,15 @@ pCodeInstruction pic16_pciRRCFW = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_C | PCC_REGISTER),   // inCond
   (PCC_W | PCC_C | PCC_Z | PCC_N), // outCond
@@ -2173,13 +2313,15 @@ pCodeInstruction pic16_pciRRNCF = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N), // outCond
@@ -2201,13 +2343,15 @@ pCodeInstruction pic16_pciRRNCFW = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   (PCC_W | PCC_Z | PCC_N), // outCond
@@ -2229,13 +2373,15 @@ pCodeInstruction pic16_pciSETF = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_REGISTER  , // outCond
@@ -2257,13 +2403,15 @@ pCodeInstruction pic16_pciSUBLW = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_STATUS), // outCond
@@ -2285,13 +2433,15 @@ pCodeInstruction pic16_pciSUBFWB = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_W | PCC_STATUS), // outCond
@@ -2313,13 +2463,15 @@ pCodeInstruction pic16_pciSUBWF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_STATUS), // outCond
@@ -2341,13 +2493,15 @@ pCodeInstruction pic16_pciSUBFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_STATUS), // outCond
@@ -2369,13 +2523,15 @@ pCodeInstruction pic16_pciSUBFWB_D1 = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_REGISTER | PCC_STATUS), // outCond
@@ -2397,13 +2553,15 @@ pCodeInstruction pic16_pciSUBFWB_D0 = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_W | PCC_STATUS), // outCond
@@ -2425,13 +2583,15 @@ pCodeInstruction pic16_pciSUBWFB_D1 = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_REGISTER | PCC_STATUS), // outCond
@@ -2453,13 +2613,15 @@ pCodeInstruction pic16_pciSUBWFB_D0 = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER | PCC_C),   // inCond
   (PCC_W | PCC_STATUS), // outCond
@@ -2481,13 +2643,15 @@ pCodeInstruction pic16_pciSWAPF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REGISTER),   // inCond
   (PCC_REGISTER), // outCond
@@ -2509,13 +2673,15 @@ pCodeInstruction pic16_pciSWAPFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_REGISTER),   // inCond
   (PCC_W), // outCond
@@ -2536,13 +2702,15 @@ pCodeInstruction pic16_pciTBLRD = {     // patch 15
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -2563,13 +2731,15 @@ pCodeInstruction pic16_pciTBLRD_POSTINC = {     // patch 15
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -2590,13 +2760,15 @@ pCodeInstruction pic16_pciTBLRD_POSTDEC = {     // patch 15
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -2617,13 +2789,15 @@ pCodeInstruction pic16_pciTBLRD_PREINC = {      // patch 15
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -2644,13 +2818,15 @@ pCodeInstruction pic16_pciTBLWT = {     // patch 15
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -2671,13 +2847,15 @@ pCodeInstruction pic16_pciTBLWT_POSTINC = {     // patch 15
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -2698,13 +2876,15 @@ pCodeInstruction pic16_pciTBLWT_POSTDEC = {     // patch 15
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -2725,13 +2905,15 @@ pCodeInstruction pic16_pciTBLWT_PREINC = {      // patch 15
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,  // inCond
   PCC_NONE  , // outCond
@@ -2753,13 +2935,15 @@ pCodeInstruction pic16_pciTSTFSZ = { // mdubuc - New
   NULL, // flow block
   NULL, // C source
   2,    // num ops
-  0,0,  // dest, bit instruction
-  1,1,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  TRUE,  // branch
+  TRUE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_REGISTER,   // inCond
   PCC_NONE, // outCond
@@ -2781,13 +2965,15 @@ pCodeInstruction pic16_pciXORWF = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  1,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  TRUE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_REGISTER | PCC_Z | PCC_N), // outCond
@@ -2809,13 +2995,15 @@ pCodeInstruction pic16_pciXORFW = {
   NULL, // flow block
   NULL, // C source
   3,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_REGISTER),   // inCond
   (PCC_W | PCC_Z | PCC_N), // outCond
@@ -2837,13 +3025,15 @@ pCodeInstruction pic16_pciXORLW = {
   NULL, // flow block
   NULL, // C source
   1,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  1,    // literal operand
-  1,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  TRUE,    // literal operand
+  TRUE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   (PCC_W | PCC_LITERAL),   // inCond
   (PCC_W | PCC_Z | PCC_N), // outCond
@@ -2865,13 +3055,15 @@ pCodeInstruction pic16_pciBANKSEL = {
   NULL, // flow block
   NULL, // C source
   0,    // num ops
-  0,0,  // dest, bit instruction
-  0,0,  // branch, skip
-  0,    // literal operand
-  0,    // RAM access bit
-  0,    // fast call/return mode select bit
-  0,    // second memory operand
-  0,    // second literal operand
+  FALSE,  // dest
+  FALSE,  // bit instruction
+  FALSE,  // branch
+  FALSE,  // skip
+  FALSE,    // literal operand
+  FALSE,    // RAM access bit
+  FALSE,    // fast call/return mode select bit
+  FALSE,    // second memory operand
+  FALSE,    // second literal operand
   POC_NOP,
   PCC_NONE,   // inCond
   PCC_NONE, // outCond
@@ -3532,9 +3724,9 @@ pCode *pic16_newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optio
   pcw->operand = optional_operand;
   pcw->label   = optional_label;
 
-  pcw->mustBeBitSkipInst = 0;
-  pcw->mustNotBeBitSkipInst = 0;
-  pcw->invertBitSkipInst = 0;
+  pcw->mustBeBitSkipInst = FALSE;
+  pcw->mustNotBeBitSkipInst = FALSE;
+  pcw->invertBitSkipInst = FALSE;
 
   return ( (pCode *)pcw);
 
@@ -3842,7 +4034,7 @@ pCode *pic16_newpCodeLabel(char *name, int key)
   pcl->pc.print = pCodePrintLabel;
 
   pcl->key = key;
-  pcl->force = 0;
+  pcl->force = FALSE;
 
   pcl->label = NULL;
   if(key>0) {
@@ -3857,7 +4049,7 @@ pCode *pic16_newpCodeLabel(char *name, int key)
 //      fprintf(stderr, "%s:%d label name: %s\n", __FILE__, __LINE__, pcl->label);
 
 
-  return ( (pCode *)pcl);
+  return ((pCode *)pcl);
 
 }
 
@@ -3865,9 +4057,9 @@ pCode *pic16_newpCodeLabelFORCE(char *name, int key)
 {
   pCodeLabel *pcl = (pCodeLabel *)pic16_newpCodeLabel(name, key);
 
-        pcl->force = 1;
+  pcl->force = TRUE;
 
-  return ( (pCode *)pcl );
+  return ((pCode *)pcl);
 }
 
 pCode *pic16_newpCodeInfo(INFO_TYPE type, pCodeOp *pcop)
@@ -3903,7 +4095,7 @@ static pBlock *newpBlock(void)
 
   PpB->function_entries = PpB->function_exits = PpB->function_calls = NULL;
   PpB->tregisters = NULL;
-  PpB->visited = 0;
+  PpB->visited = FALSE;
   PpB->FlowTree = NULL;
 
   return PpB;
@@ -8231,7 +8423,7 @@ static set *register_usage(pBlock *pb)
   if(!pc)
     return registers;
 
-  pb->visited = 1;
+  pb->visited = TRUE;
 
   if(pc->type != PC_FUNCTION)
     fprintf(stderr,"%s, first pc is not a function???\n",__FUNCTION__);
@@ -8350,7 +8542,7 @@ static void pct2(FILE *of,pBlock *pb,int indent,int usedstack)
   if(!pc)
     return;
 
-  pb->visited = 0;
+  pb->visited = FALSE;
 
   for(i=0;i<indent;i++)   // Indentation
         fputs("+   ", of);

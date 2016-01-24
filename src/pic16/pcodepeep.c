@@ -495,13 +495,13 @@ static void * cvt_altpat_mnem1a(void *pp,pCodeWildBlock *pcwb)
 
     switch(cmd_id) {
     case NOTBITSKIP:
-      PCW(pc)->mustNotBeBitSkipInst = 1;
+      PCW(pc)->mustNotBeBitSkipInst = TRUE;
       break;
     case BITSKIP:
-      PCW(pc)->mustBeBitSkipInst = 1;
+      PCW(pc)->mustBeBitSkipInst = TRUE;
       break;
     case INVERTBITSKIP:
-      PCW(pc)->invertBitSkipInst = 1;
+      PCW(pc)->invertBitSkipInst = TRUE;
     }
     return pc;
   }

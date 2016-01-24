@@ -1,4 +1,9 @@
 2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* src/pic16/pcode.c,
+	  src/pic16/pcodepeep.c:
+	  More use the logical constants.
+
+2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* src/pic14/gen.c,
 	  src/pic14/glue.c,
 	  src/pic14/pcode.c,

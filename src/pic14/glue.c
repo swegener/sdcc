@@ -476,7 +476,7 @@ pic14_emitInterruptHandler (FILE * asmFile)
 /* glue - the final glue that hold the whole thing together        */
 /*-----------------------------------------------------------------*/
 void
-picglue ()
+picglue (void)
 {
         FILE *asmFile;
         struct dbuf_s ovrBuf;

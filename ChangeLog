@@ -1,3 +1,14 @@
+2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* src/pic14/gen.c,
+	  src/pic14/pcode.c,
+	  src/pic14/pcode.h:
+	  Add support the ASRF, LSLF and LSRF instructions
+	  (enhanced intructions of pic14): feature-requests #484
+
+	* src/pic14/gen.c,
+	  src/pic14/gen.h:
+	  On more place I exchanged the "char *" to "const char *".
+
 2016-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCC.y
 	* src/SDCCast.c

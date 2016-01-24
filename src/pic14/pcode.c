@@ -112,9 +112,9 @@ static pCodeInstruction pciADDWF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_REGISTER | PCC_C | PCC_DC | PCC_Z) // outCond
@@ -133,9 +133,9 @@ static pCodeInstruction pciADDFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_W | PCC_C | PCC_DC | PCC_Z) // outCond
@@ -154,9 +154,9 @@ static pCodeInstruction pciADDLW = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_LITERAL),   // inCond
 		(PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -175,9 +175,9 @@ static pCodeInstruction pciANDLW = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_LITERAL),   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -196,9 +196,9 @@ static pCodeInstruction pciANDWF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_REGISTER | PCC_Z) // outCond
@@ -217,9 +217,9 @@ static pCodeInstruction pciANDFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -238,9 +238,9 @@ static pCodeInstruction pciBCF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,1,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,TRUE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_BSF,
 		(PCC_REGISTER | PCC_EXAMINE_PCOP),	// inCond
 		(PCC_REGISTER | PCC_EXAMINE_PCOP)	// outCond
@@ -259,9 +259,9 @@ static pCodeInstruction pciBSF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,1,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,TRUE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_BCF,
 		(PCC_REGISTER | PCC_EXAMINE_PCOP),	// inCond
 		(PCC_REGISTER | PCC_EXAMINE_PCOP)	// outCond
@@ -280,9 +280,9 @@ static pCodeInstruction pciBTFSC = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,1,  // dest, bit instruction
-		1,1,  // branch, skip
-		0,    // literal operand
+		FALSE,TRUE,  // dest, bit instruction
+		TRUE,TRUE,  // branch, skip
+		FALSE,    // literal operand
 		POC_BTFSS,
 		(PCC_REGISTER | PCC_EXAMINE_PCOP),	// inCond
 		PCC_NONE // outCond
@@ -301,9 +301,9 @@ static pCodeInstruction pciBTFSS = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,1,  // dest, bit instruction
-		1,1,  // branch, skip
-		0,    // literal operand
+		FALSE,TRUE,  // dest, bit instruction
+		TRUE,TRUE,  // branch, skip
+		FALSE,    // literal operand
 		POC_BTFSC,
 		(PCC_REGISTER | PCC_EXAMINE_PCOP),   // inCond
 		PCC_NONE // outCond
@@ -322,9 +322,9 @@ static pCodeInstruction pciCALL = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		1,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_NONE | PCC_W), // inCond, reads argument from WREG
 		(PCC_NONE | PCC_W | PCC_C | PCC_DC | PCC_Z)  // outCond, flags are destroyed by called function
@@ -343,9 +343,9 @@ static pCodeInstruction pciCOMF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_REGISTER | PCC_Z)  // outCond
@@ -364,9 +364,9 @@ static pCodeInstruction pciCOMFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_W | PCC_Z)  // outCond
@@ -385,9 +385,9 @@ static pCodeInstruction pciCLRF = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_REGISTER | PCC_Z // outCond
@@ -406,9 +406,9 @@ static pCodeInstruction pciCLRW = {
 		NULL, // flow block
 		NULL, // C source 
 		0,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -427,9 +427,9 @@ static pCodeInstruction pciCLRWDT = {
 		NULL, // flow block
 		NULL, // C source 
 		0,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_NONE  // outCond
@@ -448,9 +448,9 @@ static pCodeInstruction pciDECF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_REGISTER | PCC_Z) // outCond
@@ -469,9 +469,9 @@ static pCodeInstruction pciDECFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -490,9 +490,9 @@ static pCodeInstruction pciDECFSZ = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		1,1,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		TRUE,TRUE,  // branch, skip
+		FALSE,    // literal operand
 		POC_DECF,		// followed by BTFSC STATUS, Z --> also kills STATUS
 		PCC_REGISTER,		// inCond
 		(PCC_REGISTER | PCC_Z)	// outCond
@@ -511,9 +511,9 @@ static pCodeInstruction pciDECFSZW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		1,1,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,TRUE,  // branch, skip
+		FALSE,    // literal operand
 		POC_DECFW,	// followed by BTFSC STATUS, Z --> also kills STATUS
 		PCC_REGISTER,   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -532,9 +532,9 @@ static pCodeInstruction pciGOTO = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		1,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE,   // inCond
 		PCC_NONE    // outCond
@@ -553,9 +553,9 @@ static pCodeInstruction pciINCF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
 		(PCC_REGISTER | PCC_Z) // outCond
@@ -574,9 +574,9 @@ static pCodeInstruction pciINCFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -595,9 +595,9 @@ static pCodeInstruction pciINCFSZ = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		1,1,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		TRUE,TRUE,  // branch, skip
+		FALSE,    // literal operand
 		POC_INCF,		// followed by BTFSC STATUS, Z --> also kills STATUS
 		PCC_REGISTER,		// inCond
 		(PCC_REGISTER | PCC_Z)  // outCond
@@ -616,9 +616,9 @@ static pCodeInstruction pciINCFSZW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		1,1,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,TRUE,  // branch, skip
+		FALSE,    // literal operand
 		POC_INCFW,	// followed by BTFSC STATUS, Z --> also kills STATUS
 		PCC_REGISTER,   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -637,9 +637,9 @@ static pCodeInstruction pciIORWF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_REGISTER | PCC_Z) // outCond
@@ -658,9 +658,9 @@ static pCodeInstruction pciIORFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -679,9 +679,9 @@ static pCodeInstruction pciIORLW = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_LITERAL),   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -700,9 +700,9 @@ static pCodeInstruction pciMOVF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
 		PCC_Z // outCond
@@ -721,9 +721,9 @@ static pCodeInstruction pciMOVFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -742,9 +742,9 @@ static pCodeInstruction pciMOVWF = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_W,   // inCond
 		PCC_REGISTER // outCond
@@ -763,9 +763,9 @@ static pCodeInstruction pciMOVLW = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		(PCC_NONE | PCC_LITERAL),   // inCond
 		PCC_W // outCond
@@ -784,9 +784,9 @@ static pCodeInstruction pciNOP = {
 		NULL, // flow block
 		NULL, // C source 
 		0,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE,   // inCond
 		PCC_NONE // outCond
@@ -805,9 +805,9 @@ static pCodeInstruction pciRETFIE = {
 		NULL, // flow block
 		NULL, // C source 
 		0,    // num ops
-		0,0,  // dest, bit instruction
-		1,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE,   // inCond
 		(PCC_NONE | PCC_C | PCC_DC | PCC_Z) // outCond (not true... affects the GIE bit too), STATUS bit are retored
@@ -826,9 +826,9 @@ static pCodeInstruction pciRETLW = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		1,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		PCC_LITERAL,   // inCond
 		(PCC_W| PCC_C | PCC_DC | PCC_Z) // outCond, STATUS bits are irrelevant after RETLW
@@ -847,9 +847,9 @@ static pCodeInstruction pciRETURN = {
 		NULL, // flow block
 		NULL, // C source 
 		0,    // num ops
-		0,0,  // dest, bit instruction
-		1,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_NONE | PCC_W), // inCond, return value is possibly present in W
 		(PCC_NONE | PCC_C | PCC_DC | PCC_Z) // outCond, STATUS bits are irrelevant after RETURN
@@ -868,9 +868,9 @@ static pCodeInstruction pciRLF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_C | PCC_REGISTER), // inCond
 		(PCC_REGISTER | PCC_C) // outCond
@@ -889,9 +889,9 @@ static pCodeInstruction pciRLFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_C | PCC_REGISTER),   // inCond
 		(PCC_W | PCC_C) // outCond
@@ -910,9 +910,9 @@ static pCodeInstruction pciRRF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_C | PCC_REGISTER),   // inCond
 		(PCC_REGISTER | PCC_C) // outCond
@@ -931,9 +931,9 @@ static pCodeInstruction pciRRFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_C | PCC_REGISTER),   // inCond
 		(PCC_W | PCC_C) // outCond
@@ -952,9 +952,9 @@ static pCodeInstruction pciSUBWF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_REGISTER | PCC_C | PCC_DC | PCC_Z) // outCond
@@ -973,9 +973,9 @@ static pCodeInstruction pciSUBFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_W | PCC_C | PCC_DC | PCC_Z) // outCond
@@ -994,9 +994,9 @@ static pCodeInstruction pciSUBLW = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_LITERAL),   // inCond
 		(PCC_W | PCC_Z | PCC_C | PCC_DC) // outCond
@@ -1015,9 +1015,9 @@ static pCodeInstruction pciSWAPF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
 		PCC_REGISTER // outCond
@@ -1036,9 +1036,9 @@ static pCodeInstruction pciSWAPFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER,   // inCond
 		PCC_W // outCond
@@ -1057,9 +1057,9 @@ static pCodeInstruction pciTRIS = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE,   // inCond /* FIXME: what's TRIS doing? */
 		PCC_REGISTER // outCond	/* FIXME: what's TRIS doing */
@@ -1078,9 +1078,9 @@ static pCodeInstruction pciXORWF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_REGISTER | PCC_Z) // outCond
@@ -1099,9 +1099,9 @@ static pCodeInstruction pciXORFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER),   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -1120,9 +1120,9 @@ static pCodeInstruction pciXORLW = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_LITERAL),   // inCond
 		(PCC_W | PCC_Z) // outCond
@@ -1142,9 +1142,9 @@ static pCodeInstruction pciBANKSEL = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_NONE  // outCond
@@ -1163,9 +1163,9 @@ static pCodeInstruction pciPAGESEL = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_NONE  // outCond
@@ -1188,9 +1188,9 @@ static pCodeInstruction pciADDFSR = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_NONE  // outCond
@@ -1209,9 +1209,9 @@ static pCodeInstruction pciADDWFC = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 	        (PCC_W | PCC_REGISTER | PCC_C), // inCond
 		(PCC_REGISTER | PCC_C | PCC_DC | PCC_Z) // outCond
@@ -1230,9 +1230,9 @@ static pCodeInstruction pciADDFWC = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER | PCC_C), // inCond
 		(PCC_W | PCC_C | PCC_DC | PCC_Z) // outCond
@@ -1251,9 +1251,9 @@ static pCodeInstruction pciASRF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_REGISTER | PCC_C | PCC_Z) // outCond
@@ -1272,9 +1272,9 @@ static pCodeInstruction pciASRFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_W | PCC_C | PCC_Z) // outCond
@@ -1293,9 +1293,9 @@ static pCodeInstruction pciBRA = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		1,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_NONE  // outCond
@@ -1314,9 +1314,9 @@ static pCodeInstruction pciBRW = {
 		NULL, // flow block
 		NULL, // C source 
 		0,    // num ops
-		0,0,  // dest, bit instruction
-		1,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_NONE | PCC_W), // inCond
 		PCC_NONE // outCond
@@ -1335,9 +1335,9 @@ static pCodeInstruction pciCALLW = {
 		NULL, // flow block
 		NULL, // C source 
 		0,    // num ops
-		0,0,  // dest, bit instruction
-		1,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		TRUE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_NONE | PCC_W), // inCond, reads lower bits of subroutine address from WREG
 		(PCC_NONE | PCC_W | PCC_C | PCC_DC | PCC_Z)  // outCond, flags are destroyed by called function
@@ -1356,9 +1356,9 @@ static pCodeInstruction pciLSLF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_REGISTER | PCC_C | PCC_Z) // outCond
@@ -1377,9 +1377,9 @@ static pCodeInstruction pciLSLFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_W | PCC_C | PCC_Z) // outCond
@@ -1398,9 +1398,9 @@ static pCodeInstruction pciLSRF = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_REGISTER | PCC_C | PCC_Z) // outCond
@@ -1419,9 +1419,9 @@ static pCodeInstruction pciLSRFW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_REGISTER, // inCond
 		(PCC_W | PCC_C | PCC_Z) // outCond
@@ -1440,9 +1440,9 @@ static pCodeInstruction pciMOVIW = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		(PCC_NONE | PCC_W | PCC_Z) // outCond
@@ -1461,9 +1461,9 @@ static pCodeInstruction pciMOVIW_K = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		(PCC_NONE | PCC_W | PCC_Z) // outCond
@@ -1482,9 +1482,9 @@ static pCodeInstruction pciMOVLB = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_NONE // outCond
@@ -1503,9 +1503,9 @@ static pCodeInstruction pciMOVLP = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_NONE // outCond
@@ -1524,9 +1524,9 @@ static pCodeInstruction pciMOVWI = {
 		NULL, // flow block
 		NULL, // C source 
 		1,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		(PCC_NONE | PCC_W), // inCond
 		PCC_NONE // outCond
@@ -1545,9 +1545,9 @@ static pCodeInstruction pciMOVWI_K = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		1,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		TRUE,    // literal operand
 		POC_NOP,
 		(PCC_NONE | PCC_W), // inCond
 		PCC_NONE // outCond
@@ -1566,9 +1566,9 @@ static pCodeInstruction pciRESET = {
 		NULL, // flow block
 		NULL, // C source 
 		0,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		PCC_NONE, // inCond
 		PCC_NONE // outCond
@@ -1587,9 +1587,9 @@ static pCodeInstruction pciSUBWFB = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		1,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		TRUE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER | PCC_C), // inCond
 		(PCC_REGISTER | PCC_C | PCC_DC | PCC_Z) // outCond
@@ -1608,9 +1608,9 @@ static pCodeInstruction pciSUBWFBW = {
 		NULL, // flow block
 		NULL, // C source 
 		2,    // num ops
-		0,0,  // dest, bit instruction
-		0,0,  // branch, skip
-		0,    // literal operand
+		FALSE,FALSE,  // dest, bit instruction
+		FALSE,FALSE,  // branch, skip
+		FALSE,    // literal operand
 		POC_NOP,
 		(PCC_W | PCC_REGISTER | PCC_C), // inCond
 		(PCC_W | PCC_C | PCC_DC | PCC_Z) // outCond

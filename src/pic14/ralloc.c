@@ -315,8 +315,7 @@ regWithIdx (set *dRegs, int idx, int fixed)
 {
         reg_info *dReg;
 
-        for (dReg = setFirstItem(dRegs) ; dReg ;
-        dReg = setNextItem(dRegs)) {
+        for (dReg = setFirstItem(dRegs); dReg; dReg = setNextItem(dRegs)) {
 
                 if(idx == dReg->rIdx && (fixed == (int)dReg->isFixed)) {
                         while (dReg->reg_alias) dReg = dReg->reg_alias;
@@ -343,8 +342,8 @@ static reg_info* newReg(short type, PIC_OPTYPE pc_type, int rIdx, const char *na
         }
 
         // check whether a register at that location exists
-        reg_alias = regWithIdx( dynDirectRegs, rIdx, 0 );
-        if (!reg_alias) reg_alias = regWithIdx( dynDirectRegs, rIdx, 1 );
+        reg_alias = regWithIdx(dynDirectRegs, rIdx, FALSE);
+        if (!reg_alias) reg_alias = regWithIdx(dynDirectRegs, rIdx, TRUE);
 
         // create a new register
         dReg = Safe_calloc(1,sizeof(reg_info));
@@ -357,17 +356,17 @@ static reg_info* newReg(short type, PIC_OPTYPE pc_type, int rIdx, const char *na
                 sprintf(buffer,"r0x%02X", dReg->rIdx);
                 dReg->name = Safe_strdup(buffer);
         }
-        dReg->isFree = 0;
-        dReg->wasUsed = 0;
+        dReg->isFree = FALSE;
+        dReg->wasUsed = FALSE;
         if (type == REG_SFR)
-                dReg->isFixed = 1;
+                dReg->isFixed = TRUE;
         else
-                dReg->isFixed = 0;
+                dReg->isFixed = FALSE;
 
-        dReg->isMapped = 0;
-        dReg->isEmitted = 0;
-        dReg->isPublic = 0;
-        dReg->isExtern = 0;
+        dReg->isMapped = FALSE;
+        dReg->isEmitted = FALSE;
+        dReg->isPublic = FALSE;
+        dReg->isExtern = FALSE;
         dReg->address = 0;
         dReg->size = size;
         dReg->alias = alias;
@@ -460,7 +459,6 @@ regFindFree (set *dRegs)
 /*-----------------------------------------------------------------*/
 void initStack(int base_address, int size, int shared)
 {
-
         int i;
         PIC_device *pic;
 
@@ -475,9 +473,9 @@ void initStack(int base_address, int size, int shared)
                 SNPRINTF(&buffer[0], 16, "STK%02d", i);
                 // multi-bank device, sharebank prohibited by user
                 r = newReg(REG_STK, PO_GPR_TEMP, base_address--, buffer, 1, shared ? (pic ? pic->bankMask : 0x180) : 0x0);
-                r->isFixed = 1;
-                r->isPublic = 1;
-                r->isEmitted = 1;
+                r->isFixed = TRUE;
+                r->isPublic = TRUE;
+                r->isEmitted = TRUE;
                 //r->name[0] = 's';
                 addSet(&dynStackRegs,r);
         }
@@ -503,7 +501,7 @@ allocInternalRegister(int rIdx, const char *name, PIC_OPTYPE po_type, int alias)
 
         //fprintf(stderr,"allocInternalRegister %s addr =0x%x\n",name,rIdx);
         if(reg) {
-                reg->wasUsed = 0;
+                reg->wasUsed = FALSE;
                 return addSet(&dynInternalRegs,reg);
         }
 
@@ -522,8 +520,8 @@ allocReg (short type)
 
         reg = pic14_findFreeReg (type);
 
-        reg->isFree = 0;
-        reg->wasUsed = 1;
+        reg->isFree = FALSE;
+        reg->wasUsed = TRUE;
 
         return reg;
 
@@ -607,21 +605,21 @@ allocNewDirReg (sym_link *symlnk,const char *name)
 
                 if (IS_BITVAR (spec)) {
                         addSet(&dynDirectBitRegs, reg);
-                        reg->isBitField = 1;
+                        reg->isBitField = TRUE;
                 } else
                         addSet(&dynDirectRegs, reg);
 
                 if (!IS_STATIC (spec)) {
-                        reg->isPublic = 1;
+                        reg->isPublic = TRUE;
                 }
                 if (IS_EXTERN (spec)) {
-                        reg->isExtern = 1;
+                        reg->isExtern = TRUE;
                 }
 
         }
 
         if (address && reg) {
-                reg->isFixed = 1;
+                reg->isFixed = TRUE;
                 reg->address = address;
                 debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
         }
@@ -678,7 +676,7 @@ allocDirReg (operand *op )
 
         /* First, search the hash table to see if there is a register with this name */
         if (SPEC_ABSA ( OP_SYM_ETYPE(op)) && !(IS_BITVAR (OP_SYM_ETYPE(op))) ) {
-                reg = regWithIdx (dynProcessorRegs, SPEC_ADDR ( OP_SYM_ETYPE(op)), 1);
+                reg = regWithIdx (dynProcessorRegs, SPEC_ADDR ( OP_SYM_ETYPE(op)), TRUE);
                 /*
                 if(!reg)
                 fprintf(stderr,"ralloc %s is at fixed address but not a processor reg, addr=0x%x\n",
@@ -722,15 +720,15 @@ allocDirReg (operand *op )
 
                         if (IS_BITVAR (OP_SYM_ETYPE(op))) {
                                 addSet(&dynDirectBitRegs, reg);
-                                reg->isBitField = 1;
+                                reg->isBitField = TRUE;
                         } else
                                 addSet(&dynDirectRegs, reg);
 
                         if (!IS_STATIC (OP_SYM_ETYPE(op))) {
-                                reg->isPublic = 1;
+                                reg->isPublic = TRUE;
                         }
                         if (IS_EXTERN (OP_SYM_ETYPE(op))) {
-                                reg->isExtern = 1;
+                                reg->isExtern = TRUE;
                         }
 
 
@@ -741,7 +739,7 @@ allocDirReg (operand *op )
         }
 
         if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
-                reg->isFixed = 1;
+                reg->isFixed = TRUE;
                 reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
                 debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
         }
@@ -749,7 +747,7 @@ allocDirReg (operand *op )
 
         if(reg) {
                 if (SPEC_ABSA ( OP_SYM_ETYPE(op)) ) {
-                        reg->isFixed = 1;
+                        reg->isFixed = TRUE;
                         reg->address = SPEC_ADDR ( OP_SYM_ETYPE(op));
                         debugLog ("  -- and it is at a fixed address 0x%02x\n",reg->address);
                 }
@@ -780,7 +778,7 @@ allocRegByName (const char *name, int size)
 
 
         if(!reg) {
-                int found = 0;
+                int found = FALSE;
                 symbol *sym;
                 /* Register wasn't found in hash, so let's create
                 * a new one and put it in the hash table AND in the
@@ -791,17 +789,17 @@ allocRegByName (const char *name, int size)
                         if (strcmp(reg->name+1,sym->name)==0) {
                                 unsigned a = SPEC_ADDR(sym->etype);
                                 reg->address = a;
-                                reg->isFixed = 1;
+                                reg->isFixed = TRUE;
                                 reg->type = REG_SFR;
                                 if (!IS_STATIC (sym->etype)) {
-                                        reg->isPublic = 1;
+                                        reg->isPublic = TRUE;
                                 }
                                 if (IS_EXTERN (sym->etype)) {
-                                        reg->isExtern = 1;
+                                        reg->isExtern = TRUE;
                                 }
                                 if (IS_BITVAR (sym->etype))
-                                        reg->isBitField = 1;
-                                found = 1;
+                                        reg->isBitField = TRUE;
+                                found = TRUE;
                                 break;
                         }
                 }
@@ -811,14 +809,14 @@ allocRegByName (const char *name, int size)
                                         unsigned a = SPEC_ADDR(sym->etype);
                                         reg->address = a;
                                         if (!IS_STATIC (sym->etype)) {
-                                                reg->isPublic = 1;
+                                                reg->isPublic = TRUE;
                                         }
                                         if (IS_EXTERN (sym->etype)) {
-                                                reg->isExtern = 1;
+                                                reg->isExtern = TRUE;
                                         }
                                         if (IS_BITVAR (sym->etype))
-                                                reg->isBitField = 1;
-                                        found = 1;
+                                                reg->isBitField = TRUE;
+                                        found = TRUE;
                                         break;
                                 }
                         }
@@ -862,11 +860,11 @@ typeRegWithIdx (int idx, int type, int fixed)
 
                 break;
         case REG_STK:
-                if( (dReg = regWithIdx ( dynStackRegs, idx, 0)) != NULL ) {
+                if( (dReg = regWithIdx ( dynStackRegs, idx, FALSE)) != NULL ) {
                         debugLog ("Found a Stack Register!\n");
                         return dReg;
                 } else
-                if( (dReg = regWithIdx ( dynStackRegs, idx, 1)) != NULL ) {
+                if( (dReg = regWithIdx ( dynStackRegs, idx, TRUE)) != NULL ) {
                         debugLog ("Found a Stack Register!\n");
                         return dReg;
                 }
@@ -920,16 +918,16 @@ pic14_allocWithIdx (int idx)
 
         debugLog ("%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
 
-        if( (dReg = regWithIdx ( dynAllocRegs, idx,0)) != NULL) {
+        if( (dReg = regWithIdx ( dynAllocRegs, idx, FALSE)) != NULL) {
 
                 debugLog ("Found a Dynamic Register!\n");
-        } else if( (dReg = regWithIdx ( dynStackRegs, idx,0)) != NULL ) {
+        } else if( (dReg = regWithIdx ( dynStackRegs, idx, FALSE)) != NULL ) {
                 debugLog ("Found a Stack Register!\n");
-        } else if( (dReg = regWithIdx ( dynProcessorRegs, idx,0)) != NULL ) {
+        } else if( (dReg = regWithIdx ( dynProcessorRegs, idx, FALSE)) != NULL ) {
                 debugLog ("Found a Processor Register!\n");
-        } else if( (dReg = regWithIdx ( dynInternalRegs, idx,0)) != NULL ) {
+        } else if( (dReg = regWithIdx ( dynInternalRegs, idx, FALSE)) != NULL ) {
                 debugLog ("Found an Internal Register!\n");
-        } else if( (dReg = regWithIdx ( dynInternalRegs, idx,1)) != NULL ) {
+        } else if( (dReg = regWithIdx ( dynInternalRegs, idx, TRUE)) != NULL ) {
                 debugLog ("Found an Internal Register!\n");
         } else {
 
@@ -943,8 +941,8 @@ pic14_allocWithIdx (int idx)
 
         }
 
-        dReg->wasUsed = 1;
-        dReg->isFree = 0;
+        dReg->wasUsed = TRUE;
+        dReg->isFree = FALSE;
 
         return dReg;
 }
@@ -983,7 +981,7 @@ static void
 freeReg (reg_info * reg)
 {
         debugLog ("%s\n", __FUNCTION__);
-        reg->isFree = 1;
+        reg->isFree = TRUE;
 }
 
 
@@ -1041,7 +1039,7 @@ static void packBits(set *bregs)
         regset = regset->next) {
 
                 breg = regset->item;
-                breg->isBitField = 1;
+                breg->isBitField = TRUE;
                 //fprintf(stderr,"bit reg: %s\n",breg->name);
 
                 if(breg->isFixed) {
@@ -1056,8 +1054,8 @@ static void packBits(set *bregs)
                                 sprintf (buffer, "0x%02x", breg->address);
                                 //fprintf(stderr,"new bit field\n");
                                 bitfield = newReg(REG_SFR, PO_GPR_BIT,breg->address,buffer,1,0);
-                                bitfield->isBitField = 1;
-                                bitfield->isFixed = 1;
+                                bitfield->isBitField = TRUE;
+                                bitfield->isFixed = TRUE;
                                 bitfield->address = breg->address;
                                 //addSet(&dynDirectRegs,bitfield);
                                 addSet(&dynInternalRegs,bitfield);
@@ -1076,7 +1074,7 @@ static void packBits(set *bregs)
                                 sprintf (buffer, "bitfield%d", byte_no);
                                 //fprintf(stderr,"new relocatable bit field\n");
                                 relocbitfield = newReg(REG_GPR, PO_GPR_BIT,dynrIdx++,buffer,1,0);
-                                relocbitfield->isBitField = 1;
+                                relocbitfield->isBitField = TRUE;
                                 //addSet(&dynDirectRegs,relocbitfield);
                                 addSet(&dynInternalRegs,relocbitfield);
                                 //hTabAddItem(&dynDirectRegNames, regname2key(buffer), relocbitfield);
@@ -1409,7 +1407,7 @@ createStackSpil (symbol * sym)
                 /* found a free one : just update & return */
                 sym->usl.spillLoc = sloc;
                 sym->stackSpil = 1;
-                sloc->isFree = 0;
+                sloc->isFree = FALSE;
                 addSetHead (&sloc->usl.itmpStack, sym);
                 return sym;
         }
@@ -1754,7 +1752,7 @@ tryAgain:
         /* make sure partially assigned registers aren't reused */
         for (j=0; j<=sym->nRegs; j++)
                 if (sym->regs[j])
-                        sym->regs[j]->isFree = 0;
+                        sym->regs[j]->isFree = FALSE;
 
                         /* this looks like an infinite loop but
                 in really selectSpil will abort  */
@@ -1787,7 +1785,7 @@ tryAgain:
                 /* make sure partially assigned registers aren't reused */
                 for (j=0; j<=sym->nRegs; j++)
                         if (sym->regs[j])
-                                sym->regs[j]->isFree = 0;
+                                sym->regs[j]->isFree = FALSE;
 
                         /* this looks like an infinite loop but
                         in really selectSpil will abort  */
@@ -1866,7 +1864,7 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                 {
                         if (sym->stackSpil)
                         {
-                                sym->usl.spillLoc->isFree = 1;
+                                sym->usl.spillLoc->isFree = TRUE;
                                 sym->stackSpil = 0;
                         }
                         continue;
@@ -1965,7 +1963,7 @@ reassignLR (operand * op)
         _G.blockSpil--;
 
         for (i = 0; i < sym->nRegs; i++)
-                sym->regs[i]->isFree = 0;
+                sym->regs[i]->isFree = FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3921,7 +3919,7 @@ pic14_assignRegisters (ebbIndex *ebbi)
            r;
            r = setNextItem (dynAllocRegs))
         {
-          r->isFree = 0;
+          r->isFree = FALSE;
         }
     }
 

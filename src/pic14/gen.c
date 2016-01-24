@@ -210,12 +210,12 @@ emitpcode_real (PIC_OPCODE poc, pCodeOp * pcop)
     addpCode2pBlock (pb, newpCode (poc, pcop));
   else
     {
-      static int has_warned = 0;
+      static int has_warned = FALSE;
 
       DEBUGpic14_emitcode (";", "%s  ignoring NULL pcop", __FUNCTION__);
       if (!has_warned)
         {
-          has_warned = 1;
+          has_warned = TRUE;
           fprintf (stderr, "WARNING: encountered NULL pcop--this is probably a compiler bug...\n");
         }
     }
@@ -250,9 +250,9 @@ pic14_emitcode (const char *inst, const char *fmt, ...)
 void
 pic14_emitDebuggerSymbol (const char *debugSym)
 {
-  genLine.lineElement.isDebug = 1;
+  genLine.lineElement.isDebug = TRUE;
   pic14_emitcode ("", ";%s ==.", debugSym);
-  genLine.lineElement.isDebug = 0;
+  genLine.lineElement.isDebug = FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -280,8 +280,8 @@ resolveIfx (resolvedIfx * resIfx, iCode * ifx)
 
   //  DEBUGpic14_emitcode("; ***","%s %d",__FUNCTION__,__LINE__);
 
-  resIfx->condition = 1;        /* assume that the ifx is true */
-  resIfx->generated = 0;        /* indicate that the ifx has not been used */
+  resIfx->condition = TRUE;     /* assume that the ifx is true */
+  resIfx->generated = FALSE;    /* indicate that the ifx has not been used */
 
   if (!ifx)
     {
@@ -296,7 +296,7 @@ resolveIfx (resolvedIfx * resIfx, iCode * ifx)
       else
         {
           resIfx->lbl = IC_FALSE (ifx);
-          resIfx->condition = 0;
+          resIfx->condition = FALSE;
         }
     }
 
@@ -336,7 +336,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       sym->aop = aop = newAsmop (AOP_PCODE);
       aop->aopu.pcop = popGetImmd (sym->rname, 0, 0, 1);
       PCOI (aop->aopu.pcop)->_const = IN_CODESPACE (space);
-      PCOI (aop->aopu.pcop)->_function = 1;
+      PCOI (aop->aopu.pcop)->_function = TRUE;
       PCOI (aop->aopu.pcop)->index = 0;
       aop->size = FPTRSIZE;
       DEBUGpic14_emitcode (";", "%d size = %d, name =%s", __LINE__, aop->size, sym->rname);
@@ -348,7 +348,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       sym->aop = aop = newAsmop (AOP_PCODE);
       aop->aopu.pcop = popGetImmd (sym->rname, 0, 0, 1);
       PCOI (aop->aopu.pcop)->_const = IN_CODESPACE (space);
-      PCOI (aop->aopu.pcop)->_function = 0;
+      PCOI (aop->aopu.pcop)->_function = FALSE;
       PCOI (aop->aopu.pcop)->index = 0;
       aop->size = getSize (sym->etype) * DCL_ELEM (sym->type);
 
@@ -372,7 +372,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 
   /* if it is in code space */
   if (IN_CODESPACE (space))
-    aop->code = 1;
+    aop->code = TRUE;
 
   return aop;
 }
@@ -715,7 +715,7 @@ freeAsmop (operand * op, asmop * aaop, iCode * ic, bool pop)
   if (!aop)
     return;
 
-  aop->freed = 1;
+  aop->freed = TRUE;
 
   /* all other cases just dealloc */
   if (op)
@@ -875,8 +875,8 @@ popGetTempReg (void)
   pcop = newpCodeOp (NULL, PO_GPR_TEMP);
   if (pcop && pcop->type == PO_GPR_TEMP && PCOR (pcop)->r)
     {
-      PCOR (pcop)->r->wasUsed = 1;
-      PCOR (pcop)->r->isFree = 0;
+      PCOR (pcop)->r->wasUsed = TRUE;
+      PCOR (pcop)->r->isFree = FALSE;
     }
 
   return pcop;
@@ -890,7 +890,7 @@ popReleaseTempReg (pCodeOp * pcop)
 {
 
   if (pcop && pcop->type == PO_GPR_TEMP && PCOR (pcop)->r)
-    PCOR (pcop)->r->isFree = 1;
+    PCOR (pcop)->r->isFree = TRUE;
 
 }
 
@@ -1046,8 +1046,8 @@ popRegFromIdx (int rIdx)
 
   PCOR (pcop)->rIdx = rIdx;
   PCOR (pcop)->r = typeRegWithIdx (rIdx, REG_STK, 1);
-  PCOR (pcop)->r->isFree = 0;
-  PCOR (pcop)->r->wasUsed = 1;
+  PCOR (pcop)->r->isFree = FALSE;
+  PCOR (pcop)->r->wasUsed = TRUE;
 
   pcop->type = PCOR (pcop)->r->pc_type;
 
@@ -1101,8 +1101,8 @@ popGet (asmop * aop, int offset)        //, bool bit16, bool dname)
       pcop = Safe_calloc (1, sizeof (pCodeOpReg));
       PCOR (pcop)->rIdx = rIdx;
       PCOR (pcop)->r = pic14_regWithIdx (rIdx);
-      PCOR (pcop)->r->wasUsed = 1;
-      PCOR (pcop)->r->isFree = 0;
+      PCOR (pcop)->r->wasUsed = TRUE;
+      PCOR (pcop)->r->isFree = FALSE;
 
       PCOR (pcop)->instance = offset;
       pcop->type = PCOR (pcop)->r->pc_type;
@@ -3244,7 +3244,7 @@ genIfxJump (iCode * ic, char *jval)
 
 
   /* mark the icode as generated */
-  ic->generated = 1;
+  ic->generated = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3264,7 +3264,7 @@ genSkipc (resolvedIfx * rifx)
 
   emitpcode (POC_GOTO, popGetLabel (rifx->lbl->key));
   emitpComment ("%s:%u: created from rifx:%p", __FUNCTION__, __LINE__, rifx);
-  rifx->generated = 1;
+  rifx->generated = TRUE;
 }
 
 #define isAOP_REGlike(x)  (AOP_TYPE(x) == AOP_REG || AOP_TYPE(x) == AOP_DIR || AOP_TYPE(x) == AOP_PCODE)
@@ -3523,7 +3523,7 @@ result_in_carry:
     {
       invert_result = 1;
       // value will be used in the following genSkipc ()
-      rIfx.condition ^= 1;
+      rIfx.condition ^= TRUE;
     }                           // if
 
 correct_result_in_carry:
@@ -3558,7 +3558,7 @@ correct_result_in_carry:
     {
       //DEBUGpc ("generate control flow");
       genSkipc (&rIfx);
-      ifx->generated = 1;
+      ifx->generated = TRUE;
     }                           // if
 }
 
@@ -3753,7 +3753,7 @@ genCmpEq (iCode * ic, iCode * ifx)
     emitpLabel (false_label->key);
 
   if (ifx)
-    ifx->generated = 1;
+    ifx->generated = TRUE;
 
   freeAsmop (left, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
   freeAsmop (right, NULL, ic, (RESULTONSTACK (ic) ? FALSE : TRUE));
@@ -3888,7 +3888,7 @@ continueIfTrue (iCode * ic)
       emitpcode (POC_GOTO, popGetLabel (labelKey2num (IC_TRUE (ic)->key)));
       pic14_emitcode ("ljmp", "%05d_DS_", labelKey2num (IC_FALSE (ic)->key));
     }
-  ic->generated = 1;
+  ic->generated = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3904,7 +3904,7 @@ jumpIfTrue (iCode * ic)
       emitpcode (POC_GOTO, labelKey2num (popGetLabel (IC_TRUE (ic)->key)));
       pic14_emitcode ("ljmp", "%05d_DS_", labelKey2num (IC_FALSE (ic)->key));
     }
-  ic->generated = 1;
+  ic->generated = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -3929,7 +3929,7 @@ jmpTrueOrFalse (iCode * ic, symbol * tlbl)
       pic14_emitcode ("ljmp", "%05d_DS_", labelKey2num (IC_FALSE (ic)->key));
       pic14_emitcode ("", "%05d_DS_:", labelKey2num (tlbl->key));
     }
-  ic->generated = 1;
+  ic->generated = TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -4067,7 +4067,7 @@ genAnd (iCode * ic, iCode * ifx)
                              newpCodeOpBit (aopGet (AOP (left), offset, FALSE, FALSE), posbit, 0));
                   emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
 
-                  ifx->generated = 1;
+                  ifx->generated = TRUE;
                 }
               goto release;
             }
@@ -4104,7 +4104,7 @@ genAnd (iCode * ic, iCode * ifx)
               emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
             }
           emitpLabel(tlbl->key);
-          ifx->generated = 1;
+          ifx->generated = TRUE;
           // bit = left & literal
           if (size)
             {
@@ -5889,7 +5889,7 @@ genUnpackBits (operand * result, operand * left, int ptype, iCode * ifx)
             }
           emitpcode ((rIfx.condition) ? POC_BTFSC : POC_BTFSS, pcop);
           emitpcode (POC_GOTO, popGetLabel (rIfx.lbl->key));
-          ifx->generated = 1;
+          ifx->generated = TRUE;
         }
       else
         {
@@ -6922,7 +6922,7 @@ genIfx (iCode * ic, iCode * popIc)
         }
     }
 
-  ic->generated = 1;
+  ic->generated = TRUE;
 
   /* the result is now in the accumulator */
   freeAsmop (cond, NULL, ic, TRUE);
@@ -7452,7 +7452,7 @@ genDjnz (iCode * ic, iCode * ifx)
   emitpcode (POC_GOTO, popGetLabel (IC_TRUE (ifx)->key));
 
   freeAsmop (IC_RESULT (ic), NULL, ic, TRUE);
-  ifx->generated = 1;
+  ifx->generated = TRUE;
   return 1;
 }
 

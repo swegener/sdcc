@@ -285,18 +285,18 @@ pic14_stringInSet(const char *str, set **world, int autoAdd)
 {
   char *s;
 
-  if (!str) return 1;
+  if (!str) return TRUE;
   assert(world);
 
   for (s = setFirstItem(*world); s; s = setNextItem(*world))
   {
     /* found in set */
-    if (0 == strcmp(s, str)) return 1;
+    if (0 == strcmp(s, str)) return TRUE;
   }
 
   /* not found */
   if (autoAdd) addSet(world, Safe_strdup(str));
-  return 0;
+  return FALSE;
 }
 
 static void
@@ -305,7 +305,7 @@ pic14printLocals (struct dbuf_s *oBuf)
     set *allregs[6] = { dynAllocRegs/*, dynStackRegs, dynProcessorRegs*/,
         dynDirectRegs, dynDirectBitRegs/*, dynInternalRegs */ };
     reg_info *reg;
-    int i, is_first = 1;
+    int i, is_first = TRUE;
     static unsigned sectionNr = 0;
 
     /* emit all registers from all possible sets */
@@ -316,7 +316,7 @@ pic14printLocals (struct dbuf_s *oBuf)
             if (reg->isEmitted) continue;
 
             if (reg->wasUsed && !reg->isExtern) {
-                if (!pic14_stringInSet(reg->name, &emitted, 1)) {
+                if (!pic14_stringInSet(reg->name, &emitted, TRUE)) {
                     if (reg->isFixed) {
                         // Should not happen, really...
                         assert ( !"Compiler-assigned variables should not be pinned... This is a bug." );
@@ -332,14 +332,14 @@ pic14printLocals (struct dbuf_s *oBuf)
                             // This should greatly improve BANKSEL generation...
                             if (is_first) {
                                 dbuf_printf(oBuf, "UDL_%s_%u\tudata\n", moduleName, sectionNr++);
-                                is_first = 0;
+                                is_first = FALSE;
                             }
                             dbuf_printf(oBuf, "%s\tres\t%d\n", reg->name, reg->size);
                         }
                     }
                 }
             }
-            reg->isEmitted = 1;
+            reg->isEmitted = TRUE;
         } // for
     } // for
 }
@@ -496,7 +496,7 @@ picglue (void)
         {
                 /* main missing -- import stack from main module */
                 //fprintf (stderr, "main() missing -- assuming we are NOT the main module\n");
-                pic14_options.isLibrarySource = 1;
+                pic14_options.isLibrarySource = TRUE;
         }
 
         /* At this point we've got all the code in the form of pCode structures */
@@ -641,13 +641,13 @@ parseIvalAst (ast *node, int *inCodeSpace) {
         if (inCodeSpace && val->type
                 && (IS_FUNC(val->type) || IS_CODE(getSpec(val->type))))
         {
-            *inCodeSpace = 1;
+            *inCodeSpace = TRUE;
         }
         if (inCodeSpace && sym
                 && (IS_FUNC(sym->type)
                     || IS_CODE(getSpec(sym->type))))
         {
-            *inCodeSpace = 1;
+            *inCodeSpace = TRUE;
         }
 
         DEBUGprintf ("%s: AST_VALUE\n", __FUNCTION__);
@@ -718,17 +718,17 @@ static int
 emitIvalLabel(struct dbuf_s *oBuf, symbol *sym)
 {
     char *segname;
-    static int in_code = 0;
+    static int in_code = FALSE;
     static int sectionNr = 0;
 
     if (sym) {
         // code or data space?
         if (IS_CODE(getSpec(sym->type))) {
             segname = "code";
-            in_code = 1;
+            in_code = TRUE;
         } else {
             segname = "idata";
-            in_code  = 0;
+            in_code = FALSE;
         }
         dbuf_printf(oBuf, "\nID_%s_%d\t%s", moduleName, sectionNr++, segname);
         if (SPEC_ABSA(getSpec(sym->type))) {
@@ -752,7 +752,7 @@ emitIvals(struct dbuf_s *oBuf, symbol *sym, initList *list, long lit, int size)
     ast *node;
     operand *op;
     value *val = NULL;
-    int inCodeSpace = 0;
+    int inCodeSpace = FALSE;
     char *str = NULL;
     int in_code;
 
@@ -1072,7 +1072,7 @@ emitSymbolSet(set *s, int type)
 {
     symbol *sym;
     initList *list;
-    unsigned sectionNr = 0;
+    unsigned int sectionNr = 0;
 
     for (sym = setFirstItem(s); sym; sym = setNextItem(s)) {
 #if 0
@@ -1097,9 +1097,7 @@ emitSymbolSet(set *s, int type)
             continue;
         }
 
-        if (type != 0 || sym->cdef
-                || (!IS_STATIC(sym->etype)
-                    && IS_GLOBAL(sym)))
+        if (type != 0 || sym->cdef || (!IS_STATIC(sym->etype) && IS_GLOBAL(sym)))
         {
             // bail out for ___fsadd and friends
             if (sym->cdef && !sym->used) continue;

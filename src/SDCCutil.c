@@ -51,7 +51,7 @@
 int
 isblank(int c)
 {
-	return (c == ' ' || c == '\t');
+  return (c == ' ' || c == '\t');
 }
 #endif
 
@@ -1147,3 +1147,45 @@ char *setPrefixSuffix(const char *arg)
   return cmd;
 }
 
+char *formatInlineAsm (char *asmStr)
+{
+  char *p, *q;
+
+  if (!asmStr)
+    return NULL;
+  else
+    q = asmStr;
+
+  for (;;)
+    {
+      // omit leading space or tab
+      while (*q == '\t' || *q == ' ')
+        q++;
+      // then record the head of current line
+      p = q;
+      // search for CL or reach the end
+      while (*q != '\n' && *q != '\r' && *q != 0)
+        q++;
+      // omit more CL characters
+      while (*q == '\n' || *q == '\r')
+        q++;
+      // replace the first with tab
+      while (p != q)
+        if (*p == '\t') // '\t' appears first then no need to do
+          {
+            break;
+          }
+        else if (*p == ' ') // find the first space then replace it with tab
+          {
+            *p = '\t';
+            break;
+          }
+        else // go on to search
+          {
+            p++;
+          }
+      // check if end
+      if (*q == 0)
+        return asmStr;
+    }
+}

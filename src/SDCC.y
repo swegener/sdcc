@@ -2083,7 +2083,7 @@ asm_statement
 
         seqPointNo++;
         ex = newNode(INLINEASM, NULL, NULL);
-        ex->values.inlineasm = copyStr ($3, NULL);
+        ex->values.inlineasm = strdup(copyStr ($3, NULL));
         seqPointNo++;
         $$ = ex;
      }

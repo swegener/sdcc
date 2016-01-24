@@ -176,5 +176,5 @@ const char *copyStr (const char *src, size_t *size);
 void getPrefixSuffix(const char *);
 char *setPrefixSuffix(const char *);
 
+char *formatInlineAsm (char *);
 #endif
-

@@ -5399,6 +5399,10 @@ decorateType (ast * tree, RESULT_TYPE resultType)
       werrorfl (tree->filename, tree->lineno, E_INTERNAL_ERROR, __FILE__, __LINE__, "node PARAM shouldn't be processed here");
       /* but in processParams() */
       return tree;
+    case INLINEASM:
+      formatInlineAsm (tree->values.inlineasm);
+      TTYPE (tree) = TETYPE (tree) = NULL;
+      return tree;
     default:
       TTYPE (tree) = TETYPE (tree) = NULL;
       return tree;

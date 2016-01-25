@@ -35,6 +35,7 @@
 #define OPTION_ELF             "--out-fmt-elf"
 
 extern DEBUGFILE dwarf2DebugFile;
+extern int dwarf2FinalizeFile(FILE *);
 
 static OPTION stm8_options[] = {
   {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
@@ -135,6 +136,15 @@ static char *stm8_keywords[] = {
   "naked",
   NULL
 };
+
+static void
+stm8_genAssemblerEnd (FILE *of)
+{
+  if (options.out_fmt == 'E' && options.debug)
+    {
+      dwarf2FinalizeFile (of);
+    }
+}
 
 static void
 stm8_init (void)
@@ -246,6 +256,16 @@ stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
         dbuf_tprintf (oBuf, "\tint 0x0000 ;int%d\n", i); // int<n>
   }
   return TRUE;
+}
+
+/*----------------------------------------------------------------------*/
+/* stm8_dwarfRegNum - return the DWARF register number for a register.  */
+/*----------------------------------------------------------------------*/
+static int
+stm8_dwarfRegNum (const struct reg_info *reg)
+{
+  /* todo: return valid values */
+  return -1;
 }
 
 static bool
@@ -366,7 +386,18 @@ PORT stm8_port =
   { -1, 0, 7, 2, 0, 2 },        /* stack information */
   /* Use more fine-grained control for multiplication / division. */
   { 0, -1 },
-  { stm8_emitDebuggerSymbol },
+  { stm8_emitDebuggerSymbol,
+	{
+      stm8_dwarfRegNum,
+      NULL,
+      NULL,
+      4,                        /* addressSize */
+      0,                        /* regNumRet */
+      0,                        /* regNumSP */
+      0,                        /* regNumBP */
+      0,                        /* offsetSP */
+    },
+  },
   {
     32767,                      /* maxCount */
      2,                         /* sizeofElement */
@@ -388,7 +419,7 @@ PORT stm8_port =
   NULL,
   stm8_keywords,
   NULL,
-  NULL,                         /* no genAssemblerEnd */
+  stm8_genAssemblerEnd,
   stm8_genIVT,
   0,                            /* no genXINIT code */
   stm8_genInitStartup,          /* genInitStartup */

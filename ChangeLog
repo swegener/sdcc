@@ -1,3 +1,8 @@
+2016-01-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  Improve DWARF support for stm8 ELF, picked from patch #255 by Peter Dons Tychsen.
+
 2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* src/pic16/pcode.c,
 	  src/pic16/pcodepeep.c:

@@ -2,6 +2,8 @@
 
 	* src/stm8/main.c:
 	  Improve DWARF support for stm8 ELF, picked from patch #255 by Peter Dons Tychsen.
+	* src/SDCCsymt.c:
+	  Fix handling of preserved regs in specifier merging.
 
 2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
 	* src/pic16/pcode.c,

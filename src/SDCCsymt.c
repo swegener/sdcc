@@ -678,6 +678,8 @@ finalizeSpec (sym_link * lnk)
 sym_link *
 mergeSpec (sym_link * dest, sym_link * src, const char *name)
 {
+  unsigned int i;
+
   if (!IS_SPEC (dest) || !IS_SPEC (src))
     {
 #if 0
@@ -823,6 +825,8 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   FUNC_ISNORETURN (dest) |= FUNC_ISNORETURN (src);
   FUNC_ISSMALLC (dest) |= FUNC_ISSMALLC (src);
   FUNC_ISZ88DK_CALLEE (dest) |= FUNC_ISZ88DK_CALLEE (src);
+  for (i = 0; i < 9; i++)
+    if (dest->funcAttrs.preserved_regs[i] |= src->funcAttrs.preserved_regs[i]);
 
   if (SPEC_ADDRSPACE (src) && SPEC_ADDRSPACE (dest))
     werror (E_TWO_OR_MORE_STORAGE_CLASSES, name);

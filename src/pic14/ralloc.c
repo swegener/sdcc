@@ -304,7 +304,6 @@ static int regname2key(char const *name)
         }
 
         return ( (key + (key >> 4) + (key>>8)) & 0x3f);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -1086,7 +1085,6 @@ static void packBits(set *bregs)
                         breg->rIdx = bit_no++;
                 }
         }
-
 }
 
 
@@ -1119,7 +1117,6 @@ static void bitEQUs(FILE *of, set *bregs)
                         bit_no++;
                 }
         }
-
 }
 
 void writeUsedRegs(FILE *of)
@@ -1164,7 +1161,7 @@ static int
 noSpilLoc (symbol * sym, eBBlock * ebp, iCode * ic)
 {
         debugLog ("%s\n", __FUNCTION__);
-        return (sym->usl.spillLoc ? 0 : 1);
+        return (sym->usl.spillLoc ? FALSE : TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1174,7 +1171,7 @@ static int
 hasSpilLoc (symbol * sym, eBBlock * ebp, iCode * ic)
 {
         debugLog ("%s\n", __FUNCTION__);
-        return (sym->usl.spillLoc ? 1 : 0);
+        return (sym->usl.spillLoc ? TRUE : FALSE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1186,9 +1183,9 @@ directSpilLoc (symbol * sym, eBBlock * ebp, iCode * ic)
         debugLog ("%s\n", __FUNCTION__);
         if (sym->usl.spillLoc &&
                 (IN_DIRSPACE (SPEC_OCLS (sym->usl.spillLoc->etype))))
-                return 1;
+                return TRUE;
         else
-                return 0;
+                return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1199,7 +1196,7 @@ static int
 hasSpilLocnoUptr (symbol * sym, eBBlock * ebp, iCode * ic)
 {
         debugLog ("%s\n", __FUNCTION__);
-        return ((sym->usl.spillLoc && !sym->uptr) ? 1 : 0);
+        return ((sym->usl.spillLoc && !sym->uptr) ? TRUE : FALSE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1318,11 +1315,11 @@ noOverLap (set * itmpStack, symbol * fsym)
         sym = setNextItem (itmpStack))
         {
                 if (sym->liveTo > fsym->liveFrom)
-                        return 0;
+                        return FALSE;
 
         }
 
-        return 1;
+        return TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1338,7 +1335,7 @@ DEFSETFUNC (isFree)
         debugLog ("%s\n", __FUNCTION__);
         /* if already found */
         if (*sloc)
-                return 0;
+                return FALSE;
 
                 /* if it is free && and the itmp assigned to
                 this does not have any overlapping live ranges
@@ -1349,10 +1346,10 @@ DEFSETFUNC (isFree)
                 getSize (sym->type) >= getSize (fsym->type))
         {
                 *sloc = sym;
-                return 1;
+                return TRUE;
         }
 
-        return 0;
+        return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1381,9 +1378,7 @@ spillLRWithPtrReg (symbol * forSym)
                 if (lrsym->isspilt || !lrsym->nRegs ||
                         (lrsym->liveTo < forSym->liveFrom))
                         continue;
-
         }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -1655,7 +1650,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
         this one : happens very rarely but it does happen */
         spillThis (forSym);
         return forSym;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -1981,28 +1975,28 @@ willCauseSpill (int nr, int rt)
         if pointer type not avlb then
                 check for type gpr */
                 if (nFreeRegs (rt) >= nr)
-                        return 0;
+                        return FALSE;
                 if (nFreeRegs (REG_GPR) >= nr)
-                        return 0;
+                        return FALSE;
         }
         else
         {
                 if (pic14_ptrRegReq)
                 {
                         if (nFreeRegs (rt) >= nr)
-                                return 0;
+                                return FALSE;
                 }
                 else
                 {
                         if (nFreeRegs (REG_PTR) +
                                 nFreeRegs (REG_GPR) >= nr)
-                                return 0;
+                                return FALSE;
                 }
         }
 
         debugLog (" ... yep it will (cause a spill)\n");
         /* it will cause a spil */
-        return 1;
+        return TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2254,7 +2248,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
                                         pic14_ptrRegReq--;
                                         ptrRegSet = 0;
                                 }
-
                         }
                 }
         }
@@ -2291,7 +2284,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
                         verifyRegsAssigned (IC_RIGHT (ic), ic);
                 }
         }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2552,9 +2544,7 @@ regTypeNum (void)
                         else
                                 sym->regType = REG_GPR;
 
-
                         debugLog ("  reg name %s,  reg type %s\n", sym->rname, debugLogRegType (sym->regType));
-
                 }
                 else
                         /* for the first run we don't provide */
@@ -2562,7 +2552,6 @@ regTypeNum (void)
                         /* see how things go                  */
                         sym->nRegs = 0;
         }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2678,7 +2667,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                         bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
                         hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
 
-                        return 1;
+                        return TRUE;
 
                 }
         }
@@ -2700,14 +2689,14 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                 /* only pack if this is not a function pointer */
                 if (!IS_REF (IC_RIGHT (ic)))
                         allocDirReg(IC_RIGHT (ic));
-                return 0;
+                return FALSE;
         }
 
         if (OP_SYMBOL (IC_RIGHT (ic))->isind ||
                 OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
         {
                 debugLog ("  %d - not packing - right side fails \n", __LINE__);
-                return 0;
+                return FALSE;
         }
 
         /* if the true symbol is defined in far space or on stack
@@ -2717,7 +2706,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                 if ((dic = farSpacePackable (ic)))
                         goto pack;
                 else
-                        return 0;
+                        return FALSE;
 
         }
         /* find the definition of iTempNN scanning backwards if we find a
@@ -2789,7 +2778,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
         }
 
         if (!dic)
-                return 0;                       /* did not find */
+                return FALSE;                       /* did not find */
 
         /* if assignment then check that right is not a bit */
         if (ASSIGNMENT (ic) && !POINTER_SET (ic))
@@ -2800,7 +2789,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                         /* if result is a bit too then it's ok */
                         etype = operandType (IC_RESULT (ic));
                         if (!IS_BITFIELD (etype))
-                                return 0;
+                                return FALSE;
                 }
         }
 
@@ -2820,7 +2809,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                         IC_RESULT (ic)->key == IC_LEFT (dic)->key) ||
                         (IC_RIGHT (dic) &&
                         IC_RESULT (ic)->key == IC_RIGHT (dic)->key)))
-                        return 0;
+                        return FALSE;
         }
 pack:
         debugLog ("  packing. removing %s\n", OP_SYMBOL (IC_RIGHT (ic))->rname);
@@ -2849,9 +2838,7 @@ pack:
         bitVectUnSetBit(OP_SYMBOL(IC_RESULT(ic))->defs,ic->key);
         hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
         OP_DEFS(IC_RESULT (dic))=bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
-        return 1;
-
-
+        return TRUE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -2928,8 +2915,6 @@ findAssignToSym (operand * op, iCode * ic)
         }
 
         return dic;
-
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -3491,11 +3476,8 @@ static void isData(sym_link *sl)
                         case S_EEPROM: fprintf (of, "eeprom "); break;
                         default: break;
                         }
-
                 }
-
         }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -3578,37 +3560,35 @@ packRegisters (eBBlock * ebp)
                 /*   iTemp := _c;         */
                 /*   _c = _c & op;        */
                 if ((ic->op == BITWISEAND || ic->op == '|' || ic->op == '^') &&
-                        ic->prev &&
-                        ic->prev->op == '=' &&
-                        IS_ITEMP (IC_LEFT (ic)) &&
-                        IC_LEFT (ic) == IC_RESULT (ic->prev) &&
-                        isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev)))
-        {
+                     ic->prev &&
+                     ic->prev->op == '=' &&
+                     IS_ITEMP (IC_LEFT (ic)) &&
+                     IC_LEFT (ic) == IC_RESULT (ic->prev) &&
+                     isOperandEqual (IC_RESULT(ic), IC_RIGHT(ic->prev))) {
+
                         iCode* ic_prev = ic->prev;
                         symbol* prev_result_sym = OP_SYMBOL (IC_RESULT (ic_prev));
 
                         ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
-                        if (IC_RESULT (ic_prev) != IC_RIGHT (ic))
-            {
+
+                        if (IC_RESULT (ic_prev) != IC_RIGHT (ic)) {
                                 bitVectUnSetBit (OP_USES (IC_RESULT (ic_prev)), ic->key);
                                 if (/*IS_ITEMP (IC_RESULT (ic_prev)) && */
-                                        prev_result_sym->liveTo == ic->seq)
-                {
+                                        prev_result_sym->liveTo == ic->seq) {
                                         prev_result_sym->liveTo = ic_prev->seq;
-                }
-            }
-                        bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
+                                }
+                        }
 
+                        bitVectSetBit (OP_USES (IC_RESULT (ic)), ic->key);
                         bitVectSetBit (ic->rlive, IC_RESULT (ic)->key);
 
-                        if (bitVectIsZero (OP_USES (IC_RESULT (ic_prev))))
-            {
+                        if (bitVectIsZero (OP_USES (IC_RESULT (ic_prev)))) {
                                 bitVectUnSetBit (ic->rlive, IC_RESULT (ic)->key);
                                 bitVectUnSetBit (OP_DEFS (IC_RESULT (ic_prev)), ic_prev->key);
                                 remiCodeFromeBBlock (ebp, ic_prev);
                                 hTabDeleteItem (&iCodehTab, ic_prev->key, ic_prev, DELETE_ITEM, NULL);
-            }
-        }
+                        }
+                }
 
                 /* if this is an itemp & result of a address of a true sym
                 then mark this as rematerialisable   */
@@ -3915,9 +3895,7 @@ pic14_assignRegisters (ebbIndex *ebbi)
     {
       reg_info *r;
 
-      for (r = setFirstItem (dynAllocRegs);
-           r;
-           r = setNextItem (dynAllocRegs))
+      for (r = setFirstItem (dynAllocRegs); r; r = setNextItem (dynAllocRegs))
         {
           r->isFree = FALSE;
         }

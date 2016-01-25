@@ -1,3 +1,8 @@
+2016-01-25 Molnar Karoly <molnarkaroly AT users.sf.net>
+	* src/pic14/pcode.c,
+	  src/pic14/ralloc.c:
+	  More use the logical constants.
+
 2016-01-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c:

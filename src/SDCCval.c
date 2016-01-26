@@ -1504,7 +1504,8 @@ strVal (const char *s)
   SPEC_SCLS (val->etype) = S_LITERAL;
   SPEC_CONST (val->etype) = 1;
 
-  utf_8 = copyStr (s[0] == '"' ? s : s + 1, &utf_8_size); // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 first (handling all escape sequences, etc).
+  // Convert input string (mixed UTF-8 and UTF-32) to UTF-8 first (handling all escape sequences, etc).
+  utf_8 = copyStr (s[0] == '"' ? s : s + 1, &utf_8_size);
 
   if (s[0] == '"') // UTF-8 string literal (any prefix u8 or L in the source would already have been stripped by earlier stages)
     {
@@ -1515,18 +1516,21 @@ strVal (const char *s)
   else
     {
       size_t utf_32_size;
-      const TYPE_UDWORD *utf_32 = utf_32_from_utf_8 (&utf_32_size, utf_8, utf_8_size); // Covert to UTF-32 next, since converting UTF-32 to UTF-16 is easier than UTF-8 to UTF-16.
+      // Convert to UTF-32 next, since converting UTF-32 to UTF-16 is easier than UTF-8 to UTF-16.
+      const TYPE_UDWORD *utf_32 = utf_32_from_utf_8 (&utf_32_size, utf_8, utf_8_size);
 
-      // TODO: Should we free (utf_8) here, or do we need some other free function due to the dbuf stuff?
+	  dbuf_free (utf_8);
 
       if (s[0] == 'U' || s[0] == 'L') // UTF-32 string literal
-        wassertl (0, "UTF-32 string literals not yet supported");
+        wassertl (0, "UTF-32 string literals are not yet supported");
       else if (s[0] == 'u') // UTF-16 string literal
         {
           size_t utf_16_size;
-          const TYPE_UWORD *utf_16 = utf_16_from_utf_32 (&utf_16_size, utf_32, utf_32_size); 
+          const TYPE_UWORD *utf_16 = utf_16_from_utf_32 (&utf_16_size, utf_32, utf_32_size);
 
-          wassertl (0, "C11 UTF-16 string literals not yet supported");
+          (void)utf_16; // suppress warning of unused variable as long as this is unsupported
+
+          wassertl (0, "C11 UTF-16 string literals are not yet supported");
         }
       else
         wassert (0);

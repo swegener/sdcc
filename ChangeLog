@@ -1,4 +1,9 @@
+2016-01-26 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCval.c (strVal): free utf_8 and suppress warning
+
 2016-01-25 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* src/pic14/pcode.c,
 	  src/pic14/ralloc.c:
 	  More use the logical constants.
@@ -11,11 +16,13 @@
 	  Fix handling of preserved regs in specifier merging.
 
 2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* src/pic16/pcode.c,
 	  src/pic16/pcodepeep.c:
 	  More use the logical constants.
 
 2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* src/pic14/gen.c,
 	  src/pic14/glue.c,
 	  src/pic14/pcode.c,
@@ -24,6 +31,7 @@
 	  More use the logical constants.
 
 2016-01-24 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* src/pic14/gen.c,
 	  src/pic14/pcode.c,
 	  src/pic14/pcode.h:
@@ -35,6 +43,7 @@
 	  On more place I exchanged the "char *" to "const char *".
 
 2016-01-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCC.y
 	* src/SDCCast.c
 	* src/SDCCast.h
@@ -130,6 +139,7 @@
 	  Fix pointer dereference issue, patch #261 by Peter Dons Tychsen.
 
 2016-01-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/non-free/include/pic14/*.h,
 	  device/non-free/include/pic16/*.h,
 	  device/non-free/lib/pic14/libdev/*.c,
@@ -137,6 +147,7 @@
 	  Updated the device files.
 
 2016-01-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* src/pic14/pcode.c,
 	  src/pic14/pcode.h,
 	  src/pic16/ralloc.c,
@@ -150,6 +161,7 @@
 	  Added the option to CFLAGS: --no-warn-non-free
 
 2016-01-16 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* src/pic14/gen.c,
 	  src/pic14/pcode.c:
 	  Each function has its own code section.
@@ -165,6 +177,7 @@
 	  Add a new test case.
 
 2016-01-14 Molnar Karoly <molnarkaroly AT users.sf.net>
+
 	* device/lib/pic14/configure,
 	  device/lib/pic14/configure.ac,
 	  device/lib/pic16/configure.ac:
@@ -196,14 +209,15 @@
 	  More accurate handling of Z80/Z180 I/O in peepholes.
 
 2016-01-11 Ben Shi <powerstudio1st AT 163 DOT com>
-        * src/ds390/ralloc.c
-        * src/mcs51/ralloc.c
-          Improve positionRegs().
-        * src/mcs51/gen.c
-          Roll back to previous version.
-        * support/regression/tests/bug-2263.c
-        * support/regression/tests/bug-2403.c
-          Add new test cases.
+
+	* src/ds390/ralloc.c
+	* src/mcs51/ralloc.c
+	  Improve positionRegs().
+	* src/mcs51/gen.c
+	  Roll back to previous version.
+	* support/regression/tests/bug-2263.c
+	* support/regression/tests/bug-2403.c
+	  Add new test cases.
 
 2016-01-10 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -212,10 +226,10 @@
 
 2016-01-10 Ben Shi <powerstudio1st AT 163 DOT com>
 
-        * src/mcs51/gen.c
-          Fix a bug in genOr() when all operands are in registers.
-        * support/regression/tests/bug-2448.c
-          Add a new test case.
+	* src/mcs51/gen.c
+	  Fix a bug in genOr() when all operands are in registers.
+	* support/regression/tests/bug-2448.c
+	  Add a new test case.
 
 2016-01-09 Molnar Karoly <molnarkaroly AT users.sf.net>
 

@@ -1,3 +1,8 @@
+2016-01-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c:
+	  Fix handling of __z88dk_fastcall in specifier merging.
+
 2016-01-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCval.c (strVal): free utf_8 and suppress warning

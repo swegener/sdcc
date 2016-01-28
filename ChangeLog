@@ -1,3 +1,8 @@
+2016-01-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/Makefile.in:
+	  Change handling of test filenames for regression tests, patch #266 by Peter Dons Tychsen.
+
 2016-01-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c:

@@ -2,6 +2,9 @@
 
 	* support/regression/Makefile.in:
 	  Change handling of test filenames for regression tests, patch #266 by Peter Dons Tychsen.
+	* src/SDCCast.c,
+	  support/regression/tests/bug-2458.c:
+	  Changed result type propagation for logic operations, variant of proposed fix by Peter Dons Tychsen for bug #2458.
 
 2016-01-26 Philipp Klaus Krause <pkk AT spth.de>
 

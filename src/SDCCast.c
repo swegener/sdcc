@@ -2711,6 +2711,8 @@ resultTypePropagate (ast * tree, RESULT_TYPE resultType)
     case AND_OP:
     case OR_OP:
     case '!':
+      /* Logical operators should always propagate to boolean */
+      return RESULT_TYPE_BOOL;
     case '=':
     case '?':
     case ':':

@@ -263,7 +263,7 @@ newAsmop (short type)
 {
   asmop *aop;
 
-  aop = Safe_calloc (1, sizeof (asmop));
+  aop = Safe_alloc(sizeof(asmop));
   aop->type = type;
   return aop;
 }
@@ -767,9 +767,6 @@ pic14aopLiteral (value * val, int offset)
 char *
 aopGet (asmop * aop, int offset, bool bit16, bool dname)
 {
-  char *s = buffer;
-  char *rs;
-
   //DEBUGpic14_emitcode ("; ***","%s  %d",__FUNCTION__,__LINE__);
   /* offset is greater than
      size then zero */
@@ -779,31 +776,26 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
 
   /* depending on type */
   switch (aop->type)
-    {
-
+  {
     case AOP_IMMD:
       if (bit16)
-        sprintf (s, "%s", aop->aopu.aop_immd);
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_immd);
       else if (offset)
-        sprintf (s, "(%s >> %d)", aop->aopu.aop_immd, offset * 8);
+        SNPRINTF(buffer, sizeof(buffer), "(%s >> %d)", aop->aopu.aop_immd, offset * 8);
       else
-        sprintf (s, "%s", aop->aopu.aop_immd);
-      DEBUGpic14_emitcode (";", "%d immd %s", __LINE__, s);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_immd);
+      DEBUGpic14_emitcode (";", "%d immd %s", __LINE__, buffer);
+      return Safe_strdup(buffer);
 
     case AOP_DIR:
       if (offset)
         {
-          sprintf (s, "(%s + %d)", aop->aopu.aop_dir, offset);
-          DEBUGpic14_emitcode (";", "oops AOP_DIR did this %s\n", s);
+          SNPRINTF(buffer, sizeof(buffer), "(%s + %d)", aop->aopu.aop_dir, offset);
+          DEBUGpic14_emitcode (";", "oops AOP_DIR did this %s\n", buffer);
         }
       else
-        sprintf (s, "%s", aop->aopu.aop_dir);
-      rs = Safe_calloc (1, strlen (s) + 1);
-      strcpy (rs, s);
-      return rs;
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_dir);
+      return Safe_strdup(buffer);
 
     case AOP_REG:
       //if (dname)
@@ -816,16 +808,14 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
       return aop->aopu.aop_dir;
 
     case AOP_LIT:
-      sprintf (s, "0x%02x", pic14aopLiteral (aop->aopu.aop_lit, offset));
-      rs = Safe_strdup (s);
-      return rs;
+      SNPRINTF(buffer, sizeof(buffer), "0x%02x", pic14aopLiteral (aop->aopu.aop_lit, offset));
+      return Safe_strdup(buffer);
 
     case AOP_STR:
       aop->coff = offset;
       if (strcmp (aop->aopu.aop_str[offset], "a") == 0 && dname)
         return "acc";
       DEBUGpic14_emitcode (";", "%d - %s", __LINE__, aop->aopu.aop_str[offset]);
-
       return aop->aopu.aop_str[offset];
 
     case AOP_PCODE:
@@ -838,26 +828,24 @@ aopGet (asmop * aop, int offset, bool bit16, bool dname)
             {
               offset += PCOI (pcop)->index;
             }
+
           if (offset)
             {
               DEBUGpic14_emitcode (";", "%s offset %d", pcop->name, offset);
-              sprintf (s, "(%s+%d)", pcop->name, offset);
+              SNPRINTF(buffer, sizeof(buffer), "(%s+%d)", pcop->name, offset);
             }
           else
             {
               DEBUGpic14_emitcode (";", "%s", pcop->name);
-              sprintf (s, "%s", pcop->name);
+              SNPRINTF(buffer, sizeof(buffer), "%s", pcop->name);
             }
         }
       else
-        sprintf (s, "0x%02x", PCOI (aop->aopu.pcop)->offset);
-
+        SNPRINTF(buffer, sizeof(buffer), "0x%02x", PCOI (aop->aopu.pcop)->offset);
     }
-    rs = Safe_calloc (1, strlen (s) + 1);
-    strcpy (rs, s);
-    return rs;
 
-    }
+    return Safe_strdup(buffer);
+  }
 
   werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopget got unsupported aop->type");
   exit (0);
@@ -1004,7 +992,7 @@ static pCodeOp *
 popRegFromString (const char *str, int size, int offset)
 {
 
-  pCodeOp *pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+  pCodeOp *pcop = Safe_alloc(sizeof(pCodeOpReg));
   pcop->type = PO_DIR;
 
   DEBUGpic14_emitcode (";", "%d", __LINE__);
@@ -1012,8 +1000,7 @@ popRegFromString (const char *str, int size, int offset)
   if (!str)
     str = "BAD_STRING";
 
-  pcop->name = Safe_calloc (1, strlen (str) + 1);
-  strcpy (pcop->name, str);
+  pcop->name = Safe_strdup(str);
 
   //pcop->name = Safe_strdup( ( (str) ? str : "BAD STRING"));
 
@@ -1042,7 +1029,7 @@ popRegFromIdx (int rIdx)
 
   DEBUGpic14_emitcode ("; ***", "%s,%d  , rIdx=0x%x", __FUNCTION__, __LINE__, rIdx);
 
-  pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+  pcop = Safe_alloc(sizeof(pCodeOpReg));
 
   PCOR (pcop)->rIdx = rIdx;
   PCOR (pcop)->r = typeRegWithIdx (rIdx, REG_STK, 1);
@@ -1098,7 +1085,7 @@ popGet (asmop * aop, int offset)        //, bool bit16, bool dname)
       assert (offset < aop->size);
       rIdx = aop->aopu.aop_reg[offset]->rIdx;
 
-      pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+      pcop = Safe_alloc(sizeof(pCodeOpReg));
       PCOR (pcop)->rIdx = rIdx;
       PCOR (pcop)->r = pic14_regWithIdx (rIdx);
       PCOR (pcop)->r->wasUsed = TRUE;
@@ -1193,7 +1180,6 @@ popGetAddr (asmop * aop, int offset, int index)
 void
 aopPut (asmop * aop, const char *s, int offset)
 {
-  char *d = buffer;
   symbol *lbl;
 
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
@@ -1211,19 +1197,19 @@ aopPut (asmop * aop, const char *s, int offset)
     case AOP_DIR:
       if (offset)
         {
-          sprintf (d, "(%s + %d)", aop->aopu.aop_dir, offset);
+          SNPRINTF(buffer, sizeof(buffer), "(%s + %d)", aop->aopu.aop_dir, offset);
           fprintf (stderr, "oops aopPut:AOP_DIR did this %s\n", s);
-
         }
       else
-        sprintf (d, "%s", aop->aopu.aop_dir);
+        SNPRINTF(buffer, sizeof(buffer), "%s", aop->aopu.aop_dir);
 
-      if (strcmp (d, s))
+      if (strcmp (buffer, s))
         {
           DEBUGpic14_emitcode (";", "%d", __LINE__);
           if (strcmp (s, "W"))
             pic14_emitcode ("movf", "%s,w", s);
-          pic14_emitcode ("movwf", "%s", d);
+
+          pic14_emitcode ("movwf", "%s", buffer);
 
           if (strcmp (s, "W"))
             {
@@ -1239,7 +1225,6 @@ aopPut (asmop * aop, const char *s, int offset)
                 }
             }
           emitpcode (POC_MOVWF, popGet (aop, offset));
-
         }
       break;
 
@@ -1258,7 +1243,7 @@ aopPut (asmop * aop, const char *s, int offset)
             }
           else if (strcmp (s, "W") == 0)
             {
-              pCodeOp *pcop = Safe_calloc (1, sizeof (pCodeOpReg));
+              pCodeOp *pcop = Safe_alloc(sizeof(pCodeOpReg));
               pcop->type = PO_GPR_REGISTER;
 
               PCOR (pcop)->rIdx = -1;
@@ -1286,7 +1271,6 @@ aopPut (asmop * aop, const char *s, int offset)
         pic14_emitcode ("push", "acc");
       else
         pic14_emitcode ("push", "%s", s);
-
       break;
 
     case AOP_CRY:
@@ -1312,6 +1296,7 @@ aopPut (asmop * aop, const char *s, int offset)
                 {
                   MOVA (s);
                 }
+
               pic14_emitcode ("clr", "c");
               pic14_emitcode ("jz", "%05d_DS_", labelKey2num (lbl->key));
               pic14_emitcode ("cpl", "c");
@@ -1329,9 +1314,8 @@ aopPut (asmop * aop, const char *s, int offset)
 
     default:
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopPut got unsupported aop->type");
-      exit (0);
+      exit(0);
     }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2257,10 +2241,13 @@ genPcall (iCode * ic)
      if(AOP_TYPE(IC_LEFT(ic)) == AOP_DIR) {
      char *rname;
      char *buffer;
+     size_t len;
+
      rname = IC_LEFT(ic)->aop->aopu.aop_dir;
      DEBUGpic14_emitcode ("; ***","%s  %d AOP_DIR %s",__FUNCTION__,__LINE__,rname);
-     buffer = Safe_calloc(1,strlen(rname)+16);
-     sprintf(buffer, "%s_goto_helper", rname);
+     len = strlen(rname) + 16;
+     buffer = Safe_alloc(len);
+     SNPRINTF(buffer, len, "%s_goto_helper", rname);
      addpCode2pBlock(pb,newpCode(POC_CALL,newpCodeOp(buffer,PO_STR)));
      free(buffer);
      }
@@ -6830,7 +6817,6 @@ genPointerSet (iCode * ic)
      the pointer values */
   switch (p_type)
     {
-
     case POINTER:
     case FPOINTER:
       //case IPOINTER:
@@ -7809,16 +7795,16 @@ aop_isLitLike (asmop * aop)
 {
   assert (aop);
   if (aop->type == AOP_LIT)
-    return 1;
+    return TRUE;
   if (aop->type == AOP_IMMD)
-    return 1;
+    return TRUE;
   if ((aop->type == AOP_PCODE) && ((aop->aopu.pcop->type == PO_LITERAL)))
     {
       /* this should be treated like a literal/immediate (use MOVLW/ADDLW/SUBLW
        * instead of MOVFW/ADDFW/SUBFW, use popGetAddr instead of popGet) */
-      return 1;
+      return TRUE;
     }
-  return 0;
+  return FALSE;
 }
 
 int
@@ -7826,13 +7812,13 @@ op_isLitLike (operand * op)
 {
   assert (op);
   if (aop_isLitLike (AOP (op)))
-    return 1;
+    return TRUE;
   if (IS_SYMOP (op) && IS_FUNC (OP_SYM_TYPE (op)))
-    return 1;
+    return TRUE;
   if (IS_SYMOP (op) && IS_PTR (OP_SYM_TYPE (op)) && (AOP_TYPE (op) == AOP_PCODE) && (AOP (op)->aopu.pcop->type == PO_IMMEDIATE))
     {
-      return 1;
+      return TRUE;
     }
 
-  return 0;
+  return FALSE;
 }

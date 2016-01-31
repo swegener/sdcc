@@ -1,3 +1,37 @@
+2016-01-31 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/device.c,
+	  src/pic14/gen.c,
+	  src/pic14/glue.c,
+	  src/pic14/pcode.c,
+	  src/pic14/pcodepeep.c,
+	  src/pic14/ralloc.c,
+	  src/pic16/device.c,
+	  src/pic16/device.h,
+	  src/pic16/gen.c,
+	  src/pic16/genarith.c,
+	  src/pic16/genutils.c,
+	  src/pic16/glue.c,
+	  src/pic16/glue.h,
+	  src/pic16/graph.c,
+	  src/pic16/main.c,
+	  src/pic16/pcode.c,
+	  src/pic16/pcode.h,
+	  src/pic16/pcodepeep.c,
+	  src/pic16/ralloc.c,
+	  src/pic16/ralloc.h:
+	  Use "Safe_alloc(...)" instead of "Safe_calloc(1, ...)".
+	  Use SNPRINTF(X, sizeof(X), ...) instead of sprintf(X, ...).
+	  Some code simplification, e.g.:
+	    sprintf (s, "%s", aop->aopu.aop_dir);
+	    rs = Safe_calloc (1, strlen (s) + 1);
+	    strcpy (rs, s);
+	    return rs;
+	      .
+	      .
+	      .
+	    return Safe_strdup(aop->aopu.aop_dir);
+
 2016-01-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/Makefile.in:

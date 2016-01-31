@@ -129,8 +129,8 @@ pCodeOpReg *pic16_frame_plusw;
 pCodeOpReg pic16_pc_gpsimio   = {{PO_GPR_REGISTER, "GPSIMIO"}, -1, NULL, 0, NULL};
 pCodeOpReg pic16_pc_gpsimio2  = {{PO_GPR_REGISTER, "GPSIMIO2"}, -1, NULL, 0, NULL};
 
-char *OPT_TYPE_STR[] = { "begin", "end", "jumptable_begin", "jumptable_end" };
-char *LR_TYPE_STR[] = { "entry begin", "entry end", "exit begin", "exit end" };
+static const char *OPT_TYPE_STR[] = { "begin", "end", "jumptable_begin", "jumptable_end" };
+const char *LR_TYPE_STR[] = { "entry begin", "entry end", "exit begin", "exit end" };
 
 
 static int mnemonics_initialized = 0;
@@ -188,11 +188,11 @@ void pic16_pCodeRegMapLiveRanges(pBlock *pb);
 void OptimizeLocalRegs(void);
 pCodeOp *pic16_popGet2p(pCodeOp *src, pCodeOp *dst);
 
-char *dumpPicOptype(PIC_OPTYPE type);
+const char *dumpPicOptype(PIC_OPTYPE type);
 
 pCodeOp *pic16_popGetLit2(int, pCodeOp *);
 pCodeOp *pic16_popGetLit(int);
-pCodeOp *pic16_popGetWithString(char *);
+pCodeOp *pic16_popGetWithString(const char *);
 int isBanksel(pCode *pc);
 extern int inWparamList(char *s);
 
@@ -206,7 +206,7 @@ static void pic16_df_stats ();
 static void pic16_createDF (pBlock *pb);
 static int pic16_removeUnusedRegistersDF ();
 static void pic16_destructDF (pBlock *pb);
-static void releaseStack ();
+static void releaseStack (void);
 
 /****************************************************************/
 /*                    PIC Instructions                          */
@@ -3367,11 +3367,10 @@ void pic16initMnemonics(void)
   mnemonics_initialized = 1;
 }
 
-int pic16_getpCodePeepCommand(char *cmd);
+int pic16_getpCodePeepCommand(const char *cmd);
 
-int pic16_getpCode(char *mnem,unsigned dest)
+int pic16_getpCode(const char *mnem,unsigned dest)
 {
-
   pCodeInstruction *pci;
   int key = mnem2key((unsigned char *)mnem);
 
@@ -3406,7 +3405,6 @@ int pic16_getpCode(char *mnem,unsigned dest)
  *-----------------------------------------------------------------*/
 void pic16initpCodePeepCommands(void)
 {
-
   int key, i;
   peepCommand *pcmd;
 
@@ -3423,7 +3421,6 @@ void pic16initpCodePeepCommands(void)
     //fprintf(stderr, "peep command %s  key %d\n",pcmd->cmd,pcmd->id);
     pcmd = hTabNextItem(pic16pCodePeepCommandsHash, &key);
   }
-
 }
 
 /*-----------------------------------------------------------------
@@ -3431,9 +3428,8 @@ void pic16initpCodePeepCommands(void)
  *
  *-----------------------------------------------------------------*/
 
-int pic16_getpCodePeepCommand(char *cmd)
+int pic16_getpCodePeepCommand(const char *cmd)
 {
-
   peepCommand *pcmd;
   int key = mnem2key((unsigned char *)cmd);
 
@@ -3532,7 +3528,6 @@ void pic16_movepBlock2Head(char dbName)
       pb = pb->next;
 
   }
-
 }
 
 void pic16_copypCode(FILE *of, char dbName)
@@ -3553,7 +3548,6 @@ void pic16_copypCode(FILE *of, char dbName)
 }
 void pic16_pcode_test(void)
 {
-
   DFPRINTF((stderr,"pcode is alive!\n"));
 
   //initMnemonics();
@@ -3567,7 +3561,7 @@ void pic16_pcode_test(void)
     strcpy(buffer,dstFileName);
     strcat(buffer,".p");
 
-    if( !(pFile = fopen(buffer, "w" ))) {
+    if(!(pFile = fopen(buffer, "w" ))) {
       werror(E_FILE_OPEN_ERR,buffer);
       exit(1);
     }
@@ -3613,9 +3607,8 @@ unsigned long pic16_countInstructions(void)
 /* fixme - why not just OR in the pcop bit field                   */
 /*-----------------------------------------------------------------*/
 
-static int RegCond(pCodeOp *pcop)
+static int RegCond(const pCodeOp *pcop)
 {
-
   if(!pcop)
     return 0;
 
@@ -3630,7 +3623,6 @@ static int RegCond(pCodeOp *pcop)
     case PIC_Z_BIT:
       return PCC_Z;
     }
-
   }
 
   return 0;
@@ -3665,7 +3657,7 @@ pCode *pic16_newpCode (PIC_OPCODE op, pCodeOp *pcop)
   if(!mnemonics_initialized)
     pic16initMnemonics();
 
-  pci = Safe_calloc(1, sizeof(pCodeInstruction));
+  pci = Safe_alloc(sizeof(pCodeInstruction));
 
   if((op>=0) && (op < MAX_PIC16MNEMONICS) && pic16Mnemonics[op]) {
     memcpy(pci, pic16Mnemonics[op], sizeof(pCodeInstruction));
@@ -3706,10 +3698,9 @@ pCode *pic16_newpCode (PIC_OPCODE op, pCodeOp *pcop)
 
 pCode *pic16_newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label)
 {
-
   pCodeWild *pcw;
 
-  pcw = Safe_calloc(1,sizeof(pCodeWild));
+  pcw = Safe_alloc(sizeof(pCodeWild));
 
   pcw->pci.pc.type = PC_WILD;
   pcw->pci.pc.prev = pcw->pci.pc.next = NULL;
@@ -3728,8 +3719,7 @@ pCode *pic16_newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optio
   pcw->mustNotBeBitSkipInst = FALSE;
   pcw->invertBitSkipInst = FALSE;
 
-  return ( (pCode *)pcw);
-
+  return ((pCode *)pcw);
 }
 
  /*-----------------------------------------------------------------*/
@@ -3737,12 +3727,11 @@ pCode *pic16_newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optio
 /*-----------------------------------------------------------------*/
 
 
-pCode *pic16_newpCodeInlineP(char *cP)
+pCode *pic16_newpCodeInlineP(const char *cP)
 {
+  pCodeComment *pcc;
 
-  pCodeComment *pcc ;
-
-  pcc = Safe_calloc(1,sizeof(pCodeComment));
+  pcc = Safe_alloc(sizeof(pCodeComment));
 
   pcc->pc.type = PC_INLINE;
   pcc->pc.prev = pcc->pc.next = NULL;
@@ -3753,25 +3742,20 @@ pCode *pic16_newpCodeInlineP(char *cP)
   pcc->pc.destruct = genericDestruct;
   pcc->pc.print = genericPrint;
 
-  if(cP)
-    pcc->comment = Safe_strdup(cP);
-  else
-    pcc->comment = NULL;
+  pcc->comment = (cP != NULL) ? Safe_strdup(cP) : NULL;
 
-  return ( (pCode *)pcc);
-
+  return ((pCode *)pcc);
 }
 
 /*-----------------------------------------------------------------*/
 /* newPcodeCharP - create a new pCode from a char string           */
 /*-----------------------------------------------------------------*/
 
-pCode *pic16_newpCodeCharP(char *cP)
+pCode *pic16_newpCodeCharP(const char *cP)
 {
+  pCodeComment *pcc;
 
-  pCodeComment *pcc ;
-
-  pcc = Safe_calloc(1,sizeof(pCodeComment));
+  pcc = Safe_alloc(sizeof(pCodeComment));
 
   pcc->pc.type = PC_COMMENT;
   pcc->pc.prev = pcc->pc.next = NULL;
@@ -3782,13 +3766,9 @@ pCode *pic16_newpCodeCharP(char *cP)
   pcc->pc.destruct = genericDestruct;
   pcc->pc.print = genericPrint;
 
-  if(cP)
-    pcc->comment = Safe_strdup(cP);
-  else
-    pcc->comment = NULL;
+  pcc->comment = (cP != NULL) ? Safe_strdup(cP) : NULL;
 
-  return ( (pCode *)pcc);
-
+  return ((pCode *)pcc);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3800,35 +3780,26 @@ pCode *pic16_newpCodeFunction(const char *mod, const char *f)
 {
   pCodeFunction *pcf;
 
-  pcf = Safe_calloc(1,sizeof(pCodeFunction));
+  pcf = Safe_alloc(sizeof(pCodeFunction));
 
   pcf->pc.type = PC_FUNCTION;
   pcf->pc.prev = pcf->pc.next = NULL;
   //pcf->pc.from = pcf->pc.to = pcf->pc.label = NULL;
   pcf->pc.pb = NULL;
 
-  //  pcf->pc.analyze = genericAnalyze;
+  //pcf->pc.analyze = genericAnalyze;
   pcf->pc.destruct = genericDestruct;
   pcf->pc.print = pCodePrintFunction;
 
   pcf->ncalled = 0;
-  pcf->absblock = 0;
+  pcf->absblock = FALSE;
 
-  if(mod) {
-    pcf->modname = Safe_calloc(1,strlen(mod)+1);
-    strcpy(pcf->modname,mod);
-  } else
-    pcf->modname = NULL;
-
-  if(f) {
-    pcf->fname = Safe_calloc(1,strlen(f)+1);
-    strcpy(pcf->fname,f);
-  } else
-    pcf->fname = NULL;
+  pcf->modname = (mod != NULL) ? Safe_strdup(mod) : NULL;
+  pcf->fname   = (f != NULL)   ? Safe_strdup(f)   : NULL;
 
   pcf->stackusage = 0;
 
-  return ( (pCode *)pcf);
+  return ((pCode *)pcf);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3859,15 +3830,14 @@ static void destructpCodeFlow(pCode *pc)
   pic16_addpCode2pBlock(pb_dead_pcodes, pc);
 
 //  Safe_free(pc);
-
 }
 
-pCode *pic16_newpCodeFlow(void )
+pCode *pic16_newpCodeFlow(void)
 {
   pCodeFlow *pcflow;
 
   //_ALLOC(pcflow,sizeof(pCodeFlow));
-  pcflow = Safe_calloc(1,sizeof(pCodeFlow));
+  pcflow = Safe_alloc(sizeof(pCodeFlow));
 
   pcflow->pc.type = PC_FLOW;
   pcflow->pc.prev = pcflow->pc.next = NULL;
@@ -3894,8 +3864,7 @@ pCode *pic16_newpCodeFlow(void )
 
   pcflow->registers = newSet();
 
-  return ( (pCode *)pcflow);
-
+  return ((pCode *)pcflow);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3904,7 +3873,7 @@ pCodeFlowLink *pic16_newpCodeFlowLink(pCodeFlow *pcflow)
 {
   pCodeFlowLink *pcflowLink;
 
-  pcflowLink = Safe_calloc(1,sizeof(pCodeFlowLink));
+  pcflowLink = Safe_alloc(sizeof(pCodeFlowLink));
 
   pcflowLink->pcflow = pcflow;
   pcflowLink->bank_conflict = 0;
@@ -3918,10 +3887,9 @@ pCodeFlowLink *pic16_newpCodeFlowLink(pCodeFlow *pcflow)
 
 pCode *pic16_newpCodeCSource(int ln, const char *f, const char *l)
 {
-
   pCodeCSource *pccs;
 
-  pccs = Safe_calloc(1,sizeof(pCodeCSource));
+  pccs = Safe_alloc(sizeof(pCodeCSource));
 
   pccs->pc.type = PC_CSOURCE;
   pccs->pc.prev = pccs->pc.next = NULL;
@@ -3931,18 +3899,10 @@ pCode *pic16_newpCodeCSource(int ln, const char *f, const char *l)
   pccs->pc.print = genericPrint;
 
   pccs->line_number = ln;
-  if(l)
-    pccs->line = Safe_strdup(l);
-  else
-    pccs->line = NULL;
+  pccs->line        = (l != NULL) ? Safe_strdup(l) : NULL;
+  pccs->file_name   = (f != NULL) ? Safe_strdup(f) : NULL;
 
-  if(f)
-    pccs->file_name = Safe_strdup(f);
-  else
-    pccs->file_name = NULL;
-
-  return ( (pCode *)pccs);
-
+  return ((pCode *)pccs);
 }
 
 
@@ -3951,40 +3911,39 @@ pCode *pic16_newpCodeCSource(int ln, const char *f, const char *l)
 /*                      added by VR 6-Jun-2003                     */
 /*******************************************************************/
 
-pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
+pCode *pic16_newpCodeAsmDir(const char *asdir, const char *argfmt, ...)
 {
   pCodeAsmDir *pcad;
   va_list ap;
   char buffer[512];
   char *lbp=buffer;
 
-        pcad = Safe_calloc(1, sizeof(pCodeAsmDir));
-        pcad->pci.pc.type = PC_ASMDIR;
-        pcad->pci.pc.prev = pcad->pci.pc.next = NULL;
-        pcad->pci.pc.pb = NULL;
-        pcad->pci.isize = 2;
-        pcad->pci.pc.destruct = genericDestruct;
-        pcad->pci.pc.print = genericPrint;
+  pcad = Safe_alloc(sizeof(pCodeAsmDir));
+  pcad->pci.pc.type = PC_ASMDIR;
+  pcad->pci.pc.prev = pcad->pci.pc.next = NULL;
+  pcad->pci.pc.pb = NULL;
+  pcad->pci.isize = 2;
+  pcad->pci.pc.destruct = genericDestruct;
+  pcad->pci.pc.print = genericPrint;
 
-        if(asdir && *asdir) {
+  if(asdir && *asdir) {
+    while(isspace((const unsigned char)*asdir)) asdir++;   // strip any white space from the beginning
 
-                while(isspace((unsigned char)*asdir))asdir++;   // strip any white space from the beginning
+    pcad->directive = Safe_strdup(asdir);
+  }
 
-                pcad->directive = Safe_strdup( asdir );
-        }
+  va_start(ap, argfmt);
 
-        va_start(ap, argfmt);
+  memset(buffer, 0, sizeof(buffer));
+  if(argfmt && *argfmt)
+    vsprintf(buffer, argfmt, ap);
 
-        memset(buffer, 0, sizeof(buffer));
-        if(argfmt && *argfmt)
-                vsprintf(buffer, argfmt, ap);
+  va_end(ap);
 
-        va_end(ap);
+  while(isspace((unsigned char)*lbp)) lbp++;
 
-        while(isspace((unsigned char)*lbp))lbp++;
-
-        if(lbp && *lbp)
-                pcad->arg = Safe_strdup( lbp );
+  if(lbp && *lbp)
+    pcad->arg = Safe_strdup(lbp);
 
   return ((pCode *)pcad);
 }
@@ -3994,7 +3953,6 @@ pCode *pic16_newpCodeAsmDir(char *asdir, char *argfmt, ...)
 /*-----------------------------------------------------------------*/
 static void pCodeLabelDestruct(pCode *pc)
 {
-
   if(!pc)
     return;
 
@@ -4013,16 +3971,14 @@ static void pCodeLabelDestruct(pCode *pc)
   pic16_addpCode2pBlock(pb_dead_pcodes, pc);
 
 //  Safe_free(pc);
-
 }
 
-pCode *pic16_newpCodeLabel(char *name, int key)
+pCode *pic16_newpCodeLabel(const char *name, int key)
 {
-
-  char *s = buffer;
+  const char *s;
   pCodeLabel *pcl;
 
-  pcl = Safe_calloc(1,sizeof(pCodeLabel) );
+  pcl = Safe_alloc(sizeof(pCodeLabel));
 
   pcl->pc.type = PC_LABEL;
   pcl->pc.prev = pcl->pc.next = NULL;
@@ -4036,24 +3992,21 @@ pCode *pic16_newpCodeLabel(char *name, int key)
   pcl->key = key;
   pcl->force = FALSE;
 
-  pcl->label = NULL;
   if(key>0) {
-    sprintf(s,"_%05d_DS_",key);
+    SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_",key);
+    s = buffer;
   } else
     s = name;
 
-  if(s)
-    pcl->label = Safe_strdup(s);
+  pcl->label = (s != NULL) ? Safe_strdup(s) : NULL;
 
 //  if(pic16_pcode_verbose)
 //      fprintf(stderr, "%s:%d label name: %s\n", __FILE__, __LINE__, pcl->label);
 
-
   return ((pCode *)pcl);
-
 }
 
-pCode *pic16_newpCodeLabelFORCE(char *name, int key)
+pCode *pic16_newpCodeLabelFORCE(const char *name, int key)
 {
   pCodeLabel *pcl = (pCodeLabel *)pic16_newpCodeLabel(name, key);
 
@@ -4066,17 +4019,17 @@ pCode *pic16_newpCodeInfo(INFO_TYPE type, pCodeOp *pcop)
 {
   pCodeInfo *pci;
 
-    pci = Safe_calloc(1, sizeof(pCodeInfo));
-    pci->pci.pc.type = PC_INFO;
-    pci->pci.pc.prev = pci->pci.pc.next = NULL;
-    pci->pci.pc.pb = NULL;
-    pci->pci.label = NULL;
+  pci = Safe_alloc(sizeof(pCodeInfo));
+  pci->pci.pc.type = PC_INFO;
+  pci->pci.pc.prev = pci->pci.pc.next = NULL;
+  pci->pci.pc.pb = NULL;
+  pci->pci.label = NULL;
 
-    pci->pci.pc.destruct = genericDestruct;
-    pci->pci.pc.print = genericPrint;
+  pci->pci.pc.destruct = genericDestruct;
+  pci->pci.pc.print = genericPrint;
 
-    pci->type = type;
-    pci->oper1 = pcop;
+  pci->type = type;
+  pci->oper1 = pcop;
 
   return ((pCode *)pci);
 }
@@ -4087,10 +4040,9 @@ pCode *pic16_newpCodeInfo(INFO_TYPE type, pCodeOp *pcop)
 /*-----------------------------------------------------------------*/
 static pBlock *newpBlock(void)
 {
-
   pBlock *PpB;
 
-  PpB = Safe_calloc(1,sizeof(pBlock) );
+  PpB = Safe_alloc(sizeof(pBlock));
   PpB->next = PpB->prev = NULL;
 
   PpB->function_entries = PpB->function_exits = PpB->function_calls = NULL;
@@ -4099,7 +4051,6 @@ static pBlock *newpBlock(void)
   PpB->FlowTree = NULL;
 
   return PpB;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -4113,7 +4064,6 @@ static pBlock *newpBlock(void)
 
 pBlock *pic16_newpCodeChain(memmap *cm,char c, pCode *pc)
 {
-
   pBlock *pB  = newpBlock();
 
   pB->pcHead  = pB->pcTail = pc;
@@ -4123,8 +4073,6 @@ pBlock *pic16_newpCodeChain(memmap *cm,char c, pCode *pc)
   return pB;
 }
 
-
-
 /*-----------------------------------------------------------------*/
 /* pic16_newpCodeOpLabel - Create a new label given the key              */
 /*  Note, a negative key means that the label is part of wild card */
@@ -4132,25 +4080,27 @@ pBlock *pic16_newpCodeChain(memmap *cm,char c, pCode *pc)
 /*   optimizations).                                               */
 /*-----------------------------------------------------------------*/
 
-pCodeOp *pic16_newpCodeOpLabel(char *name, int key)
+pCodeOp *pic16_newpCodeOpLabel(const char *name, int key)
 {
-  char *s=NULL;
-  static int label_key=-1;
+  static int label_key = -1;
+
+  const char *s;
 
   pCodeOp *pcop;
 
-  pcop = Safe_calloc(1,sizeof(pCodeOpLabel) );
+  pcop = Safe_alloc(sizeof(pCodeOpLabel));
   pcop->type = PO_LABEL;
 
-  pcop->name = NULL;
+  if(key>0) {
+    SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_",key);
+    s = buffer;
+  }
+  else {
+    key = label_key--;
+    s = name;
+  }
 
-  if(key>0)
-    sprintf(s=buffer,"_%05d_DS_",key);
-  else
-    s = name, key = label_key--;
-
-  if(s)
-    pcop->name = Safe_strdup(s);
+  pcop->name = (s != NULL) ? Safe_strdup(s) : NULL;
 
   ((pCodeOpLabel *)pcop)->key = key;
 
@@ -4162,21 +4112,17 @@ pCodeOp *pic16_newpCodeOpLabel(char *name, int key)
 /*-----------------------------------------------------------------*/
 pCodeOp *pic16_newpCodeOpLit(int lit)
 {
-  char *s = buffer;
   pCodeOp *pcop;
 
-
-  pcop = Safe_calloc(1,sizeof(pCodeOpLit) );
+  pcop = Safe_alloc(sizeof(pCodeOpLit));
   pcop->type = PO_LITERAL;
 
-  pcop->name = NULL;
   //if(lit>=0)
-    sprintf(s,"0x%02x", (unsigned char) lit);
+    SNPRINTF(buffer, sizeof(buffer), "0x%02x", (unsigned char)lit);
   //else
-  //  sprintf(s, "%i", lit);
+  //  SNPRINTF(buffer, sizeof(buffer), "%i", lit);
 
-  if(s)
-    pcop->name = Safe_strdup(s);
+  pcop->name = Safe_strdup(buffer);
 
   ((pCodeOpLit *)pcop)->lit = lit;
 
@@ -4186,21 +4132,17 @@ pCodeOp *pic16_newpCodeOpLit(int lit)
 /* Allow for 12 bit literals, required for LFSR */
 pCodeOp *pic16_newpCodeOpLit12(int lit)
 {
-  char *s = buffer;
   pCodeOp *pcop;
 
-
-  pcop = Safe_calloc(1,sizeof(pCodeOpLit) );
+  pcop = Safe_alloc(sizeof(pCodeOpLit));
   pcop->type = PO_LITERAL;
 
-  pcop->name = NULL;
   //if(lit>=0)
-    sprintf(s,"0x%03x", ((unsigned int)lit) & 0x0fff);
+    SNPRINTF(buffer, sizeof(buffer), "0x%03x", ((unsigned int)lit) & 0x0fff);
   //else
-  //  sprintf(s, "%i", lit);
+  //  SNPRINTF(buffer, sizeof(buffer), "%i", lit);
 
-  if(s)
-    pcop->name = Safe_strdup(s);
+  pcop->name = Safe_strdup(buffer);
 
   ((pCodeOpLit *)pcop)->lit = lit;
 
@@ -4211,19 +4153,17 @@ pCodeOp *pic16_newpCodeOpLit12(int lit)
 /*-----------------------------------------------------------------*/
 pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2)
 {
-  char *s = buffer, tbuf[256], *tb=tbuf;
+  char tbuf[256], *tb = tbuf;
   pCodeOp *pcop;
 
-
   tb = pic16_get_op(arg2, NULL, 0);
-  pcop = Safe_calloc(1,sizeof(pCodeOpLit2) );
+  pcop = Safe_alloc(sizeof(pCodeOpLit2));
   pcop->type = PO_LITERAL;
 
-  pcop->name = NULL;
+  //pcop->name = NULL;
   //if(lit>=0) {
-    sprintf(s,"0x%02x, %s", (unsigned char)lit, tb);
-    if(s)
-      pcop->name = Safe_strdup(s);
+    SNPRINTF(buffer, sizeof(buffer), "0x%02x, %s", (unsigned char)lit, tb);
+    pcop->name = Safe_strdup(buffer);
   //}
 
   ((pCodeOpLit2 *)pcop)->lit = lit;
@@ -4234,11 +4174,11 @@ pCodeOp *pic16_newpCodeOpLit2(int lit, pCodeOp *arg2)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
+pCodeOp *pic16_newpCodeOpImmd(const char *name, int offset, int index, int code_space)
 {
   pCodeOp *pcop;
 
-        pcop = Safe_calloc(1,sizeof(pCodeOpImmd) );
+        pcop = Safe_alloc(sizeof(pCodeOpImmd));
         pcop->type = PO_IMMEDIATE;
         if(name) {
                 reg_info *r = pic16_dirregWithName(name);
@@ -4269,19 +4209,17 @@ pCodeOp *pic16_newpCodeOpImmd(char *name, int offset, int index, int code_space)
 /*-----------------------------------------------------------------*/
 pCodeOp *pic16_newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
 {
-  char *s = buffer;
   pCodeOp *pcop;
-
 
   if(!pcwb || !subtype) {
     fprintf(stderr, "Wild opcode declaration error: %s-%d\n",__FILE__,__LINE__);
     exit(1);
   }
 
-  pcop = Safe_calloc(1,sizeof(pCodeOpWild));
+  pcop = Safe_alloc(sizeof(pCodeOpWild));
   pcop->type = PO_WILD;
-  sprintf(s,"%%%d",id);
-  pcop->name = Safe_strdup(s);
+  SNPRINTF(buffer, sizeof(buffer), "%%%d", id);
+  pcop->name = Safe_strdup(buffer);
 
   PCOW(pcop)->id = id;
   PCOW(pcop)->pcwb = pcwb;
@@ -4297,45 +4235,41 @@ pCodeOp *pic16_newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
 /*-----------------------------------------------------------------*/
 pCodeOp *pic16_newpCodeOpWild2(int id, int id2, pCodeWildBlock *pcwb, pCodeOp *subtype, pCodeOp *subtype2)
 {
-  char *s = buffer;
   pCodeOp *pcop;
-
 
         if(!pcwb || !subtype || !subtype2) {
                 fprintf(stderr, "Wild opcode declaration error: %s-%d\n",__FILE__,__LINE__);
                 exit(1);
         }
 
-        pcop = Safe_calloc(1,sizeof(pCodeOpWild));
+        pcop = Safe_alloc(sizeof(pCodeOpWild));
         pcop->type = PO_WILD;
-        sprintf(s,"%%%d",id);
-        pcop->name = Safe_strdup(s);
+        SNPRINTF(buffer, sizeof(buffer), "%%%d", id);
+        pcop->name = Safe_strdup(buffer);
 
         PCOW(pcop)->id = id;
         PCOW(pcop)->pcwb = pcwb;
         PCOW(pcop)->subtype = subtype;
         PCOW(pcop)->matched = NULL;
 
-        PCOW(pcop)->pcop2 = Safe_calloc(1, sizeof(pCodeOpWild));
+        PCOW(pcop)->pcop2 = Safe_alloc(sizeof(pCodeOpWild));
 
         if(!subtype2->name) {
-                PCOW(pcop)->pcop2 = Safe_calloc(1, sizeof(pCodeOpWild));
+                PCOW(pcop)->pcop2 = Safe_alloc(sizeof(pCodeOpWild));
                 PCOW2(pcop)->pcop.type = PO_WILD;
-                sprintf(s, "%%%d", id2);
-                PCOW2(pcop)->pcop.name = Safe_strdup(s);
+                SNPRINTF(buffer, sizeof(buffer), "%%%d", id2);
+                PCOW2(pcop)->pcop.name = Safe_strdup(buffer);
                 PCOW2(pcop)->id = id2;
                 PCOW2(pcop)->subtype = subtype2;
 
 //              fprintf(stderr, "%s:%d %s [wild,wild] for name: %s (%d)\tname2: %s (%d)\n", __FILE__, __LINE__, __FUNCTION__,
 //                              pcop->name, id, PCOW2(pcop)->pcop.name, id2);
         } else {
-                PCOW2(pcop)->pcop2 = pic16_pCodeOpCopy( subtype2 );
+                PCOW2(pcop)->pcop2 = pic16_pCodeOpCopy(subtype2);
 
 //              fprintf(stderr, "%s:%d %s [wild,str] for name: %s (%d)\tname2: %s (%d)\n", __FILE__, __LINE__, __FUNCTION__,
 //                              pcop->name, id, PCOW2(pcop)->pcop.name, id2);
         }
-
-
 
   return pcop;
 }
@@ -4343,17 +4277,13 @@ pCodeOp *pic16_newpCodeOpWild2(int id, int id2, pCodeWildBlock *pcwb, pCodeOp *s
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *pic16_newpCodeOpBit(char *s, int bit, int inBitSpace, PIC_OPTYPE subt)
+pCodeOp *pic16_newpCodeOpBit(const char *s, int bit, int inBitSpace, PIC_OPTYPE subt)
 {
   pCodeOp *pcop;
 
-  pcop = Safe_calloc(1,sizeof(pCodeOpRegBit) );
+  pcop = Safe_alloc(sizeof(pCodeOpRegBit));
   pcop->type = PO_GPR_BIT;
-  if(s)
-    pcop->name = Safe_strdup(s);
-  else
-    pcop->name = NULL;
-
+  pcop->name = (s != NULL) ? Safe_strdup(s) : NULL;
   PCORB(pcop)->bit = bit;
   PCORB(pcop)->inBitSpace = inBitSpace;
   PCORB(pcop)->subtype = subt;
@@ -4385,7 +4315,7 @@ pCodeOp *pic16_newpCodeOpReg(int rIdx)
   pCodeOp *pcop;
   reg_info *r;
 
-  pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+  pcop = Safe_alloc(sizeof(pCodeOpReg));
 
   pcop->name = NULL;
 
@@ -4415,7 +4345,7 @@ pCodeOp *pic16_newpCodeOpRegNotVect(bitVect *bv)
   pCodeOp *pcop;
   reg_info *r;
 
-    pcop = Safe_calloc(1, sizeof(pCodeOpReg));
+    pcop = Safe_alloc(sizeof(pCodeOpReg));
     pcop->name = NULL;
 
     r = pic16_findFreeReg(REG_GPR);
@@ -4436,16 +4366,16 @@ pCodeOp *pic16_newpCodeOpRegNotVect(bitVect *bv)
 
 
 
-pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
+pCodeOp *pic16_newpCodeOpRegFromStr(const char *name)
 {
   pCodeOp *pcop;
   reg_info *r;
 
-        pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
-        PCOR(pcop)->r = r = pic16_allocRegByName(name, 1, NULL);
-        PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
-        pcop->type = PCOR(pcop)->r->pc_type;
-        pcop->name = PCOR(pcop)->r->name;
+  pcop = Safe_alloc(sizeof(pCodeOpReg));
+  PCOR(pcop)->r = r = pic16_allocRegByName(name, 1, NULL);
+  PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
+  pcop->type = PCOR(pcop)->r->pc_type;
+  pcop->name = PCOR(pcop)->r->name;
 
 //      if(pic16_pcode_verbose) {
 //              fprintf(stderr, "%s:%d %s allocates register %s rIdx:0x%02x\n",
@@ -4457,14 +4387,14 @@ pCodeOp *pic16_newpCodeOpRegFromStr(char *name)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-pCodeOp *pic16_newpCodeOpOpt(OPT_TYPE type, char *key)
+pCodeOp *pic16_newpCodeOpOpt(OPT_TYPE type, const char *key)
 {
   pCodeOpOpt *pcop;
 
-        pcop = Safe_calloc(1, sizeof(pCodeOpOpt));
+  pcop = Safe_alloc(sizeof(pCodeOpOpt));
 
-        pcop->type = type;
-        pcop->key = Safe_strdup( key );
+  pcop->type = type;
+  pcop->key = Safe_strdup(key);
 
   return (PCOP(pcop));
 }
@@ -4475,9 +4405,9 @@ pCodeOp *pic16_newpCodeOpLocalRegs(LR_TYPE type)
 {
   pCodeOpLocalReg *pcop;
 
-        pcop = Safe_calloc(1, sizeof(pCodeOpLocalReg));
+  pcop = Safe_alloc(sizeof(pCodeOpLocalReg));
 
-        pcop->type = type;
+  pcop->type = type;
 
   return (PCOP(pcop));
 }
@@ -4486,7 +4416,7 @@ pCodeOp *pic16_newpCodeOpLocalRegs(LR_TYPE type)
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
-pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
+pCodeOp *pic16_newpCodeOp(const char *name, PIC_OPTYPE type)
 {
   pCodeOp *pcop;
 
@@ -4503,15 +4433,13 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
   case PO_LABEL:
     pcop = pic16_newpCodeOpLabel(NULL,-1);
     break;
+
   case PO_GPR_TEMP:
     pcop = pic16_newpCodeOpReg(-1);
     break;
 
   case PO_GPR_REGISTER:
-    if(name)
-      pcop = pic16_newpCodeOpRegFromStr(name);
-    else
-      pcop = pic16_newpCodeOpReg(-1);
+    pcop = (name != NULL) ? pic16_newpCodeOpRegFromStr(name) : pic16_newpCodeOpReg(-1);
     break;
 
   case PO_TWO_OPS:
@@ -4520,12 +4448,9 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
     break;
 
   default:
-    pcop = Safe_calloc(1,sizeof(pCodeOp) );
+    pcop = Safe_alloc(sizeof(pCodeOp));
     pcop->type = type;
-    if(name)
-      pcop->name = Safe_strdup(name);
-    else
-      pcop->name = NULL;
+    pcop->name = (name != NULL) ? Safe_strdup(name) : NULL;
   }
 
   return pcop;
@@ -4533,7 +4458,7 @@ pCodeOp *pic16_newpCodeOp(char *name, PIC_OPTYPE type)
 
 pCodeOp *pic16_newpCodeOp2(pCodeOp *src, pCodeOp *dst)
 {
-  pCodeOp2 *pcop2 = Safe_calloc(1, sizeof(pCodeOp2));
+  pCodeOp2 *pcop2 = Safe_alloc(sizeof(pCodeOp2));
   pcop2->pcop.type = PO_TWO_OPS;
   pcop2->pcopL = src;
   pcop2->pcopR = dst;
@@ -4595,9 +4520,9 @@ void pic16_flushDB(char ptype, void *p)
 /*-----------------------------------------------------------------*/
 void pic16_emitDB(int c, char ptype, void *p)
 {
-  int l;
+  size_t l;
 
-        if (DBd_init<0) {
+        if (DBd_init < 0) {
          // we need to initialize
                 DBd_init = 0;
                 DBd.count = 0;
@@ -4605,20 +4530,26 @@ void pic16_emitDB(int c, char ptype, void *p)
         }
 
         l = strlen(DBd.buffer);
-        sprintf(DBd.buffer+l,"%s0x%02x", (DBd.count>0?", ":""), c & 0xff);
+
+        if (sizeof(DBd.buffer) <= l) {
+                fprintf(stderr, "%s() -- Error: Size of DBd.buffer too small. (%zu <= %zu)\n", __func__, sizeof(DBd.buffer), l);
+                exit(1);
+        }
+
+        SNPRINTF(DBd.buffer + l, sizeof(DBd.buffer) - l, "%s0x%02x", ((DBd.count > 0) ? ", " : ""), c & 0xff);
 
 //      fprintf(stderr, "%s:%d DBbuffer: '%s'\n", __FILE__, __LINE__, DBd.buffer);
 
         DBd.count++;
-        if (DBd.count>= DB_ITEMS_PER_LINE)
+        if (DBd.count >= DB_ITEMS_PER_LINE)
                 pic16_flushDB(ptype, p);
 }
 
-void pic16_emitDS(char *s, char ptype, void *p)
+void pic16_emitDS(const char *s, char ptype, void *p)
 {
-  int l;
+  size_t l;
 
-        if (DBd_init<0) {
+        if (DBd_init < 0) {
          // we need to initialize
                 DBd_init = 0;
                 DBd.count = 0;
@@ -4626,19 +4557,25 @@ void pic16_emitDS(char *s, char ptype, void *p)
         }
 
         l = strlen(DBd.buffer);
-        sprintf(DBd.buffer+l,"%s%s", (DBd.count>0?", ":""), s);
+
+        if (sizeof(DBd.buffer) <= l) {
+                fprintf(stderr, "%s() -- Error: Size of DBd.buffer too small. (%zu <= %zu)\n", __func__, sizeof(DBd.buffer), l);
+                exit(1);
+        }
+
+        SNPRINTF(DBd.buffer + l, sizeof(DBd.buffer) - l, "%s%s", ((DBd.count > 0) ? ", " : ""), s);
 
 //      fprintf(stderr, "%s:%d DBbuffer: '%s'\n", __FILE__, __LINE__, DBd.buffer);
 
         DBd.count++;    //=strlen(s);
-        if (DBd.count>=DB_ITEMS_PER_LINE)
+        if (DBd.count >= DB_ITEMS_PER_LINE)
                 pic16_flushDB(ptype, p);
 }
 
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-void pic16_pCodeConstString(char *name, const char *value, unsigned length)
+void pic16_pCodeConstString(const char *name, const char *value, unsigned length)
 {
   pBlock *pb;
   char *item;
@@ -4666,8 +4603,7 @@ void pic16_pCodeConstString(char *name, const char *value, unsigned length)
 
   pic16_addpBlock(pb);
 
-//  sprintf(buffer,"; %s = ", name);
-//  strcat(buffer, value);
+//  SNPRINTF(buffer, sizeof(buffer), "; %s = %s", name, value);
 //  fputs(buffer, stderr);
 
 //  pic16_addpCode2pBlock(pb,pic16_newpCodeCharP(buffer));
@@ -4710,7 +4646,6 @@ static void pCodeReadCodeTable(void)
 /*-----------------------------------------------------------------*/
 void pic16_addpCode2pBlock(pBlock *pb, pCode *pc)
 {
-
   if(!pc)
     return;
 
@@ -4740,7 +4675,7 @@ void pic16_addpBlock(pBlock *pb)
   if(!the_pFile) {
     /* First time called, we'll pass through here. */
     //_ALLOC(the_pFile,sizeof(pFile));
-    the_pFile = Safe_calloc(1,sizeof(pFile));
+    the_pFile = Safe_alloc(sizeof(pFile));
     the_pFile->pbHead = the_pFile->pbTail = pb;
     the_pFile->functions = NULL;
     return;
@@ -4761,7 +4696,6 @@ static void removepBlock(pBlock *pb)
 
   if(!the_pFile)
     return;
-
 
   //fprintf(stderr," Removing pBlock: dbName =%c\n",getpBlock_dbName(pb));
 
@@ -4786,7 +4720,6 @@ static void removepBlock(pBlock *pb)
   }
 
   fprintf(stderr, "Warning: call to %s:%s didn't find pBlock\n",__FILE__,__FUNCTION__);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -4794,7 +4727,6 @@ static void removepBlock(pBlock *pb)
 /*-----------------------------------------------------------------*/
 static void printpCode(FILE *of, pCode *pc)
 {
-
   if(!pc || !of)
     return;
 
@@ -4888,7 +4820,6 @@ void pic16_unlinkpCode(pCode *pc)
 
 static void genericDestruct(pCode *pc)
 {
-
   pic16_unlinkpCode(pc);
 
   if(isPCI(pc)) {
@@ -4922,9 +4853,10 @@ void DEBUGpic16_emitcode (char *inst,char *fmt, ...);
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 /* modifiers for constant immediate */
-const char *immdmod[3]={"LOW", "HIGH", "UPPER"};
 
-char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
+static const char *immdmod[3] = {"LOW", "HIGH", "UPPER"};
+
+char *pic16_get_op(pCodeOp *pcop, char *buffer, size_t size)
 {
     reg_info *r;
     static char b[128];
@@ -5039,11 +4971,10 @@ char *pic16_get_op(pCodeOp *pcop,char *buffer, size_t size)
 /*-----------------------------------------------------------------*/
 /* pic16_get_op2 - variant to support two memory operand commands  */
 /*-----------------------------------------------------------------*/
-char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
+char *pic16_get_op2(pCodeOp *pcop, char *buffer, size_t size)
 {
-
   if(pcop && pcop->type == PO_TWO_OPS) {
-    return pic16_get_op( PCOP2(pcop)->pcopR, buffer, size );
+    return pic16_get_op(PCOP2(pcop)->pcopR, buffer, size);
   }
 
   return "NO operand2";
@@ -5053,22 +4984,19 @@ char *pic16_get_op2(pCodeOp *pcop,char *buffer, size_t size)
 /*-----------------------------------------------------------------*/
 static char *pic16_get_op_from_instruction( pCodeInstruction *pcc)
 {
-
-  if(pcc )
+  if(pcc)
     return pic16_get_op(pcc->pcop,NULL,0);
 
   /* gcc 3.2:  warning: concatenation of string literals with __FUNCTION__ is deprecated
    *   return ("ERROR Null: "__FUNCTION__);
    */
   return ("ERROR Null: pic16_get_op_from_instruction");
-
 }
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static void pCodeOpPrint(FILE *of, pCodeOp *pcop)
 {
-
   fprintf(of,"pcodeopprint- not implemented\n");
 }
 
@@ -5079,6 +5007,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 {
     char *s = str;
     reg_info *r;
+    size_t len;
 
 #if 0
     if(isPCI(pc) && (PCI(pc)->pci_magic != PCI_MAGIC)) {
@@ -5092,20 +5021,20 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 
         case PC_OPCODE:
             SNPRINTF(s, size, "\t%s\t", PCI(pc)->mnemonic);
-            size -= strlen(s);
-            s += strlen(s);
+            len = strlen(s);
+            size -= len;
+            s += len;
 
             if( (PCI(pc)->num_ops >= 1) && (PCI(pc)->pcop)) {
 
                 if (PCI(pc)->pcop->type == PO_TWO_OPS)
                 {
                     /* split into two phases due to static buffer in pic16_get_op() */
-                    SNPRINTF(s, size, "%s",
-                            pic16_get_op((PCI(pc)->pcop), NULL, 0));
-                    size -= strlen(s);
-                    s += strlen(s);
-                    SNPRINTF(s, size, ", %s",
-                            pic16_get_op2((PCI(pc)->pcop), NULL, 0));
+                    SNPRINTF(s, size, "%s", pic16_get_op((PCI(pc)->pcop), NULL, 0));
+                    len = strlen(s);
+                    size -= len;
+                    s += len;
+                    SNPRINTF(s, size, ", %s", pic16_get_op2((PCI(pc)->pcop), NULL, 0));
                     break;
                 }
 
@@ -5117,12 +5046,10 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
                 if(PCI(pc)->isBitInst) {
                     if(PCI(pc)->pcop->type != PO_GPR_BIT) {
                         if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
-                            SNPRINTF(s,size,"(%s >> 3), (%s & 7)",
-                                    PCI(pc)->pcop->name ,
-                                    PCI(pc)->pcop->name );
+                            SNPRINTF(s,size,"(%s >> 3), (%s & 7)", PCI(pc)->pcop->name, PCI(pc)->pcop->name);
                         else
                             SNPRINTF(s,size,"%s,%d", pic16_get_op_from_instruction(PCI(pc)),
-                                    (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit ));
+                                    (((pCodeOpRegBit *)(PCI(pc)->pcop))->bit));
 
                     } else if(PCI(pc)->pcop->type == PO_GPR_BIT) {
                         SNPRINTF(s,size,"%s, %d", pic16_get_op_from_instruction(PCI(pc)),PCORB(PCI(pc)->pcop)->bit);
@@ -5131,7 +5058,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
                 } else {
 
                     if(PCI(pc)->pcop->type == PO_GPR_BIT) {
-                        if( PCI(pc)->num_ops == 3)
+                        if(PCI(pc)->num_ops == 3)
                             SNPRINTF(s,size,"(%s >> 3),%c",pic16_get_op_from_instruction(PCI(pc)),((PCI(pc)->isModReg) ? 'F':'W'));
                         else
                             SNPRINTF(s,size,"(1 << (%s & 7))",pic16_get_op_from_instruction(PCI(pc)));
@@ -5140,13 +5067,15 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
                     }
                 }
 
-                if( PCI(pc)->num_ops == 3 || ((PCI(pc)->num_ops == 2) && (PCI(pc)->isAccess))) {
-                    size -= strlen(s);
-                    s += strlen(s);
+                if(PCI(pc)->num_ops == 3 || ((PCI(pc)->num_ops == 2) && (PCI(pc)->isAccess))) {
+                    len = strlen(s);
+                    size -= len;
+                    s += len;
                     if(PCI(pc)->num_ops == 3 && !PCI(pc)->isBitInst) {
                         SNPRINTF(s,size,", %c", ( (PCI(pc)->isModReg) ? 'F':'W'));
-                        size -= strlen(s);
-                        s += strlen(s);
+                        len = strlen(s);
+                        size -= len;
+                        s += len;
                     }
 
                     r = pic16_getRegFromInstruction(pc);
@@ -5170,8 +5099,9 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 
         case PC_INFO:
             SNPRINTF(s,size,"; info ==>");
-            size -= strlen(s);
-            s += strlen(s);
+            len = strlen(s);
+            size -= len;
+            s += len;
             switch( PCINF(pc)->type ) {
                 case INF_OPTIMIZATION:
                     SNPRINTF(s,size, " [optimization] %s\n", OPT_TYPE_STR[ PCOO(PCINF(pc)->oper1)->type ]);
@@ -5196,7 +5126,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
             SNPRINTF(s,size,";\tWild opcode: id=%d\n",PCW(pc)->id);
             break;
         case PC_FLOW:
-            SNPRINTF(s,size,";\t--FLOW change\n");
+            SNPRINTF(s,size,";\t--FLOW change.\n");
             break;
         case PC_CSOURCE:
             SNPRINTF(s,size,"%s\t.line\t%d; %s\t%s\n", ((pic16_mplab_comp || !options.debug)?";":""),
@@ -5213,7 +5143,7 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
             break;
 
         case PC_BAD:
-            SNPRINTF(s,size,";A bad pCode is being used\n");
+            SNPRINTF(s,size,";A bad pCode is being used.\n");
             break;
     }
 
@@ -5225,7 +5155,6 @@ char *pic16_pCode2str(char *str, size_t size, pCode *pc)
 /*-----------------------------------------------------------------*/
 static void genericPrint(FILE *of, pCode *pc)
 {
-
   if(!pc || !of)
     return;
 
@@ -5255,13 +5184,13 @@ static void genericPrint(FILE *of, pCode *pc)
               fprintf(of, " [localregs] %s\n", LR_TYPE_STR[ PCOLR(PCINF(pc)->oper1)->type ]);
               break;
         }
-    };
+    }
 
     break;
 
   case PC_INLINE:
     fprintf(of,"%s\n", ((pCodeComment *)pc)->comment);
-     break;
+    break;
 
   case PC_OPCODE:
     // If the opcode has a label, print that first
@@ -5343,7 +5272,6 @@ static void genericPrint(FILE *of, pCode *pc)
   default:
     fprintf(of,"unknown pCode type %d\n",pc->type);
   }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -5352,7 +5280,6 @@ static void genericPrint(FILE *of, pCode *pc)
 
 static void pCodePrintFunction(FILE *of, pCode *pc)
 {
-
   if(!pc || !of)
     return;
 
@@ -5369,7 +5296,7 @@ static void pCodePrintFunction(FILE *of, pCode *pc)
       fprintf(of,"%s:", PCF(pc)->fname);
 
       if(pic16_pcode_verbose)
-        fprintf(of, "\t;Function start");
+        fprintf(of, "\t;Function start.");
 
       fprintf(of, "\n");
 
@@ -5403,7 +5330,6 @@ static void pCodePrintFunction(FILE *of, pCode *pc)
 
 static void pCodePrintLabel(FILE *of, pCode *pc)
 {
-
   if(!pc || !of)
     return;
 
@@ -5423,15 +5349,13 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
 {
   pBranch *b, *bprev;
 
-
   bprev = NULL;
 
   if(pcl->type == PC_OPCODE || pcl->type == PC_INLINE || pcl->type == PC_ASMDIR)
     b = PCI(pcl)->label;
   else {
-    fprintf(stderr, "LINE %d. can't unlink from non opcode\n",__LINE__);
+    fprintf(stderr, "LINE %d. can't unlink from non opcode.\n",__LINE__);
     exit(1);
-
   }
 
   //fprintf (stderr, "%s \n",__FUNCTION__);
@@ -5456,7 +5380,6 @@ static void unlinkpCodeFromBranch(pCode *pcl , pCode *pc)
     bprev = b;
     b = b->next;
   }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -5478,8 +5401,8 @@ pBranch * pic16_pBranchAppend(pBranch *h, pBranch *n)
   b->next = n;
 
   return h;
-
 }
+
 /*-----------------------------------------------------------------*/
 /* pBranchLink - given two pcodes, this function will link them    */
 /*               together through their pBranches                  */
@@ -5491,7 +5414,7 @@ static void pBranchLink(pCodeFunction *f, pCodeFunction *t)
   // Declare a new branch object for the 'from' pCode.
 
   //_ALLOC(b,sizeof(pBranch));
-  b = Safe_calloc(1,sizeof(pBranch));
+  b = Safe_alloc(sizeof(pBranch));
   b->pc = PCODE(t);             // The link to the 'to' pCode.
   b->next = NULL;
 
@@ -5500,12 +5423,11 @@ static void pBranchLink(pCodeFunction *f, pCodeFunction *t)
   // Now do the same for the 'to' pCode.
 
   //_ALLOC(b,sizeof(pBranch));
-  b = Safe_calloc(1,sizeof(pBranch));
+  b = Safe_alloc(sizeof(pBranch));
   b->pc = PCODE(f);
   b->next = NULL;
 
   t->from = pic16_pBranchAppend(t->from,b);
-
 }
 
 #if 1
@@ -5561,7 +5483,6 @@ void pic16_pCodeUnlink(pCode *pc)
   }
 
   pic16_unlinkpCode (pc);
-
 }
 #endif
 /*-----------------------------------------------------------------*/
@@ -5608,21 +5529,20 @@ static void genericAnalyze(pCode *pc)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static int compareLabel(pCode *pc, pCodeOpLabel *pcop_label)
+static int compareLabel(const pCode *pc, const pCodeOpLabel *pcop_label)
 {
   pBranch *pbr;
 
   if(pc->type == PC_LABEL) {
-    if( ((pCodeLabel *)pc)->key ==  pcop_label->key)
+    if(((pCodeLabel *)pc)->key == pcop_label->key)
       return TRUE;
   }
-  if((pc->type == PC_OPCODE)
-        || (pc->type == PC_ASMDIR)
-        ) {
+
+  if((pc->type == PC_OPCODE) || (pc->type == PC_ASMDIR)) {
     pbr = PCI(pc)->label;
     while(pbr) {
       if(pbr->pc->type == PC_LABEL) {
-        if( ((pCodeLabel *)(pbr->pc))->key ==  pcop_label->key)
+        if(((pCodeLabel *)(pbr->pc))->key == pcop_label->key)
           return TRUE;
       }
       pbr = pbr->next;
@@ -5634,7 +5554,7 @@ static int compareLabel(pCode *pc, pCodeOpLabel *pcop_label)
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-static int checkLabel(pCode *pc)
+static int checkLabel(const pCode *pc)
 {
   pBranch *pbr;
 
@@ -5654,9 +5574,9 @@ static int checkLabel(pCode *pc)
 /*-----------------------------------------------------------------*/
 /* findLabelinpBlock - Search the pCode for a particular label     */
 /*-----------------------------------------------------------------*/
-static pCode * findLabelinpBlock(pBlock *pb,pCodeOpLabel *pcop_label)
+static pCode *findLabelinpBlock(pBlock *pb, const pCodeOpLabel *pcop_label)
 {
-  pCode  *pc;
+  pCode *pc;
 
   if(!pb)
     return NULL;
@@ -5671,7 +5591,7 @@ static pCode * findLabelinpBlock(pBlock *pb,pCodeOpLabel *pcop_label)
 /*-----------------------------------------------------------------*/
 /* findLabel - Search the pCode for a particular label             */
 /*-----------------------------------------------------------------*/
-static pCode * findLabel(pCodeOpLabel *pcop_label)
+static pCode *findLabel(const pCodeOpLabel *pcop_label)
 {
   pBlock *pb;
   pCode  *pc;
@@ -5680,7 +5600,7 @@ static pCode * findLabel(pCodeOpLabel *pcop_label)
     return NULL;
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next) {
-    if( (pc = findLabelinpBlock(pb,pcop_label)) != NULL)
+    if((pc = findLabelinpBlock(pb,pcop_label)) != NULL)
       return pc;
   }
 
@@ -5760,12 +5680,8 @@ pCode * pic16_findPrevInstruction(pCode *pci)
 
   while(pc) {
 
-    if((pc->type == PC_OPCODE)
-        || (pc->type == PC_WILD)
-        || (pc->type == PC_ASMDIR)
-        )
+    if((pc->type == PC_OPCODE) || (pc->type == PC_WILD) || (pc->type == PC_ASMDIR))
       return pc;
-
 
 #ifdef PCODE_DEBUG
     fprintf(stderr,"pic16_findPrevInstruction:  ");
@@ -5787,7 +5703,6 @@ pCode * pic16_findPrevInstruction(pCode *pci)
 /*-----------------------------------------------------------------*/
 static pCode * findFunctionEnd(pCode *pc)
 {
-
   while(pc) {
     if(pc->type == PC_FUNCTION &&  !(PCF(pc)->fname))
       return pc;
@@ -5806,33 +5721,25 @@ static pCode * findFunctionEnd(pCode *pc)
 /*-----------------------------------------------------------------*/
 static void AnalyzeLabel(pCode *pc)
 {
-
   pic16_pCodeUnlink(pc);
-
 }
 #endif
 
 #if 0
 static void AnalyzeGOTO(pCode *pc)
 {
-
   pBranchLink(pc,findLabel( (pCodeOpLabel *) (PCI(pc)->pcop) ));
-
 }
 
 static void AnalyzeSKIP(pCode *pc)
 {
-
   pBranchLink(pc,pic16_findNextInstruction(pc->next));
   pBranchLink(pc,pic16_findNextInstruction(pc->next->next));
-
 }
 
 static void AnalyzeRETURN(pCode *pc)
 {
-
   //  branch_link(pc,findFunctionEnd(pc->next));
-
 }
 
 #endif
@@ -5843,7 +5750,8 @@ static void AnalyzeRETURN(pCode *pc)
 /*                            part of pic16_getRegFromInstruction(2) */
 /*-------------------------------------------------------------------*/
 
-reg_info * pic16_getRegFrompCodeOp (pCodeOp *pcop) {
+reg_info * pic16_getRegFrompCodeOp (pCodeOp *pcop)
+{
   if (!pcop) return NULL;
 
   switch(pcop->type) {
@@ -5872,11 +5780,11 @@ reg_info * pic16_getRegFrompCodeOp (pCodeOp *pcop) {
 
   case PO_IMMEDIATE:
 //    return pic16_dirregWithName(PCOI(pcop)->r->name);
-
-    if(PCOI(pcop)->r)
+/*    if(PCOI(pcop)->r)
       return (PCOI(pcop)->r);
     else
-      return NULL;
+      return NULL;*/
+    return (PCOI(pcop)->r);
 
   case PO_GPR_BIT:
     return PCOR(pcop)->r;
@@ -5941,7 +5849,6 @@ reg_info * pic16_getRegFromInstruction(pCode *pc)
 /*-------------------------------------------------------------------------------*/
 reg_info * pic16_getRegFromInstruction2(pCode *pc)
 {
-
   if(!pc                   ||
      !isPCI(pc)            ||
      !PCI(pc)->pcop        ||
@@ -5996,7 +5903,7 @@ static void AnalyzepBlock(pBlock *pb)
 
         if(!r) {
           /* register wasn't found */
-          //r = Safe_calloc(1, sizeof(regs));
+          //r = Safe_alloc(sizeof(regs));
           //memcpy(r,PCOR(PCI(pc)->pcop)->r, sizeof(regs));
           //addSet(&pb->tregisters, r);
           addSet(&pb->tregisters, PCOR(PCI(pc)->pcop)->r);
@@ -6018,8 +5925,6 @@ static void AnalyzepBlock(pBlock *pb)
         }
       }
     }
-
-
   }
 }
 
@@ -6171,16 +6076,13 @@ static void unBuildFlow(pBlock *pb)
 
     pc = pcnext;
   }
-
-
 }
 #if 0
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static void dumpCond(int cond)
 {
-
-  static char *pcc_str[] = {
+  static const char *pcc_str[] = {
     //"PCC_NONE",
     "PCC_REGISTER",
     "PCC_C",
@@ -6199,10 +6101,11 @@ static void dumpCond(int cond)
 
   fprintf(stderr, "0x%04X\n",cond);
 
-  for(i=0,j=1; i<ncond; i++, j<<=1)
-    if(cond & j)
+  for(i=0,j=1; i<ncond; i++, j<<=1) {
+    if(cond & j) {
       fprintf(stderr, "  %s\n",pcc_str[i]);
-
+    }
+  }
 }
 #endif
 
@@ -6211,7 +6114,6 @@ static void dumpCond(int cond)
 /*-----------------------------------------------------------------*/
 static void FlowStats(pCodeFlow *pcflow)
 {
-
   pCode *pc;
 
   if(!isPCFL(pcflow))
@@ -6226,12 +6128,10 @@ static void FlowStats(pCodeFlow *pcflow)
     return;
   }
 
-
   fprintf(stderr, "  FlowStats inCond: ");
   dumpCond(pcflow->inCond);
   fprintf(stderr, "  FlowStats outCond: ");
   dumpCond(pcflow->outCond);
-
 }
 #endif
 /*-----------------------------------------------------------------*
@@ -6254,13 +6154,13 @@ static int isBankInstruction(pCode *pc)
   reg_info *reg;
 
   if(!isPCI(pc))
-    return 0;
+    return FALSE;
 
-  if( PCI(pc)->op == POC_MOVLB ||
-      (( (reg = pic16_getRegFromInstruction(pc)) != NULL) && isBSR_REG(reg))) {
+  if((PCI(pc)->op == POC_MOVLB) ||
+     (((reg = pic16_getRegFromInstruction(pc)) != NULL) && isBSR_REG(reg))) {
   }
 
-  return 1;
+  return TRUE;
 }
 
 
@@ -6268,7 +6168,6 @@ static int isBankInstruction(pCode *pc)
 /*-----------------------------------------------------------------*/
 static void FillFlow(pCodeFlow *pcflow)
 {
-
   pCode *pc;
 
   if(!isPCFL(pcflow))
@@ -6317,10 +6216,10 @@ static void LinkFlow_pCode(pCodeInstruction *from, pCodeInstruction *to)
 
   addSetIfnotP(&(from->pcflow->to), toLink);   //to->pcflow);
   addSetIfnotP(&(to->pcflow->from), fromLink); //from->pcflow);
-
 }
 
-pCode *pic16_getJumptabpCode (pCode *pc) {
+static pCode *pic16_getJumptabpCode (pCode *pc)
+{
   pCode *pcinf;
 
   //fprintf (stderr, "%s - start for %p in %p", __FUNCTION__, pc, isPCI(pc) ? PCI(pc)->pcflow : NULL);
@@ -6488,32 +6387,27 @@ static void LinkFlow(pBlock *pb)
     }
 
     //fprintf(stderr, "ends with nothing: ERROR\n");
-
   }
 }
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
-int pic16_isPCinFlow(pCode *pc, pCode *pcflow)
+int pic16_isPCinFlow(const pCode *pc, const pCode *pcflow)
 {
-
   if(!pc || !pcflow)
-    return 0;
+    return FALSE;
 
   if((!isPCI(pc) && !isPCAD(pc)) || !PCI(pc)->pcflow || !isPCFL(pcflow) )
-    return 0;
+    return FALSE;
 
   if( PCI(pc)->pcflow->pc.seq == pcflow->seq)
-    return 1;
+    return TRUE;
 
-  return 0;
+  return FALSE;
 }
-
-
-
-
 
 /*-----------------------------------------------------------------*/
 /* insertBankSwitch - inserts a bank switch statement in the       */
@@ -6621,14 +6515,13 @@ static int compareBankFlow(pCodeFlow *pcflow, pCodeFlowLink *pcflowLink, int toO
 {
 
   if(!pcflow || !pcflowLink || !pcflowLink->pcflow)
-    return 0;
+    return FALSE;
 
   if(!isPCFL(pcflow) || !isPCFL(pcflowLink->pcflow))
-    return 0;
+    return FALSE;
 
   if(pcflow->firstBank == -1)
-    return 0;
-
+    return FALSE;
 
   if(pcflowLink->pcflow->firstBank == -1) {
     pCodeFlowLink *pctl = setFirstItem( toORfrom ?
@@ -6639,7 +6532,7 @@ static int compareBankFlow(pCodeFlow *pcflow, pCodeFlowLink *pcflowLink, int toO
 
   if(toORfrom) {
     if(pcflow->lastBank == pcflowLink->pcflow->firstBank)
-      return 0;
+      return FALSE;
 
     pcflowLink->bank_conflict++;
     pcflowLink->pcflow->FromConflicts++;
@@ -6647,7 +6540,7 @@ static int compareBankFlow(pCodeFlow *pcflow, pCodeFlowLink *pcflowLink, int toO
   } else {
 
     if(pcflow->firstBank == pcflowLink->pcflow->lastBank)
-      return 0;
+      return FALSE;
 
     pcflowLink->bank_conflict++;
     pcflowLink->pcflow->ToConflicts++;
@@ -6660,8 +6553,7 @@ static int compareBankFlow(pCodeFlow *pcflow, pCodeFlowLink *pcflowLink, int toO
           pcflowLink->pcflow->FromConflicts,
           pcflowLink->pcflow->ToConflicts);
   */
-  return 1;
-
+  return TRUE;
 }
 #endif
 
@@ -6673,7 +6565,6 @@ static void DumpFlow(pBlock *pb)
   pCode *pc=NULL;
   pCode *pcflow;
   pCodeFlowLink *pcfl;
-
 
   fprintf(stderr,"Dump flow \n");
   pb->pcHead->print(stderr, pb->pcHead);
@@ -6702,7 +6593,6 @@ static void DumpFlow(pBlock *pb)
         fprintf(stderr,"oops dumpflow - from is not a pcflow\n");
         pc->print(stderr,pc);
       }
-
     }
 
     for(pcfl = setFirstItem(PCFL(pcflow)->to); pcfl; pcfl=setNextItem(PCFL(pcflow)->to)) {
@@ -6714,11 +6604,8 @@ static void DumpFlow(pBlock *pb)
         fprintf(stderr,"oops dumpflow - to is not a pcflow\n");
         pc->print(stderr,pc);
       }
-
     }
-
   }
-
 }
 #endif
 /*-----------------------------------------------------------------*/
@@ -6743,10 +6630,7 @@ static int OptimizepBlock(pBlock *pb)
 
   pcprev = pc->prev;
   do {
-
-
     if(pic16_pCodePeepMatchRule(pc)) {
-
       matches++;
 
       if(pcprev)
@@ -6759,8 +6643,8 @@ static int OptimizepBlock(pBlock *pb)
 
   if(matches)
     DFPRINTF((stderr," Optimizing pBlock: %c - matches=%d\n",getpBlock_dbName(pb),matches));
-  return matches;
 
+  return matches;
 }
 
 /*-----------------------------------------------------------------*/
@@ -6778,7 +6662,6 @@ static pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
       return pc;
   }
 
-
   return NULL;
 }
 
@@ -6786,8 +6669,7 @@ static pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
 /*-----------------------------------------------------------------*/
 static void exchangeLabels(pCodeLabel *pcl, pCode *pc)
 {
-
-  char *s=NULL;
+  const char *s;
 
   if(isPCI(pc) &&
      (PCI(pc)->pcop) &&
@@ -6802,22 +6684,21 @@ static void exchangeLabels(pCodeLabel *pcl, pCode *pc)
     /* If the key is negative, then we (probably) have a label to
      * a function and the name is already defined */
 
-    if(pcl->key>0)
-      sprintf(s=buffer,"_%05d_DS_",pcl->key);
+    if(pcl->key>0) {
+      SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_", pcl->key);
+      s = buffer;
+    }
     else
       s = pcl->label;
 
-    //sprintf(buffer,"_%05d_DS_",pcl->key);
+    //SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_",pcl->key);
     if(!s) {
       fprintf(stderr, "ERROR %s:%d function label is null\n",__FUNCTION__,__LINE__);
     }
     pcol->pcop.name = Safe_strdup(s);
     pcol->key = pcl->key;
     //pc->print(stderr,pc);
-
   }
-
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -6826,7 +6707,8 @@ static void exchangeLabels(pCodeLabel *pcl, pCode *pc)
 /*-----------------------------------------------------------------*/
 static void pBlockRemoveUnusedLabels(pBlock *pb)
 {
-  pCode *pc; pCodeLabel *pcl;
+  pCode *pc;
+  pCodeLabel *pcl;
 
   if(!pb || !pb->pcHead)
     return;
@@ -6869,7 +6751,7 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
     /* This pCode is a label, so search the pBlock to see if anyone
      * refers to it */
 
-    if( (pcl->key>0) && (!findInstructionUsingLabel(pcl, pb->pcHead))
+    if((pcl->key>0) && (!findInstructionUsingLabel(pcl, pb->pcHead))
         && (!pcl->force)) {
     //if( !findInstructionUsingLabel(pcl, pb->pcHead)) {
       /* Couldn't find an instruction that refers to this label
@@ -6887,12 +6769,9 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
           Safe_free(pc->label);
         }*/
       }
-
     }
   }
-
 }
-
 
 /*-----------------------------------------------------------------*/
 /* pic16_pBlockMergeLabels - remove the pCode labels from the pCode      */
@@ -6940,7 +6819,7 @@ void pic16_pBlockMergeLabels(pBlock *pb)
 
         //_ALLOC(pbr,sizeof(pBranch));
 #if 1
-        pbr = Safe_calloc(1,sizeof(pBranch));
+        pbr = Safe_alloc(sizeof(pBranch));
         pbr->pc = pc;
         pbr->next = NULL;
 
@@ -6961,12 +6840,11 @@ void pic16_pBlockMergeLabels(pBlock *pb)
         //fprintf(stderr, "merging CSRC\n");
         //genericPrint(stderr,pcnext);
       }
-
     }
     pc = pcn;
   }
-  pBlockRemoveUnusedLabels(pb);
 
+  pBlockRemoveUnusedLabels(pb);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6996,11 +6874,8 @@ static int OptimizepCode(char dbName)
   return matches;
 }
 
-
-
 const char *pic16_pCodeOpType(pCodeOp *pcop);
 const char *pic16_pCodeOpSubType(pCodeOp *pcop);
-
 
 /*-----------------------------------------------------------------*/
 /* pic16_popCopyGPR2Bit - copy a pcode operator                          */
@@ -7034,13 +6909,13 @@ pCodeOp *pic16_popCopyGPR2Bit(pCodeOp *pc, int bitval)
 /*----------------------------------------------------------------------*
  * pic16_areRegsSame - check to see if the names of two registers match *
  *----------------------------------------------------------------------*/
-int pic16_areRegsSame(reg_info *r1, reg_info *r2)
+
+#if 0
+static int pic16_areRegsSame(const reg_info *r1, const reg_info *r2)
 {
-        if(!strcmp(r1->name, r2->name))return 1;
-
-  return 0;
+  return ((strcmp(r1->name, r2->name) == 0) ? TRUE : FALSE);
 }
-
+#endif
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
@@ -7129,8 +7004,12 @@ static void pic16_FixRegisterBanking(pBlock *pb)
                   char op1[128], op2[128];
 
                     if(prevreg) {
-                      strcpy(op1, pic16_get_op_from_instruction(PCI(pc)));
-                      strcpy(op2, pic16_get_op_from_instruction(PCI(pcprev)));
+                      strncpy(op1, pic16_get_op_from_instruction(PCI(pc)), sizeof(op1) - 1);
+                      op1[sizeof(op1) - 1] = '\0';
+
+                      strncpy(op2, pic16_get_op_from_instruction(PCI(pcprev)), sizeof(op2) - 1);
+                      op2[sizeof(op2) - 1] = '\0';
+
                       if(!strcmp(op1, op2))goto loop;
                     }
                 }
@@ -7148,7 +7027,7 @@ loop:
 /** ADDITIONS BY RAPHAEL NEIDER, 2004-11-16: GOTO OPTIMIZATIONS **/
 
 /* Returns the (maximum of the) number of bytes used by the specified pCode. */
-int instrSize (pCode *pc)
+static int instrSize (pCode *pc)
 {
   if (!pc) return 0;
 
@@ -7167,9 +7046,9 @@ int instrSize (pCode *pc)
  * label).
  * Returns 0 if pc is not preceeded by the specified label.
  */
-int isLabel (pCode *pc, char *label)
+static int isLabel (const pCode *pc, const char *label)
 {
-  if (!pc) return 0;
+  if (!pc) return FALSE;
 
   // label attached to the pCode?
   if (isPCI(pc) || isPCAD(pc) || isPCW(pc) || pc->type == PC_INFO) {
@@ -7178,29 +7057,29 @@ int isLabel (pCode *pc, char *label)
 
     while (lab) {
       if (isPCL(lab->pc) && strcmp(PCL(lab->pc)->label, label) == 0) {
-        return 1;
+        return TRUE;
       }
       lab = lab->next;
-    } // while
-  } // if
+    }
+  }
 
   // is inline assembly label?
   if (isPCAD(pc) && PCAD(pc)->directive == NULL && PCAD(pc)->arg) {
     // do not compare trailing ':'
-    if (strncmp (PCAD(pc)->arg, label, strlen (label)) == 0) {
-      return 1;
+    if (strncmp(PCAD(pc)->arg, label, strlen(label)) == 0) {
+      return TRUE;
     }
-  } // if
+  }
 
   // is pCodeLabel?
   if (isPCL(pc)) {
-      if (strcmp(PCL(pc)->label,label) == 0) {
-      return 1;
+      if (strcmp(PCL(pc)->label, label) == 0) {
+      return TRUE;
     }
-  } // if
+  }
 
   // no label/no label attached/wrong label(s)
-  return 0;
+  return FALSE;
 }
 
 /* Returns the distance to the given label in terms of words.
@@ -7208,7 +7087,7 @@ int isLabel (pCode *pc, char *label)
  * Returns max if the label could not be found or
  * its distance from pc in (-max..+max).
  */
-int findpCodeLabel (pCode *pc, char *label, int max, pCode **target) {
+static int findpCodeLabel (pCode *pc, char *label, int max, pCode **target) {
   int dist = instrSize(pc);
   pCode *curr = pc;
 
@@ -7244,11 +7123,13 @@ int findpCodeLabel (pCode *pc, char *label, int max, pCode **target) {
  *   (a) 0x10 + i for BTFSS
  *   (b) 0x00 + i for BTFSC
  */
-int isSkipOnStatus (pCode *pc)
+static int isSkipOnStatus (const pCode *pc)
 {
   int res = -1;
   pCodeOp *pcop;
+
   if (!pc || !isPCI(pc)) return -1;
+
   if (PCI(pc)->op == POC_BTFSS) res = 0x10;
   else if (PCI(pc)->op == POC_BTFSC) res = 0x00;
   else return -1;
@@ -7256,7 +7137,7 @@ int isSkipOnStatus (pCode *pc)
   pcop = PCI(pc)->pcop;
 
   if (pcop->type == PO_STATUS || (pcop->type == PO_GPR_BIT && strcmp(pcop->name, "STATUS") == 0)) {
-    return res + ((pCodeOpRegBit *)pcop)->bit;
+    return (res + ((pCodeOpRegBit *)pcop)->bit);
   }
 
   return -1;
@@ -7264,9 +7145,9 @@ int isSkipOnStatus (pCode *pc)
 
 /* Returns 1 if pc is one of BC, BZ, BOV, BN, BNC, BNZ, BNOV or BNN,
  * returns 0 otherwise. */
-int isConditionalBranch (pCode *pc)
+static int isConditionalBranch (const pCode *pc)
 {
-  if (!pc || !isPCI_BRANCH(pc)) return 0;
+  if (!pc || !isPCI_BRANCH(pc)) return FALSE;
 
   switch (PCI(pc)->op) {
   case POC_BC:
@@ -7277,13 +7158,13 @@ int isConditionalBranch (pCode *pc)
   case POC_BNZ:
   case POC_BNOV:
   case POC_BNN:
-    return 1;
+    return TRUE;
 
   default:
     break;
   } // switch
 
-  return 0;
+  return FALSE;
 }
 
 /* Returns 1 if pc has a label attached to it.
@@ -7291,10 +7172,11 @@ int isConditionalBranch (pCode *pc)
  * or a label making up its own pCode preceding this pc.
  * Returns 0 if pc cannot be reached directly via a label.
  */
-int hasNoLabel (pCode *pc)
+const int hasNoLabel (const pCode *pc)
 {
   pCode *prev;
-  if (!pc) return 1;
+
+  if (!pc) return TRUE;
 
   // are there any label pCodes between pc and the previous instruction?
   prev = pic16_findPrevInstruction (pc->prev);
@@ -7302,20 +7184,20 @@ int hasNoLabel (pCode *pc)
     // pCode with attached label?
     if ((isPCI(pc) || isPCAD(pc) || isPCW(pc) || pc->type == PC_INFO)
         && PCI(pc)->label) {
-      return 0;
+      return FALSE;
     }
     // is inline assembly label?
-    if (isPCAD(pc) && PCAD(pc)->directive == NULL) return 0;
-    if (isPCW(pc) && PCW(pc)->label) return 0;
+    if (isPCAD(pc) && PCAD(pc)->directive == NULL) return FALSE;
+    if (isPCW(pc) && PCW(pc)->label) return FALSE;
 
     // pCodeLabel?
-    if (isPCL(pc)) return 0;
+    if (isPCL(pc)) return FALSE;
 
     pc = pc->prev;
   } // if
 
   // no label found
-  return 1;
+  return TRUE;
 }
 
 static void pic16_InsertCommentAfter (pCode *pc, const char *fmt, ...) {
@@ -7357,7 +7239,8 @@ void pic16_pCodeReplace (pCode *oldPC, pCode *newPC) {
 #if 1
   if (pic16_pcode_verbose || pic16_debug_verbose) {
     char pc_str[256];
-    pic16_pCode2str (pc_str, 256, oldPC);
+
+    pic16_pCode2str (pc_str, sizeof(pc_str), oldPC);
     pic16_InsertCommentAfter (oldPC->prev, "%s: replaced %s", __FUNCTION__, pc_str);
   }
 #endif
@@ -7373,7 +7256,7 @@ void pic16_pCodeReplace (pCode *oldPC, pCode *newPC) {
 /* Returns the inverted conditional branch (if any) or NULL.
  * pcop must be set to the new jump target.
  */
-pCode *getNegatedBcc (pCode *bcc, pCodeOp *pcop)
+static pCode *getNegatedBcc (const pCode *bcc, pCodeOp *pcop)
 {
   pCode *newBcc;
 
@@ -7454,6 +7337,7 @@ pCode *skipJumptables (pCode *pc, int *isJumptable)
 pCode *pic16_findNextInstructionSkipJumptables (pCode *pc, int *isJumptable)
 {
   int isJumptab;
+
   *isJumptable = 0;
   while (pc && !isPCI(pc) && !isPCAD(pc) && !isPCW(pc)) {
     // set pc to the first pCode after a jumptable, leave pc untouched otherwise
@@ -7477,7 +7361,7 @@ pCode *pic16_findNextInstructionSkipJumptables (pCode *pc, int *isJumptable)
  * can be turned into BRAs as GOTO would cost another NOP
  * if skipped.
  */
-void pic16_OptimizeJumps ()
+void pic16_OptimizeJumps (void)
 {
   pCode *pc;
   pCode *pc_prev = NULL;
@@ -7697,13 +7581,10 @@ void pic16_OptimizeJumps ()
 
 static void pBlockDestruct(pBlock *pb)
 {
-
   if(!pb)
     return;
 
-
 //  Safe_free(pb);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -7713,7 +7594,6 @@ static void pBlockDestruct(pBlock *pb)
 /*-----------------------------------------------------------------*/
 static void mergepBlocks(char dbName)
 {
-
   pBlock *pb, *pbmerged = NULL,*pbn;
 
   pb = the_pFile->pbHead;
@@ -7738,14 +7618,12 @@ static void mergepBlocks(char dbName)
         if(pbn)
           pbn->prev = pb->prev;
 
-
         pBlockDestruct(pb);
       }
       //pic16_printpBlock(stderr, pbmerged);
     }
     pb = pbn;
   }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -7768,7 +7646,6 @@ static void AnalyzeFlow(int level)
       pic16_RemoveUnusedRegisters();
       return;
     }
-
 
     /* if this is not the first time this function has been called,
      * then clean up old flow information */
@@ -7800,7 +7677,6 @@ static void AnalyzeFlow(int level)
 
     for(pb = the_pFile->pbHead; pb; pb = pb->next)
       pic16_BuildFlow(pb);
-
 
     /* Phase 2 - Flow Analysis - linking flow blocks
      *
@@ -7939,7 +7815,7 @@ void pic16_AnalyzeBanking(void)
 static set *register_usage(pBlock *pb);
 #endif
 
-static void buildCallTree(void    )
+static void buildCallTree(void)
 {
   pBranch *pbr;
   pBlock  *pb;
@@ -7995,16 +7871,16 @@ static void buildCallTree(void    )
 
       if(isPCF(pc)) {
         if (PCF(pc)->fname) {
-        char buf[16];
+          char buf[16];
 
-          sprintf(buf, "%smain", port->fun_prefix);
+          SNPRINTF(buf, sizeof(buf), "%smain", port->fun_prefix);
           if(STRCASECMP(PCF(pc)->fname, buf) == 0) {
             //fprintf(stderr," found main \n");
             pb->cmemmap = NULL;  /* FIXME do we need to free ? */
             pb->dbName = 'M';
           }
 
-          pbr = Safe_calloc(1,sizeof(pBranch));
+          pbr = Safe_alloc(sizeof(pBranch));
           pbr->pc = pc_fstart = pc;
           pbr->next = NULL;
 
@@ -8166,7 +8042,6 @@ static void pic16_convertLocalRegs2Support(pCode *pcstart, pCode *pcend, int cou
 
 //        fprintf(stderr, "%s:%d adding extern symbol %s in externs\n", __FILE__, __LINE__, fname[ entry?0:1 ]);
     }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -8274,10 +8149,6 @@ void pic16_OptimizeLocalRegs(void)
     }
 }
 
-
-
-
-
 /*-----------------------------------------------------------------*/
 /* ispCodeFunction - returns true if *pc is the pCode of a         */
 /*                   function                                      */
@@ -8340,7 +8211,6 @@ static void MarkUsedRegisters(set *regset)
 
 static void pBlockStats(FILE *of, pBlock *pb)
 {
-
   pCode *pc;
   reg_info  *r;
 
@@ -8403,7 +8273,6 @@ static void sequencepCode(void)
     for( pc = pb->pcHead; pc; pc = pc->next)
       pc->seq = ++GpCodeSequenceNumber;
   }
-
 }
 #endif
 
@@ -8567,8 +8436,6 @@ static void pct2(FILE *of,pBlock *pb,int indent,int usedstack)
       fprintf(of,"BUG? pCode isn't a POC_CALL %d\n",__LINE__);
 
   }
-
-
 }
 
 
@@ -8694,7 +8561,7 @@ static void InlineFunction(pBlock *pb)
 
         /* Convert the function name into a label */
 
-        pbr = Safe_calloc(1,sizeof(pBranch));
+        pbr = Safe_alloc(sizeof(pBranch));
         pbr->pc = pic16_newpCodeLabel(PCF(pcn)->fname, -1);
         pbr->next = NULL;
         PCI(pct)->label = pic16_pBranchAppend(PCI(pct)->label,pbr);
@@ -8720,14 +8587,10 @@ static void InlineFunction(pBlock *pb)
 
           pce = pce_next;
         }
-
-
       }
     } else
       fprintf(stderr,"BUG? pCode isn't a POC_CALL %d\n",__LINE__);
-
   }
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -8736,7 +8599,6 @@ static void InlineFunction(pBlock *pb)
 
 void pic16_InlinepCode(void)
 {
-
   pBlock  *pb;
   pCode   *pc;
 
@@ -8777,10 +8639,9 @@ void pic16_InlinepCode(void)
 
   for(pb = the_pFile->pbHead; pb; pb = pb->next)
     unBuildFlow(pb);
-
 }
 
-char *pic_optype_names[]={
+static const char *pic_optype_names[] = {
         "PO_NONE",         // No operand e.g. NOP
         "PO_W",              // The working register (as a destination)
         "PO_WREG",           // The working register (as a file register)
@@ -8812,7 +8673,7 @@ char *pic_optype_names[]={
 };
 
 
-char *dumpPicOptype(PIC_OPTYPE type)
+const char *dumpPicOptype(PIC_OPTYPE type)
 {
         assert( type >= 0 && type < sizeof(pic_optype_names)/sizeof( char *) );
         return (pic_optype_names[ type ]);
@@ -9185,7 +9046,7 @@ int assignToSameBank (int bank0, int bank1, int doAbs, int force)
   // now assign bank eff1 to bank eff0
   pbank0 = (pseudoBank *) hTabFindByKey (coerce, eff0 % coerce->size, (void *)((char*)0+eff0), &comparePtr);
   if (!pbank0) {
-    pbank0 = Safe_calloc (1, sizeof (pseudoBank));
+    pbank0 = Safe_alloc(sizeof(pseudoBank));
     pbank0->bank = eff0;
     pbank0->size = 1;
     pbank0->ref = 1;
@@ -9354,7 +9215,7 @@ void pic16_OptimizeBanksel ()
     assert (bankNr >= 0);
     pbank = (pseudoBank *) hTabFindByKey (coerce, bankNr % coerce->size, (void *) bankNr, &comparePtr);
     if (!pbank) {
-      pbank = Safe_calloc (1, sizeof (pseudoBank));
+      pbank = Safe_alloc(sizeof(pseudoBank));
       pbank->bank = reg->address >> 8; //FIXED_BANK;
       pbank->size = 1;
       pbank->ref = 1;
@@ -9824,7 +9685,7 @@ static defmap_t *newDefmap (symbol_t sym, int in_mask, int mask, int isRead, int
     defmap_free = map->next;
     --defmap_free_count;
   } else {
-    map = (defmap_t *) Safe_calloc (1, sizeof (defmap_t));
+    map = (defmap_t *)Safe_alloc(sizeof(defmap_t));
   }
   map->sym = sym;
   map->acc.access.in_mask = (isRead ? (in_mask ? in_mask : 0xFF) : 0x00);
@@ -10113,7 +9974,7 @@ static void stackPush (dynstack_t *stack, void *data) {
     i = free_stackitems;
     free_stackitems = free_stackitems->next;
   } else {
-    i = (stackitem_t *) Safe_calloc (1, sizeof (stackitem_t));
+    i = (stackitem_t *)Safe_alloc(sizeof(stackitem_t));
   }
   i->data = data;
   i->next = *stack;
@@ -10162,7 +10023,7 @@ typedef struct {
 } state_t;
 
 static state_t *newState (pCodeFlow *flow, defmap_t *lastdef) {
-  state_t *s = (state_t *) Safe_calloc (1, sizeof (state_t));
+  state_t *s = (state_t *)Safe_alloc(sizeof(state_t));
   s->flow = flow;
   s->lastdef = lastdef;
   return s;
@@ -10836,7 +10697,7 @@ static int pic16_pCodeIsAlive (pCode *pc) {
 #if 0
     {
       char buf[256];
-      pic16_pCode2str (buf, 256, pc);
+      pic16_pCode2str (buf, sizeof(buf), pc);
       fprintf (stderr, "%s: checking for sym %x(%s) at pc %p (%s)\n", __FUNCTION__, map->sym, strFromSym (map->sym), pc, buf);
     }
 #endif
@@ -11504,9 +11365,12 @@ static void showAllDefs (symbol_t sym, pCode *pc) {
 #if 1
     fprintf (stderr, "(%x @ %p) ", map->val, map->pc);
 #else
-    { char buf[256];
-    pic16_pCode2str (buf, 256, map->pc);
+    {
+    char buf[256];
+
+    pic16_pCode2str (buf, sizeof(buf), map->pc);
     fprintf (stderr, "\n    (%x @ %p(%s)) ", map->val, map->pc, buf);
+    }
 #endif
     map = map->next;
   }
@@ -11734,7 +11598,7 @@ static void assignValnums (pCode *pc) {
     {
       /* check if old value matches new value */
       int lit;
-      int ok = 1;
+      int ok = TRUE;
       assert (pci->pcop->type == PO_LITERAL);
 
       lit = PCOL(pci->pcop)->lit;
@@ -11745,14 +11609,14 @@ static void assignValnums (pCode *pc) {
         //fprintf (stderr, "FSR%dL already set up correctly at %p (%x)\n", lit, pc, val->val);
       } else {
         /* cannot remove this LFSR */
-        ok = 0;
+        ok = FALSE;
       } // if
 
       val = defmapCurr (list, pic16_fsrsym_idx[lit][1], pc);
       if (val && (val->in_val != 0) && (val->in_val == val->val)) {
         //fprintf (stderr, "FSR%dH already set up correctly at %p (%x)\n", lit, pc, val->val);
       } else {
-        ok = 0;
+        ok = FALSE;
       } // if
 
       if (ok) {
@@ -11986,17 +11850,17 @@ static void pic16_destructDF (pBlock *pb) {
 static int pic16_pBlockHasAsmdirs (pBlock *pb) {
   pCode *pc;
 
-  if (!pb) return 0;
+  if (!pb) return FALSE;
 
   pc = pic16_findNextInstruction (pb->pcHead);
   while (pc) {
-    if (isPCAD(pc)) return 1;
+    if (isPCAD(pc)) return TRUE;
 
     pc = pic16_findNextInstruction (pc->next);
   } // while
 
   /* no PCADs found */
-  return 0;
+  return FALSE;
 }
 
 #if 1

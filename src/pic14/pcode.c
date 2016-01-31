@@ -2242,7 +2242,7 @@ pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
 	if(!mnemonics_initialized)
 		pic14initMnemonics();
 	
-	pci = Safe_calloc(1, sizeof(pCodeInstruction));
+	pci = Safe_alloc(sizeof(pCodeInstruction));
 	
 	if((op>=0) && (op < MAX_PIC14MNEMONICS) && pic14Mnemonics[op]) {
 		memcpy(pci, pic14Mnemonics[op], sizeof(pCodeInstruction));
@@ -2287,7 +2287,7 @@ pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_la
 	
 	pCodeWild *pcw;
 	
-	pcw = Safe_calloc(1,sizeof(pCodeWild));
+	pcw = Safe_alloc(sizeof(pCodeWild));
 	
 	pcw->pci.pc.type = PC_WILD;
 	pcw->pci.pc.prev = pcw->pci.pc.next = NULL;
@@ -2319,7 +2319,7 @@ pCode *newpCodeCharP(const char *cP)
 	
 	pCodeComment *pcc ;
 	
-	pcc = Safe_calloc(1,sizeof(pCodeComment));
+	pcc = Safe_alloc(sizeof(pCodeComment));
 	
 	pcc->pc.type = PC_COMMENT;
 	pcc->pc.prev = pcc->pc.next = NULL;
@@ -2348,38 +2348,26 @@ pCode *newpCodeFunction(const char *mod, const char *f, int isPublic)
 {
 	pCodeFunction *pcf;
 	
-	pcf = Safe_calloc(1,sizeof(pCodeFunction));
+	pcf = Safe_alloc(sizeof(pCodeFunction));
 	//_ALLOC(pcf,sizeof(pCodeFunction));
-	
+
 	pcf->pc.type = PC_FUNCTION;
 	pcf->pc.prev = pcf->pc.next = NULL;
 	pcf->pc.id = PCodeID();
 	//pcf->pc.from = pcf->pc.to = pcf->pc.label = NULL;
 	pcf->pc.pb = NULL;
-	
+
 	pcf->pc.destruct = genericDestruct;
 	pcf->pc.print = pCodePrintFunction;
-	
+
 	pcf->ncalled = 0;
-	
-	if(mod) {
-		//_ALLOC_ATOMIC(pcf->modname,strlen(mod)+1);
-		pcf->modname = Safe_calloc(1,strlen(mod)+1);
-		strcpy(pcf->modname,mod);
-	} else
-		pcf->modname = NULL;
-	
-	if(f) {
-		//_ALLOC_ATOMIC(pcf->fname,strlen(f)+1);
-		pcf->fname = Safe_calloc(1,strlen(f)+1);
-		strcpy(pcf->fname,f);
-	} else
-		pcf->fname = NULL;
-	
-	pcf->isPublic = (unsigned)isPublic;
-	
-	return ( (pCode *)pcf);
-	
+
+	pcf->modname = (mod != NULL) ? Safe_strdup(mod) : NULL;
+	pcf->fname   = (f != NULL)   ? Safe_strdup(f)   : NULL;
+
+	pcf->isPublic = (unsigned int)isPublic;
+
+	return ((pCode *)pcf);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2408,7 +2396,7 @@ static pCode *newpCodeFlow(void )
 	pCodeFlow *pcflow;
 	
 	//_ALLOC(pcflow,sizeof(pCodeFlow));
-	pcflow = Safe_calloc(1,sizeof(pCodeFlow));
+	pcflow = Safe_alloc(sizeof(pCodeFlow));
 	
 	pcflow->pc.type = PC_FLOW;
 	pcflow->pc.prev = pcflow->pc.next = NULL;
@@ -2444,7 +2432,7 @@ static pCodeFlowLink *newpCodeFlowLink(pCodeFlow *pcflow)
 {
 	pCodeFlowLink *pcflowLink;
 	
-	pcflowLink = Safe_calloc(1,sizeof(pCodeFlowLink));
+	pcflowLink = Safe_alloc(sizeof(pCodeFlowLink));
 	
 	pcflowLink->pcflow = pcflow;
 	pcflowLink->bank_conflict = 0;
@@ -2461,7 +2449,7 @@ pCode *newpCodeCSource(int ln, const char *f, const char *l)
 	
 	pCodeCSource *pccs;
 	
-	pccs = Safe_calloc(1,sizeof(pCodeCSource));
+	pccs = Safe_alloc(sizeof(pCodeCSource));
 	
 	pccs->pc.type = PC_CSOURCE;
 	pccs->pc.prev = pccs->pc.next = NULL;
@@ -2498,7 +2486,7 @@ pCode *newpCodeAsmDir(const char *asdir, const char *argfmt, ...)
   char buffer[512];
   char *lbp=buffer;
 
-  pcad = Safe_calloc(1, sizeof(pCodeAsmDir));
+  pcad = Safe_alloc(sizeof(pCodeAsmDir));
   pcad->pci.pc.type = PC_ASMDIR;
   pcad->pci.pc.prev = pcad->pci.pc.next = NULL;
   pcad->pci.pc.pb = NULL;
@@ -2549,7 +2537,7 @@ pCode *newpCodeLabel(const char *name, int key)
 	const char *s;
 	pCodeLabel *pcl;
 
-	pcl = Safe_calloc(1,sizeof(pCodeLabel) );
+	pcl = Safe_alloc(sizeof(pCodeLabel));
 
 	pcl->pc.type = PC_LABEL;
 	pcl->pc.prev = pcl->pc.next = NULL;
@@ -2564,7 +2552,7 @@ pCode *newpCodeLabel(const char *name, int key)
 
 	pcl->label = NULL;
 	if(key>0) {
-		sprintf(buffer, "_%05d_DS_:", key);
+		SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_:", key);
 		s = buffer;
 	} else {
 		s = name;
@@ -2574,7 +2562,7 @@ pCode *newpCodeLabel(const char *name, int key)
 		pcl->label = Safe_strdup(s);
 
 	//fprintf(stderr,"newpCodeLabel: key=%d, name=%s\n",key, ((s)?s:""));
-	return ( (pCode *)pcl);
+	return ((pCode *)pcl);
 }
 
 
@@ -2586,7 +2574,7 @@ static pBlock *newpBlock(void)
 	
 	pBlock *PpB;
 	
-	PpB = Safe_calloc(1,sizeof(pBlock) );
+	PpB = Safe_alloc(sizeof(pBlock));
 	PpB->next = PpB->prev = NULL;
 	
 	PpB->function_entries = PpB->function_exits = PpB->function_calls = NULL;
@@ -2633,13 +2621,13 @@ pCodeOp *newpCodeOpLabel(const char *name, int key)
 
 	pCodeOp *pcop;
 
-	pcop = Safe_calloc(1,sizeof(pCodeOpLabel) );
+	pcop = Safe_alloc(sizeof(pCodeOpLabel));
 	pcop->type = PO_LABEL;
 
 	pcop->name = NULL;
 
 	if(key>0) {
-		sprintf(buffer, "_%05d_DS_", key);
+		SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_", key);
 		s = buffer;
 	}
 	else {
@@ -2661,22 +2649,19 @@ pCodeOp *newpCodeOpLabel(const char *name, int key)
 /*-----------------------------------------------------------------*/
 pCodeOp *newpCodeOpLit(int lit)
 {
-	char *s = buffer;
 	pCodeOp *pcop;
-	
-	
-	pcop = Safe_calloc(1,sizeof(pCodeOpLit) );
+
+	pcop = Safe_alloc(sizeof(pCodeOpLit));
 	pcop->type = PO_LITERAL;
-	
+
 	pcop->name = NULL;
 	if(lit>=0) {
-		sprintf(s,"0x%02x", (unsigned char)lit);
-		if(s)
-			pcop->name = Safe_strdup(s);
+		SNPRINTF(buffer, sizeof(buffer),"0x%02x", (unsigned char)lit);
+		pcop->name = Safe_strdup(buffer);
 	}
-	
+
 	((pCodeOpLit *)pcop)->lit = (unsigned char)lit;
-	
+
 	return pcop;
 }
 
@@ -2686,7 +2671,7 @@ pCodeOp *newpCodeOpImmd(const char *name, int offset, int index, int code_space,
 {
 	pCodeOp *pcop;
 
-	pcop = Safe_calloc(1,sizeof(pCodeOpImmd) );
+	pcop = Safe_alloc(sizeof(pCodeOpImmd));
 	pcop->type = PO_IMMEDIATE;
 	if(name) {
 		reg_info *r = NULL;
@@ -2720,7 +2705,6 @@ pCodeOp *newpCodeOpImmd(const char *name, int offset, int index, int code_space,
 /*-----------------------------------------------------------------*/
 pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
 {
-	char *s = buffer;
 	pCodeOp *pcop;
 
 	if(!pcwb || !subtype) {
@@ -2728,10 +2712,10 @@ pCodeOp *newpCodeOpWild(int id, pCodeWildBlock *pcwb, pCodeOp *subtype)
 		exit(1);
 	}
 
-	pcop = Safe_calloc(1,sizeof(pCodeOpWild));
+	pcop = Safe_alloc(sizeof(pCodeOpWild));
 	pcop->type = PO_WILD;
-	sprintf(s,"%%%d",id);
-	pcop->name = Safe_strdup(s);
+	SNPRINTF(buffer, sizeof(buffer), "%%%d", id);
+	pcop->name = Safe_strdup(buffer);
 
 	PCOW(pcop)->id = id;
 	PCOW(pcop)->pcwb = pcwb;
@@ -2762,7 +2746,7 @@ pCodeOp *newpCodeOpBit(const char *name, int ibit, int inBitSpace)
 	pCodeOp *pcop;
 	struct reg_info *r = 0;
 
-	pcop = Safe_calloc(1,sizeof(pCodeOpRegBit) );
+	pcop = Safe_alloc(sizeof(pCodeOpRegBit));
 	pcop->type = PO_GPR_BIT;
 
 	PCORB(pcop)->bit = ibit;
@@ -2810,7 +2794,7 @@ static pCodeOp *newpCodeOpReg(int rIdx)
 {
 	pCodeOp *pcop;
 	
-	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+	pcop = Safe_alloc(sizeof(pCodeOpReg));
 	
 	pcop->name = NULL;
 	
@@ -2834,7 +2818,7 @@ pCodeOp *newpCodeOpRegFromStr(const char *name)
 {
 	pCodeOp *pcop;
 	
-	pcop = Safe_calloc(1,sizeof(pCodeOpReg) );
+	pcop = Safe_alloc(sizeof(pCodeOpReg));
 	PCOR(pcop)->r = allocRegByName(name, 1);
 	PCOR(pcop)->rIdx = PCOR(pcop)->r->rIdx;
 	pcop->type = PCOR(pcop)->r->pc_type;
@@ -2847,7 +2831,7 @@ static pCodeOp *newpCodeOpStr(const char *name)
 {
 	pCodeOp *pcop;
 	
-	pcop = Safe_calloc(1,sizeof(pCodeOpStr));
+	pcop = Safe_alloc(sizeof(pCodeOpStr));
 	pcop->type = PO_STR;
 	pcop->name = Safe_strdup(name);   
 	
@@ -2895,12 +2879,9 @@ pCodeOp *newpCodeOp(const char *name, PIC_OPTYPE type)
 		break;
 		
 	default:
-		pcop = Safe_calloc(1,sizeof(pCodeOp) );
+		pcop = Safe_alloc(sizeof(pCodeOp));
 		pcop->type = type;
-		if(name)
-			pcop->name = Safe_strdup(name);   
-		else
-			pcop->name = NULL;
+		pcop->name = (name != NULL) ? Safe_strdup(name) : NULL;
 	}
 	
 	return pcop;
@@ -2941,7 +2922,7 @@ void addpBlock(pBlock *pb)
 	if(!the_pFile) {
 		/* First time called, we'll pass through here. */
 		//_ALLOC(the_pFile,sizeof(pFile));
-		the_pFile = Safe_calloc(1,sizeof(pFile));
+		the_pFile = Safe_alloc(sizeof(pFile));
 		the_pFile->pbHead = the_pFile->pbTail = pb;
 		the_pFile->functions = NULL;
 		return;
@@ -3156,18 +3137,17 @@ void pCodeInsertAfter(pCode *pc1, pCode *pc2)
 /*------------------------------------------------------------------*/
 void pCodeInsertBefore(pCode *pc1, pCode *pc2)
 {
-	
 	if(!pc1 || !pc2)
 		return;
-	
+
 	pc2->prev = pc1->prev;
 	if(pc1->prev)
 		pc1->prev->next = pc2;
-	
+
 	pc2->pb = pc1->pb;
 	pc2->next = pc1;
 	pc1->prev = pc2;
-	
+
 	/* If this is an instrution type propogate the flow */
 	if (isPCI(pc2))
 		CopyFlow(PCI(pc2),pc1);
@@ -3179,17 +3159,17 @@ void pCodeInsertBefore(pCode *pc1, pCode *pc2)
 pCodeOp *pCodeOpCopy(pCodeOp *pcop)
 {
 	pCodeOp *pcopnew=NULL;
-	
+
 	if(!pcop)
 		return NULL;
-	
+
 	switch(pcop->type) { 
 	case PO_NONE:
 	case PO_STR:
-		pcopnew = Safe_calloc (1, sizeof (pCodeOp));
-		memcpy (pcopnew, pcop, sizeof (pCodeOp));
+		pcopnew = Safe_malloc(sizeof(pCodeOp));
+		memcpy(pcopnew, pcop, sizeof(pCodeOp));
 		break;
-		
+
 	case PO_W:
 	case PO_STATUS:
 	case PO_FSR:
@@ -3203,36 +3183,36 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
 	case PO_PCLATH:
 	case PO_DIR:
 		//DFPRINTF((stderr,"pCodeOpCopy GPR register\n"));
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpReg) );
-		memcpy (pcopnew, pcop, sizeof (pCodeOpReg));
+		pcopnew = Safe_malloc(sizeof(pCodeOpReg));
+		memcpy(pcopnew, pcop, sizeof(pCodeOpReg));
 		DFPRINTF((stderr," register index %d\n", PCOR(pcop)->r->rIdx));
 		break;
 
 	case PO_LITERAL:
 		//DFPRINTF((stderr,"pCodeOpCopy lit\n"));
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpLit) );
-		memcpy (pcopnew, pcop, sizeof (pCodeOpLit));
+		pcopnew = Safe_malloc(sizeof(pCodeOpLit));
+		memcpy(pcopnew, pcop, sizeof(pCodeOpLit));
 		break;
-		
+
 	case PO_IMMEDIATE:
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpImmd) );
-		memcpy (pcopnew, pcop, sizeof (pCodeOpImmd));
+		pcopnew = Safe_malloc(sizeof(pCodeOpImmd));
+		memcpy(pcopnew, pcop, sizeof(pCodeOpImmd));
 		break;
-		
+
 	case PO_GPR_BIT:
 	case PO_CRY:
 	case PO_BIT:
 		//DFPRINTF((stderr,"pCodeOpCopy bit\n"));
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpRegBit) );
-		memcpy (pcopnew, pcop, sizeof (pCodeOpRegBit));
+		pcopnew = Safe_malloc(sizeof(pCodeOpRegBit));
+		memcpy(pcopnew, pcop, sizeof(pCodeOpRegBit));
 		break;
 
 	case PO_LABEL:
 		//DFPRINTF((stderr,"pCodeOpCopy label\n"));
-		pcopnew = Safe_calloc(1,sizeof(pCodeOpLabel) );
-		memcpy (pcopnew, pcop, sizeof(pCodeOpLabel));
+		pcopnew = Safe_malloc(sizeof(pCodeOpLabel));
+		memcpy(pcopnew, pcop, sizeof(pCodeOpLabel));
 		break;
-		
+
 	case PO_WILD:
 		/* Here we expand the wild card into the appropriate type: */
 		/* By recursively calling pCodeOpCopy */
@@ -3245,7 +3225,7 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
 			pcopnew->name = Safe_strdup(PCOW(pcop)->pcwb->vars[PCOW(pcop)->id]);
 			//DFPRINTF((stderr,"copied a wild op named %s\n",pcopnew->name));
 		}
-		
+
 		return pcopnew;
 		break;
 
@@ -3253,12 +3233,9 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
 		assert ( !"unhandled pCodeOp type copied" );
 		break;
 	} // switch
-	
-	if(pcop->name)
-		pcopnew->name = Safe_strdup(pcop->name);
-	else
-		pcopnew->name = NULL;
-	
+
+	pcopnew->name = (pcop->name != NULL) ? Safe_strdup(pcop->name) : NULL;
+
 	return pcopnew;
 }
 
@@ -3269,7 +3246,7 @@ pCodeOp *popCopyReg(pCodeOpReg *pc)
 {
 	pCodeOpReg *pcor;
 	
-	pcor = Safe_calloc(1,sizeof(pCodeOpReg) );
+	pcor = Safe_alloc(sizeof(pCodeOpReg));
 	pcor->pcop.type = pc->pcop.type;
 	if(pc->pcop.name) {
 		if(!(pcor->pcop.name = Safe_strdup(pc->pcop.name)))
@@ -3823,7 +3800,7 @@ static void pBranchLink(pCodeFunction *f, pCodeFunction *t)
 	// Declare a new branch object for the 'from' pCode.
 	
 	//_ALLOC(b,sizeof(pBranch));
-	b = Safe_calloc(1,sizeof(pBranch));
+	b = Safe_alloc(sizeof(pBranch));
 	b->pc = PCODE(t);             // The link to the 'to' pCode.
 	b->next = NULL;
 	
@@ -3832,7 +3809,7 @@ static void pBranchLink(pCodeFunction *f, pCodeFunction *t)
 	// Now do the same for the 'to' pCode.
 	
 	//_ALLOC(b,sizeof(pBranch));
-	b = Safe_calloc(1,sizeof(pBranch));
+	b = Safe_alloc(sizeof(pBranch));
 	b->pc = PCODE(f);
 	b->next = NULL;
 	
@@ -4079,7 +4056,7 @@ static void AnalyzepBlock(pBlock *pb)
 				
 				if(!r) {
 					/* register wasn't found */
-					//r = Safe_calloc(1, sizeof(regs));
+					//r = Safe_alloc(sizeof(regs));
 					//memcpy(r,PCOR(PCI(pc)->pcop)->r, sizeof(regs));
 					//addSet(&pb->tregisters, r);
 					addSet(&pb->tregisters, PCOR(PCI(pc)->pcop)->r);
@@ -4863,28 +4840,25 @@ static int OptimizepBlock(pBlock *pb)
 {
 	pCode *pc, *pcprev;
 	int matches =0;
-	
+
 	if(!pb || options.nopeep)
 		return 0;
-	
+
 	DFPRINTF((stderr," Optimizing pBlock: %c\n",getpBlock_dbName(pb)));
 	/*
 	for(pc = pb->pcHead; pc; pc = pc->next)
 	matches += pCodePeepMatchRule(pc);
 	*/
-	
+
 	pc = findNextInstruction(pb->pcHead);
 	if(!pc)
 		return 0;
-	
+
 	pcprev = pc->prev;
 	do {
-		
-		
 		if(pCodePeepMatchRule(pc)) {
-			
 			matches++;
-			
+
 			if(pcprev)
 				pc = findNextInstruction(pcprev->next);
 			else 
@@ -4892,11 +4866,11 @@ static int OptimizepBlock(pBlock *pb)
 		} else
 			pc = findNextInstruction(pc->next);
 	} while(pc);
-	
+
 	if(matches)
 		DFPRINTF((stderr," Optimizing pBlock: %c - matches=%d\n",getpBlock_dbName(pb),matches));
+
 	return matches;
-	
 }
 
 /*-----------------------------------------------------------------*/
@@ -4922,38 +4896,35 @@ static pCode * findInstructionUsingLabel(pCodeLabel *pcl, pCode *pcs)
 /*-----------------------------------------------------------------*/
 static void exchangeLabels(pCodeLabel *pcl, pCode *pc)
 {
-	
-	char *s=NULL;
-	
+	const char *s;
+
 	if(isPCI(pc) && 
 		(PCI(pc)->pcop) && 
 		(PCI(pc)->pcop->type == PO_LABEL)) {
-		
+
 		pCodeOpLabel *pcol = PCOLAB(PCI(pc)->pcop);
-		
+
 		//fprintf(stderr,"changing label key from %d to %d\n",pcol->key, pcl->key);
 		if(pcol->pcop.name)
 			free(pcol->pcop.name);
-		
-			/* If the key is negative, then we (probably) have a label to
+
+		/* If the key is negative, then we (probably) have a label to
 		* a function and the name is already defined */
-		
-		if(pcl->key>0)
-			sprintf(s=buffer,"_%05d_DS_",pcl->key);
-		else 
+
+		if(pcl->key>0) {
+			SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_", pcl->key);
+			s = buffer;
+		} else
 			s = pcl->label;
-		
-		//sprintf(buffer,"_%05d_DS_",pcl->key);
+
+		//SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_", pcl->key);
 		if(!s) {
 			fprintf(stderr, "ERROR %s:%d function label is null\n",__FUNCTION__,__LINE__);
 		}
 		pcol->pcop.name = Safe_strdup(s);
 		pcol->key = pcl->key;
 		//pc->print(stderr,pc);
-		
 	}
-	
-	
 }
 
 /*-----------------------------------------------------------------*/
@@ -4963,54 +4934,50 @@ static void exchangeLabels(pCodeLabel *pcl, pCode *pc)
 static void pBlockRemoveUnusedLabels(pBlock *pb)
 {
 	pCode *pc; pCodeLabel *pcl;
-	
+
 	if(!pb || !pb->pcHead)
 		return;
-	
+
 	for(pc = pb->pcHead; (pc=findNextInstruction(pc->next)) != NULL; ) {
-		
 		pBranch *pbr = PCI(pc)->label;
 		if(pbr && pbr->next) {
 			pCode *pcd = pb->pcHead;
-			
+
 			//fprintf(stderr, "multiple labels\n");
 			//pc->print(stderr,pc);
-			
+
 			pbr = pbr->next;
 			while(pbr) {
-				
-				while ( (pcd = findInstructionUsingLabel(PCL(PCI(pc)->label->pc), pcd)) != NULL) {
+				while ((pcd = findInstructionUsingLabel(PCL(PCI(pc)->label->pc), pcd)) != NULL) {
 					//fprintf(stderr,"Used by:\n");
 					//pcd->print(stderr,pcd);
-					
+
 					exchangeLabels(PCL(pbr->pc),pcd);
-					
 					pcd = pcd->next;
 				}
 				pbr = pbr->next;
 			}
 		}
 	}
-	
+
 	for(pc = pb->pcHead; pc; pc = pc->next) {
-		
 		if(isPCL(pc)) // Label pcode
 			pcl = PCL(pc);
 		else if (isPCI(pc) && PCI(pc)->label) // pcode instruction with a label
 			pcl = PCL(PCI(pc)->label->pc);
 		else continue;
-		
+
 		//fprintf(stderr," found  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
-		
+
 		/* This pCode is a label, so search the pBlock to see if anyone
 		* refers to it */
-		
+
 		if( (pcl->key>0) && (!findInstructionUsingLabel(pcl, pb->pcHead))) {
 			/* Couldn't find an instruction that refers to this label
 			* So, unlink the pCode label from it's pCode chain
 			* and destroy the label */
 			//fprintf(stderr," removed  A LABEL !!! key = %d, %s\n", pcl->key,pcl->label);
-			
+
 			DFPRINTF((stderr," !!! REMOVED A LABEL !!! key = %d, %s\n", pcl->key,pcl->label));
 			if(pc->type == PC_LABEL) {
 				unlinkpCode(pc);
@@ -5021,12 +4988,9 @@ static void pBlockRemoveUnusedLabels(pBlock *pb)
 				free(pc->label);
 			}*/
 			}
-			
 		}
 	}
-	
 }
-
 
 /*-----------------------------------------------------------------*/
 /* pBlockMergeLabels - remove the pCode labels from the pCode      */
@@ -5038,63 +5002,60 @@ void pBlockMergeLabels(pBlock *pb)
 {
 	pBranch *pbr;
 	pCode *pc, *pcnext=NULL;
-	
+
 	if(!pb)
 		return;
-	
+
 	/* First, Try to remove any unused labels */
 	//pBlockRemoveUnusedLabels(pb);
-	
+
 	/* Now loop through the pBlock and merge the labels with the opcodes */
-	
+
 	pc = pb->pcHead;
-	
+
 	while(pc) {
 		pCode *pcn = pc->next;
-		
+
 		if(pc->type == PC_LABEL) {
-			
+
 			//fprintf(stderr," checking merging label %s\n",PCL(pc)->label);
 			//fprintf(stderr,"Checking label key = %d\n",PCL(pc)->key);
 			if((pcnext = findNextInstruction(pc) )) {
-				
+
 				// Unlink the pCode label from it's pCode chain
 				unlinkpCode(pc);
-				
+
 				//fprintf(stderr,"Merged label key = %d\n",PCL(pc)->key);
 				// And link it into the instruction's pBranch labels. (Note, since
 				// it's possible to have multiple labels associated with one instruction
 				// we must provide a means to accomodate the additional labels. Thus
 				// the labels are placed into the singly-linked list "label" as 
 				// opposed to being a single member of the pCodeInstruction.)
-				
+
 				//_ALLOC(pbr,sizeof(pBranch));
-				pbr = Safe_calloc(1,sizeof(pBranch));
+				pbr = Safe_alloc(sizeof(pBranch));
 				pbr->pc = pc;
 				pbr->next = NULL;
-				
+
 				PCI(pcnext)->label = pBranchAppend(PCI(pcnext)->label,pbr);
-				
 			} else {
 				fprintf(stderr, "WARNING: couldn't associate label %s with an instruction\n",PCL(pc)->label);
 			}
 		} else if(pc->type == PC_CSOURCE) {
-			
+
 			/* merge the source line symbolic info into the next instruction */
 			if((pcnext = findNextInstruction(pc) )) {
-				
+
 				// Unlink the pCode label from it's pCode chain
 				unlinkpCode(pc);
 				PCI(pcnext)->cline = PCCS(pc);
 				//fprintf(stderr, "merging CSRC\n");
 				//genericPrint(stderr,pcnext);
 			}
-			
 		}
 		pc = pcn;
 	}
 	pBlockRemoveUnusedLabels(pb);
-	
 }
 
 /*-----------------------------------------------------------------*/
@@ -5106,12 +5067,12 @@ static int OptimizepCode(char dbName)
 	int matches = 0;
 	int passes = 0;
 	pBlock *pb;
-	
+
 	if(!the_pFile)
 		return 0;
-	
+
 	DFPRINTF((stderr," Optimizing pCode\n"));
-	
+
 	do {
 		matches = 0;
 		for(pb = the_pFile->pbHead; pb; pb = pb->next) {
@@ -5120,7 +5081,7 @@ static int OptimizepCode(char dbName)
 		}
 	}
 	while(matches && ++passes < MAX_PASSES);
-	
+
 	return matches;
 }
 
@@ -5506,7 +5467,8 @@ register_reassign(pBlock *pb, unsigned startIdx, unsigned level)
               r->rIdx = idx++;
               if (peakIdx < idx)
                 peakIdx = idx;
-              sprintf(s,"r0x%02X", r->rIdx);
+
+              SNPRINTF(s, sizeof(s), "r0x%02X", r->rIdx);
               DFPRINTF((stderr,
                         "%*s(%u) reassigning register %p \"%s\" to \"%s\"\n",
                         4 * level, "", level, r, r->name, s));
@@ -5616,7 +5578,7 @@ static void buildCallTree(void)
 						pb->dbName = 'M';
 					}
 					
-					pbr = Safe_calloc(1,sizeof(pBranch));
+					pbr = Safe_alloc(sizeof(pBranch));
 					pbr->pc = pc_fstart = pc;
 					pbr->next = NULL;
 					
@@ -5958,32 +5920,32 @@ static void InlineFunction(pBlock *pb)
 					pce->pb = pb;
 					pce = pce->next;
 				}
-				
+
 				/* Remove the Function pCode */
 				pct = findNextInstruction(pcn->next);
-				
+
 				/* Link the function with the callee */
 				if (pcp) pcp->next = pcn->next;
 				pcn->next->prev = pcp;
-				
+
 				/* Convert the function name into a label */
-				
-				pbr = Safe_calloc(1,sizeof(pBranch));
+
+				pbr = Safe_alloc(sizeof(pBranch));
 				pbr->pc = newpCodeLabel(PCF(pcn)->fname, -1);
 				pbr->next = NULL;
 				PCI(pct)->label = pBranchAppend(PCI(pct)->label,pbr);
 				PCI(pct)->label = pBranchAppend(PCI(pct)->label,PCI(pc_call)->label);
-				
+
 				/* turn all of the return's except the last into goto's */
 				/* check case for 2 instruction pBlocks */
 				pce = findNextInstruction(pcn->next);
 				while(pce) {
 					pCode *pce_next = findNextInstruction(pce->next);
-					
+
 					if(pce_next == NULL) {
 						/* found the last return */
 						pCode *pc_call_next =  findNextInstruction(pc_call->next);
-						
+
 						//fprintf(stderr,"found last return\n");
 						//pce->print(stderr,pce);
 						pce->prev->next = pc_call->next;
@@ -5991,16 +5953,13 @@ static void InlineFunction(pBlock *pb)
 						PCI(pc_call_next)->label = pBranchAppend(PCI(pc_call_next)->label,
 							PCI(pce)->label);
 					}
-					
+
 					pce = pce_next;
 				}
-				
 			}
 		} else
 			fprintf(stderr,"BUG? pCode isn't a POC_CALL %d\n",__LINE__);
-		
 	}
-	
 }
 
 /*-----------------------------------------------------------------*/

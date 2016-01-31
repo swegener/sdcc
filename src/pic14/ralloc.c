@@ -160,8 +160,8 @@ decodeOp (unsigned int op)
 
         if (op < 128 && op > ' ')
         {
-                buffer[0] = (op & 0xff);
-                buffer[1] = 0;
+                buffer[0] = op & 0xff;
+                buffer[1] = '\0';
                 return buffer;
         }
 
@@ -268,15 +268,16 @@ decodeOp (unsigned int op)
         case RECEIVE:                   return "RECEIVE";
         case SEND:                      return "SEND";
         }
-        sprintf (buffer, "unknown op %d %c", op, op & 0xff);
+
+        SNPRINTF(buffer, sizeof(buffer), "unknown op %d %c", op, op & 0xff);
         return buffer;
 }
+
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static const char *
 debugLogRegType (short type)
 {
-
         switch (type)
         {
         case REG_GPR:   return "REG_GPR";
@@ -284,7 +285,7 @@ debugLogRegType (short type)
         case REG_CND:   return "REG_CND";
         }
 
-        sprintf (buffer, "unknown reg type %d", type);
+        SNPRINTF(buffer, sizeof(buffer), "unknown reg type %d", type);
         return buffer;
 }
 
@@ -298,12 +299,10 @@ static int regname2key(char const *name)
                 return 0;
 
         while(*name) {
-
                 key += (*name++) + 1;
-
         }
 
-        return ( (key + (key >> 4) + (key>>8)) & 0x3f);
+        return ((key + (key >> 4) + (key >> 8)) & 0x3f);
 }
 
 /*-----------------------------------------------------------------*/
@@ -330,11 +329,10 @@ regWithIdx (set *dRegs, int idx, int fixed)
 /*-----------------------------------------------------------------*/
 static reg_info* newReg(short type, PIC_OPTYPE pc_type, int rIdx, const char *name, int size, int alias)
 {
-
         reg_info *dReg, *reg_alias;
 
         /* check whether a matching register already exists */
-        dReg = dirregWithName( name );
+        dReg = dirregWithName(name);
         if (dReg) {
                 //printf( "%s: already present: %s\n", __FUNCTION__, name );
                 return (dReg);
@@ -345,23 +343,20 @@ static reg_info* newReg(short type, PIC_OPTYPE pc_type, int rIdx, const char *na
         if (!reg_alias) reg_alias = regWithIdx(dynDirectRegs, rIdx, TRUE);
 
         // create a new register
-        dReg = Safe_calloc(1,sizeof(reg_info));
+        dReg = Safe_alloc(sizeof(reg_info));
         dReg->type = type;
         dReg->pc_type = pc_type;
         dReg->rIdx = rIdx;
         if(name) {
                 dReg->name = Safe_strdup(name);
         } else {
-                sprintf(buffer,"r0x%02X", dReg->rIdx);
+                SNPRINTF(buffer, sizeof(buffer), "r0x%02X", dReg->rIdx);
                 dReg->name = Safe_strdup(buffer);
         }
+
         dReg->isFree = FALSE;
         dReg->wasUsed = FALSE;
-        if (type == REG_SFR)
-                dReg->isFixed = TRUE;
-        else
-                dReg->isFixed = FALSE;
-
+        dReg->isFixed = (type == REG_SFR) ? TRUE : FALSE;
         dReg->isMapped = FALSE;
         dReg->isEmitted = FALSE;
         dReg->isPublic = FALSE;
@@ -386,9 +381,7 @@ regWithName (set *dRegs, const char *name)
 {
         reg_info *dReg;
 
-        for (dReg = setFirstItem(dRegs) ; dReg ;
-        dReg = setNextItem(dRegs)) {
-
+        for (dReg = setFirstItem(dRegs); dReg; dReg = setNextItem(dRegs)) {
                 if((strcmp(name,dReg->name)==0)) {
                         return dReg;
                 }
@@ -444,15 +437,14 @@ regFindFree (set *dRegs)
 {
         reg_info *dReg;
 
-        for (dReg = setFirstItem(dRegs) ; dReg ;
-        dReg = setNextItem(dRegs)) {
-
+        for (dReg = setFirstItem(dRegs); dReg; dReg = setNextItem(dRegs)) {
                 if(dReg->isFree)
                         return dReg;
         }
 
         return NULL;
 }
+
 /*-----------------------------------------------------------------*/
 /* initStack - allocate registers for a pseudo stack               */
 /*-----------------------------------------------------------------*/
@@ -485,7 +477,6 @@ void initStack(int base_address, int size, int shared)
 reg_info *
 allocProcessorRegister(int rIdx, const char *name, short po_type, int alias)
 {
-
         //fprintf(stderr,"allocProcessorRegister %s addr =0x%x\n",name,rIdx);
         return addSet(&dynProcessorRegs,newReg(REG_SFR, po_type, rIdx, name,1,alias));
 }
@@ -524,9 +515,7 @@ allocReg (short type)
 
         return reg;
 
-
         //return addSet(&dynAllocRegs,newReg(REG_GPR, PO_GPR_TEMP,dynrIdx++,NULL,1,0));
-
 }
 
 
@@ -614,7 +603,6 @@ allocNewDirReg (sym_link *symlnk,const char *name)
                 if (IS_EXTERN (spec)) {
                         reg->isExtern = TRUE;
                 }
-
         }
 
         if (address && reg) {
@@ -630,9 +618,8 @@ allocNewDirReg (sym_link *symlnk,const char *name)
 /* allocDirReg - allocates register of given type                  */
 /*-----------------------------------------------------------------*/
 reg_info *
-allocDirReg (operand *op )
+allocDirReg (operand *op)
 {
-
         reg_info *reg;
         char *name;
 
@@ -730,7 +717,6 @@ allocDirReg (operand *op )
                                 reg->isExtern = TRUE;
                         }
 
-
                 } else {
                         debugLog ("  -- %s is declared at a config word address (0x%x)\n",name, address);
 
@@ -764,7 +750,6 @@ allocDirReg (operand *op )
 reg_info *
 allocRegByName (const char *name, int size)
 {
-
         reg_info *reg;
 
         if(!name) {
@@ -774,7 +759,6 @@ allocRegByName (const char *name, int size)
 
         /* First, search the hash table to see if there is a register with this name */
         reg = dirregWithName(name);
-
 
         if(!reg) {
                 int found = FALSE;
@@ -848,7 +832,6 @@ typeRegWithIdx (int idx, int type, int fixed)
 
         case REG_GPR:
                 if( (dReg = regWithIdx ( dynAllocRegs, idx, fixed)) != NULL) {
-
                         debugLog ("Found a Dynamic Register!\n");
                         return dReg;
                 }
@@ -912,7 +895,6 @@ pic14_regWithIdx (int idx)
 reg_info *
 pic14_allocWithIdx (int idx)
 {
-
         reg_info *dReg;
 
         debugLog ("%s - allocating with index = 0x%x\n", __FUNCTION__,idx);
@@ -929,15 +911,11 @@ pic14_allocWithIdx (int idx)
         } else if( (dReg = regWithIdx ( dynInternalRegs, idx, TRUE)) != NULL ) {
                 debugLog ("Found an Internal Register!\n");
         } else {
-
-                debugLog ("Dynamic Register not found\n");
-
+                debugLog ("Dynamic Register not found.\n");
 
                 //fprintf(stderr,"%s %d - requested register: 0x%x\n",__FUNCTION__,__LINE__,idx);
-                werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
-                        "regWithIdx not found");
+                werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "regWithIdx not found");
                 exit (1);
-
         }
 
         dReg->wasUsed = TRUE;
@@ -1033,10 +1011,7 @@ static void packBits(set *bregs)
         int byte_no=-1;
         char buffer[20];
 
-
-        for (regset = bregs ; regset ;
-        regset = regset->next) {
-
+        for (regset = bregs; regset; regset = regset->next) {
                 breg = regset->item;
                 breg->isBitField = TRUE;
                 //fprintf(stderr,"bit reg: %s\n",breg->name);
@@ -1049,8 +1024,8 @@ static void packBits(set *bregs)
                         breg->address >>= 3;
 
                         if(!bitfield) {
-                                //sprintf (buffer, "fbitfield%02x", breg->address);
-                                sprintf (buffer, "0x%02x", breg->address);
+                                //SNPRINTF(buffer, sizeof(buffer), "fbitfield%02x", breg->address);
+                                SNPRINTF(buffer, sizeof(buffer), "0x%02x", breg->address);
                                 //fprintf(stderr,"new bit field\n");
                                 bitfield = newReg(REG_SFR, PO_GPR_BIT,breg->address,buffer,1,0);
                                 bitfield->isBitField = TRUE;
@@ -1070,14 +1045,13 @@ static void packBits(set *bregs)
                         if(!relocbitfield || bit_no >7) {
                                 byte_no++;
                                 bit_no=0;
-                                sprintf (buffer, "bitfield%d", byte_no);
+                                SNPRINTF(buffer, sizeof(buffer), "bitfield%d", byte_no);
                                 //fprintf(stderr,"new relocatable bit field\n");
                                 relocbitfield = newReg(REG_GPR, PO_GPR_BIT,dynrIdx++,buffer,1,0);
                                 relocbitfield->isBitField = TRUE;
                                 //addSet(&dynDirectRegs,relocbitfield);
                                 addSet(&dynInternalRegs,relocbitfield);
                                 //hTabAddItem(&dynDirectRegNames, regname2key(buffer), relocbitfield);
-
                         }
 
                         breg->reg_alias = relocbitfield;
@@ -1095,25 +1069,17 @@ static void bitEQUs(FILE *of, set *bregs)
         int bit_no=0;
 
         //fprintf(stderr," %s\n",__FUNCTION__);
-        for (breg = setFirstItem(bregs) ; breg ;
-        breg = setNextItem(bregs)) {
-
+        for (breg = setFirstItem(bregs); breg; breg = setNextItem(bregs)) {
                 //fprintf(stderr,"bit reg: %s\n",breg->name);
 
                 bytereg = breg->reg_alias;
                 if(bytereg)
-                        fprintf (of, "%s\tEQU\t( (%s<<3)+%d)\n",
-                        breg->name,
-                        bytereg->name,
-                        breg->rIdx & 0x0007);
-
+                        fprintf(of, "%s\tEQU\t((%s << 3) + %d)\n",
+                                breg->name, bytereg->name, breg->rIdx & 0x0007);
                 else {
                         //fprintf(stderr, "bit field is not assigned to a register\n");
-                        fprintf (of, "%s\tEQU\t( (bitfield%d<<3)+%d)\n",
-                                breg->name,
-                                bit_no>>3,
-                                bit_no & 0x0007);
-
+                        fprintf(of, "%s\tEQU\t((bitfield%d << 3) + %d)\n",
+                                breg->name, bit_no >> 3, bit_no & 0x0007);
                         bit_no++;
                 }
         }
@@ -1121,9 +1087,7 @@ static void bitEQUs(FILE *of, set *bregs)
 
 void writeUsedRegs(FILE *of)
 {
-
         packBits(dynDirectBitRegs);
-
         bitEQUs(of,dynDirectBitRegs);
 }
 
@@ -1144,14 +1108,11 @@ computeSpillable (iCode * ic)
         c) - defined by this one */
 
         spillable = bitVectCopy (ic->rlive);
-        spillable =
-                bitVectCplAnd (spillable, _G.spiltSet); /* those already spilt */
-        spillable =
-                bitVectCplAnd (spillable, ic->uses);    /* used in this one */
+        spillable = bitVectCplAnd (spillable, _G.spiltSet); /* those already spilt */
+        spillable = bitVectCplAnd (spillable, ic->uses);    /* used in this one */
         bitVectUnSetBit (spillable, ic->defKey);
         spillable = bitVectIntersect (spillable, _G.regAssigned);
         return spillable;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -1283,9 +1244,7 @@ leastUsedLR (set * sset)
 
         for (; lsym; lsym = setNextItem (sset))
         {
-
-        /* if usage is the same then prefer
-                the spill the smaller of the two */
+        /* if usage is the same then prefer the spill the smaller of the two */
                 if (lsym->used == sym->used)
                         if (getSize (lsym->type) < getSize (sym->type))
                                 sym = lsym;
@@ -1293,7 +1252,6 @@ leastUsedLR (set * sset)
                         /* if less usage */
                         if (lsym->used < sym->used)
                                 sym = lsym;
-
         }
 
         setToNull ((void *) &sset);
@@ -1362,13 +1320,12 @@ spillLRWithPtrReg (symbol * forSym)
         int k;
 
         debugLog ("%s\n", __FUNCTION__);
-        if (!_G.regAssigned ||
-                bitVectIsZero (_G.regAssigned))
+        if (!_G.regAssigned || bitVectIsZero(_G.regAssigned))
                 return;
 
         /* for all live ranges */
         for (lrsym = hTabFirstItem (liveRanges, &k); lrsym;
-        lrsym = hTabNextItem (liveRanges, &k))
+             lrsym = hTabNextItem (liveRanges, &k))
         {
                 /* if no registers assigned to it or
                 spilt */
@@ -1389,8 +1346,8 @@ createStackSpil (symbol * sym)
 {
         symbol *sloc = NULL;
         int useXstack, model, noOverlay;
+        char slocBuffer[120];
 
-        char slocBuffer[30];
         debugLog ("%s\n", __FUNCTION__);
 
         FENTRY2("called.");
@@ -1407,18 +1364,8 @@ createStackSpil (symbol * sym)
                 return sym;
         }
 
-        /* could not then have to create one , this is the hard part
-        we need to allocate this on the stack : this is really a
-        hack!! but cannot think of anything better at this time */
-
-        if (sprintf (slocBuffer, "sloc%d", _G.slocNum++) >= sizeof (slocBuffer))
-        {
-                fprintf (stderr, "kkkInternal error: slocBuffer overflowed: %s:%d\n",
-                        __FILE__, __LINE__);
-                exit (1);
-        }
-
-        sloc = newiTemp (slocBuffer);
+        SNPRINTF(slocBuffer, sizeof(slocBuffer), "sloc%d", _G.slocNum++);
+        sloc = newiTemp(slocBuffer);
 
         /* set the type to the spilling symbol */
         sloc->type = copyLinkChain (sym->type);
@@ -1514,7 +1461,6 @@ spillThis (symbol * sym)
         if (!(sym->remat || sym->usl.spillLoc))
                 createStackSpil (sym);
 
-
         /* mark it has spilt & put it in the spilt set */
         sym->isspilt = 1;
         _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
@@ -1541,8 +1487,6 @@ spillThis (symbol * sym)
 
         if (sym->usl.spillLoc && !sym->remat)
                 sym->usl.spillLoc->allocreq = 1;
-
-        return;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1559,7 +1503,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
         FENTRY2("called.");
         /* get the spillable live ranges */
         lrcs = computeSpillable (ic);
-
 
         /* get all live ranges that are rematerizable */
         if ((selectS = liveRangesWith (lrcs, rematable, ebp, ic)))
@@ -1618,7 +1561,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
         /* find live ranges with spillocation && not used as pointers */
         if ((selectS = liveRangesWith (lrcs, hasSpilLocnoUptr, ebp, ic)))
         {
-
                 sym = leastUsedLR (selectS);
                 /* mark this as allocation required */
                 sym->usl.spillLoc->allocreq = 1;
@@ -1628,7 +1570,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
         /* find live ranges with spillocation */
         if ((selectS = liveRangesWith (lrcs, hasSpilLoc, ebp, ic)))
         {
-
                 sym = leastUsedLR (selectS);
                 sym->usl.spillLoc->allocreq = 1;
                 return sym;
@@ -1639,7 +1580,6 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
         used ofcourse */
         if ((selectS = liveRangesWith (lrcs, noSpilLoc, ebp, ic)))
         {
-
                 /* return a created spil location */
                 sym = createStackSpil (leastUsedLR (selectS));
                 sym->usl.spillLoc->allocreq = 1;
@@ -1704,7 +1644,6 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
                 a pop at the end of the block */
                 if (ssym->remainSpil)
                 {
-
                         iCode *nic = newiCode (IPUSH, operandFromSymbol (ssym), NULL);
                         /* add push just before this instruction */
                         addiCodeToeBBlock (ebp, nic, ic);
@@ -1714,10 +1653,7 @@ spilSomething (iCode * ic, eBBlock * ebp, symbol * forSym)
                         addiCodeToeBBlock (ebp, nic, NULL);
                 }
 
-                if (ssym == forSym)
-                        return FALSE;
-                else
-                        return TRUE;
+                return ((ssym == forSym) ? FALSE : TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1795,11 +1731,13 @@ symHasReg (symbol *sym, reg_info *reg)
         int i;
 
         debugLog ("%s\n", __FUNCTION__);
-        for (i = 0; i < sym->nRegs; i++)
-                if (sym->regs[i] == reg)
+        for (i = 0; i < sym->nRegs; i++) {
+                if (sym->regs[i] == reg) {
                         return TRUE;
+                }
+        }
 
-                return FALSE;
+        return FALSE;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1817,7 +1755,6 @@ deassignLRs (iCode * ic, eBBlock * ebp)
         for (sym = hTabFirstItem (liveRanges, &k); sym;
         sym = hTabNextItem (liveRanges, &k))
         {
-
                 symbol *psym = NULL;
                 /* if it does not end here */
                 if (sym->liveTo > ic->seq)
@@ -1911,7 +1848,6 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                                 sym->nRegs) >= result->nRegs)
                                 )
                         {
-
                                 for (i = 0; i < max (sym->nRegs, result->nRegs); i++)
                                         if (i < sym->nRegs)
                                                 result->regs[i] = sym->regs[i];
@@ -1919,7 +1855,6 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                                                 result->regs[i] = getRegGpr (ic, ebp, result);
 
                                         _G.regAssigned = bitVectSetBit (_G.regAssigned, result->key);
-
                         }
 
                         /* free the remaining */
@@ -1956,8 +1891,9 @@ reassignLR (operand * op)
 
         _G.blockSpil--;
 
-        for (i = 0; i < sym->nRegs; i++)
+        for (i = 0; i < sym->nRegs; i++) {
                 sym->regs[i]->isFree = FALSE;
+        }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1983,13 +1919,12 @@ willCauseSpill (int nr, int rt)
         {
                 if (pic14_ptrRegReq)
                 {
-                        if (nFreeRegs (rt) >= nr)
+                        if (nFreeRegs(rt) >= nr)
                                 return FALSE;
                 }
                 else
                 {
-                        if (nFreeRegs (REG_PTR) +
-                                nFreeRegs (REG_GPR) >= nr)
+                        if ((nFreeRegs(REG_PTR) + nFreeRegs(REG_GPR)) >= nr)
                                 return FALSE;
                 }
         }
@@ -2008,14 +1943,14 @@ static void
 positionRegs (symbol * result, symbol * opsym, int lineno)
 {
         int count = min (result->nRegs, opsym->nRegs);
-        int i, j = 0, shared = 0;
+        int i, j = 0, shared = FALSE;
 
         debugLog ("%s\n", __FUNCTION__);
         /* if the result has been spilt then cannot share */
         if (opsym->isspilt)
                 return;
 again:
-        shared = 0;
+        shared = FALSE;
         /* first make sure that they actually share */
         for (i = 0; i < count; i++)
         {
@@ -2023,7 +1958,7 @@ again:
                 {
                         if (result->regs[i] == opsym->regs[j] && i != j)
                         {
-                                shared = 1;
+                                shared = TRUE;
                                 goto xchgPositions;
                         }
                 }
@@ -2075,7 +2010,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
         /* for all blocks */
         for (i = 0; i < count; i++)
         {
-
                 iCode *ic;
 
                 if (ebbs[i]->noPath &&
@@ -2154,10 +2088,8 @@ serialRegAssign (eBBlock ** ebbs, int count)
                                 if (sym->remat ||
                                         (willCS && bitVectIsZero (spillable)))
                                 {
-
                                         spillThis (sym);
                                         continue;
-
                                 }
 
                                 /* If the live range preceeds the point of definition
@@ -2312,8 +2244,7 @@ rUmaskForOp (operand * op)
 
         for (j = 0; j < sym->nRegs; j++)
         {
-                rumask = bitVectSetBit (rumask,
-                        sym->regs[j]->rIdx);
+                rumask = bitVectSetBit(rumask, sym->regs[j]->rIdx);
         }
 
         return rumask;
@@ -2325,41 +2256,31 @@ rUmaskForOp (operand * op)
 static bitVect *
 regsUsedIniCode (iCode * ic)
 {
-        bitVect *rmask = newBitVect (pic14_nRegs);
+        bitVect *rmask = newBitVect(pic14_nRegs);
 
         debugLog ("%s\n", __FUNCTION__);
         /* do the special cases first */
         if (ic->op == IFX)
         {
-                rmask = bitVectUnion (rmask,
-                        rUmaskForOp (IC_COND (ic)));
-                goto ret;
+                return bitVectUnion(rmask, rUmaskForOp(IC_COND(ic)));
         }
 
         /* for the jumptable */
         if (ic->op == JUMPTABLE)
         {
-                rmask = bitVectUnion (rmask,
-                        rUmaskForOp (IC_JTCOND (ic)));
-
-                goto ret;
+                return bitVectUnion(rmask, rUmaskForOp(IC_JTCOND(ic)));
         }
 
         /* of all other cases */
         if (IC_LEFT (ic))
-                rmask = bitVectUnion (rmask,
-                rUmaskForOp (IC_LEFT (ic)));
-
+                rmask = bitVectUnion(rmask, rUmaskForOp(IC_LEFT(ic)));
 
         if (IC_RIGHT (ic))
-                rmask = bitVectUnion (rmask,
-                rUmaskForOp (IC_RIGHT (ic)));
+                rmask = bitVectUnion(rmask, rUmaskForOp(IC_RIGHT(ic)));
 
         if (IC_RESULT (ic))
-                rmask = bitVectUnion (rmask,
-                rUmaskForOp (IC_RESULT (ic)));
+                rmask = bitVectUnion(rmask, rUmaskForOp(IC_RESULT(ic)));
 
-ret:
         return rmask;
 }
 
@@ -2385,7 +2306,6 @@ createRegMask (eBBlock ** ebbs, int count)
                 /* for all instructions */
                 for (ic = ebbs[i]->sch; ic; ic = ic->next)
                 {
-
                         int j;
 
                         if (SKIP_IC2 (ic) || !ic->rlive)
@@ -2457,7 +2377,6 @@ regTypeNum (void)
 
                 /* if the live range is a temporary */
                 if (sym->isitmp) {
-
                         debugLog ("  %d - itemp register\n", __LINE__);
 
                         /* if the type is marked as a conditional */
@@ -2496,7 +2415,6 @@ regTypeNum (void)
                             (aggrToPtrDclType (operandType (IC_LEFT (ic)), FALSE) == POINTER)) {
 
                                 if (ptrPseudoSymSafe (sym, ic)) {
-
                                         symbol *psym;
 
                                         debugLog ("  %d - \n", __LINE__);
@@ -2515,7 +2433,6 @@ regTypeNum (void)
 
                                 /* if in data space or idata space then try to
                                 allocate pointer register */
-
                         }
 #endif
 
@@ -2580,7 +2497,6 @@ farSpacePackable (iCode * ic)
         symbol on the right */
         for (dic = ic->prev; dic; dic = dic->prev)
         {
-
                 /* if the definition is a call then no */
                 if ((dic->op == CALL || dic->op == PCALL) &&
                         IC_RESULT (dic)->key == IC_RIGHT (ic)->key)
@@ -2641,7 +2557,6 @@ farSpacePackable (iCode * ic)
 static int
 packRegsForAssign (iCode * ic, eBBlock * ebp)
 {
-
         iCode *dic, *sic;
 
         debugLog ("%s\n", __FUNCTION__);
@@ -2692,8 +2607,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                 return FALSE;
         }
 
-        if (OP_SYMBOL (IC_RIGHT (ic))->isind ||
-                OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
+        if (OP_SYMBOL (IC_RIGHT (ic))->isind || OP_LIVETO (IC_RIGHT (ic)) > ic->seq)
         {
                 debugLog ("  %d - not packing - right side fails \n", __LINE__);
                 return FALSE;
@@ -2707,14 +2621,12 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                         goto pack;
                 else
                         return FALSE;
-
         }
         /* find the definition of iTempNN scanning backwards if we find a
         a use of the true symbol before we find the definition then
         we cannot pack */
         for (dic = ic->prev; dic; dic = dic->prev)
         {
-
                 /* if there is a function call and this is
                 a parameter & not my parameter then don't pack it */
                 if ((dic->op == CALL || dic->op == PCALL) &&
@@ -2880,7 +2792,6 @@ findAssignToSym (operand * op, iCode * ic)
                         if ((ic->op == '+' || ic->op == '-') &&
                                 OP_SYMBOL (IC_RIGHT (dic))->onStack)
                         {
-
                                 if (IC_RESULT (ic)->key != IC_RIGHT (dic)->key &&
                                         IC_LEFT (ic)->key != IC_RIGHT (dic)->key &&
                                         IC_RIGHT (ic)->key != IC_RIGHT (dic)->key)
@@ -2908,10 +2819,11 @@ findAssignToSym (operand * op, iCode * ic)
         {
                 iCode *sic = dic->next;
 
-                for (; sic != ic; sic = sic->next)
+                for (; sic != ic; sic = sic->next) {
                         if (IC_RESULT (sic) &&
                                 IC_RESULT (sic)->key == IC_RIGHT (dic)->key)
                                 return NULL;
+                }
         }
 
         return dic;
@@ -3037,8 +2949,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
                 return NULL;
 
         /* found the definition now check if it is local */
-        if (dic->seq < ebp->fSeq ||
-                dic->seq > ebp->lSeq)
+        if (dic->seq < ebp->fSeq || dic->seq > ebp->lSeq)
                 return NULL;            /* non-local */
 
                                                         /* now check if it is the return from
@@ -3088,7 +2999,6 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
         don't have any thing in far space */
         for (dic = dic->next; dic && dic != ic; dic = dic->next)
         {
-
                 /* if there is an intervening function call then no */
                 if (dic->op == CALL || dic->op == PCALL)
                         return NULL;
@@ -3128,7 +3038,6 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
 
         OP_SYMBOL (op)->ruonly = 1;
         return sic;
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -3340,9 +3249,6 @@ packForReceive (iCode * ic, eBBlock * ebp)
 
         for (dic = ic->next; dic; dic = dic->next)
         {
-
-
-
                 if (IC_LEFT (dic) && (IC_RESULT (ic)->key == IC_LEFT (dic)->key))
                         debugLog ("    used on left\n");
                 if (IC_RIGHT (dic) && IC_RESULT (ic)->key == IC_RIGHT (dic)->key)
@@ -3353,11 +3259,11 @@ packForReceive (iCode * ic, eBBlock * ebp)
                 if ((IC_LEFT (dic) && (IC_RESULT (ic)->key == IC_LEFT (dic)->key)) ||
                         (IC_RESULT (dic) && IC_RESULT (ic)->key == IC_RESULT (dic)->key))
                         return;
-
         }
 
         debugLog ("  hey we can remove this unnecessary assign\n");
 }
+
 /*-----------------------------------------------------------------*/
 /* packForPush - hueristics to reduce iCode for pushing            */
 /*-----------------------------------------------------------------*/
@@ -3598,13 +3504,11 @@ packRegisters (eBBlock * ebp)
                         bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
                         !OP_SYMBOL (IC_LEFT (ic))->onStack)
                 {
-
                         debugLog ("  %d - %s. result is rematerializable\n", __LINE__,__FUNCTION__);
 
                         OP_SYMBOL (IC_RESULT (ic))->remat = 1;
                         OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
                         OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
-
                 }
 
                 /* if straight assignment then carry remat flag if
@@ -3693,7 +3597,6 @@ packRegisters (eBBlock * ebp)
                         isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
                         OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
                 {
-
                         debugLog ("  %d\n", __LINE__);
                         OP_SYMBOL (IC_RESULT (ic))->regType = REG_CND;
                         continue;
@@ -3766,7 +3669,6 @@ packRegisters (eBBlock * ebp)
                                                 OP_DEFS(IC_RESULT (dic))=bitVectSetBit (OP_DEFS (IC_RESULT (dic)), dic->key);
                                                 ic = ic->prev;
                                         }  else
-
                                                 OP_SYMBOL (IC_RIGHT (ic))->ruonly = 0;
                                 }
                         } else {
@@ -3822,7 +3724,6 @@ packRegisters (eBBlock * ebp)
                         getSize (operandType (IC_RESULT (ic))) <= 2)
 
                         packRegsForAccUse (ic);
-
         }
 }
 

@@ -146,8 +146,7 @@ pic14_constructAbsMap (struct dbuf_s *oBuf, struct dbuf_s *gloBuf)
 
   for (i=0; maps[i] != NULL; i++)
   {
-    for (sym = (symbol *)setFirstItem (maps[i]->syms);
-        sym; sym = setNextItem (maps[i]->syms))
+    for (sym = (symbol *)setFirstItem (maps[i]->syms); sym; sym = setNextItem (maps[i]->syms))
     {
       if (IS_DEFINED_HERE(sym) && SPEC_ABSA(sym->etype))
       {
@@ -203,9 +202,7 @@ pic14_constructAbsMap (struct dbuf_s *oBuf, struct dbuf_s *gloBuf)
 
       dbuf_printf (oBuf, "UD_abs_%s_%x\tudata_ovr\t0x%04x\n",
           moduleName, addr, addr);
-      for (sym = setFirstItem (aliases); sym;
-          sym = setNextItem (aliases))
-      {
+      for (sym = setFirstItem (aliases); sym; sym = setNextItem (aliases)) {
         if (getSize(sym->type) > size) {
           size = getSize(sym->type);
         }
@@ -277,7 +274,6 @@ pic14initialComments (FILE * afile)
         initialComments (afile);
         fprintf (afile, "; PIC port for the 14-bit core\n");
         fprintf (afile, "%s", iComments2);
-
 }
 
 int
@@ -307,6 +303,9 @@ pic14printLocals (struct dbuf_s *oBuf)
     reg_info *reg;
     int i, is_first = TRUE;
     static unsigned sectionNr = 0;
+    const char *split_locals;
+
+    split_locals = getenv("SDCC_PIC14_SPLIT_LOCALS");
 
     /* emit all registers from all possible sets */
     for (i = 0; i < 6; i++) {
@@ -323,7 +322,7 @@ pic14printLocals (struct dbuf_s *oBuf)
                         dbuf_printf(oBuf, "UDL_%s_%u\tudata\t0x%04X\n%s\tres\t%d\n",
                                 moduleName, sectionNr++, reg->address, reg->name, reg->size);
                     } else {
-                        if (getenv("SDCC_PIC14_SPLIT_LOCALS")) {
+                        if (split_locals != NULL) {
                             // assign each local register into its own section
                             dbuf_printf(oBuf, "UDL_%s_%u\tudata\n%s\tres\t%d\n",
                                     moduleName, sectionNr++, reg->name, reg->size);
@@ -538,12 +537,11 @@ picglue (void)
 
         if ((noAssemble || options.c1mode) && fullDstFileName)
         {
-                sprintf (buffer, "%s", fullDstFileName);
+                SNPRINTF(buffer, sizeof(buffer), "%s", fullDstFileName);
         }
         else
         {
-                sprintf (buffer, "%s", dstFileName);
-                strcat (buffer, ".asm");
+                SNPRINTF(buffer, sizeof(buffer), "%s.asm", dstFileName);
         }
 
         if (!(asmFile = fopen (buffer, "w"))) {

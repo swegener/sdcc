@@ -1,4 +1,11 @@
-2016-01-02 Philipp Klaus Krause <pkk AT spth.de>
+2016-02-01 Ben Shi <powerstudio1st AT 163 DOT com>
+ 
+	* src/SDCCast.c
+	  Try to find a common type for the left and right in '?:' .
+	* support/regression/tests/bug-2461.c
+	  Add a new test case.
+
+2016-02-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCglobl.h,
 	  src/SDCCmain.c,
@@ -7,7 +14,7 @@
 	  doc/sdccman.lyx:
 	  Make char unsigned by default.
 
-2016-01-02 Philipp Klaus Krause <pkk AT spth.de>
+2016-02-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdlib.h:
 	  Fix declaration of aligned_alloc() for C11.

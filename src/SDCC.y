@@ -201,8 +201,9 @@ function_definition
                                }
    | declaration_specifiers function_declarator
          {
-              pointerTypes($2->type,copyLinkChain($1));
-              addDecl($2,0,$1);
+              sym_link *p = copyLinkChain($1);
+              pointerTypes($2->type,p);
+              addDecl($2,0,p);
               $2 = createFunctionDecl($2);
               if ($2 && FUNC_ISCRITICAL ($2->type))
                 inCriticalFunction = 1;

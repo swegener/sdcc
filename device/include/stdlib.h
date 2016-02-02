@@ -79,7 +79,7 @@ void *realloc (void *ptr, size_t size);
 #endif
 
 #if __STDC_VERSION__ >= 201112L
-extern void *aligned_alloc(size_t alignment, size_t size)
+inline void *aligned_alloc(size_t alignment, size_t size)
 {
   return malloc(size);
 }

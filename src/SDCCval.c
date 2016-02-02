@@ -1344,7 +1344,7 @@ constCharacterVal (unsigned long v, char type)
     case 0: // character constant
       SPEC_NOUN (val->type) = V_INT;
       SPEC_USIGN (val->type) = 0;
-      SPEC_CVAL (val->type).v_int = options.unsigned_char ? (unsigned char) v : (signed char) v;
+      SPEC_CVAL (val->type).v_int = options.signed_char ? (signed char) v : (unsigned char) v;
       break;
     case 'L': // wide character constant
       if (!options.std_c95)

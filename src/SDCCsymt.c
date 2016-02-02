@@ -656,12 +656,12 @@ checkTypeSanity (sym_link * etype, const char *name)
 /* finalizeSpec                                                     */
 /*    currently just a V_CHAR is forced to be unsigned              */
 /*      when it's neither signed nor unsigned                       */
-/*      and the --funsigned-char command line switch is active      */
+/*      unless the --fsigned-char command line switch is active     */
 /*------------------------------------------------------------------*/
 sym_link *
 finalizeSpec (sym_link * lnk)
 {
-  if (options.unsigned_char)
+  if (!options.signed_char)
     {
       sym_link *p = lnk;
       while (p && !IS_SPEC (p))
@@ -4127,7 +4127,7 @@ initCSupport (void)
 
   floatType = newFloatLink ();
   fixed16x16Type = newFixed16x16Link ();
-  charType = (options.unsigned_char) ? UCHARTYPE : SCHARTYPE;
+  charType = (options.signed_char) ? SCHARTYPE : UCHARTYPE;
 
   fsadd = funcOfType ("__fsadd", floatType, floatType, 2, options.float_rent);
   fssub = funcOfType ("__fssub", floatType, floatType, 2, options.float_rent);

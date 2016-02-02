@@ -142,7 +142,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_CODE_SEG             "--codeseg"
 #define OPTION_CONST_SEG            "--constseg"
 #define OPTION_DOLLARS_IN_IDENT     "--fdollars-in-identifiers"
-#define OPTION_UNSIGNED_CHAR        "--funsigned-char"
+#define OPTION_SIGNED_CHAR          "--fsigned-char"
 #define OPTION_USE_NON_FREE         "--use-non-free"
 #define OPTION_PEEP_RETURN          "--peep-return"
 #define OPTION_NO_PEEP_RETURN       "--no-peep-return"
@@ -190,7 +190,7 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_STD_C11, NULL, "Use ISO C11 standard (incomplete)"},
   {0,   OPTION_STD_SDCC11, NULL, "Use ISO C11 standard with SDCC extensions"},
   {0,   OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
-  {0,   OPTION_UNSIGNED_CHAR, &options.unsigned_char, "Make \"char\" unsigned by default"},
+  {0,   OPTION_SIGNED_CHAR, &options.signed_char, "Make \"char\" signed by default"},
   {0,   OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
 
   {0,   NULL, NULL, "Code generation options"},
@@ -1979,7 +1979,9 @@ preProcess (char **envp)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_NOOVERLAY"));
 
       /* set the macro for unsigned char  */
-      if (options.unsigned_char)
+      if (options.signed_char)
+        addSet (&preArgvSet, Safe_strdup ("-D__SDCC_CHAR_SIGNED"));
+      else
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_CHAR_UNSIGNED"));
 
       /* set the macro for non-free  */

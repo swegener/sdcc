@@ -14183,9 +14183,9 @@ status collapsed
 
 \end_inset
 
--funsigned-char
+-fsigned-char
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 -
@@ -14201,28 +14201,19 @@ status collapsed
 
 \end_inset
 
--funsigned-char
+-fsigned-char
 \end_layout
 
 \end_inset
 
 
 \series default
- The default signedness for every type is 
-\family typewriter
-signed
-\family default
-.
- In some embedded environments the default signedness of 
-\family typewriter
-char
-\family default
- is 
+ By default char is 
 \family typewriter
 unsigned
 \family default
 .
- To set the signess for characters to unsigned, use the option -
+ To set the signess for characters to signed, use the option -
 \series bold
 
 \begin_inset ERT
@@ -14239,9 +14230,9 @@ status collapsed
 
 
 \series default
--funsigned-char.
+-fsigned-char.
  If this option is set and no signedness keyword (unsigned/signed) is given,
- a char will be signed.
+ a char will be unsigned.
  All other types are unaffected.
 \end_layout
 

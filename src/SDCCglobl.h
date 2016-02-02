@@ -337,7 +337,7 @@ struct options
     int std_c11;                /* enable C11 keywords/constructs */
     int std_sdcc;               /* enable SDCC extensions to C */
     int dollars_in_ident;       /* zero means dollar signs are punctuation */
-    int unsigned_char;          /* use unsigned for char without signed/unsigned modifier */
+    int signed_char;            /* use signed for char without signed/unsigned modifier */
     char *code_seg;             /* segment name to use instead of CSEG */
     char *const_seg;            /* segment name to use instead of CONST */
     /* sets */

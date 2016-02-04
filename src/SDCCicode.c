@@ -2493,7 +2493,7 @@ geniCodeStruct (operand * left, operand * right, bool islval)
 
   wassert (IS_SYMOP (right));
 
-  wassert (IS_STRUCT (type) || (IS_PTR (type) && IS_STRUCT (type->next)));
+  wassert (IS_STRUCT (type) || ((IS_PTR (type) || IS_ARRAY (type)) && IS_STRUCT (type->next)));
 
   /* add the offset */
   ic = newiCode ('+', left, operandFromLit (element->offset));

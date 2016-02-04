@@ -1,3 +1,10 @@
+2016-02-04 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Allow array members of structs can be accessed in pointer form.
+	* support/regression/tests/bug-2468.c
+	  Add a test case.
+
 2016-02-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClospre.hpp:

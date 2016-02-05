@@ -4618,13 +4618,30 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
             if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
               {
-                werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
-                fprintf (stderr, "comparing type ");
-                printTypeChain (LTYPE (tree), stderr);
-                fprintf (stderr, " to type ");
-                printTypeChain (RTYPE (tree), stderr);
-                fprintf (stderr, "\n");
-                goto errorTreeReturn;
+                if (compareType (RTYPE (tree), LTYPE (tree)) != 0)
+                  {
+                    struct ast *s = tree->left;
+                    tree->left = tree->right;
+                    tree->right = s;
+                    if (tree->opval.op == '>')
+                      tree->opval.op = '<';
+                    else if (tree->opval.op == '>')
+                      tree->opval.op = '<';
+                    else if (tree->opval.op == LE_OP)
+                      tree->opval.op = GE_OP;
+                    else if (tree->opval.op == GE_OP)
+                      tree->opval.op = LE_OP;
+                  }
+                else
+                  {
+                    werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
+                    fprintf (stderr, "comparing type ");
+                    printTypeChain (LTYPE (tree), stderr);
+                    fprintf (stderr, " to type ");
+                    printTypeChain (RTYPE (tree), stderr);
+                    fprintf (stderr, "\n");
+                    goto errorTreeReturn;
+                  }
               }
         }
 

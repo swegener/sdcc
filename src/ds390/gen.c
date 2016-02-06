@@ -11381,6 +11381,25 @@ genFarPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
               genSetDPTR (0);
             }
         }
+      else if (AOP_USESDPTR (result) && AOP_USESDPTR (right))
+        {
+          _startLazyDPSEvaluation ();
+          for (int i = size - 1; i > 0; i--)
+            emitcode ("push", aopGet (right, i, FALSE, FALSE, NULL));
+          while (size--)
+            {
+              if (offset++)
+                emitcode ("pop", "acc");
+              else
+                MOVA (aopGet (right, 0, FALSE, FALSE, NULL));
+              genSetDPTR (0);
+              _flushLazyDPS ();
+              emitcode ("movx", "@dptr,a");
+              if (size || (dopi && pi && AOP_TYPE (result) != AOP_IMMD))
+                emitcode ("inc", "dptr");
+            }
+          _endLazyDPSEvaluation ();
+        }
       else
         {
           _startLazyDPSEvaluation ();

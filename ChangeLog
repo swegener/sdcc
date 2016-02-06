@@ -1,3 +1,10 @@
+2016-02-07 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/ds390/gen.c
+	  Fix a bug in genFarPointerSet() when the result and the right operand are both in DPTR.
+	* support/regression/tests/bug-2041.c
+	  Add a new test case.
+
 2016-02-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClospre.hpp,

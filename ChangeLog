@@ -1,3 +1,10 @@
+2016-02-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCCnaddr.hpp,
+	  src/SDCCralloc.hpp:
+	  Workaround boost bug #11880 to make SDCC compile with boost 1.60.
+
 2016-02-05 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c

@@ -29,6 +29,7 @@
 #ifdef __MINGW32__
 #define _OLE2_H
 #elif defined _MSC_VER
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _OLE2_H_
 #endif
 #include <winsock2.h>

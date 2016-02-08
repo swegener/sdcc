@@ -21,8 +21,9 @@ foo(void)
 void
 testTortureExecute (void)
 {
-  if (foo() != &wordlist[206])
-    ASSERT (0);
+  ASSERT (foo() == &wordlist[206]);
+#if 0
+  ASSERT (wordlist[0] == 0);
+#endif
   return;
 }
-

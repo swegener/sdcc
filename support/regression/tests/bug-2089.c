@@ -1,19 +1,19 @@
 /*
-   bug-2089.c 
+   bug-2089.c
  */
 
 #include <testfwk.h>
 #include <string.h>
 
 struct t0_t {
-  char *p2;
+  const char *p2;
   char v2[5];
 };
 
 struct t1_t {
-  char *p0;
+  const char *p0;
   char v0[5];
-  char *p1;
+  const char *p1;
   char v1[5];
   struct t0_t t;
 };

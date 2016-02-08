@@ -1,7 +1,21 @@
+2016-02-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* debugger/mcs51/simi.c,
+	* debugger/mcs51/simi.h: applied patch 268, Thanks Peter Dons Tychsen
+	* device/include/stdlib.h: suppress unused variable warning
+	* src/SDCCsymt.c (checkSClass): globals and statics in code don't need an
+	  initializer but may be implicitly cleared
+	* support/regression/tests/gcc-torture-execute-20000412-1.c: added disabled
+	  testcase for this
+	* support/regression/tests/bug-2041.c: also check with xdata starting at 1
+	* support/regression/tests/bug-2089.c: fix warnings
+	* support/regression/tests/bug-2423.c: suppress warning 147, show weird 203
+
 2016-02-07 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/ds390/gen.c
-	  Fix a bug in genFarPointerSet() when the result and the right operand are both in DPTR.
+	  Fix a bug in genFarPointerSet() when the result and the right operand are
+	  both in DPTR.
 	* support/regression/tests/bug-2041.c
 	  Add a new test case.
 

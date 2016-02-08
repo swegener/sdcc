@@ -1937,10 +1937,10 @@ checkSClass (symbol * sym, int isProto)
   if (!isProto)
     {
       /* variables declared in CODE space must have */
-      /* initializers if not an extern */
+      /* initializers if not an extern, a global or a static */
       if (SPEC_SCLS (sym->etype) == S_CODE && sym->ival == NULL && !sym->_isparm &&
-          //!sym->level &&
-          port->mem.code_ro && !IS_EXTERN (sym->etype) && !SPEC_ABSA (sym->etype) && !funcInChain (sym->type))
+          IS_AUTO(sym) &&
+          port->mem.code_ro && !SPEC_ABSA (sym->etype) && !funcInChain (sym->type))
         werror (E_CODE_NO_INIT, sym->name);
     }
 

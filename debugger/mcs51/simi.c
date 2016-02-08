@@ -751,21 +751,24 @@ void closeSimulator (void)
     }
   simactive = 0;
   sendSim("quit\n");
-  fclose (simin);
-  fclose (simout);
   shutdown(sock, 2);
 #ifdef _WIN32
   closesocket(sock);
   sock = -1;
   if (NULL != simPid)
+    {
       TerminateProcess(simPid->hProcess, 0);
-  // Close process and thread handles.
-  CloseHandle(simPid->hProcess);
-  CloseHandle(simPid->hThread);
+      // Close process and thread handles.
+      CloseHandle(simPid->hProcess);
+      CloseHandle(simPid->hThread);
+    }
 #else
   close(sock);
   sock = -1;
   if ( simPid > 0 )
       kill (simPid,SIGKILL);
 #endif
+  /* simin/simout are now dead as they are both associated with the closed socket */
+  simin = NULL;
+  simout = NULL;
 }

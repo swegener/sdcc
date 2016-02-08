@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -81,6 +81,7 @@ void *realloc (void *ptr, size_t size);
 #if __STDC_VERSION__ >= 201112L
 inline void *aligned_alloc(size_t alignment, size_t size)
 {
+  (void)alignment;
   return malloc(size);
 }
 #endif

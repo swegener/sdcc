@@ -1,5 +1,6 @@
 /*
    bug-2041.c
+   pad: 254,255
  */
 
 #include <testfwk.h>
@@ -11,7 +12,7 @@ struct slist
   struct slist __xdata *next;
   unsigned short value;
 };
- 
+
 extern void slist_init (struct slist __xdata *p);
 
 void slist_init (struct slist __xdata *p)
@@ -19,7 +20,7 @@ void slist_init (struct slist __xdata *p)
   p->next = p;
 }
 
-unsigned char __xdata pad[255];
+unsigned char __xdata pad[{pad}];
 struct slist __xdata list;
 
 #endif

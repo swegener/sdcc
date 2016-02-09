@@ -186,7 +186,7 @@ TARGETS        += model-s08
 endif
 
 ifeq ($(OPT_DISABLE_MCS51), 0)
-TARGETS        += models small-mcs51-stack-auto
+TARGETS        += models small-mcs51-stack-auto large-mcs51-stack-auto
 endif
 
 ifeq ($(OPT_DISABLE_PIC14), 0)
@@ -251,6 +251,12 @@ small-mcs51-stack-auto:
 	if grep '^mcs51$$' $(top_builddir)/ports.build > /dev/null; then \
 	  mkdir -p small-stack-auto; cp small/Makefile small-stack-auto; \
 	  $(MAKE) MODELFLAGS="--model-small --stack-auto" PORT=small-stack-auto PORTDIR=$(BUILDDIR)/small-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
+	fi
+
+large-mcs51-stack-auto:
+	if grep '^mcs51$$' $(top_builddir)/ports.build > /dev/null; then \
+	  mkdir -p large-stack-auto; cp small/Makefile large-stack-auto; \
+	  $(MAKE) MODELFLAGS="--model-large --stack-auto" PORT=large-stack-auto PORTDIR=$(BUILDDIR)/large-stack-auto PORTINCDIR=$(INCDIR)/mcs51 objects; \
 	fi
 
 model-mcs51-stack-auto:

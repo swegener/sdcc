@@ -1,3 +1,11 @@
+2016-02-09 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/Makefile.in: added and enabled large-mcs51-stack-auto
+	* support/regression/ports/mcs51-large-stack-auto,
+	* support/regression/ports/mcs51-large-stack-auto/spec.mk,
+	* support/regression/Makefile.in: added test-mcs51-large-stack-auto
+	* support/regression/tests/bug2094505.c: disabled for mcs51-large-stack-auto
+
 2016-02-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* debugger/mcs51/simi.c,

@@ -2343,7 +2343,7 @@ genFunction (iCode * ic)
   pic14_stringInSet (sym->rname, &pic14_localFunctions, 1);
 
   pic14_emitcode ("", "%s:", sym->rname);
-  addpCode2pBlock (pb, newpCodeFunction (moduleName, sym->rname, !IS_STATIC (sym->etype)));
+  addpCode2pBlock (pb, newpCodeFunction (moduleName, sym->rname, !IS_STATIC (sym->etype), IFFUNC_ISISR (sym->type)));
 
   /* mark symbol as NOT extern (even if it was declared so previously) */
   assert (IS_SPEC (sym->etype));
@@ -2655,7 +2655,7 @@ genEndFunction (iCode * ic)
       emitpcodeNULLop (POC_RETURN);
 
       /* Mark the end of a function */
-      addpCode2pBlock (pb, newpCodeFunction (moduleName, NULL, 0));
+      addpCode2pBlock (pb, newpCodeFunction (moduleName, NULL, 0, 0));
     }
 
 }

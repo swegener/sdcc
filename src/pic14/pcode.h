@@ -428,7 +428,6 @@ typedef struct pCode
 
 typedef struct pCodeComment
 {
-
 	pCode  pc;
 
 	char *comment;
@@ -442,7 +441,6 @@ typedef struct pCodeComment
 
 typedef struct pCodeCSource
 {
-
 	pCode  pc;
 
 	int  line_number;
@@ -466,7 +464,6 @@ typedef struct pCodeCSource
 
 typedef struct pCodeFlow
 {
-
 	pCode  pc;
 
 	pCode *end;   /* Last pCode in this flow. Note that
@@ -524,7 +521,6 @@ typedef struct pCodeFlowLink
 
 typedef struct pCodeInstruction
 {
-
 	pCode  pc;
 
 	PIC_OPCODE op;        // The opcode of the instruction.
@@ -572,7 +568,6 @@ typedef struct pCodeAsmDir
 
 typedef struct pCodeLabel
 {
-
 	pCode  pc;
 
 	char *label;
@@ -587,21 +582,21 @@ typedef struct pCodeLabel
 
 typedef struct pCodeFunction
 {
-
 	pCode  pc;
 
 	char *modname;
 	char *fname;     /* If NULL, then this is the end of
 	                    a function. Otherwise, it's the
 	                    start and the name is contained
-	                    here */
+	                    here. */
 
 	pBranch *from;       // pCodes that execute before this one
 	pBranch *to;         // pCodes that execute after
 	pBranch *label;      // pCode instructions that have labels
 
-	int  ncalled;        /* Number of times function is called */
-	unsigned isPublic:1; /* True if the fn is not static and can be called from another module (ie a another c or asm file) */
+	int  ncalled;        /* Number of times function is called. */
+	unsigned isPublic:1; /* True if the fn is not static and can be called from another module (ie a another c or asm file). */
+	unsigned isInterrupt:1; /* True if the fn is interrupt. */
 
 } pCodeFunction;
 
@@ -612,7 +607,6 @@ typedef struct pCodeFunction
 
 typedef struct pCodeWild
 {
-
 	pCodeInstruction  pci;
 
 	int    id;     /* Index into the wild card array of a peepBlock 
@@ -691,7 +685,8 @@ typedef struct pFile
   variables, operands, and opcodes that exist in
   a pBlock.
 **************************************************/
-typedef struct pCodeWildBlock {
+typedef struct pCodeWildBlock
+{
 	pBlock    *pb;
 	struct pCodePeep *pcp;    // pointer back to ... I don't like this...
 
@@ -717,7 +712,8 @@ typedef struct pCodeWildBlock {
   found then the pCode is replaced by the replacement
   pCode chain.
 **************************************************/
-typedef struct pCodePeep {
+typedef struct pCodePeep
+{
 	pCodeWildBlock target;     // code we'd like to optimize
 	pCodeWildBlock replace;    // and this is what we'll optimize it with.
 
@@ -745,7 +741,8 @@ way the peep hole optimizer behaves
 
 **************************************************/
 
-enum peepCommandTypes{
+enum peepCommandTypes
+{
 	NOTBITSKIP = 0,
 	BITSKIP,
 	INVERTBITSKIP,
@@ -757,7 +754,8 @@ enum peepCommandTypes{
 
 **************************************************/
 
-typedef struct peepCommand {
+typedef struct peepCommand
+{
 	int id;
 	char *cmd;
 } peepCommand;
@@ -822,7 +820,7 @@ typedef struct peepCommand {
 
 pCode *newpCode(PIC_OPCODE op, pCodeOp *pcop); // Create a new pCode given an operand
 pCode *newpCodeCharP(const char *cP);              // Create a new pCode given a char *
-pCode *newpCodeFunction(const char *g, const char *f, int); // Create a new function.
+pCode *newpCodeFunction(const char *g, const char *f, int, int); // Create a new function.
 pCode *newpCodeLabel(const char *name,int key);    // Create a new label given a key
 pCode *newpCodeCSource(int ln, const char *f, const char *l); // Create a new symbol line.
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label);

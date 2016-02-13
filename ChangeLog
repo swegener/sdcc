@@ -1,3 +1,11 @@
+2016-02-13 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/gen.c,
+	* src/pic14/glue.c,
+	* src/pic14/pcode.c,
+	* src/pic14/pcode.h:
+	Fixed bug: "#2470 wrong asm code for PIC14 interrupt - interrupt not working"
+
 2016-02-09 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/Makefile.in: added and enabled large-mcs51-stack-auto

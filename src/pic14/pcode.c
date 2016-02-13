@@ -2048,10 +2048,10 @@ static char getpBlock_dbName(pBlock *pb)
 {
 	if(!pb)
 		return 0;
-	
+
 	if(pb->cmemmap)
 		return pb->cmemmap->dbName;
-	
+
 	return pb->dbName;
 }
 
@@ -2059,10 +2059,10 @@ void pBlockConvert2ISR(pBlock *pb)
 {
 	if(!pb)
 		return;
-	
+
 	if(pb->cmemmap)
 		pb->cmemmap = NULL;
-	
+
 	pb->dbName = 'I';
 }
 
@@ -2075,48 +2075,45 @@ void pBlockConvert2ISR(pBlock *pb)
 void movepBlock2Head(char dbName)
 {
 	pBlock *pb;
-	
+
 	if (!the_pFile)
 		return;
-	
+
 	pb = the_pFile->pbHead;
-	
+
 	while(pb) {
-		
+
 		if(getpBlock_dbName(pb) == dbName) {
 			pBlock *pbn = pb->next;
 			pb->next = the_pFile->pbHead;
 			the_pFile->pbHead->prev = pb;
 			the_pFile->pbHead = pb;
-			
+
 			if(pb->prev)
 				pb->prev->next = pbn;
-			
+
 			// If the pBlock that we just moved was the last
 			// one in the link of all of the pBlocks, then we
 			// need to point the tail to the block just before
 			// the one we moved.
 			// Note: if pb->next is NULL, then pb must have 
 			// been the last pBlock in the chain.
-			
+
 			if(pbn)
 				pbn->prev = pb->prev;
 			else
 				the_pFile->pbTail = pb->prev;
-			
+
 			pb = pbn;
-			
 		} else
 			pb = pb->next;
-		
 	}
-	
 }
 
 void copypCode(FILE *of, char dbName)
 {
 	pBlock *pb;
-	
+
 	if(!of || !the_pFile)
 		return;
 
@@ -2127,7 +2124,6 @@ void copypCode(FILE *of, char dbName)
 			fprintf (of, "\n");
 		}
 	}
-	
 }
 
 void resetpCodeStatistics (void)
@@ -2146,35 +2142,34 @@ void dumppCodeStatistics (FILE *of)
 
 void pcode_test(void)
 {
-	
 	DFPRINTF((stderr,"pcode is alive!\n"));
-	
+
 	//initMnemonics();
-	
+
 	if(the_pFile) {
-		
+
 		pBlock *pb;
 		FILE *pFile;
 		char buffer[100];
-		
+
 		/* create the file name */
 		strcpy(buffer,dstFileName);
 		strcat(buffer,".p");
-		
+
 		if( !(pFile = fopen(buffer, "w" ))) {
 			werror(E_FILE_OPEN_ERR,buffer);
 			exit(1);
 		}
-		
+
 		fprintf(pFile,"pcode dump\n\n");
-		
+
 		for(pb = the_pFile->pbHead; pb; pb = pb->next) {
 			fprintf(pFile,"\n\tNew pBlock\n\n");
 			if(pb->cmemmap)
 				fprintf(pFile,"%s",pb->cmemmap->sname);
 			else
 				fprintf(pFile,"internal pblock");
-			
+
 			fprintf(pFile,", dbName =%c\n",getpBlock_dbName(pb));
 			printpBlock(pFile,pb);
 		}
@@ -2190,10 +2185,9 @@ void pcode_test(void)
 
 static int RegCond(pCodeOp *pcop)
 {
-	
 	if(!pcop)
 		return 0;
-	
+
 	if (pcop->type == PO_GPR_BIT) {
 		const char *name = pcop->name;
 		if (!name) 
@@ -2210,7 +2204,7 @@ static int RegCond(pCodeOp *pcop)
 			}
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -2238,32 +2232,32 @@ static int RegCond(pCodeOp *pcop)
 pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
 {
 	pCodeInstruction *pci ;
-	
+
 	if(!mnemonics_initialized)
 		pic14initMnemonics();
-	
+
 	pci = Safe_alloc(sizeof(pCodeInstruction));
-	
+
 	if((op>=0) && (op < MAX_PIC14MNEMONICS) && pic14Mnemonics[op]) {
 		memcpy(pci, pic14Mnemonics[op], sizeof(pCodeInstruction));
 		pci->pc.id = PCodeID();
 		pci->pcop = pcop;
-		
+
 		if(pci->inCond & PCC_EXAMINE_PCOP)
 			pci->inCond  |= RegCond(pcop);
-		
+
 		if(pci->outCond & PCC_EXAMINE_PCOP)
 			pci->outCond  |= RegCond(pcop);
-		
+
 		pci->pc.prev = pci->pc.next = NULL;
 		return (pCode *)pci;
 	}
-	
+
 	fprintf(stderr, "pCode mnemonic error %s,%d\n",__FUNCTION__,__LINE__);
 	exit(1);
-	
+
 	return NULL;
-}       
+}
 
 /*-----------------------------------------------------------------*/
 /* newpCodeWild - create a "wild" as in wild card pCode            */
@@ -2284,30 +2278,28 @@ pCode *newpCode (PIC_OPCODE op, pCodeOp *pcop)
 
 pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_label)
 {
-	
 	pCodeWild *pcw;
-	
+
 	pcw = Safe_alloc(sizeof(pCodeWild));
-	
+
 	pcw->pci.pc.type = PC_WILD;
 	pcw->pci.pc.prev = pcw->pci.pc.next = NULL;
 	pcw->id = PCodeID();
 	pcw->pci.from = pcw->pci.to = pcw->pci.label = NULL;
 	pcw->pci.pc.pb = NULL;
-	
+
 	pcw->pci.pc.destruct = genericDestruct;
 	pcw->pci.pc.print = genericPrint;
-	
+
 	pcw->id = pCodeID;              // this is the 'n' in %n
 	pcw->operand = optional_operand;
 	pcw->label   = optional_label;
-	
+
 	pcw->mustBeBitSkipInst = 0;
 	pcw->mustNotBeBitSkipInst = 0;
 	pcw->invertBitSkipInst = 0;
-	
-	return ( (pCode *)pcw);
-	
+
+	return ((pCode *)pcw);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2316,56 +2308,53 @@ pCode *newpCodeWild(int pCodeID, pCodeOp *optional_operand, pCodeOp *optional_la
 
 pCode *newpCodeCharP(const char *cP)
 {
-	
-	pCodeComment *pcc ;
-	
+	pCodeComment *pcc;
+
 	pcc = Safe_alloc(sizeof(pCodeComment));
-	
+
 	pcc->pc.type = PC_COMMENT;
 	pcc->pc.prev = pcc->pc.next = NULL;
 	pcc->pc.id = PCodeID();
 	//pcc->pc.from = pcc->pc.to = pcc->pc.label = NULL;
 	pcc->pc.pb = NULL;
-	
+
 	pcc->pc.destruct = genericDestruct;
 	pcc->pc.print = genericPrint;
-	
+
 	if(cP)
 		pcc->comment = Safe_strdup(cP);
 	else
 		pcc->comment = NULL;
-	
-	return ( (pCode *)pcc);
-	
+
+	return ((pCode *)pcc);
 }
 
 /*-----------------------------------------------------------------*/
 /* newpCodeFunction -                                              */
 /*-----------------------------------------------------------------*/
 
-
-pCode *newpCodeFunction(const char *mod, const char *f, int isPublic)
+pCode *newpCodeFunction(const char *mod, const char *f, int isPublic, int isInterrupt)
 {
 	pCodeFunction *pcf;
-	
+
 	pcf = Safe_alloc(sizeof(pCodeFunction));
-	//_ALLOC(pcf,sizeof(pCodeFunction));
 
 	pcf->pc.type = PC_FUNCTION;
 	pcf->pc.prev = pcf->pc.next = NULL;
-	pcf->pc.id = PCodeID();
+	pcf->pc.id   = PCodeID();
 	//pcf->pc.from = pcf->pc.to = pcf->pc.label = NULL;
-	pcf->pc.pb = NULL;
+	pcf->pc.pb   = NULL;
 
 	pcf->pc.destruct = genericDestruct;
-	pcf->pc.print = pCodePrintFunction;
+	pcf->pc.print    = pCodePrintFunction;
 
 	pcf->ncalled = 0;
 
 	pcf->modname = (mod != NULL) ? Safe_strdup(mod) : NULL;
 	pcf->fname   = (f != NULL)   ? Safe_strdup(f)   : NULL;
 
-	pcf->isPublic = (unsigned int)isPublic;
+	pcf->isPublic    = (unsigned int)isPublic;
+	pcf->isInterrupt = (unsigned int)isInterrupt;
 
 	return ((pCode *)pcf);
 }
@@ -2377,53 +2366,50 @@ static void destructpCodeFlow(pCode *pc)
 {
 	if(!pc || !isPCFL(pc))
 		return;
-	
+
 		/*
 		if(PCFL(pc)->from)
 		if(PCFL(pc)->to)
 	*/
 	unlinkpCode(pc);
-	
+
 	deleteSet(&PCFL(pc)->registers);
 	deleteSet(&PCFL(pc)->from);
 	deleteSet(&PCFL(pc)->to);
 	free(pc);
-	
 }
 
 static pCode *newpCodeFlow(void )
 {
 	pCodeFlow *pcflow;
-	
-	//_ALLOC(pcflow,sizeof(pCodeFlow));
+
 	pcflow = Safe_alloc(sizeof(pCodeFlow));
-	
+
 	pcflow->pc.type = PC_FLOW;
 	pcflow->pc.prev = pcflow->pc.next = NULL;
 	pcflow->pc.pb = NULL;
-	
+
 	pcflow->pc.destruct = destructpCodeFlow;
 	pcflow->pc.print = genericPrint;
-	
+
 	pcflow->pc.seq = GpcFlowSeq++;
-	
+
 	pcflow->from = pcflow->to = NULL;
-	
+
 	pcflow->inCond = PCC_NONE;
 	pcflow->outCond = PCC_NONE;
-	
+
 	pcflow->firstBank = 'U'; /* Undetermined */
 	pcflow->lastBank = 'U'; /* Undetermined */
-	
+
 	pcflow->FromConflicts = 0;
 	pcflow->ToConflicts = 0;
-	
+
 	pcflow->end = NULL;
-	
+
 	pcflow->registers = newSet();
-	
-	return ( (pCode *)pcflow);
-	
+
+	return ((pCode *)pcflow);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2431,12 +2417,12 @@ static pCode *newpCodeFlow(void )
 static pCodeFlowLink *newpCodeFlowLink(pCodeFlow *pcflow)
 {
 	pCodeFlowLink *pcflowLink;
-	
+
 	pcflowLink = Safe_alloc(sizeof(pCodeFlowLink));
-	
+
 	pcflowLink->pcflow = pcflow;
 	pcflowLink->bank_conflict = 0;
-	
+
 	return pcflowLink;
 }
 
@@ -2446,32 +2432,30 @@ static pCodeFlowLink *newpCodeFlowLink(pCodeFlow *pcflow)
 
 pCode *newpCodeCSource(int ln, const char *f, const char *l)
 {
-	
 	pCodeCSource *pccs;
-	
+
 	pccs = Safe_alloc(sizeof(pCodeCSource));
-	
+
 	pccs->pc.type = PC_CSOURCE;
 	pccs->pc.prev = pccs->pc.next = NULL;
 	pccs->pc.id = PCodeID();
 	pccs->pc.pb = NULL;
-	
+
 	pccs->pc.destruct = genericDestruct;
 	pccs->pc.print = genericPrint;
-	
+
 	pccs->line_number = ln;
 	if(l)
 		pccs->line = Safe_strdup(l);
 	else
 		pccs->line = NULL;
-	
+
 	if(f)
 		pccs->file_name = Safe_strdup(f);
 	else
 		pccs->file_name = NULL;
-	
+
 	return ( (pCode *)pccs);
-	
 }
 
 /*******************************************************************/
@@ -2494,10 +2478,9 @@ pCode *newpCodeAsmDir(const char *asdir, const char *argfmt, ...)
   pcad->pci.pc.print = genericPrint;
 
   if(asdir && *asdir) {
+    while(isspace((unsigned char)*asdir)) asdir++;	// strip any white space from the beginning
 
-    while(isspace((unsigned char)*asdir))asdir++;	// strip any white space from the beginning
-
-    pcad->directive = Safe_strdup( asdir );
+    pcad->directive = Safe_strdup(asdir);
   }
 
   va_start(ap, argfmt);
@@ -2508,10 +2491,10 @@ pCode *newpCodeAsmDir(const char *asdir, const char *argfmt, ...)
 
   va_end(ap);
 
-  while(isspace((unsigned char)*lbp))lbp++;
+  while(isspace((unsigned char)*lbp)) lbp++;
 
   if(lbp && *lbp)
-    pcad->arg = Safe_strdup( lbp );
+    pcad->arg = Safe_strdup(lbp);
 
   return ((pCode *)pcad);
 }
@@ -2521,15 +2504,13 @@ pCode *newpCodeAsmDir(const char *asdir, const char *argfmt, ...)
 /*-----------------------------------------------------------------*/
 static void pCodeLabelDestruct(pCode *pc)
 {
-	
 	if(!pc)
 		return;
-	
+
 	if((pc->type == PC_LABEL) && PCL(pc)->label)
 		free(PCL(pc)->label);
-	
+
 	free(pc);
-	
 }
 
 pCode *newpCodeLabel(const char *name, int key)
@@ -2555,7 +2536,8 @@ pCode *newpCodeLabel(const char *name, int key)
 		SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_:", key);
 		s = buffer;
 	} else {
-		s = name;
+		SNPRINTF(buffer, sizeof(buffer), "%s:", name);
+		s = buffer;
 	}
 
 	if(s)
@@ -2571,19 +2553,17 @@ pCode *newpCodeLabel(const char *name, int key)
 /*-----------------------------------------------------------------*/
 static pBlock *newpBlock(void)
 {
-	
 	pBlock *PpB;
-	
+
 	PpB = Safe_alloc(sizeof(pBlock));
 	PpB->next = PpB->prev = NULL;
-	
+
 	PpB->function_entries = PpB->function_exits = PpB->function_calls = NULL;
 	PpB->tregisters = NULL;
 	PpB->visited = 0;
 	PpB->FlowTree = NULL;
-	
+
 	return PpB;
-	
 }
 
 /*-----------------------------------------------------------------*/
@@ -2597,13 +2577,12 @@ static pBlock *newpBlock(void)
 
 pBlock *newpCodeChain(memmap *cm,char c, pCode *pc)
 {
-	
 	pBlock *pB  = newpBlock();
-	
+
 	pB->pcHead  = pB->pcTail = pc;
 	pB->cmemmap = cm;
 	pB->dbName  = c;
-	
+
 	return pB;
 }
 
@@ -2918,7 +2897,7 @@ void addpCode2pBlock(pBlock *pb, pCode *pc)
 void addpBlock(pBlock *pb)
 {
 	// fprintf(stderr," Adding pBlock: dbName =%c\n",getpBlock_dbName(pb));
-	
+
 	if(!the_pFile) {
 		/* First time called, we'll pass through here. */
 		//_ALLOC(the_pFile,sizeof(pFile));
@@ -2943,66 +2922,64 @@ static void removepBlock(pBlock *pb)
 	
 	if(!the_pFile)
 		return;
-	
-	
+
 	//fprintf(stderr," Removing pBlock: dbName =%c\n",getpBlock_dbName(pb));
-	
+
 	for(pbs = the_pFile->pbHead; pbs; pbs = pbs->next) {
 		if(pbs == pb) {
-			
+
 			if(pbs == the_pFile->pbHead)
 				the_pFile->pbHead = pbs->next;
-			
+
 			if (pbs == the_pFile->pbTail) 
 				the_pFile->pbTail = pbs->prev;
-			
+
 			if(pbs->next)
 				pbs->next->prev = pbs->prev;
-			
+
 			if(pbs->prev)
 				pbs->prev->next = pbs->next;
-			
+
 			return;
-			
 		}
 	}
-	
+
 	fprintf(stderr, "Warning: call to %s:%s didn't find pBlock\n",__FILE__,__FUNCTION__);
-	
 }
 
 /*-----------------------------------------------------------------*/
 /* printpCode - write the contents of a pCode to a file            */
 /*-----------------------------------------------------------------*/
+
 void printpCode(FILE *of, pCode *pc)
 {
-	
 	if(!pc || !of)
 		return;
-	
+
 	if(pc->print) {
 		pc->print(of,pc);
 		return;
 	}
-	
+
 	fprintf(of,"warning - unable to print pCode\n");
 }
 
 /*-----------------------------------------------------------------*/
 /* printpBlock - write the contents of a pBlock to a file          */
 /*-----------------------------------------------------------------*/
+
 void printpBlock(FILE *of, pBlock *pb)
 {
 	pCode *pc;
-	
+
 	if(!pb)
 		return;
-	
+
 	if(!of)
 		of = stderr;
-	
+
 	for(pc = pb->pcHead; pc; pc = pc->next) {
-                if(isPCF(pc) && PCF(pc)->fname) {
+                if(isPCF(pc) && PCF(pc)->fname && !PCF(pc)->isInterrupt) {
 			fprintf(of, "S_%s_%s\tcode\n", PCF(pc)->modname, PCF(pc)->fname);
 		}
 		printpCode(of,pc);
@@ -3016,7 +2993,6 @@ void printpBlock(FILE *of, pBlock *pb)
 			}
 		}
 	} // for
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -3029,8 +3005,6 @@ void printpBlock(FILE *of, pBlock *pb)
 
 void unlinkpCode(pCode *pc)
 {
-	
-	
 	if(pc) {
 #ifdef PCODE_DEBUG
 		fprintf(stderr,"Unlinking: ");
@@ -3063,9 +3037,8 @@ void unlinkpCode(pCode *pc)
 
 static void genericDestruct(pCode *pc)
 {
-	
 	unlinkpCode(pc);
-	
+
 	if(isPCI(pc)) {
 	/* For instructions, tell the register (if there's one used)
 		* that it's no longer needed */
@@ -3073,19 +3046,18 @@ static void genericDestruct(pCode *pc)
 		if(reg)
 			deleteSetItem (&(reg->reglives.usedpCodes),pc);
 	}
-	
+
 	/* Instead of deleting the memory used by this pCode, mark
 	* the object as bad so that if there's a pointer to this pCode
 	* dangling around somewhere then (hopefully) when the type is
 	* checked we'll catch it.
 	*/
-	
+
 	pc->type = PC_BAD;
-	
+
 	addpCode2pBlock(pb_dead_pcodes, pc);
-	
+
 	//free(pc);
-	
 }
 
 
@@ -3114,18 +3086,17 @@ static void CopyFlow(pCodeInstruction *pcd, pCode *pcs) {
 /*-----------------------------------------------------------------*/
 void pCodeInsertAfter(pCode *pc1, pCode *pc2)
 {
-	
 	if(!pc1 || !pc2)
 		return;
-	
+
 	pc2->next = pc1->next;
 	if(pc1->next)
 		pc1->next->prev = pc2;
-	
+
 	pc2->pb = pc1->pb;
 	pc2->prev = pc1;
 	pc1->next = pc2;
-	
+
 	/* If this is an instrution type propogate the flow */
 	if (isPCI(pc2))
 		CopyFlow(PCI(pc2),pc1);
@@ -3245,7 +3216,7 @@ pCodeOp *pCodeOpCopy(pCodeOp *pcop)
 pCodeOp *popCopyReg(pCodeOpReg *pc)
 {
 	pCodeOpReg *pcor;
-	
+
 	pcor = Safe_alloc(sizeof(pCodeOpReg));
 	pcor->pcop.type = pc->pcop.type;
 	if(pc->pcop.name) {
@@ -3253,7 +3224,7 @@ pCodeOp *popCopyReg(pCodeOpReg *pc)
 			fprintf(stderr,"oops %s %d",__FILE__,__LINE__);
 	} else
 		pcor->pcop.name = NULL;
-	
+
 	if (pcor->pcop.type == PO_IMMEDIATE){
 		PCOL(pcor)->lit = PCOL(pc)->lit;
 	} else {
@@ -3261,9 +3232,9 @@ pCodeOp *popCopyReg(pCodeOpReg *pc)
 		pcor->rIdx = pc->rIdx;
 		if (pcor->r)
 			pcor->r->wasUsed=1;
-	}	
+	}
 	//DEBUGpic14_emitcode ("; ***","%s  , copying %s, rIdx=%d",__FUNCTION__,pc->pcop.name,pc->rIdx);
-	
+
 	return PCOP(pcor);
 }
 
@@ -3273,18 +3244,18 @@ pCodeOp *popCopyReg(pCodeOpReg *pc)
 pCode *pCodeInstructionCopy(pCodeInstruction *pci,int invert)
 {
 	pCodeInstruction *new_pci;
-	
+
 	if(invert)
 		new_pci = PCI(newpCode(pci->inverted_op,pci->pcop));
 	else
 		new_pci = PCI(newpCode(pci->op,pci->pcop));
-	
+
 	new_pci->pc.pb = pci->pc.pb;
 	new_pci->from = pci->from;
 	new_pci->to   = pci->to;
 	new_pci->label = pci->label;
 	new_pci->pcflow = pci->pcflow;
-	
+
 	return PCODE(new_pci);
 }
 
@@ -3293,7 +3264,7 @@ pCode *pCodeInstructionCopy(pCodeInstruction *pci,int invert)
 void pCodeDeleteChain(pCode *f,pCode *t)
 {
 	pCode *pc;
-	
+
 	while(f && f!=t) {
 		DFPRINTF((stderr,"delete pCode:\n"));
 		pc = f->next;
@@ -3311,13 +3282,13 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 	static char b[50];
 	char *s;
 	int use_buffer = 1;    // copy the string to the passed buffer pointer
-	
+
 	if(!buffer) {
 		buffer = b;
 		size = sizeof(b);
 		use_buffer = 0;     // Don't bother copying the string to the buffer.
 	} 
-	
+
 	if(pcop) {
 		switch(pcop->type) {
 		case PO_INDF:
@@ -3333,19 +3304,19 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 				r = typeRegWithIdx(PCOR(pcop)->r->rIdx,REG_STK,1);
 			else
 				r = pic14_regWithIdx(PCOR(pcop)->r->rIdx);
-			
+
 			if(use_buffer) {
 				SNPRINTF(buffer,size,"%s",r->name);
 				return buffer;
 			}
-			
+
 			return r->name;
 			break;
-			
+
 		case PO_IMMEDIATE:
 			s = buffer;
 			if(PCOI(pcop)->_const) {
-				
+
 				if( PCOI(pcop)->offset >= 0 && PCOI(pcop)->offset<4) {
 					switch(PCOI(pcop)->offset) {
 					case 0:
@@ -3393,7 +3364,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 			}
 			return buffer;
 			break;
-			
+
 		case PO_DIR:
 			s = buffer;
 			if( PCOR(pcop)->instance) {
@@ -3404,7 +3375,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 				SNPRINTF(s,size,"%s",pcop->name);
 			return buffer;
 			break;
-			
+
 		case PO_LABEL:
 			s = buffer;
 			if  (pcop->name) {
@@ -3442,19 +3413,16 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 	  pCodeOpType(pcop));
 
 	return "NO operand";
-
 }
 
 /*-----------------------------------------------------------------*/
 /*-----------------------------------------------------------------*/
 static char *get_op_from_instruction( pCodeInstruction *pcc)
 {
-	
 	if(pcc)
 		return get_op(pcc->pcop,NULL,0);
-	
+
 	return ("ERROR Null: get_op_from_instruction");
-	
 }
 
 /*-----------------------------------------------------------------*/

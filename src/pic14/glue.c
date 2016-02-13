@@ -456,17 +456,16 @@ pic14_emitInterruptHandler (FILE * asmFile)
 {
         if (pic14_hasInterrupt)
         {
-
                 fprintf (asmFile, "%s", iComments2);
                 fprintf (asmFile, "; interrupt and initialization code\n");
                 fprintf (asmFile, "%s", iComments2);
                 // Note - for mplink may have to enlarge section vectors in .lnk file
                 // Note: Do NOT name this code_interrupt to avoid nameclashes with
                 //       source files's code segment (interrupt.c -> code_interrupt)
-                fprintf (asmFile, "c_interrupt\t%s\t0x4\n", CODE_NAME);
+                fprintf (asmFile, "c_interrupt\t%s\t0x0004\n", CODE_NAME);
 
                 /* interrupt service routine */
-                fprintf (asmFile, "__sdcc_interrupt\n");
+                fprintf (asmFile, "__sdcc_interrupt:\n");
                 copypCode(asmFile, 'I');
         }
 }
@@ -586,7 +585,7 @@ picglue (void)
         else
           dbuf_destroy(&vBuf);
 
-        /* create interupt ventor handler */
+        /* create interupt vector handler */
         pic14_emitInterruptHandler (asmFile);
 
         /* copy over code */

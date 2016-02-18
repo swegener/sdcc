@@ -1,3 +1,8 @@
+2016-02-18 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCglue.c
+	  Add check of non-constant in a global variable's initial value.
+
 2016-02-13 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* src/pic14/gen.c,

@@ -210,6 +210,35 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
           if ((SPEC_OCLS (sym->etype) == xidata || SPEC_OCLS (sym->etype) == initialized) && !SPEC_ABSA (sym->etype) && !SPEC_ADDRSPACE (sym->etype))
             {
               sym_link *t;
+              ast *ival = NULL;
+              symbol *tsym = copySymbol (sym);
+
+              // check for constant
+              if (IS_AGGREGATE (tsym->type))
+                {
+                  ival = initAggregates (tsym, tsym->ival, NULL);
+                }
+              else
+                {
+                  if (getNelements (tsym->type, tsym->ival) > 1)
+                    {
+                      werrorfl (tsym->fileDef, tsym->lineDef, W_EXCESS_INITIALIZERS, "scalar", tsym->name);
+                    }
+                  ival = newNode ('=', newAst_VALUE (symbolVal (tsym)),
+                                  decorateType (resolveSymbols (list2expr (tsym->ival)), RESULT_TYPE_NONE));
+                }
+              if (ival)
+                {
+                  // set ival's lineno to where the symbol was defined
+                  setAstFileLine (ival, filename = tsym->fileDef, lineno = tsym->lineDef);
+                  // check if this is not a constant expression
+                  if (!constExprTree (ival))
+                    {
+                      werrorfl (ival->filename, ival->lineno, E_CONST_EXPECTED, "found expression");
+                      // but try to do it anyway
+                    }
+                }
+
               /* create a new "XINIT (CODE)" symbol, that will be emitted later
                  in the static seg */
               newSym = copySymbol (sym);

@@ -1,3 +1,8 @@
+2016-02-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCerr.c
+	  Make the error message of error E_CONST_EXPECTED more understandable.
+
 2016-02-18 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCglue.c

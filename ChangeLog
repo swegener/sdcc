@@ -1,3 +1,8 @@
+2016-02-20 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c
+	  Fix bug #2471.
+
 2016-02-19 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCerr.c

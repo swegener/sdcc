@@ -1787,6 +1787,7 @@ constExprTree (ast * cexpr)
           // the offset of a struct field will never change
           return TRUE;
         }
+#if 0
       if (IS_AST_SYM_VALUE (cexpr) && IN_CODESPACE (SPEC_OCLS (AST_SYMBOL (cexpr)->etype)))
         {
           // a symbol in code space will never change
@@ -1794,6 +1795,7 @@ constExprTree (ast * cexpr)
           //printf(" code space symbol");
           return TRUE;
         }
+#endif
       return FALSE;
     case EX_LINK:
       wassertl (0, "unexpected link in expression tree");

@@ -251,7 +251,6 @@ copyAst (ast * src)
   dest->level = src->level;
   dest->funcName = src->funcName;
   dest->reversed = src->reversed;
-  dest->parmProcessed = src->parmProcessed;
 
   if (src->ftype)
     dest->etype = getSpec (dest->ftype = copyLinkChain (src->ftype));
@@ -797,14 +796,14 @@ funcOfTypeVarg (const char *name, const char *rtype, int nArgs, const char **aty
 /* reverseParms - will reverse a parameter tree                    */
 /*-----------------------------------------------------------------*/
 static void
-reverseParms (ast * ptree)
+reverseParms (ast * ptree, int r)
 {
   ast *ttree;
   if (!ptree)
     return;
 
   /* top down if we find a nonParm tree then quit */
-  if (ptree->type == EX_OP && ptree->opval.op == PARAM && !ptree->reversed)
+  if (ptree->type == EX_OP && ptree->opval.op == PARAM && ptree->reversed != r)
     {
       /* The various functions expect the parameter tree to be right heavy. */
       /* Rotate the tree to be left heavy so that after reversal it is */
@@ -821,9 +820,9 @@ reverseParms (ast * ptree)
       ttree = ptree->left;
       ptree->left = ptree->right;
       ptree->right = ttree;
-      ptree->reversed = 1;
-      reverseParms (ptree->left);
-      reverseParms (ptree->right);
+      ptree->reversed = r;
+      reverseParms (ptree->left, r);
+      reverseParms (ptree->right, r);
     }
 
   return;
@@ -880,21 +879,13 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
       (*actParm)->decorated = 1;
       if ((*actParm)->reversed)
         {
-          int ret;
-          ret = (processParms (func, defParm, &(*actParm)->right, parmNumber, FALSE) ||
+          return (processParms (func, defParm, &(*actParm)->right, parmNumber, FALSE) ||
                  processParms (func, defParm ? defParm->next : NULL, &(*actParm)->left, parmNumber, rightmost));
-          if (!ret)
-            (*actParm)->parmProcessed = 1;    
-          return ret;
         }
       else
         {
-          int ret;
-          ret = (processParms (func, defParm, &(*actParm)->left, parmNumber, FALSE) ||
+          return (processParms (func, defParm, &(*actParm)->left, parmNumber, FALSE) ||
                  processParms (func, defParm ? defParm->next : NULL, &(*actParm)->right, parmNumber, rightmost));
-          if (!ret)
-            (*actParm)->parmProcessed = 1;
-          return ret;
         }
     }
   else if (defParm)             /* not vararg */
@@ -936,7 +927,6 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
            (IS_AST_LIT_VALUE (*actParm) && AST_VALUES (*actParm, cast.literalFromCast))))
         {
           /* Parameter was explicitly typecast; don't touch it. */
-         (*actParm)->parmProcessed = 1;
           return 0;
         }
 
@@ -981,7 +971,6 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
 
           *actParm = decorateType (*actParm, resultType);
         }
-      (*actParm)->parmProcessed = 1;
       return 0;
     }                           /* vararg */
 
@@ -989,7 +978,6 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
   /* reentrant */
   if (!defParm && *actParm && (options.stackAuto || IFFUNC_ISREENT (functype)))
     {
-      (*actParm)->parmProcessed = 1;
       return 0;
     }
   resolveSymbols (*actParm);
@@ -1045,7 +1033,6 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
     }
 
   (*parmNumber)++;
-  (*actParm)->parmProcessed = 1;
   return 0;
 }
 
@@ -5285,14 +5272,17 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           else
             functype = LTYPE (tree);
 
-          if ((tree->right && !tree->right->parmProcessed) && processParms (tree->left, FUNC_ARGS (functype), &tree->right, &parmNumber, TRUE))
+          if (tree->right && tree->right->reversed)
+            reverseParms (tree->right, 0);
+
+          if (processParms (tree->left, FUNC_ARGS (functype), &tree->right, &parmNumber, TRUE))
             {
               goto errorTreeReturn;
             }
 
           if ((options.stackAuto || IFFUNC_ISREENT (functype)) && !IFFUNC_ISBUILTIN (functype))
             {
-              reverseParms (tree->right);
+              reverseParms (tree->right, 1);
             }
 
           TTYPE (tree) = copyLinkChain(functype->next);

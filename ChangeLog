@@ -1,3 +1,11 @@
+2016-02-21 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c
+	* src/SDCCast.h
+	  Make sure the parameter list is not reversed before calling parmProcess().
+	* support/regression/tests/bug-2473.c
+	  Add a new test case.
+
 2016-02-20 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c

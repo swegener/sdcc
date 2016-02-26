@@ -708,15 +708,6 @@ double2ul (double val)
   return ((val) < 0) ? (((val) < -2147483647.0) ? 0x80000000UL : (unsigned long) -((long) -(val))) : (unsigned long) (val);
 }
 
-/*-----------------------------------------------------------------*/
-/* double2ull - double to unsigned long long conversion                  */
-/*-----------------------------------------------------------------*/
-unsigned long long
-double2ull (double val)
-{
-  return ((val) < 0) ? (((val) < -9223372036854775807.0) ? 0x8000000000000000ULL : (unsigned long long) -((long long) -(val))) : (unsigned long long) (val);
-}
-
 /*--------------------------------------------------------------------*/
 /* checkConstantRange - check if constant fits in numeric range of    */
 /* var type in comparisons and assignments                            */

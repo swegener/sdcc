@@ -1131,6 +1131,17 @@ isiCodeInFunctionCall (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* operandLitValueUll - unsigned long long value of an operand     */
+/*-----------------------------------------------------------------*/
+unsigned long long
+operandLitValueUll (operand * op)
+{
+  assert (isOperandLiteral (op));
+
+  return ullFromVal (OP_VALUE (op));
+}
+
+/*-----------------------------------------------------------------*/
 /* operandLitValue - literal value of an operand                   */
 /*-----------------------------------------------------------------*/
 double
@@ -1221,10 +1232,10 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
             /* signed and unsigned mul are the same, as long as the precision
                of the result isn't bigger than the precision of the operands. */
             retval = operandFromValue (valCastLiteral (type,
-                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (left)) *
-                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (right)),
-                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (left)) *
-                                                       (TYPE_TARGET_ULONGLONG) double2ull (operandLitValue (right))));
+                                                       operandLitValueUll (left) *
+                                                       operandLitValueUll (right),
+                                                       operandLitValueUll (left) *
+                                                       operandLitValueUll (right)));
           /* long is handled here, because it can overflow with double */
           else if (IS_LONG (type) || !IS_SPEC (type))
             /* signed and unsigned mul are the same, as long as the precision

@@ -1,3 +1,11 @@
+2016-02-26 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	* src/SDCCicode.h
+	* src/SDCCval.c
+	* src/SDCCval.h
+	  Fix potential precision loss of long long operands.
+
 2016-02-21 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c

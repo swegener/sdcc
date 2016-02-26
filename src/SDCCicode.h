@@ -316,6 +316,7 @@ iCodeTable *getTableEntry (int);
 int isOperandLiteral (const operand * const);
 operand *operandOperation (operand *, operand *, int, sym_link *);
 double operandLitValue (operand *);
+unsigned long long operandLitValueUll (operand *);
 operand *operandFromLit (double);
 operand *operandFromOperand (operand *);
 int isParameterToCall (value *, operand *);

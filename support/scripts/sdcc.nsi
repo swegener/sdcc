@@ -586,7 +586,13 @@ ${Section} "SDCC STM8 library" SEC21
   File "${DEV_ROOT}\lib\stm8\*.*"
 ${SectionEnd}
 
-${Section} "SDCC library sources" SEC22
+${Section} "SDCC large-stack-auto model library" SEC22
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\large-stack-auto"
+  File "${DEV_ROOT}\lib\large-stack-auto\*.*"
+${SectionEnd}
+
+${Section} "SDCC library sources" SEC23
   SectionIn 1
   SetOutPath "$INSTDIR\lib\src\ds390\examples"
   File "${DEV_ROOT}\lib\src\ds390\examples\MOVED"
@@ -817,7 +823,8 @@ LangString DESC_SEC18 ${LANG_ENGLISH} "SDCC S08 library"
 LangString DESC_SEC19 ${LANG_ENGLISH} "SDCC PIC16 library"
 LangString DESC_SEC20 ${LANG_ENGLISH} "SDCC PIC14 library"
 LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC STM8 library"
-LangString DESC_SEC22 ${LANG_ENGLISH} "SDCC library sources"
+LangString DESC_SEC22 ${LANG_ENGLISH} "SDCC large-stack-auto model library"
+LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC library sources"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -1007,6 +1014,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\large\*.lib"
 
   Delete "$INSTDIR\lib\small-stack-auto\*.lib"
+  Delete "$INSTDIR\lib\large-stack-auto\*.lib"
 
   Delete "$INSTDIR\lib\gbz80\*.rel"
   Delete "$INSTDIR\lib\gbz80\*.lib"
@@ -1122,6 +1130,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\medium"
   RMDir "$INSTDIR\lib\large"
   RMDir "$INSTDIR\lib\small-stack-auto"
+  RMDir "$INSTDIR\lib\large-stack-auto"
   RMDir "$INSTDIR\lib\gbz80"
   RMDir "$INSTDIR\lib\ds390"
   RMDir "$INSTDIR\lib\ds400"

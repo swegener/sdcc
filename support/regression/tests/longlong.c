@@ -6,6 +6,7 @@
 #ifdef __SDCC
 #pragma std_sdcc99
 #pragma disable_warning 85
+#pragma disable_warning 212
 #endif
 
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
@@ -40,6 +41,77 @@ static unsigned long long mulLL(unsigned long long a, unsigned long long b)
 {
   return a * b;
 }
+
+static long long divLL(long long a, long long b)
+{
+  return a / b;
+}
+
+static unsigned long long divULL(unsigned long long a, unsigned long long b)
+{
+  return a / b;
+}
+
+static unsigned long long modULL(unsigned long long a, unsigned long long b)
+{
+  return a % b;
+}
+
+static long long modLL(long long a, long long b)
+{
+  return a % b;
+}
+
+static int compareLL(unsigned long long a, unsigned long long b)
+{
+  if (a > b)
+    return 1;
+  else if (a < b)
+    return -1;
+  else
+    return 0;
+}
+
+static long long leftShiftLL(long long a)
+{
+  return a << 8;
+}
+ 
+static long long rightShiftLL(long long a)
+{
+  return a >> 8;
+}
+
+static unsigned long long rightShiftULL(unsigned long long a)
+{
+  return a >> 8;
+}
+
+static unsigned long long leftShiftULL(unsigned long long a)
+{
+  return a << 8;
+}
+
+static unsigned long long bitAndULL(unsigned long long a, unsigned long long b)
+{
+  return a & b;
+}
+
+static unsigned long long bitOrULL(unsigned long long a, unsigned long long b)
+{
+  return a | b;
+}
+
+static unsigned long long bitXorULL(unsigned long long a, unsigned long long b)
+{
+  return a ^ b;
+}
+
+static unsigned long long bitNotULL(unsigned long long a)
+{
+  return ~a;
+}
+
 #endif
 
 void
@@ -141,16 +213,62 @@ testLongLong (void)
   x = 0x0788ll;
   ASSERT (y * x == 0xa5667788ccddull * 0x0788ll); // this test is optimized by constant propagation
   ASSERT (mulLL (y, x) == 0xa5667788ccddull * 0x0788ll); // this test is not
+
+  y = 0x1122334455667700ull;
+  x = 0x2ll;
+  ASSERT (y * x == 0x1122334455667700ull * 0x2ll); // this test is optimized by constant propagation
+  ASSERT (mulLL (y, x) == 0x1122334455667700ull * 0x2ll); // this test is not
 #endif
 
-#if 0
-  y = 0x5566778899aaull;
-  ASSERT ((y << 8) == 0x5566778899aa00ull);
-
-  y = 0x5566778899aaull;
-  x = 0x33ll;
-  ASSERT (y / x == 0x5566778899aaull / 0x33ll);
+  y = 0x1122334455667700ull;
+  x = 0x7ll;
+  ASSERT (y / x == 0x1122334455667700ull / 0x7ll); // this test is optimized by constant propagation
+  ASSERT (divULL (y, x) == 0x1122334455667700ull / 0x7ll); // this test is not
+#ifndef __SDCC_gbz80
+  ASSERT (y % x == 0x1122334455667700ull % 0x7ll); // this test is optimized by constant propagation
+  ASSERT (modULL (y, x) == 0x1122334455667700ull % 0x7ll); // this test is not
 #endif
+  x = 0x1122334455667700ll;
+  ASSERT (x / 0x7ll == 0x1122334455667700ll / 0x7ll); // this test is optimized by constant propagation
+  ASSERT (divLL (x, 0x7ll) == 0x1122334455667700ll / 0x7ll); // this test is not
+#ifndef __SDCC_gbz80
+  ASSERT (x % 0x7ll == 0x1122334455667700ll % 0x7ll); // this test is optimized by constant propagation
+  ASSERT (modLL (x, 0x7ll) == 0x1122334455667700ll % 0x7ll); // this test is not
+#endif
+
+  y = 0x44556677aabbccddull;
+  x = 0x7766554433221100ull;
+  ASSERT (y < x);
+  ASSERT (x > y);
+  ASSERT (compareLL (y, x) == -1);
+  ASSERT (compareLL (x, y) == 1);
+  
+  y = 0x5566778899aabbccull;
+  x = 0xaabbccdd11223344ll;
+  ASSERT ((y << 8) == 0x66778899aabbcc00ull);
+  ASSERT (leftShiftULL (y) == 0x66778899aabbcc00ull);
+  ASSERT ((y >> 8) == 0x005566778899aabbull);
+  ASSERT (rightShiftULL (y) == 0x005566778899aabbull);
+  ASSERT ((x << 8) == 0xbbccdd1122334400ll);
+  ASSERT (leftShiftLL (x) == 0xbbccdd1122334400ll);
+  ASSERT ((x >> 8) == 0xffaabbccdd112233ll);
+  ASSERT (rightShiftLL (x) == 0xffaabbccdd112233ll);
+
+  x = 0x44556677aabbccddll;
+  ASSERT (++x == 0x44556677aabbccdell);
+  y = 0x99556677aabbccddull;
+  ASSERT (--y == 0x99556677aabbccdcull);
+
+  y = 0x69aaaaaaaaaa55aaull;
+  x = 0x69555555555555aall;
+  ASSERT ((y & x) == (0x69aaaaaaaaaa55aaull & 0x69555555555555aall));
+  ASSERT (bitAndULL (y, x) == (0x69aaaaaaaaaa55aaull & 0x69555555555555aall));
+  ASSERT ((y | x) == (0x69aaaaaaaaaa55aaull | 0x69555555555555aall));
+  ASSERT (bitOrULL (y, x) == (0x69aaaaaaaaaa55aaull | 0x69555555555555aall));
+  ASSERT ((y ^ x) == (0x69aaaaaaaaaa55aaull ^ 0x69555555555555aall));
+  ASSERT (bitXorULL (y, x) == (0x69aaaaaaaaaa55aaull ^ 0x69555555555555aall));
+  ASSERT ((~y) == (~0x69aaaaaaaaaa55aaull));
+  ASSERT (bitNotULL (y) == (~0x69aaaaaaaaaa55aaull));
 
   c(); // Unused long long return value require special handling in register allocation.
 #endif

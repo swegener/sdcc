@@ -1279,11 +1279,18 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
             }
           SPEC_USIGN (let) = 1;
           SPEC_USIGN (ret) = 1;
-          retval = operandFromValue (valCastLiteral (type,
-                                                     (TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) /
-                                                     (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)),
-                                                     (TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) /
-                                                     (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))));
+          if (IS_LONGLONG (type))
+            retval = operandFromValue (valCastLiteral (type,
+                                                       operandLitValueUll (left) /
+                                                       operandLitValueUll (right),
+                                                       operandLitValueUll (left) /
+                                                       operandLitValueUll (right)));
+          else
+            retval = operandFromValue (valCastLiteral (type,
+                                                       (TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) /
+                                                       (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)),
+                                                       (TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) /
+                                                       (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))));
         }
       else
         {
@@ -1313,11 +1320,18 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
     case LEFT_OP:
       /* The number of left shifts is always unsigned. Signed doesn't make
          sense here. Shifting by a negative number is impossible. */
-      retval = operandFromValue (valCastLiteral (type,
-                                                 ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) <<
-                                                  (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))),
-                                                 ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) <<
-                                                  (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)))));
+      if (IS_LONGLONG (type))
+        retval = operandFromValue (valCastLiteral (type,
+                                                   (operandLitValueUll (left) <<
+                                                    operandLitValueUll (right)),
+                                                   (operandLitValueUll (left) <<
+                                                    operandLitValueUll (right))));
+      else
+        retval = operandFromValue (valCastLiteral (type,
+                                                   ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) <<
+                                                    (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))),
+                                                   ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) <<
+                                                    (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)))));
       break;
     case RIGHT_OP:
       /* The number of right shifts is always unsigned. Signed doesn't make

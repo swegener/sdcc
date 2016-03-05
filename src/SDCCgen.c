@@ -207,6 +207,7 @@ genInline (iCode * ic)
 {
   char *buf, *bp, *begin;
   bool inComment = FALSE;
+  bool inLiteralString = FALSE;
 
   D (emitcode (";", "genInline"));
 
@@ -219,8 +220,14 @@ genInline (iCode * ic)
     {
       switch (*bp)
         {
+        case '"':
+          inLiteralString = !inLiteralString;
+          ++bp;
+          break;
+
         case ';':
           inComment = TRUE;
+          inLiteralString = FALSE;
           ++bp;
           break;
 
@@ -241,7 +248,7 @@ genInline (iCode * ic)
 
         default:
           /* Add \n for labels, not dirs such as c:\mydir */
-          if (!inComment && (*bp == ':') && (isspace ((unsigned char) bp[1])))
+          if (!inComment && !inLiteralString && (*bp == ':') && (isspace ((unsigned char) bp[1])))
             {
               ++bp;
               *bp = '\0';

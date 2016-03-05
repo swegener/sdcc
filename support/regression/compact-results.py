@@ -63,4 +63,4 @@ print "%-35.35s" % base,
 
 if (invalid > 0):
     print "%d invalid instructions," % invalid,
-print "(f: %2.0f, t: %3.0f, c: %2.0f, b: %6.0f, t: %8.0f)" % (failures, tests, cases, bytes, ticks)
+print "(f: %2.0f, t:%4.0f, c: %2.0f, b: %6.0f, T: %8.0f)" % (failures, tests, cases, bytes, ticks)

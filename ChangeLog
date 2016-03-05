@@ -1,7 +1,15 @@
-2016-03-06 Ben Shi <powerstudio1st AT 163 DOT com>
+2016-03-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/non-free/lib/pic16/missing: copied from device/lib/pic16/missing
+	* src/SDCCgen.c (genInline): also check for colon in single literal char
+	* support/cpp/libcpp/macro.c (create_iso_definition): fixed warning
+	* support/regression/compact-results.py: use 'T' for clock ticks
+
+2016-03-05 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCgen.c
-	  Fix a bug: colon should not be treated as a label suffix in a literal string in inline-asm.
+	  Fix a bug: colon should not be treated as a label suffix in a literal
+	  string in inline-asm.
 
 2016-03-05 Ben Shi <powerstudio1st AT 163 DOT com>
 

@@ -1666,8 +1666,8 @@ create_iso_definition (cpp_reader *pfile, cpp_macro *macro)
   cpp_token *token;
   const cpp_token *ctoken;
   bool following_paste_op = false;
-  const char *paste_op_error_msg =
-    N_("'##' cannot appear at either end of a macro expansion");
+  #define paste_op_error_msg \
+    N_("'##' cannot appear at either end of a macro expansion")
   unsigned int num_extra_tokens = 0;
 
   /* Get the first token of the expansion (or the '(' of a

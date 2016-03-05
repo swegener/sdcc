@@ -226,13 +226,14 @@ genInline (iCode * ic)
           break;
 
         case ';':
-          inComment = TRUE;
-          inLiteralString = FALSE;
+          if (!inLiteralString)
+            inComment = TRUE;
           ++bp;
           break;
 
         case '\x87':
         case '\n':
+          inLiteralString = FALSE;
           inComment = FALSE;
           *bp++ = '\0';
 

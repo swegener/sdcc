@@ -1204,7 +1204,6 @@ constVal (const char *s)
           if (dval < -2147483648.0)
             {                   /* check if we have to promote to long long int */
               SPEC_LONGLONG (val->type) = 1;
-              werror (W_LONGLONG_LITERAL, p); 
             }
         }
       else
@@ -1238,7 +1237,6 @@ constVal (const char *s)
           if (dval > 0xffffffff && SPEC_USIGN (val->type) && !SPEC_LONGLONG (val->type))
             {
               SPEC_LONGLONG (val->type) = 1;
-              werror (W_LONGLONG_LITERAL, p); 
             }
           else if (dval > 0x7fffffff && !SPEC_USIGN (val->type))
             {
@@ -1253,7 +1251,6 @@ constVal (const char *s)
                   SPEC_LONGLONG (val->type) = 1;
                   if (is_integral && (llval & 0x8000000000000000ull))
                     SPEC_USIGN (val->type) = 1;
-                  werror (W_LONGLONG_LITERAL, p); 
                 }
             }
         }
@@ -1281,8 +1278,6 @@ constVal (const char *s)
 
   if (SPEC_LONGLONG (val->type))
     {
-      if (dval > 2147483648.0 || dval < -2147483648.0)
-        werror (W_LONGLONG_LITERAL, p);
       if (SPEC_USIGN (val->type))
         {
           SPEC_CVAL (val->type).v_ulonglong = (TYPE_TARGET_ULONGLONG) llval;

@@ -479,7 +479,7 @@ struct
   { W_STRING_CANNOT_BE_TERMINATED, ERROR_LEVEL_PEDANTIC,
     "string '%s'cannot be terminated within array", 0 },
   { W_LONGLONG_LITERAL, ERROR_LEVEL_WARNING,
-    "support for large long long literals is incomplete", 0 },
+    "support for large long long literals is incomplete", 1 },
   { S_SYNTAX_ERROR, ERROR_LEVEL_SYNTAX_ERROR,
     "token -> '%s' ; column %d", 0 },
   { E_MIXING_CONFIG, ERROR_LEVEL_ERROR,

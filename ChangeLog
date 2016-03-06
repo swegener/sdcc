@@ -1,3 +1,7 @@
+2016-03-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCC.y: MSVC does not accept declarations in for loop
+
 2016-03-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/non-free/lib/pic16/missing: copied from device/lib/pic16/missing

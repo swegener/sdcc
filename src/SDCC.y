@@ -282,9 +282,10 @@ function_attributes
                      }
    |  PRESERVES_REGS '(' identifier_list ')'
                      {
+                        const struct symbol *regsym;
                         $$ = newLink (SPECIFIER);
 
-                        for(const struct symbol *regsym = $3; regsym; regsym = regsym->next)
+                        for(regsym = $3; regsym; regsym = regsym->next)
                           {
                             int regnum;
 

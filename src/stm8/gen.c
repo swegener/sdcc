@@ -4980,6 +4980,12 @@ genAnd (const iCode *ic, iCode *ifx)
         int other_offset;
         asmop *other = (aopInReg (left->aop, i, A_IDX) ? right : left)->aop;
 
+        if (!regDead (A_IDX, ic))
+          {
+            push (ASMOP_A, 0, 1);
+            pushed_a = TRUE;
+          }
+
         if (aopInReg (left->aop, i, A_IDX) && aopIsLitVal (right->aop, i, 1, 0x00)) // A is dead, it just doesn't know it yet.
           break;
 
@@ -5000,10 +5006,17 @@ genAnd (const iCode *ic, iCode *ifx)
           pop (other_stacked, 0, 2);
 
         if (aopInReg (result->aop, i, A_IDX) && size > 1)
-          {
-            push (ASMOP_A, 0, 1); // todo: Do not push, if other bytes do not affect a (e.g. due to using clr).
-            pushed_a = TRUE;
-          }
+          if (pushed_a)
+            {
+              if (!regalloc_dry_run)
+                wassertl (0, "Unimplemented and operand.");
+              cost (180, 180);
+            }
+          else
+            {
+              push (ASMOP_A, 0, 1); // todo: Do not push, if other bytes do not affect a (e.g. due to using clr).
+              pushed_a = TRUE;
+            }
         else
           {
             // Avoid overwriting operand.

@@ -1,3 +1,10 @@
+2016-03-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/gen.c
+	  Fix a bug in genAnd(): conflict register assignment.
+	* support/regression/tests/bug-2480.c
+	  Add a new test case.
+
 2016-03-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCC.y: MSVC does not accept declarations in for loop

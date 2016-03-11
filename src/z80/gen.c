@@ -4731,7 +4731,7 @@ genRet (const iCode *ic)
     }
   else if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
     {
-      unsigned long lit = ulFromVal (AOP (IC_LEFT (ic))->aopu.aop_lit);
+      unsigned long long lit = ullFromVal (AOP (IC_LEFT (ic))->aopu.aop_lit);
       emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
       emit2 ("add hl, sp");
       emit2 ("ld a, (hl)");

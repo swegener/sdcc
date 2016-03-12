@@ -1,3 +1,9 @@
+2016-03-12 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCpeeph.c (labelIsUncondJump): also search backwards
+	* src/mcs51/peeph.def: added rules 257.a-i for jump-to-jump optimization,
+	  added	rules 259.c-f to remove dead jumps, implements RFE 491
+
 2016-03-12 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/z80/gen.c

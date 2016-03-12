@@ -339,6 +339,7 @@ FBYNAME (labelIsUncondJump)
   const char *label;
   char *p, *q;
   const lineNode *pl;
+  bool found = FALSE;
   int len;
   char * jpInst = NULL;
   char * jpInst2 = NULL;
@@ -348,23 +349,48 @@ FBYNAME (labelIsUncondJump)
     return FALSE;
   len = strlen(label);
 
-  for (pl = currPl; pl; pl = pl->next)
+  for (pl = currPl; pl; pl = pl->prev)
     {
       if (pl->line && !pl->isDebug && !pl->isComment && pl->isLabel)
         {
           if (strncmp(pl->line, label, len) == 0)
-            break; /* Found Label */
+            {
+              found = TRUE;
+              break; /* Found Label */
+            }
           if (strlen(pl->line) != 7       || !ISCHARDIGIT(*(pl->line))   ||
               !ISCHARDIGIT(*(pl->line+1)) || !ISCHARDIGIT(*(pl->line+2)) ||
               !ISCHARDIGIT(*(pl->line+3)) || !ISCHARDIGIT(*(pl->line+4)) ||
               *(pl->line+5) != '$')
             {
-              return FALSE; /* non-local label encountered */
+              break; /* non-local label encountered */
             }
         }
     }
 
-  if (!pl)
+  if (!found)
+    {
+      for (pl = currPl; pl; pl = pl->next)
+        {
+          if (pl->line && !pl->isDebug && !pl->isComment && pl->isLabel)
+            {
+              if (strncmp(pl->line, label, len) == 0)
+                {
+                  found = TRUE;
+                  break; /* Found Label */
+                }
+              if (strlen(pl->line) != 7       || !ISCHARDIGIT(*(pl->line))   ||
+                  !ISCHARDIGIT(*(pl->line+1)) || !ISCHARDIGIT(*(pl->line+2)) ||
+                  !ISCHARDIGIT(*(pl->line+3)) || !ISCHARDIGIT(*(pl->line+4)) ||
+                  *(pl->line+5) != '$')
+                {
+                  return FALSE; /* non-local label encountered */
+                }
+            }
+        }
+    }
+
+  if (!pl || !found)
     return FALSE; /* did not find the label */
   pl = pl->next;
   while (pl && (pl->isDebug || pl->isComment))
@@ -376,7 +402,10 @@ FBYNAME (labelIsUncondJump)
     p++;
 
   if (TARGET_MCS51_LIKE)
-    jpInst = "ljmp";
+    {
+      jpInst = "ljmp";
+      jpInst2 = "sjmp";
+    }
   else if (TARGET_HC08_LIKE)
     {
       jpInst = "jmp";

@@ -727,49 +727,49 @@ replace {
 	jnz	%0
 } by {
 	;	Peephole 129.a	jump optimization
-        jc	%0
+	jc	%0
 }
 
 // applies to: _fsdiv.c --xstack: if (mant1 < mant2)
 replace {
 	clr	a
 	rlc	a
-        pop	%1
+	pop	%1
 	jnz	%0
 } by {
 	;	Peephole 129.b	optimized condition
-        pop	%1
-        jc	%0
+	pop	%1
+	jc	%0
 } if notVolatile %1
 
 // applies to: time.c --xstack: while((days += (LEAP_YEAR(year) ? 366 : 365)) <= epoch)
 replace {
 	clr	a
 	rlc	a
-        pop	%1
-        pop	%2
+	pop	%1
+	pop	%2
 	jnz	%0
 } by {
 	;	Peephole 129.c	optimized condition
-        pop	%1
-        pop	%2
-        jc	%0
+	pop	%1
+	pop	%2
+	jc	%0
 } if notVolatile %1 %2
 
 // applies to: _memmove.c --xstack: if (((int)src < (int)dst) && ((((int)src)+acount) > (int)dst))
 replace {
 	clr	a
 	rlc	a
-        pop	%1
-        pop	%2
-        pop	%3
+	pop	%1
+	pop	%2
+	pop	%3
 	jnz	%0
 } by {
 	;	Peephole 129.d	optimized condition
-        pop	%1
-        pop	%2
-        pop	%3
-        jc	%0
+	pop	%1
+	pop	%2
+	pop	%3
+	jc	%0
 } if notVolatile %1 %2 %3
 
 replace {
@@ -4033,6 +4033,70 @@ replace {
 } if labelRefCount(%2 0),operandsNotRelated('a' %4 %6 %8)
 
 
+replace restart {
+	ljmp	%5
+} by {
+	ljmp	%6
+	; peephole 257.a jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	sjmp	%5
+} by {
+	sjmp	%6
+	; peephole 257.b jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), labelInRange(%6), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jz	%5
+} by {
+	jz	%6
+	; peephole 257.c jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), labelInRange(%6), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jnz	%5
+} by {
+	jnz	%6
+	; peephole 257.d jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), labelInRange(%6), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jc	%5
+} by {
+	jc	%6
+	; peephole 257.e jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), labelInRange(%6), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jnc	%5
+} by {
+	jnc	%6
+	; peephole 257.f jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), labelInRange(%6), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jb	%1,%5
+} by {
+	jb	%1,%6
+	; peephole 257.g jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), labelInRange(%6), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jnb	%1,%5
+} by {
+	jnb	%1,%6
+	; peephole 257.h jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), labelInRange(%6), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
+	jbc	%1,%5
+} by {
+	jbc	%1,%6
+	; peephole 257.i jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), labelInRange(%6), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+
 // in_byte<<=1; if(in_bit) in_byte|=1;
 // helps f.e. reading data on a 3-wire (SPI) bus
 replace {
@@ -4161,7 +4225,6 @@ replace {
 } by {
 	sjmp	%1
 	;	Peephole 259.a	removed redundant label %2 and ret
-	;
 } if optimizeReturn(), labelRefCount(%2 0)
 
 // applies to f.e. gets.c
@@ -4172,8 +4235,44 @@ replace {
 } by {
 	ljmp	%1
 	;	Peephole 259.b	removed redundant label %2 and ret
-	;
 } if optimizeReturn(), labelRefCount(%2 0)
+
+replace {
+	sjmp	%1
+%2:
+	sjmp	%3
+} by {
+	sjmp	%1
+	;	Peephole 259.c	removed redundant label %2 and sjmp %3
+} if labelRefCount(%2 0)
+
+replace {
+	ljmp	%1
+%2:
+	sjmp	%3
+} by {
+	ljmp	%1
+	;	Peephole 259.d	removed redundant label %2 and sjmp %3
+} if labelRefCount(%2 0)
+
+replace {
+	sjmp	%1
+%2:
+	ljmp	%3
+} by {
+	sjmp	%1
+	;	Peephole 259.e	removed redundant label %2 and ljmp %3
+} if labelRefCount(%2 0)
+
+replace {
+	ljmp	%1
+%2:
+	ljmp	%3
+} by {
+	ljmp	%1
+	;	Peephole 259.f	removed redundant label %2 and ljmp %3
+} if labelRefCount(%2 0)
+
 
 // optimizing jumptables
 // Please note: to enable peephole 260.x you currently have to set
@@ -4755,7 +4854,7 @@ replace {
 } by {
 	;	Peephole 266.a	optimized mov/jump sequence
 	mov	%1,c
-        jc	%2
+	jc	%2
 } if notVolatile(%1)
 
 replace {
@@ -4764,7 +4863,7 @@ replace {
 } by {
 	;	Peephole 266.b	optimized mov/jump sequence
 	mov	%1,c
-        jnc	%2
+	jnc	%2
 } if notVolatile(%1)
 
 replace {

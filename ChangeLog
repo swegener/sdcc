@@ -1,3 +1,10 @@
+2016-03-12 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/z80/gen.c
+	  Rollback to previous version.
+	* support/regression/tests/bug-2477.c
+	  Disable this test case.
+
 2016-03-11 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/z80/gen.c

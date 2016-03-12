@@ -641,10 +641,10 @@ processFile (char *s)
 
   /* get the file extension.
      If no '.' then we don't know what the file type is
-     so give a warning and return */
+     so give an error and return */
   if (!dbuf_splitFile (s, &path, &ext))
     {
-      werror (W_UNKNOWN_FEXT, s);
+      werror (E_UNKNOWN_FEXT, s);
 
       dbuf_destroy (&ext);
       dbuf_destroy (&path);
@@ -654,7 +654,7 @@ processFile (char *s)
 
   /* otherwise depending on the file type */
   extp = dbuf_c_str (&ext);
-  if (STRCASECMP (extp, ".c") == 0)
+  if (STRCASECMP (extp, ".c") == 0 || STRCASECMP (extp, ".h") == 0)
     {
       char *p, *m;
 
@@ -723,7 +723,7 @@ processFile (char *s)
   dbuf_destroy (&ext);
   dbuf_destroy (&path);
 
-  werror (W_UNKNOWN_FEXT, s);
+  werror (E_UNKNOWN_FEXT, s);
 }
 
 static void
@@ -1772,8 +1772,8 @@ linkEdit (char **envp)
                     }
                   if (NULL == s)
                     {
-                      /* not found in standard library directories, serch in user defined library paths */
-                      /* TODO: sould be crt searched here at all? */
+                      /* not found in standard library directories, search in user defined library paths */
+                      /* TODO: should crt be searched here at all? */
                       for (s = setFirstItem (libPathsSet); s != NULL; s = setNextItem (libPathsSet))
                         {
                           dbuf_set_length (&crtpath, 0);

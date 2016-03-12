@@ -289,7 +289,7 @@ struct
      "unknown compiler option '%s' ignored", 0 },
   { W_UNSUPP_OPTION, ERROR_LEVEL_WARNING,
      "option '%s' no longer supported  '%s' ", 0 },
-  { W_UNKNOWN_FEXT, ERROR_LEVEL_WARNING,
+  { E_UNKNOWN_FEXT, ERROR_LEVEL_ERROR,
      "don't know what to do with file '%s'. file extension unsupported", 0 },
   { W_TOO_MANY_SRC, ERROR_LEVEL_WARNING,
      "cannot compile more than one source file. file '%s' ignored", 0 },

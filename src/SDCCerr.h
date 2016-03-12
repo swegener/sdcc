@@ -145,7 +145,7 @@ enum {
   W_SHIFT_CHANGED               = 116, /* shift changed to zero */
   W_UNKNOWN_OPTION              = 117, /* don't know the option */
   W_UNSUPP_OPTION               = 118, /* processor reset has been redifned */
-  W_UNKNOWN_FEXT                = 119, /* unknown file extension */
+  E_UNKNOWN_FEXT                = 119, /* unknown file extension */
   W_TOO_MANY_SRC                = 120, /* can only compile one .c file at a time */
   I_CYCLOMATIC                  = 121, /* information message */
   E_DIVIDE_BY_ZERO              = 122, /* / 0 */

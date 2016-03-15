@@ -2533,11 +2533,12 @@ pCode *newpCodeLabel(const char *name, int key)
 
 	pcl->label = NULL;
 	if(key>0) {
-		SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_:", key);
+		SNPRINTF(buffer, sizeof(buffer), "_%05d_DS_", key);
 		s = buffer;
 	} else {
-		SNPRINTF(buffer, sizeof(buffer), "%s:", name);
-		s = buffer;
+/*		SNPRINTF(buffer, sizeof(buffer), "%s:", name);
+		s = buffer;*/
+		s = name;
 	}
 
 	if(s)
@@ -3687,11 +3688,11 @@ static void pCodePrintLabel(FILE *of, pCode *pc)
 		return;
 	
 	if(PCL(pc)->label) 
-		fprintf(of,"%s\n",PCL(pc)->label);
-	else if (PCL(pc)->key >=0) 
-		fprintf(of,"_%05d_DS_:\n",PCL(pc)->key);
+		fprintf(of, "%s:\n", PCL(pc)->label);
+	else if (PCL(pc)->key >= 0) 
+		fprintf(of, "_%05d_DS_:\n", PCL(pc)->key);
 	else
-		fprintf(of,";wild card label: id=%d\n",-PCL(pc)->key);
+		fprintf(of, ";wild card label: id=%d\n", -PCL(pc)->key);
 	
 }
 

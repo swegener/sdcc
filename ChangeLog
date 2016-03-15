@@ -1,3 +1,8 @@
+2016-03-15 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/pcode.c:
+	Fixed bug: "#2481 wrong asm code for pic16f1827 (or even others?)"
+
 2016-03-12 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCpeeph.c (labelIsUncondJump): also search backwards

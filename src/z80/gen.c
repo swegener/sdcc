@@ -1684,7 +1684,7 @@ aopGetLitWordLong (const asmop * aop, int offset, bool with_hash)
       /* otherwise it is fairly simple */
       if (!IS_FLOAT (val->type))
         {
-          unsigned long long v = ullFromVal (val);
+          unsigned long v = ulFromVal (val);
 
           if (offset == 2)
             {
@@ -1816,12 +1816,12 @@ requiresHL (const asmop * aop)
 /* strtoul_z80: a wrapper to strtoul, which can also handle */
 /* hex numbers with a $ prefix.                             */
 /*----------------------------------------------------------*/
-static unsigned long long int 
-strtoull_z80asm (const char *nptr, char **endptr, int base)
+static unsigned long int 
+strtoul_z80asm (const char *nptr, char **endptr, int base)
 {
   char *p = NULL;
   int i, flag = 0, len;
-  unsigned long long ret;
+  unsigned long ret;
 
   if (nptr != NULL && (p = malloc ((len = strlen (nptr)) + 1 + 1)) != NULL)
     {
@@ -1845,9 +1845,9 @@ strtoull_z80asm (const char *nptr, char **endptr, int base)
     }
 
   if (flag)
-    ret = strtoull (p, endptr, base);
+    ret = strtoul (p, endptr, base);
   else
-    ret = strtoull (nptr, endptr, base);
+    ret = strtoul (nptr, endptr, base);
 
   if (p)
     free (p);
@@ -1899,8 +1899,8 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
           !IS_FLOAT (left->aopu.aop_lit->type) && offset == 0 && _G.pairs[pairId].offset == 0)
         {
           unsigned new_low, new_high, old_low, old_high;
-          unsigned long long v_new = ullFromVal (left->aopu.aop_lit);
-          unsigned long long v_old = strtoull_z80asm (_G.pairs[pairId].base, NULL, 0);
+          unsigned long v_new = ulFromVal (left->aopu.aop_lit);
+          unsigned long v_old = strtoul_z80asm (_G.pairs[pairId].base, NULL, 0);
           new_low = (v_new >> 0) & 0xff;
           new_high = (v_new >> 8) & 0xff;
           old_low = (v_old >> 0) & 0xff;
@@ -2510,7 +2510,7 @@ aopGet (asmop * aop, int offset, bool bit16)
 
         case AOP_SIMPLELIT:
         {
-          unsigned long long v = aop->aopu.aop_simplelit;
+          unsigned long v = aop->aopu.aop_simplelit;
 
           if (offset >= sizeof(v))
             v = 0;
@@ -5712,7 +5712,7 @@ static void
 genMinus (const iCode * ic)
 {
   int size, offset = 0;
-  unsigned long long lit = 0L;
+  unsigned long lit = 0L;
 
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
@@ -5737,8 +5737,8 @@ genMinus (const iCode * ic)
     }
   else
     {
-      lit = ullFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
-      lit = -(long long) lit;
+      lit = ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+      lit = -(long) lit;
     }
 
   /* Same logic as genPlus */
@@ -6461,7 +6461,7 @@ static void
 genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign, const iCode * ic)
 {
   int size, offset = 0;
-  unsigned long long lit = 0L;
+  unsigned long lit = 0L;
   bool result_in_carry = FALSE;
   int a_always_byte = -1;
 
@@ -6615,7 +6615,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
 
       if (AOP_TYPE (right) == AOP_LIT)
         {
-          lit = ullFromVal (AOP (right)->aopu.aop_lit);
+          lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
           /* optimize if(x < 0) or if(x >= 0) */
           if (lit == 0)
@@ -6944,7 +6944,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl, const iCode *ic)
 {
   int size = max (AOP_SIZE (left), AOP_SIZE (right));
   int offset = 0;
-  unsigned long long lit = 0L;
+  unsigned long long lit = 0ull;
 
   /* Swap the left and right if it makes the computation easier */
   if (AOP_TYPE (left) == AOP_LIT)
@@ -7365,7 +7365,7 @@ genAnd (const iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long long lit = 0L;
+  unsigned long lit = 0L;
   unsigned int bytelit = 0;
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
@@ -7396,7 +7396,7 @@ genAnd (const iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ullFromVal (AOP (right)->aopu.aop_lit);
+    lit = ulFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -10205,7 +10205,7 @@ genAssign (const iCode * ic)
 {
   operand *result, *right;
   int size, offset;
-  unsigned long long lit = 0L;
+  unsigned long lit = 0L;
 
   result = IC_RESULT (ic);
   right = IC_RIGHT (ic);
@@ -10236,7 +10236,7 @@ genAssign (const iCode * ic)
 
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = ullFromVal (AOP (right)->aopu.aop_lit);
+      lit = ulFromVal (AOP (right)->aopu.aop_lit);
     }
 
   if (isPair (AOP (result)))
@@ -11297,7 +11297,7 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
   bool direct_c, direct_cl;
   bool indirect_c;
   bool preinc = FALSE;
-  unsigned long long sizecost_ldir, sizecost_direct, sizecost_loop;
+  unsigned long sizecost_ldir, sizecost_direct, sizecost_loop;
   bool double_loop;
   unsigned size;
   bool live_BC = !isPairDead (PAIR_BC, ic), live_DE = !isPairDead (PAIR_DE, ic), live_HL = !isPairDead (PAIR_HL, ic), live_B = bitVectBitValue (ic->rSurv, B_IDX);

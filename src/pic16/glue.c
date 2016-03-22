@@ -623,7 +623,7 @@ pic16_printIvalType (symbol *sym, sym_link * type, initList * ilist, char ptype,
   }
 
   if (val->type != type) {
-    val = valCastLiteral(type, floatFromVal (val), ullFromVal (val));
+    val = valCastLiteral(type, floatFromVal (val), (TYPE_TARGET_ULONGLONG) ullFromVal (val));
   }
 
   for (i = 0; i < (int)getSize (type); i++) {

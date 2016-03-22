@@ -1,3 +1,13 @@
+2016-03-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c
+	* src/SDCCglue.c
+	* src/SDCCval.c
+	* src/SDCCval.h
+	* src/pic16/glue.c
+	* src/z80/gen.c
+	  Improve long long compatibility among different host machines.
+
 2016-03-19 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/z80/gen.c

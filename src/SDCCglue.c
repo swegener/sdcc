@@ -806,7 +806,7 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
 
   if (val->type != type)
     {
-      val = valCastLiteral (type, floatFromVal (val), ullFromVal (val));
+      val = valCastLiteral (type, floatFromVal (val), (TYPE_TARGET_ULONGLONG) ullFromVal (val));
     }
 
   if (IS_INTEGRAL (val->type))

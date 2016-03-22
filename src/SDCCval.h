@@ -121,7 +121,7 @@ value *symbolVal (symbol *);
 void printVal (value *);
 double floatFromVal (value *);
 unsigned long ulFromVal (value *);
-TYPE_TARGET_ULONGLONG ullFromVal (value *);
+unsigned long long ullFromVal (value *);
 
 /* convert a fixed16x16 type to double */
 double doubleFromFixed16x16 (TYPE_TARGET_ULONG value);

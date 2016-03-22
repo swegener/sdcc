@@ -1849,7 +1849,7 @@ constExprValue (ast * cexpr, int check)
       /* if we are casting a literal value then */
       if (IS_CAST_OP (cexpr) && IS_LITERAL (cexpr->right->ftype))
         {
-          return valCastLiteral (cexpr->ftype, floatFromVal (cexpr->right->opval.val), ullFromVal (cexpr->right->opval.val));
+          return valCastLiteral (cexpr->ftype, floatFromVal (cexpr->right->opval.val), (TYPE_TARGET_ULONGLONG) ullFromVal (cexpr->right->opval.val));
         }
 
       if (IS_AST_VALUE (cexpr))
@@ -4466,7 +4466,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           if (!IS_PTR (LTYPE (tree)))
             {
               tree->type = EX_VALUE;
-              tree->opval.val = valCastLiteral (LTYPE (tree), floatFromVal (valFromType (RTYPE (tree))), ullFromVal (valFromType (RTYPE (tree))));
+              tree->opval.val = valCastLiteral (LTYPE (tree), floatFromVal (valFromType (RTYPE (tree))), (TYPE_TARGET_ULONGLONG) ullFromVal (valFromType (RTYPE (tree))));
               TTYPE (tree) = tree->opval.val->type;
               tree->left = NULL;
               tree->right = NULL;

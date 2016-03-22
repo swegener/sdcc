@@ -2003,7 +2003,7 @@ ullFromLit (sym_link * lit)
 /*------------------------------------------------------------------*/
 /* ullFromVal - value to unsigned long long conversion              */
 /*------------------------------------------------------------------*/
-TYPE_TARGET_ULONGLONG
+unsigned long long
 ullFromVal (value * val)
 {
   if (!val)
@@ -2014,7 +2014,7 @@ ullFromVal (value * val)
       werror (E_CONST_EXPECTED, val->name);
       return 0;
     }
-  return ullFromLit (val->type);
+  return (unsigned long long) ullFromLit (val->type);
 }
 
 /*------------------------------------------------------------------*/
@@ -2835,7 +2835,7 @@ valRecastLitVal (sym_link * dtype, value * val)
     }
   else
     {
-      ull = ullFromVal (val);
+      ull = (TYPE_TARGET_ULONGLONG) ullFromVal (val);
       fval = (double)ull;
     }
 

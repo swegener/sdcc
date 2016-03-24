@@ -4741,7 +4741,7 @@ genRet (const iCode *ic)
       regalloc_dry_run_cost += 8;
       do
         {
-          emit2 ("ld (hl), !immedbyte", lit & 0xff);
+          emit2 ("ld (hl), !immedbyte", (unsigned long) (lit & 0xff));
           regalloc_dry_run_cost += 2;
           lit >>= 8;
           if (size > 1)
@@ -6958,7 +6958,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl, const iCode *ic)
   if (AOP_TYPE (right) == AOP_LIT)
     {
       lit = ullFromVal (AOP (right)->aopu.aop_lit);
-      if (lit == 0)
+      if (lit == 0ull)
         {
           cheapMove (ASMOP_A, 0, AOP (left), offset);
           if (size > 1)

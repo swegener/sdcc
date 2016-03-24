@@ -1,3 +1,8 @@
+2016-03-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/z80/gen.c
+	  Improve long long compatibility among different host machines.
+
 2016-03-22 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c

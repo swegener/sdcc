@@ -1,3 +1,10 @@
+2016-03-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/inline.c:
+	  Disable failing test for OpenBSD host.
+	* src/SDCCglue.c:
+	  Add assertions to help track down pointer size bugs.
+
 2016-03-27 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sdas/asstm8/stm8pst.c

@@ -147,6 +147,9 @@ bug_1864577 (void)
 #if (defined(__APPLE__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 0) && (__GNUC_PATCHLEVEL__ == 1))
 #define SKIP_EXTERNAL
 #endif
+#if (defined(__OpenBSD__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 2) && (__GNUC_PATCHLEVEL__ == 1))
+#define SKIP_EXTERNAL
+#endif
 
 #ifdef SKIP_EXTERNAL
 #warning inline definition skipped
@@ -234,3 +237,4 @@ testInline (void)
   bug_2295 ();
 #endif
 }
+

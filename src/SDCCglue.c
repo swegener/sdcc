@@ -270,7 +270,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                   symbol *ps = NULL;
                   set *tmpSym = NULL;
 
-                  dbuf_init (&tmpBuf, 4096);
+                  wassert(dbuf_init (&tmpBuf, 4096));
                   // before allocation we must parse the sym->ival tree
                   // but without actually generating initialization code
                   ++noAlloc;
@@ -280,7 +280,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
                   --noInit;
                   --noAlloc;
 
-                  // delete redundant __str_%d symbols (initiailzer for char arrays)
+                  // delete redundant __str_%d symbols (initializer for char arrays)
                   for (ps = setFirstItem (statsg->syms); ps; ps = setNextItem (statsg->syms))
                     if (!strstr (tmpBuf.buf, ps->name) && isinSet (strSym, ps))
                       addSet (&tmpSym, ps);
@@ -1474,6 +1474,9 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oB
             dbuf_tprintf (oBuf, ",!immedbyte\n", pointerTypeToGPByte (DCL_TYPE (val->type), val->name, sym->name));
           else
             dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 2));
+          break;
+        default:
+          wassertl(0, "Printing pointer of invalid size");
         }
       return;
     }

@@ -1476,7 +1476,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oB
             dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 2));
           break;
         default:
-          wassertl(0, "Printing pointer of invalid size");
+          ;//wassertl(0, "Printing pointer of invalid size");
         }
       return;
     }

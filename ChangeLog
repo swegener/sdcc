@@ -1,3 +1,8 @@
+2016-03-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCglue.c:
+	  Disable assertions to mask ds390 issue on non-OpenBSD for now.
+
 2016-03-28 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCicode.c

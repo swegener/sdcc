@@ -1,3 +1,11 @@
+2016-03-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Fix a long long issue on 32-bit machines.
+	* support/regression/tests/gcc-torture-execute-950511-1.c
+	* support/regression/tests/bug-2477.c
+	  Enabled.
+
 2016-03-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/inline.c:

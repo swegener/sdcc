@@ -2034,7 +2034,7 @@ geniCodeCast (sym_link *type, operand *op, bool implicit)
   /* if this is a literal then just change the type & return */
   if (IS_LITERAL (opetype) && op->type == VALUE && !IS_PTR (type) && !IS_PTR (optype))
     {
-      return operandFromValue (valCastLiteral (type, operandLitValue (op), operandLitValue (op)));
+      return operandFromValue (valCastLiteral (type, operandLitValue (op), operandLitValueUll (op)));
     }
 
   checkPtrCast (type, optype, implicit);

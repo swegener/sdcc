@@ -28,7 +28,7 @@ build(long h, long l)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   if (build(0, 1) != 0x0000000000000001LL)
     ASSERT(0);
   if (build(0, 0) != 0x0000000000000000LL)

@@ -23,7 +23,7 @@
 #define SHORT_VALUE ((unsigned short)0xf234U)
 #define INT_VALUE 0xf234U
 #define LONG_VALUE 0xf2345678LU
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 #define LL_VALUE 0xf2345678abcdef0LLU
 #endif
 
@@ -34,11 +34,11 @@ unsigned char uc = CHAR_VALUE;
 unsigned short us = SHORT_VALUE;
 unsigned int ui = INT_VALUE;
 unsigned long ul = LONG_VALUE;
-#if 0 // TODO: enable when support for long long is complete!
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 unsigned long long ull = LL_VALUE;
 #endif
 int shift1 = SHIFT1;
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 int shift2 = SHIFT2;
 #endif
 
@@ -68,7 +68,7 @@ testTortureExecute (void)
 
   if (ROR (ul, SHIFT1) != ROR (LONG_VALUE, SHIFT1))
     ASSERT (0);
-#if 0 // TODO: enable when support for long long is complete!
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   if (ROR (ull, shift1) != ROR (LL_VALUE, SHIFT1))
     ASSERT (0);
 
@@ -104,7 +104,7 @@ testTortureExecute (void)
 
   if (ROL (ul, SHIFT1) != ROL (LONG_VALUE, SHIFT1))
     ASSERT (0);
-#if 0 // TODO: enable when support for long long is complete!
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   if (ROL (ull, shift1) != ROL (LL_VALUE, SHIFT1))
     ASSERT (0);
 

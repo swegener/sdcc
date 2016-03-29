@@ -9,8 +9,7 @@
 #endif
 
 // Todo: Enable when sdcc supports long long modulo!
-#if 0
-
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 /* PR c/19606
    The C front end used to shorten the type of a division to a type
    that does not preserve the semantics of the original computation.
@@ -33,7 +32,7 @@ bar (void)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   int r;
 
   r = foo ();

@@ -12,7 +12,7 @@ void
 testTortureExecute (void)
 {
 // Enable when sdcc supports double and unsigned long long.
-#if 0
+#if 1
   if ((double) 18446744073709551615ULL < 1.84467440737095e+19 ||
       (double) 18446744073709551615ULL > 1.84467440737096e+19)
     ASSERT(0);

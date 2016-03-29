@@ -14,7 +14,7 @@ unsigned char cx = 7;
 unsigned short sx = 14;
 unsigned int ix = 21;
 unsigned long lx = 28;
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 unsigned long long Lx = 35;
 #endif
 
@@ -25,7 +25,7 @@ testTortureExecute (void)
   unsigned short sy;
   unsigned int iy;
   unsigned long ly;
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   unsigned long long Ly;
 #endif
 
@@ -40,7 +40,7 @@ testTortureExecute (void)
 
   ly = lx / 6; if (ly != 4) ASSERT (0);
   ly = lx % 6; if (ly != 4) ASSERT (0);
-#if 0 // TODO: Enable when long long modulo is supported!
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   Ly = Lx / 6; if (Ly != 5) ASSERT (0);
   Ly = Lx % 6; if (Ly != 5) ASSERT (0);
 #endif

@@ -28,18 +28,16 @@ void
 testTortureExecute (void)
 {
 // Test fails on 32-bit systems
-#if 0
-//#if !defined(__SDCC_mcs51) && !defined(__SDCC_hc08) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-// TODO: Enable when sdcc supports long long constants!
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+#if !defined (__SDCC_gbz80) // bug #2329
   if (signed_poly (2LL, -3) != -4LL)
     ASSERT (0);
-#endif
   
   if (unsigned_poly (2ULL, 3) != 8ULL)
     ASSERT (0);
 
   return;
+#endif
 #endif
 }
 

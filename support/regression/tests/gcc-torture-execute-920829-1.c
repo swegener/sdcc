@@ -16,10 +16,12 @@ long long c=2863311530LL,c3=2863311530LL*3;
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+#if !defined (__SDCC_gbz80) // bug #2329
   if(c*3!=c3)
     ASSERT(0);
   return;
+#endif
 #endif
 }
 

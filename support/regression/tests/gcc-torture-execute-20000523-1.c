@@ -12,9 +12,7 @@ void
 testTortureExecute (void)
 {
 // long long seems somewhat broken on MacOSX
-#if 0
-// Some ports do not support long long yet.
-//#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_gbz80)
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   long long   x;
   int         n;
 

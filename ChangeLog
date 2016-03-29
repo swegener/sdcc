@@ -1,4 +1,30 @@
-2016-03-27 Philipp Klaus Krause <pkk AT spth.de>
+2016-03-29 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/bug3475656.c
+	* support/regression/tests/gcc-torture-execute-20000314-2.c
+	* support/regression/tests/gcc-torture-execute-20000523-1.c
+	* support/regression/tests/gcc-torture-execute-20001108-1.c
+	* support/regression/tests/gcc-torture-execute-20020201-1.c
+	* support/regression/tests/gcc-torture-execute-20020226-1.c
+	* support/regression/tests/gcc-torture-execute-20020508-1.c
+	* support/regression/tests/gcc-torture-execute-20020508-2.c
+	* support/regression/tests/gcc-torture-execute-20020508-3.c
+	* support/regression/tests/gcc-torture-execute-20060110-1.c
+	* support/regression/tests/gcc-torture-execute-20060110-2.c
+	* support/regression/tests/gcc-torture-execute-20060127-1.c
+	* support/regression/tests/gcc-torture-execute-20101013-1.c
+	* support/regression/tests/gcc-torture-execute-920710-1.c
+	* support/regression/tests/gcc-torture-execute-920829-1.c
+	* support/regression/tests/gcc-torture-execute-921029-1.c
+	* support/regression/tests/gcc-torture-execute-941015-1.c
+	* support/regression/tests/gcc-torture-execute-950704-1.c
+	* support/regression/tests/gcc-torture-execute-960801-1.c
+	* support/regression/tests/gcc-torture-execute-961213-1.c
+	* support/regression/tests/gcc-torture-execute-pr19606.c
+	* support/regression/tests/gcc-torture-execute-pr27285.c
+	  Enable more longlong test cases.
+
+2016-03-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCglue.c:
 	  Disable assertions to mask ds390 issue on non-OpenBSD for now.

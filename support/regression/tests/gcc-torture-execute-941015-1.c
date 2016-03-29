@@ -9,7 +9,7 @@
 #endif
 
 // TODO: Enable when sdcc supports long long constants!
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 int
 foo1 (long long value)
 {
@@ -36,7 +36,7 @@ foo2 (unsigned long long value)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   unsigned long long value = 0xc000000000000001LL;
   int x, y;
 

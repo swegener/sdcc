@@ -24,7 +24,7 @@ USHORT div_16x8(USHORT s16, UCHAR i8)
     return(s16 / i8);
 }
 
-#if 0
+#if 1
 void itoa(USHORT sVal, PCHAR pBuf, UCHAR iRadix)
 {
     PCHAR p;            // pointer to traverse string
@@ -64,7 +64,7 @@ void testBug(void)
     unsigned short i;
 
     i = 192;
-#if 0
+#if 1
     itoa(i, c, 10);
     ASSERT(c[0] == '1');
     ASSERT(c[1] == '9');

@@ -1,5 +1,13 @@
 2016-03-29 Ben Shi <powerstudio1st AT 163 DOT com>
 
+	* support/regression/tests/gcc-torture-execute-20060127-1.c
+	* support/regression/tests/gcc-torture-execute-921029-1.c
+	* support/regression/tests/gcc-torture-execute-941015-1.c
+	* support/regression/tests/gcc-torture-execute-pr19606.c
+	  Disabled.
+ 
+2016-03-29 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/bug3475656.c
 	* support/regression/tests/gcc-torture-execute-20000314-2.c
 	* support/regression/tests/gcc-torture-execute-20000523-1.c

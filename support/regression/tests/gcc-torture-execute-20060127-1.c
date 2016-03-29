@@ -23,9 +23,10 @@ long long a = 0x1234567800000000LL;
 void
 testTortureExecute (void)
 {
-// TODO: Enable when long long literals are supported!
+#if 0 // TODO: Enable when long long literals are supported!
 #if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   f (a);
   return;
+#endif
 #endif
 }

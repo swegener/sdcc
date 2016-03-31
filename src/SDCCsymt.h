@@ -185,7 +185,9 @@ typedef struct specifier
   union
   {                                   /* Values if constant or enum */
     TYPE_TARGET_INT v_int;            /* 2 bytes: int and char values            */
-    const char *v_char;               /*          character string               */
+    const char *v_char;               /*          char character string          */
+    const TYPE_TARGET_UINT *v_char16; /*          char16_t character string      */
+    const TYPE_TARGET_ULONG *v_char32;/*          char32_t character string      */
     TYPE_TARGET_UINT v_uint;          /* 2 bytes: unsigned int const value       */
     TYPE_TARGET_LONG v_long;          /* 4 bytes: long constant value            */
     TYPE_TARGET_ULONG v_ulong;        /* 4 bytes: unsigned long constant value   */

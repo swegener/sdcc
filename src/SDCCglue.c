@@ -600,7 +600,7 @@ wrong:
 }
 
 /*-----------------------------------------------------------------*/
-/* printChar - formats and prints a characater string with DB      */
+/* printChar - formats and prints a UTF-8 character string with DB */
 /*-----------------------------------------------------------------*/
 void
 printChar (struct dbuf_s *oBuf, const char *s, int plen)
@@ -649,6 +649,68 @@ printChar (struct dbuf_s *oBuf, const char *s, int plen)
         len -= 60;
       else
         len = 0;
+    }
+  while (pplen < plen)
+    {
+      dbuf_tprintf (oBuf, "\t!db !constbyte\n", 0);
+      pplen++;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* printChar16 - formats and prints a UTF-16 character string with DB*/
+/*-----------------------------------------------------------------*/
+void
+printChar16 (struct dbuf_s *oBuf, const TYPE_TARGET_UINT *s, int plen)
+{
+  int pplen = 0;
+  int strEnd = plen / 2 - 1;
+  plen /= 2;
+
+  if (s)
+    while (s[strEnd] != 0)
+      strEnd--;
+
+  while (pplen < plen)
+    {
+      if (port->little_endian)
+        dbuf_printf (oBuf, "\t.byte %d,%d\n", (*s >> 0) & 0xff, (*s >> 8) & 0xff);
+      else
+        dbuf_printf (oBuf, "\t.byte %d,%d\n", (*s >> 8) & 0xff, (*s >> 0) & 0xff);
+
+      s++;
+      pplen++;
+    }
+  while (pplen < plen)
+    {
+      dbuf_tprintf (oBuf, "\t!db !constbyte\n", 0);
+      pplen++;
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* printChar32 - formats and prints a UTF-32 character string with DB*/
+/*-----------------------------------------------------------------*/
+void
+printChar32 (struct dbuf_s *oBuf, const TYPE_TARGET_ULONG *s, int plen)
+{
+  int pplen = 0;
+  int strEnd = plen / 4 - 1;
+  plen /= 4;
+
+  if (s)
+    while (s[strEnd] != 0)
+      strEnd--;
+
+  while (pplen < plen)
+    {
+      if (port->little_endian)
+        dbuf_printf (oBuf, "\t.byte %d,%d,%d,%d\n", (*s >> 0) & 0xff, (*s >> 8) & 0xff, (*s >> 16) & 0xff, (*s >> 24) & 0xff);
+      else
+        dbuf_printf (oBuf, "\t.byte %d,%d,%d,%d\n", (*s >> 24) & 0xff, (*s >> 16) & 0xff, (*s >> 8) & 0xff,(*s >> 0) & 0xff);
+
+      s++;
+      pplen++;
     }
   while (pplen < plen)
     {
@@ -1697,9 +1759,19 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
                 }
               dbuf_printf (oBuf, "%s:\n", sym->rname);
               /* special case for character strings */
-              if (IS_ARRAY (sym->type) && IS_CHAR (sym->type->next) && SPEC_CVAL (sym->etype).v_char)
+              if (IS_ARRAY (sym->type) &&
+                (IS_CHAR (sym->type->next) && SPEC_CVAL (sym->etype).v_char ||
+                 IS_INT (sym->type->next) && !IS_LONG (sym->type->next) && SPEC_CVAL (sym->etype).v_char16 ||
+                 IS_INT (sym->type->next) && IS_LONG (sym->type->next) && SPEC_CVAL (sym->etype).v_char32))
                 {
-                  printChar (oBuf, SPEC_CVAL (sym->etype).v_char, size);
+                  if (IS_CHAR (sym->type->next))
+                    printChar (oBuf, SPEC_CVAL (sym->etype).v_char, size);
+                  else if (IS_INT (sym->type->next) && !IS_LONG (sym->type->next))
+                    printChar16 (oBuf, SPEC_CVAL (sym->etype).v_char16, size);
+                  else if (IS_INT (sym->type->next) && IS_LONG (sym->type->next))
+                    printChar32 (oBuf, SPEC_CVAL (sym->etype).v_char32, size);
+                  else
+                    wassert (0);
                 }
               else
                 {

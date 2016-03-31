@@ -1505,18 +1505,25 @@ strVal (const char *s)
       // Convert to UTF-32 next, since converting UTF-32 to UTF-16 is easier than UTF-8 to UTF-16.
       const TYPE_UDWORD *utf_32 = utf_32_from_utf_8 (&utf_32_size, utf_8, utf_8_size);
 
-	  dbuf_free (utf_8);
+      dbuf_free (utf_8);
 
       if (s[0] == 'U' || s[0] == 'L') // UTF-32 string literal
-        wassertl (0, "UTF-32 string literals are not yet supported");
+        {
+          SPEC_NOUN (val->etype) = V_INT;
+          SPEC_USIGN (val->etype) = 1;
+          SPEC_LONG (val->etype) = 1;
+          SPEC_CVAL (val->etype).v_char32 = utf_32;
+          DCL_ELEM (val->type) = utf_32_size;
+        }
       else if (s[0] == 'u') // UTF-16 string literal
         {
           size_t utf_16_size;
           const TYPE_UWORD *utf_16 = utf_16_from_utf_32 (&utf_16_size, utf_32, utf_32_size);
 
-          (void)utf_16; // suppress warning of unused variable as long as this is unsupported
-
-          wassertl (0, "C11 UTF-16 string literals are not yet supported");
+          SPEC_NOUN (val->etype) = V_INT;
+          SPEC_USIGN (val->etype) = 1;
+          SPEC_CVAL (val->etype).v_char16 = utf_16;
+          DCL_ELEM (val->type) = utf_16_size;
         }
       else
         wassert (0);

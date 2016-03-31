@@ -7,7 +7,10 @@
 	* support/regression/tests/bitvars.c,
 	  support/regression/tests/funsigned-char.c:
 	  Detect char signedness portably.
-	 
+	* src/SDCCsymt.h,
+	  src/SDCCval.c,
+	  src/SDCCglue.c:
+	  Support wide string literals outside of array initialization.
 
 2016-03-31 Ben Shi <powerstudio1st AT 163 DOT com>
 

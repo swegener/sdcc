@@ -1978,12 +1978,6 @@ preProcess (char **envp)
       if (options.noOverlay)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_NOOVERLAY"));
 
-      /* set the macro for unsigned char  */
-      if (options.signed_char)
-        addSet (&preArgvSet, Safe_strdup ("-D__SDCC_CHAR_SIGNED"));
-      else
-        addSet (&preArgvSet, Safe_strdup ("-D__SDCC_CHAR_UNSIGNED"));
-
       /* set the macro for non-free  */
       if (options.use_non_free)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_USE_NON_FREE"));

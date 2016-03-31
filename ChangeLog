@@ -4,6 +4,9 @@
 	  Remove user-visible feature macros for signed / unsigned char.
 	* device/include/limits.h:
 	  Fix multibyte sequence limit.
+	* support/regression/tests/bitvars.c,
+	  support/regression/tests/funsigned-char.c:
+	  Detect char signedness portably.
 	 
 
 2016-03-31 Ben Shi <powerstudio1st AT 163 DOT com>

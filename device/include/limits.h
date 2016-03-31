@@ -29,7 +29,7 @@
 #ifndef __SDC51_LIMITS_H
 #define __SDC51_LIMITS_H 1
 
-#define CHAR_BIT      8    /* bits in a char */
+#define CHAR_BIT    8    /* bits in a char */
 #define SCHAR_MAX   127
 #define SCHAR_MIN  -128
 #define UCHAR_MAX   0xff
@@ -42,7 +42,10 @@
 #define CHAR_MIN    SCHAR_MIN
 #endif
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L
 #define MB_LEN_MAX  4
+#endif
+
 #define INT_MIN    -32768
 #define INT_MAX     32767
 #define SHRT_MAX    INT_MAX
@@ -56,14 +59,11 @@
 #define ULONG_MAX   0xffffffff
 #define ULONG_MIN   0
 
-#if __STDC_VERSION__ >= 199901L
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 #define LLONG_MIN   (-9223372036854775807LL-1)
 #define LLONG_MAX   9223372036854775807LL
 #define ULLONG_MAX  18446744073709551615ULL
 #endif
 
 #endif
-
-
-
 

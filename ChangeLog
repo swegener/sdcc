@@ -1,8 +1,10 @@
 2016-03-31 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/SDCCmain.c,
-	  doc/sdccman.lyx:
-	  Remove feature macros for signed / unsigned char.
+	* doc/sdccman.lyx:
+	  Remove user-visible feature macros for signed / unsigned char.
+	* device/include/limits.h:
+	  Fix multibyte sequence limit.
+	 
 
 2016-03-31 Ben Shi <powerstudio1st AT 163 DOT com>
 

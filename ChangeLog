@@ -1,3 +1,8 @@
+2016-03-31 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/gcc-torture-execute-pr19606.c
+	  Disabled in test-host.
+
 2016-03-29 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/gcc-torture-execute-20060127-1.c

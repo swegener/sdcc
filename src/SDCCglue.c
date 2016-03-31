@@ -1496,7 +1496,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oB
     return;
 
   /* if character pointer */
-  if (IS_CHAR (type->next))
+  if (IS_CHAR (type->next) || IS_INT (type->next) && IS_UNSIGNED (type->next))
     if (printIvalCharPtr (sym, type, val, oBuf))
       return;
 

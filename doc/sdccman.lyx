@@ -9359,6 +9359,15 @@ status collapsed
  to compile in this mode.
 \end_layout
 
+\begin_layout Standard
+In addition to what is mentioned in the section above, the following features
+ of this standard are not supported by sdcc:
+\end_layout
+
+\begin_layout Itemize
+Array initialization by string literals prefixed by L.
+\end_layout
+
 \begin_layout Subsection
 ISO C99
 \end_layout
@@ -9516,7 +9525,7 @@ In addition to what is mentioned in the section above, the following features
 \end_layout
 
 \begin_layout Itemize
-string literals prfixed by u or U.
+Array initialization by string literals prefixed by u or U.
 \end_layout
 
 \begin_layout Subsection

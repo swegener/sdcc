@@ -9,7 +9,9 @@
 	  Detect char signedness portably.
 	* src/SDCCsymt.h,
 	  src/SDCCval.c,
-	  src/SDCCglue.c:
+	  src/SDCCglue.c,
+	  doc/sdccman.lyx,
+	  support/regression/tests/string.c:
 	  Support wide string literals outside of array initialization.
 
 2016-03-31 Ben Shi <powerstudio1st AT 163 DOT com>

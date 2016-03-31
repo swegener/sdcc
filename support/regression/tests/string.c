@@ -2,7 +2,10 @@
 */
 #include <testfwk.h>
 #include <string.h>
-#if defined (__SDCC)
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L
+#include <wchar.h>
+#endif
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #include <uchar.h>
 #endif
 
@@ -148,9 +151,9 @@ do_teststrtok (void)
 #endif
 }
 
-// Test C11 utf-8 behaviour.
+// Test C11 UTF-8 behaviour.
 static void
-do_multibyte_utf_8 (void)
+do_utf_8 (void)
 {
 #if defined(__STDC_VERSION) && __STDC_VERSION >= 201112L
   const char *str1 = u8"Ä ä";
@@ -168,12 +171,12 @@ do_multibyte_utf_8 (void)
 #endif
 }
 
-// Test SDCC implementation-defined utf-8 behaviour
-// string literals are utf-8 (as nearly all implementations out there)
+// Test SDCC implementation-defined UTF-8 behaviour
+// string literals are UTF-8 (as nearly all implementations out there)
 static void
-do_multibyte_utf_8_sdcc (void)
+do_utf_8_sdcc (void)
 {
-#if defined (__SDCC)
+#ifdef __SDCC
   const char *str1 = "Ä ä";
   const char *str2 = "\u00c4 ä";
   const char *str3 = u8"Ä " "ä";
@@ -189,6 +192,66 @@ do_multibyte_utf_8_sdcc (void)
 #endif
 }
 
+// Test C11 UTF-16 behaviour
+static void
+do_utf_16 (void)
+{
+#ifdef __STDC_UTF_16__
+  const char16_t *str1 = u"Ä ä";
+  const char16_t *str2 = u"\u00c4 ä";
+  const char16_t *str3 = u"Ä " "ä";
+  const char16_t *str4 = "Ä " u"ä";
+  const char16_t *str5 = u"Ä " u"ä";
+
+  ASSERT (str1[0] == '\xc4');
+  ASSERT (str2[2] == '\xe4');
+  ASSERT (!memcmp (str1, str2, 4));
+  ASSERT (!memcmp (str1, str3, 4));
+  ASSERT (!memcmp (str1, str4, 4));
+  ASSERT (!memcmp (str1, str5, 4));
+#endif
+}
+
+// Test C95 UTF-32 behaviour
+static void
+do_utf_32_c95 (void)
+{
+#ifdef __STDC_ISO_10646__
+  const wchar_t *str1 = L"Ä ä";
+  const wchar_t *str2 = L"\u00c4 ä";
+  const wchar_t *str3 = L"Ä " "ä";
+  const wchar_t *str4 = "Ä " L"ä";
+  const wchar_t *str5 = L"Ä " L"ä";
+
+  ASSERT (str1[0] == '\xc4');
+  ASSERT (str2[2] == '\xe4');
+  ASSERT (!memcmp (str1, str2, 4));
+  ASSERT (!memcmp (str1, str3, 4));
+  ASSERT (!memcmp (str1, str4, 4));
+  ASSERT (!memcmp (str1, str5, 4));
+#endif
+}
+
+// Test C11 UTF-32 behaviour
+static void
+do_utf_32_c11 (void)
+{
+#ifdef __STDC_UTF_32__
+  const char32_t *str1 = U"Ä ä";
+  const char32_t *str2 = U"\u00c4 ä";
+  const char32_t *str3 = U"Ä " "ä";
+  const char32_t *str4 = "Ä " U"ä";
+  const char32_t *str5 = U"Ä " U"ä";
+
+  ASSERT (str1[0] == '\xc4');
+  ASSERT (str2[2] == '\xe4');
+  ASSERT (!memcmp (str1, str2, 4));
+  ASSERT (!memcmp (str1, str3, 4));
+  ASSERT (!memcmp (str1, str4, 4));
+  ASSERT (!memcmp (str1, str5, 4));
+#endif
+}
+
 static void
 teststr (void)
 {
@@ -200,7 +263,10 @@ teststr (void)
   do_teststrstr ();
   do_teststrspn ();
   do_teststrtok ();
-  do_multibyte_utf_8 ();
-  do_multibyte_utf_8_sdcc ();
+  do_utf_8 ();
+  do_utf_8_sdcc ();
+  do_utf_16 ();
+  do_utf_32_c95 ();
+  do_utf_32_c11 ();
 }
 

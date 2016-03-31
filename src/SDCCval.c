@@ -1426,7 +1426,7 @@ static const TYPE_UDWORD *utf_32_from_utf_8 (size_t *utf_32_len, const char *utf
       for(; seqlen; seqlen--)
         {
           codepoint <<= 6;
-          codepoint |= (*utf_8 & 0xf);
+          codepoint |= (*utf_8 & 0x3f);
           utf_8++;
           utf_8_len--;
         }

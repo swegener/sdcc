@@ -5712,7 +5712,7 @@ static void
 genMinus (const iCode * ic)
 {
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0L;
 
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
   aopOp (IC_RIGHT (ic), ic, FALSE, FALSE);
@@ -5737,8 +5737,8 @@ genMinus (const iCode * ic)
     }
   else
     {
-      lit = ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
-      lit = -(long) lit;
+      lit = ullFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+      lit = -(long long) lit;
     }
 
   /* Same logic as genPlus */

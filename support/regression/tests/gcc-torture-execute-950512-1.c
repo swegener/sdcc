@@ -8,7 +8,6 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long in these ports!
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 
 unsigned
@@ -27,7 +26,6 @@ f2 (int x)
 void
 testTortureExecute (void)
 {
-#if 0 // Fails on 32-bit hosts.
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   if (f1 (1) != (~(unsigned) 0) >> 1)
     ASSERT (0);
@@ -39,6 +37,4 @@ testTortureExecute (void)
     ASSERT (0);
   return;
 #endif
-#endif
 }
-

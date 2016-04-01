@@ -3,8 +3,10 @@
 	* src/SDCCglue.c,
 	  src/SDCCval.c:
 	  Support wide string literals in initialization of global arrays.
-	* src/SDCCast.c:
-	  Preparations for wide string literals in initialization of local arrays.
+	* src/SDCCast.c,
+	  Support wide string literals in initialization of local arrays.
+	* doc/sdccman.lyx:
+	  Update documentation on standard compliance.
 
 2016-04-01 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/gcc-torture-execute-950512-1.c

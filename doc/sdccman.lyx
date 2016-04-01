@@ -9360,12 +9360,7 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-In addition to what is mentioned in the section above, the following features
- of this standard are not supported by sdcc:
-\end_layout
-
-\begin_layout Itemize
-Array initialization by string literals prefixed by L.
+Except for the issues mentioned in the section above, this standard is supported.
 \end_layout
 
 \begin_layout Subsection
@@ -9449,12 +9444,6 @@ Compound literals.
 Variable-length arrays.
 \end_layout
 
-\begin_layout Itemize
-Integer constants for long long, unsigned long long, int_fast64_t, int_least64_t
-, int64_t, uint_fast64_t, uint_least64_t, uint64_t.
- 
-\end_layout
-
 \begin_layout Standard
 Some features of this standard are not supported in some ports:
 \end_layout
@@ -9520,12 +9509,7 @@ status collapsed
 \end_layout
 
 \begin_layout Standard
-In addition to what is mentioned in the section above, the following features
- of this standard are not supported by sdcc:
-\end_layout
-
-\begin_layout Itemize
-Array initialization by string literals prefixed by u or U.
+Except for the issues mentioned in the section above, this standard is supported.
 \end_layout
 
 \begin_layout Subsection

@@ -1329,10 +1329,6 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
   ast *rast = NULL;
   unsigned size = 0;
 
-  /* TODO: Make this function work with char16_t, char32_t */
-  if (!IS_CHAR (type->next))
-    return 0;
-
   /* if this is a pointer & right is a literal array then */
   /* just assignment will do                              */
   if (IS_PTR (type) && ((IS_LITERAL (iexpr->etype) || (IS_SPEC (iexpr->etype) && SPEC_SCLS (iexpr->etype) == S_CODE)) && IS_ARRAY (iexpr->ftype)))
@@ -1344,7 +1340,7 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
       /* for each character generate an assignment */
       /* to the array element */
       unsigned int i = 0;
-      unsigned int symsize = getSize (type);
+      unsigned int symsize = DCL_ELEM (type);
 
       if (!AST_SYMBOL (rootVal)->islocal || SPEC_STAT (getSpec (type)))
         return NULL;
@@ -1365,18 +1361,24 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
     {
       /* for each character generate an assignment */
       /* to the array element */
-      const char *s = SPEC_CVAL (iexpr->etype).v_char;
       unsigned int i = 0;
-      unsigned int symsize = getSize (type);
+      unsigned int symsize = DCL_ELEM (type);
 
-      size = getSize (iexpr->ftype);
+      size = DCL_ELEM (iexpr->ftype);
       if (symsize && size > symsize)
         {
           if (size > symsize)
             {
               char *name = (IS_AST_SYM_VALUE (sym)) ? AST_SYMBOL (sym)->name : "";
 
-              if (options.std_c99 && s[symsize] == '\0' && size == symsize + 1)
+              TYPE_TARGET_ULONG c;
+              if (IS_CHAR (type->next))
+                c = SPEC_CVAL (iexpr->etype).v_char[symsize];
+              else if (!IS_LONG (type->next))
+                c = SPEC_CVAL (iexpr->etype).v_char16[symsize];
+              else
+                c = SPEC_CVAL (iexpr->etype).v_char32[symsize];
+              if (options.std_c99 && c == '\0' && size == symsize + 1)
                 { 
                   if (!options.lessPedantic)
                     werrorfl (iexpr->filename, iexpr->lineno, W_STRING_CANNOT_BE_TERMINATED, name);
@@ -1389,11 +1391,18 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
 
       for (i = 0; i < size; i++)
         {
+          TYPE_TARGET_ULONG c;
+          if (IS_CHAR (type->next))
+            c = SPEC_CVAL (iexpr->etype).v_char[i];
+          else if (!IS_LONG (type->next))
+            c = SPEC_CVAL (iexpr->etype).v_char16[i];
+          else
+            c = SPEC_CVAL (iexpr->etype).v_char32[i];
           rast = newNode (NULLOP,
                           rast,
                           newNode ('=',
                                    newNode ('[', sym,
-                                            newAst_VALUE (valueFromLit ((float) i))), newAst_VALUE (valueFromLit (*s++))));
+                                            newAst_VALUE (valueFromLit ((float) i))), newAst_VALUE (valueFromLit (c))));
         }
 
       /* assign zero to others */

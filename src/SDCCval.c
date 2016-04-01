@@ -2937,12 +2937,12 @@ getNelements (sym_link * type, initList * ilist)
 
   /* if type is a character array and there is only one
      (string) initialiser then get the length of the string */
-  if (IS_ARRAY (type) && IS_CHAR (type->next) && !ilist->next)
+  if (IS_ARRAY (type) && (IS_CHAR (type->next) || IS_INT (type->next) && IS_UNSIGNED (type->next)) && !ilist->next)
     {
       ast *iast = ilist->init.node;
       value *v = (iast->type == EX_VALUE ? iast->opval.val : NULL);
 
-      if (v && IS_ARRAY (v->type) && IS_CHAR (v->etype))
+      if (v && IS_ARRAY (v->type) && (IS_CHAR (v->etype) || IS_INT (v->etype) && IS_UNSIGNED (v->etype) && IS_LONG (type->next) == IS_LONG (v->etype)))
         /* yep, it's a string */
         {
           return DCL_ELEM (v->type);

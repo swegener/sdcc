@@ -664,8 +664,7 @@ void
 printChar16 (struct dbuf_s *oBuf, const TYPE_TARGET_UINT *s, int plen)
 {
   int pplen = 0;
-  int strEnd = plen / 2 - 1;
-  plen /= 2;
+  int strEnd = plen - 1;
 
   if (s)
     while (s[strEnd] != 0)
@@ -695,8 +694,7 @@ void
 printChar32 (struct dbuf_s *oBuf, const TYPE_TARGET_ULONG *s, int plen)
 {
   int pplen = 0;
-  int strEnd = plen / 4 - 1;
-  plen /= 4;
+  int strEnd = plen - 1;
 
   if (s)
     while (s[strEnd] != 0)
@@ -1160,6 +1158,125 @@ printIvalChar (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
   return 1;
 }
 
+static size_t strLen16(const TYPE_TARGET_UINT *s)
+{
+  size_t l = 0;
+  while(*s++)
+    l++;
+
+  return l;
+}
+
+/*-----------------------------------------------------------------*/
+/* printIvalChar16 - generates initital value for character array  */
+/*-----------------------------------------------------------------*/
+int
+printIvalChar16 (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf, const TYPE_TARGET_UINT *s, bool check)
+{
+  value *val;
+  size_t size = DCL_ELEM(type);
+  TYPE_TARGET_UINT *p;
+  size_t asz;
+
+  if (!s)
+    {
+      val = list2val (ilist, TRUE);
+      /* if the value is a character string  */
+      if (IS_ARRAY (val->type) && IS_INT (val->etype) && IS_UNSIGNED (val->etype) && !IS_LONG (val->etype))
+        {
+          if (!size)
+            {
+              /* we have not been given a size, but now we know it */
+              size = strLen16 (SPEC_CVAL (val->etype).v_char16) + 1;
+              /* but first check, if it's a flexible array */
+              if (sym && IS_STRUCT (sym->type))
+                sym->flexArrayLength = size;
+              else
+                DCL_ELEM (type) = size;
+            }
+
+          if (check && DCL_ELEM (val->type) > size)
+            werror (W_EXCESS_INITIALIZERS, "array of chars", sym->name, sym->lineDef);
+
+          if (size > (asz = DCL_ELEM (val->type)) && !!(p = malloc (size * 2)))
+            {
+              memcpy (p, SPEC_CVAL (val->etype).v_char16, asz * 2);
+              memset (p + asz, 0x00, size * 2 - asz * 2);
+              printChar16 (oBuf, p, size);
+              free (p);
+            }
+          else
+            printChar16 (oBuf, SPEC_CVAL (val->etype).v_char16, size);
+
+          return 1;
+        }
+      else
+        return 0;
+    }
+  else
+    printChar16 (oBuf, s, strLen16 (s) + 1);
+  return 1;
+}
+
+static size_t strLen32(const TYPE_TARGET_ULONG *s)
+{
+  size_t l = 0;
+  while(*s++)
+    l++;
+  return l;
+}
+
+/*-----------------------------------------------------------------*/
+/* printIvalChar32 - generates initital value for character array  */
+/*-----------------------------------------------------------------*/
+int
+printIvalChar32 (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf, const TYPE_TARGET_ULONG *s, bool check)
+{
+  value *val;
+  size_t size = DCL_ELEM(type);
+  TYPE_TARGET_ULONG *p;
+  size_t asz;
+
+  if (!s)
+    {
+      val = list2val (ilist, TRUE);
+      /* if the value is a character string  */
+      if (IS_ARRAY (val->type) && IS_INT (val->etype) && IS_UNSIGNED (val->etype) && !IS_LONG (val->etype))
+        {
+          if (!size)
+            {
+              /* we have not been given a size, but now we know it */
+              size = strLen32 (SPEC_CVAL (val->etype).v_char32) + 1;
+              /* but first check, if it's a flexible array */
+              if (sym && IS_STRUCT (sym->type))
+                sym->flexArrayLength = size;
+              else
+                DCL_ELEM (type) = size;
+            }
+
+          if (check && DCL_ELEM (val->type) > size)
+            werror (W_EXCESS_INITIALIZERS, "array of chars", sym->name, sym->lineDef);
+
+          if (size > (asz = DCL_ELEM (val->type)) && !!(p = malloc (size * 4)))
+            {
+              memcpy (p, SPEC_CVAL (val->etype).v_char32, asz * 4);
+              memset (p + asz, 0x00, size * 4 - asz * 4);
+              printChar32 (oBuf, p, size);
+              free (p);
+            }
+          else
+            printChar32 (oBuf, SPEC_CVAL (val->etype).v_char32, size);
+
+          return 1;
+        }
+      else
+        return 0;
+    }
+  else
+    printChar32 (oBuf, s, strLen32 (s) + 1);
+  return 1;
+}
+
 /*-----------------------------------------------------------------*/
 /* printIvalArray - generates code for array initialization        */
 /*-----------------------------------------------------------------*/
@@ -1176,7 +1293,7 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
       /* array of characters can be init  */
       /* by a string                      */
       /* char *p = "abc";                 */
-      if (IS_CHAR (type->next) && ilist->type == INIT_NODE)
+      if ((IS_CHAR (type->next) || IS_INT (type->next)) && ilist->type == INIT_NODE)
         {
           val = list2val (ilist, TRUE);
           if (!val)
@@ -1189,12 +1306,18 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
               werrorfl (ilist->filename, ilist->lineno, E_CONST_EXPECTED);
               return;
             }
-          if (printIvalChar (sym, type,
-                             ilist, oBuf, SPEC_CVAL (sym->etype).v_char, check))
+          if (IS_CHAR (type->next) && printIvalChar (sym, type, ilist, oBuf, SPEC_CVAL (sym->etype).v_char, check))
             return;
+          if (IS_INT (type->next) && IS_UNSIGNED (type->next))
+            {
+              if (!IS_LONG (type->next) && printIvalChar16 (sym, type, ilist, oBuf, SPEC_CVAL (sym->etype).v_char16, check))
+                return;
+              if (IS_LONG (type->next) && printIvalChar32 (sym, type, ilist, oBuf, SPEC_CVAL (sym->etype).v_char32, check))
+                return;
+            }
         }
       /* char *p = {"abc"}; */
-      if (IS_CHAR (type->next) && ilist->type == INIT_DEEP && ilist->init.deep && ilist->init.deep->type == INIT_NODE)
+      if ((IS_CHAR (type->next) || IS_INT (type->next)) && ilist->type == INIT_DEEP && ilist->init.deep && ilist->init.deep->type == INIT_NODE)
         {
           val = list2val (ilist->init.deep, TRUE);
           if (!val)
@@ -1207,9 +1330,15 @@ printIvalArray (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *
               werrorfl (ilist->init.deep->filename, ilist->init.deep->lineno, E_CONST_EXPECTED);
               return;
             }
-          if (printIvalChar (sym, type,
-                             ilist->init.deep, oBuf, SPEC_CVAL (sym->etype).v_char, check))
+          if (IS_CHAR (type->next) && printIvalChar (sym, type, ilist->init.deep, oBuf, SPEC_CVAL (sym->etype).v_char, check))
             return;
+          if (IS_INT (type->next) && IS_UNSIGNED (type->next))
+            {
+              if (!IS_LONG (type->next) && printIvalChar16 (sym, type, ilist->init.deep, oBuf, SPEC_CVAL (sym->etype).v_char16, check))
+                return;
+              if (IS_LONG (type->next) && printIvalChar32 (sym, type, ilist->init.deep, oBuf, SPEC_CVAL (sym->etype).v_char32, check))
+                return;
+            }
         }
 
       /* not the special case             */
@@ -1767,9 +1896,9 @@ emitStaticSeg (memmap *map, struct dbuf_s *oBuf)
                   if (IS_CHAR (sym->type->next))
                     printChar (oBuf, SPEC_CVAL (sym->etype).v_char, size);
                   else if (IS_INT (sym->type->next) && !IS_LONG (sym->type->next))
-                    printChar16 (oBuf, SPEC_CVAL (sym->etype).v_char16, size);
+                    printChar16 (oBuf, SPEC_CVAL (sym->etype).v_char16, size / 2);
                   else if (IS_INT (sym->type->next) && IS_LONG (sym->type->next))
-                    printChar32 (oBuf, SPEC_CVAL (sym->etype).v_char32, size);
+                    printChar32 (oBuf, SPEC_CVAL (sym->etype).v_char32, size / 4);
                   else
                     wassert (0);
                 }

@@ -1209,7 +1209,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
   /* array of characters can be init  */
   /* by a string                      */
   /* char *p = "abc";                 */
-  if (IS_CHAR (type->next) &&
+  if ((IS_CHAR (type->next) || IS_INT (type->next) && IS_UNSIGNED (type->next)) &&
       ilist && ilist->type == INIT_NODE)
     if ((rast = createIvalCharPtr (sym,
                                    type,
@@ -1217,7 +1217,7 @@ createIvalArray (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
                                    rootValue)))
       return decorateType (resolveSymbols (rast), RESULT_TYPE_NONE);
   /* char *p = {"abc"}; */
-  if (IS_CHAR (type->next) &&
+  if ((IS_CHAR (type->next) || IS_INT (type->next) && IS_UNSIGNED (type->next)) &&
       ilist && ilist->type == INIT_DEEP && ilist->init.deep && ilist->init.deep->type == INIT_NODE)
     if ((rast = createIvalCharPtr (sym,
                                    type,
@@ -1328,6 +1328,10 @@ createIvalCharPtr (ast * sym, sym_link * type, ast * iexpr, ast * rootVal)
 {
   ast *rast = NULL;
   unsigned size = 0;
+
+  /* TODO: Make this function work with char16_t, char32_t */
+  if (!IS_CHAR (type->next))
+    return 0;
 
   /* if this is a pointer & right is a literal array then */
   /* just assignment will do                              */
@@ -1440,7 +1444,7 @@ createIvalPtr (ast * sym, sym_link * type, initList * ilist, ast * rootVal)
     iexpr = newAst_VALUE (valueFromLit (0));
 
   /* if character pointer */
-  if (IS_CHAR (type->next))
+  if (IS_CHAR (type->next) || IS_INT (type->next) && IS_UNSIGNED (type->next))
     if ((rast = createIvalCharPtr (sym, type, iexpr, rootVal)))
       return rast;
 

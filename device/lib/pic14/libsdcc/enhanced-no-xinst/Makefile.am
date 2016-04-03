@@ -50,6 +50,10 @@ libsdcce_a_SOURCES += _gptrput4.S
 libsdcce_a_SOURCES += macros.inc
 
 # Build for enhanced devices.
+
 ARCH = $(EARCH)
+libsdcce_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
+
+CLEANFILES = ../*.asm ../*.lst
 
 include $(top_srcdir)/Makefile.common

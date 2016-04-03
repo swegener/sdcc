@@ -63,21 +63,41 @@ CONFIG_CLEAN_VPATH_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 libsdcce_a_AR = $(AR) $(ARFLAGS)
 libsdcce_a_LIBADD =
-am_libsdcce_a_OBJECTS = _divschar.$(OBJEXT) _divsint.$(OBJEXT) \
-	_divslong.$(OBJEXT) _divuchar.$(OBJEXT) _divuint.$(OBJEXT) \
-	_divulong.$(OBJEXT) _modschar.$(OBJEXT) _modsint.$(OBJEXT) \
-	_modslong.$(OBJEXT) _moduchar.$(OBJEXT) _moduint.$(OBJEXT) \
-	_modulong.$(OBJEXT) _mulchar.$(OBJEXT) _mulint.$(OBJEXT) \
-	_mullong.$(OBJEXT) fs2schar.$(OBJEXT) fs2sint.$(OBJEXT) \
-	fs2slong.$(OBJEXT) fs2uchar.$(OBJEXT) fs2uint.$(OBJEXT) \
-	fs2ulong.$(OBJEXT) fsadd.$(OBJEXT) fsdiv.$(OBJEXT) \
-	fseq.$(OBJEXT) fsgt.$(OBJEXT) fslt.$(OBJEXT) fsmul.$(OBJEXT) \
-	fsneq.$(OBJEXT) fssub.$(OBJEXT) idata.$(OBJEXT) \
-	schar2fs.$(OBJEXT) sint2fs.$(OBJEXT) slong2fs.$(OBJEXT) \
-	uchar2fs.$(OBJEXT) uint2fs.$(OBJEXT) ulong2fs.$(OBJEXT) \
-	_gptrget1.$(OBJEXT) _gptrget2.$(OBJEXT) _gptrget3.$(OBJEXT) \
-	_gptrget4.$(OBJEXT) _gptrput1.$(OBJEXT) _gptrput2.$(OBJEXT) \
-	_gptrput3.$(OBJEXT) _gptrput4.$(OBJEXT)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_libsdcce_a_OBJECTS = ../libsdcce_a-_divschar.$(OBJEXT) \
+	../libsdcce_a-_divsint.$(OBJEXT) \
+	../libsdcce_a-_divslong.$(OBJEXT) \
+	../libsdcce_a-_divuchar.$(OBJEXT) \
+	../libsdcce_a-_divuint.$(OBJEXT) \
+	../libsdcce_a-_divulong.$(OBJEXT) \
+	../libsdcce_a-_modschar.$(OBJEXT) \
+	../libsdcce_a-_modsint.$(OBJEXT) \
+	../libsdcce_a-_modslong.$(OBJEXT) \
+	../libsdcce_a-_moduchar.$(OBJEXT) \
+	../libsdcce_a-_moduint.$(OBJEXT) \
+	../libsdcce_a-_modulong.$(OBJEXT) \
+	../libsdcce_a-_mulchar.$(OBJEXT) \
+	../libsdcce_a-_mulint.$(OBJEXT) \
+	../libsdcce_a-_mullong.$(OBJEXT) \
+	../libsdcce_a-fs2schar.$(OBJEXT) \
+	../libsdcce_a-fs2sint.$(OBJEXT) \
+	../libsdcce_a-fs2slong.$(OBJEXT) \
+	../libsdcce_a-fs2uchar.$(OBJEXT) \
+	../libsdcce_a-fs2uint.$(OBJEXT) \
+	../libsdcce_a-fs2ulong.$(OBJEXT) ../libsdcce_a-fsadd.$(OBJEXT) \
+	../libsdcce_a-fsdiv.$(OBJEXT) ../libsdcce_a-fseq.$(OBJEXT) \
+	../libsdcce_a-fsgt.$(OBJEXT) ../libsdcce_a-fslt.$(OBJEXT) \
+	../libsdcce_a-fsmul.$(OBJEXT) ../libsdcce_a-fsneq.$(OBJEXT) \
+	../libsdcce_a-fssub.$(OBJEXT) ../libsdcce_a-idata.$(OBJEXT) \
+	../libsdcce_a-schar2fs.$(OBJEXT) \
+	../libsdcce_a-sint2fs.$(OBJEXT) \
+	../libsdcce_a-slong2fs.$(OBJEXT) \
+	../libsdcce_a-uchar2fs.$(OBJEXT) \
+	../libsdcce_a-uint2fs.$(OBJEXT) \
+	../libsdcce_a-ulong2fs.$(OBJEXT) _gptrget1.$(OBJEXT) \
+	_gptrget2.$(OBJEXT) _gptrget3.$(OBJEXT) _gptrget4.$(OBJEXT) \
+	_gptrput1.$(OBJEXT) _gptrput2.$(OBJEXT) _gptrput3.$(OBJEXT) \
+	_gptrput4.$(OBJEXT)
 libsdcce_a_OBJECTS = $(am_libsdcce_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -182,7 +202,6 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
-runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -203,6 +222,8 @@ libsdcce_a_SOURCES = ../_divschar.c ../_divsint.c ../_divslong.c \
 	../uchar2fs.c ../uint2fs.c ../ulong2fs.c _gptrget1.S \
 	_gptrget2.S _gptrget3.S _gptrget4.S _gptrput1.S _gptrput2.S \
 	_gptrput3.S _gptrput4.S macros.inc
+libsdcce_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
+CLEANFILES = ../*.asm ../*.lst
 AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic14 \
 	-I$(top_srcdir)/../../non-free/include/pic14
 #AM_CFLAGS += --asm="$(CCAS)"
@@ -262,6 +283,84 @@ $(am__aclocal_m4_deps):
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+../$(am__dirstamp):
+	@$(MKDIR_P) ..
+	@: > ../$(am__dirstamp)
+../$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) ../$(DEPDIR)
+	@: > ../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_divschar.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_divsint.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_divslong.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_divuchar.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_divuint.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_divulong.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_modschar.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_modsint.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_modslong.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_moduchar.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_moduint.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_modulong.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_mulchar.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_mulint.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-_mullong.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fs2schar.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fs2sint.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fs2slong.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fs2uchar.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fs2uint.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fs2ulong.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fsadd.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fsdiv.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fseq.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fsgt.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fslt.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fsmul.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fsneq.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-fssub.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-idata.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-schar2fs.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-sint2fs.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-slong2fs.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-uchar2fs.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-uint2fs.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
+../libsdcce_a-ulong2fs.$(OBJEXT): ../$(am__dirstamp) \
+	../$(DEPDIR)/$(am__dirstamp)
 libsdcce.a: $(libsdcce_a_OBJECTS) $(libsdcce_a_DEPENDENCIES) $(EXTRA_libsdcce_a_DEPENDENCIES) 
 	-rm -f libsdcce.a
 	$(libsdcce_a_AR) libsdcce.a $(libsdcce_a_OBJECTS) $(libsdcce_a_LIBADD)
@@ -269,16 +368,82 @@ libsdcce.a: $(libsdcce_a_OBJECTS) $(libsdcce_a_DEPENDENCIES) $(EXTRA_libsdcce_a_
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f ../libsdcce_a-_divschar.$(OBJEXT)
+	-rm -f ../libsdcce_a-_divsint.$(OBJEXT)
+	-rm -f ../libsdcce_a-_divslong.$(OBJEXT)
+	-rm -f ../libsdcce_a-_divuchar.$(OBJEXT)
+	-rm -f ../libsdcce_a-_divuint.$(OBJEXT)
+	-rm -f ../libsdcce_a-_divulong.$(OBJEXT)
+	-rm -f ../libsdcce_a-_modschar.$(OBJEXT)
+	-rm -f ../libsdcce_a-_modsint.$(OBJEXT)
+	-rm -f ../libsdcce_a-_modslong.$(OBJEXT)
+	-rm -f ../libsdcce_a-_moduchar.$(OBJEXT)
+	-rm -f ../libsdcce_a-_moduint.$(OBJEXT)
+	-rm -f ../libsdcce_a-_modulong.$(OBJEXT)
+	-rm -f ../libsdcce_a-_mulchar.$(OBJEXT)
+	-rm -f ../libsdcce_a-_mulint.$(OBJEXT)
+	-rm -f ../libsdcce_a-_mullong.$(OBJEXT)
+	-rm -f ../libsdcce_a-fs2schar.$(OBJEXT)
+	-rm -f ../libsdcce_a-fs2sint.$(OBJEXT)
+	-rm -f ../libsdcce_a-fs2slong.$(OBJEXT)
+	-rm -f ../libsdcce_a-fs2uchar.$(OBJEXT)
+	-rm -f ../libsdcce_a-fs2uint.$(OBJEXT)
+	-rm -f ../libsdcce_a-fs2ulong.$(OBJEXT)
+	-rm -f ../libsdcce_a-fsadd.$(OBJEXT)
+	-rm -f ../libsdcce_a-fsdiv.$(OBJEXT)
+	-rm -f ../libsdcce_a-fseq.$(OBJEXT)
+	-rm -f ../libsdcce_a-fsgt.$(OBJEXT)
+	-rm -f ../libsdcce_a-fslt.$(OBJEXT)
+	-rm -f ../libsdcce_a-fsmul.$(OBJEXT)
+	-rm -f ../libsdcce_a-fsneq.$(OBJEXT)
+	-rm -f ../libsdcce_a-fssub.$(OBJEXT)
+	-rm -f ../libsdcce_a-idata.$(OBJEXT)
+	-rm -f ../libsdcce_a-schar2fs.$(OBJEXT)
+	-rm -f ../libsdcce_a-sint2fs.$(OBJEXT)
+	-rm -f ../libsdcce_a-slong2fs.$(OBJEXT)
+	-rm -f ../libsdcce_a-uchar2fs.$(OBJEXT)
+	-rm -f ../libsdcce_a-uint2fs.$(OBJEXT)
+	-rm -f ../libsdcce_a-ulong2fs.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_divschar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_divsint.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_divslong.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_divuchar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_divuint.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_divulong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_divschar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_divsint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_divslong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_divuchar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_divuint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_divulong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_modschar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_modsint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_modslong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_moduchar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_moduint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_modulong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_mulchar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_mulint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-_mullong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fs2schar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fs2sint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fs2slong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fs2uchar.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fs2uint.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fs2ulong.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fsadd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fsdiv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fseq.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fsgt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fslt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fsmul.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fsneq.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-fssub.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-idata.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-schar2fs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-sint2fs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-slong2fs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-uchar2fs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-uint2fs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../$(DEPDIR)/libsdcce_a-ulong2fs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_gptrget1.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_gptrget2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_gptrget3.Po@am__quote@
@@ -287,568 +452,542 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_gptrput2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_gptrput3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_gptrput4.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_modschar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_modsint.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_modslong.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_moduchar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_moduint.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_modulong.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mulchar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mulint.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mullong.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2schar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2sint.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2slong.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2uchar.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2uint.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fs2ulong.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsadd.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsdiv.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fseq.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsgt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fslt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsmul.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fsneq.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fssub.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/idata.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schar2fs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sint2fs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slong2fs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uchar2fs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uint2fs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ulong2fs.Po@am__quote@
 
 .S.o:
-@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCCAS_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCCAS_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCCAS_FALSE@	$(CPPASCOMPILE) -c -o $@ $<
 
 .S.obj:
-@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCCAS_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCCAS_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCCAS_FALSE@	$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.o:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c $<
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+@am__fastdepCC_FALSE@	$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-_divschar.o: ../_divschar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divschar.o -MD -MP -MF $(DEPDIR)/_divschar.Tpo -c -o _divschar.o `test -f '../_divschar.c' || echo '$(srcdir)/'`../_divschar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divschar.Tpo $(DEPDIR)/_divschar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divschar.c' object='_divschar.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divschar.o: ../_divschar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divschar.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divschar.Tpo -c -o ../libsdcce_a-_divschar.o `test -f '../_divschar.c' || echo '$(srcdir)/'`../_divschar.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divschar.Tpo ../$(DEPDIR)/libsdcce_a-_divschar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divschar.c' object='../libsdcce_a-_divschar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divschar.o `test -f '../_divschar.c' || echo '$(srcdir)/'`../_divschar.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divschar.o `test -f '../_divschar.c' || echo '$(srcdir)/'`../_divschar.c
 
-_divschar.obj: ../_divschar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divschar.obj -MD -MP -MF $(DEPDIR)/_divschar.Tpo -c -o _divschar.obj `if test -f '../_divschar.c'; then $(CYGPATH_W) '../_divschar.c'; else $(CYGPATH_W) '$(srcdir)/../_divschar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divschar.Tpo $(DEPDIR)/_divschar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divschar.c' object='_divschar.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divschar.obj: ../_divschar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divschar.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divschar.Tpo -c -o ../libsdcce_a-_divschar.obj `if test -f '../_divschar.c'; then $(CYGPATH_W) '../_divschar.c'; else $(CYGPATH_W) '$(srcdir)/../_divschar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divschar.Tpo ../$(DEPDIR)/libsdcce_a-_divschar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divschar.c' object='../libsdcce_a-_divschar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divschar.obj `if test -f '../_divschar.c'; then $(CYGPATH_W) '../_divschar.c'; else $(CYGPATH_W) '$(srcdir)/../_divschar.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divschar.obj `if test -f '../_divschar.c'; then $(CYGPATH_W) '../_divschar.c'; else $(CYGPATH_W) '$(srcdir)/../_divschar.c'; fi`
 
-_divsint.o: ../_divsint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divsint.o -MD -MP -MF $(DEPDIR)/_divsint.Tpo -c -o _divsint.o `test -f '../_divsint.c' || echo '$(srcdir)/'`../_divsint.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divsint.Tpo $(DEPDIR)/_divsint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divsint.c' object='_divsint.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divsint.o: ../_divsint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divsint.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divsint.Tpo -c -o ../libsdcce_a-_divsint.o `test -f '../_divsint.c' || echo '$(srcdir)/'`../_divsint.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divsint.Tpo ../$(DEPDIR)/libsdcce_a-_divsint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divsint.c' object='../libsdcce_a-_divsint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divsint.o `test -f '../_divsint.c' || echo '$(srcdir)/'`../_divsint.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divsint.o `test -f '../_divsint.c' || echo '$(srcdir)/'`../_divsint.c
 
-_divsint.obj: ../_divsint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divsint.obj -MD -MP -MF $(DEPDIR)/_divsint.Tpo -c -o _divsint.obj `if test -f '../_divsint.c'; then $(CYGPATH_W) '../_divsint.c'; else $(CYGPATH_W) '$(srcdir)/../_divsint.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divsint.Tpo $(DEPDIR)/_divsint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divsint.c' object='_divsint.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divsint.obj: ../_divsint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divsint.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divsint.Tpo -c -o ../libsdcce_a-_divsint.obj `if test -f '../_divsint.c'; then $(CYGPATH_W) '../_divsint.c'; else $(CYGPATH_W) '$(srcdir)/../_divsint.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divsint.Tpo ../$(DEPDIR)/libsdcce_a-_divsint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divsint.c' object='../libsdcce_a-_divsint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divsint.obj `if test -f '../_divsint.c'; then $(CYGPATH_W) '../_divsint.c'; else $(CYGPATH_W) '$(srcdir)/../_divsint.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divsint.obj `if test -f '../_divsint.c'; then $(CYGPATH_W) '../_divsint.c'; else $(CYGPATH_W) '$(srcdir)/../_divsint.c'; fi`
 
-_divslong.o: ../_divslong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divslong.o -MD -MP -MF $(DEPDIR)/_divslong.Tpo -c -o _divslong.o `test -f '../_divslong.c' || echo '$(srcdir)/'`../_divslong.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divslong.Tpo $(DEPDIR)/_divslong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divslong.c' object='_divslong.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divslong.o: ../_divslong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divslong.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divslong.Tpo -c -o ../libsdcce_a-_divslong.o `test -f '../_divslong.c' || echo '$(srcdir)/'`../_divslong.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divslong.Tpo ../$(DEPDIR)/libsdcce_a-_divslong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divslong.c' object='../libsdcce_a-_divslong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divslong.o `test -f '../_divslong.c' || echo '$(srcdir)/'`../_divslong.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divslong.o `test -f '../_divslong.c' || echo '$(srcdir)/'`../_divslong.c
 
-_divslong.obj: ../_divslong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divslong.obj -MD -MP -MF $(DEPDIR)/_divslong.Tpo -c -o _divslong.obj `if test -f '../_divslong.c'; then $(CYGPATH_W) '../_divslong.c'; else $(CYGPATH_W) '$(srcdir)/../_divslong.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divslong.Tpo $(DEPDIR)/_divslong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divslong.c' object='_divslong.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divslong.obj: ../_divslong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divslong.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divslong.Tpo -c -o ../libsdcce_a-_divslong.obj `if test -f '../_divslong.c'; then $(CYGPATH_W) '../_divslong.c'; else $(CYGPATH_W) '$(srcdir)/../_divslong.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divslong.Tpo ../$(DEPDIR)/libsdcce_a-_divslong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divslong.c' object='../libsdcce_a-_divslong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divslong.obj `if test -f '../_divslong.c'; then $(CYGPATH_W) '../_divslong.c'; else $(CYGPATH_W) '$(srcdir)/../_divslong.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divslong.obj `if test -f '../_divslong.c'; then $(CYGPATH_W) '../_divslong.c'; else $(CYGPATH_W) '$(srcdir)/../_divslong.c'; fi`
 
-_divuchar.o: ../_divuchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divuchar.o -MD -MP -MF $(DEPDIR)/_divuchar.Tpo -c -o _divuchar.o `test -f '../_divuchar.c' || echo '$(srcdir)/'`../_divuchar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divuchar.Tpo $(DEPDIR)/_divuchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divuchar.c' object='_divuchar.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divuchar.o: ../_divuchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divuchar.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divuchar.Tpo -c -o ../libsdcce_a-_divuchar.o `test -f '../_divuchar.c' || echo '$(srcdir)/'`../_divuchar.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divuchar.Tpo ../$(DEPDIR)/libsdcce_a-_divuchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divuchar.c' object='../libsdcce_a-_divuchar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divuchar.o `test -f '../_divuchar.c' || echo '$(srcdir)/'`../_divuchar.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divuchar.o `test -f '../_divuchar.c' || echo '$(srcdir)/'`../_divuchar.c
 
-_divuchar.obj: ../_divuchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divuchar.obj -MD -MP -MF $(DEPDIR)/_divuchar.Tpo -c -o _divuchar.obj `if test -f '../_divuchar.c'; then $(CYGPATH_W) '../_divuchar.c'; else $(CYGPATH_W) '$(srcdir)/../_divuchar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divuchar.Tpo $(DEPDIR)/_divuchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divuchar.c' object='_divuchar.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divuchar.obj: ../_divuchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divuchar.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divuchar.Tpo -c -o ../libsdcce_a-_divuchar.obj `if test -f '../_divuchar.c'; then $(CYGPATH_W) '../_divuchar.c'; else $(CYGPATH_W) '$(srcdir)/../_divuchar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divuchar.Tpo ../$(DEPDIR)/libsdcce_a-_divuchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divuchar.c' object='../libsdcce_a-_divuchar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divuchar.obj `if test -f '../_divuchar.c'; then $(CYGPATH_W) '../_divuchar.c'; else $(CYGPATH_W) '$(srcdir)/../_divuchar.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divuchar.obj `if test -f '../_divuchar.c'; then $(CYGPATH_W) '../_divuchar.c'; else $(CYGPATH_W) '$(srcdir)/../_divuchar.c'; fi`
 
-_divuint.o: ../_divuint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divuint.o -MD -MP -MF $(DEPDIR)/_divuint.Tpo -c -o _divuint.o `test -f '../_divuint.c' || echo '$(srcdir)/'`../_divuint.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divuint.Tpo $(DEPDIR)/_divuint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divuint.c' object='_divuint.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divuint.o: ../_divuint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divuint.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divuint.Tpo -c -o ../libsdcce_a-_divuint.o `test -f '../_divuint.c' || echo '$(srcdir)/'`../_divuint.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divuint.Tpo ../$(DEPDIR)/libsdcce_a-_divuint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divuint.c' object='../libsdcce_a-_divuint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divuint.o `test -f '../_divuint.c' || echo '$(srcdir)/'`../_divuint.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divuint.o `test -f '../_divuint.c' || echo '$(srcdir)/'`../_divuint.c
 
-_divuint.obj: ../_divuint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divuint.obj -MD -MP -MF $(DEPDIR)/_divuint.Tpo -c -o _divuint.obj `if test -f '../_divuint.c'; then $(CYGPATH_W) '../_divuint.c'; else $(CYGPATH_W) '$(srcdir)/../_divuint.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divuint.Tpo $(DEPDIR)/_divuint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divuint.c' object='_divuint.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divuint.obj: ../_divuint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divuint.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divuint.Tpo -c -o ../libsdcce_a-_divuint.obj `if test -f '../_divuint.c'; then $(CYGPATH_W) '../_divuint.c'; else $(CYGPATH_W) '$(srcdir)/../_divuint.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divuint.Tpo ../$(DEPDIR)/libsdcce_a-_divuint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divuint.c' object='../libsdcce_a-_divuint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divuint.obj `if test -f '../_divuint.c'; then $(CYGPATH_W) '../_divuint.c'; else $(CYGPATH_W) '$(srcdir)/../_divuint.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divuint.obj `if test -f '../_divuint.c'; then $(CYGPATH_W) '../_divuint.c'; else $(CYGPATH_W) '$(srcdir)/../_divuint.c'; fi`
 
-_divulong.o: ../_divulong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divulong.o -MD -MP -MF $(DEPDIR)/_divulong.Tpo -c -o _divulong.o `test -f '../_divulong.c' || echo '$(srcdir)/'`../_divulong.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divulong.Tpo $(DEPDIR)/_divulong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divulong.c' object='_divulong.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divulong.o: ../_divulong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divulong.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divulong.Tpo -c -o ../libsdcce_a-_divulong.o `test -f '../_divulong.c' || echo '$(srcdir)/'`../_divulong.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divulong.Tpo ../$(DEPDIR)/libsdcce_a-_divulong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divulong.c' object='../libsdcce_a-_divulong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divulong.o `test -f '../_divulong.c' || echo '$(srcdir)/'`../_divulong.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divulong.o `test -f '../_divulong.c' || echo '$(srcdir)/'`../_divulong.c
 
-_divulong.obj: ../_divulong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _divulong.obj -MD -MP -MF $(DEPDIR)/_divulong.Tpo -c -o _divulong.obj `if test -f '../_divulong.c'; then $(CYGPATH_W) '../_divulong.c'; else $(CYGPATH_W) '$(srcdir)/../_divulong.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_divulong.Tpo $(DEPDIR)/_divulong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divulong.c' object='_divulong.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_divulong.obj: ../_divulong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_divulong.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_divulong.Tpo -c -o ../libsdcce_a-_divulong.obj `if test -f '../_divulong.c'; then $(CYGPATH_W) '../_divulong.c'; else $(CYGPATH_W) '$(srcdir)/../_divulong.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_divulong.Tpo ../$(DEPDIR)/libsdcce_a-_divulong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_divulong.c' object='../libsdcce_a-_divulong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _divulong.obj `if test -f '../_divulong.c'; then $(CYGPATH_W) '../_divulong.c'; else $(CYGPATH_W) '$(srcdir)/../_divulong.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_divulong.obj `if test -f '../_divulong.c'; then $(CYGPATH_W) '../_divulong.c'; else $(CYGPATH_W) '$(srcdir)/../_divulong.c'; fi`
 
-_modschar.o: ../_modschar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modschar.o -MD -MP -MF $(DEPDIR)/_modschar.Tpo -c -o _modschar.o `test -f '../_modschar.c' || echo '$(srcdir)/'`../_modschar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_modschar.Tpo $(DEPDIR)/_modschar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modschar.c' object='_modschar.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_modschar.o: ../_modschar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_modschar.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_modschar.Tpo -c -o ../libsdcce_a-_modschar.o `test -f '../_modschar.c' || echo '$(srcdir)/'`../_modschar.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_modschar.Tpo ../$(DEPDIR)/libsdcce_a-_modschar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modschar.c' object='../libsdcce_a-_modschar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modschar.o `test -f '../_modschar.c' || echo '$(srcdir)/'`../_modschar.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_modschar.o `test -f '../_modschar.c' || echo '$(srcdir)/'`../_modschar.c
 
-_modschar.obj: ../_modschar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modschar.obj -MD -MP -MF $(DEPDIR)/_modschar.Tpo -c -o _modschar.obj `if test -f '../_modschar.c'; then $(CYGPATH_W) '../_modschar.c'; else $(CYGPATH_W) '$(srcdir)/../_modschar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_modschar.Tpo $(DEPDIR)/_modschar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modschar.c' object='_modschar.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_modschar.obj: ../_modschar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_modschar.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_modschar.Tpo -c -o ../libsdcce_a-_modschar.obj `if test -f '../_modschar.c'; then $(CYGPATH_W) '../_modschar.c'; else $(CYGPATH_W) '$(srcdir)/../_modschar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_modschar.Tpo ../$(DEPDIR)/libsdcce_a-_modschar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modschar.c' object='../libsdcce_a-_modschar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modschar.obj `if test -f '../_modschar.c'; then $(CYGPATH_W) '../_modschar.c'; else $(CYGPATH_W) '$(srcdir)/../_modschar.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_modschar.obj `if test -f '../_modschar.c'; then $(CYGPATH_W) '../_modschar.c'; else $(CYGPATH_W) '$(srcdir)/../_modschar.c'; fi`
 
-_modsint.o: ../_modsint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modsint.o -MD -MP -MF $(DEPDIR)/_modsint.Tpo -c -o _modsint.o `test -f '../_modsint.c' || echo '$(srcdir)/'`../_modsint.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_modsint.Tpo $(DEPDIR)/_modsint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modsint.c' object='_modsint.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_modsint.o: ../_modsint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_modsint.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_modsint.Tpo -c -o ../libsdcce_a-_modsint.o `test -f '../_modsint.c' || echo '$(srcdir)/'`../_modsint.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_modsint.Tpo ../$(DEPDIR)/libsdcce_a-_modsint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modsint.c' object='../libsdcce_a-_modsint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modsint.o `test -f '../_modsint.c' || echo '$(srcdir)/'`../_modsint.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_modsint.o `test -f '../_modsint.c' || echo '$(srcdir)/'`../_modsint.c
 
-_modsint.obj: ../_modsint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modsint.obj -MD -MP -MF $(DEPDIR)/_modsint.Tpo -c -o _modsint.obj `if test -f '../_modsint.c'; then $(CYGPATH_W) '../_modsint.c'; else $(CYGPATH_W) '$(srcdir)/../_modsint.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_modsint.Tpo $(DEPDIR)/_modsint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modsint.c' object='_modsint.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_modsint.obj: ../_modsint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_modsint.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_modsint.Tpo -c -o ../libsdcce_a-_modsint.obj `if test -f '../_modsint.c'; then $(CYGPATH_W) '../_modsint.c'; else $(CYGPATH_W) '$(srcdir)/../_modsint.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_modsint.Tpo ../$(DEPDIR)/libsdcce_a-_modsint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modsint.c' object='../libsdcce_a-_modsint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modsint.obj `if test -f '../_modsint.c'; then $(CYGPATH_W) '../_modsint.c'; else $(CYGPATH_W) '$(srcdir)/../_modsint.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_modsint.obj `if test -f '../_modsint.c'; then $(CYGPATH_W) '../_modsint.c'; else $(CYGPATH_W) '$(srcdir)/../_modsint.c'; fi`
 
-_modslong.o: ../_modslong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modslong.o -MD -MP -MF $(DEPDIR)/_modslong.Tpo -c -o _modslong.o `test -f '../_modslong.c' || echo '$(srcdir)/'`../_modslong.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_modslong.Tpo $(DEPDIR)/_modslong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modslong.c' object='_modslong.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_modslong.o: ../_modslong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_modslong.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_modslong.Tpo -c -o ../libsdcce_a-_modslong.o `test -f '../_modslong.c' || echo '$(srcdir)/'`../_modslong.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_modslong.Tpo ../$(DEPDIR)/libsdcce_a-_modslong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modslong.c' object='../libsdcce_a-_modslong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modslong.o `test -f '../_modslong.c' || echo '$(srcdir)/'`../_modslong.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_modslong.o `test -f '../_modslong.c' || echo '$(srcdir)/'`../_modslong.c
 
-_modslong.obj: ../_modslong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modslong.obj -MD -MP -MF $(DEPDIR)/_modslong.Tpo -c -o _modslong.obj `if test -f '../_modslong.c'; then $(CYGPATH_W) '../_modslong.c'; else $(CYGPATH_W) '$(srcdir)/../_modslong.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_modslong.Tpo $(DEPDIR)/_modslong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modslong.c' object='_modslong.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_modslong.obj: ../_modslong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_modslong.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_modslong.Tpo -c -o ../libsdcce_a-_modslong.obj `if test -f '../_modslong.c'; then $(CYGPATH_W) '../_modslong.c'; else $(CYGPATH_W) '$(srcdir)/../_modslong.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_modslong.Tpo ../$(DEPDIR)/libsdcce_a-_modslong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modslong.c' object='../libsdcce_a-_modslong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modslong.obj `if test -f '../_modslong.c'; then $(CYGPATH_W) '../_modslong.c'; else $(CYGPATH_W) '$(srcdir)/../_modslong.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_modslong.obj `if test -f '../_modslong.c'; then $(CYGPATH_W) '../_modslong.c'; else $(CYGPATH_W) '$(srcdir)/../_modslong.c'; fi`
 
-_moduchar.o: ../_moduchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _moduchar.o -MD -MP -MF $(DEPDIR)/_moduchar.Tpo -c -o _moduchar.o `test -f '../_moduchar.c' || echo '$(srcdir)/'`../_moduchar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_moduchar.Tpo $(DEPDIR)/_moduchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_moduchar.c' object='_moduchar.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_moduchar.o: ../_moduchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_moduchar.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_moduchar.Tpo -c -o ../libsdcce_a-_moduchar.o `test -f '../_moduchar.c' || echo '$(srcdir)/'`../_moduchar.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_moduchar.Tpo ../$(DEPDIR)/libsdcce_a-_moduchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_moduchar.c' object='../libsdcce_a-_moduchar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _moduchar.o `test -f '../_moduchar.c' || echo '$(srcdir)/'`../_moduchar.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_moduchar.o `test -f '../_moduchar.c' || echo '$(srcdir)/'`../_moduchar.c
 
-_moduchar.obj: ../_moduchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _moduchar.obj -MD -MP -MF $(DEPDIR)/_moduchar.Tpo -c -o _moduchar.obj `if test -f '../_moduchar.c'; then $(CYGPATH_W) '../_moduchar.c'; else $(CYGPATH_W) '$(srcdir)/../_moduchar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_moduchar.Tpo $(DEPDIR)/_moduchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_moduchar.c' object='_moduchar.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_moduchar.obj: ../_moduchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_moduchar.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_moduchar.Tpo -c -o ../libsdcce_a-_moduchar.obj `if test -f '../_moduchar.c'; then $(CYGPATH_W) '../_moduchar.c'; else $(CYGPATH_W) '$(srcdir)/../_moduchar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_moduchar.Tpo ../$(DEPDIR)/libsdcce_a-_moduchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_moduchar.c' object='../libsdcce_a-_moduchar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _moduchar.obj `if test -f '../_moduchar.c'; then $(CYGPATH_W) '../_moduchar.c'; else $(CYGPATH_W) '$(srcdir)/../_moduchar.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_moduchar.obj `if test -f '../_moduchar.c'; then $(CYGPATH_W) '../_moduchar.c'; else $(CYGPATH_W) '$(srcdir)/../_moduchar.c'; fi`
 
-_moduint.o: ../_moduint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _moduint.o -MD -MP -MF $(DEPDIR)/_moduint.Tpo -c -o _moduint.o `test -f '../_moduint.c' || echo '$(srcdir)/'`../_moduint.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_moduint.Tpo $(DEPDIR)/_moduint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_moduint.c' object='_moduint.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_moduint.o: ../_moduint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_moduint.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_moduint.Tpo -c -o ../libsdcce_a-_moduint.o `test -f '../_moduint.c' || echo '$(srcdir)/'`../_moduint.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_moduint.Tpo ../$(DEPDIR)/libsdcce_a-_moduint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_moduint.c' object='../libsdcce_a-_moduint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _moduint.o `test -f '../_moduint.c' || echo '$(srcdir)/'`../_moduint.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_moduint.o `test -f '../_moduint.c' || echo '$(srcdir)/'`../_moduint.c
 
-_moduint.obj: ../_moduint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _moduint.obj -MD -MP -MF $(DEPDIR)/_moduint.Tpo -c -o _moduint.obj `if test -f '../_moduint.c'; then $(CYGPATH_W) '../_moduint.c'; else $(CYGPATH_W) '$(srcdir)/../_moduint.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_moduint.Tpo $(DEPDIR)/_moduint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_moduint.c' object='_moduint.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_moduint.obj: ../_moduint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_moduint.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_moduint.Tpo -c -o ../libsdcce_a-_moduint.obj `if test -f '../_moduint.c'; then $(CYGPATH_W) '../_moduint.c'; else $(CYGPATH_W) '$(srcdir)/../_moduint.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_moduint.Tpo ../$(DEPDIR)/libsdcce_a-_moduint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_moduint.c' object='../libsdcce_a-_moduint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _moduint.obj `if test -f '../_moduint.c'; then $(CYGPATH_W) '../_moduint.c'; else $(CYGPATH_W) '$(srcdir)/../_moduint.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_moduint.obj `if test -f '../_moduint.c'; then $(CYGPATH_W) '../_moduint.c'; else $(CYGPATH_W) '$(srcdir)/../_moduint.c'; fi`
 
-_modulong.o: ../_modulong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modulong.o -MD -MP -MF $(DEPDIR)/_modulong.Tpo -c -o _modulong.o `test -f '../_modulong.c' || echo '$(srcdir)/'`../_modulong.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_modulong.Tpo $(DEPDIR)/_modulong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modulong.c' object='_modulong.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_modulong.o: ../_modulong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_modulong.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_modulong.Tpo -c -o ../libsdcce_a-_modulong.o `test -f '../_modulong.c' || echo '$(srcdir)/'`../_modulong.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_modulong.Tpo ../$(DEPDIR)/libsdcce_a-_modulong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modulong.c' object='../libsdcce_a-_modulong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modulong.o `test -f '../_modulong.c' || echo '$(srcdir)/'`../_modulong.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_modulong.o `test -f '../_modulong.c' || echo '$(srcdir)/'`../_modulong.c
 
-_modulong.obj: ../_modulong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _modulong.obj -MD -MP -MF $(DEPDIR)/_modulong.Tpo -c -o _modulong.obj `if test -f '../_modulong.c'; then $(CYGPATH_W) '../_modulong.c'; else $(CYGPATH_W) '$(srcdir)/../_modulong.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_modulong.Tpo $(DEPDIR)/_modulong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modulong.c' object='_modulong.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_modulong.obj: ../_modulong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_modulong.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_modulong.Tpo -c -o ../libsdcce_a-_modulong.obj `if test -f '../_modulong.c'; then $(CYGPATH_W) '../_modulong.c'; else $(CYGPATH_W) '$(srcdir)/../_modulong.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_modulong.Tpo ../$(DEPDIR)/libsdcce_a-_modulong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_modulong.c' object='../libsdcce_a-_modulong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _modulong.obj `if test -f '../_modulong.c'; then $(CYGPATH_W) '../_modulong.c'; else $(CYGPATH_W) '$(srcdir)/../_modulong.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_modulong.obj `if test -f '../_modulong.c'; then $(CYGPATH_W) '../_modulong.c'; else $(CYGPATH_W) '$(srcdir)/../_modulong.c'; fi`
 
-_mulchar.o: ../_mulchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mulchar.o -MD -MP -MF $(DEPDIR)/_mulchar.Tpo -c -o _mulchar.o `test -f '../_mulchar.c' || echo '$(srcdir)/'`../_mulchar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_mulchar.Tpo $(DEPDIR)/_mulchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mulchar.c' object='_mulchar.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_mulchar.o: ../_mulchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_mulchar.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_mulchar.Tpo -c -o ../libsdcce_a-_mulchar.o `test -f '../_mulchar.c' || echo '$(srcdir)/'`../_mulchar.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_mulchar.Tpo ../$(DEPDIR)/libsdcce_a-_mulchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mulchar.c' object='../libsdcce_a-_mulchar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mulchar.o `test -f '../_mulchar.c' || echo '$(srcdir)/'`../_mulchar.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_mulchar.o `test -f '../_mulchar.c' || echo '$(srcdir)/'`../_mulchar.c
 
-_mulchar.obj: ../_mulchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mulchar.obj -MD -MP -MF $(DEPDIR)/_mulchar.Tpo -c -o _mulchar.obj `if test -f '../_mulchar.c'; then $(CYGPATH_W) '../_mulchar.c'; else $(CYGPATH_W) '$(srcdir)/../_mulchar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_mulchar.Tpo $(DEPDIR)/_mulchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mulchar.c' object='_mulchar.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_mulchar.obj: ../_mulchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_mulchar.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_mulchar.Tpo -c -o ../libsdcce_a-_mulchar.obj `if test -f '../_mulchar.c'; then $(CYGPATH_W) '../_mulchar.c'; else $(CYGPATH_W) '$(srcdir)/../_mulchar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_mulchar.Tpo ../$(DEPDIR)/libsdcce_a-_mulchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mulchar.c' object='../libsdcce_a-_mulchar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mulchar.obj `if test -f '../_mulchar.c'; then $(CYGPATH_W) '../_mulchar.c'; else $(CYGPATH_W) '$(srcdir)/../_mulchar.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_mulchar.obj `if test -f '../_mulchar.c'; then $(CYGPATH_W) '../_mulchar.c'; else $(CYGPATH_W) '$(srcdir)/../_mulchar.c'; fi`
 
-_mulint.o: ../_mulint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mulint.o -MD -MP -MF $(DEPDIR)/_mulint.Tpo -c -o _mulint.o `test -f '../_mulint.c' || echo '$(srcdir)/'`../_mulint.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_mulint.Tpo $(DEPDIR)/_mulint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mulint.c' object='_mulint.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_mulint.o: ../_mulint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_mulint.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_mulint.Tpo -c -o ../libsdcce_a-_mulint.o `test -f '../_mulint.c' || echo '$(srcdir)/'`../_mulint.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_mulint.Tpo ../$(DEPDIR)/libsdcce_a-_mulint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mulint.c' object='../libsdcce_a-_mulint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mulint.o `test -f '../_mulint.c' || echo '$(srcdir)/'`../_mulint.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_mulint.o `test -f '../_mulint.c' || echo '$(srcdir)/'`../_mulint.c
 
-_mulint.obj: ../_mulint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mulint.obj -MD -MP -MF $(DEPDIR)/_mulint.Tpo -c -o _mulint.obj `if test -f '../_mulint.c'; then $(CYGPATH_W) '../_mulint.c'; else $(CYGPATH_W) '$(srcdir)/../_mulint.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_mulint.Tpo $(DEPDIR)/_mulint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mulint.c' object='_mulint.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_mulint.obj: ../_mulint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_mulint.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_mulint.Tpo -c -o ../libsdcce_a-_mulint.obj `if test -f '../_mulint.c'; then $(CYGPATH_W) '../_mulint.c'; else $(CYGPATH_W) '$(srcdir)/../_mulint.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_mulint.Tpo ../$(DEPDIR)/libsdcce_a-_mulint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mulint.c' object='../libsdcce_a-_mulint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mulint.obj `if test -f '../_mulint.c'; then $(CYGPATH_W) '../_mulint.c'; else $(CYGPATH_W) '$(srcdir)/../_mulint.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_mulint.obj `if test -f '../_mulint.c'; then $(CYGPATH_W) '../_mulint.c'; else $(CYGPATH_W) '$(srcdir)/../_mulint.c'; fi`
 
-_mullong.o: ../_mullong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mullong.o -MD -MP -MF $(DEPDIR)/_mullong.Tpo -c -o _mullong.o `test -f '../_mullong.c' || echo '$(srcdir)/'`../_mullong.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_mullong.Tpo $(DEPDIR)/_mullong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mullong.c' object='_mullong.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_mullong.o: ../_mullong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_mullong.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_mullong.Tpo -c -o ../libsdcce_a-_mullong.o `test -f '../_mullong.c' || echo '$(srcdir)/'`../_mullong.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_mullong.Tpo ../$(DEPDIR)/libsdcce_a-_mullong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mullong.c' object='../libsdcce_a-_mullong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mullong.o `test -f '../_mullong.c' || echo '$(srcdir)/'`../_mullong.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_mullong.o `test -f '../_mullong.c' || echo '$(srcdir)/'`../_mullong.c
 
-_mullong.obj: ../_mullong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mullong.obj -MD -MP -MF $(DEPDIR)/_mullong.Tpo -c -o _mullong.obj `if test -f '../_mullong.c'; then $(CYGPATH_W) '../_mullong.c'; else $(CYGPATH_W) '$(srcdir)/../_mullong.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/_mullong.Tpo $(DEPDIR)/_mullong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mullong.c' object='_mullong.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-_mullong.obj: ../_mullong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-_mullong.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-_mullong.Tpo -c -o ../libsdcce_a-_mullong.obj `if test -f '../_mullong.c'; then $(CYGPATH_W) '../_mullong.c'; else $(CYGPATH_W) '$(srcdir)/../_mullong.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-_mullong.Tpo ../$(DEPDIR)/libsdcce_a-_mullong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../_mullong.c' object='../libsdcce_a-_mullong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mullong.obj `if test -f '../_mullong.c'; then $(CYGPATH_W) '../_mullong.c'; else $(CYGPATH_W) '$(srcdir)/../_mullong.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-_mullong.obj `if test -f '../_mullong.c'; then $(CYGPATH_W) '../_mullong.c'; else $(CYGPATH_W) '$(srcdir)/../_mullong.c'; fi`
 
-fs2schar.o: ../fs2schar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2schar.o -MD -MP -MF $(DEPDIR)/fs2schar.Tpo -c -o fs2schar.o `test -f '../fs2schar.c' || echo '$(srcdir)/'`../fs2schar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2schar.Tpo $(DEPDIR)/fs2schar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2schar.c' object='fs2schar.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2schar.o: ../fs2schar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2schar.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2schar.Tpo -c -o ../libsdcce_a-fs2schar.o `test -f '../fs2schar.c' || echo '$(srcdir)/'`../fs2schar.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2schar.Tpo ../$(DEPDIR)/libsdcce_a-fs2schar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2schar.c' object='../libsdcce_a-fs2schar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2schar.o `test -f '../fs2schar.c' || echo '$(srcdir)/'`../fs2schar.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2schar.o `test -f '../fs2schar.c' || echo '$(srcdir)/'`../fs2schar.c
 
-fs2schar.obj: ../fs2schar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2schar.obj -MD -MP -MF $(DEPDIR)/fs2schar.Tpo -c -o fs2schar.obj `if test -f '../fs2schar.c'; then $(CYGPATH_W) '../fs2schar.c'; else $(CYGPATH_W) '$(srcdir)/../fs2schar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2schar.Tpo $(DEPDIR)/fs2schar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2schar.c' object='fs2schar.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2schar.obj: ../fs2schar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2schar.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2schar.Tpo -c -o ../libsdcce_a-fs2schar.obj `if test -f '../fs2schar.c'; then $(CYGPATH_W) '../fs2schar.c'; else $(CYGPATH_W) '$(srcdir)/../fs2schar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2schar.Tpo ../$(DEPDIR)/libsdcce_a-fs2schar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2schar.c' object='../libsdcce_a-fs2schar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2schar.obj `if test -f '../fs2schar.c'; then $(CYGPATH_W) '../fs2schar.c'; else $(CYGPATH_W) '$(srcdir)/../fs2schar.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2schar.obj `if test -f '../fs2schar.c'; then $(CYGPATH_W) '../fs2schar.c'; else $(CYGPATH_W) '$(srcdir)/../fs2schar.c'; fi`
 
-fs2sint.o: ../fs2sint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2sint.o -MD -MP -MF $(DEPDIR)/fs2sint.Tpo -c -o fs2sint.o `test -f '../fs2sint.c' || echo '$(srcdir)/'`../fs2sint.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2sint.Tpo $(DEPDIR)/fs2sint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2sint.c' object='fs2sint.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2sint.o: ../fs2sint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2sint.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2sint.Tpo -c -o ../libsdcce_a-fs2sint.o `test -f '../fs2sint.c' || echo '$(srcdir)/'`../fs2sint.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2sint.Tpo ../$(DEPDIR)/libsdcce_a-fs2sint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2sint.c' object='../libsdcce_a-fs2sint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2sint.o `test -f '../fs2sint.c' || echo '$(srcdir)/'`../fs2sint.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2sint.o `test -f '../fs2sint.c' || echo '$(srcdir)/'`../fs2sint.c
 
-fs2sint.obj: ../fs2sint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2sint.obj -MD -MP -MF $(DEPDIR)/fs2sint.Tpo -c -o fs2sint.obj `if test -f '../fs2sint.c'; then $(CYGPATH_W) '../fs2sint.c'; else $(CYGPATH_W) '$(srcdir)/../fs2sint.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2sint.Tpo $(DEPDIR)/fs2sint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2sint.c' object='fs2sint.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2sint.obj: ../fs2sint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2sint.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2sint.Tpo -c -o ../libsdcce_a-fs2sint.obj `if test -f '../fs2sint.c'; then $(CYGPATH_W) '../fs2sint.c'; else $(CYGPATH_W) '$(srcdir)/../fs2sint.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2sint.Tpo ../$(DEPDIR)/libsdcce_a-fs2sint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2sint.c' object='../libsdcce_a-fs2sint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2sint.obj `if test -f '../fs2sint.c'; then $(CYGPATH_W) '../fs2sint.c'; else $(CYGPATH_W) '$(srcdir)/../fs2sint.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2sint.obj `if test -f '../fs2sint.c'; then $(CYGPATH_W) '../fs2sint.c'; else $(CYGPATH_W) '$(srcdir)/../fs2sint.c'; fi`
 
-fs2slong.o: ../fs2slong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2slong.o -MD -MP -MF $(DEPDIR)/fs2slong.Tpo -c -o fs2slong.o `test -f '../fs2slong.c' || echo '$(srcdir)/'`../fs2slong.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2slong.Tpo $(DEPDIR)/fs2slong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2slong.c' object='fs2slong.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2slong.o: ../fs2slong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2slong.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2slong.Tpo -c -o ../libsdcce_a-fs2slong.o `test -f '../fs2slong.c' || echo '$(srcdir)/'`../fs2slong.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2slong.Tpo ../$(DEPDIR)/libsdcce_a-fs2slong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2slong.c' object='../libsdcce_a-fs2slong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2slong.o `test -f '../fs2slong.c' || echo '$(srcdir)/'`../fs2slong.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2slong.o `test -f '../fs2slong.c' || echo '$(srcdir)/'`../fs2slong.c
 
-fs2slong.obj: ../fs2slong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2slong.obj -MD -MP -MF $(DEPDIR)/fs2slong.Tpo -c -o fs2slong.obj `if test -f '../fs2slong.c'; then $(CYGPATH_W) '../fs2slong.c'; else $(CYGPATH_W) '$(srcdir)/../fs2slong.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2slong.Tpo $(DEPDIR)/fs2slong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2slong.c' object='fs2slong.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2slong.obj: ../fs2slong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2slong.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2slong.Tpo -c -o ../libsdcce_a-fs2slong.obj `if test -f '../fs2slong.c'; then $(CYGPATH_W) '../fs2slong.c'; else $(CYGPATH_W) '$(srcdir)/../fs2slong.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2slong.Tpo ../$(DEPDIR)/libsdcce_a-fs2slong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2slong.c' object='../libsdcce_a-fs2slong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2slong.obj `if test -f '../fs2slong.c'; then $(CYGPATH_W) '../fs2slong.c'; else $(CYGPATH_W) '$(srcdir)/../fs2slong.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2slong.obj `if test -f '../fs2slong.c'; then $(CYGPATH_W) '../fs2slong.c'; else $(CYGPATH_W) '$(srcdir)/../fs2slong.c'; fi`
 
-fs2uchar.o: ../fs2uchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2uchar.o -MD -MP -MF $(DEPDIR)/fs2uchar.Tpo -c -o fs2uchar.o `test -f '../fs2uchar.c' || echo '$(srcdir)/'`../fs2uchar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2uchar.Tpo $(DEPDIR)/fs2uchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2uchar.c' object='fs2uchar.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2uchar.o: ../fs2uchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2uchar.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2uchar.Tpo -c -o ../libsdcce_a-fs2uchar.o `test -f '../fs2uchar.c' || echo '$(srcdir)/'`../fs2uchar.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2uchar.Tpo ../$(DEPDIR)/libsdcce_a-fs2uchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2uchar.c' object='../libsdcce_a-fs2uchar.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2uchar.o `test -f '../fs2uchar.c' || echo '$(srcdir)/'`../fs2uchar.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2uchar.o `test -f '../fs2uchar.c' || echo '$(srcdir)/'`../fs2uchar.c
 
-fs2uchar.obj: ../fs2uchar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2uchar.obj -MD -MP -MF $(DEPDIR)/fs2uchar.Tpo -c -o fs2uchar.obj `if test -f '../fs2uchar.c'; then $(CYGPATH_W) '../fs2uchar.c'; else $(CYGPATH_W) '$(srcdir)/../fs2uchar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2uchar.Tpo $(DEPDIR)/fs2uchar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2uchar.c' object='fs2uchar.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2uchar.obj: ../fs2uchar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2uchar.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2uchar.Tpo -c -o ../libsdcce_a-fs2uchar.obj `if test -f '../fs2uchar.c'; then $(CYGPATH_W) '../fs2uchar.c'; else $(CYGPATH_W) '$(srcdir)/../fs2uchar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2uchar.Tpo ../$(DEPDIR)/libsdcce_a-fs2uchar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2uchar.c' object='../libsdcce_a-fs2uchar.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2uchar.obj `if test -f '../fs2uchar.c'; then $(CYGPATH_W) '../fs2uchar.c'; else $(CYGPATH_W) '$(srcdir)/../fs2uchar.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2uchar.obj `if test -f '../fs2uchar.c'; then $(CYGPATH_W) '../fs2uchar.c'; else $(CYGPATH_W) '$(srcdir)/../fs2uchar.c'; fi`
 
-fs2uint.o: ../fs2uint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2uint.o -MD -MP -MF $(DEPDIR)/fs2uint.Tpo -c -o fs2uint.o `test -f '../fs2uint.c' || echo '$(srcdir)/'`../fs2uint.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2uint.Tpo $(DEPDIR)/fs2uint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2uint.c' object='fs2uint.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2uint.o: ../fs2uint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2uint.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2uint.Tpo -c -o ../libsdcce_a-fs2uint.o `test -f '../fs2uint.c' || echo '$(srcdir)/'`../fs2uint.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2uint.Tpo ../$(DEPDIR)/libsdcce_a-fs2uint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2uint.c' object='../libsdcce_a-fs2uint.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2uint.o `test -f '../fs2uint.c' || echo '$(srcdir)/'`../fs2uint.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2uint.o `test -f '../fs2uint.c' || echo '$(srcdir)/'`../fs2uint.c
 
-fs2uint.obj: ../fs2uint.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2uint.obj -MD -MP -MF $(DEPDIR)/fs2uint.Tpo -c -o fs2uint.obj `if test -f '../fs2uint.c'; then $(CYGPATH_W) '../fs2uint.c'; else $(CYGPATH_W) '$(srcdir)/../fs2uint.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2uint.Tpo $(DEPDIR)/fs2uint.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2uint.c' object='fs2uint.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2uint.obj: ../fs2uint.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2uint.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2uint.Tpo -c -o ../libsdcce_a-fs2uint.obj `if test -f '../fs2uint.c'; then $(CYGPATH_W) '../fs2uint.c'; else $(CYGPATH_W) '$(srcdir)/../fs2uint.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2uint.Tpo ../$(DEPDIR)/libsdcce_a-fs2uint.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2uint.c' object='../libsdcce_a-fs2uint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2uint.obj `if test -f '../fs2uint.c'; then $(CYGPATH_W) '../fs2uint.c'; else $(CYGPATH_W) '$(srcdir)/../fs2uint.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2uint.obj `if test -f '../fs2uint.c'; then $(CYGPATH_W) '../fs2uint.c'; else $(CYGPATH_W) '$(srcdir)/../fs2uint.c'; fi`
 
-fs2ulong.o: ../fs2ulong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2ulong.o -MD -MP -MF $(DEPDIR)/fs2ulong.Tpo -c -o fs2ulong.o `test -f '../fs2ulong.c' || echo '$(srcdir)/'`../fs2ulong.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2ulong.Tpo $(DEPDIR)/fs2ulong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2ulong.c' object='fs2ulong.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2ulong.o: ../fs2ulong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2ulong.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2ulong.Tpo -c -o ../libsdcce_a-fs2ulong.o `test -f '../fs2ulong.c' || echo '$(srcdir)/'`../fs2ulong.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2ulong.Tpo ../$(DEPDIR)/libsdcce_a-fs2ulong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2ulong.c' object='../libsdcce_a-fs2ulong.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2ulong.o `test -f '../fs2ulong.c' || echo '$(srcdir)/'`../fs2ulong.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2ulong.o `test -f '../fs2ulong.c' || echo '$(srcdir)/'`../fs2ulong.c
 
-fs2ulong.obj: ../fs2ulong.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fs2ulong.obj -MD -MP -MF $(DEPDIR)/fs2ulong.Tpo -c -o fs2ulong.obj `if test -f '../fs2ulong.c'; then $(CYGPATH_W) '../fs2ulong.c'; else $(CYGPATH_W) '$(srcdir)/../fs2ulong.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fs2ulong.Tpo $(DEPDIR)/fs2ulong.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2ulong.c' object='fs2ulong.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fs2ulong.obj: ../fs2ulong.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fs2ulong.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fs2ulong.Tpo -c -o ../libsdcce_a-fs2ulong.obj `if test -f '../fs2ulong.c'; then $(CYGPATH_W) '../fs2ulong.c'; else $(CYGPATH_W) '$(srcdir)/../fs2ulong.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fs2ulong.Tpo ../$(DEPDIR)/libsdcce_a-fs2ulong.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fs2ulong.c' object='../libsdcce_a-fs2ulong.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fs2ulong.obj `if test -f '../fs2ulong.c'; then $(CYGPATH_W) '../fs2ulong.c'; else $(CYGPATH_W) '$(srcdir)/../fs2ulong.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fs2ulong.obj `if test -f '../fs2ulong.c'; then $(CYGPATH_W) '../fs2ulong.c'; else $(CYGPATH_W) '$(srcdir)/../fs2ulong.c'; fi`
 
-fsadd.o: ../fsadd.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsadd.o -MD -MP -MF $(DEPDIR)/fsadd.Tpo -c -o fsadd.o `test -f '../fsadd.c' || echo '$(srcdir)/'`../fsadd.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsadd.Tpo $(DEPDIR)/fsadd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsadd.c' object='fsadd.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsadd.o: ../fsadd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsadd.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsadd.Tpo -c -o ../libsdcce_a-fsadd.o `test -f '../fsadd.c' || echo '$(srcdir)/'`../fsadd.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsadd.Tpo ../$(DEPDIR)/libsdcce_a-fsadd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsadd.c' object='../libsdcce_a-fsadd.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsadd.o `test -f '../fsadd.c' || echo '$(srcdir)/'`../fsadd.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsadd.o `test -f '../fsadd.c' || echo '$(srcdir)/'`../fsadd.c
 
-fsadd.obj: ../fsadd.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsadd.obj -MD -MP -MF $(DEPDIR)/fsadd.Tpo -c -o fsadd.obj `if test -f '../fsadd.c'; then $(CYGPATH_W) '../fsadd.c'; else $(CYGPATH_W) '$(srcdir)/../fsadd.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsadd.Tpo $(DEPDIR)/fsadd.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsadd.c' object='fsadd.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsadd.obj: ../fsadd.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsadd.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsadd.Tpo -c -o ../libsdcce_a-fsadd.obj `if test -f '../fsadd.c'; then $(CYGPATH_W) '../fsadd.c'; else $(CYGPATH_W) '$(srcdir)/../fsadd.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsadd.Tpo ../$(DEPDIR)/libsdcce_a-fsadd.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsadd.c' object='../libsdcce_a-fsadd.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsadd.obj `if test -f '../fsadd.c'; then $(CYGPATH_W) '../fsadd.c'; else $(CYGPATH_W) '$(srcdir)/../fsadd.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsadd.obj `if test -f '../fsadd.c'; then $(CYGPATH_W) '../fsadd.c'; else $(CYGPATH_W) '$(srcdir)/../fsadd.c'; fi`
 
-fsdiv.o: ../fsdiv.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsdiv.o -MD -MP -MF $(DEPDIR)/fsdiv.Tpo -c -o fsdiv.o `test -f '../fsdiv.c' || echo '$(srcdir)/'`../fsdiv.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsdiv.Tpo $(DEPDIR)/fsdiv.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsdiv.c' object='fsdiv.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsdiv.o: ../fsdiv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsdiv.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsdiv.Tpo -c -o ../libsdcce_a-fsdiv.o `test -f '../fsdiv.c' || echo '$(srcdir)/'`../fsdiv.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsdiv.Tpo ../$(DEPDIR)/libsdcce_a-fsdiv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsdiv.c' object='../libsdcce_a-fsdiv.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsdiv.o `test -f '../fsdiv.c' || echo '$(srcdir)/'`../fsdiv.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsdiv.o `test -f '../fsdiv.c' || echo '$(srcdir)/'`../fsdiv.c
 
-fsdiv.obj: ../fsdiv.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsdiv.obj -MD -MP -MF $(DEPDIR)/fsdiv.Tpo -c -o fsdiv.obj `if test -f '../fsdiv.c'; then $(CYGPATH_W) '../fsdiv.c'; else $(CYGPATH_W) '$(srcdir)/../fsdiv.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsdiv.Tpo $(DEPDIR)/fsdiv.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsdiv.c' object='fsdiv.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsdiv.obj: ../fsdiv.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsdiv.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsdiv.Tpo -c -o ../libsdcce_a-fsdiv.obj `if test -f '../fsdiv.c'; then $(CYGPATH_W) '../fsdiv.c'; else $(CYGPATH_W) '$(srcdir)/../fsdiv.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsdiv.Tpo ../$(DEPDIR)/libsdcce_a-fsdiv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsdiv.c' object='../libsdcce_a-fsdiv.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsdiv.obj `if test -f '../fsdiv.c'; then $(CYGPATH_W) '../fsdiv.c'; else $(CYGPATH_W) '$(srcdir)/../fsdiv.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsdiv.obj `if test -f '../fsdiv.c'; then $(CYGPATH_W) '../fsdiv.c'; else $(CYGPATH_W) '$(srcdir)/../fsdiv.c'; fi`
 
-fseq.o: ../fseq.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fseq.o -MD -MP -MF $(DEPDIR)/fseq.Tpo -c -o fseq.o `test -f '../fseq.c' || echo '$(srcdir)/'`../fseq.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fseq.Tpo $(DEPDIR)/fseq.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fseq.c' object='fseq.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fseq.o: ../fseq.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fseq.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fseq.Tpo -c -o ../libsdcce_a-fseq.o `test -f '../fseq.c' || echo '$(srcdir)/'`../fseq.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fseq.Tpo ../$(DEPDIR)/libsdcce_a-fseq.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fseq.c' object='../libsdcce_a-fseq.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fseq.o `test -f '../fseq.c' || echo '$(srcdir)/'`../fseq.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fseq.o `test -f '../fseq.c' || echo '$(srcdir)/'`../fseq.c
 
-fseq.obj: ../fseq.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fseq.obj -MD -MP -MF $(DEPDIR)/fseq.Tpo -c -o fseq.obj `if test -f '../fseq.c'; then $(CYGPATH_W) '../fseq.c'; else $(CYGPATH_W) '$(srcdir)/../fseq.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fseq.Tpo $(DEPDIR)/fseq.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fseq.c' object='fseq.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fseq.obj: ../fseq.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fseq.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fseq.Tpo -c -o ../libsdcce_a-fseq.obj `if test -f '../fseq.c'; then $(CYGPATH_W) '../fseq.c'; else $(CYGPATH_W) '$(srcdir)/../fseq.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fseq.Tpo ../$(DEPDIR)/libsdcce_a-fseq.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fseq.c' object='../libsdcce_a-fseq.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fseq.obj `if test -f '../fseq.c'; then $(CYGPATH_W) '../fseq.c'; else $(CYGPATH_W) '$(srcdir)/../fseq.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fseq.obj `if test -f '../fseq.c'; then $(CYGPATH_W) '../fseq.c'; else $(CYGPATH_W) '$(srcdir)/../fseq.c'; fi`
 
-fsgt.o: ../fsgt.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsgt.o -MD -MP -MF $(DEPDIR)/fsgt.Tpo -c -o fsgt.o `test -f '../fsgt.c' || echo '$(srcdir)/'`../fsgt.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsgt.Tpo $(DEPDIR)/fsgt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsgt.c' object='fsgt.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsgt.o: ../fsgt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsgt.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsgt.Tpo -c -o ../libsdcce_a-fsgt.o `test -f '../fsgt.c' || echo '$(srcdir)/'`../fsgt.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsgt.Tpo ../$(DEPDIR)/libsdcce_a-fsgt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsgt.c' object='../libsdcce_a-fsgt.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsgt.o `test -f '../fsgt.c' || echo '$(srcdir)/'`../fsgt.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsgt.o `test -f '../fsgt.c' || echo '$(srcdir)/'`../fsgt.c
 
-fsgt.obj: ../fsgt.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsgt.obj -MD -MP -MF $(DEPDIR)/fsgt.Tpo -c -o fsgt.obj `if test -f '../fsgt.c'; then $(CYGPATH_W) '../fsgt.c'; else $(CYGPATH_W) '$(srcdir)/../fsgt.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsgt.Tpo $(DEPDIR)/fsgt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsgt.c' object='fsgt.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsgt.obj: ../fsgt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsgt.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsgt.Tpo -c -o ../libsdcce_a-fsgt.obj `if test -f '../fsgt.c'; then $(CYGPATH_W) '../fsgt.c'; else $(CYGPATH_W) '$(srcdir)/../fsgt.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsgt.Tpo ../$(DEPDIR)/libsdcce_a-fsgt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsgt.c' object='../libsdcce_a-fsgt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsgt.obj `if test -f '../fsgt.c'; then $(CYGPATH_W) '../fsgt.c'; else $(CYGPATH_W) '$(srcdir)/../fsgt.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsgt.obj `if test -f '../fsgt.c'; then $(CYGPATH_W) '../fsgt.c'; else $(CYGPATH_W) '$(srcdir)/../fsgt.c'; fi`
 
-fslt.o: ../fslt.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fslt.o -MD -MP -MF $(DEPDIR)/fslt.Tpo -c -o fslt.o `test -f '../fslt.c' || echo '$(srcdir)/'`../fslt.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fslt.Tpo $(DEPDIR)/fslt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fslt.c' object='fslt.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fslt.o: ../fslt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fslt.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fslt.Tpo -c -o ../libsdcce_a-fslt.o `test -f '../fslt.c' || echo '$(srcdir)/'`../fslt.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fslt.Tpo ../$(DEPDIR)/libsdcce_a-fslt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fslt.c' object='../libsdcce_a-fslt.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fslt.o `test -f '../fslt.c' || echo '$(srcdir)/'`../fslt.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fslt.o `test -f '../fslt.c' || echo '$(srcdir)/'`../fslt.c
 
-fslt.obj: ../fslt.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fslt.obj -MD -MP -MF $(DEPDIR)/fslt.Tpo -c -o fslt.obj `if test -f '../fslt.c'; then $(CYGPATH_W) '../fslt.c'; else $(CYGPATH_W) '$(srcdir)/../fslt.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fslt.Tpo $(DEPDIR)/fslt.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fslt.c' object='fslt.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fslt.obj: ../fslt.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fslt.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fslt.Tpo -c -o ../libsdcce_a-fslt.obj `if test -f '../fslt.c'; then $(CYGPATH_W) '../fslt.c'; else $(CYGPATH_W) '$(srcdir)/../fslt.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fslt.Tpo ../$(DEPDIR)/libsdcce_a-fslt.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fslt.c' object='../libsdcce_a-fslt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fslt.obj `if test -f '../fslt.c'; then $(CYGPATH_W) '../fslt.c'; else $(CYGPATH_W) '$(srcdir)/../fslt.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fslt.obj `if test -f '../fslt.c'; then $(CYGPATH_W) '../fslt.c'; else $(CYGPATH_W) '$(srcdir)/../fslt.c'; fi`
 
-fsmul.o: ../fsmul.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsmul.o -MD -MP -MF $(DEPDIR)/fsmul.Tpo -c -o fsmul.o `test -f '../fsmul.c' || echo '$(srcdir)/'`../fsmul.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsmul.Tpo $(DEPDIR)/fsmul.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsmul.c' object='fsmul.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsmul.o: ../fsmul.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsmul.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsmul.Tpo -c -o ../libsdcce_a-fsmul.o `test -f '../fsmul.c' || echo '$(srcdir)/'`../fsmul.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsmul.Tpo ../$(DEPDIR)/libsdcce_a-fsmul.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsmul.c' object='../libsdcce_a-fsmul.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsmul.o `test -f '../fsmul.c' || echo '$(srcdir)/'`../fsmul.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsmul.o `test -f '../fsmul.c' || echo '$(srcdir)/'`../fsmul.c
 
-fsmul.obj: ../fsmul.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsmul.obj -MD -MP -MF $(DEPDIR)/fsmul.Tpo -c -o fsmul.obj `if test -f '../fsmul.c'; then $(CYGPATH_W) '../fsmul.c'; else $(CYGPATH_W) '$(srcdir)/../fsmul.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsmul.Tpo $(DEPDIR)/fsmul.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsmul.c' object='fsmul.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsmul.obj: ../fsmul.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsmul.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsmul.Tpo -c -o ../libsdcce_a-fsmul.obj `if test -f '../fsmul.c'; then $(CYGPATH_W) '../fsmul.c'; else $(CYGPATH_W) '$(srcdir)/../fsmul.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsmul.Tpo ../$(DEPDIR)/libsdcce_a-fsmul.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsmul.c' object='../libsdcce_a-fsmul.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsmul.obj `if test -f '../fsmul.c'; then $(CYGPATH_W) '../fsmul.c'; else $(CYGPATH_W) '$(srcdir)/../fsmul.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsmul.obj `if test -f '../fsmul.c'; then $(CYGPATH_W) '../fsmul.c'; else $(CYGPATH_W) '$(srcdir)/../fsmul.c'; fi`
 
-fsneq.o: ../fsneq.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsneq.o -MD -MP -MF $(DEPDIR)/fsneq.Tpo -c -o fsneq.o `test -f '../fsneq.c' || echo '$(srcdir)/'`../fsneq.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsneq.Tpo $(DEPDIR)/fsneq.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsneq.c' object='fsneq.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsneq.o: ../fsneq.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsneq.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsneq.Tpo -c -o ../libsdcce_a-fsneq.o `test -f '../fsneq.c' || echo '$(srcdir)/'`../fsneq.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsneq.Tpo ../$(DEPDIR)/libsdcce_a-fsneq.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsneq.c' object='../libsdcce_a-fsneq.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsneq.o `test -f '../fsneq.c' || echo '$(srcdir)/'`../fsneq.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsneq.o `test -f '../fsneq.c' || echo '$(srcdir)/'`../fsneq.c
 
-fsneq.obj: ../fsneq.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fsneq.obj -MD -MP -MF $(DEPDIR)/fsneq.Tpo -c -o fsneq.obj `if test -f '../fsneq.c'; then $(CYGPATH_W) '../fsneq.c'; else $(CYGPATH_W) '$(srcdir)/../fsneq.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fsneq.Tpo $(DEPDIR)/fsneq.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsneq.c' object='fsneq.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fsneq.obj: ../fsneq.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fsneq.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fsneq.Tpo -c -o ../libsdcce_a-fsneq.obj `if test -f '../fsneq.c'; then $(CYGPATH_W) '../fsneq.c'; else $(CYGPATH_W) '$(srcdir)/../fsneq.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fsneq.Tpo ../$(DEPDIR)/libsdcce_a-fsneq.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fsneq.c' object='../libsdcce_a-fsneq.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fsneq.obj `if test -f '../fsneq.c'; then $(CYGPATH_W) '../fsneq.c'; else $(CYGPATH_W) '$(srcdir)/../fsneq.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fsneq.obj `if test -f '../fsneq.c'; then $(CYGPATH_W) '../fsneq.c'; else $(CYGPATH_W) '$(srcdir)/../fsneq.c'; fi`
 
-fssub.o: ../fssub.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fssub.o -MD -MP -MF $(DEPDIR)/fssub.Tpo -c -o fssub.o `test -f '../fssub.c' || echo '$(srcdir)/'`../fssub.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fssub.Tpo $(DEPDIR)/fssub.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fssub.c' object='fssub.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fssub.o: ../fssub.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fssub.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fssub.Tpo -c -o ../libsdcce_a-fssub.o `test -f '../fssub.c' || echo '$(srcdir)/'`../fssub.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fssub.Tpo ../$(DEPDIR)/libsdcce_a-fssub.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fssub.c' object='../libsdcce_a-fssub.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fssub.o `test -f '../fssub.c' || echo '$(srcdir)/'`../fssub.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fssub.o `test -f '../fssub.c' || echo '$(srcdir)/'`../fssub.c
 
-fssub.obj: ../fssub.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT fssub.obj -MD -MP -MF $(DEPDIR)/fssub.Tpo -c -o fssub.obj `if test -f '../fssub.c'; then $(CYGPATH_W) '../fssub.c'; else $(CYGPATH_W) '$(srcdir)/../fssub.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/fssub.Tpo $(DEPDIR)/fssub.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fssub.c' object='fssub.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-fssub.obj: ../fssub.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-fssub.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-fssub.Tpo -c -o ../libsdcce_a-fssub.obj `if test -f '../fssub.c'; then $(CYGPATH_W) '../fssub.c'; else $(CYGPATH_W) '$(srcdir)/../fssub.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-fssub.Tpo ../$(DEPDIR)/libsdcce_a-fssub.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../fssub.c' object='../libsdcce_a-fssub.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o fssub.obj `if test -f '../fssub.c'; then $(CYGPATH_W) '../fssub.c'; else $(CYGPATH_W) '$(srcdir)/../fssub.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-fssub.obj `if test -f '../fssub.c'; then $(CYGPATH_W) '../fssub.c'; else $(CYGPATH_W) '$(srcdir)/../fssub.c'; fi`
 
-idata.o: ../idata.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT idata.o -MD -MP -MF $(DEPDIR)/idata.Tpo -c -o idata.o `test -f '../idata.c' || echo '$(srcdir)/'`../idata.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/idata.Tpo $(DEPDIR)/idata.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../idata.c' object='idata.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-idata.o: ../idata.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-idata.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-idata.Tpo -c -o ../libsdcce_a-idata.o `test -f '../idata.c' || echo '$(srcdir)/'`../idata.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-idata.Tpo ../$(DEPDIR)/libsdcce_a-idata.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../idata.c' object='../libsdcce_a-idata.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o idata.o `test -f '../idata.c' || echo '$(srcdir)/'`../idata.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-idata.o `test -f '../idata.c' || echo '$(srcdir)/'`../idata.c
 
-idata.obj: ../idata.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT idata.obj -MD -MP -MF $(DEPDIR)/idata.Tpo -c -o idata.obj `if test -f '../idata.c'; then $(CYGPATH_W) '../idata.c'; else $(CYGPATH_W) '$(srcdir)/../idata.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/idata.Tpo $(DEPDIR)/idata.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../idata.c' object='idata.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-idata.obj: ../idata.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-idata.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-idata.Tpo -c -o ../libsdcce_a-idata.obj `if test -f '../idata.c'; then $(CYGPATH_W) '../idata.c'; else $(CYGPATH_W) '$(srcdir)/../idata.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-idata.Tpo ../$(DEPDIR)/libsdcce_a-idata.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../idata.c' object='../libsdcce_a-idata.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o idata.obj `if test -f '../idata.c'; then $(CYGPATH_W) '../idata.c'; else $(CYGPATH_W) '$(srcdir)/../idata.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-idata.obj `if test -f '../idata.c'; then $(CYGPATH_W) '../idata.c'; else $(CYGPATH_W) '$(srcdir)/../idata.c'; fi`
 
-schar2fs.o: ../schar2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT schar2fs.o -MD -MP -MF $(DEPDIR)/schar2fs.Tpo -c -o schar2fs.o `test -f '../schar2fs.c' || echo '$(srcdir)/'`../schar2fs.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/schar2fs.Tpo $(DEPDIR)/schar2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../schar2fs.c' object='schar2fs.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-schar2fs.o: ../schar2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-schar2fs.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-schar2fs.Tpo -c -o ../libsdcce_a-schar2fs.o `test -f '../schar2fs.c' || echo '$(srcdir)/'`../schar2fs.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-schar2fs.Tpo ../$(DEPDIR)/libsdcce_a-schar2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../schar2fs.c' object='../libsdcce_a-schar2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o schar2fs.o `test -f '../schar2fs.c' || echo '$(srcdir)/'`../schar2fs.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-schar2fs.o `test -f '../schar2fs.c' || echo '$(srcdir)/'`../schar2fs.c
 
-schar2fs.obj: ../schar2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT schar2fs.obj -MD -MP -MF $(DEPDIR)/schar2fs.Tpo -c -o schar2fs.obj `if test -f '../schar2fs.c'; then $(CYGPATH_W) '../schar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../schar2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/schar2fs.Tpo $(DEPDIR)/schar2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../schar2fs.c' object='schar2fs.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-schar2fs.obj: ../schar2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-schar2fs.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-schar2fs.Tpo -c -o ../libsdcce_a-schar2fs.obj `if test -f '../schar2fs.c'; then $(CYGPATH_W) '../schar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../schar2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-schar2fs.Tpo ../$(DEPDIR)/libsdcce_a-schar2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../schar2fs.c' object='../libsdcce_a-schar2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o schar2fs.obj `if test -f '../schar2fs.c'; then $(CYGPATH_W) '../schar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../schar2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-schar2fs.obj `if test -f '../schar2fs.c'; then $(CYGPATH_W) '../schar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../schar2fs.c'; fi`
 
-sint2fs.o: ../sint2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sint2fs.o -MD -MP -MF $(DEPDIR)/sint2fs.Tpo -c -o sint2fs.o `test -f '../sint2fs.c' || echo '$(srcdir)/'`../sint2fs.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sint2fs.Tpo $(DEPDIR)/sint2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../sint2fs.c' object='sint2fs.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-sint2fs.o: ../sint2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-sint2fs.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-sint2fs.Tpo -c -o ../libsdcce_a-sint2fs.o `test -f '../sint2fs.c' || echo '$(srcdir)/'`../sint2fs.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-sint2fs.Tpo ../$(DEPDIR)/libsdcce_a-sint2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../sint2fs.c' object='../libsdcce_a-sint2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sint2fs.o `test -f '../sint2fs.c' || echo '$(srcdir)/'`../sint2fs.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-sint2fs.o `test -f '../sint2fs.c' || echo '$(srcdir)/'`../sint2fs.c
 
-sint2fs.obj: ../sint2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sint2fs.obj -MD -MP -MF $(DEPDIR)/sint2fs.Tpo -c -o sint2fs.obj `if test -f '../sint2fs.c'; then $(CYGPATH_W) '../sint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../sint2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sint2fs.Tpo $(DEPDIR)/sint2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../sint2fs.c' object='sint2fs.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-sint2fs.obj: ../sint2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-sint2fs.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-sint2fs.Tpo -c -o ../libsdcce_a-sint2fs.obj `if test -f '../sint2fs.c'; then $(CYGPATH_W) '../sint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../sint2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-sint2fs.Tpo ../$(DEPDIR)/libsdcce_a-sint2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../sint2fs.c' object='../libsdcce_a-sint2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sint2fs.obj `if test -f '../sint2fs.c'; then $(CYGPATH_W) '../sint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../sint2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-sint2fs.obj `if test -f '../sint2fs.c'; then $(CYGPATH_W) '../sint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../sint2fs.c'; fi`
 
-slong2fs.o: ../slong2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slong2fs.o -MD -MP -MF $(DEPDIR)/slong2fs.Tpo -c -o slong2fs.o `test -f '../slong2fs.c' || echo '$(srcdir)/'`../slong2fs.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/slong2fs.Tpo $(DEPDIR)/slong2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../slong2fs.c' object='slong2fs.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-slong2fs.o: ../slong2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-slong2fs.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-slong2fs.Tpo -c -o ../libsdcce_a-slong2fs.o `test -f '../slong2fs.c' || echo '$(srcdir)/'`../slong2fs.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-slong2fs.Tpo ../$(DEPDIR)/libsdcce_a-slong2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../slong2fs.c' object='../libsdcce_a-slong2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slong2fs.o `test -f '../slong2fs.c' || echo '$(srcdir)/'`../slong2fs.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-slong2fs.o `test -f '../slong2fs.c' || echo '$(srcdir)/'`../slong2fs.c
 
-slong2fs.obj: ../slong2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slong2fs.obj -MD -MP -MF $(DEPDIR)/slong2fs.Tpo -c -o slong2fs.obj `if test -f '../slong2fs.c'; then $(CYGPATH_W) '../slong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../slong2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/slong2fs.Tpo $(DEPDIR)/slong2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../slong2fs.c' object='slong2fs.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-slong2fs.obj: ../slong2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-slong2fs.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-slong2fs.Tpo -c -o ../libsdcce_a-slong2fs.obj `if test -f '../slong2fs.c'; then $(CYGPATH_W) '../slong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../slong2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-slong2fs.Tpo ../$(DEPDIR)/libsdcce_a-slong2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../slong2fs.c' object='../libsdcce_a-slong2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slong2fs.obj `if test -f '../slong2fs.c'; then $(CYGPATH_W) '../slong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../slong2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-slong2fs.obj `if test -f '../slong2fs.c'; then $(CYGPATH_W) '../slong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../slong2fs.c'; fi`
 
-uchar2fs.o: ../uchar2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT uchar2fs.o -MD -MP -MF $(DEPDIR)/uchar2fs.Tpo -c -o uchar2fs.o `test -f '../uchar2fs.c' || echo '$(srcdir)/'`../uchar2fs.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/uchar2fs.Tpo $(DEPDIR)/uchar2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../uchar2fs.c' object='uchar2fs.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-uchar2fs.o: ../uchar2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-uchar2fs.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-uchar2fs.Tpo -c -o ../libsdcce_a-uchar2fs.o `test -f '../uchar2fs.c' || echo '$(srcdir)/'`../uchar2fs.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-uchar2fs.Tpo ../$(DEPDIR)/libsdcce_a-uchar2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../uchar2fs.c' object='../libsdcce_a-uchar2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o uchar2fs.o `test -f '../uchar2fs.c' || echo '$(srcdir)/'`../uchar2fs.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-uchar2fs.o `test -f '../uchar2fs.c' || echo '$(srcdir)/'`../uchar2fs.c
 
-uchar2fs.obj: ../uchar2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT uchar2fs.obj -MD -MP -MF $(DEPDIR)/uchar2fs.Tpo -c -o uchar2fs.obj `if test -f '../uchar2fs.c'; then $(CYGPATH_W) '../uchar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../uchar2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/uchar2fs.Tpo $(DEPDIR)/uchar2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../uchar2fs.c' object='uchar2fs.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-uchar2fs.obj: ../uchar2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-uchar2fs.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-uchar2fs.Tpo -c -o ../libsdcce_a-uchar2fs.obj `if test -f '../uchar2fs.c'; then $(CYGPATH_W) '../uchar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../uchar2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-uchar2fs.Tpo ../$(DEPDIR)/libsdcce_a-uchar2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../uchar2fs.c' object='../libsdcce_a-uchar2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o uchar2fs.obj `if test -f '../uchar2fs.c'; then $(CYGPATH_W) '../uchar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../uchar2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-uchar2fs.obj `if test -f '../uchar2fs.c'; then $(CYGPATH_W) '../uchar2fs.c'; else $(CYGPATH_W) '$(srcdir)/../uchar2fs.c'; fi`
 
-uint2fs.o: ../uint2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT uint2fs.o -MD -MP -MF $(DEPDIR)/uint2fs.Tpo -c -o uint2fs.o `test -f '../uint2fs.c' || echo '$(srcdir)/'`../uint2fs.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/uint2fs.Tpo $(DEPDIR)/uint2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../uint2fs.c' object='uint2fs.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-uint2fs.o: ../uint2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-uint2fs.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-uint2fs.Tpo -c -o ../libsdcce_a-uint2fs.o `test -f '../uint2fs.c' || echo '$(srcdir)/'`../uint2fs.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-uint2fs.Tpo ../$(DEPDIR)/libsdcce_a-uint2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../uint2fs.c' object='../libsdcce_a-uint2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o uint2fs.o `test -f '../uint2fs.c' || echo '$(srcdir)/'`../uint2fs.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-uint2fs.o `test -f '../uint2fs.c' || echo '$(srcdir)/'`../uint2fs.c
 
-uint2fs.obj: ../uint2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT uint2fs.obj -MD -MP -MF $(DEPDIR)/uint2fs.Tpo -c -o uint2fs.obj `if test -f '../uint2fs.c'; then $(CYGPATH_W) '../uint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../uint2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/uint2fs.Tpo $(DEPDIR)/uint2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../uint2fs.c' object='uint2fs.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-uint2fs.obj: ../uint2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-uint2fs.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-uint2fs.Tpo -c -o ../libsdcce_a-uint2fs.obj `if test -f '../uint2fs.c'; then $(CYGPATH_W) '../uint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../uint2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-uint2fs.Tpo ../$(DEPDIR)/libsdcce_a-uint2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../uint2fs.c' object='../libsdcce_a-uint2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o uint2fs.obj `if test -f '../uint2fs.c'; then $(CYGPATH_W) '../uint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../uint2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-uint2fs.obj `if test -f '../uint2fs.c'; then $(CYGPATH_W) '../uint2fs.c'; else $(CYGPATH_W) '$(srcdir)/../uint2fs.c'; fi`
 
-ulong2fs.o: ../ulong2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ulong2fs.o -MD -MP -MF $(DEPDIR)/ulong2fs.Tpo -c -o ulong2fs.o `test -f '../ulong2fs.c' || echo '$(srcdir)/'`../ulong2fs.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ulong2fs.Tpo $(DEPDIR)/ulong2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../ulong2fs.c' object='ulong2fs.o' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-ulong2fs.o: ../ulong2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-ulong2fs.o -MD -MP -MF ../$(DEPDIR)/libsdcce_a-ulong2fs.Tpo -c -o ../libsdcce_a-ulong2fs.o `test -f '../ulong2fs.c' || echo '$(srcdir)/'`../ulong2fs.c
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-ulong2fs.Tpo ../$(DEPDIR)/libsdcce_a-ulong2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../ulong2fs.c' object='../libsdcce_a-ulong2fs.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ulong2fs.o `test -f '../ulong2fs.c' || echo '$(srcdir)/'`../ulong2fs.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-ulong2fs.o `test -f '../ulong2fs.c' || echo '$(srcdir)/'`../ulong2fs.c
 
-ulong2fs.obj: ../ulong2fs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ulong2fs.obj -MD -MP -MF $(DEPDIR)/ulong2fs.Tpo -c -o ulong2fs.obj `if test -f '../ulong2fs.c'; then $(CYGPATH_W) '../ulong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../ulong2fs.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/ulong2fs.Tpo $(DEPDIR)/ulong2fs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../ulong2fs.c' object='ulong2fs.obj' libtool=no @AMDEPBACKSLASH@
+../libsdcce_a-ulong2fs.obj: ../ulong2fs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -MT ../libsdcce_a-ulong2fs.obj -MD -MP -MF ../$(DEPDIR)/libsdcce_a-ulong2fs.Tpo -c -o ../libsdcce_a-ulong2fs.obj `if test -f '../ulong2fs.c'; then $(CYGPATH_W) '../ulong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../ulong2fs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) ../$(DEPDIR)/libsdcce_a-ulong2fs.Tpo ../$(DEPDIR)/libsdcce_a-ulong2fs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='../ulong2fs.c' object='../libsdcce_a-ulong2fs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ulong2fs.obj `if test -f '../ulong2fs.c'; then $(CYGPATH_W) '../ulong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../ulong2fs.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsdcce_a_CFLAGS) $(CFLAGS) -c -o ../libsdcce_a-ulong2fs.obj `if test -f '../ulong2fs.c'; then $(CYGPATH_W) '../ulong2fs.c'; else $(CYGPATH_W) '$(srcdir)/../ulong2fs.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -958,10 +1097,13 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-rm -f ../$(DEPDIR)/$(am__dirstamp)
+	-rm -f ../$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -972,7 +1114,7 @@ clean-am: clean-generic clean-local clean-noinstLIBRARIES \
 	mostlyclean-am
 
 distclean: distclean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ../$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1018,7 +1160,7 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -rf ./$(DEPDIR)
+	-rm -rf ../$(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

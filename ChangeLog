@@ -1,3 +1,20 @@
+2016-04-03 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/lib/pic14/bootstrap.sh,
+	  device/lib/pic14/Makefile.in,
+	  device/lib/pic14/libm/Makefile.in,
+	  device/lib/pic14/libsdcc/enhanced/Makefile.am,
+	  device/lib/pic14/libsdcc/enhanced/Makefile.in,
+	  device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.am,
+	  device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.in,
+	  device/lib/pic14/libsdcc/regular/Makefile.am,
+	  device/lib/pic14/libsdcc/regular/Makefile.in:
+	  Workaround the Linux Mint bug: #2482 Link error with pic16f1827
+
+	* device/lib/pic16/*,
+	  device/non-free/lib/pic16/*:
+	  Downgraded the autoconf version from 1.15 to 1.11.6.
+
 2016-04-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCglue.c,
@@ -117,7 +134,7 @@
 2016-03-15 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* src/pic14/pcode.c:
-	Fixed bug: "#2481 wrong asm code for pic16f1827 (or even others?)"
+	  Fixed bug: "#2481 wrong asm code for pic16f1827 (or even others?)"
 
 2016-03-12 Maarten Brock <sourceforge.brock AT dse.nl>
 

@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.61)
+AC_PREREQ(2.60)
 AC_INIT([pic16lib], [0.3], [tecodev AT users sourceforge net])
 #AM_INIT_AUTOMAKE([foreign subdir-objects])
 AM_INIT_AUTOMAKE([foreign])

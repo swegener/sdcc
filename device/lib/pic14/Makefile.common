@@ -41,4 +41,3 @@ clean-intermediate: clean-local
 	  echo "Making $@ in $$subdir"; \
 	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@); \
 	done
-

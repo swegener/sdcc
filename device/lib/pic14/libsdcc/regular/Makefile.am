@@ -50,5 +50,8 @@ libsdcc_a_SOURCES += _gptrput4.S
 libsdcc_a_SOURCES += macros.inc
 libsdcc_a_SOURCES += shadowregs.c
 
-include $(top_srcdir)/Makefile.common
+libsdcc_a_CFLAGS = -p$(ARCH) $(AM_CFLAGS)
 
+CLEANFILES = ../*.asm ../*.lst
+
+include $(top_srcdir)/Makefile.common

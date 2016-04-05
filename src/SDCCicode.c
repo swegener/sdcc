@@ -1204,10 +1204,10 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
   switch (op)
     {
     case '+':
-      retval = operandFromValue (valCastLiteral (type, operandLitValue (left) + operandLitValue (right), operandLitValue (left) + operandLitValue (right)));
+      retval = operandFromValue (valCastLiteral (type, operandLitValue (left) + operandLitValue (right), operandLitValueUll (left) + operandLitValueUll (right)));
       break;
     case '-':
-      retval = operandFromValue (valCastLiteral (type, operandLitValue (left) - operandLitValue (right), operandLitValue (left) - operandLitValue (right)));
+      retval = operandFromValue (valCastLiteral (type, operandLitValue (left) - operandLitValue (right), operandLitValueUll (left) - operandLitValueUll (right)));
       break;
     case '*':
       /*
@@ -1232,8 +1232,8 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
             /* signed and unsigned mul are the same, as long as the precision
                of the result isn't bigger than the precision of the operands. */
             retval = operandFromValue (valCastLiteral (type,
-                                                       operandLitValueUll (left) *
-                                                       operandLitValueUll (right),
+                                                       operandLitValue (left) *
+                                                       operandLitValue (right),
                                                        operandLitValueUll (left) *
                                                        operandLitValueUll (right)));
           /* long is handled here, because it can overflow with double */
@@ -1267,7 +1267,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
         }
       else
         /* all others go here: */
-        retval = operandFromValue (valCastLiteral (type, operandLitValue (left) * operandLitValue (right), operandLitValue (left) * operandLitValue (right)));
+        retval = operandFromValue (valCastLiteral (type, operandLitValue (left) * operandLitValue (right), operandLitValueUll (left) * operandLitValueUll (right)));
       break;
     case '/':
       if (IS_UNSIGNED (type))
@@ -1281,8 +1281,8 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
           SPEC_USIGN (ret) = 1;
           if (IS_LONGLONG (type))
             retval = operandFromValue (valCastLiteral (type,
-                                                       operandLitValueUll (left) /
-                                                       operandLitValueUll (right),
+                                                       operandLitValue (left) /
+                                                       operandLitValue (right),
                                                        operandLitValueUll (left) /
                                                        operandLitValueUll (right)));
           else
@@ -1299,7 +1299,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
               werror (E_DIVIDE_BY_ZERO);
               retval = right;
             }
-          retval = operandFromValue (valCastLiteral (type, operandLitValue (left) / operandLitValue (right), operandLitValue (left) / operandLitValue (right)));
+          retval = operandFromValue (valCastLiteral (type, operandLitValue (left) / operandLitValue (right), operandLitValueUll (left) / operandLitValueUll (right)));
         }
       break;
     case '%':
@@ -1445,11 +1445,11 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
       break;
 
     case UNARYMINUS:
-      retval = operandFromValue (valCastLiteral (type, -1 * operandLitValue (left), -1 * operandLitValue (left)));
+      retval = operandFromValue (valCastLiteral (type, -1 * operandLitValue (left), (-1ll) * operandLitValueUll (left)));
       break;
 
     case '~':
-      retval = operandFromValue (valCastLiteral (type, ~((TYPE_TARGET_ULONG) double2ul (operandLitValue (left))), ~((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)))));
+      retval = operandFromValue (valCastLiteral (type, ~((TYPE_TARGET_ULONG) double2ul (operandLitValue (left))), ~((TYPE_TARGET_ULONGLONG) operandLitValueUll (left))));
       break;
 
     case '!':
@@ -1457,7 +1457,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
       break;
 
     case ADDRESS_OF:
-      retval = operandFromValue (valCastLiteral (type, operandLitValue (left), operandLitValue (left)));
+      retval = operandFromValue (valCastLiteral (type, operandLitValue (left), (TYPE_TARGET_ULONGLONG) operandLitValueUll (left)));
       break;
 
     default:
@@ -2978,9 +2978,9 @@ geniCodeLogic (operand * left, operand * right, int op, ast * tree)
 
   /* Avoid expensive comparisons when the type of the constant is bigger than the type of the non-const operand */
   if (IS_INTEGRAL (ltype) && IS_LITERAL (rtype) && getSize (ltype) < getSize (rtype) && !TARGET_HC08_LIKE)
-    right->svt.valOperand = valCastLiteral (ltype, operandLitValue (right), operandLitValue (right));
+    right->svt.valOperand = valCastLiteral (ltype, operandLitValue (right), operandLitValueUll (right));
   if (IS_INTEGRAL (rtype) && IS_LITERAL (ltype) && getSize (rtype) < getSize (ltype) && !TARGET_HC08_LIKE)
-    left->svt.valOperand = valCastLiteral (rtype, operandLitValue (left), operandLitValue (left));
+    left->svt.valOperand = valCastLiteral (rtype, operandLitValue (left), operandLitValueUll (left));
 
   /* if one operand is a pointer and the other is a literal generic void pointer,
      change the type of the literal generic void pointer to match the other pointer */
@@ -2998,7 +2998,7 @@ geniCodeLogic (operand * left, operand * right, int op, ast * tree)
       /* if casting literal to generic pointer, then cast to rtype instead */
       if (ic && (ic->op == CAST) && isOperandLiteral (IC_RIGHT (ic)))
         {
-          left = operandFromValue (valCastLiteral (rtype, operandLitValue (IC_RIGHT (ic)),operandLitValue (IC_RIGHT (ic))));
+          left = operandFromValue (valCastLiteral (rtype, operandLitValue (IC_RIGHT (ic)),operandLitValueUll (IC_RIGHT (ic))));
           ltype = operandType (left);
         }
     }
@@ -3016,7 +3016,7 @@ geniCodeLogic (operand * left, operand * right, int op, ast * tree)
       /* if casting literal to generic pointer, then cast to rtype instead */
       if (ic && (ic->op == CAST) && isOperandLiteral (IC_RIGHT (ic)))
         {
-          right = operandFromValue (valCastLiteral (ltype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));
+          right = operandFromValue (valCastLiteral (ltype, operandLitValue (IC_RIGHT (ic)), operandLitValueUll (IC_RIGHT (ic))));
           rtype = operandType (right);
         }
     }

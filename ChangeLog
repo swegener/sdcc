@@ -1,3 +1,12 @@
+2016-04-05 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/string.c
+	  Improve test case.
+	* src/SDCCast.c
+	* src/SDCCicode.c
+	* src/z80/gen.c
+	  Improve longlong compatibility.
+
 2016-04-03 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/lib/pic14/bootstrap.sh,

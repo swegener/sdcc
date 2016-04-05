@@ -1684,7 +1684,7 @@ aopGetLitWordLong (const asmop * aop, int offset, bool with_hash)
       /* otherwise it is fairly simple */
       if (!IS_FLOAT (val->type))
         {
-          unsigned long v = ulFromVal (val);
+          unsigned long long v = ullFromVal (val);
 
           if (offset == 2)
             {
@@ -1699,7 +1699,7 @@ aopGetLitWordLong (const asmop * aop, int offset, bool with_hash)
               wassertl (0, "Encountered an invalid offset while fetching a literal");
             }
 
-          dbuf_tprintf (&dbuf, with_hash ? "!immedword" : "!constword", v & 0xfffful);
+          dbuf_tprintf (&dbuf, with_hash ? "!immedword" : "!constword", (unsigned long) (v & 0xffffull));
         }
       else
         {
@@ -6461,7 +6461,7 @@ static void
 genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign, const iCode * ic)
 {
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0ull;
   bool result_in_carry = FALSE;
   int a_always_byte = -1;
 
@@ -6615,10 +6615,10 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
 
       if (AOP_TYPE (right) == AOP_LIT)
         {
-          lit = ulFromVal (AOP (right)->aopu.aop_lit);
+          lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
           /* optimize if(x < 0) or if(x >= 0) */
-          if (lit == 0)
+          if (lit == 0ull)
             {
               if (!sign)
                 {
@@ -6657,7 +6657,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               goto release;
             }
 
-          while (!((lit >> (offset * 8)) & 0xff))
+          while (!((lit >> (offset * 8)) & 0xffull))
             {
               size--;
               offset++;
@@ -6669,7 +6669,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                 {
                   PAIR_ID litpair = (isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC);
                   fetchPair (PAIR_HL, AOP (left));
-                  emit2 ("ld %s, !immedbyte", _pairs[litpair].name, (lit ^ 0x8000u) & 0xffffu);
+                  emit2 ("ld %s, !immedbyte", _pairs[litpair].name, (unsigned long) ((lit ^ 0x8000u) & 0xffffu));
                   regalloc_dry_run_cost += 3;
                   emit2 ("add hl, hl");
                   emit2 ("ccf");
@@ -6697,7 +6697,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                   emit2 ("xor a, !immedbyte", 0x80);
                   regalloc_dry_run_cost += 2;
                 }
-              emit2 ("sub a, !immedbyte", ((lit >> (offset * 8)) & 0xff) ^ (size == 1 ? 0x80 : 0x00));
+              emit2 ("sub a, !immedbyte", (unsigned long) (((lit >> (offset * 8)) & 0xff) ^ (size == 1 ? 0x80 : 0x00)));
               regalloc_dry_run_cost += 2;
               size--;
               offset++;
@@ -6713,7 +6713,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                       regalloc_dry_run_cost += 3;
                     }
                   /* Subtract through, propagating the carry */
-                  emit2 ("sbc a, !immedbyte", ((lit >> (offset++ * 8)) & 0xff) ^ (size ? 0x00 : 0x80));
+                  emit2 ("sbc a, !immedbyte", (unsigned long) (((lit >> (offset++ * 8)) & 0xff) ^ (size ? 0x00 : 0x80)));
                   regalloc_dry_run_cost += 2;
                 }
               result_in_carry = TRUE;
@@ -7365,7 +7365,7 @@ genAnd (const iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0L;
   unsigned int bytelit = 0;
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
@@ -7396,7 +7396,7 @@ genAnd (const iCode * ic, iCode * ifx)
       left = tmp;
     }
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -7433,7 +7433,7 @@ genAnd (const iCode * ic, iCode * ifx)
         {
           char *jumpcond = "NZ";
 
-          if ((bytelit = ((lit >> (offset * 8)) & 0x0fful)) == 0x00ul)
+          if ((bytelit = ((lit >> (offset * 8)) & 0x0ffull)) == 0x00ull)
             {
               sizel--;
               offset++;
@@ -7450,7 +7450,7 @@ genAnd (const iCode * ic, iCode * ifx)
             }
           /* Testing for the inverse of the border bits of some 32-bit registers destructively is cheap. */
           /* More combinations would be possible, but this one is the one that is common in the floating-point library. */
-          else if (AOP_TYPE (left) == AOP_REG && sizel >= 4 && ((lit >> (offset * 8)) & 0xfffffffful) == 0x7ffffffful &&
+          else if (AOP_TYPE (left) == AOP_REG && sizel >= 4 && ((lit >> (offset * 8)) & 0xffffffffull) == 0x7fffffffull &&
             !IS_GB && getPartPairId (AOP (left), offset) == PAIR_HL && isPairDead (PAIR_HL, ic) &&
             IS_RAB && getPartPairId (AOP (left), offset + 2) == PAIR_DE && isPairDead (PAIR_HL, ic))
             {
@@ -7465,7 +7465,7 @@ genAnd (const iCode * ic, iCode * ifx)
             }
           /* Testing for the inverse of the border bits of some 16-bit registers destructively is cheap. */
           /* More combinations would be possible, but these are the common ones. */
-          else if (AOP_TYPE (left) == AOP_REG && sizel >= 2 && ((lit >> (offset * 8)) & 0xfffful) == 0x7ffful &&
+          else if (AOP_TYPE (left) == AOP_REG && sizel >= 2 && ((lit >> (offset * 8)) & 0xffffull) == 0x7fffull &&
             (!IS_GB && getPartPairId (AOP (left), offset) == PAIR_HL && isPairDead (PAIR_HL, ic) ||
             IS_RAB && getPartPairId (AOP (left), offset) == PAIR_DE  && isPairDead (PAIR_DE, ic)))
             {
@@ -7622,7 +7622,7 @@ genAnd (const iCode * ic, iCode * ifx)
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              bytelit = (lit >> (offset * 8)) & 0x0FFL;
+              bytelit = (lit >> (offset * 8)) & 0x0FF;
               if (bytelit == 0x0FF)
                 continue;
               else if (bytelit == 0)
@@ -7669,7 +7669,7 @@ genAnd (const iCode * ic, iCode * ifx)
               // result = left & right
               if (AOP_TYPE (right) == AOP_LIT)
                 {
-                  if ((bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL)) == 0x0FF)
+                  if ((bytelit = (int) ((lit >> (offset * 8)) & 0x0FFull)) == 0x0FF)
                     {
                       cheapMove (AOP (result), offset, AOP (left), offset);
                       continue;
@@ -7781,7 +7781,7 @@ genOr (const iCode * ic, iCode * ifx)
       /* PENDING: Modeled after the AND code which is inefficient. */
       while (sizel--)
         {
-          bytelit = (lit >> (offset * 8)) & 0x0FFL;
+          bytelit = (lit >> (offset * 8)) & 0x0FFull;
 
           cheapMove (ASMOP_A, 0, AOP (left), offset);
 
@@ -10205,7 +10205,7 @@ genAssign (const iCode * ic)
 {
   operand *result, *right;
   int size, offset;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0L;
 
   result = IC_RESULT (ic);
   right = IC_RIGHT (ic);
@@ -10236,7 +10236,7 @@ genAssign (const iCode * ic)
 
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+      lit = ullFromVal (AOP (right)->aopu.aop_lit);
     }
 
   if (isPair (AOP (result)))
@@ -10341,7 +10341,7 @@ genAssign (const iCode * ic)
          in A for a fast clear */
       while (size--)
         {
-          if ((unsigned int) ((lit >> (offset * 8)) & 0x0FFL) == 0)
+          if ((unsigned int) ((lit >> (offset * 8)) & 0x0FFull) == 0)
             {
               if (!fXored && size > 1)
                 {

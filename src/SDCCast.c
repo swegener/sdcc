@@ -4489,10 +4489,10 @@ decorateType (ast * tree, RESULT_TYPE resultType)
             }
           else
             {
-              unsigned long gpVal = 0;
+              unsigned long long gpVal = 0;
               int size = getSize(LTYPE (tree));
-              unsigned long mask = (size >= sizeof(long)) ? 0xffffffff : (1ul << (size * 8)) - 1;
-              unsigned long pVal = ulFromVal (valFromType (RTYPE (tree))) & mask;
+              unsigned long long mask = (size >= sizeof(long long)) ? 0xffffffffffffffffull : (1ull << (size * 8)) - 1;
+              unsigned long long pVal = ullFromVal (valFromType (RTYPE (tree))) & mask;
 
               /* if casting literal specific pointer to generic pointer */
               if (IS_GENPTR (LTYPE (tree)) && IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))

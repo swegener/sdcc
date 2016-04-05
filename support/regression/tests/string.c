@@ -223,8 +223,8 @@ do_utf_32_c95 (void)
   const wchar_t *str4 = "Ä " L"ä";
   const wchar_t *str5 = L"Ä " L"ä";
 
-  ASSERT (str1[0] == '\xc4');
-  ASSERT (str2[2] == '\xe4');
+  ASSERT (str1[0] == 0xc4);
+  ASSERT (str2[2] == 0xe4);
   ASSERT (!memcmp (str1, str2, 4));
   ASSERT (!memcmp (str1, str3, 4));
   ASSERT (!memcmp (str1, str4, 4));
@@ -253,6 +253,29 @@ do_utf_32_c11 (void)
 }
 
 static void
+do_chinese (void)
+{
+#ifdef __STDC_UTF_32__
+  const char32_t *p0 = U"史斌";
+#endif
+#ifdef __STDC_ISO_10646__
+  const wchar_t *p1 = L"史庭芳";
+#endif
+#ifdef __STDC_UTF_16__
+  const char16_t *p2 = u"天津";
+#endif
+#ifdef __STDC_UTF_32__
+  ASSERT (p0[0] == 0x53f2);
+#endif
+#ifdef __STDC_ISO_10646__
+  ASSERT (p1[2] == 0x82b3);
+#endif
+#ifdef __STDC_UTF_16__
+  ASSERT (p2[1] == 0x6d25);
+#endif
+}
+
+static void
 teststr (void)
 {
   do_teststrcmp ();
@@ -268,5 +291,6 @@ teststr (void)
   do_utf_16 ();
   do_utf_32_c95 ();
   do_utf_32_c11 ();
+  do_chinese ();
 }
 

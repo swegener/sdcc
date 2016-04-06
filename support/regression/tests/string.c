@@ -205,10 +205,10 @@ do_utf_16 (void)
 
   ASSERT (str1[0] == '\xc4');
   ASSERT (str2[2] == '\xe4');
-  ASSERT (!memcmp (str1, str2, 4));
-  ASSERT (!memcmp (str1, str3, 4));
-  ASSERT (!memcmp (str1, str4, 4));
-  ASSERT (!memcmp (str1, str5, 4));
+  ASSERT (!memcmp (str1, str2, 4 * sizeof(char16_t)));
+  ASSERT (!memcmp (str1, str3, 4 * sizeof(char16_t)));
+  ASSERT (!memcmp (str1, str4, 4 * sizeof(char16_t)));
+  ASSERT (!memcmp (str1, str5, 4 * sizeof(char16_t)));
 #endif
 }
 
@@ -225,10 +225,10 @@ do_utf_32_c95 (void)
 
   ASSERT (str1[0] == 0xc4);
   ASSERT (str2[2] == 0xe4);
-  ASSERT (!memcmp (str1, str2, 4));
-  ASSERT (!memcmp (str1, str3, 4));
-  ASSERT (!memcmp (str1, str4, 4));
-  ASSERT (!memcmp (str1, str5, 4));
+  ASSERT (!memcmp (str1, str2, 4 * sizeof(wchar_t)));
+  ASSERT (!memcmp (str1, str3, 4 * sizeof(wchar_t)));
+  ASSERT (!memcmp (str1, str4, 4 * sizeof(wchar_t)));
+  ASSERT (!memcmp (str1, str5, 4 * sizeof(wchar_t)));
 #endif
 }
 
@@ -245,10 +245,10 @@ do_utf_32_c11 (void)
 
   ASSERT (str1[0] == '\xc4');
   ASSERT (str2[2] == '\xe4');
-  ASSERT (!memcmp (str1, str2, 4));
-  ASSERT (!memcmp (str1, str3, 4));
-  ASSERT (!memcmp (str1, str4, 4));
-  ASSERT (!memcmp (str1, str5, 4));
+  ASSERT (!memcmp (str1, str2, 4 * sizeof(char32_t)));
+  ASSERT (!memcmp (str1, str3, 4 * sizeof(char32_t)));
+  ASSERT (!memcmp (str1, str4, 4 * sizeof(char32_t)));
+  ASSERT (!memcmp (str1, str5, 4 * sizeof(char32_t)));
 #endif
 }
 

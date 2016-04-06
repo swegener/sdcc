@@ -1,7 +1,7 @@
 2016-04-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/string.c:
-	  Check more of wide strings.
+	  Check more of wide strings, do not depend on implementation-defined behaviour in char escape.
 
 2016-04-06 Ben Shi <powerstudio1st AT 163 DOT com>
 

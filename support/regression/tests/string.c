@@ -162,8 +162,8 @@ do_utf_8 (void)
   const char *str4 = u8"Ä " u8"ä";
   const char *str5 = "Ä " u8"ä";
 
-  ASSERT (str1[0] == '\xc3');
-  ASSERT (str2[1] == '\x84');
+  ASSERT (str1[0] == 0xc3);
+  ASSERT (str2[1] == 0x84);
   ASSERT (!strcmp (str1, str2));
   ASSERT (!strcmp (str1, str3));
   ASSERT (!strcmp (str1, str4));
@@ -183,8 +183,8 @@ do_utf_8_sdcc (void)
   const char *str4 = "Ä " "ä";
   const char *str5 = u8"Ä " u8"ä";
 
-  ASSERT (str1[0] == '\xc3');
-  ASSERT (str2[1] == '\x84');
+  ASSERT (str1[0] == 0xc3);
+  ASSERT (str2[1] == 0x84);
   ASSERT (!strcmp (str1, str2));
   ASSERT (!strcmp (str1, str3));
   ASSERT (!strcmp (str1, str4));
@@ -203,8 +203,8 @@ do_utf_16 (void)
   const char16_t *str4 = "Ä " u"ä";
   const char16_t *str5 = u"Ä " u"ä";
 
-  ASSERT (str1[0] == '\xc4');
-  ASSERT (str2[2] == '\xe4');
+  ASSERT (str1[0] == 0xc4);
+  ASSERT (str2[2] == 0xe4);
   ASSERT (!memcmp (str1, str2, 4 * sizeof(char16_t)));
   ASSERT (!memcmp (str1, str3, 4 * sizeof(char16_t)));
   ASSERT (!memcmp (str1, str4, 4 * sizeof(char16_t)));
@@ -243,8 +243,8 @@ do_utf_32_c11 (void)
   const char32_t *str4 = "Ä " U"ä";
   const char32_t *str5 = U"Ä " U"ä";
 
-  ASSERT (str1[0] == '\xc4');
-  ASSERT (str2[2] == '\xe4');
+  ASSERT (str1[0] == 0xc4);
+  ASSERT (str2[2] == 0xe4);
   ASSERT (!memcmp (str1, str2, 4 * sizeof(char32_t)));
   ASSERT (!memcmp (str1, str3, 4 * sizeof(char32_t)));
   ASSERT (!memcmp (str1, str4, 4 * sizeof(char32_t)));

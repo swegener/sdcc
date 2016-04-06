@@ -1,3 +1,10 @@
+2016-04-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/gcc-torture-execute-950512-1.c
+	* support/regression/tests/gcc-torture-execute-961122-1.c
+	* support/regression/tests/gcc-torture-execute-960402-1.c
+	  Enabled.
+
 2016-04-05 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/string.c

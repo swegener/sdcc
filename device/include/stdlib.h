@@ -43,6 +43,10 @@
 #define NULL (void *)0
 #endif
 
+#define RAND_MAX 32767
+
+#define MB_CUR_MAX 4
+
 extern float atof (const char *nptr);
 extern int atoi (const char *nptr);
 extern long int atol (const char *nptr);
@@ -55,8 +59,6 @@ extern void _itoa(int, char*, unsigned char);
 
 extern void _ultoa(unsigned long, char*, unsigned char);
 extern void _ltoa(long, char*, unsigned char);
-
-#define RAND_MAX 32767
 
 int rand(void);
 void srand(unsigned int seed);
@@ -90,6 +92,8 @@ long int labs(long int j);
 
 #if __STDC_VERSION__ >= 199901L
 int mblen(const char *s, size_t n);
+
+int wctomb(char *s, wchar_t wc);
 #endif
 
 /* Bounds-checking interfaces from annex K of the C11 standard. */

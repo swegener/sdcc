@@ -97,6 +97,7 @@ COMMON_SDCC = \
   realloc.c \
   free.c \
   mblen.c \
+  wctomb.c \
   printf_large.c \
   puts.c \
   gets.c \

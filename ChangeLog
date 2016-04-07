@@ -5,9 +5,11 @@
 	  src/SDCCerr.c:
 	  Fix bug #2488 by implementing hexadecimal floating constants.
 	* device/include/stdlib.h,
+	  device/lib/mblen.c,
+	  device/lib/wctomb.c,
 	  device/lib/incl.mk,
 	  support/regression/tests/string.c:
-	  Implement mblen().
+	  Implement mblen(), wctomb().
 
 2016-04-06 Philipp Klaus Krause <pkk AT spth.de>
 

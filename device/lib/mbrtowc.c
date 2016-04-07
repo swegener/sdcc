@@ -36,7 +36,7 @@ size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_
 	unsigned char seqlen;
 	char mbseq[4];
 	wchar_t codepoint;
-	unsigned char i;
+	unsigned char i, j;
 	static mbstate_t sps;
 
 	if(!s)
@@ -71,7 +71,10 @@ size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_
 		return(-2);
 	}
 
-	for(n = 1, i = 1; i < seqlen; i++, n++)
+	for(j = 0; j < i; j++)
+		ps->c[j] = 0;
+
+	for(n = 1, i = i ? i : 1; i < seqlen; i++, n++)
 	{
 		mbseq[i] = *s++;
 		if((mbseq[i] & 0xc0) != 0x80)

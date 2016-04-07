@@ -2,6 +2,7 @@
 */
 #include <testfwk.h>
 #include <string.h>
+#include <stdlib.h>
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L
 #include <wchar.h>
 #endif
@@ -189,6 +190,11 @@ do_utf_8_sdcc (void)
   ASSERT (!strcmp (str1, str3));
   ASSERT (!strcmp (str1, str4));
   ASSERT (!strcmp (str1, str5));
+
+  ASSERT (!mblen(0, 0));
+  ASSERT (mblen(str1, 3) == 2);
+  ASSERT (mblen("test", 3) == 1);
+  ASSERT (mblen("", 3) == 0);
 #endif
 }
 

@@ -43,13 +43,6 @@
 #define NULL (void *)0
 #endif
 
-#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90)
-int abs(int j) __preserves_regs(b, c, iyl, iyh);
-#else
-int abs(int j);
-#endif
-long int labs(long int j);
-
 extern float atof (const char *nptr);
 extern int atoi (const char *nptr);
 extern long int atol (const char *nptr);
@@ -87,6 +80,17 @@ inline void *aligned_alloc(size_t alignment, size_t size)
 #endif
 
 extern void free (void * ptr);
+
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90)
+int abs(int j) __preserves_regs(b, c, iyl, iyh);
+#else
+int abs(int j);
+#endif
+long int labs(long int j);
+
+#if __STDC_VERSION__ >= 199901L
+int mblen(const char *s, size_t n);
+#endif
 
 /* Bounds-checking interfaces from annex K of the C11 standard. */
 #if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__

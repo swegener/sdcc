@@ -96,6 +96,7 @@ COMMON_SDCC = \
   malloc.c \
   realloc.c \
   free.c \
+  mblen.c \
   printf_large.c \
   puts.c \
   gets.c \

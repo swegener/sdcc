@@ -4,6 +4,10 @@
 	  src/SDCCerr.h,
 	  src/SDCCerr.c:
 	  Fix bug #2488 by implementing hexadecimal floating constants.
+	* device/include/stdlib.h,
+	  device/lib/incl.mk,
+	  support/regression/tests/string.c:
+	  Implement mblen().
 
 2016-04-06 Philipp Klaus Krause <pkk AT spth.de>
 

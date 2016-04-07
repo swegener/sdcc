@@ -98,6 +98,10 @@ COMMON_SDCC = \
   free.c \
   mblen.c \
   wctomb.c \
+  mbrtoc32.c \
+  c32rtomb.c \
+  mbrtowc.c \
+  wcrtomb.c \
   printf_large.c \
   puts.c \
   gets.c \

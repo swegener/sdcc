@@ -37,6 +37,7 @@ extern int errno;
 
 #define EDOM        33  /* Math argument out of domain of functions */
 #define ERANGE      34  /* Math result not representable */
+#define	EILSEQ		84	/* Illegal byte sequence */
 
 /* Bounds-checking interfaces from annex K of the C11 standard. */
 #if defined (__STDC_WANT_LIB_EXT1__) && __STDC_WANT_LIB_EXT1__

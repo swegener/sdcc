@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    wchar.h - Extended and multibyte wide character utilitites
 
-   Copyright (c) 2015, Philipp Klaus Krause / pkk@spth.de
+   Copyright (c) 2015-2016, Philipp Klaus Krause / pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -36,6 +36,11 @@
   typedef unsigned int size_t;
 #endif
 
+#ifndef __MBSTATE_T_DEFINED
+#define __MBSTATE_T_DEFINED
+  typedef union {unsigned char c[3]; unsigned short int c16;} mbstate_t;
+#endif
+
 #ifndef __WINT_T_DEFINED
 #define __WINT_T_DEFINED
   typedef unsigned long int wint_t;
@@ -46,4 +51,7 @@ struct tm;
 #ifndef WEOF
   #define WEOF 0xfffffffful
 #endif
+
+size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps);
+size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);
 

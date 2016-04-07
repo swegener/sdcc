@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   wctomb.c - convert a wide character to a multibyte sequence
+   c32rtomb.c - convert a wide character to a multibyte sequence
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -26,42 +26,11 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include <stdlib.h>
+#include <uchar.h>
+#include <wchar.h>
 
-int wctomb(char *s, wchar_t wc)
+size_t c32rtomb(char *restrict s, char32_t c32, mbstate_t *restrict ps)
 {
-	unsigned char n = 0;
-
-	if(!s)
-		return(0);
-
-	if(wc < 0x80)
-	{
-		s[0] = wc;
-		return(1);
-	}
-	else if(wc < 0x800)
-	{
-		s[0] = (wc >> 6) & 0x1f | 0xc0;
-		s[1] = (wc >> 0) & 0x3f | 0x80;
-		return(2);
-	}
-	else if(wc < 0x10000)
-	{
-		s[0] = (wc >> 12) & 0x0f | 0xe0;
-		s[1] = (wc >> 6) & 0x3f  | 0x80;
-		s[2] = (wc >> 0) & 0x3f  | 0x80;
-		return(3);
-	}
-	else if(wc < 0x110000)
-	{
-		s[0] = (wc >> 18) & 0x07 | 0xf0;
-		s[1] = (wc >> 12) & 0x3f | 0x80;
-		s[2] = (wc >> 6) & 0x3f  | 0x80;
-		s[3] = (wc >> 0) & 0x3f  | 0x80;
-		return(4);
-	}
-	else
-		return(-1);
+	return(wcrtomb(s, c32, ps));
 }
 

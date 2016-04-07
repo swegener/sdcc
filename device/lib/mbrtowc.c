@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   wctomb.c - convert a wide character to a multibyte sequence
+   mbrtowc.c - convert a multibyte sequence to a wide character
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -26,42 +26,72 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+#include <wchar.h>
 #include <stdlib.h>
+#include <errno.h>
 
-int wctomb(char *s, wchar_t wc)
+size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps)
 {
-	unsigned char n = 0;
+	unsigned char first_byte;
+	unsigned char seqlen;
+	char mbseq[4];
+	wchar_t codepoint;
+	unsigned char i;
+	static mbstate_t sps;
 
 	if(!s)
-		return(0);
+		return(mbrtowc(0, "", 1, ps));
+	if(!n)
+		goto eilseq;
+	if(!ps)
+	{
+		ps = &sps;
+	}
 
-	if(wc < 0x80)
+	for(i = 0; ps->c[i] && i < 3; i++)
+		mbseq[i] = ps->c[i];
+
+	seqlen = 1;
+	first_byte = ps->c[0] ? ps->c[0] : *s;
+
+	if(first_byte & 0x80)
 	{
-		s[0] = wc;
-		return(1);
+		while (first_byte & (0x80 >> seqlen))
+			seqlen++;
+		first_byte &= (0xff >> (seqlen + 1));
 	}
-	else if(wc < 0x800)
+
+	if(seqlen > 4)
+		goto eilseq;
+
+	if(i + n < seqlen) // Incomplete multibyte character
 	{
-		s[0] = (wc >> 6) & 0x1f | 0xc0;
-		s[1] = (wc >> 0) & 0x3f | 0x80;
-		return(2);
+		for(;n-- ; i++)
+			ps->c[i] = *s++;
+		return(-2);
 	}
-	else if(wc < 0x10000)
+
+	for(n = 1, i = 1; i < seqlen; i++, n++)
 	{
-		s[0] = (wc >> 12) & 0x0f | 0xe0;
-		s[1] = (wc >> 6) & 0x3f  | 0x80;
-		s[2] = (wc >> 0) & 0x3f  | 0x80;
-		return(3);
+		mbseq[i] = *s++;
+		if((mbseq[i] & 0xc0) != 0x80)
+			goto eilseq;
 	}
-	else if(wc < 0x110000)
+
+	codepoint = first_byte;
+
+	for(s = mbseq + 1, seqlen--; seqlen; seqlen--)
 	{
-		s[0] = (wc >> 18) & 0x07 | 0xf0;
-		s[1] = (wc >> 12) & 0x3f | 0x80;
-		s[2] = (wc >> 6) & 0x3f  | 0x80;
-		s[3] = (wc >> 0) & 0x3f  | 0x80;
-		return(4);
+		codepoint <<= 6;
+		codepoint |= (*s & 0x3f);
+		s++;
 	}
-	else
-		return(-1);
+
+	*pwc = codepoint;
+	return(n);
+
+eilseq:
+	errno = EILSEQ;
+	return(-1);
 }
 

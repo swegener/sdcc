@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    uchar.h: Unicode utilities
 
-   Copyright (C) 2015, Philipp Klaus Krause, pkk@spth.de
+   Copyright (C) 2015-2016, Philipp Klaus Krause, pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -29,6 +29,11 @@
 #ifndef __SDCC_UCHAR_H
 #define __SDCC_UCHAR_H 1
 
+#ifndef __MBSTATE_T_DEFINED
+#define __MBSTATE_T_DEFINED
+  typedef union {unsigned char c[3]; unsigned short int c16;} mbstate_t;
+#endif
+
 #ifndef __SIZE_T_DEFINED
 #define __SIZE_T_DEFINED
   typedef unsigned int size_t;
@@ -43,6 +48,9 @@
 #define __CHAR32_T_DEFINED
   typedef unsigned long int char32_t;
 #endif
+
+size_t mbrtoc32(char32_t *restrict pc32, const char *restrict s, size_t n, mbstate_t *restrict ps);
+size_t c32rtomb(char *restrict s, char32_t c32, mbstate_t *restrict ps);
 
 #endif
 

@@ -1,5 +1,18 @@
 2016-04-07 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/include/errno.h,
+	  device/include/uchar.h,
+	  device/include/wchar.h,
+	  device/lib/mbrtoc32.c,
+	  device/lib/c32rtomb.c,
+	  device/lib/mbrtowc.c,
+	  device/lib/wcrtomb.c,
+	  device/lib/incl.mk,
+	  support/regression/tests/wchar.c:
+	  Implement mbrtoc32, c32rtomb(), mbrtowc(), wcrtomb().
+
+2016-04-07 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCC.lex,
 	  src/SDCCerr.h,
 	  src/SDCCerr.c:

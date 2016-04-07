@@ -27,6 +27,7 @@ D       [0-9]
 L       [a-zA-Z_$]
 H       [a-fA-F0-9]
 E       [Ee][+-]?{D}+
+BE      [Pp][+-]?{D}+
 FS      (f|F|l|L)
 IS      (u|U|l|L)*
 CP      (L|u|U)
@@ -191,18 +192,21 @@ static void checkCurrFile (const char *s);
   yylval.val = constVal (yytext);
   return CONSTANT;
 }
-0[xX]{H}+{IS}?          { count (); yylval.val = constVal (yytext); return CONSTANT; }
-0[0-7]*{IS}?            { count (); yylval.val = constVal (yytext); return CONSTANT; }
-[1-9]{D}*{IS}?          { count (); yylval.val = constVal (yytext); return CONSTANT; }
-{CP}?'(\\.|[^\\'])+'    { count (); yylval.val = charVal (yytext); return CONSTANT; /* ' make syntax highlighter happy */ }
-{D}+{E}{FS}?            { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
-{D}*"."{D}+({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
-{D}+"."{D}*({E})?{FS}?  { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
-\"                      { count (); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
-"L\""                   { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral ('L'); return STRING_LITERAL; }
-"u8\""                  { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
-"u\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('u'); return STRING_LITERAL; }
-"U\""                   { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('U'); return STRING_LITERAL; }
+0[xX]{H}+{IS}?               { count (); yylval.val = constVal (yytext); return CONSTANT; }
+0[0-7]*{IS}?                 { count (); yylval.val = constVal (yytext); return CONSTANT; }
+[1-9]{D}*{IS}?               { count (); yylval.val = constVal (yytext); return CONSTANT; }
+{CP}?'(\\.|[^\\'])+'         { count (); yylval.val = charVal (yytext); return CONSTANT; /* ' make syntax highlighter happy */ }
+{D}+{E}{FS}?                 { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
+{D}*"."{D}+({E})?{FS}?       { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
+{D}+"."{D}*({E})?{FS}?       { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
+0[xX]{H}+{BE}{FS}?           { count (); if (!options.std_c99) werror(E_HEXFLOAT_C99); yylval.val = constFloatVal (yytext); return CONSTANT; }
+0[xX]{H}*"."{H}+({BE})?{FS}? { count (); if (!options.std_c99) werror(E_HEXFLOAT_C99); yylval.val = constFloatVal (yytext); return CONSTANT; }
+0[xX]{H}+"."{H}*({BE})?{FS}? { count (); if (!options.std_c99) werror(E_HEXFLOAT_C99); yylval.val = constFloatVal (yytext); return CONSTANT; }
+\"                           { count (); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"L\""                        { count (); if (!options.std_c95) werror(E_WCHAR_STRING_C95); yylval.yystr = stringLiteral ('L'); return STRING_LITERAL; }
+"u8\""                       { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral (0); return STRING_LITERAL; }
+"u\""                        { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('u'); return STRING_LITERAL; }
+"U\""                        { count (); if (!options.std_c11) werror(E_WCHAR_STRING_C11); yylval.yystr = stringLiteral ('U'); return STRING_LITERAL; }
 ">>="                   { count (); yylval.yyint = RIGHT_ASSIGN; return RIGHT_ASSIGN; }
 "<<="                   { count (); yylval.yyint = LEFT_ASSIGN; return LEFT_ASSIGN; }
 "+="                    { count (); yylval.yyint = ADD_ASSIGN; return ADD_ASSIGN; }

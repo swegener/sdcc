@@ -527,6 +527,8 @@ struct
     "wide character string of type u8, u, U requires C11 or later", 0},
   { W_UNKNOWN_REG, ERROR_LEVEL_WARNING,
     "unknown register specification", 0},
+  { E_HEXFLOAT_C99, ERROR_LEVEL_ERROR,
+    "hexadecimal floating constant requires ISO C99 or later", 0},
 };
 
 /* -------------------------------------------------------------------------------

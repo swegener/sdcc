@@ -262,6 +262,7 @@ enum {
   E_WCHAR_STRING_C95            = 233, /* wide character string literal requires ISO C 95 or later */
   E_WCHAR_STRING_C11            = 234, /* wide character string literal requires ISO C 11 or later */
   W_UNKNOWN_REG                 = 235, /* unknown register specified */
+  E_HEXFLOAT_C99                = 236, /* hexadecimal floating constant requires ISO C99 or later */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

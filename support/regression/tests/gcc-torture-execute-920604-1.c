@@ -9,10 +9,9 @@
 #endif
 
 // TODO: Enable when sdcc supports long long mod!
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 long long
-mod (a, b)
-     long long a, b;
+mod (long long a, long long b)
 {
   return a % b;
 }
@@ -21,9 +20,8 @@ mod (a, b)
 void
 testTortureExecute (void)
 {
-#if 0
-  mod (1LL, 2LL);
-  exit (0);
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+  ASSERT (mod (1LL, 2LL) == 1);
 #endif
 }
 

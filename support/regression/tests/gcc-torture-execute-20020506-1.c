@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0 // TODO: Enable when support for long long literals is complete!
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 /* Copyright (C) 2002  Free Software Foundation.
 
    Test that (A & C1) op C2 optimizations behave correctly where C1 is
@@ -28,7 +28,7 @@ void test7 (long long l, int set);
 void test8 (unsigned long long l, int set);
 
 #ifndef LONG_LONG_MAX
-#define LONG_LONG_MAX __LONG_LONG_MAX__
+#define LONG_LONG_MAX LLONG_MAX
 #endif
 #ifndef LONG_LONG_MIN
 #define LONG_LONG_MIN (-LONG_LONG_MAX-1)
@@ -298,7 +298,8 @@ test8 (unsigned long long l, int set)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   test1 (0, 0);
   test1 (SCHAR_MAX, 0);
   test1 (SCHAR_MIN, 1);
@@ -340,6 +341,7 @@ testTortureExecute (void)
   test8 (ULONG_LONG_MAX, 1);
 
   return;
+#endif
 #endif
 }
 

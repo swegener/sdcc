@@ -1,3 +1,14 @@
+2016-04-09 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/gcc-torture-execute-20020506-1.c
+	* support/regression/tests/gcc-torture-execute-20041011-1.c
+	* support/regression/tests/gcc-torture-execute-20050111-1.c
+	* support/regression/tests/gcc-torture-execute-20060127-1.c
+	* support/regression/tests/gcc-torture-execute-920604-1.c
+	* support/regression/tests/gcc-torture-execute-921029-1.c
+	* support/regression/tests/gcc-torture-execute-941015-1.c
+	  Enabled.
+ 
 2016-04-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/errno.h,

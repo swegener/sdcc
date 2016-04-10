@@ -77,7 +77,7 @@ extern set *externs;
    for the next function.
 */
 static int max_key = 0;
-static int GpsuedoStkPtr = 0;
+static int GpseudoStkPtr = 0;
 
 pCodeOp *pic16_popGetImmd (char *name, unsigned int offset, int index);
 
@@ -2745,11 +2745,11 @@ assignResultValue (operand * oper, int res_size, int rescall)
 //      debugf("WARNING: Possible bug when returning more than 4-bytes\n");
           while (size--)
             {
-//          DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpsuedoStkPtr);
+//          DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpseudoStkPtr);
 //          DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
 
-              popaopidx (AOP (oper), size, GpsuedoStkPtr);
-              GpsuedoStkPtr++;
+              popaopidx (AOP (oper), size, GpseudoStkPtr);
+              GpseudoStkPtr++;
             }
 
           /* fix stack */
@@ -2760,7 +2760,7 @@ assignResultValue (operand * oper, int res_size, int rescall)
     {
       int areg = 0;             /* matching argument register */
 
-//      debugf("_G.useWreg = %d\tGpsuedoStkPtr = %d\n", _G.useWreg, GpsuedoStkPtr);
+//      debugf("_G.useWreg = %d\tGpseudoStkPtr = %d\n", _G.useWreg, GpseudoStkPtr);
       areg = SPEC_ARGREG (OP_SYM_ETYPE (oper)) - 1;
 
 
@@ -2768,12 +2768,12 @@ assignResultValue (operand * oper, int res_size, int rescall)
       /* I hope this code will not be called from somewhere else in the future!
        * We manually set the pseudo stack pointer in genReceive. - dw
        */
-      if (!GpsuedoStkPtr && _G.useWreg)
+      if (!GpseudoStkPtr && _G.useWreg)
         {
-//        DEBUGpic16_emitcode("; ", "pop %d", GpsuedoStkPtr);
+//        DEBUGpic16_emitcode("; ", "pop %d", GpseudoStkPtr);
 
           /* The last byte in the assignment is in W */
-          if (areg <= GpsuedoStkPtr)
+          if (areg <= GpseudoStkPtr)
             {
               size--;
 
@@ -2790,16 +2790,16 @@ assignResultValue (operand * oper, int res_size, int rescall)
               offset++;
 //          debugf("receive from WREG\n", 0);
             }
-          GpsuedoStkPtr++;      /* otherwise the calculation below fails (-_G.useWreg) */
+          GpseudoStkPtr++;      /* otherwise the calculation below fails (-_G.useWreg) */
         }
-//      GpsuedoStkPtr++;
+//      GpseudoStkPtr++;
       _G.stack_lat = AOP_SIZE (oper) - 1;
 
       while (size)
         {
           size--;
-          GpsuedoStkPtr++;
-          popaopidx (AOP (oper), offset, GpsuedoStkPtr - _G.useWreg);
+          GpseudoStkPtr++;
+          popaopidx (AOP (oper), offset, GpseudoStkPtr - _G.useWreg);
 //        debugf("receive from STACK\n", 0);
           offset++;
         }
@@ -2922,7 +2922,7 @@ genCall (iCode * ic)
 //      saveRegisters(ic);
 
   /* initialise stackParms for IPUSH pushes */
-//      stackParms = psuedoStkPtr;
+//      stackParms = pseudoStkPtr;
 //      fprintf(stderr, "%s:%d ic parmBytes = %d\n", __FILE__, __LINE__, ic->parmBytes);
   fname = OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name;
   inwparam = (inWparamList (OP_SYMBOL (IC_LEFT (ic))->name)) || (FUNC_ISWPARAM (OP_SYM_TYPE (IC_LEFT (ic))));
@@ -2935,7 +2935,7 @@ genCall (iCode * ic)
   if (_G.sendSet)
     {
       iCode *sic;
-      int psuedoStkPtr = -1;
+      int pseudoStkPtr = -1;
       int firstTimeThruLoop = 1;
 
 
@@ -2964,7 +2964,7 @@ genCall (iCode * ic)
               while (size--)
                 {
                   DEBUGpic16_emitcode ("; ", "%d left %s", __LINE__, pic16_AopType (AOP_TYPE (IC_LEFT (sic))));
-                  DEBUGpic16_emitcode ("; ", "push %d", psuedoStkPtr - 1);
+                  DEBUGpic16_emitcode ("; ", "push %d", pseudoStkPtr - 1);
 
                   if (!firstTimeThruLoop)
                     {
@@ -2974,7 +2974,7 @@ genCall (iCode * ic)
                        * passed in W. */
 
                       pushw ();
-//                  --psuedoStkPtr;             // sanity check
+//                  --pseudoStkPtr;             // sanity check
                       use_wreg = 1;
                     }
 
@@ -2993,7 +2993,7 @@ genCall (iCode * ic)
               while (size--)
                 {
                   DEBUGpic16_emitcode ("; ", "%d left %s", __LINE__, pic16_AopType (AOP_TYPE (IC_LEFT (sic))));
-                  DEBUGpic16_emitcode ("; ", "push %d", psuedoStkPtr - 1);
+                  DEBUGpic16_emitcode ("; ", "push %d", pseudoStkPtr - 1);
 
 //                pushaop(AOP(IC_LEFT(sic)), size);
                   pic16_mov2w (AOP (IC_LEFT (sic)), size);
@@ -3026,7 +3026,7 @@ genCall (iCode * ic)
   /* make the call */
   pic16_emitpcode (POC_CALL, pic16_popGetWithString (fname));
 
-  GpsuedoStkPtr = 0;
+  GpseudoStkPtr = 0;
 
   /* if we need to assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic))
@@ -3096,7 +3096,7 @@ genPcall (iCode * ic)
   if (_G.sendSet)
     {
       iCode *sic;
-      int psuedoStkPtr = -1;
+      int pseudoStkPtr = -1;
 
       /* reverse sendSet if function is not reentrant */
       if (!IFFUNC_ISREENT (fntype))
@@ -3117,7 +3117,7 @@ genPcall (iCode * ic)
           while (size--)
             {
               DEBUGpic16_emitcode ("; ", "%d left %s", __LINE__, pic16_AopType (AOP_TYPE (IC_LEFT (sic))));
-              DEBUGpic16_emitcode ("; ", "push %d", psuedoStkPtr - 1);
+              DEBUGpic16_emitcode ("; ", "push %d", pseudoStkPtr - 1);
 
               pic16_mov2w (AOP (IC_LEFT (sic)), size);
               pushw ();
@@ -3168,7 +3168,7 @@ genPcall (iCode * ic)
 
   pic16_freeAsmop (IC_LEFT (ic), NULL, ic, TRUE);
 
-  GpsuedoStkPtr = 0;
+  GpseudoStkPtr = 0;
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic))
        && (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic)))
@@ -3250,7 +3250,7 @@ genFunction (iCode * ic)
 
   pic16_labelOffset += (max_key + 4);
   max_key = 0;
-  GpsuedoStkPtr = 0;
+  GpseudoStkPtr = 0;
   _G.nRegsSaved = 0;
 
   ftype = operandType (IC_LEFT (ic));
@@ -3738,13 +3738,13 @@ genRet (iCode * ic)
       /* >32-bits, setup stack and FSR0 */
       while (size--)
         {
-//                      DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpsuedoStkPtr);
+//                      DEBUGpic16_emitcode("; ", "POC_MOVLW %d", GpseudoStkPtr);
 //                      DEBUGpic16_emitcode("; ", "POC_MOVFW PLUSW2");
 
           pic16_pushpCodeOp (pic16_popGet (AOP (IC_LEFT (ic)), size));
 
 //                      popaopidx(AOP(oper), size, GpseudoStkPtr);
-          GpsuedoStkPtr++;
+          GpseudoStkPtr++;
         }
 
       /* setup FSR0 */
@@ -11254,9 +11254,9 @@ genReceive (iCode * ic)
       _G.accInUse--;
 
       /* set pseudo stack pointer to where it should be - dw */
-      GpsuedoStkPtr = ic->parmBytes;
+      GpseudoStkPtr = ic->parmBytes;
 
-      /* setting GpsuedoStkPtr has side effects here: */
+      /* setting GpseudoStkPtr has side effects here: */
       /* FIXME: What's the correct size of the return(ed) value?
        *        For now, assuming '4' as before... */
       assignResultValue (IC_RESULT (ic), 4, 0);

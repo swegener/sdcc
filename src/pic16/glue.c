@@ -101,7 +101,7 @@ unsigned int pic16aopLiteral (value *val, int offset)
 
 iCode *tic;
 symbol *nsym;
-char tbuffer[512], *tbuf=tbuffer;;
+char tbuffer[512], *tbuf=tbuffer;
 
 
 /*-----------------------------------------------------------------*/

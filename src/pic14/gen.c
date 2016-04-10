@@ -64,7 +64,7 @@ static void genEndCritical (iCode * ic);
  */
 static int max_key = 0;
 static int labelOffset = 0;
-static int GpsuedoStkPtr = 0;
+static int GpseudoStkPtr = 0;
 static int pic14_inISR = 0;
 
 static char *zero = "0x00";
@@ -1898,8 +1898,8 @@ assignResultValue (operand * oper)
   /* assign MSB first (passed via WREG) */
   while (size--)
     {
-      get_returnvalue (oper, size, offset + GpsuedoStkPtr);
-      GpsuedoStkPtr++;
+      get_returnvalue (oper, size, offset + GpseudoStkPtr);
+      GpseudoStkPtr++;
     }
 }
 
@@ -2094,7 +2094,7 @@ genCall (iCode * ic)
        * in registers. (The pCode optimizer will get
        * rid of most of these :).
        */
-      int psuedoStkPtr = -1;
+      int pseudoStkPtr = -1;
       int firstTimeThruLoop = 1;
 
       _G.sendSet = reverseSet (_G.sendSet);
@@ -2104,7 +2104,7 @@ genCall (iCode * ic)
         {
 
           aopOp (IC_LEFT (sic), sic, FALSE);
-          psuedoStkPtr += AOP_SIZE (IC_LEFT (sic));
+          pseudoStkPtr += AOP_SIZE (IC_LEFT (sic));
           freeAsmop (IC_LEFT (sic), NULL, sic, FALSE);
         }
 
@@ -2125,7 +2125,7 @@ genCall (iCode * ic)
                    * then we need to save the parameter in a temporary
                    * register. The last byte of the last parameter is
                    * passed in W. */
-                  emitpcode (POC_MOVWF, popRegFromIdx (Gstack_base_addr - --psuedoStkPtr));
+                  emitpcode (POC_MOVWF, popRegFromIdx (Gstack_base_addr - --pseudoStkPtr));
 
                 }
               firstTimeThruLoop = 0;
@@ -2151,26 +2151,34 @@ genCall (iCode * ic)
    * file (might include this in the PAGESEL pass).
    */
   isExtern = IS_EXTERN (sym->etype) || pic14_inISR;
+#if 0
   if (isExtern)
     {
       /* Extern functions and ISRs maybe on a different page;
        * must call pagesel */
+#endif
       emitpcode (POC_PAGESEL, popGetWithString (name, 1));
+#if 0
     }
+#endif
+
   emitpcode (POC_CALL, popGetWithString (name, isExtern));
+#if 0
   if (isExtern)
     {
       /* May have returned from a different page;
        * must use pagesel to restore PCLATH before next
        * goto or call instruction */
+#endif
       emitpcode (POC_PAGESEL, popGetWithString ("$", 0));
+#if 0
     }
-  GpsuedoStkPtr = 0;
+#endif
+  GpseudoStkPtr = 0;
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
        (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
-
       _G.accInUse++;
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;
@@ -2189,8 +2197,6 @@ genCall (iCode * ic)
   /* if we hade saved some registers then unsave them */
   if (ic->regsSaved && !IFFUNC_CALLEESAVES (dtype))
     unsaveRegisters (ic);
-
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2231,7 +2237,6 @@ genPcall (iCode * ic)
   /* if send set is not empty, assign parameters */
   if (_G.sendSet)
     {
-
       DEBUGpic14_emitcode ("; ***", "%s  %d - WARNING arg-passing to indirect call not supported", __FUNCTION__, __LINE__);
       /* no way to pass args - W always gets used to make the call */
     }
@@ -2276,7 +2281,7 @@ genPcall (iCode * ic)
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;
 
-      GpsuedoStkPtr = 0;
+      GpseudoStkPtr = 0;
 
       assignResultValue (IC_RESULT (ic));
 
@@ -2291,7 +2296,6 @@ genPcall (iCode * ic)
      unsave them */
   if (ic->regsSaved)
     unsaveRegisters (ic);
-
 }
 
 /*-----------------------------------------------------------------*/
@@ -2332,7 +2336,7 @@ genFunction (iCode * ic)
 
   labelOffset += (max_key + 4);
   max_key = 0;
-  GpsuedoStkPtr = 0;
+  GpseudoStkPtr = 0;
   _G.nRegsSaved = 0;
   /* create the function header */
   pic14_emitcode (";", "-----------------------------------------");
@@ -7477,7 +7481,7 @@ genReceive (iCode * ic)
       _G.accInUse++;
       aopOp (IC_RESULT (ic), ic, FALSE);
       _G.accInUse--;
-      GpsuedoStkPtr = ic->parmBytes;    // address used arg on stack
+      GpseudoStkPtr = ic->parmBytes;    // address used arg on stack
       assignResultValue (IC_RESULT (ic));
     }
 

@@ -98,20 +98,18 @@ debugLog (const char *fmt,...)
         if (!debug || !dstFileName)
                 return;
 
-
         if (!debugF)
         {
                 /* create the file name */
-                strcpy (buffer, dstFileName);
-                strcat (buffer, ".d");
+                SNPRINTF(buffer, sizeof(buffer), "%s.d", dstFileName);
 
                 if (!(debugF = fopen (buffer, (append ? "a+" : "w"))))
                 {
                         werror (E_FILE_OPEN_ERR, buffer);
                         exit (1);
                 }
-                append = 1;             // Next time debugLog is called, we'll append the debug info
 
+                append = 1;             // Next time debugLog is called, we'll append the debug info
         }
 
         va_start (ap, fmt);
@@ -461,7 +459,8 @@ void initStack(int base_address, int size, int shared)
         for(i = 0; i<size; i++) {
                 char buffer[16];
                 reg_info *r;
-                SNPRINTF(&buffer[0], 16, "STK%02d", i);
+
+                SNPRINTF(buffer, sizeof(buffer), "STK%02d", i);
                 // multi-bank device, sharebank prohibited by user
                 r = newReg(REG_STK, PO_GPR_TEMP, base_address--, buffer, 1, shared ? (pic ? pic->bankMask : 0x180) : 0x0);
                 r->isFixed = TRUE;

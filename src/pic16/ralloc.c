@@ -130,8 +130,7 @@ debugLog (const char *fmt,...)
   if (!debugF)
     {
       /* create the file name */
-      strcpy (buffer, dstFileName);
-      strcat (buffer, ".d");
+      SNPRINTF(buffer, sizeof(buffer), "%s.d", dstFileName);
 
       if (!(debugF = fopen (buffer, (append ? "a+" : "w"))))
         {
@@ -139,7 +138,6 @@ debugLog (const char *fmt,...)
           exit (1);
         }
       append = 1;               // Next time debubLog is called, we'll append the debug info
-
     }
 
   va_start (ap, fmt);

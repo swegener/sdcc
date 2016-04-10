@@ -3558,8 +3558,7 @@ void pic16_pcode_test(void)
     char buffer[100];
 
     /* create the file name */
-    strcpy(buffer,dstFileName);
-    strcat(buffer,".p");
+    SNPRINTF(buffer, sizeof(buffer), "%s.p", dstFileName);
 
     if(!(pFile = fopen(buffer, "w" ))) {
       werror(E_FILE_OPEN_ERR,buffer);
@@ -5209,7 +5208,7 @@ static void genericPrint(FILE *of, pCode *pc)
     {
       char str[256];
 
-      pic16_pCode2str(str, 256, pc);
+      pic16_pCode2str(str, sizeof(str), pc);
 
       fprintf(of,"%s",str);
       /* Debug */
@@ -10718,7 +10717,7 @@ static int pic16_pCodeIsAlive (pCode *pc) {
 #if 0
   {
     char buf[256];
-    pic16_pCode2str (buf, 256, pc);
+    pic16_pCode2str (buf, sizeof(buf), pc);
     fprintf (stderr, "%s: pCode %p (%s) is dead.\n", __FUNCTION__, pc, buf);
   }
 #endif

@@ -1,3 +1,23 @@
+2016-04-10 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* src/pic14/gen.c,
+	  src/pic16/gen.c:
+	  Fixed typo from "psuedo" to "pseudo".
+
+	* src/pic14/gen.c:
+	  Fixed bug in genCall() function: The PAGESEL instructions must
+	  be given unconditionally. (In this context: "Each function has
+	  its own code section.")
+
+	* src/pic14/pcode.c,
+	  src/pic16/pcode.c,
+	  src/pic14/ralloc.c,
+	  src/pic16/ralloc.c:
+	  Fix potential buffer overflow.
+
+	* src/pic14/glue.c:
+	  Minor code formatting.
+
 2016-04-09 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/gcc-torture-execute-20020506-1.c

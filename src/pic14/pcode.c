@@ -2153,8 +2153,7 @@ void pcode_test(void)
 		char buffer[100];
 
 		/* create the file name */
-		strcpy(buffer,dstFileName);
-		strcat(buffer,".p");
+                SNPRINTF(buffer, sizeof(buffer), "%s.p", dstFileName);
 
 		if( !(pFile = fopen(buffer, "w" ))) {
 			werror(E_FILE_OPEN_ERR,buffer);
@@ -3553,7 +3552,7 @@ static void genericPrint(FILE *of, pCode *pc)
         genericPrint(of,PCODE(pci->cline));
 
 
-      pCode2str(str, 256, pc);
+      pCode2str(str, sizeof(str), pc);
 
       fprintf(of,"%s",str);
 

@@ -92,7 +92,7 @@ long int labs(long int j);
 
 #if __STDC_VERSION__ >= 199901L
 int mblen(const char *s, size_t n);
-
+int mbtowc(wchar_t *pwc, const char *restrict s, size_t n);
 int wctomb(char *s, wchar_t wc);
 #endif
 

@@ -97,6 +97,7 @@ COMMON_SDCC = \
   realloc.c \
   free.c \
   mblen.c \
+  mbtowc.c \
   wctomb.c \
   mbrtoc32.c \
   c32rtomb.c \

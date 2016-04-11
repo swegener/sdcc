@@ -1,3 +1,16 @@
+2016-04-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Enable iy register content tracking optimization.
+	* device/include/stdlib.h,
+	  device/lib/mbtowc.c,
+	  device/lib/incl.mk,
+	  support/regression/tests/wchar.c:
+	  Implement mbtowc().
+	* device/include/wchar.h,
+	  device/lib/mbrlen.c:
+	  Implement mbrlen().
+
 2016-04-10 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* src/pic14/gen.c,
@@ -28,7 +41,7 @@
 	* support/regression/tests/gcc-torture-execute-921029-1.c
 	* support/regression/tests/gcc-torture-execute-941015-1.c
 	  Enabled.
- 
+
 2016-04-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/errno.h,

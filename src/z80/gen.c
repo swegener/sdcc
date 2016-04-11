@@ -1868,7 +1868,7 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
 
   if (isPtr (pair))
     {
-      if (pairId == PAIR_HL)
+      if (pairId == PAIR_HL || pairId == PAIR_IY)
         {
           if (pairId == PAIR_HL && base[0] == '0')      // Ugly workaround
             {
@@ -1891,6 +1891,8 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
                       adjustPair (pair, &_G.pairs[pairId].offset, offset);
                       goto adjusted;
                     }
+                  if (pairId == PAIR_IY && offset == _G.pairs[pairId].offset)
+                    goto adjusted;
                 }
             }
         }
@@ -12147,7 +12149,6 @@ genZ80Code (iCode * lic)
         }
       regalloc_dry_run_cost = 0;
       genZ80iCode (ic);
-      /*emitDebug("; iCode %d total cost: %d", ic->key, (int)(regalloc_dry_run_cost));*/
     }
 
 

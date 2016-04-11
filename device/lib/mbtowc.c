@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   mbrtowc.c - convert a multibyte sequence to a wide character
+   mbtowc.c - convert a multibyte sequence to a wide character
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -27,31 +27,18 @@
 -------------------------------------------------------------------------*/
 
 #include <wchar.h>
-#include <errno.h>
 
-size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps)
+int mbtowc(wchar_t *pwc, const char *restrict s, size_t n)
 {
-	unsigned char first_byte;
-	unsigned char seqlen;
-	char mbseq[4];
 	wchar_t codepoint;
-	unsigned char i, j;
-	static mbstate_t sps;
+	unsigned char seqlen, i;
+	unsigned char first_byte;
 
 	if(!s)
-		return(mbrtowc(0, "", 1, ps));
-	if(!n)
-		goto eilseq;
-	if(!ps)
-	{
-		ps = &sps;
-	}
-
-	for(i = 0; ps->c[i] && i < 3; i++)
-		mbseq[i] = ps->c[i];
+		return(0);
 
 	seqlen = 1;
-	first_byte = ps->c[0] ? ps->c[0] : *s;
+	first_byte = *s;
 
 	if(first_byte & 0x80)
 	{
@@ -60,29 +47,16 @@ size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_
 		first_byte &= (0xff >> (seqlen + 1));
 	}
 
-	if(seqlen > 4)
-		goto eilseq;
+	if(n < seqlen)
+		return(-1);
 
-	if(i + n < seqlen) // Incomplete multibyte character
-	{
-		for(;n-- ; i++)
-			ps->c[i] = *s++;
-		return(-2);
-	}
-
-	for(j = 0; j < i; j++)
-		ps->c[j] = 0;
-
-	for(n = 1, i = i ? i : 1; i < seqlen; i++, n++)
-	{
-		mbseq[i] = *s++;
-		if((mbseq[i] & 0xc0) != 0x80)
-			goto eilseq;
-	}
+	for(i = 1; i < seqlen; i++)
+		if((s[i] & 0xc0) != 0x80)
+			return(-1);
 
 	codepoint = first_byte;
 
-	for(s = mbseq + 1, seqlen--; seqlen; seqlen--)
+	for(s++, i = seqlen - 1; i; i--)
 	{
 		codepoint <<= 6;
 		codepoint |= (*s & 0x3f);
@@ -90,10 +64,6 @@ size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_
 	}
 
 	*pwc = codepoint;
-	return(n);
-
-eilseq:
-	errno = EILSEQ;
-	return(-1);
+	return(seqlen);
 }
 

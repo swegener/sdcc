@@ -1,3 +1,13 @@
+2016-04-12 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/lib/pic14/configure.ac,
+	  device/lib/pic14/Makefile.in,
+	  device/lib/pic14/libm/Makefile.in,
+	  device/lib/pic14/libsdcc/enhanced/Makefile.in,
+	  device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.in,
+	  device/lib/pic14/libsdcc/regular/Makefile.in:
+	  Fixed bug: #2482 Link error with pic16f1827
+
 2016-04-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

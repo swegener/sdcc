@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   wcrtomb.c - convert a wide character to a multibyte sequence
+   c32rtomb.c - convert UTF-16 to UTF-8
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -26,14 +26,29 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include <wchar.h>
+#include <uchar.h>
 
 #include <stdlib.h>
 
-size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps)
+size_t c16rtomb(char *restrict s, char16_t c16, mbstate_t *restrict ps)
 {
-	ps;
+	wchar_t codepoint;
 
-	return(wctomb(s, wc));
+	if(ps->c[1] || ps->c[2]) // We already have the high surrogate. Now get the lowe surrogate
+	{
+		char16_t high_surrogate = ps->c[1] + (ps->c[2] << 8);
+		ps->c[1] = ps->c[2] = 0;
+		codepoint = (high_surrogate << 10) + c16 + 0x10000 - (0xd800 << 10) - 0xdc00;
+	}
+	else if (c16 < 0xd7ff || c16 >= 0xe000) // Basic multilingual plane.
+		codepoint = c16;
+	else // Get the high surrogate
+	{
+		ps->c[1] = c16 & 0xff;
+		ps->c[2] = c16 >> 8;
+		return(0);
+	}
+
+	return(wctomb(s, codepoint));
 }
 

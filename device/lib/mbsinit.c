@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   wcrtomb.c - convert a wide character to a multibyte sequence
+   mbsinit.c - determine conversion state
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -28,12 +28,8 @@
 
 #include <wchar.h>
 
-#include <stdlib.h>
-
-size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps)
+int mbsinit(const mbstate_t *ps)
 {
-	ps;
-
-	return(wctomb(s, wc));
+	return(!ps || !ps->c[0] && !ps->c[1] && !ps->c[2]);
 }
 

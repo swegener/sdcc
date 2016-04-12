@@ -1,3 +1,14 @@
+2016-04-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/uchar.h,
+	  device/include/wchar.h,
+	  device/lib/c16rtomb.c,
+	  device/lib/mbrtoc16.c,
+	  device/lib/mbsinit.c,
+	  device/lib/incl.mk,
+	  support/regression/tests/wchar.c:
+	  Implement c16rtomb(), mbrtoc16(), mbsinit().
+
 2016-04-12 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/lib/pic14/configure.ac,

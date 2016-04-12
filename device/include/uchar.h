@@ -31,7 +31,7 @@
 
 #ifndef __MBSTATE_T_DEFINED
 #define __MBSTATE_T_DEFINED
-  typedef union {unsigned char c[3]; unsigned short int c16;} mbstate_t;
+  typedef struct {unsigned char c[3];} mbstate_t;
 #endif
 
 #ifndef __SIZE_T_DEFINED
@@ -49,6 +49,8 @@
   typedef unsigned long int char32_t;
 #endif
 
+size_t mbrtoc16(char16_t *restrict pc16, const char *restrict s, size_t n, mbstate_t *restrict ps);
+size_t c16rtomb(char *restrict s, char16_t c16, mbstate_t *restrict ps);
 size_t mbrtoc32(char32_t *restrict pc32, const char *restrict s, size_t n, mbstate_t *restrict ps);
 size_t c32rtomb(char *restrict s, char32_t c32, mbstate_t *restrict ps);
 

@@ -27,18 +27,27 @@
 -------------------------------------------------------------------------*/
 
 #include <uchar.h>
+
+#include <limits.h>
 #include <wchar.h>
 
 size_t mbrtoc32(char32_t *restrict pc32, const char *restrict s, size_t n, mbstate_t *restrict ps)
 {
 	char32_t wc;
 	size_t ret;
+	static mbstate_t sps;
+
+	if(!ps)
+		ps = &sps;
 
 	if(!pc32)
 		return(mbrtowc(0, s, n, ps));
 
 	ret = mbrtowc(&wc, s, n, ps);
-	*pc32 = wc;
+
+	if(ret <= MB_LEN_MAX)
+		*pc32 = wc;
+
 	return(ret);
 }
 

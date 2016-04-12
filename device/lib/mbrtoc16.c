@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   wcrtomb.c - convert a wide character to a multibyte sequence
+   mbrtoc32.c - convert UTF-8 to UTF-16
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -26,14 +26,52 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+#include <uchar.h>
+
+#include <limits.h>
 #include <wchar.h>
 
-#include <stdlib.h>
-
-size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps)
+size_t mbrtoc16(char16_t *restrict pc16, const char *restrict s, size_t n, mbstate_t *restrict ps)
 {
-	ps;
+	char32_t codepoint;
+	size_t ret;
+	static mbstate_t sps;
+	char16_t low_surrogate;
 
-	return(wctomb(s, wc));
+	if(!s)
+		return(mbrtoc16(0, "", 1, ps));
+
+	if(!ps)
+		ps = &sps;
+
+	if(!ps->c[0] && (ps->c[1] || ps->c[2]))
+	{
+		if(pc16)
+			*pc16 = ps->c[1] + (ps->c[2] << 8);
+		ps->c[1] = ps->c[2] = 0;
+		return(-3);
+	}
+
+	ret = mbrtowc(&codepoint, s, n, ps);
+
+	if(ret > MB_LEN_MAX)
+		return(ret);
+
+	if (codepoint < 0xd7ff || codepoint >= 0xe000 && codepoint <= 0xffff) // Basic multilingual plane
+	{
+		if(pc16)
+			*pc16 = codepoint;
+		return(ret);
+	}
+
+	codepoint -= 0x100000;
+	if(pc16)
+		*pc16 = ((codepoint >> 10) & 0x3ff) + 0xd800;
+	low_surrogate = (codepoint & 0x3ff) + 0xdc00;
+	ps->c[0] = 0;
+	ps->c[1] = low_surrogate & 0xff;
+	ps->c[2] = low_surrogate >> 8;
+
+	return(ret);
 }
 

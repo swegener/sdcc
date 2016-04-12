@@ -38,7 +38,7 @@
 
 #ifndef __MBSTATE_T_DEFINED
 #define __MBSTATE_T_DEFINED
-  typedef union {unsigned char c[3]; unsigned short int c16;} mbstate_t;
+  typedef struct {unsigned char c[3];} mbstate_t;
 #endif
 
 #ifndef __WINT_T_DEFINED
@@ -52,6 +52,7 @@ struct tm;
   #define WEOF 0xfffffffful
 #endif
 
+int mbsinit(const mbstate_t *ps);
 size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
 size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps);
 size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);

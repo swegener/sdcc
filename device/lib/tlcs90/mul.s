@@ -31,13 +31,8 @@
 .globl	__mulint
 
 __mulint:
-	ld	hl, 2 (sp)
+	ld	bc, 2 (sp)
 	ld	de, 4 (sp)
-
-	;; Parameters:
-	;;	hl, de (left, right irrelevant)
-	ld	b,h
-	ld	c,l
 
 	;; 16-bit multiplication
 	;;

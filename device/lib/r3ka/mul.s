@@ -32,18 +32,11 @@
 
 __mulint:
         pop     af
-        pop     hl
+        pop     bc
         pop     de
         push    de
-        push    hl
+        push    bc
         push    af
-
-        ;; Fall through
-
-	;; Parameters:
-	;;	hl, de (left, right irrelevant)
-	ld	b,h
-	ld	c,l
 
 	;; 16-bit multiplication
 	;;

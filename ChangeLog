@@ -1,3 +1,9 @@
+2016-04-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2492.c:
+	  Fix bug #2492.
+
 2016-04-13 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/include/pic14/pic14devices.txt,

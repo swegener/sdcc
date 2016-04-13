@@ -6509,6 +6509,10 @@ genIfx (const iCode *ic)
           cost (2, 0);
         }
     }
+  else if (cond->aop->type == AOP_IMMD)
+    {
+      // An AOP_IMMD points to something valid, so it is not a null pointer. Just fall through to the unconditional jump generated below.
+    }
   else
     {
       if (!regalloc_dry_run)

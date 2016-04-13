@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:46 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-04-13 17:23:18 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -4775,13 +4775,13 @@ typedef union
 
   struct
     {
-    unsigned OPA2PCH            : 2;
+    unsigned PCH                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned PCH                : 2;
+    unsigned OPA2PCH            : 2;
     unsigned                    : 6;
     };
   } __OPA2CONbits_t;
@@ -4833,13 +4833,13 @@ typedef union
 
   struct
     {
-    unsigned OPA3PCH            : 2;
+    unsigned PCH                : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned PCH                : 2;
+    unsigned OPA3PCH            : 2;
     unsigned                    : 6;
     };
   } __OPA3CONbits_t;

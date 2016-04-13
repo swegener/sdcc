@@ -1,3 +1,12 @@
+2016-04-13 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/include/pic14/pic14devices.txt,
+	  device/non-free/include/pic14/*.h,
+	  device/non-free/include/pic16/*.h,
+	  device/non-free/lib/pic14/libdev/*.c,
+	  device/non-free/lib/pic16/libdev/*.c:
+	  Refreshed the device files.
+
 2016-04-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/uchar.h,

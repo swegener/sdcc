@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:59 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-04-13 17:23:23 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -3582,13 +3582,13 @@ typedef union
 
   struct
     {
-    unsigned DBR                : 6;
+    unsigned CWG1DBR            : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned CWG1DBR            : 6;
+    unsigned DBR                : 6;
     unsigned                    : 2;
     };
   } __CWG1DBRbits_t;
@@ -3718,13 +3718,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned CWG1MODE           : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned CWG1MODE           : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
   } __CWG1CON0bits_t;
@@ -5668,13 +5668,13 @@ typedef union
 
   struct
     {
-    unsigned LC1D1S             : 5;
+    unsigned D1S                : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned D1S                : 5;
+    unsigned LC1D1S             : 5;
     unsigned                    : 3;
     };
   } __CLC1SEL0bits_t;
@@ -5848,13 +5848,13 @@ typedef union
 
   struct
     {
-    unsigned LC1D4S             : 5;
+    unsigned D4S                : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned D4S                : 5;
+    unsigned LC1D4S             : 5;
     unsigned                    : 3;
     };
   } __CLC1SEL3bits_t;
@@ -6124,13 +6124,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 3;
+    unsigned LC2MODE            : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned LC2MODE            : 3;
+    unsigned MODE               : 3;
     unsigned                    : 5;
     };
   } __CLC2CONbits_t;
@@ -6236,13 +6236,13 @@ typedef union
 
   struct
     {
-    unsigned LC2D1S             : 5;
+    unsigned D1S                : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned D1S                : 5;
+    unsigned LC2D1S             : 5;
     unsigned                    : 3;
     };
   } __CLC2SEL0bits_t;
@@ -6416,13 +6416,13 @@ typedef union
 
   struct
     {
-    unsigned D4S                : 5;
+    unsigned LC2D4S             : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned LC2D4S             : 5;
+    unsigned D4S                : 5;
     unsigned                    : 3;
     };
   } __CLC2SEL3bits_t;

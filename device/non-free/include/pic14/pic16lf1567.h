@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:52 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-04-13 17:23:08 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -137,9 +137,9 @@
 #define SSP2CON1_ADDR           0x021D
 #define SSP2CON2_ADDR           0x021E
 #define SSP2CON3_ADDR           0x021F
-#define IOCBP_ADDR              0x0391
-#define IOCBN_ADDR              0x0392
-#define IOCBF_ADDR              0x0393
+#define IOCBP_ADDR              0x0394
+#define IOCBN_ADDR              0x0395
+#define IOCBF_ADDR              0x0396
 #define TMR4_ADDR               0x0415
 #define PR4_ADDR                0x0416
 #define T4CON_ADDR              0x0417
@@ -2994,7 +2994,7 @@ extern __at(0x021F) volatile __SSP2CON3bits_t SSP2CON3bits;
 //==============================================================================
 //        IOCBP Bits
 
-extern __at(0x0391) __sfr IOCBP;
+extern __at(0x0394) __sfr IOCBP;
 
 typedef struct
   {
@@ -3008,7 +3008,7 @@ typedef struct
   unsigned IOCBP7               : 1;
   } __IOCBPbits_t;
 
-extern __at(0x0391) volatile __IOCBPbits_t IOCBPbits;
+extern __at(0x0394) volatile __IOCBPbits_t IOCBPbits;
 
 #define _IOCBP0                 0x01
 #define _IOCBP1                 0x02
@@ -3025,7 +3025,7 @@ extern __at(0x0391) volatile __IOCBPbits_t IOCBPbits;
 //==============================================================================
 //        IOCBN Bits
 
-extern __at(0x0392) __sfr IOCBN;
+extern __at(0x0395) __sfr IOCBN;
 
 typedef struct
   {
@@ -3039,7 +3039,7 @@ typedef struct
   unsigned IOCBN7               : 1;
   } __IOCBNbits_t;
 
-extern __at(0x0392) volatile __IOCBNbits_t IOCBNbits;
+extern __at(0x0395) volatile __IOCBNbits_t IOCBNbits;
 
 #define _IOCBN0                 0x01
 #define _IOCBN1                 0x02
@@ -3056,7 +3056,7 @@ extern __at(0x0392) volatile __IOCBNbits_t IOCBNbits;
 //==============================================================================
 //        IOCBF Bits
 
-extern __at(0x0393) __sfr IOCBF;
+extern __at(0x0396) __sfr IOCBF;
 
 typedef struct
   {
@@ -3070,7 +3070,7 @@ typedef struct
   unsigned IOCBF7               : 1;
   } __IOCBFbits_t;
 
-extern __at(0x0393) volatile __IOCBFbits_t IOCBFbits;
+extern __at(0x0396) volatile __IOCBFbits_t IOCBFbits;
 
 #define _IOCBF0                 0x01
 #define _IOCBF1                 0x02

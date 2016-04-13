@@ -2493,7 +2493,7 @@ processor 16f1947, 16lf1947
 processor 16f18313, 16lf18313
 	program		2K
 	data		256
-	eeprom		0
+	eeprom		256
 	enhanced	1
 	io		6
 	maxram		0x07f
@@ -2506,7 +2506,7 @@ processor 16f18313, 16lf18313
 processor 16f18323, 16lf18323
 	program		2K
 	data		256
-	eeprom		0
+	eeprom		256
 	enhanced	1
 	io		12
 	maxram		0x07f
@@ -2519,7 +2519,7 @@ processor 16f18323, 16lf18323
 processor 16f18324, 16lf18324
 	program		4K
 	data		512
-	eeprom		0
+	eeprom		256
 	enhanced	1
 	io		12
 	maxram		0x07f
@@ -2532,7 +2532,7 @@ processor 16f18324, 16lf18324
 processor 16f18325, 16lf18325
 	program		8K
 	data		1024
-	eeprom		0
+	eeprom		256
 	enhanced	1
 	io		12
 	maxram		0x07f
@@ -2545,7 +2545,7 @@ processor 16f18325, 16lf18325
 processor 16f18344, 16lf18344
 	program		4K
 	data		512
-	eeprom		0
+	eeprom		256
 	enhanced	1
 	io		18
 	maxram		0x07f
@@ -2558,7 +2558,7 @@ processor 16f18344, 16lf18344
 processor 16f18345, 16lf18345
 	program		8K
 	data		1024
-	eeprom		0
+	eeprom		256
 	enhanced	1
 	io		18
 	maxram		0x07f

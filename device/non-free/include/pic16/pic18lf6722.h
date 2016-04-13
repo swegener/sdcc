@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:36:37 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-04-13 17:24:07 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -317,13 +317,13 @@ typedef union
 
   struct
     {
-    unsigned PDC                : 7;
+    unsigned P2DC               : 7;
     unsigned                    : 1;
     };
 
   struct
     {
-    unsigned P2DC               : 7;
+    unsigned PDC                : 7;
     unsigned                    : 1;
     };
   } __ECCP2DELbits_t;
@@ -383,21 +383,14 @@ typedef union
 
   struct
     {
-    unsigned PSS2BD             : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned PSSBD              : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned                    : 2;
-    unsigned PSS2AC             : 2;
-    unsigned                    : 4;
+    unsigned PSS2BD             : 2;
+    unsigned                    : 6;
     };
 
   struct
@@ -409,15 +402,22 @@ typedef union
 
   struct
     {
+    unsigned                    : 2;
+    unsigned PSS2AC             : 2;
     unsigned                    : 4;
-    unsigned ECCP2AS            : 3;
-    unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned ECCPAS             : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned ECCP2AS            : 3;
     unsigned                    : 1;
     };
   } __ECCP2ASbits_t;
@@ -477,13 +477,13 @@ typedef union
 
   struct
     {
-    unsigned PDC                : 7;
+    unsigned P3DC               : 7;
     unsigned                    : 1;
     };
 
   struct
     {
-    unsigned P3DC               : 7;
+    unsigned PDC                : 7;
     unsigned                    : 1;
     };
   } __ECCP3DELbits_t;
@@ -3819,27 +3819,27 @@ typedef union
 
   struct
     {
-    unsigned PSSBD              : 2;
-    unsigned                    : 6;
-    };
-
-  struct
-    {
     unsigned PSS1BD             : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned                    : 2;
-    unsigned PSSAC              : 2;
-    unsigned                    : 4;
+    unsigned PSSBD              : 2;
+    unsigned                    : 6;
     };
 
   struct
     {
     unsigned                    : 2;
     unsigned PSS1AC             : 2;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
+    unsigned                    : 2;
+    unsigned PSSAC              : 2;
     unsigned                    : 4;
     };
 
@@ -5201,6 +5201,12 @@ typedef union
 
   struct
     {
+    unsigned HLVDL              : 4;
+    unsigned                    : 4;
+    };
+
+  struct
+    {
     unsigned LVDL               : 4;
     unsigned                    : 4;
     };
@@ -5208,12 +5214,6 @@ typedef union
   struct
     {
     unsigned LVV                : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
-    unsigned HLVDL              : 4;
     unsigned                    : 4;
     };
   } __LVDCONbits_t;
@@ -5623,13 +5623,13 @@ typedef union
 
   struct
     {
-    unsigned STKPTR             : 5;
+    unsigned SP                 : 5;
     unsigned                    : 3;
     };
 
   struct
     {
-    unsigned SP                 : 5;
+    unsigned STKPTR             : 5;
     unsigned                    : 3;
     };
   } __STKPTRbits_t;

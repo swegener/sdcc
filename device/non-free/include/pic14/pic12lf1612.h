@@ -4,7 +4,7 @@
  * This file is part of the GNU PIC library for SDCC, originally
  * created by Molnar Karoly <molnarkaroly@users.sf.net> 2016.
  *
- * This file is generated automatically by the cinc2h.pl, 2016-01-17 15:35:35 UTC.
+ * This file is generated automatically by the cinc2h.pl, 2016-04-13 17:23:05 UTC.
  *
  * SDCC is licensed under the GNU Public license (GPL) v2. Note that
  * this license covers the code to the compiler and other executables,
@@ -649,27 +649,27 @@ typedef union
 
   struct
     {
-    unsigned T2OUTPS            : 4;
-    unsigned                    : 4;
-    };
-
-  struct
-    {
     unsigned OUTPS              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
+    unsigned T2OUTPS            : 4;
     unsigned                    : 4;
-    unsigned CKPS               : 3;
-    unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
     unsigned T2CKPS             : 3;
+    unsigned                    : 1;
+    };
+
+  struct
+    {
+    unsigned                    : 4;
+    unsigned CKPS               : 3;
     unsigned                    : 1;
     };
   } __T2CONbits_t;
@@ -1853,13 +1853,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned CCP1MODE           : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned CCP1MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
   } __CCP1CONbits_t;
@@ -2237,14 +2237,14 @@ typedef union
   struct
     {
     unsigned                    : 4;
-    unsigned CKPS               : 3;
+    unsigned T4CKPS             : 3;
     unsigned                    : 1;
     };
 
   struct
     {
     unsigned                    : 4;
-    unsigned T4CKPS             : 3;
+    unsigned CKPS               : 3;
     unsigned                    : 1;
     };
   } __T4CONbits_t;
@@ -2478,13 +2478,13 @@ typedef union
 
   struct
     {
-    unsigned T6OUTPS            : 4;
+    unsigned OUTPS              : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned OUTPS              : 4;
+    unsigned T6OUTPS            : 4;
     unsigned                    : 4;
     };
 
@@ -2716,13 +2716,13 @@ typedef union
 
   struct
     {
-    unsigned CWG1DBR            : 6;
+    unsigned DBR                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned DBR                : 6;
+    unsigned CWG1DBR            : 6;
     unsigned                    : 2;
     };
   } __CWG1DBRbits_t;
@@ -2778,13 +2778,13 @@ typedef union
 
   struct
     {
-    unsigned CWG1DBF            : 6;
+    unsigned DBF                : 6;
     unsigned                    : 2;
     };
 
   struct
     {
-    unsigned DBF                : 6;
+    unsigned CWG1DBF            : 6;
     unsigned                    : 2;
     };
   } __CWG1DBFbits_t;
@@ -3350,13 +3350,13 @@ typedef union
 
   struct
     {
-    unsigned WINDOW             : 3;
+    unsigned WDTWINDOW          : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned WDTWINDOW          : 3;
+    unsigned WINDOW             : 3;
     unsigned                    : 5;
     };
 
@@ -3866,13 +3866,13 @@ typedef union
 
   struct
     {
-    unsigned TSEL               : 2;
+    unsigned SCANTSEL           : 2;
     unsigned                    : 6;
     };
 
   struct
     {
-    unsigned SCANTSEL           : 2;
+    unsigned TSEL               : 2;
     unsigned                    : 6;
     };
   } __SCANTRIGbits_t;
@@ -4902,13 +4902,13 @@ typedef union
 
   struct
     {
-    unsigned MODE               : 4;
+    unsigned SMT1MODE           : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned SMT1MODE           : 4;
+    unsigned MODE               : 4;
     unsigned                    : 4;
     };
   } __SMT1CON1bits_t;
@@ -5069,13 +5069,13 @@ typedef union
 
   struct
     {
-    unsigned SSEL               : 3;
+    unsigned SMT1SSEL           : 3;
     unsigned                    : 5;
     };
 
   struct
     {
-    unsigned SMT1SSEL           : 3;
+    unsigned SSEL               : 3;
     unsigned                    : 5;
     };
   } __SMT1SIGbits_t;
@@ -5125,13 +5125,13 @@ typedef union
 
   struct
     {
-    unsigned WSEL               : 4;
+    unsigned SMT1WSEL           : 4;
     unsigned                    : 4;
     };
 
   struct
     {
-    unsigned SMT1WSEL           : 4;
+    unsigned WSEL               : 4;
     unsigned                    : 4;
     };
   } __SMT1WINbits_t;

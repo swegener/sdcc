@@ -1714,6 +1714,10 @@ promoteAnonStructs (int su, structdef * sdef)
           /* with the fields it contains and adjust all  */
           /* the offsets */
 
+          /* tagged anonymous struct/union is rejected here, though gcc allow it */
+          if (SPEC_STRUCT (field->type)->tagsym != NULL)
+            werrorfl (field->fileDef, field->lineDef, E_ANONYMOUS_STRUCT_TAG, SPEC_STRUCT (field->type)->tag);
+
           base = field->offset;
           subfield = copySymbolChain (SPEC_STRUCT (field->type)->fields);
           if (!subfield)

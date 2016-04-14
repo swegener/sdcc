@@ -1,3 +1,10 @@
+2016-04-14 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	* src/SDCCsymt.c
+	  Check tagged anonymous struct/union.
+
 2016-04-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

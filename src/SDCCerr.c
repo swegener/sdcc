@@ -529,6 +529,8 @@ struct
     "unknown register specification", 0},
   { E_HEXFLOAT_C99, ERROR_LEVEL_ERROR,
     "hexadecimal floating constant requires ISO C99 or later", 0},
+  { E_ANONYMOUS_STRUCT_TAG, ERROR_LEVEL_ERROR,
+    "tagged anonymous struct/union '%s'", 0},
 };
 
 /* -------------------------------------------------------------------------------

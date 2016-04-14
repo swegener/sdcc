@@ -5,7 +5,10 @@
 	  support/regression/tests/gcc-torture-execute-20050104-1.c,
 	  support/regression/tests/gcc-torture-execute-921202-2.c,
 	  support/regression/tests/gcc-torture-execute-950612-1.c,
-	  support/regression/tests/gcc-torture-execute-961122-1.c:
+	  support/regression/tests/gcc-torture-execute-961122-1.c,
+	  support/regression/tests/gcc-torture-execute-20060110-2.c,
+	  support/regression/tests/gcc-torture-execute-950704-1.c,
+	  support/regression/tests/longlong.c:
 	  Fixes to gbz80 carry flag handling, particularly relevant to long long.
 
 2016-04-14 Ben Shi <powerstudio1st AT 163 DOT com>

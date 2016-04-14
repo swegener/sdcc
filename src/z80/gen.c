@@ -5601,9 +5601,9 @@ genPlus (iCode * ic)
         }
       else
         {
-          _G.preserveCarry = TRUE;
           emit3_o (A_ADC, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
         }
+      _G.preserveCarry = !!size;
       if (size &&
           (requiresHL (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_RIGHT (ic)) != AOP_REG || requiresHL (AOP (IC_LEFT (ic)))
            && AOP_TYPE (IC_LEFT (ic)) != AOP_REG) && AOP_TYPE (IC_RESULT (ic)) == AOP_REG
@@ -5617,7 +5617,7 @@ genPlus (iCode * ic)
       else
         cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0);
     }
-  _G.preserveCarry = FALSE;
+
   for (size = 0; size < 2; size++)
     if (cached[size] != -1)
       {
@@ -5812,6 +5812,7 @@ genMinus (const iCode * ic)
           regalloc_dry_run_cost += 2;
           offset += 2;
           size -= 2;
+          _G.preserveCarry = !!size;
           continue;
         }
       
@@ -5828,7 +5829,6 @@ genMinus (const iCode * ic)
           else
             {
               cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
-              _G.preserveCarry = TRUE;
               emit3_o (A_SBC, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
             }
         }
@@ -5849,11 +5849,11 @@ genMinus (const iCode * ic)
                 }
             }
           else
-            emit2 ("adc a,!immedbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+              emit2 ("adc a,!immedbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
         }
-      cheapMove (AOP (IC_RESULT (ic)), offset, ASMOP_A, 0);
-      offset++;
       size--;
+      _G.preserveCarry = !!size;
+      cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0);
     }
 
   if (AOP_SIZE (IC_RESULT (ic)) == 3 && AOP_SIZE (IC_LEFT (ic)) == 3 && !sameRegs (AOP (IC_RESULT (ic)), AOP (IC_LEFT (ic))))

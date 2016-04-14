@@ -224,17 +224,13 @@ testLongLong (void)
   x = 0x7ll;
   ASSERT (y / x == 0x1122334455667700ull / 0x7ll); // this test is optimized by constant propagation
   ASSERT (divULL (y, x) == 0x1122334455667700ull / 0x7ll); // this test is not
-#ifndef __SDCC_gbz80
   ASSERT (y % x == 0x1122334455667700ull % 0x7ll); // this test is optimized by constant propagation
   ASSERT (modULL (y, x) == 0x1122334455667700ull % 0x7ll); // this test is not
-#endif
   x = 0x1122334455667700ll;
   ASSERT (x / 0x7ll == 0x1122334455667700ll / 0x7ll); // this test is optimized by constant propagation
   ASSERT (divLL (x, 0x7ll) == 0x1122334455667700ll / 0x7ll); // this test is not
-#ifndef __SDCC_gbz80
   ASSERT (x % 0x7ll == 0x1122334455667700ll % 0x7ll); // this test is optimized by constant propagation
   ASSERT (modLL (x, 0x7ll) == 0x1122334455667700ll % 0x7ll); // this test is not
-#endif
 
   y = 0x44556677aabbccddull;
   x = 0x7766554433221100ull;

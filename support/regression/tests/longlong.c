@@ -242,7 +242,7 @@ testLongLong (void)
   ASSERT (x > y);
   ASSERT (compareLL (y, x) == -1);
   ASSERT (compareLL (x, y) == 1);
-  
+
   y = 0x5566778899aabbccull;
   x = 0xaabbccdd11223344ll;
   ASSERT ((y << 8) == 0x66778899aabbcc00ull);
@@ -273,3 +273,4 @@ testLongLong (void)
   c(); // Unused long long return value require special handling in register allocation.
 #endif
 }
+

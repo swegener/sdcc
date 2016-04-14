@@ -5600,7 +5600,10 @@ genPlus (iCode * ic)
             emit3_o (A_ADD, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
         }
       else
-        emit3_o (A_ADC, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
+        {
+          _G.preserveCarry = TRUE;
+          emit3_o (A_ADC, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
+        }
       if (size &&
           (requiresHL (AOP (IC_RIGHT (ic))) && AOP_TYPE (IC_RIGHT (ic)) != AOP_REG || requiresHL (AOP (IC_LEFT (ic)))
            && AOP_TYPE (IC_LEFT (ic)) != AOP_REG) && AOP_TYPE (IC_RESULT (ic)) == AOP_REG
@@ -5614,6 +5617,7 @@ genPlus (iCode * ic)
       else
         cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0);
     }
+  _G.preserveCarry = FALSE;
   for (size = 0; size < 2; size++)
     if (cached[size] != -1)
       {
@@ -5822,7 +5826,9 @@ genMinus (const iCode * ic)
               emit3_o (A_SUB, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
             }
           else
-            {cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
+            {
+              cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
+              _G.preserveCarry = TRUE;
               emit3_o (A_SBC, ASMOP_A, 0, AOP (IC_RIGHT (ic)), offset);
             }
         }

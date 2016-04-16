@@ -1,3 +1,10 @@
+2016-04-16 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/mcs51/compiler.h: added INTERRUPT, INTERRUPT_USING, NOP
+	  macros, copied from SiLabs' compiler_defs.h
+	* device/include/mcs51/EFM8BB1.h: new, added, from RFE 271, thanks
+	  Kharitonov Dmitry
+
 2016-04-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
@@ -129,7 +136,8 @@
 2016-04-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/string.c:
-	  Check more of wide strings, do not depend on implementation-defined behaviour in char escape.
+	  Check more of wide strings, do not depend on implementation-defined
+	  behaviour in char escape.
 
 2016-04-06 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -175,6 +183,7 @@
 	  Update documentation on standard compliance.
 
 2016-04-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/gcc-torture-execute-950512-1.c
 	  Enabled.
 	* src/z80/gen.c
@@ -278,7 +287,7 @@
 2016-03-19 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/z80/gen.c
-	  Improve compatability of SDCC between 32-bit and 64-bit machines.
+	  Improve compatibility of SDCC between 32-bit and 64-bit machines.
 
 2016-03-15 Molnar Karoly <molnarkaroly AT users.sf.net>
 
@@ -512,10 +521,12 @@
 2016-01-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/Makefile.in:
-	  Change handling of test filenames for regression tests, patch #266 by Peter Dons Tychsen.
+	  Change handling of test filenames for regression tests, patch #266 by
+	  Peter Dons Tychsen.
 	* src/SDCCast.c,
 	  support/regression/tests/bug-2458.c:
-	  Changed result type propagation for logic operations, variant of proposed fix by Peter Dons Tychsen for bug #2458.
+	  Changed result type propagation for logic operations, variant of proposed
+	  fix by Peter Dons Tychsen for bug #2458.
 
 2016-01-26 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -535,7 +546,8 @@
 2016-01-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c:
-	  Improve DWARF support for stm8 ELF, picked from patch #255 by Peter Dons Tychsen.
+	  Improve DWARF support for stm8 ELF, picked from patch #255 by Peter Dons
+	  Tychsen.
 	* src/SDCCsymt.c:
 	  Fix handling of preserved regs in specifier merging.
 
@@ -609,12 +621,14 @@
 2016-01-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:
-	  More accurate handling of conditional jumps, handle ex (sp), ix and ex (sp), iy.
+	  More accurate handling of conditional jumps, handle ex (sp), ix and
+	  ex (sp), iy.
 
 2016-01-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.y:
-	  Seems we have to worry about more than MSVC wrt. C99, patch #265 by Peter Dons Tychsen.
+	  Seems we have to worry about more than MSVC wrt. C99, patch #265 by Peter
+	  Dons Tychsen.
 
 2016-01-21 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -642,11 +656,14 @@
 2016-01-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdebug.c:
-	  Debug info for block-copy-initialized global variables, patch #262 by Peter Dons Tychsen.
+	  Debug info for block-copy-initialized global variables, patch #262 by
+	  Peter Dons Tychsen.
 	* src/SDCCdwarf2.c:
-	  Fix handling of declared, but unused global vairables in debug output, patch #263 by Peter Dons Tychsen.
+	  Fix handling of declared, but unused global vairables in debug output,
+	  patch #263 by Peter Dons Tychsen.
 	* src/z80/peep.c:
-	  More accurate handling of functions returning long long for peephole optimizer.
+	  More accurate handling of functions returning long long for peephole
+	  optimizer.
 	* src/SDCCmain.c:
 	  Fix stream for help output, patch #264 by Peter Dons Tychsen.
 
@@ -796,7 +813,8 @@
 2016-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c:
-	  Do not try to output debug info in case of fatal errors - patch #260 by Peter Dons Tychsen
+	  Do not try to output debug info in case of fatal errors - patch #260 by
+	  Peter Dons Tychsen
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2452.c:
 	  Fix gbz80 right shift bug #2452.
@@ -926,7 +944,8 @@
 2015-12-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/wchar.h:
-	  A basic wchar.h with for types that are useful even with no wide character functions around.
+	  A basic wchar.h with for types that are useful even with no wide character
+	  functions around.
 
 2015-12-05 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -1051,7 +1070,8 @@
 	  support/util/dbuf_string.c,
 	  src/SDCCval.c,
 	  src/SDCC.lex:
-	  Handling of UTF-16 and UTF-16 string literals in the frontend up to strVal().
+	  Handling of UTF-16 and UTF-16 string literals in the frontend up to
+	  strVal().
 
 2015-11-06 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -1244,7 +1264,8 @@
 	  src/SDCCval.c,
 	  support/regression/tests/charconst.c,
 	  support/regression/tests/escape.c:
-	  Implement escape sequences for wide character constants, fix universal escape sequences.
+	  Implement escape sequences for wide character constants, fix universal
+	  escape sequences.
 
 2015-10-06 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -1354,7 +1375,8 @@
 	* src/SDCCast.c:
 	* src/SDCCerr.c:
 	* src/SDCCicode.c:
-	  Disable nested critical block / function call, support return in inline critical functions.
+	  Disable nested critical block / function call, support return in inline
+	  critical functions.
 	* support/regression/tests/critical.c:
 	  Improve test case.
 	* support/regression/tests/malloc.c:
@@ -1513,7 +1535,8 @@
 	* src/stm8/gen.c:
 	  Cheaper stm8 division workaround (RFE #449).
 	* doc/sdccman.lyx:
-	  Update standard compliance documentation to reflect recently implemented feature.
+	  Update standard compliance documentation to reflect recently implemented
+	  feature.
 
 2015-08-01 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -1521,7 +1544,8 @@
 	  src/SDCCsymt.c,
 	  src/SDCCralloc.hpp,
 	  src/stm8/gen.c:
-	  Static code analysis to omit stm8 division workaround when safe to do so (RFE #448).
+	  Static code analysis to omit stm8 division workaround when safe to do so
+	  (RFE #448).
 
 2015-07-31 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -1893,7 +1917,8 @@
 	  src/z80/peep.h,
 	  src/z80/peep.c,
 	  src/z80/peeph-z80.def:
-	  Fix peephole optimizer bug #2374, more efficient calls to _Noreturn functions.
+	  Fix peephole optimizer bug #2374, more efficient calls to _Noreturn
+	  functions.
 
 2015-04-20 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -2008,7 +2033,8 @@
 	  support/regression/tests/z88dk.c:
 	  Support for __z88dk_fastcall calling convention.
 	* src/stm8/peeph.def:
-	  Use relative jump on false instruction for optimizing jumps over 1-byte opcodes.
+	  Use relative jump on false instruction for optimizing jumps over 1-byte
+	  opcodes.
 
 2015-04-06 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -2027,7 +2053,8 @@
 	* src/SDCCutils.h:
 	* src/SDCCutils.c:
 	* src/SDCCmain.c:
-	  Support --program-prefix and --program-suffix while calling assembler and linker.
+	  Support --program-prefix and --program-suffix while calling assembler and
+	  linker.
 	* src/z80/gen.c:
 	* src/z80/mapping.i:
 	* src/SDCCasm.c:
@@ -2154,7 +2181,8 @@
 2015-02-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  Speed up stm8 port by skipping output early in dry runs and making some aop tests more efficient,
+	  Speed up stm8 port by skipping output early in dry runs and making some
+	  aop tests more efficient,
 	  fix code generation bug in shifts.
 
 2015-02-25 Ben Shi <powerstudio1st AT 163 DOT com>
@@ -2165,7 +2193,8 @@
         * src/SDCCval.c:
         * src/SDCCval.h:
         * pic16/glue.c:
-          Enable a global char/int/long variable initialized by an address (const pointer).
+          Enable a global char/int/long variable initialized by an address
+		  (const pointer).
 
 2015-02-24 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -2232,7 +2261,8 @@
 2015-02-06 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/SDCCtree_dec.hpp:
-	  Fix bug in weight calculation that affected tree-decompositions with imbalanced nested branches.
+	  Fix bug in weight calculation that affected tree-decompositions with
+	  imbalanced nested branches.
 	* src/z80/peeph-gbz80.def:
 	  Fix handling of (hl-), (hl+) in peepholes.
 
@@ -2241,7 +2271,9 @@
 	* src/z80/mappings.i:
 	  Fix gbz80 function entry helper.
 	* src/SDCCralloc.hpp:
-	  Use weight machanism for deciding which subtree to process first - should reduce memory consumption and improve the heuristic in the register allocator.
+	  Use weight mechanism for deciding which subtree to process first - should
+	  reduce memory consumption and improve the heuristic in the register
+	  allocator.
 
 2015-02-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -2255,7 +2287,8 @@
 	  src/z80/gen.c,
 	  src/z80/mappings.i,
 	  src/z80/peep.c:
-	  Fix name of helper function for function pointers, introduce Alan Cox' proposal for helper function for function header.
+	  Fix name of helper function for function pointers, introduce Alan Cox'
+	  proposal for helper function for function header.
 
 2015-02-02 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -2270,7 +2303,8 @@
 2015-01-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:
-	  Reorganize documentation of language extensions, in particular named address spaces, separate mcs51isms, remove references to obsolete keywords.
+	  Reorganize documentation of language extensions, in particular named
+	  address spaces, separate mcs51isms, remove references to obsolete keywords.
 
 2015-01-28 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -2450,7 +2484,8 @@
 	* src/SDCCicode.c:
 	  Fix a bug: higher 4 bytes of a longlong literal are missing while dumping.
 	* src/SDCCval.c:
-	  Fix a bug: higher 4 bytes of a longlong value are discarded while casting from a double value.
+	  Fix a bug: higher 4 bytes of a longlong value are discarded while casting
+	  from a double value.
 
 2014-12-16 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -2474,7 +2509,8 @@
 
 	* support/regression/tests/gcc-torture-execute-20080529-1.c,
 	  support/regression/tests/longlong.c:
-	  Disable tests that fail due to broken gbz80 long long multiplication (bug #2329).
+	  Disable tests that fail due to broken gbz80 long long multiplication
+	  (bug #2329).
 	* support/regression/tests/bug-2231.c,
 	  support/regression/tests/float_single.c,
 	  support/regression/tests/gcc-torture-execute-stdarg-4.c,
@@ -2508,7 +2544,8 @@
 
 	* src/stm8/ralloc.c,
 	  src/z80/ralloc.c:
-	  Do not try to use spill locations that are not on the stack in ports that can't handle it.
+	  Do not try to use spill locations that are not on the stack in ports that
+	  can't handle it.
 	* support/regression/tests/longlong.c:
 	  Enable some long long tests that pass for stm8 now.
 
@@ -2531,7 +2568,8 @@
 
 2014-11-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* device/include/ctype.h: compare as unsigned chars, added static asserts on EOF
+	* device/include/ctype.h: compare as unsigned chars, added static asserts on
+	  EOF
 	* device/lib/isdigit.c,
 	* device/lib/islower.c,
 	* device/lib/isupper.c: include stdio.h to enable the static assert in ctype.h
@@ -3016,16 +3054,19 @@
 2014-07-03 Ben Shi <powerstudio1st AT 163.com>
 
 	* sim/ucsim/stm8.src/inst.cc:
-	  Fix potential bugs in inst_dec(), inst_inc() & inst_ldxy(): flags affection.
+	  Fix potential bugs in inst_dec(), inst_inc() & inst_ldxy(): flags
+	  affection.
 	  Make inst_addw(), inst_clr() & inst_ldxydst() more understandable.
 	* sim/ucsim/stm8.src/stm8.cc:
-	  Fix potential bugs in CALLR & CALLF: the stack saved PC value is not accurate.
+	  Fix potential bugs in CALLR & CALLF: the stack saved PC value is not
+	  accurate.
 
 2014-06-30 Ben Shi <powerstudio1st AT 163.com>
 
 	* sim/ucsim/stm8.src/inst.cc:
 	  Fix potential bugs in inst_adc() & inst_add() - flags affection.
-	  Fix potential bugs in inst_sll() & inst_rlc() - reg.X & reg.Y might exceed 0xffff.
+	  Fix potential bugs in inst_sll() & inst_rlc() - reg.X & reg.Y might exceed
+	  0xffff.
 	* sim/ucsim/stm8.src/stm8.cc:
 	  Improve code quality.
 
@@ -3034,12 +3075,14 @@
 	* sim/ucsim/stm8.src/inst.cc:
 	  Fix potential bugs of flags affection in inst_sbc() and inst_cpw().
 	* sim/ucsim/stm8.src/stm8.cc:
-	  Fix potential bugs of flags affection in RLWA, and improve code quality of TRAP.
+	  Fix potential bugs of flags affection in RLWA, and improve code quality of
+	  TRAP.
 
 2014-06-21 Ben Shi <powerstudio1st AT 163.com>
 
 	* sim/ucsim/stm8.src/inst.cc:
-	  Fix potential bugs of flags affection in inst_addw(), inst_sub() and inst_cp().
+	  Fix potential bugs of flags affection in inst_addw(), inst_sub() and
+	  inst_cp().
 	* sim/ucsim/stm8.src/stm8.cc:
 	  Fix potential bugs of flags affection in simulation of RRWA.
 
@@ -3069,12 +3112,14 @@
 2014-06-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/Makefile.in:
-	  Fix non-standard end-of-line matching (makes device libraries compile on OpenBSD).
+	  Fix non-standard end-of-line matching (makes device libraries compile on
+	  OpenBSD).
 
 2014-05-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  Fix a bug in code generation for right shift by applying patch #243 by Ben Shi.
+	  Fix a bug in code generation for right shift by applying patch #243 by Ben
+	  Shi.
 
 2014-05-25 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -3157,7 +3202,8 @@
 2014-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  More efficient clearing of high bytes of x and y, more efficient right shift.
+	  More efficient clearing of high bytes of x and y, more efficient right
+	  shift.
 	* src/SDCCpeeph.c:
 	  Better immdInRange, patch by Ben Shi.
 	* src/stm8/peeph.def:
@@ -3606,7 +3652,8 @@
 
 2013-12-22 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* src/SDCCmain.c (setDefaultOptions): start xdata at 1 by default, fixes bug 2173
+	* src/SDCCmain.c (setDefaultOptions): start xdata at 1 by default, fixes bug
+	  2173
 	* src/SDCCast.c (decorateType, RETURN): error on returning void expression
 	  when not using sdcc extensions	
 	* src/stm8/gen.c (genReturn): accept returning void, fixes bug 2158
@@ -3900,7 +3947,8 @@
 2013-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Improve handling of global variables in addition (and prepare for subtraction).
+	  Improve handling of global variables in addition (and prepare for
+	  subtraction).
 	* sim/ucsim/stm8.src/inst.cc:
 	  Code cleanup.
 
@@ -4160,7 +4208,8 @@
 2013-09-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  Implement assertion for linker bug #2198 so it is no longer silent to the user.
+	  Implement assertion for linker bug #2198 so it is no longer silent to the
+	  user.
 	* support/regression/tests/gcc-torture-execute-20030714-1.c:
 	  Disable failing test.
 
@@ -4493,7 +4542,8 @@
 2013-07-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/_mullong.c:
-	  Use 16x16 multiplication instead of 8x8 where faster; patch #133 by Marco Bodrato.
+	  Use 16x16 multiplication instead of 8x8 where faster; patch #133 by Marco
+	  Bodrato.
 
 2013-07-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -4590,7 +4640,8 @@
 2013-06-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:
-	  Reorganize rules, disable rules depending on notUsed() or unimplemented ref count.
+	  Reorganize rules, disable rules depending on notUsed() or unimplemented
+	  ref count.
 	* src/stm8/peep.c,
 	  src/SDCCpeeph.c:
 	  Fix const, handling of relative jumps, read from uninitialized pointer.
@@ -4647,7 +4698,8 @@
 2013-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:
-	  Prepare for replacing absolute jumps by relative jumps and inverting jump conditions.
+	  Prepare for replacing absolute jumps by relative jumps and inverting jump
+	  conditions.
 	* src/stm8/peep.c,
 	  src/SDCCpeeph.c:
 	  Fix buffer overflows, improve error detection.
@@ -5551,7 +5603,8 @@
 	  doc/sdccman.lyx,
 	  support/regression/tests/assert.c,
 	  support/regression/tests/align.c:
-	  Support for C11 _Static_assert static assertions and _Alignas alignment specifiers.
+	  Support for C11 _Static_assert static assertions and _Alignas alignment
+	  specifiers.
 
 2013-04-01 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -5765,7 +5818,8 @@
 
 2013-01-29 Molnar Karoly <molnarkaroly AT users.sf.net>
 
-	* support/scripts/mcs51-disasm.pl: Use informations of the OSEG area from map file.
+	* support/scripts/mcs51-disasm.pl: Use informations of the OSEG area from
+	  map file.
 
 2013-01-28 Molnar Karoly <molnarkaroly AT users.sf.net>
 
@@ -5860,7 +5914,8 @@
 	* support/scripts/cinc2h.pl: New command option: --create-sfr16
 	  (This option is for the time being operates only at the pic16 series.)
 	* device/non-free/include/pic16/pic18*.h,
-	  device/non-free/lib/pic16/libdev/pic18*.c: Implementation of the __sfr16 type.
+	  device/non-free/lib/pic16/libdev/pic18*.c: Implementation of the __sfr16
+	  type.
 
 2013-01-12 Molnar Karoly <molnarkaroly AT users.sf.net>
 

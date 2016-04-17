@@ -1,3 +1,30 @@
+2016-04-17 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/lib/pic14/configure,
+	  device/lib/pic14/configure.ac,
+	  device/lib/pic14/Makefile.am,
+	  device/lib/pic14/Makefile.in,
+	  device/lib/pic16/Makefile.am,
+	  device/lib/pic16/Makefile.in,
+	  device/non-free/lib/pic14/Makefile.in,
+	  device/non-free/lib/pic16/Makefile.am,
+	  device/non-free/lib/pic16/Makefile.in:
+	  Renamed the "device/lib/pic14/.checksupport" directory to
+	  "device/lib/pic14/.checkdevices".
+	  Fix a distclean bug. Now the "make distclean" command deletes
+	  the unnecessary directories and files:
+	    device/lib/pic14/.checkdevices/*
+	    device/lib/pic14/a.*
+	    device/lib/pic16/.checkdevices/*
+	    device/lib/pic16/a.*
+	    device/lib/pic16/pics.supported
+	    device/non-free/lib/pic14/.checkdevices/*
+	    device/non-free/lib/pic14/a.*
+	    device/non-free/lib/pic14/pics.supported
+	    device/non-free/lib/pic16/.checkdevices/*
+	    device/non-free/lib/pic16/a.*
+	    device/non-free/lib/pic16/pics.supported
+
 2016-04-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/wchar.c:

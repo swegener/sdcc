@@ -2748,8 +2748,8 @@ fi
 $as_echo_n "checking whether gputils support enhanced cores... " >&6; }
 # Check support for enhanced pic cores.
 ENABLE_ENHANCED_PICS="no"
-CHECK=".checksupport/check"
-mkdir -p .checksupport
+CHECK=".checkdevices/check"
+mkdir -p .checkdevices
 printf '  include "p%s.inc"\n  END\n' "${EARCH}" > "${CHECK}.asm"
 if "$mCCAS" -p${EARCH} -o "${CHECK}.o" -c "${CHECK}.asm" >/dev/null 2>&1 && "$mLD" "${CHECK}.o" >/dev/null 2>&1; then
   ENABLE_ENHANCED_PICS="yes"

@@ -45,7 +45,11 @@ clean: recurse
 	$(Q)-$(RMDIR) "$(top_builddir)/$(builddir)"
 	-if [ -d bin ]; then $(RMDIR) bin; fi
 
-distclean: clean
+distclean-local:
+	$(Q)-$(RM) a.cod a.hex a.lst pics.supported
+	$(Q)-$(RM) -rf ./.checkdevices
+
+distclean: clean distclean-local
 	$(Q)-$(RM) config.cache config.log config.status Makefile Makefile.common
 	-if [ -d bin ]; then $(RMDIR) bin; fi
 

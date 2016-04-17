@@ -77,8 +77,8 @@ _AM_DEPENDENCIES(CCAS)
 AC_MSG_CHECKING([whether gputils support enhanced cores])
 # Check support for enhanced pic cores.
 ENABLE_ENHANCED_PICS="no"
-CHECK=".checksupport/check"
-mkdir -p .checksupport
+CHECK=".checkdevices/check"
+mkdir -p .checkdevices
 printf '  include "p%s.inc"\n  END\n' "${EARCH}" > "${CHECK}.asm"
 if "$mCCAS" -p${EARCH} -o "${CHECK}.o" -c "${CHECK}.asm" >/dev/null 2>&1 && "$mLD" "${CHECK}.o" >/dev/null 2>&1; then
   ENABLE_ENHANCED_PICS="yes"

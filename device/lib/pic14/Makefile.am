@@ -11,3 +11,8 @@ endif !ENABLE_EXTENDED_INSTRUCTIONS
 endif ENABLE_ENHANCED_PICS
 
 include $(top_srcdir)/Makefile.common
+
+DISTCLEANFILES = a.cod a.hex ./.checkdevices/*
+
+distclean-local:
+	rm -rf ./.checkdevices ./autom4te.cache

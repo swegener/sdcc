@@ -520,7 +520,7 @@ char
 \begin_inset Text
 
 \begin_layout Plain Layout
-signed
+unsigned
 \end_layout
 
 \end_inset
@@ -1410,7 +1410,7 @@ Newer versions have usually numerous bug fixes compared with the previous
  version.
  But we also sometimes introduce some incompatibilities with older versions.
  Not just for the fun of it, but to make the compiler more stable, efficient
- and ANSI compliant
+ and standard compliant
 \begin_inset Index idx
 status collapsed
 
@@ -2564,6 +2564,10 @@ storage classes
 \end_inset
 
  in this manual.
+\end_layout
+
+\begin_layout Itemize
+in sdcc version 3.6.0, the default for char changed from signed to unsigned.
 \end_layout
 
 \begin_layout Section
@@ -24759,37 +24763,7 @@ use of non-reentrant functions
 \end_layout
 
 \begin_layout Standard
-A special note here, int (16 bit) and long (32 bit) integer division
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Division
-\end_layout
-
-\end_inset
-
-, multiplication
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Multiplication
-\end_layout
-
-\end_inset
-
- & modulus
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Modulus
-\end_layout
-
-\end_inset
-
- and floating-point
+A special note here, integer multiplicative operators and floating-point
 \begin_inset Index idx
 status collapsed
 
@@ -24799,10 +24773,12 @@ Floating point support
 
 \end_inset
 
- operations are implemented using external support routines.
- If an interrupt service routine needs to do any of these operations then
- the support routines (as mentioned in a following section) will have to
- be recompiled using the 
+ operations might be implemented using external support routines, depending
+ on the target architecture.
+ If an interrupt service routine needs to do any of these operations on
+ a target where functions are non-reentrent by default, then the support
+ routines (as mentioned in a following section) will have to be recompiled
+ using the 
 \emph on
 -
 \begin_inset ERT
@@ -24933,8 +24909,9 @@ reference "sub:A-Step-by Assembler Introduction"
 \end_layout
 
 \begin_layout Standard
-Calling other functions from an interrupt service routine is not recommended,
- avoid it if possible.
+Calling other functions from an interrupt service routine on a target where
+ functions are non-reentrent by default is not recommended, avoid it if
+ possible.
  Note that when some function is called from an interrupt service routine
  it should be preceded by a #pragma
 \begin_inset space ~
@@ -31168,7 +31145,7 @@ Parameter passing
 
 \end_inset
 
-
+ (8051)
 \end_layout
 
 \begin_layout Standard
@@ -31356,7 +31333,7 @@ function pointers
 \end_layout
 
 \begin_layout Subsection
-Registers usage
+Registers usage (8051)
 \end_layout
 
 \begin_layout Standard
@@ -31466,7 +31443,7 @@ ACC
 \end_layout
 
 \begin_layout Subsection
-Assembler Routine (non-reentrant)
+Assembler Routine (non-reentrant) (8051)
 \end_layout
 
 \begin_layout Standard
@@ -32095,7 +32072,7 @@ sdcc cfunc.c asmfunc.rel
 \end_layout
 
 \begin_layout Subsection
-Assembler Routine (reentrant)
+Assembler Routine (reentrant) (8051)
 \end_layout
 
 \begin_layout Standard
@@ -32838,36 +32815,17 @@ Functions declared as __smallc are called using the Small-C calling convention.
 \end_layout
 
 \begin_layout Section
-int (16 bit)
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-int (16 bit)
-\end_layout
-
-\end_inset
-
- and long (32 bit)
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-long (32 bit)
-\end_layout
-
-\end_inset
-
- Support
+Support routines for integer multiplicative operators
 \end_layout
 
 \begin_layout Standard
-For signed & unsigned int (16 bit) and long (32 bit) variables, division,
- multiplication and modulus operations are implemented by support routines.
- These support routines are all developed in C to facilitate porting to
- other MCUs, although some model specific assembler optimizations are used.
- The following files contain the described routines, all of them can be
- found in <installdir>/share/sdcc/lib.
+Depending on the target architecture, some integer multiplicative operators
+ might be implemented by support routines.
+ These support routines exist in portable C versions to facilitate porting
+ to other MCUs, although depending on the target, assembler routines might
+ be used instead.
+ The following files contain some of the described routines, all of them
+ can be found in <installdir>/share/sdcc/lib.
 \begin_inset Newline newline
 \end_inset
 
@@ -33919,15 +33877,6 @@ convert long to floating point number
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-Note if all these routines are used simultaneously the data space might
- overflow.
- For serious floating point usage the large model might be needed.
- Also notice that you don't have to call this routines directly.
- The compiler will use them automatically every time a floating point operation
- is required.
 \end_layout
 
 \begin_layout Section
@@ -35711,7 +35660,7 @@ Libraries
 status collapsed
 
 \begin_layout Plain Layout
-GNUv2+LE
+GPLv2+LE
 \end_layout
 
 \end_inset
@@ -37225,7 +37174,6 @@ speed
 
 - The compiler will optimize code generation towards fast code, possibly
  at the expense of code size.
- Currently this has little effect.
 \end_layout
 
 \begin_layout Itemize
@@ -37283,7 +37231,7 @@ size
 
 - The compiler will optimize code generation towards compact code, possibly
  at the expense of code speed.
- Currently this has little effect.
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -37474,7 +37422,7 @@ sdcc99
 \end_inset
 
 - Generally follow the C99 standard, but allow SDCC features that conflict
- with the standard (default).
+ with the standard.
 \end_layout
 
 \begin_layout Itemize
@@ -67633,6 +67581,36 @@ will still be recognized.
 \end_layout
 
 \begin_layout Subsection
+Placement of Bank-Selection Instructions
+\end_layout
+
+\begin_layout Standard
+For non-intrinsic named address spaces, sdcc will place the bank selection
+ instructions optimally.
+ For details see Philipp Klaus Krause, 
+\begin_inset Quotes sld
+\end_inset
+
+Optimal Placement of Bank Selection Instructions in Polynomial Time
+\begin_inset Quotes srd
+\end_inset
+
+, Proceedings of the 16th International Workshop on Software and Compilers
+ for Embedded Systems, M-SCOPES ’13, pp 23–30.
+ Association for Computing Machinery, 2013.
+ 
+\end_layout
+
+\begin_layout Subsection
+Lifetime-Optimal Speculative Partial Redundancy Elimination
+\end_layout
+
+\begin_layout Standard
+sdcc has an implementation of lifetime-optimal speculative partial redundancy
+ elimination based on tree-decompositions.
+\end_layout
+
+\begin_layout Subsection
 Register Allocation
 \begin_inset CommandInset label
 LatexCommand label
@@ -67660,7 +67638,7 @@ sdcc currently has two register allocators.
  r2k, r3ka, gbz80 and stm8 ports.
  Even though it runs in polynomial time, it can be quite slow; therefore
  the --max-allocs-per-node command line option can be used for a trade-off
- between compilation speed and quality of the genrated result: Lower values
+ between compilation speed and quality of the generated code: Lower values
  result in faster compilation, higher values can result in better code being
  generated.
 \end_layout
@@ -67691,6 +67669,18 @@ Optimal Register Allocation in Polynomial Time
  Proceedings, Lecture Notes in Computer Science, volume 7791, pp.
  1-20.
  Springer, 2013.
+ Also: Philipp Klaus Krause, 
+\begin_inset Quotes sld
+\end_inset
+
+Bytewise Register Allocation
+\begin_inset Quotes srd
+\end_inset
+
+, Proceedings of the 18th International Workshop on Software and Compilers
+ for Embedded Systems, SCOPES ’15, pp 22–27.
+ Association for Computing Machinery, 2015.
+ 
 \end_layout
 
 \begin_layout Subsection

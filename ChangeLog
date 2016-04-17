@@ -1,3 +1,8 @@
+2016-04-17 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCglue.c
+	  Fix a pointer printing bug, when a 4-byte generic pointer is printed on ds390.
+
 2016-04-16 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/mcs51/compiler.h: added INTERRUPT, INTERRUPT_USING, NOP

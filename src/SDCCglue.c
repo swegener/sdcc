@@ -1666,8 +1666,15 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oB
           else
             dbuf_printf (oBuf, ",%s\n", aopLiteral (val, 2));
           break;
-        default:
-          ;//wassertl(0, "Printing pointer of invalid size");
+        case 4:
+          if (TARGET_IS_DS390 || TARGET_IS_DS400)
+            dbuf_printf (oBuf, "\t.byte %s,%s,%s,%s\n", aopLiteral (val, 0), aopLiteral (val, 1), aopLiteral (val, 2), aopLiteral (val, 3));
+          else
+            wassertl(0, "Printing pointer of invalid size");
+          break;
+       default:
+          wassertl(0, "Printing pointer of invalid size");
+          break;
         }
       return;
     }

@@ -1653,7 +1653,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oB
           else
             dbuf_tprintf (oBuf, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
           break;
-        case 3:                // how about '390??
+        case 3:
           dbuf_printf (oBuf, "; generic printIvalPtr\n");
           if (port->little_endian)
             dbuf_printf (oBuf, "\t.byte %s,%s", aopLiteral (val, 0), aopLiteral (val, 1));

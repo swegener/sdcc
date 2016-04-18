@@ -1,3 +1,10 @@
+2016-04-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Optimize jumps on boolean bitfields.
+	* src/z80/gen.c:
+	  Improve unpacking of signed bitfields.
+
 2016-04-18 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/lib/pic14/bootstrap.sh,

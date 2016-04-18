@@ -970,6 +970,26 @@ replace restart {
 } if labelRefCountChange(%2 -1)
 	
 replace restart {
+	rlca
+	and	a, #0x01
+	jp	Z, %1
+} by {
+	rlca
+	; peephole 65e removed and by changing jump condition.
+	jp	NC, %1
+} if notUsed('a'), notUsedFrom(%1 'a')
+
+replace restart {
+	rlca
+	and	a, #0x01
+	jp	NZ, %1
+} by {
+	rlca
+	; peephole 65f removed and by changing jump condition.
+	jp	C, %1
+} if notUsed('a'), notUsedFrom(%1 'a')
+
+replace restart {
 	xor	a,a
 	ld	a,#0x00
 } by {

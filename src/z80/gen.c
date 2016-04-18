@@ -142,6 +142,7 @@ enum asminst
   A_RLC,
   A_RLCA,
   A_RR,
+  A_RRA,
   A_RRC,
   A_RRCA,
   A_SBC,
@@ -169,6 +170,7 @@ static const char *asminstnames[] =
   "rlc",
   "rlca",
   "rr",
+  "rra",
   "rrc",
   "rrca",
   "sbc",
@@ -817,6 +819,7 @@ emit3Cost (enum asminst inst, asmop * op1, int offset1, asmop * op2, int offset2
     case A_CPL:
     case A_RLA:
     case A_RLCA:
+    case A_RRA:
     case A_RRCA:
       return (1);
     case A_LD:
@@ -9042,6 +9045,39 @@ end:
   freeAsmop (result, NULL);
 }
 
+/*-----------------------------------------------------------------*/
+/* unpackMaskA - generate masking code for unpacking last byte     */
+/* of bitfiled. And mask for unsigned, sign extension for signed.  */
+/*-----------------------------------------------------------------*/
+static void
+unpackMaskA(sym_link *type, int len)
+{
+  if (SPEC_USIGN (type) || len != 1)
+    {
+      emit2 ("and a,!immedbyte", ((unsigned char) - 1) >> (8 - len));
+      regalloc_dry_run_cost += 2;
+    }
+  if (!SPEC_USIGN (type))
+    {
+      if (len == 1)
+        {
+          emit3(A_RRA, 0, 0);
+          emit3(A_SBC, ASMOP_A, ASMOP_A);
+        }
+      else
+        {
+          if (!regalloc_dry_run)
+            {
+              symbol *tlbl = newiTempLabel (NULL);
+              emit2 ("bit %d,a", len - 1);
+              emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
+              emit2 ("or a,!immedbyte", (unsigned char) (0xff << len));
+              emitLabel (tlbl);
+            }
+          regalloc_dry_run_cost += 7;
+        }
+    }
+}
 
 /*-----------------------------------------------------------------*/
 /* genUnpackBits - generates code for unpacking bits               */
@@ -9069,21 +9105,7 @@ genUnpackBits (operand * result, int pair)
       emit2 ("ld a,!*pair", _pairs[pair].name);
       regalloc_dry_run_cost += (pair == PAIR_IX || pair == PAIR_IY) ? 3 : 1;
       AccRol (8 - bstr);
-      emit2 ("and a,!immedbyte", ((unsigned char) - 1) >> (8 - blen));
-      regalloc_dry_run_cost += 2;
-      if (!SPEC_USIGN (etype))
-        {
-          /* signed bit-field */
-          if (!regalloc_dry_run)
-            {
-              symbol *tlbl = newiTempLabel (NULL);
-              emit2 ("bit %d,a", blen - 1);
-              emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
-              emit2 ("or a,!immedbyte", (unsigned char) (0xff << blen));
-              emitLabel (tlbl);
-            }
-          regalloc_dry_run_cost += 7;
-        }
+      unpackMaskA (etype, blen);
       cheapMove (AOP (result), offset++, ASMOP_A, 0);
       goto finish;
     }
@@ -9108,21 +9130,8 @@ genUnpackBits (operand * result, int pair)
           cheapMove (AOP (result), offset++, ASMOP_A, 0);
           emit2 ("ld a,l");
         }
-      emit2 ("and a,!immedbyte", ((unsigned char) - 1) >> (16 - blen));
-      regalloc_dry_run_cost += 7;
-      if (!SPEC_USIGN (etype))
-        {
-          /* signed bit-field */
-          if (!regalloc_dry_run)
-            {
-              symbol *tlbl = newiTempLabel (NULL);
-              emit2 ("bit %d,a", blen - 1 - 8);
-              emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
-              emit2 ("or a,!immedbyte", (unsigned char) (0xff << (blen - 8)));
-              emitLabel (tlbl);
-            }
-          regalloc_dry_run_cost += 7;
-        }
+      regalloc_dry_run_cost += 5;
+      unpackMaskA (etype, blen - 8);
       cheapMove (AOP (result), offset++, ASMOP_A, 0);
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
@@ -9148,21 +9157,8 @@ genUnpackBits (operand * result, int pair)
   if (rlen)
     {
       emit2 ("ld a,!*pair", _pairs[pair].name);
-      emit2 ("and a,!immedbyte", ((unsigned char) - 1) >> (8 - rlen));
-      regalloc_dry_run_cost += 3;
-      if (!SPEC_USIGN (etype))
-        {
-          /* signed bit-field */
-          if (!regalloc_dry_run)
-            {
-              symbol *tlbl = newiTempLabel (NULL);
-              emit2 ("bit %d,a", rlen - 1);
-              emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
-              emit2 ("or a,!immedbyte", (unsigned char) (0xff << rlen));
-              emitLabel (tlbl);
-            }
-          regalloc_dry_run_cost += 7;
-        }
+      regalloc_dry_run_cost++;
+      unpackMaskA (etype, rlen);
       cheapMove (AOP (result), offset++, ASMOP_A, 0);
     }
 

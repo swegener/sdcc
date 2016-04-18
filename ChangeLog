@@ -1,3 +1,10 @@
+2016-04-18 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* device/lib/pic14/bootstrap.sh,
+	  device/lib/pic16/bootstrap.sh,
+	  device/non-free/lib/pic16/bootstrap.sh:
+	  Deleted the execute rights, to prevent accidental execution.
+
 2016-04-17 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* device/lib/pic14/configure,

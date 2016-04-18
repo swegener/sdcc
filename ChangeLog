@@ -1,5 +1,10 @@
 2016-04-18 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fix handling of register pair hl in block copy pointer assignment.
+
+2016-04-18 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/peeph-z80.def:
 	  Optimize jumps on boolean bitfields.
 	* src/z80/gen.c:

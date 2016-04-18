@@ -9893,6 +9893,8 @@ genPointerSet (iCode * ic)
         _push (PAIR_DE);
       if(!isPairDead (PAIR_BC, ic))
         _push (PAIR_BC);
+      if(!isPairDead (PAIR_HL, ic))
+        _push (PAIR_HL);
 
       fetchPair (PAIR_DE, AOP (result));
 
@@ -9904,6 +9906,8 @@ genPointerSet (iCode * ic)
       emit2 ("ldir");
       regalloc_dry_run_cost += 9;
 
+      if(!isPairDead (PAIR_HL, ic))
+        _pop (PAIR_HL);
       if(!isPairDead (PAIR_BC, ic))
         _pop (PAIR_BC);
       if(!isPairDead (PAIR_DE, ic))

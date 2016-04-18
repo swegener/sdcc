@@ -4,7 +4,6 @@
 
 #include <testfwk.h>
 
-//#pragma disable_warning 203
 #pragma disable_warning 147
 
 struct foo_t {

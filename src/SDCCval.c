@@ -538,10 +538,15 @@ initList *reorderIlist (sym_link * type, initList * ilist)
               else
                 werrorfl (iloop->filename, iloop->lineno, E_BAD_DESIGNATOR);
             }
-          else assert (0);
+          else
+            {
+              assert (0);
+            }
 
           if (iloop->designation->next)
             {
+              if (idx >= size)
+                continue;
               if (nlistArray[idx] == NULL)
                 nlistArray[idx] = newiList(INIT_DEEP, NULL);
               moveNestedInit(nlistArray[idx], iloop);
@@ -552,10 +557,11 @@ initList *reorderIlist (sym_link * type, initList * ilist)
       /* overwrite any existing entry with iloop */
       if (iloop->type != INIT_HOLE)
         {
+          if (idx >= size)
+            continue;
           if (nlistArray[idx] != NULL)
             werrorfl (iloop->filename, iloop->lineno, W_DUPLICATE_INIT, idx);
-          if (idx < size)
-            nlistArray[idx] = iloop;
+          nlistArray[idx] = iloop;
         }
     }
 

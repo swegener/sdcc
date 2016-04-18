@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
-   atof.c - converts an ASCII string to float
+   setjmp.c - source file for ANSI routines setjmp & longjmp
 
-   Copyright (C) 2003, Jesus Calvino-Fraga <jesusc at ieee.org>
+   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -10,7 +10,7 @@
 
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
@@ -26,69 +26,46 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include <ctype.h>
-#include <stdlib.h>
+#include <ds80c390.h>
+#include <sdcc-lib.h>
+#define __SDCC_HIDE_LONGJMP
+#include <setjmp.h>
 
-float atof(char * s)
+int __setjmp (jmp_buf buf)
 {
-	float value, fraction;
-	signed char iexp;
-	char sign;
+    unsigned char sp, esp;
+    unsigned int lsp;
 
-	//Skip leading blanks
-	while (isspace(*s)) s++;
+    /* registers would have been saved on the
+       stack anyway so we need to save SP
+       and the return address */
+    __critical {
+        sp = SP;
+        esp = ESP;
+    }
+    esp |= 0xF0;
+    lsp = esp << 8;
+    lsp |= sp;
+    *buf++ = lsp;
+    *buf++ = lsp >> 8;
+    *buf++ = *((unsigned char __xdata *) lsp - 0);
+    *buf++ = *((unsigned char __xdata *) lsp - 1);
+    *buf++ = *((unsigned char __xdata *) lsp - 2);
+    return 0;
+}
 
-	//Get the sign
-	if (*s == '-')
-	{
-		sign=1;
-		s++;
-	}
-	else
-	{
-		sign=0;
-		if (*s == '+') s++;
-	}
+int longjmp (jmp_buf buf, int rv)
+{
+    unsigned int lsp;
 
-	//Get the integer part
-	for (value=0.0; isdigit(*s); s++)
-	{
-		value=10.0*value+(*s-'0');
-	}
-
-	//Get the fraction
-	if (*s == '.')
-	{
-		s++;
-		for (fraction=0.1; isdigit(*s); s++)
-		{
-			value+=(*s-'0')*fraction;
-			fraction*=0.1;
-		}
-	}
-
-	//Finally, the exponent (not very efficient, but enough for now*/
-	if (toupper(*s)=='E')
-	{
-		s++;
-		iexp=(signed char)atoi(s);
-		{
-			while(iexp!=0)
-			{
-				if(iexp<0)
-				{
-					value*=0.1;
-					iexp++;
-				}
-				else
-				{
-					value*=10.0;
-					iexp--;
-				}
-			}
-		}
-	}
-
-	if(sign) value*=-1.0;
-	return (value);
+    lsp = *buf++;
+    lsp |= *buf++ << 8;
+    *((unsigned char __xdata *) lsp - 0) = *buf++;
+    *((unsigned char __xdata *) lsp - 1) = *buf++;
+    *((unsigned char __xdata *) lsp - 2) = *buf++;
+    __critical {
+        SP = lsp;
+        ESP = lsp >> 8;
+    }
+    return rv ? rv : 1;
 }

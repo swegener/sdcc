@@ -1,3 +1,23 @@
+2016-04-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/setjmp.h: use C89 compatible comments
+	* device/lib/ds390/setjmp.c: preliminary setjmp/longjmp implementation
+	* device/lib/gbz80/Makefile.in,
+	* device/lib/gbz80/setjmp.s,
+	* device/lib/hc08/Makefile.in
+	* device/lib/hc08/_setjmp.c
+	* device/lib/s08/Makefile.in
+	* device/lib/s08/_setjmp.c: implemented setjmp/longjmp for gbz80, hc08, s08
+	* support/regression/tests/setjmp.c: enabled for all but ds390
+	* device/lib/hc08/_divuint.c,
+	* device/lib/s08/_divuint.c: removed mcs51 asm
+	* device/lib/pic16/libc/stdlib/atof.c,
+	* device/lib/pic16/libc/stdlib/x_ftoa.c: fixed since char is now unsigned
+	* src/SDCCval.c (reorderIlist): properly fixed bug #2423
+	* src/z80/peeph-gbz80.def: added rule 2
+	* support/regression/tests/bug-2423.c: remove disabled pragma
+	* support/regression/tests/float_single.c: enabled EXPF as it seems to pass
+
 2016-04-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
@@ -1042,6 +1062,7 @@
 	  Fix call to make.
 
 2015-11-26 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/tests/gcc-torture-execute-20050111-1.c
 	* support/regression/tests/gcc-torture-execute-950511-1.c
 	  Disable test cases.

@@ -28,6 +28,14 @@ replace restart {
 } if notVolatile(%1)
 
 replace restart {
+	ldhl	sp,#%1
+	dec	hl
+} by {
+	; peephole 2 combined ld and dec.
+	ldhl	sp,#(%1 - 1)
+}
+
+replace restart {
 	jp	NC,%1
 	jp	%2
 %1:
@@ -988,7 +996,7 @@ replace {
 
 barrier
 
-// Do not trsy further peephole optimization after these, as other peepholes e.g. might try to generate add a, (hl-), etc otherwise.
+// Do not try further peephole optimization after these, as other peepholes e.g. might try to generate add a, (hl-), etc otherwise.
 
 replace {
 	ld	a,(hl)

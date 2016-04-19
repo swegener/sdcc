@@ -515,7 +515,9 @@ all: info
 # development.sh is used to determine -Werror default.
 CONFIG_STATUS_DEPENDENCIES = $(BFDDIR)/development.sh
 
-DISTCLEANFILES = sysroff.c sysroff.h site.exp site.bak embedspu
+DISTCLEANFILES = sysroff.c sysroff.h site.exp site.bak embedspu \
+	arlex.c arparse.c arparse.h defparse.c defparse.h mcparse.c \
+	mcparse.h rcparse.c rcparse.h sysinfo.c sysinfo.h syslex.c
 
 MOSTLYCLEANFILES = sysinfo$(EXEEXT_FOR_BUILD) bin2c$(EXEEXT_FOR_BUILD) \
   binutils.log binutils.sum abcdefgh*

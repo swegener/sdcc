@@ -276,7 +276,7 @@ replace restart {
 	ld	b,h
 	ld	(hl),#%1
 	; peephole 25 loaded #%1 into (hl) instead of (bc).
-}
+} if notUsed('a')
 
 replace restart {
 	ex	de, hl

@@ -1,3 +1,10 @@
+2016-04-20 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/z80/peeph-r2k.def
+	* src/z80/peeph-tlcs90.def
+	* src/z80/peeph-z80.def
+	  Fix potential bugs.
+
 2016-04-19 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/sdbinutils/bfd/doc/Makefile.am,

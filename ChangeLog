@@ -1,3 +1,11 @@
+2016-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
+
+	* support/sdbinutils/bfd/doc/Makefile.am,
+	  support/sdbinutils/bfd/doc/Makefile.in,
+	  support/sdbinutils/binutils/Makefile.am,
+	  support/sdbinutils/binutils/Makefile.in:
+	  Revert changes of wrong bugfix.
+
 2016-04-20 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/z80/peeph-r2k.def

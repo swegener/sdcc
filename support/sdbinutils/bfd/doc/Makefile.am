@@ -330,7 +330,7 @@ MOSTLYCLEANFILES = $(MKDOC) *.o *.stamp
 
 CLEANFILES = *.p *.ip
 
-DISTCLEANFILES = bfd.?? bfd.??? bfd.info* bfd.h libbfd.h libcoff.h texput.log
+DISTCLEANFILES = bfd.?? bfd.??? bfd.h libbfd.h libcoff.h texput.log
 
 MAINTAINERCLEANFILES = $(DOCFILES)
 

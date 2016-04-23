@@ -55,14 +55,14 @@ test1 (signed char c, int set)
   else
     if (set) ASSERT (0);
 
-  if ((c & (SCHAR_MAX+1)) == (SCHAR_MAX+1))
+  if ((unsigned char) (c & (SCHAR_MAX+1)) == (SCHAR_MAX+1))
     {
       if (!set) ASSERT (0);
     }
   else
     if (set) ASSERT (0);
 
-  if ((c & (SCHAR_MAX+1)) != (SCHAR_MAX+1))
+  if ((unsigned char) (c & (SCHAR_MAX+1)) != (SCHAR_MAX+1))
     {
       if (set) ASSERT (0);
     }
@@ -299,7 +299,6 @@ void
 testTortureExecute (void)
 {
 #if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   test1 (0, 0);
   test1 (SCHAR_MAX, 0);
   test1 (SCHAR_MIN, 1);
@@ -330,6 +329,7 @@ testTortureExecute (void)
   test6 (INT_MIN, 1);
   test6 (UINT_MAX, 1);
 
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   test7 (0, 0);
   test7 (LONG_LONG_MAX, 0);
   test7 (LONG_LONG_MIN, 1);

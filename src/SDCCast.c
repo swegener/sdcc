@@ -3408,6 +3408,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           if (otree != tree)
             return decorateType (otree, RESULT_TYPE_NONE);
 
+          /* if right is a literal and has the same size with left, 
+             then also sync their signess to avoid unecessary cast */
+          if (IS_LITERAL (RTYPE (tree)) && getSize (RTYPE (tree)) == getSize (LTYPE (tree)))
+            SPEC_USIGN (RTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
+
           LRVAL (tree) = RRVAL (tree) = 1;
 
           TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op);
@@ -3622,6 +3627,11 @@ decorateType (ast * tree, RESULT_TYPE resultType)
               return decorateType (tree, resultType);
             }
         }
+
+      /* if right is a literal and has the same size with left, 
+         then also sync their signess to avoid unecessary cast */
+      if (IS_LITERAL (RTYPE (tree)) && getSize (RTYPE (tree)) == getSize (LTYPE (tree)))
+        SPEC_USIGN (RTYPE (tree)) = SPEC_USIGN (LTYPE (tree));
 
       LRVAL (tree) = RRVAL (tree) = 1;
 

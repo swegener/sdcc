@@ -1,3 +1,12 @@
+2016-04-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c
+	  Change the signess of the literal operand in bitwise operation.
+	* support/regression/tests/bug-1929.c
+	  Add a new test case.
+	* support/regression/tests/gcc-torture-execute-20020506-1.c
+	  Modify test case.
+
 2016-04-21 Molnar Karoly <molnarkaroly AT users.sf.net>
 
 	* support/sdbinutils/bfd/doc/Makefile.am,

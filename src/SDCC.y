@@ -587,7 +587,7 @@ declaration
            {
              structdef *sdef = SPEC_STRUCT($1);
              structdef *osdef;
-             osdef = findSymWithBlock (StructTab, sdef->tagsym, currBlockno);
+             osdef = findSymWithBlock (StructTab, sdef->tagsym, currBlockno, NestLevel);
              if (osdef && osdef->block != currBlockno)
                {
                  sdef = newStruct(osdef->tagsym->name);
@@ -980,7 +980,7 @@ struct_or_union_specifier
             }
           else
             {
-              sdef = findSymWithBlock (StructTab, $2->tagsym, currBlockno);
+              sdef = findSymWithBlock (StructTab, $2->tagsym, currBlockno, NestLevel);
               if (sdef)
                 {
                   /* Error if a complete type already defined in this scope */
@@ -1066,7 +1066,8 @@ struct_or_union_specifier
         {
           structdef *sdef;
 
-          sdef = findSymWithBlock (StructTab, $2->tagsym, currBlockno);
+          sdef = findSymWithBlock (StructTab, $2->tagsym, currBlockno, NestLevel);
+
           if (sdef)
             $2 = sdef;
           else

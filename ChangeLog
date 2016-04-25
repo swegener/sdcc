@@ -1,3 +1,10 @@
+2016-04-25 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	* src/SDCCsymt.c
+	* src/SDCCsymt.h
+	  Check local defined structs more strictly.
+
 2016-04-24 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c

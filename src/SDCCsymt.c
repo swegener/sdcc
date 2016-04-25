@@ -297,7 +297,7 @@ findSymWithLevel (bucket ** stab, symbol * sym)
 /* findSymWithBlock - finds a symbol with name in a block          */
 /*-----------------------------------------------------------------*/
 void *
-findSymWithBlock (bucket ** stab, symbol * sym, int block)
+findSymWithBlock (bucket ** stab, symbol * sym, int block, int level)
 {
   bucket *bp;
 
@@ -307,7 +307,7 @@ findSymWithBlock (bucket ** stab, symbol * sym, int block)
   bp = stab[hashKey (sym->name)];
   while (bp)
     {
-      if (strcmp (bp->name, sym->name) == 0 && bp->block <= block)
+      if (strcmp (bp->name, sym->name) == 0 && (bp->block == block || (bp->block < block && bp->level < level)))
         break;
       bp = bp->next;
     }

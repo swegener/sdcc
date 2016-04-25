@@ -703,7 +703,7 @@ void addSym (bucket **, void *, char *, int, int, int checkType);
 void deleteSym (bucket **, void *, const char *);
 void *findSym (bucket **, void *, const char *);
 void *findSymWithLevel (bucket **, struct symbol *);
-void *findSymWithBlock (bucket **, struct symbol *, int);
+void *findSymWithBlock (bucket **, struct symbol *, int, int);
 void changePointer (sym_link * p);
 void checkTypeSanity (sym_link * etype, const char *name);
 sym_link *typeFromStr (const char *);

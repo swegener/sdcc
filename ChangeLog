@@ -1,3 +1,9 @@
+2016-04-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/ds390/gen.c (genFarPointerSet): no inline variable definitions
+	* src/ds390/main.c (_ds390_genAssemblerPreamble, _ds390_genIVT): add MCON,
+	  (_ds390_genXINIT): added _ds390_genXRAMCLEAR
+
 2016-04-25 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y
@@ -13091,7 +13097,7 @@
 2011-09-01 Borut Razem <borut.razem AT gmail.com>
 
 	* support/scripts/sdcc.nsi:
-	  dont't include readline5.dll in 64bit package;
+	  don't include readline5.dll in 64bit package;
 	  remove libgcc_s_sjlj-1.dll and libstdc++-6.dll on uninstallation;
 	  don't install 64 bit version on 32 bit Windows;
 	  use proper Program Files and registry for 64 bit installation

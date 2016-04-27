@@ -275,6 +275,7 @@ _ds390_genAssemblerPreamble (FILE * of)
   fputs ("mb\t=\t0xD4\n", of);
   fputs ("mc\t=\t0xD5\n", of);
   fputs ("acon\t=\t0x9D\n", of);
+  fputs ("mcon\t=\t0xC6\n", of);
   fputs ("F1\t=\t0xD1\t; user flag\n", of);
   if (options.parms_in_bank1)
     {
@@ -335,7 +336,8 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
       dbuf_printf (oBuf, "\tmov _TA,#0x55\n");
       if (options.stack10bit)
         {
-          dbuf_printf (oBuf, "\tmov acon,#0x06\t;24 bit addresses, 10 bit stack at 0x400000\n");
+          dbuf_printf (oBuf, "\tmov acon,#0x06\t;24 bit addresses, 10 bit stack\n");
+          dbuf_printf (oBuf, "\tmov mcon,#0x90\t;10 bit stack at 0x400000\n");
           dbuf_printf (oBuf, "\tmov _ESP,#0x00\t; reinitialize the stack\n");
           dbuf_printf (oBuf, "\tmov _SP,#0x00\n");
         }
@@ -387,7 +389,8 @@ _ds390_genInitStartup (FILE *of)
 }
 
 /* Generate code to copy XINIT to XISEG */
-static void _ds390_genXINIT (FILE * of) {
+static void _ds390_genXINIT (FILE * of)
+{
   fprintf (of, ";       _ds390_genXINIT() start\n");
   fprintf (of, "        mov     a,#l_XINIT\n");
   fprintf (of, "        orl     a,#l_XINIT>>8\n");
@@ -413,6 +416,31 @@ static void _ds390_genXINIT (FILE * of) {
   fprintf (of, "        mov     dps,#0\n");
   fprintf (of, "00003$:\n");
   fprintf (of, ";       _ds390_genXINIT() end\n");
+
+  fprintf (of, ";       _ds390_genXRAMCLEAR() start\n");
+  fprintf (of, "        mov	r0,#l_PSEG\n");
+  fprintf (of, "        mov	a,r0\n");
+  fprintf (of, "        orl	a,#(l_PSEG >> 8)\n");
+  fprintf (of, "        jz	00006$\n");
+  fprintf (of, "        mov	r1,#s_PSEG\n");
+  fprintf (of, "        mov	_P2,#(s_PSEG >> 8)\n");
+  fprintf (of, "        clr     a\n");
+  fprintf (of, "00005$:	movx	@r1,a\n");
+  fprintf (of, "        inc	r1\n");
+  fprintf (of, "        djnz	r0,00005$\n");
+  fprintf (of, "00006$: mov	r0,#l_XSEG\n");
+  fprintf (of, "        mov	a,r0\n");
+  fprintf (of, "        orl	a,#(l_XSEG >> 8)\n");
+  fprintf (of, "        jz	00008$\n");
+  fprintf (of, "        mov	r1,#((l_XSEG + 255) >> 8)\n");
+  fprintf (of, "        mov	dptr,#s_XSEG\n");
+  fprintf (of, "        clr     a\n");
+  fprintf (of, "00007$:	movx	@dptr,a\n");
+  fprintf (of, "        inc	dptr\n");
+  fprintf (of, "        djnz	r0,00007$\n");
+  fprintf (of, "        djnz	r1,00007$\n");
+  fprintf (of, "00008$:\n");
+  fprintf (of, ";       _ds390_genXRAMCLEAR() end\n");
 }
 
 /* Do CSE estimation */

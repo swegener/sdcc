@@ -11383,8 +11383,9 @@ genFarPointerSet (operand * right, operand * result, iCode * ic, iCode * pi)
         }
       else if (AOP_USESDPTR (result) && AOP_USESDPTR (right))
         {
+          int i;
           _startLazyDPSEvaluation ();
-          for (int i = size - 1; i > 0; i--)
+          for (i = size - 1; i > 0; i--)
             emitcode ("push", aopGet (right, i, FALSE, FALSE, NULL));
           while (size--)
             {

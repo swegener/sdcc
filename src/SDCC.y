@@ -207,6 +207,9 @@ function_definition
               $2 = createFunctionDecl($2);
               if ($2 && FUNC_ISCRITICAL ($2->type))
                 inCriticalFunction = 1;
+              /* warn for inlined __z88dk_fastcall or __z88dk_callee functions. */
+              if ($2 && FUNC_ISINLINE ($2->type) && (FUNC_ISZ88DK_CALLEE ($2->type) || FUNC_ISZ88DK_FASTCALL ($2->type)))
+                werror (W_INLINE_Z88, $2->name);
          }
      function_body
                                 {

@@ -531,6 +531,8 @@ struct
     "hexadecimal floating constant requires ISO C99 or later", 0},
   { E_ANONYMOUS_STRUCT_TAG, ERROR_LEVEL_ERROR,
     "tagged anonymous struct/union '%s'", 0},
+  { W_INLINE_Z88, ERROR_LEVEL_WARNING,
+    "omit __z88dk_fastcall or __z88dk_callee of inline function '%s'", 0},
 };
 
 /* -------------------------------------------------------------------------------

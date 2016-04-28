@@ -1,4 +1,11 @@
 2016-04-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	  Add warning for inlined _z88dk_* functions.
+
+2016-04-28 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/SDCC.y
 	* src/SDCCerr.c
 	  Allow typedef function types.

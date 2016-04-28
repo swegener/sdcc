@@ -496,7 +496,7 @@ struct
   { W_FLEXARRAY_INSTRUCT, ERROR_LEVEL_WARNING,
      "type of variable '%s' is struct with flexible array field", 0},
   { E_TYPE_IS_FUNCTION, ERROR_LEVEL_ERROR,
-     "type '%s' is function", 0},
+     "'%s' has function type", 0},
   { W_INLINE_NAKED, ERROR_LEVEL_WARNING,
      "inline function '%s' is __naked", 0},
   { E_Z88DK_FASTCALL_PARAMETERS, ERROR_LEVEL_ERROR,

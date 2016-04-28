@@ -1,4 +1,11 @@
-2016-04-18 Maarten Brock <sourceforge.brock AT dse.nl>
+2016-04-28 Ben Shi <powerstudio1st AT 163 DOT com>
+	* src/SDCC.y
+	* src/SDCCerr.c
+	  Allow typedef function types.
+	* support/regression/tests/bug-2497.c
+	  Add a new test case.
+
+2016-04-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (genFarPointerSet): no inline variable definitions
 	* src/ds390/main.c (_ds390_genAssemblerPreamble, _ds390_genIVT): add MCON,

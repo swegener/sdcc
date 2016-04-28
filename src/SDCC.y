@@ -610,16 +610,26 @@ declaration
 
          for (sym1 = sym = reverseSyms($2);sym != NULL;sym = sym->next) {
              sym_link *lnk = copyLinkChain($1);
-             sym_link *l0 = NULL, *l1 = NULL;
-             /* check creating intances of structs with flexible arrays */
+             sym_link *l0 = NULL, *l1 = NULL, *l2 = NULL;
+             /* check illegal declaration */
              for (l0 = sym->type; l0 != NULL; l0 = l0->next)
                if (IS_PTR (l0))
                  break;
+             /* check if creating intances of structs with flexible arrays */
              for (l1 = lnk; l1 != NULL; l1 = l1->next)
                if (IS_STRUCT (l1) && SPEC_STRUCT (l1)->b_flexArrayMember)
                  break;
              if (!options.std_c99 && l0 == NULL && l1 != NULL && SPEC_EXTR($1) != 1)
                werror (W_FLEXARRAY_INSTRUCT, sym->name);
+             /* check if creating intances of function type */
+             for (l1 = lnk; l1 != NULL; l1 = l1->next)
+               if (IS_FUNC (l1))
+                 break;
+             for (l2 = lnk; l2 != NULL; l2 = l2->next)
+               if (IS_PTR (l2))
+                 break;
+             if (l0 == NULL && l2 == NULL && l1 != NULL)
+               werrorfl(sym->fileDef, sym->lineDef, E_TYPE_IS_FUNCTION, sym->name);
              /* do the pointer stuff */
              pointerTypes(sym->type,lnk);
              addDecl (sym,0,lnk);
@@ -904,9 +914,6 @@ type_specifier
             symbol *sym;
             sym_link *p;
             sym = findSym(TypedefTab,NULL,$1);
-            if (sym != NULL)
-              if (IS_FUNC (sym->type))
-                werrorfl(sym->fileDef, sym->lineDef, E_TYPE_IS_FUNCTION, sym->name);
             $$ = p = copyLinkChain(sym ? sym->type : NULL);
             SPEC_TYPEDEF(getSpec(p)) = 0;
             ignoreTypedefType = 1;

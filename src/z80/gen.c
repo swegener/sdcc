@@ -4437,14 +4437,9 @@ genFunction (const iCode * ic)
      then save all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
     {
-      if (IS_RAB)
-        emit2 ("push ip");
-
-      /* If critical function then turn interrupts off */
-      /* except when no interrupt number is given then it implies the NMI handler */
-      if (IFFUNC_ISCRITICAL (sym->type) && (FUNC_INTNO (sym->type) != INTNO_UNSPEC))
+      if (!IFFUNC_ISCRITICAL (sym->type))
         {
-          emit2 ("!di");
+          emit2 ("!ei");
         }
 
       emit2 ("!pusha");
@@ -4574,6 +4569,8 @@ genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   int retsize = getSize (sym->type->next);
+  /* __critical __interrupt without an interrupt number is the non-maskable interrupt */
+  bool is_nmi = (IS_Z80 || IS_Z180) && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC; 
 
   wassert (!regalloc_dry_run);
   wassert (!_G.stack.pushed);
@@ -4615,16 +4612,7 @@ genEndFunction (iCode * ic)
   /* if this is an interrupt service routine
      then save all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
-    {
-      emit2 ("!popa");
-
-      /* If critical function then turn interrupts back on */
-      /* except when no interrupt number is given then it implies the NMI handler */
-      if (IFFUNC_ISCRITICAL (sym->type) && (FUNC_INTNO (sym->type) != INTNO_UNSPEC))
-        {
-          emit2 ("!ei");
-        }
-    }
+    emit2 ("!popa");
   else
     {
       /* This is a non-ISR function.
@@ -4657,18 +4645,21 @@ genEndFunction (iCode * ic)
 
   if (IFFUNC_ISISR (sym->type))
     {
-      /* "critical interrupt" is used to imply NMI handler */
-      if (!IS_GB && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC)
+      if (is_nmi)
         emit2 ("retn");
       else if (IS_RAB && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC)
         {
-          // ISR exit sequence that works on the rabbit 4000
-          emit2 ("pop ip");
           emit2 ("ipres");
           emit2 ("ret");
         }
+      else if (IS_GB)
+        emit2 (IFFUNC_ISCRITICAL (sym->type) ? "reti" : "ret");
       else
-        emit2 ("reti");
+        {
+          if (IFFUNC_ISCRITICAL (sym->type) && !is_nmi)
+            emit2 ("!ei");
+          emit2 ("reti");
+        }
     }
   else
     {

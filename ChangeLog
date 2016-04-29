@@ -1,3 +1,10 @@
+2016-04-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  doc/sdccman.lyx,
+	  .version:
+	  Reorganize interrupt handling for z80-related backends, fix bugs #2339, #2131.
+
 2016-04-29 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y
@@ -25,6 +32,7 @@
 	* src/ds390/main.c (_ds390_genAssemblerPreamble, _ds390_genIVT): add MCON,
 	  (_ds390_genXINIT): added _ds390_genXRAMCLEAR
 
+>>>>>>> .r9581
 2016-04-25 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y

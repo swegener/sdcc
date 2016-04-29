@@ -208,8 +208,10 @@ function_definition
               if ($2 && FUNC_ISCRITICAL ($2->type))
                 inCriticalFunction = 1;
               /* warn for inlined __z88dk_fastcall or __z88dk_callee functions. */
-              if ($2 && FUNC_ISINLINE ($2->type) && (FUNC_ISZ88DK_CALLEE ($2->type) || FUNC_ISZ88DK_FASTCALL ($2->type)))
-                werror (W_INLINE_Z88, $2->name);
+              if ($2 && FUNC_ISINLINE ($2->type) && (FUNC_ISZ88DK_CALLEE ($2->type) || FUNC_ISZ88DK_FASTCALL ($2->type)
+                || FUNC_BANKED ($2->type) || FUNC_REGBANK ($2->type)
+                || FUNC_ISCRITICAL ($2->type) || FUNC_ISOVERLAY ($2->type) || FUNC_ISISR ($2->type)))
+                  werror (W_INLINE_FUNCATTR, $2->name);
          }
      function_body
                                 {

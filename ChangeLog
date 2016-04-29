@@ -1,3 +1,10 @@
+2016-04-29 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCC.y
+	* src/SDCCerr.c
+	* src/SDCCerr.h
+	  Make the warning in previous commit more generic.
+
 2016-04-28 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y

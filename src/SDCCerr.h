@@ -264,7 +264,7 @@ enum {
   W_UNKNOWN_REG                 = 235, /* unknown register specified */
   E_HEXFLOAT_C99                = 236, /* hexadecimal floating constant requires ISO C99 or later */
   E_ANONYMOUS_STRUCT_TAG        = 237, /* anonymous struct/union should not have a tag */
-  W_INLINE_Z88                  = 238, /* inline functions should not be z88dk_fastcall or z88dk_callee */
+  W_INLINE_FUNCATTR             = 238, /* inline functions should not be z88dk_fastcall or z88dk_callee */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

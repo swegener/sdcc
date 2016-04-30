@@ -1,3 +1,8 @@
+2016-04-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCasm.c:
+	  Hex number case consistency, RFE #142.
+
 2016-04-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

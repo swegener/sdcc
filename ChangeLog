@@ -1,3 +1,7 @@
+2016-05-01 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* Enlarge stack size to 4MB in run time.
+
 2016-04-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCasm.c:

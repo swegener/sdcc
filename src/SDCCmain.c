@@ -42,6 +42,7 @@
 #else
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/resource.h>
 #endif
 
 /* REMOVE ME!!! */
@@ -578,6 +579,16 @@ setParseWithComma (set ** dest, const char *src)
 
       src = ++p;
     }
+}
+
+/*-------------------------------------------------------------*/
+/* setStackSize - set the stack size of a running sdcc process */
+/*-------------------------------------------------------------*/
+static void
+setStackSize (void)
+{
+  struct rlimit rl = {4 * 1024 * 1024, 4 * 1024 * 1024};
+  setrlimit (RLIMIT_STACK, &rl);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2445,7 +2456,11 @@ sig_handler (int signal)
 int
 main (int argc, char **argv, char **envp)
 {
+  /* get the prefix and the suffix of the sdcc command */
   getPrefixSuffix (argv[0]);
+
+  /* set a larger stack size of a running sdcc process to 4MB */
+  setStackSize ();
 
   /* turn all optimizations off by default */
   memset (&optimize, 0, sizeof (struct optimize));

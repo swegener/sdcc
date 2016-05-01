@@ -294,7 +294,7 @@ hasSpilLoc (symbol * sym, eBBlock * ebp, iCode * ic)
 
 #ifdef OLDRALLOC
 /** Will return 1 if the remat flag is set.
-    A symbol is rematerialisable if it doesnt need to be allocated
+    A symbol is rematerialisable if it doesn't need to be allocated
     into registers at creation as it can be re-created at any time -
     i.e. it's constant in some way.
 */

@@ -250,7 +250,7 @@ static const ASM_MAPPING _isas_mapping[] = {
       "\tCAPSOFF      ; Case sensitive\n"
       "\tISDMG        ; Gameboy mode\n"
       "_CODE\tGROUP\n"
-      "\t; We have to define these here as sdcc doesnt make them global by default\n"
+      "\t; We have to define these here as sdcc doesn't make them global by default\n"
       "\tGLOBAL __mulschar\n"
       "\tGLOBAL __muluchar\n"
       "\tGLOBAL __mulint\n"

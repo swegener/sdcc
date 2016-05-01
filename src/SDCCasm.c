@@ -58,7 +58,7 @@ dbuf_tvprintf (struct dbuf_s *dbuf, const char *format, va_list ap)
 {
   /*
      Under Linux PPC va_list is a structure instead of a primitive type,
-     and doesnt like being passed around.  This version turns everything
+     and doesn't like being passed around.  This version turns everything
      into one function.
 
      Supports:

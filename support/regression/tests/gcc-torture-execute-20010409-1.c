@@ -48,7 +48,7 @@ void test (const char *x, int *y)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 6))
   d->b = 0;
   d->a = &a;
   test ("", 0);

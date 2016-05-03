@@ -25,6 +25,11 @@ exlist = ["bug663539"]
 name = ""
 
 for line in lines:
+    # --- EMPTY: "No test result."
+    m = re.match(r'^--- EMPTY:', line)
+    if (m):
+        messagelog.append(line[4:])
+ 
     # --- Running: gen/ucz80/longor/longor
     m = re.match(r'^--- Running: (.*)$', line)
     if (m):

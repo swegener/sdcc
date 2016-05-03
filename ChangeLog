@@ -1,3 +1,11 @@
+2016-05-03 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/collate-results.py
+	* support/regression/compact-results.py
+	* support/regression/Makefile.in
+	  Detect and report 'segment fault' in test-host.
+	* support/regression/tests/gcc-torture-execute-20010409-1.c
+	  Disable for gcc-5 in test-host.
+
 2016-05-01 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* Enlarge stack size to 4MB in run time.

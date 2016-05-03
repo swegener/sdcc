@@ -8,6 +8,11 @@ points, and test cases."""
 # Read in everything
 lines = sys.stdin.readlines()
 
+if len(lines) == 0:
+    fp = open(sys.argv[1], "w")
+    fp.write('--- EMPTY: "No test result" at ' + sys.argv[1] + '\n')
+    fp.close()
+
 # Init the running totals
 failures = 0
 cases = 0

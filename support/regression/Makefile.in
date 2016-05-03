@@ -278,7 +278,7 @@ $(PORT_CASES_DIR)/%/iterations.stamp: %.c $(GENERATE_CASES)
 # iteration directory.
 $(PORT_RESULTS_DIR)/%.out: $(PORT_CASES_DIR)/%/iterations.stamp
 	$(MAKE) iterations PORT=$(PORT) CASES=$(dir $<)
-	$(PYTHON) $(srcdir)/compact-results.py < $@
+	$(PYTHON) $(srcdir)/compact-results.py $@ < $@
 
 # Rule to summarise the results for one port after all of the tests
 # have been run.

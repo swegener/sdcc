@@ -8,9 +8,16 @@ points, and test cases."""
 # Read in everything
 lines = sys.stdin.readlines()
 
-if len(lines) == 0:
+found = False
+for line in lines:
+    if (re.search(r'^--- Summary:', line)):
+        found = True
+        break
+
+if not found:
     fp = open(sys.argv[1], "w")
-    fp.write('--- EMPTY: "No test result" at ' + sys.argv[1] + '\n')
+    fp.write("--- Running: %s\n" % sys.argv[1])
+    fp.write("--- Summary: 1/0/0: 1 failed of 0 tests in 0 cases.\n")
     fp.close()
 
 # Init the running totals

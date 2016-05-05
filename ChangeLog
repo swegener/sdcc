@@ -1,3 +1,7 @@
+2016-05-05 Ben Shi <powerstudio1st AT 163 DOT com>
+	* support/regression/compact-results.py
+	  Fix spots in previous commit.
+
 2016-05-04 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/collate-results.py
 	* support/regression/compact-results.py

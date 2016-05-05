@@ -13,6 +13,9 @@ for line in lines:
     if (re.search(r'^--- Summary:', line)):
         found = True
         break
+    if (re.search(r'^--- Simulator:', line)):
+        found = True
+        break
 
 if not found:
     fp = open(sys.argv[1], "w")

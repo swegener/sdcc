@@ -114,7 +114,7 @@ include $(srcdir)/clean.mk
 # My rules
 # --------
 libucsimutil.a: $(OBJECTS)
-	ar -rcu $*.a $(OBJECTS)
+	ar -rc $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
 

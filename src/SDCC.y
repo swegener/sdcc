@@ -187,38 +187,42 @@ external_definition
 
 function_definition
    : function_declarator 
-         {   /* function type not specified */
-             /* assume it to be 'int'       */
-             addDecl($1,0,newIntLink());
-             $1 = createFunctionDecl($1);
-             if ($1 && FUNC_ISCRITICAL ($1->type))
-               inCriticalFunction = 1;
-         }
-      function_body  {
-                                   $$ = createFunction($1,$3);
-                                   if ($1 && FUNC_ISCRITICAL ($1->type))
-                                     inCriticalFunction = 0;
-                               }
-   | declaration_specifiers function_declarator
-         {
-              sym_link *p = copyLinkChain($1);
-              pointerTypes($2->type,p);
-              addDecl($2,0,p);
-              $2 = createFunctionDecl($2);
-              if ($2 && FUNC_ISCRITICAL ($2->type))
+        {   /* function type not specified */
+            /* assume it to be 'int'       */
+            addDecl($1,0,newIntLink());
+            $1 = createFunctionDecl($1);
+            if ($1 && FUNC_ISCRITICAL ($1->type))
                 inCriticalFunction = 1;
-              /* warn for inlined __z88dk_fastcall or __z88dk_callee functions. */
-              if ($2 && FUNC_ISINLINE ($2->type) && (FUNC_ISZ88DK_CALLEE ($2->type) || FUNC_ISZ88DK_FASTCALL ($2->type)
-                || FUNC_BANKED ($2->type) || FUNC_REGBANK ($2->type)
-                || FUNC_ISCRITICAL ($2->type) || FUNC_ISOVERLAY ($2->type) || FUNC_ISISR ($2->type)))
-                  werror (W_INLINE_FUNCATTR, $2->name);
-         }
+        }
+      function_body
+        {
+            $$ = createFunction($1,$3);
+            if ($1 && FUNC_ISCRITICAL ($1->type))
+                inCriticalFunction = 0;
+        }
+   | declaration_specifiers function_declarator
+        {
+            sym_link *p = copyLinkChain($1);
+            pointerTypes($2->type,p);
+            addDecl($2,0,p);
+            $2 = createFunctionDecl($2);
+            if ($2 && FUNC_ISCRITICAL ($2->type))
+                inCriticalFunction = 1;
+            /* warn for loss of calling convention for inlined functions. */
+            if ($2 && FUNC_ISINLINE ($2->type) &&
+                ( FUNC_ISZ88DK_CALLEE ($2->type) || FUNC_ISZ88DK_FASTCALL ($2->type) ||
+                  FUNC_BANKED ($2->type)         || FUNC_REGBANK ($2->type)          ||
+                  FUNC_ISOVERLAY ($2->type)      || FUNC_ISISR ($2->type) ))
+              {
+                werror (W_INLINE_FUNCATTR, $2->name);
+              }
+        }
      function_body
-                                {
-                                    $$ = createFunction($2,$4);
-                                    if ($2 && FUNC_ISCRITICAL ($2->type))
-                                      inCriticalFunction = 0;
-                                }
+        {
+            $$ = createFunction($2,$4);
+            if ($2 && FUNC_ISCRITICAL ($2->type))
+                inCriticalFunction = 0;
+        }
    ;
 
 function_attribute

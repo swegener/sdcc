@@ -175,13 +175,13 @@ include $(srcdir)/clean.mk
 ucsim_lib: $(top_builddir)/libguiucsim.a
 
 $(top_builddir)/libguiucsim.a: $(OBJECTS) $(UCSIM_OBJECTS)
-	ar -rcu $*.a $(OBJECTS) $(UCSIM_OBJECTS)
+	ar -rc $*.a $(OBJECTS) $(UCSIM_OBJECTS)
 	$(RANLIB) $*.a
 
 tool_lib: $(top_builddir)/libguitool.a
 
 $(top_builddir)/libguitool.a: $(OBJECTS) $(TOOL_OBJECTS)
-	ar -rcu $*.a $(OBJECTS) $(TOOL_OBJECTS)
+	ar -rc $*.a $(OBJECTS) $(TOOL_OBJECTS)
 	$(RANLIB) $*.a
 
 .cc.o:

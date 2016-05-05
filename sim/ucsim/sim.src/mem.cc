@@ -166,25 +166,43 @@ cl_memory::err_non_decoded(t_addr addr)
 t_addr
 cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con)
 {
-  int i;
+  int i, step;
   t_addr lva= lowest_valid_address();
   t_addr hva= highest_valid_address();
 
   if (start < lva)
     start= lva;
+  if (start > hva)
+    start= hva;
+  if (stop < lva)
+    stop= lva;
   if (stop > hva)
     stop= hva;
-  while ((start <= stop) &&
-         (start <= hva))
+  if (stop >= start)
+    {
+      step= +1;
+      stop++;
+      if (start + bpl > stop)
+        bpl= stop - start;
+    }
+  else
+    {
+      step= -1;
+      stop--;
+      if (start - bpl < stop)
+        bpl= start - stop;
+    }
+  while (start != stop)
     {
       con->dd_printf(addr_format, start); con->dd_printf(" ");
       for (i= 0;
            (i < bpl) &&
-             (start+i <= hva) &&
-             (start+i <= stop);
+             (start+i*step >= lva) &&
+             (start+i*step <= hva) &&
+             (start != stop);
            i++)
         {
-          con->dd_printf(data_format, /*read*/get(start+i)); con->dd_printf(" ");
+          con->dd_printf(data_format, /*read*/get(start+i*step)); con->dd_printf(" ");
         }
       while (i < bpl)
         {
@@ -198,11 +216,12 @@ cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con)
           i++;
         }
       for (i= 0; (i < bpl) &&
-             (start+i <= hva) &&
-             (start+i <= stop);
+             (start+i*step >= lva) &&
+             (start+i*step <= hva) &&
+             (start != stop);
            i++)
         {
-          long c= read(start+i);
+          long c= read(start+i*step);
           con->dd_printf("%c", isprint(255&c)?(255&c):'.');
           if (width > 8)
             con->dd_printf("%c", isprint(255&(c>>8))?(255&(c>>8)):'.');
@@ -212,8 +231,8 @@ cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con)
             con->dd_printf("%c", isprint(255&(c>>24))?(255&(c>>24)):'.');
         }
       con->dd_printf("\n");
-      dump_finished= start+i;
-      start+= bpl;
+      dump_finished= start+i*step;
+      start+= i*step;
     }
   return(dump_finished);
 }

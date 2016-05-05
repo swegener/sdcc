@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -26,12 +26,55 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include <8051.h>
 #include <sdcc-lib.h>
 #define __SDCC_HIDE_LONGJMP
 #include <setjmp.h>
 
-#if defined(__SDCC_STACK_AUTO) && defined(__SDCC_USE_XSTACK)
+#if defined(__SDCC_ds390)
+
+#include <ds80c390.h>
+
+int __setjmp (jmp_buf buf)
+{
+    unsigned char sp, esp;
+    unsigned long lsp;
+
+    /* registers would have been saved on the
+       stack anyway so we need to save SP
+       and the return address */
+    __critical {
+        sp = SP;
+        esp = ESP;
+    }
+    lsp = sp;
+    lsp |= (unsigned int)(esp << 8);
+    lsp |= 0x400000;
+    *buf++ = lsp;
+    *buf++ = lsp >> 8;
+    *buf++ = *((unsigned char __xdata *) lsp - 0);
+    *buf++ = *((unsigned char __xdata *) lsp - 1);
+    *buf++ = *((unsigned char __xdata *) lsp - 2);
+    return 0;
+}
+
+int longjmp (jmp_buf buf, int rv)
+{
+    unsigned long lsp;
+
+    lsp = *buf++;
+    lsp |= (unsigned int)(*buf++ << 8);
+    lsp |= 0x400000;
+    *((unsigned char __xdata *) lsp - 0) = *buf++;
+    *((unsigned char __xdata *) lsp - 1) = *buf++;
+    *((unsigned char __xdata *) lsp - 2) = *buf++;
+    __critical {
+        SP = lsp;
+        ESP = lsp >> 8;
+    }
+    return rv ? rv : 1;
+}
+
+#elif defined(__SDCC_STACK_AUTO) && defined(__SDCC_USE_XSTACK)
 
 static void dummy (void) __naked
 {
@@ -397,7 +440,8 @@ _longjmp:
 
 #else
 
-//extern unsigned char __data bp;
+#include <8051.h>
+
 extern unsigned char __data spx;
 extern unsigned char __data bpx;
 
@@ -411,7 +455,6 @@ int __setjmp (jmp_buf buf)
     *buf++ = bpx;
 #endif
     *buf++ = SP;
-//    *buf++ = bp;
     *buf++ = *((unsigned char __data *) SP - 0);
     *buf++ = *((unsigned char __data *) SP - 1);
 #ifdef __SDCC_MODEL_HUGE
@@ -429,7 +472,6 @@ int longjmp (jmp_buf buf, int rv)
     bpx = *buf++;
 #endif
     lsp = *buf++;
-//    bp = *buf++;
     *((unsigned char __data *) lsp - 0) = *buf++;
     *((unsigned char __data *) lsp - 1) = *buf++;
 #ifdef __SDCC_MODEL_HUGE

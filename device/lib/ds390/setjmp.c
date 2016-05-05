@@ -34,7 +34,7 @@
 int __setjmp (jmp_buf buf)
 {
     unsigned char sp, esp;
-    unsigned int lsp;
+    unsigned long lsp;
 
     /* registers would have been saved on the
        stack anyway so we need to save SP
@@ -43,9 +43,9 @@ int __setjmp (jmp_buf buf)
         sp = SP;
         esp = ESP;
     }
-    esp |= 0xF0;
-    lsp = esp << 8;
-    lsp |= sp;
+    lsp = sp;
+    lsp |= (unsigned int)(esp << 8);
+    lsp |= 0x400000;
     *buf++ = lsp;
     *buf++ = lsp >> 8;
     *buf++ = *((unsigned char __xdata *) lsp - 0);
@@ -56,10 +56,11 @@ int __setjmp (jmp_buf buf)
 
 int longjmp (jmp_buf buf, int rv)
 {
-    unsigned int lsp;
+    unsigned long lsp;
 
     lsp = *buf++;
-    lsp |= *buf++ << 8;
+    lsp |= (unsigned int)(*buf++ << 8);
+    lsp |= 0x400000;
     *((unsigned char __xdata *) lsp - 0) = *buf++;
     *((unsigned char __xdata *) lsp - 1) = *buf++;
     *((unsigned char __xdata *) lsp - 2) = *buf++;

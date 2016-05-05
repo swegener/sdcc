@@ -1,13 +1,39 @@
+2016-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/setjmp.h: ds390 needs 5 bytes
+	* device/lib/_setjmp.c: added ds390 version
+	* device/lib/ds390/setjmp.c: updated, but still a dummy
+	* device/lib/hc08/_setjmp.c,
+	* device/lib/s08/_setjmp.c: fixed stack pointer bug
+	* sim/ucsim/cmd.src/Makefile.in,
+	* sim/ucsim/gui.src/Makefile.in,
+	* sim/ucsim/main_in.mk,
+	* sim/ucsim/sim.src/Makefile.in: drop -u to prevent warning on ar 2.26
+	* sim/ucsim/s51.src/uc390cl.h: added ixram
+	* sim/ucsim/s51.src/uc390.cc: check full ixram range,
+	* sim/ucsim/s51.src/uc51.cc,
+	* sim/ucsim/s51.src/uc89c51r.cc: show @R0, @R1 and 8 stack bytes
+	* sim/ucsim/sim.src/mem.cc (cl_memory::dump): allow decrementing range
+	* sim/ucsim/stm8.src/inst.cc (cl_stm8::flag_cvh): fixed warnings
+	* src/SDCC.y: critical is not a part of the calling convention
+	* support/regression/tests/bug663539.c: fix to fool the python script
+	* support/regression/tests/gcc-torture-execute-20010409-1.c: use longjmp()
+	  instead of return() to mimic exit()
+	* support/regression/tests/setjmp.c: enabled for all regular targets
+
 2016-05-05 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/compact-results.py
 	  Fix spots in previous commit.
 
 2016-05-04 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/collate-results.py
 	* support/regression/compact-results.py
 	  Detect and report aborted test cases.
 
 2016-05-03 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/collate-results.py
 	* support/regression/compact-results.py
 	* support/regression/Makefile.in
@@ -46,6 +72,7 @@
 	  Add warning for inlined _z88dk_* functions.
 
 2016-04-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* src/SDCC.y
 	* src/SDCCerr.c
 	  Allow typedef function types.
@@ -58,7 +85,6 @@
 	* src/ds390/main.c (_ds390_genAssemblerPreamble, _ds390_genIVT): add MCON,
 	  (_ds390_genXINIT): added _ds390_genXRAMCLEAR
 
->>>>>>> .r9581
 2016-04-25 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCC.y

@@ -5,7 +5,7 @@
  * and Valentin Dudouyt valentin.dudouyt@gmail.com
  *
  * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- * 
+ *
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -41,7 +41,7 @@ int
 cl_stm8::fetchea(t_mem code, unsigned char prefix)
 {
    int ftc;
- 
+
    switch ((code >> 4) & 0x0f) {
    case 0x1: return (unsigned char)fetch()+regs.SP;  // SP indexed
 
@@ -49,7 +49,7 @@ cl_stm8::fetchea(t_mem code, unsigned char prefix)
 
    case 0xc:
       if ( 0 == prefix) {              // direct long
-         return fetch2();  
+         return fetch2();
       } else if ( 0x72 == prefix) {    // long pointer
          ftc = fetch2();
          return get2(ftc);
@@ -81,7 +81,7 @@ cl_stm8::fetchea(t_mem code, unsigned char prefix)
 
    case 0xe:
       if ( 0 == prefix) {               // short offset with X reg
-         return fetch()+regs.X;  
+         return fetch()+regs.X;
       } else if ( 0x90 == prefix) {     // short offset with Y reg
          return fetch()+regs.Y;
       } else {
@@ -129,7 +129,7 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
 	    resaddr = ( resHALT);
 	  }
      break;
- 
+
     case 0x4:
 	  if ( 0x72 == prefix) {           // long offset with X
          ftc = fetch2();
@@ -141,7 +141,7 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
          resaddr = ( resHALT);
 	  }
      break;
- 
+
     case 0x5:
 	  if ( 0x72 == prefix) {           // long direct
          resaddr = fetch2();
@@ -149,7 +149,7 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
          resaddr = ( resHALT);
 	  }
      break;
- 
+
     case 0x6:
           if ( 0 == prefix) {              // short offset with X
 		resaddr = (fetch()+regs.X);
@@ -190,7 +190,7 @@ cl_stm8::get_dest(t_mem code, unsigned char prefix)
 void
 cl_stm8::flag_cvh(int x, int m, int r, bool byte, bool add, int mask)
 {
-  char xt, xs, xh, mt, ms, mh, rt, rs, rh;
+  bool xt, xs, xh, mt, ms, mh, rt, rs, rh;
 
   if (byte)
     {
@@ -220,20 +220,20 @@ cl_stm8::flag_cvh(int x, int m, int r, bool byte, bool add, int mask)
   if (add)
     {
       if (mask & BIT_V)
-        FLAG_ASSIGN (BIT_V, ((xt & mt) | (mt & !rt) | (!rt & xt)) ^ ((xs & ms) | (ms & !rs) | (!rs & xs)));
+        FLAG_ASSIGN (BIT_V, ((xt && mt) || (mt && !rt) || (!rt && xt)) ^ ((xs && ms) || (ms && !rs) || (!rs && xs)));
       if (mask & BIT_C)
-        FLAG_ASSIGN (BIT_C, (xt & mt) | (mt & !rt) | (!rt & xt));
+        FLAG_ASSIGN (BIT_C, (xt && mt) || (mt && !rt) || (!rt && xt));
       if (mask & BIT_H)
-        FLAG_ASSIGN (BIT_H, (xh & mh) | (mh & !rh) | (!rh & xh));
+        FLAG_ASSIGN (BIT_H, (xh && mh) || (mh && !rh) || (!rh && xh));
     }
   else
     {
       if (mask & BIT_V)
-        FLAG_ASSIGN (BIT_V, ((!xt & mt) | (!xt & rt) | (xt & mt & rt)) ^ ((!xs & ms) | (!xs & rs) | (xs & ms & rs)));
+        FLAG_ASSIGN (BIT_V, ((!xt && mt) || (!xt && rt) || (xt && mt && rt)) ^ ((!xs && ms) || (!xs && rs) || (xs && ms && rs)));
       if (mask & BIT_H)
-        FLAG_ASSIGN (BIT_H, (!xh & mh) | (!xh & rh) | (xh & mh & rh));
-      if (mask & BIT_C)      
-        FLAG_ASSIGN (BIT_C, (!xt & mt) | (!xt & rt) | (xt & mt & rt));
+        FLAG_ASSIGN (BIT_H, (!xh && mh) || (!xh && rh) || (xh && mh && rh));
+      if (mask & BIT_C)
+        FLAG_ASSIGN (BIT_C, (!xt && mt) || (!xt && rt) || (xt && mt && rt));
     }
 }
 
@@ -345,18 +345,18 @@ cl_stm8::inst_bccmbcpl(t_mem code, unsigned char prefix)
 {
    int ea = fetch2();
    unsigned char dbyte = get1( ea);
-  
-   if (code & 0x01)  { // bccm  
+
+   if (code & 0x01)  { // bccm
       char pos = (code - 0x11) >> 1;
       dbyte = dbyte & (~(1<<pos));
       if (regs.CC & BIT_C) {
          dbyte |= (1<<pos);
-      }	
+      }
    } else { // bcpl
       char pos = (code - 0x10) >> 1;
       dbyte = dbyte ^ (1<<pos);
    }
- 
+
    store1(ea, dbyte);
    return(resGO);
 }
@@ -379,15 +379,15 @@ cl_stm8::inst_bresbset(t_mem code, unsigned char prefix)
 {
   int ea = fetch2();
   unsigned char dbyte = get1( ea);
-  
-  if (code & 0x01) { // bres  
+
+  if (code & 0x01) { // bres
 	char pos = (code - 0x11) >> 1;
 	dbyte = dbyte & (~(1<<pos));
   } else { // bset
  	char pos = (code - 0x10) >> 1;
 	dbyte = dbyte | (1<<pos);
   }
- 
+
   store1(ea, dbyte);
   return(resGO);
 }
@@ -400,7 +400,7 @@ cl_stm8::inst_btjfbtjt(t_mem code, unsigned char prefix)
   char reljump = fetch();
   char pos;
 
-  if (code & 0x01) { // btjf  
+  if (code & 0x01) { // btjf
 	pos = (code - 0x01) >> 1;
 	if(!( dbyte & (1<<pos))) {
 		PC += reljump;
@@ -434,7 +434,7 @@ cl_stm8::inst_clr(t_mem code, unsigned char prefix)
 
   FLAG_SET (BIT_Z);
   FLAG_CLEAR (BIT_N);
-  
+
   switch(((code & 0xf0) | (prefix << 8)) >> 4) {
     /* clr */
     case 0x004: regs.A = 0; return(resGO);
@@ -530,7 +530,7 @@ cl_stm8::inst_cpw(t_mem code, unsigned char prefix)
     FLAG_CVH_WORD_SUB(operand1, operand2, result, BIT_C | BIT_V);
   else
     FLAG_CVH_WORD_SUB(operand2, operand1, result, BIT_C | BIT_V);
- 
+
   return(resGO);
 }
 
@@ -552,7 +552,7 @@ cl_stm8::inst_cpl(t_mem code, unsigned char prefix)
    }
 
    operand ^= 0xffff;
- 
+
    FLAG_SET (BIT_C);
 
    if (((code&0xf0)==0x40) &&(prefix == 0x00)) {
@@ -681,9 +681,9 @@ cl_stm8::inst_inc(t_mem code, unsigned char prefix)
       opaddr = get_dest(code,prefix);
       operand = get1(opaddr);
    }
- 
+
    resval = operand + 1;
- 
+
    if (((code&0xf0)==0x40) &&(prefix == 0x00)) {
       regs.A = resval&0xff;
       FLAG_ASSIGN (BIT_Z, (resval & 0xff) == 0);
@@ -757,7 +757,7 @@ cl_stm8::inst_jr(t_mem code, unsigned char prefix)
         break;
       default:
         return(resHALT);
-    } 
+    }
   }
   else if (prefix==0x90) {
     switch ((code>>1) & 7) {
@@ -768,17 +768,17 @@ cl_stm8::inst_jr(t_mem code, unsigned char prefix)
         taken = !(regs.CC & (BIT_I1|BIT_I0));
         break;
       case 7: // JRIL (2E) / JRIH (2F), no means to test this ???
-        taken = 0; 
+        taken = 0;
       default:
         return(resHALT);
     }
   }
   else
     return(resHALT);
-  
+
   if (code & 1)
     taken = ! taken;
-  
+
   ofs = fetch();
   if (taken)
     PC += ofs;
@@ -881,7 +881,7 @@ cl_stm8::inst_lddst(t_mem code, unsigned char prefix)
    FLAG_ASSIGN (BIT_N, 0x80 & regs.A);
 
    store1(opaddr, regs.A);
- 
+
    return(resGO);
 }
 
@@ -1000,9 +1000,9 @@ cl_stm8::inst_neg(t_mem code, unsigned char prefix)
       opaddr = get_dest(code,prefix);
       operand = get1(opaddr);
    }
- 
+
    resval = 0 - operand;
- 
+
    if (((code&0xf0)==0x40) &&(prefix == 0x00)) {
       regs.A = resval&0xff;
       FLAG_ASSIGN (BIT_Z, (resval & 0xff) == 0);
@@ -1028,7 +1028,7 @@ cl_stm8::inst_neg(t_mem code, unsigned char prefix)
       FLAG_ASSIGN (BIT_V, (0x80 == operand));
       FLAG_ASSIGN (BIT_C, 0x100 & resval);
    }
- 
+
    return(resGO);
 }
 
@@ -1110,9 +1110,9 @@ cl_stm8::inst_rrc(t_mem code, unsigned char prefix)
       opaddr = get_dest(code,prefix);
       operand = get1(opaddr);
    }
- 
+
    resval = operand >> 1;
- 
+
    if (((code&0xf0)==0x40) &&(prefix == 0x00)) {
       if (regs.CC & BIT_C) {      resval |= 0x80;   }
       regs.A = resval&0xff;
@@ -1138,7 +1138,7 @@ cl_stm8::inst_rrc(t_mem code, unsigned char prefix)
       FLAG_ASSIGN (BIT_N, 0x80 & resval);
       FLAG_ASSIGN (BIT_C, (operand & 0x1));
    }
-  
+
    return(resGO);
 }
 
@@ -1175,7 +1175,7 @@ cl_stm8::inst_sll(t_mem code, unsigned char prefix)
       opaddr = get_dest(code,prefix);
       operand = get1(opaddr);
    }
- 
+
    resval = operand << 0x1;
 
    if (((code&0xf0)==0x40) &&(prefix == 0x00)) {
@@ -1199,7 +1199,7 @@ cl_stm8::inst_sll(t_mem code, unsigned char prefix)
       FLAG_ASSIGN (BIT_N, 0x80 & resval);
       FLAG_ASSIGN (BIT_C, (resval & 0x100));
    }
- 
+
    return(resGO);
 }
 
@@ -1334,7 +1334,7 @@ cl_stm8::inst_swap(t_mem code, unsigned char prefix)
       FLAG_ASSIGN (BIT_Z, (resval & 0xff) == 0);
       FLAG_ASSIGN (BIT_N, 0x80 & resval);
    }
- 
+
    return(resGO);
 }
 
@@ -1362,7 +1362,7 @@ cl_stm8::inst_tnz(t_mem code, unsigned char prefix)
       FLAG_ASSIGN (BIT_Z, (resval & 0xff) == 0);
       FLAG_ASSIGN (BIT_N, 0x80 & resval);
    }
- 
+
    return(resGO);
 }
 

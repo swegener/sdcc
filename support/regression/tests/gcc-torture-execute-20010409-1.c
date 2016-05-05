@@ -10,6 +10,9 @@
 #endif
 
 #include <string.h>
+#include <setjmp.h>
+
+jmp_buf try;
 
 typedef struct A {
   int a, b;
@@ -33,7 +36,7 @@ A *bar (const char *v, int w, int x, const char *y, int z)
 {
   if (w)
     ASSERT (0);
-  return 0;
+  longjmp(try, 1);
 }
 
 void test (const char *x, int *y)
@@ -48,10 +51,11 @@ void test (const char *x, int *y)
 void
 testTortureExecute (void)
 {
-#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 6))
-  d->b = 0;
-  d->a = &a;
-  test ("", 0);
-#endif
+  if (setjmp(try) == 0)
+  {
+    d->b = 0;
+    d->a = &a;
+    test ("", 0);
+  }
 }
 

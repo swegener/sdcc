@@ -432,12 +432,9 @@ cl_51core::print_regs(class cl_console_base *con)
   uchar data;
 
   start= psw->get() & 0x18;
-  //dump_memory(iram, &start, start+7, 8, /*sim->cmd_out()*/con, sim);
   iram->dump(start, start+7, 8, con);
-  start= psw->get() & 0x18;
   data= iram->get(iram->get(start));
-  con->dd_printf("%06x %02x %c",
-              iram->get(start), data, isprint(data)?data:'.');
+  con->dd_printf("@R0 %02x %c", data, isprint(data) ? data : '.');
 
   con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
               isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B));
@@ -447,12 +444,15 @@ cl_51core::print_regs(class cl_console_base *con)
               sfr->get(DPL), data, data, isprint(data)?data:'.');
 
   data= iram->get(iram->get(start+1));
-  con->dd_printf("%06x %02x %c", iram->get(start+1), data,
-              isprint(data)?data:'.');
+  con->dd_printf("@R1 %02x %c", isprint(data) ? data : '.');
   data= psw->get();
   con->dd_printf("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c\n", data,
               (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
               (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
+  /* show stack pointer */
+  start = sfr->get (SP);
+  con->dd_printf ("SP ", start);
+  iram->dump (start, start - 7, 8, con);
 
   print_disass(PC, con);
 }

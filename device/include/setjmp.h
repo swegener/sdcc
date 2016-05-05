@@ -53,8 +53,10 @@
 
 #if defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_r3ka)
 typedef unsigned char jmp_buf[6]; /* 2 for the stack pointer, 2 for the return address, 2 for the frame pointer. */
-#elif defined (__SDCC_stm8) || defined (__SDCC_gbz80) || defined (__SDCC_hc08) || defined (__SDCC_s08) || defined (__SDCC_ds390)
+#elif defined (__SDCC_stm8) || defined (__SDCC_gbz80) || defined (__SDCC_hc08) || defined (__SDCC_s08)
 typedef unsigned char jmp_buf[4]; /* 2 for the stack pointer, 2 for the return address. */
+#elif defined (__SDCC_ds390)
+typedef unsigned char jmp_buf[5]; /* 2 for the stack pointer, 3 for the return address. */
 #else
 typedef unsigned char jmp_buf[RET_SIZE + SP_SIZE + BP_SIZE + SPX_SIZE + BPX_SIZE];
 #endif

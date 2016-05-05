@@ -32,7 +32,7 @@
 
 static void dummy (void) __naked
 {
-	__asm
+        __asm
 
 ;--------------------------------------------------------
 ; overlayable items in ram
@@ -62,29 +62,28 @@ _longjmp_PARM_2:
 ;       -----------------------------------------
 ;        function __setjmp
 ;       -----------------------------------------
-;       Stack space usage: 0 bytes.
+;       Stack space usage: 1 bytes.
         .globl ___setjmp
 ___setjmp:
-	stx	(___setjmp_buf + 0)		; msb(buf)
-	sta	(___setjmp_buf + 1)		; lsb(buf)
+        stx	(___setjmp_buf + 0)		; msb(buf)
+        sta	(___setjmp_buf + 1)		; lsb(buf)
 
-	; save stack pointer
-	tsx
-	pshh
-	txa
-	ldhx	(___setjmp_buf)
-	sta	0,x
-	pula
-	ldhx	(___setjmp_buf)
-	sta	1,x
+        ; save stack pointer
+        tsx
+        pshh
+        txa
+        ldhx	(___setjmp_buf)
+        sta	1,x
+        pula
+        sta	0,x
 
-	; save return address
-	lda	1,s
-	sta	2,x
-	lda	2,s
-	sta	3,x
+        ; save return address
+        lda	1,s
+        sta	2,x
+        lda	2,s
+        sta	3,x
 
-	; return 0
+        ; return 0
         clra
         tax
         rts
@@ -99,31 +98,31 @@ ___setjmp:
 ;       -----------------------------------------
 ;        function longjmp
 ;       -----------------------------------------
-;       Stack space usage: 0 bytes.
+;       Stack space usage: 1 bytes.
         .globl _longjmp
         .globl _longjmp_PARM_2
 _longjmp:
-	stx	(_longjmp_buf + 0)		; msb(buf)
-	sta	(_longjmp_buf + 1)		; lsb(buf)
+        stx	(_longjmp_buf + 0)		; msb(buf)
+        sta	(_longjmp_buf + 1)		; lsb(buf)
 
-	; restore stack pointer
-	ldhx	(_longjmp_buf)
-	lda	0,x
-	psha
-	ldx	1,x
-	pulh
-	txs
+        ; restore stack pointer
+        ldhx	(_longjmp_buf)
+        lda	0,x
+        psha
+        ldx	1,x
+        pulh
+        txs
 
-	; set return address
-	ldhx	(_longjmp_buf)
-	lda	2,x
-	sta	1,s
-	lda	3,x
-	sta	2,s
+        ; set return address
+        ldhx	(_longjmp_buf)
+        lda	2,x
+        sta	1,s
+        lda	3,x
+        sta	2,s
 
 ;_setjmp.c:224: return rv ? rv : 1;
         ldx     (_longjmp_PARM_2 + 0)
-	txa
+        txa
         ora     (_longjmp_PARM_2 + 1)
         beq     0001$
         lda     (_longjmp_PARM_2 + 1)
@@ -132,5 +131,5 @@ _longjmp:
         lda     #0x01
         rts
 
-	__endasm;
+        __endasm;
 }

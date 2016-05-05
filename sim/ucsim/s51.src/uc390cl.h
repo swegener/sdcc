@@ -36,6 +36,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_uc390: public cl_uc52
 {
 public:
+  // memories and cells for faster access
+  class cl_address_space *ixram;
+
   cl_uc390(int Itype, int Itech, class cl_sim *asim);
   virtual void mk_hw_elements (void);
   virtual void make_memories(void);

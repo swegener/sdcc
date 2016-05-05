@@ -358,7 +358,7 @@ cl_uc390::make_memories(void)
   xram= as= new cl_address_space(MEM_XRAM_ID, 0, 0x100000+128, 8);
   as->init();
   address_spaces->add(as);
-  as= new cl_address_space(MEM_IXRAM_ID, 0, 0x1000, 8);
+  ixram= as= new cl_address_space(MEM_IXRAM_ID, 0, 0x1000, 8);
   as->init();
   address_spaces->add(as);
 
@@ -447,22 +447,21 @@ cl_uc390::clear_sfr(void)
 t_mem
 cl_uc390::read_mem(const char *id/*enum mem_class type*/, t_addr addr)
 {
-
-  if (strcmp(/*type*/id,/* == */MEM_XRAM_ID)==0 &&
-      addr >= 0x400000 &&
+  if (/*type == */strcmp(id, MEM_XRAM_ID)==0 &&
+      addr >= 0x400000 && addr <= 0x400fff &&
       (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       addr -= 0x400000;
-      id/*type*/ = MEM_IXRAM_ID;
+      /*type*/id = MEM_IXRAM_ID;
     }
-  return cl_51core::read_mem(id/*type*/, addr); /* 24 bit */
+  return cl_51core::read_mem(/*type*/id, addr); /* 24 bit */
 }
 
 t_mem
 cl_uc390::get_mem (const char *id/*enum mem_class type*/, t_addr addr)
 {
-  if (strcmp(/*type*/id/* == */,MEM_XRAM_ID)==0 &&
-      addr >= 0x400000 &&
+  if (/*type == */strcmp(id, MEM_XRAM_ID)==0 &&
+      addr >= 0x400000 && addr <= 0x400fff &&
       (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       addr -= 0x400000;
@@ -474,8 +473,8 @@ cl_uc390::get_mem (const char *id/*enum mem_class type*/, t_addr addr)
 void
 cl_uc390::write_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem val)
 {
-  if (strcmp(/*type ==*/id, MEM_XRAM_ID)==0 &&
-      addr >= 0x400000 &&
+  if (/*type == */strcmp(id, MEM_XRAM_ID)==0 &&
+      addr >= 0x400000 && addr <= 0x400fff &&
       (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       addr -= 0x400000;
@@ -488,13 +487,13 @@ void
 cl_uc390::set_mem (/*enum mem_class type*/const char *id, t_addr addr, t_mem val)
 {
   if (/*type == */strcmp(id,MEM_XRAM_ID)==0 &&
-      addr >= 0x400000 &&
+      addr >= 0x400000 && addr <= 0x400fff &&
       (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
       addr -= 0x400000;
       /*type*/id = MEM_IXRAM_ID;
     }
-  cl_51core::set_mem (id/*type*/, addr, val);
+  cl_51core::set_mem (/*type*/id, addr, val);
 }
 
 /*
@@ -1215,12 +1214,9 @@ cl_uc390::print_regs (class cl_console_base *con)
       return;
     }
   start = sfr->get (PSW) & 0x18;
-  //dump_memory(iram, &start, start+7, 8, /*sim->cmd_out()*/con, sim);
   iram->dump (start, start + 7, 8, con);
-  start = sfr->get (PSW) & 0x18;
   data = iram->get (iram->get (start));
-  con->dd_printf ("%06x %02x %c",
-                  iram->get (start), data, isprint (data) ? data : '.');
+  con->dd_printf ("@R0 %02x %c", data, isprint (data) ? data : '.');
   con->dd_printf ("  ACC= 0x%02x %3d %c  B= 0x%02x",
                   sfr->get (ACC), sfr->get (ACC),
                   isprint (sfr->get (ACC)) ?
@@ -1240,27 +1236,28 @@ cl_uc390::print_regs (class cl_console_base *con)
                   sfr->get (DPX1), sfr->get (DPH1), sfr->get (DPL1),
                   data, data, isprint (data) ? data : '.');
   data = iram->get (iram->get (start + 1));
-  con->dd_printf ("%06x %02x %c", iram->get (start + 1), data,
-                  isprint (data) ? data : '.');
+  con->dd_printf ("@R1 %02x %c", data, isprint (data) ? data : '.');
   con->dd_printf ("  AP= 0x%02x", sfr->get (AP));
   data= sfr->get (PSW);
   con->dd_printf ("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c    ",
                   data,
                   (data & bmCY) ? '1' : '0', (data & bmAC) ? '1' : '0',
-                  (data & bmOV) ? '1' : '0', (data & bmP ) ? '1' : '0'
-                  );
+                  (data & bmOV) ? '1' : '0', (data & bmP ) ? '1' : '0');
   /* show stack pointer */
   if (sfr->get (ACON) & 0x04)
-    /* SA: 10 bit stack */
-    con->dd_printf ("SP10 0x%03x %3d\n",
-                    (sfr->get (ESP) & 3) * 256 + sfr->get (SP),
-                    get_mem (MEM_IXRAM_ID, (sfr->get (ESP) & 3) * 256 + sfr->get (SP))
-                    );
+    {
+      /* SA: 10 bit stack */
+      start = (sfr->get (ESP) & 3) * 256 + sfr->get (SP);
+      con->dd_printf ("SP10 ", start);
+      ixram->dump (start, start - 7, 8, con);
+    }
   else
-    con->dd_printf ("SP 0x%02x %3d\n",
-                    sfr->get (SP),
-                    iram->get (sfr->get (SP))
-                    );
+    {
+      start = sfr->get (SP);
+      con->dd_printf ("SP ", start);
+      iram->dump (start, start - 7, 8, con);
+    }
+
   print_disass (PC, con);
 }
 

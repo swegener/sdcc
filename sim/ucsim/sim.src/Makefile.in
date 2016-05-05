@@ -98,7 +98,7 @@ include $(srcdir)/clean.mk
 sim_lib: $(top_builddir)/libsim.a
 
 $(top_builddir)/libsim.a: $(OBJECTS)
-	ar -rcu $*.a $(OBJECTS)
+	ar -rc $*.a $(OBJECTS)
 	$(RANLIB) $*.a
 
 .cc.o:

@@ -1,3 +1,8 @@
+2016-05-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/compact-results.py
+	  Roll back to previous version.
+
 2016-05-05 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/setjmp.h: ds390 needs 5 bytes

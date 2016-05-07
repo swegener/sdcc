@@ -447,12 +447,26 @@ cl_uc390::clear_sfr(void)
 t_mem
 cl_uc390::read_mem(const char *id/*enum mem_class type*/, t_addr addr)
 {
-  if (/*type == */strcmp(id, MEM_XRAM_ID)==0 &&
-      addr >= 0x400000 && addr <= 0x400fff &&
-      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
+  if (/*type == */strcmp(id, MEM_XRAM_ID)==0)
     {
-      addr -= 0x400000;
-      /*type*/id = MEM_IXRAM_ID;
+      if (addr >= 0x000000 && addr <= 0x000fff &&
+          ((sfr->get (MCON) & 0xc0) == 0x40)) /* IDM1:0 == 01: internal xram at 0x000000 */
+        {
+          addr -= 0x000000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
+      if (addr >= 0x00f000 && addr <= 0x00ffff &&
+          ((sfr->get (MCON) & 0xc0) == 0x00)) /* IDM1:0 == 00: internal xram at 0x00f000 */
+        {
+          addr -= 0x00f000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
+      if (addr >= 0x400000 && addr <= 0x400fff &&
+          ((sfr->get (MCON) & 0xc0) == 0x80)) /* IDM1:0 == 10: internal xram at 0x400000 */
+        {
+          addr -= 0x400000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
     }
   return cl_51core::read_mem(/*type*/id, addr); /* 24 bit */
 }
@@ -460,12 +474,26 @@ cl_uc390::read_mem(const char *id/*enum mem_class type*/, t_addr addr)
 t_mem
 cl_uc390::get_mem (const char *id/*enum mem_class type*/, t_addr addr)
 {
-  if (/*type == */strcmp(id, MEM_XRAM_ID)==0 &&
-      addr >= 0x400000 && addr <= 0x400fff &&
-      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
+  if (/*type == */strcmp(id, MEM_XRAM_ID)==0)
     {
-      addr -= 0x400000;
-      /*type*/id = MEM_IXRAM_ID;
+      if (addr >= 0x000000 && addr <= 0x000fff &&
+          ((sfr->get (MCON) & 0xc0) == 0x40)) /* IDM1:0 == 01: internal xram at 0x000000 */
+        {
+          addr -= 0x000000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
+      if (addr >= 0x00f000 && addr <= 0x00ffff &&
+          ((sfr->get (MCON) & 0xc0) == 0x00)) /* IDM1:0 == 00: internal xram at 0x00f000 */
+        {
+          addr -= 0x00f000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
+      if (addr >= 0x400000 && addr <= 0x400fff &&
+          ((sfr->get (MCON) & 0xc0) == 0x80)) /* IDM1:0 == 10: internal xram at 0x400000 */
+        {
+          addr -= 0x400000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
     }
   return cl_51core::get_mem (/*type*/id, addr);
 }
@@ -473,12 +501,26 @@ cl_uc390::get_mem (const char *id/*enum mem_class type*/, t_addr addr)
 void
 cl_uc390::write_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem val)
 {
-  if (/*type == */strcmp(id, MEM_XRAM_ID)==0 &&
-      addr >= 0x400000 && addr <= 0x400fff &&
-      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
+  if (/*type == */strcmp(id, MEM_XRAM_ID)==0)
     {
-      addr -= 0x400000;
-      /*type*/id = MEM_IXRAM_ID;
+      if (addr >= 0x000000 && addr <= 0x000fff &&
+          ((sfr->get (MCON) & 0xc0) == 0x40)) /* IDM1:0 == 01: internal xram at 0x000000 */
+        {
+          addr -= 0x000000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
+      if (addr >= 0x00f000 && addr <= 0x00ffff &&
+          ((sfr->get (MCON) & 0xc0) == 0x00)) /* IDM1:0 == 00: internal xram at 0x00f000 */
+        {
+          addr -= 0x00f000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
+      if (addr >= 0x400000 && addr <= 0x400fff &&
+          ((sfr->get (MCON) & 0xc0) == 0x80)) /* IDM1:0 == 10: internal xram at 0x400000 */
+        {
+          addr -= 0x400000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
     }
   cl_51core::write_mem (/*type*/id, addr, val);
 }
@@ -486,12 +528,26 @@ cl_uc390::write_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem v
 void
 cl_uc390::set_mem (/*enum mem_class type*/const char *id, t_addr addr, t_mem val)
 {
-  if (/*type == */strcmp(id,MEM_XRAM_ID)==0 &&
-      addr >= 0x400000 && addr <= 0x400fff &&
-      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
+  if (/*type == */strcmp(id, MEM_XRAM_ID)==0)
     {
-      addr -= 0x400000;
-      /*type*/id = MEM_IXRAM_ID;
+      if (addr >= 0x000000 && addr <= 0x000fff &&
+          ((sfr->get (MCON) & 0xc0) == 0x40)) /* IDM1:0 == 01: internal xram at 0x000000 */
+        {
+          addr -= 0x000000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
+      if (addr >= 0x00f000 && addr <= 0x00ffff &&
+          ((sfr->get (MCON) & 0xc0) == 0x00)) /* IDM1:0 == 00: internal xram at 0x00f000 */
+        {
+          addr -= 0x00f000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
+      if (addr >= 0x400000 && addr <= 0x400fff &&
+          ((sfr->get (MCON) & 0xc0) == 0x80)) /* IDM1:0 == 10: internal xram at 0x400000 */
+        {
+          addr -= 0x400000;
+          /*type*/id = MEM_IXRAM_ID;
+        }
     }
   cl_51core::set_mem (/*type*/id, addr, val);
 }

@@ -332,17 +332,21 @@ _ds390_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
         }
 
       dbuf_printf (oBuf, "__reset_vect:\n");
-      dbuf_printf (oBuf, "\tmov _TA,#0xAA\n");
-      dbuf_printf (oBuf, "\tmov _TA,#0x55\n");
       if (options.stack10bit)
         {
+          dbuf_printf (oBuf, "\tmov _TA,#0xAA\n");
+          dbuf_printf (oBuf, "\tmov _TA,#0x55\n");
           dbuf_printf (oBuf, "\tmov acon,#0x06\t;24 bit addresses, 10 bit stack\n");
+          dbuf_printf (oBuf, "\tmov _TA,#0xAA\n");
+          dbuf_printf (oBuf, "\tmov _TA,#0x55\n");
           dbuf_printf (oBuf, "\tmov mcon,#0x90\t;10 bit stack at 0x400000\n");
           dbuf_printf (oBuf, "\tmov _ESP,#0x00\t; reinitialize the stack\n");
           dbuf_printf (oBuf, "\tmov _SP,#0x00\n");
         }
       else
         {
+          dbuf_printf (oBuf, "\tmov _TA,#0xAA\n");
+          dbuf_printf (oBuf, "\tmov _TA,#0x55\n");
           dbuf_printf (oBuf, "\tmov acon,#0x02\t;24 bit addresses, default 8 bit stack\n");
         }
       dbuf_printf (oBuf, "\tljmp\t__sdcc_gsinit_startup\n");

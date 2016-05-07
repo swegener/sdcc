@@ -4,7 +4,11 @@
 	* device/lib/s08/_setjmp.c: svn eol-style native
 	* support/regression/tests/gcc-torture-execute-pr28982a.c,
 	* support/regression/tests/bug-2197.c: enabled for mcs51
-	* src/mcs51/gen.c (genFunction, genEndFunction): implemented RFE 81
+	* src/mcs51/gen.c (genFunction, genEndFunction): implemented RFE 81 to
+	  disable interrupts before stacking
+	* sim/ucsim/s51.src/uc390.cc: use IDMx/MCON instead of SA/ACON
+	* sim/ucsim/s51.src/uc390hw.cc: do not lock out all IDM settings
+	* src/ds390/main.c (_ds390_genIVT): MCON requires Timed Access
 
 2016-05-06 Ben Shi <powerstudio1st AT 163 DOT com>
 

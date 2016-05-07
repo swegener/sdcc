@@ -132,10 +132,9 @@ cl_uc390_hw::write (class cl_memory_cell *cell, t_mem *val)
         *val = cell_acon->get();
       else
         {
-
           /* lockout: IDM1:IDM0 and SA can't be set at the same time */
-            if ((cell_mcon->get() & 0xc0) == 0xc0) /* IDM1 and IDM0 set? */
-              *val &= ~0x04; /* lockout SA */
+          if ((cell_mcon->get() & 0xc0) == 0xc0) /* IDM1 and IDM0 set? */
+            *val &= ~0x04; /* lockout SA */
         }
       *val |= 0xf8; /* always 1 */
     }
@@ -173,7 +172,8 @@ cl_uc390_hw::write (class cl_memory_cell *cell, t_mem *val)
         *val = cell_mcon->get();
       else
         /* lockout: IDM1:IDM0 and SA can't be set at the same time */
-        if ((cell_acon->get() & 0x04) == 0x04) /* SA set? */
+        if (((*val & 0xc0) == 0xc0) &&
+            ((cell_acon->get() & 0x04) == 0x04)) /* SA set? */
           *val &= ~0xc0; /* lockout IDM1:IDM0 */
       *val |= 0x10; /* always 1 */
     }

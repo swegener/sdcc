@@ -148,6 +148,8 @@ static unsigned char SRMask[] = { 0xFF, 0x7F, 0x3F, 0x1F, 0x0F,
                                   0x07, 0x03, 0x01, 0x00
                                 };
 
+#define MAX_REGISTER_BANKS 4
+
 #define LSB     0
 #define MSB16   1
 #define MSB24   2
@@ -3612,7 +3614,7 @@ static void
 genFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
-  sym_link *ftype;
+  sym_link *ftype = operandType (IC_LEFT (ic));
   bool switchedPSW = FALSE;
   int calleesaves_saved_register = -1;
   int stackAdjust = sym->stack;
@@ -3628,7 +3630,6 @@ genFunction (iCode * ic)
 
   emitcode ("", "%s:", sym->rname);
   genLine.lineCurr->isLabel = 1;
-  ftype = operandType (IC_LEFT (ic));
   _G.currentFunc = sym;
 
   if (IFFUNC_ISNAKED (ftype))
@@ -3664,12 +3665,19 @@ genFunction (iCode * ic)
 
   /* if this is an interrupt service routine then
      save acc, b, dpl, dph  */
-  if (IFFUNC_ISISR (sym->type))
+  if (IFFUNC_ISISR (ftype))
     {
       bitVect *rsavebits;
 
+      /* weird but possible, one should better use a different priority */
+      /* if critical function then turn interrupts off */
+      if (IFFUNC_ISCRITICAL (ftype))
+        {
+          emitcode ("clr", "ea");
+        }
+
       rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), sym->regsUsed);
-      if (IFFUNC_HASFCALL (sym->type) || !bitVectIsZero (rsavebits))
+      if (IFFUNC_HASFCALL (ftype) || !bitVectIsZero (rsavebits))
         {
           if (!inExcludeList ("bits"))
             {
@@ -3690,14 +3698,14 @@ genFunction (iCode * ic)
       /* if this isr has no bank i.e. is going to
          run with bank 0 , then we need to save more
          registers :-) */
-      if (!FUNC_REGBANK (sym->type))
+      if (!FUNC_REGBANK (ftype))
         {
           int i;
 
           /* if this function does not call any other
              function then we can be economical and
              save only those registers that are used */
-          if (!IFFUNC_HASFCALL (sym->type))
+          if (!IFFUNC_HASFCALL (ftype))
             {
               /* if any registers used */
               if (!bitVectIsZero (sym->regsUsed))
@@ -3737,11 +3745,8 @@ genFunction (iCode * ic)
            */
           unsigned long banksToSave = 0;
 
-          if (IFFUNC_HASFCALL (sym->type))
+          if (IFFUNC_HASFCALL (ftype))
             {
-
-#define MAX_REGISTER_BANKS 4
-
               iCode *i;
               int ix;
 
@@ -3771,7 +3776,7 @@ genFunction (iCode * ic)
 //                      werror (W_FUNCPTR_IN_USING_ISR);
                       dtype = operandType (IC_LEFT (i))->next;
                     }
-                  if (dtype && FUNC_REGBANK (dtype) != FUNC_REGBANK (sym->type))
+                  if (dtype && FUNC_REGBANK (dtype) != FUNC_REGBANK (ftype))
                     {
                       /* Mark this bank for saving. */
                       if (FUNC_REGBANK (dtype) >= MAX_REGISTER_BANKS)
@@ -3820,17 +3825,30 @@ genFunction (iCode * ic)
       if (!switchedPSW)
         {
           emitpush ("psw");
-          emitcode ("mov", "psw,#!constbyte", (FUNC_REGBANK (sym->type) << 3) & 0x00ff);
+          emitcode ("mov", "psw,#!constbyte", (FUNC_REGBANK (ftype) << 3) & 0x00ff);
         }
     }
   else
     {
-      /* This is a non-ISR function. The caller has already switched register */
-      /* banks, if necessary, so just handle the callee-saves option. */
+      /* This is a non-ISR function. */
+
+      /* if critical function then turn interrupts off */
+      if (IFFUNC_ISCRITICAL (ftype))
+        {
+          symbol *tlbl = newiTempLabel (NULL);
+          emitcode ("setb", "c");
+          emitcode ("jbc", "ea,!tlabel", labelKey2num (tlbl->key)); /* atomic test & clear */
+          emitcode ("clr", "c");
+          emitLabel (tlbl);
+          emitpush ("psw");         /* save old ea via c in psw */
+        }
+
+      /* The caller has already switched register banks if */
+      /* necessary, so just handle the callee-saves option. */
 
       /* if callee-save to be used for this function
          then save the registers being used in this function */
-      if (IFFUNC_CALLEESAVES (sym->type))
+      if (IFFUNC_CALLEESAVES (ftype))
         {
           int i;
 
@@ -3858,7 +3876,7 @@ genFunction (iCode * ic)
     {
       if (options.useXstack)
         {
-          if (sym->xstack || FUNC_HASSTACKPARM (sym->type))
+          if (sym->xstack || FUNC_HASSTACKPARM (ftype))
             {
               emitcode ("mov", "r0,%s", spname);
               emitcode ("inc", "%s", spname);
@@ -3877,7 +3895,7 @@ genFunction (iCode * ic)
         }
       else
         {
-          if (sym->stack || FUNC_HASSTACKPARM (sym->type))
+          if (sym->stack || FUNC_HASSTACKPARM (ftype))
             {
               /* set up the stack */
               /* save the callers stack, but without pushed++  */
@@ -3951,7 +3969,7 @@ genFunction (iCode * ic)
   /* to clobber. No need to worry about a possible conflict with */
   /* the above early RECEIVE optimizations since they would have */
   /* freed the accumulator if they were generated. */
-  if (IFFUNC_CALLEESAVES (sym->type))
+  if (IFFUNC_CALLEESAVES (ftype))
     {
       /* if it's a callee-saves function we need a saved register */
       if (calleesaves_saved_register >= 0)
@@ -4040,17 +4058,6 @@ genFunction (iCode * ic)
   _G.stack.xpushedregs = _G.stack.xpushed;
   _G.stack.pushed = 0;
   _G.stack.xpushed = 0;
-
-  /* if critical function then turn interrupts off */
-  if (IFFUNC_ISCRITICAL (ftype))
-    {
-      symbol *tlbl = newiTempLabel (NULL);
-      emitcode ("setb", "c");
-      emitcode ("jbc", "ea,!tlabel", labelKey2num (tlbl->key)); /* atomic test & clear */
-      emitcode ("clr", "c");
-      emitLabel (tlbl);
-      emitpush ("psw");         /* save old ea via c in psw */
-    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -4060,6 +4067,7 @@ static void
 genEndFunction (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
+  sym_link *ftype = operandType (IC_LEFT (ic));
   bool fReentrant = (IFFUNC_ISREENT (sym->type) || options.stackAuto);
   lineNode *lineBodyEnd = genLine.lineCurr;
   lineNode *linePrologueStart = NULL;
@@ -4069,28 +4077,12 @@ genEndFunction (iCode * ic)
   int idx;
 
   _G.currentFunc = NULL;
-  if (IFFUNC_ISNAKED (sym->type))
+  if (IFFUNC_ISNAKED (ftype))
     {
       emitcode (";", "naked function: no epilogue.");
       if (options.debug && currFunc)
         debugFile->writeEndFunction (currFunc, ic, 0);
       return;
-    }
-
-  if (IFFUNC_ISCRITICAL (sym->type))
-    {
-      if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))))
-        {
-          emitcode ("rlc", "a");        /* save c in a */
-          emitpop ("psw");      /* restore ea via c in psw */
-          emitcode ("mov", "ea,c");
-          emitcode ("rrc", "a");        /* restore c from a */
-        }
-      else
-        {
-          emitpop ("psw");      /* restore ea via c in psw */
-          emitcode ("mov", "ea,c");
-        }
     }
 
   _G.stack.xpushed = _G.stack.xpushedregs;
@@ -4170,7 +4162,7 @@ genEndFunction (iCode * ic)
                     emitcode ("mov", "sp,_bp");
                   emitcode ("pop", "_bp");      /* without pushed-- */
                 }
-              if (sym->xstack || FUNC_HASSTACKPARM (sym->type))
+              if (sym->xstack || FUNC_HASSTACKPARM (ftype))
                 {
                   emitcode ("xch", "a,_bpx");
                   emitcode ("mov", "r0,a");
@@ -4180,7 +4172,7 @@ genEndFunction (iCode * ic)
                   emitcode ("mov", "%s,r0", spname);    //read before freeing stack space (interrupts)
                 }
             }
-          else if (sym->stack || FUNC_HASSTACKPARM (sym->type))
+          else if (sym->stack || FUNC_HASSTACKPARM (ftype))
             {
               if (sym->stack == 1)
                 emitcode ("dec", "sp");
@@ -4192,9 +4184,9 @@ genEndFunction (iCode * ic)
     }
 
   /* restore the register bank  */
-  if (IFFUNC_ISISR (sym->type))
+  if (IFFUNC_ISISR (ftype))
     {
-      if (!FUNC_REGBANK (sym->type) || !options.useXstack)
+      if (!FUNC_REGBANK (ftype) || !options.useXstack)
         {
           /* Special case of ISR using non-zero bank with useXstack
            * is handled below.
@@ -4203,7 +4195,7 @@ genEndFunction (iCode * ic)
         }
     }
 
-  if (IFFUNC_ISISR (sym->type))
+  if (IFFUNC_ISISR (ftype))
     {
       bitVect *rsavebits;
 
@@ -4211,13 +4203,13 @@ genEndFunction (iCode * ic)
       /* if this isr has no bank i.e. is going to
          run with bank 0 , then we need to save more
          registers :-) */
-      if (!FUNC_REGBANK (sym->type))
+      if (!FUNC_REGBANK (ftype))
         {
           int i;
           /* if this function does not call any other
              function then we can be economical and
              save only those registers that are used */
-          if (!IFFUNC_HASFCALL (sym->type))
+          if (!IFFUNC_HASFCALL (ftype))
             {
               /* if any registers used */
               if (!bitVectIsZero (sym->regsUsed))
@@ -4282,12 +4274,19 @@ genEndFunction (iCode * ic)
         emitpop ("acc");
 
       rsavebits = bitVectIntersect (bitVectCopy (mcs51_allBitregs ()), sym->regsUsed);
-      if (IFFUNC_HASFCALL (sym->type) || !bitVectIsZero (rsavebits))
+      if (IFFUNC_HASFCALL (ftype) || !bitVectIsZero (rsavebits))
         {
           if (!inExcludeList ("bits"))
             emitpop ("bits");
         }
       freeBitVect (rsavebits);
+
+      /* weird but possible, one should better use a different priority */
+      /* if critical function then turn interrupts off */
+      if (IFFUNC_ISCRITICAL (ftype))
+        {
+          emitcode ("setb", "ea");
+        }
 
       /* if debug then send end of function */
       if (options.debug && currFunc)
@@ -4299,7 +4298,7 @@ genEndFunction (iCode * ic)
     }
   else
     {
-      if (IFFUNC_CALLEESAVES (sym->type))
+      if (IFFUNC_CALLEESAVES (ftype))
         {
           int i;
 
@@ -4320,13 +4319,29 @@ genEndFunction (iCode * ic)
             }
         }
 
+      if (IFFUNC_ISCRITICAL (ftype))
+        {
+          if (IS_BIT (OP_SYM_ETYPE (IC_LEFT (ic))))
+            {
+              emitcode ("rlc", "a");        /* save c in a */
+              emitpop ("psw");              /* restore ea via c in psw */
+              emitcode ("mov", "ea,c");
+              emitcode ("rrc", "a");        /* restore c from a */
+            }
+          else
+            {
+              emitpop ("psw");              /* restore ea via c in psw */
+              emitcode ("mov", "ea,c");
+            }
+        }
+
       /* if debug then send end of function */
       if (options.debug && currFunc)
         {
           debugFile->writeEndFunction (currFunc, ic, 1);
         }
 
-      if (IFFUNC_ISBANKEDCALL (sym->type))
+      if (IFFUNC_ISBANKEDCALL (ftype))
         {
           emitcode ("ljmp", "__sdcc_banked_ret");
         }
@@ -4344,16 +4359,16 @@ genEndFunction (iCode * ic)
 
   /* If this was an interrupt handler using bank 0 that called another */
   /* function, then all registers must be saved; nothing to optimize.  */
-  if (IFFUNC_ISISR (sym->type) && IFFUNC_HASFCALL (sym->type) && !FUNC_REGBANK (sym->type))
+  if (IFFUNC_ISISR (ftype) && IFFUNC_HASFCALL (ftype) && !FUNC_REGBANK (ftype))
     return;
 
   /* There are no push/pops to optimize if not callee-saves or ISR */
-  if (!(FUNC_CALLEESAVES (sym->type) || FUNC_ISISR (sym->type)))
+  if (!(FUNC_CALLEESAVES (ftype) || FUNC_ISISR (ftype)))
     return;
 
   /* If there were stack parameters, we cannot optimize without also    */
   /* fixing all of the stack offsets; this is too dificult to consider. */
-  if (FUNC_HASSTACKPARM (sym->type))
+  if (FUNC_HASSTACKPARM (ftype))
     return;
 
   /* Compute the registers actually used */
@@ -4366,7 +4381,7 @@ genEndFunction (iCode * ic)
           !strncmp (lnp->line, "mov", 3) &&
           bitVectFirstBit (port->peep.getRegsWritten (lnp)) == CND_IDX &&
           !bitVectBitsInCommon (mcs51_allBankregs (), regsUsed) &&
-          !IFFUNC_HASFCALL (sym->type))
+          !IFFUNC_HASFCALL (ftype))
         {
           emitcode (";", "eliminated unneeded mov psw,# (no regs used in bank)");
           connectLine (lnp->prev, lnp->next);
@@ -4387,7 +4402,7 @@ genEndFunction (iCode * ic)
 
   /* If this was an interrupt handler that called another function */
   /* function, then assume A, B, DPH, & DPL may be modified by it. */
-  if (IFFUNC_ISISR (sym->type) && IFFUNC_HASFCALL (sym->type))
+  if (IFFUNC_ISISR (ftype) && IFFUNC_HASFCALL (ftype))
     {
       regsUsed = bitVectSetBit (regsUsed, DPL_IDX);
       regsUsed = bitVectSetBit (regsUsed, DPH_IDX);

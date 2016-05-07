@@ -8,6 +8,11 @@
 #pragma std_c99
 #endif
 
+#if defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM) || \
+    (defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO))
+#define SKIP
+#endif
+
 /* PR rtl-optimization/28982.  Function foo() does the equivalent of:
 
      float tmp_results[NVARS];
@@ -42,7 +47,7 @@
 #define LOOP(INDEX) result##INDEX += *ptr##INDEX, ptr##INDEX += inc##INDEX
 #define COPYOUT(INDEX) results[INDEX] = result##INDEX
 
-#if !defined(__SDCC_mcs51)
+#ifndef SKIP
 float *ptrs[NVARS];
 float results[NVARS];
 int incs[NVARS];
@@ -63,7 +68,7 @@ float input[NITER * NVARS];
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) 
+#ifndef SKIP
   int i;
 
   for (i = 0; i < NVARS; i++)
@@ -77,4 +82,3 @@ testTortureExecute (void)
   return;
 #endif
 }
-

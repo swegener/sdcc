@@ -587,8 +587,10 @@ setParseWithComma (set ** dest, const char *src)
 static void
 setStackSize (void)
 {
+#if 0
   struct rlimit rl = {4 * 1024 * 1024, 4 * 1024 * 1024};
   setrlimit (RLIMIT_STACK, &rl);
+#endif
 }
 
 /*-----------------------------------------------------------------*/

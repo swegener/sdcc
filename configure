@@ -5065,6 +5065,17 @@ _ACEOF
 fi
 done
 
+for ac_func in setrlimit
+do :
+  ac_fn_c_check_func "$LINENO" "setrlimit" "ac_cv_func_setrlimit"
+if test "x$ac_cv_func_setrlimit" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SETRLIMIT 1
+_ACEOF
+
+fi
+done
+
 
 
 # Macro definitions

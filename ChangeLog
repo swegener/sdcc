@@ -1,3 +1,10 @@
+2016-05-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure
+	* configure.ac
+	* src/SDCCmain.c
+	  Call setrlimit() in a more compatible way.
+
 2016-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/lib/hc08/_setjmp.c,

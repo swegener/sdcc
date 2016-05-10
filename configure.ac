@@ -97,6 +97,7 @@ esac
 AC_CHECK_FUNCS(strerror)
 AC_CHECK_FUNCS(vsnprintf snprintf vsprintf mkstemp)
 AC_CHECK_FUNCS(strndup)
+AC_CHECK_FUNCS(setrlimit)
 
 
 # Macro definitions

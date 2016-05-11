@@ -291,36 +291,40 @@ cl_timer2::do_t2_down(int cycles)
     (cycles= T_edge), T_edge= 0;
 
   if (bit_t2ex)
-    // UP
-    while (cycles--)
-      if (!cell_tl->add(1))
-        {
-          if (!cell_th->add(1))
-            {
-              cell_tcon->set_bit1(mask_TF);
-              cell_th->set(cell_rcap2h->get());
-              cell_tl->set(cell_rcap2l->get());
-              toggle= DD_TRUE;
-            }
-        }
+    {
+      // UP
+      while (cycles--)
+	if (!cell_tl->add(1))
+	  {
+	    if (!cell_th->add(1))
+	      {
+		cell_tcon->set_bit1(mask_TF);
+		cell_th->set(cell_rcap2h->get());
+		cell_tl->set(cell_rcap2l->get());
+		toggle= DD_TRUE;
+	      }
+	  }
+    }
   else
-    // DOWN
-    while (cycles--)
-      {
-        t_mem l, h;
-        if ((l= cell_tl->add(-1)) == 0xff)
-          h= cell_th->add(-1);
-        else
-          h= cell_th->get();
-        if ((TYPE_UWORD)(h*256+l) <
-            (TYPE_UWORD)(cell_rcap2h->get()*256+cell_rcap2l->get()))
-          {
-            cell_tcon->set_bit1(mask_TF);
-            cell_th->set(0xff);
-            cell_tl->set(0xff);
-            toggle= DD_TRUE;
-          }
-      }
+    {
+       // DOWN
+      while (cycles--)
+	{
+	  t_mem l, h;
+	  if ((l= cell_tl->add(-1)) == 0xff)
+	    h= cell_th->add(-1);
+	  else
+	    h= cell_th->get();
+	  if ((TYPE_UWORD)(h*256+l) <
+	      (TYPE_UWORD)(cell_rcap2h->get()*256+cell_rcap2l->get()))
+	    {
+	      cell_tcon->set_bit1(mask_TF);
+	      cell_th->set(0xff);
+	      cell_tl->set(0xff);
+	      toggle= DD_TRUE;
+	    }
+	}
+    }
   if (toggle &&
       sfr)
     {

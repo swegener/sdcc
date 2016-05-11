@@ -225,7 +225,7 @@ cl_sim::stop(class cl_ev_brk *brk)
         cmd->frozen_console->read_line();
       */
       //con->dd_printf("Stop at 0x%06x\n", uc->PC);
-      con->dd_printf("Event `%s' at %s[0x%"_A_"x]: 0x%"_A_"x %s\n",
+      con->dd_printf("Event `%s' at %s[0x%" _A_ "x]: 0x%" _A_ "x %s\n",
                      brk->id, brk->get_mem()->get_name(), brk->addr,
                      uc->instPC,
                      uc->disass(uc->instPC, " "));

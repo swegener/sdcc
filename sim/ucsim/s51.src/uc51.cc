@@ -332,24 +332,24 @@ cl_51core::disass(t_addr addr, const char *sep)
           switch (*(b++))
             {
             case 'A': // absolute address
-              sprintf(temp, "%04"_A_"x",
+              sprintf(temp, "%04" _A_ "x",
                       t_addr((addr&0xf800)|
                              (((code>>5)&0x07)*256 +
                               rom->get(addr+1))));
               break;
             case 'l': // long address
-              sprintf(temp, "%04"_A_"x",
+              sprintf(temp, "%04" _A_ "x",
                       t_addr(rom->get(addr+1)*256 +
                              rom->get(addr+2)));
               break;
             case 'a': // addr8 (direct address) at 2nd byte
               if (!get_name(rom->get(addr+1), sfr_tbl(), temp))
-                sprintf(temp, "%02"_M_"x", rom->get(addr+1));
+                sprintf(temp, "%02" _M_ "x", rom->get(addr+1));
               break;
             case '8': // addr8 (direct address) at 3rd byte
               if (!get_name(rom->get(addr+2), sfr_tbl(), temp))
-                sprintf(temp, "%02"_M_"x", rom->get(addr+2));
-              //sprintf(temp, "%02"_M_"x", rom->get(addr+2));
+                sprintf(temp, "%02" _M_ "x", rom->get(addr+2));
+              //sprintf(temp, "%02" _M_ "x", rom->get(addr+2));
               break;
             case 'b': // bitaddr at 2nd byte
               {
@@ -359,30 +359,30 @@ cl_51core::disass(t_addr addr, const char *sep)
                 if (get_name((ba<128)?((ba/8)+32):(ba&0xf8), sfr_tbl(), temp))
                   {
                     strcat(temp, ".");
-                    sprintf(c, "%1"_M_"d", ba & 0x07);
+                    sprintf(c, "%1" _M_ "d", ba & 0x07);
                     strcat(temp, c);
                     break;
                   }
-                sprintf(temp, "%02x.%"_M_"d", (ba<128)?((ba/8)+32):(ba&0xf8),
+                sprintf(temp, "%02x.%" _M_ "d", (ba<128)?((ba/8)+32):(ba&0xf8),
                         ba & 0x07);
                 break;
               }
             case 'r': // rel8 address at 2nd byte
-              sprintf(temp, "%04"_A_"x",
+              sprintf(temp, "%04" _A_ "x",
                       t_addr(addr+2+(signed char)(rom->get(addr+1))));
               break;
             case 'R': // rel8 address at 3rd byte
-              sprintf(temp, "%04"_A_"x",
+              sprintf(temp, "%04" _A_ "x",
                       t_addr(addr+3+(signed char)(rom->get(addr+2))));
               break;
             case 'd': // data8 at 2nd byte
-              sprintf(temp, "%02"_M_"x", rom->get(addr+1));
+              sprintf(temp, "%02" _M_ "x", rom->get(addr+1));
               break;
             case 'D': // data8 at 3rd byte
-              sprintf(temp, "%02"_M_"x", rom->get(addr+2));
+              sprintf(temp, "%02" _M_ "x", rom->get(addr+2));
               break;
             case '6': // data16 at 2nd(H)-3rd(L) byte
-              sprintf(temp, "%04"_A_"x",
+              sprintf(temp, "%04" _A_ "x",
                       t_addr(rom->get(addr+1)*256 +
                              rom->get(addr+2)));
               break;

@@ -1660,7 +1660,7 @@ cl_uc::stack_read(class cl_stack_op *op)
       int top_size= top->data_size(), op_size= op->data_size();
       if (top_size != op_size)
         {
-          application->debug("0x%06"_A_"x %d bytes to read out of stack "
+          application->debug("0x%06" _A_ "x %d bytes to read out of stack "
                              "but %d was pushed in last operation\n",
                              op->get_pc(), op_size, top_size);
         }
@@ -1677,9 +1677,9 @@ cl_uc::stack_read(class cl_stack_op *op)
     }
   if (removed != 1)
     {
-      application->debug("0x%06"_A_"x %d ops removed from stack-tracker "
-                         "when %s happened, top pc=0x%06"_A_"x "
-                         "top before=0x%06"_A_"x op after=0x%06"_A_"x\n",
+      application->debug("0x%06" _A_ "x %d ops removed from stack-tracker "
+                         "when %s happened, top pc=0x%06" _A_ "x "
+                         "top before=0x%06" _A_ "x op after=0x%06" _A_ "x\n",
                          op->get_pc(), removed, op->get_op_name(),
                          top?(top->get_pc()):0, top?(top->get_before()):0,
                          op->get_after());
@@ -1690,9 +1690,9 @@ cl_uc::stack_read(class cl_stack_op *op)
       int ta= top->get_after(), oa= op->get_after();
       if (ta != oa)
         {
-          application->debug("0x%06"_A_"x stack still inconsistent after %s, "
+          application->debug("0x%06" _A_ "x stack still inconsistent after %s, "
                              "%d byte(s) should be read out; top after"
-                             "=0x%06"_A_"x op after=0x%06"_A_"x\n",
+                             "=0x%06" _A_ "x op after=0x%06" _A_ "x\n",
                              op->get_pc(), op->get_op_name(), abs(ta-oa),
                              ta, oa);
           class cl_error *e=

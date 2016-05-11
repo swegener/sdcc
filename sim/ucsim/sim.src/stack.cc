@@ -70,7 +70,7 @@ cl_stack_op::info_head(class cl_console_base *con)
 void
 cl_stack_op::info(class cl_console_base *con, class cl_uc *uc)
 {
-  con->dd_printf("%-4s 0x%06"_A_"x-0x%06"_A_"x %d ",
+  con->dd_printf("%-4s 0x%06" _A_ "x-0x%06" _A_ "x %d ",
                 get_op_name(), SP_before, SP_after, abs(SP_before-SP_after));
   print_info(con);
   con->dd_printf(" ");
@@ -166,7 +166,7 @@ cl_stack_call::get_op_name(void)
 void
 cl_stack_call::print_info(class cl_console_base *con)
 {
-  con->dd_printf("0x%06"_A_"x", called_addr);
+  con->dd_printf("0x%06" _A_ "x", called_addr);
 }
 
 const char *
@@ -217,7 +217,7 @@ cl_stack_intr::get_op_name(void)
 void
 cl_stack_intr::print_info(class cl_console_base *con)
 {
-  con->dd_printf("0x%06"_A_"x", called_addr);
+  con->dd_printf("0x%06" _A_ "x", called_addr);
 }
 
 const char *
@@ -279,7 +279,7 @@ void
 cl_stack_push::print_info(class cl_console_base *con)
 {
   t_addr d= data;
-  con->dd_printf("0x%06"_A_"x", d);
+  con->dd_printf("0x%06" _A_ "x", d);
 }
 
 int
@@ -468,8 +468,8 @@ cl_error_stack_tracker_empty::~cl_error_stack_tracker_empty(void)
 void
 cl_error_stack_tracker_empty::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06"_A_"x: %s on empty stack, PC="
-               "0x06"_A_"x, SP=0x%06"_A_"x->0x%06"_A_"x\n",
+  c->dd_printf("%s(0x%06" _A_ "x: %s on empty stack, PC="
+               "0x06" _A_ "x, SP=0x%06" _A_ "x->0x%06" _A_ "x\n",
                get_type_name(), operation->get_pc(), operation->get_op_name(),
                operation->get_before(), operation->get_after());
 }
@@ -494,8 +494,8 @@ cl_error_stack_tracker_unmatch::~cl_error_stack_tracker_unmatch(void)
 void
 cl_error_stack_tracker_unmatch::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06"_A_"x): %s when %s expected, "
-               "SP=0x%06"_A_"x->0x%06"_A_"x\n",
+  c->dd_printf("%s(0x%06" _A_ "x): %s when %s expected, "
+               "SP=0x%06" _A_ "x->0x%06" _A_ "x\n",
                get_type_name(), operation->get_pc(),
                operation->get_op_name(), top->get_matching_name(),
                operation->get_before(), operation->get_after());
@@ -520,7 +520,7 @@ cl_error_stack_tracker_inconsistent::~cl_error_stack_tracker_inconsistent(void)
 void
 cl_error_stack_tracker_inconsistent::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06"_A_"x): %d byte(s) unread from the stack\n",
+  c->dd_printf("%s(0x%06" _A_ "x): %d byte(s) unread from the stack\n",
                get_type_name(), operation->get_pc(),
                unread_data_size);
 }

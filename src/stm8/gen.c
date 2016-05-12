@@ -121,14 +121,13 @@ static const char *asminstnames[] =
   "xor"
 };
 
-static struct asmop asmop_a, asmop_x, asmop_y, asmop_xy, asmop_zero, asmop_one, asmop_minus_one;
+static struct asmop asmop_a, asmop_x, asmop_y, asmop_xy, asmop_zero, asmop_one;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_X = &asmop_x;
 static struct asmop *const ASMOP_Y = &asmop_y;
 static struct asmop *const ASMOP_XY = &asmop_xy;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
-static struct asmop *const ASMOP_MINUS_ONE = &asmop_minus_one;
 
 void
 stm8_init_asmops (void)
@@ -206,16 +205,6 @@ stm8_init_asmops (void)
   asmop_one.regs[YL_IDX] = -1;
   asmop_one.regs[YH_IDX] = -1;
   asmop_one.regs[C_IDX] = -1;
-
-  asmop_minus_one.type = AOP_LIT;
-  asmop_minus_one.size = 8;
-  asmop_minus_one.aopu.aop_lit = constVal ("-1");
-  asmop_minus_one.regs[A_IDX] = -1;
-  asmop_minus_one.regs[XL_IDX] = -1;
-  asmop_minus_one.regs[XH_IDX] = -1;
-  asmop_minus_one.regs[YL_IDX] = -1;
-  asmop_minus_one.regs[YH_IDX] = -1;
-  asmop_minus_one.regs[C_IDX] = -1;
 }
 
 void emit2 (const char *inst, const char *fmt, ...)
@@ -5609,7 +5598,7 @@ genGetABit (const iCode *ic)
         }
       while (shCount--)
         emit3 (A_SRL, ASMOP_A, 0);
-      emit2 ("and", "a, #0x01");
+      emit3 (A_AND, ASMOP_A, ASMOP_ONE);
       cost (2, 1);
     }
   else

@@ -1,6 +1,7 @@
 /* lkelf.c - Create an executable ELF/DWARF file
 
    Copyright (C) 2004 Erik Petrich, epetrich at users dot sourceforge dot net
+   Copyright (C) 2015 Peter Dons Tychsen at pdt dot dontech dot dk
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -122,6 +123,14 @@ enum
 
 enum
 {
+  SHN_UNDEF = 0,
+  SHN_ABS = 0xfff1
+};
+
+#define ELF32_ST_INFO(b,t) (((b)<<4)+((t)&0xf))
+
+enum
+{
   PT_NULL = 0,
   PT_LOAD
 };
@@ -177,6 +186,16 @@ typedef struct
   Elf32_Word p_align;
 } Elf32_Phdr;
 
+typedef struct
+{
+  Elf32_Word st_name;
+  Elf32_Addr st_value;
+  Elf32_Word st_size;
+  unsigned char st_info;
+  unsigned char st_other;
+  Elf32_Half st_shndx;
+} Elf32_Sym;
+
 typedef struct strtabString
 {
   char * string;
@@ -192,6 +211,7 @@ typedef struct
 } strtabList;
 
 static strtabList shstrtab;
+static strtabList strtab;
 
 
 typedef struct listEntry
@@ -238,24 +258,27 @@ listNew (void)
   return lhp;
 }
 
-
-#if 0
-static Elf32_Word
-strtabFind (strtabList * strtab, char * str)
+/*---------------------------------------------------------------------*/
+/* strtabFind - Find section header index in a list of section headers */
+/* Returns the offset of the section                                   */
+/*---------------------------------------------------------------------*/
+static Elf32_Half
+strtabFindShndx (strtabList * strtab, char * str)
 {
   strtabString * sp;
+  Elf32_Half shndx = 0;
   sp = strtab->first;
 
   while (sp)
     {
       if (!strcmp (str, sp->string))
-        return sp->index;
+        return shndx;
+      shndx++;
       sp = sp->next;
     }
 
   return 0;
 }
-#endif
 
 /*-------------------------------------------------------------------*/
 /* strtabFindOrAdd - Finds a string in a string table or adds the    */
@@ -456,6 +479,73 @@ fputElf32_Phdr (Elf32_Phdr * phdr, FILE * fp)
   fputElf32_Word (phdr->p_align, fp);
 }
 
+/*-------------------------------------------------------------------------*/
+/* fputElf32_Sym - writes an Elf32_Sym struct (symbol) to a file */
+/*-------------------------------------------------------------------------*/
+static void
+fputElf32_Sym (Elf32_Sym * symhdr, FILE * fp)
+{
+  fputElf32_Word (symhdr->st_name, fp);
+  fputElf32_Addr (symhdr->st_value, fp);
+  fputElf32_Word (symhdr->st_size, fp);
+  fputc (symhdr->st_info, fp);
+  fputc (symhdr->st_other, fp);
+  fputElf32_Half (symhdr->st_shndx, fp);
+}
+
+enum
+{
+  STB_LOCAL = 0,
+  STB_GLOBAL,
+  STB_WEAK
+};
+
+enum
+{
+  STT_NOTYPE = 0,
+  STT_OBJECT,
+  STT_FUNC
+};
+
+/*--------------------------------------------------------------------------*/
+/* elfGenerateSyms - generates symbol headers for a list of symbols         */
+/*--------------------------------------------------------------------------*/
+static void
+elfGenerateSyms(struct head *hp)
+{
+  int i;
+  struct sym *sym;
+  Elf32_Sym *symhdr;
+
+  /* Add empty */
+  symhdr = (Elf32_Sym *)new (sizeof (*symhdr));
+  fputElf32_Sym (symhdr, ofp);
+
+  /* Add all modules */
+  while(hp)
+    {
+      /* Add all symbols */
+      for(i=0;i<hp->h_nsym;i++)
+        {
+          sym = hp->s_list[i];
+          if(sym->s_id)
+            {
+              symhdr = (Elf32_Sym *)new (sizeof (*symhdr));
+              symhdr->st_name = strtabFindOrAdd(&strtab,sym->s_id);
+              symhdr->st_value = sym->s_addr + sym->s_axp->a_addr;
+              symhdr->st_shndx = strtabFindShndx(&shstrtab,sym->s_axp->a_bap->a_id);
+              symhdr->st_info = ELF32_ST_INFO(STB_GLOBAL,STT_FUNC);
+              if(!symhdr->st_shndx)
+                {
+                  symhdr->st_shndx = SHN_ABS;
+                }
+        
+              fputElf32_Sym (symhdr, ofp);
+            }
+        }
+      hp = hp->h_hp;
+    }
+}
 
 /*--------------------------------------------------------------------------*/
 /* elfGenerateAbs - generates segments and sections for an absolute area.   */
@@ -626,6 +716,7 @@ elfGenerate (void)
   else
     ehdr.e_ident[EI_DATA] = ELFDATA2MSB;
   ehdr.e_ident[EI_VERSION] = 1;
+  ehdr.e_ident[EI_PAD] = 8;
   ehdr.e_type = ET_EXEC;
   ehdr.e_machine = TARGET_IS_STM8 ? EM_STM8 : EM_68HC08; /* FIXME: get rid of hardcoded value - EEP */
   ehdr.e_phentsize = sizeof (*phdrp);
@@ -658,7 +749,39 @@ elfGenerate (void)
       ap = ap->a_ap;
     }
 
-  /* Create the string table section after the other sections */
+  /* Create symbol table section */
+  shdrp = (Elf32_Shdr *)new (sizeof (*shdrp));
+  shdrp->sh_name = strtabFindOrAdd (&shstrtab, ".symtab");
+  shdrp->sh_type = SHT_SYMTAB;
+  shdrp->sh_flags = 0;
+  shdrp->sh_addr = 0;
+  shdrp->sh_offset = ftell (ofp);
+  shdrp->sh_link = sections->count+1;
+  shdrp->sh_info = 1;
+  shdrp->sh_addralign = 0;
+  shdrp->sh_entsize = sizeof(Elf32_Sym);
+  lep = sections->first;
+  /* Generate symbols */
+  elfGenerateSyms(headp);
+  shdrp->sh_size = ftell(ofp) - shdrp->sh_offset;
+  listAdd (sections, shdrp);
+
+  /* Create string table section */
+  shdrp = (Elf32_Shdr *)new (sizeof (*shdrp));
+  shdrp->sh_name = strtabFindOrAdd (&shstrtab, ".strtab");
+  shdrp->sh_type = SHT_STRTAB;
+  shdrp->sh_flags = 0;
+  shdrp->sh_addr = 0;
+  shdrp->sh_offset = ftell (ofp);
+  shdrp->sh_size = strtab.last ? (strtab.last->index + strlen (strtab.last->string) + 1) : 0;
+  shdrp->sh_link = 0;
+  shdrp->sh_info = 0;
+  shdrp->sh_addralign = 0;
+  shdrp->sh_entsize = 0;
+  listAdd (sections, shdrp);
+  fputElfStrtab (&strtab, ofp);
+
+  /* Create the section header string table section after the other sections */
   shdrp = (Elf32_Shdr *)new (sizeof (*shdrp));
   shdrp->sh_name = strtabFindOrAdd (&shstrtab, ".shstrtab");
   shdrp->sh_type = SHT_STRTAB;

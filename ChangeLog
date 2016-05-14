@@ -1,3 +1,18 @@
+2016-05-14 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/sdbinutils/binutils/arlex.c,
+	* support/sdbinutils/binutils/arparse.c,
+	* support/sdbinutils/binutils/arparse.h,
+	* support/sdbinutils/binutils/defparse.c,
+	* support/sdbinutils/binutils/defparse.h,
+	* support/sdbinutils/binutils/mcparse.c,
+	* support/sdbinutils/binutils/mcparse.h,
+	* support/sdbinutils/binutils/rcparse.c,
+	* support/sdbinutils/binutils/rcparse.h,
+	* support/sdbinutils/binutils/sysinfo.c,
+	* support/sdbinutils/binutils/sysinfo.h,
+	* support/sdbinutils/binutils/syslex.c: added, as in upstream git
+
 2016-05-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/linksrc/lkelf.c:

@@ -1,3 +1,8 @@
+2016-05-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Makefile.in:
+	  Fix distclean failures.
+
 2016-05-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/sdbinutils/binutils/arlex.c,

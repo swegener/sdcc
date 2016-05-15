@@ -26,12 +26,7 @@ SDCC_SDBINUTILS = support/sdbinutils
 
 TARGETS         = sdcc-librarian
 
-ifeq ($(OPT_DISABLE_HC08), 0)
-SDCC_AS        += sdas/as6808
-SDCC_LD        += sdcc-ld6808
-endif
-
-ifeq ($(OPT_DISABLE_S08), 0)
+ifneq ($(OPT_DISABLE_HC08)$(OPT_DISABLE_S08), 11)
 SDCC_AS        += sdas/as6808
 SDCC_LD        += sdcc-ld6808
 endif
@@ -41,11 +36,7 @@ SDCC_AS        += sdas/asstm8
 SDCC_LD        += sdcc-ldstm8
 endif
 
-ifeq ($(OPT_DISABLE_DS390), 0)
-SDCC_AS        += sdas/as8xcxxx
-endif
-
-ifeq ($(OPT_DISABLE_DS400), 0)
+ifneq ($(OPT_DISABLE_DS390)$(OPT_DISABLE_DS400), 11)
 SDCC_AS        += sdas/as8xcxxx
 endif
 
@@ -55,22 +46,12 @@ SDCC_LD        += sdcc-ld8051
 SDCC_MISC      += debugger/mcs51
 endif
 
-ifeq ($(OPT_DISABLE_Z80), 0)
+ifneq ($(OPT_DISABLE_Z80)$(OPT_DISABLE_Z180), 11)
 SDCC_AS        += sdas/asz80
 SDCC_LD        += sdcc-ldz80
 endif
 
-ifeq ($(OPT_DISABLE_Z180), 0)
-SDCC_AS        += sdas/asz80
-SDCC_LD        += sdcc-ldz80
-endif
-
-ifeq ($(OPT_DISABLE_R2K), 0)
-SDCC_AS        += sdas/asrab
-SDCC_LD        += sdcc-ldz80
-endif
-
-ifeq ($(OPT_DISABLE_R3KA), 0)
+ifneq ($(OPT_DISABLE_R2K)$(OPT_DISABLE_R3KA), 11)
 SDCC_AS        += sdas/asrab
 SDCC_LD        += sdcc-ldz80
 endif

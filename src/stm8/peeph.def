@@ -664,7 +664,7 @@ replace restart {
 // Barrier, so nothing else ever sees the jump-on-false optmiization.
 barrier
 
-// The STM8 has a relative jump-on-false intruction, which never jumps to its target. This can be used to optimize jumps over 1-byte instructions as we can use the instruction we jump over as the offset for the jump.
+// The STM8 has a relative jump-on-false instruction, which never jumps to its target. This can be used to optimize jumps over 1-byte instructions as we can use the instruction we jump over as the offset for the jump.
 replace {
 	jra	%5
 %2:
@@ -703,4 +703,21 @@ replace {
 	ld	a, xl
 	%5:
 } if labelRefCountChange(%5 -1)
+
+replace {
+	jrugt	%1
+	clr	a
+	jra	%2
+%1:
+	ld	a, #0x01
+%2:
+} by {
+	jrule	%1
+	ld	a, #0x01
+	.byte 0x21
+	; peephole jrf4 used jump-on-false opcode to shorten jump over 1-byte instruction.
+%1:
+	clr	a
+%2:
+} if labelRefCount(%1 1), labelRefCountChange(%2 -1)
 

@@ -4245,7 +4245,13 @@ genCmp (const iCode *ic, iCode *ifx)
     }
 
 _genCmp_1:
-  if (!ifx)
+  if (!special && !strcmp(branchInstCmp (opcode, sign, FALSE), "jrc") && !ifx && (aopInReg (result->aop, 0, A_IDX) || regDead (A_IDX, ic)))
+    {
+      emit3 (A_CLR, ASMOP_A, 0);
+      emit3 (A_RLC, ASMOP_A, 0);
+      cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
+    }
+  else if (!ifx)
     {
       symbol *tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
       symbol *tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));

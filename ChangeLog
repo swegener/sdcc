@@ -1,5 +1,12 @@
 2016-05-17 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/peep.c:
+	  Basic flag handling in notUsed(), more accurate notUsed().
+	* src/stm8/peeph.def:
+	  Enable dead load optimization (with fixed flag handling).
+
+2016-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCpeeph.c:
 	  Improve labelIsReturnOnly() accuracy.
 	* src/stm8/peeph.def:

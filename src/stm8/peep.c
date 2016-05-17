@@ -541,6 +541,21 @@ isReturned(const char *what)
 }
 
 static bool
+stm8MightReadFlag(const lineNode *pl, const char *what)
+{
+  if (ISINST (pl->line, "push"))
+     return (pl->line[5] == 'c');
+
+  if (!strcmp (what, "n"))
+    return (ISINST (pl->line, "jrmi") || ISINST (pl->line, "jrpl") || ISINST (pl->line, "jrsge") || ISINST (pl->line, "jrsgte") || ISINST (pl->line, "jrsle") || ISINST (pl->line, "jrslt"));
+
+  if (!strcmp (what, "z"))
+    return (ISINST (pl->line, "jreq") || ISINST (pl->line, "jrne") || ISINST (pl->line, "jrsgte") || ISINST (pl->line, "jrsle"));
+
+  return TRUE;
+}
+
+static bool
 stm8MightRead(const lineNode *pl, const char *what)
 {
   char extra = 0;
@@ -550,7 +565,7 @@ stm8MightRead(const lineNode *pl, const char *what)
   else if (!strcmp (what, "yl") || !strcmp (what, "yh"))
     extra = 'y';
   else if (strcmp (what, "a") != 0)
-    return FALSE;
+    return stm8MightReadFlag(pl, what);
 
   if (!extra)
     {
@@ -599,7 +614,7 @@ stm8MightRead(const lineNode *pl, const char *what)
       if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strstr (strchr(pl->line, ','), what))
         return TRUE;
 
-      if (pl->line[4] == extra && (ISINST (pl->line, "div") && !ISINST (pl->line, "divw")))
+      if (pl->line[4] == extra && ((ISINST (pl->line, "div") || ISINST (pl->line, "mul")) && !ISINST (pl->line, "divw")))
         return TRUE;
 
       if (pl->line[5] == extra && ISINST (pl->line, "addw")
@@ -627,7 +642,7 @@ stm8MightRead(const lineNode *pl, const char *what)
       if (ISINST (pl->line, "cpw") && pl->line[4] == extra)
         return TRUE;
 
-      if (argCont (strchr (pl->line, ','), extra) && (ISINST (pl->line, "adc")
+      if ((strchr (pl->line, ',') ? argCont (strchr (pl->line, ','), extra) : argCont (strchr (pl->line, '('), extra)) && (ISINST (pl->line, "adc")
         || (ISINST (pl->line, "add") && !ISINST (pl->line, "addw"))
         || ISINST (pl->line, "and")
         || ISINST (pl->line, "bcp")
@@ -688,13 +703,52 @@ stm8CondJump(const lineNode *pl)
 }
 
 static bool
+stm8SurelyWritesFlag(const lineNode *pl, const char *what)
+{
+  if (!strcmp (what, "n") || !strcmp (what, "z"))
+    {
+      if (ISINST (pl->line, "addw") && !strcmp (pl->line + 5, "sp"))
+        return FALSE;
+      if (ISINST (pl->line, "sub") && !strcmp (pl->line + 4, "sp"))
+        return FALSE;
+      if (ISINST (pl->line, "ld") || ISINST (pl->line, "ldw")) // Todo: Improve accuracy of these two.
+        return FALSE;
+      if (ISINST (pl->line, "pop"))
+        return (pl->line[5] == 'c');
+      if (ISINST (pl->line, "bccm") || ISINST (pl->line, "bcpl") ||
+        ISINST (pl->line, "break") ||
+        ISINST (pl->line, "bres") || ISINST (pl->line, "bset") ||
+        ISINST (pl->line, "btjf") || ISINST (pl->line, "btjt") ||
+        ISINST (pl->line, "call") || ISINST (pl->line, "callf") || ISINST (pl->line, "callr") ||
+        ISINST (pl->line, "ccf") ||
+        ISINST (pl->line, "exg") || ISINST (pl->line, "exgw") ||
+        ISINST (pl->line, "halt") || ISINST (pl->line, "int") ||
+        ISINST (pl->line, "jp") || ISINST (pl->line, "jpf") ||
+        pl->line[0] == 'j' && pl->line[1] == 'r' ||
+        ISINST (pl->line, "mov") || ISINST (pl->line, "mul") ||
+        ISINST (pl->line, "nop") ||
+        ISINST (pl->line, "popw") || ISINST (pl->line, "push") || ISINST (pl->line, "pushw") ||
+        ISINST (pl->line, "rcf") ||
+        ISINST (pl->line, "ret") || ISINST (pl->line, "retf") ||
+        ISINST (pl->line, "rvf") || ISINST (pl->line, "scf") ||
+        ISINST (pl->line, "sim") || ISINST (pl->line, "trap") || ISINST (pl->line, "wfe") || ISINST (pl->line, "wfi"))
+        return FALSE;
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+static bool
 stm8SurelyWrites(const lineNode *pl, const char *what)
 {
   char extra = 0;
   if (!strcmp (what, "xl") || !strcmp (what, "xh"))
     extra = 'x';
-  if (!strcmp (what, "yl") || !strcmp (what, "yh"))
+  else if (!strcmp (what, "yl") || !strcmp (what, "yh"))
     extra = 'y';
+  else if (strcmp (what, "a"))
+    return (stm8SurelyWritesFlag (pl, what));
 
   if (!extra)
     {
@@ -942,9 +996,6 @@ stm8notUsed (const char *what, lineNode *endPl, lineNode *head)
     return(stm8notUsed("xl", endPl, head) && stm8notUsed("xh", endPl, head));
   else if(strcmp(what, "y") == 0)
     return(stm8notUsed("yl", endPl, head) && stm8notUsed("yh", endPl, head));
-
-  if(strcmp(what, "a") && strcmp(what, "xl") && strcmp(what, "xh") && strcmp(what, "yl") && strcmp(what, "yh"))
-    return FALSE;
 
   _G.head = head;
 

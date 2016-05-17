@@ -1,3 +1,10 @@
+2016-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c:
+	  Improve labelIsReturnOnly() accuracy.
+	* src/stm8/peeph.def:
+	  Disable dead load optimization, introduce jump-to-return optimization.
+
 2016-05-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

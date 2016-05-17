@@ -313,7 +313,7 @@ FBYNAME (labelIsReturnOnly)
   if (!pl)
     return FALSE; /* did not find the label */
   pl = pl->next;
-  while (pl && (pl->isDebug || pl->isComment))
+  while (pl && (pl->isDebug || pl->isComment || pl->isLabel))
     pl = pl->next;
   if (!pl || !pl->line || pl->isDebug)
     return FALSE; /* next line not valid */

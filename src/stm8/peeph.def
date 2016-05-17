@@ -1,18 +1,18 @@
 // peeph.def - STM8 peephole rules
 
-replace restart {
-	ld	%1, %2
-	%3
-} by {
-	; peephole 0 removed dead load.
-} if notVolatile(%1), notVolatile(%2), notUsed(%1), notSimilar(jr %3)
+// Dead loads disabled until we have notUsed() for flags.
 
-replace restart {
-	ldw	%1, %2
-	%3
-} by {
-	; peephole 0w removed dead load.
-} if notVolatile(%1), notVolatile(%2), notUsed(%1), notSimilar(jr %3)
+//replace restart {
+//	ld	%1, %2
+//} by {
+//	; peephole 0 removed dead load.
+//} if notVolatile(%1), notVolatile(%2), notUsed(%1)
+
+//replace restart {
+//	ldw	%1, %2
+//} by {
+//	; peephole 0w removed dead load.
+//} if notVolatile(%1), notVolatile(%2), notUsed(%1)
 
 replace restart {
 	ld	%1, %2
@@ -379,6 +379,13 @@ replace restart {
 barrier
 
 replace restart {
+	jp	%5
+} by {
+	ret
+	; peephole j2e replaced jump by return.
+} if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
+
+replace restart {
 	ld	a, %1
 	srl	a
 	btjt	%1, #0, %2
@@ -661,7 +668,7 @@ replace restart {
 	; peephole r4 used rrwa.
 } if notUsed('yl')
 
-// Barrier, so nothing else ever sees the jump-on-false optmiization.
+// Barrier, so nothing else ever sees the jump-on-false optimization.
 barrier
 
 // The STM8 has a relative jump-on-false instruction, which never jumps to its target. This can be used to optimize jumps over 1-byte instructions as we can use the instruction we jump over as the offset for the jump.

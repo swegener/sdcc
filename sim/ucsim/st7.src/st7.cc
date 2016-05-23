@@ -179,7 +179,7 @@ cl_st7::inst_length(t_addr addr)
 {
   int len = 0;
 
-  get_disasm_info(addr, &len, NULL, NULL);
+  get_disasm_info(addr, &len, NULL, NULL, NULL);
 
   return len;
 }
@@ -189,9 +189,19 @@ cl_st7::inst_branch(t_addr addr)
 {
   int b;
 
-  get_disasm_info(addr, NULL, &b, NULL);
+  get_disasm_info(addr, NULL, &b, NULL, NULL);
 
   return b;
+}
+
+bool
+cl_st7::is_call(t_addr addr)
+{
+  struct dis_entry *e;
+
+  get_disasm_info(addr, NULL, NULL, NULL, &e);
+
+  return e?(e->is_call):false;
 }
 
 int
@@ -205,7 +215,8 @@ const char *
 cl_st7::get_disasm_info(t_addr addr,
                         int *ret_len,
                         int *ret_branch,
-                        int *immed_offset)
+                        int *immed_offset,
+			struct dis_entry **dentry)
 {
   const char *b = NULL;
   uint code;
@@ -285,6 +296,9 @@ cl_st7::get_disasm_info(t_addr addr,
   if (ret_len)
     *ret_len = len;
 
+  if (denrty)
+    *dentry= dis_e;
+  
   return b;
 }
 

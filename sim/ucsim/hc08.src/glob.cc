@@ -1,3 +1,4 @@
+
 /*
  * Simulator of microcontrollers (glob.cc)
  *
@@ -198,7 +199,7 @@ struct dis_entry disass_hc08[]= {
   { 0x0080, 0x00ff, ' ', 1, "rti" },
   { 0x0081, 0x00ff, ' ', 1, "rts" },
   { 0x0082, 0x00ff, ' ', 1, "bgnd" },  //HCS08 only
-  { 0x0083, 0x00ff, ' ', 1, "swi" },
+  { 0x0083, 0x00ff, ' ', 1, "swi", true },
   { 0x0084, 0x00ff, ' ', 1, "tap" },
   { 0x0085, 0x00ff, ' ', 1, "tpa" },
   { 0x0086, 0x00ff, ' ', 1, "pula" },
@@ -239,7 +240,7 @@ struct dis_entry disass_hc08[]= {
   { 0x00a9, 0x00ff, ' ', 2, "adc %b" },
   { 0x00aa, 0x00ff, ' ', 2, "ora %b" },
   { 0x00ab, 0x00ff, ' ', 2, "add %b" },
-  { 0x00ad, 0x00ff, 'R', 2, "bsr %d" },
+  { 0x00ad, 0x00ff, 'R', 2, "bsr %d", true },
   { 0x00ae, 0x00ff, ' ', 2, "ldx %b" },
   { 0x00af, 0x00ff, ' ', 2, "aix %s" },
 
@@ -256,7 +257,7 @@ struct dis_entry disass_hc08[]= {
   { 0x00ba, 0x00ff, ' ', 2, "ora %d" },
   { 0x00bb, 0x00ff, ' ', 2, "add %d" },
   { 0x00bc, 0x00ff, 'A', 2, "jmp %d" },
-  { 0x00bd, 0x00ff, 'A', 2, "jsr %d" },
+  { 0x00bd, 0x00ff, 'A', 2, "jsr %d", true },
   { 0x00be, 0x00ff, ' ', 2, "ldx %d" },
   { 0x00bf, 0x00ff, ' ', 2, "stx %d" },
 
@@ -273,7 +274,7 @@ struct dis_entry disass_hc08[]= {
   { 0x00ca, 0x00ff, ' ', 3, "ora %x" },
   { 0x00cb, 0x00ff, ' ', 3, "add %x" },
   { 0x00cc, 0x00ff, 'A', 3, "jmp %x" },
-  { 0x00cd, 0x00ff, 'A', 3, "jsr %x" },
+  { 0x00cd, 0x00ff, 'A', 3, "jsr %x", true },
   { 0x00ce, 0x00ff, ' ', 3, "ldx %x" },
   { 0x00cf, 0x00ff, ' ', 3, "stx %x" },
 
@@ -290,7 +291,7 @@ struct dis_entry disass_hc08[]= {
   { 0x00da, 0x00ff, ' ', 3, "ora %2,x" },
   { 0x00db, 0x00ff, ' ', 3, "add %2,x" },
   { 0x00dc, 0x00ff, ' ', 3, "jmp %2,x" },
-  { 0x00dd, 0x00ff, ' ', 3, "jsr %2,x" },
+  { 0x00dd, 0x00ff, ' ', 3, "jsr %2,x", true },
   { 0x00de, 0x00ff, ' ', 3, "ldx %2,x" },
   { 0x00df, 0x00ff, ' ', 3, "stx %2,x" },
 
@@ -307,7 +308,7 @@ struct dis_entry disass_hc08[]= {
   { 0x00ea, 0x00ff, ' ', 2, "ora %1,x" },
   { 0x00eb, 0x00ff, ' ', 2, "add %1,x" },
   { 0x00ec, 0x00ff, ' ', 2, "jmp %1,x" },
-  { 0x00ed, 0x00ff, ' ', 2, "jsr %1,x" },
+  { 0x00ed, 0x00ff, ' ', 2, "jsr %1,x", true },
   { 0x00ee, 0x00ff, ' ', 2, "ldx %1,x" },
   { 0x00ef, 0x00ff, ' ', 2, "stx %1,x" },
 
@@ -324,7 +325,7 @@ struct dis_entry disass_hc08[]= {
   { 0x00fa, 0x00ff, ' ', 1, "ora ,x" },
   { 0x00fb, 0x00ff, ' ', 1, "add ,x" },
   { 0x00fc, 0x00ff, ' ', 1, "jmp ,x" },
-  { 0x00fd, 0x00ff, ' ', 1, "jsr ,x" },
+  { 0x00fd, 0x00ff, ' ', 1, "jsr ,x", true },
   { 0x00fe, 0x00ff, ' ', 1, "ldx ,x" },
   { 0x00ff, 0x00ff, ' ', 1, "stx ,x" },
 

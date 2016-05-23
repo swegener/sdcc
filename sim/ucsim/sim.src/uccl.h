@@ -205,6 +205,7 @@ public:
   virtual void print_regs(class cl_console_base *con);
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
+  virtual bool is_call(t_addr addr);
   virtual int longest_inst(void);
   virtual bool get_name(t_addr addr, struct name_entry tab[], char *buf);
   virtual bool symbol2address(char *sym, struct name_entry tab[],

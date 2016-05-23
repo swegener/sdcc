@@ -87,12 +87,12 @@ struct dis_entry disass_stm8[]= {
   { 0x00e5, 0x00ff, ' ', 2, "bcp A,(%1,X)" },
   { 0x00f5, 0x00ff, ' ', 1, "bcp A,(X)" },
 
-  { 0x00cd, 0x00ff, ' ', 3, "call %x" },
-  { 0x00dd, 0x00ff, ' ', 3, "call (%2,X)" },
-  { 0x00ed, 0x00ff, ' ', 2, "call (%1,X)" },
-  { 0x00fd, 0x00ff, ' ', 1, "call (X)" },
-  { 0x008d, 0x00ff, ' ', 4, "callf %e" },
-  { 0x00ad, 0x00ff, ' ', 2, "callr %p" },
+  { 0x00cd, 0x00ff, ' ', 3, "call %x", true },
+  { 0x00dd, 0x00ff, ' ', 3, "call (%2,X)", true },
+  { 0x00ed, 0x00ff, ' ', 2, "call (%1,X)", true },
+  { 0x00fd, 0x00ff, ' ', 1, "call (X)", true },
+  { 0x008d, 0x00ff, ' ', 4, "callf %e", true },
+  { 0x00ad, 0x00ff, ' ', 2, "callr %p", true },
 
   { 0x008c, 0x00ff, ' ', 1, "ccf" },
 
@@ -323,7 +323,7 @@ struct dis_entry disass_stm8[]= {
   { 0x007d, 0x00ff, ' ', 1, "tnz (X)" },
   { 0x005d, 0x00ff, ' ', 1, "tnzw X" },
 
-  { 0x0083, 0x00ff, ' ', 1, "trap" },
+  { 0x0083, 0x00ff, ' ', 1, "trap", true },
   { 0x008f, 0x00ff, ' ', 1, "wfi" },
 
   { 0x0018, 0x00ff, ' ', 2, "xor A,(%1,SP)" },
@@ -391,8 +391,8 @@ struct dis_entry disass_stm8_72[]= {
   { 0x000c, 0x00ff, ' ', 4, "btjt %d,#6,%p" },
   { 0x000e, 0x00ff, ' ', 4, "btjt %d,#7,%p" },
 
-  { 0x00cd, 0x00ff, ' ', 3, "call [%2.w]" },
-  { 0x00dd, 0x00ff, ' ', 3, "call ([%2.w],X)" },
+  { 0x00cd, 0x00ff, ' ', 3, "call [%2.w]", true },
+  { 0x00dd, 0x00ff, ' ', 3, "call ([%2.w],X)", true },
 
   { 0x003f, 0x00ff, ' ', 3, "clr [%2.w]" },
   { 0x004f, 0x00ff, ' ', 3, "clr (%2,X)" },
@@ -524,9 +524,9 @@ struct dis_entry disass_stm8_90[]= {
   { 0x001c, 0x00ff, ' ', 3, "bcpl %d,#6" },
   { 0x001e, 0x00ff, ' ', 3, "bcpl %d,#7" },
 
-  { 0x00dd, 0x00ff, ' ', 3, "call (%2,Y)" },
-  { 0x00ed, 0x00ff, ' ', 2, "call (%1,Y)" },
-  { 0x00fd, 0x00ff, ' ', 1, "call (Y)" },
+  { 0x00dd, 0x00ff, ' ', 3, "call (%2,Y)", true },
+  { 0x00ed, 0x00ff, ' ', 2, "call (%1,Y)", true },
+  { 0x00fd, 0x00ff, ' ', 1, "call (Y)", true },
 
   { 0x004f, 0x00ff, ' ', 3, "clr (%2,Y)" },
   { 0x006f, 0x00ff, ' ', 2, "clr (%1,Y)" },
@@ -667,7 +667,7 @@ struct dis_entry disass_stm8_91[]= {
   { 0x00db, 0x00ff, ' ', 2, "add A,([%1.w],Y)" },
   { 0x00d4, 0x00ff, ' ', 2, "and A,([%1.w],Y)" },
   { 0x00d5, 0x00ff, ' ', 2, "bcp A,([%1.w],Y)" },
-  { 0x00dd, 0x00ff, ' ', 2, "call ([%1.w],Y)" },
+  { 0x00dd, 0x00ff, ' ', 2, "call ([%1.w],Y)", true },
   { 0x006f, 0x00ff, ' ', 2, "clr ([%1.w],Y)" },
   { 0x00d1, 0x00ff, ' ', 2, "cp A,([%1.w],Y)" },
   { 0x00c3, 0x00ff, ' ', 2, "cpw Y,[%1.w]" },
@@ -710,9 +710,9 @@ struct dis_entry disass_stm8_92[]= {
   { 0x00d4, 0x00ff, ' ', 2, "and A,([%1.w],X)" },
   { 0x00c5, 0x00ff, ' ', 2, "bcp A,[%1.w]" },
   { 0x00d5, 0x00ff, ' ', 2, "bcp A,([%1.w],X)" },
-  { 0x00cd, 0x00ff, ' ', 2, "call [%1.w]" },
-  { 0x00dd, 0x00ff, ' ', 2, "call ([%1.w],X)" },
-  { 0x008d, 0x00ff, ' ', 3, "callf [%2.e]" },
+  { 0x00cd, 0x00ff, ' ', 2, "call [%1.w]", true },
+  { 0x00dd, 0x00ff, ' ', 2, "call ([%1.w],X)", true },
+  { 0x008d, 0x00ff, ' ', 3, "callf [%2.e]", true },
   { 0x003f, 0x00ff, ' ', 2, "clr [%1.w]" },
   { 0x006f, 0x00ff, ' ', 2, "clr ([%1.w],X)" },
   { 0x00c1, 0x00ff, ' ', 2, "cp A,[%1.w]" },

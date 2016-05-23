@@ -178,7 +178,7 @@ cl_hc08::inst_length(t_addr addr)
 {
   int len = 0;
 
-  get_disasm_info(addr, &len, NULL, NULL);
+  get_disasm_info(addr, &len, NULL, NULL, NULL);
 
   return len;
 }
@@ -188,9 +188,19 @@ cl_hc08::inst_branch(t_addr addr)
 {
   int b;
 
-  get_disasm_info(addr, NULL, &b, NULL);
+  get_disasm_info(addr, NULL, &b, NULL, NULL);
 
   return b;
+}
+
+bool
+cl_hc08::is_call(t_addr addr)
+{
+  struct dis_entry *e;
+
+  get_disasm_info(addr, NULL, NULL, NULL, &e);
+  
+  return e?(e->is_call):false;
 }
 
 int
@@ -202,9 +212,10 @@ cl_hc08::longest_inst(void)
 
 const char *
 cl_hc08::get_disasm_info(t_addr addr,
-                        int *ret_len,
-                        int *ret_branch,
-                        int *immed_offset)
+			 int *ret_len,
+			 int *ret_branch,
+			 int *immed_offset,
+			 struct dis_entry **dentry)
 {
   const char *b = NULL;
   uint code;
@@ -258,6 +269,9 @@ cl_hc08::get_disasm_info(t_addr addr,
   if (ret_len)
     *ret_len = len;
 
+  if (dentry)
+    *dentry= dis_e;
+  
   return b;
 }
 
@@ -272,7 +286,7 @@ cl_hc08::disass(t_addr addr, const char *sep)
 
   p= work;
 
-  b = get_disasm_info(addr, &len, NULL, &immed_offset);
+  b = get_disasm_info(addr, &len, NULL, &immed_offset, NULL);
 
   if (b == NULL) {
     buf= (char*)malloc(30);

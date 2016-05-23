@@ -1113,6 +1113,22 @@ cl_uc::inst_branch(t_addr addr)
   return tabl[i].branch;
 }
 
+bool
+cl_uc::is_call(t_addr addr)
+{
+  struct dis_entry *tabl= dis_tbl();
+  int i;
+  t_mem code;
+
+  if (!rom)
+    return(0);
+
+  code = rom->get(addr);
+  for (i= 0; tabl[i].mnemonic && (code & tabl[i].mask) != tabl[i].code; i++)
+    ;
+  return tabl[i].is_call;
+}
+
 int
 cl_uc::longest_inst(void)
 {

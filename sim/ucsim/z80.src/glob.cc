@@ -273,14 +273,14 @@ struct dis_entry DISASS_NAME() []= {
   { 0x00c2, 0x00ff, 'A', 3, "JP NZ, %w" },
   { 0x00c3, 0x00ff, 'A', 3, "JP %w" },
 #ifndef R2K
-  { 0x00c4, 0x00ff, 'l', 3, "CALL NZ,%w" },
+  { 0x00c4, 0x00ff, 'l', 3, "CALL NZ,%w", true },
 #else
   { 0x00c4, 0x00ff, ' ', 2, "LD HL,(SP+%d)" },
 #endif
   { 0x00c5, 0x00ff, ' ', 1, "PUSH BC" },
   { 0x00c6, 0x00ff, ' ', 2, "ADD A,%b" },
 #ifndef R2K
-  { 0x00c7, 0x00ff, ' ', 1, "RST 0" },
+  { 0x00c7, 0x00ff, ' ', 1, "RST 0", true },
 #else
   { 0x00c7, 0x00ff, ' ', 4, "LJP %w,%b" },
 #endif
@@ -291,16 +291,16 @@ struct dis_entry DISASS_NAME() []= {
   { 0x00cb, 0x00ff, ' ', 2, "?cb?" }, /* ESC code to lots of op-codes, all 2-byte */
 
 #ifndef R2K
-  { 0x00cc, 0x00ff, 'l', 3, "CALL Z,%w" },
+  { 0x00cc, 0x00ff, 'l', 3, "CALL Z,%w", true },
 #else
   { 0x00cc, 0x00ff, 'l', 1, "BOOL  HL" },  
 #endif
-  { 0x00cd, 0x00ff, 'l', 3, "CALL %w" },
+  { 0x00cd, 0x00ff, 'l', 3, "CALL %w", true },
   { 0x00ce, 0x00ff, ' ', 2, "ADC A,%b" },
 #ifndef R2K
-  { 0x00cf, 0x00ff, ' ', 1, "RST 8" },
+  { 0x00cf, 0x00ff, ' ', 1, "RST 8", true },
 #else
-  { 0x00cf, 0x00ff, ' ', 4, "LCALL  %w,%b" },
+  { 0x00cf, 0x00ff, ' ', 4, "LCALL  %w,%b", true },
 #endif
   
   { 0x00d0, 0x00ff, ' ', 1, "RET NC" },
@@ -308,49 +308,49 @@ struct dis_entry DISASS_NAME() []= {
   { 0x00d2, 0x00ff, 'A', 3, "JP NC,%w" },
 #ifndef R2K
   { 0x00d3, 0x00ff, ' ', 2, "OUT (%b),A" },
-  { 0x00d4, 0x00ff, 'l', 3, "CALL NC,%w" },
+  { 0x00d4, 0x00ff, 'l', 3, "CALL NC,%w", true },
 #else
   { 0x00d3, 0x00ff, ' ', 1, "IOI" },
   { 0x00d4, 0x00ff, 'l', 2, "LD (SP+%d),HL" },
 #endif
   { 0x00d5, 0x00ff, ' ', 1, "PUSH DE" },
   { 0x00d6, 0x00ff, ' ', 2, "sub %b" },
-  { 0x00d7, 0x00ff, ' ', 1, "RST 10H" },
+  { 0x00d7, 0x00ff, ' ', 1, "RST 10H", true },
 
   { 0x00d8, 0x00ff, ' ', 1, "RET C" },
   { 0x00d9, 0x00ff, ' ', 1, "EXX" },
   { 0x00da, 0x00ff, 'A', 3, "JP C,%w" },
 #ifndef R2K
   { 0x00db, 0x00ff, ' ', 2, "IN A,(%b)" },
-  { 0x00dc, 0x00ff, 'l', 3, "CALL C,%w" },
+  { 0x00dc, 0x00ff, 'l', 3, "CALL C,%w", true },
 #else
   { 0x00db, 0x00ff, ' ', 1, "IOE" },
   { 0x00dc, 0x00ff, 'l', 1, "AND HL,DE" },
 #endif
   { 0x00dd, 0x00ff, ' ', 2, "?dd?" },  /* 0xdd - ESC codes,about 284, vary lengths, IX centric */
   { 0x00de, 0x00ff, ' ', 2, "SBC A,%b" },
-  { 0x00df, 0x00ff, ' ', 1, "RST 18H" },
+  { 0x00df, 0x00ff, ' ', 1, "RST 18H", true },
 
   { 0x00e0, 0x00ff, ' ', 1, "RET PO" },
   { 0x00e1, 0x00ff, ' ', 1, "POP HL" },
   { 0x00e2, 0x00ff, 'A', 3, "JP PO,%w" },
 #ifndef R2K
   { 0x00e3, 0x00ff, ' ', 1, "EX (SP),HL" },
-  { 0x00e4, 0x00ff, 'l', 3, "CALL PO,%w" },
+  { 0x00e4, 0x00ff, 'l', 3, "CALL PO,%w", true },
 #else
   { 0x00e3, 0x00ff, ' ', 1, "EX DE',HL" },
   { 0x00e4, 0x00ff, 'l', 2, "LD HL,(IX+%d)" },
 #endif
   { 0x00e5, 0x00ff, ' ', 1, "PUSH HL" },
   { 0x00e6, 0x00ff, ' ', 2, "AND %b" },
-  { 0x00e7, 0x00ff, ' ', 1, "RST 20H" },
+  { 0x00e7, 0x00ff, ' ', 1, "RST 20H", true },
 
   { 0x00e8, 0x00ff, ' ', 1, "RET PE" },
   { 0x00e9, 0x00ff, 'A', 1, "JP (HL)" },
   { 0x00ea, 0x00ff, 'A', 3, "JP PE,%w" },
   { 0x00eb, 0x00ff, ' ', 1, "EX DE,HL" },
 #ifndef R2K
-  { 0x00ec, 0x00ff, 'l', 3, "CALL PE, %w" },
+  { 0x00ec, 0x00ff, 'l', 3, "CALL PE, %w", true },
   { 0x00ed, 0x00ff, ' ', 2, "?ed?" },  /* ESC code to about 80 opcodes of various lengths */
 #else
   { 0x00ec, 0x00ff, 'l', 1, "OR HL,DE" },
@@ -358,14 +358,14 @@ struct dis_entry DISASS_NAME() []= {
 #endif
   
   { 0x00ee, 0x00ff, ' ', 2, "XOR %b" },
-  { 0x00ef, 0x00ff, ' ', 1, "RST 28H" },
+  { 0x00ef, 0x00ff, ' ', 1, "RST 28H", true },
 
   { 0x00f0, 0x00ff, ' ', 1, "RET P" },
   { 0x00f1, 0x00ff, ' ', 1, "POP AF" },
   { 0x00f2, 0x00ff, 'A', 3, "JP P,%w" },
 #ifndef R2K
   { 0x00f3, 0x00ff, ' ', 1, "DI" },
-  { 0x00f4, 0x00ff, 'l', 3, "CALL P,%w" },
+  { 0x00f4, 0x00ff, 'l', 3, "CALL P,%w", true },
 #else
   { 0x00f3, 0x00ff, ' ', 1, "RL DE" },
   { 0x00f4, 0x00ff, 'l', 2, "LD (IX+%d),HL" },
@@ -373,7 +373,7 @@ struct dis_entry DISASS_NAME() []= {
   { 0x00f5, 0x00ff, ' ', 1, "PUSH AF" },
   { 0x00f6, 0x00ff, ' ', 2, "OR %b" },
 #ifndef R2K
-  { 0x00f7, 0x00ff, ' ', 1, "RST 30H" },
+  { 0x00f7, 0x00ff, ' ', 1, "RST 30H", true },
 #else
   { 0x00f7, 0x00ff, ' ', 1, "MUL" },
 #endif
@@ -382,14 +382,14 @@ struct dis_entry DISASS_NAME() []= {
   { 0x00fa, 0x00ff, ' ', 3, "JP M,%w" },
 #ifndef R2K
   { 0x00fb, 0x00ff, ' ', 1, "EI" },
-  { 0x00fc, 0x00ff, 'l', 3, "CALL M,%w" },
+  { 0x00fc, 0x00ff, 'l', 3, "CALL M,%w", true },
 #else
   { 0x00fb, 0x00ff, ' ', 1, "RR DE" },
   { 0x00fc, 0x00ff, 'l', 1, "RR HL" },
 #endif
   { 0x00fd, 0x00ff, ' ', 1, "?fd?" }, /* ESC codes,about 284, vary lengths, IY centric */
   { 0x00fe, 0x00ff, ' ', 2, "CP %b" },
-  { 0x00ff, 0x00ff, ' ', 1, "RST 38H" },
+  { 0x00ff, 0x00ff, ' ', 1, "RST 38H", true },
 
   { 0, 0, 0, 0, NULL }
 };
@@ -535,7 +535,7 @@ struct dis_entry disass_r2k_ed[]= {
   { 0x00B0, 0x00ff, ' ', 1, "LDIR" },
   { 0x00B8, 0x00ff, ' ', 1, "LDDR" },
   
-  { 0x00EA, 0x00ff, ' ', 1, "CALL (HL)" },
+  { 0x00EA, 0x00ff, ' ', 1, "CALL (HL)", true },
   
   { 0, 0, 0, 0, NULL }
 };

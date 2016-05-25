@@ -444,7 +444,7 @@ cl_51core::print_regs(class cl_console_base *con)
               sfr->get(DPL), data, data, isprint(data)?data:'.');
 
   data= iram->get(iram->get(start+1));
-  con->dd_printf("@R1 %02x %c", isprint(data) ? data : '.');
+  con->dd_printf("@R1 %02x %c", data, isprint(data) ? data : '.');
   data= psw->get();
   con->dd_printf("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c\n", data,
               (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',

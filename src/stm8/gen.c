@@ -6583,8 +6583,10 @@ genAddrOf (const iCode *ic)
         }
       genMove (result->aop, ASMOP_Y, regDead (A_IDX, ic), FALSE, regDead (X_IDX, ic));
     }
-  else if (regDead (X_IDX, ic))
+  else if (!(regDead (XH_IDX, ic) ^ regDead (XL_IDX, ic)))
     {
+      if (!regDead (X_IDX, ic))
+        push (ASMOP_X, 0, 2);
       if (!sym->onStack)
         {
           wassert (sym->name);
@@ -6609,8 +6611,10 @@ genAddrOf (const iCode *ic)
             }
         }
       genMove (result->aop, ASMOP_X, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+      if (!regDead (X_IDX, ic))
+        pop (ASMOP_X, 0, 2);
     }
-  else // todo: Handle case of both X and Y alive; todo: Use mov when destination is a global variable.
+  else // todo: Handle case of y alive and x partially alive; todo: Use mov when destination is a global variable.
     {
       if (!regalloc_dry_run)
         wassertl (0, "Unimplemented genAddrOf deadness.");

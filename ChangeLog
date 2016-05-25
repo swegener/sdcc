@@ -1,3 +1,8 @@
+2016-05-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Implement genAddrOf for both X and Y in use (to make all regression tests compile for low --max-allocs-per-node).
+
 2016-05-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c: fixed bug #2489

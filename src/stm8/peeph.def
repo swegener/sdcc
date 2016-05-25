@@ -5,13 +5,13 @@
 replace restart {
 	ld	%1, %2
 } by {
-	; peephole 0 removed dead load from %2 to %1.
+	; peephole 0 removed dead load into %1 from %2.
 } if notVolatile(%1), notVolatile(%2), notUsed(%1), notUsed('n'), notUsed('z')
 
 replace restart {
 	ldw	%1, %2
 } by {
-	; peephole 0w removed dead load from %2 to %1.
+	; peephole 0w removed dead load into %1 from %2.
 } if notVolatile(%1), notVolatile(%2), notUsed(%1), notUsed('n'), notUsed('z')
 
 replace restart {

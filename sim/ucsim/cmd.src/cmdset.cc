@@ -154,10 +154,9 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
 {
   class cl_brk *b;
   t_addr next;
-  //int branch;
   int inst_len;
   bool is_call;
-  
+
 #if 0
   struct dis_entry *de;
   t_mem code= sim->uc->get_mem(MEM_ROM, sim->uc->PC);
@@ -171,11 +170,10 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
     }
 #endif
 
-  //branch = sim->uc->inst_branch(sim->uc->PC);
   inst_len = sim->uc->inst_length(sim->uc->PC);
   is_call= sim->uc->is_call(sim->uc->PC);
-  
-  if (/*(branch == 'a') || (branch == 'l')*/is_call)
+
+  if (is_call)
     {
       next= sim->uc->PC + inst_len;
       if (!sim->uc->fbrk_at(next))
@@ -195,10 +193,11 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
       sim->start(con);
       //sim->uc->do_inst(-1);
     }
-  else {
-    sim->uc->do_inst(1);
-    sim->uc->print_regs(con);
-  }
+  else
+    {
+      sim->uc->do_inst(1);
+      sim->uc->print_regs(con);
+    }
   return(DD_FALSE);
 }
 

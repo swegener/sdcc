@@ -42,7 +42,7 @@ public:
   class cl_memory *ram;
   class cl_memory *rom;
   struct t_regs regs;
-  
+
 public:
   cl_z80(int Itype, int Itech, class cl_sim *asim);
   virtual int init(void);
@@ -62,26 +62,25 @@ public:
   virtual int exec_inst(void);
 
   virtual const char *get_disasm_info(t_addr addr,
-				      int *ret_len,
-				      int *ret_branch,
-				      int *immed_offset,
-				      struct dis_entry **dentry);
+                                      int *ret_len,
+                                      int *ret_branch,
+                                      int *immed_offset,
+                                      struct dis_entry **dentry);
   virtual bool is_call(t_addr addr);
 
-  
   virtual void store1( TYPE_UWORD addr, t_mem val );
   virtual void store2( TYPE_UWORD addr, TYPE_UWORD val );
-  
+
   virtual TYPE_UBYTE  get1( TYPE_UWORD addr );
   virtual TYPE_UWORD  get2( TYPE_UWORD addr );
-  
+
   virtual t_mem       fetch1( void );
   virtual TYPE_UWORD  fetch2( void );
   virtual t_mem       peek1 ( void );
-  
+
   virtual TYPE_UBYTE   in_byte( TYPE_UWORD ioaddr );
   virtual void        out_byte( TYPE_UWORD ioaddr, TYPE_UBYTE io_val );
-  
+
   //virtual t_mem fetch(void);
   virtual TYPE_UBYTE  reg_g_read ( t_mem g );
   virtual void        reg_g_store( t_mem g, TYPE_UBYTE new_val );

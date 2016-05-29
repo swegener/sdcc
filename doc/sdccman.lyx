@@ -54,7 +54,7 @@
 \pdf_bookmarksopenlevel 1
 \pdf_breaklinks false
 \pdf_pdfborder false
-\pdf_colorlinks false
+\pdf_colorlinks true
 \pdf_backref false
 \pdf_pdfusetitle true
 \papersize letterpaper
@@ -162,7 +162,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDCC 3.5.5
+SDCC 3.6.0-rc1
 \begin_inset Newline newline
 \end_inset
 

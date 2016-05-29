@@ -69,9 +69,9 @@ public:
                   enum what_to_do_on_cell_change awtd);
 
   virtual void mem_cell_changed(class cl_address_space *amem, t_addr aaddr,
-				class cl_hw *hw);
+                                class cl_hw *hw);
   virtual void address_space_added(class cl_address_space *amem,
-				   class cl_hw *hw);
+                                   class cl_hw *hw);
   virtual class cl_memory_cell *get_cell();
 };
 
@@ -81,7 +81,7 @@ public:
   cl_used_cell(class cl_address_space *amem, t_addr aaddr,
                class cl_memory_cell **astore,
                enum what_to_do_on_cell_change awtd):
-    cl_watched_cell(amem, aaddr, astore, awtd) {}
+  cl_watched_cell(amem, aaddr, astore, awtd) {}
 
   virtual void mem_cell_changed(class cl_address_space *amem, t_addr aaddr,
                                 class cl_hw *hw);

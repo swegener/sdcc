@@ -223,7 +223,7 @@ cl_hw::register_cell(class cl_address_space *mem, t_addr addr,
 class cl_memory_cell *
 cl_hw::use_cell(class cl_address_space *mem, t_addr addr,
                 class cl_memory_cell **store,
-		enum what_to_do_on_cell_change awtd)
+                enum what_to_do_on_cell_change awtd)
 {
   class cl_watched_cell *wc;
   //class cl_memory_cell *cell;

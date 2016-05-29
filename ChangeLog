@@ -1,3 +1,19 @@
+2016-05-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* .version,
+	* doc/INSTALL.txt,
+	* doc/sdccman.lyx: version 3.6.0 rc1, use coloured links
+	* sdcc.spec: version 3.6.0
+	* doc/Makefile.in: silence makeindex
+	* sim/ucsim/cmd.src/cmdset.cc,
+	* sim/ucsim/hc08.src/hc08cl.h,
+	* sim/ucsim/sim.src/hw.cc,
+	* sim/ucsim/sim.src/hwcl.h,
+	* sim/ucsim/st7.src/st7cl.h,
+	* sim/ucsim/stm8.src/stm8cl.h,
+	* sim/ucsim/z80.src/z80cl.h: cosmetics
+	* sim/ucsim/st7.src/st7.cc (cl_st7::disass): fixed get_disasm_info call
+
 2016-05-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

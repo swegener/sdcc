@@ -313,7 +313,7 @@ cl_st7::disass(t_addr addr, const char *sep)
 
   p= work;
 
-  b = get_disasm_info(addr, &len, NULL, &immed_offset);
+  b = get_disasm_info(addr, &len, NULL, &immed_offset, NULL);
 
   if (b == NULL) {
     buf= (char*)malloc(30);

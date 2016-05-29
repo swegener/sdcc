@@ -79,7 +79,7 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	$(LATEX) $*
 	# is there an index?
 	if [ -f $*.idx ] ; then \
-	  $(MAKEINDEX) $*; \
+	  $(MAKEINDEX) -q $*; \
 	  $(LATEX) $*; \
 	  $(LATEX) $*; \
 	fi

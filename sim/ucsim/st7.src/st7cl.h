@@ -60,12 +60,12 @@ public:
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
-  
+
   virtual const char *get_disasm_info(t_addr addr,
-				      int *ret_len,
-				      int *ret_branch,
-				      int *immed_offset,
-				      struct dis_entry **dentry);
+                                      int *ret_len,
+                                      int *ret_branch,
+                                      int *immed_offset,
+                                      struct dis_entry **dentry);
   virtual int is_call(t_addr addr);
 
   virtual void reset(void);

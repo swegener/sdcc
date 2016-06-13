@@ -2816,7 +2816,11 @@ emitCall (const iCode *ic, bool ispcall)
   /* Special handling of assignment of long result value when using extended stack. */
   if (half)
     {
+      asmop *result;
+      int save_a = 0;
+
       aopOp (IC_RESULT (ic), ic);
+      result = IC_RESULT (ic)->aop;
 
       push (ASMOP_Y, 0, 2);
       emit2 ("ldw", "y, (3, sp)");
@@ -2826,10 +2830,27 @@ emitCall (const iCode *ic, bool ispcall)
       cost (2, 1);
       if (IC_RESULT (ic)->aop->size > 2)
         cheapMove (IC_RESULT (ic)->aop, 2, ASMOP_A, 0, TRUE);
-      emit2 ("ld", "a, (1, sp)");
+      if (result->size > 2)
+        if (aopRS (result) && aopRS (ASMOP_A) &&
+          result->aopu.bytes[2].in_reg && ASMOP_A->aopu.bytes[0].in_reg &&
+          result->aopu.bytes[2].byteu.reg == ASMOP_A->aopu.bytes[0].byteu.reg)
+            {
+              push (ASMOP_A, 0, 1);
+              save_a = 1;
+            }
+
+      if (save_a)
+        emit2 ("ld", "a, (2, sp)");
+      else
+        emit2 ("ld", "a, (1, sp)");
       cost (2, 1);
       if (IC_RESULT (ic)->aop->size > 3)
         cheapMove (IC_RESULT (ic)->aop, 3, ASMOP_A, 0, TRUE);
+      if (save_a)
+        {
+          pop (ASMOP_A, 0, 1);
+          save_a = 0;
+        }
 
       adjustStack (4, FALSE, FALSE, FALSE);
 

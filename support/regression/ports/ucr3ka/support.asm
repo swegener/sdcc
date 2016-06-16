@@ -1,5 +1,4 @@
         .area   _CODE
-        .globl  _putchar
         .globl  _exit
 
 SADR=0xC0

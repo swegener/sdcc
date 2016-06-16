@@ -581,7 +581,7 @@ unsigned int clock(void)
 	return(0);
 }
 
-#if !defined(__SDCC_z80) && !defined(__SDCC_z180) && !defined(__SDCC_gbz80) && !defined(__SDCC_r2k) && !defined(__SDCC_r3ka) && !defined(__SDCC_tlcs90) && !defined(PORT_HOST)
+#if !defined(PORT_HOST)
 void putchar(char c)
 {
 	c;

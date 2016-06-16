@@ -1,9 +1,13 @@
         .area   _CODE
-        .globl  _putchar
         .globl  _exit
 
 __putchar::
-        jp      _putchar
+		ld	hl, #2
+		add	hl, sp
+		ld	l, (hl)
+		ld	a, #1
+		rst	0x08
+		ret
 
 __initEmu::
         ret

@@ -1,5 +1,14 @@
 2016-06-16 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/include/stdio.h,
+	  device/lib/ds390/putchar.c,
+	  device/lib/puts.c,
+	  support/regression/tests/bug1115321.c,
+	  support/regression/tests/dhrystone.c:
+	  Make putchar() prototype standard-compliant, fix bug #2505.
+
+2016-06-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/*/Makefile.in,
 	  device/lib/*/putchar.s,
 	  support/regression/ports/*/support.asm,

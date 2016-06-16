@@ -582,9 +582,9 @@ unsigned int clock(void)
 }
 
 #if !defined(PORT_HOST)
-void putchar(char c)
+int putchar(int c)
 {
-	c;
+	return(c);
 }
 #endif
 

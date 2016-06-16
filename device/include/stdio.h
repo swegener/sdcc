@@ -83,7 +83,7 @@ extern char *gets(char *);
 #endif
 
 extern char getchar(void);
-extern void putchar(char);
+extern int putchar(int);
 
 #if defined(__SDCC_mcs51) && !defined(__SDCC_USE_XSTACK)
 extern void printf_fast(__code const char *fmt, ...) _REENTRANT;

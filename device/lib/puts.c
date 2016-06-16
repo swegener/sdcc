@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------
-   puts.c - source file for ANSI Function puts 
+   puts.c - source file for C function puts()
 
-   Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Copyright (C) 2016, Philipp Klaus Krause . pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -26,15 +26,13 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-extern void putchar(char);
+#include <stdio.h>
 
-int puts (char *s)
+int puts (const char *s)
 {
-	int i = 0;
-	while (*s){
-		putchar(*s++);
-		i++;
-	}
-	putchar('\n');
-	return i+1;
+    while (*s)
+        if (putchar(*s++) == EOF)
+            return EOF;
+    return putchar('\n');
 }
+

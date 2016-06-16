@@ -30,9 +30,10 @@
 #include <tinibios.h>
 #include <stdio.h>
 
-void putchar (char c)
+int putchar (int c)
 {
 	Serial0PutChar(c);
+	return(c);
 }
 
 extern char getchar(void)

@@ -250,12 +250,13 @@ void test_s( void )
     ASSERT (ret == 10);
 }
 
-#if defined SDCC && !defined __SDCC_z80 && !defined __SDCC_z180 && !defined __SDCC_r2k && !defined __SDCC_gbz80
+#if defined SDCC
 extern void _putchar(char c);
 
-void putchar(char c)
+int putchar(int c)
 {
 	_putchar(c);
+	return(c);
 }
 #endif
 

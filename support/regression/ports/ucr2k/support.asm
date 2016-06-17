@@ -6,7 +6,7 @@ __putchar::
 		add	hl, sp
 		ld	l, (hl)
 		ld	a, #1
-		rst	0x08
+		rst	0x28
 		ret
 
 __initEmu::

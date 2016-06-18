@@ -1,5 +1,12 @@
 2016-06-18 Ben Shi <powerstudio1st AT 163 DOT com>
 
+	* src/mcs51/gen.c
+	  Fix a bug in jump table of switch/case when --acall-ajmp is specified.
+	* src/mcs51/peeph.def
+	  Remove empty lines.
+
+2016-06-18 Ben Shi <powerstudio1st AT 163 DOT com>
+
 	* support/regression/ports/mcs51-huge/spec.mk
 	* support/regression/ports/mcs51-xstack-auto/spec.mk
 	  Make "make" more compatible.

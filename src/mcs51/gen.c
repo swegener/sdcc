@@ -11506,7 +11506,10 @@ genJumpTab (iCode * ic)
       emitLabel (jtab);
       /* now generate the jump labels */
       for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
-        emitcode ("ljmp", "!tlabel", labelKey2num (jtab->key));
+        if (options.acall_ajmp)
+          emitcode ("ajmp", "!tlabel", labelKey2num (jtab->key));
+        else 
+          emitcode ("ljmp", "!tlabel", labelKey2num (jtab->key));
     }
   else
     {

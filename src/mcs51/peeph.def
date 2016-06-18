@@ -4425,7 +4425,6 @@ replace {
 	ljmp	%10
 	ljmp	%11
 	ljmp	%12
-
 	ljmp	%13
 %3:
 } by {
@@ -4441,7 +4440,6 @@ replace {
 	sjmp	%10
 	sjmp	%11
 	sjmp	%12
-
 	sjmp	%13
 %3:
 } if labelJTInRange
@@ -4460,7 +4458,6 @@ replace {
 	ljmp	%10
 	ljmp	%11
 	ljmp	%12
-
 	ljmp	%13
 	ljmp	%14
 %3:
@@ -4477,7 +4474,6 @@ replace {
 	sjmp	%10
 	sjmp	%11
 	sjmp	%12
-
 	sjmp	%13
 	sjmp	%14
 %3:
@@ -4497,7 +4493,6 @@ replace {
 	ljmp	%10
 	ljmp	%11
 	ljmp	%12
-
 	ljmp	%13
 	ljmp	%14
 	ljmp	%15
@@ -4515,7 +4510,6 @@ replace {
 	sjmp	%10
 	sjmp	%11
 	sjmp	%12
-
 	sjmp	%13
 	sjmp	%14
 	sjmp	%15
@@ -4536,7 +4530,6 @@ replace {
 	ljmp	%10
 	ljmp	%11
 	ljmp	%12
-
 	ljmp	%13
 	ljmp	%14
 	ljmp	%15
@@ -4555,7 +4548,6 @@ replace {
 	sjmp	%10
 	sjmp	%11
 	sjmp	%12
-
 	sjmp	%13
 	sjmp	%14
 	sjmp	%15
@@ -4577,7 +4569,6 @@ replace {
 	ljmp	%10
 	ljmp	%11
 	ljmp	%12
-
 	ljmp	%13
 	ljmp	%14
 	ljmp	%15
@@ -4597,7 +4588,6 @@ replace {
 	sjmp	%10
 	sjmp	%11
 	sjmp	%12
-
 	sjmp	%13
 	sjmp	%14
 	sjmp	%15
@@ -4620,7 +4610,6 @@ replace {
 	ljmp	%10
 	ljmp	%11
 	ljmp	%12
-
 	ljmp	%13
 	ljmp	%14
 	ljmp	%15
@@ -4641,7 +4630,6 @@ replace {
 	sjmp	%10
 	sjmp	%11
 	sjmp	%12
-
 	sjmp	%13
 	sjmp	%14
 	sjmp	%15
@@ -4665,7 +4653,6 @@ replace {
 	ljmp	%10
 	ljmp	%11
 	ljmp	%12
-
 	ljmp	%13
 	ljmp	%14
 	ljmp	%15
@@ -4687,7 +4674,6 @@ replace {
 	sjmp	%10
 	sjmp	%11
 	sjmp	%12
-
 	sjmp	%13
 	sjmp	%14
 	sjmp	%15
@@ -4712,7 +4698,6 @@ replace {
 	ljmp	%10
 	ljmp	%11
 	ljmp	%12
-
 	ljmp	%13
 	ljmp	%14
 	ljmp	%15
@@ -4735,7 +4720,6 @@ replace {
 	sjmp	%10
 	sjmp	%11
 	sjmp	%12
-
 	sjmp	%13
 	sjmp	%14
 	sjmp	%15

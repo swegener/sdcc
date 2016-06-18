@@ -14,4 +14,4 @@ MAKE_LIBRARY = lib-files
 .PHONY: lib-files
 lib-files:
 	echo making huge library
-	make -C $(top_builddir)/device/lib models MODELS=huge
+	$(MAKE) -C $(top_builddir)/device/lib models MODELS=huge

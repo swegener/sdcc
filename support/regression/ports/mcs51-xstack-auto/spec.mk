@@ -13,4 +13,4 @@ MAKE_LIBRARY = lib-files
 
 .PHONY: lib-files
 lib-files:
-	make -C $(top_builddir)/device/lib model-mcs51-xstack-auto MODELS=small
+	$(MAKE) -C $(top_builddir)/device/lib model-mcs51-xstack-auto MODELS=small

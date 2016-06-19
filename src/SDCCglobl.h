@@ -295,7 +295,6 @@ struct options
     int nostdinc;               /* Don't use standard include files */
     int noRegParams;            /* Disable passing some parameters in registers */
     int verbose;                /* Show what the compiler is doing */
-    int shortis8bits;           /* treat short like int or char */
     int lessPedantic;           /* disable some warnings */
     int profile;                /* Turn on extra profiling information */
     int omitFramePtr;           /* Turn off the frame pointer. */

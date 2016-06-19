@@ -122,7 +122,6 @@ char buffer[PATH_MAX * 2];
 #define OPTION_WERROR               "--Werror"
 #define OPTION_DEBUG                "--debug"
 #define OPTION_NO_GCSE              "--nogcse"
-#define OPTION_SHORT_IS_8BITS       "--short-is-8bits"
 #define OPTION_NO_XINIT_OPT         "--no-xinit-opt"
 #define OPTION_NO_CCODE_IN_ASM      "--no-c-code-in-asm"
 #define OPTION_ICODE_IN_ASM         "--i-code-in-asm"
@@ -214,7 +213,6 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_NO_XINIT_OPT, &options.noXinitOpt, "don't memcpy initialized xram from code"},
   {0,   OPTION_NO_CCODE_IN_ASM, &options.noCcodeInAsm, "don't include c-code as comments in the asm file"},
   {0,   OPTION_NO_PEEP_COMMENTS, &options.noPeepComments, "don't include peephole optimizer comments"},
-  {0,   OPTION_SHORT_IS_8BITS, NULL, "Make short 8 bits (for old times sake)"},
   {0,   OPTION_CODE_SEG, NULL, "<name> use this name for the code segment"},
   {0,   OPTION_CONST_SEG, NULL, "<name> use this name for the const segment"},
 
@@ -611,7 +609,6 @@ setDefaultOptions (void)
   options.nostdlib = 0;
   options.nostdinc = 0;
   options.verbose = 0;
-  options.shortis8bits = 0;
   options.std_sdcc = 1;         /* enable SDCC language extensions */
   options.std_c95 = 1;
   options.std_c99 = 1;
@@ -1134,13 +1131,6 @@ parseCmdLine (int argc, char **argv)
             {
               setWError (1);
               addSet (&preArgvSet, Safe_strdup ("-Werror"));
-              continue;
-            }
-
-          if (strcmp (argv[i], OPTION_SHORT_IS_8BITS) == 0)
-            {
-              printf ("Option %s is deprecated and will be removed in the future.\n", OPTION_SHORT_IS_8BITS);
-              options.shortis8bits = 1;
               continue;
             }
 
@@ -2076,15 +2066,6 @@ preProcess (char **envp)
         dbuf_printf (&dbuf, "-D__SDCC_VERSION_PATCH=%d", SDCC_VERSION_P);
         addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
-
-      if (options.std_sdcc)
-        {
-          struct dbuf_s dbuf;
-
-          dbuf_init (&dbuf, 32);
-          dbuf_printf (&dbuf, "-DSDCC=%d%d%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
-          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
-        }
 
       /* add SDCC revision number */
       {

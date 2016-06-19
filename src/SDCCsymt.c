@@ -620,7 +620,7 @@ checkTypeSanity (sym_link * etype, const char *name)
   // special case for "short"
   if (SPEC_SHORT (etype))
     {
-      SPEC_NOUN (etype) = options.shortis8bits ? V_CHAR : V_INT;
+      SPEC_NOUN (etype) = V_INT;
       SPEC_SHORT (etype) = 0;
     }
 

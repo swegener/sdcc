@@ -1428,7 +1428,7 @@ reference "sub:Standard-Compliance"
 \end_inset
 
  for Standard-Compliance).
- 
+ This is a list of such changes .
 \begin_inset Note Note
 status collapsed
 
@@ -1457,14 +1457,7 @@ status collapsed
 
 \end_inset
 
--short-is-8bits commandline option (see 
-\begin_inset CommandInset ref
-LatexCommand vref
-reference "lyx:--short-is-8bits"
-
-\end_inset
-
-).
+-short-is-8bits commandline option (option removed after the 3.6.0 release).
 \end_layout
 
 \begin_layout Itemize
@@ -2501,7 +2494,8 @@ reference "sub:Standard-Compliance"
 in sdcc version 3.2.0 compiler macro definitions not starting with double
  underscore characters are deprecated if --std-cXX command line option is
  defined.
- They have been oboleted (removed) after the 3.4.0 release.
+ They have been oboleted (removed) after the 3.4.0 release (except for the
+ macro SDCC, which has been removed after the 3.6.0 release).
 \end_layout
 
 \begin_layout Itemize
@@ -2568,6 +2562,11 @@ storage classes
 
 \begin_layout Itemize
 in sdcc version 3.6.0, the default for char changed from signed to unsigned.
+\end_layout
+
+\begin_layout Itemize
+After 3.6.0, the prototype for putchar() changed from void putchar(char) to
+ int putchar(int)
 \end_layout
 
 \begin_layout Section
@@ -15524,67 +15523,6 @@ splint
 \end_inset
 
 myprogram.c
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--short-is-8bits
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--short-is-8bits
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "lyx:--short-is-8bits"
-
-\end_inset
-
- Treat short as 8-bit (for backward compatibility with older versions of
- compiler - see section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Compatibility-with-previous"
-
-\end_inset
-
-).
- This option is deprecated.
 \end_layout
 
 \begin_layout Labeling

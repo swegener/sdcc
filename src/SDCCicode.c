@@ -2542,7 +2542,7 @@ geniCodeStruct (operand * left, operand * right, bool islval)
   else
     {
       SPEC_CONST (retype) |= SPEC_CONST (etype);
-      SPEC_VOLATILE (retype) |= SPEC_VOLATILE (etype);
+      /*Do not preserve volatile */
       SPEC_RESTRICT (retype) |= SPEC_RESTRICT (etype);
     }
 

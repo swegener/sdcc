@@ -6573,6 +6573,19 @@ genIfxJump (iCode * ic, const char *jval, iCode * popIc)
 }
 
 /*-----------------------------------------------------------------*/
+/* isHexChar :- check if a char is a digit or 'a-f' or 'A-F'       */
+/*-----------------------------------------------------------------*/
+static int isHexChar (const char c)
+{
+  const char hc[] = "0123456789ABCDEFabcdef";
+  int i;
+  for (i = 0; i < strlen (hc); i++)
+    if (c == hc[i])
+      return 1;
+  return 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* genCmp :- greater or less than comparison                       */
 /*-----------------------------------------------------------------*/
 static void
@@ -6617,7 +6630,22 @@ genCmp (operand * left, operand * right, iCode * ic, iCode * ifx, int sign)
         {
           char *l = Safe_strdup (aopGet (left, offset, FALSE, FALSE, NULL));
           symbol *lbl = newiTempLabel (NULL);
-          emitcode ("cjne", "%s,%s,!tlabel", l, aopGet (right, offset, FALSE, FALSE, NULL), labelKey2num (lbl->key));
+          if (AOP(left)->type != AOP_IMMD || ((AOP(right)->type != AOP_IMMD) && AOP(right)->type != AOP_LIT))
+            emitcode ("cjne", "%s,%s,!tlabel", l, aopGet (right, offset, FALSE, FALSE, NULL), labelKey2num (lbl->key));
+          else
+            {
+              const char *l0 = l;
+              const char *r0 = aopGet (right, offset, FALSE, FALSE, NULL);
+              long l1, r1;
+              while (!isHexChar (*l0))
+                l0++;
+              while (!isHexChar (*r0))
+                r0++;
+              assert (sscanf(l0, "0x%lx", &l1) == 1);
+              assert (sscanf(r0, "0x%lx", &r1) == 1);
+              if (l1 != r1)
+                emitcode ("sjmp", "!tlabel", labelKey2num (lbl->key));
+            }
           Safe_free (l);
           emitLabel (lbl);
         }

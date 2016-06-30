@@ -27,6 +27,7 @@
 -------------------------------------------------------------------------*/
 
 #include <string.h>
+#pragma disable_warning 196
 
 #undef strchr /* Avoid conflict with builtin strchr() in Z80 and some related ports */
 

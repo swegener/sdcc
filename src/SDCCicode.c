@@ -3634,6 +3634,10 @@ geniCodeReturn (operand * op)
   if (currFunc && IFFUNC_ISNORETURN (currFunc->type))
     werror (W_NORETURNRETURN);
 
+  /* check if a cast is needed */
+  if (op && currFunc && currFunc->type && currFunc->type->next)
+    checkPtrQualifiers (currFunc->type->next, operandType (op));
+ 
   /* if the operand is present force an rvalue */
   if (op)
     op = geniCodeRValue (op, FALSE);

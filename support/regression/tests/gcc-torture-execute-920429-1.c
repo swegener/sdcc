@@ -3,6 +3,7 @@
  */
 
 #include <testfwk.h>
+#pragma disable_warning 196
 
 #ifdef __SDCC
 #pragma std_c99

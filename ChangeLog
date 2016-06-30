@@ -1,3 +1,13 @@
+2016-06-30 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Check pointer qualifier in geniCodeReturn().
+	* device/lib/_strstr.c
+	* device/lib/_strchr.c
+	* device/lib/_strrchr.c
+	* support/regression/tests/gcc-torture-execute-920429-1.c
+	  Supress warning 196.
+
 2016-06-26 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/ds390/gen.c

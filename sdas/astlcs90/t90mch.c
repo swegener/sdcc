@@ -1207,7 +1207,7 @@ machine(struct mne *mp)
           if((v1 == A) && (IS_8BIT_IMMED(v2)))
             {
               outab(op + 8);
-              outab(v2 & 0xff);
+              outrb(&e2,0);
               break;
             }
           else

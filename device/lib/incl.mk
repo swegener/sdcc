@@ -76,7 +76,6 @@ COMMON_SDCC = \
   rand.c \
   _strcat.c \
   _strchr.c \
-  _strcmp.c \
   _strcspn.c \
   _strncat.c \
   _strncmp.c \
@@ -89,7 +88,6 @@ COMMON_SDCC = \
   _strtok.c \
   _memchr.c \
   _memcmp.c \
-  _memcpy.c \
   _memset.c \
   aligned_alloc.c \
   calloc.c \

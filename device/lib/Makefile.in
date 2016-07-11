@@ -120,7 +120,9 @@ SOURCES_SDCC = $(COMMON_SDCC) \
   _ltoa.c \
   _spx.c \
   _startup.c \
+  _strcmp.c \
   _strlen.c \
+  _memcpy.c \
   _memmove.c \
   _strcpy.c \
   _heap.c \

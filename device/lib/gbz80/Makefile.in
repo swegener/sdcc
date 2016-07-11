@@ -35,8 +35,10 @@ Z80_SDCC = $(COMMON_SDCC) \
   _startup.c \
   sprintf.c \
   vprintf.c \
+  _strcmp.c \
   _strcpy.c \
   _strlen.c \
+  _memcpy.c \
   _memmove.c
 
 Z80SOURCES = $(addprefix ../,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG) $(Z80_SDCC))

@@ -3,6 +3,12 @@
 	* src/z80/main.c,
 	  src/z80/gen.c:
 	  Fix bug #2522.
+	* device/lib/stm8/memcpy.s,
+	  device/lib/stm8/strcmp.s,
+	  device/lib/*/Makefile.in,
+	  device/lib/Makefile.in,
+	  device/lib/incl.mk:
+	  Provide handwritten memcpy(), strcmp() to improve stm8 Dhrystone scores.
 
 2016-07-10 Philipp Klaus Krause <pkk AT spth.de>
 

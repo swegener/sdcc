@@ -1661,7 +1661,7 @@ machine(struct mne *mp)
             {
               outab(0xe8 + r);
               outab(0x37);
-              outab(v2);
+              outrb(&e2,0);
               break;
             }
           else
@@ -1670,14 +1670,14 @@ machine(struct mne *mp)
                 {
                   outab(0xF7);
                   outab(0x37);
-                  outab(v2);
+                  outrb(&e2,0);
                   break;
                 }
 
               outab(0xF0 + r);
               outab(e1.e_addr);
               outab(0x37);
-              outab(v2);
+              outrb(&e2,0);
               break;
             }
         }

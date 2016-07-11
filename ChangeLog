@@ -9,11 +9,13 @@
 	  device/lib/Makefile.in,
 	  device/lib/incl.mk:
 	  Provide handwritten memcpy(), strcmp() to improve stm8 Dhrystone scores.
+	* sdas/astlcs90/t90mch.c:
+	  Fix TLCS-90 assembler relocation issue for ld, reopened bug #2520.
 
 2016-07-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/astlcs90/t90mch.c:
-	  Fix TLCS-90 assembler relocation issue, bug #2520.
+	  Fix TLCS-90 assembler relocation issue for adc, bug #2520.
 
 2016-07-06 Ben Shi <powerstudio1st AT 163 DOT com>
 	* support/regression/tests/gcc-torture-execute-920612-1.c

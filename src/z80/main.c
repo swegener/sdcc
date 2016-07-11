@@ -113,8 +113,8 @@ static char *_keywords[] = {
   "sfr",
   "nonbanked",
   "banked",
-  "at",                         //.p.t.20030714 adding support for 'sfr at ADDR' construct
-  "_naked",                     //.p.t.20030714 adding support for '_naked' functions
+  "at",
+  "_naked",
   "critical",
   "interrupt",
   "z88dk_fastcall",
@@ -126,10 +126,22 @@ static char *_keywordsgb[] = {
   "sfr",
   "nonbanked",
   "banked",
-  "at",                         //.p.t.20030714 adding support for 'sfr at ADDR' construct
-  "_naked",                     //.p.t.20030714 adding support for '_naked' functions
+  "at",
+  "_naked",
   "critical",
   "interrupt",
+  "z88dk_callee",
+  NULL
+};
+
+static char *_keywordstlcs90[] = {
+  "nonbanked",
+  "banked",
+  "at",
+  "_naked",
+  "critical",
+  "interrupt",
+  "z88dk_fastcall",
   "z88dk_callee",
   NULL
 };
@@ -1588,7 +1600,7 @@ PORT tlcs90_port =
   _getRegName,
   _getRegByName,
   NULL,
-  _keywords,
+  _keywordstlcs90,
   0,                            /* no assembler preamble */
   NULL,                         /* no genAssemblerEnd */
   0,                            /* no local IVT generation code */

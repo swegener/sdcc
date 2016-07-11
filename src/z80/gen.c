@@ -2410,6 +2410,7 @@ aopGet (asmop * aop, int offset, bool bit16)
           break;
 
         case AOP_SFR:
+          wassertl (!IS_TLCS90, "TLCS-90 does not have a separate I/O space");
           if (IS_GB)
             {
               emit2 ("ldh a,(%s+%d)", aop->aopu.aop_dir, offset);
@@ -2629,6 +2630,7 @@ aopPut (asmop * aop, const char *s, int offset)
       break;
 
     case AOP_SFR:
+      wassertl (!IS_TLCS90, "TLCS-90 does not have a separate I/O space");
       if (IS_GB)
         {
           //  wassert (IS_GB);

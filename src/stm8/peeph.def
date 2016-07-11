@@ -137,6 +137,32 @@ replace restart {
 } if notSame(%3 'push' 'pop')
 
 replace restart {
+	ldw	(%1, sp), %2
+	ldw	%2, (%1, sp)
+} by {
+	ldw	(%1, sp), %2
+	; peephole 6a removed redundant load from (%1, sp) into %2.
+}
+
+replace restart {
+	ldw	(%1, sp), x
+	ldw	y, (%1, sp)
+} by {
+	ldw	(%1, sp), x
+	ldw	y, x
+	; peephole 6b replaced load from (%1, sp) into y by load from x into y.
+}
+
+replace restart {
+	ldw	(%1, sp), y
+	ldw	x, (%1, sp)
+} by {
+	ldw	(%1, sp), y
+	ldw	x, y
+	; peephole 6b replaced load from (%1, sp) into x by load from y into x.
+}
+
+replace restart {
 	ld	a, %1
 	%2	a
 	ld	%1, a

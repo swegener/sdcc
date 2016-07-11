@@ -11,6 +11,8 @@
 	  Provide handwritten memcpy(), strcmp() to improve stm8 Dhrystone scores.
 	* sdas/astlcs90/t90mch.c:
 	  Fix TLCS-90 assembler relocation issue for ld, reopened bug #2520.
+	* src/stm8/peeph.def:
+	  Some peepholes to remove redundant stm8 loads, to improve stm8 DMIPS by another 0.42%
 
 2016-07-10 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -2,6 +2,8 @@
 
 	* device/lib/stm8/memcpy.s:
 	  Partially unroll stm8 memcpy() for speed.
+	* device/lib/stm8/strcmp.s:
+	  Partially unroll stm8 strcmp() for speed.
 
 2016-07-11 Philipp Klaus Krause <pkk AT spth.de>
 

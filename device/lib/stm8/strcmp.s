@@ -42,6 +42,14 @@ loop:
 	jrne	diff
 	incw	x
 	incw	y
+
+	ld	a, (x)
+	jreq	null
+	cp	a, (y)
+	jrne	diff
+	incw	x
+	incw	y
+
 	jra	loop
 
 null:

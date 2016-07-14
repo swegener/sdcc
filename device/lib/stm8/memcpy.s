@@ -38,26 +38,63 @@ _memcpy:
 	jreq	end
 	ldw	y, (3, sp)
 
+	clr	a
 	srlw	x
-	jrnc even
-
-odd:
+	rlc	a
+	srlw	x
+	rlc	a
 	srlw	x
 	incw	x
 	ldw	(7, sp), x
 	ldw	x, (5, sp)
-	jrc	loop_3
-	jra	loop_1
-
-even:
-	srlw	x
-	jrnc even2
-	incw	x
-even2:
+	
+	jrnc	j0xx
+j1xx:
+	srl	a
+	jrc	j11x
+j10x:
+	srl	a
+	jrnc	loop_4
+	jra	loop_5
+j11x:
+	srl	a
+	jrnc	loop_6
+	jra	loop_7
+j0xx:
+	srl	a
+	jrnc	j00x
+j01x:
+	srl	a
+	jrnc	loop_2
+	jra	loop_3
+j00x:
+	srl	a
+	jrc	loop_1
+	ldw	x, (7, sp)
+	decw	x
 	ldw	(7, sp), x
 	ldw	x, (5, sp)
-	jrc	loop_2
 
+loop_8:
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+loop_7:
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+loop_6:
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+loop_5:
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
 loop_4:
 	ld	a, (x)
 	ld	(y), a
@@ -84,7 +121,7 @@ loop_1:
 	decw	x
 	ldw	(9, sp), x
 	popw	x
-	jrne	loop_4
+	jrne	loop_8
 
 end:
 	ldw	x, (3, sp)

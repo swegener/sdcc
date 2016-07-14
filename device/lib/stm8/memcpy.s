@@ -26,6 +26,8 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
+; This is a partially unrolled version of memcpy(), to reduce the count overhead.
+
 	.globl _memcpy
 
 	.area CODE
@@ -34,8 +36,19 @@ _memcpy:
 
 	ldw	x, (7, sp)
 	jreq	end
-
 	ldw	y, (3, sp)
+
+	srlw	x
+	jrnc even
+
+odd:
+	incw	x
+	ldw	(7, sp), x
+	ldw	x, (5, sp)
+	jra	odd_loop
+
+even:
+	ldw	(7, sp), x
 	ldw	x, (5, sp)
 
 loop:
@@ -43,6 +56,12 @@ loop:
 	ld	(y), a
 	incw	x
 	incw	y
+odd_loop:
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+
 	pushw	x
 	ldw	x, (9, sp)
 	decw	x

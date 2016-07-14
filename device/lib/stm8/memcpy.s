@@ -42,21 +42,38 @@ _memcpy:
 	jrnc even
 
 odd:
+	srlw	x
 	incw	x
 	ldw	(7, sp), x
 	ldw	x, (5, sp)
-	jra	odd_loop
+	jrc	loop_3
+	jra	loop_1
 
 even:
+	srlw	x
+	jrnc even2
+	incw	x
+even2:
 	ldw	(7, sp), x
 	ldw	x, (5, sp)
+	jrc	loop_2
 
-loop:
+loop_4:
 	ld	a, (x)
 	ld	(y), a
 	incw	x
 	incw	y
-odd_loop:
+loop_3:
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+loop_2:
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+loop_1:
 	ld	a, (x)
 	ld	(y), a
 	incw	x
@@ -67,7 +84,7 @@ odd_loop:
 	decw	x
 	ldw	(9, sp), x
 	popw	x
-	jrne	loop
+	jrne	loop_4
 
 end:
 	ldw	x, (3, sp)

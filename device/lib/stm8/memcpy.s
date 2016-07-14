@@ -38,38 +38,34 @@ _memcpy:
 	jreq	end
 	ldw	y, (3, sp)
 
-	clr	a
+	ld	a, xl
 	srlw	x
-	rlc	a
 	srlw	x
-	rlc	a
 	srlw	x
 	incw	x
 	ldw	(7, sp), x
 	ldw	x, (5, sp)
-	
-	jrnc	j0xx
-j1xx:
+
+	and	a, #7
 	srl	a
-	jrc	j11x
-j10x:
+	jrnc	jxx0
+jxx1:
 	srl	a
-	jrnc	loop_4
+	jrc	jx11
+jx01:
+	jreq	loop_1
 	jra	loop_5
-j11x:
-	srl	a
-	jrnc	loop_6
-	jra	loop_7
-j0xx:
-	srl	a
-	jrnc	j00x
-j01x:
-	srl	a
-	jrnc	loop_2
+jx11:
+	jreq	loop_7
 	jra	loop_3
-j00x:
+jxx0:
 	srl	a
-	jrc	loop_1
+	jrnc	jx00
+jx10:
+	jreq	loop_2
+	jra	loop_6
+jx00:
+	jrne	loop_4
 	ldw	x, (7, sp)
 	decw	x
 	ldw	(7, sp), x
@@ -126,4 +122,5 @@ loop_1:
 end:
 	ldw	x, (3, sp)
 	ret
+
 

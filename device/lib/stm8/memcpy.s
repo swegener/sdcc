@@ -42,11 +42,14 @@ _memcpy:
 	srlw	x
 	srlw	x
 	srlw	x
+
+	and	a, #7
+	jreq start_8
+
 	incw	x
 	ldw	(7, sp), x
 	ldw	x, (5, sp)
 
-	and	a, #7
 	srl	a
 	jrnc	jxx0
 jxx1:
@@ -60,14 +63,12 @@ jx11:
 	jra	loop_3
 jxx0:
 	srl	a
-	jrnc	jx00
+	jrnc	loop_4
 jx10:
 	jreq	loop_2
 	jra	loop_6
-jx00:
-	jrne	loop_4
-	ldw	x, (7, sp)
-	decw	x
+
+start_8:
 	ldw	(7, sp), x
 	ldw	x, (5, sp)
 

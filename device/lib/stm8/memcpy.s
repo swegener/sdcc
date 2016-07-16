@@ -39,16 +39,15 @@ _memcpy:
 	ldw	y, (3, sp)
 
 	ld	a, xl
+	addw	x, #7
 	srlw	x
 	srlw	x
 	srlw	x
-
-	and	a, #7
-	jreq start_8
-
-	incw	x
 	ldw	(7, sp), x
 	ldw	x, (5, sp)
+
+	and	a, #7
+	jreq loop_8
 
 	srl	a
 	jrnc	jxx0
@@ -67,10 +66,6 @@ jxx0:
 jx10:
 	jreq	loop_2
 	jra	loop_6
-
-start_8:
-	ldw	(7, sp), x
-	ldw	x, (5, sp)
 
 loop_8:
 	ld	a, (x)
@@ -123,5 +118,4 @@ loop_1:
 end:
 	ldw	x, (3, sp)
 	ret
-
 

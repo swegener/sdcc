@@ -109,7 +109,6 @@ loop_1:
 	ld	a, (x)
 	ld	(y), a
 
-
 	dec	(8, sp)
 	jrne	loop
 	dec	(7, sp)

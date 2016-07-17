@@ -3579,6 +3579,81 @@ genPlus (const iCode *ic)
 /* genMult - generates code for multiplication                     */
 /*-----------------------------------------------------------------*/
 static void
+genMultLit (const iCode *ic)
+{
+  operand *result = IC_RESULT (ic);
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  unsigned int litval;
+  asmop *add_aop;
+
+  D (emit2 ("; genMultLit", ""));
+
+  aopOp (IC_LEFT (ic), ic);
+  aopOp (IC_RIGHT (ic), ic);
+  aopOp (IC_RESULT (ic), ic);
+
+  if (left->aop->type == AOP_LIT)
+    {
+      operand *tmp = left;
+      left = right;
+      right = tmp;
+    }
+
+  wassert (right->aop->type == AOP_LIT);
+
+  litval = byteOfVal (right->aop->aopu.aop_lit, 1) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
+  add_aop = aopOnStackNotExt (left->aop, 0, 2) ? left->aop : 0;
+  if(!regDead (X_IDX, ic))
+    push (ASMOP_X, 0, 2);
+  genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+  if (!add_aop)
+    push (ASMOP_X, 0, 2);
+  if (litval == 7)
+    {
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit2 ("subw", "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
+      cost (3, 2);
+    }
+  else if (litval == 100)
+    {
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit2 ("subw", "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
+      cost (3, 2);
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit2 ("addw", "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
+      cost (3, 2);
+      emit3w (A_SLLW, ASMOP_X, 0);
+      emit3w (A_SLLW, ASMOP_X, 0);
+    }
+  else
+    wassert (0);
+  if (!add_aop)
+    adjustStack (2, regDead (A_IDX, ic), FALSE, regDead (Y_IDX, ic));
+  genMove (result->aop, ASMOP_X, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
+  if (regDead (XL_IDX, ic) ^ regDead (XH_IDX, ic))
+    {
+      if (!regalloc_dry_run)
+        wassert (0);
+      cost (100, 100);
+    }
+  if(!regDead (X_IDX, ic))
+    pop (ASMOP_X, 0, 2);
+
+  freeAsmop (right);
+  freeAsmop (left);
+  freeAsmop (result);
+}
+
+/*-----------------------------------------------------------------*/
+/* genMult - generates code for multiplication                     */
+/*-----------------------------------------------------------------*/
+static void
 genMult (const iCode *ic)
 {
   operand *result = IC_RESULT (ic);
@@ -3591,6 +3666,15 @@ genMult (const iCode *ic)
   aopOp (IC_LEFT (ic), ic);
   aopOp (IC_RIGHT (ic), ic);
   aopOp (IC_RESULT (ic), ic);
+
+  if ((left->aop->size == 2 || right->aop->size == 2) && result->aop->size == 2 && (left->aop->type == AOP_LIT || right->aop->type == AOP_LIT))
+    {
+      freeAsmop (right);
+      freeAsmop (left);
+      freeAsmop (result);
+      genMultLit (ic);
+      return;
+    }
 
   if (left->aop->size > 1 || right->aop->size > 1 || result->aop->size > 2)
     wassertl (0, "Large multiplication is handled through support function calls.");

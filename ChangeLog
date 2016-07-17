@@ -1,3 +1,9 @@
+2016-07-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Special case for int multiplication by 7 and 100.
+
 2016-07-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/stm8/memcpy.s:

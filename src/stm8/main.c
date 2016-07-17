@@ -272,6 +272,12 @@ static bool
 _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
   int result_size = IS_SYMOP (IC_RESULT (ic)) ? getSize (OP_SYM_TYPE (IC_RESULT(ic))) : 4;
+  sym_link *test = NULL;
+
+  if (IS_LITERAL (left))
+    test = left;
+  else if (IS_LITERAL (right))
+    test = right;
 
   switch (ic->op)
     {
@@ -279,7 +285,20 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
     case '%':
       return (getSize (left) <= 2 && IS_UNSIGNED (left) && getSize (right) <= 2 && IS_UNSIGNED (right));
     case '*':
-      return (result_size == 1 || getSize (left) <= 1 && getSize (right) <= 1 && result_size == 2 && IS_UNSIGNED (left) && IS_UNSIGNED (right));
+      {
+        unsigned int litval, shiftcount, addcount, subcount, bytecount, addbytecount, subbytecount;
+
+        if (result_size == 1 || getSize (left) <= 1 && getSize (right) <= 1 && result_size == 2 && IS_UNSIGNED (left) && IS_UNSIGNED (right))
+          return TRUE;
+
+        if (result_size > 2 || !test)
+          return FALSE;
+
+        if(floatFromVal (valFromType (test)) == 7 || floatFromVal (valFromType (test)) == 100 && optimize.codeSpeed)
+          return TRUE;
+
+        return FALSE;
+      }
     default:
       return FALSE;
     }

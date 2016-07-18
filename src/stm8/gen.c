@@ -3620,8 +3620,7 @@ genMultLit (const iCode *ic)
   else if (litval == 100)
     {
       emit3w (A_SLLW, ASMOP_X, 0);
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit2 ("subw", "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
+      emit2 ("addw", "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
       cost (3, 2);
       emit3w (A_SLLW, ASMOP_X, 0);
       emit3w (A_SLLW, ASMOP_X, 0);

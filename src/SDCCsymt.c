@@ -928,6 +928,7 @@ newCharLink ()
 
   p = newLink (SPECIFIER);
   SPEC_NOUN (p) = V_CHAR;
+  SPEC_USIGN (p) = 1;
 
   return p;
 }
@@ -4126,6 +4127,7 @@ initCSupport (void)
         }
       multypes[bwd][0] = l;
       multypes[bwd][1] = copyLinkChain (l);
+      SPEC_USIGN (multypes[bwd][0]) = 0;
       SPEC_USIGN (multypes[bwd][1]) = 1;
     }
 

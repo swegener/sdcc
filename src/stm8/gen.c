@@ -2144,37 +2144,50 @@ genNot (const iCode *ic)
   aopOp (left, ic);
   aopOp (result, ic);
 
-  for (i = 1; i < left->aop->size; i++)
-    if (aopInReg (left->aop, i, A_IDX))
-      {
-        push (ASMOP_A, 0, 1);
-        pushed_a = TRUE;
-        break;
-      }
-
-  if (!regDead (A_IDX, ic) && !pushed_a)
-    push (ASMOP_A, 0, 1);
-
-  for (i = 0; i < left->aop->size; i++)
+  if (left->aop->size == 2 && aopInReg (left->aop, 0, X_IDX) && regDead (X_IDX, ic))
     {
-      if (i && aopInReg (left->aop, i, A_IDX))
-        {
-          emit2 ("ld", "a, (1, sp)");
-          cost (2, 1);
-        }
-      else
-        cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+      emit2 ("subw", "x, #1");
+      cost (3, 2);
+    }
+  else if (left->aop->size == 2 && aopInReg (left->aop, 0, Y_IDX) && regDead (Y_IDX, ic))
+    {
+      emit2 ("subw", "y, #1");
+      cost (4, 2);
+    }
+  else
+    {
+      for (i = 1; i < left->aop->size; i++)
+        if (aopInReg (left->aop, i, A_IDX))
+          {
+            push (ASMOP_A, 0, 1);
+            pushed_a = TRUE;
+            break;
+          }
 
-      if (IS_FLOAT (operandType (left)) && i == left->aop->size - 1)
-        {
-          emit2 ("and", "a, #0x7f");
-          cost (2, 1);
-        }
+      if (!regDead (A_IDX, ic) && !pushed_a)
+        push (ASMOP_A, 0, 1);
 
-      if(!i)
-        emit3 (A_SUB, ASMOP_A, ASMOP_ONE);
-      else
-        emit3 (A_SBC, ASMOP_A, ASMOP_ZERO);
+      for (i = 0; i < left->aop->size; i++)
+        {
+          if (i && aopInReg (left->aop, i, A_IDX))
+            {
+              emit2 ("ld", "a, (1, sp)");
+              cost (2, 1);
+            }
+          else
+            cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+
+          if (IS_FLOAT (operandType (left)) && i == left->aop->size - 1)
+            {
+              emit2 ("and", "a, #0x7f");
+              cost (2, 1);
+            }
+
+          if(!i)
+            emit3 (A_SUB, ASMOP_A, ASMOP_ONE);
+          else
+            emit3 (A_SBC, ASMOP_A, ASMOP_ZERO);
+        }
     }
 
   emit3 (A_CLR, ASMOP_A, 0);
@@ -6788,12 +6801,7 @@ genCast (const iCode *ic)
   resulttype = operandType (result);
   righttype = operandType (right);
 
-
-
-  // todo: More efficient casts to _Bool especially for result in XL or YL.
-
-  
-  if ((getSize (resulttype) <= getSize (righttype) || !IS_SPEC (righttype) || SPEC_USIGN (righttype)) &&
+  if ((getSize (resulttype) <= getSize (righttype) || !IS_SPEC (righttype) || (SPEC_USIGN (righttype) || IS_BOOL (righttype))) &&
     (!IS_BOOL (resulttype) || IS_BOOL (righttype)))
     {
       genAssign (ic);

@@ -1,3 +1,14 @@
+2016-07-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/stm8/Makefile.in,
+	  device/lib/stm8/strcpy.s:
+	  Partially unrolled, slightly faster strcpy() for stm8.
+	* src/stm8/gen.c,
+	  src/SDCCsymt.c:
+	  More efficient handling of boolean values.
+	* device/lib/r2k/Makefile.in:
+	  Fix bug #2526.
+
 2016-07-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

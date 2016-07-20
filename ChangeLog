@@ -8,6 +8,8 @@
 	  More efficient handling of boolean values.
 	* device/lib/r2k/Makefile.in:
 	  Fix bug #2526.
+	* src/stm8/main.c:
+	  Remove unused vars.
 
 2016-07-18 Philipp Klaus Krause <pkk AT spth.de>
 

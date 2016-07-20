@@ -286,8 +286,6 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
       return (getSize (left) <= 2 && IS_UNSIGNED (left) && getSize (right) <= 2 && IS_UNSIGNED (right));
     case '*':
       {
-        unsigned int litval, shiftcount, addcount, subcount, bytecount, addbytecount, subbytecount;
-
         if (result_size == 1 || getSize (left) <= 1 && getSize (right) <= 1 && result_size == 2 && IS_UNSIGNED (left) && IS_UNSIGNED (right))
           return TRUE;
 

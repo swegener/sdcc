@@ -3910,6 +3910,7 @@ symbol *fps16x16_gteq;
 
 /* Dims: mul/div/mod, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED/BOTH */
 symbol *muldiv[3][4][4];
+symbol *muls16tos32;
 /* Dims: BYTE/WORD/DWORD/QWORD SIGNED/UNSIGNED */
 sym_link *multypes[4][2];
 /* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/USIGNED */
@@ -4324,6 +4325,8 @@ initCSupport (void)
             }
         }
     }
+
+  muls16tos32 = TARGET_IS_STM8 ? funcOfTypeVarg ("__mulsint2slong", "l", 2, (const char *[]){"i", "i"}) : 0;
 }
 
 /*-----------------------------------------------------------------*/

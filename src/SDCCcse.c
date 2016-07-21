@@ -838,7 +838,7 @@ DEFSETFUNC (ifDiCodeIsX)
 }
 
 /*-----------------------------------------------------------------*/
-/* findBackwardDef - scan backwards to find deinition of operand   */
+/* findBackwardDef - scan backwards to find definition of operand  */
 /*-----------------------------------------------------------------*/
 iCode *findBackwardDef(operand *op,iCode *ic)
 {

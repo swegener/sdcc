@@ -90,6 +90,19 @@ testDiv(void)
     ASSERT(i/4 == -12);
 }
 
+void 
+test16to32(void)
+{
+   volatile int i, j;
+   i = 42;
+   j = 42;
+   ASSERT((long)i * (long)j == 42l * 42l);
+   i = -i;
+   ASSERT((long)i * (long)j == -42l * 42l);
+   j = -j;
+   ASSERT((long)i * (long)j == -42l * -42l);
+}
+
 void
 testMod(void)
 {

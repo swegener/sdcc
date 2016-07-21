@@ -87,9 +87,10 @@ right_nonneg:
 	tnz	a
 jrpl	end
 	negw	x
-jrnc	end
-	decw	y
-
+jrnc	neg_y
+	incw	y
+neg_y:
+	negw	y
 end:
 	ret
 

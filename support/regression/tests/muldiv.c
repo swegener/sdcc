@@ -101,6 +101,13 @@ test16to32(void)
    ASSERT((long)i * (long)j == -42l * 42l);
    j = -j;
    ASSERT((long)i * (long)j == -42l * -42l);
+   i = 2342;
+   j = 4223;
+   ASSERT((long)i * (long)j == 2342l * 4223l);
+   j = -j;
+   ASSERT((long)i * (long)j == 2342l * -4223l);
+   i = -i;
+   ASSERT((long)i * (long)j == -2342l * -4223l);
 }
 
 void

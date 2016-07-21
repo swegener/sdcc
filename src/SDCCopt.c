@@ -1950,6 +1950,121 @@ discardDeadParamReceives (eBBlock ** ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
+/* optimizeOpWidth - reduce operation width.                       */
+/* Wide arithmetic operations where the result is cast to narrow   */
+/* type can be optimized by doing the casts on the operands        */
+/*-----------------------------------------------------------------*/
+static int
+optimizeOpWidth (eBBlock ** ebbs, int count)
+{
+  int i;
+  int change = 0;
+  iCode *ic, *newic;
+  iCode *uic;
+  sym_link *resulttype;
+  sym_link *nextresulttype;
+  symbol *sym;
+  int resultsize, nextresultsize;
+
+  for (i = 0; i < count; i++)
+    {
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP) &&
+            IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+            {
+              resulttype = operandType (IC_RESULT (ic));
+
+              if (!IS_INTEGRAL (resulttype) ||
+                !(IS_SYMOP (IC_LEFT (ic)) || IS_OP_LITERAL (IC_LEFT (ic))) ||
+                !(IS_SYMOP (IC_RIGHT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic))))
+                continue;
+
+              resultsize = bitsForType (resulttype);
+
+              /* There must be only one use of this first result */
+              if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
+                continue;
+
+              /* This use must a cast */
+              uic = hTabItemWithKey (iCodehTab,
+                        bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+
+              if (!uic || (uic->op != CAST && uic->op != '+'))
+                continue;
+
+              /* It must be a cast to another integer type that */
+              /* has fewer bits */
+              nextresulttype = operandType (IC_RESULT (uic));
+              if (!IS_INTEGRAL (nextresulttype) && !(IS_PTR (nextresulttype) && PTRSIZE == 2))
+                 continue;
+
+              if (IS_PTR (nextresulttype))
+                {
+                  nextresulttype = newIntLink ();
+                  SPEC_USIGN (nextresulttype) = 1;
+                }
+              else
+                nextresulttype = copyLinkChain (nextresulttype);
+
+              nextresultsize = bitsForType (nextresulttype);
+              if (nextresultsize >= resultsize)
+                 continue;
+              /* Cast to bool must be preserved to ensure that all nonzero values are correctly cast to true */
+              if (uic->op == CAST && SPEC_NOUN (nextresulttype) == V_BOOL)
+                 continue;
+
+              /* Make op result narrower */
+              sym = OP_SYMBOL (IC_RESULT (ic));
+              sym->type = nextresulttype;
+
+              /* Insert casts on operands */
+              if (IS_SYMOP (IC_LEFT (ic)))
+                {
+                  newic = newiCode (CAST, operandFromLink (nextresulttype), IC_LEFT (ic));
+                  hTabAddItem (&iCodehTab, newic->key, newic);
+                  bitVectSetBit (OP_USES (IC_LEFT (ic)), newic->key);
+                  IC_RESULT (newic) = newiTempOperand (nextresulttype, 0);
+                  bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+                  IC_LEFT (ic) = operandFromOperand (IC_RESULT (newic));
+                  bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+                  newic->filename = ic->filename;
+                  newic->lineno = ic->lineno;
+                  addiCodeToeBBlock (ebbs[i], newic, ic);
+                }
+              else
+                {
+                  wassert (IS_OP_LITERAL (IC_LEFT (ic)));
+                  IC_LEFT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))));
+                }
+              if (ic->op != LEFT_OP && IS_SYMOP (IC_RIGHT (ic)))
+                {
+                  newic = newiCode (CAST, operandFromLink (nextresulttype), IC_RIGHT (ic));
+                  hTabAddItem (&iCodehTab, newic->key, newic);
+                  bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
+                  IC_RESULT (newic) = newiTempOperand (nextresulttype, 0);
+                  bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+                  IC_RIGHT (ic) = operandFromOperand (IC_RESULT (newic));
+                  bitVectSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+                  newic->filename = ic->filename;
+                  newic->lineno = ic->lineno;
+                  addiCodeToeBBlock (ebbs[i], newic, ic);
+                }
+              else if (ic->op != LEFT_OP)
+                {
+                  wassert (IS_OP_LITERAL (IC_RIGHT (ic)));
+                  IC_RIGHT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));
+                }
+              if (uic->op == CAST)
+                uic->op = '=';
+              change++;
+            }
+        }
+    }
+  return change;
+}
+
+/*-----------------------------------------------------------------*/
 /* optimizeCastCast - remove unneeded intermediate casts.          */
 /* Integer promotion may cast (un)signed char to int and then      */
 /* recast the int to (un)signed long. If the signedness of the     */
@@ -1962,10 +2077,10 @@ optimizeCastCast (eBBlock ** ebbs, int count)
   int i;
   iCode *ic;
   iCode *uic;
-  sym_link * type1;
-  sym_link * type2;
-  sym_link * type3;
-  symbol * sym;
+  sym_link *type1;
+  sym_link *type2;
+  sym_link *type3;
+  symbol *sym;
   int size1, size2, size3;
 
   for (i = 0; i < count; i++)
@@ -2024,6 +2139,7 @@ optimizeCastCast (eBBlock ** ebbs, int count)
               /* let the second cast do all the work */
               ic->op = '=';
               IC_LEFT (ic) = NULL;
+
               sym = OP_SYMBOL (IC_RESULT (ic));
               sym->type = copyLinkChain (type1);
               sym->etype = getSpec (sym->type);
@@ -2235,6 +2351,7 @@ eBBlockFromiCode (iCode * ic)
     dumpEbbsToFileExt (DUMP_RAW1, ebbi);
 
   optimizeCastCast (ebbi->bbOrder, ebbi->count);
+  while (optimizeOpWidth (ebbi->bbOrder, ebbi->count));
   optimizeNegation (ebbi->bbOrder, ebbi->count);
 
   /* Burn the corpses, so the dead may rest in peace,

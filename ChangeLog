@@ -1,3 +1,8 @@
+2016-07-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  Narrow arithmetic operations when results are cast to narrower type: RFE #506.
+
 2016-07-21 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sdas/astlcs90/t90mch.c

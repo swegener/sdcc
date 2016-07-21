@@ -1315,7 +1315,6 @@ machine(struct mne *mp)
     case S_SRL:
       t1 = addr(&e1);
       v1 = (int) e1.e_addr;
-
       // can have a as first op or not..
       if(more())
         {
@@ -1335,7 +1334,7 @@ machine(struct mne *mp)
             }
         }
 
-      if(IS_DIRECT_MEM(v1))
+      if(IS_DIRECT_MEM(v1) && v1 > 0)
         {
           outab(0xE7);
           outab(v1 & 0xFF);

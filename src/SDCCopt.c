@@ -1993,19 +1993,119 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
   int change = 0;
   iCode *ic, *newic;
   iCode *uic;
-  sym_link *resulttype;
   sym_link *nextresulttype;
   symbol *sym;
   int resultsize, nextresultsize;
 
+  /* long and long long multiplications where operands are unsigned char due to bitwise and */
+  for (i = 0; i < count; i++)
+    for (ic = ebbs[i]->sch; ic; ic = ic->next)
+      if (ic->op == '*' && IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+        {
+          operand *left = IC_LEFT (ic);
+          operand *right = IC_RIGHT (ic);
+          sym_link *resulttype = operandType (IC_RESULT (ic));
+
+          if (!IS_INTEGRAL (resulttype) || bitsForType (resulttype) <= 16 ||
+            !(IS_ITEMP (left) || IS_OP_LITERAL (left)) ||
+            !(IS_ITEMP (right) || IS_OP_LITERAL (right)))
+            continue;
+
+          if (IS_ITEMP (left) && bitVectnBitsOn (OP_DEFS (left)) != 1 ||
+            IS_ITEMP (right) && bitVectnBitsOn (OP_DEFS (right)) != 1)
+            continue;
+
+          iCode *lic = IS_ITEMP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
+          iCode *ric = IS_ITEMP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
+
+          if (lic)
+            {
+              if (lic->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (lic)) && !IS_OP_LITERAL (IC_RIGHT (lic)))
+                continue;
+
+              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (lic)) ? IC_LEFT (lic) : IC_RIGHT (lic));
+
+              if (litval > 0x7f)
+                continue;
+            }     
+          else if (operandLitValue (left) > 0x7f)
+            continue;
+
+          if (ric)
+            {
+              if (ric->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (ric)) && !IS_OP_LITERAL (IC_RIGHT (ric)))
+                continue;
+
+              unsigned long litval = operandLitValue (IS_OP_LITERAL (IC_LEFT (ric)) ? IC_LEFT (ric) : IC_RIGHT (ric));
+
+              if (litval > 0x7f)
+                continue;
+            }
+          else if (operandLitValue (right) > 0x7f)
+            continue;
+
+          // Now replace the wide multiplication by 8x8->16 multiplication and insert casts.
+
+          if (lic)
+            {
+              newic = newiCode (CAST, operandFromLink (newCharLink()), left);
+              hTabAddItem (&iCodehTab, newic->key, newic);
+              IC_RESULT (newic) = newiTempOperand (newCharLink(), 0);
+              IC_LEFT (ic) = operandFromOperand (IC_RESULT (newic));
+              bitVectUnSetBit (OP_USES (left), ic->key);
+              bitVectSetBit (OP_USES (left), newic->key);
+              bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
+              bitVectSetBit (OP_USES (IC_RESULT (newic)), ic->key);
+              newic->filename = ic->filename;
+              newic->lineno = ic->lineno;
+              addiCodeToeBBlock (ebbs[i], newic, ic);
+            }
+          else
+            IC_LEFT (ic) = operandFromValue (valCastLiteral (newCharLink(), operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))));
+
+          if (ric)
+            {
+              newic = newiCode (CAST, operandFromLink (newCharLink()), right);
+              hTabAddItem (&iCodehTab, newic->key, newic);
+              IC_RESULT (newic) = newiTempOperand (newCharLink(), 0);
+              IC_RIGHT (ic) = operandFromOperand (IC_RESULT (newic));
+              bitVectUnSetBit (OP_USES (right), ic->key);
+              bitVectSetBit (OP_USES (right), newic->key);
+              bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
+              bitVectSetBit (OP_USES (IC_RESULT (newic)), ic->key);
+              newic->filename = ic->filename;
+              newic->lineno = ic->lineno;
+              addiCodeToeBBlock (ebbs[i], newic, ic);
+            }
+          else
+            IC_LEFT (ic) = operandFromValue (valCastLiteral (newCharLink(), operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))));
+
+          // Insert cast on result
+          newic = newiCode (CAST, operandFromLink (resulttype), 0);
+          hTabAddItem (&iCodehTab, newic->key, newic);
+          IC_RESULT (newic) = IC_RESULT (ic);
+          bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+          bitVectSetBit (OP_DEFS (IC_RESULT (ic)), newic->key);
+          nextresulttype = newIntLink();
+          SPEC_USIGN (nextresulttype) = 1;
+          IC_RESULT (ic) = newiTempOperand (nextresulttype, 0);
+          IC_RIGHT (newic) = operandFromOperand (IC_RESULT (ic));
+          bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+          bitVectSetBit (OP_USES (IC_RESULT (ic)), newic->key);
+          newic->filename = ic->filename;
+          newic->lineno = ic->lineno;
+          addiCodeToeBBlock (ebbs[i], newic, ic->next);
+        }
+
+  // Operation followed by cast
   for (i = 0; i < count; i++)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP) &&
+          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP || ic->op == BITWISEAND) &&
             IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
             {
-              resulttype = operandType (IC_RESULT (ic));
+              sym_link *resulttype = operandType (IC_RESULT (ic));
 
               if (!IS_INTEGRAL (resulttype) ||
                 !(IS_SYMOP (IC_LEFT (ic)) || IS_OP_LITERAL (IC_LEFT (ic))) ||

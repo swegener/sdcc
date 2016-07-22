@@ -5,6 +5,8 @@
 	  Fix an issue in stm8 unrolled memcpy().
 	* device/lib/stm8/__mulsint2slong.s:
 	  Optimize multiplication routine for small operands.
+	* src/SDCCopt.c:
+	  Optimize multiplication with anded operands.
 
 2016-07-21 Philipp Klaus Krause <pkk AT spth.de>
 

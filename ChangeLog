@@ -1,3 +1,9 @@
+2016-07-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/stm8/memcpy.s,
+	  support/regression/tests/memory.c:
+	  Fix an issue in stm8 unrolled memcpy().
+
 2016-07-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/stm8/Makefile.in,

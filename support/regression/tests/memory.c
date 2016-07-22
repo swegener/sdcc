@@ -46,6 +46,10 @@ void testmemory(void)
   memcpy(destination, source, 8);
   ASSERT(destination[7] == source[7]);
   ASSERT(destination[8] == 5);
+  memset(destination, 5, 9);
+  memcpy(destination, source, 3);
+  ASSERT(destination[2] == source[2]);
+  ASSERT(destination[3] == 5);
 
   /* Test memcmp() */
   memcpy(destination, source, 4);

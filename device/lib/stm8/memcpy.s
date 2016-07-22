@@ -58,8 +58,8 @@ jx01:
 	jreq	loop_1
 	jra	loop_5
 jx11:
-	jreq	loop_7
-	jra	loop_3
+	jreq	loop_3
+	jra	loop_7
 jxx0:
 	srl	a
 	jrnc	loop_4

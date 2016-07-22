@@ -62,23 +62,27 @@ right_nonneg:
 	ldw	(2, sp), x
 
 	; Multiply middle bytes
-	ldw	x, (5+3, sp)
 	ld	a, (5+5, sp)
+	jreq skip_m1
+	ldw	x, (5+3, sp)
 	mul	x, a
 	addw	x, (3, sp)
 	ldw	(3, sp), x
 	ld	a, (2, sp)
 	adc	a, #0
 	ld	(2, sp), a
+skip_m1:
 
-	ldw	x, (5+5, sp)
 	ld	a, (5+3, sp)
+	jreq skip_m2
+	ldw	x, (5+5, sp)
 	mul	x, a
 	addw	x, (3, sp)
 	ldw	(3, sp), x
 	ld	a, (2, sp)
 	adc	a, #0
 	ld	(2, sp), a
+skip_m2:
 
 	; Handle signed result
 	pop	a

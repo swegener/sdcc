@@ -235,7 +235,7 @@ PORT avr_port = {
 	 -1, 1, 4, 1, 1, 0},
 	/* avr has an 8 bit mul */
 	{
-          1, -1
+          1, -1, FALSE
         },
 	{
           avr_emitDebuggerSymbol

@@ -1369,7 +1369,7 @@ PORT pic16_port =
   },
     /* pic16 has an 8 bit mul */
   {
-     0, -1
+     0, -1, FALSE
   },
   {
     pic16_emitDebuggerSymbol

@@ -867,7 +867,7 @@ PORT mcs51_port =
     1           /* banked_overhead (switch between code banks) */
   },
   /* mcs51 has an 8 bit mul */
-  { 1, -1 },
+  { 1, -1, FALSE },
   { mcs51_emitDebuggerSymbol },
   {
     256,        /* maxCount */

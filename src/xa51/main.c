@@ -310,7 +310,7 @@ PORT xa51_port =
   },
     /* xa51 has an 16 bit mul */
   {
-    2, -2
+    2, -2, FALSE
   },
   {
     xa51_emitDebuggerSymbol

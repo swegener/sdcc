@@ -400,7 +400,7 @@ PORT pic_port =
   },
     /* pic14 has an 8 bit mul */
   {
-    1, -1
+    1, -1, FALSE
   },
   {
     pic14_emitDebuggerSymbol

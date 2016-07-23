@@ -4326,7 +4326,7 @@ initCSupport (void)
         }
     }
 
-  muls16tos32 = TARGET_IS_STM8 ? funcOfTypeVarg ("__mulsint2slong", "l", 2, (const char *[]){"i", "i"}) : 0;
+  muls16tos32 = port->support.has_mulint2long ? funcOfTypeVarg ("__mulsint2slong", "l", 2, (const char *[]){"i", "i"}) : 0;
 }
 
 /*-----------------------------------------------------------------*/

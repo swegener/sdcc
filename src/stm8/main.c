@@ -402,7 +402,7 @@ PORT stm8_port =
   { NULL, NULL },
   { -1, 0, 7, 2, 0, 2 },        /* stack information */
   /* Use more fine-grained control for multiplication / division. */
-  { 0, -1 },
+  { 0, -1, TRUE },
   { stm8_emitDebuggerSymbol,
 	{
       stm8_dwarfRegNum,

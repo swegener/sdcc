@@ -835,7 +835,7 @@ PORT hc08_port =
   },
     /* hc08 has an 8 bit mul */
   {
-    1, 5
+    1, 5, FALSE
   },
   {
     hc08_emitDebuggerSymbol,
@@ -980,7 +980,7 @@ PORT s08_port =
   },
     /* hc08 has an 8 bit mul */
   {
-    1, 5
+    1, 5, FALSE
   },
   {
     hc08_emitDebuggerSymbol,

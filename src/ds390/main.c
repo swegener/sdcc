@@ -1410,7 +1410,7 @@ PORT tininative_port =
   { NULL, NULL },
   { +1, 1, 4, 1, 1, 0 },
   /* ds390 has an 16 bit mul & div */
-  { 2, -1 },
+  { 2, -1, FALSE },
   { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */
@@ -1671,7 +1671,7 @@ PORT ds400_port =
   { _ds400_generateRomDataArea, _ds400_linkRomDataArea },
   { +1, 1, 4, 1, 1, 0 },
   /* ds390 has an 16 bit mul & div */
-  { 2, -1 },
+  { 2, -1, FALSE },
   { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */

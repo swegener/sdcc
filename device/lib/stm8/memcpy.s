@@ -43,9 +43,15 @@ _memcpy:
 	srlw	x
 	srlw	x
 	srlw	x
+	exg	a, xl
+	tnz	a
+	exg	a, xl
+	jrne	xl_nonzero
+	subw	x, #0x0100
+xl_nonzero:
 	ldw	(7, sp), x
-	ldw	x, (5, sp)
 
+	ldw	x, (5, sp)
 	and	a, #7
 	jreq loop_8
 

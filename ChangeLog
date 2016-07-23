@@ -3,8 +3,9 @@
 	* src/SDCCsymt.h,
 	  src/SDCCsymt.c,
 	  src/SDCCopt.c,
+	  device/lib/stm8/__mulsint2slong.s:
 	  support/regression/tests/muldiv.c:
-	  Preparations for unsigned 16x16->32 multiplication.
+	  Support routine for unsigned 16x16->32 multiplication.
 
 2016-07-23 Philipp Klaus Krause <pkk AT spth.de>
 

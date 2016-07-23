@@ -93,8 +93,8 @@ testDiv(void)
 void 
 test16to32(void)
 {
-   volatile int i, j;
-   volatile unsigned int ui, uj;
+   {attr} {storage} int i, j;
+   {attr} {storage} unsigned int ui, uj;
 
    i = 42;
    j = 42;
@@ -118,6 +118,9 @@ test16to32(void)
    ui = 2342;
    uj = 4223;
    ASSERT((unsigned long)ui * (unsigned long)uj == 2342ul * 4223ul);
+   ui = 0xffff;
+   uj = 0x8000;
+   ASSERT((unsigned long)ui * (unsigned long)uj == 0xfffful * 0x8000ul);
 }
 
 void

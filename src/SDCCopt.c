@@ -732,7 +732,7 @@ convilong (iCode * ic, eBBlock * ebp)
   if (IS_SYMOP (right))
       bitVectUnSetBit (OP_USES (right), ic->key);
 
-  if (op == '*' && muls16tos32[1] &&
+  if (op == '*' && (muls16tos32[0] || muls16tos32[1]) &&
     (IS_SYMOP (left) && bitVectnBitsOn (OP_DEFS (left)) == 1 || IS_OP_LITERAL (left) && operandLitValue (left) < 32768 && operandLitValue (left) >= -32768) &&
     (IS_SYMOP (right) && bitVectnBitsOn (OP_DEFS (right)) == 1 || IS_OP_LITERAL (right) && operandLitValue (right) < 32768 && operandLitValue (right) >= -32768) &&
     getSize (leftType) == 4 && getSize (rightType) == 4)
@@ -740,9 +740,11 @@ convilong (iCode * ic, eBBlock * ebp)
       iCode *lic = IS_SYMOP (left) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (left))) : 0;
       iCode *ric = IS_SYMOP (right) ? hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (right))) : 0;
 
-      if ((!lic || lic->op == CAST && getSize (operandType (IC_RIGHT (lic))) == 2 && !SPEC_USIGN (operandType (IC_RIGHT (lic)))) &&
-        (!ric || ric->op == CAST && getSize (operandType (IC_RIGHT (ric))) == 2 && !SPEC_USIGN (operandType (IC_RIGHT (ric)))))
+      if ((!lic || lic->op == CAST && getSize (operandType (IC_RIGHT (lic))) == 2 && SPEC_USIGN (operandType (IC_RIGHT (lic))) == SPEC_USIGN (operandType (left))) &&
+        (!ric || ric->op == CAST && getSize (operandType (IC_RIGHT (ric))) == 2 && SPEC_USIGN (operandType (IC_RIGHT (ric))) == SPEC_USIGN (operandType (right))))
         {
+          func = muls16tos32[SPEC_USIGN (operandType (left))];
+
           if (lic)
             {
               lic->op = '=';
@@ -759,8 +761,8 @@ convilong (iCode * ic, eBBlock * ebp)
           else
             IC_RIGHT (ic) = operandFromValue (valCastLiteral (newIntLink(), operandLitValue (right), operandLitValue (right)));
 
-          func = muls16tos32[1];
-          goto found;
+          if (func)
+            goto found;
         }
     }
 

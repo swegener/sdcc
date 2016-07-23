@@ -27,8 +27,14 @@
 ;--------------------------------------------------------------------------
 
 .globl ___mulsint2slong
+.globl ___muluint2ulong
 
 .area CODE
+
+___muluint2ulong:
+    clr a
+    ldw x, (5, sp)
+    jra right_nonneg
 
 ___mulsint2slong:
 	

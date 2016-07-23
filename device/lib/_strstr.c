@@ -27,7 +27,6 @@
 -------------------------------------------------------------------------*/
 
 #include <string.h>
-#pragma disable_warning 196
 
 char * strstr ( const char * str1, const char * str2 )
 {

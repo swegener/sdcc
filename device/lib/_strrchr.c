@@ -27,7 +27,6 @@
 -------------------------------------------------------------------------*/
 
 #include <string.h>
-#pragma disable_warning 196
 
 #ifdef __SDCC_BROKEN_STRING_FUNCTIONS
 char * strrchr ( const char * string, char ch )

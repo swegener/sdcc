@@ -289,10 +289,26 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
         if (result_size == 1 || getSize (left) <= 1 && getSize (right) <= 1 && result_size == 2 && IS_UNSIGNED (left) && IS_UNSIGNED (right))
           return TRUE;
 
-        if (result_size > 2 || !test)
+        if ((getSize (left) != 2 || getSize (right) != 2) || result_size != 2 || !test)
           return FALSE;
 
-        if(floatFromVal (valFromType (test)) == 7 || floatFromVal (valFromType (test)) == 100 && optimize.codeSpeed)
+        unsigned long long add, sub;
+        int topbit, nonzero;
+        
+
+        if (floatFromVal (valFromType (test)) < 0 || csdOfVal (&topbit, &nonzero, &add, &sub, valFromType (test)))
+          return FALSE;
+
+        int shifts = topbit;
+
+        // If the leading digits of the cse are 1 0 -1 we can use 0 1 1 instead to reduce the number of shifts.
+        if (topbit >= 2 && (add & (1 << topbit)) && (sub & (1 << (topbit - 2))))
+          shifts--;
+
+        wassert (nonzero);
+
+        // Shifts are 1 byte, additions and subtractions are 3 bytes.
+        if (shifts + 3 * (nonzero - 1) <= 9 - optimize.codeSize + 3 * optimize.codeSpeed)
           return TRUE;
 
         return FALSE;

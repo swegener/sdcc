@@ -3597,7 +3597,6 @@ genMultLit (const iCode *ic)
   operand *result = IC_RESULT (ic);
   operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
-  unsigned int litval;
   asmop *add_aop;
 
   D (emit2 ("; genMultLit", ""));
@@ -3615,36 +3614,39 @@ genMultLit (const iCode *ic)
 
   wassert (right->aop->type == AOP_LIT);
 
-  litval = byteOfVal (right->aop->aopu.aop_lit, 1) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
   add_aop = aopOnStackNotExt (left->aop, 0, 2) ? left->aop : 0;
   if(!regDead (X_IDX, ic))
     push (ASMOP_X, 0, 2);
   genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
   if (!add_aop)
     push (ASMOP_X, 0, 2);
-  if (litval == 7)
-    {
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit2 ("subw", "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
-      cost (3, 2);
-    }
-  else if (litval == 100)
-    {
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit2 ("addw", "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
-      cost (3, 2);
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit2 ("addw", "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
-      cost (3, 2);
-      emit3w (A_SLLW, ASMOP_X, 0);
-      emit3w (A_SLLW, ASMOP_X, 0);
-    }
-  else
-    wassert (0);
+
+  /* Generate a sequence of shifts, additions and subtractions based on the canonical signed digit representation of the literal operand */
+  {
+    unsigned long long add, sub;
+    int topbit, nonzero;
+
+    wassert(!csdOfVal (&topbit, &nonzero, &add, &sub, right->aop->aopu.aop_lit));
+
+    // If the leading digits of the cse are 1 0 -1 we can use 0 1 1 instead to reduce the number of shifts.
+    if (topbit >= 2 && (add & (1 << topbit)) && (sub & (1 << (topbit - 2))))
+      {
+        add = (add & ~(1u << topbit)) | (3u << (topbit - 2));
+        sub &= ~(1u << (topbit - 1));
+        topbit--;
+      }
+
+    for (int bit = topbit - 1; bit >= 0; bit--)
+      {
+        emit3w (A_SLLW, ASMOP_X, 0);
+        if ((add | sub) & (1u << bit))
+          {
+            emit2 (add & (1u << bit) ? "addw" : "subw" , "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
+            cost (3, 2);
+          }
+      }
+  }
+
   if (!add_aop)
     adjustStack (2, regDead (A_IDX, ic), FALSE, regDead (Y_IDX, ic));
   genMove (result->aop, ASMOP_X, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));

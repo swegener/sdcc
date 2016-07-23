@@ -2031,6 +2031,44 @@ ullFromVal (value * val)
 }
 
 /*------------------------------------------------------------------*/
+/* csdOfVal - return 0 if the value can be represented as csd       */
+/* topbit  - highest nonzero bit in csd                             */
+/* nonzero - number of nonzero bits in csd                          */
+/* csd_add - positive bits in csd                                   */
+/* csd_sub - negative bits in csd                                   */
+/*------------------------------------------------------------------*/
+int csdOfVal (int *topbit, int *nonzero, unsigned long long *csd_add, unsigned long long *csd_sub, value *val)
+{
+  *topbit = 0;
+  *nonzero = 0;
+  *csd_add = 0;
+  *csd_sub = 0;
+
+  unsigned long long binary = ullFromVal (val);
+  bool gamma, theta, a;
+  int bit, next;
+
+  for (a = 0, gamma = 0, bit = 0; bit < 61; bit++)
+    {
+       theta = a ^ (binary & 1);
+       gamma = !gamma && theta;
+       next = (1 - 2 * (bool)(binary & 2)) * gamma;
+       if (next > 0)
+         *csd_add |= (1 << bit);
+       else if (next < 0)
+         *csd_sub |= (1 << bit);
+       if (next)
+         {
+           (*nonzero)++;
+           *topbit = bit;
+         }
+       a = (binary & 1);
+       binary >>= 1;
+    }
+  return((bool)binary);
+}
+
+/*------------------------------------------------------------------*/
 /* isEqualVal - return 1 if value is equal to specified constant    */
 /*------------------------------------------------------------------*/
 int

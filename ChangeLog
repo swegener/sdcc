@@ -1,5 +1,13 @@
 2016-07-23 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCval.h,
+	  src/SDCCval.c,
+	  src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Generate code for 16 bit multiplication by literal based on CSD representation.
+
+2016-07-23 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCsymt.h,
 	  src/SDCCsymt.c,
 	  src/SDCCopt.c,

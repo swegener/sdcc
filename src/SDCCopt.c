@@ -732,7 +732,7 @@ convilong (iCode * ic, eBBlock * ebp)
   if (IS_SYMOP (right))
       bitVectUnSetBit (OP_USES (right), ic->key);
 
-  if (muls16tos32 && op == '*' &&
+  if (op == '*' && muls16tos32[1] &&
     (IS_SYMOP (left) && bitVectnBitsOn (OP_DEFS (left)) == 1 || IS_OP_LITERAL (left) && operandLitValue (left) < 32768 && operandLitValue (left) >= -32768) &&
     (IS_SYMOP (right) && bitVectnBitsOn (OP_DEFS (right)) == 1 || IS_OP_LITERAL (right) && operandLitValue (right) < 32768 && operandLitValue (right) >= -32768) &&
     getSize (leftType) == 4 && getSize (rightType) == 4)
@@ -759,7 +759,7 @@ convilong (iCode * ic, eBBlock * ebp)
           else
             IC_RIGHT (ic) = operandFromValue (valCastLiteral (newIntLink(), operandLitValue (right), operandLitValue (right)));
 
-          func = muls16tos32;
+          func = muls16tos32[1];
           goto found;
         }
     }

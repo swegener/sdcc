@@ -3910,7 +3910,7 @@ symbol *fps16x16_gteq;
 
 /* Dims: mul/div/mod, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED/BOTH */
 symbol *muldiv[3][4][4];
-symbol *muls16tos32;
+symbol *muls16tos32[2];
 /* Dims: BYTE/WORD/DWORD/QWORD SIGNED/UNSIGNED */
 sym_link *multypes[4][2];
 /* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/USIGNED */
@@ -4326,7 +4326,8 @@ initCSupport (void)
         }
     }
 
-  muls16tos32 = port->support.has_mulint2long ? funcOfTypeVarg ("__mulsint2slong", "l", 2, (const char *[]){"i", "i"}) : 0;
+  muls16tos32[0] = port->support.has_mulint2long ? funcOfTypeVarg ("__muluint2ulong", "ul", 2, (const char *[]){"ui", "ui"}) : 0;
+  muls16tos32[1] = port->support.has_mulint2long ? funcOfTypeVarg ("__mulsint2slong", "l", 2, (const char *[]){"i", "i"}) : 0;
 }
 
 /*-----------------------------------------------------------------*/

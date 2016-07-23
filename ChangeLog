@@ -1,5 +1,13 @@
 2016-07-23 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCCopt.c,
+	  support/regression/tests/muldiv.c:
+	  Preparations for unsigned 16x16->32 multiplication.
+
+2016-07-23 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/stm8/memcpy.s:
 	  Fix issue in loop counter in stm8 memcpy().
 	* src/port.h,

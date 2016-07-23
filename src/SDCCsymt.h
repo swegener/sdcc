@@ -607,8 +607,8 @@ extern symbol *fps16x16_gteq;
 
 /* Dims: mul/div/mod, BYTE/WORD/DWORD/QWORD, SIGNED/UNSIGNED/BOTH */
 extern symbol *muldiv[3][4][4];
-/* Signed 16 x 16 -> 32 multiplication */
-extern symbol *muls16tos32;
+/* 16 x 16 -> 32 multiplication SIGNED/UNSIGNED */
+extern symbol *muls16tos32[2];
 /* Dims: BYTE/WORD/DWORD/QWORD SIGNED/UNSIGNED */
 extern sym_link *multypes[4][2];
 /* Dims: to/from float, BYTE/WORD/DWORD/QWORD, SIGNED/USIGNED */

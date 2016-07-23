@@ -94,9 +94,7 @@ void
 test16to32(void)
 {
    volatile int i, j;
-#if 0
    volatile unsigned int ui, uj;
-#endif
 
    i = 42;
    j = 42;
@@ -107,19 +105,19 @@ test16to32(void)
    ASSERT((long)i * (long)j == -42l * -42l);
    i = 2342;
    j = 4223;
+   ASSERT((unsigned long)i * (unsigned long)j == 2342ul * 4223ul);
    ASSERT((long)i * (long)j == 2342l * 4223l);
    j = -j;
    ASSERT((long)i * (long)j == 2342l * -4223l);
    i = -i;
    ASSERT((long)i * (long)j == -2342l * -4223l);
-#if 0
+
    ui = 42;
    uj = 42;
-   ASSERT((unsigned long)i * (unsigned long)j == 42ul * 42ul);
+   ASSERT((unsigned long)ui * (unsigned long)uj == 42ul * 42ul);
    ui = 2342;
    uj = 4223;
-   ASSERT((unsigned long)i * (unsigned long)j == 2342ul * 4223ul);
-#endif
+   ASSERT((unsigned long)ui * (unsigned long)uj == 2342ul * 4223ul);
 }
 
 void

@@ -1,3 +1,7 @@
+2016-07-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCopt.c (optimizeOpWidth): don't narrow types cast to bit/sbit either
+
 2016-07-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCval.h,

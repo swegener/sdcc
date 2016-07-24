@@ -2144,8 +2144,8 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               nextresultsize = bitsForType (nextresulttype);
               if (nextresultsize >= resultsize)
                  continue;
-              /* Cast to bool must be preserved to ensure that all nonzero values are correctly cast to true */
-              if (uic->op == CAST && SPEC_NOUN (nextresulttype) == V_BOOL)
+              /* Cast to bool and bool-like types must be preserved to ensure that all nonzero values are correctly cast to true */
+              if (uic->op == CAST && IS_BOOLEAN (nextresulttype))
                  continue;
 
               /* Make op result narrower */

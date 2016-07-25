@@ -6,7 +6,7 @@
  */
 #include <testfwk.h>
 
-static void
+void
 testTwoOpBitwise(void)
 {
   {storage} {attr} {type} left, right;

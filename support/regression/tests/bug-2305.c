@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if !defined(PORT_HOST) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_gbz80) && !defined(__SDCC_stm8)
+#if !defined(PORT_HOST) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_gbz80) && !defined(__SDCC_stm8) && !defined(__SDCC_tlcs90)
 __sfr __at 0xF4 fd_select;
 
 static void foo(unsigned char x)

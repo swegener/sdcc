@@ -69,7 +69,7 @@ GENERATE_CASES = $(srcdir)/generate-cases.py
 # Each directory under ports/ is used as a port name.  Each port is tested.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out .svn xa51 rrz80 rrgbz80 pic16 pic14 mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out .svn xa51 rrz80 rrgbz80 pic16 pic14 tlcs90 mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 # These  ports will be cleaned with 'make clean'
 CLEAN_PORTS = $(filter-out .svn mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
@@ -135,47 +135,47 @@ test-ds390:
 # Helper rule for testing the z80 related ports only
 test-z80: test-ucz80 test-ucz180 test-ucgbz80 test-ucr2k test-ucr3ka
 
-# Helper rule for testing the z80 port only(use ucSim simulator)
+# Helper rule for testing the z80 port only(use uCsim simulator)
 test-ucz80:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucz80
 
-# Helper rule for testing the z180 port only(use ucSim simulator)
+# Helper rule for testing the z180 port only(use uCsim simulator)
 test-ucz180:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucz180
 
-# Helper rule for testing the gb/lr35902 port only(use ucSim simulator)
+# Helper rule for testing the gb/lr35902 port only(use uCsim simulator)
 test-ucgbz80:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucgbz80
 
-# Helper rule for testing the r2k port only(use ucSim simulator)
+# Helper rule for testing the r2k port only(use uCsim simulator)
 test-ucr2k:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucr2k
 
-# Helper rule for testing the r3k port only(use ucSim simulator)
+# Helper rule for testing the r3k port only(use uCsim simulator)
 test-ucr3ka:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucr3ka
 
-# Helper rule for testing the hc08 port only(use ucSim simulator)
+# Helper rule for testing the hc08 port only(use uCsim simulator)
 test-hc08:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=hc08
 
-# Helper rule for testing the s08 port only(use ucSim simulator)
+# Helper rule for testing the s08 port only(use uCsim simulator)
 test-s08:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=s08
 
-# Helper rule for testing the stm8 port only(use ucSim simulator)
+# Helper rule for testing the stm8 port only(use uCsim simulator)
 test-stm8:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=stm8
 
-# Helper rule for testing the xa51 port only(use ucSim simulator)
+# Helper rule for testing the xa51 port only(use uCsim simulator)
 test-xa51:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=xa51
@@ -189,6 +189,11 @@ test-pic16:
 test-pic14:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=pic14
+
+# Helper rule for testing the tlcs90 port only(use uCsim simulator)
+test-tlcs90:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=tlcs90
 
 ### Helper rule for testing the host cc only
 test-host:
@@ -223,7 +228,7 @@ else
   INC_DIR ?= $(top_srcdir)/device/include
 endif
 # Base flags.
-SDCCFLAGS += --fverbose-asm -DNO_VARARGS
+SDCCFLAGS += --fverbose-asm -DNO_VARARGS --debug
 # Extension of object intermediate files
 OBJEXT = .rel
 # Extension of files that can be run in the emulator

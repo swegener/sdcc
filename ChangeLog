@@ -1,3 +1,17 @@
+2016-07-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCmem.c (printAllocInfoSeg),
+	* src/port.h,
+	* src/avr/main.c,
+	* src/ds390/main.c,
+	* src/hc08/main.c,
+	* src/mcs51/main.c,
+	* src/pic14/main.c,
+	* src/pic16/main.c,
+	* src/stm8/main.c,
+	* src/xa51/main.c,
+	* src/z80/main.c: Display correct stack offsets when stack grows down
+
 2016-07-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (optimizeOpWidth): don't narrow types cast to bit/sbit either

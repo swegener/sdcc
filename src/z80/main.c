@@ -929,7 +929,7 @@ PORT z80_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  { -1, 0, 0, 4, 0, 2 },
+  { -1, 0, 0, 4, 0, 2, 0 },
   /* Z80 has no native mul/div commands */
   { 0, -1, FALSE },
   { z80_emitDebuggerSymbol },
@@ -1058,7 +1058,7 @@ PORT z180_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  { -1, 0, 0, 4, 0, 2 },
+  { -1, 0, 0, 4, 0, 2, 0 },
   /* Z80 has no native mul/div commands */
   { 0, -1, FALSE },
   { z80_emitDebuggerSymbol },
@@ -1186,7 +1186,7 @@ PORT r2k_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  { -1, 0, 0, 4, 0, 2 },
+  { -1, 0, 0, 4, 0, 2, 0 },
   /* Z80 has no native mul/div commands */
   { 0, -1, FALSE },
   { z80_emitDebuggerSymbol },
@@ -1315,7 +1315,7 @@ PORT r3ka_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  { -1, 0, 0, 4, 0, 2 },
+  { -1, 0, 0, 4, 0, 2, 0 },
   /* Z80 has no native mul/div commands */
   { 0, -1, FALSE },
   { z80_emitDebuggerSymbol },
@@ -1446,7 +1446,7 @@ PORT gbz80_port =
     1                           /* No fancy alignments supported. */
   },
   { NULL, NULL },
-  { -1, 0, 0, 2, 0, 4 },
+  { -1, 0, 0, 2, 0, 4, 0 },
   /* gbZ80 has no native mul/div commands */
   { 0, -1, FALSE },
   { z80_emitDebuggerSymbol },
@@ -1575,7 +1575,7 @@ PORT tlcs90_port =
     1                           /* No fancy alignments supported. */
    },
   { NULL, NULL },
-  { -1, 0, 0, 4, 0, 2 },
+  { -1, 0, 0, 4, 0, 2, 0 },
   /* Z80 has no native mul/div commands */
   { 0, -1, FALSE },
   { z80_emitDebuggerSymbol },

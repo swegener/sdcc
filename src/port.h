@@ -251,6 +251,9 @@ typedef struct
     /** 'banked' call overhead.
         Mild overlap with bank_overhead */
     int banked_overhead;
+    /** 0 if sp points to last item pushed, 1 if sp points to next location to use */
+    int offset;
+
   }
   stack;
 

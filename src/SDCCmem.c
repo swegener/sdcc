@@ -1167,6 +1167,11 @@ printAllocInfoSeg (memmap * map, symbol * func, struct dbuf_s *oBuf)
                 stack_offset = func->stack;
             }
 
+          stack_offset += port->stack.offset; /* in case sp/bp points to the next location instead of last */
+
+          if (port->stack.direction < 0)
+            stack_offset = -stack_offset;
+
           dbuf_printf (oBuf, "to stack - %s %+d\n", SYM_BP (sym), sym->stack - stack_offset);
           continue;
         }

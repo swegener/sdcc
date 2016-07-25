@@ -306,7 +306,8 @@ PORT xa51_port =
     4, // isr overhead, page zero mode
     2, // function call overhead, page zero mode
     0, // reentrant overhead NUY
-    0 // banked overhead NUY
+    0, // banked overhead NUY
+    0
   },
     /* xa51 has an 16 bit mul */
   {

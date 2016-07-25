@@ -1365,7 +1365,8 @@ PORT pic16_port =
     4,          /* extra overhead when the function is an ISR */
     1,          /* extra overhead for a function call */
     1,          /* re-entrant space */
-    0           /* 'banked' call overhead, mild overlap with bank_overhead */
+    0,          /* 'banked' call overhead, mild overlap with bank_overhead */
+    1           /* sp is offset by 1 from last item pushed */
   },
     /* pic16 has an 8 bit mul */
   {

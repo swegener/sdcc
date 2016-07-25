@@ -396,7 +396,7 @@ PORT pic_port =
   },
   { NULL, NULL },
   {
-    +1, 1, 4, 1, 1, 0
+    +1, 1, 4, 1, 1, 0, 0
   },
     /* pic14 has an 8 bit mul */
   {

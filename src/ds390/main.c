@@ -1064,9 +1064,9 @@ PORT ds390_port =
     1                           // No fancy alignments supported.
   },
   { NULL, NULL },
-  { +1, 1, 4, 1, 1, 0 },
+  { +1, 1, 4, 1, 1, 0, 0 },
   /* ds390 has an 16 bit mul & div */
-  { 2, -1 },
+  { 2, -1, FALSE },
   { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */
@@ -1408,7 +1408,7 @@ PORT tininative_port =
     1                           // No fancy alignments supported.
   },
   { NULL, NULL },
-  { +1, 1, 4, 1, 1, 0 },
+  { +1, 1, 4, 1, 1, 0, 0 },
   /* ds390 has an 16 bit mul & div */
   { 2, -1, FALSE },
   { ds390_emitDebuggerSymbol },
@@ -1669,7 +1669,7 @@ PORT ds400_port =
     1
   },
   { _ds400_generateRomDataArea, _ds400_linkRomDataArea },
-  { +1, 1, 4, 1, 1, 0 },
+  { +1, 1, 4, 1, 1, 0, 0 },
   /* ds390 has an 16 bit mul & div */
   { 2, -1, FALSE },
   { ds390_emitDebuggerSymbol },

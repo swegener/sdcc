@@ -864,7 +864,8 @@ PORT mcs51_port =
     4,          /* isr_overhead */
     1,          /* call_overhead (2 for return address - 1 for pre-incrementing push */
     1,          /* reent_overhead */
-    1           /* banked_overhead (switch between code banks) */
+    1,          /* banked_overhead (switch between code banks) */
+    0           /* sp points directly at last item pushed */
   },
   /* mcs51 has an 8 bit mul */
   { 1, -1, FALSE },

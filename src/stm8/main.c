@@ -416,7 +416,7 @@ PORT stm8_port =
     1                           /* CODE  is read-only */
   },
   { NULL, NULL },
-  { -1, 0, 7, 2, 0, 2 },        /* stack information */
+  { -1, 0, 7, 2, 0, 2, 1 },     /* stack information */
   /* Use more fine-grained control for multiplication / division. */
   { 0, -1, TRUE },
   { stm8_emitDebuggerSymbol,

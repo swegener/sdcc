@@ -831,7 +831,8 @@ PORT hc08_port =
     4,          /* isr_overhead */
     2,          /* call_overhead */
     0,          /* reent_overhead */
-    0           /* banked_overhead (switch between code banks) */
+    0,          /* banked_overhead (switch between code banks) */
+    1           /* sp is offset by 1 from last item pushed */
   },
     /* hc08 has an 8 bit mul */
   {
@@ -976,7 +977,8 @@ PORT s08_port =
     4,          /* isr_overhead */
     2,          /* call_overhead */
     0,          /* reent_overhead */
-    0           /* banked_overhead (switch between code banks) */
+    0,          /* banked_overhead (switch between code banks) */
+    1           /* sp is offset by 1 from last item pushed */
   },
     /* hc08 has an 8 bit mul */
   {

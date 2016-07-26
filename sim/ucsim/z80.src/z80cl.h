@@ -42,11 +42,13 @@ public:
   class cl_memory *ram;
   class cl_memory *rom;
   struct t_regs regs;
+  class cl_address_space *regs8;
+  class cl_address_space *regs16;
 
 public:
   cl_z80(int Itype, int Itech, class cl_sim *asim);
   virtual int init(void);
-  virtual const char *id_string(void);
+  virtual char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
@@ -56,7 +58,7 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
-  virtual const char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr, const char *sep);
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);

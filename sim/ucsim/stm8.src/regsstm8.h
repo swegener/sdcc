@@ -27,28 +27,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+/* $Id: regsstm8.h 345 2016-07-10 14:51:45Z  $ */
+
 #ifndef REGSTM8_HEADER
 #define REGSTM8_HEADER
 
 #include "ddconfig.h"
 
-
-struct t_regpair
-{
-#ifdef WORDS_BIGENDIAN
-  TYPE_UBYTE h;
-  TYPE_UBYTE l;
-#else
-  TYPE_UBYTE l;
-  TYPE_UBYTE h;
-#endif
-};
-
-#define DEF_REGPAIR(BIGNAME,smallname) \
-  union { \
-    TYPE_UWORD BIGNAME; \
-    struct t_regpair smallname; \
-  }
 
 struct t_regs
 {
@@ -57,7 +42,7 @@ struct t_regs
   TYPE_UWORD Y;
   TYPE_UWORD SP;
   TYPE_UBYTE CC;
-  TYPE_UBYTE VECTOR;
+  //TYPE_UBYTE VECTOR;
 };
 
 #define BIT_C	0x01  // carry status(out of bit 7)

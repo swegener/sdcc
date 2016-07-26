@@ -32,14 +32,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uc51rcl.h"
 
+#include "newcmdcl.h"
+
 
 class cl_uc89c51r: public cl_uc51r
 {
 public:
   //int t0_overflows;
-  uchar dpl0, dph0;
-  uchar dpl1, dph1;
-  uchar dps;
+  //uchar dpl0, dph0;
+  //uchar dpl1, dph1;
+  //uchar dps;
 
 public:
   cl_uc89c51r(int Itype, int Itech, class cl_sim *asim);
@@ -62,11 +64,12 @@ public:
 class cl_89c51r_dummy_hw: public cl_hw
 {
 protected:
-  class cl_memory_cell *auxr1;
+  class cl_memory_cell *dpl, *dph;
 public:
   cl_89c51r_dummy_hw(class cl_uc *auc);
   virtual int init(void);
 
+  virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
 };
 

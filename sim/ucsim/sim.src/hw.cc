@@ -38,85 +38,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *____________________________________________________________________________
  */
 
-cl_watched_cell::cl_watched_cell(class cl_address_space *amem, t_addr aaddr,
-                                 class cl_memory_cell **astore,
-                                 enum what_to_do_on_cell_change awtd)
-{
-  mem= amem;
-  addr= aaddr;
-  store= astore;
-  wtd= awtd;
-  if (mem)
-    {
-      cell= mem->get_cell(addr);
-      if (store)
-        *store= cell;
-    }
-}
-
-void
-cl_watched_cell::mem_cell_changed(class cl_address_space *amem, t_addr aaddr,
-                                  class cl_hw *hw)
-{
-  if (mem &&
-      mem == amem &&
-      addr == aaddr)
-    {
-      cell= mem->get_cell(addr);
-      if (store &&
-          (wtd & WTD_RESTORE))
-        *store= cell;
-      if (wtd & WTD_WRITE)
-        {
-          t_mem d= cell->get();
-          hw->write(cell, &d);
-        }
-    }
-}
-
-void
-cl_watched_cell::address_space_added(class cl_address_space *amem,
-                                     class cl_hw *hw)
-{
-}
-
-class cl_memory_cell *
-cl_watched_cell::get_cell()
-{
-  return cell;
-}
-
-void
-cl_used_cell::mem_cell_changed(class cl_address_space *amem, t_addr aaddr, 
-class cl_hw *hw)
-{
-  if (mem &&
-      mem == amem &&
-      addr == aaddr)
-    {
-      cell= mem->get_cell(addr);
-      if (store &&
-          (wtd & WTD_RESTORE))
-        *store= cell;
-      if (wtd & WTD_WRITE)
-        {
-          t_mem d= cell->get();
-          hw->write(cell, &d);
-        }
-    }
-}
-
-void
-cl_used_cell::address_space_added(class cl_address_space *amem,
-                                  class cl_hw *hw)
-{
-}
-
-
-/*
- *____________________________________________________________________________
- */
-
 cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, const char *aid_string):
   cl_guiobj()
 {
@@ -133,18 +54,40 @@ cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, const char *aid_strin
   sprintf(s, "partners of %s", get_name("hw"));
   partners= new cl_list(2, 2, s);
   sprintf(s, "watched cells of %s", get_name("hw"));
-  watched_cells= new cl_list(2, 2, s);
   free(s);
+  cfg= 0;
 }
 
 cl_hw::~cl_hw(void)
 {
-  free(id_string);
-  //hws_to_inform->disconn_all();
+  free((void*)id_string);
   delete partners;
-  delete watched_cells;
 }
 
+int
+cl_hw::init(void)
+{
+  chars n(id_string);
+  char s[100];
+  int i;
+    
+  snprintf(s, 99, "%d", id);
+  n+= '_';
+  n+= s;
+  n+= cchars("_cfg");
+
+  cfg= new cl_address_space(n, 0, cfg_size(), sizeof(t_mem)*8);
+  cfg->init();
+  cfg->hidden= true;
+  uc->address_spaces->add(cfg);
+
+  for (i= 0; i < cfg_size(); i++)
+    {
+      cfg->register_hw(i, this, false);
+    }
+  
+  return 0;
+}
 
 void
 cl_hw::new_hw_adding(class cl_hw *new_hw)
@@ -175,23 +118,44 @@ cl_hw::make_partner(enum hw_cath cath, int id)
   return(hw);
 }
 
-
-/*
- * Callback functions for changing memory locations
- */
-
-/*t_mem
-cl_hw::read(class cl_m *mem, t_addr addr)
+t_mem
+cl_hw::read(class cl_memory_cell *cell)
 {
-  // Simply return the value
-  return(mem->get(addr));
-}*/
+  conf(cell, NULL);
+  return cell->get();
+}
 
-/*void
-cl_hw::write(class cl_m *mem, t_addr addr, t_mem *val)
+void
+cl_hw::write(class cl_memory_cell *cell, t_mem *val)
 {
-  // Do not change *val by default
-}*/
+  conf(cell, val);    
+}
+
+bool
+cl_hw::conf(class cl_memory_cell *cell, t_mem *val)
+{
+  t_addr a;
+  if (cfg->is_owned(cell, &a))
+    {
+      conf_op(cell, a, val);
+      if (val)
+	cell->set(*val);
+      return true;
+    }
+  return false;
+}
+
+t_mem
+cl_hw::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  return cell->get();
+}
+
+void
+cl_hw::cfg_set(t_addr addr, t_mem val)
+{
+  cfg->set(addr, val);
+}
 
 void
 cl_hw::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
@@ -200,65 +164,20 @@ cl_hw::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 }
 
 class cl_memory_cell *
-cl_hw::register_cell(class cl_address_space *mem, t_addr addr,
-                     class cl_memory_cell **store,
-                     enum what_to_do_on_cell_change awtd)
+cl_hw::register_cell(class cl_address_space *mem, t_addr addr)
 {
-  class cl_watched_cell *wc;
-  //class cl_memory_cell *cell;
-
   if (mem)
-    mem->register_hw(addr, this, (int*)0, DD_FALSE);
+    mem->register_hw(addr, this, false);
   else
     printf("regcell JAJ no mem\n");
-  wc= new cl_watched_cell(mem, addr, store/*&cell*/, awtd);
-  //if (store)
-    //*store= cell;
-  watched_cells->add(wc);
-  // announce
-  //uc->sim->mem_cell_changed(mem, addr);
-  return(wc->get_cell());
-}
-
-class cl_memory_cell *
-cl_hw::use_cell(class cl_address_space *mem, t_addr addr,
-                class cl_memory_cell **store,
-                enum what_to_do_on_cell_change awtd)
-{
-  class cl_watched_cell *wc;
-  //class cl_memory_cell *cell;
-
-  wc= new cl_used_cell(mem, addr, store/*&cell*/, awtd);
-  //if (store)
-    //*store= cell;
-  watched_cells->add(wc);
-  return(wc->get_cell());
+  return mem->get_cell(addr);
 }
 
 void
-cl_hw::mem_cell_changed(class cl_address_space *mem, t_addr addr)
+cl_hw::unregister_cell(class cl_memory_cell *the_cell)
 {
-  int i;
-
-  for (i= 0; i < watched_cells->count; i++)
-    {
-      class cl_watched_cell *wc=
-        (class cl_watched_cell *)(watched_cells->at(i));
-      wc->mem_cell_changed(mem, addr, this);
-    }
-}
-
-void
-cl_hw::address_space_added(class cl_address_space *as)
-{
-  int i;
-
-  for (i= 0; i < watched_cells->count; i++)
-    {
-      class cl_watched_cell *wc=
-        dynamic_cast<class cl_watched_cell *>(watched_cells->object_at(i));
-      wc->address_space_added(as, this);
-    }
+  if (the_cell)
+    the_cell->remove_hw(this);
 }
 
 
@@ -292,6 +211,10 @@ cl_hw::print_info(class cl_console_base *con)
 }
 
 
+/*
+ * List of hw
+ */
+
 t_index
 cl_hws::add(void *item)
 {
@@ -315,32 +238,6 @@ cl_hws::add(void *item)
   ((class cl_hw *)item)->added_to_uc();
   return(res);
 }
-
-
-void
-cl_hws::mem_cell_changed(class cl_address_space *mem, t_addr addr)
-{
-  int i;
-  
-  for (i= 0; i < count; i++)
-    {
-      class cl_hw *hw= (class cl_hw *)(at(i));
-      hw->mem_cell_changed(mem, addr);
-    }
-}
-
-void
-cl_hws::address_space_added(class cl_address_space *mem)
-{
-  int i;
-  
-  for (i= 0; i < count; i++)
-    {
-      class cl_hw *hw= (class cl_hw *)(at(i));
-      hw->address_space_added(mem);
-    }
-}
-
 
 /*
  *____________________________________________________________________________
@@ -372,12 +269,12 @@ cl_partner_hw::refresh(void)
     {
       // partner is already set
       if (partner != hw)
-        {
-          // partner changed?
-          partner= hw;
-        }
+	{
+	  // partner changed?
+	  partner= hw;
+	}
       else
-        partner= hw;
+	partner= hw;
     }
   partner= hw;
 }
@@ -391,12 +288,12 @@ cl_partner_hw::refresh(class cl_hw *new_hw)
       id == new_hw->id)
     {
       if (partner)
-        {
-          // partner changed?
-          partner= new_hw;
-        }
+	{
+	  // partner changed?
+	  partner= new_hw;
+	}
       else
-        partner= new_hw;
+	partner= new_hw;
     }
 }
 

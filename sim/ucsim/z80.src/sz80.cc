@@ -40,12 +40,14 @@ main(int argc, char *argv[])
 {
   class cl_sim *sim;
 
+  cpus= cpus_z80;
   application= new cl_app();
   application->init(argc, argv);
   sim= new cl_simz80(application);
   sim->init();
   application->set_simulator(sim);
   application->run();
+  application->done();
   delete application;
   return(0);
 }

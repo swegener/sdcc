@@ -41,9 +41,11 @@ class cl_timer0: public cl_hw
 {
 protected:
   class cl_memory_cell *cell_tmod, *cell_tcon, *cell_tl, *cell_th;
+  class cl_memory_cell *tcon_bits[8];
+  class cl_address_space *bas;
   t_mem mask_M0, mask_M1, mask_C_T, mask_GATE, mask_TR, mask_INT,
     mask_T, mask_TF;
-  t_addr addr_tl, addr_th;
+  t_addr addr_tl, addr_th, addr_tcon;
   int mode, GATE, C_T, TR, INT, T_edge;
 public:
   cl_timer0(class cl_uc *auc, int aid, const char *aid_string);

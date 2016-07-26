@@ -60,10 +60,10 @@ cl_lr35902::init(void)
 {
   cl_uc::init(); /* Memories now exist */
 
-  rom= address_space(MEM_ROM_ID);  // code goes here...
+  //rom= address_space(MEM_ROM_ID);  // code goes here...
   
   //  ram= mem(MEM_XRAM);
-  ram= address_space(MEM_XRAM_ID);  // data goes here...
+  //ram= address_space(MEM_XRAM_ID);  // data goes here...
   
   
   // zero out ram(this is assumed in regression tests)
@@ -74,10 +74,10 @@ cl_lr35902::init(void)
   return(0);
 }
 
-const char *
+char *
 cl_lr35902::id_string(void)
 {
-  return("LR35902");
+  return((char*)"LR35902");
 }
 
 
@@ -85,14 +85,14 @@ void
 cl_lr35902::mk_hw_elements(void)
 {
   //class cl_base *o;
-  /* t_uc::mk_hw() does nothing */
+  cl_uc::mk_hw_elements();
 }
 
 void lr35902_memory::init(void) {
   cl_address_space *as_rom;
   cl_address_space *as_ram;
   
-  as_rom = new cl_address_space(MEM_ROM_ID,
+  as_rom = new cl_address_space("rom"/*MEM_ROM_ID*/,
 				lr35902_rom_start, lr35902_rom_size, 8);
   as_rom->init();
   uc_r.address_spaces->add(as_rom);
@@ -109,6 +109,104 @@ void
 cl_lr35902::make_memories(void)
 {
   mem.init( );
+  rom= mem.rom;
+  ram= mem.ram;
+  
+  regs8= new cl_address_space("regs8", 0, 16, 8);
+  regs8->init();
+  regs8->get_cell(0)->decode((t_mem*)&regs.A);
+  regs8->get_cell(1)->decode((t_mem*)&regs.F);
+  regs8->get_cell(2)->decode((t_mem*)&regs.bc.h);
+  regs8->get_cell(3)->decode((t_mem*)&regs.bc.l);
+  regs8->get_cell(4)->decode((t_mem*)&regs.de.h);
+  regs8->get_cell(5)->decode((t_mem*)&regs.de.l);
+  regs8->get_cell(6)->decode((t_mem*)&regs.hl.h);
+  regs8->get_cell(7)->decode((t_mem*)&regs.hl.l);
+
+  regs8->get_cell(8)->decode((t_mem*)&regs.aA);
+  regs8->get_cell(9)->decode((t_mem*)&regs.aF);
+  regs8->get_cell(10)->decode((t_mem*)&regs.a_bc.h);
+  regs8->get_cell(11)->decode((t_mem*)&regs.a_bc.l);
+  regs8->get_cell(12)->decode((t_mem*)&regs.a_de.h);
+  regs8->get_cell(13)->decode((t_mem*)&regs.a_de.l);
+  regs8->get_cell(14)->decode((t_mem*)&regs.a_hl.h);
+  regs8->get_cell(15)->decode((t_mem*)&regs.a_hl.l);
+
+  regs16= new cl_address_space("regs16", 0, 11, 16);
+  regs16->init();
+
+  regs16->get_cell(0)->decode((t_mem*)&regs.AF);
+  regs16->get_cell(1)->decode((t_mem*)&regs.BC);
+  regs16->get_cell(2)->decode((t_mem*)&regs.DE);
+  regs16->get_cell(3)->decode((t_mem*)&regs.HL);
+  regs16->get_cell(4)->decode((t_mem*)&regs.IX);
+  regs16->get_cell(5)->decode((t_mem*)&regs.IY);
+  regs16->get_cell(6)->decode((t_mem*)&regs.SP);
+  regs16->get_cell(7)->decode((t_mem*)&regs.aAF);
+  regs16->get_cell(8)->decode((t_mem*)&regs.aBC);
+  regs16->get_cell(9)->decode((t_mem*)&regs.aDE);
+  regs16->get_cell(10)->decode((t_mem*)&regs.aHL);
+
+  address_spaces->add(regs8);
+  address_spaces->add(regs16);
+
+  class cl_var *v;
+  vars->add(v= new cl_var(cchars("A"), regs8, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("F"), regs8, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("B"), regs8, 2));
+  v->init();
+  vars->add(v= new cl_var(cchars("C"), regs8, 3));
+  v->init();
+  vars->add(v= new cl_var(cchars("D"), regs8, 4));
+  v->init();
+  vars->add(v= new cl_var(cchars("E"), regs8, 5));
+  v->init();
+  vars->add(v= new cl_var(cchars("H"), regs8, 6));
+  v->init();
+  vars->add(v= new cl_var(cchars("L"), regs8, 7));
+  v->init();
+
+  vars->add(v= new cl_var(cchars("ALT_A"), regs8, 8));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_F"), regs8, 9));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_B"), regs8, 10));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_C"), regs8, 11));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_D"), regs8, 12));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_E"), regs8, 13));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_H"), regs8, 14));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_L"), regs8, 15));
+  v->init();
+
+  vars->add(v= new cl_var(cchars("AF"), regs16, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("BC"), regs16, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("DE"), regs16, 2));
+  v->init();
+  vars->add(v= new cl_var(cchars("HL"), regs16, 3));
+  v->init();
+  vars->add(v= new cl_var(cchars("IX"), regs16, 4));
+  v->init();
+  vars->add(v= new cl_var(cchars("IY"), regs16, 5));
+  v->init();
+  vars->add(v= new cl_var(cchars("SP"), regs16, 6));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_AF"), regs16, 7));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_BC"), regs16, 8));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_DE"), regs16, 9));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_HL"), regs16, 10));
+  v->init();
 }
 
 
@@ -135,7 +233,7 @@ void lr35902_memory::store1( TYPE_UWORD addr, t_mem val ) {
   }
   
   if ((addr- lr35902_ram_start) < lr35902_ram_size) {
-    ram->set(addr, val);
+    ram->write(addr, val);
   }
 }
 
@@ -146,7 +244,7 @@ void lr35902_memory::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
 
 TYPE_UBYTE  lr35902_memory::get1( TYPE_UWORD addr ) {
   if (addr < lr35902_rom_size) {
-    return rom->get(addr);    
+    return rom->read(addr);    
   }
   
   if (addr < lr35902_ram_start) {
@@ -155,7 +253,7 @@ TYPE_UBYTE  lr35902_memory::get1( TYPE_UWORD addr ) {
   }
   
   if ((addr-lr35902_ram_start) < lr35902_ram_size) {
-    return ram->get(addr);
+    return ram->read(addr);
   }
   
   return (addr & 0xff);
@@ -222,12 +320,12 @@ cl_lr35902::get_disasm_info(t_addr addr,
   int start_addr = addr;
   struct dis_entry *dis_e;
 
-  code= get_mem(MEM_ROM_ID, addr++);
+  code= rom->get(addr++);
   dis_e = NULL;
 
   switch(code) {
     case 0xcb:  /* ESC code to lots of op-codes, all 2-byte */
-      code= get_mem(MEM_ROM_ID, addr++);
+      code= rom->get(addr++);
       i= 0;
       while ((code & disass_lr35902_cb[i].mask) != disass_lr35902_cb[i].code &&
         disass_lr35902_cb[i].mnemonic)
@@ -270,7 +368,7 @@ cl_lr35902::get_disasm_info(t_addr addr,
   return b;
 }
 
-const char *
+char *
 cl_lr35902::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20];
@@ -297,18 +395,18 @@ cl_lr35902::disass(t_addr addr, const char *sep)
           switch (*(b++))
             {
             case 'd': // d    jump relative target, signed? byte immediate operand
-              sprintf(temp, "#%d", (char)get_mem(MEM_ROM_ID, addr+immed_offset));
+              sprintf(temp, "#%d", (char)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'w': // w    word immediate operand
               sprintf(temp, "#0x%04x",
-                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)) |
-                        (get_mem(MEM_ROM_ID, addr+immed_offset+1)<<8)) );
+                 (uint)((rom->get(addr+immed_offset)) |
+                        (rom->get(addr+immed_offset+1)<<8)) );
               ++immed_offset;
               ++immed_offset;
               break;
             case 'b': // b    byte immediate operand
-              sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
+              sprintf(temp, "#0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             default:

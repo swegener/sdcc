@@ -113,7 +113,7 @@ XCH,
 XOR,
 };
 
-extern char *op_mnemonic_str[];
+extern const char *op_mnemonic_str[];
 
 /* this classifies the operands and is used in the dissassembly
    to print the operands.  Its also used in the simulation to characterize

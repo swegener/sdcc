@@ -41,12 +41,13 @@ cl_pca::cl_pca(class cl_uc *auc, int aid):
 {
   t0_overflows= ECI_edge= 0;
   int i;
-  for (i= 0; i < 5; cex_pos[i]= cex_neg[i]= DD_FALSE, i++) ;
+  for (i= 0; i < 5; cex_pos[i]= cex_neg[i]= false, i++) ;
 }
 
 int
 cl_pca::init(void)
 {
+  cl_hw::init();
   sfr= uc->address_space(MEM_SFR_ID);
   //t_addr CCAPL[5]= {CCAPL[0], CCAPL[1], CCAPL[2], CCAPL[3], CCAPL[4]};
   //t_addr CCAPH[5]= {CCAPH[0], CCAPH[1], CCAPH[2], CCAPH[3], CCAPH[4]};
@@ -60,34 +61,56 @@ cl_pca::init(void)
     {
       fprintf(stderr, "No SFR to register PCA[%d] into\n", id);
     }
-  register_cell(sfr, CMOD, &cell_cmod, wtd_restore_write);
-  register_cell(sfr, CCON, &cell_ccon, wtd_restore_write);
+  cell_cmod= register_cell(sfr, CMOD);
+  cell_ccon= register_cell(sfr, CCON);
   for (i= 0; i < 5; i++)
     {
-      use_cell(sfr, CCAPL[i], &cell_ccapl[i], wtd_restore);
-      use_cell(sfr, CCAPH[i], &cell_ccaph[i], wtd_restore);
-      register_cell(sfr, CCAPM[i], &cell_ccapm[i], wtd_restore_write);
+      cell_ccapl[i]= sfr->get_cell(CCAPL[i]);//use_cell(sfr, CCAPL[i]);
+      cell_ccaph[i]= sfr->get_cell(CCAPH[i]);//use_cell(sfr, CCAPH[i]);
+      cell_ccapm[i]= register_cell(sfr, CCAPM[i]);
     }
-  use_cell(sfr, CL, &cell_cl, wtd_restore);
-  use_cell(sfr, CH, &cell_ch, wtd_restore);
+  cell_cl= sfr->get_cell(CL);//use_cell(sfr, CL);
+  cell_ch= sfr->get_cell(CH);//use_cell(sfr, CH);
+  cl_address_space *bas= uc->address_space("bits");
+  cell_cr= register_cell(bas, 0xda);
   return(0);
 }
 
 void
 cl_pca::added_to_uc(void)
 {
-  uc->it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF4, 0x0033, false,
-                                          "PCA module #4", 5));
-  uc->it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF3, 0x0033, false,
-                                          "PCA module #3", 5));
-  uc->it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF2, 0x0033, false,
-                                          "PCA module #2", 5));
-  uc->it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF1, 0x0033, false,
-                                          "PCA module #1", 5));
-  uc->it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCCF0, 0x0033, false,
-                                          "PCA module #0", 5));
-  uc->it_sources->add_at(4, new cl_it_src(bmEC, CCON, bmCF, 0x0033, false,
-                                          "PCA counter", 5));
+  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
+
+  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
+					  sfr->get_cell(IE), bmEC,
+					  sfr->get_cell(CCON), bmCCF4,
+					  0x0033, false, false,
+					  "PCA module #4", 5));
+  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
+					  sfr->get_cell(IE), bmEC,
+					  sfr->get_cell(CCON), bmCCF3,
+					  0x0033, false, false,
+					  "PCA module #3", 5));
+  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
+					  sfr->get_cell(IE), bmEC,
+					  sfr->get_cell(CCON), bmCCF2,
+					  0x0033, false, false,
+					  "PCA module #2", 5));
+  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
+					  sfr->get_cell(IE), bmEC,
+					  sfr->get_cell(CCON), bmCCF1,
+					  0x0033, false, false,
+					  "PCA module #1", 5));
+  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
+					  sfr->get_cell(IE), bmEC,
+					  sfr->get_cell(CCON), bmCCF0,
+					  0x0033, false, false,
+					  "PCA module #0", 5));
+  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
+					  sfr->get_cell(IE), bmEC,
+					  sfr->get_cell(CCON), bmCF,
+					  0x0033, false, false,
+					  "PCA counter", 5));
 }
 
 void
@@ -103,41 +126,45 @@ cl_pca::write(class cl_memory_cell *cell, t_mem *val)
       bit_ECF = *val & bmECF;
       t_mem o= clk_source;
       if ((clk_source= *val & (bmCPS1|bmCPS0)) != o)
-        t0_overflows= ECI_edge= 0;
+	t0_overflows= ECI_edge= 0;
     }
   else if (cell == cell_ccon)
     {
       bit_CR= *val & bmCR;
     }
+  else if (cell == cell_cr)
+    {
+      bit_CR= *val;
+    }
   else
     {
       int i;
       for (i= 0; i < 5; i++)
-        {
-          if (cell == cell_ccapm[i])
-            {
-              t_mem o= ccapm[i];
-              ccapm[i]= *val & 0xff;
-              if (o != ccapm[i])
-                cex_neg[i]= cex_pos[i]= DD_FALSE;
-            }
-          else
-            {
-              if (ccapm[i] & (bmMAT|bmTOG))
-              {
-                if (cell == cell_ccapl[i])
-                  {
-                    cell_ccapm[i]->set_bit0(bmECOM);
-                    ccapm[i]= cell_ccapm[i]->get();
-                  }
-                else if (cell == cell_ccaph[i])
-                  {
-                    cell_ccapm[i]->set_bit1(bmECOM);
-                    ccapm[i]= cell_ccapm[i]->get();
-                  }
-              }
-            }
-        }
+	{
+	  if (cell == cell_ccapm[i])
+	    {
+	      t_mem o= ccapm[i];
+	      ccapm[i]= *val & 0xff;
+	      if (o != ccapm[i])
+		cex_neg[i]= cex_pos[i]= false;
+	    }
+	  else
+	    {
+	      if (ccapm[i] & (bmMAT|bmTOG))
+	      {
+		if (cell == cell_ccapl[i])
+		  {
+		    cell_ccapm[i]->set_bit0(bmECOM);
+		    ccapm[i]= cell_ccapm[i]->get();
+		  }
+		else if (cell == cell_ccaph[i])
+		  {
+		    cell_ccapm[i]->set_bit1(bmECOM);
+		    ccapm[i]= cell_ccapm[i]->get();
+		  }
+	      }
+	    }
+	}
     }
 }
 
@@ -149,11 +176,11 @@ cl_pca::mem_cell_changed(class cl_m *mem, t_addr addr)
   if (mem && sfr && mem == sfr)
     {
       if (addr == addr_ccapXl)
-        ccapXl= sfr->get_cell(addr_ccapXl);
+	ccapXl= sfr->get_cell(addr_ccapXl);
       else if (addr == addr_ccapXh)
-        ccapXh= sfr->get_cell(addr_ccapXh);
+	ccapXh= sfr->get_cell(addr_ccapXh);
       else if (addr == addr_ccapmX)
-        ccapmX= sfr->get_cell(addr_ccapmX);
+	ccapmX= sfr->get_cell(addr_ccapmX);
     }
 }*/
 
@@ -196,22 +223,22 @@ cl_pca::do_pca_counter(int cycles)
   while (cycles--)
     {
       if (cell_cl->add(1) == 0)
-        {
-          int i;
-          for (i= 0; i < 5; i++)
-            if (ccapm[i] & bmPWM)
-              cell_ccapl[i]->set(cell_ccaph[i]->get());
-          if (cell_ch->add(1) == 0)
-            {
-              // CH,CL overflow
-              cell_ccon->set_bit1(bmCF);
-              do_pca_module(0);
-              do_pca_module(1);
-              do_pca_module(2);
-              do_pca_module(3);
-              do_pca_module(4);
-            }
-        }
+	{
+	  int i;
+	  for (i= 0; i < 5; i++)
+	    if (ccapm[i] & bmPWM)
+	      cell_ccapl[i]->set(cell_ccaph[i]->get());
+	  if (cell_ch->add(1) == 0)
+	    {
+	      // CH,CL overflow
+	      cell_ccon->set_bit1(bmCF);
+	      do_pca_module(0);
+	      do_pca_module(1);
+	      do_pca_module(2);
+	      do_pca_module(3);
+	      do_pca_module(4);
+	    }
+	}
     }
 }
 
@@ -222,18 +249,18 @@ cl_pca::do_pca_module(int nr)
   uchar bmCCF[5]= {bmCCF0, bmCCF1, bmCCF2, bmCCF3, bmCCF4};
   //uint p1= sfr->get(P1);
 
-  bool capture= DD_FALSE;
+  bool capture= false;
   if ((ccapm[nr] & bmCAPP) &&
       cex_pos[nr])
     {
-      capture= DD_TRUE;
-      cex_pos[nr]= DD_FALSE;
+      capture= true;
+      cex_pos[nr]= false;
     }
   if ((ccapm[nr] & bmCAPN) &&
       cex_neg[nr])
     {
-      capture= DD_TRUE;
-      cex_pos[nr]= DD_FALSE;
+      capture= true;
+      cex_pos[nr]= false;
     }
   if (capture)
     {
@@ -247,33 +274,33 @@ cl_pca::do_pca_module(int nr)
     {
       // Comparator enabled
       if (cell_cl->get() == cell_ccapl[nr]->get() &&
-          cell_ch->get() == cell_ccaph[nr]->get())
-        {
-          // Match
-          if (nr == 4 &&
-              (bit_WDTE))
-            {
-              reset();
-              return;
-            }
-          cell_ccon->set_bit1(bmCCF[nr]);
-          if (ccapm[nr] & bmTOG)
-            {
-              // Toggle
-              sfr->set(P1, sfr->get(P1) ^ bmCEX[nr]);
-            }
-        }
+	  cell_ch->get() == cell_ccaph[nr]->get())
+	{
+	  // Match
+	  if (nr == 4 &&
+	      (bit_WDTE))
+	    {
+	      reset();
+	      return;
+	    }
+	  cell_ccon->set_bit1(bmCCF[nr]);
+	  if (ccapm[nr] & bmTOG)
+	    {
+	      // Toggle
+	      sfr->set(P1, sfr->get(P1) ^ bmCEX[nr]);
+	    }
+	}
       if (ccapm[nr] & bmPWM)
-        {
-          // PWM
-          /*if (cell_cl->get() == 0)
-            cell_ccapl[nr]->set(cell_ccaph[nr]->get());*/
-          if (cell_cl->get() < cell_ccapl[nr]->get())
-            //sfr->set(P1, sfr->get(P1) & ~(bmCEX[nr]));
-            sfr->set_bit1(P1, bmCEX[nr]);
-          else
-            sfr->set_bit1(P1, bmCEX[nr]);
-        }
+	{
+	  // PWM
+	  /*if (cell_cl->get() == 0)
+	    cell_ccapl[nr]->set(cell_ccaph[nr]->get());*/
+	  if (cell_cl->get() < cell_ccapl[nr]->get())
+	    //sfr->set(P1, sfr->get(P1) & ~(bmCEX[nr]));
+	    sfr->set_bit1(P1, bmCEX[nr]);
+	  else
+	    sfr->set_bit1(P1, bmCEX[nr]);
+	}
     }
 }
 
@@ -282,7 +309,7 @@ cl_pca::reset(void)
 {
   t0_overflows= ECI_edge= 0;
   int i;
-  for (i= 0; i < 5; cex_pos[i]= cex_neg[i]= DD_FALSE, i++) ;
+  for (i= 0; i < 5; cex_pos[i]= cex_neg[i]= false, i++) ;
 }
 
 void
@@ -298,22 +325,22 @@ cl_pca::happen(class cl_hw *where, enum hw_event he, void *params)
       t_mem p1n= ep->new_pins & ep->new_value;
       t_mem p1o= ep->pins & ep->prev_value;
       if (!(p1n & bmECI) &&
-          (p1o & bmECI))
-        ECI_edge++;
+	  (p1o & bmECI))
+	ECI_edge++;
       int i;
       for (i= 0; i < 5; i++)
-        {
-          if (!(p1n & bmCEX[i]) &&
-              (p1o & bmCEX[i]))
-            cex_neg[i]= DD_TRUE;
-          else if ((p1n & bmCEX[i]) &&
-                   !(p1o & bmCEX[i]))
-            cex_pos[i]= DD_TRUE;
-        }
+	{
+	  if (!(p1n & bmCEX[i]) &&
+	      (p1o & bmCEX[i]))
+	    cex_neg[i]= true;
+	  else if ((p1n & bmCEX[i]) &&
+		   !(p1o & bmCEX[i]))
+	    cex_pos[i]= true;
+	}
     }
   else if (where->cathegory == HW_TIMER &&
-           he == EV_OVERFLOW &&
-           where->id == 0)
+	   he == EV_OVERFLOW &&
+	   where->id == 0)
     {
       t0_overflows++;
     }

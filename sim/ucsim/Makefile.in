@@ -17,8 +17,6 @@ srcdir		= @srcdir@
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
-transform	= @program_transform_name@
-
 # Compiling entire program or any subproject
 # ------------------------------------------
 all: checkconf
@@ -131,7 +129,7 @@ dep:
 # My rules
 # --------
 putcopyright:
-	'put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l
+	'./put(c)' -s $(STARTYEAR) *.cc *.h *.y *.l
 
 start:
 	date '+%Y.%m.%d-%H:%M' >.start
@@ -165,9 +163,9 @@ lines:
 
 # Remaking configuration
 # ----------------------
-configure: configure.in
+configure: configure.ac
 	@$(top_srcdir)/mkecho $(top_builddir) "RE-CREATING CONFIGURE"
-	autoconf configure.in >configure
+	autoconf configure.ac >configure
 	chmod 755 configure
 
 config.status: configure

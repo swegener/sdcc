@@ -1,8 +1,8 @@
 /*
  * Simulator of microcontrollers (pobj.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- *
+ * Copyright (C) 1997,16 Drotos Daniel, Talker Bt.
+ * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -61,7 +61,7 @@ cl_base::cl_base(void)
 cl_base::~cl_base(void)
 {
   if (name)
-    free(name);
+    free((void*)name);
   if (children)
     {
       int i;
@@ -88,7 +88,7 @@ const char *
 cl_base::set_name(const char *new_name)
 {
   if (name)
-    free(name);
+    free((void*)name);
   if (!new_name)
     name= 0;
   else if (*new_name)
@@ -109,7 +109,7 @@ cl_base::set_name(const char *new_name, const char *def_name)
   else
     def= strdup(def_name);
   if (name)
-    free(name);
+    free((void*)name);
   if (!new_name)
     name= def;
   else if (*new_name)
@@ -126,7 +126,7 @@ cl_base::is_named(const char *the_name)
       !*name ||
       !the_name ||
       !*the_name)
-    return(DD_FALSE);
+    return(false);
   return(strcmp(name, the_name) == 0);
 }
 
@@ -137,7 +137,7 @@ cl_base::is_inamed(const char *the_name)
       !*name ||
       !the_name ||
       !*the_name)
-    return(DD_FALSE);
+    return(false);
   return(strcasecmp(name, the_name) == 0);
 }
 
@@ -222,7 +222,7 @@ cl_base::pass_event_down(class cl_event &event)
 {
   int i;
   if (!children)
-    return(DD_FALSE);
+    return(false);
   for (i= 0; i < children->count; i++)
     {
       class cl_base *child=
@@ -231,10 +231,10 @@ cl_base::pass_event_down(class cl_event &event)
 	{
 	  child->handle_event(event);
 	  if (event.is_handled())
-	    return(DD_TRUE);
+	    return(true);
 	}
     }
-  return(DD_FALSE);
+  return(false);
 }
 
 
@@ -245,7 +245,7 @@ cl_base::pass_event_down(class cl_event &event)
 cl_event::cl_event(enum event what_event):
   cl_base()
 {
-  handled= DD_FALSE;
+  handled= false;
   what= what_event;
 }
 
@@ -264,6 +264,17 @@ cl_event::~cl_event(void)
 /*
  * Initializing a collection
  */
+
+cl_list::cl_list(t_index alimit, t_index adelta, char *aname):
+  cl_base()
+{
+  count= 0;
+  Items= 0;
+  Limit= 0;
+  Delta= adelta;
+  set_limit(alimit);
+  set_name(aname, "unnamed list");
+}
 
 cl_list::cl_list(t_index alimit, t_index adelta, const char *aname):
   cl_base()
@@ -409,19 +420,21 @@ cl_list::add_at(t_index index, void *item)
   if (count == Limit)
     set_limit(count + Delta);
 
-  { char s[1000];
-  s[0]='\0';
-  sprintf(s, "%s add_at(%d,%p) PC=0x%x (count=%d)", get_name("?"), index, item,
-	  application?
-	  ((application->sim)?
-	   ((application->sim->uc)?(application->sim->uc->PC):
-	    -3):
-	   -1):
-	  -2, count);
-  strcat(s,"\n");}
+  /*{
+    char s[1000];
+    s[0]='\0';
+    sprintf(s, "%s add_at(%d,%p) PC=0x%x (count=%d)", get_name("?"), index, item,
+	    application?
+	    ((application->sim)?
+	     ((application->sim->uc)?(application->sim->uc->PC):
+	      -3):
+	     -1):
+	    -2, count);
+    strcat(s,"\n");
+    }*/
   memmove(&Items[index+1], &Items[index], (count-index)*sizeof(void *));
   count++;
-
+  
   Items[index]= item;
 }
 
@@ -460,7 +473,7 @@ cl_list::error(t_index code, t_index info)
  */
 
 void *
-cl_list::first_that(match_func test, const void *arg)
+cl_list::first_that(match_func test, void *arg)
 {
   for (t_index i= 0; i < count; i++)
     {
@@ -547,9 +560,9 @@ cl_list::index_of(void *item, t_index *idx)
       {
 	if (idx)
 	  *idx= i;
-	return(DD_TRUE);
+	return(true);
       }
-  return(DD_FALSE);
+  return(false);
 }
 
 void *
@@ -659,7 +672,8 @@ cl_list::set_limit(t_index alimit)
 	    memcpy(AItems, Items, count*sizeof(void *));
 	}
       //delete Items;
-      free(Items);
+      if (Items)
+	free(Items);
       Items= AItems;
       Limit= alimit;
     }
@@ -677,10 +691,16 @@ cl_list::set_limit(t_index alimit)
  * Initilizing the sorted collection
  */
 
+cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta, char *aname):
+  cl_list(alimit, adelta, aname)
+{
+  Duplicates= false;
+}
+
 cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta, const char *aname):
   cl_list(alimit, adelta, aname)
 {
-  Duplicates= DD_FALSE;
+  Duplicates= false;
 }
 
 
@@ -691,7 +711,7 @@ cl_sorted_list::~cl_sorted_list(void) {}
  * Get the address of the key field in an item.
  */
 
-const void *
+void *
 cl_sorted_list::key_of(void *item)
 {
   return(item);
@@ -746,11 +766,11 @@ cl_sorted_list::add(void *item)
  */
 
 bool
-cl_sorted_list::search(const void *key, t_index &index)
+cl_sorted_list::search(void *key, t_index &index)
 {
   t_index l  = 0;
   t_index h  = count - 1;
-  bool    res= DD_FALSE;
+  bool    res= false;
 
   while (l <= h)
     {
@@ -762,7 +782,7 @@ cl_sorted_list::search(const void *key, t_index &index)
 	  h= i - 1;
 	  if (c == 0)
 	    {
-	      res= DD_TRUE;
+	      res= true;
 	      if (!Duplicates)
 		l= i;
 	    }
@@ -784,10 +804,16 @@ cl_sorted_list::search(const void *key, t_index &index)
  * Initilizing the string collection
  */
 
+cl_strings::cl_strings(t_index alimit, t_index adelta, char *aname):
+  cl_sorted_list(alimit, adelta, aname)
+{
+  Duplicates= true;
+}
+
 cl_strings::cl_strings(t_index alimit, t_index adelta, const char *aname):
   cl_sorted_list(alimit, adelta, aname)
 {
-  Duplicates= DD_TRUE;
+  Duplicates= true;
 }
 
 
@@ -799,9 +825,9 @@ cl_strings::~cl_strings(void) {}
  */
 
 int
-cl_strings::compare(const void *key1, const void *key2)
+cl_strings::compare(void *key1, void *key2)
 {
-  return(strcmp(static_cast<const char *>(key1), static_cast<const char *>(key2)));
+  return(strcmp((char *)key1, (char *)key2));
 }
 
 
@@ -827,10 +853,13 @@ cl_strings::free_item(void* item)
  * Initilizing the unsorted string collection
  */
 
-cl_ustrings::cl_ustrings(t_index alimit, t_index adelta, const char *aname):
+cl_ustrings::cl_ustrings(t_index alimit, t_index adelta, char *aname):
   cl_strings(alimit, adelta, aname)
 {}
 
+cl_ustrings::cl_ustrings(t_index alimit, t_index adelta, const char *aname):
+  cl_strings(alimit, adelta, aname)
+{}
 
 cl_ustrings::~cl_ustrings(void) {}
 
@@ -840,7 +869,7 @@ cl_ustrings::~cl_ustrings(void) {}
  */
 
 int
-cl_ustrings::compare(const void *key1, const void *key2)
+cl_ustrings::compare(void *key1, void *key2)
 {
   return(-1);
 }
@@ -851,11 +880,11 @@ cl_ustrings::compare(const void *key1, const void *key2)
  */
 
 bool
-cl_ustrings::search(const void *key, t_index& index)
+cl_ustrings::search(void *key, t_index& index)
 {
   t_index i    = 0;
-  bool    found= DD_FALSE;
-  const void *Actual;
+  bool    found= false;
+  void    *Actual;
 
   if ((count) && key)
     {

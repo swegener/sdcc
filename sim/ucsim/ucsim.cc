@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (ucsim.cc)
  *
- * Copyright (C) 2001,01 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1997,16 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // prj
 #include "globals.h"
 #include "appcl.h"
+
+#include "charscl.h"
 
 int
 main(int argc, char *argv[])

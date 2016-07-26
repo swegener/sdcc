@@ -39,9 +39,10 @@ class cl_port: public cl_hw
 {
 public:
   t_addr addr_p;
-  class cl_memory_cell *cell_p;
+  class cl_memory_cell *cell_p, *bit_cells[8];
   t_mem port_pins;
   t_mem prev;
+  class cl_address_space *bas;
 public:
   cl_port(class cl_uc *auc, int aid);
   virtual int init(void);

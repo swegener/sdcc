@@ -1,7 +1,7 @@
 /*
  * Simulator of microcontrollers (globals.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 1997,16 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -362,7 +362,7 @@ const char *copying=
  * Information about different type of CPUs
  */
 
-struct cpu_entry *cpus= NIL;
+struct cpu_entry *cpus= 0;
 
 struct cpu_entry cpus_51[]=
 {
@@ -398,7 +398,8 @@ struct cpu_entry cpus_51[]=
   {"C51RC" , CPU_51R, CPU_CMOS},
 
   {"89C51R", CPU_89C51R, CPU_CMOS},
-
+  {"C521"  , CPU_C521  , CPU_CMOS},
+  
   {"251"   , CPU_251, CPU_CMOS},
   {"C251"  , CPU_251, CPU_CMOS},
 

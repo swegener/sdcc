@@ -46,6 +46,7 @@ main(int argc, char *argv[])
   sim->init();
   application->set_simulator(sim);
   application->run();
+  application->done();
   delete application;
   return(0);
 }

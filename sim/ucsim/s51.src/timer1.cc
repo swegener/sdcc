@@ -38,6 +38,7 @@ cl_timer1::cl_timer1(class cl_uc *auc, int aid, const char *aid_string):
 /*int
 cl_timer1::init(void)
 {
+  cl_hw::init();
   return(0);
 }*/
 
@@ -69,7 +70,7 @@ cl_timer1::print_info(class cl_console_base *con)
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
 
   con->dd_printf("%s[%d] 0x%04x", id_string, id,
-                 256*cell_th->get()+cell_tl->get());
+		 256*cell_th->get()+cell_tl->get());
   //int mode= (tmod & (bmM11|bmM01)) >> 4;
   con->dd_printf(" %s", modes[mode]);
   con->dd_printf(" %s", (/*tmod&bm*/C_T/*1*/)?"counter":"timer");
@@ -83,7 +84,7 @@ cl_timer1::print_info(class cl_console_base *con)
   con->dd_printf(" %s", on?"ON":"OFF");
   con->dd_printf(" irq=%c", (cell_tcon->get()&mask_TF)?'1':'0');
   con->dd_printf(" %s", sfr?"?":((sfr->get(IE)&bmET1)?"en":"dis"));
-  con->dd_printf(" prio=%d", uc->it_priority(bmPT1));
+  con->dd_printf(" prio=%d", uc->priority_of(bmPT1));
   con->dd_printf("\n");
 }
 

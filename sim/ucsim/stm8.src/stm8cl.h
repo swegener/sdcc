@@ -25,28 +25,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+/* $Id: stm8cl.h 353 2016-07-10 16:36:55Z  $ */
+
 #ifndef STM8CL_HEADER
 #define STM8CL_HEADER
 
 #include "uccl.h"
+#include "itsrccl.h"
 
 #include "regsstm8.h"
+#include "itccl.h"
 
 
 /*
- * Base type of Z80 microcontrollers
+ * Base type of STM8 microcontrollers
  */
 
 class cl_stm8: public cl_uc
 {
 public:
-  class cl_memory *ram;
-  class cl_memory *rom;
+  class cl_address_space *ram;
+  class cl_address_space *regs8;
+  class cl_address_space *regs16;
+  //class cl_memory *rom;
   struct t_regs regs;
+  class cl_itc *itc;
+  class cl_it_src *trap_src;
 public:
   cl_stm8(class cl_sim *asim);
   virtual int init(void);
-  virtual const char *id_string(void);
+  virtual char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
@@ -56,7 +64,7 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
-  virtual const char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr, const char *sep);
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
@@ -69,6 +77,13 @@ public:
   virtual bool is_call(t_addr addr);
 
   virtual void reset(void);
+
+  virtual int  do_interrupt(void);
+  virtual int  priority_of(uchar nuof_it);
+  virtual int  priority_main(void);
+  virtual int  accept_it(class it_level *il);
+  virtual bool it_enabled(void);
+
 #include "instcl.h"
 };
 

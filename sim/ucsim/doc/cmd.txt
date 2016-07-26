@@ -61,6 +61,7 @@ G	timer value,set id value
 	memory createchip,cchip id size cellsize
 	memory createaddressspace,createaddrspace,createaspace,caddressspace,caddrspace,caspace id startaddr size
 	memory createaddressdecoder,createaddrdecoder,createadecoder,caddressdecoder,caddrdecoder,cadecoder addressspace begin end chip begin
+G	memory info
 
 	s51
 	

@@ -42,11 +42,12 @@ class cl_hc08: public cl_uc
 public:
   class cl_memory *ram;
   class cl_memory *rom;
+  class cl_address_space *regs8, *regs16;
   struct t_regs regs;
 public:
   cl_hc08(int Itype, int Itech, class cl_sim *asim);
   virtual int init(void);
-  virtual const char *id_string(void);
+  virtual char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
@@ -56,18 +57,18 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
-  virtual const char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr, const char *sep);
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
 
-  virtual const char *get_disasm_info(t_addr addr,
-                                      int *ret_len,
-                                      int *ret_branch,
-                                      int *immed_offset,
-                                      struct dis_entry **dentry);
+  virtual const char * get_disasm_info(t_addr addr,
+				       int *ret_len,
+				       int *ret_branch,
+				       int *immed_offset,
+				       struct dis_entry **dentry);
   virtual bool is_call(t_addr addr);
-
+  
   virtual void reset(void);
 #include "instcl.h"
 };

@@ -18,8 +18,6 @@ MAKEDEP         = @MAKEDEP@
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
 
-transform	= @program_transform_name@
-
 DEFS            = $(subs -DHAVE_CONFIG_H,,@DEFS@)
 CPPFLAGS        = @CPPFLAGS@ -I$(srcdir) -I$(top_srcdir) -I$(top_builddir) \
 		  -I$(top_srcdir)/cmd.src -I$(top_srcdir)/sim.src \
@@ -50,7 +48,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= glob.o \
+OBJECTS_SHARED	= glob.o itc.o serial.o rst.o timer.o \
 		  inst.o \
 		  simstm8.o stm8.o
 OBJECTS_EXE	= sstm8.o
@@ -119,7 +117,7 @@ include $(srcdir)/clean.mk
 stm8.src: sstm8$(EXEEXT)  shared_lib
 
 sstm8$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS)  -o $@ $(OBJECTS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -Wl,--start-group $(LIBS) -Wl,--end-group -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/sstm8.so
@@ -147,7 +145,7 @@ otherlibs:
 # ----------------------
 checkconf:
 	@if [ -f $(top_builddir)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
+	  $(MAKE) -C $(top_builddir) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
 # End of stm8.src/Makefile.in

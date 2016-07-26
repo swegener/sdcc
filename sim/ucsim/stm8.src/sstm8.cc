@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
   
+/* $Id: sstm8.cc 345 2016-07-10 14:51:45Z  $ */
+
 // prj
 #include "globals.h"
 
@@ -46,6 +48,7 @@ main(int argc, char *argv[])
   sim->init();
   application->set_simulator(sim);
   application->run();
+  application->done();
   delete application;
   return(0);
 }

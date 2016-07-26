@@ -81,7 +81,7 @@ void cl_r2k::store1( TYPE_UWORD addr, t_mem val ) {
   }
   
   phys_addr = mmu.logical_addr_to_phys( addr );
-  ram->set(phys_addr, val);
+  ram->write(phys_addr, val);
 }
 
 void cl_r2k::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
@@ -99,8 +99,8 @@ void cl_r2k::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
   
   phys_addr = mmu.logical_addr_to_phys( addr );
   
-  ram->set(phys_addr,   val & 0xff);
-  ram->set(phys_addr+1, (val >> 8) & 0xff);
+  ram->write(phys_addr,   val & 0xff);
+  ram->write(phys_addr+1, (val >> 8) & 0xff);
 }
 
 TYPE_UBYTE  cl_r2k::get1( TYPE_UWORD addr ) {
@@ -115,7 +115,7 @@ TYPE_UBYTE  cl_r2k::get1( TYPE_UWORD addr ) {
     return 0;
   }
   
-  return ram->get(phys_addr);
+  return ram->read(phys_addr);
 }
 
 TYPE_UWORD  cl_r2k::get2( TYPE_UWORD addr ) {
@@ -131,8 +131,8 @@ TYPE_UWORD  cl_r2k::get2( TYPE_UWORD addr ) {
     return 0;
   }
   
-  l = ram->get(phys_addr  );
-  h = ram->get(phys_addr+1);
+  l = ram->read(phys_addr  );
+  h = ram->read(phys_addr+1);
   
   return (h << 8) | l;
 }

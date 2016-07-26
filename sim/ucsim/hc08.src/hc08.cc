@@ -49,6 +49,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define uint32 t_addr
 #define uint8 unsigned char
+#define int8 char
+
+const bool TRUE = 1;
+const bool FALSE = 0;
 
 /*******************************************************************/
 
@@ -70,9 +74,9 @@ cl_hc08::init(void)
 
   xtal = 8000000;
 
-  rom= address_space(MEM_ROM_ID);
+  //rom= address_space(MEM_ROM_ID);
 //  ram= mem(MEM_XRAM);
-  ram= rom;
+  //ram= rom;
 
   // zero out ram(this is assumed in regression tests)
   for (int i=0x80; i<0x8000; i++) {
@@ -98,10 +102,10 @@ cl_hc08::reset(void)
 }
 
 
-const char *
+char *
 cl_hc08::id_string(void)
 {
-  return("unspecified HC08");
+  return((char*)"unspecified HC08");
 }
 
 
@@ -125,7 +129,7 @@ void
 cl_hc08::mk_hw_elements(void)
 {
   //class cl_base *o;
-  /* t_uc::mk_hw() does nothing */
+  cl_uc::mk_hw_elements();
 }
 
 void
@@ -133,7 +137,7 @@ cl_hc08::make_memories(void)
 {
   class cl_address_space *as;
 
-  as= new cl_address_space("rom", 0, 0x10000, 8);
+  rom= ram= as= new cl_address_space("rom", 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);
 
@@ -147,6 +151,35 @@ cl_hc08::make_memories(void)
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
+
+
+  regs8= new cl_address_space("regs8", 0, 4, 8);
+  regs8->init();
+  regs8->get_cell(0)->decode((t_mem*)&regs.A);
+  regs8->get_cell(1)->decode((t_mem*)&regs.P);
+  regs8->get_cell(2)->decode((t_mem*)&regs.H);
+  regs8->get_cell(3)->decode((t_mem*)&regs.X);
+
+  regs16= new cl_address_space("regs16", 0, 1, 16);
+  regs16->init();
+
+  regs16->get_cell(0)->decode((t_mem*)&regs.SP);
+
+  address_spaces->add(regs8);
+  address_spaces->add(regs16);
+
+  class cl_var *v;
+  vars->add(v= new cl_var(cchars("A"), regs8, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("P"), regs8, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("H"), regs8, 2));
+  v->init();
+  vars->add(v= new cl_var(cchars("X"), regs8, 3));
+  v->init();
+
+  vars->add(v= new cl_var(cchars("SP"), regs16, 0));
+  v->init();
 }
 
 
@@ -177,8 +210,9 @@ int
 cl_hc08::inst_length(t_addr addr)
 {
   int len = 0;
+  /*char *s;
 
-  get_disasm_info(addr, &len, NULL, NULL, NULL);
+    s =*/ get_disasm_info(addr, &len, NULL, NULL, NULL);
 
   return len;
 }
@@ -187,11 +221,13 @@ int
 cl_hc08::inst_branch(t_addr addr)
 {
   int b;
+  /*char *s;
 
-  get_disasm_info(addr, NULL, &b, NULL, NULL);
+    s =*/ get_disasm_info(addr, NULL, &b, NULL, NULL);
 
   return b;
 }
+
 
 bool
 cl_hc08::is_call(t_addr addr)
@@ -225,12 +261,12 @@ cl_hc08::get_disasm_info(t_addr addr,
   int start_addr = addr;
   struct dis_entry *dis_e;
 
-  code= get_mem(MEM_ROM_ID, addr++);
+  code= rom->get(addr++);
   dis_e = NULL;
 
   switch(code) {
     case 0x9e:  /* ESC code to sp relative op-codes */
-      code= get_mem(MEM_ROM_ID, addr++);
+      code= rom->get(addr++);
       i= 0;
       while ((code & disass_hc08_9e[i].mask) != disass_hc08_9e[i].code &&
         disass_hc08_9e[i].mnemonic)
@@ -275,12 +311,12 @@ cl_hc08::get_disasm_info(t_addr addr,
   return b;
 }
 
-const char *
+char *
 cl_hc08::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20];
+  char *buf, *p, *t, *s;
   const char *b;
-  char *buf, *p, *t;
   int len = 0;
   int immed_offset = 0;
 
@@ -297,63 +333,63 @@ cl_hc08::disass(t_addr addr, const char *sep)
   while (*b)
     {
       if (*b == '%')
-        {
-          b++;
-          switch (*(b++))
-            {
-            case 's': // s    signed byte immediate
-              sprintf(temp, "#%d", (char)get_mem(MEM_ROM_ID, addr+immed_offset));
-              ++immed_offset;
-              break;
-            case 'w': // w    word immediate operand
-              sprintf(temp, "#0x%04x",
-                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-                        (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
-              ++immed_offset;
-              ++immed_offset;
-              break;
-            case 'b': // b    byte immediate operand
-              sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
-              ++immed_offset;
-              break;
-            case 'x': // x    extended addressing
-              sprintf(temp, "0x%04x",
-                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-                        (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
-              ++immed_offset;
-              ++immed_offset;
-              break;
-            case 'd': // d    direct addressing
-              sprintf(temp, "*0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
-              ++immed_offset;
-              break;
-            case '2': // 2    word index offset
-              sprintf(temp, "0x%04x",
-                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-                        (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
-              ++immed_offset;
-              ++immed_offset;
-              break;
-            case '1': // b    byte index offset
-              sprintf(temp, "0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
-              ++immed_offset;
-              break;
-            case 'p': // b    byte index offset
-              sprintf(temp, "0x%04x",
-                 addr+immed_offset+1
-                 +(char)get_mem(MEM_ROM_ID, addr+immed_offset));
-              ++immed_offset;
-              break;
-            default:
-              strcpy(temp, "?");
-              break;
-            }
-          t= temp;
-          while (*t)
-            *(p++)= *(t++);
-        }
+	{
+	  b++;
+	  switch (*(b++))
+	    {
+	    case 's': // s    signed byte immediate
+	      sprintf(temp, "#%d", (char)rom->get(addr+immed_offset));
+	      ++immed_offset;
+	      break;
+	    case 'w': // w    word immediate operand
+	      sprintf(temp, "#0x%04x",
+	         (uint)((rom->get(addr+immed_offset)<<8) |
+	                (rom->get(addr+immed_offset+1))) );
+	      ++immed_offset;
+	      ++immed_offset;
+	      break;
+	    case 'b': // b    byte immediate operand
+	      sprintf(temp, "#0x%02x", (uint)rom->get(addr+immed_offset));
+	      ++immed_offset;
+	      break;
+	    case 'x': // x    extended addressing
+	      sprintf(temp, "0x%04x",
+	         (uint)((rom->get(addr+immed_offset)<<8) |
+	                (rom->get(addr+immed_offset+1))) );
+	      ++immed_offset;
+	      ++immed_offset;
+	      break;
+	    case 'd': // d    direct addressing
+	      sprintf(temp, "*0x%02x", (uint)rom->get(addr+immed_offset));
+	      ++immed_offset;
+	      break;
+	    case '2': // 2    word index offset
+	      sprintf(temp, "0x%04x",
+	         (uint)((rom->get(addr+immed_offset)<<8) |
+	                (rom->get(addr+immed_offset+1))) );
+	      ++immed_offset;
+	      ++immed_offset;
+	      break;
+	    case '1': // b    byte index offset
+              sprintf(temp, "0x%02x", (uint)rom->get(addr+immed_offset));
+	      ++immed_offset;
+	      break;
+	    case 'p': // b    byte index offset
+              sprintf(temp, "0x%04lx",
+		      (long int)(addr+immed_offset+1
+				 +(char)rom->get(addr+immed_offset)));
+	      ++immed_offset;
+	      break;
+	    default:
+	      strcpy(temp, "?");
+	      break;
+	    }
+	  t= temp;
+	  while (*t)
+	    *(p++)= *(t++);
+	}
       else
-        *(p++)= *(b++);
+	*(p++)= *(b++);
     }
   *p= '\0';
 
@@ -367,18 +403,19 @@ cl_hc08::disass(t_addr addr, const char *sep)
     buf= (char *)malloc(6+strlen(p)+1);
   else
     buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, t= buf; *p != ' '; p++, t++)
-    *t= *p;
+  for (p= work, s= buf; *p != ' '; p++, s++)
+    *s= *p;
   p++;
-  *t= '\0';
+  *s= '\0';
   if (sep == NULL)
     {
       while (strlen(buf) < 6)
-        strcat(buf, " ");
+	strcat(buf, " ");
     }
   else
     strcat(buf, sep);
   strcat(buf, p);
+
   return(buf);
 }
 
@@ -387,20 +424,20 @@ void
 cl_hc08::print_regs(class cl_console_base *con)
 {
   con->dd_printf("V--HINZC  Flags= 0x%02x %3d %c  ",
-                 regs.P, regs.P, isprint(regs.P)?regs.P:'.');
+		 regs.P, regs.P, isprint(regs.P)?regs.P:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",
-                 regs.A, regs.A, isprint(regs.A)?regs.A:'.');
+		 regs.A, regs.A, isprint(regs.A)?regs.A:'.');
   con->dd_printf("%c--%c%c%c%c%c  ",
-                 (regs.P&BIT_V)?'1':'0',
-                 (regs.P&BIT_H)?'1':'0',
-                 (regs.P&BIT_I)?'1':'0',
-                 (regs.P&BIT_N)?'1':'0',
-                 (regs.P&BIT_Z)?'1':'0',
-                 (regs.P&BIT_C)?'1':'0');
+		 (regs.P&BIT_V)?'1':'0',
+		 (regs.P&BIT_H)?'1':'0',
+		 (regs.P&BIT_I)?'1':'0',
+		 (regs.P&BIT_N)?'1':'0',
+		 (regs.P&BIT_Z)?'1':'0',
+		 (regs.P&BIT_C)?'1':'0');
   con->dd_printf("    H= 0x%02x %3d %c  ",
-                 regs.H, regs.H, isprint(regs.H)?regs.H:'.');
+		 regs.H, regs.H, isprint(regs.H)?regs.H:'.');
   con->dd_printf("X= 0x%02x %3d %c\n",
-                 regs.X, regs.X, isprint(regs.X)?regs.X:'.');
+		 regs.X, regs.X, isprint(regs.X)?regs.X:'.');
   con->dd_printf("SP= 0x%04x [SP+1]= %02x %3d %c\n",
                  regs.SP, ram->get(regs.SP+1), ram->get(regs.SP+1),
                  isprint(ram->get(regs.SP+1))?ram->get(regs.SP+1):'.');
@@ -427,16 +464,16 @@ cl_hc08::exec_inst(void)
     return(resBREAKPOINT);
   tick(1);
   switch ((code >> 4) & 0xf) {
-    case 0x0: return(inst_bittestsetclear(code, false));
-    case 0x1: return(inst_bitsetclear(code, false));
-    case 0x2: return(inst_condbranch(code, false));
+    case 0x0: return(inst_bittestsetclear(code, FALSE));
+    case 0x1: return(inst_bitsetclear(code, FALSE));
+    case 0x2: return(inst_condbranch(code, FALSE));
     case 0x3:
     case 0x4:
     case 0x5:
     case 0x6:
     case 0x7:
       switch (code & 0xf) {
-        case 0x0: return(inst_neg(code, false));
+        case 0x0: return(inst_neg(code, FALSE));
         case 0x1: return(inst_cbeq(code, false));
         case 0x2:
           switch (code) {
@@ -444,27 +481,27 @@ cl_hc08::exec_inst(void)
             case 0x42: return(inst_mul(code, false));
             case 0x52: return(inst_div(code, false));
             case 0x62: return(inst_nsa(code, false));
-            case 0x72: return(inst_daa(code, false));
+            case 0x72: return(inst_daa(code, FALSE));
             default: return(resHALT);
           }
-        case 0x3: return(inst_com(code, false));
-        case 0x4: return(inst_lsr(code, false));
+        case 0x3: return(inst_com(code, FALSE));
+        case 0x4: return(inst_lsr(code, FALSE));
         case 0x5:
           switch (code) {
-            case 0x35: return(inst_sthx(code, false));
+            case 0x35: return(inst_sthx(code, FALSE));
             case 0x45:
-            case 0x55: return(inst_ldhx(code, false));
+            case 0x55: return(inst_ldhx(code, FALSE));
             case 0x65:
-            case 0x75: return(inst_cphx(code, false));
+            case 0x75: return(inst_cphx(code, FALSE));
             default: return(resHALT);
           }
-        case 0x6: return(inst_ror(code, false));
-        case 0x7: return(inst_asr(code, false));
-        case 0x8: return(inst_lsl(code, false));
-        case 0x9: return(inst_rol(code, false));
-        case 0xa: return(inst_dec(code, false));
-        case 0xb: return(inst_dbnz(code, false));
-        case 0xc: return(inst_inc(code, false));
+        case 0x6: return(inst_ror(code, FALSE));
+        case 0x7: return(inst_asr(code, FALSE));
+        case 0x8: return(inst_lsl(code, FALSE));
+        case 0x9: return(inst_rol(code, FALSE));
+        case 0xa: return(inst_dec(code, FALSE));
+        case 0xb: return(inst_dbnz(code, FALSE));
+        case 0xc: return(inst_inc(code, FALSE));
         case 0xd: return(inst_tst(code, false));
         case 0xe:
           switch (code) {
@@ -472,25 +509,25 @@ cl_hc08::exec_inst(void)
             case 0x4e:
             case 0x5e:
             case 0x6e:
-            case 0x7e: return(inst_mov(code, false));
+            case 0x7e: return(inst_mov(code, FALSE));
             default: return(resHALT);
           }
-        case 0xf: return(inst_clr(code, false));
+        case 0xf: return(inst_clr(code, FALSE));
         default: return(resHALT);
       }
     case 0x8:
       switch (code & 0xf) {
-        case 0x0: return(inst_rti(code, false));
-        case 0x1: return(inst_rts(code, false));
-        case 0x3: return(inst_swi(code, false));
+        case 0x0: return(inst_rti(code, FALSE));
+        case 0x1: return(inst_rts(code, FALSE));
+        case 0x3: return(inst_swi(code, FALSE));
         case 0x4:
-        case 0x5: return(inst_transfer(code, false));
+        case 0x5: return(inst_transfer(code, FALSE));
         case 0x6:
         case 0x7:
         case 0x8:
         case 0x9:
         case 0xa:
-        case 0xb: return(inst_pushpull(code, false));
+        case 0xb: return(inst_pushpull(code, FALSE));
         case 0xc: return(inst_clrh(code, false));
         case 0xe: return(inst_stop(code, false));
         case 0xf: return(inst_wait(code, false));
@@ -519,16 +556,16 @@ cl_hc08::exec_inst(void)
           switch ((code >> 4) & 0xf) {
             case 0x6:
               switch (code & 0xf) {
-                case 0x0: return(inst_neg(code, true));
-                case 0x1: return(inst_cbeq(code, true));
-                case 0x3: return(inst_com(code, true));
-                case 0x4: return(inst_lsr(code, true));
-                case 0x6: return(inst_ror(code, true));
-                case 0x7: return(inst_asr(code, true));
-                case 0x8: return(inst_lsl(code, true));
-                case 0x9: return(inst_rol(code, true));
-                case 0xa: return(inst_dec(code, true));
-                case 0xb: return(inst_dbnz(code, true));
+                case 0x0: return(inst_neg(code, TRUE));
+                case 0x1: return(inst_cbeq(code, TRUE));
+                case 0x3: return(inst_com(code, TRUE));
+                case 0x4: return(inst_lsr(code, TRUE));
+                case 0x6: return(inst_ror(code, TRUE));
+                case 0x7: return(inst_asr(code, TRUE));
+                case 0x8: return(inst_lsl(code, TRUE));
+                case 0x9: return(inst_rol(code, TRUE));
+                case 0xa: return(inst_dec(code, TRUE));
+                case 0xb: return(inst_dbnz(code, TRUE));
                 case 0xc: return(inst_inc(code, true));
                 case 0xd: return(inst_tst(code, true));
                 case 0xf: return(inst_clr(code, true));
@@ -552,15 +589,15 @@ cl_hc08::exec_inst(void)
             case 0xd:
             case 0xe:
               switch (code & 0xf) {
-                case 0x0: return(inst_sub(code, true));
-                case 0x1: return(inst_cmp(code, true));
-                case 0x2: return(inst_sbc(code, true));
-                case 0x3: return(inst_cpx(code, true));
-                case 0x4: return(inst_and(code, true));
-                case 0x5: return(inst_bit(code, true));
-                case 0x6: return(inst_lda(code, true));
-                case 0x7: return(inst_sta(code, true));
-                case 0x8: return(inst_eor(code, true));
+                case 0x0: return(inst_sub(code, TRUE));
+                case 0x1: return(inst_cmp(code, TRUE));
+                case 0x2: return(inst_sbc(code, TRUE));
+                case 0x3: return(inst_cpx(code, TRUE));
+                case 0x4: return(inst_and(code, TRUE));
+                case 0x5: return(inst_bit(code, TRUE));
+                case 0x6: return(inst_lda(code, TRUE));
+                case 0x7: return(inst_sta(code, TRUE));
+                case 0x8: return(inst_eor(code, TRUE));
                 case 0x9: return(inst_adc(code, true));
                 case 0xa: return(inst_ora(code, true));
                 case 0xb: return(inst_add(code, true));
@@ -588,21 +625,21 @@ cl_hc08::exec_inst(void)
     case 0xe:
     case 0xf:
       switch (code & 0xf) {
-        case 0x0: return(inst_sub(code, false));
-        case 0x1: return(inst_cmp(code, false));
-        case 0x2: return(inst_sbc(code, false));
-        case 0x3: return(inst_cpx(code, false));
-        case 0x4: return(inst_and(code, false));
-        case 0x5: return(inst_bit(code, false));
-        case 0x6: return(inst_lda(code, false));
+        case 0x0: return(inst_sub(code, FALSE));
+        case 0x1: return(inst_cmp(code, FALSE));
+        case 0x2: return(inst_sbc(code, FALSE));
+        case 0x3: return(inst_cpx(code, FALSE));
+        case 0x4: return(inst_and(code, FALSE));
+        case 0x5: return(inst_bit(code, FALSE));
+        case 0x6: return(inst_lda(code, FALSE));
         case 0x7:
           if (code==0xa7)
-            return(inst_ais(code, false));
+            return(inst_ais(code, FALSE));
           else
-            return(inst_sta(code, false));
-        case 0x8: return(inst_eor(code, false));
-        case 0x9: return(inst_adc(code, false));
-        case 0xa: return(inst_ora(code, false));
+            return(inst_sta(code, FALSE));
+        case 0x8: return(inst_eor(code, FALSE));
+        case 0x9: return(inst_adc(code, FALSE));
+        case 0xa: return(inst_ora(code, FALSE));
         case 0xb: return(inst_add(code, false));
         case 0xc:
           if (code==0xac)
@@ -611,15 +648,15 @@ cl_hc08::exec_inst(void)
             return(inst_jmp(code, false));
         case 0xd:
           if (code==0xad)
-            return(inst_bsr(code, false));
+            return(inst_bsr(code, FALSE));
           else
-            return(inst_jsr(code, false));
-        case 0xe: return(inst_ldx(code, false));
+            return(inst_jsr(code, FALSE));
+        case 0xe: return(inst_ldx(code, FALSE));
         case 0xf:
           if (code==0xaf)
-            return(inst_aix(code, false));
+            return(inst_aix(code, FALSE));
           else
-            return(inst_stx(code, false));
+            return(inst_stx(code, FALSE));
         default: return(resHALT);
       }
     default: return(resHALT);

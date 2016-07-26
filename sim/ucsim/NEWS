@@ -45,3 +45,11 @@ Bug fixes to run sdcc regression tests
 
 Eliminate need of flex (for compile)
 Fix of some includes
+
+
+0.6.0
+
+New commands: "memory info" (same as "info memory"), "get error" (same
+as "show error").
+
+Simulator interface (virtual hw element).

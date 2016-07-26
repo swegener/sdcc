@@ -143,7 +143,7 @@ cl_ev_brk::type(void)
 bool
 cl_ev_brk::match(struct event_rec *ev)
 {
-  return(DD_FALSE);
+  return(false);
 }
 
 
@@ -160,7 +160,7 @@ brk_coll::brk_coll(t_index alimit, t_index adelta,
   rom= arom;
 }
 
-const void *
+void *
 brk_coll::key_of(void *item)
 {
   return((void *)&(((class cl_brk *)(item))->nr));
@@ -168,7 +168,7 @@ brk_coll::key_of(void *item)
 
 
 int
-brk_coll::compare(const void *key1, const void *key2)
+brk_coll::compare(void *key1, void *key2)
 {
   int k1, k2;
 
@@ -200,9 +200,9 @@ brk_coll::there_is_event(enum brk_event ev)
       b= (class cl_brk *)at(i);
       if (b->type() == brkEVENT &&
 	  ((class cl_ev_brk *)b)->event == ev)
-	return(DD_TRUE);
+	return(true);
     }
-  return(DD_FALSE);
+  return(false);
 }
 
 /*int
@@ -237,12 +237,6 @@ brk_coll::del_bp(t_addr addr)
       free_at(idx);
     }
   return;
-  /*if (rom &&
-      addr < rom->size)
-    {
-      fprintf(stderr, "brk_coll::del_bp(0x%"_A_"x\n", addr);//FIXME
-      //rom->bp_map->clear(addr);
-      }*/
 }
 
 void

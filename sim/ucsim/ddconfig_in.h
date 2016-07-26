@@ -3,6 +3,9 @@
 #ifndef DDCONFIG_HEADER
 #define DDCONFIG_HEADER
 
+#include <stdint.h>
+
+
 /* Define to be the type of length parameter of accept (without the \*'). */
 #undef ACCEPT_SOCKLEN_T
 
@@ -221,22 +224,28 @@
 #undef STDC_HEADERS
 
 /* XXX */
-#undef TYPE_BYTE
+/*#undef TYPE_BYTE*/
+/*#define TYPE_BYTE int8_t*/
 
 /* XXX */
-#undef TYPE_DWORD
+/*#undef TYPE_DWORD*/
+/*#define TYPE_DWORD int32_t*/
 
 /* XXX */
-#undef TYPE_UBYTE
+/*#undef TYPE_UBYTE*/
+/*#define TYPE_UBYTE uint8_t*/
 
 /* XXX */
-#undef TYPE_UDWORD
+/*#undef TYPE_UDWORD*/
+/*#define TYPE_UDWORD uint32_t*/
 
 /* XXX */
-#undef TYPE_UWORD
+/*#undef TYPE_UWORD*/
+/*#define TYPE_UWORD uint16_t*/
 
 /* XXX */
-#undef TYPE_WORD
+/*#undef TYPE_WORD*/
+/*#define TYPE_WORD int16_t*/
 
 /* XXX */
 #undef UCSOCKET_T
@@ -270,13 +279,10 @@
 #undef YYTEXT_POINTER
 
 /* XXX */
-#undef _A_
+/*#undef _A_*/
 
 /* XXX */
-#undef _M_
+/*#undef _M_*/
 
-/* ucsim custom defines */
-#define DD_TRUE     1
-#define DD_FALSE    0
 #define NIL         0
 #endif /* DDCONFIG_HEADER */

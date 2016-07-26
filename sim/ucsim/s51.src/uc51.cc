@@ -30,16 +30,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/time.h>
-#if FD_HEADER_OK
-# include HEADER_FD
-#endif
+//#if FD_HEADER_OK
+//# include HEADER_FD
+//#endif
 #include "i_string.h"
 
 // prj
@@ -50,7 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "optioncl.h"
 
 //cmd.src
-#include "cmduccl.h"
+#include "cmd_uccl.h"
 
 // local
 #include "uc51cl.h"
@@ -104,7 +101,7 @@ cl_51core::cl_51core(int Itype, int Itech, class cl_sim *asim):
   technology= Itech;
 
   irq_stop_option= new cl_irq_stop_option(this);
-  stop_at_it= DD_FALSE;
+  stop_at_it= false;
 }
 
 
@@ -120,52 +117,52 @@ cl_51core::init(void)
   cl_uc::init();
   set_name("mcs51_controller");
   reset();
+
   return(0);
 }
 
-const char *
+static char id_string_51[100];
+
+char *
 cl_51core::id_string(void)
 {
-  static char id_string_51[100];
   int i;
 
   for (i= 0; cpus_51[i].type_str != NULL && cpus_51[i].type != type; i++) ;
   sprintf(id_string_51, "%s %s",
-          cpus_51[i].type_str?cpus_51[i].type_str:"51",
-          (technology==CPU_HMOS)?"HMOS":"CMOS");
+	  cpus_51[i].type_str?cpus_51[i].type_str:"51",
+	  (technology==CPU_HMOS)?"HMOS":"CMOS");
   return(id_string_51);
 }
 
 void
 cl_51core::mk_hw_elements(void)
 {
+  cl_uc::mk_hw_elements();
+
   class cl_hw *h;
 
   acc= sfr->get_cell(ACC);
   psw= sfr->get_cell(PSW);
 
-  hws->add(h= new cl_timer0(this, 0, "timer0"));
+  add_hw(h= new cl_timer0(this, 0, "timer0"));
   h->init();
-  hws->add(h= new cl_timer1(this, 1, "timer1"));
+  add_hw(h= new cl_timer1(this, 1, "timer1"));
   h->init();
-  hws->add(h= new cl_serial(this));
+  add_hw(h= new cl_serial(this));
   h->init();
-  hws->add(h= new cl_port(this, 0));
+  add_hw(h= new cl_port(this, 0));
   h->init();
-  hws->add(h= new cl_port(this, 1));
+  add_hw(h= new cl_port(this, 1));
   h->init();
-  hws->add(h= new cl_port(this, 2));
+  add_hw(h= new cl_port(this, 2));
   h->init();
-  hws->add(h= new cl_port(this, 3));
+  add_hw(h= new cl_port(this, 3));
   h->init();
-  hws->add(interrupt= new cl_interrupt(this));
+  add_hw(interrupt= new cl_interrupt(this));
   interrupt->init();
-  hws->add(h= new cl_uc51_dummy_hw(this));
+  add_hw(h= new cl_uc51_cpu(this));
   h->init();
-  /*
-  acc= sfr->get_cell(ACC);
-  psw= sfr->get_cell(PSW);
-  */
 }
 
 void
@@ -177,41 +174,30 @@ cl_51core::build_cmdset(class cl_cmdset *cmdset)
 
   cl_uc::build_cmdset(cmdset);
 
-  cmdset->add(cmd= new cl_di_cmd("di", DD_TRUE,
+  cmdset->add(cmd= new cl_di_cmd("di", true,
 "di [start [stop]]  Dump Internal RAM",
 "long help of di"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dx_cmd("dx", DD_TRUE,
+  cmdset->add(cmd= new cl_dx_cmd("dx", true,
 "dx [start [stop]]  Dump External RAM",
 "long help of dx"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_ds_cmd("ds", DD_TRUE,
+  cmdset->add(cmd= new cl_ds_cmd("ds", true,
 "ds [start [stop]]  Dump SFR",
 "long help of ds"));
   cmd->init();
 }
 
-/*
-class cl_m *
-cl_51core::mk_mem(enum mem_class type, char *class_name)
-{
-  class cl_address_space *m= cl_uc::mk_mem(type, class_name);
-  if (type == MEM_SFR)
-    sfr= m;
-  if (type == MEM_IRAM)
-    iram= m;
-  return(m);
-}
-*/
 
 void
 cl_51core::make_memories(void)
 {
   class cl_address_space *as;
-
-  rom= as= new cl_address_space(MEM_ROM_ID/*"rom"*/, 0, 0x10000, 8);
+  int i;
+  
+  rom= as= new cl_address_space("rom", 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);
   iram= as= new cl_address_space(MEM_IRAM_ID/*"iram"*/, 0, 0x80, 8);
@@ -223,24 +209,24 @@ cl_51core::make_memories(void)
   xram= as= new cl_address_space(MEM_XRAM_ID/*"xram"*/, 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);
-
+  
   class cl_address_decoder *ad;
-  class cl_memory_chip *chip;
+  class cl_memory_chip *chip, *sfr_chip, *iram_chip;
 
-  chip= new cl_memory_chip("rom_chip", 0x10000, 8/*, 0xff*/);
+  chip= new cl_memory_chip("rom_chip", 0x10000, 8, 0/*, 0xff*/);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
-                             chip, 0, 0xffff, 0);
+			     chip, 0, 0xffff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("iram_chip", 0x80, 8);
+  chip= iram_chip= new cl_memory_chip("iram_chip", 0x80, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= iram/*address_space(MEM_IRAM_ID)*/,
-                             chip, 0, 0x7f, 0);
+			     chip, 0, 0x7f, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -249,22 +235,80 @@ cl_51core::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= xram/*address_space(MEM_XRAM_ID)*/,
-                             chip, 0, 0xffff, 0);
+			     chip, 0, 0xffff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("sfr_chip", 0x80, 8, 0);
-  chip->init();
-  memchips->add(chip);
+  sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8);
+  sfr_chip->init();
+  memchips->add(sfr_chip);
   ad= new cl_address_decoder(as= sfr/*address_space(MEM_SFR_ID)*/,
-                             chip, 0x80, 0xff, 0);
+			     sfr_chip, 0x80, 0xff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
   acc= sfr->get_cell(ACC);
   psw= sfr->get_cell(PSW);
+
+  regs= new cl_address_space("regs", 0, 8, 8);
+  regs->init();
+  address_spaces->add(regs);
+  
+  cl_banker *b= new cl_banker(sfr, 0xd0, 0x18,
+			      regs, 0, 7);
+  b->init();
+  regs->decoders->add(b);
+  b->add_bank(0, memory("iram_chip"), 0);
+  b->add_bank(1, memory("iram_chip"), 8);
+  b->add_bank(2, memory("iram_chip"), 16);
+  b->add_bank(3, memory("iram_chip"), 24);
+  psw->write(0);
+  for (i= 0; i < 8; i++)
+    R[i]= regs->get_cell(i);
+  
+  cl_var *v;
+  vars->add(v= new cl_var(cchars("R0"), regs, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("R1"), regs, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("R2"), regs, 2));
+  v->init();
+  vars->add(v= new cl_var(cchars("R3"), regs, 3));
+  v->init();
+  vars->add(v= new cl_var(cchars("R4"), regs, 4));
+  v->init();
+  vars->add(v= new cl_var(cchars("R5"), regs, 5));
+  v->init();
+  vars->add(v= new cl_var(cchars("R6"), regs, 6));
+  v->init();
+  vars->add(v= new cl_var(cchars("R7"), regs, 7));
+  v->init();
+
+  dptr= new cl_address_space("dptr", 0, 2, 8);
+  dptr->init();
+  ad= new cl_address_decoder(dptr, sfr_chip, 0, 1, DPL-0x80);
+  ad->init();
+  dptr->decoders->add(ad);
+  ad->activate(0);
+  address_spaces->add(dptr);
+
+  bits= as= new cl_address_space("bits", 0, 0x100, 1);
+  as->init();
+  address_spaces->add(as);
+  ad= new cl_bander(bits, 0, 127,
+		    iram_chip, 32,
+		    8, 1);
+  ad->init();
+  bits->decoders->add(ad);
+  ad->activate(0);
+  ad= new cl_bander(bits, 128, 255,
+		    sfr_chip, 0,
+		    8, 8);
+  ad->init();
+  bits->decoders->add(ad);
+  ad->activate(0);
 }
 
 
@@ -274,20 +318,6 @@ cl_51core::make_memories(void)
 
 cl_51core::~cl_51core(void)
 {
-  /*
-  if (serial_out)
-    {
-      if (isatty(fileno(serial_out)))
-        tcsetattr(fileno(serial_out), TCSANOW, &saved_attributes_out);
-      fclose(serial_out);
-    }
-  if (serial_in)
-    {
-      if (isatty(fileno(serial_in)))
-        tcsetattr(fileno(serial_in), TCSANOW, &saved_attributes_in);
-      fclose(serial_in);
-    }
-  */
   delete irq_stop_option;
 }
 
@@ -314,12 +344,12 @@ cl_51core::bit_tbl(void)
   return(bit_tab51);
 }
 
-const char *
+char *
 cl_51core::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20], c[2];
+  char *buf, *p, *t, *s;
   const char *b;
-  char *buf, *p, *t;
   t_mem code= rom->get(addr);
 
   p= work;
@@ -327,75 +357,74 @@ cl_51core::disass(t_addr addr, const char *sep)
   while (*b)
     {
       if (*b == '%')
-        {
-          b++;
-          switch (*(b++))
-            {
-            case 'A': // absolute address
-              sprintf(temp, "%04" _A_ "x",
-                      t_addr((addr&0xf800)|
-                             (((code>>5)&0x07)*256 +
-                              rom->get(addr+1))));
-              break;
-            case 'l': // long address
-              sprintf(temp, "%04" _A_ "x",
-                      t_addr(rom->get(addr+1)*256 +
-                             rom->get(addr+2)));
-              break;
-            case 'a': // addr8 (direct address) at 2nd byte
-              if (!get_name(rom->get(addr+1), sfr_tbl(), temp))
-                sprintf(temp, "%02" _M_ "x", rom->get(addr+1));
-              break;
-            case '8': // addr8 (direct address) at 3rd byte
-              if (!get_name(rom->get(addr+2), sfr_tbl(), temp))
-                sprintf(temp, "%02" _M_ "x", rom->get(addr+2));
-              //sprintf(temp, "%02" _M_ "x", rom->get(addr+2));
-              break;
-            case 'b': // bitaddr at 2nd byte
-              {
-                t_addr ba= rom->get(addr+1);
-                if (get_name(ba, bit_tbl(), temp))
-                  break;
-                if (get_name((ba<128)?((ba/8)+32):(ba&0xf8), sfr_tbl(), temp))
-                  {
-                    strcat(temp, ".");
-                    sprintf(c, "%1" _M_ "d", ba & 0x07);
-                    strcat(temp, c);
-                    break;
-                  }
-                sprintf(temp, "%02x.%" _M_ "d", (ba<128)?((ba/8)+32):(ba&0xf8),
-                        ba & 0x07);
-                break;
-              }
-            case 'r': // rel8 address at 2nd byte
-              sprintf(temp, "%04" _A_ "x",
-                      t_addr(addr+2+(signed char)(rom->get(addr+1))));
-              break;
-            case 'R': // rel8 address at 3rd byte
-              sprintf(temp, "%04" _A_ "x",
-                      t_addr(addr+3+(signed char)(rom->get(addr+2))));
-              break;
-            case 'd': // data8 at 2nd byte
-              sprintf(temp, "%02" _M_ "x", rom->get(addr+1));
-              break;
-            case 'D': // data8 at 3rd byte
-              sprintf(temp, "%02" _M_ "x", rom->get(addr+2));
-              break;
-            case '6': // data16 at 2nd(H)-3rd(L) byte
-              sprintf(temp, "%04" _A_ "x",
-                      t_addr(rom->get(addr+1)*256 +
-                             rom->get(addr+2)));
-              break;
-            default:
-              strcpy(temp, "?");
-              break;
-            }
-          t= temp;
-          while (*t)
-            *(p++)= *(t++);
-        }
+	{
+	  b++;
+	  switch (*(b++))
+	    {
+	    case 'A': // absolute address
+	      sprintf(temp, "%04x",
+		      /*t_addr*/int((addr&0xf800)|
+				    (((code>>5)&0x07)*256 +
+				     rom->get(addr+1))));
+	      break;
+	    case 'l': // long address
+	      sprintf(temp, "%04x",
+		      /*t_addr*/int(rom->get(addr+1)*256 +
+				    rom->get(addr+2)));
+	      break;
+	    case 'a': // addr8 (direct address) at 2nd byte
+ 	      if (!get_name(rom->get(addr+1), sfr_tbl(), temp))
+		sprintf(temp, "%02x", (int)rom->get(addr+1));
+	      break;
+	    case '8': // addr8 (direct address) at 3rd byte
+ 	      if (!get_name(rom->get(addr+2), sfr_tbl(), temp))
+		sprintf(temp, "%02x", (int)rom->get(addr+2));
+	      break;
+	    case 'b': // bitaddr at 2nd byte
+	      {
+		t_addr ba= rom->get(addr+1);
+		if (get_name(ba, bit_tbl(), temp))
+		  break;
+		if (get_name((ba<128)?((ba/8)+32):(ba&0xf8), sfr_tbl(), temp))
+		  {
+		    strcat(temp, ".");
+		    sprintf(c, "%1d", (int)(ba & 0x07));
+		    strcat(temp, c);
+		    break;
+		  }
+		sprintf(temp, "%02lx.%d", (long int)((ba<128)?((ba/8)+32):(ba&0xf8)),
+			(int)(ba & 0x07));
+		break;
+	      }
+	    case 'r': // rel8 address at 2nd byte
+	      sprintf(temp, "%04x",
+		      /*t_addr*/int(addr+2+(signed char)(rom->get(addr+1))));
+	      break;
+	    case 'R': // rel8 address at 3rd byte
+	      sprintf(temp, "%04x",
+		      /*t_addr*/int(addr+3+(signed char)(rom->get(addr+2))));
+	      break;
+	    case 'd': // data8 at 2nd byte
+	      sprintf(temp, "%02x", (int)rom->get(addr+1));
+	      break;
+	    case 'D': // data8 at 3rd byte
+	      sprintf(temp, "%02x", (int)rom->get(addr+2));
+	      break;
+	    case '6': // data16 at 2nd(H)-3rd(L) byte
+	      sprintf(temp, "%04x",
+		      /*t_addr*/int(rom->get(addr+1)*256 +
+				    rom->get(addr+2)));
+	      break;
+	    default:
+	      strcpy(temp, "?");
+	      break;
+	    }
+	  t= temp;
+	  while (*t)
+	    *(p++)= *(t++);
+	}
       else
-        *(p++)= *(b++);
+	*(p++)= *(b++);
     }
   *p= '\0';
 
@@ -409,14 +438,14 @@ cl_51core::disass(t_addr addr, const char *sep)
     buf= (char *)malloc(6+strlen(p)+1);
   else
     buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
-  for (p= work, t= buf; *p != ' '; p++, t++)
-    *t= *p;
+  for (p= work, s= buf; *p != ' '; p++, s++)
+    *s= *p;
   p++;
-  *t= '\0';
+  *s= '\0';
   if (sep == NULL)
     {
       while (strlen(buf) < 6)
-        strcat(buf, " ");
+	strcat(buf, " ");
     }
   else
     strcat(buf, sep);
@@ -439,9 +468,9 @@ cl_51core::print_regs(class cl_console_base *con)
   con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
               isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B));
   //eram2xram();
-  data= xram->get(sfr->get(DPH)*256+sfr->get(DPL));
-  con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", sfr->get(DPH),
-              sfr->get(DPL), data, data, isprint(data)?data:'.');
+  data= xram->get(dptr->get(/*DPH*/1)*256+dptr->get(/*DPL*/0));
+  con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", dptr->get(/*DPH*/1),
+		 dptr->get(/*DPL*/0), data, data, isprint(data)?data:'.');
 
   data= iram->get(iram->get(start+1));
   con->dd_printf("@R1 %02x %c", data, isprint(data) ? data : '.');
@@ -488,7 +517,7 @@ cl_51core::bit2mem(t_addr bitaddr, t_addr *memaddr, t_mem *bitmask)
 
 t_addr
 cl_51core::bit_address(class cl_memory *mem,
-                       t_addr mem_address, int bit_number)
+		       t_addr mem_address, int bit_number)
 {
   if (bit_number < 0 ||
       bit_number > 7 ||
@@ -503,16 +532,16 @@ cl_51core::bit_address(class cl_memory *mem,
   if (mem == sfr)
     {
       if (mem_address < 128 ||
-          mem_address % 8 != 0 ||
-          mem_address > 255)
-        return(-1);
+	  mem_address % 8 != 0 ||
+	  mem_address > 255)
+	return(-1);
       return(128 + (mem_address-128) + bit_number);
     }
   if (mem == iram)
     {
       if (mem_address < 0x20 ||
-          mem_address >= 0x20+32)
-        return(-1);
+	  mem_address >= 0x20+32)
+	return(-1);
       return((mem_address-0x20)*8 + bit_number);
     }
   return(-1);
@@ -532,7 +561,7 @@ cl_51core::reset(void)
 
   result= resGO;
 
-  //was_reti= DD_FALSE;
+  //was_reti= false;
 }
 
 
@@ -588,50 +617,50 @@ cl_51core::analyze(t_addr addr)
   code= rom->get(addr);
   tabl= &(dis_tbl()[code]);
   while (!inst_at(addr) &&
-         code != 0xa5 /* break point */)
+	 code != 0xa5 /* break point */)
     {
       set_inst_at(addr);
       switch (tabl->branch)
-        {
-        case 'a': // acall
-          analyze((addr & 0xf800)|
-                  ((rom->get(addr+1)&0x07)*256+
-                   rom->get(addr+2)));
-          analyze(addr+tabl->length);
-          break;
-        case 'A': // ajmp
-          addr= (addr & 0xf800)|
-            ((rom->get(addr+1) & 0x07)*256 + rom->get(addr+2));
-          break;
-        case 'l': // lcall
-          analyze(rom->get(addr+1)*256 + rom->get(addr+2));
-          analyze(addr+tabl->length);
-          break;
-        case 'L': // ljmp
-          addr= rom->get(addr+1)*256 + rom->get(addr+2);
-          break;
-        case 'r': // reljmp (2nd byte)
-          analyze(rom->validate_address(addr+(signed char)(rom->get(addr+1))));
-          analyze(addr+tabl->length);
-          break;
-        case 'R': // reljmp (3rd byte)
-          analyze(rom->validate_address(addr+(signed char)(rom->get(addr+2))));
-          analyze(addr+tabl->length);
-          break;
-        case 's': // sjmp
-          {
-            signed char target;
-            target= rom->get(addr+1);
-            addr+= 2;
-            addr= rom->validate_address(addr+target);
-            break;
-          }
-        case '_':
-          return;
-        default:
-          addr= rom->validate_address(addr+tabl->length);
-          break;
-        }
+	{
+	case 'a': // acall
+	  analyze((addr & 0xf800)|
+		  ((rom->get(addr+1)&0x07)*256+
+		   rom->get(addr+2)));
+	  analyze(addr+tabl->length);
+	  break;
+	case 'A': // ajmp
+	  addr= (addr & 0xf800)|
+	    ((rom->get(addr+1) & 0x07)*256 + rom->get(addr+2));
+	  break;
+	case 'l': // lcall
+	  analyze(rom->get(addr+1)*256 + rom->get(addr+2));
+	  analyze(addr+tabl->length);
+	  break;
+	case 'L': // ljmp
+	  addr= rom->get(addr+1)*256 + rom->get(addr+2);
+	  break;
+	case 'r': // reljmp (2nd byte)
+	  analyze(rom->validate_address(addr+(signed char)(rom->get(addr+1))));
+	  analyze(addr+tabl->length);
+	  break;
+	case 'R': // reljmp (3rd byte)
+	  analyze(rom->validate_address(addr+(signed char)(rom->get(addr+2))));
+	  analyze(addr+tabl->length);
+	  break;
+	case 's': // sjmp
+	  {
+	    signed char target;
+	    target= rom->get(addr+1);
+	    addr+= 2;
+	    addr= rom->validate_address(addr+target);
+	    break;
+	  }
+	case '_':
+	  return;
+	default:
+	  addr= rom->validate_address(addr+tabl->length);
+	  break;
+	}
       code= rom->get(addr);
       tabl= &(dis_tbl()[code]);
     }
@@ -677,18 +706,6 @@ cl_51core::get_direct(t_mem addr)
 
 
 /*
- * Calculating address of specified register cell in IRAM
- */
-
-class cl_memory_cell *
-cl_51core::get_reg(uchar regnum)
-{
-  t_addr a= (psw->get() & (bmRS0|bmRS1)) | (regnum & 0x07);
-  return(iram->get_cell(a));
-}
-
-
-/*
  * Fetching one instruction and executing it
  */
 
@@ -719,7 +736,7 @@ cl_51core::exec_inst(void)
     case 0x10: res= inst_jbc_bit_addr(code); break;
     case 0x11: case 0x31: case 0x51: case 0x71:
     case 0x91: case 0xb1: case 0xd1: case 0xf1:res=inst_acall_addr(code);break;
-    case 0x12: res= inst_lcall(code, 0, DD_FALSE); break;
+    case 0x12: res= inst_lcall(code, 0, false); break;
     case 0x13: res= inst_rrc(code); break;
     case 0x14: res= inst_dec_a(code); break;
     case 0x15: res= inst_dec_addr(code); break;
@@ -857,146 +874,53 @@ cl_51core::exec_inst(void)
  * (inp_avail will be TRUE if ENTER is pressed) and it can confuse
  * command interepter.
  */
-//static class cl_console_base *c= NULL;
+//static class cl_console *c= NULL;
 int
 cl_51core::do_inst(int step)
 {
   result= resGO;
   while ((result == resGO) &&
-         (state != stPD) &&
-         (step != 0))
+	 (state != stPD) &&
+	 (step != 0))
     {
       if (step > 0)
-        step--;
+	step--;
       if (state == stGO)
-        {
-          interrupt->was_reti= DD_FALSE;
-          pre_inst();
-          result= exec_inst();
-          post_inst();
-          /*
-          {
-            if (c)
-              print_regs(c);
-            else
-              {
-                if (sim->app->get_commander()==NULL)
-                  printf("no commander PC=0x%x\n",PC);
-                else
-                  if (sim->app->get_commander()->frozen_console==NULL)
-                    printf("no frozen console PC=0x%x\n",PC);
-                  else
-                    c= sim->app->get_commander()->frozen_console;
-                if (c)
-                  print_regs(c);
-                else
-                  printf("no console PC=0x%x\n",PC);
-              }
-          }
-          */
-          /*if (result == resGO)
-            result= check_events();*/
-        }
+	{
+	  interrupt->was_reti= false;
+	  pre_inst();
+	  result= exec_inst();
+	  post_inst();
+	}
       else
-        {
-          // tick hw in idle state
-          inst_ticks= 1;
-          post_inst();
-          tick(1);
-        }
+	{
+	  // tick hw in idle state
+	  inst_ticks= 1;
+	  post_inst();
+	  tick(1);
+	}
       if (result == resGO)
-        {
-          int res;
-          if ((res= do_interrupt()) != resGO)
-            result= res;
-          else
-            result= idle_pd();
-        }
-      if ((step < 0) &&
-          ((ticks->ticks % 100000) < 50))
-        {
-          if (sim->app->get_commander()->input_avail_on_frozen())
-            {
-              result= resUSER;
-            }
-          else
-            if (sim->app->get_commander()->input_avail())
-              break;
-        }
+	{
+	  int res;
+	  if ((res= do_interrupt()) != resGO)
+	    result= res;
+	  else
+	    result= idle_pd();
+	}
       if (((result == resINTERRUPT) &&
-           stop_at_it) ||
-          result >= resSTOP)
-        {
-          sim->stop(result);
-          break;
-        }
+	   stop_at_it) ||
+	  result >= resSTOP)
+	{
+	  sim->stop(result);
+	  break;
+	}
     }
   if (state == stPD)
     {
       //FIXME: tick outsiders eg. watchdog
-      if (sim->app->get_commander()->input_avail_on_frozen())
-        {
-          //fprintf(stderr,"uc: inp avail in PD mode, user stop\n");
-          result= resUSER;
-          sim->stop(result);
-        }
     }
   return(result);
 }
-
-/*void
-cl_51core::post_inst(void)
-{*/
-  //uint tcon= sfr->get(TCON);
-  //uint p3= sfr->read(P3);
-
-  //cl_uc::post_inst();
-  //set_p_flag();
-
-  // Setting up external interrupt request bits (IEx)
-  /*if ((tcon & bmIT0))
-    {
-      // IE0 edge triggered
-      if (p3_int0_edge)
-        {
-          // falling edge on INT0
-          sim->app->get_commander()->
-            debug("%g sec (%d clks): Falling edge detected on INT0 (P3.2)\n",
-                          get_rtime(), ticks->ticks);
-          sfr->set_bit1(TCON, bmIE0);
-          p3_int0_edge= 0;
-        }
-    }
-  else
-    {
-      // IE0 level triggered
-      if (p3 & bm_INT0)
-        sfr->set_bit0(TCON, bmIE0);
-      else
-        sfr->set_bit1(TCON, bmIE0);
-    }
-  if ((tcon & bmIT1))
-    {
-      // IE1 edge triggered
-      if (p3_int1_edge)
-        {
-          // falling edge on INT1
-          sfr->set_bit1(TCON, bmIE1);
-          p3_int1_edge= 0;
-        }
-    }
-  else
-    {
-      // IE1 level triggered
-      if (p3 & bm_INT1)
-        sfr->set_bit0(TCON, bmIE1);
-      else
-        sfr->set_bit1(TCON, bmIE1);
-        }*/
-  //prev_p3= p3 & port_pins[3];
-  //prev_p1= p3 & port_pins[1];
-//}
-
 
 /*
  * Abstract method to handle WDT
@@ -1020,7 +944,7 @@ cl_51core::do_interrupt(void)
 
   if (interrupt->was_reti)
     {
-      interrupt->was_reti= DD_FALSE;
+      interrupt->was_reti= false;
       return(resGO);
     }
   if (!((ie= sfr->get(IE)) & bmEA))
@@ -1030,36 +954,35 @@ cl_51core::do_interrupt(void)
     {
       class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
       if (is->is_active() &&
-          (ie & is->ie_mask) &&
-          (sfr->get(is->src_reg) & is->src_mask))
-        {
-          int pr= it_priority(is->ie_mask);
-          if (il->level >= 0 &&
-              pr <= il->level)
-            continue;
-          if (state == stIDLE)
-            {
-              state= stGO;
-              sfr->set_bit0(PCON, bmIDL);
-              interrupt->was_reti= DD_TRUE;
-              return(resGO);
-            }
-          if (is->clr_bit)
-            sfr->set_bit0(is->src_reg, is->src_mask);
-          sim->app->get_commander()->
-            debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",
-                          get_rtime(), ticks->ticks, object_name(is), PC);
-          IL= new it_level(pr, is->addr, PC, is);
-          return(accept_it(IL));
-        }
+	  is->enabled() &&
+	  is->pending())
+	{
+	  int pr= priority_of(is->ie_mask);
+	  if (il->level >= 0 &&
+	      pr <= il->level)
+	    continue;
+	  if (state == stIDLE)
+	    {
+	      state= stGO;
+	      sfr->set_bit0(PCON, bmIDL);
+	      interrupt->was_reti= true;
+	      return(resGO);
+	    }
+	  is->clear();
+	  sim->app->get_commander()->
+	    debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",
+			  get_rtime(), ticks->ticks, object_name(is), PC);
+	  IL= new it_level(pr, is->addr, PC, is);
+	  return(accept_it(IL));
+	}
     }
   return(resGO);
 }
 
 int
-cl_51core::it_priority(uchar ie_mask)
+cl_51core::priority_of(uchar nuof_it)
 {
-  if (sfr->get(IP) & ie_mask)
+  if (sfr->get(IP) & /*ie_mask*/nuof_it)
     return(1);
   return(0);
 }
@@ -1076,11 +999,21 @@ cl_51core::accept_it(class it_level *il)
   sfr->set_bit0(PCON, bmIDL);
   it_levels->push(il);
   tick(1);
-  int res= inst_lcall(0, il->addr, DD_TRUE);
+  int res= inst_lcall(0, il->addr, true);
   if (res != resGO)
     return(res);
   else
     return(resINTERRUPT);
+}
+
+
+/* check if interrupts are enabled (globally)
+ */
+
+bool
+cl_51core::it_enabled(void)
+{
+  return sfr->get(IE) & bmEA;
 }
 
 
@@ -1098,62 +1031,22 @@ cl_51core::idle_pd(void)
   if (pcon & bmIDL)
     {
       if (state != stIDLE)
-        sim->app->get_commander()->
-          debug("%g sec (%d clks): CPU in Idle mode (PC=0x%x, PCON=0x%x)\n",
-                get_rtime(), ticks->ticks, PC, pcon);
+	sim->app->get_commander()->
+	  debug("%g sec (%d clks): CPU in Idle mode (PC=0x%x, PCON=0x%x)\n",
+		get_rtime(), ticks->ticks, PC, pcon);
       state= stIDLE;
       //was_reti= 1;
     }
   if (pcon & bmPD)
     {
       if (state != stPD)
-        sim->app->get_commander()->
-          debug("%g sec (%d clks): CPU in PowerDown mode\n",
-                        get_rtime(), ticks->ticks);
+	sim->app->get_commander()->
+	  debug("%g sec (%d clks): CPU in PowerDown mode\n",
+			get_rtime(), ticks->ticks);
       state= stPD;
     }
   return(resGO);
 }
-
-
-/*
- * Checking if EVENT break happened
- */
-
-/*int
-cl_51core::check_events(void)
-{
-  int i;
-  class cl_ev_brk *eb;
-
-  if (!ebrk->count)
-    return(resGO);
-  for (i= 0; i < ebrk->count; i++)
-    {
-      eb= (class cl_ev_brk *)(ebrk->at(i));
-      if (eb->match(&event_at))
-        return(resBREAKPOINT);
-    }
-  return(resGO);
-}*/
-
-
-/*
- */
-
-/*
-void
-cl_51core::mem_cell_changed(class cl_m *mem, t_addr addr)
-{
-  if (mem == sfr)
-    switch (addr)
-      {
-      case ACC: acc= mem->get_cell(ACC); break;
-      case PSW: psw= mem->get_cell(PSW); break;
-      }
-  cl_uc::mem_cell_changed(mem, addr);
-}
-*/
 
 
 /*
@@ -1214,56 +1107,62 @@ cl_51core::inst_swap(uchar code)
 /*
  */
 
-cl_uc51_dummy_hw::cl_uc51_dummy_hw(class cl_uc *auc):
-  cl_hw(auc, HW_DUMMY, 0, "_51_dummy")
+cl_uc51_cpu::cl_uc51_cpu(class cl_uc *auc):
+  cl_hw(auc, HW_DUMMY, 0, "cpu")
 {
-  //uc51= (class cl_51core *)uc;
 }
 
 int
-cl_uc51_dummy_hw::init(void)
+cl_uc51_cpu::init(void)
 {
-  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
+  class cl_address_space *sfr= uc->address_space(MEM_SFR_ID),
+    *bas= uc->address_space("bits");
+  int i;
+  cl_hw::init();
   if (!sfr)
     {
       fprintf(stderr, "No SFR to register %s[%d] into\n", id_string, id);
     }
-  //acc= sfr->register_hw(ACC, this, 0);
-  //sp = sfr->register_hw(SP , this, 0);
-  use_cell(sfr, PSW, &cell_psw, wtd_restore);
-  register_cell(sfr, ACC, &cell_acc, wtd_restore_write);
-  register_cell(sfr, SP , &cell_sp , wtd_restore);
-  //register_cell(sfr, PCON, &cell_pcon, wtd_restore);
+  cell_psw= sfr->get_cell(PSW);//use_cell(sfr, PSW);
+  cell_acc= register_cell(sfr, ACC);
+  cell_sp= register_cell(sfr, SP);
+  for (i= 0; i < 8; i++)
+    acc_bits[i]= register_cell(bas, ACC+i);
   return(0);
 }
 
 void
-cl_uc51_dummy_hw::write(class cl_memory_cell *cell, t_mem *val)
+cl_uc51_cpu::write(class cl_memory_cell *cell, t_mem *val)
 {
-  if (cell == cell_acc)
+  if (cell == cell_sp)
+    {
+      if (*val > uc->sp_max)
+	uc->sp_max= *val;
+      uc->sp_avg= (uc->sp_avg+(*val))/2;
+    }
+  else 
     {
       bool p;
       int i;
-      uchar uc;
+      uchar uc, n= *val;
 
-      p = DD_FALSE;
-      uc= *val;
+      if (cell != cell_acc)
+	{
+	  cell->set(*val);
+	  n= cell_acc->get();
+	}
+      p = false;
+      uc= n;
       for (i= 0; i < 8; i++)
-        {
-          if (uc & 1)
-            p= !p;
-          uc>>= 1;
-        }
+	{
+	  if (uc & 1)
+	    p= !p;
+	  uc>>= 1;
+	}
       if (p)
-        cell_psw->set_bit1(bmP);
+	cell_psw->set_bit1(bmP);
       else
-        cell_psw->set_bit0(bmP);
-    }
-  else if (cell == cell_sp)
-    {
-      if (*val > uc->sp_max)
-        uc->sp_max= *val;
-      uc->sp_avg= (uc->sp_avg+(*val))/2;
+	cell_psw->set_bit0(bmP);
     }
   /*else if (cell == cell_pcon)
     {
@@ -1271,26 +1170,6 @@ cl_uc51_dummy_hw::write(class cl_memory_cell *cell, t_mem *val)
       uc->sim->stop(0);
       }*/
 }
-
-/*void
-cl_uc51_dummy_hw::happen(class cl_hw *where, enum hw_event he, void *params)
-{
-  struct ev_port_changed *ep= (struct ev_port_changed *)params;
-
-  if (where->cathegory == HW_PORT &&
-      he == EV_PORT_CHANGED &&
-      ep->id == 3)
-    {
-      t_mem p3o= ep->pins & ep->prev_value;
-      t_mem p3n= ep->new_pins & ep->new_value;
-      if ((p3o & bm_INT0) &&
-          !(p3n & bm_INT0))
-        uc51->p3_int0_edge++;
-      if ((p3o & bm_INT1) &&
-          !(p3n & bm_INT1))
-        uc51->p3_int1_edge++;
-    }
-}*/
 
 
 /* End of s51.src/uc51.cc */

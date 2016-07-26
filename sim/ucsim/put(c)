@@ -39,18 +39,19 @@ done
 
 debug "STARTYEAR= ${STARTYEAR}"
 debug "FILES= ${FILES}"
-
+debug "YEAR= ${YEAR}"
 
 
 # Doing the job
 
 putit()
 {
+    debug "F= ${1}"
   sed -n '/^\/\*@1@\*\//,$p' $1 >${1}.tmp
   if [ -f '(c).1' ]; then
-    (sed 's/@@F@@/'${1}'/g
-          s/@@S@@/'${STARTYEAR}'/g
-          s/@@Y@@/'${YEAR}'/g' '(c).1'
+    (sed 's|@@F@@|'${1}'|g
+          s|@@S@@|'${STARTYEAR}'|g
+          s|@@Y@@|'${YEAR}'|g' '(c).1'
      cat ${1}.tmp) >$1
   else
     (cat <<EOF

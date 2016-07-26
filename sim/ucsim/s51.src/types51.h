@@ -41,10 +41,10 @@ if (newbit) \
   sfr->set_bit1((reg), (bitmask)); \
 else \
   sfr->set_bit0((reg), (bitmask));
-#define GET_C     (get_mem(MEM_SFR, PSW) & bmCY)
-#define SFR_GET_C (sfr->get(PSW) & bmCY)
-#define SET_C(newC) SET_BIT((newC), PSW, bmCY)
-#define SFR_SET_C(newC) SFR_SET_BIT((newC), PSW, bmCY)
+//#define GET_C     (get_mem(MEM_SFR, PSW) & bmCY)
+//#define SFR_GET_C (sfr->get(PSW) & bmCY)
+//#define SET_C(newC) SET_BIT((newC), PSW, bmCY)
+//#define SFR_SET_C(newC) SFR_SET_BIT((newC), PSW, bmCY)
 
 
 /* Event parameters */

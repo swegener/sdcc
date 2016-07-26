@@ -41,5 +41,4 @@ cl_uc251::cl_uc251(int Itype, int Itech, class cl_sim *asim):
 {
 }
 
-
 /* End of s51.src/uc251.cc */

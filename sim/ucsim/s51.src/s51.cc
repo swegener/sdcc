@@ -56,6 +56,7 @@ main(int argc, char *argv[])
     return(1);
   application->set_simulator(sim);
   retval= /*sim->main()*/application->run();
+  application->done();
   delete application;
   
   return(retval);

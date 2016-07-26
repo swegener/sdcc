@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "stypes.h"
 #include "pobjcl.h"
+#include "errorcl.h"
 
 
 enum stack_op {
@@ -49,12 +50,12 @@ class cl_stack_op: public cl_base
 {
 protected:
   enum stack_op operation;
-  t_addr PC;    // of instruction
+  t_addr PC;	// of instruction
   t_addr SP_before;
   t_addr SP_after;
 public:
   cl_stack_op(enum stack_op op,
-              t_addr iPC, t_addr iSP_before, t_addr iSP_after);
+	      t_addr iPC, t_addr iSP_before, t_addr iSP_after);
   virtual ~cl_stack_op(void);
   virtual class cl_stack_op *mk_copy(void);
   static void info_head(class cl_console_base *con);
@@ -63,7 +64,7 @@ protected:
   virtual void print_info(class cl_console_base *con);
 public:
   virtual const char *get_op_name(void);
-  virtual const char *get_matching_name(void) { return("unknown"); }
+  virtual const char *get_matching_name(void) { return(cchars("unknown")); }
   virtual bool sp_increased(void);
   virtual int data_size(void);
   virtual bool match(class cl_stack_op *op);
@@ -83,7 +84,7 @@ protected:
   t_addr pushed_addr;
 public:
   cl_stack_call(t_addr iPC, t_addr called, t_addr pushed,
-                t_addr iSP_before, t_addr iSP_after);
+		t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
   virtual const char *get_op_name(void);
@@ -99,7 +100,7 @@ class cl_stack_intr: public cl_stack_call
 {
 public:
   cl_stack_intr(t_addr iPC, t_addr called, t_addr pushed,
-                t_addr iSP_before, t_addr iSP_after);
+		t_addr iSP_before, t_addr iSP_after);
   virtual class cl_stack_op *mk_copy(void);
 protected:
   virtual const char *get_op_name(void);
@@ -230,7 +231,7 @@ protected:
   int unread_data_size;
 public:
   cl_error_stack_tracker_inconsistent(class cl_stack_op *op,
-                                      int the_unread_data_size);
+				      int the_unread_data_size);
   virtual ~cl_error_stack_tracker_inconsistent(void);
 
   virtual void print(class cl_commander_base *c);
@@ -242,7 +243,7 @@ public:
   cl_stack_error_registry(void);
 };
 
-#endif
 
+#endif
 
 /* End of sim.src/stackcl.h */

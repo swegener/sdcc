@@ -37,13 +37,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "memcl.h"
 #include "brkcl.h"
 #include "stackcl.h"
+#include "varcl.h"
 
 
 /* Counter to count clock ticks */
 
-#define TICK_RUN        0x01
-#define TICK_INISR      0x02
-#define TICK_IDLE       0x03
+#define TICK_RUN	0x01
+#define TICK_INISR	0x02
+#define TICK_IDLE	0x03
 
 class cl_ticker: public cl_base
 {
@@ -55,7 +56,7 @@ public:
 
   cl_ticker(int adir, int in_isr, const char *aname);
   virtual ~cl_ticker(void);
-
+  
   virtual int tick(int nr);
   virtual double get_rtime(double xtal);
   virtual void dump(int nr, double xtal, class cl_console_base *con);
@@ -77,40 +78,43 @@ public:
 class cl_uc: public cl_base
 {
 public:
-  int type;                     // CPU family
-  int technology;               // CMOS, HMOS
-  int state;                    // GO, IDLE, PD
+  int type;			// CPU family
+  int technology;		// CMOS, HMOS
+  int state;			// GO, IDLE, PD
   //class cl_list *options;
   class cl_xtal_option *xtal_option;
 
-  t_addr PC, instPC;            // Program Counter
-  bool inst_exec;               // Instruction is executed
-  class cl_ticker *ticks;       // Nr of XTAL clocks
-  class cl_ticker *isr_ticks;   // Time in ISRs
-  class cl_ticker *idle_ticks;  // Time in idle mode
-  class cl_list *counters;      // User definable timers (tickers)
-  int inst_ticks;               // ticks of an instruction
-  double xtal;                  // Clock speed
+  t_addr PC, instPC;		// Program Counter
+  bool inst_exec;		// Instruction is executed
+  class cl_ticker *ticks;	// Nr of XTAL clocks
+  class cl_ticker *isr_ticks;	// Time in ISRs
+  class cl_ticker *idle_ticks;	// Time in idle mode
+  class cl_list *counters;	// User definable timers (tickers)
+  int inst_ticks;		// ticks of an instruction
+  double xtal;			// Clock speed
 
-  int brk_counter;              // Number of breakpoints
-  class brk_coll *fbrk;         // Collection of FETCH break-points
-  class brk_coll *ebrk;         // Collection of EVENT breakpoints
+  int brk_counter;		// Number of breakpoints
+  class brk_coll *fbrk;		// Collection of FETCH break-points
+  class brk_coll *ebrk;		// Collection of EVENT breakpoints
   class cl_sim *sim;
   //class cl_list *mems;
+ private:
   class cl_hws *hws;
 
+ public:
   class cl_list *memchips;      // v3
   class cl_address_space_list *address_spaces;
   class cl_address_space *rom;  // Required for almost every uc
-
   //class cl_list *address_decoders;
+  class cl_address_space *variables;
+  class cl_var_list *vars;
+  
+  class cl_irqs *it_sources;	// Sources of interrupts
+  class cl_list *it_levels;	// Follow interrupt services
+  class cl_list *stack_ops;	// Track stack operations
 
-  class cl_irqs *it_sources;    // Sources of interrupts
-  class cl_list *it_levels;     // Follow interrupt services
-  class cl_list *stack_ops;     // Track stack operations
-
-  class cl_list *errors;        // Errors of instruction execution
-  class cl_list *events;        // Events happened during inst exec
+  class cl_list *errors;	// Errors of instruction execution
+  class cl_list *events;	// Events happened during inst exec
 
   t_addr sp_max;
   t_addr sp_avg;
@@ -119,22 +123,20 @@ public:
   cl_uc(class cl_sim *asim);
   virtual ~cl_uc(void);
   virtual int init(void);
-  virtual const char *id_string(void);
+  virtual char *id_string(void);
   virtual void reset(void);
 
   // making objects
-  //virtual class cl_m *mk_mem(enum mem_class type, char *class_name);
   virtual void make_memories(void);
-  //virtual t_addr get_mem_size(char *id);
-  //virtual int get_mem_width(char *id);
+  virtual void make_variables(void);
   virtual void mk_hw_elements(void);
   virtual void build_cmdset(class cl_cmdset *cmdset);
 
   // manipulating memories
-  virtual t_mem read_mem(const char *id, t_addr addr);
-  virtual t_mem get_mem(const char *id, t_addr addr);
-  virtual void write_mem(const char *id, t_addr addr, t_mem val);
-  virtual void set_mem(const char *id, t_addr addr, t_mem val);
+  virtual t_mem read_mem(char *id, t_addr addr);
+  virtual t_mem get_mem(char *id, t_addr addr);
+  virtual void write_mem(char *id, t_addr addr, t_mem val);
+  virtual void set_mem(char *id, t_addr addr, t_mem val);
   virtual class cl_address_space *address_space(const char *id);
   virtual class cl_memory *memory(const char *id);
 
@@ -149,21 +151,25 @@ public:
   virtual bool there_is_inst(void);
 
   // manipulating hw elements
+  virtual void add_hw(class cl_hw *hw);
+  virtual int nuof_hws(void);
+  virtual class cl_hw *get_hw(int idx);
   virtual class cl_hw *get_hw(enum hw_cath cath, int *idx);
   virtual class cl_hw *get_hw(char *id_string, int *idx);
   virtual class cl_hw *get_hw(enum hw_cath cath, int hwid, int *idx);
   virtual class cl_hw *get_hw(char *id_string, int hwid, int *idx);
-
+  virtual int get_max_hw_id(enum hw_cath cath);
+  
   // "virtual" timers
   virtual int tick_hw(int cycles);
   virtual void do_extra_hw(int cycles);
   virtual int tick(int cycles);
   virtual class cl_ticker *get_counter(int nr);
-  virtual class cl_ticker *get_counter(char *nam);
+  virtual class cl_ticker *get_counter(const char *nam);
   virtual void add_counter(class cl_ticker *ticker, int nr);
-  virtual void add_counter(class cl_ticker *ticker, char *nam);
+  virtual void add_counter(class cl_ticker *ticker, const char *nam);
   virtual void del_counter(int nr);
-  virtual void del_counter(char *nam);
+  virtual void del_counter(const char *nam);
   virtual double get_rtime(void);
   virtual int clock_per_cycle(void);
 
@@ -175,7 +181,11 @@ public:
   virtual int exec_inst(void);
   virtual void post_inst(void);
 
-  virtual int it_priority(uchar ie_mask) {return(0);}
+  virtual int do_interrupt(void);
+  virtual int priority_of(uchar nuof_it) {return(0);}
+  virtual int priority_main() { return 0; }
+  virtual int accept_it(class it_level *il);
+  virtual bool it_enabled(void) { return false; }
 
   // stack tracking
   virtual void stack_write(class cl_stack_op *op);
@@ -192,12 +202,12 @@ public:
   virtual void remove_all_breaks(void);
   virtual int make_new_brknr(void);
   virtual class cl_ev_brk *mk_ebrk(enum brk_perm perm,
-                                   class cl_address_space *mem,
-                                   char op, t_addr addr, int hit);
+				   class cl_address_space *mem,
+				   char op, t_addr addr, int hit);
   virtual void check_events(void);
 
   // disassembling and symbol recognition
-  virtual const char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr, const char *sep);
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
@@ -209,23 +219,25 @@ public:
   virtual int longest_inst(void);
   virtual bool get_name(t_addr addr, struct name_entry tab[], char *buf);
   virtual bool symbol2address(char *sym, struct name_entry tab[],
-                              t_addr *addr);
+			      t_addr *addr);
+  virtual bool symbol2address(char *sym,
+			      class cl_address_space **as,
+			      t_addr *addr);
   virtual char *symbolic_bit_name(t_addr bit_address,
-                                  class cl_memory *mem,
-                                  t_addr mem_addr,
-                                  t_mem bit_mask);
+				  class cl_memory *mem,
+				  t_addr mem_addr,
+				  t_mem bit_mask);
 
   /* Converting abstract address spaces into real ones */
   virtual class cl_address_space *bit2mem(t_addr bitaddr,
-                                          t_addr *memaddr,
-                                          t_mem *bitmask);
+					  t_addr *memaddr,
+					  t_mem *bitmask);
   virtual t_addr bit_address(class cl_memory *mem,
                              t_addr mem_address,
                              int bit_number) { return(-1); }
 
   // messages from app to handle and broadcast
   virtual bool handle_event(class cl_event &event);
-  //virtual void mem_cell_changed(class cl_address_space *mem, t_addr addr);
   virtual void address_space_added(class cl_address_space *as);
 
   // Error handling
@@ -248,9 +260,9 @@ public:
 
 class cl_error_unknown_code: public cl_error
 {
-protected:
+ protected:
   class cl_uc *uc;
-public:
+ public:
   cl_error_unknown_code(class cl_uc *the_uc);
 
   virtual void print(class cl_commander_base *c);
@@ -262,7 +274,7 @@ public:
   cl_uc_error_registry(void);
 };
 
-#endif
 
+#endif
 
 /* End of uccl.h */

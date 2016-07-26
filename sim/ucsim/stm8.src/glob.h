@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+/* $Id: glob.h 345 2016-07-10 14:51:45Z  $ */
+
 #ifndef GLOB_HEADER
 #define GLOB_HEADER
 
@@ -32,6 +34,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern struct dis_entry disass_stm8[];
+
+extern struct dis_entry disass_stm8_71[];
 
 extern struct dis_entry disass_stm8_72[];
 

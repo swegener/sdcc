@@ -1,30 +1,28 @@
 /*
  * Simulator of microcontrollers (pobjcl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- *
+ * Copyright (C) 1997,16 Drotos Daniel, Talker Bt.
+ * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
 
-/*
-  This file is part of microcontroller simulator: ucsim.
+/* This file is part of microcontroller simulator: ucsim.
 
-  UCSIM is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+UCSIM is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-  UCSIM is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+UCSIM is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with UCSIM; see the file COPYING.  If not, write to the Free
-  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-  02111-1307, USA.
-*/
+You should have received a copy of the GNU General Public License
+along with UCSIM; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA. */
 /*@1@*/
 
 #ifndef POBJ_HEADER
@@ -35,6 +33,7 @@
 #include "pobjt.h"
 
 #include "eventcl.h"
+#include "charscl.h"
 
 
 /*									    #
@@ -44,13 +43,17 @@
 									    #
 */
 
+class cl_abs_base
+{
+};
+
 class cl_list;
 class cl_event;
 
-class cl_base
+class cl_base: public cl_abs_base
 {
 private:
-  char *name;
+  const char *name;
   class cl_base *parent;
   class cl_list *children;
 public:
@@ -97,7 +100,7 @@ public:
   virtual ~cl_event(void);
 
   bool is_handled(void) { return(handled); }
-  virtual void handle(void) { handled= DD_TRUE; }
+  virtual void handle(void) { handled= true; }
 };
 
 
@@ -118,6 +121,7 @@ protected:
   t_index	   Delta;
 
 public:
+  cl_list(t_index alimit, t_index adelta, char *aname);
   cl_list(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_list(void);
 
@@ -150,7 +154,7 @@ public:
   virtual t_index  add(class cl_base *item, class cl_base *parent);
   virtual void     push(void *item);
 
-	  void	   *first_that(match_func test, const void *arg);
+	  void	   *first_that(match_func test, void *arg);
 	  void	   *last_that(match_func test, void *arg);
 	  void	   for_each(iterator_func action, void *arg);
 
@@ -172,15 +176,16 @@ class cl_sorted_list: public cl_list
 public:
   bool		   Duplicates;
 public:
+  cl_sorted_list(t_index alimit, t_index adelta, char *aname);
   cl_sorted_list(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_sorted_list(void);
-
-  virtual bool	   search(const void *key, t_index& index);
+  
+  virtual bool	   search(void *key, t_index& index);
   virtual t_index  index_of(void *item);
   virtual t_index  add(void *item);
-  virtual const void *key_of(void *item);
+  virtual void	   *key_of(void *item);
 private:
-  virtual int	   compare(const void *key1, const void *key2)= 0;
+  virtual int	   compare(void *key1, void *key2)= 0;
 };
 
 
@@ -194,11 +199,12 @@ private:
 class cl_strings: public cl_sorted_list
 {
 public:
+  cl_strings(t_index alimit, t_index adelta, char *aname);
   cl_strings(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_strings(void);
-
+  
 private:
-  virtual int	   compare(const void *key1, const void *key2);
+  virtual int	   compare(void *key1, void *key2);
   virtual void	   free_item(void *item);
 };
 
@@ -213,12 +219,13 @@ private:
 class cl_ustrings: public cl_strings
 {
 public:
+  cl_ustrings(t_index alimit, t_index adelta, char *aname);
   cl_ustrings(t_index alimit, t_index adelta, const char *aname);
   virtual ~cl_ustrings(void);
-
+  
 private:
-  virtual int	   compare(const void *key1, const void *key2);
-  virtual bool	   search(const void *key, t_index &index);
+  virtual int	   compare(void *key1, void *key2);
+  virtual bool	   search(void *key, t_index &index);
 };
 
 

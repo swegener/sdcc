@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "globals.h"
 #include "utils.h"
 #include "cmdutil.h"
+#include "charscl.h"
 
 #include "sim51cl.h"
 //#include "cmd51cl.h"
@@ -57,14 +58,14 @@ class cl_uc *
 cl_sim51::mk_controller(void)
 {
   int i;
-  const char *typ= NIL;
+  char *typ= 0;
   class cl_optref type_option(this);
 
   type_option.init();
-  type_option.use("cpu_type");
+  type_option.use(cchars("cpu_type"));
   i= 0;
-  if ((typ= type_option.get_value(typ)) == NIL)
-    typ= "C51";
+  if ((typ= type_option.get_value(typ)) == 0)
+    typ= cchars("C51");
   while ((cpus_51[i].type_str != NULL) &&
 	 (strcmp(typ, cpus_51[i].type_str) != 0))
     i++;
@@ -84,6 +85,8 @@ cl_sim51::mk_controller(void)
       return(new cl_uc51r(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_89C51R:
       return(new cl_uc89c51r(cpus_51[i].type, cpus_51[i].technology, this));
+    case CPU_C521:
+      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_251:
       return(new cl_uc251(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_DS390: case CPU_DS390F:

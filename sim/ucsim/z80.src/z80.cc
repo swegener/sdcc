@@ -60,16 +60,18 @@ cl_z80::cl_z80(int Itype, int Itech, class cl_sim *asim):
   cl_uc(asim)
 {
   type= Itype;
+
 }
 
 int
 cl_z80::init(void)
 {
+
   cl_uc::init(); /* Memories now exist */
 
-  rom= address_space(MEM_ROM_ID);
+  //rom= address_space(MEM_ROM_ID);
 //  ram= mem(MEM_XRAM);
-  ram= rom;
+  //ram= rom;
 
   // zero out ram(this is assumed in regression tests)
   for (int i=0x8000; i<0x10000; i++) {
@@ -79,10 +81,10 @@ cl_z80::init(void)
   return(0);
 }
 
-const char *
+char *
 cl_z80::id_string(void)
 {
-  return("unspecified Z80");
+  return((char*)"unspecified Z80");
 }
 
 
@@ -107,7 +109,7 @@ void
 cl_z80::mk_hw_elements(void)
 {
   //class cl_base *o;
-  /* t_uc::mk_hw() does nothing */
+  cl_uc::mk_hw_elements();
 }
 
 void
@@ -115,7 +117,7 @@ cl_z80::make_memories(void)
 {
   class cl_address_space *as;
 
-  as= new cl_address_space("rom", 0, 0x10000, 8);
+  rom= ram= as= new cl_address_space("rom", 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);
 
@@ -129,6 +131,102 @@ cl_z80::make_memories(void)
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
+
+  regs8= new cl_address_space("regs8", 0, 16, 8);
+  regs8->init();
+  regs8->get_cell(0)->decode((t_mem*)&regs.A);
+  regs8->get_cell(1)->decode((t_mem*)&regs.F);
+  regs8->get_cell(2)->decode((t_mem*)&regs.bc.h);
+  regs8->get_cell(3)->decode((t_mem*)&regs.bc.l);
+  regs8->get_cell(4)->decode((t_mem*)&regs.de.h);
+  regs8->get_cell(5)->decode((t_mem*)&regs.de.l);
+  regs8->get_cell(6)->decode((t_mem*)&regs.hl.h);
+  regs8->get_cell(7)->decode((t_mem*)&regs.hl.l);
+
+  regs8->get_cell(8)->decode((t_mem*)&regs.aA);
+  regs8->get_cell(9)->decode((t_mem*)&regs.aF);
+  regs8->get_cell(10)->decode((t_mem*)&regs.a_bc.h);
+  regs8->get_cell(11)->decode((t_mem*)&regs.a_bc.l);
+  regs8->get_cell(12)->decode((t_mem*)&regs.a_de.h);
+  regs8->get_cell(13)->decode((t_mem*)&regs.a_de.l);
+  regs8->get_cell(14)->decode((t_mem*)&regs.a_hl.h);
+  regs8->get_cell(15)->decode((t_mem*)&regs.a_hl.l);
+
+  regs16= new cl_address_space("regs16", 0, 11, 16);
+  regs16->init();
+
+  regs16->get_cell(0)->decode((t_mem*)&regs.AF);
+  regs16->get_cell(1)->decode((t_mem*)&regs.BC);
+  regs16->get_cell(2)->decode((t_mem*)&regs.DE);
+  regs16->get_cell(3)->decode((t_mem*)&regs.HL);
+  regs16->get_cell(4)->decode((t_mem*)&regs.IX);
+  regs16->get_cell(5)->decode((t_mem*)&regs.IY);
+  regs16->get_cell(6)->decode((t_mem*)&regs.SP);
+  regs16->get_cell(7)->decode((t_mem*)&regs.aAF);
+  regs16->get_cell(8)->decode((t_mem*)&regs.aBC);
+  regs16->get_cell(9)->decode((t_mem*)&regs.aDE);
+  regs16->get_cell(10)->decode((t_mem*)&regs.aHL);
+
+  address_spaces->add(regs8);
+  address_spaces->add(regs16);
+
+  class cl_var *v;
+  vars->add(v= new cl_var(cchars("A"), regs8, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("F"), regs8, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("B"), regs8, 2));
+  v->init();
+  vars->add(v= new cl_var(cchars("C"), regs8, 3));
+  v->init();
+  vars->add(v= new cl_var(cchars("D"), regs8, 4));
+  v->init();
+  vars->add(v= new cl_var(cchars("E"), regs8, 5));
+  v->init();
+  vars->add(v= new cl_var(cchars("H"), regs8, 6));
+  v->init();
+  vars->add(v= new cl_var(cchars("L"), regs8, 7));
+  v->init();
+
+  vars->add(v= new cl_var(cchars("ALT_A"), regs8, 8));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_F"), regs8, 9));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_B"), regs8, 10));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_C"), regs8, 11));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_D"), regs8, 12));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_E"), regs8, 13));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_H"), regs8, 14));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_L"), regs8, 15));
+  v->init();
+
+  vars->add(v= new cl_var(cchars("AF"), regs16, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("BC"), regs16, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("DE"), regs16, 2));
+  v->init();
+  vars->add(v= new cl_var(cchars("HL"), regs16, 3));
+  v->init();
+  vars->add(v= new cl_var(cchars("IX"), regs16, 4));
+  v->init();
+  vars->add(v= new cl_var(cchars("IY"), regs16, 5));
+  v->init();
+  vars->add(v= new cl_var(cchars("SP"), regs16, 6));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_AF"), regs16, 7));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_BC"), regs16, 8));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_DE"), regs16, 9));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_HL"), regs16, 10));
+  v->init();
 }
 
 
@@ -207,12 +305,12 @@ cl_z80::get_disasm_info(t_addr addr,
   int start_addr = addr;
   struct dis_entry *dis_e;
 
-  code= get_mem(MEM_ROM_ID, addr++);
+  code= rom->get(addr++);
   dis_e = NULL;
 
   switch(code) {
     case 0xcb:  /* ESC code to lots of op-codes, all 2-byte */
-      code= get_mem(MEM_ROM_ID, addr++);
+      code= rom->get(addr++);
       i= 0;
       while ((code & disass_z80_cb[i].mask) != disass_z80_cb[i].code &&
         disass_z80_cb[i].mnemonic)
@@ -224,7 +322,7 @@ cl_z80::get_disasm_info(t_addr addr,
     break;
 
     case 0xed: /* ESC code to about 80 opcodes of various lengths */
-      code= get_mem(MEM_ROM_ID, addr++);
+      code= rom->get(addr++);
       i= 0;
       while ((code & disass_z80_ed[i].mask) != disass_z80_ed[i].code &&
         disass_z80_ed[i].mnemonic)
@@ -236,11 +334,11 @@ cl_z80::get_disasm_info(t_addr addr,
     break;
 
     case 0xdd: /* ESC codes,about 284, vary lengths, IX centric */
-      code= get_mem(MEM_ROM_ID, addr++);
+      code= rom->get(addr++);
       if (code == 0xcb) {
         immed_n = 2;
         addr++;  // pass up immed data
-        code= get_mem(MEM_ROM_ID, addr++);
+        code= rom->get(addr++);
         i= 0;
         while ((code & disass_z80_ddcb[i].mask) != disass_z80_ddcb[i].code &&
           disass_z80_ddcb[i].mnemonic)
@@ -262,11 +360,11 @@ cl_z80::get_disasm_info(t_addr addr,
     break;
 
     case 0xfd: /* ESC codes,sme as dd but IY centric */
-      code= get_mem(MEM_ROM_ID, addr++);
+      code= rom->get(addr++);
       if (code == 0xcb) {
         immed_n = 2;
         addr++;  // pass up immed data
-        code= get_mem(MEM_ROM_ID, addr++);
+        code= rom->get(addr++);
         i= 0;
         while ((code & disass_z80_fdcb[i].mask) != disass_z80_fdcb[i].code &&
           disass_z80_fdcb[i].mnemonic)
@@ -322,7 +420,7 @@ cl_z80::get_disasm_info(t_addr addr,
   return b;
 }
 
-const char *
+char *
 cl_z80::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20];
@@ -349,18 +447,18 @@ cl_z80::disass(t_addr addr, const char *sep)
           switch (*(b++))
             {
             case 'd': // d    jump relative target, signed? byte immediate operand
-              sprintf(temp, "#%d", (char)get_mem(MEM_ROM_ID, addr+immed_offset));
+              sprintf(temp, "#%d", (char)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'w': // w    word immediate operand
               sprintf(temp, "#0x%04x",
-                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)) |
-                        (get_mem(MEM_ROM_ID, addr+immed_offset+1)<<8)) );
+                 (uint)((rom->get(addr+immed_offset)) |
+                        (rom->get(addr+immed_offset+1)<<8)) );
               ++immed_offset;
               ++immed_offset;
               break;
             case 'b': // b    byte immediate operand
-              sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
+              sprintf(temp, "#0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             default:
@@ -639,23 +737,23 @@ cl_z80::exec_inst(void)
 }
 
 void cl_z80::store1( TYPE_UWORD addr, t_mem val ) {
-  ram->set(addr, val);
+  ram->write(addr, val);
 }
 
 void cl_z80::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
-  ram->set(addr,   val & 0xff);
-  ram->set(addr+1, (val >> 8) & 0xff);
+  ram->write(addr,   val & 0xff);
+  ram->write(addr+1, (val >> 8) & 0xff);
 }
 
 TYPE_UBYTE  cl_z80::get1( TYPE_UWORD addr ) {
-  return ram->get(addr);
+  return ram->read(addr);
 }
 
 TYPE_UWORD  cl_z80::get2( TYPE_UWORD addr ) {
   TYPE_UWORD  l, h;
   
-  l = ram->get(addr  );
-  h = ram->get(addr+1);
+  l = ram->read(addr  );
+  h = ram->read(addr+1);
   
   return (h << 8) | l;
 }

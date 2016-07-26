@@ -56,9 +56,9 @@ cl_uc51r::mk_hw_elements(void)
   class cl_hw *h;
 
   cl_uc52::mk_hw_elements();
-  hws->add(h= new cl_wdt(this, 0x3fff));
+  add_hw(h= new cl_wdt(this, 0x3fff));
   h->init();
-  hws->add(h= new cl_uc51r_dummy_hw(this));
+  add_hw(h= new cl_uc51r_dummy_hw(this));
   h->init();
 }
 
@@ -67,7 +67,8 @@ void
 cl_uc51r::make_memories(void)
 {
   class cl_address_space *as;
-
+  int i;
+  
   rom= as= new cl_address_space("rom", 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);
@@ -82,7 +83,7 @@ cl_uc51r::make_memories(void)
   address_spaces->add(as);
 
   class cl_address_decoder *ad;
-  class cl_memory_chip *chip;
+  class cl_memory_chip *chip, *sfr_chip, *iram_chip;
 
   chip= new cl_memory_chip("rom_chip", 0x10000, 8);
   chip->init();
@@ -92,7 +93,7 @@ cl_uc51r::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("iram_chip", 0x100, 8);
+  chip= iram_chip= new cl_memory_chip("iram_chip", 0x100, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space("iram"), chip, 0, 0xff, 0);
@@ -111,7 +112,7 @@ cl_uc51r::make_memories(void)
   chip->init();
   memchips->add(chip);
 
-  chip= new cl_memory_chip("sfr_chip", 0x80, 8);
+  chip= sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space("sfr"), chip, 0x80, 0xff, 0);
@@ -121,6 +122,56 @@ cl_uc51r::make_memories(void)
 
   acc= sfr->get_cell(ACC);
   psw= sfr->get_cell(PSW);
+
+  regs= new cl_address_space("regs", 0, 8, 8);
+  regs->init();
+  address_spaces->add(regs);
+  
+  cl_banker *b= new cl_banker(sfr, 0xd0, 0x18,
+			      regs, 0, 7);
+  b->init();
+  regs->decoders->add(b);
+  b->add_bank(0, memory("iram_chip"), 0);
+  b->add_bank(1, memory("iram_chip"), 8);
+  b->add_bank(2, memory("iram_chip"), 16);
+  b->add_bank(3, memory("iram_chip"), 24);
+  psw->write(0);
+  for (i= 0; i < 8; i++)
+    R[i]= regs->get_cell(i);
+
+  cl_var *v;
+  vars->add(v= new cl_var(cchars("R0"), regs, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("R1"), regs, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("R2"), regs, 2));
+  v->init();
+  vars->add(v= new cl_var(cchars("R3"), regs, 3));
+  v->init();
+  vars->add(v= new cl_var(cchars("R4"), regs, 4));
+  v->init();
+  vars->add(v= new cl_var(cchars("R5"), regs, 5));
+  v->init();
+  vars->add(v= new cl_var(cchars("R6"), regs, 6));
+  v->init();
+  vars->add(v= new cl_var(cchars("R7"), regs, 7));
+  v->init();
+
+  bits= as= new cl_address_space("bits", 0, 0x100, 1);
+  as->init();
+  address_spaces->add(as);
+  ad= new cl_bander(bits, 0, 127,
+		    iram_chip, 32,
+		    8, 1);
+  ad->init();
+  bits->decoders->add(ad);
+  ad->activate(0);
+  ad= new cl_bander(bits, 128, 255,
+		    sfr_chip, 0,
+		    8, 8);
+  ad->init();
+  bits->decoders->add(ad);
+  ad->activate(0);
 }
 
 
@@ -182,12 +233,12 @@ int
 cl_uc51r_dummy_hw::init(void)
 {
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
+  cl_hw::init();
   if (!sfr)
     {
       fprintf(stderr, "No SFR to register %s[%d] into\n", id_string, id);
     }
-  //use_cell(sfr, PSW, &cell_psw, wtd_restore);
-  register_cell(sfr, AUXR, &cell_auxr, wtd_restore);
+  cell_auxr= register_cell(sfr, AUXR);
   return(0);
 }
 

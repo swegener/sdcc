@@ -27,11 +27,13 @@ CPPFLAGS        = @CPPFLAGS@ -I$(top_builddir) -I$(srcdir) \
 		  -I$(top_srcdir)/$(CMDDIR) -I$(top_srcdir)/$(GUIDIR)
 CFLAGS          = @CFLAGS@ -I$(top_builddir) @WALL_FLAG@
 CXXFLAGS        = @CXXFLAGS@ -I$(top_builddir) @WALL_FLAG@
+WINSOCK_AVAIL   = @WINSOCK_AVAIL@
+LDFLAGS		= @LDFLAGS@
 
 EXEEXT		= @EXEEXT@
 
 LIB_LIST	= ucsimutil cmd sim
-UCSIM_LIBS	= -Wl,--start-group $(patsubst %,-l%,$(LIB_LIST)) -Wl,--end-group
+UCSIM_LIBS	= -Wl,--start-group $(patsubst %,-l%,$(LIB_LIST)) @LIBS@ -Wl,--end-group
 UCSIM_LIB_FILES	= $(patsubst %,lib%.a,$(LIB_LIST))
 
 prefix          = @prefix@
@@ -48,7 +50,12 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS         = pobj.o globals.o utils.o error.o app.o option.o
+OBJECTS         = pobj.o globals.o utils.o error.o app.o option.o chars.o fio.o
+ifeq ($(WINSOCK_AVAIL), 1)
+OBJECTS		+= fwio.o
+else
+OBJECTS		+= fuio.o
+endif
 SOURCES		= $(patsubst %.o,%.cc,$(OBJECTS))
 UCSIM_OBJECTS	= ucsim.o
 UCSIM_SOURCES	= $(patsubst %.o,%.cc,$(UCSIM_OBJECTS))
@@ -114,8 +121,8 @@ include $(srcdir)/clean.mk
 # My rules
 # --------
 libucsimutil.a: $(OBJECTS)
-	ar -rc $*.a $(OBJECTS)
-	$(RANLIB) $*.a
+	ar -rcD $@ $(OBJECTS)
+	$(RANLIB) $@
 
 
 ifeq ($(enable_ucsim),yes)
@@ -124,9 +131,14 @@ else
 ucsim_app:
 endif
 
+ftest_app: libs ftest$(EXEEXT)
+
 ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
 	echo $(UCSIM_LIB_FILES)
 	$(CXX) $(CXXFLAGS) -o $@ $< -L$(top_builddir) $(UCSIM_LIBS)
+
+ftest$(EXEEXT): ftest.o libucsimutil.a
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -L$(top_builddir) -lucsimutil @LIBS@
 
 ptt: ptt.o
 	$(CXX) $(CXXFLAGS) -o $@ $< -lpthread

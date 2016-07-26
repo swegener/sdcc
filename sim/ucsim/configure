@@ -699,6 +699,7 @@ enable_stm8_port
 enable_xa_port
 enable_s08_port
 enable_hc08_port
+enable_tlcs_port
 enable_r3ka_port
 enable_r2k_port
 enable_gbz80_port
@@ -733,6 +734,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -765,6 +767,7 @@ enable_z180_port
 enable_gbz80_port
 enable_r2k_port
 enable_r3ka_port
+enable_tlcs_port
 enable_hc08_port
 enable_s08_port
 enable_xa_port
@@ -834,6 +837,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE}'
@@ -1086,6 +1090,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1223,7 +1236,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1376,6 +1389,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1422,6 +1436,7 @@ Optional Features:
   --disable-gbz80-port    do not compile simulator for gbz80
   --disable-r2k-port      do not compile simulator for r2k
   --disable-r3ka-port     do not compile simulator for r3ka
+  --disable-tlcs-port    do not compile simulator for TLCS
   --disable-hc08-port     do not compile simulator for hc08
   --disable-s08-port      do not compile simulator for s08
   --enable-xa-port        compile simulator for xa
@@ -2851,6 +2866,15 @@ else
   enable_r3ka_port="yes"
 fi
 
+# Check whether --enable-tlcs-port was given.
+if test "${enable_tlcs_port+set}" = set; then :
+  enableval=$enable_tlcs_port; if test $enable_tlcs_port != "no"; then
+    enable_tlcs_port="yes"
+fi
+else
+  enable_tlcs_port="yes"
+fi
+
 # Check whether --enable-hc08-port was given.
 if test "${enable_hc08_port+set}" = set; then :
   enableval=$enable_hc08_port; if test $enable_hc08_port != "no"; then
@@ -2904,6 +2928,7 @@ fi
 else
   enable_serio="no"
 fi
+
 
 
 
@@ -15513,13 +15538,36 @@ fi
 
 done
 
-for ac_header in getopt.h unistd.h termios.h
+for ac_header in getopt.h
 do :
-  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
-ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
-if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "getopt.h" "ac_cv_header_getopt_h" "$ac_includes_default"
+if test "x$ac_cv_header_getopt_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+#define HAVE_GETOPT_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in unistd.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "unistd.h" "ac_cv_header_unistd_h" "$ac_includes_default"
+if test "x$ac_cv_header_unistd_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_UNISTD_H 1
+_ACEOF
+
+fi
+
+done
+
+for ac_header in termios.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "termios.h" "ac_cv_header_termios_h" "$ac_includes_default"
+if test "x$ac_cv_header_termios_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_TERMIOS_H 1
 _ACEOF
 
 fi
@@ -16057,7 +16105,7 @@ fi
 #curses_ok="no")
 #,
 #-lcurses)
-
+CURSES_LIBS=""
 if test $curses_h_ok != yes; then
   panel_ok="no"
   curses_ok="no"
@@ -16100,7 +16148,7 @@ fi
 $as_echo "$ac_cv_lib_panel_panel_above" >&6; }
 if test "x$ac_cv_lib_panel_panel_above" = xyes; then :
   panel_ok="yes"
-    curses_ok="yes"
+    curses_ok="no"
     CURSES_LIBS="-lpanel"
 else
   panel_ok="no"
@@ -16148,7 +16196,7 @@ fi
 $as_echo "$ac_cv_lib_curses_nl" >&6; }
 if test "x$ac_cv_lib_curses_nl" = xyes; then :
   curses_ok="yes"
-      CURSES_LIBS="-lcurses"
+      CURSES_LIBS="${CURSES_LIBS} -lcurses"
 else
   curses_ok="no"
 fi
@@ -16194,7 +16242,7 @@ fi
 $as_echo "$ac_cv_lib_ncurses_nl" >&6; }
 if test "x$ac_cv_lib_ncurses_nl" = xyes; then :
   curses_ok="yes"
-      CURSES_LIBS="-lncurses"
+      CURSES_LIBS="${CURSES_LIBS} -lncurses"
 else
   curses_ok="no"
 fi
@@ -17210,7 +17258,7 @@ _ACEOF
 # Generating output files
 # ===========================================================================
 
-ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk sim.src/Makefile cmd.src/Makefile s51.src/Makefile avr.src/Makefile z80.src/Makefile hc08.src/Makefile xa.src/Makefile stm8.src/Makefile st7.src/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
+ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk sim.src/Makefile cmd.src/Makefile s51.src/Makefile avr.src/Makefile z80.src/Makefile tlcs.src/Makefile hc08.src/Makefile xa.src/Makefile stm8.src/Makefile st7.src/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -18297,6 +18345,7 @@ do
     "s51.src/Makefile") CONFIG_FILES="$CONFIG_FILES s51.src/Makefile" ;;
     "avr.src/Makefile") CONFIG_FILES="$CONFIG_FILES avr.src/Makefile" ;;
     "z80.src/Makefile") CONFIG_FILES="$CONFIG_FILES z80.src/Makefile" ;;
+    "tlcs.src/Makefile") CONFIG_FILES="$CONFIG_FILES tlcs.src/Makefile" ;;
     "hc08.src/Makefile") CONFIG_FILES="$CONFIG_FILES hc08.src/Makefile" ;;
     "xa.src/Makefile") CONFIG_FILES="$CONFIG_FILES xa.src/Makefile" ;;
     "stm8.src/Makefile") CONFIG_FILES="$CONFIG_FILES stm8.src/Makefile" ;;
@@ -19698,4 +19747,4 @@ fi
 #gui.src/portmon.src/Makefile
 
 
-# End of configure/configure.in
+# End of configure.ac

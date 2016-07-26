@@ -12,3 +12,5 @@ Done: Tue Aug 17 1999
 dis command prints out short lists repeatedly. It should remember addresses
 printed out and stop if an already used address comes.
 Thu Sep 30 1999
+
+Linker options for mingw: -static-libgcc -static-libstdc++

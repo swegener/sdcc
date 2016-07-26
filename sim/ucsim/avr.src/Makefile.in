@@ -118,7 +118,7 @@ include $(srcdir)/clean.mk
 avr.src: savr$(EXEEXT) shared_lib
 
 savr$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -Wl,--start-group $(LIBS) -Wl,--end-group -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/savr.so
@@ -129,7 +129,7 @@ shared_lib:
 endif
 
 $(top_builddir)/savr.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/savr.so
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs:
 	$(MAKE) -C $(top_builddir)/cmd.src all
@@ -146,7 +146,7 @@ otherlibs:
 # ----------------------
 checkconf:
 	@if [ -f $(top_builddir)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
+	  $(MAKE) -C $(top_builddir) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
 # End of avr.src/Makefile.in

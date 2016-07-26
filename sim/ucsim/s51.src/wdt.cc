@@ -37,7 +37,7 @@ cl_wdt::cl_wdt(class cl_uc *auc, long resetvalue):
 {
   reset_value= resetvalue;
   wdt= -1;
-  written_since_reset= DD_FALSE;
+  written_since_reset= false;
 }
 
 int
@@ -45,12 +45,12 @@ cl_wdt::init(void)
 {
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
 
+  cl_hw::init();
   if (!sfr)
     {
       fprintf(stderr, "No SFR to register WDT into\n");
     }
-  //wdtrst= sfr->register_hw(WDTRST, this, (int*)0);
-  register_cell(sfr, WDTRST, &wdtrst, wtd_restore);
+  wdtrst= register_cell(sfr, WDTRST);
   return(0);
 }
 
@@ -63,11 +63,8 @@ cl_wdt::write(class cl_memory_cell *cell, t_mem *val)
       written_since_reset)
     {
       wdt= 0;
-      /*uc->sim->app->get_commander()->
-        debug("%g sec (%d tick): Watchdog timer enabled/reset PC= 0x%06x"
-        "\n", uc->get_rtime(), uc->ticks->ticks, uc51r->PC);*/
     }
-  written_since_reset= DD_TRUE;
+  written_since_reset= true;
 }
 
 int
@@ -77,13 +74,10 @@ cl_wdt::tick(int cycles)
     {
       wdt+= cycles;
       if (wdt > reset_value)
-        {
-          /*sim->app->get_commander()->
-            debug("%g sec (%d ticks): Watchdog timer resets the CPU, "
-            "PC= 0x%06x\n", get_rtime(), ticks->ticks, PC);*/
-          uc->reset();
-          //return(resWDTRESET);
-        }
+	{
+	  uc->reset();
+	  //return(resWDTRESET);
+	}
     }
   return(0);
 }
@@ -91,7 +85,7 @@ cl_wdt::tick(int cycles)
 void
 cl_wdt::reset(void)
 {
-  written_since_reset= DD_FALSE;
+  written_since_reset= false;
   wdt= -1;
 }
 
@@ -99,7 +93,7 @@ void
 cl_wdt::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d] %s counter=%d (remains=%d)\n", id_string, id,
-                 (wdt>=0)?"ON":"OFF", wdt, (wdt>=0)?(reset_value-wdt):0);
+		 (wdt>=0)?"ON":"OFF", wdt, (wdt>=0)?(reset_value-wdt):0);
 }
 
 

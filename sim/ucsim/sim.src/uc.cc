@@ -39,15 +39,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // cmd.src
 #include "newcmdcl.h"
-#include "cmduccl.h"
-#include "bpcl.h"
-#include "getcl.h"
-#include "setcl.h"
-#include "infocl.h"
-#include "timercl.h"
-#include "cmdstatcl.h"
-#include "cmdmemcl.h"
 #include "cmdutil.h"
+#include "cmd_uccl.h"
+#include "cmd_bpcl.h"
+#include "cmd_getcl.h"
+#include "cmd_setcl.h"
+#include "cmd_infocl.h"
+#include "cmd_timercl.h"
+#include "cmd_statcl.h"
+#include "cmd_memcl.h"
 
 // local, sim.src
 #include "uccl.h"
@@ -55,6 +55,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "memcl.h"
 #include "simcl.h"
 #include "itsrccl.h"
+#include "simifcl.h"
+
 
 static class cl_uc_error_registry uc_error_registry;
 
@@ -95,10 +97,10 @@ void
 cl_ticker::dump(int nr, double xtal, class cl_console_base *con)
 {
   con->dd_printf("timer #%d(\"%s\") %s%s: %g sec (%lu clks)\n",
-                 nr, get_name("unnamed"),
-                 (options&TICK_RUN)?"ON":"OFF",
-                 (options&TICK_INISR)?",ISR":"",
-                 get_rtime(xtal), ticks);
+		 nr, get_name("unnamed"),
+		 (options&TICK_RUN)?"ON":"OFF",
+		 (options&TICK_INISR)?",ISR":"",
+		 get_rtime(xtal), ticks);
 }
 
 
@@ -157,7 +159,7 @@ cl_uc::cl_uc(class cl_sim *asim):
   events= new cl_list(2, 2, "events in uc");
   sp_max= 0;
   sp_avg= 0;
-  inst_exec= DD_FALSE;
+  inst_exec= false;
 }
 
 
@@ -197,14 +199,16 @@ cl_uc::init(void)
     xtal= xtal_option->get_value(xtal);
   else
     xtal= 11059200;
+  vars= new cl_var_list();
+  make_variables();
   make_memories();
-  rom= address_space(MEM_ROM_ID);
+  if (rom == NULL)
+    rom= address_space(cchars("rom")/*MEM_ROM_ID*/);
   ebrk= new brk_coll(2, 2, rom);
   fbrk= new brk_coll(2, 2, rom);
-  fbrk->Duplicates= DD_FALSE;
+  fbrk->Duplicates= false;
   brk_counter= 0;
   mk_hw_elements();
-  reset();
   class cl_cmdset *cs= sim->app->get_commander()->cmdset;
   build_cmdset(cs);
 
@@ -213,18 +217,19 @@ cl_uc::init(void)
       char *fname= (char *)(sim->app->in_files->at(i));
       long l;
       if ((l= read_hex_file(fname)) >= 0)
-        {
-          sim->app->get_commander()->all_printf("%ld words read from %s\n",
-                                                l, fname);
-        }
+	{
+	  sim->app->get_commander()->all_printf("%ld words read from %s\n",
+						l, fname);
+	}
     }
+  reset();
   return(0);
 }
 
-const char *
+char *
 cl_uc::id_string(void)
 {
-  return("unknown microcontroller");
+  return((char*)"unknown microcontroller");
 }
 
 void
@@ -240,7 +245,7 @@ cl_uc::reset(void)
   /*FIXME should we clear user counters?*/
   il= (class it_level *)(it_levels->top());
   while (il &&
-         il->level >= 0)
+	 il->level >= 0)
     {
       il= (class it_level *)(it_levels->pop());
       delete il;
@@ -265,7 +270,42 @@ cl_uc::reset(void)
 
 void
 cl_uc::make_memories(void)
-{}
+{
+}
+
+void
+cl_uc::make_variables(void)
+{
+  class cl_address_space *as;
+  class cl_option *o= sim->app->options->get_option("var_size");
+  long l, i;
+  
+  if (o)
+    o->get_value(&l);
+  else
+    l= 0x100;
+
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+
+  if (l > 0)
+    {
+      variables= as= new cl_address_space("variables", 0, l, 32);
+      as->init();
+      address_spaces->add(as);
+
+      chip= new cl_memory_chip("variable_storage", l, 32);
+      chip->init();
+      memchips->add(chip);
+      ad= new cl_address_decoder(variables, chip, 0, l-1, 0);
+      ad->init();
+      variables->decoders->add(ad);
+      ad->activate(0);
+
+      for (i= 0; i < l; i++)
+	variables->set(i, 0);
+    }
+}
 
 /*t_addr
 cl_uc::get_mem_size(char *id)
@@ -284,6 +324,10 @@ cl_uc::get_mem_width(char *id)
 void
 cl_uc::mk_hw_elements(void)
 {
+  class cl_hw *h;
+
+  add_hw(h= new cl_simulator_interface(this));
+  h->init();
 }
 
 void
@@ -328,24 +372,24 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
 "long help of reset"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dump_cmd("dump", DD_TRUE,
+  cmdset->add(cmd= new cl_dump_cmd("dump", true,
 "dump memory_type [start [stop [bytes_per_line]]]\n"
 "                   Dump memory of specified type\n"
 "dump bit...        Dump bits",
 "long help of dump"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dch_cmd("dch", DD_TRUE,
+  cmdset->add(cmd= new cl_dch_cmd("dch", true,
 "dch [start [stop]] Dump code in hex form",
 "long help of dch"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_dc_cmd("dc", DD_TRUE,
+  cmdset->add(cmd= new cl_dc_cmd("dc", true,
 "dc [start [stop]]  Dump code in disass form",
 "long help of dc"));
   cmd->init();
 
-  cmdset->add(cmd= new cl_disassemble_cmd("disassemble", DD_TRUE,
+  cmdset->add(cmd= new cl_disassemble_cmd("disassemble", true,
 "disassemble [start [offset [lines]]]\n"
 "                   Disassemble code",
 "long help of disassemble"));
@@ -483,6 +527,11 @@ cmd->init();*/
 "info memory        Information about memory system",
 "long help of info memory"));
     cmd->init();
+    cset->add(cmd= new cl_info_var_cmd("variables", 0,
+"info variables     Information about variables",
+"long help of info variables"));
+    cmd->init();
+    cmd->add_name("vars");
   }
   if (!super_cmd) {
     cmdset->add(cmd= new cl_super_cmd("info", 0,
@@ -539,6 +588,8 @@ cmd->init();*/
   }
 
   {
+    class cl_super_cmd *mem_create;
+    class cl_cmdset *mem_create_cset;
     super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("memory"));
     if (super_cmd)
       cset= super_cmd->get_subcommands();
@@ -552,32 +603,84 @@ cmd->init();*/
 "long help of memory"));
     cmd->init();
     */
-    cset->add(cmd= new cl_memory_createchip_cmd("createchip", 0,
-"memory createchip id size cellsize\n"
+    mem_create= (class cl_super_cmd *)cset->get_cmd("create");
+    if (mem_create)
+      mem_create_cset= mem_create->get_subcommands();
+    else {
+      mem_create_cset= new cl_cmdset();
+      mem_create_cset->init();
+    }
+    
+    mem_create_cset->add(cmd= new cl_memory_create_chip_cmd("chip", 0,
+"memory create chip id size cellsize\n"
 "                   Create a new memory chip",
-"long help of memory createchip"));
+"long help of memory create chip"));
     cmd->init();
-    cmd->add_name("cchip");
-    cset->add(cmd= new cl_memory_createaddressspace_cmd("createaddressspace", 0,
-"memory createaddressspace id startaddr size\n"
-"                   Create address space",
-"long help of memory createaddressspace"));
+
+    mem_create_cset->add(cmd= new cl_memory_create_addressspace_cmd("addressspace", 0,
+"memory create addressspace id startaddr size\n"
+"                   Create a new address space",
+"long help of memory create addressspace"));
     cmd->init();
-    cmd->add_name("createaddrspace");
-    cmd->add_name("createaspace");
-    cmd->add_name("caddressspace");
-    cmd->add_name("caddrspace");
-    cmd->add_name("caspace");
-    cset->add(cmd= new cl_memory_createaddressdecoder_cmd("createaddressdecoder", 0,
-"memory createaddressdecoder addressspace begin end chip begin\n"
-"                   Create address decoder",
-"long help of memory createaddressdecoder"));
+    cmd->add_name("addrspace");
+    cmd->add_name("aspace");
+    cmd->add_name("as");
+    cmd->add_name("addrs");
+    cmd->add_name("addr");
+
+    mem_create_cset->add(cmd= new cl_memory_create_addressdecoder_cmd("addressdecoder", 0,
+"memory create addressdecoder addressspace begin end chip begin\n"
+"                   Create a new address decoder",
+"long help of memory create addressdecoder"));
     cmd->init();
-    cmd->add_name("createaddrdecoder");
-    cmd->add_name("createadecoder");
-    cmd->add_name("caddressdecoder");
-    cmd->add_name("caddrdecoder");
-    cmd->add_name("cadecoder");
+    cmd->add_name("addrdecoder");
+    cmd->add_name("adecoder");
+    cmd->add_name("addressdec");
+    cmd->add_name("addrdec");
+    cmd->add_name("adec");
+    cmd->add_name("ad");
+
+    mem_create_cset->add(cmd= new cl_memory_create_banker_cmd("banker", 0,
+"memory create banker addressspace begin end chip begin\n"
+"                   Create a new bank switcher",
+"long help of memory create banker"));
+    cmd->init();
+    cmd->add_name("bankswitcher");
+    cmd->add_name("banksw");
+    cmd->add_name("bsw");
+    cmd->add_name("bs");
+
+    mem_create_cset->add(cmd= new cl_memory_create_bank_cmd("bank", 0,
+"memory create bank addressspace begin end chip begin\n"
+"                   Add a new bank to bank switcher",
+"long help of memory create bank"));
+    cmd->init();
+
+    mem_create_cset->add(cmd= new cl_memory_create_bander_cmd("bander", 0,
+"memory create bander addressspace begin end chip begin bits_per_chip [distance]\n"
+"                   Create a new bit bander",
+"long help of memory create bander"));
+    cmd->init();
+    cmd->add_name("bitbander");
+    cmd->add_name("bitband");
+    cmd->add_name("band");
+    cmd->add_name("bb");
+
+    if (!mem_create)
+      cset->add(mem_create= new cl_super_cmd("create", 0,
+"memory create      Set of commands to create memory objects",
+"long help of memory create", mem_create_cset));
+    mem_create->init();
+    mem_create->add_name("add");
+
+    cset->add(cmd= new cl_info_memory_cmd("info", 0,
+"memory info        Information about memory system",
+"long help of memory info"));
+    cmd->init();
+    cset->add(cmd= new cl_memory_cell_cmd("cell", 0,
+"memory cell        Information about a memory cell",
+"long help of memory cell"));
+    cmd->init();
   }
   if (!super_cmd) {
     cmdset->add(cmd= new cl_super_cmd("memory", 0,
@@ -585,6 +688,13 @@ cmd->init();*/
 "long help of memory", cset));
     cmd->init();
   }
+
+  cmdset->add(cmd= new cl_var_cmd("var", 0,
+"var name [memory addr [bit_nr]]\n"
+"                    Create new variable",
+"long help of var"));
+  cmd->init();
+  cmd->add_name("variable");
 }
 
 
@@ -593,7 +703,7 @@ cmd->init();*/
  */
 
 t_mem
-cl_uc::read_mem(const char *id, t_addr addr)
+cl_uc::read_mem(char *id, t_addr addr)
 {
   class cl_address_space *m= address_space(id);
 
@@ -601,7 +711,7 @@ cl_uc::read_mem(const char *id, t_addr addr)
 }
 
 t_mem
-cl_uc::get_mem(const char *id, t_addr addr)
+cl_uc::get_mem(char *id, t_addr addr)
 {
   class cl_address_space *m= address_space(id);
 
@@ -609,7 +719,7 @@ cl_uc::get_mem(const char *id, t_addr addr)
 }
 
 void
-cl_uc::write_mem(const char *id, t_addr addr, t_mem val)
+cl_uc::write_mem(char *id, t_addr addr, t_mem val)
 {
   class cl_address_space *m= address_space(id);
 
@@ -618,7 +728,7 @@ cl_uc::write_mem(const char *id, t_addr addr, t_mem val)
 }
 
 void
-cl_uc::set_mem(const char *id, t_addr addr, t_mem val)
+cl_uc::set_mem(char *id, t_addr addr, t_mem val)
 {
   class cl_address_space *m= address_space(id);
 
@@ -653,10 +763,10 @@ cl_uc::address_space(const char *id)
     {
       class cl_address_space *m= (cl_address_space *)(address_spaces->at(i));
       if (!m ||
-          !m->have_real_name())
-        continue;
+	  !m->have_real_name())
+	continue;
       if (m->is_inamed(id))
-        return(m);
+	return(m);
     }
   return(0);
 }
@@ -673,19 +783,19 @@ cl_uc::memory(const char *id)
     {
       class cl_memory *m= (cl_memory *)(address_spaces->at(i));
       if (!m ||
-          !m->have_real_name())
-        continue;
+	  !m->have_real_name())
+	continue;
       if (m->is_inamed(id))
-        return(m);
+	return(m);
     }
   for (i= 0; i < memchips->count; i++)
     {
       class cl_memory *m= (cl_memory *)(memchips->at(i));
       if (!m ||
-          !m->have_real_name())
-        continue;
+	  !m->have_real_name())
+	continue;
       if (m->is_inamed(id))
-        return(m);
+	return(m);
     }
   return(0);
 }
@@ -697,16 +807,16 @@ ReadInt(FILE *f, bool *ok, int bytes)
   char s2[3];
   long l= 0;
 
-  *ok= DD_FALSE;
+  *ok= false;
   while (bytes)
     {
       if (fscanf(f, "%2c", &s2[0]) == EOF)
-        return(0);
+	return(0);
       s2[2]= '\0';
       l= l*256 + strtol(s2, NULL, 16);
       bytes--;
     }
-  *ok= DD_TRUE;
+  *ok= true;
   return(l);
 }
 
@@ -739,32 +849,32 @@ cl_uc::read_hex_file(const char *nam)
   if (!rom)
     {
       sim->app->get_commander()->
-        dd_printf("No ROM address space to read in.\n");
+	dd_printf("No ROM address space to read in.\n");
       return(-1);
     }
 
   if (!nam)
     {
       sim->app->get_commander()->
-        dd_printf("cl_uc::read_hex_file File name not specified\n");
+	dd_printf("cl_uc::read_hex_file File name not specified\n");
       return(-1);
     }
   else
     if ((f= fopen(nam, "r")) == NULL)
       {
-        fprintf(stderr, "Can't open `%s': %s\n", nam, strerror(errno));
-        return(-1);
+	fprintf(stderr, "Can't open `%s': %s\n", nam, strerror(errno));
+	return(-1);
       }
 
   //memset(inst_map, '\0', sizeof(inst_map));
-  ok= DD_TRUE;
+  ok= true;
   while (ok &&
-         rtyp != 1)
+	 rtyp != 1)
     {
       while (((c= getc(f)) != ':') &&
-             (c != EOF)) ;
+	     (c != EOF)) ;
       if (c != ':')
-        {fprintf(stderr, ": not found\n");break;}
+	{fprintf(stderr, ": not found\n");break;}
       recnum++;
       dnum= ReadInt(f, &ok, 1);//printf("dnum=%02x",dnum);
       chk = dnum;
@@ -774,59 +884,59 @@ cl_uc::read_hex_file(const char *nam)
       rtyp= ReadInt(f, &ok, 1);//printf("rtyp=%02x ",rtyp);
       chk+= rtyp;
       for (i= 0; ok && (i < dnum); i++)
-        {
-          rec[i]= ReadInt(f, &ok, 1);//printf("%02x",rec[i]);
-          chk+= rec[i];
-        }
+	{
+	  rec[i]= ReadInt(f, &ok, 1);//printf("%02x",rec[i]);
+	  chk+= rec[i];
+	}
       if (ok)
-        {
-          sum= ReadInt(f, &ok, 1);//printf(" sum=%02x\n",sum);
-          if (ok)
-            {
-              if (((sum + chk) & 0xff) == 0)
-                {
-                  if (rtyp == 0)
-                    {
-                      if (rom->width > 8)
-                        addr/= 2;
-                      for (i= 0; i < dnum; i++)
-                        {
-                          if (rom->width <= 8)
-                            {
-                              rom->set(addr, rec[i]);
-                              addr++;
-                              written++;
-                            }
-                          else if (rom->width <= 16)
-                            {
-                              if (get_low)
-                                {
-                                  low= rec[i];
-                                  get_low= 0;
-                                }
-                              else
-                                {
-                                  high= rec[i];
-                                  rom->set(addr, (high*256)+low);
-                                  addr++;
-                                  written++;
-                                  get_low= 1;
-                                }
-                            }
-                        }
-                    }
-                  else
-                    if (rtyp != 1)
-                      application->debug("Unknown record type %d(0x%x)\n",
-                                         rtyp, rtyp);
-                }
-              else
-                application->debug("Checksum error (%x instead of %x) in "
-                                   "record %ld.\n", chk, sum, recnum);
-            }
-          else
-            application->debug("Read error in record %ld.\n", recnum);
-        }
+	{
+	  sum= ReadInt(f, &ok, 1);//printf(" sum=%02x\n",sum);
+	  if (ok)
+	    {
+	      if (((sum + chk) & 0xff) == 0)
+		{
+		  if (rtyp == 0)
+		    {
+		      if (rom->width > 8)
+			addr/= 2;
+		      for (i= 0; i < dnum; i++)
+			{
+			  if (rom->width <= 8)
+			    {
+			      rom->set(addr, rec[i]);
+			      addr++;
+			      written++;
+			    }
+			  else if (rom->width <= 16)
+			    {
+			      if (get_low)
+				{
+				  low= rec[i];
+				  get_low= 0;
+				}
+			      else
+				{
+				  high= rec[i];
+				  rom->set(addr, (high*256)+low);
+				  addr++;
+				  written++;
+				  get_low= 1;
+				}
+			    }
+			}
+		    }
+		  else
+		    if (rtyp != 1)
+		      application->debug("Unknown record type %d(0x%x)\n",
+					 rtyp, rtyp);
+		}
+	      else
+		application->debug("Checksum error (%x instead of %x) in "
+				   "record %ld.\n", chk, sum, recnum);
+	    }
+	  else
+	    application->debug("Read error in record %ld.\n", recnum);
+	}
     }
   if (rom->width > 8 &&
       !get_low)
@@ -861,14 +971,14 @@ void
 cl_uc::set_inst_at(t_addr addr)
 {
   if (rom)
-    rom->set_cell_flag(addr, DD_TRUE, CELL_INST);
+    rom->set_cell_flag(addr, true, CELL_INST);
 }
 
 void
 cl_uc::del_inst_at(t_addr addr)
 {
   if (rom)
-    rom->set_cell_flag(addr, DD_FALSE, CELL_INST);
+    rom->set_cell_flag(addr, false, CELL_INST);
 }
 
 bool
@@ -876,7 +986,7 @@ cl_uc::there_is_inst(void)
 {
   if (!rom)
     return(0);
-  bool got= DD_FALSE;
+  bool got= false;
   t_addr addr;
   for (addr= 0; rom->valid_address(addr) && !got; addr++)
     got= rom->get_cell_flag(addr, CELL_INST);
@@ -900,11 +1010,11 @@ cl_uc::register_hw_read(enum mem_class type, t_addr addr, class cl_hw *hw)
   if ((m= (class cl_m*)mems->at(type)))
     {
       if ((l= m->read_locs->get_loc(addr)) == 0)
-        {
-          l= new cl_memloc(addr);
-          l->init();
-          m->read_locs->add(l);
-        }
+	{
+	  l= new cl_memloc(addr);
+	  l->init();
+	  m->read_locs->add(l);
+	}
       l->hws->add(hw);
     }
   else
@@ -916,7 +1026,39 @@ cl_uc::register_hw_write(enum mem_class type, t_addr addr, class cl_hw *hw)
 {
 }*/
 
+void
+cl_uc::add_hw(class cl_hw *hw)
+{
+  int i;
+  for (i= 0; i < hws->count; i++)
+    {
+      class cl_hw *h= (class cl_hw *)(hws->at(i));
+      h->new_hw_adding(hw);
+    }
+  hws->add(hw);
+  for (i= 0; i < hws->count; i++)
+    {
+      class cl_hw *h= (class cl_hw *)(hws->at(i));
+      if (h != hw)
+	h->new_hw_added(hw);
+    }  
+}
+
+int
+cl_uc::nuof_hws(void)
+{
+  return hws->count;
+}
+
 /* Looking for a specific HW element */
+
+class cl_hw *
+cl_uc::get_hw(int idx)
+{
+  if (idx >= hws->count)
+    return NULL;
+  return (class cl_hw *)(hws->at(idx));
+}
 
 class cl_hw *
 cl_uc::get_hw(enum hw_cath cath, int *idx)
@@ -930,7 +1072,7 @@ cl_uc::get_hw(enum hw_cath cath, int *idx)
     {
       hw= (class cl_hw *)(hws->at(i));
       if (hw->cathegory == cath)
-        break;
+	break;
     }
   if (i >= hws->count)
     return(0);
@@ -951,7 +1093,7 @@ cl_uc::get_hw(char *id_string, int *idx)
     {
       hw= (class cl_hw *)(hws->at(i));
       if (strstr(hw->id_string, id_string) == hw->id_string)
-        break;
+	break;
     }
   if (i >= hws->count)
     return(0);
@@ -970,7 +1112,7 @@ cl_uc::get_hw(enum hw_cath cath, int hwid, int *idx)
     i= *idx;
   hw= get_hw(cath, &i);
   while (hw &&
-         hw->id != hwid)
+	 hw->id != hwid)
     {
       i++;
       hw= get_hw(cath, &i);
@@ -991,7 +1133,7 @@ cl_uc::get_hw(char *id_string, int hwid, int *idx)
     i= *idx;
   hw= get_hw(id_string, &i);
   while (hw &&
-         hw->id != hwid)
+	 hw->id != hwid)
     {
       i++;
       hw= get_hw(id_string, &i);
@@ -1002,6 +1144,20 @@ cl_uc::get_hw(char *id_string, int hwid, int *idx)
   return(hw);
 }
 
+int
+cl_uc::get_max_hw_id(enum hw_cath cath)
+{
+  class cl_hw *hw;
+  int i, max= -1;
+
+  for (i= 0; i < hws->count; i++)
+    {
+      hw= (class cl_hw *)(hws->at(i));
+      if (hw->id > max)
+	max= hw->id;
+    }
+  return max;
+}
 
 /*
  * Help of the command interpreter
@@ -1028,7 +1184,7 @@ cl_uc::bit_tbl(void)
   return(&empty);
 }
 
-const char *
+char *
 cl_uc::disass(t_addr addr, const char *sep)
 {
   char *buf;
@@ -1041,9 +1197,9 @@ cl_uc::disass(t_addr addr, const char *sep)
 void
 cl_uc::print_disass(t_addr addr, class cl_console_base *con)
 {
-  const char *dis;
+  char *dis;
   class cl_brk *b;
-  int i;
+  int i, l;
 
   if (!rom)
     return;
@@ -1058,7 +1214,8 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con)
   con->dd_printf("%c ", inst_at(addr)?' ':'?');
   con->dd_printf(rom->addr_format, addr); con->dd_printf(" ");
   con->dd_printf(rom->data_format, code);
-  for (i= 1; i < inst_length(addr); i++)
+  l= inst_length(addr);
+  for (i= 1; i < l; i++)
     {
       con->dd_printf(" ");
       con->dd_printf(rom->data_format, rom->get(addr+i));
@@ -1069,7 +1226,7 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con)
       int j;
       j= rom->width/4 + ((rom->width%4)?1:0) + 1;
       while (j)
-        con->dd_printf(" "), j--;
+	con->dd_printf(" "), j--;
       i++;
     }
   con->dd_printf(" %s\n", dis);
@@ -1136,10 +1293,10 @@ cl_uc::longest_inst(void)
   int max= 0;
 
   while (de &&
-         de->mnemonic)
+	 de->mnemonic)
     {
       if (de->length > max)
-        max= de->length;
+	max= de->length;
       de++;
     }
   return(max);
@@ -1152,8 +1309,8 @@ cl_uc::get_name(t_addr addr, struct name_entry tab[], char *buf)
 
   i= 0;
   while (tab[i].name &&
-         (!(tab[i].cpu_type & type) ||
-         (tab[i].addr != addr)))
+	 (!(tab[i].cpu_type & type) ||
+	 (tab[i].addr != addr)))
     i++;
   if (tab[i].name)
     strcpy(buf, tab[i].name);
@@ -1162,39 +1319,62 @@ cl_uc::get_name(t_addr addr, struct name_entry tab[], char *buf)
 
 bool
 cl_uc::symbol2address(char *sym, struct name_entry tab[],
-                      t_addr *addr)
+		      t_addr *addr)
 {
   int i;
 
   if (!sym ||
-      !*sym)
-    return(DD_FALSE);
+      !*sym ||
+      !tab)
+    return(false);
   i= 0;
   while (tab[i].name &&
-         (!(tab[i].cpu_type & type) ||
-          strcasecmp(sym, tab[i].name) != 0))
+	 (!(tab[i].cpu_type & type) ||
+	  strcasecmp(sym, tab[i].name) != 0))
     i++;
   if (tab[i].name)
     {
       if (addr)
-        *addr= tab[i].addr;
-      return(DD_TRUE);
+	*addr= tab[i].addr;
+      return(true);
     }
-  return(DD_FALSE);
+  return(false);
 }
 
+bool
+cl_uc::symbol2address(char *sym,
+		      class cl_address_space **as,
+		      t_addr *addr)
+{
+  class cl_var *v;
+  t_index i;
+
+  if (vars->search(sym, i))
+    {
+      v= (class cl_var *)(vars->at(i));
+      if (v->bit >= 0)
+	return false;
+      if (as)
+	*as= v->as;
+      if (addr)
+	*addr= v->addr;
+      return true;
+    }
+  return false;
+}
+  
 char *
 cl_uc::symbolic_bit_name(t_addr bit_address,
-                         class cl_memory *mem,
-                         t_addr mem_addr,
-                         t_mem bit_mask)
+			 class cl_memory *mem,
+			 t_addr mem_addr,
+			 t_mem bit_mask)
 {
   char *sym_name= 0;
   int i;
 
   i= 0;
   while (bit_tbl()[i].name &&
-         (bit_tbl()[i].addr != bit_address))
+	 (bit_tbl()[i].addr != bit_address))
     i++;
   if (bit_tbl()[i].name)
     {
@@ -1208,17 +1388,17 @@ cl_uc::symbolic_bit_name(t_addr bit_address,
     {
       i= 0;
       while (sfr_tbl()[i].name &&
-             (sfr_tbl()[i].addr != mem_addr))
-        i++;
+	     (sfr_tbl()[i].addr != mem_addr))
+	i++;
       if (sfr_tbl()[i].name)
-        sym_name= strdup(sfr_tbl()[i].name);
+	sym_name= strdup(sfr_tbl()[i].name);
       else
-        sym_name= 0;
+	sym_name= 0;
     }
   if (!sym_name)
     {
       sym_name= (char *)malloc(16);
-      sprintf(sym_name, mem?(mem->addr_format):"0x%06x", mem_addr);
+      sprintf(sym_name, mem?(mem->addr_format):"0x%06lx", (unsigned long)mem_addr);
     }
   sym_name= (char *)realloc(sym_name, strlen(sym_name)+2);
   strcat(sym_name, ".");
@@ -1246,21 +1426,21 @@ cl_uc::handle_event(class cl_event &event)
     {
     case ev_address_space_added:
       {
-        try {
-          class cl_event_address_space_added &e=
-            dynamic_cast<class cl_event_address_space_added &>(event);
-          address_space_added(e.as);
-          e.handle();
-        }
-        catch (...)
-          { break; }
-        break;
+	try {
+	  class cl_event_address_space_added &e=
+	    dynamic_cast<class cl_event_address_space_added &>(event);
+	  address_space_added(e.as);
+	  e.handle();
+	}
+	catch (...)
+	  { break; }
+	break;
       }
     default:
       return(pass_event_down(event));
       break;
     }
-  return(DD_FALSE);
+  return(false);
 }
 
 /*
@@ -1276,8 +1456,8 @@ cl_uc::mem_cell_changed(class cl_address_space *mem, t_addr addr)
     {
       int i;
       for (i= 0; i < mems->count; i++)
-        {
-        }
+	{
+	}
     }
 }
 */
@@ -1285,10 +1465,12 @@ cl_uc::mem_cell_changed(class cl_address_space *mem, t_addr addr)
 void
 cl_uc::address_space_added(class cl_address_space *as)
 {
+  /*
   if (hws)
     hws->address_space_added(as);
   else
     printf("JAJ uc\n");//FIXME
+  */
 }
 
 
@@ -1309,30 +1491,30 @@ cl_uc::check_errors(void)
 {
   int i;
   class cl_commander_base *c= sim->app->get_commander();
-  bool must_stop= DD_FALSE;
+  bool must_stop= false;
 
   if (c)
     {
       for (i= 0; i < errors->count; i++)
-        {
-          class cl_error *error= (class cl_error *)(errors->at(i));
-          if (!error->is_on())
-            continue;
-          error->print(c);
-          must_stop= must_stop || (error->get_type() & err_stop);
-          if (error->inst)
-            {
-              class cl_console_base *con;
-              con= c->actual_console;
-              if (!con)
-                con= c->frozen_console;
-              if (con)
-                {
-                  con->dd_printf("Erronouse instruction: ");
-                  print_disass(error->PC, con);
-                }
-            }
-        }
+	{
+	  class cl_error *error= (class cl_error *)(errors->at(i));
+	  if (!error->is_on())
+	    continue;
+	  error->print(c);
+	  must_stop= must_stop || (error->get_type() & err_stop);
+	  if (error->inst)
+	    {
+	      class cl_console_base *con;
+	      con= c->actual_console;
+	      if (!con)
+		con= c->frozen_console;
+	      if (con)
+		{
+		  con->dd_printf("Erronouse instruction: ");
+		  print_disass(error->PC, con);
+		}
+	    }
+	}
       errors->free_all();
     }
   else
@@ -1372,7 +1554,7 @@ cl_uc::tick_hw(int cycles)
     {
       hw= (class cl_hw *)(hws->at(i));
       if (hw->flags & HWF_INSIDE)
-        hw->tick(cycles);
+	hw->tick(cycles);
     }
   do_extra_hw(cycles);
   return(0);
@@ -1399,11 +1581,11 @@ cl_uc::tick(int cycles)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (t)
-        {
-          if ((t->options&TICK_INISR) ||
-              il->level < 0)
-            t->tick(cycles * cpc);
-        }
+	{
+	  if ((t->options&TICK_INISR) ||
+	      il->level < 0)
+	    t->tick(cycles * cpc);
+	}
     }
 
   // tick for hardwares
@@ -1420,7 +1602,7 @@ cl_uc::get_counter(int nr)
 }
 
 class cl_ticker *
-cl_uc::get_counter(char *nam)
+cl_uc::get_counter(const char *nam)
 {
   int i;
 
@@ -1430,9 +1612,9 @@ cl_uc::get_counter(char *nam)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (t &&
-          t->get_name() &&
-          strcmp(t->get_name(), nam) == 0)
-        return(t);
+	  t->get_name() &&
+	  strcmp(t->get_name(), nam) == 0)
+	return(t);
     }
   return(0);
 }
@@ -1446,7 +1628,7 @@ cl_uc::add_counter(class cl_ticker *ticker, int nr)
 }
 
 void
-cl_uc::add_counter(class cl_ticker *ticker, char */*nam*/)
+cl_uc::add_counter(class cl_ticker *ticker, const char */*nam*/)
 {
   int i;
 
@@ -1456,10 +1638,10 @@ cl_uc::add_counter(class cl_ticker *ticker, char */*nam*/)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (!t)
-        {
-          counters->put_at(i, ticker);
-          return;
-        }
+	{
+	  counters->put_at(i, ticker);
+	  return;
+	}
     }
   counters->add(ticker);
 }
@@ -1477,7 +1659,7 @@ cl_uc::del_counter(int nr)
 }
 
 void
-cl_uc::del_counter(char *nam)
+cl_uc::del_counter(const char *nam)
 {
   int i;
 
@@ -1487,13 +1669,13 @@ cl_uc::del_counter(char *nam)
     {
       class cl_ticker *t= (class cl_ticker *)(counters->at(i));
       if (t &&
-          t->get_name() &&
-          strcmp(t->get_name(), nam) == 0)
-        {
-          delete t;
-          counters->put_at(i, 0);
-          return;
-        }
+	  t->get_name() &&
+	  strcmp(t->get_name(), nam) == 0)
+	{
+	  delete t;
+	  counters->put_at(i, 0);
+	  return;
+	}
     }
 }
 
@@ -1528,16 +1710,17 @@ cl_uc::fetch(t_mem *code)
   if (!code)
     return(0);
   if ((sim->state & SIM_GO) &&
-      rom)
+      rom &&
+      (sim->steps_done > 0))
     {
-      if (rom->get_cell_flag(PC, CELL_FETCH_BRK) &&
-          (brk= fbrk->get_bp(PC, &idx)) &&
-          (brk->do_hit()))
-        {
-          if (brk->perm == brkDYNAMIC)
-            fbrk->del_bp(PC);
-          return(1);
-        }
+      if (rom->get_cell_flag(PC, CELL_FETCH_BRK))
+	if ((brk= fbrk->get_bp(PC, &idx)))
+	  if (brk->do_hit())
+	    {
+	      if (brk->perm == brkDYNAMIC)
+		fbrk->del_bp(PC);
+	      return(1);
+	    }
     }
   *code= fetch();
   return(0);
@@ -1563,6 +1746,13 @@ cl_uc::do_inst(int step)
 	PC = PCsave;
       
       post_inst();
+
+      if (res == resGO)
+	{
+	  int r= do_interrupt();
+	  if (r != resGO)
+	    res= r;
+	}
     }
   if (res != resGO)
     sim->stop(res);
@@ -1572,7 +1762,7 @@ cl_uc::do_inst(int step)
 void
 cl_uc::pre_inst(void)
 {
-  inst_exec= DD_TRUE;
+  inst_exec= true;
   inst_ticks= 0;
   events->disconn_all();
 }
@@ -1592,7 +1782,56 @@ cl_uc::post_inst(void)
     check_errors();
   if (events->count)
     check_events();
-  inst_exec= DD_FALSE;
+  inst_exec= false;
+}
+
+
+/*
+ * Interrupt processing
+ */
+
+int
+cl_uc::do_interrupt(void)
+{
+  int i;
+  // NMI?
+
+  // Maskable interrupts
+  if (!it_enabled())
+    return resGO;
+  class it_level *il= (class it_level *)(it_levels->top()), *IL= 0;
+  for (i= 0; i < it_sources->count; i++)
+    {
+      class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
+       if (is->is_active() &&
+	  is->enabled() &&
+	  is->pending())
+	{
+	  int pr= priority_of(is->nuof);
+	  int ap;
+	  if (il &&
+	      il->level >= 0)
+	    ap= il->level;
+	  else
+	    ap= priority_main();
+	  if (ap >= pr)
+	    continue;
+	  is->clear();
+	  sim->app->get_commander()->
+	    debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",
+			  get_rtime(), ticks->ticks, object_name(is), PC);
+	  IL= new it_level(pr, is->addr, PC, is);
+	  return(accept_it(IL));
+	}
+    }
+  return resGO;
+}
+
+int
+cl_uc::accept_it(class it_level *il)
+{
+  it_levels->push(il);
+  return resGO;
 }
 
 
@@ -1627,9 +1866,7 @@ cl_uc::stack_write(class cl_stack_op *op)
   if (op->get_op() & stack_read_operation)
     {
       class cl_error_stack_tracker_wrong_handle *e= new
-        cl_error_stack_tracker_wrong_handle(DD_FALSE);
-      //fprintf(stderr, "%06"_A_"x cl_uc::stack_read() should be called for "
-      //"%s\n", op->get_pc(), op->get_op_name());
+	cl_error_stack_tracker_wrong_handle(false);
       e->init();
       error(e);
       return;
@@ -1645,19 +1882,14 @@ cl_uc::stack_read(class cl_stack_op *op)
   if (op->get_op() & stack_write_operation)
     {
       class cl_error_stack_tracker_wrong_handle *e= new
-        cl_error_stack_tracker_wrong_handle(DD_TRUE);
+	cl_error_stack_tracker_wrong_handle(true);
       e->init();
       error(e);
-      //fprintf(stderr, "%06"_A_"x cl_uc::stack_write() should be called for "
-      //"%s\n", op->get_pc(), op->get_op_name());
       return;
     }
   if (!top)
     {
       class cl_error *e= new cl_error_stack_tracker_empty(op);
-      /*printf("0x%06"_A_"x %s operation on stack but no operation was before\n
-        ",
-        op->get_pc(), op->get_op_name());*/
       e->init();
       error(e);
       return;
@@ -1666,25 +1898,23 @@ cl_uc::stack_read(class cl_stack_op *op)
   if (top)
     {
       if (!top->match(op))
-        {
-          class cl_error *e= new cl_error_stack_tracker_unmatch(top, op);
-          e->init();
-          error(e);
-          /*printf("0x%06"_A_"x %s operation on stack but last was %s\n",
-            op->get_pc(), op->get_op_name(), top->get_op_name());*/
-        }
+	{
+	  class cl_error *e= new cl_error_stack_tracker_unmatch(top, op);
+	  e->init();
+	  error(e);
+	}
       int top_size= top->data_size(), op_size= op->data_size();
       if (top_size != op_size)
-        {
-          application->debug("0x%06" _A_ "x %d bytes to read out of stack "
-                             "but %d was pushed in last operation\n",
-                             op->get_pc(), op_size, top_size);
-        }
+	{
+	  application->debug("0x%06x %d bytes to read out of stack "
+			     "but %d was pushed in last operation\n",
+			     (int)op->get_pc(), op_size, top_size);
+	}
     }
 
   int removed= 0;
   while (top &&
-         top->can_removed(op))
+	 top->can_removed(op))
     {
       top= (class cl_stack_op *)stack_ops->pop();
       delete top;
@@ -1693,34 +1923,36 @@ cl_uc::stack_read(class cl_stack_op *op)
     }
   if (removed != 1)
     {
-      application->debug("0x%06" _A_ "x %d ops removed from stack-tracker "
-                         "when %s happened, top pc=0x%06" _A_ "x "
-                         "top before=0x%06" _A_ "x op after=0x%06" _A_ "x\n",
-                         op->get_pc(), removed, op->get_op_name(),
-                         top?(top->get_pc()):0, top?(top->get_before()):0,
-                         op->get_after());
+      application->debug("0x%06x %d ops removed from stack-tracker "
+			 "when %s happened, top pc=0x%06x "
+			 "top before=0x%06x op after=0x%06x\n",
+			 (int)op->get_pc(), removed, op->get_op_name(),
+                         top?((int)top->get_pc()):0,
+			 top?((int)top->get_before()):0,
+                         (int)op->get_after());
     }
 
   if (top)
     {
       int ta= top->get_after(), oa= op->get_after();
       if (ta != oa)
-        {
-          application->debug("0x%06" _A_ "x stack still inconsistent after %s, "
-                             "%d byte(s) should be read out; top after"
-                             "=0x%06" _A_ "x op after=0x%06" _A_ "x\n",
-                             op->get_pc(), op->get_op_name(), abs(ta-oa),
-                             ta, oa);
-          class cl_error *e=
-            new cl_error_stack_tracker_inconsistent(op, abs(ta-oa));
-          e->init();
+	{
+	  application->debug("0x%06x stack still inconsistent after %s, "
+			     "%d byte(s) should be read out; top after"
+			     "=0x%06x op after=0x%06x\n",
+			     (int)op->get_pc(),
+			     op->get_op_name(),
+			     abs(ta-oa),
+			     ta, oa);
+	  class cl_error *e=
+	    new cl_error_stack_tracker_inconsistent(op, abs(ta-oa));
+	  e->init();
           error(e);
         }
     }
 
   delete op;
 }
-
 
 /*
  * Breakpoint handling
@@ -1744,8 +1976,8 @@ cl_uc::ebrk_at(t_addr addr, char *id)
     {
       eb= (class cl_ev_brk *)(ebrk->at(i));
       if (eb->addr == addr &&
-          !strcmp(eb->id, id))
-        return(eb);
+	  !strcmp(eb->id, id))
+	return(eb);
     }
   return(0);
 }
@@ -1794,8 +2026,8 @@ cl_uc::rm_ebrk(t_addr addr, char *id)
     {
       eb= (class cl_ev_brk *)(ebrk->at(i));
       if (eb->addr == addr &&
-          !strcmp(eb->id, id))
-        ebrk->del_bp(i, 0);
+	  !strcmp(eb->id, id))
+	ebrk->del_bp(i, 0);
     }
 }
 
@@ -1809,14 +2041,14 @@ cl_uc::rm_brk(int nr)
   if ((bp= brk_by_nr(fbrk, nr)))
     {
       fbrk->del_bp(bp->addr);
-      return(DD_TRUE);
+      return(true);
     }
   else if ((bp= brk_by_nr(ebrk, nr)))
     {
       ebrk->del_bp(ebrk->index_of(bp), 0);
-      return(DD_TRUE);
+      return(true);
     }
-  return(DD_FALSE);
+  return(false);
 }
 
 void
@@ -1850,7 +2082,7 @@ cl_uc::make_new_brknr(void)
 
 class cl_ev_brk *
 cl_uc::mk_ebrk(enum brk_perm perm, class cl_address_space *mem,
-               char op, t_addr addr, int hit)
+	       char op, t_addr addr, int hit)
 {
   class cl_ev_brk *b;
   op= toupper(op);
@@ -1867,7 +2099,7 @@ cl_uc::check_events(void)
   for (i= 0; i < events->count; i++)
     {
       class cl_ev_brk *brk=
-        dynamic_cast<class cl_ev_brk *>(events->object_at(i));
+	dynamic_cast<class cl_ev_brk *>(events->object_at(i));
       sim->stop(brk);
     }
   sim->stop(resBREAKPOINT);
@@ -1888,24 +2120,25 @@ cl_error_unknown_code::cl_error_unknown_code(class cl_uc *the_uc)
 void
 cl_error_unknown_code::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s: unknown instruction code at ", get_type_name());
+  //FILE *f= c->get_out();
+  /*cmd_fprintf(f,*/c->dd_printf("%s: unknown instruction code at ", get_type_name());
   if (uc->rom)
     {
-      c->dd_printf(uc->rom->addr_format, PC);
-      c->dd_printf(" (");
-      c->dd_printf(uc->rom->data_format, uc->rom->get(PC));
-      c->dd_printf(")");
+      /*cmd_fprintf(f,*/c->dd_printf(uc->rom->addr_format, PC);
+      /*cmd_fprintf(f,*/c->dd_printf(" (");
+      /*cmd_fprintf(f,*/c->dd_printf(uc->rom->data_format, uc->rom->get(PC));
+      /*cmd_fprintf(f,*/c->dd_printf(")");
     }
   else
-    c->dd_printf("0x%06x", PC);
-  c->dd_printf("\n");
+    /*cmd_fprintf(f,*/c->dd_printf("0x%06x", PC);
+  /*cmd_fprintf(f,*/c->dd_printf("\n");
 }
+
 
 cl_uc_error_registry::cl_uc_error_registry(void)
 {
   class cl_error_class *prev = uc_error_registry.find("non-classified");
   prev = register_error(new cl_error_class(err_error, "unknown_code", prev, ERROR_OFF));
 }
-
 
 /* End of uc.cc */

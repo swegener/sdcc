@@ -87,7 +87,7 @@ public:
 public:
   cl_r2k(int Itype, int Itech, class cl_sim *asim);
   virtual int init(void);
-  virtual const char *id_string(void);
+  virtual char *id_string(void);
   
   //virtual t_addr get_mem_size(enum mem_class type);
   virtual void mk_hw_elements(void);
@@ -97,7 +97,7 @@ public:
   virtual int inst_length(t_addr addr);
   virtual int inst_branch(t_addr addr);
   virtual int longest_inst(void);
-  virtual const char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr, const char *sep);
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);
@@ -157,7 +157,7 @@ class cl_r3ka: public cl_r2k {
   TYPE_UBYTE  SU;
   
   cl_r3ka(int Itype, int Itech, class cl_sim *asim);
-  virtual const char *id_string(void);
+  virtual char *id_string(void);
   
   virtual int exec_code(t_mem code);
   

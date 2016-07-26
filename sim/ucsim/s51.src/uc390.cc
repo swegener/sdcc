@@ -337,7 +337,7 @@ cl_uc390::mk_hw_elements (void)
   class cl_hw *h;
 
   cl_uc52::mk_hw_elements();
-  hws->add (h = new cl_uc390_hw (this));
+  add_hw(h = new cl_uc390_hw (this));
   h->init();
 }
 
@@ -345,8 +345,9 @@ void
 cl_uc390::make_memories(void)
 {
   class cl_address_space *as;
-
-  rom= as= new cl_address_space(MEM_ROM_ID, 0, 0x20000, 8);
+  int i;
+  
+  rom= as= new cl_address_space("rom"/*MEM_ROM_ID*/, 0, 0x20000, 8);
   as->init();
   address_spaces->add(as);
   iram= as= new cl_address_space(MEM_IRAM_ID, 0, 0x100, 8);
@@ -363,7 +364,7 @@ cl_uc390::make_memories(void)
   address_spaces->add(as);
 
   class cl_address_decoder *ad;
-  class cl_memory_chip *chip;
+  class cl_memory_chip *chip, *sfr_chip, *iram_chip;
 
   chip= new cl_memory_chip("rom_chip", 0x20000, 8, 0xff);
   chip->init();
@@ -373,7 +374,7 @@ cl_uc390::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("iram_chip", 0x100, 8, 0);
+  chip= iram_chip= new cl_memory_chip("iram_chip", 0x100, 8, 0);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= iram, chip, 0, 0xff, 0);
@@ -393,12 +394,12 @@ cl_uc390::make_memories(void)
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= address_space(MEM_IXRAM_ID),
-                             chip, 0, 0xfff, 0);
+			     chip, 0, 0xfff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
-  chip= new cl_memory_chip("sfr_chip", 0x80, 8, 0);
+  chip= sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8, 0);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= sfr, chip, 0x80, 0xff, 0);
@@ -408,6 +409,56 @@ cl_uc390::make_memories(void)
 
   acc= sfr->get_cell(ACC);
   psw= sfr->get_cell(PSW);
+
+  regs= new cl_address_space("regs", 0, 8, 8);
+  regs->init();
+  address_spaces->add(regs);
+  
+  cl_banker *b= new cl_banker(sfr, 0xd0, 0x18,
+			      regs, 0, 7);
+  b->init();
+  regs->decoders->add(b);
+  b->add_bank(0, memory("iram_chip"), 0);
+  b->add_bank(1, memory("iram_chip"), 8);
+  b->add_bank(2, memory("iram_chip"), 16);
+  b->add_bank(3, memory("iram_chip"), 24);
+  psw->write(0);
+  for (i= 0; i < 8; i++)
+    R[i]= regs->get_cell(i);
+  
+  cl_var *v;
+  vars->add(v= new cl_var(cchars("R0"), regs, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("R1"), regs, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("R2"), regs, 2));
+  v->init();
+  vars->add(v= new cl_var(cchars("R3"), regs, 3));
+  v->init();
+  vars->add(v= new cl_var(cchars("R4"), regs, 4));
+  v->init();
+  vars->add(v= new cl_var(cchars("R5"), regs, 5));
+  v->init();
+  vars->add(v= new cl_var(cchars("R6"), regs, 6));
+  v->init();
+  vars->add(v= new cl_var(cchars("R7"), regs, 7));
+  v->init();
+
+  bits= as= new cl_address_space("bits", 0, 0x100, 1);
+  as->init();
+  address_spaces->add(as);
+  ad= new cl_bander(bits, 0, 127,
+		    iram_chip, 32,
+		    8, 1);
+  ad->init();
+  bits->decoders->add(ad);
+  ad->activate(0);
+  ad= new cl_bander(bits, 128, 255,
+		    sfr_chip, 0,
+		    8, 8);
+  ad->init();
+  bits->decoders->add(ad);
+  ad->activate(0);
 }
 
 
@@ -419,7 +470,7 @@ void
 cl_uc390::clear_sfr(void)
 {
   cl_uc52::clear_sfr();
-          /* SFR   value */
+	  /* SFR   value */
   sfr->write(0x80, 0xff); /* P4     */
   sfr->write(0x81, 0x07); /* SP     */
   sfr->write(0x86, 0x04); /* DPS    */
@@ -445,111 +496,56 @@ cl_uc390::clear_sfr(void)
 
 
 t_mem
-cl_uc390::read_mem(const char *id/*enum mem_class type*/, t_addr addr)
+cl_uc390::read_mem(char *id/*enum mem_class type*/, t_addr addr)
 {
-  if (/*type == */strcmp(id, MEM_XRAM_ID)==0)
+
+  if (strcmp(/*type*/id,/* == */MEM_XRAM_ID)==0 &&
+      addr >= 0x400000 &&
+      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
-      if (addr >= 0x000000 && addr <= 0x000fff &&
-          ((sfr->get (MCON) & 0xc0) == 0x40)) /* IDM1:0 == 01: internal xram at 0x000000 */
-        {
-          addr -= 0x000000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
-      if (addr >= 0x00f000 && addr <= 0x00ffff &&
-          ((sfr->get (MCON) & 0xc0) == 0x00)) /* IDM1:0 == 00: internal xram at 0x00f000 */
-        {
-          addr -= 0x00f000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
-      if (addr >= 0x400000 && addr <= 0x400fff &&
-          ((sfr->get (MCON) & 0xc0) == 0x80)) /* IDM1:0 == 10: internal xram at 0x400000 */
-        {
-          addr -= 0x400000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
+      addr -= 0x400000;
+      id/*type*/ = MEM_IXRAM_ID;
     }
-  return cl_51core::read_mem(/*type*/id, addr); /* 24 bit */
+  return cl_51core::read_mem(id/*type*/, addr); /* 24 bit */
 }
 
 t_mem
-cl_uc390::get_mem (const char *id/*enum mem_class type*/, t_addr addr)
+cl_uc390::get_mem (char *id/*enum mem_class type*/, t_addr addr)
 {
-  if (/*type == */strcmp(id, MEM_XRAM_ID)==0)
+  if (strcmp(/*type*/id/* == */,MEM_XRAM_ID)==0 &&
+      addr >= 0x400000 &&
+      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
-      if (addr >= 0x000000 && addr <= 0x000fff &&
-          ((sfr->get (MCON) & 0xc0) == 0x40)) /* IDM1:0 == 01: internal xram at 0x000000 */
-        {
-          addr -= 0x000000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
-      if (addr >= 0x00f000 && addr <= 0x00ffff &&
-          ((sfr->get (MCON) & 0xc0) == 0x00)) /* IDM1:0 == 00: internal xram at 0x00f000 */
-        {
-          addr -= 0x00f000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
-      if (addr >= 0x400000 && addr <= 0x400fff &&
-          ((sfr->get (MCON) & 0xc0) == 0x80)) /* IDM1:0 == 10: internal xram at 0x400000 */
-        {
-          addr -= 0x400000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
+      addr -= 0x400000;
+      /*type*/id = MEM_IXRAM_ID;
     }
   return cl_51core::get_mem (/*type*/id, addr);
 }
 
 void
-cl_uc390::write_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem val)
+cl_uc390::write_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val)
 {
-  if (/*type == */strcmp(id, MEM_XRAM_ID)==0)
+  if (strcmp(/*type ==*/id, MEM_XRAM_ID)==0 &&
+      addr >= 0x400000 &&
+      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
-      if (addr >= 0x000000 && addr <= 0x000fff &&
-          ((sfr->get (MCON) & 0xc0) == 0x40)) /* IDM1:0 == 01: internal xram at 0x000000 */
-        {
-          addr -= 0x000000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
-      if (addr >= 0x00f000 && addr <= 0x00ffff &&
-          ((sfr->get (MCON) & 0xc0) == 0x00)) /* IDM1:0 == 00: internal xram at 0x00f000 */
-        {
-          addr -= 0x00f000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
-      if (addr >= 0x400000 && addr <= 0x400fff &&
-          ((sfr->get (MCON) & 0xc0) == 0x80)) /* IDM1:0 == 10: internal xram at 0x400000 */
-        {
-          addr -= 0x400000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
+      addr -= 0x400000;
+      /*type*/id = MEM_IXRAM_ID;
     }
   cl_51core::write_mem (/*type*/id, addr, val);
 }
 
 void
-cl_uc390::set_mem (/*enum mem_class type*/const char *id, t_addr addr, t_mem val)
+cl_uc390::set_mem (/*enum mem_class type*/char *id, t_addr addr, t_mem val)
 {
-  if (/*type == */strcmp(id, MEM_XRAM_ID)==0)
+  if (/*type == */strcmp(id,MEM_XRAM_ID)==0 &&
+      addr >= 0x400000 &&
+      (sfr->get (ACON) & 0x02)) /* AM1 set: 24-bit flat? */
     {
-      if (addr >= 0x000000 && addr <= 0x000fff &&
-          ((sfr->get (MCON) & 0xc0) == 0x40)) /* IDM1:0 == 01: internal xram at 0x000000 */
-        {
-          addr -= 0x000000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
-      if (addr >= 0x00f000 && addr <= 0x00ffff &&
-          ((sfr->get (MCON) & 0xc0) == 0x00)) /* IDM1:0 == 00: internal xram at 0x00f000 */
-        {
-          addr -= 0x00f000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
-      if (addr >= 0x400000 && addr <= 0x400fff &&
-          ((sfr->get (MCON) & 0xc0) == 0x80)) /* IDM1:0 == 10: internal xram at 0x400000 */
-        {
-          addr -= 0x400000;
-          /*type*/id = MEM_IXRAM_ID;
-        }
+      addr -= 0x400000;
+      /*type*/id = MEM_IXRAM_ID;
     }
-  cl_51core::set_mem (/*type*/id, addr, val);
+  cl_51core::set_mem (id/*type*/, addr, val);
 }
 
 /*
@@ -679,7 +675,7 @@ cl_uc390::inst_jmp_Sa_dptr (uchar code)
     }
 
   PC = rom->validate_address(sfr->read (ph) * 256 + sfr->read (pl) +
-                             acc->read());
+			     acc->read());
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     PC += sfr->read (px) * 256*256;
 
@@ -752,11 +748,11 @@ cl_uc390::inst_movc_a_Sa_dptr (uchar code)
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     acc->write (rom->read ((sfr->read (px) * 256*256 +
-                            sfr->read (ph) * 256 + sfr->read (pl) +
+			    sfr->read (ph) * 256 + sfr->read (pl) +
                 acc->read())));
   else
     acc->write (rom->read ((sfr->read (ph) * 256 + sfr->read (pl) +
-                            acc->read())));
+			    acc->read())));
 
   if (dps & 0x20)                      /* auto-switch dptr */
     sfr->write (DPS, dps ^ 1);  /* toggle dual-dptr switch */
@@ -1032,14 +1028,14 @@ cl_uc390::inst_lcall (uchar code, uint addr, bool intr)
       class cl_stack_op *so;
       if (addr)
         {
-          PC = addr;
-          so= new cl_stack_intr(instPC, PC, pushed, sp_before, sfr->get(SP));
-        }
+	  PC = addr;
+	  so= new cl_stack_intr(instPC, PC, pushed, sp_before, sfr->get(SP));
+	}
       else
         {
-          PC = h * 256 + l;
-          so= new cl_stack_call(instPC, PC, pushed, sp_before, sfr->get(SP));
-        }
+	  PC = h * 256 + l;
+	  so= new cl_stack_call(instPC, PC, pushed, sp_before, sfr->get(SP));
+	}
       so->init();
       stack_write(so);
     }
@@ -1105,7 +1101,7 @@ cl_uc390::inst_reti (uchar code)
   else
     PC = h * 256 + l;
 
-  interrupt->was_reti = DD_TRUE;
+  interrupt->was_reti = true;
   class it_level *il = (class it_level *) (it_levels->top ());
   if (il &&
       il->level >= 0)
@@ -1137,12 +1133,11 @@ cl_uc390::dis_tbl (void)
 
 }
 
-const char *
+char *
 cl_uc390::disass (t_addr addr, const char *sep)
 {
   char work[256], temp[20], c[2];
-  const char *b;
-  char *buf, *p, *t;
+  char *buf, *p, *b, *t, *org_b;
   t_mem code;
   uchar dps;
 
@@ -1151,7 +1146,7 @@ cl_uc390::disass (t_addr addr, const char *sep)
   code = rom->get(addr);
 
   p = work;
-  b = dis_tbl()[code].mnemonic;
+  b = org_b = strdup(dis_tbl()[code].mnemonic);
   while (*b)
     {
       if (*b == '%')
@@ -1166,7 +1161,7 @@ cl_uc390::disass (t_addr addr, const char *sep)
               //          (((code >> 5) & 0x07) * 256 +
               //          rom->get (addr + 1)));
 
-              sprintf (temp, "%06lx",
+              sprintf (temp, /*"%06lx"*/rom->addr_format,
                        (addr & 0xf80000L) |
                        (((code >> 5) & 0x07) * (256 * 256) +
                        (rom->get (addr + 1) * 256) +
@@ -1181,41 +1176,41 @@ cl_uc390::disass (t_addr addr, const char *sep)
               break;
             case 'a': // addr8 (direct address) at 2nd byte
               if (!get_name (rom->get (addr + 1), sfr_tbl (), temp))
-                sprintf (temp, "%02" _M_ "x", rom->get (addr + 1));
+                sprintf (temp, "%02x", (int)rom->get (addr + 1));
               break;
             case '8': // addr8 (direct address) at 3rd byte
               if (!get_name (rom->get (addr + 2), sfr_tbl (), temp))
-                sprintf (temp, "%02" _M_ "x", rom->get (addr + 2));
+                sprintf (temp, "%02x", (int)rom->get (addr + 2));
               break;
             case 'b': // bitaddr at 2nd byte
-              {
-                t_addr ba = rom->get (addr+1);
-                if (get_name (ba, bit_tbl(), temp))
-                  break;
-                if (get_name ((ba<128) ? ((ba/8)+32) : (ba&0xf8), sfr_tbl(), temp))
-                  {
-                    strcat (temp, ".");
-                    sprintf (c, "%1" _M_ "d", ba & 0x07);
-                    strcat (temp, c);
-                    break;
-                  }
-                sprintf (temp, "%02x.%" _M_ "d", (ba<128) ? ((ba/8)+32) : (ba&0xf8),
-                         ba & 0x07);
-                break;
-              }
+	      {
+		t_addr ba = rom->get (addr+1);
+		if (get_name (ba, bit_tbl(), temp))
+		  break;
+		if (get_name ((ba<128) ? ((ba/8)+32) : (ba&0xf8), sfr_tbl(), temp))
+		  {
+		    strcat (temp, ".");
+		    sprintf (c, "%1d", (int)(ba & 0x07));
+		    strcat (temp, c);
+		    break;
+		  }
+		sprintf (temp, "%02lx.%d", (long int)((ba<128) ? ((ba/8)+32) : (ba&0xf8)),
+		 	 (int)(ba & 0x07));
+		break;
+	      }
             case 'r': // rel8 address at 2nd byte
-              sprintf (temp, "%04" _A_ "x",
-                       t_addr (addr + 2 + (signed char) (rom->get (addr + 1))));
+              sprintf (temp, "%04x",
+                       /*t_addr*/int (addr + 2 + (signed char) (rom->get (addr + 1))));
               break;
             case 'R': // rel8 address at 3rd byte
-              sprintf (temp, "%04" _A_ "x",
-                       t_addr (addr + 3 + (signed char) (rom->get (addr + 2))));
+              sprintf (temp, "%04x",
+                       /*t_addr*/int (addr + 3 + (signed char) (rom->get (addr + 2))));
               break;
             case 'd': // data8 at 2nd byte
-              sprintf (temp, "%02" _M_ "x", rom->get (addr + 1));
+              sprintf (temp, "%02x", (int)rom->get (addr + 1));
               break;
             case 'D': // data8 at 3rd byte
-              sprintf (temp, "%02" _M_ "x", rom->get (addr + 2));
+              sprintf (temp, "%02x", (int)rom->get (addr + 2));
               break;
             case 'i': // inc/dec dptr
               dps = sfr->get(DPS);
@@ -1244,16 +1239,17 @@ cl_uc390::disass (t_addr addr, const char *sep)
     buf = (char *) malloc (6 + strlen (p) + 1);
   else
     buf = (char *) malloc ((p - work) + strlen (sep) + strlen (p) + 1);
-  for (p = work, t = buf; *p != ' '; p++, t++)
-    *t = *p;
+  for (p = work, b = buf; *p != ' '; p++, b++)
+    *b = *p;
   p++;
-  *t = '\0';
+  *b = '\0';
   if (sep == NULL)
     while (strlen (buf) < 6)
       strcat (buf, " ");
   else
     strcat (buf, sep);
   strcat (buf, p);
+  free(org_b);
   return buf;
 }
 
@@ -1316,6 +1312,5 @@ cl_uc390::print_regs (class cl_console_base *con)
 
   print_disass (PC, con);
 }
-
 
 /* End of s51.src/uc390.cc */

@@ -1,8 +1,8 @@
 /*
  * Simulator of microcontrollers (utils.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- *
+ * Copyright (C) 1997,16 Drotos Daniel, Talker Bt.
+ * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdarg.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include "i_string.h"
 
   // prj
@@ -62,7 +63,7 @@ get_sub_opt(char **option, const char * const *tokens, char **valuep)
     *valuep= 0;
   i= 0;
   while (tokens[i] &&
-   strcmp(*option, tokens[i]))
+	 strcmp(*option, tokens[i]))
     i++;
   if (!tokens[i])
     *valuep= *option;
@@ -71,69 +72,102 @@ get_sub_opt(char **option, const char * const *tokens, char **valuep)
 }
 
 
-const char *
+char *
 get_id_string(struct id_element *ids, int id)
 {
   int i= 0;
 
-  while (ids[i].id_string && id != ids[i].id)
+  while (ids[i].id_string &&
+	 id != ids[i].id)
     i++;
-  return(ids[i].id_string);
+  return(cchars(ids[i].id_string));
 }
 
-const char *
-get_id_string(struct id_element *ids, int id, const char *def)
+char *
+get_id_string(struct id_element *ids, int id, char *def)
 {
-  const char *s= get_id_string(ids, id);
+  char *s= get_id_string(ids, id);
 
   return(s?s:def);
 }
 
 int
-get_string_id(struct id_element *ids, const char *str)
+get_string_id(struct id_element *ids, char *str)
 {
   int i= 0;
 
-  while (ids[i].id_string && strcmp(ids[i].id_string, str) != 0)
+  while (ids[i].id_string &&
+	 strcmp(ids[i].id_string, str) != 0)
     i++;
   return(ids[i].id);
 }
 
 int
-get_string_id(struct id_element *ids, const char *str, int def)
+get_string_id(struct id_element *ids, char *str, int def)
 {
   int i= 0;
 
-  while (ids[i].id_string && strcmp(ids[i].id_string, str) != 0)
+  while (ids[i].id_string &&
+	 strcmp(ids[i].id_string, str) != 0)
     i++;
   return(ids[i].id_string?ids[i].id:def);
 }
 
 
 char *
-format_string(const char *format, ...)
+vformat_string(const char *format, va_list ap)
 {
-  va_list ap;
-  char *msg;
-
-  va_start(ap, format);
+  char *msg= NULL;
 #ifdef HAVE_VASPRINTF
   if (0 > vasprintf(&msg, format, ap))
     msg = NULL;
   return(msg);
-#elif defined HAVE_VSNPRINTF
+#else
+#  ifdef HAVE_VSNPRINTF
   msg = (char*)malloc(80*25);
   vsnprintf(msg, 80*25, format, ap);
   return(msg);
-#elif defined HAVE__VSNPRINTF
+#  else
+#    ifdef HAVE_VPRINTF
   msg = (char*)malloc(80*25);
-  _vsnprintf(msg, 80*25, format, ap);
+  vsprintf(msg, format, ap); /* Dangerous */
   return(msg);
-#else
-#error No vasprintf or vsnprintf
+#    endif
+#  endif
 #endif
+}
+
+char *
+format_string(const char *format, ...)
+{
+  va_list ap;
+
+  va_start(ap, format);
+  char *s= vformat_string(format, ap);
   va_end(ap);
-  return(msg);
+  return(s);
+}
+
+
+void
+print_char_octal(char c, FILE *f)
+{
+  if (strchr("\a\b\f\n\r\t\v\"", c))
+    switch (c)
+      {
+      case '\a': fprintf(f, "\a"); break;
+      case '\b': fprintf(f, "\b"); break;
+      case '\f': fprintf(f, "\f"); break;
+      case '\n': fprintf(f, "\n"); break;
+      case '\r': fprintf(f, "\r"); break;
+      case '\t': fprintf(f, "\t"); break;
+      case '\v': fprintf(f, "\v"); break;
+      case '\"': fprintf(f, "\""); break;
+      }
+  else if (isprint(c))
+    fprintf(f, "%c", c);
+  else
+    fprintf(f, "\\%03o", (int)c);
 }
 
 
@@ -144,14 +178,15 @@ object_name(class cl_base *o)
 
   if (o)
     name= o->get_name();
-  if (name && *name)
+  if (name &&
+      *name)
     return(name);
-  return("(unknown)");
+  return(cchars("(unknown)"));
 }
 
 
 char *
-case_string(enum letter_case lcase, const char *str)
+case_string(enum letter_case lcase, char *str)
 {
   char *p= strdup(str);
   char *s= p;
@@ -159,32 +194,29 @@ case_string(enum letter_case lcase, const char *str)
   switch (lcase)
     {
     case case_upper:
-      while (p && *p)
-        {
-          *p= toupper(*p);
-          p++;
-       }
+      while (p && *p) {
+	*p= toupper(*p);
+	p++;
+      }
       break;
     case case_lower:
-      while (p && *p)
-        {
-          *p= tolower(*p);
-          p++;
-        }
+      while (p && *p) {
+	*p= tolower(*p);
+	p++;
+      }
       break;
     case case_case:
       if (!p || *p == '\0')
-        break;
-      while (isspace(*p))
-        p++;
+	break;
+      while (isspace(*p)) p++;
       if (*p)
-        *p= toupper(*p);
+	*p= toupper(*p);
       break;
     }
   return(s);
 }
 
-/*const char *
+/*char *
 case_string(enum letter_case lcase, const char *str)
 {
   char *p= NIL;
@@ -195,6 +227,43 @@ case_string(enum letter_case lcase, const char *str)
   p= strdup(str);
   return case_string(lcase, p);
 }*/
+
+double
+dnow(void)
+{
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return (double)tv.tv_sec + ((double)tv.tv_usec/1000000.0);
+}
+
+int
+strispn(char *s, char c)
+{
+  if (!s || !*s)
+    return 0;
+  char *p= strchr(s, c);
+  if (!p)
+    return -1;
+  return p-s;
+}
+
+bool
+valid_sym_name(char *s)
+{
+  if (!s || !*s)
+    return false;
+  if (!isalpha(*s) &&
+      (*s != '_'))
+    return false;
+  char *p= s+1;
+  for (; *p; p++)
+    {
+      if (!isalnum(*p) &&
+	  (*p != '_'))
+	return false;
+    }
+  return true;
+}
 
 
 /* End of utils.cc */

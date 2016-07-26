@@ -38,23 +38,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 #include "pobjcl.h"
+#include "optioncl.h"
 
 // sim.src
-#include "appcl.h"
+//#include "appcl.h"
 
 // local, cmd
 #include "commandcl.h"
 
 
 // Flags of consoles
-#define CONS_NONE        0
-#define CONS_DEBUG       0x01   // Print debug messages on this console
-#define CONS_FROZEN      0x02   // Console is frozen (g command issued)
-#define CONS_PROMPT      0x04   // Prompt is out, waiting for input
-#define CONS_INTERACTIVE 0x08   // Interactive console
-#define CONS_NOWELCOME   0x10   // Do not print welcome message
-#define CONS_INACTIVE    0x20   // Do not do any action
-#define CONS_ECHO        0x40   // Echo commands
+enum con_flags {
+  CONS_NONE        = 0,
+  CONS_DEBUG       = 0x01,   // Print debug messages on this console
+  CONS_FROZEN      = 0x02,   // Console is frozen (g command issued)
+  CONS_INTERACTIVE = 0x08,   // Interactive console
+  CONS_NOWELCOME   = 0x10,   // Do not print welcome message
+  CONS_INACTIVE    = 0x20,   // Do not do any action
+  CONS_ECHO        = 0x40,   // Echo commands
+  CONS_REDIRECTED  = 0x80,   // Console is actually redirected
+};
 
 #define SY_ADDR         'a'
 #define ADDRESS         "a"
@@ -98,7 +101,7 @@ public:
 
 class cl_console_base: public cl_base
 {
-protected:
+ protected:
   class cl_prompt_option *prompt_option;
   class cl_optref *null_prompt_option;
   class cl_debug_option *debug_option;
@@ -106,41 +109,56 @@ protected:
   class cl_cmd *last_command;
   class cl_cmdline *last_cmdline;
 
-public:
-  cl_console_base(void): cl_base() { app = 0; flags = 0; prompt = 0; }
+  char nl;
+  chars lbuf;
+  
+ public:
+  cl_console_base(void);
 
   virtual class cl_console_base *clone_for_exec(char *fin) = 0;
 
   virtual void redirect(char *fname, char *mode) = 0;
   virtual void un_redirect(void) = 0;
-  virtual int cmd_do_print(const char *format, va_list ap) = 0;
   virtual bool is_tty(void) const = 0;
   virtual bool is_eof(void) const = 0;
-  virtual int input_avail(void) = 0;
-  virtual char *read_line(void) = 0;
-
+  virtual bool input_avail(void) = 0;
+  virtual int read_line(void) = 0;
+  virtual class cl_f *get_fout(void)= 0;
+  virtual class cl_f *get_fin(void)= 0;
+  
   virtual int init(void);
   virtual void welcome(void);
   virtual int proc_input(class cl_cmdset *cmdset);
-
-  void print_prompt(void);
-  int dd_printf(const char *format, ...);
-  int debug(const char *format, ...);
-  void print_bin(long data, int bits);
-  void print_char_octal(char c);
-
-  bool interpret(char *cmd);
-  int get_id(void) const { return(id); }
-  void set_id(int new_id);
-  void set_prompt(char *p);
+  virtual bool need_check(void) { return false; }
   
-  bool input_active(void) const;
-  bool accept_last(void) { return is_tty() ? DD_TRUE : DD_FALSE; }
+  virtual void print_prompt(void);
+  virtual int dd_printf(const char *format, ...);
+  virtual int debug(const char *format, ...);
+  virtual void print_bin(long data, int bits);
+  virtual void print_char_octal(char c);
+  virtual int cmd_do_print(const char *format, va_list ap);
 
-public:
+  virtual bool interpret(char *cmd);
+  virtual int get_id(void) const { return(id); }
+  virtual void set_id(int new_id);
+  virtual void set_prompt(char *p);
+  
+  virtual bool input_active(void) const;
+  //virtual bool accept_last(void) { return /*is_tty() ? DD_TRUE : DD_FALSE;*/flags&CONS_INTERACTIVE; }
+  virtual bool prevent_quit(void) { return true; }
+  
+ private:
   int flags; // See CONS_XXXX
-
-protected:
+ public:
+  virtual int set_flag(int flag, bool value);
+  virtual void set_interactive(bool new_val);
+  virtual bool get_flag(int flag);
+  virtual int get_flags() { return flags; };
+  virtual bool is_interactive() { return get_flag(CONS_INTERACTIVE); }
+  virtual bool is_frozen() { return get_flag(CONS_FROZEN); }
+  virtual bool set_cooked(bool new_val);
+  
+ protected:
   class cl_app *app;
   char *prompt;
   int id;
@@ -155,19 +173,20 @@ class cl_commander_base: public cl_base
 public:
   class cl_app *app;
   class cl_list *cons;
-  class cl_console_base *actual_console, *frozen_console;
+  class cl_console_base *actual_console, *frozen_console, *config_console;
   class cl_cmdset *cmdset;
 
 public:
   cl_commander_base(class cl_app *the_app, class cl_cmdset *acmdset);
   virtual ~cl_commander_base(void);
 
-  void add_console(class cl_console_base *console);
-  void del_console(class cl_console_base *console);
-  void activate_console(class cl_console_base *console);
-  void deactivate_console(class cl_console_base *console);
-
-  void prompt(void);
+  virtual void add_console(class cl_console_base *console);
+  virtual void del_console(class cl_console_base *console);
+  virtual void activate_console(class cl_console_base *console);
+  virtual void deactivate_console(class cl_console_base *console);
+  virtual int consoles_prevent_quit(void);
+  
+  //void prompt(void);
   int all_printf(const char *format, ...);        // print to all consoles
   int dd_printf(const char *format, va_list ap);  // print to actual_console
   int dd_printf(const char *format, ...);         // print to actual_console
@@ -175,13 +194,14 @@ public:
   int debug(const char *format, va_list ap);      // print consoles with debug flag set
   int flag_printf(int iflags, const char *format, ...);
   int input_avail_on_frozen(void);
-  void exec_on(class cl_console_base *cons, char *file_name);
-
+  class cl_console_base *exec_on(class cl_console_base *cons, char *file_name);
+  
   virtual int init(void) = 0;
-  virtual void set_fd_set(void) = 0;
+  virtual void update_active(void) = 0;
   virtual int proc_input(void) = 0;
   virtual int input_avail(void) = 0;
   virtual int wait_input(void) = 0;
+  virtual void check(void) { return; }
 };
 
 

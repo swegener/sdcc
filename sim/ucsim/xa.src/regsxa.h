@@ -47,12 +47,12 @@ struct t_regs
 
 /* store to sfr */
 #define set_word_direct(addr, val) { sfr->set((t_addr) (addr), (val) & 0xff); \
-                            sfr->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
+    sfr->set((t_addr) ((addr)+1), ((val) >> 8) & 0xff); }
 #define set_byte_direct(addr, val) sfr->set((t_addr) (addr), (val) )
 
 /* get from sfr */
 #define get_byte_direct(addr) sfr->get((t_addr) (addr))
-#define get_word_direct(addr) (sfr->get((t_addr) (addr)) | (sfr->get((t_addr) (addr+1)) << 8) )
+#define get_word_direct(addr) (sfr->get((t_addr) (addr)) | (sfr->get((t_addr) ((addr)+1)) << 8) )
 
 /* store to idata(onchip) ram */
 #define set_idata2(addr, val) { iram->set((t_addr) (addr), (val) & 0xff); \
@@ -81,7 +81,7 @@ struct t_regs
 #define fetch1() fetch()
 
 /* get a 1 or 2 byte register */
-#define reg2(_index) get_reg(1, REGS_OFFSET + (_index<<1)) /* function in inst.cc */
+#define reg2(_index) get_reg(1, REGS_OFFSET + ((_index)<<1)) /* function in inst.cc */
 #define reg1(_index) (unsigned char)get_reg(0, REGS_OFFSET + (_index))
 
 #define set_reg1(_index, _value) { \
@@ -89,7 +89,7 @@ struct t_regs
 }
 
 #define set_reg2(_index, _value) { \
-     set_word_direct( (REGS_OFFSET+(_index<<1)), _value); \
+    set_word_direct( (REGS_OFFSET+((_index)<<1)), _value);	\
 }
 
 #define set_reg(_word_flag, _index, _value) { \

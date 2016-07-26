@@ -120,7 +120,7 @@ cl_51core::inst_orl_a_Sri(uchar code)
   t_mem d;
   class cl_memory_cell *cell;
 
-  cell= iram->get_cell(get_reg(code & 0x01)->read());
+  cell= iram->get_cell(R[code & 0x01]->read());
   d= acc->read();
   acc->write(d|= cell->read());
   return(resGO);
@@ -139,7 +139,7 @@ cl_51core::inst_orl_a_rn(uchar code)
   t_mem d;
 
   d= acc->read();
-  acc->write(d|= get_reg(code & 0x07)->read());
+  acc->write(d|= R[code & 0x07]->read());
   return(resGO);
 }
 
@@ -229,7 +229,7 @@ cl_51core::inst_anl_a_Sri(uchar code)
   t_mem d;
   class cl_memory_cell *cell;
 
-  cell= iram->get_cell(get_reg(code & 0x01)->read());
+  cell= iram->get_cell(R[code & 0x01]->read());
   d= acc->read();
   acc->write(d & cell->read());
   return(resGO);
@@ -248,7 +248,7 @@ cl_51core::inst_anl_a_rn(uchar code)
   uchar d;
 
   d= acc->read();
-  acc->write(d & get_reg(code & 0x07)->read());
+  acc->write(d & R[code & 0x07]->read());
   return(resGO);
 }
 
@@ -336,7 +336,7 @@ cl_51core::inst_xrl_a_Sri(uchar code)
   t_mem d;
   class cl_memory_cell *cell;
 
-  cell= iram->get_cell(get_reg(code & 0x01)->read());
+  cell= iram->get_cell(R[code & 0x01]->read());
   d= acc->read();
   acc->write(d ^ cell->read());
   return(resGO);
@@ -355,7 +355,7 @@ cl_51core::inst_xrl_a_rn(uchar code)
   t_mem d;
 
   d= acc->read();
-  acc->write(d ^ get_reg(code & 0x07)->read());
+  acc->write(d ^ R[code & 0x07]->read());
   return(resGO);
 }
 

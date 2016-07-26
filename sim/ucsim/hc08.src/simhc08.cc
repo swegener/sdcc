@@ -40,13 +40,13 @@ class cl_uc *
 cl_simhc08::mk_controller(void)
 {
   int i;
-  const char *typ= NIL;
+  const char *typ= 0;
   class cl_optref type_option(this);
 
   type_option.init();
   type_option.use("cpu_type");
   i= 0;
-  if ((typ= type_option.get_value(typ)) == NIL)
+  if ((typ= type_option.get_value(typ)) == 0)
     typ= "HC08";
 
   while ((cpus_hc08[i].type_str != NULL) &&

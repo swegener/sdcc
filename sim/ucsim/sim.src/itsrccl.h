@@ -31,6 +31,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "pobjcl.h"
 #include "stypes.h"
 
+#include "uccl.h"
+#include "memcl.h"
+
 
 /*
  * Represents source of interrupt
@@ -38,29 +41,42 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_it_src: public cl_base
 {
+ private:
+  class cl_uc *uc;
+ protected:
+  class cl_memory_cell *ie_cell;
+  class cl_memory_cell *src_cell;
 public:
   int poll_priority;
-  uchar ie_mask;  // Mask in IE register
-  uchar src_reg;  // Register in SFR of source
-  uchar src_mask; // Mask of source bit in src_reg
-  uint  addr;     // Address of service routine
-  bool  clr_bit;  // Request bit must be cleared when IT accepted
-  //char  *name;	  // For debug
-  bool  active;   // Acceptance can be disabled
-
-  cl_it_src(uchar Iie_mask,
-	    uchar Isrc_reg,
-	    uchar Isrc_mask,
-	    uint  Iaddr,
-	    bool  Iclr_bit,
-	    const char  *Iname,
-	    int   apoll_priority);
+  int    nuof;	   // Number of IT to check priority
+  t_mem  ie_mask;  // Mask in IE register
+  t_mem  src_mask; // Mask of source bit in src_reg
+  t_addr addr;     // Address of service routine
+  bool   clr_bit;  // Request bit must be cleared when IT accepted
+  bool   active;   // Acceptance can be disabled
+  bool   indirect; // address comes from a vector table from `addr'
+  
+  cl_it_src(cl_uc  *Iuc,
+	    int    Inuof,
+	    class  cl_memory_cell *Iie_cell,
+	    t_mem  Iie_mask,
+	    class  cl_memory_cell *Isrc_cell,
+	    t_mem  Isrc_mask,
+	    t_addr Iaddr,
+	    bool   Iclr_bit,
+	    bool   Iindirect,
+	    const  char *Iname,
+	    int    apoll_priority);
   virtual ~cl_it_src(void);
 
           bool is_active(void);
   virtual void set_active_status(bool Aactive);
   virtual void activate(void);
   virtual void deactivate(void);
+
+  virtual bool enabled(void);
+  virtual bool pending(void);
+  virtual void clear(void);
 };
 
 
@@ -68,8 +84,8 @@ class cl_irqs: public cl_sorted_list
 {
 public:
   cl_irqs(t_index alimit, t_index adelta);
-  virtual const void *key_of(void *item); 
-  virtual int compare(const void *key1, const void *key2);
+  virtual void *key_of(void *item); 
+  virtual int compare(void *key1, void *key2);
 };
 
 

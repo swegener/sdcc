@@ -1,3 +1,5 @@
+/* $Id: instcl.h 345 2016-07-10 14:51:45Z  $ */
+
 /* stm8.src/instcl.h */
 
    //virtual void incx(void);

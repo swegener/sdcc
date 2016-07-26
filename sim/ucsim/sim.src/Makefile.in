@@ -38,7 +38,7 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS         = stack.o mem.o sim.o itsrc.o brk.o arg.o \
-		  guiobj.o uc.o hw.o
+		  guiobj.o uc.o hw.o simif.o var.o
 
 
 # Compiling entire program or any subproject
@@ -98,8 +98,8 @@ include $(srcdir)/clean.mk
 sim_lib: $(top_builddir)/libsim.a
 
 $(top_builddir)/libsim.a: $(OBJECTS)
-	ar -rc $*.a $(OBJECTS)
-	$(RANLIB) $*.a
+	ar -rcD $@ $(OBJECTS)
+	$(RANLIB) $@
 
 .cc.o:
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@

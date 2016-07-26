@@ -47,7 +47,9 @@ main(int argc, char *argv[])
   sim= new cl_simavr(application);
   sim->init();
   application->set_simulator(sim);
-  sim->main();
+  //sim->main();
+  application->run();
+  application->done();
   delete application;
   return(0);
 }

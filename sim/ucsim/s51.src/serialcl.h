@@ -28,37 +28,38 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef SERIALCL_HEADER
 #define SERIALCL_HEADER
 
+#include "fiocl.h"
 #include "stypes.h"
 #include "pobjcl.h"
 #include "uccl.h"
+#include "newcmdposixcl.h"
 
 //#include "newcmdcl.h"
 
+class cl_serial_listener;
 
 class cl_serial: public cl_hw
 {
 protected:
-  class cl_address_space *sfr;
+  class cl_address_space *sfr, *bas;
   bool there_is_t2, t2_baud;
-  class cl_memory_cell *sbuf, *pcon, *scon;
-#ifdef HAVE_TERMIOS_H
-  struct termios saved_attributes_in; // Attributes of serial interface
-  struct termios saved_attributes_out;
-#endif
+  class cl_memory_cell *sbuf, *pcon, *scon, *scon_bits[8];
   class cl_optref *serial_in_file_option;
   class cl_optref *serial_out_file_option;
-  FILE *serial_in;      // Serial line input
-  FILE *serial_out;     // Serial line output
-  uchar s_in;           // Serial channel input reg
-  uchar s_out;          // Serial channel output reg
-  bool  s_sending;      // Transmitter is working
-  bool  s_receiving;    // Receiver is working
-  int   s_rec_bit;      // Bit counter of receiver
-  int   s_tr_bit;       // Bit counter of transmitter
-  int   s_rec_t1;       // T1 overflows for receiving
-  int   s_tr_t1;        // T1 overflows for sending
-  int   s_rec_tick;     // Machine cycles for receiving
-  int   s_tr_tick;      // Machine cycles for sending
+  class cl_optref *serial_port_option;
+  class cl_serial_listener *listener;
+  class cl_f *fin;	// Serial line input
+  class cl_f *fout;	// Serial line output
+  uchar s_in;		// Serial channel input reg
+  uchar s_out;		// Serial channel output reg
+  bool  s_sending;	// Transmitter is working
+  bool  s_receiving;	// Receiver is working
+  int   s_rec_bit;	// Bit counter of receiver
+  int   s_tr_bit;	// Bit counter of transmitter
+  int   s_rec_t1;	// T1 overflows for receiving
+  int   s_tr_t1;	// T1 overflows for sending
+  int   s_rec_tick;	// Machine cycles for receiving
+  int   s_tr_tick;	// Machine cycles for sending
   uchar _mode;
   uchar _bmREN;
   uchar _bmSMOD;
@@ -82,8 +83,20 @@ public:
   virtual int tick(int cycles);
   virtual void reset(void);
   virtual void happen(class cl_hw *where, enum hw_event he, void *params);
-
+  virtual void new_io(class cl_f *f_in, class cl_f *f_out);
+  
   virtual void print_info(class cl_console_base *con);
+};
+
+
+class cl_serial_listener: public cl_listen_console
+{
+ public:
+  class cl_serial *serial_hw;
+  cl_serial_listener(int serverport, class cl_app *the_app,
+		     class cl_serial *the_serial);
+  virtual int proc_input(class cl_cmdset *cmdset);
+  virtual bool prevent_quit(void) { return false; }
 };
 
 

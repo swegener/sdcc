@@ -70,12 +70,12 @@ cl_st7::init(void)
 
   xtal = 8000000;
 
-  rom = address_space(MEM_ROM_ID);
+  //rom = address_space(MEM_ROM_ID);
 //  ram = mem(MEM_XRAM);
-  ram = rom;
+  //ram = rom;
 
   // zero out ram(this is assumed in regression tests)
-  printf("******************** leave the RAM dirty now \n");
+  //printf("******************** leave the RAM dirty now \n");
 //  for (int i=0x0; i<0x8000; i++) {
 //    ram->set((t_addr) i, 0);
 //  }
@@ -99,10 +99,10 @@ cl_st7::reset(void)
 }
 
 
-const char *
+char *
 cl_st7::id_string(void)
 {
-  return("unspecified ST7");
+  return((char*)"unspecified ST7");
 }
 
 
@@ -126,7 +126,7 @@ void
 cl_st7::mk_hw_elements(void)
 {
   //class cl_base *o;
-  /* t_uc::mk_hw() does nothing */
+  cl_uc::mk_hw_elements();
 }
 
 void
@@ -134,7 +134,7 @@ cl_st7::make_memories(void)
 {
   class cl_address_space *as;
 
-  as= new cl_address_space("rom", 0, 0x10000, 8);
+  rom= ram= as= new cl_address_space("rom", 0, 0x10000, 8);
   as->init();
   address_spaces->add(as);
 
@@ -148,6 +148,34 @@ cl_st7::make_memories(void)
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
+
+  regs8= new cl_address_space("regs8", 0, 2, 8);
+  regs8->init();
+  regs8->get_cell(0)->decode((t_mem*)&regs.A);
+  regs8->get_cell(1)->decode((t_mem*)&regs.CC);
+
+  regs16= new cl_address_space("regs16", 0, 3, 16);
+  regs16->init();
+
+  regs16->get_cell(0)->decode((t_mem*)&regs.X);
+  regs16->get_cell(1)->decode((t_mem*)&regs.Y);
+  regs16->get_cell(2)->decode((t_mem*)&regs.SP);
+
+  address_spaces->add(regs8);
+  address_spaces->add(regs16);
+
+  class cl_var *v;
+  vars->add(v= new cl_var(cchars("A"), regs8, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("CC"), regs8, 1));
+  v->init();
+  
+  vars->add(v= new cl_var(cchars("X"), regs16, 0));
+  v->init();
+  vars->add(v= new cl_var(cchars("Y"), regs16, 1));
+  v->init();
+  vars->add(v= new cl_var(cchars("SP"), regs16, 2));
+  v->init();
 }
 
 
@@ -183,7 +211,6 @@ cl_st7::inst_length(t_addr addr)
 
   return len;
 }
-
 int
 cl_st7::inst_branch(t_addr addr)
 {
@@ -226,13 +253,13 @@ cl_st7::get_disasm_info(t_addr addr,
   int start_addr = addr;
   struct dis_entry *dis_e;
 
-  code= get_mem(MEM_ROM_ID, addr++);
+  code= rom->get(addr++);
   dis_e = NULL;
 
   switch(code) {
 	/* here will be all the prefixes for ST7 */
 	case 0x90 :
-	  code= get_mem(MEM_ROM_ID, addr++);
+	  code= rom->get(addr++);
       i= 0;
       while ((code & disass_st7_90[i].mask) != disass_st7_90[i].code &&
         disass_st7_90[i].mnemonic)
@@ -244,7 +271,7 @@ cl_st7::get_disasm_info(t_addr addr,
     break;
 	  
 	case 0x91 :
-	  code= get_mem(MEM_ROM_ID, addr++);
+	  code= rom->get(addr++);
       i= 0;
       while ((code & disass_st7_91[i].mask) != disass_st7_91[i].code &&
         disass_st7_91[i].mnemonic)
@@ -256,7 +283,7 @@ cl_st7::get_disasm_info(t_addr addr,
     break;
 	  
 	case 0x92 :
-	  code= get_mem(MEM_ROM_ID, addr++);
+	  code= rom->get(addr++);
       i= 0;
       while ((code & disass_st7_92[i].mask) != disass_st7_92[i].code &&
         disass_st7_92[i].mnemonic)
@@ -296,13 +323,13 @@ cl_st7::get_disasm_info(t_addr addr,
   if (ret_len)
     *ret_len = len;
 
-  if (denrty)
+  if (dentry)
     *dentry= dis_e;
   
   return b;
 }
 
-const char *
+char *
 cl_st7::disass(t_addr addr, const char *sep)
 {
   char work[256], temp[20];
@@ -310,6 +337,7 @@ cl_st7::disass(t_addr addr, const char *sep)
   char *buf, *p, *t;
   int len = 0;
   int immed_offset = 0;
+
 
   p= work;
 
@@ -329,64 +357,64 @@ cl_st7::disass(t_addr addr, const char *sep)
           switch (*(b++))
             {
             //case 's': // s    signed byte immediate
-            //  sprintf(temp, "#%d", (char)get_mem(MEM_ROM_ID, addr+immed_offset));
+            //  sprintf(temp, "#%d", (char)rom->get(addr+immed_offset));
             //  ++immed_offset;
             //  break;
             //case 'e': // e    extended 24bit immediate operand
             //  sprintf(temp, "#0x%06lx",
-            //     (ulong)((get_mem(MEM_ROM_ID, addr+immed_offset)<<16) |
-            //            (get_mem(MEM_ROM_ID, addr+immed_offset+1)<<8) |
-            //            (get_mem(MEM_ROM_ID, addr+immed_offset+2))) );
+            //     (ulong)((rom->get(addr+immed_offset)<<16) |
+            //            (rom->get(addr+immed_offset+1)<<8) |
+            //            (rom->get(addr+immed_offset+2))) );
             //  ++immed_offset;
             //  ++immed_offset;
             //  ++immed_offset;
             //  break;
             //case 'w': // w    word immediate operand
             //  sprintf(temp, "#0x%04x",
-            //     (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-            //            (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
+            //     (uint)((rom->get(addr+immed_offset)<<8) |
+            //            (rom->get(addr+immed_offset+1))) );
             //  ++immed_offset;
             //  ++immed_offset;
             //  break;
             case 'b': // b    byte immediate operand
-              sprintf(temp, "#0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
+              sprintf(temp, "#0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'd': // d    short direct addressing
-              sprintf(temp, "$0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
+              sprintf(temp, "$0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'x': // x    long direct
               sprintf(temp, "$0x%04x",
-                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-                        (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
+                 (uint)((rom->get(addr+immed_offset)<<8) |
+                        (rom->get(addr+immed_offset+1))) );
               ++immed_offset;
               ++immed_offset;
               break;
             //case '3': // 3    24bit index offset
             //  sprintf(temp, "0x%06lx",
-            //     (ulong)((get_mem(MEM_ROM_ID, addr+immed_offset)<<16) |
-            //            (get_mem(MEM_ROM_ID, addr+immed_offset+1)<<8) |
-            //            (get_mem(MEM_ROM_ID, addr+immed_offset+2))) );
+            //     (ulong)((rom->get(addr+immed_offset)<<16) |
+            //            (rom->get(addr+immed_offset+1)<<8) |
+            //            (rom->get(addr+immed_offset+2))) );
             //  ++immed_offset;
             //  ++immed_offset;
             //  ++immed_offset;
             // break;
             case '2': // 2    word index offset
               sprintf(temp, "0x%04x",
-                 (uint)((get_mem(MEM_ROM_ID, addr+immed_offset)<<8) |
-                        (get_mem(MEM_ROM_ID, addr+immed_offset+1))) );
+                 (uint)((rom->get(addr+immed_offset)<<8) |
+                        (rom->get(addr+immed_offset+1))) );
               ++immed_offset;
               ++immed_offset;
               break;
             case '1': // b    byte index offset
-              sprintf(temp, "0x%02x", (uint)get_mem(MEM_ROM_ID, addr+immed_offset));
+              sprintf(temp, "0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
             case 'p': // b    byte index offset
-              sprintf(temp, "0x%04x",
-                 addr+immed_offset+1
-                 +(char)get_mem(MEM_ROM_ID, addr+immed_offset));
+              sprintf(temp, "0x%04lx",
+		      (long int)(addr+immed_offset+1
+				 +(char)rom->get(addr+immed_offset)));
               ++immed_offset;
               break;
             default:
@@ -470,7 +498,7 @@ cl_st7::exec_inst(void)
 
 
   if (fetch(&code)) {
-	  printf("******************** break \n");
+    //printf("******************** break \n");
 	  return(resBREAKPOINT);
   }
   tick(1);
@@ -487,7 +515,7 @@ cl_st7::exec_inst(void)
 		break;
   }
 	
-  printf("********************  switch; pc=0x%x, prefix = 0x%x, code = 0x%x\n",PC, cprefix, code);
+  //printf("********************  switch; pc=0x%lx, prefix = 0x%x, code = 0x%x\n",(long int)(PC), cprefix, code);
   switch (code & 0xf) {
    int mulres;
    
@@ -526,7 +554,7 @@ cl_st7::exec_inst(void)
             break;
          case 0x90: // this is prefix, do not be mad ???
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 		
@@ -560,7 +588,7 @@ cl_st7::exec_inst(void)
          case 0x70: // 
          case 0x90: // this is prefix, do not be mad ???
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -604,7 +632,7 @@ cl_st7::exec_inst(void)
          case 0x80: // 
          case 0x90: // this is prefix, do not be mad ???
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -627,7 +655,7 @@ cl_st7::exec_inst(void)
             return( inst_cpl( code, cprefix));
             break;
          case 0x80: // trap
-            printf("************* TRAP instruction unimplemented !!!!\n");
+	   //printf("************* TRAP instruction unimplemented !!!!\n");
             return(resINV_INST);
             break;
          case 0x90: // 
@@ -649,7 +677,7 @@ cl_st7::exec_inst(void)
             return( inst_cpxy( code, cprefix));
             break;
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -694,7 +722,7 @@ cl_st7::exec_inst(void)
             return( inst_and( code, cprefix));
             break;
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -741,7 +769,7 @@ cl_st7::exec_inst(void)
          case 0x60:
          case 0x70: // 
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -786,7 +814,7 @@ cl_st7::exec_inst(void)
             return( inst_lda( code, cprefix));
             break;
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -829,7 +857,7 @@ cl_st7::exec_inst(void)
             break;
          case 0x80: // 
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -868,7 +896,7 @@ cl_st7::exec_inst(void)
             return( inst_xor( code, cprefix));
             break;
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -913,7 +941,7 @@ cl_st7::exec_inst(void)
             return( inst_adc( code, cprefix));
             break;
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -952,7 +980,7 @@ cl_st7::exec_inst(void)
             return( inst_or( code, cprefix));
             break;
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -986,7 +1014,7 @@ cl_st7::exec_inst(void)
          case 0x70: // 
          case 0x80: // 
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -1024,7 +1052,7 @@ cl_st7::exec_inst(void)
             break;
          case 0x80: // 
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -1061,7 +1089,7 @@ cl_st7::exec_inst(void)
             break;
          case 0x80: // 
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -1105,7 +1133,7 @@ cl_st7::exec_inst(void)
             return( inst_ldxy( code, cprefix));
             break;
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
@@ -1151,13 +1179,13 @@ cl_st7::exec_inst(void)
             break;
          case 0xA0:
          default: 
-            printf("************* bad code !!!!\n");
+	   //printf("************* bad code !!!!\n");
             return(resINV_INST);
 		}
 
 
     default:
-		printf("************* bad code !!!!\n");
+      //printf("************* bad code !!!!\n");
 		return(resINV_INST);
 	}
 	  

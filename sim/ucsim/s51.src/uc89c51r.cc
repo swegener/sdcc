@@ -49,11 +49,11 @@ cl_uc89c51r::mk_hw_elements(void)
   class cl_hw *h;
 
   cl_uc52::mk_hw_elements();
-  hws->add(h= new cl_wdt(this, 0x3fff));
+  add_hw(h= new cl_wdt(this, 0x3fff));
   h->init();
-  hws->add(h= new cl_pca(this, 0));
+  add_hw(h= new cl_pca(this, 0));
   h->init();
-  hws->add(h= new cl_89c51r_dummy_hw(this));
+  add_hw(h= new cl_89c51r_dummy_hw(this));
   h->init();
 }
 
@@ -61,6 +61,21 @@ void
 cl_uc89c51r::make_memories(void)
 {
   cl_uc52::make_memories();
+  dptr->decoders->free_all();
+
+  cl_memory_chip *dptr1_chip= new cl_memory_chip("dptr1_chip", 2, 8, 0);
+  dptr1_chip->init();
+  memchips->add(dptr1_chip);
+
+  cl_banker *banker= new cl_banker(sfr, AUXR1, bmDPS,
+				   dptr, 0, 1);
+  banker->init();
+  dptr->decoders->add(banker);
+  
+  banker->add_bank(0, memory("sfr_chip"), 2);
+  banker->add_bank(1, dptr1_chip, 0);
+  banker->activate(0);
+  sfr->write(AUXR1, 0);
 }
 
 
@@ -74,7 +89,7 @@ cl_uc89c51r::reset(void)
   sfr->set_bit1(CCAPM3, bmECOM);
   sfr->set_bit1(CCAPM4, bmECOM);
   //t0_overflows= 0;
-  dpl0= dph0= dpl1= dph1= 0;
+  //dpl0= dph0= dpl1= dph1= 0;
   sfr->write(IPH, 0);
 }
 
@@ -100,7 +115,7 @@ void
 cl_uc89c51r::pre_inst(void)
 {
   //printf("pre dptr0:%02X%02X dptr1:%02X%02X\n", dph0, dpl0, dph1, dpl1);
-  dps = (sfr->get(AUXR1) & bmDPS);
+  /*dps = (sfr->get(AUXR1) & bmDPS);
   if (dps)
     {
       sfr->set(DPL, dpl1);
@@ -110,14 +125,14 @@ cl_uc89c51r::pre_inst(void)
     {
       sfr->set(DPL, dpl0);
       sfr->set(DPH, dph0);
-    }
+      }*/
   cl_uc51r::pre_inst();
 }
 
 void
 cl_uc89c51r::post_inst(void)
 {
-  if (dps)
+  /*if (dps)
     {
       dpl1= sfr->get(DPL);
       dph1= sfr->get(DPH);
@@ -126,9 +141,9 @@ cl_uc89c51r::post_inst(void)
     {
       dpl0= sfr->get(DPL);
       dph0= sfr->get(DPH);
-    }
-  dps = (sfr->get(AUXR1) & bmDPS);
-  if (dps)
+      }*/
+  //dps = (sfr->get(AUXR1) & bmDPS);
+  /*if (dps)
     {
       sfr->set(DPL, dpl1);
       sfr->set(DPH, dph1);
@@ -137,7 +152,7 @@ cl_uc89c51r::post_inst(void)
     {
       sfr->set(DPL, dpl0);
       sfr->set(DPH, dph0);
-    }
+      }*/
   //printf("post dptr0:%02X%02X dptr1:%02X%02X\n", dph0, dpl0, dph1, dpl1);
   cl_uc51r::post_inst();
 }
@@ -147,7 +162,7 @@ void
 cl_uc89c51r::print_regs(class cl_console_base *con)
 {
   t_addr start;
-  uchar data, acc, dps;
+  uchar data, acc, dps, h, l;
 
   start= psw->get() & 0x18;
   iram->dump(start, start+7, 8, con);
@@ -155,21 +170,27 @@ cl_uc89c51r::print_regs(class cl_console_base *con)
   con->dd_printf("@R0 %02x %c", data, isprint(data) ? data : '.');
 
   acc= sfr->get(ACC);
-  con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", acc, acc,
+  con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x\n", acc, acc,
               isprint(acc)?(acc):'.', sfr->get(B)); 
   //eram2xram();
-  dps = sfr->get(AUXR1) & bmDPS;
-  data= xram->get(dph0*256+dpl0);
-  con->dd_printf("  %cDPTR0= 0x%02x%02x @DPTR0= 0x%02x %3d %c",
-              dps?' ':'*', dph0, dpl0,
-              data, data, isprint(data)?data:'.');
-  data= xram->get(dph1*256+dpl1);
-  con->dd_printf("  %cDPTR1= 0x%02x%02x @DPTR1= 0x%02x %3d %c\n",
-              dps?'*':' ', dph1, dpl1,
-              data, data, isprint(data)?data:'.');
 
   data= iram->get(iram->get(start+1));
-  con->dd_printf("@R1 %02x %c", data, isprint(data) ? data : '.');
+  con->dd_printf("@R1 %02x %c\n", data, isprint(data) ? data : '.');
+
+  dps = sfr->get(AUXR1) & bmDPS;
+  h= memory("sfr_chip")->get(3);
+  l= memory("sfr_chip")->get(2);
+  data= xram->get(h*256+l);
+  con->dd_printf(" %cDPTR0= 0x%02x%02x @DPTR0= 0x%02x %3d %c\n",
+              dps?' ':'*', h, l,
+              data, data, isprint(data)?data:'.');
+  h= memory("dptr1_chip")->get(3);
+  l= memory("dptr1_chip")->get(2);
+  data= xram->get(h*256+l);
+  con->dd_printf(" %cDPTR1= 0x%02x%02x @DPTR1= 0x%02x %3d %c\n",
+              dps?'*':' ', h, l,
+              data, data, isprint(data)?data:'.');
+
   data= psw->get();
   con->dd_printf("  PSW= 0x%02x CY=%c AC=%c OV=%c P=%c\n", data,
               (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
@@ -179,6 +200,9 @@ cl_uc89c51r::print_regs(class cl_console_base *con)
   con->dd_printf ("SP ", start);
   iram->dump (start, start - 7, 8, con);
 
+  sfr->undecode_cell(DPL);
+  sfr->undecode_cell(DPH);
+  
   print_disass(PC, con);
 }
 
@@ -194,20 +218,33 @@ int
 cl_89c51r_dummy_hw::init(void)
 {
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
+  cl_hw::init();
   if (!sfr)
     {
       fprintf(stderr, "No SFR to register %s[%d] into\n", id_string, id);
     }
-  //auxr= sfr->register_hw(AUXR, this, 0);
-  register_cell(sfr, AUXR1, &auxr1, wtd_restore);
+  dpl= register_cell(sfr, DPL);
+  dph= register_cell(sfr, DPH);
   return(0);
+}
+
+t_mem
+cl_89c51r_dummy_hw::read(class cl_memory_cell *cell)
+{
+  if (cell == dpl)
+    return ((cl_uc89c51r*)uc)->dptr->read(0);
+  else if (cell == dph)
+    return ((cl_uc89c51r*)uc)->dptr->read(1);
+  return cell->get();
 }
 
 void
 cl_89c51r_dummy_hw::write(class cl_memory_cell *cell, t_mem *val)
 {
-  if (cell == auxr1)
-    auxr1->set_bit0(0x04);
+  if (cell == dpl)
+    ((cl_uc89c51r*)uc)->dptr->write(0, *val);
+  else if (cell == dph)
+    ((cl_uc89c51r*)uc)->dptr->write(1, *val);
 }
 
 

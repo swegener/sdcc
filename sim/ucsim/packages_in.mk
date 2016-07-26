@@ -8,6 +8,7 @@ enable_z180_port    = @enable_z180_port@
 enable_gbz80_port   = @enable_gbz80_port@
 enable_r2k_port     = @enable_r2k_port@
 enable_r3ka_port    = @enable_r3ka_port@
+enable_tlcs_port    = @enable_tlcs_port@
 enable_xa_port      = @enable_xa_port@
 enable_hc08_port    = @enable_hc08_port@
 enable_s08_port     = @enable_s08_port@
@@ -62,6 +63,12 @@ else
 SR3KA		=
 endif
 
+ifeq ($(enable_tlcs_port),yes)
+TLCS		= tlcs.src
+else
+TLCS		=
+endif
+
 ifeq ($(enable_hc08_port),yes)
 SHC08		= hc08.src
 else
@@ -92,8 +99,10 @@ else
 ST7      =
 endif
 
-PKGS		= cmd.src sim.src gui.src $(S51) $(S390) $(SAVR) $(SZ80) $(SZ180) \
-		  $(SGBZ80) $(SR2K) $(SR3KA) $(SHC08) $(SS08) $(XA) $(STM8) $(ST7) doc
+PKGS		= cmd.src sim.src gui.src $(S51) $(S390) \
+		  $(SAVR) $(SZ80) $(SZ180) $(SGBZ80) $(SR2K) $(SR3KA) \
+		  $(TLCS) \
+		  $(SHC08) $(SS08) $(XA) $(STM8) $(ST7) doc
 
-PKGS_ALL	= cmd.src sim.src gui.src s51.src avr.src z80.src xa.src \
+PKGS_ALL	= cmd.src sim.src gui.src s51.src avr.src z80.src tlcs.src xa.src \
 		  hc08.src stm8.src st7.src doc

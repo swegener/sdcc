@@ -33,23 +33,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 
-struct t_regpair
-{
-#ifdef WORDS_BIGENDIAN
-  TYPE_UBYTE h;
-  TYPE_UBYTE l;
-#else
-  TYPE_UBYTE l;
-  TYPE_UBYTE h;
-#endif
-};
-
-#define DEF_REGPAIR(BIGNAME,smallname) \
-  union { \
-    TYPE_UWORD BIGNAME; \
-    struct t_regpair smallname; \
-  }
-
 struct t_regs
 {
   TYPE_UBYTE A;

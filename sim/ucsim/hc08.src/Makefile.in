@@ -119,7 +119,7 @@ include $(srcdir)/clean.mk
 hc08.src: shc08$(EXEEXT)  shared_lib
 
 shc08$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS)  -o $@ $(OBJECTS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -Wl,--start-group $(LIBS) -Wl,--end-group -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/shc08.so

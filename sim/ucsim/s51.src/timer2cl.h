@@ -37,17 +37,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "timer0cl.h"
 
 
-#define T2MODE_RELOAD   0
-#define T2MODE_CAPTURE  1
-#define T2MODE_BAUDRATE 2
-#define T2MODE_OFF      3
-#define T2MODE_DOWN     4
-#define T2MODE_CLKOUT   5
+#define T2MODE_RELOAD	0
+#define T2MODE_CAPTURE	1
+#define T2MODE_BAUDRATE	2
+#define T2MODE_OFF	3
+#define T2MODE_DOWN	4
+#define T2MODE_CLKOUT	5
 
 enum t2_features {
-  t2_default    = 0x01,
-  t2_down       = 0x02,
-  t2_clock_out  = 0x04
+  t2_default	= 0x01,
+  t2_down	= 0x02,
+  t2_clock_out	= 0x04
 };
 
 

@@ -15,11 +15,11 @@
  *  -Leland Morrison 2011-09-29 
  */
 
-#define store2(addr, val) { ram->set((t_addr) (addr), val & 0xff); \
-                            ram->set((t_addr) (addr+1), (val >> 8) & 0xff); }
-#define store1(addr, val) ram->set((t_addr) (addr), val)
-#define get1(addr) ram->get((t_addr) (addr))
-#define get2(addr) (ram->get((t_addr) (addr)) | (ram->get((t_addr) (addr+1)) << 8) )
+#define store2(addr, val) { ram->write((t_addr) (addr), val & 0xff); \
+                            ram->write((t_addr) (addr+1), (val >> 8) & 0xff); }
+#define store1(addr, val) ram->write((t_addr) (addr), val)
+#define get1(addr) ram->read((t_addr) (addr))
+#define get2(addr) (ram->read((t_addr) (addr)) | (ram->read((t_addr) (addr+1)) << 8) )
 #define fetch2() (fetch() | (fetch() << 8))
 #define fetch1() fetch()
 #endif

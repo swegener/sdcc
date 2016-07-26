@@ -16,7 +16,7 @@ the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
 UCSIM is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
+but WITHOUT ANY RANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
@@ -40,6 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // prj
 #include "globals.h"
 #include "utils.h"
+#include "fiocl.h"
 
 // sim
 #include "simcl.h"
@@ -67,10 +68,8 @@ cl_prompt_option::init(void)
   char *help;
   help= format_string("Prompt string of console%d", con->get_id());
   create(con, string_opt, "prompt", help);
-  //fprintf(stderr," **new prompt option %p\"%s\", value=%p str=%p\n",option,object_name(option),option->get_value(),option->get_value()->sval);
   free(help);
   default_option("prompt");
-  //fprintf(stderr,"opt=%p\"%s\" value after default set=%p str=%p\n",option,object_name(option),option->get_value(),option->get_value()->sval);
   return(0);
 }
 
@@ -107,10 +106,7 @@ cl_debug_option::option_changed(void)
     return;
   bool b;
   option->get_value(&b);
-  if (b)
-    con->flags|= CONS_DEBUG;
-  else
-    con->flags&= ~CONS_DEBUG;
+  con->set_flag(CONS_DEBUG, b);
 }
 
 
@@ -118,6 +114,16 @@ cl_debug_option::option_changed(void)
  * Command console
  *____________________________________________________________________________
  */
+
+cl_console_base::cl_console_base(void):
+  cl_base()
+{
+  app= 0;
+  flags= 0;
+  prompt= 0;
+  nl= 0;
+  lbuf= 0;
+}
 
 int
 cl_console_base::init(void)
@@ -131,8 +137,7 @@ cl_console_base::init(void)
   debug_option= new cl_debug_option(this);
   debug_option->init();
   welcome();
-  flags&= ~CONS_PROMPT;
-  //print_prompt();
+  print_prompt();
   last_command= 0;
   last_cmdline= 0;
   return(0);
@@ -143,7 +148,7 @@ cl_console_base::welcome(void)
 {
   if (!(flags & CONS_NOWELCOME))
     {
-      dd_printf("uCsim %s, Copyright (C) 1997 Daniel Drotos, Talker Bt.\n"
+      dd_printf("uCsim %s, Copyright (C) 1997 Daniel Drotos.\n"
         "uCsim comes with ABSOLUTELY NO WARRANTY; for details type "
         "`show w'.\n"
         "This is free software, and you are welcome to redistribute it\n"
@@ -155,18 +160,25 @@ cl_console_base::welcome(void)
 void
 cl_console_base::print_prompt(void)
 {
-  if (flags & (CONS_PROMPT | CONS_FROZEN | CONS_INACTIVE))
+  if (flags & (CONS_FROZEN | CONS_INACTIVE))
     return;
 
-  flags |= CONS_PROMPT;
-  if (/*app->args->arg_avail('P')*/null_prompt_option->get_value(bool(0)))
+  if (!(flags & CONS_INTERACTIVE))
+    return;
+  
+  if (null_prompt_option->get_value(bool(0)))
     {
-      dd_printf("%c", 0);
+      class cl_f *fo= get_fout(), *fi= get_fin();
+      char c= 0;
+      if (fi &&
+	  fi->eof() &&
+	  (fi->id() == fo->id()))
+	return;
+      fo->write(&c, 1);
     }
   else
     {
       dd_printf("%d%s", id, (prompt && prompt[0]) ? prompt : "> ");
-      //              ((p= app->args->get_sarg(0, "prompt"))?p:"> "));
     }
 }
 
@@ -238,6 +250,29 @@ cl_console_base::print_char_octal(char c)
 }
 
 int
+cl_console_base::cmd_do_print(const char *format, va_list ap)
+{
+  int ret;
+  class cl_f *fo= get_fout(), *fi= get_fin();
+  
+  if (fo)
+    {
+      if (fi &&
+	  fi->eof() &&
+	  (fi->id() == fo->id()))
+	{
+	  deb("do not attempt to write on console, where input is at file_end\n");
+	  return 0;
+	}
+      ret= fo->vprintf((char*)format, ap);
+      //fo->flush();
+      return ret;
+    }
+  else
+    return 0;
+}
+
+bool
 cl_console_base::interpret(char *cmd)
 {
   dd_printf("Unknown command\n");
@@ -268,9 +303,13 @@ cl_console_base::set_prompt(char *p)
 bool
 cl_console_base::input_active(void) const
 {
-  if (((flags & CONS_FROZEN) == 0 ||
-    (flags & CONS_INTERACTIVE) != 0) &&
-    (flags & CONS_INACTIVE) == 0)
+  if ((
+       (flags & CONS_FROZEN) == 0 ||
+       (flags & CONS_INTERACTIVE) != 0
+       )
+      &&
+      (flags & CONS_INACTIVE) == 0
+      )
     {
       return true;
     }
@@ -281,22 +320,27 @@ cl_console_base::input_active(void) const
 int
 cl_console_base::proc_input(class cl_cmdset *cmdset)
 {
-  int retval = 0;
+  int retval= 0, i, do_print_prompt= 1;
 
   un_redirect();
-  if (is_eof())
+  char *cmdstr;
+  i= read_line();
+  if (i < 0)
     {
-      dd_printf("End\n");
+      deb("colsing, bacause read_line on con=%d returned %d\n", id, i);
       return 1;
     }
-  char *cmdstr = read_line();
-  if (!cmdstr)
-    return 1;
-  if (flags & CONS_FROZEN)
+  if (i == 0)
+    return 0;
+  cmdstr= lbuf;
+  if (cmdstr==NULL)
+    cmdstr= (char*)"";
+  if (is_frozen())
     {
       app->get_sim()->stop(resUSER);
-      flags&= ~CONS_FROZEN;
+      set_flag(CONS_FROZEN, false);
       retval = 0;
+      do_print_prompt= 0;
     }
   else
     {
@@ -306,27 +350,27 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
         {
           class cl_cmdline *cmdline= 0;
           class cl_cmd *cm = 0;
-          if (flags & CONS_ECHO)
+          if (get_flag(CONS_ECHO))
             dd_printf("%s\n", cmdstr);
           cmdline= new cl_cmdline(app, cmdstr, this);
           cmdline->init();
           if (cmdline->repeat() &&
-              accept_last() &&
+              is_interactive() &&
               last_command)
             {
               cm = last_command;
               delete cmdline;
               cmdline = last_cmdline;
             }
-          else
+	  else
             {
-              cm= cmdset->get_cmd(cmdline, accept_last());
+              cm= cmdset->get_cmd(cmdline, is_interactive());
               if (last_cmdline)
                 {
                   delete last_cmdline;
                   last_cmdline = 0;
                 }
-              last_command = 0;
+	      last_command = 0;
             }
           if (cm)
             {
@@ -339,23 +383,56 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
               else
                 delete cmdline;
             }
-          else
+          else if (cmdline->get_name() != 0)
             {
-              uc_yy_set_string_to_parse(cmdstr);
-              yyparse();
-              uc_yy_free_string_to_parse();
+	      if (strlen(cmdstr) > 0)
+		{
+		  uc_yy_set_string_to_parse(cmdstr);
+		  yyparse();
+		  uc_yy_free_string_to_parse();
+		}
               delete cmdline;
             }
-          /*if (!cm)
-            retval= interpret(cmdstr);*/
         }
     }
-  //retval= sim->do_cmd(cmd, this);
-  un_redirect();
-  /*if (!retval)
-    print_prompt();*/
-  free(cmdstr);
+  //un_redirect();
+  if (!retval &&
+      cmdstr &&
+      do_print_prompt &&
+      !get_flag(CONS_REDIRECTED))
+    {
+      print_prompt();
+    }
+  lbuf= 0;
   return(retval);
+}
+
+int
+cl_console_base::set_flag(int flag, bool value)
+{
+  if (value)
+    flags|= flag;
+  else
+    flags&= ~flag;
+  return flags;
+}
+
+void
+cl_console_base::set_interactive(bool new_value)
+{
+  set_flag(CONS_INTERACTIVE, new_value);
+}
+
+bool
+cl_console_base::get_flag(int flag)
+{
+  return flags & flag;
+}
+
+bool
+cl_console_base::set_cooked(bool new_val)
+{
+  return false;
 }
 
 
@@ -369,12 +446,13 @@ cl_commander_base::cl_commander_base(class cl_app *the_app, class cl_cmdset *acm
 {
   app= the_app;
   cons= new cl_list(1, 1, "consoles");
-  actual_console= frozen_console= 0;
+  actual_console= frozen_console= config_console= 0;
   cmdset= acmdset;
 }
 
 cl_commander_base::~cl_commander_base(void)
 {
+  cons->free_all();
   delete cons;
   delete cmdset;
 }
@@ -387,30 +465,46 @@ cl_commander_base::add_console(class cl_console_base *console)
   int i=cons->add(console);
   console->set_id(i);
   console->init();
-  set_fd_set();
+  update_active();
 }
 
 void
 cl_commander_base::del_console(class cl_console_base *console)
 {
   cons->disconn(console);
-  set_fd_set();
+  update_active();
+  delete console;
 }
 
 void
 cl_commander_base::activate_console(class cl_console_base *console)
 {
-  console->flags&= ~CONS_INACTIVE;
-  //console->print_prompt();
-  set_fd_set();
+  console->set_flag(CONS_INACTIVE, false);
+  console->print_prompt();
+  update_active();
 }
 
 void
 cl_commander_base::deactivate_console(class cl_console_base *console)
 {
-  console->flags|= CONS_INACTIVE;
-  set_fd_set();
+  console->set_flag(CONS_INACTIVE, true);
+  update_active();
 }
+
+int
+cl_commander_base::consoles_prevent_quit(void)
+{
+  int i, r= 0;
+
+  for (i= 0; i < cons->count; i++)
+    {
+      class cl_console_base *c= (class cl_console_base*)(cons->at(i));
+      if (c->prevent_quit())
+	r++;
+    }
+  return r;
+}
+
 
 /*
  * Printing to all consoles
@@ -433,17 +527,6 @@ cl_commander_base::all_printf(const char *format, ...)
   return(ret);
 }
 
-void
-cl_commander_base::prompt(void)
-{
-  int i;
-
-  for (i= 0; i < cons->count; i++)
-    {
-      class cl_console_base *c= (class cl_console_base*)(cons->at(i));
-      c->print_prompt();
-    }
-}
 
 /*
  * Printing to actual_console
@@ -500,7 +583,7 @@ cl_commander_base::debug(const char *format, ...)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console_base *c= (class cl_console_base*)(cons->at(i));
-      if (c->flags & CONS_DEBUG)
+      if (c->get_flag(CONS_DEBUG))
         {
           va_start(ap, format);
           ret= c->cmd_do_print(format, ap);
@@ -518,7 +601,7 @@ cl_commander_base::debug(const char *format, va_list ap)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console_base *c= (class cl_console_base*)(cons->at(i));
-      if (c->flags & CONS_DEBUG)
+      if (c->get_flag(CONS_DEBUG))
         {
           ret= c->cmd_do_print(format, ap);
         }
@@ -535,7 +618,7 @@ cl_commander_base::flag_printf(int iflags, const char *format, ...)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console_base *c= (class cl_console_base*)(cons->at(i));
-      if ((c->flags & iflags) == iflags)
+      if ((c->get_flag(iflags)) == iflags)
         {
           va_start(ap, format);
           ret= c->cmd_do_print(format, ap);
@@ -553,15 +636,17 @@ cl_commander_base::input_avail_on_frozen(void)
   return(frozen_console->input_avail());
 }
 
-void
+class cl_console_base *
 cl_commander_base::exec_on(class cl_console_base *cons, char *file_name)
 {
   if (!cons || !file_name || !fopen(file_name, "r"))
-    return;
+    return 0;
 
   class cl_console_base *subcon = cons->clone_for_exec(file_name);
-  subcon->flags |= CONS_NOWELCOME;
+  subcon->set_flag(CONS_NOWELCOME, true);
+  subcon->set_flag(CONS_INTERACTIVE, false);
   add_console(subcon);
+  return subcon;
 }
 
 

@@ -1,8 +1,8 @@
 /*
  * Simulator of microcontrollers (utils.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
- *
+ * Copyright (C) 1997,16 Drotos Daniel, Talker Bt.
+ * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
@@ -38,16 +38,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TRACE   1 ? (void)0 : (*(void (*)(const char *, ...))0)
 
 
-extern int get_sub_opt(char **option, const char * const *tokens, char **valuep);
-extern const char *get_id_string(struct id_element *ids, int id);
-extern const char *get_id_string(struct id_element *ids, int id, const char *def);
-extern int get_string_id(struct id_element *ids, const char *str);
-extern int get_string_id(struct id_element *ids, const char *str, int def);
+extern int get_sub_opt(char **option,
+		       const char * const *tokens,
+		       char **valuep);
+extern char *get_id_string(struct id_element *ids, int id);
+extern char *get_id_string(struct id_element *ids, int id, char *def);
+extern int get_string_id(struct id_element *ids, char *str);
+extern int get_string_id(struct id_element *ids, char *str, int def);
+extern char *vformat_string(const char *format, va_list ap);
 extern char *format_string(const char *format, ...);
+extern void print_char_octal(char c, FILE *f);
 extern const char *object_name(class cl_base *o);
-extern char *case_string(enum letter_case lcase, const char *str);
+extern char *case_string(enum letter_case lcase, char *str);
 
+extern double dnow(void);
 
+extern int strispn(char *s, char c);
+extern bool valid_sym_name(char *s);
+
+  
 #endif
 
 /* End of utils.h */

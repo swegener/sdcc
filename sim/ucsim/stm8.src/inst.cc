@@ -9,7 +9,6 @@
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
-
 /* This file is part of microcontroller simulator: ucsim.
 
 UCSIM is free software; you can redistribute it and/or modify
@@ -27,6 +26,8 @@ along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
+
+/* $Id: inst.cc 345 2016-07-10 14:51:45Z  $ */
 
 #include "ddconfig.h"
 #include "stdio.h"
@@ -46,6 +47,7 @@ cl_stm8::fetchea(t_mem code, unsigned char prefix)
    case 0x1: return (unsigned char)fetch()+regs.SP;  // SP indexed
 
    case 0xb: return fetch();           // direct short
+
 
    case 0xc:
       if ( 0 == prefix) {              // direct long
@@ -78,6 +80,7 @@ cl_stm8::fetchea(t_mem code, unsigned char prefix)
       } else {
          return( resHALT);
       }
+
 
    case 0xe:
       if ( 0 == prefix) {               // short offset with X reg
@@ -269,13 +272,13 @@ cl_stm8::inst_add(t_mem code, unsigned char prefix)
 int
 cl_stm8::get2(unsigned int addr)
 {
-    return((ram->get((t_addr) (addr)) << 8) | ram->get((t_addr) (addr+1)));
+    return((ram->read((t_addr) (addr)) << 8) | ram->read((t_addr) (addr+1)));
 }
 
 int
 cl_stm8::get3(unsigned int addr)
 {
-    return((ram->get((t_addr) (addr)) << 16) | (ram->get((t_addr) (addr+1)) << 8) |ram->get((t_addr) (addr+2)));
+    return((ram->read((t_addr) (addr)) << 16) | (ram->read((t_addr) (addr+1)) << 8) |ram->read((t_addr) (addr+2)));
 }
 
 int
@@ -360,7 +363,6 @@ cl_stm8::inst_bccmbcpl(t_mem code, unsigned char prefix)
    store1(ea, dbyte);
    return(resGO);
 }
-
 int
 cl_stm8::inst_bcp(t_mem code, unsigned char prefix)
 {
@@ -391,7 +393,6 @@ cl_stm8::inst_bresbset(t_mem code, unsigned char prefix)
   store1(ea, dbyte);
   return(resGO);
 }
-
 int
 cl_stm8::inst_btjfbtjt(t_mem code, unsigned char prefix)
 {
@@ -431,6 +432,7 @@ int
 cl_stm8::inst_clr(t_mem code, unsigned char prefix)
 {
   unsigned int opaddr = 0;
+
 
   FLAG_SET (BIT_Z);
   FLAG_CLEAR (BIT_N);
@@ -782,7 +784,6 @@ cl_stm8::inst_jr(t_mem code, unsigned char prefix)
   ofs = fetch();
   if (taken)
     PC += ofs;
-
   return(resGO);
 }
 
@@ -1362,7 +1363,7 @@ cl_stm8::inst_tnz(t_mem code, unsigned char prefix)
       FLAG_ASSIGN (BIT_Z, (resval & 0xff) == 0);
       FLAG_ASSIGN (BIT_N, 0x80 & resval);
    }
-
+ 
    return(resGO);
 }
 

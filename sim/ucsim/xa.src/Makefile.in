@@ -109,7 +109,7 @@ include $(srcdir)/clean.mk
 xa.src: sxa$(EXEEXT)
 
 sxa$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -Wl,--start-group $(LIBS) -Wl,--end-group -o $@
 
 otherlibs:
 	$(MAKE) -C $(top_builddir)/cmd.src all

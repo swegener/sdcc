@@ -46,7 +46,7 @@ public:
 public:
   cl_avr(class cl_sim *asim);
   virtual int init(void);
-  virtual const char *id_string(void);
+  virtual char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
   //virtual int get_mem_width(enum mem_class type);
@@ -56,7 +56,7 @@ public:
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
   virtual struct name_entry *bit_tbl(void);
-  virtual const char *disass(t_addr addr, const char *sep);
+  virtual char *disass(t_addr addr, const char *sep);
   virtual void print_regs(class cl_console_base *con);
 
   virtual int exec_inst(void);

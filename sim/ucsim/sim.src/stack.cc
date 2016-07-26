@@ -31,14 +31,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 // sim.src
+#include "uccl.h"
+
 #include "stackcl.h"
 
 
 static class cl_stack_error_registry stack_error_registry;
 
 cl_stack_op::cl_stack_op(enum stack_op op,
-                         t_addr iPC,
-                         t_addr iSP_before, t_addr iSP_after):
+			 t_addr iPC,
+			 t_addr iSP_before, t_addr iSP_after):
   cl_base()
 {
   operation= op;
@@ -70,8 +72,9 @@ cl_stack_op::info_head(class cl_console_base *con)
 void
 cl_stack_op::info(class cl_console_base *con, class cl_uc *uc)
 {
-  con->dd_printf("%-4s 0x%06" _A_ "x-0x%06" _A_ "x %d ",
-                get_op_name(), SP_before, SP_after, abs(SP_before-SP_after));
+  con->dd_printf("%-4s 0x%06x-0x%06x %d ",
+		 get_op_name(),
+		 (int)SP_before, (int)SP_after, abs(SP_before-SP_after));
   print_info(con);
   con->dd_printf(" ");
   uc->print_disass(PC, con);
@@ -107,10 +110,10 @@ cl_stack_op::data_size(void)
   return(r<0?-r:r);
 }
 
-int
+bool
 cl_stack_op::match(class cl_stack_op *op)
 {
-  return(DD_FALSE);
+  return(false);
 }
 
 bool
@@ -123,7 +126,7 @@ cl_stack_op::can_removed(class cl_stack_op *op)
       (!incr && op_incr))
     {
       printf("BIGBIG ERROR!\n");
-      return(DD_FALSE);
+      return(false);
     }
   if (incr)
     {
@@ -166,7 +169,7 @@ cl_stack_call::get_op_name(void)
 void
 cl_stack_call::print_info(class cl_console_base *con)
 {
-  con->dd_printf("0x%06" _A_ "x", called_addr);
+  con->dd_printf("0x%06x", (int)called_addr);
 }
 
 const char *
@@ -217,7 +220,7 @@ cl_stack_intr::get_op_name(void)
 void
 cl_stack_intr::print_info(class cl_console_base *con)
 {
-  con->dd_printf("0x%06" _A_ "x", called_addr);
+  con->dd_printf("0x%06x", (int)called_addr);
 }
 
 const char *
@@ -232,7 +235,7 @@ cl_stack_intr::get_matching_op(void)
   return(stack_iret);
 }
 
-int
+bool
 cl_stack_intr::match(class cl_stack_op *op)
 {
   return(op->get_op() == stack_iret);
@@ -279,10 +282,10 @@ void
 cl_stack_push::print_info(class cl_console_base *con)
 {
   t_addr d= data;
-  con->dd_printf("0x%06" _A_ "x", d);
+  con->dd_printf("0x%06x", (int)d);
 }
 
-int
+bool
 cl_stack_push::match(class cl_stack_op *op)
 {
   return(op->get_op() == stack_pop);
@@ -325,7 +328,7 @@ cl_stack_ret::get_matching_op(void)
   return(stack_call);
 }
 
-int
+bool
 cl_stack_ret::match(class cl_stack_op *op)
 {
   return(op->get_op() == stack_call);
@@ -368,7 +371,7 @@ cl_stack_iret::get_matching_op(void)
   return(stack_intr);
 }
 
-int
+bool
 cl_stack_iret::match(class cl_stack_op *op)
 {
   return(op->get_op() == stack_intr);
@@ -411,7 +414,7 @@ cl_stack_pop::get_matching_op(void)
   return(stack_push);
 }
 
-int
+bool
 cl_stack_pop::match(class cl_stack_op *op)
 {
   return(op->get_op() == stack_push);
@@ -424,14 +427,14 @@ cl_stack_pop::match(class cl_stack_op *op)
 
 cl_error_stack::cl_error_stack(void)
 {
-  classification = stack_error_registry.find("stack");
+classification = stack_error_registry.find("stack");
 }
 
 /* Stack Tracker Errors */
 
 cl_error_stack_tracker::cl_error_stack_tracker(void)
 {
-  classification = stack_error_registry.find("stack_tracker");
+classification = stack_error_registry.find("stack_tracker");
 }
 
 /* Stack Tracker: wrong handle */
@@ -440,14 +443,14 @@ cl_error_stack_tracker_wrong_handle::cl_error_stack_tracker_wrong_handle(bool wr
   cl_error_stack_tracker()
 {
   write_operation= write_op;
-  classification = stack_error_registry.find("stack_tracker_wrong_handle");
+  classification= stack_error_registry.find("stack_tracker_wrong_handle");
 }
 
 void
 cl_error_stack_tracker_wrong_handle::print(class cl_commander_base *c)
 {
   c->dd_printf("%s: wrong stack tracker handle called for %s operation\n",
-               get_type_name(), write_operation?"write":"read");
+	       get_type_name(), write_operation?"write":"read");
 }
 
 /* Stack Tracker: operation on empty stack */
@@ -457,7 +460,7 @@ cl_error_stack_tracker_empty(class cl_stack_op *op):
   cl_error_stack_tracker()
 {
   operation= op->mk_copy();
-  classification = stack_error_registry.find("operation_on_empty_stack");
+  classification= stack_error_registry.find("operation_on_empty_stack");
 }
 
 cl_error_stack_tracker_empty::~cl_error_stack_tracker_empty(void)
@@ -468,10 +471,13 @@ cl_error_stack_tracker_empty::~cl_error_stack_tracker_empty(void)
 void
 cl_error_stack_tracker_empty::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06" _A_ "x: %s on empty stack, PC="
-               "0x06" _A_ "x, SP=0x%06" _A_ "x->0x%06" _A_ "x\n",
-               get_type_name(), operation->get_pc(), operation->get_op_name(),
-               operation->get_before(), operation->get_after());
+  c->dd_printf("%s(0x%06x): %s on empty stack, PC="
+	       "0x06x, SP=0x%06x->0x%06x\n",
+	       get_type_name(), (int)operation->get_pc(),
+	       operation->get_op_name(),
+	       (int)operation->get_pc(),
+	       (int)operation->get_before(),
+	       (int)operation->get_after());
 }
 
 /* Stack Tracker: operation on empty stack */
@@ -482,7 +488,8 @@ cl_error_stack_tracker_unmatch(class cl_stack_op *Top, class cl_stack_op *op):
 {
   top= Top->mk_copy();
   operation= op->mk_copy();
-  classification = stack_error_registry.find("stack_operation_unmatched_to_top_of_stack");
+  classification=
+    stack_error_registry.find("stack_operation_unmatched_to_top_of_stack");
 }
 
 cl_error_stack_tracker_unmatch::~cl_error_stack_tracker_unmatch(void)
@@ -494,11 +501,12 @@ cl_error_stack_tracker_unmatch::~cl_error_stack_tracker_unmatch(void)
 void
 cl_error_stack_tracker_unmatch::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06" _A_ "x): %s when %s expected, "
-               "SP=0x%06" _A_ "x->0x%06" _A_ "x\n",
-               get_type_name(), operation->get_pc(),
-               operation->get_op_name(), top->get_matching_name(),
-               operation->get_before(), operation->get_after());
+  c->dd_printf("%s(0x%06x): %s when %s expected, "
+	       "SP=0x%06x->0x%06x\n",
+	       get_type_name(), (int)operation->get_pc(),
+	       operation->get_op_name(), top->get_matching_name(),
+	       (int)operation->get_before(),
+	       (int)operation->get_after());
 }
 
 /* Stack Tracker: stack is inconsistent */
@@ -509,7 +517,7 @@ cl_error_stack_tracker_inconsistent(class cl_stack_op *op,
 {
   operation= op->mk_copy();
   unread_data_size= the_unread_data_size;
-  classification = stack_error_registry.find("stack_looks_corrupted");
+  classification= stack_error_registry.find("stack_looks_corrupted");
 }
 
 cl_error_stack_tracker_inconsistent::~cl_error_stack_tracker_inconsistent(void)
@@ -520,9 +528,9 @@ cl_error_stack_tracker_inconsistent::~cl_error_stack_tracker_inconsistent(void)
 void
 cl_error_stack_tracker_inconsistent::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06" _A_ "x): %d byte(s) unread from the stack\n",
-               get_type_name(), operation->get_pc(),
-               unread_data_size);
+  c->dd_printf("%s(0x%06x): %d byte(s) unread from the stack\n",
+	       get_type_name(), (int)operation->get_pc(),
+	       unread_data_size);
 }
 
 cl_stack_error_registry::cl_stack_error_registry(void)

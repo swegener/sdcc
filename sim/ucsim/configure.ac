@@ -97,6 +97,12 @@ if test $enable_r3ka_port != "no"; then
     enable_r3ka_port="yes"
 fi,
 enable_r3ka_port="yes")
+AC_ARG_ENABLE(tlcs-port,
+[  --disable-tlcs-port    do not compile simulator for TLCS],
+if test $enable_tlcs_port != "no"; then
+    enable_tlcs_port="yes"
+fi,
+enable_tlcs_port="yes")
 AC_ARG_ENABLE(hc08-port,
 [  --disable-hc08-port     do not compile simulator for hc08],
 if test $enable_hc08_port != "no"; then
@@ -143,6 +149,7 @@ AC_SUBST(enable_z180_port)
 AC_SUBST(enable_gbz80_port)
 AC_SUBST(enable_r2k_port)
 AC_SUBST(enable_r3ka_port)
+AC_SUBST(enable_tlcs_port)
 AC_SUBST(enable_hc08_port)
 AC_SUBST(enable_s08_port)
 AC_SUBST(enable_xa_port)
@@ -192,7 +199,9 @@ fi
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h)
-AC_CHECK_HEADERS(getopt.h unistd.h termios.h)
+AC_CHECK_HEADERS(getopt.h)
+AC_CHECK_HEADERS(unistd.h)
+AC_CHECK_HEADERS(termios.h)
 
 AC_CHECK_HEADER(curses.h,
   AC_DEFINE(HAVE_CURSES_H, 1, [XXX])
@@ -316,14 +325,14 @@ AC_SUBST(DL)
 #curses_ok="no")
 #,
 #-lcurses)
-
+CURSES_LIBS=""
 if test $curses_h_ok != yes; then
   panel_ok="no"
   curses_ok="no"
 else
   AC_CHECK_LIB(panel,panel_above,
     panel_ok="yes"
-    curses_ok="yes"
+    curses_ok="no"
     CURSES_LIBS="-lpanel",
     panel_ok="no"
     curses_ok="no"
@@ -332,14 +341,14 @@ else
   if test $curses_ok != yes; then
     AC_CHECK_LIB(curses,nl,
       curses_ok="yes"
-      CURSES_LIBS="-lcurses",
+      CURSES_LIBS="${CURSES_LIBS} -lcurses",
       curses_ok="no")
   fi
 
   if test $curses_ok != yes; then
     AC_CHECK_LIB(ncurses,nl,
       curses_ok="yes"
-      CURSES_LIBS="-lncurses",
+      CURSES_LIBS="${CURSES_LIBS} -lncurses",
       curses_ok="no")
   fi
 fi
@@ -645,6 +654,7 @@ cmd.src/Makefile
 s51.src/Makefile
 avr.src/Makefile
 z80.src/Makefile
+tlcs.src/Makefile
 hc08.src/Makefile
 xa.src/Makefile
 stm8.src/Makefile
@@ -657,4 +667,4 @@ doc/Makefile
 #gui.src/portmon.src/Makefile
 
 
-# End of configure/configure.in
+# End of configure.ac

@@ -1,4 +1,9 @@
-2016-07-26  Daniel Drotos <drdani AT mazsola.iit.uni-miskolc.hu>
+2016-07-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2385.c:
+	  Disable a test for tlcs90, so all tests compile for tlcs90.
+
+2016-07-26 Daniel Drotos <drdani AT mazsola.iit.uni-miskolc.hu>
 
 	* sim/ucsim/.version, sim/ucsim/Makefile.in, sim/ucsim/NEWS,
 	  sim/ucsim/README, sim/ucsim/TODO, sim/ucsim/app.cc,

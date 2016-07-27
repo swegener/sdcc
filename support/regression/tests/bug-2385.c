@@ -11,12 +11,13 @@ struct fileblk {
   int a;
 };
 
-
+#ifndef __SDCC_tlcs90
 int silly(void)
 {
   FILE f;
   return (f = standin)->a;
 }
+#endif
 
 void testBug(void)
 {

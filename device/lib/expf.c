@@ -221,6 +221,7 @@ exp_cordic_skip:
 	mov	r3, (_expf_y + 2)
 	mov	r2, (_expf_y + 1)
 	mov	r1, (_expf_y + 0)
+	mov	exp_a, #121
 	lcall	fs_normalize_a		// end of cordic
 
 	mov	a, #127

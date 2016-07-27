@@ -1,3 +1,7 @@
+2016-07-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/expf.c: ensure exponent not random before normalization
+
 2016-07-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2385.c:

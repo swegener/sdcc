@@ -1,3 +1,7 @@
+2016-07-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (decorateType): fixed bug #2529
+
 2016-07-27 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/lib/expf.c: ensure exponent not random before normalization

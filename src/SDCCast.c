@@ -4050,7 +4050,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       /* if the left & right are equal then zero */
-      if (isAstEqual (tree->left, tree->right))
+      if (!hasSEFcalls(tree->left) && !hasSEFcalls(tree->right) && isAstEqual (tree->left, tree->right))
         {
           tree->type = EX_VALUE;
           tree->left = tree->right = NULL;

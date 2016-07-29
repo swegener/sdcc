@@ -73,6 +73,7 @@ void testmemory(void)
   ASSERT(destination == memchr(destination, 0, 4));
   ASSERT(destination + 3 == memchr(destination, 3, 4));
 
+  /* Test strlen() */
   ASSERT(strlen("test") == 4);
   ASSERT(strlen("t") == 1);
   ASSERT(strlen("") == 0);

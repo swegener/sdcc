@@ -52,8 +52,8 @@ int main(int argc, char **argv)
 	extern char *optarg;
 	int errflg=0;
 	int c;
-	char *infile = DEF_INFILE;
-	char *outfile = DEF_OUTFILE;
+	const char *infile = DEF_INFILE;
+	const char *outfile = DEF_OUTFILE;
 
 	// sort out any command line params
 	while ((c = getopt(argc, argv, "i:o:h")) != EOF)

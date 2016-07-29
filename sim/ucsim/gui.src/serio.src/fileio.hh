@@ -8,7 +8,7 @@ class FileIO
 {
 	public:
 		FileIO();
-		FileIO(char *infile, char *outfile);
+		FileIO(const char *infile, const char *outfile);
 		~FileIO();
 
 		int SendByte(char b);

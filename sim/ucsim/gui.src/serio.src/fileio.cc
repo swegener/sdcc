@@ -44,7 +44,7 @@ FileIO::FileIO()
 	}
 }
 
-FileIO::FileIO(char *infile, char *outfile)
+FileIO::FileIO(const char *infile, const char *outfile)
 {
 	// make the input fifo
 	if(mkfifo(infile, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH) == -1) {

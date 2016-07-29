@@ -5,6 +5,8 @@
 	* src/SDCCtree_dec.hpp,
 	  src/SDCCralloc.hpp:
 	  Fix bug #2467 (fix previously was blocked on bug #2450).
+	* src/z80/peeph-tlcs90.def:
+	  Remove leftover z80 peepholes that break on tlcs90.
 
 2016-07-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

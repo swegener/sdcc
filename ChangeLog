@@ -1,3 +1,9 @@
+2016-07-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sim/ucsim/fwio.cc: added _WIN32_WINNT def for GetConsoleWindow()
+	* sim/ucsim/fio.cc: handle case S_IRGRP and S_IROTH not defined
+	* sim/ucsim/doc/Makefile.in: copy *.svg files instead of *.gif
+
 2016-07-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (decorateType): fixed bug #2529

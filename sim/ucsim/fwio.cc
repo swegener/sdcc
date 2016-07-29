@@ -5,6 +5,8 @@
 # include HEADER_SOCKET
 #endif
 
+// Need to define _WIN32_WINNT as 0x500 or higher for GetConsoleWindow()
+#define _WIN32_WINNT 0x500
 #include <windows.h>
 #include <io.h>
 #include <fcntl.h>

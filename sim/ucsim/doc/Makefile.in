@@ -39,7 +39,7 @@ doc: checkconf
 # ---------------------------------------------------
 install: all installdirs
 	cp $(srcdir)/*.html $(DESTDIR)$(docdir)
-	cp $(srcdir)/*.gif $(DESTDIR)$(docdir)
+	cp $(srcdir)/*.svg $(DESTDIR)$(docdir)
 	cp $(srcdir)/*.jpg $(DESTDIR)$(docdir)
 	cp $(srcdir)/*.fig $(DESTDIR)$(docdir)
 

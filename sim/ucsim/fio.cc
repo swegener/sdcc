@@ -45,6 +45,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <fcntl.h>
 #include <sys/stat.h>
 
+// These two flags aren't defined on some platforms
+#ifndef S_IRGRP
+#define S_IRGRP 0
+#endif
+#ifndef S_IROTH
+#define S_IROTH 0
+#endif
+
 #include "fiocl.h"
 
 // prj

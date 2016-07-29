@@ -274,9 +274,9 @@ z80MightRead(const lineNode *pl, const char *what)
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
     return(!strcmp(what, "h") || !strcmp(what, "l"));
   if(!strcmp(pl->line, "ex\t(sp), ix") || !strcmp(pl->line, "ex\t(sp),ix"))
-    return(strstr(what, "ix"));
+    return(!!strstr(what, "ix"));
   if(!strcmp(pl->line, "ex\t(sp), iy") || !strcmp(pl->line, "ex\t(sp),iy"))
-    return(strstr(what, "iy"));
+    return(!!strstr(what, "iy"));
   if(!strcmp(pl->line, "ex\tde, hl") || !strcmp(pl->line, "ex\tde,hl"))
     return(!strcmp(what, "h") || !strcmp(what, "l") || !strcmp(what, "d") || !strcmp(what, "e"));
   if(ISINST(pl->line, "ld\t"))
@@ -354,7 +354,7 @@ z80MightRead(const lineNode *pl, const char *what)
   if(!IS_GB && !IS_RAB &&
     (ISINST(pl->line, "rld") ||
      ISINST(pl->line, "rrd")))
-    return(strstr("ahl", what));
+    return(!!strstr("ahl", what));
 
   // Bit set, reset and test group
   if(ISINST(pl->line, "bit\t") ||

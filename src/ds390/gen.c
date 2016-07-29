@@ -6578,7 +6578,7 @@ genIfxJump (iCode * ic, const char *jval, iCode * popIc)
 static int isHexChar (const char c)
 {
   const char hc[] = "0123456789ABCDEFabcdef";
-  int i;
+  size_t i;
   for (i = 0; i < strlen (hc); i++)
     if (c == hc[i])
       return 1;

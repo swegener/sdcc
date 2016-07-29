@@ -2054,9 +2054,9 @@ int csdOfVal (int *topbit, int *nonzero, unsigned long long *csd_add, unsigned l
        gamma = !gamma && theta;
        next = (1 - 2 * (bool)(binary & 2)) * gamma;
        if (next > 0)
-         *csd_add |= (1 << bit);
+         *csd_add |= (1ull << bit);
        else if (next < 0)
-         *csd_sub |= (1 << bit);
+         *csd_sub |= (1ull << bit);
        if (next)
          {
            (*nonzero)++;

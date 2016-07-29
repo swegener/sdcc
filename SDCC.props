@@ -3,7 +3,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\Local\boost_1_59_0;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+    <IncludePath>C:\Local\boost_1_59_0;$(IncludePath)</IncludePath>
+    <ExecutablePath>C:\Programs\GnuWin32\bin;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup />

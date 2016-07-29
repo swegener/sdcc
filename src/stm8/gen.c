@@ -3629,7 +3629,7 @@ genMultLit (const iCode *ic)
     wassert(!csdOfVal (&topbit, &nonzero, &add, &sub, right->aop->aopu.aop_lit));
 
     // If the leading digits of the cse are 1 0 -1 we can use 0 1 1 instead to reduce the number of shifts.
-    if (topbit >= 2 && (add & (1 << topbit)) && (sub & (1 << (topbit - 2))))
+    if (topbit >= 2 && (add & (1ull << topbit)) && (sub & (1ull << (topbit - 2))))
       {
         add = (add & ~(1u << topbit)) | (3u << (topbit - 2));
         sub &= ~(1u << (topbit - 1));
@@ -3639,9 +3639,9 @@ genMultLit (const iCode *ic)
     for (int bit = topbit - 1; bit >= 0; bit--)
       {
         emit3w (A_SLLW, ASMOP_X, 0);
-        if ((add | sub) & (1u << bit))
+        if ((add | sub) & (1ull << bit))
           {
-            emit2 (add & (1u << bit) ? "addw" : "subw" , "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
+            emit2 (add & (1ull << bit) ? "addw" : "subw" , "x, %s", add_aop ? aopGet (add_aop, 1) : "(1, sp)");
             cost (3, 2);
           }
       }

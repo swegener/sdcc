@@ -302,7 +302,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
         int shifts = topbit;
 
         // If the leading digits of the cse are 1 0 -1 we can use 0 1 1 instead to reduce the number of shifts.
-        if (topbit >= 2 && (add & (1 << topbit)) && (sub & (1 << (topbit - 2))))
+        if (topbit >= 2 && (add & (1ull << topbit)) && (sub & (1ull << (topbit - 2))))
           shifts--;
 
         wassert (nonzero);

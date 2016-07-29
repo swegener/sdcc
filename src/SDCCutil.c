@@ -1040,7 +1040,7 @@ copyStr (const char *src, size_t *size)
             {
               char s[5] = "\0\0\0\0";
               if (c < 0x80)
-                s[0] = c;
+                s[0] = (char)c;
               else if (c < 0x800)
                 {
                   s[0] = (c >> 6) & 0x1f | 0xc0;
@@ -1064,7 +1064,7 @@ copyStr (const char *src, size_t *size)
               dbuf_append_str (&dbuf, s);
             }
           else
-            dbuf_append_char (&dbuf, c);
+            dbuf_append_char (&dbuf, (char)c);
 
           ++src;
         }

@@ -1,3 +1,13 @@
+2016-07-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* SDCC.props: added ExecutablePath
+	* src/ds390/gen.c,
+	* src/SDCCutil.c,
+	* src/SDCCval.c,
+	* src/stm8/gen.c,
+	* src/stm8/main.c,
+	* src/z80/peep.c: fixed warnings
+
 2016-07-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c:
@@ -231,21 +241,21 @@
 
 2016-07-25 Daniel Drotos <drdani AT mazsola.iit.uni-miskolc.hu>
 
-        * device/lib/tlcs90/crt0.s,
+	* device/lib/tlcs90/crt0.s,
 	  device/lib/tlcs90/crt0_org.s: dirty
-          hacked crt0 so compiled simple programs will run at least
+	  hacked crt0 so compiled simple programs will run at least
 
 2016-07-25 Daniel Drotos <drdani AT mazsola.iit.uni-miskolc.hu>
 
-        * support/regression/Makefile.in,
-          support/regression/fwk/include/testfwk.h,
-          support/regression/ports/tlcs90,
-          support/regression/ports/tlcs90/spec.mk,
-          support/regression/ports/tlcs90/support.c,
-          support/regression/ports/tlcs90/uCsim.cmd,
-          support/regression/tests/bug-2305.c,
-          support/regression/tests/bug3379723.c: regression test prepared
-          for tlcs90
+	* support/regression/Makefile.in,
+	  support/regression/fwk/include/testfwk.h,
+	  support/regression/ports/tlcs90,
+	  support/regression/ports/tlcs90/spec.mk,
+	  support/regression/ports/tlcs90/support.c,
+	  support/regression/ports/tlcs90/uCsim.cmd,
+	  support/regression/tests/bug-2305.c,
+	  support/regression/tests/bug3379723.c: regression test prepared
+	  for tlcs90
 
 2016-07-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

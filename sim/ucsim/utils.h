@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define UTILS_HEADER
 
 #include <stdio.h>
-
+#include <stdarg.h>
 // prj
 #include "stypes.h"
 

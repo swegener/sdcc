@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 #include <stdlib.h>
+#include <stdarg.h>
 #include "i_string.h"
 
 // prj

@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /* $Id: itc.cc 347 2016-07-10 15:29:43Z  $ */
 
 // prj
+
+#include <stdarg.h>
 #include "utils.h"
 
 // sim

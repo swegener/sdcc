@@ -4,6 +4,7 @@
 #include <stdio.h>
 #if defined HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
+# include <sys/select.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
 #endif

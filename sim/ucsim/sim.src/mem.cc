@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <stdarg.h>
 #include "i_string.h"
 
 // prj

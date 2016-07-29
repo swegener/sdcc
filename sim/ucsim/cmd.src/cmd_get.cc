@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 #include "i_string.h"
 
+#include <stdarg.h>
 // prj
 #include "utils.h"
 #include "appcl.h"

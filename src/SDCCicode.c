@@ -1587,6 +1587,7 @@ operandFromOperand (operand * op)
   nop->isLiteral = op->isLiteral;
   nop->usesDefs = op->usesDefs;
   nop->isParm = op->isParm;
+  nop->isConstElimnated = op->isConstElimnated;
 
   switch (nop->type)
     {
@@ -1987,9 +1988,9 @@ geniCodeRValue (operand * op, bool force)
 /* checkPtrQualifiers - check for lost pointer qualifers           */
 /*-----------------------------------------------------------------*/
 static void
-checkPtrQualifiers (sym_link * ltype, sym_link * rtype)
+checkPtrQualifiers (sym_link * ltype, sym_link * rtype, int warn_const)
 {
-  if (IS_PTR (ltype) && IS_PTR (rtype) && !IS_FUNCPTR (ltype))
+  if (IS_PTR (ltype) && IS_PTR (rtype) && !IS_FUNCPTR (ltype) && warn_const)
     {
       if (!IS_CONSTANT (ltype->next) && IS_CONSTANT (rtype->next))
         werror (W_TARGET_LOST_QUALIFIER, "const");
@@ -2029,7 +2030,11 @@ geniCodeCast (sym_link *type, operand *op, bool implicit)
 
   /* if the operand is already the desired type then do nothing */
   if (compareType (type, optype) == 1)
+  {
+    if (IS_PTR (type) && IS_CONSTANT (opetype) && !IS_CONSTANT (getSpec(type)))
+	op->isConstElimnated = 1;
     return op;
+  }
 
   /* if this is a literal then just change the type & return */
   if (IS_LITERAL (opetype) && op->type == VALUE && !IS_PTR (type) && !IS_PTR (optype))
@@ -3211,7 +3216,7 @@ checkTypes (operand * left, operand * right)
 
   if (always_cast || compareType (ltype, rtype) == -1)
     right = geniCodeCast (ltype, right, TRUE);
-  checkPtrQualifiers (ltype, rtype);
+  checkPtrQualifiers (ltype, rtype, !right->isConstElimnated);
   return right;
 }
 
@@ -3636,8 +3641,8 @@ geniCodeReturn (operand * op)
 
   /* check if a cast is needed */
   if (op && currFunc && currFunc->type && currFunc->type->next)
-    checkPtrQualifiers (currFunc->type->next, operandType (op));
- 
+    checkPtrQualifiers (currFunc->type->next, operandType (op), !op->isConstElimnated);
+
   /* if the operand is present force an rvalue */
   if (op)
     op = geniCodeRValue (op, FALSE);
@@ -4403,7 +4408,6 @@ ast2iCode (ast * tree, int lvl)
           right = geniCodeRValue (right, TRUE);
         else
           right = geniCodeRValue (right, FALSE);
-
         return geniCodeAssign (left, right, 0, 1);
       }
     case MUL_ASSIGN:

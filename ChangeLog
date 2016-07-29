@@ -1,3 +1,19 @@
+2016-07-29 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sim/ucsim/cmd.src/cmd_exec.cc
+	* sim/ucsim/cmd.src/cmd_get.cc
+	* sim/ucsim/cmd.src/command.cc
+	* sim/ucsim/fuio.cc
+	* sim/ucsim/s51.src/interrupt.cc
+	* sim/ucsim/s51.src/uc51.cc
+	* sim/ucsim/sim.src/mem.cc
+	* sim/ucsim/stm8.src/itc.cc
+	* sim/ucsim/utils.h
+	  Fix build failures on cygwin.
+	* src/SDCCicode.c
+	* src/SDCCicode.h
+	  Fix bug #2517.
+
 2016-07-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sim/ucsim/fwio.cc: added _WIN32_WINNT def for GetConsoleWindow()

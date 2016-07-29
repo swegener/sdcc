@@ -83,6 +83,7 @@ typedef struct operand
   unsigned int isGptr:1;            /* is a generic pointer  */
   unsigned int isParm:1;            /* is a parameter        */
   unsigned int isLiteral:1;         /* operand is literal    */
+  unsigned int isConstElimnated:1;  /* if original const casted to non-const */
 
   int key;
   union

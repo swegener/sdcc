@@ -1,3 +1,9 @@
+2016-07-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (processBlockVars): fix bug #2450
+	* support/regression/tests/inline.c: add test for bug #2450
+	* src/hc08/gen.c (aopForSym): remove work-around
+
 2016-07-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2529.c

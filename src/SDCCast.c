@@ -1732,6 +1732,12 @@ processBlockVars (ast * tree, int *stack, int action)
         }
     }
 
+  if (IS_FOR_STMT (tree))
+    {
+      processBlockVars (AST_FOR (tree, initExpr), stack, action);
+      processBlockVars (AST_FOR (tree, condExpr), stack, action);
+      processBlockVars (AST_FOR (tree, loopExpr), stack, action);
+    }
   processBlockVars (tree->left, stack, action);
   processBlockVars (tree->right, stack, action);
 

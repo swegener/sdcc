@@ -2180,7 +2180,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
     }
 
   /* if it is on the stack */
-  if (sym->onStack || (!IN_DIRSPACE (space) && !IN_FARSPACE (space))) /* The !IN_DIRSPACE (space) && !IN_FARSPACE (space) is just a workaround for bugs #2506, #2450. */
+  if (sym->onStack)
     {
       sym->aop = aop = newAsmop (AOP_SOF);
       aop->aopu.aop_dir = sym->rname;

@@ -8,6 +8,26 @@
 #endif
 
 /*--------------
+    bug 2450
+*/
+
+static inline int bug2450isdigit (int c)
+{
+  return ((unsigned char)c >= (char)'0' && (unsigned char)c <= (char)'9');
+}
+
+/* Extracted from atof(). Using an inlined function in an expression */
+/* in a for-statment would leave some of the intermediate variables  */
+/* created for the inlining unallocated and thus missing an output   */
+/* storage class, which would then cause a fatal error for the code  */
+/* generator. */
+void bug2450(const char *s)
+{
+    for (; bug2450isdigit(*s););
+}
+
+
+/*--------------
     bug 1717305
 */
 

@@ -1,7 +1,10 @@
 2016-07-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c:
-	  Enable an optimization that was blocked on bug #22450.
+	  Enable an optimization that was blocked on bug #2450.
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp:
+	  Fix bug #2467 (fix previously was blocked on bug #2450).
 
 2016-07-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

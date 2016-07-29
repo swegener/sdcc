@@ -844,6 +844,7 @@ static void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::ve
 
   std::set<unsigned short int> old_inst;
   std::set_difference(T[*c].bag.begin(), T[*c].bag.end(), T[t].bag.begin(), T[t].bag.end(), std::inserter(old_inst, old_inst.end()));
+  wassert(old_inst.size() == 1);
   unsigned short int i = *(old_inst.begin());
 
   std::set<var_t> old_vars;

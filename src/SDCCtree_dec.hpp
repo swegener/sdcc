@@ -373,6 +373,16 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
   c0 = *c;
   nicify_diffs(T, c0);
 
+  // Redunant bags are isolated, and thus marked for later removal.
+  if (T[t].bag == T[c0].bag)
+    {
+      T[c0].bag.clear();
+      boost::remove_edge(t, c0, T);
+      adjacency_iter_t c, c_end;
+      for(boost::tie(c, c_end) = adjacent_vertices(t, T); c != c_end; ++c)
+        boost::add_edge(t, *c, T);
+    }
+
   if (std::includes(T[t].bag.begin(), T[t].bag.end(), T[c0].bag.begin(), T[c0].bag.end()) || std::includes(T[c0].bag.begin(), T[c0].bag.end(), T[t].bag.begin(), T[t].bag.end()))
     return;
 
@@ -384,7 +394,7 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
   boost::add_edge(t, d, T);
 }
 
-// // Ensure that all nodes' bags' sizes differ by at most one to their successors'.
+// Ensure that all nodes' bags' sizes differ by at most one to their successors'.
 template <class T_t>
 void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t)
 {
@@ -469,6 +479,27 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T)
   return(t);
 }
 
+// Remove isolated vertices possibly introduced by nicify_diffs(). Complicated, since boost does not support removing more than one vertex at a time.
+template <class T_t>
+void remove_isolated_vertices(T_t &T)
+{
+  bool change = true;
+  while(change)
+    {
+      change = false;
+      if(boost::num_vertices(T) <= 1)
+        return;
+
+      for (unsigned int i = 0; i < boost::num_vertices(T); i++)
+        if(!boost::out_degree(i, T) && !boost::in_degree(i, T))
+          {
+            remove_vertex(i, T);
+            change = true;
+            break;
+          }
+    }
+}
+
 // Transform a tree decomposition into a nice tree decomposition.
 template <class T_t>
 void nicify(T_t &T)
@@ -488,5 +519,6 @@ void nicify(T_t &T)
   nicify_joins(T, t);
   nicify_diffs(T, t);
   nicify_diffs_more(T, t);
+  remove_isolated_vertices(T);
 }
 

@@ -167,7 +167,7 @@ cl_tlcs::cpir()
 int
 cl_tlcs::cpd()
 {
-  reg.f&= ~(FLAG_S|FLAG_N|FLAG_H|FLAG_X|FLAG_V);
+  reg.f&= ~(FLAG_Z|FLAG_S|FLAG_N|FLAG_H|FLAG_X|FLAG_V);
   reg.f|= FLAG_N;
   int a= reg.a;
   int d= nas->read(reg.hl);

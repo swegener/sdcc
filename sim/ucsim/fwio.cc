@@ -1,3 +1,9 @@
+// Need to define _WIN32_WINNT as 0x500 or higher for GetConsoleWindow()
+// _WIN32_WINNT will be indirectly defined from WINVER
+#ifdef WINVER
+#undef WINVER
+#endif
+#define WINVER 0x500
 
 #include "ddconfig.h"
 
@@ -5,8 +11,6 @@
 # include HEADER_SOCKET
 #endif
 
-// Need to define _WIN32_WINNT as 0x500 or higher for GetConsoleWindow()
-#define _WIN32_WINNT 0x500
 #include <windows.h>
 #include <io.h>
 #include <fcntl.h>

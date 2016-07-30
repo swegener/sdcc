@@ -117,7 +117,7 @@ include $(srcdir)/clean.mk
 stm8.src: sstm8$(EXEEXT)  shared_lib
 
 sstm8$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -Wl,--start-group $(LIBS) -Wl,--end-group -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/sstm8.so

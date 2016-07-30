@@ -114,7 +114,7 @@ include $(srcdir)/clean.mk
 tlcs.src: stlcs$(EXEEXT) shared_lib
 
 stlcs$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -Wl,--start-group $(LIBS) -Wl,--end-group -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/stlcs.so

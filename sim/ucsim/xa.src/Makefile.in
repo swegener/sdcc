@@ -31,7 +31,7 @@ CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
 LDFLAGS         = @LDFLAGS@
 PICOPT		= @PICOPT@
 
-LIBS		= @LIBS@ -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim
+LIBS		= -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim @LIBS@
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@
@@ -109,7 +109,7 @@ include $(srcdir)/clean.mk
 xa.src: sxa$(EXEEXT)
 
 sxa$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -Wl,--start-group $(LIBS) -Wl,--end-group -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 otherlibs:
 	$(MAKE) -C $(top_builddir)/cmd.src all

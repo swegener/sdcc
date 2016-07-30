@@ -126,7 +126,7 @@ include $(srcdir)/clean.mk
 s51.src: s51$(EXEEXT) shared_lib
 
 s51$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) -Wl,--start-group $(LIBS) -Wl,--end-group -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/s51.so

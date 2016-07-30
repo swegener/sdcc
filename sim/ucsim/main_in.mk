@@ -32,8 +32,8 @@ LDFLAGS		= @LDFLAGS@
 
 EXEEXT		= @EXEEXT@
 
-LIB_LIST	= ucsimutil cmd sim
-UCSIM_LIBS	= -Wl,--start-group $(patsubst %,-l%,$(LIB_LIST)) @LIBS@ -Wl,--end-group
+LIB_LIST	= sim ucsimutil guiucsim cmd ucsimutil sim
+UCSIM_LIBS	= $(patsubst %,-l%,$(LIB_LIST)) @LIBS@
 UCSIM_LIB_FILES	= $(patsubst %,lib%.a,$(LIB_LIST))
 
 prefix          = @prefix@
@@ -135,7 +135,7 @@ ftest_app: libs ftest$(EXEEXT)
 
 ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
 	echo $(UCSIM_LIB_FILES)
-	$(CXX) $(CXXFLAGS) -o $@ $< -L$(top_builddir) $(UCSIM_LIBS)
+	$(CXX) $(CXXFLAGS) $< -L$(top_builddir) $(UCSIM_LIBS) -o $@ 
 
 ftest$(EXEEXT): ftest.o libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -L$(top_builddir) -lucsimutil @LIBS@

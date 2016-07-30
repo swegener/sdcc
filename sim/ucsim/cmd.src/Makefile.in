@@ -110,7 +110,7 @@ cmdlex.cc: cmdlex.l cmdpars.hh
 cmdlib: $(top_builddir)/libcmd.a
 
 $(top_builddir)/libcmd.a: $(OBJECTS) $(LOCAL_OBJECTS)
-	ar -rcD $@ $(OBJECTS) $(LOCAL_OBJECTS)
+	ar -rc $@ $(OBJECTS) $(LOCAL_OBJECTS)
 	$(RANLIB) $@
 
 .cc.o:

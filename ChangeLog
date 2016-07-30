@@ -1,6 +1,9 @@
 2016-07-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sim/ucsim/fwio.cc: try defining WINVER instead of _WIN32_WINNT
+	* sim/ucsim/cmd.src/Makefile.in,
+	* sim/ucsim/gui.src/Makefile.in,
+	* sim/ucsim/sim.src/Makefile.in,
 	* sim/ucsim/main_in.mk: omit -D option to ar, not supported by all ar
 
 2016-07-29 Maarten Brock <sourceforge.brock AT dse.nl>

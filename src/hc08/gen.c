@@ -4688,6 +4688,7 @@ genMinus (iCode * ic)
           pushReg (hc08_reg_a, TRUE);
           loadRegFromAop (hc08_reg_a, leftOp, offset);
           emitcode (sub, "1, s");
+          hc08_dirtyReg (hc08_reg_a, FALSE);
           regalloc_dry_run_cost += 3;
           pullNull (1);
         }

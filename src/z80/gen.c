@@ -9076,7 +9076,7 @@ unpackMaskA(sym_link *type, int len)
 /* genUnpackBits - generates code for unpacking bits               */
 /*-----------------------------------------------------------------*/
 static void
-genUnpackBits (operand * result, int pair)
+genUnpackBits (operand * result, int pair, const iCode *ic)
 {
   int offset = 0;               /* result byte offset */
   int rsize;                    /* result size */
@@ -9084,6 +9084,7 @@ genUnpackBits (operand * result, int pair)
   sym_link *etype;              /* bit-field type information */
   unsigned blen;                /* bit-field length */
   unsigned bstr;                /* bit-field starting bit within byte */
+  unsigned int pairincrement = 0;
 
   emitDebug ("; genUnpackBits");
 
@@ -9143,6 +9144,7 @@ genUnpackBits (operand * result, int pair)
           emit2 ("inc %s", _pairs[pair].name);
           regalloc_dry_run_cost += 1;
           _G.pairs[pair].offset++;
+          pairincrement++;
         }
     }
 
@@ -9156,6 +9158,15 @@ genUnpackBits (operand * result, int pair)
     }
 
 finish:
+  if (!isPairDead(pair, ic))
+    while (pairincrement)
+      {
+        emit2 ("dec %s", _pairs[pair].name);
+        regalloc_dry_run_cost += 1;
+        pairincrement--;
+        _G.pairs[pair].offset--;
+      }
+
   if (offset < rsize)
     {
       asmop *source;
@@ -9402,7 +9413,7 @@ genPointerGet (const iCode *ic)
   if (IS_BITVAR (retype))
     {
       offsetPair (pair, extrapair, !isPairDead (extrapair, ic), rightval);
-      genUnpackBits (result, pair);
+      genUnpackBits (result, pair, ic);
       if (rightval)
         spillPair (pair);
 

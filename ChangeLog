@@ -1,6 +1,8 @@
 2016-07-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genMinus): mark A as modified for reverse subtraction
+	* src/z80/gen.c (genPointerGet,genUnpackBits): preserve pointer
+	  register pair if not dead
 
 2016-07-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

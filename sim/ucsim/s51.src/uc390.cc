@@ -561,8 +561,8 @@ cl_uc390::push_byte (t_mem uc)
   if (sfr->get (ACON) & 0x04) /* SA: 10 bit stack */
     {
       if (sp == 0) /* overflow SP */
-        sfr->wadd (ESP, 1);
-      sp += (sfr->read (ESP) & 0x3) * 256;
+        sfr->wadd (R51_ESP, 1);
+      sp += (sfr->read (R51_ESP) & 0x3) * 256;
       write_mem (MEM_IXRAM_ID, sp, uc); // fixme
     }
   else
@@ -583,11 +583,11 @@ cl_uc390::pop_byte (void)
   if (sfr->get (ACON) & 0x04) /* SA: 10 bit stack */
     {
       sp = sfr->read (SP);
-      sp += (sfr->read (ESP) & 0x3) * 256;
+      sp += (sfr->read (R51_ESP) & 0x3) * 256;
       temp = read_mem (MEM_IXRAM_ID, sp); // fixme
       sp = sfr->wadd (SP, -1);
       if (sp == 0xff) /* underflow SP */
-        sfr->wadd (ESP, -1);
+        sfr->wadd (R51_ESP, -1);
       return temp;
     }
   else
@@ -1299,7 +1299,7 @@ cl_uc390::print_regs (class cl_console_base *con)
   if (sfr->get (ACON) & 0x04)
     {
       /* SA: 10 bit stack */
-      start = (sfr->get (ESP) & 3) * 256 + sfr->get (SP);
+      start = (sfr->get (R51_ESP) & 3) * 256 + sfr->get (SP);
       con->dd_printf ("SP10 ", start);
       ixram->dump (start, start - 7, 8, con);
     }

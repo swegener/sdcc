@@ -228,7 +228,7 @@ else
   INC_DIR ?= $(top_srcdir)/device/include
 endif
 # Base flags.
-SDCCFLAGS += --fverbose-asm -DNO_VARARGS --debug
+SDCCFLAGS += --fverbose-asm -DNO_VARARGS
 # Extension of object intermediate files
 OBJEXT = .rel
 # Extension of files that can be run in the emulator

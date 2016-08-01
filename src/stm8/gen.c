@@ -783,6 +783,10 @@ regFree (int idx, const iCode *ic)
     return (regFree (XL_IDX, ic) && regFree (XH_IDX, ic));
   if (idx == Y_IDX)
     return (regFree (YL_IDX, ic) && regFree (YH_IDX, ic));
+
+  if ((idx == YL_IDX || idx == YH_IDX) && stm8_extend_stack)
+    return FALSE;
+
   return (!bitVectBitValue (ic->rMask, idx));
 }
 

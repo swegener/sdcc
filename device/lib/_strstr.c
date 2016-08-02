@@ -28,25 +28,25 @@
 
 #include <string.h>
 
-char * strstr ( const char * str1, const char * str2 )
+char *strstr ( const char *str1, const char *str2 )
 {
-	const char * cp = str1;
-	const char * s1;
-	const char * s2;
+	const char *cp = str1;
+	const char *s1;
+	const char *s2;
 
-	if ( !*str2 )
-	    return str1;
+	if (!*str2)
+	    return ((char*)str1);
 
 	while (*cp)
 	{
 		s1 = cp;
 		s2 = str2;
 
-		while ( *s1 && *s2 && !(*s1-*s2) )
+		while (*s1 && *s2 && !(*s1-*s2))
 			s1++, s2++;
 
 		if (!*s2)
-			return( (char*)cp );
+			return ((char*)cp);
 
 		cp++;
 	}

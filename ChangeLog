@@ -1,5 +1,10 @@
 2016-08-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
+	* src/SDCCcse.c (cseBBlock): Recompute data flow if any outgoing
+	  expressions have been changed (fixed bug #2495)
+
+2016-08-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
 	* src/stm8/gen.c (regFree): Y is not free when using extended stack
 
 2016-07-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

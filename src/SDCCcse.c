@@ -2069,6 +2069,8 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
   int i;
   set *ptrSetSet = NULL;
   cseDef *expr;
+  int replaced;
+  int recomputeDataFlow = 0;
 
   /* if this block is not reachable */
   if (ebb->noPath)
@@ -2275,6 +2277,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
         }
 
       checkSign = isSignedOp(ic);
+      replaced = 0;
 
       /* do the operand lookup i.e. for both the */
       /* right & left operand : check the cseSet */
@@ -2300,7 +2303,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
                       if (bitVectBitValue (ebb->ndompset, IC_LEFT (ic)->key))
                           ebb->ptrsSet = bitVectSetBit (ebb->ptrsSet, pdop->key);
                       ReplaceOpWithCheaperOp (&IC_LEFT (ic), pdop);
-                      change = 1;
+                      change = replaced = 1;
                     }
                   /* check if there is a pointer set
                      for the same pointer visible if yes
@@ -2313,12 +2316,13 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
                       IC_LEFT (ic) = NULL;
                       ReplaceOpWithCheaperOp (&IC_RIGHT (ic), pdop);
                       SET_ISADDR (IC_RESULT (ic), 0);
+                      replaced = 1;
                     }
                 }
               else
                 {
                   ReplaceOpWithCheaperOp (&IC_LEFT (ic), pdop);
-                  change = 1;
+                  change = replaced = 1;
                 }
             }
         }
@@ -2331,7 +2335,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
           if (pdop)
             {
               ReplaceOpWithCheaperOp (&IC_RIGHT (ic), pdop);
-              change = 1;
+              change = replaced = 1;
             }
         }
 
@@ -2548,6 +2552,13 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
           addSetHead (&ebb->addrOf, IC_LEFT (ic));
           deleteItemIf (&cseSet, ifDefSymIsX, IC_LEFT (ic));
         }
+
+      /* If this was previously in the out expressions in the  */
+      /* original form, it might need to be killed by another block */
+      /* in the new form if we have replaced operands, so recompute */
+      /* the data flow after we finish this block */
+      if (replaced && ifDiCodeIs (ebb->outExprs, ic))
+        recomputeDataFlow = 1;
     }
 
   for (expr=setFirstItem (ebb->inExprs); expr; expr=setNextItem (ebb->inExprs))
@@ -2560,6 +2571,10 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
   ebb->outExprs = cseSet;
   ebb->outDefs = bitVectUnion (ebb->outDefs, ebb->defSet);
   ebb->ptrsSet = bitVectUnion (ebb->ptrsSet, ebb->inPtrsSet);
+
+  if (recomputeDataFlow)
+    computeDataFlow (ebbi);
+
   return change;
 }
 

@@ -55,6 +55,7 @@ AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_CHECK_PROG(AS, as, as, :)
 AC_CHECK_PROG(CP, cp, cp, :)
 AC_CHECK_PROG(AR, ar, ar, :)
+AC_CHECK_PROG(M4, gm4, gm4, m4)
 
 dnl Don't use AC_PROG_LEX
 dnl LEXLIB is not useful in gcc.

@@ -373,14 +373,17 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
   c0 = *c;
   nicify_diffs(T, c0);
 
-  // Redunant bags are isolated, and thus marked for later removal.
+  // Redundant bags are isolated, and thus marked for later removal.
   if (T[t].bag == T[c0].bag)
     {
       T[c0].bag.clear();
       boost::remove_edge(t, c0, T);
       adjacency_iter_t c, c_end;
-      for(boost::tie(c, c_end) = adjacent_vertices(t, T); c != c_end; ++c)
-        boost::add_edge(t, *c, T);
+      for(boost::tie(c, c_end) = adjacent_vertices(c0, T); c != c_end; ++c)
+        {
+          boost::add_edge(t, *c, T);
+          boost::remove_edge(c0, *c, T);
+        }
     }
 
   if (std::includes(T[t].bag.begin(), T[t].bag.end(), T[c0].bag.begin(), T[c0].bag.end()) || std::includes(T[c0].bag.begin(), T[c0].bag.end(), T[t].bag.begin(), T[t].bag.end()))

@@ -4,6 +4,8 @@
 	  Fix a warning.
 	* src/SDCCmain.c:
 	  Fix usage info, patch #274.
+	* src/SDCCtree_dec.hpp:
+	  Fix isolation of redundant nodes in the tree-decomposition.
 
 2016-08-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

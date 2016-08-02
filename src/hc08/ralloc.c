@@ -1918,21 +1918,12 @@ packPointerOp (iCode * ic, eBBlock ** ebpp)
     }
 
   /* Put the remaining operand on the right and convert to assignment     */
-  /* or cast (Sometimes the operands to the addition are different sizes, */
-  /* so there is an implicit cast. If so, need to make it explicit so     */
-  /* that all the bytes of the pointer are defined. */
   if (IS_SYMOP (offsetOp))
     bitVectUnSetBit (OP_USES (offsetOp), dic->key);
   IC_RIGHT (dic) = nonOffsetOp;
   IC_LEFT (dic) = NULL;
   SET_ISADDR (IC_RESULT (dic), 0);
-  if (getSize (operandType (pointer)) == getSize (operandType (nonOffsetOp)))
-    dic->op = '=';
-  else
-    {
-      dic->op = CAST;
-      IC_LEFT (dic) = operandFromLink (operandType (pointer));
-    }
+  dic->op = '=';
 }
 
 /*-----------------------------------------------------------------*/

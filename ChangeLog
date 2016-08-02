@@ -1,7 +1,9 @@
-2016-08-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+2016-08-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (cseBBlock): Recompute data flow if any outgoing
 	  expressions have been changed (fixed bug #2495)
+	* src/hc08/gen.c (genCopy),
+	* src/hc08/ralloc.c (packPointerOp): fixed bug #2357
 
 2016-08-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

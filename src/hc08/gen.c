@@ -3150,6 +3150,7 @@ static void
 genCopy (operand * result, operand * source)
 {
   int size = AOP_SIZE (result);
+  int srcsize = AOP_SIZE (source);
   int offset = 0;
 
   /* if they are the same and not volatile */
@@ -3157,16 +3158,39 @@ genCopy (operand * result, operand * source)
       !isOperandVolatile (source, FALSE))
     return;
 
+  /* The source and destinations may be different size due to optimizations. */
+  /* This is not a cast, so there is no need to worry about sign extension. */
+  /* When this happens, it is usually just 1 byte source to 2 byte dest, so */
+  /* nothing significant to optimize. */
+  if (srcsize < size)
+    {
+      size -= srcsize;
+      while (srcsize)
+        {
+          transferAopAop (AOP (source), offset, AOP (result), offset);
+          offset++;
+          srcsize--;
+        }
+      while (size)
+        {
+          storeConstToAop (0, AOP (result), offset);
+          offset++;
+          size--;
+        }
+
+      return;
+    }
+
   /* if they are the same registers */
   if (sameRegs (AOP (source), AOP (result)))
     return;
 
-  if (IS_AOP_HX (AOP (result)))
+  if (IS_AOP_HX (AOP (result)) && srcsize == 2)
     {
       loadRegFromAop (hc08_reg_hx, AOP (source), 0);
       return;
     }
-  if (IS_AOP_HX (AOP (source)))
+  if (IS_AOP_HX (AOP (source)) && size == 2)
     {
       storeRegToAop (hc08_reg_hx, AOP (result), 0);
       return;

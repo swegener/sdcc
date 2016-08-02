@@ -4,6 +4,7 @@
 	  expressions have been changed (fixed bug #2495)
 	* src/hc08/gen.c (genCopy),
 	* src/hc08/ralloc.c (packPointerOp): fixed bug #2357
+	* support/regression/tests/bug-2357.c: re-enabled test for hc08/s08
 
 2016-08-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -56,10 +56,8 @@ testBug (void)
   ASSERT (foo2() == 0x5555);
   ASSERT (foo3() == 0x55555555L);
 
-#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   ASSERT (foo4() == 0x5555);
   ASSERT (foo5() == 0x55555555L);
-#endif
 
 #endif
 }

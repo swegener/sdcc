@@ -62,7 +62,7 @@ ___setjmp:
 .globl _longjmp
 
 _longjmp:
-	pop	af
+	pop	de
 	pop	iy
 	pop	de
 
@@ -93,3 +93,4 @@ jump:
 	ld	b, 1(iy)
 	push	bc
 	ret
+

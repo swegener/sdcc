@@ -905,6 +905,12 @@ addPostLoopBlock (region * loopReg, ebbIndex * ebbi, iCode * ic)
                   /* insert goto to old predecessor of eblock */
                   newic = newiCodeLabelGoto (GOTO, eblock->entryLabel);
                   addiCodeToeBBlock (ebpi, newic, NULL);
+                  /* Make sure the GOTO has a target */
+                  if (eblock->sch->op != LABEL)
+                    {
+                      newic = newiCodeLabelGoto (LABEL, eblock->entryLabel);
+                      addiCodeToeBBlock (eblock, newic, eblock->sch);
+                    }
                   break;        /* got it, only one is possible */
                 }
             }

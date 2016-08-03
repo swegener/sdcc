@@ -183,7 +183,18 @@ eBBSuccessors (ebbIndex * ebbi)
 		{
 		case GOTO:	/* goto has edge to label */
 		  succ = eBBWithEntryLabel (ebbi, ic->label);
-		  break;
+
+                  /* Sometimes a block has a GOTO added after the original */
+                  /* final IFX (due to loop optimizations). If IFX found,  */
+                  /* fall through to handle the IFX too. */
+                  if (ic->prev && ic->prev->op == IFX)
+                    {
+                      if (succ)
+                        addSuccessor (ebbs[i], succ); /* add the GOTO target */
+                      ic = ic->prev;       /* get ready to handle IFX too. */
+                    }
+                  else
+                    break;
 
 		case IFX:	/* conditional jump */
 		  /* if true label is present */

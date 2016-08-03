@@ -33,7 +33,7 @@
 ; The Z80 has the ldir and lddr instructions, which are perfect for implementing memmove().
 
 _memmove:
-	pop	af
+	pop	hl
 	pop	hl
 	pop	de
 	pop	bc

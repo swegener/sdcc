@@ -1,6 +1,7 @@
 2016-08-03 Philipp Klaus Krause <pkk AT spth.de>
 
-	* device/lib/tlcs90/setjmp.s:
+	* device/lib/tlcs90/setjmp.s,
+	  device/lib/tlcs90/memmove.s:
 	  Avoid messing up interrupt flags via pop af.
 
 2016-08-02 Philipp Klaus Krause <pkk AT spth.de>

@@ -1,3 +1,9 @@
+2016-08-04 Erik Petrich <epetrich
+
+	* src/SDCCast.c (decorateTree, optimizeCompare): fixed bug #2503
+	  and an unreported bug similar to bug #2529
+	* support/regression/tests/bug-2503: added test
+
 2016-08-03 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcflow.c (eBBSuccessors),

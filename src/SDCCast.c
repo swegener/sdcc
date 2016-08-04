@@ -4665,6 +4665,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
 
       {
         CCR_RESULT ccr_result = CCR_OK;
+        ast * newResult;
 
         /* if left is integral and right is literal
            then check constant range */
@@ -4677,7 +4678,17 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           case CCR_ALWAYS_TRUE:
           case CCR_ALWAYS_FALSE:
             werrorfl (tree->filename, tree->lineno, W_COMP_RANGE, ccr_result == CCR_ALWAYS_TRUE ? "true" : "false");
-            return decorateType (newAst_VALUE (constBoolVal ((unsigned char) (ccr_result == CCR_ALWAYS_TRUE))), resultType);
+            newResult = newAst_VALUE (constBoolVal ((unsigned char) (ccr_result == CCR_ALWAYS_TRUE)));
+            /* If there are side effects, join the non-literal side */
+            /* to the boolean result with a comma operator */
+            if (hasSEFcalls (tree))
+              {
+                if (!IS_LITERAL (LTYPE (tree)))
+                  newResult = newNode (',', tree->left, newResult);
+                else
+                  newResult = newNode (',', tree->right, newResult);
+              }
+            return decorateType (newResult, resultType);
           case CCR_OK:
           default:
             break;
@@ -6412,7 +6423,7 @@ optimizeCompare (ast * root)
 
   /* if left & right are the same then depending
      of the operation do */
-  if (isAstEqual (root->left, root->right))
+  if (isAstEqual (root->left, root->right) && !hasSEFcalls (root))
     {
       switch (root->opval.op)
         {

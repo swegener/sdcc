@@ -1666,8 +1666,30 @@ ifxOptimize (iCode * ic, set * cseSet,
           sym_link *type = operandType (IC_RESULT (ic->prev));
           if (ic->prev->op != CAST || IS_BOOL (type) || bitsForType (operandType (IC_RIGHT (ic->prev))) < bitsForType (type))
           {
-            ReplaceOpWithCheaperOp(&IC_COND (ic), IC_RIGHT (ic->prev));
-            (*change)++;
+            if (!isOperandVolatile (IC_RIGHT (ic->prev), FALSE))
+              {
+                bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
+                ReplaceOpWithCheaperOp(&IC_COND (ic), IC_RIGHT (ic->prev));
+                (*change)++;
+              }
+/* There's an optimization opportunity here, but OP_USES doesn't seem to be */
+/* initialized properly at this point. - EEP 2016-08-04 */
+#if 0
+            else if (bitVectnBitsOn (OP_USES(IC_COND (ic))) == 1)
+              {
+                /* We can replace the iTemp with the original volatile symbol */
+                /* but we must make sure the volatile symbol is still accessed */
+                /* only once. */
+                bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
+                ReplaceOpWithCheaperOp(&IC_COND (ic), IC_RIGHT (ic->prev));
+                (*change)++;
+                /* Make previous assignment an assignment to self. */
+                /* killDeadCode() will eliminiate it. */
+                IC_RIGHT (ic->prev) = IC_RESULT (ic->prev);
+                IC_LEFT (ic->prev) = NULL;
+                ic->prev->op = '=';
+              }
+#endif
           }
         }
     }

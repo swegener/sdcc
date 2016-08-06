@@ -1,3 +1,8 @@
+2016-08-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/get_ticks.py: parse the byte count more robustly
+	  (buffering on stderr vs stdout sometimes jumbling text)
+
 2016-08-05 Erik Petrich <epetrich AT ivorytower.normna.ok.us>
 
 	* src/SDCCcse.c (ifxOptimize): fixed bug #2484

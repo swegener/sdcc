@@ -14,8 +14,12 @@ ticks = 0
 for line in lines:
     # 'n words read from ...', where = # bytes in hex file
     if (re.search(r'words read from', line)):
-        (data, post) = re.split(r'w', line, 1)
-        bytes = string.atoi(data)
+        (data, post) = re.split(r'words', line, 1)
+        data = re.sub(r'[^0-9]',' ',data).strip().split();
+        if len(data)>0:
+          bytes = string.atoi(data[-1])
+        else:
+          bytes = 0 # wrong size, but better than blowing up
 
     # 'Total time since last reset= 0.102021 sec (i clks)',
     # where i = # system clock ticks.

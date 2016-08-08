@@ -37,8 +37,29 @@ void deb(chars format, ...)
 }
 
 
+static void
+init_winsock(void)
+{
+  static bool is_initialized = false;
+
+  if (!is_initialized)
+    {
+      WSADATA wsaData;
+
+      // Initialize Winsock
+      int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+      if (iResult != 0)
+        {
+          //printf("WSAStartup failed: %d\n", iResult);
+          exit(1);
+        }
+      is_initialized = true;
+    }
+}
+
 cl_io::cl_io(): cl_f()
 {
+  init_winsock();
 }
 
 cl_io::cl_io(chars fn, chars mode): cl_f(fn, mode)
@@ -377,31 +398,10 @@ cl_io::set_terminal()
     }
 }
  
-static void
-init_winsock(void)
-{
-  static bool is_initialized = false;
-
-  if (!is_initialized)
-    {
-      WSADATA wsaData;
-
-      // Initialize Winsock
-      int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-      if (iResult != 0)
-        {
-          //printf("WSAStartup failed: %d\n", iResult);
-          exit(1);
-        }
-    }
-}
-
 
 int
 mk_srv_socket(int port)
 {
-  init_winsock();
-
   struct sockaddr_in name;
 
   //printf("make_server_socket(%d)\n", port);

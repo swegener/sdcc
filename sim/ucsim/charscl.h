@@ -55,8 +55,8 @@ public:
   // Operators
 
   // Cast
-  *operator char(void) { return(chars_string); };
-  *operator char(void) const { return(chars_string); };
+  operator char*(void) { return(chars_string); };
+  operator char*(void) const { return(chars_string); };
   // Assignment
   chars &operator=(char *s);
   chars &operator=(const chars &cs);

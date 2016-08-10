@@ -152,6 +152,8 @@ do_teststrtok (void)
 #endif
 }
 
+#if !defined (__APPLE__) // uchar.h/char16_t/char32_t are not supported on MacOS/Clang
+
 // Test C11 UTF-8 behaviour.
 static void
 do_utf_8 (void)
@@ -281,6 +283,8 @@ do_chinese (void)
 #endif
 }
 
+#endif // __APPLE__
+
 static void
 teststr (void)
 {
@@ -292,11 +296,13 @@ teststr (void)
   do_teststrstr ();
   do_teststrspn ();
   do_teststrtok ();
+#if !defined (__APPLE__)
   do_utf_8 ();
   do_utf_8_sdcc ();
   do_utf_16 ();
   do_utf_32_c95 ();
   do_utf_32_c11 ();
   do_chinese ();
+#endif // __APPLE__
 }
 

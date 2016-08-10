@@ -1,3 +1,11 @@
+2016-08-10 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sim/ucsim/charscl.h
+	  Fix the failure of building ucsim on MacOS.
+	* support/regression/tests/gcc-torture-execute-string-opt-18.c
+	* support/regression/tests/string.c
+	  Disable several tests on MacOS.
+
 2016-08-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/string.h,

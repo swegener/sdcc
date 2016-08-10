@@ -73,7 +73,9 @@ testTortureExecute (void)
   test2 (buf);
 #endif
   test3 (buf);
+#if !defined (__APPLE__)
   test4 (buf);
+#endif
   test5 (buf);
   test6 (buf);
   test7 (buf);

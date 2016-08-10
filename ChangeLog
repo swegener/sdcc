@@ -1,3 +1,10 @@
+2016-08-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/string.h,
+	  device/lib/tlcs90/Makefile.in,
+	  device/lib/tlcs90/memmove.s:
+	  pop af correctness for tlcs90.
+
 2016-08-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/get_ticks.py: parse the byte count more robustly
@@ -8,7 +15,7 @@
 	* src/SDCCcse.c (ifxOptimize): fixed bug #2484
 	* src/z80/gen.c (ld_cost): fixed bug #2399
 
-2016-08-04 Erik Petrich <epetrich AT ivorytower.normna.ok.us
+2016-08-04 Erik Petrich <epetrich AT ivorytower.normna.ok.us>
 
 	* src/SDCCast.c (decorateTree, optimizeCompare): fixed bug #2503
 	  and an unreported bug similar to bug #2529

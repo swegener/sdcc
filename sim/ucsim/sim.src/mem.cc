@@ -532,13 +532,13 @@ cl_bit_cell::d(t_mem v)
 t_mem
 cl_cell8::d()
 {
-  return data?(*((uint8_t*)data)):0;
+  return data?((uint8_t)*data):0;
 }
 
 void
 cl_cell8::d(t_mem v)
 {
-  data?(*((uint8_t*)data)=v):0;
+  data?(*data=(uint8_t)v):0;
 }
 
 // 8 bit cell for bit spaces
@@ -548,7 +548,7 @@ cl_bit_cell8::d()
 {
   if (!data)
     return 0;
-  uint8_t x= *((uint8_t *)data);
+  uint8_t x= (uint8_t) *data;
   x&= mask;
   return x?1:0;
 }
@@ -559,9 +559,9 @@ cl_bit_cell8::d(t_mem v)
   if (!data)
     return;
   if (v)
-    (*((uint8_t*)data))|= mask;
+    *data |= (uint8_t)mask;
   else
-    (*((uint8_t*)data))&= ~mask;
+    *data &= ~(uint8_t)mask;
 }
 
 // 16 bit cell;
@@ -569,13 +569,13 @@ cl_bit_cell8::d(t_mem v)
 t_mem
 cl_cell16::d()
 {
-  return data?(*((uint16_t*)data)):0;
+  return data?((uint16_t)*data):0;
 }
 
 void
 cl_cell16::d(t_mem v)
 {
-  data?(*((uint16_t*)data)=v):0;
+  data?(*data=(uint16_t)v):0;
 }
 
 // 16 bit cell for bit spaces
@@ -585,7 +585,7 @@ cl_bit_cell16::d()
 {
   if (!data)
     return 0;
-  return ((*((uint16_t*)data))&((uint16_t)mask))?1:0;
+  return (((uint16_t)*data)&((uint16_t)mask))?1:0;
 }
 
 void
@@ -594,9 +594,9 @@ cl_bit_cell16::d(t_mem v)
   if (!data)
     return;
   if (v)
-    (*((uint16_t*)data))|= mask;
+    *data |= (uint16_t)mask;
   else
-    (*((uint16_t*)data))&= ~mask;
+    *data &= ~(uint16_t)mask;
 }
 
 

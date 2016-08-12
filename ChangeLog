@@ -1,3 +1,8 @@
+2016-08-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sim/ucsim/sim.src/mem.cc: rewrote some of the memory cell classes
+	  to work properly on big endian architectures
+
 2016-08-10 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sim/ucsim/charscl.h

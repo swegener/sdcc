@@ -47,13 +47,13 @@
 #define SKIP_UNIVERSAL
 #define SKIP_FOR_DECLARATION /* declaration in for (C99 feature) not yet supported */
 #define SKIP_MIXED /* mixing of declaration and other statements (C99 feature) not yet supported */
-#define SKIP_RESTRICT_PARAMETER
-#define SKIP_VOLATILE_PARAMETER
-#define SKIP_CONST_PARAMETER
+#define SKIP_RESTRICT_PARAMETER /* bug #2538 */
+#define SKIP_VOLATILE_PARAMETER /* bug #2538 */
+#define SKIP_CONST_PARAMETER /* bug #2538 */
 #define SKIP_STATIC_PARAMETER /* bug #2537 */
 #define SKIP_COMPOUND /* compound literals not yet supported */
 #define SKIP_VLA /* variable-length arrays not supported */
-#define SKIP_INLINE
+#define SKIP_INLINE /* bug #1900 */
 #define SKIP_PRAGMA
 #pragma disable_warning 93 /* Using float for double. */
 #endif

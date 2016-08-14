@@ -8,3 +8,10 @@ extern char inlined_function (void)
 {
 	return 2;
 }
+
+/* needed by tests/test-p99-conformance.c */
+void
+has_undefined_symbol2(void) {
+  /* empty */
+}
+

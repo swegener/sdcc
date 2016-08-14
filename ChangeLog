@@ -1,5 +1,11 @@
 2016-08-14 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/test-p99-conformance.c,
+	  support/regression/fwk/lib/extern1.c:
+	  Enable inlining test for host.
+
+2016-08-14 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/test-p99-conformance.c:
 	  Document SDCC bug correspondance to P99 conformance tests.
 

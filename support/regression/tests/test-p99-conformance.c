@@ -39,7 +39,6 @@
 #ifdef PORT_HOST /* Common GCC issues */
 #define SKIP_EVALUATED_COMMA_ASSIGN
 #define SKIP_UNIVERSAL_UTF8
-#define SKIP_INLINE
 #else /* SDCC issues */
 #define SKIP_HEXDOUBLE /* bug #2536 */
 #define SKIP_NON_EVALUATED_COMMA_ASSIGN /* bug #2525 */

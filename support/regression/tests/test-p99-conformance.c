@@ -59,6 +59,9 @@
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_pic14) || defined(__SDCC_pic16)
 #define SKIP_LONG_LONG
 #endif
+#if defined(__SDCC_mcs51) && __SDCC_MODEL_SMALL
+#define SKIP_FLEXIBLE
+#endif
 #endif
 
 #ifndef SKIP_VA_ARGS_MACRO

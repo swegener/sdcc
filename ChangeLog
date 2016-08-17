@@ -1,3 +1,8 @@
+2016-08-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/test-p99-conformance.c:
+	  Disable a subtest for host, since it fails on older GCC, disable a subtest for backends that don't have long long.
+
 2016-08-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/test-p99-conformance.c,

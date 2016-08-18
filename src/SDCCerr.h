@@ -265,6 +265,7 @@ enum {
   E_HEXFLOAT_C99                = 236, /* hexadecimal floating constant requires ISO C99 or later */
   E_ANONYMOUS_STRUCT_TAG        = 237, /* anonymous struct/union should not have a tag */
   W_INLINE_FUNCATTR             = 238, /* inline functions should not be z88dk_fastcall or z88dk_callee */
+  E_FOR_INITAL_DECLARATION_C99  = 239, /* initial declaration in for loop requires ISO C99 or later */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

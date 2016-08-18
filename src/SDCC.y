@@ -1973,6 +1973,12 @@ do : DO {  /* create and push the continue , break & body Labels */
 for : FOR { /* create & push continue, break & body labels */
             static int Lblnum = 0;
 
+           NestLevel++;
+           STACK_PUSH(blockNum, currBlockno);
+           btree_add_child(currBlockno, ++blockNo);
+           currBlockno = blockNo;
+           ignoreTypedefType = 0;
+
             /* continue */
             SNPRINTF(lbuff, sizeof(lbuff), "_forcontinue_%d",Lblnum);
             STACK_PUSH(continueStack,newSymbol(lbuff,NestLevel));
@@ -2029,6 +2035,43 @@ iteration_statement
                             $$->right = createLabel(AST_FOR($$,continueLabel),NULL);
                           $$ = newNode(NULLOP,$$,createLabel(AST_FOR($$,falseLabel),NULL));
                           noLineno--;
+
+                          NestLevel--;
+                          currBlockno = STACK_POP(blockNum);
+                        }
+	| for '(' declaration expr_opt ';' expr_opt ')'  statement
+                        {
+                          if (!options.std_c99)
+                            werror (E_FOR_INITAL_DECLARATION_C99);
+
+                          noLineno++;
+
+                          if ( $3 && IS_TYPEDEF($3->etype))
+                            allocVariables ($3);
+                          ignoreTypedefType = 0;
+                          addSymChain(&$3);
+
+                          $$ = newNode(FOR,$8,NULL);
+                          AST_FOR($$,trueLabel) = $1;
+                          AST_FOR($$,continueLabel) =  STACK_POP(continueStack);
+                          AST_FOR($$,falseLabel) = STACK_POP(breakStack);
+                          AST_FOR($$,condLabel)  = STACK_POP(forStack);
+                          AST_FOR($$,initExpr)   = 0;
+                          AST_FOR($$,condExpr)   = $4;
+                          AST_FOR($$,loopExpr)   = $6;
+
+                          /* This continue label is not at the correct location, */
+                          /* but we need to create it now for proper binding. The */
+                          /* code that handles the FOR node will move it to the */
+                          /* proper location inside the for loop. */
+                          if (AST_FOR($$,continueLabel)->isref)
+                            $$->right = createLabel(AST_FOR($$,continueLabel),NULL);
+                          $$ = createBlock($3, newNode(NULLOP,$$,createLabel(AST_FOR($$,falseLabel),NULL)));
+                          cleanUpLevel(StructTab, NestLevel + 1);
+                          noLineno--;
+
+                          NestLevel--;
+                          currBlockno = STACK_POP(blockNum);
                         }
 ;
 

@@ -533,6 +533,8 @@ struct
     "tagged anonymous struct/union '%s'", 0},
   { W_INLINE_FUNCATTR, ERROR_LEVEL_WARNING,
     "inline function '%s' might lose function attributes", 0},
+  { E_FOR_INITAL_DECLARATION_C99, ERROR_LEVEL_ERROR,
+    "initial declaration in for loop requires ISO C99 or later", 0},
 };
 
 /* -------------------------------------------------------------------------------

@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass book
 \begin_preamble
 % Added by lyx2lyx
@@ -26,16 +28,16 @@
 \language_package default
 \inputencoding utf8
 \fontencoding global
-\font_roman times
-\font_sans helvet
-\font_typewriter courier
-\font_math auto
+\font_roman "times" "default"
+\font_sans "helvet" "default"
+\font_typewriter "courier" "default"
+\font_math "auto" "auto"
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -114,7 +116,7 @@ status collapsed
 
 \begin_layout Plain Layout
 Please note: double dashed longoptions (e.g.
- --version) are written this way: -
+ –version) are written this way: -
 \begin_inset ERT
 status collapsed
 
@@ -377,7 +379,7 @@ Supported data-types are:
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="5">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -951,6 +953,10 @@ SDCC suite is a collection of several components derived from different
 
 \begin_layout Itemize
 executables:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1151,6 +1157,10 @@ zlib/libpng License
 \end_deeper
 \begin_layout Itemize
 libraries:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -1336,7 +1346,8 @@ Documentation
 
 \begin_layout Standard
 This documentation is maintained using a free open source word processor
- (LyX) 
+ (\SpecialChar LyX
+) 
 \begin_inset Flex URL
 status collapsed
 
@@ -1423,7 +1434,7 @@ Standard-compliance
  (see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Standard-Compliance"
+reference "subsec:Standard-Compliance"
 
 \end_inset
 
@@ -2414,7 +2425,7 @@ libraries, included in sdcc packages, are in ar format in sdcc version 2.9.0
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Using-sdar-to"
+reference "subsec:Using-sdar-to"
 
 \end_inset
 
@@ -2457,7 +2468,7 @@ in sdcc version 3.1.0 pic 14 traget, structured access to SFR via
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Naming-of-special"
+reference "subsec:Naming-of-special"
 
 \end_inset
 
@@ -2483,7 +2494,7 @@ special sdcc keywords which are not preceded by a double underscore are
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Standard-Compliance"
+reference "subsec:Standard-Compliance"
 
 \end_inset
 
@@ -2492,7 +2503,7 @@ reference "sub:Standard-Compliance"
 
 \begin_layout Itemize
 in sdcc version 3.2.0 compiler macro definitions not starting with double
- underscore characters are deprecated if --std-cXX command line option is
+ underscore characters are deprecated if –std-cXX command line option is
  defined.
  They have been oboleted (removed) after the 3.4.0 release (except for the
  macro SDCC, which has been removed after the 3.6.0 release).
@@ -2511,7 +2522,7 @@ pragma config for pic16 target was introduced in version 3.2.0.
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:PIC16_Pragmas"
+reference "subsec:PIC16_Pragmas"
 
 \end_inset
 
@@ -2652,14 +2663,14 @@ Installation
 For most users it is sufficient to skip to either section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Building-SDCC-on-Linux"
+reference "subsec:Building-SDCC-on-Linux"
 
 \end_inset
 
  (Unix) or section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Windows-Install"
+reference "subsec:Windows-Install"
 
 \end_inset
 
@@ -3322,13 +3333,17 @@ These defaults are:
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
@@ -3727,13 +3742,17 @@ non-free/lib
 \end_inset
 
  
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
@@ -4436,7 +4455,7 @@ status collapsed
 Install paths
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Install-paths"
+name "subsec:Install-paths"
 
 \end_inset
 
@@ -4457,7 +4476,7 @@ Install paths
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="4.5cm">
 <column alignment="left" valignment="top" width="4cm">
@@ -4893,7 +4912,7 @@ Please note that DESTDIR must have a trailing slash!
 Search Paths
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Search-Paths"
+name "subsec:Search-Paths"
 
 \end_inset
 
@@ -4937,13 +4956,17 @@ The paths searched when running the compiler are as follows (the first catch
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
 <column alignment="block" valignment="top" width="0in">
@@ -5086,13 +5109,17 @@ $PATH
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0.5cm">
 <column alignment="block" valignment="top" width="4.8cm">
 <column alignment="block" valignment="top" width="4.8cm">
@@ -5692,13 +5719,17 @@ model
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="0.5cm">
 <column alignment="block" valignment="top" width="4.5cm">
 <column alignment="block" valignment="top" width="5cm">
@@ -6427,7 +6458,7 @@ Building SDCC
 Building SDCC on Linux
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Building-SDCC-on-Linux"
+name "subsec:Building-SDCC-on-Linux"
 
 \end_inset
 
@@ -7240,7 +7271,7 @@ Adjust your environment variable PATH to include the location of the bin
 Windows Install Using the Setup Program
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Windows-Install"
+name "subsec:Windows-Install"
 
 \end_inset
 
@@ -7731,8 +7762,11 @@ status collapsed
 
 -enable-doc to the configure arguments to build the documentation together
  with all the other stuff.
- You will need several tools (LyX, LaTeX, LaTeX2HTML, pdflatex, dvipdf,
- dvips and makeindex) to get the job done.
+ You will need several tools (\SpecialChar LyX
+, \SpecialChar LaTeX
+, \SpecialChar LaTeX
+2HTML, pdflatex, dvipdf, dvips and makeindex)
+ to get the job done.
  Another possibility is to change to the doc directory and to type 
 \family sans
 \series bold
@@ -7750,7 +7784,8 @@ make
  there.
  You're invited to make changes and additions to this manual (sdcc/doc/sdccman.ly
 x).
- Using LyX 
+ Using \SpecialChar LyX
+ 
 \begin_inset Flex URL
 status collapsed
 
@@ -8016,7 +8051,7 @@ see
  section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Install-Trouble-shooting"
+reference "subsec:Install-Trouble-shooting"
 
 \end_inset
 
@@ -8171,7 +8206,7 @@ usr/local/share/sdcc/lib directory
  section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Install-Trouble-shooting"
+reference "subsec:Install-Trouble-shooting"
 
 \end_inset
 
@@ -8270,7 +8305,7 @@ cannot find the /usr/local/share/sdcc/include directory
  section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Install-Trouble-shooting"
+reference "subsec:Install-Trouble-shooting"
 
 \end_inset
 
@@ -8330,7 +8365,7 @@ status collapsed
 Install Trouble-shooting
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Install-Trouble-shooting"
+name "subsec:Install-Trouble-shooting"
 
 \end_inset
 
@@ -8465,7 +8500,7 @@ This will install the compiler, other executables libraries and include
  See sections 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Install-paths"
+reference "subsec:Install-paths"
 
 \end_inset
 
@@ -8476,7 +8511,7 @@ reference "sub:Install-paths"
 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Search-Paths"
+reference "subsec:Search-Paths"
 
 \end_inset
 
@@ -8881,7 +8916,7 @@ Standard-compliance
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Standard-Compliance"
+name "subsec:Standard-Compliance"
 
 \end_inset
 
@@ -9002,6 +9037,10 @@ return value
 \end_inset
 
  from a function, e.g.:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -9177,6 +9216,10 @@ return rets; /* is invalid in SDCC although allowed in ANSI */
 \end_deeper
 \begin_layout Itemize
 initialization of structure arrays must be fully braced.
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -9262,6 +9305,10 @@ R style
 \end_inset
 
  function declarations are NOT allowed.
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -9310,7 +9357,7 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-Functions are not reentrant unless explicitly declared as such or --stack-auto
+Functions are not reentrant unless explicitly declared as such or –stack-auto
  is specified in the mcs51, ds390, hc08 and s08 ports.
 \end_layout
 
@@ -9420,24 +9467,9 @@ In addition to what is mentioned in the section above, the following features
 \end_layout
 
 \begin_layout Itemize
-Declarations in places other than those where ISO C90 allows them, e.g.:
+Declarations after axpressions.
 \end_layout
 
-\begin_deeper
-\begin_layout Verse
-
-\family typewriter
-for (
-\series bold
-int
-\family default
-\series default
- 
-\family typewriter
-i=0; i<10; i++) /* is invalid in SDCC although allowed in C99 */
-\end_layout
-
-\end_deeper
 \begin_layout Itemize
 Compound literals.
  
@@ -9818,7 +9850,7 @@ hyperlinks needed
  - see also section 
 \begin_inset CommandInset ref
 LatexCommand vref
-reference "sub:Postprocessing-the-Intel"
+reference "subsec:Postprocessing-the-Intel"
 
 \end_inset
 
@@ -10015,7 +10047,7 @@ status collapsed
 -dumpall) (see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Intermediate-Dump-Options"
+reference "subsec:Intermediate-Dump-Options"
 
 \end_inset
 
@@ -10026,7 +10058,7 @@ reference "sub:Intermediate-Dump-Options"
  and section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:The-anatomy-of"
+reference "subsec:The-anatomy-of"
 
 \end_inset
 
@@ -10059,7 +10091,7 @@ Intel hex format
  file
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Postprocessing-the-Intel"
+name "subsec:Postprocessing-the-Intel"
 
 \end_inset
 
@@ -10601,7 +10633,7 @@ sdar
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Using-sdar-to"
+name "subsec:Using-sdar-to"
 
 \end_inset
 
@@ -12237,7 +12269,7 @@ status collapsed
  section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Loop-Optimizations"
+reference "subsec:Loop-Optimizations"
 
 \end_inset
 
@@ -12403,7 +12435,7 @@ switch statement
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:'switch'-Statements"
+reference "subsec:'switch'-Statements"
 
 \end_inset
 
@@ -12743,7 +12775,7 @@ status collapsed
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Peephole-Optimizer"
+reference "subsec:Peephole-Optimizer"
 
 \end_inset
 
@@ -15578,7 +15610,7 @@ name "lyx:--use-non-free"
  under the non-free directory - see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Search-Paths"
+reference "subsec:Search-Paths"
 
 \end_inset
 
@@ -17066,7 +17098,7 @@ pdata (mcs51, ds390 named address space)
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:External-Stack"
+reference "subsec:External-Stack"
 
 \end_inset
 
@@ -18524,7 +18556,7 @@ GBZ80!Options!-ba <Num>
 Intermediate Dump Options
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Intermediate-Dump-Options"
+name "subsec:Intermediate-Dump-Options"
 
 \end_inset
 
@@ -18569,7 +18601,7 @@ iCode
  More on iCodes see chapter 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:The-anatomy-of"
+reference "subsec:The-anatomy-of"
 
 \end_inset
 
@@ -19085,7 +19117,7 @@ HOME
  Path, see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Install-paths"
+reference "subsec:Install-paths"
 
 \end_inset
 
@@ -19136,7 +19168,7 @@ INCLUDE
  Path, see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Search-Paths"
+reference "subsec:Search-Paths"
 
 \end_inset
 
@@ -19187,7 +19219,7 @@ LIB
  Path, see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Search-Paths"
+reference "subsec:Search-Paths"
 
 \end_inset
 
@@ -19754,7 +19786,7 @@ stack
 
 \end_inset
 
- is located in idata memory (unless --xstack is specified).
+ is located in idata memory (unless –xstack is specified).
 \end_layout
 
 \begin_layout Subsubsection
@@ -19817,7 +19849,7 @@ P2 (mcs51 sfr)
  see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MCS51-variants"
+reference "subsec:MCS51-variants"
 
 \end_inset
 
@@ -21121,7 +21153,7 @@ __xdata
  also section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Startup-Code"
+reference "subsec:Startup-Code"
 
 \end_inset
 
@@ -22642,7 +22674,7 @@ block boundary
  (section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:A-Step-by Assembler Introduction"
+reference "subsec:A-Step-by Assembler Introduction"
 
 \end_inset
 
@@ -23479,7 +23511,7 @@ Binary constants
 
 \begin_layout Standard
 SDCC supports the use of binary constants, such as 0b01100010.
- This feature is only enabled when the compiler is invoked using --std-sdccxx.
+ This feature is only enabled when the compiler is invoked using –std-sdccxx.
 \end_layout
 
 \begin_layout Subsection
@@ -23488,7 +23520,7 @@ Returning void
 
 \begin_layout Standard
 SDCC allows functions to return expressions of type void.
- This feature is only enabled when the compiler is invoked using --std-sdccxx.
+ This feature is only enabled when the compiler is invoked using –std-sdccxx.
 \end_layout
 
 \begin_layout Subsection
@@ -23497,9 +23529,9 @@ Omitting promotion on arguments of vararg function
 
 \begin_layout Standard
 Arguments to vararg functions are not promoted when explicitly cast.
- This feature is only enabled when the compiler is invoked using --std-sdccxx.
+ This feature is only enabled when the compiler is invoked using –std-sdccxx.
  This breaks compability with the C standards, so linking code compiled
- with --std-sdccxx with code compiled using --std-cxx can result in failing
+ with –std-sdccxx with code compiled using –std-cxx can result in failing
  programs when arguments to vararg functions are explicitly cast.
 \end_layout
 
@@ -23963,7 +23995,7 @@ stack
 Overlaying
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Overlaying"
+name "subsec:Overlaying"
 
 \end_inset
 
@@ -24296,7 +24328,7 @@ nooverlay ensures that the parameters and local variables for the function
 Interrupt Service Routines
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Interrupt-Service-Routines"
+name "subsec:Interrupt-Service-Routines"
 
 \end_inset
 
@@ -24477,7 +24509,7 @@ Interrupt service routines open the door for some very interesting bugs:
 \begin_layout Subsubsection
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Common-interrupt-pitfall-volatile"
+name "subsec:Common-interrupt-pitfall-volatile"
 
 \end_inset
 
@@ -24520,7 +24552,7 @@ http://en.wikipedia.org/wiki/Volatile_variable
 \begin_layout Subsubsection
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Common-interrupt-pitfall-non-atomic"
+name "subsec:Common-interrupt-pitfall-non-atomic"
 
 \end_inset
 
@@ -24638,7 +24670,7 @@ Bugs like these are hard to reproduce and can cause a lot of trouble.
 \begin_layout Subsubsection
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Common-interrupt-pitfall-stack-overflow"
+name "subsec:Common-interrupt-pitfall-stack-overflow"
 
 \end_inset
 
@@ -24691,7 +24723,7 @@ deepest
 \begin_layout Subsubsection
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Common-interrupt-pitfall-non-reentrant"
+name "subsec:Common-interrupt-pitfall-non-reentrant"
 
 \end_inset
 
@@ -24839,7 +24871,7 @@ status collapsed
 within the if clause in section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:A-Step-by Assembler Introduction"
+reference "subsec:A-Step-by Assembler Introduction"
 
 \end_inset
 
@@ -24893,7 +24925,7 @@ critical
  Also see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Overlaying"
+reference "subsec:Overlaying"
 
 \end_inset
 
@@ -24904,7 +24936,7 @@ reference "sub:Overlaying"
 about Overlaying and section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Functions-using-private-banks"
+reference "subsec:Functions-using-private-banks"
 
 \end_inset
 
@@ -24947,13 +24979,17 @@ interrupt vector table
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="9" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0in">
 <column alignment="left" valignment="top" width="0in">
 <column alignment="left" valignment="top" width="0in">
@@ -25347,7 +25383,7 @@ HC08!interrupt
  this way; instead see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Startup-Code"
+reference "subsec:Startup-Code"
 
 \end_inset
 
@@ -25433,7 +25469,7 @@ Since interrupts on the Z80 and Z180 are level-triggered (except for the
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="30text%">
@@ -25571,7 +25607,7 @@ SDCC does not attempt to generate an interrupt vector table.
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="30text%">
@@ -25680,7 +25716,7 @@ SDCC does not attempt to generate an interrupt vector table.
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top" width="30text%">
@@ -26891,7 +26927,7 @@ set).
 Functions using private register banks
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Functions-using-private-banks"
+name "subsec:Functions-using-private-banks"
 
 \end_inset
 
@@ -27266,7 +27302,7 @@ tnop
 A Step by Step Introduction
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:A-Step-by Assembler Introduction"
+name "subsec:A-Step-by Assembler Introduction"
 
 \end_inset
 
@@ -27634,7 +27670,7 @@ interrupt
 section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Common-interrupt-pitfall-volatile"
+reference "subsec:Common-interrupt-pitfall-volatile"
 
 \end_inset
 
@@ -29760,7 +29796,7 @@ peeph.def
 Naked Functions
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Naked-Functions"
+name "subsec:Naked-Functions"
 
 \end_inset
 
@@ -31545,19 +31581,19 @@ B
 \series bold
 0x00
 \series default
- -- xdata/far, 
+ – xdata/far, 
 \series bold
 0x40
 \series default
- -- idata/near -- , 
+ – idata/near – , 
 \series bold
 0x60
 \series default
- -- pdata, 
+ – pdata, 
 \series bold
 0x80
 \series default
- -- code
+ – code
 \begin_inset Note Note
 status collapsed
 
@@ -33106,13 +33142,17 @@ Depending on the target architecture, some integer multiplicative operators
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
@@ -33488,6 +33528,10 @@ SDCC supports (single precision 4 bytes) floating point numbers; the format
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -33496,7 +33540,7 @@ SDCC supports (single precision 4 bytes) floating point numbers; the format
 \size footnotesize
 \begin_inset Tabular
 <lyxtabular version="3" rows="17" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="left" valignment="top">
 <row>
@@ -34535,7 +34579,7 @@ status collapsed
  To enable float support for the pic16 targets, see 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pic16Libraries"
+reference "subsec:pic16Libraries"
 
 \end_inset
 
@@ -34698,7 +34742,7 @@ printf
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="14" columns="7">
-<features rotate="0" islongtable="true" longtabularalignment="center">
+<features islongtable="true" longtabularalignment="center">
 <column alignment="left" valignment="middle" width="14col%">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top" width="12col%">
@@ -36058,7 +36102,7 @@ The huge model compiles all functions as
 banked
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Bankswitching"
+reference "subsec:Bankswitching"
 
 \end_inset
 
@@ -36090,7 +36134,7 @@ intrinsic named address space
 External Stack
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:External-Stack"
+name "subsec:External-Stack"
 
 \end_inset
 
@@ -36275,7 +36319,7 @@ P2 (mcs51 sfr)
  (see also section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MCS51-variants"
+reference "subsec:MCS51-variants"
 
 \end_inset
 
@@ -37144,7 +37188,7 @@ pragma noinvariant
  For more details see Loop Invariants in section
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Loop-Optimizations"
+reference "subsec:Loop-Optimizations"
 
 \end_inset
 
@@ -37211,7 +37255,7 @@ __interrupt
  keyword, see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Interrupt-Service-Routines"
+reference "subsec:Interrupt-Service-Routines"
 
 \end_inset
 
@@ -37254,7 +37298,7 @@ pragma nojtbound
  For more details see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:'switch'-Statements"
+reference "subsec:'switch'-Statements"
 
 \end_inset
 
@@ -38940,7 +38984,7 @@ Defines created by the compiler
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="19" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top" width="3in">
 <row>
@@ -40121,7 +40165,7 @@ Notes on supported Processors
 MCS51 variants
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MCS51-variants"
+name "subsec:MCS51-variants"
 
 \end_inset
 
@@ -40297,7 +40341,7 @@ For more exotic implementations further customizations may be needed.
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Startup-Code"
+reference "subsec:Startup-Code"
 
 \end_inset
 
@@ -40329,7 +40373,7 @@ DPTR
 Bankswitching
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Bankswitching"
+name "subsec:Bankswitching"
 
 \end_inset
 
@@ -40368,7 +40412,7 @@ Hardware
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -43395,7 +43439,7 @@ status collapsed
  and section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MCS51-variants"
+reference "subsec:MCS51-variants"
 
 \end_inset
 
@@ -43580,8 +43624,8 @@ Z80!return value
 \end_layout
 
 \begin_layout Standard
-When enabling optimizations using --opt-code size and a sufficiently high
- value for --max-allocs-per-node sdcc typically generates much better code
+When enabling optimizations using –opt-code size and a sufficiently high
+ value for –max-allocs-per-node sdcc typically generates much better code
  for these architectures than many other compilers.
  A comparison of compilers for these architecture can be found at 
 \begin_inset Flex URL
@@ -43722,7 +43766,7 @@ Unsafe reads
 \begin_layout Standard
 Usually, Z80-based systems (except for the Gameboy) have separate I/O and
  memory spaces, and any memory location can be read without side-effects.
- For such systems, the option --allow-unsafe-reads can be used to enable
+ For such systems, the option –allow-unsafe-reads can be used to enable
  some extra optimizations.
 \end_layout
 
@@ -44425,7 +44469,7 @@ Pic device specific header and c source files are automatically generated
  (see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Search-Paths"
+reference "subsec:Search-Paths"
 
 \end_inset
 
@@ -45172,7 +45216,7 @@ s.
 Naming of special function registers
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Naming-of-special"
+name "subsec:Naming-of-special"
 
 \end_inset
 
@@ -45918,6 +45962,10 @@ status collapsed
 
 -pstack-model=[model] Used in conjunction with the command above.
  Defines the stack model to be used, valid stack models are:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -45999,6 +46047,10 @@ status collapsed
 
 -obanksel=n Set optimization level for inserting BANKSELs.
 \begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Separator latexpar
 \end_inset
 
 
@@ -46623,13 +46675,17 @@ PIC16
 \end_inset
 
  port defines the following preprocessor macros while translating a source.
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <row>
@@ -46866,13 +46922,17 @@ nnn = SMALL or LARGE respectively according to the stack model used
 \begin_layout Standard
 \noindent
 In addition the following macros are defined when calling assembler:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <row>
@@ -46989,13 +47049,17 @@ PIC16
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -47167,13 +47231,17 @@ status collapsed
 \end_inset
 
 
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -47303,7 +47371,7 @@ Linker
 Pragmas
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:PIC16_Pragmas"
+name "subsec:PIC16_Pragmas"
 
 \end_inset
 
@@ -47508,13 +47576,17 @@ module_name
  can be any library or object file (including its path).
  Note that there are four reserved keywords which have special meaning.
  These are:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="block" valignment="top" width="20page%">
 <column alignment="left" valignment="top">
@@ -47977,7 +48049,7 @@ Example:
 Header Files and Libraries
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:PIC16_Header-Files-and-Libraries"
+name "subsec:PIC16_Header-Files-and-Libraries"
 
 \end_inset
 
@@ -47993,7 +48065,7 @@ Pic device specific header and c source files are automatically generated
  (see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Search-Paths"
+reference "subsec:Search-Paths"
 
 \end_inset
 
@@ -48054,7 +48126,7 @@ NOTE: the compiled code, which use non-free pic device specific libraries,
 Header Files
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:PIC16_Header-Files"
+name "subsec:PIC16_Header-Files"
 
 \end_inset
 
@@ -48107,7 +48179,7 @@ The specific microcontroller is selected within the pic18fregs.h automatically,
 Libraries
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:pic16Libraries"
+name "subsec:pic16Libraries"
 
 \end_inset
 
@@ -48344,6 +48416,10 @@ mv picDEVICE.c /path/to/sdcc/device/non-free/lib/pic16/libdev
 
 \begin_layout Enumerate
 Either
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -48471,7 +48547,7 @@ Copy and modify an existing entry or create a new one and insert it at the
 Recompile the pic16 libraries as described in 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:pic16Libraries"
+reference "subsec:pic16Libraries"
 
 \end_inset
 
@@ -48497,13 +48573,17 @@ large model
 \begin_layout Standard
 Memory model affects the default size of pointers within the source.
  The sizes are shown in the next table:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -48622,7 +48702,7 @@ near
 The standard device libraries (see 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:PIC16_Header-Files"
+reference "subsec:PIC16_Header-Files"
 
 \end_inset
 
@@ -48692,13 +48772,17 @@ large
  uses both FSRxL and FSRxH registers.
  The following table shows the stack/frame pointers sizes according to stack
  model and the maximum space they can address:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -48942,13 +49026,17 @@ Function return values
 Return values from functions are placed to the appropriate registers following
  a modified Microchip policy optimized for SDCC.
  The following table shows these registers:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <row>
@@ -49124,13 +49212,17 @@ n
 n
 \emph default
  is the interrupt number, which for PIC18F devices can be:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -49399,13 +49491,17 @@ Generic pointers are implemented in PIC16 port as 3-byte (24-bit) types.
  and eeprom pointers.
  They are differentiated by the value of the 7th and 6th bits of the upper
  byte:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="5">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -49688,7 +49784,7 @@ Configuration bits (also known as fuses) can be configured using one of
 using #pragma config (see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:PIC16_Pragmas"
+reference "subsec:PIC16_Pragmas"
 
 \end_inset
 
@@ -49809,6 +49905,10 @@ stream
 \emph default
  pointer.
  This new type has the format:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -49816,7 +49916,7 @@ stream
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="7">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -49968,6 +50068,10 @@ upper byte high nubble is 0x2n, the rest are zeroes
 \begin_layout Standard
 \noindent
 Currently implemented there are 3 types of streams defined:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -49975,7 +50079,7 @@ Currently implemented there are 3 types of streams defined:
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="center" valignment="top">
@@ -50359,13 +50463,17 @@ Signals
 \begin_layout Standard
 The PIC18F family of microcontrollers supports a number of interrupt sources.
  A list of these interrupts is shown in the following table:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="4">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top">
 <column alignment="center" valignment="top">
 <column alignment="left" valignment="top">
@@ -50971,7 +51079,7 @@ retfie
 \end_layout
 
 \begin_layout Subsection
-PIC16 Port -- Tips
+PIC16 Port – Tips
 \end_layout
 
 \begin_layout Standard
@@ -52084,7 +52192,8 @@ status collapsed
 
 \begin_layout Plain Layout
 Check that the double quotes or an apostrophe within the command line survive
- the LyX tool chain.
+ the \SpecialChar LyX
+ tool chain.
  Previously the apostrophes got slanted in the PDF output so a cut and paste
  did not work.
 \end_layout
@@ -55230,6 +55339,10 @@ name "type promotion"
  can be omitted, if the result is the same.
  The effect of the promotion rules together with the sign-extension is often
  surprising:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -55537,7 +55650,7 @@ volatile
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Common-interrupt-pitfall-volatile"
+reference "subsec:Common-interrupt-pitfall-volatile"
 
 \end_inset
 
@@ -55737,7 +55850,7 @@ Tools
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="28" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
@@ -56750,7 +56863,7 @@ Documentation
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="10" columns="2">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="40col%">
 <column alignment="block" valignment="top" width="60col%">
 <row endhead="true">
@@ -57408,7 +57521,7 @@ Communication online at SourceForge
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="30col%">
 <column alignment="left" valignment="top" width="30col%">
 <column alignment="left" valignment="top" width="40col%">
@@ -57866,7 +57979,7 @@ Related tools
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="16" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="20col%">
 <column alignment="block" valignment="top" width="30col%">
 <column alignment="left" valignment="top" width="50col%">
@@ -58665,7 +58778,7 @@ Related documentation / recommended reading
 \align left
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="20col%">
 <column alignment="left" valignment="top" width="30col%">
 <column alignment="left" valignment="top" width="50col%">
@@ -58989,6 +59102,10 @@ Application notes
 \end_inset
 
 .
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -58997,7 +59114,7 @@ Application notes
 \size footnotesize
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="block" valignment="top" width="17col%">
 <column alignment="block" valignment="top" width="27col%">
 <column alignment="block" valignment="top" width="56col%">
@@ -59682,7 +59799,7 @@ reporting bugs is good
 Requesting Features
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Requesting-Features"
+name "subsec:Requesting-Features"
 
 \end_inset
 
@@ -60336,7 +60453,9 @@ http://sourceforge.net/projects/fpgac/
 \begin_layout Enumerate
 be able to insert excursions about skills like using a revision control
  system, submitting/applying patches, using a type-setting (as opposed to
- word-processing) engine LyX/LaTeX, using SourceForge 
+ word-processing) engine \SpecialChar LyX
+/\SpecialChar LaTeX
+, using SourceForge 
 \begin_inset Flex URL
 status collapsed
 
@@ -60889,7 +61008,7 @@ Loop optimization
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Loop-Optimizations"
+name "subsec:Loop-Optimizations"
 
 \end_inset
 
@@ -61478,7 +61597,7 @@ Subexpression
 'switch' Statements
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:'switch'-Statements"
+name "subsec:'switch'-Statements"
 
 \end_inset
 
@@ -61515,6 +61634,10 @@ jump tables
 The labels need not be in order, and the starting number need not be one
  or zero, the case labels are in numerical sequence or not too many case
  labels are missing.
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_deeper
@@ -67890,7 +68013,7 @@ sdcc has an implementation of lifetime-optimal speculative partial redundancy
 Register Allocation
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Register-Allocation"
+name "subsec:Register-Allocation"
 
 \end_inset
 
@@ -67913,7 +68036,7 @@ sdcc currently has two register allocators.
  This register allocator is used by default on the hc08, s08, z80, z180,
  r2k, r3ka, gbz80 and stm8 ports.
  Even though it runs in polynomial time, it can be quite slow; therefore
- the --max-allocs-per-node command line option can be used for a trade-off
+ the –max-allocs-per-node command line option can be used for a trade-off
  between compilation speed and quality of the generated code: Lower values
  result in faster compilation, higher values can result in better code being
  generated.
@@ -67963,7 +68086,7 @@ Bytewise Register Allocation
 Peephole Optimizer
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Peephole-Optimizer"
+name "subsec:Peephole-Optimizer"
 
 \end_inset
 
@@ -68905,7 +69028,7 @@ Phase five is register allocation.
  For new ports register allocator described above in 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Register-Allocation"
+reference "subsec:Register-Allocation"
 
 \end_inset
 
@@ -69001,7 +69124,7 @@ Compiler internals
 The anatomy of the compiler
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:The-anatomy-of"
+name "subsec:The-anatomy-of"
 
 \end_inset
 
@@ -69224,7 +69347,7 @@ iCode
 Figure II 
 \begin_inset Tabular
 <lyxtabular version="3" rows="39" columns="4">
-<features rotate="0" islongtable="true" headBottomDL="true" longtabularalignment="center">
+<features islongtable="true" headBottomDL="true" longtabularalignment="center">
 <column alignment="block" valignment="top" width="13col%">
 <column alignment="left" valignment="top" width="13col%">
 <column alignment="block" valignment="top" width="22col%">
@@ -71901,7 +72024,7 @@ _gint::
 \begin_layout Standard
 
 \size footnotesize
-; ----------------------------------------------
+; ———————————————-
 \end_layout
 
 \begin_layout Standard
@@ -71913,7 +72036,7 @@ _gint::
 \begin_layout Standard
 
 \size footnotesize
-; ----------------------------------------------
+; ———————————————-
 \end_layout
 
 \begin_layout Standard

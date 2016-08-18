@@ -45,7 +45,6 @@
 #define SKIP_NON_EVALUATED_COMMA_ASSIGN /* bug #2525 */
 #define SKIP_LONG_DOUBLE /* long double not yet supported */
 #define SKIP_UNIVERSAL
-#define SKIP_FOR_DECLARATION /* declaration in for (C99 feature) not yet supported */
 #define SKIP_MIXED /* mixing of declaration and other statements (C99 feature) not yet supported */
 #define SKIP_RESTRICT_PARAMETER /* bug #2538 */
 #define SKIP_VOLATILE_PARAMETER /* bug #2538 */

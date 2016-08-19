@@ -36,8 +36,9 @@
 
 #include <testfwk.h>
 
+#define SKIP_EVALUATED_COMMA_ASSIGN /* Looks like testing for some particular implementation-defined behaviour to me */
+
 #ifdef PORT_HOST /* Common GCC issues */
-#define SKIP_EVALUATED_COMMA_ASSIGN /* Look slike a GCC bug to me givev paragraph 3 of section 6.6 of the C11 standard */
 #define SKIP_UNIVERSAL_UTF8 /* Only works for GCC when -finput-charset= option is specified */
 #if (defined (__GNUC__) && __GNUC__ < 6)
 #define SKIP_UNIVERSAL /* Fails for older GCC (works for me in 6.1.1 but fails on some SDCC build machines*/

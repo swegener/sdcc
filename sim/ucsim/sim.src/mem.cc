@@ -80,15 +80,25 @@ int
 cl_memory::init(void)
 {
   addr_format= (char *)malloc(10);
-  sprintf(addr_format, "0x%%0%dx",
+  sprintf(addr_format, "0x%%0%d",
 	  size-1<=0xf?1:
 	  (size-1<=0xff?2:
 	   (size-1<=0xfff?3:
 	    (size-1<=0xffff?4:
 	     (size-1<=0xfffff?5:
 	      (size-1<=0xffffff?6:12))))));
+  if (sizeof(t_addr) > sizeof(long))
+    strcat(addr_format, "L");
+  else if (sizeof(t_addr) > sizeof(int))
+    strcat(addr_format, "l");
+  strcat(addr_format, "x");
   data_format= (char *)malloc(10);
-  sprintf(data_format, "%%0%dx", width/4+((width%4)?1:0));
+  sprintf(data_format, "%%0%d", width/4+((width%4)?1:0));
+  if (sizeof(t_mem) > sizeof(long))
+    strcat(data_format, "L");
+  else if (sizeof(t_mem) > sizeof(int))
+    strcat(data_format, "l");
+  strcat(data_format, "x");
   data_mask= 1;
   int w= width;
   for (--w; w; w--)

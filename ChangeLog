@@ -1,3 +1,8 @@
+2016-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Fix double underscores in manual.
+
 2016-08-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/test-p99-conformance.c:

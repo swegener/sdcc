@@ -23,6 +23,9 @@
 \date{}
 \end_preamble
 \use_default_options false
+\begin_modules
+logicalmkup
+\end_modules
 \maintain_unincluded_children false
 \language english
 \language_package default
@@ -2503,8 +2506,17 @@ reference "subsec:Standard-Compliance"
 
 \begin_layout Itemize
 in sdcc version 3.2.0 compiler macro definitions not starting with double
- underscore characters are deprecated if –std-cXX command line option is
- defined.
+ underscore characters are deprecated if 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--std-cXX
+\end_layout
+
+\end_inset
+
+ command line option is defined.
  They have been oboleted (removed) after the 3.4.0 release (except for the
  macro SDCC, which has been removed after the 3.6.0 release).
 \end_layout
@@ -9357,7 +9369,24 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-Functions are not reentrant unless explicitly declared as such or –stack-auto
+Functions are not reentrant unless explicitly declared as such or 
+\series bold
+
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+
+\series bold
+--
+\series default
+stack-auto
+\end_layout
+
+\end_inset
+
+
+\series default
  is specified in the mcs51, ds390, hc08 and s08 ports.
 \end_layout
 
@@ -9504,7 +9533,7 @@ Use
 \series bold
 -
 \begin_inset ERT
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -19786,7 +19815,17 @@ stack
 
 \end_inset
 
- is located in idata memory (unless –xstack is specified).
+ is located in idata memory (unless 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--xstack
+\end_layout
+
+\end_inset
+
+ is specified).
 \end_layout
 
 \begin_layout Subsubsection
@@ -23511,7 +23550,17 @@ Binary constants
 
 \begin_layout Standard
 SDCC supports the use of binary constants, such as 0b01100010.
- This feature is only enabled when the compiler is invoked using –std-sdccxx.
+ This feature is only enabled when the compiler is invoked using 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--std-sdccxx
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -23520,7 +23569,17 @@ Returning void
 
 \begin_layout Standard
 SDCC allows functions to return expressions of type void.
- This feature is only enabled when the compiler is invoked using –std-sdccxx.
+ This feature is only enabled when the compiler is invoked using 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--std-sdccxx
+\end_layout
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -23529,10 +23588,40 @@ Omitting promotion on arguments of vararg function
 
 \begin_layout Standard
 Arguments to vararg functions are not promoted when explicitly cast.
- This feature is only enabled when the compiler is invoked using –std-sdccxx.
+ This feature is only enabled when the compiler is invoked using 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--std-sdccxx
+\end_layout
+
+\end_inset
+
+.
  This breaks compability with the C standards, so linking code compiled
- with –std-sdccxx with code compiled using –std-cxx can result in failing
- programs when arguments to vararg functions are explicitly cast.
+ with 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--std-sdccxx
+\end_layout
+
+\end_inset
+
+ with code compiled using 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--std-cxx
+\end_layout
+
+\end_inset
+
+ can result in failing programs when arguments to vararg functions are explicitl
+y cast.
 \end_layout
 
 \begin_layout Section
@@ -43624,9 +43713,28 @@ Z80!return value
 \end_layout
 
 \begin_layout Standard
-When enabling optimizations using –opt-code size and a sufficiently high
- value for –max-allocs-per-node sdcc typically generates much better code
- for these architectures than many other compilers.
+When enabling optimizations using 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--opt-code
+\end_layout
+
+\end_inset
+
+ size and a sufficiently high value for 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--max-allocs-per-node
+\end_layout
+
+\end_inset
+
+ sdcc typically generates much better code for these architectures than
+ many other compilers.
  A comparison of compilers for these architecture can be found at 
 \begin_inset Flex URL
 status collapsed
@@ -68036,10 +68144,19 @@ sdcc currently has two register allocators.
  This register allocator is used by default on the hc08, s08, z80, z180,
  r2k, r3ka, gbz80 and stm8 ports.
  Even though it runs in polynomial time, it can be quite slow; therefore
- the –max-allocs-per-node command line option can be used for a trade-off
- between compilation speed and quality of the generated code: Lower values
- result in faster compilation, higher values can result in better code being
- generated.
+ the 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+--max-allocs-per-node
+\end_layout
+
+\end_inset
+
+ command line option can be used for a trade-off between compilation speed
+ and quality of the generated code: Lower values result in faster compilation,
+ higher values can result in better code being generated.
 \end_layout
 
 \begin_layout Standard

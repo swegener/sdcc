@@ -3110,6 +3110,7 @@ genSend (set * sendSet)
             {
               if (AOP_TYPE (IC_LEFT (sic)) != AOP_DPTR)
                 {
+                  wassertl (size < 5, "long long parameters / return values not yet supported for mcs51");
                   while (size--)
                     {
                       const char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
@@ -4473,6 +4474,7 @@ genRet (iCode * ic)
     }
   else
     {
+      wassertl (size < 5, "long long parameters / return values not yet supported for mcs51");
       while (size--)
         {
           if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
@@ -9138,6 +9140,38 @@ genlshFour (operand * result, operand * left, int shCount)
 }
 
 /*-----------------------------------------------------------------*/
+/* genlshFour - shift 8 bytes   by a known amount != 0             */
+/*-----------------------------------------------------------------*/
+static void
+genlsh8 (operand *result, operand *left, int shCount)
+{
+  int size, size2, offset;
+
+  D (emitcode (";", "genlsh8"));
+
+  size = AOP_SIZE (result);
+
+  for (size2 = size, offset = 0; size2 > 0; size2--, offset++)
+    aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
+
+  while (shCount--)
+    {
+      MOVA (aopGet (result, LSB, FALSE, FALSE));
+      emitcode ("add", "a,acc");
+
+      aopPut (result, "a", 0);
+
+      for(size--, offset = 1; size > 0; size--, offset++)
+        {
+
+          MOVA (aopGet (result, offset, FALSE, FALSE));
+          emitcode ("rlc", "a");
+          aopPut (result, "a", offset);
+        }
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genLeftShiftLiteral - left shifting by known count              */
 /*-----------------------------------------------------------------*/
 static void
@@ -9191,6 +9225,10 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
 
         case 4:
           genlshFour (result, left, shCount);
+          break;
+
+        case 8:
+          genlsh8 (result, left, shCount);
           break;
 
         default:
@@ -11864,6 +11902,8 @@ genReceive (iCode * ic)
           reg_info *tempRegs[4];
           int receivingA = 0;
           int roffset = 0;
+
+          wassertl (size < 5, "long long parameters / return values not yet supported for mcs51");
 
           for (offset = 0; offset < size; offset++)
             if (EQ (fReturn[offset], "a"))

@@ -62,7 +62,7 @@ typedef struct asmop
   union
   {
     value *aop_lit;             /* if literal */
-    reg_info *aop_reg[4];       /* array of registers */
+    reg_info *aop_reg[8];       /* array of registers */
     char *aop_dir;              /* if direct  */
     reg_info *aop_ptr;          /* either -> to r0 or r1 */
     struct
@@ -72,7 +72,7 @@ typedef struct asmop
       char *aop_immd2;          /* cast remat will generate this   */
     } aop_immd;
     symbol *aop_sym;            /* symbol when AOP_STK */
-    char *aop_str[4];           /* just a string array containing the location */
+    char *aop_str[8];           /* just a string array containing the location */
   }
   aopu;
 }

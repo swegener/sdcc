@@ -4538,7 +4538,7 @@ static bool
 genPlusIncr (iCode * ic)
 {
   unsigned int icount;
-  unsigned int size = getDataSize (IC_RESULT (ic));
+  unsigned int size = getDataSize (IC_RESULT (ic)), offset;
 
   /* will try to generate an increment */
   /* if the right side is not a literal
@@ -4575,7 +4575,8 @@ genPlusIncr (iCode * ic)
 
       l = aopGet (IC_RESULT (ic), MSB16, FALSE, FALSE);
       emitcode ("inc", "%s", l);
-      if (size > 2)
+
+      for(offset = 2; size > 2; size--, offset++)
         {
           if (EQ (l, "acc"))
             {
@@ -4590,26 +4591,10 @@ genPlusIncr (iCode * ic)
               emitcode ("cjne", "a,%s,!tlabel", l, labelKey2num (tlbl->key));
             }
 
-          l = aopGet (IC_RESULT (ic), MSB24, FALSE, FALSE);
+          l = aopGet (IC_RESULT (ic), offset, FALSE, FALSE);
           emitcode ("inc", "%s", l);
         }
-      if (size > 3)
-        {
-          if (EQ (l, "acc"))
-            {
-              emitcode ("jnz", "!tlabel", labelKey2num (tlbl->key));
-            }
-          else if (AOP_TYPE (IC_RESULT (ic)) == AOP_REG || IS_AOP_PREG (IC_RESULT (ic)))
-            {
-              emitcode ("cjne", "%s,%s,!tlabel", l, zero, labelKey2num (tlbl->key));
-            }
-          else
-            {
-              emitcode ("cjne", "a,%s,!tlabel", l, labelKey2num (tlbl->key));
-            }
 
-          emitcode ("inc", "%s", aopGet (IC_RESULT (ic), MSB32, FALSE, FALSE));
-        }
       emitLabel (tlbl);
       return TRUE;
     }

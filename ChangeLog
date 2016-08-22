@@ -18,7 +18,14 @@
 	  support/regression/tests/gcc-torture-execute-20000523-1.c,
 	  support/regression/tests/gcc-torture-execute-20000717-2.c,
 	  support/regression/tests/gcc-torture-execute-20001112-1.c,
-	  support/regression/tests/gcc-torture-execute-20001221-1.c:
+	  support/regression/tests/gcc-torture-execute-20001221-1.c,
+	  support/regression/tests/gcc-torture-execute-20060110-2.c,
+	  support/regression/tests/gcc-torture-execute-20060127-1.c,
+	  support/regression/tests/gcc-torture-execute-20071213-1.c,
+	  support/regression/tests/gcc-torture-execute-920829-1.c,
+	  support/regression/tests/gcc-torture-execute-921029-1.c,
+	  support/regression/tests/gcc-torture-execute-921202-2.c,
+	  support/regression/tests/gcc-torture-execute-930111-1.c:
 	  More long long support for mcs51.
 
 2016-08-21 Philipp Klaus Krause <pkk AT spth.de>

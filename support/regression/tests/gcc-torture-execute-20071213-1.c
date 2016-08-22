@@ -31,7 +31,7 @@ h (int x, va_list ap)
 }
 
 // Some ports do not yet support long long
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 void
 f1 (int i, long long int j, ...)
 {
@@ -59,7 +59,7 @@ void
 testTortureExecute (void)
 {
 // Some ports do not yet support long long
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   f1 (1, 2, 3, 4);
   f2 (5, 6, 7, 8, 9, 10);
 #endif

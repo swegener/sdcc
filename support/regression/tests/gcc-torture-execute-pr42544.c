@@ -15,7 +15,7 @@ extern void abort (void);
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 // TODO: Enable once sdcc really support long long literals.
   signed short s = -1;
   if (sizeof (long long) == sizeof (unsigned int))

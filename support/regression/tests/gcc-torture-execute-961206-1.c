@@ -9,7 +9,7 @@
 #endif
 
 // TODO: Enable when sdcc supports long long in these ports!
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 int
 sub1 (unsigned long long i)
 {
@@ -50,7 +50,7 @@ sub4 (unsigned long long i)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (sub1 (0x80000000ULL))
     ASSERT (0);
 

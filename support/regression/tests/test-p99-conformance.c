@@ -58,11 +58,12 @@
 #define SKIP_INLINE /* bug #1900 */
 #define SKIP_PRAGMA
 #pragma disable_warning 93 /* Using float for double. */
-#if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_pic14) || defined(__SDCC_pic16)
+#if defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_pic14) || defined(__SDCC_pic16)
 #define SKIP_LONG_LONG
 #endif
-#if defined(__SDCC_mcs51) && __SDCC_MODEL_SMALL
+#if defined(__SDCC_mcs51) && __SDCC_MODEL_SMALL /* Lack of memory */
 #define SKIP_FLEXIBLE
+#define SKIP_LONG_LONG
 #endif
 #endif
 

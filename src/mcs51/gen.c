@@ -52,7 +52,7 @@ static char *zero = "#0x00";
 static char *one = "#0x01";
 static char *spname;
 
-char *fReturn8051[] = { "dpl", "dph", "b", "a" };
+char *fReturn8051[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" };
 
 unsigned fReturnSizeMCS51 = 4;  /* shared with ralloc.c */
 char **fReturn = fReturn8051;
@@ -3110,7 +3110,6 @@ genSend (set * sendSet)
             {
               if (AOP_TYPE (IC_LEFT (sic)) != AOP_DPTR)
                 {
-                  wassertl (size < 5, "long long parameters / return values not yet supported for mcs51");
                   while (size--)
                     {
                       const char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
@@ -4474,7 +4473,6 @@ genRet (iCode * ic)
     }
   else
     {
-      wassertl (size < 5, "long long parameters / return values not yet supported for mcs51");
       while (size--)
         {
           if (AOP_TYPE (IC_LEFT (ic)) == AOP_DPTR)
@@ -11902,8 +11900,6 @@ genReceive (iCode * ic)
           reg_info *tempRegs[4];
           int receivingA = 0;
           int roffset = 0;
-
-          wassertl (size < 5, "long long parameters / return values not yet supported for mcs51");
 
           for (offset = 0; offset < size; offset++)
             if (EQ (fReturn[offset], "a"))

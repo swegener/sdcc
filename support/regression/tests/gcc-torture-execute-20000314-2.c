@@ -8,8 +8,8 @@
 #pragma std_c99
 #endif
 
-// sdcc cannot return long long yet.
-#if !defined (__SDCC_mcs51) && !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+// sdcc cannot return long long yet for some ports.
+#if !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 
 typedef unsigned long long uint64;
 const uint64 bigconst = 1ULL << 34;

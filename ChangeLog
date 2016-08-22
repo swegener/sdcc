@@ -12,6 +12,13 @@
 	  support/regression/tests/gcc-torture-execute-pr42269-2.c,
 	  support/regression/tests/gcc-torture-execute-pr42544.c,
 	  support/regression/tests/test-p99-conformance.c:
+	  support/regression/tests/gcc-torture-execute-20000121-1.c,
+	  support/regression/tests/gcc-torture-execute-20000314-2.c,
+	  support/regression/tests/gcc-torture-execute-20000412-2.c,
+	  support/regression/tests/gcc-torture-execute-20000523-1.c,
+	  support/regression/tests/gcc-torture-execute-20000717-2.c,
+	  support/regression/tests/gcc-torture-execute-20001112-1.c,
+	  support/regression/tests/gcc-torture-execute-20001221-1.c:
 	  More long long support for mcs51.
 
 2016-08-21 Philipp Klaus Krause <pkk AT spth.de>

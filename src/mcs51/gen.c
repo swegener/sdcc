@@ -9156,10 +9156,9 @@ genlsh8 (operand *result, operand *left, int shCount)
     {
       MOVA (aopGet (result, LSB, FALSE, FALSE));
       emitcode ("add", "a,acc");
-
       aopPut (result, "a", 0);
 
-      for(size--, offset = 1; size > 0; size--, offset++)
+      for(size2 = size - 1, offset = 1; size2 > 0; size2--, offset++)
         {
 
           MOVA (aopGet (result, offset, FALSE, FALSE));

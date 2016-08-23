@@ -25,6 +25,7 @@
 #include <ctype.h>
 #include "common.h"
 #include "ralloc.h"
+#include "gen.h"
 
 #define D(x) x
 #define DEADMOVEERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in deadmove");} while(0)

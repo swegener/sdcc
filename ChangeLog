@@ -1,3 +1,9 @@
+2016-08-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/mcs51/gen.h,
+	  src/mcs51/peep.c:
+	  Prepare for long long fix for deadMove() on ret.
+
 2016-08-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c,

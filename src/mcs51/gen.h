@@ -81,7 +81,7 @@ asmop;
 void gen51Code (iCode *);
 void mcs51_emitDebuggerSymbol (const char *);
 
-//extern char *fReturn8051[];
+extern char *fReturn8051[];
 extern unsigned fReturnSizeMCS51;
 //extern char **fReturn;
 

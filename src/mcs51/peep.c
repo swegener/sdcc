@@ -506,12 +506,19 @@ scan4op (lineNode **pl, const char *pReg, const char *untilOp,
                   }
 
                 /* it's a normal function return */
-                if (!((*pl)->ic) || (IS_SYMOP (IC_LEFT ((*pl)->ic)) &&
-                    IS_FUNC (OP_SYM_TYPE(IC_LEFT ((*pl)->ic))) &&
-                    FUNC_CALLEESAVES (OP_SYM_TYPE(IC_LEFT ((*pl)->ic)))))
-                  return S4O_ABORT;
-                else
-                  return S4O_TERM;
+                if (!((*pl)->ic))
+                  return S4O_ABORT; /* but no ic? */
+                if (!currFunc->type)
+                  return S4O_ABORT;  /* not a function? */
+                if (FUNC_CALLEESAVES (currFunc->type))
+                  return S4O_ABORT; /* returning from callee saves function */
+                if (getSize(currFunc->etype) > 4)
+                  {
+                    for (unsigned i = 0; i < getSize(currFunc->etype); i++)
+                      if (strstr (pReg, fReturn8051[i]))
+                        return S4O_ABORT; /* return value is partially in r4-r7 */
+                  }
+                return S4O_TERM;
               }
             break;
           case 's':

@@ -9,7 +9,7 @@
 #endif
 
 // TODO: Enable when long long comes to these ports!
-#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined (__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 long long 
 f (long long a, long long b) 
 { 

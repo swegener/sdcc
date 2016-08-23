@@ -4,7 +4,21 @@
 	  src/mcs51/peep.c,
 	  support/regression/tests/gcc-torture-execute-20000314-2.c,
 	  support/regression/tests/gcc-torture-execute-pr42269-2.c,
-	  support/regression/tests/gcc-torture-execute-20060110-2.c:
+	  support/regression/tests/gcc-torture-execute-20060110-2.c,
+	  support/regression/tests/gcc-torture-execute-20001031-1.c,
+	  support/regression/tests/gcc-torture-execute-20011126-1.c,
+	  support/regression/tests/gcc-torture-execute-20020201-1.c,
+	  support/regression/tests/gcc-torture-execute-20020219-1.c,
+	  support/regression/tests/gcc-torture-execute-20020402-3.c,
+	  support/regression/tests/gcc-torture-execute-20020506-1.c,
+	  support/regression/tests/gcc-torture-execute-20020508-1.c,
+	  support/regression/tests/gcc-torture-execute-20020508-2.c,
+	  support/regression/tests/gcc-torture-execute-20020508-3.c,
+	  support/regression/tests/gcc-torture-execute-20030307-1.c,
+	  support/regression/tests/gcc-torture-execute-20050104-1.c,
+	  support/regression/tests/gcc-torture-execute-20050111-1.c,
+	  support/regression/tests/gcc-torture-execute-941015-1.c,
+	  support/regression/tests/gcc-torture-execute-950503-1.c:
 	  long long fix for deadMove() on ret.
 
 2016-08-22 Philipp Klaus Krause <pkk AT spth.de>

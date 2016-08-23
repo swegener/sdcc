@@ -9,7 +9,7 @@
 #endif
 
 // Some ports do not yet support long long
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 
 /* PR c/4308
    This testcase failed because 0x8000000000000000 >> 0
@@ -26,7 +26,7 @@ long long foo (void)
 
 void testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (foo () != 1ULL << 63)
     ASSERT (0);
   return;

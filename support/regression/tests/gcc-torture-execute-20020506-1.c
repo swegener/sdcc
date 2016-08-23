@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 /* Copyright (C) 2002  Free Software Foundation.
 
    Test that (A & C1) op C2 optimizations behave correctly where C1 is

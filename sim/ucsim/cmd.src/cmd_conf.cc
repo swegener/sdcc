@@ -54,7 +54,7 @@ cl_conf_cmd::do_work(class cl_uc *uc,
   for (i= 0; i < uc->nuof_hws(); i++)
     {
       class cl_hw *hw= uc->get_hw(i);
-      con->dd_printf("  %s[%d]\n", hw->id_string, hw->id);
+      con->dd_printf("  %3s %s[%d]\n", hw->on?"on":"off", hw->id_string, hw->id);
     }
   return(0);
 }

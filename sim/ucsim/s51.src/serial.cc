@@ -150,6 +150,12 @@ cl_serial::init(void)
   else
     t2_baud= false;
 
+  cl_var *v;
+  chars pn(id_string);
+  pn.append("%d_", id);
+  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serial_on));
+  v->init();
+  
   return(0);
 }
 
@@ -187,8 +193,8 @@ cl_serial::read(class cl_memory_cell *cell)
 {
   if (cell == sbuf)
     return(s_in);
-  else
-    return(cell->get());
+  conf(cell, NULL);
+  return(cell->get());
 }
 
 void
@@ -259,6 +265,30 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
       if (_mode)
 	_divby= _bmSMOD?16:32;
     }
+  else
+    conf(cell, val);
+}
+
+t_mem
+cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  switch ((enum serial_cfg)addr)
+    {
+    case serial_on: // turn this HW on/off
+      if (val)
+	{
+	  if (*val)
+	    on= true;
+	  else
+	    on= false;
+	}
+      else
+	{
+	  cell->set(on?1:0);
+	}
+      break;
+    }
+  return cell->get();
 }
 
 int
@@ -432,9 +462,15 @@ cl_serial::print_info(class cl_console_base *con)
 			 "9 bit UART timer clocked" };
   int sc= scon->get();
 
-  con->dd_printf("%s[%d]", id_string, id);
+  con->dd_printf("%s[%d] %s\n", id_string, id, on?"on":"off");
+  con->dd_printf("Input: ");
+  if (fin)
+    con->dd_printf("%s/%d ", fin->get_file_name(), fin->file_id);
+  con->dd_printf("Output: ");
+  if (fout)
+    con->dd_printf("%s/%d\n", fout->get_file_name(), fout->file_id);
   int mode= (sc&(bmSM0|bmSM1))>>6;
-  con->dd_printf(" %s", modes[mode]);
+  con->dd_printf("%s", modes[mode]);
   if (mode == 1 || mode == 2)
     con->dd_printf(" (timer%d)", (t2_baud)?2:1);
   con->dd_printf(" MultiProc=%s",

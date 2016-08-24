@@ -95,11 +95,11 @@ cl_port::init(void)
   chars pn;
   pn= cchars("port");
   pn.append("%d_", id);
-  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, port51_on));
+  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, port_on));
   v->init();
-  uc->vars->add(v= new cl_var(pn+cchars("pin"), cfg, port51_pin));
+  uc->vars->add(v= new cl_var(pn+cchars("pin"), cfg, port_pin));
   v->init();
-  uc->vars->add(v= new cl_var(pn+cchars("pins"), cfg, port51_pin));
+  uc->vars->add(v= new cl_var(pn+cchars("pins"), cfg, port_pin));
   v->init();
   
   return(0);
@@ -161,9 +161,9 @@ cl_port::write(class cl_memory_cell *cell, t_mem *val)
 t_mem
 cl_port::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
-  switch (addr)
+  switch ((enum port_cfg)addr)
     {
-    case port51_on: // turn this HW on/off
+    case port_on: // turn this HW on/off
       if (val)
 	{
 	  if (*val)
@@ -176,7 +176,7 @@ cl_port::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	  cell->set(on?1:0);
 	}
       break;
-    case port51_pin: // get/set PINS
+    case port_pin: // get/set PINS
       if (val)
 	set_pin(*val);
       else

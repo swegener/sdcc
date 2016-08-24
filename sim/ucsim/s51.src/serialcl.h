@@ -36,6 +36,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include "newcmdcl.h"
 
+enum serial_cfg {
+  serial_on	   	= 0,
+};
+
 class cl_serial_listener;
 
 class cl_serial: public cl_hw
@@ -69,11 +73,13 @@ public:
   cl_serial(class cl_uc *auc);
   virtual ~cl_serial(void);
   virtual int init(void);
+  virtual int cfg_size(void) { return 10; }
 
   virtual void new_hw_added(class cl_hw *new_hw);
   virtual void added_to_uc(void);
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 
   //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
 

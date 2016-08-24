@@ -35,9 +35,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
-enum port51_cfg {
-  port51_on		= 0, // RW
-  port51_pin		= 1, // RW
+enum port_cfg {
+  port_on		= 0, // RW
+  port_pin		= 1, // RW
 };
 
 class cl_port: public cl_hw

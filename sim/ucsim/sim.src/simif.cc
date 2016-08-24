@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simif.cc 421 2016-08-24 15:54:50Z drdani $ */
+/* $Id: simif.cc 426 2016-08-24 18:39:47Z drdani $ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -674,7 +674,7 @@ cl_simulator_interface::write(class cl_memory_cell *cel, t_mem *val)
 t_mem
 cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
-  switch (addr)
+  switch ((enum simif_cfg)addr)
     {
     case simif_on: // turn this HW on/off
       if (val)

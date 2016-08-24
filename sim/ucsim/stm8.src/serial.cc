@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 346 2016-07-10 14:53:32Z  $ */
+/* $Id: serial.cc 425 2016-08-24 18:39:28Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -162,6 +162,12 @@ cl_serial::init(void)
   else
     fout= mk_io(chars(""), chars(""));
 
+  cl_var *v;
+  chars pn(id_string);
+  pn.append("%d_", id);
+  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serial_on));
+  v->init();
+  
   return(0);
 }
 
@@ -196,6 +202,7 @@ cl_serial::read(class cl_memory_cell *cell)
       return s_in;
     }
   sr_read= (cell == regs[sr]);
+  conf(cell, NULL);
   return cell->get();
 }
 
@@ -204,6 +211,8 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
 {
   printf("** write 0x%02x,'%c'\n", *val, *val);
   
+  if (conf(cell, val))
+    return;
   if (cell == regs[sr])
     {
       uint8_t v= cell->get();
@@ -243,6 +252,28 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
     }
 
   sr_read= false;
+}
+
+t_mem
+cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  switch ((enum serial_cfg)addr)
+    {
+    case serial_on: // turn this HW on/off
+      if (val)
+	{
+	  if (*val)
+	    on= true;
+	  else
+	    on= false;
+	}
+      else
+	{
+	  cell->set(on?1:0);
+	}
+      break;
+    }
+  return cell->get();
 }
 
 int
@@ -447,6 +478,18 @@ cl_serial::set_dr(t_mem val)
 {
   regs[dr]->set(val);
   printf("** DR<- %x %c\n", val, val);
+}
+
+void
+cl_serial::print_info(class cl_console_base *con)
+{
+  con->dd_printf("%s[%d] %s\n", id_string, id, on?"on":"off");
+  con->dd_printf("Input: ");
+  if (fin)
+    con->dd_printf("%s/%d ", fin->get_file_name(), fin->file_id);
+  con->dd_printf("Output: ");
+  if (fout)
+    con->dd_printf("%s/%d\n", fout->get_file_name(), fout->file_id);
 }
 
 

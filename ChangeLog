@@ -2259,7 +2259,7 @@
 
 2015-10-09 Philipp Klaus Krause <pkk AT spth.de>
 
-	* New memory management by merging malloc branch into k.
+	* New memory management by merging malloc branch into trunk.
 
 2015-10-09 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -2656,7 +2656,7 @@
 
 2015-07-01 Philipp Klaus Krause <pkk AT spth.de>
 
-	* Merge upstream binutils 2.25 by merging binutils branch into k.
+	* Merge upstream binutils 2.25 by merging binutils branch into trunk.
 
 2015-07-01 Ben Shi <powerstudio1st AT 163 DOT com>
 
@@ -4386,7 +4386,7 @@
 
 2014-03-31 Philipp Klaus Krause <pkk AT spth.de>
 
-	* Merged sdcc-stm8 branch into k.
+	* Merged sdcc-stm8 branch into trunk.
 
 2014-03-29 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -14668,7 +14668,7 @@
 
 2011-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-06-05 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -14690,7 +14690,7 @@
 
 2011-05-27 Philipp Klaus Krause <pkk AT spth.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-27 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -14712,7 +14712,7 @@
 
 2011-05-26 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-25 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -14730,7 +14730,7 @@
 
 2011-05-21 Philipp Klaus Krause <pkk AT spth.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -14747,17 +14747,17 @@
 2011-05-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c:
-	  Ported reorganization of cast to bool from k.
+	  Ported reorganization of cast to bool from trunk.
 
 2011-05-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug3303325.c:
-	  Merge from k: Fixed bug #3303325.
+	  Merge from trunk: Fixed bug #3303325.
 
 2011-05-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -14771,7 +14771,7 @@
 
 2011-05-17 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-16 Philipp Klaus Krause <pkk@spth.de>
 
@@ -14780,7 +14780,7 @@
 
 2011-05-15 Philipp Klaus Krause <pkk@spth.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -14790,7 +14790,7 @@
 
 2011-05-13 Philipp Klaus Krause <pkk@spth.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -14805,7 +14805,7 @@
 
 2011-05-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-12 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -14816,7 +14816,7 @@
 
 2011-05-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-10 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -14838,7 +14838,7 @@
 
 2011-05-08 Philipp Klaus Krause <pkk@spth.de>
 
-	* Merge from k.
+	* Merge from trunk.
 
 2011-05-06 Philipp Klaus Krause <pkk@spth.de>
 
@@ -14849,7 +14849,7 @@
 
 2011-05-06 Philipp Klaus Krause <pkk@spth.de>
 
-	* Merge everything except src/z80/gen.c from k,
+	* Merge everything except src/z80/gen.c from trunk,
 	  but mark gen.c as merged, so that further changes in gen.c
 	  will be merged.
 
@@ -14866,7 +14866,7 @@
 
 2011-04-29 Philipp Klaus Krause <pkk@spth.de>
 
-	* Merge everything except src/z80/gen.c from k.
+	* Merge everything except src/z80/gen.c from trunk.
 
 2011-04-29 Philipp Klaus Krause <pkk@spth.de>
 
@@ -14876,7 +14876,7 @@
 
 2011-04-25 Philipp Klaus Krause <pkk@spth.de>
 
-	* Merge everything except src/z80/gen.c from k.
+	* Merge everything except src/z80/gen.c from trunk.
 
 2011-04-25 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -14944,7 +14944,7 @@
 
 2011-04-21 Philipp Klaus Krause <pkk@spth.de>
 
-	* Merge everything except src/z80/gen.c from k.
+	* Merge everything except src/z80/gen.c from trunk.
 
 2011-04-20 Philipp Klaus Krause <pkk@spth.de>
 
@@ -14968,7 +14968,7 @@
 
 2011-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge everything except src/z80/gen.c from k.
+	* Merge everything except src/z80/gen.c from trunk.
 
 2011-04-19 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -14993,7 +14993,7 @@
 
 2011-04-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge everything except src/z80/gen.c from k.
+	* Merge everything except src/z80/gen.c from trunk.
 
 2011-04-17 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -15002,11 +15002,11 @@
 
 2011-04-15 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge everything except src/z80/gen.c from k.
+	* Merge everything except src/z80/gen.c from trunk.
 
 2011-04-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
-	* Merge everything except src/z80/gen.c from k.
+	* Merge everything except src/z80/gen.c from trunk.
 
 2011-04-13 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -15027,7 +15027,7 @@
 2011-04-10 Borut Razem <borut.razem AT gmail.com>
 
 	* src/z80/gen.c: dbuf-ized
-	* src/SDCCglobl.h: sync with k
+	* src/SDCCglobl.h: sync with trunk
 
 2011-04-10 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -15049,8 +15049,8 @@
 
 2011-04-09 Borut Razem <borut.razem AT gmail.com>
 
-	* Merge from k
-	* support/regression/tests/bug3166208.c: sync with k
+	* Merge from trunk
+	* support/regression/tests/bug3166208.c: sync with trunk
 
 2011-04-09 Borut Razem <borut.razem AT gmail.com>
 
@@ -15184,7 +15184,7 @@
 
 2011-03-29 Borut Razem <borut.razem AT gmail.com>
 
-	* Partially merge from k
+	* Partially merge from trunk
 
 2011-03-29 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -15614,7 +15614,7 @@
 
 	* src/mcs51/gen.c,
 	  src/z80/peeph-z80.def:
-	  Merge from k.
+	  Merge from trunk.
 
 2011-02-22 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -15630,7 +15630,7 @@
 	  src/z80/ralloc2.cc:
 	  Fixes for --fomit-frame-pointer.
 	* src/mcs51/gen.c:
-	  Merge from k.
+	  Merge from trunk.
 
 2011-02-19 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -15641,7 +15641,7 @@
 	  src/z80/gen.c:
 	  Fixes for --reserve-regs-iy.
 	* support/regression/tests/bug-3184920.c:
-	  Merge from k.
+	  Merge from trunk.
 
 2011-02-19 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -15666,12 +15666,12 @@
 
 	* src/z80/peeph-z80.def,
 	  support/regression/tests/bug-3184920.c:
-	  Fix for #3184920 from k.
+	  Fix for #3184920 from trunk.
 
 2011-02-18 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
 	* support/scripts/sdcc.nsi:
-	  Merge from k.
+	  Merge from trunk.
 	* src/z80/ralloc2.cc:
 	  Fix for --optralloc-all.
 	* src/z80/gen.c:
@@ -15685,7 +15685,7 @@
 	* src/version.awk,
 	  src/src.dsp,
 	  support/scripts/resource.rc:
-	  Merge from k.
+	  Merge from trunk.
 	* src/z80/gen.c:
 	  Improved addition by increment.
 
@@ -15710,7 +15710,7 @@
 
 2011-02-07 Borut Razem <borut.razem AT gmail.com>
 
-	* Merged from k
+	* Merged from trunk
 
 2011-02-06 Maarten Brock <sourceforge.brock AT dse.nl>
 
@@ -15722,7 +15722,7 @@
 	* src/SDCCicode.c (setOperandType),
 	  support/regression/tests/bug-221168.c,
 	  support/regression/tests/bug3166208.c:
-	  Maarten's fix of #3166208 from k.
+	  Maarten's fix of #3166208 from trunk.
 
 2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -15731,7 +15731,7 @@
 	  sdas/linksrc/Makefile.in,
 	  support/makebin/makebin.c,
 	  support/regression/tests/bug3130806.c:
-	  Fixes from k.
+	  Fixes from trunk.
 
 2011-02-04 Philipp Klaus Krause <philipp AT informatik.uni-frankfurt.de>
 
@@ -15829,7 +15829,7 @@
 	* */*.vcxproj.filters: added to svn
 	* debugger/mcs51/simi.c:
 	  fixed warning C4273: '_environ' : inconsistent dll linkage
-	* Merged from k
+	* Merged from trunk
 
 2011-01-23 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -15972,7 +15972,7 @@
 
 2011-01-17 Borut Razem <borut.razem AT gmail.com>
 
-	* Merged from k
+	* Merged from trunk
 
 2011-01-17 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -27163,7 +27163,7 @@
 	  placement to the linker (use `extern sym' rather than sym EQU addr),
 	  (validAddress): fixed to check last specified address
 	* src/pic/gen.c (aopForSym): added code to deal with array (useless?),
-	  (popGetLit): cate literal value to 8 bit,
+	  (popGetLit): truncate literal value to 8 bit,
 	  (popGet): moved assert to more appropriate place
 	  (popGetExternal): create pCode operand from and mark the according
 	    symbol as being `extern'
@@ -27222,7 +27222,7 @@
 	* src/pic/main.h: declare pic14_options
 	* src/pic/pcode.c: fixed instructions i/o relations,
 	  (RegCond): reverted to correct version,
-	  (newpCodeOpLit): cate literals to 8 bit,
+	  (newpCodeOpLit): truncate literals to 8 bit,
 	  (genericPrint): added debug output,
 	  (getRegFromInstruction): fixed for various operand types, simplified
 	  (BuildFlow): fixed broken handling of isntructions with labels
@@ -29207,7 +29207,7 @@
 
 	* src/SDCCglobl.h: ensure that PATH_MAX >= 2048 to guarantee
 	  cmdLine buffers (used when calling sdcpp...) are large enough
-	  (MAX_PATH=256 cates arguments leading to system halts when
+	  (MAX_PATH=256 truncates arguments leading to system halts when
 	  used in MinGW...)
 	* src/pic16/gen.c (pic16_sameRegs): relaxed size criterion
 	* (genUminus): rewritten to for efficiency
@@ -30821,7 +30821,7 @@
 	* support/regression/ports/mcs51-stack-auto/spec.mk: added dependencies
 	  _memcmp.c _memmove.c calloc.c realloc.c free.c
 	* support/regression/tests/malloc.c: added tests for new functionality
-	* support/regression/tests/zeropad.c: added tests for cated initializers
+	* support/regression/tests/zeropad.c: added tests for truncated initializers
 	  and initialized char arrays starting with '\x0'
 	* src/mcs51/peeph.def: fixed regression, added peephole 177.f
 
@@ -36373,7 +36373,7 @@
 
 2002-01-28  Bernhard Held  <bernhard AT bernhardheld.de>
 
-	* sim/ucsim: Merged branch ucsim-034-pre3 to main k; new version 0.4
+	* sim/ucsim: Merged branch ucsim-034-pre3 to main trunk; new version 0.4
 
 2002-01-26  Bernhard Held  <bernhard AT bernhardheld.de>
 

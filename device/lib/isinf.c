@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   isnan.c - Check if a float value is an NaN (Not a Number)
+   isinf.c - Check if a float value is an infinite (positive or negative)
 
    Copyright (C) 2016, Ben Shi, powerstudio1st@163.com
 

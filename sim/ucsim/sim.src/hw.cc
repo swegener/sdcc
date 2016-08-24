@@ -70,7 +70,9 @@ cl_hw::init(void)
   chars n(id_string);
   char s[100];
   int i;
-    
+
+  on= true;
+  
   snprintf(s, 99, "%d", id);
   n+= '_';
   n+= s;

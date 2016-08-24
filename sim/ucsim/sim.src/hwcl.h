@@ -50,6 +50,7 @@ class cl_hw: public cl_guiobj
   enum hw_cath cathegory;
   int id;
   const char *id_string;
+  bool on;
  protected:
   class cl_list *partners;
   class cl_address_space *cfg;

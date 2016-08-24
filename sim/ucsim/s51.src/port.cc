@@ -90,6 +90,18 @@ cl_port::init(void)
   for (i= 0; i < 8; i++)
     bit_cells[i]= register_cell(bas, addr_p+i);
   prev= cell_p->get();
+
+  cl_var *v;
+  chars pn;
+  pn= cchars("port");
+  pn.append("%d_", id);
+  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, port51_on));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+cchars("pin"), cfg, port51_pin));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+cchars("pins"), cfg, port51_pin));
+  v->init();
+  
   return(0);
 }
 
@@ -106,6 +118,7 @@ cl_port::read(class cl_memory_cell *cell)
       bool pv= port_pins & (1 << bi);
       return (cv && pv)?1:0;
     }
+  conf(cell, NULL);
   return cell->get();
 }
 
@@ -132,6 +145,8 @@ cl_port::write(class cl_memory_cell *cell, t_mem *val)
       else
 	nv&= ~m;
     }
+
+  conf(cell, val);
   
   ep.id= id;
   ep.addr= addr_p;
@@ -143,32 +158,64 @@ cl_port::write(class cl_memory_cell *cell, t_mem *val)
   prev= cell_p->get();
 }
 
+t_mem
+cl_port::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  switch (addr)
+    {
+    case port51_on: // turn this HW on/off
+      if (val)
+	{
+	  if (*val)
+	    on= true;
+	  else
+	    on= false;
+	}
+      else
+	{
+	  cell->set(on?1:0);
+	}
+      break;
+    case port51_pin: // get/set PINS
+      if (val)
+	set_pin(*val);
+      else
+	cell->set(port_pins);
+      break;
+    }
+  return cell->get();
+}
+
+void
+cl_port::set_pin(t_mem val)
+{
+  struct ev_port_changed ep;
+  t_mem value= val & 0xff;
+
+  ep.id= id;
+  ep.addr= addr_p;
+  ep.pins= port_pins;
+  port_pins= value;
+  ep.prev_value= cell_p->get();
+  ep.new_value= cell_p->get();
+  ep.new_pins= port_pins;
+  if (ep.pins != ep.new_pins)
+    inform_partners(EV_PORT_CHANGED, &ep);
+}
+
 void
 cl_port::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
-  struct ev_port_changed ep;
   class cl_cmd_arg *params[1]= { cmdline->param(0) };
-  long value;
 
   if (cmdline->syntax_match(uc, NUMBER))
     {
-      value= params[0]->value.number & 0xff;
-
-      ep.id= id;
-      ep.addr= addr_p;
-      ep.pins= port_pins;
-      port_pins= value;
-      ep.prev_value= cell_p->get();
-      ep.new_value= cell_p->get();
-      ep.new_pins= port_pins;
-      if (ep.pins != ep.new_pins)
-	inform_partners(EV_PORT_CHANGED, &ep);
+      set_pin(params[0]->value.number);
     }
   else
     {
       con->dd_printf("set hardware port[%d] pins_value\n                   Set port pins\n",
 		     id);
-      value= 0;
     }
 }
 

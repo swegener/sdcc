@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simif.cc 371 2016-07-17 12:55:09Z  $ */
+/* $Id: simif.cc 421 2016-08-24 15:54:50Z drdani $ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -526,6 +526,8 @@ cl_simulator_interface::init(void)
   c->init();
 
   cl_var *v;
+  uc->vars->add(v= new cl_var(cchars("simif_on"), cfg, simif_on));
+  v->init();
   uc->vars->add(v= new cl_var(cchars("sim_run"), cfg, simif_run));
   v->init();
   uc->vars->add(v= new cl_var(cchars("sim_start"), cfg, simif_start));
@@ -674,6 +676,19 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
   switch (addr)
     {
+    case simif_on: // turn this HW on/off
+      if (val)
+	{
+	  if (*val)
+	    on= true;
+	  else
+	    on= false;
+	}
+      else
+	{
+	  cell->set(on?1:0);
+	}
+      break;
     case simif_run: // simulator runing: true= run, false= stop
       if (val)
 	{
@@ -716,6 +731,7 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     case simif_reason: // reason of last stop
       if (val)
 	*val= cell->get();
+      break;
     case simif_xtal: // xtal frequ
       if (val)
 	uc->xtal= *val;

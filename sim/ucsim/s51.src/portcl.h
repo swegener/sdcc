@@ -35,6 +35,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+enum port51_cfg {
+  port51_on		= 0, // RW
+  port51_pin		= 1, // RW
+};
+
 class cl_port: public cl_hw
 {
 public:
@@ -46,10 +51,14 @@ public:
 public:
   cl_port(class cl_uc *auc, int aid);
   virtual int init(void);
+  virtual int cfg_size(void) { return 2; }
 
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 
+  virtual void set_pin(t_mem val);
+    
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
 

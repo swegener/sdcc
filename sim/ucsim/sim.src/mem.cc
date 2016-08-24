@@ -215,7 +215,7 @@ cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_console_base *con)
              (start+i*step != stop);
            i++)
         {
-          con->dd_printf(data_format, /*read*/get(start+i*step)); con->dd_printf(" ");
+          con->dd_printf(data_format, read/*get*/(start+i*step)); con->dd_printf(" ");
         }
       while (i < bpl)
         {

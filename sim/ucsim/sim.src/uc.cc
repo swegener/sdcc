@@ -1553,7 +1553,8 @@ cl_uc::tick_hw(int cycles)
   for (i= 0; i < hws->count; i++)
     {
       hw= (class cl_hw *)(hws->at(i));
-      if (hw->flags & HWF_INSIDE)
+      if ((hw->flags & HWF_INSIDE) &&
+	  (hw->on))
 	hw->tick(cycles);
     }
   do_extra_hw(cycles);

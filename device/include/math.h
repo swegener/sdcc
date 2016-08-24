@@ -103,4 +103,6 @@ float ceilf(float x) _FLOAT_FUNC_REENTRANT;
 float floorf(float x) _FLOAT_FUNC_REENTRANT;
 float modff(float x, float * y);
 
+int isnan(float f);
+int isinf(float f);
 #endif  /* _INC_MATH */

@@ -2309,7 +2309,7 @@ valDiv (value * lval, value * rval)
 {
   value *val;
 
-  if (isEqualVal (rval, 0))
+  if (isEqualVal (rval, 0) && !IS_FLOAT (computeType (lval->etype, rval->etype, RESULT_TYPE_INT, '/')))
     {
       werror (E_DIVIDE_BY_ZERO);
       return rval;

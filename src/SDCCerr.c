@@ -295,7 +295,7 @@ struct
      "cannot compile more than one source file. file '%s' ignored", 0 },
   { I_CYCLOMATIC, ERROR_LEVEL_INFO,
      "function '%s', # edges %d , # nodes %d , cyclomatic complexity %d", 0 },
-  { E_DIVIDE_BY_ZERO, ERROR_LEVEL_ERROR,
+  { E_DIVIDE_BY_ZERO, ERROR_LEVEL_WARNING,
      "dividing by ZERO", 0 },
   { E_FUNC_BIT, ERROR_LEVEL_ERROR,
      "function cannot return 'bit'", 0 },

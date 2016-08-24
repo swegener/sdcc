@@ -2988,6 +2988,23 @@ checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit)
     }
 }
 
+/*-----------------------------*/
+/* check if div or mod by zero */
+/*-----------------------------*/
+static void
+checkZero (value *val)
+{
+  if (!val)
+    return;
+
+  if ((IS_FLOAT (val->type) || IS_FIXED16X16 (val->type)) && floatFromVal (val) == 0.0)
+    werror (E_DIVIDE_BY_ZERO);
+  else if (SPEC_LONGLONG (val->type) && ullFromVal (val) == 0LL)
+    werror (E_DIVIDE_BY_ZERO);
+  else if (ulFromVal (val) == 0L)
+    werror (E_DIVIDE_BY_ZERO);
+}
+
 /*--------------------------------------------------------------------*/
 /* decorateType - compute type for this tree, also does type checking.*/
 /* This is done bottom up, since type has to flow upwards.            */
@@ -3656,6 +3673,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           werrorfl (tree->filename, tree->lineno, E_INVALID_OP, "divide");
           goto errorTreeReturn;
         }
+      /* check if div by zero */
+      if (IS_LITERAL (RTYPE (tree)) && !IS_LITERAL (LTYPE (tree)))
+        checkZero (valFromType (RETYPE (tree)));
       /* if they are both literal then */
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
@@ -3728,6 +3748,9 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           fprintf (stderr, "\n");
           goto errorTreeReturn;
         }
+      /* check if div by zero */
+      if (IS_LITERAL (RTYPE (tree)) && !IS_LITERAL (LTYPE (tree)))
+        checkZero (valFromType (RETYPE (tree)));
       /* if they are both literal then */
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))

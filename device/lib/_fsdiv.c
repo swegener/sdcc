@@ -271,7 +271,7 @@ union float_long
   };
 
 /* divide two floats */
-float __fsdiv (float a1, float a2)
+static float __fsdiv_org (float a1, float a2)
 {
   volatile union float_long fl1, fl2;
   volatile long result;
@@ -279,7 +279,7 @@ float __fsdiv (float a1, float a2)
   volatile long mant1, mant2;
   volatile int exp;
   char sign;
-
+ 
   fl1.f = a1;
   fl2.f = a2;
 
@@ -344,6 +344,23 @@ float __fsdiv (float a1, float a2)
   else
     fl1.l = PACK (sign ? SIGNBIT : 0 , exp, result);
   return (fl1.f);
+}
+
+float __fsdiv (float a1, float a2)
+{
+  float f;
+  unsigned long *p = (unsigned long *) &f;
+
+  if (a2 == 0.0f && a1 > 0.0f)
+    *p = 0x7f800000; // inf
+  else if (a2 == 0.0f && a1 < 0.0f)
+    *p = 0xff800000; // -inf
+  else if (a2 == 0.0f && a1 == 0.0f)
+    *p = 0xffc00000; // nan
+  else
+    f = __fsdiv_org (a1, a2);
+
+  return f; 
 }
 
 #endif

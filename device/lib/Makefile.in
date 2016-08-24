@@ -82,7 +82,7 @@ SOURCES_FLOAT = $(COMMON_FLOAT) \
   _fsreturnval.c \
   _fsrshift.c \
   _fsswapargs.c \
-  _logexpf.c
+  _logexpf.c 
 
 SOURCES_INT = $(COMMON_INT) \
   _divsint.c \

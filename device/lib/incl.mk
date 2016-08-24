@@ -46,7 +46,9 @@ COMMON_FLOAT = \
   floorf.c \
   ceilf.c \
   modff.c \
-  errno.c
+  errno.c \
+  isinf.c \
+  isnan.c
 
 COMMON_LONG = \
   _divslong.c \

@@ -3931,12 +3931,7 @@ genFunction (iCode * ic)
           genLine.lineElement.ic = ric;
           D (emitcode (";", "genReceive"));
           for (ofs = 0; ofs < sym->recvSize; ofs++)
-            {
-              if (EQ (fReturn[ofs], "a"))
-                emitcode ("push", "acc");       /* without pushed++ */
-              else
-                emitcode ("push", fReturn[ofs]);        /* without pushed++ */
-            }
+            _G.stack.pushed--, emitpush (fReturn[ofs]);        /* cancel out pushed++ from emitpush()*/
           stackAdjust -= sym->recvSize;
           if (stackAdjust < 0)
             {

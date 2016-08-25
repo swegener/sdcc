@@ -4,6 +4,8 @@
 	  Explicitly cast away const to silence a warning.
 	* support/regression/tests/gcc-torture-execute-20020508-?.c:
 	  Disable some failing long long tests for mcs51.
+	* src/mcs51/gen.c:
+	  Fix pushing of long long received parameters for mcs51.
 
 2016-08-24 Ben Shi <powerstudio1st AT 163 DOT com>
 

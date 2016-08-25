@@ -1,5 +1,11 @@
 2016-08-25 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/mcs51/gen.c,
+	  support/regression/tests/gcc-torture-execute-20020508-?.c:
+	  Fix long long right shift for mcs51.
+
+2016-08-25 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/_strchr.c:
 	  Explicitly cast away const to silence a warning.
 	* support/regression/tests/gcc-torture-execute-20020508-?.c:

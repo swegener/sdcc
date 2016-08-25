@@ -9118,19 +9118,20 @@ genlshFour (operand * result, operand * left, int shCount)
 }
 
 /*-----------------------------------------------------------------*/
-/* genlshFour - shift 8 bytes   by a known amount != 0             */
+/* genlshAny - shift an ynumber of bytes   by a known amount != 0  */
 /*-----------------------------------------------------------------*/
 static void
-genlsh8 (operand *result, operand *left, int shCount)
+genlshAny (operand *result, operand *left, int shCount)
 {
   int size, size2, offset;
 
-  D (emitcode (";", "genlsh8"));
+  D (emitcode (";", "genlshAny"));
 
   size = AOP_SIZE (result);
 
-  for (size2 = size, offset = 0; size2 > 0; size2--, offset++)
-    aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
+  if (!operandsEqu (result, left))
+    for (size2 = size, offset = 0; size2 > 0; size2--, offset++)
+      aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
 
   while (shCount--)
     {
@@ -9204,12 +9205,8 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
           genlshFour (result, left, shCount);
           break;
 
-        case 8:
-          genlsh8 (result, left, shCount);
-          break;
-
         default:
-          werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "*** ack! mystery literal shift!\n");
+          genlshAny (result, left, shCount);
           break;
         }
     }
@@ -9475,7 +9472,7 @@ shiftRLong (operand * left, int offl, operand * result, int sign)
 /* genrshFour - shift four byte by a known amount != 0             */
 /*-----------------------------------------------------------------*/
 static void
-genrshFour (operand * result, operand * left, int shCount, int sign)
+genrshFour (operand *result, operand *left, int shCount, int sign)
 {
   D (emitcode (";", "genrshFour"));
 
@@ -9543,6 +9540,42 @@ genrshFour (operand * result, operand * left, int shCount, int sign)
 }
 
 /*-----------------------------------------------------------------*/
+/* genrshAny - shift any number of bytes by a known amount != 0    */
+/*-----------------------------------------------------------------*/
+static void
+genrshAny (operand *result, operand *left, int shCount, int sign)
+{
+  int size, size2, offset;
+
+  D (emitcode (";", "genrshAny"));
+
+  size = AOP_SIZE (result);
+
+  if (!operandsEqu (result, left))
+    for (size2 = size, offset = 0; size2 > 0; size2--, offset++)
+      aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);
+
+  while (shCount--)
+    {
+      MOVA (aopGet (result, size - 1, FALSE, FALSE));
+      if (!sign)
+        emitcode ("clr", "c");
+      else
+        emitcode ("mov", "c,acc.7");
+      emitcode ("rrc", "a");
+      aopPut (result, "a", size - 1);
+
+      for(size2 = size - 1, offset = size - 2; size2 > 0; size2--, offset--)
+        {
+
+          MOVA (aopGet (result, offset, FALSE, FALSE));
+          emitcode ("rrc", "a");
+          aopPut (result, "a", offset);
+        }
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genRightShiftLiteral - right shifting by known count            */
 /*-----------------------------------------------------------------*/
 static void
@@ -9601,6 +9634,7 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, iCode *
           break;
 
         default:
+          genrshAny (result, left, shCount, sign);
           break;
         }
     }

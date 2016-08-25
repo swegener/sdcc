@@ -37,6 +37,7 @@ chars::chars(void)
 {
   chars_string= 0;
   chars_length= 0;
+  dynamic= false;
 }
 
 chars::chars(char *s)
@@ -48,16 +49,39 @@ chars::chars(char *s)
 
 chars::chars(const char *s)
 {
+  if ((chars_string= (char*)s) != NULL)
+    chars_length= strlen(s);
+  else
+    chars_length= 0;
+  dynamic= false;
+}
+/*
+chars::chars(const char *s)
+{
   chars_string= 0;
   chars_length= 0;
   allocate_string((char*)s);
 }
-
+*/
 chars::chars(const chars &cs)
 {
   chars_string= 0;
   chars_length= 0;
   allocate_string((char*)cs);
+}
+
+chars::chars(const char *, const char *fmt, ...)
+{
+  va_list ap;
+  char n[1000];
+
+  va_start(ap, fmt);
+  vsnprintf(n, 999, fmt, ap);
+  va_end(ap);
+
+  chars_string= strdup(n);
+  chars_length= strlen(n);
+  dynamic= true;
 }
 
 chars::~chars(void)
@@ -73,8 +97,9 @@ chars::allocate_string(char *s)
   if (s)
     {
       chars_length= strlen(s);
-      chars_string= (char*)malloc(chars_length+1);//new char[chars_length+1];
+      chars_string= (char*)malloc(chars_length+1);
       strcpy(chars_string, s);
+      dynamic= true;
     }
 }
 
@@ -82,9 +107,11 @@ void
 chars::deallocate_string(void)
 {
   if (chars_string)
-    free(chars_string);//delete [] chars_string;
+    if (dynamic)
+      free(chars_string);
   chars_string= 0;
   chars_length= 0;
+  dynamic= 0;
 }
 
 
@@ -94,17 +121,20 @@ chars::append(char *s)
   if (!s)
     return(*this);
 
-  char *temp= new char[chars_length + strlen(s) + 1];
+  char *temp= (char*)malloc(chars_length + strlen(s) + 1);
   if (chars_string)
-    strcpy(temp, chars_string);
+    {
+      strcpy(temp, chars_string);
+      if (dynamic)
+	free(chars_string);
+    }
   else
     temp[0]= '\0';
   strcat(temp, s);
-  //allocate_string(temp);
   chars_string= temp;
   chars_length+= strlen(s);
-  //delete [] temp;
-
+  dynamic= true;
+  
   return *this;
 }
 
@@ -114,19 +144,22 @@ chars::append(char c)
   if (!c)
     return(*this);
 
-  char *temp= new char[chars_length + 1 + 1];
+  char *temp= (char*)malloc(chars_length + 1 + 1);
   if (chars_string)
-    strcpy(temp, chars_string);
+    {
+      strcpy(temp, chars_string);
+      if (dynamic)
+	free(chars_string);
+    }
   else
     temp[0]= '\0';
   char b[2];
   b[0]= c;
   b[1]= 0;
   strcat(temp, b);
-  //allocate_string(temp);
   chars_string= temp;
   chars_length+= 1;
-  //delete [] temp;
+  dynamic= true;
 
   return *this;
 }
@@ -141,15 +174,20 @@ chars::append(const char *format, ...)
   vsnprintf(n, 999, format, ap);
   va_end(ap);
 
-  char *temp= new char[chars_length + strlen(n) + 1];
+  char *temp= (char*)malloc(chars_length + strlen(n) + 1);
   if (chars_string)
-    strcpy(temp, chars_string);
+    {
+      strcpy(temp, chars_string);
+      if (dynamic)
+	free(chars_string);
+    }
   else
     temp[0]= '\0';
   strcat(temp, n);
   chars_string= temp;
   chars_length+= strlen(n);
-
+  dynamic= true;
+  
   return *this;
 }
 
@@ -157,6 +195,12 @@ bool
 chars::empty()
 {
   return chars_length == 0;
+}
+
+bool
+chars::is_null()
+{
+  return chars_string == NULL;
 }
 
 // Assignment operators
@@ -300,7 +344,7 @@ chars(s)
 {
 }
 */
-
+/*
 cchars::cchars(char const *s):
 chars(s)
 {
@@ -315,11 +359,6 @@ void
 cchars::allocate_string(const char *s)
 {
   deallocate_string();
-  /*if (s)
-    {
-      chars_length= strlen(s);
-      chars_string= s
-      }*/
   allocate_string((char*)s);
 }
 
@@ -329,6 +368,6 @@ cchars::deallocate_string(void)
   chars_string= 0;
   chars_length= 0;
 }
-
+*/
 
 /* End of chars.cc */

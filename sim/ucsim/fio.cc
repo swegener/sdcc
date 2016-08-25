@@ -988,9 +988,14 @@ cl_f::write(char *buf, int count)
       // on socket, assume telnet
       for (i= 0; i < count; i++)
 	{
+	  int j;
 	  if ((buf[i] == '\r') ||
 	      (buf[i] == '\n'))
-	    ::write(file_id, "\r\n", 2);
+	    {
+	      j= ::write(file_id, "\r\n", 2);
+	      if (j != 2)
+		;
+	    }
 	    /*{
 	      deb("Outputting LineEnd=%d to fid=%d\n",buf[i],file_id);
 	      if (last_ln == 0)
@@ -1008,7 +1013,11 @@ cl_f::write(char *buf, int count)
 		deb("LE=%d != memorized=%d, skip\n", buf[i], last_ln);
 		}*/
 	  else
-	    ::write(file_id, &buf[i], 1);
+	    {
+	      j= ::write(file_id, &buf[i], 1);
+	      if (j != 1)
+		;
+	    }
 	}
       return i;
     }

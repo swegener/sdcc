@@ -1,7 +1,7 @@
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
-	rm -f *core *[%~] *.[oa] *.so ucsim$(EXEEXT)
+	rm -f *core *[%~] *.[oa] *.so ucsim$(EXEEXT) ucsim.map
 	rm -f .[a-z]*~ ptt
 
 

@@ -60,8 +60,7 @@ cl_base::cl_base(void)
 
 cl_base::~cl_base(void)
 {
-  if (name)
-    free((void*)name);
+  //if (name) free((void*)name);
   if (children)
     {
       int i;
@@ -87,6 +86,7 @@ cl_base::get_name(const char *def)
 const char *
 cl_base::set_name(const char *new_name)
 {
+  /*
   if (name)
     free((void*)name);
   if (!new_name)
@@ -95,6 +95,8 @@ cl_base::set_name(const char *new_name)
     name= strdup(new_name);
   else
     name= strdup("");
+  */
+  name= new_name;
   return(name);
 }
 
@@ -105,15 +107,14 @@ cl_base::set_name(const char *new_name, const char *def_name)
 
   if (!def_name ||
       *def_name == '\0')
-    def= strdup("");
+    def= /*strdup*/cchars("");
   else
-    def= strdup(def_name);
-  if (name)
-    free((void*)name);
+    def= /*strdup*/cchars(def_name);
+  // if (name) free((void*)name);
   if (!new_name)
     name= def;
   else if (*new_name)
-    name= strdup(new_name);
+    name= /*strdup*/(new_name);
   else
     name= def;
   return(name);
@@ -122,21 +123,22 @@ cl_base::set_name(const char *new_name, const char *def_name)
 bool
 cl_base::is_named(const char *the_name)
 {
+  /*
   if (!name ||
       !*name ||
       !the_name ||
       !*the_name)
-    return(false);
-  return(strcmp(name, the_name) == 0);
+      return(false);*/
+  return(/*strcmp(name, the_name) == 0*/name==the_name);
 }
 
 bool
 cl_base::is_inamed(const char *the_name)
 {
-  if (!name ||
+  if (/*!name ||
       !*name ||
       !the_name ||
-      !*the_name)
+      !*the_name*/name.empty())
     return(false);
   return(strcasecmp(name, the_name) == 0);
 }
@@ -155,11 +157,14 @@ cl_base::add_child(class cl_base *child)
 {
   if (!children)
     {
+      /*
       char *s;
-      s= (char*)malloc(strlen(get_name("?"))+100);
+      s= (char*)malloc(name.len()+100);
       sprintf(s, "children of %s", get_name("?"));
-      children= new cl_list(1, 1, s);
-      free(s);
+      */
+      chars cs("", "children of %s", get_name("?"));
+      children= new cl_list(1, 1, cs);
+      //free(s);
     }
   if (child)
     {

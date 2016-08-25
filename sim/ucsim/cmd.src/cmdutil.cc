@@ -144,23 +144,29 @@ extern "C" int vsnprintf(char *str, size_t size,const char *format,va_list ap);
 int
 cmd_vfprintf(FILE *f, char *format, va_list ap)
 {
-  int ret;
+  int ret, i;
   if (!f)
     return(0);
 #ifdef HAVE_VASPRINTF
   char *msg= NULL;
-  vasprintf(&msg, format, ap);
+  i= vasprintf(&msg, format, ap);
+  if (i < 0)
+    ;
   ret= fprintf(f, "%s", msg);
   free(msg);
 #else
 #  ifdef HAVE_VSNPRINTF
   char msg[80*25];
-  vsnprintf(msg, 80*25, format, ap);
+  i= vsnprintf(msg, 80*25, format, ap);
+  if (i < 0)
+    ;
   ret= fprintf(f, "%s", msg);
 #  else
 #    ifdef HAVE_VPRINTF
   char msg[80*25];
-  vsprintf(msg, format, ap); /* Dangerous */
+  i= vsprintf(msg, format, ap); /* Dangerous */
+  if (i < 0)
+    ;
   ret= fprintf(f, "%s", msg);
 #    else
 #      ifdef HAVE_DOPRNT

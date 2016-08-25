@@ -34,11 +34,13 @@ class chars
 protected:
   char *chars_string;	// stores the value
   int chars_length;	// track of string length
+  bool dynamic;
 public:
   chars(void);
   chars(char *s);
   chars(const char *s);
   chars(const chars &cs);
+  chars(const char *, const char *fmt, ...);
   virtual ~chars(void);
 private:
   virtual void allocate_string(char *s);
@@ -49,6 +51,7 @@ public:
   virtual chars &append(char c);
   virtual chars &append(const char *format, ...);
   virtual bool empty();
+  virtual bool is_null();
   virtual int len() { return chars_length; }
   
 public:
@@ -84,7 +87,7 @@ extern bool operator==(const char *s, const chars &cs);
 extern bool operator!=(char *s, const chars &cs);
 extern bool operator!=(const char *s, const chars &cs);
 
-
+/*
 class cchars: public chars
 {
  public:
@@ -95,6 +98,9 @@ class cchars: public chars
   virtual void allocate_string(const char *s);
   virtual void deallocate_string(void);
 };
+*/
+
+#define cchars chars
 
 #endif
 

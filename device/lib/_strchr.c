@@ -40,6 +40,6 @@ char * strchr ( const char * string, int ch )
 		string++;
 
 	if (*string == ch)
-		return(string);
+		return((char *)string);
 	return ( NULL );
 }

@@ -1,3 +1,8 @@
+2016-08-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/_strchr.c:
+	  Explicitly cast away const to silence a warning.
+
 2016-08-24 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* device/include/math.h

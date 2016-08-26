@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial_hwcl.h 435 2016-08-26 17:57:43Z drdani $ */
+/* $Id$ */
 
 #ifndef SERIAL_HWCL_HEADER
 #define SERIAL_HWCL_HEADER

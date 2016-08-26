@@ -110,8 +110,6 @@ class cl_commander: public cl_commander_base
 private:
   //fd_set read_set, active_set;
   //UCSOCKET_T fd_num;
-  class cl_list *active_inputs;
-  class cl_list *check_list;
   
 public:
   cl_commander(class cl_app *the_app, class cl_cmdset *acmdset)

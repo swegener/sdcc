@@ -170,13 +170,16 @@ class cl_console_base: public cl_base
 
 class cl_commander_base: public cl_base
 {
-public:
+ public:
   class cl_app *app;
   class cl_list *cons;
   class cl_console_base *actual_console, *frozen_console, *config_console;
   class cl_cmdset *cmdset;
+ protected:
+  class cl_list *active_inputs;
+  class cl_list *check_list;
 
-public:
+ public:
   cl_commander_base(class cl_app *the_app, class cl_cmdset *acmdset);
   virtual ~cl_commander_base(void);
 

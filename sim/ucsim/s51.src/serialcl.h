@@ -31,7 +31,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "fiocl.h"
 #include "stypes.h"
 #include "pobjcl.h"
+
 #include "uccl.h"
+#include "serial_hwcl.h"
+
 #include "newcmdposixcl.h"
 
 //#include "newcmdcl.h"
@@ -42,18 +45,12 @@ enum serial_cfg {
 
 class cl_serial_listener;
 
-class cl_serial: public cl_hw
+class cl_serial: public cl_serial_hw
 {
 protected:
   class cl_address_space *sfr, *bas;
   bool there_is_t2, t2_baud;
   class cl_memory_cell *sbuf, *pcon, *scon, *scon_bits[8];
-  class cl_optref *serial_in_file_option;
-  class cl_optref *serial_out_file_option;
-  class cl_optref *serial_port_option;
-  class cl_serial_listener *listener;
-  class cl_f *fin;	// Serial line input
-  class cl_f *fout;	// Serial line output
   uchar s_in;		// Serial channel input reg
   uchar s_out;		// Serial channel output reg
   bool  s_sending;	// Transmitter is working
@@ -81,28 +78,14 @@ public:
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 
-  //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
-
   virtual int  serial_bit_cnt(void);
   virtual void received(int c);
 
   virtual int tick(int cycles);
   virtual void reset(void);
   virtual void happen(class cl_hw *where, enum hw_event he, void *params);
-  virtual void new_io(class cl_f *f_in, class cl_f *f_out);
   
   virtual void print_info(class cl_console_base *con);
-};
-
-
-class cl_serial_listener: public cl_listen_console
-{
- public:
-  class cl_serial *serial_hw;
-  cl_serial_listener(int serverport, class cl_app *the_app,
-		     class cl_serial *the_serial);
-  virtual int proc_input(class cl_cmdset *cmdset);
-  virtual bool prevent_quit(void) { return false; }
 };
 
 

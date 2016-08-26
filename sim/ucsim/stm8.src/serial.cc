@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 425 2016-08-24 18:39:28Z drdani $ */
+/* $Id: serial.cc 435 2016-08-26 17:57:43Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -54,11 +54,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_serial::cl_serial(class cl_uc *auc,
 		     t_addr abase,
 		     int ttype):
-  cl_hw(auc, HW_UART, ttype, "uart")
+  cl_serial_hw(auc, ttype, "uart")
 {
-  fin= 0;
-  fout= 0;
-  listener= 0;
   type= ttype;
   base= abase;
 }
@@ -66,22 +63,15 @@ cl_serial::cl_serial(class cl_uc *auc,
 
 cl_serial::~cl_serial(void)
 {
-  if (fout)
-    delete fout;
-  if (fin)
-    delete fin;
-  delete serial_in_file_option;
-  delete serial_out_file_option;
 }
 
 int
 cl_serial::init(void)
 {
-  char *s;
   int i;
 
   set_name("stm8_uart");
-  cl_hw::init();
+  cl_serial_hw::init();
   for (i= 0; i < 12; i++)
     {
       regs[i]= register_cell(uc->rom, base+i);
@@ -106,61 +96,6 @@ cl_serial::init(void)
 				    "usart receive", 20*10+3));
 
   sr_read= false;
-  
-  s= format_string("serial%d_in_file", id);
-  serial_in_file_option= new cl_optref(this);
-  serial_in_file_option->init();
-  serial_in_file_option->use(s);
-  free(s);
-  s= format_string("serial%d_out_file", id);
-  serial_out_file_option= new cl_optref(this);
-  serial_out_file_option->init();
-  serial_out_file_option->use(s);
-  free(s);
-  s= format_string("serial%d_port", id);
-  serial_port_option= new cl_optref(this);
-  serial_port_option->init();
-  class cl_option *o= serial_port_option->use(s);
-  free(s);
-  if (o)
-    {
-      int port= serial_port_option->get_value((long)0);
-      if (port > 0)
-	listener= new cl_serial_listener(port, application, this);
-      class cl_commander_base *c= application->get_commander();
-      c->add_console(listener);
-    }
-  
-  char *f_serial_in = (char*)serial_in_file_option->get_value((char*)0);
-  char *f_serial_out= (char*)serial_out_file_option->get_value((char*)0);
-  if (f_serial_in)
-    {
-      if (f_serial_in[0] == '\001')
-	fin= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
-      else
-	fin= mk_io(chars(f_serial_in), cchars("r"));
-      //fin->save_attributes();
-      fin->set_terminal();
-      if (!fin->tty)
-	fprintf(stderr, "Warning: serial input interface connected to a "
-		"non-terminal file.\n");
-    }
-  else
-    fin= mk_io(chars(""), chars(""));
-  if (f_serial_out)
-    {
-      if (f_serial_out[0] == '\001')
-	fout= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
-      else
-	fout= mk_io(chars(f_serial_out), "w");
-      //fout->save_attributes();
-      fout->set_terminal();
-      if (!fout->tty)
-	fprintf(stderr, "Warning: serial output interface connected to a "
-		"non-terminal file.\n");
-    }
-  else
-    fout= mk_io(chars(""), chars(""));
 
   cl_var *v;
   chars pn(id_string);
@@ -392,22 +327,6 @@ cl_serial::reset(void)
 }
 
 void
-cl_serial::new_io(class cl_f *f_in, class cl_f *f_out)
-{
-  if (fin)
-    delete fin;
-  if (fout)
-    delete fout;
-  fin= f_in;
-  fout= f_out;
-  fin->set_telnet(true);
-  fin->set_terminal();
-  fout->set_terminal();
-  //printf("usart[%d] now using fin=%d fout=%d\n", id, fin->file_id, fout->file_id);
-}
-
-
-void
 cl_serial::pick_div()
 {
   uint8_t b1= regs[brr1]->get();
@@ -490,24 +409,6 @@ cl_serial::print_info(class cl_console_base *con)
   con->dd_printf("Output: ");
   if (fout)
     con->dd_printf("%s/%d\n", fout->get_file_name(), fout->file_id);
-}
-
-
-cl_serial_listener::cl_serial_listener(int serverport, class cl_app *the_app,
-				       class cl_serial *the_serial):
-  cl_listen_console(serverport, the_app)
-{
-  serial_hw= the_serial;
-}
-
-int
-cl_serial_listener::proc_input(class cl_cmdset *cmdset)
-{
-  class cl_f *i, *o;
-
-  srv_accept(fin, &i, &o);
-  serial_hw->new_io(i, o);
-  return 0;
 }
 
 

@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serialcl.h 425 2016-08-24 18:39:28Z drdani $ */
+/* $Id: serialcl.h 435 2016-08-26 17:57:43Z drdani $ */
 
 #ifndef STM8_SERIALCL_HEADER
 #define STM8_SERIALCL_HEADER
@@ -33,7 +33,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "fiocl.h"
 #include "stypes.h"
 #include "pobjcl.h"
+
 #include "uccl.h"
+#include "serial_hwcl.h"
+
 #include "newcmdposixcl.h"
 
 
@@ -58,7 +61,7 @@ enum reg_idx {
   pscr	= 11
 };
 
-class cl_serial: public cl_hw
+class cl_serial: public cl_serial_hw
 {
  protected:
   t_addr base;
@@ -80,13 +83,6 @@ class cl_serial: public cl_hw
   bool    ten;		// Transmitter is enabled
   bool    en;		// USART is enabled
  public:
-  class cl_optref *serial_in_file_option;
-  class cl_optref *serial_out_file_option;
-  class cl_optref *serial_port_option;
-  class cl_serial_listener *listener;
-  class cl_f *fin;	// Serial line input
-  class cl_f *fout;	// Serial line output
- public:
   cl_serial(class cl_uc *auc,
 	    t_addr abase,
 	    int ttype);
@@ -106,7 +102,6 @@ class cl_serial: public cl_hw
   virtual void finish_send();
   virtual void received();
   virtual void reset(void);
-  virtual void new_io(class cl_f *f_in, class cl_f *f_out);
 
   virtual void pick_div();
   virtual void pick_ctrl();
@@ -117,18 +112,6 @@ class cl_serial: public cl_hw
   virtual void set_dr(t_mem val);
   
   virtual void print_info(class cl_console_base *con);
-};
-
-
-
-class cl_serial_listener: public cl_listen_console
-{
- public:
-  class cl_serial *serial_hw;
-  cl_serial_listener(int serverport, class cl_app *the_app,
-		     class cl_serial *the_serial);
-  virtual int proc_input(class cl_cmdset *cmdset);
-  virtual bool prevent_quit(void) { return false; }
 };
 
 

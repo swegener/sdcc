@@ -49,30 +49,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 cl_serial::cl_serial(class cl_uc *auc):
-  cl_hw(auc, HW_UART, 0, "uart")
+  cl_serial_hw(auc, 0, "uart")
 {
-  fin= 0;
-  fout= 0;
-  listener= 0;
 }
 
 cl_serial::~cl_serial(void)
 {
-  if (fout)
-    delete fout;
-  if (fin)
-    delete fin;
-  delete serial_in_file_option;
-  delete serial_out_file_option;
 }
 
 int
 cl_serial::init(void)
 {
-  char *s;
-
-  cl_hw::init();
   set_name("mcs51_uart");
+  cl_serial_hw::init();
   sfr= uc->address_space(MEM_SFR_ID);
   bas= uc->address_space("bits");
   if (sfr)
@@ -86,61 +75,7 @@ cl_serial::init(void)
     {
       scon_bits[i]= register_cell(bas, SCON+i);
     }
-  
-  s= format_string("serial%d_in_file", id);
-  serial_in_file_option= new cl_optref(this);
-  serial_in_file_option->init();
-  serial_in_file_option->use(s);
-  free(s);
-  s= format_string("serial%d_out_file", id);
-  serial_out_file_option= new cl_optref(this);
-  serial_out_file_option->init();
-  serial_out_file_option->use(s);
-  free(s);
-  s= format_string("serial%d_port", id);
-  serial_port_option= new cl_optref(this);
-  serial_port_option->init();
-  class cl_option *o= serial_port_option->use(s);
-  free(s);
-  if (o)
-    {
-      int port= serial_port_option->get_value((long)0);
-      if (port > 0)
-	listener= new cl_serial_listener(port, application, this);
-      class cl_commander_base *c= application->get_commander();
-      c->add_console(listener);
-    }
-  
-  char *f_serial_in = (char*)serial_in_file_option->get_value((char*)0);
-  char *f_serial_out= (char*)serial_out_file_option->get_value((char*)0);
-  if (f_serial_in)
-    {
-      if (f_serial_in[0] == '\001')
-	fin= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
-      else
-	fin= mk_io(chars(f_serial_in), cchars("r"));
-      //fin->save_attributes();
-      fin->set_terminal();
-      if (!fin->tty)
-	fprintf(stderr, "Warning: serial input interface connected to a "
-		"non-terminal file.\n");
-    }
-  else
-    fin= mk_io(chars(""), chars(""));
-  if (f_serial_out)
-    {
-      if (f_serial_out[0] == '\001')
-	fout= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
-      else
-	fout= mk_io(chars(f_serial_out), "w");
-      //fout->save_attributes();
-      fout->set_terminal();
-      if (!fout->tty)
-	fprintf(stderr, "Warning: serial output interface connected to a "
-		"non-terminal file.\n");
-    }
-  else
-    fout= mk_io(chars(""), chars(""));
+
   class cl_hw *t2= uc->get_hw(HW_TIMER, 2, 0);
   if ((there_is_t2= t2 != 0))
     {
@@ -439,21 +374,6 @@ cl_serial::happen(class cl_hw *where, enum hw_event he, void *params)
 
 
 void
-cl_serial::new_io(class cl_f *f_in, class cl_f *f_out)
-{
-  if (fin)
-    delete fin;
-  if (fout)
-    delete fout;
-  fin= f_in;
-  fout= f_out;
-  fin->set_terminal();
-  fout->set_terminal();
-  //printf("usart[%d] now using fin=%d fout=%d\n", id, fin->file_id, fout->file_id);
-}
-
-
-void
 cl_serial::print_info(class cl_console_base *con)
 {
   const char *modes[]= { "Shift, fixed clock",
@@ -494,24 +414,6 @@ cl_serial::print_info(class cl_console_base *con)
   con->dd_printf("s_tr_t1=%d s_tr_bit=%d s_tr_tick=%d\n",
 		 s_tr_t1, s_tr_bit, s_tr_tick);
 		 con->dd_printf("divby=%d bits=%d\n", _divby, _bits);*/
-}
-
-
-cl_serial_listener::cl_serial_listener(int serverport, class cl_app *the_app,
-				       class cl_serial *the_serial):
-  cl_listen_console(serverport, the_app)
-{
-  serial_hw= the_serial;
-}
-
-int
-cl_serial_listener::proc_input(class cl_cmdset *cmdset)
-{
-  class cl_f *i, *o;
-
-  srv_accept(fin, &i, &o);
-  serial_hw->new_io(i, o);
-  return 0;
 }
 
 

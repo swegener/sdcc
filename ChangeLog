@@ -9,7 +9,8 @@
 	  support/regression/tests/gcc-torture-execute-950512-1.c,
 	  support/regression/tests/gcc-torture-execute-950612-1.c,
 	  support/regression/tests/gcc-torture-execute-960402-1.c,
-	  support/regression/tests/gcc-torture-execute-960801-1.c:
+	  support/regression/tests/gcc-torture-execute-960801-1.c,
+	  support/regression/tests/gcc-torture-execute-20000717-2.c:
 	  Fix mcs51 peephole handling of long long parameters.
 
 2016-08-25 Philipp Klaus Krause <pkk AT spth.de>

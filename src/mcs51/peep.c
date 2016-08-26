@@ -235,13 +235,12 @@ termScanAtFunc (const lineNode *pl, int rIdx)
   // most notably :  (*(void (*)()) 0) ();  see bug 1749275
   if (IS_VALOP (IC_LEFT (pl->ic)))
     return (options.model == MODEL_HUGE) && banked_reg ? S4O_ABORT : options.all_callee_saves ? S4O_CONTINUE : S4O_TERM;
-
   ftype = OP_SYM_TYPE(IC_LEFT(pl->ic));
   if (IS_FUNCPTR (ftype))
     ftype = ftype->next;
   if (IFFUNC_ISBANKEDCALL(ftype) && banked_reg)
     return S4O_ABORT;
-  if (getSize (ftype->next) > 4)
+  if (FUNC_ARGS (ftype) && getSize (FUNC_ARGS (ftype)->type) > 4)
     return S4O_ABORT;
   if (FUNC_CALLEESAVES(ftype))
     return S4O_CONTINUE;

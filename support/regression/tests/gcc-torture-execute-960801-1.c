@@ -9,7 +9,7 @@
 #endif
 
 // Some ports do not yet support long long.
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 unsigned
 f ()
 {
@@ -38,8 +38,7 @@ g ()
 void
 testTortureExecute (void)
 {
-// Test fails on 32-bit systems
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   if (f () != (unsigned short) -1)
     ASSERT (0);
   if (g () != (unsigned short) -1)

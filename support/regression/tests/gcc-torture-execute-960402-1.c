@@ -9,7 +9,7 @@
 #endif
 
 // TODO: Enable when sdcc supports long long constants!
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 f (signed long long int x)
 {
   return x > 0xFFFFFFFFLL || x < -0x80000000LL;

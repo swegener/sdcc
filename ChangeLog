@@ -1,3 +1,17 @@
+2016-08-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/mcs51/peep.c,
+	  support/regression/tests/bug-2477.c,
+	  support/regression/tests/gcc-torture-execute-20001031-1.c,
+	  support/regression/tests/gcc-torture-execute-20020506-1.c,
+	  support/regression/tests/gcc-torture-execute-20060127-1.c,
+	  support/regression/tests/gcc-torture-execute-941015-1.c,
+	  support/regression/tests/gcc-torture-execute-950512-1.c,
+	  support/regression/tests/gcc-torture-execute-950612-1.c,
+	  support/regression/tests/gcc-torture-execute-960402-1.c,
+	  support/regression/tests/gcc-torture-execute-960801-1.c:
+	  Fix mcs51 peephole handling of long long parameters.
+
 2016-08-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/mcs51/gen.c,

@@ -42,6 +42,7 @@
 #define SKIP_UNIVERSAL_UTF8 /* Only works for GCC when -finput-charset= option is specified */
 #if (defined (__GNUC__) && __GNUC__ < 6)
 #define SKIP_UNIVERSAL /* Fails for older GCC (works for me in 6.1.1 but fails on some SDCC build machines*/
+#define SKIP_INLINE /* fails for some older GCC that is still used on the FreeBSD build machines */
 #endif
 #else /* SDCC issues */
 #define SKIP_HEXDOUBLE /* bug #2536 */

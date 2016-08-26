@@ -9,8 +9,12 @@ ifdef SDCC_BIN_PATH
 
   AS_TLCS90C = $(SDCC_BIN_PATH)/sdastlcs90$(EXEEXT)
 else
-  UCTLCS90A = $(top_builddir)/sim/ucsim/tlcs.src/stlcs$(EXEEXT)
-  UCTLCS90B = $(top_builddir)/bin/stlcs$(EXEEXT)
+  ifdef UCSIM_DIR
+    UCTLCS90A = $(UCSIM_DIR)/tlcs.src/stlcs$(EXEEXT)
+  else
+    UCTLCS90A = $(top_builddir)/sim/ucsim/tlcs.src/stlcs$(EXEEXT)
+    UCTLCS90B = $(top_builddir)/bin/stlcs$(EXEEXT)
+  endif
 
   EMU = $(WINE) $(shell if [ -f $(UCTLCS90A) ]; then echo $(UCTLCS90A); else echo $(UCTLCS90B); fi)
 

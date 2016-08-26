@@ -7,8 +7,12 @@ SIM_TIMEOUT = 80
 ifdef SDCC_BIN_PATH
   S51 = $(SDCC_BIN_PATH)/s51$(EXEEXT)
 else
-  S51A = $(top_builddir)/sim/ucsim/s51.src/s51$(EXEEXT)
-  S51B = $(top_builddir)/bin/s51$(EXEEXT)
+  ifdef UCSIM_DIR
+    S51A = $(UCSIM_DIR)/s51.src/s51$(EXEEXT)
+  else
+    S51A = $(top_builddir)/sim/ucsim/s51.src/s51$(EXEEXT)
+    S51B = $(top_builddir)/bin/s51$(EXEEXT)
+  endif
 
   EMU = $(WINE) $(shell if [ -f $(S51A) ]; then echo $(S51A); else echo $(S51B); fi)
 

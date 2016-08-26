@@ -11,8 +11,12 @@ ifdef SDCC_BIN_PATH
 
   AS_Z80C = $(SDCC_BIN_PATH)/sdasrab$(EXEEXT)
 else
-  SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80$(EXEEXT)
-  SZ80B = $(top_builddir)/bin/sz80$(EXEEXT)
+  ifdef UCSIM_DIR
+    SZ80A = $(UCSIM_DIR)/z80.src/sz80$(EXEEXT)
+  else
+    SZ80A = $(top_builddir)/sim/ucsim/z80.src/sz80$(EXEEXT)
+    SZ80B = $(top_builddir)/bin/sz80$(EXEEXT)
+  endif
 
   EMU = $(WINE) $(shell if [ -f $(SZ80A) ]; then echo $(SZ80A); else echo $(SZ80B); fi)
 

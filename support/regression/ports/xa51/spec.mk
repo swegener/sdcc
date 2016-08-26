@@ -5,8 +5,12 @@ ifndef DEV_NULL
 endif
 
 # path to uCsim
-SXA_A = $(top_builddir)/sim/ucsim/xa.src/sxa$(EXEEXT)
-SXA_B = $(top_builddir)/bin/sxa$(EXEEXT)
+ifdef UCSIM_DIR
+  SXA_A = $(UCSIM_DIR)/xa.src/sxa$(EXEEXT)
+else
+  SXA_A = $(top_builddir)/sim/ucsim/xa.src/sxa$(EXEEXT)
+  SXA_B = $(top_builddir)/bin/sxa$(EXEEXT)
+endif
 
 SXA = $(shell if [ -f $(SXA_A) ]; then echo $(SXA_A); else echo $(SXA_B); fi)
 

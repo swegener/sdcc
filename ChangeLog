@@ -1,3 +1,8 @@
+2016-08-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20020506-1.c:
+	  Disable test for ds390 that accidentially got enabled when enabled for mcs51.
+
 2016-08-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/mcs51/peep.c,

@@ -4850,7 +4850,7 @@ genPlus (iCode * ic)
   /* if the lower bytes of a literal are zero skip the addition */
   if (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT)
     {
-      while ((0 == ((unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) & (0xff << skip_bytes * 8))) &&
+      while ((0 == ((unsigned int) ullFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) & (0xff << skip_bytes * 8))) &&
              (skip_bytes + 1 < size))
         {
           skip_bytes++;
@@ -4924,7 +4924,7 @@ genMinusDec (iCode * ic)
 
   /* if the literal value of the right hand side
      is greater than 4 then it is not worth it */
-  if ((icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
+  if ((icount = (unsigned int) ullFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
 
   D (emitcode (";", "genMinusDec"));
@@ -6892,7 +6892,7 @@ genAnd (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0ull;
   int bytelit = 0;
 
   D (emitcode (";", "genAnd"));
@@ -6931,7 +6931,7 @@ genAnd (iCode * ic, iCode * ifx)
     }
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+      lit = ullFromVal (AOP (right)->aopu.aop_lit);
     }
 
   size = AOP_SIZE (result);
@@ -7099,7 +7099,7 @@ genAnd (iCode * ic, iCode * ifx)
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL);
+              bytelit = (int) ((lit >> (offset * 8)) & 0x0ffull);
               if (bytelit == 0x0FF)
                 {
                   /* dummy read of volatile operand */
@@ -7241,7 +7241,7 @@ genAnd (iCode * ic, iCode * ifx)
               // result = left & right
               if (AOP_TYPE (right) == AOP_LIT)
                 {
-                  bytelit = (int) ((lit >> (offset * 8)) & 0x0FFL);
+                  bytelit = (int) ((lit >> (offset * 8)) & 0x0ffull);
                   if (bytelit == 0x0FF)
                     {
                       aopPut (result, aopGet (left, offset, FALSE, FALSE), offset);

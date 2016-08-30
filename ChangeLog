@@ -1,3 +1,8 @@
+2016-08-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/mcs51/gen.c:
+	  Fixes for mcs51 long long on 32-bit hosts.
+
 2016-08-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20020506-1.c:

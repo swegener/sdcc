@@ -5123,30 +5123,30 @@ genMinus (iCode * ic)
   /* if literal, add a,#-lit, else normal subb */
   if (AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT)
     {
-      unsigned long lit = 0L;
+      unsigned long long lit = 0L;
       bool useCarry = FALSE;
 
-      lit = ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
-      lit = -(long) lit;
+      lit = ullFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+      lit = -(long long) lit;
 
       while (size--)
         {
-          if (useCarry || ((lit >> (offset * 8)) & 0x0FFL))
+          if (useCarry || ((lit >> (offset * 8)) & 0x0ffll))
             {
               MOVA (aopGet (IC_LEFT (ic), offset, FALSE, FALSE));
-              if (!offset && !size && lit == (unsigned long) - 1)
+              if (!offset && !size && lit == (unsigned long long) - 1)
                 {
                   emitcode ("dec", "a");
                 }
               else if (!useCarry)
                 {
                   /* first add without previous c */
-                  emitcode ("add", "a,#!constbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+                  emitcode ("add", "a,#!constbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0ffll));
                   useCarry = TRUE;
                 }
               else
                 {
-                  emitcode ("addc", "a,#!constbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+                  emitcode ("addc", "a,#!constbyte", (unsigned int) ((lit >> (offset * 8)) & 0x0ffll));
                 }
               aopPut (IC_RESULT (ic), "a", offset++);
             }
@@ -6066,7 +6066,7 @@ static void
 genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign, iCode * ic)
 {
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0L;
   bool rightInB;
 
   D (emitcode (";", "genCmp"));
@@ -6110,9 +6110,9 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              lit = ulFromVal (AOP (right)->aopu.aop_lit);
+              lit = ullFromVal (AOP (right)->aopu.aop_lit);
               /* optimize if(x < 0) or if(x >= 0) */
-              if (lit == 0L)
+              if (lit == 0ll)
                 {
                   if (!sign)
                     {
@@ -6139,11 +6139,11 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               else
                 {
                   //nonzero literal
-                  int bytelit = ((lit >> (offset * 8)) & 0x0FFL);
+                  int bytelit = ((lit >> (offset * 8)) & 0x0ffll);
                   while (size && (bytelit == 0))
                     {
                       offset++;
-                      bytelit = ((lit >> (offset * 8)) & 0x0FFL);
+                      bytelit = ((lit >> (offset * 8)) & 0x0ffll);
                       size--;
                     }
                   CLRC;
@@ -6153,7 +6153,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                       if (sign && size == 0)
                         {
                           emitcode ("xrl", "a,#0x80");
-                          emitcode ("subb", "a,#0x%02x", 0x80 ^ (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
+                          emitcode ("subb", "a,#0x%02x", 0x80 ^ (unsigned int) ((lit >> (offset * 8)) & 0x0ffll));
                         }
                       else
                         {

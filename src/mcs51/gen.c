@@ -10725,13 +10725,13 @@ genPackBits (sym_link * etype, operand * right, const char *rname, int p_type)
 static void
 genLiteralAssign (operand * result, operand * right, int size, bool (*output_fn) (operand * result, const char *s, int offset))
 {
-  unsigned long lit = 0L;
+  unsigned long long lit = 0LL;
   int offset;
   int accumulator_value = -1;   /* -1 denotes: not yet set */
 
   if (!IS_FLOAT (operandType (right)))
     {
-      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+      lit = ullFromVal (AOP (right)->aopu.aop_lit);
     }
   else
     {

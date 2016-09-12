@@ -6985,6 +6985,11 @@ genAnd (iCode * ic, iCode * ifx)
                   emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
                 }
             }
+          else if (AOP_TYPE (right) == AOP_DIR && IS_BOOL (operandType (right)) && AOP_TYPE (left) == AOP_CRY)
+            {
+              MOVA (aopGet (right, 0, FALSE, FALSE));
+              emitcode ("anl", "c,acc.0");
+            }
           else
             {
               // c = bit & val;

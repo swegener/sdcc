@@ -260,7 +260,7 @@ flex10 has_flexible_array = { .flex.len = 10 };
 #endif
 
 #ifndef SKIP_RESTRICT
-char restrict_buffer[25];
+char restrict_buffer[4];
 char *restrict has_restrict_keyword = restrict_buffer;
 #endif
 

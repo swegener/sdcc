@@ -3931,7 +3931,10 @@ genFunction (iCode * ic)
           genLine.lineElement.ic = ric;
           D (emitcode (";", "genReceive"));
           for (ofs = 0; ofs < sym->recvSize; ofs++)
-            _G.stack.pushed--, emitpush (fReturn[ofs]);        /* cancel out pushed++ from emitpush()*/
+            {
+              emitpush (fReturn[ofs]);
+              _G.stack.pushed--; /* cancel out pushed++ from emitpush()*/
+            }
           stackAdjust -= sym->recvSize;
           if (stackAdjust < 0)
             {
@@ -6811,20 +6814,13 @@ genOrOp (iCode * ic)
 /* isLiteralBit - test if lit == 2^n                               */
 /*-----------------------------------------------------------------*/
 static int
-isLiteralBit (unsigned long lit)
+isLiteralBit (unsigned long long lit)
 {
-  unsigned long pw[32] = { 1L, 2L, 4L, 8L, 16L, 32L, 64L, 128L,
-                           0x100L, 0x200L, 0x400L, 0x800L,
-                           0x1000L, 0x2000L, 0x4000L, 0x8000L,
-                           0x10000L, 0x20000L, 0x40000L, 0x80000L,
-                           0x100000L, 0x200000L, 0x400000L, 0x800000L,
-                           0x1000000L, 0x2000000L, 0x4000000L, 0x8000000L,
-                           0x10000000L, 0x20000000L, 0x40000000L, 0x80000000L
-                         };
+  unsigned long long w = 1;
   int idx;
 
-  for (idx = 0; idx < 32; idx++)
-    if (lit == pw[idx])
+  for (idx = 0; idx < 64; idx++, w<<=1)
+    if (lit == w)
       return idx + 1;
   return 0;
 }
@@ -11915,7 +11911,7 @@ genReceive (iCode * ic)
       if ((isOperandInFarSpace (IC_RESULT (ic)) ||
            isOperandInPagedSpace (IC_RESULT (ic))) && (OP_SYMBOL (IC_RESULT (ic))->isspilt || IS_TRUE_SYMOP (IC_RESULT (ic))))
         {
-          reg_info *tempRegs[4];
+          reg_info *tempRegs[8];
           int receivingA = 0;
           int roffset = 0;
 

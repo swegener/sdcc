@@ -29,9 +29,12 @@
 #define __SDCC_FLOAT_LIB
 #include <float.h>
 #include <math.h>
+#include <string.h>
 
 int isnan (float f)
 {
+  float pnan = 0.0f / 0.0f;
+  float nnan = (-0.0f) / 0.0f;
   unsigned long *pl = (unsigned long *) &f;
-  return *pl == 0xffc00000 || *pl == 0x7fc00000;
+  return *pl == 0xffc00000 || *pl == 0x7fc00000 || !memcmp (&f, &pnan, sizeof (f)) || !memcmp (&f, &nnan, sizeof (f));
 }

@@ -17,7 +17,7 @@ replace {
 	mov	%1,a
 }
 
-replace {
+replace restart {
 // saving 1 byte
 	mov	%1,#0x00
 	clr	a
@@ -4275,8 +4275,6 @@ replace {
 
 
 // optimizing jumptables
-// Please note: to enable peephole 260.x you currently have to set
-// the environment variable SDCC_SJMP_JUMPTABLE
 replace {
 	add	a,%1
 	mov	dptr,#%2

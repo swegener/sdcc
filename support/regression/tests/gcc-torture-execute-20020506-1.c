@@ -18,14 +18,14 @@
 
 #include <limits.h>
 
-void test1 (signed char c, int set);
-void test2 (unsigned char c, int set);
-void test3 (short s, int set);
-void test4 (unsigned short s, int set);
-void test5 (int i, int set);
-void test6 (unsigned int i, int set);
-void test7 (long long l, int set);
-void test8 (unsigned long long l, int set);
+void fest1 (signed char c, int set);
+void fest2 (unsigned char c, int set);
+void fest3 (short s, int set);
+void fest4 (unsigned short s, int set);
+void fest5 (int i, int set);
+void fest6 (unsigned int i, int set);
+void fest7 (long long l, int set);
+void fest8 (unsigned long long l, int set);
 
 #ifndef LONG_LONG_MAX
 #define LONG_LONG_MAX LLONG_MAX
@@ -39,7 +39,7 @@ void test8 (unsigned long long l, int set);
 
 
 void
-test1 (signed char c, int set)
+fest1 (signed char c, int set)
 {
   if ((c & (SCHAR_MAX+1)) == 0)
     {
@@ -71,7 +71,7 @@ test1 (signed char c, int set)
 }
 
 void
-test2 (unsigned char c, int set)
+fest2 (unsigned char c, int set)
 {
   if ((c & (SCHAR_MAX+1)) == 0)
     {
@@ -103,7 +103,7 @@ test2 (unsigned char c, int set)
 }
 
 void
-test3 (short s, int set)
+fest3 (short s, int set)
 {
   if ((s & (SHRT_MAX+1)) == 0)
     {
@@ -135,7 +135,7 @@ test3 (short s, int set)
 }
 
 void
-test4 (unsigned short s, int set)
+fest4 (unsigned short s, int set)
 {
   if ((s & (SHRT_MAX+1)) == 0)
     {
@@ -167,7 +167,7 @@ test4 (unsigned short s, int set)
 }
 
 void
-test5 (int i, int set)
+fest5 (int i, int set)
 {
   if ((i & (INT_MAX+1U)) == 0)
     {
@@ -199,7 +199,7 @@ test5 (int i, int set)
 }
 
 void
-test6 (unsigned int i, int set)
+fest6 (unsigned int i, int set)
 {
   if ((i & (INT_MAX+1U)) == 0)
     {
@@ -231,7 +231,7 @@ test6 (unsigned int i, int set)
 }
 
 void
-test7 (long long l, int set)
+fest7 (long long l, int set)
 {
   if ((l & (LONG_LONG_MAX+1ULL)) == 0)
     {
@@ -249,7 +249,7 @@ test7 (long long l, int set)
 
   if ((l & (LONG_LONG_MAX+1ULL)) == (LONG_LONG_MAX+1ULL))
     {
-      if (!set) ASSERT (0);
+      ASSERT (set);
     }
   else
     if (set) ASSERT (0);
@@ -259,11 +259,11 @@ test7 (long long l, int set)
       if (set) ASSERT (0);
     }
   else
-    if (!set) ASSERT (0);
+    ASSERT (set);
 }
 
 void
-test8 (unsigned long long l, int set)
+fest8 (unsigned long long l, int set)
 {
   if ((l & (LONG_LONG_MAX+1ULL)) == 0)
     {
@@ -299,46 +299,46 @@ void
 testTortureExecute (void)
 {
 #if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-  test1 (0, 0);
-  test1 (SCHAR_MAX, 0);
-  test1 (SCHAR_MIN, 1);
-  test1 (UCHAR_MAX, 1);
+  fest1 (0, 0);
+  fest1 (SCHAR_MAX, 0);
+  fest1 (SCHAR_MIN, 1);
+  fest1 (UCHAR_MAX, 1);
 
-  test2 (0, 0);
-  test2 (SCHAR_MAX, 0);
-  test2 (SCHAR_MIN, 1);
-  test2 (UCHAR_MAX, 1);
+  fest2 (0, 0);
+  fest2 (SCHAR_MAX, 0);
+  fest2 (SCHAR_MIN, 1);
+  fest2 (UCHAR_MAX, 1);
 
-  test3 (0, 0);
-  test3 (SHRT_MAX, 0);
-  test3 (SHRT_MIN, 1);
-  test3 (USHRT_MAX, 1);
+  fest3 (0, 0);
+  fest3 (SHRT_MAX, 0);
+  fest3 (SHRT_MIN, 1);
+  fest3 (USHRT_MAX, 1);
 
-  test4 (0, 0);
-  test4 (SHRT_MAX, 0);
-  test4 (SHRT_MIN, 1);
-  test4 (USHRT_MAX, 1);
+  fest4 (0, 0);
+  fest4 (SHRT_MAX, 0);
+  fest4 (SHRT_MIN, 1);
+  fest4 (USHRT_MAX, 1);
 
-  test5 (0, 0);
-  test5 (INT_MAX, 0);
-  test5 (INT_MIN, 1);
-  test5 (UINT_MAX, 1);
+  fest5 (0, 0);
+  fest5 (INT_MAX, 0);
+  fest5 (INT_MIN, 1);
+  fest5 (UINT_MAX, 1);
 
-  test6 (0, 0);
-  test6 (INT_MAX, 0);
-  test6 (INT_MIN, 1);
-  test6 (UINT_MAX, 1);
+  fest6 (0, 0);
+  fest6 (INT_MAX, 0);
+  fest6 (INT_MIN, 1);
+  fest6 (UINT_MAX, 1);
 
 #if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
-  test7 (0, 0);
-  test7 (LONG_LONG_MAX, 0);
-  test7 (LONG_LONG_MIN, 1);
-  test7 (ULONG_LONG_MAX, 1);
+  fest7 (0, 0);
+  fest7 (LONG_LONG_MAX, 0);
+  fest7 (LONG_LONG_MIN, 1);
+  fest7 (ULONG_LONG_MAX, 1);
 
-  test8 (0, 0);
-  test8 (LONG_LONG_MAX, 0);
-  test8 (LONG_LONG_MIN, 1);
-  test8 (ULONG_LONG_MAX, 1);
+  fest8 (0, 0);
+  fest8 (LONG_LONG_MAX, 0);
+  fest8 (LONG_LONG_MIN, 1);
+  fest8 (ULONG_LONG_MAX, 1);
 
   return;
 #endif

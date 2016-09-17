@@ -304,12 +304,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="SDCC.lex">
-      <Filter>Custom Build</Filter>
-    </CustomBuild>
-    <CustomBuild Include="SDCC.y">
-      <Filter>Custom Build</Filter>
-    </CustomBuild>
-  </ItemGroup>
 </Project>

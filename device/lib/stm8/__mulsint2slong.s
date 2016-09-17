@@ -69,7 +69,7 @@ right_nonneg:
 
 	; Multiply middle bytes
 	ld	a, (5+5, sp)
-	jreq skip_m1
+	jreq	skip_m1
 	ldw	x, (5+3, sp)
 	mul	x, a
 	addw	x, (3, sp)
@@ -80,7 +80,7 @@ right_nonneg:
 skip_m1:
 
 	ld	a, (5+3, sp)
-	jreq skip_m2
+	jreq	skip_m2
 	ldw	x, (5+5, sp)
 	mul	x, a
 	addw	x, (3, sp)

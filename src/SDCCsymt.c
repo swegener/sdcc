@@ -4326,8 +4326,12 @@ initCSupport (void)
         }
     }
 
-  muls16tos32[0] = port->support.has_mulint2long ? funcOfTypeVarg ("__mulsint2slong", "l", 2, (const char *[]){"i", "i"}) : 0;
-  muls16tos32[1] = port->support.has_mulint2long ? funcOfTypeVarg ("__muluint2ulong", "ul", 2, (const char *[]){"ui", "ui"}) : 0;
+  {
+    const char *iparams[] = {"i", "i"};
+    const char *uiparams[] = {"ui", "ui"};
+    muls16tos32[0] = port->support.has_mulint2long ? funcOfTypeVarg ("__mulsint2slong", "l", 2, iparams) : 0;
+    muls16tos32[1] = port->support.has_mulint2long ? funcOfTypeVarg ("__muluint2ulong", "ul", 2, uiparams) : 0;
+  }
 }
 
 /*-----------------------------------------------------------------*/

@@ -1,3 +1,18 @@
+2016-09-17 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* config.vcxproj,
+	* src/sdcc.vcxproj,
+	* src/sdcc.vcxproj.filters: moved SDCC.lex and SDCC.y to config project
+	* src/mcs51/gen.c (gencjneshort): proper support for long long
+	* src/mcs51/peeph.def: restart 3.b
+	* src/SDCCsymt.c (initCSupport): MSVC doesn't support casting compound lit
+	* src/SDCCval.c (csdOfVal): we still use MSVC 2010, no mid-code declarations
+	* support/regression/tests/bug-2205.c: removed unused disabled warning
+	* support/regression/tests/gcc-torture-execute-20020506-1.c: intermediate
+	  functions should not be named test*
+	* support/regression/tests/gcc-torture-execute-961122-1.c: fixed no-return
+	  warning
+
 2016-09-17 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* device/lib/isinf.c

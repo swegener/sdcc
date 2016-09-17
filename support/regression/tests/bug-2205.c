@@ -4,10 +4,6 @@
 
 #include <testfwk.h>
 
-#if !defined(PORT_HOST)
-#  pragma disable_warning 59
-#endif
-
 static char m = 2;
 
 void two__init (void)

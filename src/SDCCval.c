@@ -2039,14 +2039,14 @@ ullFromVal (value * val)
 /*------------------------------------------------------------------*/
 int csdOfVal (int *topbit, int *nonzero, unsigned long long *csd_add, unsigned long long *csd_sub, value *val)
 {
+  unsigned long long binary = ullFromVal (val);
+  bool gamma, theta, a;
+  int bit, next;
+
   *topbit = 0;
   *nonzero = 0;
   *csd_add = 0;
   *csd_sub = 0;
-
-  unsigned long long binary = ullFromVal (val);
-  bool gamma, theta, a;
-  int bit, next;
 
   for (a = 0, gamma = 0, bit = 0; bit < 61; bit++)
     {

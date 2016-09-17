@@ -87,13 +87,33 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sdcc_vc.h</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sdcc_vc.h</Outputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating: %(Outputs)</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %Outputs)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating: %(Outputs)</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <None Include="configure_vc.awk" />
     <None Include=".version">
     </None>
+    <CustomBuild Include="src\SDCC.lex">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Lexer: SDCClex.c</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">src/SDCClex.c</Outputs>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatOutputAsContent>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Lexer: SDCClex.c</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">src/SDCClex.c</Outputs>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</TreatOutputAsContent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">flex -8 -f -osrc/SDCClex.c src/SDCC.lex</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">flex -8 -f -osrc/SDCClex.c src/SDCC.lex</Command>
+    </CustomBuild>
+    <CustomBuild Include="src\SDCC.y">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">bison -d -v -o src/SDCCy.c src/SDCC.y</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating Parser: SDCCy.c</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">src/SDCCy.c;src/SDCCy.h</Outputs>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</TreatOutputAsContent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">bison -d -v -o src/SDCCy.c src/SDCC.y</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Generating Parser: SDCCy.c</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">src/SDCCy.c;src/SDCCy.h</Outputs>
+      <TreatOutputAsContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</TreatOutputAsContent>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

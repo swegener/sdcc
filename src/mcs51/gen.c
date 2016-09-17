@@ -6357,15 +6357,25 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
     {
       if (AOP_TYPE (right) == AOP_LIT)
         {
-          int   val[4]  = {0, 0, 0, 0};
-          bool  chk[4]  = {TRUE, FALSE, FALSE, FALSE};
+          int   val[8]  = {0, 0, 0, 0, 0, 0, 0, 0};
+          bool  chk[8]  = {TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
           int   rsize   = AOP_SIZE (right);
           int   pidx    = -1;
           int   lidx, cidx;
-          unsigned long lit = ulFromVal (AOP (right)->aopu.aop_lit);
+          unsigned long long lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
           switch (rsize)
             {
+            case 8:
+              val[7]  = (lit >> 56) & 0xff;
+              chk[7]  = TRUE;
+              val[6]  = (lit >> 48) & 0xff;
+              chk[6]  = TRUE;
+              val[5]  = (lit >> 40) & 0xff;
+              chk[5]  = TRUE;
+              val[4]  = (lit >> 32) & 0xff;
+              chk[4]  = TRUE;
+              //fallthrough
             case 4:
               val[3]  = (lit >> 24) & 0xff;
               chk[3]  = TRUE;
@@ -6387,7 +6397,11 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
               if ((!chk[0] || val[0] == 0x00) &&
                   (!chk[1] || val[1] == 0x00) &&
                   (!chk[2] || val[2] == 0x00) &&
-                  (!chk[3] || val[3] == 0x00))
+                  (!chk[3] || val[3] == 0x00) &&
+                  (!chk[4] || val[4] == 0x00) &&
+                  (!chk[5] || val[5] == 0x00) &&
+                  (!chk[6] || val[6] == 0x00) &&
+                  (!chk[7] || val[7] == 0x00))
                 {
                   MOVA(aopGet(left, 0, FALSE, FALSE));
                   for (cidx = 1; cidx < size; cidx++)
@@ -6399,7 +6413,11 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
               if ((!chk[0] || val[0] == 0xFF) &&
                   (!chk[1] || val[1] == 0xFF) &&
                   (!chk[2] || val[2] == 0xFF) &&
-                  (!chk[3] || val[3] == 0xFF))
+                  (!chk[3] || val[3] == 0xFF) &&
+                  (!chk[4] || val[4] == 0xFF) &&
+                  (!chk[5] || val[5] == 0xFF) &&
+                  (!chk[6] || val[6] == 0xFF) &&
+                  (!chk[7] || val[7] == 0xFF))
                 {
                   MOVA(aopGet(left, 0, FALSE, FALSE));
                   for (cidx = 1; cidx < size; cidx++)
@@ -9119,7 +9137,7 @@ genlshFour (operand * result, operand * left, int shCount)
 }
 
 /*-----------------------------------------------------------------*/
-/* genlshAny - shift an ynumber of bytes   by a known amount != 0  */
+/* genlshAny - shift any number of bytes by a known amount != 0    */
 /*-----------------------------------------------------------------*/
 static void
 genlshAny (operand *result, operand *left, int shCount)

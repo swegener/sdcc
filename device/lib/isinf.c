@@ -29,12 +29,9 @@
 #define __SDCC_FLOAT_LIB
 #include <float.h>
 #include <math.h>
-#include <string.h>
 
 int isinf (float f)
 {
-  float pinf = 1.0f / 0.0f;
-  float ninf = (-1.0f) / 0.0f;
   unsigned long *pl = (unsigned long *) &f;
-  return *pl == 0x7f800000 || *pl == 0xff800000 || !memcmp (&f, &pinf, sizeof (f)) || !memcmp (&f, &ninf, sizeof (f));
+  return *pl == 0x7f800000 || *pl == 0xff800000;
 }

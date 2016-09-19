@@ -1,3 +1,8 @@
+2016-09-19 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/gen.c
+	  Fix a bug in bitwise-and operation (genAnd()).
+
 2016-09-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* config.vcxproj,

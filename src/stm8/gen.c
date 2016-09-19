@@ -5230,7 +5230,7 @@ genAnd (const iCode *ic, iCode *ifx)
         {
           bool new_in_a = FALSE;
           for(j = i; j < size && j != omitbyte && aopIsLitVal (right->aop, j, 1, 0x00); j++)
-            if (aopInReg (result->aop, i, A_IDX))
+            if (aopInReg (result->aop, j, A_IDX))
               new_in_a = TRUE;
           genMove_o (result->aop, i, ASMOP_ZERO, 0, j - i, TRUE, regFree (X_IDX, ic), regFree (Y_IDX, ic));
           result_in_a |= new_in_a;
@@ -5240,7 +5240,7 @@ genAnd (const iCode *ic, iCode *ifx)
         {
           bool new_in_a = FALSE;
           for(j = i; j < size && j != omitbyte && aopIsLitVal (right->aop, j, 1, 0xff); j++)
-            if (aopInReg (result->aop, i, A_IDX))
+            if (aopInReg (result->aop, j, A_IDX))
               new_in_a = TRUE;
           genMove_o (result->aop, i, left->aop, i, j - i, TRUE, regFree (X_IDX, ic), regFree (Y_IDX, ic));
           result_in_a |= new_in_a;

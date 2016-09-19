@@ -302,6 +302,7 @@ if echo $ucsim_cv_socket|grep winsock2 >/dev/null 2>&1; then
 else
   AC_CHECK_LIB(socket,socket)
   AC_CHECK_LIB(nsl,xdr_short)
+  AC_CHECK_LIB(rt,nanosleep)
 fi
 
 AC_CHECK_LIB(dl,dlopen,

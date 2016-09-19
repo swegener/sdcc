@@ -135,7 +135,7 @@ ftest_app: libs ftest$(EXEEXT)
 
 ucsim: $(UCSIM_OBJECTS) $(UCSIM_LIB_FILES)
 	echo $(UCSIM_LIB_FILES)
-	$(CXX) $(CXXFLAGS) $< -L$(top_builddir) $(UCSIM_LIBS) -Wl,-Map=$@.map -o $@ 
+	$(CXX) $(CXXFLAGS) $< -L$(top_builddir) $(UCSIM_LIBS) -o $@ 
 
 ftest$(EXEEXT): ftest.o libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< -L$(top_builddir) -lucsimutil @LIBS@

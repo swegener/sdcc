@@ -4214,7 +4214,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
         }
 
       /* if left is another '!' */
-#if 0
+#if 0 /* Disabled optimization due to bugs #2548, #2551. */
       if (IS_AST_NOT_OPER (tree->left))
         {
           if (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))

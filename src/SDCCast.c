@@ -2712,7 +2712,7 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
 /* resultTypePropagate - decides if resultType can be propagated   */
 /*-----------------------------------------------------------------*/
 static RESULT_TYPE
-resultTypePropagate (ast * tree, RESULT_TYPE resultType)
+resultTypePropagate (ast *tree, RESULT_TYPE resultType)
 {
   switch (tree->opval.op)
     {
@@ -3013,7 +3013,7 @@ checkZero (value *val)
 /* It also does constant folding, and parameter checking.             */
 /*--------------------------------------------------------------------*/
 ast *
-decorateType (ast * tree, RESULT_TYPE resultType)
+decorateType (ast *tree, RESULT_TYPE resultType)
 {
   int parmNumber;
   sym_link *p;
@@ -4214,13 +4214,15 @@ decorateType (ast * tree, RESULT_TYPE resultType)
         }
 
       /* if left is another '!' */
+#if 0
       if (IS_AST_NOT_OPER (tree->left))
         {
-          if ((resultType == RESULT_TYPE_IFX) || (resultType == RESULT_TYPE_BOOL))
+          if (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))
             {
               /* replace double '!!X' by 'X' */
               return tree->left->left;
             }
+
           /* remove double '!!X' by 'X ? 1 : 0' */
           tree->opval.op = '?';
           tree->left = tree->left->left;
@@ -4230,6 +4232,7 @@ decorateType (ast * tree, RESULT_TYPE resultType)
           tree->decorated = 0;
           return decorateType (tree, resultType);
         }
+#endif
 
       /* if left is a literal then do it */
       if (IS_LITERAL (LTYPE (tree)))

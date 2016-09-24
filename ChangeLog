@@ -1,3 +1,10 @@
+2016-09-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  support/regression/tests/bug-2548.c,
+	  support/regression/tests/bug-2551.c:
+	  Fix bugs #2548, #2551 by disabling a broken AST optimization.
+
 2016-09-19 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/stm8/gen.c

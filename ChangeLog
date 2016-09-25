@@ -1,3 +1,9 @@
+2016-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (shiftLLong): support sizes 1,2,4,8,
+	  refactored genlshOne, genlshTwo, genlshFour into genlshFixed,
+	  (genLeftShiftLiteral): support long long
+
 2016-09-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c,

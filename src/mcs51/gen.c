@@ -8931,209 +8931,87 @@ shiftRLeftOrResult (operand * left, int offl, operand * result, int offr, int sh
 }
 
 /*-----------------------------------------------------------------*/
-/* genlshOne - left shift a one byte quantity by known count       */
-/*-----------------------------------------------------------------*/
-static void
-genlshOne (operand * result, operand * left, int shCount)
-{
-  D (emitcode (";", "genlshOne"));
-
-  shiftL1Left2Result (left, LSB, result, LSB, shCount);
-}
-
-/*-----------------------------------------------------------------*/
-/* genlshTwo - left shift two bytes by known amount != 0           */
-/*-----------------------------------------------------------------*/
-static void
-genlshTwo (operand * result, operand * left, int shCount)
-{
-  int size;
-
-  D (emitcode (";", "genlshTwo"));
-
-  size = getDataSize (result);
-
-  /* if shCount >= 8 */
-  if (shCount >= 8)
-    {
-      shCount -= 8;
-
-      if (size > 1)
-        {
-          if (shCount)
-            {
-              shiftL1Left2Result (left, LSB, result, MSB16, shCount);
-            }
-          else
-            {
-              movLeft2Result (left, LSB, result, MSB16, 0);
-            }
-        }
-      aopPut (result, zero, LSB);
-    }
-
-  /*  1 <= shCount <= 7 */
-  else
-    {
-      if (size == 1)
-        shiftL1Left2Result (left, LSB, result, LSB, shCount);
-      else
-        shiftL2Left2Result (left, LSB, result, LSB, shCount);
-    }
-}
-
-/*-----------------------------------------------------------------*/
 /* shiftLLong - shift left one long from left to result            */
 /* offl = LSB or MSB16                                             */
 /*-----------------------------------------------------------------*/
 static void
 shiftLLong (operand * left, operand * result, int offr)
 {
+  int offl = LSB;
   int size = AOP_SIZE (result);
+  int useXch = (sameRegs (AOP (left), AOP (result)) && size >= MSB16 + offr && offr != LSB);
 
-  if (size >= LSB + offr)
+  if (size > offl + offr)
     {
-      MOVA (aopGet (left, LSB, FALSE, FALSE));
+      MOVA (aopGet (left, offl, FALSE, FALSE));
       emitcode ("add", "a,acc");
-      if (sameRegs (AOP (left), AOP (result)) && size >= MSB16 + offr && offr != LSB)
-        xch_a_aopGet (left, LSB + offr, FALSE, FALSE);
+      if (useXch)
+        xch_a_aopGet (left, offl + offr, FALSE, FALSE);
       else
-        aopPut (result, "a", LSB + offr);
+        aopPut (result, "a", offl + offr);
     }
 
-  if (size >= MSB16 + offr)
+  for (offl = LSB + 1; offl < LSB + 8; offl++)
     {
-      if (!(sameRegs (AOP (result), AOP (left)) && size >= MSB16 + offr && offr != LSB))
+      if (size > offl + offr)
         {
-          MOVA (aopGet (left, MSB16, FALSE, FALSE));
+          if (!useXch)
+            MOVA (aopGet (left, offl, FALSE, FALSE));
+          emitcode ("rlc", "a");
+          if (useXch)
+            xch_a_aopGet (left, offl + offr, FALSE, FALSE);
+          else
+            aopPut (result, "a", offl + offr);
         }
-      emitcode ("rlc", "a");
-      if (sameRegs (AOP (left), AOP (result)) && size >= MSB24 + offr && offr != LSB)
-        xch_a_aopGet (left, MSB16 + offr, FALSE, FALSE);
-      else
-        aopPut (result, "a", MSB16 + offr);
     }
-
-  if (size >= MSB24 + offr)
-    {
-      if (!(sameRegs (AOP (result), AOP (left)) && size >= MSB24 + offr && offr != LSB))
-        {
-          MOVA (aopGet (left, MSB24, FALSE, FALSE));
-        }
-      emitcode ("rlc", "a");
-      if (sameRegs (AOP (left), AOP (result)) && size >= MSB32 + offr && offr != LSB)
-        xch_a_aopGet (left, MSB24 + offr, FALSE, FALSE);
-      else
-        aopPut (result, "a", MSB24 + offr);
-    }
-
-  if (size > MSB32 + offr)
-    {
-      if (!(sameRegs (AOP (result), AOP (left)) && size >= MSB32 + offr && offr != LSB))
-        {
-          MOVA (aopGet (left, MSB32, FALSE, FALSE));
-        }
-      emitcode ("rlc", "a");
-      aopPut (result, "a", MSB32 + offr);
-    }
-  if (offr != LSB)
-    aopPut (result, zero, LSB);
 }
 
 /*-----------------------------------------------------------------*/
-/* genlshFour - shift four byte by a known amount != 0             */
+/* genlshFixed - shift four byte by a known amount != 0            */
 /*-----------------------------------------------------------------*/
 static void
-genlshFour (operand * result, operand * left, int shCount)
+genlshFixed (operand * result, operand * left, int shCount)
 {
-  int size;
+  int size, b;
+  int full_bytes;
 
-  D (emitcode (";", "genlshFour"));
+  D (emitcode (";", "genlshFixed"));
 
   size = AOP_SIZE (result);
 
-  /* if shifting more that 3 bytes */
-  if (shCount >= 24)
+  full_bytes = shCount / 8;
+  shCount -= full_bytes * 8;
+  if (shCount == 0)
     {
-      shCount -= 24;
-      if (shCount)
-        /* lowest order of left goes to the highest
-           order of the destination */
-        shiftL1Left2Result (left, LSB, result, MSB32, shCount);
-      else
-        movLeft2Result (left, LSB, result, MSB32, 0);
-      aopPut (result, zero, LSB);
-      aopPut (result, zero, MSB16);
-      aopPut (result, zero, MSB24);
-      return;
+      for (b = size - 1; b > full_bytes - 1; b--)
+        movLeft2Result (left, b - full_bytes, result, b, 0);
     }
-
-  /* more than two bytes */
-  else if (shCount >= 16)
+  else if ((shCount == 1) && (full_bytes < 2))
     {
-      /* lower order two bytes goes to higher order two bytes */
-      shCount -= 16;
-      /* if some more remaining */
-      if (shCount)
-        shiftL2Left2Result (left, LSB, result, MSB24, shCount);
-      else
-        {
-          movLeft2Result (left, MSB16, result, MSB32, 0);
-          movLeft2Result (left, LSB, result, MSB24, 0);
-        }
-      aopPut (result, zero, MSB16);
-      aopPut (result, zero, LSB);
-      return;
+      shiftLLong (left, result, full_bytes);
     }
-
-  /* if more than 1 byte */
-  else if (shCount >= 8)
+  else if ((shCount == 2) && (full_bytes == 0))
     {
-      /* lower order three bytes goes to higher order  three bytes */
-      shCount -= 8;
-      if (size == 2)
-        {
-          if (shCount)
-            shiftL1Left2Result (left, LSB, result, MSB16, shCount);
-          else
-            movLeft2Result (left, LSB, result, MSB16, 0);
-        }
-      else
-        {
-          /* size = 4 */
-          if (shCount == 0)
-            {
-              movLeft2Result (left, MSB24, result, MSB32, 0);
-              movLeft2Result (left, MSB16, result, MSB24, 0);
-              movLeft2Result (left, LSB, result, MSB16, 0);
-              aopPut (result, zero, LSB);
-            }
-          else if (shCount == 1)
-            shiftLLong (left, result, MSB16);
-          else
-            {
-              shiftL2Left2Result (left, MSB16, result, MSB24, shCount);
-              shiftL1Left2Result (left, LSB, result, MSB16, shCount);
-              shiftRLeftOrResult (left, LSB, result, MSB24, 8 - shCount);
-              aopPut (result, zero, LSB);
-            }
-        }
+      shiftLLong (left, result, full_bytes);
+      shiftLLong (result, result, full_bytes);
     }
-
-  /* 1 <= shCount <= 7 */
-  else if (shCount <= 2)
-    {
-      shiftLLong (left, result, LSB);
-      if (shCount == 2)
-        shiftLLong (result, result, LSB);
-    }
-  /* 3 <= shCount <= 7, optimize */
   else
     {
-      shiftL2Left2Result (left, MSB24, result, MSB24, shCount);
-      shiftRLeftOrResult (left, MSB16, result, MSB24, 8 - shCount);
-      shiftL2Left2Result (left, LSB, result, LSB, shCount);
+      int off;
+      for (off = size - 2; off - full_bytes >= 0; off -= 2)
+        {
+          shiftL2Left2Result (left, off - full_bytes, result, off, shCount);
+          if (off - full_bytes - 1 >= 0)
+              shiftRLeftOrResult (left, off - full_bytes - 1, result, off, 8 - shCount);
+        }
+      if (off - full_bytes == -1)
+        {
+          shiftL1Left2Result (left, LSB, result, full_bytes, shCount);
+        }
     }
+  for (b = LSB; b < full_bytes; b++)
+    aopPut (result, zero, b);
+  return;
 }
 
 /*-----------------------------------------------------------------*/
@@ -9190,44 +9068,18 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, iCode * 
   emitcode ("; shift left ", "result %d, left %d", size, AOP_SIZE (left));
 #endif
 
-  /* I suppose that the left size >= result size */
-  // MB: I have no idea why this would be necessary
-//  wassert (getSize (operandType (left)) >= size);
-
-  if (shCount == 0)
+  switch (size)
     {
-      while (size--)
-        {
-          movLeft2Result (left, size, result, size, 0);
-        }
-    }
-  else if (shCount >= (size * 8))
-    {
-      while (size--)
-        {
-          aopPut (result, zero, size);
-        }
-    }
-  else
-    {
-      switch (size)
-        {
-        case 1:
-          genlshOne (result, left, shCount);
-          break;
+    case 1:
+    case 2:
+    case 4:
+    case 8:
+      genlshFixed (result, left, shCount);
+      break;
 
-        case 2:
-          genlshTwo (result, left, shCount);
-          break;
-
-        case 4:
-          genlshFour (result, left, shCount);
-          break;
-
-        default:
-          genlshAny (result, left, shCount);
-          break;
-        }
+    default:
+      genlshAny (result, left, shCount);
+      break;
     }
   freeAsmop (result, NULL, ic, TRUE);
   freeAsmop (left, NULL, ic, TRUE);

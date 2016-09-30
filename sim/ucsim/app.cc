@@ -274,14 +274,24 @@ cl_app::proc_arguments(int argc, char *argv[])
   bool /*s_done= DD_FALSE,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
-  strcpy(opts, "c:C:p:PX:vVt:s:S:a:hHgJ");
+  strcpy(opts, "c:C:p:PX:vVt:s:S:a:hHgJ_");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:k:");
 #endif
 
+  for (i= 0; i < argc; i++)
+    {
+      if ((strcmp(argv[i], "-fullname") == 0) ||
+	  (strcmp(argv[i], "-quiet") == 0) ||
+	  (strcmp(argv[i], "-args") == 0) ||
+	  (strcmp(argv[i], "-nx") == 0))
+	strcpy(argv[i], "-_");
+    }
+  
   while((c= getopt(argc, argv, opts)) != -1)
     switch (c)
       {
+      case '_': break;
       case 'J': jaj= true; break;
       case 'g':
 	if (!options->set_value("go", this, true))

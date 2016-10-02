@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------
-    SDCCset.h - contains support routines for sets .
+    SDCCset.h - contains support routines for doubly linked lists.
 
     Written By - Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
@@ -53,6 +53,7 @@ void *addSet (set **, void *);
 void *addSetHead (set **, void *);
 void *getSet (set **);
 void deleteSetItem (set **, void *);
+void replaceSetItem (set *, void *olditem, void *newitem);
 void deleteItemIf (set **, int (*cond) (void *, va_list),...);
 int isinSet (const set *, const void *);
 typedef int (* insetwithFunc) (void *, void *);

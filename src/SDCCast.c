@@ -4223,7 +4223,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
               return tree->left->left;
             }
 
-          /* remove double '!!X' by 'X ? 1 : 0' */
+          /* remove double '!!X' by 'X ? 1 : 0' */ /* TODO: Casts to _Bools tend to result in far more efficient code than '?' */
           tree->opval.op = '?';
           tree->left = tree->left->left;
           tree->right = newNode (':', newAst_VALUE (constBoolVal (1)), newAst_VALUE (constBoolVal (0)));
@@ -4732,7 +4732,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
               return tree->left;
             }
 
-          /* (unsigned value) ? 1 : 0 */
+          /* (unsigned value) ? 1 : 0 */ /* TODO: Casts to _Bools tend to result in far more efficient code than '?' */
           tree->opval.op = '?';
           tree->right = newNode (':', newAst_VALUE (constBoolVal (1)), tree->right);    /* val 0 */
           tree->right->filename = tree->filename;

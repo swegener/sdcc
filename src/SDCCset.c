@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------
-    SDCCset.c - contains support routines for sets
+    SDCCset.c - contains support routines for doubly linked lists.
 
     Written By - Sandeep Dutta . sandeep.dutta@usa.net (1998)
 
@@ -213,7 +213,7 @@ deleteItemIf (set ** sset, int (*cond) (void *, va_list),...)
 /* deleteSetItem - will delete a given item from the list          */
 /*-----------------------------------------------------------------*/
 void
-deleteSetItem (set ** list, void *item)
+deleteSetItem (set **list, void *item)
 {
   set *lp, *lp1;
 
@@ -241,6 +241,24 @@ deleteSetItem (set ** list, void *item)
           return;
         }
     }
+
+  /* could not find it */
+}
+
+/*-----------------------------------------------------------------*/
+/* replaceSetItem - will replace a given item in the list          */
+/*-----------------------------------------------------------------*/
+void
+replaceSetItem (set *list, void *olditem, void *newitem)
+{
+  /* find the item in the list */
+  for (; list; list = list->next)
+    if (list->item == olditem)
+      {
+        list->item = newitem;
+        return;
+      }
+
 
   /* could not find it */
 }

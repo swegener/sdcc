@@ -302,10 +302,33 @@ labelIfx (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* replaceGotoGoto - find new target for jump                      */
+/* if we have a target statement then check if the next            */
+/* one is a goto: this means target of goto is a goto              */
+/*-----------------------------------------------------------------*/
+static symbol *
+replaceGotoGoto (const iCode *ic, const symbol *sLabel, const iCode *target)
+{
+  if (!target || !target->next)
+    return 0;
+
+  if (target->next->op != GOTO && target->next->op != LABEL || target->next == ic)
+    return 0;
+
+  symbol *repLabel = target->next->label;
+
+  if (repLabel == sLabel)
+    return 0;
+
+  return repLabel;
+}
+
+
+/*-----------------------------------------------------------------*/
 /* labelGotoGoto - target of a goto is a goto                      */
 /*-----------------------------------------------------------------*/
 int 
-labelGotoGoto (iCode * ic)
+labelGotoGoto (iCode *ic)
 {
   iCode *loop;
   int change = 0;
@@ -314,61 +337,56 @@ labelGotoGoto (iCode * ic)
     {
       iCode *stat;
       symbol *sLabel = NULL;
+      symbol *repLabel;
       stat = NULL;
       switch (loop->op)
         {
         case GOTO:              /* for a goto statement */
+
           stat = hTabItemWithKey (labelDef, (sLabel = IC_LABEL (loop))->key);
+
+          if (repLabel = replaceGotoGoto (loop, sLabel, stat))
+            {
+              hTabDeleteItem (&labelRef, (IC_LABEL (loop))->key, loop, DELETE_ITEM, NULL);
+              loop->label = repLabel;
+              hTabAddItem (&labelRef, repLabel->key, loop);
+              change++;
+            }
           break;
+
         case IFX:               /* for a conditional jump */
+
           if (IC_TRUE (loop))
             stat = hTabItemWithKey (labelDef, (sLabel = IC_TRUE (loop))->key);
           else
             stat = hTabItemWithKey (labelDef, (sLabel = IC_FALSE (loop))->key);
-        }
 
-      /* if we have a target statement then check if the next */
-      /* one is a goto: this means target of goto is a goto   */
-      if (stat && stat->next &&
-          (stat->next->op == GOTO ||
-           stat->next->op == LABEL) &&
-          stat->next != loop)
-        {
-
-          symbol *repLabel = stat->next->label; /* replace with label */
-
-          /* if they are the same then continue */
-          if (repLabel->key == sLabel->key)
-            continue;
-
-          /* replacement depends on the statement type */
-          switch (loop->op)
+          if (repLabel = replaceGotoGoto (loop, sLabel, stat))
             {
-
-            case GOTO:          /* for a goto statement */
-
-              hTabDeleteItem (&labelRef, (IC_LABEL (loop))->key, loop, DELETE_ITEM, NULL);
-              loop->label = repLabel;
-              hTabAddItem (&labelRef, repLabel->key, loop);
-              break;
-
-            case IFX:           /* for a conditional jump */
               if (IC_TRUE (loop))
                 {
-
                   hTabDeleteItem (&labelRef, (IC_TRUE (loop))->key, loop, DELETE_ITEM, NULL);
                   IC_TRUE (loop) = repLabel;
                 }
               else
                 {
-
                   hTabDeleteItem (&labelRef, (IC_FALSE (loop))->key, loop, DELETE_ITEM, NULL);
                   IC_FALSE (loop) = repLabel;
                 }
               hTabAddItem (&labelRef, repLabel->key, loop);
-
+              change++;
             }
-          change++;
+          break;
+        case JUMPTABLE:
+
+          for (sLabel = setFirstItem (IC_JTLABELS (loop)); sLabel; sLabel = setNextItem (IC_JTLABELS (loop)))
+            if (repLabel = replaceGotoGoto (loop, sLabel, hTabItemWithKey (labelDef, sLabel->key)))
+              {
+                replaceSetItem (IC_JTLABELS (loop), sLabel, repLabel);
+                hTabDeleteItem (&labelRef, sLabel->key, loop, DELETE_ITEM, NULL);
+                hTabAddItem (&labelRef, repLabel->key, loop);
+                change++;
+              }
         }
     }
 

@@ -4,6 +4,8 @@
 	  src/SDCCset.h,
 	  src/SDCCset.c:
 	  Implement jump-to-jump optimization for jump tables RFE #514.
+	* src/SDCCcse.c:
+	  Extend an optimization of bitwise and to _Bool, part of RFE #513.
 
 2016-09-25 Maarten Brock <sourceforge.brock AT dse.nl>
 

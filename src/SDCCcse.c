@@ -1333,9 +1333,12 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
             }
           /* if BITWISEAND then check if one of them is 0xff... */
           /* if yes turn it into assignment */
+          if (IS_BOOLEAN(operandType (IC_RIGHT (ic)))) /* Special handling since _Bool is stored in 8 bits */
+            goto boolcase;
           switch (bitsForType (operandType (IC_RIGHT (ic))))
             {
             case 1:
+            boolcase:
               val = 0x01;
               break;
             case 8:

@@ -321,7 +321,7 @@ DEFSETFUNC (removeFromInExprs)
 }
 
 /*-----------------------------------------------------------------*/
-/* isGlobalInNearSpace - return TRUE if valriable is a globalin data */
+/* isGlobalInNearSpace - return TRUE if variable is a globalin data */
 /*-----------------------------------------------------------------*/
 static bool
 isGlobalInNearSpace (operand * op)
@@ -1333,7 +1333,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
             }
           /* if BITWISEAND then check if one of them is 0xff... */
           /* if yes turn it into assignment */
-          if (IS_BOOLEAN(operandType (IC_RIGHT (ic)))) /* Special handling since _Bool is stored in 8 bits */
+          if (IS_BOOLEAN (operandType (IC_RIGHT (ic)))) /* Special handling since _Bool is stored in 8 bits */
             goto boolcase;
           switch (bitsForType (operandType (IC_RIGHT (ic))))
             {
@@ -1808,7 +1808,8 @@ constFold (iCode * ic, set * cseSet)
 
   /* deal with only + & - */
   if (ic->op != '+' &&
-      ic->op != '-')
+      ic->op != '-' &&
+      ic->op != BITWISEAND)
     return 0;
 
   /* check if operation with a literal */
@@ -1819,6 +1820,20 @@ constFold (iCode * ic, set * cseSet)
      left hand side */
   if (!(applyToSet (cseSet, diCodeForSym, IC_LEFT (ic), &dic)))
     return 0;
+
+  if (ic->op == BITWISEAND) /* Optimize out bitwise and of comparion results */
+    {
+      /* check that this results in 0 or 1 only */
+      if(dic->op != EQ_OP && dic->op != NE_OP && dic->op != LE_OP && dic->op != GE_OP && dic->op != '<' && dic->op != '>' && dic->op != '!')
+        return 0;
+
+      IC_RIGHT (ic) = (operandLitValueUll (IC_RIGHT (ic)) & 1) ? IC_LEFT (ic) : operandFromLit (0);
+
+      ic->op = '=';
+      IC_LEFT (ic) = 0;
+
+      return 1;
+    }
 
   /* check that this is also a +/-  */
   if (dic->op != '+' && dic->op != '-')
@@ -1834,6 +1849,8 @@ constFold (iCode * ic, set * cseSet)
      less than 2 (MCS51 specific) */
   if (!(applyToSet (cseSet, diCodeForSym, IC_LEFT (dic), &ldic)))
     return 0;
+
+
 
   if (POINTER_GET (ldic) && getSize (operandType (IC_LEFT (ldic))) <= 1)
     return 0;

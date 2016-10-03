@@ -1,5 +1,10 @@
 2016-10-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCcse.c:
+	  Optimize out negation by inverting jump condition, part of RFE #516.
+
+2016-10-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCClabel.c,
 	  src/SDCCset.h,
 	  src/SDCCset.c:

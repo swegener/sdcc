@@ -1663,16 +1663,22 @@ ifxOptimize (iCode * ic, set * cseSet,
           (*change)++;
         }
       else if(ic->prev &&  /* Remove unnecessary casts */
-        (ic->prev->op == '=' || ic->prev->op == CAST) && IS_ITEMP (IC_RESULT (ic->prev)) &&
+        (ic->prev->op == '=' || ic->prev->op == CAST || ic->prev->op == '!') && IS_ITEMP (IC_RESULT (ic->prev)) &&
         IC_RESULT (ic->prev)->key == IC_COND (ic)->key && bitVectnBitsOn (OP_USES (IC_RESULT (ic->prev))) <= 1)
         {
           sym_link *type = operandType (IC_RESULT (ic->prev));
           if (ic->prev->op != CAST || IS_BOOL (type) || bitsForType (operandType (IC_RIGHT (ic->prev))) < bitsForType (type))
           {
-            if (!isOperandVolatile (IC_RIGHT (ic->prev), FALSE))
+            if (!isOperandVolatile (ic->prev->op == '!' ? IC_LEFT (ic->prev) : IC_RIGHT (ic->prev), FALSE))
               {
+                if (ic->prev->op =='!') /* Invert jump logic */
+                  {
+                    symbol *tmp = IC_TRUE (ic);
+                    IC_TRUE (ic) = IC_FALSE (ic);
+                    IC_FALSE (ic) = tmp;
+                  }
                 bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
-                ReplaceOpWithCheaperOp(&IC_COND (ic), IC_RIGHT (ic->prev));
+                ReplaceOpWithCheaperOp(&IC_COND (ic), ic->prev->op == '!' ? IC_LEFT (ic->prev) : IC_RIGHT (ic->prev));
                 (*change)++;
               }
 /* There's an optimization opportunity here, but OP_USES doesn't seem to be */

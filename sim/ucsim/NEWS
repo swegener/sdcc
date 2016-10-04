@@ -53,3 +53,7 @@ New commands: "memory info" (same as "info memory"), "get error" (same
 as "show error").
 
 Simulator interface (virtual hw element).
+
+Simulator control over serial line terminal. Escape character is ^x
+(CTRL-x) but it is configurable for every uarts. Available functions
+are: start, stop, quit, reset, close.

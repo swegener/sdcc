@@ -40,7 +40,7 @@ cl_serial_hw::cl_serial_hw(class cl_uc *auc, int aid, chars aid_string):
   cl_hw(auc, HW_UART, aid, (const char *)aid_string)
 {
   listener= 0;
-  io= new cl_hw_io(this);
+  io= new cl_serial_io(this);
   io->init();
 }
 

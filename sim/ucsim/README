@@ -9,8 +9,7 @@ What is uCsim?
 
 uCsim is a micro-controller simulator. It is extensible to support
 different micro-controller families. Currently it supports Intel MCS51
-family. Atmel AVR core is working now and Z80 support is under
-development.
+family, Z80, ST7, STM8, HC08, XA, TLCS90, and some AVR processors.
 
 
 How to get uCsim?
@@ -22,7 +21,7 @@ from its home site:
 http://mazsola.iit.uni-miskolc.hu/~drdani/embedded/ucsim/
 
 uCsim is included in sdcc, free C compiler of Sandeep Dutta. It is a
-complete development package with debugger (see belove). It can be
+complete development package with debugger (see below). It can be
 downloaded from its home site (or from its mirrors):
 
 http://sdcc.sourceforge.net/
@@ -37,7 +36,7 @@ page at above URL for subscribing information and the archive. Ideas,
 bug reports or fixes should be sent to sdcc's list too.
 
 
-Feautres of uCsim
+Features of uCsim
 -----------------
 
 Features of uCsim are similar to features of other simulators. It
@@ -69,7 +68,7 @@ simulators. They include:
   about ratio of main program and interrupt services.
 
 - Event breakpoints. Simulator can stop the execution when read or
-  write event occures at any location of any kind of memory.
+  write event occurs at any location of any kind of memory.
 
 
 External tools
@@ -94,7 +93,7 @@ sdcdb
     any debugger GUI such as ddd to make it comfortable.
 
 
-Contributors and mainteners
+Contributors and maintainers
 ---------------------------
 
 Gunnar Holm <gunnarh@foa.nft.no>
@@ -113,5 +112,5 @@ Alexis Pavlov <alexis.pavlov@certess.com>
 Davide Zanni <davide.zanni@libero.it>
 Anton Persson <anton@omicron.se>
 
-Maintener of serialview: Timothy Hurman <ee62th@ee.surrey.ac.uk>
-Maintener of other parts: Daniel Drotos <drdani@mazsola.iit.uni-miskolc.hu>
+Maintainer of serialview: Timothy Hurman <ee62th@ee.surrey.ac.uk>
+Maintainer of other parts: Daniel Drotos <drdani@mazsola.iit.uni-miskolc.hu>

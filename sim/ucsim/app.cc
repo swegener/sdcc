@@ -98,12 +98,11 @@ cl_app::init(int argc, char *argv[])
 int
 cl_app::run(void)
 {
-  int done= 0, now_cyc= 50000;
-  double input_last_checked= 0, last_check= 0, now= 0, last_now= 0;
+  int done= 0;
+  double input_last_checked= 0;
   class cl_option *o= options->get_option("go");
   bool g_opt= false;
   unsigned int cyc= 0;
-  //int last_sopc= 0;
   
   if (o)
     o->get_value(&g_opt);
@@ -112,25 +111,7 @@ cl_app::run(void)
   
   while (!done)
     {
-      if ((++cyc % now_cyc) == 0)
-	{
-	  now= dnow();
-	  if (last_now != 0)
-	    {
-	      double d= now - last_now;
-	      if (d > 0.045)
-		{
-		  now_cyc*= 0.95;
-		  if (now_cyc < 1000)
-		    now_cyc= 1000;
-		}
-	      if (d < 0.035)
-		{
-		  now_cyc*= 1.05;
-		}
-	    }
-	  last_now= now;
-	}
+      ++cyc;
       if (!sim)
 	{
 	  commander->wait_input();
@@ -140,15 +121,16 @@ cl_app::run(void)
         {
           if (sim->state & SIM_GO)
             {
-	      if (now - input_last_checked > 0.1)
+	      if (cyc - input_last_checked > 10000)
 		{
-		  input_last_checked= dnow();
+		  input_last_checked= cyc;
 		  if (commander->input_avail())
 		    done= commander->proc_input();
                 }
 	      sim->step();
 	      if (jaj && commander->frozen_console)
-		sim->uc->print_regs(commander->frozen_console),commander->frozen_console->dd_printf("\n");
+		sim->uc->print_regs(commander->frozen_console),
+		  commander->frozen_console->dd_printf("\n");
             }
 	  else
 	    {
@@ -158,8 +140,7 @@ cl_app::run(void)
 	  if (sim->state & SIM_QUIT)
 	    done= 1;
 	}
-      if (now - last_check > 0.001)
-	commander->check();
+      commander->check();
     }
   return(0);
 }
@@ -167,7 +148,6 @@ cl_app::run(void)
 void
 cl_app::done(void)
 {
-  //delete commander;
 }
 
 
@@ -218,6 +198,7 @@ enum {
   SOPT_IN= 0,
   SOPT_OUT,
   SOPT_UART,
+  SOPT_USART,
   SOPT_PORT
 };
 
@@ -225,6 +206,7 @@ static const char *S_opts[]= {
   /*[SOPT_IN]=*/	"in",
   /*[SOPT_OUT]=*/	"out",
   /*[SOPT_UART]=*/	"uart",
+  /*[SOPT_USART]=*/	"usart",
   /*[SOPT_PORT]=*/	"port",
   NULL
 };
@@ -408,7 +390,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 		  }
 		  oname= value;
 		  break;
-		case SOPT_UART:
+		case SOPT_UART: case SOPT_USART:
 		  uart= strtol(value, 0, 0);
 		  break;
 		case SOPT_PORT:
@@ -536,16 +518,6 @@ cl_app::get_cmd(class cl_cmdline *cmdline)
 /*
  * Messages to broadcast
  */
-
-/*
-void
-cl_app::mem_cell_changed(class cl_m *mem, t_addr addr)
-{
-  if (sim)
-    sim->mem_cell_changed(mem, addr);
-}
-*/
-
 
 /* Adding and removing components */
 

@@ -9,11 +9,14 @@
 # include <arpa/inet.h>
 #endif
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <string.h>
 #include <stdarg.h>
+
+#include "utils.h"
 
 #include "fuiocl.h"
 
@@ -25,12 +28,18 @@ void deb(chars format, ...)
   return;
   if (dd==NULL)
     {
-      dd= mk_io(cchars("/dev/pts/5"),cchars("w"));
+      dd= mk_io(cchars("/dev/pts/1"),cchars("w"));
       dd->init();
     }
   va_list ap;
   va_start(ap, format);
-  dd->vprintf(format, ap);
+  //dd->vprintf(format, ap);
+  //vdprintf(dd->file_id, format, ap);
+  {
+    char *buf= vformat_string(format, ap);
+    dd->write(buf, strlen(buf));
+    free(buf);
+  }
   va_end(ap);
 }
 
@@ -219,6 +228,7 @@ cl_io::restore_attributes()
 {
   if (attributes_saved)
     {
+      saved_attributes.c_lflag|= ICANON|ECHO;
       tcsetattr(file_id, TCSAFLUSH, &saved_attributes);
       attributes_saved= 0;
     }
@@ -353,7 +363,7 @@ check_inputs(class cl_list *active, class cl_list *avail)
   for (i= 0; i < active->count; i++)
     {
       class cl_f *fio= (class cl_f *)active->at(i);
-      //deb("checking fid=%d\n", fio->file_id);
+      deb("checking fid=%d\n", fio->file_id);
       if (fio->check_dev() ||
 	  fio->eof())
 	{

@@ -205,6 +205,8 @@ extern bool check_inputs(class cl_list *active, class cl_list *avail);
 extern void msleep(int msec);
 extern void loop_delay();
 
+extern chars fio_type_name(enum file_type t);
+
 
 #endif
 

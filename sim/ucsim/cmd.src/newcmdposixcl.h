@@ -64,7 +64,7 @@ public:
   virtual bool need_check(void);
   virtual bool set_cooked(bool new_val);
   
-private:
+public:
   //FILE *get_out(void) { return rout ? rout : out; }
   class cl_f *get_fout(void) { return frout ? frout : fout; }
   class cl_f *get_fin(void) { return fin; }

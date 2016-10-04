@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 435 2016-08-26 17:57:43Z drdani $ */
+/* $Id: serial.cc 450 2016-10-03 13:50:16Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -96,13 +96,14 @@ cl_serial::init(void)
 				    "usart receive", 20*10+3));
 
   sr_read= false;
-
+  /*
   cl_var *v;
   chars pn(id_string);
   pn.append("%d_", id);
-  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serial_on));
+  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serconf_on));
+  uc->vars->add(v= new cl_var(pn+chars("check_often"), cfg, serconf_check_often));
   v->init();
-  
+  */
   return(0);
 }
 
@@ -192,9 +193,12 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
 t_mem
 cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
+  if (addr < serconf_common)
+    return cl_serial_hw::conf_op(cell, addr, val);
   switch ((enum serial_cfg)addr)
     {
-    case serial_on: // turn this HW on/off
+      /*
+    case serial_:
       if (val)
 	{
 	  if (*val)
@@ -206,6 +210,9 @@ cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	{
 	  cell->set(on?1:0);
 	}
+      break;
+      */
+    default:
       break;
     }
   return cell->get();
@@ -235,9 +242,10 @@ cl_serial::tick(int cycles)
     {
       printf("** sent %c\n", s_out);
       s_sending= false;
-      if (fout)
+      //if (io->fout)
 	{
-	  fout->write((char*)(&s_out), 1);
+	  io->dd_printf("%c", s_out);
+	  //io->flush();
 	}
       s_tr_bit-= bits;
       if (s_tx_written)
@@ -246,10 +254,12 @@ cl_serial::tick(int cycles)
 	finish_send();
     }
   if ((ren) &&
-      fin &&
+      io->fin &&
       !s_receiving)
     {
-      if (fin->input_avail())
+      //if (io->fin->input_avail())
+      //io->proc_input(0);
+      if (input_avail)
 	{
 	  s_receiving= true;
 	  s_rec_bit= 0;
@@ -260,8 +270,10 @@ cl_serial::tick(int cycles)
   if (s_receiving &&
       (s_rec_bit >= bits))
     {
-      if (fin->read(&c, 1) == 1)
+      //if (fin->read(&c, 1) == 1)
 	{
+	  c= input;
+	  input_avail= false;
 	  s_in= c;
 	  received();
 	}
@@ -404,11 +416,11 @@ cl_serial::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d] %s\n", id_string, id, on?"on":"off");
   con->dd_printf("Input: ");
-  if (fin)
-    con->dd_printf("%s/%d ", fin->get_file_name(), fin->file_id);
+  if (io->fin)
+    con->dd_printf("%s/%d ", io->fin->get_file_name(), io->fin->file_id);
   con->dd_printf("Output: ");
-  if (fout)
-    con->dd_printf("%s/%d\n", fout->get_file_name(), fout->file_id);
+  if (io->fout)
+    con->dd_printf("%s/%d\n", io->fout->get_file_name(), io->fout->file_id);
 }
 
 

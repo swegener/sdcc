@@ -137,7 +137,8 @@ class cl_console_base: public cl_base
   virtual void print_bin(long data, int bits);
   virtual void print_char_octal(char c);
   virtual int cmd_do_print(const char *format, va_list ap);
-
+  //virtual void flush(void);
+  
   virtual bool interpret(char *cmd);
   virtual int get_id(void) const { return(id); }
   virtual void set_id(int new_id);

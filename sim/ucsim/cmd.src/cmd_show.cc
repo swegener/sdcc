@@ -206,6 +206,32 @@ COMMAND_DO_WORK_APP(cl_show_console)
       con->dd_printf("%c", 'I'|((f&CONS_INTERACTIVE)?0:0x20));
       con->dd_printf("%c", 'E'|((f&CONS_ECHO)?0:0x20));
       con->dd_printf("\n");
+      class cl_f *ff= cn->get_fin();
+      con->dd_printf(" <");
+      if (ff)
+	{
+	  char *n= ff->get_file_name();
+	  chars t= fio_type_name(ff->type);
+	  con->dd_printf("\"%s\",%s,", n, (char*)t);
+	  con->dd_printf("%d,%d,", ff->file_id, ff->server_port);
+	  con->dd_printf("%c%c",
+			 ff->tty?'T':'t',
+			 ff->get_cooking()?'c':'r');
+	}
+      con->dd_printf("\n");
+      ff= cn->get_fout();
+      con->dd_printf(" >");
+      if (ff)
+	{
+	  char *n= ff->get_file_name();
+	  chars t= fio_type_name(ff->type);
+	  con->dd_printf("\"%s\",%s,", n, (char*)t);
+	  con->dd_printf("%d,", ff->file_id);
+	  con->dd_printf("%c%c",
+			 ff->tty?'T':'t',
+			 ff->get_cooking()?'c':'r');
+	}
+      con->dd_printf("\n");
     }
   return false;
 }

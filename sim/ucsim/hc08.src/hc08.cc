@@ -51,8 +51,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define uint8 unsigned char
 #define int8 char
 
-const bool TRUE = 1;
-const bool FALSE = 0;
+//const bool TRUE = 1;
+//const bool FALSE = 0;
 
 /*******************************************************************/
 
@@ -464,16 +464,16 @@ cl_hc08::exec_inst(void)
     return(resBREAKPOINT);
   tick(1);
   switch ((code >> 4) & 0xf) {
-    case 0x0: return(inst_bittestsetclear(code, FALSE));
-    case 0x1: return(inst_bitsetclear(code, FALSE));
-    case 0x2: return(inst_condbranch(code, FALSE));
+  case 0x0: return(inst_bittestsetclear(code, /*FALSE*/0));
+  case 0x1: return(inst_bitsetclear(code, /*FALSE*/0));
+    case 0x2: return(inst_condbranch(code, /*FALSE*/0));
     case 0x3:
     case 0x4:
     case 0x5:
     case 0x6:
     case 0x7:
       switch (code & 0xf) {
-        case 0x0: return(inst_neg(code, FALSE));
+        case 0x0: return(inst_neg(code, /*FALSE*/0));
         case 0x1: return(inst_cbeq(code, false));
         case 0x2:
           switch (code) {
@@ -481,27 +481,27 @@ cl_hc08::exec_inst(void)
             case 0x42: return(inst_mul(code, false));
             case 0x52: return(inst_div(code, false));
             case 0x62: return(inst_nsa(code, false));
-            case 0x72: return(inst_daa(code, FALSE));
+            case 0x72: return(inst_daa(code, /*FALSE*/0));
             default: return(resHALT);
           }
-        case 0x3: return(inst_com(code, FALSE));
-        case 0x4: return(inst_lsr(code, FALSE));
+        case 0x3: return(inst_com(code, /*FALSE*/0));
+        case 0x4: return(inst_lsr(code, /*FALSE*/0));
         case 0x5:
           switch (code) {
-            case 0x35: return(inst_sthx(code, FALSE));
+            case 0x35: return(inst_sthx(code, /*FALSE*/0));
             case 0x45:
-            case 0x55: return(inst_ldhx(code, FALSE));
+            case 0x55: return(inst_ldhx(code, /*FALSE*/0));
             case 0x65:
-            case 0x75: return(inst_cphx(code, FALSE));
+            case 0x75: return(inst_cphx(code, /*FALSE*/0));
             default: return(resHALT);
           }
-        case 0x6: return(inst_ror(code, FALSE));
-        case 0x7: return(inst_asr(code, FALSE));
-        case 0x8: return(inst_lsl(code, FALSE));
-        case 0x9: return(inst_rol(code, FALSE));
-        case 0xa: return(inst_dec(code, FALSE));
-        case 0xb: return(inst_dbnz(code, FALSE));
-        case 0xc: return(inst_inc(code, FALSE));
+        case 0x6: return(inst_ror(code, /*FALSE*/0));
+        case 0x7: return(inst_asr(code, /*FALSE*/0));
+        case 0x8: return(inst_lsl(code, /*FALSE*/0));
+        case 0x9: return(inst_rol(code, /*FALSE*/0));
+        case 0xa: return(inst_dec(code, /*FALSE*/0));
+        case 0xb: return(inst_dbnz(code, /*FALSE*/0));
+        case 0xc: return(inst_inc(code, /*FALSE*/0));
         case 0xd: return(inst_tst(code, false));
         case 0xe:
           switch (code) {
@@ -509,25 +509,25 @@ cl_hc08::exec_inst(void)
             case 0x4e:
             case 0x5e:
             case 0x6e:
-            case 0x7e: return(inst_mov(code, FALSE));
+            case 0x7e: return(inst_mov(code, /*FALSE*/0));
             default: return(resHALT);
           }
-        case 0xf: return(inst_clr(code, FALSE));
+        case 0xf: return(inst_clr(code, /*FALSE*/0));
         default: return(resHALT);
       }
     case 0x8:
       switch (code & 0xf) {
-        case 0x0: return(inst_rti(code, FALSE));
-        case 0x1: return(inst_rts(code, FALSE));
-        case 0x3: return(inst_swi(code, FALSE));
+        case 0x0: return(inst_rti(code, /*FALSE*/0));
+        case 0x1: return(inst_rts(code, /*FALSE*/0));
+        case 0x3: return(inst_swi(code, /*FALSE*/0));
         case 0x4:
-        case 0x5: return(inst_transfer(code, FALSE));
+        case 0x5: return(inst_transfer(code, /*FALSE*/0));
         case 0x6:
         case 0x7:
         case 0x8:
         case 0x9:
         case 0xa:
-        case 0xb: return(inst_pushpull(code, FALSE));
+        case 0xb: return(inst_pushpull(code, /*FALSE*/0));
         case 0xc: return(inst_clrh(code, false));
         case 0xe: return(inst_stop(code, false));
         case 0xf: return(inst_wait(code, false));
@@ -556,16 +556,16 @@ cl_hc08::exec_inst(void)
           switch ((code >> 4) & 0xf) {
             case 0x6:
               switch (code & 0xf) {
-                case 0x0: return(inst_neg(code, TRUE));
-                case 0x1: return(inst_cbeq(code, TRUE));
-                case 0x3: return(inst_com(code, TRUE));
-                case 0x4: return(inst_lsr(code, TRUE));
-                case 0x6: return(inst_ror(code, TRUE));
-                case 0x7: return(inst_asr(code, TRUE));
-                case 0x8: return(inst_lsl(code, TRUE));
-                case 0x9: return(inst_rol(code, TRUE));
-                case 0xa: return(inst_dec(code, TRUE));
-                case 0xb: return(inst_dbnz(code, TRUE));
+                case 0x0: return(inst_neg(code, /*TRUE*/1));
+                case 0x1: return(inst_cbeq(code, /*TRUE*/1));
+                case 0x3: return(inst_com(code, /*TRUE*/1));
+                case 0x4: return(inst_lsr(code, /*TRUE*/1));
+                case 0x6: return(inst_ror(code, /*TRUE*/1));
+                case 0x7: return(inst_asr(code, /*TRUE*/1));
+                case 0x8: return(inst_lsl(code, /*TRUE*/1));
+                case 0x9: return(inst_rol(code, /*TRUE*/1));
+                case 0xa: return(inst_dec(code, /*TRUE*/1));
+                case 0xb: return(inst_dbnz(code, /*TRUE*/1));
                 case 0xc: return(inst_inc(code, true));
                 case 0xd: return(inst_tst(code, true));
                 case 0xf: return(inst_clr(code, true));
@@ -589,15 +589,15 @@ cl_hc08::exec_inst(void)
             case 0xd:
             case 0xe:
               switch (code & 0xf) {
-                case 0x0: return(inst_sub(code, TRUE));
-                case 0x1: return(inst_cmp(code, TRUE));
-                case 0x2: return(inst_sbc(code, TRUE));
-                case 0x3: return(inst_cpx(code, TRUE));
-                case 0x4: return(inst_and(code, TRUE));
-                case 0x5: return(inst_bit(code, TRUE));
-                case 0x6: return(inst_lda(code, TRUE));
-                case 0x7: return(inst_sta(code, TRUE));
-                case 0x8: return(inst_eor(code, TRUE));
+                case 0x0: return(inst_sub(code, /*TRUE*/1));
+                case 0x1: return(inst_cmp(code, /*TRUE*/1));
+                case 0x2: return(inst_sbc(code, /*TRUE*/1));
+                case 0x3: return(inst_cpx(code, /*TRUE*/1));
+                case 0x4: return(inst_and(code, /*TRUE*/1));
+                case 0x5: return(inst_bit(code, /*TRUE*/1));
+                case 0x6: return(inst_lda(code, /*TRUE*/1));
+                case 0x7: return(inst_sta(code, /*TRUE*/1));
+                case 0x8: return(inst_eor(code, /*TRUE*/1));
                 case 0x9: return(inst_adc(code, true));
                 case 0xa: return(inst_ora(code, true));
                 case 0xb: return(inst_add(code, true));
@@ -625,21 +625,21 @@ cl_hc08::exec_inst(void)
     case 0xe:
     case 0xf:
       switch (code & 0xf) {
-        case 0x0: return(inst_sub(code, FALSE));
-        case 0x1: return(inst_cmp(code, FALSE));
-        case 0x2: return(inst_sbc(code, FALSE));
-        case 0x3: return(inst_cpx(code, FALSE));
-        case 0x4: return(inst_and(code, FALSE));
-        case 0x5: return(inst_bit(code, FALSE));
-        case 0x6: return(inst_lda(code, FALSE));
+        case 0x0: return(inst_sub(code, /*FALSE*/0));
+        case 0x1: return(inst_cmp(code, /*FALSE*/0));
+        case 0x2: return(inst_sbc(code, /*FALSE*/0));
+        case 0x3: return(inst_cpx(code, /*FALSE*/0));
+        case 0x4: return(inst_and(code, /*FALSE*/0));
+        case 0x5: return(inst_bit(code, /*FALSE*/0));
+        case 0x6: return(inst_lda(code, /*FALSE*/0));
         case 0x7:
           if (code==0xa7)
-            return(inst_ais(code, FALSE));
+            return(inst_ais(code, /*FALSE*/0));
           else
-            return(inst_sta(code, FALSE));
-        case 0x8: return(inst_eor(code, FALSE));
-        case 0x9: return(inst_adc(code, FALSE));
-        case 0xa: return(inst_ora(code, FALSE));
+            return(inst_sta(code, /*FALSE*/0));
+        case 0x8: return(inst_eor(code, /*FALSE*/0));
+        case 0x9: return(inst_adc(code, /*FALSE*/0));
+        case 0xa: return(inst_ora(code, /*FALSE*/0));
         case 0xb: return(inst_add(code, false));
         case 0xc:
           if (code==0xac)
@@ -648,15 +648,15 @@ cl_hc08::exec_inst(void)
             return(inst_jmp(code, false));
         case 0xd:
           if (code==0xad)
-            return(inst_bsr(code, FALSE));
+            return(inst_bsr(code, /*FALSE*/0));
           else
-            return(inst_jsr(code, FALSE));
-        case 0xe: return(inst_ldx(code, FALSE));
+            return(inst_jsr(code, /*FALSE*/0));
+        case 0xe: return(inst_ldx(code, /*FALSE*/0));
         case 0xf:
           if (code==0xaf)
-            return(inst_aix(code, FALSE));
+            return(inst_aix(code, /*FALSE*/0));
           else
-            return(inst_stx(code, FALSE));
+            return(inst_stx(code, /*FALSE*/0));
         default: return(resHALT);
       }
     default: return(resHALT);

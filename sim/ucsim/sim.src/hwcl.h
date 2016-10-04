@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // cmd.src
 #include "newcmdcl.h"
+#include "newcmdposixcl.h"
 
 // local
 #include "memcl.h"
@@ -71,6 +72,7 @@ class cl_hw: public cl_guiobj
   virtual bool conf(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
   virtual void cfg_set(t_addr addr, t_mem val);
+  virtual t_mem cfg_get(t_addr addr);
   
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual class cl_memory_cell *register_cell(class cl_address_space *mem,
@@ -82,7 +84,8 @@ class cl_hw: public cl_guiobj
   virtual void happen(class cl_hw * /*where*/, enum hw_event /*he*/,
                       void * /*params*/) {}
   virtual void inform_partners(enum hw_event he, void *params);
-
+  virtual void proc_input(class cl_f *fin, class cl_f *fout) {}
+  
   virtual void print_info(class cl_console_base *con);
 };
 
@@ -109,6 +112,20 @@ class cl_partner_hw: public cl_base
   virtual void refresh(class cl_hw *new_hw);
 
   virtual void happen(class cl_hw *where, enum hw_event he, void *params);
+};
+
+
+class cl_hw_io: public cl_console
+{
+ protected:
+  class cl_hw *hw;
+ public:
+  cl_hw_io(class cl_hw *ihw);
+  virtual int init(void);
+  
+  virtual int proc_input(class cl_cmdset *cmdset);
+  virtual bool prevent_quit(void) { return false; }
+  virtual void print_prompt(void) {}
 };
 
 

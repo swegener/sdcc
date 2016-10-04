@@ -159,6 +159,12 @@ cl_hw::cfg_set(t_addr addr, t_mem val)
   cfg->set(addr, val);
 }
 
+t_mem
+cl_hw::cfg_get(t_addr addr)
+{
+  return cfg->get(addr);
+}
+
 void
 cl_hw::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
@@ -304,6 +310,32 @@ cl_partner_hw::happen(class cl_hw *where, enum hw_event he, void *params)
 {
   if (partner)
     partner->happen(where, he, params);
+}
+
+
+/*
+ *____________________________________________________________________________
+ */
+
+cl_hw_io::cl_hw_io(class cl_hw *ihw):
+  cl_console()
+{
+  hw= ihw;
+}
+
+int
+cl_hw_io::init(void)
+{
+  set_flag(CONS_NOWELCOME, true);
+  return 0;
+}
+
+int
+cl_hw_io::proc_input(class cl_cmdset *cmdset)
+{
+  if (hw)
+    hw->proc_input(get_fin(), get_fout());
+  return 0;
 }
 
 

@@ -502,6 +502,10 @@ cl_commander::update_active(void)
       if (config_console &&
 	  (config_console != c))
 	continue;
+
+      if (f &&
+	  (f->file_id < 0))
+	continue;
       
       if (c->input_active() &&
 	  f)

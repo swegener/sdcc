@@ -84,13 +84,14 @@ cl_serial::init(void)
     }
   else
     t2_baud= false;
-
+  /*
   cl_var *v;
   chars pn(id_string);
   pn.append("%d_", id);
-  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serial_on));
+  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serconf_on));
+  uc->vars->add(v= new cl_var(pn+chars("check_often"), cfg, serconf_check_often));
   v->init();
-  
+  */
   return(0);
 }
 
@@ -207,9 +208,12 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
 t_mem
 cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
+  if (addr < serconf_common)
+    return cl_serial_hw::conf_op(cell, addr, val);
   switch ((enum serial_cfg)addr)
     {
-    case serial_on: // turn this HW on/off
+      /*
+    case serial_:
       if (val)
 	{
 	  if (*val)
@@ -221,6 +225,9 @@ cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	{
 	  cell->set(on?1:0);
 	}
+      break;
+      */
+    default:
       break;
     }
   return cell->get();
@@ -283,17 +290,23 @@ cl_serial::tick(int cycles)
     {
       s_sending= false;
       scon->set_bit1(bmTI);
-      if (fout)
+      //if (io->fout)
 	{
-	  fout->write((char*)(&s_out), 1);
+	  //io->fout->write((char*)(&s_out), 1);
+	  io->dd_printf("%c", s_out);
 	}
       s_tr_bit-= _bits;
     }
   if ((_bmREN) &&
-      fin &&
+      io->fin &&
       !s_receiving)
     {
-      if (fin->input_avail())
+      if (cfg_get(serconf_check_often))
+	{
+	  if (io->input_avail())
+	    io->proc_input(0);
+	}
+      if (/*fin->*/input_avail/*()*/)
 	{
 	  s_receiving= true;
 	  s_rec_bit= 0;
@@ -303,8 +316,10 @@ cl_serial::tick(int cycles)
   if (s_receiving &&
       (s_rec_bit >= _bits))
     {
-      if (fin->read(&c, 1) == 1)
+      //if (fin->read(&c, 1) == 1)
 	{
+	  c= input;
+	  input_avail= false;
 	  s_in= c;
 	  sbuf->set(s_in);
 	  received(c);
@@ -384,11 +399,11 @@ cl_serial::print_info(class cl_console_base *con)
 
   con->dd_printf("%s[%d] %s\n", id_string, id, on?"on":"off");
   con->dd_printf("Input: ");
-  if (fin)
-    con->dd_printf("%s/%d ", fin->get_file_name(), fin->file_id);
+  if (io->fin)
+    con->dd_printf("%s/%d ", io->fin->get_file_name(), io->fin->file_id);
   con->dd_printf("Output: ");
-  if (fout)
-    con->dd_printf("%s/%d\n", fout->get_file_name(), fout->file_id);
+  if (io->fout)
+    con->dd_printf("%s/%d\n", io->fout->get_file_name(), io->fout->file_id);
   int mode= (sc&(bmSM0|bmSM1))>>6;
   con->dd_printf("%s", modes[mode]);
   if (mode == 1 || mode == 2)

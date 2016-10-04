@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serialcl.h 435 2016-08-26 17:57:43Z drdani $ */
+/* $Id: serialcl.h 447 2016-10-03 08:00:27Z drdani $ */
 
 #ifndef STM8_SERIALCL_HEADER
 #define STM8_SERIALCL_HEADER
@@ -39,10 +39,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "newcmdposixcl.h"
 
-
-enum serial_cfg {
-  serial_on	   	= 0,
-};
 
 class cl_serial_listener;
 

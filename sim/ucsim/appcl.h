@@ -88,7 +88,6 @@ protected:
 public:
   class cl_sim *sim;
   class cl_ustrings *in_files;
-  //class cl_arguments *args;
   class cl_options *options;
   int going;
 

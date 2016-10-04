@@ -50,9 +50,10 @@ init_winsock(void)
       int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
       if (iResult != 0)
         {
-          //printf("WSAStartup failed: %d\n", iResult);
+          fprintf(stderr, "WSAStartup failed: %d\n", iResult);
           exit(1);
         }
+      //fprintf(stderr, "WSAStartup called\n");
       is_initialized = true;
     }
 }
@@ -404,13 +405,14 @@ mk_srv_socket(int port)
 {
   struct sockaddr_in name;
 
-  //printf("make_server_socket(%d)\n", port);
+  init_winsock();
+  //fprintf(stderr, "make_server_socket(%d)\n", port);
   /* Create the socket. */
   /*SOCKET*/unsigned int sock = WSASocket(PF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0);
   if (INVALID_SOCKET == sock)
     {
       fprintf(stderr, "socket: %d\n", WSAGetLastError());
-      return INVALID_SOCKET;
+      return -1;/*INVALID_SOCKET*/;
     }
 
   name.sin_family     = AF_INET;
@@ -418,8 +420,17 @@ mk_srv_socket(int port)
   name.sin_addr.s_addr= htonl(INADDR_ANY);
   if (SOCKET_ERROR == bind(sock, (struct sockaddr *)&name, sizeof(name)))
     {
-      fprintf(stderr, "bind: %d\n", WSAGetLastError());
-      return INVALID_SOCKET;
+      /*wchar_t*/LPWSTR s = NULL;
+      int e= WSAGetLastError();
+      FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		     FORMAT_MESSAGE_FROM_SYSTEM |
+		     FORMAT_MESSAGE_IGNORE_INSERTS, 
+		     NULL, e,
+		     MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		     (LPWSTR)&s, 0, NULL);
+      fprintf(stderr, "bind of port %d: %d %S\n", port, e, s);
+      LocalFree(s);
+      return -1/*INVALID_SOCKET*/;
     }
 
   //printf("socket=%d\n", sock);

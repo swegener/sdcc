@@ -39,10 +39,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include "newcmdcl.h"
 
-enum serial_cfg {
-  serial_on	   	= 0,
-};
-
 class cl_serial_listener;
 
 class cl_serial: public cl_serial_hw

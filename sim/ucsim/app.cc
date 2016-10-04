@@ -57,50 +57,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 bool jaj= false;
 
-/*
- * Program options
- */
-
-/*cl_option::cl_option(int atype, char sn, char *ln)
-{
-  type= atype;
-  short_name= sn;
-  if (!ln)
-    long_name= NULL;
-  else
-    long_name= strdup(ln);
-  values= new cl_ustrings(1, 1);
-}
-
-cl_option::~cl_option(void)
-{
-  if (long_name)
-    free(long_name);
-  delete values;
-}
-
-int
-cl_option::add_value(char *value)
-{
-  values->add(value);
-  return(values->count - 1);
-}
-
-char *
-cl_option::get_value(int index)
-{
-  if (index > values->count - 1)
-    return(0);
-  return((char*)(values->at(index)));
-}*/
-
-/* List of options */
-
-/*cl_options::cl_options(void):
-  cl_list(2, 2)
-{
-}*/
-
 
 /*
  * Application
@@ -112,7 +68,6 @@ cl_app::cl_app(void)
   sim= 0;
   in_files= new cl_ustrings(2, 2, "input files");
   options= new cl_options();
-  //going= 1;
 }
 
 cl_app::~cl_app(void)
@@ -143,8 +98,8 @@ cl_app::init(int argc, char *argv[])
 int
 cl_app::run(void)
 {
-  int done= 0;
-  double input_last_checked= 0, last_check= 0, now= 0;
+  int done= 0, now_cyc= 50000;
+  double input_last_checked= 0, last_check= 0, now= 0, last_now= 0;
   class cl_option *o= options->get_option("go");
   bool g_opt= false;
   unsigned int cyc= 0;
@@ -157,8 +112,25 @@ cl_app::run(void)
   
   while (!done)
     {
-      if ((++cyc % 1000000) == 0)
-	now= dnow();
+      if ((++cyc % now_cyc) == 0)
+	{
+	  now= dnow();
+	  if (last_now != 0)
+	    {
+	      double d= now - last_now;
+	      if (d > 0.045)
+		{
+		  now_cyc*= 0.95;
+		  if (now_cyc < 1000)
+		    now_cyc= 1000;
+		}
+	      if (d < 0.035)
+		{
+		  now_cyc*= 1.05;
+		}
+	    }
+	  last_now= now;
+	}
       if (!sim)
 	{
 	  commander->wait_input();
@@ -168,23 +140,15 @@ cl_app::run(void)
         {
           if (sim->state & SIM_GO)
             {
-	      if (now - input_last_checked > 0.2)
+	      if (now - input_last_checked > 0.1)
 		{
-		  input_last_checked= now;
+		  input_last_checked= dnow();
 		  if (commander->input_avail())
 		    done= commander->proc_input();
                 }
 	      sim->step();
-	      /*if (sim->uc->stack_ops->count != last_sopc)
-		{
-		  last_sopc= sim->uc->stack_ops->count;
-		  printf("stack ops count changed: %d\n", last_sopc);
-		  class cl_stack_op *top= (class cl_stack_op *)(sim->uc->stack_ops->top());
-		  if (top && commander->frozen_console)
-		    top->info(commander->frozen_console, sim->uc);
-		    }*/
 	      if (jaj && commander->frozen_console)
-		sim->uc->print_regs(commander->frozen_console),commander->frozen_console->dd_printf("\n");//sim->uc->print_disass(sim->uc->PC, commander->frozen_console);
+		sim->uc->print_regs(commander->frozen_console),commander->frozen_console->dd_printf("\n");
             }
 	  else
 	    {
@@ -379,34 +343,9 @@ cl_app::proc_arguments(int argc, char *argv[])
 	}
       case 's':
       {
-	//FILE *Ser_in, *Ser_out;
-	/*
-	if (s_done)
-	  {
-	    fprintf(stderr, "-s option can not be used more than once.\n");
-	    break;
-	  }
-	*/
-	//s_done= true;
-	/*
-	if ((Ser_in= fopen(optarg, "r")) == NULL)
-	  {
-	    fprintf(stderr,
-		    "Can't open `%s': %s\n", optarg, strerror(errno));
-	    return(4);
-	  }
-	*/
 	if (!options->set_value("serial0_in_file", this, /*(void*)Ser_in*/optarg))
 	  fprintf(stderr, "Warning: No \"serial0_in_file\" option found to set "
 		  "parameter of -s as serial input file\n");
-	/*
-	if ((Ser_out= fopen(optarg, "w")) == NULL)
-	  {
-	    fprintf(stderr,
-		    "Can't open `%s': %s\n", optarg, strerror(errno));
-	    return(4);
-	  }
-	*/
 	if (!options->set_value("serial0_out_file", this, /*Ser_out*/optarg))
 	  fprintf(stderr, "Warning: No \"serial_out0_file\" option found "
 		  "to set parameter of -s as serial output file\n");
@@ -416,11 +355,8 @@ cl_app::proc_arguments(int argc, char *argv[])
       // socket serial I/O by Alexandre Frey <Alexandre.Frey@trusted-logic.fr>
       case 'k':
 	{
-	  //FILE *Ser_in, *Ser_out;
-	  //int  sock;
 	  class cl_f *listener, *fin, *fout;
 	  int serverport;
-	  //int client_sock;
 	  char *s;
 	  
 	  if (k_done) {
@@ -429,42 +365,19 @@ cl_app::proc_arguments(int argc, char *argv[])
 	  k_done= true;
 
 	  serverport = strtol(optarg, 0, 0);
-	  //sock= make_server_socket(serverport);
 	  listener= mk_srv(serverport);
-	  /*
-	  if (listen(sock, 1) < 0) {
-	    fprintf(stderr, "Listen on port %d: %s\n", serverport,
-		    strerror(errno));
-	    return (4);
-	  }
-	  */
 	  fprintf(stderr, "Listening on port %d for a serial connection.\n",
 		  serverport);
-	  /*if ((client_sock= accept(sock, NULL, NULL)) < 0) {
-	    fprintf(stderr, "accept: %s\n", strerror(errno));
-	    }*/
 	  if (srv_accept(listener, &fin, &fout)!=0)
 	    {
 	      fprintf(stderr, "Error accepting connection on port %d\n", serverport);
 	      return 4;
 	    }
 	  fprintf(stderr, "Serial connection established.\n");
-	  /*
-	  if ((Ser_in= fdopen(client_sock, "r")) == NULL) {
-	    fprintf(stderr, "Can't create input stream: %s\n", strerror(errno));
-	    return (4);
-	  }
-	  */
 	  s= format_string("\0010x%llx", (unsigned long long int)(fin));
 	  if (!options->set_value("serial0_in_file", this, /*(void*)Ser_in*/s))
 	    fprintf(stderr, "Warning: No \"serial0_in_file\" option found to "
 		    "set parameter of -s as serial input file\n");
-	  /*
-	  if ((Ser_out= fdopen(client_sock, "w")) == NULL) {
-	    fprintf(stderr, "Can't create output stream: %s\n", strerror(errno));
-	    return (4);
-	  }
-	  */
 	  s= format_string("\0010x%llx", (unsigned long long int)(fout));
 	  if (!options->set_value("serial0_out_file", this, /*Ser_out*/s))
 	    fprintf(stderr, "Warning: No \"serial0_out_file\" option found "
@@ -474,7 +387,6 @@ cl_app::proc_arguments(int argc, char *argv[])
 #endif
       case 'S':
 	{
-	  // FILE *Ser_in, *Ser_out;
 	  char *iname= NULL, *oname= NULL;
 	  int uart=0, port=0;
 	  subopts= optarg;
@@ -529,14 +441,6 @@ cl_app::proc_arguments(int argc, char *argv[])
 		      options->add(o);
 		      free(h);
 		    }
-		  /*
-		  if ((Ser_in= fopen(iname, "r")) == NULL)
-		    {
-		      fprintf(stderr,
-			      "Can't open `%s': %s\n", value, strerror(errno));
-		      exit(4);
-		    }
-		  */
 		  options->set_value(s, this, /*(void*)Ser_in*/iname);
 		  free(s);
 		}
@@ -552,14 +456,6 @@ cl_app::proc_arguments(int argc, char *argv[])
 		      options->add(o);
 		      free(h);
 		    }
-		  /*
-		  if ((Ser_out= fopen(oname, "w")) == NULL)
-		    {
-		      fprintf(stderr,
-			      "Can't open `%s': %s\n", value, strerror(errno));
-		      exit(4);
-		    }
-		  */
 		  options->set_value(s, this, /*(void*)Ser_out*/oname);
 		  free(s);
 		}

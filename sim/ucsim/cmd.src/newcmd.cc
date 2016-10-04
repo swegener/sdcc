@@ -272,6 +272,14 @@ cl_console_base::cmd_do_print(const char *format, va_list ap)
     return 0;
 }
 
+/*void
+cl_console_base::flush(void)
+{
+  class cl_f *fo= get_fout();
+  if (fo)
+    fo->flush();
+    }*/
+
 bool
 cl_console_base::interpret(char *cmd)
 {

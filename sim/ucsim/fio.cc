@@ -58,16 +58,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // prj
 #include "utils.h"
 
-/*void deb(chars c)
-{
-  if (dd==NULL)
-    {
-      dd= mk_io(cchars("/dev/pts/4"),cchars("w"));
-      dd->init();
-    }
-  dd->write_str(c);
-  }*/
-
 
 cl_history::cl_history(char *aname):
   cl_ustrings(100, 10, aname)
@@ -142,7 +132,6 @@ cl_history::replace(chars line)
 
 cl_f::cl_f(void)
 {
-  //file_f= NULL;
   file_id= -1;
   own= false;
   tty= false;
@@ -165,7 +154,6 @@ cl_f::cl_f(void)
 cl_f::cl_f(chars fn, chars mode):
   cl_base()
 {
-  //file_f= NULL;
   file_id= -1;
   file_name= fn;
   file_mode= mode;
@@ -187,7 +175,6 @@ cl_f::cl_f(chars fn, chars mode):
 
 cl_f::cl_f(int the_server_port)
 {
-  //file_f= NULL;
   file_id= -1;
   own= false;
   tty= false;
@@ -248,10 +235,8 @@ cl_f::init(void)
     {
       if (file_mode.empty())
 	file_mode= cchars("r+");
-      //if ((file_f= fopen(file_name, file_mode)) != NULL)
       if ((file_id= ::open(file_name, open_flags(file_mode), (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) >= 0)
 	{
-	  //file_id= fileno(file_f);
 	  tty= isatty(file_id);
 	  own= true;
 	  save_attributes();
@@ -277,15 +262,9 @@ cl_f::use_opened(int opened_file_id, char *mode)
   own= false;
   if (opened_file_id >= 0)
     {
-      //file_f= fdopen(opened_file_id, file_mode);
-      //if (file_f != NULL)
-	{
-	  file_id= opened_file_id;
-	  tty= isatty(file_id);
-	  changed();
-	}
-	//else
-	//file_id= -1;
+      file_id= opened_file_id;
+      tty= isatty(file_id);
+      changed();
     }
   return file_id;
 }
@@ -305,8 +284,7 @@ cl_f::use_opened(FILE *f, chars mode)
   if (f)
     {
       file_mode= mode;
-      //file_f= f;
-      if ((file_id= fileno(/*file_*/f)) >= 0)
+      if ((file_id= fileno(f)) >= 0)
 	{
 	  tty= isatty(file_id);
 	  own= false;
@@ -358,13 +336,8 @@ cl_f::close(void)
   int i= 0;
 
   deb("cl_f close fid=%d\n", file_id);
-  /*if (file_f)
-    {
-      i= fclose(file_f);
-      }*/
   if (file_id >= 0)
     ::close(file_id);
-  //file_f= NULL;
   file_id= -1;
   own= false;
   file_name= 0;
@@ -377,7 +350,6 @@ int
 cl_f::stop_use(void)
 {
   //printf("cl_f stop_use fid=%d\n", file_id);
-  //file_f= NULL;
   file_id= -1;
   own= false;
   file_name= 0;
@@ -391,17 +363,6 @@ cl_f::~cl_f(void)
 {
   deb("~cl_f fid=%d\n", file_id);
   delete hist;
-  /*
-  if (echo_of != NULL)
-    echo_of->echo(NULL);
-  if (file_f)
-    {
-      if (own)
-	close();
-      else
-	stop_use();
-    }
-  */
 }
 
 static char deb_buffer[100];
@@ -984,7 +945,10 @@ cl_f::write(char *buf, int count)
   if (file_id >= 0)
     {
       if (type != F_SOCKET)
-	return ::write(file_id, buf, count);
+	{
+	  for (i=0;i<count;i++) {deb("+%c",buf[i]);fflush(stdout);}
+	  return ::write(file_id, buf, count);
+	}
       // on socket, assume telnet
       for (i= 0; i < count; i++)
 	{
@@ -1069,9 +1033,9 @@ cl_f::prntf(char *format, ...)
 bool
 cl_f::eof(void)
 {
-  if (/*file_f == NULL*/file_id < 0)
+  if (file_id < 0)
     return true;
-  return at_end && (last_used == first_free);//feof(file_f);
+  return at_end && (last_used == first_free);
 }
 
 
@@ -1242,29 +1206,23 @@ cl_f::set_telnet(bool val)
   proc_telnet= val;
 }
 
-  
-/* Socket functions */
 
-/*
-int
-cl_f::listen(int on_port)
+chars
+fio_type_name(enum file_type t)
 {
-  return -1;
+  switch (t)
+    {
+    case F_UNKNOWN: return "unknown";
+    case F_FILE: return "file";
+    case F_CHAR: return "char";
+    case F_SOCKET: return "socket";
+    case F_LISTENER: return "listener";
+    case F_PIPE: return "pipe";
+    case F_CONSOLE: return "console";
+    case F_SERIAL: return "serial";
+    }
+  return "undef";
 }
-*/
-/*
-class cl_f *
-cl_f::accept()
-{
-  return NULL;
-}
-*/
-/*
-int
-cl_f::connect(chars host, int to_port)
-{
-  return -1;
-}
-*/
+
 
 /* End of fio.cc */

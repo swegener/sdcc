@@ -104,7 +104,6 @@ cl_serial_hw::init(void)
 	io->fout= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
       else
 	io->fout= mk_io(chars(f_serial_out), "w");
-      io->fout->set_terminal();
       if (!io->fout->tty)
 	fprintf(stderr, "Warning: serial output interface connected to a "
 		"non-terminal file.\n");
@@ -189,8 +188,6 @@ cl_serial_hw::new_io(class cl_f *f_in, class cl_f *f_out)
       io->fin->raw();
       io->fin->echo(NULL);
     }
-  if (io->fout)
-    io->fout->set_terminal();
   application->get_commander()->update_active();
 }
 

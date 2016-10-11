@@ -377,7 +377,7 @@ labelGotoGoto (iCode *ic)
               change++;
             }
           break;
-        case JUMPTABLE:
+        /*case JUMPTABLE: Causes gcc-torture-execute-991016-1 failure on hc08 / z80
 
           for (sLabel = setFirstItem (IC_JTLABELS (loop)); sLabel; sLabel = setNextItem (IC_JTLABELS (loop)))
             if (repLabel = replaceGotoGoto (loop, sLabel, hTabItemWithKey (labelDef, sLabel->key)))
@@ -386,7 +386,7 @@ labelGotoGoto (iCode *ic)
                 hTabDeleteItem (&labelRef, sLabel->key, loop, DELETE_ITEM, NULL);
                 hTabAddItem (&labelRef, repLabel->key, loop);
                 change++;
-              }
+              }*/
         }
     }
 

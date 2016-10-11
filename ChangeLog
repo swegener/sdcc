@@ -1,3 +1,8 @@
+2016-10-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClabel.c:
+	  Temporarily disable jump-to-jump optimization for jump tables RFE #514, since it causes a hc08/z80 regression.
+
 2016-10-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCcse.c:

@@ -22,7 +22,7 @@ class cl_io: public cl_f
   virtual void changed(void);
   virtual int check_dev(void);
 
-  virtual void set_terminal();
+  virtual void prepare_terminal();
   virtual void save_attributes();
   virtual void restore_attributes();
 };

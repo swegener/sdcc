@@ -133,7 +133,7 @@ class cl_f: public cl_base
   virtual int stop_use(void);
 
   virtual char *get_file_name() { return file_name; };
-  
+  virtual class cl_f *get_echo_to() { return echo_to; }
  protected:
   virtual int put(char c);
   virtual int get(void);
@@ -170,7 +170,7 @@ class cl_f: public cl_base
   virtual void echo_write_str(char *s);
   virtual void echo_write_str(const char *s);
 
-  virtual void set_terminal();
+  virtual void prepare_terminal();
   virtual void save_attributes();
   virtual void restore_attributes();
   virtual int raw(void);

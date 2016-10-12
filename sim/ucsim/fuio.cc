@@ -15,6 +15,7 @@
 #include <time.h>
 #include <string.h>
 #include <stdarg.h>
+#include <fcntl.h>
 
 #include "utils.h"
 
@@ -25,11 +26,12 @@ cl_f *dd= NULL;
 
 void deb(chars format, ...)
 {
-  return;
+  //return;
   if (dd==NULL)
     {
-      dd= mk_io(cchars("/dev/pts/1"),cchars("w"));
-      dd->init();
+      dd= mk_io(/*cchars("/dev/pts/2"),cchars("w")*/"","");
+      dd->file_id= open("/dev/pts/2", O_WRONLY);
+      //dd->init();
     }
   va_list ap;
   va_start(ap, format);
@@ -37,7 +39,7 @@ void deb(chars format, ...)
   //vdprintf(dd->file_id, format, ap);
   {
     char *buf= vformat_string(format, ap);
-    dd->write(buf, strlen(buf));
+    /*dd->*/write(dd->file_id, buf, strlen(buf));
     free(buf);
   }
   va_end(ap);
@@ -116,6 +118,7 @@ cl_io::changed(void)
   else
     {
       type= determine_type();
+      if (type == F_SOCKET) tty= true;
     }
 }
 
@@ -192,23 +195,25 @@ cl_io::check_dev(void)
 }
 
 void
-cl_io::set_terminal()
+cl_io::prepare_terminal()
 {
-  if (tty)
+  if (type == F_SOCKET)
+    {
+      // assume telnet client
+      char s[7];
+      //deb("preparing TELNET %d\n", file_id);
+      sprintf(s, "%c%c%c%c%c%c", 0xff, 0xfb, 1, 0xff, 0xfb, 3 );
+      write(s, 7);
+    }
+  else if (tty)
     {
       struct termios tattr;
+      //deb("preparing TTY %d\n", file_id);
       tcgetattr(file_id, &tattr);
       tattr.c_lflag&= ~(ICANON|ECHO);
       tattr.c_cc[VMIN] = 1;
       tattr.c_cc[VTIME]= 0;
       tcsetattr(file_id, TCSAFLUSH, &tattr);
-    }
-  else if (type == F_SOCKET)
-    {
-      // assume telnet client
-      char s[7];
-      sprintf(s, "%c%c%c%c%c%c", 0xff, 0xfb, 1, 0xff, 0xfb, 3 );
-      write(s, 7);
     }
 }
 
@@ -363,7 +368,7 @@ check_inputs(class cl_list *active, class cl_list *avail)
   for (i= 0; i < active->count; i++)
     {
       class cl_f *fio= (class cl_f *)active->at(i);
-      deb("checking fid=%d\n", fio->file_id);
+      //deb("checking fid=%d\n", fio->file_id);
       if (fio->check_dev() ||
 	  fio->eof())
 	{

@@ -238,6 +238,7 @@ cl_f::init(void)
       if ((file_id= ::open(file_name, open_flags(file_mode), (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) >= 0)
 	{
 	  tty= isatty(file_id);
+	  deb("f::init, id=%d set tty=%d\n", file_id, tty);
 	  own= true;
 	  save_attributes();
 	  changed();
@@ -264,6 +265,7 @@ cl_f::use_opened(int opened_file_id, char *mode)
     {
       file_id= opened_file_id;
       tty= isatty(file_id);
+      deb("f::use_opened id=%d set tty=%d, calling changed...\n", file_id, tty);
       changed();
     }
   return file_id;
@@ -287,6 +289,7 @@ cl_f::use_opened(FILE *f, chars mode)
       if ((file_id= fileno(f)) >= 0)
 	{
 	  tty= isatty(file_id);
+	  deb("f::use_opened id=%d set tty=%d\n", file_id, tty);
 	  own= false;
 	  changed();
 	}
@@ -946,7 +949,6 @@ cl_f::write(char *buf, int count)
     {
       if (type != F_SOCKET)
 	{
-	  for (i=0;i<count;i++) {deb("+%c",buf[i]);fflush(stdout);}
 	  return ::write(file_id, buf, count);
 	}
       // on socket, assume telnet
@@ -1125,7 +1127,7 @@ cl_f::echo_write_str(const char *s)
 /* Device handling */
 
 void
-cl_f::set_terminal()
+cl_f::prepare_terminal()
 {
 }
 
@@ -1196,7 +1198,7 @@ cl_f::interactive(class cl_f *echo_out)
   save_attributes();
   echo(echo_out);
   cooked();
-  set_terminal();
+  prepare_terminal();
 }
 
 

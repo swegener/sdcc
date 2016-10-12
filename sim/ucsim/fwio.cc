@@ -363,6 +363,8 @@ cl_io::changed(void)
       //printf("win opened socket id=%d\n", file_id);
       handle= (void*)file_id;
       type= F_SOCKET;
+      deb("assuming TTY on socket %d\n", file_id);
+      tty= true;
     }
   else
     {
@@ -376,20 +378,25 @@ cl_io::changed(void)
 	      SetConsoleMode(handle, 0);
 	    }
 	    }*/
+      if (type == F_SOCKET)
+	{
+	  deb("determined socket, assume TTY... id=%d\n", file_id);
+	  tty= true;
+	}
     }
   //printf("win opened file id=%d\n", file_id);
   //printf("win handle=%p type=%d\n", handle, type);
 }
 
 void
-cl_io::set_terminal()
+cl_io::prepare_terminal()
 {
   deb("wio set_attr fid=%d type=%d\n",file_id,type);
   if (type == F_CONSOLE)
     {
       deb("wio: console mode 0 fid=%d handle=%p\n", file_id, handle);
       SetConsoleMode(handle,0);
-		     //ENABLE_PROCESSED_OUTPUT|4/*ENABLE_VIRTUAL_TERMINAL_PROCESSING*/);
+      //ENABLE_PROCESSED_OUTPUT|4/*ENABLE_VIRTUAL_TERMINAL_PROCESSING*/);
     }
   else if (type == F_SOCKET)
     {

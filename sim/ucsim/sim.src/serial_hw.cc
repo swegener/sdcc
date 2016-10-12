@@ -296,20 +296,22 @@ cl_serial_hw::proc_input(class cl_f *fi, class cl_f *fo)
 		  io->dd_printf("Exit simulator.\n");
 		  break;
 		case 'c': case 'C': case 'c'-'a'+1:
-		  // close
-		  menu= 0;
-		  io->dd_printf("Closing terminal.\n");
-		  if (io->fout)
-		    {
-		      delete io->fout;
-		      io->fout= mk_io("", "");
-		    }
-		  if (io->fin)
-		    {
-		      delete io->fin;
-		      io->fin= mk_io("", "");
-		    }
-		  break;
+		  {
+		    // close
+		    io->dd_printf("Closing terminal.\n");
+		    if (io->fin &&
+			io->fout)
+		      {
+			class cl_console *con=
+			  new cl_console(io->fin, io->fout, application);
+			con->init();
+			application->get_commander()->add_console(con);
+		      }
+		    menu= 0;
+		    io->fout= mk_io("", "");
+		    io->fin= mk_io("", "");
+		    break;
+		  }
 		default:
 		  menu= 0;
 		  io->dd_printf("Control menu closed (%d).\n", c);

@@ -217,6 +217,9 @@ COMMAND_DO_WORK_APP(cl_show_console)
 	  con->dd_printf("%c%c",
 			 ff->tty?'T':'t',
 			 ff->get_cooking()?'c':'r');
+	  class cl_f *e= ff->get_echo_to();
+	  if (e)
+	    con->dd_printf("(>%d)", e->file_id);
 	}
       con->dd_printf("\n");
       ff= cn->get_fout();

@@ -1,3 +1,8 @@
+2016-10-17 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sdas/linksrc/lkbank.c
+	  Fix bug #2549.
+
 2016-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClabel.c:

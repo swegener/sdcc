@@ -535,6 +535,7 @@ lkfopen(void)
                                         default:
                                         case 2: frmt = "ihx"; break;
                                         }
+                                        strcat(bp->b_fspec, ".ihx");
                                         fp = afile(bp->b_fspec, frmt, 1);
                                 } else
                                 if (oflag == 2) {
@@ -542,6 +543,7 @@ lkfopen(void)
                                         default:
                                         case 2: frmt = "s19"; break;
                                         }
+                                        strcat(bp->b_fspec, ".s19");
                                         fp = afile(bp->b_fspec, frmt, 1);
                                 } else
                                 if (oflag == 3) {
@@ -551,6 +553,8 @@ lkfopen(void)
                                         case 3: frmt = "bi3"; break;
                                         case 4: frmt = "bi4"; break;
                                         }
+                                        strcat(bp->b_fspec, ".");
+                                        strcat(bp->b_fspec, frmt);
                                         fp = afile(bp->b_fspec, frmt, 2);
                                 } else
                                 /* sdld specific */

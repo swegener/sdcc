@@ -1,3 +1,9 @@
+2016-10-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCBBlock.c,
+	  src/SDCClabel.c:
+	  Fix a bug in BBlock label handling, allows reenabling jump-to-jump optimization for jump tables.
+
 2016-10-17 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sdas/linksrc/lkbank.c

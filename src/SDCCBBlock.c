@@ -733,7 +733,7 @@ replaceSymBySym (set * sset, operand * src, operand * dest)
 /* replaceLabel - replace reference to one label by another        */
 /*-----------------------------------------------------------------*/
 void
-replaceLabel (eBBlock * ebp, symbol * fromLbl, symbol * toLbl)
+replaceLabel (eBBlock *ebp, symbol *fromLbl, symbol *toLbl)
 {
   iCode *ic;
 
@@ -756,6 +756,9 @@ replaceLabel (eBBlock * ebp, symbol * fromLbl, symbol * toLbl)
           else if (isSymbolEqual (IC_FALSE (ic), fromLbl))
             IC_FALSE (ic) = toLbl;
           break;
+
+        case JUMPTABLE:
+          replaceSetItem (IC_JTLABELS (ic), fromLbl, toLbl);
         }
     }
 

@@ -347,7 +347,7 @@ labelGotoGoto (iCode *ic)
 
           if (repLabel = replaceGotoGoto (loop, sLabel, stat))
             {
-              hTabDeleteItem (&labelRef, (IC_LABEL (loop))->key, loop, DELETE_ITEM, NULL);
+              hTabDeleteItem (&labelRef, sLabel->key, loop, DELETE_ITEM, NULL);
               loop->label = repLabel;
               hTabAddItem (&labelRef, repLabel->key, loop);
               change++;
@@ -365,28 +365,28 @@ labelGotoGoto (iCode *ic)
             {
               if (IC_TRUE (loop))
                 {
-                  hTabDeleteItem (&labelRef, (IC_TRUE (loop))->key, loop, DELETE_ITEM, NULL);
+                  hTabDeleteItem (&labelRef, sLabel->key, loop, DELETE_ITEM, NULL);
                   IC_TRUE (loop) = repLabel;
                 }
               else
                 {
-                  hTabDeleteItem (&labelRef, (IC_FALSE (loop))->key, loop, DELETE_ITEM, NULL);
+                  hTabDeleteItem (&labelRef, sLabel->key, loop, DELETE_ITEM, NULL);
                   IC_FALSE (loop) = repLabel;
                 }
               hTabAddItem (&labelRef, repLabel->key, loop);
               change++;
             }
           break;
-        /*case JUMPTABLE: Causes gcc-torture-execute-991016-1 failure on hc08 / z80
+        case JUMPTABLE:
 
           for (sLabel = setFirstItem (IC_JTLABELS (loop)); sLabel; sLabel = setNextItem (IC_JTLABELS (loop)))
             if (repLabel = replaceGotoGoto (loop, sLabel, hTabItemWithKey (labelDef, sLabel->key)))
               {
-                replaceSetItem (IC_JTLABELS (loop), sLabel, repLabel);
                 hTabDeleteItem (&labelRef, sLabel->key, loop, DELETE_ITEM, NULL);
+                replaceSetItem (IC_JTLABELS (loop), sLabel, repLabel);
                 hTabAddItem (&labelRef, repLabel->key, loop);
                 change++;
-              }*/
+              }
         }
     }
 

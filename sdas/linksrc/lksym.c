@@ -501,7 +501,7 @@ hash(char *p, int cflag)
  *              jhartman@compuserve.com
  *
  *      local variables:
- *              int     l               string length + 1
+ *              int     l               string length + 8
  *              char *  p               string location
  *
  *      global variables:
@@ -523,9 +523,9 @@ strsto(char *str)
         char *p;
 
         /*
-         * What we need, including a null.
+         * What we need, including a null, and maybe some extra space for strcat().
          */
-        l = strlen(str) + 1;
+        l = strlen(str) + 8;
         p = (char *) new (l);
 
         /*

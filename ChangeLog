@@ -1,3 +1,8 @@
+2016-10-22 Ben Shi <powerstudio1st AT 163 DOT com>
+
+        * sdas/linksrc/lksym.c
+          Fix a buffer overflow error in previous commit.
+
 2016-10-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCBBlock.c,

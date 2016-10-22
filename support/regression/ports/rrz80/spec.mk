@@ -7,7 +7,7 @@ MAKEBIN = $(top_builddir)/bin/makebin$(EXEEXT)
 SDCCFLAGS += --nostdinc -I$(top_srcdir)
 LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/z80
 
-SDCCFLAGS += -mz80 --less-pedantic --profile -DREENTRANT=
+SDCCFLAGS += -mz80 --less-pedantic --profile
 LINKFLAGS += --out-fmt-ihx z80.lib
 
 OBJEXT = .rel

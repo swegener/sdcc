@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 unsigned char
-foo(unsigned char a, ...) REENTRANT
+foo(unsigned char a, ...) __reentrant
 {
   va_list argptr;
   unsigned char b;
@@ -21,7 +21,7 @@ foo(unsigned char a, ...) REENTRANT
 }
 
 unsigned char
-bar(unsigned char a, unsigned char b) REENTRANT
+bar(unsigned char a, unsigned char b) __reentrant
 {
   return b / a;
 }

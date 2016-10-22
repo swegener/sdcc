@@ -30,7 +30,7 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 endif
 
-SDCCFLAGS += -mhc08 --less-pedantic --out-fmt-ihx -DREENTRANT=__reentrant
+SDCCFLAGS += -mhc08 --less-pedantic --out-fmt-ihx
 LINKFLAGS += hc08.lib
 
 OBJEXT = .rel

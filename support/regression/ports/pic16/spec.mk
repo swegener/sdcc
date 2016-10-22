@@ -25,7 +25,7 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 endif
 
-SDCCFLAGS += -mpic16 -pp18f452 --less-pedantic -Wl,-q -DREENTRANT=__reentrant
+SDCCFLAGS += -mpic16 -pp18f452 --less-pedantic -Wl,-q
 SDCCFLAGS += --no-peep
 SDCCFLAGS += --no-warn-non-free
 LINKFLAGS += libsdcc.lib libc18f.lib libm18f.lib

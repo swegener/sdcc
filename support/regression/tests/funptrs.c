@@ -16,9 +16,9 @@
    on the z80.
 */
 typedef void (*NOARGFUNPTR)(void);
-typedef void (*ONEARGFUNPTR)({type}) REENTRANT;
-typedef long int (*FOURARGFUNPTR)(char, char, long int, long int) REENTRANT;
-typedef {type} (*TYPEFUNPTR)({type}, {type}) REENTRANT;
+typedef void (*ONEARGFUNPTR)({type}) __reentrant;
+typedef long int (*FOURARGFUNPTR)(char, char, long int, long int) __reentrant;
+typedef {type} (*TYPEFUNPTR)({type}, {type}) __reentrant;
 
 int count;
 FOURARGFUNPTR fafp;
@@ -31,12 +31,12 @@ incCount(void)
 }
 
 void
-incBy({type} a) REENTRANT
+incBy({type} a) __reentrant
 {
   count += a;
 }
 
-long int f6(char a, char b, long int c, long int d) REENTRANT
+long int f6(char a, char b, long int c, long int d) __reentrant
 {
   switch (a)
     {
@@ -85,7 +85,7 @@ callViaPtr3Ansi(void (*fptr)(void))
   fptr();
 }
 
-{type} f_ret({type} arg1, {type} arg2) REENTRANT
+{type} f_ret({type} arg1, {type} arg2) __reentrant
 {
   {type} local;
   local = !arg1;

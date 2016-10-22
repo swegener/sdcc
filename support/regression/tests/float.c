@@ -139,7 +139,7 @@ testFloatMulRound (void)
     compare (result, 2.0);
 }
 
-#ifndef REENTRANT
+#if 0
 void
 main (void)
 {
@@ -147,3 +147,4 @@ main (void)
   testFloatMulRound ();
 }
 #endif
+

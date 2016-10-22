@@ -12,7 +12,7 @@
 
 char e;
 
-void foo (unsigned long ul, bool b, char c) REENTRANT
+void foo (unsigned long ul, bool b, char c) __reentrant
 {
 	if (b && (long) ul < 0)
 		e = 0;

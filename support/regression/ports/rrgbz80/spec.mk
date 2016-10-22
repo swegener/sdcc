@@ -6,7 +6,7 @@ MAKEBIN = $(top_builddir)/bin/makebin$(EXEEXT)
 SDCCFLAGS += --nostdinc -I$(top_srcdir)
 LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/gbz80
 
-SDCCFLAGS += -mgbz80 --less-pedantic -DREENTRANT=
+SDCCFLAGS += -mgbz80 --less-pedantic
 LINKFLAGS += --out-fmt-ihx gbz80.lib
 
 OBJEXT = .rel

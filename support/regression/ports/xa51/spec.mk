@@ -14,7 +14,7 @@ endif
 
 SXA = $(shell if [ -f $(SXA_A) ]; then echo $(SXA_A); else echo $(SXA_B); fi)
 
-SDCCFLAGS +=-mxa51 --less-pedantic -DREENTRANT= -I$(top_srcdir)
+SDCCFLAGS +=-mxa51 --less-pedantic -I$(top_srcdir)
 
 OBJEXT = .rel
 BINEXT = .hex

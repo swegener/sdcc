@@ -526,6 +526,7 @@ lkfopen(void)
                                 }
                         }
                         if (bp->b_ofp == NULL) {
+                                char *fpt;
                                 fp = stderr;
                                 /*
                                  * Open output file
@@ -535,16 +536,18 @@ lkfopen(void)
                                         default:
                                         case 2: frmt = "ihx"; break;
                                         }
-                                        strcat(bp->b_fspec, ".ihx");
-                                        fp = afile(bp->b_fspec, frmt, 1);
+                                        fpt = strsto(bp->b_fspec);
+                                        strcat(fpt, ".ihx");
+                                        fp = afile(fpt, frmt, 1);
                                 } else
                                 if (oflag == 2) {
                                         switch(a_bytes) {
                                         default:
                                         case 2: frmt = "s19"; break;
                                         }
-                                        strcat(bp->b_fspec, ".s19");
-                                        fp = afile(bp->b_fspec, frmt, 1);
+                                        fpt = strsto(bp->b_fspec);
+                                        strcat(fpt, ".s19");
+                                        fp = afile(fpt, frmt, 1);
                                 } else
                                 if (oflag == 3) {
                                         switch(a_bytes) {
@@ -553,13 +556,16 @@ lkfopen(void)
                                         case 3: frmt = "bi3"; break;
                                         case 4: frmt = "bi4"; break;
                                         }
-                                        strcat(bp->b_fspec, ".");
-                                        strcat(bp->b_fspec, frmt);
-                                        fp = afile(bp->b_fspec, frmt, 2);
+                                        fpt = strsto(bp->b_fspec);
+                                        strcat(fpt, ".");
+                                        strcat(fpt, frmt);
+                                        fp = afile(fpt, frmt, 2);
                                 } else
                                 /* sdld specific */
                                 if (oflag == 4) {
-                                        fp = afile(bp->b_fspec, "elf", 2);
+                                        fpt = strsto(bp->b_fspec);
+                                        strcat(fpt, ".elf");
+                                        fp = afile(fpt, "elf", 2);
                                 }
                                 /* end sdld specific */
                                 if (fp != stderr) {

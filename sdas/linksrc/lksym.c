@@ -654,7 +654,7 @@ new(unsigned int n)
  *              jhartman@compuserve.com
  *
  *      local variables:
- *              int     l               string length + 1
+ *              int     l               string length + 8
  *              int     bytes           bytes remaining in buffer area
  *              char *  p               pointer to head of copied string
  *              char *  pnext           next location in buffer area
@@ -690,7 +690,7 @@ strsto(char *str)
         /*
          * What we need, including a null.
          */
-        l = strlen(str) + 1;
+        l = strlen(str) + 8;
 
         if (l > bytes) {
                 /*

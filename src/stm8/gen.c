@@ -2169,7 +2169,10 @@ genNot (const iCode *ic)
           }
 
       if (!regDead (A_IDX, ic) && !pushed_a)
-        push (ASMOP_A, 0, 1);
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = TRUE;
+        }
 
       for (i = 0; i < left->aop->size; i++)
         {
@@ -2202,10 +2205,11 @@ genNot (const iCode *ic)
   for (i = 1; i < result->aop->size; i++)
     cheapMove (result->aop, 0, ASMOP_ZERO, 0, TRUE);
 
-  if (!regDead (A_IDX, ic))
-    pop (ASMOP_A, 0, 1);
-  else if (pushed_a)
-    adjustStack (1, FALSE, FALSE, FALSE);
+  if (pushed_a)
+    if (!regDead (A_IDX, ic) || result->aop->regs[A_IDX] < 0)
+      pop (ASMOP_A, 0, 1);
+    else
+      adjustStack (1, FALSE, FALSE, FALSE);
 
   freeAsmop (left);
   freeAsmop (result);

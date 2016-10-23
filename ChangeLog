@@ -1,3 +1,9 @@
+2016-10-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2554.c:
+	  Fix a stack corruption issue in stm8 ! code generation, bug #2554.
+
 2016-10-23 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sdas/linksrc/lkbank.c

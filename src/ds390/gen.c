@@ -7463,6 +7463,11 @@ genAnd (iCode * ic, iCode * ifx)
                   emitcode ("anl", "c,%s", AOP (left)->aopu.aop_dir);
                 }
             }
+          else if (AOP_TYPE (right) == AOP_DIR && IS_BOOL (operandType (right)) && AOP_TYPE (left) == AOP_CRY)
+            {
+              MOVA (aopGet (right, 0, FALSE, FALSE, NULL));
+              emitcode ("anl", "c,acc.0");
+            }
           else
             {
               // c = bit & val;
@@ -12107,6 +12112,28 @@ genJumpTab (iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* assignBit - assign operand to bit operand                       */
+/*-----------------------------------------------------------------*/
+static void
+assignBit (operand * result, operand * right)
+{
+  /* if the right side is a literal then
+     we know what the value is */
+  if (AOP_TYPE (right) == AOP_LIT)
+    {
+      if ((int) operandLitValue (right))
+        aopPut (result, one, 0);
+      else
+        aopPut (result, zero, 0);
+    }
+  else
+    {
+      toCarry (right);
+      outBitC (result);
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genCast - gen code for casting                                  */
 /*-----------------------------------------------------------------*/
 static void
@@ -12132,7 +12159,7 @@ genCast (iCode * ic)
   aopOp (result, ic, FALSE, (AOP_TYPE (right) == AOP_DPTR));
 
   /* if the result is a bit (and not a bitfield) */
-  if (IS_BIT (OP_SYMBOL (result)->type))
+  if (IS_BOOLEAN (OP_SYMBOL (result)->type))
     {
       /* if the right size is a literal then
          we know what the value is */
@@ -12155,13 +12182,13 @@ genCast (iCode * ic)
         }
 
       /* we need to or */
-      toBoolean (right);
-      aopPut (result, "a", 0);
+      toCarry (right);
+      outBitC (result);
       goto release;
     }
 
   /* if they are the same size : or less */
-  if (AOP_SIZE (result) <= AOP_SIZE (right))
+  if (AOP_SIZE (result) <= AOP_SIZE (right) && !IS_BOOLEAN (operandType (result)))
     {
       /* if they are in the same place */
       if (sameRegs (AOP (right), AOP (result)))

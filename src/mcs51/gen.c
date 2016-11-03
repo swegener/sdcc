@@ -2055,6 +2055,7 @@ toCarry (operand * oper)
 static void
 assignBit (operand * result, operand * right)
 {
+emitcode (";", "assignBit");
   /* if the right side is a literal then
      we know what the value is */
   if (AOP_TYPE (right) == AOP_LIT)

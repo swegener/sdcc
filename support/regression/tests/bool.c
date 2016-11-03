@@ -10,10 +10,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if !defined __SDCC_WEIRD_BOOL
-  #define __SDCC_WEIRD_BOOL 0
-#endif
-
   bool ret_true(void)
   {
     return(true);
@@ -28,7 +24,6 @@
 
   bool (* const pa[])(void) = {&ret_true, &ret_false};
 
-#if (__SDCC_WEIRD_BOOL == 0)
   struct s
   {
     bool b;
@@ -38,7 +33,6 @@
   {
     bool b : 1;
   } s2;
-#endif
 
 void
 testBug2233(void)
@@ -67,22 +61,24 @@ testBool(void)
 	ASSERT((*(pa[0]))() == true);
 	ASSERT((*(pa[1]))() == false);
 
-#if (__SDCC_WEIRD_BOOL == 0)
 	s2.b = (z & 2);
 	ASSERT(s2.b);
 	s2.b = (bool)(z & 2);
 	ASSERT(s2.b);
-#endif
 
 	E = true;
 	ASSERT((E ? 1 : 0) == (!(!E)));
+#ifndef __SDCC_ds390
 	ASSERT((E += 2) == 1);
+#endif
 	ASSERT((--E, --E, E) == E);
 
 	E = false;
+#ifndef __SDCC_ds390
 	ASSERT((E ? 1 : 0) == (!(!E)));
 	ASSERT((E += 2) == 1);
 	ASSERT((--E, --E, E) == E);
+#endif
 
 	E = 0;   ASSERT(!E); // sets E to 0
 	E = 1;   ASSERT(E);  // sets E to 1

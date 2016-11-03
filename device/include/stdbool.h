@@ -32,12 +32,6 @@
 #define true 1
 #define false 0
 
-#if defined (__SDCC_ds390) || defined (__SDCC_xa51)
- /* The ports that have __bit and use it as an imperfect substitute for bool */
- #define _Bool __bit
- #define __SDCC_WEIRD_BOOL 1
-#endif
-
 #define bool _Bool
 #define __bool_true_false_are_defined 1
 

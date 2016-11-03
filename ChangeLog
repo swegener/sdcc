@@ -1,5 +1,16 @@
 2016-11-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/include/stdbool.h,
+	  src/ds390/gen.c,
+	  support/regression/tests/bitopcse.c,
+	  support/regression/tests/bool.c,
+	  support/regression/tests/bug2942247.c,
+	  support/regression/tests/bug3404101.c,
+	  support/regression/tests/bug3565757.c:
+	  bool for ds390.
+
+2016-11-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCicode.c,
 	  src/SDCCloop.c,
 	  src/SDCCopt.c,

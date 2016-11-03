@@ -259,10 +259,6 @@ typedef struct
 
   struct
   {
-    /** One more than the smallest
-        mul/div operation the processor can do natively
-        Eg if the processor has an 8 bit mul, native below is 2 */
-    unsigned int muldiv;
     /** Size of the biggest shift the port can handle. -1 if port can handle shifts of arbitrary size. */
     signed int shift;
 
@@ -368,7 +364,7 @@ typedef struct
   /** Returns true if the port can multiply the two types nativly
       without using support functions.
    */
-  bool (*hasNativeMulFor) (iCode * ic, sym_link * left, sym_link * right);
+  bool (*hasNativeMulFor) (iCode *ic, sym_link *left, sym_link *right);
 
   /** Returns true if the port has implemented certain bit
       manipulation iCodes (RRC, RLC, SWAP, GETHBIT, GETABIT, GETBYTE, GETWORD)

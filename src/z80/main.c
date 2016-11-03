@@ -930,8 +930,7 @@ PORT z80_port =
   },
   { NULL, NULL },
   { -1, 0, 0, 4, 0, 2, 0 },
-  /* Z80 has no native mul/div commands */
-  { 0, -1, FALSE },
+  { -1, FALSE },
   { z80_emitDebuggerSymbol },
   {
     255,                        /* maxCount */
@@ -1059,8 +1058,7 @@ PORT z180_port =
   },
   { NULL, NULL },
   { -1, 0, 0, 4, 0, 2, 0 },
-  /* Z80 has no native mul/div commands */
-  { 0, -1, FALSE },
+  { -1, FALSE },
   { z80_emitDebuggerSymbol },
   {
     255,                        /* maxCount */
@@ -1187,8 +1185,7 @@ PORT r2k_port =
   },
   { NULL, NULL },
   { -1, 0, 0, 4, 0, 2, 0 },
-  /* Z80 has no native mul/div commands */
-  { 0, -1, FALSE },
+  { -1, FALSE },
   { z80_emitDebuggerSymbol },
   {
     255,                        /* maxCount */
@@ -1316,8 +1313,7 @@ PORT r3ka_port =
   },
   { NULL, NULL },
   { -1, 0, 0, 4, 0, 2, 0 },
-  /* Z80 has no native mul/div commands */
-  { 0, -1, FALSE },
+  { -1, FALSE },
   { z80_emitDebuggerSymbol },
   {
     255,                        /* maxCount */
@@ -1447,8 +1443,7 @@ PORT gbz80_port =
   },
   { NULL, NULL },
   { -1, 0, 0, 2, 0, 4, 0 },
-  /* gbZ80 has no native mul/div commands */
-  { 0, -1, FALSE },
+  { -1, FALSE },
   { z80_emitDebuggerSymbol },
   {
     255,                        /* maxCount */
@@ -1576,8 +1571,7 @@ PORT tlcs90_port =
    },
   { NULL, NULL },
   { -1, 0, 0, 4, 0, 2, 0 },
-  /* Z80 has no native mul/div commands */
-  { 0, -1, FALSE },
+  { -1, FALSE },
   { z80_emitDebuggerSymbol },
   {
     255,                        /* maxCount */
@@ -1630,3 +1624,4 @@ PORT tlcs90_port =
   9,                            /* Number of registers handled in the tree-decomposition-based register allocator in SDCCralloc.hpp */
   PORT_MAGIC
 };
+

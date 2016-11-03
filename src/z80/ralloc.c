@@ -2753,12 +2753,6 @@ packRegisters (eBBlock * ebp)
           continue;
         }
 
-#if 0
-      /* reduce for support function calls */
-      if (ic->supportRtn || ic->op == '+' || ic->op == '-')
-        packRegsForSupport (ic, ebp);
-#endif
-
       /* some cases the redundant moves can
          can be eliminated for return statements */
       if (ic->op == RETURN || ic->op == SEND)

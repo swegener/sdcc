@@ -347,6 +347,12 @@ oclsExpense (struct memmap *oclass)
   return 0;
 }
 
+static bool
+_hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
+{
+  return getSize (left) == 1 && getSize (right) == 1;
+}
+
 static int
 instructionSize(char *inst, char *op1, char *op2)
 {
@@ -867,8 +873,7 @@ PORT mcs51_port =
     1,          /* banked_overhead (switch between code banks) */
     0           /* sp points directly at last item pushed */
   },
-  /* mcs51 has an 8 bit mul */
-  { 1, -1, FALSE },
+  { -1, FALSE },
   { mcs51_emitDebuggerSymbol },
   {
     256,        /* maxCount */
@@ -899,7 +904,7 @@ PORT mcs51_port =
   _mcs51_regparm,
   NULL,                         /* process_pragma */
   NULL,                         /* getMangledFunctionName */
-  NULL,                         /* hasNativeMulFor */
+  _hasNativeMulFor,             /* hasNativeMulFor */
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
   FALSE,                        /* use_dw_for_init */

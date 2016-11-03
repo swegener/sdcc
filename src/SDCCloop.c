@@ -1186,8 +1186,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
 
           /* ask port for size not worth if native instruction
              exist for multiply & divide */
-          if (getSize (operandType (IC_LEFT (ic))) <= (unsigned long) port->support.muldiv ||
-              getSize (operandType (IC_RIGHT (ic))) <= (unsigned long) port->support.muldiv)
+          if (port->hasNativeMulFor (ic, operandType (IC_LEFT (ic)), operandType (IC_RIGHT (ic))))
             continue;
 
           /* if this is a division then the remainder should be zero

@@ -215,12 +215,6 @@ _ds390_finaliseOptions (void)
           if (!options.stack_loc) options.stack_loc = 0x400008;
         }
 
-      /* generate native code 16*16 mul/div */
-      if (options.useAccelerator)
-        port->support.muldiv=2;
-      else
-        port->support.muldiv=1;
-
       /* Fixup the memory map for the stack; it is now in
        * far space and requires an FPOINTER to access it.
        */
@@ -475,7 +469,9 @@ static bool cseCostEstimation (iCode *ic, iCode *pdic)
 
 bool _ds390_nativeMulCheck(iCode *ic, sym_link *left, sym_link *right)
 {
-    return FALSE; // #STUB
+    return
+      getSize (left) == 1 && getSize (right) == 1 ||
+      options.useAccelerator && getSize (left) == 2 && getSize (right) == 2;
 }
 
 /* Indicate which extended bit operations this port supports */
@@ -1066,7 +1062,7 @@ PORT ds390_port =
   { NULL, NULL },
   { +1, 1, 4, 1, 1, 0, 0 },
   /* ds390 has an 16 bit mul & div */
-  { 2, -1, FALSE },
+  { -1, FALSE },
   { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */
@@ -1180,12 +1176,6 @@ static void _tininative_finaliseOptions (void)
     }
 
     if (!options.stack_loc) options.stack_loc = 0x400008;
-
-    /* generate native code 16*16 mul/div */
-    if (options.useAccelerator)
-        port->support.muldiv=2;
-    else
-        port->support.muldiv=1;
 
     /* Fixup the memory map for the stack; it is now in
      * far space and requires a FPOINTER to access it.
@@ -1410,7 +1400,7 @@ PORT tininative_port =
   { NULL, NULL },
   { +1, 1, 4, 1, 1, 0, 0 },
   /* ds390 has an 16 bit mul & div */
-  { 2, -1, FALSE },
+  { -1, FALSE },
   { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */
@@ -1441,7 +1431,7 @@ PORT tininative_port =
   _ds390_regparm,
   NULL,
   NULL,
-  NULL,
+  _ds390_nativeMulCheck,
   hasExtBitOp,                  /* hasExtBitOp */
   oclsExpense,                  /* oclsExpense */
   FALSE,
@@ -1556,12 +1546,6 @@ _ds400_finaliseOptions (void)
           // assumes IDM1:0 = 1:0, CMA = 1.
         }
 
-      /* generate native code 16*16 mul/div */
-      if (options.useAccelerator)
-        port->support.muldiv=2;
-      else
-        port->support.muldiv=1;
-
       /* Fixup the memory map for the stack; it is now in
        * far space and requires a FPOINTER to access it.
        */
@@ -1670,8 +1654,7 @@ PORT ds400_port =
   },
   { _ds400_generateRomDataArea, _ds400_linkRomDataArea },
   { +1, 1, 4, 1, 1, 0, 0 },
-  /* ds390 has an 16 bit mul & div */
-  { 2, -1, FALSE },
+  { -1, FALSE },
   { ds390_emitDebuggerSymbol },
   {
     255/4,      /* maxCount */

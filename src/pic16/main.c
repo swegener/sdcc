@@ -1368,9 +1368,8 @@ PORT pic16_port =
     0,          /* 'banked' call overhead, mild overlap with bank_overhead */
     1           /* sp is offset by 1 from last item pushed */
   },
-    /* pic16 has an 8 bit mul */
   {
-     0, -1, FALSE
+     -1, FALSE
   },
   {
     pic16_emitDebuggerSymbol

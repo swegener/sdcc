@@ -1,3 +1,12 @@
+2016-11-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCicode.c,
+	  src/SDCCloop.c,
+	  src/SDCCopt.c,
+	  src/port.h,
+	  src/*/main.c:
+	  Replace all muldiv uses by hasNativeMulFor().
+
 2016-10-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

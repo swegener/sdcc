@@ -1133,7 +1133,7 @@ convertToFcall (eBBlock ** ebbs, int count)
             {
               sym_link *leftType = operandType (IC_LEFT (ic));
 
-              if (IS_INTEGRAL (leftType) && getSize (leftType) > port->support.muldiv)
+              if (IS_INTEGRAL (leftType))
                 {
                   sym_link *rightType = operandType (IC_RIGHT (ic));
 

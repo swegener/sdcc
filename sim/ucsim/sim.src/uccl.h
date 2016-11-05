@@ -98,7 +98,7 @@ public:
   class brk_coll *ebrk;		// Collection of EVENT breakpoints
   class cl_sim *sim;
   //class cl_list *mems;
- private:
+ public:
   class cl_hws *hws;
 
  public:
@@ -172,7 +172,8 @@ public:
   virtual void del_counter(const char *nam);
   virtual double get_rtime(void);
   virtual int clock_per_cycle(void);
-
+  virtual void touch(void);
+  
   // execution
   virtual t_mem fetch(void);
   virtual bool fetch(t_mem *code);
@@ -227,7 +228,9 @@ public:
 				  class cl_memory *mem,
 				  t_addr mem_addr,
 				  t_mem bit_mask);
-
+  virtual name_entry *get_name_entry(struct name_entry tabl[],
+				     char *name);
+  
   /* Converting abstract address spaces into real ones */
   virtual class cl_address_space *bit2mem(t_addr bitaddr,
 					  t_addr *memaddr,

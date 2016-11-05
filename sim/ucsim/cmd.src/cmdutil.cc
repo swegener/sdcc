@@ -46,35 +46,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 /*
- * Searching for a name in the specified table
- */
-
-struct name_entry *
-get_name_entry(struct name_entry tabl[], char *name, class cl_uc *uc)
-{
-  int i= 0;
-  char *p;
-
-  if (!tabl ||
-      !name ||
-      !(*name))
-    return(0);
-  for (p= name; *p; *p= toupper(*p), p++);
-  while (tabl[i].name &&
-	 (!(tabl[i].cpu_type & uc->type) ||
-	 (strcmp(tabl[i].name, name) != 0)))
-    {
-      //printf("tabl[%d].name=%s <-> %s\n",i,tabl[i].name,name);
-      i++;
-    }
-  if (tabl[i].name != NULL)
-    return(&tabl[i]);
-  else
-    return(0);
-}
-
-
-/*
  * Processing escape sequencies in a string
  */
 

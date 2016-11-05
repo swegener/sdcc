@@ -152,14 +152,57 @@ cl_51core::mk_hw_elements(void)
   h->init();
   add_hw(h= new cl_serial(this));
   h->init();
-  add_hw(h= new cl_port(this, 0));
-  h->init();
-  add_hw(h= new cl_port(this, 1));
-  h->init();
-  add_hw(h= new cl_port(this, 2));
-  h->init();
-  add_hw(h= new cl_port(this, 3));
-  h->init();
+
+  class cl_port_ui *d;
+  add_hw(d= new cl_port_ui(this, 0, "dport"));
+  d->init();
+
+  class cl_port *p0, *p1, *p2, *p3;
+  add_hw(p0= new cl_port(this, 0));
+  p0->init();
+  add_hw(p1= new cl_port(this, 1));
+  p1->init();
+  add_hw(p2= new cl_port(this, 2));
+  p2->init();
+  add_hw(p3= new cl_port(this, 3));
+  p3->init();
+
+  class cl_port_data pd;
+  pd.init();
+  pd.cell_dir= NULL;
+
+  pd.set_name("P0");
+  pd.cell_p  = p0->cell_p;
+  pd.cell_in = p0->cell_in;
+  pd.keyset  = chars(keysets[0]);
+  pd.basx    = 1;
+  pd.basy    = 4;
+  d->add_port(&pd, 0);
+  
+  pd.set_name("P1");
+  pd.cell_p  = p1->cell_p;
+  pd.cell_in = p1->cell_in;
+  pd.keyset  = chars(keysets[1]);
+  pd.basx    = 20;
+  pd.basy    = 4;
+  d->add_port(&pd, 1);
+  
+  pd.set_name("P2");
+  pd.cell_p  = p2->cell_p;
+  pd.cell_in = p2->cell_in;
+  pd.keyset  = chars(keysets[2]);
+  pd.basx    = 40;
+  pd.basy    = 4;
+  d->add_port(&pd, 2);
+  
+  pd.set_name("P3");
+  pd.cell_p  = p3->cell_p;
+  pd.cell_in = p3->cell_in;
+  pd.keyset  = chars(keysets[3]);
+  pd.basx    = 60;
+  pd.basy    = 4;
+  d->add_port(&pd, 3);
+  
   add_hw(interrupt= new cl_interrupt(this));
   interrupt->init();
   add_hw(h= new cl_uc51_cpu(this));

@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simif.cc 426 2016-08-24 18:39:47Z drdani $ */
+/* $Id: simif.cc 489 2016-11-03 14:29:15Z drdani $ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -427,7 +427,7 @@ cl_sif_read::produce_answer(void)
     {
       if (sif->fin)
 	{
-	  char c;
+	  int c;
 	  if (sif->fin->input_avail())
 	    {
 	      i= sif->fin->read(&c, 1);
@@ -545,6 +545,8 @@ cl_simulator_interface::init(void)
   uc->vars->add(v= new cl_var(cchars("sim_isr_ticks"), cfg, simif_isr_ticks));
   v->init();
   uc->vars->add(v= new cl_var(cchars("sim_idle_ticks"), cfg, simif_idle_ticks));
+  v->init();
+  uc->vars->add(v= new cl_var(cchars("sim_real_time"), cfg, simif_real_time));
   v->init();
   
   return(0);
@@ -689,7 +691,7 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	  cell->set(on?1:0);
 	}
       break;
-    case simif_run: // simulator runing: true= run, false= stop
+    case simif_run: // simulator running: true= run, false= stop
       if (val)
 	{
 	  if (*val)
@@ -751,6 +753,13 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       if (val)
 	*val= cell->get();
       cell->set(uc->idle_ticks->ticks);
+      break;
+    case simif_real_time: // real time in msec
+      if (val)
+	*val= cell->get();
+      cell->set(uc->get_rtime() * 1000);
+      break;
+    case simif_nuof:
       break;
     }
   return cell->get();

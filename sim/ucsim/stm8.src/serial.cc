@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 450 2016-10-03 13:50:16Z drdani $ */
+/* $Id: serial.cc 488 2016-11-03 11:00:43Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -134,7 +134,7 @@ cl_serial::read(class cl_memory_cell *cell)
       if (sr_read)
 	regs[sr]->set_bit0(0x1f);
       regs[sr]->set_bit0(0x20);
-      printf("** read DR=0x%02x\n", s_in);
+      //printf("** read DR=0x%02x\n", s_in);
       return s_in;
     }
   sr_read= (cell == regs[sr]);
@@ -145,7 +145,7 @@ cl_serial::read(class cl_memory_cell *cell)
 void
 cl_serial::write(class cl_memory_cell *cell, t_mem *val)
 {
-  printf("** write 0x%02x,'%c'\n", *val, *val);
+  //printf("** write 0x%02x,'%c'\n", *val, *val);
   
   if (conf(cell, val))
     return;
@@ -162,19 +162,19 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
       if ((cell == regs[brr1]) ||
 	  (cell == regs[brr2]))
 	{
-	  printf("** BRR1,2 %x\n", *val);
+	  //printf("** BRR1,2 %x\n", *val);
 	  pick_div();
 	}
       else if ((cell == regs[cr1]) ||
 	       (cell == regs[cr2]))
 	{
-	  printf("** CR1,2 %x\n", *val);
+	  //printf("** CR1,2 %x\n", *val);
 	  pick_ctrl();
 	}
   
       else if (cell == regs[dr])
 	{
-	  printf("** DR %x txd=%c\n", *val, *val);
+	  //printf("** DR %x txd=%c\n", *val, *val);
 	  s_txd= *val;
 	  s_tx_written= true;
 	  show_writable(false);
@@ -240,7 +240,7 @@ cl_serial::tick(int cycles)
   if (s_sending &&
       (s_tr_bit >= bits))
     {
-      printf("** sent %c\n", s_out);
+      //printf("** sent %c\n", s_out);
       s_sending= false;
       //if (io->fout)
 	{
@@ -254,7 +254,7 @@ cl_serial::tick(int cycles)
 	finish_send();
     }
   if ((ren) &&
-      io->fin &&
+      io->get_fin() &&
       !s_receiving)
     {
       //if (io->fin->input_avail())
@@ -287,7 +287,7 @@ cl_serial::tick(int cycles)
 void
 cl_serial::start_send()
 {
-  printf("** start_send ten=%d %c\n", ten, s_txd);
+  //printf("** start_send ten=%d %c\n", ten, s_txd);
   if (ten)
     {
       s_out= s_txd;
@@ -301,7 +301,7 @@ cl_serial::start_send()
 void
 cl_serial::restart_send()
 {
-  printf("** restart_send ten=%d %c\n", ten, s_txd);
+  //printf("** restart_send ten=%d %c\n", ten, s_txd);
   if (ten)
     {
       s_out= s_txd;
@@ -332,7 +332,7 @@ void
 cl_serial::reset(void)
 {
   int i;
-  printf("** reset\n");
+  //printf("** reset\n");
   regs[sr]->set(0xc0);
   for (i= 2; i < 12; i++)
     regs[i]->set(0);
@@ -345,7 +345,7 @@ cl_serial::pick_div()
   uint8_t b2= regs[brr2]->get();
   div= ((((b2&0xf0)<<4) + b1)<<4) + (b2&0xf);
   mcnt= 0;
-  printf("pick_div %d\n", div);
+  //printf("pick_div %d\n", div);
 }
 
 void
@@ -360,7 +360,7 @@ cl_serial::pick_ctrl()
   s_rec_bit= s_tr_bit= 0;
   s_receiving= false;
   s_tx_written= false;
-  printf("pick_ctrl en=%d ten=%d ren=%d\n", en, ten, ren);
+  //printf("pick_ctrl en=%d ten=%d ren=%d\n", en, ten, ren);
 }
 
 void
@@ -372,7 +372,7 @@ cl_serial::show_writable(bool val)
   else
     // TXE=0
     regs[sr]->set_bit0(0x80);
-  printf("** TXE=%d sr=%x\n", val, regs[sr]->get());
+  //printf("** TXE=%d sr=%x\n", val, regs[sr]->get());
 }
 
 void
@@ -382,7 +382,7 @@ cl_serial::show_readable(bool val)
     regs[sr]->set_bit1(0x20);
   else
     regs[sr]->set_bit0(0x20);
-  printf("** RX=%d sr=%x\n", val, regs[sr]->get());
+  //printf("** RX=%d sr=%x\n", val, regs[sr]->get());
 }
 
 void
@@ -392,7 +392,7 @@ cl_serial::show_tx_complete(bool val)
     regs[sr]->set_bit1(0x40);
   else
     regs[sr]->set_bit0(0x40);
-  printf("** TC=%d sr=%x\n", val, regs[sr]->get());
+  //printf("** TC=%d sr=%x\n", val, regs[sr]->get());
 }
 
 void
@@ -408,7 +408,7 @@ void
 cl_serial::set_dr(t_mem val)
 {
   regs[dr]->set(val);
-  printf("** DR<- %x %c\n", val, val);
+  //printf("** DR<- %x %c\n", val, val);
 }
 
 void
@@ -416,11 +416,13 @@ cl_serial::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d] %s\n", id_string, id, on?"on":"off");
   con->dd_printf("Input: ");
-  if (io->fin)
-    con->dd_printf("%s/%d ", io->fin->get_file_name(), io->fin->file_id);
+  class cl_f *fin= io->get_fin(), *fout= io->get_fout();
+  if (fin)
+    con->dd_printf("%s/%d ", fin->get_file_name(), fin->file_id);
   con->dd_printf("Output: ");
-  if (io->fout)
-    con->dd_printf("%s/%d\n", io->fout->get_file_name(), io->fout->file_id);
+  if (fout)
+    con->dd_printf("%s/%d", fout->get_file_name(), fout->file_id);
+  con->dd_printf("\n");
 }
 
 

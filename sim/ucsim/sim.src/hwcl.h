@@ -43,6 +43,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uccl.h"
 
 
+class cl_hw;
+
+class cl_hw_io: public cl_console
+{
+ protected:
+  class cl_hw *hw;
+ public:
+  cl_hw_io(class cl_hw *ihw);
+  virtual int init(void);
+  
+  virtual int proc_input(class cl_cmdset *cmdset);
+  virtual bool prevent_quit(void) { return false; }
+  virtual void print_prompt(void) {}
+
+  virtual void convert2console(void);
+  virtual void pass2hw(class cl_hw *new_hw);
+};
+
+
 class cl_hw: public cl_guiobj
 {
  public:
@@ -55,6 +74,9 @@ class cl_hw: public cl_guiobj
  protected:
   class cl_list *partners;
   class cl_address_space *cfg;
+  class cl_hw_io *io;
+  int cache_run;
+  unsigned int cache_time;
  public:
   cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, const char *aid_string);
   virtual ~cl_hw(void);
@@ -84,7 +106,16 @@ class cl_hw: public cl_guiobj
   virtual void happen(class cl_hw * /*where*/, enum hw_event /*he*/,
                       void * /*params*/) {}
   virtual void inform_partners(enum hw_event he, void *params);
-  virtual void proc_input(class cl_f *fin, class cl_f *fout) {}
+  virtual void touch(void);
+  
+  virtual void make_io(void);
+  virtual void new_io(class cl_f *f_in, class cl_f *f_out);
+  virtual cl_hw_io *get_io(void);
+  virtual bool proc_input(void);
+  virtual bool handle_input(char c);
+  virtual void refresh_display(bool force);
+  virtual void draw_display(void);
+  virtual cl_hw *next_displayer(void);
   
   virtual void print_info(class cl_console_base *con);
 };
@@ -94,6 +125,7 @@ class cl_hws: public cl_list
  public:
  cl_hws(void): cl_list(2, 2, cchars("hws")) {}
   virtual t_index add(void *item);
+  virtual cl_hw *next_displayer(class cl_hw *hw);
 };
 
 
@@ -112,20 +144,6 @@ class cl_partner_hw: public cl_base
   virtual void refresh(class cl_hw *new_hw);
 
   virtual void happen(class cl_hw *where, enum hw_event he, void *params);
-};
-
-
-class cl_hw_io: public cl_console
-{
- protected:
-  class cl_hw *hw;
- public:
-  cl_hw_io(class cl_hw *ihw);
-  virtual int init(void);
-  
-  virtual int proc_input(class cl_cmdset *cmdset);
-  virtual bool prevent_quit(void) { return false; }
-  virtual void print_prompt(void) {}
 };
 
 

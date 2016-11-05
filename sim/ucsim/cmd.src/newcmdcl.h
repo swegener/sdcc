@@ -111,6 +111,8 @@ class cl_console_base: public cl_base
 
   char nl;
   chars lbuf;
+
+  int tu_bg_color, tu_fg_color;
   
  public:
   cl_console_base(void);
@@ -125,6 +127,9 @@ class cl_console_base: public cl_base
   virtual int read_line(void) = 0;
   virtual class cl_f *get_fout(void)= 0;
   virtual class cl_f *get_fin(void)= 0;
+  virtual void drop_files(void)= 0; // do not close, just ignore
+  virtual void close_files(void)= 0;
+  virtual void replace_files(bool close_old, cl_f *new_in, cl_f *new_out)= 0;
   
   virtual int init(void);
   virtual void welcome(void);
@@ -138,6 +143,18 @@ class cl_console_base: public cl_base
   virtual void print_char_octal(char c);
   virtual int cmd_do_print(const char *format, va_list ap);
   //virtual void flush(void);
+  virtual void tu_cls(void);
+  virtual void tu_clc(void);
+  virtual void tu_cll(void);
+  virtual void tu_go(int x1, int y1);
+  virtual void tu_save(void);
+  virtual void tu_restore(void);
+  virtual void tu_hide(void);
+  virtual void tu_show(void);
+  virtual void tu_color(int bg, int fg);
+  virtual void tu_mouse_on(void);
+  virtual void tu_mouse_off(void);
+  virtual void tu_reset(void);
   
   virtual bool interpret(char *cmd);
   virtual int get_id(void) const { return(id); }

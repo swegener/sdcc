@@ -50,6 +50,7 @@ public:
   virtual chars &append(char *s);
   virtual chars &append(char c);
   virtual chars &append(const char *format, ...);
+  virtual chars &format(const char *format, ...);
   virtual bool empty();
   virtual bool is_null();
   virtual int len() { return chars_length; }

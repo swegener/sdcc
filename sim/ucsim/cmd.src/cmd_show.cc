@@ -188,6 +188,10 @@ COMMAND_DO_WORK_APP(cl_show_error_cmd)
 
 #include "newcmdposixcl.h"
 
+/*
+ * Command: show console
+ *----------------------------------------------------------------------------
+ */
 COMMAND_DO_WORK_APP(cl_show_console)
 {
   class cl_commander_base *cm= app->get_commander();

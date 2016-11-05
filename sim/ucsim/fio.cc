@@ -149,6 +149,7 @@ cl_f::cl_f(void)
   attributes_saved= 0;
   hist= new cl_history("history");
   proc_telnet= false;
+  proc_escape= false;
 }
 
 cl_f::cl_f(chars fn, chars mode):
@@ -898,7 +899,7 @@ cl_f::input_avail(void)
 }
 
 int
-cl_f::read(char *buf, int max)
+cl_f::read(int *buf, int max)
 {
   return read_dev(buf, max);
 }
@@ -907,7 +908,7 @@ cl_f::read(char *buf, int max)
 /* IO primitives */
 
 int
-cl_f::read_dev(char *buf, int max)
+cl_f::read_dev(int *buf, int max)
 {
   int i= 0, c;
   
@@ -919,7 +920,7 @@ cl_f::read_dev(char *buf, int max)
       c= get();
       //if (c == -2) // ^C
 	  //return i;
-      if (c < 0)
+      if (c == -1)
 	{
 	  if (i>0)
 	    // got something
@@ -1206,6 +1207,12 @@ void
 cl_f::set_telnet(bool val)
 {
   proc_telnet= val;
+}
+
+void
+cl_f::set_escape(bool val)
+{
+  proc_escape= val;
 }
 
 

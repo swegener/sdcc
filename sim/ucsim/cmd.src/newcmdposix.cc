@@ -126,6 +126,44 @@ cl_console::clone_for_exec(char *_fin)
   return(con);
 }
 
+void
+cl_console::drop_files(void) // do not close, just ignore
+{
+  fin= 0;
+  fout= 0;
+  frout= 0;
+  application->get_commander()->update_active();
+}
+
+void
+cl_console::close_files(void)
+{
+  if (frout)
+    delete frout;
+  if (fout)
+    {
+      if (fout->tty)
+	tu_reset();
+      delete fout;
+    }
+  if (fin)
+    delete fin;
+  drop_files();
+}
+
+void
+cl_console::replace_files(bool close_old, cl_f *new_in, cl_f *new_out)
+{
+  if (frout)
+    delete frout;
+  frout= 0;
+  if (close_old)
+    close_files();
+  fin= new_in;
+  fout= new_out;
+  application->get_commander()->update_active();
+}
+
 /*
 void
 cl_console::set_id(int new_id)
@@ -151,6 +189,8 @@ cl_console::~cl_console(void)
       //if (flags & CONS_PROMPT)
       //fout->write_str("\n");
       //fout->flush();
+      if (fout->tty)
+	tu_reset();
       deb("deleting fout:%d of console %d\n", fout->file_id, id);
       delete fout;
     }
@@ -238,7 +278,7 @@ int
 cl_console::read_line(void)
 {
   int i= 0;
-  char b[2]= { 0, 0 };
+  int b[2]= { 0, 0 };
 
   do {
     i= fin->read(b, 1);
@@ -281,7 +321,12 @@ cl_console::read_line(void)
 	    */
 	    return 1;
 	  }
-	lbuf+= b;
+	{
+	  char s[2];
+	  s[0]= b[0];
+	  s[1]= b[1];
+	  lbuf+= s;
+	}
       }
   }
   while (i > 0);
@@ -497,7 +542,7 @@ cl_commander::update_active(void)
     {
       class cl_console *c=
 	(class cl_console *)cons->at(i);
-      class cl_f *f= c->fin;
+      class cl_f *f= c->get_fin();
 
       if (config_console &&
 	  (config_console != c))
@@ -558,21 +603,23 @@ cl_commander::proc_input(void)
   for (int j = 0; j < cons->count; j++)
     {
       class cl_console *c = dynamic_cast<class cl_console*>((class cl_console_base*)(cons->at(j)));
-
+      class cl_f *f= c->get_fin();
+      
       if (config_console &&
 	  (config_console != c))
 	continue;
       
-      if (c->input_active())
+      if (c->input_active() &&
+	  f)
         {
-	  deb("check input on fid=%d\n", c->fin->file_id);
+	  deb("check input on fid=%d\n", f->file_id);
 	  if (c->input_avail())
             {
               actual_console = c;
               int retval = c->proc_input(cmdset);
               if (retval)
                 {
-		  deb("closing console fin-fid=%d\n", c->fin->file_id);
+		  deb("closing console fin-fid=%d\n", f->file_id);
                   del_console(c);
                   //delete c;
                 }
@@ -583,7 +630,7 @@ cl_commander::proc_input(void)
               return(i == 0);
             }
 	  else
-	    deb("no input on fid=%d\n", c->fin->file_id);
+	    deb("no input on fid=%d\n", f->file_id);
         }
     }
   return 0;

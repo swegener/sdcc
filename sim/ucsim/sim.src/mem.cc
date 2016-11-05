@@ -821,6 +821,13 @@ cl_memory_cell::set_bit0(t_mem bits)
   /*(*data)&=*/d(d()& ~bits);
 }
 
+void
+cl_memory_cell::toggle_bits(t_mem bits)
+{
+  bits&= mask;
+  d(d() ^ bits);
+}
+
 
 void
 cl_memory_cell::append_operator(class cl_memory_operator *op)

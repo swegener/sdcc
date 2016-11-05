@@ -91,15 +91,25 @@ cl_port::init(void)
     bit_cells[i]= register_cell(bas, addr_p+i);
   prev= cell_p->get();
 
+  cell_in= cfg->get_cell(port_pin);
+  
   cl_var *v;
   chars pn;
   pn= cchars("port");
   pn.append("%d_", id);
   uc->vars->add(v= new cl_var(pn+chars("on"), cfg, port_on));
   v->init();
-  uc->vars->add(v= new cl_var(pn+cchars("pin"), cfg, port_pin));
+  uc->vars->add(v= new cl_var(pn+chars("pin"), cfg, port_pin));
   v->init();
-  uc->vars->add(v= new cl_var(pn+cchars("pins"), cfg, port_pin));
+  uc->vars->add(v= new cl_var(pn+chars("pins"), cfg, port_pin));
+  v->init();
+  chars p= chars("pin");
+  p.append("%d", id);
+  uc->vars->add(v= new cl_var(p, cfg, port_pin));
+  v->init();
+  p= chars("pins");
+  p.append("%d", id);
+  uc->vars->add(v= new cl_var(p, cfg, port_pin));
   v->init();
   
   return(0);

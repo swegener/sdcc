@@ -63,7 +63,7 @@ public:
   virtual int init(void);
   virtual const char *get_name(void) { return(name); }
   virtual const char *get_name(const char *def);
-  virtual bool have_name(void) { return/*(name != 0)*/ name.is_null(); }
+  virtual bool have_name(void) { return/*(name != 0)*/ !name.is_null(); }
   virtual bool have_real_name(void) { return/*(name != 0 && *name != '\0')*/ !name.empty(); }
   const char *set_name(const char *new_name);
   const char *set_name(const char *new_name, const char *def_name);

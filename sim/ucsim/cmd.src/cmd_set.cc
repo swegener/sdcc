@@ -311,6 +311,18 @@ COMMAND_DO_WORK_APP(cl_set_console_cmd)
 				 cmdline->param(2),
 				 cmdline->param(3) };
   char *s1= 0, *s2= 0;
+  class cl_uc *uc= app->sim->uc;
+  if (params[0] && /*cmdline->syntax_match(uc, HW)*/params[0]->as_hw(uc))
+    {
+      class cl_hw *hw= params[0]->value.hw;
+      con->dd_printf("Converting console to display of %s[%d]...\n",
+		     hw->id_string, hw->id);
+      hw->new_io(con->get_fin(), con->get_fout());
+      if (hw->get_io())
+	return con->drop_files(), true;
+      else
+	return con->dd_printf("%s[%d]: no display\n", hw->id_string, hw->id), false;
+    }
   
   if (cmdline->syntax_match(0, STRING))
     s1= params[0]->value.string.string;
@@ -320,6 +332,9 @@ COMMAND_DO_WORK_APP(cl_set_console_cmd)
       s2= params[1]->value.string.string;
     }
 
+  if (!s1)
+    return false;
+  
   if (strstr(s1, "i") == s1)
     {
       // interactive

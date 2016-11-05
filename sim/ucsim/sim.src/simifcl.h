@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simifcl.h 370 2016-07-17 10:59:36Z  $ */
+/* $Id: simifcl.h 474 2016-10-20 11:53:36Z drdani $ */
 
 #ifndef SIMIFCL_HEADER
 #define SIMIFCL_HEADER
@@ -345,7 +345,7 @@ class cl_simulator_interface: public cl_hw
   cl_simulator_interface(class cl_uc *auc);
   virtual ~cl_simulator_interface(void);
   virtual int init(void);
-  virtual int cfg_size(void) { return 10; }
+  virtual int cfg_size(void) { return simif_nuof; }
  
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual t_mem read(class cl_memory_cell *cel);

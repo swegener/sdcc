@@ -1416,6 +1416,35 @@ cl_uc::symbolic_bit_name(t_addr bit_address,
 
 
 /*
+ * Searching for a name in the specified table
+ */
+
+struct name_entry *
+cl_uc::get_name_entry(struct name_entry tabl[], char *name)
+{
+  int i= 0;
+  char *p;
+
+  if (!tabl ||
+      !name ||
+      !(*name))
+    return(0);
+  for (p= name; *p; *p= toupper(*p), p++);
+  while (tabl[i].name &&
+	 (!(tabl[i].cpu_type & type) ||
+	 (strcmp(tabl[i].name, name) != 0)))
+    {
+      //printf("tabl[%d].name=%s <-> %s\n",i,tabl[i].name,name);
+      i++;
+    }
+  if (tabl[i].name != NULL)
+    return(&tabl[i]);
+  else
+    return(0);
+}
+
+
+/*
  * Messages to broadcast
  */
 
@@ -1481,6 +1510,7 @@ cl_uc::address_space_added(class cl_address_space *as)
 void
 cl_uc::error(class cl_error *error)
 {
+  //printf("error adding: %s...\n", error->get_class()->get_name());
   errors->add(error);
   if ((error->inst= inst_exec))
     error->PC= instPC;
@@ -1495,6 +1525,7 @@ cl_uc::check_errors(void)
 
   if (c)
     {
+      //printf("error list: %d items\n", errors->count);
       for (i= 0; i < errors->count; i++)
 	{
 	  class cl_error *error= (class cl_error *)(errors->at(i));
@@ -1856,6 +1887,18 @@ cl_uc::clock_per_cycle(void)
   return(1);
 }
 
+void
+cl_uc::touch(void)
+{
+  class cl_hw *hw;
+  int i;
+  for (i= 0; i < hws->count; i++)
+    {
+      hw= (class cl_hw *)(hws->at(i));
+      hw->touch();
+    }
+}
+
 
 /*
  * Stack tracking system
@@ -1864,6 +1907,8 @@ cl_uc::clock_per_cycle(void)
 void
 cl_uc::stack_write(class cl_stack_op *op)
 {
+  delete op;
+  return ;
   if (op->get_op() & stack_read_operation)
     {
       class cl_error_stack_tracker_wrong_handle *e= new
@@ -1878,6 +1923,8 @@ cl_uc::stack_write(class cl_stack_op *op)
 void
 cl_uc::stack_read(class cl_stack_op *op)
 {
+  delete op;
+  return ;
   class cl_stack_op *top= (class cl_stack_op *)(stack_ops->top());
 
   if (op->get_op() & stack_write_operation)

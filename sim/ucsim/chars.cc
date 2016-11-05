@@ -191,6 +191,35 @@ chars::append(const char *format, ...)
   return *this;
 }
 
+chars &
+chars::format(const char *format, ...)
+{
+  deallocate_string();
+
+  va_list ap;
+  char n[1000];
+  
+  va_start(ap, format);
+  vsnprintf(n, 999, format, ap);
+  va_end(ap);
+
+  char *temp= (char*)malloc(chars_length + strlen(n) + 1);
+  if (chars_string)
+    {
+      strcpy(temp, chars_string);
+      if (dynamic)
+	free(chars_string);
+    }
+  else
+    temp[0]= '\0';
+  strcat(temp, n);
+  chars_string= temp;
+  chars_length+= strlen(n);
+  dynamic= true;
+  
+  return *this;
+}
+
 bool
 chars::empty()
 {

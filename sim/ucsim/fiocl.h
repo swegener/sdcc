@@ -45,28 +45,28 @@ enum file_type {
 };
 
 enum tu_special_keys {
-  TU_UP		= -1,
-  TU_DOWN	= -2,
-  TU_LEFT	= -3,
-  TU_RIGHT	= -4,
-  TU_HOME	= -5,
-  TU_END	= -6,
-  TU_PGUP	= -7,
-  TU_PGDOWN	= -8,
-  TU_DEL	= -9,
-  TU_F1		= -10,
-  TU_F2		= -11,
-  TU_F3		= -12,
-  TU_F4		= -13,
-  TU_F5		= -14,
-  TU_F6		= -15,
-  TU_F7		= -16,
-  TU_F8		= -17,
-  TU_F9		= -18,
-  TU_F10	= -19,
-  TU_F11	= -20,
-  TU_F12	= -21,
-  TU_INS	= -22
+  TU_UP		= -101,
+  TU_DOWN	= -102,
+  TU_LEFT	= -103,
+  TU_RIGHT	= -104,
+  TU_HOME	= -105,
+  TU_END	= -106,
+  TU_PGUP	= -107,
+  TU_PGDOWN	= -108,
+  TU_DEL	= -109,
+  TU_F1		= -110,
+  TU_F2		= -111,
+  TU_F3		= -112,
+  TU_F4		= -113,
+  TU_F5		= -114,
+  TU_F6		= -115,
+  TU_F7		= -116,
+  TU_F8		= -117,
+  TU_F9		= -118,
+  TU_F10	= -119,
+  TU_F11	= -120,
+  TU_F12	= -121,
+  TU_INS	= -122
 };
 
 
@@ -108,11 +108,12 @@ class cl_f: public cl_base
   int cursor;
   char esc_buffer[100];
   char last_ln;
-  char buffer[1024];
+  int buffer[1024];
   int last_used, first_free;
   bool attributes_saved;
   class cl_history *hist;
-  bool proc_telnet;
+  bool proc_telnet; // in raw mode
+  bool proc_escape; // in raw mode
  public:
   cl_f(void);
   cl_f(chars fn, chars mode);
@@ -146,14 +147,14 @@ class cl_f: public cl_base
   virtual int pick(const char *s);
  public:
   virtual int input_avail(void);
-  virtual int read(char *buf, int max);
+  virtual int read(int *buf, int max);
 
  public:
   //FILE *f(void) { return file_f; };
   int id(void) { return file_id; };
 
   virtual int check_dev(void)= 0;
-  virtual int read_dev(char *buf, int max);
+  virtual int read_dev(int *buf, int max);
   virtual int write(char *buf, int count);
   virtual int write_str(char *s);
   virtual int write_str(const char *s);
@@ -180,7 +181,9 @@ class cl_f: public cl_base
   virtual void interactive(class cl_f *echo_out);
   virtual int get_cooking() { return cooking; }
   virtual void set_telnet(bool val);
+  virtual void set_escape(bool val);
   virtual bool get_telnet() { return proc_telnet; }
+  virtual bool get_escape() { return proc_escape; }
  public:
   int server_port;
 

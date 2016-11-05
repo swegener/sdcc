@@ -50,6 +50,7 @@ class cl_serial_io: public cl_hw_io
  cl_serial_io(class cl_hw *ihw):
   cl_hw_io(ihw)
   {}
+  //virtual bool prevent_quit(void) { return true; }
 };
 
 class cl_serial_hw: public cl_hw
@@ -59,7 +60,7 @@ class cl_serial_hw: public cl_hw
   class cl_optref *serial_out_file_option;
   class cl_optref *serial_port_option;
   class cl_serial_listener *listener;
-  class cl_hw_io *io;
+  //class cl_hw_io *io;
   char input;
   bool input_avail;
   char menu;
@@ -71,8 +72,11 @@ class cl_serial_hw: public cl_hw
 
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 
+  virtual void make_io(void);
   virtual void new_io(class cl_f *f_in, class cl_f *f_out);
-  virtual void proc_input(class cl_f *fi, class cl_f *fo);
+  virtual bool proc_input(void);
+  virtual void refresh_display(bool force) {}
+  virtual void draw_display(void) {}
 };
 
 

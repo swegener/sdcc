@@ -272,6 +272,88 @@ cl_console_base::cmd_do_print(const char *format, va_list ap)
     return 0;
 }
 
+void
+cl_console_base::tu_cls(void)
+{
+  dd_printf("\033[2J");
+}
+
+void
+cl_console_base::tu_cll(void)
+{
+  dd_printf("\033[K");
+}
+
+void
+cl_console_base::tu_clc(void)
+{
+  tu_save();
+  dd_printf(" ");
+  tu_restore();
+}
+
+void
+cl_console_base::tu_go(int x1, int y1)
+{
+  dd_printf("\033[%d;%dH", y1, x1);
+}
+
+void
+cl_console_base::tu_save(void)
+{
+  dd_printf("\033[s");
+}
+
+void
+cl_console_base::tu_restore(void)
+{
+  dd_printf("\033[u");
+}
+
+void
+cl_console_base::tu_hide(void)
+{
+  dd_printf("\033[?25l");
+}
+
+void
+cl_console_base::tu_show(void)
+{
+  dd_printf("\033[?25h");
+}
+
+void
+cl_console_base::tu_color(int bg, int fg)
+{
+  if (bg >= 0)
+    dd_printf("\033[%dm", (tu_bg_color= bg)+40);
+  if (fg >= 0)
+    dd_printf("\033[%dm", (tu_fg_color= fg)+30);
+}
+
+void
+cl_console_base::tu_mouse_on(void)
+{
+  // enable mouse click reports of terminal
+  dd_printf("\033[1;2'z"); // enable locator reporting, as character cells
+  dd_printf("\033[?9h"); // send mouse X,Y on btn press (X10 mode)
+}
+
+void
+cl_console_base::tu_mouse_off(void)
+{
+  dd_printf("\033[?9l"); // do not send mouse X,Y on btn press
+  dd_printf("\033[0;0'z"); // disable locator reporting
+}
+
+void
+cl_console_base::tu_reset(void)
+{
+  tu_mouse_off();
+  dd_printf("\033c"); // terminal reset
+  dd_printf("\033[!p"); // soft terminal reset
+}
+
 /*void
 cl_console_base::flush(void)
 {
@@ -290,11 +372,11 @@ cl_console_base::interpret(char *cmd)
 void
 cl_console_base::set_id(int new_id)
 {
-  char *s;
-
+  //char *s;
   id= new_id;
-  set_name(s= format_string("console%d", id));
-  free(s);
+  if (!have_real_name())
+    set_name(/*s= format_string*/chars("", "console%d", id));
+  //free(s);
 }
 
 void

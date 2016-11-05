@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef PORTCL_HEADER
 #define PORTCL_HEADER
 
-#include "hwcl.h"
+#include "port_hwcl.h"
 
 
 class cl_port: public cl_hw

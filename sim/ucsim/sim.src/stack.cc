@@ -53,6 +53,7 @@ cl_stack_op::cl_stack_op(enum stack_op op,
 
 cl_stack_op::~cl_stack_op(void)
 {
+  //printf("stack op %p deleting...\n", this);
 }
 
 
@@ -116,9 +117,12 @@ cl_stack_op::match(class cl_stack_op *op)
   return(false);
 }
 
+bool bigbig= false;
+
 bool
 cl_stack_op::can_removed(class cl_stack_op *op)
 {
+  return false;
   bool incr= sp_increased(); // FIXME
   bool op_incr= op->sp_increased(); // FIXME
 
@@ -126,6 +130,7 @@ cl_stack_op::can_removed(class cl_stack_op *op)
       (!incr && op_incr))
     {
       printf("BIGBIG ERROR!\n");
+      bigbig= true;
       return(false);
     }
   if (incr)
@@ -488,14 +493,25 @@ cl_error_stack_tracker_unmatch(class cl_stack_op *Top, class cl_stack_op *op):
 {
   top= Top->mk_copy();
   operation= op->mk_copy();
+  //printf("top=%p op=%p\n", top, operation);
   classification=
     stack_error_registry.find("stack_operation_unmatched_to_top_of_stack");
 }
 
 cl_error_stack_tracker_unmatch::~cl_error_stack_tracker_unmatch(void)
 {
-  delete operation;
-  delete top;
+  //printf("trying delete stackop %p op\n", operation);
+  //printf("trying delete stackop %p top\n", top);
+  if (bigbig)
+    {
+      delete operation;
+      delete top;
+    }
+  else
+    {
+      delete operation;
+      delete top;
+    }
 }
 
 void

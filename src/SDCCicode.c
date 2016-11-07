@@ -1276,6 +1276,7 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
             {
               werror (E_DIVIDE_BY_ZERO);
               retval = right;
+              break;
             }
           SPEC_USIGN (let) = 1;
           SPEC_USIGN (ret) = 1;
@@ -1294,10 +1295,11 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
         }
       else
         {
-          if (operandLitValue (right) == 0)
+          if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0)
             {
               werror (E_DIVIDE_BY_ZERO);
               retval = right;
+              break;
             }
           retval = operandFromValue (valCastLiteral (type, operandLitValue (left) / operandLitValue (right), operandLitValueUll (left) / operandLitValueUll (right)));
         }

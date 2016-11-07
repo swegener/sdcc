@@ -1,3 +1,8 @@
+2016-11-07 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCicode.c
+	  Fix a bug in zeror-divider check.
+
 2016-11-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdbool.h,

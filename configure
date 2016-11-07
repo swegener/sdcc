@@ -639,7 +639,6 @@ OPT_DISABLE_SDCPP
 OPT_DISABLE_PACKIHX
 OPT_DISABLE_DEVICE_LIB
 OPT_DISABLE_UCSIM
-OPT_DISABLE_XA51
 OPT_DISABLE_AVR
 OPT_DISABLE_STM8
 OPT_DISABLE_S08
@@ -6858,7 +6857,6 @@ cat >>confdefs.h <<_ACEOF
 #define STD_DS400_LIB "libds400"
 _ACEOF
 
-####AC_DEFINE_UNQUOTED(STD_XA51_LIB,  "libxa51", [XXX])
 
 # SDCC runtime environment variables
 sdcc_dir_name="SDCC_HOME"
@@ -7295,15 +7293,6 @@ OPT_DISABLE_AVR=1
 
 cat >>confdefs.h <<_ACEOF
 #define OPT_DISABLE_AVR ${OPT_DISABLE_AVR}
-_ACEOF
-
-
-
-####AC_DO_PORT_ENABLER(xa51,  xa51,  XA51,  [Includes the XA51 port (disabled by default)])
-OPT_DISABLE_XA51=1
-
-cat >>confdefs.h <<_ACEOF
-#define OPT_DISABLE_XA51 ${OPT_DISABLE_XA51}
 _ACEOF
 
 
@@ -7872,8 +7861,6 @@ if test $OPT_DISABLE_PIC16 = 0 && test $OPT_DISABLE_NON_FREE = 0; then
   test $OPT_DISABLE_DEVICE_LIB = 0 && subdirs="$subdirs device/non-free/lib/pic16"
 
 fi
-
-####test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
 
 if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0; then
   ac_config_files="$ac_config_files src/z80/Makefile"

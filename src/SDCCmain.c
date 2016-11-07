@@ -339,9 +339,6 @@ static PORT *_ports[] = {
 #if !OPT_DISABLE_TININative
   &tininative_port,
 #endif
-#if !OPT_DISABLE_XA51
-  &xa51_port,
-#endif
 #if !OPT_DISABLE_DS400
   &ds400_port,
 #endif

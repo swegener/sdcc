@@ -341,17 +341,6 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
               emitDebugSym (&map->oBuf, sym);
               dbuf_printf (&map->oBuf, " == 0x%04x\n", SPEC_ADDR (sym->etype));
             }
-          if (TARGET_IS_XA51)
-            {
-              if (map == sfr)
-                {
-                  equ = "sfr";
-                }
-              else if (map == bit || map == sfrbit)
-                {
-                  equ = "bit";
-                }
-            }
           dbuf_printf (&map->oBuf, "%s\t%s\t0x%04x\n", sym->rname, equ, SPEC_ADDR (sym->etype));
         }
       else
@@ -2184,7 +2173,7 @@ glue (void)
   dbuf_init (&ovrBuf, 4096);
 
   mcs51_like = (port->general.glue_up_main &&
-                (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_XA51 || TARGET_IS_DS400));
+                (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400));
 
   /* print the global struct definitions */
   if (options.debug)

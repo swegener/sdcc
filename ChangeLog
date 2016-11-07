@@ -1,3 +1,17 @@
+2016-11-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure.ac,
+	  configure,
+	  src/SDCCasm.c,
+	  src/SDCCasm.h,
+	  src/SDCCglue.c,
+	  src/SDCCmain.c,
+	  src/port.h,
+	  src/xa51,
+	  support/regression/ports/xa51,
+	  support/regression/Makefile.in:
+	  Kill incomplete, unmaintained xa51 backend.
+
 2016-11-07 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCicode.c

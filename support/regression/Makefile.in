@@ -70,7 +70,7 @@ GENERATE_CASES = $(srcdir)/generate-cases.py
 # Each directory under ports/ is used as a port name.  Each port is tested.
 # Each port must have a spec.mk which describes how to build the object
 # files and how to run the emulator.
-ALL_PORTS = $(filter-out .svn xa51 rrz80 rrgbz80 pic16 pic14 tlcs90 mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
+ALL_PORTS = $(filter-out .svn rrz80 rrgbz80 pic16 pic14 tlcs90 mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
 
 # These  ports will be cleaned with 'make clean'
 CLEAN_PORTS = $(filter-out .svn mcs51-common,$(notdir $(wildcard $(PORTS_DIR)/*)))
@@ -175,11 +175,6 @@ test-s08:
 test-stm8:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=stm8
-
-# Helper rule for testing the xa51 port only(use uCsim simulator)
-test-xa51:
-	$(MAKE) test-common
-	$(MAKE) test-port PORT=xa51
 
 # Helper rule for testing the pic16 port only(use gpsim simulator)
 test-pic16:

@@ -696,7 +696,6 @@ AC_DEFINE_UNQUOTED(STD_LONG_LIB,  "liblong", [XXX])
 AC_DEFINE_UNQUOTED(STD_FP_LIB,    "libfloat", [XXX])
 AC_DEFINE_UNQUOTED(STD_DS390_LIB, "libds390", [XXX])
 AC_DEFINE_UNQUOTED(STD_DS400_LIB, "libds400", [XXX])
-####AC_DEFINE_UNQUOTED(STD_XA51_LIB,  "libxa51", [XXX])
 
 # SDCC runtime environment variables
 sdcc_dir_name="SDCC_HOME"
@@ -830,11 +829,6 @@ OPT_DISABLE_AVR=1
 AC_DEFINE_UNQUOTED(OPT_DISABLE_AVR, ${OPT_DISABLE_AVR}, [Define to 1 to disable the AVR port])
 AC_SUBST(OPT_DISABLE_AVR)
 
-####AC_DO_PORT_ENABLER(xa51,  xa51,  XA51,  [Includes the XA51 port (disabled by default)])
-OPT_DISABLE_XA51=1
-AC_DEFINE_UNQUOTED(OPT_DISABLE_XA51, ${OPT_DISABLE_XA51}, [Define to 1 to disable the XA51 port])
-AC_SUBST(OPT_DISABLE_XA51)
-
 AC_DO_DISABLER(ucsim,      UCSIM,      [Disables configuring and building of ucsim])
 AC_DO_DISABLER(device-lib, DEVICE_LIB, [Disables building device libraries])
 AC_DO_DISABLER(packihx,    PACKIHX,    [Disables building packihx])
@@ -922,8 +916,6 @@ fi
 if test $OPT_DISABLE_PIC16 = 0 && test $OPT_DISABLE_NON_FREE = 0; then
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/non-free/lib/pic16)
 fi
-
-####test $OPT_DISABLE_XA51 = 0 && AC_CONFIG_FILES([src/xa51/Makefile])
 
 if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0; then
   AC_CONFIG_FILES([src/z80/Makefile])

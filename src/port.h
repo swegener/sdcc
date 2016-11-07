@@ -17,7 +17,6 @@
 #define TARGET_ID_DS390    5
 #define TARGET_ID_PIC14    6
 #define TARGET_ID_PIC16    7
-#define TARGET_ID_XA51     9
 #define TARGET_ID_DS400    10
 #define TARGET_ID_HC08     11
 #define TARGET_ID_Z180     12
@@ -36,7 +35,6 @@
 #define TARGET_IS_DS400    (port->id == TARGET_ID_DS400)
 #define TARGET_IS_PIC14    (port->id == TARGET_ID_PIC14)
 #define TARGET_IS_PIC16    (port->id == TARGET_ID_PIC16)
-#define TARGET_IS_XA51     (port->id == TARGET_ID_XA51)
 #define TARGET_IS_Z80      (port->id == TARGET_ID_Z80)
 #define TARGET_IS_Z180     (port->id == TARGET_ID_Z180)
 #define TARGET_IS_R2K      (port->id == TARGET_ID_R2K)
@@ -445,9 +443,6 @@ extern PORT pic16_port;
 #endif
 #if !OPT_DISABLE_TININative
 extern PORT tininative_port;
-#endif
-#if !OPT_DISABLE_XA51
-extern PORT xa51_port;
 #endif
 #if !OPT_DISABLE_DS400
 extern PORT ds400_port;

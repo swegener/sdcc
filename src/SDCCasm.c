@@ -544,59 +544,6 @@ static const ASM_MAPPING _a390_mapping[] = {
   {NULL, NULL}
 };
 
-#if !OPT_DISABLE_XA51
-static const ASM_MAPPING _xa_asm_mapping[] = {
-  {"labeldef", "%s:"},
-  {"slabeldef", "%s:"},
-  {"tlabeldef", "L%05d:"},
-  {"tlabel", "L%05d"},
-  {"immed", "#"},
-  {"zero", "#0"},
-  {"one", "#1"},
-  {"area", ".area %s"},
-  {"areacode", ".area %s"},
-  {"areadata", ".area %s"},
-  {"areahome", ".area %s"},
-  {"ascii", ".db \"%s\""},
-  {"ds", ".ds %d"},
-  {"db", ".db"},
-  {"dbs", ".db \"%s\""},
-  {"dw", ".dw"},
-  {"dws", ".dw %s"},
-  {"constbyte", "0x%02x"},
-  {"constword", "0x%04x"},
-  {"immedword", "0x%04x"},
-  {"immedbyte", "0x%02x"},
-  {"hashedstr", "#%s"},
-  {"lsbimmeds", "#<%s"},
-  {"msbimmeds", "#>%s"},
-  {"module", "; .module %s"},
-  {"global", ".globl %s"},
-  {"fileprelude", ""},
-  {"functionheader",
-   "; ---------------------------------\n"
-   "; Function %s\n"
-   "; ---------------------------------"},
-  {"functionlabeldef", "%s:"},
-  {"globalfunctionlabeldef", "%s::"},
-  {"bankimmeds", "0     ; PENDING: bank support"},
-  {"los", "(%s & 0FFh)"},
-  {"his", "((%s / 256) & 0FFh)"},
-  {"hihis", "((%s / 65536) & 0FFh)"},
-  {"hihihis", "((%s / 16777216) & 0FFh)"},
-  {"lod", "(%d & 0FFh)"},
-  {"hid", "((%d / 256) & 0FFh)"},
-  {"hihid", "((%d / 65536) & 0FFh)"},
-  {"hihihid", "((%d / 16777216) & 0FFh)"},
-  {"lol", "(L%05d & 0FFh)"},
-  {"hil", "((L%05d / 256) & 0FFh)"},
-  {"hihil", "((L%05d / 65536) & 0FFh)"},
-  {"hihihil", "((L%09d / 16777216) & 0FFh)"},
-  {"equ", " equ"},
-  {NULL, NULL}
-};
-#endif
-
 const ASM_MAPPINGS asm_asxxxx_mapping = {
   NULL,
   _asxxxx_mapping
@@ -615,9 +562,3 @@ const ASM_MAPPINGS asm_a390_mapping = {
   _a390_mapping
 };
 
-#if !OPT_DISABLE_XA51
-const ASM_MAPPINGS asm_xa_asm_mapping = {
-  NULL,
-  _xa_asm_mapping
-};
-#endif

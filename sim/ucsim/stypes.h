@@ -30,19 +30,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
-typedef int8_t TYPE_BYTE;
-typedef uint8_t TYPE_UBYTE;
-typedef int16_t TYPE_WORD;
-typedef uint16_t TYPE_UWORD;
-typedef int32_t TYPE_DWORD;
-typedef uint32_t TYPE_UDWORD;
+//typedef int8_t TYPE_BYTE;
+//typedef uint8_t TYPE_UBYTE;
+//typedef int16_t TYPE_WORD;
+//typedef uint16_t TYPE_UWORD;
+//typedef int32_t TYPE_DWORD;
+//typedef uint32_t TYPE_UDWORD;
 
 typedef unsigned char	uchar;
 typedef unsigned int	uint;
 typedef unsigned long	ulong;
-typedef int64_t		t_addr;		/* 64 bit max */
-typedef uint32_t	t_mem;		/* 32 bit max */
-typedef int32_t		t_smem;		/* signed 32 bit memory */
+
+typedef   signed TYPE_BYTE  i8_t;
+typedef unsigned TYPE_BYTE  u8_t;
+typedef   signed TYPE_WORD  i16_t;
+typedef unsigned TYPE_WORD  u16_t;
+typedef   signed TYPE_DWORD i32_t;
+typedef unsigned TYPE_DWORD u32_t;
+typedef   signed TYPE_QWORD i64_t;
+typedef unsigned TYPE_QWORD u64_t;
+
+typedef i64_t		t_addr;		/* 64 bit max */
+typedef u32_t		t_mem;		/* 32 bit max */
+typedef i32_t		t_smem;		/* signed 32 bit memory */
 
 enum {
   max_mem_size= 0x40000000		/* 1 GB */
@@ -63,7 +73,7 @@ enum error_type {
 // table of dissassembled instructions
 struct dis_entry
 {
-  uint64_t code, mask; // max 8 byte of code
+  /*uint64_t*/long long code, mask; // max 8 byte of code
   char  branch;
   uchar length;
   const char *mnemonic;

@@ -45,28 +45,43 @@ enum file_type {
 };
 
 enum tu_special_keys {
-  TU_UP		= -101,
-  TU_DOWN	= -102,
-  TU_LEFT	= -103,
-  TU_RIGHT	= -104,
-  TU_HOME	= -105,
-  TU_END	= -106,
-  TU_PGUP	= -107,
-  TU_PGDOWN	= -108,
-  TU_DEL	= -109,
-  TU_F1		= -110,
-  TU_F2		= -111,
-  TU_F3		= -112,
-  TU_F4		= -113,
-  TU_F5		= -114,
-  TU_F6		= -115,
-  TU_F7		= -116,
-  TU_F8		= -117,
-  TU_F9		= -118,
-  TU_F10	= -119,
-  TU_F11	= -120,
-  TU_F12	= -121,
-  TU_INS	= -122
+  TU_UP		= -10,
+  TU_DOWN	= -11,
+  TU_LEFT	= -12,
+  TU_RIGHT	= -13,
+  TU_HOME	= -14,
+  TU_END	= -15,
+  TU_PGUP	= -16,
+  TU_PGDOWN	= -17,
+  TU_DEL	= -18,
+  TU_F1		= -19,
+  TU_F2		= -20,
+  TU_F3		= -21,
+  TU_F4		= -22,
+  TU_F5		= -23,
+  TU_F6		= -24,
+  TU_F7		= -25,
+  TU_F8		= -26,
+  TU_F9		= -27,
+  TU_F10	= -28,
+  TU_F11	= -29,
+  TU_F12	= -30,
+  TU_INS	= -31,
+
+  // mouse reports in 4 bytes: FF X Y Code
+  TU_BTN1	= -50, // button1
+  TU_BTN2	= -51, // button2
+  TU_BTN3	= -52, // button3
+  TU_CBTN1	= -53, // CTRL-button1
+  TU_CBTN2	= -54, // CTRL-button2
+  TU_CBTN3	= -55, // CTRL-button3
+  TU_ABTN1	= -56, // ALT-button1
+  TU_ABTN2	= -57, // ALT-button2
+  TU_ABTN3	= -58, // ALT-button3
+  TU_SUP	= -59, // Scroll-UP
+  TU_SDOWN	= -60, // Scroll-DOWN
+  TU_CSUP	= -61, // CTRL-Scroll-UP
+  TU_CSDOWN	= -62, // CTRL-Scroll-DOWN
 };
 
 
@@ -136,11 +151,12 @@ class cl_f: public cl_base
   virtual char *get_file_name() { return file_name; };
   virtual class cl_f *get_echo_to() { return echo_to; }
  protected:
-  virtual int put(char c);
+  virtual int put(int c);
   virtual int get(void);
   virtual int finish_esc(int k);
   virtual int process_telnet(char ci);
   virtual int process_esc(char c);
+  virtual int process_csi(void);
   virtual int process(char c);
   virtual int pick(void);
   virtual int pick(char c);

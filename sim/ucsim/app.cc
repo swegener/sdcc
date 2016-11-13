@@ -190,14 +190,20 @@ print_help(char *name)
      "                  in=file   serial input will be read from file named `file'\n"
      "                  out=file  serial output will be written to `file'\n"
      "                  port=nr   Use localhost:nr as server for serial line\n"
+     "  -I options   `options' is a comma separated list of options according to\n"
+     "               simulator interface. Known options are:\n"
+     "                 if=memory[address]  turn on interface on given memory location"
+     "                 in=file             specify input file for IO"
+     "                 out=file            spacify output file forr IO"
      "  -p prompt    Specify string for prompt\n"
      "  -P           Prompt is a null ('\\0') character\n"
      "  -g           Go, start simulation\n"
+     "  -G           Go, start simulation, quit on stop\n"
      "  -a nr        Specify size of variable space (default=256)\n"
      "  -V           Verbose mode\n"
-     "  -v           Print out version number\n"
-     "  -H           Print out types of known CPUs\n"
-     "  -h           Print out this help\n"
+     "  -v           Print out version number and quit\n"
+     "  -H           Print out types of known CPUs and quit\n"
+     "  -h           Print out this help and quit\n"
      );
 }
 
@@ -218,6 +224,19 @@ static const char *S_opts[]= {
   NULL
 };
 
+enum {
+  IOPT_IF= 0,
+  IOPT_IN,
+  IOPT_OUT
+};
+
+static const char *I_opts[]= {
+  /*IOPT_IF*/		"if",
+  /*IOPT_IN*/		"in",
+  /*IOPT_OUT*/		"out",
+  NULL
+};
+
 int
 cl_app::proc_arguments(int argc, char *argv[])
 {
@@ -227,7 +246,7 @@ cl_app::proc_arguments(int argc, char *argv[])
   bool /*s_done= DD_FALSE,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
-  strcpy(opts, "c:C:p:PX:vVt:s:S:a:hHgJ_");
+  strcpy(opts, "c:C:p:PX:vVt:s:S:I:a:hHgGJ_");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:k:");
 #endif
@@ -250,6 +269,14 @@ cl_app::proc_arguments(int argc, char *argv[])
 	if (!options->set_value("go", this, true))
 	  fprintf(stderr, "Warning: No \"go\" option found "
 		  "to set by -g\n");
+	break;
+      case 'G':
+	if (!options->set_value("go", this, true))
+	  fprintf(stderr, "Warning: No \"go\" option found "
+		  "to set by -G\n");
+	if (!options->set_value("quit", this, true))
+	  fprintf(stderr, "Warning: No \"quit\" option found "
+		  "to set by -G\n");
 	break;
       case 'c':
 	if (!options->set_value("console_on", this, optarg))
@@ -463,6 +490,61 @@ cl_app::proc_arguments(int argc, char *argv[])
 		  options->set_value(s, this, (long)port);
 		  free(s);
 		}
+	    }
+	  break;
+	}
+      case 'I':
+	{
+	  char *ifstr= NULL, *in= NULL, *out= NULL;
+	  subopts= optarg;
+	  while (*subopts != '\0')
+	    {
+	      switch (get_sub_opt(&subopts, I_opts, &value))
+		{
+		case IOPT_IF:
+		  if (value == NULL) {
+		    fprintf(stderr, "No value for -I if\n");
+		    exit(1);
+		  }
+		  ifstr= value;
+		  break;
+		case IOPT_IN:
+		  if (value == NULL) {
+		    fprintf(stderr, "No value for -I in\n");
+		    exit(1);
+		  }
+		  in= value;
+		  break;
+		case IOPT_OUT:
+		  if (value == NULL) {
+		    fprintf(stderr, "No value for -I out\n");
+		    exit(1);
+		  }
+		  out= value;
+		  break;
+		}
+	    }
+	  if (ifstr)
+	    {
+	      char *s= strtok(ifstr, "[]:.");
+	      if (s)
+		{
+		  options->set_value("simif_memory", this, s);
+		  s= strtok(NULL, "[]:.");
+		  if (s)
+		    {
+		      long l= strtol(s, 0, 0);
+		      options->set_value("simif_address", this, l);
+		    }
+		}
+	    }
+	  if (in)
+	    {
+	      options->set_value("simif_infile", this, in);
+	    }
+	  if (out)
+	    {
+	      options->set_value("simif_outfile", this, out);
 	    }
 	  break;
 	}
@@ -750,11 +832,34 @@ cl_app::mk_options(void)
   o->init();
   o->hide();
 
+  options->new_option(o= new cl_bool_option(this, "quit",
+					    "Quit on stop (-G)"));
+  o->init();
+  o->hide();
+  
   options->new_option(o= new cl_number_option(this, "var_size",
 					      "Size of variable space (-a)"));
   o->init();
   o->set_value((long)0x100);
   o->hide();
+
+  options->new_option(o= new cl_string_option(this, "simif_memory",
+					      "Memory for simulator interface (-I)"));
+  o->init();
+  o->hide();
+  options->new_option(o= new cl_number_option(this, "simif_address",
+					      "Address for simulator interface (-I)"));
+  o->init();
+  o->hide();
+  options->new_option(o= new cl_string_option(this, "simif_infile",
+					      "Name of input file for simulator interface (-I)"));
+  o->init();
+  o->hide();
+  options->new_option(o= new cl_string_option(this, "simif_outfile",
+					      "Name of output file for simulator interface (-I)"));
+  o->init();
+  o->hide();
+  
 }
 
 

@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: tlcs.cc 390 2016-07-21 21:13:30Z  $ */
+/* $Id: tlcs.cc 500 2016-11-12 15:15:43Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -58,23 +58,23 @@ cl_tlcs::cl_tlcs(class cl_sim *asim):
   //sleep_executed= 0;
   regs8= new cl_address_space("regs8", 0, 16, 8);
   regs8->init();
-  regs8->get_cell(0)->decode((t_mem*)&reg.a);
-  regs8->get_cell(1)->decode((t_mem*)&reg.f);
-  regs8->get_cell(2)->decode((t_mem*)&reg.b);
-  regs8->get_cell(3)->decode((t_mem*)&reg.c);
-  regs8->get_cell(4)->decode((t_mem*)&reg.d);
-  regs8->get_cell(5)->decode((t_mem*)&reg.e);
-  regs8->get_cell(6)->decode((t_mem*)&reg.h);
-  regs8->get_cell(7)->decode((t_mem*)&reg.l);
+  regs8->get_cell(0)->decode((t_mem*)&reg.raf.a);
+  regs8->get_cell(1)->decode((t_mem*)&reg.raf.f);
+  regs8->get_cell(2)->decode((t_mem*)&reg.rbc.b);
+  regs8->get_cell(3)->decode((t_mem*)&reg.rbc.c);
+  regs8->get_cell(4)->decode((t_mem*)&reg.rde.d);
+  regs8->get_cell(5)->decode((t_mem*)&reg.rde.e);
+  regs8->get_cell(6)->decode((t_mem*)&reg.rhl.h);
+  regs8->get_cell(7)->decode((t_mem*)&reg.rhl.l);
 
-  regs8->get_cell(8)->decode((t_mem*)&reg.alt_a);
-  regs8->get_cell(9)->decode((t_mem*)&reg.alt_f);
-  regs8->get_cell(10)->decode((t_mem*)&reg.alt_b);
-  regs8->get_cell(11)->decode((t_mem*)&reg.alt_c);
-  regs8->get_cell(12)->decode((t_mem*)&reg.alt_d);
-  regs8->get_cell(13)->decode((t_mem*)&reg.alt_e);
-  regs8->get_cell(14)->decode((t_mem*)&reg.alt_h);
-  regs8->get_cell(15)->decode((t_mem*)&reg.alt_l);
+  regs8->get_cell(8)->decode((t_mem*)&reg.ralt_af.alt_a);
+  regs8->get_cell(9)->decode((t_mem*)&reg.ralt_af.alt_f);
+  regs8->get_cell(10)->decode((t_mem*)&reg.ralt_bc.alt_b);
+  regs8->get_cell(11)->decode((t_mem*)&reg.ralt_bc.alt_c);
+  regs8->get_cell(12)->decode((t_mem*)&reg.ralt_de.alt_d);
+  regs8->get_cell(13)->decode((t_mem*)&reg.ralt_de.alt_e);
+  regs8->get_cell(14)->decode((t_mem*)&reg.ralt_hl.alt_h);
+  regs8->get_cell(15)->decode((t_mem*)&reg.ralt_hl.alt_l);
 
   regs16= new cl_address_space("regs16", 0, 11, 16);
   regs16->init();
@@ -240,7 +240,7 @@ cl_tlcs::dis_tbl(void)
 //virtual struct name_entry *bit_tbl(void);
 
 const char *
-cl_tlcs::regname_r(uint8_t r)
+cl_tlcs::regname_r(u8_t r)
 {
   switch (r & 7)
     {
@@ -256,7 +256,7 @@ cl_tlcs::regname_r(uint8_t r)
 }
 
 const char *
-cl_tlcs::regname_R(uint8_t R)
+cl_tlcs::regname_R(u8_t R)
 {
   switch (R & 7)
     {
@@ -271,7 +271,7 @@ cl_tlcs::regname_R(uint8_t R)
 }
 
 const char *
-cl_tlcs::regname_Q(uint8_t Q)
+cl_tlcs::regname_Q(u8_t Q)
 {
   switch (Q & 7)
     {
@@ -286,7 +286,7 @@ cl_tlcs::regname_Q(uint8_t Q)
 }
 
 const char *
-cl_tlcs::regname_i(uint8_t i)
+cl_tlcs::regname_i(u8_t i)
 {
   switch (i & 3)
     {
@@ -298,7 +298,7 @@ cl_tlcs::regname_i(uint8_t i)
 }
 
 const char *
-cl_tlcs::bitname(uint8_t b)
+cl_tlcs::bitname(u8_t b)
 {
   switch (b & 0x07)
     {
@@ -315,7 +315,7 @@ cl_tlcs::bitname(uint8_t b)
 }
 
 const char *
-cl_tlcs::condname_cc(uint8_t cc)
+cl_tlcs::condname_cc(u8_t cc)
 {
   switch (cc & 0xf)
     {
@@ -340,7 +340,7 @@ cl_tlcs::condname_cc(uint8_t cc)
 }
 
 const char *
-cl_tlcs::condname_C(uint8_t cc)
+cl_tlcs::condname_C(u8_t cc)
 {
   switch (cc & 0xf)
     {
@@ -368,7 +368,7 @@ char *
 cl_tlcs::disass(t_addr addr, const char *sep)
 {
   struct dis_entry *de;
-  uint64_t c;
+  u64_t c;
   int i;
   chars s("");
   char *buf, *t, l[20];
@@ -376,7 +376,7 @@ cl_tlcs::disass(t_addr addr, const char *sep)
   c= 0;
   for (i= 7; i>=0; i--)
     {
-      uint8_t cb= rom->get(addr+i);
+      u8_t cb= rom->get(addr+i);
       c<<= 8;
       c|= cb;
     }
@@ -384,7 +384,7 @@ cl_tlcs::disass(t_addr addr, const char *sep)
   de= dis_tbl();
   while (de->mnemonic != NULL)
     {
-      if ((c & de->mask) == de->code)
+      if ((c & de->mask) == u64_t(de->code))
 	break;
       de++;
     }
@@ -446,13 +446,13 @@ int
 cl_tlcs::inst_length(t_addr addr)
 {
   struct dis_entry *de;
-  uint64_t c;
+  u64_t c;
   int i;
   
   c= 0;
   for (i= 7; i>=0; i--)
     {
-      uint8_t cb= rom->get(addr+i);
+      u8_t cb= rom->get(addr+i);
       c<<= 8;
       c|= cb;
     }
@@ -460,7 +460,7 @@ cl_tlcs::inst_length(t_addr addr)
   de= dis_tbl();
   while (de->mnemonic != NULL)
     {
-      if ((c & de->mask) == de->code)
+      if ((c & de->mask) == u64_t(de->code))
 	break;
       de++;
     }
@@ -476,18 +476,18 @@ void
 cl_tlcs::print_regs(class cl_console_base *con)
 {
   con->dd_printf("SZIHXVNC  Flags= 0x%02x %3d %c  ",
-                 reg.f, reg.f, isprint(reg.f)?reg.f:'.');
+                 reg.raf.f, reg.raf.f, isprint(reg.raf.f)?reg.raf.f:'.');
   con->dd_printf("A= 0x%02x %3d %c\n",
-                 reg.a, reg.a, isprint(reg.a)?reg.a:'.');
+                 reg.raf.a, reg.raf.a, isprint(reg.raf.a)?reg.raf.a:'.');
   con->dd_printf("%c%c%c%c%c%c%c%c\n",
-                 (reg.f&FLAG_S)?'1':'0',
-                 (reg.f&FLAG_Z)?'1':'0',
-		 (reg.f&FLAG_I)?'1':'0',
-                 (reg.f&FLAG_H)?'1':'0',
-                 (reg.f&FLAG_X)?'1':'0',
-                 (reg.f&FLAG_V)?'1':'0',
-                 (reg.f&FLAG_N)?'1':'0',
-                 (reg.f&FLAG_C)?'1':'0');
+                 (reg.raf.f&FLAG_S)?'1':'0',
+                 (reg.raf.f&FLAG_Z)?'1':'0',
+		 (reg.raf.f&FLAG_I)?'1':'0',
+                 (reg.raf.f&FLAG_H)?'1':'0',
+                 (reg.raf.f&FLAG_X)?'1':'0',
+                 (reg.raf.f&FLAG_V)?'1':'0',
+                 (reg.raf.f&FLAG_N)?'1':'0',
+                 (reg.raf.f&FLAG_C)?'1':'0');
   con->dd_printf("BC= 0x%04x [BC]= %02x %3d %c  ",
                  reg.bc, nas->get(reg.bc), nas->get(reg.bc),
                  isprint(nas->get(reg.bc))?nas->get(reg.bc):'.');
@@ -525,8 +525,8 @@ cl_tlcs::exec_inst(void)
     {
     case 0x00: break; // NOP //res= resGO;
     case 0x01: res= resHALT; break; // HALT
-    case 0x02: reg.f&= ~FLAG_I; break; // DI
-    case 0x03: reg.f|= FLAG_I; break; // EI
+    case 0x02: reg.raf.f&= ~FLAG_I; break; // DI
+    case 0x03: reg.raf.f|= FLAG_I; break; // EI
     case 0x08: res= ex_de_hl(); break;
     case 0x09: res= ex_af_alt_af(); break;
     case 0x0a: res= exx(); break;
@@ -556,14 +556,14 @@ cl_tlcs::exec_inst(void)
       break;
     case 0x97: c2= fetch(); inst_inc16(t_addr(0xff00+c2)); break; // INCW (0ffn)
     case 0x9F: c2= fetch(); inst_dec16(t_addr(0xff00+c2)); break; // DECW (0ffn)
-    case 0xa0: reg.a= op_rlc(reg.a, false); break; // RLCA
-    case 0xa1: reg.a= op_rrc(reg.a, false); break; // RRCA
-    case 0xa2: reg.a= op_rl(reg.a, false); break; // RLA
-    case 0xa3: reg.a= op_rr(reg.a, false); break; // RRA
-    case 0xa4: reg.a= op_sla(reg.a, false); break; // SLAA
-    case 0xa5: reg.a= op_sra(reg.a, false); break; // SRAA
-    case 0xa6: reg.a= op_sla(reg.a, false); break; // SLLA (=SLAA)
-    case 0xa7: reg.a= op_srl(reg.a, false); break; // SRLA
+    case 0xa0: reg.raf.a= op_rlc(reg.raf.a, false); break; // RLCA
+    case 0xa1: reg.raf.a= op_rrc(reg.raf.a, false); break; // RRCA
+    case 0xa2: reg.raf.a= op_rl(reg.raf.a, false); break; // RLA
+    case 0xa3: reg.raf.a= op_rr(reg.raf.a, false); break; // RRA
+    case 0xa4: reg.raf.a= op_sla(reg.raf.a, false); break; // SLAA
+    case 0xa5: reg.raf.a= op_sra(reg.raf.a, false); break; // SRAA
+    case 0xa6: reg.raf.a= op_sla(reg.raf.a, false); break; // SLLA (=SLAA)
+    case 0xa7: reg.raf.a= op_srl(reg.raf.a, false); break; // SRLA
     case 0xff: res= inst_swi(); break;
     case 0xe3:
       c2= fetch();
@@ -605,7 +605,7 @@ cl_tlcs::exec_inst(void)
 	  {
 	  case 0x14: // ADD ix,mn
 	    {
-	      uint16_t *ra= aof_reg16_ix(c1);
+	      u16_t *ra= aof_reg16_ix(c1);
 	      c2= fetch();
 	      c3= fetch();
 	      *ra= op_add16(*ra, c3*256 + c2);
@@ -621,8 +621,8 @@ cl_tlcs::exec_inst(void)
 	    switch (c1 & 0xf8) // c1= XX+r,rr,...
 	      {
 		// r, g, etc coded in single byte instruction
-	      case 0x20: reg.a= *aof_reg8(c1); break; // LD A,r
-	      case 0x28: *aof_reg8(c1)= reg.a; break; // LD r,A
+	      case 0x20: reg.raf.a= *aof_reg8(c1); break; // LD A,r
+	      case 0x28: *aof_reg8(c1)= reg.raf.a; break; // LD r,A
 	      case 0x38: // LD rr,mn
 		c2= fetch();
 		c3= fetch();
@@ -656,9 +656,9 @@ cl_tlcs::exec_inst(void)
  */
 
 int
-cl_tlcs::exec_inst2(uint8_t c1)
+cl_tlcs::exec_inst2(u8_t c1)
 {
-  uint8_t c2= fetch();
+  u8_t c2= fetch();
   int res= resGO;
   class cl_memory_cell *n= cell_n(c2);
   
@@ -667,12 +667,12 @@ cl_tlcs::exec_inst2(uint8_t c1)
     {
     case 0x07: inst_incx(n); break; // INCX (0ffn)
     case 0x0F: inst_decx(n); break; // DECX (0ffn)
-    case 0x12: reg.hl= reg.l * c2; break; // MUL HL,n
+    case 0x12: reg.hl= reg.rhl.l * c2; break; // MUL HL,n
     case 0x13: inst_div_hl(c2); break; // DIV HL,n
     case 0x18: inst_djnz_b(int8_t(c2)); break; // DJNZ $+2+d
     case 0x19: inst_djnz_bc(int8_t(c2)); break; // DJNZ BC,$+2+d
-    case 0x27: reg.a= n->read(); break; // LD A,(0ffn)
-    case 0x2F: n->write(reg.a); break; // LD (0ffn),A
+    case 0x27: reg.raf.a= n->read(); break; // LD A,(0ffn)
+    case 0x2F: n->write(reg.raf.a); break; // LD (0ffn),A
     case 0x47: reg.hl= mem16(0xff00 + c2); break; // LD HL,(0ffn)
     case 0x4f: write16(0xff00+c2, reg.hl); break; // LD (0xffn),HL
     case 0x60: inst_add_a(n); break; // ADD A,(0ffn)
@@ -683,7 +683,7 @@ cl_tlcs::exec_inst2(uint8_t c1)
     case 0x65: inst_xor_a(n); break; // XOR A,(0ffn)
     case 0x66: inst_or_a(n); break; // OR A,(0ffn)
     case 0x67: op_cp_a(n); break; // CP A,(0ffn)
-    case 0x68: reg.a= op_add_a(c2); break; // ADD A,n
+    case 0x68: reg.raf.a= op_add_a(c2); break; // ADD A,n
     case 0x69: inst_adc_a(c2); break; // ADC A,n
     case 0x6A: inst_sub_a(c2); break; // SUB A,n
     case 0x6B: inst_sbc_a(c2); break; // SBC A,n
@@ -740,7 +740,7 @@ cl_tlcs::exec_inst2(uint8_t c1)
  */
 
 int
-cl_tlcs::exec_inst2_f3(uint8_t c2)
+cl_tlcs::exec_inst2_f3(u8_t c2)
 {
   int res= resGO;
   
@@ -759,18 +759,18 @@ cl_tlcs::exec_inst2_f3(uint8_t c2)
     case 0x65: res= inst_xor_a(cell_hl_a()); break; // XOR A,(HL+A)
     case 0x66: res= inst_or_a(cell_hl_a()); break; // OR A,(HL+A)
     case 0x67: res= op_cp_a(cell_hl_a()); break; // CP A,(HL+A)
-    case 0x70: reg.hl= op_add_hl((t_addr)(reg.hl+reg.a)); break; // ADD HL,(HL+A)
-    case 0x71: reg.hl= op_adc_hl((t_addr)(reg.hl+reg.a)); break; // ADC HL,(HL+A)
-    case 0x72: reg.hl= op_sub_hl((t_addr)(reg.hl+reg.a)); break; // SUB HL,(HL+A)
-    case 0x73: reg.hl= op_sbc_hl((t_addr)(reg.hl+reg.a)); break; // SBC HL,(HL+A)
-    case 0x74: reg.hl= op_and_hl((t_addr)(reg.hl+reg.a)); break; // AND HL,(HL+A)
-    case 0x75: reg.hl= op_xor_hl((t_addr)(reg.hl+reg.a)); break; // XOR HL,(HL+A)
-    case 0x76: reg.hl= op_or_hl((t_addr)(reg.hl+reg.a)); break; // OR HL,(HL+A)
-    case 0x77: reg.hl= op_sub_hl((t_addr)(reg.hl+reg.a)); break; // CP HL,(HL+A)
+    case 0x70: reg.hl= op_add_hl((t_addr)(reg.hl+reg.raf.a)); break; // ADD HL,(HL+A)
+    case 0x71: reg.hl= op_adc_hl((t_addr)(reg.hl+reg.raf.a)); break; // ADC HL,(HL+A)
+    case 0x72: reg.hl= op_sub_hl((t_addr)(reg.hl+reg.raf.a)); break; // SUB HL,(HL+A)
+    case 0x73: reg.hl= op_sbc_hl((t_addr)(reg.hl+reg.raf.a)); break; // SBC HL,(HL+A)
+    case 0x74: reg.hl= op_and_hl((t_addr)(reg.hl+reg.raf.a)); break; // AND HL,(HL+A)
+    case 0x75: reg.hl= op_xor_hl((t_addr)(reg.hl+reg.raf.a)); break; // XOR HL,(HL+A)
+    case 0x76: reg.hl= op_or_hl((t_addr)(reg.hl+reg.raf.a)); break; // OR HL,(HL+A)
+    case 0x77: reg.hl= op_sub_hl((t_addr)(reg.hl+reg.raf.a)); break; // CP HL,(HL+A)
     case 0x87: inst_inc(cell_hl_a()); break; // INC (HL+A)
     case 0x8f: inst_dec(cell_hl_a()); break; // DEC (HL+A)
-    case 0x97: inst_inc16((t_addr)(reg.hl+reg.a)); break; // INCW (HL+A)
-    case 0x9f: inst_dec16((t_addr)(reg.hl+reg.a)); break; // DECW (HL+A)
+    case 0x97: inst_inc16((t_addr)(reg.hl+reg.raf.a)); break; // INCW (HL+A)
+    case 0x9f: inst_dec16((t_addr)(reg.hl+reg.raf.a)); break; // DECW (HL+A)
     case 0xa0: inst_rlc(cell_hl_a()); break; // RLC (HL+A)
     case 0xa1: inst_rrc(cell_hl_a()); break; // RRC (HL+A)
     case 0xa2: inst_rl(cell_hl_a()); break; // RL (HL+A)
@@ -783,8 +783,8 @@ cl_tlcs::exec_inst2_f3(uint8_t c2)
       // handle c1==f3 cases where second byte is not fix
       if ((c2 & 0xfc) == 0x14) // ADD ix,(HL+A)
 	{
-	  uint16_t *op1= aof_reg16_ix(c2);
-	  uint16_t op2= mem16(reg.hl+reg.a);
+	  u16_t *op1= aof_reg16_ix(c2);
+	  u16_t op2= mem16(reg.hl+reg.raf.a);
 	  *op1= op_add16(*op1, op2);
 	}
       else
@@ -793,16 +793,16 @@ cl_tlcs::exec_inst2_f3(uint8_t c2)
 	  case 0x18: // TSET b,(HL+A)
 	    {
 	      cl_memory_cell *c= cell_hl_a();
-	      uint8_t v= c->read();
+	      u8_t v= c->read();
 	      c->write(op_tset(v, c2));
 	      break;
 	    }
 	  case 0x28: *aof_reg8(c2)= cell_hl_a()->read(); break; // LD r,(HL+A)
-	  case 0x48: *aof_reg16_rr(c2)= mem16(reg.hl+reg.a); break; // LD rr,(HL+A)
+	  case 0x48: *aof_reg16_rr(c2)= mem16(reg.hl+reg.raf.a); break; // LD rr,(HL+A)
 	  case 0x50: // EX (HL+A),rr
 	    {
 	      cl_memory_cell *c= cell_hl_a();
-	      uint16_t t= c->read(), *r= aof_reg16_rr(c2);
+	      u16_t t= c->read(), *r= aof_reg16_rr(c2);
 	      c->write(*r);
 	      *r= t;
 	      break;
@@ -811,14 +811,14 @@ cl_tlcs::exec_inst2_f3(uint8_t c2)
 	  case 0xb0: // RES b,(HL+A)
 	    {
 	      cl_memory_cell *c= cell_hl_a();
-	      uint8_t v= op_res(c->read(), c2);
+	      u8_t v= op_res(c->read(), c2);
 	      c->write(v);
 	      break;
 	    }
 	  case 0xb8: // SET b,(HL+A)
 	    {
 	      cl_memory_cell *c= cell_hl_a();
-	      uint8_t v= op_set(c->read(), c2);
+	      u8_t v= op_set(c->read(), c2);
 	      c->write(v);
 	      break;
 	    }
@@ -835,15 +835,15 @@ cl_tlcs::exec_inst2_f3(uint8_t c2)
  */
 
 int
-cl_tlcs::exec_inst2_f7(uint8_t c2)
+cl_tlcs::exec_inst2_f7(u8_t c2)
 {
   int res= resGO;
-  uint8_t n, m;
+  u8_t n, m;
   
   switch (c2)
     {
     case 0x37: n= fetch(); cell_hl_a()->write(n); break; // LD (HL+A),n
-    case 0x3f: n= fetch(); m= fetch(); write16(reg.hl+reg.a, m*256+n); break; // LDW (HL+A),mn
+    case 0x3f: n= fetch(); m= fetch(); write16(reg.hl+reg.raf.a, m*256+n); break; // LDW (HL+A),mn
     case 0x68: n= fetch(); cell_hl_a()->write(op_add8(cell_hl_a()->read(), n)); break; // ADD (HL+A),n
     case 0x69: n= fetch(); cell_hl_a()->write(op_adc8(cell_hl_a()->read(), n)); break; // ADC (HL+A),n
     case 0x6a: n= fetch(); cell_hl_a()->write(op_sub8(cell_hl_a()->read(), n)); break; // SUB (HL+A),n
@@ -855,14 +855,14 @@ cl_tlcs::exec_inst2_f7(uint8_t c2)
     default:
       switch (c2 & 0xf0)
 	{
-	case 0xc0: if (cc(c2)) PC= reg.hl|reg.a; break; // JP [cc,]HL+A
-	case 0xd0: if (cc(c2)) inst_call(PC-2, reg.hl+reg.a); break; // CALL [cc,]HL+A
+	case 0xc0: if (cc(c2)) PC= reg.hl|reg.raf.a; break; // JP [cc,]HL+A
+	case 0xd0: if (cc(c2)) inst_call(PC-2, reg.hl+reg.raf.a); break; // CALL [cc,]HL+A
 	default:
 	  switch (c2 & 0xf8)
 	    {
 	    case 0x20: cell_hl_a()->write(*aof_reg8(c2)); break; // LD (HL+A),r
-	    case 0x38: *aof_reg16_rr(c2)= reg.hl+reg.a; break; // LDA rr,HL+A
-	    case 0x40: write16(reg.hl+reg.a, *aof_reg16_rr(c2)); break; // LD (HL+A),rr
+	    case 0x38: *aof_reg16_rr(c2)= reg.hl+reg.raf.a; break; // LDA rr,HL+A
+	    case 0x40: write16(reg.hl+reg.raf.a, *aof_reg16_rr(c2)); break; // LD (HL+A),rr
 	    default:
 	      res= resINV_INST;
 	      break;
@@ -877,7 +877,7 @@ cl_tlcs::exec_inst2_f7(uint8_t c2)
  */
 
 int
-cl_tlcs::exec_inst2_fe(uint8_t c2)
+cl_tlcs::exec_inst2_fe(u8_t c2)
 {
   int res= resGO;
   
@@ -907,7 +907,7 @@ cl_tlcs::exec_inst2_fe(uint8_t c2)
  */
 
 int
-cl_tlcs::exec_inst2_e0gg(uint8_t c1, uint8_t c2)
+cl_tlcs::exec_inst2_e0gg(u8_t c1, u8_t c2)
 {
   int res= resGO;
   cl_memory_cell *gg= cell_gg(c1);
@@ -949,7 +949,7 @@ cl_tlcs::exec_inst2_e0gg(uint8_t c1, uint8_t c2)
     default:
       if ((c2 & 0xfc) == 0x14) // ADD ix,(gg)
 	{
-	  uint16_t *ix= aof_reg16_ix(c2);
+	  u16_t *ix= aof_reg16_ix(c2);
 	  *ix= op_add16(*ix, mem16gg(c1));
 	}
       else
@@ -960,8 +960,8 @@ cl_tlcs::exec_inst2_e0gg(uint8_t c1, uint8_t c2)
 	  case 0x48: *aof_reg16_rr(c2)= mem16gg(c1); break; // LD rr,(gg)
 	  case 0x50: // EX (gg),rr
 	    {
-	      uint16_t *ra= aof_reg16_rr(c2);
-	      uint16_t r= *ra;
+	      u16_t *ra= aof_reg16_rr(c2);
+	      u16_t r= *ra;
 	      *ra= mem16gg(c1);
 	      write16gg(c1, r);
 	      break;
@@ -982,12 +982,12 @@ cl_tlcs::exec_inst2_e0gg(uint8_t c1, uint8_t c2)
  */
 
 int
-cl_tlcs::exec_inst2_e8gg(uint8_t c1, uint8_t c2)
+cl_tlcs::exec_inst2_e8gg(u8_t c1, u8_t c2)
 {
   int res= resGO;
   class cl_memory_cell *gg= cell_gg(c1);
   t_addr gv= *aof_reg16_gg(c1);
-  uint8_t n, m;
+  u8_t n, m;
   
   switch (c2)
     {
@@ -1026,11 +1026,11 @@ cl_tlcs::exec_inst2_e8gg(uint8_t c1, uint8_t c2)
  */
 
 int
-cl_tlcs::exec_inst2_f8gg(uint8_t c1, uint8_t c2)
+cl_tlcs::exec_inst2_f8gg(u8_t c1, u8_t c2)
 {
   int res= resGO;
-  uint8_t *ga= aof_reg8(c1), n;
-  uint16_t *gga= aof_reg16_gg(c1);
+  u8_t *ga= aof_reg8(c1), n;
+  u16_t *gga= aof_reg16_gg(c1);
 
   if ((c1 == 0xfe) &&
       (
@@ -1043,9 +1043,9 @@ cl_tlcs::exec_inst2_f8gg(uint8_t c1, uint8_t c2)
     {
       switch (c2)
 	{
-	case 0x12: reg.hl= reg.l * (*ga); break; // MUL HL,g
+	case 0x12: reg.hl= reg.rhl.l * (*ga); break; // MUL HL,g
 	case 0x13: inst_div_hl(*ga); break; // DIV HL,g
-	case 0x60: reg.a= op_add_a(*ga); break; // ADD A,g
+	case 0x60: reg.raf.a= op_add_a(*ga); break; // ADD A,g
 	case 0x61: inst_adc_a(*ga); break; // ADC A,g
 	case 0x62: inst_sub_a(*ga); break; // SUB A,g
 	case 0x63: inst_sbc_a(*ga); break; // SBC A,g
@@ -1106,10 +1106,10 @@ cl_tlcs::exec_inst2_f8gg(uint8_t c1, uint8_t c2)
  */
 
 int
-cl_tlcs::exec_inst3(uint8_t c1, uint8_t c2)
+cl_tlcs::exec_inst3(u8_t c1, u8_t c2)
 {
   int res= resGO;
-  uint8_t c3= fetch();
+  u8_t c3= fetch();
   
   switch (c1)
     {
@@ -1143,7 +1143,7 @@ cl_tlcs::exec_inst3(uint8_t c1, uint8_t c2)
  */
 
 int
-cl_tlcs::exec_inst3_e7(uint8_t c1, uint8_t c2, uint8_t c3)
+cl_tlcs::exec_inst3_e7(u8_t c1, u8_t c2, u8_t c3)
 {
   int res= resGO;
   cl_memory_cell *n= cell_n(c2);
@@ -1165,7 +1165,7 @@ cl_tlcs::exec_inst3_e7(uint8_t c1, uint8_t c2, uint8_t c3)
     default:
       if ((c3 & 0xfc) == 0x14) // ADD ix,(0ffn)
 	{
-	  uint16_t *aix= aof_reg16_ix(c3);
+	  u16_t *aix= aof_reg16_ix(c3);
 	  *aix= op_add16(*aix, mem16(0xff00 + c2));
 	}
       else
@@ -1176,8 +1176,8 @@ cl_tlcs::exec_inst3_e7(uint8_t c1, uint8_t c2, uint8_t c3)
 	  case 0x48: *aof_reg16_rr(c3)= mem16(0xff00 + c2); break; // LD rr,(0ffn);
 	  case 0x50: // EX (0ffn),rr
 	    {
-	      uint16_t temp= mem16(0xff00+c2);
-	      uint16_t *ar= aof_reg16_rr(c3);
+	      u16_t temp= mem16(0xff00+c2);
+	      u16_t *ar= aof_reg16_rr(c3);
 	      write16(0xff00+c2, *ar);
 	      *ar= temp;
 	      break;
@@ -1195,13 +1195,13 @@ cl_tlcs::exec_inst3_e7(uint8_t c1, uint8_t c2, uint8_t c3)
  */
 
 int
-cl_tlcs::exec_inst3_f0ix(uint8_t c1)
+cl_tlcs::exec_inst3_f0ix(u8_t c1)
 {
   int8_t d= fetch();
-  uint8_t c3= fetch();
+  u8_t c3= fetch();
   int res= resGO;
   cl_memory_cell *c= cell_ixd(c1, d);
-  uint16_t a= *aof_reg16_ix(c1)+d;
+  u16_t a= *aof_reg16_ix(c1)+d;
   
   switch (c3)
     {
@@ -1240,8 +1240,8 @@ cl_tlcs::exec_inst3_f0ix(uint8_t c1)
     default:
       if ((c3 & 0xfc) == 0x14) // ADD ix,(jx+d)
 	{
-	  uint16_t *rp= aof_reg16_ix(c3);
-	  uint16_t op= mem16ixd(c1, d);
+	  u16_t *rp= aof_reg16_ix(c3);
+	  u16_t op= mem16ixd(c1, d);
 	  *rp= op_add16(*rp, op);
 	}
       else
@@ -1252,8 +1252,8 @@ cl_tlcs::exec_inst3_f0ix(uint8_t c1)
 	  case 0x48: *aof_reg16_rr(c3)= mem16ixd(c1, d); break; // LD rr,(ix+d)
 	  case 0x50: // EX (ix+d),rr
 	    {
-	      uint16_t temp= mem16ixd(c1, d);
-	      uint16_t *ra= aof_reg16_rr(c3);
+	      u16_t temp= mem16ixd(c1, d);
+	      u16_t *ra= aof_reg16_rr(c3);
 	      write16ixd(c1, d, *ra);
 	      *ra= temp;
 	      break;
@@ -1274,10 +1274,10 @@ cl_tlcs::exec_inst3_f0ix(uint8_t c1)
  */
 
 int
-cl_tlcs::exec_inst4_e3(uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
+cl_tlcs::exec_inst4_e3(u8_t c1, u8_t c2, u8_t c3, u8_t c4)
 {
   int res= resGO;
-  uint16_t mn= c3 * 256 + c2;
+  u16_t mn= c3 * 256 + c2;
   class cl_memory_cell *c= nas->get_cell(mn);
 
   switch (c4)
@@ -1325,8 +1325,8 @@ cl_tlcs::exec_inst4_e3(uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
 	  case 0x48: *aof_reg16_rr(c4)= mem16(mn); break; // LD rr,(mn)
 	  case 0x50: // EX (mn),rr
 	    {
-	      uint16_t temp= mem16(mn);
-	      uint16_t *ar= aof_reg16_rr(c4);
+	      u16_t temp= mem16(mn);
+	      u16_t *ar= aof_reg16_rr(c4);
 	      write16(mn, *ar);
 	      *ar= temp;
 	    }
@@ -1346,12 +1346,12 @@ cl_tlcs::exec_inst4_e3(uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
  */
 
 int
-cl_tlcs::exec_inst4_ef(uint8_t c1, uint8_t c2, uint8_t c3)
+cl_tlcs::exec_inst4_ef(u8_t c1, u8_t c2, u8_t c3)
 {
   int res= resGO;
-  uint8_t n;
+  u8_t n;
   cl_memory_cell *wc= cell_n(c2);
-  uint8_t wd= wc->read();
+  u8_t wd= wc->read();
   
   switch (c3)
     {
@@ -1382,12 +1382,12 @@ cl_tlcs::exec_inst4_ef(uint8_t c1, uint8_t c2, uint8_t c3)
  */
 
 int
-cl_tlcs::exec_inst4_eb(uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
+cl_tlcs::exec_inst4_eb(u8_t c1, u8_t c2, u8_t c3, u8_t c4)
 {
   int res= resGO;
-  uint16_t nm23= c3*256 + c2;
-  uint16_t vw23= nm23;
-  uint8_t n5;
+  u16_t nm23= c3*256 + c2;
+  u16_t vw23= nm23;
+  u8_t n5;
   class cl_memory_cell *c= nas->get_cell(vw23);
   
   switch (c4)
@@ -1428,11 +1428,11 @@ cl_tlcs::exec_inst4_eb(uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4)
  */
 
 int
-cl_tlcs::exec_inst4_f4ix(uint8_t c1, uint8_t c2, uint8_t c3)
+cl_tlcs::exec_inst4_f4ix(u8_t c1, u8_t c2, u8_t c3)
 {
   int res= resGO;
   int8_t d= c2;
-  uint8_t n;
+  u8_t n;
   cl_memory_cell *c= cell_ixd(c1, d);
   
   switch (c3)
@@ -1566,7 +1566,7 @@ cl_tlcs::exec_call(t_addr PC_of_inst, t_addr called, t_mem data)
 }
 
 void
-cl_tlcs::set_p(uint8_t data)
+cl_tlcs::set_p(u8_t data)
 {
   // P=1 means EVEN
   int b= 0, i;
@@ -1579,30 +1579,30 @@ cl_tlcs::set_p(uint8_t data)
     }
   if (b&1)
     // ODD, P <- 0
-    reg.f&= ~FLAG_V;
+    reg.raf.f&= ~FLAG_V;
   else
     // EVEN, P <- 1
-    reg.f|= FLAG_V;
+    reg.raf.f|= FLAG_V;
 }
 
-uint8_t *
-cl_tlcs::aof_reg8(uint8_t data_r)
+u8_t *
+cl_tlcs::aof_reg8(u8_t data_r)
 {
   switch (data_r & 0x07)
     {
-    case 0: return &reg.b;
-    case 1: return &reg.c;
-    case 2: return &reg.d;
-    case 3: return &reg.e;
-    case 4: return &reg.h;
-    case 5: return &reg.l;
-    case 6: return &reg.a;
+    case 0: return &reg.rbc.b;
+    case 1: return &reg.rbc.c;
+    case 2: return &reg.rde.d;
+    case 3: return &reg.rde.e;
+    case 4: return &reg.rhl.h;
+    case 5: return &reg.rhl.l;
+    case 6: return &reg.raf.a;
     default: return &reg.dummy;
     }
 }
 
-uint16_t *
-cl_tlcs::aof_reg16_rr(uint8_t data_rr)
+u16_t *
+cl_tlcs::aof_reg16_rr(u8_t data_rr)
 {
   switch (data_rr & 0x07)
     {
@@ -1616,8 +1616,8 @@ cl_tlcs::aof_reg16_rr(uint8_t data_rr)
     }
 }
 
-uint16_t *
-cl_tlcs::aof_reg16_qq(uint8_t data_qq)
+u16_t *
+cl_tlcs::aof_reg16_qq(u8_t data_qq)
 {
   switch (data_qq & 0x07)
     {
@@ -1631,8 +1631,8 @@ cl_tlcs::aof_reg16_qq(uint8_t data_qq)
     }
 }
 
-uint16_t *
-cl_tlcs::aof_reg16_ix(uint8_t data_ix)
+u16_t *
+cl_tlcs::aof_reg16_ix(u8_t data_ix)
 {
   switch (data_ix & 0x03)
     {
@@ -1643,8 +1643,8 @@ cl_tlcs::aof_reg16_ix(uint8_t data_ix)
     }
 }
 
-uint16_t *
-cl_tlcs::aof_reg16_gg(uint8_t data_gg)
+u16_t *
+cl_tlcs::aof_reg16_gg(u8_t data_gg)
 {
   return aof_reg16_rr(data_gg);
 }
@@ -1652,11 +1652,11 @@ cl_tlcs::aof_reg16_gg(uint8_t data_gg)
 class cl_memory_cell *
 cl_tlcs::cell_hl_a()
 {
-  return nas->get_cell(reg.hl + reg.a);
+  return nas->get_cell(reg.hl + reg.raf.a);
 }
 
 class cl_memory_cell *
-cl_tlcs::cell_gg(uint8_t gg)
+cl_tlcs::cell_gg(u8_t gg)
 {
   if ((gg & 0x7) == 4)
     return xas->get_cell(*aof_reg16_gg(gg));
@@ -1666,13 +1666,13 @@ cl_tlcs::cell_gg(uint8_t gg)
 }
 
 class cl_memory_cell *
-cl_tlcs::cell_n(uint8_t n)
+cl_tlcs::cell_n(u8_t n)
 {
   return nas->get_cell(0xff00 + n);
 }
 
 class cl_memory_cell *
-cl_tlcs::cell_ixd(uint8_t ix, int8_t d)
+cl_tlcs::cell_ixd(u8_t ix, int8_t d)
 {
   switch (ix & 0x03)
     {
@@ -1683,10 +1683,10 @@ cl_tlcs::cell_ixd(uint8_t ix, int8_t d)
   return nas->dummy;
 }
 
-uint16_t
+u16_t
 cl_tlcs::mem16(t_addr addr)
 {
-  uint8_t l, h;
+  u8_t l, h;
   
   l= nas->read(addr);
   h= nas->read(addr+1);
@@ -1694,12 +1694,12 @@ cl_tlcs::mem16(t_addr addr)
   return h*256 + l;
 }
 
-uint16_t
-cl_tlcs::mem16gg(uint8_t gg)
+u16_t
+cl_tlcs::mem16gg(u8_t gg)
 {
-  uint8_t l, h;
+  u8_t l, h;
   cl_address_space *as= nas;
-  uint16_t addr= *aof_reg16_gg(gg);
+  u16_t addr= *aof_reg16_gg(gg);
   
   if ((gg & 7) == 4)
     as= xas;
@@ -1712,12 +1712,12 @@ cl_tlcs::mem16gg(uint8_t gg)
   return h*256 + l;
 }
 
-uint16_t
-cl_tlcs::mem16ixd(uint8_t ix, int8_t d)
+u16_t
+cl_tlcs::mem16ixd(u8_t ix, int8_t d)
 {
-  uint8_t l, h;
+  u8_t l, h;
   cl_address_space *as= nas;
-  uint16_t addr= *aof_reg16_ix(ix) + d;
+  u16_t addr= *aof_reg16_ix(ix) + d;
   
   if ((ix&3) == 0)
     as= xas;
@@ -1731,7 +1731,7 @@ cl_tlcs::mem16ixd(uint8_t ix, int8_t d)
 }
 
 void
-cl_tlcs::write16(t_addr addr, uint16_t val)
+cl_tlcs::write16(t_addr addr, u16_t val)
 {
   nas->write(addr, val & 0xff);
   nas->write(addr+1, val / 256);
@@ -1739,10 +1739,10 @@ cl_tlcs::write16(t_addr addr, uint16_t val)
 
 
 void
-cl_tlcs::write16gg(uint8_t gg, uint16_t val)
+cl_tlcs::write16gg(u8_t gg, u16_t val)
 {
   cl_address_space *as= nas;
-  uint16_t addr= *aof_reg16_gg(gg);
+  u16_t addr= *aof_reg16_gg(gg);
   
   if ((gg&7) == 4)
     as = xas;
@@ -1754,10 +1754,10 @@ cl_tlcs::write16gg(uint8_t gg, uint16_t val)
 
 
 void
-cl_tlcs::write16ixd(uint8_t ix, int8_t d, uint16_t val)
+cl_tlcs::write16ixd(u8_t ix, int8_t d, u16_t val)
 {
   cl_address_space *as= nas;
-  uint16_t addr= *aof_reg16_ix(ix) + d;
+  u16_t addr= *aof_reg16_ix(ix) + d;
   
   if ((ix&3) == 0)
     as = xas;
@@ -1771,11 +1771,11 @@ cl_tlcs::write16ixd(uint8_t ix, int8_t d, uint16_t val)
 bool
 cl_tlcs::flag(enum tlcs_flags f)
 {
-  return (reg.f & f)?true:false;
+  return (reg.raf.f & f)?true:false;
 }
 
 bool
-cl_tlcs::cc(uint8_t cc)
+cl_tlcs::cc(u8_t cc)
 {
   bool s= flag(FLAG_S);
   bool v= flag(FLAG_V);
@@ -1787,16 +1787,16 @@ cl_tlcs::cc(uint8_t cc)
     case 3: return flag(FLAG_C) || flag(FLAG_Z);
     case 4: return v;
     case 5: return s;
-    case 6: return reg.f & FLAG_Z;
-    case 7: return reg.f & FLAG_C;
+    case 6: return reg.raf.f & FLAG_Z;
+    case 7: return reg.raf.f & FLAG_C;
     case 8: return true;
     case 9: return !((s && !v) || (!s && v));
     case 10: return !(flag(FLAG_Z) || ((s && !v) || (!s && v)));
     case 11: return !(flag(FLAG_C) || flag(FLAG_Z));
     case 12: return !v;
     case 13: return !s;
-    case 14: return !(reg.f & FLAG_Z);
-    case 15: return !(reg.f & FLAG_C);
+    case 14: return !(reg.raf.f & FLAG_Z);
+    case 15: return !(reg.raf.f & FLAG_C);
     }
   return false;
 }

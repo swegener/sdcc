@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: itc.cc 406 2016-07-29 14:12:59Z drdani $ */
+/* $Id: itc.cc 496 2016-11-11 12:48:27Z drdani $ */
 
 // prj
 
@@ -85,7 +85,7 @@ cl_itc::write(class cl_memory_cell *cell, t_mem *val)
       (a >= 0x7f70) &&
       (a <  0x7f70+8))
     {
-      uint8_t mask= 0xff;
+      u8_t mask= 0xff;
       if ((*val & 0x03) == 0x02)
 	mask&= ~0x03;
       if ((*val & 0x0c) == 0x08)
@@ -94,7 +94,7 @@ cl_itc::write(class cl_memory_cell *cell, t_mem *val)
 	mask&= ~0x30;
       if ((*val & 0xc0) == 0x80)
 	mask&= ~0xc0;
-      uint8_t o= cell->get(), v= *val;
+      u8_t o= cell->get(), v= *val;
       o&= ~mask;
       v&= mask;
       o|= v;

@@ -144,11 +144,11 @@ cl_timer0::write(class cl_memory_cell *cell, t_mem *val)
 {
   t_addr ba;
   bool b= bas->is_owned(cell, &ba);
-  uint8_t n= *val;
+  u8_t n= *val;
   
   if (b)
     {
-      uint8_t m= 1 << (ba - addr_tcon);
+      u8_t m= 1 << (ba - addr_tcon);
       n= cell_tcon->get();
       if (*val)
 	n|= m;

@@ -1,4 +1,4 @@
-/* $Id: port_hwcl.h 486 2016-10-28 10:48:50Z drdani $ */
+/* $Id: port_hwcl.h 494 2016-11-10 20:52:08Z drdani $ */
 
 #ifndef PORT_HW_HEADER
 #define PORT_HW_HEADER
@@ -43,7 +43,7 @@ class cl_port_ui: public cl_hw
   virtual void make_io(void);
   virtual void new_io(class cl_f *f_in, class cl_f *f_out);
   virtual bool proc_input(void);
-  virtual bool handle_input(char c);
+  virtual bool handle_input(int c);
   virtual void refresh_display(bool force);
   virtual void draw_display(void);
 };

@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include <stdint.h>
+//#include <stdint.h>
 #include "cmdlexcl.h"
 #include "cmdpars.hh"
 

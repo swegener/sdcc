@@ -210,23 +210,23 @@ cl_lr35902::make_memories(void)
 }
 
 
-void cl_lr35902::store1( TYPE_UWORD addr, t_mem val ) {
+void cl_lr35902::store1( u16_t addr, t_mem val ) {
   mem.store1( addr, val );
 }
 
-void cl_lr35902::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
+void cl_lr35902::store2( u16_t addr, u16_t val ) {
   mem.store2( addr, val );
 }
 
-TYPE_UBYTE  cl_lr35902::get1( TYPE_UWORD addr ) {
+u8_t  cl_lr35902::get1( u16_t addr ) {
   return mem.get1( addr );
 }
 
-TYPE_UWORD  cl_lr35902::get2( TYPE_UWORD addr ) {
+u16_t  cl_lr35902::get2( u16_t addr ) {
   return mem.get2( addr );
 }
 
-void lr35902_memory::store1( TYPE_UWORD addr, t_mem val ) {
+void lr35902_memory::store1( u16_t addr, t_mem val ) {
   if (addr < lr35902_ram_start) {
     /* flag illegal operation ? */
     return;
@@ -237,12 +237,12 @@ void lr35902_memory::store1( TYPE_UWORD addr, t_mem val ) {
   }
 }
 
-void lr35902_memory::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
+void lr35902_memory::store2( u16_t addr, u16_t val ) {
   store1(addr,   val & 0xff);
   store1(addr+1, (val >> 8) & 0xff);
 }
 
-TYPE_UBYTE  lr35902_memory::get1( TYPE_UWORD addr ) {
+u8_t  lr35902_memory::get1( u16_t addr ) {
   if (addr < lr35902_rom_size) {
     return rom->read(addr);    
   }
@@ -259,8 +259,8 @@ TYPE_UBYTE  lr35902_memory::get1( TYPE_UWORD addr ) {
   return (addr & 0xff);
 }
 
-TYPE_UWORD  lr35902_memory::get2( TYPE_UWORD addr ) {
-  TYPE_UWORD  l, h;
+u16_t  lr35902_memory::get2( u16_t addr ) {
+  u16_t  l, h;
   
   l = get1(addr  );
   h = get1(addr+1);

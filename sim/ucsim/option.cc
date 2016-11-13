@@ -147,7 +147,9 @@ void
 cl_option::get_value(char **val)
 {
   if (val)
-    *val= value.sval;
+    {
+      *val= value.sval;
+    }
 }
 
 void

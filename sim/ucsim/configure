@@ -17242,6 +17242,12 @@ $as_echo_n "checking type name for dword... " >&6; }
 TYPE_DWORD=`type_name 4`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $TYPE_DWORD" >&5
 $as_echo "$TYPE_DWORD" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking type name for qword" >&5
+$as_echo_n "checking type name for qword... " >&6; }
+TYPE_QWORD=`type_name 8`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $TYPE_QWORD" >&5
+$as_echo "$TYPE_QWORD" >&6; }
+
 
 cat >>confdefs.h <<_ACEOF
 #define TYPE_BYTE $TYPE_BYTE
@@ -17259,19 +17265,12 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define TYPE_UBYTE unsigned $TYPE_BYTE
+#define TYPE_QWORD $TYPE_QWORD
 _ACEOF
 
-
-cat >>confdefs.h <<_ACEOF
-#define TYPE_UWORD unsigned $TYPE_WORD
-_ACEOF
-
-
-cat >>confdefs.h <<_ACEOF
-#define TYPE_UDWORD unsigned $TYPE_DWORD
-_ACEOF
-
+#AC_DEFINE_UNQUOTED(TYPE_UBYTE, [unsigned $TYPE_BYTE], [XXX])
+#AC_DEFINE_UNQUOTED(TYPE_UWORD, [unsigned $TYPE_WORD], [XXX])
+#AC_DEFINE_UNQUOTED(TYPE_UDWORD, [unsigned $TYPE_DWORD], [XXX])
 
 
 

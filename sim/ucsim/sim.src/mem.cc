@@ -542,13 +542,13 @@ cl_bit_cell::d(t_mem v)
 t_mem
 cl_cell8::d()
 {
-  return data?((uint8_t)*data):0;
+  return data?((/*uint8_t*/uchar)*data):0;
 }
 
 void
 cl_cell8::d(t_mem v)
 {
-  data?(*data=(uint8_t)v):0;
+  data?(*data=(/*uint8_t*/uchar)v):0;
 }
 
 // 8 bit cell for bit spaces
@@ -558,7 +558,7 @@ cl_bit_cell8::d()
 {
   if (!data)
     return 0;
-  uint8_t x= (uint8_t) *data;
+  /*uint8_t*/uchar x= (/*uint8_t*/uchar) *data;
   x&= mask;
   return x?1:0;
 }
@@ -569,9 +569,9 @@ cl_bit_cell8::d(t_mem v)
   if (!data)
     return;
   if (v)
-    *data |= (uint8_t)mask;
+    *data |= (/*uint8_t*/uchar)mask;
   else
-    *data &= ~(uint8_t)mask;
+    *data &= ~(/*uint8_t*/uchar)mask;
 }
 
 // 16 bit cell;
@@ -579,13 +579,13 @@ cl_bit_cell8::d(t_mem v)
 t_mem
 cl_cell16::d()
 {
-  return data?((uint16_t)*data):0;
+  return data?((u16_t)*data):0;
 }
 
 void
 cl_cell16::d(t_mem v)
 {
-  data?(*data=(uint16_t)v):0;
+  data?(*data=(u16_t)v):0;
 }
 
 // 16 bit cell for bit spaces
@@ -595,7 +595,7 @@ cl_bit_cell16::d()
 {
   if (!data)
     return 0;
-  return (((uint16_t)*data)&((uint16_t)mask))?1:0;
+  return (((u16_t)*data)&((u16_t)mask))?1:0;
 }
 
 void
@@ -604,9 +604,9 @@ cl_bit_cell16::d(t_mem v)
   if (!data)
     return;
   if (v)
-    *data |= (uint16_t)mask;
+    *data |= (u16_t)mask;
   else
-    *data &= ~(uint16_t)mask;
+    *data &= ~(u16_t)mask;
 }
 
 
@@ -654,7 +654,7 @@ cl_memory_cell::init(void)
 }
 
 
-TYPE_UBYTE
+uchar
 cl_memory_cell::get_flags(void)
 {
   return(flags);
@@ -667,7 +667,7 @@ cl_memory_cell::get_flag(enum cell_flag flag)
 }
 
 void
-cl_memory_cell::set_flags(TYPE_UBYTE what)
+cl_memory_cell::set_flags(uchar what)
 {
   flags= what;
 }

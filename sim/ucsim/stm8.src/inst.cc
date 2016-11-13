@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst.cc 345 2016-07-10 14:51:45Z  $ */
+/* $Id: inst.cc 496 2016-11-11 12:48:27Z drdani $ */
 
 #include "ddconfig.h"
 #include "stdio.h"
@@ -285,7 +285,7 @@ int
 cl_stm8::inst_addw(t_mem code, unsigned char prefix)
 {
   long int result, operand1, operand2, nibble_high, nibble_low;
-  TYPE_UWORD *dest_ptr;
+  u16_t *dest_ptr;
   bool sub;
 
   nibble_high = (code >> 4) & 0x0f;
@@ -813,7 +813,7 @@ int
 cl_stm8::inst_ldxy(t_mem code, unsigned char prefix)
 {
   unsigned int operand;
-  TYPE_UWORD *dest_ptr;
+  u16_t *dest_ptr;
   dest_ptr = (prefix == 0x90) ? &regs.Y : &regs.X;
   if((prefix == 0x00 && code == 0x16) || (prefix == 0x91 && code == 0xce) || (prefix == 0x91 && code == 0xde)) dest_ptr = &regs.Y;
 

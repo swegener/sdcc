@@ -232,7 +232,7 @@ class cl_memory_cell: public cl_cell_data
   t_mem def_data;
  protected:
   uchar width;
-  TYPE_UBYTE flags;
+  /*TYPE_UBYTE*/uchar flags;
   class cl_memory_operator *operators;
  public:
   cl_memory_cell(uchar awidth);
@@ -242,9 +242,9 @@ class cl_memory_cell: public cl_cell_data
   virtual t_mem *get_data(void) { return(data); }
   virtual t_mem get_mask(void) { return(mask); }
   virtual void set_mask(t_mem m) { mask= m; }
-  virtual TYPE_UBYTE get_flags(void);
+  virtual /*TYPE_UBYTE*/uchar get_flags(void);
   virtual bool get_flag(enum cell_flag flag);
-  virtual void set_flags(TYPE_UBYTE what);
+  virtual void set_flags(/*TYPE_UBYTE*/uchar what);
   virtual void set_flag(enum cell_flag flag, bool val);
 
   virtual void un_decode(void);

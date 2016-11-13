@@ -46,20 +46,20 @@ public:
   
   /* Note: DEF_REGPAIR is defined in regsz80.h */
   
-  TYPE_UBYTE  xpc;
-  TYPE_UBYTE  dataseg;
-  TYPE_UBYTE  stackseg;
-  TYPE_UBYTE  segsize;
+  u8_t  xpc;
+  u8_t  dataseg;
+  u8_t  stackseg;
+  u8_t  segsize;
   
-  TYPE_UBYTE  io_flag; /* pseudo register for ioi/ioe prefixes */
+  u8_t  io_flag; /* pseudo register for ioi/ioe prefixes */
   
-  TYPE_UBYTE  mmidr;  /* MMU Instruction/Data Register __at 0x10 */
+  u8_t  mmidr;  /* MMU Instruction/Data Register __at 0x10 */
   
   rabbit_mmu( cl_r2k *parent_ip ):parent_p(parent_ip),
     xpc(0), dataseg(0), stackseg(0), segsize(0xFF)
     { }
   
-  TYPE_UDWORD  logical_addr_to_phys( TYPE_UWORD logical_addr );
+  u32_t/*TYPE_UDWORD*/  logical_addr_to_phys( u16_t logical_addr );
 };
 
 
@@ -73,12 +73,12 @@ public:
   
   rabbit_mmu   mmu;
 
-  TYPE_UWORD ins_start;  /* PC value for start of the current instruction */
-  TYPE_UBYTE ip;  /* interrupt priority register */
+  u16_t ins_start;  /* PC value for start of the current instruction */
+  u8_t ip;  /* interrupt priority register */
   
   /* iir, eir registers are not full supported */
-  TYPE_UBYTE iir;
-  TYPE_UBYTE eir;
+  u8_t iir;
+  u8_t eir;
   
   /* see Rabbit Family of Microprocessors: Instruction Reference Manual */
   /*   019-0098 * 090409-L */
@@ -109,14 +109,14 @@ public:
                         int *immed_offset);
   
   
-  virtual void store1( TYPE_UWORD addr, t_mem val );
-  virtual void store2( TYPE_UWORD addr, TYPE_UWORD val );
+  virtual void store1( u16_t addr, t_mem val );
+  virtual void store2( u16_t addr, u16_t val );
   
-  virtual TYPE_UBYTE  get1( TYPE_UWORD addr );
-  virtual TYPE_UWORD  get2( TYPE_UWORD addr );
+  virtual u8_t  get1( u16_t addr );
+  virtual u16_t  get2( u16_t addr );
   
   virtual t_mem       fetch1( void );
-  virtual TYPE_UWORD  fetch2( void );
+  virtual u16_t  fetch2( void );
   
   virtual t_mem fetch(void);
   virtual bool fetch(t_mem *code) {
@@ -154,7 +154,7 @@ public:
 class cl_r3ka: public cl_r2k {
  public:
   
-  TYPE_UBYTE  SU;
+  u8_t  SU;
   
   cl_r3ka(int Itype, int Itech, class cl_sim *asim);
   virtual char *id_string(void);

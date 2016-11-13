@@ -112,7 +112,7 @@ class cl_hw: public cl_guiobj
   virtual void new_io(class cl_f *f_in, class cl_f *f_out);
   virtual cl_hw_io *get_io(void);
   virtual bool proc_input(void);
-  virtual bool handle_input(char c);
+  virtual bool handle_input(int c);
   virtual void refresh_display(bool force);
   virtual void draw_display(void);
   virtual cl_hw *next_displayer(void);

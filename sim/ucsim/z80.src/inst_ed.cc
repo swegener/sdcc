@@ -47,7 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int  cl_z80::inst_ed_(t_mem code)
 {
   unsigned short tw;
-  TYPE_UBYTE     ubtmp;
+  u8_t     ubtmp;
   
   if (code < 0x40)
     {

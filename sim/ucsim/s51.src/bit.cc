@@ -68,7 +68,7 @@ cl_51core::inst_anl_c_bit(uchar code)
   //t_mem m;
   //t_addr a;
   //class cl_address_space *mem;
-  uint8_t bitaddr= fetch(), c= bits->get(0xd7);
+  u8_t bitaddr= fetch(), c= bits->get(0xd7);
   
   //mem= bit2mem(bitaddr, &a, &m);
   /*SFR_SET_C*/bits->set(0xd7,/*SFR_GET_C*/c &&
@@ -90,7 +90,7 @@ cl_51core::inst_mov_bit_c(uchar code)
   //t_addr a;
   //t_mem m, d;
   //class cl_address_space *mem;
-  uint8_t bitaddr= fetch();
+  u8_t bitaddr= fetch();
   
   //mem= bit2mem(bitaddr, &a, &m);
   /*d= mem->read(a, HW_PORT);
@@ -116,7 +116,7 @@ cl_51core::inst_mov_c_bit(uchar code)
   //t_addr a;
   //t_mem m;
   //class cl_address_space *mem;
-  uint8_t bitaddr= fetch(), x;
+  u8_t bitaddr= fetch(), x;
   
   //mem= bit2mem(bitaddr, &a, &m);
   //SFR_SET_C(/*mem->read(a) & m*/bits->read(bitaddr));
@@ -138,7 +138,7 @@ cl_51core::inst_orl_c_Sbit(uchar code)
   //t_mem m;
   //t_addr a;
   //class cl_address_space *mem;
-  uint8_t bitaddr= fetch();
+  u8_t bitaddr= fetch();
   
   //mem= bit2mem(fetch(), &a, &m);
   /*SFR_SET_C(*/bits->set(0xd7, /*SFR_GET_C*/bits->get(0xd7) ||
@@ -160,7 +160,7 @@ cl_51core::inst_anl_c_Sbit(uchar code)
   //t_mem m;
   //t_addr a;
   //class cl_address_space *mem;
-  uint8_t bitaddr= fetch();
+  u8_t bitaddr= fetch();
     
   //mem= bit2mem(fetch(), &a, &m);
   /*SFR_SET_C(*/bits->set(0xd7, /*SFR_GET_C*/bits->get(0xd7) &&
@@ -182,7 +182,7 @@ cl_51core::inst_cpl_bit(uchar code)
   //t_addr a;
   //t_mem m, d;
   //class cl_address_space *mem;
-  uint8_t bitaddr= fetch(), b;
+  u8_t bitaddr= fetch(), b;
   
   //mem= bit2mem(fetch(), &a, &m);
   //d= mem->read(a, HW_PORT);
@@ -220,7 +220,7 @@ cl_51core::inst_clr_bit(uchar code)
   //t_addr a;
   //t_mem m;
   //class cl_address_space *mem;
-  uint8_t bitaddr= fetch();//, b;
+  u8_t bitaddr= fetch();//, b;
   
   //b= bits->get(bitaddr);
   //mem= bit2mem(bitaddr, &a, &m);
@@ -258,7 +258,7 @@ cl_51core::inst_setb_bit(uchar code)
   //t_addr a;
   //t_mem m, d;
   //class cl_address_space *mem;
-  uint8_t bitaddr= fetch();
+  u8_t bitaddr= fetch();
   
   //mem= bit2mem(bitaddr, &a, &m);
   //d= mem->read(a, HW_PORT);

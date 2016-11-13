@@ -270,7 +270,7 @@ int  cl_r2k::inst_ed_(t_mem code)
 
 int  cl_r3ka::inst_ed_(t_mem code)
 {
-  TYPE_UBYTE  tb;
+  u8_t  tb;
   
   switch(code)
     {

@@ -298,7 +298,7 @@ cl_hw::proc_input(void)
 }
 
 bool
-cl_hw::handle_input(char c)
+cl_hw::handle_input(int c)
 {
   if (!io)
     return false;

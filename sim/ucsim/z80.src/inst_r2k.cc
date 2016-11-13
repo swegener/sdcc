@@ -23,9 +23,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "z80mac.h"
 
 
-unsigned   word_parity( TYPE_UWORD  x ) {
+unsigned   word_parity( u16_t  x ) {
   // bitcount(x) performed by shift-and-add
-  TYPE_UWORD  tmp = (x & 0x5555) + ((x & 0xAAAA) >> 1);
+  u16_t  tmp = (x & 0x5555) + ((x & 0xAAAA) >> 1);
   tmp = (tmp & 0x3333) + ((tmp & 0xCCCC) >> 2);
   tmp = (tmp & 0x0F0F) + ((tmp & 0xF0F0) >> 4);
   tmp = (tmp & 0x000F) + ((tmp & 0x0F00) >> 8);
@@ -35,28 +35,28 @@ unsigned   word_parity( TYPE_UWORD  x ) {
 }
 
 /******** rabbit 2000 memory access helper functions *****************/
-TYPE_UDWORD  rabbit_mmu::logical_addr_to_phys( TYPE_UWORD logical_addr ) {
-  TYPE_UDWORD  phys_addr = logical_addr;
+u32_t  rabbit_mmu::logical_addr_to_phys( u16_t logical_addr ) {
+  u32_t  phys_addr = logical_addr;
   unsigned     segnib = logical_addr >> 12;
   
   if (segnib >= 0xE000)
   {
-    phys_addr += ((TYPE_UDWORD)xpc) << 12;
+    phys_addr += ((u32_t)xpc) << 12;
   }
   else if (segnib >= ((segsize >> 4) & 0x0F))
   {
-    phys_addr += ((TYPE_UDWORD)stackseg) << 12;    
+    phys_addr += ((u32_t)stackseg) << 12;    
   }
   else if (segnib >= (segsize & 0x0F))
   {
-    phys_addr += ((TYPE_UDWORD)dataseg) << 12;    
+    phys_addr += ((u32_t)dataseg) << 12;    
   }
   
   return phys_addr;
 }
 
-void cl_r2k::store1( TYPE_UWORD addr, t_mem val ) {
-  TYPE_UDWORD  phys_addr;
+void cl_r2k::store1( u16_t addr, t_mem val ) {
+  u32_t  phys_addr;
   
   if (mmu.io_flag == IOI) {
     if ((mmu.mmidr ^ 0x80) & 0x80)
@@ -84,8 +84,8 @@ void cl_r2k::store1( TYPE_UWORD addr, t_mem val ) {
   ram->write(phys_addr, val);
 }
 
-void cl_r2k::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
-  TYPE_UDWORD  phys_addr;
+void cl_r2k::store2( u16_t addr, u16_t val ) {
+  u32_t  phys_addr;
   
   if (mmu.io_flag == IOI) {
     /* I/O operation for on-chip device (serial ports, timers, etc) */
@@ -103,8 +103,8 @@ void cl_r2k::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
   ram->write(phys_addr+1, (val >> 8) & 0xff);
 }
 
-TYPE_UBYTE  cl_r2k::get1( TYPE_UWORD addr ) {
-  TYPE_UDWORD  phys_addr = mmu.logical_addr_to_phys( addr );
+u8_t  cl_r2k::get1( u16_t addr ) {
+  u32_t  phys_addr = mmu.logical_addr_to_phys( addr );
   
   if (mmu.io_flag == IOI) {
     /* stub for on-chip device I/O */
@@ -118,9 +118,9 @@ TYPE_UBYTE  cl_r2k::get1( TYPE_UWORD addr ) {
   return ram->read(phys_addr);
 }
 
-TYPE_UWORD  cl_r2k::get2( TYPE_UWORD addr ) {
-  TYPE_UDWORD phys_addr = mmu.logical_addr_to_phys( addr );
-  TYPE_UWORD  l, h;
+u16_t  cl_r2k::get2( u16_t addr ) {
+  u32_t phys_addr = mmu.logical_addr_to_phys( addr );
+  u16_t  l, h;
   
   if (mmu.io_flag == IOI) {
     /* stub for on-chip device I/O */
@@ -141,8 +141,8 @@ t_mem       cl_r2k::fetch1( void ) {
   return fetch( );
 }
 
-TYPE_UWORD  cl_r2k::fetch2( void ) {
-  TYPE_UWORD  c1, c2;
+u16_t  cl_r2k::fetch2( void ) {
+  u16_t  c1, c2;
   
   c1 = fetch( );
   c2 = fetch( );
@@ -157,7 +157,7 @@ t_mem cl_r2k::fetch(void) {
    * which does check for a breakpoint hit
    */
   
-  TYPE_UDWORD phys_addr = mmu.logical_addr_to_phys( PC );
+  u32_t phys_addr = mmu.logical_addr_to_phys( PC );
   ulong code;
   
   if (!rom)
@@ -170,7 +170,7 @@ t_mem cl_r2k::fetch(void) {
 
 /******** start rabbit 2000 specific codes *****************/
 int cl_r2k::inst_add_sp_d(t_mem code) {
-  TYPE_UWORD  d = fetch( );
+  u16_t  d = fetch( );
   /* sign-extend d from 8-bits to 16-bits */
   d |= (d>>7)*0xFF00;
   regs.SP = (regs.SP + d) & 0xffff;
@@ -207,7 +207,7 @@ cl_r2k::inst_r2k_ld(t_mem code)
 }
 
 int cl_r2k::inst_r2k_ex (t_mem code) {
-  TYPE_UWORD tempw;
+  u16_t tempw;
   
   switch(code) {
   case 0xE3:
@@ -223,7 +223,7 @@ int cl_r2k::inst_r2k_ex (t_mem code) {
 }
 
 int cl_r2k::inst_ljp(t_mem code) {
-  TYPE_UWORD  mn;
+  u16_t  mn;
   
   mn = fetch2();  /* don't clobber PC before the fetch for xmem page */
   mmu.xpc = fetch1();
@@ -233,7 +233,7 @@ int cl_r2k::inst_ljp(t_mem code) {
 }
 
 int cl_r2k::inst_lcall(t_mem code) {
-  TYPE_UWORD  mn;
+  u16_t  mn;
   
   push1(mmu.xpc);
   push2(PC+2);
@@ -398,7 +398,7 @@ cl_r2k::inst_rst(t_mem code)
 
 int cl_r2k::inst_xd(t_mem prefix)
 {
-  TYPE_UWORD  *regs_IX_OR_IY = (prefix==0xdd)?(&regs.IX):(&regs.IY);
+  u16_t  *regs_IX_OR_IY = (prefix==0xdd)?(&regs.IX):(&regs.IY);
   t_mem code;
   
   if (fetch(&code))
@@ -514,7 +514,7 @@ int cl_r2k::inst_xd(t_mem prefix)
     
   case 0xE3: // EX (SP),IX
   {
-    TYPE_UWORD tempw;
+    u16_t tempw;
     
     tempw = *regs_IX_OR_IY;
     *regs_IX_OR_IY = get2(regs.SP);
@@ -568,7 +568,7 @@ int cl_r2k::inst_xd(t_mem prefix)
     
   case 0xFC: // RR IX|IY
   {
-    TYPE_UWORD  tmp = (regs.F & BIT_C) << (15 - BITPOS_C);
+    u16_t  tmp = (regs.F & BIT_C) << (15 - BITPOS_C);
     tmp |= (*regs_IX_OR_IY >> 1);
     
     regs.F = (regs.F & ~BIT_C) | ((*regs_IX_OR_IY & 1) << BITPOS_C);

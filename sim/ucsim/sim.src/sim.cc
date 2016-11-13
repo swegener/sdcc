@@ -138,7 +138,12 @@ void
 cl_sim::stop(int reason)
 {
   class cl_commander_base *cmd= app->get_commander();
+  class cl_option *o= app->options->get_option("quit");
+  bool q_opt= false;
 
+  if (o)
+    o->get_value(&q_opt);
+  
   state&= ~SIM_GO;
   if (simif)
     simif->cfg_set(simif_reason, reason);
@@ -208,6 +213,8 @@ cl_sim::stop(int reason)
       cmd->frozen_console->print_prompt();
       cmd->frozen_console= 0;
     }
+  if (q_opt)
+    state|= SIM_QUIT;
   cmd->update_active();
 }
 
@@ -215,8 +222,15 @@ void
 cl_sim::stop(class cl_ev_brk *brk)
 {
   class cl_commander_base *cmd= app->get_commander();
+  class cl_option *o= app->options->get_option("quit");
+  bool q_opt= false;
+
+  if (o)
+    o->get_value(&q_opt);
 
   state&= ~SIM_GO;
+  if (simif)
+    simif->cfg_set(simif_reason, resBREAKPOINT);
   if (cmd->frozen_console)
     {
       class cl_console_base *con= cmd->frozen_console;
@@ -234,6 +248,8 @@ cl_sim::stop(class cl_ev_brk *brk)
       //con->print_prompt();
       //cmd->frozen_console= 0;
     }
+  if (q_opt)
+    state|= SIM_QUIT;
 }
 
 

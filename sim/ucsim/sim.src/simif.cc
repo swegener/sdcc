@@ -25,13 +25,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simif.cc 489 2016-11-03 14:29:15Z drdani $ */
+/* $Id: simif.cc 493 2016-11-10 19:45:34Z drdani $ */
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "i_string.h"
 
 // prj
+#include "globals.h"
 
 // sim
 #include "simcl.h"
@@ -479,8 +481,29 @@ cl_simulator_interface::~cl_simulator_interface(void)
 int
 cl_simulator_interface::init(void)
 {
+  cl_option *oas= application->options->get_option("simif_memory");
+  cl_option *oa = application->options->get_option("simif_address");
+  char *oas_v;
+  long oa_v;
+  
   cl_hw::init();
   fin= fout= NULL;
+
+  if (oas &&
+      oa)
+    {
+      oas->get_value(&oas_v);
+      oa->get_value(&oa_v);
+      if (oas_v &&
+	  (strlen(oas_v) > 0))
+	{
+	  if (as_name)
+	    free((void*)as_name);
+	  as_name= strdup(oas_v);
+	  addr= oa_v;
+	}
+    }
+  
   if (as_name)
     {
       as= uc->address_space(as_name);
@@ -491,12 +514,33 @@ cl_simulator_interface::init(void)
 	    address= as->highest_valid_address();
 	  cell= register_cell(as, address);
 	}
+      else
+	fprintf(stderr, "Simif: %s is not a valid address space name\n", as_name);
     }
   else
     {
       as= NULL;
       cell= NULL;
     }
+
+  class cl_option *fo= application->options->get_option("simif_infile");
+  char *s;
+  if (fo)
+    {
+      fo->get_value(&s);
+      if (s &&
+	  (strlen(s) > 0))
+	fin= mk_io(s, "r");
+    }
+  fo= application->options->get_option("simif_outfile");
+  if (fo)
+    {
+      fo->get_value(&s);
+      if (s &&
+	  (strlen(s) > 0))
+	fout= mk_io(s, "w");
+    }
+
   class cl_sif_command *c;
   commands->add(c= new cl_sif_detect(this));
   c->init();
@@ -528,6 +572,7 @@ cl_simulator_interface::init(void)
   cl_var *v;
   uc->vars->add(v= new cl_var(cchars("simif_on"), cfg, simif_on));
   v->init();
+  cfg_set(simif_on, 1);
   uc->vars->add(v= new cl_var(cchars("sim_run"), cfg, simif_run));
   v->init();
   uc->vars->add(v= new cl_var(cchars("sim_start"), cfg, simif_start));
@@ -578,7 +623,7 @@ cl_simulator_interface::set_cmd(class cl_cmdline *cmdline,
 			 mem->highest_valid_address());
 	  return;
 	}
-      as_name= (char*)mem->get_name();
+      as_name= strdup((char*)mem->get_name());
       addr= a;
       if ((as= dynamic_cast<class cl_address_space *>(mem)) != 0)
 	{
@@ -824,9 +869,21 @@ cl_simulator_interface::print_info(class cl_console_base *con)
 	dynamic_cast<class cl_sif_command *>(commands->object_at(i));
       if (!c)
 	continue;
-      con->dd_printf("0x%02x %s %s\n", c->get_command(),
+      int cmd= c->get_command();
+      con->dd_printf("0x%02x/%c %s: %s\n", cmd,
+		     isprint(cmd)?cmd:' ',
 		     c->get_name(), c->get_description());
     }
+  
+  con->dd_printf("Input file: ");
+  if (fin)
+    con->dd_printf("%s", fin->get_file_name());
+  con->dd_printf("\n");
+  
+  con->dd_printf("Output file: ");
+  if (fout)
+    con->dd_printf("%s", fout->get_file_name());
+  con->dd_printf("\n");
 }
 
 

@@ -497,7 +497,7 @@ cl_z80::inst_Xd(void)
 
       case 0xE3: // EX (SP),IX
         {
-          TYPE_UWORD tempw;
+          u16_t tempw;
 
           tempw = regs_IX_OR_IY;
           regs_IX_OR_IY = get2(regs.SP);

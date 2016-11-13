@@ -138,7 +138,7 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
 {
   t_addr ba;
   bool b= bas->is_owned(cell, &ba);
-  uint8_t n= *val;
+  u8_t n= *val;
   
   if (cell == sbuf)
     {
@@ -151,7 +151,7 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
   if (b)
     {
       n= scon->get();
-      uint8_t m= 1 << (ba - SCON);
+      u8_t m= 1 << (ba - SCON);
       if (*val)
 	n|= m;
       else

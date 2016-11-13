@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_cpu_others.cc 226 2016-06-21 10:30:04Z  $ */
+/* $Id: inst_cpu_others.cc 500 2016-11-12 15:15:43Z drdani $ */
 
 #include "tlcscl.h"
 
@@ -34,28 +34,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int
 cl_tlcs::inst_daa_a()
 {
-  if (((reg.a & 0x0f) > 9) ||
-      (reg.f & FLAG_H))
+  if (((reg.raf.a & 0x0f) > 9) ||
+      (reg.raf.f & FLAG_H))
     {
-      int al= reg.a & 0x0f;
+      int al= reg.raf.a & 0x0f;
       if (al + 6 > 15)
-	reg.f|= FLAG_H;
+	reg.raf.f|= FLAG_H;
       else
-	reg.f&= ~FLAG_H;
-      if ((int)reg.a + 6 > 255)
-	reg.f|= FLAG_C|FLAG_X;
+	reg.raf.f&= ~FLAG_H;
+      if ((int)reg.raf.a + 6 > 255)
+	reg.raf.f|= FLAG_C|FLAG_X;
       else
-	reg.f&= ~(FLAG_C|FLAG_X);
-      reg.a+= 6;
+	reg.raf.f&= ~(FLAG_C|FLAG_X);
+      reg.raf.a+= 6;
     }
-  if (((reg.a & 0xf0) > 0x90) ||
-      (reg.f & FLAG_C))
+  if (((reg.raf.a & 0xf0) > 0x90) ||
+      (reg.raf.f & FLAG_C))
     {
-      if ((int)reg.a + 0x60 > 255)
-	reg.f|= FLAG_C;
+      if ((int)reg.raf.a + 0x60 > 255)
+	reg.raf.f|= FLAG_C;
       else
-	reg.f&= ~FLAG_C;
-      reg.a+= 0x60;
+	reg.raf.f&= ~FLAG_C;
+      reg.raf.a+= 0x60;
     }
   return resGO;
 }
@@ -65,8 +65,8 @@ cl_tlcs::inst_daa_a()
 int
 cl_tlcs::inst_cpl_a()
 {
-  reg.a= ~reg.a;
-  reg.f|= FLAG_H|FLAG_N;
+  reg.raf.a= ~reg.raf.a;
+  reg.raf.f|= FLAG_H|FLAG_N;
   return resGO;
 }
 
@@ -75,22 +75,22 @@ cl_tlcs::inst_cpl_a()
 int
 cl_tlcs::inst_neg_a()
 {
-  reg.f&= ~(FLAG_S|FLAG_Z|FLAG_H/*|FLAG_X*/|FLAG_V|FLAG_C);
-  reg.f|= FLAG_N;
-  if (reg.a == 0x80)
-    reg.f|= FLAG_V;
-  if (reg.a)
-    reg.f|= (FLAG_C|FLAG_X);
+  reg.raf.f&= ~(FLAG_S|FLAG_Z|FLAG_H/*|FLAG_X*/|FLAG_V|FLAG_C);
+  reg.raf.f|= FLAG_N;
+  if (reg.raf.a == 0x80)
+    reg.raf.f|= FLAG_V;
+  if (reg.raf.a)
+    reg.raf.f|= (FLAG_C|FLAG_X);
 
-  //uint8_t a= ~reg.a;
-  if ((reg.a & 0x0f) == 0)//if (a&0xf + 1 > 15)
-    reg.f|= FLAG_H;
-  reg.a= 0-reg.a;
+  //uint8_t a= ~reg.raf.a;
+  if ((reg.raf.a & 0x0f) == 0)//if (a&0xf + 1 > 15)
+    reg.raf.f|= FLAG_H;
+  reg.raf.a= 0-reg.raf.a;
 
-  if (reg.a & 0x80)
-    reg.f|= FLAG_S;
-  if (!reg.a)
-    reg.f|= FLAG_Z;
+  if (reg.raf.a & 0x80)
+    reg.raf.f|= FLAG_S;
+  if (!reg.raf.a)
+    reg.raf.f|= FLAG_Z;
   
   return resGO;
 }
@@ -100,15 +100,15 @@ cl_tlcs::inst_neg_a()
 int
 cl_tlcs::inst_ccf()
 {
-  if (reg.f & FLAG_C)
-    reg.f&= ~(FLAG_C);
+  if (reg.raf.f & FLAG_C)
+    reg.raf.f&= ~(FLAG_C);
   else
-    reg.f|= FLAG_C;
-  if (reg.f & FLAG_X)
-    reg.f&= ~(FLAG_X);
+    reg.raf.f|= FLAG_C;
+  if (reg.raf.f & FLAG_X)
+    reg.raf.f&= ~(FLAG_X);
   else
-    reg.f|= FLAG_X;
-  reg.f&= ~FLAG_N;
+    reg.raf.f|= FLAG_X;
+  reg.raf.f&= ~FLAG_N;
   return resGO;
 }
 
@@ -117,8 +117,8 @@ cl_tlcs::inst_ccf()
 int
 cl_tlcs::inst_scf()
 {
-  reg.f|= FLAG_C|FLAG_X;
-  reg.f&= ~(FLAG_N|FLAG_H);
+  reg.raf.f|= FLAG_C|FLAG_X;
+  reg.raf.f&= ~(FLAG_N|FLAG_H);
   return resGO;
 }
 
@@ -127,7 +127,7 @@ cl_tlcs::inst_scf()
 int
 cl_tlcs::inst_rcf()
 {
-  reg.f&= ~(FLAG_C|FLAG_X|FLAG_N|FLAG_H);
+  reg.raf.f&= ~(FLAG_C|FLAG_X|FLAG_N|FLAG_H);
   return resGO;
 }
 
@@ -137,7 +137,7 @@ int
 cl_tlcs::inst_swi()
 {
   t_addr iPC= PC-1;
-  reg.f&= ~FLAG_I;
+  reg.raf.f&= ~FLAG_I;
   exec_intr(iPC, 0x0010, PC);
   exec_push(iPC, reg.af);
   PC= 0x0010;
@@ -149,7 +149,7 @@ cl_tlcs::inst_swi()
 int
 cl_tlcs::inst_mul_hl(class cl_memory_cell *cell)
 {
-  reg.hl= reg.l * cell->read();
+  reg.hl= reg.rhl.l * cell->read();
   return resGO;
 }
 
@@ -158,23 +158,23 @@ cl_tlcs::inst_mul_hl(class cl_memory_cell *cell)
 int
 cl_tlcs::inst_div_hl(class cl_memory_cell *cell)
 {
-  uint8_t m= cell->read();
+  u8_t m= cell->read();
   return inst_div_hl(m);
 }
 
 
 // DIV HL,val
 int
-cl_tlcs::inst_div_hl(uint8_t d)
+cl_tlcs::inst_div_hl(u8_t d)
 {
-  uint8_t m= d;
-  reg.f&= ~FLAG_V;
+  u8_t m= d;
+  reg.raf.f&= ~FLAG_V;
   if ((m == 0) ||
       ((reg.hl / m) > 255))
-    reg.f|= FLAG_V;
+    reg.raf.f|= FLAG_V;
   else
-    reg.l= reg.hl / m;
-  reg.h= reg.hl % m;
+    reg.rhl.l= reg.hl / m;
+  reg.rhl.h= reg.hl % m;
   return resGO;
 }
 

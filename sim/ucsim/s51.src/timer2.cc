@@ -87,7 +87,7 @@ cl_timer2::write(class cl_memory_cell *cell, t_mem *val)
   
   if (b)
     {
-      uint8_t m= 1 << (ba - addr_tcon);
+      u8_t m= 1 << (ba - addr_tcon);
       n= cell_tcon->get();
       if (*val)
 	n|= m;
@@ -298,8 +298,8 @@ cl_timer2::do_t2_down(int cycles)
 	    h= cell_th->add(-1);
 	  else
 	    h= cell_th->get();
-	  if ((TYPE_UWORD)(h*256+l) <
-	      (TYPE_UWORD)(cell_rcap2h->get()*256+cell_rcap2l->get()))
+	  if ((u16_t)(h*256+l) <
+	      (u16_t)(cell_rcap2h->get()*256+cell_rcap2l->get()))
 	    {
 	      cell_tcon->set_bit1(mask_TF);
 	      cell_th->set(0xff);

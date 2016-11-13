@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 488 2016-11-03 11:00:43Z drdani $ */
+/* $Id: serial.cc 496 2016-11-11 12:48:27Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -151,7 +151,7 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
     return;
   if (cell == regs[sr])
     {
-      uint8_t v= cell->get();
+      u8_t v= cell->get();
       if ((*val & 0x40) == 0)
 	v&= ~0x40;
       *val= v;
@@ -341,8 +341,8 @@ cl_serial::reset(void)
 void
 cl_serial::pick_div()
 {
-  uint8_t b1= regs[brr1]->get();
-  uint8_t b2= regs[brr2]->get();
+  u8_t b1= regs[brr1]->get();
+  u8_t b2= regs[brr2]->get();
   div= ((((b2&0xf0)<<4) + b1)<<4) + (b2&0xf);
   mcnt= 0;
   //printf("pick_div %d\n", div);
@@ -351,8 +351,8 @@ cl_serial::pick_div()
 void
 cl_serial::pick_ctrl()
 {
-  uint8_t c1= regs[cr1]->get();
-  uint8_t c2= regs[cr2]->get();
+  u8_t c1= regs[cr1]->get();
+  u8_t c2= regs[cr2]->get();
   en= !(c1 & 0x20);
   ten= c2 & 0x08;
   ren= c2 & 0x04;

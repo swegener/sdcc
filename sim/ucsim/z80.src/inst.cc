@@ -460,7 +460,7 @@ cl_z80::inst_ex(t_mem code)
 {
   /* 0x08 // EX AF,AF' */
   unsigned char tmp;
-  TYPE_UWORD tempw;
+  u16_t tempw;
 
   switch (code) {
     case 0x08: // EX AF,AF'
@@ -1180,7 +1180,7 @@ int
 cl_z80::inst_exx(t_mem code)
 {
   /* case 0xD9: // EXX - swap BC,DE,HL with alternates */
-  TYPE_UWORD tempw;
+  u16_t tempw;
 
   tempw = regs.aBC;
   regs.BC = regs.aBC;

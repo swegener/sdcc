@@ -36,17 +36,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 struct t_regpair
 {
 #ifdef WORDS_BIGENDIAN
-  TYPE_UBYTE h;
-  TYPE_UBYTE l;
+  u8_t/*TYPE_UBYTE*/ h;
+  u8_t/*TYPE_UBYTE*/ l;
 #else
-  TYPE_UBYTE l;
-  TYPE_UBYTE h;
+  u8_t/*TYPE_UBYTE*/ l;
+  u8_t/*TYPE_UBYTE*/ h;
 #endif
 };
 
 #define DEF_REGPAIR(BIGNAME,smallname) \
   union { \
-    TYPE_UWORD BIGNAME; \
+    u16_t/*TYPE_UWORD*/ BIGNAME;		\
     struct t_regpair smallname; \
   }
 
@@ -55,14 +55,14 @@ struct t_regs
   //TYPE_UBYTE A;
   //TYPE_UBYTE F;
   union {
-    uint16_t AF;
+    u16_t AF;
     struct {
 #ifdef WORDS_BIGENDIAN
-      TYPE_UBYTE A;
-      TYPE_UBYTE F;
+      u8_t/*TYPE_UBYTE*/ A;
+      u8_t/*TYPE_UBYTE*/ F;
 #else
-      TYPE_UBYTE F;
-      TYPE_UBYTE A;
+      u8_t/*TYPE_UBYTE*/ F;
+      u8_t/*TYPE_UBYTE*/ A;
 #endif
     };
   };
@@ -71,20 +71,20 @@ struct t_regs
   DEF_REGPAIR(HL, hl);
   DEF_REGPAIR(IX, ix);
   DEF_REGPAIR(IY, iy);
-  TYPE_UWORD SP;
+  u16_t/*TYPE_UWORD*/ SP;
   /* there are alternate AF,BC,DE,HL register sets, and a few instructions
      that swap one for the other */
   //TYPE_UBYTE aA;
   //TYPE_UBYTE aF;
   union {
-    uint16_t aAF;
+    u16_t aAF;
     struct {
 #ifdef WORDS_BIGENDIAN
-      TYPE_UBYTE aA;
-      TYPE_UBYTE aF;
+      u8_t/*TYPE_UBYTE*/ aA;
+      u8_t/*TYPE_UBYTE*/ aF;
 #else
-      TYPE_UBYTE aF;
-      TYPE_UBYTE aA;
+      u8_t/*TYPE_UBYTE*/ aF;
+      u8_t/*TYPE_UBYTE*/ aA;
 #endif
     };
   };
@@ -92,7 +92,7 @@ struct t_regs
   DEF_REGPAIR(aDE, a_de);
   DEF_REGPAIR(aHL, a_hl);
   
-  TYPE_UBYTE iv;  /* interrupt vector, see ed 47 ld A,IV.. */
+  u8_t/*TYPE_UBYTE*/ iv;  /* interrupt vector, see ed 47 ld A,IV.. */
 };
 
 enum {

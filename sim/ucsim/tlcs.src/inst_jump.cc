@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_jump.cc 243 2016-06-23 16:14:48Z  $ */
+/* $Id: inst_jump.cc 500 2016-11-12 15:15:43Z drdani $ */
 
 #include "tlcscl.h"
 
@@ -58,7 +58,7 @@ cl_tlcs::inst_reti()
 
 // CALL
 int
-cl_tlcs::inst_call(t_addr PC_of_inst, uint16_t addr)
+cl_tlcs::inst_call(t_addr PC_of_inst, u16_t addr)
 {
   exec_call(PC_of_inst, addr, PC);
   PC= addr;
@@ -70,8 +70,8 @@ cl_tlcs::inst_call(t_addr PC_of_inst, uint16_t addr)
 int
 cl_tlcs::inst_djnz_b(int8_t d)
 {
-  reg.b--;
-  if (reg.b != 0)
+  reg.rbc.b--;
+  if (reg.rbc.b != 0)
     PC+= d;
   return resGO;
 }

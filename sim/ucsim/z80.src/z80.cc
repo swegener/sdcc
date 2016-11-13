@@ -736,21 +736,21 @@ cl_z80::exec_inst(void)
   return(resINV_INST);
 }
 
-void cl_z80::store1( TYPE_UWORD addr, t_mem val ) {
+void cl_z80::store1( u16_t addr, t_mem val ) {
   ram->write(addr, val);
 }
 
-void cl_z80::store2( TYPE_UWORD addr, TYPE_UWORD val ) {
+void cl_z80::store2( u16_t addr, u16_t val ) {
   ram->write(addr,   val & 0xff);
   ram->write(addr+1, (val >> 8) & 0xff);
 }
 
-TYPE_UBYTE  cl_z80::get1( TYPE_UWORD addr ) {
+u8_t  cl_z80::get1( u16_t addr ) {
   return ram->read(addr);
 }
 
-TYPE_UWORD  cl_z80::get2( TYPE_UWORD addr ) {
-  TYPE_UWORD  l, h;
+u16_t  cl_z80::get2( u16_t addr ) {
+  u16_t  l, h;
   
   l = ram->read(addr  );
   h = ram->read(addr+1);
@@ -762,8 +762,8 @@ t_mem       cl_z80::fetch1( void ) {
   return fetch( );
 }
 
-TYPE_UWORD  cl_z80::fetch2( void ) {
-  TYPE_UWORD  c1, c2;
+u16_t  cl_z80::fetch2( void ) {
+  u16_t  c1, c2;
   
   c1 = fetch( );
   c2 = fetch( );
@@ -774,17 +774,17 @@ t_mem       cl_z80::peek1 ( void ) {
   return rom->read(PC);
 }
 
-TYPE_UBYTE  cl_z80:: in_byte( TYPE_UWORD ioaddr )
+u8_t  cl_z80:: in_byte( u16_t ioaddr )
 {
   return 0;
 }
 
-void        cl_z80::out_byte( TYPE_UWORD ioaddr, TYPE_UBYTE io_val )
+void        cl_z80::out_byte( u16_t ioaddr, u8_t io_val )
 {
   return;
 }
 
-TYPE_UBYTE  cl_z80::reg_g_read ( t_mem g )
+u8_t  cl_z80::reg_g_read ( t_mem g )
 {
   switch( g )
     {
@@ -801,7 +801,7 @@ TYPE_UBYTE  cl_z80::reg_g_read ( t_mem g )
     }
 }
 
-void        cl_z80::reg_g_store( t_mem g, TYPE_UBYTE new_val )
+void        cl_z80::reg_g_store( t_mem g, u8_t new_val )
 {
   switch( g )
     {

@@ -1,4 +1,4 @@
-/* $Id: port_hw.cc 487 2016-10-30 20:31:41Z drdani $ */
+/* $Id: port_hw.cc 496 2016-11-11 12:48:27Z drdani $ */
 
 #include <ctype.h>
 
@@ -81,6 +81,8 @@ cl_port_ui::new_io(class cl_f *f_in, class cl_f *f_out)
   cl_hw::new_io(f_in, f_out);
   io->tu_mouse_on();
   io->dd_printf("\033[2 q");
+  if (f_in)
+    f_in->set_escape(true);
 }
 
 
@@ -91,27 +93,35 @@ cl_port_ui::proc_input(void)
 }
 
 bool
-cl_port_ui::handle_input(char c)
+cl_port_ui::handle_input(int c)
 {
   class cl_port_io *pio= (class cl_port_io *)io;
   int i;
+  int8_t i8= c;
 
-  for (i= 0; i < NUOF_PORT_UIS; i++)
+  if (i8 < 0)
     {
-      if (pd[i].cell_p == NULL)
-	continue;
-	
-      if (pd[i].keyset != NULL)
+      fprintf(stderr, "Port: spec key= %d\n", i8);
+    }
+  else
+    {
+      for (i= 0; i < NUOF_PORT_UIS; i++)
 	{
-	  int bit;
-	  for (bit= 0; pd[i].keyset[bit]; bit++)
-	    if (pd[i].keyset[bit] == c)
-	      {
-		t_mem m= pd[i].cell_in->read();
-		pd[i].cell_in->write(m ^ (1<<(7-bit)));
-		pio->tu_go(1,1);
-		return true;
-	      }
+	  if (pd[i].cell_p == NULL)
+	    continue;
+	  
+	  if (pd[i].keyset != NULL)
+	    {
+	      int bit;
+	      for (bit= 0; pd[i].keyset[bit]; bit++)
+		if (pd[i].keyset[bit] == c)
+		  {
+		    t_mem m= pd[i].cell_in->read();
+		    pd[i].cell_in->write(m ^ (1<<(7-bit)));
+		    pio->tu_go(1,1);
+		    return true;
+		  }
+	    }
 	}
     }
   pio->tu_go(1,24);
@@ -119,7 +129,11 @@ cl_port_ui::handle_input(char c)
   int ret= cl_hw::handle_input(c); // handle default keys
   pio->tu_go(1,1);
   //pio->tu_cll();
-  //pio->dd_printf("Unknown command: %c (%d,0x%02x)\n", isprint(c)?c:'?', c, c);
+  if (!ret)
+    {
+      u8_t u= c;
+      fprintf(stderr, "Unknown command: %c (%d,0x%x)\n", isprint(u)?u:'?', i8, c);
+    }
   return ret;
 }
 

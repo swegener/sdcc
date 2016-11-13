@@ -27,12 +27,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "lr35902cl.h"
 
-static TYPE_UBYTE  swap_nibbles(TYPE_UBYTE  val) {
+static u8_t  swap_nibbles(u8_t  val) {
   return ((val >> 4) & 0x0f) | ((val << 4) & 0xf0);
 }
 
 int cl_lr35902::inst_cb(void) {
-  TYPE_UBYTE  result;
+  u8_t  result;
   t_mem       code;
   
   if ( (peek1( ) & 0xf8) != 0x30 )
@@ -64,7 +64,7 @@ int cl_lr35902::inst_cb(void) {
 
 int cl_lr35902::inst_st_sp_abs(t_mem code) {
   if (code == 0x08) {
-    TYPE_UWORD addr = fetch2( );
+    u16_t addr = fetch2( );
     store2( addr, regs.SP );
     return(resGO);
   }
@@ -106,7 +106,7 @@ int cl_lr35902::inst_ldd   (t_mem code) {
 }
 
 int cl_lr35902::inst_ldh   (t_mem code) {
-  TYPE_UWORD addr = 0xFF00 + fetch1( );
+  u16_t addr = 0xFF00 + fetch1( );
   
   if (code == 0xE0) {
     store1( addr, regs.A );
@@ -131,7 +131,7 @@ int cl_lr35902::inst_reti  (t_mem code) {
 }
 
 int cl_lr35902::inst_add_sp_d(t_mem code) {
-  TYPE_UWORD  d = fetch( );
+  u16_t  d = fetch( );
   /* sign-extend d from 8-bits to 16-bits */
   d |= (d>>7)*0xFF00;
   
@@ -147,7 +147,7 @@ int cl_lr35902::inst_add_sp_d(t_mem code) {
 }
 
 int cl_lr35902::inst_ld16  (t_mem code) {
-  TYPE_UWORD addr = fetch2( );
+  u16_t addr = fetch2( );
   if (code == 0xEA) {
     store1( addr, regs.A );
     return resGO;
@@ -160,7 +160,7 @@ int cl_lr35902::inst_ld16  (t_mem code) {
 }
 
 int cl_lr35902::inst_ldhl_sp (t_mem code) {
-  TYPE_UWORD  d = fetch( );
+  u16_t  d = fetch( );
   /* sign-extend d from 8-bits to 16-bits */
   d |= (d>>7)*0xFF00;
 

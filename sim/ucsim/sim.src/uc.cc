@@ -1761,7 +1761,7 @@ cl_uc::fetch(t_mem *code)
 int
 cl_uc::do_inst(int step)
 {
-  TYPE_UWORD  PCsave;
+  t_addr PCsave;
   int res= resGO;
 
   if (step < 0)

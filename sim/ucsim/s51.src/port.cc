@@ -136,7 +136,7 @@ void
 cl_port::write(class cl_memory_cell *cell, t_mem *val)
 {
   struct ev_port_changed ep;
-  uint8_t nv= *val;
+  u8_t nv= *val;
   t_addr ba;
   
   if (cell == cell_p)

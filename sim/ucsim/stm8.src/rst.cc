@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: rst.cc 356 2016-07-12 09:50:46Z  $ */
+/* $Id: rst.cc 496 2016-11-11 12:48:27Z drdani $ */
 
 #include "rstcl.h"
 
@@ -55,7 +55,7 @@ cl_rst::write(class cl_memory_cell *cell, t_mem *val)
 {
   if (cell == rst_sr)
     {
-      uint8_t v= *val & 0x1f, o= cell->get();
+      u8_t v= *val & 0x1f, o= cell->get();
       *val= o & ~v;
     }
 }

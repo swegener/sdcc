@@ -48,11 +48,11 @@ class lr35902_memory
   virtual void init( void );
   
   
-  virtual void store1( TYPE_UWORD addr, t_mem val );
-  virtual void store2( TYPE_UWORD addr, TYPE_UWORD val );
+  virtual void store1( u16_t addr, t_mem val );
+  virtual void store2( u16_t addr, u16_t val );
   
-  virtual TYPE_UBYTE  get1( TYPE_UWORD addr );
-  virtual TYPE_UWORD  get2( TYPE_UWORD addr );
+  virtual u8_t  get1( u16_t addr );
+  virtual u16_t  get2( u16_t addr );
   
   // fetch not included b/c it only uses the rom
 };
@@ -88,11 +88,11 @@ public:
   
 
   // memory access altered to use the 'mem' object
-  virtual void store1( TYPE_UWORD addr, t_mem val );
-  virtual void store2( TYPE_UWORD addr, TYPE_UWORD val );
+  virtual void store1( u16_t addr, t_mem val );
+  virtual void store2( u16_t addr, u16_t val );
   
-  virtual TYPE_UBYTE  get1( TYPE_UWORD addr );
-  virtual TYPE_UWORD  get2( TYPE_UWORD addr );
+  virtual u8_t  get1( u16_t addr );
+  virtual u16_t  get2( u16_t addr );
   
   
   // see #include "instcl.h" for Z80 versions

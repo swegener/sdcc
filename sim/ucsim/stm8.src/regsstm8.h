@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: regsstm8.h 345 2016-07-10 14:51:45Z  $ */
+/* $Id: regsstm8.h 496 2016-11-11 12:48:27Z drdani $ */
 
 #ifndef REGSTM8_HEADER
 #define REGSTM8_HEADER
@@ -37,12 +37,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 struct t_regs
 {
-  TYPE_UBYTE A;
-  TYPE_UWORD X;
-  TYPE_UWORD Y;
-  TYPE_UWORD SP;
-  TYPE_UBYTE CC;
-  //TYPE_UBYTE VECTOR;
+  u8_t A;
+  u16_t X;
+  u16_t Y;
+  u16_t SP;
+  u8_t CC;
+  //u8_t VECTOR;
 };
 
 #define BIT_C	0x01  // carry status(out of bit 7)

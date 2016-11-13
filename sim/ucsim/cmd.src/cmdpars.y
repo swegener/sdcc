@@ -1,5 +1,5 @@
 %{
-#include <stdint.h>
+  //#include <stdint.h>
 
 #include "cmdlexcl.h"
 #include "memcl.h"
@@ -230,11 +230,11 @@ cast_expr
 	  $$= $4.memory->read($4.address);
 	  if ($2 == PTOK_INT)
 	    {
-	      uint32_t smask;
+	      u32_t smask;
 	      smask= 1 << ($4.memory->width - 1);
 	      if ($$ & smask)
 		{
-		  uint32_t mask;
+		  u32_t mask;
 		  mask= -1 & ~($4.memory->data_mask);
 		  $$= $$ | mask;
 		}

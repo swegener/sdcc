@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serialcl.h 447 2016-10-03 08:00:27Z drdani $ */
+/* $Id: serialcl.h 496 2016-11-11 12:48:27Z drdani $ */
 
 #ifndef STM8_SERIALCL_HEADER
 #define STM8_SERIALCL_HEADER
@@ -66,9 +66,9 @@ class cl_serial: public cl_serial_hw
   int div;
   int mcnt;
   bool    sr_read;	// last op was read of SR
-  uint8_t s_in;		// Serial channel input reg
-  uint8_t s_out;	// Serial channel output reg
-  uint8_t s_txd;	// TX data register
+  u8_t s_in;		// Serial channel input reg
+  u8_t s_out;	// Serial channel output reg
+  u8_t s_txd;	// TX data register
   bool    s_sending;	// Transmitter is working (s_out is not empty)
   bool    s_receiving;	// Receiver is working (s_in is shifting)
   bool	  s_tx_written;	// TX data reg has been written

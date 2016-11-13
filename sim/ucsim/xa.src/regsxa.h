@@ -106,11 +106,11 @@ struct t_regs
   { set_word_direct(REGS_OFFSET+(7*2), _value); } \
 }
 
-#define get_sp() ((TYPE_UWORD)(get_word_direct(REGS_OFFSET+(7*2))))
+#define get_sp() ((u16_t)(get_word_direct(REGS_OFFSET+(7*2))))
 
 /* the program status word */
 #define PSW 0x400
-#define get_psw() ((TYPE_UWORD)(get_word_direct(PSW)))
+#define get_psw() ((u16_t)(get_word_direct(PSW)))
 #define set_psw(_flags) set_word_direct(PSW, _flags)
 
 /* the system configuration register */

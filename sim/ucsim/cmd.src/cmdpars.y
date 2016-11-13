@@ -1,5 +1,4 @@
 %{
-  //#include <stdint.h>
 
 #include "cmdlexcl.h"
 #include "memcl.h"
@@ -56,7 +55,7 @@ static void yyerror (const char *msg);
 %type <bit> bit
 
 %union {
-  /*long*/int32_t number;
+  long number;
   class cl_memory *memory_object;
   struct {
     class cl_memory *memory;

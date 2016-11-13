@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simif.cc 493 2016-11-10 19:45:34Z drdani $ */
+/* $Id: simif.cc 504 2016-11-13 20:18:32Z drdani $ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -280,7 +280,7 @@ cl_sif_cmdinfo::produce_answer(void)
     {
       class cl_sif_command *sc=
 	dynamic_cast<class cl_sif_command *>(sif->commands->object_at(i));
-      if (sc->get_command() == cm)
+      if (sc->get_command() == (enum sif_command)cm)
 	{
 	  about= sc;
 	  break;
@@ -311,7 +311,7 @@ cl_sif_cmdhelp::produce_answer(void)
     {
       class cl_sif_command *sc=
 	dynamic_cast<class cl_sif_command *>(sif->commands->object_at(i));
-      if (sc->get_command() == cm)
+      if (sc->get_command() == (enum sif_command)cm)
 	{
 	  about= sc;
 	  break;
@@ -704,7 +704,7 @@ cl_simulator_interface::write(class cl_memory_cell *cel, t_mem *val)
 	  if (!c)
 	    continue;
 	  enum sif_command cm= c->get_command();
-	  if (*val == cm)
+	  if ((enum sif_command)(*val) == cm)
 	    {
 	      active_command= c;
 	      c->start();

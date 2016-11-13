@@ -64,7 +64,6 @@
 /* Copy the first part of user declarations.  */
 #line 1 "cmdpars.y" /* yacc.c:339  */
 
-#include <stdint.h>
 
 #include "cmdlexcl.h"
 #include "memcl.h"
@@ -73,7 +72,7 @@
 
 static void yyerror (const char *msg);
 
-#line 77 "y.tab.c" /* yacc.c:339  */
+#line 76 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -209,9 +208,9 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 58 "cmdpars.y" /* yacc.c:355  */
+#line 57 "cmdpars.y" /* yacc.c:355  */
 
-  /*long*/int32_t number;
+  long number;
   class cl_memory *memory_object;
   struct {
     class cl_memory *memory;
@@ -223,7 +222,7 @@ union YYSTYPE
     long mask;
   } bit;
 
-#line 227 "y.tab.c" /* yacc.c:355  */
+#line 226 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -240,7 +239,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 244 "y.tab.c" /* yacc.c:358  */
+#line 243 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -542,14 +541,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    75,    75,   141,   142,   143,   145,   150,   157,   163,
-     177,   179,   186,   194,   195,   204,   205,   206,   207,   227,
-     228,   246,   250,   251,   252,   253,   257,   258,   259,   263,
-     264,   265,   269,   270,   271,   272,   273,   277,   278,   279,
-     283,   284,   288,   289,   293,   294,   298,   299,   303,   304,
-     308,   309,   313,   316,   358,   376,   377,   378,   379,   380,
-     381,   382,   383,   384,   385,   386,   390,   391,   395,   396,
-     403,   404
+       0,    74,    74,   140,   141,   142,   144,   149,   156,   162,
+     176,   178,   185,   193,   194,   203,   204,   205,   206,   226,
+     227,   245,   249,   250,   251,   252,   256,   257,   258,   262,
+     263,   264,   268,   269,   270,   271,   272,   276,   277,   278,
+     282,   283,   287,   288,   292,   293,   297,   298,   302,   303,
+     307,   308,   312,   315,   357,   375,   376,   377,   378,   379,
+     380,   381,   382,   383,   384,   385,   389,   390,   394,   395,
+     402,   403
 };
 #endif
 
@@ -1414,93 +1413,93 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 75 "cmdpars.y" /* yacc.c:1646  */
+#line 74 "cmdpars.y" /* yacc.c:1646  */
     { application->dd_printf("%d\n", (yyvsp[0].number)); }
-#line 1420 "y.tab.c" /* yacc.c:1646  */
+#line 1419 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 141 "cmdpars.y" /* yacc.c:1646  */
+#line 140 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].memory).memory->read((yyvsp[0].memory).address); }
-#line 1426 "y.tab.c" /* yacc.c:1646  */
+#line 1425 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 142 "cmdpars.y" /* yacc.c:1646  */
+#line 141 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[0].bit).memory->read((yyvsp[0].bit).mem_address) & (yyvsp[0].bit).mask)?1:0; }
-#line 1432 "y.tab.c" /* yacc.c:1646  */
+#line 1431 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 143 "cmdpars.y" /* yacc.c:1646  */
+#line 142 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1438 "y.tab.c" /* yacc.c:1646  */
+#line 1437 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 145 "cmdpars.y" /* yacc.c:1646  */
+#line 144 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-1].number); }
-#line 1444 "y.tab.c" /* yacc.c:1646  */
+#line 1443 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 150 "cmdpars.y" /* yacc.c:1646  */
+#line 149 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1450 "y.tab.c" /* yacc.c:1646  */
+#line 1449 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 158 "cmdpars.y" /* yacc.c:1646  */
+#line 157 "cmdpars.y" /* yacc.c:1646  */
     {
 	  (yyval.number)= (yyvsp[-1].memory).memory->read((yyvsp[-1].memory).address);
 	  (yyvsp[-1].memory).memory->write((yyvsp[-1].memory).address, (yyval.number)+1);
 	}
-#line 1459 "y.tab.c" /* yacc.c:1646  */
+#line 1458 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 164 "cmdpars.y" /* yacc.c:1646  */
+#line 163 "cmdpars.y" /* yacc.c:1646  */
     {
 	  (yyval.number)= (yyvsp[-1].memory).memory->read((yyvsp[-1].memory).address);
 	  (yyvsp[-1].memory).memory->write((yyvsp[-1].memory).address, (yyval.number)-1);
 	}
-#line 1468 "y.tab.c" /* yacc.c:1646  */
+#line 1467 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 177 "cmdpars.y" /* yacc.c:1646  */
+#line 176 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1474 "y.tab.c" /* yacc.c:1646  */
+#line 1473 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 180 "cmdpars.y" /* yacc.c:1646  */
+#line 179 "cmdpars.y" /* yacc.c:1646  */
     {
 	  (yyval.number)= (yyvsp[0].memory).memory->read((yyvsp[0].memory).address);
 	  (yyvsp[0].memory).memory->write((yyvsp[0].memory).address, (yyval.number)+1);
 	  (yyval.number)= (yyvsp[0].memory).memory->read((yyvsp[0].memory).address);
 	}
-#line 1484 "y.tab.c" /* yacc.c:1646  */
+#line 1483 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 187 "cmdpars.y" /* yacc.c:1646  */
+#line 186 "cmdpars.y" /* yacc.c:1646  */
     {
 	  (yyval.number)= (yyvsp[0].memory).memory->read((yyvsp[0].memory).address);
 	  (yyvsp[0].memory).memory->write((yyvsp[0].memory).address, (yyval.number)-1);
 	  (yyval.number)= (yyvsp[0].memory).memory->read((yyvsp[0].memory).address);
 	}
-#line 1494 "y.tab.c" /* yacc.c:1646  */
+#line 1493 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 194 "cmdpars.y" /* yacc.c:1646  */
+#line 193 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].memory).address; }
-#line 1500 "y.tab.c" /* yacc.c:1646  */
+#line 1499 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 196 "cmdpars.y" /* yacc.c:1646  */
+#line 195 "cmdpars.y" /* yacc.c:1646  */
     {
 	  (yyval.number)= (yyvsp[0].bit).bit_address;
 	  if ((yyval.number) < 0)
@@ -1509,252 +1508,252 @@ yyreduce:
 	      (yyval.number)= 0;
 	    }
 	}
-#line 1513 "y.tab.c" /* yacc.c:1646  */
+#line 1512 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 204 "cmdpars.y" /* yacc.c:1646  */
+#line 203 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= -(yyvsp[0].number); }
-#line 1519 "y.tab.c" /* yacc.c:1646  */
+#line 1518 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 205 "cmdpars.y" /* yacc.c:1646  */
+#line 204 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= +(yyvsp[0].number); }
-#line 1525 "y.tab.c" /* yacc.c:1646  */
+#line 1524 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 206 "cmdpars.y" /* yacc.c:1646  */
+#line 205 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ~(yyvsp[0].number); }
-#line 1531 "y.tab.c" /* yacc.c:1646  */
+#line 1530 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 207 "cmdpars.y" /* yacc.c:1646  */
+#line 206 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[0].number))?0:1; }
-#line 1537 "y.tab.c" /* yacc.c:1646  */
+#line 1536 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 227 "cmdpars.y" /* yacc.c:1646  */
+#line 226 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1543 "y.tab.c" /* yacc.c:1646  */
+#line 1542 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 229 "cmdpars.y" /* yacc.c:1646  */
+#line 228 "cmdpars.y" /* yacc.c:1646  */
     {
 	  (yyval.number)= (yyvsp[0].memory).memory->read((yyvsp[0].memory).address);
 	  if ((yyvsp[-2].number) == PTOK_INT)
 	    {
-	      uint32_t smask;
+	      u32_t smask;
 	      smask= 1 << ((yyvsp[0].memory).memory->width - 1);
 	      if ((yyval.number) & smask)
 		{
-		  uint32_t mask;
+		  u32_t mask;
 		  mask= -1 & ~((yyvsp[0].memory).memory->data_mask);
 		  (yyval.number)= (yyval.number) | mask;
 		}
 	    }
 	}
-#line 1562 "y.tab.c" /* yacc.c:1646  */
+#line 1561 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 246 "cmdpars.y" /* yacc.c:1646  */
+#line 245 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_INT; }
-#line 1568 "y.tab.c" /* yacc.c:1646  */
+#line 1567 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 250 "cmdpars.y" /* yacc.c:1646  */
+#line 249 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1574 "y.tab.c" /* yacc.c:1646  */
+#line 1573 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 251 "cmdpars.y" /* yacc.c:1646  */
+#line 250 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) * (yyvsp[0].number); }
-#line 1580 "y.tab.c" /* yacc.c:1646  */
+#line 1579 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 252 "cmdpars.y" /* yacc.c:1646  */
+#line 251 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) / (yyvsp[0].number); }
-#line 1586 "y.tab.c" /* yacc.c:1646  */
+#line 1585 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 253 "cmdpars.y" /* yacc.c:1646  */
+#line 252 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) % (yyvsp[0].number); }
-#line 1592 "y.tab.c" /* yacc.c:1646  */
+#line 1591 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 257 "cmdpars.y" /* yacc.c:1646  */
+#line 256 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1598 "y.tab.c" /* yacc.c:1646  */
+#line 1597 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 258 "cmdpars.y" /* yacc.c:1646  */
+#line 257 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) + (yyvsp[0].number); }
-#line 1604 "y.tab.c" /* yacc.c:1646  */
+#line 1603 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 259 "cmdpars.y" /* yacc.c:1646  */
+#line 258 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) - (yyvsp[0].number); }
-#line 1610 "y.tab.c" /* yacc.c:1646  */
+#line 1609 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 263 "cmdpars.y" /* yacc.c:1646  */
+#line 262 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1616 "y.tab.c" /* yacc.c:1646  */
+#line 1615 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 264 "cmdpars.y" /* yacc.c:1646  */
+#line 263 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) << (yyvsp[0].number); }
-#line 1622 "y.tab.c" /* yacc.c:1646  */
+#line 1621 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 265 "cmdpars.y" /* yacc.c:1646  */
+#line 264 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) >> (yyvsp[0].number); }
-#line 1628 "y.tab.c" /* yacc.c:1646  */
+#line 1627 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 269 "cmdpars.y" /* yacc.c:1646  */
+#line 268 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1634 "y.tab.c" /* yacc.c:1646  */
+#line 1633 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 270 "cmdpars.y" /* yacc.c:1646  */
+#line 269 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-2].number) < (yyvsp[0].number))?1:0; }
-#line 1640 "y.tab.c" /* yacc.c:1646  */
+#line 1639 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 271 "cmdpars.y" /* yacc.c:1646  */
+#line 270 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-2].number) > (yyvsp[0].number))?1:0; }
-#line 1646 "y.tab.c" /* yacc.c:1646  */
+#line 1645 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 272 "cmdpars.y" /* yacc.c:1646  */
+#line 271 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-2].number) <= (yyvsp[0].number))?1:0; }
-#line 1652 "y.tab.c" /* yacc.c:1646  */
+#line 1651 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 273 "cmdpars.y" /* yacc.c:1646  */
+#line 272 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-2].number) >= (yyvsp[0].number))?1:0; }
-#line 1658 "y.tab.c" /* yacc.c:1646  */
+#line 1657 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 277 "cmdpars.y" /* yacc.c:1646  */
+#line 276 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1664 "y.tab.c" /* yacc.c:1646  */
+#line 1663 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 278 "cmdpars.y" /* yacc.c:1646  */
+#line 277 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-2].number)==(yyvsp[0].number))?1:0; }
-#line 1670 "y.tab.c" /* yacc.c:1646  */
+#line 1669 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 279 "cmdpars.y" /* yacc.c:1646  */
+#line 278 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-2].number)!=(yyvsp[0].number))?1:0; }
-#line 1676 "y.tab.c" /* yacc.c:1646  */
+#line 1675 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 283 "cmdpars.y" /* yacc.c:1646  */
+#line 282 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1682 "y.tab.c" /* yacc.c:1646  */
+#line 1681 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 284 "cmdpars.y" /* yacc.c:1646  */
+#line 283 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) & (yyvsp[0].number); }
-#line 1688 "y.tab.c" /* yacc.c:1646  */
+#line 1687 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 288 "cmdpars.y" /* yacc.c:1646  */
+#line 287 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1694 "y.tab.c" /* yacc.c:1646  */
+#line 1693 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 289 "cmdpars.y" /* yacc.c:1646  */
+#line 288 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) ^ (yyvsp[0].number); }
-#line 1700 "y.tab.c" /* yacc.c:1646  */
+#line 1699 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 293 "cmdpars.y" /* yacc.c:1646  */
+#line 292 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1706 "y.tab.c" /* yacc.c:1646  */
+#line 1705 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 294 "cmdpars.y" /* yacc.c:1646  */
+#line 293 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[-2].number) | (yyvsp[0].number); }
-#line 1712 "y.tab.c" /* yacc.c:1646  */
+#line 1711 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 298 "cmdpars.y" /* yacc.c:1646  */
+#line 297 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1718 "y.tab.c" /* yacc.c:1646  */
+#line 1717 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 299 "cmdpars.y" /* yacc.c:1646  */
+#line 298 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-2].number) && (yyvsp[0].number))?1:0; }
-#line 1724 "y.tab.c" /* yacc.c:1646  */
+#line 1723 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 303 "cmdpars.y" /* yacc.c:1646  */
+#line 302 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1730 "y.tab.c" /* yacc.c:1646  */
+#line 1729 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 304 "cmdpars.y" /* yacc.c:1646  */
+#line 303 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-2].number) || (yyvsp[0].number))?1:0; }
-#line 1736 "y.tab.c" /* yacc.c:1646  */
+#line 1735 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 308 "cmdpars.y" /* yacc.c:1646  */
+#line 307 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1742 "y.tab.c" /* yacc.c:1646  */
+#line 1741 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 309 "cmdpars.y" /* yacc.c:1646  */
+#line 308 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= ((yyvsp[-4].number))?((yyvsp[-2].number)):((yyvsp[0].number)); }
-#line 1748 "y.tab.c" /* yacc.c:1646  */
+#line 1747 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 313 "cmdpars.y" /* yacc.c:1646  */
+#line 312 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1754 "y.tab.c" /* yacc.c:1646  */
+#line 1753 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 317 "cmdpars.y" /* yacc.c:1646  */
+#line 316 "cmdpars.y" /* yacc.c:1646  */
     {
 	  t_mem org= (yyvsp[-2].memory).memory->read((yyvsp[-2].memory).address);
 	  (yyval.number)= (yyvsp[0].number);
@@ -1796,11 +1795,11 @@ yyreduce:
 	    }
 	  (yyval.number)= (yyvsp[-2].memory).memory->read((yyvsp[-2].memory).address);
 	}
-#line 1800 "y.tab.c" /* yacc.c:1646  */
+#line 1799 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 359 "cmdpars.y" /* yacc.c:1646  */
+#line 358 "cmdpars.y" /* yacc.c:1646  */
     {
 	  if ((yyvsp[0].number))
 	    {
@@ -1815,98 +1814,98 @@ yyreduce:
 	      (yyval.number)= 0;
 	    }
 	}
-#line 1819 "y.tab.c" /* yacc.c:1646  */
+#line 1818 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 376 "cmdpars.y" /* yacc.c:1646  */
+#line 375 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_EQUAL; }
-#line 1825 "y.tab.c" /* yacc.c:1646  */
+#line 1824 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 377 "cmdpars.y" /* yacc.c:1646  */
+#line 376 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_MUL_ASSIGN; }
-#line 1831 "y.tab.c" /* yacc.c:1646  */
+#line 1830 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 378 "cmdpars.y" /* yacc.c:1646  */
+#line 377 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_DIV_ASSIGN; }
-#line 1837 "y.tab.c" /* yacc.c:1646  */
+#line 1836 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 379 "cmdpars.y" /* yacc.c:1646  */
+#line 378 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_MOD_ASSIGN; }
-#line 1843 "y.tab.c" /* yacc.c:1646  */
+#line 1842 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 380 "cmdpars.y" /* yacc.c:1646  */
+#line 379 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_ADD_ASSIGN; }
-#line 1849 "y.tab.c" /* yacc.c:1646  */
+#line 1848 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 381 "cmdpars.y" /* yacc.c:1646  */
+#line 380 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_SUB_ASSIGN; }
-#line 1855 "y.tab.c" /* yacc.c:1646  */
+#line 1854 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 382 "cmdpars.y" /* yacc.c:1646  */
+#line 381 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_LEFT_ASSIGN; }
-#line 1861 "y.tab.c" /* yacc.c:1646  */
+#line 1860 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 383 "cmdpars.y" /* yacc.c:1646  */
+#line 382 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_RIGHT_ASSIGN; }
-#line 1867 "y.tab.c" /* yacc.c:1646  */
+#line 1866 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 384 "cmdpars.y" /* yacc.c:1646  */
+#line 383 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_AND_ASSIGN; }
-#line 1873 "y.tab.c" /* yacc.c:1646  */
+#line 1872 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 385 "cmdpars.y" /* yacc.c:1646  */
+#line 384 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_XOR_ASSIGN; }
-#line 1879 "y.tab.c" /* yacc.c:1646  */
+#line 1878 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 386 "cmdpars.y" /* yacc.c:1646  */
+#line 385 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= PTOK_OR_ASSIGN; }
-#line 1885 "y.tab.c" /* yacc.c:1646  */
+#line 1884 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 390 "cmdpars.y" /* yacc.c:1646  */
+#line 389 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1891 "y.tab.c" /* yacc.c:1646  */
+#line 1890 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 391 "cmdpars.y" /* yacc.c:1646  */
+#line 390 "cmdpars.y" /* yacc.c:1646  */
     { (yyval.number)= (yyvsp[0].number); }
-#line 1897 "y.tab.c" /* yacc.c:1646  */
+#line 1896 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 397 "cmdpars.y" /* yacc.c:1646  */
+#line 396 "cmdpars.y" /* yacc.c:1646  */
     {
 	    (yyval.memory).memory= (yyvsp[-3].memory_object);
 	    (yyval.memory).address= (yyvsp[-1].number);
 	  }
-#line 1906 "y.tab.c" /* yacc.c:1646  */
+#line 1905 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 405 "cmdpars.y" /* yacc.c:1646  */
+#line 404 "cmdpars.y" /* yacc.c:1646  */
     {
 	    (yyval.bit).memory= (yyvsp[-2].memory).memory;
 	    (yyval.bit).mem_address= (yyvsp[-2].memory).address;
@@ -1916,11 +1915,11 @@ yyreduce:
 	    if (uc)
 	      (yyval.bit).bit_address= uc->bit_address((yyvsp[-2].memory).memory, (yyvsp[-2].memory).address, (yyvsp[0].number));
 	  }
-#line 1920 "y.tab.c" /* yacc.c:1646  */
+#line 1919 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1924 "y.tab.c" /* yacc.c:1646  */
+#line 1923 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2148,7 +2147,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 416 "cmdpars.y" /* yacc.c:1906  */
+#line 415 "cmdpars.y" /* yacc.c:1906  */
 
 
 static void

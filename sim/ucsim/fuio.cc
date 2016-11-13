@@ -24,7 +24,7 @@
 
 cl_f *dd= NULL;
 
-void deb(chars format, ...)
+void deb(const char *format, ...)
 {
   return;
   if (dd==NULL)

@@ -146,9 +146,9 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 58 "cmdpars.y" /* yacc.c:1909  */
+#line 57 "cmdpars.y" /* yacc.c:1909  */
 
-  /*long*/int32_t number;
+  long number;
   class cl_memory *memory_object;
   struct {
     class cl_memory *memory;

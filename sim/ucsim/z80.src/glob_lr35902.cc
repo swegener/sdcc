@@ -37,7 +37,7 @@
   */
 /*  uint  code, mask;  char  branch;  uchar length;  char  *mnemonic; */
 
-struct dis_entry DISASS_NAME() []= {
+struct dis_entry /*DISASS_NAME()*/disass_lr35902 []= {
   { 0x0000, 0x00ff, ' ', 1, "NOP" },
   { 0x0001, 0x00ff, ' ', 3, "LD BC,%w" },
   { 0x0002, 0x00ff, ' ', 1, "LD (BC),A" },

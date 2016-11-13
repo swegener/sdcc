@@ -573,8 +573,10 @@ cl_optref::get_value(const char *)
 {
   if (!option)
     {
+      char *o= (char *)object_name(owner);
+      char *n= (char *)get_name();
       fprintf(stderr, "Warning: \"%s\" is dereferencing a non-existent "
-	      "string option: %s\n", object_name(owner), get_name());
+	      "string option: %s\n", o, n?n:"?"); 
       return(0);
     }
   else

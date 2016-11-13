@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define FIOCL_HEADER
 
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "pobjcl.h"
 
@@ -209,7 +210,7 @@ class cl_f: public cl_base
   //virtual int connect(chars host, int to_port);
 };
 
-extern void deb(chars format, ...);
+extern void deb(const char *format, ...);
 
 extern int mk_srv_socket(int port);
 

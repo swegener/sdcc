@@ -1,5 +1,11 @@
 2016-11-17 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCClospre.cc,
+	  src/SDCClospre.hpp:
+	  More fine-grained handling of volatile to allow more optimizations in lospre.
+
+2016-11-17 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/ralloc.c,
 	  src/z80/ralloc.c:
 	  Fix some comments on spilling.

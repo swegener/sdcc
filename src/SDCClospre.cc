@@ -105,11 +105,11 @@ candidate_expression (const iCode *const ic, int lkey)
   if(ic->op == '=' && IS_OP_LITERAL (right))
     return (false);
 
-  if(IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
-    return (false);
+  //if(IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
+  //  return (false);
 
-  if(POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
-    return (false);
+  //if(POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
+  //  return (false);
 
   // Todo: Allow more operands!
   if (ic->op != CAST && left && !(IS_SYMOP (left) || IS_OP_LITERAL (left)) ||
@@ -169,6 +169,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   const operand *const eleft = IC_LEFT (eic);
   const operand *const eright = IC_RIGHT (eic);
   const bool uses_global = (eic->op == GET_VALUE_AT_ADDRESS || isOperandGlobal (eleft) || isOperandGlobal (eright) || IS_SYMOP (eleft) && OP_SYMBOL_CONST (eleft)->addrtaken || IS_SYMOP (eright) && OP_SYMBOL_CONST (eright)->addrtaken);
+  const bool uses_volatile = POINTER_GET (eic) && IS_VOLATILE (operandType (eleft)->next) || IS_OP_VOLATILE (eleft) || IS_OP_VOLATILE (eright);
   bool safety_required = false;
 
   // In redundancy elimination, safety means not doing a computation on any path were it was not done before.
@@ -178,7 +179,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   // safety, since reading from an unknown location could result in making the device do something or in a SIGSEGV. 
   // On the other hand, addition is something that typically does not require safety, since adding two undefined
   // operands gives just another undefined (the C standard allows trap representations, which, could result
-  // in addition requiring safety though; AFAIK none of the targets currently supported by sdcc have trap representations).
+  // in addition requiring safety though; AFAIK none of the targets currently supported by SDCC have trap representations).
   // Philipp, 2012-07-06.
   //
   // For now we just always require safety for "dangerous" operations.
@@ -188,6 +189,10 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
 
   // Function calls can have any side effects.
   if (eic->op == CALL || eic->op == PCALL)
+    safety_required = true;
+
+  // volatile requires safety.
+  if (uses_volatile)
     safety_required = true;
 
   // Reading from an invalid address might be dangerous, since there could be memory-mapped I/O.
@@ -207,16 +212,22 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   for (vertex_t i = 0; i < boost::num_vertices (*cfg); i++)
     {
        const iCode *const ic = (*cfg)[i].ic;
+       const operand *const left = IC_LEFT (ic);
+       const operand *const right = IC_RIGHT (ic);
+       const operand *const result = IC_RESULT (ic);
+
        (*cfg)[i].uses = same_expression (eic, ic);
        (*cfg)[i].invalidates = false;
-       if (IC_RESULT (ic) && !IS_OP_LITERAL (IC_RESULT (ic)) && !POINTER_SET(ic) &&
-         (eleft && isOperandEqual (eleft, IC_RESULT (ic)) || eright && isOperandEqual (eright, IC_RESULT (ic))))
+       if (IC_RESULT (ic) && !IS_OP_LITERAL (result) && !POINTER_SET(ic) &&
+         (eleft && isOperandEqual (eleft, result) || eright && isOperandEqual (eright, result)))
          (*cfg)[i].invalidates = true;
        if (ic->op == FUNCTION || ic->op == ENDFUNCTION || ic->op == RECEIVE)
          (*cfg)[i].invalidates = true;
-       if(uses_global && (ic->op == CALL || ic->op == PCALL))
+       if ((uses_global || uses_volatile) && (ic->op == CALL || ic->op == PCALL))
          (*cfg)[i].invalidates = true;
-       if(uses_global && POINTER_SET (ic)) // TODO: More accuracy here!
+       if (uses_volatile && !(*cfg)[i].uses && (POINTER_GET (ic) && IS_VOLATILE (operandType (left)->next)) || IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
+         (*cfg)[i].invalidates = true;
+       if (uses_global && POINTER_SET (ic)) // TODO: More accuracy here!
          (*cfg)[i].invalidates = true;
 
        (*cfg)[i].forward = std::pair<int, int>(-1, -1);
@@ -226,7 +237,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
 }
 
 // Dump cfg, with numbered nodes.
-void dump_cfg_lospre(const cfg_lospre_t &cfg)
+void dump_cfg_lospre (const cfg_lospre_t &cfg)
 {
   if(!currFunc)
     return;

@@ -53,6 +53,9 @@ typedef stx::btree_set<unsigned short int> lospreset_t; // Faster than std::set
 typedef std::set<unsigned short int> lospreset_t;
 #endif
 
+// #define DEBUG_LOSPRE
+// #define DEBUG_LOSPRE_ASS
+
 struct assignment_lospre
 {
   boost::tuple<float, float> s; // First entry: Calculation costs, second entry: Lifetime costs.
@@ -123,7 +126,7 @@ struct tree_dec_lospre_node
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_lospre_node, float> cfg_lospre_t; // The edge property is the cost of subdividing the edge and inserting an instruction (for now we always use 1, optimizing for code size, but relative execution frequency could be used when optimizing for speed or total energy consumption; aggregates thereof can be a good idea as well).
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_lospre_node> tree_dec_lospre_t;
 
-#if 1
+#ifdef DEBUG_LOSPRE
 void print_assignment(const assignment_lospre &a, cfg_lospre_t G)
 {
   wassert(a.global.size() == boost::num_vertices (G));
@@ -195,6 +198,10 @@ void tree_dec_lospre_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_de
   adjacency_iter_t c, c_end;
   boost::tie(c, c_end) = adjacent_vertices(t, T);
 
+#ifdef DEBUG_LOSPRE_ASS
+  std::cout << "Forget (" << t << "):\n"; std::cout.flush();
+#endif
+
   assignment_list_lospre_t &alist = T[t].assignments;
 
   std::swap(alist, T[*c].assignments);
@@ -235,6 +242,14 @@ void tree_dec_lospre_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_de
 
   alist.sort();
 
+#ifdef DEBUG_LOSPRE_ASS
+  for(ai = alist.begin(); ai != alist.end(); ++ai)
+    {
+      print_assignment(*ai, G);
+      std::cout << "\n";
+    }
+#endif
+
   // Collapse (locally) identical assignments.
   for (ai = alist.begin(); ai != alist.end();)
     {
@@ -259,6 +274,18 @@ void tree_dec_lospre_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_de
 
   if(!alist.size())
     std::cerr << "No surviving assignments at forget node (lospre).\n";
+
+#ifdef DEBUG_LOSPRE
+  std::cout << "Remaining assignments: " << alist.size() << "\n"; std::cout.flush();
+#endif
+
+#ifdef DEBUG_LOSPRE_ASS
+  for(ai = alist.begin(); ai != alist.end(); ++ai)
+    {
+      print_assignment(*ai, G);
+      std::cout << "\n";
+    }
+#endif
 }
 
 // Handle join nodes in the nice tree decomposition
@@ -746,8 +773,10 @@ static int tree_dec_lospre (tree_dec_lospre_t/*T_t*/ &T, cfg_lospre_t/*G_t*/ &G,
   wassert(T[find_root(T)].assignments.begin() != T[find_root(T)].assignments.end());
   const assignment_lospre &winner = *(T[find_root(T)].assignments.begin());
 
-  //std::cout << "Winner (lospre): ";
-  //print_assignment(winner, G);
+#ifdef DEBUG_LOSPRE
+  std::cout << "Winner (lospre): ";
+  print_assignment(winner, G);
+#endif
 
   int change;
   if (change = implement_lospre_assignment(winner, T, G, ic))

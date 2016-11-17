@@ -18,6 +18,7 @@
 
 #include <set>
 #include <map>
+#include <iostream>
 
 #include <boost/graph/adjacency_list.hpp>
 

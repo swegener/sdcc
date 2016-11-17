@@ -528,7 +528,7 @@ spillThis (symbol * sym)
       createStackSpil (sym);
     }
 
-  /* mark it has spilt & put it in the spilt set */
+  /* mark it as spilt & put it in the spilt set */
   sym->isspilt = sym->spillA = 1;
   _G.spiltSet = bitVectSetBit (_G.spiltSet, sym->key);
 

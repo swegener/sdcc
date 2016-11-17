@@ -178,7 +178,7 @@ spillThis (symbol *sym, bool force_spill)
   if (!(sym->remat || sym->usl.spillLoc) || (sym->usl.spillLoc && !sym->usl.spillLoc->onStack)) // stm8 port currently only supports on-stack spill locations in code generation.
     createStackSpil (sym);
 
-  /* mark it has spilt & put it in the spilt set */
+  /* mark it as spilt */
   sym->isspilt = sym->spillA = 1;
 
   if (force_spill)
@@ -475,7 +475,7 @@ serialRegMark (eBBlock ** ebbs, int count)
             {
               symbol *sym = OP_SYMBOL (IC_RESULT (ic));
 
-              D (D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
+              D (D_ALLOC, ("serialRegMark: in loop on result %p\n", sym));
 
               if (sym->isspilt && sym->usl.spillLoc) // todo: Remove once remat is supported!
                 {
@@ -493,7 +493,7 @@ serialRegMark (eBBlock ** ebbs, int count)
               if (!sym->nRegs ||
                   sym->isspilt || sym->for_newralloc || sym->liveTo <= ic->seq)
                 {
-                  D (D_ALLOC, ("serialRegAssign: won't live long enough.\n"));
+                  D (D_ALLOC, ("serialRegMark: won't live long enough.\n"));
                   continue;
                 }
 

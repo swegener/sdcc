@@ -1266,7 +1266,7 @@ cl_uc390::print_regs (class cl_console_base *con)
       return;
     }
   start = sfr->get (PSW) & 0x18;
-  iram->dump (start, start + 7, 8, con);
+  iram->dump (start, start + 7, 8, con->get_fout());
   data = iram->get (iram->get (start));
   con->dd_printf ("@R0 %02x %c", data, isprint (data) ? data : '.');
   con->dd_printf ("  ACC= 0x%02x %3d %c  B= 0x%02x",
@@ -1301,13 +1301,13 @@ cl_uc390::print_regs (class cl_console_base *con)
       /* SA: 10 bit stack */
       start = (sfr->get (R51_ESP) & 3) * 256 + sfr->get (SP);
       con->dd_printf ("SP10 ", start);
-      ixram->dump (start, start - 7, 8, con);
+      ixram->dump (start, start - 7, 8, con->get_fout());
     }
   else
     {
       start = sfr->get (SP);
       con->dd_printf ("SP ", start);
-      iram->dump (start, start - 7, 8, con);
+      iram->dump (start, start - 7, 8, con->get_fout());
     }
 
   print_disass (PC, con);

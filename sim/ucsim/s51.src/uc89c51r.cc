@@ -165,7 +165,7 @@ cl_uc89c51r::print_regs(class cl_console_base *con)
   uchar data, acc, dps, h, l;
 
   start= psw->get() & 0x18;
-  iram->dump(start, start+7, 8, con);
+  iram->dump(start, start+7, 8, con->get_fout());
   data= iram->get(iram->get(start));
   con->dd_printf("@R0 %02x %c", data, isprint(data) ? data : '.');
 
@@ -198,7 +198,7 @@ cl_uc89c51r::print_regs(class cl_console_base *con)
   /* show stack pointer */
   start = sfr->get (SP);
   con->dd_printf ("SP ", start);
-  iram->dump (start, start - 7, 8, con);
+  iram->dump (start, start - 7, 8, con->get_fout());
 
   sfr->undecode_cell(DPL);
   sfr->undecode_cell(DPH);

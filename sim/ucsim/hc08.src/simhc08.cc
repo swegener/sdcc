@@ -64,6 +64,8 @@ cl_simhc08::mk_controller(void)
     case CPU_HC08:
     case CPU_HCS08:
       return(new cl_hc08(cpus_hc08[i].type, cpus_hc08[i].technology, this));
+    default:
+      return NULL;
     }
 
   return(NULL);

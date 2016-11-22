@@ -52,6 +52,7 @@ public:
   class cl_memory_cell *cell_p, *cell_in, *bit_cells[8];
 public:
   cl_port(class cl_uc *auc, int aid);
+  cl_port(class cl_uc *auc, int aid, t_addr the_addr);
   virtual int init(void);
   virtual int cfg_size(void) { return 2; }
 

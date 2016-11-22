@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc52cl.h"
 #include "regs51.h"
 #include "timer2cl.h"
+#include "portcl.h"
 
 
 /*
@@ -53,6 +54,11 @@ cl_uc52::mk_hw_elements(void)
   cl_51core::mk_hw_elements();
   add_hw(h= new cl_timer2(this, 2, "timer2", t2_default|t2_down));
   h->init();
+
+  if (technology & CPU_F380)
+    {
+      h= new cl_port(this, 4, 0xc7);
+    }
 }
 
 void

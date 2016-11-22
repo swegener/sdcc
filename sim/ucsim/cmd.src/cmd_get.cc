@@ -72,7 +72,7 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
 	con->dd_printf("Warning: Invalid address %s\n",
 		       (char*)cmdline->tokens->at(i+1));
       else
-	mem->dump(parm->value.address, parm->value.address, 1, con);
+	mem->dump(parm->value.address, parm->value.address, 1, con->get_fout());
     }
 
   return(false);;

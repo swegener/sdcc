@@ -417,7 +417,7 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
   i= read_line();
   if (i < 0)
     {
-      deb("colsing, bacause read_line on con=%d returned %d\n", id, i);
+      deb("closing, bacause read_line on con=%d returned %d\n", id, i);
       return 1;
     }
   if (i == 0)
@@ -485,7 +485,7 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
             }
         }
     }
-  //un_redirect();
+  un_redirect();
   if (!retval &&
       cmdstr &&
       do_print_prompt &&

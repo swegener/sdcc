@@ -59,6 +59,25 @@ enum cell_flag {
   CELL_NON_DECODED	= 0x40	/* Cell is not decoded (yet) */
 };
 
+enum dump_format {
+  // main formats
+  df_format	= 0x000f,
+  df_hex	= 0x0001,
+  df_string	= 0x0002,
+  df_ihex	= 0x0003,
+  df_binary	= 0x0004,
+  // modifiers
+  df_data_size	= 0x00f0,
+  df_1		= 0x0010,
+  df_2		= 0x0020,
+  df_4		= 0x0040,
+  df_8		= 0x0080,
+  // endianes
+  df_endian	= 0x0100,
+  df_little	= 0x0000,
+  df_big	= 0x0100,
+};
+
 #define CELL_GENERAL	(CELL_NORMAL|CELL_INST|CELL_FETCH_BRK)
 
 
@@ -99,9 +118,14 @@ public:
   virtual void err_inv_addr(t_addr addr);
   virtual void err_non_decoded(t_addr addr);
 
-  virtual t_addr dump(t_addr start, t_addr stop, int bpl,
-		      class cl_console_base *con);
-  virtual t_addr dump(class cl_console_base *con);
+  virtual t_addr dump(t_addr start, t_addr stop, int bpl, class cl_f *f);
+  virtual t_addr dump_s(t_addr start, t_addr stop, int bpl, class cl_f *f);
+  virtual t_addr dump_b(t_addr start, t_addr stop, int bpl, class cl_f *f);
+  virtual t_addr dump_i(t_addr start, t_addr stop, int bpl, class cl_f *f);
+  virtual t_addr dump(class cl_f *f);
+  virtual t_addr dump(enum dump_format fmt,
+		      t_addr start, t_addr stop, int bpl,
+		      class cl_f *f);
   virtual bool search_next(bool case_sensitive,
 			   t_mem *array, int len, t_addr *addr);
 

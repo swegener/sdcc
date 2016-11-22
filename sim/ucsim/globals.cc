@@ -405,7 +405,10 @@ struct cpu_entry cpus_51[]=
 
   {"DS390" , CPU_DS390, CPU_CMOS},
   {"DS390F", CPU_DS390F, CPU_CMOS},
-  {NULL, 0, 0}
+
+  {"F380"  , CPU_52, CPU_F380},
+  
+  {NULL, CPU_NONE, 0}
 };
 
 struct cpu_entry cpus_z80[]=
@@ -415,14 +418,14 @@ struct cpu_entry cpus_z80[]=
   {"R2K"    , CPU_R2K,     0},
   {"R3KA"   , CPU_R3KA,    0},
   {"LR35902", CPU_LR35902, 0},
-  {NULL, 0, 0}
+  {NULL, CPU_NONE, 0}
 };
 
 struct cpu_entry cpus_hc08[]=
 {
   {"HC08"   , CPU_HC08, 0},
   {"HCS08"  , CPU_HCS08,0},
-  {NULL, 0, 0}
+  {NULL, CPU_NONE, 0}
 };
 
 /* End of globals.cc */

@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <ctype.h>
+
 // prj
 #include "globals.h"
 #include "utils.h"
@@ -184,7 +186,8 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 				 cmdline->param(1),
 				 cmdline->param(2),
 				 cmdline->param(3) };
-
+  /*enum dump_format*/int fmt= df_hex;
+  
   if (params[0] &&
       params[0]->as_bit(uc))
     {
@@ -210,42 +213,86 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 	}
       if (params[0])
 	con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+      return false;
     }
-  else
+  if (params[0] &&
+      params[0]->as_string())
     {
-      if (!params[0] ||
-	  !params[0]->as_memory(uc))
+      char *s= params[0]->get_svalue();
+      if (s && *s &&
+	  (strlen(s) > 1) &&
+	  (s[0]=='/'))
 	{
-	  con->dd_printf("No memory specified. Use \"info memory\" for available memories\n");
-	  return(false);
+	  size_t i;
+	  for (i= 0; i < strlen(s); i++)
+	    s[i]= tolower(s[i]);
+	  switch (tolower(s[1]))
+	    {
+	    case 's': fmt= df_string; break;
+	    case 'h': fmt= df_hex; break;
+	    case 'i': fmt= df_ihex; bpl= 32; break;
+	    case 'b':
+	      if (con->get_fout() &&
+		  con->get_fout()->tty)
+		return con->dd_printf("Error: binary format not supported on tty\n"),
+		  false;
+	      fmt= df_binary;
+	      break;
+	    }
+	  if (strlen(s) > 2)
+	    for (i= 2; i < strlen(s); i++)
+	      {
+		switch (s[i])
+		  {
+		  case 'l': fmt|= df_little; break;
+		  case 'b': fmt|= df_big; break;
+		  case '1': fmt|= df_1; break;
+		  case '2': fmt|= df_2; break;
+		  case '4': fmt|= df_4; break;
+		  case '8': fmt|= df_8; break;
+		  }
+	      }
+	  cmdline->shift();
+	  params[0]= cmdline->param(0);
+	  params[1]= cmdline->param(1);
+	  params[2]= cmdline->param(2);
+	  params[3]= cmdline->param(3);
 	}
-      if (cmdline->syntax_match(uc, MEMORY))
-	{
-	  mem= params[0]->value.memory.memory;
-	  mem->dump(con);
-	}
-      else if (cmdline->syntax_match(uc, MEMORY ADDRESS)) {
-	mem  = params[0]->value.memory.memory;
-	start= params[1]->value.address;
-	end  = start+10*8-1;
-	mem->dump(start, end, bpl, con);
-      }
-      else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
-	mem  = params[0]->value.memory.memory;
-	start= params[1]->value.address;
-	end  = params[2]->value.address;
-	mem->dump(start, end, bpl, con);
-      }
-      else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS NUMBER)) {
-	mem  = params[0]->value.memory.memory;
-	start= params[1]->value.address;
-	end  = params[2]->value.address;
-	bpl  = params[3]->value.number;
-	mem->dump(start, end, bpl, con);
-      }
-      else
-	con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
     }
+  
+  enum dump_format df= (enum dump_format)fmt;
+  if (!params[0] ||
+      !params[0]->as_memory(uc))
+    {
+      con->dd_printf("No memory specified. Use \"info memory\" for available memories\n");
+      return(false);
+    }
+  if (cmdline->syntax_match(uc, MEMORY))
+    {
+      mem= params[0]->value.memory.memory;
+      mem->dump(df, -1, -1, bpl, con->get_fout());
+    }
+  else if (cmdline->syntax_match(uc, MEMORY ADDRESS)) {
+    mem  = params[0]->value.memory.memory;
+    start= params[1]->value.address;
+    end  = start+10*8-1;
+    mem->dump(df, start, end, bpl, con->get_fout());
+  }
+  else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
+    mem  = params[0]->value.memory.memory;
+    start= params[1]->value.address;
+    end  = params[2]->value.address;
+    mem->dump(df, start, end, bpl, con->get_fout());
+  }
+  else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS NUMBER)) {
+    mem  = params[0]->value.memory.memory;
+    start= params[1]->value.address;
+    end  = params[2]->value.address;
+    bpl  = params[3]->value.number;
+    mem->dump(df, start, end, bpl, con->get_fout());
+  }
+  else
+    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
 
   return(false);;
 }
@@ -511,7 +558,7 @@ cl_where_cmd::do_real_work(class cl_uc *uc,
     bool found= mem->search_next(case_sensitive, array, len, &addr);
     while (found)
       {
-	mem->dump(addr, addr+len-1, 8, con);
+	mem->dump(addr, addr+len-1, 8, con->get_fout());
 	addr++;
 	found= mem->search_next(case_sensitive, array, len, &addr);
       }

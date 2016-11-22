@@ -88,15 +88,9 @@ struct name_entry
   const char	*name;
 };
 
-
-struct cpu_entry
-{
-  const char *type_str;
-  int  type;
-  int  technology;
-};
-
 enum cpu_type {
+  CPU_NONE      = 0,
+  
   CPU_51	= 0x0001,
   CPU_31	= 0x0002,
   CPU_52	= 0x0004,
@@ -107,8 +101,10 @@ enum cpu_type {
   CPU_DS390	= 0x0080,
   CPU_DS390F	= 0x0100,
   CPU_C521	= 0x0200,
+
   CPU_ALL_51	= (CPU_51|CPU_31),
-  CPU_ALL_52	= (CPU_52|CPU_32|CPU_51R|CPU_89C51R|CPU_251|CPU_DS390|CPU_DS390F|
+  CPU_ALL_52	= (CPU_52|CPU_32|CPU_51R|CPU_89C51R|CPU_251|
+		   CPU_DS390|CPU_DS390F|
 		   CPU_C521),
 
   CPU_AVR	= 0x0001,
@@ -134,8 +130,20 @@ enum cpu_type {
   CPU_ST7       = 0x0001,
   CPU_ALL_ST7   = (CPU_ST7),
 
+  // technology
   CPU_CMOS	= 0x0001,
-  CPU_HMOS	= 0x0002
+  CPU_HMOS	= 0x0002,
+
+  // variant
+  CPU_F380      = 0x010000,
+};
+
+
+struct cpu_entry
+{
+  const char *type_str;
+  enum cpu_type  type;
+  int  technology;
 };
 
 /* Classes of memories, this is index on the list */

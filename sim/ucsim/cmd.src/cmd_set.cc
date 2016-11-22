@@ -81,7 +81,7 @@ COMMAND_DO_WORK_UC(cl_set_mem_cmd)
 	     i++, addr++)
 	  mem->write(addr, array[i]);
 	uc->check_errors();
-	mem->dump(start, start+len-1, 8, con);
+	mem->dump(start, start+len-1, 8, con->get_fout());
       }
   }
   else
@@ -117,7 +117,7 @@ COMMAND_DO_WORK_UC(cl_set_bit_cmd)
       mem->set_bit1(mem_addr, bit_mask);
     else
       mem->set_bit0(mem_addr, bit_mask);
-    mem->dump(mem_addr, mem_addr, 1, con);
+    mem->dump(mem_addr, mem_addr, 1, con->get_fout());
   }
   else
     con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");

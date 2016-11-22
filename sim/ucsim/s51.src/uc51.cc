@@ -132,7 +132,7 @@ cl_51core::id_string(void)
   for (i= 0; cpus_51[i].type_str != NULL && cpus_51[i].type != type; i++) ;
   sprintf(id_string_51, "%s %s",
 	  cpus_51[i].type_str?cpus_51[i].type_str:"51",
-	  (technology==CPU_HMOS)?"HMOS":"CMOS");
+	  (technology & CPU_HMOS)?"HMOS":"CMOS");
   return(id_string_51);
 }
 
@@ -505,7 +505,7 @@ cl_51core::print_regs(class cl_console_base *con)
   uchar data;
 
   start= psw->get() & 0x18;
-  iram->dump(start, start+7, 8, con);
+  iram->dump(start, start+7, 8, con->get_fout());
   data= iram->get(iram->get(start));
   con->dd_printf("@R0 %02x %c", data, isprint(data) ? data : '.');
 
@@ -525,7 +525,7 @@ cl_51core::print_regs(class cl_console_base *con)
   /* show stack pointer */
   start = sfr->get (SP);
   con->dd_printf ("SP ", start);
-  iram->dump (start, start - 7, 8, con);
+  iram->dump (start, start - 7, 8, con->get_fout());
 
   print_disass(PC, con);
 }
@@ -1071,7 +1071,7 @@ cl_51core::idle_pd(void)
 {
   uint pcon= sfr->get(PCON);
 
-  if (technology != CPU_CMOS)
+  if (!(technology & CPU_CMOS))
     return(resGO);
   if (pcon & bmIDL)
     {

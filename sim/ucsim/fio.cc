@@ -1061,7 +1061,7 @@ cl_f::write_str(const char *s)
 }
 
 int
-cl_f::vprintf(char *format, va_list ap)
+cl_f::vprintf(const char *format, va_list ap)
 {
   char *s= vformat_string(format, ap);
   int i= write_str(s);
@@ -1070,7 +1070,7 @@ cl_f::vprintf(char *format, va_list ap)
 }
 
 int
-cl_f::prntf(char *format, ...)
+cl_f::prntf(const char *format, ...)
 {
   va_list ap;
   int ret= 0;

@@ -75,6 +75,9 @@ cl_simz80::mk_controller(void)
       
     case CPU_LR35902:
       return(new cl_lr35902(cpus_z80[i].type, cpus_z80[i].technology, this));
+
+    default:
+      return NULL;
     }
 
   return(NULL);

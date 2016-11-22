@@ -43,6 +43,13 @@ cl_port::cl_port(class cl_uc *auc, int aid):
   port_pins= 0xff;
 }
 
+cl_port::cl_port(class cl_uc *auc, int aid, t_addr the_addr):
+  cl_hw(auc, HW_PORT, aid, "port")
+{
+  port_pins= 0xff;
+  addr_p= the_addr;
+}
+
 int
 cl_port::init(void)
 {
@@ -77,7 +84,7 @@ cl_port::init(void)
 	make_partner(HW_DUMMY, 0);
 	break;
       }
-    default: addr_p= P0; return(1);
+    default: break;//addr_p= P0; return(1);
     }
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
   bas= uc->address_space("bits");
@@ -86,11 +93,13 @@ cl_port::init(void)
       fprintf(stderr, "No SFR to register port into\n");
     }
   cell_p= register_cell(sfr, addr_p);
-  int i;
-  for (i= 0; i < 8; i++)
-    bit_cells[i]= register_cell(bas, addr_p+i);
+  if ((addr_p % 8) == 0)
+    {
+      int i;
+      for (i= 0; i < 8; i++)
+	bit_cells[i]= register_cell(bas, addr_p+i);
+    }
   prev= cell_p->get();
-
   cell_in= cfg->get_cell(port_pin);
   
   cl_var *v;

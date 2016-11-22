@@ -91,6 +91,9 @@ cl_sim51::mk_controller(void)
       return(new cl_uc251(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_DS390: case CPU_DS390F:
       return(new cl_uc390(cpus_51[i].type, cpus_51[i].technology, this));
+    default:
+      fprintf(stderr, "Unknow processor type\n");
+      exit(1);
     }
   return(NULL);
 }

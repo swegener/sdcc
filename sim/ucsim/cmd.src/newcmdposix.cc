@@ -199,9 +199,6 @@ cl_console::~cl_console(void)
       deb("deleting fin:%d of console %d\n", fin->file_id, id);
       delete fin;
     }
-  delete prompt_option;
-  delete null_prompt_option;
-  delete debug_option;
 }
 
 

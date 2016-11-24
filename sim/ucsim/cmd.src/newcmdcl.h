@@ -116,7 +116,8 @@ class cl_console_base: public cl_base
   
  public:
   cl_console_base(void);
-
+  virtual ~cl_console_base(void);
+  
   virtual class cl_console_base *clone_for_exec(char *fin) = 0;
 
   virtual void redirect(char *fname, char *mode) = 0;

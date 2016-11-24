@@ -123,6 +123,19 @@ cl_console_base::cl_console_base(void):
   prompt= 0;
   nl= 0;
   lbuf= 0;
+  prompt_option= 0;
+  null_prompt_option= 0;
+  debug_option= 0;
+}
+
+cl_console_base::~cl_console_base(void)
+{
+  if (prompt_option)
+    delete prompt_option;
+  if (null_prompt_option)
+    delete null_prompt_option;
+  if (debug_option)
+    delete debug_option;
 }
 
 int

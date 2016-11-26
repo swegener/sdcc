@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   mbtowc.c - convert a multibyte sequence to a wide character
+   wctomb.c - convert a wide character string to a multibyte string
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -28,42 +28,25 @@
 
 #include <stdlib.h>
 
-int mbtowc(wchar_t *pwc, const char *restrict s, size_t n)
+#include <limits.h>
+
+size_t wcstombs(char *restrict s, const wchar_t *restrict pwcs, size_t n)
 {
-	wchar_t codepoint;
-	unsigned char seqlen, i;
-	unsigned char first_byte;
+	size_t m = 0;
+	char buffer[MB_LEN_MAX];
 
-	if(!s)
-		return(0);
-
-	seqlen = 1;
-	first_byte = *s;
-
-	if(first_byte & 0x80)
+	while(n > MB_LEN_MAX || n >= wctomb(buffer, *pwcs))
 	{
-		while (first_byte & (0x80 >> seqlen))
-			seqlen++;
-		first_byte &= (0xff >> (seqlen + 1));
-	}
-
-	if(n < seqlen)
-		return(-1);
-
-	for(i = 1; i < seqlen; i++)
-		if((s[i] & 0xc0) != 0x80)
+		int b = wctomb(s, *pwcs);
+		if(!b)
+			break;
+		if(b == -1)
 			return(-1);
-
-	codepoint = first_byte;
-
-	for(s++, i = seqlen - 1; i; i--)
-	{
-		codepoint <<= 6;
-		codepoint |= (*s & 0x3f);
-		s++;
+		n -= b;
+		m += b;
+		pwcs++;
 	}
 
-	*pwc = codepoint;
-	return(seqlen);
+	return(m);
 }
 

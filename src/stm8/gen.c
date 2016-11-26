@@ -4499,15 +4499,21 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
             }
           else
             {
-              if (!x_dead && !aopInReg (left->aop, i, X_IDX))
+              if (!x_dead && !aopInReg (left->aop, i, X_IDX) && !aopInReg (left->aop, i, Y_IDX))
                 push (ASMOP_X, 0, 2);
 
               genMove_o (aopInReg (left->aop, i, Y_IDX) ? ASMOP_Y : ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i + 1 && right->aop->regs[A_IDX] <= i + 1, TRUE, FALSE);
+              if (right->aop->type == AOP_LIT &&
+                (!(aopInReg (left->aop, i, X_IDX) && !x_dead) || aopInReg (left->aop, i, Y_IDX) && regDead (Y_IDX, ic)) &&
+                (aopIsLitVal (right->aop, i, 2, 0x0001) || aopIsLitVal (right->aop, i, 2, 0xffff)))
+                emit3w (aopIsLitVal (right->aop, i, 2, 0x0001) ? A_DECW : A_INCW, aopInReg (left->aop, i, Y_IDX) ? ASMOP_Y : ASMOP_X, 0);
+              else
+                {
+                  emit2 ("cpw", aopInReg (left->aop, i, Y_IDX) ? "y, %s" : "x, %s", aopGet2 (right->aop, i));
+                  cost (3 + aopInReg (left->aop, i, Y_IDX), 2);
+                }
 
-              emit2 ("cpw", aopInReg (left->aop, i, Y_IDX) ? "y, %s" : "x, %s", aopGet2 (right->aop, i));
-              cost (3 + aopInReg (left->aop, i, Y_IDX), 2);
-
-              if (!x_dead && !aopInReg (left->aop, i, X_IDX))
+              if (!x_dead && !aopInReg (left->aop, i, X_IDX) && !aopInReg (left->aop, i, Y_IDX))
                 pop (ASMOP_X, 0, 2);
             }
 
@@ -4527,7 +4533,13 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
             }
 
           cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
-          emit3_o (A_CP, ASMOP_A, 0, right->aop, i);
+
+          if (right->aop->type == AOP_LIT &&
+            !(aopInReg (left->aop, i, A_IDX) && !regDead (A_IDX, ic)) &&
+            (aopIsLitVal (right->aop, i, 1, 0x01) || aopIsLitVal (right->aop, i, 1, 0xff)))
+            emit3 (aopIsLitVal (right->aop, i, 1, 0x01) ? A_DEC : A_INC, ASMOP_A, 0);
+          else
+            emit3_o (A_CP, ASMOP_A, 0, right->aop, i);
 
           i++;
         }

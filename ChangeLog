@@ -3,8 +3,11 @@
 	* device/include/stdlib.h,
 	  device/lib/incl.mk,
 	  device/lib/mbstowcs.c,
-	  device/lib/wcstombs.c:
+	  device/lib/wcstombs.c,
+	 .version:
 	  Multibyte/wide string conversion functions.
+	* src/stm8/gen.c:
+	  Optimize comparisons with (partial) 1 and -1.
 
 2016-11-17 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -38,10 +38,12 @@ size_t wcstombs(char *restrict s, const wchar_t *restrict pwcs, size_t n)
 	while(n > MB_LEN_MAX || n >= wctomb(buffer, *pwcs))
 	{
 		int b = wctomb(s, *pwcs);
-		if(!b)
+
+		if(b == 1 && !*s)
 			break;
 		if(b < 0)
 			return(-1);
+
 		n -= b;
 		m += b;
 		s += b;

@@ -64,6 +64,6 @@ int mbtowc(wchar_t *pwc, const char *restrict s, size_t n)
 	}
 
 	*pwc = codepoint;
-	return(seqlen);
+	return(codepoint ? seqlen : 0);
 }
 

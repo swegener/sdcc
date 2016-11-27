@@ -34,7 +34,6 @@ static void
 testwcharstringnorestart(void)
 {
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L && !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Not enough memory
-#if !defined(__SDCC_stm8) && !defined(__SDCC_z80)  && !defined(__SDCC_z180) && !defined(__SDCC_r2k) && !defined(__SDCC_r3ka) && !defined(__SDCC_gbz80) && !defined(__SDCC_tlcs90) // Bug
 	wchar_t wcs1[5] = L"Test";
 	wchar_t wcs2[5];
 	char mbs[5 * MB_LEN_MAX];
@@ -44,7 +43,6 @@ testwcharstringnorestart(void)
 	ASSERT (wcs1[3] == L't');
 	ASSERT (wcs2[3] == L't');
 	ASSERT(!wcscmp(wcs1, wcs2));
-#endif
 #endif
 }
 

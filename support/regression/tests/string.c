@@ -233,6 +233,7 @@ do_utf_32_c95 (void)
 
   ASSERT (str1[0] == 0xc4);
   ASSERT (str2[2] == 0xe4);
+  ASSERT (wcslen (str1) == 3);
   ASSERT (!memcmp (str1, str2, 4 * sizeof(wchar_t)));
   ASSERT (!memcmp (str1, str3, 4 * sizeof(wchar_t)));
   ASSERT (!memcmp (str1, str4, 4 * sizeof(wchar_t)));

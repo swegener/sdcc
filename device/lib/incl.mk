@@ -106,6 +106,7 @@ COMMON_SDCC = \
   mbrtoc32.c \
   c32rtomb.c \
   wcscmp.c \
+  wcslen.c \
   btowc.c \
   wctob.c \
   mbsinit.c \

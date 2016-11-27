@@ -8,6 +8,8 @@
 	  device/lib/wcscmp.c,
 	  device/lib/wcstombs.c,
 	  device/lib/wctob.c,
+	  device/lib/wcslen.c,
+	  support/regression/tests/string.c,
 	  support/regression/tests/wchar.c:
 	  Improvements and fixes in wide character library support.
 

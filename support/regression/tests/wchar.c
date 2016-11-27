@@ -38,10 +38,11 @@ testwcharstringnorestart(void)
 	wchar_t wcs2[5];
 	char mbs[5 * MB_LEN_MAX];
 
+	ASSERT(wcslen (wcs1) == 4);
 	ASSERT(wcstombs(mbs, wcs1, 5) > 0);
 	ASSERT(mbstowcs(wcs2, mbs, 5 * MB_LEN_MAX) > 0);
-	ASSERT (wcs1[3] == L't');
-	ASSERT (wcs2[3] == L't');
+	ASSERT(wcs1[3] == L't');
+	ASSERT(wcs2[3] == L't');
 	ASSERT(!wcscmp(wcs1, wcs2));
 #endif
 }

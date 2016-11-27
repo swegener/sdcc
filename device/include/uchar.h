@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   uchar.h: Unicode utilities
+   uchar.h: Unicode utilities  (ISO C 11 7.28)
 
    Copyright (C) 2015-2016, Philipp Klaus Krause, pkk@spth.de
 

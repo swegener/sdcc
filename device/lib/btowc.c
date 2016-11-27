@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   mbstowcs.c - convert a multibyte string to a wide character string
+   btowc.c - convert a single-byte character to a wide character
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -26,24 +26,16 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include <stdlib.h>
+#include <wchar.h>
 
-#include <limits.h>
+#include <stdio.h>
 
-size_t mbstowcs(wchar_t *restrict pwcs, const char *restrict s, size_t n)
+_Static_assert(EOF & 0x80, "Invalid EOF");
+
+wint_t btowc(int c)
 {
-	size_t m = 0;
-	while(n--)
-	{
-		int b = mbtowc(pwcs++, s, MB_LEN_MAX);
-		if(!b)
-			break;
-		if(b < 0)
-			return(-1);
-		s += b;
-		m++;
-	}
-
-	return(m);
+	if(c & 0x80)
+		return WEOF;
+	return c;
 }
 

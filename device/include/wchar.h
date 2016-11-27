@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   wchar.h - Extended and multibyte wide character utilitites
+   wchar.h - Extended and multibyte wide character utilitites (ISO C 11 7.29)
 
    Copyright (c) 2015-2016, Philipp Klaus Krause / pkk@spth.de
 
@@ -52,7 +52,17 @@ struct tm;
   #define WEOF 0xfffffffful
 #endif
 
+/* C99 Wide string comparison functions (ISO C11 7.29.4.4) */
+int wcscmp(const wchar_t *s1, const wchar_t *s2);
+
+/* C99 Single-byte/wide character conversion functions (ISO C 11 7.29.6.1) */
+wint_t btowc(int c);
+int wctob(wint_t c);
+
+/* C99 Conversion state functions (ISO C 11 7.29.6.2) */
 int mbsinit(const mbstate_t *ps);
+
+/* C99 Restartable multibyte/wide character conversion functions (ISO C 11 7.29.6.3) */
 size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps);
 size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps);
 size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps);

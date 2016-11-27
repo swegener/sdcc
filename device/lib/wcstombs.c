@@ -40,10 +40,11 @@ size_t wcstombs(char *restrict s, const wchar_t *restrict pwcs, size_t n)
 		int b = wctomb(s, *pwcs);
 		if(!b)
 			break;
-		if(b == -1)
+		if(b < 0)
 			return(-1);
 		n -= b;
 		m += b;
+		s += b;
 		pwcs++;
 	}
 

@@ -32,6 +32,6 @@ size_t mbrlen(const char *restrict s, size_t n, mbstate_t *restrict ps)
 {
 	static mbstate_t sps;
 
-	mbrtowc(0, s, n, ps ? ps : sps);
+	mbrtowc(0, s, n, ps ? ps : &sps);
 }
 

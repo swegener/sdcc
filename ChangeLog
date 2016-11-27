@@ -1,3 +1,16 @@
+2016-11-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/wchar.h,
+	  device/lib/btowc.c,
+	  device/lib/incl.mk,
+	  device/lib/mbrlen.c,
+	  device/lib/mbstowcs.c,
+	  device/lib/wcscmp.c,
+	  device/lib/wcstombs.c,
+	  device/lib/wctob.c,
+	  support/regression/tests/wchar.c:
+	  Improvements and fixes in wide character library support.
+
 2016-11-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdlib.h,

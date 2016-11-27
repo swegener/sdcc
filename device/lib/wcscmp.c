@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   mbstowcs.c - convert a multibyte string to a wide character string
+   wcscmp.c - compare strings
 
    Copyright (C) 2016, Philipp Klaus Krause, pkk@spth.de
 
@@ -26,24 +26,17 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#include <stdlib.h>
+#include <wchar.h>
 
-#include <limits.h>
-
-size_t mbstowcs(wchar_t *restrict pwcs, const char *restrict s, size_t n)
+int wcscmp(const wchar_t *s1, const wchar_t *s2)
 {
-	size_t m = 0;
-	while(n--)
-	{
-		int b = mbtowc(pwcs++, s, MB_LEN_MAX);
-		if(!b)
-			break;
-		if(b < 0)
-			return(-1);
-		s += b;
-		m++;
-	}
+	while(*s1 == *s2 && *s1)
+		s1++, s2++;
 
-	return(m);
+	if(*s1 < *s2)
+		return(-1);
+	if(*s1 > *s2)
+		return(1);
+	return(0);
 }
 

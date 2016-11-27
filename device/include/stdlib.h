@@ -1,7 +1,8 @@
 /*-------------------------------------------------------------------------
-   stdlib.h - ANSI functions forward declarations
+   stdlib.h - General utilities (ISO C 11 7.22)
 
-   Copyright (C)1998, Sandeep Dutta . sandeep.dutta@usa.net
+   Copyright (C) 1998, Sandeep Dutta . sandeep.dutta@usa.net
+   Copyright (c) 2016, Philipp Klaus Krause, pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -90,14 +91,14 @@ int abs(int j);
 #endif
 long int labs(long int j);
 
-/* C99 Multibyte/wide character conversion functions (ISO C 11 7.22.7)*/
+/* C99 Multibyte/wide character conversion functions (ISO C 11 7.22.7) */
 #if __STDC_VERSION__ >= 199901L
 int mblen(const char *s, size_t n);
 int mbtowc(wchar_t *restrict pwc, const char *restrict s, size_t n);
 int wctomb(char *s, wchar_t wc);
 #endif
 
-/* C99 Multibyte/wide string conversion functions (ISO C 11 7.22.8)*/
+/* C99 Multibyte/wide string conversion functions (ISO C 11 7.22.8) */
 #if __STDC_VERSION__ >= 199901L
 size_t mbstowcs(wchar_t *restrict pwcs, const char *restrict s, size_t n);
 size_t wcstombs(char *restrict s, const wchar_t *restrict pwcs, size_t n);

@@ -165,6 +165,7 @@ t_mem cl_r2k::fetch(void) {
   
   code= rom->read(phys_addr);
   PC = (PC + 1) & 0xffffUL;
+  vc.fetch++;
   return(code);
 }
 
@@ -195,10 +196,10 @@ cl_r2k::inst_r2k_ld(t_mem code)
    *   FD F4 = ld (iy+d),hl
    */
   switch(code) {
-  case 0xC4:  regs.HL = get2( add_u16_disp(regs.SP, fetch()) ); break;
-  case 0xD4:  store2( add_u16_disp(regs.SP, fetch()), regs.HL ); break;
-  case 0xE4:  regs.HL = get2( add_u16_disp(regs.IX, fetch()) ); break;
-  case 0xF4:  store2( add_u16_disp(regs.IX, fetch()), regs.HL ); break;
+  case 0xC4:  regs.HL = get2( add_u16_disp(regs.SP, fetch()) ); vc.rd+= 2; break;
+  case 0xD4:  store2( add_u16_disp(regs.SP, fetch()), regs.HL ); vc.wr+= 2; break;
+  case 0xE4:  regs.HL = get2( add_u16_disp(regs.IX, fetch()) ); vc.rd+= 2; break;
+  case 0xF4:  store2( add_u16_disp(regs.IX, fetch()), regs.HL ); vc.wr+= 2; break;
   default:
     return(resINV_INST);
   }
@@ -237,6 +238,7 @@ int cl_r2k::inst_lcall(t_mem code) {
   
   push1(mmu.xpc);
   push2(PC+2);
+  vc.wr+= 2;
   
   mn = fetch2();  /* don't clobber PC before the fetch for xmem page */
   mmu.xpc = fetch1();
@@ -351,6 +353,7 @@ cl_r2k::inst_rst(t_mem code)
     case 0xC7: // RST 0
       push2(PC+2);
       PC = 0x0;
+      vc.wr+= 2;
     break;
     case 0xCF: // RST 8
       return(resINV_INST);
@@ -358,14 +361,17 @@ cl_r2k::inst_rst(t_mem code)
     case 0xD7: // RST 10H
       push2(PC+2);
       PC = 0x10;
+      vc.wr+= 2;
     break;
     case 0xDF: // RST 18H
       push2(PC+2);
       PC = 0x18;
+      vc.wr+= 2;
     break;
     case 0xE7: // RST 20H
       push2(PC+2);
       PC = 0x20;
+      vc.wr+= 2;
     break;
     case 0xEF: // RST 28H
       //PC = 0x28;
@@ -388,6 +394,7 @@ cl_r2k::inst_rst(t_mem code)
     case 0xFF: // RST 38H
       push2(PC+2);
       PC = 0x38;
+      vc.wr+= 2;
     break;
     default:
       return(resINV_INST);
@@ -481,6 +488,7 @@ int cl_r2k::inst_xd(t_mem prefix)
     
   case 0xC4: // LD IX,(SP+n)
     *regs_IX_OR_IY = get2( add_u16_disp(regs.SP, fetch()) );
+    vc.rd+= 2;
     return(resGO);
     
   case 0xCB: // escape, IX prefix to CB commands
@@ -505,11 +513,13 @@ int cl_r2k::inst_xd(t_mem prefix)
     
   case 0xD4: // LD (SP+n),IX|IY
     store2( add_u16_disp(regs.SP, fetch()), *regs_IX_OR_IY );
+    vc.wr+= 2;
     return(resGO);
     
   case 0xE1: // POP IX
     *regs_IX_OR_IY = get2(regs.SP);
     regs.SP+=2;
+    vc.rd+= 2;
     return(resGO);
     
   case 0xE3: // EX (SP),IX
@@ -519,6 +529,8 @@ int cl_r2k::inst_xd(t_mem prefix)
     tempw = *regs_IX_OR_IY;
     *regs_IX_OR_IY = get2(regs.SP);
     store2(regs.SP, tempw);
+    vc.rd+= 2;
+    vc.wr+= 2;
   }
   return(resGO);
   
@@ -527,10 +539,12 @@ int cl_r2k::inst_xd(t_mem prefix)
       regs.HL = get2( add_u16_disp(regs.HL, fetch()) );
     else
       regs.HL = get2( add_u16_disp(regs.IY, fetch()) );
+    vc.rd+= 2;
     return(resGO);
     
   case 0xE5: // PUSH IX
     push2(*regs_IX_OR_IY);
+    vc.wr+= 2;
     return(resGO);
     
   case 0xE9: // JP (IX)
@@ -540,6 +554,7 @@ int cl_r2k::inst_xd(t_mem prefix)
   case 0xEA:
     push2(PC);
     PC = *regs_IX_OR_IY;
+    vc.wr+= 2;
     return(resGO);
     
   case 0xDC: // AND IX|IY,DE  for rabbit processors
@@ -564,6 +579,7 @@ int cl_r2k::inst_xd(t_mem prefix)
       store2( add_u16_disp(regs.HL, fetch()), regs.HL );
     else
       store2( add_u16_disp(regs.IY, fetch()), regs.HL );
+    vc.wr+= 2;
     return(resGO);
     
   case 0xFC: // RR IX|IY

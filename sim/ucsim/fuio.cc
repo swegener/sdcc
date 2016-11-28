@@ -210,7 +210,9 @@ cl_io::prepare_terminal()
       struct termios tattr;
       //deb("preparing TTY %d\n", file_id);
       tcgetattr(file_id, &tattr);
-      tattr.c_lflag&= ~(ICANON|ECHO);
+      tattr.c_iflag&= ~IXON;
+      tattr.c_lflag&= ~ICANON;
+      tattr.c_lflag&= ~ECHO;
       tattr.c_cc[VMIN] = 1;
       tattr.c_cc[VTIME]= 0;
       tcsetattr(file_id, TCSAFLUSH, &tattr);

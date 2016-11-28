@@ -52,6 +52,8 @@ int cl_lr35902::inst_cb(void) {
     {
       result = swap_nibbles(get1(regs.HL));
       store1(regs.HL, result);
+      vc.rd++;
+      vc.wr++;
     }
     break;
     
@@ -66,6 +68,7 @@ int cl_lr35902::inst_st_sp_abs(t_mem code) {
   if (code == 0x08) {
     u16_t addr = fetch2( );
     store2( addr, regs.SP );
+    vc.wr+= 2;
     return(resGO);
   }
   
@@ -81,10 +84,12 @@ int cl_lr35902::inst_ldi   (t_mem code) {
   if (code == 0x22) {
     store1( regs.HL, regs.A );
     regs.HL ++;
+    vc.wr++;
     return resGO;
   } else if (code == 0x2A) {
     regs.A = get1( regs.HL );
     regs.HL ++;
+    vc.rd++;
     return resGO;
   }
   
@@ -95,10 +100,12 @@ int cl_lr35902::inst_ldd   (t_mem code) {
   if (code == 0x32) {
     store1( regs.HL, regs.A );
     regs.HL --;
+    vc.wr++;
     return resGO;
   } else if (code == 0x3A) {
     regs.A = get1( regs.HL );
     regs.HL --;
+    vc.rd++;
     return resGO;
   }
   
@@ -110,9 +117,11 @@ int cl_lr35902::inst_ldh   (t_mem code) {
   
   if (code == 0xE0) {
     store1( addr, regs.A );
+    vc.wr++;
     return resGO;
   } else if (code == 0xF0) {
     regs.A = get1( addr );
+    vc.rd++;
     return resGO;
   }
   
@@ -126,6 +135,7 @@ int cl_lr35902::inst_reti  (t_mem code) {
   /* pop2(PC); */
   PC=get2(regs.SP);
   regs.SP+=2;
+  vc.rd+= 2;
   
   return resGO;
 }
@@ -150,9 +160,11 @@ int cl_lr35902::inst_ld16  (t_mem code) {
   u16_t addr = fetch2( );
   if (code == 0xEA) {
     store1( addr, regs.A );
+    vc.wr++;
     return resGO;
   } else if (code == 0xFA) {
     regs.A = get1( addr );
+    vc.rd++;
     return resGO;
   }
   

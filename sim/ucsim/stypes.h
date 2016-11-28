@@ -283,8 +283,9 @@ enum simif_cfg {
   simif_isr_ticks	= 8,  // R
   simif_idle_ticks	= 9,  // R
   simif_real_time	= 10, // R
-
-  simif_nuof		= 11
+  simif_vclk		= 11, // R
+  
+  simif_nuof		= 12
 };
 
 #endif

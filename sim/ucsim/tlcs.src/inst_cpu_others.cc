@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_cpu_others.cc 500 2016-11-12 15:15:43Z drdani $ */
+/* $Id: inst_cpu_others.cc 517 2016-11-22 19:12:14Z drdani $ */
 
 #include "tlcscl.h"
 
@@ -150,6 +150,7 @@ int
 cl_tlcs::inst_mul_hl(class cl_memory_cell *cell)
 {
   reg.hl= reg.rhl.l * cell->read();
+  vc.rd++;
   return resGO;
 }
 
@@ -159,6 +160,7 @@ int
 cl_tlcs::inst_div_hl(class cl_memory_cell *cell)
 {
   u8_t m= cell->read();
+  vc.rd++;
   return inst_div_hl(m);
 }
 

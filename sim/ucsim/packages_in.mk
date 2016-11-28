@@ -17,10 +17,12 @@ enable_st7_port     = @enable_st7_port@
 
 ifeq ($(enable_mcs51_port),yes)
 S51		= s51.src
-else ifeq ($(enable_ds390_port),yes)
+else
+ifeq ($(enable_ds390_port),yes)
 S390		= s51.src
 else
 S51		=
+endif
 endif
 
 ifeq ($(enable_avr_port),yes)
@@ -31,16 +33,24 @@ endif
 
 ifeq ($(enable_z80_port),yes)
 SZ80		= z80.src
-else ifeq ($(enable_z180_port),yes)
+else
+ifeq ($(enable_z180_port),yes)
 SZ180		= z80.src
-else ifeq ($(enable_gbz80_port),yes)
+else
+ifeq ($(enable_gbz80_port),yes)
 SGBZ80		= z80.src
-else ifeq ($(enable_r2k_port),yes)
+else
+ifeq ($(enable_r2k_port),yes)
 SR2K		= z80.src
-else ifeq ($(enable_r3ka_port),yes)
+else
+ifeq ($(enable_r3ka_port),yes)
 SR3KA		= z80.src
 else
 SZ80		=
+endif
+endif
+endif
+endif
 endif
 
 ifeq ($(enable_tlcs_port),yes)
@@ -51,10 +61,12 @@ endif
 
 ifeq ($(enable_hc08_port),yes)
 SHC08		= hc08.src
-else ifeq ($(enable_s08_port),yes)
+else
+ifeq ($(enable_s08_port),yes)
 SS08		= hc08.src
 else
 SHC08		=
+endif
 endif
 
 ifeq ($(enable_xa_port),yes)

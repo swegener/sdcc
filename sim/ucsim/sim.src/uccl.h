@@ -73,6 +73,13 @@ public:
   virtual void option_changed(void);
 };
 
+struct vcounter_t {
+  t_mem inst;
+  t_mem fetch;
+  t_mem rd;
+  t_mem wr;
+};
+
 /* Abstract microcontroller */
 
 class cl_uc: public cl_base
@@ -92,7 +99,8 @@ public:
   class cl_list *counters;	// User definable timers (tickers)
   int inst_ticks;		// ticks of an instruction
   double xtal;			// Clock speed
-
+  struct vcounter_t vc;		// Virtual clk counter
+  
   int brk_counter;		// Number of breakpoints
   class brk_coll *fbrk;		// Collection of FETCH break-points
   class brk_coll *ebrk;		// Collection of EVENT breakpoints

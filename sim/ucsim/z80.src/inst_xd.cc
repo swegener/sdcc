@@ -44,6 +44,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     case 0x22: // LD (nnnn),IX
       tw = fetch2();
       store2(tw, regs_IX_OR_IY);
+      vc.wr+= 2;
     return(resGO);
     case 0x26: // LD HX,nn
       regs_iX_h = fetch1();
@@ -51,6 +52,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     case 0x2A: // LD IX,(nnnn)
       tw = fetch2();
       regs_IX_OR_IY = get2(tw);
+      vc.rd+= 2;
     return(resGO);
     case 0x2E: // LD LX,nn
       regs_iX_l = fetch1();
@@ -58,6 +60,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     case 0x36: // LD (IX+dd),nn
       tw = add_u16_disp(regs_IX_OR_IY, fetch());
       store1(tw, fetch());
+      vc.wr++;
     return(resGO);
     case 0x44: // LD B,HX
       regs.bc.h = regs_iX_h;
@@ -67,6 +70,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     return(resGO);
     case 0x46: // LD B,(IX+dd)
       regs.bc.h = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
+      vc.rd++;
     return(resGO);
     case 0x4C: // LD C,HX
       regs.bc.l = regs_iX_h;
@@ -76,6 +80,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     return(resGO);
     case 0x4E: // LD C,(IX+dd)
       regs.bc.l = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
+      vc.rd++;
     return(resGO);
     case 0x54: // LD D,HX
       regs.de.h = regs_iX_h;
@@ -85,6 +90,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     return(resGO);
     case 0x56: // LD D,(IX+dd)
       regs.de.h = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
+      vc.rd++;
     return(resGO);
     case 0x5C: // LD E,H
       regs.de.l = regs.hl.h;
@@ -94,6 +100,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     return(resGO);
     case 0x5E: // LD E,(IX+dd)
       regs.de.l = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
+      vc.rd++;
     return(resGO);
     case 0x60: // LD HX,B
       regs_iX_h = regs.bc.h;
@@ -114,6 +121,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     return(resGO);
     case 0x66: // LD H,(IX+dd)
       regs.hl.h = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
+      vc.rd++;
     return(resGO);
     case 0x67: // LD HX,A
       regs_iX_h = regs.A;
@@ -137,30 +145,38 @@ cl_z80::inst_Xd_ld(t_mem code)
     return(resGO);
     case 0x6E: // LD L,(IX+dd)
       regs.hl.l = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
+      vc.rd++;
     return(resGO);
     case 0x6F: // LD LX,A
       regs_iX_l = regs.A;
     return(resGO);
     case 0x70: // LD (IX+dd),B
       store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.bc.h);
+      vc.wr++;
     return(resGO);
     case 0x71: // LD (IX+dd),C
       store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.bc.l);
+      vc.wr++;
     return(resGO);
     case 0x72: // LD (IX+dd),D
       store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.de.h);
+      vc.wr++;
     return(resGO);
     case 0x73: // LD (IX+dd),E
       store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.de.l);
+      vc.wr++;
     return(resGO);
     case 0x74: // LD (IX+dd),H
       store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.hl.h);
+      vc.wr++;
     return(resGO);
     case 0x75: // LD (IX+dd),L
       store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.hl.l);
+      vc.wr++;
     return(resGO);
     case 0x77: // LD (IX+dd),A
       store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.A);
+      vc.wr++;
     return(resGO);
     case 0x7C: // LD A,HX
       regs.A = regs_iX_h;
@@ -170,6 +186,7 @@ cl_z80::inst_Xd_ld(t_mem code)
     return(resGO);
     case 0x7E: // LD A,(IX+dd)
       regs.A = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
+      vc.rd++;
     return(resGO);
     case 0xF9: // LD SP,IX
       regs.SP = regs_IX_OR_IY;
@@ -206,6 +223,7 @@ cl_z80::inst_Xd_add(t_mem code)
         addr = add_u16_disp(regs_IX_OR_IY, fetch());
         ourtmp = get1(addr);
         add_A_bytereg(ourtmp);
+	vc.rd++;
       }
       return(resGO);
   }
@@ -218,6 +236,7 @@ cl_z80::inst_Xd_push(t_mem code)
   switch (code) {
     case 0xe5: // PUSH IX
       push2(regs_IX_OR_IY);
+      vc.wr+= 2;
     return(resGO);
   }
   return(resINV_INST);
@@ -244,6 +263,8 @@ cl_z80::inst_Xd_inc(t_mem code)
         tmp = get1(addr);
         inc(tmp);
         store1(addr, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     default:
@@ -274,6 +295,8 @@ cl_z80::inst_Xd_dec(t_mem code)
         tmp = get1(addr);
         dec(tmp);
         store1(addr, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     default:
@@ -301,6 +324,7 @@ cl_z80::inst_Xd_misc(t_mem code)
         addr = add_u16_disp(regs_IX_OR_IY, fetch());
         utmp = get1(addr);
         adc_A_bytereg(utmp);
+	vc.rd++;
       }
     return(resGO);
 
@@ -314,6 +338,7 @@ cl_z80::inst_Xd_misc(t_mem code)
       { unsigned char tmp1;
         tmp1 = get1(add_u16_disp(regs_IX_OR_IY, fetch()));
         sub_A_bytereg(tmp1);
+	vc.rd++;
       }
     return(resGO);
 
@@ -327,6 +352,7 @@ cl_z80::inst_Xd_misc(t_mem code)
       { unsigned char utmp;
         utmp = get1(add_u16_disp(regs_IX_OR_IY, fetch()));
         sbc_A_bytereg(utmp);
+	vc.rd++;
       }
     return(resGO);
 
@@ -340,6 +366,7 @@ cl_z80::inst_Xd_misc(t_mem code)
       { unsigned char utmp;
         utmp = get1(add_u16_disp(regs_IX_OR_IY, fetch()));
         and_A_bytereg(utmp);
+	vc.rd++;
       }
     return(resGO);
 
@@ -353,6 +380,7 @@ cl_z80::inst_Xd_misc(t_mem code)
       { unsigned char utmp;
         utmp = get1(add_u16_disp(regs_IX_OR_IY, fetch()));
         xor_A_bytereg(utmp);
+	vc.rd++;
       }
     return(resGO);
 
@@ -366,6 +394,7 @@ cl_z80::inst_Xd_misc(t_mem code)
       { unsigned char utmp;
         utmp = get1(add_u16_disp(regs_IX_OR_IY, fetch()));
         or_A_bytereg(utmp);
+	vc.rd++;
       }
     return(resGO);
 
@@ -379,6 +408,7 @@ cl_z80::inst_Xd_misc(t_mem code)
       { unsigned char utmp;
         utmp = get1(add_u16_disp(regs_IX_OR_IY, fetch()));
         cp_bytereg(utmp);
+	vc.rd++;
       }
     return(resGO);
   }
@@ -460,7 +490,7 @@ cl_z80::inst_Xd(void)
       case 0x2B: // DEC IX
       case 0x2D: // DEC LX
       case 0x35: // DEC (IX+dd)
-      return(inst_Xd_dec(code));
+	return(inst_Xd_dec(code));
 
       case 0x8C: // ADC A,HX
       case 0x8D: // ADC A,LX
@@ -493,6 +523,7 @@ cl_z80::inst_Xd(void)
       case 0xE1: // POP IX
         regs_IX_OR_IY = get2(regs.SP);
         regs.SP+=2;
+	vc.rd+= 2;
       return(resGO);
 
       case 0xE3: // EX (SP),IX
@@ -502,11 +533,14 @@ cl_z80::inst_Xd(void)
           tempw = regs_IX_OR_IY;
           regs_IX_OR_IY = get2(regs.SP);
           store2(regs.SP, tempw);
+	  vc.rd+= 2;
+	  vc.wr+= 2;
         }
       return(resGO);
 
       case 0xE5: // PUSH IX
         push2(regs_IX_OR_IY);
+	vc.wr+= 2;
       return(resGO);
 
       case 0xE9: // JP (IX)

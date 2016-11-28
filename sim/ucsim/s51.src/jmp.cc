@@ -81,10 +81,12 @@ cl_51core::inst_jbc_bit_addr(uchar code)
   //t_mem d= mem->read(a, HW_PORT);
   //mem->write(a, d & ~m);
   b= bits->get(bitaddr);
+  vc.rd++;
   if (/*d & m*/b)
     {
       bits->write(bitaddr, 0);
       PC= rom->validate_address(PC + (signed char)jaddr);
+      vc.wr++;
     }
   tick(1);
   return(resGO);
@@ -137,6 +139,7 @@ cl_51core::inst_acall_addr(uchar code)
   class cl_stack_op *so= new cl_stack_call(instPC, PC, pushed, sp_before, sp);
   so->init();
   stack_write(so);
+  vc.wr+= 2;
   return(resGO);
 }
 
@@ -183,6 +186,7 @@ cl_51core::inst_lcall(uchar code, uint addr, bool intr)
     so= new cl_stack_call(instPC, PC, pushed, sp_before, sp/*_after*/);
   so->init();
   stack_write(so);
+  vc.wr+= 2;
   return(resGO);
 }
 
@@ -209,6 +213,7 @@ cl_51core::inst_jb_bit_addr(uchar code)
   b= bits->read(bitaddr);
   if (/*mem->read(a) & m*/b)
     PC= rom->validate_address(PC + (signed char)jaddr);
+  vc.rd++;
   return(resGO);
 }
 
@@ -239,6 +244,7 @@ cl_51core::inst_ret(uchar code)
   class cl_stack_op *so= new cl_stack_ret(instPC, PC, sp_before, sp/*_after*/);
   so->init();
   stack_read(so);
+  vc.rd+= 2;
   return(resGO);
 }
 
@@ -265,6 +271,7 @@ cl_51core::inst_jnb_bit_addr(uchar code)
   b= bits->read(bitaddr);
   if (!/*(mem->read(a) & m)*/b)
     PC= rom->validate_address(PC + (signed char)jaddr);
+  vc.rd++;
   return(resGO);
 }
 
@@ -305,6 +312,7 @@ cl_51core::inst_reti(uchar code)
     new cl_stack_iret(instPC, PC, sp_before, sp_after);
   so->init();
   stack_read(so);
+  vc.rd+= 2;
   return(resGO);
 }
 
@@ -398,6 +406,7 @@ cl_51core::inst_jmp_Sa_dptr(uchar code)
   u16_t l= /*sfr*/dptr->read(/*DPL*/0);
   PC= rom->validate_address(h*256 + l + acc->read());
   tick(1);
+  vc.rd+= 2;
   return(resGO);
 }
 
@@ -436,6 +445,7 @@ cl_51core::inst_cjne_a_Sdata_addr(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, (ac= acc->read()) < data);
   if (ac != data)
     PC= rom->validate_address(PC + (signed char)jaddr);
+  vc.rd++;
   return(resGO);
 }
 
@@ -460,6 +470,7 @@ cl_51core::inst_cjne_a_addr_addr(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, acc->get() < data);
   if (acc->read() != data)
     PC= rom->validate_address(PC + (signed char)jaddr);
+  vc.rd++;//= 2;
   return(resGO);
 }
 
@@ -484,6 +495,7 @@ cl_51core::inst_cjne_Sri_Sdata_addr(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, (d= cell->read()) < data);
   if (d != data)
     PC= rom->validate_address(PC + (signed char)jaddr);
+  vc.rd++;//= 2;
   return(resGO);
 }
 
@@ -508,6 +520,7 @@ cl_51core::inst_cjne_rn_Sdata_addr(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, (r= reg->read()) < data);
   if (r != data)
     PC= rom->validate_address(PC + (signed char)jaddr);
+  //vc.rd++;
   return(resGO);
 }
 
@@ -531,6 +544,8 @@ cl_51core::inst_djnz_addr_addr(uchar code)
   d= cell->write(d-1);
   if (d)
     PC= rom->validate_address(PC + (signed char)jaddr);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -553,6 +568,8 @@ cl_51core::inst_djnz_rn_addr(uchar code)
   t_mem r= reg->wadd(-1);
   if (r)
     PC= rom->validate_address(PC + (signed char)jaddr);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 

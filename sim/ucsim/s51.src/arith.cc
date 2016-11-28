@@ -51,6 +51,8 @@ cl_51core::inst_rr(uchar code)
     acc->write((ac >> 1) | 0x80);
   else
     acc->write(ac >> 1);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -73,6 +75,8 @@ cl_51core::inst_rrc(uchar code)
   if (cy)
     ac|= 0x80;
   sfr->write(ACC, ac);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -93,6 +97,8 @@ cl_51core::inst_rl(uchar code)
     acc->write((ac << 1 ) | 0x01);
   else
     acc->write(ac << 1);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -118,6 +124,8 @@ cl_51core::inst_add_a_Sdata(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, newC);
   SFR_SET_BIT(newC ^ c6, PSW, bmOV);
   SFR_SET_BIT(newA, PSW, bmAC);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -146,6 +154,8 @@ cl_51core::inst_add_a_addr(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, newC);
   SFR_SET_BIT(newC ^ c6, PSW, bmOV);
   SFR_SET_BIT(newA, PSW, bmAC);
+  vc.rd++;//= 2;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -173,6 +183,8 @@ cl_51core::inst_add_a_Sri(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, newC);
   SFR_SET_BIT(newC ^ c6, PSW, bmOV);
   SFR_SET_BIT(newA, PSW, bmAC);
+  vc.rd++;//= 3;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -198,6 +210,8 @@ cl_51core::inst_add_a_rn(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, newC);
   SFR_SET_BIT(newC ^ c6, PSW, bmOV);
   SFR_SET_BIT(newA, PSW, bmAC);
+  //vc.rd+= 2;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -220,6 +234,8 @@ cl_51core::inst_rlc(uchar code)
   if (cy)
     ac|= 0x01;
   acc->write(ac);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -245,6 +261,8 @@ cl_51core::inst_addc_a_Sdata(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, newC);
   SFR_SET_BIT(newC ^ c6, PSW, bmOV);
   SFR_SET_BIT(newA, PSW, bmAC);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -273,6 +291,8 @@ cl_51core::inst_addc_a_addr(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, newC);
   SFR_SET_BIT(newC ^ c6, PSW, bmOV);
   SFR_SET_BIT(newA, PSW, bmAC);
+  vc.rd++;//= 2;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -300,6 +320,8 @@ cl_51core::inst_addc_a_Sri(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, newC);
   SFR_SET_BIT(newC ^ c6, PSW, bmOV);
   SFR_SET_BIT(newA, PSW, bmAC);
+  vc.rd++;//= 3;
+  //vc.rd++;
   return(resGO);
 }
 
@@ -325,6 +347,8 @@ cl_51core::inst_addc_a_rn(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, newC);
   SFR_SET_BIT(newC ^ c6, PSW, bmOV);
   SFR_SET_BIT(newA, PSW, bmAC);
+  //vc.rd+= 2;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -353,6 +377,8 @@ cl_51core::inst_div_ab(uchar code)
     }
   psw->write(pw);
   tick(3);
+  vc.rd++;//= 2;
+  vc.wr++;//= 2;
   return(resGO);
 }
 
@@ -381,6 +407,8 @@ cl_51core::inst_subb_a_Sdata(uchar code)
 	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
 	     (((ac&0x0f) < ((data+c)&0x0f) ||
 	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -411,6 +439,8 @@ cl_51core::inst_subb_a_addr(uchar code)
 	     (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
 	   (((ac&0x0f) < ((data+c)&0x0f) ||
 	     (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  vc.rd++;//= 2;
+  //vc.rd++;
   return(resGO);
 }
 
@@ -441,6 +471,8 @@ cl_51core::inst_subb_a_Sri(uchar code)
 	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
 	     (((ac&0x0f) < ((data+c)&0x0f) ||
 	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  vc.rd++;//= 3;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -469,6 +501,8 @@ cl_51core::inst_subb_a_rn(uchar code)
 	       (ac>0x7f && data<0x80 && result<0x80))?bmOV:0) |
 	     (((ac&0x0f) < ((data+c)&0x0f) ||
 	       (c && ((data&0x0f)==0x0f)))?bmAC:0));
+  //vc.rd+= 2;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -492,6 +526,8 @@ cl_51core::inst_mul_ab(uchar code)
   SFR_SET_BIT(x/*sfr->get(B)*/, PSW, bmOV);
   SFR_SET_BIT(0, PSW, bmCY);
   tick(3);
+  vc.rd++;//= 2;
+  vc.wr++;//= 2;
   return(resGO);
 }
 
@@ -525,6 +561,8 @@ cl_51core::inst_da_a(uchar code)
     }
   acc->write(ac);
   psw->write(pw);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 

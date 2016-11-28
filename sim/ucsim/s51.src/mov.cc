@@ -52,6 +52,7 @@ int
 cl_51core::inst_mov_a_Sdata(uchar code)
 {
   acc->write(fetch());
+  //vc.wr++;
   return(resGO);
 }
 
@@ -70,6 +71,7 @@ cl_51core::inst_mov_addr_Sdata(uchar code)
   cell= get_direct(fetch());
   cell->write(fetch());
   tick(1);
+  vc.wr++;
   return(resGO);
 }
 
@@ -88,6 +90,8 @@ cl_51core::inst_mov_Sri_Sdata(uchar code)
   cell= iram->get_cell(R[code & 0x01]->read());
   t_mem d= fetch();
   cell->write(d);
+  //vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -105,6 +109,7 @@ cl_51core::inst_mov_rn_Sdata(uchar code)
 
   reg= R[code & 0x07];
   reg->write(fetch());
+  //vc.wr++;
   return(resGO);
 }
 
@@ -120,6 +125,8 @@ cl_51core::inst_movc_a_Sa_pc(uchar code)
 {
   acc->write(rom->read(PC + acc->read()));
   tick(1);
+  vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -140,6 +147,8 @@ cl_51core::inst_mov_addr_addr(uchar code)
   d= get_direct(fetch());
   d->write(s->read());
   tick(1);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -159,6 +168,8 @@ cl_51core::inst_mov_addr_Sri(uchar code)
   s= iram->get_cell(R[code & 0x01]->read());
   d->write(s->read());
   tick(1);
+  vc.rd++;//= 2;
+  vc.wr++;
   return(resGO);
 }
 
@@ -177,6 +188,8 @@ cl_51core::inst_mov_addr_rn(uchar code)
   cell= get_direct(fetch());
   cell->write(R[code & 0x07]->read());
   tick(1);
+  //vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -193,6 +206,7 @@ cl_51core::inst_mov_dptr_Sdata(uchar code)
   /*sfr*/dptr->write(/*DPH*/1, fetch());
   /*sfr*/dptr->write(/*DPL*/0, fetch());
   tick(1);
+  vc.wr+= 2;
   return(resGO);
 }
 
@@ -210,6 +224,8 @@ cl_51core::inst_movc_a_Sa_dptr(uchar code)
   u16_t l= /*sfr*/dptr->read(/*DPL*/0);
   acc->write(rom->read(h*256 + l +  acc->read()));
   tick(1);
+  vc.rd+= 3;//4;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -229,6 +245,8 @@ cl_51core::inst_mov_Sri_addr(uchar code)
   s= get_direct(fetch());
   d->write(s->read());
   tick(1);
+  vc.rd++;//= 2;
+  vc.wr++;
   return(resGO);
 }
 
@@ -248,6 +266,8 @@ cl_51core::inst_mov_rn_addr(uchar code)
   cell= get_direct(fetch());
   reg->write(cell->read());
   tick(1);
+  vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -275,6 +295,8 @@ cl_51core::inst_push(uchar code)
   so->init();
   stack_write(so);
   tick(1);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -295,6 +317,8 @@ cl_51core::inst_xch_a_addr(uchar code)
   temp= acc->read();
   acc->write(cell->read());
   cell->write(temp);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -315,6 +339,8 @@ cl_51core::inst_xch_a_Sri(uchar code)
   temp= acc->read();
   acc->write(cell->read());
   cell->write(temp);
+  vc.rd++;//= 3;
+  vc.wr++;//= 2;
   return(resGO);
 }
 
@@ -335,6 +361,8 @@ cl_51core::inst_xch_a_rn(uchar code)
   temp= acc->read();
   acc->write(reg->read());
   reg->write(temp);
+  //vc.rd+= 2;
+  //vc.wr+= 2;
   return(resGO);
 }
 
@@ -364,6 +392,8 @@ cl_51core::inst_pop(uchar code)
     new cl_stack_pop(instPC, data, sp_before, sp/*_after*/);
   so->init();
   stack_read(so);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -384,6 +414,8 @@ cl_51core::inst_xchd_a_Sri(uchar code)
   temp= (d= cell->read()) & 0x0f;
   cell->write((d & 0xf0) | (acc->read() & 0x0f));
   acc->write((acc->get() & 0xf0) | temp);
+  vc.rd++;//= 3;
+  vc.wr++;//= 2;
   return(resGO);
 }
 
@@ -401,6 +433,8 @@ cl_51core::inst_movx_a_Sdptr(uchar code)
   u16_t l= /*sfr*/dptr->read(/*DPL*/0);
   acc->write(xram->read(h*256 + l));
   tick(1);
+  vc.rd+= 3;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -419,6 +453,8 @@ cl_51core::inst_movx_a_Sri(uchar code)
   d= R[code & 0x01]->read();
   acc->write(xram->read(sfr->read(P2)*256 + d));
   tick(1);
+  vc.rd++;//= 2;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -446,7 +482,10 @@ cl_51core::inst_mov_a_addr(uchar code)
     {
       cell= get_direct(address);
       acc->write(cell->read());
+      vc.rd++;
+      //vc.wr++;
     }
+  
   return(resGO);
 }
 
@@ -464,6 +503,8 @@ cl_51core::inst_mov_a_Sri(uchar code)
 
   cell= iram->get_cell(R[code & 0x01]->read());
   acc->write(cell->read());
+  vc.rd++;//= 2;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -478,6 +519,8 @@ int
 cl_51core::inst_mov_a_rn(uchar code)
 {
   acc->write(R[code & 0x07]->read());
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -495,6 +538,8 @@ cl_51core::inst_movx_Sdptr_a(uchar code)
   u16_t l= /*sfr*/dptr->read(/*DPL*/0);  
   xram->write(h*256 + l, acc->read());
   tick(1);
+  vc.rd+= 2;//3;
+  vc.wr++;
   return(resGO);
 }
 
@@ -516,6 +561,8 @@ cl_51core::inst_movx_Sri_a(uchar code)
   v= acc->read();
   xram->write(a, v);
   tick(1);
+  vc.rd++;//= 2;
+  vc.wr++;
   return(resGO);
 }
 
@@ -533,6 +580,8 @@ cl_51core::inst_mov_addr_a(uchar code)
   
   cell= get_direct(fetch());
   cell->write(acc->read());
+  //vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -550,6 +599,8 @@ cl_51core::inst_mov_Sri_a(uchar code)
 
   cell= iram->get_cell(R[code & 0x01]->read());
   cell->write(acc->read());
+  //vc.rd+= 2;
+  vc.wr++;
   return(resGO);
 }
 
@@ -567,6 +618,8 @@ cl_51core::inst_mov_rn_a(uchar code)
 
   reg= R[code & 0x07];
   reg->write(acc->read());
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 

@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst.cc 496 2016-11-11 12:48:27Z drdani $ */
+/* $Id: inst.cc 519 2016-11-23 14:21:44Z drdani $ */
 
 #include "ddconfig.h"
 #include "stdio.h"
@@ -270,15 +270,24 @@ cl_stm8::inst_add(t_mem code, unsigned char prefix)
 }
 
 int
+cl_stm8::get_1(unsigned int addr)
+{
+  vc.rd++;
+  return ram->read((t_addr) (addr));
+}
+
+int
 cl_stm8::get2(unsigned int addr)
 {
-    return((ram->read((t_addr) (addr)) << 8) | ram->read((t_addr) (addr+1)));
+  vc.rd+= 2;
+  return((ram->read((t_addr) (addr)) << 8) | ram->read((t_addr) (addr+1)));
 }
 
 int
 cl_stm8::get3(unsigned int addr)
 {
-    return((ram->read((t_addr) (addr)) << 16) | (ram->read((t_addr) (addr+1)) << 8) |ram->read((t_addr) (addr+2)));
+  vc.rd+= 3;
+  return((ram->read((t_addr) (addr)) << 16) | (ram->read((t_addr) (addr+1)) << 8) |ram->read((t_addr) (addr+2)));
 }
 
 int
@@ -347,7 +356,8 @@ int
 cl_stm8::inst_bccmbcpl(t_mem code, unsigned char prefix)
 {
    int ea = fetch2();
-   unsigned char dbyte = get1( ea);
+   unsigned char dbyte;
+   dbyte= get1( ea);
 
    if (code & 0x01)  { // bccm
       char pos = (code - 0x11) >> 1;
@@ -380,7 +390,8 @@ int
 cl_stm8::inst_bresbset(t_mem code, unsigned char prefix)
 {
   int ea = fetch2();
-  unsigned char dbyte = get1( ea);
+  unsigned char dbyte;
+  dbyte= get1( ea);
 
   if (code & 0x01) { // bres
 	char pos = (code - 0x11) >> 1;
@@ -397,7 +408,8 @@ int
 cl_stm8::inst_btjfbtjt(t_mem code, unsigned char prefix)
 {
   int ea = fetch2();
-  unsigned char dbyte = get1( ea);
+  unsigned char dbyte;
+  dbyte= get1( ea);
   char reljump = fetch();
   char pos;
 

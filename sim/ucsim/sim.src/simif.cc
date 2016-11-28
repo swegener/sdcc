@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simif.cc 504 2016-11-13 20:18:32Z drdani $ */
+/* $Id: simif.cc 518 2016-11-23 07:26:09Z drdani $ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -593,6 +593,8 @@ cl_simulator_interface::init(void)
   v->init();
   uc->vars->add(v= new cl_var(cchars("sim_real_time"), cfg, simif_real_time));
   v->init();
+  uc->vars->add(v= new cl_var(cchars("sim_vclk"), cfg, simif_vclk));
+  v->init();
   
   return(0);
 }
@@ -803,6 +805,11 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       if (val)
 	*val= cell->get();
       cell->set(uc->get_rtime() * 1000);
+      break;
+    case simif_vclk: // virtual clock
+      if (val)
+	*val= cell->get();
+      cell->set(uc->vc.fetch + uc->vc.rd + uc->vc.wr);
       break;
     case simif_nuof:
       break;

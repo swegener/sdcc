@@ -157,6 +157,14 @@ cl_uc51r::make_memories(void)
   vars->add(v= new cl_var(cchars("R7"), regs, 7));
   v->init();
 
+  dptr= new cl_address_space("dptr", 0, 2, 8);
+  dptr->init();
+  ad= new cl_address_decoder(dptr, sfr_chip, 0, 1, DPL-0x80);
+  ad->init();
+  dptr->decoders->add(ad);
+  ad->activate(0);
+  address_spaces->add(dptr);
+
   bits= as= new cl_address_space("bits", 0, 0x100, 1);
   as->init();
   address_spaces->add(as);

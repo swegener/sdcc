@@ -90,6 +90,7 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x43: // LD (nnnn),BC
       tw = fetch2();
       store2(tw, regs.BC);
+      vc.wr+= 2;
       return(resGO);
     case 0x44: // NEG
       regs.F &= ~(BIT_ALL);  /* clear these */
@@ -103,6 +104,7 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
     case 0x45: // RETN (return from non-maskable interrupt)
       pop2(PC);
+      vc.rd+= 2;
       return(resGO);
 #if 0
     case 0x46: // IM 0
@@ -112,10 +114,12 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x47: // LD IV,A
       regs.iv = regs.A;
       return(resGO);
-
+      
     case 0x48: // IN C,(C)
+      vc.rd++;
       return(resGO);
     case 0x49: // OUT (C),C
+      vc.wr++;
       return(resGO);
 
     case 0x4A: // ADC HL,BC
@@ -124,6 +128,7 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x4B: // LD BC,(nnnn)
       tw = fetch2();
       regs.BC = get2(tw);
+      vc.rd+= 2;
       return(resGO);
     case 0x4C: // MLT BC
       if(type != CPU_Z180)
@@ -132,14 +137,17 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
     case 0x4D: // RETI (return from interrupt)
       pop2(PC);
+      vc.rd+= 2;
       return(resGO);
     case 0x4F: // LD R,A
       /* Load "refresh" register(whats that?) */
       return(resGO);
 
     case 0x50: // IN D,(C)
+      vc.rd++;
       return(resGO);
     case 0x51: // OUT (C),D
+      vc.wr++;
       return(resGO);
 
     case 0x52: // SBC HL,DE
@@ -148,6 +156,7 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x53: // LD (nnnn),DE
       tw = fetch2();
       store2(tw, regs.DE);
+      vc.wr+= 2;
       return(resGO);
 #if 0
     case 0x56: // IM 1
@@ -156,10 +165,12 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x57: // LD A,IV
       regs.A = regs.iv;
       return(resGO);
-
+      
     case 0x58: // IN E,(C)
+      vc.rd++;
       return(resGO);
     case 0x59: // OUT (C),E
+      vc.wr++;
       return(resGO);
 
     case 0x5A: // ADC HL,DE
@@ -168,6 +179,7 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x5B: // LD DE,(nnnn)
       tw = fetch2();
       regs.DE = get2(tw);
+      vc.rd+= 2;
       return(resGO);
     case 0x5C: // MLT DE
       if(type != CPU_Z180)
@@ -180,8 +192,10 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x5F: // LD A,R
       return(resGO);
     case 0x60: // IN H,(C)
+      vc.rd++;
       return(resGO);
     case 0x61: // OUT (C),H
+      vc.wr++;
       return(resGO);
 #endif
     case 0x62: // SBC HL,HL
@@ -190,6 +204,7 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x63: // LD (nnnn),HL opcode 22 does the same faster
       tw = fetch2();
       store2(tw, regs.HL);
+      vc.wr+= 2;
       return(resGO);
     case 0x64:
       if (type != CPU_Z180)
@@ -203,8 +218,10 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 #endif
     case 0x68: // IN L,(C)
+      vc.rd++;
       return(resGO);
     case 0x69: // OUT (C),L
+      vc.wr++;
       return(resGO);
 
     case 0x6A: // ADC HL,HL
@@ -213,6 +230,7 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x6B: // LD HL,(nnnn) opcode 2A does the same faster
       tw = fetch2();
       regs.HL = get2(tw);
+      vc.rd+= 2;
       return(resGO);
     case 0x6C: // MLT HL
       if(type != CPU_Z180)
@@ -226,8 +244,10 @@ int  cl_z80::inst_ed_(t_mem code)
 #endif
 
     case 0x70: // IN (C)  set flags only (TSTI)
+      vc.rd++;
       return(resGO);
     case 0x71: //  OUT (C),0
+      vc.wr++;
       return(resGO);
 
     case 0x72: // SBC HL,SP
@@ -236,11 +256,14 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x73: // LD (nnnn),SP
       tw = fetch2();
       store2(tw, regs.SP);
+      vc.wr+= 2;
       return(resGO);
 
     case 0x78: // IN A,(C)
+      vc.rd++;
       return(resGO);
     case 0x79: // OUT (C),A
+      vc.wr++;
       return(resGO);
 
     case 0x7A: // ADC HL,SP
@@ -249,6 +272,7 @@ int  cl_z80::inst_ed_(t_mem code)
     case 0x7B: // LD SP,(nnnn)
       tw = fetch2();
       regs.SP = get2(tw);
+      vc.rd+= 2;
       return(resGO);
 
     case 0x7C: // MLT SP
@@ -290,6 +314,8 @@ int  cl_z80::inst_ed_(t_mem code)
       --regs.DE;
       --regs.BC;
       if (regs.BC != 0) regs.F |= BIT_P;
+      vc.rd++;
+      vc.wr++;
       return(resGO);
     case 0xA9: // CPD
 /* fixme: checkme, compare to other emul. */
@@ -301,7 +327,8 @@ int  cl_z80::inst_ed_(t_mem code)
       ++regs.HL;
       --regs.BC;
       if (regs.BC != 0) regs.F |= BIT_P;
-
+      vc.rd++;
+      
       return(resGO);
 
     case 0xAA: // IND
@@ -317,6 +344,8 @@ int  cl_z80::inst_ed_(t_mem code)
         ++regs.HL;
         ++regs.DE;
         --regs.BC;
+	vc.rd++;
+	vc.wr++;
       } while (regs.BC != 0);
       return(resGO);
 
@@ -336,6 +365,7 @@ int  cl_z80::inst_ed_(t_mem code)
 /* fixme: set BIT_A correctly. */
         ++regs.HL;
         --regs.BC;
+	vc.rd++;
       } while (regs.BC != 0 && (regs.F & BIT_Z) == 0);
       if(regs.BC != 0)
         regs.F |= BIT_P;
@@ -355,6 +385,8 @@ int  cl_z80::inst_ed_(t_mem code)
         --regs.HL;
         --regs.DE;
         --regs.BC;
+	vc.rd++;
+	vc.wr++;
       } while (regs.BC != 0);
       return(resGO);
     case 0xB9: // CPDR
@@ -367,6 +399,7 @@ int  cl_z80::inst_ed_(t_mem code)
         }
         --regs.HL;
         --regs.BC;
+	vc.rd++;
       } while (regs.BC != 0);
       return(resGO);
 #if 0

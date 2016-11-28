@@ -153,6 +153,7 @@ cl_sim::stop(int reason)
       if (reason == resUSER &&
 	  cmd->frozen_console->input_avail())
 	cmd->frozen_console->read_line();
+      cmd->frozen_console->un_redirect();
       cmd->frozen_console->dd_printf("Stop at 0x%06x: (%d) ", uc->PC, reason);
       switch (reason)
 	{

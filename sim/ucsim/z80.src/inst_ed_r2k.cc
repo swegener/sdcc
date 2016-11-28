@@ -51,6 +51,7 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x43: // LD (nnnn),BC
     tw = fetch2();
     store2(tw, regs.BC);
+    vc.wr+= 2;
     break;
     
   case 0x44: // NEG
@@ -86,11 +87,13 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x4B: // LD BC,(nnnn)
     tw = fetch2();
     regs.BC = get2(tw);
+    vc.rd+= 2;
     break;
     
   case 0x4D: // RETI
     ip=get1(regs.SP); regs.SP+=1;
     pop2(PC);
+    vc.rd+= 2;
     // TODO: chained-atomic, so set some marker
     break;
 
@@ -109,12 +112,15 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x53: // LD (nnnn),DE
     tw = fetch2();
     store2(tw, regs.DE);
+    vc.rd+= 2;
     break;
     
   case 0x54: // EX (SP),HL
     tw = get2(regs.SP);
     store2( regs.SP, regs.HL );
     regs.HL = tw;
+    vc.rd+= 2;
+    vc.wr+= 2;
     break;
     
     // 0x56: see 0x46
@@ -133,6 +139,7 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x5B: // LD DE,(nnnn)
     tw = fetch2();
     regs.DE = get2(tw);
+    vc.rd+= 2;
     break;
     
   case 0x5D: // ipres
@@ -156,6 +163,7 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x63: // LD (nnnn),HL opcode 22 does the same faster
     tw = fetch2();
     store2(tw, regs.HL);
+    vc.wr+= 2;
     break;
     
   case 0x67: // LD XPC,A
@@ -173,6 +181,7 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x6B: // LD HL,(nnnn) opcode 2A does the same faster
     tw = fetch2();
     regs.HL = get2(tw);
+    vc.rd+= 2;
     break;
     
   case 0x72: // SBC HL,SP
@@ -181,10 +190,12 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x73: // LD (nnnn),SP
     tw = fetch2();
     store2(tw, regs.SP);
+    vc.wr+= 2;
     break;
     
   case 0x76: // PUSH IP
     push1(ip);
+    vc.wr+= 2;
     break;
     
   case 0x77: // LD A,XPC
@@ -197,6 +208,7 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x7B: // LD SP,(nnnn)
     tw = fetch2();
     regs.SP = get2(tw);
+    vc.rd+= 2;
     break;
     
   case 0x7D: // LD IY, HL
@@ -205,6 +217,7 @@ int  cl_r2k::inst_ed_(t_mem code)
 
   case 0x7E:
     ip=get1(regs.SP); regs.SP+=1;
+    vc.rd++;
     break;
     
   case 0xA0: // LDI
@@ -214,6 +227,8 @@ int  cl_r2k::inst_ed_(t_mem code)
     ++regs.HL;
     ++regs.DE;
     --regs.BC;
+    vc.rd++;
+    vc.wr++;
     if (regs.BC != 0) regs.F |= BIT_P;
     return(resGO);
     
@@ -224,6 +239,8 @@ int  cl_r2k::inst_ed_(t_mem code)
     --regs.HL;
     --regs.DE;
     --regs.BC;
+    vc.rd++;
+    vc.wr++;
     if (regs.BC != 0) regs.F |= BIT_P;
     return(resGO);
     
@@ -236,7 +253,8 @@ int  cl_r2k::inst_ed_(t_mem code)
     ++regs.HL;
     ++regs.DE;
     --regs.BC;
-    
+    vc.rd++;
+    vc.wr++;
     if (regs.BC != 0)
       PC = ins_start;
     return(resGO);
@@ -250,6 +268,8 @@ int  cl_r2k::inst_ed_(t_mem code)
     --regs.HL;
     --regs.DE;
     --regs.BC;
+    vc.rd++;
+    vc.wr++;
     
     if (regs.BC != 0)
       PC = ins_start;
@@ -258,6 +278,7 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0xEA: // CALL (HL)
     push2(PC);
     PC = regs.HL;
+    vc.wr+= 2;
     return(resGO);
     
   
@@ -276,11 +297,13 @@ int  cl_r3ka::inst_ed_(t_mem code)
     {
     case  0x66:  // PUSH SU
       push1(SU);
+      vc.wr++;
       return(resGO);
       
     case  0x6E:  // POP  SU
       SU = get1(regs.SP);
       regs.SP++;
+      vc.rd++;
       return(resGO);
       
     case  0x6F:  // SETUSR
@@ -304,6 +327,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
       store1( regs.DE, tb );
       regs.HL++;
       regs.BC--;
+      vc.rd++;
+      vc.wr++;
       if (regs.BC)
         PC = ins_start;
       return(resGO);
@@ -315,6 +340,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
       store1( regs.DE, tb );
       regs.HL--;
       regs.BC--;
+      vc.rd++;
+      vc.wr++;
       if (regs.BC)
         PC = ins_start;
       return(resGO);
@@ -340,6 +367,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
         regs.aDE = ((tmp >> 8) & 0xFFFF);
         regs.F &= ~(BIT_C);
         regs.F |= (tmp >> 24) ? BIT_C : 0;
+	vc.rd+= 2;
+	vc.wr++;
       }
       
       regs.IX++;
@@ -371,6 +400,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
         regs.aDE = ((tmp >> 8) & 0xFFFF);
         regs.F &= ~(BIT_C);
         regs.F |= (tmp >> 24) ? BIT_C : 0;
+	vc.rd+= 2;
+	vc.wr++;
       }
       
       regs.IX++;
@@ -388,6 +419,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
       store1( regs.DE, tb );
       regs.DE++;
       regs.BC--;
+      vc.rd++;
+      vc.wr++;
       if (regs.BC)
         PC = ins_start;
       return(resGO);
@@ -399,6 +432,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
       store1( regs.DE, tb );
       regs.DE--;
       regs.BC--;
+      vc.rd++;
+      vc.wr++;
       if (regs.BC)
         PC = ins_start;
       return(resGO);
@@ -411,6 +446,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
       regs.DE++;
       regs.HL++;
       regs.BC--;
+      vc.rd++;
+      vc.wr++;
       if (regs.BC)
         PC = ins_start;
       return(resGO);
@@ -423,6 +460,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
       regs.DE--;
       regs.HL--;
       regs.BC--;
+      vc.rd++;
+      vc.wr++;
       if (regs.BC)
         PC = ins_start;
       return(resGO);

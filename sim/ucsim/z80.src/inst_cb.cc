@@ -59,6 +59,8 @@ cl_z80::inst_cb_rlc(t_mem code)
         tmp = get1(regs.HL);
         rlc_byte(tmp);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x07: // RLC A
@@ -95,6 +97,8 @@ cl_z80::inst_cb_rrc(t_mem code)
         tmp = get1(regs.HL);
         rrc_byte(tmp);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x0F: // RRC A
@@ -131,6 +135,8 @@ cl_z80::inst_cb_rl(t_mem code)
         tmp = get1(regs.HL);
         rl_byte(tmp);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x17: // RL A
@@ -167,6 +173,8 @@ cl_z80::inst_cb_rr(t_mem code)
         tmp = get1(regs.HL);
         rr_byte(tmp);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x1F: // RR A
@@ -203,6 +211,8 @@ cl_z80::inst_cb_sla(t_mem code)
         tmp = get1(regs.HL);
         sla_byte(tmp);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x27: // SLA A
@@ -239,6 +249,8 @@ cl_z80::inst_cb_sra(t_mem code)
         tmp = get1(regs.HL);
         sra_byte(tmp);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x2F: // SRA A
@@ -275,6 +287,8 @@ cl_z80::inst_cb_slia(t_mem code)
         tmp = get1(regs.HL);
         slia_byte(tmp);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x37: // SLIA A
@@ -311,6 +325,8 @@ cl_z80::inst_cb_srl(t_mem code)
         tmp = get1(regs.HL);
         srl_byte(tmp);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x3F: // SRL A
@@ -344,6 +360,8 @@ cl_z80::inst_cb_bit(t_mem code)
         tmp = get1(regs.HL);
         bit_byte(tmp, bit_bitnum);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x7: // BIT x,A
@@ -376,6 +394,8 @@ cl_z80::inst_cb_res(t_mem code)
         tmp = get1(regs.HL);
         tmp &= ~(1 << bit_bitnum);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.rd++;
       }
     break;
     case 0x7: // RES x,A
@@ -407,6 +427,8 @@ cl_z80::inst_cb_set(t_mem code)
         tmp = get1(regs.HL);
         tmp |= (1 << bit_bitnum);
         store1(regs.HL, tmp);
+	vc.rd++;
+	vc.wr++;
       }
     break;
     case 0x7: // SET x,A

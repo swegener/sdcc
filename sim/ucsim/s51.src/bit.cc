@@ -52,6 +52,7 @@ cl_51core::inst_orl_c_bit(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7,/*SFR_GET_C*/bits->get(0xd7) ||
 	    /*(mem->read(a) & m)*/bits->read(bitaddr));
   tick(1);
+  vc.rd++;
   return(resGO);
 }
 
@@ -74,6 +75,7 @@ cl_51core::inst_anl_c_bit(uchar code)
   /*SFR_SET_C*/bits->set(0xd7,/*SFR_GET_C*/c &&
 	    /*(mem->read(a) & m)*/bits->read(bitaddr));
   tick(1);
+  vc.rd++;
   return(resGO);
 }
 
@@ -100,6 +102,8 @@ cl_51core::inst_mov_bit_c(uchar code)
   mem->write(a, d&~m);*/
   bits->write(bitaddr, /*SFR_GET_C*/bits->get(0xd7));
   tick(1);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -122,6 +126,7 @@ cl_51core::inst_mov_c_bit(uchar code)
   //SFR_SET_C(/*mem->read(a) & m*/bits->read(bitaddr));
   x= bits->read(bitaddr);
   bits->set(0xd7, x);
+  vc.rd++;
   return(resGO);
 }
 
@@ -144,6 +149,7 @@ cl_51core::inst_orl_c_Sbit(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, /*SFR_GET_C*/bits->get(0xd7) ||
 			  !(/*mem->read(a) & m*/bits->read(bitaddr)));
   tick(1);
+  vc.rd++;
   return(resGO);
 }
 
@@ -166,6 +172,7 @@ cl_51core::inst_anl_c_Sbit(uchar code)
   /*SFR_SET_C(*/bits->set(0xd7, /*SFR_GET_C*/bits->get(0xd7) &&
 			  !(/*mem->read(a) & m*/bits->read(bitaddr)));
   tick(1);
+  vc.rd++;
   return(resGO);
 }
 
@@ -189,6 +196,8 @@ cl_51core::inst_cpl_bit(uchar code)
   //mem->write(a, d^m);
   b= bits->/*read*/get(bitaddr);
   bits->write(bitaddr, !b);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -204,6 +213,8 @@ cl_51core::inst_cpl_c(uchar code)
 {
   //psw->write(psw->read() ^ bmCY);
   bits->write(0xd7, !bits->read(0xd7));
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -227,6 +238,8 @@ cl_51core::inst_clr_bit(uchar code)
   //t_mem d= mem->read(a, HW_PORT);
   //mem->write(a, d&~m);
   bits->write(bitaddr, 0);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -264,6 +277,8 @@ cl_51core::inst_setb_bit(uchar code)
   //d= mem->read(a, HW_PORT);
   //mem->write(a, d|m);
   bits->write(bitaddr, 1);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 

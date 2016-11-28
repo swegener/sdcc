@@ -242,6 +242,7 @@ cl_uc::reset(void)
   ticks->ticks= 0;
   isr_ticks->ticks= 0;
   idle_ticks->ticks= 0;
+  vc.inst= vc.fetch= vc.rd= vc.wr= 0;
   /*FIXME should we clear user counters?*/
   il= (class it_level *)(it_levels->top());
   while (il &&
@@ -1725,6 +1726,7 @@ cl_uc::fetch(void)
 
   code= rom->read(PC);
   PC= rom->inc_address(PC);
+  vc.fetch++;
   return(code);
 }
 
@@ -1797,6 +1799,7 @@ cl_uc::pre_inst(void)
   inst_exec= true;
   inst_ticks= 0;
   events->disconn_all();
+  vc.inst++;
 }
 
 int

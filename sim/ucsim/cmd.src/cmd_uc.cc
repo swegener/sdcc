@@ -52,6 +52,14 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
 		 get_id_string(cpu_states, uc->state),
 		 uc->PC, 
 		 uc->xtal);
+  con->dd_printf("Operation since last reset= (%lu vclks)\n",
+		 (unsigned long)(uc->vc.fetch) +
+		 (unsigned long)(uc->vc.rd) +
+		 (unsigned long)(uc->vc.wr));
+  con->dd_printf("Inst= %lu ", (unsigned long)(uc->vc.inst));
+  con->dd_printf("Fetch= %lu ", (unsigned long)(uc->vc.fetch));
+  con->dd_printf("Read= %lu ", (unsigned long)(uc->vc.rd));
+  con->dd_printf("Write= %lu\n", (unsigned long)(uc->vc.wr));
   con->dd_printf("Total time since last reset= %g sec (%lu clks)\n",
 		 uc->get_rtime(), uc->ticks->ticks);
   con->dd_printf("Time in isr = %g sec (%lu clks) %3.2g%%\n",

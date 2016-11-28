@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: tlcs.cc 500 2016-11-12 15:15:43Z drdani $ */
+/* $Id: tlcs.cc 517 2016-11-22 19:12:14Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -547,12 +547,14 @@ cl_tlcs::exec_inst(void)
       c2= fetch();
       c3= fetch();
       cell_n(c2)->write(c3);
+      vc.wr++;
       break;
     case 0x3F: // LDW (0ffw),mn
       c2= fetch();
       c3= fetch();
       c4= fetch();
       write16(0xff00+c2, c4*256 + c3);
+      vc.wr+= 2;
       break;
     case 0x97: c2= fetch(); inst_inc16(t_addr(0xff00+c2)); break; // INCW (0ffn)
     case 0x9F: c2= fetch(); inst_dec16(t_addr(0xff00+c2)); break; // DECW (0ffn)
@@ -613,8 +615,8 @@ cl_tlcs::exec_inst(void)
 	    }
 	  case 0xf0: res= exec_inst3_f0ix(c1); break; // F0+ix d XX
 	  case 0xf4: // F4+ix d XX [n [m]]
-	      c2= fetch();
-	      c3= fetch();
+	    c2= fetch();
+	    c3= fetch();
 	    res= exec_inst4_f4ix(c1, c2, c3);
 	    break;
 	  default:
@@ -672,9 +674,9 @@ cl_tlcs::exec_inst2(u8_t c1)
     case 0x18: inst_djnz_b(int8_t(c2)); break; // DJNZ $+2+d
     case 0x19: inst_djnz_bc(int8_t(c2)); break; // DJNZ BC,$+2+d
     case 0x27: reg.raf.a= n->read(); break; // LD A,(0ffn)
-    case 0x2F: n->write(reg.raf.a); break; // LD (0ffn),A
-    case 0x47: reg.hl= mem16(0xff00 + c2); break; // LD HL,(0ffn)
-    case 0x4f: write16(0xff00+c2, reg.hl); break; // LD (0xffn),HL
+    case 0x2F: n->write(reg.raf.a); vc.wr++; break; // LD (0ffn),A
+    case 0x47: reg.hl= mem16(0xff00 + c2); vc.rd+= 2; break; // LD HL,(0ffn)
+    case 0x4f: write16(0xff00+c2, reg.hl); vc.wr+= 2; break; // LD (0xffn),HL
     case 0x60: inst_add_a(n); break; // ADD A,(0ffn)
     case 0x61: inst_adc_a(n); break; // ADC A,(0ffn)
     case 0x62: inst_sub_a(n); break; // SUB A,(0ffn)
@@ -785,6 +787,7 @@ cl_tlcs::exec_inst2_f3(u8_t c2)
 	{
 	  u16_t *op1= aof_reg16_ix(c2);
 	  u16_t op2= mem16(reg.hl+reg.raf.a);
+	  vc.rd+= 2;
 	  *op1= op_add16(*op1, op2);
 	}
       else
@@ -794,32 +797,40 @@ cl_tlcs::exec_inst2_f3(u8_t c2)
 	    {
 	      cl_memory_cell *c= cell_hl_a();
 	      u8_t v= c->read();
+	      vc.rd++;
 	      c->write(op_tset(v, c2));
+	      vc.wr++;
 	      break;
 	    }
-	  case 0x28: *aof_reg8(c2)= cell_hl_a()->read(); break; // LD r,(HL+A)
-	  case 0x48: *aof_reg16_rr(c2)= mem16(reg.hl+reg.raf.a); break; // LD rr,(HL+A)
+	  case 0x28: *aof_reg8(c2)= cell_hl_a()->read(); vc.rd++; break; // LD r,(HL+A)
+	  case 0x48: *aof_reg16_rr(c2)= mem16(reg.hl+reg.raf.a); vc.rd+= 2; break; // LD rr,(HL+A)
 	  case 0x50: // EX (HL+A),rr
 	    {
 	      cl_memory_cell *c= cell_hl_a();
 	      u16_t t= c->read(), *r= aof_reg16_rr(c2);
+	      vc.rd++;
 	      c->write(*r);
+	      vc.wr++;
 	      *r= t;
 	      break;
 	    }
-	  case 0xa8: op_bit(cell_hl_a()->read(), c2); break; // BIT b,(HL+A)
+	  case 0xa8: op_bit(cell_hl_a()->read(), c2); vc.rd++; break; // BIT b,(HL+A)
 	  case 0xb0: // RES b,(HL+A)
 	    {
 	      cl_memory_cell *c= cell_hl_a();
 	      u8_t v= op_res(c->read(), c2);
+	      vc.rd++;
 	      c->write(v);
+	      vc.wr++;
 	      break;
 	    }
 	  case 0xb8: // SET b,(HL+A)
 	    {
 	      cl_memory_cell *c= cell_hl_a();
 	      u8_t v= op_set(c->read(), c2);
+	      vc.rd++;
 	      c->write(v);
+	      vc.wr++;
 	      break;
 	    }
 	  default:
@@ -842,16 +853,16 @@ cl_tlcs::exec_inst2_f7(u8_t c2)
   
   switch (c2)
     {
-    case 0x37: n= fetch(); cell_hl_a()->write(n); break; // LD (HL+A),n
-    case 0x3f: n= fetch(); m= fetch(); write16(reg.hl+reg.raf.a, m*256+n); break; // LDW (HL+A),mn
-    case 0x68: n= fetch(); cell_hl_a()->write(op_add8(cell_hl_a()->read(), n)); break; // ADD (HL+A),n
-    case 0x69: n= fetch(); cell_hl_a()->write(op_adc8(cell_hl_a()->read(), n)); break; // ADC (HL+A),n
-    case 0x6a: n= fetch(); cell_hl_a()->write(op_sub8(cell_hl_a()->read(), n)); break; // SUB (HL+A),n
-    case 0x6b: n= fetch(); cell_hl_a()->write(op_sbc8(cell_hl_a()->read(), n)); break; // SBC (HL+A),n
-    case 0x6c: n= fetch(); cell_hl_a()->write(op_and8(cell_hl_a()->read(), n)); break; // AND (HL+A),n
-    case 0x6d: n= fetch(); cell_hl_a()->write(op_xor8(cell_hl_a()->read(), n)); break; // XOR (HL+A),n
-    case 0x6e: n= fetch(); cell_hl_a()->write(op_or8(cell_hl_a()->read(), n)); break; // OR (HL+A),n
-    case 0x6f: n= fetch(); op_cp8(cell_hl_a()->read(), n); break; // CP (HL+A),n
+    case 0x37: n= fetch(); cell_hl_a()->write(n); vc.wr++; break; // LD (HL+A),n
+    case 0x3f: n= fetch(); m= fetch(); write16(reg.hl+reg.raf.a, m*256+n); vc.wr+= 2; break; // LDW (HL+A),mn
+    case 0x68: n= fetch(); cell_hl_a()->write(op_add8(cell_hl_a()->read(), n)); vc.rd++; vc.wr++; break; // ADD (HL+A),n
+    case 0x69: n= fetch(); cell_hl_a()->write(op_adc8(cell_hl_a()->read(), n)); vc.rd++; vc.wr++; break; // ADC (HL+A),n
+    case 0x6a: n= fetch(); cell_hl_a()->write(op_sub8(cell_hl_a()->read(), n)); vc.rd++; vc.wr++; break; // SUB (HL+A),n
+    case 0x6b: n= fetch(); cell_hl_a()->write(op_sbc8(cell_hl_a()->read(), n)); vc.rd++; vc.wr++; break; // SBC (HL+A),n
+    case 0x6c: n= fetch(); cell_hl_a()->write(op_and8(cell_hl_a()->read(), n)); vc.rd++; vc.wr++; break; // AND (HL+A),n
+    case 0x6d: n= fetch(); cell_hl_a()->write(op_xor8(cell_hl_a()->read(), n)); vc.rd++; vc.wr++; break; // XOR (HL+A),n
+    case 0x6e: n= fetch(); cell_hl_a()->write(op_or8(cell_hl_a()->read(), n)); vc.rd++; vc.wr++; break; // OR (HL+A),n
+    case 0x6f: n= fetch(); op_cp8(cell_hl_a()->read(), n); vc.rd++; break; // CP (HL+A),n
     default:
       switch (c2 & 0xf0)
 	{
@@ -860,9 +871,9 @@ cl_tlcs::exec_inst2_f7(u8_t c2)
 	default:
 	  switch (c2 & 0xf8)
 	    {
-	    case 0x20: cell_hl_a()->write(*aof_reg8(c2)); break; // LD (HL+A),r
+	    case 0x20: cell_hl_a()->write(*aof_reg8(c2)); vc.wr++; break; // LD (HL+A),r
 	    case 0x38: *aof_reg16_rr(c2)= reg.hl+reg.raf.a; break; // LDA rr,HL+A
-	    case 0x40: write16(reg.hl+reg.raf.a, *aof_reg16_rr(c2)); break; // LD (HL+A),rr
+	    case 0x40: write16(reg.hl+reg.raf.a, *aof_reg16_rr(c2)); vc.wr+= 2; break; // LD (HL+A),rr
 	    default:
 	      res= resINV_INST;
 	      break;
@@ -956,14 +967,16 @@ cl_tlcs::exec_inst2_e0gg(u8_t c1, u8_t c2)
 	switch (c2 & 0xf8)
 	  {
 	  case 0x18: inst_tset(gg, c2); break; // TSET b,(gg)
-	  case 0x28: *aof_reg8(c2)= gg->read(); break; // LD r,(gg)
-	  case 0x48: *aof_reg16_rr(c2)= mem16gg(c1); break; // LD rr,(gg)
+	  case 0x28: *aof_reg8(c2)= gg->read(); vc.rd++; break; // LD r,(gg)
+	  case 0x48: *aof_reg16_rr(c2)= mem16gg(c1); vc.rd+= 2; break; // LD rr,(gg)
 	  case 0x50: // EX (gg),rr
 	    {
 	      u16_t *ra= aof_reg16_rr(c2);
 	      u16_t r= *ra;
 	      *ra= mem16gg(c1);
+	      vc.rd+= 2;
 	      write16gg(c1, r);
+	      vc.wr+= 2;
 	      break;
 	    }
 	  case 0xa8: inst_bit(gg, c2); break; // BIT b,(gg)
@@ -991,16 +1004,16 @@ cl_tlcs::exec_inst2_e8gg(u8_t c1, u8_t c2)
   
   switch (c2)
     {
-    case 0x37: n= fetch(); gg->write(n); break; // LD (gg),n
-    case 0x3F: n= fetch(); m= fetch(); write16gg(c1, m*256+n); break; // LDW (gg),mn
-    case 0x68: n= fetch(); gg->write(op_add8(gg->read(), n)); break; // ADD (gg),n
-    case 0x69: n= fetch(); gg->write(op_adc8(gg->read(), n)); break; // ADC (gg),n
-    case 0x6a: n= fetch(); gg->write(op_sub8(gg->read(), n)); break; // SUB (gg),n
-    case 0x6b: n= fetch(); gg->write(op_sbc8(gg->read(), n)); break; // SBC (gg),n
-    case 0x6c: n= fetch(); gg->write(op_and8(gg->read(), n)); break; // AND (gg),n
-    case 0x6d: n= fetch(); gg->write(op_xor8(gg->read(), n)); break; // XOR (gg),n
-    case 0x6e: n= fetch(); gg->write(op_or8(gg->read(), n)); break; // OR (gg),n
-    case 0x6f: n= fetch(); op_cp8(gg->read(), n); break; // CP (gg),n
+    case 0x37: n= fetch(); gg->write(n); vc.wr++; break; // LD (gg),n
+    case 0x3F: n= fetch(); m= fetch(); write16gg(c1, m*256+n); vc.wr+= 2; break; // LDW (gg),mn
+    case 0x68: n= fetch(); gg->write(op_add8(gg->read(), n)); vc.rd++; vc.wr++; break; // ADD (gg),n
+    case 0x69: n= fetch(); gg->write(op_adc8(gg->read(), n)); vc.rd++; vc.wr++; break; // ADC (gg),n
+    case 0x6a: n= fetch(); gg->write(op_sub8(gg->read(), n)); vc.rd++; vc.wr++; break; // SUB (gg),n
+    case 0x6b: n= fetch(); gg->write(op_sbc8(gg->read(), n)); vc.rd++; vc.wr++; break; // SBC (gg),n
+    case 0x6c: n= fetch(); gg->write(op_and8(gg->read(), n)); vc.rd++; vc.wr++; break; // AND (gg),n
+    case 0x6d: n= fetch(); gg->write(op_xor8(gg->read(), n)); vc.rd++; vc.wr++; break; // XOR (gg),n
+    case 0x6e: n= fetch(); gg->write(op_or8(gg->read(), n)); vc.rd++; vc.wr++; break; // OR (gg),n
+    case 0x6f: n= fetch(); op_cp8(gg->read(), n); vc.rd++; break; // CP (gg),n
     default:
       switch (c2 & 0xf0)
 	{
@@ -1009,8 +1022,8 @@ cl_tlcs::exec_inst2_e8gg(u8_t c1, u8_t c2)
 	default:
 	  switch (c2 & 0xf8)
 	    {
-	    case 0x20: gg->write(*aof_reg8(c2)); break; // LD (gg),r
-	    case 0x40: write16gg(c1, *aof_reg16_rr(c2)); break; // LD (gg),rr
+	    case 0x20: gg->write(*aof_reg8(c2)); vc.wr++; break; // LD (gg),r
+	    case 0x40: write16gg(c1, *aof_reg16_rr(c2)); vc.wr+= 2; break; // LD (gg),rr
 	    default:
 	      res= resINV_INST;
 	      break;
@@ -1167,18 +1180,21 @@ cl_tlcs::exec_inst3_e7(u8_t c1, u8_t c2, u8_t c3)
 	{
 	  u16_t *aix= aof_reg16_ix(c3);
 	  *aix= op_add16(*aix, mem16(0xff00 + c2));
+	  vc.rd+= 2;
 	}
       else
 	switch (c3 & 0xf8)
 	  {
 	  case 0x18: inst_tset(n, c3); break; // TSET b,(0ffn)
-	  case 0x28: *aof_reg8(c3)= n->read(); break; // LD r,(0ffn)
-	  case 0x48: *aof_reg16_rr(c3)= mem16(0xff00 + c2); break; // LD rr,(0ffn);
+	  case 0x28: *aof_reg8(c3)= n->read(); vc.rd++; break; // LD r,(0ffn)
+	  case 0x48: *aof_reg16_rr(c3)= mem16(0xff00 + c2); vc.rd+= 2; break; // LD rr,(0ffn);
 	  case 0x50: // EX (0ffn),rr
 	    {
 	      u16_t temp= mem16(0xff00+c2);
+	      vc.rd+= 2;
 	      u16_t *ar= aof_reg16_rr(c3);
 	      write16(0xff00+c2, *ar);
+	      vc.wr+= 2;
 	      *ar= temp;
 	      break;
 	    }
@@ -1217,14 +1233,14 @@ cl_tlcs::exec_inst3_f0ix(u8_t c1)
     case 0x65: inst_xor_a(c); break; // XOR A,(ix+d)
     case 0x66: inst_or_a(c); break; // OR A,(ix+d)
     case 0x67: op_cp_a(c); break; // CP A,(ix+d)
-    case 0x70: reg.hl= op_add_hl((t_mem)mem16ixd(c1,d)); break; // ADD HL,(ix+d)
-    case 0x71: reg.hl= op_adc_hl((t_mem)mem16ixd(c1,d)); break; // ADC HL,(ix+d)
-    case 0x72: reg.hl= op_sub_hl((t_mem)mem16ixd(c1,d)); break; // SUB HL,(ix+d)
-    case 0x73: reg.hl= op_sbc_hl((t_mem)mem16ixd(c1,d)); break; // SBC HL,(ix+d)
-    case 0x74: reg.hl= op_and_hl((t_mem)mem16ixd(c1,d)); break; // AND HL,(ix+d)
-    case 0x75: reg.hl= op_xor_hl((t_mem)mem16ixd(c1,d)); break; // XOR HL,(ix+d)
-    case 0x76: reg.hl= op_or_hl((t_mem)mem16ixd(c1,d)); break; // OR HL,(ix+d)
-    case 0x77: op_sub_hl((t_mem)mem16ixd(c1,d)); break; // CP HL,(ix+d)
+    case 0x70: reg.hl= op_add_hl((t_mem)mem16ixd(c1,d)); vc.rd+= 2; break; // ADD HL,(ix+d)
+    case 0x71: reg.hl= op_adc_hl((t_mem)mem16ixd(c1,d)); vc.rd+= 2; break; // ADC HL,(ix+d)
+    case 0x72: reg.hl= op_sub_hl((t_mem)mem16ixd(c1,d)); vc.rd+= 2; break; // SUB HL,(ix+d)
+    case 0x73: reg.hl= op_sbc_hl((t_mem)mem16ixd(c1,d)); vc.rd+= 2; break; // SBC HL,(ix+d)
+    case 0x74: reg.hl= op_and_hl((t_mem)mem16ixd(c1,d)); vc.rd+= 2; break; // AND HL,(ix+d)
+    case 0x75: reg.hl= op_xor_hl((t_mem)mem16ixd(c1,d)); vc.rd+= 2; break; // XOR HL,(ix+d)
+    case 0x76: reg.hl= op_or_hl((t_mem)mem16ixd(c1,d)); vc.rd+= 2; break; // OR HL,(ix+d)
+    case 0x77: op_sub_hl((t_mem)mem16ixd(c1,d)); vc.rd+= 2; break; // CP HL,(ix+d)
     case 0x87: inst_inc(c); break; // INC (ix+d)
     case 0x8F: inst_dec(c); break; // DEC (ix+d)
     case 0x97: inst_inc16ix(c1, a); break; // INCW (ix+d)
@@ -1242,19 +1258,22 @@ cl_tlcs::exec_inst3_f0ix(u8_t c1)
 	{
 	  u16_t *rp= aof_reg16_ix(c3);
 	  u16_t op= mem16ixd(c1, d);
+	  vc.rd+= 2;
 	  *rp= op_add16(*rp, op);
 	}
       else
 	switch (c3 & 0xf8)
 	  {
 	  case 0x18: inst_tset(c, c3); break; // TSET b,(ix+d)
-	  case 0x28: *aof_reg8(c3)= c->read(); break; // LD r,(ix+d)
-	  case 0x48: *aof_reg16_rr(c3)= mem16ixd(c1, d); break; // LD rr,(ix+d)
+	  case 0x28: *aof_reg8(c3)= c->read(); vc.rd++; break; // LD r,(ix+d)
+	  case 0x48: *aof_reg16_rr(c3)= mem16ixd(c1, d); vc.rd+= 2; break; // LD rr,(ix+d)
 	  case 0x50: // EX (ix+d),rr
 	    {
 	      u16_t temp= mem16ixd(c1, d);
+	      vc.rd+= 2;
 	      u16_t *ra= aof_reg16_rr(c3);
 	      write16ixd(c1, d, *ra);
+	      vc.wr+= 2;
 	      *ra= temp;
 	      break;
 	    }
@@ -1321,13 +1340,15 @@ cl_tlcs::exec_inst4_e3(u8_t c1, u8_t c2, u8_t c3, u8_t c4)
 	switch (c4 & 0xf8)
 	  {
 	  case 0x18: inst_tset(c, c4); break;; // TSET b,(mn)
-	  case 0x28: *aof_reg8(c4)= c->read(); break; // LD r,(mn)
-	  case 0x48: *aof_reg16_rr(c4)= mem16(mn); break; // LD rr,(mn)
+	  case 0x28: *aof_reg8(c4)= c->read(); vc.rd++; break; // LD r,(mn)
+	  case 0x48: *aof_reg16_rr(c4)= mem16(mn); vc.rd+= 2; break; // LD rr,(mn)
 	  case 0x50: // EX (mn),rr
 	    {
 	      u16_t temp= mem16(mn);
+	      vc.rd+= 2;
 	      u16_t *ar= aof_reg16_rr(c4);
 	      write16(mn, *ar);
+	      vc.wr+= 2;
 	      *ar= temp;
 	    }
 	  case 0xa8: inst_bit(c, c4); break; // BIT b,(mn)
@@ -1355,19 +1376,19 @@ cl_tlcs::exec_inst4_ef(u8_t c1, u8_t c2, u8_t c3)
   
   switch (c3)
     {
-    case 0x68: n= fetch(); wc->write(op_add8(wd, n)); break; // ADD (0ffw),n
-    case 0x69: n= fetch(); wc->write(op_adc8(wd, n)); break; // ADC (0ffw),n
-    case 0x6a: n= fetch(); wc->write(op_sub8(wd, n)); break; // SUB (0ffw),n
-    case 0x6b: n= fetch(); wc->write(op_sbc8(wd, n)); break; // SBC (0ffw),n
-    case 0x6c: n= fetch(); wc->write(op_and8(wd, n)); break; // AND (0ffw),n
-    case 0x6d: n= fetch(); wc->write(op_xor8(wd, n)); break; // XOR (0ffw),n
-    case 0x6e: n= fetch(); wc->write(op_or8(wd, n)); break; // OR (0ffw),n
+    case 0x68: n= fetch(); wc->write(op_add8(wd, n)); vc.wr++; break; // ADD (0ffw),n
+    case 0x69: n= fetch(); wc->write(op_adc8(wd, n)); vc.wr++; break; // ADC (0ffw),n
+    case 0x6a: n= fetch(); wc->write(op_sub8(wd, n)); vc.wr++; break; // SUB (0ffw),n
+    case 0x6b: n= fetch(); wc->write(op_sbc8(wd, n)); vc.wr++; break; // SBC (0ffw),n
+    case 0x6c: n= fetch(); wc->write(op_and8(wd, n)); vc.wr++; break; // AND (0ffw),n
+    case 0x6d: n= fetch(); wc->write(op_xor8(wd, n)); vc.wr++; break; // XOR (0ffw),n
+    case 0x6e: n= fetch(); wc->write(op_or8(wd, n)); vc.wr++; break; // OR (0ffw),n
     case 0x6f: n= fetch(); op_cp8(wd, n); break; // CP (0ffw),n
     default:
       switch (c3 & 0xf8) // EF n XX+r
 	{
-	case 0x20: wc->write(*aof_reg8(c3)); break; // LD (0ffn),r
-	case 0x40: write16(0xff00+c2, *aof_reg16_rr(c3)); break; // LD (0ffn),rr
+	case 0x20: wc->write(*aof_reg8(c3)); vc.wr++; break; // LD (0ffn),r
+	case 0x40: write16(0xff00+c2, *aof_reg16_rr(c3)); vc.wr+= 2; break; // LD (0ffn),rr
 	default:
 	  res= resINV_INST;
 	  break;
@@ -1392,21 +1413,21 @@ cl_tlcs::exec_inst4_eb(u8_t c1, u8_t c2, u8_t c3, u8_t c4)
   
   switch (c4)
     {
-    case 0x37: n5= fetch(); c->write(n5); break; // LD (vw),n
-    case 0x3f: n5= fetch(); write16(vw23, n5 + fetch()*256); break; // LDW (vw),mn
-    case 0x68: n5= fetch(); c->write(op_add8(c->read(), n5)); break; // ADD (vw),n
-    case 0x69: n5= fetch(); c->write(op_adc8(c->read(), n5)); break; // ADC (vw),n
-    case 0x6a: n5= fetch(); c->write(op_sub8(c->read(), n5)); break; // SUB (vw),n
-    case 0x6b: n5= fetch(); c->write(op_sbc8(c->read(), n5)); break; // SBC (vw),n
-    case 0x6c: n5= fetch(); c->write(op_and8(c->read(), n5)); break; // AND (vw),n
-    case 0x6d: n5= fetch(); c->write(op_xor8(c->read(), n5)); break; // XOR (vw),n
-    case 0x6e: n5= fetch(); c->write(op_or8(c->read(), n5)); break; // OR (vw),n
-    case 0x6f: n5= fetch(); op_cp8(c->read(), n5); break; // CP (vw),n
+    case 0x37: n5= fetch(); c->write(n5); vc.wr++; break; // LD (vw),n
+    case 0x3f: n5= fetch(); write16(vw23, n5 + fetch()*256); vc.wr+= 2; break; // LDW (vw),mn
+    case 0x68: n5= fetch(); c->write(op_add8(c->read(), n5)); vc.wr++; break; // ADD (vw),n
+    case 0x69: n5= fetch(); c->write(op_adc8(c->read(), n5)); vc.wr++; break; // ADC (vw),n
+    case 0x6a: n5= fetch(); c->write(op_sub8(c->read(), n5)); vc.wr++; break; // SUB (vw),n
+    case 0x6b: n5= fetch(); c->write(op_sbc8(c->read(), n5)); vc.wr++; break; // SBC (vw),n
+    case 0x6c: n5= fetch(); c->write(op_and8(c->read(), n5)); vc.wr++; break; // AND (vw),n
+    case 0x6d: n5= fetch(); c->write(op_xor8(c->read(), n5)); vc.wr++; break; // XOR (vw),n
+    case 0x6e: n5= fetch(); c->write(op_or8(c->read(), n5)); vc.wr++; break; // OR (vw),n
+    case 0x6f: n5= fetch(); op_cp8(c->read(), n5); vc.rd++; break; // CP (vw),n
     default:
       switch (c4 & 0xf8)
 	{
-	case 0x20: c->write(*aof_reg8(c4)); break; // LD (mn),r
-	case 0x40: write16(vw23, *aof_reg16_rr(c4)); break; // LD (mn),rr
+	case 0x20: c->write(*aof_reg8(c4)); vc.wr++; break; // LD (mn),r
+	case 0x40: write16(vw23, *aof_reg16_rr(c4)); vc.wr+= 2; break; // LD (mn),rr
 	default:
 	  switch (c4 & 0xf0)
 	    {
@@ -1437,16 +1458,16 @@ cl_tlcs::exec_inst4_f4ix(u8_t c1, u8_t c2, u8_t c3)
   
   switch (c3)
     {
-    case 0x37: n= fetch(); c->write(n); break; // LD (ix+d),n
-    case 0x3f: n= fetch(); write16ixd(c1, d, n+fetch()*256); break; // LDW (ix+d),mn
-    case 0x68: n= fetch(); c->write(op_add8(c->read(), n)); break; // ADD (ix+d),n
-    case 0x69: n= fetch(); c->write(op_adc8(c->read(), n)); break; // ADC (ix+d),n
-    case 0x6a: n= fetch(); c->write(op_sub8(c->read(), n)); break; // SUB (ix+d),n
-    case 0x6b: n= fetch(); c->write(op_sbc8(c->read(), n)); break; // SBC (ix+d),n
-    case 0x6c: n= fetch(); c->write(op_and8(c->read(), n)); break; // AND (ix+d),n
-    case 0x6d: n= fetch(); c->write(op_xor8(c->read(), n)); break; // XOR (ix+d),n
-    case 0x6e: n= fetch(); c->write(op_or8(c->read(), n)); break; // OR (ix+d),n
-    case 0x6f: n= fetch(); op_cp8(c->read(), n); break; // CP (ix+d),n
+    case 0x37: n= fetch(); c->write(n); vc.wr++; break; // LD (ix+d),n
+    case 0x3f: n= fetch(); write16ixd(c1, d, n+fetch()*256); vc.wr+= 2; break; // LDW (ix+d),mn
+    case 0x68: n= fetch(); c->write(op_add8(c->read(), n)); vc.rd++; vc.wr++; break; // ADD (ix+d),n
+    case 0x69: n= fetch(); c->write(op_adc8(c->read(), n)); vc.rd++; vc.wr++; break; // ADC (ix+d),n
+    case 0x6a: n= fetch(); c->write(op_sub8(c->read(), n)); vc.rd++; vc.wr++; break; // SUB (ix+d),n
+    case 0x6b: n= fetch(); c->write(op_sbc8(c->read(), n)); vc.rd++; vc.wr++; break; // SBC (ix+d),n
+    case 0x6c: n= fetch(); c->write(op_and8(c->read(), n)); vc.rd++; vc.wr++; break; // AND (ix+d),n
+    case 0x6d: n= fetch(); c->write(op_xor8(c->read(), n)); vc.rd++; vc.wr++; break; // XOR (ix+d),n
+    case 0x6e: n= fetch(); c->write(op_or8(c->read(), n)); vc.rd++; vc.wr++; break; // OR (ix+d),n
+    case 0x6f: n= fetch(); op_cp8(c->read(), n); vc.rd++; break; // CP (ix+d),n
     default:
       switch (c3 & 0xf0)
 	{
@@ -1455,9 +1476,9 @@ cl_tlcs::exec_inst4_f4ix(u8_t c1, u8_t c2, u8_t c3)
 	default:
 	  switch (c3 & 0xf8)
 	    {
-	    case 0x20: c->write(*aof_reg8(c3)); break; // LD (ix+d),r
+	    case 0x20: c->write(*aof_reg8(c3)); vc.wr++; break; // LD (ix+d),r
 	    case 0x38: *aof_reg16_rr(c3)= *aof_reg16_ix(c1)+d; break; // LDA rr,ix+d
-	    case 0x40: write16ixd(c1, d, *aof_reg16_rr(c3)); break; // LD (ix+d),rr
+	    case 0x40: write16ixd(c1, d, *aof_reg16_rr(c3)); vc.wr+= 2; break; // LD (ix+d),rr
 	    default:
 	      res= resINV_INST;
 	      break;
@@ -1479,6 +1500,7 @@ cl_tlcs::do_push(t_mem data)
   nas->write(reg.sp, (data>>8)&0xff);
   reg.sp-= 1;
   nas->write(reg.sp, (data&0xff));
+  vc.wr+= 2;
   return sp_before;
 }
 
@@ -1493,6 +1515,7 @@ cl_tlcs::do_pop(t_mem *data)
   reg.sp+= 1;
   if (data)
     *data= val;
+  vc.rd+= 2;
   return sp_before;
 }
 

@@ -115,6 +115,7 @@ int
 cl_51core::init(void)
 {
   irq_stop_option->init();
+  dptr= 0;
   cl_uc::init();
   set_name("mcs51_controller");
   reset();
@@ -512,10 +513,23 @@ cl_51core::print_regs(class cl_console_base *con)
   con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
               isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B));
   //eram2xram();
-  data= xram->get(dptr->get(/*DPH*/1)*256+dptr->get(/*DPL*/0));
-  con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n", dptr->get(/*DPH*/1),
-		 dptr->get(/*DPL*/0), data, data, isprint(data)?data:'.');
-
+  if (dptr)
+    {
+      data= xram->get(dptr->get(/*DPH*/1)*256+dptr->get(/*DPL*/0));
+      con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n",
+		     dptr->get(/*DPH*/1),
+		     dptr->get(/*DPL*/0),
+		     data, data, isprint(data)?data:'.');
+    }
+  else
+    {
+      data= xram->get(sfr->get(DPH)*256+sfr->get(DPL));
+      con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n",
+		     sfr->get(DPH),
+		     sfr->get(DPL),
+		     data, data, isprint(data)?data:'.');
+    }
+  
   data= iram->get(iram->get(start+1));
   con->dd_printf("@R1 %02x %c", data, isprint(data) ? data : '.');
   data= psw->get();

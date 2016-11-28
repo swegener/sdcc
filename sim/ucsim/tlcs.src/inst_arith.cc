@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_arith.cc 500 2016-11-12 15:15:43Z drdani $ */
+/* $Id: inst_arith.cc 517 2016-11-22 19:12:14Z drdani $ */
 
 #include "tlcscl.h"
 
@@ -59,6 +59,8 @@ cl_tlcs::inst_inc(cl_memory_cell *cell)
   u8_t d= cell->read();
   d= op_inc(d);
   cell->write(d);
+  vc.rd++;
+  vc.wr++;
 }
 
 
@@ -71,6 +73,8 @@ cl_tlcs::inst_incx(cl_memory_cell *cell)
       u8_t d= cell->read();
       d= op_inc(d);
       cell->write(d);
+      vc.rd++;
+      vc.wr++;
     }
 }
 
@@ -105,6 +109,8 @@ cl_tlcs::inst_dec(cl_memory_cell *cell)
   u8_t d= cell->read();
   d= op_dec(d);
   cell->write(d);
+  vc.rd++;
+  vc.wr++;
 }
 
 
@@ -117,6 +123,8 @@ cl_tlcs::inst_decx(cl_memory_cell *cell)
       u8_t d= cell->read();
       d= op_dec(d);
       cell->write(d);
+      vc.rd++;
+      vc.wr++;
     }
 }
 
@@ -147,6 +155,7 @@ cl_tlcs::inst_inc16gg(u8_t gg, t_addr addr)
     as= yas;
   u8_t l= as->read(addr);
   u8_t h= as->read(addr+1);
+  vc.rd+= 2;
   u16_t d= h*256 + l;
 
   if (((int)d + 1) > 0xffff)
@@ -161,6 +170,7 @@ cl_tlcs::inst_inc16gg(u8_t gg, t_addr addr)
 
   as->write(addr, d & 0xff);
   as->write(addr+1, d >> 8);
+  vc.wr+= 2;
   
   return d;
 }
@@ -212,6 +222,7 @@ cl_tlcs::inst_dec16gg(u8_t gg, t_addr addr)
     as= yas;
   u8_t l= as->read(addr);
   u8_t h= as->read(addr+1);
+  vc.rd+= 2;
   u16_t d= h*256 + l;
 
   if (((int)d - 1) < 0)
@@ -226,6 +237,7 @@ cl_tlcs::inst_dec16gg(u8_t gg, t_addr addr)
 
   as->write(addr, d & 0xff);
   as->write(addr+1, d >> 8);
+  vc.wr+= 2;
   
   return d;
 }
@@ -293,6 +305,7 @@ int
 cl_tlcs::inst_add_a(class cl_memory_cell *cell)
 {
   reg.raf.a= op_add_a((u8_t)(cell->read()));
+  vc.rd++;
   return resGO;
 }
 
@@ -340,6 +353,7 @@ cl_tlcs::inst_adc_a(u8_t d)
 int
 cl_tlcs::inst_adc_a(class cl_memory_cell *cell)
 {
+  vc.rd++;
   return inst_adc_a((u8_t)(cell->read()));
 }
 
@@ -388,6 +402,7 @@ cl_tlcs::inst_sub_a(u8_t d)
 int
 cl_tlcs::inst_sub_a(class cl_memory_cell *cell)
 {
+  vc.rd++;
   return inst_sub_a((u8_t)(cell->read()));
 }
 
@@ -442,6 +457,7 @@ cl_tlcs::inst_sbc_a(u8_t d)
 int
 cl_tlcs::inst_sbc_a(class cl_memory_cell *cell)
 {
+  vc.rd++;
   return inst_sbc_a((u8_t)(cell->read()));
 }
 
@@ -477,6 +493,7 @@ cl_tlcs::inst_and_a(u8_t d)
 int
 cl_tlcs::inst_and_a(class cl_memory_cell *cell)
 {
+  vc.rd++;
   return inst_and_a((u8_t)(cell->read()));
 }
 
@@ -511,6 +528,7 @@ cl_tlcs::inst_xor_a(u8_t d)
 int
 cl_tlcs::inst_xor_a(class cl_memory_cell *cell)
 {
+  vc.rd++;
   return inst_xor_a((u8_t)(cell->read()));
 }
 
@@ -545,6 +563,7 @@ cl_tlcs::inst_or_a(u8_t d)
 int
 cl_tlcs::inst_or_a(class cl_memory_cell *cell)
 {
+  vc.rd++;
   return inst_or_a((u8_t)(cell->read()));
 }
 
@@ -572,6 +591,7 @@ cl_tlcs::op_cp_a(u8_t d)
 int
 cl_tlcs::op_cp_a(class cl_memory_cell *cell)
 {
+  vc.rd++;
   return op_cp_a((u8_t)(cell->read()));
 }
 
@@ -614,7 +634,8 @@ cl_tlcs::op_add_hl(t_addr addr)
   dl= nas->read(addr);
   dh= nas->read(addr+1);
   d= dh*256 + dl;
-
+  vc.rd+= 2;
+  
   return op_add16(reg.hl, d);
 }
 
@@ -648,6 +669,7 @@ cl_tlcs::op_adc_hl(t_addr addr)
   u8_t dh= nas->read(addr+1);
   u16_t d= dh*256 + dl;
   int oldc= (reg.raf.f & FLAG_C)?1:0;
+  vc.rd+= 2;
   
   return op_add_hl((t_mem)d + oldc);
 }
@@ -697,7 +719,8 @@ cl_tlcs::op_sub_hl(t_addr addr)
   u8_t dl= nas->read(addr);
   u8_t dh= nas->read(addr+1);
   u16_t d= dh*256 + dl;
-
+  vc.rd+= 2;
+  
   return op_sub16(reg.hl, d);
 }
 
@@ -745,6 +768,7 @@ cl_tlcs::op_sbc_hl(t_addr addr)
   u8_t dl= nas->read(addr);
   u8_t dh= nas->read(addr+1);
   u16_t d= dh*256 + dl;
+  vc.rd+= 2;
   
   return op_sbc_hl((t_mem)d);
 }
@@ -777,6 +801,7 @@ cl_tlcs::op_and_hl(t_addr addr)
   u8_t dl= nas->read(addr);
   u8_t dh= nas->read(addr+1);
   u16_t d= dh*256 + dl;
+  vc.rd+= 2;
   
   return op_and_hl((t_mem)d);
 }
@@ -808,6 +833,7 @@ cl_tlcs::op_xor_hl(t_addr addr)
   u8_t dl= nas->read(addr);
   u8_t dh= nas->read(addr+1);
   u16_t d= dh*256 + dl;
+  vc.rd+= 2;
   
   return op_xor_hl((t_mem)d);
 }
@@ -839,6 +865,7 @@ cl_tlcs::op_or_hl(t_addr addr)
   u8_t dl= nas->read(addr);
   u8_t dh= nas->read(addr+1);
   u16_t d= dh*256 + dl;
+  vc.rd+= 2;
   
   return op_or_hl((t_mem)d);
 }

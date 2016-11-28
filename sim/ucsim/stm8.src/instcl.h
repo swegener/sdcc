@@ -1,9 +1,10 @@
-/* $Id: instcl.h 345 2016-07-10 14:51:45Z  $ */
+/* $Id: instcl.h 519 2016-11-23 14:21:44Z drdani $ */
 
 /* stm8.src/instcl.h */
 
    //virtual void incx(void);
    virtual int fetchea(t_mem code, unsigned char prefix);
+   virtual int get_1(unsigned int addr);
    virtual int get2(unsigned int addr);
    virtual int get3(unsigned int addr);
    virtual int get_dest(t_mem code, unsigned char prefix);

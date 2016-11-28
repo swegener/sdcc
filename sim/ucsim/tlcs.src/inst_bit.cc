@@ -50,8 +50,10 @@ u8_t
 cl_tlcs::inst_tset(cl_memory_cell *cell, u8_t bitnr)
 {
   u8_t v= cell->read();
+  vc.rd++;
   v= op_tset(v, bitnr);
   cell->write(v);
+  vc.wr++;
   return v;
 }
 
@@ -77,8 +79,10 @@ u8_t
 cl_tlcs::inst_bit(cl_memory_cell *cell, u8_t bitnr)
 {
   u8_t v= cell->read();
+  vc.rd++;
   v= op_bit(v, bitnr);
   cell->write(v);
+  vc.wr++;
   return v;
 }
 
@@ -100,8 +104,10 @@ u8_t
 cl_tlcs::inst_res(cl_memory_cell *cell, u8_t bitnr)
 {
   u8_t v= cell->read();
+  vc.rd++;
   v= op_res(v, bitnr);
   cell->write(v);
+  vc.wr++;
   return v;
 }
 
@@ -123,8 +129,10 @@ u8_t
 cl_tlcs::inst_set(cl_memory_cell *cell, u8_t bitnr)
 {
   u8_t v= cell->read();
+  vc.rd++;
   v= op_set(v, bitnr);
   cell->write(v);
+  vc.wr++;
   return v;
 }
 

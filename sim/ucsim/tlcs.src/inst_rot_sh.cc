@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_rot_sh.cc 500 2016-11-12 15:15:43Z drdani $ */
+/* $Id: inst_rot_sh.cc 517 2016-11-22 19:12:14Z drdani $ */
 
 #include "tlcscl.h"
 
@@ -61,7 +61,9 @@ u8_t
 cl_tlcs::inst_rlc(cl_memory_cell *cell)
 {
   u8_t d= op_rlc(cell->read(), true);
+  vc.rd++;
   cell->write(d);
+  vc.wr++;
   return d;
 }
 
@@ -97,7 +99,9 @@ u8_t
 cl_tlcs::inst_rrc(cl_memory_cell *cell)
 {
   u8_t d= op_rrc(cell->read(), true);
+  vc.rd++;
   cell->write(d);
+  vc.wr++;
   return d;
 }
 
@@ -132,7 +136,9 @@ u8_t
 cl_tlcs::inst_rl(cl_memory_cell *cell)
 {
   u8_t d= op_rl(cell->read(), true);
+  vc.rd++;
   cell->write(d);
+  vc.wr++;
   return d;
 }
 
@@ -167,7 +173,9 @@ u8_t
 cl_tlcs::inst_rr(cl_memory_cell *cell)
 {
   u8_t d= op_rr(cell->read(), true);
+  vc.rd++;
   cell->write(d);
+  vc.wr++;
   return d;
 }
 
@@ -200,7 +208,9 @@ u8_t
 cl_tlcs::inst_sla(cl_memory_cell *cell)
 {
   u8_t d= op_sla(cell->read(), true);
+  vc.rd++;
   cell->write(d);
+  vc.wr++;
   return d;
 }
 
@@ -235,7 +245,9 @@ u8_t
 cl_tlcs::inst_sra(cl_memory_cell *cell)
 {
   u8_t d= op_sra(cell->read(), true);
+  vc.rd++;
   cell->write(d);
+  vc.wr++;
   return d;
 }
 
@@ -268,7 +280,9 @@ u8_t
 cl_tlcs::inst_srl(cl_memory_cell *cell)
 {
   u8_t d= op_srl(cell->read(), true);
+  vc.rd++;
   cell->write(d);
+  vc.wr++;
   return d;
 }
 
@@ -280,9 +294,11 @@ cl_tlcs::inst_rld(class cl_memory_cell *cell)
   reg.raf.f&= ~(FLAG_H|FLAG_X|FLAG_N);
 
   u8_t c= cell->read();
+  vc.rd++;
   u8_t temp= reg.raf.a & 0x0f;
   reg.raf.a= (reg.raf.a & 0xf0) + (c >> 4);
   cell->write((c << 4) + temp);
+  vc.wr++;
   set_p(reg.raf.a);
   return resGO;
 }
@@ -295,9 +311,11 @@ cl_tlcs::inst_rrd(class cl_memory_cell *cell)
   reg.raf.f&= ~(FLAG_H|FLAG_X|FLAG_N);
 
   u8_t c= cell->read();
+  vc.rd++;
   u8_t temp= reg.raf.a & 0x0f;
   reg.raf.a= (reg.raf.a & 0xf0) + (c & 0x0f);
   cell->write((temp << 4) + (c >> 4));
+  vc.wr++;
   set_p(reg.raf.a);
   return resGO;
 }

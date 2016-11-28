@@ -42,7 +42,8 @@ cl_z80::inst_XXcb_rlc(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   rlc_byte(tmp);
-
+  vc.rd++;
+  
   switch(code) {
     case 0x00: // RLC B
       regs.bc.h = tmp;
@@ -72,7 +73,8 @@ cl_z80::inst_XXcb_rlc(t_mem code)
     break;
   }
   store1(addr, tmp);
-
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -84,7 +86,8 @@ cl_z80::inst_XXcb_rrc(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   rrc_byte(tmp);
-
+  vc.rd++;
+  
   switch(code) {
     case 0x08: // RRC B
       regs.bc.h = tmp;
@@ -114,7 +117,8 @@ cl_z80::inst_XXcb_rrc(t_mem code)
     break;
   }
   store1(addr, tmp);
-
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -126,7 +130,8 @@ cl_z80::inst_XXcb_rl(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   rl_byte(tmp);
-
+  vc.rd++;
+  
   switch(code) {
     case 0x10: // RL B
       regs.bc.h = tmp;
@@ -156,7 +161,8 @@ cl_z80::inst_XXcb_rl(t_mem code)
     break;
   }
   store1(addr, tmp);
-
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -168,7 +174,8 @@ cl_z80::inst_XXcb_rr(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   rr_byte(tmp);
-
+  vc.rd++;
+  
   switch(code) {
     case 0x18: // RR B
       regs.bc.h = tmp;
@@ -198,7 +205,8 @@ cl_z80::inst_XXcb_rr(t_mem code)
     break;
   }
   store1(addr, tmp);
-
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -210,7 +218,8 @@ cl_z80::inst_XXcb_sla(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   sla_byte(tmp);
-
+  vc.rd++;
+  
   switch(code) {
     case 0x20: // SLA B
       regs.bc.h = tmp;
@@ -240,6 +249,8 @@ cl_z80::inst_XXcb_sla(t_mem code)
     break;
   }
   store1(addr, tmp);
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -251,7 +262,8 @@ cl_z80::inst_XXcb_sra(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   sra_byte(tmp);
-
+  vc.rd++;
+  
   switch(code) {
     case 0x28: // SRA B
       regs.bc.h = tmp;
@@ -281,6 +293,8 @@ cl_z80::inst_XXcb_sra(t_mem code)
     break;
   }
   store1(addr, tmp);
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -292,7 +306,8 @@ cl_z80::inst_XXcb_slia(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   slia_byte(tmp);
-
+  vc.rd++;
+  
   switch(code) {
     case 0x30: // SLIA B	(Shift Left Inverted Arithmetic)
       regs.bc.h = tmp;
@@ -322,6 +337,8 @@ cl_z80::inst_XXcb_slia(t_mem code)
     break;
   }
   store1(addr, tmp);
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -333,7 +350,8 @@ cl_z80::inst_XXcb_srl(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   srl_byte(tmp);
-
+  vc.rd++;
+  
   switch(code) {
     case 0x38: // SRL B
       regs.bc.h = tmp;
@@ -363,6 +381,8 @@ cl_z80::inst_XXcb_srl(t_mem code)
     break;
   }
   store1(addr, tmp);
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -378,9 +398,11 @@ cl_z80::inst_XXcb_bit(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   bit_byte(tmp, bit_bitnum);
-
+  vc.rd++;
+  
   store1(addr, tmp);
-
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -395,7 +417,8 @@ cl_z80::inst_XXcb_res(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   tmp &= ~(1 << bit_bitnum);
-
+  vc.rd++;
+  
   switch(code & 0x7) {
     case 0x0: // RES x,B
       regs.bc.h = tmp; break;
@@ -417,6 +440,8 @@ cl_z80::inst_XXcb_res(t_mem code)
       return(resINV_INST);
   }
   store1(addr, tmp);
+  vc.wr++;
+  
   return(resGO);
 }
 
@@ -431,7 +456,8 @@ cl_z80::inst_XXcb_set(t_mem code)
   addr = add_u16_disp(regs_IX_OR_IY, n_offset);
   tmp = get1(addr);
   tmp |= (1 << bit_bitnum);
-
+  vc.rd++;
+  
   switch(code & 0x7) {
     case 0x0: // SET x,B
       regs.bc.h = tmp; break;
@@ -453,6 +479,8 @@ cl_z80::inst_XXcb_set(t_mem code)
       return(resINV_INST);
   }
   store1(addr, tmp);
+  vc.wr++;
+  
   return(resGO);
 }
 

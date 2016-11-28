@@ -498,7 +498,8 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
             }
         }
     }
-  un_redirect();
+  if (!is_frozen())
+    un_redirect();
   if (!retval &&
       cmdstr &&
       do_print_prompt &&

@@ -43,6 +43,8 @@ cl_51core::inst_inc_a(uchar code)
 {
   acc->wadd(1);
   return(resGO);
+  //vc.rd++;
+  //vc.wr++;
 }
 
 
@@ -59,6 +61,8 @@ cl_51core::inst_inc_addr(uchar code)
 
   t_mem d= cell->read(HW_PORT);
   cell->write(d+1);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -76,6 +80,8 @@ cl_51core::inst_inc_Sri(uchar code)
 
   cell= iram->get_cell(R[code & 0x01]->read());
   cell->wadd(1);
+  vc.rd++;//= 2;
+  vc.wr++;
   return(resGO);
 }
 
@@ -92,6 +98,8 @@ cl_51core::inst_inc_rn(uchar code)
   class cl_memory_cell *reg= R[code & 0x07];
 
   reg->wadd(1);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -106,7 +114,8 @@ int
 cl_51core::inst_dec_a(uchar code)
 {
   acc->wadd(-1);
-
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -125,6 +134,8 @@ cl_51core::inst_dec_addr(uchar code)
   cell= get_direct(fetch());
   t_mem d= cell->read(HW_PORT);
   cell->write(d-1);
+  vc.rd++;
+  vc.wr++;
   return(resGO);
 }
 
@@ -142,6 +153,8 @@ cl_51core::inst_dec_Sri(uchar code)
 
   cell= iram->get_cell(R[code & 0x01]->read());
   cell->add(-1);
+  vc.rd++;//= 2;
+  vc.wr++;
   return(resGO);
 }
 
@@ -158,6 +171,8 @@ cl_51core::inst_dec_rn(uchar code)
   class cl_memory_cell *reg= R[code & 0x07];
 
   reg->wadd(-1);
+  //vc.rd++;
+  //vc.wr++;
   return(resGO);
 }
 
@@ -177,6 +192,8 @@ cl_51core::inst_inc_dptr(uchar code)
   /*sfr*/dptr->write(/*DPH*/1, (_dptr >> 8) & 0xff);
   /*sfr*/dptr->write(/*DPL*/0, _dptr & 0xff);
   tick(1);
+  vc.rd+= 2;
+  vc.wr+= 2;
   return(resGO);
 }
 

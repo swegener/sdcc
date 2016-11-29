@@ -323,10 +323,11 @@ struct dis_entry disass_390f[] = {
 cl_uc390::cl_uc390 (int Itype, int Itech, class cl_sim *asim):
   cl_uc52 (Itype, Itech, asim)
 {
+  //flat24_flag= 0;
   if (Itype == CPU_DS390F)
     {
       printf ("24-bit flat mode, warning: lots of sfr-functions not implemented!\n");
-      flat24_flag = 1;
+      //flat24_flag = 1;
     }
   // todo: add interrupt sources
 }
@@ -477,8 +478,12 @@ cl_uc390::clear_sfr(void)
   sfr->write(0x90, 0xff); /* P1     */
   sfr->write(0x92, 0xbf); /* P4CNT  */
   sfr->write(0x9b, 0xfc); /* ESP    */
-  if (flat24_flag)
-    sfr->/*write*/set(ACON, 0xfa); /* ACON; AM1 set: 24-bit flat */
+  if (type == CPU_DS390F/*flat24_flag*/)
+    {
+      sfr->/*write*/set(ACON, 0xfa); /* ACON; AM1 set: 24-bit flat */
+      //printf("ACON inited to 0xfa, 24 bit flat mode!\n");
+      //printf("CPU type=%d (%x) flag24=%d\n", type, type, flat24_flag);
+    }
   else
     sfr->/*write*/set(ACON, 0xf8); /* ACON   */
   sfr->write(0xa0, 0xff); /* P2     */
@@ -930,6 +935,7 @@ cl_uc390::inst_ljmp (uchar code)
 
   if (sfr->get (ACON) & 0x02) /* AM1 set: 24-bit flat? */
     {
+      //printf("LJMP in 24 bit mode! PC=%x\n", PC);
       x = fetch ();
       h = fetch ();
       l = fetch ();

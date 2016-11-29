@@ -80,7 +80,7 @@ public:
   virtual void   print_regs(class cl_console_base *con);
 
 protected:
-  int flat24_flag; /* true if processor == ds390f */
+  //int flat24_flag; /* true if processor == ds390f */
   virtual void push_byte (t_mem uc);
   virtual t_mem pop_byte (void);
 };

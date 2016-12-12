@@ -25903,6 +25903,67 @@ Interrupt handler cannot be interrupted by further interrupts
 
 \end_layout
 
+\begin_layout Subsection
+STM8 Interrupt Service Routines
+\end_layout
+
+\begin_layout Standard
+The STM8 has a trap interrupt.
+ Where the keyword 
+\emph on
+__interrupt
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+interrupt
+\end_layout
+
+\end_inset
+
+
+\emph default
+ is used for normal user interrupts, the 
+\emph on
+__trap
+\emph default
+ keyword is used for the trap handler:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+void handler (void) __trap
+\begin_inset Newline newline
+\end_inset
+
+{
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\begin_inset Newline newline
+\end_inset
+
+}
+\end_layout
+
 \begin_layout Section
 Enabling and Disabling Interrupts
 \end_layout

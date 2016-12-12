@@ -4,4 +4,4 @@ if [ -z "$PRJ" ]; then
    PRJ=t1
 fi
 
-../stlcs -C c ${PRJ}.ihx <run.cmd
+../sz80 -C conf.cmd ${PRJ}.ihx <run.cmd

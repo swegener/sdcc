@@ -25908,7 +25908,8 @@ STM8 Interrupt Service Routines
 \end_layout
 
 \begin_layout Standard
-The STM8 has a trap interrupt.
+The STM8 interrupt table contains 31 entries: Reset (used by SDCC for program
+ startup), trap and user interrupts 0 to 29.
  Where the keyword 
 \emph on
 __interrupt

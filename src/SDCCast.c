@@ -4646,7 +4646,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
             }
           if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
             {
-              werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
+              werrorfl (tree->filename, tree->lineno, E_INCOMPAT_TYPES);
               fprintf (stderr, "comparing type ");
               printTypeChain (LTYPE (tree), stderr);
               fprintf (stderr, " to type ");
@@ -4678,7 +4678,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
                   }
                 else
                   {
-                    werrorfl (tree->filename, tree->lineno, E_COMPARE_OP);
+                    werrorfl (tree->filename, tree->lineno, E_INCOMPAT_TYPES);
                     fprintf (stderr, "comparing type ");
                     printTypeChain (LTYPE (tree), stderr);
                     fprintf (stderr, " to type ");

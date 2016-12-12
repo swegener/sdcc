@@ -140,7 +140,7 @@ struct
   { E_SHIFT_OP_INVALID, ERROR_LEVEL_ERROR,
      "invalid operand for shift operator", 0 },
   { E_COMPARE_OP, ERROR_LEVEL_ERROR,
-     "compare operand cannot be struct/union", 0 },
+     "operands are not comparable", 0 },
   { E_BITWISE_OP, ERROR_LEVEL_ERROR,
      "operand invalid for bitwise operation", 0 },
   { E_ANDOR_OP, ERROR_LEVEL_ERROR,

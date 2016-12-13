@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "utils.h"
 #include "globals.h"
+#include "fiocl.h"
 
 #include "serial_hwcl.h"
 
@@ -118,11 +119,11 @@ cl_serial_hw::init(void)
       fi->interactive(NULL);
       fi->raw();
       fi->echo(NULL);
-      deb("** serial io fin %d\n", fi->file_id);
+      //deb("** serial io fin %d\n", fi->file_id);
     }
   if (fo)
     {
-      deb("** serial io fount %d\n", fo->file_id);
+      //deb("** serial io fount %d\n", fo->file_id);
     }
 
   menu= 0;

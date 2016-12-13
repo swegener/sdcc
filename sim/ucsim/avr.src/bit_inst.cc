@@ -303,6 +303,8 @@ cl_avr::cbi_A_b(t_mem code)
   mask= 1 << (code&7);
   d= ~mask & ram->read(addr);
   ram->write(addr, d);
+  vc.rd++;
+  vc.wr++;
   tick(1);
   return(resGO);
 }
@@ -324,6 +326,8 @@ cl_avr::sbi_A_b(t_mem code)
   mask= 1 << (code&7);
   t_mem d= mask | ram->read(addr);
   ram->write(addr, d);
+  vc.rd++;
+  vc.wr++;
   tick(1);
   return(resGO);
 }
@@ -351,6 +355,7 @@ cl_avr::bld_Rd_b(t_mem code)
   else
     data= ram->read(d) & ~mask;
   ram->write(d, data);
+  vc.wr++;
   return(resGO);
 }
 
@@ -376,6 +381,7 @@ cl_avr::bst_Rd_b(t_mem code)
     ram->set_bit1(SREG, BIT_T);
   else
     ram->set_bit0(SREG, BIT_T);
+  vc.rd++;
   return(resGO);
 }
 

@@ -38,42 +38,19 @@ class cl_uc51r: public cl_uc52
 {
 public:
   int   clock_out;
-
-public:
-  //uchar ERAM[ERAM_SIZE];
-
+  class cl_memory_chip *eram_chip;
+  
 public:
   cl_uc51r(int Itype, int Itech, class cl_sim *asim);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
-
+  virtual void make_chips(void);
+  virtual void decode_xram(void);
+  
   virtual void reset(void);
   virtual void clear_sfr(void);
 
-  //virtual void eram2xram(void);
-  //virtual void xram2eram(void);
-
-  //virtual void proc_write(t_addr addr);
-
   virtual void received(int c);
-
-  //virtual int inst_movx_a_Sdptr(uchar code);		/* e0 */
-  //virtual int inst_movx_a_Sri(uchar code);		/* e2,e3 */
-  //virtual int inst_movx_Sdptr_a(uchar code);		/* f0 */
-  //virtual int inst_movx_Sri_a(uchar code);		/* f2,f3 */
-};
-
-
-class cl_uc51r_dummy_hw: public cl_hw
-{
-protected:
-  class cl_memory_cell *cell_auxr;
-public:
-  cl_uc51r_dummy_hw(class cl_uc *auc);
-  virtual int init(void);
-
-  virtual void write(class cl_memory_cell *cell, t_mem *val);
-  //virtual void happen(class cl_hw *where, enum hw_event he, void *params);
 };
 
 

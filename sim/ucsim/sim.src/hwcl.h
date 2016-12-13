@@ -94,7 +94,9 @@ class cl_hw: public cl_guiobj
   virtual bool conf(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
   virtual void cfg_set(t_addr addr, t_mem val);
+  virtual void cfg_write(t_addr addr, t_mem val);
   virtual t_mem cfg_get(t_addr addr);
+  virtual t_mem cfg_read(t_addr addr);
   
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual class cl_memory_cell *register_cell(class cl_address_space *mem,

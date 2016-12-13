@@ -220,14 +220,14 @@ class cl_tlcs: public cl_uc
   virtual class cl_memory_cell *cell_hl_a();
   virtual class cl_memory_cell *cell_gg(u8_t gg);
   virtual class cl_memory_cell *cell_n(u8_t n);
-  virtual class cl_memory_cell *cell_ixd(u8_t ix, int8_t d);
+  virtual class cl_memory_cell *cell_ixd(u8_t ix, i8_t d);
   
   virtual u16_t mem16(t_addr addr);
   virtual u16_t mem16gg(u8_t gg);
-  virtual u16_t mem16ixd(u8_t ix, int8_t d);
+  virtual u16_t mem16ixd(u8_t ix, i8_t d);
   virtual void write16(t_addr addr, u16_t val);
   virtual void write16gg(u8_t gg, u16_t val);
-  virtual void write16ixd(u8_t ix, int8_t d, u16_t val);
+  virtual void write16ixd(u8_t ix, i8_t d, u16_t val);
   virtual bool flag(enum tlcs_flags f);
   virtual bool cc(u8_t cc);
   
@@ -355,8 +355,8 @@ class cl_tlcs: public cl_uc
   virtual int inst_ret();			// 1e
   virtual int inst_reti();			// 1f
   virtual int inst_call(t_addr PC_of_inst, u16_t addr);	// CALL addr
-  virtual int inst_djnz_b(int8_t d);
-  virtual int inst_djnz_bc(int8_t d);
+  virtual int inst_djnz_b(i8_t d);
+  virtual int inst_djnz_bc(i8_t d);
   
   // ?
 };

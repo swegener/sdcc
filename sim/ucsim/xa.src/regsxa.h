@@ -46,35 +46,38 @@ struct t_regs
 */
 
 /* store to sfr */
-#define set_word_direct(addr, val) { sfr->set((t_addr) (addr), (val) & 0xff); \
-    sfr->set((t_addr) ((addr)+1), ((val) >> 8) & 0xff); }
-#define set_byte_direct(addr, val) sfr->set((t_addr) (addr), (val) )
+#define set_word_direct(addr, val) { sfr->write((t_addr) (addr), (val) & 0xff); \
+    sfr->write((t_addr) ((addr)+1), ((val) >> 8) & 0xff); \
+    vc.wr+= 2; }
+#define set_byte_direct(addr, val) { sfr->write((t_addr) (addr), (val) ); vc.wr++; }
 
 /* get from sfr */
-#define get_byte_direct(addr) sfr->get((t_addr) (addr))
-#define get_word_direct(addr) (sfr->get((t_addr) (addr)) | (sfr->get((t_addr) ((addr)+1)) << 8) )
+#define get_byte_direct(addr) (vc.rd++, (sfr->read((t_addr) (addr))))
+#define get_word_direct(addr) (vc.rd+= 2, ((sfr->read((t_addr) (addr)) | (sfr->read((t_addr) ((addr)+1)) << 8) )))
 
 /* store to idata(onchip) ram */
-#define set_idata2(addr, val) { iram->set((t_addr) (addr), (val) & 0xff); \
-                            iram->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
-#define set_idata1(addr, val) iram->set((t_addr) (addr), (val) )
+#define set_idata2(addr, val) { iram->write((t_addr) (addr), (val) & 0xff); \
+                            iram->write((t_addr) (addr+1), ((val) >> 8) & 0xff); \
+  			    vc.wr+= 2; }
+#define set_idata1(addr, val) { iram->write((t_addr) (addr), (val) ); vc.wr++; }
 
 /* get from idata(onchip) ram */
-#define get_idata1(addr) iram->get((t_addr) (addr))
-#define get_idata2(addr) (iram->get((t_addr) (addr)) | (iram->get((t_addr) (addr+1)) << 8) )
+#define get_idata1(addr) (vc.rd++, (iram->read((t_addr) (addr))))
+#define get_idata2(addr) (vc.rd+= 2, (iram->read((t_addr) (addr)) | (iram->read((t_addr) (addr+1)) << 8) ))
 
 /* store to xdata(external) ram */
-#define set_xdata2(addr, val) { ram->set((t_addr) (addr), (val) & 0xff); \
-                            ram->set((t_addr) (addr+1), ((val) >> 8) & 0xff); }
-#define set_xdata1(addr, val) ram->set((t_addr) (addr), val)
+#define set_xdata2(addr, val) { ram->write((t_addr) (addr), (val) & 0xff); \
+                            ram->write((t_addr) (addr+1), ((val) >> 8) & 0xff); \
+  			    vc.wr+= 2; }
+#define set_xdata1(addr, val) { ram->write((t_addr) (addr), val); vc.wr++; }
 
 /* get from xdata(external) ram */
-#define get_xdata1(addr) ram->get((t_addr) (addr))
-#define get_xdata2(addr) (ram->get((t_addr) (addr)) | (ram->get((t_addr) (addr+1)) << 8) )
+#define get_xdata1(addr) (vc.rd++, (ram->read((t_addr) (addr))))
+#define get_xdata2(addr) (vc.rd+= 2, (ram->read((t_addr) (addr)) | (ram->read((t_addr) (addr+1)) << 8) ))
 
 /* get from code */
-#define getcode1(addr) rom->get((t_addr) (addr))
-#define getcode2(addr) (rom->get((t_addr) (addr)) | (rom->get((t_addr) (addr+1)) << 8) )
+#define getcode1(addr) (vc.rd++, rom->read((t_addr) (addr)))
+#define getcode2(addr) (vc.rd+= 2, (rom->read((t_addr) (addr)) | (rom->read((t_addr) (addr+1)) << 8) ))
 
 /* fetch from opcode code space */
 #define fetch2() ((fetch() << 8) | fetch())

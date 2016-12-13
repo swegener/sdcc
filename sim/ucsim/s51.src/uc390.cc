@@ -345,121 +345,118 @@ cl_uc390::mk_hw_elements (void)
 void
 cl_uc390::make_memories(void)
 {
-  class cl_address_space *as;
-  int i;
-  
-  rom= as= new cl_address_space("rom"/*MEM_ROM_ID*/, 0, 0x20000, 8);
-  as->init();
-  address_spaces->add(as);
-  iram= as= new cl_address_space(MEM_IRAM_ID, 0, 0x100, 8);
-  as->init();
-  address_spaces->add(as);
-  sfr= as= new cl_address_space(MEM_SFR_ID, 0x80, 0x80, 8);
-  as->init();
-  address_spaces->add(as);
-  xram= as= new cl_address_space(MEM_XRAM_ID, 0, 0x100000+128, 8);
-  as->init();
-  address_spaces->add(as);
-  ixram= as= new cl_address_space(MEM_IXRAM_ID, 0, 0x1000, 8);
-  as->init();
-  address_spaces->add(as);
-
   class cl_address_decoder *ad;
-  class cl_memory_chip *chip, *sfr_chip, *iram_chip;
 
-  chip= new cl_memory_chip("rom_chip", 0x20000, 8, 0xff);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= rom, chip, 0, 0x1ffff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  chip= iram_chip= new cl_memory_chip("iram_chip", 0x100, 8, 0);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= iram, chip, 0, 0xff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  chip= new cl_memory_chip("xram_chip", 0x100000+128, 8, 0);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= xram, chip, 0, 0x10007f, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  chip= new cl_memory_chip("ixram_chip", 0x1000, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= address_space(MEM_IXRAM_ID),
-			     chip, 0, 0xfff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  chip= sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8, 0);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= sfr, chip, 0x80, 0xff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
+  make_address_spaces();
+  dptr= 0;
+  make_chips();
 
   acc= sfr->get_cell(ACC);
   psw= sfr->get_cell(PSW);
 
+  decode_regs();
+  decode_rom();
+  decode_iram();
+  decode_sfr();
+  decode_xram();
+  decode_bits();
+  decode_dptr();
+  
+  ad= new cl_address_decoder(ixram, ixram_chip, 0, 0xfff, 0);
+  ad->init();
+  ixram->decoders->add(ad);
+  ad->activate(0);
+}
+
+void
+cl_uc390::make_address_spaces(void)
+{
+  rom= new cl_address_space("rom", 0, 0x20000, 8);
+  rom->init();
+  address_spaces->add(rom);
+  
+  iram= new cl_address_space("iram", 0, 0x100, 8);
+  iram->init();
+  address_spaces->add(iram);
+
+  sfr= new cl_address_space("sfr", 0x80, 0x80, 8);
+  sfr->init();
+  address_spaces->add(sfr);
+
+  xram= new cl_address_space("xram", 0, 0x100000+128, 8);
+  xram->init();
+  address_spaces->add(xram);
+
+  ixram= new cl_address_space("ixram", 0, 0x1000, 8);
+  ixram->init();
+  address_spaces->add(ixram);
+
   regs= new cl_address_space("regs", 0, 8, 8);
   regs->init();
   address_spaces->add(regs);
-  
-  cl_banker *b= new cl_banker(sfr, 0xd0, 0x18,
-			      regs, 0, 7);
-  b->init();
-  regs->decoders->add(b);
-  b->add_bank(0, memory("iram_chip"), 0);
-  b->add_bank(1, memory("iram_chip"), 8);
-  b->add_bank(2, memory("iram_chip"), 16);
-  b->add_bank(3, memory("iram_chip"), 24);
-  psw->write(0);
-  for (i= 0; i < 8; i++)
-    R[i]= regs->get_cell(i);
-  
-  cl_var *v;
-  vars->add(v= new cl_var(cchars("R0"), regs, 0));
-  v->init();
-  vars->add(v= new cl_var(cchars("R1"), regs, 1));
-  v->init();
-  vars->add(v= new cl_var(cchars("R2"), regs, 2));
-  v->init();
-  vars->add(v= new cl_var(cchars("R3"), regs, 3));
-  v->init();
-  vars->add(v= new cl_var(cchars("R4"), regs, 4));
-  v->init();
-  vars->add(v= new cl_var(cchars("R5"), regs, 5));
-  v->init();
-  vars->add(v= new cl_var(cchars("R6"), regs, 6));
-  v->init();
-  vars->add(v= new cl_var(cchars("R7"), regs, 7));
-  v->init();
 
-  bits= as= new cl_address_space("bits", 0, 0x100, 1);
-  as->init();
-  address_spaces->add(as);
-  ad= new cl_bander(bits, 0, 127,
-		    iram_chip, 32,
-		    8, 1);
+  bits= new cl_address_space("bits", 0, 0x100, 1);
+  bits->init();
+  address_spaces->add(bits);
+}
+
+void
+cl_uc390::make_chips(void)
+{
+  rom_chip= new cl_memory_chip("rom_chip", 0x20000, 8, 0xff);
+  rom_chip->init();
+  memchips->add(rom_chip);
+
+  iram_chip= new cl_memory_chip("iram_chip", 0x100, 8, 0);
+  iram_chip->init();
+  memchips->add(iram_chip);
+
+  xram_chip= new cl_memory_chip("xram_chip", 0x100000+128, 8, 0);
+  xram_chip->init();
+  memchips->add(xram_chip);
+
+  ixram_chip= new cl_memory_chip("ixram_chip", 0x1000, 8);
+  ixram_chip->init();
+  memchips->add(ixram_chip);
+
+  sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8, 0);
+  sfr_chip->init();
+  memchips->add(sfr_chip);
+}
+
+void
+cl_uc390::decode_rom(void)
+{
+  class cl_address_decoder *ad;
+  ad= new cl_address_decoder(rom, rom_chip, 0, 0x1ffff, 0);
   ad->init();
-  bits->decoders->add(ad);
+  rom->decoders->add(ad);
   ad->activate(0);
-  ad= new cl_bander(bits, 128, 255,
-		    sfr_chip, 0,
-		    8, 8);
+}
+
+void
+cl_uc390::decode_xram(void)
+{
+  class cl_address_decoder *ad;
+  
+  ad= new cl_address_decoder(xram, xram_chip, 0, 0x10007f, 0);
   ad->init();
-  bits->decoders->add(ad);
+  xram->decoders->add(ad);
   ad->activate(0);
+}
+
+void
+cl_uc390::decode_dptr(void)
+{
+  cl_var *v;
+  vars->add(v= new cl_var(chars("dpl"), sfr, 0x82));
+  v->init();
+  vars->add(v= new cl_var(chars("DPL"), sfr, 0x82));
+  v->init();
+  vars->add(v= new cl_var(chars("dph"), sfr, 0x83));
+  v->init();
+  vars->add(v= new cl_var(chars("DPH"), sfr, 0x83));
+  v->init();
 }
 
 

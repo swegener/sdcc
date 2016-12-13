@@ -68,7 +68,7 @@ cl_tlcs::inst_call(t_addr PC_of_inst, u16_t addr)
 
 // DJNZ
 int
-cl_tlcs::inst_djnz_b(int8_t d)
+cl_tlcs::inst_djnz_b(i8_t d)
 {
   reg.rbc.b--;
   if (reg.rbc.b != 0)
@@ -79,7 +79,7 @@ cl_tlcs::inst_djnz_b(int8_t d)
 
 // DJNZ BC
 int
-cl_tlcs::inst_djnz_bc(int8_t d)
+cl_tlcs::inst_djnz_bc(i8_t d)
 {
   reg.bc--;
   if (reg.bc != 0)

@@ -208,6 +208,7 @@ cl_uc::init(void)
   fbrk= new brk_coll(2, 2, rom);
   fbrk->Duplicates= false;
   brk_counter= 0;
+  make_cpu_hw();
   mk_hw_elements();
   class cl_cmdset *cs= sim->app->get_commander()->cmdset;
   build_cmdset(cs);
@@ -322,6 +323,12 @@ cl_uc::get_mem_width(char *id)
   return(m?(m->width):8);
 }
 */
+void
+cl_uc::make_cpu_hw(void)
+{
+  cpu= NULL;
+}
+
 void
 cl_uc::mk_hw_elements(void)
 {

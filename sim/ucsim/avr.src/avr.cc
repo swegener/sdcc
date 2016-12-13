@@ -651,6 +651,7 @@ cl_avr::push_data(t_mem data)
   sph= ram->read(SPH);
   sp= 0xffff & (256*sph + spl);
   data= ram->write(sp, data);
+  vc.wr++;
   sp= 0xffff & (sp-1);
   spl= sp & 0xff;
   sph= (sp>>8) & 0xff;
@@ -673,6 +674,7 @@ cl_avr::push_addr(t_addr addr)
   ram->write(sp, ah);
   sp= 0xffff & (sp-1);
   ram->write(sp, al);
+  vc.wr+= 2;
   sp= 0xffff & (sp-1);
   spl= sp & 0xff;
   sph= (sp>>8) & 0xff;
@@ -692,6 +694,7 @@ cl_avr::pop_data(t_mem *data)
   sp= 256*sph + spl;
   sp= 0xffff & (sp+1);
   *data= ram->read(sp);
+  vc.rd++;
   spl= sp & 0xff;
   sph= (sp>>8) & 0xff;
   ram->write(SPL, spl);
@@ -713,6 +716,7 @@ cl_avr::pop_addr(t_addr *addr)
   al= ram->read(sp);
   sp= 0xffff & (sp+1);
   ah= ram->read(sp);
+  vc.rd+= 2;
   *addr= ah*256 + al;
   spl= sp & 0xff;
   sph= (sp>>8) & 0xff;

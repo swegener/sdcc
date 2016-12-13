@@ -128,7 +128,7 @@ cl_app::run(void)
 		    sim->uc->touch();
 		  if (commander->input_avail())
 		    done= commander->proc_input();
-                }
+		}
 	      sim->step();
 	      if (jaj && commander->frozen_console)
 		sim->uc->print_regs(commander->frozen_console),

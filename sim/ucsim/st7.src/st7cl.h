@@ -68,7 +68,10 @@ public:
                                       int *immed_offset,
                                       struct dis_entry **dentry);
   virtual bool is_call(t_addr addr);
-
+  virtual t_mem get_1(t_addr addr);
+  virtual t_mem get_2(t_addr addr);
+  virtual t_mem get_3(t_addr addr);
+  
   virtual void reset(void);
 #include "instcl.h"
 };

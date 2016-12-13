@@ -1199,5 +1199,27 @@ cl_st7::exec_inst(void)
   return(resINV_INST);
 }
 
+t_mem
+cl_st7::get_1(t_addr addr)
+{
+  vc.rd++;
+  return ram->read(addr);
+}
+
+t_mem
+cl_st7::get_2(t_addr addr)
+{
+  vc.rd+= 2;
+  return (ram->read(addr) << 8) | ram->read(addr+1);
+}
+
+t_mem
+cl_st7::get_3(t_addr addr)
+{
+  vc.rd+= 3;
+  return (ram->read(addr) << 16) |
+    (ram->read(addr+1) << 8) |
+    (ram->read(addr+2));
+}
 
 /* End of st7.src/st7.cc */

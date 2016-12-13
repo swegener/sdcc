@@ -25,7 +25,6 @@ along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
-#include <stdint.h>
 
 #include "ddconfig.h"
 
@@ -351,7 +350,7 @@ int  cl_r3ka::inst_ed_(t_mem code)
       // {CF:DE':(HL)} <= (IX) + [(IY)*DE + DE' + CF];
       // BC--; IX++; IY++; HL++;
       {
-        uint32_t  tmp;
+        u32_t  tmp;
         
         /* scale a sum for operand pointed to by IY */
         tmp  = get1(regs.IY);
@@ -384,7 +383,7 @@ int  cl_r3ka::inst_ed_(t_mem code)
       // {CF:DE':(HL)} <= (IX) - [(IY)*DE + DE' + CF];
       // BC--; IX++; IY++; HL++;
       {
-        uint32_t  tmp;
+        u32_t  tmp;
         
         /* scale a sum for operand pointed to by IY */
         tmp  = get1(regs.IY);

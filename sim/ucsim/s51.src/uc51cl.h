@@ -71,7 +71,8 @@ public:
   class cl_address_space *sfr, *iram, *xram, *regs, *bits;
   class cl_address_space *dptr;
   class cl_memory_cell *acc, *psw, *R[8];
-
+  class cl_memory_chip *rom_chip, *sfr_chip, *iram_chip, *xram_chip;
+  
 public:
   // Help to detect external it requests (falling edge)
   uchar prev_p1;	// Prev state of P1
@@ -90,11 +91,22 @@ public:
   virtual ~cl_51core(void);
   virtual int    init(void);
   virtual char  *id_string(void);
+  virtual void make_cpu_hw(void);
   virtual void mk_hw_elements(void);
   virtual void build_cmdset(class cl_cmdset *cmdset);
   //virtual class cl_m *mk_mem(enum mem_class type, char *class_name);
   virtual void make_memories(void);
-
+  virtual void make_address_spaces(void);
+  virtual void make_chips(void);
+  virtual void decode_regs(void);
+  virtual void decode_bits(void);
+  virtual void decode_rom(void);
+  virtual void decode_iram(void);
+  virtual void decode_sfr(void);
+  virtual void decode_xram(void);
+  virtual void decode_dptr(void);
+  virtual void make_vars(void);
+  
   virtual int clock_per_cycle(void) { return(12); }
   virtual struct dis_entry *dis_tbl(void);
   virtual struct name_entry *sfr_tbl(void);
@@ -242,6 +254,18 @@ protected:
 };
 
 
+enum uc51cpu_cfg {
+  uc51cpu_aof_mdps	= 0, // addr of multi_DPTR_sfr selector
+  uc51cpu_mask_mdps	= 1, // mask in mutli_DPTR_sfr selector
+  uc51cpu_aof_mdps1l	= 2, // addr of multi_DPTR_sfr DPL1
+  uc51cpu_aof_mdps1h	= 3, // addr of multi_DPTR_sfr DPH1
+
+  uc51cpu_aof_mdpc	= 4, // addr of multi_DPTR_chip selector
+  uc51cpu_mask_mdpc	= 5, // mask in multi_DPTR_chip selector
+  
+  uc51cpu_nuof		= 16
+};
+
 class cl_uc51_cpu: public cl_hw
 {
  protected:
@@ -250,8 +274,10 @@ class cl_uc51_cpu: public cl_hw
  public:
   cl_uc51_cpu(class cl_uc *auc);
   virtual int init(void);
+  virtual int cfg_size(void) { return uc51cpu_nuof; }
 
   virtual void write(class cl_memory_cell *cell, t_mem *val);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 };
 
 

@@ -20,7 +20,7 @@ top_srcdir	= @top_srcdir@
 # Compiling entire program or any subproject
 # ------------------------------------------
 all: checkconf
-	$(MAKE) -f main.mk all &
+	$(MAKE) -f main.mk all
 	@for pkg in cmd.src sim.src gui.src; do \
 	  $(MAKE) -C $$pkg $$pkg ; \
 	done

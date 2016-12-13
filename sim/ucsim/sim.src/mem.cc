@@ -695,13 +695,13 @@ cl_bit_cell::d(t_mem v)
 t_mem
 cl_cell8::d()
 {
-  return data?((/*uint8_t*/uchar)*data):0;
+  return data?((/*u8_t*/uchar)*data):0;
 }
 
 void
 cl_cell8::d(t_mem v)
 {
-  data?(*data=(/*uint8_t*/uchar)v):0;
+  data?(*data=(/*u8_t*/uchar)v):0;
 }
 
 // 8 bit cell for bit spaces
@@ -711,7 +711,7 @@ cl_bit_cell8::d()
 {
   if (!data)
     return 0;
-  /*uint8_t*/uchar x= (/*uint8_t*/uchar) *data;
+  /*u8_t*/uchar x= (/*u8_t*/uchar) *data;
   x&= mask;
   return x?1:0;
 }
@@ -722,9 +722,9 @@ cl_bit_cell8::d(t_mem v)
   if (!data)
     return;
   if (v)
-    *data |= (/*uint8_t*/uchar)mask;
+    *data |= (/*u8_t*/uchar)mask;
   else
-    *data &= ~(/*uint8_t*/uchar)mask;
+    *data &= ~(/*u8_t*/uchar)mask;
 }
 
 // 16 bit cell;
@@ -1146,6 +1146,7 @@ cl_address_space::cl_address_space(const char *id,
     cell= &c8;
   else if (awidth <= 16)
     cell= &c16;
+  cell->init();
   int i;
   for (i= 0; i < size; i++)
     {
@@ -1407,7 +1408,8 @@ cl_address_space::undecode_cell(t_addr addr)
 
 void
 cl_address_space::undecode_area(class cl_address_decoder *skip,
-				t_addr begin, t_addr end,class cl_console_base *con)
+				t_addr begin, t_addr end,
+				class cl_console_base *con)
 {
 #define D if (con) con->debug
   D("Undecoding area 0x%x-0x%x of %s\n", begin, end, get_name());
@@ -1767,6 +1769,13 @@ cl_address_decoder::activate(class cl_console_base *con)
   return(activated);
 }
 
+/* Check if this DEC is fully within the specified area
+
+   as_begin....................as_end
+ ^                                    ^
+ begin                              end
+
+*/
 
 bool
 cl_address_decoder::fully_covered_by(t_addr begin, t_addr end)
@@ -1776,6 +1785,18 @@ cl_address_decoder::fully_covered_by(t_addr begin, t_addr end)
     return(true);
   return(false);
 }
+
+/* Check if some part of this DEC is in the specified area:
+
+   as_begin......................as_end
+                         ^               ^
+                         begin         end
+
+   as_begin......................as_end
+^               ^
+begin           end
+
+*/
 
 bool
 cl_address_decoder::is_in(t_addr begin, t_addr end)
@@ -1788,6 +1809,14 @@ cl_address_decoder::is_in(t_addr begin, t_addr end)
     return(true);
   return(false);
 }
+
+/* Check if this DEC covers the specified area:
+
+   as_begin....................as_end
+             ^             ^
+             begin       end
+
+*/
 
 bool
 cl_address_decoder::covers(t_addr begin, t_addr end)
@@ -1844,7 +1873,7 @@ cl_address_decoder::split(t_addr begin, t_addr end)
       if (as_begin < begin)
 	nd= new cl_address_decoder(address_space, memchip,
 				   as_begin, begin-1, chip_begin);
-      shrink_out_of(end+1, as_end);
+      shrink_out_of(as_begin, end);
     }
   if (nd)
     nd->init();

@@ -221,34 +221,6 @@ cl_uc390_hw::write (class cl_memory_cell *cell, t_mem *val)
     }
 }
 
-/*void
-cl_uc390_hw::mem_cell_changed (class cl_m *mem, t_addr addr)
-{
-  class cl_m *sfr = uc->mem (MEM_SFR);
-
-  if (mem && sfr && mem == sfr)
-    switch (addr)
-      {
-	case DPS:   cell_dps   = sfr->get_cell (DPS);   break;
-	case P4CNT: cell_p4cnt = sfr->get_cell (P4CNT); break;
-	case EXIF:  cell_exif  = sfr->get_cell (EXIF);  break;
-	case ACON:  cell_acon  = sfr->get_cell (ACON);  break;
-	case P5CNT: cell_p5cnt = sfr->get_cell (P5CNT); break;
-	case C0C:   cell_c0c   = sfr->get_cell (C0C);   break;
-	case PMR:   cell_pmr   = sfr->get_cell (PMR);   break;
-	case MCON:  cell_mcon  = sfr->get_cell (MCON);  break;
-	case TA:    cell_ta    = sfr->get_cell (TA);    break;
-	case COR:   cell_cor   = sfr->get_cell (COR);   break;
-	case MCNT0: cell_mcnt0 = sfr->get_cell (MCNT0); break;
-	case MCNT1: cell_mcnt1 = sfr->get_cell (MCNT1); break;
-	case MA:    cell_ma    = sfr->get_cell (MA);    break;
-	case MB:    cell_mb    = sfr->get_cell (MB);    break;
-	case MC:    cell_mc    = sfr->get_cell (MC);    break;
-	case WDCON: cell_wdcon = sfr->get_cell (WDCON); break;
-	case C1C:   cell_c1c   = sfr->get_cell (C1C);   break;
-      }
-}*/
-
 void
 cl_uc390_hw::reset(void)
 {

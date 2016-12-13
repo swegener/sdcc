@@ -97,7 +97,7 @@ cl_port_ui::handle_input(int c)
 {
   class cl_port_io *pio= (class cl_port_io *)io;
   int i;
-  int8_t i8= c;
+  i8_t i8= c;
 
   if (i8 < 0)
     {

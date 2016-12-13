@@ -165,10 +165,22 @@ cl_hw::cfg_set(t_addr addr, t_mem val)
   cfg->set(addr, val);
 }
 
+void
+cl_hw::cfg_write(t_addr addr, t_mem val)
+{
+  cfg->write(addr, val);
+}
+
 t_mem
 cl_hw::cfg_get(t_addr addr)
 {
   return cfg->get(addr);
+}
+
+t_mem
+cl_hw::cfg_read(t_addr addr)
+{
+  return cfg->read(addr);
 }
 
 void

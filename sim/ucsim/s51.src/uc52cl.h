@@ -36,27 +36,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_uc52: public cl_51core
 {
-protected:
-  //class cl_it_src *exf2it;
-  //int   s_rec_t2;	// T2 overflows for receiving
-  //int   s_tr_t2;	// T2 overflows for sending
-
 public:
   cl_uc52(int Itype, int Itech, class cl_sim *asim);
+  virtual int init(void);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
-
+  virtual void make_address_spaces(void);
+  virtual void decode_iram(void);
+  virtual void decode_dptr(void);
+  
   virtual void clear_sfr(void);
-
-  virtual class cl_memory_cell *get_indirect(uchar addr, int *res);
-  //virtual t_addr get_mem_size(enum mem_class type);
-
-  /*virtual void do_extra_hw(int cycles);
-  virtual int  do_timer2(int cycles);
-  virtual int  do_t2_baud(int cycles);
-  virtual void do_t2_capture(int *cycles, bool nocount);
-  virtual void do_t2_reload(int *cycles, bool nocount);
-  virtual int  serial_bit_cnt(int mode);*/
 };
 
 

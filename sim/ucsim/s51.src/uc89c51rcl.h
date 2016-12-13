@@ -38,40 +38,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_uc89c51r: public cl_uc51r
 {
 public:
-  //int t0_overflows;
-  //uchar dpl0, dph0;
-  //uchar dpl1, dph1;
-  //uchar dps;
-
-public:
   cl_uc89c51r(int Itype, int Itech, class cl_sim *asim);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
-
+  
   virtual void  reset(void);
-  virtual void  pre_inst(void);
-  virtual void  post_inst(void);
   virtual int   it_priority(uchar ie_mask);
-  virtual void  print_regs(class cl_console_base *con);
-
-  //virtual void  do_extra_hw(int cycles);
-  //virtual int   t0_overflow(void);
-  /*virtual int   do_pca(int cycles);
-  virtual int   do_pca_counter(int cycles);
-  virtual int   do_pca_module(int nr);*/
 };
 
-class cl_89c51r_dummy_hw: public cl_hw
-{
-protected:
-  class cl_memory_cell *dpl, *dph;
-public:
-  cl_89c51r_dummy_hw(class cl_uc *auc);
-  virtual int init(void);
-
-  virtual t_mem read(class cl_memory_cell *cell);
-  virtual void write(class cl_memory_cell *cell, t_mem *val);
-};
 
 #endif
 

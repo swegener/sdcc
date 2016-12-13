@@ -17,11 +17,14 @@
 #define BITPOS_H 4  // 10H
 #define BITPUS_V 7  // 80H
 
-#define store2(addr, val) { ram->set((t_addr) (addr) & 0xffff, (val >> 8) & 0xff); \
-                            ram->set((t_addr) (addr+1) & 0xffff, val & 0xff); }
-#define store1(addr, val) ram->set((t_addr) (addr), val)
-#define get1(addr) ram->get((t_addr) (addr) & 0xffff)
-#define get2(addr) ((ram->get((t_addr) (addr) & 0xffff) << 8) | ram->get((t_addr) (addr+1) & 0xffff) )
+#define store2(addr, val) { ram->write((t_addr) (addr) & 0xffff, (val >> 8) & 0xff); \
+                            ram->write((t_addr) (addr+1) & 0xffff, val & 0xff); \
+  			    vc.wr+=2; }
+#define store1(addr, val) { ram->write((t_addr) (addr), val); vc.wr++; }
+//#define get1(addr) ram->get((t_addr) (addr) & 0xffff)
+#define get1(addr) get_1(addr)
+//#define get2(addr) ((ram->get((t_addr) (addr) & 0xffff) << 8) | ram->get((t_addr) (addr+1) & 0xffff) )
+#define get2(addr) get_2(addr)
 //#define fetch2() ((fetch() << 8) | fetch() )
 #define fetch1() fetch()
 #define push2(val) {store2(regs.SP-1,(val)); regs.SP-=2; }

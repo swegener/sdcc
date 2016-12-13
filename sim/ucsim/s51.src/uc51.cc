@@ -117,8 +117,11 @@ cl_51core::init(void)
   irq_stop_option->init();
   dptr= 0;
   cl_uc::init();
+  decode_dptr();
   set_name("mcs51_controller");
   reset();
+
+  make_vars();
 
   return(0);
 }
@@ -135,6 +138,13 @@ cl_51core::id_string(void)
 	  cpus_51[i].type_str?cpus_51[i].type_str:"51",
 	  (technology & CPU_HMOS)?"HMOS":"CMOS");
   return(id_string_51);
+}
+
+void
+cl_51core::make_cpu_hw(void)
+{
+  cpu= new cl_uc51_cpu(this);
+  cpu->init();
 }
 
 void
@@ -206,8 +216,6 @@ cl_51core::mk_hw_elements(void)
   
   add_hw(interrupt= new cl_interrupt(this));
   interrupt->init();
-  add_hw(h= new cl_uc51_cpu(this));
-  h->init();
 }
 
 void
@@ -239,68 +247,86 @@ cl_51core::build_cmdset(class cl_cmdset *cmdset)
 void
 cl_51core::make_memories(void)
 {
-  class cl_address_space *as;
-  int i;
+  make_address_spaces();
+  make_chips();
   
-  rom= as= new cl_address_space("rom", 0, 0x10000, 8);
-  as->init();
-  address_spaces->add(as);
-  iram= as= new cl_address_space(MEM_IRAM_ID/*"iram"*/, 0, 0x80, 8);
-  as->init();
-  address_spaces->add(as);
-  sfr= as= new cl_address_space(MEM_SFR_ID/*"sfr"*/, 0x80, 0x80, 8);
-  as->init();
-  address_spaces->add(as);
-  xram= as= new cl_address_space(MEM_XRAM_ID/*"xram"*/, 0, 0x10000, 8);
-  as->init();
-  address_spaces->add(as);
-  
-  class cl_address_decoder *ad;
-  class cl_memory_chip *chip, *sfr_chip, *iram_chip;
-
-  chip= new cl_memory_chip("rom_chip", 0x10000, 8, 0/*, 0xff*/);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
-			     chip, 0, 0xffff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  chip= iram_chip= new cl_memory_chip("iram_chip", 0x80, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= iram/*address_space(MEM_IRAM_ID)*/,
-			     chip, 0, 0x7f, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  chip= new cl_memory_chip("xram_chip", 0x10000, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= xram/*address_space(MEM_XRAM_ID)*/,
-			     chip, 0, 0xffff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8);
-  sfr_chip->init();
-  memchips->add(sfr_chip);
-  ad= new cl_address_decoder(as= sfr/*address_space(MEM_SFR_ID)*/,
-			     sfr_chip, 0x80, 0xff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
   acc= sfr->get_cell(ACC);
   psw= sfr->get_cell(PSW);
+
+  decode_regs();
+  decode_rom();
+  decode_iram();
+  decode_sfr();
+  decode_xram();
+  decode_bits();
+}
+
+void
+cl_51core::make_address_spaces(void)
+{
+  rom= new cl_address_space("rom", 0, 0x10000, 8);
+  rom->init();
+  address_spaces->add(rom);
+  
+  iram= new cl_address_space("iram", 0, 0x80, 8);
+  iram->init();
+  address_spaces->add(iram);
+
+  sfr= new cl_address_space("sfr", 0x80, 0x80, 8);
+  sfr->init();
+  address_spaces->add(sfr);
+
+  xram= new cl_address_space("xram", 0, 0x10000, 8);
+  xram->init();
+  address_spaces->add(xram);
 
   regs= new cl_address_space("regs", 0, 8, 8);
   regs->init();
   address_spaces->add(regs);
+
+  bits= new cl_address_space("bits", 0, 0x100, 1);
+  bits->init();
+  address_spaces->add(bits);
+
+  dptr= new cl_address_space("dptr", 0, 2, 8);
+  dptr->init();
+  address_spaces->add(dptr);
+}
+
+void
+cl_51core::make_chips(void)
+{
+  rom_chip= new cl_memory_chip("rom_chip", 0x10000, 8, 0/*, 0xff*/);
+  rom_chip->init();
+  memchips->add(rom_chip);
   
+  iram_chip= new cl_memory_chip("iram_chip", 0x100, 8);
+  iram_chip->init();
+  memchips->add(iram_chip);
+
+  xram_chip= new cl_memory_chip("xram_chip", 0x10000, 8);
+  xram_chip->init();
+  memchips->add(xram_chip);
+
+  sfr_chip= new cl_memory_chip("sfr_chip", 0x80, 8);
+  sfr_chip->init();
+  memchips->add(sfr_chip);
+}
+
+void
+cl_51core::decode_rom(void)
+{
+  class cl_address_decoder *ad;
+  ad= new cl_address_decoder(rom, rom_chip, 0, 0xffff, 0);
+  ad->init();
+  rom->decoders->add(ad);
+  ad->activate(0);
+}
+
+void
+cl_51core::decode_regs(void)
+{
+  int i;
   cl_banker *b= new cl_banker(sfr, 0xd0, 0x18,
 			      regs, 0, 7);
   b->init();
@@ -312,8 +338,170 @@ cl_51core::make_memories(void)
   psw->write(0);
   for (i= 0; i < 8; i++)
     R[i]= regs->get_cell(i);
+}
+
+void
+cl_51core::decode_bits(void)
+{
+  class cl_address_decoder *ad;
+  
+  ad= new cl_bander(bits, 0, 127,
+		    iram_chip, 32,
+		    8, 1);
+  ad->init();
+  bits->decoders->add(ad);
+  ad->activate(0);
+
+  ad= new cl_bander(bits, 128, 255,
+		    sfr_chip, 0,
+		    8, 8);
+  ad->init();
+  bits->decoders->add(ad);
+  ad->activate(0);
+}
+
+void
+cl_51core::decode_iram(void)
+{
+  class cl_address_decoder *ad;
+  
+  ad= new cl_address_decoder(iram, iram_chip, 0, 0x7f, 0);
+  ad->init();
+  iram->decoders->add(ad);
+  ad->activate(0);
+}
+
+void
+cl_51core::decode_sfr(void)
+{
+  class cl_address_decoder *ad;
+  
+  ad= new cl_address_decoder(sfr, sfr_chip, 0x80, 0xff, 0);
+  ad->init();
+  sfr->decoders->add(ad);
+  ad->activate(0);
+}
+
+void
+cl_51core::decode_xram(void)
+{
+  class cl_address_decoder *ad;
+  
+  ad= new cl_address_decoder(xram, xram_chip, 0, 0xffff, 0);
+  ad->init();
+  xram->decoders->add(ad);
+  ad->activate(0);
+}
+
+void
+cl_51core::decode_dptr(void)
+{
+  class cl_address_decoder *ad;
+  t_mem adps= 0, mdps, dpl1, dph1, mdpc, adpc;
+  class cl_banker *banker;
+
+  dptr->undecode_area(NULL, 0, 1, NULL);
+  
+  if (cpu)
+    {
+      adps= cpu->cfg_get(uc51cpu_aof_mdps);
+      mdps= cpu->cfg_get(uc51cpu_mask_mdps);
+      dpl1= cpu->cfg_get(uc51cpu_aof_mdps1l);
+      dph1= cpu->cfg_get(uc51cpu_aof_mdps1h);
+
+      adpc= cpu->cfg_get(uc51cpu_aof_mdpc);
+      mdpc= cpu->cfg_get(uc51cpu_mask_mdpc);
+      
+      if ((adps > 0x7f) &&
+	  (dpl1 > 0x7f) &&
+	  (dph1 > 0x7f))
+	{
+	  // multi DPTR sfr style
+	  //printf("MDPS %x %x %x %x\n", adps, mdps, dpl1, dph1);
+	  banker= new cl_banker(sfr, adps, mdps,
+				dptr, 0, 0);
+	  banker->init();
+	  dptr->decoders->add(banker);
+	  banker->add_bank(0, memory("sfr_chip"), DPL-0x80);
+	  banker->add_bank(1, memory("sfr_chip"), dpl1-0x80);
+	  banker->activate(0);
+
+	  banker= new cl_banker(sfr, adps, mdps,
+				dptr, 1, 1);
+	  banker->init();
+	  dptr->decoders->add(banker);
+	  banker->add_bank(0, memory("sfr_chip"), DPH-0x80);
+	  banker->add_bank(1, memory("sfr_chip"), dph1-0x80);
+	  banker->activate(0);
+
+	  sfr->write(adps, sfr->get(adps));
+	}
+      else if (adpc > 0x7f)
+	{
+	  // multi DPTR chip style
+	  adps=0x80;
+	  class cl_memory_chip *dptr_chip= (cl_memory_chip*)memory("dptr_chip");
+	  if (dptr_chip == 0)
+	    {
+	      dptr_chip= new cl_memory_chip("dptr_chip", 3*8, 8);
+	      dptr_chip->init();
+	      memchips->add(dptr_chip);
+	    }
+	  if (dptr_chip &&
+	      (mdpc != 0))
+	    {
+	      int a, m= mdpc;
+	      //printf("MDPC %x %x\n", adpc, mdpc);
+	      while ((m&1) == 0)
+		m>>= 1;
+	      
+	      banker= new cl_banker(sfr, adpc, mdpc,
+			    dptr, 0, 1);
+	      banker->init();
+	      dptr->decoders->add(banker);
+	      for (a= 0; a <= m; a++)
+		banker->add_bank(a, dptr_chip, a*2);
+	      banker->activate(0);
+
+	      banker= new cl_banker(sfr, adpc, mdpc,
+			    sfr, DPL, DPH);
+	      banker->init();
+	      sfr->decoders->add(banker);
+	      for (a= 0; a <= m; a++)
+		banker->add_bank(a, dptr_chip, a*2);
+	      banker->activate(0);
+	      
+	      sfr->write(adpc, sfr->get(adpc));
+	    }
+	}
+      else
+	adps= 0;
+    }
+  if (adps == 0)
+    {
+      //printf("DPTR\n");
+      ad= new cl_address_decoder(dptr, sfr_chip, 0, 1, DPL-0x80);
+      ad->init();
+      dptr->decoders->add(ad);
+      ad->activate(0);
+    }
   
   cl_var *v;
+  vars->add(v= new cl_var(chars("dpl"), dptr, 0));
+  v->init();
+  vars->add(v= new cl_var(chars("DPL"), dptr, 0));
+  v->init();
+  vars->add(v= new cl_var(chars("dph"), dptr, 1));
+  v->init();
+  vars->add(v= new cl_var(chars("DPH"), dptr, 1));
+  v->init();
+}
+
+void
+cl_51core::make_vars(void)
+{
+  cl_var *v;
+
   vars->add(v= new cl_var(cchars("R0"), regs, 0));
   v->init();
   vars->add(v= new cl_var(cchars("R1"), regs, 1));
@@ -330,32 +518,7 @@ cl_51core::make_memories(void)
   v->init();
   vars->add(v= new cl_var(cchars("R7"), regs, 7));
   v->init();
-
-  dptr= new cl_address_space("dptr", 0, 2, 8);
-  dptr->init();
-  ad= new cl_address_decoder(dptr, sfr_chip, 0, 1, DPL-0x80);
-  ad->init();
-  dptr->decoders->add(ad);
-  ad->activate(0);
-  address_spaces->add(dptr);
-
-  bits= as= new cl_address_space("bits", 0, 0x100, 1);
-  as->init();
-  address_spaces->add(as);
-  ad= new cl_bander(bits, 0, 127,
-		    iram_chip, 32,
-		    8, 1);
-  ad->init();
-  bits->decoders->add(ad);
-  ad->activate(0);
-  ad= new cl_bander(bits, 128, 255,
-		    sfr_chip, 0,
-		    8, 8);
-  ad->init();
-  bits->decoders->add(ad);
-  ad->activate(0);
 }
-
 
 /*
  * Destroying the micro-controller object
@@ -503,33 +666,18 @@ void
 cl_51core::print_regs(class cl_console_base *con)
 {
   t_addr start;
-  uchar data;
-
+  t_mem data;
+  t_mem dp;
+  
+  // show regs
   start= psw->get() & 0x18;
   iram->dump(start, start+7, 8, con->get_fout());
+  // show indirectly addressed IRAM and some basic regs
   data= iram->get(iram->get(start));
   con->dd_printf("@R0 %02x %c", data, isprint(data) ? data : '.');
 
-  con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x", sfr->get(ACC), sfr->get(ACC),
+  con->dd_printf("  ACC= 0x%02x %3d %c  B= 0x%02x\n", sfr->get(ACC), sfr->get(ACC),
               isprint(sfr->get(ACC))?(sfr->get(ACC)):'.', sfr->get(B));
-  //eram2xram();
-  if (dptr)
-    {
-      data= xram->get(dptr->get(/*DPH*/1)*256+dptr->get(/*DPL*/0));
-      con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n",
-		     dptr->get(/*DPH*/1),
-		     dptr->get(/*DPL*/0),
-		     data, data, isprint(data)?data:'.');
-    }
-  else
-    {
-      data= xram->get(sfr->get(DPH)*256+sfr->get(DPL));
-      con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n",
-		     sfr->get(DPH),
-		     sfr->get(DPL),
-		     data, data, isprint(data)?data:'.');
-    }
-  
   data= iram->get(iram->get(start+1));
   con->dd_printf("@R1 %02x %c", data, isprint(data) ? data : '.');
   data= psw->get();
@@ -540,7 +688,98 @@ cl_51core::print_regs(class cl_console_base *con)
   start = sfr->get (SP);
   con->dd_printf ("SP ", start);
   iram->dump (start, start - 7, 8, con->get_fout());
-
+  // show DPTR(s)
+  if (dptr)
+    {
+      int act;
+      int mask;
+	      int i;
+      if (cpu &&
+	  (cpu->cfg_get(uc51cpu_aof_mdpc) > 0x7f))
+	{
+	  // multi DPTR chip style
+	  act= sfr->get(cpu->cfg_get(uc51cpu_aof_mdpc));
+	  mask= cpu->cfg_get(uc51cpu_mask_mdpc);
+	  while ((mask&1) == 0)
+	    {
+	      act>>= 1;
+	      mask>>= 1;
+	    }
+	  act&= mask;
+	  class cl_memory *dptr_chip= memory("dptr_chip");
+	  if (dptr_chip)
+	    {
+	      for (i= 0; i <= mask; i++)
+		{
+		  int a= i*dptr->get_size();
+		  dp= 0;
+		  int di;
+		  for (di= dptr->get_size()-1; di >= 0; di--)
+		    dp= (dp<<8) + dptr_chip->get(a+di);
+		  con->dd_printf(" %cDPTR%d= ", (i==act)?'*':' ', i);
+		  con->dd_printf(xram->addr_format, dp);
+		  data= xram->read(dp);
+		  con->dd_printf(" @DPTR%d= ", i);
+		  con->dd_printf("0x%02x %3d %c\n", data, data,
+				 isprint(data)?data:'.');
+		}
+	    }
+	}
+      else if (cpu &&
+	  (cpu->cfg_get(uc51cpu_aof_mdps) > 0x7f))
+	{
+	  // multi DPTR sfr style
+	  act= sfr->get(cpu->cfg_get(uc51cpu_aof_mdps));
+	  mask= cpu->cfg_get(uc51cpu_mask_mdps);
+	  while ((mask&1) == 0)
+	    {
+	      act>>= 1;
+	      mask>>= 1;
+	    }
+	  act&= mask;
+	  i= 0;
+	  dp= sfr_chip->get(DPL-0x80) +
+	    sfr_chip->get(DPH-0x80) * 256;
+	  con->dd_printf(" %cDPTR%d= ", (i==act)?'*':' ', i);
+	  con->dd_printf(xram->addr_format, dp);
+	  data= xram->read(dp);
+	  con->dd_printf(" @DPTR%d= ", i);
+	  con->dd_printf("0x%02x %3d %c\n", data, data,
+			 isprint(data)?data:'.');
+	  i= 1;
+	  dp= sfr_chip->get(cpu->cfg_get(uc51cpu_aof_mdps1l) - 0x80) +
+	    sfr_chip->get(cpu->cfg_get(uc51cpu_aof_mdps1h) - 0x80) * 256;
+	  con->dd_printf(" %cDPTR%d= ", (i==act)?'*':' ', i);
+	  con->dd_printf(xram->addr_format, dp);
+	  data= xram->read(dp);
+	  con->dd_printf(" @DPTR%d= ", i);
+	  con->dd_printf("0x%02x %3d %c\n", data, data,
+			 isprint(data)?data:'.');
+	}
+      else
+	{
+	  // non-multi DPTR
+	  t_mem dp= dptr->get(0) +
+	    dptr->get(1) * 256 +
+	    dptr->get(2) * 256*256 +
+	    dptr->get(3) * 256*256*256;
+	  data= xram->get(dp);
+	  con->dd_printf("   DPTR= ");
+	  con->dd_printf(xram->addr_format, dp);
+	  con->dd_printf(" @DPTR= 0x%02x %3d %c\n",
+			 data, data, isprint(data)?data:'.');
+	}
+    }
+  else
+    {
+      // no dptr address space, read SFR directly
+      data= xram->get(sfr->read(DPH)*256+sfr->read(DPL));
+      con->dd_printf("   DPTR= 0x%02x%02x @DPTR= 0x%02x %3d %c\n",
+		     sfr->get(DPH),
+		     sfr->get(DPL),
+		     data, data, isprint(data)?data:'.');
+    }
+  
   print_disass(PC, con);
 }
 
@@ -1187,12 +1426,29 @@ cl_uc51_cpu::init(void)
   cell_sp= register_cell(sfr, SP);
   for (i= 0; i < 8; i++)
     acc_bits[i]= register_cell(bas, ACC+i);
+
+  cl_var *v;
+  uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps"), cfg, uc51cpu_aof_mdps));
+  v->init();
+  uc->vars->add(v= new cl_var(cchars("cpu_mask_mdps"), cfg, uc51cpu_mask_mdps));
+  v->init();
+  uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps1l"), cfg, uc51cpu_aof_mdps1l));
+  v->init();
+  uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps1h"), cfg, uc51cpu_aof_mdps1h));
+  v->init();
+  uc->vars->add(v= new cl_var(cchars("cpu_aof_mdpc"), cfg, uc51cpu_aof_mdpc));
+  v->init();
+  uc->vars->add(v= new cl_var(cchars("cpu_mask_mdpc"), cfg, uc51cpu_mask_mdpc));
+  v->init();
+  
   return(0);
 }
 
 void
 cl_uc51_cpu::write(class cl_memory_cell *cell, t_mem *val)
 {
+  if (conf(cell, val))
+    return;
   if (cell == cell_sp)
     {
       if (*val > uc->sp_max)
@@ -1230,5 +1486,35 @@ cl_uc51_cpu::write(class cl_memory_cell *cell, t_mem *val)
       }*/
 }
 
+t_mem
+cl_uc51_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  if (val)
+    cell->set(*val);
+  switch ((enum uc51cpu_cfg)addr)
+    {
+    case uc51cpu_aof_mdps: // addr of multi_DPTR_sfr selector
+      if (val)
+	((cl_51core *)uc)->decode_dptr();
+      break;
+    case uc51cpu_mask_mdps: // mask in mutli_DPTR_sfr selector
+      break;
+    case uc51cpu_aof_mdps1l: // addr of multi_DPTR_sfr DPL1
+      break;
+    case uc51cpu_aof_mdps1h: // addr of multi_DPTR_sfr DPH1
+      break;
+
+    case uc51cpu_aof_mdpc: // addr of multi_DPTR_chip selector
+      if (val)
+	((cl_51core *)uc)->decode_dptr();
+      break;
+    case uc51cpu_mask_mdpc: // mask in multi_DPTR_chip selector
+      break;
+  
+    case uc51cpu_nuof:
+      break;
+    }
+  return cell->get();
+}
 
 /* End of s51.src/uc51.cc */

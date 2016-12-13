@@ -424,9 +424,9 @@ cl_tlcs::disass(t_addr addr, const char *sep)
 	    case 'N': /*  n in 3rd byte */ snprintf(l,19,"%02x",(int)((c>>16)&0xff));s+= l; break;
 	    case 'o': /*  n in 4th byte */ snprintf(l,19,"%02x",(int)((c>>24)&0xff));s+= l; break;
 	    case 'O': /*  n in 5th byte */ snprintf(l,19,"%02x",(int)((c>>32)&0xff));s+= l; break;
-	    case '1': /*  PC+2+d in 2nd byte */ snprintf(l,19,"0x%04x",(int)(addr+2+int8_t((c>>8)&0xff))); s+= l; break;
-	    case 'd': /*  d in 2nd byte */ snprintf(l,19,"%+d",(int)(int8_t((c>>8)&0xff))); s+= l; break;
-	    case 'D': /* cd in 2,3 byte */ snprintf(l,19,"0x%04x",(int)(addr+3+int16_t((c>>8)&0xffff))); s+= l; break;	      
+	    case '1': /*  PC+2+d in 2nd byte */ snprintf(l,19,"0x%04x",(int)(addr+2+i8_t((c>>8)&0xff))); s+= l; break;
+	    case 'd': /*  d in 2nd byte */ snprintf(l,19,"%+d",(int)(i8_t((c>>8)&0xff))); s+= l; break;
+	    case 'D': /* cd in 2,3 byte */ snprintf(l,19,"0x%04x",(int)(addr+3+i16_t((c>>8)&0xffff))); s+= l; break;	      
 	    case 'M': /* mn in 2,3 byte */ snprintf(l,19,"0x%04x",(int)((c>>8)&0xffff)); s+= l; break;
 	    case 'm': /* mn in 3,4 byte */ snprintf(l,19,"0x%04x",(int)((c>>16)&0xffff)); s+= l; break;
 	    case 'X': /* mn in 4,5 byte */ snprintf(l,19,"0x%04x",(int)((c>>24)&0xffff)); s+= l; break;
@@ -539,7 +539,7 @@ cl_tlcs::exec_inst(void)
     case 0x17: // LDAR HL,$+2+cd
       c2= fetch();
       c3= fetch();
-      reg.hl= PC + int16_t(c3*256 + c2);
+      reg.hl= PC + i16_t(c3*256 + c2);
       break;
     case 0x1e: res= inst_ret(); break;
     case 0x1f: res= inst_reti(); break;
@@ -671,8 +671,8 @@ cl_tlcs::exec_inst2(u8_t c1)
     case 0x0F: inst_decx(n); break; // DECX (0ffn)
     case 0x12: reg.hl= reg.rhl.l * c2; break; // MUL HL,n
     case 0x13: inst_div_hl(c2); break; // DIV HL,n
-    case 0x18: inst_djnz_b(int8_t(c2)); break; // DJNZ $+2+d
-    case 0x19: inst_djnz_bc(int8_t(c2)); break; // DJNZ BC,$+2+d
+    case 0x18: inst_djnz_b(i8_t(c2)); break; // DJNZ $+2+d
+    case 0x19: inst_djnz_bc(i8_t(c2)); break; // DJNZ BC,$+2+d
     case 0x27: reg.raf.a= n->read(); break; // LD A,(0ffn)
     case 0x2F: n->write(reg.raf.a); vc.wr++; break; // LD (0ffn),A
     case 0x47: reg.hl= mem16(0xff00 + c2); vc.rd+= 2; break; // LD HL,(0ffn)
@@ -723,7 +723,7 @@ cl_tlcs::exec_inst2(u8_t c1)
 	default: // pass others to 3 byte decoder
 	  if ((c1 & 0xf0) == 0xc0) // JR [cc,]$+2+d
 	    {
-	      int8_t d= c2;
+	      i8_t d= c2;
 	      if (cc(c1))
 		PC+= d;
 	    }
@@ -1127,9 +1127,9 @@ cl_tlcs::exec_inst3(u8_t c1, u8_t c2)
   switch (c1)
     {
     case 0x1a: PC= c3*256 + c2; break; // JP mn
-    case 0x1b: PC+= int16_t(c3*256 + c2); break; // JRL $+2+cd
+    case 0x1b: PC+= i16_t(c3*256 + c2); break; // JRL $+2+cd
     case 0x1c: inst_call(PC-3, c3*256 + c2); break; // CALL mn
-    case 0x1d: inst_call(PC-3, PC + int16_t(c3*256 + c2)); break; // CALR $+2+cd
+    case 0x1d: inst_call(PC-3, PC + i16_t(c3*256 + c2)); break; // CALR $+2+cd
     case 0x78: reg.hl= op_add_hl((t_mem)(c3*256+c2)); break; // ADD HL,mn
     case 0x79: reg.hl= op_adc_hl((t_mem)(c3*256+c2)); break; // ADC HL,mn
     case 0x7a: reg.hl= op_sub_hl((t_mem)(c3*256+c2)); break; // SUB HL,mn
@@ -1213,7 +1213,7 @@ cl_tlcs::exec_inst3_e7(u8_t c1, u8_t c2, u8_t c3)
 int
 cl_tlcs::exec_inst3_f0ix(u8_t c1)
 {
-  int8_t d= fetch();
+  i8_t d= fetch();
   u8_t c3= fetch();
   int res= resGO;
   cl_memory_cell *c= cell_ixd(c1, d);
@@ -1452,7 +1452,7 @@ int
 cl_tlcs::exec_inst4_f4ix(u8_t c1, u8_t c2, u8_t c3)
 {
   int res= resGO;
-  int8_t d= c2;
+  i8_t d= c2;
   u8_t n;
   cl_memory_cell *c= cell_ixd(c1, d);
   
@@ -1695,7 +1695,7 @@ cl_tlcs::cell_n(u8_t n)
 }
 
 class cl_memory_cell *
-cl_tlcs::cell_ixd(u8_t ix, int8_t d)
+cl_tlcs::cell_ixd(u8_t ix, i8_t d)
 {
   switch (ix & 0x03)
     {
@@ -1736,7 +1736,7 @@ cl_tlcs::mem16gg(u8_t gg)
 }
 
 u16_t
-cl_tlcs::mem16ixd(u8_t ix, int8_t d)
+cl_tlcs::mem16ixd(u8_t ix, i8_t d)
 {
   u8_t l, h;
   cl_address_space *as= nas;
@@ -1777,7 +1777,7 @@ cl_tlcs::write16gg(u8_t gg, u16_t val)
 
 
 void
-cl_tlcs::write16ixd(u8_t ix, int8_t d, u16_t val)
+cl_tlcs::write16ixd(u8_t ix, i8_t d, u16_t val)
 {
   cl_address_space *as= nas;
   u16_t addr= *aof_reg16_ix(ix) + d;

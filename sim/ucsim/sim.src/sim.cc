@@ -43,6 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // local, sim.src
 #include "simcl.h"
 #include "appcl.h"
+#include "simifcl.h"
 
 
 /*

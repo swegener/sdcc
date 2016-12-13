@@ -683,7 +683,7 @@ cl_tlcs::op_sub16(t_mem d1, t_mem d2)
 
   unsigned int op1= (unsigned int)d1;
   unsigned int op2= (unsigned int)d2;
-  signed int res= (int16_t)d1 - (int16_t)d2;
+  signed int res= (i16_t)d1 - (i16_t)d2;
 
   reg.raf.f&= ~(FLAG_C|FLAG_V|FLAG_Z|FLAG_S);
   reg.raf.f|= FLAG_N;
@@ -733,7 +733,7 @@ cl_tlcs::op_sbc_hl(t_mem val)
 
   unsigned int op1= (unsigned int)reg.hl;
   unsigned int op2= (unsigned int)val;
-  signed int res= (int16_t)reg.hl - (int16_t)val;
+  signed int res= (i16_t)reg.hl - (i16_t)val;
 
   if (reg.raf.f & FLAG_C)
     {

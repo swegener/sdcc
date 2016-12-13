@@ -45,6 +45,44 @@ cl_uc52::cl_uc52(int Itype, int Itech, class cl_sim *asim):
 {
 }
 
+int
+cl_uc52::init(void)
+{
+  int ret;
+  ret= cl_51core::init();
+  if (cpu &&
+      (type == CPU_C521))
+    {
+      cpu->cfg_set(uc51cpu_aof_mdps, 0x86);
+      cpu->cfg_set(uc51cpu_mask_mdps, 1);
+      cpu->cfg_set(uc51cpu_aof_mdps1l, 0x84);
+      cpu->cfg_set(uc51cpu_aof_mdps1h, 0x85);
+      decode_dptr();
+    }
+  else if (cpu &&
+	   (type == CPU_517))
+    {
+      cpu->cfg_set(uc51cpu_aof_mdpc, 0x92);
+      cpu->cfg_set(uc51cpu_mask_mdpc, 7);
+      class cl_memory_chip *dptr_chip=
+	new cl_memory_chip("dptr_chip", 3*8, 8);
+      dptr_chip->init();
+      memchips->add(dptr_chip);
+      decode_dptr();
+    }
+  else if (cpu &&
+	   (type == CPU_89C51R))
+    {
+      cpu->cfg_set(uc51cpu_aof_mdpc, 0xA2);
+      cpu->cfg_set(uc51cpu_mask_mdpc, 1);
+      class cl_memory_chip *dptr_chip=
+	new cl_memory_chip("dptr_chip", 3*8, 8);
+      dptr_chip->init();
+      memchips->add(dptr_chip);
+      decode_dptr();
+    }
+  return ret;
+}
 
 void
 cl_uc52::mk_hw_elements(void)
@@ -58,158 +96,67 @@ cl_uc52::mk_hw_elements(void)
   if (technology & CPU_F380)
     {
       h= new cl_port(this, 4, 0xc7);
+      add_hw(h);
+      h->init();
     }
 }
 
 void
 cl_uc52::make_memories(void)
 {
-  class cl_address_space *as;
-  int i;
+  cl_51core::make_memories();
+}
+
+void
+cl_uc52::make_address_spaces(void)
+{
+  rom= new cl_address_space("rom", 0, 0x10000, 8);
+  rom->init();
+  address_spaces->add(rom);
   
-  rom= as= new cl_address_space("rom", 0, 0x10000, 8);
-  as->init();
-  address_spaces->add(as);
-  iram= as= new cl_address_space("iram", 0, 0x100, 8);
-  as->init();
-  address_spaces->add(as);
-  sfr= as= new cl_address_space("sfr", 0x80, 0x80, 8);
-  as->init();
-  address_spaces->add(as);
-  xram= as= new cl_address_space("xram", 0, 0x10000, 8);
-  as->init();
-  address_spaces->add(as);
+  iram= new cl_address_space("iram", 0, 0x100, 8);
+  iram->init();
+  address_spaces->add(iram);
 
-  class cl_address_decoder *ad;
-  class cl_memory_chip *chip, *iram_chip, *sfr_chip;
+  sfr= new cl_address_space("sfr", 0x80, 0x80, 8);
+  sfr->init();
+  address_spaces->add(sfr);
 
-  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= address_space("rom"), chip, 0, 0xffff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
+  xram= new cl_address_space("xram", 0, 0x10000, 8);
+  xram->init();
+  address_spaces->add(xram);
 
-  chip= iram_chip= new cl_memory_chip("iram_chip", 0x100, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= address_space("iram"), chip, 0, 0xff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  chip= new cl_memory_chip("xram_chip", 0x10000, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= address_space("xram"), chip, 0, 0xffff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  sfr_chip= chip= new cl_memory_chip("sfr_chip", 0x80, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= address_space("sfr"), chip, 0x80, 0xff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
-  acc= sfr->get_cell(ACC);
-  psw= sfr->get_cell(PSW);
   regs= new cl_address_space("regs", 0, 8, 8);
   regs->init();
   address_spaces->add(regs);
-  
-  cl_banker *b= new cl_banker(sfr, 0xd0, 0x18,
-			      regs, 0, 7);
-  b->init();
-  regs->decoders->add(b);
-  b->add_bank(0, memory("iram_chip"), 0);
-  b->add_bank(1, memory("iram_chip"), 8);
-  b->add_bank(2, memory("iram_chip"), 16);
-  b->add_bank(3, memory("iram_chip"), 24);
-  psw->write(0);
-  for (i= 0; i < 8; i++)
-    R[i]= regs->get_cell(i);
-  
-  cl_var *v;
-  vars->add(v= new cl_var(cchars("R0"), regs, 0));
-  v->init();
-  vars->add(v= new cl_var(cchars("R1"), regs, 1));
-  v->init();
-  vars->add(v= new cl_var(cchars("R2"), regs, 2));
-  v->init();
-  vars->add(v= new cl_var(cchars("R3"), regs, 3));
-  v->init();
-  vars->add(v= new cl_var(cchars("R4"), regs, 4));
-  v->init();
-  vars->add(v= new cl_var(cchars("R5"), regs, 5));
-  v->init();
-  vars->add(v= new cl_var(cchars("R6"), regs, 6));
-  v->init();
-  vars->add(v= new cl_var(cchars("R7"), regs, 7));
-  v->init();
+
+  bits= new cl_address_space("bits", 0, 0x100, 1);
+  bits->init();
+  address_spaces->add(bits);
 
   dptr= new cl_address_space("dptr", 0, 2, 8);
   dptr->init();
   address_spaces->add(dptr);
-
-  if (type == CPU_C521)
-    {
-      /*
-      cl_memory_chip *dptr1_chip= new cl_memory_chip("dptr1_chip", 2, 8, 0);
-      dptr1_chip->init();
-      memchips->add(dptr1_chip);
-
-      cl_banker *banker= new cl_banker(sfr, AUXR1, bmDPS,
-				       dptr, 0, 1);
-      banker->init();
-      dptr->decoders->add(banker);
-  
-      banker->add_bank(0, memory("sfr_chip"), 2);
-      banker->add_bank(1, dptr1_chip, 0);
-      banker->activate(0);
-      sfr->write(AUXR1, 0);
-      */
-      // DPL=82  DPH=83
-      // DPL1=84 DPH1=85
-      // DPS=86
-      cl_banker *banker= new cl_banker(sfr, 0x86, 1,
-				       dptr, 0, 1);
-      banker->init();
-      dptr->decoders->add(banker);
-
-      banker->add_bank(0, memory("sfr_chip"), 0x82-0x80);
-      banker->add_bank(1, memory("sfr_chip"), 0x84-0x80);
-      banker->activate(0);
-      sfr->write(0x86, 0);
-    }
-  else
-    {
-      ad= new cl_address_decoder(dptr, sfr_chip, 0, 1, DPL-0x80);
-      ad->init();
-      dptr->decoders->add(ad);
-      ad->activate(0);
-    }
-
-  bits= as= new cl_address_space("bits", 0, 0x100, 1);
-  as->init();
-  address_spaces->add(as);
-  ad= new cl_bander(bits, 0, 127,
-		    iram_chip, 32,
-		    8, 1);
-  ad->init();
-  bits->decoders->add(ad);
-  ad->activate(0);
-  ad= new cl_bander(bits, 128, 255,
-		    sfr_chip, 0,
-		    8, 8);
-  ad->init();
-  bits->decoders->add(ad);
-  ad->activate(0);
 }
 
+
+void
+cl_uc52::decode_iram(void)
+{
+  class cl_address_decoder *ad;
+  
+  ad= new cl_address_decoder(iram, iram_chip, 0, 0xff, 0);
+  ad->init();
+  iram->decoders->add(ad);
+  ad->activate(0);
+
+}
+
+void
+cl_uc52::decode_dptr(void)
+{
+  cl_51core::decode_dptr();
+}
 
 void
 cl_uc52::clear_sfr(void)
@@ -220,19 +167,6 @@ cl_uc52::clear_sfr(void)
   sfr->write(TL2, 0);
   sfr->write(RCAP2L, 0);
   sfr->write(RCAP2H, 0);
-}
-
-
-/*
- * Calculating address of indirectly addressed IRAM cell
- *
- */
-
-class cl_memory_cell *
-cl_uc52::get_indirect(uchar addr, int *res)
-{
-  *res= resGO;
-  return(iram->get_cell(addr));
 }
 
 

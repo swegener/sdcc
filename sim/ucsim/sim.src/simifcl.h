@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simifcl.h 474 2016-10-20 11:53:36Z drdani $ */
+/* $Id: simifcl.h 546 2016-12-12 14:53:15Z drdani $ */
 
 #ifndef SIMIFCL_HEADER
 #define SIMIFCL_HEADER
@@ -93,6 +93,23 @@ enum sif_answer_type {
   SIFAT_ARRAY		= 0x02,	// array of some bytes
   SIFAT_STRING		= 0x03,	// a string
   SIFAT_NONE		= 0x04	// no answer at all
+};
+
+enum simif_cfg {
+  simif_on		= 0,  // RW
+  simif_run		= 1,  // RW
+  simif_start		= 2,  // RW
+  simif_stop		= 3,  // RW
+  simif_quit		= 4,  // W
+  simif_reason		= 5,  // R
+  simif_xtal		= 6,  // RW
+  simif_ticks		= 7,  // R
+  simif_isr_ticks	= 8,  // R
+  simif_idle_ticks	= 9,  // R
+  simif_real_time	= 10, // R
+  simif_vclk		= 11, // R
+  
+  simif_nuof		= 12
 };
 
 class cl_simulator_interface;

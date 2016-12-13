@@ -1048,11 +1048,11 @@ cl_normal_cell::add(long what)
   t_mem d;
   
   if (width <= 8)
-    d= /*TYPE_BYTE*/int8_t(data) + what;
+    d= /*TYPE_BYTE*/i8_t(data) + what;
   else if (width <= 16)
-    d= /*TYPE_WORD*/int16_t(data) + what;
+    d= /*TYPE_WORD*/i16_t(data) + what;
   else
-    d= /*TYPE_DWORD*/int32_t(data) + what;
+    d= /*TYPE_DWORD*/i32_t(data) + what;
   return(data= d & mask);
 }
 

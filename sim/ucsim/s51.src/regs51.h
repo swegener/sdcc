@@ -66,8 +66,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define P4      0x80
 #define DPXL	0x84 /* */
-#define DPL1	0x84 /* 2nd Data Pointer Low byte */
-#define DPH1	0x85 /* 2nd Data Pointer High byte */
+//#define DPL1	0x84 /* 2nd Data Pointer Low byte */
+//#define DPH1	0x85 /* 2nd Data Pointer High byte */
 #define DPS	0x86 /* DPS 1H=DPTR is DPL1/DPH1,... */
 #define EXIF    0x91 /* */
 #define P4CNT   0x92 /* */

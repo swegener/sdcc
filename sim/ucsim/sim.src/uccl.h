@@ -107,6 +107,7 @@ public:
   class cl_sim *sim;
   //class cl_list *mems;
  public:
+  class cl_hw *cpu;
   class cl_hws *hws;
 
  public:
@@ -137,6 +138,7 @@ public:
   // making objects
   virtual void make_memories(void);
   virtual void make_variables(void);
+  virtual void make_cpu_hw(void);
   virtual void mk_hw_elements(void);
   virtual void build_cmdset(class cl_cmdset *cmdset);
 

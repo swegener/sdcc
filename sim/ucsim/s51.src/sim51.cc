@@ -87,6 +87,8 @@ cl_sim51::mk_controller(void)
       return(new cl_uc89c51r(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_C521:
       return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
+    case CPU_517:
+      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_251:
       return(new cl_uc251(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_DS390: case CPU_DS390F:

@@ -381,6 +381,7 @@ cl_avr::sbic_P_b(t_mem code)
   
   addr= ((code&0xf8)>>3)+0x20;
   mask= 1 << (code&7);
+  vc.rd++;
   if (0 == (mask & ram->read(addr)))
     {
       code= fetch();
@@ -410,6 +411,7 @@ cl_avr::sbis_P_b(t_mem code)
   
   addr= ((code&0xf8)>>3)+0x20;
   mask= 1 << (code&7);
+  vc.rd++;
   if (mask & ram->read(addr))
     {
       code= fetch();

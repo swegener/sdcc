@@ -6217,8 +6217,15 @@ genPointerGet (const iCode *ic)
         }
 
       if (bit_field && blen < 8 && !i) // The only byte might need shifting.
-        while (bstr--)
-          emit3 (A_SRL, ASMOP_A, 0);
+        {
+          if (bstr >= 4)
+            {
+              emit3 (A_SWAP, ASMOP_A, 0);
+              bstr -= 4;
+            }
+          while (bstr--)
+            emit3 (A_SRL, ASMOP_A, 0);
+        }
       if (bit_field && blen < 8) // The partial byte.
         {
           emit2 ("and", "a, #0x%02x", 0xff >> (8 - blen));
@@ -6473,6 +6480,29 @@ genPointerSet (iCode * ic)
           cost (180, 180);
         }
 
+      if (bit_field && blen < 8 && right->aop->type == AOP_LIT) // We can save a lot of shifting and masking using the known literal value
+        {
+          unsigned char bval = (byteOfVal (right->aop->aopu.aop_lit, i) << bstr) & ((0xff >> (8 - blen)) << bstr);
+          emit2 ("ld", "a, #0x%02x", ~((0xff >> (8 - blen)) << bstr) & 0xff);
+          cost (2, 1);
+          if (!i)
+            {
+              emit2 ("and", use_y ? "a, (y)" : "a, (x)", i);
+              cost (1 + use_y, 1);
+            }
+          else
+            {
+              emit2 ("and", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", i);
+              cost ((size - 1 - i < 256 ? 2 : 3) + use_y, 1);
+            }
+          if (bval)
+            {
+              emit2 ("or", "a, #0x%02x", bval);
+              cost (2, 1);
+            }
+          goto store;
+        }
+
       if (pushed_a && aopInReg (right->aop, i, A_IDX))
         {
           emit2 ("ld", "a, (1, sp)");
@@ -6483,7 +6513,9 @@ genPointerSet (iCode * ic)
 
       if (bit_field && blen < 8)
         {
-          for (j = 0; j < bstr; j++)
+          if (bstr >= 4)
+            emit3 (A_SWAP, ASMOP_A, 0);
+          for (j = (bstr >= 4 ? 4 : 0); j < bstr; j++)
             emit3 (A_SLL, ASMOP_A, 0);
           emit2 ("and", "a, #0x%02x", (0xff >> (8 - blen)) << bstr);
           cost (2, 1);
@@ -6504,6 +6536,8 @@ genPointerSet (iCode * ic)
           emit2 ("or", "a, (1, sp)");
           cost (2, 1);
         }
+
+store:
 
       if (!(bit_field ? i : size - 1 - i))
         {

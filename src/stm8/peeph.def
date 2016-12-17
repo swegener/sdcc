@@ -243,6 +243,38 @@ replace restart {
 } if notUsed(%1), notUsed('a')
 
 replace restart {
+	clr	a
+	and	a, %1
+} by {
+	clr	a
+	; peephole 12-8 removed redundant and.
+} if notVolatile(%1)
+
+replace restart {
+	and	a, %1
+	tnz	a
+} by {
+	and	a, %1
+	; peephole 12-9 removed redundant tnz.
+}
+
+replace restart {
+	ld	a, (%1)
+	tnz	a
+} by {
+	ld	a, (%1)
+	; peephole 12-10 removed redundant tnz.
+}
+
+replace restart {
+	ld	a, (%1, %2)
+	tnz	a
+} by {
+	ld	a, (%1, %2)
+	; peephole 12-11 removed redundant tnz.
+}
+
+replace restart {
 	ldw	%1, #%2
 	ld	a, (%1)
 	xor	a, #0x01
@@ -313,15 +345,15 @@ replace restart {
 } if notUsed('x'), immdInRange(0 255 '+' 2 %2 %9)
 
 replace restart {
-	popw	a
-	popw	a
+	pop	a
+	pop	a
 } by {
 	popw	x
 	; peephole 14a merged pop a into popw x
 } if notUsed('a'), notUsed('x')
 
 replace restart {
-	popw	a
+	pop	a
 	popw	x
 } by {
 	addw	sp, #3
@@ -330,7 +362,7 @@ replace restart {
 
 replace restart {
 	popw	x
-	popw	a
+	pop	a
 } by {
 	addw	sp, #3
 	; peephole 14c merged popw x into addw.

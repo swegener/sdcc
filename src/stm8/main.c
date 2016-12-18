@@ -236,25 +236,20 @@ stm8_genInitStartup(FILE * of)
   fprintf (of, "; stm8_genXINIT() end\n");
 }
 
+#define STM8_INTERRUPTS_COUNT 30
+
 int
 stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
 {
-  #define STM8_INTERRUPTS_COUNT 30
   int i;
-  dbuf_tprintf (oBuf, "\tint s_GSINIT ;reset\n");
-  
-  if(interrupts[INTNO_TRAP])
-    dbuf_printf (oBuf, "\tint %s ;trap\n", interrupts[INTNO_TRAP]->rname);
-  else
-    dbuf_tprintf (oBuf, "\tint 0x0000 ;trap\n");
+  dbuf_tprintf (oBuf, "\tint s_GSINIT ; reset\n");
+
+  if (interrupts[INTNO_TRAP] || intCount)
+    dbuf_printf (oBuf, "\tint %s ; trap\n", interrupts[INTNO_TRAP] ? interrupts[INTNO_TRAP]->rname : "0x0000");
     
-  for(i = 0; i < STM8_INTERRUPTS_COUNT; i++)
-  {
-      if (i < intCount && interrupts[i])
-        dbuf_printf (oBuf, "\tint %s ;int%d\n", interrupts[i]->rname, i);
-      else
-        dbuf_tprintf (oBuf, "\tint 0x0000 ;int%d\n", i); // int<n>
-  }
+  for (i = 0; i < intCount; i++)
+    dbuf_printf (oBuf, "\tint %s ; int%d\n", interrupts[i] ? interrupts[i]->rname : "0x0000", i);
+
   return TRUE;
 }
 

@@ -244,6 +244,12 @@ stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
   int i;
   dbuf_tprintf (oBuf, "\tint s_GSINIT ; reset\n");
 
+  if(intCount > STM8_INTERRUPTS_COUNT)
+    {
+      werror(E_INT_BAD_INTNO, intCount - 1);
+      intCount = STM8_INTERRUPTS_COUNT;
+    }
+
   if (interrupts[INTNO_TRAP] || intCount)
     dbuf_printf (oBuf, "\tint %s ; trap\n", interrupts[INTNO_TRAP] ? interrupts[INTNO_TRAP]->rname : "0x0000");
     

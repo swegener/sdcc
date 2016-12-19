@@ -59,9 +59,7 @@ testwcharrestart(void)
 	ASSERT(mbrtowc(&w, c, 1, &ps) == 1);
 	ASSERT(wcrtomb(c, w, &ps) == 1);
 	ASSERT(c[0] == 'C');
-#if !defined(__SDCC_z80)  && !defined(__SDCC_z180)
 	ASSERT(mbrtowc(&w, c, 1, &ps) == mbrlen(c, 1, &ps));
-#endif
 #endif
 }
 

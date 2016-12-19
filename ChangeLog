@@ -1,3 +1,9 @@
+2016-12-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/mbrlen.c,
+	  support/regression/tests/wchar.c:
+	  Fix bug #2566.
+
 2016-12-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c:

@@ -615,6 +615,7 @@ setDefaultOptions (void)
   options.stack10bit = 0;
   options.out_fmt = 0;
   options.dump_graphs = 0;
+  options.dependencyFileOpt = 0;
 
   /* now for the optimizations */
   /* turn on the everything */
@@ -1343,11 +1344,30 @@ parseCmdLine (int argc, char **argv)
               /* preprocessor options */
             case 'M':
               {
-                preProcOnly = 1;
                 if (argv[i][2] == 'M')
-                  addSet (&preArgvSet, Safe_strdup ("-MM"));
+                  {
+                    if (argv[i][3] == 'D')
+                      {
+                        options.dependencyFileOpt = USER_DEPENDENCY_FILE_OPT;
+                      }
+                    else
+                      {
+                        addSet (&preArgvSet, Safe_strdup ("-MM"));
+                        preProcOnly = 1;
+                      }
+                  }
                 else
-                  addSet (&preArgvSet, Safe_strdup ("-M"));
+                  {
+                    if (argv[i][2] == 'D')
+                      {
+                        options.dependencyFileOpt = SYSTEM_DEPENDENCY_FILE_OPT;
+                      }
+                    else
+                      {
+                        addSet (&preArgvSet, Safe_strdup ("-M"));
+                        preProcOnly = 1;
+                      }
+                  }
                 break;
               }
 
@@ -1955,6 +1975,30 @@ preProcess (char **envp)
 
           dbuf_init (&dbuf, 256);
           dbuf_printf (&dbuf, "-obj-ext=%s", port->linker.rel_ext);
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+        }
+
+      if (options.dependencyFileOpt)
+        {
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, PATH_MAX);
+          if (options.dependencyFileOpt == SYSTEM_DEPENDENCY_FILE_OPT)
+            dbuf_append_str (&dbuf, "-MD ");
+          else
+            dbuf_append_str (&dbuf, "-MMD ");
+          if (fullDstFileName)
+            dbuf_splitFile (fullDstFileName, &dbuf, NULL);
+          else
+            dbuf_append_str (&dbuf, dstFileName);
+          dbuf_append_str (&dbuf, ".d");
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+
+          dbuf_init (&dbuf, PATH_MAX);
+          if (fullDstFileName)
+            dbuf_printf (&dbuf, "-MT %s", fullDstFileName);
+          else
+            dbuf_printf (&dbuf, "-MT %s%s", dstFileName, port->linker.rel_ext);
           addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
         }
 

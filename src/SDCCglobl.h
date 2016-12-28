@@ -264,6 +264,13 @@ typedef struct {
     char *funcs[128];   /* function name that belong to this */
 } olay;
 
+enum
+  {
+    NO_DEPENDENCY_FILE_OPT = 0,
+    SYSTEM_DEPENDENCY_FILE_OPT = 1,
+    USER_DEPENDENCY_FILE_OPT = 2
+  };
+
 /* other command line options */
 /*
  * cloneOptions function in SDCC.lex should be updated every time
@@ -339,6 +346,7 @@ struct options
     int signed_char;            /* use signed for char without signed/unsigned modifier */
     char *code_seg;             /* segment name to use instead of CSEG */
     char *const_seg;            /* segment name to use instead of CONST */
+    int dependencyFileOpt;      /* write dependencies to given file */
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */
     set *excludeRegsSet;        /* registers excluded from saving */

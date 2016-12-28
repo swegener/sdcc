@@ -1,3 +1,8 @@
+2016-12-28 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCglobl.h,
+	* src/SDCCmain.c: applied patch #276, adds -MD option, Thanks Anders Dellien
+
 2016-12-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/mbrlen.c,

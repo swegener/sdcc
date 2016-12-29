@@ -38,6 +38,7 @@ testwcharstringnorestart(void)
 	wchar_t wcs2[5];
 	char mbs[5 * MB_LEN_MAX];
 
+	// Test basic functionality
 	ASSERT(wcslen (wcs1) == 4);
 	ASSERT(wcstombs(mbs, wcs1, 5 * MB_LEN_MAX) > 0);
 	ASSERT(mbstowcs(wcs2, mbs, 5) > 0);
@@ -45,10 +46,12 @@ testwcharstringnorestart(void)
 	ASSERT(wcs2[3] == L't');
 	ASSERT(!wcscmp(wcs1, wcs2));
 
+	// Test for 0-terminated strings
 	ASSERT(wcstombs(mbs, wcs1, 1000) > 0);
 	ASSERT(mbstowcs(wcs2, mbs, 1000) > 0);
 	ASSERT(!wcscmp(wcs1, wcs2));
 
+	// Test for unterminated strings
 	mbs[2] = 0;
 	wcs2[2] = 0;
 	ASSERT(wcstombs(mbs, wcs1, 2) == 2);

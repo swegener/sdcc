@@ -1,4 +1,4 @@
-/* $Id: port_hw.cc 496 2016-11-11 12:48:27Z drdani $ */
+/* $Id: port_hw.cc 549 2016-12-13 11:15:58Z drdani $ */
 
 #include <ctype.h>
 

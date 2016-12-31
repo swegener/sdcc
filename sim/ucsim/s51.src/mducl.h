@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (tlcs.src/inst_jmp.cc)
+ * Simulator of microcontrollers (s51.src/mducl.h)
  *
  * Copyright (C) 2016,16 Drotos Daniel, Talker Bt.
  * 
@@ -25,67 +25,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_jump.cc 549 2016-12-13 11:15:58Z drdani $ */
+#ifndef MDUCL_HEADER
+#define MDUCL_HEADER
 
-#include "tlcscl.h"
+#include "hwcl.h"
 
 
-// 1e
-int
-cl_tlcs::inst_ret()
+class cl_mdu517: public cl_hw
 {
-  t_mem pushed_pc;
-
-  exec_ret(PC-1, &pushed_pc);
-  PC= pushed_pc;
-  return resGO;
-}
-
-
-// 1f
-int
-cl_tlcs::inst_reti()
-{
-  t_mem pushed_pc, pushed_af;
+ protected:
+  u8_t v[7];
+  class cl_memory_cell *regs[7];//, *arcon;
+  u64_t writes;
+  int nuof_writes;
+  //bool calcing;
+ public:
+  cl_mdu517(class cl_uc *auc, int aid);
+  virtual int init(void);
   
-  exec_pop(PC-1, &pushed_af);
-  exec_reti(PC-1, &pushed_pc);
-  reg.af= pushed_af;
-  PC= pushed_pc;
-  return resGO;
-}
+  virtual t_mem read(class cl_memory_cell *cell);
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+};
 
 
-// CALL
-int
-cl_tlcs::inst_call(t_addr PC_of_inst, u16_t addr)
-{
-  exec_call(PC_of_inst, addr, PC);
-  PC= addr;
-  return resGO;
-}
+#endif
 
-
-// DJNZ
-int
-cl_tlcs::inst_djnz_b(i8_t d)
-{
-  reg.rbc.b--;
-  if (reg.rbc.b != 0)
-    PC+= d;
-  return resGO;
-}
-
-
-// DJNZ BC
-int
-cl_tlcs::inst_djnz_bc(i8_t d)
-{
-  reg.bc--;
-  if (reg.bc != 0)
-    PC+= d;
-  return resGO;
-}
-
-
-/* End of tlcs.src/inst_jmp.cc */
+/* End of s51.src/mducl.h */

@@ -102,11 +102,13 @@ enum cpu_type {
   CPU_DS390F	= 0x0100,
   CPU_C521	= 0x0200,
   CPU_517	= 0x0400,
+  CPU_F380	= 0x0800,
   
   CPU_ALL_51	= (CPU_51|CPU_31),
   CPU_ALL_52	= (CPU_52|CPU_32|CPU_51R|CPU_89C51R|CPU_251|
 		   CPU_DS390|CPU_DS390F|
-		   CPU_C521|CPU_517),
+		   CPU_C521|CPU_517|
+		   CPU_F380),
 
   CPU_AVR	= 0x0001,
   CPU_ALL_AVR	= (CPU_AVR),
@@ -134,9 +136,6 @@ enum cpu_type {
   // technology
   CPU_CMOS	= 0x0001,
   CPU_HMOS	= 0x0002,
-
-  // variant
-  CPU_F380      = 0x010000,
 };
 
 
@@ -246,6 +245,7 @@ enum hw_cath {
   HW_SIMIF	= 0x0080,
   HW_RESET	= 0x0100,
   HW_CLOCK	= 0x0200,
+  HW_CALC	= 0x0400,
 };
 
 // Events that can happen in peripherals

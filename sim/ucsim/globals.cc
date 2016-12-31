@@ -387,6 +387,8 @@ struct cpu_entry cpus_51[]=
   {"8032"  , CPU_32, CPU_HMOS},
   {"C32"   , CPU_32, CPU_CMOS},
   {"80C32" , CPU_32, CPU_CMOS},
+  {"F380"  , CPU_F380, CPU_CMOS},
+  
 
   {"51R"   , CPU_51R, CPU_CMOS},
   {"51RA"  , CPU_51R, CPU_CMOS},
@@ -411,8 +413,6 @@ struct cpu_entry cpus_51[]=
   {"DS390" , CPU_DS390, CPU_CMOS},
   {"DS390F", CPU_DS390F, CPU_CMOS},
 
-  {"F380"  , CPU_52, CPU_F380},
-  
   {NULL, CPU_NONE, 0}
 };
 

@@ -302,6 +302,8 @@ struct dis_entry disass_51[]= {
 
 struct name_entry sfr_tab51[]=
 {
+  {CPU_F380,			  0xc7, "P4"},
+  
   {CPU_251,                       0x84, "DPXL"},
   {CPU_251|CPU_DS390|CPU_DS390F,  0x93, "DPX"},
   {CPU_251,                       0xa8, "IE0"},

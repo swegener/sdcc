@@ -34,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "regs51.h"
 #include "timer2cl.h"
 #include "portcl.h"
+#include "mducl.h"
 
 
 /*
@@ -93,11 +94,34 @@ cl_uc52::mk_hw_elements(void)
   add_hw(h= new cl_timer2(this, 2, "timer2", t2_default|t2_down));
   h->init();
 
-  if (technology & CPU_F380)
+  if (type == CPU_F380)
     {
-      h= new cl_port(this, 4, 0xc7);
-      add_hw(h);
-      h->init();
+      class cl_port *p4= new cl_port(this, 4, 0xc7);
+      add_hw(p4);
+      p4->init();
+
+      class cl_port_ui *d= (class cl_port_ui *)get_hw(cchars("dport"), NULL);
+      if (d)
+	{
+	  class cl_port_data pd;
+	  pd.init();
+	  pd.cell_dir= NULL;
+	  
+	  pd.set_name("P4");
+	  pd.cell_p  = p4->cell_p;
+	  pd.cell_in = p4->cell_in;
+	  pd.keyset  = chars(keysets[4]);
+	  pd.basx    = 1;
+	  pd.basy    = 4+7;
+	  d->add_port(&pd, 4);
+	}
+    }
+
+  if (type == CPU_517)
+    {
+      class cl_mdu517 *mdu= new cl_mdu517(this, 0);
+      add_hw(mdu);
+      mdu->init();
     }
 }
 
@@ -167,6 +191,8 @@ cl_uc52::clear_sfr(void)
   sfr->write(TL2, 0);
   sfr->write(RCAP2L, 0);
   sfr->write(RCAP2H, 0);
+  if (type == CPU_F380)
+    sfr->write(/*P4*/0xc7, 0xff);
 }
 
 

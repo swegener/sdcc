@@ -7,6 +7,7 @@ clean:
 	rm -f test_*.??* '(null).cdb' *.lnk *.ihx
 	rm -f .[a-z]*~
 	rm -f s51$(EXEEXT)
+	$(MAKE) -C test clean
 
 
 # Deleting all files created by configuring or building the program

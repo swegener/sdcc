@@ -275,7 +275,7 @@ void main(void)
   test_16div16(0);
   test_16mul16(0);
   test_norm(0);
-  test_shift(1);
+  test_shift(0);
   
   *simif= 's';
   while (1)

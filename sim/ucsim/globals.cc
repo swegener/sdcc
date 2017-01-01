@@ -409,6 +409,13 @@ struct cpu_entry cpus_51[]=
 
   {"517"   , CPU_517, CPU_CMOS},
   {"C517"  , CPU_517, CPU_CMOS},
+
+  {"88X"   , CPU_XC88X, CPU_CMOS},
+  {"886"   , CPU_XC88X, CPU_CMOS},
+  {"888"   , CPU_XC88X, CPU_CMOS},
+  {"XC88X" , CPU_XC88X, CPU_CMOS},
+  {"XC886" , CPU_XC88X, CPU_CMOS},
+  {"XC888" , CPU_XC88X, CPU_CMOS},
   
   {"DS390" , CPU_DS390, CPU_CMOS},
   {"DS390F", CPU_DS390F, CPU_CMOS},

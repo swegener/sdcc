@@ -72,6 +72,17 @@ cl_uc52::init(void)
       decode_dptr();
     }
   else if (cpu &&
+	   (type == CPU_XC88X))
+    {
+      cpu->cfg_set(uc51cpu_aof_mdpc, 0xA2);
+      cpu->cfg_set(uc51cpu_mask_mdpc, 1);
+      class cl_memory_chip *dptr_chip=
+	new cl_memory_chip("dptr_chip", 3*8, 8);
+      dptr_chip->init();
+      memchips->add(dptr_chip);
+      decode_dptr();
+    }
+  else if (cpu &&
 	   (type == CPU_89C51R))
     {
       cpu->cfg_set(uc51cpu_aof_mdpc, 0xA2);
@@ -117,11 +128,15 @@ cl_uc52::mk_hw_elements(void)
 	}
     }
 
-  if (type == CPU_517)
+  else if (type == CPU_517)
     {
       class cl_mdu517 *mdu= new cl_mdu517(this, 0);
       add_hw(mdu);
       mdu->init();
+    }
+  
+  else if (type == CPU_XC88X)
+    {
     }
 }
 

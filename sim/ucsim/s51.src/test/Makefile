@@ -9,3 +9,4 @@ clean:
 	for p in $(PRJ); do \
 		$(MAKE) -f $$p.mk clean ;\
 	done
+	rm -f *.out

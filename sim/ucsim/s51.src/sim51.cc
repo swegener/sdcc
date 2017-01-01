@@ -89,6 +89,8 @@ cl_sim51::mk_controller(void)
       return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_517:
       return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
+    case CPU_XC88X:
+      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_F380:
       return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_251:

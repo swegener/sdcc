@@ -42,10 +42,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "cmd51cl.h"
 #include "uc51cl.h"
 #include "uc52cl.h"
+#include "uc521cl.h"
+#include "uc517cl.h"
 #include "uc51rcl.h"
 #include "uc89c51rcl.h"
 #include "uc251cl.h"
 #include "uc390cl.h"
+#include "uc88xcl.h"
+#include "uc380cl.h"
 #include "glob.h"
 
 
@@ -86,20 +90,20 @@ cl_sim51::mk_controller(void)
     case CPU_89C51R:
       return(new cl_uc89c51r(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_C521:
-      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc521(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_517:
-      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc517(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_XC88X:
-      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc88x(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_F380:
-      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc380(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_251:
       return(new cl_uc251(cpus_51[i].type, cpus_51[i].technology, this));
     case CPU_DS390: case CPU_DS390F:
       return(new cl_uc390(cpus_51[i].type, cpus_51[i].technology, this));
     default:
-      fprintf(stderr, "Unknow processor type\n");
-      exit(1);
+      fprintf(stderr, "Unknown processor type\n");
+      return NULL;
     }
   return(NULL);
 }

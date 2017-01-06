@@ -1,6 +1,6 @@
 TARGET		= stm8
 
-CC		= sdcc -m$(TARGET)
+CC		= sdcc -m$(TARGET) --std-c99
 
 CPPFLAGS	=
 CFLAGS		= --debug

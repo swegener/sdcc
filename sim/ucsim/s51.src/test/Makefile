@@ -1,4 +1,4 @@
-PRJ		= test_mdu517
+PRJ		= test_mdu517 test_mdu88x
 
 all:
 	for p in $(PRJ); do \

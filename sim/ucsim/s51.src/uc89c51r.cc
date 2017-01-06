@@ -42,6 +42,21 @@ cl_uc89c51r::cl_uc89c51r(int Itype, int Itech, class cl_sim *asim):
 {
 }
 
+int
+cl_uc89c51r::init(void)
+{
+  int r= cl_uc51r::init();
+
+  cpu->cfg_set(uc51cpu_aof_mdpc, 0xA2);
+  cpu->cfg_set(uc51cpu_mask_mdpc, 1);
+  class cl_memory_chip *dptr_chip=
+    new cl_memory_chip("dptr_chip", 3*8, 8);
+  dptr_chip->init();
+  memchips->add(dptr_chip);
+  decode_dptr();
+  
+  return r;
+}
 
 void
 cl_uc89c51r::mk_hw_elements(void)

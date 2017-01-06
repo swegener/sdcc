@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stlcs.cc 216 2016-06-18 08:02:40Z  $ */
+/* $Id: stlcs.cc 569 2017-01-03 14:48:13Z drdani $ */
 
 #include <stdio.h>
 
@@ -48,7 +48,7 @@ main(int argc, char *argv[])
   application->init(argc, argv);
   sim= new cl_simtlcs(application);
   if (sim->init())
-    return(1);
+    sim->state|= SIM_QUIT;
   application->set_simulator(sim);
   retval= application->run();
   application->done();

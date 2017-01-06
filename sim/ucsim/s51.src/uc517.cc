@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (sxa.cc)
+ * Simulator of microcontrollers (s51.src/uc517.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2017,17 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,32 +25,41 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-// prj
-#include "globals.h"
+#include "mducl.h"
 
-// sim.src
-#include "appcl.h"
-
-// local
-#include "simxacl.h"
+#include "uc517cl.h"
 
 
-int
-main(int argc, char *argv[])
+cl_uc517::cl_uc517(int Itype, int Itech, class cl_sim *asim):
+  cl_uc52(Itype, Itech, asim)
 {
-  class cl_sim *sim;
-
-  application= new cl_app();
-  application->init(argc, argv);
-  sim= new cl_simxa(application);
-  if (sim->init())
-    sim->state|= SIM_QUIT;
-  application->set_simulator(sim);
-  application->run();
-  application->done();
-  delete application;
-  return(0);
 }
 
+int
+cl_uc517::init(void)
+{
+  int ret;
+  ret= cl_uc52::init();
 
-/* End of xa.src/sxa.cc */
+  cpu->cfg_set(uc51cpu_aof_mdpc, 0x92);
+  cpu->cfg_set(uc51cpu_mask_mdpc, 7);
+  class cl_memory_chip *dptr_chip=
+    new cl_memory_chip("dptr_chip", 3*8, 8);
+  dptr_chip->init();
+  memchips->add(dptr_chip);
+  decode_dptr();
+
+  return ret;
+}
+
+void
+cl_uc517::mk_hw_elements(void)
+{
+  cl_uc52::mk_hw_elements();
+
+  class cl_mdu517 *mdu= new cl_mdu517(this, 0);
+  add_hw(mdu);
+  mdu->init();
+}
+
+/* End of s51.src/uc517.cc */

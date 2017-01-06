@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serialcl.h 496 2016-11-11 12:48:27Z drdani $ */
+/* $Id: serialcl.h 581 2017-01-05 15:01:20Z drdani $ */
 
 #ifndef STM8_SERIALCL_HEADER
 #define STM8_SERIALCL_HEADER
@@ -41,21 +41,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 class cl_serial_listener;
-
-enum reg_idx {
-  sr	= 0,
-  dr	= 1,
-  brr1	= 2,
-  brr2	= 3,
-  cr1	= 4,
-  cr2	= 5,
-  cr3	= 6,
-  cr4	= 7,
-  cr5	= 8,
-  cr6	= 9,
-  gtr	= 10,
-  pscr	= 11
-};
 
 class cl_serial: public cl_serial_hw
 {

@@ -51,48 +51,7 @@ cl_uc52::init(void)
 {
   int ret;
   ret= cl_51core::init();
-  if (cpu &&
-      (type == CPU_C521))
-    {
-      cpu->cfg_set(uc51cpu_aof_mdps, 0x86);
-      cpu->cfg_set(uc51cpu_mask_mdps, 1);
-      cpu->cfg_set(uc51cpu_aof_mdps1l, 0x84);
-      cpu->cfg_set(uc51cpu_aof_mdps1h, 0x85);
-      decode_dptr();
-    }
-  else if (cpu &&
-	   (type == CPU_517))
-    {
-      cpu->cfg_set(uc51cpu_aof_mdpc, 0x92);
-      cpu->cfg_set(uc51cpu_mask_mdpc, 7);
-      class cl_memory_chip *dptr_chip=
-	new cl_memory_chip("dptr_chip", 3*8, 8);
-      dptr_chip->init();
-      memchips->add(dptr_chip);
-      decode_dptr();
-    }
-  else if (cpu &&
-	   (type == CPU_XC88X))
-    {
-      cpu->cfg_set(uc51cpu_aof_mdpc, 0xA2);
-      cpu->cfg_set(uc51cpu_mask_mdpc, 1);
-      class cl_memory_chip *dptr_chip=
-	new cl_memory_chip("dptr_chip", 3*8, 8);
-      dptr_chip->init();
-      memchips->add(dptr_chip);
-      decode_dptr();
-    }
-  else if (cpu &&
-	   (type == CPU_89C51R))
-    {
-      cpu->cfg_set(uc51cpu_aof_mdpc, 0xA2);
-      cpu->cfg_set(uc51cpu_mask_mdpc, 1);
-      class cl_memory_chip *dptr_chip=
-	new cl_memory_chip("dptr_chip", 3*8, 8);
-      dptr_chip->init();
-      memchips->add(dptr_chip);
-      decode_dptr();
-    }
+
   return ret;
 }
 
@@ -104,40 +63,6 @@ cl_uc52::mk_hw_elements(void)
   cl_51core::mk_hw_elements();
   add_hw(h= new cl_timer2(this, 2, "timer2", t2_default|t2_down));
   h->init();
-
-  if (type == CPU_F380)
-    {
-      class cl_port *p4= new cl_port(this, 4, 0xc7);
-      add_hw(p4);
-      p4->init();
-
-      class cl_port_ui *d= (class cl_port_ui *)get_hw(cchars("dport"), NULL);
-      if (d)
-	{
-	  class cl_port_data pd;
-	  pd.init();
-	  pd.cell_dir= NULL;
-	  
-	  pd.set_name("P4");
-	  pd.cell_p  = p4->cell_p;
-	  pd.cell_in = p4->cell_in;
-	  pd.keyset  = chars(keysets[4]);
-	  pd.basx    = 1;
-	  pd.basy    = 4+7;
-	  d->add_port(&pd, 4);
-	}
-    }
-
-  else if (type == CPU_517)
-    {
-      class cl_mdu517 *mdu= new cl_mdu517(this, 0);
-      add_hw(mdu);
-      mdu->init();
-    }
-  
-  else if (type == CPU_XC88X)
-    {
-    }
 }
 
 void
@@ -206,8 +131,6 @@ cl_uc52::clear_sfr(void)
   sfr->write(TL2, 0);
   sfr->write(RCAP2L, 0);
   sfr->write(RCAP2H, 0);
-  if (type == CPU_F380)
-    sfr->write(/*P4*/0xc7, 0xff);
 }
 
 

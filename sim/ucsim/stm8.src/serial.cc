@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 496 2016-11-11 12:48:27Z drdani $ */
+/* $Id: serial.cc 581 2017-01-05 15:01:20Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -49,6 +49,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // local
 #include "serialcl.h"
+
+
+enum reg_idx {
+  sr	= 0,
+  dr	= 1,
+  brr1	= 2,
+  brr2	= 3,
+  cr1	= 4,
+  cr2	= 5,
+  cr3	= 6,
+  cr4	= 7,
+  cr5	= 8,
+  cr6	= 9,
+  gtr	= 10,
+  pscr	= 11
+};
 
 
 cl_serial::cl_serial(class cl_uc *auc,

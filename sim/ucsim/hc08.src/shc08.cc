@@ -44,7 +44,8 @@ main(int argc, char *argv[])
   application= new cl_app();
   application->init(argc, argv);
   sim= new cl_simhc08(application);
-  sim->init();
+  if (sim->init())
+    sim->state|= SIM_QUIT;
   application->set_simulator(sim);
   application->run();
   application->done();

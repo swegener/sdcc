@@ -7,14 +7,14 @@
 #include "print.h"
 
 void
-print(char *s)
+print(char *s) __reentrant
 {
   if (s)
     for (; *s; putchar(*s++)) ;
 }
 
 void
-print_form(char *s, long l, void *p)
+print_form(char *s, long l, void *p) __reentrant
 {
   if (s)
     for (; *s; s++)
@@ -39,7 +39,7 @@ print_form(char *s, long l, void *p)
 /* signed integer in decimal */
 
 void
-print_d(long i)
+print_d(long i) __reentrant
 {
   long x= 1000000000;
   char in= 0;
@@ -63,7 +63,7 @@ print_d(long i)
 /* unsigned integer in decimal */
 
 void
-print_u(unsigned int i)
+print_u(unsigned int i) __reentrant
 {
   int x= 10000;
   while (x)
@@ -86,7 +86,7 @@ print_cx(unsigned char i)
 }
 
 void
-print_x(unsigned int i)
+print_x(unsigned int i) __reentrant
 {
 /*
   unsigned char j;
@@ -102,14 +102,14 @@ print_x(unsigned int i)
 }
 
 void
-print_lx(unsigned long i)
+print_lx(unsigned long i) __reentrant
 {
   print_x(i >> 16);
   print_x(i & 0xffff);
 }
 
 void
-print_p(void *p)
+print_p(void *p) __reentrant
 {
   unsigned char t= ((long)p)/0x10000;
   if (t>=0x80)
@@ -180,7 +180,7 @@ term_show()
 
 
 void
-term_color(int bg, int fg)
+term_color(int bg, int fg) __reentrant
 {
   if (bg >= 0)
     print_form("\033[%um", bg+40, NULL);

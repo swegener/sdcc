@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (sxa.cc)
+ * Simulator of microcontrollers (s51.src/uc380cl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2017,17 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,32 +25,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-// prj
-#include "globals.h"
+#ifndef UC380CL_HEADER
+#define UC380CL_HEADER
 
-// sim.src
-#include "appcl.h"
+#include "uc52cl.h"
 
-// local
-#include "simxacl.h"
-
-
-int
-main(int argc, char *argv[])
+class cl_uc380: public cl_uc52
 {
-  class cl_sim *sim;
-
-  application= new cl_app();
-  application->init(argc, argv);
-  sim= new cl_simxa(application);
-  if (sim->init())
-    sim->state|= SIM_QUIT;
-  application->set_simulator(sim);
-  application->run();
-  application->done();
-  delete application;
-  return(0);
-}
+ public:
+  cl_uc380(int Itype, int Itech, class cl_sim *asim);
+  virtual int init(void);
+  virtual void mk_hw_elements(void);
+  virtual void clear_sfr(void);
+};
 
 
-/* End of xa.src/sxa.cc */
+#endif
+
+/* End of s51.src/uc380cl.h */

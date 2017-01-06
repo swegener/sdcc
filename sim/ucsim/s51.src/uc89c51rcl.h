@@ -39,6 +39,7 @@ class cl_uc89c51r: public cl_uc51r
 {
 public:
   cl_uc89c51r(int Itype, int Itech, class cl_sim *asim);
+  virtual int init(void);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
   

@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (sxa.cc)
+ * Simulator of microcontrollers (s51.src/uc521.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2017,17 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,32 +25,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-// prj
-#include "globals.h"
+#include "uc521cl.h"
 
-// sim.src
-#include "appcl.h"
 
-// local
-#include "simxacl.h"
-
+cl_uc521::cl_uc521(int Itype, int Itech, class cl_sim *asim):
+  cl_uc52(Itype, Itech, asim)
+{
+}
 
 int
-main(int argc, char *argv[])
+cl_uc521::init(void)
 {
-  class cl_sim *sim;
+  int ret;
+  ret= cl_uc52::init();
 
-  application= new cl_app();
-  application->init(argc, argv);
-  sim= new cl_simxa(application);
-  if (sim->init())
-    sim->state|= SIM_QUIT;
-  application->set_simulator(sim);
-  application->run();
-  application->done();
-  delete application;
-  return(0);
+  cpu->cfg_set(uc51cpu_aof_mdps, 0x86);
+  cpu->cfg_set(uc51cpu_mask_mdps, 1);
+  cpu->cfg_set(uc51cpu_aof_mdps1l, 0x84);
+  cpu->cfg_set(uc51cpu_aof_mdps1h, 0x85);
+  decode_dptr();
+
+  return ret;
 }
 
 
-/* End of xa.src/sxa.cc */
+/* End of s51.src/uc521.cc */

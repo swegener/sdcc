@@ -2871,6 +2871,22 @@ geniCodeDerefPtr (operand * op, int lvl)
       op->isaddr = 1;
       op = geniCodeRValue (op, TRUE);
     }
+  else if (IS_OP_LITERAL (op))
+    {
+	  /* To avoid problems converting a dereferenced literal pointer */
+	  /* back and forth between lvalue and rvalue formats, replace   */
+	  /* the literal pointer with an iTemp and assign the literal    */
+	  /* value to the iTemp. */
+	  iCode *ic;
+      operand *iop = newiTempOperand (optype, 0);
+      SPEC_SCLS (OP_SYM_ETYPE (iop)) = S_AUTO;   /* remove S_LITERAL */
+      iop->isaddr = 0;                 /* assign to the iTemp itself */
+      ic = newiCode ('=', NULL, op);
+      IC_RESULT (ic) = iop;
+      ADDTOCHAIN (ic);
+      op = operandFromOperand (iop); /* now use the iTemp as operand */
+      optype = operandType (op);
+	}
 
   /* now get rid of the pointer part */
   if (isLvaluereq (lvl) && IS_ITEMP (op))

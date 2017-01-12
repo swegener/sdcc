@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef SIM_MEMCL_HEADER
 #define SIM_MEMCL_HEADER
 
+#include <stdio.h>
+
 #include "ddconfig.h"
 
 // prj
@@ -133,7 +135,6 @@ public:
   virtual t_addr lowest_valid_address(void) { return(start_address); }
   virtual t_addr highest_valid_address(void) { return(start_address+size-1); }
 
-
   virtual t_mem read(t_addr addr)=0;
   virtual t_mem read(t_addr addr, enum hw_cath skip)=0;
   virtual t_mem get(t_addr addr)=0;
@@ -147,6 +148,8 @@ public:
 /*
  * Operators for memory cells
  */
+
+class cl_banker;
 
 class cl_memory_operator: public cl_base
 {
@@ -167,9 +170,9 @@ public:
   virtual t_mem read(void);
   virtual t_mem read(enum hw_cath skip) { return(read()); }
   virtual t_mem write(t_mem val);
-};
 
-class cl_banker;
+  virtual class cl_banker *get_banker(void) { return NULL; }
+};
 
 class cl_bank_switcher_operator: public cl_memory_operator
 {
@@ -180,6 +183,7 @@ class cl_bank_switcher_operator: public cl_memory_operator
 			    class cl_banker *the_banker);
   
   virtual t_mem write(t_mem val);
+  virtual class cl_banker *get_banker(void) { return banker; }
 };
 
 class cl_hw_operator: public cl_memory_operator
@@ -293,7 +297,8 @@ class cl_memory_cell: public cl_cell_data
   virtual void prepend_operator(class cl_memory_operator *op);
   virtual void del_operator(class cl_brk *brk);
   virtual void del_operator(class cl_hw *hw);
- 
+  virtual class cl_banker *get_banker(void);
+  
   virtual class cl_memory_cell *add_hw(class cl_hw *hw, t_addr addr);
   virtual void remove_hw(class cl_hw *hw);
   virtual class cl_event_handler *get_event_handler(void);
@@ -512,7 +517,8 @@ class cl_banker: public cl_address_decoder
 
   virtual t_mem actual_bank();
   virtual bool activate(class cl_console_base *con);
-
+  virtual bool switch_to(int bank_nr, class cl_console_base *con);
+  
   virtual void print_info(chars pre, class cl_console_base *con);
 };
 

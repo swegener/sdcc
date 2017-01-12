@@ -1060,6 +1060,22 @@ cl_memory_cell::del_operator(class cl_hw *hw)
     }
 }
 
+class cl_banker *
+cl_memory_cell::get_banker(void)
+{
+  class cl_memory_operator *op= operators;
+  class cl_banker *b= NULL;
+
+  while (op)
+    {
+      b= op->get_banker();
+      if (b)
+	return b;
+      op= op->get_next();
+    }
+  return NULL;
+}
+
 class cl_memory_cell *
 cl_memory_cell::add_hw(class cl_hw *hw, t_addr addr)
 {
@@ -2040,6 +2056,31 @@ bool
 cl_banker::activate(class cl_console_base *con)
 {
   int b= actual_bank();
+  t_addr i, s;
+  t_mem *data;
+  class cl_memory_cell *c;
+
+  if (b == bank)
+    return true;
+  if (banks[b] == NULL)
+    return true;
+  s= as_end - as_begin + 1;
+  for (i= 0; i < s; i++)
+    {
+      t_addr ca= banks[b]->chip_begin + i;
+      data= banks[b]->memchip->get_slot(ca);
+      c= address_space->get_cell(as_begin+i);
+      c->decode(data);
+    }
+  bank= b;
+
+  return true;
+}
+
+bool
+cl_banker::switch_to(int bank_nr, class cl_console_base *con)
+{
+  int b= bank_nr;//actual_bank();
   t_addr i, s;
   t_mem *data;
   class cl_memory_cell *c;

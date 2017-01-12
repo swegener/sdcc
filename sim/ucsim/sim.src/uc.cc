@@ -649,7 +649,7 @@ cmd->init();*/
     cmd->add_name("ad");
 
     mem_create_cset->add(cmd= new cl_memory_create_banker_cmd("banker", 0,
-"memory create banker addressspace begin end chip begin\n"
+"memory create banker switcher_addressspace switcher_address switcher_mask banked_addressspace start end\n"
 "                   Create a new bank switcher",
 "long help of memory create banker"));
     cmd->init();
@@ -659,7 +659,7 @@ cmd->init();*/
     cmd->add_name("bs");
 
     mem_create_cset->add(cmd= new cl_memory_create_bank_cmd("bank", 0,
-"memory create bank addressspace begin end chip begin\n"
+"memory create bank addressspace begin bank_nr chip begin\n"
 "                   Add a new bank to bank switcher",
 "long help of memory create bank"));
     cmd->init();
@@ -837,6 +837,37 @@ ReadInt(FILE *f, bool *ok, int bytes)
  *
  */
 
+void
+cl_uc::set_rom(t_addr addr, t_mem val)
+{
+  //printf("rom[%lx]=%x\n", addr, val);
+  t_addr size= rom->get_size();
+  if (addr < size)
+    {
+      rom->set(addr, val);
+      return;
+    }
+  t_addr bank, caddr;
+  bank= addr / size;
+  caddr= addr % size;
+  //printf("getting decoder of %ld/%lx\n", bank, caddr);
+  class cl_banker *d= (class cl_banker *)(rom->get_decoder_of(caddr));
+  if (d)
+    {
+      if (!d->is_banker())
+	{
+	  //printf("cell at %lx has no banker\n", caddr);
+	  return;
+	}
+      //printf("setting %ld/rom[%lx]=%x\n", bank, caddr, val);
+      d->switch_to(bank, NULL);
+      rom->set(caddr, val);
+      d->activate(NULL);
+    }
+  else
+    ;//printf("no decoder at %lx\n", caddr);
+}
+
 long
 cl_uc::read_hex_file(const char *nam)
 {
@@ -844,6 +875,7 @@ cl_uc::read_hex_file(const char *nam)
   int c;
   long written= 0, recnum= 0;
 
+  uint  base= 0;  // extended address, added to every adress
   uchar dnum;     // data number
   uchar rtyp=0;   // record type
   uint  addr= 0;  // address
@@ -911,7 +943,7 @@ cl_uc::read_hex_file(const char *nam)
 			{
 			  if (rom->width <= 8)
 			    {
-			      rom->set(addr, rec[i]);
+			      set_rom(base+addr, rec[i]);
 			      addr++;
 			      written++;
 			    }
@@ -925,12 +957,21 @@ cl_uc::read_hex_file(const char *nam)
 			      else
 				{
 				  high= rec[i];
-				  rom->set(addr, (high*256)+low);
+				  set_rom(base+addr, (high*256)+low);
 				  addr++;
 				  written++;
 				  get_low= 1;
 				}
 			    }
+			}
+		    }
+		  else if (rtyp == 4)
+		    {
+		      printf("hex record type=4\n");
+		      if (dnum >= 2)
+			{
+			  base= (rec[0]*256+rec[1]) << 16;
+			  printf("hex base=%x\n", base);
 			}
 		    }
 		  else

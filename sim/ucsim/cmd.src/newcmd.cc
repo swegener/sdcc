@@ -363,7 +363,7 @@ void
 cl_console_base::tu_reset(void)
 {
   tu_mouse_off();
-  dd_printf("\033c"); // terminal reset
+  //dd_printf("\033c"); // terminal reset
   dd_printf("\033[!p"); // soft terminal reset
 }
 

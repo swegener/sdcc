@@ -95,6 +95,13 @@ cl_app::init(int argc, char *argv[])
 
 /* Main cycle */
 
+enum run_states {
+  rs_config,
+  rs_read_files,
+  rs_start,
+  rs_run
+};
+
 int
 cl_app::run(void)
 {
@@ -103,14 +110,43 @@ cl_app::run(void)
   class cl_option *o= options->get_option("go");
   bool g_opt= false;
   unsigned int cyc= 0;
+  enum run_states rs= rs_config;
   
-  if (o)
-    o->get_value(&g_opt);
-  if (sim && g_opt)
-    sim->start(0, 0);
+  
   
   while (!done)
     {
+      if ((rs == rs_config) &&
+	  (commander->config_console == NULL))
+	{
+	  rs= rs_read_files;
+	}
+      if (rs == rs_read_files)
+	{
+	  if (sim->uc != NULL)
+	    {
+	      int i;
+	      for (i= 0; i < in_files->count; i++)
+		{
+		  char *fname= (char *)(in_files->at(i));
+		  long l;
+		  if ((l= sim->uc->read_hex_file(fname)) >= 0)
+		    {
+		      commander->all_printf("%ld words read from %s\n",
+					    l, fname);
+		    }
+		}
+	    }
+	  rs= rs_start;
+	}
+      if (rs == rs_start)
+	{
+	  if (o)
+	    o->get_value(&g_opt);
+	  if (sim && g_opt)
+	    sim->start(0, 0);
+	  rs= rs_run;
+	}
       ++cyc;
       if (!sim)
 	{

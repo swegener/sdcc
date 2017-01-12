@@ -151,6 +151,7 @@ public:
   virtual class cl_memory *memory(const char *id);
 
   // file handling
+  virtual void set_rom(t_addr addr, t_mem val);
   virtual long read_hex_file(const char *nam);
 
   // instructions, code analyzer

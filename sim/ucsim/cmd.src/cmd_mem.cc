@@ -274,6 +274,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_banker_cmd)
 		      (class cl_address_space *)banked_as, asb, ase);
       d->init();
       ((class cl_address_space *)banked_as)->decoders->add(d);
+      ((class cl_address_space *)banked_as)->undecode_area(d, asb, ase, con);
       d->activate(con);
     }
   return(false);

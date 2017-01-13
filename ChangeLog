@@ -1,4 +1,9 @@
-2016-01-12 Philipp Klaus Krause <pkk AT spth.de>
+2017-01-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (expandInlineFuncs,fixupInline): Fix bug #2559
+	* support/regression/tests/bug-2559.c: Re-enable test
+
+2017-01-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
 	  Improve efficiency of wide left-shifts.

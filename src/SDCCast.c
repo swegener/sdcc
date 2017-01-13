@@ -6718,7 +6718,7 @@ fixupInline (ast * tree, int level)
 
       if (inlineState.retsym && tree->right)
         {
-          assignTree = newNode ('=', newAst_VALUE (symbolVal (inlineState.retsym)), tree->right);
+          assignTree = newNode ('=', newAst_VALUE (symbolVal (copySymbol (inlineState.retsym))), tree->right);
           copyAstLoc (assignTree, tree);
         }
 
@@ -6966,6 +6966,8 @@ expandInlineFuncs (ast * tree, ast * block)
           temptree = newNode (BLOCK, NULL, temptree);
           copyAstLoc (temptree, tree);
           inlinetree2 = temptree;
+          inlinetree2->level += 2;
+          inlinetree2->block = blockNo+2;
 
           /* Handle the return type */
           if (!IS_VOID (func->type->next))
@@ -6986,6 +6988,8 @@ expandInlineFuncs (ast * tree, ast * block)
 
           inlinetree = newNode (BLOCK, NULL, inlinetree2);
           copyAstLoc (inlinetree, tree);
+          inlinetree2->level += 1;
+          inlinetree2->block = blockNo+1;
 
           /* To pass parameters to the inlined function, we need some  */
           /* intermediate variables. This avoids scoping problems      */
@@ -7020,7 +7024,7 @@ expandInlineFuncs (ast * tree, ast * block)
                 }
 
               temparg = inlineTempVar (args->sym->type, tree->level + 1);
-              inlineAddDecl (temparg, inlinetree, FALSE, FALSE);
+              inlineAddDecl (copySymbol (temparg), inlinetree, FALSE, FALSE);
 
               assigntree = newNode ('=', newAst_VALUE (symbolVal (temparg)), passedarg);
               assigntree->initMode = 1; // tell that assignment is initializer

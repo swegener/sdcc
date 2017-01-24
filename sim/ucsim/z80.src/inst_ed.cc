@@ -51,7 +51,7 @@ int  cl_z80::inst_ed_(t_mem code)
   
   if (code < 0x40)
     {
-      if (type != CPU_Z180)
+      if (type->type != CPU_Z180)
         return resINV_INST;
       
       switch ( code & 0x07 )
@@ -131,7 +131,7 @@ int  cl_z80::inst_ed_(t_mem code)
       vc.rd+= 2;
       return(resGO);
     case 0x4C: // MLT BC
-      if(type != CPU_Z180)
+      if(type->type != CPU_Z180)
         return(resINV_INST);
       regs.BC = (unsigned long)(regs.bc.h) * (unsigned long)(regs.bc.l);
       return(resGO);
@@ -182,7 +182,7 @@ int  cl_z80::inst_ed_(t_mem code)
       vc.rd+= 2;
       return(resGO);
     case 0x5C: // MLT DE
-      if(type != CPU_Z180)
+      if(type->type != CPU_Z180)
         return(resINV_INST);
       regs.DE = (unsigned long)(regs.de.h) * (unsigned long)(regs.de.l);
       return(resGO);
@@ -207,7 +207,7 @@ int  cl_z80::inst_ed_(t_mem code)
       vc.wr+= 2;
       return(resGO);
     case 0x64:
-      if (type != CPU_Z180)
+      if (type->type != CPU_Z180)
         return(resINV_INST);
       ubtmp = fetch();      // TST A,n
       tst_A_bytereg(ubtmp);
@@ -233,7 +233,7 @@ int  cl_z80::inst_ed_(t_mem code)
       vc.rd+= 2;
       return(resGO);
     case 0x6C: // MLT HL
-      if(type != CPU_Z180)
+      if(type->type != CPU_Z180)
         return(resINV_INST);
       regs.HL = (unsigned long)(regs.hl.h) * (unsigned long)(regs.hl.l);
       return(resGO);

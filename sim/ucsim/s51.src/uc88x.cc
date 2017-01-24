@@ -30,8 +30,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc88xcl.h"
 
 
-cl_uc88x::cl_uc88x(int Itype, int Itech, class cl_sim *asim):
-  cl_uc52(Itype, Itech, asim)
+cl_uc88x::cl_uc88x(struct cpu_entry *Itype, class cl_sim *asim):
+  cl_uc52(Itype, asim)
 {
 }
 

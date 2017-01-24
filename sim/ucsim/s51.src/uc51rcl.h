@@ -41,7 +41,7 @@ public:
   class cl_memory_chip *eram_chip;
   
 public:
-  cl_uc51r(int Itype, int Itech, class cl_sim *asim);
+  cl_uc51r(struct cpu_entry *Itype, class cl_sim *asim);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
   virtual void make_chips(void);

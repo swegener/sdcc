@@ -40,7 +40,7 @@ public:
   class cl_address_space *ixram;
   class cl_memory_chip *ixram_chip;
   
-  cl_uc390(int Itype, int Itech, class cl_sim *asim);
+  cl_uc390(struct cpu_entry *Itype, class cl_sim *asim);
   virtual void mk_hw_elements (void);
   virtual void make_memories(void);
   virtual void make_address_spaces();

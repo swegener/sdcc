@@ -48,7 +48,15 @@ cl_conf_cmd::do_work(class cl_uc *uc,
   int i;
 
   con->dd_printf("ucsim version %s\n", VERSIONSTR);
-  con->dd_printf("Type of microcontroller: %s\n", uc->id_string());
+  con->dd_printf("Type of microcontroller: %s", uc->id_string());
+  if (cpus &&
+      uc->type)
+    {
+      const char *s= uc->type->sub_help;
+      if (s && *s)
+	con->dd_printf(" %s", s);
+    }
+  con->dd_printf("\n");
   con->dd_printf("Controller has %d hardware element(s).\n",
 		 uc->nuof_hws());
   for (i= 0; i < uc->nuof_hws(); i++)

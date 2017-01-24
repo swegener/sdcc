@@ -133,6 +133,7 @@ cl_xtal_option::option_changed(void)
 cl_uc::cl_uc(class cl_sim *asim):
   cl_base()
 {
+  type= NULL;
   //int i;
   sim = asim;
   //mems= new cl_list(MEM_TYPES, 1);
@@ -1358,7 +1359,7 @@ cl_uc::get_name(t_addr addr, struct name_entry tab[], char *buf)
 
   i= 0;
   while (tab[i].name &&
-	 (!(tab[i].cpu_type & type) ||
+	 (!(tab[i].cpu_type & type->type) ||
 	 (tab[i].addr != addr)))
     i++;
   if (tab[i].name)
@@ -1378,7 +1379,7 @@ cl_uc::symbol2address(char *sym, struct name_entry tab[],
     return(false);
   i= 0;
   while (tab[i].name &&
-	 (!(tab[i].cpu_type & type) ||
+	 (!(tab[i].cpu_type & type->type) ||
 	  strcasecmp(sym, tab[i].name) != 0))
     i++;
   if (tab[i].name)
@@ -1480,7 +1481,7 @@ cl_uc::get_name_entry(struct name_entry tabl[], char *name)
     return(0);
   for (p= name; *p; *p= toupper(*p), p++);
   while (tabl[i].name &&
-	 (!(tabl[i].cpu_type & type) ||
+	 (!(tabl[i].cpu_type & type->type) ||
 	 (strcmp(tabl[i].name, name) != 0)))
     {
       //printf("tabl[%d].name=%s <-> %s\n",i,tabl[i].name,name);

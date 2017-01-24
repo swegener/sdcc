@@ -36,7 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_uc251: public cl_uc89c51r
 {
 public:
-  cl_uc251(int Itype, int Itech, class cl_sim *asim);
+  cl_uc251(struct cpu_entry *Itype, class cl_sim *asim);
 };
 
 

@@ -596,9 +596,13 @@ cl_app::proc_arguments(int argc, char *argv[])
 	      exit(0);
 	    }
 	  i= 0;
+	  printf("%-20s%-30s%-30s\n", "Parameter", "Family", "Subtype");
 	  while (cpus[i].type_str != NULL)
 	    {
-	      printf("%s\n", cpus[i].type_str);
+	      printf("%-20s%-30s%-30s\n",
+		     cpus[i].type_str,
+		     cpus[i].type_help,
+		     cpus[i].sub_help);
 	      i++;
 	    }
 	  exit(0);

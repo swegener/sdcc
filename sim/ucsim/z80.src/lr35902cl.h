@@ -64,7 +64,7 @@ public:
   lr35902_memory    mem;
   
 public:
-  cl_lr35902(int Itype, int Itech, class cl_sim *asim);
+  cl_lr35902(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
   virtual char *id_string(void);
   

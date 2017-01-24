@@ -61,7 +61,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Base type of HC08 controllers
  */
 
-cl_hc08::cl_hc08(int Itype, int Itech, class cl_sim *asim):
+cl_hc08::cl_hc08(struct cpu_entry *Itype, class cl_sim *asim):
   cl_uc(asim)
 {
   type= Itype;

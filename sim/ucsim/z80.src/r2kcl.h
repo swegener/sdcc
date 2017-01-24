@@ -85,7 +85,7 @@ public:
   
 
 public:
-  cl_r2k(int Itype, int Itech, class cl_sim *asim);
+  cl_r2k(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
   virtual char *id_string(void);
   
@@ -156,7 +156,7 @@ class cl_r3ka: public cl_r2k {
   
   u8_t  SU;
   
-  cl_r3ka(int Itype, int Itech, class cl_sim *asim);
+  cl_r3ka(struct cpu_entry *Itype, class cl_sim *asim);
   virtual char *id_string(void);
   
   virtual int exec_code(t_mem code);

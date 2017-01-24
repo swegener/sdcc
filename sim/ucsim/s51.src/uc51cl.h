@@ -87,7 +87,7 @@ public:
 public:
   int result;		// result of instruction execution
 
-  cl_51core(int Itype, int Itech, class cl_sim *asim);
+  cl_51core(struct cpu_entry *Itype, class cl_sim *asim);
   virtual ~cl_51core(void);
   virtual int    init(void);
   virtual char  *id_string(void);

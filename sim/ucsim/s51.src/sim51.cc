@@ -71,7 +71,7 @@ cl_sim51::mk_controller(void)
   if ((typ= type_option.get_value(typ)) == 0)
     typ= cchars("C52");
   while ((cpus_51[i].type_str != NULL) &&
-	 (strcmp(typ, cpus_51[i].type_str) != 0))
+	 (strcasecmp(typ, cpus_51[i].type_str) != 0))
     i++;
   if (cpus_51[i].type_str == NULL)
     {
@@ -82,25 +82,25 @@ cl_sim51::mk_controller(void)
   switch (cpus_51[i].type)
     {
     case CPU_51: case CPU_31:
-      return(new cl_51core(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_51core(&cpus_51[i], this));
     case CPU_52: case CPU_32:
-      return(new cl_uc52(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc52(&cpus_51[i], this));
     case CPU_51R:
-      return(new cl_uc51r(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc51r(&cpus_51[i], this));
     case CPU_89C51R:
-      return(new cl_uc89c51r(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc89c51r(&cpus_51[i], this));
     case CPU_C521:
-      return(new cl_uc521(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc521(&cpus_51[i], this));
     case CPU_517:
-      return(new cl_uc517(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc517(&cpus_51[i], this));
     case CPU_XC88X:
-      return(new cl_uc88x(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc88x(&cpus_51[i], this));
     case CPU_F380:
-      return(new cl_uc380(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc380(&cpus_51[i], this));
     case CPU_251:
-      return(new cl_uc251(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc251(&cpus_51[i], this));
     case CPU_DS390: case CPU_DS390F:
-      return(new cl_uc390(cpus_51[i].type, cpus_51[i].technology, this));
+      return(new cl_uc390(&cpus_51[i], this));
     default:
       fprintf(stderr, "Unknown processor type\n");
       return NULL;

@@ -25,45 +25,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: timer.cc 582 2017-01-05 18:33:41Z drdani $ */
+/* $Id: timer.cc 608 2017-01-24 12:08:41Z drdani $ */
 
 #include "timercl.h"
 
-
-enum stm8_tim_reg_idx {
-  cr1	=  0, // control 1
-  cr2	=  1, // control 2
-  smcr	=  2, // slave mode control
-  etr	=  3, // external trigger
-  ier	=  4, // interrupt enable
-  sr1	=  5, // status 1
-  sr2	=  6, // status 2
-  egr	=  7, // event generation
-  ccmr1	=  8, // capture/compare mode 1
-  ccmr2	=  9, // capture/compare mode 2
-  ccmr3	= 10, // capture/compare mode 3
-  ccmr4	= 11, // capture/compare mode 4
-  ccer1	= 12, // capture/compare enable 1
-  ccer2	= 13, // capture/compare enable 2
-  cntrh	= 14, // counter high
-  cntrl	= 15, // counter low
-  pscrh	= 16, // prescaler high
-  pscrl	= 17, // prescaler low
-  arrh	= 18, // auto-reload high
-  arrl	= 19, // auto-reload low
-  rcr	= 20, // repetition counter
-  ccr1h	= 21, // capture/compare 1 high
-  ccr1l	= 22, // capture/compare 1 low
-  ccr2h	= 23, // capture/compare 2 high
-  ccr2l	= 24, // capture/compare 2 low
-  ccr3h	= 25, // capture/compare 3 high
-  ccr3l	= 26, // capture/compare 3 low
-  ccr4h	= 27, // capture/compare 4 high
-  ccr4l	= 28, // capture/compare 4 low
-  bkr	= 29, // break
-  dtr	= 30, // deadtime
-  oisr	= 31  // output idle state  
-};
 
 enum tim_cr1_bits {
   cen	= 0x01,
@@ -85,8 +50,9 @@ cl_tim::cl_tim(class cl_uc *auc, int aid, t_addr abase):
 {
   base= abase;
   int i;
-  for (i= 0; i<32; i++)
+  for (i= 0; i<32+6; i++)
     regs[i]= 0;
+  memset(&idx, 0xff, sizeof(idx));
 }
 
 int
@@ -98,7 +64,7 @@ cl_tim::init(void)
   set_name(s);
   id_string= strdup(s);
   cl_hw::init();
-  for (i= 0; i < 32; i++)
+  for (i= 0; i < 32+6; i++)
     {
       regs[i]= register_cell(uc->rom, base+i);
     }
@@ -124,7 +90,9 @@ cl_tim::init(void)
       bits= 16; mask= 0xffff;      
       break;
     }
- 
+  pbits= 16;
+  bidir= true;
+  
   return 0;
 }
 
@@ -141,9 +109,9 @@ cl_tim::tick(int cycles)
 	prescaler_cnt--;
       if (prescaler_cnt == 0)
 	{
-	  prescaler_cnt= prescaler_preload;
+	  prescaler_cnt= calc_prescaler() - 1;
 	  // count
-	  if (regs[cr1]->get() & cen)
+	  if (regs[idx.cr1]->get() & cen)
 	    {
 	      count();
 	    }
@@ -162,10 +130,13 @@ cl_tim::reset(void)
   prescaler_cnt= 0;
   prescaler_preload= 0;
 
-  for (i= 0; i<32; i++)
+  for (i= 0; i<32+6; i++)
     regs[i]->set(0);
-  regs[arrh]->set(0xff);
-  regs[arrl]->set(0xff);
+  if (bits > 8)
+    regs[idx.arrh]->set(0xff);
+  regs[idx.arrl]->set(0xff);
+
+  update_event();
 }
 
 t_mem
@@ -176,30 +147,25 @@ cl_tim::read(class cl_memory_cell *cell)
   
   if (conf(cell, NULL))
     return v;
-  if (uc->rom->is_owned(cell, &a))
+  if (!uc->rom->is_owned(cell, &a))
+    return v;
+  if ((a < base) ||
+      (a >= base+32+6))
+    return v;
+
+  a-= base;
+
+  if (a == idx.pscrl)
+    v= prescaler_preload && 0xff;
+  else if (a == idx.pscrh)
+    v= (prescaler_preload >> 8) & 0xff;
+    
+  else if (a == idx.cntrh)
+    timer_ls_buffer= regs[idx.cntrl]->get();
+  else if (a == idx.cntrl)
     {
-      if ((a >= base) &&
-	  (a < base+32))
-	{
-	  a-= base;
-	  switch ((enum stm8_tim_reg_idx )a)
-	    {
-	    case pscrl:
-	      v= prescaler_preload && 0xff;
-	      break;
-	    case pscrh:
-	      v= (prescaler_preload >> 8) & 0xff;
-	      break;
-	    case cntrh:
-	      timer_ls_buffer= regs[cntrl]->get();
-	      break;
-	    case cntrl:
-	      v= timer_ls_buffer;
-	      break;
-	    default:
-	      break;
-	    }
-	}
+      if (bits > 8)
+	v= timer_ls_buffer;
     }
   
   return v;
@@ -217,43 +183,57 @@ cl_tim::write(class cl_memory_cell *cell, t_mem *val)
     return;
 
   *val&= 0xff;
-  if (uc->rom->is_owned(cell, &a))
+  if (!uc->rom->is_owned(cell, &a))
+    return;  
+  if ((a < base) ||
+      (a >= base+32+6))
+    return;
+  
+  a-= base;
+  if (a == idx.cr1)
     {
-      if ((a >= base) &&
-	  (a < base+32))
+      if (!bidir)
+	*val&= 0x1f;
+    }
+  else if (a == idx.egr)
+    {
+      if (*val & 0x01)
 	{
-	  a-= base;
-	  switch ((enum stm8_tim_reg_idx )a)
-	    {
-	    case pscrh:
-	      prescaler_ms_buffer= *val;
-	      *val= cell->get();
-	      break;
-	    case pscrl:
-	      prescaler_preload= prescaler_ms_buffer * 256 + *val;
-	      break;
-	    case arrh:
-	      if ((regs[cr1]->get() & arpe) != 0)
-		{
-		  arr_ms_buffer= *val;
-		  *val= cell->get();
-		}
-	      break;
-	    case arrl:
-	      {
-		u8_t l, h;
-		if ((regs[cr1]->get() & arpe) != 0)
-		  {
-		    regs[arrl]->set(l= *val);
-		    regs[arrh]->set(h= arr_ms_buffer);
-		    if ((regs[cr1]->get() & arpe) == 0)
-		      set_counter(h*256 + l);
-		  }
-		break;
-	      }
-	    default:
-	      break;
-	    }
+	  update_event();
+	  prescaler_cnt= calc_prescaler() - 1;  
+	}
+      *val= 0;
+    }
+  else if (a == idx.pscrh)
+    {
+      prescaler_ms_buffer= *val;
+      *val= cell->get();
+    }
+  else if (a == idx.pscrl)
+    {
+      prescaler_preload= *val;
+      if (idx.pscrh > 0)
+	prescaler_preload+= prescaler_ms_buffer * 256;
+    }
+    
+  else if (a == idx.arrh)
+    {
+      if ((regs[idx.cr1]->get() & arpe) != 0)
+	{
+	  arr_ms_buffer= *val;
+	  *val= cell->get();
+	}
+    }
+  else if (a == idx.arrl)
+    {
+      u8_t l, h= 0;
+      if ((regs[idx.cr1]->get() & arpe) != 0)
+	{
+	  regs[idx.arrl]->set(l= *val);
+	  if (idx.arrh > 0)
+	    regs[idx.arrh]->set(h= arr_ms_buffer);
+	  if ((regs[idx.cr1]->get() & arpe) == 0)
+	    set_counter(h*256 + l);
 	}
     }
 }
@@ -284,27 +264,11 @@ cl_tim::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 void
 cl_tim::count(void)
 {
-  u8_t c1= regs[cr1]->get();
-  if (regs[cr1]->get() & dir)
-    {
-      // down
-      set_counter(cnt-1);
-      if (cnt == 0)
-	{
-	  if ((c1 & cms) == cms0)
-	    // edge aligned
-	    set_counter(regs[arrh]->get()*256+regs[arrl]->get());
-	  else
-	    // center aligned
-	    regs[cr1]->set(c1&= ~dir);
-	  if ((c1 & udis) == 0)
-	    update_event();
-	}
-    }
-  else
+  u8_t c1= regs[idx.cr1]->get();
+  if (get_dir())
     {
       // up
-      u16_t arr= regs[arrh]->get() * 256 + regs[arrl]->get();
+      u16_t arr= get_arr();
       set_counter(cnt+1);
       if (cnt == arr)
 	{
@@ -313,7 +277,23 @@ cl_tim::count(void)
 	    set_counter(0);
 	  else
 	    // center aligned
-	    regs[cr1]->set(c1|= dir);
+	    regs[idx.cr1]->set(c1|= dir);
+	  if ((c1 & udis) == 0)
+	    update_event();
+	}
+    }
+  else
+    {
+      // down
+      set_counter(cnt-1);
+      if (cnt == 0)
+	{
+	  if ((c1 & cms) == cms0)
+	    // edge aligned
+	    set_counter(get_arr());
+	  else
+	    // center aligned
+	    regs[idx.cr1]->set(c1&= ~dir);
 	  if ((c1 & udis) == 0)
 	    update_event();
 	}
@@ -321,48 +301,95 @@ cl_tim::count(void)
 }
 
 u16_t
+cl_tim::get_counter()
+{
+  if (bits > 8)
+    return regs[idx.cntrh]->get()*256 + regs[idx.cntrl]->get();
+  return regs[idx.cntrl]->get();
+}
+
+u16_t
 cl_tim::set_counter(u16_t val)
 {
   cnt= val & mask;
-  regs[cntrl]->set(val&0xff);
+  regs[idx.cntrl]->set(val&0xff);
   if (bits > 8)
-    regs[cntrh]->set(val>>8);
+    regs[idx.cntrh]->set(val>>8);
   return val;
 }
 
 void
 cl_tim::update_event(void)
 {
-  u8_t c1= regs[cr1]->get();
+  u8_t c1= regs[idx.cr1]->get();
 
   if (c1 & opm)
-    regs[cr1]->set_bit0(cen);
+    regs[idx.cr1]->set_bit0(cen);
   else
     {
-      if (c1 & dir)
-	{
-	  // down
-	  u16_t ar= regs[arrh]->get() * 256 + regs[arrl]->get();
-	  set_counter(ar);
-	}
-      else
+      if (get_dir())
 	{
 	  // up
 	  set_counter(0);
 	}
+      else
+	{
+	  // down
+	  u16_t ar= get_arr();
+	  set_counter(ar);
+	}
     }
 }
 
+// true: UP, false: down
+bool
+cl_tim::get_dir()
+{
+  return !(regs[idx.cr1]->get() & dir);
+}
+
+u16_t
+cl_tim::get_arr()
+{
+  u16_t arr= regs[idx.arrl]->get();
+  if (bits > 8)
+    arr+= regs[idx.arrh]->get() * 256;
+  return arr;
+}
+
+u16_t
+cl_tim::calc_prescaler()
+{
+  u16_t v;
+  switch (pbits)
+    {
+    case 3:
+      v= (1 << (prescaler_preload & 0x07));
+      break;
+    case 4:
+      v= (1 << (prescaler_preload & 0x0f));
+      break;
+    default: // 16
+      v= prescaler_preload + 1;
+      break;
+    }
+  return v;
+}
 
 void
 cl_tim::print_info(class cl_console_base *con)
 {
-  u8_t c1= regs[cr1]->get();
-  con->dd_printf("%s 0x%04x %d %s\n", get_name(), cnt, cnt, (c1&cen)?"on":"off");
+  u8_t c1= regs[idx.cr1]->get();
+  // features
+  con->dd_printf("%s %d bit %s counter at 0x%06x\n", get_name(), bits,
+		 bidir?"Up/Down":"Up", base);
+  // actual values
+  con->dd_printf("cnt= 0x%04x %d %s\n", cnt, cnt, (c1&cen)?"on":"off");
   con->dd_printf("dir= %s\n", (c1&dir)?"down":"up");
-  con->dd_printf("prescaler= 0x%04x %d of 0x%04x %d\n",
+  con->dd_printf("prs= 0x%04x %d of 0x%04x %d\n",
 		 prescaler_cnt, prescaler_cnt,
-		 prescaler_preload, prescaler_preload);
+		 calc_prescaler(), calc_prescaler());
+  con->dd_printf("arr= 0x%04x %d\n", get_arr(), get_arr());
 }
 
 
@@ -373,6 +400,105 @@ cl_tim1::cl_tim1(class cl_uc *auc, int aid, t_addr abase):
 {
 }
 
+int
+cl_tim1::init(void)
+{
+  cl_tim::init();
+  return 0;
+}
+
+cl_tim1_saf::cl_tim1_saf(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim1(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  idx.etr	=  3;
+  idx.ier	=  4;
+  idx.sr1	=  5;
+  idx.sr2	=  6;
+  idx.egr	=  7;
+  idx.ccmr1	=  8;
+  idx.ccmr2	=  9;
+  idx.ccmr3	= 10;
+  idx.ccmr4	= 11;
+  idx.ccer1	= 12;
+  idx.ccer2	= 13;
+  idx.cntrh	= 14;
+  idx.cntrl	= 15;
+  idx.pscrh	= 16;
+  idx.pscrl	= 17;
+  idx.arrh	= 18;
+  idx.arrl	= 19;
+  idx.rcr	= 20;
+  idx.ccr1h	= 21;
+  idx.ccr1l	= 22;
+  idx.ccr2h	= 23;
+  idx.ccr2l	= 24;
+  idx.ccr3h	= 25;
+  idx.ccr3l	= 26;
+  idx.ccr4h	= 27;
+  idx.ccr4l	= 28;
+  idx.bkr	= 29;
+  idx.dtr	= 30;
+  idx.oisr	= 31;
+}
+
+int
+cl_tim1_saf::init(void)
+{
+  cl_tim1::init();
+  return 0;
+}
+
+cl_tim1_all::cl_tim1_all(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim1(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  idx.etr	=  3;
+  //der=4
+  idx.ier	=  5;
+  idx.sr1	=  6;
+  idx.sr2	=  7;
+  idx.egr	=  8;
+  idx.ccmr1	=  9;
+  idx.ccmr2	= 10;
+  idx.ccmr3	= 11;
+  idx.ccmr4	= 12;
+  idx.ccer1	= 13;
+  idx.ccer2	= 14;
+  idx.cntrh	= 15;
+  idx.cntrl	= 16;
+  idx.pscrh	= 17;
+  idx.pscrl	= 18;
+  idx.arrh	= 19;
+  idx.arrl	= 20;
+  idx.rcr	= 21;
+  idx.ccr1h	= 22;
+  idx.ccr1l	= 23;
+  idx.ccr2h	= 24;
+  idx.ccr2l	= 25;
+  idx.ccr3h	= 26;
+  idx.ccr3l	= 27;
+  idx.ccr4h	= 28;
+  idx.ccr4l	= 29;
+  idx.bkr	= 30;
+  idx.dtr	= 31;
+  idx.oisr	= 32;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim1_all::init(void)
+{
+  cl_tim1::init();
+  return 0;
+}
+
 
 /********************************************************************** 235 */
 
@@ -381,12 +507,746 @@ cl_tim235::cl_tim235(class cl_uc *auc, int aid, t_addr abase):
 {
 }
 
+int
+cl_tim235::init(void)
+{
+  cl_tim::init();
+  return 0;
+}
+
+
+/****** TIM 2 */
+
+cl_tim2_saf_a::cl_tim2_saf_a(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  //idx.cr2	=  1;
+  //idx.smcr	=  2;
+  //idx.etr	=  3;
+  //der=4
+  idx.ier	=  1;
+  idx.sr1	=  2;
+  idx.sr2	=  3;
+  idx.egr	=  4;
+  idx.ccmr1	=  5;
+  idx.ccmr2	=  6;
+  idx.ccmr3	=  7;
+  //idx.ccmr4	= 10;
+  idx.ccer1	=  8;
+  idx.ccer2	=  9;
+  idx.cntrh	= 10;
+  idx.cntrl	= 11;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 12;
+  idx.arrh	= 13;
+  idx.arrl	= 14;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 15;
+  idx.ccr1l	= 0x10;
+  idx.ccr2h	= 0x11;
+  idx.ccr2l	= 0x12;
+  idx.ccr3h	= 0x13;
+  idx.ccr3l	= 0x14;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 30;
+  //idx.dtr	= 31;
+  //idx.oisr	= 32;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim2_saf_a::init(void)
+{
+  cl_tim235::init();
+  pbits= 4;
+  bidir= false;
+  return 0;
+}
+
+
+cl_tim2_saf_b::cl_tim2_saf_b(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  //idx.cr2	=  1;
+  //idx.smcr	=  2;
+  //idx.etr	=  3;
+  //der=4
+  idx.ier	=  3;
+  idx.sr1	=  4;
+  idx.sr2	=  5;
+  idx.egr	=  6;
+  idx.ccmr1	=  7;
+  idx.ccmr2	=  8;
+  idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  idx.ccer1	= 10;
+  idx.ccer2	= 11;
+  idx.cntrh	= 12;
+  idx.cntrl	= 13;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 14;
+  idx.arrh	= 15;
+  idx.arrl	= 16;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 0x11;
+  idx.ccr1l	= 0x12;
+  idx.ccr2h	= 0x13;
+  idx.ccr2l	= 0x14;
+  idx.ccr3h	= 0x15;
+  idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 30;
+  //idx.dtr	= 31;
+  //idx.oisr	= 32;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim2_saf_b::init(void)
+{
+  cl_tim235::init();
+  pbits= 4;
+  bidir= false;
+  return 0;
+}
+
+
+cl_tim2_all::cl_tim2_all(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  idx.etr	=  3;
+  idx.der	=  4;
+  idx.ier	=  5;
+  idx.sr1	=  6;
+  idx.sr2	=  7;
+  idx.egr	=  8;
+  idx.ccmr1	=  9;
+  idx.ccmr2	= 0x0a;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  idx.ccer1	= 0x0b;
+  //idx.ccer2	= 11;
+  idx.cntrh	= 0x0c;
+  idx.cntrl	= 0x0d;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x0e;
+  idx.arrh	= 0x0f;
+  idx.arrl	= 0x10;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 0x11;
+  idx.ccr1l	= 0x12;
+  idx.ccr2h	= 0x13;
+  idx.ccr2l	= 0x14;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  idx.bkr	= 0x15;
+  //idx.dtr	= 31;
+  idx.oisr	= 0x16;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim2_all::init(void)
+{
+  cl_tim235::init();
+  pbits= 3;
+  return 0;
+}
+
+
+cl_tim2_l101::cl_tim2_l101(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  idx.etr	=  3;
+  //idx.der	=  4;
+  idx.ier	=  4;
+  idx.sr1	=  5;
+  idx.sr2	=  6;
+  idx.egr	=  7;
+  idx.ccmr1	=  8;
+  idx.ccmr2	= 0x09;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  idx.ccer1	= 0x0a;
+  //idx.ccer2	= 11;
+  idx.cntrh	= 0x0b;
+  idx.cntrl	= 0x0c;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x0d;
+  idx.arrh	= 0x0e;
+  idx.arrl	= 0x0f;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 0x10;
+  idx.ccr1l	= 0x11;
+  idx.ccr2h	= 0x12;
+  idx.ccr2l	= 0x13;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  idx.bkr	= 0x14;
+  //idx.dtr	= 31;
+  idx.oisr	= 0x15;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim2_l101::init(void)
+{
+  cl_tim235::init();
+  pbits= 3;
+  return 0;
+}
+
+
+/****** TIM 3 */
+
+cl_tim3_saf::cl_tim3_saf(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  //idx.cr2	=  1;
+  //idx.smcr	=  2;
+  //idx.etr	=  3;
+  //der=4
+  idx.ier	=  1;
+  idx.sr1	=  2;
+  idx.sr2	=  3;
+  idx.egr	=  4;
+  idx.ccmr1	=  5;
+  idx.ccmr2	=  6;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  idx.ccer1	=  7;
+  //idx.ccer2	=  8;
+  idx.cntrh	=  8;
+  idx.cntrl	=  9;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0xa;
+  idx.arrh	= 0xb;
+  idx.arrl	= 0xc;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 0x0d;
+  idx.ccr1l	= 0x0c;
+  idx.ccr2h	= 0x0f;
+  idx.ccr2l	= 0x10;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 30;
+  //idx.dtr	= 31;
+  //idx.oisr	= 32;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim3_saf::init(void)
+{
+  cl_tim235::init();
+  pbits= 4;
+  bidir= false;
+  return 0;
+}
+
+
+cl_tim3_all::cl_tim3_all(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  idx.etr	=  3;
+  idx.der	=  4;
+  idx.ier	=  5;
+  idx.sr1	=  6;
+  idx.sr2	=  7;
+  idx.egr	=  8;
+  idx.ccmr1	=  9;
+  idx.ccmr2	= 0x0a;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  idx.ccer1	= 0x0b;
+  //idx.ccer2	= 11;
+  idx.cntrh	= 0x0c;
+  idx.cntrl	= 0x0d;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x0e;
+  idx.arrh	= 0x0f;
+  idx.arrl	= 0x10;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 0x11;
+  idx.ccr1l	= 0x12;
+  idx.ccr2h	= 0x13;
+  idx.ccr2l	= 0x14;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  idx.bkr	= 0x15;
+  //idx.dtr	= 31;
+  idx.oisr	= 0x16;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim3_all::init(void)
+{
+  cl_tim235::init();
+  pbits= 3;
+  return 0;
+}
+
+
+cl_tim3_l101::cl_tim3_l101(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  idx.etr	=  3;
+  //idx.der	=  4;
+  idx.ier	=  4;
+  idx.sr1	=  5;
+  idx.sr2	=  6;
+  idx.egr	=  7;
+  idx.ccmr1	=  8;
+  idx.ccmr2	= 0x09;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  idx.ccer1	= 0x0a;
+  //idx.ccer2	= 11;
+  idx.cntrh	= 0x0b;
+  idx.cntrl	= 0x0c;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x0d;
+  idx.arrh	= 0x0e;
+  idx.arrl	= 0x0f;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 0x10;
+  idx.ccr1l	= 0x11;
+  idx.ccr2h	= 0x12;
+  idx.ccr2l	= 0x13;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  idx.bkr	= 0x14;
+  //idx.dtr	= 31;
+  idx.oisr	= 0x15;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim3_l101::init(void)
+{
+  cl_tim235::init();
+  pbits= 3;
+  return 0;
+}
+
+
+/****** TIM 5 */
+
+cl_tim5_saf::cl_tim5_saf(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  //idx.etr	=  3;
+  //der=4
+  idx.ier	=  3;
+  idx.sr1	=  4;
+  idx.sr2	=  5;
+  idx.egr	=  6;
+  idx.ccmr1	=  7;
+  idx.ccmr2	=  8;
+  idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  idx.ccer1	= 0xa;
+  idx.ccer2	= 0xb;
+  idx.cntrh	= 0xc;
+  idx.cntrl	= 0xd;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0xe;
+  idx.arrh	= 0xf;
+  idx.arrl	= 0x10;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 0x11;
+  idx.ccr1l	= 0x12;
+  idx.ccr2h	= 0x13;
+  idx.ccr2l	= 0x14;
+  idx.ccr3h	= 0x15;
+  idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 30;
+  //idx.dtr	= 31;
+  //idx.oisr	= 32;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim5_saf::init(void)
+{
+  cl_tim235::init();
+  pbits= 4;
+  bidir= false;
+  return 0;
+}
+
+
+cl_tim5_all::cl_tim5_all(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim235(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  idx.etr	=  3;
+  idx.der	=  4;
+  idx.ier	=  5;
+  idx.sr1	=  6;
+  idx.sr2	=  7;
+  idx.egr	=  8;
+  idx.ccmr1	=  9;
+  idx.ccmr2	= 0x0a;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  idx.ccer1	= 0x0b;
+  //idx.ccer2	= 11;
+  idx.cntrh	= 0x0c;
+  idx.cntrl	= 0x0d;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x0e;
+  idx.arrh	= 0x0f;
+  idx.arrl	= 0x10;
+  //idx.rcr	= 21;
+  idx.ccr1h	= 0x11;
+  idx.ccr1l	= 0x12;
+  idx.ccr2h	= 0x13;
+  idx.ccr2l	= 0x14;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  idx.bkr	= 0x15;
+  //idx.dtr	= 31;
+  idx.oisr	= 0x16;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim5_all::init(void)
+{
+  cl_tim235::init();
+  pbits= 3;
+  return 0;
+}
+
 
 /*********************************************************************** 46 */
 
 cl_tim46::cl_tim46(class cl_uc *auc, int aid, t_addr abase):
   cl_tim(auc, aid, abase)
 {
+}
+
+int
+cl_tim46::init(void)
+{
+  cl_tim::init();
+  pbits= 4;
+  return 0;
+}
+
+
+/********* TIM 4 */
+
+cl_tim4_saf_a::cl_tim4_saf_a(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim46(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  //idx.cr2	=  1;
+  //idx.smcr	=  2;
+  //idx.etr	=  3;
+  //idx.der	=  4;
+  idx.ier	=  1;
+  idx.sr1	=  2;
+  //idx.sr2	=  7;
+  idx.egr	=  3;
+  //idx.ccmr1	=  9;
+  //idx.ccmr2	= 0x0a;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  //idx.ccer1	= 0x0b;
+  //idx.ccer2	= 11;
+  //idx.cntrh	= 0x0c;
+  idx.cntrl	= 0x04;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x05;
+  //idx.arrh	= 0x0f;
+  idx.arrl	= 0x06;
+  //idx.rcr	= 21;
+  //idx.ccr1h	= 0x11;
+  //idx.ccr1l	= 0x12;
+  //idx.ccr2h	= 0x13;
+  //idx.ccr2l	= 0x14;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 0x15;
+  //idx.dtr	= 31;
+  //idx.oisr	= 0x16;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim4_saf_a::init(void)
+{
+  cl_tim46::init();
+  pbits= 3;
+  bidir= false;
+  return 0;
+}
+
+
+cl_tim4_saf_b::cl_tim4_saf_b(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim46(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  //idx.cr2	=  1;
+  //idx.smcr	=  2;
+  //idx.etr	=  3;
+  //idx.der	=  4;
+  idx.ier	=  3;
+  idx.sr1	=  4;
+  //idx.sr2	=  7;
+  idx.egr	=  5;
+  //idx.ccmr1	=  9;
+  //idx.ccmr2	= 0x0a;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  //idx.ccer1	= 0x0b;
+  //idx.ccer2	= 11;
+  //idx.cntrh	= 0x0c;
+  idx.cntrl	= 0x06;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x07;
+  //idx.arrh	= 0x0f;
+  idx.arrl	= 0x08;
+  //idx.rcr	= 21;
+  //idx.ccr1h	= 0x11;
+  //idx.ccr1l	= 0x12;
+  //idx.ccr2h	= 0x13;
+  //idx.ccr2l	= 0x14;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 0x15;
+  //idx.dtr	= 31;
+  //idx.oisr	= 0x16;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim4_saf_b::init(void)
+{
+  cl_tim46::init();
+  pbits= 3;
+  bidir= false;
+  return 0;
+}
+
+
+cl_tim4_all::cl_tim4_all(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim46(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  //idx.etr	=  3;
+  idx.der	=  3;
+  idx.ier	=  4;
+  idx.sr1	=  5;
+  //idx.sr2	=  7;
+  idx.egr	=  6;
+  //idx.ccmr1	=  9;
+  //idx.ccmr2	= 0x0a;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  //idx.ccer1	= 0x0b;
+  //idx.ccer2	= 11;
+  //idx.cntrh	= 0x0c;
+  idx.cntrl	= 0x07;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x08;
+  //idx.arrh	= 0x0f;
+  idx.arrl	= 0x09;
+  //idx.rcr	= 21;
+  //idx.ccr1h	= 0x11;
+  //idx.ccr1l	= 0x12;
+  //idx.ccr2h	= 0x13;
+  //idx.ccr2l	= 0x14;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 0x15;
+  //idx.dtr	= 31;
+  //idx.oisr	= 0x16;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim4_all::init(void)
+{
+  cl_tim46::init();
+  pbits= 4;
+  bidir= false;
+  return 0;
+}
+
+
+cl_tim4_l101::cl_tim4_l101(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim46(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  //idx.etr	=  3;
+  //idx.der	=  3;
+  idx.ier	=  3;
+  idx.sr1	=  4;
+  //idx.sr2	=  7;
+  idx.egr	=  5;
+  //idx.ccmr1	=  9;
+  //idx.ccmr2	= 0x0a;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  //idx.ccer1	= 0x0b;
+  //idx.ccer2	= 11;
+  //idx.cntrh	= 0x0c;
+  idx.cntrl	= 0x06;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x07;
+  //idx.arrh	= 0x0f;
+  idx.arrl	= 0x08;
+  //idx.rcr	= 21;
+  //idx.ccr1h	= 0x11;
+  //idx.ccr1l	= 0x12;
+  //idx.ccr2h	= 0x13;
+  //idx.ccr2l	= 0x14;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 0x15;
+  //idx.dtr	= 31;
+  //idx.oisr	= 0x16;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim4_l101::init(void)
+{
+  cl_tim46::init();
+  pbits= 4;
+  bidir= false;
+  return 0;
+}
+
+
+/*********** TIM6 */
+
+cl_tim6_saf::cl_tim6_saf(class cl_uc *auc, int aid, t_addr abase):
+  cl_tim46(auc, aid, abase)
+{
+  idx.cr1	=  0;
+  idx.cr2	=  1;
+  idx.smcr	=  2;
+  //idx.etr	=  3;
+  //idx.der	=  4;
+  idx.ier	=  3;
+  idx.sr1	=  4;
+  //idx.sr2	=  7;
+  idx.egr	=  5;
+  //idx.ccmr1	=  9;
+  //idx.ccmr2	= 0x0a;
+  //idx.ccmr3	=  9;
+  //idx.ccmr4	= 10;
+  //idx.ccer1	= 0x0b;
+  //idx.ccer2	= 11;
+  //idx.cntrh	= 0x0c;
+  idx.cntrl	= 0x06;
+  //idx.pscrh	= 14;
+  idx.pscrl	= 0x07;
+  //idx.arrh	= 0x0f;
+  idx.arrl	= 0x08;
+  //idx.rcr	= 21;
+  //idx.ccr1h	= 0x11;
+  //idx.ccr1l	= 0x12;
+  //idx.ccr2h	= 0x13;
+  //idx.ccr2l	= 0x14;
+  //idx.ccr3h	= 0x15;
+  //idx.ccr3l	= 0x16;
+  //idx.ccr4h	= 28;
+  //idx.ccr4l	= 29;
+  //idx.bkr	= 0x15;
+  //idx.dtr	= 31;
+  //idx.oisr	= 0x16;
+  //dcr1=33
+  //dcr2=34
+  //dmar=35
+}
+
+int
+cl_tim6_saf::init(void)
+{
+  cl_tim46::init();
+  pbits= 3;
+  bidir= false;
+  return 0;
 }
 
 

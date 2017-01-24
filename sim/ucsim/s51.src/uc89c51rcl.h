@@ -38,7 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class cl_uc89c51r: public cl_uc51r
 {
 public:
-  cl_uc89c51r(int Itype, int Itech, class cl_sim *asim);
+  cl_uc89c51r(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);

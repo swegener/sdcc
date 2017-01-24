@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8cl.h 353 2016-07-10 16:36:55Z  $ */
+/* $Id: stm8cl.h 607 2017-01-19 11:11:44Z drdani $ */
 
 #ifndef STM8CL_HEADER
 #define STM8CL_HEADER
@@ -52,7 +52,7 @@ public:
   class cl_itc *itc;
   class cl_it_src *trap_src;
 public:
-  cl_stm8(class cl_sim *asim);
+  cl_stm8(struct cpu_entry *IType, class cl_sim *asim);
   virtual int init(void);
   virtual char *id_string(void);
 

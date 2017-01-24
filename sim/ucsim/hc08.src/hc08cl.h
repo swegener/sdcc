@@ -45,7 +45,7 @@ public:
   class cl_address_space *regs8, *regs16;
   struct t_regs regs;
 public:
-  cl_hc08(int Itype, int Itech, class cl_sim *asim);
+  cl_hc08(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
   virtual char *id_string(void);
 

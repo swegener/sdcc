@@ -37,8 +37,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "wdtcl.h"
 
 
-cl_uc89c51r::cl_uc89c51r(int Itype, int Itech, class cl_sim *asim):
-  cl_uc51r(Itype, Itech, asim)
+cl_uc89c51r::cl_uc89c51r(struct cpu_entry *Itype, class cl_sim *asim):
+  cl_uc51r(Itype, asim)
 {
 }
 

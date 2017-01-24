@@ -40,8 +40,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Making an 8051r CPU object
  */
 
-cl_uc51r::cl_uc51r(int Itype, int Itech, class cl_sim *asim):
-  cl_uc52(Itype, Itech, asim)
+cl_uc51r::cl_uc51r(struct cpu_entry *Itype, class cl_sim *asim):
+  cl_uc52(Itype, asim)
 {
   /*  int i;
   for (i= 0; i < ERAM_SIZE; i++)

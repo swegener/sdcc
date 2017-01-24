@@ -53,7 +53,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_avr::cl_avr(class cl_sim *asim):
   cl_uc(asim)
 {
-  type= CPU_AVR;
+  type= (struct cpu_entry *)malloc(sizeof(struct cpu_entry));
+  type->type= CPU_AVR;
   sleep_executed= 0;
 }
 

@@ -64,17 +64,17 @@ cl_simz80::mk_controller(void)
     {
     case CPU_Z80:
     case CPU_Z180:
-      return(new cl_z80(cpus_z80[i].type, cpus_z80[i].technology, this));
+      return(new cl_z80(&cpus_z80[i], this));
     // Add Rabbits, etc here.
 
     case CPU_R2K:
-      return(new cl_r2k (cpus_z80[i].type, cpus_z80[i].technology, this));
+      return(new cl_r2k (&cpus_z80[i], this));
       
     case CPU_R3KA:
-      return(new cl_r3ka(cpus_z80[i].type, cpus_z80[i].technology, this));
+      return(new cl_r3ka(&cpus_z80[i], this));
       
     case CPU_LR35902:
-      return(new cl_lr35902(cpus_z80[i].type, cpus_z80[i].technology, this));
+      return(new cl_lr35902(&cpus_z80[i], this));
 
     default:
       return NULL;

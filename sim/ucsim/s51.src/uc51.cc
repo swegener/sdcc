@@ -95,11 +95,10 @@ cl_irq_stop_option::option_changed(void)
  * Making a new micro-controller and reset it
  */
 
-cl_51core::cl_51core(int Itype, int Itech, class cl_sim *asim):
+cl_51core::cl_51core(struct cpu_entry *Itype, class cl_sim *asim):
   cl_uc(asim)
 {
   type= Itype;
-  technology= Itech;
 
   irq_stop_option= new cl_irq_stop_option(this);
   stop_at_it= false;
@@ -133,10 +132,13 @@ cl_51core::id_string(void)
 {
   int i;
 
-  for (i= 0; cpus_51[i].type_str != NULL && cpus_51[i].type != type; i++) ;
+  for (i= 0;
+       (cpus_51[i].type_str != NULL) &&
+	 (cpus_51[i].type != type->type);
+       i++) ;
   sprintf(id_string_51, "%s %s",
 	  cpus_51[i].type_str?cpus_51[i].type_str:"51",
-	  (technology & CPU_HMOS)?"HMOS":"CMOS");
+	  (type->subtype & CPU_HMOS)?"HMOS":"CMOS");
   return(id_string_51);
 }
 
@@ -1324,7 +1326,7 @@ cl_51core::idle_pd(void)
 {
   uint pcon= sfr->get(PCON);
 
-  if (!(technology & CPU_CMOS))
+  if (!(type->subtype & CPU_CMOS))
     return(resGO);
   if (pcon & bmIDL)
     {

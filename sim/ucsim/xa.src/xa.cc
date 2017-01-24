@@ -52,7 +52,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 cl_xa::cl_xa(class cl_sim *asim):
   cl_uc(asim)
 {
-  type= CPU_XA;
+  type= (struct cpu_entry *)malloc(sizeof(struct cpu_entry));
+  type->type= CPU_XA;
 }
 
 int

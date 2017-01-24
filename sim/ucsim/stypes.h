@@ -128,8 +128,69 @@ enum cpu_type {
   CPU_HCS08     = 0x0002,
   CPU_ALL_HC08  = (CPU_HC08|CPU_HCS08),
 
-  CPU_STM8	= 0x0001,
-  CPU_ALL_STM8	= (CPU_STM8),
+  CPU_STM8S		= 0x0001,		// S and AF family
+  CPU_STM8AF		= 0x0001,
+  CPU_STM8SAF		= 0x0001,
+  // Devices of S family 0x00 00 00 XX
+  DEV_STM8S903		= 0x00000001,
+  DEV_STM8S003		= 0x00000002,
+  DEV_STM8S005		= 0x00000004,
+  DEV_STM8S007		= 0x00000008,
+  DEV_STM8S103		= 0x00000010,
+  DEV_STM8S105		= 0x00000020,
+  DEV_STM8S207		= 0x00000040,
+  DEV_STM8S208		= 0x00000080,
+  DEV_STM8S		= (DEV_STM8S903|
+			   DEV_STM8S003|
+			   DEV_STM8S005|
+			   DEV_STM8S007|
+			   DEV_STM8S103|
+			   DEV_STM8S105|
+			   DEV_STM8S207|
+			   DEV_STM8S208),
+  // Devices of AF family 0x00 00 0X 00
+  DEV_STM8AF52		= 0x00000100,
+  DEV_STM8AF62_12	= 0x00000200,
+  DEV_STM8AF62_46	= 0x00000400,
+  DEV_STM8AF		= (DEV_STM8AF52|
+			   DEV_STM8AF62_12|
+			   DEV_STM8AF62_46),
+
+  DEV_STM8SAF		= (DEV_STM8S|DEV_STM8AF),
+  
+  CPU_STM8L		= 0x0002,		// AL and L family
+  // Devices of AL family 0x00 0X 00 00
+  DEV_STM8AL3xE		= 0x00010000,
+  DEV_STM8AL3x8		= 0x00020000,
+  DEV_STM8AL3x346	= 0x00040000,
+  DEV_STM8AL		= (DEV_STM8AL3xE|
+			   DEV_STM8AL3x8|
+			   DEV_STM8AL3x346),
+  // Devices of L family 0xXX 00 00 00
+  DEV_STM8L051		= 0x01000000,
+  DEV_STM8L052C		= 0x02000000,
+  DEV_STM8L052R		= 0x04000000,
+  DEV_STM8L151x23	= 0x08000000,
+  DEV_STM8L15x46	= 0x10000000,
+  DEV_STM8L15x8		= 0x20000000,
+  DEV_STM8L162		= 0x40000000,
+  DEV_STM8L		= (DEV_STM8L051|
+			   DEV_STM8L052C|
+			   DEV_STM8L052R|
+			   DEV_STM8L151x23|
+			   DEV_STM8L15x46|
+			   DEV_STM8L15x8|
+			   DEV_STM8L162),
+
+  DEV_STM8ALL		= (DEV_STM8AL|DEV_STM8L),
+  
+  CPU_STM8101		= 0x0004,		// L101 family
+  CPU_STM8L101		= 0x0004,
+  // Devices of L101 family 0x00 00 X0 00
+  DEV_STM8101		= 0x00001000,
+  DEV_STM8L101		= 0x00001000,
+  
+  CPU_ALL_STM8	= (CPU_STM8S|CPU_STM8L|CPU_STM8101),
 
   CPU_ST7       = 0x0001,
   CPU_ALL_ST7   = (CPU_ST7),
@@ -144,7 +205,9 @@ struct cpu_entry
 {
   const char *type_str;
   enum cpu_type  type;
-  int  technology;
+  int  subtype;
+  const char *type_help;
+  const char *sub_help;
 };
 
 /* Classes of memories, this is index on the list */

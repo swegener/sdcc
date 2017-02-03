@@ -1,4 +1,4 @@
-MAIN		= stm8l_disc_serial
+MAIN		= stm8l_disc_getbl
 
 OTHERS		=
 

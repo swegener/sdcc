@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: timercl.h 608 2017-01-24 12:08:41Z drdani $ */
+/* $Id: timercl.h 621 2017-02-03 10:13:54Z drdani $ */
 
 #ifndef STM8_TIMERCL_HEADER
 #define STM8_TIMERCL_HEADER
@@ -84,7 +84,8 @@ class cl_tim: public cl_hw
  protected:
   t_addr base;
   cl_memory_cell *regs[32+6];
-
+  bool clk_enabled;
+  
   int cnt; // copy of counter value
 
   // Features
@@ -107,7 +108,9 @@ class cl_tim: public cl_hw
  
   virtual int tick(int cycles);
   virtual void reset(void);
-  
+  virtual void happen(class cl_hw *where, enum hw_event he,
+                      void *params);
+
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);

@@ -48,7 +48,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= glob.o itc.o serial.o rst.o timer.o \
+OBJECTS_SHARED	= glob.o itc.o serial.o rst.o timer.o port.o clk.o \
 		  inst.o \
 		  simstm8.o stm8.o
 OBJECTS_EXE	= sstm8.o
@@ -147,5 +147,17 @@ checkconf:
 	@if [ -f $(top_builddir)/devel ]; then\
 	  $(MAKE) -C $(top_builddir) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
+
+bl_l15x46.hex: bl_l15x46.asc
+	srec_cat $< -Ascii_Hex -Output $@ -Intel
+
+bl_l15x46.cc: bl_l15x46.asc
+	srec_cat $< -Ascii_Hex -Output $@ -C-Array bl_l15x46 -INClude
+
+bl_s105.hex: bl_s105.asc
+	srec_cat $< -Ascii_Hex -Output $@ -Intel
+
+bl_s105.cc: bl_s105.asc
+	srec_cat $< -Ascii_Hex -Output $@ -C-Array bl_s105 -INClude
 
 # End of stm8.src/Makefile.in

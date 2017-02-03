@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 581 2017-01-05 15:01:20Z drdani $ */
+/* $Id: serial.cc 611 2017-01-25 20:14:27Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -48,6 +48,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "itsrccl.h"
 
 // local
+#include "clkcl.h"
 #include "serialcl.h"
 
 
@@ -69,11 +70,13 @@ enum reg_idx {
 
 cl_serial::cl_serial(class cl_uc *auc,
 		     t_addr abase,
-		     int ttype):
+		     int ttype, int atxit, int arxit):
   cl_serial_hw(auc, ttype, "uart")
 {
   type= ttype;
   base= abase;
+  txit= atxit;
+  rxit= arxit;
 }
 
 
@@ -88,6 +91,7 @@ cl_serial::init(void)
 
   set_name("stm8_uart");
   cl_serial_hw::init();
+  clk_enabled= false;
   for (i= 0; i < 12; i++)
     {
       regs[i]= register_cell(uc->rom, base+i);
@@ -95,21 +99,21 @@ cl_serial::init(void)
   pick_div();
   pick_ctrl();
 
-  uc->it_sources->add(new cl_it_src(uc, 20,
+  uc->it_sources->add(new cl_it_src(uc, txit,
 				    regs[cr2], 0x80,
 				    regs[sr], 0x80,
-				    0x8058, false, false,
-				    "usart transmit register empty", 20*10+1));
-  uc->it_sources->add(new cl_it_src(uc, 20,
+				    0x8008+txit*4, false, false,
+				    chars("", "usart%d transmit register empty", id), 20*10+1));
+  uc->it_sources->add(new cl_it_src(uc, txit,
 				    regs[cr2], 0x40,
 				    regs[sr], 0x40,
-				    0x8058, false, false,
-				    "usart trasnmit complete", 20*10+2));
-  uc->it_sources->add(new cl_it_src(uc, 21,
+				    0x8008+txit*4, false, false,
+				    chars("", "usart%d transmit complete", id), 20*10+2));
+  uc->it_sources->add(new cl_it_src(uc, rxit,
 				    regs[cr2], 0x20,
 				    regs[sr], 0x20,
-				    0x805C, false, false,
-				    "usart receive", 20*10+3));
+				    0x8008+rxit*4, false, false,
+				    chars("", "usart%d receive", id), 20*10+3));
 
   sr_read= false;
   /*
@@ -239,7 +243,8 @@ cl_serial::tick(int cycles)
 {
   char c;
 
-  if (!en)
+  if (!en ||
+      !clk_enabled)
     return 0;
   
   if ((mcnt+= cycles) >= div)
@@ -355,6 +360,20 @@ cl_serial::reset(void)
 }
 
 void
+cl_serial::happen(class cl_hw *where, enum hw_event he,
+		  void *params)
+{
+  if ((he == EV_CLK_ON) ||
+      (he == EV_CLK_OFF))
+    {
+      cl_clk_event *e= (cl_clk_event *)params;
+      if ((e->cath == HW_UART) &&
+	  (e->id == id))
+	clk_enabled= he == EV_CLK_ON;
+    }
+}
+
+void
 cl_serial::pick_div()
 {
   u8_t b1= regs[brr1]->get();
@@ -431,6 +450,7 @@ void
 cl_serial::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d] %s\n", id_string, id, on?"on":"off");
+  con->dd_printf("clk %s\n", clk_enabled?"enabled":"disabled");
   con->dd_printf("Input: ");
   class cl_f *fin= io->get_fin(), *fout= io->get_fout();
   if (fin)

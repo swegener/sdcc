@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8cl.h 607 2017-01-19 11:11:44Z drdani $ */
+/* $Id: stm8cl.h 613 2017-01-26 20:09:25Z drdani $ */
 
 #ifndef STM8CL_HEADER
 #define STM8CL_HEADER
@@ -47,6 +47,14 @@ public:
   class cl_address_space *ram;
   class cl_address_space *regs8;
   class cl_address_space *regs16;
+  class cl_memory_chip
+    *ram_chip, // max 6k
+    *eeprom_chip, // max 2k
+    *option_chip, // 128 bytes
+    *io_chip, // 2k
+    *boot_chip, // 2k
+    *cpu_chip, // 256 bytes
+    *flash_chip; // max 128k
   //class cl_memory *rom;
   struct t_regs regs;
   class cl_itc *itc;
@@ -85,6 +93,21 @@ public:
   virtual bool it_enabled(void);
 
 #include "instcl.h"
+};
+
+
+class cl_stm8_cpu: public cl_hw
+{
+ protected:
+  class cl_memory_cell *regs[11];
+ public:
+  cl_stm8_cpu(class cl_uc *auc);
+  virtual int init(void);
+  virtual int cfg_size(void) { return 2; }
+
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
+  virtual t_mem read(class cl_memory_cell *cell);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 };
 
 

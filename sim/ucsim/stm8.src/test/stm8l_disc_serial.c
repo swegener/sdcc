@@ -2,49 +2,91 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define PC_DDR	(*(volatile uint8_t *)0x500c)
-#define PC_CR1	(*(volatile uint8_t *)0x500d)
+#include "stm8.h"
 
-#define CLK_DIVR	(*(volatile uint8_t *)0x50c0)
-#define CLK_PCKENR1	(*(volatile uint8_t *)0x50c3)
-
-#define USART1_SR	(*(volatile uint8_t *)0x5230)
-#define USART1_DR	(*(volatile uint8_t *)0x5231)
-#define USART1_BRR1	(*(volatile uint8_t *)0x5232)
-#define USART1_BRR2	(*(volatile uint8_t *)0x5233)
-#define USART1_CR2	(*(volatile uint8_t *)0x5235)
-#define USART1_CR3	(*(volatile uint8_t *)0x5236)
-
-#define USART_CR2_TEN (1 << 3)
-#define USART_CR3_STOP2 (1 << 5)
-#define USART_CR3_STOP1 (1 << 4)
-#define USART_SR_TXE (1 << 7)
 
 int putchar(int c)
 {
-	while(!(USART1_SR & USART_SR_TXE));
+  while(!(USART->sr & USART_SR_TXE));
+  
+  USART->dr = c;
+  return c;
+}
 
-	USART1_DR = c;
-	return c;
+
+volatile uint8_t rx_buf[8];
+volatile uint8_t first_free= 0;
+volatile uint8_t last_used= 0;
+
+void isr_rx(void) __interrupt(USART_RX_IRQ)
+{
+  volatile uint8_t d;
+  if (USART->sr & USART_SR_RXNE)
+    {
+      uint8_t n;
+      d= USART->dr;
+      n= (first_free+1)%8;
+      if (n != last_used)
+	{
+	  rx_buf[first_free]= d;
+	  first_free= n;
+	}
+    }
+}
+
+char received()
+{
+  return first_free != last_used;
+}
+
+char getchar()
+{
+  uint8_t o;
+  while (!received())
+    ;
+  o= last_used;
+  last_used= (last_used+1)%8;
+  return rx_buf[o];
 }
 
 void main(void)
 {
-	unsigned long i = 0;
+  unsigned long i = 0;
+  int a= 0;
+  
+  CLK->ckdivr = 0x00; // Set the frequency to 16 MHz
+  CLK->pckenr1 = 0xFF; // Enable peripherals
 
-	CLK_DIVR = 0x00; // Set the frequency to 16 MHz
-	CLK_PCKENR1 = 0xFF; // Enable peripherals
+  GPIOC->ddr = 0x08; // Put TX line on
+  GPIOC->cr1 = 0x08;
 
-	PC_DDR = 0x08; // Put TX line on
-	PC_CR1 = 0x08;
+  USART->cr2 = USART_CR2_TEN | USART_CR2_REN; // Allow TX and RX
+  USART->cr3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2); // 1 stop bit
+  USART->brr2 = 0x03;
+  USART->brr1 = 0x68; // 9600 baud
 
-	USART1_CR2 = USART_CR2_TEN; // Allow TX and RX
-	USART1_CR3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2); // 1 stop bit
-	USART1_BRR2 = 0x03; USART1_BRR1 = 0x68; // 9600 baud
+  USART->cr2|= USART_CR2_RIEN;
+  EI;
 
-	for(;;)
+  for(;;)
+    {
+      i++;
+      if (received())
 	{
-		printf("Hello World!\n");
-		for(i = 0; i < 147456; i++); // Sleep
+	  char c= getchar();
+	  if (c == '*')
+	    {
+	      printf("0x%04x\n", a);
+	    }
+	  else
+	    printf("%c", c);
+	  i= 0;
 	}
+      else
+      if (i > 147456*2)
+	{
+	  printf("\ntick %d, press any key\n", a++);
+	  i= 0;
+	}
+    }
 }

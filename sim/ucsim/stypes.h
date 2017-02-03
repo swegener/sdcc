@@ -316,7 +316,9 @@ enum hw_cath {
 enum hw_event {
   EV_OVERFLOW,
   EV_PORT_CHANGED,
-  EV_T2_MODE_CHANGED
+  EV_T2_MODE_CHANGED,
+  EV_CLK_ON,
+  EV_CLK_OFF
 };
 
 // flags of hw units

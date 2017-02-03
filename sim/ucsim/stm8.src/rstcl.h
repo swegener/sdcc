@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: rstcl.h 352 2016-07-10 16:36:45Z  $ */
+/* $Id: rstcl.h 614 2017-01-27 08:39:01Z drdani $ */
 
 #ifndef STM8_RSTCL_HEADER
 #define STM8_RSTCL_HEADER
@@ -39,8 +39,9 @@ class cl_rst: public cl_hw
  public:
   t_addr base;
   class cl_memory_cell *rst_sr;
+  t_mem mask;
  public:
-  cl_rst(class cl_uc *auc, t_addr abase);
+  cl_rst(class cl_uc *auc, t_addr abase, t_mem amask);
   //virtual ~cl_rst(void);
   virtual int init(void);
 

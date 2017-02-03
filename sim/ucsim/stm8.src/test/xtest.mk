@@ -1,7 +1,8 @@
-MAIN		= stm8l_disc_serial
+MAIN		= xtest
 
-OTHERS		=
+OTHERS		= 
 
 include sdcc.mk
 
 CPPFLAGS	= -DDEVICE=DEV_STM8L15x46
+#-DUSART=USART2

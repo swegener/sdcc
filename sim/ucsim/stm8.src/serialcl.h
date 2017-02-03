@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serialcl.h 581 2017-01-05 15:01:20Z drdani $ */
+/* $Id: serialcl.h 611 2017-01-25 20:14:27Z drdani $ */
 
 #ifndef STM8_SERIALCL_HEADER
 #define STM8_SERIALCL_HEADER
@@ -45,8 +45,9 @@ class cl_serial_listener;
 class cl_serial: public cl_serial_hw
 {
  protected:
+  bool clk_enabled;
   t_addr base;
-  int type;
+  int type, txit, rxit;
   class cl_memory_cell *regs[12];
   int div;
   int mcnt;
@@ -66,7 +67,7 @@ class cl_serial: public cl_serial_hw
  public:
   cl_serial(class cl_uc *auc,
 	    t_addr abase,
-	    int ttype);
+	    int ttype, int atxit, int arxit);
   virtual ~cl_serial(void);
   virtual int init(void);
   virtual int cfg_size(void) { return 10; }
@@ -83,6 +84,8 @@ class cl_serial: public cl_serial_hw
   virtual void finish_send();
   virtual void received();
   virtual void reset(void);
+  virtual void happen(class cl_hw *where, enum hw_event he,
+                      void *params);
 
   virtual void pick_div();
   virtual void pick_ctrl();

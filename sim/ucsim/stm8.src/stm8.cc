@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8.cc 608 2017-01-24 12:08:41Z drdani $ */
+/* $Id: stm8.cc 621 2017-02-03 10:13:54Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -54,9 +54,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "serialcl.h"
 #include "rstcl.h"
 #include "timercl.h"
-
-#define uint32 t_addr
-#define uint8 unsigned char
+#include "portcl.h"
+#include "clkcl.h"
 
 /*******************************************************************/
 
@@ -154,45 +153,162 @@ cl_stm8::mk_hw_elements(void)
   cl_uc::mk_hw_elements();
   class cl_option *o;
 
-  {
-    o= new cl_string_option(this, "serial1_in_file",
-			    "Input file for serial line uart1 (-S)");
-    application->options->new_option(o);
-    o->init();
-    o->hide();
-    o= new cl_string_option(this, "serial1_out_file",
-			    "Output file for serial line uart1 (-S)");
-    application->options->new_option(o);
-    o->init();
-    o->hide();
-    
-    add_hw(h= new cl_serial(this, 0x5230, 1));
-    h->init();
-  }
+  o= new cl_string_option(this, "serial1_in_file",
+			  "Input file for serial line uart1 (-S)");
+  application->options->new_option(o);
+  o->init();
+  o->hide();
+  o= new cl_string_option(this, "serial1_out_file",
+			  "Output file for serial line uart1 (-S)");
+  application->options->new_option(o);
+  o->init();
+  o->hide();
 
-  {
-    o= new cl_string_option(this, "serial2_in_file",
-			    "Input file for serial line uart2 (-S)");
-    application->options->new_option(o);
-    o->init();
-    o->hide();
-    o= new cl_string_option(this, "serial2_out_file",
-			    "Output file for serial line uart2 (-S)");
-    application->options->new_option(o);
-    o->init();
-    o->hide();
-    
-    add_hw(h= new cl_serial(this, 0x5240, 2));
-    h->init();
-  }
+  o= new cl_string_option(this, "serial2_in_file",
+			  "Input file for serial line uart2 (-S)");
+  application->options->new_option(o);
+  o->init();
+  o->hide();
+  o= new cl_string_option(this, "serial2_out_file",
+			  "Output file for serial line uart2 (-S)");
+  application->options->new_option(o);
+  o->init();
+  o->hide();
   
+  o= new cl_string_option(this, "serial3_in_file",
+			  "Input file for serial line uart3 (-S)");
+  application->options->new_option(o);
+  o->init();
+  o->hide();
+  o= new cl_string_option(this, "serial3_out_file",
+			  "Output file for serial line uart3 (-S)");
+  application->options->new_option(o);
+  o->init();
+  o->hide();
+  
+  o= new cl_string_option(this, "serial4_in_file",
+			  "Input file for serial line uart4 (-S)");
+  application->options->new_option(o);
+  o->init();
+  o->hide();
+  o= new cl_string_option(this, "serial4_out_file",
+			  "Output file for serial line uart4 (-S)");
+  application->options->new_option(o);
+  o->init();
+  o->hide();
+
+  add_hw(h= new cl_stm8_cpu(this));
+  h->init();
+  
+  if (type->type == CPU_STM8S)
+    {
+      add_hw(h= new cl_clk_saf(this));
+      h->init();
+      if (type->subtype & (DEV_STM8S003|
+			   DEV_STM8S007|
+			   DEV_STM8S103|
+			   DEV_STM8S207|
+			   DEV_STM8S208|
+			   DEV_STM8S903|
+			   DEV_STM8AF52))
+	{
+	  add_hw(h= new cl_serial(this, 0x5230, 1, 17, 18));
+	  h->init();
+	}
+      if (type->subtype & (DEV_STM8S005|
+			   DEV_STM8S105|
+			   DEV_STM8AF62_46))
+	{
+	  add_hw(h= new cl_serial(this, 0x5240, 2, 20, 21));
+	  h->init();
+	}
+      if (type->subtype & (DEV_STM8S007|
+			   DEV_STM8S207|
+			   DEV_STM8S208|
+			   DEV_STM8AF52))
+	{
+	  add_hw(h= new cl_serial(this, 0x5240, 3, 20, 21));
+	  h->init();
+	}
+      if (type->subtype & (DEV_STM8AF62_12))
+	{
+	  add_hw(h= new cl_serial(this, 0x5230, 4, 17, 18));
+	  h->init();
+	}
+    }
+  if (type->type == CPU_STM8L)
+    {
+      add_hw(h= new cl_clk_all(this));
+      h->init();
+      add_hw(h= new cl_serial(this, 0x5230, 1, 27, 28));
+      h->init();
+      if (type->subtype & (DEV_STM8AL3xE|
+			   DEV_STM8AL3x8|
+			   DEV_STM8L052R|
+			   DEV_STM8L15x8|
+			   DEV_STM8L162))
+	{
+	  add_hw(h= new cl_serial(this, 0x53e0, 2, 19, 20));
+	  h->init();
+	}
+      if (type->subtype & (DEV_STM8AL3xE|
+			   DEV_STM8AL3x8|
+			   DEV_STM8L052R|
+			   DEV_STM8L15x8|
+			   DEV_STM8L162))
+	{
+	  add_hw(h= new cl_serial(this, 0x53f0, 3, 21, 22));
+	  h->init();
+	}
+    }
+  if (type->type == CPU_STM8L101)
+    {
+      add_hw(h= new cl_clk_l101(this));
+      h->init();
+      add_hw(h= new cl_serial(this, 0x5230, 1, 27, 28));
+      h->init();
+    }
+
   add_hw(itc= new cl_itc(this));
   itc->init();
 
+  {
+    add_hw(h= new cl_port(this, 0x5000, "pa"));
+    h->init();
+    add_hw(h= new cl_port(this, 0x5005, "pb"));
+    h->init();
+    add_hw(h= new cl_port(this, 0x500a, "pc"));
+    h->init();
+    add_hw(h= new cl_port(this, 0x500f, "pd"));
+    h->init();
+  }
+  
   if (type->type == CPU_STM8S)
     {
       // all S and AF
-      add_hw(h= new cl_rst(this, 0x50b3));
+      add_hw(h= new cl_port(this, 0x5014, "pe"));
+      h->init();
+      add_hw(h= new cl_port(this, 0x5019, "pf"));
+      h->init();
+      if (type->subtype & (DEV_STM8S005|
+			   DEV_STM8S007|
+			   DEV_STM8S105|
+			   DEV_STM8S207|
+			   DEV_STM8S208|
+			   DEV_STM8AF52|
+			   DEV_STM8AF62_46))
+	{
+	  add_hw(h= new cl_port(this, 0x501e, "pg"));
+	  h->init();
+	  if (type->subtype != DEV_STM8AF62_46)
+	    {
+	      add_hw(h= new cl_port(this, 0x5023, "ph"));
+	      h->init();
+	      add_hw(h= new cl_port(this, 0x5028, "pi"));
+	      h->init();
+	    }
+	}
+      add_hw(h= new cl_rst(this, 0x50b3, 0x1f));
       h->init();
       add_hw(h= new cl_tim1_saf(this, 1, 0x5250));
       h->init();
@@ -232,7 +348,30 @@ cl_stm8::mk_hw_elements(void)
     }
   else if (type->type == CPU_STM8L)
     {
-      add_hw(h= new cl_rst(this, 0x50b0));
+      if (type->subtype != DEV_STM8L051)
+	{
+	  add_hw(h= new cl_port(this, 0x5014, "pe"));
+	  h->init();
+	  add_hw(h= new cl_port(this, 0x5019, "pf"));
+	  h->init();
+	}
+      if (type->subtype & (DEV_STM8AL3xE|
+			   DEV_STM8AL3x8|
+			   DEV_STM8L052R|
+			   DEV_STM8L15x8|
+			   DEV_STM8L162))
+	{
+	  add_hw(h= new cl_port(this, 0x501e, "pg"));
+	  h->init();
+	  if (type->subtype != DEV_STM8L052R)
+	    {
+	      add_hw(h= new cl_port(this, 0x5023, "ph"));
+	      h->init();
+	      add_hw(h= new cl_port(this, 0x5028, "pi"));
+	      h->init();
+	    }
+	}
+      add_hw(h= new cl_rst(this, 0x50b0+1, 0x3f));
       h->init();
       add_hw(h= new cl_tim2_all(this, 2, 0x5250));
       h->init();
@@ -268,7 +407,7 @@ cl_stm8::mk_hw_elements(void)
     }
   else if (type->type == CPU_STM8L101)
     {
-      add_hw(h= new cl_rst(this, 0x50b0));
+      add_hw(h= new cl_rst(this, 0x50b0+1, 0x0f));
       h->init();
       add_hw(h= new cl_tim2_l101(this, 2, 0x5250));
       h->init();
@@ -291,17 +430,75 @@ cl_stm8::make_memories(void)
 {
   class cl_address_space *as;
 
-  rom= ram= as= new cl_address_space("rom", 0, 0x20000, 8);
+  rom= ram= as= new cl_address_space("rom", 0, 0x28000, 8);
   as->init();
   address_spaces->add(as);
 
   class cl_address_decoder *ad;
-  class cl_memory_chip *chip;
+  class cl_memory_chip /* *chip,*/ *rom_chip;
 
-  c= chip= new cl_memory_chip("rom_chip", 0x20000, 8);
-  chip->init();
-  memchips->add(chip);
-  ad= new cl_address_decoder(as= address_space("rom"), chip, 0, 0x1ffff, 0);
+  c= rom_chip= new cl_memory_chip("rom_chip", 0x20000, 8);
+  rom_chip->init();
+  memchips->add(rom_chip);
+
+  ram_chip= new cl_memory_chip("ram_chip", 0x1800, 8);
+  ram_chip->init();
+  memchips->add(ram_chip);
+  eeprom_chip= new cl_memory_chip("eeprom_chip", 0x0800, 8);
+  eeprom_chip->init();
+  memchips->add(eeprom_chip);
+  option_chip= new cl_memory_chip("option_chip", 0x0080, 8);
+  option_chip->init();
+  memchips->add(option_chip);
+  io_chip= new cl_memory_chip("io_chip", 0x0800, 8);
+  io_chip->init();
+  memchips->add(io_chip);
+  boot_chip= new cl_memory_chip("boot_chip", 0x0800, 8);
+  boot_chip->init();
+  memchips->add(boot_chip);
+  cpu_chip= new cl_memory_chip("cpu_chip", 0x0100, 8);
+  cpu_chip->init();
+  memchips->add(cpu_chip);
+  flash_chip= new cl_memory_chip("flash_chip", 0x20000, 8);
+  flash_chip->init();
+  memchips->add(flash_chip);
+  /*
+  ad= new cl_address_decoder(as= address_space("rom"), rom_chip, 0, 0x1ffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+  */
+  ad= new cl_address_decoder(as= address_space("rom"), ram_chip, 0, 0x17ff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  ad= new cl_address_decoder(as= address_space("rom"), eeprom_chip, 0x4000, 0x47ff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  ad= new cl_address_decoder(as= address_space("rom"), option_chip, 0x4800, 0x487f, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  ad= new cl_address_decoder(as= address_space("rom"), io_chip, 0x5000, 0x57ff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  ad= new cl_address_decoder(as= address_space("rom"), boot_chip, 0x6000, 0x67ff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  ad= new cl_address_decoder(as= address_space("rom"), cpu_chip, 0x7f00, 0x7fff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  ad= new cl_address_decoder(as= address_space("rom"), flash_chip, 0x8000, 0x27fff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
@@ -1597,7 +1794,7 @@ cl_stm8::accept_it(class it_level *il)
   PC = il->addr;
 
   it_levels->push(il);
-  return resINTERRUPT;
+  return resGO;//resINTERRUPT;
 }
 
 
@@ -1608,6 +1805,145 @@ bool
 cl_stm8::it_enabled(void)
 {
   return !(regs.CC & BIT_I0) || !(regs.CC & BIT_I1);
+}
+
+
+cl_stm8_cpu::cl_stm8_cpu(class cl_uc *auc):
+  cl_hw(auc, HW_DUMMY, 0, "cpu")
+{
+}
+
+int
+cl_stm8_cpu::init(void)
+{
+  int i;
+  cl_hw::init();
+  for (i= 0; i < 11; i++)
+    {
+      regs[i]= register_cell(uc->rom, 0x7f00+i);
+    }
+  return 0;
+}
+
+void
+cl_stm8_cpu::write(class cl_memory_cell *cell, t_mem *val)
+{
+  t_addr a;
+  cl_stm8 *u= (cl_stm8*)uc;
+
+  if (conf(cell, val))
+    return;
+  
+  if (conf(cell, NULL))
+    return;
+
+  *val&= 0xff;
+  if (!uc->rom->is_owned(cell, &a))
+    return;  
+  if ((a < 0x7f00) ||
+      (a > 0x7f0a))
+    return;
+
+  a-= 0x7f00;
+  switch (a)
+    {
+    case 0:
+      u->regs.A= *val;
+      break;
+    case 1:
+      u->PC= (u->PC & 0xffff) + (*val << 16);
+      break;
+    case 2:
+      u->PC= (u->PC & 0xff00ff) | (*val << 8);
+      break;
+    case 3:
+      u->PC= (u->PC & 0xffff00) | (*val);
+      break;
+    case 4:
+      u->regs.X= (u->regs.X & 0xff) | (*val << 8);
+      break;
+    case 5:
+      u->regs.X= (u->regs.X & 0xff00) | (*val);
+      break;
+    case 6:
+      u->regs.Y= (u->regs.Y & 0xff) | (*val << 8);
+      break;
+    case 7:
+      u->regs.Y= (u->regs.Y & 0xff00) | (*val);
+      break;
+    case 8:
+      u->regs.SP= (u->regs.SP & 0xff) | (*val << 8);
+      break;
+    case 9:
+      u->regs.SP= (u->regs.SP & 0xff00) | (*val);
+      break;
+    case 0xa:
+      u->regs.CC= (u->regs.CC & 0xff00) | (*val);
+      break;
+    }
+}
+
+t_mem
+cl_stm8_cpu::read(class cl_memory_cell *cell)
+{
+  t_mem v= cell->get();
+  t_addr a;
+  cl_stm8 *u= (cl_stm8*)uc;
+  
+  if (conf(cell, NULL))
+    return v;
+  if (!uc->rom->is_owned(cell, &a))
+    return v;
+  if ((a < 0x7f00) ||
+      (a > 0x7f0a))
+    return v;
+
+  a-= 0x7f00;
+  switch (a)
+    {
+    case 0:
+      v= u->regs.A;
+      break;
+    case 1:
+      v= (u->PC >> 16) & 0xff;
+      break;
+    case 2:
+      v= (u->PC >> 8) & 0xff;
+      break;
+    case 3:
+      v= u->PC & 0xff;
+      break;
+    case 4:
+      v= (u->regs.X >> 8) & 0xff;
+      break;
+    case 5:
+      v= u->regs.X & 0xff;
+      break;
+    case 6:
+      v= (u->regs.Y >> 8) & 0xff;
+      break;
+    case 7:
+      v= u->regs.Y & 0xff;
+      break;
+    case 8:
+      v= (u->regs.SP >> 8) & 0xff;
+      break;
+    case 9:
+      v= u->regs.SP & 0xff;
+      break;
+    case 0xa:
+      v= u->regs.CC;
+      break;
+    }
+  return v;
+}
+
+t_mem
+cl_stm8_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  if (val)
+    cell->set(*val);
+  return cell->get();
 }
 
 

@@ -25,7 +25,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: timer.cc 608 2017-01-24 12:08:41Z drdani $ */
+/* $Id: timer.cc 621 2017-02-03 10:13:54Z drdani $ */
+
+#include "clkcl.h"
 
 #include "timercl.h"
 
@@ -92,6 +94,7 @@ cl_tim::init(void)
     }
   pbits= 16;
   bidir= true;
+  clk_enabled= false;
   
   return 0;
 }
@@ -99,9 +102,10 @@ cl_tim::init(void)
 int
 cl_tim::tick(int cycles)
 {
-  if (!on)
+  if (!on ||
+      !clk_enabled)
     return resGO;
-
+  
   while (cycles--)
     {
       // count prescaler
@@ -137,6 +141,20 @@ cl_tim::reset(void)
   regs[idx.arrl]->set(0xff);
 
   update_event();
+}
+
+void
+cl_tim::happen(class cl_hw *where, enum hw_event he,
+	       void *params)
+{
+  if ((he == EV_CLK_ON) ||
+      (he == EV_CLK_OFF))
+    {
+      cl_clk_event *e= (cl_clk_event *)params;
+      if ((e->cath == HW_TIMER) &&
+	  (e->id == id))
+	clk_enabled= he == EV_CLK_ON;
+    }
 }
 
 t_mem
@@ -192,22 +210,33 @@ cl_tim::write(class cl_memory_cell *cell, t_mem *val)
   a-= base;
   if (a == idx.cr1)
     {
+      u8_t v= cell->get();
       if (!bidir)
 	*val&= 0x1f;
+      else
+	{
+	  if ((v & cms))
+	    {
+	      *val&= ~dir;
+	      if (v & dir)
+		*val|= dir;
+	    }
+	}
     }
   else if (a == idx.egr)
     {
       if (*val & 0x01)
 	{
 	  update_event();
-	  prescaler_cnt= calc_prescaler() - 1;  
+	  prescaler_cnt= calc_prescaler() - 1;
+	  //*val&= ~0x01;
 	}
       *val= 0;
     }
   else if (a == idx.pscrh)
     {
       prescaler_ms_buffer= *val;
-      *val= cell->get();
+      //*val= cell->get();
     }
   else if (a == idx.pscrl)
     {
@@ -221,7 +250,7 @@ cl_tim::write(class cl_memory_cell *cell, t_mem *val)
       if ((regs[idx.cr1]->get() & arpe) != 0)
 	{
 	  arr_ms_buffer= *val;
-	  *val= cell->get();
+	  //*val= cell->get();
 	}
     }
   else if (a == idx.arrl)
@@ -384,6 +413,7 @@ cl_tim::print_info(class cl_console_base *con)
   con->dd_printf("%s %d bit %s counter at 0x%06x\n", get_name(), bits,
 		 bidir?"Up/Down":"Up", base);
   // actual values
+  con->dd_printf("clk= %s\n", clk_enabled?"enabled":"disabled");
   con->dd_printf("cnt= 0x%04x %d %s\n", cnt, cnt, (c1&cen)?"on":"off");
   con->dd_printf("dir= %s\n", (c1&dir)?"down":"up");
   con->dd_printf("prs= 0x%04x %d of 0x%04x %d\n",
@@ -458,7 +488,7 @@ cl_tim1_all::cl_tim1_all(class cl_uc *auc, int aid, t_addr abase):
   idx.cr2	=  1;
   idx.smcr	=  2;
   idx.etr	=  3;
-  //der=4
+  idx.der	=  4;
   idx.ier	=  5;
   idx.sr1	=  6;
   idx.sr2	=  7;

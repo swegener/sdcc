@@ -26,6 +26,7 @@
 
 #include <pic16f877.h>
 
+static unsigned int __at(0x2007) _config = _WDT_OFF;
 
 void
 _putchar(char c)
@@ -33,6 +34,9 @@ _putchar(char c)
   while (!TXIF)
     ;
   TXREG = c;
+  /* wait until the transmit buffer is empty */
+  while (!TRMT)
+    ;
 }
 
 
@@ -73,6 +77,7 @@ _initEmu(void)
 
   //2. Enable the asynchronous serial port by clearing
   //   bit SYNC and setting bit SPEN.
+  CREN = 1;
   SPEN = 1;
 
   //3. If interrupts are desired, set enable bit TXIE.
@@ -92,13 +97,10 @@ _initEmu(void)
 void
 _exitEmu(void)
 {
-  /* wait until the transmit buffer is empty */
-  while (!TRMT)
-    ;
-
   /* set the breakpoint */
   __asm
-   .direct "a", "\"\""
+   .direct "a", "\"PASSED\""
+   goto	$
   __endasm;
 }
 

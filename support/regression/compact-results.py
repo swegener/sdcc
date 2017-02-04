@@ -51,20 +51,28 @@ for line in lines:
     # '--- Summary: f/t/c: ...', where f = # failures, t = # test points,
     # c = # test cases.
     if (re.search(r'^--- Summary:', line)):
-        (summary, data, rest) = re.split(r':', line)
-        (nfailures, ntests, ncases) = re.split(r'/', data)
+        try:
+            (summary, data, rest) = re.split(r':', line)
+            (nfailures, ntests, ncases) = re.split(r'/', data)
+            tests = tests + string.atof(ntests)
+            cases = cases + string.atof(ncases)
+        except ValueError:
+            print "Bad summary line:", line
+            nfailures = '1'
         failures = failures + string.atof(nfailures)
-        tests = tests + string.atof(ntests)
-        cases = cases + string.atof(ncases)
         if (string.atof(nfailures)):
             print "Failure: %s" % name
 
     # '--- Simulator: b/t: ...', where b = # bytes, t = # ticks
     if (re.search(r'^--- Simulator:', line)):
-        (simulator, data, rest) = re.split(r':', line)
-        (nbytes, nticks) = re.split(r'/', data)
-        bytes = bytes + string.atof(nbytes)
-        ticks = ticks + string.atof(nticks)
+        try:
+            (simulator, data, rest) = re.split(r':', line)
+            (nbytes, nticks) = re.split(r'/', data)
+        except ValueError:
+            print "Bad simulator line:", line
+        else:
+            bytes = bytes + string.atof(nbytes)
+            ticks = ticks + string.atof(nticks)
 
     # Stop at 0x000228: (106) Invalid instruction 0x00fd
     if (re.search(r'Invalid instruction', line) or re.search(r'unknown instruction', line)):

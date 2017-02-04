@@ -89,4 +89,6 @@ float ceilf(float x) _MATH_REENTRANT;
 float floorf(float x) _MATH_REENTRANT;
 float modff(float x, float * y);
 
+int isnan(float f);
+int isinf(float f);
 #endif  /* _PIC16_MATH_H */

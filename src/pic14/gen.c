@@ -6537,6 +6537,7 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
 {
   int size = 0;
   int offset = 0;
+  sym_link *rtype = operandType(right);
 
   FENTRY;
   DEBUGpic14_emitcode ("; ***", "%s  %d", __FUNCTION__, __LINE__);
@@ -6553,35 +6554,46 @@ genDataPointerSet (operand * right, operand * result, iCode * ic)
    */
   size = AOP_SIZE(right);
 
-  // tsd, was l+1 - the underline `_' prefix was being stripped
-  while (size--)
+  /*test the right operand has a pointer value*/
+  if ((AOP_TYPE(right) == AOP_PCODE) && PIC_IS_DATA_PTR(rtype))
+  {
+    while (size--)
+    {
+      emitpcode(POC_MOVLW, popGetAddr(AOP(right), size, 0));
+      emitpcode(POC_MOVWF, popGet(AOP(result), size));
+    }
+  }
+  else
+  {
+    // tsd, was l+1 - the underline `_' prefix was being stripped
+    while (size--)
     {
       emitpComment ("%s:%u: size=%d, offset=%d, AOP_TYPE(res)=%d", __FILE__, __LINE__, size, offset,
                     AOP_TYPE (result));
 
       if (AOP_TYPE (right) == AOP_LIT)
+      {
+        unsigned int lit = pic14aopLiteral (AOP (IC_RIGHT (ic))->aopu.aop_lit, offset);
+        //fprintf (stderr, "%s:%u: lit %d 0x%x\n", __FUNCTION__,__LINE__, lit, lit);
+        if (lit & 0xff)
         {
-          unsigned int lit = pic14aopLiteral (AOP (IC_RIGHT (ic))->aopu.aop_lit, offset);
-          //fprintf (stderr, "%s:%u: lit %d 0x%x\n", __FUNCTION__,__LINE__, lit, lit);
-          if (lit & 0xff)
-            {
-              emitpcode (POC_MOVLW, popGetLit (lit & 0xff));
-              emitpcode (POC_MOVWF, popGet (AOP (result), offset));
-            }
-          else
-            {
-              emitpcode (POC_CLRF, popGet (AOP (result), offset));
-            }
-        }
-      else
-        {
-          //fprintf (stderr, "%s:%u: no lit\n", __FUNCTION__,__LINE__);
-          emitpcode (POC_MOVFW, popGet (AOP (right), offset));
+          emitpcode (POC_MOVLW, popGetLit (lit & 0xff));
           emitpcode (POC_MOVWF, popGet (AOP (result), offset));
         }
-
+        else
+        {
+          emitpcode (POC_CLRF, popGet (AOP (result), offset));
+        }
+      }
+      else
+      {
+        //fprintf (stderr, "%s:%u: no lit\n", __FUNCTION__,__LINE__);
+        emitpcode (POC_MOVFW, popGet (AOP (right), offset));
+        emitpcode (POC_MOVWF, popGet (AOP (result), offset));
+      }
       offset++;
     }
+  }
 
   freeAsmop (right, NULL, ic, TRUE);
   freeAsmop (result, NULL, ic, TRUE);
@@ -7802,7 +7814,9 @@ aop_isLitLike (asmop * aop)
     return TRUE;
   if (aop->type == AOP_IMMD)
     return TRUE;
-  if ((aop->type == AOP_PCODE) && ((aop->aopu.pcop->type == PO_LITERAL)))
+  if ((aop->type == AOP_PCODE) &&
+      ((aop->aopu.pcop->type == PO_LITERAL) ||
+       (aop->aopu.pcop->type == PO_IMMEDIATE)))
     {
       /* this should be treated like a literal/immediate (use MOVLW/ADDLW/SUBLW
        * instead of MOVFW/ADDFW/SUBFW, use popGetAddr instead of popGet) */

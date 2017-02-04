@@ -1,3 +1,22 @@
+2017-02-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/pic14/math.h,
+	  device/include/pic16/math.h,
+	  device/lib/pic14/libm/Makefile.am,
+	  device/lib/pic14/libm/Makefile.in,
+	  device/lib/pic16/libm/Makefile.am,
+	  device/lib/pic16/libm/Makefile.in,
+	  src/pic14/gen.c,
+	  src/pic14/glue.c,
+	  support/regression/compact-results.py,
+	  support/regression/ports/pic14/support.c,
+	  support/regression/tests/absolute.c,
+	  support/regression/tests/bug1723128.c,
+	  support/regression/tests/bug2686159.c,
+	  support/regression/tests/gcc-torture-execute-20021120-1.c,
+	  support/regression/tests/gcc-torture-execute-pr19606.c:
+	  Various pic14-related fixes: Patches 01, 02, 04, 05, 07, 09, 11, 14, 15 by Martin Habets via sdcc-devel.
+
 2017-01-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (expandInlineFuncs,fixupInline): Fix bug #2559

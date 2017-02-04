@@ -980,7 +980,8 @@ emitInitVal(struct dbuf_s *oBuf, symbol *topsym, sym_link *my_type, initList *li
         return;
     }
 
-    if (IS_CHAR(my_type) || IS_INT(my_type) || IS_LONG(my_type)) {
+    if (IS_CHAR(my_type) || IS_INT(my_type) || IS_LONG(my_type) ||
+	IS_BOOL(my_type)) {
         // integral type, 8, 16, or 32 bit
         DEBUGprintf ("(integral, %d byte) 0x%lx/%ld\n", size, list ? (long)list2int(list) : 0, list ? (long)list2int(list) : 0);
         emitIvals(oBuf, topsym, list, 0, size);

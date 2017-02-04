@@ -8,7 +8,8 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51)
+/* This generates too much code for a pic14 */
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14)
 
 /* Macros to emit "L Nxx R" for each octal number xx between 000 and 037.  */
 #define OP1(L, N, R, I, J) L N##I##J R

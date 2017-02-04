@@ -17,6 +17,8 @@ libm18f_a_SOURCES += expf.c
 libm18f_a_SOURCES += fabsf.c
 libm18f_a_SOURCES += floorf.c
 libm18f_a_SOURCES += frexpf.c
+libm18f_a_SOURCES += isinf.c
+libm18f_a_SOURCES += isnan.c
 libm18f_a_SOURCES += ldexpf.c
 libm18f_a_SOURCES += log10f.c
 libm18f_a_SOURCES += logf.c
@@ -30,6 +32,11 @@ libm18f_a_SOURCES += sqrtf.c
 libm18f_a_SOURCES += tancotf.c
 libm18f_a_SOURCES += tanf.c
 libm18f_a_SOURCES += tanhf.c
+
+# Use the generic code where possible. Sadly using VPATH does not work:
+#VPATH = $(srcdir) ../..
+%.c: ../../%.c
+	test -e $@ || ln -s $^ $@
 
 include $(top_srcdir)/Makefile.common
 

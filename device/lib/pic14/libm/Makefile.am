@@ -17,6 +17,8 @@ libm_a_SOURCES += expf.c
 libm_a_SOURCES += fabsf.c
 libm_a_SOURCES += floorf.c
 libm_a_SOURCES += frexpf.c
+libm_a_SOURCES += isinf.c
+libm_a_SOURCES += isnan.c
 libm_a_SOURCES += ldexpf.c
 libm_a_SOURCES += log10f.c
 libm_a_SOURCES += logf.c
@@ -42,5 +44,9 @@ if !ENABLE_EXTENDED_INSTRUCTIONS
 libme_a_CFLAGS += --no-extended-instructions
 endif !ENABLE_EXTENDED_INSTRUCTIONS
 
+# Use the generic code where possible. Sadly using VPATH does not work:
+#VPATH = $(srcdir) ../..
+%.c: ../../%.c
+	test -e $@ || ln -s $^ $@
 
 include $(top_srcdir)/Makefile.common

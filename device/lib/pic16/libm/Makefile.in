@@ -98,8 +98,9 @@ am_libm18f_a_OBJECTS = acosf.$(OBJEXT) asincosf.$(OBJEXT) \
 	asinf.$(OBJEXT) atan2f.$(OBJEXT) atanf.$(OBJEXT) \
 	ceilf.$(OBJEXT) cosf.$(OBJEXT) coshf.$(OBJEXT) cotf.$(OBJEXT) \
 	errno.$(OBJEXT) expf.$(OBJEXT) fabsf.$(OBJEXT) \
-	floorf.$(OBJEXT) frexpf.$(OBJEXT) ldexpf.$(OBJEXT) \
-	log10f.$(OBJEXT) logf.$(OBJEXT) modff.$(OBJEXT) powf.$(OBJEXT) \
+	floorf.$(OBJEXT) frexpf.$(OBJEXT) isinf.$(OBJEXT) \
+	isnan.$(OBJEXT) ldexpf.$(OBJEXT) log10f.$(OBJEXT) \
+	logf.$(OBJEXT) modff.$(OBJEXT) powf.$(OBJEXT) \
 	sincosf.$(OBJEXT) sincoshf.$(OBJEXT) sinf.$(OBJEXT) \
 	sinhf.$(OBJEXT) sqrtf.$(OBJEXT) tancotf.$(OBJEXT) \
 	tanf.$(OBJEXT) tanhf.$(OBJEXT)
@@ -203,6 +204,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -214,8 +216,9 @@ top_srcdir = @top_srcdir@
 lib_LIBRARIES = libm18f.a
 libm18f_a_SOURCES = acosf.c asincosf.c asinf.c atan2f.c atanf.c \
 	ceilf.c cosf.c coshf.c cotf.c errno.c expf.c fabsf.c floorf.c \
-	frexpf.c ldexpf.c log10f.c logf.c modff.c powf.c sincosf.c \
-	sincoshf.c sinf.c sinhf.c sqrtf.c tancotf.c tanf.c tanhf.c
+	frexpf.c isinf.c isnan.c ldexpf.c log10f.c logf.c modff.c \
+	powf.c sincosf.c sincoshf.c sinf.c sinhf.c sqrtf.c tancotf.c \
+	tanf.c tanhf.c
 AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic16 \
 	-I$(top_srcdir)/../../non-free/include/pic16
 #AM_CFLAGS += --no-optimize-goto
@@ -327,6 +330,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fabsf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/floorf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/frexpf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/isinf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/isnan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ldexpf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log10f.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logf.Po@am__quote@
@@ -558,6 +563,11 @@ uninstall-am: uninstall-libLIBRARIES
 	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-libLIBRARIES
 
+
+# Use the generic code where possible. Sadly using VPATH does not work:
+#VPATH = $(srcdir) ../..
+%.c: ../../%.c
+	test -e $@ || ln -s $^ $@
 
 clean-local:
 	$(RM) *.asm;

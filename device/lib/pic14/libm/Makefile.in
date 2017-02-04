@@ -72,6 +72,7 @@ am_libm_a_OBJECTS = libm_a-acosf.$(OBJEXT) libm_a-asincosf.$(OBJEXT) \
 	libm_a-cotf.$(OBJEXT) libm_a-errno.$(OBJEXT) \
 	libm_a-expf.$(OBJEXT) libm_a-fabsf.$(OBJEXT) \
 	libm_a-floorf.$(OBJEXT) libm_a-frexpf.$(OBJEXT) \
+	libm_a-isinf.$(OBJEXT) libm_a-isnan.$(OBJEXT) \
 	libm_a-ldexpf.$(OBJEXT) libm_a-log10f.$(OBJEXT) \
 	libm_a-logf.$(OBJEXT) libm_a-modff.$(OBJEXT) \
 	libm_a-powf.$(OBJEXT) libm_a-sincosf.$(OBJEXT) \
@@ -89,6 +90,7 @@ am__objects_1 = libme_a-acosf.$(OBJEXT) libme_a-asincosf.$(OBJEXT) \
 	libme_a-cotf.$(OBJEXT) libme_a-errno.$(OBJEXT) \
 	libme_a-expf.$(OBJEXT) libme_a-fabsf.$(OBJEXT) \
 	libme_a-floorf.$(OBJEXT) libme_a-frexpf.$(OBJEXT) \
+	libme_a-isinf.$(OBJEXT) libme_a-isnan.$(OBJEXT) \
 	libme_a-ldexpf.$(OBJEXT) libme_a-log10f.$(OBJEXT) \
 	libme_a-logf.$(OBJEXT) libme_a-modff.$(OBJEXT) \
 	libme_a-powf.$(OBJEXT) libme_a-sincosf.$(OBJEXT) \
@@ -196,6 +198,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -207,8 +210,9 @@ top_srcdir = @top_srcdir@
 noinst_LIBRARIES = libm.a $(am__append_1)
 libm_a_SOURCES = acosf.c asincosf.c asinf.c atan2f.c atanf.c ceilf.c \
 	cosf.c coshf.c cotf.c errno.c expf.c fabsf.c floorf.c frexpf.c \
-	ldexpf.c log10f.c logf.c modff.c powf.c sincosf.c sincoshf.c \
-	sinf.c sinhf.c sqrtf.c tancotf.c tanf.c tanhf.c
+	isinf.c isnan.c ldexpf.c log10f.c logf.c modff.c powf.c \
+	sincosf.c sincoshf.c sinf.c sinhf.c sqrtf.c tancotf.c tanf.c \
+	tanhf.c
 libm_a_CFLAGS = -p$(ARCH) $(AM_CFLAGS)
 libme_a_SOURCES = $(libm_a_SOURCES)
 libme_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS) $(am__append_2)
@@ -376,6 +380,18 @@ libm_a-frexpf.o: frexpf.c
 libm_a-frexpf.obj: frexpf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm_a_CFLAGS) $(CFLAGS) -c -o libm_a-frexpf.obj `if test -f 'frexpf.c'; then $(CYGPATH_W) 'frexpf.c'; else $(CYGPATH_W) '$(srcdir)/frexpf.c'; fi`
 
+libm_a-isinf.o: isinf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm_a_CFLAGS) $(CFLAGS) -c -o libm_a-isinf.o `test -f 'isinf.c' || echo '$(srcdir)/'`isinf.c
+
+libm_a-isinf.obj: isinf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm_a_CFLAGS) $(CFLAGS) -c -o libm_a-isinf.obj `if test -f 'isinf.c'; then $(CYGPATH_W) 'isinf.c'; else $(CYGPATH_W) '$(srcdir)/isinf.c'; fi`
+
+libm_a-isnan.o: isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm_a_CFLAGS) $(CFLAGS) -c -o libm_a-isnan.o `test -f 'isnan.c' || echo '$(srcdir)/'`isnan.c
+
+libm_a-isnan.obj: isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm_a_CFLAGS) $(CFLAGS) -c -o libm_a-isnan.obj `if test -f 'isnan.c'; then $(CYGPATH_W) 'isnan.c'; else $(CYGPATH_W) '$(srcdir)/isnan.c'; fi`
+
 libm_a-ldexpf.o: ldexpf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libm_a_CFLAGS) $(CFLAGS) -c -o libm_a-ldexpf.o `test -f 'ldexpf.c' || echo '$(srcdir)/'`ldexpf.c
 
@@ -537,6 +553,18 @@ libme_a-frexpf.o: frexpf.c
 
 libme_a-frexpf.obj: frexpf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libme_a_CFLAGS) $(CFLAGS) -c -o libme_a-frexpf.obj `if test -f 'frexpf.c'; then $(CYGPATH_W) 'frexpf.c'; else $(CYGPATH_W) '$(srcdir)/frexpf.c'; fi`
+
+libme_a-isinf.o: isinf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libme_a_CFLAGS) $(CFLAGS) -c -o libme_a-isinf.o `test -f 'isinf.c' || echo '$(srcdir)/'`isinf.c
+
+libme_a-isinf.obj: isinf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libme_a_CFLAGS) $(CFLAGS) -c -o libme_a-isinf.obj `if test -f 'isinf.c'; then $(CYGPATH_W) 'isinf.c'; else $(CYGPATH_W) '$(srcdir)/isinf.c'; fi`
+
+libme_a-isnan.o: isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libme_a_CFLAGS) $(CFLAGS) -c -o libme_a-isnan.o `test -f 'isnan.c' || echo '$(srcdir)/'`isnan.c
+
+libme_a-isnan.obj: isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libme_a_CFLAGS) $(CFLAGS) -c -o libme_a-isnan.obj `if test -f 'isnan.c'; then $(CYGPATH_W) 'isnan.c'; else $(CYGPATH_W) '$(srcdir)/isnan.c'; fi`
 
 libme_a-ldexpf.o: ldexpf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libme_a_CFLAGS) $(CFLAGS) -c -o libme_a-ldexpf.o `test -f 'ldexpf.c' || echo '$(srcdir)/'`ldexpf.c
@@ -815,6 +843,11 @@ uninstall-am:
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am
 
+
+# Use the generic code where possible. Sadly using VPATH does not work:
+#VPATH = $(srcdir) ../..
+%.c: ../../%.c
+	test -e $@ || ln -s $^ $@
 ARCH  ?= @ARCH@
 EARCH ?= @EARCH@
 

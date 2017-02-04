@@ -1791,8 +1791,9 @@ void  pCodeInitRegisters(void)
 	/* Set pseudo stack size to SHAREBANKSIZE - 3.
 	 * On multi memory bank ICs this leaves room for WSAVE/SSAVE/PSAVE
 	 * (used for interrupts) to fit into the shared portion of the
-	 * memory bank. */
-	stkSize = stkSize - 3;
+	 * memory bank. This is not needed on enhanced processors. */
+	if (!pic->isEnhancedCore)
+		stkSize = stkSize - 3;
 	assert(stkSize >= 0);
 	initStack(shareBankAddress, stkSize, haveShared);
 	
@@ -1816,25 +1817,27 @@ void  pCodeInitRegisters(void)
 	pc_intcon.rIdx = IDX_INTCON;
 	pc_pcl.rIdx = IDX_PCL;
 	pc_pclath.rIdx = IDX_PCLATH;
+
+	if (!pic->isEnhancedCore) {
+		/* Interrupt storage for working register - must be same address in all banks ie section SHAREBANK. */
+		pc_wsave.r = allocInternalRegister(IDX_WSAVE,pc_wsave.pcop.name,pc_wsave.pcop.type, pic ? pic->bankMask : 0xf80);
+		/* Interrupt storage for status register. */
+		pc_ssave.r = allocInternalRegister(IDX_SSAVE,pc_ssave.pcop.name,pc_ssave.pcop.type, (pic && haveShared) ? pic->bankMask : 0);
+		/* Interrupt storage for pclath register. */
+		pc_psave.r = allocInternalRegister(IDX_PSAVE,pc_psave.pcop.name,pc_psave.pcop.type, (pic && haveShared) ? pic->bankMask : 0);
 	
-	/* Interrupt storage for working register - must be same address in all banks ie section SHAREBANK. */
-	pc_wsave.r = allocInternalRegister(IDX_WSAVE,pc_wsave.pcop.name,pc_wsave.pcop.type, pic ? pic->bankMask : 0xf80);
-	/* Interrupt storage for status register. */
-	pc_ssave.r = allocInternalRegister(IDX_SSAVE,pc_ssave.pcop.name,pc_ssave.pcop.type, (pic && haveShared) ? pic->bankMask : 0);
-	/* Interrupt storage for pclath register. */
-	pc_psave.r = allocInternalRegister(IDX_PSAVE,pc_psave.pcop.name,pc_psave.pcop.type, (pic && haveShared) ? pic->bankMask : 0);
+		pc_wsave.rIdx = pc_wsave.r->rIdx;
+		pc_ssave.rIdx = pc_ssave.r->rIdx;
+		pc_psave.rIdx = pc_psave.r->rIdx;
 	
-	pc_wsave.rIdx = pc_wsave.r->rIdx;
-	pc_ssave.rIdx = pc_ssave.r->rIdx;
-	pc_psave.rIdx = pc_psave.r->rIdx;
-	
-	pc_wsave.r->isFixed = 1; /* Some PIC ICs do not have a sharebank - this register needs to be reserved across all banks. */
-	pc_wsave.r->address = shareBankAddress-stkSize;
-	pc_ssave.r->isFixed = 1; /* This register must be in the first bank. */
-	pc_ssave.r->address = shareBankAddress-stkSize-1;
-	pc_psave.r->isFixed = 1; /* This register must be in the first bank. */
-	pc_psave.r->address = shareBankAddress-stkSize-2;
-	
+		pc_wsave.r->isFixed = 1; /* Some PIC ICs do not have a sharebank - this register needs to be reserved across all banks. */
+		pc_wsave.r->address = shareBankAddress-stkSize;
+		pc_ssave.r->isFixed = 1; /* This register must be in the first bank. */
+		pc_ssave.r->address = shareBankAddress-stkSize-1;
+		pc_psave.r->isFixed = 1; /* This register must be in the first bank. */
+		pc_psave.r->address = shareBankAddress-stkSize-2;
+	}
+
 	/* probably should put this in a separate initialization routine */
 	pb_dead_pcodes = newpBlock();
 	

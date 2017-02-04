@@ -15,7 +15,7 @@
 	  support/regression/tests/bug2686159.c,
 	  support/regression/tests/gcc-torture-execute-20021120-1.c,
 	  support/regression/tests/gcc-torture-execute-pr19606.c:
-	  Various pic14-related fixes: Patches 01, 02, 04, 05, 07, 09, 11, 14, 15 by Martin Habets via sdcc-devel.
+	  Various pic14-related fixes: Patches 00, 01, 02, 04, 05, 07, 09, 11, 14, 15 by Martin Habets via sdcc-devel.
 
 2017-01-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

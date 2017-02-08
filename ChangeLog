@@ -1,3 +1,10 @@
+2017-02-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/rand.c:
+	  Replace LCB by xorshift for rand().
+	* src/z80/gen.c:
+	  Optimize wide left shifts, part of RFE #524.
+
 2017-02-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/pic14/math.h,

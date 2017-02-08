@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    rand.c - random number generator
 
-   Copyright (C) 2006, Maarten Brock, sourceforge.brock@dse.nl
+   Copyright (C) 2017, Philipp Klaus Krause, pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -24,19 +24,34 @@
    be covered by the GNU General Public License. This exception does
    not however invalidate any other reasons why the executable file
    might be covered by the GNU General Public License.
+
+   This is an xorshift PRNG. See George Marsaglia, "Xorshift RNGs" for details.
+   The width of 32 bits was chosen to not regress in period length vs. the
+   PRNG from the C standard, while at the same time minimizing RAM usage.
+   The parameters a, b, c were chosen to allow the generation of efficient code.
 -------------------------------------------------------------------------*/
 
 #include <stdlib.h>
 
-static unsigned long int next = 1;
+#include <stdint.h>
+
+static uint32_t s = 1;
 
 int rand(void)
 {
-    next = next * 1103515245UL + 12345;
-    return (unsigned int)(next/65536) % (RAND_MAX + 1U);
+	register unsigned long t = s;
+
+	t ^= t >> 10;
+	t ^= t << 9;
+	t ^= t >> 25;
+
+	s = t;
+
+	return(t & RAND_MAX);
 }
 
 void srand(unsigned int seed)
 {
-    next = seed;
+    s = seed | 0x8000; /* s shall not become 0 */
 }
+

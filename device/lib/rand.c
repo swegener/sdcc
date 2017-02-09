@@ -35,7 +35,7 @@
 
 #include <stdint.h>
 
-static uint32_t s = 1;
+static uint32_t s = 0x80000001;
 
 int rand(void)
 {
@@ -52,6 +52,6 @@ int rand(void)
 
 void srand(unsigned int seed)
 {
-    s = seed | 0x8000; /* s shall not become 0 */
+    s = seed | 0x80000000; /* s shall not become 0 */
 }
 

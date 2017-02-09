@@ -2,11 +2,14 @@
 
 	* src/z80/gen.c:
 	  Optimize wide right shifts, part of RFE #524.
+	* device/lib/rand.c,
+	  support/regression/tests/rand.c:
+	  Fix default seed.
 
 2017-02-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/rand.c:
-	  Replace LCB by xorshift for rand().
+	  Replace LCG by xorshift for rand().
 	* src/z80/gen.c:
 	  Optimize wide left shifts, part of RFE #524.
 

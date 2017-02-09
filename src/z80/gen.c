@@ -8910,6 +8910,8 @@ genRightShift (const iCode * ic)
   bool is_signed;
   int countreg;
   bool shift_by_lit, shift_by_one, shift_by_zero;
+  int shiftcount;
+  int byteoffset = 0;
 
   symbol *tlbl = 0, *tlbl1 = 0;
 
@@ -8936,8 +8938,8 @@ genRightShift (const iCode * ic)
 
   /* Useful for the case of shifting a size > 2 value by a literal */
   shift_by_lit = AOP_TYPE (right) == AOP_LIT;
-  shift_by_one = (shift_by_lit && ulFromVal (AOP (right)->aopu.aop_lit) == 1);
-  shift_by_zero = (shift_by_lit && ulFromVal (AOP (right)->aopu.aop_lit) == 0);
+  if (shift_by_lit)
+    shiftcount = ulFromVal (AOP (right)->aopu.aop_lit);
 
   aopOp (result, ic, FALSE, FALSE);
   aopOp (left, ic, FALSE, FALSE);
@@ -8969,28 +8971,47 @@ genRightShift (const iCode * ic)
      same */
   if (!sameRegs (AOP (left), AOP (result)))
     {
+      int soffset = 0;
+      int doffset = 0;
       size = AOP_SIZE (result);
-      offset = 0;
+
+      if (!is_signed && shift_by_lit)
+      {
+        byteoffset = shiftcount / 8;
+        shiftcount %= 8;
+        soffset = byteoffset;
+        size -= byteoffset;
+      }
+
       if (AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) == AOP_REG)
         {
           short src[8], dst[8];
           while (size--)
             {
-              src[offset] = AOP (left)->aopu.aop_reg[offset]->rIdx;
-              dst[offset] = AOP (result)->aopu.aop_reg[offset]->rIdx;
-              offset++;
+              src[doffset] = AOP (left)->aopu.aop_reg[soffset]->rIdx;
+              dst[doffset] = AOP (result)->aopu.aop_reg[doffset]->rIdx;
+              soffset++;
+              doffset++;
             }
-          regMove (dst, src, AOP_SIZE (result), TRUE);
+          regMove (dst, src, AOP_SIZE (result) - byteoffset, TRUE);
         }
       else
         {
           while (size--)
             {
-              cheapMove (AOP (result), offset, AOP (left), offset);
-              offset++;
+              cheapMove (AOP (result), doffset, AOP (left), soffset);
+              soffset++;
+              doffset++;
             }
         }
+      size = byteoffset;
+      doffset = AOP_SIZE (result) - byteoffset;
+      while (size--)
+        cheapMove (AOP (result), doffset++, ASMOP_ZERO, 0);
     }
+
+  shift_by_one = (shift_by_lit && shiftcount == 1);
+  shift_by_zero = (shift_by_lit && shiftcount == 0);
 
   if (!regalloc_dry_run)
     {
@@ -9005,9 +9026,12 @@ genRightShift (const iCode * ic)
 
   if (shift_by_zero)
     goto end;
-  else if (shift_by_lit)
-    cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
-  else
+  else if (shift_by_lit && shiftcount > 1)
+    {
+      emit2 ("ld %s, !immedbyte", countreg == A_IDX ? "a" : regsZ80[countreg].name, shiftcount);
+      regalloc_dry_run_cost += 2;
+    }
+  else if (!shift_by_lit)
     {
       emit2 ("inc %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
       regalloc_dry_run_cost += 1;
@@ -9022,8 +9046,8 @@ genRightShift (const iCode * ic)
     spillPair (PAIR_HL);
 
   while (size)
-    {
-      if (IS_RAB && !(is_signed && first) && size >= 2 && AOP_TYPE (result) == AOP_REG &&
+    { 
+      if (IS_RAB && !(is_signed && first) && size >= 2 && byteoffset < 2 && AOP_TYPE (result) == AOP_REG &&
         (getPartPairId (AOP (result), offset - 1) == PAIR_HL || getPartPairId (AOP (result), offset - 1) == PAIR_DE))
         {
           if (first)
@@ -9035,6 +9059,8 @@ genRightShift (const iCode * ic)
           regalloc_dry_run_cost++;
           size -= 2, offset -= 2;
         }
+      else if (!is_signed && first && byteoffset--) // Skip known 0 bytes
+        size--, offset--;
       else if (first)
         {
           emit3_o (is_signed ? A_SRA : A_SRL, AOP (result), offset, 0, 0);

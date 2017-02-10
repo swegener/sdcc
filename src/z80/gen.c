@@ -2584,7 +2584,7 @@ canAssignToPtr (const char *s)
 }
 
 static bool
-canAssignToPtr3 (const asmop * aop)
+canAssignToPtr3 (const asmop *aop)
 {
   if (aop->type == AOP_ACC || aop->type == AOP_REG || aop->type == AOP_HLREG)
     return (TRUE);
@@ -2879,7 +2879,7 @@ aopPut3 (asmop * op1, int offset1, asmop * op2, int offset2)
 
 // Move, but try not to.
 static void
-cheapMove (asmop * to, int to_offset, asmop * from, int from_offset)
+cheapMove (asmop *to, int to_offset, asmop *from, int from_offset)
 {
   /* Todo: Longer list of moves that can be optimized out. */
   if (to->type == AOP_ACC && from->type == AOP_ACC && to_offset == from_offset)
@@ -8549,6 +8549,7 @@ genLeftShift (const iCode * ic)
   int shiftcount;
   int byteshift = 0;
   bool started;
+  bool save_a;
 
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);
@@ -8580,7 +8581,7 @@ genLeftShift (const iCode * ic)
     (AOP_SIZE (result) < 3 || AOP (result)->aopu.aop_reg[2]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
     (AOP_SIZE (result) < 4 || AOP (result)->aopu.aop_reg[3]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx)))))
     countreg = AOP (right)->aopu.aop_reg[0]->rIdx;
-  else if (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG) &&
+  else if (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG || shift_by_lit) &&
     (AOP_TYPE (result) != AOP_REG ||
     AOP (result)->aopu.aop_reg[0]->rIdx != B_IDX &&
     (AOP_SIZE (result) < 2 || AOP (result)->aopu.aop_reg[1]->rIdx != B_IDX &&
@@ -8593,7 +8594,9 @@ genLeftShift (const iCode * ic)
   if (!shift_by_lit)
     cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
 
-  if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
+  save_a = !(AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) != AOP_REG || !IS_GB &&
+    (AOP_TYPE (left) == AOP_STK && canAssignToPtr3 (right->aop) || AOP_TYPE (right) == AOP_STK && canAssignToPtr3 (left->aop)));
+  if (save_a)
     _push (PAIR_AF);
 
   /* now move the left to the result if they are not the
@@ -8650,7 +8653,7 @@ genLeftShift (const iCode * ic)
   size = AOP_SIZE (result);
   offset = 0;
 
-  if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
+  if (save_a)
     _pop (PAIR_AF);
 
   if (shift_by_lit && !shiftcount)
@@ -8912,6 +8915,7 @@ genRightShift (const iCode * ic)
   bool shift_by_lit, shift_by_one, shift_by_zero;
   int shiftcount;
   int byteoffset = 0;
+  bool save_a;
 
   symbol *tlbl = 0, *tlbl1 = 0;
 
@@ -8951,7 +8955,7 @@ genRightShift (const iCode * ic)
     (AOP_SIZE (result) < 3 || AOP (result)->aopu.aop_reg[2]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
     (AOP_SIZE (result) < 4 || AOP (result)->aopu.aop_reg[3]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx)))))
     countreg = AOP (right)->aopu.aop_reg[0]->rIdx;
-  else if (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG) &&
+  else if (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG || shift_by_lit) &&
     (AOP_TYPE (result) != AOP_REG ||
     AOP (result)->aopu.aop_reg[0]->rIdx != B_IDX &&
     (AOP_SIZE (result) < 2 || AOP (result)->aopu.aop_reg[1]->rIdx != B_IDX &&
@@ -8964,7 +8968,9 @@ genRightShift (const iCode * ic)
   if (!shift_by_lit)
     cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
 
-  if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
+  save_a = !(AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) != AOP_REG || !IS_GB &&
+    (AOP_TYPE (left) == AOP_STK && canAssignToPtr3 (right->aop) || AOP_TYPE (right) == AOP_STK && canAssignToPtr3 (left->aop)));
+  if (save_a)
     _push (PAIR_AF);
 
   /* now move the left to the result if they are not the
@@ -9021,7 +9027,7 @@ genRightShift (const iCode * ic)
   size = AOP_SIZE (result);
   offset = size - 1;
 
-  if (AOP_TYPE (left) != AOP_REG || AOP_TYPE (result) != AOP_REG)
+  if (save_a)
     _pop (PAIR_AF);
 
   if (shift_by_zero)

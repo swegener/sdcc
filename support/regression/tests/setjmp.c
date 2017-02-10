@@ -40,7 +40,9 @@ void g(void)
 void f1(void)
 {
 	static int i;
-	int j = setjmp(buf);
+	int j;
+	i= 0;
+	j= setjmp(buf);
 	ASSERT(i == j);
 	i++;
 	if(!j)

@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: itc.cc 496 2016-11-11 12:48:27Z drdani $ */
+/* $Id: itc.cc 644 2017-02-15 12:33:31Z drdani $ */
 
 // prj
 
@@ -140,7 +140,7 @@ cl_itc::print_info(class cl_console_base *con)
       class cl_it_src *is= (class cl_it_src *)(uc->it_sources->at(i));
       con->dd_printf("  0x%06x", is->addr);
       con->dd_printf(" %-3s", (is->enabled())?"en":"dis");
-      con->dd_printf(" %2d", uc->priority_of(is->ie_mask));
+      con->dd_printf(" %2d", uc->priority_of(/*is->ie_mask*/is->nuof));
       con->dd_printf(" %-3s", (is->pending())?"YES":"no");
       con->dd_printf(" %-3s", (is->active)?"act":"no");
       con->dd_printf(" %s", object_name(is));

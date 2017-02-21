@@ -11,6 +11,7 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 MAKEDEP         = @MAKEDEP@
+AR		= @AR@
 
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
@@ -175,7 +176,7 @@ include $(srcdir)/clean.mk
 ucsim_lib: $(top_builddir)/libguiucsim.a
 
 $(top_builddir)/libguiucsim.a: $(OBJECTS) $(UCSIM_OBJECTS)
-	ar -rc $@ $(OBJECTS) $(UCSIM_OBJECTS)
+	$(AR) -rc $@ $(OBJECTS) $(UCSIM_OBJECTS)
 	$(RANLIB) $@
 
 tool_lib: $(top_builddir)/libguitool.a

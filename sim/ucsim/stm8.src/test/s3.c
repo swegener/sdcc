@@ -6,9 +6,6 @@
 
 #include "stm8.h"
 
-//#define CLK_DIVR	(*(volatile uint8_t *)0x50c6)
-//#define CLK_PCKENR1	(*(volatile uint8_t *)0x50c7)
-
 volatile unsigned char *sif= (unsigned char *)0x7fff;
 
 int sifchar(int c)

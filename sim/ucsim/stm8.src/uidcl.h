@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (stm8.src/portcl.h)
+ * Simulator of microcontrollers (stm8.src/uidcl.h)
  *
  * Copyright (C) 2017,17 Drotos Daniel, Talker Bt.
  * 
@@ -25,28 +25,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef PORTCL_HEADER
-#define PORTCL_HEADER
+#ifndef UIDCL_HEADER
+#define UIDCL_HEADER
 
-#include "port_hwcl.h"
+#include "hwcl.h"
 
-
-class cl_port: public cl_hw
+class cl_uid: public cl_hw
 {
- public:
-  class cl_memory_cell *cell_p, *cell_in, *cell_dir;
+ protected:
   t_addr base;
+  //class cl_memory_cell *regs[12];
  public:
-  cl_port(class cl_uc *auc, t_addr abase/*, int aid*/, const char *aname);
+  cl_uid(class cl_uc *auc, t_addr abase);
   virtual int init(void);
-  virtual void reset(void);
 
+  virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
-
   virtual void print_info(class cl_console_base *con);
 };
 
-
 #endif
 
-/* End of stm8.src/portcl.h */
+/* End of stm8.src/uidcl.h */

@@ -1,63 +1,11 @@
 // Source code under CC0 1.0
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "stm8.h"
 
-int putchar(int c)
-{
-  while(!(
-	  USART->sr
-	  //USART1_SR
-	  & USART_SR_TXE));
-  
-  USART->dr
-    //USART1_DR
-    = c;
-  return c;
-}
-
-
-volatile uint8_t rx_buf[8];
-volatile uint8_t first_free= 0;
-volatile uint8_t last_used= 0;
-
-void isr_rx(void) __interrupt(USART_RX_IRQ/*28*/)
-{
-  volatile uint8_t d;
-  if (
-      USART->sr
-      //USART1_SR
-      & USART_SR_RXNE)
-    {
-      uint8_t n;
-      d=
-	USART->dr
-	//USART1_DR
-	;
-      n= (first_free+1)%8;
-      if (n != last_used)
-	{
-	  rx_buf[first_free]= d;
-	  first_free= n;
-	}
-    }
-}
-
-char received()
-{
-  return first_free != last_used;
-}
-
-char getchar()
-{
-  uint8_t o;
-  while (!received())
-    ;
-  o= last_used;
-  last_used= (last_used+1)%8;
-  return rx_buf[o];
-}
+#include "serial.h"
 
 void
 print_bl()
@@ -78,7 +26,58 @@ print_bl()
     }
   printf("%c\n", 3);
 }
-	 
+
+#define DELIM " ,"
+
+void
+proc_cmd(char *cmd)
+{
+  int i;
+  char *s= strtok(cmd, DELIM);
+  
+  if (s)
+    {
+      if (strcmp(s, "bl") == 0)
+	print_bl();
+      if (strcmp(s, "uid") == 0)
+	{
+#if defined UID
+	  uint8_t *p= UID;
+	  printf("0x%04x ", p);
+	  for (i= 0; i < 12; i++)
+	    printf("%02x ", p[i]);
+	  printf("\n");
+#else
+	  printf("no uid\n");
+#endif
+	}
+    }
+}
+
+char cmd[100];
+
+void
+proc_input(char c)
+{
+  int l= strlen(cmd);
+
+  printf("%c", c);
+  if ((c == '\n') ||
+      (c == '\r'))
+    {
+      proc_cmd(cmd);
+      cmd[0]= 0;
+    }
+  else
+    {
+      if (l < 99)
+	{
+	  cmd[l++]= c;
+	  cmd[l]= 0;
+	}
+    }
+}
+  
 void main(void)
 {
   unsigned long i = 0;
@@ -111,17 +110,13 @@ void main(void)
     |= USART_CR2_RIEN;
   EI;
 
+  cmd[0]= 0;
   for(;;)
     {
-      if (received())
+      if (serial_received())
 	{
 	  char c= getchar();
-	  if (c == '=')
-	    {
-	      print_bl();
-	    }
-	  else
-	    printf("%c", c);
+	  proc_input(c);
 	}
     }
 }

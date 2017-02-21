@@ -131,6 +131,25 @@ cl_z80::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
 
+  inputs= new cl_address_space("inputs", 0, 0x10000, 8);
+  inputs->init();
+  chip= new cl_memory_chip("in_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(inputs, chip, 0, 0xffff, 0);
+  ad->init();
+  inputs->decoders->add(ad);
+  address_spaces->add(inputs);
+  outputs= new cl_address_space("outputs", 0, 0x10000, 8);
+  outputs->init();
+  chip= new cl_memory_chip("out_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(outputs, chip, 0, 0xffff, 0);
+  ad->init();
+  outputs->decoders->add(ad);
+  address_spaces->add(outputs);
+  
   regs8= new cl_address_space("regs8", 0, 16, 8);
   regs8->init();
   regs8->get_cell(0)->decode((t_mem*)&regs.A);
@@ -775,11 +794,12 @@ t_mem       cl_z80::peek1 ( void ) {
 
 u8_t  cl_z80:: in_byte( u16_t ioaddr )
 {
-  return 0;
+  return inputs->read(ioaddr);
 }
 
 void        cl_z80::out_byte( u16_t ioaddr, u8_t io_val )
 {
+  outputs->write(ioaddr, io_val);
   return;
 }
 

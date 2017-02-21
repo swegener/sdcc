@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8cl.h 613 2017-01-26 20:09:25Z drdani $ */
+/* $Id: stm8cl.h 649 2017-02-16 08:45:32Z drdani $ */
 
 #ifndef STM8CL_HEADER
 #define STM8CL_HEADER
@@ -65,6 +65,7 @@ public:
   virtual char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
+  virtual void mk_port(t_addr base, chars n);
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
 

@@ -59,6 +59,7 @@ void
 cl_clk::write(class cl_memory_cell *cell, t_mem *val)
 {
   cl_clk_event e;
+  hw_event ev;
   
   if ((cell == pckenr1) ||
       (cell == pckenr2) ||
@@ -66,12 +67,23 @@ cl_clk::write(class cl_memory_cell *cell, t_mem *val)
     {
       cell->set(*val);
       e.set(HW_TIMER, 1);
-      inform_partners(tim(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
-      inform_partners(tim(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
-      inform_partners(tim(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
-      inform_partners(tim(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
-      inform_partners(tim(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
-      inform_partners(tim(e.id  )?EV_CLK_ON:EV_CLK_OFF, &e);
+      ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
+      e.id= 2;
+      ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
+      e.id= 3;
+      ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
+      e.id= 4;
+      ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
+      e.id= 5;
+      ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
+      e.id= 6;
+      ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
       e.set(HW_UART, 1);
       inform_partners(usart(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
       inform_partners(usart(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
@@ -200,7 +212,7 @@ cl_clk_all::tim(int id)
   switch (id)
     {
     case 1:
-      return pckenr2 && (pckenr2->get() & 0x01);
+      return pckenr2 && (pckenr2->get() & 0x02);
     case 2:
       return pckenr1 && (pckenr1->get() & 0x01);
     case 3:

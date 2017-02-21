@@ -59,6 +59,11 @@
 
 #define DEV_STM8L101	0x00001000
 
+#define DEV_STM8LDISC	DEV_STM8L15x46
+#define DEV_LDISC	DEV_STM8L15x46
+#define DEV_STM8SDISC	DEV_STM8S105
+#define DEV_SDISC	DEV_STM8S105
+
 #ifndef DEVICE
 #define DEVICE DEV_STM8S208
 #endif
@@ -138,10 +143,62 @@ struct GPIO_t {
 #endif
 
 
+/* Timers
+ */
+
+/* bits of control 1 register */
+#define TIM_CR1_CEN	(1 << 0)
+
+/* Bits of interrupt enable register */
+#define TIM_IER_UIE	(1 << 0)
+
+/* Bits of interrupt flag register */
+#define TIM_SR1_UIF	(1 << 0)
+
+/* Bits of event generator register */
+#define TIM_EGR_UG	(1 << 0)
+
 /* TIM1
  */
 
-#if (DEVICE & DEV_STM8ALL)
+#if (DEVICE & DEV_STM8SAF)
+struct TIM1_t {
+  volatile uint8_t cr1;		//=  0;
+  volatile uint8_t cr2;		//=  1;
+  volatile uint8_t smcr;	//=  2;
+  volatile uint8_t etr;		//=  3;
+  volatile uint8_t ier;		//=  4;
+  volatile uint8_t sr1;		//=  5;
+  volatile uint8_t sr2;		//=  6;
+  volatile uint8_t egr;		//=  7;
+  volatile uint8_t ccmr1;	//=  8;
+  volatile uint8_t ccmr2;	//=  9;
+  volatile uint8_t ccmr3;	//= 10;
+  volatile uint8_t ccmr4;	//= 11;
+  volatile uint8_t ccer1;	//= 12;
+  volatile uint8_t ccer2;	//= 13;
+  volatile uint8_t cntrh;	//= 14;
+  volatile uint8_t cntrl;	//= 15;
+  volatile uint8_t pscrh;	//= 16;
+  volatile uint8_t pscrl;	//= 17;
+  volatile uint8_t arrh;	//= 18;
+  volatile uint8_t arrl;	//= 19;
+  volatile uint8_t rcr;		//= 20;
+  volatile uint8_t ccr1h;	//= 21;
+  volatile uint8_t ccr1l;	//= 22;
+  volatile uint8_t ccr2h;	//= 23;
+  volatile uint8_t ccr2l;	//= 24;
+  volatile uint8_t ccr3h;	//= 25;
+  volatile uint8_t ccr3l;	//= 26;
+  volatile uint8_t ccr4h;	//= 27;
+  volatile uint8_t ccr4l;	//= 28;
+  volatile uint8_t bkr;		//= 29;
+  volatile uint8_t dtr;		//= 30;
+  volatile uint8_t oisr;	//= 31;
+};
+#define TIM1_UP_IRQ	11
+#define TIM1_CC_IRQ	12
+#elif (DEVICE & DEV_STM8ALL)
 struct TIM1_t {
   volatile uint8_t cr1;		//=  0;
   volatile uint8_t cr2;		//=  1;
@@ -177,6 +234,8 @@ struct TIM1_t {
   volatile uint8_t dtr;		//= 31;
   volatile uint8_t oisr;	//= 32;
 };
+#define TIM1_UP_IRQ	23
+#define TIM1_CC_IRQ	24
 #endif
 
 #if (DEVICE & DEV_STM8S) || (DEVICE & DEV_STM8AF)
@@ -189,6 +248,131 @@ struct TIM1_t {
   (DEVICE & DEV_STM8L15x8) || \
   (DEVICE & DEV_STM8L162)
 #define TIM1 ((struct TIM1_t *)0x52B0)
+#endif
+
+/* TIM2
+ */
+
+#if ((DEVICE & DEV_STM8S005) || \
+     (DEVICE & DEV_STM8S007) || \
+     (DEVICE & DEV_STM8S105) || \
+     (DEVICE & DEV_STM8S207) || \
+     (DEVICE & DEV_STM8S208) || \
+     (DEVICE & DEV_STM8AF52) ||	\
+     (DEVICE & DEV_STM8AF62_46))
+struct TIM2_t {
+  volatile uint8_t cr1;		//=  0;
+  volatile uint8_t ier;		//=  1;
+  volatile uint8_t sr1;		//=  2;
+  volatile uint8_t sr2;		//=  3;
+  volatile uint8_t egr;		//=  4;
+  volatile uint8_t ccmr1;	//=  5;
+  volatile uint8_t ccmr2;	//=  6;
+  volatile uint8_t ccmr3;	//=  7;
+  volatile uint8_t ccer1;	//=  8;
+  volatile uint8_t ccer2;	//=  9;
+  volatile uint8_t cntrh;	//= 10;
+  volatile uint8_t cntrl;	//= 11;
+  volatile uint8_t pscrl;	//= 12;
+  volatile uint8_t arrh;	//= 13;
+  volatile uint8_t arrl;	//= 14;
+  volatile uint8_t ccr1h;	//= 15;
+  volatile uint8_t ccr1l;	//= 0x10;
+  volatile uint8_t ccr2h;	//= 0x11;
+  volatile uint8_t ccr2l;	//= 0x12;
+  volatile uint8_t ccr3h;	//= 0x13;
+  volatile uint8_t ccr3l;	//= 0x14;
+};
+#define TIM2_UP_IRQ 13
+#define TIM2_CC_IRQ 14
+#define TIM2 ((struct TIM2_t *)0x5300)
+#elif ((DEVICE & DEV_STM8S003) || \
+       (DEVICE & DEV_STM8S103))
+struct TIM2_t {
+  volatile uint8_t cr1;		//=  0;
+  volatile uint8_t _dummy1;	//=  1;
+  volatile uint8_t _dummy2;	//=  2;
+  volatile uint8_t ier;		//=  3;
+  volatile uint8_t sr1;		//=  4;
+  volatile uint8_t sr2;		//=  5;
+  volatile uint8_t egr;		//=  6;
+  volatile uint8_t ccmr1;	//=  7;
+  volatile uint8_t ccmr2;	//=  8;
+  volatile uint8_t ccmr3;	//=  9;
+  volatile uint8_t ccer1;	//= 10;
+  volatile uint8_t ccer2;	//= 11;
+  volatile uint8_t cntrh;	//= 12;
+  volatile uint8_t cntrl;	//= 13;
+  volatile uint8_t pscrl;	//= 14;
+  volatile uint8_t arrh;	//= 15;
+  volatile uint8_t arrl;	//= 16;
+  volatile uint8_t ccr1h;	//= 0x11;
+  volatile uint8_t ccr1l;	//= 0x12;
+  volatile uint8_t ccr2h;	//= 0x13;
+  volatile uint8_t ccr2l;	//= 0x14;
+  volatile uint8_t ccr3h;	//= 0x15;
+  volatile uint8_t ccr3l;	//= 0x16;
+};
+#define TIM2_UP_IRQ 13
+#define TIM2_CC_IRQ 14
+#define TIM2 ((struct TIM2_t *)0x5300)
+#elif (DEVICE & DEV_STM8ALL)
+struct TIM2_t {
+  volatile uint8_t cr1;		//=  0;
+  volatile uint8_t cr2;		//=  1;
+  volatile uint8_t smcr;	//=  2;
+  volatile uint8_t etr;		//=  3;
+  volatile uint8_t der;		//=  4;
+  volatile uint8_t ier;		//=  5;
+  volatile uint8_t sr1;		//=  6;
+  volatile uint8_t sr2;		//=  7;
+  volatile uint8_t egr;		//=  8;
+  volatile uint8_t ccmr1;	//=  9;
+  volatile uint8_t ccmr2;	//= 0x0a;
+  volatile uint8_t ccer1;	//= 0x0b;
+  volatile uint8_t cntrh;	//= 0x0c;
+  volatile uint8_t cntrl;	//= 0x0d;
+  volatile uint8_t pscrl;	//= 0x0e;
+  volatile uint8_t arrh;	//= 0x0f;
+  volatile uint8_t arrl;	//= 0x10;
+  volatile uint8_t ccr1h;	//= 0x11;
+  volatile uint8_t ccr1l;	//= 0x12;
+  volatile uint8_t ccr2h;	//= 0x13;
+  volatile uint8_t ccr2l;	//= 0x14;
+  volatile uint8_t bkr;		//= 0x15;
+  volatile uint8_t oisr;	//= 0x16;
+};
+#define TIM2_UP_IRQ 19
+#define TIM2_CC_IRQ 20
+#define TIM2 ((struct TIM2_t *)0x5250)
+#elif (DEVICE & DEV_STM8L101)
+struct TIM2_t {
+  volatile uint8_t cr1;		//=  0;
+  volatile uint8_t cr2;		//=  1;
+  volatile uint8_t smcr;	//=  2;
+  volatile uint8_t etr;		//=  3;
+  volatile uint8_t ier;		//=  4;
+  volatile uint8_t sr1;		//=  5;
+  volatile uint8_t sr2;		//=  6;
+  volatile uint8_t egr;		//=  7;
+  volatile uint8_t ccmr1;	//=  8;
+  volatile uint8_t ccmr2;	//= 0x09;
+  volatile uint8_t ccer1;	//= 0x0a;
+  volatile uint8_t cntrh;	//= 0x0b;
+  volatile uint8_t cntrl;	//= 0x0c;
+  volatile uint8_t pscrl;	//= 0x0d;
+  volatile uint8_t arrh;	//= 0x0e;
+  volatile uint8_t arrl;	//= 0x0f;
+  volatile uint8_t ccr1h;	//= 0x10;
+  volatile uint8_t ccr1l;	//= 0x11;
+  volatile uint8_t ccr2h;	//= 0x12;
+  volatile uint8_t ccr2l;	//= 0x13;
+  volatile uint8_t bkr;		//= 0x14;
+  volatile uint8_t oisr;	//= 0x15;
+};
+#define TIM2_UP_IRQ 19
+#define TIM2_CC_IRQ 20
+#define TIM2 ((struct TIM2_t *)0x5250)
 #endif
 
 /* USART
@@ -461,6 +645,47 @@ struct USART4_saf_t {
 #define USART_RX_IRQ USART4_RX_IRQ
 #endif
 #endif
+#if ((DEVICE & DEV_STM8S003) || \
+     (DEVICE & DEV_STM8S005) || \
+     (DEVICE & DEV_STM8S103) || \
+     (DEVICE & DEV_STM8S105) || \
+     (DEVICE & DEV_STM8S903) || \
+     (DEVICE & DEV_STM8AF62_12) || \
+     (DEVICE & DEV_STM8AF62_46))
+#define USART_TX_GPIO GPIOD
+#define USART_RX_GPIO GPIOD
+#define USART_TX_PIN  5
+#define USART_RX_PIN  6
+#endif
+#if ((DEVICE & DEV_STM8S007) ||\
+     (DEVICE & DEV_STM8S207) ||\
+     (DEVICE & DEV_STM8S208) ||\
+     (DEVICE & DEV_STM8AF52))
+#define USART_TX_GPIO GPIOA
+#define USART_RX_GPIO GPIOA
+#define USART_TX_PIN  5
+#define USART_RX_PIN  4
+#endif
+#if (DEVICE & DEV_STM8AL) ||\
+  (DEVICE & DEV_STM8L052C) ||\
+  (DEVICE & DEV_STM8L052R) ||\
+  (DEVICE & DEV_STM8L151x23) ||\
+  (DEVICE & DEV_STM8L15x46) ||\
+  (DEVICE & DEV_STM8L15x8) ||\
+  (DEVICE & DEV_STM8L162) ||\
+  (DEVICE & DEV_STM8L101)
+#define USART_TX_GPIO GPIOC
+#define USART_RX_GPIO GPIOC
+#define USART_TX_PIN  3
+#define USART_RX_PIN  2
+#endif
+#if (DEVICE & DEV_STM8L051)
+/* non-default AF only because C2 and C3 are not available */
+#define USART_TX_GPIO
+#define USART_RX_GPIO
+#define USART_TX_PIN 
+#define USART_RX_PIN 
+#endif
 
 /* CLK
  */
@@ -517,7 +742,25 @@ struct CLK_t {
 
 #define CLK ((struct CLK_t *)0x50C0)
 
+/* UID
+ */
 
+#if (DEVICE & DEV_STM8S103) || \
+  (DEVICE & DEV_STM8S903) || \
+  (DEVICE & DEV_STM8AF62_12)
+#define UID ((uint8_t*)0x4865)
+#endif
+#if (DEVICE & DEV_STM8AL) || \
+  (DEVICE & DEV_STM8L151x23) || \
+  (DEVICE & DEV_STM8L15x46) ||	\
+  (DEVICE & DEV_STM8L15x8) || \
+  (DEVICE & DEV_STM8L162)
+#define UID ((uint8_t*)0x4926)
+#endif
+#if (DEVICE & DEV_STM8L101)
+#define UID ((uint8_t*)0x4925)
+#endif
+  
 #define EI __asm__("rim")
 #define DI __asm__("sim")
 

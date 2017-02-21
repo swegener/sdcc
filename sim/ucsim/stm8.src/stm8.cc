@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8.cc 621 2017-02-03 10:13:54Z drdani $ */
+/* $Id: stm8.cc 650 2017-02-16 10:48:00Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -56,6 +56,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "timercl.h"
 #include "portcl.h"
 #include "clkcl.h"
+#include "uidcl.h"
+#include "bl.h"
 
 /*******************************************************************/
 
@@ -146,6 +148,47 @@ cl_stm8::get_mem_size(enum mem_class type)
  return(cl_uc::get_mem_size(type));
 }
 */
+
+ /*
+   L15x46 uid: 0x4926 00 5b 00 16 11 47 30 31 38 35 35 36
+ */
+
+static class cl_port_ui *d= NULL;
+static int puix= 1;
+static int puiy= 4;
+static int puik= 0;
+static int puis= 1;
+static const char *puiks= keysets[puik];
+static class cl_port_data pd;
+
+void
+cl_stm8::mk_port(t_addr base, chars n)
+{
+  class cl_port *p;
+  add_hw(p= new cl_port(this, base, n));
+  p->init();
+
+  pd.set_name(n);
+  pd.cell_p  = p->cell_p;
+  pd.cell_in = p->cell_in;
+  pd.cell_dir= p->cell_dir;
+  pd.keyset  = chars(puiks);
+  pd.basx    = puix;
+  pd.basy    = puiy;
+  d->add_port(&pd, puis++);
+  
+  if ((puix+= 20) > 80)
+    {
+      puix= 1;
+      if ((puiy+= 7) > 20)
+	;
+    }
+  if ((puik+= 1) > 6)
+    puiks= NULL;
+  else
+    puiks= keysets[puik];
+}
+
 void
 cl_stm8::mk_hw_elements(void)
 {
@@ -197,6 +240,10 @@ cl_stm8::mk_hw_elements(void)
   o->init();
   o->hide();
 
+  add_hw(d= new cl_port_ui(this, 0, "dport"));
+  d->init();
+  pd.init();
+  
   add_hw(h= new cl_stm8_cpu(this));
   h->init();
   
@@ -273,22 +320,17 @@ cl_stm8::mk_hw_elements(void)
   itc->init();
 
   {
-    add_hw(h= new cl_port(this, 0x5000, "pa"));
-    h->init();
-    add_hw(h= new cl_port(this, 0x5005, "pb"));
-    h->init();
-    add_hw(h= new cl_port(this, 0x500a, "pc"));
-    h->init();
-    add_hw(h= new cl_port(this, 0x500f, "pd"));
-    h->init();
+    mk_port(0x5000, "pa");
+    mk_port(0x5005, "pb");
+    mk_port(0x500a, "pc");
+    mk_port(0x500f, "pd");
   }
   
   if (type->type == CPU_STM8S)
     {
       // all S and AF
-      add_hw(h= new cl_port(this, 0x5014, "pe"));
-      h->init();
-      add_hw(h= new cl_port(this, 0x5019, "pf"));
+      mk_port(0x5014, "pe");
+      mk_port(0x5019, "pf");
       h->init();
       if (type->subtype & (DEV_STM8S005|
 			   DEV_STM8S007|
@@ -298,14 +340,11 @@ cl_stm8::mk_hw_elements(void)
 			   DEV_STM8AF52|
 			   DEV_STM8AF62_46))
 	{
-	  add_hw(h= new cl_port(this, 0x501e, "pg"));
-	  h->init();
+	  mk_port(0x501e, "pg");
 	  if (type->subtype != DEV_STM8AF62_46)
 	    {
-	      add_hw(h= new cl_port(this, 0x5023, "ph"));
-	      h->init();
-	      add_hw(h= new cl_port(this, 0x5028, "pi"));
-	      h->init();
+	      mk_port(0x5023, "ph");
+	      mk_port(0x5028, "pi");
 	    }
 	}
       add_hw(h= new cl_rst(this, 0x50b3, 0x1f));
@@ -336,7 +375,7 @@ cl_stm8::mk_hw_elements(void)
 	  add_hw(h= new cl_tim6_saf(this, 6, 0x5340));
 	  h->init();
 	}
-      if (type->subtype & (DEV_STM8S903|
+      if (type->subtype & (DEV_STM8S003|
 			   DEV_STM8S103))
 	{
 	  add_hw(h= new cl_tim2_saf_b(this, 2, 0x5300));
@@ -350,10 +389,8 @@ cl_stm8::mk_hw_elements(void)
     {
       if (type->subtype != DEV_STM8L051)
 	{
-	  add_hw(h= new cl_port(this, 0x5014, "pe"));
-	  h->init();
-	  add_hw(h= new cl_port(this, 0x5019, "pf"));
-	  h->init();
+	  mk_port(0x5014, "pe");
+	  mk_port(0x5019, "pf");
 	}
       if (type->subtype & (DEV_STM8AL3xE|
 			   DEV_STM8AL3x8|
@@ -361,14 +398,11 @@ cl_stm8::mk_hw_elements(void)
 			   DEV_STM8L15x8|
 			   DEV_STM8L162))
 	{
-	  add_hw(h= new cl_port(this, 0x501e, "pg"));
-	  h->init();
+	  mk_port(0x501e, "pg");
 	  if (type->subtype != DEV_STM8L052R)
 	    {
-	      add_hw(h= new cl_port(this, 0x5023, "ph"));
-	      h->init();
-	      add_hw(h= new cl_port(this, 0x5028, "pi"));
-	      h->init();
+	      mk_port(0x5023, "ph");
+	      mk_port(0x5028, "pi");
 	    }
 	}
       add_hw(h= new cl_rst(this, 0x50b0+1, 0x3f));
@@ -416,7 +450,30 @@ cl_stm8::mk_hw_elements(void)
       add_hw(h= new cl_tim4_l101(this, 4, 0x52E0));
       h->init();
     }
-    
+
+  // UID
+  if (type->subtype & (DEV_STM8S103 |
+		       DEV_STM8S903 |
+		       DEV_STM8AF62_12))
+    {
+      add_hw(h= new cl_uid(this, 0x4865));
+      h->init();
+    }
+  else if (type->subtype & (DEV_STM8AL |
+			    DEV_STM8L151x23 |
+			    DEV_STM8L15x46 |
+			    DEV_STM8L15x8 |
+			    DEV_STM8L162))
+    {
+      add_hw(h= new cl_uid(this, 0x4926));
+      h->init();
+    }
+  else if (type->subtype & (DEV_STM8L101))
+    {
+      add_hw(h= new cl_uid(this, 0x4925));
+      h->init();
+    }
+  
   //add_hw(h= new cl_tim235(this, 3, 0x5320));
   //h->init();
   //add_hw(h= new cl_tim46(this, 4, 0x5340));
@@ -437,29 +494,36 @@ cl_stm8::make_memories(void)
   class cl_address_decoder *ad;
   class cl_memory_chip /* *chip,*/ *rom_chip;
 
-  c= rom_chip= new cl_memory_chip("rom_chip", 0x20000, 8);
+  c= rom_chip= NULL;/*new cl_memory_chip("rom_chip", 0x20000, 8, 0);
   rom_chip->init();
-  memchips->add(rom_chip);
+  memchips->add(rom_chip);*/
 
   ram_chip= new cl_memory_chip("ram_chip", 0x1800, 8);
   ram_chip->init();
   memchips->add(ram_chip);
-  eeprom_chip= new cl_memory_chip("eeprom_chip", 0x0800, 8);
+  eeprom_chip= new cl_memory_chip("eeprom_chip", 0x0800, 8, 0);
   eeprom_chip->init();
   memchips->add(eeprom_chip);
-  option_chip= new cl_memory_chip("option_chip", 0x0080, 8);
+  option_chip= new cl_memory_chip("option_chip", 0x0800, 8, 0);
   option_chip->init();
   memchips->add(option_chip);
   io_chip= new cl_memory_chip("io_chip", 0x0800, 8);
   io_chip->init();
   memchips->add(io_chip);
-  boot_chip= new cl_memory_chip("boot_chip", 0x0800, 8);
+  if (type->subtype & DEV_STM8S105)
+    boot_chip= new cl_memory_chip("boot_chip_s105", bl_s105_length, 8, bl_s105);
+  else if (type->subtype & DEV_STM8L15x46)
+    boot_chip= new cl_memory_chip("boot_chip_l15x46", bl_l15x46_length, 8, bl_l15x46);
+  /*else if (type->subtype & DEV_STM8L101)
+    boot_chip= new cl_memory_chip("boot_chip_l101", bl_l15x46_length, 8, bl_l15x46);*/
+  else
+    boot_chip= new cl_memory_chip("boot_chip", 0x0800, 8);
   boot_chip->init();
   memchips->add(boot_chip);
   cpu_chip= new cl_memory_chip("cpu_chip", 0x0100, 8);
   cpu_chip->init();
   memchips->add(cpu_chip);
-  flash_chip= new cl_memory_chip("flash_chip", 0x20000, 8);
+  flash_chip= new cl_memory_chip("flash_chip", 0x20000, 8, 0);
   flash_chip->init();
   memchips->add(flash_chip);
   /*
@@ -468,41 +532,48 @@ cl_stm8::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
   */
-  ad= new cl_address_decoder(as= address_space("rom"), ram_chip, 0, 0x17ff, 0);
+  ad= new cl_address_decoder(as= rom, ram_chip, 0, 0x17ff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
-  ad= new cl_address_decoder(as= address_space("rom"), eeprom_chip, 0x4000, 0x47ff, 0);
+  ad= new cl_address_decoder(as= rom, eeprom_chip, 0x4000, 0x47ff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
-  ad= new cl_address_decoder(as= address_space("rom"), option_chip, 0x4800, 0x487f, 0);
+  ad= new cl_address_decoder(as= rom, option_chip, 0x4800, 0x4fff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
-  ad= new cl_address_decoder(as= address_space("rom"), io_chip, 0x5000, 0x57ff, 0);
+  ad= new cl_address_decoder(as= rom, io_chip, 0x5000, 0x57ff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
-  ad= new cl_address_decoder(as= address_space("rom"), boot_chip, 0x6000, 0x67ff, 0);
+  ad= new cl_address_decoder(as= rom, boot_chip, 0x6000, 0x67ff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+  rom->set_cell_flag(0x6000, 0x67ff, true, CELL_READ_ONLY);
+
+  ad= new cl_address_decoder(as= rom, cpu_chip, 0x7f00, 0x7fff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
 
-  ad= new cl_address_decoder(as= address_space("rom"), cpu_chip, 0x7f00, 0x7fff, 0);
+  ad= new cl_address_decoder(as= rom, flash_chip, 0x8000, 0x27fff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
-
-  ad= new cl_address_decoder(as= address_space("rom"), flash_chip, 0x8000, 0x27fff, 0);
-  ad->init();
-  as->decoders->add(ad);
-  ad->activate(0);
-
+  class cl_option *o= application->options->get_option("writable_flash");
+  bool wv= false;
+  if (o)
+    o->get_value(&wv);
+  if (!wv)
+    rom->set_cell_flag(0x8000, 0x27fff, true, CELL_READ_ONLY);
+  
   regs8= new cl_address_space("regs8", 0, 2, 8);
   regs8->init();
   regs8->get_cell(0)->decode((t_mem*)&regs.A);
@@ -1745,7 +1816,7 @@ cl_stm8::priority_of(uchar nuof_it)
   t_mem cv;
   int levels[4]= { 2, 1, 0, 3 };
 
-  if (nuof_it > 29)
+  if (nuof_it > 31)
     return 0;
   i1_mask= 2 << ((nuof_it % 4) * 2);
   i0_mask= 1 << ((nuof_it % 4) * 2);

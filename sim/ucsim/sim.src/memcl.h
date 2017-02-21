@@ -42,22 +42,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_event_handler;
 
-
-// Cell types
-#define CELL_NORMAL	0x00	/* Nothing special */
-#define CELL_HW_READ	0x01	/* Hw handles read */
-#define CELL_HW_WRITE	0x02	/* Hw catches write */
-//#define CELL_INST	0x04	/* Marked as instruction */
-//#define CELL_FETCH_BRK	0x08	/* Fetch breakpoint */
-#define CELL_READ_BRK	0x10	/* Read event breakpoint */
-#define CELL_WRITE_BRK	0x20	/* Write event breakpoint */
-
 // Cell flags
 enum cell_flag {
   CELL_NONE		= 0x00,
   CELL_VAR		= 0x01, /* At least one variable points to it */
   CELL_INST		= 0x04,	/* Marked as instruction */
   CELL_FETCH_BRK	= 0x08,	/* Fetch breakpoint */
+  CELL_READ_ONLY	= 0x10, /* Cell is readonly */
   CELL_NON_DECODED	= 0x40	/* Cell is not decoded (yet) */
 };
 
@@ -247,6 +238,7 @@ class cl_cell_data: public cl_abs_base
   t_mem *data;
   virtual t_mem d();
   virtual void d(t_mem v);
+  virtual void dl(t_mem v);
 };
 
 class cl_memory_cell: public cl_cell_data
@@ -285,7 +277,8 @@ class cl_memory_cell: public cl_cell_data
   virtual t_mem get(void);
   virtual t_mem write(t_mem val);
   virtual t_mem set(t_mem val);
-
+  virtual t_mem download(t_mem val);
+  
   virtual t_mem add(long what);
   virtual t_mem wadd(long what);
 
@@ -382,14 +375,17 @@ class cl_address_space: public cl_memory
   virtual t_mem get(t_addr addr);
   virtual t_mem write(t_addr addr, t_mem val);
   virtual void set(t_addr addr, t_mem val);
+  virtual void download(t_addr, t_mem val);
+  
   virtual t_mem wadd(t_addr addr, long what);
   virtual void set_bit1(t_addr addr, t_mem bits);
   virtual void set_bit0(t_addr addr, t_mem bits);
-
+  
   virtual class cl_memory_cell *get_cell(t_addr addr);
   virtual int get_cell_flag(t_addr addr);
   virtual bool get_cell_flag(t_addr addr, enum cell_flag flag);
   virtual void set_cell_flag(t_addr addr, bool set_to, enum cell_flag flag);
+  virtual void set_cell_flag(t_addr start_addr, t_addr end_addr, bool set_to, enum cell_flag flag);
   virtual class cl_memory_cell *search_cell(enum cell_flag flag, bool value,
 					    t_addr *addr);
   virtual bool is_owned(class cl_memory_cell *cell, t_addr *addr);
@@ -435,8 +431,10 @@ class cl_memory_chip: public cl_memory
 protected:
   t_mem *array;
   int init_value;
+  bool array_is_mine;
 public:
   cl_memory_chip(const char *id, int asize, int awidth, int initial= -1);
+  cl_memory_chip(const char *id, int asize, int awidth, t_mem *aarray);
   virtual ~cl_memory_chip(void);
   virtual int init(void);
 
@@ -454,7 +452,7 @@ public:
   virtual void set_bit0(t_addr addr, t_mem bits);
 };
 
-
+  
 /*
  * Address decoder
  */

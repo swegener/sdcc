@@ -49,6 +49,7 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS_SHARED	= glob.o itc.o serial.o rst.o timer.o port.o clk.o \
+		  uid.o bl.o \
 		  inst.o \
 		  simstm8.o stm8.o
 OBJECTS_EXE	= sstm8.o
@@ -114,9 +115,9 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-stm8.src: sstm8$(EXEEXT)  shared_lib
+stm8.src: sstm8$(EXEEXT) shared_lib
 
-sstm8$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a
+sstm8$(EXEEXT): $(OBJECTS) $(top_builddir)/*.a bl_source
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
 ifeq ($(dlso_ok),yes)
@@ -152,12 +153,20 @@ bl_l15x46.hex: bl_l15x46.asc
 	srec_cat $< -Ascii_Hex -Output $@ -Intel
 
 bl_l15x46.cc: bl_l15x46.asc
-	srec_cat $< -Ascii_Hex -Output $@ -C-Array bl_l15x46 -INClude
+	srec_cat $< -Ascii_Hex -Output $@ -C-Array bl_l15x46 -INClude -No-CONST
 
 bl_s105.hex: bl_s105.asc
 	srec_cat $< -Ascii_Hex -Output $@ -Intel
 
 bl_s105.cc: bl_s105.asc
-	srec_cat $< -Ascii_Hex -Output $@ -C-Array bl_s105 -INClude
+	srec_cat $< -Ascii_Hex -Output $@ -C-Array bl_s105 -INClude -No-CONST
+
+bl_source: bl.cc bl.h
+
+bl.cc: bl_head.cc bl_l15x46.cc bl_s105.cc
+	cat bl_head.cc bl_l15x46.cc bl_s105.cc|sed 's/unsigned char/t_mem/' >$@
+
+bl.h: bl_l15x46.h bl_s105.h
+	cat bl_l15x46.h bl_s105.h|sed 's/unsigned char/t_mem/' >$@
 
 # End of stm8.src/Makefile.in

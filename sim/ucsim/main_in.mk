@@ -13,6 +13,7 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 MAKEDEP         = @MAKEDEP@
+AR		= @AR@
 
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
@@ -121,7 +122,7 @@ include $(srcdir)/clean.mk
 # My rules
 # --------
 libucsimutil.a: $(OBJECTS)
-	ar -rc $@ $(OBJECTS)
+	$(AR) -rc $@ $(OBJECTS)
 	$(RANLIB) $@
 
 

@@ -44,7 +44,8 @@ public:
   struct t_regs regs;
   class cl_address_space *regs8;
   class cl_address_space *regs16;
-
+  class cl_address_space *inputs;
+  class cl_address_space *outputs;
 public:
   cl_z80(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);

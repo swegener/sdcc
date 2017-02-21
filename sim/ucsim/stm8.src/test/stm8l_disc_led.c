@@ -4,11 +4,7 @@
 #include "stm8.h"
 
 #define PC GPIOC
-
 #define PE GPIOE
-
-//#define CLK_DIVR	(*(volatile uint8_t *)0x50c0)
-//#define CLK_PCKENR2	(*(volatile uint8_t *)0x50c4)
 
 unsigned int clock(void)
 {
@@ -28,7 +24,7 @@ void main(void)
   TIM1->pscrh = 0x3e;
   TIM1->pscrl = 0x80;
   // Enable timer
-  TIM1->cr1 = 0x01;
+  TIM1->cr1 = TIM_CR1_CEN;
 
   // Configure pins
   PE->ddr = 0x80;

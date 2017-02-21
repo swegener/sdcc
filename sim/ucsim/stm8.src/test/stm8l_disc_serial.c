@@ -78,6 +78,14 @@ void main(void)
 	    {
 	      printf("0x%04x\n", a);
 	    }
+	  else if (c == '?')
+	    {
+	      for (i= 0; i < 12; i++)
+		{
+		  printf("%02x", ((uint8_t*)0x4926)[i]);
+		}
+	      printf("\n");
+	    }
 	  else
 	    printf("%c", c);
 	  i= 0;
@@ -85,8 +93,9 @@ void main(void)
       else
       if (i > 147456*2)
 	{
-	  printf("\ntick %d, press any key\n", a++);
+	  printf("\ntick %d 0x%04x, press any key\n", a, a);
 	  i= 0;
+	  a++;
 	}
     }
 }

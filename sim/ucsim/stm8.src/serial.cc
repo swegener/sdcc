@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 611 2017-01-25 20:14:27Z drdani $ */
+/* $Id: serial.cc 623 2017-02-03 18:09:49Z drdani $ */
 
 #include "ddconfig.h"
 

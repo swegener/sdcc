@@ -236,6 +236,7 @@ print_help(char *name)
      "  -g           Go, start simulation\n"
      "  -G           Go, start simulation, quit on stop\n"
      "  -a nr        Specify size of variable space (default=256)\n"
+     "  -w           Writable flash"
      "  -V           Verbose mode\n"
      "  -v           Print out version number and quit\n"
      "  -H           Print out types of known CPUs and quit\n"
@@ -282,7 +283,7 @@ cl_app::proc_arguments(int argc, char *argv[])
   bool /*s_done= DD_FALSE,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
-  strcpy(opts, "c:C:p:PX:vVt:s:S:I:a:hHgGJ_");
+  strcpy(opts, "c:C:p:PX:vVt:s:S:I:a:whHgGJ_");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:k:");
 #endif
@@ -374,6 +375,11 @@ cl_app::proc_arguments(int argc, char *argv[])
 	  fprintf(stderr, "Warning: No \"var_size\" option found to set "
 		  "by parameter of -a as variable space size\n");
 	break;
+      case 'w': {
+	if (!options->set_value("writable_flash", this, bool(true)))
+	  fprintf(stderr, "Warning: No \"writable_flash\" option found to set\n");	       
+	break;
+      }
       case 'v':
 	printf("%s: %s\n", argv[0], VERSIONSTR);
         exit(0);
@@ -825,6 +831,11 @@ cl_app::mk_options(void)
 {
   class cl_option *o;
 
+  options->new_option(o= new cl_bool_option(this, "writable_flash",
+					    "Use writable flash chip (-w)"));
+  o->init();
+  o->set_value((bool)false);
+  
   options->new_option(o= new cl_bool_option(this, "null_prompt",
 					    "Use \\0 as prompt (-P)"));
   o->init();

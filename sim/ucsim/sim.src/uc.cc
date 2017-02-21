@@ -845,7 +845,7 @@ cl_uc::set_rom(t_addr addr, t_mem val)
   t_addr size= rom->get_size();
   if (addr < size)
     {
-      rom->set(addr, val);
+      rom->download(addr, val);
       return;
     }
   t_addr bank, caddr;
@@ -862,7 +862,7 @@ cl_uc::set_rom(t_addr addr, t_mem val)
 	}
       //printf("setting %ld/rom[%lx]=%x\n", bank, caddr, val);
       d->switch_to(bank, NULL);
-      rom->set(caddr, val);
+      rom->download(caddr, val);
       d->activate(NULL);
     }
   else

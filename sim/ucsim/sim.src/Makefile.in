@@ -13,6 +13,7 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 MAKEDEP         = @MAKEDEP@
+AR		= @AR@
 
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
@@ -99,7 +100,7 @@ include $(srcdir)/clean.mk
 sim_lib: $(top_builddir)/libsim.a
 
 $(top_builddir)/libsim.a: $(OBJECTS)
-	ar -rc $@ $(OBJECTS)
+	$(AR) -rc $@ $(OBJECTS)
 	$(RANLIB) $@
 
 .cc.o:

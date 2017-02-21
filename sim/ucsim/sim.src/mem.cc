@@ -668,6 +668,12 @@ cl_cell_data::d(t_mem v)
   data?(*data=v):0;
 }
 
+void
+cl_cell_data::dl(t_mem v)
+{
+  data?(*data=v):0;
+}
+
 // bit cell for bit spaces
 
 t_mem
@@ -770,7 +776,7 @@ cl_bit_cell16::d(t_mem v)
 cl_memory_cell::cl_memory_cell(uchar awidth)//: cl_base()
 {
   data= 0;
-  flags= 0;
+  flags= CELL_NON_DECODED;
   width= awidth;
   //*data= 0;
   def_data= 0;
@@ -780,6 +786,13 @@ cl_memory_cell::cl_memory_cell(uchar awidth)//: cl_base()
 #ifdef STATISTIC
   nuof_writes= nuof_reads= 0;
 #endif
+  mask= 1;
+  int w= width;
+  for (--w; w; w--)
+    {
+      mask<<= 1;
+      mask|= 1;
+    }
 }
 
 cl_memory_cell::~cl_memory_cell(void)
@@ -794,14 +807,14 @@ cl_memory_cell::init(void)
 {
   //cl_base::init();
   data= &def_data;
-  flags= CELL_NON_DECODED;
-  mask= 1;
+  //flags= CELL_NON_DECODED;
+  /*mask= 1;
   int w= width;
   for (--w; w; w--)
     {
       mask<<= 1;
       mask|= 1;
-    }
+      }*/
   //set(0/*rand()*/);
   return(0);
 }
@@ -927,6 +940,8 @@ cl_memory_cell::write(t_mem val)
 #endif
   if (operators)
     val= operators->write(val);
+  if (flags & CELL_READ_ONLY)
+    return d();
   if (width == 1)
     d(val);
   else
@@ -937,6 +952,8 @@ cl_memory_cell::write(t_mem val)
 t_mem
 cl_memory_cell::set(t_mem val)
 {
+  if (flags & CELL_READ_ONLY)
+    return d();
   if (width == 1)
     d(val);
   else
@@ -944,7 +961,15 @@ cl_memory_cell::set(t_mem val)
   return /* *data*/d();
 }
 
-
+t_mem
+cl_memory_cell::download(t_mem val)
+{
+  if (width == 1)
+    dl(val);
+  else
+    /* *data=*/dl(val & mask);
+  return /* *data*/d();
+}
 
 t_mem
 cl_memory_cell::add(long what)
@@ -964,21 +989,21 @@ void
 cl_memory_cell::set_bit1(t_mem bits)
 {
   bits&= mask;
-  /*(*data)|=*/d(d()| bits);
+  /*(*data)|=*//*d*/set(d()| bits);
 }
 
 void
 cl_memory_cell::set_bit0(t_mem bits)
 {
   bits&= mask;
-  /*(*data)&=*/d(d()& ~bits);
+  /*(*data)&=*//*d*/set(d()& ~bits);
 }
 
 void
 cl_memory_cell::toggle_bits(t_mem bits)
 {
   bits&= mask;
-  d(d() ^ bits);
+  /*d*/set(d() ^ bits);
 }
 
 
@@ -1162,7 +1187,7 @@ cl_address_space::cl_address_space(const char *id,
     cell= &c8;
   else if (awidth <= 16)
     cell= &c16;
-  cell->init();
+  //cell->init();
   int i;
   for (i= 0; i < size; i++)
     {
@@ -1251,6 +1276,20 @@ cl_address_space::set(t_addr addr, t_mem val)
       return;
     }
   /* *(cella[idx].data)=*/cella[idx].set( val/*&(data_mask)*/);
+}
+
+void
+cl_address_space::download(t_addr addr, t_mem val)
+{
+  t_addr idx= addr-start_address;
+  if (idx >= size ||
+      addr < start_address)
+    {
+      err_inv_addr(addr);
+      dummy->download(val);
+      return;
+    }
+  /* *(cella[idx].data)=*/cella[idx].download( val/*&(data_mask)*/);
 }
 
 t_mem
@@ -1342,6 +1381,15 @@ cl_address_space::set_cell_flag(t_addr addr, bool set_to, enum cell_flag flag)
   else
     cell= &cella[idx];
   cell->set_flag(flag, set_to);
+}
+
+void
+cl_address_space::set_cell_flag(t_addr start_addr, t_addr end_addr, bool set_to, enum cell_flag flag)
+{
+  t_addr a;
+
+  for (a= start_addr; a <= end_addr; a++)
+    set_cell_flag(a, set_to, flag);
 }
 
 class cl_memory_cell *
@@ -1604,16 +1652,32 @@ cl_address_space_list::add(class cl_address_space *mem)
  *                                                                  Memory chip
  */
 
-cl_memory_chip::cl_memory_chip(const char *id, int asize, int awidth, int initial):
+cl_memory_chip::cl_memory_chip(const char *id,
+			       int asize,
+			       int awidth,
+			       int initial):
   cl_memory(id, asize, awidth)
 {
   array= (t_mem *)malloc(size * sizeof(t_mem));
   init_value= initial;
+  array_is_mine= true;
+}
+
+cl_memory_chip::cl_memory_chip(const char *id,
+			       int asize,
+			       int awidth,
+			       t_mem *aarray):
+  cl_memory(id, asize, awidth)
+{
+  array= aarray;
+  init_value= 0;
+  array_is_mine= false;
 }
 
 cl_memory_chip::~cl_memory_chip(void)
 {
-  if (array)
+  if (array &&
+      array_is_mine)
     free(array);
 }
 
@@ -1622,10 +1686,13 @@ cl_memory_chip::init(void)
 {
   cl_memory::init();
   int i;
-  for (i= 0; i < size; i++)
-    set(i,
-	(init_value<0)?rand():(init_value)
-	);
+  if (array_is_mine)
+    {
+      for (i= 0; i < size; i++)
+	set(i,
+	    (init_value<0)?rand():(init_value)
+	    );
+    }
   return(0);
 }
 

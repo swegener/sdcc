@@ -13,6 +13,7 @@ CXXCPP		= @CXXCPP@
 RANLIB		= @RANLIB@
 INSTALL	        = @INSTALL@
 MAKEDEP         = @MAKEDEP@
+AR		= @AR@
 
 LEX		= @LEX@
 YACC		= @YACC@
@@ -110,7 +111,7 @@ cmdlex.cc: cmdlex.l cmdpars.hh
 cmdlib: $(top_builddir)/libcmd.a
 
 $(top_builddir)/libcmd.a: $(OBJECTS) $(LOCAL_OBJECTS)
-	ar -rc $@ $(OBJECTS) $(LOCAL_OBJECTS)
+	$(AR) -rc $@ $(OBJECTS) $(LOCAL_OBJECTS)
 	$(RANLIB) $@
 
 .cc.o:

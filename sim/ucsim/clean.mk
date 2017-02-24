@@ -3,7 +3,6 @@
 clean:
 	rm -f *core *[%~] *.[oa] *.so ucsim$(EXEEXT) ucsim.map
 	rm -f .[a-z]*~ ptt
-	$(MAKE) -C example clean
 
 
 # Deleting all files created by configuring or building the program

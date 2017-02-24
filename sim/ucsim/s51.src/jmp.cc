@@ -48,7 +48,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-cl_51core::inst_ajmp_addr(uchar code)
+cl_51core::instruction_01/*inst_ajmp_addr*/(t_mem/*uchar*/ code)
 {
   uchar h, l;
 
@@ -67,7 +67,7 @@ cl_51core::inst_ajmp_addr(uchar code)
  */
 
 int
-cl_51core::inst_jbc_bit_addr(uchar code)
+cl_51core::instruction_10/*inst_jbc_bit_addr*/(t_mem/*uchar*/ code)
 {
   uchar bitaddr, jaddr, b;
 
@@ -100,13 +100,12 @@ cl_51core::inst_jbc_bit_addr(uchar code)
  */
 
 int
-cl_51core::inst_ljmp(uchar code)
+cl_51core::instruction_02/*inst_ljmp*/(t_mem code)
 {
   PC= fetch()*256 + fetch();
   tick(1);
   return(resGO);
 }
-
 
 /*
  * 0x[13579bdf]1 2 24 ACALL addr
@@ -115,7 +114,7 @@ cl_51core::inst_ljmp(uchar code)
  */
 
 int
-cl_51core::inst_acall_addr(uchar code)
+cl_51core::instruction_11/*inst_acall_addr*/(t_mem/*uchar*/ code)
 {
   uchar h, l;
   class cl_memory_cell *stck;
@@ -151,7 +150,7 @@ cl_51core::inst_acall_addr(uchar code)
  */
 
 int
-cl_51core::inst_lcall(uchar code, uint addr, bool intr)
+cl_51core::inst_lcall(t_mem code, uint addr, bool intr)
 {
   uchar h= 0, l= 0;
   t_mem sp, sp_before/*, sp_after*/;
@@ -198,7 +197,7 @@ cl_51core::inst_lcall(uchar code, uint addr, bool intr)
  */
 
 int
-cl_51core::inst_jb_bit_addr(uchar code)
+cl_51core::instruction_20/*inst_jb_bit_addr*/(t_mem/*uchar*/ code)
 {
   uchar bitaddr, jaddr, b;
   //t_addr a;
@@ -225,7 +224,7 @@ cl_51core::inst_jb_bit_addr(uchar code)
  */
 
 int
-cl_51core::inst_ret(uchar code)
+cl_51core::instruction_22/*inst_ret*/(t_mem/*uchar*/ code)
 {
   uchar h= 0, l= 0;
   t_mem sp, sp_before/*, sp_after*/;
@@ -256,7 +255,7 @@ cl_51core::inst_ret(uchar code)
  */
 
 int
-cl_51core::inst_jnb_bit_addr(uchar code)
+cl_51core::instruction_30/*inst_jnb_bit_addr*/(t_mem/*uchar*/ code)
 {
   uchar bitaddr, jaddr, b;
   //t_mem m;
@@ -283,7 +282,7 @@ cl_51core::inst_jnb_bit_addr(uchar code)
  */
 
 int
-cl_51core::inst_reti(uchar code)
+cl_51core::instruction_32/*inst_reti*/(t_mem/*uchar*/ code)
 {
   uchar h= 0, l= 0;
   t_mem sp, sp_before, sp_after;
@@ -324,7 +323,7 @@ cl_51core::inst_reti(uchar code)
  */
 
 int
-cl_51core::inst_jc_addr(uchar code)
+cl_51core::instruction_40/*inst_jc_addr*/(t_mem/*uchar*/ code)
 {
   uchar jaddr;
 
@@ -343,7 +342,7 @@ cl_51core::inst_jc_addr(uchar code)
  */
 
 int
-cl_51core::inst_jnc_addr(uchar code)
+cl_51core::instruction_50/*inst_jnc_addr*/(t_mem/*uchar*/ code)
 {
   uchar jaddr;
 
@@ -362,7 +361,7 @@ cl_51core::inst_jnc_addr(uchar code)
  */
 
 int
-cl_51core::inst_jz_addr(uchar code)
+cl_51core::instruction_60/*inst_jz_addr*/(t_mem/*uchar*/ code)
 {
   uchar jaddr;
 
@@ -381,7 +380,7 @@ cl_51core::inst_jz_addr(uchar code)
  */
 
 int
-cl_51core::inst_jnz_addr(uchar code)
+cl_51core::instruction_70/*inst_jnz_addr*/(t_mem/*uchar*/ code)
 {
   uchar jaddr;
 
@@ -400,7 +399,7 @@ cl_51core::inst_jnz_addr(uchar code)
  */
 
 int
-cl_51core::inst_jmp_Sa_dptr(uchar code)
+cl_51core::instruction_73/*inst_jmp_Sa_dptr*/(t_mem/*uchar*/ code)
 {
   u16_t h= /*sfr*/dptr->read(/*DPH*/1);
   u16_t l= /*sfr*/dptr->read(/*DPL*/0);
@@ -418,7 +417,7 @@ cl_51core::inst_jmp_Sa_dptr(uchar code)
  */
 
 int
-cl_51core::inst_sjmp(uchar code)
+cl_51core::instruction_80/*inst_sjmp*/(t_mem/*uchar*/ code)
 {
   signed char target= fetch();
 
@@ -435,7 +434,7 @@ cl_51core::inst_sjmp(uchar code)
  */
 
 int
-cl_51core::inst_cjne_a_Sdata_addr(uchar code)
+cl_51core::instruction_b4/*inst_cjne_a_Sdata_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, jaddr, ac;
 
@@ -457,7 +456,7 @@ cl_51core::inst_cjne_a_Sdata_addr(uchar code)
  */
 
 int
-cl_51core::inst_cjne_a_addr_addr(uchar code)
+cl_51core::instruction_b5/*inst_cjne_a_addr_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, jaddr;
   t_addr a;
@@ -482,7 +481,7 @@ cl_51core::inst_cjne_a_addr_addr(uchar code)
  */
 
 int
-cl_51core::inst_cjne_Sri_Sdata_addr(uchar code)
+cl_51core::instruction_b6/*inst_cjne_Sri_Sdata_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, jaddr;
   class cl_memory_cell *cell;
@@ -507,7 +506,7 @@ cl_51core::inst_cjne_Sri_Sdata_addr(uchar code)
  */
 
 int
-cl_51core::inst_cjne_rn_Sdata_addr(uchar code)
+cl_51core::instruction_b8/*inst_cjne_rn_Sdata_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, jaddr;
   class cl_memory_cell *reg;
@@ -532,7 +531,7 @@ cl_51core::inst_cjne_rn_Sdata_addr(uchar code)
  */
 
 int
-cl_51core::inst_djnz_addr_addr(uchar code)
+cl_51core::instruction_d5/*inst_djnz_addr_addr*/(t_mem/*uchar*/ code)
 {
   uchar jaddr;
   class cl_memory_cell *cell;
@@ -557,7 +556,7 @@ cl_51core::inst_djnz_addr_addr(uchar code)
  */
 
 int
-cl_51core::inst_djnz_rn_addr(uchar code)
+cl_51core::instruction_d8/*inst_djnz_rn_addr*/(t_mem/*uchar*/ code)
 {
   uchar jaddr;
   class cl_memory_cell *reg;

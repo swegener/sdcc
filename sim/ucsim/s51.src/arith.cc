@@ -42,7 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-cl_51core::inst_rr(uchar code)
+cl_51core::instruction_03/*inst_rr*/(t_mem/*uchar*/ code)
 {
   uchar ac;
 
@@ -64,7 +64,7 @@ cl_51core::inst_rr(uchar code)
  */
 
 int
-cl_51core::inst_rrc(uchar code)
+cl_51core::instruction_13/*inst_rrc*/(t_mem/*uchar*/ code)
 {
   bool cy;
   uchar ac;
@@ -88,7 +88,7 @@ cl_51core::inst_rrc(uchar code)
  */
 
 int
-cl_51core::inst_rl(uchar code)
+cl_51core::instruction_23/*inst_rl*/(t_mem/*uchar*/ code)
 {
   uchar ac;
 
@@ -110,7 +110,7 @@ cl_51core::inst_rl(uchar code)
  */
 
 int
-cl_51core::inst_add_a_Sdata(uchar code)
+cl_51core::instruction_24/*inst_add_a_Sdata*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
   bool newC, newA, c6;
@@ -137,7 +137,7 @@ cl_51core::inst_add_a_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_add_a_addr(uchar code)
+cl_51core::instruction_25/*inst_add_a_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
   bool newC, newA, c6;
@@ -167,7 +167,7 @@ cl_51core::inst_add_a_addr(uchar code)
  */
 
 int
-cl_51core::inst_add_a_Sri(uchar code)
+cl_51core::instruction_26/*inst_add_a_Sri*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
   bool newC, newA, c6;
@@ -196,7 +196,7 @@ cl_51core::inst_add_a_Sri(uchar code)
  */
 
 int
-cl_51core::inst_add_a_rn(uchar code)
+cl_51core::instruction_28/*inst_add_a_rn*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
   bool newC, newA, c6;
@@ -223,7 +223,7 @@ cl_51core::inst_add_a_rn(uchar code)
  */
 
 int
-cl_51core::inst_rlc(uchar code)
+cl_51core::instruction_33/*inst_rlc*/(t_mem/*uchar*/ code)
 {
   bool cy;
   uchar ac;
@@ -247,7 +247,7 @@ cl_51core::inst_rlc(uchar code)
  */
 
 int
-cl_51core::inst_addc_a_Sdata(uchar code)
+cl_51core::instruction_34/*inst_addc_a_Sdata*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
@@ -274,7 +274,7 @@ cl_51core::inst_addc_a_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_addc_a_addr(uchar code)
+cl_51core::instruction_35/*inst_addc_a_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
@@ -304,7 +304,7 @@ cl_51core::inst_addc_a_addr(uchar code)
  */
 
 int
-cl_51core::inst_addc_a_Sri(uchar code)
+cl_51core::instruction_36/*inst_addc_a_Sri*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
@@ -333,7 +333,7 @@ cl_51core::inst_addc_a_Sri(uchar code)
  */
 
 int
-cl_51core::inst_addc_a_rn(uchar code)
+cl_51core::instruction_38/*inst_addc_a_rn*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
   bool orgC, newC, newA, c6;
@@ -360,7 +360,7 @@ cl_51core::inst_addc_a_rn(uchar code)
  */
 
 int
-cl_51core::inst_div_ab(uchar code)
+cl_51core::instruction_84/*inst_div_ab*/(t_mem/*uchar*/ code)
 {
   uchar temp, pw, b, ac;
 
@@ -390,7 +390,7 @@ cl_51core::inst_div_ab(uchar code)
  */
 
 int
-cl_51core::inst_subb_a_Sdata(uchar code)
+cl_51core::instruction_94/*inst_subb_a_Sdata*/(t_mem/*uchar*/ code)
 {
   uchar data, ac, result, pw, c;
 
@@ -420,7 +420,7 @@ cl_51core::inst_subb_a_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_subb_a_addr(uchar code)
+cl_51core::instruction_95/*inst_subb_a_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, ac, result, pw, c;
   class cl_memory_cell *cell;
@@ -452,7 +452,7 @@ cl_51core::inst_subb_a_addr(uchar code)
  */
 
 int
-cl_51core::inst_subb_a_Sri(uchar code)
+cl_51core::instruction_96/*inst_subb_a_Sri*/(t_mem/*uchar*/ code)
 {
   uchar data, ac, result, pw, c;
   class cl_memory_cell *cell;
@@ -484,7 +484,7 @@ cl_51core::inst_subb_a_Sri(uchar code)
  */
 
 int
-cl_51core::inst_subb_a_rn(uchar code)
+cl_51core::instruction_98/*inst_subb_a_rn*/(t_mem/*uchar*/ code)
 {
   uchar data, ac, result, pw, c;
 
@@ -514,7 +514,7 @@ cl_51core::inst_subb_a_rn(uchar code)
  */
 
 int
-cl_51core::inst_mul_ab(uchar code)
+cl_51core::instruction_a4/*inst_mul_ab*/(t_mem/*uchar*/ code)
 {
   uint temp, pw, ac, b, x;
 
@@ -539,7 +539,7 @@ cl_51core::inst_mul_ab(uchar code)
  */
 
 int
-cl_51core::inst_da_a(uchar code)
+cl_51core::instruction_d4/*inst_da_a*/(t_mem/*uchar*/ code)
 {
   uchar ac, pw;
 

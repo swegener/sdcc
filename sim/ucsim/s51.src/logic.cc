@@ -42,7 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 int
-cl_51core::inst_orl_addr_a(uchar code)
+cl_51core::instruction_42/*inst_orl_addr_a*/(t_mem/*uchar*/ code)
 {
   class cl_memory_cell *cell;
 
@@ -61,7 +61,7 @@ cl_51core::inst_orl_addr_a(uchar code)
  */
 
 int
-cl_51core::inst_orl_addr_Sdata(uchar code)
+cl_51core::instruction_43/*inst_orl_addr_Sdata*/(t_mem/*uchar*/ code)
 {
   class cl_memory_cell *cell;
   int res= resGO;
@@ -83,7 +83,7 @@ cl_51core::inst_orl_addr_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_orl_a_Sdata(uchar code)
+cl_51core::instruction_44/*inst_orl_a_Sdata*/(t_mem/*uchar*/ code)
 {
   uchar d;
 
@@ -102,7 +102,7 @@ cl_51core::inst_orl_a_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_orl_a_addr(uchar code)
+cl_51core::instruction_45/*inst_orl_a_addr*/(t_mem/*uchar*/ code)
 {
   t_mem d;
   class cl_memory_cell *cell;
@@ -123,7 +123,7 @@ cl_51core::inst_orl_a_addr(uchar code)
  */
 
 int
-cl_51core::inst_orl_a_Sri(uchar code)
+cl_51core::instruction_46/*inst_orl_a_Sri*/(t_mem/*uchar*/ code)
 {
   t_mem d;
   class cl_memory_cell *cell;
@@ -144,7 +144,7 @@ cl_51core::inst_orl_a_Sri(uchar code)
  */
 
 int
-cl_51core::inst_orl_a_rn(uchar code)
+cl_51core::instruction_48/*inst_orl_a_rn*/(t_mem/*uchar*/ code)
 {
   t_mem d;
 
@@ -163,7 +163,7 @@ cl_51core::inst_orl_a_rn(uchar code)
  */
 
 int
-cl_51core::inst_anl_addr_a(uchar code)
+cl_51core::instruction_52/*inst_anl_addr_a*/(t_mem/*uchar*/ code)
 {
   class cl_memory_cell *cell;
   
@@ -182,7 +182,7 @@ cl_51core::inst_anl_addr_a(uchar code)
  */
 
 int
-cl_51core::inst_anl_addr_Sdata(uchar code)
+cl_51core::instruction_53/*inst_anl_addr_Sdata*/(t_mem/*uchar*/ code)
 {
   class cl_memory_cell *cell;
   t_mem d;
@@ -204,7 +204,7 @@ cl_51core::inst_anl_addr_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_anl_a_Sdata(uchar code)
+cl_51core::instruction_54/*inst_anl_a_Sdata*/(t_mem/*uchar*/ code)
 {
   uchar d;
 
@@ -223,7 +223,7 @@ cl_51core::inst_anl_a_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_anl_a_addr(uchar code)
+cl_51core::instruction_55/*inst_anl_a_addr*/(t_mem/*uchar*/ code)
 {
   t_mem d;
   class cl_memory_cell *cell;
@@ -244,7 +244,7 @@ cl_51core::inst_anl_a_addr(uchar code)
  */
 
 int
-cl_51core::inst_anl_a_Sri(uchar code)
+cl_51core::instruction_56/*inst_anl_a_Sri*/(t_mem/*uchar*/ code)
 {
   t_mem d;
   class cl_memory_cell *cell;
@@ -265,7 +265,7 @@ cl_51core::inst_anl_a_Sri(uchar code)
  */
 
 int
-cl_51core::inst_anl_a_rn(uchar code)
+cl_51core::instruction_58/*inst_anl_a_rn*/(t_mem/*uchar*/ code)
 {
   uchar d;
 
@@ -284,7 +284,7 @@ cl_51core::inst_anl_a_rn(uchar code)
  */
 
 int
-cl_51core::inst_xrl_addr_a(uchar code)
+cl_51core::instruction_62/*inst_xrl_addr_a*/(t_mem/*uchar*/ code)
 {
   class cl_memory_cell *cell;
 
@@ -303,7 +303,7 @@ cl_51core::inst_xrl_addr_a(uchar code)
  */
 
 int
-cl_51core::inst_xrl_addr_Sdata(uchar code)
+cl_51core::instruction_63/*inst_xrl_addr_Sdata*/(t_mem/*uchar*/ code)
 {
   class cl_memory_cell *cell;
 
@@ -323,7 +323,7 @@ cl_51core::inst_xrl_addr_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_xrl_a_Sdata(uchar code)
+cl_51core::instruction_64/*inst_xrl_a_Sdata*/(t_mem/*uchar*/ code)
 {
   uchar d;
 
@@ -342,7 +342,7 @@ cl_51core::inst_xrl_a_Sdata(uchar code)
  */
 
 int
-cl_51core::inst_xrl_a_addr(uchar code)
+cl_51core::instruction_65/*inst_xrl_a_addr*/(t_mem/*uchar*/ code)
 {
   t_mem d;
   class cl_memory_cell *cell;
@@ -363,7 +363,7 @@ cl_51core::inst_xrl_a_addr(uchar code)
  */
 
 int
-cl_51core::inst_xrl_a_Sri(uchar code)
+cl_51core::instruction_66/*inst_xrl_a_Sri*/(t_mem/*uchar*/ code)
 {
   t_mem d;
   class cl_memory_cell *cell;
@@ -384,7 +384,7 @@ cl_51core::inst_xrl_a_Sri(uchar code)
  */
 
 int
-cl_51core::inst_xrl_a_rn(uchar code)
+cl_51core::instruction_68/*inst_xrl_a_rn*/(t_mem/*uchar*/ code)
 {
   t_mem d;
 
@@ -403,7 +403,7 @@ cl_51core::inst_xrl_a_rn(uchar code)
  */
 
 int
-cl_51core::inst_cpl_a(uchar code)
+cl_51core::instruction_f4/*inst_cpl_a*/(t_mem/*uchar*/ code)
 {
   acc->write(~(acc->read()));
   //vc.rd++;

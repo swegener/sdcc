@@ -43,6 +43,7 @@ clean:
 	rm -f $(MAIN).ihx $(MAIN).hex $(MAIN).lk $(MAIN).map $(MAIN).mem $(MAIN).cdb $(MAIN).omf $(MAIN).noi
 	rm -f *~
 	rm -f $(MAIN).dep
+	rm -f $(MAIN).sim $(MAIN).out
 
 
 # End of sdcc.mk

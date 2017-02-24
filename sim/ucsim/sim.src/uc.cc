@@ -1858,6 +1858,30 @@ cl_uc::exec_inst(void)
   return(resGO);
 }
 
+int
+cl_uc::exec_inst_tab(instruction_wrapper_fn itab[])
+{
+  t_mem c;
+  int res= resGO;
+  instPC= PC;
+  if (fetch(&c))
+    return resBREAKPOINT;
+  if (itab[c] == NULL)
+    {
+      PC= instPC;
+      return resNOT_DONE;
+    }
+  res= itab[c](this, c);
+  if (res == resNOT_DONE)
+    {
+      PC= instPC;
+      return res;
+    }
+  tick(1);
+  return res;
+}
+
+
 void
 cl_uc::post_inst(void)
 {

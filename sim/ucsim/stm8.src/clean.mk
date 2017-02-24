@@ -4,7 +4,6 @@ clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
 	rm -f sstm8$(EXEEXT)
-	$(MAKE) -C test clean
 
 
 # Deleting all files created by configuring or building the program

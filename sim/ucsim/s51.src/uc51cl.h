@@ -140,117 +140,118 @@ protected:
   //virtual void  post_inst(void);
 
   virtual int inst_unknown(void);
-  virtual int inst_nop(uchar code);			/* 00 */
-  virtual int inst_ajmp_addr(uchar code);		/* [02468ace]1 */
-  virtual int inst_ljmp(uchar code);			/* 02 */
-  virtual int inst_rr(uchar code);			/* 03 */
-  virtual int inst_inc_a(uchar code);			/* 04 */
-  virtual int inst_inc_addr(uchar code);		/* 05 */
-  virtual int inst_inc_Sri(uchar code);			/* 06,07 */
-  virtual int inst_inc_rn(uchar code);			/* 08-0f */
-  virtual int inst_jbc_bit_addr(uchar code);		/* 10 */
-  virtual int inst_acall_addr(uchar code);		/* [13579bdf]1 */
-  virtual int inst_lcall(uchar code, uint addr, bool intr);/* 12 */
-  virtual int inst_rrc(uchar code);			/* 13 */
-  virtual int inst_dec_a(uchar code);			/* 14 */
-  virtual int inst_dec_addr(uchar code);		/* 15 */
-  virtual int inst_dec_Sri(uchar code);			/* 16,17 */
-  virtual int inst_dec_rn(uchar code);			/* 18-1f */
-  virtual int inst_jb_bit_addr(uchar code);		/* 20 */
-  virtual int inst_ret(uchar code);			/* 22 */
-  virtual int inst_rl(uchar code);			/* 23 */
-  virtual int inst_add_a_Sdata(uchar code);		/* 24 */
-  virtual int inst_add_a_addr(uchar code);		/* 25 */
-  virtual int inst_add_a_Sri(uchar code);		/* 26,27 */
-  virtual int inst_add_a_rn(uchar code);		/* 28-2f */
-  virtual int inst_jnb_bit_addr(uchar code);		/* 30 */
-  virtual int inst_reti(uchar code);			/* 32 */
-  virtual int inst_rlc(uchar code);			/* 33 */
-  virtual int inst_addc_a_Sdata(uchar code);		/* 34 */
-  virtual int inst_addc_a_addr(uchar code);		/* 35 */
-  virtual int inst_addc_a_Sri(uchar code);		/* 36,37 */
-  virtual int inst_addc_a_rn(uchar code);		/* 38-3f */
-  virtual int inst_jc_addr(uchar code);			/* 40 */
-  virtual int inst_orl_addr_a(uchar code);		/* 42 */
-  virtual int inst_orl_addr_Sdata(uchar code);		/* 43 */
-  virtual int inst_orl_a_Sdata(uchar code);		/* 44 */
-  virtual int inst_orl_a_addr(uchar code);		/* 45 */
-  virtual int inst_orl_a_Sri(uchar code);		/* 46,47 */
-  virtual int inst_orl_a_rn(uchar code);		/* 48-4f */
-  virtual int inst_jnc_addr(uchar code);		/* 50 */
-  virtual int inst_anl_addr_a(uchar code);		/* 52 */
-  virtual int inst_anl_addr_Sdata(uchar code);		/* 53 */
-  virtual int inst_anl_a_Sdata(uchar code);		/* 54 */
-  virtual int inst_anl_a_addr(uchar code);		/* 55 */
-  virtual int inst_anl_a_Sri(uchar code);		/* 56,57 */
-  virtual int inst_anl_a_rn(uchar code);		/* 58-5f */
-  virtual int inst_jz_addr(uchar code);			/* 60 */
-  virtual int inst_xrl_addr_a(uchar code);		/* 62 */
-  virtual int inst_xrl_addr_Sdata(uchar code);		/* 63 */
-  virtual int inst_xrl_a_Sdata(uchar code);		/* 64 */
-  virtual int inst_xrl_a_addr(uchar code);		/* 65 */
-  virtual int inst_xrl_a_Sri(uchar code);		/* 66,67 */
-  virtual int inst_xrl_a_rn(uchar code);		/* 68-6f */
-  virtual int inst_jnz_addr(uchar code);		/* 70 */
-  virtual int inst_orl_c_bit(uchar code);		/* 72 */
-  virtual int inst_jmp_Sa_dptr(uchar code);		/* 73 */
-  virtual int inst_mov_a_Sdata(uchar code);		/* 74 */
-  virtual int inst_mov_addr_Sdata(uchar code);		/* 75 */
-  virtual int inst_mov_Sri_Sdata(uchar code);		/* 76,77 */
-  virtual int inst_mov_rn_Sdata(uchar code);		/* 78-7f */
-  virtual int inst_sjmp(uchar code);			/* 80 */
-  virtual int inst_anl_c_bit(uchar code);		/* 82 */
-  virtual int inst_movc_a_Sa_pc(uchar code);		/* 83 */
-  virtual int inst_div_ab(uchar code);			/* 84 */
-  virtual int inst_mov_addr_addr(uchar code);		/* 85 */
-  virtual int inst_mov_addr_Sri(uchar code);		/* 86,87 */
-  virtual int inst_mov_addr_rn(uchar code);		/* 88-8f */
-  virtual int inst_mov_dptr_Sdata(uchar code);		/* 90 */
-  virtual int inst_mov_bit_c(uchar code);		/* 92 */
-  virtual int inst_movc_a_Sa_dptr(uchar code);		/* 93 */
-  virtual int inst_subb_a_Sdata(uchar code);		/* 94 */
-  virtual int inst_subb_a_addr(uchar code);		/* 95 */
-  virtual int inst_subb_a_Sri(uchar code);		/* 96,97 */
-  virtual int inst_subb_a_rn(uchar code);		/* 98-9f */
-  virtual int inst_orl_c_Sbit(uchar code);		/* a0 */
-  virtual int inst_mov_c_bit(uchar code);		/* a2 */
-  virtual int inst_inc_dptr(uchar code);		/* a3 */
-  virtual int inst_mul_ab(uchar code);			/* a4 */
-  virtual int inst_mov_Sri_addr(uchar code);		/* a6,a7 */
-  virtual int inst_mov_rn_addr(uchar code);		/* a8-af */
-  virtual int inst_anl_c_Sbit(uchar code);		/* b0 */
-  virtual int inst_cpl_bit(uchar code);			/* b2 */
-  virtual int inst_cpl_c(uchar code);			/* b3 */
-  virtual int inst_cjne_a_Sdata_addr(uchar code);	/* b4 */
-  virtual int inst_cjne_a_addr_addr(uchar code);	/* b5 */
-  virtual int inst_cjne_Sri_Sdata_addr(uchar code);	/* b6,b7 */
-  virtual int inst_cjne_rn_Sdata_addr(uchar code);	/* b8-bf */
-  virtual int inst_push(uchar code);			/* c0 */
-  virtual int inst_clr_bit(uchar code);			/* c2 */
-  virtual int inst_clr_c(uchar code);			/* c3*/
-  virtual int inst_swap(uchar code);			/* c4 */
-  virtual int inst_xch_a_addr(uchar code);		/* c5 */
-  virtual int inst_xch_a_Sri(uchar code);		/* c6,c7 */
-  virtual int inst_xch_a_rn(uchar code);		/* c8-cf */
-  virtual int inst_pop(uchar code);			/* d0 */
-  virtual int inst_setb_bit(uchar code);		/* d2 */
-  virtual int inst_setb_c(uchar code);			/* d3 */
-  virtual int inst_da_a(uchar code);			/* d4 */
-  virtual int inst_djnz_addr_addr(uchar code);		/* d5 */
-  virtual int inst_xchd_a_Sri(uchar code);		/* d6,d7 */
-  virtual int inst_djnz_rn_addr(uchar code);		/* d8-df */
-  virtual int inst_movx_a_Sdptr(uchar code);		/* e0 */
-  virtual int inst_movx_a_Sri(uchar code);		/* e2,e3 */
-  virtual int inst_clr_a(uchar code);			/* e4 */
-  virtual int inst_mov_a_addr(uchar code);		/* e5 */
-  virtual int inst_mov_a_Sri(uchar code);		/* e6,e7 */
-  virtual int inst_mov_a_rn(uchar code);		/* e8-ef */
-  virtual int inst_movx_Sdptr_a(uchar code);		/* f0 */
-  virtual int inst_movx_Sri_a(uchar code);		/* f2,f3 */
-  virtual int inst_cpl_a(uchar code);			/* f4 */
-  virtual int inst_mov_addr_a(uchar code);		/* f5 */
-  virtual int inst_mov_Sri_a(uchar code);		/* f6,f7 */
-  virtual int inst_mov_rn_a(uchar code);		/* f8-ff */
+  virtual int instruction_00/*inst_nop*/(t_mem/*uchar*/ code);		/* 00 */
+  virtual int instruction_01/*inst_ajmp_addr*/(t_mem/*uchar*/ code);	/* [02468ace]1 */
+  virtual int instruction_02/*inst_ljmp*/(t_mem/*uchar*/ code);		/* 02 */
+  virtual int instruction_03/*inst_rr*/(t_mem/*uchar*/ code);		/* 03 */
+  virtual int instruction_04/*inst_inc_a*/(t_mem/*uchar*/ code);	/* 04 */
+  virtual int instruction_05/*inst_inc_addr*/(t_mem/*uchar*/ code);	/* 05 */
+  virtual int instruction_06/*inst_inc_Sri*/(t_mem/*uchar*/ code);	/* 06,07 */
+  virtual int instruction_08/*inst_inc_rn*/(t_mem/*uchar*/ code);	/* 08-0f */
+  virtual int instruction_10/*inst_jbc_bit_addr*/(t_mem/*uchar*/ code);	/* 10 */
+  virtual int instruction_11/*inst_acall_addr*/(t_mem/*uchar*/ code);	/* [13579bdf]1 */
+  virtual int inst_lcall(t_mem code, uint addr, bool intr);		/* 12 */
+  virtual int instruction_12(t_mem code) { return inst_lcall(code, 0, false); }
+  virtual int instruction_13/*inst_rrc*/(t_mem/*uchar*/ code);		/* 13 */
+  virtual int instruction_14/*inst_dec_a*/(t_mem/*uchar*/ code);	/* 14 */
+  virtual int instruction_15/*inst_dec_addr*/(t_mem/*uchar*/ code);	/* 15 */
+  virtual int instruction_16/*inst_dec_Sri*/(t_mem/*uchar*/ code);	/* 16,17 */
+  virtual int instruction_18/*inst_dec_rn*/(t_mem/*uchar*/ code);	/* 18-1f */
+  virtual int instruction_20/*inst_jb_bit_addr*/(t_mem/*uchar*/ code);	/* 20 */
+  virtual int instruction_22/*inst_ret*/(t_mem/*uchar*/ code);		/* 22 */
+  virtual int instruction_23/*inst_rl*/(t_mem/*uchar*/ code);		/* 23 */
+  virtual int instruction_24/*inst_add_a_Sdata*/(t_mem/*uchar*/ code);	/* 24 */
+  virtual int instruction_25/*inst_add_a_addr*/(t_mem/*uchar*/ code);	/* 25 */
+  virtual int instruction_26/*inst_add_a_Sri*/(t_mem/*uchar*/ code);	/* 26,27 */
+  virtual int instruction_28/*inst_add_a_rn*/(t_mem/*uchar*/ code);	/* 28-2f */
+  virtual int instruction_30/*inst_jnb_bit_addr*/(t_mem/*uchar*/ code);	/* 30 */
+  virtual int instruction_32/*inst_reti*/(t_mem/*uchar*/ code);		/* 32 */
+  virtual int instruction_33/*inst_rlc*/(t_mem/*uchar*/ code);		/* 33 */
+  virtual int instruction_34/*inst_addc_a_Sdata*/(t_mem/*uchar*/ code);	/* 34 */
+  virtual int instruction_35/*inst_addc_a_addr*/(t_mem/*uchar*/ code);	/* 35 */
+  virtual int instruction_36/*inst_addc_a_Sri*/(t_mem/*uchar*/ code);	/* 36,37 */
+  virtual int instruction_38/*inst_addc_a_rn*/(t_mem/*uchar*/ code);	/* 38-3f */
+  virtual int instruction_40/*inst_jc_addr*/(t_mem/*uchar*/ code);	/* 40 */
+  virtual int instruction_42/*inst_orl_addr_a*/(t_mem/*uchar*/ code);	/* 42 */
+  virtual int instruction_43/*inst_orl_addr_Sdata*/(t_mem/*uchar*/ code);/* 43 */
+  virtual int instruction_44/*inst_orl_a_Sdata*/(t_mem/*uchar*/ code);	/* 44 */
+  virtual int instruction_45/*inst_orl_a_addr*/(t_mem/*uchar*/ code);	/* 45 */
+  virtual int instruction_46/*inst_orl_a_Sri*/(t_mem/*uchar*/ code);	/* 46,47 */
+  virtual int instruction_48/*inst_orl_a_rn*/(t_mem/*uchar*/ code);	/* 48-4f */
+  virtual int instruction_50/*inst_jnc_addr*/(t_mem/*uchar*/ code);	/* 50 */
+  virtual int instruction_52/*inst_anl_addr_a*/(t_mem/*uchar*/ code);	/* 52 */
+  virtual int instruction_53/*inst_anl_addr_Sdata*/(t_mem/*uchar*/ code);/* 53 */
+  virtual int instruction_54/*inst_anl_a_Sdata*/(t_mem/*uchar*/ code);	/* 54 */
+  virtual int instruction_55/*inst_anl_a_addr*/(t_mem/*uchar*/ code);	/* 55 */
+  virtual int instruction_56/*inst_anl_a_Sri*/(t_mem/*uchar*/ code);	/* 56,57 */
+  virtual int instruction_58/*inst_anl_a_rn*/(t_mem/*uchar*/ code);	/* 58-5f */
+  virtual int instruction_60/*inst_jz_addr*/(t_mem/*uchar*/ code);	/* 60 */
+  virtual int instruction_62/*inst_xrl_addr_a*/(t_mem/*uchar*/ code);	/* 62 */
+  virtual int instruction_63/*inst_xrl_addr_Sdata*/(t_mem/*uchar*/ code);/* 63 */
+  virtual int instruction_64/*inst_xrl_a_Sdata*/(t_mem/*uchar*/ code);	/* 64 */
+  virtual int instruction_65/*inst_xrl_a_addr*/(t_mem/*uchar*/ code);	/* 65 */
+  virtual int instruction_66/*inst_xrl_a_Sri*/(t_mem/*uchar*/ code);	/* 66,67 */
+  virtual int instruction_68/*inst_xrl_a_rn*/(t_mem/*uchar*/ code);	/* 68-6f */
+  virtual int instruction_70/*inst_jnz_addr*/(t_mem/*uchar*/ code);	/* 70 */
+  virtual int instruction_72/*inst_orl_c_bit*/(t_mem/*uchar*/ code);	/* 72 */
+  virtual int instruction_73/*inst_jmp_Sa_dptr*/(t_mem/*uchar*/ code);	/* 73 */
+  virtual int instruction_74/*inst_mov_a_Sdata*/(t_mem/*uchar*/ code);	/* 74 */
+  virtual int instruction_75/*inst_mov_addr_Sdata*/(t_mem/*uchar*/ code);/* 75 */
+  virtual int instruction_76/*inst_mov_Sri_Sdata*/(t_mem/*uchar*/ code);/* 76,77 */
+  virtual int instruction_78/*inst_mov_rn_Sdata*/(t_mem/*uchar*/ code);	/* 78-7f */
+  virtual int instruction_80/*inst_sjmp*/(t_mem/*uchar*/ code);		/* 80 */
+  virtual int instruction_82/*inst_anl_c_bit*/(t_mem/*uchar*/ code);	/* 82 */
+  virtual int instruction_83/*inst_movc_a_Sa_pc*/(t_mem/*uchar*/ code);	/* 83 */
+  virtual int instruction_84/*inst_div_ab*/(t_mem/*uchar*/ code);	/* 84 */
+  virtual int instruction_85/*inst_mov_addr_addr*/(t_mem/*uchar*/ code);/* 85 */
+  virtual int instruction_86/*inst_mov_addr_Sri*/(t_mem/*uchar*/ code);	/* 86,87 */
+  virtual int instruction_88/*inst_mov_addr_rn*/(t_mem/*uchar*/ code);	/* 88-8f */
+  virtual int instruction_90/*inst_mov_dptr_Sdata*/(t_mem/*uchar*/ code);/* 90 */
+  virtual int instruction_92/*inst_mov_bit_c*/(t_mem/*uchar*/ code);	/* 92 */
+  virtual int instruction_93/*inst_movc_a_Sa_dptr*/(t_mem/*uchar*/ code);/* 93 */
+  virtual int instruction_94/*inst_subb_a_Sdata*/(t_mem/*uchar*/ code);	/* 94 */
+  virtual int instruction_95/*inst_subb_a_addr*/(t_mem/*uchar*/ code);	/* 95 */
+  virtual int instruction_96/*inst_subb_a_Sri*/(t_mem/*uchar*/ code);	/* 96,97 */
+  virtual int instruction_98/*inst_subb_a_rn*/(t_mem/*uchar*/ code);	/* 98-9f */
+  virtual int instruction_a0/*inst_orl_c_Sbit*/(t_mem/*uchar*/ code);	/* a0 */
+  virtual int instruction_a2/*inst_mov_c_bit*/(t_mem/*uchar*/ code);	/* a2 */
+  virtual int instruction_a3/*inst_inc_dptr*/(t_mem/*uchar*/ code);	/* a3 */
+  virtual int instruction_a4/*inst_mul_ab*/(t_mem/*uchar*/ code);	/* a4 */
+  virtual int instruction_a6/*inst_mov_Sri_addr*/(t_mem/*uchar*/ code);	/* a6,a7 */
+  virtual int instruction_a8/*inst_mov_rn_addr*/(t_mem/*uchar*/ code);	/* a8-af */
+  virtual int instruction_b0/*inst_anl_c_Sbit*/(t_mem/*uchar*/ code);	/* b0 */
+  virtual int instruction_b2/*inst_cpl_bit*/(t_mem/*uchar*/ code);	/* b2 */
+  virtual int instruction_b3/*inst_cpl_c*/(t_mem/*uchar*/ code);	/* b3 */
+  virtual int instruction_b4/*inst_cjne_a_Sdata_addr*/(t_mem/*uchar*/ code);/* b4 */
+  virtual int instruction_b5/*inst_cjne_a_addr_addr*/(t_mem/*uchar*/ code);/* b5 */
+  virtual int instruction_b6/*inst_cjne_Sri_Sdata_addr*/(t_mem/*uchar*/ code);/* b6,b7 */
+  virtual int instruction_b8/*inst_cjne_rn_Sdata_addr*/(t_mem/*uchar*/ code);/* b8-bf */
+  virtual int instruction_c0/*inst_push*/(t_mem/*uchar*/ code);		/* c0 */
+  virtual int instruction_c2/*inst_clr_bit*/(t_mem/*uchar*/ code);	/* c2 */
+  virtual int instruction_c3/*inst_clr_c*/(t_mem/*uchar*/ code);	/* c3*/
+  virtual int instruction_c4/*inst_swap*/(t_mem/*uchar*/ code);		/* c4 */
+  virtual int instruction_c5/*inst_xch_a_addr*/(t_mem/*uchar*/ code);	/* c5 */
+  virtual int instruction_c6/*inst_xch_a_Sri*/(t_mem/*uchar*/ code);	/* c6,c7 */
+  virtual int instruction_c8/*inst_xch_a_rn*/(t_mem/*uchar*/ code);	/* c8-cf */
+  virtual int instruction_d0/*inst_pop*/(t_mem/*uchar*/ code);		/* d0 */
+  virtual int instruction_d2/*inst_setb_bit*/(t_mem/*uchar*/ code);	/* d2 */
+  virtual int instruction_d3/*inst_setb_c*/(t_mem/*uchar*/ code);	/* d3 */
+  virtual int instruction_d4/*inst_da_a*/(t_mem/*uchar*/ code);		/* d4 */
+  virtual int instruction_d5/*inst_djnz_addr_addr*/(t_mem/*uchar*/ code);/* d5 */
+  virtual int instruction_d6/*inst_xchd_a_Sri*/(t_mem/*uchar*/ code);	/* d6,d7 */
+  virtual int instruction_d8/*inst_djnz_rn_addr*/(t_mem/*uchar*/ code);	/* d8-df */
+  virtual int instruction_e0/*inst_movx_a_Sdptr*/(t_mem/*uchar*/ code);	/* e0 */
+  virtual int instruction_e2/*inst_movx_a_Sri*/(t_mem/*uchar*/ code);	/* e2,e3 */
+  virtual int instruction_e4/*inst_clr_a*/(t_mem/*uchar*/ code);	/* e4 */
+  virtual int instruction_e5/*inst_mov_a_addr*/(t_mem/*uchar*/ code);	/* e5 */
+  virtual int instruction_e6/*inst_mov_a_Sri*/(t_mem/*uchar*/ code);	/* e6,e7 */
+  virtual int instruction_e8/*inst_mov_a_rn*/(t_mem/*uchar*/ code);	/* e8-ef */
+  virtual int instruction_f0/*inst_movx_Sdptr_a*/(t_mem/*uchar*/ code);	/* f0 */
+  virtual int instruction_f2/*inst_movx_Sri_a*/(t_mem/*uchar*/ code);	/* f2,f3 */
+  virtual int instruction_f4/*inst_cpl_a*/(t_mem/*uchar*/ code);	/* f4 */
+  virtual int instruction_f5/*inst_mov_addr_a*/(t_mem/*uchar*/ code);	/* f5 */
+  virtual int instruction_f6/*inst_mov_Sri_a*/(t_mem/*uchar*/ code);	/* f6,f7 */
+  virtual int instruction_f8/*inst_mov_rn_a*/(t_mem/*uchar*/ code);	/* f8-ff */
 };
 
 

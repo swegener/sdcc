@@ -17,8 +17,14 @@ if [ -f ${PRJ}.ihx ]; then
     else
 	TYPE="-t 52"
     fi
-    CMD="../s51 ${TYPE} ${CONF} -Z6666 -S in=/dev/null,out=${PRJ}.out -G ${PRJ}.ihx"
-    echo $CMD
-    $CMD
+    if [ -f ${PRJ}.cmd ]; then
+	CMD="../s51 ${TYPE} ${CONF} -S in=/dev/null,out=${PRJ}.out ${PRJ}.ihx"
+	echo $CMD
+	$CMD <${PRJ}.cmd | tee ${PRJ}.sim
+    else
+	CMD="../s51 ${TYPE} ${CONF} -Z6666 -S in=/dev/null,out=${PRJ}.out -G ${PRJ}.ihx"
+	echo $CMD
+	$CMD|tee ${PRJ}.sim
+    fi
     cat ${PRJ}.out
 fi

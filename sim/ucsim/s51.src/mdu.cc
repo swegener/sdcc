@@ -171,7 +171,7 @@ cl_mdu517::init(void)
       v[i]= regs[i]->get();
     }
   nuof_writes= 0;
-  writes= 0xffffffffffff;
+  writes= 0xffffffffffffULL;
   //calcing= 0;
   return 0;
 }
@@ -223,7 +223,7 @@ cl_mdu517::write(class cl_memory_cell *cell, t_mem *val)
 	  }*/
       if (a == 0)
 	{
-	  writes= 0xffffffffffff;
+	  writes= 0xffffffffffffULL;
 	  nuof_writes= 0;
 	  set_err(false);
 	}
@@ -236,7 +236,7 @@ cl_mdu517::write(class cl_memory_cell *cell, t_mem *val)
       writes|= ((u64_t)a << (nuof_writes*8));
       if (a == 6)
 	{
-	  writes= 0xff0603020100; // force norm/shift
+	  writes= 0xff0603020100ULL; // force norm/shift
 	  con->set(ar= *val & 0x7f);
 	  set_err(false);
 	}
@@ -249,42 +249,42 @@ cl_mdu517::write(class cl_memory_cell *cell, t_mem *val)
       switch (writes)
 	{
 	  //   665544332211
-	case 0x050403020100:
+	case 0x050403020100ULL:
 	  {
 	    // 32/16
 	    op_32udiv16();
 	    //calcing= 6;
-	    writes= 0xffffffffffff;
+	    writes= 0xffffffffffffULL;
 	    nuof_writes= 0;
 	    break;
 	  }
 	  //   665544332211
-	case 0xffff05040100:
+	case 0xffff05040100ULL:
 	  {
 	    op_16udiv16();
 	    //calcing= 6;
-	    writes= 0xffffffffffff;
+	    writes= 0xffffffffffffULL;
 	    nuof_writes= 0;
 	    break;
 	  }
 	  //   665544332211
-	case 0xffff05010400:
+	case 0xffff05010400ULL:
 	  {
 	    // 16*16
 	    op_16umul16();
-	    writes= 0xffffffffffff;
+	    writes= 0xffffffffffffULL;
 	    nuof_writes= 0;
 	    break;
 	  }
 	  //   665544332211
-	case 0xff0603020100:
+	case 0xff0603020100ULL:
 	  {
 	    // norm, shift
 	    if ((ar & 0x1f) == 0)
 	      op_norm();
 	    else
 	      op_lshift();
-	    writes= 0xffffffffffff;
+	    writes= 0xffffffffffffULL;
 	    nuof_writes= 0;
 	    break;
 	  }
@@ -292,7 +292,7 @@ cl_mdu517::write(class cl_memory_cell *cell, t_mem *val)
 	  if (nuof_writes > 5)
 	    {
 	      set_err(true);
-	      writes= 0xffffffffffff;
+	      writes= 0xffffffffffffULL;
 	      nuof_writes= 0;
 	    }
 	  break;

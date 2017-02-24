@@ -610,7 +610,7 @@ cl_uc390::pop_byte (void)
  */
 
 int
-cl_uc390::inst_inc_dptr (uchar code)
+cl_uc390::instruction_a3/*inst_inc_dptr*/ (t_mem/*uchar*/ code)
 {
   ulong dptr;
 
@@ -658,7 +658,7 @@ cl_uc390::inst_inc_dptr (uchar code)
  */
 
 int
-cl_uc390::inst_jmp_Sa_dptr (uchar code)
+cl_uc390::instruction_73/*inst_jmp_Sa_dptr*/ (t_mem/*uchar*/ code)
 {
   uchar pl, ph, px, dps;
 
@@ -692,7 +692,7 @@ cl_uc390::inst_jmp_Sa_dptr (uchar code)
  */
 
 int
-cl_uc390::inst_mov_dptr_Sdata (uchar code)
+cl_uc390::instruction_90/*inst_mov_dptr_Sdata*/ (t_mem/*uchar*/ code)
 {
   uchar pl, ph, px, dps;
 
@@ -730,7 +730,7 @@ cl_uc390::inst_mov_dptr_Sdata (uchar code)
  */
 
 int
-cl_uc390::inst_movc_a_Sa_dptr (uchar code)
+cl_uc390::instruction_93/*inst_movc_a_Sa_dptr*/ (t_mem/*uchar*/ code)
 {
   uchar pl, ph, px, dps;
 
@@ -770,7 +770,7 @@ cl_uc390::inst_movc_a_Sa_dptr (uchar code)
  */
 
 int
-cl_uc390::inst_push (uchar code)
+cl_uc390::instruction_c0/*inst_push*/ (t_mem/*uchar*/ code)
 {
   class cl_memory_cell *cell;
 
@@ -794,7 +794,7 @@ cl_uc390::inst_push (uchar code)
  */
 
 int
-cl_uc390::inst_pop (uchar code)
+cl_uc390::instruction_d0/*inst_pop*/ (t_mem/*uchar*/ code)
 {
   class cl_memory_cell *cell;
 
@@ -818,7 +818,7 @@ cl_uc390::inst_pop (uchar code)
  */
 
 int
-cl_uc390::inst_movx_a_Sdptr (uchar code)
+cl_uc390::instruction_e0/*inst_movx_a_Sdptr*/ (t_mem/*uchar*/ code)
 {
   uchar pl, ph, px, dps;
 
@@ -857,7 +857,7 @@ cl_uc390::inst_movx_a_Sdptr (uchar code)
  */
 
 int
-cl_uc390::inst_movx_Sdptr_a (uchar code)
+cl_uc390::instruction_f0/*inst_movx_Sdptr_a*/ (t_mem/*uchar*/ code)
 {
   uchar pl, ph, px, dps;
 
@@ -898,7 +898,7 @@ cl_uc390::inst_movx_Sdptr_a (uchar code)
  */
 
 int
-cl_uc390::inst_ajmp_addr (uchar code)
+cl_uc390::instruction_01/*inst_ajmp_addr*/ (t_mem/*uchar*/ code)
 {
   uchar x, h, l;
 
@@ -926,7 +926,7 @@ cl_uc390::inst_ajmp_addr (uchar code)
  */
 
 int
-cl_uc390::inst_ljmp (uchar code)
+cl_uc390::instruction_02/*inst_ljmp*/ (t_mem/*uchar*/ code)
 {
   uchar x, h, l;
 
@@ -955,7 +955,7 @@ cl_uc390::inst_ljmp (uchar code)
  */
 
 int
-cl_uc390::inst_acall_addr (uchar code)
+cl_uc390::instruction_11/*inst_acall_addr*/ (t_mem/*uchar*/ code)
 {
   uchar x, h, l;
 
@@ -1000,7 +1000,7 @@ cl_uc390::inst_acall_addr (uchar code)
  */
 
 int
-cl_uc390::inst_lcall (uchar code, uint addr, bool intr)
+cl_uc390::inst_lcall (t_mem/*uchar*/ code, uint addr, bool intr)
 {
   uchar x = 0, h = 0, l = 0;
 
@@ -1052,7 +1052,7 @@ cl_uc390::inst_lcall (uchar code, uint addr, bool intr)
  */
 
 int
-cl_uc390::inst_ret (uchar code)
+cl_uc390::instruction_22/*inst_ret*/ (t_mem/*uchar*/ code)
 {
   uchar x = 0, h, l;
 
@@ -1085,7 +1085,7 @@ cl_uc390::inst_ret (uchar code)
  */
 
 int
-cl_uc390::inst_reti (uchar code)
+cl_uc390::instruction_32/*inst_reti*/ (t_mem/*uchar*/ code)
 {
   uchar x = 0, h, l;
 

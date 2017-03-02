@@ -64,7 +64,7 @@ cl_z80::inst_cb_rlc(t_mem code)
       }
     break;
     case 0x07: // RLC A
-      rlc_byte(regs.A);
+      rlc_byte(regs.raf.A);
     break;
   }
   return(resGO);
@@ -102,7 +102,7 @@ cl_z80::inst_cb_rrc(t_mem code)
       }
     break;
     case 0x0F: // RRC A
-      rrc_byte(regs.A);
+      rrc_byte(regs.raf.A);
     break;
   }
   return(resGO);
@@ -140,7 +140,7 @@ cl_z80::inst_cb_rl(t_mem code)
       }
     break;
     case 0x17: // RL A
-      rl_byte(regs.A);
+      rl_byte(regs.raf.A);
     break;
   }
   return(resGO);
@@ -178,7 +178,7 @@ cl_z80::inst_cb_rr(t_mem code)
       }
     break;
     case 0x1F: // RR A
-      rr_byte(regs.A);
+      rr_byte(regs.raf.A);
     break;
   }
   return(resGO);
@@ -216,7 +216,7 @@ cl_z80::inst_cb_sla(t_mem code)
       }
     break;
     case 0x27: // SLA A
-      sla_byte(regs.A);
+      sla_byte(regs.raf.A);
     break;
   }
   return(resGO);
@@ -254,7 +254,7 @@ cl_z80::inst_cb_sra(t_mem code)
       }
     break;
     case 0x2F: // SRA A
-      sra_byte(regs.A);
+      sra_byte(regs.raf.A);
     break;
   }
   return(resGO);
@@ -292,7 +292,7 @@ cl_z80::inst_cb_slia(t_mem code)
       }
     break;
     case 0x37: // SLIA A
-      slia_byte(regs.A);
+      slia_byte(regs.raf.A);
     break;
   }
   return(resGO);
@@ -330,7 +330,7 @@ cl_z80::inst_cb_srl(t_mem code)
       }
     break;
     case 0x3F: // SRL A
-      srl_byte(regs.A);
+      srl_byte(regs.raf.A);
     break;
   }
   return(resGO);
@@ -365,7 +365,7 @@ cl_z80::inst_cb_bit(t_mem code)
       }
     break;
     case 0x7: // BIT x,A
-      bit_byte(regs.A, bit_bitnum); break;
+      bit_byte(regs.raf.A, bit_bitnum); break;
     break;
   }
   return(resGO);
@@ -399,7 +399,7 @@ cl_z80::inst_cb_res(t_mem code)
       }
     break;
     case 0x7: // RES x,A
-      regs.A &= ~(1 << bit_bitnum); break;
+      regs.raf.A &= ~(1 << bit_bitnum); break;
   }
   return(resGO);
 }
@@ -432,7 +432,7 @@ cl_z80::inst_cb_set(t_mem code)
       }
     break;
     case 0x7: // SET x,A
-      regs.A |= (1 << bit_bitnum); break;
+      regs.raf.A |= (1 << bit_bitnum); break;
   }
   return(resGO);
 }

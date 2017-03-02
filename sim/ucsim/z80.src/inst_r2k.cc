@@ -248,37 +248,37 @@ int cl_r2k::inst_lcall(t_mem code) {
 }
 
 int cl_r2k::inst_bool(t_mem code) {
-  regs.F &= ~BIT_ALL;
+  regs.raf.F &= ~BIT_ALL;
   if (regs.HL)
     regs.HL = 1;
   else
-    regs.F |= BIT_Z;
+    regs.raf.F |= BIT_Z;
   return(resGO);
 }
 
 int cl_r2k::inst_r2k_and(t_mem code) {  // AND HL,DE
   regs.HL &= regs.DE;
   
-  regs.F &= ~BIT_ALL;
+  regs.raf.F &= ~BIT_ALL;
   if (regs.DE & 0x8000)
-    regs.F |= BIT_S;
+    regs.raf.F |= BIT_S;
   if (regs.DE == 0)
-    regs.F |= BIT_Z;
+    regs.raf.F |= BIT_Z;
   if (word_parity(regs.DE))
-    regs.F |= BIT_P;
+    regs.raf.F |= BIT_P;
   return(resGO);
 }
 
 int cl_r2k::inst_r2k_or (t_mem code) {  // OR  HL,DE
   regs.HL |= regs.DE;
   
-  regs.F &= ~BIT_ALL;
+  regs.raf.F &= ~BIT_ALL;
   if (regs.DE & 0x8000)
-    regs.F |= BIT_S;
+    regs.raf.F |= BIT_S;
   if (regs.DE == 0)
-    regs.F |= BIT_Z;
+    regs.raf.F |= BIT_Z;
   if (word_parity(regs.DE))
-    regs.F |= BIT_P;
+    regs.raf.F |= BIT_P;
   return(resGO);
 }
 
@@ -297,51 +297,51 @@ int cl_r2k::inst_mul(t_mem code) {
 }
 
 int cl_r2k::inst_rl_de(t_mem code) {
-  unsigned int oldcarry = (regs.F & BIT_C);
+  unsigned int oldcarry = (regs.raf.F & BIT_C);
   
-  regs.F &= ~BIT_ALL;
-  regs.F |= (((regs.DE >> 15) & 1U) << BITPOS_C);
+  regs.raf.F &= ~BIT_ALL;
+  regs.raf.F |= (((regs.DE >> 15) & 1U) << BITPOS_C);
   regs.DE = (regs.DE << 1) | (oldcarry >> BITPOS_C);
   
   if (regs.DE & 0x8000)
-    regs.F |= BIT_S;
+    regs.raf.F |= BIT_S;
   if (regs.DE == 0)
-    regs.F |= BIT_Z;
+    regs.raf.F |= BIT_Z;
   if (word_parity(regs.DE))
-    regs.F |= BIT_P;
+    regs.raf.F |= BIT_P;
   return(resGO);
 }
 
 int cl_r2k::inst_rr_de(t_mem code) {
-  unsigned int oldcarry = (regs.F & BIT_C);
+  unsigned int oldcarry = (regs.raf.F & BIT_C);
 
-  regs.F &= ~BIT_ALL;
-  regs.F |= ((regs.DE & 1) << BITPOS_C);
+  regs.raf.F &= ~BIT_ALL;
+  regs.raf.F |= ((regs.DE & 1) << BITPOS_C);
   regs.DE = (regs.DE >> 1) | (oldcarry << (15 - BITPOS_C));
   
   if (regs.DE & 0x8000)
-    regs.F |= BIT_S;
+    regs.raf.F |= BIT_S;
   if (regs.DE == 0)
-    regs.F |= BIT_Z;
+    regs.raf.F |= BIT_Z;
   if (word_parity(regs.DE))
-    regs.F |= BIT_P;
+    regs.raf.F |= BIT_P;
   return(resGO);
 }
 
 int cl_r2k::inst_rr_hl(t_mem code)    // RR HL
 {
-  unsigned int oldcarry = (regs.F & BIT_C);
+  unsigned int oldcarry = (regs.raf.F & BIT_C);
   
-  regs.F &= ~BIT_ALL;
-  regs.F |= ((regs.HL & 1) << BITPOS_C);
+  regs.raf.F &= ~BIT_ALL;
+  regs.raf.F |= ((regs.HL & 1) << BITPOS_C);
   regs.HL = (regs.HL >> 1) | (oldcarry << (15 - BITPOS_C));
   
   if (regs.HL & 0x8000)
-    regs.F |= BIT_S;
+    regs.raf.F |= BIT_S;
   if (regs.HL == 0)
-    regs.F |= BIT_Z;
+    regs.raf.F |= BIT_Z;
   if (word_parity(regs.HL))
-    regs.F |= BIT_P;
+    regs.raf.F |= BIT_P;
   return(resGO);
 }
 
@@ -375,7 +375,7 @@ cl_r2k::inst_rst(t_mem code)
     break;
     case 0xEF: // RST 28H
       //PC = 0x28;
-      switch (regs.A) {
+      switch (regs.raf.A) {
         case 0:
           return(resBREAKPOINT);
 //          ::exit(0);
@@ -504,10 +504,10 @@ int cl_r2k::inst_xd(t_mem prefix)
       *regs_IX_OR_IY = 1;
     
     // update flags
-    regs.F &= ~BIT_ALL;
+    regs.raf.F &= ~BIT_ALL;
     // bit 15 will never be set, so S<=0
     if (*regs_IX_OR_IY == 0)
-      regs.F |= BIT_Z;
+      regs.raf.F |= BIT_Z;
     // L/V and C are always cleared
     return(resGO);
     
@@ -565,13 +565,13 @@ int cl_r2k::inst_xd(t_mem prefix)
       *regs_IX_OR_IY |= regs.DE;
     
     // update flags
-    regs.F &= ~BIT_ALL;
+    regs.raf.F &= ~BIT_ALL;
     if (*regs_IX_OR_IY & 0x8000)
-      regs.F |= BIT_S;
+      regs.raf.F |= BIT_S;
     if (regs_IX_OR_IY == 0)
-      regs.F |= BIT_Z;
+      regs.raf.F |= BIT_Z;
     if (word_parity(*regs_IX_OR_IY))
-      regs.F |= BIT_P;
+      regs.raf.F |= BIT_P;
     return(resGO);
     
   case 0xF4: // LD (HL|IY+d),HL
@@ -584,17 +584,17 @@ int cl_r2k::inst_xd(t_mem prefix)
     
   case 0xFC: // RR IX|IY
   {
-    u16_t  tmp = (regs.F & BIT_C) << (15 - BITPOS_C);
+    u16_t  tmp = (regs.raf.F & BIT_C) << (15 - BITPOS_C);
     tmp |= (*regs_IX_OR_IY >> 1);
     
-    regs.F = (regs.F & ~BIT_C) | ((*regs_IX_OR_IY & 1) << BITPOS_C);
+    regs.raf.F = (regs.raf.F & ~BIT_C) | ((*regs_IX_OR_IY & 1) << BITPOS_C);
     
     if (*regs_IX_OR_IY & 0x8000)
-      regs.F |= BIT_S;
+      regs.raf.F |= BIT_S;
     if (*regs_IX_OR_IY == 0)
-      regs.F |= BIT_Z;
+      regs.raf.F |= BIT_Z;
     if (word_parity(*regs_IX_OR_IY))
-      regs.F |= BIT_P;
+      regs.raf.F |= BIT_P;
     return(resGO);
   }
   

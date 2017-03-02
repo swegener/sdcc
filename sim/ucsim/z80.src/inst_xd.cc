@@ -124,7 +124,7 @@ cl_z80::inst_Xd_ld(t_mem code)
       vc.rd++;
     return(resGO);
     case 0x67: // LD HX,A
-      regs_iX_h = regs.A;
+      regs_iX_h = regs.raf.A;
     return(resGO);
     case 0x68: // LD LX,B
       regs_iX_l = regs.bc.h;
@@ -148,7 +148,7 @@ cl_z80::inst_Xd_ld(t_mem code)
       vc.rd++;
     return(resGO);
     case 0x6F: // LD LX,A
-      regs_iX_l = regs.A;
+      regs_iX_l = regs.raf.A;
     return(resGO);
     case 0x70: // LD (IX+dd),B
       store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.bc.h);
@@ -175,17 +175,17 @@ cl_z80::inst_Xd_ld(t_mem code)
       vc.wr++;
     return(resGO);
     case 0x77: // LD (IX+dd),A
-      store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.A);
+      store1(add_u16_disp(regs_IX_OR_IY,fetch()), regs.raf.A);
       vc.wr++;
     return(resGO);
     case 0x7C: // LD A,HX
-      regs.A = regs_iX_h;
+      regs.raf.A = regs_iX_h;
     return(resGO);
     case 0x7D: // LD A,LX
-      regs.A = regs_iX_l;
+      regs.raf.A = regs_iX_l;
     return(resGO);
     case 0x7E: // LD A,(IX+dd)
-      regs.A = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
+      regs.raf.A = get1(add_u16_disp(regs_IX_OR_IY,fetch()));
       vc.rd++;
     return(resGO);
     case 0xF9: // LD SP,IX

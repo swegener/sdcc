@@ -35,12 +35,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 #define tst_A_bytereg(br) {                                \
-   ubtmp = regs.A & (br);                                  \
-   regs.F &= ~(BIT_ALL);  /* clear these */                \
-   regs.F |= BIT_A;                                        \
-   if (ubtmp == 0)    regs.F |= BIT_Z;                     \
-   if (ubtmp & 0x80)  regs.F |= BIT_S;                     \
-   if (parity(ubtmp)) regs.F |= BIT_P;                     \
+   ubtmp = regs.raf.A & (br);                                  \
+   regs.raf.F &= ~(BIT_ALL);  /* clear these */                \
+   regs.raf.F |= BIT_A;                                        \
+   if (ubtmp == 0)    regs.raf.F |= BIT_Z;                     \
+   if (ubtmp & 0x80)  regs.raf.F |= BIT_S;                     \
+   if (parity(ubtmp)) regs.raf.F |= BIT_P;                     \
 }
 
 
@@ -93,14 +93,14 @@ int  cl_z80::inst_ed_(t_mem code)
       vc.wr+= 2;
       return(resGO);
     case 0x44: // NEG
-      regs.F &= ~(BIT_ALL);  /* clear these */
-      if (regs.A != 0)    regs.F |= BIT_C;
-      if (regs.A == 0x80) regs.F |= BIT_P;
-      if ((regs.A & 0x0F) != 0) regs.F |= BIT_A;
-      regs.A -= regs.A;
-      regs.F |= BIT_N; /* not addition */
-      if (regs.A == 0)    regs.F |= BIT_Z;
-      if (regs.A & 0x80)  regs.F |= BIT_S;
+      regs.raf.F &= ~(BIT_ALL);  /* clear these */
+      if (regs.raf.A != 0)    regs.raf.F |= BIT_C;
+      if (regs.raf.A == 0x80) regs.raf.F |= BIT_P;
+      if ((regs.raf.A & 0x0F) != 0) regs.raf.F |= BIT_A;
+      regs.raf.A -= regs.raf.A;
+      regs.raf.F |= BIT_N; /* not addition */
+      if (regs.raf.A == 0)    regs.raf.F |= BIT_Z;
+      if (regs.raf.A & 0x80)  regs.raf.F |= BIT_S;
       return(resGO);
     case 0x45: // RETN (return from non-maskable interrupt)
       pop2(PC);
@@ -112,7 +112,7 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 #endif
     case 0x47: // LD IV,A
-      regs.iv = regs.A;
+      regs.iv = regs.raf.A;
       return(resGO);
       
     case 0x48: // IN C,(C)
@@ -163,7 +163,7 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 #endif
     case 0x57: // LD A,IV
-      regs.A = regs.iv;
+      regs.raf.A = regs.iv;
       return(resGO);
       
     case 0x58: // IN E,(C)
@@ -282,12 +282,12 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
     case 0xA0: // LDI
       // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
-      regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+      regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
       store1(regs.DE, get1(regs.HL));
       ++regs.HL;
       ++regs.DE;
       --regs.BC;
-      if (regs.BC != 0) regs.F |= BIT_P;
+      if (regs.BC != 0) regs.raf.F |= BIT_P;
       return(resGO);
     case 0xA1: // CPI
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.
@@ -297,7 +297,7 @@ int  cl_z80::inst_ed_(t_mem code)
         cp_bytereg(tmp);
         ++regs.HL;
         --regs.BC;
-        if (regs.BC != 0) regs.F |= BIT_P;
+        if (regs.BC != 0) regs.raf.F |= BIT_P;
       }
       return(resGO);
 
@@ -308,25 +308,25 @@ int  cl_z80::inst_ed_(t_mem code)
 
     case 0xA8: // LDD
       // BC - count, source=HL, dest=DE.  *DE-- = *HL--, --BC until zero
-      regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+      regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
       store1(regs.DE, get1(regs.HL));
       --regs.HL;
       --regs.DE;
       --regs.BC;
-      if (regs.BC != 0) regs.F |= BIT_P;
+      if (regs.BC != 0) regs.raf.F |= BIT_P;
       vc.rd++;
       vc.wr++;
       return(resGO);
     case 0xA9: // CPD
 /* fixme: checkme, compare to other emul. */
 
-      regs.F &= ~(BIT_ALL);  /* clear these */
-      if ((regs.A - get1(regs.HL)) == 0) {
-        regs.F |= (BIT_Z | BIT_P);
+      regs.raf.F &= ~(BIT_ALL);  /* clear these */
+      if ((regs.raf.A - get1(regs.HL)) == 0) {
+        regs.raf.F |= (BIT_Z | BIT_P);
       }
       ++regs.HL;
       --regs.BC;
-      if (regs.BC != 0) regs.F |= BIT_P;
+      if (regs.BC != 0) regs.raf.F |= BIT_P;
       vc.rd++;
       
       return(resGO);
@@ -338,7 +338,7 @@ int  cl_z80::inst_ed_(t_mem code)
 
     case 0xB0: // LDIR
       // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
-      regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+      regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
       do {
         store1(regs.DE, get1(regs.HL));
         ++regs.HL;
@@ -351,24 +351,24 @@ int  cl_z80::inst_ed_(t_mem code)
 
     case 0xB1: // CPIR
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.
-      regs.F &= ~(BIT_P | BIT_A | BIT_Z | BIT_S);  /* clear these */
-      regs.F |= BIT_N;
+      regs.raf.F &= ~(BIT_P | BIT_A | BIT_Z | BIT_S);  /* clear these */
+      regs.raf.F |= BIT_N;
       do {
-        if((regs.A - get1(regs.HL)) == 0)
-          regs.F |= BIT_Z;
+        if((regs.raf.A - get1(regs.HL)) == 0)
+          regs.raf.F |= BIT_Z;
         else
-          regs.F &= ~BIT_Z;
-        if((regs.A - get1(regs.HL)) & 0x80)
-          regs.F |= BIT_S;
+          regs.raf.F &= ~BIT_Z;
+        if((regs.raf.A - get1(regs.HL)) & 0x80)
+          regs.raf.F |= BIT_S;
         else
-          regs.F &= ~BIT_S;
+          regs.raf.F &= ~BIT_S;
 /* fixme: set BIT_A correctly. */
         ++regs.HL;
         --regs.BC;
 	vc.rd++;
-      } while (regs.BC != 0 && (regs.F & BIT_Z) == 0);
+      } while (regs.BC != 0 && (regs.raf.F & BIT_Z) == 0);
       if(regs.BC != 0)
-        regs.F |= BIT_P;
+        regs.raf.F |= BIT_P;
 
       return(resGO);
 #if 0
@@ -379,7 +379,7 @@ int  cl_z80::inst_ed_(t_mem code)
 #endif
     case 0xB8: // LDDR
       // BC - count, source=HL, dest=DE.  *DE-- = *HL--, --BC until zero
-      regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+      regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
       do {
         store1(regs.DE, get1(regs.HL));
         --regs.HL;
@@ -391,10 +391,10 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
     case 0xB9: // CPDR
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.
-      regs.F &= ~(BIT_ALL);  /* clear these */
+      regs.raf.F &= ~(BIT_ALL);  /* clear these */
       do {
-        if ((regs.A - get1(regs.HL)) == 0) {
-          regs.F |= (BIT_Z | BIT_P);
+        if ((regs.raf.A - get1(regs.HL)) == 0) {
+          regs.raf.F |= (BIT_Z | BIT_P);
           break;
         }
         --regs.HL;

@@ -16,9 +16,7 @@
 #define BITPOS_I 3  // 8H
 #define BITPOS_H 4  // 10H
 
-#define store2(addr, val) { ram->write((t_addr) (addr), (val >> 8) & 0xff); \
-                            ram->write((t_addr) (addr+1), val & 0xff); \
-  			    vc.wr+= 2; }
+#define store2(addr, val) { ram->write((t_addr) (addr), (val >> 8) & 0xff); ram->write((t_addr) (addr+1), val & 0xff); vc.wr+= 2; }
 #define store1(addr, val) { ram->write((t_addr) (addr), val); vc.wr++; }
 #define get1(addr) get_1(addr)
 //ram->get((t_addr) (addr))

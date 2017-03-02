@@ -66,14 +66,14 @@ cl_z80::inst_ld(t_mem code)
       regs.BC = fetch2();
       break;
     case 2: // LD (BC),A
-      store1(regs.BC, regs.A);
+      store1(regs.BC, regs.raf.A);
       vc.wr++;
       break;
     case 6: // LD B,nn
       regs.bc.h = fetch();
       break;
     case 0xa: // LD A,(BC)
-      regs.A = get1(regs.BC);
+      regs.raf.A = get1(regs.BC);
       vc.rd++;
       break;
     case 0x0e: // LD C,nn
@@ -83,14 +83,14 @@ cl_z80::inst_ld(t_mem code)
       regs.DE = fetch2();
       break;
     case 0x12: // LD (DE),A
-      store1(regs.DE, regs.A);
+      store1(regs.DE, regs.raf.A);
       vc.wr++;
       break;
     case 0x16: // LD D,nn
       regs.de.h = fetch();
       break;
     case 0x1A: // LD A,(DE)
-      regs.A = get1(regs.DE);
+      regs.raf.A = get1(regs.DE);
       vc.rd++;
       break;
     case 0x1E: // LD E,nn
@@ -128,7 +128,7 @@ cl_z80::inst_ld(t_mem code)
       {
 	unsigned short tw;
 	tw = fetch2();
-	store1(tw, regs.A);
+	store1(tw, regs.raf.A);
 	vc.wr++;
 	break;
       }
@@ -137,11 +137,11 @@ cl_z80::inst_ld(t_mem code)
       vc.wr++;
       break;
     case 0x3A: // LD A,(nnnn)
-      regs.A = get1(fetch2());
+      regs.raf.A = get1(fetch2());
       vc.rd++;
       break;
     case 0x3E: // LD A,nn
-      regs.A = fetch();
+      regs.raf.A = fetch();
       break;
     case 0x40: // LD B,B
       break;
@@ -165,7 +165,7 @@ cl_z80::inst_ld(t_mem code)
       vc.rd++;
       break;
     case 0x47: // LD B,A
-      regs.bc.h = regs.A;
+      regs.bc.h = regs.raf.A;
       break;
     case 0x48: // LD C,B
       regs.bc.l = regs.bc.h;
@@ -189,7 +189,7 @@ cl_z80::inst_ld(t_mem code)
       vc.rd++;
       break;
     case 0x4F: // LD C,A
-      regs.bc.l = regs.A;
+      regs.bc.l = regs.raf.A;
       break;
     case 0x50: // LD D,B
       regs.de.h = regs.bc.h;
@@ -213,7 +213,7 @@ cl_z80::inst_ld(t_mem code)
       vc.rd++;
       break;
     case 0x57: // LD D,A
-      regs.de.h = regs.A;
+      regs.de.h = regs.raf.A;
       break;
     case 0x58: // LD E,B
       regs.de.l = regs.bc.h;
@@ -237,7 +237,7 @@ cl_z80::inst_ld(t_mem code)
       vc.rd++;
       break;
     case 0x5F: // LD E,A
-      regs.de.l = regs.A;
+      regs.de.l = regs.raf.A;
       break;
     case 0x60: // LD H,B
       regs.hl.h = regs.bc.h;
@@ -262,7 +262,7 @@ cl_z80::inst_ld(t_mem code)
       vc.rd++;
       break;
     case 0x67: // LD H,A
-      regs.hl.h = regs.A;
+      regs.hl.h = regs.raf.A;
       break;
     case 0x68: // LD L,B
       regs.hl.l = regs.bc.h;
@@ -286,7 +286,7 @@ cl_z80::inst_ld(t_mem code)
       vc.rd++;
       break;
     case 0x6F: // LD L,A
-      regs.hl.l = regs.A;
+      regs.hl.l = regs.raf.A;
       break;
     case 0x70: // LD (HL),B
       store1(regs.HL, regs.bc.h);
@@ -316,29 +316,29 @@ cl_z80::inst_ld(t_mem code)
       return(resHALT);
 
     case 0x77: // LD (HL),A
-      store1(regs.HL, regs.A);
+      store1(regs.HL, regs.raf.A);
       vc.wr++;
       break;
     case 0x78: // LD A,B
-      regs.A = regs.bc.h;
+      regs.raf.A = regs.bc.h;
       break;
     case 0x79: // LD A,C
-      regs.A = regs.bc.l;
+      regs.raf.A = regs.bc.l;
       break;
     case 0x7A: // LD A,D
-      regs.A = regs.de.h;
+      regs.raf.A = regs.de.h;
       break;
     case 0x7B: // LD A,E
-      regs.A = regs.de.l;
+      regs.raf.A = regs.de.l;
       break;
     case 0x7C: // LD A,H
-      regs.A = regs.hl.h;
+      regs.raf.A = regs.hl.h;
       break;
     case 0x7D: // LD A,L
-      regs.A = regs.hl.l;
+      regs.raf.A = regs.hl.l;
       break;
     case 0x7E: // LD A,(HL)
-      regs.A = get1(regs.HL);
+      regs.raf.A = get1(regs.HL);
       vc.rd++;
       break;
     case 0x7F: // LD A,A
@@ -398,7 +398,7 @@ cl_z80::inst_inc(t_mem code)
 	 break;
       }
     case 0x3C: // INC A
-      inc(regs.A);
+      inc(regs.raf.A);
       break;
     default:
       return(resINV_INST);
@@ -452,7 +452,7 @@ cl_z80::inst_dec(t_mem code)
       --regs.SP;
       break;
     case 0x3D: // DEC A
-      dec(regs.A);
+      dec(regs.raf.A);
       break;
     default:
       return(resINV_INST);
@@ -464,12 +464,12 @@ cl_z80::inst_dec(t_mem code)
 int
 cl_z80::inst_rlca(t_mem code)
 {
-  regs.F &= ~(BIT_A | BIT_N | BIT_C);
-  if (regs.A & 0x80) {
-     regs.F |= BIT_C;
-     regs.A = (regs.A << 1) | 0x01;
+  regs.raf.F &= ~(BIT_A | BIT_N | BIT_C);
+  if (regs.raf.A & 0x80) {
+     regs.raf.F |= BIT_C;
+     regs.raf.A = (regs.raf.A << 1) | 0x01;
    } else
-     regs.A = (regs.A << 1);
+     regs.raf.A = (regs.raf.A << 1);
 
   return(resGO);
 }
@@ -477,13 +477,13 @@ cl_z80::inst_rlca(t_mem code)
 int
 cl_z80::inst_rrca(t_mem code)
 {
-  regs.F &= ~(BIT_A | BIT_N | BIT_C);
-  if (regs.A & 0x01) {
-     regs.F |= BIT_C;
-     regs.A = (regs.A >> 1) | 0x80;
+  regs.raf.F &= ~(BIT_A | BIT_N | BIT_C);
+  if (regs.raf.A & 0x01) {
+     regs.raf.F |= BIT_C;
+     regs.raf.A = (regs.raf.A >> 1) | 0x80;
    }
    else
-     regs.A = (regs.A >> 1);
+     regs.raf.A = (regs.raf.A >> 1);
   return(resGO);
 }
 
@@ -496,13 +496,13 @@ cl_z80::inst_ex(t_mem code)
 
   switch (code) {
     case 0x08: // EX AF,AF'
-      tmp = regs.aA;
-      regs.aA = regs.A;
-      regs.A = tmp;
+      tmp = regs.ralt_af.aA;
+      regs.ralt_af.aA = regs.raf.A;
+      regs.raf.A = tmp;
 
-      tmp = regs.aF;
-      regs.aF = regs.F;
-      regs.F = tmp;
+      tmp = regs.ralt_af.aF;
+      regs.ralt_af.aF = regs.raf.F;
+      regs.raf.F = tmp;
     break;
 
     case 0xE3: // EX (SP),HL
@@ -574,7 +574,7 @@ cl_z80::inst_add(t_mem code)
       }
       
     case 0x87: // ADD A,A
-      add_A_bytereg(regs.A);
+      add_A_bytereg(regs.raf.A);
       break;
       
     case 0xC6: // ADD A,nn
@@ -611,14 +611,14 @@ cl_z80::inst_djnz(t_mem code)
 int
 cl_z80::inst_rra(t_mem code)
 {
-  rr_byte(regs.A);
+  rr_byte(regs.raf.A);
   return(resGO);
 }
 
 int
 cl_z80::inst_rla(t_mem code)
 {
-  rl_byte(regs.A);
+  rl_byte(regs.raf.A);
   return(resGO);
 }
 
@@ -633,22 +633,22 @@ cl_z80::inst_jr(t_mem code)
       PC += j;
     break;
     case 0x20: // JR NZ,dd
-      if (!(regs.F & BIT_Z)) {
+      if (!(regs.raf.F & BIT_Z)) {
         PC += j;
       }
     break;
     case 0x28: // JR Z,dd
-      if ((regs.F & BIT_Z)) {
+      if ((regs.raf.F & BIT_Z)) {
         PC += j;
       }
     break;
     case 0x30: // JR NC,dd
-      if (!(regs.F & BIT_C)) {
+      if (!(regs.raf.F & BIT_C)) {
         PC += j;
       }
     break;
     case 0x38: // JR C,dd
-      if ((regs.F & BIT_C)) {
+      if ((regs.raf.F & BIT_C)) {
         PC += j;
       }
     break;
@@ -677,25 +677,25 @@ cl_z80::inst_daa(t_mem code)
      taking the lazy way out for now and just transcribing MH's code.
    */
   unsigned char incr;
-  unsigned char N = regs.F & BIT_N; /* save N */
-  unsigned char C = regs.F & BIT_C; /* save C */
-  if ((regs.F & BIT_A) || ((regs.A & 0x0f) > 9))
+  unsigned char N = regs.raf.F & BIT_N; /* save N */
+  unsigned char C = regs.raf.F & BIT_C; /* save C */
+  if ((regs.raf.F & BIT_A) || ((regs.raf.A & 0x0f) > 9))
        incr = 6;
   else incr = 0;
 
-  if ((regs.F & BIT_C) || ((regs.A & 0xf0) > 0x90) || (regs.A > 0x99))
+  if ((regs.raf.F & BIT_C) || ((regs.raf.A & 0xf0) > 0x90) || (regs.raf.A > 0x99))
     incr |= 0x60;
 
-  if (regs.F & BIT_N) {  /* not addition */
+  if (regs.raf.F & BIT_N) {  /* not addition */
     sub_A_bytereg(incr);
   } else {
     add_A_bytereg(incr);
   }
-  regs.F &= ~(BIT_P | BIT_N);
-  if (parity(regs.A))
-    regs.F |= BIT_P;
-  regs.F |= N; /* restore N */
-  regs.F |= C; /* or with original C */
+  regs.raf.F &= ~(BIT_P | BIT_N);
+  if (parity(regs.raf.A))
+    regs.raf.F |= BIT_P;
+  regs.raf.F |= N; /* restore N */
+  regs.raf.F |= C; /* or with original C */
 
   return(resGO);
 }
@@ -703,8 +703,8 @@ cl_z80::inst_daa(t_mem code)
 int
 cl_z80::inst_cpl(t_mem code)
 {
-  regs.F |= (BIT_A | BIT_N);
-  regs.A = ~regs.A;
+  regs.raf.F |= (BIT_A | BIT_N);
+  regs.raf.A = ~regs.raf.A;
   return(resGO);
 }
 
@@ -712,8 +712,8 @@ int
 cl_z80::inst_scf(t_mem code)
 {
   /* Set Carry Flag */
-  regs.F &= ~(BIT_A | BIT_N);
-  regs.F |= BIT_C;
+  regs.raf.F &= ~(BIT_A | BIT_N);
+  regs.raf.F |= BIT_C;
   return(resGO);
 }
 
@@ -721,10 +721,10 @@ int
 cl_z80::inst_ccf(t_mem code)
 {
   /* Complement Carry Flag */
-  regs.F &= ~(BIT_A | BIT_N);
-  if (regs.F & BIT_C)
-    regs.F |= BIT_A;
-  regs.F ^= BIT_C;
+  regs.raf.F &= ~(BIT_A | BIT_N);
+  if (regs.raf.F & BIT_C)
+    regs.raf.F |= BIT_A;
+  regs.raf.F ^= BIT_C;
   return(resGO);
 }
 
@@ -766,7 +766,7 @@ cl_z80::inst_adc(t_mem code)
 	break;
       }
     case 0x8F: // ADC A,A
-      adc_A_bytereg(regs.A);
+      adc_A_bytereg(regs.raf.A);
       break;
       
     case 0xCE: // ADC A,nn
@@ -816,7 +816,7 @@ cl_z80::inst_sbc(t_mem code)
 	break;
       }
     case 0x9F: // SBC A,A
-      sbc_A_bytereg(regs.A);
+      sbc_A_bytereg(regs.raf.A);
       break;
     case 0xDE: // SBC A,nn
       {
@@ -864,7 +864,7 @@ cl_z80::inst_and(t_mem code)
 	break;
       }
     case 0xA7: // AND A
-      and_A_bytereg(regs.A);
+      and_A_bytereg(regs.raf.A);
       break;
     case 0xE6: // AND nn
       and_A_bytereg(fetch());
@@ -909,7 +909,7 @@ cl_z80::inst_xor(t_mem code)
 	break;
       }
     case 0xAF: // XOR A
-      xor_A_bytereg(regs.A);
+      xor_A_bytereg(regs.raf.A);
       break;
     case 0xEE: // XOR nn
       xor_A_bytereg(fetch());
@@ -954,7 +954,7 @@ cl_z80::inst_or(t_mem code)
 	break;
       }
     case 0xB7: // OR A
-      or_A_bytereg(regs.A);
+      or_A_bytereg(regs.raf.A);
       break;
     case 0xF6: // OR nn
       or_A_bytereg(fetch());
@@ -999,7 +999,7 @@ cl_z80::inst_cp(t_mem code)
 	break;
       }
     case 0xBF: // CP A
-      cp_bytereg(regs.A);
+      cp_bytereg(regs.raf.A);
       break;
     case 0xFE: // CP nn
       {
@@ -1027,7 +1027,7 @@ cl_z80::inst_rst(t_mem code)
       break;
     case 0xCF: // RST 8
       //PC = 0x08;
-      switch (regs.A)
+      switch (regs.raf.A)
 	{
 	case 0:
 	  return(resBREAKPOINT);
@@ -1084,13 +1084,13 @@ cl_z80::inst_ret(t_mem code)
   switch(code)
     {
     case 0xC0: // RET NZ
-      if (!(regs.F & BIT_Z)) {
+      if (!(regs.raf.F & BIT_Z)) {
         pop2(PC);
 	vc.rd+= 2;
       }
       break;
     case 0xC8: // RET Z
-      if ((regs.F & BIT_Z)) {
+      if ((regs.raf.F & BIT_Z)) {
         pop2(PC);
 	vc.rd+= 2;
       }
@@ -1100,37 +1100,37 @@ cl_z80::inst_ret(t_mem code)
       vc.rd+= 2;
       break;
     case 0xD0: // RET NC
-      if (!(regs.F & BIT_C)) {
+      if (!(regs.raf.F & BIT_C)) {
         pop2(PC);
 	vc.rd+= 2;
       }
       break;
     case 0xD8: // RET C
-      if ((regs.F & BIT_C)) {
+      if ((regs.raf.F & BIT_C)) {
         pop2(PC);
 	vc.rd+= 2;
       }
       break;
     case 0xE0: // RET PO
-      if (!(regs.F & BIT_P)) {
+      if (!(regs.raf.F & BIT_P)) {
         pop2(PC);
 	vc.rd+= 2;
       }
       break;
     case 0xE8: // RET PE
-      if ((regs.F & BIT_P)) {
+      if ((regs.raf.F & BIT_P)) {
         pop2(PC);
 	vc.rd+= 2;
       }
       break;
     case 0xF0: // RET P
-      if (!(regs.F & BIT_S)) {
+      if (!(regs.raf.F & BIT_S)) {
         pop2(PC);
 	vc.rd+= 2;
       }
       break;
     case 0xF8: // RET M
-      if ((regs.F & BIT_S)) {
+      if ((regs.raf.F & BIT_S)) {
         pop2(PC);
 	vc.rd+= 2;
       }
@@ -1148,7 +1148,7 @@ cl_z80::inst_call(t_mem code)
   switch(code)
     {
     case 0xC4: // CALL NZ,nnnn
-      if (!(regs.F & BIT_Z)) {
+      if (!(regs.raf.F & BIT_Z)) {
         push2(PC+2);
         PC = fetch2();
 	vc.wr+= 2;
@@ -1157,7 +1157,7 @@ cl_z80::inst_call(t_mem code)
       }
       break;
     case 0xCC: // CALL Z,nnnn
-      if (regs.F & BIT_Z) {
+      if (regs.raf.F & BIT_Z) {
         push2(PC+2);
         PC = fetch2();
 	vc.wr+= 2;
@@ -1171,7 +1171,7 @@ cl_z80::inst_call(t_mem code)
       vc.wr+= 2;
       break;
     case 0xD4: // CALL NC,nnnn
-      if (!(regs.F & BIT_C)) {
+      if (!(regs.raf.F & BIT_C)) {
         push2(PC+2);
         PC = fetch2();
 	vc.wr+= 2;
@@ -1180,7 +1180,7 @@ cl_z80::inst_call(t_mem code)
       }
       break;
     case 0xDC: // CALL C,nnnn
-      if (regs.F & BIT_C) {
+      if (regs.raf.F & BIT_C) {
         push2(PC+2);
         PC = fetch2();
 	vc.wr+= 2;
@@ -1189,7 +1189,7 @@ cl_z80::inst_call(t_mem code)
       }
       break;
     case 0xE4: // CALL PO,nnnn
-      if (!(regs.F & BIT_P)) {
+      if (!(regs.raf.F & BIT_P)) {
         push2(PC+2);
         PC = fetch2();
 	vc.wr+= 2;
@@ -1198,7 +1198,7 @@ cl_z80::inst_call(t_mem code)
       }
       break;
     case 0xEC: // CALL PE,nnnn
-      if (regs.F & BIT_P) {
+      if (regs.raf.F & BIT_P) {
         push2(PC+2);
         PC = fetch2();
 	vc.wr+= 2;
@@ -1207,7 +1207,7 @@ cl_z80::inst_call(t_mem code)
       }
       break;
     case 0xF4: // CALL P,nnnn
-      if (!(regs.F & BIT_S)) {
+      if (!(regs.raf.F & BIT_S)) {
         push2(PC+2);
         PC = fetch2();
 	vc.wr+= 2;
@@ -1216,7 +1216,7 @@ cl_z80::inst_call(t_mem code)
       }
       break;
     case 0xFC: // CALL M,nnnn
-      if (regs.F & BIT_S) {
+      if (regs.raf.F & BIT_S) {
         push2(PC+2);
         PC = fetch2();
 	vc.wr+= 2;
@@ -1236,7 +1236,7 @@ int
 cl_z80::inst_out(t_mem code)
 {
   t_addr a= fetch();
-  outputs->write(a, regs.A);
+  outputs->write(a, regs.raf.A);
   return(resGO);
 }
 
@@ -1258,8 +1258,8 @@ cl_z80::inst_push(t_mem code)
       vc.wr+= 2;
       break;
     case 0xF5: // PUSH AF
-      push1(regs.A);
-      push1(regs.F);
+      push1(regs.raf.A);
+      push1(regs.raf.F);
       vc.wr+= 2;
       break;
     default:
@@ -1294,7 +1294,7 @@ int
 cl_z80::inst_in(t_mem code)
 {
   t_addr a= fetch();
-  regs.A= inputs->read(a);
+  regs.raf.A= inputs->read(a);
   return(resGO);
 }
 
@@ -1330,7 +1330,7 @@ cl_z80::inst_sub(t_mem code)
       }
       break;
     case 0x97: // SUB A
-      sub_A_bytereg(regs.A);
+      sub_A_bytereg(regs.raf.A);
       break;
     case 0xD6: // SUB nn
       {
@@ -1367,8 +1367,8 @@ cl_z80::inst_pop(t_mem code)
       vc.rd+= 2;
       break;
     case 0xF1: // POP AF
-      regs.F = get1(regs.SP++);
-      regs.A = get1(regs.SP++);
+      regs.raf.F = get1(regs.SP++);
+      regs.raf.A = get1(regs.SP++);
       vc.rd+= 2;
       break;
     default:
@@ -1384,7 +1384,7 @@ cl_z80::inst_jp(t_mem code)
   switch (code)
     {
     case 0xC2: // JP NZ,nnnn
-      if (!(regs.F & BIT_Z)) {
+      if (!(regs.raf.F & BIT_Z)) {
         PC = fetch2();
       } else {
         fetch2();
@@ -1396,7 +1396,7 @@ cl_z80::inst_jp(t_mem code)
       break;
       
     case 0xCA: // JP Z,nnnn
-      if (regs.F & BIT_Z) {
+      if (regs.raf.F & BIT_Z) {
         PC = fetch2();
       } else {
         fetch2();
@@ -1404,7 +1404,7 @@ cl_z80::inst_jp(t_mem code)
       break;
       
     case 0xD2: // JP NC,nnnn
-      if (!(regs.F & BIT_C)) {
+      if (!(regs.raf.F & BIT_C)) {
         PC = fetch2();
       } else {
         fetch2();
@@ -1412,7 +1412,7 @@ cl_z80::inst_jp(t_mem code)
       break;
       
     case 0xDA: // JP C,nnnn
-      if (regs.F & BIT_C) {
+      if (regs.raf.F & BIT_C) {
         PC = fetch2();
       } else {
         fetch2();
@@ -1420,7 +1420,7 @@ cl_z80::inst_jp(t_mem code)
       break;
       
     case 0xE2: // JP PO,nnnn
-      if (!(regs.F & BIT_P)) {
+      if (!(regs.raf.F & BIT_P)) {
         PC = fetch2();
       } else {
         fetch2();
@@ -1432,7 +1432,7 @@ cl_z80::inst_jp(t_mem code)
       break;
       
     case 0xEA: // JP PE,nnnn
-      if (regs.F & BIT_P) {
+      if (regs.raf.F & BIT_P) {
         PC = fetch2();
       } else {
         fetch2();
@@ -1440,7 +1440,7 @@ cl_z80::inst_jp(t_mem code)
       break;
       
     case 0xF2: // JP P,nnnn (positive)
-      if (!(regs.F & BIT_S)) {
+      if (!(regs.raf.F & BIT_S)) {
         PC = fetch2();
       } else {
         fetch2();
@@ -1448,7 +1448,7 @@ cl_z80::inst_jp(t_mem code)
       break;
       
     case 0xFA: // JP M,nnnn (sign negative)
-      if (regs.F & BIT_S) {
+      if (regs.raf.F & BIT_S) {
         PC = fetch2();
       } else {
         fetch2();

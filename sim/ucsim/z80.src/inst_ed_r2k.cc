@@ -54,14 +54,14 @@ int  cl_r2k::inst_ed_(t_mem code)
     break;
     
   case 0x44: // NEG
-    regs.F &= ~(BIT_ALL);  /* clear these */
-    if (regs.A != 0)    regs.F |= BIT_C;
-    if (regs.A == 0x80) regs.F |= BIT_P;
-    if ((regs.A & 0x0F) != 0) regs.F |= BIT_A;
-    regs.A -= regs.A;
-    regs.F |= BIT_N; /* not addition */
-    if (regs.A == 0)    regs.F |= BIT_Z;
-    if (regs.A & 0x80)  regs.F |= BIT_S;
+    regs.raf.F &= ~(BIT_ALL);  /* clear these */
+    if (regs.raf.A != 0)    regs.raf.F |= BIT_C;
+    if (regs.raf.A == 0x80) regs.raf.F |= BIT_P;
+    if ((regs.raf.A & 0x0F) != 0) regs.raf.F |= BIT_A;
+    regs.raf.A -= regs.raf.A;
+    regs.raf.F |= BIT_N; /* not addition */
+    if (regs.raf.A == 0)    regs.raf.F |= BIT_Z;
+    if (regs.raf.A & 0x80)  regs.raf.F |= BIT_S;
     break;
     
   case 0x46: // ipset0
@@ -73,7 +73,7 @@ int  cl_r2k::inst_ed_(t_mem code)
     break;
     
   case 0x47: // LD EIR,A
-    eir = regs.A;
+    eir = regs.raf.A;
     break;
   case 0x49:
     regs.aBC = regs.BC;
@@ -98,7 +98,7 @@ int  cl_r2k::inst_ed_(t_mem code)
 
     // 0x4E: see 0x46
   case 0x4F:
-    iir = regs.A;
+    iir = regs.raf.A;
     break;
     
   case 0x51:
@@ -124,7 +124,7 @@ int  cl_r2k::inst_ed_(t_mem code)
     
     // 0x56: see 0x46
   case 0x57:
-    regs.A = eir;
+    regs.raf.A = eir;
     break;
     
   case 0x59: // LD DE', BC
@@ -148,7 +148,7 @@ int  cl_r2k::inst_ed_(t_mem code)
     // 0x5E: see 0x46
 
   case 0x5F: // LD A,IIR
-    regs.A = iir;
+    regs.raf.A = iir;
     break;
     
   case 0x61: // LD HL',DE
@@ -166,7 +166,7 @@ int  cl_r2k::inst_ed_(t_mem code)
     break;
     
   case 0x67: // LD XPC,A
-    mmu.xpc = regs.A;
+    mmu.xpc = regs.raf.A;
     break;
     
   case 0x69: // LD HL',BC
@@ -198,7 +198,7 @@ int  cl_r2k::inst_ed_(t_mem code)
     break;
     
   case 0x77: // LD A,XPC
-    regs.A = mmu.xpc;
+    regs.raf.A = mmu.xpc;
     break;
     
   case 0x7A: // ADC HL,SP
@@ -221,31 +221,31 @@ int  cl_r2k::inst_ed_(t_mem code)
     
   case 0xA0: // LDI
     // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
-    regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+    regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
     store1(regs.DE, get1(regs.HL));
     ++regs.HL;
     ++regs.DE;
     --regs.BC;
     vc.rd++;
     vc.wr++;
-    if (regs.BC != 0) regs.F |= BIT_P;
+    if (regs.BC != 0) regs.raf.F |= BIT_P;
     return(resGO);
     
   case 0xA8: // LDD
     // BC - count, source=HL, dest=DE.  *DE-- = *HL--, --BC until zero
-    regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+    regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
     store1(regs.DE, get1(regs.HL));
     --regs.HL;
     --regs.DE;
     --regs.BC;
     vc.rd++;
     vc.wr++;
-    if (regs.BC != 0) regs.F |= BIT_P;
+    if (regs.BC != 0) regs.raf.F |= BIT_P;
     return(resGO);
     
   case 0xB0: // LDIR
     // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
-    regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+    regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
     
     tw = get1(regs.HL);
     store1(regs.DE, tw);
@@ -260,7 +260,7 @@ int  cl_r2k::inst_ed_(t_mem code)
     
   case 0xB8: // LDDR
     // BC - count, source=HL, dest=DE.  *DE-- = *HL--, --BC until zero
-    regs.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
+    regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
     
     tw = get1(regs.HL);
     store1(regs.DE, tw);
@@ -314,9 +314,9 @@ int  cl_r3ka::inst_ed_(t_mem code)
       return(resGO);
       
     case  0x7F:  // RDMODE
-      regs.F &= ~(BIT_C);
+      regs.raf.F &= ~(BIT_C);
       if (SU & 0x01)
-        regs.F |= BIT_C;
+        regs.raf.F |= BIT_C;
       return(resGO);
       
     case  0x90:  // LDISR
@@ -356,7 +356,7 @@ int  cl_r3ka::inst_ed_(t_mem code)
         tmp  = get1(regs.IY);
         tmp *= regs.DE;
         tmp += regs.aDE;
-        tmp += (regs.F & BIT_C) ? 1 : 0;
+        tmp += (regs.raf.F & BIT_C) ? 1 : 0;
         
         /* simple add for operand pointed to by IX */
         tmp += get1(regs.IX);
@@ -364,8 +364,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
         /* store the result(s) */
         store1( regs.HL, tmp & 0xFF );
         regs.aDE = ((tmp >> 8) & 0xFFFF);
-        regs.F &= ~(BIT_C);
-        regs.F |= (tmp >> 24) ? BIT_C : 0;
+        regs.raf.F &= ~(BIT_C);
+        regs.raf.F |= (tmp >> 24) ? BIT_C : 0;
 	vc.rd+= 2;
 	vc.wr++;
       }
@@ -389,7 +389,7 @@ int  cl_r3ka::inst_ed_(t_mem code)
         tmp  = get1(regs.IY);
         tmp *= regs.DE;
         tmp += regs.aDE;
-        tmp += (regs.F & BIT_C) ? 1 : 0;
+        tmp += (regs.raf.F & BIT_C) ? 1 : 0;
         
         /* subtract above from operand pointed to by IX */
         tmp = get1(regs.IX) - tmp;
@@ -397,8 +397,8 @@ int  cl_r3ka::inst_ed_(t_mem code)
         /* store the result(s) */
         store1( regs.HL, tmp & 0xFF );
         regs.aDE = ((tmp >> 8) & 0xFFFF);
-        regs.F &= ~(BIT_C);
-        regs.F |= (tmp >> 24) ? BIT_C : 0;
+        regs.raf.F &= ~(BIT_C);
+        regs.raf.F |= (tmp >> 24) ? BIT_C : 0;
 	vc.rd+= 2;
 	vc.wr++;
       }

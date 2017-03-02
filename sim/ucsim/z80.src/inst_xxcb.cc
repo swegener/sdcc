@@ -66,7 +66,7 @@ cl_z80::inst_XXcb_rlc(t_mem code)
     case 0x06: // RLC (HL)
     break;
     case 0x07: // RLC A
-      regs.A = tmp;
+      regs.raf.A = tmp;
     break;
     default:
       return(resINV_INST);
@@ -110,7 +110,7 @@ cl_z80::inst_XXcb_rrc(t_mem code)
     case 0x0E: // RRC (HL)
     break;
     case 0x0F: // RRC A
-      regs.A = tmp;
+      regs.raf.A = tmp;
     break;
     default:
       return(resINV_INST);
@@ -154,7 +154,7 @@ cl_z80::inst_XXcb_rl(t_mem code)
     case 0x16: // RL (HL)
     break;
     case 0x17: // RL A
-      regs.A = tmp;
+      regs.raf.A = tmp;
     break;
     default:
       return(resINV_INST);
@@ -198,7 +198,7 @@ cl_z80::inst_XXcb_rr(t_mem code)
     case 0x1E: // RR (HL)
     break;
     case 0x1F: // RR A
-      regs.A = tmp;
+      regs.raf.A = tmp;
     break;
     default:
       return(resINV_INST);
@@ -242,7 +242,7 @@ cl_z80::inst_XXcb_sla(t_mem code)
     case 0x26: // SLA (HL)
     break;
     case 0x27: // SLA A
-      regs.A = tmp;
+      regs.raf.A = tmp;
     break;
     default:
       return(resINV_INST);
@@ -286,7 +286,7 @@ cl_z80::inst_XXcb_sra(t_mem code)
     case 0x2E: // SRA (HL)
     break;
     case 0x2F: // SRA A
-      regs.A = tmp;
+      regs.raf.A = tmp;
     break;
     default:
       return(resINV_INST);
@@ -330,7 +330,7 @@ cl_z80::inst_XXcb_slia(t_mem code)
     case 0x36: // SLIA (HL)
     break;
     case 0x37: // SLIA A
-      regs.A = tmp;
+      regs.raf.A = tmp;
     break;
     default:
       return(resINV_INST);
@@ -374,7 +374,7 @@ cl_z80::inst_XXcb_srl(t_mem code)
     case 0x3E: // SRL (HL)
     break;
     case 0x3F: // SRL A
-      regs.A = tmp;
+      regs.raf.A = tmp;
     break;
     default:
       return(resINV_INST);
@@ -435,7 +435,7 @@ cl_z80::inst_XXcb_res(t_mem code)
     case 0x6: // RES x,(HL)
       break;
     case 0x7: // RES x,A
-      regs.A = tmp; break;
+      regs.raf.A = tmp; break;
     default:
       return(resINV_INST);
   }
@@ -474,7 +474,7 @@ cl_z80::inst_XXcb_set(t_mem code)
     case 0x6: // SET x,(HL)
       break;
     case 0x7: // SET x,A
-      regs.A = tmp; break;
+      regs.raf.A = tmp; break;
     default:
       return(resINV_INST);
   }

@@ -1032,9 +1032,8 @@ convsmallc (iCode *ic, eBBlock *ebp)
   assert (ic->op == CALL || ic->op == PCALL);
 
   for (icc = ic->prev; icc && icc->op == IPUSH; icc = icc->prev)
-    ;
+    ic = icc;
   icp = icc;
-  ic = icp->next;
 
   /* Reverse parameters. */
   for (icc = ic; icc->op != CALL && icc->op != PCALL; icc = icc->next)

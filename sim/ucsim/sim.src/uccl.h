@@ -122,7 +122,8 @@ public:
   //class cl_list *address_decoders;
   class cl_address_space *variables;
   class cl_var_list *vars;
-  
+
+  bool irq;
   class cl_irqs *it_sources;	// Sources of interrupts
   class cl_list *it_levels;	// Follow interrupt services
   class cl_list *stack_ops;	// Track stack operations

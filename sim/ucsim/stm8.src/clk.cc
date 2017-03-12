@@ -51,6 +51,11 @@ cl_clk::init(void)
   make_partner(HW_TIMER, 4);
   make_partner(HW_TIMER, 5);
   make_partner(HW_TIMER, 6);
+
+  make_partner(HW_UART, 1);
+  make_partner(HW_UART, 2);
+  make_partner(HW_UART, 3);
+  make_partner(HW_UART, 4);
   
   return 0;
 }
@@ -66,29 +71,46 @@ cl_clk::write(class cl_memory_cell *cell, t_mem *val)
       (cell == pckenr3))
     {
       cell->set(*val);
+
       e.set(HW_TIMER, 1);
       ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
       inform_partners(ev, &e);
+
       e.id= 2;
       ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
       inform_partners(ev, &e);
+
       e.id= 3;
       ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
       inform_partners(ev, &e);
+
       e.id= 4;
       ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
       inform_partners(ev, &e);
+
       e.id= 5;
       ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
       inform_partners(ev, &e);
+
       e.id= 6;
       ev= tim(e.id)?EV_CLK_ON:EV_CLK_OFF;
       inform_partners(ev, &e);
+
       e.set(HW_UART, 1);
-      inform_partners(usart(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
-      inform_partners(usart(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
-      inform_partners(usart(e.id++)?EV_CLK_ON:EV_CLK_OFF, &e);
-      inform_partners(usart(e.id  )?EV_CLK_ON:EV_CLK_OFF, &e);
+      ev= usart(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
+
+      e.id= 2;
+      ev= usart(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
+
+      e.id= 3;
+      ev= usart(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
+
+      e.id= 4;
+      ev= usart(e.id)?EV_CLK_ON:EV_CLK_OFF;
+      inform_partners(ev, &e);
     }
 }
 

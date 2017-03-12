@@ -1,4 +1,5 @@
-PRJ		= test_mdu517 test_mdu88x
+PRJ		= test_mdu517 test_mdu88x \
+		  stn stp strr sts stt stxr stxrw stxw
 
 all:
 	for p in $(PRJ); do \
@@ -9,4 +10,5 @@ clean:
 	for p in $(PRJ); do \
 		$(MAKE) -f $$p.mk clean ;\
 	done
-	rm -f *.out
+	rm -f *.out *.sout *.tim *.csv *.sim
+	rm -f st*[56].cmd

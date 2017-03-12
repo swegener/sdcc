@@ -1,7 +1,8 @@
-CC		= sdcc --model-large
+CC		= sdcc 
 
+MODEL		= large
 CPPFLAGS	=
-CFLAGS		= --debug
+CFLAGS		= --debug --model-$(MODEL)
 LDFLAGS		=
 LIBS		=
 

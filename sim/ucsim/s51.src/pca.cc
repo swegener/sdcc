@@ -80,37 +80,44 @@ void
 cl_pca::added_to_uc(void)
 {
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
-
-  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
-					  sfr->get_cell(IE), bmEC,
-					  sfr->get_cell(CCON), bmCCF4,
-					  0x0033, false, false,
-					  "PCA module #4", 5));
-  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
-					  sfr->get_cell(IE), bmEC,
-					  sfr->get_cell(CCON), bmCCF3,
-					  0x0033, false, false,
-					  "PCA module #3", 5));
-  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
-					  sfr->get_cell(IE), bmEC,
-					  sfr->get_cell(CCON), bmCCF2,
-					  0x0033, false, false,
-					  "PCA module #2", 5));
-  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
-					  sfr->get_cell(IE), bmEC,
-					  sfr->get_cell(CCON), bmCCF1,
-					  0x0033, false, false,
-					  "PCA module #1", 5));
-  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
-					  sfr->get_cell(IE), bmEC,
-					  sfr->get_cell(CCON), bmCCF0,
-					  0x0033, false, false,
-					  "PCA module #0", 5));
-  uc->it_sources->add_at(4, new cl_it_src(uc, bmEC,
-					  sfr->get_cell(IE), bmEC,
-					  sfr->get_cell(CCON), bmCF,
-					  0x0033, false, false,
-					  "PCA counter", 5));
+  class cl_it_src *is;
+  
+  uc->it_sources->add_at(4, is= new cl_it_src(uc, bmEC,
+					      sfr->get_cell(IE), bmEC,
+					      sfr->get_cell(CCON), bmCCF4,
+					      0x0033, false, false,
+					      "PCA module #4", 5));
+  is->init();
+  uc->it_sources->add_at(4, is= new cl_it_src(uc, bmEC,
+					      sfr->get_cell(IE), bmEC,
+					      sfr->get_cell(CCON), bmCCF3,
+					      0x0033, false, false,
+					      "PCA module #3", 5));
+  is->init();
+  uc->it_sources->add_at(4, is= new cl_it_src(uc, bmEC,
+					      sfr->get_cell(IE), bmEC,
+					      sfr->get_cell(CCON), bmCCF2,
+					      0x0033, false, false,
+					      "PCA module #2", 5));
+  is->init();
+  uc->it_sources->add_at(4, is= new cl_it_src(uc, bmEC,
+					      sfr->get_cell(IE), bmEC,
+					      sfr->get_cell(CCON), bmCCF1,
+					      0x0033, false, false,
+					      "PCA module #1", 5));
+  is->init();
+  uc->it_sources->add_at(4, is= new cl_it_src(uc, bmEC,
+					      sfr->get_cell(IE), bmEC,
+					      sfr->get_cell(CCON), bmCCF0,
+					      0x0033, false, false,
+					      "PCA module #0", 5));
+  is->init();
+  uc->it_sources->add_at(4, is= new cl_it_src(uc, bmEC,
+					      sfr->get_cell(IE), bmEC,
+					      sfr->get_cell(CCON), bmCF,
+					      0x0033, false, false,
+					      "PCA counter", 5));
+  is->init();
 }
 
 void

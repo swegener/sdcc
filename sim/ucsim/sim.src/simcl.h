@@ -56,7 +56,7 @@ public:
   class cl_gui *gui;
   class cl_hw *simif;
   
-  double start_at;
+  double start_at, stop_at;
   unsigned long start_tick;
   unsigned long steps_done;
   unsigned long steps_todo; // use this if not 0

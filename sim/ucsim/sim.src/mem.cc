@@ -459,8 +459,8 @@ cl_memory::search_next(bool case_sensitive,
  *                                                             Memory operators
  */
 
-cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell,
-				       t_addr addr):
+cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell/*,
+								    t_addr addr*/):
   cl_base()
 {
   cell= acell;
@@ -475,7 +475,7 @@ cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell,
       mask= ~0;
     }
   next_operator= 0;
-  address= addr;
+  //address= addr;
 }
 /*
 cl_memory_operator::cl_memory_operator(class cl_memory_cell *acell,
@@ -523,9 +523,9 @@ cl_memory_operator::write(t_mem val)
 /* Memory operator for bank switcher */
 
 cl_bank_switcher_operator::cl_bank_switcher_operator(class cl_memory_cell *acell,
-						     t_addr addr,
+						     /*t_addr addr,*/
 						     class cl_banker *the_banker):
-  cl_memory_operator(acell, addr)
+  cl_memory_operator(acell/*, addr*/)
 {
   banker= the_banker;
   set_name("bank_switcher");
@@ -546,10 +546,10 @@ cl_bank_switcher_operator::write(t_mem val)
 
 /* Memory operator for hw callbacks */
 
-cl_hw_operator::cl_hw_operator(class cl_memory_cell *acell, t_addr addr,
+cl_hw_operator::cl_hw_operator(class cl_memory_cell *acell/*, t_addr addr*/,
 			       //t_mem *data_place, t_mem the_mask,
 			       class cl_hw *ahw):
-  cl_memory_operator(acell, addr/*, data_place, the_mask*/)
+  cl_memory_operator(acell/*, addr*//*, data_place, the_mask*/)
 {
   hw= ahw;
   set_name("hw");
@@ -604,10 +604,10 @@ cl_hw_operator::write(t_mem val)
 
 /* Write event break on cell */
 
-cl_write_operator::cl_write_operator(class cl_memory_cell *acell, t_addr addr,
+cl_write_operator::cl_write_operator(class cl_memory_cell *acell/*, t_addr addr*/,
 				     //t_mem *data_place, t_mem the_mask,
 				     class cl_uc *auc, class cl_brk *the_bp):
-  cl_event_break_operator(acell, addr/*, data_place, the_mask*/, auc, the_bp)
+  cl_event_break_operator(acell/*, addr*//*, data_place, the_mask*/, auc, the_bp)
 {
   uc= auc;
   bp= the_bp;
@@ -629,10 +629,10 @@ cl_write_operator::write(t_mem val)
 
 /* Read event break on cell */
 
-cl_read_operator::cl_read_operator(class cl_memory_cell *acell, t_addr addr,
+cl_read_operator::cl_read_operator(class cl_memory_cell *acell/*, t_addr addr*/,
 				   //t_mem *data_place, t_mem the_mask,
 				   class cl_uc *auc, class cl_brk *the_bp):
-  cl_event_break_operator(acell, addr/*, data_place, the_mask*/, auc, the_bp)
+  cl_event_break_operator(acell/*, addr*//*, data_place, the_mask*/, auc, the_bp)
 {
   uc= auc;
   bp= the_bp;
@@ -993,6 +993,13 @@ cl_memory_cell::set_bit1(t_mem bits)
 }
 
 void
+cl_memory_cell::write_bit1(t_mem bits)
+{
+  bits&= mask;
+  /*(*data)|=*//*d*/write(d()| bits);
+}
+
+void
 cl_memory_cell::set_bit0(t_mem bits)
 {
   bits&= mask;
@@ -1000,10 +1007,24 @@ cl_memory_cell::set_bit0(t_mem bits)
 }
 
 void
+cl_memory_cell::write_bit0(t_mem bits)
+{
+  bits&= mask;
+  /*(*data)&=*//*d*/write(d()& ~bits);
+}
+
+void
 cl_memory_cell::toggle_bits(t_mem bits)
 {
   bits&= mask;
   /*d*/set(d() ^ bits);
+}
+
+void
+cl_memory_cell::wtoggle_bits(t_mem bits)
+{
+  bits&= mask;
+  /*d*/write(d() ^ bits);
 }
 
 
@@ -1102,9 +1123,9 @@ cl_memory_cell::get_banker(void)
 }
 
 class cl_memory_cell *
-cl_memory_cell::add_hw(class cl_hw *hw, t_addr addr)
+cl_memory_cell::add_hw(class cl_hw *hw/*, t_addr addr*/)
 {
-  class cl_hw_operator *o= new cl_hw_operator(this, addr/*, data, mask*/, hw);
+  class cl_hw_operator *o= new cl_hw_operator(this/*, addr*//*, data, mask*/, hw);
   append_operator(o);
   return(this);
 }
@@ -1546,7 +1567,7 @@ cl_address_space::register_hw(t_addr addr, class cl_hw *hw,
       addr < start_address)
     return(0);
   class cl_memory_cell *cell= &cella[idx];
-  cell->add_hw(hw, addr);
+  cell->add_hw(hw/*, addr*/);
   if (announce)
     ;//uc->sim->/*app->*/mem_cell_changed(this, addr);//FIXME
   return(cell);
@@ -1578,12 +1599,12 @@ cl_address_space::set_brk(t_addr addr, class cl_brk *brk)
     {
     case brkWRITE: case brkWXRAM: case brkWIRAM: case brkWSFR:
       //e= 'W';
-      op= new cl_write_operator(cell, addr, //cell->get_data(), cell->get_mask(),
+      op= new cl_write_operator(cell/*, addr*/, //cell->get_data(), cell->get_mask(),
 				uc, brk);
       break;
     case brkREAD: case brkRXRAM: case brkRCODE: case brkRIRAM: case brkRSFR:
       //e= 'R';
-      op= new cl_read_operator(cell, addr, //cell->get_data(), cell->get_mask(),
+      op= new cl_read_operator(cell/*, addr*/, //cell->get_data(), cell->get_mask(),
 			       uc, brk);
       break;
     case brkNONE:
@@ -2052,7 +2073,7 @@ cl_banker::init()
   if (c)
     {
       class cl_bank_switcher_operator *o=
-	new cl_bank_switcher_operator(c, banker_addr, this);
+	new cl_bank_switcher_operator(c/*, banker_addr*/, this);
       c->prepend_operator(o);
     }
   

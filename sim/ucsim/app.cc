@@ -111,9 +111,7 @@ cl_app::run(void)
   bool g_opt= false;
   unsigned int cyc= 0;
   enum run_states rs= rs_config;
-  
-  
-  
+    
   while (!done)
     {
       if ((rs == rs_config) &&
@@ -167,8 +165,10 @@ cl_app::run(void)
 		}
 	      sim->step();
 	      if (jaj && commander->frozen_console)
-		sim->uc->print_regs(commander->frozen_console),
-		  commander->frozen_console->dd_printf("\n");
+		{
+		  sim->uc->print_regs(commander->frozen_console),
+		    commander->frozen_console->dd_printf("\n");
+		}
             }
 	  else
 	    {

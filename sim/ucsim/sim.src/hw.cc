@@ -199,6 +199,16 @@ cl_hw::register_cell(class cl_address_space *mem, t_addr addr)
   return mem->get_cell(addr);
 }
 
+class cl_memory_cell *
+cl_hw::register_cell(class cl_memory_cell *cell)
+{
+  if (cell)
+    {
+      cell->add_hw(this);
+    }
+  return cell;
+}
+
 void
 cl_hw::unregister_cell(class cl_memory_cell *the_cell)
 {

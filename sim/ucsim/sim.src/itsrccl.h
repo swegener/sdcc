@@ -39,7 +39,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * Represents source of interrupt
  */
 
-class cl_it_src: public cl_base
+class cl_it_src: public /*cl_base*/cl_hw
 {
  private:
   class cl_uc *uc;
@@ -68,7 +68,8 @@ public:
 	    const  char *Iname,
 	    int    apoll_priority);
   virtual ~cl_it_src(void);
-
+  virtual int init(void);
+  
           bool is_active(void);
   virtual void set_active_status(bool Aactive);
   virtual void activate(void);
@@ -77,6 +78,9 @@ public:
   virtual bool enabled(void);
   virtual bool pending(void);
   virtual void clear(void);
+
+  virtual void write(class cl_memory_cell *cell, t_mem *val);
+  virtual t_mem read(class cl_memory_cell *cell);
 };
 
 

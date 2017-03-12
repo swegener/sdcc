@@ -573,8 +573,8 @@ struct USART4_saf_t {
 
 #if (DEVICE & DEV_STM8SAF)
 #if defined USART1
-#define USART1_TX_IRQ 11
-#define USART1_RX_IRQ 12
+#define USART1_TX_IRQ 17
+#define USART1_RX_IRQ 18
 #endif
 #endif
 #if (DEVICE & DEV_STM8ALL) || \

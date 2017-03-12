@@ -118,19 +118,26 @@ void
 cl_timer0::added_to_uc(void)
 {
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
-
+  class cl_it_src *is;
+  
   if (id == 0)
-    uc->it_sources->add(new cl_it_src(uc, bmET0,
-				      sfr->get_cell(IE), bmET0,
-				      sfr->get_cell(TCON), bmTF0,
-				      0x000b, true, false,
-				      "timer #0", 2));
+    {
+      uc->it_sources->add(is= new cl_it_src(uc, bmET0,
+					    sfr->get_cell(IE), bmET0,
+					    sfr->get_cell(TCON), bmTF0,
+					    0x000b, true, false,
+					    "timer #0", 2));
+      is->init();
+    }
   else if (id == 1)
-    uc->it_sources->add(new cl_it_src(uc, bmET1,
-				      sfr->get_cell(IE), bmET1,
-				      sfr->get_cell(TCON), bmTF1,
-				      0x001b, true, false,
-				      "timer #1", 4));
+    {
+      uc->it_sources->add(is= new cl_it_src(uc, bmET1,
+					    sfr->get_cell(IE), bmET1,
+					    sfr->get_cell(TCON), bmTF1,
+					    0x001b, true, false,
+					    "timer #1", 4));
+      is->init();
+    }
 }
 
 /*t_mem

@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8.cc 650 2017-02-16 10:48:00Z drdani $ */
+/* $Id: stm8.cc 678 2017-03-07 11:33:52Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -95,7 +95,7 @@ cl_stm8::init(void)
 			  (t_addr)0x8004,
 			  false, false,
 			  "trap", 0);
-  
+  trap_src->init();
   return(0);
 }
 
@@ -331,7 +331,6 @@ cl_stm8::mk_hw_elements(void)
       // all S and AF
       mk_port(0x5014, "pe");
       mk_port(0x5019, "pf");
-      h->init();
       if (type->subtype & (DEV_STM8S005|
 			   DEV_STM8S007|
 			   DEV_STM8S105|

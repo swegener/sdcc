@@ -53,7 +53,8 @@ cl_it_src::cl_it_src(cl_uc  *Iuc,
 		     bool   Iindirect,
 		     const  char *Iname,
 		     int    apoll_priority):
-  cl_base()
+	  /*cl_base()*/
+	  cl_hw(Iuc, HW_INTERRUPT, 100+Inuof, chars("", "itsrc_%d", Inuof))
 {
   uc= Iuc;
   poll_priority= apoll_priority;
@@ -73,6 +74,14 @@ cl_it_src::cl_it_src(cl_uc  *Iuc,
 }
 
 cl_it_src::~cl_it_src(void) {}
+
+int
+cl_it_src::init(void)
+{
+  register_cell(ie_cell);
+  register_cell(src_cell);
+  return 0;
+}
 
 bool
 cl_it_src::is_active(void)
@@ -126,7 +135,52 @@ cl_it_src::clear(void)
     src_cell->set_bit0(src_mask);
 }
 
+void
+cl_it_src::write(class cl_memory_cell *cell, t_mem *val)
+{
+  t_mem iev= ie_cell->get();
+  t_mem srcv= src_cell->get();
+  t_mem ier, srcr;
+  
+  if (cell == ie_cell)
+    {
+      //printf("ITSRC ie=%x\n", *val);
+      iev= *val;
+    }
+  if (cell == src_cell)
+    {
+      //printf("ITSRC src=%x\n", *val);
+      srcv= *val;
+    }
+  ier= iev&ie_mask;
+  srcr= srcv&src_mask;
+  /*
+  printf("%2d iev =%x & %x = %x\n", nuof, iev, ie_mask, ier);
+  printf("%2d srcv=%x & %x = %x\n", nuof, srcv, src_mask, srcr);
+  printf("%2d ie=%s src=%s req=%s\n", nuof,
+	 ier?"true":"false",
+	 srcr?"true":"false",
+	 (ier&&srcr)?"TRUE":"FALSE");
+  */
+  if (ier)
+    {
+      if (srcr)
+	{
+	  //printf("%2d IRQ\n", nuof);
+	  uc->irq= true;
+	}
+    }
+}
+
+t_mem
+cl_it_src::read(class cl_memory_cell *cell)
+{
+  return cell->get();
+}
+
+
 /*
+ *  Sorted list of IRQ sources
  */
 
 cl_irqs::cl_irqs(t_index alimit, t_index adelta):

@@ -91,6 +91,8 @@ cl_sim::step(void)
 {
   if (state & SIM_GO)
     {
+      if (steps_done == 0)
+	start_at= dnow();
       uc->do_inst(1);
       steps_done++;
       if ((steps_todo > 0) &&
@@ -128,7 +130,6 @@ cl_sim::start(class cl_console_base *con, unsigned long steps_to_do)
       app->get_commander()->frozen_console= con;
       app->get_commander()->update_active();
     }
-  start_at= dnow();
   if (uc)
     start_tick= uc->ticks->ticks;
   steps_done= 0;
@@ -146,6 +147,7 @@ cl_sim::stop(int reason)
     o->get_value(&q_opt);
   
   state&= ~SIM_GO;
+  stop_at= dnow();
   if (simif)
     simif->cfg_set(simif_reason, reason);
   
@@ -204,11 +206,12 @@ cl_sim::stop(int reason)
 	}
       cmd->frozen_console->dd_printf("F 0x%06x\n", uc->PC); // for sdcdb
       unsigned long dt= uc?(uc->ticks->ticks - start_tick):0;
-      if (reason != resSTEP)
+      if ((reason != resSTEP) ||
+	  (steps_done > 1))
 	cmd->frozen_console->dd_printf("Simulated %lu ticks in %f sec, rate=%f\n",
 				       dt,
-				       dnow() - start_at,
-				       (dt*(1/uc->xtal)) / (dnow() - start_at));
+				       stop_at - start_at,
+				       (dt*(1/uc->xtal)) / (stop_at - start_at));
       //if (cmd->actual_console != cmd->frozen_console)
       cmd->frozen_console->set_flag(CONS_FROZEN, false);
       //cmd->frozen_console->dd_printf("_s_");

@@ -67,17 +67,20 @@ void
 cl_interrupt::added_to_uc(void)
 {
   class cl_address_space *sfr= uc->address_space(MEM_SFR_ID);
-
-  uc->it_sources->add(new cl_it_src(uc, bmEX0,
-				    sfr->get_cell(IE), bmEX0,
-				    sfr->get_cell(TCON), bmIE0,
-				    0x0003, true, false,
-				    "external #0", 1));
-  uc->it_sources->add(new cl_it_src(uc, bmEX1,
-				    sfr->get_cell(IE), bmEX1,
-				    sfr->get_cell(TCON), bmIE1,
-				    0x0013, true, false,
-				    "external #1", 3));
+  class cl_it_src *is;
+  
+  uc->it_sources->add(is= new cl_it_src(uc, bmEX0,
+					sfr->get_cell(IE), bmEX0,
+					sfr->get_cell(TCON), bmIE0,
+					0x0003, true, false,
+					"external #0", 1));
+  is->init();
+  uc->it_sources->add(is= new cl_it_src(uc, bmEX1,
+					sfr->get_cell(IE), bmEX1,
+					sfr->get_cell(TCON), bmIE1,
+					0x0013, true, false,
+					"external #1", 3));
+  is->init();
 }
 
 void

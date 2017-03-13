@@ -8628,7 +8628,7 @@ genLeftShift (const iCode * ic)
         }
       else
         {
-          while (size)
+          while (size && lsize)
             {
               cheapMove (AOP (result), doffset, AOP (left), soffset);
               soffset++;

@@ -1,5 +1,5 @@
 /*
-   bug1-2195.c
+   bug-2195.c
 
    A peephole optimizer bug in calls to __z88dk_fastcall.
 */

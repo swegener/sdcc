@@ -9395,6 +9395,10 @@ genPointerGet (const iCode *ic)
 
       /* Just do it */
       offset = 0;
+
+      if (surviving_a && !pushed_a)
+        _push (PAIR_AF), pushed_a = TRUE;
+
       while (size--)
         {
           if (!regalloc_dry_run)

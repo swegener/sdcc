@@ -1,3 +1,9 @@
+2017-03-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2582.c:
+	  Fix bug #2582.
+
 2017-03-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCC.y: fixed bug #2587

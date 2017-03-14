@@ -15,7 +15,7 @@ void g23(int i)
 void g42(int i)
 {
 	ASSERT(i == 42);
-	i42 ^= 42;
+	i42 += 42;
 }
 
 void testFor(void)
@@ -23,7 +23,7 @@ void testFor(void)
 	{
 		int i = 23;
 		g23(i);
-		for(int i = 0; i < 1; i++)
+		for(int i = 0; i < 2; i++)
 		{
 			int i = 42;
 			g42(i);
@@ -31,6 +31,6 @@ void testFor(void)
 		g23(i);
 	}
 	ASSERT(i23 == 0);
-	ASSERT(i42 == 42);
+	ASSERT(i42 == 84);
 }
 

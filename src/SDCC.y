@@ -2039,19 +2039,22 @@ iteration_statement
                           NestLevel--;
                           currBlockno = STACK_POP(blockNum);
                         }
-	| for '(' declaration expr_opt ';' expr_opt ')'  statement
+	| for '(' declaration expr_opt ';' expr_opt ')'
                         {
                           if (!options.std_c99)
                             werror (E_FOR_INITAL_DECLARATION_C99);
-
-                          noLineno++;
 
                           if ( $3 && IS_TYPEDEF($3->etype))
                             allocVariables ($3);
                           ignoreTypedefType = 0;
                           addSymChain(&$3);
+                        }
+       statement
+                        {
 
-                          $$ = newNode(FOR,$8,NULL);
+                          noLineno++;
+
+                          $$ = newNode(FOR,$9,NULL);
                           AST_FOR($$,trueLabel) = $1;
                           AST_FOR($$,continueLabel) =  STACK_POP(continueStack);
                           AST_FOR($$,falseLabel) = STACK_POP(breakStack);

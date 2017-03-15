@@ -9,6 +9,9 @@
 	  support/regression/tests/bug2686159.c,
 	  support/regression/tests/bug3027957.c:
 	  Fix bug #2584.
+	* src/SDCCicode.c,
+	  support/regression/tests/bug-2568.c:
+	  Fix bug #2568.
 
 2017-03-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

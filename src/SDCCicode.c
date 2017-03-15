@@ -2346,6 +2346,7 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
     {
       isarray = left->isaddr;
       nBytes = getSize (ltype->next);
+
       if (nBytes == 0)
         werror (E_UNKNOWN_SIZE, IS_SYMOP (left) ? OP_SYMBOL (left)->name : "<no name>");
       // there is no need to multiply with 1
@@ -2376,7 +2377,7 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
 
   /* if they are both literals then we know */
   if (IS_LITERAL (letype) && IS_LITERAL (retype) && left->isLiteral && right->isLiteral)
-    return operandFromValue (valPlus (valFromType (ltype), valFromType (rtype)));
+    return operandFromValue (valPlus (valFromType (ltype), valMult (valFromType (rtype), valueFromLit (getSize (ltype->next)))));
 
   ic = newiCode ('+', left, right);
 

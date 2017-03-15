@@ -2997,12 +2997,18 @@ checkZero (value *val)
   if (!val)
     return;
 
-  if ((IS_FLOAT (val->type) || IS_FIXED16X16 (val->type)) && floatFromVal (val) == 0.0)
-    werror (E_DIVIDE_BY_ZERO);
-  else if (SPEC_LONGLONG (val->type) && ullFromVal (val) == 0LL)
-    werror (E_DIVIDE_BY_ZERO);
-  else if (ulFromVal (val) == 0L)
-    werror (E_DIVIDE_BY_ZERO);
+  if (IS_FLOAT (val->type) || IS_FIXED16X16 (val->type))
+    {
+	  if (floatFromVal (val) == 0.0)
+        werror (E_DIVIDE_BY_ZERO);
+    }
+  else if (SPEC_LONGLONG (val->type))
+    {
+	  if (ullFromVal (val) == 0LL)
+        werror (E_DIVIDE_BY_ZERO);
+	}
+  else if (ulFromVal (val) == 0L) {
+    werror (E_DIVIDE_BY_ZERO); }
 }
 
 /*--------------------------------------------------------------------*/

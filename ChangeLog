@@ -1,3 +1,7 @@
+2017-03-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (checkZero): fix bug #2586
+
 2017-03-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

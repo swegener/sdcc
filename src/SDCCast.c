@@ -478,6 +478,9 @@ hasSEFcalls (ast * tree)
        tree->opval.op == PCALL || tree->opval.op == '=' || tree->opval.op == INC_OP || tree->opval.op == DEC_OP))
     return TRUE;
 
+  if (astHasVolatile(tree))
+    return TRUE;
+
   return (hasSEFcalls (tree->left) | hasSEFcalls (tree->right));
 }
 
@@ -2014,7 +2017,7 @@ isLoopCountable (ast * initExpr, ast * condExpr, ast * loopExpr, symbol ** sym, 
 /* astHasVolatile - returns true if ast contains any volatile      */
 /*-----------------------------------------------------------------*/
 bool
-astHasVolatile (ast * tree)
+astHasVolatile (ast *tree)
 {
   if (!tree)
     return FALSE;
@@ -4085,7 +4088,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
         }
 
       /* if the left & right are equal then zero */
-      if (!hasSEFcalls(tree->left) && !hasSEFcalls(tree->right) && isAstEqual (tree->left, tree->right))
+      if (!hasSEFcalls(tree->left) && !hasSEFcalls(tree->right) &&
+        isAstEqual (tree->left, tree->right))
         {
           tree->type = EX_VALUE;
           tree->left = tree->right = NULL;

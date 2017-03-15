@@ -224,6 +224,7 @@ int setAstFileLine (ast *, char *, int);
 symbol *funcOfType (const char *, sym_link *, sym_link *, int, int);
 symbol *funcOfTypeVarg (const char *, const char *, int, const char **);
 ast *initAggregates (symbol *, initList *, ast *);
+bool astHasVolatile (ast *tree);
 bool hasSEFcalls (ast *);
 void addSymToBlock (symbol *, ast *);
 void freeStringSymbol (symbol *);

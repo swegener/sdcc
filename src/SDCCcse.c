@@ -944,6 +944,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
     case '+':
       /* if adding the same thing change to left shift by 1 */
       if (IC_LEFT (ic)->key == IC_RIGHT (ic)->key &&
+          !IS_OP_VOLATILE (IC_LEFT (ic)) &&
           !(IS_FLOAT (operandType (IC_RESULT (ic)))
             || IS_FIXED(operandType (IC_RESULT (ic)))))
         {
@@ -1010,8 +1011,9 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       break;
     case '-':
       /* if subtracting the same thing then zero     */
-      if (IC_LEFT (ic)->key == IC_RIGHT (ic)->key)
-        {
+      if (IC_LEFT (ic)->key == IC_RIGHT (ic)->key &&
+        !IS_OP_VOLATILE (IC_LEFT (ic)))
+        {printf("Sub. at %d\n", ic->key);
           ic->op = '=';
           IC_RIGHT (ic) = operandFromLit (0);
           IC_LEFT (ic) = NULL;
@@ -1219,7 +1221,8 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
     case EQ_OP:
     case LE_OP:
     case GE_OP:
-      if (isOperandEqual (IC_LEFT (ic), IC_RIGHT (ic)))
+      if (isOperandEqual (IC_LEFT (ic), IC_RIGHT (ic)) &&
+        !IS_OP_VOLATILE (IC_LEFT (ic)))
         {
           ic->op = '=';
           IC_RIGHT (ic) = operandFromLit (1);
@@ -1230,7 +1233,8 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
     case NE_OP:
     case '>':
     case '<':
-      if (isOperandEqual (IC_LEFT (ic), IC_RIGHT (ic)))
+      if (isOperandEqual (IC_LEFT (ic), IC_RIGHT (ic)) &&
+        !IS_OP_VOLATILE (IC_LEFT (ic)))
         {
           ic->op = '=';
           IC_RIGHT (ic) = operandFromLit (0);

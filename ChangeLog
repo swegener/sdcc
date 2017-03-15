@@ -1,3 +1,10 @@
+2017-03-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.h,
+	  src/SDCCast.c,
+	  src/SDCCcse.c:
+	  Fix bug #2593.
+
 2017-03-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (checkZero): fix bug #2586

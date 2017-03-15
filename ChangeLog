@@ -4,6 +4,11 @@
 	  src/SDCCast.c,
 	  src/SDCCcse.c:
 	  Fix bug #2593.
+	* support/regression/tests/absolute.c,
+	  support/regression/tests/bug-2304.c,
+	  support/regression/tests/bug2686159.c,
+	  support/regression/tests/bug3027957.c:
+	  Fix bug #2584.
 
 2017-03-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

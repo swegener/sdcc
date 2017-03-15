@@ -9,6 +9,8 @@
 # define ADDRESS(x) (0x02 ## x)
 #elif defined(__SDCC_pic14)
 # define ADDRESS(x) (0x01 ## x)
+#elif defined(__SDCC_stm8)
+# define ADDRESS(x) (0x10 ## x)
 #else
 # define ADDRESS(x) (0xCA ## x)
 #endif

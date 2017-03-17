@@ -12,7 +12,6 @@
 
 void foo(void)
 {
-
   ((unsigned char __xdata *)ADDRESS)[100] = 0x12;
 }
 
@@ -24,7 +23,9 @@ char * correct(void)
 
 void testBug(void)
 {
+#ifdef __SDCC
   foo();
   ASSERT (*(unsigned char __xdata *)(ADDRESS + 0x64) == 0x12);
+#endif
 }
 

@@ -1,3 +1,7 @@
+2017-03-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodeAdd): Fix bug #2568 fix
+
 2017-03-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.h,

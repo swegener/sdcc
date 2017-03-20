@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (portcl.h)
+ * Simulator of microcontrollers (sim.src/vcdcl.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2017,17 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,53 +25,41 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#ifndef PORTCL_HEADER
-#define PORTCL_HEADER
+#ifndef VCDCL_HEADER
+#define VCDCL_HEADER
 
-#include "stypes.h"
-#include "pobjcl.h"
-#include "uccl.h"
-
-#include "newcmdcl.h"
-
-#include "port_hwcl.h"
+#include "hwcl.h"
 
 
-enum port_cfg {
-  port_on		= 0, // RW
-  port_pin		= 1, // RW
-  port_value		= 2, // RO
-};
-
-class cl_port: public cl_hw
+class cl_vcd: public cl_hw
 {
-public:
-  t_addr addr_p;
-  t_mem port_pins;
-  t_mem prev;
-  class cl_address_space *bas;
-  class cl_memory_cell *cell_p, *cell_in, *bit_cells[8];
-public:
-  cl_port(class cl_uc *auc, int aid);
-  cl_port(class cl_uc *auc, int aid, t_addr the_addr);
-  virtual int init(void);
-  virtual int cfg_size(void) { return 3; }
+ protected:
+  class cl_list *locs;
+  bool started, paused;
+  class cl_f *fout;
+  bool change;
+  double change_time;
+  chars modul;
+ public:
+  cl_vcd(class cl_uc *auc, int aid, chars aid_string);
+
+  virtual void add(class cl_memory_cell *cell);
+  virtual bool add(class cl_memory *m, t_addr a, class cl_console_base *con);
+  virtual void del(class cl_memory_cell *cell);
+  virtual bool del(class cl_memory *m, t_addr a, class cl_console_base *con);
+  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
 
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 
-  virtual void set_pin(t_mem val);
-    
-  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
-  //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);
+  virtual void report(class cl_memory_cell *cell, int nr);
+  virtual int tick(int cycles);
 
-  virtual void make_io(void) {}
-  //virtual int tick(int cycles);
   virtual void print_info(class cl_console_base *con);
 };
 
 
 #endif
 
-/* End of s51.src/portcl.h */
+/* End of sim.src/vcdcl.h */

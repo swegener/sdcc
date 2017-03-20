@@ -97,6 +97,7 @@ public:
       t_addr mem_address;
       t_mem mask;
     } bit;
+    class cl_memory_cell *cell;
   } value;
 
 public:
@@ -114,6 +115,7 @@ public:
   virtual bool as_string(void);
   virtual bool as_memory(class cl_uc *uc);
   virtual bool as_hw(class cl_uc *uc);
+  virtual bool as_cell(class cl_uc *uc);
   virtual bool as_bit(class cl_uc *uc);
 };
 
@@ -144,6 +146,7 @@ public:
   virtual bool as_number(void) { return(false); }
   virtual bool as_string(void);
   virtual bool as_hw(class cl_uc *uc);
+  virtual bool as_cell(class cl_uc *uc);
 };
 
 class cl_cmd_str_arg: public cl_cmd_arg
@@ -180,6 +183,7 @@ public:
   cl_cmd_array_arg(class cl_cmd_arg *aname, class cl_cmd_arg *aindex);
   virtual ~cl_cmd_array_arg(void);
   virtual bool as_hw(class cl_uc *uc);
+  virtual bool as_cell(class cl_uc *uc);
 };
 
 

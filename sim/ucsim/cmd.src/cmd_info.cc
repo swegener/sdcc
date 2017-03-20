@@ -145,39 +145,33 @@ COMMAND_DO_WORK_UC(cl_info_stack_cmd)
 COMMAND_DO_WORK_UC(cl_info_memory_cmd)
 {
   int i;
+  class cl_memory *mem= NULL;
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2),
+				 cmdline->param(3) };
 
+  if (cmdline->syntax_match(uc, MEMORY))
+    {
+      mem= params[0]->value.memory.memory;
+      if (mem)
+	{
+	  mem->print_info("", con);
+	}
+      return false;
+    }
   con->dd_printf("Memory chips:\n");
   for (i= 0; i < uc->memchips->count; i++)
     {
       class cl_memory_chip *m= (class cl_memory_chip *)(uc->memchips->at(i));
-      if (m &&
-	  !m->hidden)
-	{
-	  char *n= (char*)(m->get_name());
-	  con->dd_printf("  0x%06x-0x%06x %8d %s (%d,%s,%s)\n",
-			 (unsigned int)(m->get_start_address()),
-			 (unsigned int)(m->highest_valid_address()),
-			 (unsigned int)(m->get_size()),
-			 n,
-			 m->width, m->data_format, m->addr_format);
-	}
+      m->print_info("  ", con);
     }
   con->dd_printf("Address spaces:\n");
   for (i= 0; i < uc->address_spaces->count; i++)
     {
       class cl_address_space *m=
 	(class cl_address_space *)(uc->address_spaces->at(i));
-      if (m &&
-	  !m->hidden)
-	{
-	  char *n= (char*)(m->get_name());
-	  con->dd_printf("  0x%06x-0x%06x %8d %s (%d,%s,%s)\n",
-			 (unsigned int)(m->get_start_address()),
-			 (unsigned int)(m->highest_valid_address()),
-			 (unsigned int)(m->get_size()),
-			 n,
-			 m->width, m->data_format, m->addr_format);
-	}
+      m->print_info("  ", con);
     }
   con->dd_printf("Address decoders:\n");
   for (i= 0; i < uc->address_spaces->count; i++)
@@ -189,28 +183,7 @@ COMMAND_DO_WORK_UC(cl_info_memory_cmd)
 	{
 	  class cl_address_decoder *d=
 	    (class cl_address_decoder *)(m->decoders->at(j));
-	  //con->dd_printf("%2d ", j);
 	  d->print_info(chars("  "), con);
-	  /*
-	  if (d->address_space)
-	    {
-	      con->dd_printf("%s ", d->address_space->get_name("unknown"));
-	      con->dd_printf(d->address_space->addr_format, d->as_begin);
-	      con->dd_printf(" ");
-	      con->dd_printf(d->address_space->addr_format, d->as_end);
-	    }
-	  else
-	    con->dd_printf("x");
-	  con->dd_printf(" -> ");
-	  if (d->memchip)
-	    {
-	      con->dd_printf("%s ", d->memchip->get_name("unknown"));
-	      con->dd_printf(d->memchip->addr_format, d->chip_begin);
-	    }
-	  else
-	    con->dd_printf("x");
-	  con->dd_printf(" %s\n", (d->activated)?"activated":"inactive");
-	  */
 	}
     }
   return(0);

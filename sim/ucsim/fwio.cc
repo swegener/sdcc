@@ -265,6 +265,14 @@ cl_io::check_dev(void)
 			 (vk <= 0x39))		pick(c);
 		else if ((vk >= 0x41) &&
 			 (vk <= 0x5a))		pick(c);
+		else if ((vk >= 0xb8) &&
+			 (vk <= 0xd7))		pick(c);
+		else if ((vk >= 0xdb) &&
+			 (vk <= 0xdf))		pick(c);
+		else if ((vk >= 0xe1) &&
+			 (vk <= 0xe4))		pick(c);
+		else if ((vk >= 0xe6) &&
+			 (vk <= 0xf5))		pick(c);
 		else if ((vk >= VK_NUMPAD0) &&
 			 (vk <= VK_NUMPAD9))
 		  {
@@ -283,11 +291,11 @@ cl_io::check_dev(void)
 		      case VK_NUMPAD9: pick("\033[5~"); break;
 		      };
 		  }
-		if (vk == VK_MULTIPLY)		pick('*');
-		if (vk == VK_ADD)		pick('+');
-		if (vk == VK_SEPARATOR)		;
-		if (vk == VK_SUBTRACT)		pick('-');
-		if (vk == VK_DECIMAL)		pick('.');
+		else if (vk == VK_MULTIPLY)	pick('*');
+		else if (vk == VK_ADD)		pick('+');
+		else if (vk == VK_SEPARATOR)	;
+		else if (vk == VK_SUBTRACT)	pick('-');
+		else if (vk == VK_DECIMAL)	pick('.');
 		else if (vk == VK_DIVIDE)	pick('/');
 		else if ((vk >= VK_F1) &&
 			 (vk <= VK_F12))
@@ -300,6 +308,7 @@ cl_io::check_dev(void)
 		  }
 		else if ((vk >= VK_F13) &&
 			 (vk <= VK_F24))	;
+		//else printf("vk=%d 0x%x c='%c'\n",vk,vk,c);
 	      }
 	  }
       

@@ -101,6 +101,7 @@ cl_port::init(void)
     }
   prev= cell_p->get();
   cell_in= cfg->get_cell(port_pin);
+  cfg->set(port_value, prev & cell_in->get());
   
   cl_var *v;
   chars pn;
@@ -111,6 +112,8 @@ cl_port::init(void)
   uc->vars->add(v= new cl_var(pn+chars("pin"), cfg, port_pin));
   v->init();
   uc->vars->add(v= new cl_var(pn+chars("pins"), cfg, port_pin));
+  v->init();
+  uc->vars->add(v= new cl_var(pn+chars("value"), cfg, port_value));
   v->init();
   chars p= chars("pin");
   p.append("%d", id);
@@ -152,6 +155,8 @@ cl_port::write(class cl_memory_cell *cell, t_mem *val)
     {
       (*val)&= 0xff; // 8 bit port
       nv= *val;
+      if ((port_pins & nv) != cfg->get(port_value))
+	cfg->write(port_value, port_pins & nv);
     }
   
   if (bas->is_owned(cell, &ba))
@@ -163,6 +168,8 @@ cl_port::write(class cl_memory_cell *cell, t_mem *val)
 	nv|= m;
       else
 	nv&= ~m;
+      if ((port_pins & nv) != cfg->get(port_value))
+	cfg->write(port_value, port_pins & nv);
     }
 
   conf(cell, val);
@@ -201,6 +208,10 @@ cl_port::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       else
 	cell->set(port_pins);
       break;
+    case port_value:
+      if (val)
+	cell->set(*val);
+      break;
     }
   return cell->get();
 }
@@ -220,6 +231,8 @@ cl_port::set_pin(t_mem val)
   ep.new_pins= port_pins;
   if (ep.pins != ep.new_pins)
     inform_partners(EV_PORT_CHANGED, &ep);
+  if ((port_pins & ep.prev_value) != cfg->get(port_value))
+    cfg->write(port_value, port_pins & ep.prev_value);
 }
 
 void

@@ -11,4 +11,4 @@ clean:
 		$(MAKE) -f $$p.mk clean ;\
 	done
 	rm -f *.out *.sout *.tim *.csv *.sim
-	rm -f st*[56].cmd
+	rm -f st*[56][0-9][0-9].cmd st*[56]*.txt

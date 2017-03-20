@@ -417,48 +417,56 @@ cl_cmdline::syntax_match(class cl_uc *uc, const char *syntax)
     {
       //printf("***Checking %s as %c\n",parm->get_svalue(),*p);
       if (uc)
-	switch (*p)
-	  {
-	  case SY_ADDR:
-	    if (!parm->as_address(uc))
-	      return(false);
-	    //printf("ADDRESS match %lx\n",parm->value.address);
-	    break;
-	  case SY_MEMORY:
-	    if (!parm->as_memory(uc))
-	      return(false);
-	    //printf("MEMORY match %s\n",parm->value.memory->class_name);
-	    break;
-	  case SY_BIT:
-	    if (!parm->as_bit(uc))
-	      return(false);
-	    break;
-	  }
-      switch (*p)
 	{
-	case SY_ADDR: case SY_MEMORY: case SY_BIT: break;
-	case SY_NUMBER:
-	  if (!parm->as_number())
-	    return(false);
-	  break;
-	case SY_DATA:
-	  if (!parm->as_data())
-	    return(false);
-	  break;
-	case SY_HW:
-	  if (!parm->as_hw(uc))
-	    return(false);
-	  break;
-	case SY_STRING:
-	  if (!parm->as_string())
-	    return(false);
-	  break;
-	case SY_DATALIST:
-	  if (!set_data_list(parm, &iparam))
-	    return(false);
-	  break;
-	default:
-	  return(false);
+	  switch (*p)
+	    {
+	    case SY_ADDR:
+	      if (!parm->as_address(uc))
+		return(false);
+	      //printf("ADDRESS match %lx\n",parm->value.address);
+	      break;
+	    case SY_MEMORY:
+	      if (!parm->as_memory(uc))
+		return(false);
+	      //printf("MEMORY match %s\n",parm->value.memory->class_name);
+	      break;
+	    case SY_BIT:
+	      if (!parm->as_bit(uc))
+		return(false);
+	      break;
+	    case SY_HW:
+	      if (!parm->as_hw(uc))
+		return(false);
+	      break;
+	    case SY_CELL:
+	      if (!parm->as_cell(uc))
+		return false;
+	      break;
+	    }
+	}
+      //else
+	{
+	  switch (*p)
+	    {
+	    case SY_ADDR: case SY_MEMORY: case SY_BIT: break;
+	    case SY_NUMBER:
+	      if (!parm->as_number())
+		return(false);
+	      break;
+	    case SY_DATA:
+	      if (!parm->as_data())
+		return(false);
+	      break;
+	    case SY_STRING:
+	      if (!parm->as_string())
+		return(false);
+	      break;
+	    case SY_DATALIST:
+	      if (!set_data_list(parm, &iparam))
+		return(false);
+	      break;
+	      //default: return(false);
+	    }
 	}
       p++;
       iparam++;

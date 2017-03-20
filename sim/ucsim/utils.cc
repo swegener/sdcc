@@ -216,6 +216,21 @@ case_string(enum letter_case lcase, char *str)
   return(s);
 }
 
+chars
+cbin(long data, int bits)
+{
+  long mask= 1;
+  chars c= "";
+  
+  mask= mask << ((bits >= 1)?(bits-1):0);
+  while (bits--)
+    {
+      c+= (data&mask)?'1':'0';
+      mask>>= 1;
+    }
+  return c;
+}
+
 /*char *
 case_string(enum letter_case lcase, const char *str)
 {

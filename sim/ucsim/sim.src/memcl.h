@@ -133,6 +133,8 @@ public:
   virtual void set(t_addr addr, t_mem val)=0;
   virtual void set_bit1(t_addr addr, t_mem bits)=0;
   virtual void set_bit0(t_addr addr, t_mem bits)=0;
+
+  virtual void print_info(chars pre, class cl_console_base *con);
 };
 
 
@@ -266,7 +268,8 @@ class cl_memory_cell: public cl_cell_data
   virtual bool get_flag(enum cell_flag flag);
   virtual void set_flags(/*TYPE_UBYTE*/uchar what);
   virtual void set_flag(enum cell_flag flag, bool val);
-
+  virtual uchar get_width(void) { return width; }
+  
   virtual void un_decode(void);
   virtual void decode(class cl_memory_chip *chip, t_addr addr);
   virtual void decode(t_mem *data_ptr);
@@ -299,7 +302,8 @@ class cl_memory_cell: public cl_cell_data
   virtual void remove_hw(class cl_hw *hw);
   virtual class cl_event_handler *get_event_handler(void);
 
-  virtual void print_operators(class cl_console_base *con);
+  virtual void print_info(chars pre, class cl_console_base *con);
+  virtual void print_operators(cchars pre, class cl_console_base *con);
 };
 
 class cl_bit_cell: public cl_memory_cell
@@ -413,6 +417,8 @@ class cl_address_space: public cl_memory
   virtual void set_nuof_reads(unsigned long value) {}
   virtual void set_nuof_writes(unsigned long value) {}
 #endif
+
+  virtual void print_info(chars pre, class cl_console_base *con);
 };
 
 class cl_address_space_list: public cl_list
@@ -453,6 +459,8 @@ public:
   virtual void set(t_addr addr, t_mem val);
   virtual void set_bit1(t_addr addr, t_mem bits);
   virtual void set_bit0(t_addr addr, t_mem bits);
+
+  virtual void print_info(chars pre, class cl_console_base *con);
 };
 
   

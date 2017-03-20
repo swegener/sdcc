@@ -53,6 +53,7 @@ cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, const char *aid_strin
     id_string= strdup(aid_string);
   else
     id_string= strdup("unknown hw element");
+  set_name(id_string);
   char *s= (char*)malloc(strlen(get_name("hw"))+100);
   sprintf(s, "partners of %s", get_name("hw"));
   partners= new cl_list(2, 2, s);

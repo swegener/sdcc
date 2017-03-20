@@ -421,8 +421,13 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
   t_addr a= 0;
   class cl_address_space *as= 0;
   class cl_memory_cell *c= 0;
-  
-  if (cmdline->syntax_match(uc, MEMORY NUMBER))
+
+  if (cmdline->syntax_match(uc, CELL))
+    {
+      c= params[0]->value.cell;
+      m= as= uc->address_space(c, &a);
+    }
+  else if (cmdline->syntax_match(uc, MEMORY ADDRESS /*NUMBER*/))
     {
       m= params[0]->value.memory.memory;
       a= params[1]->value.number;
@@ -432,14 +437,16 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
   if (m == 0)
     return con->dd_printf("Syntax error.\n"), false;
 
-  c= as->get_cell(a);
+  if (!c)
+    c= as->get_cell(a);
   con->dd_printf("%s", as->get_name());
   con->dd_printf("[");
   con->dd_printf(as->addr_format, a);
-  con->dd_printf("]\n");
+  con->dd_printf("] %s\n", (char*)uc->cell_name(c));
 
-  con->dd_printf("cell data= %p mask=%x flags=%x\n",
+  con->dd_printf("cell data=%p/%d mask=%x flags=%x\n",
 		 c->get_data(),
+		 c->get_width(),
 		 c->get_mask(),
 		 c->get_flags());
 
@@ -457,7 +464,7 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
     }
 
   con->dd_printf("Operators:\n");
-  c->print_operators(con);
+  c->print_operators(" ", con);
   
   return false;
 }

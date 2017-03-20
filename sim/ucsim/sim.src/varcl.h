@@ -22,7 +22,8 @@ class cl_var: public cl_base
  public:
   cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, int ibit= -1);
   virtual int init(void);
-
+  virtual class cl_memory_cell *get_cell(void) { return cell; }
+  
   virtual void print_info(cl_console_base *con);
 };
 

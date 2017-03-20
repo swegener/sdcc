@@ -173,6 +173,12 @@ cl_cmd_arg::as_hw(class cl_uc *uc)
 }
 
 bool
+cl_cmd_arg::as_cell(class cl_uc *uc)
+{
+  return(false);
+}
+
+bool
 cl_cmd_arg::as_string(void)
 {
   char *s= get_svalue();
@@ -319,6 +325,20 @@ cl_cmd_sym_arg::as_hw(class cl_uc *uc)
   return(true);
 }
 
+bool
+cl_cmd_sym_arg::as_cell(class cl_uc *uc)
+{
+  class cl_address_space *as;
+  t_addr addr;
+  
+  if (uc->symbol2address(get_svalue(), &as, &addr))
+    {
+      value.cell= as->get_cell(addr);
+      return value.cell != NULL;
+    }
+  return false;
+}
+
 
 /* String */
 
@@ -419,6 +439,26 @@ cl_cmd_array_arg::as_hw(class cl_uc *uc)
   
   value.hw= uc->get_hw(n, a, NULL);
   return(value.hw != NULL);
+}
+
+bool
+cl_cmd_array_arg::as_cell(class cl_uc *uc)
+{
+  // address_space[address]
+  char *n;
+  t_addr a;
+  if (name_arg == 0 ||
+      index == 0 ||
+      (n= name_arg->get_svalue()) == NULL ||
+      !index->get_address(uc, &a))
+    return false;
+  class cl_memory *m= uc->memory(n);
+  if (!m)
+    return false;
+  if (!m->is_address_space())
+    return false;
+  value.cell= ((cl_address_space*)m)->get_cell(a);
+  return value.cell != NULL;
 }
 
 

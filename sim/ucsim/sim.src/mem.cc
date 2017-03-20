@@ -454,6 +454,21 @@ cl_memory::search_next(bool case_sensitive,
   return(found);
 }
 
+void
+cl_memory::print_info(chars pre, class cl_console_base *con)
+{
+  char *n= (char*)(get_name());
+  if (!hidden)
+    {
+      con->dd_printf("%s0x%06x-0x%06x %8d %s (%d,%s,%s)\n", (char*)pre,
+		     (unsigned int)(get_start_address()),
+		     (unsigned int)(highest_valid_address()),
+		     (unsigned int)(get_size()),
+		     n,
+		     width, data_format, addr_format);
+    }
+}
+
 
 /*
  *                                                             Memory operators
@@ -1149,7 +1164,25 @@ cl_memory_cell::get_event_handler(void)
 }
 
 void
-cl_memory_cell::print_operators(class cl_console_base *con)
+cl_memory_cell::print_info(chars pre, class cl_console_base *con)
+{
+  con->dd_printf("%sFlags:", (char*)pre);
+  if (flags & CELL_VAR)
+    con->dd_printf(" VAR");
+  if (flags & CELL_INST)
+    con->dd_printf(" INST");
+  if (flags & CELL_FETCH_BRK)
+    con->dd_printf(" FBRK");
+  if (flags & CELL_READ_ONLY)
+    con->dd_printf(" RO");
+  if (flags & CELL_NON_DECODED)
+    con->dd_printf(" NDC");
+  con->dd_printf("\n");
+  print_operators(pre, con);
+}
+
+void
+cl_memory_cell::print_operators(chars pre, class cl_console_base *con)
 {
   class cl_memory_operator *o= operators;
   if (!operators)
@@ -1157,7 +1190,7 @@ cl_memory_cell::print_operators(class cl_console_base *con)
   int i= 0;
   while (o)
     {
-      printf(" %02d. %s\n", i, o->get_name("?"));
+      printf("%s %02d. %s\n", (char*)pre, i, o->get_name("?"));
       i++;
       o= o->get_next();
     }
@@ -1644,6 +1677,21 @@ cl_address_space::del_brk(t_addr addr, class cl_brk *brk)
     }
 }
 
+void
+cl_address_space::print_info(chars pre, class cl_console_base *con)
+{
+  char *n= (char*)(get_name());
+  if (!hidden)
+    {
+      con->dd_printf("%s0x%06x-0x%06x %8d %s (%d,%s,%s)\n", (char*)pre,
+		     (unsigned int)(get_start_address()),
+		     (unsigned int)(highest_valid_address()),
+		     (unsigned int)(get_size()),
+		     n,
+		     width, data_format, addr_format);
+    }
+}
+
 
 /*
  * List of address spaces
@@ -1771,6 +1819,22 @@ cl_memory_chip::set_bit0(t_addr addr, t_mem bits)
       size <= addr)
     return;
   array[addr]&= ((~bits) & data_mask);
+}
+
+void
+cl_memory_chip::print_info(chars pre, class cl_console_base *con)
+{
+  char *n= (char*)(get_name());
+  if (!hidden)
+    {
+      //con->dd_printf(pre0);
+      con->dd_printf("%s0x%06x-0x%06x %8d %s (%d,%s,%s)\n", (char*)pre,
+		     (unsigned int)(get_start_address()),
+		     (unsigned int)(highest_valid_address()),
+		     (unsigned int)(get_size()),
+		     n,
+		     width, data_format, addr_format);
+    }
 }
 
 

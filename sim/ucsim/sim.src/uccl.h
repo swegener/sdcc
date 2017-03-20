@@ -154,6 +154,8 @@ public:
   virtual void write_mem(char *id, t_addr addr, t_mem val);
   virtual void set_mem(char *id, t_addr addr, t_mem val);
   virtual class cl_address_space *address_space(const char *id);
+  virtual class cl_address_space *address_space(class cl_memory_cell *cell);
+  virtual class cl_address_space *address_space(class cl_memory_cell *cell, t_addr *addr);
   virtual class cl_memory *memory(const char *id);
 
   // file handling
@@ -250,6 +252,7 @@ public:
 				  t_mem bit_mask);
   virtual name_entry *get_name_entry(struct name_entry tabl[],
 				     char *name);
+  virtual chars cell_name(class cl_memory_cell *cell);
   
   /* Converting abstract address spaces into real ones */
   virtual class cl_address_space *bit2mem(t_addr bitaddr,

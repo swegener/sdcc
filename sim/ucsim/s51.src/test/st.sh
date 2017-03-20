@@ -98,9 +98,10 @@ E=$(grep Elapsed $SIM)
 E=$(echo $E|cut -d ' ' -f 2)
 C=$(grep 'Total time' $SIM|sed 's/^[^(]*(//'|sed 's/ .*//')
 S=$(echo "scale=3;${C}/${E}/1000000"|bc)
-
+ST=$(grep 'Simulated ' $SIM|cut -d' ' -f5)
 echo "st${TEST} speed= $S Mclk/sec"|tee -a $SIM
 
 echo "st${TEST},${VER},${E},${S}"|tee $CSV
 
-echo $E >st${TEST}${VER}.txt
+echo $E >st${TEST}${VER}_e.txt
+echo $ST >st${TEST}${VER}_st.txt

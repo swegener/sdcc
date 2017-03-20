@@ -75,6 +75,8 @@ enum con_flags {
 #define DATALIST        "D"
 #define SY_BIT          'b'
 #define BIT             "b"
+#define SY_CELL		'c'
+#define CELL		"c"
 
 
 class cl_prompt_option: public cl_optref

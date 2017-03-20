@@ -56,6 +56,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "simcl.h"
 #include "itsrccl.h"
 #include "simifcl.h"
+#include "vcdcl.h"
 
 
 static class cl_uc_error_registry uc_error_registry;
@@ -338,6 +339,8 @@ cl_uc::mk_hw_elements(void)
   class cl_hw *h;
 
   add_hw(h= new cl_simulator_interface(this));
+  h->init();
+  add_hw(h= new cl_vcd(this, 0, "vcd"));
   h->init();
 }
 
@@ -777,6 +780,28 @@ cl_uc::address_space(const char *id)
 	  !m->have_real_name())
 	continue;
       if (m->is_inamed(id))
+	return(m);
+    }
+  return(0);
+}
+
+class cl_address_space *
+cl_uc::address_space(class cl_memory_cell *cell)
+{
+  return(address_space(cell, (t_addr*)NULL));
+}
+
+class cl_address_space *
+cl_uc::address_space(class cl_memory_cell *cell, t_addr *addr)
+{
+  int i;
+
+  for (i= 0; i < address_spaces->count; i++)
+    {
+      class cl_address_space *m= (cl_address_space *)(address_spaces->at(i));
+      if (!m)
+	continue;
+      if (m->is_owned(cell, addr))
 	return(m);
     }
   return(0);
@@ -1401,6 +1426,9 @@ cl_uc::symbol2address(char *sym,
   class cl_var *v;
   t_index i;
 
+  if (!sym ||
+      !*sym)
+    return false;
   if (vars->search(sym, i))
     {
       v= (class cl_var *)(vars->at(i));
@@ -1493,6 +1521,30 @@ cl_uc::get_name_entry(struct name_entry tabl[], char *name)
     return(&tabl[i]);
   else
     return(0);
+}
+
+chars
+cl_uc::cell_name(class cl_memory_cell *cell)
+{
+  if (cell == NULL)
+    return chars("");
+  if (cell->get_flag(CELL_VAR))
+    {
+      int i;
+      for (i= 0; i < vars->count; i++)
+	{
+	  class cl_var *v= (cl_var*)(vars->at(i));
+	  if (v->get_cell() &&
+	      (cell == v->get_cell()))
+	    return chars(v->get_name());
+	}
+    }
+  class cl_address_space *as;
+  t_addr a;
+  as= address_space(cell, &a);
+  if (as == NULL)
+    return chars("");
+  return chars("", "%s_%06x", as->get_name(), a);
 }
 
 

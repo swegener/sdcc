@@ -84,6 +84,24 @@ struct vcounter_t {
   t_mem wr;
 };
 
+class cl_omf_rec: public cl_base
+{
+ protected:
+  unsigned int f_offset, offset;
+ public:
+  u8_t type;
+  u16_t len;
+  u8_t *rec;
+  u8_t chk;
+ public:
+  cl_omf_rec(void);
+  virtual ~cl_omf_rec(void);
+  virtual unsigned char g(cl_f *f);
+  virtual u16_t pick_word(int i);
+  virtual chars pick_str(int i);
+  virtual bool read(cl_f *f);
+};
+
 /* Abstract microcontroller */
 
 class cl_uc: public cl_base
@@ -161,7 +179,12 @@ public:
   // file handling
   virtual void set_rom(t_addr addr, t_mem val);
   virtual long read_hex_file(const char *nam);
-
+  virtual long read_hex_file(cl_console_base *con);
+  virtual long read_hex_file(cl_f *f);
+  virtual long read_omf_file(cl_f *f);
+  virtual cl_f *find_loadable_file(chars nam);
+  virtual long read_file(chars nam);
+  
   // instructions, code analyzer
   virtual void analyze(t_addr addr) {}
   virtual bool inst_at(t_addr addr);

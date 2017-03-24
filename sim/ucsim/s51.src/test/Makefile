@@ -1,9 +1,10 @@
 PRJ		= test_mdu517 test_mdu88x \
-		  stn stp strr sts stt stxr stxrw stxw
+		  stn stp strr sts stt stxr stxrw stxw \
+		  stt_small stt_large
 
 all:
 	for p in $(PRJ); do \
-		$(MAKE) -f $$p.mk ;\
+		$(MAKE) -f $$p.mk clean all ;\
 	done
 
 clean:

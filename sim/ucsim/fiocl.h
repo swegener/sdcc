@@ -148,12 +148,14 @@ class cl_f: public cl_base
   virtual void changed(void);
   virtual int close(void);
   virtual int stop_use(void);
-
+  virtual bool opened(void) { return file_id >= 0; }
+  
   virtual char *get_file_name() { return file_name; };
   virtual class cl_f *get_echo_to() { return echo_to; }
  protected:
   virtual int put(int c);
   virtual int get(void);
+  virtual int free_place(void);
   virtual int finish_esc(int k);
   virtual int process_telnet(char ci);
   virtual int process_esc(char c);
@@ -165,7 +167,8 @@ class cl_f: public cl_base
  public:
   virtual int input_avail(void);
   virtual int read(int *buf, int max);
-
+  virtual int getc(void);
+  
  public:
   //FILE *f(void) { return file_f; };
   int id(void) { return file_id; };

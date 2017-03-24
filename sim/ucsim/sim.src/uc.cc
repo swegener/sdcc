@@ -126,6 +126,109 @@ cl_xtal_option::option_changed(void)
 }
 
 
+/* OMF file record */
+
+cl_omf_rec::cl_omf_rec(void):
+  cl_base()
+{
+  offset= 0;
+  f_offset= 0;
+  type= 0;
+  len= 0;
+  rec= NULL;
+  chk= 0;
+}
+
+cl_omf_rec::~cl_omf_rec(void)
+{
+  if (rec)
+    free(rec);
+}
+
+unsigned char
+cl_omf_rec::g(cl_f *f)
+{
+  unsigned char c= f->getc();
+  offset++;
+  return c;
+}
+
+u16_t
+cl_omf_rec::pick_word(int i)
+{
+  unsigned char h, l;
+  u16_t w;
+  
+  if (i >= len-1)
+    return 0;
+  l= rec[i];
+  h= rec[i+1];
+  w= h*256+l;
+  return w;
+}
+
+chars
+cl_omf_rec::pick_str(int i)
+{
+  unsigned char l, j;
+  chars s= "";
+  
+  if (i >= len-1)
+    return chars("");
+  l= rec[i];
+  j= 0;
+  while (l &&
+	 (i < len))
+    {
+      s+= rec[i+1+j];
+      l--;
+      j++;
+    }
+  return s;
+}
+
+bool
+cl_omf_rec::read(cl_f *f)
+{
+  unsigned char c;
+  int i, l, h;
+
+  if (rec)
+    {
+      free(rec);
+      rec= NULL;
+    }
+  f_offset= offset;
+  if (f->eof())
+    return false;
+  c= g(f);
+  type= c;
+  if (f->eof())
+    return false;
+  c= g(f);
+  l= c;
+  //printf("l=%02x\n", c);
+  if (f->eof())
+    return false;
+  c= g(f);
+  h= c;
+  //printf("h=%02x\n", c);
+  if (f->eof())
+    return false;
+  len= h*256+l-1;
+  rec= (u8_t*)malloc(len);
+  for (i= 0; i < len; i++)
+    {
+      rec[i]= g(f);
+      if (f->eof())
+	return false;
+    }
+  chk= g(f);
+  
+  return true;
+}
+
+
 /*
  * Abstract microcontroller
  ******************************************************************************
@@ -214,19 +317,20 @@ cl_uc::init(void)
   mk_hw_elements();
   class cl_cmdset *cs= sim->app->get_commander()->cmdset;
   build_cmdset(cs);
+  irq= false;
+  reset();
 
+  return 0;
   for (i= 0; i < sim->app->in_files->count; i++)
     {
       char *fname= (char *)(sim->app->in_files->at(i));
       long l;
       if ((l= read_hex_file(fname)) >= 0)
 	{
-	  sim->app->get_commander()->all_printf("%ld words read from %s\n",
+	  /*sim->app->get_commander()->all_*/printf("%ld words read from %s\n",
 						l, fname);
 	}
     }
-  irq= false;
-  reset();
   return(0);
 }
 
@@ -838,16 +942,31 @@ cl_uc::memory(const char *id)
 
 
 static long
-ReadInt(FILE *f, bool *ok, int bytes)
+ReadInt(cl_f *f, bool *ok, int bytes)
 {
   char s2[3];
   long l= 0;
-
+  int c;
+  
   *ok= false;
   while (bytes)
     {
-      if (fscanf(f, "%2c", &s2[0]) == EOF)
+      if (f->eof())
 	return(0);
+      c= f->getc();
+      if ((c < 0) ||
+	  (c == 0) ||
+	  (c > 0xff))
+	return 0;
+      s2[0]= c;
+      if (f->eof())
+	return(0);
+      c= f->getc();
+      if ((c < 0) ||
+	  (c == 0) ||
+	  (c > 0xff))
+	return 0;
+      s2[1]= c;
       s2[2]= '\0';
       l= l*256 + strtol(s2, NULL, 16);
       bytes--;
@@ -868,7 +987,7 @@ ReadInt(FILE *f, bool *ok, int bytes)
 void
 cl_uc::set_rom(t_addr addr, t_mem val)
 {
-  //printf("rom[%lx]=%x\n", addr, val);
+  //printf("rom[%06lx]=%02x\n", addr, val);
   t_addr size= rom->get_size();
   if (addr < size)
     {
@@ -899,7 +1018,40 @@ cl_uc::set_rom(t_addr addr, t_mem val)
 long
 cl_uc::read_hex_file(const char *nam)
 {
-  FILE *f;
+  cl_f *f;
+  
+  if (!nam)
+    {
+      fprintf(stderr, "cl_uc::read_hex_file File name not specified\n");
+      return(-1);
+    }
+  else
+    if ((f= /*fopen*/mk_io(nam, "r")) == NULL)
+      {
+	fprintf(stderr, "Can't open `%s': %s\n", nam, strerror(errno));
+	return(-1);
+      }
+  long l= read_hex_file(f);
+  delete f;
+  return l;
+}
+
+long
+cl_uc::read_hex_file(cl_console_base *con)
+{
+  cl_f *f;
+  if (con == NULL)
+    return -1;
+  f= con->get_fin();
+  if (f == NULL)
+    return -1;
+  long l= read_hex_file(f);
+  return l;
+}
+
+long
+cl_uc::read_hex_file(cl_f *f)
+{
   int c;
   long written= 0, recnum= 0;
 
@@ -921,35 +1073,22 @@ cl_uc::read_hex_file(const char *nam)
       return(-1);
     }
 
-  if (!nam)
-    {
-      sim->app->get_commander()->
-	dd_printf("cl_uc::read_hex_file File name not specified\n");
-      return(-1);
-    }
-  else
-    if ((f= fopen(nam, "r")) == NULL)
-      {
-	fprintf(stderr, "Can't open `%s': %s\n", nam, strerror(errno));
-	return(-1);
-      }
-
   //memset(inst_map, '\0', sizeof(inst_map));
   ok= true;
   while (ok &&
 	 rtyp != 1)
     {
-      while (((c= getc(f)) != ':') &&
-	     (c != EOF)) ;
+      while (((c= /*getc(f)*/f->getc()) != ':') &&
+	     (/*c != EOF*/!f->eof())) /*printf("search_record=%c\n",c)*/;
       if (c != ':')
 	{fprintf(stderr, ": not found\n");break;}
       recnum++;
-      dnum= ReadInt(f, &ok, 1);//printf("dnum=%02x",dnum);
+      dnum= ReadInt(f, &ok, 1);//printf("%ld:dnum=%02x ",recnum,dnum);
       chk = dnum;
-      addr= ReadInt(f, &ok, 2);//printf("addr=%04x",addr);
+      addr= ReadInt(f, &ok, 2);//printf("%ld:addr=%04x ",recnum,addr);
       chk+= (addr & 0xff);
       chk+= ((addr >> 8) & 0xff);
-      rtyp= ReadInt(f, &ok, 1);//printf("rtyp=%02x ",rtyp);
+      rtyp= ReadInt(f, &ok, 1);//printf("%ld:rtyp=%02x ",recnum,rtyp);
       chk+= rtyp;
       for (i= 0; ok && (i < dnum); i++)
 	{
@@ -958,7 +1097,7 @@ cl_uc::read_hex_file(const char *nam)
 	}
       if (ok)
 	{
-	  sum= ReadInt(f, &ok, 1);//printf(" sum=%02x\n",sum);
+	  sum= ReadInt(f, &ok, 1);//printf(" %ld:sum=%02x\n",recnum,sum);
 	  if (ok)
 	    {
 	      if (((sum + chk) & 0xff) == 0)
@@ -995,35 +1134,114 @@ cl_uc::read_hex_file(const char *nam)
 		    }
 		  else if (rtyp == 4)
 		    {
-		      printf("hex record type=4\n");
+		      //printf("hex record type=4\n");
 		      if (dnum >= 2)
 			{
 			  base= (rec[0]*256+rec[1]) << 16;
-			  printf("hex base=%x\n", base);
+			  //printf("hex base=%x\n", base);
 			}
 		    }
 		  else
 		    if (rtyp != 1)
-		      application->debug("Unknown record type %d(0x%x)\n",
+		      /*application->debug*/fprintf(stderr, "Unknown record type %d(0x%x)\n",
 					 rtyp, rtyp);
 		}
 	      else
-		application->debug("Checksum error (%x instead of %x) in "
+		/*application->debug*/fprintf(stderr, "Checksum error (%x instead of %x) in "
 				   "record %ld.\n", chk, sum, recnum);
 	    }
 	  else
-	    application->debug("Read error in record %ld.\n", recnum);
+	    /*application->debug*/fprintf(stderr, "Read error in record %ld.\n", recnum);
 	}
     }
   if (rom->width > 8 &&
       !get_low)
     rom->set(addr, low);
 
-  if (nam)
-    fclose(f);
-  application->debug("%ld records have been read\n", recnum);
   analyze(0);
   return(written);
+}
+
+long
+cl_uc::read_omf_file(cl_f *f)
+{
+  long written= 0;
+  class cl_omf_rec rec;
+  while (rec.read(f))
+    {
+      if (rec.type == 0x06)
+	{
+	  // content
+	  u16_t addr= rec.pick_word(1);
+	  int i= 3;
+	  while (i < rec.len)
+	    {
+	      set_rom(addr+i, rec.rec[i]);
+	      written++;
+	      i++;
+	    }
+	}
+    }
+  return (written);
+}
+
+cl_f *
+cl_uc::find_loadable_file(chars nam)
+{
+  cl_f *f;
+  bool o;
+  chars c;
+  
+  f= mk_io(nam, "r");
+  o= (f->opened());
+  if (o)
+    return f;
+
+  c= chars("", "%s.ihx", (char*)nam);
+  f->open(c, chars("r"));
+  o= (f->opened());
+  if (o)
+    return f;
+  c= chars("", "%s.hex", (char*)nam);
+  f->open(c, chars("r"));
+  o= (f->opened());
+  if (o)
+    return f;
+  c= chars("", "%s.ihex", (char*)nam);
+  f->open(c, chars("r"));
+  o= (f->opened());
+  if (o)
+    return f;
+
+  c= chars("", "%s.omf", (char*)nam);
+  f->open(c, chars("r"));
+  o= (f->opened());
+  if (o)
+    return f;
+
+  delete f;
+  return NULL;
+}
+
+long
+cl_uc::read_file(chars nam)
+{
+  cl_f *f= find_loadable_file(nam);
+  long l= 0;
+  
+  if (!f)
+    {
+      printf("no loadable file found\n");
+      return 0;
+    }
+  printf("Loading from %s\n", f->get_file_name());
+  if (is_hex_file(f))
+    l= read_hex_file(f);
+  else if (is_omf_file(f))
+    l= read_omf_file(f);
+
+  delete f;
+  return l;
 }
 
 

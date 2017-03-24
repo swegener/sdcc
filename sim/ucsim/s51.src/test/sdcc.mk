@@ -9,19 +9,21 @@ LIBS		=
 ALL		= $(MAIN) $(OTHERS)
 OBJECTS		= $(MAIN).rel $(OTHERS:=.rel)
 
-all: $(MAIN).hex
+APP		?= $(MAIN)
 
-dep: $(MAIN).dep
+all: $(APP).hex
 
-$(MAIN).dep: $(OBJECTS:.rel=.c) *.h
-	@>$(MAIN).dep
+dep: $(APP).dep
+
+$(APP).dep: $(OBJECTS:.rel=.c) *.h
+	@>$(APP).dep
 	@for c in $(OBJECTS:.rel=.c); do \
-		$(CC) -MM $(CPPFALGS) $$c >>$(MAIN).dep ;\
+		$(CC) -MM $(CPPFALGS) $$c >>$(APP).dep ;\
 	done
 
-include $(MAIN).dep
+include $(APP).dep
 
-$(MAIN).ihx: $(OBJECTS)
+$(APP).ihx: $(OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o $@
 
 .SUFFIXES: .rel .ihx .hex
@@ -35,9 +37,10 @@ $(MAIN).ihx: $(OBJECTS)
 clean:
 	rm -f $(ALL:=.rel) $(ALL:=.asm) $(ALL:=.lst) $(ALL:=.rst) $(ALL:=.sym) $(ALL:=.adb)
 	rm -f $(MAIN).ihx $(MAIN).hex $(MAIN).lk $(MAIN).map $(MAIN).mem $(MAIN).cdb $(MAIN).omf $(MAIN).noi
+	rm -f $(APP).ihx $(APP).hex $(APP).lk $(APP).map $(APP).mem $(APP).cdb $(APP).omf $(APP).noi
 	rm -f *~
-	rm -f $(MAIN).dep
-	rm -f $(MAIN).sim
+	rm -f $(MAIN).dep $(APP).dep
+	rm -f $(MAIN).sim $(APP).sim
 
 
 # End of sdcc.mk

@@ -11,12 +11,34 @@ void t0_isr(void) __interrupt (1)
   T0set(tr);
 }
 
+int var;
+__data  int dvar;
+__idata int ivar;
+__xdata int xvar;
+__pdata int pvar;
+__code  int cvar;
+__sfr   __at(0x81) svar;
+__bit   bvar;
+
+void
+fn(void)
+{
+  volatile int fn_local;
+  volatile int fn_hide;
+  fn_local= fn_hide= 1;
+  {
+    volatile int fn_blocked, fn_hide;
+    fn_blocked= fn_hide= 2;
+  }
+}
+
 void
 main(void)
 {
   volatile unsigned int i, x= 0, j;
   __xdata char *p= (__xdata char *)0;
 
+  bvar= 1;
   sif= (unsigned char __xdata *)0xffff;
   tr= T_kezdoertek(10);
   T0idozito1(0);

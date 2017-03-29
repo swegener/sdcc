@@ -151,6 +151,7 @@ class cl_f: public cl_base
   virtual bool opened(void) { return file_id >= 0; }
   
   virtual char *get_file_name() { return file_name; };
+  virtual char *get_fname() { return file_name; };
   virtual class cl_f *get_echo_to() { return echo_to; }
  protected:
   virtual int put(int c);
@@ -168,6 +169,7 @@ class cl_f: public cl_base
   virtual int input_avail(void);
   virtual int read(int *buf, int max);
   virtual int getc(void);
+  virtual chars gets(void);
   
  public:
   //FILE *f(void) { return file_f; };

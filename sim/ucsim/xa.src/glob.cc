@@ -448,22 +448,5 @@ struct xa_dis_entry disass_xa[]= {
  {0,0x0000,0x0000,  0,1,BAD_OPCODE, REG_REG}
 };
 
-/*
- * Names of SFRs
- */
-
-struct name_entry sfr_tabXA51[]=
-{
-#include "xa_sfr.cc"
-};
-
-/*
- * Names of SBITs
- */
-
-struct name_entry bit_tabXA51[]=
-{
-#include "xa_bit.cc"
-};
 
 /* End of xa.src/glob.cc */

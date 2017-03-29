@@ -2056,16 +2056,16 @@ uc_yy_check_id(char *token)
 	      yylval.memory.address= addr;
 	      return PTOK_MEMORY;
 	  }
+      /*
       else if ((found= uc->symbol2address(yytext, uc->sfr_tbl(), &addr)))
 	{
-	  /*yylval.number= addr;
-	    return PTOK_NUMBER;*/
+	  //yylval.number= addr; return PTOK_NUMBER;
 	  yylval.memory.memory = uc->address_space(MEM_SFR_ID);
 	  yylval.memory.address = addr;
 	  return PTOK_MEMORY;
 	}
-
-      found= uc->symbol2address(yytext, uc->bit_tbl(), &addr);
+      */
+      //found= uc->symbol2address(yytext, uc->bit_tbl(), &addr);
       if (found)
 	{
 	  t_addr memaddr;

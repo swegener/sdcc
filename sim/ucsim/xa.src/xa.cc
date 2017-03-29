@@ -45,6 +45,184 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "glob.h"
 #include "regsxa.h"
 
+
+/*
+ * Names of SFRs
+ */
+
+static struct name_entry sfr_tabXA51[]=
+{
+  //#include "xa_sfr.cc"
+  {CPU_XA, 0x400, "PSW"}, /* Program status word */
+  {CPU_XA, 0x400, "PSWL"}, /* Program status word (low byte) */
+  {CPU_XA, 0x401, "PSWH"}, /* Program status word (high byte) */
+  {CPU_XA, 0x402, "PSW51"}, /* 80C51 compatible PSW */
+  {CPU_XA, 0x403, "SSEL"}, /* Segment selection register */
+  {CPU_XA, 0x404, "PCON"}, /* Power control register */
+  {CPU_XA, 0x410, "TCON"}, /* Timer 0 and 1 control register */
+  {CPU_XA, 0x411, "TSTAT"}, /* Timer 0 and 1 extended status */
+  {CPU_XA, 0x418, "T2CON"}, /* Timer 2 control register */
+  {CPU_XA, 0x419, "T2MOD"}, /* Timer 2 mode control */
+  {CPU_XA, 0x41F, "WDCON"}, /* Watchdog control register */
+  {CPU_XA, 0x420, "S0CON"}, /* Serial port 0 control register */
+  {CPU_XA, 0x421, "S0STAT"}, /* Serial port 0 extended status */
+  {CPU_XA, 0x424, "S1CON"}, /* Serial port 1 control register */
+  {CPU_XA, 0x425, "S1STAT"}, /* Serial port 1 extended status */
+  {CPU_XA, 0x426, "IEL"}, /* Interrupt enable low byte */
+  {CPU_XA, 0x427, "IEH"}, /* Interrupt enable high byte */
+  {CPU_XA, 0x42A, "SWR"}, /* Software Interrupt Request */
+  {CPU_XA, 0x430, "P0"}, /* Port 0 */
+  {CPU_XA, 0x431, "P1"}, /* Port 1 */
+  {CPU_XA, 0x432, "P2"}, /* Port 2 */
+  {CPU_XA, 0x433, "P3"}, /* Port3 */
+  {CPU_XA, 0x440, "SCR"}, /* System configuration register */
+  {CPU_XA, 0x441, "DS"}, /* Data segment */
+  {CPU_XA, 0x442, "ES"}, /* Extra segment */
+  {CPU_XA, 0x443, "CS"}, /* Code segment */
+  {CPU_XA, 0x450, "TL0"}, /* Timer 0 low byte */
+  {CPU_XA, 0x451, "TH0"}, /* Timer 0 high byte */
+  {CPU_XA, 0x452, "TL1"}, /* Timer 1 low byte */
+  {CPU_XA, 0x453, "TH1"}, /* Timer 1 high byte */
+  {CPU_XA, 0x454, "RTL0"}, /* Timer 0 extended reload, low byte */
+  {CPU_XA, 0x455, "RTH0"}, /* Timer 0 extended reload, high byte */
+  {CPU_XA, 0x456, "RTL1"}, /* Timer 1 extended reload, low byte */
+  {CPU_XA, 0x457, "RTH1"}, /* Timer 1 extended reload, high byte */
+  {CPU_XA, 0x458, "TL2"}, /* Timer 2 low byte */
+  {CPU_XA, 0x459, "TH2"}, /* Timer 2 high byte */
+  {CPU_XA, 0x45A, "T2CAPL"}, /* Timer 2 capture register, low byte */
+  {CPU_XA, 0x45B, "T2CAPH"}, /* Timer 2 capture register, high byte */
+  {CPU_XA, 0x45C, "TMOD"}, /* Timer 0 and 1 mode register */
+  {CPU_XA, 0x45D, "WFEED1"}, /* Watchdog feed 1 */
+  {CPU_XA, 0x45E, "WFEED2"}, /* Watchdog feed 2 */
+  {CPU_XA, 0x45F, "WDL"}, /* Watchdog timer reload */
+  {CPU_XA, 0x460, "S0BUF"}, /* Serial port 0 buffer register */
+  {CPU_XA, 0x461, "S0ADDR"}, /* Serial port 0 address register */
+  {CPU_XA, 0x462, "S0ADEN"}, /* Serial port 0 address enable register */
+  {CPU_XA, 0x464, "S1BUF"}, /* Serial port 1 buffer register */
+  {CPU_XA, 0x465, "S1ADDR"}, /* Serial port 1 address register */
+  {CPU_XA, 0x466, "S1ADEN"}, /* Serial port 1 address enable register */
+  {CPU_XA, 0x468, "BTRL"}, /* Bus timing register high byte */
+  {CPU_XA, 0x469, "BTRH"}, /* Bus timing register low byte */
+  {CPU_XA, 0x46A, "BCR"}, /* Bus configuration register */
+  {CPU_XA, 0x470, "P0CFGA"}, /* Port 0 configuration A */
+  {CPU_XA, 0x471, "P1CFGA"}, /* Port 1 configuration A */
+  {CPU_XA, 0x472, "P2CFGA"}, /* Port 2 configuration A */
+  {CPU_XA, 0x473, "P3CFGA"}, /* Port 3 configuration A */
+  {CPU_XA, 0x47A, "SWE"}, /* Software Interrupt Enable */
+  {CPU_XA, 0x4A0, "IPA0"}, /* Interrupt priority 0 */
+  {CPU_XA, 0x4A1, "IPA1"}, /* Interrupt priority 1 */
+  {CPU_XA, 0x4A2, "IPA2"}, /* Interrupt priority 2 */
+  {CPU_XA, 0x4A4, "IPA4"}, /* Interrupt priority 4 */
+  {CPU_XA, 0x4A5, "IPA5"}, /* Interrupt priority 5 */
+  {CPU_XA, 0x4F0, "P0CFGB"}, /* Port 0 configuration B */
+  {CPU_XA, 0x4F1, "P1CFGB"}, /* Port 1 configuration B */
+  {CPU_XA, 0x4F2, "P2CFGB"}, /* Port 2 configuration B */
+  {CPU_XA, 0x4F3, "P3CFGB"}, /* Port 3 configuration B */
+  { 0, 0, NULL }
+};
+
+/*
+ * Names of SBITs
+ */
+
+static struct name_entry bit_tabXA51[]=
+{
+  //#include "xa_bit.cc"
+  {CPU_XA, 0x33B, "ETI1"}, /* TX interrupt enable 1 */
+  {CPU_XA, 0x33A, "ERI1"}, /* RX interrupt enable 1 */
+  {CPU_XA, 0x339, "ETI0"}, /* TX interrupt enable 0 */
+  {CPU_XA, 0x338, "ERI0"}, /* RX interrupt enable 0 */
+  {CPU_XA, 0x337, "EA"}, /* global int. enable */
+  {CPU_XA, 0x334, "ET2"}, /* timer 2 interrupt */
+  {CPU_XA, 0x333, "ET1"}, /* timer 1 interrupt */
+  {CPU_XA, 0x332, "EX1"}, /* external interrupt 1 */
+  {CPU_XA, 0x331, "ET0"}, /* timer 0 interrupt */
+  {CPU_XA, 0x330, "EX0"}, /* external interrupt 0 */
+  {CPU_XA, 0x221, "PD"}, /* power down */
+  {CPU_XA, 0x220, "IDL"},
+  {CPU_XA, 0x20F, "SM"},
+  {CPU_XA, 0x20E, "TM"},
+  {CPU_XA, 0x20D, "RS1"},
+  {CPU_XA, 0x20C, "RS0"},
+  {CPU_XA, 0x20B, "IM3"},
+  {CPU_XA, 0x20A, "IM2"},
+  {CPU_XA, 0x209, "IM1"},
+  {CPU_XA, 0x208, "IM0"},
+  {CPU_XA, 0x307, "S0M0"},
+  {CPU_XA, 0x306, "S0M1"},
+  {CPU_XA, 0x305, "S0M2"},
+  {CPU_XA, 0x304, "R0EN"},
+  {CPU_XA, 0x303, "T0B8"},
+  {CPU_XA, 0x302, "R0B8"},
+  {CPU_XA, 0x301, "TI0"}, /* serial port 0 tx ready */
+  {CPU_XA, 0x300, "RI0"}, /* serial port 0 rx ready */
+  {CPU_XA, 0x30B, "FE0"},
+  {CPU_XA, 0x30A, "BR0"},
+  {CPU_XA, 0x309, "OE0"},
+  {CPU_XA, 0x308, "STINT0"},
+  {CPU_XA, 0x327, "S1M0"},
+  {CPU_XA, 0x326, "S1M1"},
+  {CPU_XA, 0x325, "S1M2"},
+  {CPU_XA, 0x324, "R1EN"},
+  {CPU_XA, 0x323, "T1B8"},
+  {CPU_XA, 0x322, "R1B8"},
+  {CPU_XA, 0x321, "TI1"}, /* serial port 0 tx ready */
+  {CPU_XA, 0x320, "RI1"}, /* serial port 0 rx ready */
+  {CPU_XA, 0x32B, "FE1"},
+  {CPU_XA, 0x32A, "BR1"},
+  {CPU_XA, 0x329, "OE1"},
+  {CPU_XA, 0x328, "STINT1"},
+  {CPU_XA, 0x356, "SWR7"},
+  {CPU_XA, 0x355, "SWR6"},
+  {CPU_XA, 0x354, "SWR5"},
+  {CPU_XA, 0x353, "SWR4"},
+  {CPU_XA, 0x352, "SWR3"},
+  {CPU_XA, 0x351, "SWR2"},
+  {CPU_XA, 0x350, "SWR1"},
+  {CPU_XA, 0x2C7, "TF2"},
+  {CPU_XA, 0x2C6, "EXF2"},
+  {CPU_XA, 0x2C5, "RCLK0"},
+  {CPU_XA, 0x2C4, "TCLK0"},
+  {CPU_XA, 0x2CD, "RCLK1"},
+  {CPU_XA, 0x2CC, "TCLK1"},
+  {CPU_XA, 0x2C3, "EXEN2"},
+  {CPU_XA, 0x2C2, "TR2"},
+  {CPU_XA, 0x2C1, "CT2"},
+  {CPU_XA, 0x2C0, "CPRL2"},
+  {CPU_XA, 0x2C9, "T2OE"},
+  {CPU_XA, 0x2C8, "DCEN"},
+  {CPU_XA, 0x287, "TF1"},
+  {CPU_XA, 0x286, "TR1"},
+  {CPU_XA, 0x285, "TF0"},
+  {CPU_XA, 0x284, "TR0"},
+  {CPU_XA, 0x283, "IE1"},
+  {CPU_XA, 0x282, "IT1"},
+  {CPU_XA, 0x281, "IE0"},
+  {CPU_XA, 0x280, "IT0"},
+  {CPU_XA, 0x28A, "T1OE"},
+  {CPU_XA, 0x288, "T0OE"},
+  {CPU_XA, 0x2FF, "PRE2"},
+  {CPU_XA, 0x2FE, "PRE1"},
+  {CPU_XA, 0x2FD, "PRE0"},
+  {CPU_XA, 0x2FA, "WDRUN"},
+  {CPU_XA, 0x2F9, "WDTOF"},
+  {CPU_XA, 0x2F8, "WDMOD"},
+  {CPU_XA, 0x388, "WR1"},
+  {CPU_XA, 0x38F, "T2EX"},
+  {CPU_XA, 0x38C, "RXD1"},
+  {CPU_XA, 0x38D, "TXD1"},
+  {CPU_XA, 0x398, "RXD0"},
+  {CPU_XA, 0x399, "TXD0"},
+  {CPU_XA, 0x39A, "INT0"},
+  {CPU_XA, 0x39B, "INT1"},
+  {CPU_XA, 0x39C, "T0"},
+  {CPU_XA, 0x39D, "T1"},
+  {CPU_XA, 0x39E, "WR"},
+  {CPU_XA, 0x39F, "RD"},
+  { 0, 0, NULL }
+};
+
+
 /*
  * Base type of xa controllers
  */
@@ -60,8 +238,6 @@ int
 cl_xa::init(void)
 {
   cl_uc::init(); /* Memories now exist */
-  //ram= address_space(MEM_XRAM_ID);
-  //rom= address_space(MEM_ROM_ID);
 
   /* set SCR to osc/4, native XA mode, flat 24 */
   set_scr(0);
@@ -74,21 +250,41 @@ cl_xa::init(void)
 
   printf("The XA Simulator is in development, UNSTABLE, DEVELOPERS ONLY!\n");
 
+  int i;
+  for (i= 0; sfr_tabXA51[i].name != NULL; i++)
+    {
+      if (type->type & sfr_tabXA51[i].cpu_type)
+	{
+	  class cl_var *v;
+	  vars->add(v= new cl_var(chars(sfr_tabXA51[i].name),
+				  sfr,
+				  sfr_tabXA51[i].addr));
+	  v->init();
+	}
+    }
+  for (i= 0; bit_tabXA51[i].name != NULL; i++)
+    {
+      if (type->type & bit_tabXA51[i].cpu_type)
+	{
+	  class cl_var *v;
+	  t_addr a= bit_tabXA51[i].addr;
+	  int bitnr, offset= 0;
+	  if (a >= 0x200)
+	    {
+	      a-= 0x200;
+	      offset= 0x400;
+	    }
+	  bitnr= a%8;
+	  a= offset + a/8;
+	  vars->add(v= new cl_var(chars(bit_tabXA51[i].name),
+				  sfr,
+				  a, bitnr));
+	  v->init();
+	}
+    }
   return(0);
 }
 
-/*
-class cl_m *
-cl_xa::mk_mem(enum mem_class type, char *class_name)
-{
-  class cl_m *m= cl_uc::mk_mem(type, class_name);
-  if (type == MEM_SFR)
-    sfr= m;
-  if (type == MEM_IRAM)
-    iram= m;
-  return(m);
-}
-*/
 
 char *
 cl_xa::id_string(void)
@@ -100,21 +296,6 @@ cl_xa::id_string(void)
 /*
  * Making elements of the controller
  */
-/*
-t_addr
-cl_xa::get_mem_size(enum mem_class type)
-{
-  switch(type)
-    {
-    case MEM_IRAM: return(0x2000);
-    case MEM_SFR:  return(0x2000);
-    case MEM_ROM:  return(0x10000);
-    case MEM_XRAM: return(0x10000);
-    default: return(0);
-    }
- return(cl_uc::get_mem_size(type));
-}
-*/
 
 void
 cl_xa::mk_hw_elements(void)
@@ -229,7 +410,7 @@ cl_xa::longest_inst(void)
 
 static char dir_name[64];
 char *cl_xa::get_dir_name(short addr) {
-  if (!get_name(addr, sfr_tbl(), dir_name)) {
+  if (!/*get*/addr_name(addr, sfr/*_tbl()*/, dir_name)) {
     sprintf (dir_name, "0x%03x", addr);
   }
   return dir_name;
@@ -237,7 +418,10 @@ char *cl_xa::get_dir_name(short addr) {
 
 static char bit_name[64];
 char *cl_xa::get_bit_name(short addr) {
-  if (!get_name(addr, bit_tbl(), bit_name)) {
+  t_addr a= addr; int offset= 0, bitnr= addr%8;
+  if (a >= 0x200) { a-= 0x200; offset= 0x400; }
+  a= offset+a/8;
+  if (!/*get*/addr_name(a/*ddr*/, sfr/*bit_tbl()*/, bitnr, bit_name)) {
     sprintf (bit_name, "0x%03x", addr);
   }
   return bit_name;

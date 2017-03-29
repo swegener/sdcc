@@ -267,14 +267,13 @@ cl_cmd_sym_arg::as_string(void)
 bool
 cl_cmd_sym_arg::get_address(class cl_uc *uc, t_addr *addr)
 {
-  struct name_entry *ne;
+  t_addr a;
 
-  if ((ne= uc->get_name_entry(uc->sfr_tbl(),
-			      get_svalue())) != NULL)
+  if (uc->symbol2address(get_svalue(), NULL, &a))
     {
       if (addr)
-	*addr= ne->addr;
-      return(1);
+	*addr= a;
+      return 1;
     }
   return(0);
 }
@@ -285,6 +284,7 @@ cl_cmd_sym_arg::get_bit_address(class cl_uc *uc, // input
 				t_addr *mem_addr,
 				t_mem *bit_mask)
 {
+  /*
   struct name_entry *ne;
 
   ne= uc->get_name_entry(uc->bit_tbl(), get_svalue());
@@ -293,17 +293,38 @@ cl_cmd_sym_arg::get_bit_address(class cl_uc *uc, // input
   if (mem)
     *mem= uc->bit2mem(ne->addr, mem_addr, bit_mask);
   return(mem && *mem);
+  */
+  class cl_var *v= uc->var(get_svalue());
+  if (v)
+    {
+      if (mem)
+	*mem= v->as;
+      if (mem_addr)
+	*mem_addr= v->addr;
+      if (bit_mask)
+	{
+	  if (v->bitnr < 0)
+	    {
+	      *bit_mask= 1;
+	    }
+	  else
+	    {
+	      *bit_mask= 1 << v->bitnr;
+	    }
+	}
+      return true;
+    }
+  return false;
 }
 
 bool
 cl_cmd_sym_arg::as_address(class cl_uc *uc)
 {
-  struct name_entry *ne;
-  //printf("SYM %s as addr?\n",get_svalue());
-  if ((ne= uc->get_name_entry(uc->sfr_tbl(), get_svalue())) != NULL)
+  t_addr a;
+  if (uc->symbol2address(get_svalue(), NULL, &a))
     {
-      value.address= ne->addr;
-      return(true);
+      value.address= a;
+      return true;
     }
   return(false);
 }

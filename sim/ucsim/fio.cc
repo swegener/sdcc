@@ -977,6 +977,36 @@ cl_f::getc(void)
     return i;
 }
 
+chars
+cl_f::gets(void)
+{
+  chars s= "";
+  char c;
+
+  if (eof())
+    return s;
+  c= getc();
+  while ((c == '\n') ||
+	 (c == '\r'))
+    {
+      if (eof())
+	return s;
+      c= getc();
+    }
+  if (eof())
+    return s;
+  s+= c;
+  c= getc();
+  while (!eof() &&
+	 (c != '\n') &&
+	 (c != '\r'))
+    {
+      s+= c;
+      c= getc();
+    }
+  return s;
+}
+
 
 /* IO primitives */
 

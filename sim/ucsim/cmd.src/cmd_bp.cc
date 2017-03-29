@@ -80,6 +80,34 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
     hit= params[3]->value.number;
     do_event(uc, mem, op, addr, hit, con);
   }
+  else if (cmdline->syntax_match(uc, CELL NUMBER)) {
+    hit= params[1]->value.number;
+    mem= uc->address_space(params[0]->value.cell, &addr);
+    if (!mem)
+      return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
+	false;
+    if (mem == uc->rom)
+      do_fetch(uc, addr, hit, con);
+    else
+      {
+	do_event(uc, mem, 'r', addr, hit, con);
+	do_event(uc, mem, 'w', addr, hit, con);
+      }
+  }
+  else if (cmdline->syntax_match(uc, CELL)) {
+    hit= 1;
+    mem= uc->address_space(params[0]->value.cell, &addr);
+    if (!mem)
+      return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
+	false;
+    if (mem == uc->rom)
+      do_fetch(uc, addr, hit, con);
+    else
+      {
+	do_event(uc, mem, 'r', addr, hit, con);
+	do_event(uc, mem, 'w', addr, hit, con);
+      }
+  }
   else
     {
       con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");

@@ -131,7 +131,7 @@ struct t_regs
 
 
 #if 0
---------------------------------------------------------------------
+/*--------------------------------------------------------------------
 Developer Notes.
 
 This user guide has got the detailed information on the XA chip. 
@@ -277,6 +277,7 @@ set_indirect1(addr, value) {
 }
 
 ----------------------------------------------
+*/
 #endif
 
 

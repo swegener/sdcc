@@ -3,12 +3,12 @@
 #include "varcl.h"
 
 
-cl_var::cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, int ibit):
+cl_var::cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, int ibitnr):
   cl_base()
 {
   as= ias;
   addr= iaddr;
-  bit= ibit;
+  bitnr= ibitnr;
 
   set_name(iname);
   
@@ -23,7 +23,7 @@ cl_var::init(void)
       !as->valid_address(addr))
     return 0;
   cell= as->get_cell(addr);
-  if (cell && (bit < 0))
+  if (cell && (bitnr < 0))
     cell->set_flag(CELL_VAR, true);
   return 0;
 }
@@ -39,8 +39,8 @@ cl_var::print_info(cl_console_base *con)
       con->dd_printf("[");
       con->dd_printf(as->addr_format, addr);
       con->dd_printf("]");
-      if (bit >= 0)
-	con->dd_printf(".%d", bit);
+      if (bitnr >= 0)
+	con->dd_printf(".%d", bitnr);
     }
   con->dd_printf("\n");
 }

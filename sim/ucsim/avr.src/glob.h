@@ -32,7 +32,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern struct dis_entry disass_avr[];
-extern struct name_entry sfr_tabl[];
 
 
 #endif

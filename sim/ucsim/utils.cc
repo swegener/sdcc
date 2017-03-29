@@ -337,5 +337,22 @@ is_omf_file(class cl_f *f)
   return false;
 }
 
+bool
+is_cdb_file(class cl_f *f)
+{
+  char *n;
+  if (!f)
+    return false;
+  n= f->get_file_name();
+  if (!n ||
+      !*n)
+    return false;
+
+  if (strend(n, cchars(".cdb")))
+    return true;
+
+  return false;
+}
+
 
 /* End of utils.cc */

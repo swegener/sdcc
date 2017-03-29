@@ -46,6 +46,72 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "regsavr.h"
 
 
+// Addresses are IRAM addresses!
+static struct name_entry sfr_tabl[]= {
+  { CPU_ALL_AVR, 0x001a, "XL"},
+  { CPU_ALL_AVR, 0x001a, "XL" },
+  { CPU_ALL_AVR, 0x001b, "XH" },
+  { CPU_ALL_AVR, 0x001c, "YL" },
+  { CPU_ALL_AVR, 0x001d, "YH" },
+  { CPU_ALL_AVR, 0x001e, "ZL" },
+  { CPU_ALL_AVR, 0x001f, "ZH" },
+  { CPU_ALL_AVR, 0x0024, "ADCL" },
+  { CPU_ALL_AVR, 0x0025, "ADCH" },
+  { CPU_ALL_AVR, 0x0026, "ADCSR" },
+  { CPU_ALL_AVR, 0x0027, "ADMUX" },
+  { CPU_ALL_AVR, 0x0028, "ACSR" },
+  { CPU_ALL_AVR, 0x0029, "UBRR" },
+  { CPU_ALL_AVR, 0x002A, "UCR" },
+  { CPU_ALL_AVR, 0x002B, "USR" },
+  { CPU_ALL_AVR, 0x002C, "UDR" },
+  { CPU_ALL_AVR, 0x002D, "SPCR" },
+  { CPU_ALL_AVR, 0x002E, "SPSR" },
+  { CPU_ALL_AVR, 0x002F, "SPDR" },
+  { CPU_ALL_AVR, 0x0030, "PIND" },
+  { CPU_ALL_AVR, 0x0031, "DDRD" },
+  { CPU_ALL_AVR, 0x0032, "PORTD" },
+  { CPU_ALL_AVR, 0x0033, "PINC" },
+  { CPU_ALL_AVR, 0x0034, "DDRC" },
+  { CPU_ALL_AVR, 0x0035, "PORTC" },
+  { CPU_ALL_AVR, 0x0036, "PINB" },
+  { CPU_ALL_AVR, 0x0037, "DDRB" },
+  { CPU_ALL_AVR, 0x0038, "PORTB" },
+  { CPU_ALL_AVR, 0x0039, "PINA" },
+  { CPU_ALL_AVR, 0x003A, "DDRA" },
+  { CPU_ALL_AVR, 0x003B, "PORTA" },
+  { CPU_ALL_AVR, 0x003C, "EECR" },
+  { CPU_ALL_AVR, 0x003D, "EEDR" },
+  { CPU_ALL_AVR, 0x003E, "EEARL" },
+  { CPU_ALL_AVR, 0x003E, "EEARH" },
+  { CPU_ALL_AVR, 0x0041, "WDTCR" },
+  { CPU_ALL_AVR, 0x0042, "ASSR" },
+  { CPU_ALL_AVR, 0x0043, "OCR2" },
+  { CPU_ALL_AVR, 0x0044, "TCNT2" },
+  { CPU_ALL_AVR, 0x0045, "TCCR2" },
+  { CPU_ALL_AVR, 0x0046, "ICR1L" },
+  { CPU_ALL_AVR, 0x0047, "ICR1H" },
+  { CPU_ALL_AVR, 0x0048, "OCR1BL" },
+  { CPU_ALL_AVR, 0x0049, "OCR1BH" },
+  { CPU_ALL_AVR, 0x004A, "OCR1AL" },
+  { CPU_ALL_AVR, 0x004B, "OCR1AH" },
+  { CPU_ALL_AVR, 0x004C, "TCNT1L" },
+  { CPU_ALL_AVR, 0x004D, "TCNT1H" },
+  { CPU_ALL_AVR, 0x004E, "TCCR1B" },
+  { CPU_ALL_AVR, 0x004F, "TCCR1A" },
+  { CPU_ALL_AVR, 0x0052, "TCNT0" },
+  { CPU_ALL_AVR, 0x0053, "TCCR0" },
+  { CPU_ALL_AVR, 0x0054, "MCUSR" },
+  { CPU_ALL_AVR, 0x0055, "MCUCR" },
+  { CPU_ALL_AVR, 0x0058, "TIFR" },
+  { CPU_ALL_AVR, 0x0059, "TIMSK" },
+  { CPU_ALL_AVR, 0x005A, "GIFR" },
+  { CPU_ALL_AVR, 0x005B, "GIMSK" },
+  { CPU_ALL_AVR, 0x005D, "SPL" },
+  { CPU_ALL_AVR, 0x005E, "SPH" },
+  { CPU_ALL_AVR, 0x005F, "SREG" },
+  {0, 0, NULL}
+};
+
 /*
  * Base type of AVR microcontrollers
  */
@@ -62,8 +128,18 @@ int
 cl_avr::init(void)
 {
   cl_uc::init(); /* Memories now exist */
-  //ram= address_space(MEM_IRAM_ID);
-  //rom= address_space("rom"/*MEM_ROM_ID*/);
+  int i;
+  for (i= 0; sfr_tabl[i].name != NULL; i++)
+    {
+      if (type->type & sfr_tabl[i].cpu_type)
+	{
+	  class cl_var *v;
+	  vars->add(v= new cl_var(chars(sfr_tabl[i].name),
+				  ram,
+				  sfr_tabl[i].addr));
+	  v->init();
+	}
+    }
   return(0);
 }
 
@@ -77,29 +153,6 @@ cl_avr::id_string(void)
 /*
  * Making elements of the controller
  */
-/*
-t_addr
-cl_avr::get_mem_size(enum mem_class type)
-{
-  switch(type)
-    {
-    case MEM_ROM: return(8*1024);
-    case MEM_IRAM: return(0x10000);
-    default: return(0);
-    }
-  //return(0);
-  //return(cl_uc::get_mem_size(type));
-}
-*/
-/*
-int
-cl_avr::get_mem_width(enum mem_class type)
-{
-  if (type == MEM_ROM)
-    return(16);
-  return(cl_uc::get_mem_width(type));
-}
-*/
 
 void
 cl_avr::mk_hw_elements(void)
@@ -156,19 +209,6 @@ cl_avr::dis_tbl(void)
   return(disass_avr);
 }
 
-struct name_entry *
-cl_avr::sfr_tbl(void)
-{
-  return(sfr_tabl);
-}
-
-struct name_entry *
-cl_avr::bit_tbl(void)
-{
-  //FIXME
-  return(0);
-}
-
 char *
 cl_avr::disass(t_addr addr, const char *sep)
 {
@@ -201,24 +241,24 @@ cl_avr::disass(t_addr addr, const char *sep)
 	  switch (*(b++))
 	    {
 	    case 'd': // Rd   .... ...d dddd ....  0<=d<=31
-	      if (!get_name(data= (code&0x01f0)>>4, sfr_tbl(), temp))
+	      if (!/*get*/addr_name(data= (code&0x01f0)>>4, /*sfr_tbl()*/ram, temp))
 		sprintf(temp, "r%d", data);
 	      break;
 	    case 'D': // Rd   .... .... dddd ....  16<=d<=31
-	      if (!get_name(data= 16+((code&0xf0)>>4), sfr_tbl(), temp))
+	      if (!/*get*/addr_name(data= 16+((code&0xf0)>>4), /*sfr_tbl()*/ram, temp))
 		sprintf(temp, "r%d", data);
 	      break;
 	    case 'K': // K    .... KKKK .... KKKK  0<=K<=255
 	      sprintf(temp, "%d", ((code&0xf00)>>4)|(code&0xf));
 	      break;
 	    case 'r': // Rr   .... ..r. .... rrrr  0<=r<=31
-	      if (!get_name(data= ((code&0x0200)>>5)|(code&0x000f),
-			    sfr_tbl(), temp))
+	      if (!/*get*/addr_name(data= ((code&0x0200)>>5)|(code&0x000f),
+				    /*sfr_tbl()*/ram, temp))
 		sprintf(temp, "r%d", data);
 	      break;
 	    case '2': // Rdl  .... .... ..dd ....  dl= {24,26,28,30}
-	      if (!get_name(data= 24+(2*((code&0x0030)>>4)),
-			    sfr_tbl(), temp))
+	      if (!/*get*/addr_name(data= 24+(2*((code&0x0030)>>4)),
+				    /*sfr_tbl()*/ram, temp))
 		sprintf(temp, "r%d", data);
 	      break;
 	    case '6': // K    .... .... KK.. KKKK  0<=K<=63
@@ -246,12 +286,12 @@ cl_avr::disass(t_addr addr, const char *sep)
 	      break;
 	    case 'P': // P    .... .... pppp p...  0<=P<=31
 	      data= (code&0xf8)>>3;
-	      if (!get_name(data+0x20, sfr_tbl(), temp))
+	      if (!/*get*/addr_name(data+0x20, /*sfr_tbl()*/ram, temp))
 		sprintf(temp, "%d", data);
 	      break;
 	    case 'p': // P    .... .PP. .... PPPP  0<=P<=63
 	      data= ((code&0x600)>>5)|(code&0xf);
-	      if (!get_name(data+0x20, sfr_tbl(), temp))
+	      if (!/*get*/addr_name(data+0x20, /*sfr_tbl()*/ram, temp))
 		sprintf(temp, "%d", data);
 	      break;
 	    case 'q': // q    ..q. qq.. .... .qqq  0<=q<=63

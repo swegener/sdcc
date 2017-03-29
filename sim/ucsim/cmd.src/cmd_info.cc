@@ -199,10 +199,25 @@ COMMAND_DO_WORK_UC(cl_info_var_cmd)
 {
   class cl_var *v;
   int i;
+  class cl_cmd_arg *params[1]= { cmdline->param(0) };
+  char *s= NULL;
   
+  if (cmdline->syntax_match(uc, STRING))
+    {
+      s= params[0]->get_svalue();
+      if (!s ||
+	  !*s)
+	s= NULL;
+    }
   for (i= 0; i < uc->vars->count; i++)
     {
       v= (class cl_var *)(uc->vars->at(i));
+      if ((s == NULL) ||
+	  (
+	   (strstr(v->as->get_name(), s) != NULL) ||
+	   (strstr(v->get_name(), s) != NULL)
+	   )
+	  )
       v->print_info(con);
     }
   return 0;

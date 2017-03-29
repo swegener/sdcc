@@ -30,8 +30,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 extern struct dis_entry  disass_51[];
-extern struct name_entry sfr_tab51[];
-extern struct name_entry bit_tab51[];
 
 
 #endif

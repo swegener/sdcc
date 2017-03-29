@@ -102,8 +102,8 @@ COMMAND_DO_WORK_UC(cl_file_cmd)
       return(0);
     }
   
-  if ((l= uc->read_file(fname)) >= 0)
-    con->dd_printf("%ld words read from %s\n", l, fname);
+  if ((l= uc->read_file(fname, con)) >= 0)
+    ;//con->dd_printf("%ld words read from %s\n", l, fname);
     
   return(0);
 }
@@ -616,6 +616,10 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
     {
       m= params[1]->value.memory.memory;
       addr= params[2]->value.address;
+    }
+  else if (cmdline->syntax_match(uc, STRING CELL))
+    {
+      m= uc->address_space(params[1]->value.cell, &addr);
     }
   else if (cmdline->syntax_match(uc, STRING))
     {

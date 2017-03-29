@@ -206,8 +206,7 @@ extern struct dis_entry glob_disass_xa[];
 
 extern struct xa_dis_entry disass_xa[];
 
-extern struct name_entry sfr_tabXA51[];
-extern struct name_entry bit_tabXA51[];
+
 #endif
 
 /* End of xa.src/glob.h */

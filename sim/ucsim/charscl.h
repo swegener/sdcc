@@ -35,6 +35,7 @@ protected:
   char *chars_string;	// stores the value
   int chars_length;	// track of string length
   bool dynamic;
+  int pars_pos;
 public:
   chars(void);
   chars(char *s);
@@ -54,6 +55,9 @@ public:
   virtual bool empty();
   virtual bool is_null();
   virtual int len() { return chars_length; }
+  virtual void start_parse(void) { start_parse(0); }
+  virtual void start_parse(int at) { pars_pos= at; }
+  virtual chars token(chars delims);
   
 public:
   // Operators

@@ -1139,7 +1139,7 @@ cl_uc390::dis_tbl (void)
 char *
 cl_uc390::disass (t_addr addr, const char *sep)
 {
-  char work[256], temp[20], c[2];
+  char work[256], temp[200]/*, c[2]*/;
   char *buf, *p, *b, *t, *org_b;
   t_mem code;
   uchar dps;
@@ -1178,27 +1178,25 @@ cl_uc390::disass (t_addr addr, const char *sep)
                        // rom->get (addr + 1) * 256 + rom->get (addr + 2));
               break;
             case 'a': // addr8 (direct address) at 2nd byte
-              if (!get_name (rom->get (addr + 1), sfr_tbl (), temp))
-                sprintf (temp, "%02x", (int)rom->get (addr + 1));
+	      daddr_name(rom->get(addr+1), temp);
               break;
             case '8': // addr8 (direct address) at 3rd byte
-              if (!get_name (rom->get (addr + 2), sfr_tbl (), temp))
-                sprintf (temp, "%02x", (int)rom->get (addr + 2));
+	      daddr_name(rom->get(addr+2), temp);
               break;
             case 'b': // bitaddr at 2nd byte
 	      {
 		t_addr ba = rom->get (addr+1);
-		if (get_name (ba, bit_tbl(), temp))
+		/*if (get_name (ba, bit_tbl(), temp))
 		  break;
-		if (get_name ((ba<128) ? ((ba/8)+32) : (ba&0xf8), sfr_tbl(), temp))
-		  {
-		    strcat (temp, ".");
-		    sprintf (c, "%1d", (int)(ba & 0x07));
-		    strcat (temp, c);
-		    break;
-		  }
-		sprintf (temp, "%02lx.%d", (long int)((ba<128) ? ((ba/8)+32) : (ba&0xf8)),
-		 	 (int)(ba & 0x07));
+		if (ba<128)
+		  addr_name((ba/8)+32,iram,temp);
+		else
+		  addr_name(ba&0xf8,sfr,temp);
+		strcat (temp, ".");
+		sprintf (c, "%1d", (int)(ba & 0x07));
+		strcat (temp, c);
+		break;*/
+		baddr_name(ba, temp);
 		break;
 	      }
             case 'r': // rel8 address at 2nd byte

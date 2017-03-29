@@ -33,6 +33,12 @@ fn(void)
 }
 
 void
+sfun(void)
+{
+  return ;
+}
+
+void
 main(void)
 {
   volatile unsigned int i, x= 0, j;

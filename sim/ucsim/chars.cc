@@ -38,6 +38,7 @@ chars::chars(void)
   chars_string= 0;
   chars_length= 0;
   dynamic= false;
+  pars_pos= 0;
 }
 
 chars::chars(char *s)
@@ -54,6 +55,7 @@ chars::chars(const char *s)
   else
     chars_length= 0;
   dynamic= false;
+  pars_pos= 0;
 }
 /*
 chars::chars(const char *s)
@@ -82,6 +84,7 @@ chars::chars(const char *, const char *fmt, ...)
   chars_string= strdup(n);
   chars_length= strlen(n);
   dynamic= true;
+  pars_pos= 0;
 }
 
 chars::~chars(void)
@@ -101,6 +104,7 @@ chars::allocate_string(char *s)
       strcpy(chars_string, s);
       dynamic= true;
     }
+  pars_pos= 0;
 }
 
 void
@@ -114,6 +118,42 @@ chars::deallocate_string(void)
   dynamic= 0;
 }
 
+
+chars
+chars::token(chars delims)
+{
+  chars c= (char*)NULL;
+
+  if (delims.len() < 1)
+    return c;
+  if (pars_pos >= chars_length)
+    return c;
+  if (chars_length < 1)
+    return c;
+
+  int l;
+  // skip initial delims first;
+  l= strspn(&chars_string[pars_pos], (char*)delims);
+  pars_pos+= l;
+  if (pars_pos >= chars_length)
+    return c;
+  // skip chars not in delims: search token end
+  l= strcspn(&chars_string[pars_pos], (char*)delims);
+  if (l > 0)
+    {
+      // found
+      int i;
+      for (i= pars_pos; i < pars_pos+l; i++)
+	c+= chars_string[i];
+      pars_pos= i;
+      // skip delims at end
+      l= strspn(&chars_string[pars_pos], (char*)delims);
+      pars_pos+= l;
+      return c;
+    }
+  // not found more
+  return c;
+}
 
 chars &
 chars::append(char *s)

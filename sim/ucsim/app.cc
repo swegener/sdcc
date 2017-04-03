@@ -54,6 +54,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "cmd_getcl.h"
 #include "cmd_setcl.h"
 #include "newcmdposixcl.h"
+#include "cmdlexcl.h"
 
 bool jaj= false;
 
@@ -121,7 +122,7 @@ cl_app::run(void)
 	}
       if (rs == rs_read_files)
 	{
-	  if (sim->uc != NULL)
+	  if (sim && (sim->uc != NULL))
 	    {
 	      int i;
 	      for (i= 0; i < in_files->count; i++)
@@ -216,7 +217,7 @@ print_help(char *name)
      "  -X freq[k|M] XTAL frequency\n"
      "  -C cfg_file  Read initial commands from `cfg_file' and execute them\n"
      "  -c file      Open command console on `file' (use `-' for std in/out)\n"
-     "  -Z portnum   Use localhost:portnum for command console\n"
+     "  -Z portnum   Use localhost:portnum for command console (def. 5559)\n"
      "  -k portnum   Use localhost:portnum for serial I/O\n"
      "  -s file      Connect serial interface uart0 to `file'\n"
      "  -S options   `options' is a comma separated list of options according to\n"
@@ -225,11 +226,12 @@ print_help(char *name)
      "                  in=file   serial input will be read from file named `file'\n"
      "                  out=file  serial output will be written to `file'\n"
      "                  port=nr   Use localhost:nr as server for serial line\n"
+     "                            (def. 5560+uart_nr)\n"
      "  -I options   `options' is a comma separated list of options according to\n"
      "               simulator interface. Known options are:\n"
      "                 if=memory[address]  turn on interface on given memory location"
      "                 in=file             specify input file for IO"
-     "                 out=file            spacify output file forr IO"
+     "                 out=file            specify output file forr IO"
      "  -p prompt    Specify string for prompt\n"
      "  -P           Prompt is a null ('\\0') character\n"
      "  -g           Go, start simulation\n"
@@ -648,6 +650,15 @@ cl_app::get_cmd(class cl_cmdline *cmdline)
   return(0);
 }
 
+long
+cl_app::eval(chars expr)
+{
+  expr_result= 0;
+  uc_yy_set_string_to_parse((char*)expr);
+  yyparse();
+  uc_yy_free_string_to_parse();
+  return expr_result;
+}
 
 /*
  * Messages to broadcast

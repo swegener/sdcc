@@ -71,7 +71,7 @@ static void yyerror (const char *msg);
 %%
 
 ucsim_grammar:
-	expr { application->dd_printf("%d\n", $1); }
+expr { application->/*dd_printf("%d\n", $1)*/expr_result=$1; }
 	;
 /*
 assignment:

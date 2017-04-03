@@ -35,17 +35,7 @@ int
 main(int argc, char *argv[])
 {
   int ret;
-  chars c= "abc: 12,234,nnh,(ee)";
-  chars t;
-  
-  c.start_parse();
-  t= c.token(chars(" :,"));
-  while (!t.is_null())
-    {
-      printf("token: %s\n", (char*)t);
-      t= c.token(" :,()");
-    }
-  return 0;
+
   application= new cl_app();
   application->init(argc, argv);
   ret= application->run();

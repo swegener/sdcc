@@ -451,7 +451,9 @@ cl_commander::init(void)
   class cl_optref config_file_option(this);
   class cl_optref port_number_option(this);
   class cl_console_base *con;
-
+  int ccnt= 0;
+  cl_console_base *c;
+  
   console_on_option.init();
   console_on_option.use("console_on");
   config_file_option.init();
@@ -466,8 +468,16 @@ cl_commander::init(void)
   bool need_config= true;
 
   if (port_number_option.use("port_number"))
-    add_console(new cl_listen_console(port_number_option.get_value((long)0), app));
-
+    {
+      add_console(c= new cl_listen_console(port_number_option.get_value((long)0), app));
+    }
+  else
+    {
+      c= new cl_listen_console(5559, app);
+      add_console(c);
+      c->prev_quit= 0;
+      ccnt= 1;
+    }
   char *Config= config_file_option.get_value("");
   char *cn= console_on_option.get_value("");
 
@@ -492,7 +502,7 @@ cl_commander::init(void)
 	  need_config= false;
 	}
     }
-  if (cons->get_count() == 0)
+  if (cons->get_count() == ccnt)
     {
       class cl_f *in, *out;
       in= cp_io(fileno(stdin), cchars("r"));

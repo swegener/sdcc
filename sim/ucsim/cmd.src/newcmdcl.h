@@ -115,7 +115,9 @@ class cl_console_base: public cl_base
   chars lbuf;
 
   int tu_bg_color, tu_fg_color;
-  
+ public:
+    int prev_quit;
+
  public:
   cl_console_base(void);
   virtual ~cl_console_base(void);
@@ -166,7 +168,7 @@ class cl_console_base: public cl_base
   
   virtual bool input_active(void) const;
   //virtual bool accept_last(void) { return /*is_tty() ? DD_TRUE : DD_FALSE;*/flags&CONS_INTERACTIVE; }
-  virtual bool prevent_quit(void) { return true; }
+  virtual bool prevent_quit(void) { return (prev_quit>=0)?prev_quit:true; }
   
  private:
   int flags; // See CONS_XXXX

@@ -52,13 +52,15 @@ public:
   enum  brk_perm perm;  // permanency (FIX,DYNAMIC)
   int   hit;
   int   cnt;
-
+  chars cond;
+  
   cl_brk(class cl_address_space *imem, int inr, t_addr iaddr,
 	 enum brk_perm iperm, int ihit);
   virtual ~cl_brk(void);
 
   class cl_address_space *get_mem(void) { return(mem); }
 
+  virtual bool condition(void);
   virtual void activate(void);
   virtual void inactivate(void);
   virtual enum brk_type type(void)= 0;

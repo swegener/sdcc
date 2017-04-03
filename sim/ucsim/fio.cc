@@ -429,7 +429,7 @@ cl_f::finish_esc(int k)
 }
 
 int
-cl_f::process_telnet(char ci)
+cl_f::process_telnet(unsigned char ci)
 {
   int l= strlen(esc_buffer);
   esc_buffer[l]= ci;
@@ -965,7 +965,7 @@ cl_f::read(int *buf, int max)
 }
 
 int
-cl_f::getc(void)
+cl_f::get_c(void)
 {
   int c;
   while (!check_dev())
@@ -978,31 +978,31 @@ cl_f::getc(void)
 }
 
 chars
-cl_f::gets(void)
+cl_f::get_s(void)
 {
   chars s= "";
   char c;
 
   if (eof())
     return s;
-  c= getc();
+  c= get_c();
   while ((c == '\n') ||
 	 (c == '\r'))
     {
       if (eof())
 	return s;
-      c= getc();
+      c= get_c();
     }
   if (eof())
     return s;
   s+= c;
-  c= getc();
+  c= get_c();
   while (!eof() &&
 	 (c != '\n') &&
 	 (c != '\r'))
     {
       s+= c;
-      c= getc();
+      c= get_c();
     }
   return s;
 }

@@ -90,7 +90,8 @@ public:
   class cl_ustrings *in_files;
   class cl_options *options;
   int going;
-
+  long expr_result;
+  
 public:
   cl_app(void);
   virtual ~cl_app(void);
@@ -108,6 +109,7 @@ public:
   class cl_uc *get_uc(void);
   class cl_commander_base *get_commander(void) { return(commander); }
   virtual class cl_cmd *get_cmd(class cl_cmdline *cmdline);
+  virtual long eval(chars expr);
 
 public: // messages to broadcast
   //virtual void mem_cell_changed(class cl_m *mem, t_addr addr);

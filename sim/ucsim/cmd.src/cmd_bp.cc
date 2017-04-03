@@ -50,35 +50,52 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
   t_addr addr= 0;
   int hit= 1;
   char op;
+  chars cond= "";
+  char *s;
   class cl_address_space *mem;
-  class cl_cmd_arg *params[4]= { cmdline->param(0),
+  class cl_cmd_arg *params[6]= { cmdline->param(0),
 				 cmdline->param(1),
 				 cmdline->param(2),
-				 cmdline->param(3) };
+				 cmdline->param(3),
+				 cmdline->param(4),
+				 cmdline->param(5) };
 
-  if (cmdline->syntax_match(uc, ADDRESS)) {
-    addr= params[0]->value.address;
-    hit= 1;
-    do_fetch(uc, addr, hit, con);
-  }
-  else if (cmdline->syntax_match(uc, ADDRESS NUMBER)) {
-    addr= params[0]->value.address;
+  if (0) {}
+  else if (cmdline->syntax_match(uc, CELL NUMBER STRING STRING)) {
     hit= params[1]->value.number;
-    do_fetch(uc, addr, hit, con);
+    mem= uc->address_space(params[0]->value.cell, &addr);
+    if (!mem)
+      return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
+	false;
+    s= params[2]->get_svalue();
+    if (s && *s &&
+	(strcmp(s, "if") == 0))
+      cond= params[3]->get_svalue();
+    if (mem == uc->rom)
+      do_fetch(uc, addr, hit, cond, con);
+    else
+      {
+	do_event(uc, mem, 'r', addr, hit, cond, con);
+	do_event(uc, mem, 'w', addr, hit, cond, con);
+      }
   }
-  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS)) {
-    mem= params[0]->value.memory.address_space;
-    op= *(params[1]->get_svalue());
-    addr= params[2]->value.address;
+  else if (cmdline->syntax_match(uc, CELL STRING STRING)) {
     hit= 1;
-    do_event(uc, mem, op, addr, hit, con);
-  }
-  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER)) {
-    mem= params[0]->value.memory.address_space;
-    op= *(params[1]->get_svalue());
-    addr= params[2]->value.address;
-    hit= params[3]->value.number;
-    do_event(uc, mem, op, addr, hit, con);
+    mem= uc->address_space(params[0]->value.cell, &addr);
+    if (!mem)
+      return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
+	false;
+    s= params[1]->get_svalue();
+    if (s && *s &&
+	(strcmp(s, "if") == 0))
+      cond= params[2]->get_svalue();
+    if (mem == uc->rom)
+      do_fetch(uc, addr, hit, cond, con);
+    else
+      {
+	do_event(uc, mem, 'r', addr, hit, cond, con);
+	do_event(uc, mem, 'w', addr, hit, cond, con);
+      }
   }
   else if (cmdline->syntax_match(uc, CELL NUMBER)) {
     hit= params[1]->value.number;
@@ -87,11 +104,11 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
       return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
 	false;
     if (mem == uc->rom)
-      do_fetch(uc, addr, hit, con);
+      do_fetch(uc, addr, hit, cond, con);
     else
       {
-	do_event(uc, mem, 'r', addr, hit, con);
-	do_event(uc, mem, 'w', addr, hit, con);
+	do_event(uc, mem, 'r', addr, hit, cond, con);
+	do_event(uc, mem, 'w', addr, hit, cond, con);
       }
   }
   else if (cmdline->syntax_match(uc, CELL)) {
@@ -101,12 +118,36 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
       return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
 	false;
     if (mem == uc->rom)
-      do_fetch(uc, addr, hit, con);
+      do_fetch(uc, addr, hit, cond, con);
     else
       {
-	do_event(uc, mem, 'r', addr, hit, con);
-	do_event(uc, mem, 'w', addr, hit, con);
+	do_event(uc, mem, 'r', addr, hit, cond, con);
+	do_event(uc, mem, 'w', addr, hit, cond, con);
       }
+  }
+  else if (cmdline->syntax_match(uc, ADDRESS)) {
+    addr= params[0]->value.address;
+    hit= 1;
+    do_fetch(uc, addr, hit, cond, con);
+  }
+  else if (cmdline->syntax_match(uc, ADDRESS NUMBER)) {
+    addr= params[0]->value.address;
+    hit= params[1]->value.number;
+    do_fetch(uc, addr, hit, cond, con);
+  }
+  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS)) {
+    mem= params[0]->value.memory.address_space;
+    op= *(params[1]->get_svalue());
+    addr= params[2]->value.address;
+    hit= 1;
+    do_event(uc, mem, op, addr, hit, cond, con);
+  }
+  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER)) {
+    mem= params[0]->value.memory.address_space;
+    op= *(params[1]->get_svalue());
+    addr= params[2]->value.address;
+    hit= params[3]->value.number;
+    do_event(uc, mem, op, addr, hit, cond, con);
   }
   else
     {
@@ -118,7 +159,9 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
 
 void
 cl_break_cmd::do_fetch(class cl_uc *uc,
-		       t_addr addr, int hit, class cl_console_base *con)
+		       t_addr addr, int hit,
+		       chars cond,
+		       class cl_console_base *con)
 {
   if (hit > 99999)
     {
@@ -133,6 +176,7 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
 					uc->make_new_brknr(),
                                         addr, perm, hit);
       b->init();
+      b->cond= cond;
       uc->fbrk->add_bp(b);
       const char *s= uc->disass(addr, NULL);
       con->dd_printf("Breakpoint %d at 0x%06x: %s\n", b->nr, addr, s);
@@ -144,13 +188,18 @@ void
 cl_break_cmd::do_event(class cl_uc *uc,
 		       class cl_address_space *mem,
 		       char op, t_addr addr, int hit,
+		       chars cond,
 		       class cl_console_base *con)
 {
   class cl_ev_brk *b= NULL;
 
   b= uc->mk_ebrk(perm, mem, op, addr, hit);
   if (b)
-    uc->ebrk->add_bp(b);
+    {
+      b->init();
+      b->cond= cond;
+      uc->ebrk->add_bp(b);
+    }
   else
     con->dd_printf("Couldn't make event breakpoint\n");
 }

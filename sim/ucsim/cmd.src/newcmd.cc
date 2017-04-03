@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 #include "i_string.h"
 
-#include "cmdlexcl.h"
+//#include "cmdlexcl.h"
 
 // prj
 #include "globals.h"
@@ -153,6 +153,7 @@ cl_console_base::init(void)
   print_prompt();
   last_command= 0;
   last_cmdline= 0;
+  prev_quit= -1;
   return(0);
 }
 
@@ -490,9 +491,11 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
             {
 	      if (strlen(cmdstr) > 0)
 		{
-		  uc_yy_set_string_to_parse(cmdstr);
+		  /*uc_yy_set_string_to_parse(cmdstr);
 		  yyparse();
-		  uc_yy_free_string_to_parse();
+		  uc_yy_free_string_to_parse();*/
+		  long l= application->eval(cmdstr);
+		  dd_printf("%ld\n", l/*application->expr_result*/);
 		}
               delete cmdline;
             }

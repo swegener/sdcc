@@ -46,15 +46,16 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 {
   int i;
 
-  con->dd_printf("Num Type       Disp Hit   Cnt   Address  What\n");
+  con->dd_printf("Num Type       Disp Hit   Cnt   Address  Cond  What\n");
   for (i= 0; i < uc->fbrk->count; i++)
     {
       class cl_brk *fb= (class cl_brk *)(uc->fbrk->at(i));
       const char *s= uc->disass(fb->addr, NULL);
-      con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", fb->nr,
+      con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %-5s %s\n", fb->nr,
                      "fetch", (fb->perm==brkFIX)?"keep":"del ",
-                     fb->hit, fb->cnt,
-                     fb->addr, s);
+                     fb->hit, fb->cnt, fb->addr,
+		     fb->condition()?"true":"false",
+		     s);
       free((char *)s);
     }
   for (i= 0; i < uc->ebrk->count; i++)

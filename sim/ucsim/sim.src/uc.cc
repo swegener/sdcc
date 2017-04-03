@@ -148,7 +148,7 @@ cl_omf_rec::~cl_omf_rec(void)
 unsigned char
 cl_omf_rec::g(cl_f *f)
 {
-  unsigned char c= f->getc();
+  unsigned char c= f->get_c();
   offset++;
   return c;
 }
@@ -953,7 +953,7 @@ ReadInt(cl_f *f, bool *ok, int bytes)
     {
       if (f->eof())
 	return(0);
-      c= f->getc();
+      c= f->get_c();
       if ((c < 0) ||
 	  (c == 0) ||
 	  (c > 0xff))
@@ -961,7 +961,7 @@ ReadInt(cl_f *f, bool *ok, int bytes)
       s2[0]= c;
       if (f->eof())
 	return(0);
-      c= f->getc();
+      c= f->get_c();
       if ((c < 0) ||
 	  (c == 0) ||
 	  (c > 0xff))
@@ -1078,7 +1078,7 @@ cl_uc::read_hex_file(cl_f *f)
   while (ok &&
 	 rtyp != 1)
     {
-      while (((c= /*getc(f)*/f->getc()) != ':') &&
+      while (((c= /*getc(f)*/f->get_c()) != ':') &&
 	     (/*c != EOF*/!f->eof())) /*printf("search_record=%c\n",c)*/;
       if (c != ':')
 	{fprintf(stderr, ": not found\n");break;}
@@ -1195,7 +1195,7 @@ cl_uc::read_cdb_file(cl_f *f)
   class cl_cdb_rec *r;
   class cl_var *v;
   
-  ln= f->gets();
+  ln= f->get_s();
   while (!ln.empty())
     {
       //printf("CBD LN=%s\n",(char*)ln);
@@ -1245,7 +1245,7 @@ cl_uc::read_cdb_file(cl_f *f)
 		}
 	    }
 	}
-      ln= f->gets();
+      ln= f->get_s();
     }
   fns->free_all();
   delete fns;

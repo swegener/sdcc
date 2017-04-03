@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 
 #include "pobjcl.h"
+#include "globals.h"
+
 #include "brkcl.h"
 
 
@@ -48,10 +50,20 @@ cl_brk::cl_brk(class cl_address_space *imem, int inr, t_addr iaddr,
   perm = iperm;
   hit  = ihit;
   cnt  = ihit;
+  cond = (char*)"";
 }
 
 cl_brk::~cl_brk(void)
 {}
+
+bool
+cl_brk::condition(void)
+{
+  if (cond.empty())
+    return true;
+  long l= application->eval(cond);
+  return l!=0;
+}
 
 void
 cl_brk::activate(void)
@@ -74,7 +86,8 @@ cl_brk::do_hit(void)
   if (cnt <= 0)
     {
       cnt= hit;
-      return(1);
+      if (condition())
+	return(1);      
     }
   return(0);
 }

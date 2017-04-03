@@ -642,21 +642,21 @@ cl_cmd::work(class cl_app *app,
       if (!app)
 	{
 	  con->dd_printf("There is no application to work on!\n");
-	  return(true);
+	  return(false);
 	}
       return(do_work(app, cmdline, con));
     case operate_on_sim:
       if (!sim)
 	{
 	  con->dd_printf("There is no simulator to work on!\n");
-	  return(true);
+	  return(false);
 	}
       return(do_work(sim, cmdline, con));
     case operate_on_uc:
       if (!sim)
 	{
 	  con->dd_printf("There is no microcontroller to work on!\n");
-	  return(true);
+	  return(false);
 	}
       return(do_work(uc, cmdline, con));
     default:

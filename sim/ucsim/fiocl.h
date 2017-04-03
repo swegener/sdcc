@@ -31,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "charscl.h"
 #include "pobjcl.h"
 
 
@@ -158,7 +159,7 @@ class cl_f: public cl_base
   virtual int get(void);
   virtual int free_place(void);
   virtual int finish_esc(int k);
-  virtual int process_telnet(char ci);
+  virtual int process_telnet(unsigned char ci);
   virtual int process_esc(char c);
   virtual int process_csi(void);
   virtual int process(char c);
@@ -168,8 +169,8 @@ class cl_f: public cl_base
  public:
   virtual int input_avail(void);
   virtual int read(int *buf, int max);
-  virtual int getc(void);
-  virtual chars gets(void);
+  virtual int get_c(void);
+  virtual chars get_s(void);
   
  public:
   //FILE *f(void) { return file_f; };

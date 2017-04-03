@@ -339,7 +339,7 @@ cl_list::operator[](t_index index)
 /*
  * Deleting the indexed item from the collection
  */
-#include "globals.h"
+
 void
 cl_list::disconn_at(t_index index)
 {
@@ -347,16 +347,6 @@ cl_list::disconn_at(t_index index)
       index >= count)
     error(1, 0);
   count--;
-  /*{ char s[1000];
-  s[0]='\0';
-  sprintf(s, "disconn_at(%d) PC=0x%x", index,
-	  application?
-	  ((application->sim)?
-	   ((application->sim->uc)?(application->sim->uc->PC):
-	    -3):
-	   -1):
-	  -2);
-	  strcat(s,"\n");}*/
   memmove(&Items[index], &Items[index+1], (count-index)*sizeof(void *));
 }
 

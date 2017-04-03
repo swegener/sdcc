@@ -9513,11 +9513,6 @@ Some features of this standard are not supported in some ports:
 \end_layout
 
 \begin_layout Itemize
-Support for _Bool / bool is incomplete (no pointers to bool, or bool inside
- a struct) in the mcs51 and ds390 ports.
-\end_layout
-
-\begin_layout Itemize
 There is no support for data types long long, unsigned long long, int_fast64_t,
  int_least64_t, int64_t, uint_fast64_t, uint_least64_t, uint64_t in the
  mcs51, ds390, ds400, pic14 and pic16 ports.

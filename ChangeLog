@@ -1,3 +1,8 @@
+2017-04-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update documentation on _Bool / bool support.
+
 2017-03-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug3027957.c:

@@ -33265,11 +33265,10 @@ Small-C calling convention
 
 \begin_layout Standard
 Functions declared as __smallc are called using the Small-C calling convention.
- This way assembler routines orginally written for Small-C or code genrated
- by Small-C can be called from sdcc.
- Currently variable arguments are not supported and neither are function
- definitions using __smallc (as would be useful for calling sdcc-generated
- functions from Small-C.
+ This way assembler routines orginally written for Small-C or code generated
+ by Small-C can be called from SDCC.
+ Currently variable arguments are not yet supported (neither on the caller
+ nor on the callee side).
 \end_layout
 
 \begin_layout Section
@@ -43921,6 +43920,7 @@ There are three other calling conventions supported, which can be specified
  For __z88dk_callee, parameters are passed on the stack, but the stack is
  not adjusted for the parameters after the call (thus the callee has to
  do this instead).
+ __z88dk_callee is currently supportd on the caller side only.
  __z88dk_callee can be combined with __smallc.
 \end_layout
 

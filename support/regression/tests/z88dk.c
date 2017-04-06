@@ -38,7 +38,7 @@ unsigned long int (*p4)(unsigned long int) __z88dk_fastcall;
 unsigned long int (*p4)(unsigned long int) __z88dk_fastcall __reentrant;
 #endif
 
-/* __smallc and __z88dk_callee are currently only supported on the caller side */
+/* __z88dk_callee is currently only supported on the caller side */
 
 void s1(int x, int y) __smallc;
 

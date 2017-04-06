@@ -1,5 +1,13 @@
 2017-04-06 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCmem.c,
+	  support/regression/tests/z88dk.c,
+	  support/regression/tests/smallc.c,
+	  doc/sdccman.lyx:
+	  Support for __smallc callees.
+
+2017-04-06 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCast.c:
 	  Fix bug #2570.
 	* src/SDCCmem.h,

@@ -4584,6 +4584,8 @@ genEndFunction (iCode * ic)
       return;
     }
 
+  wassertl(regalloc_dry_run || !IFFUNC_ISZ88DK_CALLEE(sym->type), "Unimplemented __z88dk_callee support on callee side");
+
   if (!IS_GB && !_G.omitFramePtr && sym->stack > (optimize.codeSize ? 2 : 1))
     {
       emit2 ("ld sp, ix");

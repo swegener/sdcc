@@ -113,7 +113,7 @@ void initMem ();
 bool defaultOClass (struct symbol *);
 void allocGlobal (struct symbol *);
 void allocLocal (struct symbol *);
-void allocParms (struct value *);
+void allocParms (struct value *, bool smallc);
 void deallocParms (struct value *);
 void deallocLocal (struct symbol *);
 int allocVariables (struct symbol *);
@@ -124,3 +124,4 @@ void printAllocInfo (struct symbol *, struct dbuf_s *);
 void doOverlays (struct eBBlock **, int count);
 void deleteFromSeg(struct symbol *);
 #endif
+

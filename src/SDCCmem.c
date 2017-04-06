@@ -607,10 +607,12 @@ allocGlobal (symbol * sym)
 /* allocParms - parameters are always passed on stack              */
 /*-----------------------------------------------------------------*/
 void
-allocParms (value * val)
+allocParms (value *val, bool smallc)
 {
   value *lval;
   int pNum = 1;
+
+  wassertl (!smallc, "SmallC calling convention not yet supported for callee");
 
   for (lval = val; lval; lval = lval->next, pNum++)
     {

@@ -125,15 +125,12 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
 	do_event(uc, mem, 'w', addr, hit, cond, con);
       }
   }
-  else if (cmdline->syntax_match(uc, ADDRESS)) {
-    addr= params[0]->value.address;
-    hit= 1;
-    do_fetch(uc, addr, hit, cond, con);
-  }
-  else if (cmdline->syntax_match(uc, ADDRESS NUMBER)) {
-    addr= params[0]->value.address;
-    hit= params[1]->value.number;
-    do_fetch(uc, addr, hit, cond, con);
+  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER)) {
+    mem= params[0]->value.memory.address_space;
+    op= *(params[1]->get_svalue());
+    addr= params[2]->value.address;
+    hit= params[3]->value.number;
+    do_event(uc, mem, op, addr, hit, cond, con);
   }
   else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS)) {
     mem= params[0]->value.memory.address_space;
@@ -142,12 +139,15 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
     hit= 1;
     do_event(uc, mem, op, addr, hit, cond, con);
   }
-  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER)) {
-    mem= params[0]->value.memory.address_space;
-    op= *(params[1]->get_svalue());
-    addr= params[2]->value.address;
-    hit= params[3]->value.number;
-    do_event(uc, mem, op, addr, hit, cond, con);
+  else if (cmdline->syntax_match(uc, ADDRESS NUMBER)) {
+    addr= params[0]->value.address;
+    hit= params[1]->value.number;
+    do_fetch(uc, addr, hit, cond, con);
+  }
+  else if (cmdline->syntax_match(uc, ADDRESS)) {
+    addr= params[0]->value.address;
+    hit= 1;
+    do_fetch(uc, addr, hit, cond, con);
   }
   else
     {

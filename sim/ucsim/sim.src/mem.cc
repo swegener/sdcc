@@ -1530,7 +1530,8 @@ cl_address_space::undecode_area(class cl_address_decoder *skip,
 				class cl_console_base *con)
 {
 #define D if (con) con->debug
-  D("Undecoding area 0x%x-0x%x of %s\n", begin, end, get_name());
+  //#define D printf
+  D("Undecoding area 0x%lx-0x%lx of %s (skip=%s)\n", begin, end, get_name(), skip?(skip->get_name()):"-");
   int i;
   for (i= 0; i < decoders->count; i++)
     {
@@ -1539,8 +1540,8 @@ cl_address_space::undecode_area(class cl_address_decoder *skip,
       if (!d ||
 	  d == skip)
 	continue;
-      D("  Checking decoder 0x%x-0x%x -> %s[0x%x]\n",
-	d->as_begin, d->as_end, d->memchip->get_name(), d->chip_begin);
+      D("  Checking decoder 0x%lx-0x%lx -> %s[0x%lx]\n",
+	d->as_begin, d->as_end, (d->memchip)?(d->memchip->get_name()):"(none)", d->chip_begin);
       if (d->fully_covered_by(begin, end))
 	{
 	  // decoder can be removed
@@ -1557,13 +1558,13 @@ cl_address_space::undecode_area(class cl_address_decoder *skip,
 	  D("    Must be split\n");
 	  class cl_address_decoder *nd= d->split(begin, end);
 	  D("    After split:\n");
-	  D("      0x%x-0x%x -> %s[0x%x]\n",
-	    d->as_begin, d->as_end, d->memchip->get_name(), d->chip_begin);
+	  D("      0x%lx-0x%lx -> %s[0x%lx]\n",
+	    d->as_begin, d->as_end, (d->memchip)?(d->memchip->get_name()):"(none)", d->chip_begin);
 	  if (nd)
 	    {
 	      decoders->add(nd);
-	      D("      0x%x-0x%x -> %s[0x%x]\n",
-		nd->as_begin, nd->as_end, nd->memchip->get_name(), nd->chip_begin);
+	      D("      0x%lx-0x%lx -> %s[0x%lx]\n",
+		nd->as_begin, nd->as_end, (nd->memchip)?(nd->memchip->get_name()):"none", nd->chip_begin);
 	      nd->activate(con);
 	    }
 	}
@@ -1582,8 +1583,8 @@ cl_address_space::undecode_area(class cl_address_decoder *skip,
 	    }
 	  else
 	    {
-	      D("    Shrinked to 0x%x-0x%x -> %s[0x%x]\n",
-		d->as_begin, d->as_end, d->memchip->get_name(), d->chip_begin);
+	      D("    Shrinked to 0x%lx-0x%lx -> %s[0x%lx]\n",
+		d->as_begin, d->as_end, (d->memchip)?(d->memchip->get_name()):"(none)", d->chip_begin);
 	    }
 	}
     }
@@ -1879,7 +1880,8 @@ bool
 cl_address_decoder::activate(class cl_console_base *con)
 {
 #define D if (con) con->debug
-  D("Activation of an address decoder\n");
+  //#define D printf
+  D("Activation of an address decoder %s (%s[%06lx-%06lx]\n", get_name(""), address_space->get_name(), as_begin, as_end);
   if (activated)
     {
       D("Already activated\n");
@@ -1921,6 +1923,7 @@ cl_address_decoder::activate(class cl_console_base *con)
 
   address_space->undecode_area(this, as_begin, as_end, con);
 
+  D("Decoder maps %s[%06lx-%06lx] -> %s[%06lx]...\n",address_space->get_name(),as_begin,as_end,memchip->get_name(),chip_begin);
   t_addr asa, ca;
   for (asa= as_begin, ca= chip_begin;
        asa <= as_end;
@@ -1928,7 +1931,7 @@ cl_address_decoder::activate(class cl_console_base *con)
     {
       if (!address_space->decode_cell(asa, memchip, ca))
 	{
-	  D("Decoding 0x%06x->0x%06x failed\n", asa, ca);
+	  D("Decoding 0x%06lx->0x%06lx failed\n", asa, ca);
 	}
     }
   activated= true;
@@ -2086,14 +2089,47 @@ cl_address_decoder::print_info(chars pre, class cl_console_base *con)
 cl_banker::cl_banker(class cl_address_space *the_banker_as,
 		     t_addr the_banker_addr,
 		     t_mem the_banker_mask,
+		     //int the_banker_shift,
 		     class cl_address_space *the_as,
 		     t_addr the_asb,
 		     t_addr the_ase):
-  cl_address_decoder(the_as, NULL, the_asb, the_ase, -1)
+  cl_address_decoder(the_as, NULL, the_asb, the_ase, (t_addr)-1)
 {
   banker_as= the_banker_as;
   banker_addr= the_banker_addr;
   banker_mask= the_banker_mask;
+  //banker_shift= the_banker_shift;
+  banker2_as= NULL;
+  banker2_addr= 0;
+  banker2_mask= 0;
+  banker2_shift= 0;
+  nuof_banks= 0;
+  banks= 0;
+  //bank_ptrs= 0;
+  bank= -1;
+}
+
+cl_banker::cl_banker(class cl_address_space *the_banker_as,
+		     t_addr the_banker_addr,
+		     t_mem the_banker_mask,
+		     //int the_banker_shift,
+		     class cl_address_space *the_banker2_as,
+		     t_addr the_banker2_addr,
+		     t_mem the_banker2_mask,
+		     int the_banker2_shift,
+		     class cl_address_space *the_as,
+		     t_addr the_asb,
+		     t_addr the_ase):
+  cl_address_decoder(the_as, NULL, the_asb, the_ase, (t_addr)-1)
+{
+  banker_as= the_banker_as;
+  banker_addr= the_banker_addr;
+  banker_mask= the_banker_mask;
+  //banker_shift= the_banker_shift;
+  banker2_as= the_banker2_as;
+  banker2_addr= the_banker2_addr;
+  banker2_mask= the_banker2_mask;
+  banker2_shift= the_banker2_shift;
   nuof_banks= 0;
   banks= 0;
   //bank_ptrs= 0;
@@ -2104,14 +2140,14 @@ int
 cl_banker::init()
 {
   int m= banker_mask;
-  int b;
+  int b, b2;
 
   shift_by= 0;
+  shift2_by= 0;
   if (m == 0)
     nuof_banks= 0;
   else
     {
-      shift_by= 0;
       while ((m&1) == 0)
 	m>>= 1, shift_by++;
       b= 1;
@@ -2122,6 +2158,20 @@ cl_banker::init()
 	  b++;
 	}
       nuof_banks= 1 << b;
+    }
+  shift2_by= 0;
+  if (banker2_as &&
+      banker2_mask)
+    {
+      m= banker2_mask;
+      while ((m&1) == 0)
+	m>>=1, shift2_by++;
+      b2= 1;
+      m>>= 1;
+      while ((m&1) != 0)
+	m>>= 1, b2++;
+      if (b2)
+	nuof_banks*= (1 << b2);
     }
   if (nuof_banks > 0)
     {
@@ -2140,7 +2190,17 @@ cl_banker::init()
 	new cl_bank_switcher_operator(c/*, banker_addr*/, this);
       c->prepend_operator(o);
     }
-  
+  if (banker2_as &&
+      banker2_mask)
+    {
+      c= banker2_as->get_cell(banker2_addr);
+      if (c)
+	{
+	  class cl_bank_switcher_operator *o=
+	    new cl_bank_switcher_operator(c/*, banker_addr*/, this);
+	  c->prepend_operator(o);
+	}
+    }
   return 0;
 }
 
@@ -2200,8 +2260,18 @@ cl_banker::actual_bank()
 {
   //t_mem m= banker_mask;
   t_mem v= banker_as->read(banker_addr) & banker_mask;
-
-  return v >> shift_by;
+  t_mem v2;
+  
+  v= (v >> shift_by);
+  if (banker2_as &&
+      banker2_mask)
+    {
+      v2= banker2_as->read(banker2_addr) & banker2_mask;
+      v2>>= shift2_by;
+      v2= v2 << banker2_shift;
+      v= v | v2;
+    }
+  return v;
 }
 
 bool

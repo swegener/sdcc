@@ -270,7 +270,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_banker_cmd)
   else
     {
       class cl_banker *d=
-	new cl_banker((class cl_address_space *)banker_as, addr, mask,
+	new cl_banker((class cl_address_space *)banker_as, addr, mask, //0,
 		      (class cl_address_space *)banked_as, asb, ase);
       d->init();
       ((class cl_address_space *)banked_as)->decoders->add(d);

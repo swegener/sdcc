@@ -220,6 +220,111 @@ static struct name_entry sfr_tab51[]=
   {CPU_89C51R|CPU_251,            0xfd, "CCAP3H"},
   {CPU_89C51R|CPU_251,            0xfe, "CCAP4H"},
 
+  {CPU_F380, 0x8e, "CKCON"},
+  {CPU_F380, 0x8f, "PSCTL"},
+  {CPU_F380, 0x91, "TMR3CN"},
+  {CPU_F380, 0x91, "TMR4CN"},
+  {CPU_F380, 0x92, "TMR3RLL"},
+  {CPU_F380, 0x92, "TMR4RLL"},
+  {CPU_F380, 0x93, "TMR3RLH"},
+  {CPU_F380, 0x93, "TMR4RLH"},
+  {CPU_F380, 0x94, "TMR3L"},
+  {CPU_F380, 0x94, "TMR4L"},
+  {CPU_F380, 0x95, "TMR3H"},
+  {CPU_F380, 0x95, "TMR4H"},
+  {CPU_F380, 0x96, "USB0ADR"},
+  {CPU_F380, 0x97, "USB0DAT"},
+  {CPU_F380, 0x9a, "CPT1CN"},
+  {CPU_F380, 0x9b, "CPT0CN"},
+  {CPU_F380, 0x9c, "CPT1MD"},
+  {CPU_F380, 0x9d, "CPT0MD"},
+  {CPU_F380, 0x9e, "CPT1MX"},
+  {CPU_F380, 0x9f, "CPT0MX"},
+  {CPU_F380, 0xa1, "SPI0CFG"},
+  {CPU_F380, 0xa2, "SPI0CKR"},
+  {CPU_F380, 0xa3, "SPI0DAT"},
+  {CPU_F380, 0xa4, "P0MDOUT"},
+  {CPU_F380, 0xa5, "P1MDOUT"},
+  {CPU_F380, 0xa6, "P2MDOUT"},
+  {CPU_F380, 0xa7, "P3MDOUT"},
+  {CPU_F380, 0xa9, "CLKSEL"},
+  {CPU_F380, 0xaa, "EMI0CN"},
+  {CPU_F380, 0xac, "SBCON1"},
+  {CPU_F380, 0xae, "P4MDOUT"},
+  {CPU_F380, 0xaf, "PFE0CN"},
+  {CPU_F380, 0xb1, "OSCXCN"},
+  {CPU_F380, 0xb2, "OSCICN"},
+  {CPU_F380, 0xb3, "OSCICL"},
+  {CPU_F380, 0xb4, "SBRLL1"},
+  {CPU_F380, 0xb5, "SBRLH1"},
+  {CPU_F380, 0xb6, "FLSCL"},
+  {CPU_F380, 0xb7, "FLKEY"},
+  {CPU_F380, 0xb9, "CLKMUL"},
+  {CPU_F380, 0xb9, "SMBTC"},
+  {CPU_F380, 0xba, "AMX0N"},
+  {CPU_F380, 0xbb, "AMX0P"},
+  {CPU_F380, 0xbc, "ADC0CF"},
+  {CPU_F380, 0xbd, "ADC0L"},
+  {CPU_F380, 0xbe, "ADC0H"},
+  {CPU_F380, 0xbf, "SFRPAGE"},
+  {CPU_F380, 0xc0, "SMB0CN"},
+  {CPU_F380, 0xc0, "SMB1CN"},
+  {CPU_F380, 0xc1, "SMB0CF"},
+  {CPU_F380, 0xc1, "SMB1CF"},
+  {CPU_F380, 0xc2, "SMB0DAT"},
+  {CPU_F380, 0xc2, "SMB1DAT"},
+  {CPU_F380, 0xc3, "ADC0GTL"},
+  {CPU_F380, 0xc4, "ADC0GTH"},
+  {CPU_F380, 0xc5, "ADC0LTL"},
+  {CPU_F380, 0xc6, "ADC0LTH"},
+  {CPU_F380, 0xc7, "P4"},
+  {CPU_F380, 0xd1, "REF0CN"},
+  {CPU_F380, 0xd2, "SCON1"},
+  {CPU_F380, 0xd3, "SBUF1"},
+  {CPU_F380, 0xd4, "P0SKIP"},
+  {CPU_F380, 0xd5, "P1SKIP"},
+  {CPU_F380, 0xd6, "P2SKIP"},
+  {CPU_F380, 0xd7, "USB0XCN"},
+  {CPU_F380, 0xd8, "PCA0CN"},
+  {CPU_F380, 0xd9, "PCA0MD"},
+  {CPU_F380, 0xda, "PCA0CPM0"},
+  {CPU_F380, 0xdb, "PCA0CPM1"},
+  {CPU_F380, 0xdc, "PCA0CPM2"},
+  {CPU_F380, 0xdd, "PCA0CPM3"},
+  {CPU_F380, 0xde, "PCA0CPM4"},
+  {CPU_F380, 0xdf, "P3SKIP"},
+  {CPU_F380, 0xe1, "XBR0"},
+  {CPU_F380, 0xe2, "XBR1"},
+  {CPU_F380, 0xe3, "XBR2"},
+  {CPU_F380, 0xe4, "IT01CF"},
+  {CPU_F380, 0xe4, "CKCON1"},
+  {CPU_F380, 0xe5, "SMOD1"},
+  {CPU_F380, 0xe6, "EIE1"},
+  {CPU_F380, 0xe7, "EIE2"},
+  {CPU_F380, 0xe8, "ADC0CN"},
+  {CPU_F380, 0xe9, "PCA0CPL1"},
+  {CPU_F380, 0xea, "PCA0CPH1"},
+  {CPU_F380, 0xeb, "PCA0CPL2"},
+  {CPU_F380, 0xec, "PCA0CPH2"},
+  {CPU_F380, 0xed, "PCA0CPL3"},
+  {CPU_F380, 0xee, "PCA0CPH3"},
+  {CPU_F380, 0xef, "RSTSRC"},
+  {CPU_F380, 0xf1, "P0MDIN"},
+  {CPU_F380, 0xf2, "P1MDIN"},
+  {CPU_F380, 0xf3, "P2MDIN"},
+  {CPU_F380, 0xf4, "P3MDIN"},
+  {CPU_F380, 0xf5, "P4MDIN"},
+  {CPU_F380, 0xf6, "EIP1"},
+  {CPU_F380, 0xf7, "EIP2"},
+  {CPU_F380, 0xf8, "SPI0CN"},
+  {CPU_F380, 0xf9, "PCA0L"},
+  {CPU_F380, 0xfa, "PCA0H"},
+  {CPU_F380, 0xfb, "PCA0CPL0"},
+  {CPU_F380, 0xfc, "PCA0CPH0"},
+  {CPU_F380, 0xfd, "PCA0CPL4"},
+  {CPU_F380, 0xfe, "PCA0CPH4"},
+  {CPU_F380, 0xff, "VDM0CN"},
+  
   {0, 0, NULL}
 };
 
@@ -803,6 +908,7 @@ cl_51core::decode_rom(void)
   class cl_address_decoder *ad;
   ad= new cl_address_decoder(rom, rom_chip, 0, 0xffff, 0);
   ad->init();
+  ad->set_name("def_rom_decoder");
   rom->decoders->add(ad);
   ad->activate(0);
 }
@@ -811,9 +917,10 @@ void
 cl_51core::decode_regs(void)
 {
   int i;
-  cl_banker *b= new cl_banker(sfr, 0xd0, 0x18,
+  cl_banker *b= new cl_banker(sfr, 0xd0, 0x18, //0,
 			      regs, 0, 7);
   b->init();
+  b->set_name("def_regs_banker");
   regs->decoders->add(b);
   b->add_bank(0, memory("iram_chip"), 0);
   b->add_bank(1, memory("iram_chip"), 8);
@@ -833,6 +940,7 @@ cl_51core::decode_bits(void)
 		    iram_chip, 32,
 		    8, 1);
   ad->init();
+  ad->set_name("def_bits_bander_0-7f");
   bits->decoders->add(ad);
   ad->activate(0);
 
@@ -840,6 +948,7 @@ cl_51core::decode_bits(void)
 		    sfr_chip, 0,
 		    8, 8);
   ad->init();
+  ad->set_name("def_bits_bander_80-ff");
   bits->decoders->add(ad);
   ad->activate(0);
 }
@@ -851,6 +960,7 @@ cl_51core::decode_iram(void)
   
   ad= new cl_address_decoder(iram, iram_chip, 0, 0x7f, 0);
   ad->init();
+  ad->set_name("def_iram_decoder");
   iram->decoders->add(ad);
   ad->activate(0);
 }
@@ -862,6 +972,7 @@ cl_51core::decode_sfr(void)
   
   ad= new cl_address_decoder(sfr, sfr_chip, 0x80, 0xff, 0);
   ad->init();
+  ad->set_name("def_sfr_decoder");
   sfr->decoders->add(ad);
   ad->activate(0);
 }
@@ -873,6 +984,7 @@ cl_51core::decode_xram(void)
   
   ad= new cl_address_decoder(xram, xram_chip, 0, 0xffff, 0);
   ad->init();
+  ad->set_name("def_xram_decoder");
   xram->decoders->add(ad);
   ad->activate(0);
 }
@@ -902,7 +1014,7 @@ cl_51core::decode_dptr(void)
 	{
 	  // multi DPTR sfr style
 	  //printf("MDPS %x %x %x %x\n", adps, mdps, dpl1, dph1);
-	  banker= new cl_banker(sfr, adps, mdps,
+	  banker= new cl_banker(sfr, adps, mdps, //0,
 				dptr, 0, 0);
 	  banker->init();
 	  dptr->decoders->add(banker);
@@ -910,7 +1022,7 @@ cl_51core::decode_dptr(void)
 	  banker->add_bank(1, memory("sfr_chip"), dpl1-0x80);
 	  banker->activate(0);
 
-	  banker= new cl_banker(sfr, adps, mdps,
+	  banker= new cl_banker(sfr, adps, mdps, //0,
 				dptr, 1, 1);
 	  banker->init();
 	  dptr->decoders->add(banker);
@@ -939,7 +1051,7 @@ cl_51core::decode_dptr(void)
 	      while ((m&1) == 0)
 		m>>= 1;
 	      
-	      banker= new cl_banker(sfr, adpc, mdpc,
+	      banker= new cl_banker(sfr, adpc, mdpc, //0,
 			    dptr, 0, 1);
 	      banker->init();
 	      dptr->decoders->add(banker);
@@ -947,7 +1059,7 @@ cl_51core::decode_dptr(void)
 		banker->add_bank(a, dptr_chip, a*2);
 	      banker->activate(0);
 
-	      banker= new cl_banker(sfr, adpc, mdpc,
+	      banker= new cl_banker(sfr, adpc, mdpc, //0,
 			    sfr, DPL, DPH);
 	      banker->init();
 	      sfr->decoders->add(banker);

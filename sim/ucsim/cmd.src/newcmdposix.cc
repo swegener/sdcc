@@ -471,6 +471,7 @@ cl_commander::init(void)
     {
       add_console(c= new cl_listen_console(port_number_option.get_value((long)0), app));
     }
+  /*
   else
     {
       c= new cl_listen_console(5559, app);
@@ -478,6 +479,7 @@ cl_commander::init(void)
       c->prev_quit= 0;
       ccnt= 1;
     }
+  */
   char *Config= config_file_option.get_value("");
   char *cn= console_on_option.get_value("");
 

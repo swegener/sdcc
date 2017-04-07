@@ -72,6 +72,96 @@ cl_uc380::mk_hw_elements(void)
 }
 
 void
+cl_uc380::make_chips(void)
+{
+  cl_uc52::make_chips();
+  sfr_chip->set_name("sfr_0_chip");
+  sfr_f_chip= new cl_memory_chip("sfr_f_chip", 0x80, 8, 0);
+  sfr_f_chip->init();
+  memchips->add(sfr_f_chip);
+}
+
+void
+cl_uc380::decode_sfr(void)
+{
+  cl_uc52::decode_sfr();
+  t_addr sfrpage= 0xbf;
+  class cl_banker *ad;
+
+  ad= new cl_banker(sfr, sfrpage, 0x0f,
+		    sfr, 0xe4, 0xe4);
+  ad->init();
+  ad->set_name("sfr_banker_0xe4");
+  ad->add_bank(0  , sfr_chip  , 0xe4-0x80);
+  ad->add_bank(0xf, sfr_f_chip, 0xe4-0x80);
+  sfr->decoders->add(ad);
+  sfr->undecode_area(ad, 0xe4, 0xe4, NULL);
+  ad->activate(NULL);
+  
+  ad= new cl_banker(sfr, sfrpage, 0x0f,
+		    sfr, 0xc8, 0xc8);
+  ad->init();
+  ad->set_name("sfr_banker_0xc8");
+  ad->add_bank(0  , sfr_chip  , 0xc8-0x80);
+  ad->add_bank(0xf, sfr_f_chip, 0xc8-0x80);
+  sfr->decoders->add(ad);
+  sfr->undecode_area(ad, 0xc8, 0xc8, NULL);
+  ad->activate(NULL);
+  
+  ad= new cl_banker(sfr, sfrpage, 0x0f,
+		    sfr, 0xca, 0xcf);
+  ad->init();
+  ad->set_name("sfr_banker_0xca-0xcf");
+  ad->add_bank(0  , sfr_chip  , 0xca-0x80);
+  ad->add_bank(0xf, sfr_f_chip, 0xca-0x80);
+  sfr->decoders->add(ad);
+  sfr->undecode_area(ad, 0xca, 0xcf, NULL);
+  ad->activate(NULL);
+  
+  ad= new cl_banker(sfr, sfrpage, 0x0f,
+		    sfr, 0xc0, 0xc2);
+  ad->init();
+  ad->set_name("sfr_banker_0xc0-0xc2");
+  ad->add_bank(0  , sfr_chip  , 0xc0-0x80);
+  ad->add_bank(0xf, sfr_f_chip, 0xc0-0x80);
+  sfr->decoders->add(ad);
+  sfr->undecode_area(ad, 0xc0, 0xc2, NULL);
+  ad->activate(NULL);
+  
+  ad= new cl_banker(sfr, sfrpage, 0x0f,
+		    sfr, 0xb9, 0xb9);
+  ad->init();
+  ad->set_name("sfr_banker_0xb9");
+  ad->add_bank(0  , sfr_chip  , 0xb9-0x80);
+  ad->add_bank(0xf, sfr_f_chip, 0xb9-0x80);
+  sfr->decoders->add(ad);
+  sfr->undecode_area(ad, 0xb9, 0xb9, NULL);
+  ad->activate(NULL);
+  
+  ad= new cl_banker(sfr, sfrpage, 0x0f,
+		    sfr, 0xbc, 0xbc);
+  ad->init();
+  ad->set_name("sfr_banker_0xbc");
+  ad->add_bank(0  , sfr_chip  , 0xbc-0x80);
+  ad->add_bank(0xf, sfr_f_chip, 0xbc-0x80);
+  sfr->decoders->add(ad);
+  sfr->undecode_area(ad, 0xbc, 0xbc, NULL);
+  ad->activate(NULL);
+  
+  ad= new cl_banker(sfr, sfrpage, 0x0f,
+		    sfr, 0x91, 0x95);
+  ad->init();
+  ad->set_name("sfr_banker_0x91-0x95");
+  ad->add_bank(0  , sfr_chip  , 0x91-0x80);
+  ad->add_bank(0xf, sfr_f_chip, 0x91-0x80);
+  sfr->decoders->add(ad);
+  sfr->undecode_area(ad, 0x91, 0x95, NULL);
+  ad->activate(NULL);
+  
+  ad->activate(NULL);
+}
+
+void
 cl_uc380::clear_sfr(void)
 {
   cl_uc52::clear_sfr();

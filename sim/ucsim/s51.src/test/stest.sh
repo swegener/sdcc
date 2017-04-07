@@ -1,4 +1,4 @@
-VERS="504 505 606 610 615 620"
+VERS="504 505 606 610 615 620 625"
 
 TESTS=$(cat st_list.txt)
 
@@ -14,7 +14,7 @@ echo >>st_st.csv
 
 for t in $TESTS; do
     for v in $VERS; do
-	make -f st${t}.mk
+	make -f st${t}.mk clean all
 	./st.sh -v $v $t
     done
     (

@@ -88,7 +88,7 @@ cl_uc51r::decode_xram(void)
   xram->decoders->add(ad);
   ad->activate(0);
   
-  b= new cl_banker(sfr, AUXR, 0x02,
+  b= new cl_banker(sfr, AUXR, 0x02, //0,
 		   xram, 0, 0xff);
   b->init();
   xram->decoders->add(b);

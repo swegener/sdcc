@@ -75,19 +75,20 @@ cl_serial_hw::init(void)
   serial_port_option->init();
   class cl_option *o= serial_port_option->use(s);
   free(s);
-  int port;
+  int port= -1;
   if (o)
     {
       port= serial_port_option->get_value((long)0);
       if (port < 0)
-	port= 5560+id;
+	;//port= 5560+id;
     }
-  else
-    port= 5560+id;
-  listener= new cl_serial_listener(port, application, this);
-  class cl_commander_base *c= application->get_commander();
-  c->add_console(listener);
-  
+  //else port= 5560+id;
+  if (port > 0)
+    {
+      listener= new cl_serial_listener(port, application, this);
+      class cl_commander_base *c= application->get_commander();
+      c->add_console(listener);
+    }
   char *f_serial_in = (char*)serial_in_file_option->get_value((char*)0);
   char *f_serial_out= (char*)serial_out_file_option->get_value((char*)0);
   class cl_f *fi, *fo;

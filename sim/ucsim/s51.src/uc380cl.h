@@ -32,10 +32,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class cl_uc380: public cl_uc52
 {
+ protected:
+  class cl_memory_chip *sfr_f_chip;
  public:
   cl_uc380(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
   virtual void mk_hw_elements(void);
+  virtual void make_chips(void);
+  virtual void decode_sfr(void);
   virtual void clear_sfr(void);
 };
 

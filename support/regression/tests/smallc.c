@@ -6,6 +6,10 @@
 #include <testfwk.h>
 #include <stdlib.h>
 
+#ifdef PORT_HOST
+#define __smallc
+#endif
+
 unsigned char f1(unsigned char c) __smallc
 {
 	return c + 1;

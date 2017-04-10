@@ -22,7 +22,7 @@ void
 testTortureExecute (void)
 {
 // Some ports do not support long long yet.
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (f(0x0123456789ABCDEFLL) != 0xCD)
     ASSERT(0);
   return;

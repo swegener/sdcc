@@ -463,12 +463,14 @@ endOfWorld:
     }
   /* in the case that result AND left AND right needs a pointer reg
      we can safely use the result's */
-  if (bitVectBitValue (mcs51_rUmaskForOp (IC_RESULT (ic)), R0_IDX))
+  if (bitVectBitValue (mcs51_rUmaskForOp (IC_RESULT (ic)), R0_IDX) &&
+    (!OP_SYMBOL (IC_RESULT (ic)) || OP_SYMBOL (IC_RESULT (ic))->regs[getSize (operandType (IC_RESULT (ic))) - 1]->rIdx == R0_IDX))
     {
       aop->type = AOP_R0;
       return REG_WITH_INDEX (R0_IDX);
     }
-  if (bitVectBitValue (mcs51_rUmaskForOp (IC_RESULT (ic)), R1_IDX))
+  if (bitVectBitValue (mcs51_rUmaskForOp (IC_RESULT (ic)), R1_IDX) &&
+    (!OP_SYMBOL (IC_RESULT (ic)) || OP_SYMBOL (IC_RESULT (ic))->regs[getSize (operandType (IC_RESULT (ic))) - 1]->rIdx == R1_IDX))
     {
       aop->type = AOP_R1;
       return REG_WITH_INDEX (R1_IDX);
@@ -11533,7 +11535,7 @@ genCast (iCode * ic)
     return;
 
   aopOp (right, ic, FALSE);
-  aopOp (result, ic, FALSE);
+  aopOp (result, ic, TRUE);
 
   /* if the result is a bit (and not a bitfield) */
   if (IS_BOOLEAN (OP_SYMBOL (result)->type))

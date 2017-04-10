@@ -14,6 +14,9 @@
 	  Fix bug #2597.
 	* src/SDCCglue.c:
 	  Fix bug #2574 (patch by Sebastian).
+	* src/mcs51/gen.c,
+	  support/regression/tests/gcc-torture-execute-921202-2.c:
+	  Fix bug #2542.
 
 2017-04-06 Philipp Klaus Krause <pkk AT spth.de>
 

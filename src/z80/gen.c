@@ -1149,7 +1149,7 @@ newAsmop (short type)
 /* aopForSym - for a true symbol                                   */
 /*-----------------------------------------------------------------*/
 static asmop *
-aopForSym (const iCode * ic, symbol * sym, bool result, bool requires_a)
+aopForSym (const iCode * ic, symbol * sym, bool requires_a)
 {
   asmop *aop;
   memmap *space;
@@ -1457,7 +1457,7 @@ aopOp (operand * op, const iCode * ic, bool result, bool requires_a)
   /* if this is a true symbol */
   if (IS_TRUE_SYMOP (op))
     {
-      op->aop = aopForSym (ic, OP_SYMBOL (op), result, requires_a);
+      op->aop = aopForSym (ic, OP_SYMBOL (op), requires_a);
       return;
     }
 
@@ -1556,7 +1556,7 @@ aopOp (operand * op, const iCode * ic, bool result, bool requires_a)
               oldAsmOp = sym->usl.spillLoc->aop;
               sym->usl.spillLoc->aop = NULL;
             }
-          sym->aop = op->aop = aop = aopForSym (ic, sym->usl.spillLoc, result, requires_a);
+          sym->aop = op->aop = aop = aopForSym (ic, sym->usl.spillLoc, requires_a);
           if (getSize (sym->type) != getSize (sym->usl.spillLoc->type))
             {
               /* Don't reuse the new aop, go with the last one */

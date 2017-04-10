@@ -681,7 +681,12 @@ allocParms (value *val, bool smallc)
           allocIntoSeg (lval->sym);
         }
       else
-        { /* allocate them in the automatic space */
+        {
+          /* Do not allocate for inline functions to avoid multiple definitions - see bug report #2591. */
+          if(IFFUNC_ISINLINE (currFunc->type) && !IS_STATIC (currFunc->etype) && !IS_EXTERN (currFunc->etype))
+            continue;
+
+          /* allocate them in the automatic space */
           /* generate a unique name  */
           SNPRINTF (lval->sym->rname, sizeof(lval->sym->rname),
                     "%s%s_PARM_%d", port->fun_prefix, currFunc->name, pNum);

@@ -8,6 +8,10 @@
 	  Always specify signedness for char in debug dumps.
 	* support/regression/tests/bug-2539.c:
 	  Test for bug #2539.
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-tlcs90.def,
+	  src/z80/peeph-r2k.def:
+	  Fix bug #2597.
 
 2017-04-06 Philipp Klaus Krause <pkk AT spth.de>
 

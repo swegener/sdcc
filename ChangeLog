@@ -6,6 +6,8 @@
 	  Do not try to test __smallc for host.
 	* src/SDCCsymt.c:
 	  Always specify signedness for char in debug dumps.
+	* support/regression/tests/bug-2539.c:
+	  Test for bug #2539.
 
 2017-04-06 Philipp Klaus Krause <pkk AT spth.de>
 

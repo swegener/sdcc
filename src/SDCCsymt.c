@@ -3515,6 +3515,8 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
             dbuf_append_str (dbuf, "const-");
           if (SPEC_USIGN (type))
             dbuf_append_str (dbuf, "unsigned-");
+          else if (SPEC_NOUN (type) == V_CHAR)
+            dbuf_append_str (dbuf, "signed-");
           switch (SPEC_NOUN (type))
             {
             case V_INT:

@@ -1,3 +1,9 @@
+2017-04-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  support/regression/tests/bug-2596.c:
+	  Fix bug #2598 by not inlining calls to functions with variable arguments.
+
 2017-04-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmem.c:

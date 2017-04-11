@@ -6933,7 +6933,7 @@ expandInlineFuncs (ast * tree, ast * block)
         werrorfl (tree->left->filename, tree->left->lineno, E_INVALID_CRITICAL);
 
       /* Is this an inline function that we can inline? */
-      if (IFFUNC_ISINLINE (func->type) && func->funcTree)
+      if (IFFUNC_ISINLINE (func->type) && !IFFUNC_HASVARARGS(func->type) && func->funcTree)
         {
           symbol *retsym = NULL;
           symbol *retlab;

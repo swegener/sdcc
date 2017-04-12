@@ -1,3 +1,8 @@
+2017-04-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/smallc.c:
+	  Disable Small-C test for mcs51.
+
 2017-04-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c,

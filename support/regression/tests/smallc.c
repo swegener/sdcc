@@ -33,10 +33,12 @@ unsigned int s2(unsigned int c, unsigned int d) __smallc
 void
 testSmallC(void)
 {
+#ifndef __SDCC_mcs51
   ASSERT (f1 (23) == 24);
   ASSERT (f2 (23) == 24);
 
   ASSERT (s1 (42, 23) == 19);
   ASSERT (s2 (42, 23) == 19);
+#endif
 }
 

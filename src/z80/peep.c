@@ -480,6 +480,21 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "ld\tiy") && strncmp(what, "iy", 2) == 0)
     return TRUE;
 
+  if (IS_Z180)
+    {
+      if (ISINST(pl->line, "mlt\t"))
+        return(strchr(pl->line + 4, *what) != 0);
+
+      if (ISINST(pl->line, "otim") ||
+        ISINST(pl->line, "otimr") ||
+        ISINST(pl->line, "otdm") ||
+        ISINST(pl->line, "otdmr"))
+        return(strchr("bchl", *what));
+
+      if (ISINST(pl->line, "in0"))
+        return(!strncmp(pl->line + 4, what, strlen(what)));
+    }
+
   return FALSE;
 }
 

@@ -1,3 +1,9 @@
+2017-04-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  support/regression/tests/bug-2601.c:
+	  Fix bug #2601.
+
 2017-04-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:

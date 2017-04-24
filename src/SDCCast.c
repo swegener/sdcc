@@ -4003,9 +4003,14 @@ decorateType (ast *tree, RESULT_TYPE resultType)
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
+
       /* if the left is a pointer */
       if (IS_PTR (LTYPE (tree)) || IS_AGGREGATE (LTYPE (tree)))
-        TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
+        {
+          if (!IS_UNSIGNED (RTYPE (tree)))
+            tree->right = addCast (tree->right, resultTypeProp, TRUE);
+          TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
+        }
       else
         {
           tree->left = addCast (tree->left, resultTypeProp, TRUE);

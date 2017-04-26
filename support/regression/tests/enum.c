@@ -27,8 +27,13 @@ enum _IndexedEnum {
   INDEXED_TWO_ALIAS = INDEXED_ZERO + 2,
   INDEXED_TWO_ALIAS2 = INDEXED_ONE_ALIAS2 + 1,
   INDEXED_MATH = INDEXED_ONE_ALIAS + INDEXED_TWO * INDEXED_THREE
-
 };
+
+enum _SignedEnum {
+  SIGNED_POS = 1,
+  SIGNED_ZERO = 0,
+  SIGNED_NEG = -1
+} se;
 
 volatile enum _IntEnum {
   INT_256 = 256,
@@ -43,7 +48,7 @@ testSimpleEnum(void)
   ASSERT(SIMPLE_TWO == 2);
 }
 
-void 
+void
 testValuesEnum(void)
 {
   ASSERT(VALUES_ZERO == 0);
@@ -65,6 +70,17 @@ testIndexedEnum(void)
   ASSERT(INDEXED_TWO_ALIAS == 2);
   ASSERT(INDEXED_TWO_ALIAS2 == 2);
   ASSERT(INDEXED_MATH == 7);
+}
+
+void
+testSignedEnum(void)
+{
+  ASSERT(SIGNED_POS == 1);
+  ASSERT(SIGNED_ZERO == 0);
+  ASSERT(SIGNED_NEG == -1);
+
+  se = SIGNED_NEG;
+  ASSERT(se == SIGNED_NEG);
 }
 
 void

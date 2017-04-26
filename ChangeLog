@@ -1,3 +1,9 @@
+2017-04-27 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c (newEnumType): fixed bug 2545
+	* support/regression/tests/enum.c: added test
+	* support/regression/tests/bug-2590.c: disabled for non-z80
+
 2017-04-26 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/ds390/gen.c (assignBit): disabled to fix a warning

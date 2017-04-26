@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifdef __SDCC
+#ifdef __SDCC_z80
 
 #pragma disable_warning 85
 

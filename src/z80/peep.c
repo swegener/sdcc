@@ -489,7 +489,7 @@ z80SurelyWrites(const lineNode *pl, const char *what)
         ISINST(pl->line, "otimr") ||
         ISINST(pl->line, "otdm") ||
         ISINST(pl->line, "otdmr"))
-        return(strchr("bchl", *what));
+        return(strchr("bchl", *what) != NULL);
 
       if (ISINST(pl->line, "in0"))
         return(!strncmp(pl->line + 4, what, strlen(what)));

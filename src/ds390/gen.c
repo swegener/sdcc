@@ -2202,7 +2202,29 @@ toCarry (operand * oper)
       emitcode ("add", "a,#0xff");
     }
 }
-
+#if 0 // as of yet still unused
+/*-----------------------------------------------------------------*/
+/* assignBit - assign operand to bit operand                       */
+/*-----------------------------------------------------------------*/
+static void
+assignBit(operand * result, operand * right)
+{
+	/* if the right side is a literal then
+	we know what the value is */
+	if (AOP_TYPE(right) == AOP_LIT)
+	{
+		if ((int)operandLitValue(right))
+			aopPut(result, one, 0);
+		else
+			aopPut(result, zero, 0);
+	}
+	else
+	{
+		toCarry(right);
+		outBitC(result);
+	}
+}
+#endif
 /*-------------------------------------------------------------------*/
 /* xch_a_aopGet - for exchanging acc with value of the aop           */
 /*-------------------------------------------------------------------*/
@@ -12109,28 +12131,6 @@ genJumpTab (iCode * ic)
   /* now generate the jump labels */
   for (jtab = setFirstItem (IC_JTLABELS (ic)); jtab; jtab = setNextItem (IC_JTLABELS (ic)))
     emitcode ("ljmp", "!tlabel", labelKey2num (jtab->key));
-}
-
-/*-----------------------------------------------------------------*/
-/* assignBit - assign operand to bit operand                       */
-/*-----------------------------------------------------------------*/
-static void
-assignBit (operand * result, operand * right)
-{
-  /* if the right side is a literal then
-     we know what the value is */
-  if (AOP_TYPE (right) == AOP_LIT)
-    {
-      if ((int) operandLitValue (right))
-        aopPut (result, one, 0);
-      else
-        aopPut (result, zero, 0);
-    }
-  else
-    {
-      toCarry (right);
-      outBitC (result);
-    }
 }
 
 /*-----------------------------------------------------------------*/

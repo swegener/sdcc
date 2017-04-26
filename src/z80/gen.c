@@ -8548,7 +8548,7 @@ genLeftShift (const iCode * ic)
   operand *left, *right, *result;
   int countreg;
   bool shift_by_lit;
-  int shiftcount;
+  int shiftcount = 0;
   int byteshift = 0;
   bool started;
   bool save_a;
@@ -8915,7 +8915,7 @@ genRightShift (const iCode * ic)
   bool is_signed;
   int countreg;
   bool shift_by_lit, shift_by_one, shift_by_zero;
-  int shiftcount;
+  int shiftcount = 0;
   int byteoffset = 0;
   bool save_a;
 

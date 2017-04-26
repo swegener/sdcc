@@ -48,7 +48,7 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
   const operand *result = IC_RESULT(ic);
   const operand *left = IC_LEFT(ic);
   const operand *right = IC_RIGHT(ic);
-	
+
   if(!result || !IS_SYMOP(result))
     return;
 
@@ -113,12 +113,12 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   const i_assignment_t &ia = a.i_assignment;
 
   if(ia.registers[REG_A][1] < 0)
-    return(true);	// Register a not in use.
+    return(true);       // Register a not in use.
 
   if(ic->op == IPUSH)
     {
       if (ia.registers[REG_XL][1] < 0 || ia.registers[REG_YL][1] < 0 && !stm8_extend_stack)
-        return(true);	// Register xl or yl free; code generation can use them when a is not available.
+        return(true);   // Register xl or yl free; code generation can use them when a is not available.
 
       // push a does not disturb a.
       if (getSize(operandType(IC_LEFT(ic))) <= 1 && operand_in_reg(left, REG_A, ia, i, G))
@@ -169,7 +169,7 @@ static bool Yinst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(true);   // Only an extended stack can make Y unavailable.
 
   if(ia.registers[REG_YL][1] < 0 && ia.registers[REG_YH][1] < 0)
-    return(true);	// Register Y not in use.
+    return(true);   // Register Y not in use.
 
   return(false);
 }
@@ -244,14 +244,14 @@ static void assign_operands_for_cost(const assignment &a, unsigned short int i, 
     }
     
   if(ic->op == SEND && ic->builtinSEND)
-    assign_operands_for_cost(a, *(adjacent_vertices(i, G).first), G, I);
+    assign_operands_for_cost(a, (unsigned short)*(adjacent_vertices(i, G).first), G, I);
 }
 
 template <class G_t, class I_t>
 static bool operand_sane(const operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
 #if 0
-  int v, byteregs[8];	// Todo: Change this when sdcc supports variables larger than 8 bytes.
+  int v, byteregs[8];   // Todo: Change this when sdcc supports variables larger than 8 bytes.
   unsigned short int size;
 
   if(!o || !IS_SYMOP(o))
@@ -513,9 +513,9 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Winner: ";
   for(unsigned int i = 0; i < boost::num_vertices(I); i++)
-  {
-  	std::cout << "(" << i << ", " << int(winner.global[i]) << ") ";
-  }
+    {
+      std::cout << "(" << i << ", " << int(winner.global[i]) << ") ";
+    }
   std::cout << "\n";
   std::cout << "Cost: " << winner.s << "\n";
   std::cout.flush();
@@ -541,7 +541,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
     }
 
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
-    set_surviving_regs(winner, i, G, I);	// Never freed. Memory leak?
+    set_surviving_regs(winner, i, G, I);    // Never freed. Memory leak?
 
   return(!assignment_optimal);
 }

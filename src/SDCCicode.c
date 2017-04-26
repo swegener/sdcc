@@ -2034,7 +2034,7 @@ geniCodeCast (sym_link *type, operand *op, bool implicit)
   if (compareType (type, optype) == 1)
   {
     if (IS_PTR (type) && IS_CONSTANT (opetype) && !IS_CONSTANT (getSpec(type)))
-	op->isConstElimnated = 1;
+      op->isConstElimnated = 1;
     return op;
   }
 
@@ -2378,9 +2378,9 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
   /* if they are both literals then we know */
   if (IS_LITERAL (letype) && IS_LITERAL (retype) && left->isLiteral && right->isLiteral)
     {
-	  value *scaledRight = valFromType (rtype);
-	  if (IS_PTR (ltype))
-	    scaledRight = valMult (scaledRight, valueFromLit (getSize (ltype->next)));
+      value *scaledRight = valFromType (rtype);
+      if (IS_PTR (ltype))
+        scaledRight = valMult (scaledRight, valueFromLit (getSize (ltype->next)));
       return operandFromValue (valPlus (valFromType (ltype), scaledRight));
     }
 
@@ -2879,11 +2879,11 @@ geniCodeDerefPtr (operand * op, int lvl)
     }
   else if (IS_OP_LITERAL (op))
     {
-	  /* To avoid problems converting a dereferenced literal pointer */
-	  /* back and forth between lvalue and rvalue formats, replace   */
-	  /* the literal pointer with an iTemp and assign the literal    */
-	  /* value to the iTemp. */
-	  iCode *ic;
+      /* To avoid problems converting a dereferenced literal pointer */
+      /* back and forth between lvalue and rvalue formats, replace   */
+      /* the literal pointer with an iTemp and assign the literal    */
+      /* value to the iTemp. */
+      iCode *ic;
       operand *iop = newiTempOperand (optype, 0);
       SPEC_SCLS (OP_SYM_ETYPE (iop)) = S_AUTO;   /* remove S_LITERAL */
       iop->isaddr = 0;                 /* assign to the iTemp itself */
@@ -2892,7 +2892,7 @@ geniCodeDerefPtr (operand * op, int lvl)
       ADDTOCHAIN (ic);
       op = operandFromOperand (iop); /* now use the iTemp as operand */
       optype = operandType (op);
-	}
+    }
 
   /* now get rid of the pointer part */
   if (isLvaluereq (lvl) && IS_ITEMP (op))
@@ -2956,9 +2956,8 @@ geniCodeLeftShift (operand * left, operand * right, RESULT_TYPE resultType)
   iCode *ic;
   sym_link *resType;
 
-  ic = newiCode (LEFT_OP, left, right);
-
   resType = usualBinaryConversions (&left, &right, resultType, LEFT_OP);
+  ic = newiCode(LEFT_OP, left, right);
   IC_RESULT (ic) = newiTempOperand (resType, 0);
   ADDTOCHAIN (ic);
   return IC_RESULT (ic);

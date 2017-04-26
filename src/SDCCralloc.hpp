@@ -153,10 +153,10 @@ struct assignment
 {
   float s;
 
-  varset_t local;	// Entries: var
-  std::vector<reg_t> global;	// Entries: global[var] = reg (-1 if no reg assigned)
-  icosts_t i_costs;  // Costs for all instructions in bag (needed to avoid double counting costs at join nodes)
-  i_assignment_t i_assignment; // Assignment at the instruction currently being added in an introduce node;
+  varset_t local;               // Entries: var
+  std::vector<reg_t> global;    // Entries: global[var] = reg (-1 if no reg assigned)
+  icosts_t i_costs;             // Costs for all instructions in bag (needed to avoid double counting costs at join nodes)
+  i_assignment_t i_assignment;  // Assignment at the instruction currently being added in an introduce node;
 
   bool marked;
 
@@ -449,7 +449,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   // This check is too expensive - Profiling shows that compiling the Dhrystone benchmark for stm8 with default options, we spend about a quarter of compiler runtime in here!
   // Profiling shows that we spend a significant amount of time on the first call to copy_graph()
   // Todo: Improve efficiency, e.g. using subgraph or filtered_graph to avoid the costly first call to copy_graph()
-  for (var_t i = boost::num_vertices(con) - 1; i >= 0; i--)
+  for (var_t i = (var_t)boost::num_vertices(con) - 1; i >= 0; i--)
     {
       cfg_sym_t cfg2;
       boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties())); // This call to copy_graph is expensive!
@@ -972,7 +972,7 @@ static void tree_dec_ralloc_join(T_t &T, typename boost::graph_traits<T_t>::vert
   std::list<assignment>::iterator ai;
   for(ai = alist1.begin(); ai != alist1.end(); ++ai)
     {
-  	  print_assignment(*ai);
+      print_assignment(*ai);
       std::cout << "\n";
     }
 #endif
@@ -987,7 +987,7 @@ void get_best_local_assignment(assignment &a, typename boost::graph_traits<T_t>:
   for(ai = ai_best = alist.begin(), ai_end = alist.end(); ai != ai_end; ++ai)
     if(ai->s < ai_best->s)
       ai_best = ai;
-	
+
   a = *ai_best;
 }
 

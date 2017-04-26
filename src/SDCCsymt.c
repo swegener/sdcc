@@ -2191,9 +2191,12 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
       /* Otherwise fall through to the general case */
     }
 
+  /* shift operators have the important type in the left operand */
+  if (op == LEFT_OP || op == RIGHT_OP)
+    rType = copyLinkChain(type1);
 
   /* if one of them is a pointer or array then that prevails */
-  if (IS_PTR (type1) || IS_ARRAY (type1))
+  else if (IS_PTR (type1) || IS_ARRAY (type1))
     rType = copyLinkChain (type1);
   else if (IS_PTR (type2) || IS_ARRAY (type2))
     rType = copyLinkChain (type2);

@@ -2,6 +2,8 @@
 
 	* doc/sdccman.lyx:
 	  Update manual for --std-sdcc99 vs. --std-c11 change.
+	* device/lib/tlcs90/crt0.s:
+	  Fix bug #2583.
 
 2017-04-27 Maarten Brock <sourceforge.brock AT dse.nl>
 

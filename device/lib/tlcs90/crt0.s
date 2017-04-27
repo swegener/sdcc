@@ -267,17 +267,21 @@ _astart:
 
 	;call _boot1
 	
-	ld    hl, #0xFF20	; data start
+	ld    hl, #s__DATA	; data start
 	ld    a, #0x00
 	
 clear_ram:
 	call  _wd_reset_asm
+
+	cp    hl, #0xFFC0	; io start, 160 bytes data
+	jr    z, zeroed_data
 	
 	ld    (hl),a
 	inc   hl
-	cp    hl, #0xFFC0	; io start, 160 bytes data
-	jr    nz, clear_ram
-	
+
+	jr	clear_ram
+zeroed_data:
+
 	call  _wd_reset_asm
 
 ;	res   TX_ACTIVE,(_ser_irq_flags)

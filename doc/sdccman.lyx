@@ -15118,7 +15118,7 @@ status collapsed
 
 \series default
  Generally follow the ISO C99 standard, but allow some SDCC behaviour that
- conflicts with the standard (default).
+ conflicts with the standard.
 \end_layout
 
 \begin_layout Labeling
@@ -15164,6 +15164,52 @@ status collapsed
 
 \series default
  Follow the ISO C99 standard.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc11
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc11
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generally follow the ISO C11 standard, but allow some SDCC behaviour that
+ conflicts with the standard (default).
 \end_layout
 
 \begin_layout Labeling

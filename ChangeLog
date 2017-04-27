@@ -1,3 +1,8 @@
+2017-04-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update manual for --std-sdcc99 vs. --std-c11 change.
+
 2017-04-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/SDCCsymt.c (newEnumType): fixed bug 2545

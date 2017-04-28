@@ -9,6 +9,8 @@
 	* src/SDCCsymt.h,
 	  src/SDCCsymt.c:
 	  Minor improvements for const-correctness.
+	* src/SDCCpeeph.c:
+	  Fix bug #2600.
 
 2017-04-28 Philipp Klaus Krause <pkk AT spth.de>
 

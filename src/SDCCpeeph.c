@@ -43,7 +43,7 @@ static int hashSymbolName (const char *name);
 static void buildLabelRefCountHash (lineNode * head);
 static void bindVar (int key, char **s, hTab ** vtab);
 
-static bool matchLine (char *, char *, hTab **);
+static bool matchLine (char *, const char *, hTab **);
 
 #define FBYNAME(x) static int x (hTab *vars, lineNode *currPl, lineNode *endPl, \
         lineNode *head, char *cmdLine)
@@ -1838,7 +1838,7 @@ top:
 /* keyForVar - returns the numeric key for a var                   */
 /*-----------------------------------------------------------------*/
 static int
-keyForVar (char *d)
+keyForVar (const char *d)
 {
   int i = 0;
 
@@ -1902,23 +1902,23 @@ bindVar (int key, char **s, hTab ** vtab)
 /* matchLine - matches one line                                    */
 /*-----------------------------------------------------------------*/
 static bool
-matchLine (char *s, char *d, hTab ** vars)
+matchLine (char *s, const char *d, hTab ** vars)
 {
   if (!s || !(*s))
     return FALSE;
 
+  /* skip leading white spaces */
+  while (ISCHARSPACE (*s))
+    s++;
+  while (ISCHARSPACE (*d))
+    d++;
+
   while (*s && *d)
     {
-      /* skip white space in both */
-      while (ISCHARSPACE (*s))
-        s++;
-      while (ISCHARSPACE (*d))
-        d++;
-
       /* if the destination is a var */
       if (*d == '%' && ISCHARDIGIT (*(d + 1)) && vars)
         {
-          char *v = hTabItemWithKey (*vars, keyForVar (d + 1));
+          const char *v = hTabItemWithKey (*vars, keyForVar (d + 1));
           /* if the variable is already bound
              then it MUST match with dest */
           if (v)
@@ -1935,24 +1935,22 @@ matchLine (char *s, char *d, hTab ** vars)
           d++;
           while (ISCHARDIGIT (*d))
             d++;
-
+        }
+      else if (ISCHARSPACE (*s) && ISCHARSPACE (*d)) /* whitespace sequences match any whitespace sequences */
+        {
           while (ISCHARSPACE (*s))
             s++;
           while (ISCHARSPACE (*d))
             d++;
         }
-
-      /* they should be an exact match other wise */
-      if (*s && *d)
+      else if (*s && *d) /* they should be an exact match otherwise */
         {
           if (*s++ != *d++)
             return FALSE;
         }
-
     }
 
-  /* get rid of the trailing spaces
-     in both source & destination */
+  /* skip trailing whitespaces */
   if (*s)
     while (ISCHARSPACE (*s))
       s++;

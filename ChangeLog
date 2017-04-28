@@ -1,3 +1,10 @@
+2017-04-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2590.c:
+	  Enable for all z80-related backends.
+	* support/regression/tests/bug-2601.c:
+	  Disable for ds390.
+
 2017-04-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

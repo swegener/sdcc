@@ -24,7 +24,7 @@ void testBug(void)
 
 	a = c + 1;
 	b = -1;
-
+#ifndef __SDCC_ds390
 	p = 0;
 	f();
 	ASSERT(*p == 23);
@@ -32,5 +32,6 @@ void testBug(void)
 	p = 0;
 	g();
 	ASSERT(*p == 23);
+#endif
 }
 

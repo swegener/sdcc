@@ -1,5 +1,17 @@
 2017-04-28 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCast.c,
+	  src/SDCCicode.c,
+	  support/regression/tests/bug-2601.c,
+	  support/regression/tests/bug3537338.c,
+	  support/regression/tests/gcc-torture-execute-20021120-1.c:
+	  Fix bug #2602.
+	* src/SDCCsymt.h,
+	  src/SDCCsymt.c:
+	  Minor improvements for const-correctness.
+
+2017-04-28 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/bug-2590.c:
 	  Enable for all z80-related backends.
 	* support/regression/tests/bug-2601.c:
@@ -1952,7 +1964,7 @@
 2016-02-05 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c
-	  Fix a bug in comparason operaion.
+	  Fix a bug in comparison operation.
 	* support/regression/tests/memory.c
 	  Enable more tests.
 
@@ -1969,7 +1981,7 @@
 	  Fix compare operator, patch #267 by Peter Dons Tychsen.
 	* device/lib/pic16/libsdcc/char/divschar.c,
 	  device/lib/pic16/libsdcc/char/modschar.c:
-	  Fix signedness of pci16 char support routines.
+	  Fix signedness of pic16 char support routines.
 
 2016-02-01 Ben Shi <powerstudio1st AT 163 DOT com>
  

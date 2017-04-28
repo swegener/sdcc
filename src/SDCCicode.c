@@ -2322,7 +2322,7 @@ geniCodeSubtract (operand * left, operand * right, RESULT_TYPE resultType)
 /* geniCodeAdd - generates iCode for addition                      */
 /*-----------------------------------------------------------------*/
 static operand *
-geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
+geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl)
 {
   iCode *ic;
   sym_link *resType;
@@ -2368,6 +2368,26 @@ geniCodeAdd (operand * left, operand * right, RESULT_TYPE resultType, int lvl)
           if (indexUnsigned)
             SPEC_USIGN (getSpec (operandType (right))) = 1;
         }
+
+      if (getSize (ltype) > getSize (operandType (right)) && !IS_UNSIGNED (getSpec (operandType (right))))
+        {
+          sym_link *type = 0;
+
+          switch(getSize (ltype))
+            {
+            case 2:
+              type = newIntLink();
+              break;
+            case 3:
+            case 4:
+              type = newLongLink();
+              break;
+            default:
+              wassert(0);
+            }
+          right = geniCodeCast (type, right, TRUE);
+        }
+
       resType = copyLinkChain (ltype);
     }
   else

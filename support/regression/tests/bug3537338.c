@@ -18,6 +18,11 @@ int get_signed(signed char index)
 	return *(ptr+index);
 }
 
+int get_signedi(int index)
+{
+	return *(ptr+index);
+}
+
 int get_unsigned(unsigned char index)
 {
 	return *(ptr+index);
@@ -27,7 +32,9 @@ void testBug(void)
 {
 #ifndef __SDCC_pic16
     ASSERT (get_signed(-1) == globals[0]);
+    ASSERT (get_signedi(-1) == globals[0]);
     ASSERT (get_signed(1) == globals[2]);
     ASSERT (get_unsigned(1) == globals[2]);
 #endif
 }
+

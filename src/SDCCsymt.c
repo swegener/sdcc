@@ -1222,7 +1222,7 @@ bitsForType (sym_link * p)
 /* copySymbolChain - copies a symbol chain                          */
 /*------------------------------------------------------------------*/
 symbol *
-copySymbolChain (symbol * src)
+copySymbolChain (const symbol * src)
 {
   symbol *dest;
 
@@ -1238,7 +1238,7 @@ copySymbolChain (symbol * src)
 /* copySymbol - makes a copy of a symbol                            */
 /*------------------------------------------------------------------*/
 symbol *
-copySymbol (symbol * src)
+copySymbol (const symbol * src)
 {
   symbol *dest;
 
@@ -2001,9 +2001,10 @@ checkDecl (symbol * sym, int isProto)
 /* copyLinkChain - makes a copy of the link chain & rets ptr 2 head */
 /*------------------------------------------------------------------*/
 sym_link *
-copyLinkChain (sym_link * p)
+copyLinkChain (const sym_link *p)
 {
-  sym_link *head, *curr, *loop;
+  sym_link *head, *loop;
+  const sym_link *curr;
 
   /* note: v_struct and v_struct->fields are not copied! */
   curr = p;

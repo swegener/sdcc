@@ -4006,11 +4006,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
 
       /* if the left is a pointer */
       if (IS_PTR (LTYPE (tree)) || IS_AGGREGATE (LTYPE (tree)))
-        {
-          if (!IS_UNSIGNED (RTYPE (tree)))
-            tree->right = addCast (tree->right, resultTypeProp, TRUE);
-          TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
-        }
+        TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
       else
         {
           tree->left = addCast (tree->left, resultTypeProp, TRUE);

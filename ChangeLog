@@ -1,8 +1,11 @@
 2017-04-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmain.c,
-	  doc/sdccman.lyx:
+	  doc/sdccman.lyx,
+	  .version:
 	  Resurrect SDCC macro zombie for old SiLabs IDE support.
+	* sdcc.spec:
+	  Update list of targets in description.
 
 2017-04-28 Philipp Klaus Krause <pkk AT spth.de>
 

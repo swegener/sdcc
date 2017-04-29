@@ -2108,6 +2108,20 @@ preProcess (char **envp)
         addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }
 
+      /* A macro that has been deprecated since 3.2.0,
+        since its name makes it non-compliant.
+        It got removed a few times, but keeps coming back.
+        This time it got added back for the 3.7.0 release
+        to support the old SiLabs */
+      if (TARGET_IS_MCS51 && options.std_sdcc)
+        {
+          struct dbuf_s dbuf;
+
+          dbuf_init (&dbuf, 32);
+          dbuf_printf (&dbuf, "-DSDCC=%d%d%d", SDCC_VERSION_HI, SDCC_VERSION_LO, SDCC_VERSION_P);
+          addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
+        }
+
       /* add SDCC revision number */
       {
         struct dbuf_s dbuf;
@@ -2120,7 +2134,7 @@ preProcess (char **envp)
       /* add port (processor information to processor */
       addSet (&preArgvSet, Safe_strdup ("-D__SDCC_{port}"));
 
-      /* Optinal C features not (yet) supported by sdcc */
+      /* Optional C features not (yet) supported by SDCC */
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_COMPLEX__=1"));
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_THREADS__=1"));
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_ATOMICS__=1"));

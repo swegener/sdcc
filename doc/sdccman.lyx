@@ -2518,7 +2518,8 @@ status open
 
  command line option is defined.
  They have been oboleted (removed) after the 3.4.0 release (except for the
- macro SDCC, which has been removed after the 3.6.0 release).
+ macro SDCC, which has been removed after the 3.6.0 release (and brought back
+ for mcs51 for the 3.7.0 release)).
 \end_layout
 
 \begin_layout Itemize
@@ -39174,7 +39175,7 @@ Defines created by the compiler
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="19" columns="2">
+<lyxtabular version="3" rows="20" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top" width="3in">
@@ -39239,9 +39240,33 @@ version macro
 Always defined.
  Version number string (e.g.
  SDCC_3_2_0 for sdcc 3.2.0).
- In older versions SDCC was always defined instead.
- From version 2.5.6 SDCC was the version number as an int (ex.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SDCC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+OBSOLETE.
+ WILL BE REMOVED IN THE FUTURE.
+ CURRENTLY Only defined for the mcs51 backend (and only if –std-cXX is not
+ used).
+ This macro has been available since SDCC 2.5.6 and is the version number
+ as an int (ex.
  256).
+ PLEASE USE OTHER VERSION MACROS INSTEAD!
 \end_layout
 
 \end_inset

@@ -14,6 +14,7 @@ RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 STRIP		= @STRIP@
 MAKEDEP         = @MAKEDEP@
+SREC_CAT	= @SREC_CAT@
 
 top_builddir	= @top_builddir@
 top_srcdir	= @top_srcdir@
@@ -159,17 +160,17 @@ checkconf:
 	  $(MAKE) -C $(top_builddir) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
-bl_l15x46.hex: bl_l15x46.asc
-	srec_cat $< -Ascii_Hex -Output $@ -Intel
+#bl_l15x46.hex: bl_l15x46.asc
+#	$(SREC_CAT) $< -Ascii_Hex -Output $@ -Intel
 
-bl_l15x46.cc: bl_l15x46.asc
-	srec_cat $< -Ascii_Hex -Output $@ -C-Array bl_l15x46 -INClude -No-CONST
+#bl_l15x46.cc: bl_l15x46.asc
+#	$(SREC_CAT) $< -Ascii_Hex -Output $@ -C-Array bl_l15x46 -INClude -No-CONST
 
-bl_s105.hex: bl_s105.asc
-	srec_cat $< -Ascii_Hex -Output $@ -Intel
+#bl_s105.hex: bl_s105.asc
+#	$(SREC_CAT) $< -Ascii_Hex -Output $@ -Intel
 
-bl_s105.cc: bl_s105.asc
-	srec_cat $< -Ascii_Hex -Output $@ -C-Array bl_s105 -INClude -No-CONST
+#bl_s105.cc: bl_s105.asc
+#	$(SREC_CAT) $< -Ascii_Hex -Output $@ -C-Array bl_s105 -INClude -No-CONST
 
 #bl_source: bl.cc bl.h
 

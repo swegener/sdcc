@@ -1,7 +1,9 @@
 2017-05-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:
-	  Document separation of _Bool/bool and __bit for mcs51 and ds390.
+	  Document separation of _Bool/bool and __bit for mcs51 and ds390,
+	  fix typos,
+	  automatic version number.
 
 2017-04-29 Philipp Klaus Krause <pkk AT spth.de>
 

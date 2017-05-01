@@ -1068,7 +1068,7 @@ Exception are pic device libraries and header files which are derived from
  with the GPL.
  Pic device libraries and header files are located at non-free/lib and non-free/
 include directories respectively.
- Sdcc should be run with the 
+ SDCC should be run with the 
 \series bold
 -
 \begin_inset ERT
@@ -1498,7 +1498,7 @@ status collapsed
 
 \end_inset
 
--short-is-8bits commandline option (option removed after the 3.6.0 release).
+-short-is-8bits command line option (option removed after the 3.6.0 release).
 \end_layout
 
 \begin_layout Itemize
@@ -1835,7 +1835,7 @@ arg
 
 \end_inset
 
- functions are casted to generic pointers on harvard architectures (e.g.
+ functions are casted to generic pointers on Harvard architectures (e.g.
  mcs51, ds390) unless explicitly casted and 
 \series bold
 -
@@ -2230,7 +2230,7 @@ g the library.
 \end_layout
 
 \begin_layout Itemize
-in versions older then 2.8.5 the unnamed bitfield structure members participated
+in versions older then 2.8.5 the unnamed bit-field structure members participated
  in initialization, which is not conforming with ISO/IEC 9899:1999 standard
  (see section Section 6.7.8 Initialization, clause 9)
 \begin_inset Newline newline
@@ -2240,7 +2240,7 @@ in versions older then 2.8.5 the unnamed bitfield structure members participated
 \begin_inset Newline newline
 \end_inset
 
-Old behavior, before version 2.8.5:
+Old behaviour, before version 2.8.5:
 \family typewriter
 
 \begin_inset Newline newline
@@ -2348,7 +2348,7 @@ int b : 2;
 \begin_inset Newline newline
 \end_inset
 
-New behavior:
+New behaviour:
 \family typewriter
 
 \begin_inset Newline newline
@@ -2450,7 +2450,7 @@ int b : 2;
 \end_layout
 
 \begin_layout Itemize
-libraries, included in sdcc packages, are in ar format in sdcc version 2.9.0
+libraries, included in SDCC packages, are in ar format in SDCC version 2.9.0
  and higher.
  See section 
 \begin_inset CommandInset ref
@@ -2467,25 +2467,25 @@ targets for xa51 and avr are disabled by default in version 3.0.0 and higher.
 \end_layout
 
 \begin_layout Itemize
-in sdcc version 3.0.0 and higher sdldgb and sdldz80 don't support generation
- of GameBoy binary image format.
- The makebin utility can be used to convert Intel Hex format to GameBoy
+in SDCC version 3.0.0 and higher sdldgb and sdldz80 don't support generation
+ of Game Boy binary image format.
+ The makebin utility can be used to convert Intel Hex format to Game Boy
  binary image format.
 \end_layout
 
 \begin_layout Itemize
-in sdcc version 3.0.0 and higher sdldgb and sdldz80 don't support generation
- of rrgb (GameBoy simulator) map file and no$gmb symbol file formats.
+in SDCC version 3.0.0 and higher sdldgb and sdldz80 don't support generation
+ of rrgb (Game Boy simulator) map file and no$gmb symbol file formats.
  The as2gbmap utility can be used to convert sdld map format to rrgb and
  no$gmb file formats.
 \end_layout
 
 \begin_layout Itemize
-asranlib utility was renamed to sdranlib in sdcc version 3.1.0.
+asranlib utility was renamed to sdranlib in SDCC version 3.1.0.
 \end_layout
 
 \begin_layout Itemize
-in sdcc version 3.1.0 pic 14 traget, structured access to SFR via 
+in SDCC version 3.1.0 pic14 target, structured access to SFR via 
 \family typewriter
 <sfrname>_bits.<bitname>
 \family default
@@ -2494,7 +2494,7 @@ in sdcc version 3.1.0 pic 14 traget, structured access to SFR via
 <sfrname>bits.<bitname>
 \family default
 .
- It will be obsoleted (removed) in one of next sdcc releases.
+ It will be obsoleted (removed) in one of next SDCC releases.
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2506,20 +2506,20 @@ reference "subsec:Naming-of-special"
 \end_layout
 
 \begin_layout Itemize
-sdar archive managing utility and sdnm utilityes were introduced in version
+sdar archive managing utility and sdnm utilities were introduced in version
  3.2.0.
  sdar, sdranlib and sdnm are derived from GNU Binutils package.
 \end_layout
 
 \begin_layout Itemize
-with sdcc version 3.2.0 the sdcclib utility is deprecated.
- Sdar utility should be used to create sdcc object file archives.
- Sdcclib utility will become obsolete in one of next sdcc releases and will
- be removed from sdcc packages.
+with SDCC version 3.2.0 the sdcclib utility is deprecated.
+ Sdar utility should be used to create SDCC object file archives.
+ Sdcclib utility will become obsolete in one of next SDCC releases and will
+ be removed from SDCC packages.
 \end_layout
 
 \begin_layout Itemize
-special sdcc keywords which are not preceded by a double underscore are
+special SDCC keywords which are not preceded by a double underscore are
  obsoleted (removed) in version 3.2.0 and higher.
  See section 
 \begin_inset CommandInset ref
@@ -2532,7 +2532,7 @@ reference "subsec:Standard-Compliance"
 \end_layout
 
 \begin_layout Itemize
-in sdcc version 3.2.0 compiler macro definitions not starting with double
+in SDCC version 3.2.0 compiler macro definitions not starting with double
  underscore characters are deprecated if 
 \begin_inset Flex Code
 status open
@@ -2544,13 +2544,13 @@ status open
 \end_inset
 
  command line option is defined.
- They have been oboleted (removed) after the 3.4.0 release (except for the
+ They have been obsoleted (removed) after the 3.4.0 release (except for the
  macro SDCC, which has been removed after the 3.6.0 release (and brought back
  for mcs51 for the 3.7.0 release)).
 \end_layout
 
 \begin_layout Itemize
-in sdcc version 3.2.0 new compiler macros for processor definition were introduced
+in SDCC version 3.2.0 new compiler macros for processor definition were introduced
  for pic14 and pic16 targets: -D__SDCC_PIC16XXXX and -D__SDCC_PIC18FXXX
  respectively.
  The pic16 macro definition -D__18fXXX is deprecated.
@@ -2600,7 +2600,7 @@ sdobjcopy utility was introduced in version 3.3.0.
 \end_layout
 
 \begin_layout Itemize
-Up to the sdcc 3.4.0 release, intrinsic named address spaces were called 
+Up to the SDCC 3.4.0 release, intrinsic named address spaces were called 
 \begin_inset Quotes sld
 \end_inset
 
@@ -2612,7 +2612,7 @@ storage classes
 \end_layout
 
 \begin_layout Itemize
-in sdcc version 3.6.0, the default for char changed from signed to unsigned.
+in SDCC version 3.6.0, the default for char changed from signed to unsigned.
 \end_layout
 
 \begin_layout Itemize
@@ -2632,7 +2632,7 @@ System Requirements
 What do you need before you start installation of SDCC? A computer, and
  a desire to compute.
  The preferred method of installation is to compile SDCC from source using
- GNU gcc and make.
+ GNU GCC and make.
  For Windows some pre-compiled binary distributions are available for your
  convenience.
  You should have some experience with command line tools and compiler use.
@@ -3027,7 +3027,7 @@ status collapsed
 
 \end_inset
 
--disable-gbz80-port Excludes the GameBoy gbz80 port
+-disable-gbz80-port Excludes the Game Boy gbz80 port
 \end_layout
 
 \begin_layout Labeling
@@ -7952,7 +7952,7 @@ http://www.opencores.org
 \begin_inset Quotes sld
 \end_inset
 
-some processors which are targetted by SDCC can be implemented in a 
+some processors which are targeted by SDCC can be implemented in a 
 \emph on
 f
 \emph default
@@ -8838,7 +8838,7 @@ http://shop-pdp.kent.edu/
 
 .
  In 2009 Alan made his ASxxxx Cross Assemblers version 5.0 available under
- the GPL licence (GPLv3 or later), so a reunion is now a work in progress.
+ the GPL license (GPLv3 or later), so a reunion is now a work in progress.
  Thanks Alan!
 \end_layout
 
@@ -9524,7 +9524,7 @@ status collapsed
 
 \begin_layout Standard
 In addition to what is mentioned in the section above, the following features
- of this standard are not supported by sdcc:
+ of this standard are not supported by SDCC:
 \end_layout
 
 \begin_layout Itemize
@@ -9609,7 +9609,7 @@ Embedded C
 
 \begin_layout Standard
 SDCC supports named address spaces.
- The support for fixed-point math in sdcc is inconsistent with the standard.
+ The support for fixed-point math in SDCC is inconsistent with the standard.
  Other parts of the standard are not supported.
 \end_layout
 
@@ -10697,7 +10697,7 @@ name "subsec:Using-sdar-to"
 \end_layout
 
 \begin_layout Standard
-Support for sdar format libraries was introduced in sdcc 2.9.0.
+Support for sdar format libraries was introduced in SDCC 2.9.0.
 \series bold
 
 \begin_inset Newline newline
@@ -10754,7 +10754,7 @@ sdcclib
 status collapsed
 
 \begin_layout Plain Layout
-With sdcc version 3.2.0 the sdcclib utility is deprecated.
+With SDCC version 3.2.0 the sdcclib utility is deprecated.
  Sdar utility should be used to create sdcc object file archives.
  Sdcclib utility will become obsolete in one of next sdcc releases and will
  be removed from sdcc packages.
@@ -19388,7 +19388,7 @@ SDCC supports some language extensions useful for embedded systems.
  depends on the target architecture) and non-intrinsic named address spaces
  (defined by the user using the keyword __addressmod, they are particularly
  useful with custom bank-switching hardware).
- Unlike the Embedded C standard, sdcc allows local variables to have an
+ Unlike the Embedded C standard, SDCC allows local variables to have an
  intrinsic named address space even when not explicitly declared as static
  or extern.
 \end_layout
@@ -19773,8 +19773,8 @@ idata (mcs51, ds390 named address space)
 \end_layout
 
 \begin_layout Standard
-Variables in this address spacewill be allocated into the indirectly addressable
- portion of the internal ram of a 8051, e.g.:
+Variables in this address space will be allocated into the indirectly addressabl
+e portion of the internal ram of a 8051, e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -20482,12 +20482,12 @@ The bit addressable memory consists of 128 bits which are located from 0x20
 \end_inset
 
 Apart from this 8051 specific intrinsic named address space most architectures
- support ANSI-C bitfields
+ support ANSI-C bit-fields
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
-bitfields
+bit-fields
 \end_layout
 
 \end_inset
@@ -20497,7 +20497,7 @@ bitfields
 status collapsed
 
 \begin_layout Plain Layout
-Not really meant as examples, but nevertheless showing what bitfields are
+Not really meant as examples, but nevertheless showing what bit-fields are
  about: device/include/mc68hc908qy.h and support/regression/tests/bitfields.c
 \end_layout
 
@@ -20808,7 +20808,7 @@ __sfr16
 __sfr32.
 
 \emph default
- Allthough SDCC usually accesses them Least Significant Byte (LSB) first,
+ Although SDCC usually accesses them Least Significant Byte (LSB) first,
  this is not guaranteed.
 \begin_inset Newline newline
 \end_inset
@@ -22296,7 +22296,7 @@ _
 
 \end_inset
 
-xdata (hc08 named addres space)
+xdata (hc08 named address space)
 \end_layout
 
 \end_inset
@@ -22559,7 +22559,7 @@ at
 
  <address>
 \emph default
- keyword, whch can also be used in addition to a named address space, e.g.:
+ keyword, which can also be used in addition to a named address space, e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -24476,7 +24476,7 @@ set_error
 \begin_inset space ~
 \end_inset
 
-nooverlay was not present, this could cause unpredictable runtime behavior
+nooverlay was not present, this could cause unpredictable runtime behaviour
  when called from an interrupt service routine.
  The #pragma
 \begin_inset space ~
@@ -24908,7 +24908,7 @@ Floating point support
  operations might be implemented using external support routines, depending
  on the target architecture.
  If an interrupt service routine needs to do any of these operations on
- a target where functions are non-reentrent by default, then the support
+ a target where functions are non-reentrant by default, then the support
  routines (as mentioned in a following section) will have to be recompiled
  using the 
 \emph on
@@ -25042,7 +25042,7 @@ reference "subsec:A-Step-by Assembler Introduction"
 
 \begin_layout Standard
 Calling other functions from an interrupt service routine on a target where
- functions are non-reentrent by default is not recommended, avoid it if
+ functions are non-reentrant by default is not recommended, avoid it if
  possible.
  Note that when some function is called from an interrupt service routine
  it should be preceded by a #pragma
@@ -25072,8 +25072,8 @@ pragma nooverlay
 \end_inset
 
  if it is not reentrant.
- Furthermore nonreentrant functions should not be called from the main program
- while the interrupt service routine might be active.
+ Furthermore non-reentrant functions should not be called from the main
+ program while the interrupt service routine might be active.
  They also must not be called from low priority interrupt service routines
  while a high priority interrupt service routine might be active.
  You could use semaphores or make the function 
@@ -25624,7 +25624,7 @@ void nmi_isr (void) __critical __interrupt
 
 \begin_layout Standard
 Since interrupts on the Z80 and Z180 are level-triggered (except for the
- NMI), interruptible interupt handlers shouldonly be used where hardware
+ NMI), interruptible interrupt handlers should only be used where hardware
  acknowledge is available.
 \end_layout
 
@@ -26926,8 +26926,8 @@ interrupt jitter
 \end_layout
 
 \begin_layout Standard
-You can reenable interrupts within an interrupt routine and on some architecture
-s you can make use of two (or more) levels of 
+You can re-enable interrupts within an interrupt routine and on some architectur
+es you can make use of two (or more) levels of 
 \emph on
 interrupt priorities
 \emph default
@@ -26943,7 +26943,7 @@ interrupt priority
 
 .
  On some architectures which don't support interrupt priorities these can
- be implemented by manipulating the interrupt mask and reenabling interrupts
+ be implemented by manipulating the interrupt mask and re-enabling interrupts
  within the interrupt routine.
  Check there is sufficient space on the stack
 \begin_inset Index idx
@@ -27370,7 +27370,7 @@ Assembler routines
 \end_layout
 
 \begin_layout Subsection
-Inline Assemblere Code Formats
+Inline Assembler Code Formats
 \end_layout
 
 \begin_layout Standard
@@ -33342,8 +33342,9 @@ Small-C calling convention
 \end_layout
 
 \begin_layout Standard
-Functions declared as __smallc are called using the Small-C calling convention.
- This way assembler routines orginally written for Small-C or code generated
+Functions declared as __smallc are called using the Small-C calling convention
+ (passing arguments on-stack left-to-right).
+ This way assembler routines originally written for Small-C or code generated
  by Small-C can be called from SDCC.
  Currently variable arguments are not yet supported (neither on the caller
  nor on the callee side).
@@ -34548,7 +34549,7 @@ putchar()
 \begin_layout Verse
 
 \family typewriter
-void putchar (char c) {
+int putchar (int c) {
 \begin_inset Newline newline
 \end_inset
 
@@ -34657,9 +34658,32 @@ TI = 0;
 \end_inset
 
 SBUF = c;
-\begin_inset Newline newline
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+\begin_inset space ~
 \end_inset
 
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return c;
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
 }
 \end_layout
 
@@ -36602,7 +36626,7 @@ Flat 24 (DS390 memory model)
 \end_inset
 
 Note that the compiler does not generate any code to place the processor
- into 24 bitmode (although 
+ into 24 bit mode (although 
 \emph on
 tinibios
 \emph default
@@ -39165,7 +39189,8 @@ Defines Created by the Compiler
 \end_layout
 
 \begin_layout Standard
-The compiler creates the following #defines
+Besides defines from the C standards, the compiler creates the following
+ #defines
 \begin_inset Index idx
 status collapsed
 
@@ -46826,12 +46851,12 @@ GET (PIC16)
 
 \end_inset
 
- When this variable exists, reading of structure bitfields is optimized
- by directly loading FSR0 with the address of the bitfield structure.
- Normally SDCC will cast the bitfield structure to a bitfield pointer and
- then load FSR0.
+ When this variable exists, reading of structure bit-fields is optimized
+ by directly loading FSR0 with the address of the bit-field structure.
+ Normally SDCC will cast the bit-field structure to a bit-field pointer
+ and then load FSR0.
  This step saves data ram and code space for functions that make heavy use
- of bitfields.
+ of bit-fields.
  (i.e., 80 bytes of code space are saved when compiling malloc.c with this
  option).
  
@@ -59833,7 +59858,7 @@ SDCC has grown to be a large project.
 \end_layout
 
 \begin_layout Standard
-The SDCC project is hosted on the SDCC sourceforge site at 
+The SDCC project is hosted on the SDCC SourceForge site at 
 \begin_inset Flex URL
 status collapsed
 
@@ -59857,7 +59882,7 @@ Mailing list(s)
 
 , forums, bug reporting system, patch submission
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 Patch submission
@@ -59924,7 +59949,7 @@ Communication!Bug report
 
 \begin_layout Standard
 The recommended way of reporting bugs is using the infrastructure of the
- sourceforge site.
+ SourceForge site.
  You can follow the status of bug reports there and have an overview about
  the known bugs.
 \end_layout
@@ -60041,7 +60066,7 @@ download
 
 \end_inset
 
- on sourceforge per day
+ on SourceForge per day
 \begin_inset Foot
 status collapsed
 
@@ -60260,7 +60285,7 @@ Communication!Mailing lists
  and forums are archived and searchable so if you are lucky someone already
  had a similar problem.
  While mails to the lists themselves are delivered promptly their web front
- end on sourceforge sometimes shows a severe time lag (up to several weeks),
+ end on SourceForge sometimes shows a severe time lag (up to several weeks),
  if you're seriously using SDCC please consider subscribing to the lists.
 \end_layout
 
@@ -60486,7 +60511,7 @@ Regression test
  for several target platforms through simulators.
  The regression test suite comprises about 1000 files which expand to more
  than 1500 test cases which include about 7000 tests.
- A large number of tests from the gcc test suite is included in this.
+ A large number of tests from the GCC test suite is included in this.
  The results of these tests are published daily on SDCC's snapshot page
  (click on the red or green symbols on the right side of 
 \begin_inset Flex URL
@@ -60680,7 +60705,7 @@ complete
 
 \begin_layout Enumerate
 have a curriculum that can be extended for years.
- Then you could use an fpga board as target and your curriculum will seamlessly
+ Then you could use an FPGA board as target and your curriculum will seamlessly
  extend from logic synthesis (http://www.opencores.org 
 \begin_inset Flex URL
 status collapsed
@@ -68251,7 +68276,7 @@ Placement of Bank-Selection Instructions
 \end_layout
 
 \begin_layout Standard
-For non-intrinsic named address spaces, sdcc will place the bank selection
+For non-intrinsic named address spaces, SDCC will place the bank selection
  instructions optimally.
  For details see Philipp Klaus Krause, 
 \begin_inset Quotes sld
@@ -68272,7 +68297,7 @@ Lifetime-Optimal Speculative Partial Redundancy Elimination
 \end_layout
 
 \begin_layout Standard
-sdcc has an implementation of lifetime-optimal speculative partial redundancy
+SDCC has an implementation of lifetime-optimal speculative partial redundancy
  elimination based on tree-decompositions.
 \end_layout
 
@@ -68298,7 +68323,7 @@ Register-Allocation
 \end_layout
 
 \begin_layout Standard
-sdcc currently has two register allocators.
+SDCC currently has two register allocators.
  One of them is optimal when optimizing for code size.
  This register allocator is used by default on the hc08, s08, z80, z180,
  r2k, r3ka, gbz80 and stm8 ports.
@@ -68324,7 +68349,7 @@ It first creates a tree-decomposition of the control-flow graph, and then
  Optimality is achieved through the use of a cost function, which gives
  cost for instructions under register assignments.
  The cost function is target-specific and has to be implemented for each
- port; in all current sdcc ports the cost function is integrated into code
+ port; in all current SDCC ports the cost function is integrated into code
  generation.
 \end_layout
 
@@ -69308,7 +69333,7 @@ reference "subsec:Register-Allocation"
 
 \end_inset
 
- should be used in most cases, since it can result in substancially better
+ should be used in most cases, since it can result in substantially better
  code.
  In the old register allocator, there are two parts to register allocation.
 \begin_inset Newline newline

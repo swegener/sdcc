@@ -1,3 +1,8 @@
+2017-05-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Note that _Bool/bool is now a separte type from __bit on mcs51 and ds390.
+
 2017-04-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmain.c,

@@ -2593,6 +2593,10 @@ After 3.6.0, the prototype for putchar() changed from void putchar(char) to
  int putchar(int)
 \end_layout
 
+\begin_layout Itemize
+Before 3.7.0 mcs51 and ds390 got a full _Bool/bool type, separate from __bit.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

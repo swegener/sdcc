@@ -687,7 +687,7 @@ long long
 status open
 
 \begin_layout Plain Layout
-Incomplete support in the pic14 and pic16 ports.
+Incomplete support in the ds390, ds400, pic14 and pic16 backends.
 \end_layout
 
 \end_inset
@@ -842,7 +842,17 @@ generic
 \begin_inset Text
 
 \begin_layout Plain Layout
-__bit (mcs51, ds390)
+__bit
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+Only supported in the mcs51, ds390, ds400 backends.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset

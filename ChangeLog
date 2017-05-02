@@ -1,3 +1,8 @@
+2017-05-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Minor fix in list of supported data types.
+
 2017-05-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

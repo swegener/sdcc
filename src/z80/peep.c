@@ -206,6 +206,13 @@ static bool argCont(const char *arg, const char *what)
 {
   while(isspace (*arg) || *arg == ',')
     arg++;
+
+  if(arg[0] == '(' && arg[1] && arg[2] && (arg[2] != ')' && arg[3] != ')'))
+    return FALSE;
+
+  if(*arg == '(')
+    arg++;
+
   return(arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
 }
 
@@ -281,7 +288,7 @@ z80MightRead(const lineNode *pl, const char *what)
     return(!strcmp(what, "h") || !strcmp(what, "l") || !strcmp(what, "d") || !strcmp(what, "e"));
   if(ISINST(pl->line, "ld\t"))
     {
-      if(strstr(strchr(pl->line, ','), what) && strchr(pl->line, ',')[1] != '#' && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[2] == '#') && !(strchr(pl->line, ',')[1] == '(' && strchr(pl->line, ',')[3] != ')' && strchr(pl->line, ',')[4] != ')'))
+      if(argCont(strchr(pl->line, ','), what))
         return TRUE;
       if(*(strchr(pl->line, ',') - 1) == ')' && strstr(pl->line + 3, what) && (strchr(pl->line, '#') == 0 || strchr(pl->line, '#') > strchr(pl->line, ',')))
         return TRUE;

@@ -4,6 +4,8 @@
 	  Be more forgiving about omitted whitespace after comma in peephole matching (whitespace handling had become stricter in the fix to #2600).
 	* src/z80/peep.c:
 	  Slightly more accurate analysis of register reads, also wrt. whitespaces.
+	* src/z80/gen.c:
+	  Unify emitted asm syntax wrt. space after comma.
 
 2017-05-02 Philipp Klaus Krause <pkk AT spth.de>
 

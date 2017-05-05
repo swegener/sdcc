@@ -2081,7 +2081,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         }
       else
         {
-          cheapMove (result, roffset + i, source, soffset + i, !(a_dead && (result->regs[A_IDX] >= i || result->regs[A_IDX] == -1) && source->regs[A_IDX] <= i));
+          cheapMove (result, roffset + i, source, soffset + i, !(a_dead && (result->regs[A_IDX] >= (roffset + i) || result->regs[A_IDX] == -1) && source->regs[A_IDX] <= i));
           i++;
         }
     }

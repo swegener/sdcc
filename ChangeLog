@@ -1,3 +1,7 @@
+2017-05-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/stm8/gen.c (genMove_o): fixed bug #2607
+
 2017-05-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c:

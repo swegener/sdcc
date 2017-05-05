@@ -47,3 +47,10 @@ testBug (void)
   var32 = notinlined_ptr_fnc(inline_ptr_fnc(1));
   ASSERT(var32 == glob_var32_b);
 }
+
+extern inline
+int32_t inline_fnc(char sel);
+
+extern inline
+int32_t *inline_ptr_fnc(char sel);
+

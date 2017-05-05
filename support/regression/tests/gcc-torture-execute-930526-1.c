@@ -36,3 +36,6 @@ testTortureExecute (void)
   f (4);
   return;
 }
+
+extern inline void f (int x);
+

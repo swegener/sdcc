@@ -1,6 +1,7 @@
 2017-05-05 Philipp Klaus Krause <pkk AT spth.de>
 
-	* support/regression/tests/bug-2188.c:
+	* support/regression/tests/bug-2188.c,
+	  support/regression/tests/gcc-torture-execute-930526-1.c:
 	  Add extern declaration to make test compile where functions aren't inlined.
 
 2017-05-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

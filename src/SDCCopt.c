@@ -2103,13 +2103,13 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP || ic->op == BITWISEAND) &&
+          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP || ic->op == BITWISEAND || ic->op == CAST) &&
             IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
             {
               sym_link *resulttype = operandType (IC_RESULT (ic));
 
               if (!IS_INTEGRAL (resulttype) ||
-                !(IS_SYMOP (IC_LEFT (ic)) || IS_OP_LITERAL (IC_LEFT (ic))) ||
+                ic->op != CAST && !(IS_SYMOP (IC_LEFT (ic)) || IS_OP_LITERAL (IC_LEFT (ic))) ||
                 !(IS_SYMOP (IC_RIGHT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic))))
                 continue;
 
@@ -2119,26 +2119,38 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
                 continue;
 
-              /* This use must a cast */
+              /* This use must be a cast or similar */
               uic = hTabItemWithKey (iCodehTab,
                         bitVectFirstBit (OP_USES (IC_RESULT (ic))));
 
-              if (!uic || (uic->op != CAST && uic->op != '+'))
+              if (!uic || (uic->op != CAST && uic->op != '+' && uic->op != LEFT_OP && uic->op != RIGHT_OP))
                 continue;
 
               /* It must be a cast to another integer type that */
               /* has fewer bits */
-              nextresulttype = operandType (IC_RESULT (uic));
-              if (!IS_INTEGRAL (nextresulttype) && !(IS_PTR (nextresulttype) && PTRSIZE == 2))
-                 continue;
-
-              if (IS_PTR (nextresulttype))
+              if (uic->op == LEFT_OP || uic->op == RIGHT_OP)
                 {
-                  nextresulttype = newIntLink ();
-                  SPEC_USIGN (nextresulttype) = 1;
+                   /* Since shifting by the width of an operand or more is undefined behaviour, and no type is wider than 256 bits,
+                      we can optimize when the result is used as right operand to a shift. */
+                   if(!isOperandEqual (IC_RESULT (ic), IC_RIGHT (uic)) || isOperandEqual (IC_RESULT (ic), IC_LEFT (uic)))
+                     continue;
+
+                   nextresulttype = newCharLink ();
                 }
               else
-                nextresulttype = copyLinkChain (nextresulttype);
+                {
+                  nextresulttype = operandType (IC_RESULT (uic));
+                  if (!IS_INTEGRAL (nextresulttype) && !(IS_PTR (nextresulttype) && PTRSIZE == 2))
+                     continue;
+
+                  if (IS_PTR (nextresulttype))
+                    {
+                      nextresulttype = newIntLink ();
+                      SPEC_USIGN (nextresulttype) = 1;
+                    }
+                  else
+                    nextresulttype = copyLinkChain (nextresulttype);
+                }
 
               nextresultsize = bitsForType (nextresulttype);
               if (nextresultsize >= resultsize)
@@ -2152,41 +2164,44 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               sym->type = nextresulttype;
 
               /* Insert casts on operands */
+              if (ic->op != CAST)
+                {
               if (IS_SYMOP (IC_LEFT (ic)))
-                {
-                  newic = newiCode (CAST, operandFromLink (nextresulttype), IC_LEFT (ic));
-                  hTabAddItem (&iCodehTab, newic->key, newic);
-                  bitVectSetBit (OP_USES (IC_LEFT (ic)), newic->key);
-                  IC_RESULT (newic) = newiTempOperand (nextresulttype, 0);
-                  bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
-                  IC_LEFT (ic) = operandFromOperand (IC_RESULT (newic));
-                  bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key);
-                  newic->filename = ic->filename;
-                  newic->lineno = ic->lineno;
-                  addiCodeToeBBlock (ebbs[i], newic, ic);
-                }
-              else
-                {
-                  wassert (IS_OP_LITERAL (IC_LEFT (ic)));
-                  IC_LEFT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))));
-                }
-              if (ic->op != LEFT_OP && IS_SYMOP (IC_RIGHT (ic)))
-                {
-                  newic = newiCode (CAST, operandFromLink (nextresulttype), IC_RIGHT (ic));
-                  hTabAddItem (&iCodehTab, newic->key, newic);
-                  bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
-                  IC_RESULT (newic) = newiTempOperand (nextresulttype, 0);
-                  bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-                  IC_RIGHT (ic) = operandFromOperand (IC_RESULT (newic));
-                  bitVectSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-                  newic->filename = ic->filename;
-                  newic->lineno = ic->lineno;
-                  addiCodeToeBBlock (ebbs[i], newic, ic);
-                }
-              else if (ic->op != LEFT_OP)
-                {
-                  wassert (IS_OP_LITERAL (IC_RIGHT (ic)));
-                  IC_RIGHT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));
+                    {
+                      newic = newiCode (CAST, operandFromLink (nextresulttype), IC_LEFT (ic));
+                      hTabAddItem (&iCodehTab, newic->key, newic);
+                      bitVectSetBit (OP_USES (IC_LEFT (ic)), newic->key);
+                      IC_RESULT (newic) = newiTempOperand (nextresulttype, 0);
+                      bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+                      IC_LEFT (ic) = operandFromOperand (IC_RESULT (newic));
+                      bitVectSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+                      newic->filename = ic->filename;
+                      newic->lineno = ic->lineno;
+                      addiCodeToeBBlock (ebbs[i], newic, ic);
+                    }
+                  else
+                    {
+                      wassert (IS_OP_LITERAL (IC_LEFT (ic)));
+                      IC_LEFT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))));
+                    }
+                  if (ic->op != LEFT_OP && IS_SYMOP (IC_RIGHT (ic)))
+                    {
+                      newic = newiCode (CAST, operandFromLink (nextresulttype), IC_RIGHT (ic));
+                      hTabAddItem (&iCodehTab, newic->key, newic);
+                      bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
+                      IC_RESULT (newic) = newiTempOperand (nextresulttype, 0);
+                      bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+                      IC_RIGHT (ic) = operandFromOperand (IC_RESULT (newic));
+                      bitVectSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
+                      newic->filename = ic->filename;
+                      newic->lineno = ic->lineno;
+                      addiCodeToeBBlock (ebbs[i], newic, ic);
+                    }
+                  else if (ic->op != LEFT_OP)
+                    {
+                      wassert (IS_OP_LITERAL (IC_RIGHT (ic)));
+                      IC_RIGHT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));
+                    }
                 }
               if (uic->op == CAST)
                 uic->op = '=';

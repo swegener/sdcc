@@ -5620,7 +5620,7 @@ genLeftShift (const iCode *ic)
 
   for (i = 0; i < size; i++)
     {
-      if (aopRS (shiftop) && (!aopInReg (shiftop, i, A_IDX) || aopInReg (shiftop, i, A_IDX)) && shiftop->aopu.bytes[i].in_reg &&
+      if (aopRS (shiftop) && (!aopInReg (shiftop, i, A_IDX) || aopInReg (right->aop, 0, A_IDX)) && shiftop->aopu.bytes[i].in_reg &&
         right->aop->regs[shiftop->aopu.bytes[i].byteu.reg->rIdx] == 0)
         {
           if (!regalloc_dry_run)
@@ -6016,7 +6016,7 @@ genRightShift (const iCode *ic)
 
   for (i = 0; i < size; i++)
     {
-      if (aopRS (shiftop) && (!aopInReg (shiftop, i, A_IDX) || aopInReg (right->aop, i, A_IDX)) && shiftop->aopu.bytes[i].in_reg &&
+      if (aopRS (shiftop) && (!aopInReg (shiftop, i, A_IDX) || aopInReg (right->aop, 0, A_IDX)) && shiftop->aopu.bytes[i].in_reg &&
         right->aop->regs[shiftop->aopu.bytes[i].byteu.reg->rIdx] == 0)
         {
           if (!regalloc_dry_run)

@@ -6239,7 +6239,7 @@ no_mlt:
       if (AOP_TYPE (IC_RESULT (ic)) != AOP_REG || AOP (IC_RESULT (ic))->aopu.aop_reg[0]->rIdx != L_IDX)
         l_cost += ld_cost (AOP (IC_RESULT (ic)), ASMOP_L);
     }
-  add_in_hl = (!byteResult || isPairDead (PAIR_HL, ic) && !bitVectBitValue (ic->rSurv, D_IDX) && l_cost < a_cost);
+  add_in_hl = (!byteResult || isPairDead (PAIR_HL, ic) && l_cost < a_cost);
 
   if (byteResult)
     {
@@ -8596,16 +8596,19 @@ genLeftShift (const iCode * ic)
   if (!shift_by_lit)
     cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
 
-  save_a = !(AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) != AOP_REG || !IS_GB &&
-    (AOP_TYPE (left) == AOP_STK && canAssignToPtr3 (right->aop) || AOP_TYPE (right) == AOP_STK && canAssignToPtr3 (left->aop)));
-  if (save_a)
-    _push (PAIR_AF);
+  save_a = (countreg == A_IDX && !shift_by_lit) &&
+    !(AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) != AOP_REG ||
+    !IS_GB && (AOP_TYPE (left) == AOP_STK && canAssignToPtr3 (result->aop) || AOP_TYPE (result) == AOP_STK && canAssignToPtr3 (left->aop)));
 
   /* now move the left to the result if they are not the
      same */
   if (!sameRegs (AOP (left), AOP (result)))
     {
       int soffset, doffset;
+
+      if (save_a)
+        _push (PAIR_AF);
+
       if (shift_by_lit)
       {
         byteshift = shiftcount / 8;
@@ -8645,6 +8648,9 @@ genLeftShift (const iCode * ic)
       size = byteshift;
       while (size--)
         cheapMove (AOP (result), doffset++, ASMOP_ZERO, 0);
+
+      if (save_a)
+        _pop (PAIR_AF);
     }
 
   if (!regalloc_dry_run)
@@ -8654,9 +8660,6 @@ genLeftShift (const iCode * ic)
     }
   size = AOP_SIZE (result);
   offset = 0;
-
-  if (save_a)
-    _pop (PAIR_AF);
 
   if (shift_by_lit && !shiftcount)
     goto end;
@@ -8970,10 +8973,9 @@ genRightShift (const iCode * ic)
   if (!shift_by_lit)
     cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
 
-  save_a = !(AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) != AOP_REG || !IS_GB &&
-    (AOP_TYPE (left) == AOP_STK && canAssignToPtr3 (right->aop) || AOP_TYPE (right) == AOP_STK && canAssignToPtr3 (left->aop)));
-  if (save_a)
-    _push (PAIR_AF);
+  save_a = (countreg == A_IDX && !shift_by_lit) &&
+    !(AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) != AOP_REG ||
+    !IS_GB && (AOP_TYPE (left) == AOP_STK && canAssignToPtr3 (result->aop) || AOP_TYPE (result) == AOP_STK && canAssignToPtr3 (left->aop)));
 
   /* now move the left to the result if they are not the
      same */
@@ -8990,6 +8992,9 @@ genRightShift (const iCode * ic)
         soffset = byteoffset;
         size -= byteoffset;
       }
+
+      if (save_a)
+        _push (PAIR_AF);
 
       if (AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) == AOP_REG)
         {
@@ -9016,6 +9021,9 @@ genRightShift (const iCode * ic)
       doffset = AOP_SIZE (result) - byteoffset;
       while (size--)
         cheapMove (AOP (result), doffset++, ASMOP_ZERO, 0);
+
+      if (save_a)
+        _pop (PAIR_AF);
     }
 
   shift_by_one = (shift_by_lit && shiftcount == 1);
@@ -9028,9 +9036,6 @@ genRightShift (const iCode * ic)
     }
   size = AOP_SIZE (result);
   offset = size - 1;
-
-  if (save_a)
-    _pop (PAIR_AF);
 
   if (shift_by_zero)
     goto end;

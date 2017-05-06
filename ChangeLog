@@ -1,3 +1,20 @@
+2017-05-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* doc/sdccman.lyx: fixed typo
+	* sim/ucsim/gui.src/Makefile.in: use $(AR)
+	* src/mcs51/gen.c: cosmetic
+	* src/SDCC.lex,
+	* src/stm8/main.c,
+	* src/z80/main.c: make __smallc a target specific keyword 
+	* src/SDCCicode.c (geniCodeAdd): take generic pointers into account
+	* src/z80/ralloc2.cc (assign_operands_for_cost): fix warning, remove TABs
+	* support/regression/fwk/lib/extern1.c,
+	* support/regression/tests/inline.c: added bug2591 test
+	* support/regression/tests/bug-2601.c: test with several pointer sizes
+	* support/regression/tests/bug-2590.c,
+	* support/regression/tests/smallc.c,
+	* support/regression/tests/z88dk.c: test __smallc only on stm8 & z80-like
+
 2017-05-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2188.c,
@@ -11,7 +28,8 @@
 2017-05-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c:
-	  Be more forgiving about omitted whitespace after comma in peephole matching (whitespace handling had become stricter in the fix to #2600).
+	  Be more forgiving about omitted whitespace after comma in peephole matching
+	  (whitespace handling had become stricter in the fix to #2600).
 	* src/z80/peep.c:
 	  Slightly more accurate analysis of register reads, also wrt. whitespaces.
 	* src/z80/gen.c:

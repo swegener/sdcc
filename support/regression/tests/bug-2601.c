@@ -1,11 +1,12 @@
 /*
    bug-2601.c
+   mem: __idata, __xdata,
 */
 
 #include <testfwk.h>
 
-unsigned char *p;
-unsigned char *a;
+unsigned char {mem} *p;
+unsigned char {mem} *a;
 signed char b;
 
 void f(void)
@@ -18,10 +19,10 @@ void g(void)
     p = b + a;
 }
 
+unsigned char {mem} c[2] = {23, 42};
+
 void testBug(void)
 {
-	unsigned char c[2] = {23, 42};
-
 	a = c + 1;
 	b = -1;
 
@@ -33,4 +34,3 @@ void testBug(void)
 	g();
 	ASSERT(*p == 23);
 }
-

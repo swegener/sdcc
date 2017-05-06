@@ -8,6 +8,18 @@
 #endif
 
 /*--------------
+    bug 2591
+    inline definition with parameters not in registers
+	these parameters should not be allocated here
+    the corresponding external definition is in fwk/lib/extern1.c
+*/
+inline long bug2591 (long a, long b, long c)
+{
+  return a | b | c;
+}
+
+
+/*--------------
     bug 2450
 */
 

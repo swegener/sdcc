@@ -167,7 +167,7 @@ static void checkCurrFile (const char *s);
 "inline"                { count (); TKEYWORD99 (INLINE); }
 "_Noreturn"             { count (); return NORETURN;}
 "restrict"              { count (); TKEYWORD99 (RESTRICT); }
-"__smallc"              { count (); return SMALLC; }
+"__smallc"              { count (); TKEYWORD (SMALLC); }
 "__preserves_regs"      { count (); return PRESERVES_REGS; }
 "__z88dk_fastcall"      { count (); TKEYWORD (Z88DK_FASTCALL); }
 "__z88dk_callee"        { count (); TKEYWORD (Z88DK_CALLEE); }

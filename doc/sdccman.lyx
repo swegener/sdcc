@@ -167,7 +167,7 @@ SDCC Compiler User Guide
 \begin_layout Date
 
 \size normal
-SDC 
+SDCC 
 \begin_inset CommandInset include
 LatexCommand input
 filename "../.version"

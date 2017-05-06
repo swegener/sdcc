@@ -2344,6 +2344,7 @@ geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl)
   /* if left is a pointer then size */
   if (IS_PTR (ltype) || IS_ARRAY (ltype))
     {
+	  unsigned int ptrSize;
       isarray = left->isaddr;
       nBytes = getSize (ltype->next);
 
@@ -2352,7 +2353,7 @@ geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl)
       // there is no need to multiply with 1
       if (nBytes != 1)
         {
-          unsigned int ptrSize = getArraySizePtr (left);
+          ptrSize = getArraySizePtr (left);
           size = operandFromLit (nBytes);
           SPEC_USIGN (getSpec (operandType (size))) = 1;
           indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
@@ -2369,11 +2370,12 @@ geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl)
             SPEC_USIGN (getSpec (operandType (right))) = 1;
         }
 
-      if (getSize (ltype) > getSize (operandType (right)) && !IS_UNSIGNED (getSpec (operandType (right))))
+      ptrSize = getSize(ltype) - ((IS_GENPTR (ltype) && (GPTRSIZE > FPTRSIZE)) ? 1 : 0);
+      if (ptrSize > getSize (rtype) && !IS_UNSIGNED (retype))
         {
           sym_link *type = 0;
 
-          switch(getSize (ltype))
+          switch(ptrSize)
             {
             case 2:
               type = newIntLink();

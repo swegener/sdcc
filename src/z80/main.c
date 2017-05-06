@@ -119,6 +119,7 @@ static char *_keywords[] = {
   "interrupt",
   "z88dk_fastcall",
   "z88dk_callee",
+  "smallc",
   NULL
 };
 
@@ -131,6 +132,7 @@ static char *_keywordsgb[] = {
   "critical",
   "interrupt",
   "z88dk_callee",
+  "smallc",
   NULL
 };
 
@@ -143,6 +145,7 @@ static char *_keywordstlcs90[] = {
   "interrupt",
   "z88dk_fastcall",
   "z88dk_callee",
+  "smallc",
   NULL
 };
 

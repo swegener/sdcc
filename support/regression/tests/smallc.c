@@ -6,7 +6,7 @@
 #include <testfwk.h>
 #include <stdlib.h>
 
-#ifdef PORT_HOST
+#if !(defined __SDCC_z80 || defined __SDCC_z180 || defined __SDCC_gbz80 || defined __SDCC_r2k || defined __SDCC_r3ka || defined __SDCC_tlcs90 || defined __SDCC_stm8)
 #define __smallc
 #endif
 
@@ -33,12 +33,10 @@ unsigned int s2(unsigned int c, unsigned int d) __smallc
 void
 testSmallC(void)
 {
-#ifndef __SDCC_mcs51
   ASSERT (f1 (23) == 24);
   ASSERT (f2 (23) == 24);
 
   ASSERT (s1 (42, 23) == 19);
   ASSERT (s2 (42, 23) == 19);
-#endif
 }
 

@@ -48,7 +48,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
 
   operand_map_t::const_iterator oi, oi_end;
 
-  var_t byteregs[4];	// Todo: Change this when sdcc supports variables larger than 4 bytes in registers.
+  var_t byteregs[4];    // Todo: Change this when sdcc supports variables larger than 4 bytes in registers.
   unsigned short int size;
 
   if(o && IS_SYMOP(o))
@@ -79,7 +79,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
                   (byteregs[1] != byteregs[0] + 1 || (byteregs[0] != REG_C && byteregs[0] != REG_E && byteregs[0] != REG_L)))
                 c += 2.0f;
               if (size == 4 &&
-				  (byteregs[3] != byteregs[2] + 1 || (byteregs[2] != REG_C && byteregs[2] != REG_E && byteregs[0] != REG_L)))
+                  (byteregs[3] != byteregs[2] + 1 || (byteregs[2] != REG_C && byteregs[2] != REG_E && byteregs[0] != REG_L)))
                 c += 2.0f;
 
               // Code generator cannot handle variables only partially in A.
@@ -181,7 +181,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
   if(!right || !IS_SYMOP(right) || !result || !IS_SYMOP(result) || POINTER_GET(ic) || POINTER_SET(ic))
     return(default_instruction_cost(a, i, G, I));
 
-  reg_t byteregs[4] = {-1, -1, -1, -1};	// Todo: Change this when sdcc supports variables larger than 4 bytes.
+  reg_t byteregs[4] = {-1, -1, -1, -1}; // Todo: Change this when sdcc supports variables larger than 4 bytes.
 
   operand_map_t::const_iterator oi, oi_end;
 
@@ -268,7 +268,7 @@ return_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
   if(!left || !IS_SYMOP(left))
     return(default_instruction_cost(a, i, G, I));
 
-  reg_t byteregs[4] = {-1, -1, -1, -1};	// Todo: Change this when sdcc supports variables larger than 4 bytes.
+  reg_t byteregs[4] = {-1, -1, -1, -1}; // Todo: Change this when sdcc supports variables larger than 4 bytes.
   
   operand_map_t::const_iterator oi, oi_end;
 
@@ -322,7 +322,7 @@ call_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
   if(!result || !IS_SYMOP(result))
     return(default_instruction_cost(a, i, G, I));
 
-  reg_t byteregs[4] = {-1, -1, -1, -1};	// Todo: Change this when sdcc supports variables larger than 4 bytes.
+  reg_t byteregs[4] = {-1, -1, -1, -1}; // Todo: Change this when sdcc supports variables larger than 4 bytes.
   
   operand_map_t::const_iterator oi, oi_end;
 
@@ -394,7 +394,7 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
   const operand *result = IC_RESULT(ic);
   const operand *left = IC_LEFT(ic);
   const operand *right = IC_RIGHT(ic);
-	
+
   if(!result || !IS_SYMOP(result))
     return;
     
@@ -523,7 +523,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   const operand *const result = IC_RESULT(ic);
 
   if(ia.registers[REG_A][1] < 0)
-    return(true);	// Register A not in use.
+    return(true);   // Register A not in use.
 
   bool exstk = (should_omit_frame_ptr || (currFunc && currFunc->stack > 127) || IS_GB);
 
@@ -682,7 +682,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   bool unused_H = (ia.registers[REG_H][1] < 0);
 
   if(unused_L && unused_H)
-    return(true);	// Register HL not in use.
+    return(true);   // Register HL not in use.
 
 #if 0
   if (ic->key == 3)
@@ -744,7 +744,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(result_only_HL && ic->op == PCALL)
     return(true);
 
-  if(exstk && (operand_on_stack(result, a, i, G) + operand_on_stack(left, a, i, G) + operand_on_stack(right, a, i, G) >= 2) && (result && IS_SYMOP(result) && getSize(operandType(result)) >= 2 || !result_only_HL))	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
+  if(exstk && (operand_on_stack(result, a, i, G) + operand_on_stack(left, a, i, G) + operand_on_stack(right, a, i, G) >= 2) && (result && IS_SYMOP(result) && getSize(operandType(result)) >= 2 || !result_only_HL)) // Todo: Make this more accurate to get better code when using --fomit-frame-pointer
     return(false);
   if(exstk && (operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)) && (ic->op == '>' || ic->op == '<'))
     return(false);
@@ -841,10 +841,10 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
          ic->op == '<' ||
          ic->op == EQ_OP ||*/
          (ic->op == '+' && getSize(operandType(IC_RESULT(ic))) == 1) ||
-         (ic->op == '+' && getSize(operandType(IC_RESULT(ic))) <= 2 && (result_only_HL || !IS_GB)) ))))	// 16 bit addition on gbz80 might need to use add hl, rr.
+         (ic->op == '+' && getSize(operandType(IC_RESULT(ic))) <= 2 && (result_only_HL || !IS_GB)) )))) // 16 bit addition on gbz80 might need to use add hl, rr.
     return(true);
 
-  if((ic->op == '<' || ic->op == '>') && (IS_ITEMP(left) || IS_OP_LITERAL(left) || IS_ITEMP(right) || IS_OP_LITERAL(right)))	// Todo: Fix for large stack.
+  if((ic->op == '<' || ic->op == '>') && (IS_ITEMP(left) || IS_OP_LITERAL(left) || IS_ITEMP(right) || IS_OP_LITERAL(right))) // Todo: Fix for large stack.
     return(true);
     
   if(ic->op == EQ_OP && IS_VALOP(right))
@@ -863,10 +863,10 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     operand_in_reg(right, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(right, REG_IYH, ia, i, G))) // Uses ld r, 0 (iy)
     return(true);
 
-  if((ic->op == '=') && POINTER_SET(ic) && operand_in_reg(result, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(result, REG_IYH, ia, i, G))	// Uses ld 0 (iy), l etc
+  if((ic->op == '=') && POINTER_SET(ic) && operand_in_reg(result, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(result, REG_IYH, ia, i, G)) // Uses ld 0 (iy), l etc
     return(true);
 
-  if((ic->op == '=' || ic->op == CAST) && POINTER_SET(ic) && !result_only_HL)	// loads result pointer into (hl) first.
+  if((ic->op == '=' || ic->op == CAST) && POINTER_SET(ic) && !result_only_HL) // loads result pointer into (hl) first.
     return(false);
 
   if((ic->op == '=' || ic->op == CAST) && !POINTER_GET(ic) && !input_in_HL)
@@ -896,7 +896,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   const i_assignment_t &ia = a.i_assignment;
 
   /*if(ic->key == 40)
-		std::cout << "1IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";*/
+    std::cout << "1IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";*/
 
   bool exstk = (should_omit_frame_ptr || (currFunc && currFunc->stack > 127));
 
@@ -937,9 +937,9 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   //bool result_only_IY = (result_in_IYL || unused_IYL || dying_IYL) && (result_in_IYH || unused_IYH || dying_IYH);
 
   if(unused_IYL && unused_IYH)
-    return(true);	// Register IY not in use.
+    return(true); // Register IY not in use.
 
-  if(exstk && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))	// Todo: Make this more accurate to get better code when using --fomit-frame-pointer
+  if(exstk && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G))) // Todo: Make this more accurate to get better code when using --fomit-frame-pointer
     return(false);
 
   // Code generator cannot handle variables that are only partially in IY.
@@ -1006,10 +1006,10 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   if(!result_in_IY && !input_in_IY &&
     (ic->op == '=' || ic->op == CAST && getSize(operandType(IC_RIGHT (ic))) >= 2 && (getSize(operandType(IC_RESULT (ic))) <= getSize(operandType(IC_RIGHT (ic))) || !IS_SPEC(operandType(IC_RIGHT (ic))) || SPEC_USIGN(operandType(IC_RIGHT(ic))))) &&
-    operand_is_pair(IC_RESULT(ic), a, i, G))	// DirSpace access won't use iy here.
+    operand_is_pair(IC_RESULT(ic), a, i, G)) // DirSpace access won't use iy here.
     return(true);
 
-  if(ic->op == IPUSH)	// todo: More instructions that can use IY.
+  if(ic->op == IPUSH) // todo: More instructions that can use IY.
     return(true);
 
   if(ic->op == GET_VALUE_AT_ADDRESS && isOperandInDirSpace(IC_RESULT(ic)))
@@ -1044,7 +1044,7 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   bool unused_D = (ia.registers[REG_D][1] < 0);
 
   if(unused_E && unused_D)
-    return(true);	// Register DE not in use.
+    return(true); // Register DE not in use.
 
   const iCode *ic = G[i].ic;
   const operand *left = IC_LEFT(ic);
@@ -1169,7 +1169,7 @@ static void assign_operands_for_cost(const assignment &a, unsigned short int i, 
     }
     
   if(ic->op == SEND && ic->builtinSEND)
-    assign_operands_for_cost(a, *(adjacent_vertices(i, G).first), G, I);
+    assign_operands_for_cost(a, (unsigned short)*(adjacent_vertices(i, G).first), G, I);
 }
 
 // Cost function.
@@ -1294,7 +1294,7 @@ bool local_assignment_insane(const assignment &a, const I_t &I, var_t lastvar)
             return(true);
         }
     }
-	
+
   return(false);
 }
 
@@ -1356,7 +1356,7 @@ static void get_best_local_assignment_biased(assignment &a, typename boost::grap
 too_risky:
       ;
     }
-	
+
   a = *ai_best;
   
   std::set<var_t>::const_iterator vi, vi_end;
@@ -1489,9 +1489,9 @@ static bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Winner: ";
   for(unsigned int i = 0; i < boost::num_vertices(I); i++)
-  {
-  	std::cout << "(" << i << ", " << int(winner.global[i]) << ") ";
-  }
+    {
+      std::cout << "(" << i << ", " << int(winner.global[i]) << ") ";
+    }
   std::cout << "\n";
   std::cout << "Cost: " << winner.s << "\n";
   std::cout.flush();
@@ -1543,7 +1543,7 @@ static bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
     }
 
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
-    set_surviving_regs(winner, i, G, I);	// Never freed. Memory leak?
+    set_surviving_regs(winner, i, G, I); // Never freed. Memory leak?
 
   return(!assignment_optimal);
 }

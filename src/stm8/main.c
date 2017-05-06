@@ -134,6 +134,7 @@ static char *stm8_keywords[] = {
   "interrupt",
   "trap",
   "naked",
+  "smallc",
   NULL
 };
 

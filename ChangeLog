@@ -1,3 +1,8 @@
+2017-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/fwk/lib/extern1.c: renamed bug2591 to bug_2591
+	* support/regression/tests/inline.c: skip bug_2591 for old buggy GCC
+
 2017-05-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:

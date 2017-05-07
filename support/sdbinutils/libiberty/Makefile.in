@@ -113,7 +113,8 @@ installcheck: installcheck-subdir
 
 INCDIR=$(srcdir)/$(MULTISRCTOP)../include
 
-COMPILE.c = $(CC) -c @DEFS@ $(CFLAGS) $(CPPFLAGS) -I. -I$(INCDIR) $(HDEFINES) @ac_libiberty_warn_cflags@
+COMPILE.c = $(CC) -c @DEFS@ $(CFLAGS) $(CPPFLAGS) -I. -I$(INCDIR) \
+               $(HDEFINES) @ac_libiberty_warn_cflags@
 
 # Just to make sure we don't use a built-in rule with VPATH
 .c.$(objext):
@@ -458,7 +459,6 @@ distclean: distclean-subdir
 	@$(MULTICLEAN) multi-clean DO=distclean
 	-rm -f *~ Makefile config.cache config.status xhost-mkfrag TAGS multilib.out
 	-rm -f config.log
-	-rmdir testsuite 2>/dev/null
 maintainer-clean realclean: maintainer-clean-subdir
 	$(MAKE) SUBDIRS="" distclean
 

@@ -10,7 +10,7 @@
 	these parameters should only be allocated here
     the corresponding inline definition is in tests/inline.c
 */
-extern long bug2591 (long a, long b, long c)
+extern long bug_2591 (long a, long b, long c)
 {
   return a | b | c;
 }

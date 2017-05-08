@@ -170,10 +170,10 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	ld	hl,#%1
-	ld	a,(hl)
+	ld	hl, #%1
+	ld	a, (hl)
 } by {
-	ld	a,(#%1)
+	ld	a, (#%1)
 	; peephole 17 loaded a from (#%1) directly instead of using hl.
 } if notUsed('hl')
 
@@ -399,6 +399,17 @@ replace restart {
 	ld	d,a
 	push	de
 } if notUsed('d'), notUsed('a')
+
+replace restart {
+	push	de
+	inc	sp
+	push	af
+	inc	sp
+} by {
+	; peephole 35a pushed de instead of pushing twice.
+	ld	e, a
+	push	de
+} if notUsed('e'), notUsed('a')
 
 replace restart {
 	push	af
@@ -867,9 +878,17 @@ replace restart {
 	ld	a,%1 (%2)
 	bit	%3,a
 } by {
-	; peephole 52 tested bit of %1 (%2) directly instead of going through a.
+	; peephole 52 tested bit %3 of %1 (%2) directly instead of going through a.
 	bit	%3,%1 (%2)
 } if notUsed('a')
+
+replace restart {
+	ld	%1, (hl)
+	bit	%2, %1
+} by {
+	; peephole 52a tested bit %2 of (hl) directly instead of going through %1.
+	bit	%2, (hl)
+} if notUsed(%1)
 
 replace restart {
 	ld	a,%1

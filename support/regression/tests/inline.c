@@ -186,6 +186,17 @@ inline char inlined_function (void)
 /*  function pointer defined in fwk/lib/extern2.c initialized to the
     externally defined inlined_function */
 extern char (*inlined_function_pointer) (void);
+
+/*--------------
+    bug 2591
+    inline definition with parameters not in registers
+	these parameters should not be allocated here
+    the corresponding external definition is in fwk/lib/extern1.c
+*/
+inline long bug_2591 (long a, long b, long c)
+{
+  return a | b | c;
+}
 #endif
 
 /*--------------
@@ -237,17 +248,6 @@ bug_2295 (void)
   ASSERT (x == 1);
   ASSERT (y == 1);
   ASSERT (z == 1);
-}
-
-/*--------------
-    bug 2591
-    inline definition with parameters not in registers
-	these parameters should not be allocated here
-    the corresponding external definition is in fwk/lib/extern1.c
-*/
-inline long bug_2591 (long a, long b, long c)
-{
-  return a | b | c;
 }
 
 /*--------------*/

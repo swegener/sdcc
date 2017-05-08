@@ -1,3 +1,7 @@
+2017-05-08 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/inline.c: oops, wrong place to skip bug_2591
+
 2017-05-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def,

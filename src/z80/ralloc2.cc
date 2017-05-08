@@ -806,6 +806,8 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
   if(ic->op == IPUSH && input_in_H && (getSize(operandType(IC_LEFT(ic))) <= 2 || ia.registers[REG_L][1] > 0 && I[ia.registers[REG_L][1]].byte == 2 && ia.registers[REG_H][1] > 0 && I[ia.registers[REG_H][1]].byte == 3))
     return(true);
+  if(ic->op == IPUSH && getSize(operandType(left)) == 1 && IS_OP_LITERAL(left) && ia.registers[REG_A][1] < 0) // Can be pushed in A.
+    return(true);
   if(ic->op == IPUSH && ic->next && ic->next->op == CALL)
     return(true);
   if(ic->op == IPUSH && getSize(operandType(left)) == 2 &&

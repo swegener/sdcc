@@ -4874,7 +4874,7 @@ genPlusIncr (const iCode * ic)
               if (freep != PAIR_INVALID)
                 {
                   fetchPair (freep, AOP (IC_RIGHT (ic)));
-                  emit2 ("add hl,%s", _pairs[freep].name);
+                  emit2 ("add hl, %s", _pairs[freep].name);
                   regalloc_dry_run_cost += 1;
                   return TRUE;
                 }
@@ -4882,7 +4882,7 @@ genPlusIncr (const iCode * ic)
           else
             {
               fetchPair (resultId, AOP (IC_RIGHT (ic)));
-              emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
+              emit2 ("add hl, %s", getPairName (AOP (IC_LEFT (ic))));
               regalloc_dry_run_cost += 1;
               return TRUE;
             }
@@ -4942,7 +4942,7 @@ genPlusIncr (const iCode * ic)
           if (size)
             {
               if (!regalloc_dry_run)
-                emit2 ("jp NZ,!tlabel", labelKey2num (tlbl->key));
+                emit2 ("jp NZ, !tlabel", labelKey2num (tlbl->key));
               regalloc_dry_run_cost += 3;
             }
         }
@@ -4997,8 +4997,8 @@ outBitAcc (operand * result)
     {
       if (!regalloc_dry_run)
         {
-          emit2 ("jp Z,!tlabel", labelKey2num (tlbl->key));
-          emit2 ("ld a,!one");
+          emit2 ("jp Z, !tlabel", labelKey2num (tlbl->key));
+          emit2 ("ld a, !one");
           emitLabel (tlbl);
         }
       regalloc_dry_run_cost += 5;
@@ -5161,7 +5161,7 @@ genPlus (iCode * ic)
           dbuf_init (&dbuf, 128);
           dbuf_printf (&dbuf, "#(%s + %s)", left, right);
           Safe_free (left);
-          emit2 ("ld %s,%s", getPairName (AOP (IC_RESULT (ic))), dbuf_c_str (&dbuf));
+          emit2 ("ld %s, %s", getPairName (AOP (IC_RESULT (ic))), dbuf_c_str (&dbuf));
           dbuf_destroy (&dbuf);
           regalloc_dry_run_cost += (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY ? 4 : 3);
           goto release;
@@ -5179,27 +5179,27 @@ genPlus (iCode * ic)
 
       if (left == PAIR_HL && right != PAIR_INVALID)
         {
-          emit2 ("add hl,%s", _pairs[right].name);
+          emit2 ("add hl, %s", _pairs[right].name);
           regalloc_dry_run_cost += 1;
           goto release;
         }
       else if (right == PAIR_HL && left != PAIR_INVALID)
         {
-          emit2 ("add hl,%s", _pairs[left].name);
+          emit2 ("add hl, %s", _pairs[left].name);
           regalloc_dry_run_cost += 1;
           goto release;
         }
       else if (right != PAIR_INVALID && right != PAIR_HL)
         {
           fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
-          emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
+          emit2 ("add hl, %s", getPairName (AOP (IC_RIGHT (ic))));
           regalloc_dry_run_cost += 1;
           goto release;
         }
       else if (left != PAIR_INVALID && left != PAIR_HL)
         {
           fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
-          emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
+          emit2 ("add hl, %s", getPairName (AOP (IC_LEFT (ic))));
           regalloc_dry_run_cost += 1;
           goto release;
         }
@@ -5207,7 +5207,7 @@ genPlus (iCode * ic)
         {
           PAIR_ID pair = (isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC);
           fetchPair (pair, AOP (IC_RIGHT (ic)));
-          emit2 ("add hl,%s", _pairs[pair].name);
+          emit2 ("add hl, %s", _pairs[pair].name);
           regalloc_dry_run_cost += 1;
           goto release;
         }
@@ -5215,7 +5215,7 @@ genPlus (iCode * ic)
         {
           PAIR_ID pair = (isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC);
           fetchPair (pair, AOP (IC_LEFT (ic)));
-          emit2 ("add hl,%s", _pairs[pair].name);
+          emit2 ("add hl, %s", _pairs[pair].name);
           regalloc_dry_run_cost += 1;
           goto release;
         }

@@ -2846,8 +2846,7 @@ joinPushes (iCode * lic)
       val = constVal (dbuf_c_str (&dbuf));
       dbuf_destroy (&dbuf);
       SPEC_NOUN (val->type) = V_INT;
-      IC_LEFT (ic) = operandFromOperand (IC_LEFT (ic));
-      OP_VALUE (IC_LEFT (ic)) = val;
+      IC_LEFT (ic) = operandFromValue (val);
 
       /* Now remove the second one from the list. */
       ic->next = uic->next;
@@ -3106,7 +3105,7 @@ z80_oldralloc (ebbIndex * ebbi)
 /* New register allocator                                          */
 /*-----------------------------------------------------------------*/
 void
-z80_ralloc (ebbIndex * ebbi)
+z80_ralloc (ebbIndex *ebbi)
 {
   eBBlock **ebbs = ebbi->bbOrder;
   int count = ebbi->count;
@@ -3152,6 +3151,8 @@ z80_ralloc (ebbIndex * ebbi)
   /* Mark variables for assignment by the new allocator */
   serialRegMark (ebbs, count);
 
+  joinPushes (iCodeLabelOptimize(iCodeFromeBBlock (ebbs, count)));
+
   /* The new register allocator invokes its magic */
   ic = z80_ralloc2_cc (ebbi);
 
@@ -3177,8 +3178,6 @@ z80_ralloc (ebbIndex * ebbi)
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);
     }
-
-  ic = joinPushes (ic);
 
   /* redo that offsets for stacked automatic variables */
   redoStackOffsets ();

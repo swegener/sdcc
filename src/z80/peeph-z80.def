@@ -103,6 +103,19 @@ replace restart {
 // Rule OK unless both %5 and %4 are volatile, but we can't express that directly.
 
 replace restart {
+	ld	%3 (ix), %1
+	ld	%4 (ix), %2
+	ld	%5, %3 (ix)
+	ld	%6, %4 (ix)
+} by {
+	ld	%3 (ix), %1
+	ld	%4 (ix), %2
+	; peephole 10a loaded %5%6 from %1%2 directly instead of going through %3 (ix) %4 (ix).
+	ld	%5, %1
+	ld	%6, %2
+} if canAssign(%5 %1), canAssign(%6 %2), notSame(%5 %2)
+
+replace restart {
 	ld	%1, %2 (%3)
 	ld	%4, %1
 } by {
@@ -414,15 +427,75 @@ replace restart {
 } if notUsed('bc')
 
 replace restart {
+	push	hl
+	inc	sp
+	push	de
+	inc	sp
+} by {
+	ld	l, d
+	; peephole 37a combined pushing of b and d.
+	push	hl
+} if notUsed('l')
+
+replace restart {
 	push	bc
 	inc	sp
 	push	de
 	inc	sp
 } by {
 	ld	c, d
-	; peephole 37a combined pushing of b and d.
+	; peephole 37b combined pushing of b and d.
 	push	bc
 } if notUsed('c')
+
+replace restart {
+	push	de
+	inc	sp
+	push	bc
+	inc	sp
+} by {
+	ld	e, b
+	; peephole 37c combined pushing of d and b.
+	push	de
+} if notUsed('e')
+
+replace restart {
+	push	af
+	inc	sp
+	ld	a, c
+	push	af
+	inc	sp
+} by {
+	ld	b, a
+	; peephole 37d combined pushing of a and c.
+	push	bc
+} if notUsed('b'), notUsed('a')
+
+replace restart {
+	push	de
+	inc	sp
+	ld	a, c
+	push	af
+	inc	sp
+} by {
+	ld	e, c
+	; peephole 37e combined pushing of d and c.
+	push	de
+} if notUsed('e'), notUsed('a')
+
+replace restart {
+	ld	a, e
+	push	af
+	inc	sp
+	ld	a, %2 (ix)
+	push	af
+	inc	sp
+} by {
+	ld	d, e
+	ld	e, %2 (ix)
+	; peephole 37f combined pushing of e and %2 (ix).
+	push	de
+} if notUsed('d'), notUsed('e'), notUsed('a')
 
 replace restart {
 	push	bc
@@ -465,16 +538,16 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	ld	a,%1 (%3)
+	ld	a, %1 (%3)
 	push	af
 	inc	sp
-	ld	a,%2 (%3)
+	ld	a, %2 (%3)
 	push	af
 	inc	sp
 } by {
-	; peephole 42 pushed %1 (%3), %2(%3) through hl instead of af.
-	ld	h,%1 (%3)
-	ld	l,%2 (%3)
+	; peephole 42 pushed %1 (%3), %2 (%3) through hl instead of af.
+	ld	h, %1 (%3)
+	ld	l, %2 (%3)
 	push	hl
 } if notUsed('a'), notUsed('hl')
 
@@ -509,12 +582,21 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
+	pop	%1
+	ld	%2 (ix), %3
+	push	%1
+} by {
+	; peephole 44a eleminated dead pop/push pair.
+	ld	%2 (ix), %3
+} if notUsed(%1), operandsNotRelated(%1 %3)
+
+replace restart {
 	push	hl
 	pop	bc
 } by {
 	ld	c, l
 	ld	b, h
-	; peephole 44a replaced push/pop pair by loads.
+	; peephole 44b replaced push/pop pair by loads.
 } if notUsed('hl')
 
 replace restart {
@@ -523,7 +605,7 @@ replace restart {
 } by {
 	ld	e, l
 	ld	d, h
-	; peephole 44b replaced push/pop pair by loads.
+	; peephole 44c replaced push/pop pair by loads.
 } if notUsed('hl')
 
 replace restart {
@@ -1867,6 +1949,20 @@ replace restart {
 	inc	sp
 	ld	hl,#%1
 	; peephole 135 used ex to move #%1 onto the stack.
+	ex	(sp),hl
+} if notUsed('a'), notUsed('hl')
+
+replace restart {
+	pop	af
+	inc	sp
+	ld	h, %1 (ix)
+	ld	l, %2 (ix)
+	push	hl
+} by {
+	inc	sp
+	ld	h, %1 (ix)
+	ld	l, %2 (ix)
+	; peephole 135a used ex to move %1 (ix) %2 (ix) onto the stack.
 	ex	(sp),hl
 } if notUsed('a'), notUsed('hl')
 

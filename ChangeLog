@@ -1,3 +1,10 @@
+2017-05-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def,
+	  src/z80/ralloc.c,
+	  src/z80/ralloc2.cc:
+	  Improve handling of 8-bit parameters.
+
 2017-05-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/fwk/lib/extern1.c: renamed bug2591 to bug_2591

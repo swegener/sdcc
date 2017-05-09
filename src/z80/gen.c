@@ -6947,11 +6947,12 @@ genCmpLt (iCode * ic, iCode * ifx)
 /* returns pair that still needs to be popped                      */
 /*-----------------------------------------------------------------*/
 static PAIR_ID
-gencjneshort (operand * left, operand * right, symbol * lbl, const iCode *ic)
+gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
 {
   int size = max (AOP_SIZE (left), AOP_SIZE (right));
   int offset = 0;
-  unsigned long long lit = 0ull;
+  bool a_result = FALSE;
+  bool next_zero;
 
   /* Swap the left and right if it makes the computation easier */
   if (AOP_TYPE (left) == AOP_LIT)
@@ -6964,64 +6965,69 @@ gencjneshort (operand * left, operand * right, symbol * lbl, const iCode *ic)
   /* if the right side is a literal then anything goes */
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = ullFromVal (AOP (right)->aopu.aop_lit);
-      if (lit == 0ull)
+      while (size--)
         {
-          cheapMove (ASMOP_A, 0, AOP (left), offset);
-          if (size > 1)
+          next_zero = size && !byteOfVal (AOP (right)->aopu.aop_lit, offset + 1);
+
+          // Test for 0 can be done more efficiently using or
+          if (!byteOfVal (AOP (right)->aopu.aop_lit, offset))
             {
-              while (--size)
-                emit3_o (A_OR, ASMOP_A, 0, AOP (left), ++offset);
+              if (!a_result)
+                {
+                  cheapMove (ASMOP_A, 0, AOP (left), offset);
+                  emit3 (A_OR, ASMOP_A, ASMOP_A);
+                }
+              else
+                emit3_o (A_OR, ASMOP_A, 0, AOP (left), offset);
+
+              a_result = TRUE;
+            }
+          else if ((AOP_TYPE (left) == AOP_ACC && !bitVectBitValue (ic->rSurv, A_IDX) ||
+            AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[offset]->rIdx != IYH_IDX && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[offset]->rIdx)) &&
+            byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0x01 && !next_zero)
+            {
+              if(!regalloc_dry_run)
+                emit2 ("dec %s", aopGet (AOP (left), offset, FALSE));
+              regalloc_dry_run_cost++;
+              a_result = (AOP_TYPE (left) == AOP_ACC);
+            }
+          else if ((AOP_TYPE (left) == AOP_ACC && !bitVectBitValue (ic->rSurv, A_IDX) ||
+            AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[offset]->rIdx != IYH_IDX && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[offset]->rIdx)) &&
+            byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0xff && !next_zero)
+            {
+              if(!regalloc_dry_run)
+                emit2 ("inc %s", aopGet (AOP (left), offset, FALSE));
+              regalloc_dry_run_cost++;
+              a_result = (AOP_TYPE (left) == AOP_ACC);
             }
           else
-            emit3 (A_OR, ASMOP_A, ASMOP_A);
-          if (!regalloc_dry_run)
-            emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
-          regalloc_dry_run_cost += 3;
-        }
-      else
-        {
-          while (size--)
             {
-              if ((AOP_TYPE (left) == AOP_ACC && !bitVectBitValue (ic->rSurv, A_IDX) ||
-                AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[offset]->rIdx != IYH_IDX && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[offset]->rIdx)) &&
-                byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0x01)
+              cheapMove (ASMOP_A, 0, AOP (left), offset);
+
+              if (byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0x01)
                 {
-                  if(!regalloc_dry_run)
-                    emit2 ("dec %s", aopGet (AOP (left), offset, FALSE));
+                  emit2 ("dec a");
                   regalloc_dry_run_cost++;
                 }
-              else if ((AOP_TYPE (left) == AOP_ACC && !bitVectBitValue (ic->rSurv, A_IDX) ||
-                AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[offset]->rIdx != IYH_IDX && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[offset]->rIdx)) &&
-                byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0xff)
+              else if (byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0xff)
                 {
-                  if(!regalloc_dry_run)
-                    emit2 ("inc %s", aopGet (AOP (left), offset, FALSE));
+                  emit2 ("inc a");
                   regalloc_dry_run_cost++;
                 }
               else
-                {
-                  cheapMove (ASMOP_A, 0, AOP (left), offset);
-                  if (byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0x00)
-                    emit3 (A_OR, ASMOP_A, ASMOP_A);
-                  else if (byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0x01)
-                    {
-                      emit2 ("dec a");
-                      regalloc_dry_run_cost++;
-                    }
-                  else if (byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0xff)
-                    {
-                      emit2 ("inc a");
-                      regalloc_dry_run_cost++;
-                    }
-                  else
-                    emit3_o (A_SUB, ASMOP_A, 0, AOP (right), offset);
-                }
+                emit3_o (A_SUB, ASMOP_A, 0, AOP (right), offset);
+
+              a_result = TRUE;
+            }
+
+          // Only emit jump now if there is not following test for 0 (which would just or to a current result in a)
+          if (!(next_zero && a_result))
+            {
               if (!regalloc_dry_run)
                 emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
               regalloc_dry_run_cost += 3;
-              offset++;
             }
+          offset++;
         }
     }
   /* if the right side is in a register or
@@ -10665,18 +10671,33 @@ release:
 /* genJumpTab - generate code for jump table                       */
 /*-----------------------------------------------------------------*/
 static void
-genJumpTab (const iCode * ic)
+genJumpTab (const iCode *ic)
 {
   symbol *jtab = NULL;
+  operand *jtcond = IC_JTCOND (ic);
+  bool pushed_pair = FALSE;
+  PAIR_ID pair;
 
-  aopOp (IC_JTCOND (ic), ic, FALSE, FALSE);
-  /* get the condition into accumulator */
-  if (!IS_GB && !isPairDead (PAIR_DE, ic))
-    _push (PAIR_DE);
-  cheapMove (ASMOP_E, 0, AOP (IC_JTCOND (ic)), 0);
+  aopOp (jtcond, ic, FALSE, FALSE);
+
+  // Choose extra pair DE or BC for addition
+  if (AOP_TYPE (jtcond) == AOP_REG && AOP (jtcond)->aopu.aop_reg[0]->rIdx == E_IDX && isPairDead (PAIR_DE, ic))
+    pair = PAIR_DE;
+  else if (AOP_TYPE (jtcond) == AOP_REG && AOP (jtcond)->aopu.aop_reg[0]->rIdx == C_IDX && isPairDead (PAIR_BC, ic))
+    pair = PAIR_BC;
+  else if ((pair = getDeadPairId (ic)) == PAIR_INVALID)
+    pair = PAIR_DE;
+
+  if (!isPairDead (pair, ic))
+    {
+      _push (pair);
+      pushed_pair = TRUE;
+    }
+
+  cheapMove (pair == PAIR_DE ? ASMOP_E : ASMOP_C, 0, AOP (jtcond), 0);
   if (!regalloc_dry_run)
     {
-      emit2 ("ld d, !zero");
+      emit2 ("ld %s, !zero", _pairs[pair].h);
       jtab = newiTempLabel (NULL);
     }
   regalloc_dry_run_cost += 2;
@@ -10684,14 +10705,16 @@ genJumpTab (const iCode * ic)
   if (!regalloc_dry_run)
     {
       emit2 ("ld hl, !immed!tlabel", labelKey2num (jtab->key));
-      emit2 ("add hl, de");
-      emit2 ("add hl, de");
-      emit2 ("add hl, de");
+      emit2 ("add hl, %s", _pairs[pair].name);
+      emit2 ("add hl, %s", _pairs[pair].name);
+      emit2 ("add hl, %s", _pairs[pair].name);
     }
   regalloc_dry_run_cost += 5;
   freeAsmop (IC_JTCOND (ic), NULL);
-  if (!IS_GB && !isPairDead (PAIR_DE, ic))
-    _pop (PAIR_DE);
+
+  if (pushed_pair)
+    _pop (pair);
+
   if (!regalloc_dry_run)
     {
       emit2 ("jp !*hl");

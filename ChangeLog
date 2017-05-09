@@ -1,3 +1,9 @@
+2017-05-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/main.c,
+	  src/z80/gen.c:
+	  Better code for switch statements.
+
 2017-05-08 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/inline.c: oops, wrong place to skip bug_2591

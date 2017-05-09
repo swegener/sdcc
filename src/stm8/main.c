@@ -434,7 +434,7 @@ PORT stm8_port =
   },
   {
     32767,                      /* maxCount */
-     2,                         /* sizeofElement */
+    2,                          /* sizeofElement */
     {4, 5, 5},                  /* sizeofMatchJump[] - assuming operand in reg, inverse can be optimized away - would be much higher otherwise */
     {4, 5, 5},                  /* sizeofRangeCompare[] - same as above */
     3,                          /* sizeofSubtract - assuming 2 byte index, would be 2 otherwise */

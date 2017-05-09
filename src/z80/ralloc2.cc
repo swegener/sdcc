@@ -576,6 +576,12 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       return(true);
     }
 
+  // can use non-destructive cp on == and < (> might swap operands).
+  if((ic->op == EQ_OP || ic->op == '<') &&
+    getSize(operandType(IC_LEFT(ic))) == 1 && ifxForOp (IC_RESULT(ic), ic) && operand_in_reg(left, REG_A, ia, i, G) &&
+    (IS_OP_LITERAL (right) || operand_in_reg(right, REG_C, ia, i, G) || operand_in_reg(right, REG_B, ia, i, G) || operand_in_reg(right, REG_E, ia, i, G) || operand_in_reg(right, REG_D, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G)))
+    return(true);
+
   const std::set<var_t> &dying = G[i].dying;
 
   if(ic->op == GET_VALUE_AT_ADDRESS)

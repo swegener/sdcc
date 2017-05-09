@@ -6515,6 +6515,15 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           goto fix;
         }
 
+      // Preserve A if necessary
+      if (ifx && size == 1 && AOP_TYPE (left) == AOP_ACC && bitVectBitValue (ic->rSurv, A_IDX) &&
+        (AOP_TYPE (right) == AOP_LIT || AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (right)->aopu.aop_reg[offset]->rIdx != IYH_IDX || AOP_TYPE (right) == AOP_STK))
+        {
+          emit3 (A_CP, ASMOP_A, AOP (right));
+          result_in_carry = TRUE;
+          goto release;
+        }
+
       // On the Gameboy we can't afford to adjust HL as it may trash the carry.
       if (size > 1 && IS_GB && (requiresHL (AOP (right)) && requiresHL (AOP (left))))
         {
@@ -6955,15 +6964,27 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
   bool next_zero;
 
   /* Swap the left and right if it makes the computation easier */
-  if (AOP_TYPE (left) == AOP_LIT)
+  if (AOP_TYPE (left) == AOP_LIT || AOP_TYPE (right) == AOP_ACC)
     {
       operand *t = right;
       right = left;
       left = t;
     }
 
+  /* Non-destructive compare */
+  if (AOP_TYPE (left) == AOP_ACC && bitVectBitValue (ic->rSurv, A_IDX) &&
+    (AOP_TYPE (right) == AOP_LIT || AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (right)->aopu.aop_reg[offset]->rIdx != IYH_IDX || AOP_TYPE (right) == AOP_STK))
+    {
+      if (AOP_TYPE (right) == AOP_LIT && !byteOfVal (AOP (right)->aopu.aop_lit, 0))
+        emit3 (A_OR, ASMOP_A, ASMOP_A);
+      else
+        emit3 (A_CP, ASMOP_A, AOP (right));
+      if (!regalloc_dry_run)
+        emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
+      regalloc_dry_run_cost += 3;
+    }
   /* if the right side is a literal then anything goes */
-  if (AOP_TYPE (right) == AOP_LIT)
+  else if (AOP_TYPE (right) == AOP_LIT)
     {
       while (size--)
         {
@@ -7131,9 +7152,6 @@ genCmpEq (iCode * ic, iCode * ifx)
 
   hl_touched = (AOP_TYPE (IC_LEFT (ic)) == AOP_HL || AOP_TYPE (IC_RIGHT (ic)) == AOP_HL || IS_GB
                 && AOP_TYPE (IC_LEFT (ic)) == AOP_STK || IS_GB && AOP_TYPE (IC_RIGHT (ic)) == AOP_STK);
-
-  emitDebug ("; genCmpEq: left %u, right %u, result %u", AOP_SIZE (IC_LEFT (ic)), AOP_SIZE (IC_RIGHT (ic)),
-             AOP_SIZE (IC_RESULT (ic)));
 
   /* Swap operands if it makes the operation easier. ie if:
      1.  Left is a literal.

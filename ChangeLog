@@ -1,7 +1,7 @@
 2017-05-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdwarf2.c:
-	  Fix encoding DWARF info for _Bool.
+	  Fix encoding DWARF info for _Bool, explicitly specify for char.
 
 2017-05-09 Philipp Klaus Krause <pkk AT spth.de>
 

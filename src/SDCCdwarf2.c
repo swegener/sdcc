@@ -2420,7 +2420,7 @@ dwTagFromType (sym_link * type, dwtag * parent)
                     {
                       dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
                                                         DW_ATE_signed));
-                      dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "char"));
+                      dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "signed char"));
                     }
                   dwAddTagAttr (tp, dwNewAttrConst (DW_AT_byte_size,
                                                     getSize (type)));

@@ -1,3 +1,9 @@
+2017-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/test-p99-conformance.c: renamed p99-conformance.c
+	  decreased flex10 to flex2,
+	  removed SKIP_FLEXIBLE, SKIP_LONG_LONG for mcs51
+
 2017-05-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdwarf2.c:
@@ -32,7 +38,8 @@
 	* src/stm8/gen.c:
 	  Fix bug in register handling in shifts.
 	* src/z80/gen.c:
-	  Optimize computations on shift counts, fix bug in register handling of wide shifts.
+	  Optimize computations on shift counts, fix bug in register handling of
+	  wide shifts.
 
 2017-05-06 Maarten Brock <sourceforge.brock AT dse.nl>
 

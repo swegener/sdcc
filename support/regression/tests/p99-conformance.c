@@ -39,33 +39,29 @@
 #define SKIP_EVALUATED_COMMA_ASSIGN /* Looks like testing for some particular implementation-defined behaviour to me */
 
 #ifdef PORT_HOST /* Common GCC issues */
-#define SKIP_UNIVERSAL_UTF8 /* Only works for GCC when -finput-charset= option is specified */
-#if (defined (__GNUC__) && __GNUC__ < 6)
-#define SKIP_UNIVERSAL /* Fails for older GCC (works for me in 6.1.1 but fails on some SDCC build machines*/
-#define SKIP_INLINE /* fails for some older GCC that is still used on the FreeBSD build machines */
-#endif
+# define SKIP_UNIVERSAL_UTF8 /* Only works for GCC when -finput-charset= option is specified */
+# if (defined (__GNUC__) && __GNUC__ < 5)
+#  define SKIP_UNIVERSAL /* Fails for older GCC (works for me in 6.1.1 but fails on some SDCC build machines*/
+#  define SKIP_INLINE /* fails for some older GCC that is still used on the FreeBSD build machines */
+# endif
 #else /* SDCC issues */
-#define SKIP_HEXDOUBLE /* bug #2536 */
-#define SKIP_NON_EVALUATED_COMMA_ASSIGN /* bug #2525 */
-#define SKIP_LONG_DOUBLE /* long double not yet supported */
-#define SKIP_UNIVERSAL
-#define SKIP_MIXED /* mixing of declaration and other statements (C99 feature) not yet supported */
-#define SKIP_RESTRICT_PARAMETER /* bug #2538 */
-#define SKIP_VOLATILE_PARAMETER /* bug #2538 */
-#define SKIP_CONST_PARAMETER /* bug #2538 */
-#define SKIP_STATIC_PARAMETER /* bug #2537 */
-#define SKIP_COMPOUND /* compound literals not yet supported */
-#define SKIP_VLA /* variable-length arrays not supported */
-#define SKIP_INLINE /* bug #1900 */
-#define SKIP_PRAGMA
-#pragma disable_warning 93 /* Using float for double. */
-#if defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_pic14) || defined(__SDCC_pic16)
-#define SKIP_LONG_LONG
-#endif
-#if defined(__SDCC_mcs51) && __SDCC_MODEL_SMALL /* Lack of memory */
-#define SKIP_FLEXIBLE
-#define SKIP_LONG_LONG
-#endif
+# define SKIP_HEXDOUBLE /* bug #2536 */
+# define SKIP_NON_EVALUATED_COMMA_ASSIGN /* bug #2525 */
+# define SKIP_LONG_DOUBLE /* long double not yet supported */
+# define SKIP_UNIVERSAL
+# define SKIP_MIXED /* mixing of declaration and other statements (C99 feature) not yet supported */
+# define SKIP_RESTRICT_PARAMETER /* bug #2538 */
+# define SKIP_VOLATILE_PARAMETER /* bug #2538 */
+# define SKIP_CONST_PARAMETER /* bug #2538 */
+# define SKIP_STATIC_PARAMETER /* bug #2537 */
+# define SKIP_COMPOUND /* compound literals not yet supported */
+# define SKIP_VLA /* variable-length arrays not supported */
+# define SKIP_INLINE /* bug #1900 */
+# define SKIP_PRAGMA
+# pragma disable_warning 93 /* Using float for double. */
+# if defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_pic14) || defined(__SDCC_pic16)
+#  define SKIP_LONG_LONG
+# endif
 #endif
 
 #ifndef SKIP_VA_ARGS_MACRO
@@ -254,9 +250,9 @@ typedef struct {
 } flexible;
 typedef union {
   flexible flex;
-  char buffer[sizeof(flexible) + 10*sizeof(double)];
-} flex10;
-flex10 has_flexible_array = { .flex.len = 10 };
+  char buffer[sizeof(flexible) + 2*sizeof(double)];
+} flex2;
+flex2 has_flexible_array = { .flex.len = 2 };
 #endif
 
 #ifndef SKIP_RESTRICT

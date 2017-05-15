@@ -7569,7 +7569,7 @@ genAnd (const iCode * ic, iCode * ifx)
             }
           /* Non-destructive and when exactly one bit per byte is set. */
           else if (isLiteralBit (bytelit) >= 0 &&
-            (AOP_TYPE (left) == AOP_STK || AOP_TYPE (left) == AOP_ACC || AOP_TYPE (left) == AOP_IY || AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[0]->rIdx != IYL_IDX))
+            (AOP_TYPE (left) == AOP_STK || AOP_TYPE (left) == AOP_ACC || AOP_TYPE (left) == AOP_HL || AOP_TYPE (left) == AOP_IY || AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[0]->rIdx != IYL_IDX))
             {
               if (!regalloc_dry_run)
                 emit2 ("bit %d, %s", isLiteralBit (bytelit), aopGet (AOP (left), offset, FALSE));

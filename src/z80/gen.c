@@ -6621,7 +6621,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           goto fix;
         }
 
-      if (IS_GB && sign)
+      if (IS_GB && sign && AOP_TYPE (right) != AOP_LIT)
         {
           cheapMove (ASMOP_A, 0, AOP (right), size - 1);
           cheapMove (ASMOP_E, 0, ASMOP_A, 0);

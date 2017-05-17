@@ -1,6 +1,11 @@
 2017-05-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Fix bug #2617.
+
+2017-05-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Fix a z80 codegen bug #2615 in and (triggered by recent register allocation changes when using --reserve-regs-iy).
 
 2017-05-15 Philipp Klaus Krause <pkk AT spth.de>

@@ -6516,7 +6516,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
         }
 
       // Preserve A if necessary
-      if (ifx && size == 1 && AOP_TYPE (left) == AOP_ACC && bitVectBitValue (ic->rSurv, A_IDX) &&
+      if (ifx && size == 1 && !sign && AOP_TYPE (left) == AOP_ACC && bitVectBitValue (ic->rSurv, A_IDX) &&
         (AOP_TYPE (right) == AOP_LIT || AOP_TYPE (right) == AOP_REG && AOP (right)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (right)->aopu.aop_reg[offset]->rIdx != IYH_IDX || AOP_TYPE (right) == AOP_STK))
         {
           emit3 (A_CP, ASMOP_A, AOP (right));

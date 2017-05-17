@@ -577,7 +577,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     }
 
   // Can use non-destructive cp on == and < (> might swap operands).
-  if((ic->op == EQ_OP || ic->op == '<') &&
+  if((ic->op == EQ_OP || ic->op == '<' && SPEC_USIGN(getSpec(operandType(left))) && SPEC_USIGN(getSpec(operandType(right)))) &&
     getSize(operandType(IC_LEFT(ic))) == 1 && ifxForOp (IC_RESULT(ic), ic) && operand_in_reg(left, REG_A, ia, i, G) &&
     (IS_OP_LITERAL (right) || operand_in_reg(right, REG_C, ia, i, G) || operand_in_reg(right, REG_B, ia, i, G) || operand_in_reg(right, REG_E, ia, i, G) || operand_in_reg(right, REG_D, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G)))
     return(true);
@@ -585,7 +585,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   const std::set<var_t> &dying = G[i].dying;
 
   if(ic->op == GET_VALUE_AT_ADDRESS)
-    return(result_in_A || !IS_BITVAR(getSpec(operandType (result))));
+    return(result_in_A || !IS_BITVAR(getSpec(operandType(result))));
   if(ic->op == '=' && POINTER_SET (ic))
     return(dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end() || !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))));
 

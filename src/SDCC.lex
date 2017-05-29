@@ -1066,7 +1066,7 @@ static struct pragma_s pragma_tbl[] = {
   { "noinvariant",       P_NOINVARIANT,     0, doPragma },
   { "noloopreverse",     P_LOOPREV,         0, doPragma },
   { "stackauto",         P_STACKAUTO,       0, doPragma },
-  { "nojtbound",         P_NOJTBOUND,       0, doPragma },
+  { "nojtbound",         P_NOJTBOUND,       1, doPragma },
   { "nogcse",            P_NOGCSE,          0, doPragma },
   { "overlay",           P_OVERLAY_,        0, doPragma },
   { "nooverlay",         P_NOOVERLAY,       0, doPragma },

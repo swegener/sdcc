@@ -3764,7 +3764,6 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   iCode *ic;
   symbol *falseLabel;
   set *labels = NULL;
-  int needRangeCheck = !optimize.noJTabBoundary || tree->values.switchVals.swDefault;
   sym_link *cetype = getSpec (operandType (cond));
   int sizeofMinCost, sizeofZeroMinCost, sizeofMaxCost;
   int sizeofMatchJump, sizeofJumpTable;
@@ -3813,14 +3812,13 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   sizeofMinCost = 0;
   sizeofZeroMinCost = 0;
   sizeofMaxCost = 0;
-  if (needRangeCheck)
-    {
-      if (!(min == 0 && IS_UNSIGNED (cetype)))
-        sizeofMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
-      if (!IS_UNSIGNED (cetype))
-        sizeofZeroMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
-      sizeofMaxCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
-    }
+
+  if (!(min == 0 && IS_UNSIGNED (cetype)))
+    sizeofMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
+  if (!IS_UNSIGNED (cetype))
+    sizeofZeroMinCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
+  sizeofMaxCost = port->jumptableCost.sizeofRangeCompare[sizeIndex];
+
   if (min)
     sizeofMinCost += port->jumptableCost.sizeofSubtract;
 
@@ -3893,33 +3891,31 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
     }
 
   /* first we rule out the boundary conditions */
-  /* if only optimization says so */
-  if (needRangeCheck)
-    {
-      operand *lit;
-      operand *boundary;
-      sym_link *cetype = getSpec (operandType (cond));
-      /* no need to check the lower bound if
-         the condition is always >= min or
-         the condition is unsigned & minimum value is zero */
-      if ((checkConstantRange (cetype, caseVals->etype, '<', FALSE) != CCR_ALWAYS_FALSE) &&
-          (!(min == 0 && IS_UNSIGNED (cetype))))
-        {
-          lit = operandFromValue (valCastLiteral (cetype, min, min));
-          boundary = geniCodeLogic (cond, lit, '<', NULL);
-          ic = newiCodeCondition (boundary, falseLabel, NULL);
-          ADDTOCHAIN (ic);
-        }
+  {
+    operand *lit;
+    operand *boundary;
+    sym_link *cetype = getSpec (operandType (cond));
+    /* no need to check the lower bound if
+       the condition is always >= min or
+       the condition is unsigned & minimum value is zero */
+    if ((checkConstantRange (cetype, caseVals->etype, '<', FALSE) != CCR_ALWAYS_FALSE) &&
+        (!(min == 0 && IS_UNSIGNED (cetype))))
+      {
+        lit = operandFromValue (valCastLiteral (cetype, min, min));
+        boundary = geniCodeLogic (cond, lit, '<', NULL);
+        ic = newiCodeCondition (boundary, falseLabel, NULL);
+        ADDTOCHAIN (ic);
+      }
 
-      /* now for upper bounds */
-      if (checkConstantRange (cetype, maxVal->etype, '>', FALSE) != CCR_ALWAYS_FALSE)
-        {
-          lit = operandFromValue (valCastLiteral (cetype, max, max));
-          boundary = geniCodeLogic (cond, lit, '>', NULL);
-          ic = newiCodeCondition (boundary, falseLabel, NULL);
-          ADDTOCHAIN (ic);
-        }
-    }
+    /* now for upper bounds */
+    if (checkConstantRange (cetype, maxVal->etype, '>', FALSE) != CCR_ALWAYS_FALSE)
+      {
+        lit = operandFromValue (valCastLiteral (cetype, max, max));
+        boundary = geniCodeLogic (cond, lit, '>', NULL);
+        ic = newiCodeCondition (boundary, falseLabel, NULL);
+        ADDTOCHAIN (ic);
+      }
+  }
 
   /* if the min is not zero then we now make it zero */
   if (min)

@@ -2641,6 +2641,11 @@ After 3.6.0, the prototype for putchar() changed from void putchar(char) to
 Before 3.7.0 mcs51 and ds390 got a full _Bool/bool type, separate from __bit.
 \end_layout
 
+\begin_layout Itemize
+Before 3.7.0, the option –nojtbound and the corresponding pragma have been
+ deprecated.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout
@@ -12447,104 +12452,6 @@ pragma noinduction
 \end_inset
 
  can be used to turn off induction optimizations for a given function only.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nojtbound
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--nojtbound
-\end_layout
-
-\end_inset
-
-
-\size large
- 
-\series default
-\size default
- Will not generate boundary condition check when switch statements
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-switch statement
-\end_layout
-
-\end_inset
-
- are implemented using jump-tables.
- See section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:'switch'-Statements"
-
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-Switch Statements for more details.
- It is recommended that this option is NOT used, #pragma
-\begin_inset space ~
-\end_inset
-
-nojtbound
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-#
-\end_layout
-
-\end_inset
-
-pragma nojtbound
-\end_layout
-
-\end_inset
-
- can be used to turn off boundary checking for jump tables for a given function
- only.
 \end_layout
 
 \begin_layout Labeling
@@ -37528,45 +37435,6 @@ reference "subsec:Interrupt-Service-Routines"
 \end_inset
 
 about interrupts.
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
-nojtbound
-\series default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-#
-\end_layout
-
-\end_inset
-
-pragma nojtbound
-\end_layout
-
-\end_inset
-
- - will not generate code for boundary value checking, when switch statements
- are turned into jump-tables (dangerous).
- For more details see section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "subsec:'switch'-Statements"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Itemize
@@ -63706,57 +63574,6 @@ There might be reasons which SDCC cannot know about to either favour or
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-The pragma nojtbound
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-#
-\end_layout
-
-\end_inset
-
-pragma nojtbound
-\end_layout
-
-\end_inset
-
- can be used to turn off checking the 
-\emph on
-j
-\emph default
-ump 
-\emph on
-t
-\emph default
-able 
-\emph on
-bound
-\emph default
-aries.
- It has no effect if a default label is supplied.
- Use of this pragma is dangerous: if the switch
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-switch statement
-\end_layout
-
-\end_inset
-
- argument is not matched by a case statement the processor will happily
- jump into Nirvana.
 \end_layout
 
 \begin_layout Subsection

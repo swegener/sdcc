@@ -867,6 +867,9 @@ scanOptionsTable (const OPTION * optionsTable, char shortOpt, const char *longOp
                (optionsTable[i].arg_type == CLAT_BOOLEAN && len == strlen (longOpt) && optionsTable[i].longOpt)) &&
               strncmp (optionsTable[i].longOpt, longOpt, len) == 0)
             {
+              if (strncmp ("--nojtbound", longOpt, len) == 0)
+                werror (W_DEPRECATED_OPTION, "--nojtbound");
+
               /* If it is a flag then we can handle it here */
               if (optionsTable[i].pparameter != NULL)
                 {

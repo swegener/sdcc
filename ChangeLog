@@ -1,5 +1,13 @@
 2017-05-15 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCC.lex,
+	  src/SDCCmain.c,
+	  src/SDCCicode.c,
+	  doc/sdccman.lyx:
+	  Deprecate --nojtbound and the corresponding pragma.
+
+2017-05-15 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Fix bug #2617.
 

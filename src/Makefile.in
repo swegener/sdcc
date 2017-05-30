@@ -48,7 +48,7 @@ SLIBSOURCES     = $(patsubst %.o,$(SLIB)/%.c,$(SLIBOBJS))
 SOURCES         := $(patsubst %.o,%.c,$(OBJECTS))
 
 # C++ sources (.cc extension)
-CXXSOURCES      += $(notdir $(wildcard $(srcdir)/*.cc))
+CXXSOURCES      += $(sort $(notdir $(wildcard $(srcdir)/*.cc)))
 OBJECTS         += $(patsubst %.cc,%.o,$(CXXSOURCES))
 
 TARGET          = $(top_builddir)/bin/sdcc$(EXEEXT)

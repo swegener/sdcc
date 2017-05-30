@@ -20,8 +20,8 @@ MKLIB	?=
 # fallback: if builddir is not specified via the command line...
 builddir ?= build/$(patsubst $(shell cd $(top_srcdir); pwd)/%,%,$(CURDIR))
 
-C_SRC	?= $(notdir $(wildcard $(srcdir)/*.c))
-S_SRC	?= $(notdir $(wildcard $(srcdir)/*.S))
+C_SRC	?= $(sort $(notdir $(wildcard $(srcdir)/*.c)))
+S_SRC	?= $(sort $(notdir $(wildcard $(srcdir)/*.S)))
 OBJS	?= $(addprefix $(top_builddir)/$(builddir)/,$(C_SRC:%.c=%.o) $(S_SRC:%.S=%.o))
 
 LIB_O	?= $(OBJS)

@@ -13,10 +13,10 @@ INCLUDEFLAGS = -I$(srcdir)/.. -I..
 
 # If the sources aren't specified, assume all in this directory.
 ifndef SOURCES
-SOURCES = $(notdir $(wildcard $(srcdir)/*.c))
+SOURCES = $(sort $(notdir $(wildcard $(srcdir)/*.c)))
 endif
 ifndef CXXSOURCES
-CXXSOURCES = $(notdir $(wildcard $(srcdir)/*.cc))
+CXXSOURCES = $(sort $(notdir $(wildcard $(srcdir)/*.cc)))
 endif
 
 # If the peephole rules aren't specified, assume all.

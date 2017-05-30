@@ -1,5 +1,13 @@
 2017-05-15 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/non-free/lib/pic14/Makefile.in,
+	  device/non-free/lib/pic14/Makefile.subdir,
+	  src/Makefile.in,
+	  src/port.mk:
+	  Sort directory listings towards are reproducible build, patch by Bernhard M. Wiedemann.
+
+2017-05-15 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCC.lex,
 	  src/SDCCmain.c,
 	  src/SDCCicode.c,

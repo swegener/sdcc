@@ -113,7 +113,7 @@ int
 cl_51core::instruction_24/*inst_add_a_Sdata*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
-  bool newC, newA, c6;
+  u8_t newC, newA, c6;
 
   data= fetch();
   ac  = acc->read();
@@ -140,7 +140,7 @@ int
 cl_51core::instruction_25/*inst_add_a_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
-  bool newC, newA, c6;
+  u8_t newC, newA, c6;
   class cl_memory_cell *cell;
   t_addr a;
 
@@ -170,7 +170,7 @@ int
 cl_51core::instruction_26/*inst_add_a_Sri*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
-  bool newC, newA, c6;
+  u8_t newC, newA, c6;
   class cl_memory_cell *cell;
 
   cell= iram->get_cell(R[code & 0x01]->read());
@@ -199,7 +199,7 @@ int
 cl_51core::instruction_28/*inst_add_a_rn*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
-  bool newC, newA, c6;
+  u8_t newC, newA, c6;
 
   data= R[code & 0x07]->read();
   ac  = acc->get();
@@ -250,7 +250,7 @@ int
 cl_51core::instruction_34/*inst_addc_a_Sdata*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
-  bool orgC, newC, newA, c6;
+  u8_t orgC, newC, newA, c6;
 
   data= fetch();
   ac  = acc->get();
@@ -277,7 +277,7 @@ int
 cl_51core::instruction_35/*inst_addc_a_addr*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
-  bool orgC, newC, newA, c6;
+  u8_t orgC, newC, newA, c6;
   class cl_memory_cell *cell;
   t_addr a;
 
@@ -307,7 +307,7 @@ int
 cl_51core::instruction_36/*inst_addc_a_Sri*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
-  bool orgC, newC, newA, c6;
+  u8_t orgC, newC, newA, c6;
   class cl_memory_cell *cell;
   
   cell= iram->get_cell(R[code & 0x01]->read());
@@ -336,7 +336,7 @@ int
 cl_51core::instruction_38/*inst_addc_a_rn*/(t_mem/*uchar*/ code)
 {
   uchar data, ac;
-  bool orgC, newC, newA, c6;
+  u8_t orgC, newC, newA, c6;
 
   data= R[code & 0x07]->read();
   ac  = acc->get();

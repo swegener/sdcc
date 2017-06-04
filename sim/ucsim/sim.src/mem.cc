@@ -79,8 +79,9 @@ cl_memory::~cl_memory(void)
 int
 cl_memory::init(void)
 {
-  addr_format= (char *)malloc(10);
-  sprintf(addr_format, "0x%%0%d",
+  chars c= chars("",
+		 //addr_format= (char *)malloc(10);
+		 /*sprintf(addr_format,*/ "0x%%0%d",
 	  size-1<=0xf?1:
 	  (size-1<=0xff?2:
 	   (size-1<=0xfff?3:
@@ -88,17 +89,20 @@ cl_memory::init(void)
 	     (size-1<=0xfffff?5:
 	      (size-1<=0xffffff?6:12))))));
   if (sizeof(t_addr) > sizeof(long))
-    strcat(addr_format, "L");
+    c+= cchars("L");//strcat(addr_format, "L");
   else if (sizeof(t_addr) > sizeof(int))
-    strcat(addr_format, "l");
-  strcat(addr_format, "x");
-  data_format= (char *)malloc(10);
-  sprintf(data_format, "%%0%d", width/4+((width%4)?1:0));
+    c+= cchars("l");//strcat(addr_format, "l");
+  c+= cchars("x");//strcat(addr_format, "x");
+  addr_format= strdup((char*)c);
+  //data_format= (char *)malloc(10);
+  c= cchars("");
+  /*sprintf(data_*/c.format("%%0%d", width/4+((width%4)?1:0));
   if (sizeof(t_mem) > sizeof(long))
-    strcat(data_format, "L");
+    c+= cchars("L");//strcat(data_format, "L");
   else if (sizeof(t_mem) > sizeof(int))
-    strcat(data_format, "l");
-  strcat(data_format, "x");
+    c+= cchars("l");//strcat(data_format, "l");
+  c+= cchars("x");//strcat(data_format, "x");
+  data_format= strdup((char*)c);
   data_mask= 1;
   int w= width;
   for (--w; w; w--)

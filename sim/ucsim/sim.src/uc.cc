@@ -1744,51 +1744,28 @@ cl_uc::symbolic_bit_name(t_addr bit_address,
 			 t_addr mem_addr,
 			 t_mem bit_mask)
 {
-  char *sym_name= 0;
+  //char *sym_name= 0;
   int i;
-
-  /*i= 0;
-  while (bit_tbl()[i].name &&
-	 (bit_tbl()[i].addr != bit_address))
-    i++;
-  if (bit_tbl()[i].name)
-    {
-      sym_name= strdup(bit_tbl()[i].name);
-      return(sym_name);
-    }
-  */
-  /*
-  if (mem &&
-      mem->have_real_name() &&
-      strstr(mem->get_name(), "sfr") == mem->get_name())
-    {
-      i= 0;
-      while (sfr_tbl()[i].name &&
-	     (sfr_tbl()[i].addr != mem_addr))
-	i++;
-      if (sfr_tbl()[i].name)
-	sym_name= strdup(sfr_tbl()[i].name);
-      else
-	sym_name= 0;
-    }
-  */
-  if (!sym_name)
+  chars c= chars("", mem?(mem->addr_format):"0x%06lx", (unsigned long)mem_addr);
+  /*if (!sym_name)
     {
       sym_name= (char *)malloc(16);
       sprintf(sym_name, mem?(mem->addr_format):"0x%06lx", (unsigned long)mem_addr);
-    }
-  sym_name= (char *)realloc(sym_name, strlen(sym_name)+2);
-  strcat(sym_name, ".");
+      }*/
+  /*sym_name= (char *)realloc(sym_name, strlen(sym_name)+2);
+    strcat(sym_name, ".");*/
+  c+= cchars(".");
   i= 0;
   while (bit_mask > 1)
     {
       bit_mask>>=1;
       i++;
     }
-  char bitnumstr[10];
-  sprintf(bitnumstr, "%1d", i);
-  strcat(sym_name, bitnumstr);
-  return(sym_name);
+  //char bitnumstr[10];
+  /*sprintf(bitnumstr, "%1d", i);
+    strcat(sym_name, bitnumstr);*/
+  c.append("%d", i);
+  return(/*sym_name*/strdup((char*)c));
 }
 
 

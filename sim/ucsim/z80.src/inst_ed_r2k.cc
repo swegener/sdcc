@@ -68,7 +68,7 @@ int  cl_r2k::inst_ed_(t_mem code)
   case 0x56: // ipset1
   case 0x4E: // ipset2
   case 0x5E: // ipset3
-    ip = ((ip << 2) && 0xFC);
+    ip = ((ip << 2) & 0xFC);
     ip |= (code >> 3) & 0x03;
     break;
     

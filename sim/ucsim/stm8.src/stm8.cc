@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8.cc 678 2017-03-07 11:33:52Z drdani $ */
+/* $Id: stm8.cc 747 2017-06-10 15:10:04Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -861,10 +861,19 @@ cl_stm8::disass(t_addr addr, const char *sep)
               ++immed_offset;
               break;
             case 'p': // b    byte index offset
-              sprintf(temp, "0x%04lx",
-		      (long int)(addr+immed_offset+1
-				 +(int)rom->get(addr+immed_offset)));
-              ++immed_offset;
+	      {
+		long int base;
+		i8_t offs;
+		base= addr+immed_offset+1;
+		offs= rom->get(addr+immed_offset);
+		long int res= base+offs;
+		sprintf(temp, "0x%04lx",
+			/*(long int)(addr+immed_offset+1
+			  +(int)rom->get(addr+immed_offset))*/
+			res
+			);
+		++immed_offset;
+	      }
               break;
             default:
               strcpy(temp, "?");
@@ -1199,31 +1208,11 @@ cl_stm8::exec_inst(void)
                return( inst_cpl( code, cprefix));
                break;
             case 0x80: // TRAP
-               // store to stack
-               //PC++;
-	       /*
-               push2( PC & 0xffff);
-               push1( PC >> 16); //extended PC
-               push2( regs.Y);
-               push2( regs.X);
-               push1( regs.A);
-               push1( regs.CC);
-               // set I1 and I0 status bits
-               FLAG_SET(BIT_I1);
-               FLAG_SET(BIT_I0);
-               // get TRAP address
-               PC = get1(0x8004);
-               if (PC == 0x82) { // this is reserved opcode for vector table
-		 //regs.VECTOR = 0;
-                  PC = get1(0x8005) << 16;
-                  PC |= get2(0x8006);
-                  return(resGO);
-		  }*/
 	       {
 		 class it_level *il= new it_level(3, 0x8004, PC, trap_src);
 		 accept_it(il);
 	       }
-               return(resHALT);
+               return(/*resHALT*/resGO);
             case 0x90:
                if(cprefix==0x90) {
                   regs.Y = regs.X;

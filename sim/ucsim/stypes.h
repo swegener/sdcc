@@ -311,6 +311,7 @@ enum hw_cath {
   HW_RESET	= 0x0100,
   HW_CLOCK	= 0x0200,
   HW_CALC	= 0x0400,
+  HW_FLASH	= 0x0800
 };
 
 // Events that can happen in peripherals

@@ -50,7 +50,7 @@ srcdir          = @srcdir@
 VPATH           = @srcdir@
 
 OBJECTS_SHARED	= glob.o itc.o serial.o rst.o timer.o port.o clk.o \
-		  uid.o bl.o \
+		  uid.o bl.o flash.o \
 		  inst.o \
 		  simstm8.o stm8.o
 OBJECTS_EXE	= sstm8.o

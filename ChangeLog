@@ -1,4 +1,4 @@
-2017-05-31 Philipp Klaus Krause <pkk AT spth.de>
+2017-06-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/stm8.c:
 	  More efficient equality comparisons, fix bug #2612.

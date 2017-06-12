@@ -4499,21 +4499,23 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
             }
           else
             {
-              if (!x_dead && !aopInReg (left->aop, i, X_IDX) && !aopInReg (left->aop, i, Y_IDX))
+              bool cmp_y = aopInReg (left->aop, i, Y_IDX);
+              if (!cmp_y && !x_dead && !aopInReg (left->aop, i, X_IDX))
                 push (ASMOP_X, 0, 2);
-
               genMove_o (aopInReg (left->aop, i, Y_IDX) ? ASMOP_Y : ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i + 1 && right->aop->regs[A_IDX] <= i + 1, TRUE, FALSE);
-              if (right->aop->type == AOP_LIT &&
-                (!(aopInReg (left->aop, i, X_IDX) && !x_dead) || aopInReg (left->aop, i, Y_IDX) && regDead (Y_IDX, ic)) &&
+              if (right->aop->type == AOP_LIT && aopIsLitVal (right->aop, i, 2, 0x0000))
+                emit3w (A_TNZW, cmp_y ? ASMOP_Y : ASMOP_X, 0);
+              else if (right->aop->type == AOP_LIT &&
+                (!cmp_y && (x_dead || !aopInReg (left->aop, i, X_IDX)) || cmp_y && regDead (Y_IDX, ic)) &&
                 (aopIsLitVal (right->aop, i, 2, 0x0001) || aopIsLitVal (right->aop, i, 2, 0xffff)))
-                emit3w (aopIsLitVal (right->aop, i, 2, 0x0001) ? A_DECW : A_INCW, aopInReg (left->aop, i, Y_IDX) ? ASMOP_Y : ASMOP_X, 0);
+                emit3w (aopIsLitVal (right->aop, i, 2, 0x0001) ? A_DECW : A_INCW, cmp_y ? ASMOP_Y : ASMOP_X, 0);
               else
                 {
-                  emit2 ("cpw", aopInReg (left->aop, i, Y_IDX) ? "y, %s" : "x, %s", aopGet2 (right->aop, i));
-                  cost (3 + aopInReg (left->aop, i, Y_IDX), 2);
+                  emit2 ("cpw", cmp_y ? "y, %s" : "x, %s", aopGet2 (right->aop, i));
+                  cost (3 + cmp_y, 2);
                 }
 
-              if (!x_dead && !aopInReg (left->aop, i, X_IDX) && !aopInReg (left->aop, i, Y_IDX))
+              if (!cmp_y && !x_dead && !aopInReg (left->aop, i, X_IDX))
                 pop (ASMOP_X, 0, 2);
             }
 

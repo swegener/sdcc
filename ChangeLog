@@ -1,5 +1,10 @@
 2017-05-31 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/stm8.c:
+	  More efficient equality comparisons, fix bug #2612.
+
+2017-05-31 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/non-free/lib/pic14/Makefile.in,
 	  device/non-free/lib/pic14/Makefile.subdir,
 	  src/Makefile.in,

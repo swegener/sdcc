@@ -4481,7 +4481,17 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
       if (i <= size - 2 && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD || right->aop->type == AOP_DIR || aopOnStack (right->aop, i, 2)))
         {
           bool x_dead = regDead (X_IDX, ic) && left->aop->regs[XL_IDX] <= i + 1 && left->aop->regs[XH_IDX] <= i + 1 && right->aop->regs[XL_IDX] <= i + 1 && right->aop->regs[XH_IDX] <= i + 1;
-          if (aopInReg (left->aop, i, Y_IDX) && aopOnStack (right->aop, i, 2))
+          bool y_dead = regDead (Y_IDX, ic) && left->aop->regs[YL_IDX] <= i + 1 && left->aop->regs[YH_IDX] <= i + 1 && right->aop->regs[YL_IDX] <= i + 1 && right->aop->regs[YH_IDX] <= i + 1;
+
+          /* Try to use flag setting from ldw */
+          if(aopOnStackNotExt (left->aop, i, 2) &&
+            right->aop->type == AOP_LIT && aopIsLitVal (right->aop, i, 2, 0x0000) &&
+            (x_dead || y_dead))
+            {
+              emit2 ("ldw", x_dead ? "x, %s" : "y, %s", aopGet2 (left->aop, i));
+              cost (2, 2);
+            }
+          else if (aopInReg (left->aop, i, Y_IDX) && aopOnStack (right->aop, i, 2))
             {
               if (x_dead)
                 {

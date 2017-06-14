@@ -1,3 +1,8 @@
+2017-06-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2621.c:
+	  Disable test for ds390, which doesn't have long long.
+
 2017-06-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/stm8.c:

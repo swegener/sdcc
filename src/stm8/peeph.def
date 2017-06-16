@@ -259,6 +259,54 @@ replace restart {
 }
 
 replace restart {
+	or	a, %1
+	tnz	a
+} by {
+	or	a, %1
+	; peephole 12-9a removed redundant tnz.
+}
+
+replace restart {
+	xor	a, %1
+	tnz	a
+} by {
+	xor	a, %1
+	; peephole 12-9b removed redundant tnz.
+}
+
+replace restart {
+	add	a, %1
+	tnz	a
+} by {
+	add	a, %1
+	; peephole 12-9c removed redundant tnz.
+}
+
+replace restart {
+	adc	a, %1
+	tnz	a
+} by {
+	adc	a, %1
+	; peephole 12-9d removed redundant tnz.
+}
+
+replace restart {
+	sub	a, %1
+	tnz	a
+} by {
+	sub	a, %1
+	; peephole 12-9e removed redundant tnz.
+}
+
+replace restart {
+	sbc	a, %1
+	tnz	a
+} by {
+	sbc	a, %1
+	; peephole 12-9f removed redundant tnz.
+}
+
+replace restart {
 	ld	a, (%1)
 	tnz	a
 } by {
@@ -272,6 +320,30 @@ replace restart {
 } by {
 	ld	a, (%1, %2)
 	; peephole 12-11 removed redundant tnz.
+}
+
+replace restart {
+	rlc	a
+	tnz	a
+} by {
+	rlc	a
+	; peephole 12-12 removed redundant tnz.
+}
+
+replace restart {
+	ld	x, (%1, %2)
+	tnz	x
+} by {
+	ld	x, (%1, %2)
+	; peephole 12-13 removed redundant tnzw.
+}
+
+replace restart {
+	ld	y, (%1, %2)
+	tnz	y
+} by {
+	ld	y, (%1, %2)
+	; peephole 12-14 removed redundant tnzw.
 }
 
 replace restart {

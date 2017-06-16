@@ -4119,7 +4119,7 @@ genCmpTop (operand *left, operand *right, operand *result, const iCode *ic)
 
   if ((size >= 2 && !sign && aopIsLitVal (right->aop, 0, size - 1, ~0) && aopIsLitVal (right->aop, size - 1, 1, 0x00) && opcode == '>'))
     {
-      if (aopInReg (left->aop, size - 1, A_IDX) || aopOnStack (left->aop, size - 1, 1) || left->aop->type == AOP_IMMD)
+      if (aopInReg (left->aop, size - 1, A_IDX) || aopOnStack (left->aop, size - 1, 1) || left->aop->type == AOP_DIR)
         {
           emit3_o (A_TNZ, left->aop, size - 1, 0, 0);
           ret = 20;
@@ -4144,11 +4144,21 @@ genCmpTop (operand *left, operand *right, operand *result, const iCode *ic)
         emit3w (A_TNZW, ASMOP_X, NULL);
       else if (aopInReg (left->aop, 2, Y_IDX) || aopInReg (left->aop, 2, YH_IDX) && aopInReg (left->aop, 3, YL_IDX))
         emit3w (A_TNZW, ASMOP_Y, NULL);
+      else if (regDead (X_IDX, ic) && (aopOnStackNotExt (left->aop, size - 2, 2) || left->aop->type == AOP_DIR))
+        {
+          emit2 ("ldw", "x, %s", aopGet2 (left->aop, size - 2));
+          cost (2 + (left->aop->type == AOP_DIR), 2);
+         }
       else if (regDead (X_IDX, ic))
         {
           genMove_o (ASMOP_X, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
           emit3w (A_TNZW, ASMOP_X, NULL);
         }
+       else if (size >= 2 && regDead (Y_IDX, ic) && (aopOnStackNotExt (left->aop, size - 2, 2) || left->aop->type == AOP_DIR))
+        {
+          emit2 ("ldw", "y, %s", aopGet2 (left->aop, size - 2));
+          cost (2 + 2 * (left->aop->type == AOP_DIR), 2);
+         }
       else if (regDead (Y_IDX, ic))
         {
           genMove_o (ASMOP_Y, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), regDead (X_IDX, ic), TRUE);
@@ -4165,7 +4175,7 @@ genCmpTop (operand *left, operand *right, operand *result, const iCode *ic)
     }
   else if (sign && aopIsLitVal (right->aop, 0, size, 0) && opcode == '<')
     {
-      if (aopInReg (left->aop, size - 1, A_IDX) || aopOnStack (left->aop, size - 1, 1) || left->aop->type == AOP_IMMD)
+      if (aopInReg (left->aop, size - 1, A_IDX) || aopOnStack (left->aop, size - 1, 1) || left->aop->type == AOP_DIR)
         emit3_o (A_TNZ, left->aop, size - 1, 0, 0);
       else if (size >= 2 && aopInReg (left->aop, size - 2, X_IDX))
         emit3w (A_TNZW, ASMOP_X, NULL);
@@ -4176,6 +4186,11 @@ genCmpTop (operand *left, operand *right, operand *result, const iCode *ic)
           genMove_o (ASMOP_X, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
           emit3w (A_TNZW, ASMOP_X, NULL);
         }
+       else if (size >= 2 && regDead (Y_IDX, ic) && (aopOnStackNotExt (left->aop, size - 2, 2) || left->aop->type == AOP_DIR))
+        {
+          emit2 ("ldw", "y, %s", aopGet2 (left->aop, size - 2));
+          cost (2 + 2 * (left->aop->type == AOP_DIR), 2);
+         }
       else if (size >= 2 && regDead (Y_IDX, ic))
         {
           genMove_o (ASMOP_Y, 0, left->aop, size - 2, 2, regDead (A_IDX, ic), regDead (X_IDX, ic), TRUE);
@@ -4484,12 +4499,12 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
           bool y_dead = regDead (Y_IDX, ic) && left->aop->regs[YL_IDX] <= i + 1 && left->aop->regs[YH_IDX] <= i + 1 && right->aop->regs[YL_IDX] <= i + 1 && right->aop->regs[YH_IDX] <= i + 1;
 
           /* Try to use flag setting from ldw */
-          if(aopOnStackNotExt (left->aop, i, 2) &&
+          if((aopOnStackNotExt (left->aop, i, 2) || left->aop->type == AOP_DIR) &&
             right->aop->type == AOP_LIT && aopIsLitVal (right->aop, i, 2, 0x0000) &&
             (x_dead || y_dead))
             {
               emit2 ("ldw", x_dead ? "x, %s" : "y, %s", aopGet2 (left->aop, i));
-              cost (2, 2);
+              cost (2 + (left->aop->type == AOP_DIR) * (2 - x_dead), 2);
             }
           else if (aopInReg (left->aop, i, Y_IDX) && aopOnStack (right->aop, i, 2))
             {

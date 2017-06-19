@@ -96,7 +96,7 @@ cl_memory::init(void)
   addr_format= strdup((char*)c);
   //data_format= (char *)malloc(10);
   c= cchars("");
-  /*sprintf(data_*/c.format("%%0%d", width/4+((width%4)?1:0));
+  /*sprintf(data_*/c.format("0x%%0%d", width/4+((width%4)?1:0));
   if (sizeof(t_mem) > sizeof(long))
     c+= cchars("L");//strcat(data_format, "L");
   else if (sizeof(t_mem) > sizeof(int))

@@ -191,12 +191,10 @@ cl_console::~cl_console(void)
       //fout->flush();
       if (fout->tty)
 	tu_reset();
-      deb("deleting fout:%d of console %d\n", fout->file_id, id);
       delete fout;
     }
   if (fin)
     {
-      deb("deleting fin:%d of console %d\n", fin->file_id, id);
       delete fin;
     }
 }
@@ -281,7 +279,6 @@ cl_console::read_line(void)
     i= fin->read(b, 1);
     if (i < -1)
       {
-	deb("read_line(con=%d,fid=%d) error\n", id, fin->file_id);
 	return -1;
       }
     if (i == 0)
@@ -304,7 +301,6 @@ cl_console::read_line(void)
 	    if (nl &&
 		(nl != b[0]))
 	      {
-		deb("readline: skip %d after %d\n", b[0], nl);
 		nl= 0;
 		continue;
 	      }
@@ -368,7 +364,6 @@ cl_listen_console::proc_input(class cl_cmdset *cmdset)
   cmd= app->get_commander();
 
   srv_accept(fin, &in, &out);
-  deb("Listener %d created in:%d out:%d\n", fin->file_id,in->file_id,out->file_id);
   class cl_console_base *c= new cl_console(in, out, app);
   c->set_flag(CONS_INTERACTIVE, true);
   in->interactive(out);
@@ -621,25 +616,19 @@ cl_commander::proc_input(void)
       if (c->input_active() &&
 	  f)
         {
-	  deb("check input on fid=%d\n", f->file_id);
 	  if (c->input_avail())
             {
               actual_console = c;
               int retval = c->proc_input(cmdset);
               if (retval)
                 {
-		  deb("closing console fin-fid=%d\n", f->file_id);
                   del_console(c);
                   //delete c;
                 }
               actual_console = 0;
 	      int i= consoles_prevent_quit();
-	      if (!i)
-		deb("no more consoles left\n");
               return(i == 0);
             }
-	  else
-	    deb("no input on fid=%d\n", f->file_id);
         }
     }
   return 0;

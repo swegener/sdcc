@@ -39,9 +39,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * INFO BREAKPOINTS command
  */
 
-//int
-//cl_info_bp_cmd::do_work(class cl_sim *sim,
-//			class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 {
   int i;
@@ -56,6 +53,8 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
                      fb->hit, fb->cnt, fb->addr,
 		     fb->condition()?"true":"false",
 		     s);
+      if (!(fb->commands.empty()))
+	con->dd_printf("     %s\n", (char*)(fb->commands));
       free((char *)s);
     }
   for (i= 0; i < uc->ebrk->count; i++)
@@ -65,14 +64,9 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 		     "event", (eb->perm==brkFIX)?"keep":"del ",
 		     eb->hit, eb->cnt,
 		     eb->addr, eb->id);
+      if (!(eb->commands.empty()))
+	con->dd_printf("     %s\n", (char*)(eb->commands));
     }
-  /*t_addr a;
-  class cl_rom *r= (class cl_rom *)(sim->uc->mem(MEM_ROM));
-  for (a= 0; a < sim->uc->get_mem_size(MEM_ROM); a++)
-    {
-      if (r->bp_map->get(a))
-	con->dd_printf("0x%06x\n", a);
-	}*/
   return(0);
 }
 
@@ -81,9 +75,6 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
  * INFO REGISTERS command
  */
 
-//int
-//cl_info_reg_cmd::do_work(class cl_sim *sim,
-//			 class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_info_reg_cmd)
 {
   uc->print_regs(con);
@@ -121,9 +112,6 @@ COMMAND_DO_WORK_UC(cl_info_hw_cmd)
  * INFO STACK command
  */
 
-//int
-//cl_info_stack_cmd::do_work(class cl_sim *sim,
-//                          class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_UC(cl_info_stack_cmd)
 {
   int i;

@@ -258,7 +258,7 @@ cl_xa::init(void)
 	  class cl_var *v;
 	  vars->add(v= new cl_var(chars(sfr_tabXA51[i].name),
 				  sfr,
-				  sfr_tabXA51[i].addr));
+				  sfr_tabXA51[i].addr, ""));
 	  v->init();
 	}
     }
@@ -278,7 +278,7 @@ cl_xa::init(void)
 	  a= offset + a/8;
 	  vars->add(v= new cl_var(chars(bit_tabXA51[i].name),
 				  sfr,
-				  a, bitnr));
+				  a, "", bitnr));
 	  v->init();
 	}
     }

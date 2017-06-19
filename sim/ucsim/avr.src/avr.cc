@@ -136,7 +136,7 @@ cl_avr::init(void)
 	  class cl_var *v;
 	  vars->add(v= new cl_var(chars(sfr_tabl[i].name),
 				  ram,
-				  sfr_tabl[i].addr));
+				  sfr_tabl[i].addr, ""));
 	  v->init();
 	}
     }

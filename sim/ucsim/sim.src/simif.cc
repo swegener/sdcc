@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simif.cc 518 2016-11-23 07:26:09Z drdani $ */
+/* $Id: simif.cc 762 2017-06-18 19:42:07Z drdani $ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -570,32 +570,47 @@ cl_simulator_interface::init(void)
   c->init();
 
   cl_var *v;
-  uc->vars->add(v= new cl_var(cchars("simif_on"), cfg, simif_on));
+  uc->vars->add(v= new cl_var(cchars("simif_on"), cfg, simif_on,
+			      "Turn simif on/off"));
   v->init();
   cfg_set(simif_on, 1);
-  uc->vars->add(v= new cl_var(cchars("sim_run"), cfg, simif_run));
+  uc->vars->add(v= new cl_var(cchars("sim_run"), cfg, simif_run,
+			      "WR: 0/1 sets running state, RD: check if simulation is running"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_start"), cfg, simif_start));
+  uc->vars->add(v= new cl_var(cchars("sim_start"), cfg, simif_start,
+			      "WR: start simulation, RD: true if running"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_stop"), cfg, simif_stop));
+  uc->vars->add(v= new cl_var(cchars("sim_stop"), cfg, simif_stop,
+			      "WR: stop simulation, RD: true if stopped"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_quit"), cfg, simif_quit));
+  uc->vars->add(v= new cl_var(cchars("sim_quit"), cfg, simif_quit,
+			      "WR: quit simulator"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_reason"), cfg, simif_reason));
+  uc->vars->add(v= new cl_var(cchars("sim_reason"), cfg, simif_reason,
+			      "RO: Reason of last stop"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_xtal"), cfg, simif_xtal));
+  uc->vars->add(v= new cl_var(cchars("sim_xtal"), cfg, simif_xtal,
+			      "Xtal frequency in Hz"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_ticks"), cfg, simif_ticks));
+  uc->vars->add(v= new cl_var(cchars("sim_ticks"), cfg, simif_ticks,
+			      "RO: nuof ticks simulatoed so far"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_isr_ticks"), cfg, simif_isr_ticks));
+  uc->vars->add(v= new cl_var(cchars("sim_isr_ticks"), cfg, simif_isr_ticks,
+			      "RO: ticks spent in ISR"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_idle_ticks"), cfg, simif_idle_ticks));
+  uc->vars->add(v= new cl_var(cchars("sim_idle_ticks"), cfg, simif_idle_ticks,
+			      "RO: ticks spent in idle state"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_real_time"), cfg, simif_real_time));
+  uc->vars->add(v= new cl_var(cchars("sim_real_time"), cfg, simif_real_time,
+			      "RO: real time since reset in msec"));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("sim_vclk"), cfg, simif_vclk));
+  uc->vars->add(v= new cl_var(cchars("sim_vclk"), cfg, simif_vclk,
+			      "RO: nuof simulated virtual clocks"));
   v->init();
-  
+  uc->vars->add(v= new cl_var(cchars("PC"), cfg, simif_pc,
+			      "RW: PC register"));
+  v->init();
+
   return(0);
 }
 
@@ -810,6 +825,20 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       if (val)
 	*val= cell->get();
       cell->set(uc->vc.fetch + uc->vc.rd + uc->vc.wr);
+      break;
+    case simif_pc: // PC of uc
+      if (val)
+	{
+	  t_addr addr= *val;
+	  class cl_address_space *rom= uc->rom;
+	  if (rom)
+	    {
+	      if (addr > rom->highest_valid_address())
+		addr= rom->highest_valid_address();
+	    }
+	  uc->PC= addr;
+	}
+      cell->set(uc->PC);
       break;
     case simif_nuof:
       break;

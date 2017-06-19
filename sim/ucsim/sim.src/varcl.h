@@ -17,10 +17,11 @@ class cl_var: public cl_base
   class cl_address_space *as; // reference
   t_addr addr;
   int bitnr;
+  chars desc;
  protected:
   class cl_memory_cell *cell;
  public:
-  cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, int ibitnr= -1);
+  cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, chars adesc, int ibitnr= -1);
   virtual int init(void);
   virtual class cl_memory_cell *get_cell(void) { return cell; }
   

@@ -658,7 +658,7 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
   if (m)
     {
       v= new cl_var(params[0]->value.string.string,
-		    (cl_address_space*)m, addr, bit);
+		    (cl_address_space*)m, addr, chars(""), bit);
       v->init();
       uc->vars->add(v);
     }
@@ -676,7 +676,7 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
 	    return con->dd_printf("out of range\n"),
 	      false;
 	  v= new cl_var(params[0]->value.string.string,
-			uc->variables, addr, bit);
+			uc->variables, addr, chars(""), bit);
 	  v->init();
 	  uc->vars->add(v);
 	}

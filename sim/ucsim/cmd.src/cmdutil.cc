@@ -32,11 +32,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 #include <assert.h>
 #include <sys/types.h>
-//#if defined HAVE_SYS_SOCKET_H
-//# include <sys/socket.h>
-//# include <netinet/in.h>
-//# include <arpa/inet.h>
-//#endif
 #include "i_string.h"
 
 #include "stypes.h"

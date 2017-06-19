@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <ctype.h>
+
 #include "ddconfig.h"
 
 #include "stdlib.h"
@@ -275,6 +277,63 @@ COMMAND_DO_WORK_UC(cl_delete_cmd)
 	}
     }
   return(false);
+}
+
+
+/*
+ * COMMANDS [nr] cmdstring...
+ */
+
+COMMAND_DO_WORK_UC(cl_commands_cmd)
+{
+  long nr= -1;
+  
+  cmdline->shift();
+  chars s= chars(cmdline->cmd);
+  if (cmdline->rest)
+    {
+      s+= ';';
+      s+= cmdline->rest;
+    }
+  if (!s.empty())
+    {
+      if (isdigit(((char*)s)[0]))
+	{
+	  class cl_cmd_arg *p= cmdline->param(0);
+	  if (p)
+	    {
+	      long l;
+	      if (p->get_ivalue(&l))
+		nr= l;
+	    }
+	  cmdline->shift();
+	  s= chars(cmdline->cmd);
+	  if (cmdline->rest)
+	    {
+	      s+= ';';
+	      s+= cmdline->rest;
+	    }
+	}
+    }
+  else
+    return con->dd_printf("command missing\n"), false;
+
+  if (nr < 0)
+    nr= uc->brk_counter;
+  if (nr == 0)
+    return con->dd_printf("breakpoint (%d) not found\n", nr), false;
+  
+  class cl_brk *b= uc->brk_by_nr(nr);
+  if (!b)
+    return con->dd_printf("no breakpoint (%d)\n", nr), false;
+
+  if (!s.empty())
+    b->commands= s;
+  else
+    b->commands= chars("");
+  cmdline->rest= NULL;
+  
+  return false;
 }
 
 

@@ -50,7 +50,8 @@ cl_brk::cl_brk(class cl_address_space *imem, int inr, t_addr iaddr,
   perm = iperm;
   hit  = ihit;
   cnt  = ihit;
-  cond = (char*)"";
+  cond = chars("");
+  commands= chars("");
 }
 
 cl_brk::~cl_brk(void)

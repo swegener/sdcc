@@ -96,14 +96,21 @@ chars::~chars(void)
 void
 chars::allocate_string(char *s)
 {
-  deallocate_string();
+  char *n= NULL;
+  int l= 0;
+  bool d= false;
+  
   if (s)
     {
-      chars_length= strlen(s);
-      chars_string= (char*)malloc(chars_length+1);
-      strcpy(chars_string, s);
-      dynamic= true;
+      l= strlen(s);
+      n= (char*)malloc(l+1);
+      strcpy(n, s);
+      d= true;
     }
+  deallocate_string();
+  chars_length= l;
+  chars_string= n;
+  dynamic= d;
   pars_pos= 0;
 }
 

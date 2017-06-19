@@ -250,7 +250,7 @@ enum inst_result {
   resHALT	= 101,	/* Serious error, halt CPU */
   resINV_ADDR	= 102,	/* Invalid indirect address */
   resSTACK_OV	= 103,	/* Stack overflow */
-  resBREAKPOINT	= 104,	/* Breakpoint */
+  resBREAKPOINT	= 104,	/* Fetch Breakpoint */
   resUSER	= 105,	/* Stopped by user */
   resINV_INST	= 106,	/* Invalid instruction */
   resBITADDR	= 107,	/* Bit address is uninterpretable */
@@ -258,6 +258,7 @@ enum inst_result {
   resSTEP	= 109,	/* Step command done, no more exex needed */
   resSIMIF	= 110,	/* Stopped by simulated prog itself through sim interface */
   resNOT_DONE	= 111,	/* Intruction has not simulated */
+  resEVENTBREAK = 112,  /* Event breakpoint */
 };
   
 #define BIT_MASK(bitaddr) (1 << (bitaddr & 0x07))

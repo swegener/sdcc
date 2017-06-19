@@ -449,13 +449,13 @@ void
 cl_uc390::decode_dptr(void)
 {
   cl_var *v;
-  vars->add(v= new cl_var(chars("dpl"), sfr, 0x82));
+  vars->add(v= new cl_var(chars("dpl"), sfr, 0x82, ""));
   v->init();
-  vars->add(v= new cl_var(chars("DPL"), sfr, 0x82));
+  vars->add(v= new cl_var(chars("DPL"), sfr, 0x82, ""));
   v->init();
-  vars->add(v= new cl_var(chars("dph"), sfr, 0x83));
+  vars->add(v= new cl_var(chars("dph"), sfr, 0x83, ""));
   v->init();
-  vars->add(v= new cl_var(chars("DPH"), sfr, 0x83));
+  vars->add(v= new cl_var(chars("DPH"), sfr, 0x83, ""));
   v->init();
 }
 

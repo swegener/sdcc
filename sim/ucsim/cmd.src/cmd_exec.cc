@@ -370,17 +370,50 @@ COMMAND_DO_WORK_APP(cl_exec_cmd)
 COMMAND_DO_WORK_APP(cl_expression_cmd)
 {
   char *s= cmdline->cmd;
+  char *fmt= NULL;
+  int fmt_len= 0;
   if (!s ||
       !*s)
     return(false);
-  int i= strspn(s, " \t\v\n");
+  int i= strspn(s, " \t\v\n\r");
   s+= i;
   i= strspn(s, "abcdefghijklmnopqrstuvwxyz");
   s+= i;
-  /*uc_yy_set_string_to_parse(s);
-  yyparse();
-  uc_yy_free_string_to_parse();*/
-  con->dd_printf("%ld\n", application->/*expr_result*/eval(s));
+  i= strspn(s, " \t\v\n");
+  s+= i;
+  t_mem v= 0;
+  if (s && *s)
+    {
+      if (*s == '/')
+	{
+	  i= strcspn(s, " \t\v\n\r");
+	  fmt= s+1;
+	  fmt_len= i;
+	  s+= i;
+	  i= strspn(s, " \t\v\n\r");
+	  s+= i;
+	}
+      if (s && *s)
+	v= application->eval(s);
+      if (fmt)
+	{
+	  for (i= 0; i < fmt_len; i++)
+	    {
+	      switch (fmt[i])
+		{
+		case 'x': con->dd_printf("%lx\n", v); break;
+		case 'X': con->dd_printf("0x%lx\n", v); break;
+		case '0': con->dd_printf("0x%08lx\n", v); break;
+		case 'd': con->dd_printf("%ld\n", v); break;
+		case 'o': con->dd_printf("%lo\n", v); break;
+		case 'u': con->dd_printf("%lu\n", v); break;
+		case 'b': con->dd_printf("%s\n", (char*)cbin(v,8*sizeof(v))); break;
+		}
+	    }
+	}
+      else
+	con->dd_printf("%ld\n", v);
+    }
   return(false);
 }
 

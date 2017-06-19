@@ -70,6 +70,9 @@ cl_cmdline::~cl_cmdline(void)
 int
 cl_cmdline::init(void)
 {
+  rest= NULL;
+  params->free_all();
+  tokens->free_all();
   split();
   return(0);
 }
@@ -88,10 +91,9 @@ cl_cmdline::split(void)
 {
   //class cl_sim *sim;
   char *start= cmd;
-  int i, j;
+  int i;//, j;
   class cl_cmd_arg *arg;
 
-  deb("cmdline 1 name=ENTER\n");
   set_name("\n");
   if (!cmd ||
       !*cmd)
@@ -99,59 +101,61 @@ cl_cmdline::split(void)
   start+= strspn(start, " \t\v\r,");
   if (!start)
     return 0;
-  deb("cmdline 2 name=NULL\n");
   set_name(0);
   if (*start == '\n')
     {
       // never, as \n stripped by readline
-      deb("cmdline 3 name=ENTER\n");
       set_name("\n");
       return(0);
     }
   else if (*start == '#')
     return *start= 0;
+  else if (*start == ';')
+    {
+      rest= start+1;
+      *start= 0;
+      return 0;
+    }
   if (!*start)
     return(0);
-  i= strcspn(start, " \t\v\r,");
+  // start now points to first word
+  i= strcspn(start, " \t\v\r,;#");
+  // i should be at end of it
   if (i)
     {
       if (*start == '#')
-	return deb("cmdline 4 name=ENTER"), set_name("\n"), *start= 0;
+	return set_name("\n"), *start= 0;
       char *n= (char*)malloc(i+1);
       strncpy(n, start, i);
       n[i]= '\0';
-      j= strispn(start, '#');
-      if (j>0)
-	n[j]= '\0';
-      deb("cmdline 5 name=%s\n",n);
       set_name(n);
       free(n);
-      if (j>0)
-	return start[j]= 0;
     }
   start+= i;
   start= skip_delims(start);
   while (*start)
     {
       char *end= start, *param_str;
-      if (*start == '"')
+      if (*start == '#')
+	return *start= '\0';
+      else if (*start == ';')
+	{
+	  rest= start+1;
+	  *start= 0;
+	  return 0;
+	}
+      else if (*start == '"')
 	split_out_string(&start, &end);
       else if (*start == '>')
 	split_out_output_redirection(&start, &end);
       else
 	{
 	  char *dot;
-          i= strcspn(start, " \t\v\r,");
+          i= strcspn(start, " \t\v\r,#;");
           end= start+i;
-	  if (*start == '#')
-	    return *start= 0;
           param_str= (char *)malloc(i+1);
           strncpy(param_str, start, i);
 	  param_str[i]= '\0';
-	  j= strispn(start, '#');
-	  if (j>0)
-	    end= start+j, param_str[j]= start[j]= '\0';
-	  deb("cmdline token=%s\n",param_str);
 	  tokens->add(strdup(param_str));
 	  if ((dot= strchr(param_str, '.')) != NULL)
 	    split_out_bit(dot, param_str);
@@ -171,8 +175,6 @@ cl_cmdline::split(void)
 	      arg->init();
 	    }
 	  free(param_str);
-	  if (j>0)
-	    return 0;
 	}
       start= end;
       start= skip_delims(start);
@@ -351,18 +353,20 @@ cl_cmdline::shift(void)
 {
   char *s= skip_delims(cmd);
 
+  params->free_all();
+  tokens->free_all();
   set_name(0);
   if (s && *s)
     {
       while (*s &&
-	     strchr(" \t\v\r,", *s) == NULL)
+	     strchr(" \t\v\r,;#", *s) == NULL)
 	s++;
       s= skip_delims(s);
-      char *p= strdup(s);
+      char *p= strdup(s), *r= rest?strdup(rest):NULL;
       free(cmd);
       cmd= p;
-      delete params;
-      params= new cl_list(2, 2, "params");
+      rest= r;
+      //params= new cl_list(2, 2, "params");
       split();
       if (strcmp(get_name(), "\n") == 0)
 	set_name(0);
@@ -538,7 +542,23 @@ cl_cmdline::set_data_list(class cl_cmd_arg *parm, int *iparm)
   return(true);
 }
 
+bool
+cl_cmdline::restart_at_rest(void)
+{
+  char *newcmd;
+  if ((rest == NULL) ||
+      (*rest == 0))
+    {
+      return false;
+    }
+  newcmd= strdup(rest);
+  if (cmd)
+    free(cmd);
+  cmd= newcmd;
+  return true;
+}
 
+  
 /*
  * Command
  *____________________________________________________________________________

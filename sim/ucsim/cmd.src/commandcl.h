@@ -54,6 +54,7 @@ class cl_cmdline: public cl_base
 public:
   class cl_app *app;
   char *cmd;
+  char *rest;
   //char *name;
   class cl_list *params;
   class cl_ustrings *tokens;
@@ -79,6 +80,7 @@ public:
   virtual bool syntax_match(class cl_uc *uc, const char *syntax);
   virtual bool set_data_list(class cl_cmd_arg *parm, int *iparm);
   virtual int nuof_params(void) { return(params->get_count()); }
+  virtual bool restart_at_rest(void);
 private:
   char *skip_delims(char *start);
 };

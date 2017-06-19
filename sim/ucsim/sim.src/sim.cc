@@ -92,9 +92,11 @@ cl_sim::step(void)
   if (state & SIM_GO)
     {
       if (steps_done == 0)
-	start_at= dnow();
-      uc->do_inst(1);
-      steps_done++;
+	{
+	  start_at= dnow();
+	}
+      if (uc->do_inst(1) == resGO)
+	steps_done++;
       if ((steps_todo > 0) &&
 	  (steps_done >= steps_todo))
 	stop(resSTEP);
@@ -137,7 +139,7 @@ cl_sim::start(class cl_console_base *con, unsigned long steps_to_do)
 }
 
 void
-cl_sim::stop(int reason)
+cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 {
   class cl_commander_base *cmd= app->get_commander();
   class cl_option *o= app->options->get_option("quit");
@@ -150,8 +152,27 @@ cl_sim::stop(int reason)
   stop_at= dnow();
   if (simif)
     simif->cfg_set(simif_reason, reason);
+
+  class cl_brk *b= NULL;
+  if (reason == resBREAKPOINT)
+    {
+      b= uc->fbrk_at(uc->PC);
+    }
+  else if (ebrk != NULL)
+    {
+      b= ebrk;
+    }
+  if (b)
+    {
+      if (!(b->commands.empty()))
+	{
+	  application->exec(b->commands);
+	  steps_done= 0;
+	}
+    }
   
-  if (cmd->frozen_console)
+  if (!(state & SIM_GO) &&
+      cmd->frozen_console)
     {
       if (reason == resUSER &&
 	  cmd->frozen_console->input_avail())
@@ -172,6 +193,19 @@ cl_sim::stop(int reason)
 	case resBREAKPOINT:
 	  cmd->frozen_console->dd_printf("Breakpoint\n");
 	  uc->print_regs(cmd->frozen_console);
+	  break;
+	case resEVENTBREAK:
+	  cmd->frozen_console->dd_printf("Event break\n");
+	  //uc->print_regs(cmd->frozen_console);
+	  if (b)
+	    {
+	      class cl_ev_brk *eb= (cl_ev_brk*)b;
+	      class cl_address_space *m= eb->get_mem();
+	      cmd->frozen_console->dd_printf("Event `%s' at %s[0x%x]: 0x%x %s\n",
+					     eb->id, m?(m->get_name()):"mem?", (int)eb->addr,
+					     (int)uc->instPC,
+					     uc->disass(uc->instPC, " "));
+	    }
 	  break;
 	case resINTERRUPT:
 	  cmd->frozen_console->dd_printf("Interrupt\n");
@@ -218,11 +252,12 @@ cl_sim::stop(int reason)
       cmd->frozen_console->print_prompt();
       cmd->frozen_console= 0;
     }
-  if (q_opt)
+  if (!(state & SIM_GO) &&
+      q_opt)
     state|= SIM_QUIT;
   cmd->update_active();
 }
-
+/*
 void
 cl_sim::stop(class cl_ev_brk *brk)
 {
@@ -233,30 +268,34 @@ cl_sim::stop(class cl_ev_brk *brk)
   if (o)
     o->get_value(&q_opt);
 
-  state&= ~SIM_GO;
+  //state&= ~SIM_GO;
   if (simif)
-    simif->cfg_set(simif_reason, resBREAKPOINT);
-  if (cmd->frozen_console)
+    simif->cfg_set(simif_reason, resEVENTBREAK);
+
+  if (brk)
+    {
+      if (!(brk->commands.empty()))
+	{
+	  application->exec(brk->commands);
+	  steps_done= 0;
+	  printf("event brk PC=%ld, simgo=%d\n",uc->PC,state&SIM_GO);
+	}
+    }
+
+  if (!(state & SIM_GO) &&
+      cmd->frozen_console)
     {
       class cl_console_base *con= cmd->frozen_console;
-      /*
-      if (reason == resUSER &&
-	  cmd->frozen_console->input_avail())
-	cmd->frozen_console->read_line();
-      */
-      //con->dd_printf("Stop at 0x%06x\n", uc->PC);
       con->dd_printf("Event `%s' at %s[0x%x]: 0x%x %s\n",
 		     brk->id, brk->get_mem()->get_name(), (int)brk->addr,
 		     (int)uc->instPC,
 		     uc->disass(uc->instPC, " "));
-      //con->flags&= ~CONS_FROZEN;
-      //con->print_prompt();
-      //cmd->frozen_console= 0;
     }
-  if (q_opt)
+  if (!(state & SIM_GO) &&
+      q_opt)
     state|= SIM_QUIT;
 }
-
+*/
 
 /*
  */
@@ -273,7 +312,8 @@ cl_sim::build_cmdset(class cl_cmdset *cmdset)
   cmd->init();
   cmd->add_name("go");
   cmd->add_name("r");
-
+  cmd->add_name("continue");
+  
   cmdset->add(cmd= new cl_stop_cmd("stop", 0,
 "stop               Stop",
 "long help of stop"));

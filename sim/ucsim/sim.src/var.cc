@@ -3,13 +3,14 @@
 #include "varcl.h"
 
 
-cl_var::cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, int ibitnr):
+cl_var::cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, chars adesc, int ibitnr):
   cl_base()
 {
   as= ias;
   addr= iaddr;
   bitnr= ibitnr;
-
+  desc= adesc;
+  
   set_name(iname);
   
   cell= NULL;
@@ -35,14 +36,25 @@ cl_var::print_info(cl_console_base *con)
   con->dd_printf("%s ", get_name("?"));
   if (cell)
     {
+      t_mem v= cell->read();
       con->dd_printf("%s", as->get_name("?"));
       con->dd_printf("[");
       con->dd_printf(as->addr_format, addr);
-      con->dd_printf("]");
+      con->dd_printf("] ");
       if (bitnr >= 0)
-	con->dd_printf(".%d", bitnr);
+	{
+	  con->dd_printf(".%d", bitnr);
+	  con->dd_printf("= %d", (v & (1<<bitnr))?1:0);
+	}
+      else
+	{
+	  con->dd_printf("= ");
+	  con->dd_printf(as->data_format, v);
+	}
     }
   con->dd_printf("\n");
+  if (!desc.empty())
+    con->dd_printf("  %s\n", (char*)desc);
 }
 
 

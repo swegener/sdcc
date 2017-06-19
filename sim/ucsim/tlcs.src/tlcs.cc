@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: tlcs.cc 549 2016-12-13 11:15:58Z drdani $ */
+/* $Id: tlcs.cc 754 2017-06-13 08:26:25Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -109,61 +109,61 @@ cl_tlcs::init(void)
     nas->set((t_addr) i, 0);
   }
 
-  vars->add(v= new cl_var(cchars("A"), regs8, 0));
+  vars->add(v= new cl_var(cchars("A"), regs8, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("F"), regs8, 1));
+  vars->add(v= new cl_var(cchars("F"), regs8, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("B"), regs8, 2));
+  vars->add(v= new cl_var(cchars("B"), regs8, 2, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("C"), regs8, 3));
+  vars->add(v= new cl_var(cchars("C"), regs8, 3, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("D"), regs8, 4));
+  vars->add(v= new cl_var(cchars("D"), regs8, 4, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("E"), regs8, 5));
+  vars->add(v= new cl_var(cchars("E"), regs8, 5, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("H"), regs8, 6));
+  vars->add(v= new cl_var(cchars("H"), regs8, 6, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("L"), regs8, 7));
-  v->init();
-
-  vars->add(v= new cl_var(cchars("ALT_A"), regs8, 8));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_F"), regs8, 9));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_B"), regs8, 10));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_C"), regs8, 11));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_D"), regs8, 12));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_E"), regs8, 13));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_H"), regs8, 14));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_L"), regs8, 15));
+  vars->add(v= new cl_var(cchars("L"), regs8, 7, ""));
   v->init();
 
-  vars->add(v= new cl_var(cchars("AF"), regs16, 0));
+  vars->add(v= new cl_var(cchars("ALT_A"), regs8, 8, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("BC"), regs16, 1));
+  vars->add(v= new cl_var(cchars("ALT_F"), regs8, 9, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("DE"), regs16, 2));
+  vars->add(v= new cl_var(cchars("ALT_B"), regs8, 10, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("HL"), regs16, 3));
+  vars->add(v= new cl_var(cchars("ALT_C"), regs8, 11, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("IX"), regs16, 4));
+  vars->add(v= new cl_var(cchars("ALT_D"), regs8, 12, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("IY"), regs16, 5));
+  vars->add(v= new cl_var(cchars("ALT_E"), regs8, 13, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("SP"), regs16, 6));
+  vars->add(v= new cl_var(cchars("ALT_H"), regs8, 14, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_AF"), regs16, 7));
+  vars->add(v= new cl_var(cchars("ALT_L"), regs8, 15, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_BC"), regs16, 8));
+
+  vars->add(v= new cl_var(cchars("AF"), regs16, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_DE"), regs16, 9));
+  vars->add(v= new cl_var(cchars("BC"), regs16, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_HL"), regs16, 11));
+  vars->add(v= new cl_var(cchars("DE"), regs16, 2, ""));
+  v->init();
+  vars->add(v= new cl_var(cchars("HL"), regs16, 3, ""));
+  v->init();
+  vars->add(v= new cl_var(cchars("IX"), regs16, 4, ""));
+  v->init();
+  vars->add(v= new cl_var(cchars("IY"), regs16, 5, ""));
+  v->init();
+  vars->add(v= new cl_var(cchars("SP"), regs16, 6, ""));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_AF"), regs16, 7, ""));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_BC"), regs16, 8, ""));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_DE"), regs16, 9, ""));
+  v->init();
+  vars->add(v= new cl_var(cchars("ALT_HL"), regs16, 11, ""));
   v->init();
 
   return(0);

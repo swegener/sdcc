@@ -169,16 +169,16 @@ cl_hc08::make_memories(void)
   address_spaces->add(regs16);
 
   class cl_var *v;
-  vars->add(v= new cl_var(cchars("A"), regs8, 0));
+  vars->add(v= new cl_var(cchars("A"), regs8, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("P"), regs8, 1));
+  vars->add(v= new cl_var(cchars("P"), regs8, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("H"), regs8, 2));
+  vars->add(v= new cl_var(cchars("H"), regs8, 2, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("X"), regs8, 3));
+  vars->add(v= new cl_var(cchars("X"), regs8, 3, ""));
   v->init();
 
-  vars->add(v= new cl_var(cchars("SP"), regs16, 0));
+  vars->add(v= new cl_var(cchars("SP"), regs16, 0, ""));
   v->init();
 }
 

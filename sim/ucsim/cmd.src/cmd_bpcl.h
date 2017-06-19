@@ -64,6 +64,8 @@ COMMAND_ON(uc,cl_clear_cmd);
 // DELETE
 COMMAND_ON(uc,cl_delete_cmd);
 
+// COMMANDS
+COMMAND_ON(uc,cl_commands_cmd);
 
 #endif
 

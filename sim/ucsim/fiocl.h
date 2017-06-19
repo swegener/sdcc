@@ -216,7 +216,7 @@ class cl_f: public cl_base
   //virtual int connect(chars host, int to_port);
 };
 
-extern void deb(const char *format, ...);
+//extern void deb(const char *format, ...);
 
 extern int mk_srv_socket(int port);
 

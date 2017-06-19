@@ -555,6 +555,11 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
 "long help of clear"));
   cmd->init();
 
+  cmdset->add(cmd= new cl_commands_cmd("commands", 0,
+"commands [breakpoint-nr] command_string",
+"long help of commands"));
+  cmd->init();
+  
   {
     super_cmd= (class cl_super_cmd *)(cmdset->get_cmd("get"));
     if (super_cmd)
@@ -1211,7 +1216,7 @@ cl_uc::read_cdb_file(cl_f *f)
 		  chars n= ln.token("$");
 		  if ((r= fns->rec(n)) != NULL)
 		    {
-		      vars->add(v= new cl_var(n, rom, r->addr));
+		      vars->add(v= new cl_var(n, rom, r->addr, ""));
 		      v->init();
 		      fns->del(n);
 		      cnt++;
@@ -1236,7 +1241,7 @@ cl_uc::read_cdb_file(cl_f *f)
 		  if ((r= fns->rec(n)) != NULL)
 		    {
 		      fns->del(n);
-		      vars->add(v= new cl_var(n, rom, a));
+		      vars->add(v= new cl_var(n, rom, a, ""));
 		      v->init();
 		      cnt++;
 		    }
@@ -2568,13 +2573,13 @@ void
 cl_uc::check_events(void)
 {
   int i;
+  //sim->stop(resEVENTBREAK);
   for (i= 0; i < events->count; i++)
     {
       class cl_ev_brk *brk=
 	dynamic_cast<class cl_ev_brk *>(events->object_at(i));
-      sim->stop(brk);
+      sim->stop(resEVENTBREAK, brk);
     }
-  sim->stop(resBREAKPOINT);
 }
 
 

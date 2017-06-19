@@ -47,15 +47,20 @@ cl_port::init(void)
 
   cl_var *v;
   chars pn= cchars(get_name());
-  uc->vars->add(v= new cl_var(pn+chars("_ddr"), uc->rom, base+2));
+  uc->vars->add(v= new cl_var(pn+chars("_ddr"), uc->rom, base+2,
+			      "Direction register"));
   v->init();
-  uc->vars->add(v= new cl_var(pn+chars("_odr"), uc->rom, base+0));
+  uc->vars->add(v= new cl_var(pn+chars("_odr"), uc->rom, base+0,
+			      "Output data register"));
   v->init();
-  uc->vars->add(v= new cl_var(pn+chars("_idr"), uc->rom, base+1));
+  uc->vars->add(v= new cl_var(pn+chars("_idr"), uc->rom, base+1,
+			      "Input data register (outside value of port pins)"));
   v->init();
-  uc->vars->add(v= new cl_var(pn+chars("_pin"), uc->rom, base+1));
+  uc->vars->add(v= new cl_var(pn+chars("_pin"), uc->rom, base+1,
+			      "Outside value of port pins"));
   v->init();
-  uc->vars->add(v= new cl_var(pn+chars("_pins"), uc->rom, base+1));
+  uc->vars->add(v= new cl_var(pn+chars("_pins"), uc->rom, base+1,
+			      "Outside value of port pins"));
   v->init();
   
   return 0;

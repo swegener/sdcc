@@ -53,6 +53,7 @@ public:
   int   hit;
   int   cnt;
   chars cond;
+  chars commands;
   
   cl_brk(class cl_address_space *imem, int inr, t_addr iaddr,
 	 enum brk_perm iperm, int ihit);

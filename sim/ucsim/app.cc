@@ -642,13 +642,13 @@ cl_app::get_uc(void)
 
 
 /* Command handling */
-
+/*
 class cl_cmd *
 cl_app::get_cmd(class cl_cmdline *cmdline)
 {
   return(0);
 }
-
+*/
 long
 cl_app::eval(chars expr)
 {
@@ -657,6 +657,40 @@ cl_app::eval(chars expr)
   yyparse();
   uc_yy_free_string_to_parse();
   return expr_result;
+}
+
+void
+cl_app::exec(chars line)
+{
+  class cl_console_base *c= commander->frozen_console;
+  if (c == NULL)
+    {
+      c= new cl_console_dummy();
+      c->init();
+    }
+  class cl_cmdline *cmdline= new cl_cmdline(this, (char*)line, c);
+  do
+    {
+      cmdline->init();
+      class cl_cmd *cm= commander->cmdset->get_cmd(cmdline, false/*c->is_interactive()*/);
+      if (cm)
+	{
+	  cm->work(this, cmdline, c);
+	}
+      else if (cmdline->get_name() != 0)
+	{
+	  char *e= cmdline->cmd;
+	  if (strlen(e) > 0)
+	    {
+	      long l= eval(e);
+	      c->dd_printf("%ld\n", l);
+	    }
+	}
+    }
+  while (cmdline->restart_at_rest());
+  delete cmdline;
+  if (c != commander->frozen_console)
+    delete c;
 }
 
 /*

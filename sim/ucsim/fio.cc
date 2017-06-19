@@ -239,7 +239,6 @@ cl_f::init(void)
       if ((file_id= ::open(file_name, open_flags(file_mode), (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) >= 0)
 	{
 	  tty= isatty(file_id);
-	  deb("f::init, id=%d set tty=%d\n", file_id, tty);
 	  own= true;
 	  save_attributes();
 	  changed();
@@ -266,7 +265,6 @@ cl_f::use_opened(int opened_file_id, char *mode)
     {
       file_id= opened_file_id;
       tty= isatty(file_id);
-      deb("f::use_opened id=%d set tty=%d, calling changed...\n", file_id, tty);
       changed();
     }
   return file_id;
@@ -290,7 +288,6 @@ cl_f::use_opened(FILE *f, chars mode)
       if ((file_id= fileno(f)) >= 0)
 	{
 	  tty= isatty(file_id);
-	  deb("f::use_opened id=%d set tty=%d\n", file_id, tty);
 	  own= false;
 	  changed();
 	}
@@ -331,7 +328,6 @@ cl_f::open(char *fn, char *mode)
 void
 cl_f::changed(void)
 {
-  deb("cl_f changed fid=%d\n", file_id);
 }
 
 int
@@ -339,7 +335,6 @@ cl_f::close(void)
 {
   int i= 0;
 
-  deb("cl_f close fid=%d\n", file_id);
   if (file_id >= 0)
     ::close(file_id);
   file_id= -1;
@@ -365,22 +360,7 @@ cl_f::stop_use(void)
 
 cl_f::~cl_f(void)
 {
-  deb("~cl_f fid=%d\n", file_id);
   delete hist;
-}
-
-static char deb_buffer[100];
-
-static char *
-dc(unsigned char c)
-{
-  if (c<31)
-    sprintf(deb_buffer, "/%d,%02x", c, c);
-  else if (c>127)
-    sprintf(deb_buffer, "/%d,%02x", c, c);
-  else
-    sprintf(deb_buffer, "%c", c);
-  return deb_buffer;
 }
 
 /* Buffer handling */
@@ -392,7 +372,6 @@ cl_f::put(int c)
   if (n == last_used)
     return -1;
   buffer[first_free]= c;
-  deb("fid=%d put[%d]=%s\n",file_id,first_free,dc(c));
   first_free= n;
   return 0;
 }
@@ -402,13 +381,11 @@ cl_f::get(void)
 {
   if (last_used == first_free)
     {
-      deb("fid=%d get: empty\n",file_id);
       return -1;
     }
   int c= buffer[last_used];
   //if (c == 3 /* ^C */)
   //return -2;
-  deb("fid=%d get[%d]=%s\n",file_id,last_used,dc(c));
   last_used= (last_used + 1) % 1024;
   return c;
 }
@@ -438,19 +415,12 @@ cl_f::process_telnet(unsigned char ci)
   if ((ci == 0xff) &&
       (l == 2))
     {
-      deb("Double ff\n");
       return finish_esc(0xff);
     }
   if (l == 3)
     {
-      char s[44];
-      sprintf(s, "IAC %02x %02x\n", esc_buffer[1]&0xff, esc_buffer[2]&0xff);
-      deb(s);
-      //esc_buffer[1]= 0xfc;
-      //write(esc_buffer, 3);
       return finish_esc(0);
     }
-  deb("Inside telnt msg l=%d\n", l);
   return 0;
 }
 
@@ -509,7 +479,6 @@ cl_f::process_csi(void)
     case '~':
       {
 	int n;
-	deb("ESC_[~ ");deb(&esc_buffer[1]);deb("\n");
 	n= strtol(&esc_buffer[2], 0, 0);
 	switch (n)
 	  {
@@ -556,7 +525,6 @@ cl_f::process_esc(char c)
 	case 'O':
 	  if (l < 3)
 	    return 0;
-	  deb("ESC_O ");deb(&esc_buffer[1]);deb("\n");
 	  switch (c)
 	    {
 	    case 'P': return finish_esc(TU_F1);
@@ -571,7 +539,6 @@ cl_f::process_esc(char c)
 	case 'N':
 	  if (l < 3)
 	    return 0;
-	  deb("ESC_N ");deb(&esc_buffer[1]);deb("\n");
 	  switch (c)
 	    {
 	    default: return finish_esc(c);
@@ -581,7 +548,6 @@ cl_f::process_esc(char c)
 	  return process_csi();
 	  break;
 	default:
-	  deb("ESC_? ");deb(&esc_buffer[1]);deb("\n");
 	  return finish_esc(c);
 	}
     }
@@ -594,13 +560,11 @@ cl_f::process_esc(char c)
       if (ci == '\033')
 	{
 	  esc_buffer[0]= '\033', esc_buffer[1]= 0;
-	  deb("Start ESC\n");
 	  return 0;
 	}
       if (ci == 0xff)
 	{
 	  esc_buffer[0]= 0xff, esc_buffer[1]= 0;
-	  deb("Start IAC\n");
 	  return 0;
 	}
     }
@@ -615,15 +579,8 @@ cl_f::process(char c)
   int i;
   unsigned int ci= c&0xff;
 
-  deb("\n%d. processing fid=%d c=%02x,%d,%c cooked=%d tlnt=%d\n", j++, file_id, ci, ci, (ci>31)?ci:'.', cooking, proc_telnet);
   if (!cooking)
     {
-      /*if (ci == 3)
-	{
-	  deb("non-coocking ^C, finish\n");
-	  at_end= 1;
-	}
-	else*/
       if (proc_escape)
 	{
 	  if ((ci == '\033') ||
@@ -641,11 +598,9 @@ cl_f::process(char c)
 	  if ((ci == 0xff) ||
 	      (esc_buffer[0] != 0))
 	    {
-	      deb("Processing telnet msg, ci=%02x\n", ci);
 	      ci= process_telnet(ci);
 	      if (!ci)
 		{
-		  deb("skip\n");
 		  return last_ln= 0;
 		}
 	    }
@@ -655,23 +610,19 @@ cl_f::process(char c)
 	      (ci == 0) ||
 	      (last_ln != 0))
 	    {
-	      deb("Processing line ending ci=%02x\n", ci);
 	      if ((last_ln == 0) &&
 		  (ci != 0))
 		{
-		  deb("Starting lineend sequence\nkeep\n");
 		  last_ln= ci;
 		}
 	      else
 		{
 		  if (last_ln != (int)ci)
 		    {
-		      deb("different le char(%x) after last=%x, skip\n",ci,last_ln);
 		      return last_ln= 0;
 		    }
 		  if (ci == 0)
 		    {
-		      deb("Zero char after last=%x, skip\n", last_ln);
 		      return last_ln= 0;
 		    }		      
 		}
@@ -699,23 +650,15 @@ cl_f::process(char c)
       last_ln= 0;
       return put(c);
     }
-  //return put(c);
+
   int l= strlen(line);
   int k= process_esc(c);
   int ret= 0;
-  /*if (!k || tu_ready)
-    return;*/
-  {
-    char s[100];
-    sprintf(s, "c=%d k=%d\n", c, k);
-    deb(s);
-  }
   if (!k)
     return last_ln= 0;
   // CURSOR MOVEMENT
   if (k == TU_LEFT)
     {
-      deb("Left\n");
       if (cursor > 0)
 	{
 	  cursor--;
@@ -724,7 +667,6 @@ cl_f::process(char c)
     }
   else if (k == TU_RIGHT)
     {
-      deb("Right\n");
       if (line[cursor] != 0)
 	{
 	  cursor++;
@@ -734,7 +676,6 @@ cl_f::process(char c)
   else if ((k == TU_HOME) ||
 	   (k == 'A'-'A'+1))
     {
-      deb("Home\n");
       if (cursor > 0)
 	{
 	  echo_cursor_go_left(cursor);
@@ -744,7 +685,6 @@ cl_f::process(char c)
   else if ((k == TU_END) ||
 	   (k == 'E'-'A'+1))
     {
-      deb("End\n");
       if (line[cursor] != 0)
 	{
 	  echo_cursor_go_right(l-cursor);
@@ -787,13 +727,6 @@ cl_f::process(char c)
 	}
     }
   // FINISH EDITING
-  /*else if ((k == 'C'-'A'+1) ||
-	   (k == 'D'-'A'+1))
-    {
-      //ready= 1;
-      deb("Cooking close on ^C/^D\n");
-      at_end= 1;
-      }*/
   else if ((k == '\n') ||
 	   (k == '\r') ||
 	   (k == 0))
@@ -801,13 +734,10 @@ cl_f::process(char c)
       if (last_ln &&
 	  (last_ln != k))
 	{
-	  deb("Skip %d after %d\n", k, last_ln);
 	  last_ln= 0;
 	  return 0;
 	}
       last_ln= k;
-      deb("Enter \"");deb(line);deb("\"\n");
-      //ready= 1;
       for (i= 0; i<l; i++)
 	put(line[i]);
       put('\n');
@@ -822,7 +752,6 @@ cl_f::process(char c)
   else if ((k == 127) || /*DEL*/
 	   (k == 8 /*BS*/))
     {
-      deb("BS\n");
       if (cursor > 0)
 	{
 	  for (i= cursor; line[i]; i++)
@@ -841,7 +770,6 @@ cl_f::process(char c)
   else if (//(k == 127) || /*DEL*/
 	   (k == TU_DEL))
     {
-      deb("Del\n");
       if (line[cursor] != 0)
 	{
 	  for (i= cursor+1; line[i]; i++)
@@ -857,7 +785,6 @@ cl_f::process(char c)
     }
   else if (k == 'K'-'A'+1)
     {
-      deb("^K\n");
       if (cursor > 0)
 	echo_cursor_go_left(cursor);
       echo_cursor_save();
@@ -868,13 +795,9 @@ cl_f::process(char c)
       line[cursor= 0]= 0;
     }
   else if (k < 0)
-    deb("k<0\n");
+    ;
   else if (isprint(k))
     {
-      char s[100];
-      deb("Insert ");
-      sprintf(s,"%d,%02x,%c\n",k,k,(k>31)?k:'.');
-      deb(s);
       if (l < /*tu_buf_size*/1023)
 	{
 	  if (line[cursor] == 0)
@@ -896,7 +819,6 @@ cl_f::process(char c)
 	    }
 	}
     }
-  deb("Line=\"%s\" curs=%d\n",line,cursor);
   return ret;
 }
 
@@ -908,20 +830,16 @@ cl_f::pick(void)
   if (fp < 5)
     return 0;
   int i= ::read(file_id, b, (fp>101)?99:fp-1);
-  deb("pick fid=%d i=%d\n", file_id, i);
-  {int j;for(j=0;j<i;j++)deb("pick[%d]=%s\n",j,dc(b[j]));}
   if (i > 0)
     {
       int j;
       for (j= 0; j < i; j++)
 	{
-	  //if (b[j] == 3 /* ^C */)
-	    process(b[j]);
+	  process(b[j]);
 	}
     }
   if (i == 0)
     {
-      deb("pick: read=0, finish\n");
       at_end= 1;
     }
   if (i < 0)
@@ -953,8 +871,6 @@ cl_f::input_avail(void)
   int ret= check_dev();
   if (ret)
     return ret;
-  if (at_end)
-    deb("fid=%d no dev input, but at end\n", file_id);
   return at_end;
 }
 
@@ -1066,22 +982,6 @@ cl_f::write(char *buf, int count)
 	      if (j != 2)
 		;
 	    }
-	    /*{
-	      deb("Outputting LineEnd=%d to fid=%d\n",buf[i],file_id);
-	      if (last_ln == 0)
-		{
-		  deb("Memorize LE=%d\n",buf[i]);
-		  last_ln= buf[i];
-		  ::write(file_id, "\r\n", 2);
-		}
-	      else if (last_ln == buf[i])
-		{
-		  deb("LE == memorized\n");
-		  ::write(file_id, "\r\n", 2);
-		}
-	      else
-		deb("LE=%d != memorized=%d, skip\n", buf[i], last_ln);
-		}*/
 	  else
 	    {
 	      j= ::write(file_id, &buf[i], 1);

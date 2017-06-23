@@ -1,3 +1,11 @@
+2017-06-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Improve 16-bit register-to-register transfer,
+	  consider cycle cost for register allocation.
+	* src/stm8/peeph.def:
+	  Improve 16-bit addition with on-stack operand.
+
 2017-06-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

@@ -2344,7 +2344,7 @@ geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl)
   /* if left is a pointer then size */
   if (IS_PTR (ltype) || IS_ARRAY (ltype))
     {
-	  unsigned int ptrSize;
+      unsigned int ptrSize;
       isarray = left->isaddr;
       nBytes = getSize (ltype->next);
 

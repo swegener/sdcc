@@ -1510,9 +1510,9 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   // Now do the register shuffling.
 
   // Try to use exgw x, y.
-  if (regsize >= 4)
+  if (regsize >= 3)
     {
-      int ex[4] = {-1, -1, -1, -1};
+      int ex[4] = {-2, -2, -2, -2};
 
       // Find XL and check that it is exchanged with YL, find XH and check that it is exchanged with YH.
       for (i = 0; i < n; i++)
@@ -1526,16 +1526,23 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           if (!assigned[i] && aopInReg (result, roffset + i, YH_IDX) && aopInReg (source, soffset + i, XH_IDX))
             ex[3] = i;
         }
-      if (ex[0] >= 0 && ex[1] >= 0 && ex[2] >= 0 && ex[3] >= 0)
+
+      int exsum = (ex[0] >= 0) + (ex[1] >= 0) + (ex[2] >= 0) + (ex[3] >= 0);
+
+      if (exsum == 4)
         {
           emit2 ("exgw", "x, y");
           cost (1, 1);
-          assigned[ex[0]] = TRUE;
-          assigned[ex[1]] = TRUE;
-          assigned[ex[2]] = TRUE;
-          assigned[ex[3]] = TRUE;
-          regsize -= 4;
-          size -= 4;
+          if(ex[0] >= 0)
+            assigned[ex[0]] = TRUE;
+          if(ex[1] >= 0)
+            assigned[ex[1]] = TRUE;
+          if(ex[2] >= 0)
+            assigned[ex[2]] = TRUE;
+          if(ex[3] >= 0)
+            assigned[ex[3]] = TRUE;
+          regsize -= exsum;
+          size -= exsum;
         }
     }
 
@@ -1736,8 +1743,8 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   {
     const int il = result->regs[XL_IDX] - roffset;
     const int ih = result->regs[XH_IDX] - roffset;
-    const bool assign_l = (il > 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, YL_IDX));
-    const bool assign_h = (ih > 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, YH_IDX));
+    const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, YL_IDX));
+    const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, YH_IDX));
     if (source->regs[XL_IDX] < 0 && source->regs[XH_IDX] < 0 &&
       (assign_l && assign_h || assign_l && xh_dead && ih < 0 || assign_h && xl_dead && il < 0))
     {
@@ -1762,13 +1769,21 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   {
     const int il = result->regs[YL_IDX] - roffset;
     const int ih = result->regs[YH_IDX] - roffset;
-    const bool assign_l = (il > 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, XL_IDX));
-    const bool assign_h = (ih > 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, XH_IDX));
+    const bool assign_l = (il >= 0 && il < n && !assigned[il] && aopInReg (source, soffset + il, XL_IDX));
+    const bool assign_h = (ih >= 0 && ih < n && !assigned[ih] && aopInReg (source, soffset + ih, XH_IDX));
     if (source->regs[YL_IDX] < 0 && source->regs[YH_IDX] < 0 &&
       (assign_l && assign_h || assign_l && yh_dead && ih < 0 || assign_h && yl_dead && il < 0))
     {
-      emit2 ("ldw", "y, x");
-      cost (2, 1);
+      if(x_dead && assign_l && assign_h)
+        {
+          emit2 ("exgw", "x, y");
+          cost (1, 1);
+        }
+      else
+        {
+          emit2 ("ldw", "y, x");
+          cost (2, 1);
+        }
       if (assign_l)
         {
           assigned[il] = TRUE;
@@ -6174,7 +6189,10 @@ genPointerGet (const iCode *ic)
     }
 
   // todo: Handle this more gracefully, save x instead of using y.
-  use_y = (aopInReg (left->aop, 0, Y_IDX) && size <= 1 + aopInReg (result->aop, 0, Y_IDX)) || !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX));
+  use_y = (aopInReg (left->aop, 0, Y_IDX) && size <= 1 + aopInReg (result->aop, 0, Y_IDX)) ||
+    !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX)) ||
+    !bit_field && size == 2 && aopInReg (result->aop, 0, Y_IDX) && aopInReg (left->aop, 0, X_IDX) && !regDead (X_IDX, ic);
+
   if (use_y ? !(regDead (Y_IDX, ic) || aopInReg (left->aop, 0, Y_IDX)) : !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX)))
     {
       if (!regalloc_dry_run)
@@ -7309,7 +7327,7 @@ genSTM8iCode (iCode *ic)
     }
 }
 
-unsigned int
+float
 drySTM8iCode (iCode *ic)
 {
   regalloc_dry_run = TRUE;
@@ -7324,7 +7342,9 @@ drySTM8iCode (iCode *ic)
 
   wassert (regalloc_dry_run);
 
-  return (regalloc_dry_run_cost_bytes);
+  const unsigned int byte_cost_weight = 1 << (optimize.codeSize * 3 + !optimize.codeSpeed * 3);
+
+  return (regalloc_dry_run_cost_bytes * byte_cost_weight + regalloc_dry_run_cost_cycles * 0.2f /* Execution probabilty guess - replace by a more exact guess in the range [0.0, 1.0] (from profiler data or control-flow analysis) */);
 }
 
 /*---------------------------------------------------------------------*/

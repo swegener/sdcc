@@ -97,6 +97,16 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
+	ldw	(%1, sp), x
+	ldw	x, (%2, sp)
+	addw	x, (%1, sp)
+} by {
+	ldw	(%1, sp), x
+	; peephole 3e eliminated load using commutativity of addition
+	addw	x, (%2, sp)
+}
+
+replace restart {
 	ld	a, (%1, y)
 	push	a
 	ld	a, (%2, x)

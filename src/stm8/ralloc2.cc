@@ -27,7 +27,7 @@ extern "C"
 {
   #include "ralloc.h"
   #include "gen.h"
-  unsigned int drySTM8iCode (iCode *ic);
+  float drySTM8iCode (iCode *ic);
   bool stm8_assignment_optimal;
   long int stm8_call_stack_size;
   bool stm8_extend_stack;
@@ -399,7 +399,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case SWAP:
       assign_operands_for_cost(a, i, G, I);
       set_surviving_regs(a, i, G, I);
-      c = (float)drySTM8iCode(ic);
+      c = drySTM8iCode(ic);
       unset_surviving_regs(i, G);
       ic->generated = false;
 #if 0

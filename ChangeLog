@@ -1,7 +1,7 @@
 2017-06-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  More efficient >= 32-bit increment for spilt local variables.
+	  More efficient >= 32-bit increment for (partially) spilt local variables.
 
 2017-06-23 Philipp Klaus Krause <pkk AT spth.de>
 

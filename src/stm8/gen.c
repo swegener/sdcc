@@ -3451,16 +3451,27 @@ genPlus (const iCode *ic)
         }
       // Using incw with a chain or conditional jumps to emulate carry - allows somewhat more efficient 32-bit increment.
       else if(!started && !pushed_a && rightop->type == AOP_LIT && regDead (X_IDX, ic) && !((size - i) % 2) &&
-        aopOnStack (leftop, i, size - i) && (aopOnStack (result->aop, i, size - i) && result->aop->aopu.bytes[0].byteu.stk == leftop->aopu.bytes[0].byteu.stk) &&
-        aopIsLitVal (rightop, i, 2, 0x0001) && aopIsLitVal (rightop, i + 2, size - i, 0))
+        aopIsLitVal (rightop, i, 2, 0x0001) && aopIsLitVal (rightop, i + 2, size - i, 0) &&
+        ((aopOnStack (leftop, i, size - i) && aopOnStack (result->aop, i, size - i) ||
+          aopOnStack (leftop, i, size - i - 2) && aopOnStack (leftop, i, size - i - 2) && aopInReg (result->aop, size - 2, Y_IDX) && aopInReg (result->aop, size - 2, Y_IDX) ||
+          aopOnStack (leftop, i + 2, size - i - 2) && aopOnStack (leftop, i + 2, size - i - 2) && aopInReg (result->aop, i, Y_IDX) && aopInReg (result->aop, i, Y_IDX)) &&
+          result->aop->aopu.bytes[0].byteu.stk == leftop->aopu.bytes[0].byteu.stk ||
+            size - i == 4 && 
+            (aopInReg (leftop, i, Y_IDX) && aopInReg (result->aop, i, Y_IDX) && aopInReg (leftop, i + 2, X_IDX) && aopInReg (result->aop, i + 2, X_IDX) || aopInReg (leftop, i, X_IDX) && aopInReg (result->aop, i, X_IDX) && aopInReg (leftop, i + 2, Y_IDX) && aopInReg (result->aop, i + 2, Y_IDX))))
         {
           if(!endlbl && !regalloc_dry_run)
             endlbl =  newiTempLabel (NULL);
           for(;;)
             {
-              genMove_o (ASMOP_X, 0, leftop, i, 2, a_free, TRUE, FALSE);
-              emit3w (A_INCW, ASMOP_X, 0);
-              genMove_o (result->aop, i, ASMOP_X, 0, 2, a_free, TRUE, FALSE);
+              if(aopInReg (leftop, i, Y_IDX) && aopInReg (result->aop, i, Y_IDX) ||
+                aopInReg (leftop, i, X_IDX) && aopInReg (result->aop, i, X_IDX))
+                emit3w_o (A_INCW, result->aop, i, 0, 0);
+              else
+                {
+                  genMove_o (ASMOP_X, 0, leftop, i, 2, a_free, TRUE, FALSE);
+                  emit3w (A_INCW, ASMOP_X, 0);
+                  genMove_o (result->aop, i, ASMOP_X, 0, 2, a_free, TRUE, FALSE);
+                }
               i += 2;
               if(i >= size)
                 break;

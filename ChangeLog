@@ -1,6 +1,11 @@
 2017-06-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
+	  More efficient >= 32-bit increment for spilt local variables.
+
+2017-06-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
 	  Improve 16-bit register-to-register transfer,
 	  consider cycle cost for register allocation.
 	* src/stm8/peeph.def:

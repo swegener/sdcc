@@ -3308,6 +3308,7 @@ genPlus (const iCode *ic)
   bool started;
   bool pushed_a = FALSE;
   bool result_in_a = FALSE;
+  symbol *endlbl = 0;
 
   D (emit2 ("; genPlus", ""));
 
@@ -3419,7 +3420,7 @@ genPlus (const iCode *ic)
        bool yh_free = regDead (YH_IDX, ic) && (result->aop->regs[YH_IDX] >= i || result->aop->regs[YH_IDX] < 0) && leftop->regs[YH_IDX] <= i + 1 && rightop->regs[YH_IDX] < i;
        bool y_free = yl_free && yh_free;
 
-      // We can use incw / decw only for the only, top non-zero word, since it neither takes into account an existing carry nor does it update the carry.
+      // We can use incw / decw easily only for the only, top non-zero word, since it neither takes into account an existing carry nor does it update the carry.
       if (!started && i == size - 2 &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
         rightop->type == AOP_LIT && !byteOfVal (rightop->aopu.aop_lit, i + 1) &&
@@ -3447,6 +3448,25 @@ genPlus (const iCode *ic)
           emit3w (A_DECW, x ? ASMOP_X : ASMOP_Y, 0);
           started = TRUE;
           i += 2;
+        }
+      // Using incw with a chain or conditional jumps to emulate carry - allows somewhat more efficient 32-bit increment.
+      else if(!started && !pushed_a && rightop->type == AOP_LIT && regDead (X_IDX, ic) && !((size - i) % 2) &&
+        aopOnStack (leftop, i, size - i) && (aopOnStack (result->aop, i, size - i) && result->aop->aopu.bytes[0].byteu.stk == leftop->aopu.bytes[0].byteu.stk) &&
+        aopIsLitVal (rightop, i, 2, 0x0001) && aopIsLitVal (rightop, i + 2, size - i, 0))
+        {
+          if(!endlbl && !regalloc_dry_run)
+            endlbl =  newiTempLabel (NULL);
+          for(;;)
+            {
+              genMove_o (ASMOP_X, 0, leftop, i, 2, a_free, TRUE, FALSE);
+              emit3w (A_INCW, ASMOP_X, 0);
+              genMove_o (result->aop, i, ASMOP_X, 0, 2, a_free, TRUE, FALSE);
+              i += 2;
+              if(i >= size)
+                break;
+              if (endlbl)
+                emit2 ("jrne", "!tlabel", labelKey2num (endlbl->key));
+            }
         }
       else if (!started &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
@@ -3605,6 +3625,8 @@ genPlus (const iCode *ic)
     pop (ASMOP_A, 0, 1);
   else if (pushed_a)
     adjustStack (1, FALSE, FALSE, FALSE);
+
+  emitLabel (endlbl);
 
   freeAsmop (right);
   freeAsmop (left);

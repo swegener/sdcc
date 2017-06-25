@@ -237,7 +237,7 @@ aopInReg (const asmop *aop, int offset, short rIdx)
   if (!(aop->type == AOP_REG || aop->type == AOP_REGSTK))
     return (FALSE);
 
-  if (offset >= aop->size)
+  if (offset >= aop->size || offset < 0)
     return (FALSE);
 
   if (rIdx == X_IDX)

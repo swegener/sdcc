@@ -116,7 +116,7 @@ static bool operand_sane(const operand *o, const assignment &a, unsigned short i
     return(true);
   
   // Register combinations code generation cannot handle yet (AH, XH, HA).
-  if(a.local.find(oi->second) != a.local.end() && a.local.find(oi2->second) != a.local.end())
+  if(std::binary_search(a.local.begin(), a.local.end(), oi->second) && std::binary_search(a.local.begin(), a.local.end(), oi2->second))
     {
       const reg_t l = a.global[oi->second];
       const reg_t h = a.global[oi2->second];
@@ -125,16 +125,16 @@ static bool operand_sane(const operand *o, const assignment &a, unsigned short i
     }
   
   // In registers.
-  if(a.local.find(oi->second) != a.local.end())
+  if(std::binary_search(a.local.begin(), a.local.end(), oi->second))
     {
       while(++oi != oi_end)
-        if(a.local.find(oi->second) == a.local.end())
+        if(!std::binary_search(a.local.begin(), a.local.end(), oi->second))
           return(false);
     }
   else
     {
        while(++oi != oi_end)
-        if(a.local.find(oi->second) != a.local.end())
+        if(std::binary_search(a.local.begin(), a.local.end(), oi->second))
           return(false);
     }
  
@@ -167,7 +167,7 @@ static bool operand_is_ax(const operand *o, const assignment &a, unsigned short 
     return(false);
   
   // Register combinations code generation cannot handle yet (AX, AH, XH, HA).
-  if(a.local.find(oi->second) != a.local.end() && a.local.find(oi2->second) != a.local.end())
+  if(std::binary_search(a.local.begin(), a.local.end(), oi->second) && std::binary_search(a.local.begin(), a.local.end(), oi2->second))
     {
       const reg_t l = a.global[oi->second];
       const reg_t h = a.global[oi2->second];
@@ -352,7 +352,7 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
   iCode *ic = G[i].ic;
   
   bitVectClear(ic->rMask);
-  bitVectClear(ic->rMask);
+  bitVectClear(ic->rSurv);
   
   cfg_alive_t::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
@@ -520,8 +520,9 @@ static void get_best_local_assignment_biased(assignment &a, typename boost::grap
   a = *T[t].assignments.begin();
 
   std::set<var_t>::const_iterator vi, vi_end;
-  for(vi = T[t].alive.begin(), vi_end = T[t].alive.end(); vi != vi_end; ++vi)
-    a.local.insert(*vi);
+  varset_t newlocal;
+  std::set_union(T[t].alive.begin(), T[t].alive.end(), a.local.begin(), a.local.end(), std::inserter(newlocal, newlocal.end()));
+  a.local = newlocal;
 }
 
 // This is just a dummy for now, it probably isn't really needed for hc08 due to the low number of registers.

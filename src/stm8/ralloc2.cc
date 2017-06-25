@@ -179,8 +179,8 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
 {
   iCode *ic = G[i].ic;
 
-  bitVectClear(ic->rSurv);
   bitVectClear(ic->rMask);
+  bitVectClear(ic->rSurv);
 
   cfg_alive_t::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
@@ -415,8 +415,9 @@ static void get_best_local_assignment_biased(assignment &a, typename boost::grap
   a = *T[t].assignments.begin();
 
   std::set<var_t>::const_iterator vi, vi_end;
-  for(vi = T[t].alive.begin(), vi_end = T[t].alive.end(); vi != vi_end; ++vi)
-    a.local.insert(*vi);
+  varset_t newlocal;
+  std::set_union(T[t].alive.begin(), T[t].alive.end(), a.local.begin(), a.local.end(), std::inserter(newlocal, newlocal.end()));
+  a.local = newlocal;
 }
 
 // Suggest to honor register keyword and to not reverse bytes and prefer use of a. Prefer x over y.

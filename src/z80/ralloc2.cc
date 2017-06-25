@@ -59,7 +59,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
           var_t v = oi->second;
 
           // In registers.
-          if(a.local.find(v) != a.local.end())
+          if(std::binary_search(a.local.begin(), a.local.end(), v))
             {
               c += 1.0f;
               byteregs[I[v].byte] = a.global[v];
@@ -68,7 +68,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
               while(++oi != oi_end)
                 {
                   v = oi->second;
-                  c += (a.local.find(v) != a.local.end() ? 1.0f : std::numeric_limits<float>::infinity());
+                  c += (std::binary_search(a.local.begin(), a.local.end(), v) ? 1.0f : std::numeric_limits<float>::infinity());
                   byteregs[I[v].byte] = a.global[v];
                   size++;
                 }
@@ -102,7 +102,7 @@ float default_operand_cost(const operand *o, const assignment &a, unsigned short
               while(++oi != oi_end)
                 {
                   v = oi->second;
-                  c += (a.local.find(v) == a.local.end() ? 4.0f : std::numeric_limits<float>::infinity());
+                  c += (!std::binary_search(a.local.begin(), a.local.end(), v) ? 4.0f : std::numeric_limits<float>::infinity());
                 }
             }
         }
@@ -125,16 +125,16 @@ static bool operand_sane(const operand *o, const assignment &a, unsigned short i
     return(true);
   
   // In registers.
-  if(a.local.find(oi->second) != a.local.end())
+  if(std::binary_search(a.local.begin(), a.local.end(), oi->second))
     {
       while(++oi != oi_end)
-        if(a.local.find(oi->second) == a.local.end())
+        if(!std::binary_search(a.local.begin(), a.local.end(), oi->second))
           return(false);
     }
   else
     {
        while(++oi != oi_end)
-        if(a.local.find(oi->second) != a.local.end())
+        if(std::binary_search(a.local.begin(), a.local.end(), oi->second))
           return(false);
     }
  
@@ -192,7 +192,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
     {
       var_t v = oi->second;
 
-      if(a.local.find(v) == a.local.end())
+      if(!std::binary_search(a.local.begin(), a.local.end(), v))
         return(default_instruction_cost(a, i, G, I));
 
       c += 1.0f;
@@ -202,7 +202,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
       while(++oi != oi_end)
         {
           v = oi->second;
-          c += (a.local.find(v) != a.local.end() ? 1.0f : std::numeric_limits<float>::infinity());
+          c += (std::binary_search(a.local.begin(), a.local.end(), v) ? 1.0f : std::numeric_limits<float>::infinity());
           byteregs[I[v].byte] = a.global[v];
           size1++;
         }
@@ -227,7 +227,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
     {
       var_t v = oi->second;
 
-      if(a.local.find(v) == a.local.end())
+      if(!std::binary_search(a.local.begin(), a.local.end(), v))
         return(default_instruction_cost(a, i, G, I));
 
       c += 1.0f;
@@ -238,7 +238,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
       while(++oi != oi_end)
         {
           v = oi->second;
-          c += (a.local.find(v) != a.local.end() ? 1.0f : std::numeric_limits<float>::infinity());
+          c += (std::binary_search(a.local.begin(), a.local.end(), v) ? 1.0f : std::numeric_limits<float>::infinity());
           if(byteregs[I[v].byte] == a.global[v])
             c -= 2.0f;
           size2++;
@@ -279,7 +279,7 @@ return_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
     {
       var_t v = oi->second;
 
-      if(a.local.find(v) == a.local.end())
+      if(!std::binary_search(a.local.begin(), a.local.end(), v))
         return(default_instruction_cost(a, i, G, I));
 
       c += 1.0f;
@@ -289,7 +289,7 @@ return_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
       while(++oi != oi_end)
         {
           v = oi->second;
-          c += (a.local.find(v) != a.local.end() ? 1.0f : std::numeric_limits<float>::infinity());
+          c += (std::binary_search(a.local.begin(), a.local.end(), v) ? 1.0f : std::numeric_limits<float>::infinity());
           byteregs[I[v].byte] = a.global[v];
           size++;
         }
@@ -333,7 +333,7 @@ call_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
     {
       var_t v = oi->second;
 
-      if(a.local.find(v) == a.local.end())
+      if(!std::binary_search(a.local.begin(), a.local.end(), v))
         return(default_instruction_cost(a, i, G, I));
 
       c += 1.0f;
@@ -343,7 +343,7 @@ call_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
       while(++oi != oi_end)
         {
           v = oi->second;
-          c += (a.local.find(v) != a.local.end() ? 1.0f : std::numeric_limits<float>::infinity());
+          c += (std::binary_search(a.local.begin(), a.local.end(), v) ? 1.0f : std::numeric_limits<float>::infinity());
           byteregs[I[v].byte] = a.global[v];
           size++;
         }
@@ -1092,8 +1092,8 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
 {
   iCode *ic = G[i].ic;
   
-  bitVectClear(ic->rMask );
-  bitVectClear(ic->rMask );
+  bitVectClear(ic->rMask);
+  bitVectClear(ic->rSurv);
   
   cfg_alive_t::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
@@ -1358,8 +1358,9 @@ too_risky:
   a = *ai_best;
   
   std::set<var_t>::const_iterator vi, vi_end;
-  for(vi = T[t].alive.begin(), vi_end = T[t].alive.end(); vi != vi_end; ++vi)
-    a.local.insert(*vi);
+  varset_t newlocal;
+  std::set_union(T[t].alive.begin(), T[t].alive.end(), a.local.begin(), a.local.end(), std::inserter(newlocal, newlocal.end()));
+  a.local = newlocal;
 }
 
 template <class G_t, class I_t>

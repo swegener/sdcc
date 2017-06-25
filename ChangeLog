@@ -1,3 +1,10 @@
+2017-06-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  .version,
+	  src/*/ralloc2.cc:
+	  Speed up register allocator.
+
 2017-06-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp,

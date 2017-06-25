@@ -135,19 +135,13 @@ struct i_assignment_t
   }
 };
 
-#ifdef HAVE_STX_BTREE_SET_H
-typedef stx::btree_set<var_t> varset_t; // Faster than std::set
-#else
-typedef std::set<var_t> varset_t;
-#endif
-//typedef std::set<var_t, std::less<var_t>, boost::fast_pool_allocator<var_t> > varset_t; // Slower than ordinary std::set
+typedef std::vector<var_t> varset_t;// Faster than std::set,  std::tr1::unordered_set and stx::btree_set.
 
 #ifdef HAVE_STX_BTREE_MAP_H
 typedef stx::btree_map<int, float> icosts_t; // Faster than std::map
 #else
 typedef std::map<int, float> icosts_t;
 #endif
-//typedef std::tr1::unordered_set<var_t> varset_t; // Speed about the same as std::set
 
 typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set in this role.
 typedef std::set<var_t> cfg_dying_t; // Faster than stx::btree_set in this role.
@@ -643,7 +637,9 @@ static void assignments_introduce_variable(assignment_list_t &alist, unsigned sh
                   a = *ai;
                   ai->marked = true;
                   a.marked = false;
-                  a.local.insert(v);
+                  varset_t::iterator i = std::lower_bound(a.local.begin(), a.local.end(), v);
+                  if (i == a.local.end() || *i != v)
+                    a.local.insert(i, v);
                 }
               a.global[v] = r;
               a.i_assignment.add_var(v, r);
@@ -865,8 +861,9 @@ static void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::ve
     {
       // Erasing by iterators doesn't work with B-Trees, and erasing by value invalidates iterators.
       std::set<var_t>::const_iterator oi, oi_end;
-      for (oi = old_vars.begin(), oi_end = old_vars.end(); oi != oi_end; ++oi)
-        ai->local.erase(*oi);
+      varset_t newlocal;
+      std::set_difference(ai->local.begin(), ai->local.end(), old_vars.begin(), old_vars.end(), std::inserter(newlocal, newlocal.end()));
+      ai->local = newlocal;
 
       ai->i_costs.erase(i);
     }

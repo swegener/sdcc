@@ -464,6 +464,21 @@ bitVectFirstBit (const bitVect * bvp)
 }
 
 /*-----------------------------------------------------------------*/
+/* bitVectIsZero - clear all bits                                  */
+/*-----------------------------------------------------------------*/
+void
+bitVectClear (bitVect *bvp)
+{
+  int i;
+
+  if (!bvp)
+    return;
+
+  for (i = 0; i < bvp->bSize; i++)
+    bvp->vect[i] = 0;
+}
+
+/*-----------------------------------------------------------------*/
 /* bitVectDebugOn - prints bits that are on                        */
 /*-----------------------------------------------------------------*/
 void 
@@ -485,3 +500,4 @@ bitVectDebugOn (bitVect * bvp, FILE * of)
     }
   fprintf (of, "}\n");
 }
+

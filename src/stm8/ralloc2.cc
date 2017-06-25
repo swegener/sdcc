@@ -178,11 +178,11 @@ template <class G_t, class I_t>
 static void set_surviving_regs(const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
 {
   iCode *ic = G[i].ic;
-  
-  ic->rMask = newBitVect(port->num_regs);
-  ic->rSurv = newBitVect(port->num_regs);
-  
-  std::set<var_t>::const_iterator v, v_end;
+
+  bitVectClear(ic->rSurv);
+  bitVectClear(ic->rMask);
+
+  cfg_varset_t::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
     {
       if(a.global[*v] < 0)
@@ -193,15 +193,6 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
         if(!((IC_RESULT(ic) && !POINTER_SET(ic)) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
           ic->rSurv = bitVectSetBit(ic->rSurv, a.global[*v]);
     }
-}
-
-template<class G_t>
-static void unset_surviving_regs(unsigned short int i, const G_t &G)
-{
-  iCode *ic = G[i].ic;
-  
-  freeBitVect(ic->rSurv);
-  freeBitVect(ic->rMask);
 }
 
 template <class G_t, class I_t>
@@ -400,7 +391,6 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
       assign_operands_for_cost(a, i, G, I);
       set_surviving_regs(a, i, G, I);
       c = drySTM8iCode(ic);
-      unset_surviving_regs(i, G);
       ic->generated = false;
 #if 0
       std::cout << "Got cost " << c << "\n";
@@ -541,7 +531,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
     }
 
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
-    set_surviving_regs(winner, i, G, I);    // Never freed. Memory leak?
+    set_surviving_regs(winner, i, G, I);
 
   return(!assignment_optimal);
 }

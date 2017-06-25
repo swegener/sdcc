@@ -246,7 +246,7 @@ static bool XAinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   bool left_in_A = operand_in_reg(result, REG_A, ia, i, G);
   bool left_in_X = operand_in_reg(result, REG_X, ia, i, G);
 
-  const std::set<var_t> &dying = G[i].dying;
+  const cfg_varset_t &dying = G[i].dying;
 
   bool dying_A = result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end();
   bool dying_H = result_in_H || dying.find(ia.registers[REG_H][1]) != dying.end() || dying.find(ia.registers[REG_H][0]) != dying.end();
@@ -351,10 +351,10 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
 {
   iCode *ic = G[i].ic;
   
-  ic->rMask = newBitVect(port->num_regs);
-  ic->rSurv = newBitVect(port->num_regs);
+  bitVectClear(ic->rMask);
+  bitVectClear(ic->rMask);
   
-  std::set<var_t>::const_iterator v, v_end;
+  cfg_varset_t::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
     {
       if(a.global[*v] < 0)
@@ -364,15 +364,6 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
         if(!((IC_RESULT(ic) && !POINTER_SET(ic)) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
           ic->rSurv = bitVectSetBit(ic->rSurv, a.global[*v]);
     }
-}
-
-template<class G_t>
-static void unset_surviving_regs(unsigned short int i, const G_t &G)
-{
-  iCode *ic = G[i].ic;
-  
-  freeBitVect(ic->rSurv);
-  freeBitVect(ic->rMask);
 }
 
 template <class G_t, class I_t>
@@ -509,7 +500,6 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
       assign_operands_for_cost(a, i, G, I);
       set_surviving_regs(a, i, G, I);
       c = dryhc08iCode(ic);
-      unset_surviving_regs(i, G);
       return(c);
     default:
       return(0.0f);
@@ -636,7 +626,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
     }
 
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
-    set_surviving_regs(winner, i, G, I);	// Never freed. Memory leak?
+    set_surviving_regs(winner, i, G, I);
 
   return(!assignment_optimal);
 }

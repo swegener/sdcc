@@ -1,4 +1,12 @@
-2017-06-23 Philipp Klaus Krause <pkk AT spth.de>
+2017-06-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/SDCCbitv.h,
+	  src/SDCCbitv.c,
+	  src/*/ralloc2.cc:
+	  Speed up register allocator a bit.
+
+2017-06-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
 	  More efficient >= 32-bit increment for (partially) spilt local variables.

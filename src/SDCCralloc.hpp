@@ -149,6 +149,8 @@ typedef std::map<int, float> icosts_t;
 #endif
 //typedef std::tr1::unordered_set<var_t> varset_t; // Speed about the same as std::set
 
+typedef std::set<var_t> cfg_varset_t; // Faster than stx::btree_set in this role.
+
 struct assignment
 {
   float s;
@@ -207,8 +209,8 @@ struct cfg_node
 {
   iCode *ic;
   operand_map_t operands;
-  std::set<var_t> alive;
-  std::set<var_t> dying;
+  cfg_varset_t alive;
+  cfg_varset_t dying;
 
 #ifdef DEBUG_SEGV
   cfg_node(void);
@@ -320,6 +322,8 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
         extra_ic_generated(ic);
 
         cfg[i].ic = ic;
+        ic->rSurv = newBitVect(port->num_regs); // Never freed. Memory leak?
+        ic->rMask = newBitVect(port->num_regs); // Never freed. Memory leak?
 
         if (ic->generated)
           continue;
@@ -493,7 +497,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
       adjacency_iter_t j, j_end;
       for (boost::tie(j, j_end) = adjacent_vertices(i, cfg); j != j_end; ++j)
         {
-          std::set<var_t>::const_iterator v, v_end;
+          cfg_varset_t::const_iterator v, v_end;
           for (v = cfg[*j].alive.begin(), v_end = cfg[*j].alive.end(); v != v_end; ++v)
             {
               const symbol *const vsym = (symbol *)(hTabItemWithKey(liveRanges, con[*v].v));
@@ -516,12 +520,12 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   // Construct conflict graph
   for (boost::graph_traits<cfg_t>::vertices_size_type i = 0; i < num_vertices(cfg); i++)
     {
-      std::set<var_t>::const_iterator v, v_end;
+      cfg_varset_t::const_iterator v, v_end;
       const iCode *ic = cfg[i].ic;
       
       for (v = cfg[i].alive.begin(), v_end = cfg[i].alive.end(); v != v_end; ++v)
         {
-          std::set<var_t>::const_iterator v2, v2_end;
+          cfg_varset_t::const_iterator v2, v2_end;
           
           // Conflict between operands are handled by add_operand_conflicts_in_node().
           if (cfg[i].dying.find (*v) != cfg[i].dying.end())
@@ -599,13 +603,14 @@ void assignments_introduce_instruction(assignment_list_t &alist, unsigned short 
 
   for (ai = alist.begin(), ai_end = alist.end(); ai != ai_end; ++ai)
     {
-      std::set<var_t> i_variables;
+      varset_t i_variables;
 
       std::set_intersection(ai->local.begin(), ai->local.end(), G[i].alive.begin(), G[i].alive.end(), std::inserter(i_variables, i_variables.end()));
 
       i_assignment_t ia;
 
-      std::set<var_t>::const_iterator v, v_end;
+      varset_t::const_iterator v, v_end;
+
       for (v = i_variables.begin(), v_end = i_variables.end(); v != v_end; ++v)
         if (ai->global[*v] >= 0)
           ia.add_var(*v, ai->global[*v]);
@@ -1145,7 +1150,7 @@ static void dump_cfg(const cfg_t &cfg)
     {
       std::ostringstream os;
       os << i << ", " << cfg[i].ic->key << ": ";
-      std::set<var_t>::const_iterator v;
+      cfg_varset_t::const_iterator v;
       for (v = cfg[i].alive.begin(); v != cfg[i].alive.end(); ++v)
         os << *v << " ";
       name[i] = os.str();

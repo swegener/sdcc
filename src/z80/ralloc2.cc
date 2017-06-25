@@ -582,7 +582,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     (IS_OP_LITERAL (right) || operand_in_reg(right, REG_C, ia, i, G) || operand_in_reg(right, REG_B, ia, i, G) || operand_in_reg(right, REG_E, ia, i, G) || operand_in_reg(right, REG_D, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G)))
     return(true);
 
-  const cfg_varset_t &dying = G[i].dying;
+  const cfg_dying_t &dying = G[i].dying;
 
   if(ic->op == GET_VALUE_AT_ADDRESS)
     return(result_in_A || !IS_BITVAR(getSpec(operandType(result))));
@@ -721,7 +721,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     }
   bool input_in_HL = input_in_L || input_in_H;
 
-  const cfg_varset_t &dying = G[i].dying;
+  const cfg_dying_t &dying = G[i].dying;
   
   bool dying_L = result_in_L || dying.find(ia.registers[REG_L][1]) != dying.end() || dying.find(ia.registers[REG_L][0]) != dying.end();
   bool dying_H = result_in_H || dying.find(ia.registers[REG_H][1]) != dying.end() || dying.find(ia.registers[REG_H][0]) != dying.end();
@@ -1095,7 +1095,7 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
   bitVectClear(ic->rMask );
   bitVectClear(ic->rMask );
   
-  cfg_varset_t::const_iterator v, v_end;
+  cfg_alive_t::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
     {
       if(a.global[*v] < 0)

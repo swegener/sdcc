@@ -182,7 +182,7 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
   bitVectClear(ic->rSurv);
   bitVectClear(ic->rMask);
 
-  cfg_varset_t::const_iterator v, v_end;
+  cfg_alive_t::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
     {
       if(a.global[*v] < 0)

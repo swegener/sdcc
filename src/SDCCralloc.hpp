@@ -149,7 +149,8 @@ typedef std::map<int, float> icosts_t;
 #endif
 //typedef std::tr1::unordered_set<var_t> varset_t; // Speed about the same as std::set
 
-typedef std::set<var_t> cfg_varset_t; // Faster than stx::btree_set in this role.
+typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set in this role.
+typedef std::set<var_t> cfg_dying_t; // Faster than stx::btree_set in this role.
 
 struct assignment
 {
@@ -209,8 +210,8 @@ struct cfg_node
 {
   iCode *ic;
   operand_map_t operands;
-  cfg_varset_t alive;
-  cfg_varset_t dying;
+  cfg_alive_t alive;
+  cfg_dying_t dying;
 
 #ifdef DEBUG_SEGV
   cfg_node(void);
@@ -405,7 +406,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
                   wassert (key_to_index.find(ic->key) != key_to_index.end());
                   wassert (sym_to_index.find(std::pair<int, int>(i, k)) != sym_to_index.end());
                   wassertl (key_to_index[ic->key] < boost::num_vertices(cfg), "Node not in CFG.");
-                  cfg[key_to_index[ic->key]].alive.insert(sym_to_index[std::pair<int, int>(i, k)]);
+                  cfg[key_to_index[ic->key]].alive.push_back(sym_to_index[std::pair<int, int>(i, k)]);
                 }
 
               // TODO: Move this to a place where it also works when using the old allocator!
@@ -459,7 +460,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
       boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties())); // This call to copy_graph is expensive!
       for (int j = boost::num_vertices(cfg) - 1; j >= 0; j--)
         {
-          if (cfg[j].alive.find(i) == cfg[j].alive.end())
+          if (std::find(cfg[j].alive.begin(), cfg[j].alive.end(), i) == cfg[j].alive.end())
             {
               boost::clear_vertex(j, cfg2);
               boost::remove_vertex(j, cfg2);
@@ -478,26 +479,28 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 
           for (boost::graph_traits<cfg_t>::vertices_size_type j = 0; j < boost::num_vertices(cfg) - 1; j++)
             {
-              if(cfg[j].alive.find(i) != cfg[j].alive.end())
+              if(std::binary_search(cfg[j].alive.begin(), cfg[j].alive.end(), i))
                 {
                   for (boost::graph_traits<cfg_t>::vertices_size_type k = 0; k < boost::num_vertices(cfg) - 1; k++)
                     {
                       if (component[j] == component[k])
-                        cfg[k].alive.insert(i);
+                        cfg[k].alive.push_back(i);
                     }
                 }
             }
         }
     }
 
+  // Sort alive and setup dying.
   for (boost::graph_traits<cfg_t>::vertices_size_type i = 0; i < num_vertices(cfg); i++)
     {
-      cfg[i].dying = cfg[i].alive;
+      std::sort(cfg[i].alive.begin(), cfg[i].alive.end());
+      cfg[i].dying = cfg_dying_t(cfg[i].alive.begin(), cfg[i].alive.end());;
       typedef boost::graph_traits<cfg_t>::adjacency_iterator adjacency_iter_t;
       adjacency_iter_t j, j_end;
       for (boost::tie(j, j_end) = adjacent_vertices(i, cfg); j != j_end; ++j)
         {
-          cfg_varset_t::const_iterator v, v_end;
+          cfg_alive_t::const_iterator v, v_end;
           for (v = cfg[*j].alive.begin(), v_end = cfg[*j].alive.end(); v != v_end; ++v)
             {
               const symbol *const vsym = (symbol *)(hTabItemWithKey(liveRanges, con[*v].v));
@@ -520,12 +523,12 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   // Construct conflict graph
   for (boost::graph_traits<cfg_t>::vertices_size_type i = 0; i < num_vertices(cfg); i++)
     {
-      cfg_varset_t::const_iterator v, v_end;
+      cfg_alive_t::const_iterator v, v_end;
       const iCode *ic = cfg[i].ic;
       
       for (v = cfg[i].alive.begin(), v_end = cfg[i].alive.end(); v != v_end; ++v)
         {
-          cfg_varset_t::const_iterator v2, v2_end;
+          cfg_alive_t::const_iterator v2, v2_end;
           
           // Conflict between operands are handled by add_operand_conflicts_in_node().
           if (cfg[i].dying.find (*v) != cfg[i].dying.end())
@@ -1150,7 +1153,7 @@ static void dump_cfg(const cfg_t &cfg)
     {
       std::ostringstream os;
       os << i << ", " << cfg[i].ic->key << ": ";
-      cfg_varset_t::const_iterator v;
+      cfg_alive_t::const_iterator v;
       for (v = cfg[i].alive.begin(); v != cfg[i].alive.end(); ++v)
         os << *v << " ";
       name[i] = os.str();

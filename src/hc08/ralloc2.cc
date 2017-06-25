@@ -246,7 +246,7 @@ static bool XAinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   bool left_in_A = operand_in_reg(result, REG_A, ia, i, G);
   bool left_in_X = operand_in_reg(result, REG_X, ia, i, G);
 
-  const cfg_varset_t &dying = G[i].dying;
+  const cfg_dying_t &dying = G[i].dying;
 
   bool dying_A = result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end();
   bool dying_H = result_in_H || dying.find(ia.registers[REG_H][1]) != dying.end() || dying.find(ia.registers[REG_H][0]) != dying.end();
@@ -354,7 +354,7 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
   bitVectClear(ic->rMask);
   bitVectClear(ic->rMask);
   
-  cfg_varset_t::const_iterator v, v_end;
+  cfg_alive_t::const_iterator v, v_end;
   for (v = G[i].alive.begin(), v_end = G[i].alive.end(); v != v_end; ++v)
     {
       if(a.global[*v] < 0)

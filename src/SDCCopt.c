@@ -2447,11 +2447,80 @@ offsetFoldUse (eBBlock **ebbs, int count)
 }
 
 /*-----------------------------------------------------------------*/
+/* guessCounts - Guess execution counts for iCodes                 */
+/* Needs ic->seq assigned (typically done by computeLiveRanges()   */
+/*-----------------------------------------------------------------*/
+void guessCounts (iCode *start_ic, ebbIndex *ebbi)
+{
+  iCode *ic;
+  int i;
+  bool needprop;
+
+  for (ic = start_ic; ic; ic = ic->next)
+    ic->count = 0;
+  start_ic->pcount = 1.0f;
+  needprop = TRUE;
+
+  for(i = 0; needprop && i < 24; i++) // 24 is an arbitrary limit to reduce runtime at the cost of accuracy.
+    {
+      needprop = FALSE;
+      for (ic = start_ic; ic; ic = ic->next)
+        {
+          if(ic->pcount <= 0.01) // 0.01 is an arbitrary limit to reduce runtime at the cost of accuracy.
+            continue;
+
+          ic->count += ic->pcount;
+
+          if (ic->op == GOTO)
+            {
+              iCode *target = hTabItemWithKey (labelDef, IC_LABEL (ic)->key);
+              target->pcount += ic->pcount;
+              needprop = TRUE;
+            }
+          else if(ic->op == IFX) // Use a classic, simple branch prediction. Works well for typical loops.
+            {
+              iCode *target = hTabItemWithKey (labelDef, (IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key);
+              if(target->seq >= ic->seq)
+                {
+                  target->pcount += ic->pcount / 4;
+                  if(ic->next)
+                    ic->next->pcount += ic->pcount * 3 / 4;
+                }
+              else
+                {
+                  target->pcount += ic->pcount * 3 / 4;
+                  if(ic->next)
+                    ic->next->pcount += ic->pcount / 4;
+                }
+              needprop = TRUE;
+            }
+          else if(ic->op == JUMPTABLE)
+            {
+              symbol *label;
+              int n = elementsInSet (IC_JTLABELS (ic));
+
+              for (label = setFirstItem (IC_JTLABELS (ic)); label; label = setNextItem (IC_JTLABELS (ic)))
+                {
+                  iCode *target = hTabItemWithKey (labelDef, label->key);
+                  target->pcount += ic->pcount / n;
+                }
+              needprop = TRUE;
+            }
+            else if(ic->op == CALL && IS_SYMOP (IC_LEFT (ic)) && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type))
+              ;
+          else if (ic->next)
+            ic->next->pcount += ic->pcount;
+          ic->pcount = 0.0f;
+        }
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* eBBlockFromiCode - creates extended basic blocks from iCode     */
 /*                    will return an array of eBBlock pointers     */
 /*-----------------------------------------------------------------*/
 eBBlock **
-eBBlockFromiCode (iCode * ic)
+eBBlockFromiCode (iCode *ic)
 {
   ebbIndex *ebbi = NULL;
   int change = 1;
@@ -2579,6 +2648,7 @@ eBBlockFromiCode (iCode * ic)
   computeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
   adjustIChain (ebbi->bbOrder, ebbi->count);
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
+  guessCounts (ic, ebbi);
   if (optimize.lospre && (TARGET_Z80_LIKE || TARGET_HC08_LIKE || TARGET_IS_STM8)) /* Todo: enable for other ports. */
     {
       lospre (ic, ebbi);

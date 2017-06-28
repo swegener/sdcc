@@ -197,6 +197,9 @@ typedef struct iCode
   int argreg;                   /* argument regno for SEND/RECEIVE */
   int eBBlockNum;               /* belongs to which eBBlock */
   char riu;                     /* after ralloc, the registers in use */
+  float count;                  /* An execution count or probability */
+  float pcount;                 /* For propagation of count */
+
   struct ast *tree;             /* ast node for this iCode (if not NULL) */
 }
 iCode;

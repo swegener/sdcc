@@ -7416,7 +7416,9 @@ genSTM8Code (iCode *lic)
           emit2 ("; ic:", "%d: %s", ic->key, iLine);
           dbuf_free (iLine);
         }
-
+#if 0
+      emit2 (";", "count: %f", ic->count);
+#endif
       genSTM8iCode(ic);
 
 #if 0

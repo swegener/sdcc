@@ -3,6 +3,8 @@
 	* src/SDCCgen.c,
 	  support/regression/tests/bug-2627.c:
 	  Fix bug #2627.
+	* src/stm8/gen.c:
+	  Enable use of execution count in stm8 register allocation cost calculations.
 
 2017-06-28 Philipp Klaus Krause <pkk AT spth.de>
 

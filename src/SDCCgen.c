@@ -356,6 +356,7 @@ ifxForOp (operand * op, const iCode * ic)
 
       if (ifxIc && ifxIc->op == IFX &&
         IC_COND (ifxIc)->key == op->key &&
+        OP_SYMBOL (op)->liveFrom >= ic->seq &&
         OP_SYMBOL (op)->liveTo <= ifxIc->seq)
         return ifxIc;
     }

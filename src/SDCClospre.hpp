@@ -544,6 +544,7 @@ static void split_edge(T_t &T, G_t &G, typename boost::graph_traits<G_t>::edge_d
   newic->lineno = ic->lineno;
   newic->prev = G[boost::source(e, G)].ic;
   newic->next = G[boost::target(e, G)].ic;
+  newic->count = G[boost::source(e, G)].ic->count;
   G[boost::source(e, G)].ic->next = newic;
   G[boost::target(e, G)].ic->prev = newic;
 
@@ -555,11 +556,11 @@ static void split_edge(T_t &T, G_t &G, typename boost::graph_traits<G_t>::edge_d
 
   // Insert node into cfg.
   typename boost::graph_traits<G_t>::vertex_descriptor n = boost::add_vertex(G);
-  // TODO: Exact cost.
+
   G[n].ic = newic;
   G[n].uses = false;
   boost::add_edge(boost::source(e, G), n, G[e], G);
-  boost::add_edge(n, boost::target(e, G), 3.0, G);
+  boost::add_edge(n, boost::target(e, G), G[e], G);
 
 #ifdef DEBUG_LOSPRE
   std::cout << "Calculating " << OP_SYMBOL_CONST(tmpop)->name << " at ic " << newic->key << "\n";

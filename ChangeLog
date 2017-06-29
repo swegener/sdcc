@@ -1,3 +1,9 @@
+2017-06-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCgen.c,
+	  support/regression/tests/bug-2627.c:
+	  Fix bug #2627.
+
 2017-06-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.h,

@@ -1,3 +1,10 @@
+2016-12-12 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCast.c:
+	  add cast to left and right subtree only if they both can be casted.
+	* support/regression/tests/bug-2611.c:
+	  add a new test case.
+
 2017-06-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCgen.c,

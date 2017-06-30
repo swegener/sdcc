@@ -3880,8 +3880,16 @@ decorateType (ast *tree, RESULT_TYPE resultType)
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
-      tree->left = addCast (tree->left, resultTypeProp, FALSE);
-      tree->right = addCast (tree->right, resultTypeProp, FALSE);
+
+      { // cast happen only if both left and right can be casted to result type
+        ast *l = addCast (tree->left, resultTypeProp, FALSE);
+        ast *r = addCast (tree->right, resultTypeProp, FALSE);
+        if (l != tree->left && r != tree->right)
+          {
+            tree->left = l;
+            tree->right = r;
+          }
+      }
       TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op));
 
       return tree;

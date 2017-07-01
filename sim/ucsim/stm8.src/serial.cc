@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serial.cc 754 2017-06-13 08:26:25Z drdani $ */
+/* $Id: serial.cc 765 2017-07-01 10:43:56Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -120,14 +120,7 @@ cl_serial::init(void)
   is->init();
 
   sr_read= false;
-  /*
-  cl_var *v;
-  chars pn(id_string);
-  pn.append("%d_", id);
-  uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serconf_on));
-  uc->vars->add(v= new cl_var(pn+chars("check_often"), cfg, serconf_check_often));
-  v->init();
-  */
+
   return(0);
 }
 
@@ -135,14 +128,6 @@ cl_serial::init(void)
 void
 cl_serial::new_hw_added(class cl_hw *new_hw)
 {
-  /*  if (new_hw->cathegory == HW_TIMER &&
-      new_hw->id == 2)
-    {
-      there_is_t2= DD_TRUE;
-      t_mem d= sfr->get(T2CON);
-      t2_baud= d & (bmRCLK | bmTCLK);
-    }
-  */
 }
 
 void
@@ -158,7 +143,6 @@ cl_serial::read(class cl_memory_cell *cell)
       if (sr_read)
 	regs[sr]->set_bit0(0x1f);
       regs[sr]->set_bit0(0x20);
-      //printf("** read DR=0x%02x\n", s_in);
       return s_in;
     }
   sr_read= (cell == regs[sr]);
@@ -169,8 +153,6 @@ cl_serial::read(class cl_memory_cell *cell)
 void
 cl_serial::write(class cl_memory_cell *cell, t_mem *val)
 {
-  //printf("** write 0x%02x,'%c'\n", *val, *val);
-  
   if (conf(cell, val))
     return;
   if (cell == regs[sr])
@@ -188,19 +170,16 @@ cl_serial::write(class cl_memory_cell *cell, t_mem *val)
       if ((cell == regs[brr1]) ||
 	  (cell == regs[brr2]))
 	{
-	  //printf("** BRR1,2 %x\n", *val);
 	  pick_div();
 	}
       else if ((cell == regs[cr1]) ||
 	       (cell == regs[cr2]))
 	{
-	  //printf("** CR1,2 %x\n", *val);
 	  pick_ctrl();
 	}
   
       else if (cell == regs[dr])
 	{
-	  //printf("**%d DR %x txd=%c\n", id, *val, *val);
 	  s_txd= *val;
 	  s_tx_written= true;
 	  show_writable(false);
@@ -267,13 +246,8 @@ cl_serial::tick(int cycles)
   if (s_sending &&
       (s_tr_bit >= bits))
     {
-      //printf("**%d sent %c\n", id, s_out);
       s_sending= false;
-      //if (io->fout)
-	{
-	  io->dd_printf("%c", s_out);
-	  //io->flush();
-	}
+      io->dd_printf("%c", s_out);
       s_tr_bit-= bits;
       if (s_tx_written)
 	restart_send();
@@ -284,8 +258,6 @@ cl_serial::tick(int cycles)
       io->get_fin() &&
       !s_receiving)
     {
-      //if (io->fin->input_avail())
-      //io->proc_input(0);
       if (cfg_get(serconf_check_often))
 	{
 	  if (io->input_avail())
@@ -302,7 +274,6 @@ cl_serial::tick(int cycles)
   if (s_receiving &&
       (s_rec_bit >= bits))
     {
-      //if (fin->read(&c, 1) == 1)
 	{
 	  c= input;
 	  input_avail= false;
@@ -319,7 +290,6 @@ cl_serial::tick(int cycles)
 void
 cl_serial::start_send()
 {
-  //printf("**%d start_send ten=%d %c\n", id, ten, s_txd);
   if (ten)
     {
       s_out= s_txd;
@@ -333,7 +303,6 @@ cl_serial::start_send()
 void
 cl_serial::restart_send()
 {
-  //printf("**%d restart_send ten=%d %c\n", id, ten, s_txd);
   if (ten)
     {
       s_out= s_txd;
@@ -364,7 +333,6 @@ void
 cl_serial::reset(void)
 {
   int i;
-  //printf("** reset\n");
   regs[sr]->set(0xc0);
   for (i= 2; i < 12; i++)
     regs[i]->set(0);
@@ -391,7 +359,6 @@ cl_serial::pick_div()
   u8_t b2= regs[brr2]->get();
   div= ((((b2&0xf0)<<4) + b1)<<4) + (b2&0xf);
   mcnt= 0;
-  //printf("pick_div %d\n", div);
 }
 
 void
@@ -406,20 +373,17 @@ cl_serial::pick_ctrl()
   s_rec_bit= s_tr_bit= 0;
   s_receiving= false;
   s_tx_written= false;
-  //printf("pick_ctrl en=%d ten=%d ren=%d\n", en, ten, ren);
 }
 
 void
 cl_serial::show_writable(bool val)
 {
-  //printf("**%d Writable=%d sr old=%x\n", id, val, regs[sr]->get());
   if (val)
     // TXE=1
     regs[sr]->write_bit1(0x80);
   else
     // TXE=0
     regs[sr]->write_bit0(0x80);
-  //printf("**%d Writable=%d sr new=%x\n", id, val, regs[sr]->get());
 }
 
 void
@@ -429,7 +393,6 @@ cl_serial::show_readable(bool val)
     regs[sr]->write_bit1(0x20);
   else
     regs[sr]->write_bit0(0x20);
-  //printf("**%d Readable=%d sr=%x\n", id, val, regs[sr]->get());
 }
 
 void
@@ -439,7 +402,6 @@ cl_serial::show_tx_complete(bool val)
     regs[sr]->write_bit1(0x40);
   else
     regs[sr]->write_bit0(0x40);
-  //printf("**%d TxComplete=%d sr=%x\n", id, val, regs[sr]->get());
 }
 
 void
@@ -455,7 +417,6 @@ void
 cl_serial::set_dr(t_mem val)
 {
   regs[dr]->set(val);
-  //printf("** DR<- %x %c\n", val, val);
 }
 
 void

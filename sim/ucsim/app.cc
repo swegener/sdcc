@@ -228,9 +228,9 @@ print_help(char *name)
      "                  port=nr   Use localhost:nr as server for serial line\n"
      "  -I options   `options' is a comma separated list of options according to\n"
      "               simulator interface. Known options are:\n"
-     "                 if=memory[address]  turn on interface on given memory location"
-     "                 in=file             specify input file for IO"
-     "                 out=file            specify output file forr IO"
+     "                 if=memory[address]  turn on interface on given memory location\n"
+     "                 in=file             specify input file for IO\n"
+     "                 out=file            specify output file forr IO\n"
      "  -p prompt    Specify string for prompt\n"
      "  -P           Prompt is a null ('\\0') character\n"
      "  -g           Go, start simulation\n"
@@ -498,6 +498,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 		      o->hide();
 		      options->add(o);
 		      free(h);
+		      printf("app creates %s option @%p\n",s,o);
 		    }
 		  options->set_value(s, this, /*(void*)Ser_in*/iname);
 		  free(s);
@@ -513,6 +514,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 		      o->hide();
 		      options->add(o);
 		      free(h);
+		      printf("app creates %s option @%p\n",s,o);
 		    }
 		  options->set_value(s, this, /*(void*)Ser_out*/oname);
 		  free(s);

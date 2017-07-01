@@ -97,7 +97,7 @@ COMMAND_DO_WORK_APP(cl_show_option_cmd)
 	  !strcmp(s, o->get_name()))
 	{
 	  int j;
-	  con->dd_printf("%d. %s: ", i, object_name(o));
+	  con->dd_printf("%d. %s (%p): ", i, object_name(o), o);
 	  o->print(con);
 	  con->dd_printf(" - %s\n", o->help);
 	  con->dd_printf("  Type: %s\n", o->get_type_name());

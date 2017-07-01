@@ -125,11 +125,6 @@ cl_serial_hw::init(void)
       fi->interactive(NULL);
       fi->raw();
       fi->echo(NULL);
-      //deb("** serial io fin %d\n", fi->file_id);
-    }
-  if (fo)
-    {
-      //deb("** serial io fount %d\n", fo->file_id);
     }
 
   menu= 0;
@@ -231,19 +226,16 @@ cl_serial_hw::proc_input(void)
 	  (fout->file_id == fin->file_id))
 	{
 	  delete fout;
-	  //io->fout= 0;//mk_io("", "");
 	  io->replace_files(false, fin, 0);
 	  fout= 0;
 	}
       delete fin;
-      //io->fin= 0;//mk_io("", "");
       io->replace_files(false, 0, fout);
-      //application->get_commander()->update_active();
       return true;
     }
   if (menu == 0)
     {
-      if (!input_avail || !run)
+      if (fin->tty)
 	{
 	  if (fin->read(&c, 1))
 	    {
@@ -264,11 +256,19 @@ cl_serial_hw::proc_input(void)
 				'a'+esc-1, 'a'+esc-1
 				);
 		}
-	      else if (run)
+	      else if (!input_avail)
 		{
 		  input= c;
 		  input_avail= true;
 		}
+	    }
+	}
+      else if (!input_avail)
+	{
+	  if (fin->read(&c, 1))
+	    {
+	      input= c;
+	      input_avail= true;
 	    }
 	}
     }

@@ -132,8 +132,9 @@ class cl_options: public cl_sorted_list
 
 class cl_optref: public cl_base
 {
-protected:
+ public:
   class cl_option *option;
+protected:
   class cl_base *owner;
 public:
   cl_optref(class cl_base *the_owner);

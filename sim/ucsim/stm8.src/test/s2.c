@@ -15,6 +15,11 @@ int sifchar(int c)
   return c;
 }
 
+int waitsend()
+{
+  while(!(USART->sr & USART_SR_TXE));
+}
+
 int putchar(int c)
 {
   while(!(USART->sr & USART_SR_TXE));
@@ -51,12 +56,14 @@ void main(void)
   CLK->ckdivr = 0x00; // Set the frequency to 16 MHz
   CLK->pckenr1 = 0xFF; // Enable peripherals
 
-  USART->cr2 = USART_CR2_TEN | USART_CR2_REN; // Allow TX and RX
+  USART->cr2 = USART_CR2_TEN; // Allow TX only yet
   USART->cr3 &= ~(USART_CR3_STOP1 | USART_CR3_STOP2); // 1 stop bit
   USART->brr2 = 0x03;
   USART->brr1 = 0x68; // 9600 baud
   
   printf("Hello World!\n");
+  waitsend();
+  USART->cr2 = USART_CR2_TEN | USART_CR2_REN; // Allow TX and RX
   for (;;)
     {
       if (received())
@@ -64,6 +71,8 @@ void main(void)
 	  char c= getchar();
 	  *sif= 'x';*sif= c;
 	  putchar(toupper(c));
+	  if (c == 'Z')
+	    *sif= 's';
 	}
     }
 }

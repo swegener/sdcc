@@ -1098,7 +1098,7 @@ convertToFcall (eBBlock ** ebbs, int count)
           if (ic->op == '%' && isOperandLiteral(IC_RIGHT(ic)) &&
               IS_UNSIGNED(operandType(IC_LEFT(ic))))
             {
-              unsigned litVal = abs((unsigned) double2ul (operandLitValue(IC_RIGHT(ic))));
+              unsigned long litVal = double2ul (operandLitValue(IC_RIGHT(ic)));
 
               /* modulo by 1: no remainder */
               if (litVal == 1)

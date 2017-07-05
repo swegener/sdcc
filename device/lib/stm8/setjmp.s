@@ -69,5 +69,3 @@ jump:
 	ldw	y, (y)
 	jp	(y)
 
-	ret
-

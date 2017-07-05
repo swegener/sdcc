@@ -827,7 +827,7 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   FUNC_ISZ88DK_FASTCALL (dest) |= FUNC_ISZ88DK_FASTCALL (src);
   FUNC_ISZ88DK_CALLEE (dest) |= FUNC_ISZ88DK_CALLEE (src);
   for (i = 0; i < 9; i++)
-    if (dest->funcAttrs.preserved_regs[i] |= src->funcAttrs.preserved_regs[i]);
+    dest->funcAttrs.preserved_regs[i] |= src->funcAttrs.preserved_regs[i];
 
   if (SPEC_ADDRSPACE (src) && SPEC_ADDRSPACE (dest))
     werror (E_TWO_OR_MORE_STORAGE_CLASSES, name);
@@ -2980,7 +2980,7 @@ checkFunction (symbol * sym, symbol * csym)
     sym->type->next = sym->etype = newIntLink ();
 
   /* function cannot return aggregate */
-  if (IS_AGGREGATE (sym->type->next) || IS_LONGLONG (sym->type->next) && !(TARGET_Z80_LIKE || TARGET_HC08_LIKE || TARGET_ID_STM8))
+  if (IS_AGGREGATE (sym->type->next))
     {
       werror (E_FUNC_AGGR, sym->name);
       return 0;

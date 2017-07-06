@@ -9,10 +9,40 @@ replace restart {
 } if notVolatile(%1), notVolatile(%2), notUsed(%1), notUsed('n'), notUsed('z')
 
 replace restart {
+	clr	%1
+} by {
+	; peephole 0a removed dead clear of %1.
+} if notVolatile(%1), notUsed(%1), notUsed('n'), notUsed('z')
+
+replace restart {
+	and	a, %1
+} by {
+	; peephole 0c removed dead and.
+} if notVolatile(%1), notUsed('a'), notUsed('n'), notUsed('z')
+
+replace restart {
+	or	a, %1
+} by {
+	; peephole 0d removed dead or.
+} if notVolatile(%1), notUsed('a'), notUsed('n'), notUsed('z')
+
+replace restart {
+	xor	a, %1
+} by {
+	; peephole 0e removed dead xor.
+} if notVolatile(%1), notUsed('a'), notUsed('n'), notUsed('z')
+
+replace restart {
 	ldw	%1, %2
 } by {
 	; peephole 0w removed dead load into %1 from %2.
 } if notVolatile(%1), notVolatile(%2), notUsed(%1), notUsed('n'), notUsed('z')
+
+replace restart {
+	clrw	%1
+} by {
+	; peephole 0x removed dead clrw of %1.
+} if notVolatile(%1), notUsed(%1), notUsed('n'), notUsed('z')
 
 replace restart {
 	ld	%1, %2

@@ -1,3 +1,9 @@
+2017-07-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def,
+	  src/stm8/peep.c:
+	  Improve accuracy and fix bugs in peephole optimizer.
+
 2017-07-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c,

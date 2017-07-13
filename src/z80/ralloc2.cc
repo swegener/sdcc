@@ -970,9 +970,9 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(false);
 
 #if 0
-  if(ic->key == 99)
+  if(ic->key == 32)
     {
-      std::cout << "IYinst_ok: Assignment: ";
+      std::cout << "A IYinst_ok: Assignment: ";
       //print_assignment(a);
       std::cout << "\n";
       std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
@@ -980,7 +980,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 #endif
 
   if(result_in_IY &&
-    (ic->op == '=' ||
+    (ic->op == '=' && !(POINTER_SET(ic) && isOperandInDirSpace(IC_RIGHT(ic))) ||
     ic->op == CAST && getSize(operandType(IC_RESULT(ic))) <= getSize(operandType(IC_RIGHT(ic))) || 
     ic->op == '+')) // todo: More instructions that can write iy.
     return(true);
@@ -994,9 +994,9 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
 
 #if 0
-  if(ic->key == 99)
+  if(ic->key == 32)
     {
-      std::cout << "IYinst_ok: Assignment: ";
+      std::cout << "B IYinst_ok: Assignment: ";
       //print_assignment(a);
       std::cout << "\n";
       std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";

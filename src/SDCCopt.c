@@ -2103,7 +2103,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP || ic->op == BITWISEAND || ic->op == CAST) &&
+          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == BITWISEAND || ic->op == CAST) &&
             IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
             {
               sym_link *resulttype = operandType (IC_RESULT (ic));
@@ -2120,15 +2120,33 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                 continue;
 
               /* This use must be a cast or similar */
-              uic = hTabItemWithKey (iCodehTab,
-                        bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+              uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (ic))));
 
               if (!uic || (uic->op != CAST && uic->op != '+' && uic->op != LEFT_OP && uic->op != RIGHT_OP))
                 continue;
 
+              /* Special handling since we might need more bits in the operand than in the result */
+              if (ic->op == RIGHT_OP)
+                {
+                  int shiftbits, resultbits;
+
+                  if (!IS_OP_LITERAL (IC_RIGHT (ic)))
+                    continue;
+
+                  shiftbits = (int) operandLitValue (IC_RIGHT (ic));
+                  resultbits = bitsForType (operandType (IC_RESULT (uic)));
+
+                  if (resultbits + shiftbits > 16)
+                    continue;
+                  else if (resultbits + shiftbits > 8)
+                    nextresulttype = newIntLink ();
+                  else
+                    nextresulttype = newCharLink ();
+                  SPEC_USIGN (nextresulttype) = 1;
+                }
               /* It must be a cast to another integer type that */
               /* has fewer bits */
-              if (uic->op == LEFT_OP || uic->op == RIGHT_OP)
+              else if (uic->op == LEFT_OP || uic->op == RIGHT_OP)
                 {
                    /* Since shifting by the width of an operand or more is undefined behaviour, and no type is wider than 256 bits,
                       we can optimize when the result is used as right operand to a shift. */
@@ -2166,7 +2184,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               /* Insert casts on operands */
               if (ic->op != CAST)
                 {
-              if (IS_SYMOP (IC_LEFT (ic)))
+                  if (IS_SYMOP (IC_LEFT (ic)))
                     {
                       newic = newiCode (CAST, operandFromLink (nextresulttype), IC_LEFT (ic));
                       hTabAddItem (&iCodehTab, newic->key, newic);
@@ -2203,7 +2221,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                       IC_RIGHT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));
                     }
                 }
-              if (uic->op == CAST)
+              if (uic->op == CAST && ic->op != RIGHT_OP)
                 uic->op = '=';
               change++;
             }

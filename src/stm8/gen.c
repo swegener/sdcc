@@ -6220,6 +6220,12 @@ genPointerGet (const iCode *ic)
       cost (4, 4);
       goto release;
     }
+  else if (!bit_field && size == 1 && !offset && left->aop->type == AOP_LIT && aopInReg(result->aop, 0, A_IDX))
+    {
+      emit2("ld", "a, 0x%02x%02x",  byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0));
+      cost (3, 1);
+      goto release;
+    }
 
   // todo: Handle this more gracefully, save x instead of using y.
   use_y = (aopInReg (left->aop, 0, Y_IDX) && size <= 1 + aopInReg (result->aop, 0, Y_IDX)) ||

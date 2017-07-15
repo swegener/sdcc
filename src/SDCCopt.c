@@ -2116,13 +2116,54 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               resultsize = bitsForType (resulttype);
 
               /* There must be only one use of this first result */
-              if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
+              if (bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) != 1 || bitVectnBitsOn (OP_USES (IC_RESULT (ic))) != 1)
                 continue;
 
-              /* This use must be a cast or similar */
               uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (ic))));
 
-              if (!uic || (uic->op != CAST && uic->op != '+' && uic->op != LEFT_OP && uic->op != RIGHT_OP))
+              if(!uic)
+                continue;
+
+              /* Skip over assignment */
+              if(uic->op == '=' &&
+                bitVectnBitsOn (OP_DEFS (IC_RESULT (uic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (uic))) == 1 &&
+                compareType (operandType (IC_RESULT (ic)), operandType (IC_RESULT (uic))) == 1)
+                uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (uic))));
+
+              /* Try to handle a few cases where the result has multiple uses */
+              else if(ic->op == '*' && bitsForType (operandType (IC_RESULT (ic))) > 16 && uic->op == '=' &&
+                bitVectnBitsOn (OP_DEFS (IC_RESULT (uic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (uic))) > 1 &&
+                compareType (operandType (IC_RESULT (ic)), operandType (IC_RESULT (uic))) == 1)
+                {
+                  bool ok = true;
+                  const bitVect *uses;
+                  int bit;
+
+                  uses = bitVectCopy (OP_USES (IC_RESULT (uic)));
+                  for (bit = bitVectFirstBit(uses); bitVectnBitsOn (uses); bitVectUnSetBit(uses, bit), bit = bitVectFirstBit(uses))
+                    {
+                      iCode *uuic = hTabItemWithKey (iCodehTab, bit);
+                      if (uuic->op != CAST || bitsForType (operandType (IC_RESULT (uuic))) > 16 || IS_BOOLEAN (operandType (IC_RESULT (uuic))))
+                        {
+                          ok = false;
+                          break;
+                        }
+                    }
+
+                  if (!ok)
+                    continue;
+
+                  nextresulttype = newIntLink ();
+                  SPEC_USIGN (nextresulttype) = 1;
+                  sym = OP_SYMBOL (IC_RESULT (uic));
+                  sym->type = nextresulttype;
+
+                  nextresulttype = newIntLink ();
+                  SPEC_USIGN (nextresulttype) = 1;
+                  goto optimize;
+                }
+
+              if (uic->op != CAST && uic->op != '+' && uic->op != LEFT_OP && uic->op != RIGHT_OP)
                 continue;
 
               /* Special handling since we might need more bits in the operand than in the result */
@@ -2177,6 +2218,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               if (uic->op == CAST && IS_BOOLEAN (nextresulttype))
                  continue;
 
+optimize:
               /* Make op result narrower */
               sym = OP_SYMBOL (IC_RESULT (ic));
               sym->type = nextresulttype;

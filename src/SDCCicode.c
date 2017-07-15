@@ -2347,13 +2347,13 @@ geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl)
       unsigned int ptrSize;
       isarray = left->isaddr;
       nBytes = getSize (ltype->next);
+      ptrSize = getArraySizePtr (left); // works for both arrays and pointers
 
       if (nBytes == 0)
         werror (E_UNKNOWN_SIZE, IS_SYMOP (left) ? OP_SYMBOL (left)->name : "<no name>");
       // there is no need to multiply with 1
       if (nBytes != 1)
         {
-          ptrSize = getArraySizePtr (left);
           size = operandFromLit (nBytes);
           SPEC_USIGN (getSpec (operandType (size))) = 1;
           indexUnsigned = IS_UNSIGNED (getSpec (operandType (right)));
@@ -2370,7 +2370,6 @@ geniCodeAdd (operand *left, operand *right, RESULT_TYPE resultType, int lvl)
             SPEC_USIGN (getSpec (operandType (right))) = 1;
         }
 
-      ptrSize = getSize(ltype) - ((IS_GENPTR (ltype) && (GPTRSIZE > FPTRSIZE)) ? 1 : 0);
       if (ptrSize > getSize (rtype) && !IS_UNSIGNED (retype))
         {
           sym_link *type = 0;

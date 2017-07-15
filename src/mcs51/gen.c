@@ -4454,6 +4454,7 @@ static void
 genRet (iCode * ic)
 {
   int size, offset = 0, pushed = 0;
+  bool pushedA = FALSE;
 
   D (emitcode (";", "genRet"));
 
@@ -4486,8 +4487,18 @@ genRet (iCode * ic)
             {
               const char *l = aopGet (IC_LEFT (ic), offset, FALSE, FALSE);
               if (!EQ (fReturn[offset], l))
-                emitcode ("mov", "%s,%s", fReturn[offset++], l);
+                emitcode ("mov", "%s,%s", fReturn[offset], l);
+              if (size && !strcmp(fReturn[offset], "a") && aopGetUsesAcc (IC_LEFT (ic), offset+1))
+                {
+                  emitpush ("acc");
+                  pushedA = TRUE;
+                }
+              offset++;
             }
+        }
+      if (pushedA)
+        {
+           emitpop ("acc");
         }
 
       while (pushed)

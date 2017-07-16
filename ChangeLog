@@ -2,6 +2,9 @@
 
 	* src/SDCCopt.c:
 	  Implement basic narrowing of loop counters, RFE #530.
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2630.c:
+	  Fix bug #2630.
 
 2017-07-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

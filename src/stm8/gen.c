@@ -3453,9 +3453,9 @@ genPlus (const iCode *ic)
       else if(!started && !pushed_a && rightop->type == AOP_LIT && regDead (X_IDX, ic) && !((size - i) % 2) &&
         aopIsLitVal (rightop, i, 2, 0x0001) && aopIsLitVal (rightop, i + 2, size - i, 0) &&
         ((aopOnStack (leftop, i, size - i) && aopOnStack (result->aop, i, size - i) ||
-          aopOnStack (leftop, i, size - i - 2) && aopOnStack (leftop, i, size - i - 2) && aopInReg (result->aop, size - 2, Y_IDX) && aopInReg (result->aop, size - 2, Y_IDX) ||
-          aopOnStack (leftop, i + 2, size - i - 2) && aopOnStack (leftop, i + 2, size - i - 2) && aopInReg (result->aop, i, Y_IDX) && aopInReg (result->aop, i, Y_IDX)) &&
-          result->aop->aopu.bytes[0].byteu.stk == leftop->aopu.bytes[0].byteu.stk ||
+          aopOnStack (leftop, i, size - i - 2) && aopOnStack (leftop, i, size - i - 2) && aopInReg (result->aop, size - 2, Y_IDX) && aopInReg (result->aop, size - 2, Y_IDX)) &&
+          result->aop->aopu.bytes[i].byteu.stk == leftop->aopu.bytes[i].byteu.stk ||
+          aopOnStack (leftop, i + 2, size - i - 2) && aopOnStack (leftop, i + 2, size - i - 2) && aopInReg (result->aop, i, Y_IDX) && aopInReg (result->aop, i, Y_IDX) && result->aop->aopu.bytes[i + 2].byteu.stk == leftop->aopu.bytes[i + 2].byteu.stk ||
             size - i == 4 && 
             (aopInReg (leftop, i, Y_IDX) && aopInReg (result->aop, i, Y_IDX) && aopInReg (leftop, i + 2, X_IDX) && aopInReg (result->aop, i + 2, X_IDX) || aopInReg (leftop, i, X_IDX) && aopInReg (result->aop, i, X_IDX) && aopInReg (leftop, i + 2, Y_IDX) && aopInReg (result->aop, i + 2, Y_IDX))))
         {

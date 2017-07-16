@@ -1,5 +1,10 @@
 2017-07-16 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Improve writing of constants to bit-fields.
+
+2017-07-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/ralloc.c,
 	  src/stm8/gen.c:
 	  Better code for operations on 8-bit global variables.

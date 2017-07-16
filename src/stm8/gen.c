@@ -6611,17 +6611,34 @@ genPointerSet (iCode * ic)
       if (bit_field && blen < 8 && right->aop->type == AOP_LIT) // We can save a lot of shifting and masking using the known literal value
         {
           unsigned char bval = (byteOfVal (right->aop->aopu.aop_lit, i) << bstr) & ((0xff >> (8 - blen)) << bstr);
-          emit2 ("ld", "a, #0x%02x", ~((0xff >> (8 - blen)) << bstr) & 0xff);
-          cost (2, 1);
-          if (!i)
+
+          if (((~((0xff >> (8 - blen)) << bstr) & 0xff) | bval) == 0xff)
             {
-              emit2 ("and", use_y ? "a, (y)" : "a, (x)", i);
-              cost (1 + use_y, 1);
+              if (!i)
+                {
+                  emit2 ("ld", use_y ? "a, (y)" : "a, (x)");
+                  cost (1 + use_y, 1);
+                }
+              else
+                {
+                  emit2 ("ld", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", i);
+                  cost ((size - 1 - i < 256 ? 2 : 3) + use_y, 1);
+                }
             }
           else
             {
-              emit2 ("and", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", i);
-              cost ((size - 1 - i < 256 ? 2 : 3) + use_y, 1);
+              emit2 ("ld", "a, #0x%02x", ~((0xff >> (8 - blen)) << bstr) & 0xff);
+              cost (2, 1);
+              if (!i)
+                {
+                  emit2 ("and", use_y ? "a, (y)" : "a, (x)");
+                  cost (1 + use_y, 1);
+                }
+              else
+                {
+                  emit2 ("and", use_y ? "a, (0x%x, y)" : "a, (0x%x, x)", i);
+                  cost ((size - 1 - i < 256 ? 2 : 3) + use_y, 1);
+                }
             }
           if (bval)
             {

@@ -212,14 +212,6 @@ replace restart {
 } if notUsed('a'), notSame(%2 'push' 'pop'), notSame(%1 'xl' 'xh' 'yl' 'yh')
 
 replace restart {
-	ld	a, %1
-	tst	a
-} by {
-	tst	%1
-	; peephole 8 tested in %1 instead of a.
-} if notUsed('a'), notSame(%1 'xl' 'xh' 'yl' 'yh')
-
-replace restart {
 	ld	a, (x)
 	or	a, #0x80
 	ld	(x), a

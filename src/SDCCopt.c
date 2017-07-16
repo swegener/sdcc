@@ -2077,7 +2077,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
           for(uic = ebbs[i + 1]->sch; uic; uic = uic->next)
             {
               if(uic->op == CALL || uic->op == PCALL || uic->op == IFX || uic->op == LABEL ||
-                uic->op == GOTO && IC_LABEL (uic) != label)
+                uic->op == GOTO && IC_LABEL (uic) != label || uic->op == INLINEASM)
                 {
                   ok = false;
                   break;

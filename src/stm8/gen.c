@@ -6268,19 +6268,16 @@ genPointerGet (const iCode *ic)
           i++, blen -= 8;
           continue;
         }
-      else if (!bit_field && aopInReg (result->aop, i, Y_IDX) && !use_y && optimize.codeSize) // Short (4/5/6 bytes vs. 6/8/10 for assigning individual bytes), but slow (7 cycles vs. 4) due to push / pop.
+      else if (!bit_field && aopInReg (result->aop, i, Y_IDX) && !use_y)
         {
           o--;
-          push (ASMOP_X, 0, 2);
 
+          emit2 ("ldw", "y, x");
           if (!o)
-            emit2 ("ldw", "x, (x)");
+            emit2 ("ldw", "y, (y)");
           else
-            emit2 ("ldw", "x, (0x%x, x)", o);
-          emit2 ("exgw", "x, y");
-          cost (2 + (o > 0) + (o > 256), 3);
-
-          pop (ASMOP_X, 0, 2);
+            emit2 ("ldw", "y, (0x%x, y)", o);
+          cost (4 + (o > 0) + (o > 256), 3);
 
           i++, blen -= 8;
           continue;

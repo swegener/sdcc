@@ -1,5 +1,10 @@
 2017-07-16 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Improve code generation for wide read through pointer.
+
+2017-07-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCopt.c:
 	  Implement narrowing of loop counters, RFE #530.
 	* src/stm8/gen.c,

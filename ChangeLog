@@ -1,3 +1,10 @@
+2017-07-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (isInitiallyTrue),
+	* src/SDCCerr.c (setWarningDisabledState),
+	* src/SDCCerr.h: fix bugs #2552 & #2614
+	* src/SDCCast.c (decorateType): fix bug #2550
+
 2017-07-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:

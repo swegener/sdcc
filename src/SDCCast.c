@@ -2489,7 +2489,17 @@ isInitiallyTrue (ast *initExpr, ast * condExpr)
   /* simplifies to a non-zero (TRUE) literal value */      
   condExpr = copyAst (condExpr);
   if (replLoopSymByVal (condExpr, sym, AST_VALUE (initExpr)))
-    condExpr = decorateType (condExpr, RESULT_TYPE_NONE);
+    {
+      int original;
+
+      /* We are speculating that the condition is always true */
+      /* or false for the first loop iteration; no need to    */
+      /* trigger a warning that may not apply to the original */
+      /* source code. */
+      original = setWarningDisabledState (W_COMP_RANGE, TRUE);
+      condExpr = decorateType (condExpr, RESULT_TYPE_NONE);
+      setWarningDisabledState (W_COMP_RANGE, original);
+    }
   if (!IS_AST_LIT_VALUE (condExpr))
     return FALSE;
   return !isEqualVal (AST_VALUE (condExpr), 0);
@@ -5403,6 +5413,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
                                      newAst_LINK (copyLinkChain (currFunc->type->next)),
                                      tree->right);
               tree->right->values.cast.implicitCast = 1;
+              tree->right->lineno = tree->right->left->lineno = tree->lineno;
+              tree->right->filename = tree->right->left->filename = tree->filename;
               tree->right = decorateType (tree->right, IS_GENPTR (currFunc->type->next) ? RESULT_TYPE_GPTR : RESULT_TYPE_NONE);
             }
           else if (!typecompat)

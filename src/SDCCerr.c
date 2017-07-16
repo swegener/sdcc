@@ -720,6 +720,23 @@ setWarningDisabled (int errNum)
 }
 
 /* -------------------------------------------------------------------------------
+ * disabledState - Enable/Disable output of specified warning
+ * -------------------------------------------------------------------------------
+ */
+int
+setWarningDisabledState (int errNum, int disabled)
+{
+  if ((errNum >= 0) && (errNum < NELEM (ErrTab)) && (ErrTab[errNum].errType <= ERROR_LEVEL_WARNING))
+  {
+    int originalState = ErrTab[errNum].disabled;
+    ErrTab[errNum].disabled = disabled;
+    return originalState;
+  }
+  return 0;
+}
+
+
+/* -------------------------------------------------------------------------------
  * Set the flag to treat warnings as errors
  * -------------------------------------------------------------------------------
  */

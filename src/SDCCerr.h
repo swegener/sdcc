@@ -382,6 +382,14 @@ void setWarningDisabled (int errNum);
 
 /*
 -------------------------------------------------------------------------------
+disabledState - Enable/Disable output of specified warning
+-------------------------------------------------------------------------------
+*/
+
+int setWarningDisabledState (int errNum, int disabled);
+
+/*
+-------------------------------------------------------------------------------
 Set the flag to treat warnings as errors
 -------------------------------------------------------------------------------
 */

@@ -2302,6 +2302,11 @@ genCpl (const iCode *ic)
 
           i += 2;
         }
+      else if ((aopOnStack (result->aop, i, 1) || result->aop->type == AOP_DIR) && aopSame (result->aop, i, left->aop, i, 1))
+        {
+          emit3_o (A_CPL, result->aop, i, 0, 0);
+          i++;
+        }
       else
         {
           bool pushed_left = destroyed_a && aopInReg (left->aop, i, A_IDX);
@@ -2430,7 +2435,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           i += 2;
         }
       else if (!started && aopIsLitVal (left_aop, i, 1, 0x00) &&
-        aopOnStack (result_aop, i, 1) && aopOnStack (right_aop, i, 1) && result_aop->aopu.bytes[i].byteu.stk == right_aop->aopu.bytes[i].byteu.stk)
+        (aopOnStack (result_aop, i, 1) || result_aop->type == AOP_DIR) && aopSame (result_aop, i, right_aop, i, 1))
         {
           emit3_o (A_NEG, result_aop, i, 0, 0);
           started = TRUE;
@@ -5030,6 +5035,12 @@ genOr (const iCode *ic)
           emit3_o (A_RLC, left->aop, i, 0, 0);
           i++;
         }
+      else if ((aopOnStack (left->aop, i, 1) || left->aop->type == AOP_DIR) && aopSame (left->aop, i, result->aop, i, 1) &&
+        right->aop->type == AOP_LIT && isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)) >= 0)
+        {
+          emit2 ("bset", "%s, #%d", aopGet (left->aop, i), isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)));
+          i++;
+        }
       else
         {
           right_stacked = stack_aop (right->aop, i, &right_offset);
@@ -5332,6 +5343,13 @@ genAnd (const iCode *ic, iCode *ifx)
           emit3w (A_SRLW, ASMOP_X, 0);
           emit3w (A_SLLW, ASMOP_X, 0);
           i += 2;
+          continue;
+        }
+      else if ((aopOnStack (left->aop, i, 1) || left->aop->type == AOP_DIR) && aopSame (left->aop, i, result->aop, i, 1) &&
+        right->aop->type == AOP_LIT && isLiteralBit (~byteOfVal (right->aop->aopu.aop_lit, i) & 0xff) >= 0)
+        {
+          emit2 ("bres", "%s, #%d", aopGet (left->aop, i), isLiteralBit (~byteOfVal (right->aop->aopu.aop_lit, i) & 0xff));
+          i++;
           continue;
         }
 

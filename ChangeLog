@@ -1,3 +1,8 @@
+2017-07-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  Implement basic narrowing of loop counters, RFE #530.
+
 2017-07-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (isInitiallyTrue),

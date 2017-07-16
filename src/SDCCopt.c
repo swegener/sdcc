@@ -1982,6 +1982,49 @@ discardDeadParamReceives (eBBlock ** ebbs, int count)
     }
 }
 
+/* Insert a cast of operand op of ic to type type */
+static void prependCast (iCode *ic, operand *op, sym_link *type, eBBlock *ebb)
+{
+  iCode *newic = newiCode (CAST, operandFromLink (type), op);
+  hTabAddItem (&iCodehTab, newic->key, newic);
+
+  IC_RESULT (newic) = newiTempOperand (type, 0);
+  bitVectSetBit (OP_USES (op), newic->key);
+  OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
+  bitVectUnSetBit (OP_USES (op), ic->key);
+  OP_USES (IC_RESULT (newic)) = bitVectSetBit (OP_USES (IC_RESULT (newic)), ic->key);
+  newic->filename = ic->filename;
+  newic->lineno = ic->lineno;
+
+  addiCodeToeBBlock (ebb, newic, ic);
+
+  if (isOperandEqual (op, IC_LEFT (ic)))
+    IC_LEFT (ic) = IC_RESULT (newic);
+
+  if (isOperandEqual (op, IC_RIGHT (ic)))
+    IC_RIGHT (ic) = IC_RESULT (newic);
+}
+
+/* Insert a cast of result of ic from type type */
+static void appendCast (iCode *ic, sym_link *type, eBBlock *ebb)
+{
+  iCode *newic = newiCode (CAST, operandFromLink (operandType (IC_RESULT (ic))), 0);
+  hTabAddItem (&iCodehTab, newic->key, newic);
+
+  IC_RESULT (newic) = IC_RESULT (ic);
+  bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+  bitVectSetBit (OP_DEFS (IC_RESULT (ic)), newic->key);
+  IC_RESULT (ic) = newiTempOperand (type, 0);
+  IC_RIGHT (newic) = operandFromOperand (IC_RESULT (ic));
+  bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+  bitVectSetBit (OP_USES (IC_RESULT (ic)), newic->key);
+  newic->filename = ic->filename;
+  newic->lineno = ic->lineno;
+  addiCodeToeBBlock (ebb, newic, ic->next);
+}
+
+
+
 /*-----------------------------------------------------------------*/
 /* optimizeOpWidth - reduce operation width.                       */
 /* Wide arithmetic operations where the result is cast to narrow   */
@@ -2006,6 +2049,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
           sym_link *newcountertype, *oldcountertype;
           const symbol *label;
           const iCode *ifx, *inc = 0;
+          iCode *mul = 0;
           bool ok = true, found = false;
 
           if (ic->op != LABEL || !ic->next)
@@ -2050,6 +2094,8 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
           uses = bitVectCopy (OP_USES (IC_LEFT (ic)));
           for (bit = bitVectFirstBit (uses); bitVectnBitsOn (uses); bitVectUnSetBit (uses, bit), bit = bitVectFirstBit (uses))
             {
+              operand *mulotherop = 0;
+              iCode *mul_candidate = 0;
               uic = hTabItemWithKey (iCodehTab, bit);
 
               if(uic->op == '+' && IS_OP_LITERAL (IC_RIGHT (uic)) && operandLitValue (IC_RIGHT (uic)) == 1 && isOperandEqual (IC_LEFT (uic), IC_LEFT (ic)))
@@ -2062,6 +2108,16 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                 {
                   found = false;
                   break;
+                }
+
+              if (uic && uic->op == '*')
+                {
+                  mulotherop = isOperandEqual (IC_LEFT (ic), IC_LEFT (uic)) ? IC_RIGHT (uic) : IC_LEFT (uic);
+                  if (isOperandEqual (IC_RIGHT (ic), mulotherop))
+                    {
+                      mul_candidate = uic;
+                      uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (uic))));
+                    }
                 }
 
               for (int i = 0; i < 8 && uic &&
@@ -2077,17 +2133,21 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
 
               // Use as array index?    
               if (uic->op == GET_VALUE_AT_ADDRESS || POINTER_SET(uic) && isOperandEqual (IC_RESULT (uic), IC_LEFT (ic)))
-                found = true;
+                {
+                  found = true;
+                  if (mul_candidate)
+                    mul = mul_candidate;
+                }
             }
    
           if (!found || !inc)
             continue;
 
-          /* All backends (except ds390 / ds400) have an array size limit substantially smaller than 2^16. Thus if the loop counter ever goes outside
+          /* All backends (except ds390 / ds400) have an array size limit smaller than 2^16. Thus if the loop counter ever goes outside
              the range of a 16-bit type, the array access would result in undefined behaviour. We can thus replace the loop
-             counter by a 16-bit type. */
-   
-          newcountertype = newIntLink ();
+             counter by a 16-bit type. If we found a squaring multiplication, we can even use an 8-bit type*/
+
+          newcountertype = mul ? newCharLink () : newIntLink ();
           SPEC_USIGN (newcountertype) = 1;
           OP_SYMBOL (IC_LEFT (ic))->type = newcountertype;
           OP_SYMBOL (IC_RESULT (inc))->type = newcountertype;
@@ -2097,7 +2157,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
             {
               uic = hTabItemWithKey (iCodehTab, bit);
 
-              if (uic->key == inc->key)
+              if (uic == inc || uic == mul)
                 continue;
               if (uic->op == CAST)
                 continue;
@@ -2110,41 +2170,21 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                 }
 
               // Need to insert cast.
-              newic = newiCode (CAST, operandFromLink (oldcountertype), IC_LEFT (ic));
-
-              hTabAddItem (&iCodehTab, newic->key, newic);
-              IC_RESULT (newic) = newiTempOperand (oldcountertype, 0);
-              bitVectSetBit (OP_USES (IC_LEFT (ic)), newic->key);
-              OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
-              newic->filename = uic->filename;
-              newic->lineno = uic->lineno;
-
-              addiCodeToeBBlock (ebbs[i + 1], newic, uic);
-
-              if (isOperandEqual (IC_LEFT (ic), IC_LEFT (uic)))
-                IC_LEFT (uic) = IC_RESULT (newic);
-              if (isOperandEqual (IC_LEFT (ic), IC_RIGHT (uic)))
-                IC_RIGHT (uic) = IC_RESULT (newic);
-
-              bitVectUnSetBit (OP_USES (IC_LEFT (ic)), uic->key);
-              OP_USES (IC_RESULT (newic)) = bitVectSetBit (OP_USES (IC_RESULT (newic)), uic->key);
-
+              prependCast (uic, IC_LEFT (ic), oldcountertype, ebbs[i + 1]);
             }
 
           // Insert cast for comparison.
           if(!IS_OP_LITERAL (IC_RIGHT (ic)))
+            prependCast (ic, IC_RIGHT (ic), newcountertype, ebbs[i]);
+
+          // Bonus: Can narrow a multiplication in the loop.
+          if (mul)
             {
-              newic = newiCode (CAST, operandFromLink (newcountertype), IC_RIGHT (ic));
-              hTabAddItem (&iCodehTab, newic->key, newic);
-              IC_RESULT (newic) = newiTempOperand (newcountertype, 0);
-              bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
-              OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
-              bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
-              OP_USES (IC_RESULT (newic)) = bitVectSetBit (OP_USES (IC_RESULT (newic)), ic->key);
-              newic->filename = ic->filename;
-              newic->lineno = ic->lineno;
-              addiCodeToeBBlock (ebbs[i], newic, ic);
-              IC_RIGHT (ic) = IC_RESULT (newic);
+              prependCast (mul, IC_LEFT (mul), newcountertype, ebbs[i + 1]);
+              prependCast (mul, IC_RIGHT (mul), newcountertype, ebbs[i + 1]);
+              nextresulttype = newIntLink();
+              SPEC_USIGN (nextresulttype) = 1;
+              appendCast(mul, nextresulttype, ebbs[i + 1]);
             }
         }
     }
@@ -2233,20 +2273,9 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
             IC_LEFT (ic) = operandFromValue (valCastLiteral (newCharLink(), operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))));
 
           // Insert cast on result
-          newic = newiCode (CAST, operandFromLink (resulttype), 0);
-          hTabAddItem (&iCodehTab, newic->key, newic);
-          IC_RESULT (newic) = IC_RESULT (ic);
-          bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
-          bitVectSetBit (OP_DEFS (IC_RESULT (ic)), newic->key);
           nextresulttype = newIntLink();
           SPEC_USIGN (nextresulttype) = 1;
-          IC_RESULT (ic) = newiTempOperand (nextresulttype, 0);
-          IC_RIGHT (newic) = operandFromOperand (IC_RESULT (ic));
-          bitVectSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
-          bitVectSetBit (OP_USES (IC_RESULT (ic)), newic->key);
-          newic->filename = ic->filename;
-          newic->lineno = ic->lineno;
-          addiCodeToeBBlock (ebbs[i], newic, ic->next);
+          appendCast(ic, nextresulttype, ebbs[i]);
         }
 
   // Operation followed by cast

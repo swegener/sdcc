@@ -288,6 +288,37 @@ aopOnStackNotExt (const asmop *aop, int offset, int size)
 }
 
 /*-----------------------------------------------------------------*/
+/* aopSame - are two asmops in the same location?                  */
+/*-----------------------------------------------------------------*/
+static bool
+aopSame (const asmop *aop1, int offset1, const asmop *aop2, int offset2, int size)
+{
+  for(; size; size--, offset1++, offset2++)
+    {
+      if (aopRS (aop1) && aopRS (aop2) && // Same register
+        aop1->aopu.bytes[offset1].in_reg && aop2->aopu.bytes[offset2].in_reg &&
+        aop1->aopu.bytes[offset1].byteu.reg == aop2->aopu.bytes[offset2].byteu.reg)
+        continue;
+
+      if (aopOnStack (aop1, offset1, 1) && aopOnStack (aop2, offset2, 1) && // Same stack location
+        aop1->aopu.bytes[offset1].byteu.stk == aop2->aopu.bytes[offset2].byteu.stk)
+        continue;
+
+      if (aop1->type == AOP_LIT && aop2->type == AOP_LIT &&
+        byteOfVal (aop1->aopu.aop_lit, offset1) == byteOfVal (aop2->aopu.aop_lit, offset2))
+        continue;
+
+      if (aop1->type == AOP_DIR && aop2->type == AOP_DIR &&
+        offset1 == offset2 && !strcmp(aop1->aopu.aop_dir, aop2->aopu.aop_dir))
+        return (TRUE);
+
+      return (FALSE);
+    }
+
+  return (TRUE);
+}
+
+/*-----------------------------------------------------------------*/
 /* aopIsLitVal - asmop from offset is val                          */
 /*-----------------------------------------------------------------*/
 static bool
@@ -1252,12 +1283,7 @@ cheapMove (asmop *result, int roffset, asmop *source, int soffset, bool save_a)
 {
   bool dummy = (result->type == AOP_DUMMY || source->type == AOP_DUMMY);
 
-  if (aopRS (result) && aopRS (source) && // Same register
-    result->aopu.bytes[roffset].in_reg && source->aopu.bytes[soffset].in_reg &&
-    result->aopu.bytes[roffset].byteu.reg == source->aopu.bytes[soffset].byteu.reg)
-    return;
-  if (aopOnStack (result, roffset, 1) && aopOnStack (source, soffset, 1) && // Same stack location
-    result->aopu.bytes[roffset].byteu.stk == source->aopu.bytes[soffset].byteu.stk)
+  if (aopSame (result, roffset, source, soffset, 1))
     return;
   else if (!dummy && (!aopRS (result) || aopInReg (result, roffset, A_IDX) || aopOnStack (result, roffset, 1)) && aopIsLitVal (source, soffset, 1, 0))
     emit3_o (A_CLR, result, roffset, 0, 0);
@@ -2411,7 +2437,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           i++;
         }
       else if (!started && i == size - 1 &&
-        aopOnStack (result_aop, i, 1) && aopOnStack (left_aop, i, 1) && result_aop->aopu.bytes[i].byteu.stk == left_aop->aopu.bytes[i].byteu.stk &&
+        (aopOnStack (result_aop, i, 1) || result_aop->type == AOP_DIR) && aopSame (result_aop, i, left_aop, i, 1) &&
         right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) <= 2 + !a_free)
         {
           for (j = 0; j < byteOfVal (right_aop->aopu.aop_lit, i); j++)
@@ -2419,7 +2445,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           i++;
         }
       else if (!started && i == size - 1 &&
-        aopOnStack (result_aop, i, 1) && aopOnStack (left_aop, i, 1) && result_aop->aopu.bytes[i].byteu.stk == left_aop->aopu.bytes[i].byteu.stk &&
+        (aopOnStack (result_aop, i, 1) || result_aop->type == AOP_DIR) && aopSame (result_aop, i, left_aop, i, 1) &&
         right_aop->type == AOP_LIT && byteOfVal (right_aop->aopu.aop_lit, i) >= 254 - !a_free)
         {
           for (j = byteOfVal (right_aop->aopu.aop_lit, i); j < 256; j++)
@@ -3495,7 +3521,7 @@ genPlus (const iCode *ic)
           i += 2;
         }
       else if (!started && i == size - 1 &&
-        aopOnStack (result->aop, i, 1) && aopOnStack (leftop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == leftop->aopu.bytes[i].byteu.stk &&
+        (aopOnStack (leftop, i, 1) || leftop->type == AOP_DIR) && aopSame (result->aop, i, leftop, i, 1) &&
         rightop->type == AOP_LIT && byteOfVal (rightop->aopu.aop_lit, i) <= 2 + !a_free)
         {
           for (j = 0; j < byteOfVal (rightop->aopu.aop_lit, i); j++)
@@ -3503,7 +3529,7 @@ genPlus (const iCode *ic)
           i++;
         }
       else if (!started && i == size - 1 &&
-        aopOnStack (result->aop, i, 1) && aopOnStack (leftop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == leftop->aopu.bytes[i].byteu.stk &&
+        (aopOnStack (leftop, i, 1) || leftop->type == AOP_DIR) && aopSame (result->aop, i, leftop, i, 1) &&
         rightop->type == AOP_LIT && byteOfVal (rightop->aopu.aop_lit, i) >= 254 - !a_free)
         {
           for (j = byteOfVal (rightop->aopu.aop_lit, i); j < 256; j++)
@@ -5287,7 +5313,7 @@ genAnd (const iCode *ic, iCode *ifx)
           i++;
           continue;
         }
-      else if (aopIsLitVal (right->aop, i, 1, 0xff) && (aopOnStack (left->aop, i, 1) && aopOnStack (result->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk || aopRS (left->aop) && aopRS (result->aop) && left->aop->aopu.bytes[i].in_reg && result->aop->aopu.bytes[i].in_reg && left->aop->aopu.bytes[i].byteu.reg == result->aop->aopu.bytes[i].byteu.reg)) // Same register or same stack location.
+      else if (aopIsLitVal (right->aop, i, 1, 0xff) && aopSame (left->aop, i, result->aop, i, 1))
         {
           i++;
           continue;

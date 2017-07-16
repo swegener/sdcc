@@ -261,7 +261,6 @@ regTypeNum (void)
     }
 }
 
-#if 0
 /** Register reduction for assignment.
  */
 static int
@@ -356,6 +355,14 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
         }
     }
 
+  /* For now eliminate 8-bit temporary variables only.
+     The STM8 instruction soperating directly on memory
+     operands are 8-bit, so the most benefit is in 8-bit
+     operations. On the other hand, supporting wider
+     operations well in codegen is also more effort. */
+  if (bitsForType (operandType (IC_RESULT (dic))) > 8)
+    return 0;
+
   /* if the result is on stack or iaccess then it must be
      the same atleast one of the operands */
   if (OP_SYMBOL (IC_RESULT (ic))->onStack || OP_SYMBOL (IC_RESULT (ic))->iaccess)
@@ -425,7 +432,6 @@ packRegisters (eBBlock * ebp)
         break;
     }
 }
-#endif
 
 /**
   Mark variables for assignment by the register allocator.
@@ -600,20 +606,15 @@ void
 stm8_assignRegisters (ebbIndex * ebbi)
 {
   eBBlock **ebbs = ebbi->bbOrder;
-  int count = ebbi->count;
+  int i, count = ebbi->count;
   iCode *ic;
-#if 0 // ENABLE WHEN LINKER BUG #2198 IS FIXED
-  int i;
-#endif
 
   stm8_init_asmops();
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */
-#if 0 // ENABLE WHEN LINKER BUG #2198 IS FIXED
   for (i = 0; i < count; i++)
     packRegisters (ebbs[i]);
-#endif
 
   /* liveranges probably changed by register packing
      so we compute them again */

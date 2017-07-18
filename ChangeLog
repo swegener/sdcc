@@ -1,3 +1,9 @@
+2017-07-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c,
+	  support/regression/tests/loop.c:
+	  Improve narrowing of loop counters.
+
 2017-07-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

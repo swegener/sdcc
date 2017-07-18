@@ -2062,6 +2062,8 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
             continue;
 
           oldcountertype = operandType (IC_LEFT (ic));
+          if (IS_VOLATILE (oldcountertype))
+            continue;
 
           // Only try to narrow wide counters.
           if (!IS_INTEGRAL(oldcountertype) || bitsForType (oldcountertype) <= 16 || TARGET_IS_DS390 || TARGET_IS_DS400 || (!SPEC_USIGN (oldcountertype))) // TODO: Handle signed types as well, maybe even transform int to unsigned int?
@@ -2094,6 +2096,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
           uses = bitVectCopy (OP_USES (IC_LEFT (ic)));
           for (bit = bitVectFirstBit (uses); bitVectnBitsOn (uses); bitVectUnSetBit (uses, bit), bit = bitVectFirstBit (uses))
             {
+              operand *prevresult = IC_LEFT(ic);
               operand *mulotherop = 0;
               iCode *mul_candidate = 0;
               uic = hTabItemWithKey (iCodehTab, bit);
@@ -2125,6 +2128,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                 uic->op == '=' || uic->op == '+' || uic->op == LEFT_OP ||
                 uic->op == '*' && IS_OP_LITERAL (IC_RIGHT (uic)) && operandLitValue (IC_RIGHT (uic)) >= 1); i++)
                 {
+                  prevresult = IC_RESULT (uic);
                   uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (uic))));
                 }
  
@@ -2132,14 +2136,14 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                 continue;
 
               // Use as array index?    
-              if (uic->op == GET_VALUE_AT_ADDRESS || POINTER_SET(uic) && isOperandEqual (IC_RESULT (uic), IC_LEFT (ic)))
+              if (uic->op == GET_VALUE_AT_ADDRESS || POINTER_SET(uic) && isOperandEqual (IC_RESULT (uic), prevresult))
                 {
                   found = true;
                   if (mul_candidate)
                     mul = mul_candidate;
                 }
             }
-   
+
           if (!found || !inc)
             continue;
 
@@ -2174,7 +2178,9 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
             }
 
           // Insert cast for comparison.
-          if(!IS_OP_LITERAL (IC_RIGHT (ic)))
+          if (IS_OP_LITERAL (IC_RIGHT (ic)))
+            IC_RIGHT (ic) = operandFromValue (valCastLiteral (newcountertype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));
+          else
             prependCast (ic, IC_RIGHT (ic), newcountertype, ebbs[i]);
 
           // Bonus: Can narrow a multiplication in the loop.

@@ -2048,9 +2048,9 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
         {
           sym_link *newcountertype, *oldcountertype;
           const symbol *label;
-          const iCode *ifx, *inc = 0;
+          const iCode *ifx, *inc = 0, *obstacle = 0;
           iCode *mul = 0;
-          bool ok = true, found = false;
+          bool found = false;
 
           if (ic->op != LABEL || !ic->next)
             continue;
@@ -2078,16 +2078,20 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
              the loop is entered and left through ifx only */
           for(uic = ebbs[i + 1]->sch; uic; uic = uic->next)
             {
-              if(uic->op == CALL || uic->op == PCALL || uic->op == IFX || uic->op == LABEL ||
-                uic->op == GOTO && IC_LABEL (uic) != label || uic->op == INLINEASM)
+              if(uic->op == GOTO && IC_LABEL (uic) == label)
+                break;
+
+              if(!obstacle &&
+                (uic->op == CALL || uic->op == PCALL || uic->op == IFX || uic->op == LABEL ||
+                uic->op == GOTO && IC_LABEL (uic) != label || uic->op == INLINEASM))
                 {
-                  ok = false;
+                  obstacle = uic;
                   break;
                 }
-              if(uic->op == GOTO)
-                break;
             }
-          if(!ok || !uic || uic->op != GOTO)
+
+          // TODO: Proceed despite obstacle, but only consider array accesses before obstacle.
+          if(obstacle || !uic || uic->op != GOTO || IC_LABEL (uic) != label)
             continue;
 
           const bitVect *uses;

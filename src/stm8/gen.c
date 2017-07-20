@@ -5035,7 +5035,7 @@ genOr (const iCode *ic)
           emit3_o (A_RLC, left->aop, i, 0, 0);
           i++;
         }
-      else if ((aopOnStack (left->aop, i, 1) || left->aop->type == AOP_DIR) && aopSame (left->aop, i, result->aop, i, 1) &&
+      else if (left->aop->type == AOP_DIR && aopSame (left->aop, i, result->aop, i, 1) &&
         right->aop->type == AOP_LIT && isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)) >= 0)
         {
           emit2 ("bset", "%s, #%d", aopGet (left->aop, i), isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)));

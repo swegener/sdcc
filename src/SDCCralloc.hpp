@@ -60,6 +60,7 @@
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
 #include <boost/graph/connected_components.hpp>
+#include <boost/container/flat_map.hpp>
 
 #include "common.h"
 #include "SDCCtree_dec.hpp"
@@ -197,8 +198,7 @@ struct tree_dec_node
   unsigned weight; // The weight is the number of nodes at which intermediate results need to be remembered. In general, to minimize memory consumption, at join nodes the child with maximum weight should be processed first.
 };
 
-typedef std::multimap<int, var_t> operand_map_t;
-//typedef stx::btree_multimap<int, var_t> operand_map_t; // Slightly slower than std::multimap.
+typedef boost::container::flat_multimap<int, var_t> operand_map_t; // Faster than std::multimap<int, var_t> and stx::btree_multimap<int, var_t>.
 
 struct cfg_node
 {
@@ -266,7 +266,7 @@ add_operand_to_cfg_node(cfg_node &n, operand *o, std::map<std::pair<int, reg_t>,
     {
       if (n.operands.find(OP_SYMBOL_CONST(o)->key) == n.operands.end())
         for (k = 0; k < OP_SYMBOL_CONST(o)->nRegs; k++)
-          n.operands.insert(std::pair<const int, var_t>(OP_SYMBOL_CONST(o)->key, sym_to_index[std::pair<int, reg_t>(OP_SYMBOL_CONST(o)->key, k)]));
+          n.operands.insert(std::pair<int, var_t>(OP_SYMBOL_CONST(o)->key, sym_to_index[std::pair<int, reg_t>(OP_SYMBOL_CONST(o)->key, k)]));
     }
 }
 

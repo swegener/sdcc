@@ -598,6 +598,44 @@ void assignments_introduce_instruction(assignment_list_t &alist, unsigned short 
 {
   assignment_list_t::iterator ai, ai_end;
 
+#if 1 // Efficient code - reduces total SDCC runtime by about 5.5% vs. code below
+  struct inserter_t
+    {
+      explicit inserter_t(const std::vector<reg_t>& g, i_assignment_t& a) : global(g), ia(a)
+        {
+	}	
+      inserter_t& operator=(var_t v)
+        {
+          if (global[v] >= 0)
+            ia.add_var(v, global[v]);
+        }
+      inserter_t& operator*()
+        {
+          return(*this);
+        }
+      inserter_t& operator++()
+        {
+          return(*this);
+        }
+      inserter_t& operator++(int i)
+        {
+          i;
+          return(*this);
+        }
+      private:
+        const std::vector<reg_t>& global;
+        i_assignment_t& ia;
+    };
+
+  for (ai = alist.begin(), ai_end = alist.end(); ai != ai_end; ++ai)
+    {
+      i_assignment_t ia;
+
+      std::set_intersection(ai->local.begin(), ai->local.end(), G[i].alive.begin(), G[i].alive.end(), inserter_t(ai->global, ia));
+
+      ai->i_assignment = ia;
+    }
+#else // Human-readable code
   for (ai = alist.begin(), ai_end = alist.end(); ai != ai_end; ++ai)
     {
       varset_t i_variables;
@@ -614,6 +652,7 @@ void assignments_introduce_instruction(assignment_list_t &alist, unsigned short 
 
       ai->i_assignment = ia;
     }
+#endif
 }
 
 template <class G_t, class I_t>

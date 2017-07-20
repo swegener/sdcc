@@ -438,9 +438,9 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
         c += 0.1f;
       if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // Try to honour register keyword.
         c += 4.0f;
-      if((I[*v].byte % 2) && (a.global[*v] == REG_XL || a.global[*v] == REG_YL)) // Try not to reverse bytes.
-        c += 0.1f;
-      if(!(I[*v].byte % 2) && (a.global[*v] == REG_XH || a.global[*v] == REG_YH)) // Try not to reverse bytes.
+      if((I[*v].byte % 2) ? // Try not to reverse bytes.
+        (a.global[*v] == REG_XL || a.global[*v] == REG_YL) :
+        (a.global[*v] == REG_XH || a.global[*v] == REG_YH))
         c += 0.1f;
     }
 

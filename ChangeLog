@@ -2,6 +2,9 @@
 
 	* src/stm8/gen.c:
 	  Fix an issue similar to bug #2633.
+	* src/SDCCralloc.hpp,
+	  src/stm8/ralloc2.cc:
+	  Speed up register allocator a bit.
 
 2017-07-19 Philipp Klaus Krause <pkk AT spth.de>
 

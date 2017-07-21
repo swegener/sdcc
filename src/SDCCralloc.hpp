@@ -60,6 +60,7 @@
 #include <boost/graph/graphviz.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
 #include <boost/graph/connected_components.hpp>
+#include <boost/container/flat_set.hpp>
 #include <boost/container/flat_map.hpp>
 
 #include "common.h"
@@ -136,7 +137,7 @@ struct i_assignment_t
   }
 };
 
-typedef std::vector<var_t> varset_t;// Faster than std::set,  std::tr1::unordered_set and stx::btree_set.
+typedef std::vector<var_t> varset_t;// Faster than std::set,  std::tr1::unordered_set and stx::btree_set here.
 
 #ifdef HAVE_STX_BTREE_MAP_H
 typedef stx::btree_map<int, float> icosts_t; // Faster than std::map
@@ -144,8 +145,8 @@ typedef stx::btree_map<int, float> icosts_t; // Faster than std::map
 typedef std::map<int, float> icosts_t;
 #endif
 
-typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set in this role.
-typedef std::set<var_t> cfg_dying_t; // Faster than stx::btree_set in this role.
+typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set here .
+typedef boost::container::flat_set<var_t> cfg_dying_t; // Faster than stx::btree_set and std::set here.
 
 struct assignment
 {
@@ -198,7 +199,7 @@ struct tree_dec_node
   unsigned weight; // The weight is the number of nodes at which intermediate results need to be remembered. In general, to minimize memory consumption, at join nodes the child with maximum weight should be processed first.
 };
 
-typedef boost::container::flat_multimap<int, var_t> operand_map_t; // Faster than std::multimap<int, var_t> and stx::btree_multimap<int, var_t>.
+typedef boost::container::flat_multimap<int, var_t> operand_map_t; // Faster than std::multimap<int, var_t> and stx::btree_multimap<int, var_t> here.
 
 struct cfg_node
 {

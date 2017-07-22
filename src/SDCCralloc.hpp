@@ -66,13 +66,6 @@
 #include "common.h"
 #include "SDCCtree_dec.hpp"
 
-#ifdef HAVE_STX_BTREE_SET_H
-#include <stx/btree_set.h>
-#endif
-#ifdef HAVE_STX_BTREE_MAP_H
-#include <stx/btree_map.h>
-#endif
-
 extern "C"
 {
 #include "SDCCbtree.h"
@@ -137,13 +130,9 @@ struct i_assignment_t
   }
 };
 
-typedef std::vector<var_t> varset_t;// Faster than std::set,  std::tr1::unordered_set and stx::btree_set here.
+typedef std::vector<var_t> varset_t; // Faster than std::set,  std::tr1::unordered_set and stx::btree_set here.
 
-#ifdef HAVE_STX_BTREE_MAP_H
-typedef stx::btree_map<int, float> icosts_t; // Faster than std::map
-#else
-typedef std::map<int, float> icosts_t;
-#endif
+typedef boost::container::flat_map<int, float> icosts_t; // Faster than std::map and stx::btree_map here.
 
 typedef std::vector<var_t> cfg_alive_t; // Faster than stx::btree_set here .
 typedef boost::container::flat_set<var_t> cfg_dying_t; // Faster than stx::btree_set and std::set here.
@@ -751,6 +740,7 @@ static void drop_worst_assignments(assignment_list_t &alist, unsigned short int 
   std::cout << "Too many assignments here (" << i << "):" << alist_size << " > " << options.max_allocs_per_node / port->num_regs << ". Dropping some.\n"; std::cout.flush();
 #endif
 
+#if 0
   assignment_rep *arep = new assignment_rep[alist_size];
 
   for (n = 0, ai = alist.begin(); n < alist_size; ++ai, n++)
@@ -765,7 +755,61 @@ static void drop_worst_assignments(assignment_list_t &alist, unsigned short int 
 
   for (n = options.max_allocs_per_node / port->num_regs + 1; n < alist_size; n++)
     alist.erase(arep[n].i);
-    
+#else // More efficient, reduces total SDCC runtime by about 1%.
+
+  size_t endsize = options.max_allocs_per_node / port->num_regs + 1;
+  size_t arep_maxsize = std::min(alist_size, endsize * 2) + 1;
+  size_t m, k;
+  float bound = std::numeric_limits<float>::infinity();
+
+  assignment_rep *arep = new assignment_rep[arep_maxsize];
+
+  for(m = 0, n = 1, ai = alist.begin(), ++ai; n < alist_size; n++)
+    {
+      float s = ai->s;
+
+      if(s > bound)
+        {
+          alist.erase(ai++);
+          continue;
+        }
+      s += compability_cost(*ai, ac, I);
+      if(s > bound)
+        {
+          alist.erase(ai++);
+          continue;
+        }
+      s += rough_cost_estimate(*ai, i, G, I);
+      if(s > bound)
+        {
+          alist.erase(ai++);
+          continue;
+        }
+
+      if(m >= arep_maxsize - 1)
+      {
+        std::nth_element(arep, arep + (endsize - 1), arep + m);
+        for(k = endsize; k < m; k++)
+          alist.erase(arep[k].i);
+        bound = arep[endsize - 1].s;
+        
+        m = endsize;
+      }
+
+      arep[m].i = ai;
+      arep[m].s = s;
+
+      m++;
+
+      ++ai;       
+    }
+
+  std::nth_element(arep, arep + (endsize - 1), arep + m);
+
+  for (n = endsize; n < m; n++)
+    alist.erase(arep[n].i);
+#endif
+
   delete[] arep;
 }
 
@@ -891,25 +935,23 @@ static void tree_dec_ralloc_forget(T_t &T, typename boost::graph_traits<T_t>::ve
   wassert(old_inst.size() == 1);
   unsigned short int i = *(old_inst.begin());
 
-  std::set<var_t> old_vars;
+  varset_t old_vars;
   std::set_difference(T[*c].alive.begin(), T[*c].alive.end(), T[t].alive.begin(), T[t].alive.end(), std::inserter(old_vars, old_vars.end()));
 
   assignment_list_t::iterator ai, aif;
 
   // Restrict assignments (locally) to current variables.
+  varset_t newlocal;
   for (ai = alist.begin(); ai != alist.end(); ++ai)
     {
-      // Erasing by iterators doesn't work with B-Trees, and erasing by value invalidates iterators.
-      std::set<var_t>::const_iterator oi, oi_end;
-      varset_t newlocal;
+      newlocal.clear();
       std::set_difference(ai->local.begin(), ai->local.end(), old_vars.begin(), old_vars.end(), std::inserter(newlocal, newlocal.end()));
-      ai->local = newlocal;
+      std::swap(ai->local, newlocal);
 
       ai->i_costs.erase(i);
     }
 
   alist.sort();
-  //std::sort(alist.begin(), alist.end());
 
   // Collapse (locally) identical assignments.
   for (ai = alist.begin(); ai != alist.end();)

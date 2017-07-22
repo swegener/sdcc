@@ -43,15 +43,7 @@ extern "C"
 #include "port.h"
 }
 
-#ifdef HAVE_STX_BTREE_SET_H
-#include <stx/btree_set.h>
-#endif
-
-#if 0 //def HAVE_STX_BTREE_SET_H
-typedef stx::btree_set<unsigned short int> lospreset_t; // Faster than std::set
-#else
 typedef std::set<unsigned short int> lospreset_t;
-#endif
 
 // #define DEBUG_LOSPRE
 // #define DEBUG_LOSPRE_ASS

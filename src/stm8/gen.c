@@ -979,7 +979,7 @@ aopOp (operand *op, const iCode *ic)
     aop->size = getSize (operandType (op));
     op->aop = aop;
 
-    for (i = 0; i < getSize (operandType (op)); i++)
+    for (i = 0; i < aop->size; i++)
       {
         aop->aopu.bytes[i].in_reg = !!sym->regs[i];
         if (sym->regs[i])

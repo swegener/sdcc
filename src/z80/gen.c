@@ -2058,8 +2058,8 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
       else if (pairId == PAIR_IY)
         {
           /* The Rabbit has the ld iy, n (sp) instruction. */
-          int fp_offset = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-          int sp_offset = fp_offset + _G.stack.pushed;
+          int fp_offset = aop->aopu.aop_stk + offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+          int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
           if ((IS_RAB || IS_TLCS90) && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && abs (sp_offset) <= 127)
             {
               emit2 ("ld iy, %d (sp)", sp_offset);
@@ -2114,8 +2114,8 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
       else
         {
           /* The Rabbit has the ld hl, n (sp) and ld hl, n (ix) instructions. */
-          int fp_offset = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-          int sp_offset = fp_offset + _G.stack.pushed;
+          int fp_offset = aop->aopu.aop_stk + offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+          int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
           if ((IS_RAB || IS_TLCS90) && aop->size - offset >= 2 && (aop->type == AOP_STK || aop->type == AOP_EXSTK)
               && (pairId == PAIR_HL || pairId == PAIR_IY || pairId == PAIR_DE) && (abs (fp_offset) <= 127 && pairId == PAIR_HL
                   && aop->type == AOP_STK
@@ -2857,8 +2857,8 @@ aopPut3 (asmop * op1, int offset1, asmop * op2, int offset2)
     {
       if ((op1->type == AOP_STK || op1->type == AOP_EXSTK))
         {
-          fp_offset = op1->aopu.aop_stk + _G.stack.offset + offset1 + (op1->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-          sp_offset = fp_offset + _G.stack.pushed;
+          fp_offset = op1->aopu.aop_stk + offset1 + (op1->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+          sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
         }
 
       if ((op1->type == AOP_STK || op1->type == AOP_EXSTK) && !sp_offset && _G.omitFramePtr && op1->size == 1 &&
@@ -2895,8 +2895,8 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset)
 static void
 commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
 {
-  int fp_offset = aop->aopu.aop_stk + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-  int sp_offset = fp_offset + _G.stack.pushed;
+  int fp_offset = aop->aopu.aop_stk + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+  int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
 
   /* Stack positions will change, so do not assume this is possible in the cost function. */
   if (!regalloc_dry_run && !IS_GB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && !sp_offset
@@ -4226,9 +4226,9 @@ emitCall (const iCode *ic, bool ispcall)
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
       wassert (AOP_TYPE (IC_RESULT (ic)) == AOP_STK || AOP_TYPE (IC_RESULT (ic)) == AOP_EXSTK);
       fp_offset =
-        AOP (IC_RESULT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_RESULT (ic))->aopu.aop_stk >
+        AOP (IC_RESULT (ic))->aopu.aop_stk + (AOP (IC_RESULT (ic))->aopu.aop_stk >
             0 ? _G.stack.param_offset : 0);
-      sp_offset = fp_offset + _G.stack.pushed;
+      sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
       pair = (ispcall && !IS_GB) ? PAIR_IY : PAIR_HL;
       emit2 ("ld %s, !immedword", _pairs[pair].name, sp_offset);
       emit2 ("add %s, sp", _pairs[pair].name);
@@ -4766,9 +4766,9 @@ genRet (const iCode *ic)
         {
           int sp_offset, fp_offset;
           fp_offset =
-            AOP (IC_LEFT (ic))->aopu.aop_stk + _G.stack.offset + (AOP (IC_LEFT (ic))->aopu.aop_stk >
+            AOP (IC_LEFT (ic))->aopu.aop_stk + (AOP (IC_LEFT (ic))->aopu.aop_stk >
                 0 ? _G.stack.param_offset : 0);
-          sp_offset = fp_offset + _G.stack.pushed;
+          sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
           emit2 ("ld hl, #%d", sp_offset);
           emit2 ("add hl, sp");
           regalloc_dry_run_cost += 4;
@@ -9468,8 +9468,8 @@ genPointerGet (const iCode *ic)
           regalloc_dry_run_cost += 3;
         }
 
-      fp_offset = AOP (result)->aopu.aop_stk + _G.stack.offset + (AOP (result)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-      sp_offset = fp_offset + _G.stack.pushed;
+      fp_offset = AOP (result)->aopu.aop_stk + (AOP (result)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
       emit2 ("ld hl, !immedword", sp_offset);
       emit2 ("add hl, sp");
       emit2 ("ex de, hl");
@@ -10004,8 +10004,8 @@ genPointerSet (iCode * ic)
 
       fetchPair (PAIR_DE, AOP (result));
 
-      fp_offset = AOP (right)->aopu.aop_stk + _G.stack.offset + (AOP (right)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-      sp_offset = fp_offset + _G.stack.pushed;
+      fp_offset = AOP (right)->aopu.aop_stk + (AOP (right)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
       emit2 ("ld hl, !immedword", sp_offset);
       emit2 ("add hl, sp");
       emit2 ("ld bc, !immedword", size);
@@ -10558,9 +10558,9 @@ genAssign (const iCode * ic)
               if (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK)
                 {
                   int fp_offset =
-                    AOP (result)->aopu.aop_stk + offset + _G.stack.offset + (AOP (result)->aopu.aop_stk >
+                    AOP (result)->aopu.aop_stk + offset + (AOP (result)->aopu.aop_stk >
                         0 ? _G.stack.param_offset : 0);
-                  int sp_offset = fp_offset + _G.stack.pushed;
+                  int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
                   emit2 ("ld hl, #%d", sp_offset);
                   emit2 ("add hl, sp");
                   emit2 ("ex de, hl");
@@ -10575,9 +10575,9 @@ genAssign (const iCode * ic)
               if (AOP_TYPE (right) == AOP_STK || AOP_TYPE (right) == AOP_EXSTK)
                 {
                   int fp_offset =
-                    AOP (right)->aopu.aop_stk + offset + _G.stack.offset + (AOP (right)->aopu.aop_stk >
+                    AOP (right)->aopu.aop_stk + offset + (AOP (right)->aopu.aop_stk >
                         0 ? _G.stack.param_offset : 0);
-                  int sp_offset = fp_offset + _G.stack.pushed;
+                  int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
                   emit2 ("ld hl, #%d", sp_offset);
                   emit2 ("add hl, sp");
                   regalloc_dry_run_cost += 4;

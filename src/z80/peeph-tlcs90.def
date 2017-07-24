@@ -116,7 +116,7 @@ replace restart {
 } by {
 	; peephole 12 loaded %2 into %3 (%4) directly instead of going through %1.
 	ld	%3 (%4), %2
-} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1)
+} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1), notSame(%1 'hl')
 
 replace restart {
 	ld	%1, %2 (%3)
@@ -136,7 +136,7 @@ replace restart {
 	ld	%5 (%6), %4
 	; peephole 14 loaded %7 into %2 (%3) directly instead of going through %1.
 	ld	%2 (%3), %7
-} if canAssign(%2 %3 %7), notVolatile(%1), notUsed(%1), notSame(%1 %4)
+} if canAssign(%2 %3 %7), notVolatile(%1), notUsed(%1), notSame(%1 %4 %1 'hl')
 
 replace restart {
 	ld	%1, %2 (%3)
@@ -361,7 +361,7 @@ replace restart {
 	; peephole 34 loaded %3 from %2 instead of going through %1 (ix).
 	ld	%1 (ix), %2
 	ld	%3, %2
-}
+} if canAssign(%3 %2)
 // Don't need to check for volatile, since ix is used for the stack.
 
 replace restart {
@@ -373,7 +373,7 @@ replace restart {
 	push	de
 	; peephole 34a loaded %2 from a instead of %1 (ix)
 	ld	%2, a
-}	
+} if canAssign(%2 'a')
 
 replace restart {
 	push	af

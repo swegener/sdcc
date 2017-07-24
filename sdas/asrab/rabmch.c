@@ -593,7 +593,7 @@ VOID  machine(struct mne * mp)
                         if ((t1 == S_IDIY) || (t1 == S_IDIX) ||
                             (t1 == S_IDHL) || (t1 == S_IDHL_OFFSET)) {
                                 outab(0xF4);
-                                outrb(&e2, 0);
+                                outrb(&e1, 0);
                                 break;
                         }
 

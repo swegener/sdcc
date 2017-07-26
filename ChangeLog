@@ -1,3 +1,9 @@
+2017-07-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c,
+	* src/SDCCicode.c
+	* src/SDCCralloc.hpp: fix bug #2567, include block num in iCode debug
+
 2017-07-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/gen.c: fix bug #2486 (frame pointer offset wrong)

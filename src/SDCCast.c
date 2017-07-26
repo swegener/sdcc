@@ -5693,6 +5693,8 @@ createBlock (symbol * decl, ast * body)
   ex->level++;
   ex->filename = NULL;
   ex->lineno = 0;
+  if (body)
+    ex->block = body->block;
   return ex;
 }
 
@@ -7207,7 +7209,10 @@ createFunction (symbol * name, ast * body)
 
   /* create a dummy block if none exists */
   if (!body)
-    body = newNode (BLOCK, NULL, NULL);
+    {
+      body = newNode (BLOCK, NULL, NULL);
+      body->block = ++blockNo;
+    }
 
   noLineno++;
 
@@ -7274,6 +7279,7 @@ createFunction (symbol * name, ast * body)
 
   ex = newAst_VALUE (symbolVal (name)); /* create name */
   ex = newNode (FUNCTION, ex, body);
+  ex->block = body->block;
   ex->values.args = FUNC_ARGS (name->type);
   ex->decorated = 1;
   if (options.dump_ast)

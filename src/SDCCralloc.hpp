@@ -394,10 +394,10 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
                 }
 
               // TODO: Move this to a place where it also works when using the old allocator!
-              if(isym->block)
-                isym->block = btree_lowest_common_ancestor(isym->block, ic->block);
-              else
-                isym->block = ic->block;
+              isym->block = btree_lowest_common_ancestor(isym->block, ic->block);
+              // If this symbol has a spill location, ensure the spill location is also allocated in a compatible block
+              if (SYM_SPIL_LOC(isym))
+                SYM_SPIL_LOC(isym)->block = btree_lowest_common_ancestor(SYM_SPIL_LOC(isym)->block, isym->block);
             }
         }
 

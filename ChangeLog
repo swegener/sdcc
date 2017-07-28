@@ -1,3 +1,11 @@
+2017-07-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* aclocal.m4:
+	  Added new file.
+	* configure
+	* configure.ac:
+	  Check if C++14 or C++11 is supported.
+
 2017-07-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2567.c:
@@ -120,7 +128,7 @@
 	* sdas/asstm8/stm8pst.c:
 	  Support for break debug instruction, patch by Reto Schneider.
 
-2016-12-12 Ben Shi <powerstudio1st AT 163 DOT com>
+2017-06-30 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCast.c:
 	  add cast to left and right subtree only if they both can be casted.

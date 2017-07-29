@@ -428,7 +428,6 @@ if test "$ac_cv_prog_cc_c99" != "no"; then
   CFLAGS="$ac_cv_prog_cc_c99 ${CFLAGS}"
 fi
 
-AX_CXX_COMPILE_STDCXX_14
 AX_CXX_COMPILE_STDCXX_11
 
 # SDCC_C_UNNAMED_STRUCT_TAG ()

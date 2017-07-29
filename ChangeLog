@@ -1,3 +1,9 @@
+2017-07-29 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* configure
+	* configure.ac:
+	  Remove requirement of C++14.
+
 2017-07-28 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* aclocal.m4:

@@ -2959,8 +2959,16 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
               cheapMove (aop, 1, ASMOP_B, 0);
               break;
             case PAIR_DE:
-              cheapMove (aop, 0, ASMOP_E, 0);
-              cheapMove (aop, 1, ASMOP_D, 0);
+              if (aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == L_IDX && aop->aopu.aop_reg[1]->rIdx == H_IDX && !dont_destroy)
+                {
+                  emit2 ("ex de, hl");
+                  regalloc_dry_run_cost++;
+                }
+              else
+                {
+                  cheapMove (aop, 0, ASMOP_E, 0);
+                  cheapMove (aop, 1, ASMOP_D, 0);
+                }
               break;
             case PAIR_HL:
               if (aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == H_IDX && aop->aopu.aop_reg[1]->rIdx == L_IDX)
@@ -2973,6 +2981,11 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
                 {
                   cheapMove (aop, 1, ASMOP_H, 0);
                   cheapMove (aop, 0, ASMOP_L, 0);
+                }
+              else if (aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == E_IDX && aop->aopu.aop_reg[1]->rIdx == D_IDX && !dont_destroy)
+                {
+                  emit2 ("ex de, hl");
+                  regalloc_dry_run_cost++;
                 }
               else
                 {
@@ -5313,7 +5326,7 @@ genPlus (iCode * ic)
       && isPairDead (PAIR_HL, ic))
     {
       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
-      emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
+      emit2 ("add hl, %s", getPairName (AOP (IC_RIGHT (ic))));
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
@@ -5324,7 +5337,7 @@ genPlus (iCode * ic)
       && isPairDead (PAIR_HL, ic))
     {
       fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
-      emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
+      emit2 ("add hl, %s", getPairName (AOP (IC_LEFT (ic))));
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
@@ -5334,7 +5347,7 @@ genPlus (iCode * ic)
   if (isPair (AOP (IC_LEFT (ic))) && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_LEFT (ic))) == PAIR_HL
       && isPairDead (PAIR_HL, ic))
     {
-      emit2 ("add hl,%s", getPairName (AOP (IC_RIGHT (ic))));
+      emit2 ("add hl, %s", getPairName (AOP (IC_RIGHT (ic))));
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
@@ -5344,7 +5357,7 @@ genPlus (iCode * ic)
   if (isPair (AOP (IC_LEFT (ic))) && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_RIGHT (ic))) == PAIR_HL
       && isPairDead (PAIR_HL, ic))
     {
-      emit2 ("add hl,%s", getPairName (AOP (IC_LEFT (ic))));
+      emit2 ("add hl, %s", getPairName (AOP (IC_LEFT (ic))));
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);

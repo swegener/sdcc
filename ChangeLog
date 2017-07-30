@@ -1,7 +1,8 @@
 2017-07-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Improve 16-bit left-shift by 7.
+	  Improve 16-bit left-shift by 7,
+	  improve transfers between hl and de (in codegen at a cost in peephole opt).
 
 2017-07-29 Ben Shi <powerstudio1st AT 163 DOT com>
 

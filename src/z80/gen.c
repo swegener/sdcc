@@ -8256,6 +8256,20 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
       wassert (0);
     }
 
+  /* For a shift of 7 we can use cheaper right shifts */
+  else if (shCount == 7 && AOP_TYPE (left) == AOP_REG && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[0]->rIdx) && AOP_TYPE (result) == AOP_REG &&
+    AOP (left)->aopu.aop_reg[0]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[1]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[0]->rIdx != IYH_IDX && AOP (left)->aopu.aop_reg[1]->rIdx != IYH_IDX &&
+    AOP (result)->aopu.aop_reg[0]->rIdx != IYL_IDX && AOP (result)->aopu.aop_reg[1]->rIdx != IYL_IDX && AOP (result)->aopu.aop_reg[0]->rIdx != IYH_IDX && AOP (result)->aopu.aop_reg[1]->rIdx != IYH_IDX &&
+    (optimize.codeSpeed || getPairId (AOP (result)) != PAIR_HL || getPairId (AOP (left)) != PAIR_HL)) /* but a sequence of add hl, hl might still be cheaper code-size wise */
+    {
+      emit3_o (A_RR, AOP (left), 1, 0, 0);
+      emit3_o (A_LD, AOP (result), 1, AOP (left), 0);
+      emit3_o (A_RR, AOP (result), 1, 0, 0);
+      emit3_o (A_LD, AOP (result), 0, ASMOP_ZERO, 0);
+      emit3_o (A_RR, AOP (result), 0, 0, 0);
+      return;
+    }
+
   if (AOP_TYPE (result) != AOP_REG && AOP_TYPE (left) == AOP_REG && AOP_SIZE (left) >= 2 && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[0]->rIdx) && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[1]->rIdx) ||
     getPairId (AOP (left)) == PAIR_HL && isPairDead (PAIR_HL, ic))
     shiftoperand = left;

@@ -2959,7 +2959,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
               cheapMove (aop, 1, ASMOP_B, 0);
               break;
             case PAIR_DE:
-              if (aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == L_IDX && aop->aopu.aop_reg[1]->rIdx == H_IDX && !dont_destroy)
+              if (!IS_GB && aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == L_IDX && aop->aopu.aop_reg[1]->rIdx == H_IDX && !dont_destroy)
                 {
                   emit2 ("ex de, hl");
                   regalloc_dry_run_cost++;
@@ -2982,7 +2982,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
                   cheapMove (aop, 1, ASMOP_H, 0);
                   cheapMove (aop, 0, ASMOP_L, 0);
                 }
-              else if (aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == E_IDX && aop->aopu.aop_reg[1]->rIdx == D_IDX && !dont_destroy)
+              else if (!IS_GB && aop->type == AOP_REG && aop->aopu.aop_reg[0]->rIdx == E_IDX && aop->aopu.aop_reg[1]->rIdx == D_IDX && !dont_destroy)
                 {
                   emit2 ("ex de, hl");
                   regalloc_dry_run_cost++;

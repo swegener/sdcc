@@ -1,3 +1,8 @@
+2017-07-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix a gbz80 codegen issue.
+
 2017-07-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCmem.c (initMem),

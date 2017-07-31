@@ -346,7 +346,7 @@ initMem ()
   eeprom = allocMap (0, 1, 0, 0, 0, 0, 0, REG_NAME, 'K', EEPPOINTER);
 
   /* the unknown map */
-  generic = allocMap (1, 0, 0, 1, 1, 0, 0, REG_NAME, ' ', GPOINTER);
+  generic = allocMap (0, 0, 0, 0, 0, 0, 0, DATA_NAME, ' ', GPOINTER);
 
 }
 

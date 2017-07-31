@@ -1,3 +1,9 @@
+2017-07-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCmem.c (initMem),
+	* src/hc08/gen.c (aopForSym): fix bug #2385
+	* support/regression/tests/bug-2385.c: re-enable for all ports
+
 2017-07-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

@@ -2230,23 +2230,10 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       return aop;
     }
 
-  /* if it is in far space */
-  if (IN_FARSPACE (space))
-    {
-      sym->aop = aop = newAsmop (AOP_EXT);
-      aop->aopu.aop_dir = sym->rname;
-      aop->size = getSize (sym->type);
-      return aop;
-    }
-
-  werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopForSym should never reach here");
-
-  exit (1);
-
-  /* if it is in code space */
-  if (IN_CODESPACE (space))
-    aop->code = 1;
-
+  /* default to far space */
+  sym->aop = aop = newAsmop (AOP_EXT);
+  aop->aopu.aop_dir = sym->rname;
+  aop->size = getSize (sym->type);
   return aop;
 }
 

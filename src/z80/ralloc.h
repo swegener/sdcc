@@ -31,7 +31,8 @@
 
 enum
 {
-  C_IDX = 0,
+  A_IDX = 0,
+  C_IDX,
   B_IDX,
   E_IDX,
   D_IDX,
@@ -49,10 +50,14 @@ enum
   S_IDX,
   T_IDX,
 #endif
-  CND_IDX
-};
+  CND_IDX,
 
-#define A_IDX (IS_GB ? 4 : (IY_RESERVED ? 6 : 8))
+  // These pairs are for internal use in code generation only.
+  IY_IDX,
+  BC_IDX,
+  DE_IDX,
+  HL_IDX
+};
 
 enum
 {

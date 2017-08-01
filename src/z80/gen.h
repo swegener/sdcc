@@ -44,8 +44,6 @@ typedef enum
   AOP_IY,
   /* Is pointed to by HL */
   AOP_HL,
-  /* Is in A */
-  AOP_ACC,
   /* Is in H and L */
   AOP_HLREG,
   /* Simple literal. */

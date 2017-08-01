@@ -31,15 +31,15 @@ extern "C"
   bool should_omit_frame_ptr;
 };
 
-#define REG_C 0
-#define REG_B 1
-#define REG_E 2
-#define REG_D 3
-#define REG_L 4
-#define REG_H 5
-#define REG_IYL 6
-#define REG_IYH 7
-#define REG_A (port->num_regs - 1)
+#define REG_A 0
+#define REG_C 1
+#define REG_B 2
+#define REG_E 3
+#define REG_D 4
+#define REG_L 5
+#define REG_H 6
+#define REG_IYL 7
+#define REG_IYH 8
 
 template <class G_t, class I_t>
 float default_operand_cost(const operand *o, const assignment &a, unsigned short int i, const G_t &G, const I_t &I)
@@ -503,7 +503,7 @@ static bool operand_is_pair(const operand *o, const assignment &a, unsigned shor
   if(oi3 != oi_end)
     return(false);
 
-  if(a.global[oi->second] % 2)
+  if(a.global[oi->second] != REG_C && a.global[oi->second] != REG_E && a.global[oi->second] != REG_L && a.global[oi->second] != REG_IYL)
     return(false);
   if(a.global[oi->second] + 1 != a.global[oi2->second])
     return(false);
@@ -1101,6 +1101,7 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
       if(a.global[*v] < 0)
         continue;
       ic->rMask = bitVectSetBit(ic->rMask, a.global[*v]);
+
       if(G[i].dying.find(*v) == G[i].dying.end())
         if(!((IC_RESULT(ic) && !POINTER_SET(ic)) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
           ic->rSurv = bitVectSetBit(ic->rSurv, a.global[*v]);
@@ -1119,19 +1120,12 @@ static void assign_operand_for_cost(operand *o, const assignment &a, unsigned sh
       var_t v = oi->second;
       if(a.global[v] >= 0)
         { 
-          if(a.global[v] != REG_A && (a.global[v] != REG_IYL && a.global[v] != REG_IYH || !OPTRALLOC_IY))
+          if(a.global[v] != REG_IYL && a.global[v] != REG_IYH || !OPTRALLOC_IY)
             {
               sym->regs[I[v].byte] = regsZ80 + a.global[v];
               sym->accuse = 0;
               sym->isspilt = false;
               sym->nRegs = I[v].size;
-            }
-          else if(a.global[v] == REG_A)
-            {
-              sym->accuse = ACCUSE_A;
-              sym->isspilt = false;
-              sym->nRegs = 0;
-              sym->regs[I[v].byte] = 0;
             }
           else
             {
@@ -1259,7 +1253,7 @@ float weird_byte_order(const assignment &a, const I_t &I)
   
   varset_t::const_iterator vi, vi_end;
   for(vi = a.local.begin(), vi_end = a.local.end(); vi != vi_end; ++vi)
-    if(a.global[*vi] % 2 != I[*vi].byte % 2)
+    if(a.global[*vi] > 0 && (a.global[*vi] - 1) % 2 != I[*vi].byte % 2)
       c += 8.0f;
 
   return(c);
@@ -1408,9 +1402,9 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
       const symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
       if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // When in doubt, try to honour register keyword.
         c += 32.0f;
-      if((I[*v].byte % 2) && (a.global[*v] == REG_L || a.global[*v] == REG_E || a.global[*v] == REG_C)) // Try not to reverse bytes.
+      if((I[*v].byte % 2) && (a.global[*v] == REG_L || a.global[*v] == REG_E || a.global[*v] == REG_C || a.global[*v] == REG_IYL)) // Try not to reverse bytes.
         c += 8.0f;
-      if(!(I[*v].byte % 2) && I[*v].size > 1 && (a.global[*v] == REG_H || a.global[*v] == REG_D || a.global[*v] == REG_B)) // Try not to reverse bytes.
+      if(!(I[*v].byte % 2) && I[*v].size > 1 && (a.global[*v] == REG_H || a.global[*v] == REG_D || a.global[*v] == REG_B || a.global[*v] == REG_IYH)) // Try not to reverse bytes.
         c += 8.0f;
       if(I[*v].byte == 0 && I[*v].size > 1 || I[*v].byte == 2 && I[*v].size > 3)
         {
@@ -1508,19 +1502,12 @@ static bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
       symbol *sym = (symbol *)(hTabItemWithKey(liveRanges, I[v].v));
       if(winner.global[v] >= 0)
         {
-          if(winner.global[v] != REG_A && (winner.global[v] != REG_IYL && winner.global[v] != REG_IYH || !OPTRALLOC_IY))
+          if(winner.global[v] != REG_IYL && winner.global[v] != REG_IYH || !OPTRALLOC_IY)
             {
               sym->regs[I[v].byte] = regsZ80 + winner.global[v];
               sym->accuse = 0;
               sym->isspilt = false;
               sym->nRegs = I[v].size;
-            }
-          else if(winner.global[v] == REG_A)
-            {
-              sym->accuse = ACCUSE_A;
-              sym->isspilt = false;
-              sym->nRegs = 0;
-              sym->regs[0] = 0;
             }
           else
             {

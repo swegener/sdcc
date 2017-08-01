@@ -105,6 +105,7 @@ static struct
 } _G;
 
 static reg_info _gbz80_regs[] = {
+  {REG_GPR, A_IDX, "a", 1},
   {REG_GPR, C_IDX, "c", 1},
   {REG_GPR, B_IDX, "b", 1},
   {REG_GPR, E_IDX, "e", 1},
@@ -115,6 +116,7 @@ static reg_info _gbz80_regs[] = {
 };
 
 static reg_info _z80_regs[] = {
+  {REG_GPR, A_IDX, "a", 1},
   {REG_GPR, C_IDX, "c", 1},
   {REG_GPR, B_IDX, "b", 1},
   {REG_GPR, E_IDX, "e", 1},
@@ -145,7 +147,7 @@ allocReg (short type)
 {
   int i;
 
-  for (i = 0; i < _G.nRegs; i++)
+  for (i = C_IDX; i < _G.nRegs; i++)
     {
       /* For now we allocate from any free */
       if (regsZ80[i].isFree)
@@ -171,7 +173,7 @@ regWithIdx (int idx)
 {
   int i;
 
-  for (i = 0; i < _G.nRegs; i++)
+  for (i = C_IDX; i < _G.nRegs; i++)
     {
       if (regsZ80[i].rIdx == idx)
         {
@@ -202,7 +204,7 @@ nFreeRegs (int type)
   int i;
   int nfr = 0;
 
-  for (i = 0; i < _G.nRegs; i++)
+  for (i = C_IDX; i < _G.nRegs; i++)
     {
       /* For now only one reg type */
       if (regsZ80[i].isFree)
@@ -1005,7 +1007,7 @@ tryAllocatingRegPair (symbol * sym)
 {
   int i;
   wassert (sym->nRegs == 2);
-  for (i = 0; i < _G.nRegs; i += 2)
+  for (i = C_IDX; i < _G.nRegs; i += 2)
     {
       if ((regsZ80[i].isFree) && (regsZ80[i + 1].isFree))
         {
@@ -1434,7 +1436,7 @@ rUmaskForOp (const operand * op)
 
   for (j = 0; j < sym->nRegs; j++)
     {
-      if (!(sym->regs[j]) || sym->regs[j]->rIdx < C_IDX || sym->regs[j]->rIdx > CND_IDX)
+      if (!(sym->regs[j]) || sym->regs[j]->rIdx < 0 || sym->regs[j]->rIdx > CND_IDX)
         {
           werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "rUmaskForOp: Register not found");
           exit (0);
@@ -1683,7 +1685,7 @@ freeAllRegs ()
 
   D (D_ALLOC, ("freeAllRegs: running.\n"));
 
-  for (i = 0; i < _G.nRegs; i++)
+  for (i = C_IDX; i < _G.nRegs; i++)
     regsZ80[i].isFree = 1;
 }
 
@@ -3021,12 +3023,12 @@ z80_oldralloc (ebbIndex * ebbi)
   if (IS_GB)
     {
       /* DE is required for the code gen. */
-      _G.nRegs = 2;
+      _G.nRegs = 3;
       regsZ80 = _gbz80_regs;
     }
   else
     {
-      _G.nRegs = 4;
+      _G.nRegs = 5;
       regsZ80 = _z80_regs;
     }
     

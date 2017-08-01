@@ -10738,7 +10738,7 @@ genJumpTab (const iCode *ic)
 /* genCast - gen code for casting                                  */
 /*-----------------------------------------------------------------*/
 static void
-genCast (const iCode * ic)
+genCast (const iCode *ic)
 {
   operand *result = IC_RESULT (ic);
   sym_link *rtype = operandType (IC_RIGHT (ic));
@@ -10768,7 +10768,7 @@ genCast (const iCode * ic)
       goto release;
     }
 
-  /* if they are the same size : or less */
+  /* if they are the same size or less */
   if (AOP_SIZE (result) <= AOP_SIZE (right))
     {
       genAssign (ic);
@@ -10798,8 +10798,8 @@ genCast (const iCode * ic)
     {
       if (surviving_a && !pushed_a)
         _push (PAIR_AF), pushed_a = TRUE;
-      /* we need to extend the sign :{ */
-      cheapMove (ASMOP_A, 0, AOP (right), AOP_SIZE (right) - 1);
+      /* we need to extend the sign */
+      cheapMove (ASMOP_A, 0, AOP_TYPE (result) == AOP_REG ? AOP (result) : AOP (right), AOP_SIZE (right) - 1);
       emit3 (A_RLA, 0, 0);
       emit3 (A_SBC, ASMOP_A, ASMOP_A);
       while (size--)

@@ -1,3 +1,7 @@
+2017-08-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/gcc-torture-execute-20010224-1.c: re-enable
+
 2017-07-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

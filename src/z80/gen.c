@@ -90,33 +90,32 @@ static struct
   const char *name;
   const char *l;
   const char *h;
+  int l_idx;
+  int h_idx;
 } _pairs[NUM_PAIRS] =
 {
   {
-    "??1", "?2", "?3"
+    "??1", "?2", "?3", -1, -1
   },
   {
-    "af", "f", "a"
+    "af", "f", "a", -1, A_IDX
   },
   {
-    "bc", "c", "b"
+    "bc", "c", "b", C_IDX, B_IDX
   },
   {
-    "de", "e", "d"
+    "de", "e", "d", E_IDX, D_IDX
   },
   {
-    "hl", "l", "h"
+    "hl", "l", "h", L_IDX, H_IDX
   },
   {
-    "iy", "iyl", "iyh"
+    "iy", "iyl", "iyh", IYL_IDX, IYH_IDX
   },
   {
-    "ix", "ixl", "ixh"
+    "ix", "ixl", "ixh", -1, -1
   }
 };
-
-// PENDING
-#define ACC_NAME        _pairs[PAIR_AF].h
 
 enum
 {
@@ -982,7 +981,7 @@ aopDump (const char *plabel, asmop * aop)
 static void
 _moveA (const char *moveFrom)
 {
-  _emitMove (ACC_NAME, moveFrom);
+  _emitMove ("a", moveFrom);
 }
 
 /* Load aop into A */
@@ -2160,62 +2159,23 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
               emit2 ("bool hl");
               regalloc_dry_run_cost++;
               if (!regalloc_dry_run)
-                emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
+                emit2 ("ld %s, %s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
               regalloc_dry_run_cost += ld_cost (ASMOP_L, aop);
-            }
-          else if (pairId == PAIR_HL && aop->type == AOP_REG && aop->size - offset >= 2 && aop->aopu.aop_reg[offset]->rIdx != H_IDX && aop->aopu.aop_reg[offset + 1]->rIdx != L_IDX)
-            {
-              if (aop->aopu.aop_reg[offset + 0]->rIdx != L_IDX)
-                {
-                  if (!regalloc_dry_run)
-                    emit2 ("ld l, %s", aopGet (aop, offset + 0, FALSE));
-                  regalloc_dry_run_cost++;
-                }
-              if (aop->aopu.aop_reg[offset + 1]->rIdx != H_IDX)
-                {
-                  if (!regalloc_dry_run)
-                    emit2 ("ld h, %s", aopGet (aop, offset + 1, FALSE));
-                  regalloc_dry_run_cost++;
-                }
-            }
-          else if (pairId == PAIR_DE && aop->type == AOP_REG && aop->size - offset >= 2 && aop->aopu.aop_reg[offset]->rIdx != D_IDX && aop->aopu.aop_reg[offset + 1]->rIdx != E_IDX)
-            {
-              if (aop->aopu.aop_reg[offset + 0]->rIdx != E_IDX)
-                {
-                  if (!regalloc_dry_run)
-                    emit2 ("ld e, %s", aopGet (aop, offset + 0, FALSE));
-                  regalloc_dry_run_cost++;
-                }
-              if (aop->aopu.aop_reg[offset + 1]->rIdx != D_IDX)
-                {
-                  if (!regalloc_dry_run)
-                    emit2 ("ld d, %s", aopGet (aop, offset + 1, FALSE));
-                  regalloc_dry_run_cost++;
-                }
-            }
-          else if (pairId == PAIR_BC && aop->type == AOP_REG && aop->size - offset >= 2 && aop->aopu.aop_reg[offset]->rIdx != B_IDX && aop->aopu.aop_reg[offset + 1]->rIdx != C_IDX)
-            {
-              if (aop->aopu.aop_reg[offset + 0]->rIdx != C_IDX)
-                {
-                  if (!regalloc_dry_run)
-                    emit2 ("ld c, %s", aopGet (aop, offset + 0, FALSE));
-                  regalloc_dry_run_cost++;
-                }
-              if (aop->aopu.aop_reg[offset + 1]->rIdx != B_IDX)
-                {
-                  if (!regalloc_dry_run)
-                    emit2 ("ld b, %s", aopGet (aop, offset + 1, FALSE));
-                  regalloc_dry_run_cost++;
-                }
             }
           else
             {
-              if (!regalloc_dry_run)
+              if (!aopInReg (aop, offset, _pairs[pairId].l_idx))
                 {
-                  emit2 ("ld %s,%s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
-                  emit2 ("ld %s,%s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
+                   if (!regalloc_dry_run)
+                     emit2 ("ld %s, %s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
+                   regalloc_dry_run_cost += ld_cost (ASMOP_L, aop);
                 }
-              regalloc_dry_run_cost += ld_cost (ASMOP_L, aop) * 2;
+              if (!aopInReg (aop, offset + 1, _pairs[pairId].h_idx))
+                {
+                   if (!regalloc_dry_run)
+                     emit2 ("ld %s, %s", _pairs[pairId].h, aopGet (aop, offset + 1, FALSE));
+                   regalloc_dry_run_cost += ld_cost (ASMOP_H, aop);
+                }
             }
         }
       /* PENDING: check? */
@@ -10212,7 +10172,7 @@ release:
 /* genIfx - generate code for Ifx statement                        */
 /*-----------------------------------------------------------------*/
 static void
-genIfx (iCode * ic, iCode * popIc)
+genIfx (iCode *ic, iCode *popIc)
 {
   operand *cond = IC_COND (ic);
   int isbit = 0;
@@ -10221,7 +10181,7 @@ genIfx (iCode * ic, iCode * popIc)
 
   /* get the value into acc */
   if (AOP_TYPE (cond) != AOP_CRY && !IS_BOOL (operandType (cond)))
-    _toBoolean (cond, FALSE);
+    _toBoolean (cond, !popIc);
   /* Special case: Condition is bool */
   else if (IS_BOOL (operandType (cond)))
     {
@@ -10252,7 +10212,7 @@ genIfx (iCode * ic, iCode * popIc)
   else if (isbit && !IS_ITEMP (cond))
     genIfxJump (ic, OP_SYMBOL (cond)->rname);
   else
-    genIfxJump (ic, "a");
+    genIfxJump (ic, popIc ? "a" : "nz");
 
   if (!regalloc_dry_run)
     ic->generated = 1;

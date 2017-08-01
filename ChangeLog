@@ -5,6 +5,8 @@
 	  src/z80/ralloc.h,
 	  src/z80/ralloc2.cc:
 	  Handle register A more like other registers.
+	* src/z80/peeph-z80.def:
+	  1-byte-instruction in jump target for cheaper jumps.
 
 2017-08-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

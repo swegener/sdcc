@@ -2434,3 +2434,41 @@ replace {
 	; peephole 158 used djnz
 }
 
+barrier
+
+// To weird to let any other peephole rules see the result of the rules below
+
+replace {
+	jr	Z, %2
+	ld	a, #%3
+	jr	%1
+%2:
+	xor	a, a
+%1:
+} by {
+	jr	Z, %2
+	ld	a, #%3
+	.db	#0x28
+	; peephole 159 used jr Z opcode to jump over 1-byte instruction.
+%2:
+	xor	a, a
+%1:
+}
+
+replace {
+	jr	NZ, %2
+	ld	a, #%3
+	jr	%1
+%2:
+	xor	a, a
+%1:
+} by {
+	jr	NZ, %2
+	ld	a, #%3
+	.db	#0x20
+	; peephole 159a used jr NZ opcode to jump over 1-byte instruction.
+%2:
+	xor	a, a
+%1:
+}
+

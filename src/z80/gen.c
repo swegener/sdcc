@@ -10660,6 +10660,8 @@ skip_byte:
                 _pop (PAIR_HL);
                 spillPair (PAIR_HL);
               }
+            else if (AOP_TYPE (right) == AOP_LIT && !((lit >> (offset * 8)) & 0xff) && aopInReg (AOP (result), offset, A_IDX))
+              emit3 (A_XOR, ASMOP_A, ASMOP_A);
             else
               cheapMove (AOP (result), offset, AOP (right), offset);
             offset++;

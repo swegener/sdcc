@@ -6,7 +6,7 @@
 	  src/z80/ralloc2.cc:
 	  Handle register A more like other registers.
 	* src/z80/peeph-z80.def:
-	  1-byte-instruction in jump target for cheaper jumps.
+	  Instructions in jump target for cheaper short jumps.
 
 2017-08-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

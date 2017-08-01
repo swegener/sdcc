@@ -2443,13 +2443,47 @@ replace {
 	ld	a, #%3
 	jr	%1
 %2:
+	ld	a, #%4
+%1:
+} by {
+	jr	Z, %2
+	ld	a, #%3
+	.db	#0xca
+	; peephole 159z used jp Z opcode to jump over 2-byte instruction.
+%2:
+	ld	a, #%4
+%1:
+}
+
+replace {
+	jr	NZ, %2
+	ld	a, #%3
+	jr	%1
+%2:
+	ld	a, #%4
+%1:
+} by {
+	jr	NZ, %2
+	ld	a, #%3
+	.db	#0xc2
+	; peephole 159nz used jp NZ opcode to jump over 2-byte instruction.
+%2:
+	ld	a, #%4
+%1:
+}
+
+replace {
+	jr	Z, %2
+	ld	a, #%3
+	jr	%1
+%2:
 	xor	a, a
 %1:
 } by {
 	jr	Z, %2
 	ld	a, #%3
 	.db	#0x28
-	; peephole 159 used jr Z opcode to jump over 1-byte instruction.
+	; peephole 159xz used jr Z opcode to jump over 1-byte instruction.
 %2:
 	xor	a, a
 %1:
@@ -2466,9 +2500,111 @@ replace {
 	jr	NZ, %2
 	ld	a, #%3
 	.db	#0x20
-	; peephole 159a used jr NZ opcode to jump over 1-byte instruction.
+	; peephole 159xnz used jr NZ opcode to jump over 1-byte instruction.
 %2:
 	xor	a, a
+%1:
+}
+
+replace {
+	jr	Z, %2
+	ld	c, #%3
+	jr	%1
+%2:
+	ld	c, #%4
+%1:
+} by {
+	jr	Z, %2
+	ld	c, #%3
+	.db	#0xca
+	; peephole 160z used jp Z opcode to jump over 2-byte instruction.
+%2:
+	ld	c, #%4
+%1:
+}
+
+replace {
+	jr	NZ, %2
+	ld	c, #%3
+	jr	%1
+%2:
+	ld	c, #%4
+%1:
+} by {
+	jr	NZ, %2
+	ld	c, #%3
+	.db	#0xc2
+	; peephole 160nz used jp NZ opcode to jump over 2-byte instruction.
+%2:
+	ld	c, #%4
+%1:
+}
+
+replace {
+	jr	Z, %2
+	ld	e, #%3
+	jr	%1
+%2:
+	ld	e, #%4
+%1:
+} by {
+	jr	Z, %2
+	ld	e, #%3
+	.db	#0xca
+	; peephole 161z used jp Z opcode to jump over 2-byte instruction.
+%2:
+	ld	e, #%4
+%1:
+}
+
+replace {
+	jr	NZ, %2
+	ld	e, #%3
+	jr	%1
+%2:
+	ld	e, #%4
+%1:
+} by {
+	jr	NZ, %2
+	ld	e, #%3
+	.db	#0xc2
+	; peephole 161nz used jp NZ opcode to jump over 2-byte instruction.
+%2:
+	ld	e, #%4
+%1:
+}
+
+replace {
+	jr	Z, %2
+	ld	l, #%3
+	jr	%1
+%2:
+	ld	l, #%4
+%1:
+} by {
+	jr	Z, %2
+	ld	l, #%3
+	.db	#0xca
+	; peephole 162z used jp Z opcode to jump over 2-byte instruction.
+%2:
+	ld	l, #%4
+%1:
+}
+
+replace {
+	jr	NZ, %2
+	ld	l, #%3
+	jr	%1
+%2:
+	ld	l, #%4
+%1:
+} by {
+	jr	NZ, %2
+	ld	l, #%3
+	.db	#0xc2
+	; peephole 162nz used jp NZ opcode to jump over 2-byte instruction.
+%2:
+	ld	l, #%4
 %1:
 }
 

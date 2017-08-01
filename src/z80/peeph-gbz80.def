@@ -503,15 +503,15 @@ replace restart {
 	//add	%3, %4
 }
 
-replace restart {
-	ld	%1,a
-	ld	a,%2
-	add	a,%1
-} by {
-	ld	%1, a
-	; peephole 43 removed load by exploiting commutativity of addition.
-	add	a,%2
-}
+//replace restart {
+//	ld	%1,a
+//	ld	a,%2
+//	add	a,%1
+//} by {
+//	ld	%1, a
+//	; peephole 43 removed load by exploiting commutativity of addition.
+//	add	a,%2
+//} if notSame(%2 '(bc)' '(de)'), canAssign('b' %2) Conditions are necessary, but canAssign() not implemented for gbz80
 
 replace restart {
 	or	a,%1

@@ -18,8 +18,8 @@
 //
 // An optimal, polynomial-time register allocator.
 
-//#define DEBUG_RALLOC_DEC // Uncomment to get debug messages while doing register allocation on the tree decomposition.
-//#define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (much more verbose than the one above).
+// #define DEBUG_RALLOC_DEC // Uncomment to get debug messages while doing register allocation on the tree decomposition.
+// #define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (much more verbose than the one above).
 
 #include "SDCCralloc.hpp"
 
@@ -463,6 +463,23 @@ static bool operand_in_reg(const operand *o, const i_assignment_t &ia, unsigned 
   return(false);
 }
 
+// Return true, iff the operand is placed in a reg.
+template <class G_t>
+static bool operand_byte_in_reg(const operand *o, int offset, reg_t r, const assignment &a, unsigned short int i, const G_t &G)
+{
+  if(!o || !IS_SYMOP(o))
+    return(false);
+
+  operand_map_t::const_iterator oi, oi2, oi3, oi_end;
+
+  for(boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key); offset && oi != oi_end; offset--, oi++);
+
+  if(oi == oi_end)
+    return(false);
+
+  return(a.global[oi->second] == r);
+}
+
 // Return true, iff the operand is placed on the stack.
 template <class G_t>
 bool operand_on_stack(const operand *o, const assignment &a, unsigned short int i, const G_t &G)
@@ -529,10 +546,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   //std::cout << "Ainst_ok: A = (" << ia.registers[REG_A][0] << ", " << ia.registers[REG_A][1] << "), inst " << i << ", " << ic->key << "\n";
 
-  // Code generator cannot handle variables that are only partially in A.
-  if(I[ia.registers[REG_A][1]].size > 1 || (ia.registers[REG_A][0] >= 0 && I[ia.registers[REG_A][0]].size > 1))
-    return(false);
-
   // Check if the result of this instruction is placed in A.
   bool result_in_A = operand_in_reg(IC_RESULT(ic), REG_A, ia, i, G);
   
@@ -567,32 +580,58 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     }
   nobit:
 
-  // The Z180 has a non-destructive testing and.
-  if(IS_Z180 && ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) &&
-    (operand_in_reg(left, REG_A, ia, i, G) && (IS_OP_LITERAL(right) /*|| operand_in_reg(right, ia, i, G) && !operand_in_reg(right, REG_IYL, ia, i, G) && !operand_in_reg(right, REG_IYH, ia, i, G)*/) ||
-    operand_in_reg(right, REG_A, ia, i, G) && (IS_OP_LITERAL(left) /*|| operand_in_reg(left, ia, i, G) && !operand_in_reg(left, REG_IYL, ia, i, G) && !operand_in_reg(left, REG_IYH, ia, i, G)*/)))
-    {
-      operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
-      return(true);
-    }
-
   // Can use non-destructive cp on == and < (> might swap operands).
   if((ic->op == EQ_OP || ic->op == '<' && SPEC_USIGN(getSpec(operandType(left))) && SPEC_USIGN(getSpec(operandType(right)))) &&
     getSize(operandType(IC_LEFT(ic))) == 1 && ifxForOp (IC_RESULT(ic), ic) && operand_in_reg(left, REG_A, ia, i, G) &&
     (IS_OP_LITERAL (right) || operand_in_reg(right, REG_C, ia, i, G) || operand_in_reg(right, REG_B, ia, i, G) || operand_in_reg(right, REG_E, ia, i, G) || operand_in_reg(right, REG_D, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G)))
     return(true);
 
+  // The Z180 has a non-destructive testing and.
+  if(IS_Z180 && ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) &&
+    (getSize(operandType(left)) == 1 && operand_in_reg(left, REG_A, ia, i, G) && (IS_OP_LITERAL(right) /*|| operand_in_reg(right, ia, i, G) && !operand_in_reg(right, REG_IYL, ia, i, G) && !operand_in_reg(right, REG_IYH, ia, i, G)*/) ||
+    getSize(operandType(right)) == 1 && operand_in_reg(right, REG_A, ia, i, G) && (IS_OP_LITERAL(left) /*|| operand_in_reg(left, ia, i, G) && !operand_in_reg(left, REG_IYL, ia, i, G) && !operand_in_reg(left, REG_IYH, ia, i, G)*/)))
+    {
+      operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
+      return(true);
+    }
+
   const cfg_dying_t &dying = G[i].dying;
+  const bool dying_A = result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end();
+
+  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G)) && getSize(operandType(IC_RESULT(ic))) == 1 && dying_A)
+    return(true);
+
+  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G)) && // First byte of input and last byte of output may be in A.
+    IS_ITEMP(result) && (input_in_A || result_in_A) &&
+    (IS_ITEMP(left) || IS_OP_LITERAL(left)) &&
+    (IS_ITEMP(right) || IS_OP_LITERAL(right)))
+    {
+      
+      if((operand_byte_in_reg(left, 0, REG_A, a, i, G) && dying_A || !operand_in_reg(left, REG_A, ia, i, G)) &&
+        (operand_byte_in_reg(right, 0, REG_A, a, i, G) && dying_A || !operand_in_reg(right, REG_A, ia, i, G)) &&
+        (operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G) || !result_in_A))
+        return(true);
+    }
+
+  if (ic->op == LEFT_OP && getSize(operandType(IC_RESULT(ic))) == 2 && IS_OP_LITERAL(right) && byteOfVal (OP_VALUE (IC_RIGHT(ic)), 0) == 7)
+    {
+      if(!operand_in_reg(left, REG_A, ia, i, G) || dying_A)
+        return(true);
+    }
+
+  // Code generator mostly cannot handle variables that are only partially in A.
+  if(I[ia.registers[REG_A][1]].size > 1 || (ia.registers[REG_A][0] >= 0 && I[ia.registers[REG_A][0]].size > 1))
+    return(false);
 
   if(ic->op == GET_VALUE_AT_ADDRESS)
     return(result_in_A || !IS_BITVAR(getSpec(operandType(result))));
   if(ic->op == '=' && POINTER_SET (ic))
-    return(dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end() || !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))));
+    return(dying_A || !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))));
 
   if(1)
     {
       // Variable in A is not used by this instruction
-      if(ic->op == '+' && IS_ITEMP (IC_LEFT(ic)) && IS_ITEMP (IC_RESULT(ic)) && IS_OP_LITERAL (right) &&
+      if(ic->op == '+' && IS_ITEMP (left) && IS_ITEMP (IC_RESULT(ic)) && IS_OP_LITERAL (right) &&
           ulFromVal (OP_VALUE (IC_RIGHT(ic))) == 1 &&
           OP_KEY (IC_RESULT(ic)) == OP_KEY (IC_LEFT(ic)))
         return(true);
@@ -620,7 +659,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     }
 
   // Last use of operand in A.
-  if(input_in_A && (result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end()))
+  if(input_in_A && dying_A)
     {
       if(ic->op != IFX &&
         ic->op != RETURN &&
@@ -1294,10 +1333,6 @@ bool local_assignment_insane(const assignment &a, const I_t &I, var_t lastvar)
 template <class G_t, class I_t>
 static bool assignment_hopeless(const assignment &a, unsigned short int i, const G_t &G, const I_t &I, const var_t lastvar)
 {
-  // Can check for Ainst_ok() since A only contains 1-byte variables.
-  if(!G[i].ic->generated && !Ainst_ok(a, i, G, I))
-    return(true);
-
   if(local_assignment_insane(a, I, lastvar))
     return(true);
 

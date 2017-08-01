@@ -1,6 +1,7 @@
 2017-08-01 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z80/gen.c,
+	* src/z80/gen.h,
+	  src/z80/gen.c,
 	  src/z80/ralloc.h,
 	  src/z80/ralloc2.cc:
 	  Handle register A more like other registers.

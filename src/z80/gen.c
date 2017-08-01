@@ -345,7 +345,7 @@ aopInReg (const asmop *aop, int offset, short rIdx)
   if (rIdx == HL_IDX)
     return (aopInReg (aop, offset, L_IDX) && aopInReg (aop, offset + 1, H_IDX));
 
-  return (aop->aopu.aop_reg[0]->rIdx == rIdx);
+  return (aop->aopu.aop_reg[offset]->rIdx == rIdx);
 }
 
 /* WARNING: This function is dangerous to use. It works literally:
@@ -1510,7 +1510,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
 
       if (sym->accuse)
         {
-          if (sym->accuse == ACCUSE_A) /* For compability with old register allocator */
+          if (sym->accuse == ACCUSE_A) /* For compability with old register allocator only */
             {
               sym->aop = op->aop = aop = newAsmop (AOP_REG);
               aop->size = getSize (sym->type);
@@ -5528,7 +5528,7 @@ genPlus (iCode * ic)
                 }
               else
                 {
-                  if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+                  if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP_SIZE (IC_RIGHT (ic)) == 2 && AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_SIZE (IC_LEFT (ic)) == 2)
                     {
                       const short dst[4] = { E_IDX, L_IDX, D_IDX, H_IDX };
                       short src[4];
@@ -8275,7 +8275,10 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
       emit3_o (A_LD, AOP (result), 1, AOP (left), 0);
       emit3_o (A_RR, AOP (result), 1, 0, 0);
       emit3_o (A_LD, AOP (result), 0, ASMOP_ZERO, 0);
-      emit3_o (A_RR, AOP (result), 0, 0, 0);
+      if (aopInReg (AOP (result), 0, A_IDX))
+        emit3 (A_RRA, 0, 0);
+      else
+        emit3_o (A_RR, AOP (result), 0, 0, 0);
       return;
     }
 

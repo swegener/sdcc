@@ -663,7 +663,8 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     {
       if(ic->op != IFX &&
         ic->op != RETURN &&
-        !((ic->op == RIGHT_OP || ic->op == LEFT_OP) && (IS_OP_LITERAL(right) || operand_in_reg(right, REG_A, ia, i, G))) &&
+        !((ic->op == RIGHT_OP || ic->op == LEFT_OP) &&
+          (IS_OP_LITERAL(right) || operand_in_reg(right, REG_A, ia, i, G) || getSize(operandType(IC_RESULT(ic))) == 1 && ia.registers[REG_B][1] < 0)) &&
         !((ic->op == '=' || ic->op == CAST) && !(IY_RESERVED && POINTER_SET(ic))) &&
         !IS_BITWISE_OP (ic) &&
         !(ic->op == '~') &&

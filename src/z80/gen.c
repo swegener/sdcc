@@ -8411,25 +8411,16 @@ AccLsh (unsigned int shCount)
     0xFF, 0xFE, 0xFC, 0xF8, 0xF0, 0xE0, 0xC0, 0x80, 0x00
   };
 
-  if (shCount != 0)
+  if (shCount <= 3)
+    while (shCount--)
+      emit3 (A_ADD, ASMOP_A, ASMOP_A);
+  else
     {
-      if (shCount == 1)
-        {
-          emit3 (A_ADD, ASMOP_A, ASMOP_A);
-        }
-      else if (shCount == 2)
-        {
-          emit3 (A_ADD, ASMOP_A, ASMOP_A);
-          emit3 (A_ADD, ASMOP_A, ASMOP_A);
-        }
-      else
-        {
-          /* rotate left accumulator */
-          AccRol (shCount);
-          /* and kill the lower order bits */
-          emit2 ("and a, !immedbyte", SLMask[shCount]);
-          regalloc_dry_run_cost += 2;
-        }
+      /* rotate left accumulator */
+      AccRol (shCount);
+      /* and kill the lower order bits */
+      emit2 ("and a, !immedbyte", SLMask[shCount]);
+      regalloc_dry_run_cost += 2;
     }
 }
 
@@ -8437,13 +8428,13 @@ AccLsh (unsigned int shCount)
 /* shiftL1Left2Result - shift left one byte from left to result    */
 /*-----------------------------------------------------------------*/
 static void
-shiftL1Left2Result (operand * left, int offl, operand * result, int offr, unsigned int shCount)
+shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned int shCount)
 {
   /* If operand and result are the same we can shift in place.
      However shifting in acc using add is cheaper than shifting
      in place using sla; when shifting by more than 2 shifting in
-     acc is worth the additional effort for loading from/to acc. */
-  if (sameRegs (AOP (left), AOP (result)) && shCount <= 2 && offr == offl)
+     acc it is worth the additional effort for loading from / to acc. */
+  if (!aopInReg(result->aop, 0, A_IDX) && sameRegs (AOP (left), AOP (result)) && shCount <= 2 && offr == offl)
     {
       while (shCount--)
         emit3 (A_SLA, AOP (result), 0);
@@ -8598,22 +8589,16 @@ genLeftShift (const iCode * ic)
   if (AOP_TYPE (right) == AOP_REG && !bitVectBitValue (ic->rSurv, AOP (right)->aopu.aop_reg[0]->rIdx) && AOP (right)->aopu.aop_reg[0]->rIdx != IYL_IDX && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG) &&
     (AOP_TYPE (result) != AOP_REG ||
     AOP (result)->aopu.aop_reg[0]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
-    (AOP_SIZE (result) < 2 || AOP (result)->aopu.aop_reg[1]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
-    (AOP_SIZE (result) < 3 || AOP (result)->aopu.aop_reg[2]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx &&
-    (AOP_SIZE (result) < 4 || AOP (result)->aopu.aop_reg[3]->rIdx != AOP (right)->aopu.aop_reg[0]->rIdx)))))
+    !aopInReg (AOP (result), 0, AOP (right)->aopu.aop_reg[0]->rIdx) && !aopInReg (AOP (result), 1, AOP (right)->aopu.aop_reg[0]->rIdx) && !aopInReg (AOP (result), 2, AOP (right)->aopu.aop_reg[0]->rIdx) && !aopInReg (AOP (result), 3, AOP (right)->aopu.aop_reg[0]->rIdx)))
     countreg = AOP (right)->aopu.aop_reg[0]->rIdx;
   else if (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG || shift_by_lit) &&
-    (AOP_TYPE (result) != AOP_REG ||
-    AOP (result)->aopu.aop_reg[0]->rIdx != B_IDX &&
-    (AOP_SIZE (result) < 2 || AOP (result)->aopu.aop_reg[1]->rIdx != B_IDX &&
-    (AOP_SIZE (result) < 3 || AOP (result)->aopu.aop_reg[2]->rIdx != B_IDX &&
-    (AOP_SIZE (result) < 4 || AOP (result)->aopu.aop_reg[3]->rIdx != B_IDX)))))
+    !aopInReg (AOP (result), 0, B_IDX) && !aopInReg (AOP (result), 1, B_IDX) && !aopInReg (AOP (result), 2, B_IDX) && !aopInReg (AOP (result), 3, B_IDX))
     countreg = B_IDX;
   else
     countreg = A_IDX;
 
   if (!shift_by_lit)
-    cheapMove (countreg == A_IDX ? ASMOP_A : asmopregs[countreg], 0, AOP (right), 0);
+    cheapMove (asmopregs[countreg], 0, AOP (right), 0);
 
   save_a = (countreg == A_IDX && !shift_by_lit) &&
     !(AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) != AOP_REG ||
@@ -8729,7 +8714,10 @@ genLeftShift (const iCode * ic)
         {
           if (offset >= byteshift)
             {
-              emit3_o (started ? A_RL : A_SLA, AOP (result), offset, 0, 0);
+              if (aopInReg (AOP (result) , offset, A_IDX))
+                emit3 (started ? A_ADC : A_ADD, ASMOP_A, ASMOP_A);
+              else
+                emit3_o (started ? A_RL : A_SLA, AOP (result), offset, 0, 0);
               started = true;
             }
           size--, offset++;

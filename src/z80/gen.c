@@ -616,7 +616,7 @@ z80_emitDebuggerSymbol (const char *debugSym)
 
 // Todo: Handle IY (when used as AOP_HLREG or AOP_REG) correctly.
 static unsigned char
-ld_cost (asmop *op1, asmop *op2)
+ld_cost (const asmop *op1, const asmop *op2)
 {
   AOP_TYPE op1type = op1->type;
   AOP_TYPE op2type = op2->type;
@@ -624,7 +624,7 @@ ld_cost (asmop *op1, asmop *op2)
   /* Costs are symmetric */
   if (op2type == AOP_REG || op2type == AOP_HLREG || op2type == AOP_DUMMY)
     {
-      asmop *tmp = op1;
+      const asmop *tmp = op1;
       op1 = op2;
       op2 = tmp;
       op1type = op1->type;
@@ -771,7 +771,7 @@ ld_cost (asmop *op1, asmop *op2)
 }
 
 static unsigned char
-op8_cost (asmop * op2)
+op8_cost (const asmop * op2)
 {
   switch (op2->type)
     {
@@ -803,7 +803,7 @@ op8_cost (asmop * op2)
 }
 
 static unsigned char
-bit8_cost (asmop * op1)
+bit8_cost (const asmop * op1)
 {
   switch (op1->type)
     {
@@ -826,7 +826,7 @@ bit8_cost (asmop * op1)
 }
 
 static unsigned char
-emit3Cost (enum asminst inst, asmop * op1, int offset1, asmop * op2, int offset2)
+emit3Cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, int offset2)
 {
   if (op2 && offset2 >= op2->size)
     op2 = ASMOP_ZERO;
@@ -869,7 +869,7 @@ emit3Cost (enum asminst inst, asmop * op1, int offset1, asmop * op2, int offset2
 }
 
 static void
-emit3_o (enum asminst inst, asmop * op1, int offset1, asmop * op2, int offset2)
+emit3_o (enum asminst inst, asmop *op1, int offset1, asmop *op2, int offset2)
 {
   unsigned char cost;
 
@@ -895,7 +895,7 @@ emit3_o (enum asminst inst, asmop * op1, int offset1, asmop * op2, int offset2)
 }
 
 static void
-emit3 (enum asminst inst, asmop * op1, asmop * op2)
+emit3 (enum asminst inst, asmop *op1, asmop *op2)
 {
   emit3_o (inst, op1, 0, op2, 0);
 }
@@ -1649,7 +1649,7 @@ isLitWord (const asmop *aop)
 }
 
 static const char *
-aopGetLitWordLong (const asmop * aop, int offset, bool with_hash)
+aopGetLitWordLong (const asmop *aop, int offset, bool with_hash)
 {
   static struct dbuf_s dbuf = { 0 };
 
@@ -2220,7 +2220,7 @@ setupPairFromSP (PAIR_ID id, int offset)
 }
 
 static void
-setupPair (PAIR_ID pairId, asmop * aop, int offset)
+setupPair (PAIR_ID pairId, asmop *aop, int offset)
 {
   switch (aop->type)
     {
@@ -2312,7 +2312,7 @@ emitLabelSpill (symbol *tlbl)
 /* aopGet - for fetching value of the aop                          */
 /*-----------------------------------------------------------------*/
 static const char *
-aopGet (asmop * aop, int offset, bool bit16)
+aopGet (asmop *aop, int offset, bool bit16)
 {
   static struct dbuf_s dbuf = { 0 };
 
@@ -8231,14 +8231,23 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
     AOP (result)->aopu.aop_reg[0]->rIdx != IYL_IDX && AOP (result)->aopu.aop_reg[1]->rIdx != IYL_IDX && AOP (result)->aopu.aop_reg[0]->rIdx != IYH_IDX && AOP (result)->aopu.aop_reg[1]->rIdx != IYH_IDX &&
     (optimize.codeSpeed || getPairId (AOP (result)) != PAIR_HL || getPairId (AOP (left)) != PAIR_HL)) /* but a sequence of add hl, hl might still be cheaper code-size wise */
     {
+      // Handling the low byte in A with xor clearing is cheaper.
+      bool special_a = (!bitVectBitValue (ic->rSurv, A_IDX) && !aopInReg (AOP (left), 0, A_IDX) && !aopInReg (AOP (left), 0, A_IDX));
+      asmop *lowbyte = special_a ? ASMOP_A : AOP (result);
+
+      if (special_a)
+        emit3 (A_XOR, ASMOP_A, ASMOP_A);
       emit3_o (A_RR, AOP (left), 1, 0, 0);
       emit3_o (A_LD, AOP (result), 1, AOP (left), 0);
       emit3_o (A_RR, AOP (result), 1, 0, 0);
-      emit3_o (A_LD, AOP (result), 0, ASMOP_ZERO, 0);
-      if (aopInReg (AOP (result), 0, A_IDX))
+      if (!special_a)
+        emit3_o (A_LD, AOP (result), 0, ASMOP_ZERO, 0);
+      if (aopInReg (lowbyte, 0, A_IDX))
         emit3 (A_RRA, 0, 0);
       else
-        emit3_o (A_RR, AOP (result), 0, 0, 0);
+        emit3 (A_RR, lowbyte, 0);
+      if (special_a)
+        cheapMove (AOP (result), 0, lowbyte, 0);
       return;
     }
 

@@ -2623,7 +2623,8 @@ aopPut (asmop * aop, const char *s, int offset)
           else
             {
               /* 8 bit mode */
-              emit2 ("ld a, %s", s);
+              if (strcmp (s, "a"))
+                emit2 ("ld a, %s", s);
               emit2 ("out (%s), a", aop->aopu.aop_dir);
             }
         }

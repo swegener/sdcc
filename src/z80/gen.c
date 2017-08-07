@@ -7746,16 +7746,12 @@ genOr (const iCode * ic, iCode * ifx)
                   }
               }
             // This is a bit broken, there will be problems for y_0 = x_0 | z_0, x_0 = y_0 | z_1 as either order of the two byte ors will result in the result destroying the second part of the operand. Currently, we use a workaround in the register allocator to avoid this. See also the comment on the 2-byte addition workaround above.
-            if (!aopInReg (left->aop, 0, A_IDX))
-              cheapMove (ASMOP_A, 0, AOP (left), offset);
+            cheapMove (ASMOP_A, 0, AOP (left), offset);
             if (AOP_TYPE (right) == AOP_LIT && isLiteralBit (((lit >> (offset * 8)) & 0x0FFL)) >= 0)
               emit2 ("set %d, a", isLiteralBit (((lit >> (offset * 8)) & 0x0FFL)));
             else
               emit3_o (A_OR, ASMOP_A, 0, AOP (right), offset);
             cheapMove (AOP (result), offset, ASMOP_A, 0);
-            /* PENDING: something weird is going on here.  Add exception. */
-            if (aopInReg (result->aop, 0, A_IDX))
-              break;
           }
     }
 
@@ -8354,7 +8350,6 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
         {
           if (shCount)
             {
-              movLeft2Result (left, LSB, result, MSB16, 0);
               shiftL1Left2Result (left, LSB, result, MSB16, shCount);
               aopPut3 (AOP (result), LSB, ASMOP_ZERO, 0);
             }

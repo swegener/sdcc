@@ -542,6 +542,10 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   if(ia.registers[REG_A][1] < 0)
     return(true);   // Register A not in use.
 
+  // Some instructions don't touch registers.
+  if(SKIP_IC2(ic))
+    return(true);
+
   bool exstk = (should_omit_frame_ptr || (currFunc && currFunc->stack > 127) || IS_GB);
 
   //std::cout << "Ainst_ok: A = (" << ia.registers[REG_A][0] << ", " << ia.registers[REG_A][1] << "), inst " << i << ", " << ic->key << "\n";
@@ -598,17 +602,18 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   const cfg_dying_t &dying = G[i].dying;
   const bool dying_A = result_in_A || dying.find(ia.registers[REG_A][1]) != dying.end() || dying.find(ia.registers[REG_A][0]) != dying.end();
 
-  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_GB) && getSize(operandType(IC_RESULT(ic))) == 1 && dying_A)
+  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_GB) &&
+    getSize(operandType(IC_RESULT(ic))) == 1 && dying_A)
     return(true);
 
-  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_GB || ic->op == '&' || ic->op == '|' || ic->op == '^' || ic->op == '~') && // First byte of input and last byte of output may be in A.
-    IS_ITEMP(result) && (input_in_A || result_in_A) &&
+  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_GB || ic->op == BITWISEAND || ic->op == '|' || ic->op == '^' || ic->op == '~') && // First byte of input and last byte of output may be in A.
+    IS_ITEMP(result) && dying_A &&
     (IS_ITEMP(left) || IS_OP_LITERAL(left)) &&
-    (IS_ITEMP(right) || IS_OP_LITERAL(right)))
+    (!right || IS_ITEMP(right) || IS_OP_LITERAL(right)))
     {
       
-      if((operand_byte_in_reg(left, 0, REG_A, a, i, G) && dying_A || !operand_in_reg(left, REG_A, ia, i, G)) &&
-        (operand_byte_in_reg(right, 0, REG_A, a, i, G) && dying_A || !operand_in_reg(right, REG_A, ia, i, G)) &&
+      if((operand_byte_in_reg(left, 0, REG_A, a, i, G) || !operand_in_reg(left, REG_A, ia, i, G)) &&
+        (operand_byte_in_reg(right, 0, REG_A, a, i, G) || !operand_in_reg(right, REG_A, ia, i, G)) &&
         (operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G) || !result_in_A))
         return(true);
     }
@@ -618,6 +623,11 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       if(!operand_in_reg(left, REG_A, ia, i, G) || dying_A)
         return(true);
     }
+
+  // inc / dec does not affect a.
+  if ((ic->op == '+' || ic->op == '-') && IS_OP_LITERAL(right) && byteOfVal (OP_VALUE (IC_RIGHT(ic)), 0) <= 2 &&
+    (getSize(operandType(IC_RESULT(ic))) == 2 && operand_is_pair(IC_RESULT(ic), a, i, G) || getSize(operandType(IC_RESULT(ic))) == 1 && operand_in_reg(result, ia, i, G) && operand_in_reg(result, ia, i, G)))
+    return(true);
 
   // Code generator mostly cannot handle variables that are only partially in A.
   if(I[ia.registers[REG_A][1]].size > 1 || (ia.registers[REG_A][0] >= 0 && I[ia.registers[REG_A][0]].size > 1))

@@ -1,5 +1,11 @@
 2017-08-07 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Improve use of register A.
+
+2017-08-07 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/gen.h:
 	  Refactor and optimize subtraction.

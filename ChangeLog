@@ -1,3 +1,12 @@
+2017-08-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/gen.h:
+	  Refactor and optimize subtraction.
+	* sim/ucsim/z80.src/inst_ed.cc,
+	  sim/ucsim/z80.src/inst_ed_r2k.cc:
+	  Fix negation.
+
 2017-08-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

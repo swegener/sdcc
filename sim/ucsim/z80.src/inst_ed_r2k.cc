@@ -58,7 +58,7 @@ int  cl_r2k::inst_ed_(t_mem code)
     if (regs.raf.A != 0)    regs.raf.F |= BIT_C;
     if (regs.raf.A == 0x80) regs.raf.F |= BIT_P;
     if ((regs.raf.A & 0x0F) != 0) regs.raf.F |= BIT_A;
-    regs.raf.A -= regs.raf.A;
+    regs.raf.A = 0 - regs.raf.A;
     regs.raf.F |= BIT_N; /* not addition */
     if (regs.raf.A == 0)    regs.raf.F |= BIT_Z;
     if (regs.raf.A & 0x80)  regs.raf.F |= BIT_S;

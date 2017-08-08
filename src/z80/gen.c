@@ -320,7 +320,7 @@ cost(unsigned int bytes, unsigned int cycles)
 }
 
 static void
-cost2(unsigned int bytes, unsigned int cycles_z80, unsigned int cycles_z180, unsigned int cycles_rab, unsigned int cycles_gbz80, unsigned int cycles_tlcs90)
+cost2(unsigned int bytes, unsigned int cycles_z80, unsigned int cycles_z180, unsigned int cycles_r2k, unsigned int cycles_gbz80, unsigned int cycles_tlcs90)
 {
   regalloc_dry_run_cost += bytes;
 }

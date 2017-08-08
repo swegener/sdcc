@@ -189,12 +189,12 @@ stm8_init_asmops (void)
   asmop_zero.type = AOP_LIT;
   asmop_zero.size = 1;
   asmop_zero.aopu.aop_lit = constVal ("0");
-  asmop_a.regs[A_IDX] = -1;
-  asmop_a.regs[XL_IDX] = -1;
-  asmop_a.regs[XH_IDX] = -1;
-  asmop_a.regs[YL_IDX] = -1;
-  asmop_a.regs[YH_IDX] = -1;
-  asmop_a.regs[C_IDX] = -1;
+  asmop_zero.regs[A_IDX] = -1;
+  asmop_zero.regs[XL_IDX] = -1;
+  asmop_zero.regs[XH_IDX] = -1;
+  asmop_zero.regs[YL_IDX] = -1;
+  asmop_zero.regs[YH_IDX] = -1;
+  asmop_zero.regs[C_IDX] = -1;
 
   asmop_one.type = AOP_LIT;
   asmop_one.size = 1;

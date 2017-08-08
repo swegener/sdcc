@@ -1,3 +1,8 @@
+2017-08-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Fix ASMOP_A / ASMOP_ZERO initialization.
+
 2017-08-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,

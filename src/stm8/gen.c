@@ -4845,6 +4845,13 @@ genXor (const iCode *ic)
           continue;
         }
 
+      if (left->aop->type == AOP_DIR && aopSame (left->aop, i, result->aop, i, 1) &&
+        right->aop->type == AOP_LIT && isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)) >= 0)
+        {
+          emit2 ("bcpl", "%s, #%d", aopGet (left->aop, i), isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)));
+          continue;
+        }
+
       right_stacked = stack_aop (right->aop, i, &right_offset);
 
       cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
@@ -6525,6 +6532,16 @@ genPointerSet (iCode * ic)
             }
           goto release;
         }
+    }
+
+  if (!bit_field && size == 1 && (result->aop->type == AOP_LIT || result->aop->type == AOP_IMMD) && aopInReg(right->aop, 0, A_IDX))
+    {
+      if (result->aop->type == AOP_LIT)
+        emit2 ("ld", "0x%02x%02x, %s", byteOfVal (result->aop->aopu.aop_lit, 1), byteOfVal (result->aop->aopu.aop_lit, 0), aopGet (right->aop, 0));
+      else
+        emit2 ("ld", "%s, %s", result->aop->aopu.aop_immd, aopGet (right->aop, 0));
+      cost (3, 1);
+      goto release;
     }
 
   // Long pointer indirect long addressing mode is useful only in two very specific cases:

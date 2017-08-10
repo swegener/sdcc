@@ -340,6 +340,8 @@ stm8instructionSize(const lineNode *pl)
       return(3+i);
     if(isReg(op1start) && isReg(op2start))
       return(1+i);
+    if(!strcmp(op2start, "a"))
+      return(3);
     if(readint(op2start) <= 0xFF)
       return(2+i);
     else

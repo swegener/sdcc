@@ -1,3 +1,9 @@
+2017-08-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdio.h,
+	  device/lib/ds390/putchar.c:
+	  Make getchar() prototype standard-compliant.
+
 2017-08-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

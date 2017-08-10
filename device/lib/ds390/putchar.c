@@ -36,7 +36,8 @@ int putchar (int c)
 	return(c);
 }
 
-extern char getchar(void)
+extern int getchar(void)
 {
 	return Serial0GetChar();
 }
+

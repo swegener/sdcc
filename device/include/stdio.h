@@ -82,7 +82,7 @@ extern int puts(const char *);
 extern char *gets(char *);
 #endif
 
-extern char getchar(void);
+extern int getchar(void);
 extern int putchar(int);
 
 #if defined(__SDCC_mcs51) && !defined(__SDCC_USE_XSTACK)

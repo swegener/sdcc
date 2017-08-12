@@ -1,3 +1,7 @@
+2017-08-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c: fix bug #2624
+
 2017-08-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdio.h,

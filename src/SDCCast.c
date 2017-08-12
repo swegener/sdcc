@@ -3024,6 +3024,172 @@ checkZero (value *val)
     werror (E_DIVIDE_BY_ZERO); }
 }
 
+/*--------------------------------------------------------*/
+/* return true if subtree <search> is somewhere in <tree> */
+/*--------------------------------------------------------*/
+static bool
+isAstInAst (ast *tree, ast *search)
+{
+  if (tree == search)
+    return TRUE;
+  if (!tree)
+    return FALSE;
+  if (tree->type == EX_OP)
+    {
+	  if (isAstInAst (tree->left, search))
+	    return TRUE;
+	  if (isAstInAst (tree->right, search))
+	    return TRUE;
+	}
+  return FALSE;
+}
+
+/*---------------------------------------*/
+/* make a simple copy of single ast node */
+/*---------------------------------------*/
+static ast *
+copyAstNode (ast *tree)
+{
+  ast * newtree;
+	
+  newtree = newAst_(tree->type);
+  newtree->lineno = tree->lineno;
+  newtree->filename = tree->filename;
+  newtree->level = tree->level;
+  newtree->block = tree->block;
+  newtree->initMode = tree->initMode;
+  newtree->seqPoint = tree->seqPoint;
+  newtree->funcName = tree->funcName;
+  newtree->reversed = tree->reversed;
+  newtree->decorated = tree->decorated;
+
+  if (tree->ftype)
+    newtree->etype = getSpec (newtree->ftype = copyLinkChain (tree->ftype));
+
+  if (tree->type == EX_VALUE)
+    {
+      newtree->opval.val = tree->opval.val;
+    }
+
+  else if (tree->type == EX_LINK)
+    {
+      newtree->opval.lnk = tree->opval.lnk;
+    }
+  else
+    {
+      newtree->opval.op = tree->opval.op;
+      copyAstValues (newtree, tree);
+      newtree->left = tree->left;
+      newtree->right = tree->right;
+
+      newtree->trueLabel = tree->trueLabel;
+      newtree->falseLabel = tree->falseLabel;
+    }
+
+  return newtree;
+}
+
+/*-------------------------------------------------*/
+/* extract the ast subtrees that have side-effects */
+/*-------------------------------------------------*/
+static void
+rewriteAstGatherSideEffects (ast *tree, set ** sideEffects)
+{
+  if (!tree) return;
+  if (tree->type == EX_OP)
+    {
+	  switch (tree->opval.op)
+	    {
+		  case '=':
+		  case INC_OP:
+		  case DEC_OP:
+		  case CALL:
+		  case PCALL:
+		    addSetHead (sideEffects, tree);
+		    break;
+		  default:
+		    if (tree->left)
+		      rewriteAstGatherSideEffects (tree->left, sideEffects);
+		    if (tree->right)
+		      rewriteAstGatherSideEffects (tree->right, sideEffects);
+		}
+	  return;
+    }
+  if (TETYPE (tree) && IS_VOLATILE (TETYPE (tree)))
+    {
+	  addSetHead (sideEffects, tree);
+	  return;
+	}
+}
+
+/*-------------------------------------------------------------------*/
+/* after rewriting a node, rejoin the portions of any old left/right */
+/* subtree that had side effects with a comma operator               */
+/*-------------------------------------------------------------------*/
+static void
+rewriteAstJoinSideEffects (ast *tree, ast *oLeft, ast *oRight)
+{
+  set * sideEffects = NULL;
+  ast * sefTree;
+
+  /* If the old left or right subtree has been orphaned, */
+  /* gather any side-effects in it */
+  if (oLeft && !isAstInAst (tree, oLeft))
+    rewriteAstGatherSideEffects (oLeft, &sideEffects);
+  if (oRight && !isAstInAst (tree, oRight))
+    rewriteAstGatherSideEffects (oRight, &sideEffects);
+
+  /* Join any side-effects found */
+  for (sefTree = setFirstItem (sideEffects); sefTree; sefTree = setNextItem (sideEffects))
+    {
+	  tree->right = copyAstNode (tree);
+	  tree->left = sefTree;
+	  tree->type = EX_OP;
+	  tree->opval.op = ',';
+	}
+
+  deleteSet (&sideEffects);
+}
+
+/*--------------------------------------------------------------*/
+/* rewrite ast node as an operator node and rejoin any orphaned */
+/* side-effects with a comma operator                           */
+/*--------------------------------------------------------------*/
+static void
+rewriteAstNodeOp (ast *tree, int op, ast *left, ast *right)
+{
+  ast *oLeft = (tree->type == EX_OP) ? tree->left : NULL;
+  ast *oRight = (tree->type == EX_OP) ? tree->right : NULL;
+
+  tree->type = EX_OP;
+  tree->opval.op = op;
+  tree->left = left;
+  tree->right = right;
+  tree->decorated = 0;
+  
+  rewriteAstJoinSideEffects (tree, oLeft, oRight);
+}
+
+/*----------------------------------------------------------*/
+/* rewrite ast node as a value node and rejoin any orphaned */
+/* side-effects with a comma operator                       */
+/*----------------------------------------------------------*/
+static void
+rewriteAstNodeVal (ast *tree, value *val)
+{
+  ast *oLeft = (tree->type == EX_OP) ? tree->left : NULL;
+  ast *oRight = (tree->type == EX_OP) ? tree->right : NULL;
+
+  tree->type = EX_VALUE;
+  tree->opval.val = val;
+  tree->left = NULL;
+  tree->right = NULL;
+  TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
+  tree->decorated = 0;
+  
+  rewriteAstJoinSideEffects (tree, oLeft, oRight);
+}
+
 /*--------------------------------------------------------------------*/
 /* decorateType - compute type for this tree, also does type checking.*/
 /* This is done bottom up, since type has to flow upwards.            */
@@ -3616,12 +3782,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* if they are both literal then rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
-          tree->opval.val = valBitwise (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)), tree->opval.op);
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = tree->opval.val->etype;
-          TTYPE (tree) = tree->opval.val->type;
-          return tree;
+          rewriteAstNodeVal (tree, valBitwise (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)), tree->opval.op));
+          return decorateType (tree, resultType);
         }
 
       /* if left is a literal exchange left & right */
@@ -3699,11 +3861,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
-          tree->opval.val = valDiv (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)));
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
-          return tree;
+          rewriteAstNodeVal (tree, valDiv (valFromType (LETYPE (tree)), valFromType (RETYPE (tree))));
+          return decorateType (tree, resultType);
         }
 
       LRVAL (tree) = RRVAL (tree) = 1;
@@ -3774,11 +3933,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
-          tree->opval.val = valMod (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)));
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
-          return tree;
+          rewriteAstNodeVal (tree, valMod (valFromType (LETYPE (tree)), valFromType (RETYPE (tree))));
+          return decorateType (tree, resultType);
         }
       LRVAL (tree) = RRVAL (tree) = 1;
       TETYPE (tree) = getSpec (TTYPE (tree) = computeType (LTYPE (tree), RTYPE (tree), resultType, tree->opval.op));
@@ -3857,11 +4013,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
-          tree->opval.val = valMult (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)));
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
-          return tree;
+          rewriteAstNodeVal (tree, valMult (valFromType (LETYPE (tree)), valFromType (RETYPE (tree))));
+          return decorateType (tree, resultType);
         }
 
       /* if left is a literal exchange left & right */
@@ -3960,13 +4113,10 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
           tree->left = addCast (tree->left, resultTypeProp, TRUE);
           tree->right = addCast (tree->right, resultTypeProp, TRUE);
-          tree->opval.val = valPlus (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)));
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
-          return tree;
+          rewriteAstNodeVal (tree, valPlus (valFromType (LETYPE (tree)), valFromType (RETYPE (tree))));
+          return decorateType (tree, resultType);
         }
 
       /* if the right is a pointer or left is a literal
@@ -4097,14 +4247,11 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
           tree->left = addCast (tree->left, resultTypeProp, TRUE);
           tree->right = addCast (tree->right, resultTypeProp, TRUE);
-          tree->opval.val = valMinus (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)));
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
-          return tree;
-        }
+          rewriteAstNodeVal (tree, valMinus (valFromType (LETYPE (tree)), valFromType (RETYPE (tree))));
+          return decorateType (tree, resultType);
+       }
 
       /* if the left & right are equal then zero */
       if (!hasSEFcalls(tree->left) && !hasSEFcalls(tree->right) &&
@@ -4266,11 +4413,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* if left is a literal then do it */
       if (IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
-          tree->opval.val = valNot (valFromType (LETYPE (tree)));
-          tree->left = NULL;
-          TETYPE (tree) = TTYPE (tree) = tree->opval.val->type;
-          return tree;
+          rewriteAstNodeVal (tree, valNot (valFromType (LETYPE (tree))));
+          return decorateType (tree, resultType);
         }
       LRVAL (tree) = 1;
       TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
@@ -4323,12 +4467,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
-          tree->opval.val = valShift (valFromType (LETYPE (tree)),
-                                      valFromType (RETYPE (tree)), (tree->opval.op == LEFT_OP ? 1 : 0));
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
-          return tree;
+          rewriteAstNodeVal (tree, valShift (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)), (tree->opval.op == LEFT_OP ? 1 : 0)));
+          return decorateType (tree, resultType);
         }
 
       /* see if this is a GETBYTE operation if yes
@@ -4629,11 +4769,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* rewrite the tree */
       if (IS_LITERAL (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
         {
-          tree->type = EX_VALUE;
-          tree->opval.val = valLogicAndOr (valFromType (LTYPE (tree)), valFromType (RTYPE (tree)), tree->opval.op);
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
-          return tree;
+          rewriteAstNodeVal (tree, valLogicAndOr (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)), tree->opval.op));
+          return decorateType (tree, resultType);
         }
       LRVAL (tree) = RRVAL (tree) = 1;
       TTYPE (tree) = TETYPE (tree) = (resultTypeProp == RESULT_TYPE_BOOL) ? newBoolLink () : newCharLink ();
@@ -4777,10 +4914,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           floatFromVal (valFromType (LTYPE (tree))) == 0 &&
           tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))
         {
-          tree->opval.op = '!';
-          tree->left = tree->right;
-          tree->right = NULL;
-          tree->decorated = 0;
+		  rewriteAstNodeOp (tree, '!', tree->right, NULL);
           return decorateType (tree, resultType);
         }
 
@@ -4789,9 +4923,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           floatFromVal (valFromType (RTYPE (tree))) == 0 &&
           tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))
         {
-          tree->opval.op = '!';
-          tree->right = NULL;
-          tree->decorated = 0;
+		  rewriteAstNodeOp (tree, '!', tree->left, NULL);
           return decorateType (tree, resultType);
         }
 
@@ -4799,11 +4931,8 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* rewrite the tree */
       if (IS_LITERAL (RETYPE (tree)) && IS_LITERAL (LETYPE (tree)))
         {
-          tree->type = EX_VALUE;
-          tree->opval.val = valCompare (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)), tree->opval.op);
-          tree->right = tree->left = NULL;
-          TETYPE (tree) = getSpec (TTYPE (tree) = tree->opval.val->type);
-          return tree;
+          rewriteAstNodeVal (tree, valCompare (valFromType (LETYPE (tree)), valFromType (RETYPE (tree)), tree->opval.op));
+          return decorateType (tree, resultType);
         }
 
       /* if one is 'signed char ' and the other one is 'unsigned char' */

@@ -1,3 +1,9 @@
+2017-08-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c (cseBBlock),
+	* src/SDCCptropt.c (ptrPostIncDecOpt, pattern1, pattern2),
+	* src/SDCCptropt.h: fix bug #2459
+
 2017-08-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c: fix bug #2624

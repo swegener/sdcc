@@ -2162,7 +2162,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       if (ic->op == '=' && !POINTER_SET (ic) &&
           IS_PTR (operandType (IC_RESULT (ic))))
         {
-          ptrPostIncDecOpt (ic);
+          ptrPostIncDecOpt (ic, ebb);
         }
 
       /* clear the def & use chains for the operands involved */

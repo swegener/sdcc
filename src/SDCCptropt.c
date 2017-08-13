@@ -54,7 +54,7 @@ findPointerGetSet (iCode * sic, operand * op)
 }
 
 static int
-pattern1 (iCode * sic)
+pattern1 (iCode * sic, eBBlock * ebb)
 {
   /* this is what we do. look for sequences like
 
@@ -106,13 +106,15 @@ pattern1 (iCode * sic)
   /* and put them after the pointer get/set icode */
   if ((st->next = pgs->next))
     st->next->prev = st;
+  if (!st->next)
+    ebb->ech = st;
   pgs->next = sh;
   sh->prev = pgs;
   return 1;
 }
 
 static int
-pattern2 (iCode * sic)
+pattern2 (iCode * sic, eBBlock * ebb)
 {
   /* this is what we do. look for sequences like
 
@@ -175,6 +177,8 @@ pattern2 (iCode * sic)
   /* and put them after the pointer get/set icode */
   if ((st->next = pgs->next))
     st->next->prev = st;
+  if (!st->next)
+    ebb->ech = st;
   pgs->next = sh;
   sh->prev = pgs;
   return 1;
@@ -185,11 +189,11 @@ pattern2 (iCode * sic)
 /*                     this will help register allocation amongst others */
 /*-----------------------------------------------------------------------*/
 void
-ptrPostIncDecOpt (iCode * sic)
+ptrPostIncDecOpt (iCode * sic, eBBlock * ebb)
 {
-  if (pattern1 (sic))
+  if (pattern1 (sic, ebb))
     return;
-  pattern2 (sic);
+  pattern2 (sic, ebb);
 }
 
 /*-----------------------------------------------------------------------*/

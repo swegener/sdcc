@@ -26,7 +26,7 @@
 #ifndef SDCCPTROPT_H
 #define SDCCPTROPT_H 1
 
-void ptrPostIncDecOpt (iCode *);
+void ptrPostIncDecOpt (iCode *, eBBlock *);
 int ptrAddition (iCode *);
 symbol *ptrBaseRematSym (symbol *);
 int ptrPseudoSymSafe (symbol *, iCode *);

@@ -1,3 +1,8 @@
+2017-08-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Fix bug #2640.
+
 2017-08-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c (cseBBlock),
@@ -89,7 +94,7 @@
 2017-07-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2567.c:
-	  Test fpor bug #2567.
+	  Test for bug #2567.
 
 2017-07-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

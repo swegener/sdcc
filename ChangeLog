@@ -1,3 +1,8 @@
+2017-08-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCglue.c:
+	  More verbose error message on initialization from incompatible pointer type.
+
 2017-08-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc:

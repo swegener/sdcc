@@ -581,10 +581,13 @@ initPointer (initList * ilist, sym_link * toType, int showError)
 
 wrong:
   if (showError)
-    if (expr)
-      werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
-    else
-      werror (E_INCOMPAT_PTYPES);
+    {
+      if (expr)
+        werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
+      else
+        werror (E_INCOMPAT_PTYPES);
+      printFromToType (expr->left->ftype, toType);
+    }
   return NULL;
 }
 

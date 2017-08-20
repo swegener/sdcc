@@ -1,3 +1,12 @@
+2017-08-20 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/SDCCpeeph.c:
+	  Improve notVolatile() for stm8.
+	* src/stm8/peeph.def:
+	  Add more rules for optimization with BSET/BRES.
+	* support/regression/tests/bug-2642.c:
+	  Add a new test case.
+
 2017-08-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCglue.c:

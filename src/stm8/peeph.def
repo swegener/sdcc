@@ -247,6 +247,66 @@ replace restart {
 replace restart {
 	ldw	%1, #%2
 	ld	a, (%1)
+	or	a, #0x02
+	ld	(%1), a
+} by {
+	bset	%2, #1
+	; peephole 11-1 replaced or by bset.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	or	a, #0x04
+	ld	(%1), a
+} by {
+	bset	%2, #2
+	; peephole 11-2 replaced or by bset.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	or	a, #0x08
+	ld	(%1), a
+} by {
+	bset	%2, #3
+	; peephole 11-3 replaced or by bset.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	or	a, #0x10
+	ld	(%1), a
+} by {
+	bset	%2, #4
+	; peephole 11-4 replaced or by bset.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	or	a, #0x20
+	ld	(%1), a
+} by {
+	bset	%2, #5
+	; peephole 11-5 replaced or by bset.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	or	a, #0x40
+	ld	(%1), a
+} by {
+	bset	%2, #6
+	; peephole 11-6 replaced or by bset.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
 	or	a, #0x80
 	ld	(%1), a
 } by {
@@ -255,13 +315,145 @@ replace restart {
 } if notUsed(%1), notUsed('a')
 
 replace restart {
+	ld	a, %1
+	or	a, #0x01
+	ld	%1, a
+} by {
+	bset	%2, #0
+	; peephole 11-8 replaced or by bset.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	or	a, #0x02
+	ld	%1, a
+} by {
+	bset	%2, #1
+	; peephole 11-9 replaced or by bset.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	or	a, #0x04
+	ld	%1, a
+} by {
+	bset	%2, #2
+	; peephole 11-10 replaced or by bset.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	or	a, #0x08
+	ld	%1, a
+} by {
+	bset	%2, #3
+	; peephole 11-11 replaced or by bset.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	or	a, #0x10
+	ld	%1, a
+} by {
+	bset	%2, #4
+	; peephole 11-12 replaced or by bset.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1, %2)
+
+replace restart {
+	ld	a, %1
+	or	a, #0x20
+	ld	%1, a
+} by {
+	bset	%2, #5
+	; peephole 11-13 replaced or by bset.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	or	a, #0x40
+	ld	%1, a
+} by {
+	bset	%2, #6
+	; peephole 11-14 replaced or by bset.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	or	a, #0x80
+	ld	%1, a
+} by {
+	bset	%2, #7
+	; peephole 11-15 replaced or by bset.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
 	ldw	%1, #%2
 	ld	a, (%1)
 	and	a, #0xfe
 	ld	(%1), a
 } by {
 	bres	%2, #0
-	; peephole 12-0 replaced and by bres.
+	; peephole 11-16 replaced and by bres.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #0xfd
+	ld	(%1), a
+} by {
+	bres	%2, #1
+	; peephole 11-17 replaced and by bres.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #0xfb
+	ld	(%1), a
+} by {
+	bres	%2, #2
+	; peephole 11-18 replaced and by bres.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #0xf7
+	ld	(%1), a
+} by {
+	bres	%2, #3
+	; peephole 11-19 replaced and by bres.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #0xef
+	ld	(%1), a
+} by {
+	bres	%2, #4
+	; peephole 11-20 replaced and by bres.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #0xdf
+	ld	(%1), a
+} by {
+	bres	%2, #5
+	; peephole 11-21 replaced and by bres.
+} if notUsed(%1), notUsed('a')
+
+replace restart {
+	ldw	%1, #%2
+	ld	a, (%1)
+	and	a, #0xbf
+	ld	(%1), a
+} by {
+	bres	%2, #6
+	; peephole 11-22 replaced and by bres.
 } if notUsed(%1), notUsed('a')
 
 replace restart {
@@ -271,8 +463,80 @@ replace restart {
 	ld	(%1), a
 } by {
 	bres	%2, #7
-	; peephole 12-7 replaced and by bres.
+	; peephole 11-23 replaced and by bres.
 } if notUsed(%1), notUsed('a')
+
+replace restart {
+	ld	a, %1
+	and	a, #0xfe
+	ld	%1, a
+} by {
+	bres	%2, #0
+	; peephole 11-24 replaced and by bres.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	and	a, #0xfd
+	ld	%1, a
+} by {
+	bres	%2, #1
+	; peephole 11-25 replaced and by bres.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	and	a, #0xfb
+	ld	%1, a
+} by {
+	bres	%2, #2
+	; peephole 11-26 replaced and by bres.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	and	a, #0xf7
+	ld	%1, a
+} by {
+	bres	%2, #3
+	; peephole 11-27 replaced and by bres.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	and	a, #0xef
+	ld	%1, a
+} by {
+	bres	%2, #4
+	; peephole 11-28 replaced and by bres.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	and	a, #0xdf
+	ld	%1, a
+} by {
+	bres	%2, #5
+	; peephole 11-29 replaced and by bres.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	and	a, #0xbf
+	ld	%1, a
+} by {
+	bres	%2, #6
+	; peephole 11-30 replaced and by bres.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
+
+replace restart {
+	ld	a, %1
+	and	a, #0x7f
+	ld	%1, a
+} by {
+	bres	%2, #7
+	; peephole 11-31 replaced and by bres.
+} if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
 
 replace restart {
 	clr	a

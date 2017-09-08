@@ -1,3 +1,10 @@
+2017-09-08 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/stm8/peeph.def:
+	  Optimize bit-xor with BCPL.
+	* support/regression/tests/bug-2642.c:
+	  Improve test case.
+
 2017-08-20 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/SDCCpeeph.c:

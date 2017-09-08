@@ -16,5 +16,8 @@ void testBug(void)
 	VIO |= 0x80;
 	VIO |= 0x08;
 	ASSERT (VIO == 0xff);
+	VIO ^= 0x80;
+	VIO ^= 0x08;
+	ASSERT (VIO == 0x77);
 #endif
 }

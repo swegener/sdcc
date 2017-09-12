@@ -52,11 +52,13 @@ do_command(void)
 void testBug(void)
 {
 #ifdef __SDCC
+#ifndef __SDCC_gbz80
 	ig.rx_byte = 0;
 	ig.input_cnt = 1;
 
 	ASSERT (do_command() == 2);
 	ASSERT (ig.input_cnt == 2);
 	ASSERT (count == 1);
+#endif
 #endif
 }

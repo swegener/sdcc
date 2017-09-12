@@ -1,3 +1,9 @@
+2017-09-12 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/bug-441448.c:
+	* support/regression/tests/bug2729218.c:
+	  Disabled for gbz80.
+
 2017-09-08 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/stm8/peeph.def:

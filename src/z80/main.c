@@ -732,24 +732,24 @@ _getRegName (const struct reg_info *reg)
 static int
 _getRegByName (const char *name)
 {
-  if (!strcmp (name, "c"))
-    return 0;
-  if (!strcmp (name, "b"))
-    return 1;
-  if (!strcmp (name, "e"))
-    return 2;
-  if (!strcmp (name, "d"))
-    return 3;
-  if (!strcmp (name, "l"))
-    return 4;
-  if (!strcmp (name, "h"))
-    return 5;
-  if (!strcmp (name, "iyl"))
-    return 6;
-  if (!strcmp (name, "iyh"))
-    return 7;
   if (!strcmp (name, "a"))
-    return port->num_regs - 1;
+    return 0;
+  if (!strcmp (name, "c"))
+    return 1;
+  if (!strcmp (name, "b"))
+    return 2;
+  if (!strcmp (name, "e"))
+    return 3;
+  if (!strcmp (name, "d"))
+    return 4;
+  if (!strcmp (name, "l"))
+    return 5;
+  if (!strcmp (name, "h"))
+    return 6;
+  if (!strcmp (name, "iyl"))
+    return 7;
+  if (!strcmp (name, "iyh"))
+    return 8;
   return -1;
 }
 

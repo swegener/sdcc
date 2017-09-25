@@ -9845,7 +9845,7 @@ genPointerSet (iCode * ic)
         }
       else
         {
-          if (surviving_a && !pushed_a && aopInReg (right->aop, 0, A_IDX))
+          if (surviving_a && !pushed_a && !aopInReg (right->aop, 0, A_IDX))
             _push (PAIR_AF), pushed_a = TRUE;
           if (AOP_TYPE (right) == AOP_LIT && byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0x00)
             emit3 (A_XOR, ASMOP_A, ASMOP_A);

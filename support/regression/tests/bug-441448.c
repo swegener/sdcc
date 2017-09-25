@@ -18,11 +18,9 @@ DATA unsigned char dummy1, dummy2;
 void 
 testPrePostIncrement(void) 
 {
-#ifndef __SDCC_gbz80 
     dummy2 = TxFifo.buffer[++TxFifo.OutPtr]; 
     dummy1 = RxFifo.buffer[RxFifo.OutPtr++];
 
     ASSERT(dummy2 == 'B');
     ASSERT(dummy1 == 'F');
-#endif
 }

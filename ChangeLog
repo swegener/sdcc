@@ -1,4 +1,13 @@
 2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
+	* src/SDCCval.c,
+	  support/regression/tests/bug-2645.c:
+	  Fix bug #2645, patch by Kamil Zbróg.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-441448.c,
+	  support/regression/tests/bug2729218.c:
+	  Fix bug #2649.
+
+2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdwarf2.c:
 	  Fix long long support in DWARF output (bug #2613)
@@ -7,9 +16,6 @@
 	* device/lib/calloc.c,
 	  support/regression/tests/malloc.c:
 	  Fix bug #2650.
-	* src/SDCCval.c,
-	  support/regression/tests/bug-2645.c:
-	  Fix bug #2645, patch by Kamil Zbróg.
 
 2017-09-21 Philipp Klaus Krause <pkk AT spth.de>
 

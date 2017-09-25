@@ -1436,10 +1436,10 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
     regsize += source->aopu.bytes[soffset + i].in_reg;
 
   a_dead |= (result->regs[A_IDX] >= 0 && result->regs[A_IDX] < n);
-  xl_dead = x_dead || (result->regs[XL_IDX] >= 0 && result->regs[XL_IDX] < n);
-  xh_dead = x_dead || (result->regs[XH_IDX] >= 0 && result->regs[XH_IDX] < n);
-  yl_dead = y_dead || (result->regs[YL_IDX] >= 0 && result->regs[YL_IDX] < n);
-  yh_dead = y_dead || (result->regs[YH_IDX] >= 0 && result->regs[YH_IDX] < n);
+  xl_dead = x_dead || (result->regs[XL_IDX] >= roffset && result->regs[XL_IDX] < roffset + n);
+  xh_dead = x_dead || (result->regs[XH_IDX] >= roffset && result->regs[XH_IDX] < roffset + n);
+  yl_dead = y_dead || (result->regs[YL_IDX] >= roffset && result->regs[YL_IDX] < roffset + n);
+  yh_dead = y_dead || (result->regs[YH_IDX] >= roffset && result->regs[YH_IDX] < roffset + n);
   x_dead |= (xl_dead && xh_dead);
   y_dead |= (yl_dead && yh_dead);
 
@@ -5361,7 +5361,6 @@ genAnd (const iCode *ic, iCode *ifx)
         }
 
       // Cases that want a free a.
-
       if (!pushed_a && !(regDead (A_IDX, ic) && !result_in_a))
         {
           push (ASMOP_A, 0, 1);

@@ -29,10 +29,8 @@ testTortureExecute (void)
     ABORT ();
   if (f(6) != 0)
     ABORT ();
-#ifndef __SDCC_stm8
   if (f(5) != 0)
     ABORT ();
-#endif
   if (f(15) != 15)
     ABORT ();
 }

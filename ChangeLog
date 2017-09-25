@@ -1,4 +1,14 @@
 2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20111227-1.c,
+	  support/regression/tests/gcc-torture-execute-2012*.c,
+	  support/regression/tests/gcc-torture-execute-2013*.c,
+	  support/regression/tests/gcc-torture-execute-2014*.c,
+	  support/regression/tests/gcc-torture-execute-2015*.c:
+	  Port more tests from the GCC testsuite.
+
+2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCval.c,
 	  support/regression/tests/bug-2645.c:
 	  Fix bug #2645, patch by Kamil Zbróg.

@@ -2,6 +2,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #if defined(__SDCC_pic16)
 #include <malloc.h>
 #endif
@@ -112,6 +113,19 @@ void mallocfree(void)
 
 	free(a);
 	free(c);
+
+	/* Check that we can allocate at least 256 bytes at once. */
+#if defined(PORT_HOST) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka)
+	a = malloc(256);
+	ASSERT(a);
+	free(a);
+#endif
+
+	/* Check for overflow in calloc() memory size calculation,  bug #2650. */
+#ifndef PORT_HOST
+	c = calloc(SIZE_MAX / 256, 258);
+	ASSERT(!c);
+#endif
 }
 
 void

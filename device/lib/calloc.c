@@ -28,6 +28,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
 #define XDATA __xdata
@@ -39,8 +40,16 @@ void XDATA *calloc (size_t nmemb, size_t size)
 {
 	void XDATA *ptr;
 
-	if (ptr = malloc(nmemb * size))
-		memset(ptr, 0, nmemb * size);
+	unsigned long msize = (unsigned long)nmemb * (unsigned long)size;
+
+	_Static_assert(sizeof(unsigned long) >= sizeof(size_t) * 2,
+		"size_t too large wrt. unsigned long for overflow check");
+
+	if (msize > SIZE_MAX)
+		return(0);
+
+	if (ptr = malloc(msize))
+		memset(ptr, 0, msize);
 
 	return(ptr);
 }

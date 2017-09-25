@@ -4,6 +4,9 @@
 	  Fix long long support in DWARF output (bug #2613)
 	* src/z80/gen.c:
 	  Fix interaction of __z88dk_fastcall with frame pointer setup when optimizing for code size (bug #2581).
+	* device/lib/calloc.c,
+	  support/regression/tests/malloc.c:
+	  Fix bug #2650.
 
 2017-09-21 Philipp Klaus Krause <pkk AT spth.de>
 

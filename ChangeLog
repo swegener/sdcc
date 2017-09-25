@@ -10,6 +10,10 @@
 	* src/stm8/gen.c,
 	  support/regression/tests/gcc-torture-execute-20141022-1.c:
 	  Fix bug #2652.
+	* support/regression/tests/gcc-torture-execute-pr51581-1.c,
+	  support/regression/tests/gcc-torture-execute-pr51581-2.c:
+	  support/regression/tests/gcc-torture-execute-pr6*.c:
+	  Port more tests from the GCC testsuite.
 
 2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
 

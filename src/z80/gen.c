@@ -4349,13 +4349,13 @@ genFunction (const iCode * ic)
   else if (sym->stack)
     {
       if (!_G.omitFramePtr)
-        emit2 (optimize.codeSize ? "!enters" : "!enter");
+        emit2 ((optimize.codeSize && !IFFUNC_ISZ88DK_FASTCALL (ftype)) ? "!enters" : "!enter");
       adjustStack (-sym->stack, !IS_TLCS90, TRUE, TRUE, !IY_RESERVED);
       _G.stack.pushed = 0;
     }
   else if (!_G.omitFramePtr)
     {
-      emit2 (optimize.codeSize ? "!enters" : "!enter");
+      emit2 ((optimize.codeSize && !IFFUNC_ISZ88DK_FASTCALL (ftype)) ? "!enters" : "!enter");
     }
 
   _G.stack.offset = sym->stack;

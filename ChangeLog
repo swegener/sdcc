@@ -7,6 +7,9 @@
 	* device/lib/calloc.c,
 	  support/regression/tests/malloc.c:
 	  Fix bug #2650.
+	* src/SDCCval.c,
+	  support/regression/tests/bug-2645.c:
+	  Fix bug #2645, patch by Kamil Zbróg.
 
 2017-09-21 Philipp Klaus Krause <pkk AT spth.de>
 

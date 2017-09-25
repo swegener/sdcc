@@ -299,9 +299,9 @@ list2expr (initList * ilist)
 /* resolveIvalSym - resolve symbols in initial values               */
 /*------------------------------------------------------------------*/
 void
-resolveIvalSym (initList * ilist, sym_link * type)
+resolveIvalSym (initList *ilist, sym_link *type)
 {
-  int is_ptr = IS_PTR (type);
+  int is_ptr = IS_PTR (type) || (IS_ARRAY(type) && IS_PTR(type->next));
   RESULT_TYPE resultType = getResultTypeFromType (getSpec (type));
 
   while (ilist)

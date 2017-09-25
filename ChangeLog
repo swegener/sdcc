@@ -1,3 +1,8 @@
+2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCdwarf2.c:
+	  Fix long long support in DWARF output (bug #2613)
+
 2017-09-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c:

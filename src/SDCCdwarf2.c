@@ -2076,7 +2076,8 @@ dwHashType (sym_link * type)
           hash ^= SPEC_NOUN (type)
                | (SPEC_CONST (type) << 4)
                | (SPEC_VOLATILE (type) << 5)
-               | (SPEC_LONG (type) << 6);
+               | (SPEC_LONG (type) << 6)
+               | (SPEC_LONGLONG (type) << 7);
         }
       
       type = type->next;
@@ -2119,6 +2120,8 @@ dwMatchTypes (const void * type1v, const void * type2v)
               if (SPEC_SHORT (type1) != SPEC_SHORT (type2))
                 return 0;
               if (SPEC_LONG (type1) != SPEC_LONG (type2))
+                return 0;
+              if (SPEC_LONGLONG (type1) != SPEC_LONGLONG (type2))
                 return 0;
               if (SPEC_USIGN (type1) != SPEC_USIGN (type2))
                 return 0;
@@ -2356,7 +2359,10 @@ dwTagFromType (sym_link * type, dwtag * parent)
                     {
                       dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
                                                         DW_ATE_unsigned));
-                      if (SPEC_LONG (type))
+                      if (SPEC_LONGLONG (type))
+                        dwAddTagAttr (tp, dwNewAttrString (DW_AT_name,
+                                                           "unsigned long long"));
+                      else if (SPEC_LONG (type))
                         dwAddTagAttr (tp, dwNewAttrString (DW_AT_name,
                                                            "unsigned long"));
                       else
@@ -2367,7 +2373,9 @@ dwTagFromType (sym_link * type, dwtag * parent)
                     {
                       dwAddTagAttr (tp, dwNewAttrConst (DW_AT_encoding,
                                                         DW_ATE_signed));
-                      if (SPEC_LONG (type))
+                      if (SPEC_LONGLONG (type))
+                        dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "long long"));
+                      else if (SPEC_LONG (type))
                         dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "long"));
                       else
                         dwAddTagAttr (tp, dwNewAttrString (DW_AT_name, "int"));

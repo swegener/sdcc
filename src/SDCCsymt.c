@@ -1760,7 +1760,7 @@ promoteAnonStructs (int su, structdef * sdef)
 /* checkSClass - check the storage class specification              */
 /*------------------------------------------------------------------*/
 static void
-checkSClass (symbol * sym, int isProto)
+checkSClass (symbol *sym, int isProto)
 {
   sym_link *t;
 
@@ -1777,6 +1777,12 @@ checkSClass (symbol * sym, int isProto)
   if (SPEC_SCLS (sym->etype) == S_SBIT || SPEC_SCLS (sym->etype) == S_SFR)
     {
       SPEC_VOLATILE (sym->etype) = 1;
+    }
+
+  if (SPEC_NEEDSPAR (sym->etype))
+    {
+      werrorfl (sym->fileDef, sym->lineDef, E_QUALIFIED_ARRAY_NOPARAM);
+      SPEC_NEEDSPAR (sym->etype) = 0;
     }
 
   /* make sure restrict is only used with pointers */

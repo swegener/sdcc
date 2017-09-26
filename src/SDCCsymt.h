@@ -177,6 +177,7 @@ typedef struct specifier
   unsigned b_isregparm:1;           /* is the first parameter     */
   unsigned b_isenum:1;              /* is an enumerated type      */
   unsigned b_bitUnnamed:1;          /* is an unnamed bit-field    */
+  unsigned b_needspar:1;            /* has to be a parameter      */
   unsigned _bitStart;               /* bit start position         */
   unsigned _bitLength;              /* bit length                 */
   unsigned _addr;                   /* address of symbol          */
@@ -480,7 +481,8 @@ extern sym_link *validateLink (sym_link * l,
 #define SPEC_CVAL(x) validateLink(x, "SPEC_CVAL", #x, SPECIFIER, __FILE__, __LINE__)->select.s.const_val
 #define SPEC_BSTR(x) validateLink(x, "SPEC_BSTR", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitStart
 #define SPEC_BLEN(x) validateLink(x, "SPEC_BLEN", #x, SPECIFIER, __FILE__, __LINE__)->select.s._bitLength
-#define SPEC_BUNNAMED(x) validateLink(x, "SPEC_BLEN", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_bitUnnamed
+#define SPEC_BUNNAMED(x) validateLink(x, "SPEC_BUNNAMED", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_bitUnnamed
+#define SPEC_NEEDSPAR(x) validateLink(x, "SPEC_NEEDSPAR", #x, SPECIFIER, __FILE__, __LINE__)->select.s.b_needspar
 
 /* Sleaze: SPEC_ISR_SAVED_BANKS is only used on
  * function type symbols, which obviously cannot

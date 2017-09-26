@@ -535,6 +535,10 @@ struct
     "inline function '%s' might lose function attributes", 0},
   { E_FOR_INITAL_DECLARATION_C99, ERROR_LEVEL_ERROR,
     "initial declaration in for loop requires ISO C99 or later", 0},
+  { E_QUALIFIED_ARRAY_PARAM_C99, ERROR_LEVEL_ERROR,
+    "qualifiers in array parameters require ISO C99 or later", 0},
+  { E_QUALIFIED_ARRAY_NOPARAM, ERROR_LEVEL_ERROR,
+    "qualifier in array declarator that is not a parameter", 0},
 };
 
 /* -------------------------------------------------------------------------------

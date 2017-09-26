@@ -36,6 +36,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 #define SKIP_EVALUATED_COMMA_ASSIGN /* Looks like testing for some particular implementation-defined behaviour to me */
 
 #ifdef PORT_HOST /* Common GCC issues */
@@ -51,8 +53,6 @@
 # define SKIP_UNIVERSAL
 # define SKIP_MIXED /* mixing of declaration and other statements (C99 feature) not yet supported */
 # define SKIP_RESTRICT_PARAMETER /* bug #2538 */
-# define SKIP_VOLATILE_PARAMETER /* bug #2538 */
-# define SKIP_CONST_PARAMETER /* bug #2538 */
 # define SKIP_STATIC_PARAMETER /* bug #2537 */
 # define SKIP_COMPOUND /* compound literals not yet supported */
 # define SKIP_VLA /* variable-length arrays not supported */

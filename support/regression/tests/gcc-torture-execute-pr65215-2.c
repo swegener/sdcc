@@ -18,18 +18,20 @@ foo (unsigned int x)
   return (x >> 24) | ((x >> 8) & 0xff00) | ((x << 8) & 0xff0000) | (x << 24);
 }
 
+#ifndef __SDCC_ds390 // Enable when ds390 supports long long
 unsigned long long
 bar (unsigned long long *x)
 {
   return ((unsigned long long) foo (*x) << 32) | foo (*x >> 32);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if 0 // Enable when SDCC supports intermingling of declarations and statements
   if (CHAR_BIT != 8 || sizeof (unsigned int) != 4 || sizeof (unsigned long long) != 8)
     return;
-#if 0 // Enable when SDCC supports intermingling of declarations and statements
   unsigned long long l = foo (0xfeedbea8U) | ((unsigned long long) foo (0xdeadbeefU) << 32);
   if (bar (&l) != 0xfeedbea8deadbeefULL)
     ASSERT (0);

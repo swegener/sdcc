@@ -14,6 +14,7 @@
 int a, b, c, d = 1, e, f = 1, h, i, k;
 char g, j;
 
+#ifndef __SDCC_ds390 // Enable when ds390 supports long long
 void
 fn1 (void)
 {
@@ -34,11 +35,14 @@ fn1 (void)
 	return;
     }
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_ds390 // Enable when ds390 supports long long
   fn1 ();
   if (c != 1)
     ASSERT (0);
+#endif
 }

@@ -116,7 +116,7 @@ bool uselessDecl = TRUE;
 %type <sym> declaration_list identifier_list
 %type <sym> declarator2_function_attributes while do for critical
 %type <sym> addressmod
-%type <lnk> pointer type_specifier_list type_specifier_list_ type_specifier type_name
+%type <lnk> pointer type_specifier_list type_specifier_list_ type_specifier type_qualifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier alignment_specifier
 %type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
 %type <lnk> function_attribute function_attributes enum_specifier
@@ -801,8 +801,52 @@ Interrupt_storage
         }
    ;
 
+type_qualifier
+   : SD_CONST  {
+                  $$=newLink(SPECIFIER);
+                  SPEC_CONST($$) = 1;
+               }
+   | RESTRICT  {
+                  $$=newLink(SPECIFIER);
+                  SPEC_RESTRICT($$) = 1;
+               }
+   | VOLATILE  {
+                  $$=newLink(SPECIFIER);
+                  SPEC_VOLATILE($$) = 1;
+               }
+   | ADDRSPACE_NAME {
+                  $$=newLink(SPECIFIER);
+                  SPEC_ADDRSPACE($$) = findSym (AddrspaceTab, 0, $1);
+               }
+   | XDATA     {
+                  $$ = newLink (SPECIFIER);
+                  SPEC_SCLS($$) = S_XDATA;
+               }
+   | CODE      {
+                  $$ = newLink (SPECIFIER);
+                  SPEC_SCLS($$) = S_CODE;
+               }
+   | EEPROM    {
+                  $$ = newLink (SPECIFIER);
+                  SPEC_SCLS($$) = S_EEPROM;
+               }
+   | DATA      {
+                  $$ = newLink (SPECIFIER);
+                  SPEC_SCLS($$) = S_DATA;
+               }
+   | IDATA     {
+                  $$ = newLink (SPECIFIER);
+                  SPEC_SCLS($$) = S_IDATA;
+               }
+   | PDATA     {
+                  $$ = newLink (SPECIFIER);
+                  SPEC_SCLS($$) = S_PDATA;
+               }
+   ;
+
 type_specifier
-   : SD_BOOL   {
+   : type_qualifier { $$ = $1; }
+   | SD_BOOL   {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_BOOL;
                   ignoreTypedefType = 1;
@@ -842,22 +886,6 @@ type_specifier
                   SPEC_NOUN($$) = V_VOID;
                   ignoreTypedefType = 1;
                }
-   | SD_CONST  {
-                  $$=newLink(SPECIFIER);
-                  SPEC_CONST($$) = 1;
-               }
-   | VOLATILE  {
-                  $$=newLink(SPECIFIER);
-                  SPEC_VOLATILE($$) = 1;
-               }
-   | RESTRICT  {
-                  $$=newLink(SPECIFIER);
-                  SPEC_RESTRICT($$) = 1;
-               }
-   | ADDRSPACE_NAME {
-                  $$=newLink(SPECIFIER);
-                  SPEC_ADDRSPACE($$) = findSym (AddrspaceTab, 0, $1);
-               }
    | SD_FLOAT  {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_FLOAT;
@@ -867,30 +895,6 @@ type_specifier
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_FIXED16X16;
                   ignoreTypedefType = 1;
-               }
-   | XDATA     {
-                  $$ = newLink (SPECIFIER);
-                  SPEC_SCLS($$) = S_XDATA;
-               }
-   | CODE      {
-                  $$ = newLink (SPECIFIER);
-                  SPEC_SCLS($$) = S_CODE;
-               }
-   | EEPROM    {
-                  $$ = newLink (SPECIFIER);
-                  SPEC_SCLS($$) = S_EEPROM;
-               }
-   | DATA      {
-                  $$ = newLink (SPECIFIER);
-                  SPEC_SCLS($$) = S_DATA;
-               }
-   | IDATA     {
-                  $$ = newLink (SPECIFIER);
-                  SPEC_SCLS($$) = S_IDATA;
-               }
-   | PDATA     {
-                  $$ = newLink (SPECIFIER);
-                  SPEC_SCLS($$) = S_PDATA;
                }
    | BIT       {
                   $$=newLink(SPECIFIER);

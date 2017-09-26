@@ -2,6 +2,19 @@
 
 	* src/SDCCerr.c:
 	  Improve error message for storage class specifiers in parameters.
+	* src/SDCC.y:
+	  Separate type qualifiers from type specifiers to prepare for RFE #2538.
+	* support/regression/tests/gcc-torture-execute-20120111-1.c,
+	  support/regression/tests/gcc-torture-execute-20120817-1.c,
+	  support/regression/tests/gcc-torture-execute-20140212-1.c,
+	  support/regression/tests/gcc-torture-execute-20141125-1.c,
+	  support/regression/tests/gcc-torture-execute-20170111-1.c,
+	  support/regression/tests/gcc-torture-execute-pr65170.c,
+	  support/regression/tests/gcc-torture-execute-pr65215-1.c,
+	  support/regression/tests/gcc-torture-execute-pr65215-2.c,
+	  support/regression/tests/gcc-torture-execute-pr66940.c,
+	  support/regression/tests/gcc-torture-execute-pr69320-4.c:
+	  Disable new long long tests for ds390.
 
 2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
 

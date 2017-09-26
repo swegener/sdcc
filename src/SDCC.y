@@ -1417,7 +1417,7 @@ declarator2
          }
    | declarator3 '[' type_qualifier_list ']'
          {
-            sym_link   *p;
+            sym_link *p, *n;
 
             if (!options.std_c99)
               werror (E_QUALIFIED_ARRAY_PARAM_C99);
@@ -1425,9 +1425,14 @@ declarator2
             p = newLink (DECLARATOR);
             DCL_TYPE(p) = ARRAY;
             DCL_ELEM(p) = 0;
+            DCL_PTR_CONST(p) = SPEC_CONST ($3);
+            DCL_PTR_RESTRICT(p) = SPEC_RESTRICT ($3);
+            DCL_PTR_VOLATILE(p) = SPEC_VOLATILE ($3);
+            DCL_PTR_ADDRSPACE(p) = SPEC_ADDRSPACE ($3);
             addDecl($1,0,p);
-            SPEC_NEEDSPAR($3) = 1;
-            addDecl($1,0,$3);
+            n = newLink (SPECIFIER);
+            SPEC_NEEDSPAR(n) = 1;
+            addDecl($1,0,n);
          }
    | declarator3 '[' constant_expr ']'
          {
@@ -1460,7 +1465,7 @@ declarator2
          }
 | declarator3 '[' type_qualifier_list constant_expr ']'
          {
-            sym_link *p;
+            sym_link *p, *n;
             value *tval;
             int size;
 
@@ -1488,9 +1493,14 @@ declarator2
                   }
               }
             DCL_ELEM(p) = size;
+            DCL_PTR_CONST(p) = SPEC_CONST ($3);
+            DCL_PTR_RESTRICT(p) = SPEC_RESTRICT ($3);
+            DCL_PTR_VOLATILE(p) = SPEC_VOLATILE ($3);
+            DCL_PTR_ADDRSPACE(p) = SPEC_ADDRSPACE ($3);
             addDecl($1, 0, p);
-            SPEC_NEEDSPAR($3) = 1;
-            addDecl($1,0,$3);
+            n = newLink (SPECIFIER);
+            SPEC_NEEDSPAR(n) = 1;
+            addDecl($1,0,n);
          }
    ;
 

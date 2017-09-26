@@ -27,6 +27,8 @@
 	* src/SDCC.y,
 	  support/regression/tests/p99-conformance.c:
 	  RFE #2538: qualifiers in array parameters (ISO C99).
+	* doc/sdccman.lyx:
+	  Document missing support for static in array parameters.
 
 2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -9562,6 +9562,10 @@ Compound literals.
 Variable-length arrays.
 \end_layout
 
+\begin_layout Itemize
+static in array parameters.
+\end_layout
+
 \begin_layout Standard
 Some features of this standard are not supported in some ports:
 \end_layout

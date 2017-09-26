@@ -21,12 +21,12 @@
 	  src/SDCCsymt.h,
 	  src/SDCCsymt.c,
 	  support/regression/tests/p99-conformance.c:
-	  Partially implement RFE #2538: const and volatile in array parameters.
+	  Partially fix bug #2538: const and volatile in array parameters.
 	* support/regression/tests/gcc-torture-execute-pr51581-1.c:
 	  Fix for test-host.
 	* src/SDCC.y,
 	  support/regression/tests/p99-conformance.c:
-	  RFE #2538: qualifiers in array parameters (ISO C99).
+	  Fix bug #2538: qualifiers in array parameters (ISO C99).
 	* doc/sdccman.lyx:
 	  Document missing support for static in array parameters.
 

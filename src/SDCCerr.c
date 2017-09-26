@@ -451,7 +451,7 @@ struct
   { W_DEPRECATED_KEYWORD, ERROR_LEVEL_WARNING,
      "keyword '%s' is deprecated, use '%s' instead", 0 },
   { E_STORAGE_CLASS_FOR_PARAMETER, ERROR_LEVEL_ERROR,
-     "storage class specified for parameter '%s'", 0 },
+     "storage class other than register specified for parameter '%s'", 0 },
   { E_OFFSETOF_TYPE, ERROR_LEVEL_ERROR,
      "offsetof can only be applied to structs/unions", 0 },
   { E_INCOMPLETE_FIELD, ERROR_LEVEL_ERROR,

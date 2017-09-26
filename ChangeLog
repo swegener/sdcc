@@ -1,3 +1,8 @@
+2017-09-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.c:
+	  Improve error message for storage class specifiers in parameters.
+
 2017-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20111227-1.c,

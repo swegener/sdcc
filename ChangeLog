@@ -1,3 +1,13 @@
+2017-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-pr7*.c
+	  support/regression/tests/gcc-torture-execute-pr8*.c:
+	  Port more tests from the GCC testsuite.
+	* support/regression/tests/gcc-torture-execute-930529-1.c:
+	  Disable test that hangs on GCC 7.2.0 for host.
+	* support/regression/tests/gcc-torture-execute-pr51581-?.c:
+	  Fix for test-host.
+
 2017-09-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCerr.c:

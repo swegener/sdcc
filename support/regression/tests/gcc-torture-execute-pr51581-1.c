@@ -127,7 +127,7 @@ testTortureExecute (void)
   int i;
   for (i = 0; i < N; i++)
     {
-#ifndef TEST_HOST
+#ifndef PORT_HOST
       __asm;
       __endasm;
 #endif

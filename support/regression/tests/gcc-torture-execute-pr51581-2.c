@@ -140,8 +140,10 @@ testTortureExecute (void)
   int i;
   for (i = 0; i < N; i++)
     {
+#ifndef PORT_HOST
       __asm;
       __endasm;
+#endif
       a[i] = i - N / 2;
       b[i] = i;
     }

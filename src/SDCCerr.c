@@ -538,7 +538,9 @@ struct
   { E_QUALIFIED_ARRAY_PARAM_C99, ERROR_LEVEL_ERROR,
     "qualifiers in array parameters require ISO C99 or later", 0},
   { E_QUALIFIED_ARRAY_NOPARAM, ERROR_LEVEL_ERROR,
-    "qualifier in array declarator that is not a parameter", 0},
+    "qualifier or static in array declarator that is not a parameter", 0},
+  { E_STATIC_ARRAY_PARAM_C99, ERROR_LEVEL_ERROR,
+    "static in array parameters requires ISO C99 or later", 0},
 };
 
 /* -------------------------------------------------------------------------------

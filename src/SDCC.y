@@ -1463,7 +1463,42 @@ declarator2
             DCL_ELEM(p) = size;
             addDecl($1, 0, p);
          }
-| declarator3 '[' type_qualifier_list constant_expr ']'
+  | declarator3 '[' STATIC constant_expr ']'
+         {
+            sym_link *p, *n;
+            value *tval;
+            int size;
+
+            if (!options.std_c99)
+              werror (E_STATIC_ARRAY_PARAM_C99);
+
+            tval = constExprValue($4, TRUE);
+            /* if it is not a constant then Error  */
+            p = newLink (DECLARATOR);
+            DCL_TYPE(p) = ARRAY;
+
+            if (!tval || (SPEC_SCLS(tval->etype) != S_LITERAL))
+              {
+                werror(E_CONST_EXPECTED);
+                /* Assume a single item array to limit the cascade */
+                /* of additional errors. */
+                size = 1;
+              }
+            else
+              {
+                if ((size = (int) ulFromVal(tval)) < 0)
+                  {
+                    werror(E_NEGATIVE_ARRAY_SIZE, $1->name);
+                    size = 1;
+                  }
+              }
+            DCL_ELEM(p) = size;
+            addDecl($1, 0, p);
+            n = newLink (SPECIFIER);
+            SPEC_NEEDSPAR(n) = 1;
+            addDecl($1,0,n);
+         }
+  | declarator3 '[' type_qualifier_list constant_expr ']'
          {
             sym_link *p, *n;
             value *tval;
@@ -1473,6 +1508,90 @@ declarator2
               werror (E_QUALIFIED_ARRAY_PARAM_C99);
 
             tval = constExprValue($4, TRUE);
+            /* if it is not a constant then Error  */
+            p = newLink (DECLARATOR);
+            DCL_TYPE(p) = ARRAY;
+
+            if (!tval || (SPEC_SCLS(tval->etype) != S_LITERAL))
+              {
+                werror(E_CONST_EXPECTED);
+                /* Assume a single item array to limit the cascade */
+                /* of additional errors. */
+                size = 1;
+              }
+            else
+              {
+                if ((size = (int) ulFromVal(tval)) < 0)
+                  {
+                    werror(E_NEGATIVE_ARRAY_SIZE, $1->name);
+                    size = 1;
+                  }
+              }
+            DCL_ELEM(p) = size;
+            DCL_PTR_CONST(p) = SPEC_CONST ($3);
+            DCL_PTR_RESTRICT(p) = SPEC_RESTRICT ($3);
+            DCL_PTR_VOLATILE(p) = SPEC_VOLATILE ($3);
+            DCL_PTR_ADDRSPACE(p) = SPEC_ADDRSPACE ($3);
+            addDecl($1, 0, p);
+            n = newLink (SPECIFIER);
+            SPEC_NEEDSPAR(n) = 1;
+            addDecl($1,0,n);
+         }
+| declarator3 '[' STATIC type_qualifier_list constant_expr ']'
+         {
+            sym_link *p, *n;
+            value *tval;
+            int size;
+
+            if (!options.std_c99)
+              {
+                werror (E_STATIC_ARRAY_PARAM_C99);
+                werror (E_QUALIFIED_ARRAY_PARAM_C99);
+              }
+
+            tval = constExprValue($5, TRUE);
+            /* if it is not a constant then Error  */
+            p = newLink (DECLARATOR);
+            DCL_TYPE(p) = ARRAY;
+
+            if (!tval || (SPEC_SCLS(tval->etype) != S_LITERAL))
+              {
+                werror(E_CONST_EXPECTED);
+                /* Assume a single item array to limit the cascade */
+                /* of additional errors. */
+                size = 1;
+              }
+            else
+              {
+                if ((size = (int) ulFromVal(tval)) < 0)
+                  {
+                    werror(E_NEGATIVE_ARRAY_SIZE, $1->name);
+                    size = 1;
+                  }
+              }
+            DCL_ELEM(p) = size;
+            DCL_PTR_CONST(p) = SPEC_CONST ($4);
+            DCL_PTR_RESTRICT(p) = SPEC_RESTRICT ($4);
+            DCL_PTR_VOLATILE(p) = SPEC_VOLATILE ($4);
+            DCL_PTR_ADDRSPACE(p) = SPEC_ADDRSPACE ($4);
+            addDecl($1, 0, p);
+            n = newLink (SPECIFIER);
+            SPEC_NEEDSPAR(n) = 1;
+            addDecl($1,0,n);
+         }
+| declarator3 '[' type_qualifier_list STATIC constant_expr ']'
+         {
+            sym_link *p, *n;
+            value *tval;
+            int size;
+
+            if (!options.std_c99)
+              {
+                werror (E_QUALIFIED_ARRAY_PARAM_C99);
+                werror (E_STATIC_ARRAY_PARAM_C99);
+              }
+
+            tval = constExprValue($5, TRUE);
             /* if it is not a constant then Error  */
             p = newLink (DECLARATOR);
             DCL_TYPE(p) = ARRAY;

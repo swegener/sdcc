@@ -267,7 +267,8 @@ enum {
   W_INLINE_FUNCATTR             = 238, /* inline functions should not be z88dk_fastcall or z88dk_callee */
   E_FOR_INITAL_DECLARATION_C99  = 239, /* initial declaration in for loop requires ISO C99 or later */
   E_QUALIFIED_ARRAY_PARAM_C99   = 240, /* qualifiers in array parameters require ISO C99 or later */
-  E_QUALIFIED_ARRAY_NOPARAM     = 241, /* qualifier in array declarator that is not a parameter */
+  E_QUALIFIED_ARRAY_NOPARAM     = 241, /* qualifier or static in array declarator that is not a parameter */
+  E_STATIC_ARRAY_PARAM_C99      = 242, /* static in array parameters requires ISO C99 or later */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

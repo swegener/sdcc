@@ -55,7 +55,7 @@
 # define SKIP_COMPOUND /* compound literals not yet supported */
 # define SKIP_VLA /* variable-length arrays not supported */
 # define SKIP_INLINE /* bug #1900 */
-# define SKIP_PRAGMA
+# define SKIP_PRAGMA /* Standard pragmas not supported */
 # pragma disable_warning 93 /* Using float for double. */
 # if defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_pic14) || defined(__SDCC_pic16)
 #  define SKIP_LONG_LONG

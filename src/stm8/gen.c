@@ -3639,14 +3639,9 @@ genPlus (const iCode *ic)
           if (!started && aopIsLitVal (rightop, i, 1, 0))
             ; // Skip over this byte.
           // We can use inc / dec only for the only, top non-zero byte, since it neither takes into account an existing carry nor does it update the carry.
-          else if (!started && i == size - 1 && aopIsLitVal (rightop, i, 1, 1))
+          else if (!started && i == size - 1 && (aopIsLitVal (rightop, i, 1, 1) || aopIsLitVal (rightop, i, 1, 255)))
             {
-              emit3 (A_INC, ASMOP_A, 0);
-              started = TRUE;
-            }
-          else if (!started && i == size - 1 && aopIsLitVal (rightop, i, 1, 255))
-            {
-              emit3 (A_DEC, ASMOP_A, 0);
+              emit3 (aopIsLitVal (rightop, i, 1, 1) ? A_INC : A_DEC, ASMOP_A, 0);
               started = TRUE;
             }
           else

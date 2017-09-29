@@ -5301,11 +5301,11 @@ genPlus (iCode * ic)
           if (aopInReg (rightop, i + 1, H_IDX) || aopInReg (rightop, i + 1, L_IDX))
             {
               cheapMove (ASMOP_B, 0, AOP (IC_RIGHT (ic)), i + 1);
-              fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+              fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, i);
             }
           else
             {
-              fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+              fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, i);
               cheapMove (ASMOP_B, 0, AOP (IC_RIGHT (ic)), i + 1);
             }
           emit2 ("add hl, bc");
@@ -5319,11 +5319,11 @@ genPlus (iCode * ic)
           if (aopInReg (leftop, i + 1, H_IDX) || aopInReg (leftop, i + 1, L_IDX))
             {
               cheapMove (ASMOP_B, 0, AOP (IC_LEFT (ic)), i + 1);
-              fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+              fetchPairLong (PAIR_HL, AOP (IC_RIGHT (ic)), 0, i);
             }
           else
             {
-              fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+              fetchPairLong (PAIR_HL, AOP (IC_RIGHT (ic)), 0, i);
               cheapMove (ASMOP_B, 0, AOP (IC_LEFT (ic)), i + 1);
             }
           emit2 ("add hl, bc");
@@ -5337,11 +5337,11 @@ genPlus (iCode * ic)
           if (aopInReg (rightop, i + 1, H_IDX) || aopInReg (rightop, i + 1, L_IDX))
             {
               cheapMove (ASMOP_D, 0, AOP (IC_RIGHT (ic)), i + 1);
-              fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+              fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, i);
             }
           else
             {
-              fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+              fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, i);
               cheapMove (ASMOP_D, 0, AOP (IC_RIGHT (ic)), i + 1);
             }
           emit2 ("add hl, de");
@@ -5355,11 +5355,11 @@ genPlus (iCode * ic)
           if (aopInReg (leftop, i + 1, H_IDX) || aopInReg (leftop, i + 1, L_IDX))
             {
               cheapMove (ASMOP_D, 0, AOP (IC_LEFT (ic)), i + 1);
-              fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+              fetchPairLong (PAIR_HL, AOP (IC_RIGHT (ic)), 0, i);
             }
           else
             {
-              fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
+              fetchPairLong (PAIR_HL, AOP (IC_RIGHT (ic)), 0, i);
               cheapMove (ASMOP_D, 0, AOP (IC_LEFT (ic)), i + 1);
             }
           emit2 ("add hl, de");
@@ -5376,7 +5376,7 @@ genPlus (iCode * ic)
             pair = PAIR_DE;
           if (pair_alive = !isPairDead (pair, ic))
             _push (pair);
-          fetchPair (pair, AOP (IC_RIGHT (ic)));
+          fetchPairLong (pair, AOP (IC_RIGHT (ic)), 0, i);
           if (started)
             {
               emit2 ("adc hl, %s", _pairs[pair].name);

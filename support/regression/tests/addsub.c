@@ -6,6 +6,11 @@
 */
 #include <testfwk.h>
 
+{type} add_func({type} i)
+{
+	return(i + (5ul << 16));
+}
+
 void 
 testAdd(void)
 {
@@ -37,6 +42,19 @@ testAdd(void)
 
   result += 0xab00;
   ASSERT(result == ({type})(0xab00-39-70));
+
+  left = 0x5500;
+  right = 0x0a00;
+
+  result = left + right;
+  ASSERT(result == ({type})(0x5500 + 0x0a00));
+
+  left = 0x550000ul;
+
+  result = left + 0x0a0000ul;
+  ASSERT(result == ({type})(0x550000ul + 0x0a0000ul));
+
+  ASSERT(add_func(0) == ({type})(5ul << 16));
 }
 
 void 

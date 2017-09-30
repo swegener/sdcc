@@ -3827,7 +3827,22 @@ genIpush (const iCode * ic)
       offset = size;
       while (size--)
         {
-          if (AOP (IC_LEFT (ic))->type == AOP_IY)
+          if (size && getFreePairId (ic) != PAIR_INVALID)
+            {
+              offset -= 2;
+
+              PAIR_ID pair = getFreePairId (ic);
+              fetchPairLong (pair, AOP (IC_LEFT (ic)), 0, offset);
+              emit2 ("push %s", _pairs[pair].name);
+              regalloc_dry_run_cost += 1;
+              size--;
+
+              if (!regalloc_dry_run)
+                _G.stack.pushed += 2;
+
+              continue;
+            }
+          else if (AOP (IC_LEFT (ic))->type == AOP_IY)
             {
               wassertl (!bitVectBitValue (ic->rSurv, A_IDX), "Loading from address destroys A, which must survive.");
               emit2 ("ld a, (%s)", aopGetLitWordLong (AOP (IC_LEFT (ic)), --offset, FALSE));
@@ -5457,7 +5472,9 @@ genPlus (iCode * ic)
       else if (i == size - 1 && started && aopIsLitVal (rightop, i, 1, 0) &&
         !aopInReg (leftop, i, A_IDX) && // adc a, #0 is cheaper than conditional inc.
         (leftop->type == AOP_REG && AOP (IC_RESULT (ic))->type == AOP_REG && leftop->aopu.aop_reg[i]->rIdx == AOP (IC_RESULT (ic))->aopu.aop_reg[i]->rIdx &&
-        leftop->aopu.aop_reg[i]->rIdx != IYL_IDX && leftop->aopu.aop_reg[i]->rIdx != IYH_IDX || leftop->type == AOP_STK && leftop == AOP (IC_RESULT (ic))))
+        leftop->aopu.aop_reg[i]->rIdx != IYL_IDX && leftop->aopu.aop_reg[i]->rIdx != IYH_IDX ||
+        leftop->type == AOP_STK && leftop == AOP (IC_RESULT (ic)) ||
+        leftop->type == AOP_PAIRPTR && leftop->aopu.aop_pairId == PAIR_HL))
         {
           if (!tlbl && !regalloc_dry_run)
             tlbl = newiTempLabel (0);

@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Fix issues in built-in memset() and handling of literals.
+	* src/z80/gen.c:
+	  Improve long long parameter passing.
 
 2017-09-29 Philipp Klaus Krause <pkk AT spth.de>
 

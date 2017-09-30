@@ -1,3 +1,8 @@
+2017-09-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix issues in built-in memset() and handling of literals.
+
 2017-09-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

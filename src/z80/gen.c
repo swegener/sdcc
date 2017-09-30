@@ -246,7 +246,7 @@ bool z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX + 1];
 bool z80_symmParm_in_calls_from_current_function;
 bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
-static const char *aopGet (asmop * aop, int offset, bool bit16);
+static const char *aopGet (asmop *aop, int offset, bool bit16);
 
 static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_zero, asmop_one;
 static struct asmop *const ASMOP_A = &asmop_a;
@@ -596,25 +596,29 @@ getPartPairId (const asmop *aop, int offset)
 }
 
 static PAIR_ID
-getPairId (const asmop *aop)
+getPairId_o (const asmop *aop, int offset)
 {
-  if (aop->size == 2)
+  if (aop->size - offset == 2)
     {
       if (aop->type == AOP_REG)
         {
-          wassert (aop->aopu.aop_reg[0] && aop->aopu.aop_reg[1]);
+          wassert (aop->aopu.aop_reg[offset] && aop->aopu.aop_reg[offset + 1]);
 
-          if ((aop->aopu.aop_reg[0]->rIdx == C_IDX) && (aop->aopu.aop_reg[1]->rIdx == B_IDX))
+          if ((aop->aopu.aop_reg[offset]->rIdx == C_IDX) && (aop->aopu.aop_reg[offset + 1]->rIdx == B_IDX))
             {
               return PAIR_BC;
             }
-          if ((aop->aopu.aop_reg[0]->rIdx == E_IDX) && (aop->aopu.aop_reg[1]->rIdx == D_IDX))
+          if ((aop->aopu.aop_reg[offset]->rIdx == E_IDX) && (aop->aopu.aop_reg[offset + 1]->rIdx == D_IDX))
             {
               return PAIR_DE;
             }
-          if ((aop->aopu.aop_reg[0]->rIdx == L_IDX) && (aop->aopu.aop_reg[1]->rIdx == H_IDX))
+          if ((aop->aopu.aop_reg[offset]->rIdx == L_IDX) && (aop->aopu.aop_reg[offset + 1]->rIdx == H_IDX))
             {
               return PAIR_HL;
+            }
+          if ((aop->aopu.aop_reg[offset]->rIdx == IYL_IDX) && (aop->aopu.aop_reg[offset + 1]->rIdx == IYH_IDX))
+            {
+              return PAIR_IY;
             }
         }
       else if (aop->type == AOP_STR || aop->type == AOP_HLREG)
@@ -622,13 +626,22 @@ getPairId (const asmop *aop)
           int i;
           for (i = 0; i < NUM_PAIRS; i++)
             {
-              if (!strcmp (aop->aopu.aop_str[0], _pairs[i].l) && !strcmp (aop->aopu.aop_str[1], _pairs[i].h))
+              if (!strcmp (aop->aopu.aop_str[offset], _pairs[i].l) && !strcmp (aop->aopu.aop_str[offset + 1], _pairs[i].h))
                 return i;
             }
         }
     }
   return PAIR_INVALID;
 }
+
+static PAIR_ID
+getPairId (const asmop *aop)
+{
+  if (aop->size != 2)
+    return PAIR_INVALID;
+  return (getPairId_o (aop, 0));
+}
+
 
 /*-----------------------------------------------------------------*/
 /* z80_emitDebuggerSymbol - associate the current code location    */
@@ -1015,7 +1028,7 @@ _moveA3 (asmop * from, int offset)
 }
 
 static const char *
-getPairName (asmop * aop)
+getPairName (asmop *aop)
 {
   if (aop->type == AOP_REG)
     {
@@ -1715,18 +1728,7 @@ aopGetLitWordLong (const asmop *aop, int offset, bool with_hash)
         {
           unsigned long long v = ullFromVal (val);
 
-          if (offset == 2)
-            {
-              v >>= 16;
-            }
-          else if (offset == 0)
-            {
-              // OK
-            }
-          else
-            {
-              wassertl (0, "Encountered an invalid offset while fetching a literal");
-            }
+          v >>= (offset * 8);
 
           dbuf_tprintf (&dbuf, with_hash ? "!immedword" : "!constword", (unsigned long) (v & 0xffffull));
         }
@@ -4918,6 +4920,7 @@ genPlus (iCode * ic)
   bool premoved, started;
   asmop *leftop;
   asmop *rightop;
+  symbol *tlbl = 0;
 
   /* special cases :- */
 
@@ -5398,8 +5401,8 @@ genPlus (iCode * ic)
         && (aopInReg (leftop, i, L_IDX) || aopInReg (rightop, i, L_IDX))
         && (aopInReg (leftop, i, C_IDX) || aopInReg (rightop, i, C_IDX) || aopInReg (leftop, i, E_IDX) || aopInReg (rightop, i, E_IDX)))
         {
-          PAIR_ID pair = (AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX
-                      || AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == C_IDX) ? PAIR_BC : PAIR_DE;
+          PAIR_ID pair = (leftop->aopu.aop_reg[i]->rIdx == C_IDX
+                      || rightop->aopu.aop_reg[i]->rIdx == C_IDX) ? PAIR_BC : PAIR_DE;
           if (started)
             {
               emit2 ("adc hl, %s", _pairs[pair].name);
@@ -5429,6 +5432,40 @@ genPlus (iCode * ic)
       else if (!premoved && !started && (leftop->type == AOP_REG || AOP (IC_RESULT (ic))->type == AOP_REG) && aopIsLitVal (rightop, i, 1, 0))
         {
           cheapMove (AOP (IC_RESULT (ic)), i, leftop, i);
+          i++;
+        }
+      // Conditional 16-bit inc.
+      else if (i == size - 2 && started && aopIsLitVal (rightop, i, 2, 0) && (
+        aopInReg (AOP (IC_RESULT (ic)), i, BC_IDX) && aopInReg (leftop, i, BC_IDX) ||
+        aopInReg (AOP (IC_RESULT (ic)), i, DE_IDX) && aopInReg (leftop, i, DE_IDX) ||
+        aopInReg (AOP (IC_RESULT (ic)), i, HL_IDX) && aopInReg (leftop, i, HL_IDX) ||
+        aopInReg (AOP (IC_RESULT (ic)), i, IY_IDX) && aopInReg (leftop, i, IY_IDX)))
+        {
+          PAIR_ID pair = getPairId_o (leftop, i);
+
+          if (!tlbl && !regalloc_dry_run)
+            tlbl = newiTempLabel (0);
+
+          if (!regalloc_dry_run)
+            emit2 ("jp NC, !tlabel", labelKey2num (tlbl->key));
+          regalloc_dry_run_cost += 2; // Use cost of jr as the peephole optimizer can typically optimize this jp into jr. Do not emit jr directly to still allow jump-to-jump optimization.
+          emit2 ("inc %s", _pairs[pair].name);
+          regalloc_dry_run_cost += (1 + (pair == PAIR_IY));
+          i += 2;
+        }
+      // Conditional 8-bit inc.
+      else if (i == size - 1 && started && aopIsLitVal (rightop, i, 1, 0) &&
+        !aopInReg (leftop, i, A_IDX) && // adc a, #0 is cheaper than conditional inc.
+        (leftop->type == AOP_REG && AOP (IC_RESULT (ic))->type == AOP_REG && leftop->aopu.aop_reg[i]->rIdx == AOP (IC_RESULT (ic))->aopu.aop_reg[i]->rIdx &&
+        leftop->aopu.aop_reg[i]->rIdx != IYL_IDX && leftop->aopu.aop_reg[i]->rIdx != IYH_IDX || leftop->type == AOP_STK && leftop == AOP (IC_RESULT (ic))))
+        {
+          if (!tlbl && !regalloc_dry_run)
+            tlbl = newiTempLabel (0);
+
+          if (!regalloc_dry_run)
+            emit2 ("jp NC, !tlabel", labelKey2num (tlbl->key));
+          regalloc_dry_run_cost += 2; // Use cost of jr as the peephole optimizer can typically optimize this jp into jr. Do not emit jr directly to still allow jump-to-jump optimization.
+          emit3_o (A_INC, leftop, i, 0, 0);
           i++;
         }
       else
@@ -5470,6 +5507,9 @@ genPlus (iCode * ic)
     }
 
   _G.preserveCarry = FALSE;
+
+  if (tlbl)
+    emitLabel (tlbl);
 
   for (size = 0; size < 2; size++)
     if (cached[size] != -1)
@@ -11434,7 +11474,7 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
           saved_BC = TRUE;
         }
 
-      setupForMemset (ic, dst, c, direct_c);
+      setupForMemset (ic, dst, c, direct_cl);
 
       emit2 ("ld b, !immedbyte", double_loop ? (size / 2 + size % 2) : size);
       regalloc_dry_run_cost += 2;
@@ -11449,13 +11489,13 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
       if (!regalloc_dry_run)
         {
           emitLabel (tlbl1);
-          emit2 ("ld (hl), %s", aopGet (direct_c ? AOP (c) : ASMOP_A, 0, FALSE));
+          emit2 ("ld (hl), %s", aopGet (direct_cl ? AOP (c) : ASMOP_A, 0, FALSE));
           emit2 ("inc hl");
           if (double_loop)
             {
               if (size % 2)
                 emitLabel (tlbl2);
-              emit2 ("ld (hl), %s", aopGet (direct_c ? AOP (c) : ASMOP_A, 0, FALSE));
+              emit2 ("ld (hl), %s", aopGet (direct_cl ? AOP (c) : ASMOP_A, 0, FALSE));
               emit2 ("inc hl");
             }
           emit2 ("djnz !tlabel", labelKey2num (tlbl1->key));

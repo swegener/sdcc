@@ -21,7 +21,7 @@ int f(long long a)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390 // Enable when ds390 supports long long
+#if !defined(__SDCC_ds390) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Bug #2661.
   if(f(0x48375d8000000000ull) != 1)
     ASSERT(0);
   if (f(0xfc00000000000000ull) != 1024)

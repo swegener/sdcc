@@ -8,6 +8,8 @@
 	  Fix bug #2569.
 	* src/SDCCralloc.hpp:
 	  Change filenames for graphs from register allocation for --dump-graphs.
+	* support/regression/tests/gcc-torture-execute-20141125-1.c:
+	  Disable new test since it fails on 32-bit hosts, bug #2661.
 
 2017-09-30 Philipp Klaus Krause <pkk AT spth.de>
 

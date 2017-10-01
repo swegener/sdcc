@@ -1207,7 +1207,7 @@ static void good_re_root(T_t &T)
 // Dump conflict graph, with numbered nodes, show live variables at each node.
 static void dump_con(const con_t &con)
 {
-  std::ofstream dump_file((std::string(dstFileName) + ".dumpcon" + currFunc->rname + ".dot").c_str());
+  std::ofstream dump_file((std::string(dstFileName) + ".dumpralloccon" + currFunc->rname + ".dot").c_str());
 
   std::string *name = new std::string[num_vertices(con)];
   for (var_t i = 0; static_cast<boost::graph_traits<cfg_t>::vertices_size_type>(i) < boost::num_vertices(con); i++)
@@ -1225,7 +1225,7 @@ static void dump_con(const con_t &con)
 // Dump cfg, with numbered nodes, show live variables at each node.
 static void dump_cfg(const cfg_t &cfg)
 {
-  std::ofstream dump_file((std::string(dstFileName) + ".dumpcfg" + currFunc->rname + ".dot").c_str());
+  std::ofstream dump_file((std::string(dstFileName) + ".dumpralloccfg" + currFunc->rname + ".dot").c_str());
 
   std::string *name = new std::string[num_vertices(cfg)];
   for (unsigned int i = 0; i < boost::num_vertices(cfg); i++)
@@ -1244,7 +1244,7 @@ static void dump_cfg(const cfg_t &cfg)
 // Dump tree decomposition, show bag and live variables at each node.
 static void dump_tree_decomposition(const tree_dec_t &tree_dec)
 {
-  std::ofstream dump_file((std::string(dstFileName) + ".dumpdec" + currFunc->rname + ".dot").c_str());
+  std::ofstream dump_file((std::string(dstFileName) + ".dumprallocdec" + currFunc->rname + ".dot").c_str());
 
   unsigned int w = 0;
 

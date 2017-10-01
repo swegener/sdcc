@@ -6,6 +6,8 @@
 	* src/z80/peep.c,
 	  support/regression/tests/bug-2569.c:
 	  Fix bug #2569.
+	* src/SDCCralloc.hpp:
+	  Change filenames for graphs from register allocation for --dump-graphs.
 
 2017-09-30 Philipp Klaus Krause <pkk AT spth.de>
 

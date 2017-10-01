@@ -29,7 +29,9 @@ bar (void)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && (__GNUC__ < 7))
   if (sizeof (int) > sizeof (char) && bar () != 0)
     ASSERT (0);
   return;
+#endif
 }

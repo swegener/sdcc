@@ -1,3 +1,9 @@
+2017-10-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-pr80501.c,
+	  support/regression/tests/gcc-torture-execute-pr81555.c:
+	  Disable tests for older host compilers.
+
 2017-09-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

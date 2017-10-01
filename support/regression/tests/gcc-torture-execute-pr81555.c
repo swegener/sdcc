@@ -27,8 +27,10 @@ foo (void)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && (__GNUC__ < 7))
   foo ();
   if (f || g != 1)
     ASSERT (0);
   return;
+#endif
 }

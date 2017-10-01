@@ -870,14 +870,18 @@ int z80instructionSize(lineNode *pl)
   /* All ld instructions */
   if(ISINST(pl->line, "ld\t") || ISINST(pl->line, "ld "))
     {
-      /* These 3 are the only cases of 4 byte long ld instructions. */
+      /* These 4 are the only cases of 4 byte long ld instructions. */
       if(!STRNCASECMP(op1start, "ix", 2) || !STRNCASECMP(op1start, "iy", 2))
         return(4);
       if((argCont(op1start, "(ix)") || argCont(op1start, "(iy)")) && op2start[0] == '#')
         return(4);
+
       if(op1start[0] == '('               && STRNCASECMP(op1start, "(bc)", 4) &&
          STRNCASECMP(op1start, "(de)", 4) && STRNCASECMP(op1start, "(hl)", 4) &&
-         STRNCASECMP(op2start, "hl", 2)   && STRNCASECMP(op2start, "a", 1))
+         STRNCASECMP(op2start, "hl", 2)   && STRNCASECMP(op2start, "a", 1) ||
+         op2start[0] == '('               && STRNCASECMP(op2start, "(bc)", 4) &&
+         STRNCASECMP(op1start, "(de)", 4) && STRNCASECMP(op2start, "(hl)", 4) &&
+         STRNCASECMP(op1start, "hl", 2)   && STRNCASECMP(op1start, "a", 1))
         return(4);
 
       if(IS_RAB && !STRNCASECMP(op1start, "hl", 2) && (argCont(op2start, "(hl)") || argCont(op2start, "(iy)")))

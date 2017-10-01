@@ -3,6 +3,9 @@
 	* support/regression/tests/gcc-torture-execute-pr80501.c,
 	  support/regression/tests/gcc-torture-execute-pr81555.c:
 	  Disable tests for older host compilers.
+	* src/z80/peep.c,
+	  support/regression/tests/bug-2569.c:
+	  Fix bug #2569.
 
 2017-09-30 Philipp Klaus Krause <pkk AT spth.de>
 

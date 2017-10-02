@@ -41,7 +41,7 @@ replace restart {
 %1:
 } by {
 	jp	C,%2
-	; peephole 60 removed jp by using inverse jump logic
+	; peephole 3 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -51,7 +51,7 @@ replace restart {
 %1:
 } by {
 	jp	NC,%2
-	; peephole 61 removed jp by using inverse jump logic
+	; peephole 4 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -61,7 +61,7 @@ replace restart {
 %1:
 } by {
 	jp	Z,%2
-	; peephole 62 removed jp by using inverse jump logic
+	; peephole 5 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -71,7 +71,7 @@ replace restart {
 %1:
 } by {
 	jp	NZ,%2
-	; peephole 63 removed jp by using inverse jump logic
+	; peephole 6 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -79,14 +79,14 @@ replace restart {
 	jp	%5
 } by {
 	jp	%6
-	; peephole 64 jumped to %6 directly instead of via %5.
+	; peephole 7 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
 	jp	%1,%5
 } by {
 	jp	%1,%6
-	; peephole 65 jumped to %6 directly instead of via %5.
+	; peephole 8 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
@@ -94,7 +94,7 @@ replace restart {
 %2:
 %1:
 } by {
-   ; peephole 65a' eliminated jump.
+   ; peephole 9 eliminated jump.
 %2:
 %1:
 } if labelRefCountChange(%1 -1)
@@ -104,7 +104,7 @@ replace {
 	ld	d,#0x%2
 } by {
 	ld	de,#0x%2%1
-	; peephole 11 combined constant loads into register pair.
+	; peephole 10 combined constant loads into register pair.
 }
 
 replace {
@@ -112,7 +112,7 @@ replace {
 	ld	h,#0x%2
 } by {
 	ld	hl,#0x%2%1
-	; peephole 12 combined constant loads into register pair.
+	; peephole 11 combined constant loads into register pair.
 }
 
 replace {
@@ -120,7 +120,7 @@ replace {
 	ld	b,#0x%2
 } by {
 	ld	bc,#0x%2%1
-	; peephole 13 combined constant loads into register pair.
+	; peephole 12 combined constant loads into register pair.
 }
 
 replace restart {
@@ -128,7 +128,7 @@ replace restart {
 	ld	a,%1
 } by {
 	ld	%1,a
-	; peephole 14 removed redundant load from %1 into a.
+	; peephole 13 removed redundant load from %1 into a.
 } if notVolatile(%1), notSame(%1 '(hl+)'), notSame(%1 '(hl-)')
 
 replace restart {
@@ -136,7 +136,7 @@ replace restart {
 	ld	%1,a
 } by {
 	ld	a,%1
-	; peephole 15 removed redundant load from a into %1.
+	; peephole 14 removed redundant load from a into %1.
 } if notVolatile(%1), notSame(%1 '(hl+)'), notSame(%1 '(hl-)')
 
 replace restart {
@@ -144,7 +144,7 @@ replace restart {
 	or	a,a
 } by {
 	and	a,%1
-	; peephole 20 removed redundant or after and.
+	; peephole 15 removed redundant or after and.
 }
 
 replace restart {
@@ -152,7 +152,7 @@ replace restart {
 	or	a,a
 } by {
 	xor	a,%1
-	; peephole 21 removed redundant or after xor.
+	; peephole 16 removed redundant or after xor.
 }
 
 replace restart {
@@ -160,7 +160,7 @@ replace restart {
 	and	a,%2
 	ld	%1,a
 } by {
-	; peephole 22 removed redundant load into %1.
+	; peephole 17 removed redundant load into %1.
 	and	a,%2
 	ld	%1,a
 } if notVolatile(%1)
@@ -171,7 +171,7 @@ replace {
 } by {
 	ld	a,%2
 	ld	%1,a
-	; peephole 23 load value in a first and use it next
+	; peephole 18 load value in a first and use it next
 } if notVolatile(%1 %2)
 
 replace restart {
@@ -182,7 +182,7 @@ replace restart {
 } by {
 	ld	%1,%2
 	ld	%3,%4
-	; peephole 24 removed redundant load from %3%1 into %4%2
+	; peephole 19 removed redundant load from %3%1 into %4%2
 } if notVolatile(%1 %2 %3 %4)
 
 replace restart {
@@ -194,7 +194,7 @@ replace restart {
 	ld	a,%1
 	cp	a,%2
 	jp	%3,%4
-	; peephole 33 removed load by replacing sub with cp
+	; peephole 20 removed load by replacing sub with cp
 	assert	a=%1
 } if notVolatile(%1)
 
@@ -206,7 +206,7 @@ replace restart {
 } by {
 	cp	a,#%2
 	jp	%3,%4
-	; peephole 34 removed load by replacing sub with cp
+	; peephole 21 removed load by replacing sub with cp
 	assert	a=%1
 }
 
@@ -222,7 +222,7 @@ replace restart {
 } by {
 	rlca
 	and	a,#0x01
-	; peephole 39 replaced zero load, rla by and since rlca writes the same value to carry bit and least significant bit.
+	; peephole 22 replaced zero load, rla by and since rlca writes the same value to carry bit and least significant bit.
 }
 
 replace restart {
@@ -231,7 +231,7 @@ replace restart {
 	ld	a,%3
 	adc	a,%4
 } by {
-	; peephole 41 removed lower part of multibyte addition.
+	; peephole 23 removed lower part of multibyte addition.
 	ld	%2,a
 	ld	a,%3
 	add	a,%4
@@ -245,7 +245,7 @@ replace restart {
 	or	a,%1
 	jp	NZ,%2
 	ld	%3,a
-	; peephole 45 replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 24 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
@@ -256,7 +256,7 @@ replace restart {
 	and	a,%1
 	jp	NZ,%2
 	ld	%3,a
-	; peephole 46 replaced constant #0x00 by a (which has just been tested to be #0x00).
+	; peephole 25 replaced constant #0x00 by a (which has just been tested to be #0x00).
 }
 
 replace restart {
@@ -266,7 +266,7 @@ replace restart {
 	inc	bc
 } by {
 	ld	bc,#%1 + %2 + 3
-	; peephole 60 moved triple increment of bc to constant.
+	; peephole 26 moved triple increment of bc to constant.
 }
 
 replace restart {
@@ -275,7 +275,7 @@ replace restart {
 	inc	bc
 } by {
 	ld	bc,#%1 + %2 + 2
-	; peephole 61 moved double increment of bc to constant.
+	; peephole 27 moved double increment of bc to constant.
 }
 
 replace restart {
@@ -283,7 +283,7 @@ replace restart {
 	inc	bc
 } by {
 	ld	bc,#%1 + %2 + 1
-	; peephole 62 moved increment of bc to constant.
+	; peephole 28 moved increment of bc to constant.
 }
 
 replace restart {
@@ -296,7 +296,7 @@ replace restart {
 	ld	b,a
 } by {
 	ld	bc,#%1 + 0x%3%2
-	; peephole 63 moved addition of constant 0x%3%2 to bc to constant.
+	; peephole 29 moved addition of constant 0x%3%2 to bc to constant.
 }
 
 replace restart {
@@ -309,7 +309,7 @@ replace restart {
 	ld	b,a
 } by {
 	ld	bc,#%1 + %4 + 0x%3%2
-	; peephole 64 moved addition of constant 0x%3%2 to bc to constant.
+	; peephole 30 moved addition of constant 0x%3%2 to bc to constant.
 }
 
 replace restart {
@@ -317,7 +317,7 @@ replace restart {
 	ret
 } by {
 	jp	%1
-	; peephole 65 replaced call at end of function by jump.
+	; peephole 31 replaced call at end of function by jump.
 }
 
 barrier
@@ -326,7 +326,7 @@ barrier
 replace restart {
 %1:
 } by {
-	; peephole 149 removed unused label %1.
+	; peephole 32 removed unused label %1.
 } if labelRefCount(%1 0)
 
 // Ensure that all rules above see only jp, not jr.

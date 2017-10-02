@@ -3669,6 +3669,8 @@ geniCodeFunctionBody (ast * tree, int lvl)
 
   /* now generate the end proc */
   ic = newiCode (ENDFUNCTION, func, NULL);
+  ic->filename = OP_SYMBOL (func)->fileDef;
+  ic->lineno = OP_SYMBOL (func)->lastLine;
   ic->tree = tree;
   ADDTOCHAIN (ic);
   return;

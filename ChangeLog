@@ -3,6 +3,10 @@
 	* support/regression/tests/cvu_play_music.c,
 	  support/regression/tests/io.c:
 	  Improve coverage of z80 peephole rules.
+	* src/SDCCicode.c:
+	  Improve debug info for ENDFUNCTION iCode, patch by Åke Rehnman.
+	* src/z80/peeph-tlcs90.def:
+	  Remove obsolete tlcs90 peephole rules.
 
 2017-10-01 Philipp Klaus Krause <pkk AT spth.de>
 

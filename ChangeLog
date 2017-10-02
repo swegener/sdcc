@@ -1,3 +1,7 @@
+2017-10-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: fix bug #2662 (omit debug info on dry run)
+
 2017-10-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/cvu_play_music.c,

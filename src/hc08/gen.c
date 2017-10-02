@@ -263,7 +263,7 @@ updateCFA (void)
   if (!currFunc)
     return;
 
-  if (options.debug)
+  if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, hc08_reg_sp, 1 + _G.stackOfs + _G.stackPushes);
 }
 
@@ -4042,7 +4042,7 @@ genFunction (iCode * ic)
 
   _G.stackOfs = 0;
   _G.stackPushes = 0;
-  if (options.debug)
+  if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, hc08_reg_sp, 0);
 
   if (IFFUNC_ISNAKED (ftype))
@@ -4146,7 +4146,7 @@ genEndFunction (iCode * ic)
   if (IFFUNC_ISNAKED (sym->type))
     {
       emitcode (";", "naked function: no epilogue.");
-      if (options.debug && currFunc)
+      if (options.debug && currFunc && !regalloc_dry_run)
         debugFile->writeEndFunction (currFunc, ic, 0);
       return;
     }
@@ -4195,7 +4195,7 @@ genEndFunction (iCode * ic)
 
 
       /* if debug then send end of function */
-      if (options.debug && currFunc)
+      if (options.debug && currFunc && !regalloc_dry_run)
         {
           debugFile->writeEndFunction (currFunc, ic, 1);
         }
@@ -4222,7 +4222,7 @@ genEndFunction (iCode * ic)
         }
 
       /* if debug then send end of function */
-      if (options.debug && currFunc)
+      if (options.debug && currFunc && !regalloc_dry_run)
         {
           debugFile->writeEndFunction (currFunc, ic, 1);
         }
@@ -4324,7 +4324,7 @@ genLabel (iCode * ic)
   if (IC_LABEL (ic) == entryLabel)
     return;
 
-  if (options.debug)
+  if (options.debug && !regalloc_dry_run)
     debugFile->writeLabel (IC_LABEL (ic), ic);
 
   emitLabel (IC_LABEL (ic));
@@ -10756,12 +10756,12 @@ genhc08Code (iCode *lic)
   if (allocInfo && currFunc)
     printAllocInfo (currFunc, codeOutBuf);
   /* if debug information required */
-  if (options.debug && currFunc)
+  if (options.debug && currFunc && !regalloc_dry_run)
     {
       debugFile->writeFunction (currFunc, lic);
     }
 
-  if (options.debug)
+  if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
 
   init_aop_pass();

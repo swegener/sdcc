@@ -89,21 +89,6 @@ replace restart {
 	; peephole 65 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
-// A peephole that makes the code longer. Let's hope it's worth it in speed gain and furhter optimization potential.
-replace restart {
-	ld	a,#0x00
-%1:
-	bit	%2,a
-	jp	Z,%3
-} by {
-	ld	a,#0x00
-	jp	%3
-	; peephole 65a jumped directly to %3 instead of testing a first.
-%1:
-	bit	%2,a
-	jp	Z,%3
-} if labelRefCountChange(%3 +1)
-
 replace restart {
 	jp	%1
 %2:
@@ -113,43 +98,6 @@ replace restart {
 %2:
 %1:
 } if labelRefCountChange(%1 -1)
-
-replace restart {
-	ld	%1, %2
-	jp	%3
-	jp	%4
-} by {
-	ld	%1, %2
-	jp	%3
-	; peephole 65b removed unreachable jump to %3.
-}
-
-replace restart {
-	ld	%1, %2
-	jp	%3
-%3:
-} by {
-	ld	%1, %2
-%3:
-	; peephole 65c removed redundant jump to %3.
-} if labelRefCountChange(%3 -1)
-
-replace restart {
-	ld	%1, #0x01
-	bit	0, %1
-	jp	Z, %2
-} by {
-	ld	%1, #0x01
-	; peephole 65d removed impossible jump to %2.
-} if labelRefCountChange(%2 -1)
-
-replace restart {
-	xor	a,a
-	ld	a,#0x00
-} by {
-	xor	a,a
-	; peephole 10 removed redundant load of 0 into a.
-}
 
 replace {
 	ld	e,#0x%1
@@ -190,36 +138,6 @@ replace restart {
 	ld	a,%1
 	; peephole 15 removed redundant load from a into %1.
 } if notVolatile(%1), notSame(%1 '(hl+)'), notSame(%1 '(hl-)')
-
-replace restart {
-	ld	%2,%3
-	ld	a,%2
-	and	a,%1
-	ld	%2,%4
-} by {
-	ld	a,%3
-	; peephole 16 moved %3 directly into a instead of going through %2.
-	and	a,%1
-	ld	%2,%4
-} if notVolatile(%2), notSame(%1 %2)
-
-replace restart {
-	ld	%1,a
-	xor	a,a
-	or	a,%1
-} by {
-	ld	%1,a
-	or	a,a
-	; peephole 18 used value still in a instead of loading it from %1.
-}
-
-replace restart {
-	or	a,%1
-	or	a,a
-} by {
-	or	a,%1
-	; peephole 19 removed redundant or after or.
-}
 
 replace restart {
 	and	a,%1
@@ -268,98 +186,6 @@ replace restart {
 } if notVolatile(%1 %2 %3 %4)
 
 replace restart {
-	ld	b,%1
-	ld	a,b
-	pop	bc
-} by {
-	ld	a,%1
-	; peephole 25 removed load into b
-	pop	bc
-}
-
-replace restart {
-	ld	c,%1
-	ld	a,c
-	pop	bc
-} by {
-	ld	a,%1
-	; peephole 26 removed load into c
-	pop	bc
-}
-
-replace restart {
-	ld	d,%1
-	ld	a,d
-	pop	de
-} by {
-	ld	a,%1
-	; peephole 27 removed load into d
-	pop	de
-}
-
-replace restart {
-	ld	e,%1
-	ld	a,e
-	pop	de
-} by {
-	ld	a,%1
-	; peephole 28 removed load into e
-	pop	de
-}
-
-replace restart {
-	ld	h,%1
-	ld	a,h
-	pop	hl
-} by {
-	ld	a,%1
-	; peephole 29 removed load into h
-	pop	hl
-}
-
-replace restart {
-	ld	l,%1
-	ld	a,l
-	pop	hl
-} by {
-	ld	a,%1
-	; peephole 30 removed load into l
-	pop	hl
-}
-
-replace restart {
-	ld	a,c
-	push	af
-	inc	sp
-	ld	a,#%2
-	push	af
-	inc	sp
-	call	%3
-} by {
-	ld	b,c
-	ld	c,#%2
-	push	bc
-	; peephole 31 moved and pushed arguments c and #%2 through bc instead of pushing them individually.
-	call	%3
-}
-
-replace restart {
-	ld	a,e
-	push	af
-	inc	sp
-	ld	a,#%2
-	push	af
-	inc	sp
-	call	%3
-} by {
-	ld	d,e
-	ld	e,#%2
-	push	de
-	; peephole 32 moved and pushed arguments e and #%2 through de instead of pushing them individually.
-	call	%3
-}
-
-replace restart {
 	ld	a,%1
 	sub	a,%2
 	jp	%3,%4
@@ -390,60 +216,6 @@ replace restart {
 }
 
 replace restart {
-	sub	a,#0xFF
-	jp	Z,%1
-} by {
-	inc	a
-	; peephole 35 replaced sub a,#0xFF by inc a.
-	jp	Z,%1
-}
-
-replace restart {
-	sub	a,#0xFF
-	jp	NZ,%1
-} by {
-	inc	a
-	; peephole 36 replaced sub a,#0xFF by inc a.
-	jp	NZ,%1
-}
-
-replace restart {
-	ld	bc,#%1 + %2
-	ld	a,c
-	add	a,%3
-	ld	c,a
-	ld	a,b
-	adc	a,%4
-	ld	b,a
-} by {
-	ld	a,#<(%1 + %2)
-	add	a,%3
-	ld	c,a
-	ld	a,#>(%1 + %2)
-	; peephole 37 directly used (%1 + %2) in calculation instead of placing it in bc first.
-	adc	a,%4
-	ld	b,a
-}
-
-replace restart {
-	ld	de,#%1 + %2
-	ld	a,e
-	add	a,%3
-	ld	e,a
-	ld	a,d
-	adc	a,%4
-	ld	d,a
-} by {
-	ld	a,#<(%1 + %2)
-	add	a,%3
-	ld	e,a
-	ld	a,#>(%1 + %2)
-	; peephole 38 directly used (%1 + %2) in calculation instead of placing it in de first.
-	adc	a,%4
-	ld	d,a
-}
-
-replace restart {
 	rlca
 	ld	a,#0x00
 	rla
@@ -451,17 +223,6 @@ replace restart {
 	rlca
 	and	a,#0x01
 	; peephole 39 replaced zero load, rla by and since rlca writes the same value to carry bit and least significant bit.
-}
-
-replace restart {
-	ld	%1,%2
-	push	%1
-	pop	%4
-	ld	%1,%3
-} by {
-	ld	%4,%2
-	; peephole 40 moved %2 directly into de instead of going through %1.
-	ld	%1,%3
 }
 
 replace restart {
@@ -474,55 +235,6 @@ replace restart {
 	ld	%2,a
 	ld	a,%3
 	add	a,%4
-}
-
-replace restart {
-	ld	%1,a
-	ld	a,%2
-	add	a,%1
-	ld	%1,a
-} by {
-	; peephole 42 removed loads by exploiting commutativity of addition.
-	add	a,%2
-	ld	%1,a
-} if notVolatile(%1)
-
-// sdcc does not use the H flag. sla resets it, while add sets it.
-// To ensure that the state of the H flag is not changed by this
-// peephole uncomment the add %3, %4 at the end (since it overwrite the H flag).
-replace restart {
-	ld	%1, a
-	sla	%1
-	ld	a, %2
-	//add	%3, %4
-} by {
-	add	a, a
-	; peephole 42a shifts in accumulator insted of %1
-	ld	%1, a
-	ld	a, %2
-	//add	%3, %4
-}
-
-//replace restart {
-//	ld	%1,a
-//	ld	a,%2
-//	add	a,%1
-//} by {
-//	ld	%1, a
-//	; peephole 43 removed load by exploiting commutativity of addition.
-//	add	a,%2
-//} if notSame(%2 '(bc)' '(de)'), canAssign('b' %2) Conditions are necessary, but canAssign() not implemented for gbz80
-
-replace restart {
-	or	a,%1
-	jp	NZ,%2
-	xor	a,a
-	or	a,%3
-} by {
-	or	a,%1
-	jp	NZ,%2
-	; peephole 44 removed redundant zeroing of a (which has just been tested to be #0x00).
-	or	a,%3
 }
 
 replace restart {
@@ -545,107 +257,6 @@ replace restart {
 	jp	NZ,%2
 	ld	%3,a
 	; peephole 46 replaced constant #0x00 by a (which has just been tested to be #0x00).
-}
-
-replace restart {
-	sub	a,%1
-	jp	NZ,%2
-	ld	%3,#0x00
-} by {
-	sub	a,%1
-	jp	NZ,%2
-	ld	%3,a
-	; peephole 47 replaced constant #0x00 by a (which has just been tested to be #0x00).
-}
-
-replace restart {
-	dec	a
-	jp	NZ,%1
-	ld	%2,#0x00
-} by {
-	dec	a
-	jp	NZ,%1
-	ld	%2,a
-	; peephole 48 replaced constant #0x00 by a (which has just been tested to be #0x00).
-}
-
-replace restart {
-	or	a,%1
-	jp	NZ,%2
-	push	%3
-	ld	%4,#0x00
-} by {
-	or	a,%1
-	jp	NZ,%2
-	push	%3
-	ld	%4,a
-	; peephole 53 replaced constant #0x00 by a (which has just been tested to be #0x00).
-}
-
-replace restart {
-	and	a,%1
-	jp	NZ,%2
-	push	%3
-	ld	%4,#0x00
-} by {
-	sub	a,%1
-	jp	NZ,%2
-	push	%3
-	ld	%4,a
-	; peephole 54 replaced constant #0x00 by a (which has just been tested to be #0x00).
-}
-
-replace restart {
-	sub	a,%1
-	jp	NZ,%2
-	push	%3
-	ld	%4,#0x00
-} by {
-	sub	a,%1
-	jp	NZ,%2
-	push	%3
-	ld	%4,a
-	; peephole 55 replaced constant #0x00 by a (which has just been tested to be #0x00).
-}
-
-replace restart {
-	dec	a
-	jp	NZ,%1
-	push	%2
-	ld	%3,#0x00
-} by {
-	dec	a
-	jp	NZ,%1
-	push	%2
-	ld	%3,a
-	; peephole 56 replaced constant #0x00 by a (which has just been tested to be #0x00).
-}
-
-replace restart {
-	ld	de,#%1 + %2
-	inc	de
-	inc	de
-	inc	de
-} by {
-	ld	de,#%1 + %2 + 3
-	; peephole 57 moved triple increment of de to constant.
-}
-
-replace restart {
-	ld	de,#%1 + %2
-	inc	de
-	inc	de
-} by {
-	ld	de,#%1 + %2 + 2
-	; peephole 58 moved double increment of de to constant.
-}
-
-replace restart {
-	ld	de,#%1 + %2
-	inc	de
-} by {
-	ld	de,#%1 + %2 + 1
-	; peephole 59 moved increment of de to constant.
 }
 
 replace restart {
@@ -707,17 +318,6 @@ replace restart {
 } by {
 	jp	%1
 	; peephole 65 replaced call at end of function by jump.
-}
-
-// Callee saves ix.
-replace restart {
-	call	%1
-	pop	ix
-	ret
-} by {
-	pop	ix
-	jp	%1
-	; peephole 66 replaced call at end of function by jump moving call beyond pop ix.
 }
 
 barrier

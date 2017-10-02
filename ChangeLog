@@ -7,6 +7,8 @@
 	  Improve debug info for ENDFUNCTION iCode, patch by Åke Rehnman.
 	* src/z80/peeph-tlcs90.def:
 	  Remove obsolete tlcs90 peephole rules.
+	* src/z80/peeph-gbz80.def:
+	  Remove obsolete gbz80 peephole rules.
 
 2017-10-01 Philipp Klaus Krause <pkk AT spth.de>
 

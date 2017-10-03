@@ -30,7 +30,7 @@ extern "C"
   #include "gen.h"
   unsigned char dryhc08iCode (iCode *ic);
   bool hc08_assignment_optimal;
-};
+}
 
 #define REG_A 0
 #define REG_X 1

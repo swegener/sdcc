@@ -1,3 +1,8 @@
+2017-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp:
+	  Make source compilable with MSVC++ 2015.
+
 2017-10-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: fix bug #2662 (omit debug info on dry run)

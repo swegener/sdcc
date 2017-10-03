@@ -31,7 +31,7 @@ extern "C"
   bool stm8_assignment_optimal;
   long int stm8_call_stack_size;
   bool stm8_extend_stack;
-};
+}
 
 #define REG_A 0
 #define REG_XL 1

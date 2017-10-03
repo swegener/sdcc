@@ -588,12 +588,12 @@ void assignments_introduce_instruction(assignment_list_t &alist, unsigned short 
 {
   assignment_list_t::iterator ai, ai_end;
 
-#if 1 // Efficient code - reduces total SDCC runtime by about 5.5% vs. code below
+#if !defined(_MSC_VER) // Efficient code - reduces total SDCC runtime by about 5.5% vs. code below, but doesn't work with MSVC++ (at least up to MSVC++ 2015)
   struct inserter_t
     {
       explicit inserter_t(const std::vector<reg_t>& g, i_assignment_t& a) : global(g), ia(a)
         {
-	}	
+	}
       inserter_t& operator=(var_t v)
         {
           if (global[v] >= 0)

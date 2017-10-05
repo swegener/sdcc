@@ -1502,6 +1502,7 @@ strVal (const char *s)
   if (s[0] == '"') // UTF-8 string literal (any prefix u8 or L in the source would already have been stripped by earlier stages)
     {
       SPEC_NOUN (val->etype) = V_CHAR;
+      SPEC_USIGN (val->etype) = !options.signed_char;
       SPEC_CVAL (val->etype).v_char = utf_8;
       DCL_ELEM (val->type) = utf_8_size;
     }

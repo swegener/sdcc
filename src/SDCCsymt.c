@@ -2515,7 +2515,11 @@ comparePtrType (sym_link *dest, sym_link *src, bool bMustCast)
   if ((IS_VOID (src->next) && !IS_VOID (dest->next)) || (!IS_VOID (src->next) && IS_VOID (dest->next)))
     return -1;
   res = compareType (dest->next, src->next);
-  if (res == 1)
+
+  /* All function pointers can be cast (6.6 in the ISO C11 standard) TODO: What about address spaces? */
+  if (res == 0 && !bMustCast && IS_DECL (src) && IS_FUNC (src->next) && IS_DECL (dest) && IS_FUNC (dest->next))
+    return -1;
+  else if (res == 1)
     return bMustCast ? -1 : 1;
   else if (res == -2)
     return bMustCast ? -1 : -2;

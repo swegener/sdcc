@@ -1,3 +1,12 @@
+2017-10-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCval.c,
+	  support/regression/tests/generic.c:
+	  Fix string literal signedness to match char.
+	* src/SDCCsymt.c,
+	  support/regression/tests/bug-2663.c:
+	  Partial fix for bug #2663.
+
 2017-10-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp:

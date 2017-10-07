@@ -7268,12 +7268,12 @@ expandInlineFuncs (ast * tree, ast * block)
 /*                      except for the function body.         */
 /*------------------------------------------------------------*/
 symbol *
-createFunctionDecl (symbol *name)
+createFunctionDecl (symbol * name)
 {
   symbol *csym;
   value *args;
   sym_link *type;
-fprintf(stderr, "createFunctionDecl() for %s\n", name->name);
+
   /* if check function return 0 then some problem */
   if (checkFunction (name, NULL) == 0)
     return NULL;

@@ -376,7 +376,7 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
 /* initValPointer - pointer initialization code massaging          */
 /*-----------------------------------------------------------------*/
 value *
-initValPointer (ast * expr)
+initValPointer (ast *expr)
 {
   value *val;
 
@@ -524,7 +524,7 @@ initValPointer (ast * expr)
 /* initPointer - pointer initialization code massaging             */
 /*-----------------------------------------------------------------*/
 value *
-initPointer (initList * ilist, sym_link * toType, int showError)
+initPointer (initList *ilist, sym_link *toType, int showError)
 {
   value *val;
   ast *expr;
@@ -537,7 +537,11 @@ initPointer (initList * ilist, sym_link * toType, int showError)
   expr = list2expr (ilist);
 
   if (!expr)
-    goto wrong;
+    {
+      if (showError)
+        werror (E_CONST_EXPECTED);
+      return 0;
+    }
 
   /* try it the old way first */
   if ((val = constExprValue (expr, FALSE)))
@@ -556,7 +560,7 @@ initPointer (initList * ilist, sym_link * toType, int showError)
   /* (char *)(expr1) */
   if (IS_CAST_OP (expr))
     {
-      if (compareType (toType, expr->left->ftype) == 0)
+      if (compareType (toType, expr->left->ftype) == 0 && showError)
         {
           werror (W_INIT_WRONG);
           printFromToType (expr->left->ftype, toType);
@@ -579,16 +583,14 @@ initPointer (initList * ilist, sym_link * toType, int showError)
   if (val)
     return val;
 
-wrong:
   if (showError)
     {
       if (expr)
-        werrorfl (expr->filename, expr->lineno, E_INCOMPAT_PTYPES);
+        werrorfl (expr->filename, expr->lineno, E_CONST_EXPECTED);
       else
-        werror (E_INCOMPAT_PTYPES);
-      printFromToType (expr->left->ftype, toType);
+        werror (E_CONST_EXPECTED);
     }
-  return NULL;
+  return 0;
 }
 
 /*-----------------------------------------------------------------*/

@@ -1,3 +1,8 @@
+2017-10-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* https://sourceforge.net/p/sdcc/bugs/2641/:
+	  Fix bug #2641.
+
 2017-10-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCval.c,

@@ -6,6 +6,9 @@
 	  src/SDCCerr.h,
 	  src/SDCCerr.c:
 	  Improve error reporting for conflicting function declarations.
+	* src/SDCCast.c,
+	  support/regression,tests/bug-2556.c:
+	  Fix bug #2556.
 
 2017-10-07 Philipp Klaus Krause <pkk AT spth.de>
 

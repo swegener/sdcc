@@ -7268,11 +7268,17 @@ expandInlineFuncs (ast * tree, ast * block)
 /*                      except for the function body.         */
 /*------------------------------------------------------------*/
 symbol *
-createFunctionDecl (symbol * name)
+createFunctionDecl (symbol *name)
 {
   symbol *csym;
   value *args;
   sym_link *type;
+
+  /* This change would be done by addSymChain() below anyway.
+     But we need to do it here to avoid checkFunction() to report
+     a mismatch with an earlier declaration (that already underwent the change).
+     Fixed bug #2556. */
+  changePointer (name->type);
 
   /* if check function return 0 then some problem */
   if (checkFunction (name, NULL) == 0)

@@ -3055,27 +3055,23 @@ checkFunction (symbol * sym, symbol * csym)
   /* check the return value type   */
   if (compareType (csym->type, sym->type) <= 0)
     {
-      werror (E_PREV_DEF_CONFLICT, csym->name, "type");
+      werror (E_PREV_DECL_CONFLICT, csym->name, "type", csym->fileDef, csym->lineDef);
       printFromToType (csym->type, sym->type);
       return 0;
     }
 
   if (FUNC_ISISR (csym->type) != FUNC_ISISR (sym->type))
-    {
-      werror (E_PREV_DEF_CONFLICT, csym->name, "interrupt");
-    }
+    werror (E_PREV_DECL_CONFLICT, csym->name, "interrupt", csym->fileDef, csym->lineDef);
 
   /* I don't think this is necessary for interrupts. An isr is a  */
   /* root in the calling tree.                                    */
   if ((FUNC_REGBANK (csym->type) != FUNC_REGBANK (sym->type)) && (!FUNC_ISISR (sym->type)))
-    {
-      werror (E_PREV_DEF_CONFLICT, csym->name, "using");
-    }
+    werror (E_PREV_DECL_CONFLICT, csym->name, "using", csym->fileDef, csym->lineDef);
 
   if (IFFUNC_ISNAKED (csym->type) != IFFUNC_ISNAKED (sym->type))
     {
 // disabled since __naked has no influence on the calling convention
-//      werror (E_PREV_DEF_CONFLICT, csym->name, "__naked");
+//      werror (E_PREV_DECL_CONFLICT, csym->name, "__naked", csym->fileDef, csym->lineDef);
       FUNC_ISNAKED (sym->type) = 1;
     }
 
@@ -3103,22 +3099,18 @@ checkFunction (symbol * sym, symbol * csym)
   /* Really, reentrant should match regardless of argCnt, but     */
   /* this breaks some existing code (the fp lib functions). If    */
   /* the first argument is always passed the same way, this       */
-  /* lax checking is ok (but may not be true for in future ports) */
+  /* lax checking is ok (but may not be true for in future backends) */
   if (IFFUNC_ISREENT (csym->type) != IFFUNC_ISREENT (sym->type) && argCnt > 1)
     {
       //printf("argCnt = %d\n",argCnt);
-      werror (E_PREV_DEF_CONFLICT, csym->name, "reentrant");
+      werror (E_PREV_DECL_CONFLICT, csym->name, "reentrant", csym->fileDef, csym->lineDef);
     }
 
   if (IFFUNC_ISWPARAM (csym->type) != IFFUNC_ISWPARAM (sym->type))
-    {
-      werror (E_PREV_DEF_CONFLICT, csym->name, "wparam");
-    }
+    werror (E_PREV_DECL_CONFLICT, csym->name, "wparam", csym->fileDef, csym->lineDef);
 
   if (IFFUNC_ISSHADOWREGS (csym->type) != IFFUNC_ISSHADOWREGS (sym->type))
-    {
-      werror (E_PREV_DEF_CONFLICT, csym->name, "shadowregs");
-    }
+    werror (E_PREV_DECL_CONFLICT, csym->name, "shadowregs", csym->fileDef, csym->lineDef);
 
   /* compare expected args with actual args */
   exargs = FUNC_ARGS (csym->type);

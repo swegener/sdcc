@@ -2,6 +2,10 @@
 
 	* support/regression/tests/bug-2663.c:
 	  Disable new function pointer test for ds390.
+	* src/SDCCsymt.c,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c:
+	  Improve error reporting for conflicting function declarations.
 
 2017-10-07 Philipp Klaus Krause <pkk AT spth.de>
 

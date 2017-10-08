@@ -3217,8 +3217,8 @@ valForCastAggr (ast * aexpr, sym_link * type, ast * cnst, int op)
 }
 
 /*-----------------------------------------------------------------*/
-/* valForCastAggr - will return value for a cast of an aggregate   */
-/*                  with no constant                               */
+/* valForCastArr - will return value for a cast of an aggregate    */
+/*                 with no constant                                */
 /*-----------------------------------------------------------------*/
 value *
 valForCastArr (ast * aexpr, sym_link * type)

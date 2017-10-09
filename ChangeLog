@@ -1,3 +1,11 @@
+2017-10-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/_divuchar.c,
+	  device/lib/_moduchar.c,
+	  device/lib/_muluchar.c,
+	  src/SDCCsymt.c:
+	  Generic support routine infrastructure.
+
 2017-10-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2663.c:

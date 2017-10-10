@@ -2,6 +2,8 @@
 
 	* src/SDCCralloc.hpp:
 	  Fix bug #2667.
+	* support/regression/tests/gcc-torture-execute-pr68532.c:
+	  Disable test for medium model.
 
 2017-10-10 Ben Shi <powerstudio1st AT 163 DOT com>
 	* src/mcs51/gen.c:

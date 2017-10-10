@@ -1207,6 +1207,9 @@ static void good_re_root(T_t &T)
 // Dump conflict graph, with numbered nodes, show live variables at each node.
 static void dump_con(const con_t &con)
 {
+  if (!currFunc)
+    return;
+
   std::ofstream dump_file((std::string(dstFileName) + ".dumpralloccon" + currFunc->rname + ".dot").c_str());
 
   std::string *name = new std::string[num_vertices(con)];
@@ -1225,6 +1228,9 @@ static void dump_con(const con_t &con)
 // Dump cfg, with numbered nodes, show live variables at each node.
 static void dump_cfg(const cfg_t &cfg)
 {
+  if (!currFunc)
+    return;
+
   std::ofstream dump_file((std::string(dstFileName) + ".dumpralloccfg" + currFunc->rname + ".dot").c_str());
 
   std::string *name = new std::string[num_vertices(cfg)];
@@ -1244,6 +1250,9 @@ static void dump_cfg(const cfg_t &cfg)
 // Dump tree decomposition, show bag and live variables at each node.
 static void dump_tree_decomposition(const tree_dec_t &tree_dec)
 {
+  if (!currFunc)
+    return;
+
   std::ofstream dump_file((std::string(dstFileName) + ".dumprallocdec" + currFunc->rname + ".dot").c_str());
 
   unsigned int w = 0;

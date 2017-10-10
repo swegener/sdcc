@@ -154,14 +154,14 @@ replace {
 	mov	%5,a
 	mov	%6,#0x00
 } by {
-	clr a
-	mov %1,a
-	mov %2,a
-	mov %3,a
-	mov %4,a
-	mov %5,a
+	clr	a
+	mov	%1,a
+	mov	%2,a
+	mov	%3,a
+	mov	%4,a
+	mov	%5,a
 	;	Peephole 3.k	changed mov %6,#0x00 to ...,a
-	mov %6,a
+	mov	%6,a
 }
 
 replace {
@@ -543,7 +543,7 @@ replace {
 	cjne	%11,%12,%3
 	cpl	a
 %3:
-	jnz %4
+	jnz	%4
 } by {
 	;	Peephole 115.d	jump optimization (acc not set)
 	cjne	%1,%2,%3
@@ -605,7 +605,7 @@ replace {
 	cjne	%12,%13,%3
 	clr	a
 %3:
-	jnz  %4
+	jnz	%4
 } by {
 	;	Peephole 115.h	jump optimization (acc not set)
 	cjne	%1,%2,%4
@@ -2024,7 +2024,7 @@ replace {
 } if labelInRange(%8), labelRefCount(%3 2), labelRefCountChange(%3 -2), labelRefCountChange(%8 1)
 
 replace {
-	cjne	 @%1,%2,%3
+	cjne	@%1,%2,%3
 	inc	%1
 	cjne	@%1,%6,%3
 	sjmp	%7

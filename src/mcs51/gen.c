@@ -4487,7 +4487,10 @@ genRet (iCode * ic)
             {
               const char *l = aopGet (IC_LEFT (ic), offset, FALSE, FALSE);
               if (!EQ (fReturn[offset], l))
-                emitcode ("mov", "%s,%s", fReturn[offset], l);
+                if (fReturn[offset][0] == 'r' && AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+                  emitcode ("mov", "%s,a%s", fReturn[offset], l); // use regsiter's direct address instead of name
+                else
+                  emitcode ("mov", "%s,%s", fReturn[offset], l);
               if (size && !strcmp(fReturn[offset], "a") && aopGetUsesAcc (IC_LEFT (ic), offset+1))
                 {
                   emitpush ("acc");

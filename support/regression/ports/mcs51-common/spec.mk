@@ -30,7 +30,7 @@ else
 endif
 
 SDCCFLAGS += --less-pedantic
-LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib
+LINKFLAGS += mcs51.lib libsdcc.lib liblong.lib libint.lib libfloat.lib liblonglong.lib
 
 OBJEXT = .rel
 BINEXT = .ihx

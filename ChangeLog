@@ -25,6 +25,15 @@
 	  support/regression/tests/gcc-torture-execute-pr78791.c,
 	  support/regression/tests/gcc-torture-execute-pr81556.c:
 	  Enable mcs51 tests that pass for me now.
+	* device/lib/hc08/Makefile.in,
+	  device/lib/hc08/_divuint.c,
+	  device/lib/hc08/_divulong.c,
+	  device/lib/hc08/_mullong.c,
+	  device/lib/hc08/Makefile.in,
+	  device/lib/hc08/_divuint.c,
+	  device/lib/hc08/_divulong.c,
+	  device/lib/hc08/_mullong.c:
+	  Replace some backend-specific functions in hc08 and s08 libraries by generic ones.
 
 2017-10-10 Philipp Klaus Krause <pkk AT spth.de>
 

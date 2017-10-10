@@ -1,5 +1,33 @@
 2017-10-10 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/gcc-torture-execute-20001108-1.c,
+	  support/regression/tests/gcc-torture-execute-20020201-1.c,
+	  support/regression/tests/gcc-torture-execute-20020226-1.c,
+	  support/regression/tests/gcc-torture-execute-20060110-1.c,
+	  support/regression/tests/gcc-torture-execute-20060110-2.c,
+	  support/regression/tests/gcc-torture-execute-20060127-1.c,
+	  support/regression/tests/gcc-torture-execute-20071030-1.c,
+	  support/regression/tests/gcc-torture-execute-20080529-1.c,
+	  support/regression/tests/gcc-torture-execute-20101013-1.c,
+	  support/regression/tests/gcc-torture-execute-20120817-1.c,
+	  support/regression/tests/gcc-torture-execute-920604-1.c,
+	  support/regression/tests/gcc-torture-execute-920829-1.c,
+	  support/regression/tests/gcc-torture-execute-920922-1.c,
+	  support/regression/tests/gcc-torture-execute-930702-1.c,
+	  support/regression/tests/gcc-torture-execute-950511-1.c,
+	  support/regression/tests/gcc-torture-execute-950612-1.c,
+	  support/regression/tests/gcc-torture-execute-950915-1.c,
+	  support/regression/tests/gcc-torture-execute-961213-1.c,
+	  support/regression/tests/gcc-torture-execute-990513-1.c,
+	  support/regression/tests/gcc-torture-execute-pr19606.c,
+	  support/regression/tests/gcc-torture-execute-pr47538.c,
+	  support/regression/tests/gcc-torture-execute-pr65170.c,
+	  support/regression/tests/gcc-torture-execute-pr78791.c,
+	  support/regression/tests/gcc-torture-execute-pr81556.c:
+	  Enable mcs51 tests that pass for me now.
+
+2017-10-10 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCralloc.hpp:
 	  Fix bug #2667.
 	* support/regression/tests/gcc-torture-execute-pr68532.c:

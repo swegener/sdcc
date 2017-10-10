@@ -8,7 +8,6 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51)
 #include <string.h>
 
 void foo (int *BM_tab, int j)
@@ -25,7 +24,6 @@ void foo (int *BM_tab, int j)
       *--BM_tab = j;
     }
 }
-#endif
 
 void
 testTortureExecute (void)

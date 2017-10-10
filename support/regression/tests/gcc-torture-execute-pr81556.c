@@ -18,22 +18,18 @@ unsigned long long int e = 0xf27771784749f32bULL;
 void
 foo (void)
 {
-#ifndef __SDCC_mcs51
   _Bool a = d > 1;
   g = f % ((d > 1) << 9);
   h = a & (e & (a & b & c));
-#endif
 }
 #endif
 void
 testTortureExecute (void)
 {
 #ifndef __SDCC_ds390
-#ifndef __SDCC_mcs51
   foo ();
   if (g != 1 || h != 0)
     ASSERT (0);
   return;
-#endif
 #endif
 }

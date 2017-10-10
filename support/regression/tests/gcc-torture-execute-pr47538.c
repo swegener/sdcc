@@ -9,7 +9,6 @@
 #pragma disable_warning 93
 #endif
 
-#ifndef SDCC_mcs51
 #include <string.h>
 
 /* PR tree-optimization/47538 */
@@ -52,12 +51,11 @@ foo (struct S *x, const struct S *y)
       x->c[0] = 2.0 * o;
     }
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !(defined __SDCC_mcs51)
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL))
   struct S x, y;
   double c[4] = { 10, 20, 30, 40 }, d[4], e[4] = { 118, 118, 118, 118 };
 

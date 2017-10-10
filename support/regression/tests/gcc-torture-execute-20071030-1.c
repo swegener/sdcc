@@ -50,7 +50,6 @@ typedef struct client_s
         client_frame_t frames[64];
 } client_t;
 
-#if !defined(__SDCC_mcs51)
 int CalcPing (client_t *cl)
 {
         float ping;
@@ -73,7 +72,6 @@ int CalcPing (client_t *cl)
 
         return ping * 1000;
 }
-#endif
 
 void testTortureExecute(void)
 {

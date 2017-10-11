@@ -1,6 +1,11 @@
 2017-10-11 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/mcs51/peeph.def:
+	  Fix potential bugs in a serial of rules (241a-241h) by adding check of labelRefCount().
+
+2017-10-11 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/mcs51/peeph.def:
 	  Add two optimization rules for long long comparison.
 
 2017-10-10 Philipp Klaus Krause <pkk AT spth.de>

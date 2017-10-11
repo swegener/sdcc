@@ -182,29 +182,12 @@ replace {
 }
 
 replace {
-	lda	%1,s
-	tsta
-} by {
-	; Peephole 4b	- eliminated redundant tsta
-	lda	%1,s
-}
-
-replace {
 	ldx	%1
 	tstx
 } by {
 	; Peephole 4c	- eliminated redundant tstx
 	ldx	%1
 }
-
-replace {
-	ldx	%1,s
-	tstx
-} by {
-	; Peephole 4d	- eliminated redundant tstx
-	ldx	%1,s
-}
-
 
 replace {
 	jmp	%5
@@ -219,34 +202,6 @@ replace {
 	; Peephole 6b  - replaced jmp to rts with rts
 	rts
 } if optimizeReturn(), labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
-
-replace restart {
-	psha
-	lda	%1
-	sta	1,s
-} by {
-	; Peephole 7  - optimized stack allocation
-	lda	%1
-	psha
-}
-
-// These two have been disabled, since the check for volatile doesn't work: notVolatile checks if %1 is volatile, however we need to know if (%1) is volatile.
-
-//replace restart {
-//	lda	%1
-//	sta	%1
-//} by {
-//	; Peephole 8a  - removed redundant sta
-//	lda	%1
-//} if notVolatile %1
-
-//replace restart {
-//	sta	%1
-//	lda	%1
-//} by {
-//	; Peephole 8b  - removed redundant lda
-//	sta	%1
-//} if notVolatile %1
 
 replace {
         bne     %1
@@ -296,38 +251,6 @@ replace {
 } by {
 	; Peephole 10b   - combined cmp/beq
 	cbeq	*%2,%1
-}
-
-replace {
-	cmp	%2,s
-	beq	%1
-} by {
-	; Peephole 10c   - combined cmp/beq
-	cbeq	%2,s,%1
-}
-
-replace {
-        deca
-        bne     %1
-} by {
-        ; Peephole 11a   - combined deca/bne
-        dbnza   %1
-}
-
-replace {
-        decx
-        bne     %1
-} by {
-        ; Peephole 11b   - combined decx/bne
-        dbnzx   %1
-}
-
-replace {
-        dec     *%2
-        bne     %1
-} by {
-        ; Peephole 10c   - combined dec/bne
-        dbnz    *%2,%1
 }
 
 replace {

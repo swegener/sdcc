@@ -2797,7 +2797,37 @@ replace restart {
 	addc	a,%1
 }
 
-// peepholes 241.a to 241.d and 241.e to 241.h need to be in order
+// peepholes 241.a0 to 241.d and 241.e0 to 241.h need to be in order
+replace {
+	cjne	r%2,#%3,%0
+	cjne	r%4,#%5,%0
+	cjne	r%6,#%7,%0
+	cjne	r%8,#%9,%0
+	cjne	r%10,#%11,%0
+	cjne	r%12,#%13,%0
+	cjne	r%14,#%15,%0
+	cjne	r%16,#%17,%0
+	mov	a,#0x01
+	sjmp	%1
+%0:
+	clr	a
+%1:
+} by {
+	;	Peephole 241.a0	optimized compare
+	clr	a
+	cjne	r%2,#%3,%0
+	cjne	r%4,#%5,%0
+	cjne	r%6,#%7,%0
+	cjne	r%8,#%9,%0
+	cjne	r%10,#%11,%0
+	cjne	r%12,#%13,%0
+	cjne	r%14,#%15,%0
+	cjne	r%16,#%17,%0
+	inc	a
+%0:
+%1:
+} if labelRefCountChange(%1 -1)
+
 replace {
 	cjne	r%2,#%3,%0
 	cjne	r%4,#%5,%0
@@ -2876,6 +2906,52 @@ replace {
 %0:
 %1:
 } if labelRefCountChange(%1 -1)
+
+// applies to f.e. j = (k!=0x1000);
+// with volatile idata long long k;
+replace {
+	cjne	@r%0,#%3,%1
+	inc	r%0
+	cjne	@r%0,#%4,%1
+	inc	r%0
+	cjne	@r%0,#%5,%1
+	inc	r%0
+	cjne	@r%0,#%6,%1
+	inc	r%0
+	cjne	@r%0,#%7,%1
+	inc	r%0
+	cjne	@r%0,#%8,%1
+	inc	r%0
+	cjne	@r%0,#%9,%1
+	inc	r%0
+	cjne	@r%0,#%10,%1
+	mov	a,#0x01
+	sjmp	%2
+%1:
+	clr	a
+%2:
+} by {
+	;	Peephole 241.e0	optimized compare
+	clr	a
+	cjne	@r%0,#%3,%1
+	inc	r%0
+	cjne	@r%0,#%4,%1
+	inc	r%0
+	cjne	@r%0,#%5,%1
+	inc	r%0
+	cjne	@r%0,#%6,%1
+	inc	r%0
+	cjne	@r%0,#%7,%1
+	inc	r%0
+	cjne	@r%0,#%8,%1
+	inc	r%0
+	cjne	@r%0,#%9,%1
+	inc	r%0
+	cjne	@r%0,#%10,%1
+	inc	a
+%1:
+%2:
+} if labelRefCountChange(%2 -1)
 
 // applies to f.e. j = (k!=0x1000);
 // with volatile idata long k;

@@ -1,5 +1,11 @@
 2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/gcc-torture-execute-920922-1.c,
+	  support/regression/tests/gcc-torture-execute-950612-1.c:
+	  Disable tests that fail due to bug #2669.
+
+2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/peeph.def:
 	  Renumber peephole rules.
 

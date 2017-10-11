@@ -38,6 +38,7 @@ void
 testTortureExecute (void)
 {
 #if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) // Bug #2669
   int i;
   for (i = 0; i <= 10; i++)
     {
@@ -59,6 +60,7 @@ testTortureExecute (void)
 	ASSERT (0);
     }
   return;
+#endif
 #endif
 }
 

@@ -1,5 +1,10 @@
 2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/peeph.def:
+	  Remove obsolete peephole rules.
+
+2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/hc08/peeph.def:
 	  Renumber peephole rules.
 

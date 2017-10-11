@@ -15,21 +15,9 @@ replace restart {
 } if notVolatile(%1), notUsed(%1), notUsed('n'), notUsed('z')
 
 replace restart {
-	and	a, %1
-} by {
-	; peephole 0c removed dead and.
-} if notVolatile(%1), notUsed('a'), notUsed('n'), notUsed('z')
-
-replace restart {
 	or	a, %1
 } by {
 	; peephole 0d removed dead or.
-} if notVolatile(%1), notUsed('a'), notUsed('n'), notUsed('z')
-
-replace restart {
-	xor	a, %1
-} by {
-	; peephole 0e removed dead xor.
 } if notVolatile(%1), notUsed('a'), notUsed('n'), notUsed('z')
 
 replace restart {
@@ -60,14 +48,6 @@ replace restart {
 	; peephole 1w removed redundant load from %1 into %2.
 } if notVolatile(%1), notVolatile(%2)
 
-//replace restart {
-//	ld	%1, %2
-//	ld	%3, %1
-//} by {
-//	; peephole 1b loaded %3 from %2 directly instead of going through %1.
-//	ld	%3, %2
-//} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
-
 replace restart {
 	ld	%1, a
 	exg	a, %1
@@ -88,14 +68,6 @@ replace restart {
 	pushw	%1
 } by {
 	; peephole 3 removed dead popw / pushw pair.
-} if notUsed(%1)
-
-replace restart {
-	addw	%1, #%2
-	ldw	(%1), a
-} by {
-	; peephole 3a moved addition of offset into storage instruction
-	ldw	(%2, %1), a
 } if notUsed(%1)
 
 replace restart {
@@ -135,34 +107,6 @@ replace restart {
 	; peephole 3e eliminated load using commutativity of addition
 	addw	x, (%2, sp)
 }
-
-replace restart {
-	ld	a, (%1, y)
-	push	a
-	ld	a, (%2, x)
-	ld	(%3, sp), a
-	pop	a
-} by {
-	ld	a, (%2, x)
-	ld	(%3, sp), a
-	ld	a, (%1, y)
-	; peephole 4 changed order of memory accesses to avoid pushing a.
-}
-// TODO: Check for volatile (can't do it if both (%1, y) and (%2, x) are volatile)!
-
-replace restart {
-	ld	a, (%1, y)
-	push	a
-	ld	a, (x)
-	ld	(%3, sp), a
-	pop	a
-} by {
-	ld	a, (x)
-	ld	(%3, sp), a
-	ld	a, (%1, y)
-	; peephole 5 changed order of memory accesses to avoid pushing a.
-}
-// TODO: Check for volatile (can't do it if both (%1, y) and (%2, x) are volatile)!
 
 replace restart {
 	ldw	%1, (%2, sp)
@@ -221,98 +165,6 @@ replace restart {
 	rrc	(x)
 	; peephole 9 set msb in carry instead of a.
 } if notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	%5	a, #%4
-	ldw	%1, #%2
-} by {
-	ldw	%1, #%2
-	ld	a, (%1)
-	%5	a, #%4
-	; peephole 10 removed redundant load of #%2 into %1
-}
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	or	a, #0x01
-	ld	(%1), a
-} by {
-	bset	%2, #0
-	; peephole 11-0 replaced or by bset.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	or	a, #0x02
-	ld	(%1), a
-} by {
-	bset	%2, #1
-	; peephole 11-1 replaced or by bset.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	or	a, #0x04
-	ld	(%1), a
-} by {
-	bset	%2, #2
-	; peephole 11-2 replaced or by bset.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	or	a, #0x08
-	ld	(%1), a
-} by {
-	bset	%2, #3
-	; peephole 11-3 replaced or by bset.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	or	a, #0x10
-	ld	(%1), a
-} by {
-	bset	%2, #4
-	; peephole 11-4 replaced or by bset.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	or	a, #0x20
-	ld	(%1), a
-} by {
-	bset	%2, #5
-	; peephole 11-5 replaced or by bset.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	or	a, #0x40
-	ld	(%1), a
-} by {
-	bset	%2, #6
-	; peephole 11-6 replaced or by bset.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	or	a, #0x80
-	ld	(%1), a
-} by {
-	bset	%2, #7
-	; peephole 11-7 replaced or by bset.
-} if notUsed(%1), notUsed('a')
 
 replace restart {
 	ld	a, %1
@@ -385,86 +237,6 @@ replace restart {
 	bset	%2, #7
 	; peephole 11-15 replaced or by bset.
 } if notUsed('a'), operandsLiteral(%1), immdInRange(0 65535 '+' 0 %1 %2)
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	and	a, #0xfe
-	ld	(%1), a
-} by {
-	bres	%2, #0
-	; peephole 11-16 replaced and by bres.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	and	a, #0xfd
-	ld	(%1), a
-} by {
-	bres	%2, #1
-	; peephole 11-17 replaced and by bres.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	and	a, #0xfb
-	ld	(%1), a
-} by {
-	bres	%2, #2
-	; peephole 11-18 replaced and by bres.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	and	a, #0xf7
-	ld	(%1), a
-} by {
-	bres	%2, #3
-	; peephole 11-19 replaced and by bres.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	and	a, #0xef
-	ld	(%1), a
-} by {
-	bres	%2, #4
-	; peephole 11-20 replaced and by bres.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	and	a, #0xdf
-	ld	(%1), a
-} by {
-	bres	%2, #5
-	; peephole 11-21 replaced and by bres.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	and	a, #0xbf
-	ld	(%1), a
-} by {
-	bres	%2, #6
-	; peephole 11-22 replaced and by bres.
-} if notUsed(%1), notUsed('a')
-
-replace restart {
-	ldw	%1, #%2
-	ld	a, (%1)
-	and	a, #0x7f
-	ld	(%1), a
-} by {
-	bres	%2, #7
-	; peephole 11-23 replaced and by bres.
-} if notUsed(%1), notUsed('a')
 
 replace restart {
 	ld	a, %1
@@ -604,7 +376,8 @@ replace restart {
 	xor	a, #0x40
 	ld	(%1), a
 } by {
-	bcpl	%2, #6
+	bcpl	%2, #6-32
+11-33
 	; peephole 11-38 replaced or by bcpl.
 } if notUsed(%1), notUsed('a')
 
@@ -775,22 +548,6 @@ replace restart {
 } by {
 	rlc	a
 	; peephole 12-12 removed redundant tnz.
-}
-
-replace restart {
-	ld	x, (%1, %2)
-	tnz	x
-} by {
-	ld	x, (%1, %2)
-	; peephole 12-13 removed redundant tnzw.
-}
-
-replace restart {
-	ld	y, (%1, %2)
-	tnz	y
-} by {
-	ld	y, (%1, %2)
-	; peephole 12-14 removed redundant tnzw.
 }
 
 replace restart {

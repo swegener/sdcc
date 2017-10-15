@@ -196,6 +196,8 @@ stm8_setDefaultOptions (void)
   options.data_loc = 0x0001; /* We can't use the byte at address zero in C, since NULL pointers have special meaning */
   options.code_loc = 0x8000;
 
+  options.stack_loc = -1; /* Do not set the stack pointer in software- just use the device-specific reset value. */
+
   options.out_fmt = 'i';        /* Default output format is ihx */
 }
 
@@ -211,6 +213,12 @@ void
 stm8_genInitStartup(FILE * of)
 {
   fprintf (of, "__sdcc_gs_init_startup:\n");
+
+  if (options.stack_loc >= 0)
+    {
+      fprintf (of, "\tldw\tx, #0x%04x\n", options.stack_loc);
+      fprintf (of, "\tldw\tsp, x\n");
+    }
 
   /* Init static & global variables */
   fprintf (of, "__sdcc_init_data:\n");

@@ -7,6 +7,8 @@
 	  src/stm8/ralloc.c,
 	  src/stm8/ralloc.h:
 	  STM8 frame address debug info, based on patch by Åke Rehnman.
+	* src/stm8/main.c:
+	  Implement RFE #538: Option for stack pointer startup value for stm8.
 
 2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
 

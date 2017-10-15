@@ -772,7 +772,7 @@ getStringArg (const char *szStart, char **argv, int *pi, int argc)
 /** Gets the integer argument to this option using the same rules as
     getStringArg.
 */
-int
+long
 getIntArg (const char *szStart, char **argv, int *pi, int argc)
 {
   char *p;

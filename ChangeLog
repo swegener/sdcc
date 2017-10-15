@@ -18,6 +18,8 @@
 	  src/SDCCnaddr.hpp,
 	  src/SDCClospre.cc:
 	  More verbose --dump-graphs output.
+	* device/lib/z180/mul.s:
+	  Better multiplication support routine for z180.
 
 2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
 

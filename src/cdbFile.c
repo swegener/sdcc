@@ -12,7 +12,7 @@ int cdbOpenFile (const char *file);
 int cdbCloseFile (void);
 int cdbWriteFunction (symbol *pSym, iCode *ic);
 int cdbWriteEndFunction (symbol *pSym, iCode *ic, int offset);
-int cdbWriteLabel (symbol *pSym, iCode *ic);
+int cdbWriteLabel (symbol *pSym, const iCode *ic);
 int cdbWriteScope (iCode *ic);
 int cdbWriteSymbol (symbol *pSym);
 int cdbWriteType (structdef *sdef, int block, int inStruct, const char *tag);
@@ -176,7 +176,7 @@ cdbWriteEndFunction (symbol *pSym, iCode *ic, int offset)
  *****************************************************************/
 
 int
-cdbWriteLabel (symbol *pSym, iCode *ic)
+cdbWriteLabel (symbol *pSym, const iCode *ic)
 {
   if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "cdbFile.c:cdbWriteLabel()\n");

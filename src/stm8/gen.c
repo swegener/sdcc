@@ -219,6 +219,22 @@ void emit2 (const char *inst, const char *fmt, ...)
     }
 }
 
+/*--------------------------------------------------------------------------*/
+/* updateCFA - update the debugger information to reflect the current       */
+/*             connonical frame address relative to the stack pointer       */
+/*--------------------------------------------------------------------------*/
+static void
+updateCFA (void)
+{
+  /* there is no frame unless there is a function */
+  if (!currFunc)
+    return;
+
+  if (options.debug && !regalloc_dry_run)
+    debugFile->writeFrameAddress (NULL, &stm8_regs[SP_IDX], 1 + G.stack.param_offset + G.stack.pushed);
+}
+//
+
 /*-----------------------------------------------------------------*/
 /* aopRS - asmop in register or on stack                           */
 /*-----------------------------------------------------------------*/
@@ -1076,6 +1092,7 @@ push (const asmop *op, int offset, int size)
     wassertl (0, "Invalid size for push/pushw");
 
   G.stack.pushed += size;
+  updateCFA ();
 }
 
 static void
@@ -1110,6 +1127,7 @@ pop (const asmop *op, int offset, int size)
     wassertl (0, "Invalid size for pop/popw");
 
   G.stack.pushed -= size;
+  updateCFA ();
 }
 
 void swap_to_a(int idx)
@@ -1220,6 +1238,7 @@ adjustStack (int n, bool a_free, bool x_free, bool y_free)
           emit2 ("ldw", "sp, x");
           cost (5, 4);
           G.stack.pushed -= n;
+          updateCFA ();
           n -= n;
         }
       else if (abs(n) > 255 * 3 + (n > 0 || a_free) + (optimize.codeSize && x_free) && y_free)
@@ -1229,6 +1248,7 @@ adjustStack (int n, bool a_free, bool x_free, bool y_free)
           emit2 ("ldw", "sp, y");
           cost (5, 4);
           G.stack.pushed -= n;
+          updateCFA ();
           n -= n;
         }
       else if (n > 255)
@@ -1236,6 +1256,7 @@ adjustStack (int n, bool a_free, bool x_free, bool y_free)
           emit2 ("addw", "sp, #255");
           cost (2, 1);
           G.stack.pushed -= 255;
+          updateCFA ();
           n -= 255;
         }
       else if (n < -255)
@@ -1243,6 +1264,7 @@ adjustStack (int n, bool a_free, bool x_free, bool y_free)
           emit2 ("sub", "sp, #255");
           cost (2, 1);
           G.stack.pushed += 255;
+          updateCFA ();
           n += 255;
         }
       else if (n == 2 && x_free && optimize.codeSize)
@@ -1270,6 +1292,7 @@ adjustStack (int n, bool a_free, bool x_free, bool y_free)
           emit2 (n > 0 ? "addw" : "sub", "sp, #%d", abs (n));
           cost (2, 1);     
           G.stack.pushed -= n;
+          updateCFA ();
           n -= n;
         }
     }
@@ -3105,6 +3128,9 @@ genFunction (iCode *ic)
   bigreturn = (getSize (ftype->next) > 4);
   G.stack.param_offset += bigreturn * 2;
 
+  if (options.debug && !regalloc_dry_run)
+    debugFile->writeFrameAddress (NULL, &stm8_regs[SP_IDX], 1);
+
   /* adjust the stack for the function */
   if (sym->stack)
     adjustStack (-sym->stack, TRUE, TRUE, !stm8_extend_stack);
@@ -3126,7 +3152,7 @@ genEndFunction (iCode *ic)
   if (IFFUNC_ISNAKED(sym->type))
   {
       D (emit2 (";", "naked function: no epilogue."));
-      if (options.debug && currFunc)
+      if (options.debug && currFunc && !regalloc_dry_run)
         debugFile->writeEndFunction (currFunc, ic, 0);
       return;
   }
@@ -3143,18 +3169,16 @@ genEndFunction (iCode *ic)
   if (IFFUNC_ISISR (sym->type))
     {
       /* if debug then send end of function */
-      if (options.debug && currFunc)
-        {
-          debugFile->writeEndFunction (currFunc, ic, 1);
-        }
-
+      if (options.debug && currFunc && !regalloc_dry_run)
+        debugFile->writeEndFunction (currFunc, ic, 1);
+        
       emit2 ("iret", "");
       cost (1, 11);
     }
   else
     {
       /* if debug then send end of function */
-      if (options.debug && currFunc)
+      if (options.debug && currFunc && !regalloc_dry_run)
         debugFile->writeEndFunction (currFunc, ic, 1);
 
       emit2 ("ret", "");
@@ -3304,6 +3328,9 @@ genLabel (const iCode *ic)
   /* special case never generate */
   if (IC_LABEL (ic) == entryLabel)
     return;
+
+  if (options.debug && !regalloc_dry_run)
+    debugFile->writeLabel (IC_LABEL (ic), ic);
 
   emitLabel (IC_LABEL (ic));
 }
@@ -4725,6 +4752,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
     }
 
   G.stack.pushed = pushed;
+  updateCFA ();
 
   freeAsmop (right);
   freeAsmop (left);
@@ -7462,21 +7490,37 @@ void
 genSTM8Code (iCode *lic)
 {
   iCode *ic;
+  int clevel = 0;
+  int cblock = 0;  
   int cln = 0;
   regalloc_dry_run = FALSE;
 
   /* if debug information required */
-  if (options.debug && currFunc)
-    {
-      debugFile->writeFunction (currFunc, lic);
-    }
+  if (options.debug && currFunc && !regalloc_dry_run)
+    debugFile->writeFunction (currFunc, lic);
+
+  if (options.debug && !regalloc_dry_run)
+    debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
 
   for (ic = lic; ic; ic = ic->next)
     {
       initGenLineElement ();
+      
+      genLine.lineElement.ic = ic;
+      
+      if (ic->level != clevel || ic->block != cblock)
+        {
+          if (options.debug)
+            debugFile->writeScope (ic);
+          clevel = ic->level;
+          cblock = ic->block;
+        }
 
       if (ic->lineno && cln != ic->lineno)
         {
+          if (options.debug)
+            debugFile->writeCLine (ic);
+
           if (!options.noCcodeInAsm)
             emit2 (";", "%s: %d: %s", ic->filename, ic->lineno, printCLine (ic->filename, ic->lineno));
           cln = ic->lineno;
@@ -7500,6 +7544,9 @@ genSTM8Code (iCode *lic)
       D (emit2 (";", "Cost for generated ic %d : (%d, %d)", ic->key, regalloc_dry_run_cost_bytes, regalloc_dry_run_cost_cycles));
 #endif
     }
+
+  if (options.debug)
+    debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
 
   /* now we are ready to call the
      peephole optimizer */

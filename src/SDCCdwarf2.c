@@ -39,7 +39,7 @@ int dwOpenFile (const char *file);
 int dwCloseFile (void);
 int dwWriteFunction (symbol *pSym, iCode *ic);
 int dwWriteEndFunction (symbol *pSym, iCode *ic, int offset);
-int dwWriteLabel (symbol *pSym, iCode *ic);
+int dwWriteLabel (symbol *pSym, const iCode *ic);
 int dwWriteScope (iCode *ic);
 int dwWriteSymbol (symbol *pSym);
 int dwWriteType (structdef *sdef, int block, int inStruct, const char *tag);
@@ -2800,7 +2800,7 @@ dwWriteEndFunction (symbol *sym, iCode *ic, int offset)
 /* dwWriteLabel - generate a tag for a source level label                */
 /*-----------------------------------------------------------------------*/
 int
-dwWriteLabel (symbol *sym, iCode *ic)
+dwWriteLabel (symbol *sym, const iCode *ic)
 {
   char debugSym[SDCC_NAME_MAX + 1];
   dwtag * tp;

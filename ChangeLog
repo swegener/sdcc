@@ -11,6 +11,8 @@
 	  Implement RFE #538: Option for stack pointer startup value for stm8.
 	* device/lib/*/mulchar.s:
 	  Minor char multiplication improvement.
+	* sdas/linksrc/lkelf.c:
+	  RFE #2670 ELF e_entry, patch by Åke Rehnman.
 
 2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
 

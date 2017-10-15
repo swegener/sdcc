@@ -729,6 +729,15 @@ elfGenerate (void)
   ehdr.e_entry = 0;
   if (execStartMSBfound && execStartLSBfound)
     ehdr.e_entry = (execStartMSB << 8) + execStartLSB;
+  else
+  {
+    struct sym *entryp_sym;
+    entryp_sym = lkpsym("s_GSINIT",0);
+    if (entryp_sym)
+    {
+      ehdr.e_entry = entryp_sym->s_addr + entryp_sym->s_axp->a_addr;
+    }
+  }
 
   /* Write out the ELF header as a placeholder; we will update */
   /* it with the final values when everything is complete */

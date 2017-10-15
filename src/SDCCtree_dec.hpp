@@ -525,3 +525,35 @@ void nicify(T_t &T)
   remove_isolated_vertices(T);
 }
 
+class cfg_titlewriter
+{
+public:
+  explicit cfg_titlewriter(const std::string& f, const std::string& p) : function(f), purpose(p)
+    {
+    }
+  void operator()(std::ostream& out) const
+    {
+      out << "graph [label=\"Control-flow-graph for " << purpose << " (function " << function << ")\"]\n";
+    }
+private:
+  std::string function;
+  std::string purpose;
+};
+
+class dec_titlewriter
+{
+public:
+  explicit dec_titlewriter(unsigned int w, const std::string& f, const std::string& p) : function(f), purpose(p)
+    {
+      width = w;
+    }
+  void operator()(std::ostream& out) const
+    {
+      out << "graph [label=\"Tree-decomposition of width " << width << " for " << purpose << " (function " << function << ")\"]\n";
+    }
+private:
+  unsigned int width;
+  std::string function;
+  std::string purpose;
+};
+

@@ -483,7 +483,7 @@ void dump_cfg_naddr(const cfg_t &cfg)
         os << *n << " ";
       name[i] = os.str();
     }
-  boost::write_graphviz(dump_file, cfg, boost::make_label_writer(name));
+  boost::write_graphviz(dump_file, cfg, boost::make_label_writer(name), boost::default_writer(), cfg_titlewriter(currFunc->rname, " bank selection instr. placement"));
   delete[] name;
 }
 
@@ -506,7 +506,7 @@ static void dump_tree_decomposition_naddr(const tree_dec_naddr_t &tree_dec)
         os << *v1 << " ";
       name[i] = os.str();
     }
-  boost::write_graphviz(dump_file, tree_dec, boost::make_label_writer(name));
+  boost::write_graphviz(dump_file, tree_dec, boost::make_label_writer(name), boost::default_writer(), dec_titlewriter((w - 1), currFunc->rname, " bank selection instr. placement"));
   delete[] name;
 }
 

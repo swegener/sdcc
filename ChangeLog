@@ -13,6 +13,11 @@
 	  Minor char multiplication improvement.
 	* sdas/linksrc/lkelf.c:
 	  RFE #2670 ELF e_entry, patch by Åke Rehnman.
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/SDCCnaddr.hpp,
+	  src/SDCClospre.cc:
+	  More verbose --dump-graphs output.
 
 2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
 

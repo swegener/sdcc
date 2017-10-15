@@ -1243,7 +1243,8 @@ static void dump_cfg(const cfg_t &cfg)
         os << *v << " ";
       name[i] = os.str();
     }
-  boost::write_graphviz(dump_file, cfg, boost::make_label_writer(name));
+
+  boost::write_graphviz(dump_file, cfg, boost::make_label_writer(name), boost::default_writer(), cfg_titlewriter(currFunc->rname, "register allocator"));
   delete[] name;
 }
 
@@ -1273,7 +1274,8 @@ static void dump_tree_decomposition(const tree_dec_t &tree_dec)
         os << *v2 << " ";
       name[i] = os.str();
     }
-  boost::write_graphviz(dump_file, tree_dec, boost::make_label_writer(name));
+
+  boost::write_graphviz(dump_file, tree_dec, boost::make_label_writer(name), boost::default_writer(), dec_titlewriter(w - 1, currFunc->rname, "register allocator"));
   delete[] name;
 
 #ifdef D_RALLOC_DEC

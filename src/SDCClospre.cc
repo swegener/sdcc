@@ -253,7 +253,7 @@ void dump_cfg_lospre (const cfg_lospre_t &cfg)
       dbuf_free (iLine);
       name[i] = os.str();
     }
-  boost::write_graphviz(dump_file, cfg, boost::make_label_writer(name));
+  boost::write_graphviz(dump_file, cfg, boost::make_label_writer(name), boost::default_writer(), cfg_titlewriter(currFunc->rname, "lospre"));
   delete[] name;
 }
 

@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  mulchar.s
 ;
-;  Copyright (C) 2009, Philipp Klaus Krause
+;  Copyright (c) 2017, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -56,20 +56,16 @@ __muluschar:
         ld      c,(hl)
         jr      signexte
 
-;; Originally from GBDK by Pascal Felber.
-
 __mulschar:
         ld      hl,#2+1
         add     hl,sp
 
         ld      e,(hl)
         dec     hl
-        ld      l,(hl)
+        ld      c,(hl)
 
         ;; Need to sign extend before going in.
-        ld      c,l
-
-        ld      a,l
+        ld      a,c
         rla
         sbc     a,a
         ld      b,a

@@ -6,7 +6,7 @@
 	  src/stm8/gen.c,
 	  src/stm8/ralloc.c,
 	  src/stm8/ralloc.h:
-	  STM8 rame address debug info, based on patch by Åke Rehnman.
+	  STM8 frame address debug info, based on patch by Åke Rehnman.
 
 2017-10-11 Philipp Klaus Krause <pkk AT spth.de>
 

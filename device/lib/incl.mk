@@ -17,7 +17,6 @@ COMMON_FLOAT = \
   _fsmul.c \
   _fssub.c \
   _fseq.c \
-  _fsgt.c \
   _fslt.c \
   _fsneq.c \
   fabsf.c \

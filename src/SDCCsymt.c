@@ -3901,9 +3901,6 @@ symbol *fsdiv;
 symbol *fseq;
 symbol *fsneq;
 symbol *fslt;
-symbol *fslteq;
-symbol *fsgt;
-symbol *fsgteq;
 
 symbol *fps16x16_add;
 symbol *fps16x16_sub;
@@ -4151,9 +4148,6 @@ initCSupport (void)
   fseq = funcOfType ("__fseq", charType, floatType, 2, options.float_rent);
   fsneq = funcOfType ("__fsneq", charType, floatType, 2, options.float_rent);
   fslt = funcOfType ("__fslt", charType, floatType, 2, options.float_rent);
-  fslteq = funcOfType ("__fslteq", charType, floatType, 2, options.float_rent);
-  fsgt = funcOfType ("__fsgt", charType, floatType, 2, options.float_rent);
-  fsgteq = funcOfType ("__fsgteq", charType, floatType, 2, options.float_rent);
 
   fps16x16_add = funcOfType ("__fps16x16_add", fixed16x16Type, fixed16x16Type, 2, options.float_rent);
   fps16x16_sub = funcOfType ("__fps16x16_sub", fixed16x16Type, fixed16x16Type, 2, options.float_rent);

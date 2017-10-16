@@ -592,9 +592,6 @@ extern symbol *fsdiv;
 extern symbol *fseq;
 extern symbol *fsneq;
 extern symbol *fslt;
-extern symbol *fslteq;
-extern symbol *fsgt;
-extern symbol *fsgteq;
 
 extern symbol *fps16x16_add;
 extern symbol *fps16x16_sub;

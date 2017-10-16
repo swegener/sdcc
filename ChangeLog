@@ -2,6 +2,12 @@
 
 	* src/stm8/main.c:
 	  Debug info infrastructure for stm8 registers.
+	* device/lib/_fsgt.c,
+	  device/lib/incl.mk,
+	  src/SDCCsymt.h,
+	  src/SDCCsymt.c
+	  src/SDCCopt.c:
+	  Remove __fsgt support function, RFE #526.
 
 2017-10-16 Ben Shi <powerstudio1st AT 163 DOT com>
 

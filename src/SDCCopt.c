@@ -102,14 +102,13 @@ cnvToFcall (iCode * ic, eBBlock * ebp)
           func = fslt;
           break;
         case '>':
-          func = fsgt;
-          break;
-        case LE_OP:
-          func = fslteq;
-          break;
-        case GE_OP:
-          func = fsgteq;
-          break;
+          {
+            operand *tmp = right;
+            right = left;
+            left = tmp;
+            func = fslt;
+            break;
+          }
         }
     }
   else if (IS_FIXED16X16 (operandType (right)))

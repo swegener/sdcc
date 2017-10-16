@@ -2233,7 +2233,7 @@ setupPairFromSP (PAIR_ID id, int offset)
   else
     {
       emit2 ("!ldahlsp", offset);
-      regalloc_dry_run_cost += 3;
+      regalloc_dry_run_cost += 4 - IS_GB * 2;
     }
 
   if (_G.preserveCarry)
@@ -4574,8 +4574,7 @@ genRet (const iCode *ic)
   else if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)
     {
       unsigned long long lit = ullFromVal (AOP (IC_LEFT (ic))->aopu.aop_lit);
-      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
-      emit2 ("add hl, sp");
+      setupPairFromSP (PAIR_HL, _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
       emit2 ("ld a, (hl)");
       emit2 ("inc hl");
       emit2 ("ld h, (hl)");
@@ -4597,8 +4596,7 @@ genRet (const iCode *ic)
   else if (!IS_GB && AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK
            || AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_IY)
     {
-      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
-      emit2 ("add hl, sp");
+      setupPairFromSP (PAIR_HL, _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
       emit2 ("ld e, (hl)");
       emit2 ("inc hl");
       emit2 ("ld d, (hl)");
@@ -4625,8 +4623,7 @@ genRet (const iCode *ic)
     }
   else
     {
-      emit2 ("ld hl, #%d", _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
-      emit2 ("add hl, sp");
+      setupPairFromSP (PAIR_HL, _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
       emit2 ("ld c, (hl)");
       emit2 ("inc hl");
       emit2 ("ld b, (hl)");

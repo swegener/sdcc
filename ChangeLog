@@ -8,6 +8,8 @@
 	  src/SDCCsymt.c
 	  src/SDCCopt.c:
 	  Remove __fsgt support function, RFE #526.
+	* src/z80/gen.c:
+	  Improve handling of variables on stack in return.
 
 2017-10-16 Ben Shi <powerstudio1st AT 163 DOT com>
 

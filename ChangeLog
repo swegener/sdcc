@@ -1,3 +1,8 @@
+2017-10-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  Debug info infrastructure for stm8 registers.
+
 2017-10-16 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* src/mcs51/peeph.def:

@@ -274,8 +274,7 @@ stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
 static int
 stm8_dwarfRegNum (const struct reg_info *reg)
 {
-  /* todo: return valid values */
-  return -1;
+  return reg->rIdx;
 }
 
 static bool
@@ -429,15 +428,15 @@ PORT stm8_port =
   { -1, 0, 7, 2, 0, 2, 1 },     /* stack information */
   { -1, TRUE },
   { stm8_emitDebuggerSymbol,
-	{
+    {
       stm8_dwarfRegNum,
-      NULL,
-      NULL,
+      0,                        /* cfiSame */
+      0,                        /* cfiUndef */
       4,                        /* addressSize */
-      0,                        /* regNumRet */
-      0,                        /* regNumSP */
+      9,                        /* regNumRet */
+      SP_IDX,                   /* regNumSP */
       0,                        /* regNumBP */
-      0,                        /* offsetSP */
+      2,                        /* offsetSP */
     },
   },
   {

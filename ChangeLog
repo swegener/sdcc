@@ -1,3 +1,8 @@
+2017-10-16 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/mcs51/peeph.def:
+	  Fix a potential bug in label reference count calculation.
+
 2017-10-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdebug.h,

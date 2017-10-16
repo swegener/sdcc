@@ -3458,6 +3458,16 @@ dbuf_printTypeChain (sym_link * start, struct dbuf_s *dbuf)
                 dbuf_append_str (dbuf, " __z88dk_callee");
               if (IFFUNC_ISZ88DK_FASTCALL (type))
                 dbuf_append_str (dbuf, " __z88dk_fastcall");
+              for (unsigned char i = 0; i < 9; i++)
+                  if (type->funcAttrs.preserved_regs[i])
+                  {
+                    dbuf_append_str (dbuf, " __preserves_regs(");
+                    for (; i < 9; i++)
+                      if (type->funcAttrs.preserved_regs[i])
+                        dbuf_printf (dbuf, " %d", i);
+                    dbuf_append_str (dbuf, " )");
+                    break;
+                  }
               break;
             case GPOINTER:
               dbuf_append_str (dbuf, "generic*");

@@ -330,6 +330,15 @@ typedef struct dwloclist
   struct dwloclist * next;
 } dwloclist;
 
+typedef struct dwcfilist
+{
+  char * startLabel;
+  char * endLabel;
+  int callsize;
+  dwlocregion * region;
+  struct dwcfilist * next;
+} dwcfilist;
+
 struct dwtag;
 
 typedef struct dwattr
@@ -390,7 +399,6 @@ typedef struct dwline
   struct dwline * next;
 } dwline;
 
-#if 0
 typedef struct dwblock
 {
   unsigned char * data;
@@ -419,7 +427,6 @@ typedef struct dwfde
   char * endLabel;
   dwcfins * ins;
 } dwfde;
-#endif
-
 
 #endif
+

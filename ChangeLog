@@ -1,3 +1,9 @@
+2017-10-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCdwarf2.h,
+	  src/SDCCdwarf2.c:
+	  CFI handling in DWARFv2 output, patch by Åke Rehnman.
+
 2017-10-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c:

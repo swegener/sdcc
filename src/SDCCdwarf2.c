@@ -78,7 +78,7 @@ int dwRefNum = 0;
 int dwScopeBlock = 0;
 int dwScopeLevel = 0;
 int dwDebugSymbol = 0;
-//dwcfins * dwCIEins = NULL;
+dwcfins * dwCIEins = NULL;
 dwlocregion * dwFrameLastLoc = NULL;
 dwloclist * dwRootLocList = NULL;
 dwloclist * dwFrameLocList = NULL;
@@ -88,6 +88,8 @@ int dwLineOpcodeBase = 10;
 set * dwFilenameSet = NULL;
 dwline * dwLineFirst = NULL;
 dwline * dwLineLast = NULL;
+dwlocregion * dwCFILastLoc = NULL;
+dwcfilist * dwCFIRoot = NULL;
 
 
 /*----------------------------------------------------------------------*/
@@ -407,8 +409,6 @@ dwWriteWordDelta (char * label1, char * label2)
 }
 
 
-/* disabled to eliminiate unused function warning */
-#if 0 
 /*----------------------------------------------------------------------*/
 /* dwWriteAddressDelta - generate an assembler constant in the form:    */
 /*                                                                      */
@@ -435,6 +435,7 @@ dwWriteAddressDelta (char * label1, char * label2)
     }
 }
 
+#if 0
 /*----------------------------------------------------------------------*/
 /* dwWriteULEB128Delta - generate an unsigned variable byte assembler   */
 /*                       constant in the form:                          */
@@ -454,6 +455,19 @@ dwWriteULEB128Delta (char * label1, char * label2, int offset)
 #endif
 
 /*------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------*/
+/* dwNewCFIlist - allocates a new CFI list node                         */
+/*----------------------------------------------------------------------*/
+dwcfilist *
+dwNewCFIlist ()
+{
+  dwcfilist * p;
+  
+  p = Safe_alloc (sizeof (dwcfilist));
+  
+  return p;
+}
 
 /*----------------------------------------------------------------------*/
 /* dwNewLoc - allocates a new location expression node                  */
@@ -1803,9 +1817,6 @@ dwWriteLineNumbers (void)
 /*------------------------------------------------------------------------*/
 
 
-/* I have disabled all of this canonical frame address related code */
-/* until I better understand this part of the DWARF2 spec. -- EEP   */
-#if 0
 static void
 dwWriteCFAinstructions (dwcfins *ip)
 {
@@ -1820,7 +1831,7 @@ dwWriteCFAinstructions (dwcfins *ip)
           switch (op->opcode)
             {
             case DW_CFA_set_loc:
-              dwWriteAddress (NULL, op->label, op->operand1);
+              dwWriteAddress (op->label, op->operand1, NULL);
               break;
             
             case DW_CFA_advance_loc1:
@@ -1951,74 +1962,23 @@ dwAddCFinsOp (dwcfins * ip, dwcfop *op)
   ip->last = op;
 }
 
-static dwcfins *
-dwGenCFIins (void)
+static void
+dwGenCFIins (int callsize, int id)
 {
   dwcfins * ip;
   dwcfop * op;
   int i;
+  char s[32];
   
-  ip = dwNewCFins ();
-  
-  /* Define the CFA as the top of the stack at function start. */
-  /* The return address is then at cfa+0                       */
-  op = dwNewCFop (DW_CFA_def_cfa);
-  op->operand1 = port->debugger.dwarf.regNumSP;
-  op->operand2 = port->debugger.dwarf.offsetSP;
-  dwAddCFinsOp (ip, op);
-
-  op = dwNewCFop (DW_CFA_offset + port->debugger.dwarf.regNumRet);
-  op->operand1 = 0;
-  dwAddCFinsOp (ip, op);
-
-  if (port->debugger.dwarf.cfiUndef)
-    for (i=0; i < port->debugger.dwarf.cfiUndef->size; i++)
-      {
-        if (bitVectBitValue (port->debugger.dwarf.cfiUndef, i))
-          {
-            op = dwNewCFop (DW_CFA_undefined);
-            dwAddCFinsOp (ip, op);
-          }
-    }
-  
-  if (port->debugger.dwarf.cfiSame)
-    for (i=0; i < port->debugger.dwarf.cfiSame->size; i++)
-      {
-        if (bitVectBitValue (port->debugger.dwarf.cfiSame, i))
-          {
-            op = dwNewCFop (DW_CFA_undefined);
-            dwAddCFinsOp (ip, op);
-          }
-      }
-
-  return ip;
-}
-
-
-static void
-dwWriteFDE (dwfde * fp)
-{
-  dwWriteWord (NULL, dwSizeofCFAinstructions(fp->ins) + 4
-                + port->debugger.dwarf.addressSize * 2, NULL);
-  
-  dwWriteWord ("Ldebug_CIE_start-4", 0, NULL);
-  
-  dwWriteAddressDelta (fp->endLabel, fp->startLabel);
-  
-  dwWriteCFAinstructions (fp->ins);
-  
-}
-
-static void
-dwWriteFrames (void)
-{  
   tfprintf (dwarf2FilePtr, "\n\t!area\n", ".debug_frame (NOLOAD)");
 
   /* FIXME: these two dw should be combined into a dd */
   tfprintf (dwarf2FilePtr, "\t!dw\t0\n");
-  tfprintf (dwarf2FilePtr, "\t!dw\t%s\n", "Ldebug_CIE_end-Ldebug_CIE_start");
+  tfprintf (dwarf2FilePtr, "\t!dw\t");
+  tfprintf (dwarf2FilePtr, "Ldebug_CIE%d_end-Ldebug_CIE%d_start\n", id, id);
 
-  tfprintf (dwarf2FilePtr, "!slabeldef\n", "Ldebug_CIE_start");
+  snprintf(s, sizeof(s), "Ldebug_CIE%d_start", id);
+  tfprintf (dwarf2FilePtr, "!slabeldef\n", s);
   
   tfprintf (dwarf2FilePtr, "\t!dw\t0xffff\n");
   tfprintf (dwarf2FilePtr, "\t!dw\t0xffff\n");  /* CIE_id */
@@ -2029,25 +1989,137 @@ dwWriteFrames (void)
 
   dwWriteULEB128 (NULL, 1, NULL);       /* code alignment factor */
   
-  dwWriteSLEB128 (NULL, (port->stack.direction > 0) ? -1 : 1, NULL); /* data alignment factor */
+  dwWriteSLEB128 (NULL, (port->stack.direction > 0) ? 1 : -1, NULL); /* data alignment factor */
   
   dwWriteByte (NULL, port->debugger.dwarf.regNumRet, NULL);
   
-  if (!dwCIEins)
-    {
-      #if 0
-      if (port->debugger.dwarf.genCFIins)
-        dwCIEins = port->debugger.dwarf.genCFIins ();
-      else
-      #endif
-        dwCIEins = dwGenCFIins ();
-    }
-  dwWriteCFAinstructions (dwCIEins);
+  ip = dwNewCFins ();
   
-  tfprintf (dwarf2FilePtr, "!slabeldef\n", "Ldebug_CIE_end");
-}
-#endif
+  /* Define the CFA as the SP at the previous frame (call site) */
+  /* The return address is then at CFA-1 (for stm8)             */
+  op = dwNewCFop (DW_CFA_def_cfa);
+  op->operand1 = port->debugger.dwarf.regNumSP;
+  op->operand2 = port->debugger.dwarf.offsetSP;
+  if (callsize == 3)
+    op->operand2 = port->debugger.dwarf.offsetSP + port->stack.isr_overhead;
+  dwAddCFinsOp (ip, op);
 
+  op = dwNewCFop (DW_CFA_offset + port->debugger.dwarf.regNumRet);
+  op->operand1 = 1;  /* perhaps we need a way to configure this relative position for the ret pos? ARE*/
+  dwAddCFinsOp (ip, op);
+
+  if (port->debugger.dwarf.cfiUndef)
+    for (i=0; i < port->debugger.dwarf.cfiUndef->size; i++)
+      {
+        if (bitVectBitValue (port->debugger.dwarf.cfiUndef, i))
+          {
+            op = dwNewCFop (DW_CFA_undefined);
+            op->operand1 = i;
+            dwAddCFinsOp (ip, op);
+          }
+    }
+  
+  if (port->debugger.dwarf.cfiSame)
+    for (i=0; i < port->debugger.dwarf.cfiSame->size; i++)
+      {
+        if (bitVectBitValue (port->debugger.dwarf.cfiSame, i))
+          {
+            op = dwNewCFop (DW_CFA_same_value);
+            op->operand1 = i;
+            dwAddCFinsOp (ip, op);
+          }
+      }
+
+  dwWriteCFAinstructions (ip);
+  
+  op = ip->first;
+  while (op)
+  {
+    dwcfop * next;
+    next = op->next;
+    Safe_free(op);
+    op = next;
+  }
+  Safe_free(ip);
+
+  snprintf(s, sizeof(s), "Ldebug_CIE%d_end", id);
+  tfprintf (dwarf2FilePtr, "!slabeldef\n",s);
+}
+
+
+static void
+dwWriteFDE (dwfde * fp, int id)
+{
+  //length
+  dwWriteWord (NULL, dwSizeofCFAinstructions(fp->ins) + 4
+                + port->debugger.dwarf.addressSize * 2 , NULL);
+
+  //CIE ptr
+  char s[32];
+  snprintf(s, sizeof(s), "Ldebug_CIE%d_start-4", id);
+  dwWriteWord (s, 0, NULL);
+  
+  //initial loc
+  dwWriteAddress(fp->startLabel, 0, "initial loc");
+
+  //address range
+  dwWriteAddressDelta (fp->endLabel, fp->startLabel);
+
+  //instructions
+  dwWriteCFAinstructions (fp->ins);
+}
+
+static void
+dwWriteFrames (void)
+{
+  dwfde fp;
+  dwcfop * op;
+  dwcfilist * cfip;
+  dwlocregion * lrp;
+
+  int id = 0;
+  cfip = dwCFIRoot;
+  while (cfip)
+    {
+      fp.startLabel=cfip->startLabel;
+      fp.endLabel=cfip->endLabel;
+
+      fp.ins = dwNewCFins();
+
+      lrp = cfip->region;
+
+      /* emit fde records */
+      while (lrp)
+        {
+          op = dwNewCFop (DW_CFA_set_loc);
+          op->label = lrp->startLabel;
+          op->operand1 = 0;
+          dwAddCFinsOp (fp.ins, op);
+          op = dwNewCFop (DW_CFA_def_cfa_offset);
+          if (cfip->callsize == 3)
+            op->operand1 = lrp->loc->operand.offset +  port->debugger.dwarf.offsetSP - 1 + port->stack.isr_overhead;
+          else
+            op->operand1 = lrp->loc->operand.offset +  port->debugger.dwarf.offsetSP - 1; /* another -1 constant that needs attention ARE*/
+          dwAddCFinsOp (fp.ins, op);
+
+          lrp = lrp ->next;
+        }
+
+      dwGenCFIins(cfip->callsize, id);
+      dwWriteFDE(&fp, id++);
+
+      op = fp.ins->first;
+      while (op)
+      {
+        dwcfop * next;
+        next = op->next;
+        Safe_free(op);
+        op = next;
+      }
+
+      cfip = cfip->next;
+    }
+}
 
 
 
@@ -2706,7 +2778,17 @@ dwWriteFunction (symbol *sym, iCode *ic)
 {
   dwtag * tp;
   value * args;
-    
+
+  /* Add this function to CFI list */
+  dwcfilist * cfip;
+  cfip = dwNewCFIlist();
+  cfip->callsize = 1;
+  if (FUNC_ISISR (sym->type))
+    cfip->callsize = 3;
+  cfip->next = dwCFIRoot;
+  dwCFIRoot = cfip;
+  dwCFILastLoc = NULL;
+  
   dwFuncTag = tp = dwNewTag (DW_TAG_subprogram);
   
   dwAddTagAttr (dwFuncTag, dwNewAttrString (DW_AT_name, sym->name));
@@ -2974,6 +3056,7 @@ dwWriteFrameAddress(const char *variable, struct reg_info *reg, int offset)
 {
   char * debugSym = NULL;
   dwlocregion * lrp;
+  dwlocregion * cfi_lrp;
   dwloc * lp;
   int regNum;
     
@@ -2982,10 +3065,17 @@ dwWriteFrameAddress(const char *variable, struct reg_info *reg, int offset)
     {
       debugSym = dwNewDebugSymbol ();
       emitDebuggerSymbol (debugSym);
-      
+
       dwFrameLastLoc->endLabel = debugSym;
       dwFrameLastLoc = NULL;
     }
+
+  if (dwCFILastLoc)
+    {
+      dwCFILastLoc->endLabel = debugSym;
+      dwCFIRoot->endLabel = debugSym;
+    }
+
 
   if (!variable && !reg)
     return 1;
@@ -3000,6 +3090,21 @@ dwWriteFrameAddress(const char *variable, struct reg_info *reg, int offset)
 
   lrp = Safe_alloc (sizeof (dwlocregion));
   lrp->startLabel = debugSym;
+
+  /*** Create a new loc region for CFI */
+  cfi_lrp = Safe_alloc (sizeof (dwlocregion));
+  cfi_lrp->startLabel = debugSym;
+  cfi_lrp->loc = dwNewLoc (0, NULL, offset);
+  if (dwCFILastLoc)
+    {
+      dwCFILastLoc->next = cfi_lrp;
+    }
+  else
+    {
+      dwCFIRoot->region = cfi_lrp;
+      dwCFIRoot->startLabel = debugSym;
+    }
+  dwCFILastLoc = cfi_lrp;
 
   if (variable)         /* frame pointer based from a global variable */
     {
@@ -3036,12 +3141,12 @@ dwWriteFrameAddress(const char *variable, struct reg_info *reg, int offset)
         }
     }
   dwFrameLastLoc = lrp;
-  
+
   if (!dwFrameLocList)
     dwFrameLocList = dwNewLocList();
   lrp->next = dwFrameLocList->region;
   dwFrameLocList->region = lrp;
-  
+
   return 1;
 }
 
@@ -3106,6 +3211,9 @@ dwarf2FinalizeFile (FILE *of)
 
   /* Write the .debug_pubnames section */
   dwWritePubnames ();
+
+  dwWriteFrames ();
   
   return 1;
 }
+

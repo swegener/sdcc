@@ -502,7 +502,8 @@ _parseOptions (int *pargc, char **argv, int *i)
               return TRUE;
             }
         }
-      else if (!strncmp (argv[*i], OPTION_ASM, sizeof (OPTION_ASM) - 1))
+
+      if (!strncmp (argv[*i], OPTION_ASM, sizeof (OPTION_ASM) - 1))
         {
           char *asmblr = getStringArg (OPTION_ASM, argv, i, *pargc);
 
@@ -885,7 +886,7 @@ PORT z80_port =
     NULL,                       //LINKCMD,
     NULL,
     ".rel",
-    1,
+    1,                          /* needLinkerScript */
     _crt,                       /* crt */
     _libs_z80,                  /* libs */
   },

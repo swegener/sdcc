@@ -1,3 +1,7 @@
+2017-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/z80/main.c (_parseOptions): fix bug #2634
+
 2017-10-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdwarf2.h,

@@ -10792,10 +10792,10 @@ genCast (const iCode *ic)
 
   /* So we now know that the size of destination is greater
      than the size of the source */
-  /* we move to result for the size of source */
+  /* we move to result for the size of source - 1*/
   size = AOP_SIZE (right);
   offset = 0;
-  while (size--)
+  while (--size)
     {
       cheapMove (AOP (result), offset, AOP (right), offset);
       offset++;
@@ -10806,6 +10806,8 @@ genCast (const iCode *ic)
   /* Unsigned or not an integral type - right fill with zeros */
   if (IS_BOOL (rtype) || !IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE (right) == AOP_CRY)
     {
+      cheapMove (AOP (result), offset, AOP (right), offset);
+      offset++;
       while (size--)
         aopPut3 (AOP (result), offset++, ASMOP_ZERO, 0);
     }
@@ -10813,8 +10815,10 @@ genCast (const iCode *ic)
     {
       if (surviving_a && !pushed_a)
         _push (PAIR_AF), pushed_a = TRUE;
+
+      cheapMove (ASMOP_A, 0, AOP (right), offset);
+      cheapMove (AOP (result), offset++, ASMOP_A, 0);
       /* we need to extend the sign */
-      cheapMove (ASMOP_A, 0, AOP_TYPE (result) == AOP_REG ? AOP (result) : AOP (right), AOP_SIZE (right) - 1);
       emit3 (A_RLA, 0, 0);
       emit3 (A_SBC, ASMOP_A, ASMOP_A);
       while (size--)

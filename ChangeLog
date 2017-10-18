@@ -3,6 +3,8 @@
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
 	  Improve subtraction of global variables.
+	* src/z80/gen.c:
+	  Simplify stack adjustment.
 
 2017-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

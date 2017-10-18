@@ -3031,7 +3031,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
       n -= n;
     }
 
-  while (abs(n) > 1)
+  while (abs(n))
     {
       if ((IS_RAB || IS_GB) && abs(n) > (optimize.codeSize ? 2 : 1))
         {
@@ -3076,33 +3076,18 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
           cost (1, 10);
           n -= 2;
         }
-      else if (n >= 2)
+      else if (n >= 1)
         {
           emit2 ("inc sp");
-          emit2 ("inc sp");
-          cost2 (2, 12, 8, 4, 16, 8);
-          n -= 2;
+          cost2 (1, 6, 4, 2, 8, 4);
+          n--;
         }
-      else if (n <= -2)
+      else if (n <= -1)
         {
           emit2 ("dec sp");
-          emit2 ("dec sp");
-          cost2 (2, 12, 8, 4, 16, 8);
-          n += 2;
+          cost2 (1, 6, 4, 2, 8, 4);
+          n++;
         }
-    }
-
-  if (n == 1)
-    {
-      emit2 ("inc sp");
-      cost2 (1, 6, 4, 2, 8, 4);
-      n--;
-    }
-  else if (n == -1)
-    {
-      emit2 ("dec sp");
-      cost2 (1, 6, 4, 2, 8, 4);
-      n++;
     }
 
   wassert(!n);

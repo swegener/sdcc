@@ -481,7 +481,7 @@ getDeadPairId (const iCode *ic)
 }
 
 static PAIR_ID
-getFreePairId (const iCode *ic)        // Todo: Cost
+getFreePairId (const iCode *ic)
 {
   if (!isPairInUse (PAIR_BC, ic))
     {
@@ -3112,7 +3112,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
 /* movLeft2Result - move byte from left to result                  */
 /*-----------------------------------------------------------------*/
 static void
-movLeft2Result (operand * left, int offl, operand * result, int offr, int sign)
+movLeft2Result (operand *left, int offl, operand *result, int offr, int sign)
 {
   if (!sameRegs (AOP (left), AOP (result)) || (offl != offr))
     {
@@ -5713,14 +5713,26 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
   /* if literal right, add a, #-lit, else normal subb */
   while (size)
     {
-      if (!IS_GB && (getPartPairId (left, offset) == PAIR_HL || left->type == AOP_LIT) && getPartPairId (result, offset) == PAIR_HL &&
-        (getPartPairId (right, offset) == PAIR_BC || getPartPairId (right, offset) == PAIR_DE))
+      if (!IS_GB &&
+        aopInReg (result, offset, HL_IDX) &&
+        (aopInReg (left, offset, HL_IDX) || left->type == AOP_LIT || left->type == AOP_IY) &&
+        (aopInReg (right, offset, BC_IDX) || aopInReg (right, offset, DE_IDX) || ((right->type == AOP_IY || right->type == AOP_HL) && getFreePairId (ic) != PAIR_INVALID)))
         {
-          if (left->type == AOP_LIT)
-            fetchLitPair (PAIR_HL, left, offset);
+          PAIR_ID rightpair;
+
+          if (left->type == AOP_LIT || left->type == AOP_IY)
+            fetchPairLong (PAIR_HL, left, ic, offset);
+          if (right->type == AOP_IY || right->type == AOP_HL)
+            {
+              rightpair = getFreePairId (ic);
+              fetchPairLong (rightpair, right, ic, offset);
+            }
+          else
+            rightpair = getPartPairId (right, offset);
+
           if (!offset)
             emit3 (A_CP, ASMOP_A, ASMOP_A);
-          emit2 ("sbc hl, %s", _pairs[getPartPairId (right, offset)].name);
+          emit2 ("sbc hl, %s", _pairs[rightpair].name);
           regalloc_dry_run_cost += 2;
           offset += 2;
           size -= 2;

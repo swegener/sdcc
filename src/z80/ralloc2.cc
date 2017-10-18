@@ -642,6 +642,9 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   if(I[ia.registers[REG_A][1]].size > 1 || (ia.registers[REG_A][0] >= 0 && I[ia.registers[REG_A][0]].size > 1))
     return(false);
 
+  if(ic->op == '!' && getSize(operandType(left)) <= 2 && dying_A)
+    return(true);
+
   if(ic->op == GET_VALUE_AT_ADDRESS)
     return(!IS_BITVAR(getSpec(operandType(result))));
   if(ic->op == '=' && POINTER_SET (ic))

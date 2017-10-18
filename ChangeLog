@@ -7,6 +7,8 @@
 	  Simplify stack adjustment.
 	* src/z80/gen.c:
 	  Improve 32-bit increment.
+	* src/z80/gen.c:
+	  Improve handling of a in negation.
 
 2017-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

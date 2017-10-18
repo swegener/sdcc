@@ -618,6 +618,15 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
         return(true);
     }
 
+  // First two bytes of input may be in A.
+  if(ic->op == IFX && dying_A && (getSize(operandType(left)) >= 1 &&
+    operand_byte_in_reg(left, 0, REG_A, a, i, G) || getSize(operandType(left)) >= 2 && !IS_FLOAT (operandType(left)) && operand_byte_in_reg(left, 1, REG_A, a, i, G)))
+    return(true);
+
+  // Last byte of output may be in A.
+  if(ic->op == GET_VALUE_AT_ADDRESS && IS_ITEMP(result) && operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G))
+    return(true);
+
   if (ic->op == LEFT_OP && getSize(operandType(IC_RESULT(ic))) == 2 && IS_OP_LITERAL(right) && byteOfVal (OP_VALUE (IC_RIGHT(ic)), 0) == 7)
     {
       if(!operand_in_reg(left, REG_A, ia, i, G) || dying_A)
@@ -634,7 +643,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(false);
 
   if(ic->op == GET_VALUE_AT_ADDRESS)
-    return(result_in_A || !IS_BITVAR(getSpec(operandType(result))));
+    return(!IS_BITVAR(getSpec(operandType(result))));
   if(ic->op == '=' && POINTER_SET (ic))
     return(dying_A || !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))));
 

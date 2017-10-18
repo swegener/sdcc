@@ -5,6 +5,8 @@
 	  Improve subtraction of global variables.
 	* src/z80/gen.c:
 	  Simplify stack adjustment.
+	* src/z80/gen.c:
+	  Improve 32-bit increment.
 
 2017-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

@@ -7,10 +7,12 @@
 	  Simplify stack adjustment.
 	* src/z80/gen.c:
 	  Improve 32-bit increment.
-	* src/z80/gen.c:
+	* src/z80/ralloc2.cc:
 	  Improve handling of a in negation.
 	* src/z80/gen.c:
 	  Improve cast to signed long and signed long long.
+	* src/z80/gen.c:
+	  Improve addition of immediates.
 
 2017-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

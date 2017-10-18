@@ -5284,7 +5284,7 @@ genPlus (iCode * ic)
           commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
           i += 2;
         }
-     else  if ((!premoved || i) && !started && i == size - 2 && !i && isPair (AOP (IC_LEFT (ic))) && AOP_TYPE (IC_RIGHT (ic)) == AOP_LIT && getPairId (AOP (IC_LEFT (ic))) != PAIR_HL
+     else  if ((!premoved || i) && !started && i == size - 2 && !i && isPair (AOP (IC_LEFT (ic))) && (rightop->type == AOP_LIT  || rightop->type == AOP_IMMD) && getPairId (AOP (IC_LEFT (ic))) != PAIR_HL
           && isPairDead (PAIR_HL, ic))
         {
           fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
@@ -5384,7 +5384,7 @@ genPlus (iCode * ic)
           i += 2;
         }
       // When adding a literal, the 16 bit addition results in smaller, faster code than two 8-bit additions.
-      else if ((!premoved || i) && aopInReg (AOP (IC_RESULT (ic)), i, HL_IDX) && aopInReg (leftop, i, HL_IDX) && rightop->type == AOP_LIT && !aopIsLitVal (rightop, i, 1, 0))
+      else if ((!premoved || i) && aopInReg (AOP (IC_RESULT (ic)), i, HL_IDX) && aopInReg (leftop, i, HL_IDX) && (rightop->type == AOP_LIT && !aopIsLitVal (rightop, i, 1, 0) || rightop->type == AOP_IMMD))
         {
           PAIR_ID pair = getFreePairId (ic);
           bool pair_alive;

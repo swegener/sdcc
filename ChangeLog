@@ -1,10 +1,20 @@
+2017-10-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* SDCC.props: boost 1.64
+	* sdas/linksrc/lkmem.c: fixed warning
+	* src/mcs51/peep.c,
+	* src/SDCCast.c,
+	* src/SDCCcse.c,
+	* src/SDCCmem.c,
+	* src/z80/ralloc2.cc: cosmetic changes
+
 2017-10-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,
 	  src/z80/gen.c:
 	  Improve handling of a in pointer read and ifx.
 
-2017-05-13 Maarten Brock <sourceforge.brock AT dse.nl>
+2017-10-17 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/z80/main.c (_parseOptions): fix bug #2634
 

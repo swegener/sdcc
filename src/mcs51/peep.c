@@ -262,7 +262,7 @@ termScanAtFunc (const lineNode *pl, int rIdx)
 /*       points to a register (e.g. "ar0"). scan4op() tests for    */
 /*       read or write operations with this register               */
 /*    const char *untilOp                                          */
-/*       points to NULL or a opcode (e.g. "push").                 */
+/*       points to NULL or an opcode (e.g. "push").                */
 /*       scan4op() returns if it hits this opcode.                 */
 /*    lineNode **plCond                                            */
 /*       If a conditional branch is met plCond points to the       */

@@ -3012,16 +3012,18 @@ checkZero (value *val)
 
   if (IS_FLOAT (val->type) || IS_FIXED16X16 (val->type))
     {
-	  if (floatFromVal (val) == 0.0)
+      if (floatFromVal (val) == 0.0)
         werror (E_DIVIDE_BY_ZERO);
     }
   else if (SPEC_LONGLONG (val->type))
     {
-	  if (ullFromVal (val) == 0LL)
+      if (ullFromVal (val) == 0LL)
         werror (E_DIVIDE_BY_ZERO);
-	}
-  else if (ulFromVal (val) == 0L) {
-    werror (E_DIVIDE_BY_ZERO); }
+    }
+  else if (ulFromVal (val) == 0L)
+    {
+      werror (E_DIVIDE_BY_ZERO);
+    }
 }
 
 /*--------------------------------------------------------*/
@@ -3036,11 +3038,11 @@ isAstInAst (ast *tree, ast *search)
     return FALSE;
   if (tree->type == EX_OP)
     {
-	  if (isAstInAst (tree->left, search))
-	    return TRUE;
-	  if (isAstInAst (tree->right, search))
-	    return TRUE;
-	}
+      if (isAstInAst (tree->left, search))
+        return TRUE;
+      if (isAstInAst (tree->right, search))
+        return TRUE;
+    }
   return FALSE;
 }
 
@@ -3051,7 +3053,7 @@ static ast *
 copyAstNode (ast *tree)
 {
   ast * newtree;
-	
+
   newtree = newAst_(tree->type);
   newtree->lineno = tree->lineno;
   newtree->filename = tree->filename;
@@ -3070,7 +3072,6 @@ copyAstNode (ast *tree)
     {
       newtree->opval.val = tree->opval.val;
     }
-
   else if (tree->type == EX_LINK)
     {
       newtree->opval.lnk = tree->opval.lnk;
@@ -3095,31 +3096,34 @@ copyAstNode (ast *tree)
 static void
 rewriteAstGatherSideEffects (ast *tree, set ** sideEffects)
 {
-  if (!tree) return;
+  if (!tree)
+    return;
+
   if (tree->type == EX_OP)
     {
-	  switch (tree->opval.op)
-	    {
-		  case '=':
-		  case INC_OP:
-		  case DEC_OP:
-		  case CALL:
-		  case PCALL:
-		    addSetHead (sideEffects, tree);
-		    break;
-		  default:
-		    if (tree->left)
-		      rewriteAstGatherSideEffects (tree->left, sideEffects);
-		    if (tree->right)
-		      rewriteAstGatherSideEffects (tree->right, sideEffects);
-		}
-	  return;
+      switch (tree->opval.op)
+        {
+          case '=':
+          case INC_OP:
+          case DEC_OP:
+          case CALL:
+          case PCALL:
+            addSetHead (sideEffects, tree);
+            break;
+          default:
+            if (tree->left)
+              rewriteAstGatherSideEffects (tree->left, sideEffects);
+            if (tree->right)
+              rewriteAstGatherSideEffects (tree->right, sideEffects);
+            break;
+        }
+      return;
     }
   if (TETYPE (tree) && IS_VOLATILE (TETYPE (tree)))
     {
-	  addSetHead (sideEffects, tree);
-	  return;
-	}
+      addSetHead (sideEffects, tree);
+      return;
+    }
 }
 
 /*-------------------------------------------------------------------*/
@@ -3142,11 +3146,11 @@ rewriteAstJoinSideEffects (ast *tree, ast *oLeft, ast *oRight)
   /* Join any side-effects found */
   for (sefTree = setFirstItem (sideEffects); sefTree; sefTree = setNextItem (sideEffects))
     {
-	  tree->right = copyAstNode (tree);
-	  tree->left = sefTree;
-	  tree->type = EX_OP;
-	  tree->opval.op = ',';
-	}
+      tree->right = copyAstNode (tree);
+      tree->left = sefTree;
+      tree->type = EX_OP;
+      tree->opval.op = ',';
+    }
 
   deleteSet (&sideEffects);
 }
@@ -4914,7 +4918,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           floatFromVal (valFromType (LTYPE (tree))) == 0 &&
           tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))
         {
-		  rewriteAstNodeOp (tree, '!', tree->right, NULL);
+          rewriteAstNodeOp (tree, '!', tree->right, NULL);
           return decorateType (tree, resultType);
         }
 
@@ -4923,7 +4927,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           floatFromVal (valFromType (RTYPE (tree))) == 0 &&
           tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))
         {
-		  rewriteAstNodeOp (tree, '!', tree->left, NULL);
+          rewriteAstNodeOp (tree, '!', tree->left, NULL);
           return decorateType (tree, resultType);
         }
 

@@ -646,8 +646,7 @@ allocParms (value *val, bool smallc)
             lval->sym->onStack = 1;
 
           /* choose which stack 2 use   */
-          /*  use xternal stack */
-          if (options.useXstack)
+          if (options.useXstack)    /* use external stack */
             {
               /* PENDING: stack direction support */
               wassertl (!smallc, "SmallC calling convention not yet supported for xstack callee");
@@ -656,10 +655,10 @@ allocParms (value *val, bool smallc)
                 xstackPtr - getSize (lval->type);
               xstackPtr -= getSize (lval->type);
             }
-          else
-            {                   /* use internal stack   */
+          else                      /* use internal stack   */
+            {
               SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = istack;
-              if ((port->stack.direction > 0) ^(IFFUNC_ISSMALLC (currFunc->type)))
+              if ((port->stack.direction > 0) != (IFFUNC_ISSMALLC (currFunc->type)))
                 {
                   SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
                     stackPtr - (FUNC_REGBANK (currFunc->type) ? port->stack.bank_overhead : 0) -

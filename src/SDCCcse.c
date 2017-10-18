@@ -1860,8 +1860,6 @@ constFold (iCode * ic, set * cseSet)
   if (!(applyToSet (cseSet, diCodeForSym, IC_LEFT (dic), &ldic)))
     return 0;
 
-
-
   if (POINTER_GET (ldic) && getSize (operandType (IC_LEFT (ldic))) <= 1)
     return 0;
 

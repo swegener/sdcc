@@ -476,7 +476,7 @@ int summary2(struct area * areap)
     int toreturn = 0;
     unsigned int i, j;
     unsigned long int Stack_Start=0, Stack_Size;
-    int spare_begin = -1, spare_size = 0;
+    unsigned int spare_begin = 0, spare_size = 0;
 
     struct area * xp;
     struct area * xstack_xp = NULL;

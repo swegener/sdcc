@@ -1329,9 +1329,25 @@ replace restart {
 	ld	(hl),#0x00
 	inc	hl
 	ld	(hl),#0x00
+	inc	hl
+	ld	(hl),#0x00
 } by {
 	xor	a, a
-	; peephole 128 cached zero in a.
+	; peephole 128a cached zero in a.
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+	inc	hl
+	ld	(hl), a
+} if notUsed('a')
+
+replace restart {
+	ld	(hl),#0x00
+	inc	hl
+	ld	(hl),#0x00
+} by {
+	xor	a, a
+	; peephole 128b cached zero in a.
 	ld	(hl), a
 	inc	hl
 	ld	(hl), a

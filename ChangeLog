@@ -1,3 +1,8 @@
+2017-10-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def:
+	  Optimize ifx on 16-bit pointer read.
+
 2017-10-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

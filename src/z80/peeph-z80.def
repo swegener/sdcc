@@ -993,6 +993,18 @@ replace restart {
 // canAssign('b' %2) is true, iff or a,%2 is possible.
 
 replace restart {
+	ld	%1, (hl)
+	inc	hl
+	ld	a, (hl)
+	or	a, %1
+} by {
+	ld	a, (hl)
+	inc	hl
+	; peephole 99a removed load by reordering or arguments.
+	or	a, (hl)
+} if notUsed(%1)
+
+replace restart {
 	and	a,%1
 	or	a,a
 } by {

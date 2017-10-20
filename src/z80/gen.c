@@ -10817,7 +10817,10 @@ genCast (const iCode *ic)
         _push (PAIR_AF), pushed_a = TRUE;
 
       cheapMove (ASMOP_A, 0, AOP (right), offset);
-      cheapMove (AOP (result), offset++, ASMOP_A, 0);
+      if (AOP (right)->type != AOP_REG || AOP (result)->type != AOP_REG || AOP (right)->aopu.aop_reg[offset] != AOP (result)->aopu.aop_reg[offset])
+        cheapMove (AOP (result), offset, ASMOP_A, 0);
+      offset++;
+
       /* we need to extend the sign */
       emit3 (A_RLA, 0, 0);
       emit3 (A_SBC, ASMOP_A, ASMOP_A);

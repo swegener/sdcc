@@ -924,50 +924,50 @@ replace restart {
 } if notUsed('a'), notUsedFrom(%1 'a')
 
 replace {
-	ld	e,#0x%1
-	ld	d,#0x%2
+	ld	e, #0x%1
+	ld	d, #0x%2
 } by {
-	ld	de,#0x%2%1
+	ld	de, #0x%2%1
 	; peephole 92 combined constant loads into register pair.
 }
 
 replace {
-	ld	d,#0x%1
-	ld	e,#0x%2
+	ld	d, #0x%1
+	ld	e, #0x%2
 } by {
-	ld	de,#0x%1%2
+	ld	de, #0x%1%2
 	; peephole 93 combined constant loads into register pair.
 }
 
 replace {
-	ld	l,#0x%1
-	ld	h,#0x%2
+	ld	l, #0x%1
+	ld	h, #0x%2
 } by {
-	ld	hl,#0x%2%1
+	ld	hl, #0x%2%1
 	; peephole 94 combined constant loads into register pair.
 }
 
 replace {
-	ld	h,#0x%1
-	ld	l,#0x%2
+	ld	h, #0x%1
+	ld	l, #0x%2
 } by {
-	ld	hl,#0x%1%2
+	ld	hl, #0x%1%2
 	; peephole 95 combined constant loads into register pair.
 }
 
 replace {
-	ld	c,#0x%1
-	ld	b,#0x%2
+	ld	c, #0x%1
+	ld	b, #0x%2
 } by {
-	ld	bc,#0x%2%1
+	ld	bc, #0x%2%1
 	; peephole 96 combined constant loads into register pair.
 }
 
 replace {
-	ld	b,#0x%1
-	ld	c,#0x%2
+	ld	b, #0x%1
+	ld	c, #0x%2
 } by {
-	ld	bc,#0x%1%2
+	ld	bc, #0x%1%2
 	; peephole 97 combined constant loads into register pair.
 }
 

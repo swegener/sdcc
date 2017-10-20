@@ -1,9 +1,15 @@
+2017-10-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Improve handling of a in cast.
+
 2017-10-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-z80.def:
 	  Optimize ifx on 16-bit pointer read.
 	* src/z80/peeph-z80.def:
-	  Improve peephole rules for chaching 0 in a.
+	  Improve peephole rules for caching 0 in a.
 
 2017-10-18 Philipp Klaus Krause <pkk AT spth.de>
 

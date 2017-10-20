@@ -3,6 +3,8 @@
 	* src/z80/ralloc2.cc,
 	  src/z80/gen.c:
 	  Improve handling of a in cast.
+	* src/z80/gen.c:
+	  Improve &.
 
 2017-10-19 Philipp Klaus Krause <pkk AT spth.de>
 

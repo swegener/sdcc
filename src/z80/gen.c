@@ -7638,6 +7638,8 @@ genAnd (const iCode * ic, iCode * ifx)
       goto release;
     }
 
+  wassertl (AOP_TYPE (result) != AOP_CRY, "Result of and is in a bit");
+
   for (int i = 0; i < size;)
     {
       if (AOP_TYPE (right) == AOP_LIT)
@@ -7659,9 +7661,9 @@ genAnd (const iCode * ic, iCode * ifx)
           else if (isLiteralBit (~bytelit & 0xffu) >= 0 &&
             (AOP_TYPE (result) == AOP_REG || left == right && (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_DIR)))
             {
-              cheapMove (result->aop, offset, left->aop, offset);
+              cheapMove (result->aop, i, left->aop, i);
               if (!regalloc_dry_run)
-                emit2 ("res %d, %s", isLiteralBit (~bytelit & 0xffu), aopGet (result->aop, offset, FALSE));
+                emit2 ("res %d, %s", isLiteralBit (~bytelit & 0xffu), aopGet (result->aop, i, FALSE));
               regalloc_dry_run_cost += 2;
               i++;
               continue;
@@ -7825,62 +7827,84 @@ genOr (const iCode * ic, iCode * ifx)
       goto release;
     }
 
-  /* if left is same as result */
-  if (sameRegs (AOP (result), AOP (left)))
+  wassertl (AOP_TYPE (result) != AOP_CRY, "Result of or is in a bit");
+
+  for (int i = 0; i < size;)
     {
-      for (; size--; offset++)
+      if (AOP_TYPE (right) == AOP_LIT)
         {
-          if (AOP_TYPE (right) == AOP_LIT)
+          bytelit = byteOfVal (right->aop->aopu.aop_lit, i);
+
+          if (bytelit == 0xff)
             {
-              bytelit = (lit >> (offset * 8)) & 0x0FFL;
-              if (bytelit == 0x00L)
-                continue;
-              else
-                {
-                  cheapMove (ASMOP_A, 0, AOP (left), offset);
-                  if (isLiteralBit (bytelit) >= 0)
-                    emit2 ("set %d, a", isLiteralBit (bytelit));
-                  else
-                    emit3_o (A_OR, ASMOP_A, 0, AOP (right), offset);
-                  cheapMove (AOP (result), offset, ASMOP_A, 0);
-                }
+              // TODO
             }
-          else
+          else if (bytelit == 0x00)
             {
-              cheapMove (ASMOP_A, 0, AOP (left), offset);
-              emit3_o (A_OR, ASMOP_A, 0, AOP (right), offset);
-              cheapMove (AOP (result), offset, ASMOP_A, 0);
+              cheapMove (result->aop, i, left->aop, i);
+              i++;
+              continue;
+            }
+          else if (isLiteralBit (bytelit) >= 0 &&
+            (AOP_TYPE (result) == AOP_REG || left == right && (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_DIR)))
+            {
+              cheapMove (result->aop, i, left->aop, i);
+              if (!regalloc_dry_run)
+                emit2 ("set %d, %s", isLiteralBit (bytelit), aopGet (result->aop, i, FALSE));
+              regalloc_dry_run_cost += 2;
+              i++;
+              continue;
+            }
+          else if (IS_RAB &&
+            (aopInReg (result->aop, i, HL_IDX) && (aopInReg (left->aop, i, HL_IDX) && !isPairInUse (PAIR_DE, ic) || aopInReg (left->aop, i, DE_IDX)) ||
+            aopInReg (result->aop, i, H_IDX) && aopInReg (result->aop, i + 1, L_IDX) && (aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i + 1, L_IDX) && !isPairInUse (PAIR_DE, ic) || aopInReg (left->aop, i, D_IDX) && aopInReg (left->aop, i + 1, E_IDX))))
+            {
+              unsigned short mask = aopInReg (result->aop, i, L_IDX) ? (bytelit + (byteOfVal (right->aop->aopu.aop_lit, i + 1) << 8)) : (byteOfVal (right->aop->aopu.aop_lit, i + 1) + (bytelit << 8));
+              bool mask_in_de = (aopInReg (left->aop, i, L_IDX) | aopInReg (left->aop, i, H_IDX));
+              emit2 (mask_in_de ? "ld de, !immedword" : "ld hl, !immedword", mask);
+              emit2 ("or hl, de");
+              regalloc_dry_run_cost += 4;
+              i += 2;
+              continue;
             }
         }
-    }
-  else
-    {
-      // left & result in different registers
-      if (AOP_TYPE (result) == AOP_CRY)
+
+      if (IS_RAB)
         {
-          wassertl (0, "Result of OR is in a bit");
+          const bool this_byte_l = aopInReg (result->aop, i, L_IDX) &&
+            (aopInReg (left->aop, i, L_IDX) && aopInReg (left->aop, i, E_IDX) || aopInReg (left->aop, i, E_IDX) && aopInReg (left->aop, i, L_IDX));
+          const bool this_byte_h = aopInReg (result->aop, i, H_IDX) &&
+            (aopInReg (left->aop, i, H_IDX) && aopInReg (left->aop, i, D_IDX) || aopInReg (left->aop, i, D_IDX) && aopInReg (left->aop, i, H_IDX));
+          const bool next_byte_l = aopInReg (result->aop, i + 1, L_IDX) &&
+            (aopInReg (left->aop, i + 1, L_IDX) && aopInReg (left->aop, i + 1, E_IDX) || aopInReg (left->aop, i + 1, E_IDX) && aopInReg (left->aop, i + 1, L_IDX));
+          const bool next_byte_h = aopInReg (result->aop, i + 1, H_IDX) &&
+            (aopInReg (left->aop, i + 1, H_IDX) && aopInReg (left->aop, i + 1, D_IDX) || aopInReg (left->aop, i + 1, D_IDX) && aopInReg (left->aop, i + 1, H_IDX));
+
+          const bool this_byte = this_byte_l || this_byte_h;
+          const bool next_byte = next_byte_l || next_byte_h;
+
+          const bool next_byte_unused = !bitVectBitValue (ic->rMask, this_byte_l ? H_IDX : L_IDX);
+
+          if (this_byte && (next_byte || next_byte_unused))
+            {
+              emit2 ("or hl, de");
+              regalloc_dry_run_cost++;
+              i += (1 + next_byte);
+              continue;
+            }
         }
+
+      // Use plain or in a.
+      if (aopInReg (right->aop, i, A_IDX))
+        emit3_o (A_OR, ASMOP_A, 0, left->aop, i);
       else
-        for (; (size--); offset++)
-          {
-            // normal case
-            // result = left & right
-            if (AOP_TYPE (right) == AOP_LIT)
-              {
-                if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
-                  {
-                    cheapMove (AOP (result), offset, AOP (left), offset);
-                    continue;
-                  }
-              }
-            // This is a bit broken, there will be problems for y_0 = x_0 | z_0, x_0 = y_0 | z_1 as either order of the two byte ors will result in the result destroying the second part of the operand. Currently, we use a workaround in the register allocator to avoid this. See also the comment on the 2-byte addition workaround above.
-            cheapMove (ASMOP_A, 0, AOP (left), offset);
-            if (AOP_TYPE (right) == AOP_LIT && isLiteralBit (((lit >> (offset * 8)) & 0x0FFL)) >= 0)
-              emit2 ("set %d, a", isLiteralBit (((lit >> (offset * 8)) & 0x0FFL)));
-            else
-              emit3_o (A_OR, ASMOP_A, 0, AOP (right), offset);
-            cheapMove (AOP (result), offset, ASMOP_A, 0);
-          }
+        {
+          cheapMove (ASMOP_A, 0, left->aop, i);
+          emit3_o (A_OR, ASMOP_A, 0, right->aop, i);
+        }
+      cheapMove (result->aop, i, ASMOP_A, 0);
+
+      i++;
     }
 
 release:

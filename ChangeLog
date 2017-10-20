@@ -5,6 +5,8 @@
 	  Improve handling of a in cast.
 	* src/z80/gen.c:
 	  Improve &.
+	* src/z80/gen.c:
+	  Improve |.
 
 2017-10-19 Philipp Klaus Krause <pkk AT spth.de>
 

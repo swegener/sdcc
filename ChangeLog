@@ -1,3 +1,8 @@
+2017-10-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCdwarf2.c:
+	  Infrastructure for debug info for partially spilt variables.
+
 2017-10-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,

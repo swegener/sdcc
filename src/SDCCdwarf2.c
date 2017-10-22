@@ -2715,9 +2715,7 @@ dwWriteSymbolInternal (symbol *sym)
         {
           if (!symloc->regs[i]) /* Spilt byte of variable */
             {
-              // TODO: Implement this instead of giving up!
-              lp = NULL;
-              break;
+              reglp = dwNewLoc (DW_OP_fbreg, NULL, symloc->stack /* TODO: + or - some offset to get the correct byte */);
             }
           else /* Byte in registers */
             {

@@ -2,6 +2,8 @@
 
 	* src/SDCCdwarf2.c:
 	  Infrastructure for debug info for partially spilt variables.
+	* src/SDCCmain.c:
+	  Document command line options in help output.
 
 2017-10-20 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -2643,7 +2643,7 @@ dwWriteSymbolInternal (symbol *sym)
   symbol * symloc;
   dwtag * functp;
   dwattr * funcap;
-  int inregs = 0;
+  bool inregs = FALSE;
 
   if (!sym->level || IS_EXTERN (sym->etype))
     scopetp = dwRootTag;
@@ -2688,14 +2688,20 @@ dwWriteSymbolInternal (symbol *sym)
   if (!sym->allocreq && sym->reqv)
     {
       symloc = OP_SYMBOL (symloc->reqv);
-      if (symloc->isspilt && !symloc->remat)
+
+      for (int i = 0; i < sym->nRegs; i++)
+        if (symloc->regs[i])
+          {
+            inregs = TRUE;
+            break;
+          }
+
+      if (!inregs && symloc->isspilt && !symloc->remat)
         symloc = symloc->usl.spillLoc;
-      else
-        inregs = 1;
     }
   
   lp = NULL;
-  if (inregs && symloc->regs[0])
+  if (inregs) /* Variable (partially) in registers*/
     {
       dwloc * reglp;
       dwloc * lastlp = NULL;
@@ -2707,17 +2713,26 @@ dwWriteSymbolInternal (symbol *sym)
            (port->little_endian ? (i < symloc->nRegs) : (i >= 0));
            (port->little_endian ? i++ : i--))
         {
-          regNum = port->debugger.dwarf.regNum (symloc->regs[i]);
-          if (regNum >= 0 && regNum <= 31)
-            reglp = dwNewLoc (DW_OP_reg0 + regNum, NULL, 0);
-          else if (regNum >= 0)
-            reglp = dwNewLoc (DW_OP_regx, NULL, regNum);
-          else
+          if (!symloc->regs[i]) /* Spilt byte of variable */
             {
-              /* We are forced to give up if the ABI for this port */
-              /* does not define a number for this register        */
+              // TODO: Implement this instead of giving up!
               lp = NULL;
               break;
+            }
+          else /* Byte in registers */
+            {
+              regNum = port->debugger.dwarf.regNum (symloc->regs[i]);
+              if (regNum >= 0 && regNum <= 31)
+                reglp = dwNewLoc (DW_OP_reg0 + regNum, NULL, 0);
+              else if (regNum >= 0)
+                reglp = dwNewLoc (DW_OP_regx, NULL, regNum);
+              else
+                {
+                  /* We are forced to give up if the ABI for this port */
+                  /* does not define a number for this register        */
+                  lp = NULL;
+                  break;
+                }
             }
           
           if (lastlp)

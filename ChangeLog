@@ -1,3 +1,8 @@
+2017-10-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCdwarf2.c:
+	  Debug info for partially spilt variables.
+
 2017-10-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCdwarf2.c:

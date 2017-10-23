@@ -2636,13 +2636,13 @@ dwFindScope (dwtag * tp, int block)
 static int
 dwWriteSymbolInternal (symbol *sym)
 {
-  dwtag * tp;
-  dwtag * subtp;
-  dwloc * lp;
-  dwtag * scopetp;
-  symbol * symloc;
-  dwtag * functp;
-  dwattr * funcap;
+  dwtag *tp;
+  dwtag *subtp;
+  dwloc *lp;
+  dwtag *scopetp;
+  symbol *symloc;
+  dwtag *functp;
+  dwattr *funcap;
   bool inregs = FALSE;
 
   if (!sym->level || IS_EXTERN (sym->etype))
@@ -2703,19 +2703,28 @@ dwWriteSymbolInternal (symbol *sym)
   lp = NULL;
   if (inregs) /* Variable (partially) in registers*/
     {
-      dwloc * reglp;
-      dwloc * lastlp = NULL;
-      int regNum;
-      int i;
+      dwloc *reglp;
+      dwloc *lastlp = NULL;
+      symbol *spillloc = NULL;
+      int regNum, i, stack = 0;
+      int stackchange = port->little_endian ? port->stack.direction : -port->stack.direction;
+
+      if ((spillloc = symloc->usl.spillLoc) && spillloc->onStack)
+        stack = (port->little_endian ? spillloc->stack + symloc->nRegs - 1 : spillloc->stack);
       
       /* register allocation */
       for (i = (port->little_endian ? 0 : symloc->nRegs-1);
            (port->little_endian ? (i < symloc->nRegs) : (i >= 0));
-           (port->little_endian ? i++ : i--))
+           (port->little_endian ? i++ : i--), stack += stackchange)
         {
           if (!symloc->regs[i]) /* Spilt byte of variable */
             {
-              reglp = dwNewLoc (DW_OP_fbreg, NULL, symloc->usl.spillLoc->stack /* TODO: + or - some offset to get the correct byte */);
+              if (!(spillloc && spillloc->onStack))
+                {
+                  lp = NULL;
+                  break;
+                }
+              reglp = dwNewLoc (DW_OP_fbreg, NULL, stack);
             }
           else /* Byte in registers */
             {

@@ -2,6 +2,9 @@
 
 	* src/SDCCdwarf2.c:
 	  Debug info for partially spilt variables.
+	* doc/sdccman.lyx,
+	  doc/Makefile.in:
+	  Fix SDCC version in manual title for out-of-tree build.
 
 2017-10-22 Philipp Klaus Krause <pkk AT spth.de>
 

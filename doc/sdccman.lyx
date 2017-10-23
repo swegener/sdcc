@@ -170,7 +170,7 @@ SDCC Compiler User Guide
 SDCC 
 \begin_inset CommandInset include
 LatexCommand input
-filename "../.version"
+filename "sdcc_version"
 
 \end_inset
 

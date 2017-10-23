@@ -71,8 +71,9 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 
 %.tex: %.lyx
 	if [ "$(srcdir)" != "." ] ; then \
-	  cp -f $(srcdir)/$(notdir $<) $(srcdir)/*.svg . ; \
+	  cp -f $(srcdir)/$(notdir $^) $(srcdir)/*.svg . ; \
 	fi
+	echo $(VERSION) > sdcc_version
 	$(LYX) -e latex $(notdir $<);
 
 %.ind: %.dvi

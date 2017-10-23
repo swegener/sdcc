@@ -2791,8 +2791,8 @@ getLeftResultType (ast * tree, RESULT_TYPE resultType)
     case '[':
       if (!IS_ARRAY (LTYPE (tree)))
         return resultType;
-      if (DCL_ELEM (LTYPE (tree)) > 0 && getSize (tree->left->ftype) < 256)
-        return RESULT_TYPE_CHAR;
+      if (DCL_ELEM (LTYPE (tree)) > 0 && getSize (tree->left->ftype) < 128)
+        return RESULT_TYPE_CHAR; // TODO: Instead of doing this optimization here, do it later on the iCode (where it probably could use a more efficient unsigned char).
       return resultType;
     default:
       return resultType;

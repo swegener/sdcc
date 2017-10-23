@@ -5,6 +5,9 @@
 	* doc/sdccman.lyx,
 	  doc/Makefile.in:
 	  Fix SDCC version in manual title for out-of-tree build.
+	* src/SDCCast.c,
+	  support/regression/tests/bug-2632.c:
+	  Fix bug #2632.
 
 2017-10-22 Philipp Klaus Krause <pkk AT spth.de>
 

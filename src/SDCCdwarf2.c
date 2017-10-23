@@ -2685,7 +2685,7 @@ dwWriteSymbolInternal (symbol *sym)
   /*   b) register equivalent,                   */
   /*   c) spill location                         */
   symloc = sym;
-  if (!sym->allocreq && sym->reqv)
+  if (/*!sym->allocreq &&*/ sym->reqv)
     {
       symloc = OP_SYMBOL (symloc->reqv);
 

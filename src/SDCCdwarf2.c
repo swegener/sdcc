@@ -2689,7 +2689,7 @@ dwWriteSymbolInternal (symbol *sym)
     {
       symloc = OP_SYMBOL (symloc->reqv);
 
-      for (int i = 0; i < sym->nRegs; i++)
+      for (int i = 0; i < symloc->nRegs; i++)
         if (symloc->regs[i])
           {
             inregs = TRUE;
@@ -2699,7 +2699,7 @@ dwWriteSymbolInternal (symbol *sym)
       if (!inregs && symloc->isspilt && !symloc->remat)
         symloc = symloc->usl.spillLoc;
     }
-  
+
   lp = NULL;
   if (inregs) /* Variable (partially) in registers*/
     {
@@ -2711,7 +2711,7 @@ dwWriteSymbolInternal (symbol *sym)
 
       if ((spillloc = symloc->usl.spillLoc) && spillloc->onStack)
         stack = (port->little_endian ? spillloc->stack + symloc->nRegs - 1 : spillloc->stack);
-      
+
       /* register allocation */
       for (i = (port->little_endian ? 0 : symloc->nRegs-1);
            (port->little_endian ? (i < symloc->nRegs) : (i >= 0));

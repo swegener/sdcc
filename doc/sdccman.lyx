@@ -21189,7 +21189,7 @@ __xdata
  also section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Startup-Code"
+reference "subsec:MCS51-Startup-Code"
 
 \end_inset
 
@@ -25469,7 +25469,7 @@ HC08!interrupt
  this way; instead see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Startup-Code"
+reference "subsec:MCS51-Startup-Code"
 
 \end_inset
 
@@ -40498,7 +40498,7 @@ For more exotic implementations further customizations may be needed.
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "subsec:Startup-Code"
+reference "subsec:MCS51-Startup-Code"
 
 \end_inset
 
@@ -40847,6 +40847,13 @@ reference "lyx:-Wl option"
 
 \begin_layout Subsection
 MCS51/DS390 Startup Code
+\begin_inset CommandInset label
+LatexCommand label
+name "subsec:MCS51-Startup-Code"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -60869,7 +60876,7 @@ The compiler will try to keep these temporary variables in registers.
 \begin_layout Subsection
 Dead-Code Elimination
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 Dead-code elimination

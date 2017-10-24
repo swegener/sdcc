@@ -2037,6 +2037,19 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
           _pop (pairId);
           _push (pairId);
         }
+      else if (!IS_GB && (aop->type == AOP_IY || aop->type == AOP_HL) && !(pairId == PAIR_IY && aop->size < 2))
+        {
+          /* Instead of fetching relative to IY, just grab directly
+             from the address IY refers to */
+          emit2 ("ld %s, (%s)", _pairs[pairId].name, aopGetLitWordLong (aop, offset, FALSE));
+          regalloc_dry_run_cost += (pairId == PAIR_HL ? 3 : 4);
+
+          if (aop->size < 2)
+            {
+              emit2 ("ld %s, !zero", _pairs[pairId].h);
+              regalloc_dry_run_cost += 2;
+            }
+        }
       /* we need to get it byte by byte */
       else if (pairId == PAIR_HL && (IS_GB || (IY_RESERVED && aop->type == AOP_HL)) && requiresHL (aop))
         {
@@ -2071,19 +2084,6 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                     _pop (PAIR_AF);
                 }
               break;
-            }
-        }
-      else if (!IS_GB && aop->type == AOP_IY && !(pairId == PAIR_IY && aop->size < 2))
-        {
-          /* Instead of fetching relative to IY, just grab directly
-             from the address IY refers to */
-          emit2 ("ld %s, (%s)", _pairs[pairId].name, aopGetLitWordLong (aop, offset, FALSE));
-          regalloc_dry_run_cost += (pairId == PAIR_HL ? 3 : 4);
-
-          if (aop->size < 2)
-            {
-              emit2 ("ld %s, !zero", _pairs[pairId].h);
-              regalloc_dry_run_cost += 2;
             }
         }
       else if (pairId == PAIR_IY)
@@ -4009,7 +4009,17 @@ static void genSend (const iCode *ic)
     }
   else if (size <= 4)
     {
-      if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+      if (_fReturn3[0]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[1]->aopu.aop_reg[0]->rIdx == H_IDX &&
+        _fReturn3[2]->aopu.aop_reg[0]->rIdx == E_IDX && _fReturn3[3]->aopu.aop_reg[0]->rIdx == D_IDX)
+        {
+          fetchPairLong (PAIR_DE, AOP (IC_LEFT (ic)), ic, 2);
+          z80_regs_used_as_parms_in_calls_from_current_function[E_IDX] = true;
+          z80_regs_used_as_parms_in_calls_from_current_function[D_IDX] = true;
+          fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
+          z80_regs_used_as_parms_in_calls_from_current_function[L_IDX] = true;
+          z80_regs_used_as_parms_in_calls_from_current_function[H_IDX] = true;
+        }
+      else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
         {
           int i;
           short retarray[4], oparray[4];

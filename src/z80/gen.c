@@ -1769,6 +1769,7 @@ aopGetLitWordLong (const asmop *aop, int offset, bool with_hash)
 
     default:
       dbuf_destroy (&dbuf);
+      fprintf (stderr, "aop->type: %d\n", aop->type);
       wassertl (0, "aopGetLitWordLong got unsupported aop->type");
       exit (0);
     }
@@ -2457,13 +2458,16 @@ aopGet (asmop *aop, int offset, bool bit16)
           break;
 
         case AOP_EXSTK:
-          wassert (!IS_GB);
-          setupPair (PAIR_IY, aop, offset);
-          dbuf_tprintf (&dbuf, "!*iyx", offset);
-          break;
+          if (!IY_RESERVED)
+            {
+              wassert (!IS_GB);
+              setupPair (PAIR_IY, aop, offset);
+              dbuf_tprintf (&dbuf, "!*iyx", offset);
+              break;
+            }
 
         case AOP_STK:
-          if (IS_GB)
+          if (IS_GB || aop->type == AOP_EXSTK)
             {
               setupPair (PAIR_HL, aop, offset);
               dbuf_tprintf (&dbuf, "!*hl");
@@ -2513,7 +2517,8 @@ aopGet (asmop *aop, int offset, bool bit16)
 
         default:
           dbuf_destroy (&dbuf);
-          wassertl (0, "aopget got unsupported aop->type");
+          fprintf (stderr, "aop->type: %d\n", aop->type);
+          wassertl (0, "aopGet got unsupported aop->type");
           exit (0);
         }
     }
@@ -2701,22 +2706,25 @@ aopPut (asmop * aop, const char *s, int offset)
       break;
 
     case AOP_EXSTK:
-      wassert (!IS_GB);
-      if (!canAssignToPtr (s))
+      if(!IY_RESERVED)
         {
-          emit2 ("ld a, %s", s);
-          setupPair (PAIR_IY, aop, offset);
-          emit2 ("ld !*iyx, a", offset);
-        }
-      else
-        {
-          setupPair (PAIR_IY, aop, offset);
-          emit2 ("ld !*iyx, %s", offset, s);
-        }
-      break;
+          wassert (!IS_GB);
+          if (!canAssignToPtr (s))
+            {
+              emit2 ("ld a, %s", s);
+              setupPair (PAIR_IY, aop, offset);
+              emit2 ("ld !*iyx, a", offset);
+            }
+          else
+            {
+              setupPair (PAIR_IY, aop, offset);
+              emit2 ("ld !*iyx, %s", offset, s);
+            }
+          break;
+       }
 
     case AOP_STK:
-      if (IS_GB)
+      if (IS_GB || aop->type == AOP_EXSTK)
         {
           /* PENDING: re-target */
           if (!strcmp (s, "!*hl") || !strcmp (s, "(hl)") || !strcmp (s, "[hl]"))
@@ -2811,7 +2819,8 @@ aopPut (asmop * aop, const char *s, int offset)
       break;
 
     default:
-      dbuf_destroy (&dbuf);
+      dbuf_destroy (&dbuf); fprintf (stderr, "AOP_DIR: %d\n",AOP_DIR);
+      fprintf (stderr, "aop->type: %d\n", aop->type);
       werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopPut got unsupported aop->type");
       exit (0);
     }
@@ -9973,7 +9982,7 @@ genPointerSet (iCode * ic)
   aopOp (result, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
 
-  if (IS_GB)
+  if (IS_GB || IY_RESERVED)
     pairId = isRegOrLit (AOP (right)) ? PAIR_HL : PAIR_DE;
   if (isPair (AOP (result)) && isPairDead (getPairId (AOP (result)), ic))
     pairId = getPairId (AOP (result));
@@ -10181,7 +10190,7 @@ genPointerSet (iCode * ic)
           offset++;
         }
       /* Restore operand partially in HL. */
-      if (!isPairDead (pairId, ic))
+      if (!isPairDead (pairId, ic) && AOP (result)->type == AOP_REG)
         {
           while(offset-- > 1)
             {

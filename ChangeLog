@@ -2,6 +2,8 @@
 
 	* doc/sdccman.lyx:
 	  Fix broken references.
+	* src/z80/gen.c:
+	  Fix various --reserve-regs-iy issues, including bugs #2400, #2278.
 
 2017-10-23 Philipp Klaus Krause <pkk AT spth.de>
 

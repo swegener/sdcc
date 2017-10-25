@@ -648,6 +648,14 @@ replace restart {
 } if labelRefCountChange(%1 -1)
 
 replace restart {
+	jra	%1
+%1:
+} by {
+%1:
+	; peephole j1c removed redundant jump.
+} if labelRefCountChange(%1 -1)
+
+replace restart {
 	jp	%1
 	jp	%2
 } by {
@@ -928,6 +936,32 @@ replace restart {
 } by {
 	; peephole j30 removed unused label %1.
 } if labelRefCount(%1 0)
+
+
+replace restart {
+	ldw     x, (%1, sp)
+	cpw     x, #%2
+	jrsge   %3
+	ldw     x, #%2
+} by {
+	ldw     x, #%2
+	cpw     x, (%1, sp)
+	jrslt   %3
+	; peephole j31 removed load by inverting jump condition.
+} if notUsedFrom(%3 'x')
+
+replace restart {
+	ldw     x, (%1, sp)
+	cpw     x, #%2
+	jrsle   %3
+	ldw     x, #%2
+} by {
+	ldw     x, #%2
+	cpw     x, (%1, sp)
+	jrsgt   %3
+	; peephole j32 removed load by inverting jump condition.
+} if notUsedFrom(%3 'x')
+
 
 // Barrier, since notUsed() is better at dealing with ret than with jp to unknown location.
 barrier

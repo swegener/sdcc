@@ -2,6 +2,9 @@
 
 	* src/z80/gen:
 	  Fix a --reserve-regs-iy bug in 32/64-bit comparisons.
+	* src/stm8/peeph.def,
+	  src/stm8/gen.c:
+	  Minor improvements for stm8.
 
 2017-10-25 Philipp Klaus Krause <pkk AT spth.de>
 

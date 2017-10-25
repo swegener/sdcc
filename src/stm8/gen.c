@@ -2066,6 +2066,20 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             }
           i += 2;
         }
+      else if (i + 1 < size && source->type == AOP_LIT && aopIsLitVal (source, soffset + i, 2, byteOfVal (source->aopu.aop_lit, soffset + i - 2) + byteOfVal (source->aopu.aop_lit, soffset + i - 1) * 256) &&
+        (aopInReg (result, roffset + i, X_IDX) && aopInReg (result, roffset + i - 2, Y_IDX) || aopInReg (result, roffset + i, Y_IDX) && aopInReg (result, roffset + i - 2, X_IDX)))
+        {
+          emit2 ("ldw", "%s, %s", aopGet2 (result, roffset + i), aopGet2 (result, roffset + i - 2));
+          cost (1 + aopInReg (result, roffset + i, Y_IDX), 1);
+          i += 2;
+        }
+      else if (i + 1 < size && aopInReg (result, roffset + i, X_IDX) && (aopIsLitVal (source, soffset + i, 2, 0x0001) || aopIsLitVal (source, soffset + i, 2, 0xffff)))
+        {
+          bool dec = aopIsLitVal (source, soffset + i, 2, 0xffff);
+          emit3w (A_CLRW, ASMOP_X, 0);
+          emit3w (dec ? A_DECW : A_INCW, ASMOP_X, 0);
+          i += 2;
+        }
       else if (i + 1 < size && aopInReg (result, roffset + i, X_IDX) &&
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {

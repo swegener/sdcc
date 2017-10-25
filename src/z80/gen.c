@@ -4115,20 +4115,37 @@ emitCall (const iCode *ic, bool ispcall)
           emit2 ("call %s", aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
           regalloc_dry_run_cost += 3;
         }
-      else if (!(isPair (AOP (IC_LEFT (ic))) && getPairId (AOP (IC_LEFT (ic))) == PAIR_IY) && !IFFUNC_ISZ88DK_FASTCALL (ftype))
+      else if (getPairId (AOP (IC_LEFT (ic))) != PAIR_IY && !IFFUNC_ISZ88DK_FASTCALL (ftype))
         {
           spillPair (PAIR_HL);
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
           emit2 ("call ___sdcc_call_hl");
         }
-      else
+      else if (!IS_GB && !IY_RESERVED)
         {
-          wassert (!IS_GB);
-          wassertl (!IY_RESERVED, "__z88dk_fastcall through function pointer for --reserve-regs-iy unimplemented");
           spillPair (PAIR_IY);
           fetchPairLong (PAIR_IY, AOP (IC_LEFT (ic)), ic, 0);
           emit2 ("call ___sdcc_call_iy");
         }
+      else // Use bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
+        {
+          wassert (IY_RESERVED); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
+          symbol *tlbl = 0;
+          if (!regalloc_dry_run)
+            {
+              tlbl = newiTempLabel (NULL);
+              emit2 ("ld bc, #!tlabel", labelKey2num (tlbl->key));
+              emit2 ("push bc");
+              regalloc_dry_run_cost += 4;
+            }
+          fetchPairLong (PAIR_BC, AOP (IC_LEFT (ic)), ic, 0);
+          emit2 ("push bc");
+          emit2 ("ret");
+          regalloc_dry_run_cost += 2;
+          if (tlbl)
+            emit2 ("!tlabeldef", labelKey2num (tlbl->key));
+        }
+
       freeAsmop (IC_LEFT (ic), NULL);
     }
   else

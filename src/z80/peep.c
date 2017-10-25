@@ -217,6 +217,27 @@ static bool argCont(const char *arg, const char *what)
 }
 
 static bool
+z80MightBeParmInCallFromCurrentFunction(const char *what)
+{
+  if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
+    return TRUE;
+  if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
+    return TRUE;
+  if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
+    return TRUE;
+  if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
+    return TRUE;
+  if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
+    return TRUE;
+  if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
+    return TRUE;
+  if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
+    return TRUE;
+
+  return FALSE;
+}
+
+static bool
 z80MightRead(const lineNode *pl, const char *what)
 {
   if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
@@ -256,27 +277,11 @@ z80MightRead(const lineNode *pl, const char *what)
         return FALSE;
       }
       else // Fallback needed for calls through function pointers and for calls to literal addresses.
-      {
-        if (strchr(what, 'l') && z80_regs_used_as_parms_in_calls_from_current_function[L_IDX])
-          return TRUE;
-        if (strchr(what, 'h') && z80_regs_used_as_parms_in_calls_from_current_function[H_IDX])
-          return TRUE;
-        if (strchr(what, 'e') && z80_regs_used_as_parms_in_calls_from_current_function[E_IDX])
-          return TRUE;
-        if (strchr(what, 'd') && z80_regs_used_as_parms_in_calls_from_current_function[D_IDX])
-          return TRUE;
-        if (strchr(what, 'c') && z80_regs_used_as_parms_in_calls_from_current_function[C_IDX])
-          return TRUE;
-        if (strchr(what, 'b') && z80_regs_used_as_parms_in_calls_from_current_function[B_IDX])
-          return TRUE;
-        if (strstr(what, "iy") && (z80_regs_used_as_parms_in_calls_from_current_function[IYL_IDX] || z80_regs_used_as_parms_in_calls_from_current_function[IYH_IDX]))
-          return TRUE;
-        return FALSE;
-      }
+        return z80MightBeParmInCallFromCurrentFunction(what);
     }
 
-  if(ISINST(pl->line, "ret"))
-    return(isReturned(what));
+  if(ISINST(pl->line, "ret")) // --reserev-regs-iy uses ret in code gen for calls through function pointers
+    return(IY_RESERVED ? isReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : isReturned(what));
 
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
     return(!strcmp(what, "h") || !strcmp(what, "l"));

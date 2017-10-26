@@ -1,7 +1,7 @@
 2017-10-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,
-	  src/z80/gen,
+	  src/z80/gen.c,
 	  support/regression/tests/bug-2370.c:
 	  Fix various --reserve-regs-iy issues, including bug #2370 and most of bug #2674.
 

@@ -10017,8 +10017,10 @@ genPointerSet (iCode * ic)
   aopOp (result, ic, FALSE, FALSE);
   aopOp (right, ic, FALSE, FALSE);
 
-  if (IS_GB || IY_RESERVED)
+  if (IS_GB)
     pairId = isRegOrLit (AOP (right)) ? PAIR_HL : PAIR_DE;
+  else if (IY_RESERVED)
+    pairId = (isRegOrLit (AOP (right)) || AOP_TYPE (right) == AOP_STK) ? PAIR_HL : PAIR_DE;
   if (isPair (AOP (result)) && isPairDead (getPairId (AOP (result)), ic))
     pairId = getPairId (AOP (result));
 

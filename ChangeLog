@@ -3,7 +3,7 @@
 	* src/z80/ralloc2.cc,
 	  src/z80/gen,
 	  support/regression/tests/bug-2370.c:
-	  Fix various --reserve-regs-iy issues, including bug #2370.
+	  Fix various --reserve-regs-iy issues, including bug #2370 and most of bug #2674.
 
 2017-10-25 Philipp Klaus Krause <pkk AT spth.de>
 

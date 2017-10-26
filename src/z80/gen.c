@@ -6555,6 +6555,9 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
       // On the Gameboy we can't afford to adjust HL as it may trash the carry.
       if (size > 1 && (IS_GB || IY_RESERVED) && (requiresHL (AOP (right)) && requiresHL (AOP (left))))
         {
+          if (!isPairDead (PAIR_DE, ic))
+            _push (PAIR_DE);
+
           // Pull left into DE and right into HL
           if (!regalloc_dry_run)
             {
@@ -6578,13 +6581,18 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                 }
               offset++;
             }
-          if (sign)
+          if (sign && IS_GB)
             {
+              wassert(isPairDead (PAIR_DE, ic));
               emit2 ("ld a, (de)");
               emit2 ("ld d, a");
               emit2 ("ld e, (hl)");
               regalloc_dry_run_cost += 3;
             }
+
+          if (!isPairDead (PAIR_DE, ic))
+            _pop (PAIR_DE);
+
           spillPair (PAIR_HL);
           result_in_carry = TRUE;
           goto fix;

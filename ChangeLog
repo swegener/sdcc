@@ -11,6 +11,8 @@
 	  Do not work around missing C99 support.
 	* support/regression/Makefile.in:
 	  Reduce make overhead in regression testing from quadratic to linear in the number of tests.
+	* sim/ucsim/app.cc:
+	  Speed up simulator command handling for faster regression testing.
 
 2017-10-26 Philipp Klaus Krause <pkk AT spth.de>
 

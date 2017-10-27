@@ -202,16 +202,20 @@ test-host2:
 
 # Begin per-port rules
 # List of all of the known source test suites.
+# Do not do this for the individual test files, to avoid quadratic complexity.
+ifndef CASES
 ALL_C_TESTS = $(shell find $(TESTS_DIR) -name "*.c")
 ALL_M_TESTS = $(shell find $(TESTS_DIR) -name "*.m4")
-
 M_CASES = $(ALL_M_TESTS:$(TESTS_DIR)/%.m4=$(CASES_DIR)/%.c)
+endif
 
 # Intermediate directory
 PORT_CASES_DIR = $(CASES_DIR)/$(PORT)
 PORT_RESULTS_DIR = $(RESULTS_DIR)/$(PORT)
 # Each test generates a result log file
+ifndef CASES
 PORT_RESULTS = $(sort $(patsubst %.c,$(PORT_RESULTS_DIR)/%.out,$(notdir $(ALL_C_TESTS))) $(patsubst %.m4,$(PORT_RESULTS_DIR)/%.out,$(notdir $(ALL_M_TESTS))))
+endif
 
 SDCC_EXTRA_DIR = $(top_builddir)/../sdcc-extra
 

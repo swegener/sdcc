@@ -123,30 +123,7 @@ const char *getBuildEnvironment (void);
  */
 size_t SDCCsnprintf (char *, size_t, const char *, ...);
 
-# if defined(HAVE_VSNPRINTF)
-
-/* best option: we can define our own snprintf which logs errors.
- */
-#  define SNPRINTF SDCCsnprintf
-
-# elif defined(HAVE_SPRINTF)
-
-/* if we can't build a safe snprintf for lack of vsnprintf but there
- * is a native snprintf, use it.
- */
-#  define SNPRINTF snprintf
-
-# elif defined(HAVE_VSPRINTF)
-
-/* we can at least define our own unsafe version.
- */
-#  define SNPRINTF SDCCsnprintf
-
-# else
-/* We don't have a native snprintf nor the functions we need to write one.
- */
-#  error "Need at least one of snprintf, vsnprintf, vsprintf!"
-# endif
+#define SNPRINTF SDCCsnprintf
 
 /** Pragma tokenizer
  */

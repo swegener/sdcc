@@ -5082,46 +5082,13 @@ esac
 
 # Checking for functions
 # ===========================================================================
-for ac_func in strerror
-do :
-  ac_fn_c_check_func "$LINENO" "strerror" "ac_cv_func_strerror"
-if test "x$ac_cv_func_strerror" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_STRERROR 1
-_ACEOF
-
-fi
-done
-
-for ac_func in vsnprintf snprintf vsprintf mkstemp
+for ac_func in strerror mkstemp strndup setrlimit
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
 if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_func" | $as_tr_cpp` 1
-_ACEOF
-
-fi
-done
-
-for ac_func in strndup
-do :
-  ac_fn_c_check_func "$LINENO" "strndup" "ac_cv_func_strndup"
-if test "x$ac_cv_func_strndup" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_STRNDUP 1
-_ACEOF
-
-fi
-done
-
-for ac_func in setrlimit
-do :
-  ac_fn_c_check_func "$LINENO" "setrlimit" "ac_cv_func_setrlimit"
-if test "x$ac_cv_func_setrlimit" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_SETRLIMIT 1
 _ACEOF
 
 fi

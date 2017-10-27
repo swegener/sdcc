@@ -736,7 +736,6 @@ getBuildEnvironment (void)
 #endif
 }
 
-#if defined(HAVE_VSNPRINTF) || defined(HAVE_VSPRINTF)
 size_t
 SDCCsnprintf (char *dst, size_t n, const char *fmt, ...)
 {
@@ -745,12 +744,7 @@ SDCCsnprintf (char *dst, size_t n, const char *fmt, ...)
 
   va_start (args, fmt);
 
-#if defined(HAVE_VSNPRINTF)
   len = vsnprintf (dst, n, fmt, args);
-#else
-  vsprintf (dst, fmt, args);
-  len = strlen (dst) + 1;
-#endif
 
   va_end (args);
 
@@ -765,7 +759,6 @@ SDCCsnprintf (char *dst, size_t n, const char *fmt, ...)
 
   return len;
 }
-#endif
 
 /** Pragma tokenizer
  */

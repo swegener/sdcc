@@ -360,15 +360,10 @@ AC_SUBST(panel_ok)
 AC_SUBST(curses_ok)
 AC_SUBST(CURSES_LIBS)
 
-AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(vsnprintf)
-AC_CHECK_FUNCS(_vsnprintf)
 AC_CHECK_FUNCS(vasprintf)
-AC_CHECK_FUNCS(strlen strcpy strcat strstr strcmp strerror strtok strdup)
-AC_CHECK_FUNCS(strchr memcpy)
+AC_CHECK_FUNCS(strerror strdup)
 dnl AC_CHECK_FUNCS(getline)
 dnl AC_CHECK_FUNCS(getdelim)
-AC_CHECK_FUNCS(fgets)
 AC_CHECK_FUNCS(yylex)
 
 AC_CACHE_CHECK(whether scanf knows %a, ucsim_cv_scanf_a,

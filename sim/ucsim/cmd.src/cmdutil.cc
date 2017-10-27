@@ -121,28 +121,11 @@ cmd_vfprintf(FILE *f, char *format, va_list ap)
   ret= fprintf(f, "%s", msg);
   free(msg);
 #else
-#  ifdef HAVE_VSNPRINTF
   char msg[80*25];
   i= vsnprintf(msg, 80*25, format, ap);
   if (i < 0)
     ;
   ret= fprintf(f, "%s", msg);
-#  else
-#    ifdef HAVE_VPRINTF
-  char msg[80*25];
-  i= vsprintf(msg, format, ap); /* Dangerous */
-  if (i < 0)
-    ;
-  ret= fprintf(f, "%s", msg);
-#    else
-#      ifdef HAVE_DOPRNT
-  /* ??? */
-  /*strcpy(msg, "Unimplemented printf has called.\n");*/
-#      else
-  /*strcpy(msg, "printf can not be implemented, upgrade your libc.\n");*/
-#      endif
-#    endif
-#  endif
 #endif
   fflush(f);
   return(ret);

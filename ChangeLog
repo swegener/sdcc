@@ -1,3 +1,15 @@
+2017-10-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure,
+	  configure.ac,
+	  sim/ucsim/cmd.src/cmdutil.cc,
+	  sim/ucsim/configure,
+	  sim/ucsim/configure.ac,
+	  sim/ucsim/utils.cc,
+	  src/SDCCutil.c,
+	  src/SDCCutil.h:
+	  Do not work around missing C99 support.
+
 2017-10-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,

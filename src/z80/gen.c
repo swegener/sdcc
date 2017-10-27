@@ -1796,13 +1796,11 @@ adjustPair (const char *pair, int *pold, int new_val)
   while (*pold < new_val)
     {
       emit2 ("inc %s", pair);
-      regalloc_dry_run_cost++;
       (*pold)++;
     }
   while (*pold > new_val)
     {
       emit2 ("dec %s", pair);
-      regalloc_dry_run_cost++;
       (*pold)--;
     }
 }
@@ -2268,32 +2266,31 @@ setupPair (PAIR_ID pairId, asmop *aop, int offset)
       wassertl (pairId == PAIR_IY || pairId == PAIR_HL, "The Z80 extended stack must be in IY or HL");
 
       {
-        offset += aop->aopu.aop_stk + _G.stack.offset;
+        int offset = aop->aopu.aop_stk + _G.stack.offset;
 
         if (aop->aopu.aop_stk >= 0)
           offset += _G.stack.param_offset;
 
-        if (_G.pairs[pairId].last_type != aop->type || _G.pairs[pairId].offset != offset)
+        if (_G.pairs[pairId].last_type == aop->type && _G.pairs[pairId].offset == offset)
+          {
+            /* Already setup */
+          }
+        else
           {
             struct dbuf_s dbuf;
 
-            if (_G.pairs[pairId].last_type == aop->type && abs (offset - _G.pairs[pairId].offset) < 3)
-              adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, offset);
-            else
-              {
-                if (_G.preserveCarry)
-                  _push (PAIR_AF);
-                dbuf_init (&dbuf, 128);
-                dbuf_printf (&dbuf, "%d", offset + _G.stack.pushed);
-                emit2 ("ld %s, !hashedstr", _pairs[pairId].name, dbuf_c_str (&dbuf));
-                dbuf_destroy (&dbuf);
-                emit2 ("add %s, sp", _pairs[pairId].name);
-                _G.pairs[pairId].last_type = aop->type;
-                _G.pairs[pairId].offset = offset;
-                regalloc_dry_run_cost += 3 + 2 * (pairId == PAIR_IY);
-                if (_G.preserveCarry)
-                  _pop (PAIR_AF);
-              }
+            /* PENDING: Do this better. */
+            if (_G.preserveCarry)
+              _push (PAIR_AF);
+            dbuf_init (&dbuf, 128);
+            dbuf_printf (&dbuf, "%d", offset + _G.stack.pushed);
+            emit2 ("ld %s, !hashedstr", _pairs[pairId].name, dbuf_c_str (&dbuf));
+            dbuf_destroy (&dbuf);
+            emit2 ("add %s, sp", _pairs[pairId].name);
+            _G.pairs[pairId].last_type = aop->type;
+            _G.pairs[pairId].offset = offset;
+            if (_G.preserveCarry)
+              _pop (PAIR_AF);
           }
       }
       break;

@@ -6,6 +6,9 @@
 	  Reduce pic device support warning timeout.
 	* support/regression/tests/gcc-torture-execute-920612-1.c:
 	  Disable a host test that fails for GCC 7.2.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2580.c:
+	  Fix bug #2580.
 
 2017-10-27 Philipp Klaus Krause <pkk AT spth.de>
 

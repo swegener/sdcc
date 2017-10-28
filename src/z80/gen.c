@@ -10904,14 +10904,33 @@ release:
 static void
 genReceive (const iCode * ic)
 {
-  int size, offset = 0;
-  aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-  size = AOP_SIZE (IC_RESULT (ic));
+  int size = 0;
+  operand *result = IC_RESULT (ic);
+  aopOp (result, ic, FALSE, FALSE);
+  size = AOP_SIZE (result);
 
-  while (size--)
+  for (unsigned int i = 0; i < size;)
     {
-      cheapMove (AOP (IC_RESULT (ic)), offset, _fReturn3[offset], 0);
-      offset++;
+       if (size - i >= 2 && (result->aop->type == AOP_HL || result->aop->type == AOP_IY) &&
+         (_fReturn3[i]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[i + 1]->aopu.aop_reg[0]->rIdx == H_IDX || _fReturn3[i]->aopu.aop_reg[0]->rIdx == E_IDX && _fReturn3[i + 1]->aopu.aop_reg[0]->rIdx == D_IDX))
+         {
+           emit2 ("ld (%s), %s", aopGetLitWordLong (result->aop, i, FALSE), _fReturn3[i]->aopu.aop_reg[0]->rIdx == L_IDX ?  "hl" : "de");
+           regalloc_dry_run_cost += 3 + (_fReturn3[i]->aopu.aop_reg[0]->rIdx != L_IDX);
+           i += 2;
+           continue;
+         }
+
+       if (requiresHL (result->aop) && (_fReturn3[i]->aopu.aop_reg[0]->rIdx == L_IDX || _fReturn3[i]->aopu.aop_reg[0]->rIdx == H_IDX))
+         {
+           emit2 (_fReturn3[i]->aopu.aop_reg[0]->rIdx == L_IDX ? "ld a, l" : "ld a, h");
+           emit2 ("ld (%s), a", aopGetLitWordLong (result->aop, i, FALSE));
+           regalloc_dry_run_cost += 4;
+           i++;
+           continue;
+         }
+
+       cheapMove (result->aop, i, _fReturn3[i], 0);
+       i++;
     }
 
   freeAsmop (IC_RESULT (ic), NULL);

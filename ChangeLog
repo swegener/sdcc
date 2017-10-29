@@ -5,6 +5,8 @@
 	* support/regression/ports/ucz80-resiy,
 	  support/regression/Makefile.in:
 	  Add target for z80 test with --reserve-regs-iy.
+	* doc/Makefile.in:
+	  Try to resurrect full documentation build.
 
 2017-10-28 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -14,8 +14,7 @@ include ../Makefile.common
 
 MANUAL = sdccman
 
-#all: $(MANUAL).pdf $(MANUAL).html/index.html $(MANUAL).txt
-all: $(MANUAL).pdf
+all: $(MANUAL).pdf $(MANUAL).html/index.html $(MANUAL).txt
 
 install:
 	$(INSTALL) -d $(DESTDIR)$(docdir)
@@ -100,7 +99,7 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 archive: all
 	rm -rf sdcc-doc sdcc-doc.tar.bz2
 	mkdir sdcc-doc
-	rsync -rCt avr z80 *.pdf *.txt $(srcdir)/*.txt sdcc-doc
+	rsync -rCt *.pdf *.txt $(srcdir)/*.txt sdcc-doc
 
 	for doc in $(MANUAL); do \
 	  rsync -Rt $$doc.html/*.html $$doc.html/*.png $$doc.html/*.css sdcc-doc/; \

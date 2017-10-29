@@ -2,6 +2,9 @@
 
 	* support/regression/tests/bug-2580.c:
 	  Fix an issue for host systems where char is signed.
+	* support/regression/ports/ucz80-resiy,
+	  support/regression/Makefile.in:
+	  Add target for z80 test with --reserve-regs-iy.
 
 2017-10-28 Philipp Klaus Krause <pkk AT spth.de>
 

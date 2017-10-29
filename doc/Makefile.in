@@ -106,10 +106,10 @@ archive: all
 	done
 
 	mkdir sdcc-doc/as
-	rsync -rCt $(top_srcdir)/as/doc/* sdcc-doc/as/
+	rsync -rCt $(top_srcdir)/sdas/doc/* sdcc-doc/as/
 
 	mkdir sdcc-doc/ucsim
-	cd $(top_srcdir)/sim/ucsim/doc; rsync *.html *.jpg *.gif *.fig ../../../doc/sdcc-doc/ucsim/
+	cd $(top_srcdir)/sim/ucsim/doc; rsync *.html *.jpg *.fig ../../../doc/sdcc-doc/ucsim/
 
 	tar -c sdcc-doc | bzip2 -9 > sdcc-doc.tar.bz2
 

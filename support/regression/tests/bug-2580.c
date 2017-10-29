@@ -10,7 +10,7 @@
 unsigned {type} game_menu_sel;
 unsigned {type} s_lin1;
 
-void game_menu_back({type} f_start)
+void game_menu_back(unsigned {type} f_start)
 #if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_tlcs90) || defined(__SDCC_r2k) || defined(__SDCC_r3ka)
 __z88dk_fastcall
 #endif
@@ -23,6 +23,6 @@ void testBug(void)
 {
     game_menu_back(0x55aaa5a5ul);
     ASSERT(game_menu_sel == 0);
-    ASSERT(s_lin1 == ({type})0x55aaa5a5ul);
+    ASSERT(s_lin1 == (unsigned {type})0x55aaa5a5ul);
 }
 

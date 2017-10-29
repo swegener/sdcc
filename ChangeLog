@@ -1,3 +1,8 @@
+2017-10-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2580.c:
+	  Fix an issue for host systems where char is signed.
+
 2017-10-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/pic16/configure,

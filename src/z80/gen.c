@@ -2232,7 +2232,7 @@ setupPairFromSP (PAIR_ID id, int offset)
       regalloc_dry_run_cost++;
     }
 
-  if (offset < INT8MIN || offset > INT8MAX || id != PAIR_HL)
+  if (offset < INT8MIN || offset > INT8MAX || id == PAIR_IY)
     {
       struct dbuf_s dbuf;
       dbuf_init (&dbuf, 128);
@@ -2269,11 +2269,11 @@ static void pointPairToAop (PAIR_ID pairId, const asmop *aop, int offset)
 {
   switch (aop->type)
     {
-    case AOP_STK:
     case AOP_EXSTK:
       wassertl (!IS_GB, "The GBZ80 doesn't have an extended stack");
+    case AOP_STK:
 
-      int abso = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      ;int abso = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
 
       if ((_G.pairs[pairId].last_type == AOP_STK || _G.pairs[pairId].last_type == AOP_EXSTK) && abs (_G.pairs[pairId].offset - abso) < 3)
         adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, abso);

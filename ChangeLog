@@ -1,3 +1,8 @@
+2017-10-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix a --reserve-regs-iy issue, part of bug #2674.
+
 2017-10-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2580.c:

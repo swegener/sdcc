@@ -2244,6 +2244,50 @@ setupPairFromSP (PAIR_ID id, int offset)
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* pointPairToAop() make a register pair point to a byte of an aop */
+/*-----------------------------------------------------------------*/
+static void pointPairToAop (PAIR_ID pairId, asmop *aop, int offset)
+{
+  switch (aop->type)
+    {
+    case AOP_STK:
+    case AOP_EXSTK:
+      wassertl (!IS_GB, "The GBZ80 doesn't have an extended stack");
+      wassertl (pairId == PAIR_IY || pairId == PAIR_HL, "The Z80 extended stack must be in IY or HL"); // TODO: Implement support for de via ex de, hl.
+
+      int abso = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+
+      if ((_G.pairs[pairId].last_type == AOP_STK || _G.pairs[pairId].last_type == AOP_EXSTK) && abs (_G.pairs[pairId].offset - abso) < 3)
+        adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, abso);
+      else
+        {
+          struct dbuf_s dbuf; // TODO: Merge this and setupPairFromSP above into one function!
+          if (_G.preserveCarry)
+            _push (PAIR_AF);
+          dbuf_init (&dbuf, 128);
+          dbuf_printf (&dbuf, "%d", abso + _G.stack.pushed);
+          emit2 ("ld %s, !hashedstr", _pairs[pairId].name, dbuf_c_str (&dbuf));
+          dbuf_destroy (&dbuf);
+          emit2 ("add %s, sp", _pairs[pairId].name);
+          regalloc_dry_run_cost += 4 + (pairId == PAIR_IY) * 2;
+          if (_G.preserveCarry)
+            _pop (PAIR_AF);
+        }
+
+      _G.pairs[pairId].offset = abso;
+
+      break;
+    default:
+      wassertl (0, "Unsupported aop type for pointPairToAop()");
+    }
+
+  _G.pairs[pairId].last_type = aop->type;
+}
+
+// Weird function. Sometimes offset is used, sometimes not.
+// Callers rely on that behaviour. Uses of this should be replaced
+// by pointPairToAop() above after the 3.7.0 release.
 static void
 setupPair (PAIR_ID pairId, asmop *aop, int offset)
 {
@@ -2469,7 +2513,7 @@ aopGet (asmop *aop, int offset, bool bit16)
         case AOP_STK:
           if (IS_GB || aop->type == AOP_EXSTK)
             {
-              setupPair (PAIR_HL, aop, offset);
+              pointPairToAop (PAIR_HL, aop, offset);
               dbuf_tprintf (&dbuf, "!*hl");
             }
           else if (_G.omitFramePtr)
@@ -2732,7 +2776,7 @@ aopPut (asmop * aop, const char *s, int offset)
               emit2 ("ld a, !*hl");
               s = "a";
             }
-          setupPair (PAIR_HL, aop, offset);
+          pointPairToAop (PAIR_HL, aop, offset);
           if (!canAssignToPtr (s))
             {
               emit2 ("ld a, %s", s);

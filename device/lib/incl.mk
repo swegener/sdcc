@@ -118,4 +118,4 @@ COMMON_SDCC = \
   assert.c \
   time.c
 
-MODELS = small medium large
+MODELS = small medium large huge

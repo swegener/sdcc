@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Fix --reserve-regs-iy issues, part of bug #2674.
+	* device/lib/incl.mk:
+	  Build library for mcs51 huge model, to reduce differences with Debian version.
 
 2017-10-29 Philipp Klaus Krause <pkk AT spth.de>
 

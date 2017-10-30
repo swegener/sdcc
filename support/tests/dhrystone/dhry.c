@@ -12,7 +12,7 @@
     * Removed malloc's for a couple of static arrays.
     * Into one file.
     * Proc_8 is a bit messy.  It originally took a 2 dim array, but
-      sdcc doesnt support this.  So the offsets are hard coded...
+      sdcc doesn't support this.  So the offsets are hard coded...
 
     Notes:
     * The comment at the start of Func_1 about the input being

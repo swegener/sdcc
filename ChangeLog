@@ -2,6 +2,8 @@
 
 	* src/z80/ralloc2.cc:
 	  Fix a bug in Z80 sfr handling.
+	* support/scripts/Makefile.in:
+	  Fix an access rights issue in make install, patch by Felix Salfelder.
 
 2017-10-30 Philipp Klaus Krause <pkk AT spth.de>
 

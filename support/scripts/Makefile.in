@@ -13,7 +13,7 @@ install: all installdirs
 	$(INSTALL) $(TARGET) $(DESTDIR)$(bindir)/`echo as2gbmap|sed '$(transform)'`
 
 installdirs:
-	$(INSTALL) -d $(DESTDIR)$(bindir)
+	-$(INSTALL) -d $(DESTDIR)$(bindir)
 
 uninstall:
 	rm -rf $(DESTDIR)$(bindir)/`echo as2gbmap|sed '$(transform)'`

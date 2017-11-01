@@ -535,8 +535,8 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   const i_assignment_t &ia = a.i_assignment;
 
-  const operand *const left = IC_LEFT(ic);
-  const operand *const right = IC_RIGHT(ic);
+  operand *const left = IC_LEFT(ic);
+  operand *const right = IC_RIGHT(ic);
   const operand *const result = IC_RESULT(ic);
 
   if(ia.registers[REG_A][1] < 0)
@@ -567,6 +567,12 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       input_in_A = operand_in_reg(left, REG_A, ia, i, G) || operand_in_reg(right, REG_A, ia, i, G);
       break;
     }
+
+  // sfr access needs to go through a.
+  if(input_in_A &&
+    (IS_TRUE_SYMOP (left) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (left)->etype)) ||
+    IS_TRUE_SYMOP (right) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (right)->etype))))
+    return(false);
 
   // bit instructions do not disturb a.
   if(ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) &&

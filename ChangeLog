@@ -1,3 +1,8 @@
+2017-11-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc:
+	  Fix a bug in Z80 sfr handling.
+
 2017-10-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

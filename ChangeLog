@@ -1,3 +1,8 @@
+2017-11-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2684.c:
+	  Test for bug #2684.
+
 2017-11-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc:

@@ -4,6 +4,9 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+#pragma disable_warning 196
+
 /* printf.c
  *    Dale Schumacher                         399 Beacon Ave.
  *    (alias: Dalnefre')                      St. Paul, MN  55104
@@ -74,6 +77,7 @@ static int prtfld(FILE * op, size_t maxlen, size_t ct, unsigned char *buf, int l
 	return 0;
 }
 
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL))
 int _vfnprintf(FILE * op, size_t maxlen, const char *fmt, va_list ap)
 {
 	register int i, ljustf, lval, preci, dpoint, width, radix, cnt = 0;
@@ -257,6 +261,7 @@ int _vfnprintf(FILE * op, size_t maxlen, const char *fmt, va_list ap)
 		op->bufwrite = op->bufstart;
 	return (cnt);
 }
+#endif
 
 void testBug(void)
 {

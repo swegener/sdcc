@@ -1,3 +1,8 @@
+2017-11-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2684.c:
+	  Disable new test for mcs51-small, which doesn't have enough RAM.
+
 2017-11-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2684.c:

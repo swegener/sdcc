@@ -6,6 +6,11 @@
 	  Fix bug #2681.
 	* support/regression/tests/bug-2645.c:
 	  Silence an mcs51 warning.
+	* support/regression/tests/bug-2567.c,
+	  support/regression/tests/gcc-torture-execute-pr60062.c,
+	  support/regression/tests/gcc-torture-execute-pr63209.c,
+	  support/regression/tests/gcc-torture-execute-pr80153.c:
+	  Silence some warning about unused function arguments.
 
 2017-11-03 Philipp Klaus Krause <pkk AT spth.de>
 

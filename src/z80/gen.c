@@ -2925,6 +2925,9 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
   int fp_offset = aop->aopu.aop_stk + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
   int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
 
+  if (getPairId (aop) == id)
+    return;
+
   /* Stack positions will change, so do not assume this is possible in the cost function. */
   if (!regalloc_dry_run && !IS_GB && (aop->type == AOP_STK || aop->type == AOP_EXSTK) && !sp_offset
       && ((!IS_RAB && id == PAIR_HL) || id == PAIR_IY) && !dont_destroy)
@@ -3020,8 +3023,13 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
                   cheapMove (aop, 1, ASMOP_H, 0);
                 }
               break;
+            case PAIR_IY:
+              cheapMove (aop, 0, ASMOP_IYL, 0);
+              cheapMove (aop, 1, ASMOP_IYH, 0);
+              break;
             default:
               wassertl (0, "Unknown pair id in commitPair()");
+              fprintf (stderr, "pair %s\n", _pairs[id].name);
             }
         }
     }

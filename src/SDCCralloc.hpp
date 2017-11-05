@@ -598,6 +598,7 @@ void assignments_introduce_instruction(assignment_list_t &alist, unsigned short 
         {
           if (global[v] >= 0)
             ia.add_var(v, global[v]);
+          return(*this);
         }
       inserter_t& operator*()
         {

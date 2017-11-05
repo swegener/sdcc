@@ -1,3 +1,10 @@
+2017-11-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  src/z80/gen.c,
+	  support/regression/tests/bug-2681.c:
+	  Fix bug #2681.
+
 2017-11-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2684.c:

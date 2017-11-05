@@ -4,6 +4,8 @@
 	  src/z80/gen.c,
 	  support/regression/tests/bug-2681.c:
 	  Fix bug #2681.
+	* support/regression/tests/bug-2645.c:
+	  Silence an mcs51 warning.
 
 2017-11-03 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 88
+
 unsigned char *backgrounds[1] = {25768 + 32 + 32 + 32 + 32 + 32 + 32};
 
 void testBug(void)

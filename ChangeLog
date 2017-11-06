@@ -7,6 +7,9 @@
 	  support/regression/tests/bug-2687.c,
 	  support/regression/tests/generic.c:
 	  Fix bugs #2221, #2687.
+	* configure.ac,
+	  configure:
+	  Fix bug #2689.
 
 2017-11-05 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -367,6 +367,7 @@ dnl replace \\ by \
 $2=`echo "[$]$2" | sed 's,\\\\\\\\,\\\\,g'`
 ])
 
+AX_CXX_COMPILE_STDCXX_11
 
 # Checking characteristics of compilers and other programs
 # ===========================================================================
@@ -402,7 +403,7 @@ if test "$ac_cv_c_compiler_gnu" = "yes"; then
 
   WALL_FLAG="-Wall -Wno-parentheses"
   C99_FLAG="--std=c99"
-  MAKEDEP="$CC $sdcc_cv_MM"
+  MAKEDEP="$CXX $sdcc_cv_MM"
 else
   sdcc_IS_SUNPRO
   if test "$sdcc_cv_c_compiler_sunpro" = "yes"; then
@@ -424,8 +425,6 @@ AC_PROG_CC_C99
 if test "$ac_cv_prog_cc_c99" != "no"; then
   CFLAGS="$ac_cv_prog_cc_c99 ${CFLAGS}"
 fi
-
-AX_CXX_COMPILE_STDCXX_11
 
 # SDCC_C_UNNAMED_STRUCT_TAG ()
 # chech whether C compiler supports tag in unnamed struct
@@ -1007,6 +1006,7 @@ sdcc ${VERSION} is now configured for
   CXXFLAGS:             ${CXXFLAGS}
   CPPFLAGS:             ${CPPFLAGS}
   LDFLAGS:              ${LDFLAGS}
+  MAKEDEP:              ${MAKEDEP}
 
   ENABLED Ports:
     ds390               ${enable_ds390_port}

@@ -662,10 +662,10 @@ include_dir_suffix
 inclib_dir_suffix
 LIB_TYPE
 sdccconf_h_dir_separator
-HAVE_CXX11
 C99_FLAG
 WALL_FLAG
 MAKEDEP
+HAVE_CXX11
 CCACHE
 CXXCPP
 EGREP
@@ -5181,345 +5181,6 @@ done
 
 
 
-
-# Checking characteristics of compilers and other programs
-# ===========================================================================
-if test "$ac_cv_c_compiler_gnu" = "yes"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether preprocessor accepts -MM or -M" >&5
-$as_echo_n "checking whether preprocessor accepts -MM or -M... " >&6; }
-if ${sdcc_cv_MM+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  echo "#include <stdio.h>" >_test_.c
-  echo "" >>_test_.c
-  $CPP -v -MM _test_.c 1>&5 2>&5
-  if test "$?" = "0"; then
-    sdcc_cv_MM="-MM"
-  else
-    sdcc_cv_MM="-M"
-  fi
-  rm -f _test_.*
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_MM" >&5
-$as_echo "$sdcc_cv_MM" >&6; }
-
-  # This is the first time when CFLAGS are set/modified!!
-  arg1=`echo -ggdb | sed -e"s/^-*//" -e"s/-/_/"`
-ac_test_CFLAGS=${CFLAGS+set}
-sdcc_save_CFLAGS=$CFLAGS
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C accepts -ggdb" >&5
-$as_echo_n "checking whether C accepts -ggdb... " >&6; }
-if eval \${sdcc_cv_c_$arg1+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  sdcc_save_c_werror_flag=$ac_c_werror_flag
-   ac_c_werror_flag=yes
-
-   CFLAGS="-ggdb"
-   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  eval sdcc_cv_c_$arg1=yes
-else
-  eval sdcc_cv_c_$arg1=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-   ac_c_werror_flag=$sdcc_save_c_werror_flag
-fi
-eval ac_res=\$sdcc_cv_c_$arg1
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-   CFLAGS=$sdcc_save_CFLAGS
-
-  if test "$sdcc_cv_c_ggdb" = "yes"; then
-    CFLAGS="-ggdb ${CFLAGS}"
-    CXXFLAGS="-ggdb ${CXXFLAGS}"
-  fi
-
-  arg1=`echo -pipe | sed -e"s/^-*//" -e"s/-/_/"`
-ac_test_CFLAGS=${CFLAGS+set}
-sdcc_save_CFLAGS=$CFLAGS
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C accepts -pipe" >&5
-$as_echo_n "checking whether C accepts -pipe... " >&6; }
-if eval \${sdcc_cv_c_$arg1+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  sdcc_save_c_werror_flag=$ac_c_werror_flag
-   ac_c_werror_flag=yes
-
-   CFLAGS="-pipe"
-   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  eval sdcc_cv_c_$arg1=yes
-else
-  eval sdcc_cv_c_$arg1=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-   ac_c_werror_flag=$sdcc_save_c_werror_flag
-fi
-eval ac_res=\$sdcc_cv_c_$arg1
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-   CFLAGS=$sdcc_save_CFLAGS
-
-  if test "$sdcc_cv_c_pipe" = "yes"; then
-    CFLAGS="-pipe ${CFLAGS}"
-    # Don't use "-pipe" on x86 Solaris g++, since src/z80/ralloc2.cc dies with:
-    # Assembler: ralloc2.cc
-    #         "<stdin>", line 117637 : Internal: Out of symbol table
-    if test `uname` != "SunOS" -o \( `uname` = "SunOS" -a `uname -m` != "i86pc" \); then
-      CXXFLAGS="-pipe ${CXXFLAGS}"
-    fi
-  fi
-
-  WALL_FLAG="-Wall -Wno-parentheses"
-  C99_FLAG="--std=c99"
-  MAKEDEP="$CC $sdcc_cv_MM"
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C compiler" >&5
-$as_echo_n "checking whether we are using the SunPRO C compiler... " >&6; }
-if ${sdcc_cv_c_compiler_sunpro+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main ()
-{
-#if !defined __SUNPRO_C && !defined __SUNPRO_CC
-       choke me
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
-  sdcc_cv_c_compiler_sunpro=yes
-else
-  sdcc_cv_c_compiler_sunpro=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_c_compiler_sunpro" >&5
-$as_echo "$sdcc_cv_c_compiler_sunpro" >&6; }
-  if test "$sdcc_cv_c_compiler_sunpro" = "yes"; then
-    C99_FLAG="-xc99"
-    CFLAGS="-xO2 ${C99_FLAG} ${CFLAGS}"
-    CXXFLAGS="-xO2 ${CXXFLAGS}"
-    WALL_FLAG=
-    MAKEDEP="$CC ${C99_FLAG} -xM1"
-  fi
-fi
-
-
-
-
-
-# Try to append a c99 flag
-# -------------------------------------------------------------------------
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to accept ISO C99" >&5
-$as_echo_n "checking for $CC option to accept ISO C99... " >&6; }
-if ${ac_cv_prog_cc_c99+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_cv_prog_cc_c99=no
-ac_save_CC=$CC
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <wchar.h>
-#include <stdio.h>
-
-// Check varargs macros.  These examples are taken from C99 6.10.3.5.
-#define debug(...) fprintf (stderr, __VA_ARGS__)
-#define showlist(...) puts (#__VA_ARGS__)
-#define report(test,...) ((test) ? puts (#test) : printf (__VA_ARGS__))
-static void
-test_varargs_macros (void)
-{
-  int x = 1234;
-  int y = 5678;
-  debug ("Flag");
-  debug ("X = %d\n", x);
-  showlist (The first, second, and third items.);
-  report (x>y, "x is %d but y is %d", x, y);
-}
-
-// Check long long types.
-#define BIG64 18446744073709551615ull
-#define BIG32 4294967295ul
-#define BIG_OK (BIG64 / BIG32 == 4294967297ull && BIG64 % BIG32 == 0)
-#if !BIG_OK
-  your preprocessor is broken;
-#endif
-#if BIG_OK
-#else
-  your preprocessor is broken;
-#endif
-static long long int bignum = -9223372036854775807LL;
-static unsigned long long int ubignum = BIG64;
-
-struct incomplete_array
-{
-  int datasize;
-  double data[];
-};
-
-struct named_init {
-  int number;
-  const wchar_t *name;
-  double average;
-};
-
-typedef const char *ccp;
-
-static inline int
-test_restrict (ccp restrict text)
-{
-  // See if C++-style comments work.
-  // Iterate through items via the restricted pointer.
-  // Also check for declarations in for loops.
-  for (unsigned int i = 0; *(text+i) != '\0'; ++i)
-    continue;
-  return 0;
-}
-
-// Check varargs and va_copy.
-static void
-test_varargs (const char *format, ...)
-{
-  va_list args;
-  va_start (args, format);
-  va_list args_copy;
-  va_copy (args_copy, args);
-
-  const char *str;
-  int number;
-  float fnumber;
-
-  while (*format)
-    {
-      switch (*format++)
-	{
-	case 's': // string
-	  str = va_arg (args_copy, const char *);
-	  break;
-	case 'd': // int
-	  number = va_arg (args_copy, int);
-	  break;
-	case 'f': // float
-	  fnumber = va_arg (args_copy, double);
-	  break;
-	default:
-	  break;
-	}
-    }
-  va_end (args_copy);
-  va_end (args);
-}
-
-int
-main ()
-{
-
-  // Check bool.
-  _Bool success = false;
-
-  // Check restrict.
-  if (test_restrict ("String literal") == 0)
-    success = true;
-  char *restrict newvar = "Another string";
-
-  // Check varargs.
-  test_varargs ("s, d' f .", "string", 65, 34.234);
-  test_varargs_macros ();
-
-  // Check flexible array members.
-  struct incomplete_array *ia =
-    malloc (sizeof (struct incomplete_array) + (sizeof (double) * 10));
-  ia->datasize = 10;
-  for (int i = 0; i < ia->datasize; ++i)
-    ia->data[i] = i * 1.234;
-
-  // Check named initializers.
-  struct named_init ni = {
-    .number = 34,
-    .name = L"Test wide string",
-    .average = 543.34343,
-  };
-
-  ni.number = 58;
-
-  int dynamic_array[ni.number];
-  dynamic_array[ni.number - 1] = 543;
-
-  // work around unused variable warnings
-  return (!success || bignum == 0LL || ubignum == 0uLL || newvar[0] == 'x'
-	  || dynamic_array[ni.number - 1] != 543);
-
-  ;
-  return 0;
-}
-_ACEOF
-for ac_arg in '' -std=gnu99 -std=c99 -c99 -AC99 -D_STDC_C99= -qlanglvl=extc99
-do
-  CC="$ac_save_CC $ac_arg"
-  if ac_fn_c_try_compile "$LINENO"; then :
-  ac_cv_prog_cc_c99=$ac_arg
-fi
-rm -f core conftest.err conftest.$ac_objext
-  test "x$ac_cv_prog_cc_c99" != "xno" && break
-done
-rm -f conftest.$ac_ext
-CC=$ac_save_CC
-
-fi
-# AC_CACHE_VAL
-case "x$ac_cv_prog_cc_c99" in
-  x)
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
-$as_echo "none needed" >&6; } ;;
-  xno)
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
-$as_echo "unsupported" >&6; } ;;
-  *)
-    CC="$CC $ac_cv_prog_cc_c99"
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c99" >&5
-$as_echo "$ac_cv_prog_cc_c99" >&6; } ;;
-esac
-if test "x$ac_cv_prog_cc_c99" != xno; then :
-
-fi
-
-
-if test "$ac_cv_prog_cc_c99" != "no"; then
-  CFLAGS="$ac_cv_prog_cc_c99 ${CFLAGS}"
-fi
-
   ax_cxx_compile_alternatives="11 0x"    ax_cxx_compile_cxx11_required=true
   ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -6505,6 +6166,344 @@ $as_echo "#define HAVE_CXX11 1" >>confdefs.h
 
 
 
+
+# Checking characteristics of compilers and other programs
+# ===========================================================================
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether preprocessor accepts -MM or -M" >&5
+$as_echo_n "checking whether preprocessor accepts -MM or -M... " >&6; }
+if ${sdcc_cv_MM+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  echo "#include <stdio.h>" >_test_.c
+  echo "" >>_test_.c
+  $CPP -v -MM _test_.c 1>&5 2>&5
+  if test "$?" = "0"; then
+    sdcc_cv_MM="-MM"
+  else
+    sdcc_cv_MM="-M"
+  fi
+  rm -f _test_.*
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_MM" >&5
+$as_echo "$sdcc_cv_MM" >&6; }
+
+  # This is the first time when CFLAGS are set/modified!!
+  arg1=`echo -ggdb | sed -e"s/^-*//" -e"s/-/_/"`
+ac_test_CFLAGS=${CFLAGS+set}
+sdcc_save_CFLAGS=$CFLAGS
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C accepts -ggdb" >&5
+$as_echo_n "checking whether C accepts -ggdb... " >&6; }
+if eval \${sdcc_cv_c_$arg1+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  sdcc_save_c_werror_flag=$ac_c_werror_flag
+   ac_c_werror_flag=yes
+
+   CFLAGS="-ggdb"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval sdcc_cv_c_$arg1=yes
+else
+  eval sdcc_cv_c_$arg1=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   ac_c_werror_flag=$sdcc_save_c_werror_flag
+fi
+eval ac_res=\$sdcc_cv_c_$arg1
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+   CFLAGS=$sdcc_save_CFLAGS
+
+  if test "$sdcc_cv_c_ggdb" = "yes"; then
+    CFLAGS="-ggdb ${CFLAGS}"
+    CXXFLAGS="-ggdb ${CXXFLAGS}"
+  fi
+
+  arg1=`echo -pipe | sed -e"s/^-*//" -e"s/-/_/"`
+ac_test_CFLAGS=${CFLAGS+set}
+sdcc_save_CFLAGS=$CFLAGS
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C accepts -pipe" >&5
+$as_echo_n "checking whether C accepts -pipe... " >&6; }
+if eval \${sdcc_cv_c_$arg1+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  sdcc_save_c_werror_flag=$ac_c_werror_flag
+   ac_c_werror_flag=yes
+
+   CFLAGS="-pipe"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  eval sdcc_cv_c_$arg1=yes
+else
+  eval sdcc_cv_c_$arg1=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+   ac_c_werror_flag=$sdcc_save_c_werror_flag
+fi
+eval ac_res=\$sdcc_cv_c_$arg1
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+   CFLAGS=$sdcc_save_CFLAGS
+
+  if test "$sdcc_cv_c_pipe" = "yes"; then
+    CFLAGS="-pipe ${CFLAGS}"
+    # Don't use "-pipe" on x86 Solaris g++, since src/z80/ralloc2.cc dies with:
+    # Assembler: ralloc2.cc
+    #         "<stdin>", line 117637 : Internal: Out of symbol table
+    if test `uname` != "SunOS" -o \( `uname` = "SunOS" -a `uname -m` != "i86pc" \); then
+      CXXFLAGS="-pipe ${CXXFLAGS}"
+    fi
+  fi
+
+  WALL_FLAG="-Wall -Wno-parentheses"
+  C99_FLAG="--std=c99"
+  MAKEDEP="$CXX $sdcc_cv_MM"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C compiler" >&5
+$as_echo_n "checking whether we are using the SunPRO C compiler... " >&6; }
+if ${sdcc_cv_c_compiler_sunpro+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+#if !defined __SUNPRO_C && !defined __SUNPRO_CC
+       choke me
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  sdcc_cv_c_compiler_sunpro=yes
+else
+  sdcc_cv_c_compiler_sunpro=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $sdcc_cv_c_compiler_sunpro" >&5
+$as_echo "$sdcc_cv_c_compiler_sunpro" >&6; }
+  if test "$sdcc_cv_c_compiler_sunpro" = "yes"; then
+    C99_FLAG="-xc99"
+    CFLAGS="-xO2 ${C99_FLAG} ${CFLAGS}"
+    CXXFLAGS="-xO2 ${CXXFLAGS}"
+    WALL_FLAG=
+    MAKEDEP="$CC ${C99_FLAG} -xM1"
+  fi
+fi
+
+
+
+
+
+# Try to append a c99 flag
+# -------------------------------------------------------------------------
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to accept ISO C99" >&5
+$as_echo_n "checking for $CC option to accept ISO C99... " >&6; }
+if ${ac_cv_prog_cc_c99+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_prog_cc_c99=no
+ac_save_CC=$CC
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <wchar.h>
+#include <stdio.h>
+
+// Check varargs macros.  These examples are taken from C99 6.10.3.5.
+#define debug(...) fprintf (stderr, __VA_ARGS__)
+#define showlist(...) puts (#__VA_ARGS__)
+#define report(test,...) ((test) ? puts (#test) : printf (__VA_ARGS__))
+static void
+test_varargs_macros (void)
+{
+  int x = 1234;
+  int y = 5678;
+  debug ("Flag");
+  debug ("X = %d\n", x);
+  showlist (The first, second, and third items.);
+  report (x>y, "x is %d but y is %d", x, y);
+}
+
+// Check long long types.
+#define BIG64 18446744073709551615ull
+#define BIG32 4294967295ul
+#define BIG_OK (BIG64 / BIG32 == 4294967297ull && BIG64 % BIG32 == 0)
+#if !BIG_OK
+  your preprocessor is broken;
+#endif
+#if BIG_OK
+#else
+  your preprocessor is broken;
+#endif
+static long long int bignum = -9223372036854775807LL;
+static unsigned long long int ubignum = BIG64;
+
+struct incomplete_array
+{
+  int datasize;
+  double data[];
+};
+
+struct named_init {
+  int number;
+  const wchar_t *name;
+  double average;
+};
+
+typedef const char *ccp;
+
+static inline int
+test_restrict (ccp restrict text)
+{
+  // See if C++-style comments work.
+  // Iterate through items via the restricted pointer.
+  // Also check for declarations in for loops.
+  for (unsigned int i = 0; *(text+i) != '\0'; ++i)
+    continue;
+  return 0;
+}
+
+// Check varargs and va_copy.
+static void
+test_varargs (const char *format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  va_list args_copy;
+  va_copy (args_copy, args);
+
+  const char *str;
+  int number;
+  float fnumber;
+
+  while (*format)
+    {
+      switch (*format++)
+	{
+	case 's': // string
+	  str = va_arg (args_copy, const char *);
+	  break;
+	case 'd': // int
+	  number = va_arg (args_copy, int);
+	  break;
+	case 'f': // float
+	  fnumber = va_arg (args_copy, double);
+	  break;
+	default:
+	  break;
+	}
+    }
+  va_end (args_copy);
+  va_end (args);
+}
+
+int
+main ()
+{
+
+  // Check bool.
+  _Bool success = false;
+
+  // Check restrict.
+  if (test_restrict ("String literal") == 0)
+    success = true;
+  char *restrict newvar = "Another string";
+
+  // Check varargs.
+  test_varargs ("s, d' f .", "string", 65, 34.234);
+  test_varargs_macros ();
+
+  // Check flexible array members.
+  struct incomplete_array *ia =
+    malloc (sizeof (struct incomplete_array) + (sizeof (double) * 10));
+  ia->datasize = 10;
+  for (int i = 0; i < ia->datasize; ++i)
+    ia->data[i] = i * 1.234;
+
+  // Check named initializers.
+  struct named_init ni = {
+    .number = 34,
+    .name = L"Test wide string",
+    .average = 543.34343,
+  };
+
+  ni.number = 58;
+
+  int dynamic_array[ni.number];
+  dynamic_array[ni.number - 1] = 543;
+
+  // work around unused variable warnings
+  return (!success || bignum == 0LL || ubignum == 0uLL || newvar[0] == 'x'
+	  || dynamic_array[ni.number - 1] != 543);
+
+  ;
+  return 0;
+}
+_ACEOF
+for ac_arg in '' -std=gnu99 -std=c99 -c99 -AC99 -D_STDC_C99= -qlanglvl=extc99
+do
+  CC="$ac_save_CC $ac_arg"
+  if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_prog_cc_c99=$ac_arg
+fi
+rm -f core conftest.err conftest.$ac_objext
+  test "x$ac_cv_prog_cc_c99" != "xno" && break
+done
+rm -f conftest.$ac_ext
+CC=$ac_save_CC
+
+fi
+# AC_CACHE_VAL
+case "x$ac_cv_prog_cc_c99" in
+  x)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
+$as_echo "none needed" >&6; } ;;
+  xno)
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
+$as_echo "unsupported" >&6; } ;;
+  *)
+    CC="$CC $ac_cv_prog_cc_c99"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cc_c99" >&5
+$as_echo "$ac_cv_prog_cc_c99" >&6; } ;;
+esac
+if test "x$ac_cv_prog_cc_c99" != xno; then :
+
+fi
+
+
+if test "$ac_cv_prog_cc_c99" != "no"; then
+  CFLAGS="$ac_cv_prog_cc_c99 ${CFLAGS}"
+fi
 
 # SDCC_C_UNNAMED_STRUCT_TAG ()
 # chech whether C compiler supports tag in unnamed struct
@@ -10573,6 +10572,7 @@ sdcc ${VERSION} is now configured for
   CXXFLAGS:             ${CXXFLAGS}
   CPPFLAGS:             ${CPPFLAGS}
   LDFLAGS:              ${LDFLAGS}
+  MAKEDEP:              ${MAKEDEP}
 
   ENABLED Ports:
     ds390               ${enable_ds390_port}
@@ -10641,6 +10641,7 @@ sdcc ${VERSION} is now configured for
   CXXFLAGS:             ${CXXFLAGS}
   CPPFLAGS:             ${CPPFLAGS}
   LDFLAGS:              ${LDFLAGS}
+  MAKEDEP:              ${MAKEDEP}
 
   ENABLED Ports:
     ds390               ${enable_ds390_port}

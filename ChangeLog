@@ -1,3 +1,13 @@
+2017-11-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCval.c,
+	  src/SDCCval.c,
+	  src/SDCC.lex,
+	  support/regression/tests/bug-2221.c,
+	  support/regression/tests/bug-2687.c,
+	  support/regression/tests/generic.c:
+	  Fix bugs #2221, #2687.
+
 2017-11-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCralloc.hpp,

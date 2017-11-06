@@ -189,12 +189,12 @@ static void checkCurrFile (const char *s);
       yyerror ("binary (0b) constants are not allowed in ISO C");
     }
   count ();
-  yylval.val = constVal (yytext);
+  yylval.val = constIntVal (yytext);
   return CONSTANT;
 }
-0[xX]{H}+{IS}?               { count (); yylval.val = constVal (yytext); return CONSTANT; }
-0[0-7]*{IS}?                 { count (); yylval.val = constVal (yytext); return CONSTANT; }
-[1-9]{D}*{IS}?               { count (); yylval.val = constVal (yytext); return CONSTANT; }
+0[xX]{H}+{IS}?               { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
+0[0-7]*{IS}?                 { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
+[1-9]{D}*{IS}?               { count (); yylval.val = constIntVal (yytext); return CONSTANT; }
 {CP}?'(\\.|[^\\'])+'         { count (); yylval.val = charVal (yytext); return CONSTANT; /* ' make syntax highlighter happy */ }
 {D}+{E}{FS}?                 { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }
 {D}*"."{D}+({E})?{FS}?       { count (); yylval.val = constFloatVal (yytext); return CONSTANT; }

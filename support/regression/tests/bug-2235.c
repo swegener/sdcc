@@ -1,4 +1,4 @@
-/*      bug2235.c
+/*      bug-2235.c
 */
 
 #include <testfwk.h>

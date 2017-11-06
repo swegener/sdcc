@@ -17,9 +17,7 @@ void testGeneric(void)
   ASSERT (_Generic(l, default : 0, int : 1, long int : 2) == 2);
   ASSERT (_Generic(l, default : 0, int : 1, char : 2) == 0);
   ASSERT (_Generic('c', default : 0, int : 1, char : 2) == 1);
-#if 0 // Integer constant still have wrong type when small
   ASSERT (_Generic(7, default : 0, int : 1, char : 2) == 1);
-#endif
   ASSERT (_Generic(e, default : 0, int : 1, char : 2) == 1);
   ASSERT (_Generic(c, default : 0, int : 1, char : 2) == 2);
   ASSERT (_Generic("c"[0], char : 1, default : 0) == _Generic(c, char : 1, default : 0)); // There once was a bug where the sign of plain char different from the sign of char in string literals.

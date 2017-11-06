@@ -10,6 +10,7 @@
 
 //two functions that use the same registers (but should be in different banks)
 
+#ifndef __SDCC_mcs51 // Bug when using stack auto : Error: <a> machine specific addressing or addressing mode error
 unsigned char calculate(unsigned char v1,unsigned char v2)
 {
 	unsigned char v3;
@@ -40,10 +41,11 @@ void T2_isr(void) __interrupt(5) __using(1)
 	//corrupt calculate in main loop
 }
 #endif
+#endif
 
 void testBug(void)
 {
-#ifdef __SDCC_mcs51
+#if 0 //defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO) // TODO:remove STACK_AUTO CONDITION when division support routine becomes reentrant or sdcc optimizes out the call.
 	TF2 = 0;				//clear timer 2 interrupt
 	ET2 = 1;				//enable timer 2 interrupt
 	EA = 1;					//enable interrupts

@@ -1120,27 +1120,63 @@ constFixed16x16Val (const char *s)
 }
 
 /*-----------------------------------------------------------------*/
-/* constVal - converts an INTEGER constant into a cheapest value   */
+/* constVal - converts a constant into a cheap value type          */
 /*-----------------------------------------------------------------*/
 value *
 constVal (const char *s)
 {
-  value *val;
+  value *val = constIntVal (s);
+
+  wassert (SPEC_NOUN (val->type) == V_INT);
+
+  if (SPEC_LONGLONG (val->type))
+    ;
+  else if (SPEC_LONG (val->type))
+    ;
+  else if (SPEC_USIGN (val->type))
+    {
+      unsigned int i = SPEC_CVAL (val->type).v_uint;
+      if (i < 256)
+        SPEC_NOUN (val->type) = V_CHAR;
+    }
+  else
+    {
+      int i = SPEC_CVAL (val->type).v_int;
+      if (i >= 0 && i < 256)
+        {
+          SPEC_NOUN (val->type) = V_CHAR;
+          SPEC_USIGN (val->type) = TRUE;
+          SPEC_CVAL (val->type).v_uint = i;
+        }
+      else if (i >= -128 && i < 128)
+        {
+          SPEC_NOUN (val->type) = V_CHAR;
+        }
+    }
+
+  return val;
+}
+
+/*-----------------------------------------------------------------*/
+/* constIntVal - converts an integer constant into correct type    */
+/* See ISO C11, section 6.4.4.1 for the rules.                     */
+/*-----------------------------------------------------------------*/
+value *
+constIntVal (const char *s)
+{
   char *p, *p2;
   double dval;
   long long int llval;
-  bool is_integral = 0;
+  value *val = newValue ();
+  bool decimal, u_suffix = FALSE, l_suffix = FALSE, ll_suffix = FALSE;
 
-  val = newValue ();            /* alloc space for value */
-
-  val->type = val->etype = newLink (SPECIFIER); /* create the specifier */
+  val->type = val->etype = newLink (SPECIFIER);
   SPEC_SCLS (val->type) = S_LITERAL;
   SPEC_CONST (val->type) = 1;
-  /* let's start with a signed char */
-  SPEC_NOUN (val->type) = V_CHAR;
   SPEC_USIGN (val->type) = 0;
 
   errno = 0;
+
   if (s[0] == '0')
     {
       if (s[1] == 'b' || s[1] == 'B')
@@ -1148,7 +1184,7 @@ constVal (const char *s)
       else
         llval = strtoull (s, &p, 0);
       dval = (double)(unsigned long long int) llval;
-      is_integral = 1;
+      decimal = FALSE;
     }
   else
     {
@@ -1157,6 +1193,7 @@ constVal (const char *s)
         llval = strtoull (s, &p, 0);
       else
         llval = strtoll (s, &p, 0);
+      decimal = TRUE;
     }
 
   if (errno)
@@ -1165,11 +1202,10 @@ constVal (const char *s)
       werror (W_INVALID_INT_CONST, s, dval);
     }
 
-  /* Setup the flags first */
-  /* set the unsigned flag if 'uU' is found */
+  // Check suffixes
   if ((p2 = strchr (p, 'u')) || (p2 = strchr (p, 'U')))
     {
-      SPEC_USIGN (val->type) = 1;
+      u_suffix = TRUE;
       p2++;
       if (strchr (p2, 'u') || strchr (p2, 'U'))
         werror (E_INTEGERSUFFIX, p);
@@ -1177,89 +1213,71 @@ constVal (const char *s)
 
   if ((p2 = strstr (p, "ll")) || (p2 = strstr (p, "LL")))
     {
-      SPEC_NOUN (val->type) = V_INT;
-      SPEC_LONGLONG (val->type) = 1;
+      ll_suffix = TRUE;
       p2 += 2;
       if (strchr (p2, 'l') || strchr (p2, 'L'))
-        werror (E_INTEGERSUFFIX, p); 
+        werror (E_INTEGERSUFFIX, p);
     }
-  /* set the b_long flag if 'l' or 'L' is found */
   else if ((p2 = strchr (p, 'l')) || (p2 = strchr (p, 'L')))
     {
-      SPEC_NOUN (val->type) = V_INT;
-      SPEC_LONG (val->type) = 1;
+      l_suffix = TRUE;
       p2++;
       if (strchr (p2, 'l') || strchr (p2, 'L'))
         werror (E_INTEGERSUFFIX, p);
-      /* c89 allows unsigned long without explicit u suffix */
-      if (!options.std_c99 && dval > 0x7fffffff && dval <= 0xffffffff)
-         SPEC_USIGN (val->type) = 1;
+    }
+
+  SPEC_NOUN (val->type) = V_INT;
+
+  if (u_suffix) // Choose first of unsigned int, unsigned long int, unsigned long long int that fits.
+    {
+      SPEC_USIGN (val->type) = 1;
+      if (ll_suffix || dval > 0xffffffff)
+        SPEC_LONGLONG (val->type) = 1;
+      else if(l_suffix || dval > 0xffff)
+        SPEC_LONG (val->type) = 1;
     }
   else
-    {
-      if (dval < 0)
-        {                       /* "-28u" will still be signed and negative */
-          if (dval < -128)
-            {                   /* check if we have to promote to int */
-              SPEC_NOUN (val->type) = V_INT;
-            }
-          if (dval < -32768)
-            {                   /* check if we have to promote to long int */              
-              SPEC_LONG (val->type) = 1;
-            }
-          if (dval < -2147483648.0)
-            {                   /* check if we have to promote to long long int */
-              SPEC_LONGLONG (val->type) = 1;
-            }
-        }
-      else
-        {                       /* >=0 */
-          if (dval > 0xff ||    /* check if we have to promote to int */
-              SPEC_USIGN (val->type))
-            {                   /* If it's unsigned, we can't use unsigned char.
-                                   After an integral promotion it will be a signed int;
-                                   this certainly isn't what the programer wants */
-              SPEC_NOUN (val->type) = V_INT;
-            }
-          else
-            {                   /* store char's always as unsigned; this helps other optimizations */
-              SPEC_USIGN (val->type) = 1;
-            }
-          if (dval > 0xffff && SPEC_USIGN (val->type) && !SPEC_LONGLONG (val->type))
-            {                   /* check if we have to promote to long */
-              SPEC_LONG (val->type) = 1;
-            }
-          else if (dval > 0x7fff && !SPEC_USIGN (val->type))
-            {                   /* check if we have to promote to long int */
-              if (is_integral && dval <= 0xffff)
-                {               /* integral (hex, octal and binary) constants may be stored in unsigned type */
-                  SPEC_USIGN (val->type) = 1;
-                }
-              else
+    {  
+      if (decimal) // Choose first of int, long int, long long int that fits.
+        {
+          if (ll_suffix || dval > 0x7fffffff || dval < -0x80000000ll)
+            {
+              if (!options.std_c99) // C90 exception: Use unsigned long
                 {
+                  SPEC_USIGN (val->type) = 1;
                   SPEC_LONG (val->type) = 1;
                 }
-            }
-          if (dval > 0xffffffff && SPEC_USIGN (val->type) && !SPEC_LONGLONG (val->type))
-            {
-              SPEC_LONGLONG (val->type) = 1;
-            }
-          else if (dval > 0x7fffffff && !SPEC_USIGN (val->type))
-            {
-              /* integral constants can be unsigned long. */
-              /* c89 also allows unsigned long decimal constants without explicit suffix */
-              if ((is_integral || !options.std_c99) && dval <= 0xffffffff)
-                {
-                  SPEC_USIGN (val->type) = 1;
-                }
               else
-                {
-                  SPEC_LONGLONG (val->type) = 1;
-                  if (is_integral && (llval & 0x8000000000000000ull))
-                    SPEC_USIGN (val->type) = 1;
-                }
+                SPEC_LONGLONG (val->type) = 1;
             }
+          else if(l_suffix || dval > 0x7fff || dval < -0x8000l)
+            SPEC_LONG (val->type) = 1;
         }
+      else // Choose first of int, unsigned int, long int, unsigned long int, long long int, unsigned long long int that fits.
+       {
+         if (dval > 0x7fffffffffffffff)
+           {
+             SPEC_USIGN (val->type) = 1;
+             SPEC_LONGLONG (val->type) = 1;
+           }
+         else if (ll_suffix || dval > 0xffffffff || dval < -0x80000000ll)
+           {
+             SPEC_LONGLONG (val->type) = 1;
+           }
+         else if (dval > 0x7fffffff)
+           {
+             SPEC_USIGN (val->type) = 1;
+             SPEC_LONG (val->type) = 1;
+           }
+         else if (l_suffix || dval > 0xffff || dval < -0x8000l)
+           {
+             SPEC_LONG (val->type) = 1;
+           }
+         else if (dval > 0x7fff)
+           {
+             SPEC_USIGN (val->type) = 1;
+           }
+       }
     }
 
   /* check for out of range */

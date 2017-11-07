@@ -17,11 +17,9 @@ void
 testTortureExecute (void)
 {
 #if !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
-#if !defined (__SDCC_gbz80) // bug #2329
   if(c*3!=c3)
     ASSERT(0);
   return;
-#endif
 #endif
 }
 

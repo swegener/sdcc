@@ -599,34 +599,34 @@ barrier
 // Do not try further peephole optimization after these, as other peepholes e.g. might try to generate add a, (hl-), etc otherwise.
 
 replace {
-	ld	a,(hl)
+	ld	a, (hl)
 	inc	hl
 } by {
-	ld	a,(hl+)
+	ld	a, (hl+)
 	; peephole GB1 used ldi to increment hl after load
 }
 
 replace {
-	ld	a,(hl)
+	ld	a, (hl)
 	dec	hl
 } by {
-	ld	a,(hl-)
+	ld	a, (hl-)
 	; peephole GB2 used ldd to decrement hl after load
 }
 
 replace {
-	ld	(hl),a
+	ld	(hl), a
 	inc	hl
 } by {
-	ld	(hl+),a
+	ld	(hl+), a
 	; peephole GB3 used ldi to increment hl after load
 }
 
 replace {
-	ld	(hl),a
+	ld	(hl), a
 	dec	hl
 } by {
-	ld	(hl-),a
+	ld	(hl-), a
 	; peephole GB4 used ldd to decrement hl after load
 }
 
@@ -638,13 +638,26 @@ replace {
 }
 
 replace {
-	ld	(hl),a
+	ld	(hl), a
 	inc	de
-	ld	a,(de)
+	ld	a, (de)
 	inc	hl
 } by {
-	ld	(hl+),a
+	ld	(hl+), a
 	; peephole GB6 used ldi to increment hl
 	inc	de
-	ld	a,(de)
+	ld	a, (de)
 }
+
+replace {
+	ld	a, (hl)
+	ld	(bc), a
+	inc	bc
+	inc	hl
+} by {
+	ld	a, (hl+)
+	; peephole GB7 used ldi to increment hl
+	ld	(bc), a
+	inc	bc
+}
+

@@ -5243,7 +5243,7 @@ genPlus (iCode * ic)
               if (getPairId (AOP (IC_LEFT (ic))) == PAIR_BC)
                 {
                   fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
-                  emit2 ("add hl,bc");
+                  emit2 ("add hl, bc");
                   regalloc_dry_run_cost += 1;
                 }
               else
@@ -5283,7 +5283,7 @@ genPlus (iCode * ic)
                       fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
                       fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
                     }
-                  emit2 ("add hl,de");
+                  emit2 ("add hl, de");
                   regalloc_dry_run_cost += 1;
                 }
               spillPair (PAIR_HL);
@@ -5948,6 +5948,7 @@ genUminus (const iCode *ic)
     genSub (ic, AOP (IC_RESULT (ic)), ASMOP_ZERO, AOP (IC_LEFT (ic)));
 
 release:
+  _G.preserveCarry = FALSE;
   freeAsmop (IC_LEFT (ic), NULL);
   freeAsmop (IC_RESULT (ic), NULL);
 }
@@ -8880,6 +8881,9 @@ genLeftShift (const iCode * ic)
     }
 
 end:
+  if (!shift_by_lit && requiresHL (AOP (result))) // Shift by 0 skips over hl adjustments.
+    spillPair (PAIR_HL);
+
   freeAsmop (left, NULL);
   freeAsmop (right, NULL);
   freeAsmop (result, NULL);
@@ -9250,6 +9254,9 @@ genRightShift (const iCode * ic)
     }
 
 end:
+  if (!shift_by_lit && requiresHL (AOP (result))) // Shift by 0 skips over hl adjustments.
+    spillPair (PAIR_HL);
+
   freeAsmop (left, NULL);
   freeAsmop (right, NULL);
   freeAsmop (result, NULL);

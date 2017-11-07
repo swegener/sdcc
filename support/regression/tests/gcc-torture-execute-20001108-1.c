@@ -28,7 +28,6 @@ void
 testTortureExecute (void)
 {
 #if !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
-#if !defined (__SDCC_gbz80) // bug #2329
   if (signed_poly (2LL, -3) != -4LL)
     ASSERT (0);
   
@@ -36,7 +35,6 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 #endif
 }
 

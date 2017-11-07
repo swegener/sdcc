@@ -169,21 +169,15 @@ testLongLong (void)
   y = 42;
   ASSERT (y + tmp == 42 + 23);
   ASSERT (y - tmp == 42 - 23);
-#ifndef __SDCC_gbz80 // long long multiplication broken on gbz80, bug #2329
   ASSERT (y * tmp == 42 * 23);
-#endif
   ASSERT (y / tmp == 42 / 23);
   ASSERT (y % tmp == 42 % 23);
 
   tmp = 42;
   x = 42ll << 23;
   ASSERT (x + y == (42ll << 23) + 42);
-#ifndef __SDCC_gbz80 // Breaks due to bug in hl handling in gbz80 port
   ASSERT (x - y == (42ll << 23) - 42);
-#endif
-#ifndef __SDCC_gbz80 // long long multiplication broken on gbz80, bug #2329
   ASSERT (x * y == (42ll << 23) * 42);
-#endif
   ASSERT (x / tmp == (42ll << 23) / 42);
   ASSERT (x % tmp == (42ll << 23) % 42);
 
@@ -192,7 +186,8 @@ testLongLong (void)
   ASSERT (y + x == 0x9988776655443322ull + 0x1122334455667788ll);
   ASSERT (y - x == 0x9988776655443322ull - 0x1122334455667788ll);
 
-#ifndef __SDCC_gbz80 // long long multiplication broken on gbz80, bug #2329
+  ASSERT (mulLL (1ull, 1ull) == 1ull * 1ull);
+
   y = 0x55667788ull;
   ASSERT (y * y == 0x55667788ull * 0x55667788ull); // this test is optimized by constant propagation
   ASSERT (mulLL (y, y) == 0x55667788ull * 0x55667788ull); // this test is not
@@ -218,7 +213,6 @@ testLongLong (void)
   x = 0x2ll;
   ASSERT (y * x == 0x1122334455667700ull * 0x2ll); // this test is optimized by constant propagation
   ASSERT (mulLL (y, x) == 0x1122334455667700ull * 0x2ll); // this test is not
-#endif
 
   y = 0x1122334455667700ull;
   x = 0x7ll;

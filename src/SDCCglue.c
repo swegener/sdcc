@@ -152,7 +152,11 @@ emitRegularMap (memmap * map, bool addPublics, bool arFlag)
       if (!strcmp (map->sname, CODE_NAME))
         dbuf_tprintf (&map->oBuf, "\t!areacode\n", map->sname);
       else if (!strcmp (map->sname, DATA_NAME))
-        dbuf_tprintf (&map->oBuf, "\t!areadata\n", map->sname);
+        {
+          dbuf_tprintf (&map->oBuf, "\t!areadata\n", map->sname);
+          if (options.data_seg && strcmp (DATA_NAME, options.data_seg))
+            dbuf_tprintf (&map->oBuf, "\t!area\n", options.data_seg);
+        }
       else if (!strcmp (map->sname, HOME_NAME))
         dbuf_tprintf (&map->oBuf, "\t!areahome\n", map->sname);
       else
@@ -1963,10 +1967,9 @@ emitMaps (void)
   emitRegularMap (code, TRUE, FALSE);
 
   if (options.const_seg)
-    {
-      dbuf_tprintf (&code->oBuf, "\t!area\n", options.const_seg);
-    }
+    dbuf_tprintf (&code->oBuf, "\t!area\n", options.const_seg);
   emitStaticSeg (statsg, &code->oBuf);
+
   if (port->genXINIT)
     {
       dbuf_tprintf (&code->oBuf, "\t!area\n", xinit->sname);

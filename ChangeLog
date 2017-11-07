@@ -1,5 +1,13 @@
 2017-11-07 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCglobl.h,
+	  src/SDCCglue.c,
+	  src/SDCCmain.c,
+	  src/z80/main.c:
+	  Implement --data-seg, part of RFE #544.
+
+2017-11-07 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/peeph-gbz80.def,
 	  support/regression/tests/longlong.c,

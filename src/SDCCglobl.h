@@ -346,6 +346,7 @@ struct options
     int signed_char;            /* use signed for char without signed/unsigned modifier */
     char *code_seg;             /* segment name to use instead of CSEG */
     char *const_seg;            /* segment name to use instead of CONST */
+    char *data_seg;             /* segment name to use instead of DATA */
     int dependencyFileOpt;      /* write dependencies to given file */
     /* sets */
     set *calleeSavesSet;        /* list of functions using callee save */

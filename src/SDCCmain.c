@@ -141,6 +141,7 @@ char buffer[PATH_MAX * 2];
 #define OPTION_STD_SDCC11           "--std-sdcc11"
 #define OPTION_CODE_SEG             "--codeseg"
 #define OPTION_CONST_SEG            "--constseg"
+#define OPTION_DATA_SEG             "--dataseg"
 #define OPTION_DOLLARS_IN_IDENT     "--fdollars-in-identifiers"
 #define OPTION_SIGNED_CHAR          "--fsigned-char"
 #define OPTION_USE_NON_FREE         "--use-non-free"
@@ -215,6 +216,7 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_NO_PEEP_COMMENTS, &options.noPeepComments, "don't include peephole optimizer comments"},
   {0,   OPTION_CODE_SEG, NULL, "<name> use this name for the code segment"},
   {0,   OPTION_CONST_SEG, NULL, "<name> use this name for the const segment"},
+  {0,   OPTION_DATA_SEG, NULL, "<name> use this name for the data segment"},
 
   {0,   NULL, NULL, "Optimization options"},
   {0,   "--nooverlay", &options.noOverlay, "Disable overlaying leaf function auto variables"},
@@ -612,6 +614,7 @@ setDefaultOptions (void)
   options.std_c11 = 1;          /* default to C11 (we want inline by default, so we need at least C99, and support for C11 is more complete than C99) */
   options.code_seg = CODE_NAME ? Safe_strdup (CODE_NAME) : NULL;        /* default to CSEG for generated code */
   options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL;     /* default to CONST for generated code */
+  options.data_seg = DATA_NAME ? Safe_strdup (DATA_NAME) : NULL;        /* default to DATA for non-initialized data */
   options.stack10bit = 0;
   options.out_fmt = 0;
   options.dump_graphs = 0;
@@ -1219,6 +1222,18 @@ parseCmdLine (int argc, char **argv)
               if (options.const_seg)
                 Safe_free (options.const_seg);
               options.const_seg = dbuf_detach (&segname);
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_DATA_SEG) == 0)
+            {
+              struct dbuf_s segname;
+
+              dbuf_init (&segname, 16);
+              dbuf_printf (&segname, "%-8s(DATA)", getStringArg (OPTION_DATA_SEG, argv, &i, argc));
+              if (options.data_seg)
+                Safe_free (options.data_seg);
+              options.data_seg = dbuf_detach (&segname);
               continue;
             }
 

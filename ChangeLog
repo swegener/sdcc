@@ -13,6 +13,8 @@
 	  support/regression/tests/gcc-torture-execute-961213-1.c,
 	  support/regression/tests/gcc-torture-execute-pr65170:
 	  Fix bugs #2329, #2656, #2653.
+	* support/makebin/makebin.c:
+	  Apply patch #278 by Brandon Blake.
 
 2017-11-06 Philipp Klaus Krause <pkk AT spth.de>
 

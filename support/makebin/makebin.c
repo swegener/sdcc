@@ -94,6 +94,7 @@ usage (void)
            "  -ya n          number of ram banks (default: 0)\n"
            "  -yt n          MBC type (default: no MBC)\n"
            "  -yn name       cartridge name (default: none)\n"
+           "  -yc            GameBoy Color\n"
            "Arguments:\n"
            "  <in_file>      optional IHX input file, '-' means stdin. (default: stdin)\n"
            "  <out_file>     optional output file, '-' means stdout. (default: stdout)\n");
@@ -107,6 +108,7 @@ struct gb_opt_s
   BYTE mbc_type;                  /* MBC type (default: no MBC) */
   short nb_rom_banks;             /* Number of rom banks (default: 2) */
   BYTE nb_ram_banks;              /* Number of ram banks (default: 0) */
+  BYTE is_gbc;                    /* True if GBC, false for all other*/
 };
 
 void
@@ -139,6 +141,11 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
   for (i = 0; i < CART_NAME_LEN; ++i)
     {
       rom[0x134 + i] = toupper (o->cart_name[i]);
+    }
+
+  if (o->is_gbc)
+    {
+      rom[0x143] = 0x80;
     }
 
   /*
@@ -409,6 +416,10 @@ main (int argc, char **argv)
               strncpy (gb_opt.cart_name, *argv, CART_NAME_LEN);
               break;
 
+            case 'c':
+              gb_opt.is_gbc = 1;
+              break;
+
             default:
               usage ();
               return 1;
@@ -489,3 +500,4 @@ main (int argc, char **argv)
   else
     return 1;
 }
+

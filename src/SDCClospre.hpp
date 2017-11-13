@@ -29,8 +29,6 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>
 
-#include "SDCCtree_dec.hpp"
-
 extern "C"
 {
 #include "SDCCsymt.h"
@@ -116,7 +114,14 @@ struct tree_dec_lospre_node
 };
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_lospre_node, float> cfg_lospre_t; // The edge property is the cost of subdividing the edge and inserting an instruction (for now we always use 1, optimizing for code size, but relative execution frequency could be used when optimizing for speed or total energy consumption; aggregates thereof can be a good idea as well).
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_lospre_node> tree_dec_lospre_t;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, tree_dec_lospre_node> tree_dec_t;
+
+#ifdef HAVE_TREEDEC_COMBINATIONS_HPP
+#include <treedec/treedec_traits.hpp>
+TREEDEC_TREEDEC_BAG_TRAITS(tree_dec_t, bag);
+#endif
+
+#include "SDCCtree_dec.hpp"
 
 #ifdef DEBUG_LOSPRE
 void print_assignment(const assignment_lospre &a, cfg_lospre_t G)
@@ -758,7 +763,7 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
 
 /* Using a template here confuses debugging tools such as valgrind. */
 /*template <class T_t, class G_t>*/
-static int tree_dec_lospre (tree_dec_lospre_t/*T_t*/ &T, cfg_lospre_t/*G_t*/ &G, const iCode *ic)
+static int tree_dec_lospre (tree_dec_t/*T_t*/ &T, cfg_lospre_t/*G_t*/ &G, const iCode *ic)
 {
   if(tree_dec_lospre_nodes(T, find_root(T), G))
     return(-1);
@@ -790,7 +795,7 @@ static void implement_safety(const assignment_lospre &a, G_t &G)
 
 /* Using a template here confuses debugging tools such as valgrind. */
 /*template <class T_t, class G_t>*/
-static int tree_dec_safety (tree_dec_lospre_t/*T_t*/ &T, cfg_lospre_t/*G_t*/ &G, const iCode *ic)
+static int tree_dec_safety (tree_dec_t/*T_t*/ &T, cfg_lospre_t/*G_t*/ &G, const iCode *ic)
 {
   if(tree_dec_safety_nodes(T, find_root(T), G))
     return(-1);

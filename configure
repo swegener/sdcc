@@ -5009,6 +5009,33 @@ fi
 
 done
 
+for ac_header in treedec/combinations.hpp
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "treedec/combinations.hpp" "ac_cv_header_treedec_combinations_hpp" "$ac_includes_default"
+if test "x$ac_cv_header_treedec_combinations_hpp" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_TREEDEC_COMBINATIONS_HPP 1
+_ACEOF
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: treedec library missing, falling back to Thorup." >&5
+$as_echo "$as_me: WARNING: treedec library missing, falling back to Thorup." >&2;}
+fi
+
+done
+
+for ac_header in gala/graph.h
+do :
+  ac_fn_cxx_check_header_mongrel "$LINENO" "gala/graph.h" "ac_cv_header_gala_graph_h" "$ac_includes_default"
+if test "x$ac_cv_header_gala_graph_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_GALA_GRAPH_H 1
+_ACEOF
+
+fi
+
+done
+
 for ac_header in boost/graph/adjacency_list.hpp
 do :
   ac_fn_cxx_check_header_mongrel "$LINENO" "boost/graph/adjacency_list.hpp" "ac_cv_header_boost_graph_adjacency_list_hpp" "$ac_includes_default"
@@ -6278,6 +6305,7 @@ $as_echo "$ac_res" >&6; }
 
   WALL_FLAG="-Wall -Wno-parentheses"
   C99_FLAG="--std=c99"
+  # We use CXX instead of CC here, since some of the C++ source files require a C++ compiler even during dependency generation.
   MAKEDEP="$CXX $sdcc_cv_MM"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we are using the SunPRO C compiler" >&5

@@ -1,3 +1,53 @@
+2017-11-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merged nothorup branch to trunk.
+
+2017-11-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp:
+	  Document choice of algorithm for tree-decomposition.
+
+2017-11-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure.ac,
+	  src/SDCCtree_dec.hpp,
+	  sdccconf_in.h,
+	  configure:
+	  Automatically use gala for treedec.
+	  
+2017-11-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdccconf_in.h:
+	  Regenerate to get correct definitions from configuration.
+
+2017-11-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure,
+	  configure.ac,
+	  src/SDCClospre.cc,
+	  src/SDCClospre.hpp,
+	  src/SDCCnaddr.cc,
+	  src/SDCCnaddr.hpp,
+	  src/SDCCralloc.hpp,
+	  src/SDCCtree_dec.hpp,
+	  src/hc08/ralloc2.cc,
+	  src/stm8/ralloc2.cc,
+	  src/z80/ralloc2.cc:
+	  Detect and use treedec when available, fall back to Thorup otherwise.
+
+2017-11-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.cc,
+	  src/SDCClospre.hpp,
+	  src/SDCCnaddr.cc,
+	  src/SDCCnaddr.hpp,
+	  src/SDCCralloc.hpp,
+	  src/SDCCtree_dec.hpp,
+	  src/hc08/ralloc2.cc,
+	  src/stm8/ralloc2.cc,
+	  src/z80/ralloc2.cc:
+	  tdlib to treedec rename.
+
 2017-11-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCglobl.h,
@@ -55,13 +105,36 @@
 
 2017-11-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCtree_dec.hpp:
+	  Fix bug #2684.
+
+2017-11-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp:
+	  Cleanup algorithm selection.
+
+2017-11-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/bug-2684.c:
 	  Disable new test for mcs51-small, which doesn't have enough RAM.
+
+2017-11-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCCnaddr.hpp,
+	  src/SDCCralloc.hpp,
+	  src/SDCCtree_dec.hpp:
+	  More changes for current tdlib, patch by Felix Salfelder.
 
 2017-11-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2684.c:
 	  Test for bug #2684.
+
+2017-11-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp:
+	  Use find_root() from tdlib when available.
 
 2017-11-01 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -69,6 +142,27 @@
 	  Fix a bug in Z80 sfr handling.
 	* support/scripts/Makefile.in:
 	  Fix an access rights issue in make install, patch by Felix Salfelder.
+
+2017-10-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/SDCCralloc.hpp,
+	  src/stm8/ralloc2.cc,
+	  src/hc08/ralloc2.cc,
+	  src/z80/ralloc2.cc:
+	  Allow use of tdlib Thorup in place of SDCC Thorup in register allocator.
+	* src/SDCClospre.cc,
+	  src/SDCClospre.hpp,
+	  src/SDCCnaddr.cc,
+	  src/SDCCnaddr.hpp:
+	  Allow use of tdlib Thorup in place of SDCC Thorup in lospre and bank selection instruction placement.
+	* src/SDCClospre.cc,
+	  src/SDCCnaddr.cc,
+	  src/hc08/ralloc2.cc,
+	  src/z80/ralloc2.cc:
+	  Enable use of tdlib Thorup in place of SDCC Thorup.
+	* src/SDCCtree_dec.hp:
+	  Use PP+FI+TM instead of Thorup.
 
 2017-10-30 Philipp Klaus Krause <pkk AT spth.de>
 

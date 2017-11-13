@@ -64,7 +64,6 @@
 #include <boost/container/flat_map.hpp>
 
 #include "common.h"
-#include "SDCCtree_dec.hpp"
 
 extern "C"
 {
@@ -224,6 +223,13 @@ typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, con_
 typedef boost::adjacency_matrix<boost::undirectedS, con_node> con2_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, cfg_node> cfg_t;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS> cfg_sym_t;
+
+#ifdef HAVE_TREEDEC_COMBINATIONS_HPP
+#include <treedec/treedec_traits.hpp>
+TREEDEC_TREEDEC_BAG_TRAITS(tree_dec_t, bag);
+#endif
+
+#include "SDCCtree_dec.hpp"
 
 // Cost function. Port-specific.
 template <class G_t, class I_t>

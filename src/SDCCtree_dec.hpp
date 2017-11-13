@@ -40,6 +40,7 @@
 //
 // void thorup_elimination_ordering(l_t &l, const J_t &J)
 // Creates an elimination ordering l of a graph J using Thorup's heuristic.
+//
 
 #include <map>
 #include <vector>
@@ -49,9 +50,13 @@
 
 #include <boost/tuple/tuple_io.hpp>
 #include <boost/graph/graph_traits.hpp>
+#include <boost/graph/graph_utility.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/graph/copy.hpp>
 #include <boost/graph/adjacency_list.hpp>
+
+#undef RANGE
+#undef BLOCK
 
 struct forget_properties
 {
@@ -60,6 +65,8 @@ struct forget_properties
   {
   }
 };
+
+#ifndef HAVE_TREEDEC_COMBINATIONS_HPP
 
 // Thorup algorithm D.
 // The use of the multimap makes the complexity of this O(|I|log|I|), which could be reduced to O(|I|).
@@ -279,6 +286,7 @@ void thorup_tree_decomposition(T_t &tree_decomposition, const G_t &cfg)
 
   tree_decomposition_from_elimination_ordering(tree_decomposition, elimination_ordering, cfg);
 }
+#endif
 
 // Ensure that all joins are at proper join nodes: Each node that has two children has the same bag as its children.
 // Complexity: Linear in the number of vertices of T.
@@ -466,6 +474,15 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
   nicify_diffs_more(T, t);
 }
 
+#ifdef HAVE_TREEDEC_COMBINATIONS_HPP
+#include <treedec/treedec_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/graph/graph_utility.hpp>
+#include <treedec/nice_decomposition.hpp>
+
+using treedec::find_root;
+#else
 // Find a root of an acyclic graph T
 // Complexity: Linear in the number of vertices of T.
 template <class T_t>
@@ -481,6 +498,7 @@ typename boost::graph_traits<T_t>::vertex_descriptor find_root(T_t &T)
 
   return(t);
 }
+#endif
 
 // Remove isolated vertices possibly introduced by nicify_diffs(). Complicated, since boost does not support removing more than one vertex at a time.
 template <class T_t>
@@ -556,4 +574,82 @@ private:
   std::string function;
   std::string purpose;
 };
+
+#ifdef HAVE_TREEDEC_COMBINATIONS_HPP
+
+#include <treedec/graph.hpp>
+#include <treedec/preprocessing.hpp>
+#include <boost/graph/copy.hpp>
+
+#include <treedec/thorup.hpp>
+#include <treedec/combinations.hpp>
+#include <treedec/misc.hpp>
+
+template <typename G1_t, typename G2_t>
+void copy_undir(G1_t &G1, G2_t const &G2){
+    for(unsigned i = 0; i < boost::num_vertices(G2); i++){
+        boost::add_vertex(G1);
+    }
+    typename boost::graph_traits<G2_t>::edge_iterator eIt, eEnd;
+    for(boost::tie(eIt, eEnd) = boost::edges(G2); eIt != eEnd; eIt++){
+        assert (boost::source(*eIt, G2) != boost::target(*eIt, G2));
+        if ( !boost::edge(boost::source(*eIt, G2), boost::target(*eIt, G2), G1).second){
+            boost::add_edge(boost::source(*eIt, G2), boost::target(*eIt, G2), G1);
+        }else{
+			  // already there
+			  // intended here: this way, or the other.
+		  }
+    }
+}
+
+#endif
+
+#undef USE_THORUP // Thorup's classic algorithm (default in SDCC pre-3.7.0). Substantially worse width than the others.
+#define USE_PP_FI_TM 1 // A good trade-off between width and runtime
+#undef USE_EX17 // Slightly better width than PP_FI_TM, but no polynomial runtime bound.
+#undef USE_PP_MD // Slightly worse width than PP_FI_TM.
+#undef USE_PP_FI // Slightly worse width than PP_FI_TM.
+
+// Get a nice tree decomposition for a cfg.
+template <class T_t, class G_t>
+void get_nice_tree_decomposition(T_t &tree_dec, const G_t &cfg)
+{
+#ifdef HAVE_TREEDEC_COMBINATIONS_HPP
+
+#ifdef USE_THORUP
+  treedec::thorup<G_t> a(cfg);
+#else
+  typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> cfg2_t;
+  cfg2_t cfg2;
+  copy_undir(cfg2, cfg);
+#if USE_PP_FI_TM
+  treedec::comb::PP_FI_TM<cfg2_t> a(cfg2);
+#elif USE_EX17
+  treedec::comb::ex17<cfg2_t> a(cfg2);
+#elif USE_PP_MD
+  treedec::comb::PP_MD<cfg2_t> a(cfg2);
+#elif USE_PP_FI
+  treedec::comb::PP_FI<cfg2_t> a(cfg2);
+#else
+#error No algorithm selected
+#endif
+#endif
+
+  a.do_it();
+  a.get_tree_decomposition(tree_dec);
+  // TODO: get_tree_decomposition must do that
+  wassert(treedec::is_valid_treedecomposition(cfg, tree_dec));
+
+#else
+
+  thorup_tree_decomposition(tree_dec, cfg);
+
+#endif
+
+  nicify(tree_dec);
+
+#ifdef HAVE_TREEDEC_COMBINATIONS_HPP
+  wassert(treedec::is_valid_treedecomposition(cfg, tree_dec));
+#endif
+}
 

@@ -309,7 +309,8 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
   iCode *ic = G[i].ic;
   float c;
 
-  wassert (TARGET_IS_STM8);
+  wassert(TARGET_IS_STM8);
+  wassert(ic);
 
   if(!inst_sane(a, i, G, I))
     return(std::numeric_limits<float>::infinity());
@@ -559,9 +560,7 @@ iCode *stm8_ralloc2_cc(ebbIndex *ebbi)
 
   tree_dec_t tree_decomposition;
 
-  thorup_tree_decomposition(tree_decomposition, control_flow_graph);
-
-  nicify(tree_decomposition);
+  get_nice_tree_decomposition(tree_decomposition, control_flow_graph);
 
   alive_tree_dec(tree_decomposition, control_flow_graph);
 

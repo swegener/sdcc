@@ -1,3 +1,11 @@
+2017-11-14 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* src/mcs51/gen.c,
+	* src/mcs51/rtrack.c:
+	  Fix illegal form of MOV.
+	* support/regression/tests/bug-2221.c:
+	  Partially enabled.
+
 2017-11-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merged nothorup branch to trunk.

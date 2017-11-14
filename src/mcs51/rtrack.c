@@ -332,7 +332,7 @@ bool _mcs51_rtrackUpdate (const char *line)
                         /* ignore DPL/DPH for now as peephole rule for MOV DPTR is much better */
                       {
                         emitcode (";", "genFromRTrack replaced\t%s", line);
-                        emitcode ("mov", "%s,a", regs8051[regIdx].name);
+                        emitcode ("mov", "%s,a", regs8051[regIdx].dname);
                         modified = true;
                       }
                     else if (regs8051[regIdx].rtrack.valueKnown && (value == regs8051[regIdx].rtrack.value + 1) &&

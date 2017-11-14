@@ -10,7 +10,6 @@
 
 //two functions that use the same registers (but should be in different banks)
 
-#ifndef __SDCC_mcs51 // Bug when using stack auto : Error: <a> machine specific addressing or addressing mode error
 unsigned char calculate(unsigned char v1,unsigned char v2)
 {
 	unsigned char v3;
@@ -40,7 +39,6 @@ void T2_isr(void) __interrupt(5) __using(1)
 	//which is necessary to ensure that calculateISR uses registers from bank 1 to not
 	//corrupt calculate in main loop
 }
-#endif
 #endif
 
 void testBug(void)

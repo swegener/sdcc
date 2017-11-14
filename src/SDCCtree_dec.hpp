@@ -66,8 +66,6 @@ struct forget_properties
   }
 };
 
-#ifndef HAVE_TREEDEC_COMBINATIONS_HPP
-
 // Thorup algorithm D.
 // The use of the multimap makes the complexity of this O(|I|log|I|), which could be reduced to O(|I|).
 template <class l_t>
@@ -286,7 +284,6 @@ void thorup_tree_decomposition(T_t &tree_decomposition, const G_t &cfg)
 
   tree_decomposition_from_elimination_ordering(tree_decomposition, elimination_ordering, cfg);
 }
-#endif
 
 // Ensure that all joins are at proper join nodes: Each node that has two children has the same bag as its children.
 // Complexity: Linear in the number of vertices of T.
@@ -614,6 +611,8 @@ void copy_undir(G1_t &G1, G2_t const &G2){
 template <class T_t, class G_t>
 void get_nice_tree_decomposition(T_t &tree_dec, const G_t &cfg)
 {
+  thorup_tree_decomposition(tree_dec, cfg);
+
 #ifdef HAVE_TREEDEC_COMBINATIONS_HPP
 
 #ifdef USE_THORUP
@@ -623,27 +622,25 @@ void get_nice_tree_decomposition(T_t &tree_dec, const G_t &cfg)
   cfg2_t cfg2;
   copy_undir(cfg2, cfg);
 #if USE_PP_FI_TM
-  treedec::comb::PP_FI_TM<cfg2_t> a(cfg2);
+  treedec::comb::PP_FI_TM<cfg2_t> a2(cfg2);
 #elif USE_EX17
-  treedec::comb::ex17<cfg2_t> a(cfg2);
+  treedec::comb::ex17<cfg2_t> a2(cfg2);
 #elif USE_PP_MD
-  treedec::comb::PP_MD<cfg2_t> a(cfg2);
+  treedec::comb::PP_MD<cfg2_t> a2(cfg2);
 #elif USE_PP_FI
-  treedec::comb::PP_FI<cfg2_t> a(cfg2);
+  treedec::comb::PP_FI<cfg2_t> a2(cfg2);
 #else
 #error No algorithm selected
 #endif
 #endif
 
-  a.do_it();
-  a.get_tree_decomposition(tree_dec);
-  // TODO: get_tree_decomposition must do that
-  wassert(treedec::is_valid_treedecomposition(cfg, tree_dec));
+  T_t tree_dec2;
+  a2.do_it();
+  a2.get_tree_decomposition(tree_dec2);
+  wassert(treedec::is_valid_treedecomposition(cfg, tree_dec2));
 
-#else
-
-  thorup_tree_decomposition(tree_dec, cfg);
-
+  if (treedec::get_width(tree_dec2) < treedec::get_width(tree_dec))
+    tree_dec = tree_dec2;
 #endif
 
   nicify(tree_dec);

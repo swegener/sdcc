@@ -15,14 +15,13 @@
 void
 bar (int x, va_list *ap)
 {
+  (void)x;
   if (ap)
     {
       int i;
       for (i = 0; i < 10; i++)
-	if (i != va_arg (*ap, int))
-	  ASSERT (0);
-      if (va_arg (*ap, double) != 0.5)
-	ASSERT (0);
+        ASSERT (i == va_arg (*ap, int));
+      ASSERT (va_arg (*ap, double) == 0.5);
     }
 }
 

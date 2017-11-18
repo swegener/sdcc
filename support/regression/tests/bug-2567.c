@@ -1,5 +1,5 @@
 /* bug-2567.c
-   A bug resulting in overlapping spill lcoations in temporary variables.
+   A bug resulting in overlapping spill locations in temporary variables.
  */
 #include <testfwk.h>
 
@@ -54,6 +54,7 @@ uint_fast8_t workers;
 
 void cvu_voutb(const uint8_t value, const cv_vmemp dest)
 {
+	(void)value;
 	ASSERT(dest == tile_at(0, 1) || dest == tile_at(1, 1) || dest == tile_at(0, 2) || dest == tile_at(1, 2));
 }
 

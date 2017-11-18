@@ -4,6 +4,10 @@
 
 #include <testfwk.h>
 
+#ifdef __SDCC
+#pragma disable_warning 84
+#endif
+
 /* PR rtl-optimization/68321 */
 
 int e = 1, u = 5, t2, t5, i, k;
@@ -17,11 +21,11 @@ fn1 (int p1)
   for (;;)
     {
       if (p1 / 3)
-	for (; t5;)
-	  u || n;
+        for (; t5;)
+          u || n;
       t2 = p1 & 4;
       if (b + 1)
-	return 0;
+        return 0;
       u = g[0];
     }
 }
@@ -33,12 +37,11 @@ testTortureExecute (void)
     {
       char c;
       if (!m)
-	c = t;
+        c = t;
       fn1 (c);
     }
-  
-  if (a[t2] != 0) 
-    ASSERT (0); 
+
+  ASSERT (a[t2] == 0);
 
   return;
 }

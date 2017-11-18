@@ -6,6 +6,7 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#pragma disable_warning 180
 #endif
 
 /* PR rtl-optimization/60116 */
@@ -28,11 +29,11 @@ fn1 (void)
       g = j * 147;
       l = ~g + (long long) e && 1;
       if (d)
-	c = l;
+        c = l;
       else
-	h = i = l * 9UL;
+        h = i = l * 9UL;
       if (f)
-	return;
+        return;
     }
 }
 #endif
@@ -42,7 +43,6 @@ testTortureExecute (void)
 {
 #ifndef __SDCC_ds390 // Enable when ds390 supports long long
   fn1 ();
-  if (c != 1)
-    ASSERT (0);
+  ASSERT (c == 1);
 #endif
 }

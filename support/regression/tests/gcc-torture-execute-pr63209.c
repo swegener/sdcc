@@ -10,13 +10,14 @@
 #endif
 
 static int Sub(int a, int b) {
-  return  b -a;
+  return  b - a;
 }
 
 static unsigned Select(unsigned a, unsigned b, unsigned c) {
   const int pa_minus_pb =
-      Sub((a >>  8) & 0xff, (b >>  8) & 0xff) + 
-      Sub((a >>  0) & 0xff, (b >>  0) & 0xff); 
+      Sub((a >>  8) & 0xff, (b >>  8) & 0xff) +
+      Sub((a >>  0) & 0xff, (b >>  0) & 0xff);
+  (void)c;
   return (pa_minus_pb <= 0) ? a : b;
 }
 
@@ -30,10 +31,5 @@ testTortureExecute (void) {
   const unsigned top[2] = {0xff7a7a7a, 0xff7a7a7a};
   const unsigned left = 0xff7b7b7b;
   const unsigned pred = Predictor(left, top /*+ 1*/);
-  if (pred == left)
-    return;
-  ASSERT(0);
+  ASSERT (pred == left);
 }
-
-
-

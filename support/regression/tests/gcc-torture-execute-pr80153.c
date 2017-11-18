@@ -16,9 +16,9 @@
 void check (int, int, int);
 void check (int c, int c2, int val)
 {
-  if (!val) {
-    ASSERT (0);
-  }
+  (void)c;
+  (void)c2;
+  ASSERT (val);
 }
 
 static const char *buf;

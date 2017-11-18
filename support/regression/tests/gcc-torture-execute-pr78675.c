@@ -5,7 +5,7 @@
 #include <testfwk.h>
 
 #ifdef __SDCC
-#pragma std_c99
+#pragma disable_warning 84
 #endif
 
 /* PR tree-optimization/78675 */
@@ -27,22 +27,16 @@ foo (long int x)
 void
 testTortureExecute (void)
 {
-  if (foo (0) != 0)
-    ASSERT (0);
+  ASSERT (foo (0) == 0);
   a = 0;
-  if (foo (1) != 0)
-    ASSERT (0);
+  ASSERT (foo (1) == 0);
   a = 0;
-  if (foo (25) != 0)
-    ASSERT (0);
+  ASSERT (foo (25) == 0);
   a = -64;
-  if (foo (0) != 0)
-    ASSERT (0);
+  ASSERT (foo (0) == 0);
   a = -64;
-  if (foo (1) != 0)
-    ASSERT (0);
+  ASSERT (foo (1) == 0);
   a = -64;
-  if (foo (25) != 0)
-    ASSERT (0);
+  ASSERT (foo (25) == 0);
   return;
 }

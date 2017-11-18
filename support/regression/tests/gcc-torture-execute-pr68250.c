@@ -4,6 +4,10 @@
 
 #include <testfwk.h>
 
+#ifdef __SDCC
+#pragma disable_warning 84
+#endif
+
 /* PR rtl-optimization/68250 */
 
 signed char a, b, h, k, l, m, o;
@@ -25,8 +29,7 @@ fn1 (void)
 void
 fn2 (int k)
 {
-  if (k != 1)
-    ASSERT (0);
+  ASSERT (k == 1);
 }
 
 void
@@ -37,9 +40,9 @@ testTortureExecute (void)
     {
       fn1 ();
       if (k)
-	i = k;
+        i = k;
       if (i > q)
-	g = 0;
+        g = 0;
     }
   fn2 (k);
   return;

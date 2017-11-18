@@ -1,3 +1,23 @@
+2017-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/ports/mcs51-huge/spec.mk,
+	* support/regression/Makefile.in: huge lib is now built by default
+	* support/regression/tests/gcc-torture-execute-20140212-1.c,
+	* support/regression/tests/gcc-torture-execute-20140212-2.c,
+	* support/regression/tests/gcc-torture-execute-pr60062.c,
+	* support/regression/tests/gcc-torture-execute-pr63209.c,
+	* support/regression/tests/gcc-torture-execute-pr64979.c,
+	* support/regression/tests/gcc-torture-execute-pr67714.c,
+	* support/regression/tests/gcc-torture-execute-pr68250.c,
+	* support/regression/tests/gcc-torture-execute-pr68321.c,
+	* support/regression/tests/gcc-torture-execute-pr68390.c,
+	* support/regression/tests/gcc-torture-execute-pr78675.c,
+	* support/regression/tests/gcc-torture-execute-pr80153.c,
+	* support/regression/tests/bug-2567.c: fix or suppress warnings
+	* support/regression/tests/gcc-torture-execute-pr66940.c: added test that
+	  long != long long
+	* support/regression/tests/inline.c: added test for bug 2591
+
 2017-11-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCtree_dec.hpp:

@@ -15,7 +15,6 @@ int f(unsigned short usVlanID);
 int f(unsigned short usVlanID)
 {
   unsigned int uiVlanID = 0xffffffff;
-  int i;
   if ((unsigned short)0xffff != usVlanID)
     uiVlanID = (unsigned int)usVlanID;
   return uiVlanID;
@@ -24,8 +23,6 @@ int f(unsigned short usVlanID)
 void
 testTortureExecute (void)
 {
-  if (f(1) != 1)
-    ASSERT (0);
-  if (f(0xffff) != -1)
-    ASSERT (0);
+  ASSERT (f(1) == 1);
+  ASSERT (f(0xffff) == -1);
 }

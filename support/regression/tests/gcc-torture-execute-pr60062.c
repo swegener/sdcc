@@ -1,5 +1,5 @@
 /*
-   pr60003.c from the execute part of the gcc torture tests.
+   pr60062.c from the execute part of the gcc torture tests.
  */
 
 #include <testfwk.h>
@@ -18,15 +18,14 @@ int a;
 static void
 foo (const char *p1, int p2)
 {
-  if (strcmp (p1, "hello") != 0)
-    ASSERT (0);
+  (void)p2;
+  ASSERT (strcmp (p1, "hello") == 0);
 }
 
 static void
 bar (const char *p1)
 {
-  if (strcmp (p1, "hello") != 0)
-    ASSERT (0);
+  ASSERT (strcmp (p1, "hello") == 0);
 }
 
 void

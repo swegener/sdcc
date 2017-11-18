@@ -4,6 +4,11 @@
 
 #include <testfwk.h>
 
+#ifdef __SDCC
+#pragma std_c99
+#pragma disable_warning 84
+#endif
+
 unsigned int b;
 int c;
 
@@ -26,8 +31,7 @@ testTortureExecute (void)
   signed char f = e ^ b;
   volatile int g = (int) f;
 
-  if (g != -15)
-    ASSERT (0);
+  ASSERT (g == -15);
 #endif
   return;
 }

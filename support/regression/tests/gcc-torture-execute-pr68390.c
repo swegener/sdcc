@@ -20,13 +20,10 @@ double broken(double (*indirect)(int x, ...), int v)
 void
 testTortureExecute (void)
 {
-  double d1, d2;
+  double d1;
   int i = 2;
   d1 = broken (direct, i);
-  if (d1 != i*i)
-    {
-      ASSERT (0);
-    }
+  ASSERT (d1 == i*i);
   return;
 }
 

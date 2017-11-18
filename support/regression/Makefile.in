@@ -114,7 +114,7 @@ test-mcs51-large:
 
 test-mcs51-huge:
 	$(MAKE) test-common
-	$(MAKE) make_library test-port PORT=mcs51-huge
+	$(MAKE) test-port PORT=mcs51-huge
 
 test-mcs51-stack-auto:
 	$(MAKE) test-common

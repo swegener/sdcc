@@ -2,8 +2,10 @@
 
 	* sim/ucsim/cmd.src/Makefile.in,
 	  sim/ucsim/cmd.src/cmdpars.cc,
-	  sim/ucsim/cmd.src/cmdpars.hh:
-	  Fix dependency generation issue for out-of-tree builds.
+	  sim/ucsim/cmd.src/cmdpars.hh,
+	  device/lib/pic14/*,
+	  device/lib/pic16/*:
+	  Fixes for out-of-tree builds.
 
 2017-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
 

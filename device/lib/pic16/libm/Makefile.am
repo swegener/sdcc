@@ -33,10 +33,10 @@ libm18f_a_SOURCES += tancotf.c
 libm18f_a_SOURCES += tanf.c
 libm18f_a_SOURCES += tanhf.c
 
-# Use the generic code where possible. Sadly using VPATH does not work:
-#VPATH = $(srcdir) ../..
+# Use the generic code where possible.
 %.c: ../../%.c
-	test -e $@ || ln -s $^ $@
+	test -e $(<D)/pic16/libm/$(@F) || ln -s $^ $@
+	test -e $@ || ln -s $(<D)/pic16/libm/$(@F) $@
 
 include $(top_srcdir)/Makefile.common
 

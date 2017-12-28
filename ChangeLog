@@ -1,3 +1,10 @@
+2017-12-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/cmd.src/Makefile.in,
+	  sim/ucsim/cmd.src/cmdpars.cc,
+	  sim/ucsim/cmd.src/cmdpars.hh:
+	  Fix dependency generation issue for out-of-tree builds.
+
 2017-11-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/ports/mcs51-huge/spec.mk,

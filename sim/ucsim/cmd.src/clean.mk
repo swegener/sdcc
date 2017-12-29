@@ -7,8 +7,8 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
+	rm -f cmdpars.cc cmdpars.hh
 #	rm -f cmdpars.cc cmdpars.hh cmdlex.cc
-
 
 # Deleting all files created by configuring or building the program
 # -----------------------------------------------------------------

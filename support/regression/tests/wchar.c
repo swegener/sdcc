@@ -46,10 +46,12 @@ testwcharstringnorestart(void)
 	ASSERT(wcs2[3] == L't');
 	ASSERT(!wcscmp(wcs1, wcs2));
 
+#if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && ((__GNUC__ < 5) || (__GNUC__ == 5 && __GNUC_MINOR__ < 5)))
 	// Test for 0-terminated strings
 	ASSERT(wcstombs(mbs, wcs1, 1000) > 0);
 	ASSERT(mbstowcs(wcs2, mbs, 1000) > 0);
 	ASSERT(!wcscmp(wcs1, wcs2));
+#endif
 
 	// Test for unterminated strings
 	mbs[2] = 0;

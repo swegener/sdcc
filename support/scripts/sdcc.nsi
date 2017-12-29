@@ -525,43 +525,55 @@ ${Section} "SDCC Z80 library" SEC12
   File "${DEV_ROOT}\lib\z80\*.*"
 ${SectionEnd}
 
-${Section} "SDCC small model library" SEC13
+${Section} "SDCC mcs51 small model library" SEC13
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\small"
   File "${DEV_ROOT}\lib\small\*.*"
 ${SectionEnd}
 
-${Section} "SDCC medium model library" SEC14
+${Section} "SDCC mcs51 medium model library" SEC14
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\medium"
   File "${DEV_ROOT}\lib\medium\*.*"
 ${SectionEnd}
 
-${Section} "SDCC large model library" SEC15
+${Section} "SDCC mcs51 large model library" SEC15
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\large"
   File "${DEV_ROOT}\lib\large\*.*"
 ${SectionEnd}
 
-${Section} "SDCC small-stack-auto model library" SEC16
+${Section} "SDCC mcs51 huge model library" SEC16
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\huge"
+  File "${DEV_ROOT}\lib\huge\*.*"
+${SectionEnd}
+
+${Section} "SDCC mcs51 small-stack-auto model library" SEC17
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\small-stack-auto"
   File "${DEV_ROOT}\lib\small-stack-auto\*.*"
 ${SectionEnd}
 
-${Section} "SDCC HC08 library" SEC17
+${Section} "SDCC mcs51 large-stack-auto model library" SEC18
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\large-stack-auto"
+  File "${DEV_ROOT}\lib\large-stack-auto\*.*"
+${SectionEnd}
+
+${Section} "SDCC HC08 library" SEC19
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\hc08"
   File "${DEV_ROOT}\lib\hc08\*.*"
 ${SectionEnd}
 
-${Section} "SDCC S08 library" SEC18
+${Section} "SDCC S08 library" SEC20
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\s08"
   File "${DEV_ROOT}\lib\s08\*.*"
 ${SectionEnd}
 
-${Section} "SDCC PIC16 library" SEC19
+${Section} "SDCC PIC16 library" SEC21
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic16"
   File "${DEV_ROOT}\lib\pic16\*.o"
@@ -571,7 +583,7 @@ ${Section} "SDCC PIC16 library" SEC19
   File "${DEV_ROOT}\non-free\lib\pic16\*.lib"
 ${SectionEnd}
 
-${Section} "SDCC PIC14 library" SEC20
+${Section} "SDCC PIC14 library" SEC22
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pic14"
   File "${DEV_ROOT}\lib\pic14\*.lib"
@@ -580,19 +592,13 @@ ${Section} "SDCC PIC14 library" SEC20
   File "${DEV_ROOT}\non-free\lib\pic14\*.lib"
 ${SectionEnd}
 
-${Section} "SDCC STM8 library" SEC21
+${Section} "SDCC STM8 library" SEC23
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\stm8"
   File "${DEV_ROOT}\lib\stm8\*.*"
 ${SectionEnd}
 
-${Section} "SDCC large-stack-auto model library" SEC22
-  SectionIn 1 2
-  SetOutPath "$INSTDIR\lib\large-stack-auto"
-  File "${DEV_ROOT}\lib\large-stack-auto\*.*"
-${SectionEnd}
-
-${Section} "SDCC library sources" SEC23
+${Section} "SDCC library sources" SEC24
   SectionIn 1
   SetOutPath "$INSTDIR\lib\src\ds390\examples"
   File "${DEV_ROOT}\lib\src\ds390\examples\MOVED"
@@ -814,17 +820,18 @@ LangString DESC_SEC09 ${LANG_ENGLISH} "SDCC Z180 library"
 LangString DESC_SEC10 ${LANG_ENGLISH} "SDCC Rabbit 2000 library"
 LangString DESC_SEC11 ${LANG_ENGLISH} "SDCC Rabbit 3000A library"
 LangString DESC_SEC12 ${LANG_ENGLISH} "SDCC Z80 library"
-LangString DESC_SEC13 ${LANG_ENGLISH} "SDCC small model library"
-LangString DESC_SEC14 ${LANG_ENGLISH} "SDCC medium model library"
-LangString DESC_SEC15 ${LANG_ENGLISH} "SDCC large model library"
-LangString DESC_SEC16 ${LANG_ENGLISH} "SDCC small-stack-auto model library"
-LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC HC08 library"
-LangString DESC_SEC18 ${LANG_ENGLISH} "SDCC S08 library"
-LangString DESC_SEC19 ${LANG_ENGLISH} "SDCC PIC16 library"
-LangString DESC_SEC20 ${LANG_ENGLISH} "SDCC PIC14 library"
-LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC STM8 library"
-LangString DESC_SEC22 ${LANG_ENGLISH} "SDCC large-stack-auto model library"
-LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC library sources"
+LangString DESC_SEC13 ${LANG_ENGLISH} "SDCC mcs51 small model library"
+LangString DESC_SEC14 ${LANG_ENGLISH} "SDCC mcs51 medium model library"
+LangString DESC_SEC15 ${LANG_ENGLISH} "SDCC mcs51 large model library"
+LangString DESC_SEC16 ${LANG_ENGLISH} "SDCC mcs51 huge model library"
+LangString DESC_SEC17 ${LANG_ENGLISH} "SDCC mcs51 small-stack-auto model library"
+LangString DESC_SEC18 ${LANG_ENGLISH} "SDCC mcs51 large-stack-auto model library"
+LangString DESC_SEC19 ${LANG_ENGLISH} "SDCC HC08 library"
+LangString DESC_SEC20 ${LANG_ENGLISH} "SDCC S08 library"
+LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC PIC16 library"
+LangString DESC_SEC22 ${LANG_ENGLISH} "SDCC PIC14 library"
+LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC STM8 library"
+LangString DESC_SEC24 ${LANG_ENGLISH} "SDCC library sources"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -850,6 +857,8 @@ LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC library sources"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC20} $(DESC_SEC20)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC21} $(DESC_SEC21)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC22} $(DESC_SEC22)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC23} $(DESC_SEC23)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC24} $(DESC_SEC24)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 ;--------------------------------
 

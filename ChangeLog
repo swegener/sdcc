@@ -1,3 +1,8 @@
+2017-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/wchar.c: disabled test for gcc 5.4 and older
+	* support/scripts/sdcc.nsi: added huge library
+
 2017-12-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/cmd.src/clean.mk:

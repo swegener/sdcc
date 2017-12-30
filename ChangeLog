@@ -1,3 +1,7 @@
+2017-12-30 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/scripts/sdcc.nsi: added sdastlcs90.exe
+
 2017-12-29 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/wchar.c: disabled test for gcc 5.4 and older

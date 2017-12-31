@@ -25,8 +25,10 @@ void checkf(int a, bool b)
   bool c = f(a, b);
   char d;
   memcpy (&d, &c, 1);
+#if defined (__SDCC) || defined(__GNUC__)
   if ( d != (a==0)^b)
     ASSERT(0);
+#endif
 }
 
 void
@@ -37,3 +39,4 @@ testTortureExecute (void)
   checkf(1, 1);
   checkf(1, 0);
 }
+

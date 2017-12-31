@@ -1,3 +1,8 @@
+2017-12-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-1981238.c:
+	  Fix struct packing test for host.
+
 2017-12-30 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/scripts/sdcc.nsi: added sdastlcs90.exe

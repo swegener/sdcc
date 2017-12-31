@@ -3,7 +3,7 @@
 */
 #include <testfwk.h>
 
-#if defined(__SUNPRO_C) || defined(__GNUC__)
+#if defined(__SUNPRO_C) || defined(__GNUC__) || defined(__clang__)
 #pragma pack(1)
 #endif
 
@@ -30,8 +30,10 @@ __code struct {
 void
 testBitfield (void)
 {
+#if defined (__SDCC) || defined(__SUNPRO_C) || defined(__GNUC__) || defined(__clang__)
   ASSERT (sizeof (pad) == 2);
   ASSERT (sizeof (noPad) == 2);
   ASSERT (sizeof (initialNoPad[0]) == 1);
+#endif
 }
 

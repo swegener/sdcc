@@ -1,9 +1,6 @@
-2017-12-31 Philipp Klaus Krause <pkk AT spth.de>
+2018-01-03 Maarten Brock <sourceforge.brock AT dse.nl>
 
-	* support/regression/tests/bug-1981238.c:
-	  Fix struct packing test for host.
-	* support/regression/tests/gcc-torture-execute-20141107-1.c:
-	  Fix test for host.
+	* support/scripts/sdcc.nsi: added tlcs90 library
 
 2017-12-30 Maarten Brock <sourceforge.brock AT dse.nl>
 

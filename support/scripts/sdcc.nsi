@@ -599,7 +599,13 @@ ${Section} "SDCC STM8 library" SEC23
   File "${DEV_ROOT}\lib\stm8\*.*"
 ${SectionEnd}
 
-${Section} "SDCC library sources" SEC24
+${Section} "SDCC TLCS90 library" SEC24
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\tlcs90"
+  File "${DEV_ROOT}\lib\tlcs90\*.*"
+${SectionEnd}
+
+${Section} "SDCC library sources" SEC25
   SectionIn 1
   SetOutPath "$INSTDIR\lib\src\ds390\examples"
   File "${DEV_ROOT}\lib\src\ds390\examples\MOVED"
@@ -655,6 +661,9 @@ ${Section} "SDCC library sources" SEC24
 
   SetOutPath "$INSTDIR\lib\src\large"
 #  File "${DEV_ROOT}\lib\src\large\Makefile"
+
+  SetOutPath "$INSTDIR\lib\src\huge"
+#  File "${DEV_ROOT}\lib\src\huge\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\pic14"
 #  File "${DEV_ROOT}\lib\src\pic14\configure"
@@ -832,7 +841,8 @@ LangString DESC_SEC20 ${LANG_ENGLISH} "SDCC S08 library"
 LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC PIC16 library"
 LangString DESC_SEC22 ${LANG_ENGLISH} "SDCC PIC14 library"
 LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC STM8 library"
-LangString DESC_SEC24 ${LANG_ENGLISH} "SDCC library sources"
+LangString DESC_SEC24 ${LANG_ENGLISH} "SDCC TLCS90 library"
+LangString DESC_SEC25 ${LANG_ENGLISH} "SDCC library sources"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -860,6 +870,7 @@ LangString DESC_SEC24 ${LANG_ENGLISH} "SDCC library sources"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC22} $(DESC_SEC22)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC23} $(DESC_SEC23)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC24} $(DESC_SEC24)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC25} $(DESC_SEC25)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 ;--------------------------------
 

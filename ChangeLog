@@ -1,5 +1,11 @@
 2017-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/ds390/ralloc.c,
+	  support/regression/tests/*.c:
+	  Fix conflict in assigment of long long return values.
+
+2017-01-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de.de>
+
 	* device/include/stdint.h,
 	  src/SDCCsymt.c,
 	  src/ds390/gen.c,

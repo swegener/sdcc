@@ -53,6 +53,7 @@ static char *fReturn24[] = { "dpl", "dph", "dpx", "b", "a", "r4", "r5", "r6", "r
 static char *fReturn16[] = { "dpl", "dph", "b", "a", "r4", "r5", "r6", "r7" };
 
 static char **fReturn = fReturn24;
+char **fReturnDS390 = fReturn24;
 static char *accUse[] = { "a", "b" };
 
 static char *dptrn[2][3];

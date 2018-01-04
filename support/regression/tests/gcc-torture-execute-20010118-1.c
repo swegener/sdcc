@@ -42,12 +42,10 @@ bar (A *v, int x, int y, int w, int h)
 void
 testTortureExecute (void)
 {
-#ifndef SDCC_ds390
   A w = { 100, 110, 20, 30, -1, -1 };
   bar (&w,400,420,50,70);
   if (w.d != 70)
     ASSERT(0);
   return;
-#endif
 }
 

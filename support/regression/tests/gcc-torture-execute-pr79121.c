@@ -10,7 +10,6 @@
 
 #include <stdint.h>
 
-#ifndef __SDCC_ds390
 unsigned long long f1 (int32_t x)
 {
   return ((unsigned long long) x) << 4;
@@ -30,7 +29,6 @@ long long f4 (int32_t x)
 {
   return ((long long) x) << 4;
 }
-#endif
 
 void
 testTortureExecute (void)

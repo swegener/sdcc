@@ -9,7 +9,7 @@
 #endif
 
 // TODO: Enable when sdcc supports long long in these ports!
-#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 typedef unsigned long long ULL;
 ULL back;
 ULL hpart, lpart;

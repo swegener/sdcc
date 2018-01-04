@@ -9,7 +9,7 @@
 #endif
 
 // TODO: Enable when sdcc supports long long in these ports!
-#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 long long acc;
 
 void
@@ -28,7 +28,7 @@ subhi (short a)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   acc = 0xffff00000000ll;
   addhi (1);
   ASSERT (acc == 0x1000000000000ll);

@@ -61,7 +61,7 @@ typedef struct asmop
   {
     short dptr;                 /* if AOP_DPTRn */
     value *aop_lit;             /* if literal */
-    reg_info *aop_reg[4];       /* array of registers */
+    reg_info *aop_reg[8];       /* array of registers */
     char *aop_dir;              /* if direct  */
     reg_info *aop_ptr;          /* either -> to r0 or r1 */
     struct

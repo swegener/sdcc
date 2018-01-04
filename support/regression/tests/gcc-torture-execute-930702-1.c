@@ -9,7 +9,7 @@
 #pragma disable_warning 93
 #endif
 
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_ds390)
+#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
 int fp (double a, int b)
 {
   if (a != 33 || b != 11)

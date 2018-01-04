@@ -9,7 +9,7 @@
 #endif
 
 // TODO: Enable when sdcc supports long long constants!
-#if !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 int
 foo1 (long long value)
 {

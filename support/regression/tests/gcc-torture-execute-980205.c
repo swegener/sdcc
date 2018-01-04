@@ -11,7 +11,6 @@
 
 #include <stdarg.h>
 
-//#ifndef __SDCC_ds390
 void fdouble (double one, ...)
 {
   double value;
@@ -24,7 +23,6 @@ void fdouble (double one, ...)
   if (one != 1.0 || value != 2.0)
     ASSERT (0);
 }
-//#endif
 
 void
 testTortureExecute (void)

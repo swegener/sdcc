@@ -10,7 +10,7 @@
 #endif
 
 // Some ports do not support long long yet.
-#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 // Not enough memory
 #if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL))
 
@@ -122,7 +122,7 @@ test8 (int a, int b, int c, int d, int e, int f, int g, int h, long long value, 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 #if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL))
   test1 (1, VALUE, AFTER);
   test2 (1, 2, VALUE, AFTER);

@@ -4,7 +4,6 @@
 
 #include <testfwk.h>
 
-#ifndef __SDCC_ds390 // Enable when ds390 supports long long
 long long
 foo (long long ival)
 {
@@ -13,7 +12,6 @@ foo (long long ival)
 
  return 0x7fffffffffffffffL;
 }
-#endif
 
 void
 testTortureExecute (void)

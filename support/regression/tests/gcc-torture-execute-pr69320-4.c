@@ -23,9 +23,9 @@ testTortureExecute (void) {
     c = *e != 5 || d;
     *f = fn1(c || b, a);
   }
-#ifndef __SDCC_ds390 // Enable when ds390 supports long long
+
   if ((long long) a != 1)
     ASSERT(0);
-#endif
+
   return;
 }

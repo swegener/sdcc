@@ -1,7 +1,9 @@
 2017-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/ds390/gen.c:
-	  Fixes in ds390 long long support for 32-bit hosts.
+	* src/ds390/gen.c,
+	  support/regression/ports/ds390/spec.mk,
+	  support/regression/tests/*.c:
+	  Fixes in ds390 long long support.
 
 2017-01-04 Philipp Klaus Krause <pkk AT spth.de>
 

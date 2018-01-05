@@ -8,13 +8,10 @@
 
 enum type {TYPE_OTHER, TYPE_INT, TYPE_LONG, TYPE_LONGLONG, TYPE_UINT, TYPE_ULONG, TYPE_ULONGLONG};
 
-#ifndef __SDCC_ds390 // Enable when ds390 supports long long
 #define TYPEOF(x) _Generic(x, default: TYPE_OTHER, int: TYPE_INT, long: TYPE_LONG, long long: TYPE_LONGLONG, unsigned int: TYPE_UINT, unsigned long: TYPE_ULONG, unsigned long long: TYPE_ULONGLONG)
-#endif
 
 void testBug(void)
 {
-#ifndef __SDCC_ds390 // Enable when ds390 supports long long
 	ASSERT(0x7fffu == (unsigned int)(0x7fff));
 	ASSERT(TYPEOF(0x7fffu) == TYPE_UINT);
 	ASSERT(0xffffu == (unsigned int)(0xffff));
@@ -29,6 +26,5 @@ void testBug(void)
 	ASSERT(TYPEOF(0x7fffffffffffffffu) == TYPE_ULONGLONG || TYPEOF(0x7fffffffffffffffu) == TYPE_ULONG || TYPEOF(0x7fffffffffffffffu) == TYPE_UINT);
 	ASSERT(0xffffffffffffffffu == (unsigned long long)(0xffffffffffffffff));
 	ASSERT(TYPEOF(0xffffffffffffffffu) == TYPE_ULONGLONG || TYPEOF(0xffffffffffffffffu) == TYPE_ULONG || TYPEOF(0xffffffffffffffffu) == TYPE_UINT);
-#endif
 }
 

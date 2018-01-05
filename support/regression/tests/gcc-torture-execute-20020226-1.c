@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 /* This tests the rotate patterns that some machines support.  */
 
 #include <limits.h>
@@ -41,7 +41,7 @@ int shift2 = SHIFT2;
 void
 testTortureExecute (void)
 {
-#if !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   if (ROR (uc, shift1) != ROR (CHAR_VALUE, SHIFT1))
     ASSERT (0);
 

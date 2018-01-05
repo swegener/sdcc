@@ -16,11 +16,10 @@ foo (long long ival)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390 // Enable when ds390 supports long long
   ASSERT (foo (-1) == (-0x7fffffffffffffffL - 1));
   ASSERT (foo (1) == 0x7fffffffffffffffL);
 
   ASSERT (foo (-1) != (-0x7fffffff - 1));
-#endif
+
   return;
 }

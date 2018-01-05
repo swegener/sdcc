@@ -119,7 +119,7 @@ testLongLong (void)
 {
   volatile unsigned long tmp;
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   i = 42;
   ASSERT (g() == 43);
   i = 23;
@@ -177,8 +177,10 @@ testLongLong (void)
   x = 42ll << 23;
   ASSERT (x + y == (42ll << 23) + 42);
   ASSERT (x - y == (42ll << 23) - 42);
+#ifndef __SDCC_ds390
   ASSERT (x * y == (42ll << 23) * 42);
   ASSERT (x / tmp == (42ll << 23) / 42);
+#endif
   ASSERT (x % tmp == (42ll << 23) % 42);
 
   x = 0x1122334455667788ll;
@@ -190,6 +192,7 @@ testLongLong (void)
 
   y = 0x55667788ull;
   ASSERT (y * y == 0x55667788ull * 0x55667788ull); // this test is optimized by constant propagation
+#ifndef __SDCC_ds390
   ASSERT (mulLL (y, y) == 0x55667788ull * 0x55667788ull); // this test is not
   y = 0x55667788ull;
   x = 0x55667788ll;
@@ -259,6 +262,7 @@ testLongLong (void)
   ASSERT (bitXorULL (y, x) == (0x69aaaaaaaaaa55aaull ^ 0x69555555555555aall));
   ASSERT ((~y) == (~0x69aaaaaaaaaa55aaull));
   ASSERT (bitNotULL (y) == (~0x69aaaaaaaaaa55aaull));
+#endif
 
   c(); // Unused long long return value require special handling in register allocation.
 #endif

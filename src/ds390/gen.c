@@ -3143,7 +3143,7 @@ genSend (set * sendSet)
                     if (fReturn[offset][0] == 'r' && (AOP_TYPE (IC_LEFT (sic)) == AOP_REG || AOP_TYPE (IC_LEFT (sic)) == AOP_R0 || AOP_TYPE (IC_LEFT (sic)) == AOP_R1)) 
                       emitcode ("mov", "a%s,%s", fReturn[offset], l); // use register's direct address instead of name
                     else
-                       emitcode ("mov", "%s,%s", fReturn[offset], l);
+                      emitcode ("mov", "%s,%s", fReturn[offset], l);
                   offset++;
                 }
               _endLazyDPSEvaluation ();

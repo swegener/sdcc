@@ -1203,7 +1203,7 @@ xchgPositions:
 
 /*-----------------------------------------------------------------*/
 /* positionRegs - the allocator can allocate the registers of the  */
-/* return value to thd result, if this happens make sure they are  */
+/* return value to the result, if this happens make sure they are  */
 /* in the same position as the return value otherwise chaos results*/
 /*-----------------------------------------------------------------*/
 static int
@@ -1554,7 +1554,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                     }
                 }
 
-              if (ic->op == CALL || ic->op == PCALL)
+              if (ic->op == CALL || ic->op == PCALL || ic->op == RECEIVE)
                 {
                   positionRegsReturned (OP_SYMBOL (IC_RESULT (ic)));
                 }

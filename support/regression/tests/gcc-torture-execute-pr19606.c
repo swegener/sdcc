@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_pic14)
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_pic14)
 /* PR c/19606
    The C front end used to shorten the type of a division to a type
    that does not preserve the semantics of the original computation.
@@ -31,7 +31,7 @@ bar (void)
 void
 testTortureExecute (void)
 {
-#if !defined (__SDCC_ds390) && !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_pic14)
+#if !defined (__SDCC_hc08) && !defined (__SDCC_s08) && !defined (__SDCC_pic14)
 #if !defined (PORT_HOST) // failed in test-host
   int r;
 

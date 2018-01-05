@@ -1,6 +1,7 @@
 2017-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/ds390/gen.c,
+	  src/ds390/ralloc.c,
 	  support/regression/ports/ds390/spec.mk,
 	  support/regression/tests/*.c:
 	  Fixes in ds390 long long support.

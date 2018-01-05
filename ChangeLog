@@ -1,8 +1,13 @@
+2017-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/ds390/gen.c:
+	  Fixes in ds390 long long support for 32-bit hosts.
+
 2017-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/ds390/ralloc.c,
 	  support/regression/tests/*.c:
-	  Fix conflict in assigment of long long return values.
+	  Fix conflict in assignment of long long return values.
 
 2017-01-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de.de>
 

@@ -4448,9 +4448,9 @@ findLabelBackwards (iCode * ic, int key)
 /* genPlusIncr :- does addition with increment if possible         */
 /*-----------------------------------------------------------------*/
 static bool
-genPlusIncr (iCode * ic)
+genPlusIncr (iCode *ic)
 {
-  unsigned int icount;
+  unsigned long long icount;
   unsigned int size = getDataSize (IC_RESULT (ic)), offset;
 
   /* will try to generate an increment */
@@ -4461,7 +4461,7 @@ genPlusIncr (iCode * ic)
 
   /* if the literal value of the right hand side
      is greater than 4 then it is not worth it */
-  if ((icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
+  if ((icount = ullFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
 
   if (size == 1 && AOP (IC_LEFT (ic)) == AOP (IC_RESULT (ic)) && AOP_TYPE (IC_LEFT (ic)) == AOP_DIR)
@@ -4942,7 +4942,7 @@ genPlus (iCode * ic)
           /* if result in bit space */
           if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY)
             {
-              if (ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit) != 0L)
+              if (ullFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit))
                 emitcode ("cpl", "c");
               outBitC (IC_RESULT (ic));
             }
@@ -5060,7 +5060,7 @@ release:
 static bool
 genMinusDec (iCode * ic)
 {
-  unsigned int icount;
+  unsigned long long icount;
   unsigned int size = getDataSize (IC_RESULT (ic));
 
   /* will try to generate a decrement */
@@ -5071,7 +5071,7 @@ genMinusDec (iCode * ic)
 
   /* if the literal value of the right hand side
      is greater than 4 then it is not worth it */
-  if ((icount = (unsigned int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
+  if ((icount = ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit)) > 4)
     return FALSE;
 
   if (size == 1 && AOP (IC_LEFT (ic)) == AOP (IC_RESULT (ic)) && AOP_TYPE (IC_LEFT (ic)) == AOP_DIR)
@@ -5271,7 +5271,7 @@ genMinus (iCode * ic)
 {
   int size, offset = 0;
   int rSize;
-  long lit = 0L;
+  long long lit = 0L;
   bool pushResult;
 
   D (emitcode (";", "genMinus"));
@@ -5303,7 +5303,7 @@ genMinus (iCode * ic)
     }
   else
     {
-      lit = (long) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
+      lit = ullFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
       lit = -lit;
     }
 
@@ -6611,7 +6611,7 @@ static void
 genCmp (operand * left, operand * right, iCode * ic, iCode * ifx, int sign)
 {
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0;
   operand *result;
 
   D (emitcode (";", "genCmp"));
@@ -6672,7 +6672,7 @@ genCmp (operand * left, operand * right, iCode * ic, iCode * ifx, int sign)
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              lit = ulFromVal (AOP (right)->aopu.aop_lit);
+              lit = ullFromVal (AOP (right)->aopu.aop_lit);
               /* optimize if(x < 0) or if(x >= 0) */
               if (lit == 0L)
                 {
@@ -6716,7 +6716,7 @@ genCmp (operand * left, operand * right, iCode * ic, iCode * ifx, int sign)
                   emitcode ("xrl", "a,#!constbyte", 0x80);
                   if (AOP_TYPE (right) == AOP_LIT)
                     {
-                      unsigned long lit = ulFromVal (AOP (right)->aopu.aop_lit);
+                      unsigned long long lit = ullFromVal (AOP (right)->aopu.aop_lit);
                       // emitcode (";", "genCmp #3.1");
                       emitcode ("subb", "a,#!constbyte", 0x80 ^ (unsigned int) ((lit >> (offset * 8)) & 0x0FFL));
                     }
@@ -6840,7 +6840,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
 {
   int size = max (AOP_SIZE (left), AOP_SIZE (right));
   int offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0;
 
   D (emitcode (";", "gencjneshort"));
 
@@ -6855,7 +6855,7 @@ gencjneshort (operand * left, operand * right, symbol * lbl)
     }
 
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
   /* generic pointers require special handling since all NULL pointers must compare equal */
   if (opIsGptr (left) || opIsGptr (right))
@@ -6968,7 +6968,7 @@ genCmpEq (iCode * ic, iCode * ifx)
         {
           if (AOP_TYPE (right) == AOP_LIT)
             {
-              unsigned long lit = ulFromVal (AOP (right)->aopu.aop_lit);
+              unsigned long long lit = ullFromVal (AOP (right)->aopu.aop_lit);
               if (lit == 0L)
                 {
                   emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
@@ -7042,7 +7042,7 @@ genCmpEq (iCode * ic, iCode * ifx)
     {
       if (AOP_TYPE (right) == AOP_LIT)
         {
-          unsigned long lit = ulFromVal (AOP (right)->aopu.aop_lit);
+          unsigned long long lit = ullFromVal (AOP (right)->aopu.aop_lit);
           if (lit == 0L)
             {
               emitcode ("mov", "c,%s", AOP (left)->aopu.aop_dir);
@@ -7379,7 +7379,7 @@ genAnd (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0L;
   int bytelit = 0;
   bool pushResult;
 
@@ -7428,7 +7428,7 @@ genAnd (iCode * ic, iCode * ifx)
     }
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+      lit = ullFromVal (AOP (right)->aopu.aop_lit);
     }
 
   size = AOP_SIZE (result);
@@ -7823,11 +7823,11 @@ release:
 /* genOr  - code for or                                            */
 /*-----------------------------------------------------------------*/
 static void
-genOr (iCode * ic, iCode * ifx)
+genOr (iCode *ic, iCode *ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0;
   int bytelit = 0;
   bool pushResult;
 
@@ -7877,7 +7877,7 @@ genOr (iCode * ic, iCode * ifx)
     }
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+      lit = ullFromVal (AOP (right)->aopu.aop_lit);
     }
 
   size = AOP_SIZE (result);
@@ -8221,11 +8221,11 @@ release:
 /* genXor - code for xclusive or                                   */
 /*-----------------------------------------------------------------*/
 static void
-genXor (iCode * ic, iCode * ifx)
+genXor (iCode *ic, iCode *ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0;
   int bytelit = 0;
   bool pushResult;
 
@@ -8275,7 +8275,7 @@ genXor (iCode * ic, iCode * ifx)
     }
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+      lit = ullFromVal (AOP (right)->aopu.aop_lit);
     }
 
   size = AOP_SIZE (result);

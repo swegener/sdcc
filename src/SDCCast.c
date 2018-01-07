@@ -1500,7 +1500,7 @@ createIval (ast * sym, sym_link * type, initList * ilist, ast * wid, ast * rootV
 /* initAggregates - initialises aggregate variables with initv     */
 /*-----------------------------------------------------------------*/
 ast *
-initAggregates (symbol * sym, initList * ival, ast * wid)
+initAggregates (symbol *sym, initList *ival, ast *wid)
 {
   ast *newAst = newAst_VALUE (symbolVal (sym));
   return createIval (newAst, sym->type, ival, wid, newAst, 1);

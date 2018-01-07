@@ -966,8 +966,9 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
 
 /*-----------------------------------------------------------------*/
 /* printIvalBitFields - generate initializer for bitfields         */
+/* return the number of bytes written                              */
 /*-----------------------------------------------------------------*/
-static void
+static unsigned int
 printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
 {
   symbol *lsym = *sym;
@@ -975,6 +976,7 @@ printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
   unsigned long ival = 0;
   unsigned size = 0;
   unsigned bit_start = 0;
+  unsigned long int bytes_written = 0;
 
   while (lsym && IS_BITFIELD (lsym->type))
     {
@@ -1025,29 +1027,35 @@ printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
     {
     case 1:
       dbuf_tprintf (oBuf, "\t!db !constbyte\n", ival);
+      bytes_written++;
       break;
 
     case 2:
       dbuf_tprintf (oBuf, "\t!db !constbyte, !constbyte\n", (ival & 0xff), (ival >> 8) & 0xff);
+      bytes_written += 2;
       break;
 
     case 4:
       dbuf_tprintf (oBuf, "\t!db !constbyte, !constbyte, !constbyte, !constbyte\n",
                     (ival & 0xff), (ival >> 8) & 0xff, (ival >> 16) & 0xff, (ival >> 24) & 0xff);
+      bytes_written += 4;
       break;
     }
   *sym = lsym;
   *ilist = lilist;
+
+  return (bytes_written);
 }
 
 /*-----------------------------------------------------------------*/
 /* printIvalStruct - generates initial value for structures        */
 /*-----------------------------------------------------------------*/
 static void
-printIvalStruct (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oBuf)
+printIvalStruct (symbol *sym, sym_link *type, initList *ilist, struct dbuf_s *oBuf)
 {
   symbol *sflds;
   initList *iloop = NULL;
+  unsigned int skip_holes = 0;
 
   sflds = SPEC_STRUCT (type)->fields;
 
@@ -1090,6 +1098,8 @@ printIvalStruct (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s 
     {
       while (sflds)
         {
+          unsigned int oldoffset = sflds->offset;
+
           if (IS_BITFIELD (sflds->type))
             printIvalBitFields (&sflds, &iloop, oBuf);
           else
@@ -1098,6 +1108,19 @@ printIvalStruct (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s 
               sflds = sflds->next;
               iloop = iloop ? iloop->next : NULL;
             }
+
+          // Handle members from anonymous unions. Just a hack to fix bug #2643.
+          while (sflds && sflds->offset == oldoffset)
+            {
+              sflds = sflds->next;
+              skip_holes++;
+            }
+        }
+
+      while (skip_holes && iloop && iloop->type == INIT_HOLE)
+        {
+          skip_holes--;
+          iloop = iloop ? iloop->next : NULL;
         }
     }
 

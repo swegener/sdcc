@@ -1,7 +1,8 @@
 2017-01-07 Philipp Klaus Krause <pkk AT spth.de>
 
-	* support/regression/tests/bug-2643.c:
-	  Test for bug #2643.
+	* src/SDCCglue.c,
+	  support/regression/tests/bug-2643.c:
+	  Fix bug #2643.
 
 2017-01-05 Philipp Klaus Krause <pkk AT spth.de>
 

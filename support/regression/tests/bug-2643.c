@@ -12,13 +12,11 @@ struct S z = { 7, { .c = 8 } };
 
 void testBug(void)
 {
-#ifndef __SDCC
 	ASSERT (x.a == 1);
 	ASSERT (x.b == 2);
 	ASSERT (y.a == 5);
 	ASSERT (y.b == 6);
 	ASSERT (z.a == 7);
 	ASSERT (z.c == 8);
-#endif
 }
 

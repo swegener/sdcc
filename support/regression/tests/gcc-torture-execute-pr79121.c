@@ -33,8 +33,6 @@ long long f4 (int32_t x)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_s08
-#ifndef __SDCC_hc08
   if (f1 (0xf0000000) != 0xffffffff00000000)
     ASSERT (0);
   if (f2 (0xf0000000) != 0xf00000000)
@@ -44,6 +42,4 @@ testTortureExecute (void)
   if (f4 (0xf0000000) != 0xffffffff00000000)
     ASSERT (0);
   return;
-#endif
-#endif
 }

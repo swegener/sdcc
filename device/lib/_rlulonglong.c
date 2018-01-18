@@ -32,6 +32,32 @@
 
 #ifdef __SDCC_LONGLONG
 
+#if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8) // Big-endian
+
+unsigned long long _rlulonglong(unsigned long long l, signed char s)
+{
+	uint32_t *const top = (uint32_t *)((char *)(&l) + 0);
+	uint16_t *const middle = (uint16_t *)((char *)(&l) + 4);
+	uint32_t *const bottom = (uint32_t *)((char *)(&l) + 4);
+	uint16_t *const b = (uint16_t *)(&l);
+
+	for(;s >= 16; s-= 16)
+	{
+		b[0] = b[1];
+		b[1] = b[2];
+		b[2] = b[3];
+		b[3] = 0;
+	}
+
+	(*top) <<= s;
+	(*top) |= (((uint32_t)((*middle) & 0xffffu) << s) >> 16);
+	(*bottom) <<= s;
+
+	return(l);
+}
+
+#else // Little-endian
+
 unsigned long long _rlulonglong(unsigned long long l, signed char s)
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
@@ -53,6 +79,8 @@ unsigned long long _rlulonglong(unsigned long long l, signed char s)
 
 	return(l);
 }
+
+#endif
 
 #endif
 

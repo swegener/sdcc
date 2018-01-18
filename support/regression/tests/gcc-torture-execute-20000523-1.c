@@ -11,8 +11,6 @@
 void
 testTortureExecute (void)
 {
-// long long seems somewhat broken on MacOSX
-#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   long long   x;
   int         n;
 
@@ -31,6 +29,5 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 }
 

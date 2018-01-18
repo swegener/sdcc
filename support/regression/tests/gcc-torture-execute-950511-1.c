@@ -11,7 +11,7 @@
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 
   unsigned long long xx;
   unsigned long long *x = (unsigned long long *) &xx;

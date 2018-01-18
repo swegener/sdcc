@@ -6,6 +6,13 @@
 	  Remove leftovers from deprectaed nojtbound pragma and option.
 	* doc/sdccman.lyx:
 	  Update list of incompatible changes.
+	* src/hc08/gen.c,
+	  src/SDCCast.c,
+	  device/lib/_rlulonglong.c,
+	  device/lib/_rrslonglong.c,
+	  device/lib/_rrulonglong.c,
+	  support/regression/tests/*.c:
+	  Fixed many long long issues, including bugs #2658 and #2118.
 
 2017-01-07 Philipp Klaus Krause <pkk AT spth.de>
 

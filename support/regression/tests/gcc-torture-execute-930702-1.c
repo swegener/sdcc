@@ -9,14 +9,12 @@
 #pragma disable_warning 93
 #endif
 
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
 int fp (double a, int b)
 {
   if (a != 33 || b != 11)
     ASSERT (0);
   return (0);
 }
-#endif
 
 void
 testTortureExecute (void)

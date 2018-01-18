@@ -19,11 +19,9 @@ int f(long long a)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) // Bug #2661.
   if(f(0x48375d8000000000ull) != 1)
     ASSERT(0);
   if (f(0xfc00000000000000ull) != 1024)
     ASSERT(0);
-#endif
 }
 

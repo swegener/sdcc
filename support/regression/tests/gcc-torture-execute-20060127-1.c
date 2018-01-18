@@ -23,7 +23,7 @@ long long a = 0x1234567800000000LL;
 void
 testTortureExecute (void)
 {
-#if !defined (__SDCC_mcs51) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+#if !defined (__SDCC_mcs51)
   f (a);
   return;
 #endif

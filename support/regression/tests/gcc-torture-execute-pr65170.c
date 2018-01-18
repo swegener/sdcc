@@ -27,9 +27,7 @@ foo (V b, V c)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   foo (1, 1);
   return;
-#endif
 }
 

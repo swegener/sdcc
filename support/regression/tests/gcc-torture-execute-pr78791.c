@@ -22,11 +22,7 @@ foo (unsigned long long x, unsigned long long y, unsigned long long z)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_s08
-#ifndef __SDCC_hc08
   if (foo (64, 7, 0) != 10 || foo (28, 3, 2) != 14)
     ASSERT (0);
   return;
-#endif
-#endif
 }

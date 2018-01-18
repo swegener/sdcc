@@ -27,7 +27,7 @@ f2 (int x)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   if (f1 (1) != (~(unsigned) 0) >> 1)
     ASSERT (0);
   if (f1 (0) != ((~(unsigned) 0) >> 1) - 1)

@@ -40,7 +40,7 @@ build_ref_for_offset (void *base, long long offset)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_hc08) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined (__SDCC_s08)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   void *ret = build_ref_for_offset ((void *)0, 32);
   if (ret != (void *)0)
     ASSERT (0);

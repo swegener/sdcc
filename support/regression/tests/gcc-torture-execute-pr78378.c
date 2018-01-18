@@ -20,12 +20,8 @@ foo (unsigned long long x)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_s08
-#ifndef __SDCC_hc08
   unsigned long long x = foo (1);
   if (x != 0x2c24)
     ASSERT(0);
   return;
-#endif
-#endif
 }

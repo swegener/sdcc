@@ -8,7 +8,6 @@
 #pragma std_c99
 #endif
 
-#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 /* This tests the rotate patterns that some machines support.  */
 
 #include <limits.h>
@@ -36,12 +35,10 @@ unsigned long ul = LONG_VALUE;
 unsigned long long ull = LL_VALUE;
 int shift1 = SHIFT1;
 int shift2 = SHIFT2;
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
   if (ROR (uc, shift1) != ROR (CHAR_VALUE, SHIFT1))
     ASSERT (0);
 
@@ -115,6 +112,5 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 }
 

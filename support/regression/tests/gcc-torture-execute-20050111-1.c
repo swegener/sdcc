@@ -36,7 +36,7 @@ testTortureExecute (void)
 {
 // Some ports do not yet support long long
 #if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
+
   if (sizeof (long long) != 8)
     return;
 
@@ -52,6 +52,5 @@ testTortureExecute (void)
   if (bar (0x25) != 0x2500000000ULL)
     ASSERT (0);
   return;
-#endif
 #endif
 }

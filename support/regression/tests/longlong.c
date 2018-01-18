@@ -119,7 +119,7 @@ testLongLong (void)
 {
   volatile unsigned long tmp;
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_hc08) && !defined(__SDCC_s08)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   i = 42;
   ASSERT (g() == 43);
   i = 23;
@@ -181,7 +181,9 @@ testLongLong (void)
   ASSERT (x * y == (42ll << 23) * 42);
   ASSERT (x / tmp == (42ll << 23) / 42);
 #endif
+#if !defined __SDCC_hc08 && !defined __SDCC_s08 // hc08 / s08-specific bug
   ASSERT (x % tmp == (42ll << 23) % 42);
+#endif
 
   x = 0x1122334455667788ll;
   y = 0x9988776655443322ull;
@@ -221,6 +223,7 @@ testLongLong (void)
   x = 0x7ll;
   ASSERT (y / x == 0x1122334455667700ull / 0x7ll); // this test is optimized by constant propagation
   ASSERT (divULL (y, x) == 0x1122334455667700ull / 0x7ll); // this test is not
+#if !defined __SDCC_hc08 && !defined __SDCC_s08 // hc08 / s08-specific bugs
   ASSERT (y % x == 0x1122334455667700ull % 0x7ll); // this test is optimized by constant propagation
   ASSERT (modULL (y, x) == 0x1122334455667700ull % 0x7ll); // this test is not
   x = 0x1122334455667700ll;
@@ -228,7 +231,7 @@ testLongLong (void)
   ASSERT (divLL (x, 0x7ll) == 0x1122334455667700ll / 0x7ll); // this test is not
   ASSERT (x % 0x7ll == 0x1122334455667700ll % 0x7ll); // this test is optimized by constant propagation
   ASSERT (modLL (x, 0x7ll) == 0x1122334455667700ll % 0x7ll); // this test is not
-
+#endif
   y = 0x44556677aabbccddull;
   x = 0x7766554433221100ull;
   ASSERT (y < x);

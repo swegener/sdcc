@@ -8,8 +8,6 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports long long constants!
-#if !defined (__SDCC_hc08) && !defined (__SDCC_s08)
 int
 foo1 (long long value)
 {
@@ -31,12 +29,11 @@ foo2 (unsigned long long value)
   else
     return 2;
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined (__SDCC_hc08) && !defined (__SDCC_s08)
+#if !defined(__SDCC_mcs51)
   unsigned long long value = 0xc000000000000001LL;
   int x, y;
 

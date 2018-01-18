@@ -5652,7 +5652,7 @@ genCmp (iCode * ic, iCode * ifx)
   sym_link *letype, *retype;
   int sign, opcode;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0ull;
   char *sub;
   symbol *jlbl = NULL;
   bool needpulla = FALSE;
@@ -5745,7 +5745,7 @@ genCmp (iCode * ic, iCode * ifx)
 
           if ((AOP_TYPE (right) == AOP_LIT) && !isOperandVolatile (left, FALSE))
             {
-              lit = ulFromVal (AOP (right)->aopu.aop_lit);
+              lit = ullFromVal (AOP (right)->aopu.aop_lit);
               while ((size > 1) && (((lit >> (8 * offset)) & 0xff) == 0))
                 {
                   offset++;
@@ -6160,8 +6160,8 @@ genAnd (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
-  unsigned long litinv;
+  unsigned long long lit = 0ll;
+  unsigned long long litinv;
   int bitpos = -1;
   unsigned char bytemask;
   bool needpulla = FALSE;
@@ -6198,13 +6198,15 @@ genAnd (iCode * ic, iCode * ifx)
 
   if (AOP_TYPE (right) == AOP_LIT)
     {
-      lit = ulFromVal (AOP (right)->aopu.aop_lit);
+      lit = ullFromVal (AOP (right)->aopu.aop_lit);
       if (size == 1)
         lit &= 0xff;
       else if (size == 2)
         lit &= 0xffff;
       else if (size == 4)
         lit &= 0xffffffff;
+      else if (size == 8)
+        lit &= 0xffffffffffffffff;
       bitpos = isLiteralBit (lit) - 1;
     }
 
@@ -6408,7 +6410,7 @@ genOr (iCode * ic, iCode * ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
-  unsigned long lit = 0L;
+  unsigned long long lit = 0ull;
   unsigned char bytemask;
   bool needpulla = FALSE;
   bool earlystore = FALSE;
@@ -6441,7 +6443,7 @@ genOr (iCode * ic, iCode * ifx)
     }
 
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
   size = (AOP_SIZE (left) >= AOP_SIZE (right)) ? AOP_SIZE (left) : AOP_SIZE (right);
 
@@ -6522,7 +6524,7 @@ genOr (iCode * ic, iCode * ifx)
     }
 
   if (AOP_TYPE (right) == AOP_LIT)
-    lit = ulFromVal (AOP (right)->aopu.aop_lit);
+    lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
   size = AOP_SIZE (result);
 
@@ -6636,7 +6638,7 @@ genXor (iCode * ic, iCode * ifx)
       while (size--)
         {
           loadRegFromAop (hc08_reg_a, AOP (left), offset);
-          if (AOP_TYPE (right) == AOP_LIT && ((ulFromVal (AOP (right)->aopu.aop_lit) >> (offset * 8)) & 0xff) == 0)
+          if (AOP_TYPE (right) == AOP_LIT && ((ullFromVal (AOP (right)->aopu.aop_lit) >> (offset * 8)) & 0xff) == 0)
             {
               emitcode ("tsta", "");
               regalloc_dry_run_cost++;
@@ -9668,7 +9670,7 @@ genIfx (iCode * ic, iCode * popIc)
   /* branch or no branch */
   if (AOP_TYPE (cond) == AOP_LIT)
     {
-      unsigned long lit = ulFromVal (AOP (cond)->aopu.aop_lit);
+      unsigned long long lit = ullFromVal (AOP (cond)->aopu.aop_lit);
       freeAsmop (cond, NULL, ic, TRUE);
 
       /* if there was something to be popped then do it */

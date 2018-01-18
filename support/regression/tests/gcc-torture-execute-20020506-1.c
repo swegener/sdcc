@@ -329,7 +329,6 @@ testTortureExecute (void)
   fest6 (INT_MIN, 1);
   fest6 (UINT_MAX, 1);
 
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08)
   fest7 (0, 0);
   fest7 (LONG_LONG_MAX, 0);
   fest7 (LONG_LONG_MIN, 1);
@@ -341,7 +340,6 @@ testTortureExecute (void)
   fest8 (ULONG_LONG_MAX, 1);
 
   return;
-#endif
 #endif
 }
 

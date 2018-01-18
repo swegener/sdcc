@@ -224,7 +224,6 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_NO_LABEL_OPT, NULL, "Disable label optimisation"},
   {0,   OPTION_NO_LOOP_INV, NULL, "Disable optimisation of invariants"},
   {0,   OPTION_NO_LOOP_IND, NULL, "Disable loop variable induction"},
-  {0,   "--nojtbound", &optimize.noJTabBoundary, "Don't generate boundary check for jump tables"},
   {0,   "--noloopreverse", &optimize.noLoopReverse, "Disable the loop reverse optimisation"},
   {0,   "--no-peep", &options.nopeep, "Disable the peephole assembly file optimisation"},
   {0,   "--no-reg-params", &options.noRegParams, "On some ports, disable passing some parameters in registers"},

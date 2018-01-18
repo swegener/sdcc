@@ -232,7 +232,6 @@ struct optimize
     int label4;
     int loopInvariant;
     int loopInduction;
-    int noJTabBoundary;
     int noLoopReverse;
     int codeSpeed;
     int codeSize;

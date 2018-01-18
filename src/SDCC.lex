@@ -598,7 +598,6 @@ enum {
    P_NOINDUCTION,
    P_NOINVARIANT,
    P_STACKAUTO,
-   P_NOJTBOUND,
    P_OVERLAY_,     /* I had a strange conflict with P_OVERLAY while */
                    /* cross-compiling for MINGW32 with gcc 3.2 */
    P_NOOVERLAY,
@@ -797,17 +796,6 @@ doPragma (int id, const char *name, const char *cp)
         }
 
       options.stackAuto = 1;
-      break;
-
-    case P_NOJTBOUND:
-      cp = get_pragma_token(cp, &token);
-      if (TOKEN_EOL != token.type)
-        {
-          err = 1;
-          break;
-        }
-
-      optimize.noJTabBoundary = 1;
       break;
 
     case P_NOGCSE:
@@ -1066,7 +1054,6 @@ static struct pragma_s pragma_tbl[] = {
   { "noinvariant",       P_NOINVARIANT,     0, doPragma },
   { "noloopreverse",     P_LOOPREV,         0, doPragma },
   { "stackauto",         P_STACKAUTO,       0, doPragma },
-  { "nojtbound",         P_NOJTBOUND,       1, doPragma },
   { "nogcse",            P_NOGCSE,          0, doPragma },
   { "overlay",           P_OVERLAY_,        0, doPragma },
   { "nooverlay",         P_NOOVERLAY,       0, doPragma },

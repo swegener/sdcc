@@ -2467,8 +2467,7 @@ int b : 2;
 \end_layout
 
 \begin_layout Itemize
-libraries, included in SDCC packages, are in ar format in SDCC version 2.9.0
- and higher.
+In 2.9.0 libraries included in SDCC packages, are in ar format.
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2480,29 +2479,29 @@ reference "subsec:Using-sdar-to"
 \end_layout
 
 \begin_layout Itemize
-targets for xa51 and avr are disabled by default in version 3.0.0 and higher.
+In 3.0.0 targets for xa51 and avr are disabled by default.
 \end_layout
 
 \begin_layout Itemize
-in SDCC version 3.0.0 and higher sdldgb and sdldz80 don't support generation
- of Game Boy binary image format.
+In 3.0.0 sdldgb and sdldz80 don't support generation of Game Boy binary image
+ format.
  The makebin utility can be used to convert Intel Hex format to Game Boy
  binary image format.
 \end_layout
 
 \begin_layout Itemize
-in SDCC version 3.0.0 and higher sdldgb and sdldz80 don't support generation
- of rrgb (Game Boy simulator) map file and no$gmb symbol file formats.
+In 3.0.0 sdldgb and sdldz80 don't support generation of rrgb (Game Boy simulator)
+ map file and no$gmb symbol file formats.
  The as2gbmap utility can be used to convert sdld map format to rrgb and
  no$gmb file formats.
 \end_layout
 
 \begin_layout Itemize
-asranlib utility was renamed to sdranlib in SDCC version 3.1.0.
+In 3.1.0 asranlib utility was renamed to sdranlib.
 \end_layout
 
 \begin_layout Itemize
-in SDCC version 3.1.0 pic14 target, structured access to SFR via 
+In 3.1.0 pic14 target, structured access to SFR via 
 \family typewriter
 <sfrname>_bits.<bitname>
 \family default
@@ -2529,15 +2528,15 @@ sdar archive managing utility and sdnm utilities were introduced in version
 \end_layout
 
 \begin_layout Itemize
-with SDCC version 3.2.0 the sdcclib utility is deprecated.
+In 3.2.0 the sdcclib utility is deprecated.
  Sdar utility should be used to create SDCC object file archives.
  Sdcclib utility will become obsolete in one of next SDCC releases and will
  be removed from SDCC packages.
 \end_layout
 
 \begin_layout Itemize
-special SDCC keywords which are not preceded by a double underscore are
- obsoleted (removed) in version 3.2.0 and higher.
+In 3.2.0 special SDCC keywords which are not preceded by a double underscore
+ are obsoleted (removed).
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2549,8 +2548,8 @@ reference "subsec:Standard-Compliance"
 \end_layout
 
 \begin_layout Itemize
-in SDCC version 3.2.0 compiler macro definitions not starting with double
- underscore characters are deprecated if 
+In 3.2.0 compiler macro definitions not starting with double underscore characters
+ are deprecated if 
 \begin_inset Flex Code
 status open
 
@@ -2567,15 +2566,14 @@ status open
 \end_layout
 
 \begin_layout Itemize
-in SDCC version 3.2.0 new compiler macros for processor definition were introduced
- for pic14 and pic16 targets: -D__SDCC_PIC16XXXX and -D__SDCC_PIC18FXXX
- respectively.
+In 3.2.0 new compiler macros for processor definition were introduced for
+ pic14 and pic16 targets: -D__SDCC_PIC16XXXX and -D__SDCC_PIC18FXXX respectively.
  The pic16 macro definition -D__18fXXX is deprecated.
  It was obsoleted (removed) after the 3.4.0 release.
 \end_layout
 
 \begin_layout Itemize
-pragma config for pic16 target was introduced in version 3.2.0.
+In 3.2.0 pragma config for pic16 target was introduced.
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2587,7 +2585,7 @@ reference "subsec:PIC16_Pragmas"
 \end_layout
 
 \begin_layout Itemize
-new inline assembler format 
+In 3.2.0 new inline assembler format 
 \family typewriter
 __asm__ (inline_assembler_code
 \begin_inset Quotes srd
@@ -2600,7 +2598,7 @@ __asm__ (inline_assembler_code
 __asm ...
  __endasem;
 \family default
- format introduced in version 3.2.0.
+ format introduced.
  See section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2617,7 +2615,7 @@ sdobjcopy utility was introduced in version 3.3.0.
 \end_layout
 
 \begin_layout Itemize
-Up to the SDCC 3.4.0 release, intrinsic named address spaces were called 
+Before 3.4.0 release, intrinsic named address spaces were called 
 \begin_inset Quotes sld
 \end_inset
 
@@ -2629,21 +2627,25 @@ storage classes
 \end_layout
 
 \begin_layout Itemize
-in SDCC version 3.6.0, the default for char changed from signed to unsigned.
+In 3.6.0, the default for char changed from signed to unsigned.
 \end_layout
 
 \begin_layout Itemize
-After 3.6.0, the prototype for putchar() changed from void putchar(char) to
- int putchar(int)
+In 3.7.0, the prototype for putchar() changed from void putchar(char) to int
+ putchar(int)
 \end_layout
 
 \begin_layout Itemize
-Before 3.7.0 mcs51 and ds390 got a full _Bool/bool type, separate from __bit.
+In 3.7.0 mcs51 and ds390 got a full _Bool/bool type, separate from __bit.
 \end_layout
 
 \begin_layout Itemize
-Before 3.7.0, the option –nojtbound and the corresponding pragma have been
- deprecated.
+In 3.7.0, the option –nojtbound and the corresponding pragma have been deprecated.
+\end_layout
+
+\begin_layout Itemize
+In 3.7.0, the prototype for getchar() changed from char getchar(void) to int
+ getchar().
 \end_layout
 
 \begin_layout Section

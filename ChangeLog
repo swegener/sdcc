@@ -1,9 +1,15 @@
+2017-01-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peep.c,
+	  support/regression/tests/bug-2708.c:
+	  Fix bug #2708.
+
 2017-01-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,
 	  src/SDCCglobl.h,
 	  src/SDCCmain.c:
-	  Remove leftovers from deprectaed nojtbound pragma and option.
+	  Remove leftovers from deprecated nojtbound pragma and option.
 	* doc/sdccman.lyx:
 	  Update list of incompatible changes.
 	* src/hc08/gen.c,

@@ -148,7 +148,7 @@ stm8instructionSize(const lineNode *pl)
   char *operand;
   char *op1start;
   char *op2start;
-  int i = 0;
+  
   operand = nextToken(pl->line);
   op1start = nextToken(NULL);
   op2start = nextToken(NULL);
@@ -237,17 +237,19 @@ stm8instructionSize(const lineNode *pl)
                 || EQUALS(operand, "rrc")
                 || EQUALS(operand, "tnz"))
   {
+    int i = 0;
+
     assert (op1start != NULL);
     if(!strcmp(op1start, "a") || !strcmp(op1start, "(x)"))
       return(1);
     if(!strcmp(op1start, "(y)"))
       return(2);
-    if(op1start[0] == '(')
+    if(op1start[0] == '('|| op1start[0] == '[')
       op1start++;
     if(strstr(op1start, ",y)"))
       i++; // costs extra byte for operating with y
     if(isLabel(op1start))
-      return(3);
+      return(4);
     if(readint(op1start) <= 0xFF)
       return(2+i);
     /* op1 > 0xFF */
@@ -309,6 +311,7 @@ stm8instructionSize(const lineNode *pl)
                 || EQUALS(operand, "sub")
                 || EQUALS(operand, "xor"))
   {
+    int i = 0;
     char suffix;
     assert (op1start != NULL && op2start != NULL);
     suffix = operand[strlen(operand)-1];
@@ -349,7 +352,7 @@ stm8instructionSize(const lineNode *pl)
     return 4;
   }
 
-  /* mov costs 3, 4 or 5 bytes depending on it's addressing mode */
+  /* mov costs 3, 4 or 5 bytes depending on its addressing mode */
   if(EQUALS(operand, "mov")) {
     assert (op1start != NULL && op2start != NULL);
     if(isImmediate(op2start))

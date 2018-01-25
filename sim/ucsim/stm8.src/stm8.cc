@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8.cc 765 2017-07-01 10:43:56Z drdani $ */
+/* $Id: stm8.cc 776 2017-07-09 11:45:22Z drdani $ */
 
 #include "ddconfig.h"
 
@@ -71,6 +71,7 @@ cl_stm8::cl_stm8(struct cpu_entry *IType, class cl_sim *asim):
   cl_uc(asim)
 {
   type= IType;
+  flash_ctrl= NULL;
 }
 
 int
@@ -501,14 +502,14 @@ cl_stm8::mk_hw_elements(void)
   // FLASH
   if (type->subtype & (DEV_STM8SAF))
     {
-      add_hw(h= new cl_saf_flash(this, 0x505a));
-      h->init();
+      add_hw(flash_ctrl= new cl_saf_flash(this, 0x505a));
+      flash_ctrl->init();
     }
   else if (type->subtype & (DEV_STM8ALL |
 			    DEV_STM8L101))
     {
-      add_hw(h= new cl_l_flash(this, 0x5050));
-      h->init();
+      add_hw(flash_ctrl= new cl_l_flash(this, 0x5050));
+      flash_ctrl->init();
     }
   //add_hw(h= new cl_tim235(this, 3, 0x5320));
   //h->init();
@@ -523,7 +524,7 @@ cl_stm8::make_memories(void)
 {
   class cl_address_space *as;
 
-  rom= ram= as= new cl_address_space("rom", 0, 0x28000, 8);
+  rom= ram= as= new cl_flash_as/*address_space*/("rom", 0, 0x28000/*, 8*/);
   as->init();
   address_spaces->add(as);
 
@@ -1005,26 +1006,28 @@ cl_stm8::exec_inst(void)
   }
   tick(1);
 
-  switch (code) { // get prefix
-	case 0x72:
-	case 0x90:
-	case 0x91:
-	case 0x92:
-		cprefix = code;
-		fetch(&code);
-		break;
-	 case 0x82:
-	   {
-	     int ce= fetch();
-	     int ch= fetch();
-	     int cl= fetch();
-	     PC= ce*0x10000 + ch*0x100 + cl;
-	     return resGO;
-	   }
-	default:
-		cprefix = 0x00;
-		break;
-  }
+  switch (code)
+    { // get prefix
+    case 0x72:
+    case 0x90:
+    case 0x91:
+    case 0x92:
+      cprefix = code;
+      fetch(&code);
+      break;
+    case 0x82:
+      {
+	int ce= fetch();
+	int ch= fetch();
+	int cl= fetch();
+	PC= ce*0x10000 + ch*0x100 + cl;
+	return resGO;
+      }
+    case 0x8b: return resSTOP; // BREAK instruction
+    default:
+      cprefix = 0x00;
+      break;
+    }
 
    // exceptions
    if((cprefix==0x90)&&((code&0xf0)==0x10)) {

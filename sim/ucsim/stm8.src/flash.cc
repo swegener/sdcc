@@ -25,14 +25,73 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <stdlib.h>
+
+#include "globals.h"
+
+#include "stm8cl.h"
+
 #include "flashcl.h"
 
+
+/* Address space/cell which can contain flash memory */
+
+t_mem
+cl_flash_cell::write(t_mem val)
+{
+  if (flags & CELL_READ_ONLY)
+    {
+      class cl_stm8 *uc= (cl_stm8 *)(application->get_uc());
+      if (uc)
+	{
+	  t_addr a;
+	  if (uc->rom->is_owned(this, &a) &&
+	      uc->flash_ctrl)
+	    {
+	      uc->flash_ctrl->flash_write(a, val);
+	      return d();
+	    }
+	}
+    }
+  return cl_cell8::write(val);
+}
+
+cl_flash_as::cl_flash_as(const char *id, t_addr astart, t_addr asize):
+  cl_address_space(id, astart, asize, 8)
+{
+  class cl_flash_cell c8(8);
+  class cl_memory_cell *cell= &c8;
+  start_address= astart;
+  decoders= new cl_decoder_list(2, 2, false);
+  cella= (class cl_memory_cell *)malloc(size * sizeof(class cl_memory_cell));
+  //cell->init();
+  int i;
+  for (i= 0; i < size; i++)
+    {
+      memcpy(&(cella[i]), cell, sizeof(class cl_memory_cell));
+      cella[i].init();
+    }
+  dummy= new cl_dummy_cell(8);
+  dummy->init();
+}
+
+int
+cl_flash_as::init(void)
+{
+  return cl_address_space::init();
+}
+
+
+/* Flash controller */
 
 cl_flash::cl_flash(class cl_uc *auc, t_addr abase, const char *aname):
 	cl_hw(auc, HW_FLASH, 0, aname)
 {
   base= abase;
   set_name(aname);
+  wbuf_started= false;
+  wbuf_start= 0;
+  rww= true;
 }
 
 int
@@ -44,15 +103,81 @@ cl_flash::init(void)
   return 0;
 }
 
+int
+cl_flash::tick(int cycles)
+{
+  if (state & fs_busy)
+    {
+      double now= uc->get_rtime();
+      double elapsed= (now - start_time) * 10e6;
+
+      if ((state == fs_pre_erase) &&
+	  (elapsed > tprog/2.0))
+	{
+	  int i;
+	  printf("FLASH zeroing %06lx .. %d\n", wbuf_start, wbuf_size);
+	  for (i= 0; i < wbuf_size; i++)
+	    {
+	      class cl_memory_cell *c= uc->rom->get_cell(wbuf_start + i);
+	      c->download(0);
+	    }
+	  if (mode == fm_erase)
+	    {
+	      printf("FLASH end of erase, finish\n");
+	      finish_program(true);
+	    }
+	  else
+	    {
+	      printf("FLASH end of erase, cont program\n");
+	      state= fs_program;
+	    }
+	}
+      else if (elapsed > tprog)
+	{
+	  int i;
+	  printf("FLASH dl-ing %06lx .. %d\n", wbuf_start, wbuf_size);
+	  for (i= 0; i < wbuf_size; i++)
+	    {
+	      class cl_memory_cell *c= uc->rom->get_cell(wbuf_start + i);
+	      t_mem org= c->get();
+	      c->download(org | wbuf[i]);
+	    }
+	  printf("FLASH end of program\n");
+	  finish_program(true);
+	}
+    }
+  return 0;
+}
+
+void
+cl_flash::finish_program(bool ok)
+{
+  if (ok)
+    iapsr->set_bit1(0x04);
+  else
+    iapsr->set_bit1(0x01);
+  state= fs_wait_mode;
+}
+
 void
 cl_flash::reset(void)
 {
+  printf("FLASH reset\n");
   puk1st= false;
   duk1st= false;
   p_unlocked= false;
   d_unlocked= false;
   p_failed= false;
   d_failed= false;
+
+  state= fs_wait_mode;
+  mode= fm_unknown;
+  
+  cr1r->write(0);
+  iapsr->write(0x40);
+  cr2r->write(0);
+  if (ncr2r)
+    ncr2r->write(0xff);
 }
 
 t_mem
@@ -73,6 +198,7 @@ cl_flash::read(class cl_memory_cell *cell)
 	v|= 0x08;
       // read clears EOP and WR_PG_DIS bits
       cell->set(v & ~0x05);
+      if (v & 0x05) printf("FLASH read iapsr5 %02x\n",v);	
     }
   return v;
 }
@@ -88,6 +214,7 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
   
   if (cell == pukr)
     {
+      printf("FLASH write-pukr %02x\n",*val);
       if (p_failed)
 	;
       else if (!puk1st)
@@ -108,6 +235,7 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
     }
   else if (cell == dukr)
     {
+      printf("FLASH write-dukr %02x\n",*val);
       if (d_failed)
 	;
       else if (!duk1st)
@@ -128,6 +256,9 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
     }
   else if (cell == iapsr)
     {
+      printf("FLASH write-iapsr %02x\n",*val);
+      t_mem org= iapsr->get();
+      // PUL, DUL
       if (!(*val & 0x02))
 	p_unlocked= puk1st= false;
       if (!(*val & 0x08))
@@ -137,6 +268,38 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
 	*val|= 0x02;
       if (d_unlocked)
 	*val|= 0x08;
+      // HVOFF
+      *val&= ~0x40;
+      // EOP
+      *val&= 0x40;
+      if (org & 0x40)
+	*val|= 0x40;
+    }
+  else if (cell == cr2r)
+    {
+      printf("FLASH write-cr2r %02x\n",*val);
+      *val&= ~0x0e;
+      if (state & fs_busy)
+	{
+	  *val&= ~0x30;
+	  *val|= (cr2r->get() & 0x30);
+	}
+      if ((ncr2r == NULL) ||
+	  (ncr2r->get() == ((~(*val))&0xff)))
+	set_flash_mode(*val);
+    }
+  else if ((ncr2r != NULL) &&
+	   (cell == ncr2r))
+    {
+      printf("FLASH write-ncr2r %02x\n",*val);
+      *val|= 0x0e;
+      if (state & fs_busy)
+	{
+	  *val&= ~0x30;
+	  *val|= (ncr2r->get() & 0x30);
+	}
+      if (cr2r->get() == ((~(*val))&0xff))
+	set_flash_mode((~(*val))&0xff);
     }
 }
 
@@ -163,6 +326,181 @@ cl_flash::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 }
 
 void
+cl_flash::flash_write(t_addr a, t_mem val)
+{
+  printf("FLASH wr(%06lx,%02x)\n",a,val);
+  if (!uc)
+    {
+      printf("  no uc\n");
+      return;
+    }
+  if (uc->rom == NULL)
+    {
+      printf("  no rom\n");
+      return;
+    }
+  if ((a >= 0x8000) &&
+      !p_unlocked)
+    {
+      printf("  plocked\n");
+      return;
+    }
+  if ((a < 0x8000) &&
+      !d_unlocked)
+    {
+      printf("  dlocked\n");
+      return;
+    }
+  if (state & fs_busy)
+    {
+      printf("  busy %d\n",state);
+      return;
+    }
+
+  printf("  wbuf_start=%06lx\n",wbuf_start);
+  if (wbuf_start == 0)
+    {
+      printf("  calling start_wbuf(%06lx)\n",a);
+      start_wbuf(a);
+    }
+  
+  int offset= a - wbuf_start;
+  printf("  offset=%d\n",offset);
+  if (mode == fm_byte)
+    {
+      // fixup tprog
+      wbuf[0]= uc->rom->get(wbuf_start + 0);
+      wbuf[1]= uc->rom->get(wbuf_start + 1);
+      wbuf[2]= uc->rom->get(wbuf_start + 2);
+      wbuf[3]= uc->rom->get(wbuf_start + 3);
+      if (tprog < 6000)
+	{
+	  if (wbuf[0] ||
+	      wbuf[1] ||
+	      wbuf[2] ||
+	      wbuf[3])
+	    tprog= 6000;
+	}
+      wbuf[offset]= val;
+      if (tprog < 6000)
+	start_program(fs_program);
+    }
+  else if (mode == fm_erase)
+    {
+      printf("  romwrite in erase mode\n");
+      wbuf[offset]= val;
+      wbuf_writes++;
+      if ((wbuf_writes == 4) &&
+	  (((a+1) % 4) == 0))
+	{
+	  u8_t v= 0;
+	  v|= wbuf[0];
+	  v|= wbuf[1];
+	  v|= wbuf[2];
+	  v|= wbuf[3];
+	  if (v == 0)
+	    {
+	      printf("  starting erase\n");
+	      start_program(fs_pre_erase);
+	    }
+	}
+    }
+  else
+    {
+      wbuf[offset]= val;
+      wbuf_started= true;
+      wbuf_writes++;
+      if ((wbuf_writes == wbuf_size) ||
+	  (offset == wbuf_size-1))
+	{
+	  if ((mode == fm_fast_word) ||
+	      (mode == fm_fast_block))
+	    start_program(fs_program);
+	  else
+	    start_program(fs_pre_erase);
+	}
+    }
+}
+
+// normal program: 6 ms
+// fast program: 3 ms
+// erase: 3 ms
+
+void
+cl_flash::set_flash_mode(t_mem cr2val)
+{
+  bool fix= cr1r->get() & 0x01; /* FIX */
+
+  printf("FLASH set_mode %02x\n", cr2val);
+  if (cr2val & 0x40 /* WPRG */ )
+    {
+      mode= fm_word;
+      tprog= 6000; /* normal mode */
+      wbuf_size= 4;
+    }
+  else if (cr2val & 0x20 /* ERASE */ )
+    {
+      mode= fm_erase;
+      tprog= 3000;
+      wbuf_size= 128;
+    }
+  else if (cr2val & 0x10 /* FPRG */ )
+    {
+      mode= fm_fast_block;
+      tprog= 3000;
+      wbuf_size= 128;
+    }
+  else if (cr2val & 0x01 /* PRG */ )
+    {
+      mode= fm_block;
+      tprog= 6000;
+      wbuf_size= 128;
+    }
+  else
+    {
+      mode= fm_byte;
+      tprog= fix?6000:3000;
+      wbuf_size= 4;
+    }
+  state= fs_wait_data;
+  wbuf_started= false;
+  wbuf_start= 0;
+}
+
+void
+cl_flash::start_wbuf(t_addr addr)
+{
+  int i;
+  wbuf_start= addr - (addr % wbuf_size);
+  wbuf_writes= 0;
+  for (i= 0; i < 256; i++)
+    wbuf[i]= 0;
+  printf("FLASH start_wbuf %06lx (wbuf_start=%06lx,size=%d)\n", addr, wbuf_start, wbuf_size);
+}
+
+void
+cl_flash::start_program(enum stm8_flash_state start_state)
+{
+  printf("FLASH start prg %d\n", start_state);
+  state= start_state;
+  start_time= uc->get_rtime();
+}
+
+const char *
+cl_flash::state_name(enum stm8_flash_state s)
+{
+  switch (s)
+    {
+    case fs_wait_mode: return "wait_mode";
+    case fs_wait_data: return "wait_data";
+    case fs_pre_erase: return "erase";
+    case fs_program: return "program";
+    case fs_busy: return "busy";
+    }
+  return "unknown";
+}
+  
+void
 cl_flash::print_info(class cl_console_base *con)
 {
   con->dd_printf(chars("", "Flash at %s\n", uc->rom->addr_format), base);
@@ -187,6 +525,8 @@ cl_flash::print_info(class cl_console_base *con)
   else
     con->dd_printf("locked");
   con->dd_printf("\n");
+
+  con->dd_printf("State: %s\n", state_name(state));
 }
 
 
@@ -200,9 +540,26 @@ cl_saf_flash::cl_saf_flash(class cl_uc *auc, t_addr abase):
 void
 cl_saf_flash::registration(void)
 {
+  class cl_it_src *is;
+
+  cr1r= register_cell(uc->rom, base+0);
+  cr2r= register_cell(uc->rom, base+1);
+  ncr2r= register_cell(uc->rom, base+2);
+  iapsr= register_cell(uc->rom, base+5);
   pukr= register_cell(uc->rom, base+8);
   dukr= register_cell(uc->rom, base+10);
-  iapsr= register_cell(uc->rom, base+5);
+
+  uc->it_sources->add(is= new cl_it_src(uc, 24,
+					cr1r,0x02,
+					iapsr,0x04,
+					0x8008+24*4, false, false,
+					chars("end of flash programming"), 20*20+0));
+  uc->it_sources->add(is= new cl_it_src(uc, 24,
+					cr1r,0x02,
+					iapsr,0x01,
+					0x8008+24*4, false, false,
+					chars("write attempted to protected page"), 20*20+1));
+  is->init();
 }
 
 
@@ -216,9 +573,26 @@ cl_l_flash::cl_l_flash(class cl_uc *auc, t_addr abase):
 void
 cl_l_flash::registration(void)
 {
+  class cl_it_src *is;
+
+  cr1r= register_cell(uc->rom, base+0);
+  cr2r= register_cell(uc->rom, base+1);
   pukr= register_cell(uc->rom, base+2);
   dukr= register_cell(uc->rom, base+3);
   iapsr= register_cell(uc->rom, base+4);
+  ncr2r= NULL;
+  
+  uc->it_sources->add(is= new cl_it_src(uc, 1,
+					cr1r,0x02,
+					iapsr,0x04,
+					0x8008+1*4, false, false,
+					chars("end of flash programming"), 20*20+0));
+  uc->it_sources->add(is= new cl_it_src(uc, 1,
+					cr1r,0x02,
+					iapsr,0x01,
+					0x8008+1*4, false, false,
+					chars("write attempted to protected page"), 20*20+1));
+  is->init();
 }
 
 

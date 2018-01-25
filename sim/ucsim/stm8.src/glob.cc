@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: glob.cc 752 2017-06-12 08:38:16Z drdani $ */
+/* $Id: glob.cc 776 2017-07-09 11:45:22Z drdani $ */
 
 #include <stdio.h>
 
@@ -337,6 +337,8 @@ struct dis_entry disass_stm8[]= {
   { 0x00e8, 0x00ff, ' ', 2, "xor A,(%1,X)" },
   { 0x00f8, 0x00ff, ' ', 1, "xor A,(X)" },
 
+  { 0x008b, 0x00ff, ' ', 1, "break" },
+  
   { 0, 0, 0, 0, NULL }
 };
 

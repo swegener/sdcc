@@ -418,6 +418,7 @@ struct cpu_entry cpus_51[]=
     {"XC886" , CPU_XC88X, CPU_CMOS		, "Infineon XC88[68]", "cmos"},
     {"XC888" , CPU_XC88X, CPU_CMOS		, "Infineon XC88[68]", "cmos"},
 
+    {"DS320" , CPU_DS320, CPU_CMOS    , "Dallas DS80C320" , "cmos"},
     // F type should go to subtype...
     {"DS390" , CPU_DS390, CPU_CMOS		, "Dallas DS80C390" , "cmos"},
     {"DS390F", CPU_DS390F, CPU_CMOS		, "Dallas DS80C390F", "cmos"},

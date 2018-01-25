@@ -15,7 +15,7 @@ int sifchar(int c)
   return c;
 }
 
-int waitsend()
+void waitsend()
 {
   while(!(USART->sr & USART_SR_TXE));
 }

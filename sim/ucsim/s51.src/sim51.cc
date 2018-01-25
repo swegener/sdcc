@@ -49,6 +49,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc251cl.h"
 #include "uc390cl.h"
 #include "uc88xcl.h"
+#include "uc320cl.h"
 #include "uc380cl.h"
 #include "glob.h"
 
@@ -99,6 +100,8 @@ cl_sim51::mk_controller(void)
       return(new cl_uc380(&cpus_51[i], this));
     case CPU_251:
       return(new cl_uc251(&cpus_51[i], this));
+    case CPU_DS320:
+      return(new cl_uc320(&cpus_51[i], this));
     case CPU_DS390: case CPU_DS390F:
       return(new cl_uc390(&cpus_51[i], this));
     default:

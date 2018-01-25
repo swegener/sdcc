@@ -1,21 +1,18 @@
-PRJ		= t1 t2 t3 t4 s0 s1 s2 s3 \
-		  stm8l_disc_serial \
-		  stm8l_disc_led \
-		  stm8l_disc_tim \
-		  stm8l_disc_getbl \
-		  stm8l_disc_monitor \
-		  stm8s_disc_led \
-		  stm8s_disc_tim \
-		  stm8s_disc_serial \
-		  stm8s_disc_getbl \
-		  ss sl xtest
+PROJECTS	= a s0 s1 s2 s3 t1 t2 t3 t4 xtest \
+		  sl ss lled sled ltim stim sertest \
+		  getbl \
+		  monitor
 
-all:
-	for p in $(PRJ); do \
-		$(MAKE) -f $$p.mk ;\
-	done
+.PHONY: projects $(PROJECTS)
+
+projects: $(PROJECTS)
+
+$(PROJECTS):
+	$(MAKE) MAIN=$@ -f sdcc.mk
 
 clean:
-	for p in $(PRJ); do \
-		$(MAKE) -f $$p.mk clean ;\
+	for p in $(PROJECTS); do \
+		$(MAKE) MAIN=$$p -f sdcc.mk clean ;\
+		rm -rf $$p*.hex ;\
+		rm -rf $$p*.cdb ;\
 	done

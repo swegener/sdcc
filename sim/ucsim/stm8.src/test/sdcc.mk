@@ -1,3 +1,7 @@
+VPATH		= ..
+
+vpath		%.mk $(VPATH)
+
 TARGET		= stm8
 
 CC		= sdcc -m$(TARGET) --std-c99
@@ -7,43 +11,57 @@ CFLAGS		= --debug
 LDFLAGS		=
 LIBS		=
 
+-include	$(MAIN).mk
+
+DEVICES		?= S208
+
 ALL		= $(MAIN) $(OTHERS)
+
 OBJECTS		= $(MAIN).rel $(OTHERS:=.rel)
 
-APP		?= $(MAIN)
-
-all: del_serial_rel $(APP).hex
-
-del_serial_rel:
-	rm -f serial.rel
-
-dep: $(APP).dep
-
-$(APP).dep: $(OBJECTS:.rel=.c) *.h
-	@>$(APP).dep
-	@for c in $(OBJECTS:.rel=.c); do \
-		$(CC) -MM $(CPPFALGS) $$c >>$(APP).dep ;\
-	done
-
-include $(APP).dep
-
-$(APP).ihx: $(OBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o $@
+CPPFLAGS	= -DDEVICE=DEV_STM8$(DEVICE) -I$(VPATH)
 
 .SUFFIXES: .rel .ihx .hex
 
+.PHONY: $(DEVICES)
+
+all: $(DEVICES)
+
+$(DEVICES):
+	test -d $@ || mkdir $@
+	$(MAKE) -C $@ DEVICE=$@ REAL=yes MAIN=$(MAIN) -I$(VPATH) -f$(VPATH)/sdcc.mk compile copy_result
+
+copy_result: $(VPATH)/$(MAIN)_$(DEVICE).hex $(VPATH)/$(MAIN)_$(DEVICE).cdb
+
+$(VPATH)/$(MAIN)_$(DEVICE).hex: $(MAIN).hex
+	cp $< $@
+
+$(VPATH)/$(MAIN)_$(DEVICE).cdb: $(MAIN).cdb
+	cp $(MAIN).cdb $@
+
+compile: dep $(MAIN).hex
+
 .c.rel:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
 
 .ihx.hex:
 	packihx $< >$@
 
+$(MAIN).ihx: $(OBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAAGS) $(OBJECTS) -o $@
+
+$(MAIN).cdb: $(MAIN).hex
+
+dep: $(MAIN).dep
+
+$(MAIN).dep: $(addprefix ../,$(OBJECTS:.rel=.c)) ../*.h
+	for c in $(addprefix ../,$(OBJECTS:.rel=.c)); do \
+		$(CC) -MM $(CPPFLAGS) $$c >>$@; \
+	done
+
 clean:
-	rm -f $(ALL:=.rel) $(ALL:=.asm) $(ALL:=.lst) $(ALL:=.rst) $(ALL:=.sym) $(ALL:=.adb)
-	rm -f $(MAIN).ihx $(MAIN).hex $(MAIN).lk $(MAIN).map $(MAIN).mem $(MAIN).cdb $(MAIN).omf $(MAIN).noi $(MAIN).adb $(MAIN).sym $(MAIN).cdb
-	rm -f *.ihx *.hex
-	rm -f *~
-	rm -f $(MAIN).dep $(APP).dep
+	rm -rf $(DEVICES)
 
-
-# End of sdcc.mk
+ifeq ($(REAL),yes)
+include $(MAIN).dep
+endif

@@ -498,7 +498,6 @@ cl_app::proc_arguments(int argc, char *argv[])
 		      o->hide();
 		      options->add(o);
 		      free(h);
-		      printf("app creates %s option @%p\n",s,o);
 		    }
 		  options->set_value(s, this, /*(void*)Ser_in*/iname);
 		  free(s);
@@ -514,7 +513,6 @@ cl_app::proc_arguments(int argc, char *argv[])
 		      o->hide();
 		      options->add(o);
 		      free(h);
-		      printf("app creates %s option @%p\n",s,o);
 		    }
 		  options->set_value(s, this, /*(void*)Ser_out*/oname);
 		  free(s);

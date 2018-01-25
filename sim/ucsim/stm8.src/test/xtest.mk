@@ -1,8 +1,1 @@
-MAIN		= xtest
-
-OTHERS		= 
-
-include sdcc.mk
-
-CPPFLAGS	= -DDEVICE=DEV_STM8L15x46
-#-DUSART=USART2
+DEVICES		= LDISC

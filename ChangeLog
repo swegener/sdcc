@@ -7,6 +7,9 @@
 	  Implement qsort(), RFE #554.
 	* device/lib/stm8/heap.s:
 	  Increase stm8 default heapsize to 1KB size of other backends.
+	* src/SDCCpeeph.c,
+	  src/SDCCgen.c:
+	  Code cleanup.
 
 2017-01-24 Philipp Klaus Krause <pkk AT spth.de>
 

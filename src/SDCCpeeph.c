@@ -1151,7 +1151,7 @@ FBYNAME (notSimilar)
   if (!operands)
     {
       fprintf (stderr,
-               "*** internal error: notSame peephole restriction"
+               "*** internal error: notSimilar peephole restriction"
                " malformed: %s\n", cmdLine);
       return FALSE;
     }
@@ -1635,14 +1635,14 @@ newPeepRule (lineNode * match,
 /* getPeepLine - parses the peep lines                             */
 /*-----------------------------------------------------------------*/
 static void
-getPeepLine (lineNode ** head, char **bpp)
+getPeepLine (lineNode ** head, const char **bpp)
 {
   char lines[MAX_PATTERN_LEN];
   char *lp;
   int isComment;
 
   lineNode *currL = NULL;
-  char *bp = *bpp;
+  const char *bp = *bpp;
   while (1)
     {
 
@@ -1700,12 +1700,13 @@ getPeepLine (lineNode ** head, char **bpp)
 /* readRules - reads the rules from a string buffer                */
 /*-----------------------------------------------------------------*/
 static void
-readRules (char *bp)
+readRules (const char *bp)
 {
   char restart = 0, barrier = 0;
   char lines[MAX_PATTERN_LEN];
   size_t safetycounter;
-  char *lp, *rp;
+  char *lp;
+  const char *rp;
   lineNode *match;
   lineNode *replace;
   lineNode *currL = NULL;

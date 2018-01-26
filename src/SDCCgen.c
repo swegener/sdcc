@@ -92,17 +92,7 @@ add_line_node (const char *line)
 
   pl = Safe_alloc (sizeof (lineNode));
 
-#if 1
   memcpy (pl, (lineElem_t *) & genLine.lineElement, sizeof (lineElem_t));
-#else
-  pl->ic = genLine.lineElement.ic;
-  pl->isInline = genLine.lineElement.isInline;
-  pl->isComment = genLine.lineElement.isComment;
-  pl->isDebug = genLine.lineElement.isDebug;
-  pl->isLabel = genLine.lineElement.isLabel;
-  pl->visited = genLine.lineElement.visited;
-  pl->aln = genLine.lineElement.aln;
-#endif
 
   pl->line = Safe_strdup (line);
 

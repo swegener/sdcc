@@ -30,6 +30,10 @@
 #ifndef __SDCC_STDLIB_H
 #define __SDCC_STDLIB_H 1
 
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_ds400) && !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#define __reentrant
+#endif
+
 #ifndef __SIZE_T_DEFINED
 #define __SIZE_T_DEFINED
   typedef unsigned int size_t;
@@ -83,6 +87,8 @@ inline void *aligned_alloc(size_t alignment, size_t size)
 #endif
 
 extern void free (void * ptr);
+
+extern void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant);
 
 #if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90)
 int abs(int j) __preserves_regs(b, c, iyl, iyh);

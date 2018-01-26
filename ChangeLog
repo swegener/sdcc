@@ -1,3 +1,11 @@
+2017-01-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdlib.h,
+	  device/lib/incl.mk,
+	  device/lib/qsort.c,
+	  support/regression/tests/qsort.c:
+	  Implement qsort(), RFE #554.
+
 2017-01-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c,

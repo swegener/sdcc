@@ -34,8 +34,8 @@
 	call ___sdcc_heap_init
 
 	.area DATA
-	; For now just allocate 128 bytes for the heap.
+	; For now just allocate 1024 bytes for the heap.
 ___sdcc_heap::
-	.ds 255
+	.ds 1023
 ___sdcc_heap_end::
 	.ds 1 

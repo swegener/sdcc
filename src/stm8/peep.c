@@ -638,7 +638,6 @@ stm8MightRead(const lineNode *pl, const char *what)
         || ISINST (pl->line, "sraw")
         || ISINST (pl->line, "srlw")
         || ISINST (pl->line, "subw")
-        || ISINST (pl->line, "addw")
         || ISINST (pl->line, "tnzw")))
           return TRUE;
 
@@ -692,8 +691,8 @@ stm8MightRead(const lineNode *pl, const char *what)
 
   if(ISINST(pl->line, "ret"))
     return(isReturned(what));
-  else
-    return FALSE;
+
+  return FALSE;
 }
 
 static bool

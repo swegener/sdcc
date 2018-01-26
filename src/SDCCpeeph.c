@@ -1612,7 +1612,7 @@ newPeepRule (lineNode * match,
   else
     pr->cond = NULL;
 
-  pr->vars = newHashTable (100);
+  pr->vars = newHashTable (16);
 
   /* if root is empty */
   if (!rootRules)

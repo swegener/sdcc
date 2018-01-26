@@ -1,5 +1,10 @@
 2017-01-26 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCpeeph.c:
+	  Reduce memory usage in the peephole optimizer.
+	  
+2017-01-26 Philipp Klaus Krause <krasueph@informatik.uni-freiburg.de>
+
 	* device/include/stdlib.h,
 	  device/lib/incl.mk,
 	  device/lib/qsort.c,

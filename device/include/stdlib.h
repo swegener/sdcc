@@ -52,22 +52,27 @@
 
 #define MB_CUR_MAX 4
 
+/* Numeric conversion functions (ISO C11 7.22.1) */
 extern float atof (const char *nptr);
 extern int atoi (const char *nptr);
 extern long int atol (const char *nptr);
 #ifdef __SDCC_LONGLONG
 extern long long int atoll (const char *nptr);
 #endif
+extern long int strtol(const char *nptr, char **endptr, int base);
+extern unsigned long int strtoul(const char *nptr, char **endptr, int base);
 
+/* SDCC extensions */
 extern void _uitoa(unsigned int, char*, unsigned char);
 extern void _itoa(int, char*, unsigned char);
-
 extern void _ultoa(unsigned long, char*, unsigned char);
 extern void _ltoa(long, char*, unsigned char);
 
+/* Pseudo-random sequence generation functions (ISO C11 7.22.2) */
 int rand(void);
 void srand(unsigned int seed);
 
+/* Memory management functions (ISO C11 7.22.3) */
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
 void __xdata *calloc (size_t nmemb, size_t size);
 void __xdata *malloc (size_t size);
@@ -77,7 +82,6 @@ void *calloc (size_t nmemb, size_t size);
 void *malloc (size_t size);
 void *realloc (void *ptr, size_t size);
 #endif
-
 #if __STDC_VERSION__ >= 201112L
 inline void *aligned_alloc(size_t alignment, size_t size)
 {
@@ -85,11 +89,12 @@ inline void *aligned_alloc(size_t alignment, size_t size)
   return malloc(size);
 }
 #endif
-
 extern void free (void * ptr);
 
+/* Searching and sorting utilities (ISO C11 7.22.5) */
 extern void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant);
 
+/* Integer arithmetic functions (ISO C11 7.22.6) */
 #if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90)
 int abs(int j) __preserves_regs(b, c, iyl, iyh);
 #else
@@ -97,7 +102,7 @@ int abs(int j);
 #endif
 long int labs(long int j);
 
-/* C99 Multibyte/wide character conversion functions (ISO C 11 7.22.7) */
+/* C99 Multibyte/wide character conversion functions (ISO C11 7.22.7) */
 #if __STDC_VERSION__ >= 199901L
 int mblen(const char *s, size_t n);
 int mbtowc(wchar_t *restrict pwc, const char *restrict s, size_t n);

@@ -1,9 +1,18 @@
+2017-01-31 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
+
+	* device/lib/strtol.c,
+	  device/lib/strtoul.c,
+	  support/regression/tests/strto.c,
+	  device/include/stdlib.h,
+	  device/lib/incl.mk:
+	  Implement strtoul(), strtol() RFE #555.
+
 2017-01-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c:
 	  Reduce memory usage in the peephole optimizer.
 	  
-2017-01-26 Philipp Klaus Krause <krasueph@informatik.uni-freiburg.de>
+2017-01-26 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
 
 	* device/include/stdlib.h,
 	  device/lib/incl.mk,

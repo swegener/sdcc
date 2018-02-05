@@ -336,7 +336,8 @@ MAINTAINERCLEANFILES = $(DOCFILES)
 
 # We want install to imply install-info as per GNU standards, despite the
 # cygnus option.
-install: install-info
+# Do not install info documentation when installing SDCC
+#install: install-info
 
 MAINTAINERCLEANFILES += bfd.info
 

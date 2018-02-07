@@ -36243,10 +36243,9 @@ huge
 never
 \emph default
  be combined together or the results would be unpredictable.
- The library routines supplied with the compiler are compiled as small,
- medium and large.
+ The library routines supplied with the compiler are compiled for all models.
  The compiled library modules are contained in separate directories as small,
- medium and large so that you can link to the appropriate set.
+ medium, large and huge so that you can link to the appropriate set.
 \end_layout
 
 \begin_layout Standard

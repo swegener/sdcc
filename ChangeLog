@@ -1,3 +1,8 @@
+2017-02-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update for default build of lib for huge mcs51 memory model.
+
 2017-02-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

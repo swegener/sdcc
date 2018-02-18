@@ -5562,7 +5562,9 @@ genPlus (iCode * ic)
       // Conditional 8-bit inc.
       else if (i == size - 1 && started && aopIsLitVal (rightop, i, 1, 0) &&
         !aopInReg (leftop, i, A_IDX) && // adc a, #0 is cheaper than conditional inc.
-        (leftop->type == AOP_REG && AOP (IC_RESULT (ic))->type == AOP_REG && leftop->aopu.aop_reg[i]->rIdx == AOP (IC_RESULT (ic))->aopu.aop_reg[i]->rIdx &&
+        (i < leftop->size &&
+        leftop->type == AOP_REG && AOP (IC_RESULT (ic))->type == AOP_REG &&
+        leftop->aopu.aop_reg[i]->rIdx == AOP (IC_RESULT (ic))->aopu.aop_reg[i]->rIdx &&
         leftop->aopu.aop_reg[i]->rIdx != IYL_IDX && leftop->aopu.aop_reg[i]->rIdx != IYH_IDX ||
         leftop->type == AOP_STK && leftop == AOP (IC_RESULT (ic)) ||
         leftop->type == AOP_PAIRPTR && leftop->aopu.aop_pairId == PAIR_HL))

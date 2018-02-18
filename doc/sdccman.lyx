@@ -6610,6 +6610,10 @@ Type
 \series default
 ".
  This configures the package for compilation on your system.
+ When the treedec library is available, it should be found and used automaticall
+y (improving the compilation time / code quality trade-off).
+ As of SDCC 3.7.0, the current develop branch from https://github.com/freetdi/tdlib
+ is a suitable version of treedec.
 \end_layout
 
 \begin_layout Enumerate

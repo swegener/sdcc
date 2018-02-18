@@ -1,3 +1,11 @@
+2016-02-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2715.c:
+	  Fix bug #2715.
+	* doc/sdccman.lyx:
+	  Document treedec location.
+
 2016-02-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* .version,

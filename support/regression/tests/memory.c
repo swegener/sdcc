@@ -79,3 +79,23 @@ void testmemory(void)
   ASSERT(strlen("") == 0);
 }
 
+#if defined(__SDCC_stm8) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka)
+unsigned char largedest[1050];
+unsigned char largesource[1050];
+
+void testLarge(void)
+{
+  memset(largedest, 0, 1050);
+  memset(largedest, 1, 4);
+  memset(largesource, 2, 1050);
+
+  memcpy(largedest + 1, largesource, 1024);
+
+  ASSERT(largedest[0] == 1);
+  ASSERT(largedest[1] == 2);
+  ASSERT(largedest[1024] == 2);
+  ASSERT(largedest[1025] == 0);
+}
+
+#endif
+

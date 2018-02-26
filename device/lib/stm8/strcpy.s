@@ -39,18 +39,14 @@ loop:
 	ld	a, (x)
 	ld	(y), a
 	jreq	end
-	incw	x
-	incw	y
-	ld	a, (x)
-	ld	(y), a
+	ld	a, (1, x)
+	ld	(1, y), a
 	jreq	end
-	incw	x
-	incw	y
-	ld	a, (x)
-	ld	(y), a
+	ld	a, (2, x)
+	ld	(2, y), a
 	jreq	end
-	incw	x
-	incw	y
+	addw	x, #3
+	addw	y, #3
 	jra	loop
 
 end:

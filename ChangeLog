@@ -3,6 +3,11 @@
 	* .version,
 	  src/stm8/peeph.def:
 	  Implement RFE #557.
+	* device/lib/stm8/strcmp.s,
+	  device/lib/stm8/strcpy.s:
+	  Faster string functions from patch #281 by Benedikt Freisen.
+	* support/regression/tests/memory.c:
+	  Test mmeory functions on larger arrays.
 
 2016-02-18 Philipp Klaus Krause <pkk AT spth.de>
 

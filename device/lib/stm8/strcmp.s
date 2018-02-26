@@ -32,28 +32,36 @@
 
 _strcmp:
 
-	ldw	x, (3, sp)
-	ldw	y, (5, sp)
+	ldw	y, (3, sp)
+	ldw	x, (5, sp)
 
 loop:
-	ld	a, (x)
+	ld	a, (y)
 	jreq	null
-	cp	a, (y)
+	cp	a, (x)
 	jrne	diff
-	incw	x
-	incw	y
 
-	ld	a, (x)
-	jreq	null
-	cp	a, (y)
+	ld	a, (1, y)
+	jreq	null_1
+	cp	a, (1, x)
 	jrne	diff
-	incw	x
-	incw	y
+
+	ld	a, (2, y)
+	jreq	null_2
+	cp	a, (2, x)
+	jrne	diff
+
+	addw	y, #3
+	addw	x, #3
 
 	jra	loop
 
+null_2:
+	incw	x
+null_1:
+	incw	x
 null:
-	tnz	(y)
+	tnz	(x)
 	jrne	less
 	clrw	x
 	ret

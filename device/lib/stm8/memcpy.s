@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  memcpy.s
 ;
-;  Copyright (C) 2016, Philipp Klaus Krause
+;  Copyright (C) 2018, Benedikt Freisen
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -26,99 +26,62 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-; This is a partially unrolled version of memcpy(), to reduce the count overhead.
+; This memcpy() implementation has been optimized for speed using 4x loop
+; unrolling and index relative addressing.
+
+; void *memcpy(void *dest, const void *src, size_t n);
 
 	.globl _memcpy
 
 	.area CODE
 
 _memcpy:
-
-	ldw	x, (7, sp)
-	jreq	end
 	ldw	y, (3, sp)
-
-	ld	a, xl
-	addw	x, #0x0807
-	srlw	x
-	srlw	x
-	srlw	x
-	exg	a, xl
-	tnz	a
-	exg	a, xl
-	jrne	xl_nonzero
-	subw	x, #0x0100
-xl_nonzero:
-	ldw	(7, sp), x
-
 	ldw	x, (5, sp)
-	and	a, #7
-	jreq loop_8
 
-	srl	a
-	jrnc	jxx0
-jxx1:
-	srl	a
-	jrc	jx11
-jx01:
-	jreq	loop_1
-	jra	loop_5
-jx11:
-	jreq	loop_3
-	jra	loop_7
-jxx0:
-	srl	a
-	jrnc	loop_4
-jx10:
-	jreq	loop_2
-	jra	loop_6
+	srl	(7, sp)
+	rrc	(8, sp)
+	jrnc	n_x0
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+n_x0:
+	srl	(7, sp)
+	rrc	(8, sp)
+	jrnc	n_00
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+	ld	a, (x)
+	ld	(y), a
+	incw	x
+	incw	y
+n_00:
+	tnz	(8, sp)
+	jrne	loop_ent
+	dec	(7, sp)
+	jrmi	end
+	jra	loop_ent
 
 loop:
-	incw	x
-	incw	y
-loop_8:
+	addw	x, #4
+	addw	y, #4
+loop_ent:
 	ld	a, (x)
 	ld	(y), a
-	incw	x
-	incw	y
-loop_7:
-	ld	a, (x)
-	ld	(y), a
-	incw	x
-	incw	y
-loop_6:
-	ld	a, (x)
-	ld	(y), a
-	incw	x
-	incw	y
-loop_5:
-	ld	a, (x)
-	ld	(y), a
-	incw	x
-	incw	y
-loop_4:
-	ld	a, (x)
-	ld	(y), a
-	incw	x
-	incw	y
-loop_3:
-	ld	a, (x)
-	ld	(y), a
-	incw	x
-	incw	y
-loop_2:
-	ld	a, (x)
-	ld	(y), a
-	incw	x
-	incw	y
-loop_1:
-	ld	a, (x)
-	ld	(y), a
+	ld	a, (1, x)
+	ld	(1, y), a
+	ld	a, (2, x)
+	ld	(2, y), a
+	ld	a, (3, x)
+	ld	(3, y), a
 
 	dec	(8, sp)
 	jrne	loop
 	dec	(7, sp)
-	jrne	loop
+	jrpl	loop
 
 end:
 	ldw	x, (3, sp)

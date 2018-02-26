@@ -7,7 +7,9 @@
 	  device/lib/stm8/strcpy.s:
 	  Faster string functions from patch #281 by Benedikt Freisen.
 	* support/regression/tests/memory.c:
-	  Test mmeory functions on larger arrays.
+	  Test memory functions on larger arrays.
+	* device/lib/stm8/memcpy.s:
+	  Faster string function based on patch #281 by Benedikt Freisen.
 
 2016-02-18 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -930,6 +930,13 @@ replace restart {
 	; peephole j29 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelInRange(%6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
+replace restart {
+	call	%5
+} by {
+	callr	%5
+	; peephole j30 changed absolute to relative call.
+} if labelInRange(%5)
+
 // Should be one of the last ones. Opens the code to further peephole optimization.
 replace restart {
 %1:

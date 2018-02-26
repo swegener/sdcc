@@ -1,3 +1,9 @@
+2016-02-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* .version,
+	  src/stm8/peeph.def:
+	  Implement RFE #557.
+
 2016-02-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

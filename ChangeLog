@@ -7,6 +7,8 @@
 	* src/stm8/main.c,
 	  src/stm8/gen.c:
 	  Code generation for large memory model for stm8 (RFE #556).
+	* support/regression/tests/memory.c:
+	  Enable test for host.
 
 2016-02-26 Philipp Klaus Krause <pkk AT spth.de>
 

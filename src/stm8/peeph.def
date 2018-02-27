@@ -1021,6 +1021,14 @@ replace restart {
 }
 
 replace restart {
+	callf	%1
+	retf
+} by {
+	jpf	%1
+	; peephole j31a replaced call at end of function by jump (tail call optimization).
+}
+
+replace restart {
 	ld	xl, a
 	ld	a, xh
 } by {

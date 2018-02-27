@@ -368,6 +368,13 @@ cost(unsigned int bytes, unsigned int cycles)
   regalloc_dry_run_cost_cycles += cycles;
 }
 
+void emitJP(const symbol *target, float probability)
+{
+  if (!regalloc_dry_run)
+     emit2 (options.model == MODEL_LARGE ? "jpf" : "jp", "%05d$", labelKey2num (target->key));
+  cost (3 + (options.model == MODEL_LARGE), (1 + (options.model == MODEL_LARGE)) * probability);
+}
+
 static const char *
 aopGet(const asmop *aop, int offset)
 {
@@ -3353,11 +3360,7 @@ jumpret:
   /* generate a jump to the return label
      if the next is not the return statement */
   if (!(ic->next && ic->next->op == LABEL && IC_LABEL (ic->next) == returnLabel))
-    {
-      if (!regalloc_dry_run)
-        emit2 ("jp", "%05d$", labelKey2num (returnLabel->key));
-      cost (3, 1);
-    }
+    emitJP(returnLabel, 1.0f);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3386,8 +3389,7 @@ genGoto (const iCode *ic)
 {
   D (emit2 ("; genGoto", ""));
 
-  emit2 ("jp", "%05d$", labelKey2num (IC_LABEL (ic)->key));
-  cost (3, 1);
+  emitJP(IC_LABEL (ic), 1.0f);
 }
 
 /*-----------------------------------------------------------------*/
@@ -4556,9 +4558,7 @@ _genCmp_1:
           }
       cost (2, 0);
       cheapMove (result->aop, 0, ASMOP_ZERO, 0, !regDead (A_IDX, ic));
-      if (tlbl2)
-        emit2 ("jp", "%05d$", labelKey2num (tlbl2->key));
-      cost (3, 1);
+      emitJP (tlbl2, 1.0f);
       emitLabel (tlbl1);
       cheapMove (result->aop, 0, ASMOP_ONE, 0, !regDead (A_IDX, ic));
       emitLabel (tlbl2);
@@ -4580,9 +4580,7 @@ _genCmp_1:
             break;
           }
       cost (2, 0);
-      if (!regalloc_dry_run)
-        emit2 ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
-      cost (3, 1);
+      emitJP (IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx), 1.0f);
       emitLabel (tlbl);
       if (!regalloc_dry_run)
         ifx->generated = 1;
@@ -4751,9 +4749,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
   if (!ifx)
     {
       cheapMove (result->aop, 0, opcode == EQ_OP ? ASMOP_ONE : ASMOP_ZERO, 0, !regDead (A_IDX, ic));
-      if (tlbl)
-        emit2 ("jp", "%05d$", labelKey2num (tlbl->key));
-      cost (3, 0);
+      emitJP(tlbl, 0.0f);
       if (pop_a)
         {
           emitLabel (tlbl_NE_pop);
@@ -4765,8 +4761,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
     }
   else if (IC_TRUE (ifx) && opcode == EQ_OP || IC_FALSE (ifx) && opcode == NE_OP)
     {
-      emit2 ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
-      cost (3, 0);
+      emitJP(IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx), 0.0f);
       if (pop_a)
         {
           emitLabel (tlbl_NE_pop);
@@ -4778,17 +4773,14 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
     }
   else
     {
-      if (tlbl)
-        emit2 ("jp", "%05d$", labelKey2num (tlbl->key));
-      cost (3, 0);
+      emitJP(tlbl, 0.0f);
       if (pop_a)
         {
           emitLabel (tlbl_NE_pop);
           pop (ASMOP_A, 0, 1);
         }
       emitLabel (tlbl_NE);
-      emit2 ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
-      cost (3, 0);
+      emitJP(IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx), 0.0f);
       emitLabel (tlbl);
       if (!regalloc_dry_run)
         ifx->generated = 1;
@@ -5206,7 +5198,7 @@ genAnd (const iCode *ic, iCode *ifx)
           if (tlbl)
             {
               emit2 (IC_TRUE (ifx) ? "btjf" : "btjt", "%s, #%d, !tlabel", aopGet (left->aop, i), isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)) - i * 8, labelKey2num (tlbl->key));
-              emit2 ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
+              emit2 (options.model == MODEL_LARGE ? "jpf" : "jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
               emitLabel (tlbl);
             }
           cost (8, 4); // Hmm. Cost 2 or 3 for btjf?
@@ -5284,9 +5276,7 @@ genAnd (const iCode *ic, iCode *ifx)
             emit2 (IC_TRUE (ifx) ? "jreq" : "jrne", "!tlabel", labelKey2num (tlbl->key));
           cost (2, 2); // Hmm. Cycle cost overestimate.
         }
-      if (!regalloc_dry_run)
-        emit2 ("jp", "!tlabel", labelKey2num ((IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx))->key));
-      cost (3, 1); // Hmm. Cycle cost overestimate.
+      emitJP(IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx), 1.0f); // Hmm. Cycle cost overestimate.
       emitLabel (tlbl);
       goto release;
     }
@@ -6921,14 +6911,12 @@ genIfx (const iCode *ic)
   if (inv)
     {
       emitLabel (tlbl);
-      emit2 ("jp", "!tlabel", labelKey2num ((IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key));
-      cost (3, 0);
+      emitJP(IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic), 0.0f);
       emitLabel (tlbl2);
     }
   else
     {
-      emit2 ("jp", "!tlabel", labelKey2num ((IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key));
-      cost (3, 0);
+      emitJP(IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic), 0.0f);
       emitLabel (tlbl);
     }
 

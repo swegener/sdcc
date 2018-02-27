@@ -6,7 +6,7 @@
 	  Improve handling of 24-bit jumps in peephole optimizer.
 	* src/stm8/main.c,
 	  src/stm8/gen.c:
-	  Basics of a large memory model for stm8.
+	  Code generation for large memory model for stm8 (RFE #556).
 
 2016-02-26 Philipp Klaus Krause <pkk AT spth.de>
 

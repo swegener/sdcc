@@ -1,14 +1,16 @@
 2016-02-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/stm8.src/inst.cc:
-	  Fix handling of 16-bit and 17-bit jumps in simulator.
+	  Fix handling of 16-bit and 17-bit jumps in simulator (RFE #556).
 	* src/stm8/peep.c:
-	  Improve handling of 24-bit jumps in peephole optimizer.
+	  Improve handling of 24-bit jumps in peephole optimizer (RFE #556).
 	* src/stm8/main.c,
 	  src/stm8/gen.c:
 	  Code generation for large memory model for stm8 (RFE #556).
 	* support/regression/tests/memory.c:
 	  Enable test for host.
+	* src/stm8/peeph.def:
+	  New peephole rules for large memory model (RFE #556).
 
 2016-02-26 Philipp Klaus Krause <pkk AT spth.de>
 

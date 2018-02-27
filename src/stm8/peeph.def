@@ -630,11 +630,26 @@ replace restart {
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
+	jpf	%5
+} by {
+	jpf	%6
+	; peephole j1a jumped to %6 directly instead of via %5.
+} if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
+
+replace restart {
 	jp	%1
 %1:
 } by {
 %1:
-	; peephole j1a removed redundant jump.
+	; peephole j1b removed redundant jump.
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jpf	%1
+%1:
+} by {
+%1:
+	; peephole j1c removed redundant jump.
 } if labelRefCountChange(%1 -1)
 
 replace restart {
@@ -644,7 +659,17 @@ replace restart {
 } by {
 %2:
 %1:
-	; peephole j1b removed redundant jump.
+	; peephole j1d removed redundant jump.
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jpf	%1
+%2:
+%1:
+} by {
+%2:
+%1:
+	; peephole j1e removed redundant jump.
 } if labelRefCountChange(%1 -1)
 
 replace restart {
@@ -652,7 +677,7 @@ replace restart {
 %1:
 } by {
 %1:
-	; peephole j1c removed redundant jump.
+	; peephole j1f removed redundant jump.
 } if labelRefCountChange(%1 -1)
 
 replace restart {
@@ -698,6 +723,13 @@ replace restart {
 } if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
 replace restart {
+	jpf	%5
+} by {
+	retf
+	; peephole j2f replaced jump by return.
+} if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
+
+replace restart {
 	ld	a, %1
 	srl	a
 	btjt	%1, #0, %2
@@ -724,6 +756,13 @@ replace restart {
 } by {
 	jra	%5
 	; peephole j5 changed absolute to relative unconditional jump.
+} if labelInRange(%5)
+
+replace restart {
+	jpf	%5
+} by {
+	jra	%5
+	; peephole j5a changed absolute to relative unconditional jump.
 } if labelInRange(%5)
 
 replace restart {

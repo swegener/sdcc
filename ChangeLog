@@ -4,6 +4,9 @@
 	  Fix handling of 16-bit and 17-bit jumps in simulator.
 	* src/stm8/peep.c:
 	  Improve handling of 24-bit jumps in peephole optimizer.
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Basics of a large memory model for stm8.
 
 2016-02-26 Philipp Klaus Krause <pkk AT spth.de>
 

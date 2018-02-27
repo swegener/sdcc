@@ -2871,6 +2871,8 @@ emitCall (const iCode *ic, bool ispcall)
 
       aopOp (left, ic);
 
+      wassertl (options.model == MODEL_MEDIUM, "Function pointers are not yet implemented for the large model");
+
       if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
         {
           emit2 ("call", "%s", aopGet2 (left->aop, 0));
@@ -2892,17 +2894,35 @@ emitCall (const iCode *ic, bool ispcall)
     }
   else
     {
-      if (IS_LITERAL (etype))
+      if (options.model == MODEL_LARGE)
         {
-          emit2 ("call", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
-          cost (3, 4);
+          if (IS_LITERAL (etype))
+            {
+              emit2 ("callf", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+              cost (4, 5);
+            }
+          else
+            {
+              bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
+              emit2 (jump ? "jpf" : "callf", "%s",
+                (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
+              cost (4, jump ? 2 : 5);
+            }
         }
       else
         {
-          bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
-          emit2 (jump ? "jp" : "call", "%s",
-            (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
-          cost (3, jump ? 1 : 4);
+          if (IS_LITERAL (etype))
+            {
+              emit2 ("call", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+              cost (3, 4);
+            }
+          else
+            {
+              bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
+              emit2 (jump ? "jp" : "call", "%s",
+                (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
+              cost (3, jump ? 1 : 4);
+            }
         }
     }
 
@@ -3141,6 +3161,7 @@ genFunction (iCode *ic)
 
   bigreturn = (getSize (ftype->next) > 4);
   G.stack.param_offset += bigreturn * 2;
+  G.stack.param_offset += (options.model == MODEL_LARGE);
 
   if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, &stm8_regs[SP_IDX], 1);
@@ -3195,8 +3216,16 @@ genEndFunction (iCode *ic)
       if (options.debug && currFunc && !regalloc_dry_run)
         debugFile->writeEndFunction (currFunc, ic, 1);
 
-      emit2 ("ret", "");
-      cost (1, 4);
+      if (options.model == MODEL_LARGE)
+        {
+          emit2 ("retf", "");
+          cost (1, 5);
+        }
+      else
+        {
+          emit2 ("ret", "");
+          cost (1, 4);
+        }
     }
 }
 

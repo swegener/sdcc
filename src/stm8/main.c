@@ -260,10 +260,10 @@ stm8_genIVT(struct dbuf_s * oBuf, symbol ** intTable, int intCount)
     }
 
   if (interrupts[INTNO_TRAP] || intCount)
-    dbuf_printf (oBuf, "\tint %s ; trap\n", interrupts[INTNO_TRAP] ? interrupts[INTNO_TRAP]->rname : "0x0000");
+    dbuf_printf (oBuf, "\tint %s ; trap\n", interrupts[INTNO_TRAP] ? interrupts[INTNO_TRAP]->rname : "0x000000");
     
   for (i = 0; i < intCount; i++)
-    dbuf_printf (oBuf, "\tint %s ; int%d\n", interrupts[i] ? interrupts[i]->rname : "0x0000", i);
+    dbuf_printf (oBuf, "\tint %s ; int%d\n", interrupts[i] ? interrupts[i]->rname : "0x000000", i);
 
   return TRUE;
 }
@@ -362,9 +362,9 @@ PORT stm8_port =
   {
     glue,
     TRUE,                       /* We want stm8_genIVT to be triggered */
-    NO_MODEL,
-    NO_MODEL,
-    NULL,                       /* model == target */
+    MODEL_MEDIUM | MODEL_LARGE,
+    MODEL_MEDIUM,
+    NULL,                       /* model == target. Change this when the large model gets its own library */
   },
   {                             /* Assembler */
     stm8AsmCmd,

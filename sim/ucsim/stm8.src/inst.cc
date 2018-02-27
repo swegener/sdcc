@@ -433,7 +433,7 @@ cl_stm8::inst_btjfbtjt(t_mem code, unsigned char prefix)
 int
 cl_stm8::inst_call(t_mem code, unsigned char prefix)
 {
-  int newPC = fetchea(code, prefix);
+  t_addr newPC = (PC & 0xff0000ul) + fetchea(code, prefix);
   push2(PC);
   PC = newPC;
 
@@ -726,7 +726,7 @@ cl_stm8::inst_inc(t_mem code, unsigned char prefix)
 int
 cl_stm8::inst_jp(t_mem code, unsigned char prefix)
 {
-  int newPC = fetchea(code, prefix);
+  t_addr newPC = (PC & 0xff0000ul) + fetchea(code, prefix);
   PC = newPC;
   return(resGO);
 }

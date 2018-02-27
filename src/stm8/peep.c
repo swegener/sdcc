@@ -689,7 +689,7 @@ stm8MightRead(const lineNode *pl, const char *what)
         }
     }
 
-  if(ISINST(pl->line, "ret"))
+  if(ISINST(pl->line, "ret") || ISINST(pl->line, "retf"))
     return(isReturned(what));
 
   return FALSE;
@@ -698,7 +698,7 @@ stm8MightRead(const lineNode *pl, const char *what)
 static bool
 stm8UncondJump(const lineNode *pl)
 {
-  return (ISINST(pl->line, "jp\t") || ISINST(pl->line, "jra\t") || ISINST(pl->line, "jpf\t"));
+  return (ISINST(pl->line, "jp\t") || ISINST(pl->line, "jra\t") || ISINST(pl->line, "jrt\t") || ISINST(pl->line, "jpf\t"));
 }
 
 static bool
@@ -841,7 +841,7 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
 static bool
 stm8SurelyReturns(const lineNode *pl)
 {
-  return(ISINST(pl->line, "ret"));
+  return(ISINST(pl->line, "ret") || ISINST(pl->line, "retf"));
 }
 
 /*-----------------------------------------------------------------*/

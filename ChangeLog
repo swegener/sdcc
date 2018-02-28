@@ -1,8 +1,14 @@
 2016-02-28 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Implement calls through functions pointers via retpoline for stm8 large memory model (RFE #556).
+
+2016-02-28 Philipp Klaus Krause <pkk AT spth.de>
+
 	* doc/sdccman.lyx:
 	  Document stm8 memory models (RFE #556).
-	* src/stm8/gen.c:
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
 	  Do not generate jump tables for stm8 large memory model (RFE #556).
 
 2016-02-27 Philipp Klaus Krause <pkk AT spth.de>

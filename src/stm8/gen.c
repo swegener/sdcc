@@ -2878,24 +2878,56 @@ emitCall (const iCode *ic, bool ispcall)
 
       aopOp (left, ic);
 
-      wassertl (options.model == MODEL_MEDIUM, "Function pointers are not yet implemented for the large model");
+      if (options.model == MODEL_LARGE)
+        {
+          wassertl (left->aop->size == 3, "Functions pointers should be 24 bits in large memory model.");
 
-      if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
-        {
-          emit2 ("call", "%s", aopGet2 (left->aop, 0));
-          cost (3, 4);
-        }
-      else if (aopInReg (left->aop, 0, Y_IDX)) // Faster than going through x.
-        {
-          emit2 ("call", "(y)");
-          cost (2, 4);
+          symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+
+          if (!regalloc_dry_run)
+            emit2("ld", "a, #(!tlabel >> 16)", labelKey2num (tlbl->key));
+          push (ASMOP_A, 0, 1);
+          if (!regalloc_dry_run)
+            emit2("ld", "a, #(!tlabel >> 8)", labelKey2num (tlbl->key));
+          push (ASMOP_A, 0, 1);
+          if (!regalloc_dry_run)
+            emit2("ld", "a, #(!tlabel)", labelKey2num (tlbl->key));
+          push (ASMOP_A, 0, 1);
+
+          cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
+          push (ASMOP_A, 0, 1);
+          cheapMove (ASMOP_A, 0, left->aop, 1, FALSE);
+          push (ASMOP_A, 0, 1);
+          cheapMove (ASMOP_A, 0, left->aop, 2, FALSE);
+          push (ASMOP_A, 0, 1);
+          emit2("retf", "");
+          cost (1, 5);
+
+          G.stack.pushed -= 6;
+
+          emitLabel (tlbl);
         }
       else
         {
-          genMove (ASMOP_X, left->aop, TRUE, TRUE, TRUE);
+          wassertl (left->aop->size == 2, "Functions pointers should be 16 bits in medium memory model.");
+
+          if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
+            {
+              emit2 ("call", "%s", aopGet2 (left->aop, 0));
+              cost (3, 4);
+            }
+          else if (aopInReg (left->aop, 0, Y_IDX)) // Faster than going through x.
+            {
+              emit2 ("call", "(y)");
+              cost (2, 4);
+            }
+          else
+            {
+              genMove (ASMOP_X, left->aop, TRUE, TRUE, TRUE);
           
-          emit2 ("call", "(x)");
-          cost (1, 4);
+              emit2 ("call", "(x)");
+              cost (1, 4);
+            }
         }
       freeAsmop (left);
     }

@@ -183,6 +183,9 @@ stm8_finaliseOptions (void)
 {
   port->mem.default_local_map = data;
   port->mem.default_globl_map = data;
+
+  if (options.model == MODEL_LARGE)
+    port->jumptableCost.maxCount = 0;
 }
 
 static void

@@ -7023,6 +7023,8 @@ genJumpTab (const iCode *ic)
 
   D (emit2 ("; genJumpTab", ""));
 
+  wassertl (options.model != MODEL_LARGE, "Jump tables not implemented for large memory model.");
+
   cond = IC_JTCOND (ic);
 
   aopOp (cond, ic);

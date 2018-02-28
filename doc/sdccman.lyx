@@ -36634,6 +36634,67 @@ status collapsed
  However, currently the linker can not handle code segments > 64k.
 \end_layout
 
+\begin_layout Subsection
+STM8 Memory Models
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Memory model
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+STM8 memory models
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+SDCC implements two memory models for the STM8: 
+\emph on
+medium
+\emph default
+ (default) and 
+\emph on
+large
+\emph default
+.
+ Modules compiled with different memory models should 
+\emph on
+never
+\emph default
+ be combined together.
+ The library routines supplied with the compiler are compiled for the medium
+ memory model.
+\end_layout
+
+\begin_layout Standard
+In the medium model the address space is 16 bits for both objects and functions,
+ allowing for a memory space of 64 KB.
+ Since the STM8 typically has Flash starting at 0x8000, this means that
+ only up to 32 KB of Flash can be used (most STM8 devices don't have more
+ than 32 KB of Flash).
+\end_layout
+
+\begin_layout Standard
+In the large memory model, the address space is 16 bits for objects and
+ 24 bits for functions.
+ Since the STM8 typically has flash starting at 0x8000, this means that
+ up to 32 KB of flash can be used for constant data, while the whole Flash
+ can be used for functions.
+ Code generated for the large model is slightly bigger and slower and needs
+ slightly more stack space than code generated for the medium model.
+\end_layout
+
 \begin_layout Section
 Pragmas
 \begin_inset CommandInset label

@@ -1,4 +1,4 @@
-2018-01-03 Maarten Brock <sourceforge.brock AT dse.nl>
+2018-03-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/stm8/gen.c (emitCall): fix callf with literal
 	* support/regression/tests/bug-1981238.c: added tests,

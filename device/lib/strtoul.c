@@ -13,7 +13,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License 
+   You should have received a copy of the GNU General Public License
    along with this library; see the file COPYING. If not, write to the
    Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
@@ -73,7 +73,7 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
     }
 
   // base not specified.
-  if (!base) 
+  if (!base)
     {
       if (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2))
         {
@@ -97,7 +97,7 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
   if (_isdigit (*ptr, base) < 0)
     {
       if (endptr)
-        *endptr = nptr;
+        *endptr = (char*)nptr;
       return (0);
     }
 
@@ -118,7 +118,7 @@ unsigned long int strtoul(const char *nptr, char **endptr, int base)
     }
 
   if (endptr)
-    *endptr = ptr;
+    *endptr = (char*)ptr;
 
   if (range_error)
     {

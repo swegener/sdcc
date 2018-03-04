@@ -5,6 +5,7 @@
 	  changed pad.b to 5 bits so the total is <= 8
 	* support/regression/tests/memory.c: enabled test for ds390, mcs51-large
 	  and mcs51-huge
+	* device/lib/strtoul.c: fix warnings
 
 2018-03-04 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -119,7 +119,9 @@ $(top_builddir)/libcmd.a: $(OBJECTS) $(LOCAL_OBJECTS)
 cmdpars.hh: cmdpars.cc
 
 cmdpars.cc: cmdpars.y
-	$(YACC) -d -o $@ $<
+	$(YACC) -d $<
+	mv y.tab.c $*.cc
+	mv y.tab.h $*.hh
 
 .l.cc:
 	rm -f $@

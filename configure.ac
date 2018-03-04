@@ -1003,6 +1003,7 @@ sdcc ${VERSION} is now configured for
   Build:                ${build}
   Host:                 ${host}
   Source directory:     ${srcdir}
+  Yacc:                 ${YACC}
   C compiler:           ${CC}
   CFLAGS:               ${CFLAGS}
   C++ compiler:         ${CXX}

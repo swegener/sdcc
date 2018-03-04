@@ -1,14 +1,19 @@
-2016-03-04 Philipp Klaus Krause <pkk AT spth.de>
+2018-03-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/stm8.src/stm8.cc:
 	  Fix bug #2694.
+	* configure.ac,
+	  configure,
+	  src/Makefile.in,
+	  sim/ucsim/cmd.src/Makefile.in:
+	  Fix bug #2724.
 
-2016-02-28 Philipp Klaus Krause <pkk AT spth.de>
+2018-02-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
 	  Implement calls through functions pointers via retpoline for stm8 large memory model (RFE #556).
 
-2016-02-28 Philipp Klaus Krause <pkk AT spth.de>
+2018-02-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:
 	  Document stm8 memory models (RFE #556).
@@ -16,7 +21,7 @@
 	  src/stm8/gen.c:
 	  Do not generate jump tables for stm8 large memory model (RFE #556).
 
-2016-02-27 Philipp Klaus Krause <pkk AT spth.de>
+2018-02-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/stm8.src/inst.cc:
 	  Fix handling of 16-bit and 17-bit jumps in simulator (RFE #556).
@@ -30,7 +35,7 @@
 	* src/stm8/peeph.def:
 	  New peephole rules for large memory model (RFE #556).
 
-2016-02-26 Philipp Klaus Krause <pkk AT spth.de>
+2018-02-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* .version,
 	  src/stm8/peeph.def:
@@ -43,7 +48,7 @@
 	* device/lib/stm8/memcpy.s:
 	  Faster string function based on patch #281 by Benedikt Freisen.
 
-2016-02-18 Philipp Klaus Krause <pkk AT spth.de>
+2018-02-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2715.c:
@@ -51,30 +56,30 @@
 	* doc/sdccman.lyx:
 	  Document treedec location.
 
-2016-02-07 Philipp Klaus Krause <pkk AT spth.de>
+2018-02-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* .version,
 	  doc/INSTALL.txt,
 	  sdcc.spec:
 	  Version 3.7.0
 
-2017-02-07 Philipp Klaus Krause <pkk AT spth.de>
+2018-02-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:
 	  Update for default build of lib for huge mcs51 memory model.
 
-2017-02-06 Philipp Klaus Krause <pkk AT spth.de>
+2018-02-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:
 	  Fixed a typo.
 
-2017-02-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2018-02-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/sdbinutils/bfd/doc/Makefile.am,
 	  support/sdbinutils/bfd/doc/Makefile.in:
 	  Fix bug #2711.
 
-2017-01-31 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2018-01-31 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/lib/strtol.c,
 	  device/lib/strtoul.c,
@@ -83,12 +88,12 @@
 	  device/lib/incl.mk:
 	  Implement strtoul(), strtol() RFE #555.
 
-2017-01-26 Philipp Klaus Krause <pkk AT spth.de>
+2018-01-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c:
 	  Reduce memory usage in the peephole optimizer.
 	  
-2017-01-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2018-01-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* device/include/stdlib.h,
 	  device/lib/incl.mk,
@@ -102,13 +107,13 @@
 	  src/stm8/peep.c:
 	  Code cleanup.
 
-2017-01-24 Philipp Klaus Krause <pkk AT spth.de>
+2018-01-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c,
 	  support/regression/tests/bug-2708.c:
 	  Fix bug #2708.
 
-2017-01-18 Philipp Klaus Krause <pkk AT spth.de>
+2018-01-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,
 	  src/SDCCglobl.h,
@@ -124,13 +129,13 @@
 	  support/regression/tests/*.c:
 	  Fixed many long long issues, including bugs #2658 and #2118.
 
-2017-01-07 Philipp Klaus Krause <pkk AT spth.de>
+2018-01-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCglue.c,
 	  support/regression/tests/bug-2643.c:
 	  Fix bug #2643.
 
-2017-01-05 Philipp Klaus Krause <pkk AT spth.de>
+2018-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/ds390/gen.c,
 	  src/ds390/ralloc.c,
@@ -138,13 +143,13 @@
 	  support/regression/tests/*.c:
 	  Fixes in ds390 long long support.
 
-2017-01-04 Philipp Klaus Krause <pkk AT spth.de>
+2018-01-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/ds390/ralloc.c,
 	  support/regression/tests/*.c:
 	  Fix conflict in assignment of long long return values.
 
-2017-01-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de.de>
+2018-01-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de.de>
 
 	* device/include/stdint.h,
 	  src/SDCCsymt.c,

@@ -127,19 +127,15 @@ altlex.o: altlex.c SDCCy.h reswords.h
 SDCCy.h: SDCCy.c
 
 SDCCy.c: SDCC.y
-	$(YACC) -d -v -o $@ $<
+	$(YACC) -d $<
+	mv y.tab.c $*.c
+	mv y.tab.h $*.h
 
 SDCClex.c: SDCC.lex SDCCy.h
 	$(LEX) -8 -f -t $< >$@
 
 version.h: ../ChangeLog
 	$(AWK) -f $(srcdir)/version.awk $< > $@
-
-.y.c:
-	rm -f $*.cc $*.h
-	$(YACC) -d $<
-	mv y.tab.c $*.cc
-	mv y.tab.h $*.h
 
 .l.c:
 	rm -f $*.cc

@@ -808,6 +808,9 @@ mergeSpec (sym_link * dest, sym_link * src, const char *name)
   if (IS_STRUCT (dest) && SPEC_STRUCT (dest) == NULL)
     SPEC_STRUCT (dest) = SPEC_STRUCT (src);
 
+  if (FUNC_ISISR (dest) && FUNC_ISISR (src))
+    werror (E_INT_MULTIPLE, name);
+
   /* these are the only function attributes that will be set
      in a specifier while parsing */
   FUNC_NONBANKED (dest) |= FUNC_NONBANKED (src);

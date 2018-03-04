@@ -276,10 +276,10 @@ function_attributes
                      }
    |  TRAP
                      {
-					    $$ = newLink (SPECIFIER);
+                        $$ = newLink (SPECIFIER);
                         FUNC_INTNO($$) = INTNO_TRAP;
-						FUNC_ISISR($$) = 1;
-				     }
+                        FUNC_ISISR($$) = 1;
+                     }
    |  SMALLC         {  $$ = newLink (SPECIFIER);
                         FUNC_ISSMALLC($$) = 1;
                      }
@@ -790,8 +790,10 @@ alignment_specifier
 Interrupt_storage
    : INTERRUPT { $$ = INTNO_UNSPEC; }
    | INTERRUPT constant_expr
-        { int intno = (int) ulFromVal(constExprValue($2,TRUE));
-          if ((intno >= 0) && (intno <= INTNO_MAX))
+        { 
+          value *val = constExprValue($2,TRUE);
+          int intno = (int) ulFromVal(val);
+          if (val && (intno >= 0) && (intno <= INTNO_MAX))
             $$ = intno;
           else
             {

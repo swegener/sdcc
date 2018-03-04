@@ -274,7 +274,7 @@ typedef struct sym_link
     unsigned smallc:1;              /* Parameters on stack are passed in reverse order */
     unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
     unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
-    unsigned intno;                 /* 1=Interrupt service routine          */
+    unsigned intno;                 /* Number of interrupt for interrupt service routine */
     short regbank;                  /* register bank 2b used                */
     unsigned builtin;               /* is a builtin function                */
     unsigned javaNative;            /* is a JavaNative Function (TININative ONLY) */

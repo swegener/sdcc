@@ -1801,7 +1801,7 @@ floatFromVal (value * val)
 /* ulFromVal - value to unsigned long conversion                    */
 /*------------------------------------------------------------------*/
 unsigned long
-ulFromVal (value * val)
+ulFromVal (value *val)
 {
   if (!val)
     return 0;

@@ -541,6 +541,8 @@ struct
     "qualifier or static in array declarator that is not a parameter", 0},
   { E_STATIC_ARRAY_PARAM_C99, ERROR_LEVEL_ERROR,
     "static in array parameters requires ISO C99 or later", 0},
+  { E_INT_MULTIPLE, ERROR_LEVEL_ERROR,
+    "mutiple interrupt numbers for '%s'", 0},
 };
 
 /* -------------------------------------------------------------------------------

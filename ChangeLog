@@ -7,6 +7,11 @@
 	  src/Makefile.in,
 	  sim/ucsim/cmd.src/Makefile.in:
 	  Fix bug #2724.
+	* src/SDCC.y,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCsymt.c:
+	  Fix bug #2720.
 
 2018-02-28 Philipp Klaus Krause <pkk AT spth.de>
 

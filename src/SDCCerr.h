@@ -269,6 +269,7 @@ enum {
   E_QUALIFIED_ARRAY_PARAM_C99   = 240, /* qualifiers in array parameters require ISO C99 or later */
   E_QUALIFIED_ARRAY_NOPARAM     = 241, /* qualifier or static in array declarator that is not a parameter */
   E_STATIC_ARRAY_PARAM_C99      = 242, /* static in array parameters requires ISO C99 or later */
+  E_INT_MULTIPLE                = 243, /* mutiple interrupt numbers */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

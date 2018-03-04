@@ -1798,7 +1798,7 @@ checkSClass (symbol *sym, int isProto)
   t = sym->type;
   while (t)
     {
-      if (IS_DECL (t) && DCL_PTR_RESTRICT (t) && !IS_PTR (t))
+      if (IS_DECL (t) && DCL_PTR_RESTRICT (t) && !(IS_PTR (t) && !IS_FUNCPTR(t)))
         {
           werrorfl (sym->fileDef, sym->lineDef, E_BAD_RESTRICT);
           DCL_PTR_RESTRICT (t) = 0;

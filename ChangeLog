@@ -1,5 +1,12 @@
 2018-03-04 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c:
+	  Fix bug #2714.
+
+2018-03-04 Philipp Klaus Krause <pkk AT spth.de>
+
 	* sim/ucsim/stm8.src/stm8.cc:
 	  Fix bug #2694.
 	* configure.ac,

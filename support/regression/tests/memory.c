@@ -4,6 +4,12 @@
 
 #include <string.h>
 
+#if defined(__SDCC_stm8) || defined(PORT_HOST) || defined(__SDCC_ds390) || \
+	(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_LARGE) || defined(__SDCC_MODEL_HUGE))) || \
+    defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka)
+#define TEST_LARGE
+#endif
+
 unsigned char destination[9];
 const unsigned char source[9] = {0, 1, 2, 3};
 int c;
@@ -79,14 +85,14 @@ void testmemory(void)
   ASSERT(strlen("") == 0);
 }
 
-#if defined(__SDCC_stm8) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(PORT_HOST)
+#ifdef TEST_LARGE
 unsigned char largedest[1050];
 unsigned char largesource[1050];
 #endif
 
 void testLarge(void)
 {
-#if defined(__SDCC_stm8) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(PORT_HOST)
+#ifdef TEST_LARGE
   memset(largedest, 0, 1050);
   memset(largedest, 1, 4);
   memset(largesource, 2, 1050);
@@ -99,6 +105,3 @@ void testLarge(void)
   ASSERT(largedest[1025] == 0);
 #endif
 }
-
-
-

@@ -1,3 +1,11 @@
+2018-01-03 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/stm8/gen.c (emitCall): fix callf with literal
+	* support/regression/tests/bug-1981238.c: added tests,
+	  changed pad.b to 5 bits so the total is <= 8
+	* support/regression/tests/memory.c: enabled test for ds390, mcs51-large
+	  and mcs51-huge
+
 2018-03-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCerr.c,

@@ -11,7 +11,7 @@ __code struct {
   char x:1;
   char  :0;
   char d:2;
-  char b:6;
+  char b:5;
 } pad = {1, 2, 1};
 
 __code struct {
@@ -34,6 +34,17 @@ testBitfield (void)
   ASSERT (sizeof (pad) == 2);
   ASSERT (sizeof (noPad) == 2);
   ASSERT (sizeof (initialNoPad[0]) == 1);
+  ASSERT (pad.x == 1);
+  ASSERT (pad.d == 2);
+  ASSERT (pad.b == 1);
+  ASSERT (noPad.p == 1);
+  ASSERT (noPad.q == 120);
+  ASSERT (noPad.s == 1);
+  ASSERT (noPad.t == 127);
+#if 0
+  ASSERT (initialNoPad[0].b == 2);
+  ASSERT (initialNoPad[1].b == 4);
+#endif
 #endif
 }
 

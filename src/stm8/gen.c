@@ -2937,7 +2937,7 @@ emitCall (const iCode *ic, bool ispcall)
         {
           if (IS_LITERAL (etype))
             {
-              emit2 ("callf", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+              emit2 ("callf", "0x%06X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
               cost (4, 5);
             }
           else

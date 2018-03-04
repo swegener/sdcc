@@ -1202,7 +1202,8 @@ cl_stm8::exec_inst(void)
                break;
             case 0x30: // POP longmem
                opaddr = fetch2();
-               pop1( opaddr);
+               pop1(tempi);
+               store1(opaddr, tempi);
                return(resGO);
             case 0x40: //mul
                if(cprefix==0x90) {

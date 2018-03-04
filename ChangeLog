@@ -1,3 +1,8 @@
+2016-03-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/stm8.src/stm8.cc:
+	  Fix bug #2694.
+
 2016-02-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

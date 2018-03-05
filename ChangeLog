@@ -1,3 +1,9 @@
+2018-03-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCopt.c,
+	  support/regression/tests/bug-2712.c:
+	  Fix bug #2712.
+
 2018-03-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* src/stm8/gen.c (emitCall): fix callf with literal

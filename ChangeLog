@@ -1,3 +1,8 @@
+2018-03-06 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug-1981238.c: disabled new tests that fail on
+	  host
+
 2018-03-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCopt.c,

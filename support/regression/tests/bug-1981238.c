@@ -34,6 +34,7 @@ testBitfield (void)
   ASSERT (sizeof (pad) == 2);
   ASSERT (sizeof (noPad) == 2);
   ASSERT (sizeof (initialNoPad[0]) == 1);
+#if 0
   ASSERT (pad.x == 1);
   ASSERT (pad.d == 2);
   ASSERT (pad.b == 1);
@@ -41,7 +42,6 @@ testBitfield (void)
   ASSERT (noPad.q == 120);
   ASSERT (noPad.s == 1);
   ASSERT (noPad.t == 127);
-#if 0
   ASSERT (initialNoPad[0].b == 2);
   ASSERT (initialNoPad[1].b == 4);
 #endif

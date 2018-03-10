@@ -65,8 +65,10 @@ testTortureExecute (void)
   printf ("WORKS.\n");
 }
 
+#if !defined(PORT_HOST)
 int putchar(int c)
 {
   c;
 }
+#endif
 

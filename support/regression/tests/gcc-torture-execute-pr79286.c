@@ -30,8 +30,10 @@ testTortureExecute (void)
 #endif
 }
 
+#if !defined(PORT_HOST)
 int putchar (int c)
 {
   c;
 }
+#endif
 

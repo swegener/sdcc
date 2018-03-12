@@ -25,7 +25,7 @@ void checkf(int a, bool b)
   bool c = f(a, b);
   char d;
   memcpy (&d, &c, 1);
-#if defined (__SDCC) || (defined(__GNUC__) && !defined(__PPC__))
+#if defined (__SDCC) || (defined(__GNUC__) && !defined(__POWERPC__))
   if ( d != (a==0)^b)
     ASSERT(0);
 #endif

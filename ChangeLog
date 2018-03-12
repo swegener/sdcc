@@ -1,3 +1,11 @@
+
+2018-03-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug-1981238.c,
+	  support/regression/tests/gcc-torture-execute-20141107-1.c,
+	  support/regression/tests/gcc-torture-execute-920711-1.c: Test for
+	  __POWERPC__ instead of __PPC__
+
 2018-03-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/bug-1981238.c,

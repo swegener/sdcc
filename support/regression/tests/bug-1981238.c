@@ -30,7 +30,7 @@ __code struct {
 void
 testBitfield (void)
 {
-#if (defined (__SDCC) || defined(__SUNPRO_C) || defined(__GNUC__) || defined(__clang__)) && !defined(__PPC__)
+#if (defined (__SDCC) || defined(__SUNPRO_C) || defined(__GNUC__) || defined(__clang__)) && !defined(__POWERPC__)
   ASSERT (sizeof (pad) == 2);
   ASSERT (sizeof (noPad) == 2);
   ASSERT (sizeof (initialNoPad[0]) == 1);

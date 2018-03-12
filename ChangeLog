@@ -2,6 +2,9 @@
 
 	* src/SDCCralloc.hpp:
 	  Fix --dump-graphs debug output for non-connected live-ranges.
+	* src/SDCClrange.c,
+	  src/SDCCopt.c:
+	  Fix non-connected live-ranges, bugs #2525, #2644, #2266, #2319.
 
 2018-03-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

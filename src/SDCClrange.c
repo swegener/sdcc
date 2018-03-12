@@ -1085,6 +1085,8 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
                       IC_RESULT (ic) = operandFromOperand (tmpop);
                       if (pset)
                         IC_RESULT(ic)->isaddr = TRUE;
+                      else
+                        bitVectUnSetBit (sym->defs, ic->key);
                     }
                   bitVectUnSetBit (sym->uses, ic->key);
                 }

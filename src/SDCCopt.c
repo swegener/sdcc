@@ -2988,6 +2988,18 @@ eBBlockFromiCode (iCode *ic)
   /* miscelaneous optimizations */
   miscOpt (ebbi->bbOrder, ebbi->count);
 
+  /* Split any live-ranges that became non-connected in dead code elimination. */
+  {
+    recomputeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
+    adjustIChain (ebbi->bbOrder, ebbi->count);
+    ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
+    separateLiveRanges (ic, ebbi);
+    ebbi = iCodeBreakDown (ic);
+    computeControlFlow (ebbi);
+    loops = createLoopRegions (ebbi);
+    computeDataFlow (ebbi);
+  }
+
   /* compute the live ranges */
   recomputeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);
 

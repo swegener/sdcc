@@ -444,6 +444,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   // This check is too expensive - Profiling shows that compiling the Dhrystone benchmark for stm8 with default options, we spend about a quarter of compiler runtime in here!
   // Profiling shows that we spend a significant amount of time on the first call to copy_graph()
   // Todo: Improve efficiency, e.g. using subgraph or filtered_graph to avoid the costly first call to copy_graph()
+  // Issues to solve: cfg2 is undirected, cfg is bidirectional; this makes use of subgraph or filtered_graph harder.
   for (var_t i = (var_t)boost::num_vertices(con) - 1; i >= 0; i--)
     {
       cfg_sym_t cfg2;
@@ -456,6 +457,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
               boost::remove_vertex(j, cfg2);
             }
         }
+
       std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));
       if (boost::connected_components(cfg2, &component[0]) > 1)
         {

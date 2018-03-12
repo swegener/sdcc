@@ -461,7 +461,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
         {
           // Non-connected CFGs are created by at least GCSE and lospre. We now have a live-range splitter that fixes them, so this should no longer be necessary, but we leave this code here for now, so in case one gets through, we can still generate correct code.
           std::cerr << "Warning: Non-connected liverange found and extended to connected component of the CFG:" << con[i].name << ". Please contact sdcc authors with source code to reproduce.\n";
-          
+
           cfg_sym_t cfg2;
           boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
           std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));
@@ -469,14 +469,12 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 
           for (boost::graph_traits<cfg_t>::vertices_size_type j = 0; j < boost::num_vertices(cfg) - 1; j++)
             {
-              if(std::binary_search(cfg[j].alive.begin(), cfg[j].alive.end(), i))
-                {
-                  for (boost::graph_traits<cfg_t>::vertices_size_type k = 0; k < boost::num_vertices(cfg) - 1; k++)
-                    {
-                      if (component[j] == component[k])
-                        cfg[k].alive.push_back(i);
-                    }
-                }
+              if (std::find(cfg[j].alive.begin(), cfg[j].alive.end(), i) == cfg[j].alive.end())
+                continue;
+
+              for (boost::graph_traits<cfg_t>::vertices_size_type k = 0; k < boost::num_vertices(cfg) - 1; k++)
+                if (component[j] == component[k] && std::find(cfg[k].alive.begin(), cfg[k].alive.end(), i) == cfg[k].alive.end())
+                  cfg[k].alive.push_back(i);
             }
         }
     }

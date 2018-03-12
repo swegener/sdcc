@@ -1,3 +1,7 @@
+2018-03-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCralloc.hpp:
+	  Fix --dump-graphs debug output for non-connected live-ranges.
 
 2018-03-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -15,7 +19,6 @@
 	* support/regression/tests/gcc-torture-execute-20121108-1.c,
 	  support/regression/tests/gcc-torture-execute-pr79286.c: Don't
 	  define putchar when compiling for host
-    
 
 2018-03-06 Maarten Brock <sourceforge.brock AT dse.nl>
 

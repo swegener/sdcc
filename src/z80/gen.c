@@ -2271,9 +2271,10 @@ static void pointPairToAop (PAIR_ID pairId, const asmop *aop, int offset)
     {
     case AOP_EXSTK:
       wassertl (!IS_GB, "The GBZ80 doesn't have an extended stack");
+
     case AOP_STK:
 
-      ;int abso = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      ; int abso = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
 
       if ((_G.pairs[pairId].last_type == AOP_STK || _G.pairs[pairId].last_type == AOP_EXSTK) && abs (_G.pairs[pairId].offset - abso) < 3)
         adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, abso);
@@ -2283,6 +2284,7 @@ static void pointPairToAop (PAIR_ID pairId, const asmop *aop, int offset)
       _G.pairs[pairId].offset = abso;
 
       break;
+
     default:
       wassertl (0, "Unsupported aop type for pointPairToAop()");
     }
@@ -2620,7 +2622,7 @@ canAssignToPtr3 (const asmop *aop)
 /* aopPut - puts a string for a aop                                */
 /*-----------------------------------------------------------------*/
 static void
-aopPut (asmop * aop, const char *s, int offset)
+aopPut (asmop *aop, const char *s, int offset)
 {
   struct dbuf_s dbuf;
 
@@ -2714,6 +2716,7 @@ aopPut (asmop * aop, const char *s, int offset)
       break;
 
     case AOP_REG:
+emitDebug ("; aopPut() AOP_REG");
       if (!strcmp (s, "!*hl"))
         emit2 ("ld %s,!*hl", aop->aopu.aop_reg[offset]->name);
       else
@@ -9414,7 +9417,7 @@ finish:
 
 static void
 _moveFrom_tpair_ (asmop * aop, int offset, PAIR_ID pair)
-{
+{emitDebug ("; _moveFrom_tpair_()");
   if (!IS_GB && aop->type == AOP_REG)
     {
       if (!regalloc_dry_run)
@@ -9650,14 +9653,21 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 
-
- if (getPairId (AOP (result)) == PAIR_HL || size == 2 && AOP_TYPE (result) == AOP_REG
-           && (AOP (result)->aopu.aop_reg[0] == regsZ80 + L_IDX || AOP (result)->aopu.aop_reg[0] == regsZ80 + H_IDX))
+ if (getPairId (AOP (result)) == PAIR_HL || size == 2 && (aopInReg (result->aop, 0, L_IDX) || aopInReg (result->aop, 0, H_IDX)))
     {
       wassertl (size == 2, "HL must be of size 2");
       if (IS_RAB && getPairId (AOP (result)) == PAIR_HL && rightval_in_range)
         {
           emit2 ("ld hl, %d (hl)", rightval);
+          regalloc_dry_run_cost += 3;
+        }
+      else if (aopInReg (result->aop, 1, A_IDX))
+        {
+          offsetPair (pair, extrapair, !isPairDead (extrapair, ic), rightval + 1);
+          emit2 ("ld a, !*hl");
+          emit2 ("dec hl");
+          if (!regalloc_dry_run)
+            aopPut (AOP (result), "!*hl", 0);
           regalloc_dry_run_cost += 3;
         }
       else

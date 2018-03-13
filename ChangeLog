@@ -1,4 +1,10 @@
-2018-03-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2018-03-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2716.c:
+	  Fix bug #2716.
+
+2018-03-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Fix --reserve-regs-iy issue in function pointers to functions returning long long.

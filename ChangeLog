@@ -1,3 +1,8 @@
+2018-03-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Fix --reserve-regs-iy issue in function pointers to functions returning long long.
+
 2018-03-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCralloc.hpp:

@@ -13,8 +13,7 @@
 	* support/valdiag/valdiag.py,
 	  support/valdiag/Makefile.in:
 	  Include z180, r2k, gbz80, tlcs90, s08, stm8 in diagnostic validation.
-	* support/valdiag/valdiag.py,
-	  support/regression/generate-cases.py,
+	* support/regression/generate-cases.py,
 	  support/regression/HTMLgen.py,
 	  support/regression/get_ticks.py:
 	  Convert Python 1 to Python 2/3.

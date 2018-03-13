@@ -213,7 +213,7 @@ def parseInputfile(inputfilename):
 def parseResults(output):
     results = {}
     for line in output:
-        print(line),
+        print line,
 
         if string.count(line, "SIGSEG"):
             results[0] = ["FAULT", string.strip(line)]
@@ -245,10 +245,10 @@ def parseResults(output):
     return results
 
 def showUsage():
-    print("Usage: test testmode cfile [objectfile]")
-    print("Choices for testmode are:")
+    print "Usage: test testmode cfile [objectfile]"
+    print "Choices for testmode are:"
     for testmodename in testmodes.keys():
-        print("   %s" % testmodename
+        print "   %s" % testmodename
     sys.exit(1)
 
 # Start here
@@ -307,8 +307,8 @@ for testname in testcases.keys():
     else:
         ccstd = ""
     cmd = string.join([cc,ccflags,ccstd,ccdef,inputfilename])
-    print()
-    print(cmd)
+    print
+    print cmd
     spawn = popen2.Popen4(cmd)
     spawn.wait()
     output = spawn.fromchild.readlines()
@@ -339,6 +339,6 @@ for testname in testcases.keys():
         print "at %s:%d" % (inputfilename, checkline)
         failurecount = failurecount + 1
 
-print()
+print
 print "--- Summary: %d/%d/%d: " % (failurecount, testcount, casecount),
 print "%d failed of %d tests in %d cases." % (failurecount, testcount, casecount)

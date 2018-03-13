@@ -96,13 +96,33 @@ testmodes = {
         "compiler":sdcc,
         "port":"z80"
     },
+    "z180":{
+        "compiler":sdcc,
+        "port":"z180"
+    },
+    "r2k":{
+        "compiler":sdcc,
+        "port":"r2k"
+    },
     "gbz80":{
         "compiler":sdcc,
         "port":"gbz80"
     },
+    "tlcs90":{
+        "compiler":sdcc,
+        "port":"tlcs90"
+    },
     "hc08":{
         "compiler":sdcc,
         "port":"hc08"
+    },
+    "s08":{
+        "compiler":sdcc,
+        "port":"s08"
+    },
+    "stm8":{
+        "compiler":sdcc,
+        "port":"stm8"
     },
     "pic14":{
         "compiler":sdcc,

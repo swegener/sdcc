@@ -10,6 +10,9 @@
 	  device/lib/incl.mk,
 	  support/regression/tests/qsort.c:
 	  Implement bsearch().
+	* support/valdiag/valdiag.py,
+	  support/valdiag/Makefile.in:
+	  Include z180, r2k, gbz80, tlcs90, s08, stm8 in diagnostic validation.
 
 2018-03-13 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -74,6 +74,7 @@ COMMON_SDCC = \
   atoll.c \
   strtol.c \
   strtoul.c \
+  bsearch.c \
   qsort.c \
   abs.c \
   labs.c \

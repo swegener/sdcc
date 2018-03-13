@@ -32,5 +32,21 @@ void testSort(void)
 	qsort(unsorted, NUM_ELEM, sizeof({type}), &cmp);
 
 	ASSERT(!memcmp(unsorted, sorted, sizeof({type}) * NUM_ELEM));
+
+	{
+		const {type} e95 = 95;
+		const {type} e35 = 35;
+		const {type} e10 = -10;
+		const {type} e20 = 20;
+		const {type} e60 = 60;
+		const {type} e190 = 190;
+
+		ASSERT(bsearch(&e95, sorted, NUM_ELEM, sizeof({type}), &cmp) == 0);
+		ASSERT(bsearch(&e35, sorted, NUM_ELEM, sizeof({type}), &cmp) == 0);
+		ASSERT(*(const {type} *)(bsearch(&e10, sorted, NUM_ELEM, sizeof({type}), &cmp)) == -10);
+		ASSERT(*(const {type} *)(bsearch(&e20, sorted, NUM_ELEM, sizeof({type}), &cmp)) == 20);
+		ASSERT(*(const {type} *)(bsearch(&e60, sorted, NUM_ELEM, sizeof({type}), &cmp)) == 60);
+		ASSERT(*(const {type} *)(bsearch(&e190, sorted, NUM_ELEM, sizeof({type}), &cmp)) == 190);
+	}
 }
 

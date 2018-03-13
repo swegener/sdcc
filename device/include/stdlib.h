@@ -92,6 +92,7 @@ inline void *aligned_alloc(size_t alignment, size_t size)
 extern void free (void * ptr);
 
 /* Searching and sorting utilities (ISO C11 7.22.5) */
+extern void *bsearch(const void *key, const void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant);
 extern void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant);
 
 /* Integer arithmetic functions (ISO C11 7.22.6) */

@@ -5,6 +5,11 @@
 	  Fix bug #2716.
 	* src/SDCCopt.c:
 	  Disable fix for non-connected live-ranges for ds390.
+	* device/include/stdlib.h,
+	  device/lib/bsearch.c,
+	  device/lib/incl.mk,
+	  support/regression/tests/qsort.c:
+	  Implement bsearch().
 
 2018-03-13 Philipp Klaus Krause <pkk AT spth.de>
 

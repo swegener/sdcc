@@ -145,7 +145,7 @@ class InstanceGenerator:
                     # Trim the name
                     name = trim(name)
                     # Trim all the values
-                    values = map(trim, values)
+                    values = list(map(trim, values))
                     
                     self.replacements[name] = values
                 elif re.search(r'\*/', line) != None:
@@ -171,7 +171,7 @@ class InstanceGenerator:
         createdir(outdir)
 
         # Generate
-        self.permute(os.path.join(outdir, self.basename), self.replacements.keys())
+        self.permute(os.path.join(outdir, self.basename), list(self.replacements.keys()))
 
         # Remove the temporary file
         os.remove(self.tmpname)
@@ -179,7 +179,7 @@ class InstanceGenerator:
 def main():
     # Check and parse the command line arguments
     if len(sys.argv) < 3:
-        print "usage: generate-cases.py template.c outdir"
+        print("usage: generate-cases.py template.c outdir")
         sys.exit(-1)
         
     # Input name is the first arg.

@@ -88,7 +88,7 @@ class StringTemplate:
         if len(self.delimiters) != 2:
             raise ValueError("delimiter argument must be a pair of strings")
         self.delimiter_width = len(self.delimiters[0])
-        delimiters = map(re.escape, self.delimiters)
+        delimiters = list(map(re.escape, self.delimiters))
         self.subpatstr = delimiters[0] + "[\w_]+" + delimiters[1]
         self.subpat = re.compile(self.subpatstr)
         self.substitutions = substitutions or {}
@@ -98,7 +98,7 @@ class StringTemplate:
         self.source = template
     
     def keys(self):
-        return self.substitutions.keys()
+        return list(self.substitutions.keys())
 
     def __setitem__(self, name, value):
         self.substitutions[name] = value
@@ -130,7 +130,7 @@ class StringTemplate:
             matched = self.subpat.search(source[i:])
         else:
             output.append(source[i:])
-        return string.join(output, '')
+        return "".join(output)
     
     def write(self, filename = None):
         """Emit the Document HTML to a file or standard output.

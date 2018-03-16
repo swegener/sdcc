@@ -22,6 +22,8 @@
 #   what you give them.   Help stamp out software-hoarding!  
 #---------------------------------------------------------------------------
 
+from __future__ import print_function
+
 import sys, string, os, popen2, re
 
 macrodefs = {}
@@ -168,7 +170,7 @@ def expandPyExpr(expr):
     return expandedExpr
 
 def addDefines(deflist):
-    for define in deflist.keys():
+    for define in list(deflist.keys()):
         expandeddef = expandPyExpr(define)
         macrodefs[expandeddef] = expandPyExpr(deflist[define])
 
@@ -185,7 +187,7 @@ def parseInputfile(inputfilename):
         p = string.find(line, "TEST")
         if p>=0:
             testname = string.split(line[p:])[0]
-            if not testcases.has_key(testname):
+            if testname not in testcases:
                 testcases[testname] = {}
 
         # See if a new test is being defined
@@ -213,7 +215,7 @@ def parseInputfile(inputfilename):
 def parseResults(output):
     results = {}
     for line in output:
-        print line,
+        print(line, end=' ')
 
         if string.count(line, "SIGSEG"):
             results[0] = ["FAULT", string.strip(line)]
@@ -245,10 +247,10 @@ def parseResults(output):
     return results
 
 def showUsage():
-    print "Usage: test testmode cfile [objectfile]"
-    print "Choices for testmode are:"
-    for testmodename in testmodes.keys():
-        print "   %s" % testmodename
+    print("Usage: test testmode cfile [objectfile]")
+    print("Choices for testmode are:")
+    for testmodename in list(testmodes.keys()):
+        print("   %s" % testmodename)
     sys.exit(1)
 
 # Start here
@@ -257,7 +259,7 @@ if len(sys.argv)<3:
 
 testmodename = sys.argv[1]
 if not testmodename in testmodes:
-    print "Unknown test mode '%s'" % testmodename
+    print("Unknown test mode '%s'" % testmodename)
     showUsage()
 
 testmode = testmodes[testmodename]
@@ -288,15 +290,15 @@ inputfilenameshort = os.path.basename(inputfilename)
 try:
     testcases = parseInputfile(inputfilename)
 except IOError:
-    print "Unable to read file '%s'" % inputfilename
+    print("Unable to read file '%s'" % inputfilename)
     sys.exit(1)
 
-casecount = len(testcases.keys())
+casecount = len(list(testcases.keys()))
 testcount = 0
 failurecount = 0
 
-print "--- Running: %s " % inputfilenameshort
-for testname in testcases.keys():
+print("--- Running: %s " % inputfilenameshort)
+for testname in list(testcases.keys()):
     if string.find(testname,"DISABLED"):
       continue
     ccdef = compilermode["CCDEF"]+testname
@@ -307,8 +309,8 @@ for testname in testcases.keys():
     else:
         ccstd = ""
     cmd = string.join([cc,ccflags,ccstd,ccdef,inputfilename])
-    print
-    print cmd
+    print()
+    print(cmd)
     spawn = popen2.Popen4(cmd)
     spawn.wait()
     output = spawn.fromchild.readlines()
@@ -320,7 +322,7 @@ for testname in testcases.keys():
 
     # Go through the tests of this case and make sure
     # the compiler gave a diagnostic
-    for checkline in testcases[testname].keys():
+    for checkline in list(testcases[testname].keys()):
         testcount = testcount + 1
         if checkline in results:
             if "IGNORE" in testcases[testname][checkline]:
@@ -329,16 +331,16 @@ for testname in testcases.keys():
         else:
             for wanted in testcases[testname][checkline]:
                 if not wanted=="IGNORE":
-                    print "--- FAIL: expected %s" % wanted,
-                    print "at %s:%d" % (inputfilename, checkline)
+                    print("--- FAIL: expected %s" % wanted, end=' ')
+                    print("at %s:%d" % (inputfilename, checkline))
                     failurecount = failurecount + 1
 
     # Output any unexpected diagnostics    
-    for checkline in results.keys():
-        print '--- FAIL: unexpected message "%s" ' % results[checkline][1],
-        print "at %s:%d" % (inputfilename, checkline)
+    for checkline in list(results.keys()):
+        print('--- FAIL: unexpected message "%s" ' % results[checkline][1], end=' ')
+        print("at %s:%d" % (inputfilename, checkline))
         failurecount = failurecount + 1
 
-print
-print "--- Summary: %d/%d/%d: " % (failurecount, testcount, casecount),
-print "%d failed of %d tests in %d cases." % (failurecount, testcount, casecount)
+print()
+print("--- Summary: %d/%d/%d: " % (failurecount, testcount, casecount), end=' ')
+print("%d failed of %d tests in %d cases." % (failurecount, testcount, casecount))

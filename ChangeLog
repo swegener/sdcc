@@ -1,7 +1,8 @@
 2018-03-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/collate-results.py,
-	  support/regression/compact-results.py:
+	  support/regression/compact-results.py,
+	  support/valdiag/valdiag.py:
 	  Convert Python 1 to Python 2/3.
 	* support/regression/tests/qsort.c:
 	  Disable test for mcs51-small due to lack of RAM.

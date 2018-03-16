@@ -5,6 +5,8 @@
 	  Convert Python 1 to Python 2/3.
 	* support/regression/tests/qsort.c:
 	  Disable test for mcs51-small due to lack of RAM.
+	* sim/ucsim/cmd.src/cmdlex.cc:
+	  Remove lex-generated file from repository.
 
 2018-03-13 Philipp Klaus Krause <pkk AT spth.de>
 

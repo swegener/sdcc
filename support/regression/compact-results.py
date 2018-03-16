@@ -47,7 +47,7 @@ for line in lines:
 
     base = name
     m = re.match(r'([^/]*)/([^/]*)/([^/]*)/(.*)$', name)
-    if (m >= 3):
+    if (m):
         base = m.group(3)
 
     # '--- Summary: f/t/c: ...', where f = # failures, t = # test points,
@@ -56,13 +56,13 @@ for line in lines:
         try:
             (summary, data, rest) = re.split(r':', line)
             (nfailures, ntests, ncases) = re.split(r'/', data)
-            tests = tests + string.atof(ntests)
-            cases = cases + string.atof(ncases)
+            tests = tests + float(ntests)
+            cases = cases + float(ncases)
         except ValueError:
             print("Bad summary line:", line)
             nfailures = '1'
-        failures = failures + string.atof(nfailures)
-        if (string.atof(nfailures)):
+        failures = failures + float(nfailures)
+        if (float(nfailures)):
             print("Failure: %s" % name)
 
     # '--- Simulator: b/t: ...', where b = # bytes, t = # ticks
@@ -73,8 +73,8 @@ for line in lines:
         except ValueError:
             print("Bad simulator line:", line)
         else:
-            bytes = bytes + string.atof(nbytes)
-            ticks = ticks + string.atof(nticks)
+            bytes = bytes + float(nbytes)
+            ticks = ticks + float(nticks)
 
     # Stop at 0x000228: (106) Invalid instruction 0x00fd
     if (re.search(r'Invalid instruction', line) or re.search(r'unknown instruction', line)):

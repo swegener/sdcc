@@ -32,7 +32,7 @@ void testSort(void)
 	qsort(unsorted, NUM_ELEM, sizeof({type}), &cmp);
 
 	ASSERT(!memcmp(unsorted, sorted, sizeof({type}) * NUM_ELEM));
-
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) // Not enough RAM
 	{
 		const {type} e95 = 95;
 		const {type} e35 = 35;
@@ -48,5 +48,6 @@ void testSort(void)
 		ASSERT(*(const {type} *)(bsearch(&e60, sorted, NUM_ELEM, sizeof({type}), &cmp)) == 60);
 		ASSERT(*(const {type} *)(bsearch(&e190, sorted, NUM_ELEM, sizeof({type}), &cmp)) == 190);
 	}
+#endif
 }
 

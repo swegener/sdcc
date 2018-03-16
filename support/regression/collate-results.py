@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import sys, re
 import string
 
@@ -73,15 +75,15 @@ for line in lines:
         messagelog.append("HALT instruction: %s" % name)
 
 if (len(sys.argv) > 1):
-    print "Summary for '%s':" % sys.argv[1],
+    print("Summary for '%s':" % sys.argv[1], end=' ')
 if (unmatch > 0):
-    print "%d abnormal stops (" % unmatch,
+    print("%d abnormal stops (" % unmatch, end=' ')
     if (invalid > 0):
-        print "%d invalid instructions," % invalid,
+        print("%d invalid instructions," % invalid, end=' ')
     if (halt > 0):
-        print "%d HALT instructions," % halt,
-    print "),",
-print "%.0f failures, %.0f tests, %.0f test cases, %.0f bytes, %.0f ticks" % (failures, tests, cases, bytes, ticks)
+        print("%d HALT instructions," % halt, end=' ')
+    print("),", end=' ')
+print("%.0f failures, %.0f tests, %.0f test cases, %.0f bytes, %.0f ticks" % (failures, tests, cases, bytes, ticks))
 for msg in messagelog:
-  print "  ",msg
-print
+  print("  ",msg)
+print()

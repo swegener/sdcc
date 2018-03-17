@@ -435,7 +435,7 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
   for(v = a.local.begin(), v_end = a.local.end(); v != v_end; ++v)
     {
       const symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
-      if(a.global[*v] < 0) // Try to put variables into registers.
+      if(a.global[*v] < 0 && !sym->remat) // Try to put non-rematerializeable variables into registers.
         c += 0.1f;
       if(a.global[*v] < 0 && IS_REGISTER(sym->type)) // Try to honour register keyword.
         c += 4.0f;

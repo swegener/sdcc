@@ -7424,7 +7424,8 @@ resultRemat (const iCode * ic)
   if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
     {
       const symbol *sym = OP_SYMBOL_CONST (IC_RESULT (ic));
-      if (!sym->remat || !sym->isspilt || POINTER_SET (ic))
+
+      if (!sym->remat || POINTER_SET (ic))
         return(false);
 
       bool completely_spilt = TRUE;

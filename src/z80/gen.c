@@ -2716,7 +2716,6 @@ aopPut (asmop *aop, const char *s, int offset)
       break;
 
     case AOP_REG:
-emitDebug ("; aopPut() AOP_REG");
       if (!strcmp (s, "!*hl"))
         emit2 ("ld %s,!*hl", aop->aopu.aop_reg[offset]->name);
       else

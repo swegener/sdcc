@@ -2107,7 +2107,7 @@ skip_byte:
 /* genMove_o - Copy part of one asmop to another                   */
 /*-----------------------------------------------------------------*/
 static void
-genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead, bool x_dead, bool y_dead)
+genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead_global, bool x_dead_global, bool y_dead_global)
 {
   int i;
 
@@ -2118,20 +2118,26 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
   wassertl (roffset + size <= result->size, "Trying to write beyond end of operand");
 
 #if 0
-  D (emit2(";  genMove_o", "offset %d %d, size %d, deadness %d %d %d", roffset, soffset, size, a_dead, x_dead, y_dead));
+  D (emit2(";  genMove_o", "offset %d %d, size %d, deadness %d %d %d", roffset, soffset, size, a_dead_global, x_dead_global, y_dead_global));
 #endif
 
   if (aopRS (result) && aopRS (source))
     {
-      genCopy (result, roffset, source, soffset, size, a_dead, x_dead, y_dead);
+      genCopy (result, roffset, source, soffset, size, a_dead_global, x_dead_global, y_dead_global);
       return;
     }
 
   for (i = 0; i < size;)
     {
-      x_dead = x_dead && (!aopRS (result) || (result->regs[XL_IDX] >= (roffset + i) || result->regs[XL_IDX] < 0) && (result->regs[XH_IDX] >= (roffset + i) || result->regs[XH_IDX] < 0)) && (!aopRS (source) || source->regs[XL_IDX] <= i + 1 && source->regs[XH_IDX] <= i + 1);
-      y_dead = y_dead && (!aopRS (result) || (result->regs[YL_IDX] >= (roffset + i) || result->regs[YL_IDX] < 0) && (result->regs[YH_IDX] >= (roffset + i) || result->regs[YH_IDX] < 0)) && (!aopRS (source) || source->regs[YL_IDX] <= i + 1 && source->regs[YH_IDX] <= i + 1);
-      a_dead = a_dead && (!aopRS (result) || (result->regs[A_IDX] >= (roffset + i) || result->regs[A_IDX] < 0)) && (!aopRS (source) || source->regs[A_IDX] <= i);
+      const bool x_dead = x_dead_global &&
+        (!aopRS (result) || (result->regs[XL_IDX] >= (roffset + i) || result->regs[XL_IDX] < 0) && (result->regs[XH_IDX] >= (roffset + i) || result->regs[XH_IDX] < 0)) &&
+        (!aopRS (source) || source->regs[XL_IDX] <= i + 1 && source->regs[XH_IDX] <= i + 1);
+      const bool y_dead = y_dead_global &&
+        (!aopRS (result) || (result->regs[YL_IDX] >= (roffset + i) || result->regs[YL_IDX] < 0) && (result->regs[YH_IDX] >= (roffset + i) || result->regs[YH_IDX] < 0)) &&
+        (!aopRS (source) || source->regs[YL_IDX] <= i + 1 && source->regs[YH_IDX] <= i + 1);
+      const bool a_dead = a_dead_global &&
+        (!aopRS (result) || (result->regs[A_IDX] >= (roffset + i) || result->regs[A_IDX] < 0)) &&
+        (!aopRS (source) || source->regs[A_IDX] <= i);
 
       if (i + 1 < size && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && aopIsLitVal (source, soffset + i, 2, 0x0000))
         {

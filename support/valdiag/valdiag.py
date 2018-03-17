@@ -24,7 +24,7 @@
 
 from __future__ import print_function
 
-import sys, string, os, popen2, re
+import sys, string, os, re, subprocess
 
 macrodefs = {}
 
@@ -153,10 +153,11 @@ def evalQualifier(expr):
         elif len(token)>0:
             if token[0]=="_" or token[0] in string.ascii_letters:
                 tokens[tokenindex] = "0"
-    expr = string.join(tokens,"")
-    expr = string.replace(expr,"&&"," and ");
-    expr = string.replace(expr,"||"," or ");
-    expr = string.replace(expr,"!"," not ");
+    #expr = string.join(tokens,"")
+    expr = "".join(tokens)
+    expr = expr.replace("&&"," and ");
+    expr = expr.replace("||"," or ");
+    expr = expr.replace("!"," not ");
     return eval(expr)
 
 def expandPyExpr(expr):
@@ -166,7 +167,7 @@ def expandPyExpr(expr):
             tokens[tokenindex]=eval(tokens[tokenindex])
             tokens[tokenindex-1]=""
             tokens[tokenindex+1]=""
-    expandedExpr = string.join(tokens,"")
+    expandedExpr = "".join(tokens)
     return expandedExpr
 
 def addDefines(deflist):
@@ -184,21 +185,21 @@ def parseInputfile(inputfilename):
     for line in inputfile.readlines():
 
         # See if a new testcase is being defined
-        p = string.find(line, "TEST")
+        p = line.find("TEST")
         if p>=0:
-            testname = string.split(line[p:])[0]
+            testname = line[p:].split()[0]
             if testname not in testcases:
                 testcases[testname] = {}
 
         # See if a new test is being defined
         for testtype in ["ERROR", "WARNING", "IGNORE"]:
-            p = string.find(line, testtype);
+            p = line.find(testtype);
             if p>=0:
                 # Found a test definition
-                qualifier = string.strip(line[p+len(testtype):])
-                p = string.find(qualifier, "*/")
+                qualifier = line[p+len(testtype):].strip()
+                p = qualifier.find("*/")
                 if p>=0:
-                    qualifier = string.strip(qualifier[:p])
+                    qualifier = qualifier[:p].strip()
                 if len(qualifier)==0:
                     qualifier="1"
                 qualifier = evalQualifier(qualifier)
@@ -217,13 +218,13 @@ def parseResults(output):
     for line in output:
         print(line, end=' ')
 
-        if string.count(line, "SIGSEG"):
-            results[0] = ["FAULT", string.strip(line)]
+        if line.count("SIGSEG"):
+            results[0] = ["FAULT", line.strip()]
             continue
 
         # look for something of the form:
         #   filename:line:message
-        msg = string.split(line,":",2)
+        msg = line.split(":",2)
         if len(msg)<3: continue
         if msg[0]!=inputfilename: continue
         if len(msg[1])==0: continue
@@ -232,18 +233,18 @@ def parseResults(output):
         # it's in the right form; parse it
         linenumber = int(msg[1])
         msgtype = "UNKNOWN"
-        uppermsg = string.upper(msg[2])
-        if string.count(uppermsg,"ERROR"):
+        uppermsg = msg[2].upper()
+        if uppermsg.count("ERROR"):
             msgtype = "ERROR"
-        if string.count(uppermsg,"WARNING"):
+        if uppermsg.count("WARNING"):
             msgtype = "WARNING"
-        msgtext = string.strip(msg[2])
+        msgtext = msg[2].strip()
         ignore = 0
         for ignoreExpr in ignoreExprList:
            if re.search(ignoreExpr,msgtext)!=None:
                ignore = 1
         if not ignore:
-            results[linenumber]=[msgtype,string.strip(msg[2])]
+            results[linenumber]=[msgtype,msg[2].strip()]
     return results
 
 def showUsage():
@@ -268,13 +269,13 @@ port = expandPyExpr(testmode["port"])
 cc = expandPyExpr(compilermode["CC"])
 ccflags = expandPyExpr(compilermode["CCFLAGS"])
 if "flags" in testmode:
-    ccflags = string.join([ccflags,expandPyExpr(testmode["flags"])])
+    ccflags = " ".join([ccflags,expandPyExpr(testmode["flags"])])
 if len(sys.argv)>=4:
     if "CCOUTPUT" in compilermode:
-        ccflags = string.join([ccflags,expandPyExpr(compilermode["CCOUTPUT"]),sys.argv[3]])
+        ccflags = " ".join([ccflags,expandPyExpr(compilermode["CCOUTPUT"]),sys.argv[3]])
 if len(sys.argv)>=5:
     if "CCINCLUDEDIR" in compilermode:
-        ccflags = string.join([ccflags,expandPyExpr(compilermode["CCINCLUDEDIR"]),sys.argv[4]])
+        ccflags = " ".join([ccflags,expandPyExpr(compilermode["CCINCLUDEDIR"]),sys.argv[4]])
 if "defined" in compilermode:
     addDefines(compilermode["defined"])
 if "defined" in testmode:
@@ -299,7 +300,7 @@ failurecount = 0
 
 print("--- Running: %s " % inputfilenameshort)
 for testname in list(testcases.keys()):
-    if string.find(testname,"DISABLED"):
+    if testname.find("DISABLED"):
       continue
     ccdef = compilermode["CCDEF"]+testname
     if testname[-3:] == "C89":
@@ -308,12 +309,15 @@ for testname in list(testcases.keys()):
         ccstd = compilermode["C99"]
     else:
         ccstd = ""
-    cmd = string.join([cc,ccflags,ccstd,ccdef,inputfilename])
+    cmd = " ".join([cc,ccflags,ccstd,ccdef,inputfilename])
     print()
     print(cmd)
-    spawn = popen2.Popen4(cmd)
-    spawn.wait()
-    output = spawn.fromchild.readlines()
+    #spawn = popen2.Popen4(cmd)
+    #spawn.wait()
+    #output = spawn.fromchild.readlines()
+    spawn = Popen(args=cmd, bufsize=-1, stdout = PIPE, stderr = STDOUT, close_fds=True)
+    (stdoutdata,stderrdata) = spawn.communicate()
+    output = stdoutdata.readlines()
 
     results = parseResults(output)
 

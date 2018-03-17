@@ -1,3 +1,9 @@
+2018-03-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/collate-results.py,
+	  support/valdiag/valdiag.py: replace use of deprecated
+	  functions for better Python 3 compatibility
+
 2018-03-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/collate-results.py,

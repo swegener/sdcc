@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 import sys, re
-import string
+#import string
 
 """Simple script that scans all of the test suite results text fed in
 through stdin and summarises the total number of failures, test
@@ -42,10 +42,10 @@ for line in lines:
     if (re.search(r'^--- Summary:', line)):
         (summary, data, rest) = re.split(r':', line)
         (nfailures, ntests, ncases) = re.split(r'/', data)
-        failures = failures + string.atof(nfailures)
-        tests = tests + string.atof(ntests)
-        cases = cases + string.atof(ncases)
-        if (string.atof(nfailures)):
+        failures = failures + int(nfailures)
+        tests = tests + int(ntests)
+        cases = cases + int(ncases)
+        if (int(nfailures)):
             messagelog.append("Failure: %s" % name)
         flag = 1 
 
@@ -53,8 +53,8 @@ for line in lines:
     if (re.search(r'^--- Simulator:', line)):
         (simulator, data, rest) = re.split(r':', line)
         (nbytes, nticks) = re.split(r'/', data)
-        bytes = bytes + string.atof(nbytes)
-        ticks = ticks + string.atof(nticks)
+        bytes = bytes + int(nbytes)
+        ticks = ticks + int(nticks)
         if (flag != 1):
             for e in exlist:
                 if (e in name):

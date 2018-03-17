@@ -7415,7 +7415,7 @@ genDummyRead (const iCode *ic)
 /*-----------------------------------------------------------------*/
 /* resultRemat - result is to be rematerialized                    */
 /*-----------------------------------------------------------------*/
-static int
+static bool
 resultRemat (const iCode * ic)
 {
   if (SKIP_IC (ic) || ic->op == IFX)
@@ -7424,11 +7424,18 @@ resultRemat (const iCode * ic)
   if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
     {
       const symbol *sym = OP_SYMBOL_CONST (IC_RESULT (ic));
-      if (sym->remat && !POINTER_SET (ic) && sym->isspilt)
-        return 1;
+      if (!sym->remat || !sym->isspilt || POINTER_SET (ic))
+        return(false);
+
+      bool completely_spilt = TRUE;
+      for (unsigned int i = 0; i < getSize (sym->type); i++)
+        if (sym->regs[i])
+          completely_spilt = FALSE;
+      if (completely_spilt)
+        return(true);
     }
 
-  return 0;
+  return (false);
 }
 
 /*---------------------------------------------------------------------*/

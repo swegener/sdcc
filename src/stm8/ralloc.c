@@ -453,7 +453,7 @@ packRegisters (eBBlock * ebp)
       /* Safe: just propagates the remat flag */
       /* if straight assignment then carry remat flag if this is the
          only definition */
-      if (ic->op == '=' && !POINTER_SET (ic) && IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat && !IS_CAST_ICODE (OP_SYMBOL (IC_RIGHT (ic))->rematiCode) && !isOperandGlobal (IC_RESULT (ic)) &&  /* due to bug 1618050 */
+      if (ic->op == '=' && !POINTER_SET (ic) && IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat && !IS_CAST_ICODE (OP_SYMBOL (IC_RIGHT (ic))->rematiCode) && !isOperandGlobal (IC_RESULT (ic)) &&
           bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;

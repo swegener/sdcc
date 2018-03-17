@@ -33,6 +33,19 @@ static struct
   lineNode *head;
 } _G;
 
+static bool
+isInt(const char *str)
+{
+  int ret;
+  while(str[0] == '#' || str[0] == '(')
+    str++;
+  if(sscanf(str, "0x%x", &ret))
+    return(ret);
+  if(!sscanf(str, "%d", &ret))
+    return(false);
+  return(true);
+}
+
 static int
 readint(const char *str)
 {
@@ -126,13 +139,13 @@ isImmediate(const char *what)
 static int
 isShortoff(const char *what, const char *mode)
 {
-  return(isRelativeAddr(what, mode) && readint(what) <= 0xFF);
+  return(isRelativeAddr(what, mode) && isInt(what) && readint(what) <= 0xff);
 }
 
 static int
 isLongoff(const char *what, const char *mode)
 {
-  return(isRelativeAddr(what, mode) && readint(what) > 0xFF);
+  return(isRelativeAddr(what, mode) && (!isInt(what) || readint(what) > 0xff));
 }
 
 static int

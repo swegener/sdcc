@@ -433,6 +433,48 @@ packRegisters (eBBlock * ebp)
       if (!change)
         break;
     }
+
+  for (ic = ebp->sch; ic; ic = ic->next)
+    {
+      D (D_ALLOC, ("packRegisters: looping on ic %p\n", ic));
+
+      /* Safe: address of a true sym is always constant. */
+      /* if this is an itemp & result of a address of a true sym
+         then mark this as rematerialisable   */
+      if (ic->op == ADDRESS_OF && !operandLitValue (IC_RIGHT (ic)) /* STM8 codegen cannot handle non-zero right operand in rematerialization yet */ && 
+          IS_ITEMP (IC_RESULT (ic)) &&
+          IS_TRUE_SYMOP (IC_LEFT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !OP_SYMBOL (IC_LEFT (ic))->onStack)
+        {
+          OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+          OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+          OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+        }
+
+      /* Safe: just propagates the remat flag */
+      /* if straight assignment then carry remat flag if this is the
+         only definition */
+      if (ic->op == '=' && !POINTER_SET (ic) && IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat && !IS_CAST_ICODE (OP_SYMBOL (IC_RIGHT (ic))->rematiCode) && !isOperandGlobal (IC_RESULT (ic)) &&  /* due to bug 1618050 */
+          bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
+        {
+          OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
+          OP_SYMBOL (IC_RESULT (ic))->rematiCode = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+        }
+
+      /* if cast to a generic pointer & the pointer being
+         cast is remat, then we can remat this cast as well */
+      if (ic->op == CAST &&
+          IS_SYMOP (IC_RIGHT (ic)) && OP_SYMBOL (IC_RIGHT (ic))->remat && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
+        {
+          sym_link *to_type = operandType (IC_LEFT (ic));
+          sym_link *from_type = operandType (IC_RIGHT (ic));
+          if (IS_GENPTR (to_type) && IS_PTR (from_type))
+            {
+              OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+              OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+              OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+            }
+        }
+    }
 }
 
 /**

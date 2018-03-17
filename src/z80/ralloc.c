@@ -2685,11 +2685,11 @@ packRegisters (eBBlock * ebp)
 
   for (ic = ebp->sch; ic; ic = ic->next)
     {
+      D (D_ALLOC, ("packRegisters: looping on ic %p\n", ic));
+
       /* Safe: address of a true sym is always constant. */
       /* if this is an itemp & result of a address of a true sym
          then mark this as rematerialisable   */
-      D (D_ALLOC, ("packRegisters: looping on ic %p\n", ic));
-
       if (ic->op == ADDRESS_OF &&
           IS_ITEMP (IC_RESULT (ic)) &&
           IS_TRUE_SYMOP (IC_LEFT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !OP_SYMBOL (IC_LEFT (ic))->onStack)

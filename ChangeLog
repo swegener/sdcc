@@ -4,6 +4,10 @@
 	  Test for bug #2714.
 	* src/SDCCralloc.hpp:
 	  Faster check for non-connected live-ranges.
+	* src/stm8/ralloc.c,
+	  src/stm8/gen.c,
+	  src/stm8/peep.c:
+	  Basic support for rematerialization of addresses for stm8.
 
 2018-03-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

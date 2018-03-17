@@ -876,7 +876,7 @@ newAsmop (short type)
   aop->regs[YH_IDX] = -1;
   aop->regs[C_IDX] = -1;
 
-  return aop;
+  return (aop);
 }
 
 /*-----------------------------------------------------------------*/
@@ -919,7 +919,7 @@ aopForSym (const iCode *ic, symbol *sym)
     {
       aop = newAsmop (AOP_IMMD);
       aop->aopu.aop_immd = sym->rname;
-      aop->size = 2;
+      aop->size = getSize (sym->type);
     }
   /* Assign depending on the storage class */
   else if (sym->onStack || sym->iaccess)
@@ -941,6 +941,67 @@ aopForSym (const iCode *ic, symbol *sym)
       aop->aopu.aop_dir = sym->rname;
       aop->size = getSize (sym->type);
     }
+
+  return (aop);
+}
+
+/*-----------------------------------------------------------------*/
+/* aopForRemat - rematerializes an object                          */
+/*-----------------------------------------------------------------*/
+static asmop *
+aopForRemat (symbol *sym)
+{
+  iCode *ic = sym->rematiCode;
+  asmop *aop = newAsmop (AOP_IMMD);
+  int val = 0;
+  struct dbuf_s dbuf;
+
+  wassert(ic);
+
+  for (;;)
+    {
+      if (ic->op == '+')
+        {
+          if (isOperandLiteral (IC_RIGHT (ic)))
+            {
+              val += (int) operandLitValue (IC_RIGHT (ic));
+              ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+            }
+          else
+            {
+              val += (int) operandLitValue (IC_LEFT (ic));
+              ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+            }
+        }
+      else if (ic->op == '-')
+        {
+          val -= (int) operandLitValue (IC_RIGHT (ic));
+          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
+        }
+      else if (IS_CAST_ICODE (ic))
+        {
+          ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
+        }
+      else if (ic->op == ADDRESS_OF)
+        {
+          val += (int) operandLitValue (IC_RIGHT (ic));
+          break;
+        }
+      else
+        break;
+    }
+
+  dbuf_init (&dbuf, 128);
+
+  if (val)
+    {
+      wassert(0);
+      //dbuf_printf (&dbuf, "(%s %c 0x%04x)", OP_SYMBOL (IC_LEFT (ic))->rname, val >= 0 ? '+' : '-', abs (val) & 0xffff);
+    }
+  else
+    aop->aopu.aop_immd = OP_SYMBOL (IC_LEFT (ic))->rname;
+
+  aop->size = getSize (sym->type);
 
   return aop;
 }
@@ -979,6 +1040,20 @@ aopOp (operand *op, const iCode *ic)
       return;
     }
 
+  /* Rematerialize symbols where all bytes are spilt. */
+  if (sym->remat && sym->isspilt)
+    {
+      bool completely_spilt = TRUE;
+      for (i = 0; i < getSize (sym->type); i++)
+        if (sym->regs[i])
+          completely_spilt = FALSE;
+      if (completely_spilt)
+        {
+          op->aop = aopForRemat (sym);
+          return;
+        }
+    }
+
   /* if the type is a conditional */
   if (sym->regType == REG_CND)
     {
@@ -986,11 +1061,6 @@ aopOp (operand *op, const iCode *ic)
       op->aop = aop;
       sym->aop = sym->aop;
       return;
-    }
-
-  if (sym->remat)
-    {
-      wassertl (0, "Unimplemented remat asmop.");
     }
 
   /* None of the above, which only leaves temporaries. */
@@ -7342,6 +7412,25 @@ genDummyRead (const iCode *ic)
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* resultRemat - result is to be rematerialized                    */
+/*-----------------------------------------------------------------*/
+static int
+resultRemat (const iCode * ic)
+{
+  if (SKIP_IC (ic) || ic->op == IFX)
+    return 0;
+
+  if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
+    {
+      const symbol *sym = OP_SYMBOL_CONST (IC_RESULT (ic));
+      if (sym->remat && !POINTER_SET (ic) && sym->isspilt)
+        return 1;
+    }
+
+  return 0;
+}
+
 /*---------------------------------------------------------------------*/
 /* genSTM8Code - generate code for STM8 for a single iCode instruction */
 /*---------------------------------------------------------------------*/
@@ -7354,6 +7443,13 @@ genSTM8iCode (iCode *ic)
   if (!regalloc_dry_run)
     printf ("ic %d op %d stack pushed %d\n", ic->key, ic->op, G.stack.pushed);
 #endif
+
+  if (resultRemat (ic))
+    {
+      if (!regalloc_dry_run)
+        D (emit2 ("; skipping iCode since result will be rematerialized", ""));
+      return;
+    }
 
   if (ic->generated)
     {

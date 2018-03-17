@@ -1,5 +1,10 @@
 2018-03-17 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Implement RFE #566.
+
+2018-03-17 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/valdiag/tests/restrict.c:
 	  Test for bug #2714.
 	* src/SDCCralloc.hpp:

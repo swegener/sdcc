@@ -2129,6 +2129,10 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 
   for (i = 0; i < size;)
     {
+      x_dead = x_dead && (!aopRS (result) || (result->regs[XL_IDX] >= (roffset + i) || result->regs[XL_IDX] < 0) && (result->regs[XH_IDX] >= (roffset + i) || result->regs[XH_IDX] < 0)) && (!aopRS (source) || source->regs[XL_IDX] <= i + 1 && source->regs[XH_IDX] <= i + 1);
+      y_dead = y_dead && (!aopRS (result) || (result->regs[YL_IDX] >= (roffset + i) || result->regs[YL_IDX] < 0) && (result->regs[YH_IDX] >= (roffset + i) || result->regs[YH_IDX] < 0)) && (!aopRS (source) || source->regs[YL_IDX] <= i + 1 && source->regs[YH_IDX] <= i + 1);
+      a_dead = a_dead && (!aopRS (result) || (result->regs[A_IDX] >= (roffset + i) || result->regs[A_IDX] < 0)) && (!aopRS (source) || source->regs[A_IDX] <= i);
+
       if (i + 1 < size && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && aopIsLitVal (source, soffset + i, 2, 0x0000))
         {
           if (aopInReg (result, roffset + i, X_IDX) && !clr_x)
@@ -2185,8 +2189,9 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           cost (4, 2);
           i += 2;
         }
-      else if (x_dead && i + 1 < size && (result->regs[XL_IDX] < 0 && result->regs[XH_IDX] < 0 && aopOnStack (result, roffset + i, 2) || result->type == AOP_DIR) &&
-        (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
+      else if (x_dead && i + 1 < size &&
+        (aopOnStack (result, roffset + i, 2) || result->type == AOP_DIR) &&
+        (aopOnStackNotExt (source, soffset + i, 2) || source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           if (aopIsLitVal (source, soffset + i, 2, 0x0000))
             {
@@ -2207,7 +2212,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       else if (i + 1 < size && aopIsLitVal (source, soffset + i + 1, 1, 0x00) && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)))
         {
           emit3w_o (A_CLRW, result, roffset + i, 0, 0);
-          cheapMove (result, roffset + i, source, soffset + i, !(a_dead && (result->regs[A_IDX] >= i || result->regs[A_IDX] == -1) && source->regs[A_IDX] <= i));
+          cheapMove (result, roffset + i, source, soffset + i, !a_dead);
           i += 2;
         }
       else if ((!aopRS (result) || aopOnStack(result, roffset + i, 1) || aopInReg (result, roffset + i, A_IDX)) && aopIsLitVal (source, soffset + i, 1, 0x00))
@@ -2215,7 +2220,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           emit3_o (A_CLR, result, roffset + i, 0, 0);
           i++;
         }
-      else if (y_dead && result->regs[YL_IDX] < 0 && result->regs[YH_IDX] < 0 && aopOnStack (result, roffset + i, 2) &&
+      else if (y_dead && aopOnStack (result, roffset + i, 2) &&
         (source->type == AOP_LIT || source->type == AOP_DIR && soffset + i + 1 < source->size || source->type == AOP_IMMD))
         {
           if (aopIsLitVal (source, soffset + i, 2, 0x0000))
@@ -2234,9 +2239,17 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           cost (2, 2);
           i += 2;
         }
+      else if (y_dead && i + 1 < size && aopOnStack (source, soffset + i, 2) && source->type == AOP_DIR)
+        {
+          emit2 ("ldw", "y, %s", aopGet2 (source, soffset + i));
+          emit2 ("ldw", "%s, y", aopGet2 (result, roffset + i));
+          cost (6, 4);
+          clr_y = FALSE;
+          i += 2;
+        }
       else
         {
-          cheapMove (result, roffset + i, source, soffset + i, !(a_dead && (result->regs[A_IDX] >= (roffset + i) || result->regs[A_IDX] == -1) && source->regs[A_IDX] <= i));
+          cheapMove (result, roffset + i, source, soffset + i, !a_dead);
           i++;
         }
     }

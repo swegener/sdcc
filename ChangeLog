@@ -2,6 +2,8 @@
 
 	* support/valdiag/tests/restrict.c:
 	  Test for bug #2714.
+	* src/SDCCralloc.hpp:
+	  Faster check for non-connected live-ranges.
 
 2018-03-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

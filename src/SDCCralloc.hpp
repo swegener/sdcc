@@ -266,8 +266,80 @@ add_operand_to_cfg_node(cfg_node &n, operand *o, std::map<std::pair<int, reg_t>,
     }
 }
 
+// Check if the live-range of variable i is connected
+#if 0
+// This check was too expensive - Profiling shows that compiling the Dhrystone benchmark for stm8 with default options, we spent about a quarter of compiler runtime in here!
+// Profiling shows that we spent a significant amount of time on the first call to copy_graph()
+// Todo: Improve efficiency, e.g. using subgraph or filtered_graph to avoid the costly first call to copy_graph()
+// Issues to solve: cfg2 is undirected, cfg is bidirectional; this makes use of subgraph or filtered_graph harder.
+static bool liverange_connected(cfg_t &cfg, var_t i)
+{
+  cfg_sym_t cfg2;
+  boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties())); // This call to copy_graph is expensive!
+  for (int j = boost::num_vertices(cfg) - 1; j >= 0; j--)
+    {
+      if (std::find(cfg[j].alive.begin(), cfg[j].alive.end(), i) == cfg[j].alive.end())
+        {
+          boost::clear_vertex(j, cfg2);
+          boost::remove_vertex(j, cfg2);
+        }
+    }
+
+  std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));
+
+  return(boost::connected_components(cfg2, &component[0]) <= 1);
+}
+#else
+// A not very elegant, but faster check
+static inline int component_size_impl(const cfg_t &cfg, var_t v, int i, std::vector<bool>& visited)
+{
+  typename boost::graph_traits<cfg_t>::in_edge_iterator in, in_end;
+  typename boost::graph_traits<cfg_t>::out_edge_iterator out, out_end;
+
+  int size = 1;
+  visited[i] = true;
+
+  for(boost::tie(in, in_end) = boost::in_edges(i, cfg); in != in_end; ++in)
+    if(!visited[boost::source(*in, cfg)])
+      size += component_size_impl(cfg, v, boost::source(*in, cfg), visited);
+
+  for(boost::tie(out, out_end) = boost::out_edges(i, cfg); out != out_end; ++out)
+    if(!visited[boost::target(*out, cfg)])
+      size += component_size_impl(cfg, v, boost::target(*out, cfg), visited);
+
+  return(size);
+}
+
+static inline int component_size(const cfg_t &cfg, var_t v, int i)
+{
+  std::vector<bool> visited(boost::num_vertices(cfg));
+
+  return(component_size_impl(cfg, v, i, visited));
+}
+
+static bool liverange_connected(const cfg_t &cfg, var_t v)
+{
+  std::vector<bool> life(boost::num_vertices(cfg));
+  int num_life = 0;
+  int last_life;
+
+  for(int i = 0; i < boost::num_vertices (cfg); i++)
+    if(std::find(cfg[i].alive.begin(), cfg[i].alive.end(), v) != cfg[i].alive.end())
+      {
+        life[i] = true;
+        num_life++;
+        last_life = i;
+      }
+
+  if(!num_life)
+    return(true);
+
+  return(component_size(cfg, v, last_life) >= num_life);
+}
+#endif
+
 // A quick-and-dirty function to get the CFG from sdcc.
-static inline iCode *
+static iCode *
 create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 {
   eBBlock **ebbs = ebbi->bbOrder;
@@ -441,45 +513,27 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
 #endif
 
   // Check for unconnected live ranges, some might have survived earlier stages.
-  // This check is too expensive - Profiling shows that compiling the Dhrystone benchmark for stm8 with default options, we spend about a quarter of compiler runtime in here!
-  // Profiling shows that we spend a significant amount of time on the first call to copy_graph()
-  // Todo: Improve efficiency, e.g. using subgraph or filtered_graph to avoid the costly first call to copy_graph()
-  // Issues to solve: cfg2 is undirected, cfg is bidirectional; this makes use of subgraph or filtered_graph harder.
   for (var_t i = (var_t)boost::num_vertices(con) - 1; i >= 0; i--)
-    {
-      cfg_sym_t cfg2;
-      boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties())); // This call to copy_graph is expensive!
-      for (int j = boost::num_vertices(cfg) - 1; j >= 0; j--)
-        {
-          if (std::find(cfg[j].alive.begin(), cfg[j].alive.end(), i) == cfg[j].alive.end())
-            {
-              boost::clear_vertex(j, cfg2);
-              boost::remove_vertex(j, cfg2);
-            }
-        }
+    if (!liverange_connected(cfg, i))
+      {
+        // Non-connected CFGs are created by at least GCSE and lospre. We now have a live-range splitter that fixes them, so this should no longer be necessary, but we leave this code here for now, so in case one gets through, we can still generate correct code.
+        std::cerr << "Warning: Non-connected liverange found and extended to connected component of the CFG:" << con[i].name << ". Please contact sdcc authors with source code to reproduce.\n";
 
-      std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));
-      if (boost::connected_components(cfg2, &component[0]) > 1)
-        {
-          // Non-connected CFGs are created by at least GCSE and lospre. We now have a live-range splitter that fixes them, so this should no longer be necessary, but we leave this code here for now, so in case one gets through, we can still generate correct code.
-          std::cerr << "Warning: Non-connected liverange found and extended to connected component of the CFG:" << con[i].name << ". Please contact sdcc authors with source code to reproduce.\n";
+        cfg_sym_t cfg2;
+        boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
+        std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));
+        boost::connected_components(cfg2, &component[0]);
 
-          cfg_sym_t cfg2;
-          boost::copy_graph(cfg, cfg2, boost::vertex_copy(forget_properties()).edge_copy(forget_properties()));
-          std::vector<boost::graph_traits<cfg_t>::vertices_size_type> component(num_vertices(cfg2));
-          boost::connected_components(cfg2, &component[0]);
+        for (boost::graph_traits<cfg_t>::vertices_size_type j = 0; j < boost::num_vertices(cfg) - 1; j++)
+          {
+            if (std::find(cfg[j].alive.begin(), cfg[j].alive.end(), i) == cfg[j].alive.end())
+              continue;
 
-          for (boost::graph_traits<cfg_t>::vertices_size_type j = 0; j < boost::num_vertices(cfg) - 1; j++)
-            {
-              if (std::find(cfg[j].alive.begin(), cfg[j].alive.end(), i) == cfg[j].alive.end())
-                continue;
-
-              for (boost::graph_traits<cfg_t>::vertices_size_type k = 0; k < boost::num_vertices(cfg) - 1; k++)
-                if (component[j] == component[k] && std::find(cfg[k].alive.begin(), cfg[k].alive.end(), i) == cfg[k].alive.end())
-                  cfg[k].alive.push_back(i);
-            }
-        }
-    }
+            for (boost::graph_traits<cfg_t>::vertices_size_type k = 0; k < boost::num_vertices(cfg) - 1; k++)
+              if (component[j] == component[k] && std::find(cfg[k].alive.begin(), cfg[k].alive.end(), i) == cfg[k].alive.end())
+                cfg[k].alive.push_back(i);
+          }
+      }
 
   // Sort alive and setup dying.
   for (boost::graph_traits<cfg_t>::vertices_size_type i = 0; i < num_vertices(cfg); i++)

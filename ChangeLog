@@ -1,3 +1,8 @@
+2018-03-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Improve handling of rematerialized operands in addition.
+
 2018-03-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/valdiag/valdiag.py: Fix a very old bug, more fixes

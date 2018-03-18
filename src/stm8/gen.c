@@ -3543,7 +3543,7 @@ genPlus (const iCode *ic)
   size = result->aop->size;
 
   /* Swap if left is literal or right is in A. */
-  if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD || aopInReg (right->aop, 0, A_IDX) || right->aop->type != AOP_LIT && right->aop->size == 1 && aopOnStackNotExt (left->aop, 0, 2) || left->aop->type == AOP_STK && (right->aop->type == AOP_REG || right->aop->type == AOP_REGSTK)) // todo: Swap in more cases when right in reg, left not. Swap individually per-byte.
+  if (left->aop->type == AOP_LIT || right->aop->type != AOP_LIT && left->aop->type == AOP_IMMD || aopInReg (right->aop, 0, A_IDX) || right->aop->type != AOP_LIT && right->aop->size == 1 && aopOnStackNotExt (left->aop, 0, 2) || left->aop->type == AOP_STK && (right->aop->type == AOP_REG || right->aop->type == AOP_REGSTK)) // todo: Swap in more cases when right in reg, left not. Swap individually per-byte.
     {
       operand *t = right;
       right = left;
@@ -3644,8 +3644,20 @@ genPlus (const iCode *ic)
        bool yh_free = regDead (YH_IDX, ic) && (result->aop->regs[YH_IDX] >= i || result->aop->regs[YH_IDX] < 0) && leftop->regs[YH_IDX] <= i + 1 && rightop->regs[YH_IDX] < i;
        bool y_free = yl_free && yh_free;
 
+      // Special case for rematerializing sums
+      if (!started && i == size - 2 && (leftop->type == AOP_IMMD && rightop->type == AOP_LIT) &&
+        (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX) || x_free && aopOnStack (result->aop, i, 2)))
+        {
+          unsigned offset = byteOfVal (right->aop->aopu.aop_lit, 1) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
+          bool y = aopInReg (result->aop, i, Y_IDX) ;
+          emit2 ("ldw", y ? "y, %s+%d" : "x, %s+%d", aopGet2 (leftop, i), offset);
+          cost (3 + y, 2);
+          genMove_o (result->aop, i, y ? ASMOP_Y : ASMOP_X, 0, 2, a_free, TRUE, y_free);
+          started = TRUE;
+          i += 2;
+        }
       // We can use incw / decw easily only for the only, top non-zero word, since it neither takes into account an existing carry nor does it update the carry.
-      if (!started && i == size - 2 &&
+      else if (!started && i == size - 2 &&
         (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
         rightop->type == AOP_LIT && !byteOfVal (rightop->aopu.aop_lit, i + 1) &&
         byteOfVal (rightop->aopu.aop_lit, i) <= 1 + aopInReg (result->aop, i, X_IDX) ||
@@ -3692,9 +3704,9 @@ genPlus (const iCode *ic)
                 emit3w_o (A_INCW, result->aop, i, 0, 0);
               else
                 {
-                  genMove_o (ASMOP_X, 0, leftop, i, 2, a_free, TRUE, FALSE);
+                  genMove_o (ASMOP_X, 0, leftop, i, 2, a_free, TRUE, y_free);
                   emit3w (A_INCW, ASMOP_X, 0);
-                  genMove_o (result->aop, i, ASMOP_X, 0, 2, a_free, TRUE, FALSE);
+                  genMove_o (result->aop, i, ASMOP_X, 0, 2, a_free, TRUE, y_free);
                 }
               i += 2;
               if(i >= size)

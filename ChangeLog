@@ -2,6 +2,8 @@
 
 	* src/stm8/gen.c:
 	  Improve handling of rematerialized operands and I/O.
+	* support/sdbinutils:
+	  Merge upstream GNU Binutils 2.30.
 
 2018-03-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

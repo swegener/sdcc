@@ -1,5 +1,5 @@
 /* srconv.c -- Sysroff conversion program
-   Copyright (C) 1994-2014 Free Software Foundation, Inc.
+   Copyright (C) 1994-2018 Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
 
@@ -43,52 +43,12 @@ static int addrsize;
 static char *toolname;
 static char **rnames;
 
-static int get_member_id (int);
-static int get_ordinary_id (int);
-static char *section_translate (char *);
-static char *strip_suffix (const char *);
-static void checksum (FILE *, unsigned char *, int, int);
-static void writeINT (int, unsigned char *, int *, int, FILE *);
-static void writeBITS (int, unsigned char *, int *, int);
-static void writeBARRAY (barray, unsigned char *, int *, int, FILE *);
-static void writeCHARS (char *, unsigned char *, int *, int, FILE *);
-static void wr_tr (void);
-static void wr_un (struct coff_ofile *, struct coff_sfile *, int, int);
-static void wr_hd (struct coff_ofile *);
-static void wr_sh (struct coff_ofile *, struct coff_section *);
-static void wr_ob (struct coff_ofile *, struct coff_section *);
-static void wr_rl (struct coff_ofile *, struct coff_section *);
-static void wr_object_body (struct coff_ofile *);
-static void wr_dps_start
-  (struct coff_sfile *, struct coff_section *, struct coff_scope *, int, int);
-static void wr_dps_end (struct coff_section *, struct coff_scope *, int);
-static int *nints (int);
-static void walk_tree_type_1
-  (struct coff_sfile *, struct coff_symbol *, struct coff_type *, int);
-static void walk_tree_type
-  (struct coff_sfile *, struct coff_symbol *, struct coff_type *, int);
 static void walk_tree_symbol
   (struct coff_sfile *, struct coff_section *, struct coff_symbol *, int);
 static void walk_tree_scope
   (struct coff_section *, struct coff_sfile *, struct coff_scope *, int, int);
-static void walk_tree_sfile (struct coff_section *, struct coff_sfile *);
-static void wr_program_structure (struct coff_ofile *, struct coff_sfile *);
-static void wr_du (struct coff_ofile *, struct coff_sfile *, int);
-static void wr_dus (struct coff_ofile *, struct coff_sfile *);
 static int find_base (struct coff_sfile *, struct coff_section *);
-static void wr_dln (struct coff_ofile *, struct coff_sfile *, int);
 static void wr_globals (struct coff_ofile *, struct coff_sfile *, int);
-static void wr_debug (struct coff_ofile *);
-static void wr_cs (void);
-static int wr_sc (struct coff_ofile *, struct coff_sfile *);
-static void wr_er (struct coff_ofile *, struct coff_sfile *, int);
-static void wr_ed (struct coff_ofile *, struct coff_sfile *, int);
-static void wr_unit_info (struct coff_ofile *);
-static void wr_module (struct coff_ofile *);
-static int align (int);
-static void prescan (struct coff_ofile *);
-static void show_usage (FILE *, int);
-extern int main (int, char **);
 
 static FILE *file;
 static bfd *abfd;
@@ -167,7 +127,8 @@ checksum (FILE *ffile, unsigned char *ptr, int size, int ccode)
 
   last = !(ccode & 0xff00);
   if (size & 0x7)
-    abort ();
+    fatal (_("Checksum failure"));
+
   ptr[0] = ccode | (last ? 0x80 : 0);
   ptr[1] = bytes + 1;
 
@@ -178,7 +139,7 @@ checksum (FILE *ffile, unsigned char *ptr, int size, int ccode)
   ptr[bytes] = ~sum;
   if (fwrite (ptr, bytes + 1, 1, ffile) != 1)
     /* FIXME: Return error status.  */
-    abort ();
+    fatal (_("Failed to write checksum"));
 }
 
 
@@ -218,7 +179,7 @@ writeINT (int n, unsigned char *ptr, int *idx, int size, FILE *ffile)
       ptr[byte + 3] = n >> 0;
       break;
     default:
-      abort ();
+      fatal (_("Unsupported integer write size: %d"), size);
     }
   *idx += size * 8;
 }
@@ -304,7 +265,7 @@ wr_tr (void)
 
   if (fwrite (b, sizeof (b), 1, file) != 1)
     /* FIXME: Return error status.  */
-    abort ();
+    fatal (_("Failed to write TR block"));
 }
 
 static void
@@ -395,7 +356,8 @@ wr_hd (struct coff_ofile *p)
 	  toolname = "C_H8/300S";
 	  break;
 	default:
-	  abort();
+	  fatal (_("Unrecognized H8300 sub-architecture: %ld"),
+		 bfd_get_mach (abfd));
 	}
       rnames = rname_h8300;
       break;
@@ -412,7 +374,7 @@ wr_hd (struct coff_ofile *p)
       rnames = rname_sh;
       break;
     default:
-      abort ();
+      fatal (_("Unsupported architecture: %d"), bfd_get_arch (abfd));
     }
 
   if (! (bfd_get_file_flags(abfd) & EXEC_P))
@@ -866,7 +828,7 @@ walk_tree_type_1 (struct coff_sfile *sfile, struct coff_symbol *symbol,
       break;
 
     default:
-      abort ();
+      fatal (_("Unrecognised type: %d"), type->type);
     }
 }
 
@@ -912,13 +874,14 @@ static void
 walk_tree_type (struct coff_sfile *sfile, struct coff_symbol *symbol,
 		struct coff_type *type, int nest)
 {
+  struct IT_dty dty;
+
+  dty.spare = 0;
+  dty.end = 0;
+  dty.neg = 0x1001;
+
   if (symbol->type->type == coff_function_type)
     {
-      struct IT_dty dty;
-
-      dty.end = 0;
-      dty.neg = 0x1001;
-
       sysroff_swap_dty_out (file, &dty);
       walk_tree_type_1 (sfile, symbol, type, nest);
       dty.end = 1;
@@ -944,10 +907,6 @@ walk_tree_type (struct coff_sfile *sfile, struct coff_symbol *symbol,
     }
   else
     {
-      struct IT_dty dty;
-
-      dty.end = 0;
-      dty.neg = 0x1001;
       sysroff_swap_dty_out (file, &dty);
       walk_tree_type_1 (sfile, symbol, type, nest);
       dty.end = 1;
@@ -995,7 +954,7 @@ walk_tree_symbol (struct coff_sfile *sfile, struct coff_section *section ATTRIBU
       return;
 
     default:
-      abort ();
+      fatal (_("Unrecognised coff symbol type: %d"), symbol->type->type);
     }
 
   if (symbol->where->where == coff_where_member_of_struct)
@@ -1057,7 +1016,7 @@ walk_tree_symbol (struct coff_sfile *sfile, struct coff_section *section ATTRIBU
       break;
 
     default:
-      abort ();
+      fatal (_("Unrecognised coff symbol visibility: %d"), symbol->visible->type);
     }
 
   dsy.dlength = symbol->type->size;
@@ -1083,7 +1042,7 @@ walk_tree_symbol (struct coff_sfile *sfile, struct coff_section *section ATTRIBU
       break;
 
     default:
-      abort ();
+      fatal (_("Unrecognised coff symbol location: %d"), symbol->where->where);
     }
 
   switch (symbol->where->where)
@@ -1128,7 +1087,7 @@ walk_tree_symbol (struct coff_sfile *sfile, struct coff_section *section ATTRIBU
       break;
 
     default:
-      abort ();
+      fatal (_("Unrecognised coff symbol location: %d"), symbol->where->where);
     }
 
   if (symbol->where->where == coff_where_register)
@@ -1157,7 +1116,7 @@ walk_tree_symbol (struct coff_sfile *sfile, struct coff_section *section ATTRIBU
       break;
 
     default:
-      abort ();
+      fatal (_("Unrecognised coff symbol visibility: %d"), symbol->visible->type);
     }
 
   dsy.sfn = 0;
@@ -1202,6 +1161,8 @@ walk_tree_sfile (struct coff_section *section, struct coff_sfile *sfile)
 static void
 wr_program_structure (struct coff_ofile *p, struct coff_sfile *sfile)
 {
+  if (p->nsections < 4)
+    return;
   walk_tree_sfile (p->sections + 4, sfile);
 }
 
@@ -1460,7 +1421,7 @@ wr_cs (void)
 
   if (fwrite (b, sizeof (b), 1, file) != 1)
     /* FIXME: Return error status.  */
-    abort ();
+    fatal (_("Failed to write CS struct"));
 }
 
 /* Write out the SC records for a unit.  Create an SC
@@ -1703,6 +1664,9 @@ prescan (struct coff_ofile *otree)
   struct coff_symbol *s;
   struct coff_section *common_section;
 
+  if (otree->nsections < 3)
+    return;
+
   /* Find the common section - always section 3.  */
   common_section = otree->sections + 3;
 
@@ -1713,7 +1677,6 @@ prescan (struct coff_ofile *otree)
       if (s->visible->type == coff_vis_common)
 	{
 	  struct coff_where *w = s->where;
-
 	  /*      s->visible->type = coff_vis_ext_def; leave it as common */
 	  common_section->size = align (common_section->size);
 	  w->offset = common_section->size + common_section->address;
@@ -1726,7 +1689,7 @@ prescan (struct coff_ofile *otree)
 
 char *program_name;
 
-static void
+ATTRIBUTE_NORETURN static void
 show_usage (FILE *ffile, int status)
 {
   fprintf (ffile, _("Usage: %s [option(s)] in-file [out-file]\n"), program_name);
@@ -1772,6 +1735,7 @@ main (int ac, char **av)
 
   program_name = av[0];
   xmalloc_set_program_name (program_name);
+  bfd_set_error_program_name (program_name);
 
   expandargv (&ac, &av);
 
@@ -1883,10 +1847,12 @@ main (int ac, char **av)
     printf ("ids %d %d\n", base1, base2);
 
   tree = coff_grok (abfd);
+  if (tree)
+    {
+      if (!noprescan)
+	prescan (tree);
 
-  if (!noprescan)
-    prescan (tree);
-
-  wr_module (tree);
+      wr_module (tree);
+    }
   return 0;
 }

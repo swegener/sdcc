@@ -1,5 +1,5 @@
 /* BFD back-end for National Semiconductor's CR16C ELF
-   Copyright (C) 2004-2014 Free Software Foundation, Inc.
+   Copyright (C) 2004-2018 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -180,7 +180,12 @@ elf_cr16c_info_to_howto_rel (bfd *abfd ATTRIBUTE_UNUSED,
 {
   unsigned int r_type = ELF32_R_TYPE (dst->r_info);
 
-  BFD_ASSERT (r_type < (unsigned int) RINDEX_16C_MAX);
+  if (r_type >= RINDEX_16C_MAX)
+    {
+      /* xgettext:c-format */
+      _bfd_error_handler (_("%B: invalid CR16C reloc number: %d"), abfd, r_type);
+      r_type = 0;
+    }
   cache_ptr->howto = &elf_howto_table[r_type];
 }
 
@@ -228,10 +233,10 @@ cr16c_elf_final_link_relocate (reloc_howto_type *howto,
     case R_NUMBER:
       switch (size)
 	{
-	case R_S_16C_08: 	/* One byte.  */
+	case R_S_16C_08:	/* One byte.  */
 	  value = bfd_get_8 (abfd, (char *) data + octets);
 	  break;
-	case R_S_16C_16: 	/* Two bytes. */
+	case R_S_16C_16:	/* Two bytes. */
 	  sword = bfd_get_16 (abfd, (bfd_byte *) data + octets);
 	  value = sword;
 	  break;
@@ -432,7 +437,7 @@ cr16c_elf_final_link_relocate (reloc_howto_type *howto,
     case R_NUMBER:
       switch (size)
 	{
-	case R_S_16C_08: 	/* One byte.  */
+	case R_S_16C_08:	/* One byte.  */
 	  if (value > (int) MAX_UBYTE || value < MIN_BYTE)
 	    return bfd_reloc_overflow;
 	  value &= 0xFF;
@@ -577,7 +582,7 @@ cr16c_elf_final_link_relocate (reloc_howto_type *howto,
 	  if (neg2pos)
 	    {
 	      /* Change load/stor negative displ opcode
-	         to load/stor positive displ opcode.  */
+		 to load/stor positive displ opcode.  */
 	      value = bfd_get_8 (abfd, (char *) data + octets - 3);
 	      value &= 0xF7;
 	      value |= 0x2;
@@ -726,7 +731,7 @@ elf32_cr16c_relocate_section (bfd *output_bfd,
 	RELOC_AGAINST_DISCARDED_SECTION (info, input_bfd, input_section,
 					 rel, 1, relend, howto, 0, contents);
 
-      if (info->relocatable)
+      if (bfd_link_relocatable (info))
 	{
 	  /* This is a relocatable link.  We don't have to change
 	     anything, unless the reloc is against a section symbol,
@@ -761,18 +766,14 @@ elf32_cr16c_relocate_section (bfd *output_bfd,
 	  switch (r)
 	    {
 	    case bfd_reloc_overflow:
-	      if (!((*info->callbacks->reloc_overflow)
-		    (info, (h ? &h->root : NULL), name, howto->name,
-		     (bfd_vma) 0, input_bfd, input_section,
-		     rel->r_offset)))
-		return FALSE;
+	      (*info->callbacks->reloc_overflow)
+		(info, (h ? &h->root : NULL), name, howto->name,
+		 (bfd_vma) 0, input_bfd, input_section, rel->r_offset);
 	      break;
 
 	    case bfd_reloc_undefined:
-	      if (!((*info->callbacks->undefined_symbol)
-		    (info, name, input_bfd, input_section,
-		     rel->r_offset, TRUE)))
-		return FALSE;
+	      (*info->callbacks->undefined_symbol)
+		(info, name, input_bfd, input_section, rel->r_offset, TRUE);
 	      break;
 
 	    case bfd_reloc_outofrange:
@@ -792,10 +793,8 @@ elf32_cr16c_relocate_section (bfd *output_bfd,
 	      /* fall through */
 
 	    common_error:
-	      if (!((*info->callbacks->warning)
-		    (info, msg, name, input_bfd, input_section,
-		     rel->r_offset)))
-		return FALSE;
+	      (*info->callbacks->warning) (info, msg, name, input_bfd,
+					   input_section, rel->r_offset);
 	      break;
 	    }
 	}
@@ -952,9 +951,9 @@ elf32_cr16c_link_output_symbol_hook (struct bfd_link_info *info ATTRIBUTE_UNUSED
 #define elf_info_to_howto_rel			elf_cr16c_info_to_howto_rel
 #define elf_backend_relocate_section		elf32_cr16c_relocate_section
 #define elf_backend_symbol_processing		elf32_cr16c_symbol_processing
-#define elf_backend_section_from_bfd_section 	elf32_cr16c_section_from_bfd_section
+#define elf_backend_section_from_bfd_section	elf32_cr16c_section_from_bfd_section
 #define elf_backend_add_symbol_hook		elf32_cr16c_add_symbol_hook
-#define elf_backend_link_output_symbol_hook 	elf32_cr16c_link_output_symbol_hook
+#define elf_backend_link_output_symbol_hook	elf32_cr16c_link_output_symbol_hook
 
 #define elf_backend_can_gc_sections     1
 

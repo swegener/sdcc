@@ -1,5 +1,5 @@
 /* Define a target vector and some small routines for a variant of a.out.
-   Copyright (C) 1990-2014 Free Software Foundation, Inc.
+   Copyright (C) 1990-2018 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -42,12 +42,12 @@ MY (callback) (bfd *abfd)
   unsigned long arch_align;
 
   /* Calculate the file positions of the parts of a newly read aout header.  */
-  obj_textsec (abfd)->size = N_TXTSIZE (*execp);
+  obj_textsec (abfd)->size = N_TXTSIZE (execp);
 
   /* The virtual memory addresses of the sections.  */
-  obj_textsec (abfd)->vma = N_TXTADDR (*execp);
-  obj_datasec (abfd)->vma = N_DATADDR (*execp);
-  obj_bsssec  (abfd)->vma = N_BSSADDR (*execp);
+  obj_textsec (abfd)->vma = N_TXTADDR (execp);
+  obj_datasec (abfd)->vma = N_DATADDR (execp);
+  obj_bsssec  (abfd)->vma = N_BSSADDR (execp);
 
   /* For some targets, if the entry point is not in the same page
      as the start of the text, then adjust the VMA so that it is.
@@ -71,20 +71,20 @@ MY (callback) (bfd *abfd)
   obj_bsssec (abfd)->lma = obj_bsssec (abfd)->vma;
 
   /* The file offsets of the sections.  */
-  obj_textsec (abfd)->filepos = N_TXTOFF (*execp);
-  obj_datasec (abfd)->filepos = N_DATOFF (*execp);
+  obj_textsec (abfd)->filepos = N_TXTOFF (execp);
+  obj_datasec (abfd)->filepos = N_DATOFF (execp);
 
   /* The file offsets of the relocation info.  */
-  obj_textsec (abfd)->rel_filepos = N_TRELOFF (*execp);
-  obj_datasec (abfd)->rel_filepos = N_DRELOFF (*execp);
+  obj_textsec (abfd)->rel_filepos = N_TRELOFF (execp);
+  obj_datasec (abfd)->rel_filepos = N_DRELOFF (execp);
 
   /* The file offsets of the string table and symbol table.  */
-  obj_sym_filepos (abfd) = N_SYMOFF (*execp);
-  obj_str_filepos (abfd) = N_STROFF (*execp);
+  obj_sym_filepos (abfd) = N_SYMOFF (execp);
+  obj_str_filepos (abfd) = N_STROFF (execp);
 
   /* Determine the architecture and machine type of the object file.  */
 #ifdef SET_ARCH_MACH
-  SET_ARCH_MACH (abfd, *execp);
+  SET_ARCH_MACH (abfd, execp);
 #else
   bfd_default_set_arch_mach (abfd, DEFAULT_ARCH, 0);
 #endif
@@ -149,11 +149,11 @@ MY (object_p) (bfd *abfd)
   exec.a_info = GET_MAGIC (abfd, exec_bytes.e_info);
 #endif
 
-  if (N_BADMAG (exec))
+  if (N_BADMAG (&exec))
     return 0;
 
 #ifdef MACHTYPE_OK
-  if (!(MACHTYPE_OK (N_MACHTYPE (exec))))
+  if (!(MACHTYPE_OK (N_MACHTYPE (&exec))))
     return 0;
 #endif
 
@@ -332,9 +332,9 @@ MY_final_link_callback (bfd *abfd,
 {
   struct internal_exec *execp = exec_hdr (abfd);
 
-  *ptreloff = N_TRELOFF (*execp);
-  *pdreloff = N_DRELOFF (*execp);
-  *psymoff = N_SYMOFF (*execp);
+  *ptreloff = N_TRELOFF (execp);
+  *pdreloff = N_DRELOFF (execp);
+  *psymoff = N_SYMOFF (execp);
 }
 
 #endif
@@ -373,7 +373,7 @@ MY_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
   _bfd_archive_bsd_construct_extended_name_table
 #endif
 #ifndef	MY_write_armap
-#define	MY_write_armap		bsd_write_armap
+#define	MY_write_armap		_bfd_bsd_write_armap
 #endif
 #ifndef MY_read_ar_hdr
 #define MY_read_ar_hdr		_bfd_generic_read_ar_hdr
@@ -450,6 +450,9 @@ MY_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
 #ifndef MY_canonicalize_reloc
 #define MY_canonicalize_reloc NAME (aout, canonicalize_reloc)
 #endif
+#ifndef MY_set_reloc
+#define MY_set_reloc _bfd_generic_set_reloc
+#endif
 #ifndef MY_make_empty_symbol
 #define MY_make_empty_symbol NAME (aout, make_empty_symbol)
 #endif
@@ -458,6 +461,10 @@ MY_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
 #endif
 #ifndef MY_get_symbol_info
 #define MY_get_symbol_info NAME (aout, get_symbol_info)
+#endif
+#ifndef MY_get_symbol_version_string
+#define MY_get_symbol_version_string \
+  _bfd_nosymbols_get_symbol_version_string
 #endif
 #ifndef MY_get_lineno
 #define MY_get_lineno NAME (aout, get_lineno)
@@ -506,6 +513,9 @@ MY_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
 #ifndef MY_bfd_define_common_symbol
 #define MY_bfd_define_common_symbol bfd_generic_define_common_symbol
 #endif
+#ifndef MY_bfd_define_start_stop
+#define MY_bfd_define_start_stop bfd_generic_define_start_stop
+#endif
 #ifndef MY_bfd_reloc_type_lookup
 #define MY_bfd_reloc_type_lookup NAME (aout, reloc_type_lookup)
 #endif
@@ -536,6 +546,10 @@ MY_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
 #endif
 #ifndef MY_bfd_link_split_section
 #define MY_bfd_link_split_section  _bfd_generic_link_split_section
+#endif
+
+#ifndef MY_bfd_link_check_relocs
+#define MY_bfd_link_check_relocs   _bfd_generic_link_check_relocs
 #endif
 
 #ifndef MY_bfd_copy_private_bfd_data
@@ -655,11 +669,11 @@ const bfd_target MY (vec) =
      bfd_getl32, bfd_getl_signed_32, bfd_putl32,
      bfd_getl16, bfd_getl_signed_16, bfd_putl16, /* Headers.  */
 #endif
-    {_bfd_dummy_target, MY_object_p, 		/* bfd_check_format.  */
+    {_bfd_dummy_target, MY_object_p,		/* bfd_check_format.  */
        bfd_generic_archive_p, MY_core_file_p},
     {bfd_false, MY_mkobject,			/* bfd_set_format.  */
        _bfd_generic_mkarchive, bfd_false},
-    {bfd_false, MY_write_object_contents, 	/* bfd_write_contents.  */
+    {bfd_false, MY_write_object_contents,	/* bfd_write_contents.  */
        _bfd_write_archive_contents, bfd_false},
 
      BFD_JUMP_TABLE_GENERIC (MY),

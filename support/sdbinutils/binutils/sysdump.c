@@ -1,5 +1,5 @@
 /* Sysroff object format dumper.
-   Copyright (C) 1994-2014 Free Software Foundation, Inc.
+   Copyright (C) 1994-2018 Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
 
@@ -38,21 +38,7 @@ static int code;
 static int addrsize = 4;
 static FILE *file;
 
-static void dh (unsigned char *, int);
-static void itheader (char *, int);
-static void p (void);
-static void tabout (void);
-static void pbarray (barray *);
-static int getone (int);
-static int opt (int);
-static void must (int);
-static void tab (int, char *);
-static void dump_symbol_info (void);
 static void derived_type (void);
-static void module (void);
-static void show_usage (FILE *, int);
-
-extern int main (int, char **);
 
 static char *
 getCHARS (unsigned char *ptr, int *idx, int size, int max)
@@ -66,6 +52,9 @@ getCHARS (unsigned char *ptr, int *idx, int size, int max)
 
   if (b == 0)
     {
+      /* PR 17512: file: 13caced2.  */
+      if (oc >= max)
+	return _("*corrupt*");
       /* Got to work out the length of the string from self.  */
       b = ptr[oc++];
       (*idx) += 8;
@@ -166,7 +155,12 @@ getINT (unsigned char *ptr, int *idx, int size, int max)
   int byte = *idx / 8;
 
   if (byte >= max)
-    return 0;
+    {
+      /* PR 17512: file: id:000001,src:000002,op:flip1,pos:45.  */
+      /* Prevent infinite loops re-reading beyond the end of the buffer.  */
+      fatal (_("ICE: getINT: Out of buffer space"));
+      return 0;
+    }
 
   if (size == -2)
     size = addrsize;
@@ -188,7 +182,7 @@ getINT (unsigned char *ptr, int *idx, int size, int max)
       n = (ptr[byte + 0] << 24) + (ptr[byte + 1] << 16) + (ptr[byte + 2] << 8) + (ptr[byte + 3]);
       break;
     default:
-      abort ();
+      fatal (_("Unsupported read size: %d"), size);
     }
 
   *idx += size * 8;
@@ -615,6 +609,8 @@ module (void)
   do
     {
       c = getc (file);
+      if (c == EOF)
+	break;
       ungetc (c, file);
 
       c &= 0x7f;
@@ -639,7 +635,7 @@ module (void)
 
 char *program_name;
 
-static void
+ATTRIBUTE_NORETURN static void
 show_usage (FILE *ffile, int status)
 {
   fprintf (ffile, _("Usage: %s [option(s)] in-file\n"), program_name);
@@ -676,6 +672,7 @@ main (int ac, char **av)
 
   program_name = av[0];
   xmalloc_set_program_name (program_name);
+  bfd_set_error_program_name (program_name);
 
   expandargv (&ac, &av);
 

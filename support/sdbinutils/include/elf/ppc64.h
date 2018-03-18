@@ -1,5 +1,5 @@
 /* PPC64 ELF support for BFD.
-   Copyright (C) 2003-2014 Free Software Foundation, Inc.
+   Copyright (C) 2003-2018 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -152,11 +152,20 @@ START_RELOC_NUMBERS (elf_ppc64_reloc_type)
 /* Added for ELFv2.  */
   RELOC_NUMBER (R_PPC64_REL24_NOTOC,	   116)
   RELOC_NUMBER (R_PPC64_ADDR64_LOCAL,	   117)
+  RELOC_NUMBER (R_PPC64_ENTRY,		   118)
 
 #ifndef RELOC_MACROS_GEN_FUNC
-/* Fake relocation only used internally by ld.  */
+/* Relocation only used internally by ld.  If you need to use these
+   reloc numbers, you can change them to some other unused value
+   without affecting the ABI.  They will never appear in object files.  */
   RELOC_NUMBER (R_PPC64_LO_DS_OPT,	   128)
+/* Reloc only used internally by gas.  As above, value is unimportant.  */
+  RELOC_NUMBER (R_PPC64_16DX_HA,	   129)
 #endif
+
+/* Power9 split rel16 for addpcis.  */
+  RELOC_NUMBER (R_PPC64_REL16DX_HA,	   246)
+
 /* Support STT_GNU_IFUNC plt calls.  */
   RELOC_NUMBER (R_PPC64_JMP_IREL,	   247)
   RELOC_NUMBER (R_PPC64_IRELATIVE,	   248)
@@ -242,5 +251,6 @@ ppc64_encode_local_entry(unsigned int val)
 #define DT_PPC64_OPT		(DT_LOPROC + 3)
 #define PPC64_OPT_TLS		1
 #define PPC64_OPT_MULTI_TOC	2
+#define PPC64_OPT_LOCALENTRY	4
 
 #endif /* _ELF_PPC64_H */

@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2014 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2018 Free Software Foundation, Inc.
    Written by Steve Chamberlain of Cygnus Support (steve@cygnus.com).
 
    This file is part of GNU binutils.
@@ -21,6 +21,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static char writecode;
 static char *it;
@@ -40,14 +41,14 @@ extern int yylex (void);
 %union {
  int i;
  char *s;
-} 
+}
 %token COND
 %token REPEAT
 %token '(' ')'
 %token <s> TYPE
 %token <s> NAME
 %token <i> NUMBER UNIT
-%type <i> attr_size 
+%type <i> attr_size
 %type <s> attr_desc attr_id attr_type
 %%
 
@@ -56,10 +57,10 @@ top:  {
     {
     case 'i':
       printf("#ifdef SYSROFF_SWAP_IN\n");
-      break; 
+      break;
     case 'p':
       printf("#ifdef SYSROFF_p\n");
-      break; 
+      break;
     case 'd':
       break;
     case 'g':
@@ -72,7 +73,7 @@ top:  {
       printf("#include <ansidecl.h>\n");
       break;
     }
- } 
+ }
 it_list {
   switch (writecode) {
   case 'i':
@@ -80,7 +81,7 @@ it_list {
   case 'g':
   case 'c':
     printf("#endif\n");
-    break; 
+    break;
   case 'd':
     break;
   }
@@ -94,10 +95,10 @@ it_list: it it_list
   ;
 
 it:
-	'(' NAME NUMBER 
+	'(' NAME NUMBER
       {
 	it = $2; code = $3;
-	switch (writecode) 
+	switch (writecode)
 	  {
 	  case 'd':
 	    printf("\n\n\n#define IT_%s_CODE 0x%x\n", it,code);
@@ -116,7 +117,7 @@ it:
 	    printf("\tunsigned char raw[255];\n");
 	    printf("\tint idx = 0;\n");
 	    printf("\tint size;\n");
-	    printf("\tmemset(raw,0,255);\n");	
+	    printf("\tmemset(raw,0,255);\n");
 	    printf("\tmemset(ptr,0,sizeof(*ptr));\n");
 	    printf("\tsize = fillup(raw);\n");
 	    break;
@@ -143,23 +144,24 @@ it:
 	    break;
 	  }
 
-      } 
-	it_field_list 
+      }
+	it_field_list
 ')'
 {
   switch (writecode) {
-  case 'd': 
+  case 'd':
     printf("};\n");
     break;
   case 'g':
     printf("\tchecksum(ffile,raw, idx, IT_%s_CODE);\n", it);
-    
+    /* Fall through.  */
   case 'i':
-
   case 'o':
   case 'c':
     printf("}\n");
   }
+
+  free (it);
 }
 ;
 
@@ -167,7 +169,7 @@ it:
 
 it_field_list:
 		it_field it_field_list
-	|	cond_it_field it_field_list	
+	|	cond_it_field it_field_list
 	|	repeat_it_field it_field_list
 	|
 	;
@@ -175,24 +177,25 @@ it_field_list:
 repeat_it_field: '(' REPEAT NAME
 	{
 	  rdepth++;
-	  switch (writecode) 
+	  switch (writecode)
 	    {
 	    case 'c':
 	      if (rdepth==1)
 	      printf("\tprintf(\"repeat %%d\\n\", %s);\n",$3);
 	      if (rdepth==2)
 	      printf("\tprintf(\"repeat %%d\\n\", %s[n]);\n",$3);
+	      /* Fall through.  */
 	    case 'i':
 	    case 'g':
 	    case 'o':
 
-	      if (rdepth==1) 
+	      if (rdepth==1)
 		{
 	      printf("\t{ int n; for (n = 0; n < %s; n++) {\n",    $3);
 	    }
 	      if (rdepth == 2) {
 	      printf("\t{ int m; for (m = 0; m < %s[n]; m++) {\n",    $3);
-	    }		
+	    }
 
 	      break;
 	    }
@@ -201,9 +204,11 @@ repeat_it_field: '(' REPEAT NAME
          repeat = $3;
 	}
 
-	 it_field_list ')' 
+	 it_field_list ')'
 
 	{
+	  free (repeat);
+
 	  repeat = oldrepeat;
 	  oldrepeat =0;
 	  rdepth--;
@@ -221,7 +226,7 @@ repeat_it_field: '(' REPEAT NAME
 
 cond_it_field: '(' COND NAME
 	{
-	  switch (writecode) 
+	  switch (writecode)
 	    {
 	    case 'i':
 	    case 'g':
@@ -230,9 +235,11 @@ cond_it_field: '(' COND NAME
 	      printf("\tif (%s) {\n", $3);
 	      break;
 	    }
+
+	  free ($3);
 	}
 
-	 it_field_list ')' 
+	 it_field_list ')'
 	{
 	  switch (writecode)
 	    {
@@ -246,8 +253,8 @@ cond_it_field: '(' COND NAME
        ;
 
 it_field:
-	'(' attr_desc '(' attr_type attr_size ')' attr_id 
-	{name = $7; } 
+	'(' attr_desc '(' attr_type attr_size ')' attr_id
+	{name = $7; }
 	enums ')'
 	{
 	  char *desc = $2;
@@ -256,12 +263,12 @@ it_field:
 	  char *id = $7;
 char *p = names[rdepth];
 char *ptr = pnames[rdepth];
-	  switch (writecode) 
+	  switch (writecode)
 	    {
 	    case 'g':
-	      if (size % 8) 
+	      if (size % 8)
 		{
-		  
+
 		  printf("\twriteBITS(ptr->%s%s,raw,&idx,%d);\n",
 			 id,
 			 names[rdepth], size);
@@ -273,15 +280,15 @@ char *ptr = pnames[rdepth];
 		       id,
 		       names[rdepth],size/8);
 		}
-	      break;	      
+	      break;
 	    case 'i':
 	      {
 
 		if (rdepth >= 1)
 
 		  {
-		    printf("if (!ptr->%s) ptr->%s = (%s*)xcalloc(%s, sizeof(ptr->%s[0]));\n", 
-			   id, 
+		    printf("if (!ptr->%s) ptr->%s = (%s*)xcalloc(%s, sizeof(ptr->%s[0]));\n",
+			   id,
 			   id,
 			   type,
 			   repeat,
@@ -290,8 +297,8 @@ char *ptr = pnames[rdepth];
 
 		if (rdepth == 2)
 		  {
-		    printf("if (!ptr->%s[n]) ptr->%s[n] = (%s**)xcalloc(%s[n], sizeof(ptr->%s[n][0]));\n", 
-			   id, 
+		    printf("if (!ptr->%s[n]) ptr->%s[n] = (%s**)xcalloc(%s[n], sizeof(ptr->%s[n][0]));\n",
+			   id,
 			   id,
 			   type,
 			   repeat,
@@ -300,11 +307,11 @@ char *ptr = pnames[rdepth];
 
 	      }
 
-	      if (size % 8) 
+	      if (size % 8)
 		{
 		  printf("\tptr->%s%s = getBITS(raw,&idx, %d,size);\n",
 			 id,
-			 names[rdepth], 
+			 names[rdepth],
 			 size);
 		}
 	      else {
@@ -319,7 +326,7 @@ char *ptr = pnames[rdepth];
 	      printf("\tput%s(raw,%d,%d,&idx,ptr->%s%s);\n", type,size/8,size%8,id,names[rdepth]);
 	      break;
 	    case 'd':
-	      if (repeat) 
+	      if (repeat)
 		printf("\t/* repeat %s */\n", repeat);
 
 		  if (type[0] == 'I') {
@@ -341,46 +348,49 @@ char *ptr = pnames[rdepth];
 		  else   if (type[0] == 'C')
 		  printf("\tprintf(\"%%s\\n\",ptr->%s%s);\n", id,p);
 
-		  else   if (type[0] == 'B') 
+		  else   if (type[0] == 'B')
 		    {
 		  printf("\tpbarray(&ptr->%s%s);\n", id,p);
 		}
 	      else abort();
 		  break;
 		}
+
+	  free (desc);
+	  free (id);
 	}
 
 	;
 
 
-attr_type:	
+attr_type:
 	 TYPE { $$ = $1; }
  	|  { $$ = "INT";}
 	;
 
-attr_desc: 
-	'(' NAME ')'	
+attr_desc:
+	'(' NAME ')'
 	{ $$ = $2; }
 	;
 
 attr_size:
-	 NUMBER UNIT 
+	 NUMBER UNIT
 	{ $$ = $1 * $2; }
 	;
 
 
 attr_id:
 		'(' NAME ')'	{ $$ = $2; }
-	|	{ $$ = "dummy";}
-	;	
-	
-enums: 
+	|	{ $$ = strdup ("dummy");}
+	;
+
+enums:
 	| '(' enum_list ')' ;
 
 enum_list:
 	|
-	enum_list '(' NAME NAME ')' { 
-	  switch (writecode) 
+	enum_list '(' NAME NAME ')' {
+	  switch (writecode)
 	    {
 	    case 'd':
 	      printf("#define %s %s\n", $3,$4);
@@ -388,6 +398,9 @@ enum_list:
 	    case 'c':
 		printf("if (ptr->%s%s == %s) { tabout(); printf(\"%s\\n\");}\n", name, names[rdepth],$4,$3);
 	    }
+
+	  free ($3);
+	  free ($4);
 	}
 
 	;
@@ -404,7 +417,7 @@ enum_list:
 
 int yydebug;
 
-int 
+int
 main (int ac, char **av)
 {
   yydebug=0;

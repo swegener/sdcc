@@ -1,5 +1,5 @@
 /* BFD back-end for i386 a.out binaries.
-   Copyright (C) 1990-2014 Free Software Foundation, Inc.
+   Copyright (C) 1990-2018 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -32,7 +32,7 @@
 /* This macro is only relevant when N_MAGIC(x) == ZMAGIC.  */
 #define N_HEADER_IN_TEXT(x)	1
 
-#define N_TXTSIZE(x)	((x).a_text)
+#define N_TXTSIZE(x)	((x)->a_text)
 
 #include "sysdep.h"
 #include "bfd.h"
@@ -40,7 +40,7 @@
 #include "aout/aout64.h"
 #include "aout/stab_gnu.h"
 #include "aout/ar.h"
-#include "libaout.h"           /* BFD a.out internal data structures */
+#include "libaout.h"	       /* BFD a.out internal data structures */
 
 #define DEFAULT_ARCH bfd_arch_i386
 

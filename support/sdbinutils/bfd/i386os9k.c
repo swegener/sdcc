@@ -1,5 +1,5 @@
 /* BFD back-end for os9000 i386 binaries.
-   Copyright (C) 1990-2014 Free Software Foundation, Inc.
+   Copyright (C) 1990-2018 Free Software Foundation, Inc.
    Written by Cygnus Support.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -103,8 +103,8 @@ os9k_callback (bfd *abfd)
   obj_datasec (abfd)->filepos = execp->a_dload;
 
   /* The file positions of the relocation info ***
-  obj_textsec (abfd)->rel_filepos = N_TROFF(*execp);
-  obj_datasec (abfd)->rel_filepos =  N_DROFF(*execp);  */
+  obj_textsec (abfd)->rel_filepos = N_TROFF (execp);
+  obj_datasec (abfd)->rel_filepos =  N_DROFF (execp);  */
 
   adata (abfd).page_size = 1;	/* Not applicable.  */
   adata (abfd).segment_size = 1;/* Not applicable.  */
@@ -128,7 +128,7 @@ os9k_object_p (bfd *abfd)
     }
 
   anexec.a_info = H_GET_16 (abfd, exec_bytes.m_sync);
-  if (N_BADMAG (anexec))
+  if (N_BADMAG (&anexec))
     {
       bfd_set_error (bfd_error_wrong_format);
       return 0;
@@ -155,6 +155,8 @@ os9k_sizeof_headers (bfd *abfd ATTRIBUTE_UNUSED,
 #define aout_32_close_and_cleanup aout_32_bfd_free_cached_info
 
 #define aout_32_find_line	      _bfd_nosymbols_find_line
+#define aout_32_get_symbol_version_string \
+  _bfd_nosymbols_get_symbol_version_string
 #define aout_32_bfd_make_debug_symbol _bfd_nosymbols_bfd_make_debug_symbol
 
 #define aout_32_bfd_reloc_type_lookup _bfd_norelocs_bfd_reloc_type_lookup
@@ -162,6 +164,8 @@ os9k_sizeof_headers (bfd *abfd ATTRIBUTE_UNUSED,
 
 #define aout_32_get_section_contents_in_window \
   _bfd_generic_get_section_contents_in_window
+
+#define aout_32_set_reloc _bfd_generic_set_reloc
 
 #define os9k_bfd_get_relocated_section_contents \
   bfd_generic_get_relocated_section_contents
@@ -174,6 +178,7 @@ os9k_sizeof_headers (bfd *abfd ATTRIBUTE_UNUSED,
 #define os9k_section_already_linked \
   _bfd_generic_section_already_linked
 #define os9k_bfd_define_common_symbol bfd_generic_define_common_symbol
+#define os9k_bfd_define_start_stop bfd_generic_define_start_stop
 #define os9k_bfd_link_hash_table_create _bfd_generic_link_hash_table_create
 #define os9k_bfd_link_add_symbols _bfd_generic_link_add_symbols
 #define os9k_bfd_link_just_syms _bfd_generic_link_just_syms
@@ -181,6 +186,7 @@ os9k_sizeof_headers (bfd *abfd ATTRIBUTE_UNUSED,
   _bfd_generic_copy_link_hash_symbol_type
 #define os9k_bfd_final_link _bfd_generic_final_link
 #define os9k_bfd_link_split_section  _bfd_generic_link_split_section
+#define os9k_bfd_link_check_relocs   _bfd_generic_link_check_relocs
 
 const bfd_target i386_aout_os9k_vec =
   {

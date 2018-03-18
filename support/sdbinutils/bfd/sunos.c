@@ -1,5 +1,5 @@
 /* BFD backend for SunOS binaries.
-   Copyright (C) 1990-2014 Free Software Foundation, Inc.
+   Copyright (C) 1990-2018 Free Software Foundation, Inc.
    Written by Cygnus Support.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -42,29 +42,29 @@
        && bfd_lookup_arch (bfd_arch_m68k, 0) != NULL))
 
 #define MY_get_dynamic_symtab_upper_bound  sunos_get_dynamic_symtab_upper_bound
-#define MY_canonicalize_dynamic_symtab     sunos_canonicalize_dynamic_symtab
-#define MY_get_synthetic_symtab            _bfd_nodynamic_get_synthetic_symtab
+#define MY_canonicalize_dynamic_symtab	   sunos_canonicalize_dynamic_symtab
+#define MY_get_synthetic_symtab		   _bfd_nodynamic_get_synthetic_symtab
 #define MY_get_dynamic_reloc_upper_bound   sunos_get_dynamic_reloc_upper_bound
-#define MY_canonicalize_dynamic_reloc      sunos_canonicalize_dynamic_reloc
-#define MY_bfd_link_hash_table_create      sunos_link_hash_table_create
-#define MY_add_dynamic_symbols             sunos_add_dynamic_symbols
-#define MY_add_one_symbol                  sunos_add_one_symbol
-#define MY_link_dynamic_object             sunos_link_dynamic_object
-#define MY_write_dynamic_symbol            sunos_write_dynamic_symbol
-#define MY_check_dynamic_reloc             sunos_check_dynamic_reloc
-#define MY_finish_dynamic_link             sunos_finish_dynamic_link
+#define MY_canonicalize_dynamic_reloc	   sunos_canonicalize_dynamic_reloc
+#define MY_bfd_link_hash_table_create	   sunos_link_hash_table_create
+#define MY_add_dynamic_symbols		   sunos_add_dynamic_symbols
+#define MY_add_one_symbol		   sunos_add_one_symbol
+#define MY_link_dynamic_object		   sunos_link_dynamic_object
+#define MY_write_dynamic_symbol		   sunos_write_dynamic_symbol
+#define MY_check_dynamic_reloc		   sunos_check_dynamic_reloc
+#define MY_finish_dynamic_link		   sunos_finish_dynamic_link
 
-static bfd_boolean sunos_add_dynamic_symbols            (bfd *, struct bfd_link_info *, struct external_nlist **, bfd_size_type *, char **);
-static bfd_boolean sunos_add_one_symbol                 (struct bfd_link_info *, bfd *, const char *, flagword, asection *, bfd_vma, const char *, bfd_boolean, bfd_boolean, struct bfd_link_hash_entry **);
-static bfd_boolean sunos_link_dynamic_object            (struct bfd_link_info *, bfd *);
-static bfd_boolean sunos_write_dynamic_symbol           (bfd *, struct bfd_link_info *, struct aout_link_hash_entry *);
-static bfd_boolean sunos_check_dynamic_reloc            (struct bfd_link_info *, bfd *, asection *, struct aout_link_hash_entry *, void *, bfd_byte *, bfd_boolean *, bfd_vma *);
-static bfd_boolean sunos_finish_dynamic_link            (bfd *, struct bfd_link_info *);
-static struct bfd_link_hash_table *sunos_link_hash_table_create  (bfd *);
-static long        sunos_get_dynamic_symtab_upper_bound (bfd *);
-static long        sunos_canonicalize_dynamic_symtab    (bfd *, asymbol **);
-static long        sunos_get_dynamic_reloc_upper_bound  (bfd *);
-static long        sunos_canonicalize_dynamic_reloc     (bfd *, arelent **, asymbol **);
+static bfd_boolean sunos_add_dynamic_symbols		(bfd *, struct bfd_link_info *, struct external_nlist **, bfd_size_type *, char **);
+static bfd_boolean sunos_add_one_symbol			(struct bfd_link_info *, bfd *, const char *, flagword, asection *, bfd_vma, const char *, bfd_boolean, bfd_boolean, struct bfd_link_hash_entry **);
+static bfd_boolean sunos_link_dynamic_object		(struct bfd_link_info *, bfd *);
+static bfd_boolean sunos_write_dynamic_symbol		(bfd *, struct bfd_link_info *, struct aout_link_hash_entry *);
+static bfd_boolean sunos_check_dynamic_reloc		(struct bfd_link_info *, bfd *, asection *, struct aout_link_hash_entry *, void *, bfd_byte *, bfd_boolean *, bfd_vma *);
+static bfd_boolean sunos_finish_dynamic_link		(bfd *, struct bfd_link_info *);
+static struct bfd_link_hash_table *sunos_link_hash_table_create	 (bfd *);
+static long	   sunos_get_dynamic_symtab_upper_bound (bfd *);
+static long	   sunos_canonicalize_dynamic_symtab	(bfd *, asymbol **);
+static long	   sunos_get_dynamic_reloc_upper_bound	(bfd *);
+static long	   sunos_canonicalize_dynamic_reloc	(bfd *, arelent **, asymbol **);
 
 /* Include the usual a.out support.  */
 #include "aoutf1.h"
@@ -792,7 +792,7 @@ sunos_create_dynamic_sections (bfd *abfd,
     }
 
   if ((needed && ! sunos_hash_table (info)->dynamic_sections_needed)
-      || info->shared)
+      || bfd_link_pic (info))
     {
       bfd *dynobj;
 
@@ -828,7 +828,7 @@ sunos_add_dynamic_symbols (bfd *abfd,
     {
       if (! sunos_create_dynamic_sections (abfd, info,
 					   ((abfd->flags & DYNAMIC) != 0
-					    && !info->relocatable)))
+					    && !bfd_link_relocatable (info))))
 	return FALSE;
     }
 
@@ -860,7 +860,7 @@ sunos_add_dynamic_symbols (bfd *abfd,
 
   /* The native linker seems to just ignore dynamic objects when -r is
      used.  */
-  if (info->relocatable)
+  if (bfd_link_relocatable (info))
     return TRUE;
 
   /* There's no hope of using a dynamic object which does not exactly
@@ -1214,7 +1214,7 @@ bfd_sunos_record_link_assignment (bfd *output_bfd,
 
   /* In a shared library, the __DYNAMIC symbol does not appear in the
      dynamic symbol table.  */
-  if (! info->shared || strcmp (name, "__DYNAMIC") != 0)
+  if (! bfd_link_pic (info) || strcmp (name, "__DYNAMIC") != 0)
     {
       h->flags |= SUNOS_DEF_REGULAR;
 
@@ -1513,7 +1513,7 @@ sunos_scan_ext_relocs (struct bfd_link_info *info,
 	  /* If we are making a shared library, or if the symbol is
 	     defined by a dynamic object, we will need a dynamic reloc
 	     entry.  */
-	  if (info->shared
+	  if (bfd_link_pic (info)
 	      || (h != NULL
 		  && (h->flags & SUNOS_DEF_DYNAMIC) != 0
 		  && (h->flags & SUNOS_DEF_REGULAR) == 0))
@@ -1529,7 +1529,7 @@ sunos_scan_ext_relocs (struct bfd_link_info *info,
 	{
 	  /* But, if we are creating a shared library, we need to
 	     generate an absolute reloc.  */
-	  if (info->shared)
+	  if (bfd_link_pic (info))
 	    {
 	      if (dynobj == NULL)
 		{
@@ -1559,13 +1559,13 @@ sunos_scan_ext_relocs (struct bfd_link_info *info,
 	continue;
 
       if (r_type != RELOC_JMP_TBL
-	  && ! info->shared
+	  && ! bfd_link_pic (info)
 	  && ((h->flags & SUNOS_DEF_DYNAMIC) == 0
 	      || (h->flags & SUNOS_DEF_REGULAR) != 0))
 	continue;
 
       if (r_type == RELOC_JMP_TBL
-	  && ! info->shared
+	  && ! bfd_link_pic (info)
 	  && (h->flags & SUNOS_DEF_DYNAMIC) == 0
 	  && (h->flags & SUNOS_DEF_REGULAR) == 0)
 	{
@@ -1595,10 +1595,10 @@ sunos_scan_ext_relocs (struct bfd_link_info *info,
 	}
 
       BFD_ASSERT (r_type == RELOC_JMP_TBL
-		  || info->shared
+		  || bfd_link_pic (info)
 		  || (h->flags & SUNOS_REF_REGULAR) != 0);
       BFD_ASSERT (r_type == RELOC_JMP_TBL
-		  || info->shared
+		  || bfd_link_pic (info)
 		  || h->plt_offset != 0
 		  || ((h->root.root.type == bfd_link_hash_defined
 		       || h->root.root.type == bfd_link_hash_defweak)
@@ -1657,13 +1657,13 @@ sunos_scan_ext_relocs (struct bfd_link_info *info,
 	      /* We will also need a dynamic reloc entry, unless this
 		 is a JMP_TBL reloc produced by linking PIC compiled
 		 code, and we are not making a shared library.  */
-	      if (info->shared || (h->flags & SUNOS_DEF_REGULAR) == 0)
+	      if (bfd_link_pic (info) || (h->flags & SUNOS_DEF_REGULAR) == 0)
 		srel->size += RELOC_EXT_SIZE;
 	    }
 
 	  /* If we are creating a shared library, we need to copy over
 	     any reloc other than a jump table reloc.  */
-	  if (info->shared && r_type != RELOC_JMP_TBL)
+	  if (bfd_link_pic (info) && r_type != RELOC_JMP_TBL)
 	    srel->size += RELOC_EXT_SIZE;
 	}
     }
@@ -1880,7 +1880,7 @@ bfd_sunos_size_dynamic_sections (bfd *output_bfd,
   *sneedptr = NULL;
   *srulesptr = NULL;
 
-  if (info->relocatable)
+  if (bfd_link_relocatable (info))
     return TRUE;
 
   if (output_bfd->xvec != &MY(vec))
@@ -2119,7 +2119,7 @@ sunos_write_dynamic_symbol (bfd *output_bfd,
       switch (bfd_get_arch (output_bfd))
 	{
 	case bfd_arch_sparc:
-	  if (info->shared || (h->flags & SUNOS_DEF_REGULAR) == 0)
+	  if (bfd_link_pic (info) || (h->flags & SUNOS_DEF_REGULAR) == 0)
 	    {
 	      bfd_put_32 (output_bfd, SPARC_PLT_ENTRY_WORD0, p);
 	      bfd_put_32 (output_bfd,
@@ -2146,7 +2146,7 @@ sunos_write_dynamic_symbol (bfd *output_bfd,
 	  break;
 
 	case bfd_arch_m68k:
-	  if (! info->shared && (h->flags & SUNOS_DEF_REGULAR) != 0)
+	  if (! bfd_link_pic (info) && (h->flags & SUNOS_DEF_REGULAR) != 0)
 	    abort ();
 	  bfd_put_16 (output_bfd, M68K_PLT_ENTRY_WORD0, p);
 	  bfd_put_32 (output_bfd, (- (h->plt_offset + 2)), p + 2);
@@ -2160,7 +2160,7 @@ sunos_write_dynamic_symbol (bfd *output_bfd,
 
       /* We also need to add a jump table reloc, unless this is the
 	 result of a JMP_TBL reloc from PIC compiled code.  */
-      if (info->shared || (h->flags & SUNOS_DEF_REGULAR) == 0)
+      if (bfd_link_pic (info) || (h->flags & SUNOS_DEF_REGULAR) == 0)
 	{
 	  BFD_ASSERT (h->dynindx >= 0);
 	  BFD_ASSERT (s->reloc_count * obj_reloc_entry_size (dynobj)
@@ -2314,7 +2314,7 @@ sunos_write_dynamic_symbol (bfd *output_bfd,
 }
 
 /* This is called for each reloc against an external symbol.  If this
-   is a reloc which are are going to copy as a dynamic reloc, then
+   is a reloc which are going to copy as a dynamic reloc, then
    copy it over, and tell the caller to not bother processing this
    reloc.  */
 
@@ -2343,7 +2343,7 @@ sunos_check_dynamic_reloc (struct bfd_link_info *info,
 
   if (h != NULL
       && h->plt_offset != 0
-      && (info->shared
+      && (bfd_link_pic (info)
 	  || (h->flags & SUNOS_DEF_REGULAR) == 0))
     {
       asection *splt;
@@ -2451,14 +2451,14 @@ sunos_check_dynamic_reloc (struct bfd_link_info *info,
       if ((*got_offsetp & 1) == 0)
 	{
 	  if (h == NULL
-	      || (! info->shared
+	      || (! bfd_link_pic (info)
 		  && ((h->flags & SUNOS_DEF_DYNAMIC) == 0
 		      || (h->flags & SUNOS_DEF_REGULAR) != 0)))
 	    PUT_WORD (dynobj, *relocationp, sgot->contents + *got_offsetp);
 	  else
 	    PUT_WORD (dynobj, 0, sgot->contents + *got_offsetp);
 
-	  if (info->shared
+	  if (bfd_link_pic (info)
 	      || (h != NULL
 		  && (h->flags & SUNOS_DEF_DYNAMIC) != 0
 		  && (h->flags & SUNOS_DEF_REGULAR) == 0))
@@ -2574,7 +2574,7 @@ sunos_check_dynamic_reloc (struct bfd_link_info *info,
 
   if (! sunos_hash_table (info)->dynamic_sections_needed)
     return TRUE;
-  if (! info->shared)
+  if (! bfd_link_pic (info))
     {
       if (h == NULL
 	  || h->dynindx == -1
@@ -2726,7 +2726,7 @@ sunos_finish_dynamic_link (bfd *abfd, struct bfd_link_info *info)
      dynamic information, unless this is a shared library.  */
   s = bfd_get_linker_section (dynobj, ".got");
   BFD_ASSERT (s != NULL);
-  if (info->shared || sdyn->size == 0)
+  if (bfd_link_pic (info) || sdyn->size == 0)
     PUT_WORD (dynobj, 0, s->contents);
   else
     PUT_WORD (dynobj, sdyn->output_section->vma + sdyn->output_offset,

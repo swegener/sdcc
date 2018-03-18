@@ -1,5 +1,5 @@
 /* BFD back-end for Zilog Z80 COFF binaries.
-   Copyright (C) 2005-2014 Free Software Foundation, Inc.
+   Copyright (C) 2005-2018 Free Software Foundation, Inc.
    Contributed by Arnold Metselaar <arnold_m@operamail.com>
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -81,7 +81,7 @@ rtype2howto (arelent *internal, struct internal_reloc *dst)
   switch (dst->r_type)
     {
     default:
-      abort ();
+      internal->howto = NULL;
       break;
     case R_IMM8:
       internal->howto = &r_imm8;
@@ -153,10 +153,10 @@ coff_z80_reloc_name_lookup (bfd *abfd ATTRIBUTE_UNUSED,
 
 static void
 reloc_processing (arelent *relent,
-                  struct internal_reloc *reloc,
-                  asymbol **symbols,
-                  bfd *abfd,
-                  asection *section)
+		  struct internal_reloc *reloc,
+		  asymbol **symbols,
+		  bfd *abfd,
+		  asection *section)
 {
   relent->address = reloc->r_vaddr;
   rtype2howto (relent, reloc);
@@ -172,12 +172,12 @@ reloc_processing (arelent *relent,
 
 static void
 extra_case (bfd *in_abfd,
-            struct bfd_link_info *link_info,
-            struct bfd_link_order *link_order,
-            arelent *reloc,
-            bfd_byte *data,
-            unsigned int *src_ptr,
-            unsigned int *dst_ptr)
+	    struct bfd_link_info *link_info,
+	    struct bfd_link_order *link_order,
+	    arelent *reloc,
+	    bfd_byte *data,
+	    unsigned int *src_ptr,
+	    unsigned int *dst_ptr)
 {
   asection * input_section = link_order->u.indirect.section;
   int val;
@@ -188,14 +188,11 @@ extra_case (bfd *in_abfd,
 	val = bfd_coff_reloc16_get_value (reloc, link_info,
 					   input_section);
 	if (val>127 || val<-128) /* Test for overflow.  */
-	  {
-	    if (! ((*link_info->callbacks->reloc_overflow)
-		   (link_info, NULL,
-		    bfd_asymbol_name (*reloc->sym_ptr_ptr),
-		    reloc->howto->name, reloc->addend, input_section->owner,
-		    input_section, reloc->address)))
-	      abort ();
-	  }
+	  (*link_info->callbacks->reloc_overflow)
+	    (link_info, NULL, bfd_asymbol_name (*reloc->sym_ptr_ptr),
+	     reloc->howto->name, reloc->addend, input_section->owner,
+	     input_section, reloc->address);
+
 	bfd_put_8 (in_abfd, val, data + *dst_ptr);
 	(*dst_ptr) += 1;
 	(*src_ptr) += 1;
@@ -247,14 +244,11 @@ extra_case (bfd *in_abfd,
 				     the offset.  */
 
 	if (gap >= 128 || gap < -128)
-	  {
-	    if (! ((*link_info->callbacks->reloc_overflow)
-		   (link_info, NULL,
-		    bfd_asymbol_name (*reloc->sym_ptr_ptr),
-		    reloc->howto->name, reloc->addend, input_section->owner,
-		    input_section, reloc->address)))
-	      abort ();
-	  }
+	  (*link_info->callbacks->reloc_overflow)
+	    (link_info, NULL, bfd_asymbol_name (*reloc->sym_ptr_ptr),
+	     reloc->howto->name, reloc->addend, input_section->owner,
+	     input_section, reloc->address);
+
 	bfd_put_8 (in_abfd, gap, data + *dst_ptr);
 	(*dst_ptr)++;
 	(*src_ptr)++;

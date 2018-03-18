@@ -1,5 +1,5 @@
 /* ELF support for BFD.
-   Copyright (C) 1991-2014 Free Software Foundation, Inc.
+   Copyright (C) 1991-2018 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -135,6 +135,21 @@ typedef struct {
   unsigned char	sh_entsize[8];		/* Entry size if section holds table */
 } Elf64_External_Shdr;
 
+/* Compression header */
+
+typedef struct {
+  unsigned char	ch_type[4];		/* Type of compression */
+  unsigned char	ch_size[4];		/* Size of uncompressed data in bytes */
+  unsigned char	ch_addralign[4];	/* Alignment of uncompressed data  */
+} Elf32_External_Chdr;
+
+typedef struct {
+  unsigned char	ch_type[4];		/* Type of compression */
+  unsigned char	ch_reserved[4];		/* Padding */
+  unsigned char	ch_size[8];		/* Size of uncompressed data in bytes */
+  unsigned char	ch_addralign[8];	/* Alignment of uncompressed data  */
+} Elf64_External_Chdr;
+
 /* Symbol table entry */
 
 typedef struct {
@@ -167,6 +182,22 @@ typedef struct {
   unsigned char	type[4];		/* Interpretation of the descriptor */
   char		name[1];		/* Start of the name+desc data */
 } Elf_External_Note;
+
+/* Align an address upward to a boundary, expressed as a number of bytes.
+   E.g. align to an 8-byte boundary with argument of 8.  */
+#define ELF_ALIGN_UP(addr, boundary) \
+  (((bfd_vma) (addr) + ((boundary) - 1)) & ~ (bfd_vma) ((boundary) -1))
+
+/* Compute the offset of the note descriptor from size of note entry's
+   owner string and note alignment.  */
+#define ELF_NOTE_DESC_OFFSET(namesz, align) \
+  ELF_ALIGN_UP (offsetof (Elf_External_Note, name) + (namesz), (align))
+
+/* Compute the offset of the next note entry from size of note entry's
+   owner string, size of the note descriptor and note alignment.  */
+#define ELF_NOTE_NEXT_OFFSET(namesz, descsz, align) \
+  ELF_ALIGN_UP (ELF_NOTE_DESC_OFFSET ((namesz), (align)) + (descsz), \
+		(align))
 
 /* Relocation Entries */
 typedef struct {

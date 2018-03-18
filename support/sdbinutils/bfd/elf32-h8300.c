@@ -1,5 +1,5 @@
 /* BFD back-end for Renesas H8/300 ELF binaries.
-   Copyright (C) 1993-2014 Free Software Foundation, Inc.
+   Copyright (C) 1993-2018 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -33,7 +33,8 @@ static void elf32_h8_info_to_howto_rel
 static unsigned long elf32_h8_mach (flagword);
 static void elf32_h8_final_write_processing (bfd *, bfd_boolean);
 static bfd_boolean elf32_h8_object_p (bfd *);
-static bfd_boolean elf32_h8_merge_private_bfd_data (bfd *, bfd *);
+static bfd_boolean elf32_h8_merge_private_bfd_data
+  (bfd *, struct bfd_link_info *);
 static bfd_boolean elf32_h8_relax_section
   (bfd *, asection *, struct bfd_link_info *, bfd_boolean *);
 static bfd_boolean elf32_h8_relax_delete_bytes
@@ -61,7 +62,7 @@ static reloc_howto_type h8_elf_howto_table[] =
 #define R_H8_NONE_X 0
   HOWTO (R_H8_NONE,		/* type */
 	 0,			/* rightshift */
-	 0,			/* size (0 = byte, 1 = short, 2 = long) */
+	 3,			/* size (0 = byte, 1 = short, 2 = long) */
 	 0,			/* bitsize */
 	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
@@ -480,7 +481,7 @@ elf32_h8_relocate_section (bfd *output_bfd, struct bfd_link_info *info,
 	RELOC_AGAINST_DISCARDED_SECTION (info, input_bfd, input_section,
 					 rel, 1, relend, howto, 0, contents);
 
-      if (info->relocatable)
+      if (bfd_link_relocatable (info))
 	continue;
 
       r = elf32_h8_final_link_relocate (r_type, input_bfd, output_bfd,
@@ -507,18 +508,14 @@ elf32_h8_relocate_section (bfd *output_bfd, struct bfd_link_info *info,
 	  switch (r)
 	    {
 	    case bfd_reloc_overflow:
-	      if (! ((*info->callbacks->reloc_overflow)
-		     (info, (h ? &h->root : NULL), name, howto->name,
-		      (bfd_vma) 0, input_bfd, input_section,
-		      rel->r_offset)))
-		return FALSE;
+	      (*info->callbacks->reloc_overflow)
+		(info, (h ? &h->root : NULL), name, howto->name,
+		 (bfd_vma) 0, input_bfd, input_section, rel->r_offset);
 	      break;
 
 	    case bfd_reloc_undefined:
-	      if (! ((*info->callbacks->undefined_symbol)
-		     (info, name, input_bfd, input_section,
-		      rel->r_offset, TRUE)))
-		return FALSE;
+	      (*info->callbacks->undefined_symbol)
+		(info, name, input_bfd, input_section, rel->r_offset, TRUE);
 	      break;
 
 	    case bfd_reloc_outofrange:
@@ -538,10 +535,8 @@ elf32_h8_relocate_section (bfd *output_bfd, struct bfd_link_info *info,
 	      /* fall through */
 
 	    common_error:
-	      if (!((*info->callbacks->warning)
-		    (info, msg, name, input_bfd, input_section,
-		     rel->r_offset)))
-		return FALSE;
+	      (*info->callbacks->warning) (info, msg, name, input_bfd,
+					   input_section, rel->r_offset);
 	      break;
 	    }
 	}
@@ -646,8 +641,10 @@ elf32_h8_object_p (bfd *abfd)
    time is the architecture/machine information.  */
 
 static bfd_boolean
-elf32_h8_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
+elf32_h8_merge_private_bfd_data (bfd *ibfd, struct bfd_link_info *info)
 {
+  bfd *obfd = info->output_bfd;
+
   if (bfd_get_flavour (ibfd) != bfd_target_elf_flavour
       || bfd_get_flavour (obfd) != bfd_target_elf_flavour)
     return TRUE;
@@ -667,27 +664,27 @@ elf32_h8_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
 
    There are a few relaxing opportunities available on the H8:
 
-     jmp/jsr:24    ->    bra/bsr:8		2 bytes
+     jmp/jsr:24	   ->	 bra/bsr:8		2 bytes
      The jmp may be completely eliminated if the previous insn is a
      conditional branch to the insn after the jump.  In that case
      we invert the branch and delete the jump and save 4 bytes.
 
-     bCC:16          ->    bCC:8                  2 bytes
-     bsr:16          ->    bsr:8                  2 bytes
+     bCC:16	     ->	   bCC:8		  2 bytes
+     bsr:16	     ->	   bsr:8		  2 bytes
 
-     bset:16	     ->    bset:8                 2 bytes
-     bset:24/32	     ->    bset:8                 4 bytes
+     bset:16	     ->	   bset:8		  2 bytes
+     bset:24/32	     ->	   bset:8		  4 bytes
      (also applicable to other bit manipulation instructions)
 
-     mov.b:16	     ->    mov.b:8                2 bytes
-     mov.b:24/32     ->    mov.b:8                4 bytes
+     mov.b:16	     ->	   mov.b:8		  2 bytes
+     mov.b:24/32     ->	   mov.b:8		  4 bytes
 
-     bset:24/32	     ->    bset:16                2 bytes
+     bset:24/32	     ->	   bset:16		  2 bytes
      (also applicable to other bit manipulation instructions)
 
-     mov.[bwl]:24/32 ->    mov.[bwl]:16           2 bytes
+     mov.[bwl]:24/32 ->	   mov.[bwl]:16		  2 bytes
 
-     mov.[bwl] @(displ:24/32+ERx) -> mov.[bwl] @(displ:16+ERx)  4 bytes.  */
+     mov.[bwl] @(displ:24/32+ERx) -> mov.[bwl] @(displ:16+ERx)	4 bytes.  */
 
 static bfd_boolean
 elf32_h8_relax_section (bfd *abfd, asection *sec,
@@ -707,7 +704,7 @@ elf32_h8_relax_section (bfd *abfd, asection *sec,
   /* We don't have to do anything for a relocatable link, if
      this section does not have relocs, or if this is not a
      code section.  */
-  if (link_info->relocatable
+  if (bfd_link_relocatable (link_info)
       || (sec->flags & SEC_RELOC) == 0
       || sec->reloc_count == 0
       || (sec->flags & SEC_CODE) == 0)
@@ -742,7 +739,7 @@ elf32_h8_relax_section (bfd *abfd, asection *sec,
 	 some long jumps created by the compiler.  */
       if (irel != internal_relocs)
 	last_reloc = irel - 1;
-      
+
       switch(ELF32_R_TYPE (irel->r_info))
 	{
 	case R_H8_DIR24R8:
@@ -811,8 +808,8 @@ elf32_h8_relax_section (bfd *abfd, asection *sec,
 	      && h->root.type != bfd_link_hash_defweak)
 	    {
 	      /* This appears to be a reference to an undefined
-                 symbol.  Just ignore it--it will be caught by the
-                 regular reloc processing.  */
+		 symbol.  Just ignore it--it will be caught by the
+		 regular reloc processing.  */
 	      continue;
 	    }
 
@@ -1739,8 +1736,17 @@ elf32_h8_get_relocated_section_contents (bfd *output_bfd,
 /* And relaxing stuff.  */
 #define bfd_elf32_bfd_relax_section     elf32_h8_relax_section
 #define bfd_elf32_bfd_get_relocated_section_contents \
-                                elf32_h8_get_relocated_section_contents
+				elf32_h8_get_relocated_section_contents
 
 #define elf_symbol_leading_char '_'
+
+#include "elf32-target.h"
+
+#undef  TARGET_BIG_SYM
+#define TARGET_BIG_SYM			h8300_elf32_linux_vec
+#undef  TARGET_BIG_NAME
+#define TARGET_BIG_NAME			"elf32-h8300-linux"
+#undef  elf_symbol_leading_char
+#define elf32_bed			elf32_h8300_linux_bed
 
 #include "elf32-target.h"

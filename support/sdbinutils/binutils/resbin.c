@@ -1,5 +1,5 @@
 /* resbin.c -- manipulate the Windows binary resource format.
-   Copyright (C) 1997-2014 Free Software Foundation, Inc.
+   Copyright (C) 1997-2018 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support.
    Rewritten by Kai Tietz, Onevision.
 
@@ -574,8 +574,6 @@ bin_to_res_dialog (windres_bfd *wrbfd, const bfd_byte *data, rc_uint_type length
 	dc->data = NULL;
       else
 	{
-	  off = (off + 3) &~ 3;
-
 	  if (length < off + datalen)
 	    toosmall (_("dialog control data"));
 
@@ -961,9 +959,10 @@ bin_to_res_version (windres_bfd *wrbfd, const bfd_byte *data, rc_uint_type lengt
   get_version_header (wrbfd, data, length, "VS_VERSION_INFO",
 		      (unichar **) NULL, &verlen, &vallen, &type, &off);
 
-  if ((unsigned int) verlen != length)
-    fatal (_("version length %d does not match resource length %lu"),
-	   (int) verlen, (unsigned long) length);
+  /* PR 17512: The verlen field does not include padding length.  */
+  if (verlen > length)
+    fatal (_("version length %lu greater than resource length %lu"),
+	   (unsigned long) verlen, (unsigned long) length);
 
   if (type != 0)
     fatal (_("unexpected version type %d"), (int) type);
@@ -1067,7 +1066,7 @@ bin_to_res_version (windres_bfd *wrbfd, const bfd_byte *data, rc_uint_type lengt
 	      verlen -= off;
 
 	  stverlen -= off;
- 
+
 	  vst->strings = NULL;
 	  ppvs = &vst->strings;
 
@@ -1164,8 +1163,15 @@ bin_to_res_version (windres_bfd *wrbfd, const bfd_byte *data, rc_uint_type lengt
 	      vallen -= 4;
 	    }
 	}
+      else if (ch == 0)
+	{
+	  if (length == 8)
+	    /* Padding - skip.  */
+	    break;
+	  fatal (_("nul bytes found in version string"));
+	}
       else
-	fatal (_("unexpected version string"));
+	fatal (_("unexpected version string character: %x"), ch);
 
       vi->next = NULL;
       *pp = vi;
@@ -1318,7 +1324,7 @@ resid_to_bin (windres_bfd *wrbfd, rc_uint_type off, rc_res_id id)
       if (wrbfd)
 	{
 	  struct bin_res_id bri;
-	  
+
 	  windres_put_16 (wrbfd, bri.sig, 0xffff);
 	  windres_put_16 (wrbfd, bri.id, id.u.id);
 	  set_windres_bfd_content (wrbfd, &bri, off, BIN_RES_ID);
@@ -1556,7 +1562,7 @@ res_to_bin_dialog (windres_bfd *wrbfd, rc_uint_type off, const rc_dialog *dialog
 	      windres_put_32 (wrbfd, bdc.id, dc->id);
 	      set_windres_bfd_content (wrbfd, &bdc, off, BIN_DIALOGEX_CONTROL_SIZE);
 	    }
-	}      
+	}
       off += (dialogex != 0 ? BIN_DIALOGEX_CONTROL_SIZE : BIN_DIALOG_CONTROL_SIZE);
 
       off = resid_to_bin (wrbfd, off, dc->class);
@@ -1574,7 +1580,6 @@ res_to_bin_dialog (windres_bfd *wrbfd, rc_uint_type off, const rc_dialog *dialog
 	{
 	  rc_uint_type saved_off = off;
 	  rc_uint_type old_off;
-	  off += (4 - ((off - off_delta) & 3)) & 3;
 
 	  old_off = off;
 	  off = res_to_bin_rcdata (wrbfd, off, dc->data);
@@ -1582,10 +1587,10 @@ res_to_bin_dialog (windres_bfd *wrbfd, rc_uint_type off, const rc_dialog *dialog
 	    old_off = off = saved_off;
 	  if (wrbfd)
 	    windres_put_16 (wrbfd, dc_rclen, off - old_off);
-	    }
+	}
       if (wrbfd)
 	set_windres_bfd_content (wrbfd, dc_rclen, marker, 2);
-	}
+    }
 
   if (wrbfd)
     {

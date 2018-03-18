@@ -1,5 +1,5 @@
 /* SPARC ELF support for BFD.
-   Copyright (C) 1996-2014 Free Software Foundation, Inc.
+   Copyright (C) 1996-2018 Free Software Foundation, Inc.
    By Doug Evans, Cygnus Support, <dje@cygnus.com>.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -237,7 +237,7 @@ enum
 #define ELF_SPARC_HWCAP_CRC32C	0x20000000 /* CRC32C insn */
 
 #define ELF_SPARC_HWCAP2_FJATHPLUS 0x00000001 /* Fujitsu Athena+ */
-#define ELF_SPARC_HWCAP2_VIS3B     0x00000002 /* VIS3 present on multiple chips */
+#define ELF_SPARC_HWCAP2_VIS3B     0x00000002 /* Subset of VIS3 present on sparc64 X+ */
 #define ELF_SPARC_HWCAP2_ADP       0x00000004 /* Application Data Protection */
 #define ELF_SPARC_HWCAP2_SPARC5    0x00000008 /* The 29 new fp and sub instructions */
 #define ELF_SPARC_HWCAP2_MWAIT     0x00000010 /* mwait instruction and load/monitor ASIs */
@@ -248,5 +248,14 @@ enum
 #define ELF_SPARC_HWCAP2_FJATHHPC  0x00001000 /* Fujitsu HPC instrs */
 #define ELF_SPARC_HWCAP2_FJDES     0x00002000 /* Fujitsu DES instrs */
 #define ELF_SPARC_HWCAP2_FJAES     0x00010000 /* Fujitsu AES instrs */
+
+#define ELF_SPARC_HWCAP2_SPARC6    0x00020000 /* OSA2017 new instructions */
+#define ELF_SPARC_HWCAP2_ONADDSUB  0x00040000 /* Oracle Number add/subtract */
+#define ELF_SPARC_HWCAP2_ONMUL     0x00080000 /* Oracle Number multiply */
+#define ELF_SPARC_HWCAP2_ONDIV     0x00100000 /* Oracle Number divide */
+#define ELF_SPARC_HWCAP2_DICTUNP   0x00200000 /* Dictionary unpack instruction */
+#define ELF_SPARC_HWCAP2_FPCMPSHL  0x00400000 /* Partition compare with shifted result */
+#define ELF_SPARC_HWCAP2_RLE       0x00800000 /* Run-length encoded burst and length */
+#define ELF_SPARC_HWCAP2_SHA3      0x01000000 /* SHA3 instruction */
 
 #endif /* _ELF_SPARC_H */

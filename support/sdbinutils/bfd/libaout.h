@@ -1,5 +1,5 @@
 /* BFD back-end data structures for a.out (and similar) files.
-   Copyright (C) 1990-2014 Free Software Foundation, Inc.
+   Copyright (C) 1990-2018 Free Software Foundation, Inc.
    Written by Cygnus Support.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -232,18 +232,18 @@ struct internal_exec
   unsigned char a_talign;	/* Alignment of text segment.  */
   unsigned char a_dalign;	/* Alignment of data segment.  */
   unsigned char a_balign;	/* Alignment of bss segment.  */
-  char a_relaxable;           	/* Enough info for linker relax.  */
+  char a_relaxable;		/* Enough info for linker relax.  */
 };
 
 /* Magic number is written
-   < MSB          >
+   < MSB	  >
    3130292827262524232221201918171615141312111009080706050403020100
-   < FLAGS        >< MACHINE TYPE ><  MAGIC NUMBER                >  */
+   < FLAGS	  >< MACHINE TYPE ><  MAGIC NUMBER		  >  */
 
 /* Magic number for NetBSD is
-   <MSB           >
+   <MSB		  >
    3130292827262524232221201918171615141312111009080706050403020100
-   < FLAGS    >< MACHINE TYPE     ><  MAGIC NUMBER                >  */
+   < FLAGS    >< MACHINE TYPE	  ><  MAGIC NUMBER		  >  */
 
 enum machine_type
 {
@@ -256,7 +256,7 @@ enum machine_type
   M_NS32032 = (64),	  /* NS32032 running ?  */
   M_NS32532 = (64 + 5),	  /* NS32532 running mach.  */
   M_386 = 100,
-  M_29K = 101,            /* AMD 29000.  */
+  M_29K = 101,		  /* AMD 29000.  */
   M_386_DYNIX = 102,	  /* Sequent running dynix.  */
   M_ARM = 103,		  /* Advanced Risc Machines ARM.  */
   M_SPARCLET = 131,	  /* SPARClet = M_SPARC + 128.  */
@@ -272,8 +272,8 @@ enum machine_type
   M_SPARCLET_1 = 147,	  /* 0x93, reserved.  */
   M_POWERPC_NETBSD = 149, /* NetBSD/powerpc (big-endian) binary.  */
   M_VAX4K_NETBSD = 150,	  /* NetBSD/vax 4K pages binary.  */
-  M_MIPS1 = 151,          /* MIPS R2000/R3000 binary.  */
-  M_MIPS2 = 152,          /* MIPS R4000/R6000 binary.  */
+  M_MIPS1 = 151,	  /* MIPS R2000/R3000 binary.  */
+  M_MIPS2 = 152,	  /* MIPS R4000/R6000 binary.  */
   M_88K_OPENBSD = 153,	  /* OpenBSD/m88k binary.  */
   M_HPPA_OPENBSD = 154,	  /* OpenBSD/hppa binary.  */
   M_SPARC64_NETBSD = 156, /* NetBSD/sparc64 binary.  */
@@ -291,48 +291,48 @@ enum machine_type
   M_CRIS = 255		  /* Axis CRIS binary.  */
 };
 
-#define N_DYNAMIC(exec) ((exec).a_info & 0x80000000)
+#define N_DYNAMIC(execp) ((execp)->a_info & 0x80000000)
 
 #ifndef N_MAGIC
-# define N_MAGIC(exec) ((exec).a_info & 0xffff)
+# define N_MAGIC(execp) ((execp)->a_info & 0xffff)
 #endif
 
 #ifndef N_MACHTYPE
-# define N_MACHTYPE(exec) ((enum machine_type)(((exec).a_info >> 16) & 0xff))
+# define N_MACHTYPE(execp) ((enum machine_type)(((execp)->a_info >> 16) & 0xff))
 #endif
 
 #ifndef N_FLAGS
-# define N_FLAGS(exec) (((exec).a_info >> 24) & 0xff)
+# define N_FLAGS(execp) (((execp)->a_info >> 24) & 0xff)
 #endif
 
 #ifndef N_SET_INFO
-# define N_SET_INFO(exec, magic, type, flags) \
-((exec).a_info = ((magic) & 0xffff) \
+# define N_SET_INFO(execp, magic, type, flags) \
+((execp)->a_info = ((magic) & 0xffff) \
  | (((int)(type) & 0xff) << 16) \
  | (((flags) & 0xff) << 24))
 #endif
 
 #ifndef N_SET_DYNAMIC
-# define N_SET_DYNAMIC(exec, dynamic) \
-((exec).a_info = (dynamic) ? (long) ((exec).a_info | 0x80000000) : \
-((exec).a_info & 0x7fffffff))
+# define N_SET_DYNAMIC(execp, dynamic) \
+((execp)->a_info = (dynamic) ? (long) ((execp)->a_info | 0x80000000) : \
+((execp)->a_info & 0x7fffffff))
 #endif
 
 #ifndef N_SET_MAGIC
-# define N_SET_MAGIC(exec, magic) \
-((exec).a_info = (((exec).a_info & 0xffff0000) | ((magic) & 0xffff)))
+# define N_SET_MAGIC(execp, magic) \
+((execp)->a_info = (((execp)->a_info & 0xffff0000) | ((magic) & 0xffff)))
 #endif
 
 #ifndef N_SET_MACHTYPE
-# define N_SET_MACHTYPE(exec, machtype) \
-((exec).a_info = \
- ((exec).a_info&0xff00ffff) | ((((int)(machtype))&0xff) << 16))
+# define N_SET_MACHTYPE(execp, machtype) \
+((execp)->a_info = \
+ ((execp)->a_info & 0xff00ffff) | ((((int) (machtype)) &0xff) << 16))
 #endif
 
 #ifndef N_SET_FLAGS
-# define N_SET_FLAGS(exec, flags) \
-((exec).a_info = \
- ((exec).a_info&0x00ffffff) | (((flags) & 0xff) << 24))
+# define N_SET_FLAGS(execp, flags) \
+((execp)->a_info = \
+ ((execp)->a_info & 0x00ffffff) | (((flags) & 0xff) << 24))
 #endif
 
 typedef struct aout_symbol
@@ -428,25 +428,25 @@ struct  aout_data_struct
   struct internal_exec e;
 };
 
-#define	adata(bfd)		           ((bfd)->tdata.aout_data->a)
-#define	exec_hdr(bfd)		           (adata (bfd).hdr)
-#define	obj_aout_symbols(bfd)	           (adata (bfd).symbols)
-#define	obj_textsec(bfd)	           (adata (bfd).textsec)
-#define	obj_datasec(bfd)	           (adata (bfd).datasec)
-#define	obj_bsssec(bfd)		           (adata (bfd).bsssec)
-#define	obj_sym_filepos(bfd)	           (adata (bfd).sym_filepos)
-#define	obj_str_filepos(bfd)	           (adata (bfd).str_filepos)
-#define	obj_reloc_entry_size(bfd)          (adata (bfd).reloc_entry_size)
-#define	obj_symbol_entry_size(bfd)         (adata (bfd).symbol_entry_size)
-#define obj_aout_subformat(bfd)	           (adata (bfd).subformat)
-#define obj_aout_external_syms(bfd)        (adata (bfd).external_syms)
+#define	adata(bfd)			   ((bfd)->tdata.aout_data->a)
+#define	exec_hdr(bfd)			   (adata (bfd).hdr)
+#define	obj_aout_symbols(bfd)		   (adata (bfd).symbols)
+#define	obj_textsec(bfd)		   (adata (bfd).textsec)
+#define	obj_datasec(bfd)		   (adata (bfd).datasec)
+#define	obj_bsssec(bfd)			   (adata (bfd).bsssec)
+#define	obj_sym_filepos(bfd)		   (adata (bfd).sym_filepos)
+#define	obj_str_filepos(bfd)		   (adata (bfd).str_filepos)
+#define	obj_reloc_entry_size(bfd)	   (adata (bfd).reloc_entry_size)
+#define	obj_symbol_entry_size(bfd)	   (adata (bfd).symbol_entry_size)
+#define obj_aout_subformat(bfd)		   (adata (bfd).subformat)
+#define obj_aout_external_syms(bfd)	   (adata (bfd).external_syms)
 #define obj_aout_external_sym_count(bfd)   (adata (bfd).external_sym_count)
-#define obj_aout_sym_window(bfd)           (adata (bfd).sym_window)
-#define obj_aout_external_strings(bfd)     (adata (bfd).external_strings)
+#define obj_aout_sym_window(bfd)	   (adata (bfd).sym_window)
+#define obj_aout_external_strings(bfd)	   (adata (bfd).external_strings)
 #define obj_aout_external_string_size(bfd) (adata (bfd).external_string_size)
-#define obj_aout_string_window(bfd)        (adata (bfd).string_window)
-#define obj_aout_sym_hashes(bfd)           (adata (bfd).sym_hashes)
-#define obj_aout_dynamic_info(bfd)         (adata (bfd).dynamic_info)
+#define obj_aout_string_window(bfd)	   (adata (bfd).string_window)
+#define obj_aout_sym_hashes(bfd)	   (adata (bfd).sym_hashes)
+#define obj_aout_dynamic_info(bfd)	   (adata (bfd).dynamic_info)
 
 /* We take the address of the first element of an asymbol to ensure that the
    macro is only ever applied to an asymbol.  */
@@ -564,7 +564,7 @@ extern int NAME (aout, sizeof_headers)
   (bfd *, struct bfd_link_info *);
 
 extern bfd_boolean NAME (aout, adjust_sizes_and_vmas)
-  (bfd *, bfd_size_type *, file_ptr *);
+  (bfd *);
 
 extern void NAME (aout, swap_exec_header_in)
   (bfd *, struct external_exec *, struct internal_exec *);
@@ -624,15 +624,12 @@ extern bfd_boolean NAME (aout, bfd_free_cached_info)
 #ifndef WRITE_HEADERS
 #define WRITE_HEADERS(abfd, execp)					      \
       {									      \
-	bfd_size_type text_size; /* Dummy vars.  */			      \
-	file_ptr text_end;						      \
-       									      \
 	if (adata(abfd).magic == undecided_magic)			      \
-	  NAME (aout, adjust_sizes_and_vmas) (abfd, & text_size, & text_end); \
-    									      \
+	  NAME (aout, adjust_sizes_and_vmas) (abfd);			      \
+									      \
 	execp->a_syms = bfd_get_symcount (abfd) * EXTERNAL_NLIST_SIZE;	      \
 	execp->a_entry = bfd_get_start_address (abfd);			      \
-    									      \
+									      \
 	execp->a_trsize = ((obj_textsec (abfd)->reloc_count) *		      \
 			   obj_reloc_entry_size (abfd));		      \
 	execp->a_drsize = ((obj_datasec (abfd)->reloc_count) *		      \
@@ -644,26 +641,26 @@ extern bfd_boolean NAME (aout, bfd_free_cached_info)
 			  abfd) != EXEC_BYTES_SIZE)			      \
 	  return FALSE;							      \
 	/* Now write out reloc info, followed by syms and strings.  */	      \
-  									      \
+									      \
 	if (bfd_get_outsymbols (abfd) != NULL				      \
-	    && bfd_get_symcount (abfd) != 0) 				      \
+	    && bfd_get_symcount (abfd) != 0)				      \
 	  {								      \
-	    if (bfd_seek (abfd, (file_ptr) (N_SYMOFF(*execp)), SEEK_SET) != 0)\
+	    if (bfd_seek (abfd, (file_ptr) (N_SYMOFF (execp)), SEEK_SET) != 0)\
 	      return FALSE;						      \
 									      \
 	    if (! NAME (aout, write_syms) (abfd))			      \
 	      return FALSE;						      \
 	  }								      \
 									      \
-	if (bfd_seek (abfd, (file_ptr) (N_TRELOFF (*execp)), SEEK_SET) != 0)  \
-	  return FALSE;						      	      \
-	if (!NAME (aout, squirt_out_relocs) (abfd, obj_textsec (abfd)))       \
-	  return FALSE;						      	      \
+	if (bfd_seek (abfd, (file_ptr) (N_TRELOFF (execp)), SEEK_SET) != 0)   \
+	  return FALSE;							      \
+	if (!NAME (aout, squirt_out_relocs) (abfd, obj_textsec (abfd)))	      \
+	  return FALSE;							      \
 									      \
-	if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (*execp)), SEEK_SET) != 0)  \
-	  return FALSE;						      	      \
-	if (!NAME (aout, squirt_out_relocs) (abfd, obj_datasec (abfd)))       \
-	  return FALSE;						      	      \
+	if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (execp)), SEEK_SET) != 0)   \
+	  return FALSE;							      \
+	if (!NAME (aout, squirt_out_relocs) (abfd, obj_datasec (abfd)))	      \
+	  return FALSE;							      \
       }
 #endif
 

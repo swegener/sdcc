@@ -1,5 +1,5 @@
 /* BFD back-end for Intel 960 COFF files.
-   Copyright (C) 1990-2014 Free Software Foundation, Inc.
+   Copyright (C) 1990-2018 Free Software Foundation, Inc.
    Written by Cygnus Support.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -62,22 +62,22 @@ coff_i960_is_local_label_name (bfd *abfd ATTRIBUTE_UNUSED, const char *name)
 /* This is just like the usual CALC_ADDEND, but it includes the
    section VMA for PC relative relocs.  */
 #ifndef CALC_ADDEND
-#define CALC_ADDEND(abfd, ptr, reloc, cache_ptr)                \
-  {                                                             \
-    coff_symbol_type *coffsym = (coff_symbol_type *) NULL;      \
-    if (ptr && bfd_asymbol_bfd (ptr) != abfd)                   \
-      coffsym = (obj_symbols (abfd)                             \
-                 + (cache_ptr->sym_ptr_ptr - symbols));         \
-    else if (ptr)                                               \
-      coffsym = coff_symbol_from (abfd, ptr);                   \
-    if (coffsym != (coff_symbol_type *) NULL                    \
-        && coffsym->native->u.syment.n_scnum == 0)              \
-      cache_ptr->addend = 0;                                    \
-    else if (ptr && bfd_asymbol_bfd (ptr) == abfd               \
-             && ptr->section != (asection *) NULL)              \
-      cache_ptr->addend = - (ptr->section->vma + ptr->value);   \
-    else                                                        \
-      cache_ptr->addend = 0;                                    \
+#define CALC_ADDEND(abfd, ptr, reloc, cache_ptr)		\
+  {								\
+    coff_symbol_type *coffsym = (coff_symbol_type *) NULL;	\
+    if (ptr && bfd_asymbol_bfd (ptr) != abfd)			\
+      coffsym = (obj_symbols (abfd)				\
+		 + (cache_ptr->sym_ptr_ptr - symbols));		\
+    else if (ptr)						\
+      coffsym = coff_symbol_from (ptr);				\
+    if (coffsym != (coff_symbol_type *) NULL			\
+	&& coffsym->native->u.syment.n_scnum == 0)		\
+      cache_ptr->addend = 0;					\
+    else if (ptr && bfd_asymbol_bfd (ptr) == abfd		\
+	     && ptr->section != (asection *) NULL)		\
+      cache_ptr->addend = - (ptr->section->vma + ptr->value);	\
+    else							\
+      cache_ptr->addend = 0;					\
     if (ptr && (reloc.r_type == 25 || reloc.r_type == 27))	\
       cache_ptr->addend += asect->vma;				\
   }
@@ -128,7 +128,7 @@ optcall_callback (bfd *abfd,
       {
       case C_LEAFSTAT:
       case C_LEAFEXT:
-  	/* This is a call to a leaf procedure, replace instruction with a bal
+	/* This is a call to a leaf procedure, replace instruction with a bal
 	   to the correct location.  */
 	{
 	  union internal_auxent *aux = &((cs->native+2)->u.auxent);
@@ -142,9 +142,9 @@ optcall_callback (bfd *abfd,
 	     sym and auxents untouched, so the delta between the two
 	     is the offset of the bal entry point.  */
 	  word = ((word +  olf)  & BAL_MASK) | BAL;
-  	  bfd_put_32 (abfd, (bfd_vma) word,
+	  bfd_put_32 (abfd, (bfd_vma) word,
 		      (bfd_byte *) data + reloc_entry->address);
-  	}
+	}
 	result = bfd_reloc_ok;
 	break;
       case C_SCALL:
@@ -201,7 +201,7 @@ coff_i960_relocate (bfd *abfd,
   if (bfd_is_com_section (bfd_get_section (symbol)))
     {
       /* I don't really know what the right action is for a common
-         symbol.  */
+	 symbol.  */
       return bfd_reloc_continue;
     }
 
@@ -322,7 +322,7 @@ coff_i960_start_final_link (bfd *abfd, struct bfd_link_info *info)
   asection *o;
   bfd_byte *esym;
 
-  if (! info->relocatable)
+  if (! bfd_link_relocatable (info))
     return TRUE;
 
   esym = (bfd_byte *) bfd_malloc (symesz);
@@ -429,7 +429,7 @@ coff_i960_relocate_section (bfd *output_bfd ATTRIBUTE_UNUSED,
 	  else
 	    {
 	      sec = sections[symndx];
-              val = (sec->output_section->vma
+	      val = (sec->output_section->vma
 		     + sec->output_offset
 		     + sym->n_value
 		     - sec->vma);
@@ -447,18 +447,15 @@ coff_i960_relocate_section (bfd *output_bfd ATTRIBUTE_UNUSED,
 		     + sec->output_section->vma
 		     + sec->output_offset);
 	    }
-	  else if (! info->relocatable)
-	    {
-	      if (! ((*info->callbacks->undefined_symbol)
-		     (info, h->root.root.string, input_bfd, input_section,
-		      rel->r_vaddr - input_section->vma, TRUE)))
-		return FALSE;
-	    }
+	  else if (! bfd_link_relocatable (info))
+	    (*info->callbacks->undefined_symbol)
+	      (info, h->root.root.string, input_bfd, input_section,
+	       rel->r_vaddr - input_section->vma, TRUE);
 	}
 
       done = FALSE;
 
-      if (howto->type == R_OPTCALL && ! info->relocatable && symndx != -1)
+      if (howto->type == R_OPTCALL && ! bfd_link_relocatable (info) && symndx != -1)
 	{
 	  int class_val;
 
@@ -471,19 +468,18 @@ coff_i960_relocate_section (bfd *output_bfd ATTRIBUTE_UNUSED,
 	    {
 	    case C_NULL:
 	      /* This symbol is apparently not from a COFF input file.
-                 We warn, and then assume that it is not a leaf
-                 function.  */
-	      if (! ((*info->callbacks->reloc_dangerous)
-		     (info,
-		      _("uncertain calling convention for non-COFF symbol"),
-		      input_bfd, input_section,
-		      rel->r_vaddr - input_section->vma)))
-		return FALSE;
+		 We warn, and then assume that it is not a leaf
+		 function.  */
+	      (*info->callbacks->reloc_dangerous)
+		(info,
+		 _("uncertain calling convention for non-COFF symbol"),
+		 input_bfd, input_section,
+		 rel->r_vaddr - input_section->vma);
 	      break;
 	    case C_LEAFSTAT:
 	    case C_LEAFEXT:
 	      /* This is a call to a leaf procedure; use the bal
-                 instruction.  */
+		 instruction.  */
 	      {
 		long olf;
 		unsigned long word;
@@ -555,11 +551,10 @@ coff_i960_relocate_section (bfd *output_bfd ATTRIBUTE_UNUSED,
 		  return FALSE;
 	      }
 
-	    if (! ((*info->callbacks->reloc_overflow)
-		   (info, (h ? &h->root : NULL), name, howto->name,
-		    (bfd_vma) 0, input_bfd, input_section,
-		    rel->r_vaddr - input_section->vma)))
-	      return FALSE;
+	    (*info->callbacks->reloc_overflow)
+	      (info, (h ? &h->root : NULL), name, howto->name,
+	       (bfd_vma) 0, input_bfd, input_section,
+	       rel->r_vaddr - input_section->vma);
 	  }
 	}
     }

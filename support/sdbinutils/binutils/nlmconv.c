@@ -1,5 +1,5 @@
 /* nlmconv.c -- NLM conversion program
-   Copyright (C) 1993-2014 Free Software Foundation, Inc.
+   Copyright (C) 1993-2018 Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
 
@@ -211,6 +211,7 @@ main (int argc, char **argv)
 
   program_name = argv[0];
   xmalloc_set_program_name (program_name);
+  bfd_set_error_program_name (program_name);
 
   expandargv (&argc, &argv);
 
@@ -1057,7 +1058,7 @@ main (int argc, char **argv)
   {
     const int    max_len  = NLM_MODULE_NAME_SIZE - 2;
     const char * filename = lbasename (output_file);
-    
+
     len = strlen (filename);
     if (len > max_len)
       len = max_len;
@@ -1223,7 +1224,7 @@ copy_sections (bfd *inbfd, asection *insec, void *data_ptr)
   const char *inname;
   asection *outsec;
   bfd_size_type size;
-  void *contents;
+  bfd_byte *contents;
   long reloc_size;
   bfd_byte buf[4];
   bfd_size_type add;
@@ -1239,9 +1240,7 @@ copy_sections (bfd *inbfd, asection *insec, void *data_ptr)
     contents = NULL;
   else
     {
-      contents = xmalloc (size);
-      if (! bfd_get_section_contents (inbfd, insec, contents,
-				      (file_ptr) 0, size))
+      if (!bfd_malloc_and_get_section (inbfd, insec, &contents))
 	bfd_fatal (bfd_get_filename (inbfd));
     }
 
@@ -1415,6 +1414,9 @@ i386_mangle_relocs (bfd *outbfd, asection *insec, arelent ***relocs_ptr,
       bfd_vma addend;
 
       rel = *relocs++;
+      /* PR 17512: file: 057f89c1.  */
+      if (rel->sym_ptr_ptr == NULL)
+	continue;
       sym = *rel->sym_ptr_ptr;
 
       /* We're moving the relocs from the input section to the output
@@ -1871,7 +1873,7 @@ powerpc_mangle_relocs (bfd *outbfd, asection *insec,
 
   toc_howto = bfd_reloc_type_lookup (insec->owner, BFD_RELOC_PPC_TOC16);
   if (toc_howto == (reloc_howto_type *) NULL)
-    abort ();
+    fatal (_("Unable to locate PPC_TOC16 reloc information"));
 
   /* If this is the .got section, clear out all the contents beyond
      the initial size.  We must do this here because copy_sections is
@@ -1910,6 +1912,10 @@ powerpc_mangle_relocs (bfd *outbfd, asection *insec,
 	    }
 	}
 
+      /* PR 17512: file: 70cfde95.  */
+      if (rel->howto == NULL)
+	continue;
+
       /* We must be able to resolve all PC relative relocs at this
 	 point.  If we get a branch to an undefined symbol we build a
 	 stub, since NetWare will resolve undefined symbols into a
@@ -1926,6 +1932,13 @@ powerpc_mangle_relocs (bfd *outbfd, asection *insec,
 	  else
 	    {
 	      bfd_vma val;
+
+	      if (rel->address > contents_size - 4)
+		{
+		  non_fatal (_("Out of range relocation: %lx"),
+			     (long) rel->address);
+		  break;
+		}
 
 	      assert (rel->howto->size == 2 && rel->howto->pcrel_offset);
 	      val = bfd_get_32 (outbfd, (bfd_byte *) contents + rel->address);
@@ -1976,6 +1989,13 @@ powerpc_mangle_relocs (bfd *outbfd, asection *insec,
 	  switch (rel->howto->size)
 	    {
 	    case 1:
+	      if (rel->address > contents_size - 2)
+		{
+		  non_fatal (_("Out of range relocation: %lx"),
+			     (long) rel->address);
+		  break;
+		}
+
 	      val = bfd_get_16 (outbfd,
 				(bfd_byte *) contents + rel->address);
 	      val = ((val &~ rel->howto->dst_mask)
@@ -1991,6 +2011,14 @@ powerpc_mangle_relocs (bfd *outbfd, asection *insec,
 	      break;
 
 	    case 2:
+	      /* PR 17512: file: 0455a112.  */
+	      if (rel->address > contents_size - 4)
+		{
+		  non_fatal (_("Out of range relocation: %lx"),
+			     (long) rel->address);
+		  break;
+		}
+
 	      val = bfd_get_32 (outbfd,
 				(bfd_byte *) contents + rel->address);
 	      val = ((val &~ rel->howto->dst_mask)
@@ -2002,7 +2030,7 @@ powerpc_mangle_relocs (bfd *outbfd, asection *insec,
 	      break;
 
 	    default:
-	      abort ();
+	      fatal (_("Unsupported relocation size: %d"), rel->howto->size);
 	    }
 
 	  if (! bfd_is_und_section (bfd_get_section (sym)))
@@ -2052,7 +2080,7 @@ link_inputs (struct string_list *inputs, char *ld, char * mfile)
   for (q = inputs; q != NULL; q = q->next)
     ++c;
 
-  argv = (char **) alloca ((c + 7) * sizeof (char *));
+  argv = (char **) xmalloc ((c + 7) * sizeof (char *));
 
 #ifndef __MSDOS__
   if (ld == NULL)
@@ -2110,6 +2138,8 @@ link_inputs (struct string_list *inputs, char *ld, char * mfile)
 
   pid = pexecute (ld, argv, program_name, (char *) NULL, &errfmt, &errarg,
 		  PEXECUTE_SEARCH | PEXECUTE_ONE);
+  free (argv);
+
   if (pid == -1)
     {
       fprintf (stderr, _("%s: execution of %s failed: "), program_name, ld);

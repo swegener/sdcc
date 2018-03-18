@@ -1,5 +1,5 @@
 /* BFD back-end for TMS320C30 coff binaries.
-   Copyright (C) 1998-2014 Free Software Foundation, Inc.
+   Copyright (C) 1998-2018 Free Software Foundation, Inc.
    Contributed by Steven Haworth (steve@pm.cse.rmit.edu.au)
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -136,7 +136,7 @@ rtype2howto (arelent *internal, struct internal_reloc *dst)
       internal->howto = &tic30_coff_howto_table[4];
       break;
     default:
-      abort ();
+      internal->howto = NULL;
       break;
     }
 }

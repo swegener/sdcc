@@ -1,5 +1,5 @@
 /* nm.c -- Describe symbol table of a rel file.
-   Copyright (C) 1991-2014 Free Software Foundation, Inc.
+   Copyright (C) 1991-2018 Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
 
@@ -28,7 +28,15 @@
 #include "libiberty.h"
 #include "elf-bfd.h"
 #include "elf/common.h"
+#define DO_NOT_DEFINE_AOUTHDR
+#define DO_NOT_DEFINE_FILHDR
+#define DO_NOT_DEFINE_LINENO
+#define DO_NOT_DEFINE_SCNHDR
+#include "coff/external.h"
+#include "coff/internal.h"
+#include "libcoff.h"
 #include "bucomm.h"
+#include "plugin-api.h"
 #include "plugin.h"
 
 /* When sorting by size, we use this structure to hold the size and a
@@ -56,6 +64,7 @@ struct extended_symbol_info
   symbol_info *sinfo;
   bfd_vma ssize;
   elf_symbol_type *elfinfo;
+  coff_symbol_type *coffinfo;
   /* FIXME: We should add more fields for Type, Line, Section.  */
 };
 #define SYM_NAME(sym)        (sym->sinfo->name)
@@ -148,10 +157,10 @@ static int sort_by_size = 0;	/* Sort by size of symbol.  */
 static int undefined_only = 0;	/* Print undefined symbols only.  */
 static int dynamic = 0;		/* Print dynamic symbols.  */
 static int show_version = 0;	/* Show the version number.  */
-static int show_stats = 0;	/* Show statistics.  */
 static int show_synthetic = 0;	/* Display synthesized symbols too.  */
 static int line_numbers = 0;	/* Print line numbers for symbols.  */
 static int allow_special_symbols = 0;  /* Allow special symbols.  */
+static int with_symbol_versions = 0; /* Include symbol version information in the output.  */
 
 /* When to print the names of files.  Not mutually exclusive in SYSV format.  */
 static int filename_per_file = 0;	/* Once per file, on its own line.  */
@@ -211,18 +220,18 @@ static struct option long_options[] =
   {"reverse-sort", no_argument, &reverse_sort, 1},
   {"size-sort", no_argument, 0, OPTION_SIZE_SORT},
   {"special-syms", no_argument, &allow_special_symbols, 1},
-  {"stats", no_argument, &show_stats, 1},
   {"synthetic", no_argument, &show_synthetic, 1},
   {"target", required_argument, 0, OPTION_TARGET},
   {"defined-only", no_argument, &defined_only, 1},
   {"undefined-only", no_argument, &undefined_only, 1},
   {"version", no_argument, &show_version, 1},
+  {"with-symbol-versions", no_argument, &with_symbol_versions, 1},
   {0, no_argument, 0, 0}
 };
 
 /* Some error-reporting functions.  */
 
-static void
+ATTRIBUTE_NORETURN static void
 usage (FILE *stream, int status)
 {
   fprintf (stream, _("Usage: %s [option(s)] [file(s)]\n"), program_name);
@@ -262,6 +271,7 @@ usage (FILE *stream, int status)
   -t, --radix=RADIX      Use RADIX for printing symbol values\n\
       --target=BFDNAME   Specify the target object format as BFDNAME\n\
   -u, --undefined-only   Display only undefined symbols\n\
+      --with-symbol-versions  Display version strings after symbol names\n\
   -X 32_64               (ignored)\n\
   @FILE                  Read options from FILE\n\
   -h, --help             Display this information\n\
@@ -331,9 +341,10 @@ set_output_format (char *f)
 }
 
 static const char *
-get_symbol_type (unsigned int type)
+get_elf_symbol_type (unsigned int type)
 {
-  static char buff [32];
+  static char *bufp;
+  int n;
 
   switch (type)
     {
@@ -344,15 +355,48 @@ get_symbol_type (unsigned int type)
     case STT_FILE:     return "FILE";
     case STT_COMMON:   return "COMMON";
     case STT_TLS:      return "TLS";
-    default:
-      if (type >= STT_LOPROC && type <= STT_HIPROC)
-	sprintf (buff, _("<processor specific>: %d"), type);
-      else if (type >= STT_LOOS && type <= STT_HIOS)
-	sprintf (buff, _("<OS specific>: %d"), type);
-      else
-	sprintf (buff, _("<unknown>: %d"), type);
-      return buff;
     }
+
+  free (bufp);
+  if (type >= STT_LOPROC && type <= STT_HIPROC)
+    n = asprintf (&bufp, _("<processor specific>: %d"), type);
+  else if (type >= STT_LOOS && type <= STT_HIOS)
+    n = asprintf (&bufp, _("<OS specific>: %d"), type);
+  else
+    n = asprintf (&bufp, _("<unknown>: %d"), type);
+  if (n < 0)
+    fatal ("%s", xstrerror (errno));
+  return bufp;
+}
+
+static const char *
+get_coff_symbol_type (const struct internal_syment *sym)
+{
+  static char *bufp;
+  int n;
+
+  switch (sym->n_sclass)
+    {
+    case C_BLOCK: return "Block";
+    case C_FILE:  return "File";
+    case C_LINE:  return "Line";
+    }
+
+  if (!sym->n_type)
+    return "None";
+
+  switch (DTYPE(sym->n_type))
+    {
+    case DT_FCN: return "Function";
+    case DT_PTR: return "Pointer";
+    case DT_ARY: return "Array";
+    }
+
+  free (bufp);
+  n = asprintf (&bufp, _("<unknown>: %d/%d"), sym->n_sclass, sym->n_type);
+  if (n < 0)
+    fatal ("%s", xstrerror (errno));
+  return bufp;
 }
 
 /* Print symbol name NAME, read from ABFD, with printf format FORM,
@@ -434,7 +478,9 @@ filter_symbols (bfd *abfd, bfd_boolean is_dynamic, void *minisyms,
       if (sym == NULL)
 	bfd_fatal (bfd_get_filename (abfd));
 
-      if (strcmp (sym->name, "__gnu_lto_slim") == 0)
+      if (sym->name[0] == '_'
+	  && sym->name[1] == '_'
+	  && strcmp (sym->name + (sym->name[2] == '_'), "__gnu_lto_slim") == 0)
 	non_fatal (_("%s: plugin needed to handle lto object"),
 		   bfd_get_filename (abfd));
 
@@ -639,7 +685,8 @@ size_forward1 (const void *P_x, const void *P_y)
 
 #define file_symbol(s, sn, snl)			\
   (((s)->flags & BSF_FILE) != 0			\
-   || ((sn)[(snl) - 2] == '.'			\
+   || ((snl) > 2				\
+       && (sn)[(snl) - 2] == '.'		\
        && ((sn)[(snl) - 1] == 'o'		\
 	   || (sn)[(snl) - 1] == 'a')))
 
@@ -731,9 +778,14 @@ sort_symbols_by_size (bfd *abfd, bfd_boolean is_dynamic, void *minisyms,
 
       sec = bfd_get_section (sym);
 
-      if (bfd_get_flavour (abfd) == bfd_target_elf_flavour)
+      /* Synthetic symbols don't have a full type set of data available, thus
+	 we can't rely on that information for the symbol size.  Ditto for
+	 bfd/section.c:global_syms like *ABS*.  */
+      if ((sym->flags & (BSF_SECTION_SYM | BSF_SYNTHETIC)) == 0
+	  && bfd_get_flavour (abfd) == bfd_target_elf_flavour)
 	sz = ((elf_symbol_type *) sym)->internal_elf_sym.st_size;
-      else if (bfd_is_com_section (sec))
+      else if ((sym->flags & (BSF_SECTION_SYM | BSF_SYNTHETIC)) == 0
+	       && bfd_is_com_section (sec))
 	sz = sym->value;
       else
 	{
@@ -806,7 +858,10 @@ get_relocs (bfd *abfd, asection *sec, void *dataarg)
 /* Print a single symbol.  */
 
 static void
-print_symbol (bfd *abfd, asymbol *sym, bfd_vma ssize, bfd *archive_bfd)
+print_symbol (bfd *        abfd,
+	      asymbol *    sym,
+	      bfd_vma      ssize,
+	      bfd *        archive_bfd)
 {
   symbol_info syminfo;
   struct extended_symbol_info info;
@@ -816,13 +871,38 @@ print_symbol (bfd *abfd, asymbol *sym, bfd_vma ssize, bfd *archive_bfd)
   format->print_symbol_filename (archive_bfd, abfd);
 
   bfd_get_symbol_info (abfd, sym, &syminfo);
+
   info.sinfo = &syminfo;
   info.ssize = ssize;
-  if (bfd_get_flavour (abfd) == bfd_target_elf_flavour)
-    info.elfinfo = (elf_symbol_type *) sym;
+  /* Synthetic symbols do not have a full symbol type set of data available.
+     Nor do bfd/section.c:global_syms like *ABS*.  */
+  if ((sym->flags & (BSF_SECTION_SYM | BSF_SYNTHETIC)) != 0)
+    {
+      info.elfinfo = NULL;
+      info.coffinfo = NULL;
+    }
   else
-    info.elfinfo = NULL;
+    {
+      info.elfinfo = elf_symbol_from (abfd, sym);
+      info.coffinfo = coff_symbol_from (sym);
+    }
+
   format->print_symbol_info (&info, abfd);
+
+  if (with_symbol_versions)
+    {
+      const char *  version_string = NULL;
+      bfd_boolean   hidden = FALSE;
+
+      if ((sym->flags & (BSF_SECTION_SYM | BSF_SYNTHETIC)) == 0)
+	version_string = bfd_get_symbol_version_string (abfd, sym, &hidden);
+
+      if (bfd_is_und_section (bfd_get_section (sym)))
+	hidden = TRUE;
+
+      if (version_string && *version_string != '\0')
+	printf (hidden ? "@%s" : "@@%s", version_string);
+    }
 
   if (line_numbers)
     {
@@ -941,12 +1021,15 @@ print_symbol (bfd *abfd, asymbol *sym, bfd_vma ssize, bfd *archive_bfd)
 /* Print the symbols when sorting by size.  */
 
 static void
-print_size_symbols (bfd *abfd, bfd_boolean is_dynamic,
-		    struct size_sym *symsizes, long symcount,
-		    bfd *archive_bfd)
+print_size_symbols (bfd *              abfd,
+		    bfd_boolean        is_dynamic,
+		    struct size_sym *  symsizes,
+		    long               symcount,
+		    bfd *              archive_bfd)
 {
   asymbol *store;
-  struct size_sym *from, *fromend;
+  struct size_sym *from;
+  struct size_sym *fromend;
 
   store = bfd_make_empty_symbol (abfd);
   if (store == NULL)
@@ -954,6 +1037,7 @@ print_size_symbols (bfd *abfd, bfd_boolean is_dynamic,
 
   from = symsizes;
   fromend = from + symcount;
+
   for (; from < fromend; from++)
     {
       asymbol *sym;
@@ -967,15 +1051,25 @@ print_size_symbols (bfd *abfd, bfd_boolean is_dynamic,
 }
 
 
-/* Print the symbols.  If ARCHIVE_BFD is non-NULL, it is the archive
-   containing ABFD.  */
+/* Print the symbols of ABFD that are held in MINISYMS.
+
+   If ARCHIVE_BFD is non-NULL, it is the archive containing ABFD.
+
+   SYMCOUNT is the number of symbols in MINISYMS.
+
+   SIZE is the size of a symbol in MINISYMS.  */
 
 static void
-print_symbols (bfd *abfd, bfd_boolean is_dynamic, void *minisyms, long symcount,
-	       unsigned int size, bfd *archive_bfd)
+print_symbols (bfd *         abfd,
+	       bfd_boolean   is_dynamic,
+	       void *        minisyms,
+	       long          symcount,
+	       unsigned int  size,
+	       bfd *         archive_bfd)
 {
   asymbol *store;
-  bfd_byte *from, *fromend;
+  bfd_byte *from;
+  bfd_byte *fromend;
 
   store = bfd_make_empty_symbol (abfd);
   if (store == NULL)
@@ -983,6 +1077,7 @@ print_symbols (bfd *abfd, bfd_boolean is_dynamic, void *minisyms, long symcount,
 
   from = (bfd_byte *) minisyms;
   fromend = from + symcount * size;
+
   for (; from < fromend; from += size)
     {
       asymbol *sym;
@@ -1004,6 +1099,7 @@ display_rel_file (bfd *abfd, bfd *archive_bfd)
   void *minisyms;
   unsigned int size;
   struct size_sym *symsizes;
+  asymbol *synthsyms = NULL;
 
   if (! dynamic)
     {
@@ -1034,12 +1130,11 @@ display_rel_file (bfd *abfd, bfd *archive_bfd)
 
   if (show_synthetic && size == sizeof (asymbol *))
     {
-      asymbol *synthsyms;
-      long synth_count;
       asymbol **static_syms = NULL;
       asymbol **dyn_syms = NULL;
       long static_count = 0;
       long dyn_count = 0;
+      long synth_count;
 
       if (dynamic)
 	{
@@ -1061,6 +1156,7 @@ display_rel_file (bfd *abfd, bfd *archive_bfd)
 		bfd_fatal (bfd_get_filename (abfd));
 	    }
 	}
+
       synth_count = bfd_get_synthetic_symtab (abfd, static_count, static_syms,
 					      dyn_count, dyn_syms, &synthsyms);
       if (synth_count > 0)
@@ -1110,6 +1206,8 @@ display_rel_file (bfd *abfd, bfd *archive_bfd)
   else
     print_size_symbols (abfd, dynamic, symsizes, symcount, archive_bfd);
 
+  if (synthsyms)
+    free (synthsyms);
   free (minisyms);
   free (symsizes);
 }
@@ -1181,6 +1279,8 @@ display_archive (bfd *file)
 	  bfd_close (last_arfile);
 	  lineno_cache_bfd = NULL;
 	  lineno_cache_rel_bfd = NULL;
+	  if (arfile == last_arfile)
+	    return;
 	}
       last_arfile = arfile;
     }
@@ -1434,7 +1534,6 @@ print_symbol_info_bsd (struct extended_symbol_info *info, bfd *abfd)
 	print_value (abfd, SYM_SIZE (info));
       else
 	print_value (abfd, SYM_VALUE (info));
-
       if (print_size && SYM_SIZE (info))
 	{
 	  printf (" ");
@@ -1485,7 +1584,10 @@ print_symbol_info_sysv (struct extended_symbol_info *info, bfd *abfd)
       /* Type, Size, Line, Section */
       if (info->elfinfo)
 	printf ("%18s|",
-		get_symbol_type (ELF_ST_TYPE (info->elfinfo->internal_elf_sym.st_info)));
+		get_elf_symbol_type (ELF_ST_TYPE (info->elfinfo->internal_elf_sym.st_info)));
+      else if (info->coffinfo)
+	printf ("%18s|",
+		get_coff_symbol_type (&info->coffinfo->native->u.syment));
       else
 	printf ("                  |");
 
@@ -1501,6 +1603,8 @@ print_symbol_info_sysv (struct extended_symbol_info *info, bfd *abfd)
 
       if (info->elfinfo)
 	printf("|     |%s", info->elfinfo->symbol.section->name);
+      else if (info->coffinfo)
+	printf("|     |%s", info->coffinfo->symbol.section->name);
       else
 	printf("|     |");
     }
@@ -1541,6 +1645,7 @@ main (int argc, char **argv)
 
   program_name = *argv;
   xmalloc_set_program_name (program_name);
+  bfd_set_error_program_name (program_name);
 #if BFD_SUPPORTS_PLUGINS
   bfd_plugin_set_program_name (program_name);
 #endif
@@ -1696,15 +1801,6 @@ main (int argc, char **argv)
     }
 
   END_PROGRESS (program_name);
-
-#ifdef HAVE_SBRK
-  if (show_stats)
-    {
-      char *lim = (char *) sbrk (0);
-
-      non_fatal (_("data size %ld"), (long) (lim - (char *) &environ));
-    }
-#endif
 
   exit (retval);
   return retval;

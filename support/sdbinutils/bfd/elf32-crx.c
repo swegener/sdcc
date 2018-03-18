@@ -1,5 +1,5 @@
 /* BFD back-end for National Semiconductor's CRX ELF
-   Copyright (C) 2004-2014 Free Software Foundation, Inc.
+   Copyright (C) 2004-2018 Free Software Foundation, Inc.
    Written by Tomer Levi, NSC, Israel.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -82,8 +82,8 @@ static reloc_howto_type crx_elf_howto_table[] =
 {
   HOWTO (R_CRX_NONE,		/* type */
 	 0,			/* rightshift */
-	 2,			/* size */
-	 32,			/* bitsize */
+	 3,			/* size */
+	 0,			/* bitsize */
 	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_dont,/* complain_on_overflow */
@@ -272,7 +272,7 @@ static reloc_howto_type crx_elf_howto_table[] =
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_CRX_NUM8",		/* name */
 	 FALSE,			/* partial_inplace */
-	 0x0,	  		/* src_mask */
+	 0x0,			/* src_mask */
 	 0xff,			/* dst_mask */
 	 FALSE),		/* pcrel_offset */
 
@@ -286,7 +286,7 @@ static reloc_howto_type crx_elf_howto_table[] =
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_CRX_NUM16",		/* name */
 	 FALSE,			/* partial_inplace */
-	 0x0,	  		/* src_mask */
+	 0x0,			/* src_mask */
 	 0xffff,		/* dst_mask */
 	 FALSE),		/* pcrel_offset */
 
@@ -300,7 +300,7 @@ static reloc_howto_type crx_elf_howto_table[] =
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_CRX_NUM32",		/* name */
 	 FALSE,			/* partial_inplace */
-	 0x0,	  		/* src_mask */
+	 0x0,			/* src_mask */
 	 0xffffffff,		/* dst_mask */
 	 FALSE),		/* pcrel_offset */
 
@@ -314,7 +314,7 @@ static reloc_howto_type crx_elf_howto_table[] =
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_CRX_IMM16",		/* name */
 	 FALSE,			/* partial_inplace */
-	 0x0, 	 		/* src_mask */
+	 0x0,			/* src_mask */
 	 0xffff,		/* dst_mask */
 	 FALSE),		/* pcrel_offset */
 
@@ -328,7 +328,7 @@ static reloc_howto_type crx_elf_howto_table[] =
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_CRX_IMM32",		/* name */
 	 FALSE,			/* partial_inplace */
-	 0x0,  			/* src_mask */
+	 0x0,			/* src_mask */
 	 0xffffffff,		/* dst_mask */
 	 FALSE),		/* pcrel_offset */
 
@@ -423,7 +423,14 @@ elf_crx_info_to_howto (bfd *abfd ATTRIBUTE_UNUSED, arelent *cache_ptr,
 		       Elf_Internal_Rela *dst)
 {
   unsigned int r_type = ELF32_R_TYPE (dst->r_info);
-  BFD_ASSERT (r_type < (unsigned int) R_CRX_MAX);
+  if (r_type >= R_CRX_MAX)
+    {
+      /* xgettext:c-format */
+      _bfd_error_handler (_("%B: unrecognised CRX reloc number: %d"),
+			  abfd, r_type);
+      bfd_set_error (bfd_error_bad_value);
+      r_type = R_CRX_NONE;
+    }
   cache_ptr->howto = &crx_elf_howto_table[r_type];
 }
 
@@ -876,7 +883,7 @@ elf32_crx_relocate_section (bfd *output_bfd, struct bfd_link_info *info,
 	RELOC_AGAINST_DISCARDED_SECTION (info, input_bfd, input_section,
 					 rel, 1, relend, howto, 0, contents);
 
-      if (info->relocatable)
+      if (bfd_link_relocatable (info))
 	continue;
 
       r = crx_elf_final_link_relocate (howto, input_bfd, output_bfd,
@@ -903,18 +910,14 @@ elf32_crx_relocate_section (bfd *output_bfd, struct bfd_link_info *info,
 	  switch (r)
 	    {
 	     case bfd_reloc_overflow:
-	       if (!((*info->callbacks->reloc_overflow)
-		     (info, (h ? &h->root : NULL), name, howto->name,
-		      (bfd_vma) 0, input_bfd, input_section,
-		      rel->r_offset)))
-		 return FALSE;
+	       (*info->callbacks->reloc_overflow)
+		 (info, (h ? &h->root : NULL), name, howto->name,
+		  (bfd_vma) 0, input_bfd, input_section, rel->r_offset);
 	       break;
 
 	     case bfd_reloc_undefined:
-	       if (!((*info->callbacks->undefined_symbol)
-		     (info, name, input_bfd, input_section,
-		      rel->r_offset, TRUE)))
-		 return FALSE;
+	       (*info->callbacks->undefined_symbol)
+		 (info, name, input_bfd, input_section, rel->r_offset, TRUE);
 	       break;
 
 	     case bfd_reloc_outofrange:
@@ -934,10 +937,8 @@ elf32_crx_relocate_section (bfd *output_bfd, struct bfd_link_info *info,
 	       /* Fall through.  */
 
 	     common_error:
-	       if (!((*info->callbacks->warning)
-		     (info, msg, name, input_bfd, input_section,
-		      rel->r_offset)))
-		 return FALSE;
+	       (*info->callbacks->warning) (info, msg, name, input_bfd,
+					    input_section, rel->r_offset);
 	       break;
 	    }
 	}
@@ -973,7 +974,7 @@ elf32_crx_relax_section (bfd *abfd, asection *sec,
   /* We don't have to do anything for a relocatable link, if
      this section does not have relocs, or if this is not a
      code section.  */
-  if (link_info->relocatable
+  if (bfd_link_relocatable (link_info)
       || (sec->flags & SEC_RELOC) == 0
       || sec->reloc_count == 0
       || (sec->flags & SEC_CODE) == 0)

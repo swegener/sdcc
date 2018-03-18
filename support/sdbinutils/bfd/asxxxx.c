@@ -166,14 +166,8 @@
 
 /* Macros for converting between hex and binary.  */
 
-static const char digs[] = "0123456789ABCDEF";
-
 #define NIBBLE(x)    hex_value(x)
 #define HEX(buffer) ((NIBBLE ((buffer)[0])<<4) + NIBBLE ((buffer)[1]))
-#define TOHEX(d, x, ch) \
-        d[1] = digs[(x) & 0xf]; \
-        d[0] = digs[((x)>>4)&0xf]; \
-        ch += ((x) & 0xff);
 #define ISHEX(x)    hex_p(x)
 
 /* When scanning the asxxxx .rel file, a linked list of asxxxx_symbol
@@ -330,7 +324,7 @@ asxxxx_bad_byte (bfd *abfd,
     }
   else
     {
-      char buf[10];
+      char buf[16];
 
       if (! ISPRINT (c))
         sprintf (buf, "\\%03o", (unsigned int) c);
@@ -1040,6 +1034,8 @@ asxxxx_get_symbol_info (bfd *ignore_abfd ATTRIBUTE_UNUSED,
   bfd_symbol_info (symbol, ret);
 }
 
+#define asxxxx_get_symbol_version_string _bfd_nosymbols_get_symbol_version_string
+
 static void
 asxxxx_print_symbol (bfd *abfd,
                    void * afile,
@@ -1091,6 +1087,8 @@ asxxxx_print_symbol (bfd *abfd,
 #define asxxxx_bfd_copy_link_hash_symbol_type       _bfd_generic_copy_link_hash_symbol_type
 #define asxxxx_bfd_final_link                       _bfd_generic_final_link
 #define asxxxx_bfd_link_split_section               _bfd_generic_link_split_section
+#define asxxxx_bfd_link_check_relocs                _bfd_generic_link_check_relocs
+#define asxxxx_bfd_define_start_stop                bfd_generic_define_start_stop
 
 const bfd_target asxxxx_vec =
 {

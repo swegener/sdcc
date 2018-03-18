@@ -59,6 +59,11 @@ extern char *getwd ();
 
 #if !(defined (VMS) || (defined(_WIN32) && !defined(__CYGWIN__)))
 
+#ifdef _WIN32
+#include <direct.h>
+#define getcwd	_getcwd
+#endif
+
 /* Get the working directory.  Use the PWD environment variable if it's
    set correctly, since this is faster and gives more uniform answers
    to the user.  Yield the working directory if successful; otherwise,
@@ -106,11 +111,6 @@ getpwd (void)
 }
 
 #else	/* VMS || _WIN32 && !__CYGWIN__ */
-
-#ifdef _WIN32
-#include <direct.h>
-#define getcwd	_getcwd
-#endif
 
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 255

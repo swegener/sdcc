@@ -1,5 +1,5 @@
 /* BFD backend for hp-ux 9000/300
-   Copyright (C) 1990-2014 Free Software Foundation, Inc.
+   Copyright (C) 1990-2018 Free Software Foundation, Inc.
    Written by Glenn Engel.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -20,9 +20,9 @@
    MA 02110-1301, USA.  */
 
 
-/*  hpux native  ------------> |               |
-                               | hp300hpux bfd | ----------> hpux w/gnu ext
-    hpux w/gnu extension ----> |               |
+/*  hpux native	 ------------> |	       |
+			       | hp300hpux bfd | ----------> hpux w/gnu ext
+    hpux w/gnu extension ----> |	       |
 
     Support for the 9000/[34]00 has several limitations.
       1. Shared libraries are not supported.
@@ -52,12 +52,12 @@
     code where a unique implementation is needed:
 
     {
-        #define a bunch of stuff
-        #include <aoutx.h>
+	#define a bunch of stuff
+	#include <aoutx.h>
 
-        implement a bunch of functions
+	implement a bunch of functions
 
-        #include "aout-target.h"
+	#include "aout-target.h"
     }
 
     The hp symbol table is a bit different than other a.out targets.  Instead
@@ -168,16 +168,16 @@
 
 #define HP_SYMTYPE_ALIGN	0x10
 #define HP_SYMTYPE_EXTERNAL	0x20
-#define HP_SECONDARY_SYMBOL     0x40
+#define HP_SECONDARY_SYMBOL	0x40
 
 /* RELOCATION DEFINITIONS */
 #define HP_RSEGMENT_TEXT	0x00
 #define HP_RSEGMENT_DATA	0x01
 #define HP_RSEGMENT_BSS		0x02
 #define HP_RSEGMENT_EXTERNAL	0x03
-#define HP_RSEGMENT_PCREL       0x04
-#define HP_RSEGMENT_RDLT        0x05
-#define HP_RSEGMENT_RPLT        0x06
+#define HP_RSEGMENT_PCREL	0x04
+#define HP_RSEGMENT_RDLT	0x05
+#define HP_RSEGMENT_RPLT	0x06
 #define HP_RSEGMENT_NOOP	0x3F
 
 #define HP_RLENGTH_BYTE		0x00
@@ -224,32 +224,32 @@ MY (callback) (bfd *abfd)
   struct internal_exec *execp = exec_hdr (abfd);
 
   /* Calculate the file positions of the parts of a newly read aout header */
-  obj_textsec (abfd)->size = N_TXTSIZE (*execp);
+  obj_textsec (abfd)->size = N_TXTSIZE (execp);
 
   /* The virtual memory addresses of the sections */
-  obj_textsec (abfd)->vma = N_TXTADDR (*execp);
-  obj_datasec (abfd)->vma = N_DATADDR (*execp);
-  obj_bsssec (abfd)->vma = N_BSSADDR (*execp);
+  obj_textsec (abfd)->vma = N_TXTADDR (execp);
+  obj_datasec (abfd)->vma = N_DATADDR (execp);
+  obj_bsssec (abfd)->vma = N_BSSADDR (execp);
 
   obj_textsec (abfd)->lma = obj_textsec (abfd)->vma;
   obj_datasec (abfd)->lma = obj_datasec (abfd)->vma;
   obj_bsssec (abfd)->lma = obj_bsssec (abfd)->vma;
 
   /* The file offsets of the sections */
-  obj_textsec (abfd)->filepos = N_TXTOFF (*execp);
-  obj_datasec (abfd)->filepos = N_DATOFF (*execp);
+  obj_textsec (abfd)->filepos = N_TXTOFF (execp);
+  obj_datasec (abfd)->filepos = N_DATOFF (execp);
 
   /* The file offsets of the relocation info */
-  obj_textsec (abfd)->rel_filepos = N_TRELOFF (*execp);
-  obj_datasec (abfd)->rel_filepos = N_DRELOFF (*execp);
+  obj_textsec (abfd)->rel_filepos = N_TRELOFF (execp);
+  obj_datasec (abfd)->rel_filepos = N_DRELOFF (execp);
 
   /* The file offsets of the string table and symbol table.  */
-  obj_sym_filepos (abfd) = N_SYMOFF (*execp);
-  obj_str_filepos (abfd) = N_STROFF (*execp);
+  obj_sym_filepos (abfd) = N_SYMOFF (execp);
+  obj_str_filepos (abfd) = N_STROFF (execp);
 
   /* Determine the architecture and machine type of the object file.  */
 #ifdef SET_ARCH_MACH
-  SET_ARCH_MACH (abfd, *execp);
+  SET_ARCH_MACH (abfd, execp);
 #else
   bfd_default_set_arch_mach (abfd, DEFAULT_ARCH, 0);
 #endif
@@ -257,11 +257,11 @@ MY (callback) (bfd *abfd)
   if (obj_aout_subformat (abfd) == gnu_encap_format)
     {
       /* The file offsets of the relocation info */
-      obj_textsec (abfd)->rel_filepos = N_GNU_TRELOFF (*execp);
-      obj_datasec (abfd)->rel_filepos = N_GNU_DRELOFF (*execp);
+      obj_textsec (abfd)->rel_filepos = N_GNU_TRELOFF (execp);
+      obj_datasec (abfd)->rel_filepos = N_GNU_DRELOFF (execp);
 
       /* The file offsets of the string table and symbol table.  */
-      obj_sym_filepos (abfd) = N_GNU_SYMOFF (*execp);
+      obj_sym_filepos (abfd) = N_GNU_SYMOFF (execp);
       obj_str_filepos (abfd) = (obj_sym_filepos (abfd) + execp->a_syms);
 
       abfd->flags |= HAS_LINENO | HAS_DEBUG | HAS_SYMS | HAS_LOCALS;
@@ -280,15 +280,13 @@ MY (write_object_contents) (bfd * abfd)
 {
   struct external_exec exec_bytes;
   struct internal_exec *execp = exec_hdr (abfd);
-  bfd_size_type text_size;	/* dummy vars */
-  file_ptr text_end;
 
   memset (&exec_bytes, 0, sizeof (exec_bytes));
 
   obj_reloc_entry_size (abfd) = RELOC_STD_SIZE;
 
   if (adata (abfd).magic == undecided_magic)
-    NAME (aout,adjust_sizes_and_vmas) (abfd, &text_size, &text_end);
+    NAME (aout,adjust_sizes_and_vmas) (abfd);
   execp->a_syms = 0;
 
   execp->a_entry = bfd_get_start_address (abfd);
@@ -298,8 +296,8 @@ MY (write_object_contents) (bfd * abfd)
   execp->a_drsize = ((obj_datasec (abfd)->reloc_count) *
 		     obj_reloc_entry_size (abfd));
 
-  N_SET_MACHTYPE (*execp, 0xc);
-  N_SET_FLAGS (*execp, aout_backend_info (abfd)->exec_hdr_flags);
+  N_SET_MACHTYPE (execp, 0xc);
+  N_SET_FLAGS (execp, aout_backend_info (abfd)->exec_hdr_flags);
 
   NAME (aout,swap_exec_header_out) (abfd, execp, &exec_bytes);
 
@@ -319,7 +317,7 @@ MY (write_object_contents) (bfd * abfd)
   if (bfd_get_symcount (abfd) != 0)
     {
       /* Skip the relocs to where we want to put the symbols.  */
-      if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (*execp) + execp->a_drsize),
+      if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (execp) + execp->a_drsize),
 		    SEEK_SET) != 0)
 	return FALSE;
     }
@@ -329,11 +327,11 @@ MY (write_object_contents) (bfd * abfd)
 
   if (bfd_get_symcount (abfd) != 0)
     {
-      if (bfd_seek (abfd, (file_ptr) N_TRELOFF (*execp), SEEK_CUR) != 0)
+      if (bfd_seek (abfd, (file_ptr) N_TRELOFF (execp), SEEK_CUR) != 0)
 	return FALSE;
       if (!NAME (aout,squirt_out_relocs) (abfd, obj_textsec (abfd)))
 	return FALSE;
-      if (bfd_seek (abfd, (file_ptr) N_DRELOFF (*execp), SEEK_CUR) != 0)
+      if (bfd_seek (abfd, (file_ptr) N_DRELOFF (execp), SEEK_CUR) != 0)
 	return FALSE;
       if (!NAME (aout,squirt_out_relocs) (abfd, obj_datasec (abfd)))
 	return FALSE;
@@ -407,9 +405,9 @@ convert_sym_type (struct external_nlist *sym_pointer ATTRIBUTE_UNUSED,
 	      abort ();
 	    case N_UNDF | N_EXT:
 	      /* If the value is nonzero, then just treat this as a
-                 common symbol.  I don't know if this is correct in
-                 all cases, but it is more correct than treating it as
-                 a weak undefined symbol.  */
+		 common symbol.  I don't know if this is correct in
+		 all cases, but it is more correct than treating it as
+		 a weak undefined symbol.  */
 	      if (cache_ptr->symbol.value == 0)
 		new_type = N_WEAKU;
 	      break;
@@ -434,9 +432,9 @@ convert_sym_type (struct external_nlist *sym_pointer ATTRIBUTE_UNUSED,
 
 /*
 DESCRIPTION
-        Swaps the information in an executable header taken from a raw
-        byte stream memory image, into the internal exec_header
-        structure.
+	Swaps the information in an executable header taken from a raw
+	byte stream memory image, into the internal exec_header
+	structure.
 */
 
 void
@@ -465,7 +463,7 @@ NAME (aout,swap_exec_header_in) (bfd *abfd,
   /* check the header to see if it was generated by a bfd output */
   /* this is detected rather bizarrely by requiring a bunch of   */
   /* header fields to be zero and an old unused field (now used) */
-  /* to be set.                                                  */
+  /* to be set.							 */
   /***************************************************************/
   do
     {
@@ -604,7 +602,7 @@ MY (slurp_symbol_table) (bfd *abfd)
 	    /**************************************************************/
 	    /* the hp string is not null terminated so we create a new one*/
 	    /* by copying the string to overlap the just vacated nlist    */
-	    /* structure before it in memory.                             */
+	    /* structure before it in memory.				  */
 	    /**************************************************************/
 	    cache_ptr->symbol.name = strings;
 	    memcpy (strings, sym_pointer + 1, length);
@@ -694,7 +692,7 @@ MY (swap_std_reloc_in) (bfd *abfd,
     {
       /* The GNU linker assumes any offset from beginning of section */
       /* is already incorporated into the image while the HP linker  */
-      /* adds this in later.  Add it in now...                       */
+      /* adds this in later.  Add it in now...			     */
       MOVE_ADDRESS (-cache_ptr->address);
     }
   else
@@ -780,7 +778,7 @@ doit:
 /************************************************************************/
 /* The following functions are identical to functions in aoutx.h except */
 /* they refer to MY(func) rather than NAME(aout,func) and they also     */
-/* call aout_32 versions if the input file was generated by gcc         */
+/* call aout_32 versions if the input file was generated by gcc		*/
 /************************************************************************/
 
 long aout_32_canonicalize_symtab  (bfd *, asymbol **);

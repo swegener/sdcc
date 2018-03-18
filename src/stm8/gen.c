@@ -6459,10 +6459,27 @@ genPointerGet (const iCode *ic)
       cost (4, 4);
       goto release;
     }
-  else if (!bit_field && size == 1 && !offset && left->aop->type == AOP_LIT && aopInReg(result->aop, 0, A_IDX))
+  // Special case for efficient handling of 8-bit I/O and rematerialized pointers
+  else if (!bit_field && size == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
+    && aopInReg(result->aop, 0, A_IDX))
     {
-      emit2("ld", "a, 0x%02x%02x",  byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0));
+      if (left->aop->type == AOP_LIT)
+        emit2("ld", offset ? "a, 0x%02x%02x+%d" : "a, 0x%02x%02x",  byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);
+      else
+        emit2("ld", offset ? "a, %s+%d" : "a, %s", left->aop->aopu.aop_immd, offset);
       cost (3, 1);
+      goto release;
+    }
+  // Special case for efficient handling of 16-bit I/O and rematerialized pointers
+  else if (!bit_field && size == 2 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) &&
+    (aopInReg (result->aop, 0, X_IDX) || aopInReg (result->aop, 0, Y_IDX)))
+    {
+      bool use_y = aopInReg (result->aop, 0, Y_IDX);
+      if (left->aop->type == AOP_LIT)
+        emit2("ldw", offset ? "%s, 0x%02x%02x+%d" : "%s, 0x%02x%02x", use_y ? "y" : "x", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);
+      else
+        emit2("ldw", offset ? "%s, %s+%d" : "%s, %s", use_y ? "y" : "x", left->aop->aopu.aop_immd, offset);
+      cost (3 + use_y, 2);
       goto release;
     }
 

@@ -1,7 +1,7 @@
 2018-03-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  Improve handling of rematerialized operands in addition.
+	  Improve handling of rematerialized operands and I/O.
 
 2018-03-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

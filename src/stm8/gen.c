@@ -27,6 +27,7 @@
 static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost_bytes;
 static unsigned int regalloc_dry_run_cost_cycles;
+static unsigned int regalloc_dry_run_cycle_scale = 1;
 
 static struct
 {
@@ -365,7 +366,7 @@ static void
 cost(unsigned int bytes, unsigned int cycles)
 {
   regalloc_dry_run_cost_bytes += bytes;
-  regalloc_dry_run_cost_cycles += cycles;
+  regalloc_dry_run_cost_cycles += cycles * regalloc_dry_run_cycle_scale;
 }
 
 void emitJP(const symbol *target, float probability)
@@ -5887,6 +5888,7 @@ genLeftShift (const iCode *ic)
   int i, size;
   bool pushed_a = FALSE;
   symbol *tlbl1, *tlbl2;
+  unsigned int iterations;
 
   struct asmop shiftop_impl;
   struct asmop *shiftop;
@@ -5951,6 +5953,7 @@ genLeftShift (const iCode *ic)
   tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   cheapMove (ASMOP_A, 0, right->aop, 0, FALSE);
+  iterations = (right->aop->type == AOP_LIT ? byteOfVal (right->aop->aopu.aop_lit, 0) : 2);
 
   if (right->aop->type != AOP_LIT || aopIsLitVal (right->aop, 0, 1, 0))
     {
@@ -5963,6 +5966,7 @@ genLeftShift (const iCode *ic)
 
   emitLabel (tlbl1);
 
+  regalloc_dry_run_cycle_scale = iterations;
   for (i = 0; i < size;)
      {
         int swapidx = -1;
@@ -5995,11 +5999,12 @@ genLeftShift (const iCode *ic)
           }
         i++;
      }
-
   emit3 (A_DEC, ASMOP_A, 0);
+  regalloc_dry_run_cycle_scale = 1;
+
   if (tlbl1)
     emit2 ("jrne", "!tlabel", labelKey2num (tlbl1->key));
-  cost (2, 0);
+  cost (2, (iterations - 1) * 2 + 1);
   emitLabel (tlbl2);
 
   if(!regDead (A_IDX, ic))
@@ -6280,6 +6285,7 @@ genRightShift (const iCode *ic)
   bool pushed_a = FALSE;
   symbol *tlbl1, *tlbl2;
   bool sign;
+  unsigned int iterations;
 
   struct asmop shiftop_impl;
   struct asmop *shiftop;
@@ -6348,6 +6354,8 @@ genRightShift (const iCode *ic)
   tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
   cheapMove (ASMOP_A, 0, right->aop, 0, FALSE);
 
+  iterations = (right->aop->type == AOP_LIT ? byteOfVal (right->aop->aopu.aop_lit, 0) : 2);
+
   if (right->aop->type != AOP_LIT || aopIsLitVal (right->aop, 0, 1, 0))
     {
       if (!aopOnStack (right->aop, 0, 1) && right->aop->type != AOP_DIR)
@@ -6359,6 +6367,7 @@ genRightShift (const iCode *ic)
 
   emitLabel (tlbl1);
 
+  regalloc_dry_run_cycle_scale = iterations;
   for (i = size - 1; i >= 0;)
      {
         int swapidx = -1;
@@ -6390,11 +6399,12 @@ genRightShift (const iCode *ic)
           }
         i--;
      }
-
   emit3 (A_DEC, ASMOP_A, 0);
+  regalloc_dry_run_cycle_scale = 1;
+
   if (tlbl1)
     emit2 ("jrne", "!tlabel", labelKey2num (tlbl1->key));
-  cost (2, 0);
+  cost (2, (iterations - 1) * 2 + 1);
   emitLabel (tlbl2);
 
   if(!regDead (A_IDX, ic))
@@ -6499,7 +6509,7 @@ genPointerGet (const iCode *ic)
   genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
   if (floatFromVal (right->aop->aopu.aop_lit) < 0.0)
     {
-      emit2 ("ADDW", use_y ? "y, #0x%x" : "x, #0x%x", offset);
+      emit2 ("addw", use_y ? "y, #0x%x" : "x, #0x%x", offset);
       offset = 0;
       cost (use_y ? 4 : 3, 2);
     }

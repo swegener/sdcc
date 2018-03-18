@@ -25,6 +25,7 @@
 from __future__ import print_function
 
 import sys, string, os, re, subprocess
+from subprocess import Popen, PIPE, STDOUT
 
 macrodefs = {}
 
@@ -300,7 +301,7 @@ failurecount = 0
 
 print("--- Running: %s " % inputfilenameshort)
 for testname in list(testcases.keys()):
-    if testname.find("DISABLED"):
+    if testname.find("DISABLED")>=0:
       continue
     ccdef = compilermode["CCDEF"]+testname
     if testname[-3:] == "C89":
@@ -312,12 +313,11 @@ for testname in list(testcases.keys()):
     cmd = " ".join([cc,ccflags,ccstd,ccdef,inputfilename])
     print()
     print(cmd)
-    #spawn = popen2.Popen4(cmd)
-    #spawn.wait()
-    #output = spawn.fromchild.readlines()
-    spawn = Popen(args=cmd, bufsize=-1, stdout = PIPE, stderr = STDOUT, close_fds=True)
+    spawn = Popen(args=cmd.split(), bufsize=-1, stdout = PIPE, stderr = STDOUT, close_fds=True)
     (stdoutdata,stderrdata) = spawn.communicate()
-    output = stdoutdata.readlines()
+    if not isinstance(stdoutdata, str): # python 3 returns bytes so
+      stdoutdata = str(stdoutdata,"utf-8") # convert to str type first
+    output = stdoutdata.splitlines(True)
 
     results = parseResults(output)
 

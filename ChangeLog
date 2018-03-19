@@ -1,3 +1,9 @@
+2018-03-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/ralloc.c,
+	  src/stm8/ralloc.c:
+	  Do not mark global variables as rematerializeable.
+
 2018-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/generate-cases.py: apply patch #282 from

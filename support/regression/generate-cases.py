@@ -28,17 +28,6 @@ __getSuiteName(void)
 """ 
 
 # Utility functions
-def trim(a):
-    """Removes all white space from the start and the end of a string.
-    Like java.lang.String.trim"""
-    ret = chomp(re.sub(r'^\s+', '', a))
-    return ret
-    
-def chomp(a):
-    """Removes all white space from the end of a string.
-    Like perl's chomp"""
-    return re.sub(r'\s+$', '', a)
-
 def createdir(path):
     """Creates a directory if it doesn't exist"""
     if not os.path.isdir(path):
@@ -97,7 +86,10 @@ class InstanceGenerator:
     def writetemplate(self):
         """Given a template file and a temporary name writes out a verbatim copy
         of the source file and adds the suite table and functions."""
-        fout = open(self.tmpname, 'w')
+        if sys.version_info[0]<3:
+            fout = open(self.tmpname, 'w')
+        else:
+            fout = open(self.tmpname, 'w', encoding="latin-1")
 
         for line in self.lines:
             fout.write(line)
@@ -121,7 +113,10 @@ class InstanceGenerator:
 
     def readfile(self):
         """Read in all of the input file."""
-        fin = open(self.inname)
+        if sys.version_info[0]<3:
+            fin = open(self.inname)
+        else:
+            fin = open(self.inname, encoding="latin-1")
         self.lines = fin.readlines()
         fin.close()
 
@@ -131,7 +126,7 @@ class InstanceGenerator:
 
         # Iterate over the source file and pull out the meta data.
         for line in self.lines:
-            line = trim(line)
+            line = line.strip()
 
             # If we are still in the header, see if this is a substitution line
             if inheader:
@@ -143,9 +138,9 @@ class InstanceGenerator:
                     values = re.split(r',', rawvalues)
                     
                     # Trim the name
-                    name = trim(name)
+                    name = name.strip()
                     # Trim all the values
-                    values = list(map(trim, values))
+                    values = [value.strip() for value in values]
                     
                     self.replacements[name] = values
                 elif re.search(r'\*/', line) != None:

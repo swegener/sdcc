@@ -1,3 +1,12 @@
+2018-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/generate-cases.py: apply patch #282 from
+	  Diego Herranz
+	* support/regression/generate-cases.py,
+	* support/regression/HTMLgen.py: use latin-1 encoding for file I/O
+	  to pass through UTF-8 and non-UTF-8 data without interpretation
+	  when using Python 3
+
 2018-03-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/sdbinutils:

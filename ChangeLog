@@ -1,3 +1,9 @@
+2018-03-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure.ac,
+	  configure:
+	  Migrate to Python 3.6 for default.
+
 2018-03-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/ralloc.c,

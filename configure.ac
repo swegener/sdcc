@@ -64,7 +64,7 @@ AC_CHECK_PROGS(LEX, flex lex, :)
 dnl Don't use AC_PROG_YACC
 AC_CHECK_PROGS(YACC, 'bison -y' byacc yacc, :)
 
-AC_CHECK_PROGS(PYTHON, python2 python2.7 python2.6 python2.5 python2.4, python)
+AC_CHECK_PROGS(PYTHON, python3.6 python2.7 python2 python3, python)
 
 AC_DEFUN([SDCC_REQUIRE_PROG],
 [if test "$1" = ":"; then

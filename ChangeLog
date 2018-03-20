@@ -2,6 +2,10 @@
 
 	* support/scripts/as2gbmap.py:
 	  Migrate to Python 2/3.
+	* src/z80/ralloc.c,
+	  src/stm8/ralloc.c,
+	  support/regression/tests/bug-2347.c:
+	  Fix bug #2347.
 
 2018-03-19 Philipp Klaus Krause <pkk AT spth.de>
 

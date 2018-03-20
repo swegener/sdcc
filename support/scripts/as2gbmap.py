@@ -25,6 +25,8 @@
 #  Borut Razem
 #  borut.razem@siol.net
 
+from __future__ import print_function
+
 import sys
 import os
 import re
@@ -42,8 +44,9 @@ def main():
     if len(args) > 0 and args[0] != "-":
         try:
             fin = open(args[0], "r")
-        except IOError, (errno, strerror):
-            print >> sys.stderr, "%s: can't open %s: %s" % (os.path.basename(sys.argv[0]), args[0], strerror)
+        except IOError as xxx_todo_changeme:
+            (errno, strerror) = xxx_todo_changeme.args
+            print("%s: can't open %s: %s" % (os.path.basename(sys.argv[0]), args[0], strerror), file=sys.stderr)
             return 1
     else:
         fin = sys.stdin
@@ -51,8 +54,9 @@ def main():
     if len(args) > 1 and args[1] != "-":
         try:
             fout = open(args[1], "w")
-        except IOError, (errno, strerror):
-            print >> sys.stderr, "%s: can't create %s: %s" % (os.path.basename(sys.argv[1]), args[1], strerror)
+        except IOError as xxx_todo_changeme1:
+            (errno, strerror) = xxx_todo_changeme1.args
+            print("%s: can't create %s: %s" % (os.path.basename(sys.argv[1]), args[1], strerror), file=sys.stderr)
             return 1
     else:
         fout = sys.stdout;
@@ -73,9 +77,9 @@ def main():
             continue
 
         if re.match(r"^Area +Addr +Size +Decimal +Bytes +\(Attributes\)$", line):
-            line = fin.next()
+            line = next(fin)
             if re.match(r"^[- ]+$", line):
-                line = fin.next()
+                line = next(fin)
                 m = re.match(r"^([^ ]+) +([0-9A-Fa-f]{4}) +([0-9A-Fa-f]{4}) += +\d+\. +\w+ +\(([^\)]+)\)$", line)
                 if m:
                     if area:
@@ -128,49 +132,49 @@ def main():
 
     if options.no_gmb:
         # generate no$gmp map file
-        print >> fout, '; no$gmb format .sym file'
-        print >> fout, '; Generated automagically by %s' % os.path.basename(sys.argv[0])
+        print('; no$gmb format .sym file', file=fout)
+        print('; Generated automagically by %s' % os.path.basename(sys.argv[0]), file=fout)
         for e in areas:
-            print >> fout, '; Area: %s' % e['area']
+            print('; Area: %s' % e['area'], file=fout)
             if e['globals']:
                 e['globals'].sort(key = operator.itemgetter('value'))
                 for g in e['globals']:
                    if g['global'][0:3] != 'l__':
                         if g['value'] > 0x7FFF:
-                            print >> fout, '00:%04X %s' % (g['value'], g['global'])
+                            print('00:%04X %s' % (g['value'], g['global']), file=fout)
                         else:
-                            print >> fout, '%02X:%04X %s' % (g['value'] // 16384, g['value'], g['global'])
+                            print('%02X:%04X %s' % (g['value'] // 16384, g['value'], g['global']), file=fout)
     else:
         # generate rrgb map file
         for e in areas:
-            print >> fout, 'AREA %s' % e['area']
-            print >> fout, '\tRADIX %s' % e['radix']
-            print >> fout, '\tBASE %04X' % e['base']
-            print >> fout, '\tSIZE %04X' % e['size']
-            print >> fout, '\tATTRIB %s' % e['attrib']
+            print('AREA %s' % e['area'], file=fout)
+            print('\tRADIX %s' % e['radix'], file=fout)
+            print('\tBASE %04X' % e['base'], file=fout)
+            print('\tSIZE %04X' % e['size'], file=fout)
+            print('\tATTRIB %s' % e['attrib'], file=fout)
             if e['globals']:
                 e['globals'].sort(key = operator.itemgetter('value'))
-                print >> fout, '\tGLOBALS'
+                print('\tGLOBALS', file=fout)
                 for g in e['globals']:
-                    print >> fout, '\t\t%s\t%04X' % (g['global'], g['value'])
+                    print('\t\t%s\t%04X' % (g['global'], g['value']), file=fout)
     
         if modules:
-            print >> fout, 'MODULES'
+            print('MODULES', file=fout)
             for m in modules:
-                print >> fout, '\tFILE %s' % m['file']
+                print('\tFILE %s' % m['file'], file=fout)
                 if m['name']:
-                    print >> fout, '\t\tNAME %s' % m['name']
+                    print('\t\tNAME %s' % m['name'], file=fout)
     
         if libraries:
-            print >> fout, 'LIBRARIES'
+            print('LIBRARIES', file=fout)
             for m in libraries:
-                print >> fout, '\tLIBRARY %s' % m['library']
-                print >> fout, '\t\tMODULE %s' % m['module']
+                print('\tLIBRARY %s' % m['library'], file=fout)
+                print('\t\tMODULE %s' % m['module'], file=fout)
     
         if ubads:
-            print >> fout, 'USERBASEDEF'
+            print('USERBASEDEF', file=fout)
             for m in ubads:
-                print >> fout, '\t%s = 0x%04X' % (m['symbol'], int(m['value'], 16))
+                print('\t%s = 0x%04X' % (m['symbol'], int(m['value'], 16)), file=fout)
         return 0
 
 if __name__ == '__main__':

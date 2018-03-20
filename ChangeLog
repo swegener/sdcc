@@ -1,3 +1,8 @@
+2018-03-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/scripts/as2gbmap.py:
+	  Migrate to Python 2/3.
+
 2018-03-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* configure.ac,

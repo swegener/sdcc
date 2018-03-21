@@ -2734,7 +2734,7 @@ packRegisters (eBBlock * ebp)
           OP_SYMBOL (IC_LEFT (ic))->remat &&
           (!IS_SYMOP (IC_RIGHT (ic)) || !IS_CAST_ICODE (OP_SYMBOL (IC_RIGHT (ic))->rematiCode)) &&
           bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1)
-        {printf("4 %s remat.\n", OP_SYMBOL (IC_RESULT (ic))->name);
+        {
           OP_SYMBOL (IC_RESULT (ic))->remat = 1;
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
           OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;

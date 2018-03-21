@@ -2984,14 +2984,16 @@ packRegisters (eBBlock ** ebpp, int blockno)
       if ((ic->op == BITWISEAND || ic->op == '|' || ic->op == '^') &&
           ic->prev &&
           ic->prev->op == '=' &&
-          IS_ITEMP (IC_LEFT (ic)) &&
-          IC_LEFT (ic) == IC_RESULT (ic->prev) && isOperandEqual (IC_RESULT (ic), IC_RIGHT (ic->prev)))
+          (IS_ITEMP (IC_LEFT (ic)) && isOperandEqual (IC_LEFT (ic), IC_RESULT (ic->prev)) && isOperandEqual (IC_RESULT (ic), IC_RIGHT (ic->prev)) ||
+           IS_ITEMP (IC_RIGHT (ic)) && isOperandEqual (IC_RIGHT (ic), IC_RESULT (ic->prev)) && isOperandEqual (IC_RESULT (ic), IC_RIGHT (ic->prev))))
         {
+          bool left = IS_ITEMP (IC_LEFT (ic)) && isOperandEqual (IC_LEFT (ic), IC_RESULT (ic->prev)) && isOperandEqual (IC_RESULT (ic), IC_RIGHT (ic->prev));
+
           iCode *ic_prev = ic->prev;
           symbol *prev_result_sym = OP_SYMBOL (IC_RESULT (ic_prev));
 
-          ReplaceOpWithCheaperOp (&IC_LEFT (ic), IC_RESULT (ic));
-          if (IC_RESULT (ic_prev) != IC_RIGHT (ic))
+          ReplaceOpWithCheaperOp (left ? &IC_LEFT (ic) : &IC_RIGHT (ic), IC_RESULT (ic));
+          if (IC_RESULT (ic_prev) != (left ? IC_RIGHT (ic) : IC_LEFT (ic)))
             {
               bitVectUnSetBit (OP_USES (IC_RESULT (ic_prev)), ic->key);
               if (              /*IS_ITEMP (IC_RESULT (ic_prev)) && */

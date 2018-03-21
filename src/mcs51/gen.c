@@ -7155,11 +7155,18 @@ genAnd (iCode * ic, iCode * ifx)
                   emitcode ("anl", "a,%s", aopGet (right, offset, FALSE, FALSE));
                   aopPut (result, "a", offset);
                 }
+              else if (AOP_TYPE (left) != AOP_DPTR)
+                {
+                  char *l = Safe_strdup (aopGet (left, offset, FALSE, TRUE));
+                  emitcode ("anl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                  Safe_free (l);
+                }
               else
                 {
                   char *l = Safe_strdup (aopGet (left, offset, FALSE, TRUE));
                   emitcode ("anl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
                   Safe_free (l);
+                  aopPut (result, "a", offset);
                 }
             }
           else
@@ -7549,11 +7556,18 @@ genOr (iCode * ic, iCode * ifx)
                   emitcode ("orl", "a,%s", aopGet (right, offset, FALSE, FALSE));
                   aopPut (result, "a", offset);
                 }
+              else if (AOP_TYPE (left) != AOP_DPTR)
+                {
+                  char *l = Safe_strdup (aopGet (left, offset, FALSE, TRUE));
+                  emitcode ("orl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                  Safe_free (l);
+                }
               else
                 {
                   char *l = Safe_strdup (aopGet (left, offset, FALSE, TRUE));
                   emitcode ("orl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
                   Safe_free (l);
+                  aopPut (result, "a", offset);
                 }
             }
           else
@@ -7908,11 +7922,18 @@ genXor (iCode * ic, iCode * ifx)
                   emitcode ("xrl", "a,%s", aopGet (right, offset, FALSE, FALSE));
                   aopPut (result, "a", offset);
                 }
+              else if (AOP_TYPE (left) != AOP_DPTR)
+                {
+                  char *l = Safe_strdup (aopGet (left, offset, FALSE, TRUE));
+                  emitcode ("xrl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
+                  Safe_free (l);
+                }
               else
                 {
                   char *l = Safe_strdup (aopGet (left, offset, FALSE, TRUE));
                   emitcode ("xrl", "%s,%s", l, aopGet (right, offset, FALSE, FALSE));
                   Safe_free (l);
+                  aopPut (result, "a", offset);
                 }
             }
           else

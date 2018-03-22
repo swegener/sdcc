@@ -870,7 +870,7 @@ tryAgain:
 /* getRegBit - will try for Bit if not spill this                  */
 /*-----------------------------------------------------------------*/
 static reg_info *
-getRegBit (symbol * sym)
+getRegBitTry (symbol * sym)
 {
   reg_info *reg;
 
@@ -878,7 +878,6 @@ getRegBit (symbol * sym)
   if ((reg = allocReg (REG_BIT)))
     return reg;
 
-  spillThis (sym);
   return 0;
 }
 
@@ -1395,7 +1394,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                   else
                     {
                       if (sym->regType == REG_BIT) /* Try to allocate to bit register if possible */
-                        sym->regs[j] = getRegBitNoSpil (sym);
+                        sym->regs[j] = getRegBitTry (sym);
                       if (ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)))
                         {
                           symbol *right = OP_SYMBOL (IC_RIGHT (ic));
@@ -1930,6 +1929,59 @@ rematStr (symbol * sym)
   return dbuf_detach_c_str (&dbuf);
 }
 
+/*------------------------------------------------------------------*/
+/* isBitVar - returns true if sym is a good candiate for allocation */
+/*            to a bit                                              */
+/*------------------------------------------------------------------*/
+static bool isFlagVar (symbol *sym)
+{
+  if (IS_BIT (sym->type))
+   return (true);
+
+  if (!(IS_SPEC(sym->type) && SPEC_NOUN (sym->type) == V_BOOL && !sym->addrtaken))
+    return (false);
+
+  bitVect *defs = bitVectCopy (sym->defs);
+  bitVect *uses = bitVectCopy (sym->uses);
+  int key;
+  unsigned int gooduses = 0;
+  unsigned int baduses = 0;
+
+  for (key = bitVectFirstBit (defs); key >= 0; key = bitVectFirstBit (defs))
+    {
+      bitVectUnSetBit (defs, key);
+
+      iCode *ic = hTabItemWithKey (iCodehTab, key);
+
+      if (ic->op == AND_OP || ic->op == OR_OP || ic->op == EQ_OP || ic->op == '<' || ic->op == '>' || ic->op == CAST || ic->op == '!')
+        gooduses++;
+      else if (ic->op == '=' &&
+        (IS_OP_LITERAL (IC_RIGHT (ic)) || IS_SYMOP (IC_RIGHT (ic)) && IS_BIT (OP_SYMBOL (IC_RIGHT (ic))->type)))
+        gooduses++;
+      else
+        baduses++;
+    }
+
+  for (key = bitVectFirstBit (uses); key >= 0; key = bitVectFirstBit (uses))
+    {
+      bitVectUnSetBit (uses, key);
+
+      iCode *ic = hTabItemWithKey (iCodehTab, key);
+
+      if (IFX)
+        gooduses++;
+      else if (ic->op == '=' && !POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)) && IS_BIT (OP_SYMBOL (IC_RESULT (ic))->type))
+        gooduses++;
+      else
+        baduses++;
+    }
+
+  freeBitVect (defs);
+  freeBitVect (uses);
+
+  return (gooduses > baduses * 2);
+}
+
 /*-----------------------------------------------------------------*/
 /* regTypeNum - computes the type & number of registers required   */
 /*-----------------------------------------------------------------*/
@@ -1997,7 +2049,7 @@ regTypeNum (eBBlock * ebbs)
           /* determine the type of register required */
           if (sym->nRegs == 1 && IS_PTR (sym->type) && sym->uptr)
             sym->regType = REG_PTR;
-          else if (IS_BIT (sym->type))
+          else if (isFlagVar (sym))
             sym->regType = REG_BIT;
           else
             sym->regType = REG_GPR;

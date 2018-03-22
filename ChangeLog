@@ -1,3 +1,8 @@
+2018-03-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/mcs51/ralloc.c:
+	  Make better use of acc for 8-bit operands.
+
 2018-03-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/valdiag/Makefile.in: display any actual failure(s)

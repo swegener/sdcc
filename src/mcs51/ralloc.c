@@ -2788,12 +2788,7 @@ packRegsForAccUse (iCode * ic)
      or an arithmetic / bitwise / shift operation then not */
   if (uic->op != '=' && !IS_ARITHMETIC_OP (uic) && !IS_BITWISE_OP (uic) && uic->op != LEFT_OP && uic->op != RIGHT_OP)
     return;
-#if 0
-  /* if used in ^ operation then make sure right is not a
-     literal (WIML: Why is this?) */
-  if (uic->op == '^' && isOperandLiteral (IC_RIGHT (uic)))
-    return;
-#endif
+
   /* if shift operation make sure right side is not a literal */
   /* WIML: Why is this? */
   if (uic->op == RIGHT_OP && (isOperandLiteral (IC_RIGHT (uic)) || getSize (operandType (IC_RESULT (uic))) > 1))
@@ -3255,6 +3250,7 @@ packRegisters (eBBlock ** ebpp, int blockno)
            || IS_CONDITIONAL (ic)
            || IS_BITWISE_OP (ic)
            || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == CALL
+           || ic->op == '=' && !POINTER_SET(ic) && getSize (operandType (IC_RESULT (ic))) < 2
            || (ic->op == ADDRESS_OF && isOperandOnStack (IC_LEFT (ic)))) &&
           IS_ITEMP (IC_RESULT (ic)) && getSize (operandType (IC_RESULT (ic))) <= 2)
         {

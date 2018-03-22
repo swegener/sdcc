@@ -2,6 +2,8 @@
 
 	* src/mcs51/gen.c:
 	  Fix handling of acc for multiplicative operators.
+	* src/mcs51/ralloc.c:
+	  Fall back to generic registers when running out of bit registers.
 
 2018-03-22 Philipp Klaus Krause <pkk AT spth.de>
 

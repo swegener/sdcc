@@ -1392,10 +1392,10 @@ serialRegAssign (eBBlock ** ebbs, int count)
                   sym->regs[j] = NULL;
                   if (sym->regType == REG_PTR)
                     sym->regs[j] = getRegPtr (ic, ebbs[i], sym);
-                  else if (sym->regType == REG_BIT)
-                    sym->regs[j] = getRegBit (sym);
                   else
                     {
+                      if (sym->regType == REG_BIT) /* Try to allocate to bit register if possible */
+                        sym->regs[j] = getRegBitNoSpil (sym);
                       if (ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)))
                         {
                           symbol *right = OP_SYMBOL (IC_RIGHT (ic));

@@ -43,6 +43,7 @@ clean-port:
 
 $(PORT_RESULTS_DIR)/%.out: $(TESTS_DIR)/%.c
 	$(PYTHON) $(srcdir)/valdiag.py $(PORT) $< $(PORT_BUILD_DIR)/$* $(srcdir)/../../device/include > $@
+	grep FAIL $@ ; true
 	cat $@ | $(PYTHON) $(srcdir)/../regression/compact-results.py
 
 port-results: port-dirs $(PORT_RESULTS)

@@ -2027,7 +2027,7 @@ toBoolean (operand * oper)
 /*-----------------------------------------------------------------*/
 static void
 toCarry (operand *oper)
-{
+{ 
   /* if the operand is a literal then
      we know what the value is */
   if (AOP_TYPE (oper) == AOP_LIT)
@@ -2042,7 +2042,7 @@ toCarry (operand *oper)
       if (!IS_OP_ACCUSE (oper))
         emitcode ("mov", "c,%s", oper->aop->aopu.aop_dir);
     }
-  else if (IS_BOOL (operandType (oper))) 
+  else if (IS_BOOL (operandType (oper)) || IS_BITFIELD (operandType (oper)) && SPEC_BLEN (getSpec (operandType (oper))) == 1) 
     {
       MOVA (aopGet (oper, 0, FALSE, FALSE));
       emitcode ("rrc", "a");
@@ -11569,6 +11569,7 @@ genCast (iCode * ic)
   sym_link *rtype = operandType (IC_RIGHT (ic));
   operand *right = IC_RIGHT (ic);
   int size, offset;
+  bool right_boolean;
 
   D (emitcode (";", "genCast"));
 
@@ -11579,15 +11580,17 @@ genCast (iCode * ic)
   aopOp (right, ic, FALSE);
   aopOp (result, ic, TRUE);
 
+  right_boolean = IS_BOOLEAN (rtype) || IS_BITFIELD (rtype) &&  SPEC_BLEN (getSpec (rtype)) == 1;
+
   /* if the result is a bit (and not a bitfield) */
-  if (IS_BOOLEAN (OP_SYMBOL (result)->type))
+  if (IS_BOOLEAN (OP_SYMBOL (result)->type) && !right_boolean)
     {
       assignBit (result, right);
       goto release;
     }
 
   /* if they are the same size : or less */
-  if (AOP_SIZE (result) <= AOP_SIZE (right) && !IS_BOOLEAN (operandType (result)))
+  if (AOP_SIZE (result) <= AOP_SIZE (right))
     {
       /* if they are in the same place */
       if (sameRegs (AOP (right), AOP (result)))

@@ -1968,7 +1968,12 @@ static bool isFlagVar (symbol *sym)
 
       iCode *ic = hTabItemWithKey (iCodehTab, key);
 
-      if (IFX)
+      if (!ic) /* Shouldn't happen, but does */
+        continue;
+
+      if (ic->op == IFX || ic->op == '!' || ic->op == AND_OP || ic->op == OR_OP)
+        gooduses++;
+      else if (ic->op == BITWISEAND || ic->op == '|' || ic->op == '^')
         gooduses++;
       else if (ic->op == '=' && !POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic)) && IS_BIT (OP_SYMBOL (IC_RESULT (ic))->type))
         gooduses++;
@@ -1979,7 +1984,7 @@ static bool isFlagVar (symbol *sym)
   freeBitVect (defs);
   freeBitVect (uses);
 
-  return (gooduses > baduses * 2);
+  return (gooduses >= baduses * 2);
 }
 
 /*-----------------------------------------------------------------*/

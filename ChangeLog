@@ -2,6 +2,8 @@
 
 	* src/mcs51/ralloc.c:
 	  Make better use of acc for 8-bit operands.
+	* src/SDCCopt.c:
+	  Optimize width of temporaries for bit tests.
 
 2018-03-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

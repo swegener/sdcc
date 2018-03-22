@@ -2509,32 +2509,49 @@ optimizeCastCast (eBBlock ** ebbs, int count)
                 bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) != 1)
                 continue;
 
-              /* This use must be a second cast */
               uic = hTabItemWithKey (iCodehTab,
                         bitVectFirstBit (OP_USES (IC_RESULT (ic))));
-              if (!uic || uic->op != CAST)
+              if(!uic || (uic->op != CAST && uic->op != BITWISEAND))
                 continue;
 
-              /* It must be a cast to another integer type that */
-              /* has no loss of bits */
               type3 = operandType (IC_RESULT (uic));
-              if (!IS_INTEGRAL (type3))
-                 continue;
-              size3 = bitsForType (type3);
-              if (size3 < size1)
-                 continue;
-              /* If they are the same size, they must have the same signedness */
-              if (size3 == size2 && SPEC_USIGN (type3) != SPEC_USIGN (type2))
-                continue;
-
-              /* The signedness between the first and last types */
-              /* must match */
-              if (SPEC_USIGN (type3) != SPEC_USIGN (type1))
-                 continue;
 
               /* Cast to bool must be preserved to ensure that all nonzero values are correctly cast to true */
               if (SPEC_NOUN (type2) == V_BOOL && SPEC_NOUN(type3) != V_BOOL)
                  continue;
+
+              /* Special case: Second use is a bit test */
+              if (uic->op == BITWISEAND && IS_OP_LITERAL (IC_RIGHT (uic)) && ifxForOp (IC_RESULT (uic), uic))
+                {
+                  unsigned long long mask = operandLitValue (IC_RIGHT (uic));
+
+                  /* Signed cast might set bits above the width of type1 */
+                  if (!SPEC_USIGN (type1) && (mask >> (bitsForType (type1))))
+                    continue;
+
+                  IC_RIGHT (uic) = operandFromValue (valCastLiteral (type1, operandLitValue (IC_RIGHT (uic)), operandLitValue (IC_RIGHT (uic))));
+                }
+              else if (uic->op == CAST) /* Otherwise this use must be a second cast */
+                {
+                  /* It must be a cast to another integer type that */
+                  /* has no loss of bits */
+                  type3 = operandType (IC_RESULT (uic));
+                  if (!IS_INTEGRAL (type3))
+                    continue;
+                  size3 = bitsForType (type3);
+                  if (size3 < size1)
+                     continue;
+                  /* If they are the same size, they must have the same signedness */
+                  if (size3 == size2 && SPEC_USIGN (type3) != SPEC_USIGN (type2))
+                    continue;
+
+                  /* The signedness between the first and last types must match */
+                  if (SPEC_USIGN (type3) != SPEC_USIGN (type1))
+                    continue;
+                }
+              else
+                continue;
+
 
               /* Change the first cast to a simple assignment and */
               /* let the second cast do all the work */

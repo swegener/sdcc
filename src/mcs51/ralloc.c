@@ -2822,6 +2822,14 @@ packRegsForAccUse (iCode * ic)
   if (!(isCommutativeOp (ic->op) || ic->op == '-') && IC_LEFT (uic)->key != IC_RESULT (ic)->key)
     return;
 
+  /* Sign handling will overwrite a */
+  if (uic->op == '*' && getSize (operandType (IC_RESULT (uic))) > 1 &&
+    (!SPEC_USIGN (getSpec (operandType (IC_LEFT (uic)))) || !SPEC_USIGN (getSpec (operandType (IC_RIGHT (uic))))))
+    return;
+  if ((uic->op == '/' || uic->op == '%') &&
+    (!SPEC_USIGN (getSpec (operandType (IC_LEFT (uic)))) || !SPEC_USIGN (getSpec (operandType (IC_RIGHT (uic))))))
+    return;
+
 #if 0
   // this is too dangerous and need further restrictions
   // see bug #447547

@@ -5281,7 +5281,7 @@ genMultOneByte (operand * left, operand * right, operand * result)
 
   /* (if two literals: the value is computed before) */
   /* if one literal, literal on the right */
-  if (AOP_TYPE (left) == AOP_LIT)
+  if (AOP_TYPE (left) == AOP_LIT || AOP_TYPE (right) == AOP_ACC)
     {
       operand *t = right;
       right = left;
@@ -5310,7 +5310,9 @@ genMultOneByte (operand * left, operand * right, operand * result)
       /* emitcode (";","unsigned"); */
       /* TODO: check for accumulator clash between left & right aops? */
 
-      if (AOP_TYPE (right) == AOP_LIT)
+      /*if (AOP_TYPE (right) == AOP_ACC)
+        MOVB (aopGet (left, 0, FALSE, FALSE));
+      else*/ if (AOP_TYPE (right) == AOP_LIT)
         {
           /* moving to accumulator first helps peepholes */
           MOVA (aopGet (left, 0, FALSE, FALSE));

@@ -1,5 +1,10 @@
 2018-03-22 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/mcs51/gen.c:
+	  Fix handling of acc for multiplicative operators.
+
+2018-03-22 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/mcs51/gen.c,
 	  src/SDCCast.c
 	  Improve code generation for _Bool.

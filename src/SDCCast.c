@@ -4931,6 +4931,15 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           return decorateType (tree, resultType);
         }
 
+      /* 'ifx (op == 1)' -> 'ifx (op)' for bool */
+      if (IS_LITERAL (RETYPE (tree)) &&
+          floatFromVal (valFromType (RTYPE (tree))) == 1 && IS_BOOLEAN (LETYPE (tree)) &&
+          tree->opval.op == EQ_OP && (resultType == RESULT_TYPE_IFX || resultType == RESULT_TYPE_BOOL))
+        {
+          tree = tree->left;
+          return decorateType (tree, resultType);
+        }
+
       /* if they are both literal then */
       /* rewrite the tree */
       if (IS_LITERAL (RETYPE (tree)) && IS_LITERAL (LETYPE (tree)))

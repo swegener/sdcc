@@ -1097,7 +1097,7 @@ aopOp (operand * op, iCode * ic, bool result)
     }
 
   /* if the type is a bit register */
-  if (sym->regType == REG_BIT)
+  if (sym->regType == REG_BIT && sym->regs[0]->type == REG_BIT)
     {
       sym->aop = op->aop = aop = newAsmop (AOP_CRY);
       aop->size = sym->nRegs;   //1???
@@ -1818,7 +1818,7 @@ aopPut (operand * result, const char *s, int offset)
 /* loadDptrFromOperand - load dptr (and optionally B) from operand op */
 /*--------------------------------------------------------------------*/
 static void
-loadDptrFromOperand (operand * op, bool loadBToo)
+loadDptrFromOperand (operand *op, bool loadBToo)
 {
   if (AOP_TYPE (op) != AOP_STR)
     {
@@ -2026,7 +2026,7 @@ toBoolean (operand * oper)
 /* toCarry - make boolean and move into carry                      */
 /*-----------------------------------------------------------------*/
 static void
-toCarry (operand * oper)
+toCarry (operand *oper)
 {
   /* if the operand is a literal then
      we know what the value is */
@@ -2041,6 +2041,11 @@ toCarry (operand * oper)
     {
       if (!IS_OP_ACCUSE (oper))
         emitcode ("mov", "c,%s", oper->aop->aopu.aop_dir);
+    }
+  else if (IS_BOOL (operandType (oper))) 
+    {
+      MOVA (aopGet (oper, 0, FALSE, FALSE));
+      emitcode ("rrc", "a");
     }
   else
     {
@@ -2712,7 +2717,6 @@ assignResultValue (operand * oper, operand * func)
       outBitC (oper);
       return FALSE;
     }
-
   if ((size > 3) && aopPutUsesAcc (oper, fReturn[offset], offset))
     {
       emitpush ("acc");
@@ -3535,7 +3539,7 @@ genPcall (iCode * ic)
   /* if we need assign a result value */
   if ((IS_ITEMP (IC_RESULT (ic)) &&
        !IS_BIT (OP_SYM_ETYPE (IC_RESULT (ic))) &&
-       (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic)))
+       (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->accuse || OP_SYMBOL (IC_RESULT (ic))->spildir)) || IS_TRUE_SYMOP (IC_RESULT (ic)))
     {
       _G.accInUse++;
       aopOp (IC_RESULT (ic), ic, FALSE);

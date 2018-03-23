@@ -3090,7 +3090,7 @@ genSend (set * sendSet)
         }
     }
 
-  if (options.useXstack || bit_count)
+  if (options.useXstack || bit_count || setFirstItem (sendSet) && operandSize (IC_LEFT ((iCode *)(setFirstItem (sendSet)))) >= 6)
     {
       if (bit_count)
         BITSINB++;

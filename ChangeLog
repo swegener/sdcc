@@ -1,5 +1,11 @@
 2018-03-23 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/mcs51/gen.c,
+	  support/regression/tests/gcc-torture-execute-950612-1.c:
+	  Fix bug #2669.
+
+2018-03-23 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/mcs51/gen.c:
 	  Fix a bug in code generation that was triggered by lospre.
 	* support/regression/tests/gcc-torture-execute-20060110-2.c:

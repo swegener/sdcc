@@ -2,6 +2,8 @@
 
 	* src/mcs51/gen.c:
 	  Fix a bug in code generation that was triggered by lospre.
+	* support/regression/tests/gcc-torture-execute-20060110-2.c:
+	  Enable test for mcs51.
 
 2018-03-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

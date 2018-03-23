@@ -9,7 +9,7 @@
 #pragma disable_warning 212
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 long long x;
 unsigned long long y;
 int i;
@@ -119,7 +119,7 @@ testLongLong (void)
 {
   volatile unsigned long tmp;
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM) )) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   i = 42;
   ASSERT (g() == 43);
   i = 23;

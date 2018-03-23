@@ -3,6 +3,8 @@
 	* src/mcs51/gen.c,
 	  support/regression/tests/gcc-torture-execute-950612-1.c:
 	  Fix bug #2669.
+	* support/regression/tests/longlong.c:
+	  Enable full long long regression testing for large and huge mcs51 memory model.
 
 2018-03-23 Philipp Klaus Krause <pkk AT spth.de>
 

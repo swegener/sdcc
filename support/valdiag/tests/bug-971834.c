@@ -12,7 +12,7 @@ unsigned char ttt = 2;
 short foo (void)
 {
   unsigned short a;
-  a |= ttt;		/* WARNING(SDCC) */
+  a |= ttt;		/* WARNING(SDCC || GCC) */
   return a;
 }
 #endif

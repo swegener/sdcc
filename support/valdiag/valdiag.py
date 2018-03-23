@@ -28,6 +28,7 @@ import sys, string, os, re, subprocess
 from subprocess import Popen, PIPE, STDOUT
 
 macrodefs = {}
+extramacrodefs = {}
 
 gcc = {
     "CC":"gcc",
@@ -73,7 +74,13 @@ testmodes = {
     },
     "mcs51":{
         "compiler":sdcc,
-        "port":"mcs51"
+        "port":"mcs51",
+        "extra-defines": {
+            "__has_bit":"1",
+            "__has_data":"1",
+            "__has_xdata":"1",
+            "__has_reentrant":"1"
+        }
     },
     "mcs51-large":{
         "compiler":sdcc,
@@ -81,6 +88,12 @@ testmodes = {
         "flags":"--model-large",
         "defined": {
             "SDCC_MODEL_LARGE":"1"
+        },
+        "extra-defines" : {
+            "__has_bit":"1",
+            "__has_data":"1",
+            "__has_xdata":"1",
+            "__has_reentrant":"1"
         }
     },
     "mcs51-stack-auto":{
@@ -89,11 +102,23 @@ testmodes = {
         "flags":"--stack-auto",
         "defined": {
             "SDCC_STACK_AUTO":"1"
+        },
+        "extra-defines": {
+            "__has_bit":"1",
+            "__has_data":"1",
+            "__has_xdata":"1",
+            "__has_reentrant":"1"
         }
     },
     "ds390":{
         "compiler":sdcc,
-        "port":"ds390"
+        "port":"ds390",
+        "extra-defines": {
+            "__has_bit":"1",
+            "__has_data":"1",
+            "__has_xdata":"1",
+            "__has_reentrant":"1"
+        }
     },
     "z80":{
         "compiler":sdcc,
@@ -117,11 +142,21 @@ testmodes = {
     },
     "hc08":{
         "compiler":sdcc,
-        "port":"hc08"
+        "port":"hc08",
+        "extra-defines": {
+            "__has_data":"1",
+            "__has_xdata":"1",
+            "__has_reentrant":"1"
+        }
     },
     "s08":{
         "compiler":sdcc,
-        "port":"s08"
+        "port":"s08",
+        "extra-defines": {
+            "__has_data":"1",
+            "__has_xdata":"1",
+            "__has_reentrant":"1"
+        }
     },
     "stm8":{
         "compiler":sdcc,
@@ -171,10 +206,12 @@ def expandPyExpr(expr):
     expandedExpr = "".join(tokens)
     return expandedExpr
 
-def addDefines(deflist):
+def addDefines(deflist, isExtra):
     for define in list(deflist.keys()):
         expandeddef = expandPyExpr(define)
         macrodefs[expandeddef] = expandPyExpr(deflist[define])
+        if isExtra:
+            extramacrodefs[expandeddef] = macrodefs[expandeddef]
 
 def parseInputfile(inputfilename):
     inputfile = open(inputfilename, "r")
@@ -278,9 +315,13 @@ if len(sys.argv)>=5:
     if "CCINCLUDEDIR" in compilermode:
         ccflags = " ".join([ccflags,expandPyExpr(compilermode["CCINCLUDEDIR"]),sys.argv[4]])
 if "defined" in compilermode:
-    addDefines(compilermode["defined"])
+    addDefines(compilermode["defined"], False)
 if "defined" in testmode:
-    addDefines(testmode["defined"])
+    addDefines(testmode["defined"], False)
+if "extra-defines" in compilermode:
+    addDefines(compilermode["extra-defines"], True)
+if "extra-defines" in testmode:
+    addDefines(testmode["extra-defines"], True)
 if "ignoremsg" in compilermode:
     ignoreExprList = compilermode["ignoremsg"]
 else:
@@ -304,6 +345,8 @@ for testname in list(testcases.keys()):
     if testname.find("DISABLED")>=0:
       continue
     ccdef = compilermode["CCDEF"]+testname
+    for extradef in list(extramacrodefs.keys()):
+        ccdef = ccdef + " " + compilermode["CCDEF"] + extradef + "=" + extramacrodefs[extradef]
     if testname[-3:] == "C89":
         ccstd = compilermode["C89"]
     elif testname[-3:] == "C99":

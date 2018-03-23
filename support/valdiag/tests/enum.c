@@ -78,7 +78,7 @@ enum tag {	/* ERROR */
 #endif
 
 #ifdef TEST8
-enum tag x;
+enum tag x;  /* IGNORE(GCC) */
 
 enum tag
 {

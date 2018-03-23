@@ -67,25 +67,25 @@ int a=1;	/* ERROR */
 #define AT(x)
 #endif
 
-#if defined(__z80) || defined(__gbz80)
-#define XDATA
-#define DATA
-#else
+#if defined(__has_xdata)
 #define XDATA __xdata
 #define DATA __data
+#else
+#define XDATA
+#define DATA
 #endif
 
 #ifdef TEST9
 #ifdef SDCC
 XDATA int a;	/* IGNORE */
-DATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
+DATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 
 #ifdef TEST9b
 #ifdef SDCC
 DATA int a;	/* IGNORE */
-XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
+XDATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 
@@ -106,21 +106,21 @@ XDATA int a;
 #ifdef TEST9e
 #ifdef SDCC
 extern XDATA int a; /* IGNORE */
-DATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
+DATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 
 #ifdef TEST9f
 #ifdef SDCC
 extern DATA int a; /* IGNORE */
-XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
+XDATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 
 #ifdef TEST10
-#if defined(SDCC) && !(defined(__z80) || defined(__gbz80))
+#if defined(SDCC) && defined(__has_xdata)
 extern volatile XDATA AT(0) int a; /* IGNORE */
-volatile XDATA int a;	/* ERROR(SDCC && !(__z80 || __gbz80)) */
+volatile XDATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 

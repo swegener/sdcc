@@ -31,9 +31,11 @@ long func(float x)
 }
 #endif
 
-#ifdef TEST3
+/* This is no longer an error in C11, so test with earlier standard. */
+/* Unfortunately, GCC seems to accept this regardless. */
+#ifdef TEST3_C99
 typedef int I;		/* IGNORE */
-typedef int I;		/* ERROR */
+typedef int I;		/* ERROR(SDCC) */
 #endif
 
 #ifdef TEST4

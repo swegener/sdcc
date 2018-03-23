@@ -68,7 +68,7 @@ char foo(void)
 {
   switch(x)
     {
-      char y;
+      char y; /* IGNORE */
       x++;		/* WARNING(SDCC) */
       
       case 0:
@@ -119,11 +119,11 @@ char foo(void)
 #ifdef TEST7
 char foo(void)
 {
-  float f;
+  float f; /* IGNORE */
   f=x;
   switch(f)		/* ERROR */
     {
-      char y;
+      char y; /* IGNORE */
       
       case 0:
         return 0;
@@ -143,7 +143,7 @@ char foo(void)
 {
   switch(x)
     {
-      char y;
+      char y; /* IGNORE */
       
       case 0.0:		/* ERROR */
         return 0;

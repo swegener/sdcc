@@ -1,3 +1,16 @@
+2018-03-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/valdiag/valdiag.py: define some port specific
+	  macros (__has_bit, __has_data, __has_xdata, __has_reentrant)
+	  to simplify conditions
+	* support/valdiag/tests/bug-971834.c,
+	* support/valdiag/tests/enum.c,
+	* support/valdiag/tests/funcdec.c,
+	* support/valdiag/tests/primtypes.c,
+	* support/valdiag/tests/switch.c,
+	* support/valdiag/tests/tentdecl.c,
+	* support/valdiag/tests/typedef.c: update for newer SDCC/GCC versions
+
 2018-03-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/mcs51/gen.c,

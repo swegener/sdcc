@@ -6309,9 +6309,9 @@ genCmpLt (iCode * ic, iCode * ifx)
                (SPEC_USIGN (retype) && !(IS_CHAR (retype) && IS_LITERAL (retype))));
     }
   /* assign the asmops */
-  aopOp (result, ic, TRUE);
   aopOp (left, ic, FALSE);
   aopOp (right, ic, FALSE);
+  aopOp (result, ic, TRUE);
 
   genCmp (left, right, result, ifx, sign, ic);
 

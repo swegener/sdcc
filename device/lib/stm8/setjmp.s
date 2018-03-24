@@ -52,7 +52,7 @@ _longjmp:
 	ldw	x, (3, sp)
 	ldw	y, (5, sp)
 
-	; Restore return address
+	; Restore stack pointer
 	pushw	x
 	ldw	x, (2, x)
 	ldw	(1, x), y

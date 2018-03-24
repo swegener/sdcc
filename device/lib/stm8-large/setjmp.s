@@ -31,30 +31,32 @@
 	.globl ___setjmp
 
 ___setjmp:
-	ldw	y, (3, sp)
+	ldw	y, (4, sp)
 
 	; store return address
 	ldw	x, (1, sp)
 	ldw	(y), x
+	ld	a, (3, sp)
+	ld	(2, y), a
 
 	; store stack pointer
 	ldw	x, sp
-	ldw	(2, y), x
+	ldw	(3, y), x
 
 	; return 0
 	clrw	x
 
-	ret
+	retf
 
 	.globl _longjmp
 
 _longjmp:
-	ldw	x, (3, sp)
-	ldw	y, (5, sp)
+	ldw	x, (4, sp)
+	ldw	y, (6, sp)
 
-	; Restore return address
+	; Restore stack pointer
 	pushw	x
-	ldw	x, (2, x)
+	ldw	x, (3, x)
 	ldw	(1, x), y
 	popw	y
 	ldw	sp, x
@@ -65,7 +67,10 @@ _longjmp:
 	jrne	jump
 	incw	x
 jump:
-	; Return
-	ldw	y, (y)
-	jp	(y)
+	; return
+	ld	a, (y)
+	ldw	y, (2, y)
+	pushw	y
+	push	a
+	retf
 

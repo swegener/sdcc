@@ -192,6 +192,7 @@ _ds390_finaliseOptions (void)
   else
     {
       port->s.far_ptr_size = 3;
+      port->s.funcptr_size = 3;
       port->s.ptr_size = 4;
 
       port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
@@ -1026,8 +1027,8 @@ PORT ds390_port =
     NULL,
     NULL,
   },
-  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-  { 1, 2, 2, 4, 8, 1, 2, 3, 1, 4, 4 },
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, bit, float */
+  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4 },
 
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
@@ -1157,12 +1158,13 @@ static void _tininative_finaliseOptions (void)
         fprintf(stderr,"TININative supports only MODEL FLAT24\n");
     }
     port->s.far_ptr_size = 3;
+    port->s.funcptr_size = 3;
     port->s.ptr_size = 4;
 
     port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
 
     port->stack.call_overhead += 2;     /* This acounts for the extra byte
-                                         * of return addres on the stack.
+                                         * of return address on the stack.
                                          * but is ugly. There must be a
                                          * better way.
                                          */
@@ -1365,8 +1367,8 @@ PORT tininative_port =
     NULL,
     NULL,
   },
-  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-  { 1, 2, 2, 4, 8, 1, 3, 3, 1, 4, 4 },
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
+  { 1, 2, 2, 4, 8, 1, 3, 3, 3, 3, 1, 4 },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
 
@@ -1521,6 +1523,7 @@ _ds400_finaliseOptions (void)
   else
     {
       port->s.far_ptr_size = 3;
+      port->s.funcptr_size = 3;
       port->s.ptr_size = 4;
 
       port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
@@ -1620,8 +1623,8 @@ PORT ds400_port =
     NULL,
     NULL,
   },
-  /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-  { 1, 2, 2, 4, 8, 1, 2, 3, 1, 4, 4 },
+  /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
+  { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4 },
 
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */

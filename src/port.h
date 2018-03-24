@@ -171,12 +171,13 @@ typedef struct
     unsigned int int_size;
     int long_size;
     int longlong_size;
-    int near_ptr_size;          //near
-    int far_ptr_size;           //far
-    int ptr_size;               //generic
+    int near_ptr_size;          // __near
+    int far_ptr_size;           // __far
+    int ptr_size;               // generic
+    int funcptr_size;
+    int banked_funcptr_size;
     int bit_size;
     int float_size;
-    int max_base_size;
   }
   s;
 

@@ -1311,12 +1311,13 @@ PORT pic16_port =
     2,      /* int */
     4,      /* long */
     8,      /* long long */
-    2,      /* ptr */
-    3,      /* fptr, far pointers (see Microchip) */
+    2,      /* near ptr */
+    3,      /* far ptr, far pointers (see Microchip) */
     3,      /* gptr */
+    2,      /* func ptr */
+    3,      /* banked func ptr */
     1,      /* bit */
     4,      /* float */
-    4       /* max */
   },
 
     /* generic pointer tags */

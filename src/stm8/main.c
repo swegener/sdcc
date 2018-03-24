@@ -150,7 +150,6 @@ stm8_genAssemblerEnd (FILE *of)
 static void
 stm8_init (void)
 {
-  // fprintf(stderr, "stm8_init\n");
   asm_addTree (&asm_asxxxx_mapping);
 }
 
@@ -186,6 +185,7 @@ stm8_finaliseOptions (void)
 
   if (options.model == MODEL_LARGE)
     {
+      port->s.funcptr_size = 3;
       port->stack.call_overhead = 3;
       port->jumptableCost.maxCount = 0;
     }
@@ -401,7 +401,20 @@ PORT stm8_port =
     NULL,
   },
   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
-  { 1, 2, 2, 4, 8, 2, 2, 2, 1, 4, 4 },
+  {
+    1,                          /* char */
+    2,                          /* short */
+    2,                          /* int */
+    4,                          /* long */
+    8,                          /* long long */
+    2,                          /* near ptr */
+    2,                          /* far ptr */
+    2,                          /* generic ptr */
+    2,                          /* func ptr */
+    0,                          /* banked func ptr */
+    1,                          /* bit */
+    4,                          /* float */
+  },
   /* tags for generic pointers */
   { 0x00, 0x40, 0x60, 0x80 },   /* far, near, xstack, code */
   {
@@ -438,7 +451,7 @@ PORT stm8_port =
      2,                         /* call overhead */
      0,
      2,
-     1                          /* sp points to next free stack location */
+     1,                         /* sp points to next free stack location */
   },     
   { -1, TRUE },
   { stm8_emitDebuggerSymbol,

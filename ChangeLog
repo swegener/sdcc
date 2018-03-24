@@ -1,6 +1,15 @@
 2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/port.h,
+	  src/*/main.c,
+	  src/SDCCglobl.h,
+	  src/SDCCglue.c,
+	  src/SDCCsymt.c:
+	  Handle function pointer sizes separately from object pointer sizes.
+
+2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/port.h,
 	  src/SDCCglobl.h,
 	  src/SDCCast.c,
 	  src/SDCCdwarf2.c,

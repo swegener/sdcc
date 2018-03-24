@@ -1448,7 +1448,7 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
 
   size = getSize (type);
 
-  if (size == FARPTRSIZE)
+  if (size == FUNCPTRSIZE)
     {
       if (port->use_dw_for_init)
         {
@@ -1459,14 +1459,14 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
           printPointerType (oBuf, name);
         }
     }
-  else if (size == GPTRSIZE)
+  else if (size == BFUNCPTRSIZE)
     {
       _printPointerType (oBuf, name, size);
       dbuf_printf (oBuf, "\n");
     }
   else
     {
-      assert (0);
+      wassertl (0, "Invalid function pointer size.");
     }
 
   return;

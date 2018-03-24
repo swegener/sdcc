@@ -1,7 +1,7 @@
 2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
-	  Fixes for handling of immediate operands for memory model.
+	  Fixes for handling of immediate operands for large memory model.
 
 2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
 

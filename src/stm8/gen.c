@@ -418,7 +418,7 @@ aopGet(const asmop *aop, int offset)
   if (aop->type == AOP_IMMD)
     {
       wassertl (offset < (2 + (options.model == MODEL_LARGE)), "Immediate operand out of range");
-      SNPRINTF (buffer, sizeof(buffer), offset ? "#>%s" : "#<%s", aop->aopu.aop_immd);
+      SNPRINTF (buffer, sizeof(buffer), offset ? "#(%s >> %d)" : "#%s", aop->aopu.aop_immd, offset * 8);
       return (buffer);
     }
 
@@ -455,7 +455,7 @@ aopGet2(const asmop *aop, int offset)
     }
   else if (aop->type == AOP_IMMD)
     {
-      SNPRINTF (buffer, sizeof(buffer), "#%s", aop->aopu.aop_immd);
+      SNPRINTF (buffer, sizeof(buffer), offset ? "#(%s >> %d)" : "#%s", aop->aopu.aop_immd, offset * 8);
       return (buffer);
     }
 

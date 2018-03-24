@@ -38,5 +38,5 @@ __fast_long_neg:
 	ret
 __fast_long_neg_0:
 	incw y
-	ret
+	retf
 

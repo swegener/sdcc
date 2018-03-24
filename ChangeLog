@@ -11,6 +11,9 @@
 	  src/stm8/gen.c,
 	  device/lib/stm8-large:
 	  stm8-large library.
+	* support/regression/Makefile.in,
+	  support/regression/ports/stm8-large:
+	  stm8-large regression test target.
 
 2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
 

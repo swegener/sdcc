@@ -616,7 +616,7 @@ aopForSym (iCode * ic, operand * op, bool result)
       aop->aopu.pcop = pic16_popGetImmd (sym->rname, 0, 0);
       PCOI (aop->aopu.pcop)->_const = IN_CODESPACE (space);
       PCOI (aop->aopu.pcop)->index = 0;
-      aop->size = FPTRSIZE;
+      aop->size = FARPTRSIZE;
       DEBUGpic16_emitcode (";", "%d size = %d, name =%s", __LINE__, aop->size, sym->rname);
       return aop;
     }
@@ -694,7 +694,7 @@ aopForSym (iCode * ic, operand * op, bool result)
   if (IN_DIRSPACE (space))
     aop->size = PTRSIZE;
   else if (IN_CODESPACE (space) || IN_FARSPACE (space))
-    aop->size = FPTRSIZE;
+    aop->size = FARPTRSIZE;
   else if (IC_LEFT (ic) && AOP (IC_LEFT (ic)))
     aop->size = AOP_SIZE (IC_LEFT (ic));
   else if (IC_RIGHT (ic) && AOP (IC_RIGHT (ic)))
@@ -708,7 +708,7 @@ aopForSym (iCode * ic, operand * op, bool result)
       if (SPEC_SCLS (sym->etype) == S_PDATA)
         {
           fprintf (stderr, "%s: %d symbol in PDATA space\n", __FILE__, __LINE__);
-          aop->size = FPTRSIZE;
+          aop->size = FARPTRSIZE;
         }
       else
         assert (0);

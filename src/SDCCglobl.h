@@ -147,9 +147,9 @@
 #define INTSIZE       port->s.int_size
 #define LONGSIZE      port->s.long_size
 #define LONGLONGSIZE  port->s.longlong_size
-#define PTRSIZE       port->s.ptr_size
-#define FPTRSIZE      port->s.fptr_size
-#define GPTRSIZE      port->s.gptr_size
+#define NEARPTRSIZE   port->s.near_ptr_size
+#define FARPTRSIZE    port->s.far_ptr_size
+#define GPTRSIZE      port->s.ptr_size
 #define BITSIZE       port->s.bit_size
 #define FLOATSIZE     port->s.float_size
 #define MAXBASESIZE   port->s.max_base_size

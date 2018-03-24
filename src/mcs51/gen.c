@@ -3487,7 +3487,7 @@ genPcall (iCode * ic)
 
           emitDummyCall();
           /* now push the function address */
-          pushSide (IC_LEFT (ic), FPTRSIZE, ic);
+          pushSide (IC_LEFT (ic), FARPTRSIZE, ic);
 
           /* send set is not empty: assign */
           genSend (reverseSet (_G.sendSet));

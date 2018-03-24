@@ -2921,7 +2921,7 @@ checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit)
               // maybe this is NULL, then it's ok.
               if (!(IS_LITERAL (orgType) && (SPEC_CVAL (orgType).v_ulong == 0)))
                 {
-                  if (GPTRSIZE > FPTRSIZE && IS_GENPTR (newType) && !IS_FUNCPTR (newType))
+                  if (GPTRSIZE > FARPTRSIZE && IS_GENPTR (newType) && !IS_FUNCPTR (newType))
                     {
                       // no way to set the storage
                       if (IS_LITERAL (orgType))
@@ -2960,7 +2960,7 @@ checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit)
           else if (IS_GENPTR (orgType) && IS_VOID (orgType->next))
             {                   // cast from void* is always allowed
             }
-          else if (GPTRSIZE > FPTRSIZE /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80 */ )
+          else if (GPTRSIZE > FARPTRSIZE /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80 */ )
             {
               // if not a pointer to a function
               if (!(IS_CODEPTR (newType) && IS_FUNC (newType->next) && IS_FUNC (orgType)))
@@ -4611,7 +4611,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           unsigned int gptype = 0;
           unsigned int addr = SPEC_ADDR (sym->etype);
 
-          if (IS_GENPTR (LTYPE (tree)) && ((GPTRSIZE > FPTRSIZE) || TARGET_IS_PIC16))
+          if (IS_GENPTR (LTYPE (tree)) && ((GPTRSIZE > FARPTRSIZE) || TARGET_IS_PIC16))
             {
               switch (SPEC_SCLS (sym->etype))
                 {

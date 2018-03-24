@@ -338,7 +338,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       PCOI (aop->aopu.pcop)->_const = IN_CODESPACE (space);
       PCOI (aop->aopu.pcop)->_function = TRUE;
       PCOI (aop->aopu.pcop)->index = 0;
-      aop->size = FPTRSIZE;
+      aop->size = FARPTRSIZE;
       DEBUGpic14_emitcode (";", "%d size = %d, name =%s", __LINE__, aop->size, sym->rname);
       return aop;
     }
@@ -368,7 +368,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
 
   allocDirReg (IC_LEFT (ic));
 
-  aop->size = FPTRSIZE;
+  aop->size = FARPTRSIZE;
 
   /* if it is in code space */
   if (IN_CODESPACE (space))
@@ -2232,7 +2232,7 @@ genPcall (iCode * ic)
 
   poc = (op_isLitLike (IC_LEFT (ic)) ? POC_MOVLW : POC_MOVFW);
 
-  pushSide (IC_LEFT (ic), FPTRSIZE);
+  pushSide (IC_LEFT (ic), FARPTRSIZE);
 
   /* if send set is not empty, assign parameters */
   if (_G.sendSet)

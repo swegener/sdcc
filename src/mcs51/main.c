@@ -163,18 +163,18 @@ _mcs51_finaliseOptions (void)
     case MODEL_SMALL:
       port->mem.default_local_map = data;
       port->mem.default_globl_map = data;
-      port->s.gptr_size = 3;
+      port->s.ptr_size = 3;
       break;
     case MODEL_MEDIUM:
       port->mem.default_local_map = pdata;
       port->mem.default_globl_map = pdata;
-      port->s.gptr_size = 3;
+      port->s.ptr_size = 3;
       break;
     case MODEL_LARGE:
     case MODEL_HUGE:
       port->mem.default_local_map = xdata;
       port->mem.default_globl_map = xdata;
-      port->s.gptr_size = 3;
+      port->s.ptr_size = 3;
       break;
     default:
       port->mem.default_local_map = data;

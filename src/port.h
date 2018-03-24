@@ -171,9 +171,9 @@ typedef struct
     unsigned int int_size;
     int long_size;
     int longlong_size;
-    int ptr_size;               //near
-    int fptr_size;              //far
-    int gptr_size;              //generic
+    int near_ptr_size;          //near
+    int far_ptr_size;           //far
+    int ptr_size;               //generic
     int bit_size;
     int float_size;
     int max_base_size;

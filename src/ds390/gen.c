@@ -3457,7 +3457,7 @@ genPcall (iCode * ic)
     }
 
   /* now push the function address */
-  pushSide (IC_LEFT (ic), FPTRSIZE, ic);
+  pushSide (IC_LEFT (ic), FARPTRSIZE, ic);
 
   /* if send set is not empty then assign */
   if (_G.sendSet)
@@ -11763,7 +11763,7 @@ genAddrOf (iCode * ic)
           size = AOP_SIZE (IC_RESULT (ic)) - 1;
 
 
-          if (options.stack10bit && size < (FPTRSIZE - 1))
+          if (options.stack10bit && size < (FARPTRSIZE - 1))
             {
               fprintf (stderr, "*** warning: pointer to stack var truncated.\n");
             }

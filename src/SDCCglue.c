@@ -1448,7 +1448,7 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
 
   size = getSize (type);
 
-  if (size == FPTRSIZE)
+  if (size == FARPTRSIZE)
     {
       if (port->use_dw_for_init)
         {
@@ -1499,7 +1499,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s *oBu
         {
           dbuf_tprintf (oBuf, "\t!dbs\n", val->name);
         }
-      else if (size == FPTRSIZE)
+      else if (size == FARPTRSIZE)
         {
           if (port->use_dw_for_init)
             {
@@ -1550,7 +1550,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s *oBu
             dbuf_tprintf (oBuf, "\t.byte %s,%s\n", aopLiteral (val, 1), aopLiteral (val, 0));
           break;
         case 3:
-          if (IS_GENPTR (type) && GPTRSIZE > FPTRSIZE && floatFromVal (val) != 0)
+          if (IS_GENPTR (type) && GPTRSIZE > FARPTRSIZE && floatFromVal (val) != 0)
             {
               if (!IS_PTR (val->type) && !IS_FUNC (val->type))
                 {
@@ -1571,7 +1571,7 @@ printIvalCharPtr (symbol * sym, sym_link * type, value * val, struct dbuf_s *oBu
             }
           break;
         case 4:
-          if (IS_GENPTR (type) && GPTRSIZE > FPTRSIZE && floatFromVal (val) != 0)
+          if (IS_GENPTR (type) && GPTRSIZE > FARPTRSIZE && floatFromVal (val) != 0)
             {
               if (!IS_PTR (val->type) && !IS_FUNC (val->type))
                 {
@@ -1706,7 +1706,7 @@ printIvalPtr (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *oB
     {
       dbuf_tprintf (oBuf, "\t!dbs\n", val->name);
     }
-  else if (size == FPTRSIZE)
+  else if (size == FARPTRSIZE)
     {
       if (port->use_dw_for_init)
         dbuf_tprintf (oBuf, "\t!dws\n", val->name);

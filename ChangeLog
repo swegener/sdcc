@@ -1,5 +1,26 @@
 2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/port.h,
+	  src/SDCCglobl.h,
+	  src/SDCCast.c,
+	  src/SDCCdwarf2.c,
+	  src/SDCCglue.c,
+	  src/SDCCicode.c,
+	  src/SDCCopt.c,
+	  src/SDCCsymt.c,
+	  src/ds390/gen.c,
+	  src/ds390/main.c,
+	  src/ds390/ralloc.c,
+	  src/hc08/gen.c,
+	  src/mcs51/gen.c,
+	  src/mcs51/main.c,
+	  src/mcs51/ralloc.c,
+	  src/pic14/gen.c,
+	  src/pic16/gen.c:
+	  Rename pointer size macros for clarification.
+
+2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/longlong.c:
 	  Disable test for mcs51 medium model.
 	* support/regression/tests/bool.c:

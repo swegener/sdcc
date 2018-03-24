@@ -1366,7 +1366,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
               /* if we need ptr regs for the right side
                  then mark it */
               if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic))
-                  && getSize (OP_SYMBOL (IC_LEFT (ic))->type) <= (unsigned int) PTRSIZE)
+                  && getSize (OP_SYMBOL (IC_LEFT (ic))->type) <= (unsigned int) NEARPTRSIZE)
                 {
                   mcs51_ptrRegReq++;
                   ptrRegSet = 1;
@@ -3170,10 +3170,10 @@ packRegisters (eBBlock ** ebpp, int blockno)
                                      OP_SYMBOL (IC_RESULT (ic))->iaccess ||
                                      SPEC_OCLS (OP_SYMBOL (IC_RESULT (ic))->etype) == idata) ? 1 : 0);
               if (POINTER_GET (ic) && IS_SYMOP (IC_LEFT (ic))
-                  && getSize (OP_SYMBOL (IC_LEFT (ic))->type) <= (unsigned int) PTRSIZE)
+                  && getSize (OP_SYMBOL (IC_LEFT (ic))->type) <= (unsigned int) NEARPTRSIZE)
                 mcs51_ptrRegReq++;
               if (POINTER_SET (ic) && IS_SYMOP (IC_RESULT (ic))
-                  && getSize (OP_SYMBOL (IC_RESULT (ic))->type) <= (unsigned int) PTRSIZE)
+                  && getSize (OP_SYMBOL (IC_RESULT (ic))->type) <= (unsigned int) NEARPTRSIZE)
                 mcs51_ptrRegReq++;
             }
         }

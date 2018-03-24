@@ -1094,12 +1094,12 @@ getSize (sym_link * p)
     case IPOINTER:
     case PPOINTER:
     case POINTER:
-      return (PTRSIZE);
+      return (NEARPTRSIZE);
     case EEPPOINTER:
     case FPOINTER:
     case CPOINTER:
     case FUNCTION:
-      return (IFFUNC_ISBANKEDCALL (p) ? GPTRSIZE : FPTRSIZE);
+      return (IFFUNC_ISBANKEDCALL (p) ? GPTRSIZE : FARPTRSIZE);
     case GPOINTER:
       return (GPTRSIZE);
 
@@ -1208,12 +1208,12 @@ bitsForType (sym_link * p)
     case IPOINTER:
     case PPOINTER:
     case POINTER:
-      return (PTRSIZE * 8);
+      return (NEARPTRSIZE * 8);
     case EEPPOINTER:
     case FPOINTER:
     case CPOINTER:
     case FUNCTION:
-      return (FPTRSIZE * 8);
+      return (FARPTRSIZE * 8);
     case GPOINTER:
       return (GPTRSIZE * 8);
     default:

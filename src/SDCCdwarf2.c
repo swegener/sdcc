@@ -3133,7 +3133,7 @@ dwWriteFrameAddress(const char *variable, struct reg_info *reg, int offset)
       dwloc * lp;
 
       lrp->loc = dwNewLoc (DW_OP_addr, variable, 0);
-      lrp->loc->next = lp = dwNewLoc (DW_OP_deref_size, NULL, PTRSIZE);
+      lrp->loc->next = lp = dwNewLoc (DW_OP_deref_size, NULL, NEARPTRSIZE);
       if (offset)
         {
           lp->next = dwNewLoc (DW_OP_consts, NULL, offset);

@@ -191,8 +191,8 @@ _ds390_finaliseOptions (void)
     }
   else
     {
-      port->s.fptr_size = 3;
-      port->s.gptr_size = 4;
+      port->s.far_ptr_size = 3;
+      port->s.ptr_size = 4;
 
       port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
 
@@ -1156,8 +1156,8 @@ static void _tininative_finaliseOptions (void)
         options.model = MODEL_FLAT24 ;
         fprintf(stderr,"TININative supports only MODEL FLAT24\n");
     }
-    port->s.fptr_size = 3;
-    port->s.gptr_size = 4;
+    port->s.far_ptr_size = 3;
+    port->s.ptr_size = 4;
 
     port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
 
@@ -1520,8 +1520,8 @@ _ds400_finaliseOptions (void)
     }
   else
     {
-      port->s.fptr_size = 3;
-      port->s.gptr_size = 4;
+      port->s.far_ptr_size = 3;
+      port->s.ptr_size = 4;
 
       port->stack.isr_overhead += 2;      /* Will save dpx on ISR entry. */
 

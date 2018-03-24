@@ -2388,7 +2388,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               else
                 {
                   nextresulttype = operandType (IC_RESULT (uic));
-                  if (!IS_INTEGRAL (nextresulttype) && !(IS_PTR (nextresulttype) && PTRSIZE == 2))
+                  if (!IS_INTEGRAL (nextresulttype) && !(IS_PTR (nextresulttype) && NEARPTRSIZE == 2))
                      continue;
 
                   if (IS_PTR (nextresulttype))

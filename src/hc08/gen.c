@@ -2175,7 +2175,7 @@ aopForSym (iCode * ic, symbol * sym, bool result)
       sym->aop = aop = newAsmop (AOP_IMMD);
       aop->aopu.aop_immd.aop_immd1 = Safe_calloc (1, strlen (sym->rname) + 1);
       strcpy (aop->aopu.aop_immd.aop_immd1, sym->rname);
-      aop->size = FPTRSIZE;
+      aop->size = FARPTRSIZE;
       return aop;
     }
 
@@ -3918,7 +3918,7 @@ genPcall (iCode * ic)
       updateCFA ();
 
       /* now push the function address */
-      pushSide (IC_LEFT (ic), FPTRSIZE, ic);
+      pushSide (IC_LEFT (ic), FARPTRSIZE, ic);
     }
 
   /* if send set is not empty then assign */

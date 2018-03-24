@@ -1850,7 +1850,7 @@ getArraySizePtr (operand * op)
   if (IS_PTR (ltype))
     {
       int size = getSize (ltype);
-      return ((IS_GENPTR (ltype) && GPTRSIZE > FPTRSIZE) ? (size - 1) : size);
+      return ((IS_GENPTR (ltype) && GPTRSIZE > FARPTRSIZE) ? (size - 1) : size);
     }
 
   if (IS_ARRAY (ltype))
@@ -1861,23 +1861,23 @@ getArraySizePtr (operand * op)
         case IPOINTER:
         case PPOINTER:
         case POINTER:
-          return (PTRSIZE);
+          return (NEARPTRSIZE);
         case EEPPOINTER:
         case FPOINTER:
         case CPOINTER:
         case FUNCTION:
-          return (FPTRSIZE);
+          return (FARPTRSIZE);
         case GPOINTER:
-          if (GPTRSIZE > FPTRSIZE)
+          if (GPTRSIZE > FARPTRSIZE)
             return (GPTRSIZE - 1);
           else
-            return (FPTRSIZE);
+            return (FARPTRSIZE);
 
         default:
-          return (FPTRSIZE);
+          return (FARPTRSIZE);
         }
     }
-  return (FPTRSIZE);
+  return (FARPTRSIZE);
 }
 
 /*-----------------------------------------------------------------*/

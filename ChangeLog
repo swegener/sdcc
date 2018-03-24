@@ -18,6 +18,9 @@
 	  src/pic14/gen.c,
 	  src/pic16/gen.c:
 	  Rename pointer size macros for clarification.
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Simplify call overhead handling for large memory model.
 
 2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
 

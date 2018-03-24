@@ -3290,7 +3290,6 @@ genFunction (iCode *ic)
 
   bigreturn = (getSize (ftype->next) > 4);
   G.stack.param_offset += bigreturn * 2;
-  G.stack.param_offset += (options.model == MODEL_LARGE);
 
   if (options.debug && !regalloc_dry_run)
     debugFile->writeFrameAddress (NULL, &stm8_regs[SP_IDX], 1);

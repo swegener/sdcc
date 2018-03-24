@@ -185,7 +185,10 @@ stm8_finaliseOptions (void)
   port->mem.default_globl_map = data;
 
   if (options.model == MODEL_LARGE)
-    port->jumptableCost.maxCount = 0;
+    {
+      port->stack.call_overhead = 3;
+      port->jumptableCost.maxCount = 0;
+    }
 }
 
 static void
@@ -428,7 +431,15 @@ PORT stm8_port =
     1                           /* CODE  is read-only */
   },
   { NULL, NULL },
-  { -1, 0, 7, 2, 0, 2, 1 },     /* stack information */
+  {                             /* stack information */
+    -1,                         /* direction */
+     0,
+     7,                         /* isr overhead */
+     2,                         /* call overhead */
+     0,
+     2,
+     1                          /* sp points to next free stack location */
+  },     
   { -1, TRUE },
   { stm8_emitDebuggerSymbol,
     {

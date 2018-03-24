@@ -947,7 +947,8 @@ fi
 if test $OPT_DISABLE_STM8 = 0; then
   AC_CONFIG_FILES([src/stm8/Makefile
                    sdas/asstm8/Makefile])
-  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/stm8/Makefile])
+  test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/stm8/Makefile
+                                                       device/lib/stm8-large/Makefile])
 fi
 
 test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/Makefile])

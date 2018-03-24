@@ -6,6 +6,11 @@
 	  src/SDCCglue.c,
 	  src/SDCCsymt.c:
 	  Handle function pointer sizes separately from object pointer sizes.
+	* configure.ac,
+	  device/lib/Makefile.in,
+	  src/stm8/gen.c,
+	  device/lib/stm8-large:
+	  stm8-large library.
 
 2018-03-24 Philipp Klaus Krause <pkk AT spth.de>
 

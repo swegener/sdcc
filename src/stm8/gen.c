@@ -417,7 +417,7 @@ aopGet(const asmop *aop, int offset)
 
   if (aop->type == AOP_IMMD)
     {
-      wassertl (offset < 2, "Immediate operand out of range");
+      wassertl (offset < (2 + (options.model == MODEL_LARGE)), "Immediate operand out of range");
       SNPRINTF (buffer, sizeof(buffer), offset ? "#>%s" : "#<%s", aop->aopu.aop_immd);
       return (buffer);
     }

@@ -8879,7 +8879,7 @@ fi
 if test $OPT_DISABLE_STM8 = 0; then
   ac_config_files="$ac_config_files src/stm8/Makefile sdas/asstm8/Makefile"
 
-  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/stm8/Makefile"
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/stm8/Makefile device/lib/stm8-large/Makefile"
 
 fi
 
@@ -9620,6 +9620,7 @@ do
     "src/stm8/Makefile") CONFIG_FILES="$CONFIG_FILES src/stm8/Makefile" ;;
     "sdas/asstm8/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asstm8/Makefile" ;;
     "device/lib/stm8/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/stm8/Makefile" ;;
+    "device/lib/stm8-large/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/stm8-large/Makefile" ;;
     "device/lib/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/Makefile" ;;
     "device/non-free/lib/Makefile") CONFIG_FILES="$CONFIG_FILES device/non-free/lib/Makefile" ;;
     "main.mk") CONFIG_FILES="$CONFIG_FILES main.mk:main_in.mk" ;;

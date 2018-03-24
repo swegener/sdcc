@@ -366,10 +366,20 @@ objects-hc08:
 
 model-stm8:
 	if grep '^stm8$$' $(top_builddir)/ports.build > /dev/null; then \
-	  $(MAKE) MODELFLAGS="-mstm8" PORT=stm8 objects-stm8 OEXT=.o; \
+	  $(MAKE) MODELFLAGS="-mstm8" PORT=stm8 objects-stm8; \
 	fi
 
 objects-stm8:
+	$(MAKE) build-dir
+	$(MAKE) port-specific-objects
+	$(MAKE) clean_intermediate
+
+model-stm8-large:
+	if grep '^stm8$$' $(top_builddir)/ports.build > /dev/null; then \
+	  $(MAKE) MODELFLAGS="-mstm8 --model-large" PORT=stm8-large objects-stm8; \
+	fi
+
+objects-stm8-large:
 	$(MAKE) build-dir
 	$(MAKE) port-specific-objects
 	$(MAKE) clean_intermediate

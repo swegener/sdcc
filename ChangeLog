@@ -2,6 +2,8 @@
 
 	* support/regression/tests/longlong.c:
 	  Disable test for mcs51 medium model.
+	* support/regression/tests/bool.c:
+	  Test assignments between bool bitfields.
 
 2018-03-23 Philipp Klaus Krause <pkk AT spth.de>
 

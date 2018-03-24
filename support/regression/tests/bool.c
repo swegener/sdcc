@@ -10,29 +10,35 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-  bool ret_true(void)
-  {
-    return(true);
-  }
+bool ret_true(void)
+{
+  return(true);
+}
 
-  bool ret_false(void)
-  {
-    return(false);
-  }
+bool ret_false(void)
+{
+  return(false);
+}
 
-  volatile bool E;
+volatile bool E;
 
-  bool (* const pa[])(void) = {&ret_true, &ret_false};
+bool (* const pa[])(void) = {&ret_true, &ret_false};
 
-  struct s
-  {
-    bool b;
-  };
+struct s
+{
+  bool b;
+};
 
-  struct
-  {
-    bool b : 1;
-  } s2;
+struct
+{
+  bool b : 1;
+  bool b1 : 1;
+} s2;
+
+void fieldassign(void)
+{
+	s2.b1 = s2.b;
+}
 
 void
 testBug2233(void)
@@ -48,6 +54,7 @@ testBug2233(void)
 	ASSERT(test);
 #endif
 }
+
 
 void
 testBool(void)
@@ -92,5 +99,13 @@ testBool(void)
 	E--;     ASSERT(E);  // sets E to 1-E
 	E = true;
 	E--;     ASSERT(!E); // sets E to 1-E
+
+#ifndef __SDCC_mcs51
+	ASSERT(!s2.b1);
+	s2.b = true;
+	fieldassign();
+	ASSERT(s2.b1);
+#endif
 #endif
 }
+

@@ -2416,7 +2416,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
               /* if we need ptr regs for the right side
                  then mark it */
               if (POINTER_GET (ic) && IS_SYMOP( IC_LEFT(ic) ) && getSize (OP_SYMBOL (IC_LEFT (ic))->type)
-                  <= (unsigned) PTRSIZE)
+                  <= (unsigned) NEARPTRSIZE)
                 {
                   pic16_ptrRegReq++;
                   ptrRegSet = 1;

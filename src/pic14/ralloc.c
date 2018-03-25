@@ -2133,7 +2133,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                                 if (POINTER_GET (ic)
                                         && IS_SYMOP(IC_LEFT(ic))
                                         && getSize (OP_SYMBOL (IC_LEFT (ic))->type)
-                                                <= (unsigned) PTRSIZE)
+                                                <= (unsigned) NEARPTRSIZE)
                                 {
                                         pic14_ptrRegReq++;
                                         ptrRegSet = 1;

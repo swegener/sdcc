@@ -692,7 +692,7 @@ aopForSym (iCode * ic, operand * op, bool result)
 #endif
 
   if (IN_DIRSPACE (space))
-    aop->size = PTRSIZE;
+    aop->size = NEARPTRSIZE;
   else if (IN_CODESPACE (space) || IN_FARSPACE (space))
     aop->size = FARPTRSIZE;
   else if (IC_LEFT (ic) && AOP (IC_LEFT (ic)))
@@ -701,7 +701,7 @@ aopForSym (iCode * ic, operand * op, bool result)
     aop->size = AOP_SIZE (IC_RIGHT (ic));
   else if (sym->onStack)
     {
-      aop->size = PTRSIZE;
+      aop->size = NEARPTRSIZE;
     }
   else
     {

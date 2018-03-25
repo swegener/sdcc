@@ -2,6 +2,10 @@
 
 	* src/stm8/gen.c:
 	  Improve calls via global function pointers.
+	* src/pic16/gen.c,
+	  src/pic16/ralloc.c,
+	  src/pic16/ralloc.c:
+	  Fix NEARPTRSIZE use.
 
 2018-03-25 Philipp Klaus Krause <pkk AT spth.de>
 

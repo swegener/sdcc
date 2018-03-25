@@ -2989,7 +2989,14 @@ genCall (const iCode *ic)
 
       aopOp (left, ic);
 
-      if (options.model == MODEL_LARGE)
+      if (options.model == MODEL_LARGE && left->aop->type == AOP_DIR)
+        {
+          wassertl (left->aop->size == 3, "Functions pointers should be 24 bits in large memory model.");
+
+          emit2 ("callf", "((%s))", aopGet2 (left->aop, 0));
+          cost (4, 8);
+        }
+      else if (options.model == MODEL_LARGE)
         {
           wassertl (left->aop->size == 3, "Functions pointers should be 24 bits in large memory model.");
 

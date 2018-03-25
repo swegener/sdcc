@@ -1,5 +1,10 @@
 2018-03-25 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Improve calls via global function pointers.
+
+2018-03-25 Philipp Klaus Krause <pkk AT spth.de>
+
 	* device/lib/stm8-large/Makefile.in,
 	  device/lib/stm8-large/_fast_long_neg.s:
 	  Remove unused support routine.

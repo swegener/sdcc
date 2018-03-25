@@ -2929,13 +2929,18 @@ genIpush (const iCode * ic)
   freeAsmop (IC_LEFT (ic));
 }
 
+/*-----------------------------------------------------------------*/
+/* genCall - generates a call statement                            */
+/*-----------------------------------------------------------------*/
 static void
-emitCall (const iCode *ic, bool ispcall)
+genCall (const iCode *ic)
 {
   bool SomethingReturned, bigreturn, half;
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
+
+  D (emit2 ("; genCall", ""));
 
   saveRegsForCall (ic);
 
@@ -2962,7 +2967,7 @@ emitCall (const iCode *ic, bool ispcall)
       freeAsmop (IC_RESULT (ic));
     }
 
-  if (ispcall)
+  if (ic->op == PCALL)
     {
       operand *left = IC_LEFT (ic);
 
@@ -2975,14 +2980,13 @@ emitCall (const iCode *ic, bool ispcall)
           symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
 
           if (!regalloc_dry_run)
-            emit2("ld", "a, #(!tlabel >> 16)", labelKey2num (tlbl->key));
-          push (ASMOP_A, 0, 1);
-          if (!regalloc_dry_run)
-            emit2("ld", "a, #(!tlabel >> 8)", labelKey2num (tlbl->key));
-          push (ASMOP_A, 0, 1);
-          if (!regalloc_dry_run)
-            emit2("ld", "a, #(!tlabel)", labelKey2num (tlbl->key));
-          push (ASMOP_A, 0, 1);
+            {
+              emit2("push", "#(!tlabel)", labelKey2num (tlbl->key));
+              emit2("push", "#(!tlabel >> 8)", labelKey2num (tlbl->key));
+              emit2("push", "#(!tlabel >> 16)", labelKey2num (tlbl->key));
+              cost (6, 3);
+              G.stack.pushed += 3;
+            }
 
           cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
           push (ASMOP_A, 0, 1);
@@ -3181,29 +3185,6 @@ emitCall (const iCode *ic, bool ispcall)
 
   G.saved = FALSE;
 }
-
-/*-----------------------------------------------------------------*/
-/* genCall - generates a call statement                            */
-/*-----------------------------------------------------------------*/
-static void
-genCall (const iCode *ic)
-{
-  D (emit2 ("; genCall", ""));
-
-  emitCall (ic, FALSE);
-}
-
-/*-----------------------------------------------------------------*/
-/* genPCall - generates a call by pointer statement                */
-/*-----------------------------------------------------------------*/
-static void
-genPCall (const iCode *ic)
-{
-  D (emit2 ("; genPcall", ""));
-
-  emitCall (ic, TRUE);
-}
-
 
 /*---------------------------------------------------------------------*/
 /* genCritical - mask interrupts until important block completes       */
@@ -7546,11 +7527,8 @@ genSTM8iCode (iCode *ic)
       break;
 
     case CALL:
-      genCall (ic);
-      break;
-
     case PCALL:
-      genPCall (ic);
+      genCall (ic);
       break;
 
     case FUNCTION:

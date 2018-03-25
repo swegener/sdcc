@@ -6,6 +6,8 @@
 	  src/pic16/ralloc.c,
 	  src/pic16/ralloc.c:
 	  Fix NEARPTRSIZE use.
+	* src/hc08/main.c:
+	  Fix leftover max type size.
 
 2018-03-25 Philipp Klaus Krause <pkk AT spth.de>
 

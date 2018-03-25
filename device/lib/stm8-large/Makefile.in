@@ -19,7 +19,10 @@ STM8_FLOAT = $(COMMON_FLOAT)
 STM8_INT = $(COMMON_INT) \
   _mulint.c \
   _divsint.c \
-  _modsint.c
+  _modsint.c \
+  _mulschar.c \
+  _divschar.c \
+  _modschar.c
 
 STM8_LONG = $(COMMON_LONG) \
   _divulong.c \

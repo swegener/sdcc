@@ -9,7 +9,9 @@
 	* src/SDCCpeeph.c:
 	  Fix labelIsUncondJump() for large memory model.
 	* src/stm8/gen.c:
-	  Simplify generation of calls, implement handling of 24-bit return values.
+	  Simplify generation of calls, implement 24-bit return values.
+	* device/lib/stm8-large/Makefile.in:
+	  Fix build of char multiplicative operator routines for large memory model.
 
 2018-03-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

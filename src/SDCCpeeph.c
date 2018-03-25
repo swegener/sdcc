@@ -418,7 +418,7 @@ FBYNAME (labelIsUncondJump)
     }
   else if (TARGET_IS_STM8)
     {
-      jpInst = "jp";
+      jpInst = (options.model == MODEL_LARGE ? "jpf" : "jp");
       jpInst2 = "jra";
     }
   len = strlen(jpInst);

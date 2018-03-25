@@ -2,10 +2,12 @@
 
 	* device/lib/stm8-large/Makefile.in,
 	  device/lib/stm8-large/_fast_long_neg.s:
-	  Remove ununsed support routine.
+	  Remove unused support routine.
 	* src/port.h,
 	  src/stm8/main.c:
 	  Fix library path for large memory model.
+	* src/SDCCpeeph.c:
+	  Fix labelIsUncondJump() for large memory model.
 
 2018-03-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

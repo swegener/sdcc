@@ -1,11 +1,15 @@
-import sys, re
+import sys, re, io
 import string
 
 """Simple script that scans all of the simulator output text fed in
 through stdin and summarises the total number of system clock ticks."""
 
 # Read in everything
-lines = sys.stdin.readlines()
+if sys.version_info[0]<3:
+    safe_stdin = sys.stdin
+else:
+    safe_stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="latin-1")
+lines = safe_stdin.readlines()
 
 # Declare globals
 bytes = 0

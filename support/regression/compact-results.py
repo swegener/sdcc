@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import sys, re
+import sys, re, io
 import string
 
 """Simple script that scans all of the test suite results text fed in
@@ -8,7 +8,11 @@ through stdin and summarises the total number of failures, test
 points, and test cases."""
 
 # Read in everything
-lines = sys.stdin.readlines()
+if sys.version_info[0]<3:
+    safe_stdin = sys.stdin
+else:
+    safe_stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="latin-1")
+lines = safe_stdin.readlines()
 
 found = False
 for line in lines:

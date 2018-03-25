@@ -340,6 +340,25 @@ hasExtBitOp (int op, int size)
   return (op == GETABIT);
 }
 
+static const char *
+get_model (void)
+{
+  int index;
+
+  switch (options.model)
+    {
+    case MODEL_MEDIUM:
+      return ("stm8");
+      break;
+    case MODEL_LARGE:
+      return ("stm8-large");
+      break;
+    default:
+      werror (W_UNKNOWN_MODEL, __FILE__, __LINE__);
+      return "unknown";
+    }
+}
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -370,7 +389,7 @@ PORT stm8_port =
     TRUE,                       /* We want stm8_genIVT to be triggered */
     MODEL_MEDIUM | MODEL_LARGE,
     MODEL_MEDIUM,
-    NULL,                       /* model == target. Change this when the large model gets its own library */
+    &get_model,                 /* model string used as library destination */
   },
   {                             /* Assembler */
     stm8AsmCmd,

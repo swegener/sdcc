@@ -105,7 +105,7 @@ typedef struct
     int supported_models;
     int default_model;
     /** return the model string, used as library destination;
-        port->taget is used as model string if get_model is NULL */
+        port->target is used as model string if get_model is NULL */
     const char *(*get_model) (void);
   }
   general;

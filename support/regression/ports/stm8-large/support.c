@@ -3,7 +3,7 @@ _putchar(unsigned char c)
 {
   c;
   __asm
-    ld	a, (0x03, sp)
+    ld	a, (0x04, sp)
     .db 0x71, 0xed
   __endasm;
 }

@@ -11,7 +11,9 @@
 	* src/stm8/gen.c:
 	  Simplify generation of calls, implement 24-bit return values.
 	* device/lib/stm8-large/Makefile.in:
-	  Fix build of char multiplicative operator routines for large memory model.
+	  Fix build of char multiplicative operator routines.
+	* support/regression/ports/stm8-large/support.c:
+	  Fix regression test output.
 
 2018-03-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

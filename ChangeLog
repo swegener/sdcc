@@ -9,7 +9,7 @@
 	* src/SDCCpeeph.c:
 	  Fix labelIsUncondJump() for large memory model.
 	* src/stm8/gen.c:
-	  Simplify generation of calls.
+	  Simplify generation of calls, implement handling of 24-bit return values.
 
 2018-03-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

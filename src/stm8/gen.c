@@ -122,11 +122,12 @@ static const char *asminstnames[] =
   "xor"
 };
 
-static struct asmop asmop_a, asmop_x, asmop_y, asmop_xy, asmop_zero, asmop_one;
+static struct asmop asmop_a, asmop_x, asmop_y, asmop_xy, asmop_xyl, asmop_zero, asmop_one;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_X = &asmop_x;
 static struct asmop *const ASMOP_Y = &asmop_y;
 static struct asmop *const ASMOP_XY = &asmop_xy;
+static struct asmop *const ASMOP_XYL = &asmop_xyl;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 
@@ -185,6 +186,21 @@ stm8_init_asmops (void)
   asmop_xy.regs[XH_IDX] = 1;
   asmop_xy.regs[YL_IDX] = 2;
   asmop_xy.regs[YH_IDX] = 3;
+  asmop_xy.regs[C_IDX] = -1;
+
+  asmop_xyl.type = AOP_REG;
+  asmop_xyl.size = 3;
+  asmop_xyl.aopu.bytes[0].in_reg = TRUE;
+  asmop_xyl.aopu.bytes[0].byteu.reg = stm8_regs + XL_IDX;
+  asmop_xyl.aopu.bytes[1].in_reg = TRUE;
+  asmop_xyl.aopu.bytes[1].byteu.reg = stm8_regs + XH_IDX;
+  asmop_xyl.aopu.bytes[2].in_reg = TRUE;
+  asmop_xyl.aopu.bytes[2].byteu.reg = stm8_regs + YL_IDX;
+  asmop_xy.regs[A_IDX] = -1;
+  asmop_xy.regs[XL_IDX] = 0;
+  asmop_xy.regs[XH_IDX] = 1;
+  asmop_xy.regs[YL_IDX] = 2;
+  asmop_xy.regs[YH_IDX] = -1;
   asmop_xy.regs[C_IDX] = -1;
 
   asmop_zero.type = AOP_LIT;
@@ -3131,7 +3147,7 @@ genCall (const iCode *ic)
 
       size = !half ? IC_RESULT (ic)->aop->size : (IC_RESULT (ic)->aop->size > 2 ? 2 : IC_RESULT (ic)->aop->size);   
 
-      wassert (getSize (ftype->next) == 1 || getSize (ftype->next) == 2 || getSize (ftype->next) == 4);
+      wassert (getSize (ftype->next) >= 1 && getSize (ftype->next) <= 4);
 
       genMove_o (IC_RESULT (ic)->aop, 0, getSize (ftype->next) == 1 ? ASMOP_A : ASMOP_XY, 0, size, TRUE, TRUE, !stm8_extend_stack);
 
@@ -3369,6 +3385,10 @@ genReturn (const iCode *ic)
       break;
     case 2:
       genMove (ASMOP_X, left->aop, TRUE, TRUE, TRUE);
+      break;
+    case 3:
+      wassertl (regalloc_dry_run || !stm8_extend_stack, "Unimplemented 24-bit return in function with extended stack access.");
+      genMove (ASMOP_XYL, left->aop, TRUE, TRUE, TRUE);
       break;
     case 4:
       wassertl (regalloc_dry_run || !stm8_extend_stack, "Unimplemented long return in function with extended stack access.");

@@ -107,30 +107,30 @@ void foo(void)
 {
    s8 = -129;		/* WARNING */
    s8 =  INT8_MIN;
-   s8 = UINT8_MAX;
+   s8 = UINT8_MAX;      /* WARNING */
    s8 =  256;		/* WARNING */
 
    s8 = -129;		/* WARNING */
-   u8 =  INT8_MIN;
+   u8 =  INT8_MIN;      /* WARNING */
    u8 = UINT8_MAX;
    u8 =  256;		/* WARNING */
 
    s16 = -32769L;	/* WARNING */
    s16 =  INT16_MIN;
-   s16 = UINT16_MAX;
+   s16 = UINT16_MAX;    /* WARNING */
    s16 =  65536L;	/* WARNING */
 
    s16 = -32769L;	/* WARNING */
-   u16 =  INT16_MIN;
+   u16 =  INT16_MIN;    /* WARNING */
    u16 = UINT16_MAX;
    u16 =  65536L;	/* WARNING */
 
    /* sdcc can't hold a number (INT32_MIN - 1) or (INT32_MAX + 1),
       there's no 'double' or 'long long' */
    s32 =  INT32_MIN;
-   s32 = UINT32_MAX;
+   s32 = UINT32_MAX;    /* WARNING */
 
-   u32 =  INT32_MIN;
+   u32 =  INT32_MIN;    /* WARNING */
    u32 = UINT32_MAX;
 }
 #endif
@@ -226,21 +226,21 @@ void foo(void)
 
   str.sb1 = -2;			/* WARNING */
   str.sb1 = -1;
-  str.sb1 =  1;
+  str.sb1 =  1;                 /* WARNING */
   str.sb1 =  2;			/* WARNING */
 
   str.ub1 = -2;			/* WARNING */
-  str.ub1 = -1;
+  str.ub1 = -1;                 /* WARNING */
   str.ub1 =  1;
   str.ub1 =  2;			/* WARNING */
 
   str.sb3 = -5;			/* WARNING */
   str.sb3 = -4;
-  str.sb3 =  7;
+  str.sb3 =  7;                 /* WARNING */
   str.sb3 =  8;			/* WARNING */
 
   str.ub3 = -5;			/* WARNING */
-  str.ub3 = -4;
+  str.ub3 = -4;                 /* WARNING */
   str.ub3 =  7;
   str.ub3 =  8;			/* WARNING */
 

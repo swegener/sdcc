@@ -1,5 +1,10 @@
 2018-03-26 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/valdiag/tests/constantRange.c:
+	  Make tests expect a few more warnings implemented in SDCC.
+
+2018-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCCerr.h,
 	  src/SDCCerr.c,
 	  src/SDCCast.c,

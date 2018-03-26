@@ -2965,7 +2965,7 @@ checkPtrCast (sym_link *newType, sym_link *orgType, bool implicit, bool orgIsNul
                 errors += werror (W_INCOMPAT_PTYPES);
             }
           else if (GPTRSIZE > FARPTRSIZE /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80 */ )
-            {printf("Pointer cast D.\n");
+            {
               // if not a pointer to a function
               if (!(IS_CODEPTR (newType) && IS_FUNC (newType->next) && IS_FUNC (orgType)))
                 {

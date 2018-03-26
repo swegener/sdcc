@@ -6,6 +6,9 @@
 	  support/valdiag/valdiag.py,
 	  support/valdiag/tests/pointers.c:
 	  Diagnostics for conversions between pointers to objects and pointers to functions.
+	* src/stm8/gen.c,
+	  src/stm8/peeph.def:
+	  Some minor improvements.
 
 2018-03-25 Philipp Klaus Krause <pkk AT spth.de>
 

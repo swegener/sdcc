@@ -358,7 +358,7 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
     }
 
   /* For now eliminate 8-bit temporary variables only.
-     The STM8 instruction soperating directly on memory
+     The STM8 instructions operating directly on memory
      operands are 8-bit, so the most benefit is in 8-bit
      operations. On the other hand, supporting wider
      operations well in codegen is also more effort. */

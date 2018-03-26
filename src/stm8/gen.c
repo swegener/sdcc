@@ -2096,6 +2096,12 @@ skip_byte:
             emit3w (A_CLRW, ASMOP_Y, 0);
           i += 2;
         }
+      else if (y_dead && aopIsLitVal (source, soffset + i + 1, 1, 0x00) &&
+        (aopInReg (result, roffset + i, YL_IDX) && result->regs[YH_IDX] < 0 || aopInReg (result, roffset + i, YH_IDX) && result->regs[YL_IDX] < 0))
+        {
+          emit3w (A_CLRW, ASMOP_Y, 0);
+          i++;
+        }
       else
         { 
           cheapMove (result, roffset + i, ASMOP_ZERO, 0, !a_free);
@@ -5093,6 +5099,7 @@ genOr (const iCode *ic)
 {
   operand *left, *right, *result;
   int size, i, j, omitbyte = -1;
+  bool result_in_a = FALSE;
   bool pushed_a = FALSE;
 
   D (emit2 ("; genOr", ""));
@@ -5145,10 +5152,7 @@ genOr (const iCode *ic)
           pop (other_stacked, 0, 2);
 
         if (aopInReg (result->aop, i, A_IDX) && size > 1)
-          {
-            push (ASMOP_A, 0, 1);
-            pushed_a = TRUE;
-          }
+          result_in_a = TRUE;
         else
           {
             // Avoid overwriting operand.
@@ -5217,12 +5221,9 @@ genOr (const iCode *ic)
         }
       else if (aopIsLitVal (right->aop, i, 1, 0x00)) // If long sequences of 0x00 are common, we should use genMove_o instead.
         {
-          cheapMove (result->aop, i, left->aop, i, FALSE);
+          cheapMove (result->aop, i, left->aop, i, result_in_a && !pushed_a);
           if (aopInReg (result->aop, i, A_IDX) && i != size - 1)
-            {
-              push (ASMOP_A, 0, 1);
-              pushed_a = TRUE;
-            }
+            result_in_a = TRUE;
           i++;
         }
       else if (aopOnStack (left->aop, i, 1) && aopOnStack (result->aop, i, 1) && result->aop->aopu.bytes[i].byteu.stk == left->aop->aopu.bytes[i].byteu.stk && aopIsLitVal (right->aop, i, 1, 0x80))
@@ -5249,6 +5250,12 @@ genOr (const iCode *ic)
         }
       else
         {
+          if (result_in_a && !pushed_a)
+            {
+              push (ASMOP_A, 0, 1);
+              pushed_a = TRUE;
+            }
+
           right_stacked = stack_aop (right->aop, i, &right_offset);
 
           cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
@@ -5267,10 +5274,7 @@ genOr (const iCode *ic)
           if (!aopInReg (result->aop, i, A_IDX) || i == size - 1)
             cheapMove (result->aop, i, ASMOP_A, 0, FALSE);
           else
-            {
-              push (ASMOP_A, 0, 1);
-              pushed_a = TRUE;
-            }
+            result_in_a = TRUE;
           i++;
         }
     }
@@ -6472,7 +6476,7 @@ genPointerGet (const iCode *ic)
   // Long pointer indirect long addressing mode is useful only in one very specific case:
   if (!bit_field && size == 1 && !offset && left->aop->type == AOP_DIR && !regDead (X_IDX, ic) && aopInReg(result->aop, 0, A_IDX))
     {
-      emit2("ld", "a, ((%s))", aopGet2(left->aop, 0));
+      emit2("ld", "a, [%s]", aopGet2(left->aop, 0));
       cost (4, 4);
       goto release;
     }
@@ -6769,13 +6773,13 @@ genPointerSet (iCode * ic)
   // Long pointer indirect long addressing mode is useful only in two very specific cases:
   if (!bit_field && size == 1 && result->aop->type == AOP_DIR && !regDead (X_IDX, ic) && aopInReg(right->aop, 0, A_IDX))
     {
-      emit2("ld", "((%s)), a", aopGet2 (result->aop, 0));
+      emit2("ld", "[%s], a", aopGet2 (result->aop, 0));
       cost (4, 4);
       goto release;
     }
   else if (!bit_field && size == 2 && result->aop->type == AOP_DIR && (!regDead (Y_IDX, ic) || !optimize.codeSpeed) && aopInReg(right->aop, 0, X_IDX))
     {
-      emit2("ldw", "((%s)), x", aopGet2 (result->aop, 0));
+      emit2("ldw", "[%s], x", aopGet2 (result->aop, 0));
       cost (4, 5);
       goto release;
     }

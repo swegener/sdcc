@@ -6,6 +6,11 @@
 	  Fix | of a with itself.
 	* support/valdiag/tests/bug-971834.c:
 	  Do not expect unreasonable warning.
+	* src/SDCCast.h,
+	  src/SDCCast.c,
+	  src/SDCCicode.c,
+	  support/valdiag/tests/pointers.c:
+	  Fix bug #2730.
 
 2018-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

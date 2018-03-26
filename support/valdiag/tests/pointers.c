@@ -14,6 +14,7 @@ void testPtr(void)
 	fptr1 = vp;    /* WARNING */
 	fptr2 = fptr1; /* IGNORE(GCC) */
 	vp = fptr1;    /* WARNING */
+	fptr1 = (void *)0;
 }
 
 #endif

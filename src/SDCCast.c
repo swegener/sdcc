@@ -2900,7 +2900,7 @@ CodePtrPointsToConst (sym_link * t)
 /* checkPtrCast - if casting to/from pointers, do some checking    */
 /*-----------------------------------------------------------------*/
 void
-checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit)
+checkPtrCast (sym_link *newType, sym_link *orgType, bool implicit, bool orgIsNullPtrConstant)
 {
   int errors = 0;
   
@@ -2956,12 +2956,12 @@ checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit)
             }
           else if (IS_GENPTR (newType) && IS_VOID (newType->next)) // cast to void* is always allowed
             {
-              if (IS_FUNCPTR (orgType))
+              if (IS_FUNCPTR (orgType)) 
                 errors += werror (FUNCPTRSIZE > GPTRSIZE ? E_INCOMPAT_PTYPES : W_INCOMPAT_PTYPES);
             }
-          else if (IS_GENPTR (orgType) && IS_VOID (orgType->next)) // cast from void* is always allowed
+          else if (IS_GENPTR (orgType) && IS_VOID (orgType->next)) // cast from void* is always allowed - as long as we cast to a pointer to an object type
             {
-              if (IS_FUNCPTR (newType))
+              if (IS_FUNCPTR (newType) && !orgIsNullPtrConstant) // cast to pointer to function is only allowed for null pointer constants
                 errors += werror (W_INCOMPAT_PTYPES);
             }
           else if (GPTRSIZE > FARPTRSIZE /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80 */ )
@@ -4727,7 +4727,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
                       gpVal &= mask;
                     }
                 }
-              checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast);
+              checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast, !ullFromVal (valFromType (RTYPE (tree))));
               LRVAL (tree) = 1;
               tree->type = EX_VALUE;
               tree->opval.val = valCastLiteral (LTYPE (tree), gpVal | pVal, gpVal | pVal);
@@ -4739,7 +4739,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
               return tree;
             }
         }
-      checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast);
+      checkPtrCast (LTYPE (tree), RTYPE (tree), tree->values.cast.implicitCast, FALSE);
       if (IS_GENPTR (LTYPE (tree)) && (resultType != RESULT_TYPE_GPTR))
         {
           if (IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))

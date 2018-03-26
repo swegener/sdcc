@@ -6474,21 +6474,23 @@ genPointerGet (const iCode *ic)
   offset = byteOfVal (right->aop->aopu.aop_lit, 1) * 256 + byteOfVal (right->aop->aopu.aop_lit, 0);
 
   // Long pointer indirect long addressing mode is useful only in one very specific case:
-  if (!bit_field && size == 1 && !offset && left->aop->type == AOP_DIR && !regDead (X_IDX, ic) && aopInReg(result->aop, 0, A_IDX))
+  if (!bit_field && size == 1 && !offset && left->aop->type == AOP_DIR && !regDead (X_IDX, ic) && regDead (A_IDX, ic))
     {
       emit2("ld", "a, [%s]", aopGet2(left->aop, 0));
       cost (4, 4);
+      cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
       goto release;
     }
   // Special case for efficient handling of 8-bit I/O and rematerialized pointers
   else if (!bit_field && size == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
-    && aopInReg(result->aop, 0, A_IDX))
+    && regDead (A_IDX, ic))
     {
       if (left->aop->type == AOP_LIT)
         emit2("ld", offset ? "a, 0x%02x%02x+%d" : "a, 0x%02x%02x",  byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);
       else
         emit2("ld", offset ? "a, %s+%d" : "a, %s", left->aop->aopu.aop_immd, offset);
       cost (3, 1);
+      cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
       goto release;
     }
   // Special case for efficient handling of 16-bit I/O and rematerialized pointers

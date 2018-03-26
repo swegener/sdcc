@@ -26,7 +26,7 @@ char foo (void)
   unsigned char a, i;
   for (i = 0; i < sizeof(ttt); i++)
     a |= ttt[i];	/* WARNING(SDCC) */
-  return a;		/* WARNING(SDCC) */
+  return a;
 }
 #endif
 

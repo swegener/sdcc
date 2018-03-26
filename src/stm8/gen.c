@@ -5137,7 +5137,7 @@ genOr (const iCode *ic)
 
         other_stacked = stack_aop (other, i, &other_offset);
 
-        if (aopIsLitVal (right->aop, i, 1, 0))
+        if (aopIsLitVal (right->aop, i, 1, 0) || aopInReg (other, i, A_IDX))
           ;
         else if (!other_stacked)
           emit3_o (A_OR, ASMOP_A, 0, other, i);

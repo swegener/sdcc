@@ -2,6 +2,10 @@
 
 	* support/valdiag/tests/constantRange.c:
 	  Make tests expect a few more warnings implemented in SDCC.
+	* src/stm8/gen.c:
+	  Fix | of a with itself.
+	* support/valdiag/tests/bug-971834.c:
+	  Do not expect unreasonable warning.
 
 2018-03-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

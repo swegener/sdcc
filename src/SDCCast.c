@@ -2954,14 +2954,18 @@ checkPtrCast (sym_link * newType, sym_link * orgType, bool implicit)
             {
               errors += werror (E_INCOMPAT_PTYPES);
             }
-          else if (IS_GENPTR (newType) && IS_VOID (newType->next))
-            {                   // cast to void* is always allowed
+          else if (IS_GENPTR (newType) && IS_VOID (newType->next)) // cast to void* is always allowed
+            {
+              if (IS_FUNCPTR (orgType))
+                errors += werror (FUNCPTRSIZE > GPTRSIZE ? E_INCOMPAT_PTYPES : W_INCOMPAT_PTYPES);
             }
-          else if (IS_GENPTR (orgType) && IS_VOID (orgType->next))
-            {                   // cast from void* is always allowed
+          else if (IS_GENPTR (orgType) && IS_VOID (orgType->next)) // cast from void* is always allowed
+            {
+              if (IS_FUNCPTR (newType))
+                errors += werror (W_INCOMPAT_PTYPES);
             }
           else if (GPTRSIZE > FARPTRSIZE /*!TARGET_IS_Z80 && !TARGET_IS_GBZ80 */ )
-            {
+            {printf("Pointer cast D.\n");
               // if not a pointer to a function
               if (!(IS_CODEPTR (newType) && IS_FUNC (newType->next) && IS_FUNC (orgType)))
                 {

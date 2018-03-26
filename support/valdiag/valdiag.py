@@ -32,7 +32,7 @@ extramacrodefs = {}
 
 gcc = {
     "CC":"gcc",
-    "CCFLAGS":"-c -Wall -DPORT_HOST=1",
+    "CCFLAGS":"-c -pedantic -Wall -DPORT_HOST=1",
     "CCDEF":"-D",
     "CCOUTPUT":"-o",
     "C89":"-std=c89",

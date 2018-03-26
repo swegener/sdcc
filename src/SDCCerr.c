@@ -543,6 +543,8 @@ struct
     "static in array parameters requires ISO C99 or later", 0},
   { E_INT_MULTIPLE, ERROR_LEVEL_ERROR,
     "mutiple interrupt numbers for '%s'", 0},
+  { W_INCOMPAT_PTYPES, ERROR_LEVEL_WARNING,
+     "pointer types incompatible ", 0 },
 };
 
 /* -------------------------------------------------------------------------------

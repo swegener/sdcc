@@ -1,3 +1,12 @@
+2018-03-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCCast.c,
+	  support/valdiag/valdiag.py,
+	  support/valdiag/tests/pointers.c:
+	  Diagnostics for conversions between pointers to objects and pointers to functions.
+
 2018-03-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

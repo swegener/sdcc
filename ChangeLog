@@ -11,7 +11,7 @@
 	* src/SDCCglue.c:
 	  Use jpf to reach main() for stm8 large memory model.
 	* src/stm8/gen.c:
-	  Give up on assembler for stm8 large memory model.
+	  Give up on assembler for stm8 large memory model to make regression tests pass.
 
 2018-03-26 Philipp Klaus Krause <pkk AT spth.de>
 

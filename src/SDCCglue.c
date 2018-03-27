@@ -1454,7 +1454,7 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
         {
           dbuf_tprintf (oBuf, "\t.byte #0x00\n");
           dbuf_tprintf (oBuf, "\t!dws\n", name);
-          fprintf(stderr, "GENERATING CODE FOR FUNCTION POINTER THAT IS BROKEN FOR >16-BIT SPACE\n");
+          fprintf(stderr, "GENERATING CODE FOR FUNCTION POINTER THAT WILL ONLY WORK IF THE POINTED-TO FUNCTION (%s) IS IN THE LOWER 16 BIT OF THE ADDRESS SPACE!\n", name);
         }
       else if (port->use_dw_for_init)
         {

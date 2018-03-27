@@ -3024,7 +3024,7 @@ genCall (const iCode *ic)
               emit2("push", "#(!tlabel >> 8)", labelKey2num (tlbl->key));
               //emit2("push", "#(!tlabel >> 16)", labelKey2num (tlbl->key));
               emit2("push", "#0x00");
-              fprintf(stderr, "GENERATING CODE FOR CALL VIA FUNCTION POINTER THAT WILL ONLY WORK IF THE CALLING FUNCTION IS IN THE LOWER 16 BIT OF THE ADDRESS SAPCE!\n");
+              fprintf(stderr, "GENERATING CODE FOR CALL VIA FUNCTION POINTER THAT WILL ONLY WORK IF THE CALLING FUNCTION IS IN THE LOWER 16 BIT OF THE ADDRESS SPACE!\n");
               emit2(";", "BROKEN FOR >16-BIT SPACE! WOULD NEED HIGHEST BYTE OF 24-BIT ADDRESS");
               cost (6, 3);
               G.stack.pushed += 3;

@@ -219,10 +219,6 @@
                                          : "empty"))
 
 /* optimization options */
-/*
- * cloneOptimize function in SDCC.lex should be updated every time
- * a new set is added to the optimize structure!
- */
 struct optimize
   {
     int global_cse;
@@ -238,6 +234,7 @@ struct optimize
     int codeSize;
     int lospre;
     int allow_unsafe_read;
+    int noStdLibCall;
   };
 
 /** Build model.

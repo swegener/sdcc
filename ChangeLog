@@ -1,3 +1,11 @@
+2018-03-27 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCast.c,
+	  doc/sdccman.lyx,
+	  src/SDCCglobl.h,
+	  src/SDCCmain.c:
+	  Implement basic optimization of calls to standard library functions, RFE #564.
+
 2018-03-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

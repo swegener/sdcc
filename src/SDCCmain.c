@@ -236,6 +236,7 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_MAX_ALLOCS_PER_NODE, &options.max_allocs_per_node, "Maximum number of register assignments considered at each node of the tree decomposition", CLAT_INTEGER},
   {0,   OPTION_NO_LOSPRE, NULL, "Disable lospre"},
   {0,   OPTION_ALLOW_UNSAFE_READ, NULL, "Allow optimizations to read any memory location anytime"},
+  {0,   "--nostdlibcall", &optimize.noStdLibCall, "Disable optimization of calls to standard library"},
 
   {0,   NULL, NULL, "Internal debugging options"},
   {0,   OPTION_DUMP_AST, &options.dump_ast, "Dump front-end AST before generating i-code"},

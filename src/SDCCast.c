@@ -24,6 +24,8 @@
 
 #define DEBUG_CF(x)             /* puts(x); */
 
+#include <stdint.h>
+
 #include "common.h"
 #include "dbuf_string.h"
 #include "SDCCbtree.h"
@@ -1642,7 +1644,7 @@ freeStringSymbol (symbol * sym)
 /* stringToSymbol - creates a symbol from a literal string         */
 /*-----------------------------------------------------------------*/
 static value *
-stringToSymbol (value * val)
+stringToSymbol (value *val)
 {
   struct dbuf_s dbuf;
   static int charLbl = 0;
@@ -1691,7 +1693,7 @@ stringToSymbol (value * val)
   else
     {
       addSet (&strSym, sym);
-      addSet (&statsg->syms, sym);      
+      addSet (&statsg->syms, sym);
     }
   sym->ival = NULL;
   return symbolVal (sym);
@@ -3157,6 +3159,110 @@ rewriteAstJoinSideEffects (ast *tree, ast *oLeft, ast *oRight)
     }
 
   deleteSet (&sideEffects);
+}
+
+static void
+optStdLibCall (ast *tree, RESULT_TYPE resulttype)
+{
+  ast *parms = tree->right;
+  ast *func = tree->left;
+
+  if (!TARGET_IS_STM8 && !TARGET_Z80_LIKE) // Regression test gcc-torture-execute-20121108-1.c fails to build for hc08 and mcs51 (without --stack-auto)
+    return;
+
+  if (!IS_FUNC (func->ftype) || IS_LITERAL (func->ftype) || func->type != EX_VALUE || !func->opval.val->sym)
+    return;
+
+  const char *funcname = func->opval.val->sym->name;
+
+  unsigned int nparms = 0;
+  ast *parm;
+  for (parm = parms; parm && parm->type == EX_OP && parm->opval.op == PARAM; parm = parm->right)
+    if (parm->left)
+      nparms++;
+  if (parm)
+    nparms++;
+
+  // Optimize printf() to puts().
+  if (!strcmp(funcname, "printf") && nparms == 1 && resulttype == RESULT_TYPE_NONE)
+    {
+      ast *parm = parms;
+
+      if (parm->type == EX_OP && parm->opval.op == CAST)
+        parm = parm->right;
+
+      if (parm->type != EX_VALUE || !IS_ARRAY (parm->opval.val->type) || !parm->opval.val->sym)
+        return;
+
+      size_t strlength = DCL_ELEM (parm->opval.val->type);
+      symbol *strsym = parm->opval.val->sym;
+      sym_link *strlink = strsym->etype;
+
+      if (strsym->isstrlit != 1 || !strlink || !IS_SPEC(strlink) || SPEC_NOUN (strlink) != V_CHAR)
+        return;
+
+      for (size_t i = 0; i < strlength; i++)
+        if (SPEC_CVAL (strlink).v_char[i] == '%')
+          return;
+      if(strlength < 2 || SPEC_CVAL (strlink).v_char[strlength - 2] != '\n')
+        return;
+
+      symbol *puts_sym = findSym (SymbolTab, NULL, "puts");
+
+      if(!puts_sym)
+        return;
+
+      DCL_ELEM (strsym->type)--;
+      func->opval.val->sym = puts_sym;
+    }
+  // Optimize strcpy() to memcpy().
+  else if (!strcmp(funcname, "strcpy") && nparms == 2)
+    {
+      ast *parm = parms->right;
+
+      if (parm->type == EX_OP && parm->opval.op == CAST)
+        parm = parm->right;
+
+      if (parm->type != EX_VALUE || !IS_ARRAY (parm->opval.val->type) || !parm->opval.val->sym)
+        return;
+
+      size_t strlength = DCL_ELEM (parm->opval.val->type);
+      symbol *strsym = parm->opval.val->sym;
+      sym_link *strlink = strsym->etype;
+
+      if (!strsym->isstrlit || !strlink || !IS_SPEC(strlink) || SPEC_NOUN (strlink) != V_CHAR)
+        return;
+
+      for (size_t i = 0; i < strlength; i++)
+        if (!SPEC_CVAL (strlink).v_char[i])
+          {
+            strlength = i + 1;
+            break;
+          }
+
+      size_t minlength; // Minimum string length for replacement.
+      if (TARGET_IS_STM8)
+        minlength = optimize.codeSize ? SIZE_MAX : 12;
+      else // TODO:Check for other targets when memcpy() is a better choice than strcpy;
+        minlength = SIZE_MAX;
+
+      if (strlength < minlength)
+        return;
+
+      symbol *memcpy_sym = findSym (SymbolTab, NULL, "memcpy");
+
+      if(!memcpy_sym)
+        return;
+
+      ast *lengthparm = newAst_VALUE (valCastLiteral (newIntLink(), strlength, strlength));
+      decorateType (lengthparm, RESULT_TYPE_NONE);
+      ast *node = newAst_OP (PARAM);
+      node->left = parm;
+      node->right = lengthparm;
+      node->decorated = 1;
+      parms->right = node;
+      func->opval.val->sym = memcpy_sym;
+    }
 }
 
 /*--------------------------------------------------------------*/
@@ -5517,14 +5623,13 @@ decorateType (ast *tree, RESULT_TYPE resultType)
             reverseParms (tree->right, 0);
 
           if (processParms (tree->left, FUNC_ARGS (functype), &tree->right, &parmNumber, TRUE))
-            {
-              goto errorTreeReturn;
-            }
+            goto errorTreeReturn;
+
+          if (!optimize.noStdLibCall)
+            optStdLibCall (tree, resultType);
 
           if ((options.stackAuto || IFFUNC_ISREENT (functype)) && !IFFUNC_ISBUILTIN (functype))
-            {
-              reverseParms (tree->right, 1);
-            }
+            reverseParms (tree->right, 1);
 
           TTYPE (tree) = copyLinkChain(functype->next);
           TETYPE (tree) = getSpec (TTYPE (tree));
@@ -5657,7 +5762,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       }
     case PARAM:
       werrorfl (tree->filename, tree->lineno, E_INTERNAL_ERROR, __FILE__, __LINE__, "node PARAM shouldn't be processed here");
-      /* but in processParams() */
+      /* but in processParms() */
       return tree;
     case INLINEASM:
       formatInlineAsm (tree->values.inlineasm);

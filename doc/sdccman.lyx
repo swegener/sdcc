@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -41,6 +41,8 @@ logicalmkup
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -83,6 +85,7 @@ logicalmkup
 \suppress_date false
 \justification true
 \use_refstyle 0
+\use_minted 0
 \branch test
 \selected 0
 \filename_suffix 0
@@ -100,7 +103,10 @@ logicalmkup
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language swedish
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style swedish
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle fancy
@@ -13293,6 +13299,51 @@ status collapsed
  This will enable additional optimizations, but can result in spurious reads
  from undefined memory addresses, which can be harmful if the target system
  uses certain ways of doing memory-mapped I/O.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-
+\series bold
+nostdlibcall
+\series default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-nostdlibcall
+\end_layout
+
+\end_inset
+
+ Disable the optimization of calls to the standard library.
 \end_layout
 
 \begin_layout Subsection
@@ -73614,6 +73665,8 @@ To avoid confusion, the installation and building options for SDCC itself
 \begin_inset CommandInset index_print
 LatexCommand printindex
 type "idx"
+name "Index"
+literal "true"
 
 \end_inset
 

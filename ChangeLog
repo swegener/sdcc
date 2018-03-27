@@ -5,6 +5,9 @@
 	  src/SDCCglobl.h,
 	  src/SDCCmain.c:
 	  Implement basic optimization of calls to standard library functions, RFE #564.
+	* support/regression/tests/bug-716242.c,
+	  support/regression/tests/genptrs.c:
+	  Fix tests that assign void * to function pointers.
 
 2018-03-26 Philipp Klaus Krause <pkk AT spth.de>
 

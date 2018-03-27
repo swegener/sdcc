@@ -1,8 +1,13 @@
 /* bug-716242.c
 
    syntax tests about function pointers at compile time
+
+   This also tests an implementation extension that allows the casting of void * to function pointers,
+   which is not available for the stm8 large memory model.
  */
 #include <testfwk.h>
+
+#pragma disable_warning 244
 
 const void *p;
 int ret;
@@ -22,12 +27,14 @@ g (int (*h) (int))
 void
 f1 ()
 {
+#if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE))
 #if defined(__SDCC_ds390)
   p = (void __code *) mul2;
 #else
   p = (void *) mul2;
 #endif
   g ((int (*) (int)) p);
+#endif
 }
 
 /****************************/

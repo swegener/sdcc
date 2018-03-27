@@ -10,6 +10,8 @@
 	  Fix tests that assign void * to function pointers.
 	* src/SDCCglue.c:
 	  Use jpf to reach main() for stm8 large memory model.
+	* src/stm8/gen.c:
+	  Give up on assembler stm8 large memory model.
 
 2018-03-26 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -434,7 +434,17 @@ aopGet(const asmop *aop, int offset)
   if (aop->type == AOP_IMMD)
     {
       wassertl (offset < (2 + (options.model == MODEL_LARGE)), "Immediate operand out of range");
-      SNPRINTF (buffer, sizeof(buffer), offset ? "#(%s >> %d)" : "#%s", aop->aopu.aop_immd, offset * 8);
+      if (offset == 0)
+        SNPRINTF (buffer, sizeof(buffer), "#<%s", aop->aopu.aop_immd);
+      else if (offset == 1)
+        SNPRINTF (buffer, sizeof(buffer), "#(%s >> 8)", aop->aopu.aop_immd);
+      else if (offset == 2)
+        {
+          SNPRINTF (buffer, sizeof(buffer), "#0x00");
+          if (!regalloc_dry_run)
+            fprintf(stderr, "GENERATING CODE FOR FUNCTION POINTER THAT IS BROKEN FOR >16-BIT SPACE\n");
+          emit2(";", "BROKEN FOR >16-BIT SPACE! WOULD NEED HIGHEST BYTE OF 24-BIT ADDRESS");
+        }
       return (buffer);
     }
 
@@ -3012,7 +3022,10 @@ genCall (const iCode *ic)
             {
               emit2("push", "#(!tlabel)", labelKey2num (tlbl->key));
               emit2("push", "#(!tlabel >> 8)", labelKey2num (tlbl->key));
-              emit2("push", "#(!tlabel >> 16)", labelKey2num (tlbl->key));
+              //emit2("push", "#(!tlabel >> 16)", labelKey2num (tlbl->key));
+              emit2("push", "#0x00");
+              fprintf(stderr, "GENERATING CODE FOR CALL THAT IS BROKEN FOR >16-BIT SPACE\n");
+              emit2(";", "BROKEN FOR >16-BIT SPACE! WOULD NEED HIGHEST BYTE OF 24-BIT ADDRESS");
               cost (6, 3);
               G.stack.pushed += 3;
             }

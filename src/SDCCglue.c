@@ -2560,7 +2560,7 @@ glue (void)
 
       /* put in jump or call to main */
       if(TARGET_IS_STM8)
-        fprintf (asmFile, "\tjp\t_main\n");
+        fprintf (asmFile, options.model == MODEL_LARGE ? "\tjpf\t_main\n" : "\tjp\t_main\n");
       else
         fprintf (asmFile, "\t%cjmp\t_main\n", options.acall_ajmp ? 'a' : 'l');        /* needed? */
       fprintf (asmFile, ";\treturn from main will return to caller\n");

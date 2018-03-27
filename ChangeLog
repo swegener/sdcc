@@ -8,6 +8,8 @@
 	* support/regression/tests/bug-716242.c,
 	  support/regression/tests/genptrs.c:
 	  Fix tests that assign void * to function pointers.
+	* src/SDCCglue.c:
+	  Use jpf to reach main() for stm8 large memory model.
 
 2018-03-26 Philipp Klaus Krause <pkk AT spth.de>
 

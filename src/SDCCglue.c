@@ -1450,7 +1450,13 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
 
   if (size == FUNCPTRSIZE)
     {
-      if (port->use_dw_for_init)
+      if (TARGET_IS_STM8 && FUNCPTRSIZE == 3)
+        {
+          dbuf_tprintf (oBuf, "\t.byte #0x00\n");
+          dbuf_tprintf (oBuf, "\t!dws\n", name);
+          fprintf(stderr, "GENERATING CODE FOR FUNCTION POINTER THAT IS BROKEN FOR >16-BIT SPACE\n");
+        }
+      else if (port->use_dw_for_init)
         {
           dbuf_tprintf (oBuf, "\t!dws\n", name);
         }

@@ -574,10 +574,8 @@ packRegisters (eBBlock * ebp)
         }
 
       /* In some cases redundant moves can be eliminated */
-#if 0
-      if (ic->op == GET_VALUE_AT_ADDRESS || ic->op == SET_VALUE_AT_ADDRESS)
+      if (ic->op == GET_VALUE_AT_ADDRESS) // || ic->op == SET_VALUE_AT_ADDRESS || ic->op == IFX && operandSize (IC_COND (ic)) == 1
         packRegsForOneuse (ic, &(IC_LEFT (ic)), ebp);
-#endif
     }
 }
 

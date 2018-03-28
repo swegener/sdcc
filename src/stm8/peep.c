@@ -149,6 +149,12 @@ isLongoff(const char *what, const char *mode)
 }
 
 static int
+isPtr(const char *what)
+{
+  return(what[0] == '[' || what[0] == '(' && (what[1] == '[' || what[1] == '('));
+}
+
+static int
 isSpIndexed(const char *what)
 {
   return isRelativeAddr(what, "sp");
@@ -349,6 +355,8 @@ stm8instructionSize(const lineNode *pl)
     if(isLongoff(op1start, "x") || isLongoff(op2start, "x"))
       return(3);
     if(isLongoff(op1start, "y") || isLongoff(op2start, "y"))
+      return(4);
+    if(isPtr(op1start) || isPtr(op2start))
       return(4);
     if(strchr(op1start, 'y') || strchr(op2start, 'y'))
       i++; // costs extra byte for operating with y

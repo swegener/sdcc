@@ -110,6 +110,7 @@ iCodeTable codeTable[] = {
   {LEFT_OP, "<<", picGeneric, NULL},
   {RIGHT_OP, ">>", picGeneric, NULL},
   {GET_VALUE_AT_ADDRESS, "@", picGetValueAtAddr, NULL},
+  {SET_VALUE_AT_ADDRESS, "@", picSetValueAtAddr, NULL},
   {ADDRESS_OF, "&", picAddrOf, NULL},
   {CAST, "<>", picCast, NULL},
   {'=', ":=", picAssign, NULL},

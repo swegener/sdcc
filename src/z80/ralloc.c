@@ -2017,7 +2017,7 @@ packRegsForOneuse (iCode * ic, operand * op, eBBlock * ebp)
   if (bitVectnBitsOn (OP_DEFS (op)) > 1)
     return NULL;                /* has more than one definition */
 
-  /* get the that definition */
+  /* get that definition */
   if (!(dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (op)))))
     return NULL;
 

@@ -255,6 +255,8 @@ printILine (iCode * ic)
   struct dbuf_s tmpBuf;
   iCodeTable *icTab = getTableEntry (ic->op);
 
+  wassert (icTab);
+
   dbuf_init (&tmpBuf, 1024);
 
   if (INLINEASM == ic->op)

@@ -553,7 +553,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
               const operand *const right = IC_RIGHT(cfg[*j].ic);
               const operand *const result = IC_RESULT(cfg[*j].ic);
 
-              if (!POINTER_SET(cfg[*j].ic) && 
+              if (!(POINTER_SET(cfg[*j].ic) || cfg[*j].ic->op == SET_VALUE_AT_ADDRESS) && 
                 (!left || !IS_SYMOP(left) || OP_SYMBOL_CONST(left)->key != vsym->key) &&
                 (!right || !IS_SYMOP(right) || OP_SYMBOL_CONST(right)->key != vsym->key) &&
                 result && IS_SYMOP(result) && OP_SYMBOL_CONST(result)->key == vsym->key)

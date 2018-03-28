@@ -189,7 +189,7 @@ static void set_surviving_regs(const assignment &a, unsigned short int i, const 
         continue;
       ic->rMask = bitVectSetBit(ic->rMask, a.global[*v]);
 
-      if(!((IC_RESULT(ic) && !POINTER_SET(ic)) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
+      if(!(IC_RESULT(ic) && IS_SYMOP(IC_RESULT(ic)) && OP_SYMBOL_CONST(IC_RESULT(ic))->key == I[*v].v))
         if(G[i].dying.find(*v) == G[i].dying.end())
           ic->rSurv = bitVectSetBit(ic->rSurv, a.global[*v]);
     }
@@ -378,6 +378,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case LEFT_OP:
     case RIGHT_OP:
     case GET_VALUE_AT_ADDRESS:
+    case SET_VALUE_AT_ADDRESS:
     case '=':
     case IFX:
     case ADDRESS_OF:

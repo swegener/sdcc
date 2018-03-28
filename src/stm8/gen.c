@@ -6698,29 +6698,29 @@ genAssign (const iCode *ic)
 static void
 genPointerSet (iCode * ic)
 {
-  operand *result = IC_RESULT (ic);
+  operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
   int size, i, j;
   bool use_y;
   int pushed_a = 0;
   int blen, bstr;
-  bool bit_field = IS_BITVAR (getSpec (operandType (right))) || IS_BITVAR (getSpec (operandType (result)));
+  bool bit_field = IS_BITVAR (getSpec (operandType (right))) || IS_BITVAR (getSpec (operandType (left)));
   int cache_l = -1, cache_h = -1/*, cache_a = -1*/;
   
-  blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : result)))) : 0;
-  bstr = bit_field ? (SPEC_BSTR (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : result)))) : 0;
+  blen = bit_field ? (SPEC_BLEN (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
+  bstr = bit_field ? (SPEC_BSTR (getSpec (operandType (IS_BITVAR (getSpec (operandType (right))) ? right : left)))) : 0;
 
   D (emit2 ("; genPointerSet", ""));
 
-  aopOp (result, ic);
+  aopOp (left, ic);
   aopOp (right, ic);
 
   size = right->aop->size;
 
   // In some cases a sequence of mov instructions is more efficient.
-  if (!bit_field && (result->aop->type == AOP_LIT || result->aop->type == AOP_IMMD) && (right->aop->type == AOP_DIR || right->aop->type == AOP_LIT|| right->aop->type == AOP_IMMD))
+  if (!bit_field && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && (right->aop->type == AOP_DIR || right->aop->type == AOP_LIT|| right->aop->type == AOP_IMMD))
     {
-      // First, make an estimate to find out if it is worth it (estimate not exact, could be improved a bit, probably not worth it since result type is uncommon)
+      // First, make an estimate to find out if it is worth it (estimate not exact, could be improved a bit, probably not worth it since left type is uncommon)
       const int mov_size = size * (right->aop->type == AOP_DIR ? 3 : 4);
       const int mov_cycles = size * 1;
       int normal_size = 3;
@@ -6765,44 +6765,44 @@ genPointerSet (iCode * ic)
         {
           for (i = 0; i < size; i++)
             {
-              if (result->aop->type == AOP_LIT)
-                emit2 ("mov", "0x%02x%02x+%d, %s", byteOfVal (result->aop->aopu.aop_lit, 1), byteOfVal (result->aop->aopu.aop_lit, 0), size - i - 1, aopGet (right->aop, i));
+              if (left->aop->type == AOP_LIT)
+                emit2 ("mov", "0x%02x%02x+%d, %s", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), size - i - 1, aopGet (right->aop, i));
               else
-                emit2 ("mov", "%s+%d, %s", result->aop->aopu.aop_immd, size - i - 1, aopGet (right->aop, i));
+                emit2 ("mov", "%s+%d, %s", left->aop->aopu.aop_immd, size - i - 1, aopGet (right->aop, i));
               cost (right->aop->type == AOP_DIR ? 3 : 4, 1);
             }
           goto release;
         }
     }
 
-  if (!bit_field && size == 1 && (result->aop->type == AOP_LIT || result->aop->type == AOP_IMMD) && aopInReg(right->aop, 0, A_IDX))
+  if (!bit_field && size == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && aopInReg(right->aop, 0, A_IDX))
     {
-      if (result->aop->type == AOP_LIT)
-        emit2 ("ld", "0x%02x%02x, %s", byteOfVal (result->aop->aopu.aop_lit, 1), byteOfVal (result->aop->aopu.aop_lit, 0), aopGet (right->aop, 0));
+      if (left->aop->type == AOP_LIT)
+        emit2 ("ld", "0x%02x%02x, %s", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), aopGet (right->aop, 0));
       else
-        emit2 ("ld", "%s, %s", result->aop->aopu.aop_immd, aopGet (right->aop, 0));
+        emit2 ("ld", "%s, %s", left->aop->aopu.aop_immd, aopGet (right->aop, 0));
       cost (3, 1);
       goto release;
     }
 
   // Long pointer indirect long addressing mode is useful only in two very specific cases:
-  if (!bit_field && size == 1 && result->aop->type == AOP_DIR && !regDead (X_IDX, ic) && aopInReg(right->aop, 0, A_IDX))
+  if (!bit_field && size == 1 && left->aop->type == AOP_DIR && !regDead (X_IDX, ic) && aopInReg(right->aop, 0, A_IDX))
     {
-      emit2("ld", "[%s], a", aopGet2 (result->aop, 0));
+      emit2("ld", "[%s], a", aopGet2 (left->aop, 0));
       cost (4, 4);
       goto release;
     }
-  else if (!bit_field && size == 2 && result->aop->type == AOP_DIR && (!regDead (Y_IDX, ic) || !optimize.codeSpeed) && aopInReg(right->aop, 0, X_IDX))
+  else if (!bit_field && size == 2 && left->aop->type == AOP_DIR && (!regDead (Y_IDX, ic) || !optimize.codeSpeed) && aopInReg(right->aop, 0, X_IDX))
     {
-      emit2("ldw", "[%s], x", aopGet2 (result->aop, 0));
+      emit2("ldw", "[%s], x", aopGet2 (left->aop, 0));
       cost (4, 5);
       goto release;
     }
 
   // todo: Handle this more gracefully, save x instead of using y, when doing so is more efficient.
-  use_y = (aopInReg (result->aop, 0, Y_IDX) && size <= 1 + aopInReg (right->aop, 0, X_IDX)) || regDead (Y_IDX, ic) && (!(regDead (X_IDX, ic) || aopInReg (result->aop, 0, X_IDX)) || right->aop->regs[XL_IDX] >= 0 || right->aop->regs[XH_IDX] >= 0);
+  use_y = (aopInReg (left->aop, 0, Y_IDX) && size <= 1 + aopInReg (right->aop, 0, X_IDX)) || regDead (Y_IDX, ic) && (!(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX)) || right->aop->regs[XL_IDX] >= 0 || right->aop->regs[XH_IDX] >= 0);
 
-  if (!(regDead (use_y ? Y_IDX : X_IDX, ic) || aopInReg (result->aop, 0, use_y ? Y_IDX : X_IDX)) || right->aop->regs[use_y ? YL_IDX : XL_IDX] >= 0 || right->aop->regs[use_y ? YH_IDX : XH_IDX] >= 0)
+  if (!(regDead (use_y ? Y_IDX : X_IDX, ic) || aopInReg (left->aop, 0, use_y ? Y_IDX : X_IDX)) || right->aop->regs[use_y ? YL_IDX : XL_IDX] >= 0 || right->aop->regs[use_y ? YH_IDX : XH_IDX] >= 0)
     {
       if (!regalloc_dry_run)
         wassertl (0, "No free reg for pointer.");
@@ -6811,7 +6811,7 @@ genPointerSet (iCode * ic)
       goto release;
     }
 
-  genMove (use_y ? ASMOP_Y : ASMOP_X, result->aop, regDead (A_IDX, ic) && !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, regDead (A_IDX, ic) && !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {
@@ -6959,7 +6959,7 @@ store:
 
 release:
   freeAsmop (right);
-  freeAsmop (result);
+  freeAsmop (left);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7668,11 +7668,13 @@ genSTM8iCode (iCode *ic)
       genPointerGet (ic);
       break;
 
+    case SET_VALUE_AT_ADDRESS:
+      genPointerSet (ic);
+      break;
+
     case '=':
-      if (!POINTER_SET (ic))
-        genAssign (ic);
-      else
-        genPointerSet (ic);
+      wassert (!POINTER_SET (ic));
+      genAssign (ic);
       break;
 
     case IFX:

@@ -225,6 +225,7 @@ endif
 
 ifeq ($(OPT_DISABLE_STM8), 0)
 TARGETS        += model-stm8
+TARGETS        += model-stm8-large
 endif
 
 # Compiling entire program or any subproject

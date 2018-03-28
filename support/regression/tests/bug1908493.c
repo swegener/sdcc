@@ -7,6 +7,8 @@
 
 #include <testfwk.h>
 
+#if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE)) // Assembler not suitable for 24-bit function pointers
+
 #define Q_REENTRANT __reentrant
 #define Q_ASSERT
 #define Q_SIG(me_) (((QFsm *)(me_))->evt.sig)
@@ -121,14 +123,17 @@ QHsm_dispatch (QHsm *me) Q_REENTRANT
         t = path[0];                            /* target of the transition */
     }
 }
+#endif
 
 void
 testBug (void)
 {
+#if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE)) // Assembler not suitable for 24-bit function pointers
     AO_derived.super.state = (QHsmState)state_2;
     AO_derived.super.evt.sig = 2;
 
     QHsm_dispatch ((QHsm *)&AO_derived);
+#endif
 
     ASSERT (1);     /*if we don't get here the regression test will timeout */
 }

@@ -54,7 +54,7 @@ testZ88dk(void)
   ASSERT (f1 (23) == 24);
   ASSERT (f2 (23) == 24);
   ASSERT (f4 (23) == 24);
-
+#if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE)) // Assembler not suitable for 24-bit function pointers
   p1 = &f1;
   p2 = &f2;
   p4 = &f4;
@@ -62,5 +62,6 @@ testZ88dk(void)
   ASSERT ((*p1) (23) == 24);
   ASSERT ((*p2) (23) == 24);
   ASSERT ((*p4) (23) == 24);
+#endif
 }
 

@@ -481,7 +481,9 @@ aopGet2(const asmop *aop, int offset)
     }
   else if (aop->type == AOP_IMMD)
     {
-      SNPRINTF (buffer, sizeof(buffer), offset ? "#(%s >> %d)" : "#%s", aop->aopu.aop_immd, offset * 8);
+      if (offset)
+        fprintf(stderr, "GENERATING BROKEN CODE FOR FUNCTION POINTER (%s)!\n", aop->aopu.aop_immd);
+      SNPRINTF (buffer, sizeof(buffer), "#%s", aop->aopu.aop_immd);
       return (buffer);
     }
 

@@ -108,11 +108,13 @@ int *volatile iptr;
 
 void testPointerCompare(void)
 {
+#if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE)) // Assembler not suitable for 24-bit function pointers
 	int i;
 	fptr = &testPointerCompare;
 	iptr = &i;
 	ASSERT(iptr == &i);
 	ASSERT(fptr == &testPointerCompare);
+#endif
 }
 
 /*

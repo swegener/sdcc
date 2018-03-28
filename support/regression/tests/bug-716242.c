@@ -92,6 +92,8 @@ f6 ()
 static void
 testFuncPtr (void)
 {
+#if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE)) // Assembler not suitable for 24-bit function pointers
   f1 ();
   ASSERT (ret == 4);
+#endif
 }

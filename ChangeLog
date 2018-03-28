@@ -1,5 +1,20 @@
 2018-03-28 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2124.c,
+	  support/regression/tests/bug-2373.c,
+	  support/regression/tests/bug-716242.c,
+	  support/regression/tests/bug1908493.c,
+	  support/regression/tests/compare.c,
+	  support/regression/tests/funptrs.c,
+	  support/regression/tests/gcc-torture-execute-930702-1.c,
+	  support/regression/tests/gcc-torture-execute-991112-1.c,
+	  support/regression/tests/gcc-torture-execute-func-ptr-1.c,
+	  support/regression/tests/z88dk.c:
+	  Give up on supporting function pointers for stm8 large memory model.
+
+2018-03-28 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/gen.c:
 	  Fix long long return values for large memory model.
 	* sim/ucsim/stm8.src/glob.cc:

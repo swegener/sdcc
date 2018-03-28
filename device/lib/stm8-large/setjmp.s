@@ -63,13 +63,14 @@ _longjmp:
 
 	; Calculate return value
 	popw	x
+	pop	a
 	tnzw	x
 	jrne	jump
 	incw	x
 jump:
 	; return
 	ld	a, (y)
-	ldw	y, (2, y)
+	ldw	y, (1, y)
 	pushw	y
 	push	a
 	retf

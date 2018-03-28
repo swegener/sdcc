@@ -156,7 +156,7 @@ struct dis_entry disass_stm8[]= {
   { 0x00dc, 0x00ff, ' ', 3, "jp (%2,X)" },
   { 0x00ec, 0x00ff, ' ', 2, "jp (%1,X)" },
   { 0x00fc, 0x00ff, ' ', 1, "jp (X)" },
-  { 0x00ad, 0x00ff, ' ', 4, "jpf %e" },
+  { 0x00ac, 0x00ff, ' ', 4, "jpf %e" },
   { 0x0020, 0x00ff, ' ', 2, "jra %p" },
 
   { 0x0021, 0x00ff, ' ', 2, "jrf %p" },

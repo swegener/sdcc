@@ -2,6 +2,8 @@
 
 	* src/stm8/gen.c:
 	  Fix long long return values for large memory model.
+	* sim/ucsim/stm8.src/glob.cc:
+	  Fix decoding of jpf.
 
 2018-03-28 Philipp Klaus Krause <pkk AT spth.de>
 

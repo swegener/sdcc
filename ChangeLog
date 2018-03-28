@@ -1,5 +1,10 @@
 2018-03-28 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Fix long long return values for large memory model.
+
+2018-03-28 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCC.y,
 	  src/SDCCasm.c,
 	  src/SDCCicode.c,

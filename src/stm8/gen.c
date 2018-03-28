@@ -3431,16 +3431,18 @@ genReturn (const iCode *ic)
             break;
           }
 
-      if (G.stack.pushed + 3 <= 255)
+      unsigned int o = G.stack.pushed + 3 + (options.model == MODEL_LARGE);
+
+      if (o <= 255)
         {
-          emit2 ("ldw", "x, (0x%02x, sp)", G.stack.pushed + 3);
+          emit2 ("ldw", "x, (0x%02x, sp)", o);
           cost (2, 2);
         }
       else
         {
           emit2 ("ldw", "x, sp");
           cost (1, 1);
-          emit2 ("addw", "x, #0x%04x", G.stack.pushed + 3);
+          emit2 ("addw", "x, #0x%04x", o);
           cost (3, 2);
           emit2 ("ldw", "x, (x)");
           cost (1, 1);

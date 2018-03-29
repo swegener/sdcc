@@ -1,3 +1,14 @@
+2018-03-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCast.c,
+	  src/SDCCutil.c,
+	  src/SDCCval.c,
+	  src/SDCCval.h:
+	  Make optimization of stdlib calls play nice with string reuse.
+	* support/util/dbuf.c,
+	  support/util/dbuf.h:
+	  Improve const-correctness.
+
 2018-03-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

@@ -117,6 +117,7 @@ value *reverseValWithType (value *);
 value *copyValue (value *);
 value *copyValueChain (value *);
 value *strVal (const char *);
+value *rawStrVal (const char *, size_t size);
 value *charVal (const char *);
 value *symbolVal (symbol *);
 void printVal (value *);

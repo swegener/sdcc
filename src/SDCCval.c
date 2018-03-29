@@ -1505,7 +1505,7 @@ strVal (const char *s)
   const char *utf_8;
   size_t utf_8_size;
 
-  val = newValue ();            /* get a new one */
+  val = newValue ();
 
   /* get a declarator */
   val->type = newLink (DECLARATOR);
@@ -1554,7 +1554,34 @@ strVal (const char *s)
         wassert (0);
     }
 
-  return val;
+  return (val);
+}
+
+/*------------------------------------------------------------------*/
+/* rawStrVal - converts a string to a value                         */
+/*------------------------------------------------------------------*/
+value *
+rawStrVal (const char *s, size_t size)
+{
+  struct dbuf_s dbuf;
+  value *val = newValue ();
+  
+  dbuf_init (&dbuf, size);
+  wassert (dbuf_append (&dbuf, s, size));
+
+  /* get a declarator */
+  val->type = newLink (DECLARATOR);
+  DCL_TYPE (val->type) = ARRAY;
+  val->type->next = val->etype = newLink (SPECIFIER);
+  SPEC_SCLS (val->etype) = S_LITERAL;
+  SPEC_CONST (val->etype) = 1;
+
+  SPEC_NOUN (val->etype) = V_CHAR;
+  SPEC_USIGN (val->etype) = !options.signed_char;
+  SPEC_CVAL (val->etype).v_char = dbuf_detach (&dbuf);
+  DCL_ELEM (val->type) = size;
+
+  return (val);
 }
 
 /*------------------------------------------------------------------*/

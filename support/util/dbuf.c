@@ -207,7 +207,7 @@ const char *dbuf_c_str(struct dbuf_s *dbuf)
  * Get the buffer pointer.
  */
 
-const void *dbuf_get_buf(struct dbuf_s *dbuf)
+const void *dbuf_get_buf(const struct dbuf_s *dbuf)
 {
   assert(dbuf != NULL);
   assert(dbuf->alloc != 0);
@@ -221,7 +221,7 @@ const void *dbuf_get_buf(struct dbuf_s *dbuf)
  * Get the buffer length.
  */
 
-size_t dbuf_get_length(struct dbuf_s *dbuf)
+size_t dbuf_get_length(const struct dbuf_s *dbuf)
 {
   assert(dbuf != NULL);
   assert(dbuf->alloc != 0);

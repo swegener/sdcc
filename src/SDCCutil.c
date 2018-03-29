@@ -933,8 +933,8 @@ octalEscape (const char **str)
 const char *
 copyStr (const char *src, size_t *size)
 {
- const char *begin = NULL;
- struct dbuf_s dbuf;
+  const char *begin = NULL;
+  struct dbuf_s dbuf;
 
   dbuf_init(&dbuf, 128);
 

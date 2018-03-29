@@ -3212,7 +3212,21 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
       if(!puts_sym)
         return;
 
-      DCL_ELEM (strsym->type)--;
+      // Do the equivalent of
+      // DCL_ELEM (strsym->type)--;
+      // but in a way that works better with the reuse of string symbols
+      {
+        struct dbuf_s dbuf;
+        dbuf_init (&dbuf, /*strlength - 1*/ 17);
+	wassert (dbuf_append (&dbuf, SPEC_CVAL (strlink).v_char, strlength - 1));
+        ((char *)(dbuf_get_buf (&dbuf)))[strlength - 2] = 0;
+
+        parm->opval.val = stringToSymbol (rawStrVal (dbuf_get_buf (&dbuf), strlength - 1));
+	dbuf_destroy (&dbuf);
+
+        freeStringSymbol (strsym);
+      }
+
       func->opval.val->sym = puts_sym;
     }
   // Optimize strcpy() to memcpy().

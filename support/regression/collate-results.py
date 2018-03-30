@@ -44,8 +44,14 @@ for line in lines:
     # '--- Summary: f/t/c: ...', where f = # failures, t = # test points,
     # c = # test cases.
     if (re.search(r'^--- Summary:', line)):
-        (summary, data, rest) = re.split(r':', line)
-        (nfailures, ntests, ncases) = re.split(r'/', data)
+        try:
+            (summary, data, rest) = re.split(r':', line)
+            (nfailures, ntests, ncases) = re.split(r'/', data)
+        except ValueError:
+            print("Bad summary line: ", line)
+            nfailures = '1'
+            ntests = '0'
+            ncases = '0'
         failures = failures + int(nfailures)
         tests = tests + int(ntests)
         cases = cases + int(ncases)
@@ -55,10 +61,14 @@ for line in lines:
 
     # '--- Simulator: b/t: ...', where b = # bytes, t = # ticks
     if (re.search(r'^--- Simulator:', line)):
-        (simulator, data, rest) = re.split(r':', line)
-        (nbytes, nticks) = re.split(r'/', data)
-        bytes = bytes + int(nbytes)
-        ticks = ticks + int(nticks)
+        try:
+            (simulator, data, rest) = re.split(r':', line)
+            (nbytes, nticks) = re.split(r'/', data)
+        except ValueError:
+            print("Bad simulator line", line)
+        else:
+            bytes = bytes + int(nbytes)
+            ticks = ticks + int(nticks)
         if (flag != 1):
             for e in exlist:
                 if (e in name):
@@ -77,6 +87,12 @@ for line in lines:
     if (re.search(r'HALT instruction', line) or re.search(r'Halt instruction', line) or re.search(r'halt instruction', line)):
         halt += 1
         messagelog.append("HALT instruction: %s" % name)
+    
+    # --- FAIL: "timeout, simulation killed" in xx/xx/testfile.c
+    m = re.search(r'simulation killed',line)
+    if (m):
+      name = line.split()[-1]
+      name = '.'.join(name.split('.')[0:-1])
 
 if (len(sys.argv) > 1):
     print("Summary for '%s':" % sys.argv[1], end=' ')

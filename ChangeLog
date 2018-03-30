@@ -1,3 +1,8 @@
+2018-03-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/collate-results.py: fix bug #2731 and
+	  handle malformed "Summary" and "Simulator" stats better
+
 2018-03-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCast.c,

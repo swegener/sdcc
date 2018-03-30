@@ -16,7 +16,7 @@ void foo(void)
 #ifdef TEST1
 void foo(void)
 {
-  c = 1  <<  7;
+  uc = 1 <<  7;	        /* IGNORE(SDCC) */ // Gives a false warning (bug #2733)
 
   i = c  << 10;
   i = 1  << 10;
@@ -34,7 +34,7 @@ void foo(void)
 #ifdef TEST2
 void foo(void)
 {
-  i = 1  >> 40;		/* WARNING       */
+  i = 1  >> 40;		/* IGNORE(SDCC) */ /* WARNING(GCC) */ // Warning missing (bug #2734)
 
   i = uc >>  7;
   i = 1  >>  7;

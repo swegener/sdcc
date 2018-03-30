@@ -1,3 +1,8 @@
+2018-03-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/valdiag/tests/overflow.c:
+	  Disable tests for known bugs #2733, #2734.
+
 2018-03-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/collate-results.py: fix bug #2731 and

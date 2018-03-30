@@ -2,6 +2,8 @@
 
 	* support/valdiag/tests/overflow.c:
 	  Disable tests for known bugs #2733, #2734.
+	* device/lib/stm8-large/heap.s:
+	  Fix heap initialization.
 
 2018-03-30 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

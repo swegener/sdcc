@@ -31,7 +31,7 @@
 	.globl ___sdcc_heap_end
 
 	.area GSINIT
-	call ___sdcc_heap_init
+	callf ___sdcc_heap_init
 
 	.area DATA
 	; For now just allocate 1024 bytes for the heap.

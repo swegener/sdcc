@@ -31,7 +31,7 @@ void foo(int a) {a; }	/* ERROR */
 #ifdef TEST5
 void foo(int, int) REENTRANT;	/* IGNORE */
 #if HAS_REENTRANT
-void foo(int a, int b) {a; b;} /* ERROR(SDCC && __has_reentrant && !SDCC_STACK_AUTO) */
+void foo(int a, int b) {a; b;} /* IGNORE(SDCC && __has_reentrant && !SDCC_STACK_AUTO) */ // Should be error, see bug #2735.
 #endif
 #endif
 

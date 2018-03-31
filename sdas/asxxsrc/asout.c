@@ -511,7 +511,7 @@ outrxb(int i, struct expr *esp, int r)
                                 outatxb(i,esp->e_addr);
                         }
                 } else {
-                        if ((i == 1) && (!is_sdas() || !is_sdas_target_8051_like())) {
+                        if ((i == 1) && (!is_sdas() || !(is_sdas_target_8051_like() || is_sdas_target_stm8()))) {
                                 r |= R_BYTE | R_BYTX | esp->e_rlcf;
                                 if (r & R_MSB) {
                                         out_lb(hibyte(esp->e_addr),r|R_RELOC|R_HIGH);

@@ -69,6 +69,7 @@ sdas_init (char *path)
     { "8051", TARGET_ID_8051 },
     { "390", TARGET_ID_DS390 },
     { "6808", TARGET_ID_6808 },
+    { "stm8", TARGET_ID_STM8 },
   };
   int i = NELEM (tgt);
 
@@ -132,4 +133,11 @@ is_sdas_target_8051_like(void)
 {
   check_init();
   return target == TARGET_ID_8051 || target == TARGET_ID_DS390;
+}
+
+int
+is_sdas_target_stm8(void)
+{
+  check_init();
+  return target == TARGET_ID_STM8;
 }

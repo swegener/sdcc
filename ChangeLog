@@ -9,6 +9,8 @@
 	* src/SDCCglue.c,
 	  src/stm8/gen.c:
 	  Enable support for 24-bit function pointers for stm8 large memory model.
+	* support/valdiag/Makefile.in:
+	  Omit host by default.
 
 2018-03-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

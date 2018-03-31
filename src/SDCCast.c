@@ -1643,7 +1643,7 @@ freeStringSymbol (symbol *sym)
 /*-----------------------------------------------------------------*/
 /* stringToSymbol - creates a symbol from a literal string         */
 /*-----------------------------------------------------------------*/
-static value *
+value *
 stringToSymbol (value *val)
 {
   struct dbuf_s dbuf;
@@ -3217,7 +3217,7 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
       // but in a way that works better with the reuse of string symbols
       {
         struct dbuf_s dbuf;
-        dbuf_init (&dbuf, /*strlength - 1*/ 17);
+        dbuf_init (&dbuf, strlength - 1);
 	wassert (dbuf_append (&dbuf, SPEC_CVAL (strlink).v_char, strlength - 1));
         ((char *)(dbuf_get_buf (&dbuf)))[strlength - 2] = 0;
 

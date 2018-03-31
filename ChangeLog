@@ -2,6 +2,10 @@
 
 	* src/SDCCopt.c:
 	  Consider string literal reuse in dead code elimination, part of RFE #567.
+	* src/SDCCast.c,
+	  src/SDCCast.h,
+	  src/SDCCopt.c:
+	  Merge adjacent calls to puts(), RFE #564.
 
 2018-03-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

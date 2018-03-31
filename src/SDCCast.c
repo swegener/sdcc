@@ -1626,7 +1626,7 @@ gatherAutoInit (symbol * autoChain)
 /* freeStringSymbol - delete a literal string if no more usage     */
 /*-----------------------------------------------------------------*/
 void
-freeStringSymbol (symbol * sym)
+freeStringSymbol (symbol *sym)
 {
   /* make sure this is a literal string */
   assert (sym->isstrlit);

@@ -1915,8 +1915,11 @@ killDeadCode (ebbIndex * ebbi)
 
                       /* for the left & right remove the usage */
                       if (IS_SYMOP (IC_LEFT (ic)))
-                        bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
-
+                        {
+                          if (OP_SYMBOL (IC_LEFT (ic))->isstrlit)
+                            freeStringSymbol (OP_SYMBOL (IC_LEFT (ic)));
+                          bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
+                        }
                       if (IS_SYMOP (IC_RIGHT (ic)))
                         bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
                     }

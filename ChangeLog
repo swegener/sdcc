@@ -1,3 +1,8 @@
+2018-03-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  Consider string literal reuse in dead code elimination, part of RFE #567.
+
 2018-03-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sdas/asxxsrc/asout.c

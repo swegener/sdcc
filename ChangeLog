@@ -6,6 +6,9 @@
 	  src/SDCCast.h,
 	  src/SDCCopt.c:
 	  Merge adjacent calls to puts(), RFE #564.
+	* src/SDCCglue.c,
+	  src/stm8/gen.c:
+	  Enable support for 24-bit function pointers for stm8 large memory model.
 
 2018-03-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

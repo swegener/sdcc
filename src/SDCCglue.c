@@ -1452,9 +1452,8 @@ printIvalFuncPtr (sym_link * type, initList * ilist, struct dbuf_s *oBuf)
     {
       if (TARGET_IS_STM8 && FUNCPTRSIZE == 3)
         {
-          dbuf_tprintf (oBuf, "\t.byte #0x00\n");
-          dbuf_tprintf (oBuf, "\t!dws\n", name);
-          fprintf(stderr, "GENERATING CODE FOR FUNCTION POINTER THAT WILL ONLY WORK IF THE POINTED-TO FUNCTION (%s) IS IN THE LOWER 16 BIT OF THE ADDRESS SPACE!\n", name);
+          _printPointerType (oBuf, name, size);
+          dbuf_printf (oBuf, "\n");
         }
       else if (port->use_dw_for_init)
         {

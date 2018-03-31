@@ -436,15 +436,8 @@ aopGet(const asmop *aop, int offset)
       wassertl (offset < (2 + (options.model == MODEL_LARGE)), "Immediate operand out of range");
       if (offset == 0)
         SNPRINTF (buffer, sizeof(buffer), "#<%s", aop->aopu.aop_immd);
-      else if (offset == 1)
-        SNPRINTF (buffer, sizeof(buffer), "#(%s >> 8)", aop->aopu.aop_immd);
-      else if (offset == 2)
-        {
-          SNPRINTF (buffer, sizeof(buffer), "#0x00");
-          if (!regalloc_dry_run)
-            fprintf(stderr, "GENERATING CODE FOR FUNCTION POINTER THAT WILL ONLY WORK IF THE POINTED-TO FUNCTION (%s) IS IN THE LOWER 16 BIT OF THE ADDRESS SPACE!\n", aop->aopu.aop_immd);
-          emit2(";", "BROKEN FOR >16-BIT SPACE! WOULD NEED HIGHEST BYTE OF 24-BIT ADDRESS");
-        }
+      else
+        SNPRINTF (buffer, sizeof(buffer), "#(%s >> %d)", aop->aopu.aop_immd, offset * 8);
       return (buffer);
     }
 
@@ -3024,10 +3017,7 @@ genCall (const iCode *ic)
             {
               emit2("push", "#(!tlabel)", labelKey2num (tlbl->key));
               emit2("push", "#(!tlabel >> 8)", labelKey2num (tlbl->key));
-              //emit2("push", "#(!tlabel >> 16)", labelKey2num (tlbl->key));
-              emit2("push", "#0x00");
-              fprintf(stderr, "GENERATING CODE FOR CALL VIA FUNCTION POINTER THAT WILL ONLY WORK IF THE CALLING FUNCTION IS IN THE LOWER 16 BIT OF THE ADDRESS SPACE!\n");
-              emit2(";", "BROKEN FOR >16-BIT SPACE! WOULD NEED HIGHEST BYTE OF 24-BIT ADDRESS");
+              emit2("push", "#(!tlabel >> 16)", labelKey2num (tlbl->key));
               cost (6, 3);
               G.stack.pushed += 3;
             }

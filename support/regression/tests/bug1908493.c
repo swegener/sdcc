@@ -7,8 +7,6 @@
 
 #include <testfwk.h>
 
-#if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE)) // Assembler not suitable for 24-bit function pointers
-
 #define Q_REENTRANT __reentrant
 #define Q_ASSERT
 #define Q_SIG(me_) (((QFsm *)(me_))->evt.sig)
@@ -123,7 +121,6 @@ QHsm_dispatch (QHsm *me) Q_REENTRANT
         t = path[0];                            /* target of the transition */
     }
 }
-#endif
 
 void
 testBug (void)

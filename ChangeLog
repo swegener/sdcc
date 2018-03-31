@@ -11,7 +11,8 @@
 	  Enable support for 24-bit function pointers for stm8 large memory model.
 	* support/valdiag/Makefile.in:
 	  Omit host by default.
-	* support/valdiag/tests/funcdec.c:
+	* support/valdiag/tests/funcdec.c,
+	  support/valdiag/tests/tentdecl.c:
 	  Disable test affected by bug #2735.
 
 2018-03-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>

@@ -78,14 +78,14 @@ int a=1;	/* ERROR */
 #ifdef TEST9
 #ifdef SDCC
 XDATA int a;	/* IGNORE */
-DATA int a;	/* ERROR(SDCC && __has_xdata) */
+DATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
 #endif
 #endif
 
 #ifdef TEST9b
 #ifdef SDCC
 DATA int a;	/* IGNORE */
-XDATA int a;	/* ERROR(SDCC && __has_xdata) */
+XDATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
 #endif
 #endif
 
@@ -106,21 +106,21 @@ XDATA int a;
 #ifdef TEST9e
 #ifdef SDCC
 extern XDATA int a; /* IGNORE */
-DATA int a;	/* ERROR(SDCC && __has_xdata) */
+DATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
 #endif
 #endif
 
 #ifdef TEST9f
 #ifdef SDCC
 extern DATA int a; /* IGNORE */
-XDATA int a;	/* ERROR(SDCC && __has_xdata) */
+XDATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
 #endif
 #endif
 
 #ifdef TEST10
 #if defined(SDCC) && defined(__has_xdata)
 extern volatile XDATA AT(0) int a; /* IGNORE */
-volatile XDATA int a;	/* ERROR(SDCC && __has_xdata) */
+volatile XDATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
 #endif
 #endif
 

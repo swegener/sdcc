@@ -439,20 +439,20 @@ PORT stm8_port =
   {
     "XSEG",
     "STACK",
-    "CODE",
-    "DATA",
+    "CODE",                     /* code */
+    "DATA",                     /* data */
     NULL,                       /* idata */
     NULL,                       /* pdata */
     NULL,                       /* xdata */
     NULL,                       /* bit */
-    "RSEG (ABS)",
+    "RSEG (ABS)",               /* reg */
     "GSINIT",                   /* static initialization */
     NULL,                       /* overlay */
-    "GSFINAL",
-    "HOME",
+    "GSFINAL",                  /* gsfinal */
+    "HOME",                     /* home */
     NULL,                       /* xidata */
     NULL,                       /* xinit */
-    NULL,                       /* const_name */
+    "CONST",                    /* const_name */
     "CABS (ABS)",               /* cabs_name */
     "DABS (ABS)",               /* xabs_name */
     NULL,                       /* iabs_name */

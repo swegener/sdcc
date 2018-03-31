@@ -14,6 +14,8 @@
 	* support/valdiag/tests/funcdec.c,
 	  support/valdiag/tests/tentdecl.c:
 	  Disable test affected by bug #2735.
+	* src/stm8/main.c:
+	  Separate default name for const segment from code segment.
 
 2018-03-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

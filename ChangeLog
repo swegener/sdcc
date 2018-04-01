@@ -1,3 +1,8 @@
+2018-04-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/valdiag/tests/funcdec.c,
+	* support/valdiag/tests/tentdecl.c: fix bug #2735
+
 2018-03-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:

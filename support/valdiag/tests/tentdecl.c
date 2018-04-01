@@ -76,51 +76,51 @@ int a=1;	/* ERROR */
 #endif
 
 #ifdef TEST9
-#ifdef SDCC
+#ifdef __SDCC
 XDATA int a;	/* IGNORE */
 DATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
 #endif
 #endif
 
 #ifdef TEST9b
-#ifdef SDCC
+#ifdef __SDCC
 DATA int a;	/* IGNORE */
-XDATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
+XDATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 
 #ifdef TEST9c
-#ifdef SDCC
+#ifdef __SDCC
 extern DATA int a;
 DATA int a;
 #endif
 #endif
 
 #ifdef TEST9d
-#ifdef SDCC
+#ifdef __SDCC
 extern XDATA int a;
 XDATA int a;
 #endif
 #endif
 
 #ifdef TEST9e
-#ifdef SDCC
+#ifdef __SDCC
 extern XDATA int a; /* IGNORE */
-DATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
+DATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 
 #ifdef TEST9f
-#ifdef SDCC
+#ifdef __SDCC
 extern DATA int a; /* IGNORE */
-XDATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
+XDATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 
 #ifdef TEST10
-#if defined(SDCC) && defined(__has_xdata)
+#if defined(__SDCC) && defined(__has_xdata)
 extern volatile XDATA AT(0) int a; /* IGNORE */
-volatile XDATA int a;	/* IGNORE(SDCC && __has_xdata) */ // Should be error, see bug #2735.
+volatile XDATA int a;	/* ERROR(SDCC && __has_xdata) */
 #endif
 #endif
 

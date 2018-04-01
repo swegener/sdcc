@@ -20,7 +20,7 @@ void foo(int, int);	/* IGNORE */
 void foo(int a) {a; }	/* ERROR */
 #endif
 
-#if defined(SDCC) && defined(__has_reentrant)
+#if defined(__SDCC) && defined(__has_reentrant)
 #define REENTRANT __reentrant
 #define HAS_REENTRANT 1
 #else
@@ -31,7 +31,7 @@ void foo(int a) {a; }	/* ERROR */
 #ifdef TEST5
 void foo(int, int) REENTRANT;	/* IGNORE */
 #if HAS_REENTRANT
-void foo(int a, int b) {a; b;} /* IGNORE(SDCC && __has_reentrant && !SDCC_STACK_AUTO) */ // Should be error, see bug #2735.
+void foo(int a, int b) {a; b;} /* ERROR(SDCC && __has_reentrant && !SDCC_STACK_AUTO) */
 #endif
 #endif
 

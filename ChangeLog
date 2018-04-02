@@ -1,3 +1,8 @@
+2018-04-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20060110-2.c:
+	  Disable failing test.
+
 2018-04-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/valdiag/tests/funcdec.c,

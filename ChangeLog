@@ -1,3 +1,16 @@
+2018-04-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2124.c,
+	  support/regression/tests/bug-2373.c,
+	  support/regression/tests/bug1908493.c,
+	  support/regression/tests/compare.c,
+	  support/regression/tests/funptrs.c,
+	  support/regression/tests/gcc-torture-execute-930702-1.c,
+	  support/regression/tests/gcc-torture-execute-991112-1.c,
+	  support/regression/tests/z88dk.c:
+	  Workaround for 24-bit symbol assembler issue.
+
 2018-04-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-20060110-2.c:

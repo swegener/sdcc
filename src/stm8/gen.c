@@ -456,6 +456,9 @@ aopGet2(const asmop *aop, int offset)
 {
   static char buffer[256];
 
+  /* Workaround for an assembler issue  - see below */
+  if (regalloc_dry_run && aop->type == AOP_IMMD && offset)
+    cost (100, 100);
   /* Don't really need the value during dry runs, so save some time. */
   if (regalloc_dry_run)
     return ("");
@@ -475,7 +478,7 @@ aopGet2(const asmop *aop, int offset)
   else if (aop->type == AOP_IMMD)
     {
       if (offset)
-        fprintf(stderr, "GENERATING BROKEN CODE FOR FUNCTION POINTER (%s)!\n", aop->aopu.aop_immd);
+        fprintf(stderr, "GENERATING BROKEN CODE FOR FUNCTION POINTER (%s)!\n", aop->aopu.aop_immd); /* Assembler issue - can't get upper 16 bits of 24-bit value */
       SNPRINTF (buffer, sizeof(buffer), "#%s", aop->aopu.aop_immd);
       return (buffer);
     }
@@ -3022,10 +3025,15 @@ genCall (const iCode *ic)
               G.stack.pushed += 3;
             }
 
-          cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
-          push (ASMOP_A, 0, 1);
-          cheapMove (ASMOP_A, 0, left->aop, 1, FALSE);
-          push (ASMOP_A, 0, 1);
+          if (aopInReg (left->aop, 0, X_IDX) || aopInReg (left->aop, 0, Y_IDX))
+            push (left->aop, 0, 2);
+          else
+            {
+              cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
+              push (ASMOP_A, 0, 1);
+              cheapMove (ASMOP_A, 0, left->aop, 1, FALSE);
+              push (ASMOP_A, 0, 1);
+            }
           cheapMove (ASMOP_A, 0, left->aop, 2, FALSE);
           push (ASMOP_A, 0, 1);
           emit2("retf", "");

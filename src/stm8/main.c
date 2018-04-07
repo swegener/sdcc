@@ -343,8 +343,6 @@ hasExtBitOp (int op, int size)
 static const char *
 get_model (void)
 {
-  int index;
-
   switch (options.model)
     {
     case MODEL_MEDIUM:

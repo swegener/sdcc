@@ -641,7 +641,7 @@ outrw(struct expr *esp, int r)
                                 out_lw(esp->e_addr,r|R_RELOC);
                         }
                         if (oflag) {
-                                if (!is_sdas() || !is_sdas_target_8051_like()) {
+                                if (!is_sdas() || !(is_sdas_target_8051_like() || is_sdas_target_stm8())) {
                                         outchk(2, 4);
                                         out_txb(2, esp->e_addr);
                                         if (esp->e_flag) {

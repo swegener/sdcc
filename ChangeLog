@@ -1,3 +1,9 @@
+2018-04-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure,
+	  configure.ac:
+	  Use C11 instead of ms-extensions to get support for anonymous struct.
+
 2018-04-07 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asxxsrc/asout.c (outrw): enable emit 24-bit relocation data for stm8

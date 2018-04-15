@@ -1,4 +1,4 @@
-/* config.in.  Generated from configure.in by autoheader.  */
+/* config.in.  Generated from configure.ac by autoheader.  */
 /* Define to 1 if NLS is requested.  */
 #undef ENABLE_NLS
 

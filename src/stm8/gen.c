@@ -456,7 +456,7 @@ aopGet2(const asmop *aop, int offset)
 {
   static char buffer[256];
 
-  /* Workaround for an assembler issue  - see below */
+  /* Workaround for an assembler issue */
   if (regalloc_dry_run && aop->type == AOP_IMMD && offset)
     cost (100, 100);
   /* Don't really need the value during dry runs, so save some time. */
@@ -478,8 +478,9 @@ aopGet2(const asmop *aop, int offset)
   else if (aop->type == AOP_IMMD)
     {
       if (offset)
-        fprintf(stderr, "GENERATING BROKEN CODE FOR FUNCTION POINTER (%s)!\n", aop->aopu.aop_immd); /* Assembler issue - can't get upper 16 bits of 24-bit value */
-      SNPRINTF (buffer, sizeof(buffer), "#%s", aop->aopu.aop_immd);
+        SNPRINTF (buffer, sizeof(buffer), "#(%s >> %d)", aop->aopu.aop_immd, offset * 8);
+      else
+        SNPRINTF (buffer, sizeof(buffer), "#%s", aop->aopu.aop_immd);
       return (buffer);
     }
 

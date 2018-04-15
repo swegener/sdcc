@@ -1,10 +1,7 @@
-/* ddconfig_in.h.  Generated from configure.in by autoheader.  */
+/* ddconfig_in.h.  Generated from configure.ac by autoheader.  */
 
 #ifndef DDCONFIG_HEADER
 #define DDCONFIG_HEADER
-
-//#include <stdint.h>
-
 
 /* Define to be the type of length parameter of accept (without the \*'). */
 #undef ACCEPT_SOCKLEN_T
@@ -40,14 +37,8 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
-/* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
-#undef HAVE_DOPRNT
-
 /* Define to 1 if you have the <endian.h> header file. */
 #undef HAVE_ENDIAN_H
-
-/* Define to 1 if you have the `fgets' function. */
-#undef HAVE_FGETS
 
 /* XXX */
 #undef HAVE_FLEX
@@ -61,14 +52,14 @@
 /* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
+/* Define to 1 if you have the `rt' library (-lrt). */
+#undef HAVE_LIBRT
+
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
 /* Define to 1 if you have the <machine/endian.h> header file. */
 #undef HAVE_MACHINE_ENDIAN_H
-
-/* Define to 1 if you have the `memcpy' function. */
-#undef HAVE_MEMCPY
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -82,18 +73,6 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
-/* Define to 1 if you have the `strcat' function. */
-#undef HAVE_STRCAT
-
-/* Define to 1 if you have the `strchr' function. */
-#undef HAVE_STRCHR
-
-/* Define to 1 if you have the `strcmp' function. */
-#undef HAVE_STRCMP
-
-/* Define to 1 if you have the `strcpy' function. */
-#undef HAVE_STRCPY
-
 /* Define to 1 if you have the `strdup' function. */
 #undef HAVE_STRDUP
 
@@ -105,15 +84,6 @@
 
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
-
-/* Define to 1 if you have the `strlen' function. */
-#undef HAVE_STRLEN
-
-/* Define to 1 if you have the `strstr' function. */
-#undef HAVE_STRSTR
-
-/* Define to 1 if you have the `strtok' function. */
-#undef HAVE_STRTOK
 
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */
@@ -147,20 +117,11 @@
 /* Define to 1 if you have the `vasprintf' function. */
 #undef HAVE_VASPRINTF
 
-/* Define to 1 if you have the `vprintf' function. */
-#undef HAVE_VPRINTF
-
-/* Define to 1 if you have the `vsnprintf' function. */
-#undef HAVE_VSNPRINTF
-
 /* XXX */
 #undef HAVE_WINSOCK2_H
 
 /* Define to 1 if you have the `yylex' function. */
 #undef HAVE_YYLEX
-
-/* Define to 1 if you have the `_vsnprintf' function. */
-#undef HAVE__VSNPRINTF
 
 /* XXX */
 #undef HEADER_FD
@@ -168,8 +129,7 @@
 /* XXX */
 #undef HEADER_SOCKET
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* Define to the address where bug reports for this package should be sent. */
@@ -225,9 +185,15 @@
 
 /* XXX */
 #undef TYPE_BYTE
-#undef TYPE_WORD
+
+/* XXX */
 #undef TYPE_DWORD
+
+/* XXX */
 #undef TYPE_QWORD
+
+/* XXX */
+#undef TYPE_WORD
 
 /* XXX */
 #undef UCSOCKET_T
@@ -261,10 +227,13 @@
 #undef YYTEXT_POINTER
 
 /* XXX */
-/*#undef _A_*/
+#undef _A_
 
 /* XXX */
-/*#undef _M_*/
+#undef _M_
 
+/* ucsim custom defines */
+#define DD_TRUE     1
+#define DD_FALSE    0
 #define NIL         0
 #endif /* DDCONFIG_HEADER */

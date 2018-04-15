@@ -1,4 +1,4 @@
-/* config_in.h.  Generated from configure.in by autoheader.  */
+/* config_in.h.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H

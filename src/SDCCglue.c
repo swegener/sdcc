@@ -138,7 +138,7 @@ emitDebugSym (struct dbuf_s *oBuf, symbol * sym)
 /* emitRegularMap - emit code for maps with no special cases       */
 /*-----------------------------------------------------------------*/
 static void
-emitRegularMap (memmap * map, bool addPublics, bool arFlag)
+emitRegularMap (memmap *map, bool addPublics, bool arFlag)
 {
   symbol *sym;
   ast *ival = NULL;
@@ -1025,6 +1025,10 @@ printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
 
   switch (size)
     {
+    case 0:
+      dbuf_tprintf (oBuf, "\n");
+      break;
+
     case 1:
       dbuf_tprintf (oBuf, "\t!db !constbyte\n", ival);
       bytes_written++;
@@ -1040,6 +1044,8 @@ printIvalBitFields (symbol ** sym, initList ** ilist, struct dbuf_s *oBuf)
                     (ival & 0xff), (ival >> 8) & 0xff, (ival >> 16) & 0xff, (ival >> 24) & 0xff);
       bytes_written += 4;
       break;
+    default:
+      wassert (0);
     }
   *sym = lsym;
   *ilist = lilist;

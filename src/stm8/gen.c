@@ -2716,7 +2716,12 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         }
       else
         {
-          if (!a_free)
+          if (pushed_a && left_aop->regs[A_IDX] == i && regDead (A_IDX, ic))
+            {
+              pop (ASMOP_A, 0, 1);
+              pushed_a = FALSE;
+            }
+          else if (!a_free)
             {
               push (ASMOP_A, 0, 1);
               pushed_a = TRUE;

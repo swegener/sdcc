@@ -1,7 +1,9 @@
 2018-04-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c:
-	  Fix reads from unallocted memory.
+	  Fix reads from unallocated memory.
+	* src/stm8/gen.c:
+	  Fix bug #2743.
 
 2018-04-16 Philipp Klaus Krause <pkk AT spth.de>
 

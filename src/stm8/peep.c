@@ -641,11 +641,10 @@ stm8MightRead(const lineNode *pl, const char *what)
       if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strstr (strchr(pl->line, ','), what))
         return TRUE;
 
-      if (pl->line[4] == extra && ((ISINST (pl->line, "div") || ISINST (pl->line, "mul")) && !ISINST (pl->line, "divw")))
+      if (((ISINST (pl->line, "div") || ISINST (pl->line, "mul")) && !ISINST (pl->line, "divw")) && pl->line[4] == extra)
         return TRUE;
 
-      if (pl->line[5] == extra &&
-        (ISINST (pl->line, "addw")
+      if ((ISINST (pl->line, "addw")
         || ISINST (pl->line, "cplw")
         || ISINST (pl->line, "decw")
         || ISINST (pl->line, "incw")
@@ -659,11 +658,12 @@ stm8MightRead(const lineNode *pl, const char *what)
         || ISINST (pl->line, "sraw")
         || ISINST (pl->line, "srlw")
         || ISINST (pl->line, "subw")
-        || ISINST (pl->line, "tnzw")))
+        || ISINST (pl->line, "tnzw")) &&
+        pl->line[5] == extra)
           return TRUE;
 
-      if (pl->line[6] == extra && ISINST (pl->line, "pushw")
-        || ISINST (pl->line, "swapw"))
+      if (ISINST (pl->line, "pushw")
+        || ISINST (pl->line, "swapw") && pl->line[6] == extra)
           return TRUE;
 
       if (ISINST (pl->line, "cpw") && pl->line[4] == extra)
@@ -822,12 +822,13 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
         || ISINST (pl->line, "iret"))
           return TRUE;
 
-      if (pl->line[4] == extra && ((ISINST (pl->line, "div") && !ISINST (pl->line, "divw"))
+      if (((ISINST (pl->line, "div") && !ISINST (pl->line, "divw"))
         || ISINST (pl->line, "ldw")
-        || ISINST (pl->line, "mul")))
+        || ISINST (pl->line, "mul"))
+        && pl->line[4] == extra)
           return TRUE;
 
-      if (pl->line[5] == extra && (ISINST (pl->line, "addw")
+      if ((ISINST (pl->line, "addw")
         || ISINST (pl->line, "clrw")
         || ISINST (pl->line, "cplw")
         || ISINST (pl->line, "decw")
@@ -842,10 +843,11 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
         || ISINST (pl->line, "slaw")
         || ISINST (pl->line, "sraw")
         || ISINST (pl->line, "srlw")
-        || ISINST (pl->line, "subw")))
+        || ISINST (pl->line, "subw")) &&
+        pl->line[5] == extra)
           return TRUE;
 
-      if (pl->line[6] == extra && ISINST (pl->line, "swapw"))
+      if (ISINST (pl->line, "swapw") && pl->line[6] == extra)
         return TRUE;
 
       if ((ISINST (pl->line, "ld") && !ISINST (pl->line, "ldw") && !ISINST (pl->line, "ldf"))

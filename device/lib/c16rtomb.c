@@ -34,7 +34,7 @@ size_t c16rtomb(char *restrict s, char16_t c16, mbstate_t *restrict ps)
 {
 	wchar_t codepoint;
 
-	if(ps->c[1] || ps->c[2]) // We already have the high surrogate. Now get the lowe surrogate
+	if(ps->c[1] || ps->c[2]) // We already have the high surrogate. Now get the low surrogate
 	{
 		char16_t high_surrogate = ps->c[1] + (ps->c[2] << 8);
 		ps->c[1] = ps->c[2] = 0;

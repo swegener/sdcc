@@ -1,3 +1,8 @@
+2018-04-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/wchar.c:
+	  A bit of additional UTF-16 and UTF-32 support testing.
+
 2018-04-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peep.c:

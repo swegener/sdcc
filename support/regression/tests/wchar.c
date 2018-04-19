@@ -73,6 +73,7 @@ testwcharrestart(void)
 
 	c[0] = 'C';
 	ASSERT(mbrtowc(&w, c, 1, &ps) == 1);
+	ASSERT(w == (L"C")[0]);
 	ASSERT(wcrtomb(c, w, &ps) == 1);
 	ASSERT(c[0] == 'C');
 	ASSERT(mbrtowc(&w, c, 1, &ps) == mbrlen(c, 1, &ps));
@@ -89,6 +90,7 @@ testchar16restart(void)
 
 	c[0] = 'C';
 	ASSERT(mbrtoc16(c16, c, 1, &ps) == 1);
+	ASSERT(c16[0] == (u"C")[0]);
 	ASSERT(c16rtomb(c, c16[0], &ps) == 1);
 	ASSERT(c[0] == 'C');
 #endif
@@ -104,6 +106,7 @@ testchar32restart(void)
 
 	c[0] = 'C';
 	ASSERT(mbrtoc32(c32, c, 1, &ps) == 1);
+	ASSERT(c32[0] == (U"C")[0]);
 	ASSERT(c32rtomb(c, c32[0], &ps) == 1);
 	ASSERT(c[0] == 'C');
 #endif

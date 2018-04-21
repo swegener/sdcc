@@ -1,6 +1,12 @@
 2018-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdint.h,
+	  support/regression/tests/constantRange.c:
+	  Fix intmax_t, uintmax_t limit macros.
+
+2018-04-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdint.h,
 	  support/regression/tests/wchar.c:
 	  Fix wchar_t, wint_t limit macros.
 

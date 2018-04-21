@@ -196,13 +196,25 @@ typedef unsigned long long int  uintmax_t;
 #endif
 
 /* Minimum for largest signed integral type.  */
-#define INTMAX_MIN             (-__INT32_C(-2147483647L)-1)
+#ifndef __SDCC_LONGLONG
+#define INTMAX_MIN             (-2147483647L-1)
+#else
+#define INTMAX_MIN             (-9223372036854775807LL-1)
+#endif
+
 /* Maximum for largest signed integral type.  */
-#define INTMAX_MAX             (__INT32_C(2147483647L))
+#ifndef __SDCC_LONGLONG
+#define INTMAX_MAX             (2147483647L)
+#else
+#define INTMAX_MAX             (9223372036854775807LL)
+#endif
 
 /* Maximum for largest unsigned integral type.  */
-#define UINTMAX_MAX            (__UINT32_C(4294967295UL))
-
+#ifndef __SDCC_LONGLONG
+#define UINTMAX_MAX            (4294967295UL)
+#else
+#define UINTMAX_MAX            (18446744073709551615ULL)
+#endif
 
 /* Limits of other integer types.  */
 

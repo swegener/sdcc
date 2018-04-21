@@ -234,11 +234,11 @@ typedef unsigned long long int  uintmax_t;
 #define UINT64_C(c)    c ## ULL
 #endif
 
-#define WCHAR_MIN      CHAR_MIN
-#define WCHAR_MAX      CHAR_MAX
+#define WCHAR_MIN      0
+#define WCHAR_MAX      0xffffffff
 
-#define WINT_MIN       INT_MIN
-#define WINT_MAX       INT_MAX
+#define WINT_MIN       0
+#define WINT_MAX       0xffffffff
 
 /* Maximal type.  */
 #ifdef __SDCC_LONGLONG

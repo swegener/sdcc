@@ -13,6 +13,12 @@
 #include <uchar.h>
 #endif
 
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#include <stdint.h>
+_Static_assert(!WCHAR_MIN, "nonzero WCHAR_MIN");
+_Static_assert(WEOF <= WINT_MAX, "WEOF out of wint_t range");
+#endif
+
 static void
 testwcharnorestart(void)
 {

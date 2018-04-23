@@ -15,8 +15,10 @@
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 #include <stdint.h>
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 _Static_assert(!WCHAR_MIN, "nonzero WCHAR_MIN");
 _Static_assert(WEOF <= WINT_MAX, "WEOF out of wint_t range");
+#endif
 #endif
 
 static void
@@ -33,6 +35,14 @@ testwcharnorestart(void)
 	ASSERT(wctob(btowc('C')) == 'C');
 	ASSERT(btowc(EOF) == WEOF);
 	ASSERT(wctob(WEOF) == EOF);
+
+	ASSERT(wctomb(c, L'W') == 1);
+	ASSERT(c[0] == 'W');
+#ifdef __STDC_ISO_10646__
+	ASSERT(wctomb(c, 0x110000) == -1);
+	ASSERT(wctomb(c, 0xd800) == -1);
+	ASSERT(wctomb(c, 0xdfff) == -1);
+#endif
 #endif
 }
 

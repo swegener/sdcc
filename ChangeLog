@@ -2,6 +2,9 @@
 
 	* doc/sdccman.lyx:
 	  Update documentation on long long support.
+	* device/lib/wctomb.c,
+	  support/regression/tests/wchar.c:
+	  Fix wctomb() error handling wrt. invalid surrogate codepoints.
 
 2018-04-21 Philipp Klaus Krause <pkk AT spth.de>
 

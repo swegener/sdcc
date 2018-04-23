@@ -46,6 +46,8 @@ int wctomb(char *s, wchar_t wc)
 		s[1] = (wc >> 0) & 0x3f | 0x80;
 		return(2);
 	}
+	else if(wc >= 0xd800 && wc < 0xe000) // Unpaired surrogate
+		return(-1);
 	else if(wc < 0x10000)
 	{
 		s[0] = (wc >> 12) & 0x0f | 0xe0;

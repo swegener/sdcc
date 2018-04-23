@@ -8,6 +8,9 @@
 	* device/lib/wcrtomb.c,
 	  support/regression/tests/wchar.c:
 	  Fix wcrtomb() errno handling.
+	* device/lib/mbrtowc.c,
+	  device/lib/mbtowc.c:
+	  Improve mbrtowc(), mbtowc() error handling.
 
 2018-04-21 Philipp Klaus Krause <pkk AT spth.de>
 

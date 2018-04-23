@@ -47,7 +47,7 @@ int mbtowc(wchar_t *pwc, const char *restrict s, size_t n)
 		first_byte &= (0xff >> (seqlen + 1));
 	}
 
-	if(n < seqlen)
+	if(seqlen > 4 || n < seqlen)
 		return(-1);
 
 	for(i = 1; i < seqlen; i++)
@@ -62,6 +62,9 @@ int mbtowc(wchar_t *pwc, const char *restrict s, size_t n)
 		codepoint |= (*s & 0x3f);
 		s++;
 	}
+
+	if(codepoint >= 0xd800 && codepoint <= 0xdfff) // UTF-16 surrogate.
+		return(-1);
 
 	*pwc = codepoint;
 	return(codepoint ? seqlen : 0);

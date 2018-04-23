@@ -57,7 +57,7 @@ size_t mbrtoc16(char16_t *restrict pc16, const char *restrict s, size_t n, mbsta
 	if(ret > MB_LEN_MAX)
 		return(ret);
 
-	if (codepoint < 0xd7ff || codepoint >= 0xe000 && codepoint <= 0xffff) // Basic multilingual plane
+	if (codepoint <= 0xffff) // Basic multilingual plane
 	{
 		if(pc16)
 			*pc16 = codepoint;

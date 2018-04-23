@@ -11,6 +11,11 @@
 	* device/lib/mbrtowc.c,
 	  device/lib/mbtowc.c:
 	  Improve mbrtowc(), mbtowc() error handling.
+	* device/lib/mbrtoc16.c:
+	  Simplify mbrtoc16() by relying on mbrtowc() error handling.
+	* device/lib/c16rtomb.c,
+	  support/regression/tests/wchar.c:
+	  Fix c16rtomb() error handling.
 
 2018-04-21 Philipp Klaus Krause <pkk AT spth.de>
 

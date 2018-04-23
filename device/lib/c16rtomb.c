@@ -29,26 +29,53 @@
 #include <uchar.h>
 
 #include <stdlib.h>
+#include <limits.h>
+#include <errno.h>
 
 size_t c16rtomb(char *restrict s, char16_t c16, mbstate_t *restrict ps)
 {
 	wchar_t codepoint;
+	char buf[MB_LEN_MAX];
+	static mbstate_t sps;
 
-	if(ps->c[1] || ps->c[2]) // We already have the high surrogate. Now get the low surrogate
+	if(!s)
+		s = buf;
+
+	if(!ps)
+		ps = &sps;
+
+	if (!c16) // 0 always resets conversion state.
 	{
-		char16_t high_surrogate = ps->c[1] + (ps->c[2] << 8);
+		ps->c[1] = ps->c[2] = 0;
+		codepoint = 0;
+	}
+	else if(ps->c[1] || ps->c[2]) // We already have the high surrogate. Now get the low surrogate
+	{
+		char16_t high_surrogate;
+
+		if(c16 < 0xdc00 || c16 > 0xdfff)
+			goto eilseq;
+
+		high_surrogate = ps->c[1] + (ps->c[2] << 8);
 		ps->c[1] = ps->c[2] = 0;
 		codepoint = (high_surrogate << 10) - (0xd800 << 10) + c16 - 0xdc00 + 0x10000;
 	}
-	else if (c16 < 0xd7ff || c16 >= 0xe000) // Basic multilingual plane.
+	else if(c16 < 0xd7ff || c16 >= 0xe000) // Basic multilingual plane.
 		codepoint = c16;
 	else // Get the high surrogate
 	{
+		if(c16 > 0xdbff)
+			goto eilseq;
+
 		ps->c[1] = c16 & 0xff;
 		ps->c[2] = c16 >> 8;
 		return(0);
 	}
 
 	return(wctomb(s, codepoint));
+
+eilseq:
+	errno = EILSEQ;
+	return(-1);
 }
 

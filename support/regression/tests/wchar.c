@@ -117,6 +117,22 @@ testchar16restart(void)
 	ASSERT(c16[0] == (u"C")[0]);
 	ASSERT(c16rtomb(c, c16[0], &ps) == 1);
 	ASSERT(c[0] == 'C');
+
+	ASSERT(c16rtomb(0, c16[0], 0) == 1);
+
+#ifdef __STDC_UTF_16__
+	ASSERT(c16rtomb(c, 0xdc00, 0) == -1);  // Invalid: Unpaired UTF-16 surrogate.
+	ASSERT(errno == EILSEQ);
+
+	errno = 0;
+	ASSERT(c16rtomb(c, u'\0', 0) == 1);    // Converting a 0 character resets internal state.
+
+	ASSERT(c16rtomb(c, 0xd800, 0) == 0);
+	ASSERT(c16rtomb(c, 0xd800, 0) == -1);  // Invalid: Unpaired UTF-16 surrogate.
+	ASSERT(errno == EILSEQ);
+	errno = 0;
+	ASSERT(c16rtomb(c, u'\0', 0) == 1);    // Converting a 0 character resets internal state.
+#endif
 #endif
 }
 

@@ -5,6 +5,9 @@
 	* device/lib/wctomb.c,
 	  support/regression/tests/wchar.c:
 	  Fix wctomb() error handling wrt. invalid surrogate codepoints.
+	* device/lib/wcrtomb.c,
+	  support/regression/tests/wchar.c:
+	  Fix wcrtomb() errno handling.
 
 2018-04-21 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
+#include <errno.h>
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L
 #include <wchar.h>
 #endif
@@ -39,9 +40,9 @@ testwcharnorestart(void)
 	ASSERT(wctomb(c, L'W') == 1);
 	ASSERT(c[0] == 'W');
 #ifdef __STDC_ISO_10646__
-	ASSERT(wctomb(c, 0x110000) == -1);
-	ASSERT(wctomb(c, 0xd800) == -1);
-	ASSERT(wctomb(c, 0xdfff) == -1);
+	ASSERT(wctomb(c, 0x110000) == -1); // Invalid: Out of 21-bit Unicode range.
+	ASSERT(wctomb(c, 0xd800) == -1);   // Invalid: Unpaired UTF-16 surrogate.
+	ASSERT(wctomb(c, 0xdfff) == -1);   // Invalid: Unpaired UTF-16 surrogate.
 #endif
 #endif
 }
@@ -93,6 +94,13 @@ testwcharrestart(void)
 	ASSERT(wcrtomb(c, w, &ps) == 1);
 	ASSERT(c[0] == 'C');
 	ASSERT(mbrtowc(&w, c, 1, &ps) == mbrlen(c, 1, &ps));
+#ifdef __STDC_ISO_10646__
+	errno = 0;
+	ASSERT(wcrtomb(c, 0x110000, 0) == -1); // Invalid: Out of 21-bit Unicode range.
+	ASSERT(errno == EILSEQ);
+	ASSERT(wcrtomb(c, 0xd800, 0) == -1);   // Invalid: Unpaired UTF-16 surrogate.
+	ASSERT(wcrtomb(c, 0xdfff, 0) == -1);   // Invalid: Unpaired UTF-16 surrogate.
+#endif
 #endif
 }
 

@@ -38,7 +38,7 @@ size_t c16rtomb(char *restrict s, char16_t c16, mbstate_t *restrict ps)
 	{
 		char16_t high_surrogate = ps->c[1] + (ps->c[2] << 8);
 		ps->c[1] = ps->c[2] = 0;
-		codepoint = (high_surrogate << 10) + c16 + 0x10000 - (0xd800 << 10) - 0xdc00;
+		codepoint = (high_surrogate << 10) - (0xd800 << 10) + c16 - 0xdc00 + 0x10000;
 	}
 	else if (c16 < 0xd7ff || c16 >= 0xe000) // Basic multilingual plane.
 		codepoint = c16;

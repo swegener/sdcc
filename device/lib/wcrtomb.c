@@ -29,11 +29,19 @@
 #include <wchar.h>
 
 #include <stdlib.h>
+#include <errno.h>
 
 size_t wcrtomb(char *restrict s, wchar_t wc, mbstate_t *restrict ps)
 {
+	size_t ret;
+
 	ps;
 
-	return(wctomb(s, wc));
+	ret = wctomb(s, wc);
+
+	if(ret == (size_t)(-1))
+		errno = EILSEQ;
+
+	return(ret);
 }
 

@@ -2,6 +2,10 @@
 
 	* device/include/stdbool.h:
 	  Change the type of true and false to _Bool (see also N 2229).
+	* device/include/assert.h,
+	  device/lib/__assert.c,
+	  device/lib/incl.mk:
+	  Fix bug #2745.
 
 2018-04-23 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -29,9 +29,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void _assert(char *expr, const char *filename, unsigned int linenumber)
+void __assert(const char *expression, const char *functionname, const char *filename, unsigned int linenumber)
 {
-	printf("Assert(%s) failed at line %u in file %s.\n",
-		expr, linenumber, filename);
-	while(1);
+	printf("Assert(%s) failed in function %s at line %u in file %s.\n",
+		expression, functionname, linenumber, filename);
+	for(;;);
 }
+

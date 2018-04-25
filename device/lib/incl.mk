@@ -119,7 +119,7 @@ COMMON_SDCC = \
   printf_large.c \
   puts.c \
   gets.c \
-  assert.c \
+  __assert.c \
   time.c
 
 MODELS = small medium large huge

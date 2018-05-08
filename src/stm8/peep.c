@@ -609,8 +609,7 @@ stm8MightRead(const lineNode *pl, const char *what)
         || ISINST (pl->line, "xor"))
           return TRUE;
 
-      if (pl->line[4] == 'a' &&
-        (ISINST (pl->line, "add")
+      if ((ISINST (pl->line, "add")
         || ISINST (pl->line, "cpl")
         || ISINST (pl->line, "dec")
         || ISINST (pl->line, "exg")
@@ -623,11 +622,13 @@ stm8MightRead(const lineNode *pl, const char *what)
         || ISINST (pl->line, "sra")
         || ISINST (pl->line, "srl")
         || ISINST (pl->line, "sub")
-        || ISINST (pl->line, "tnz")))
+        || ISINST (pl->line, "tnz")) &&
+        pl->line[4] == 'a')
           return TRUE;
 
-      if ((pl->line[5] == 'a') && (ISINST (pl->line, "push")
-        || ISINST (pl->line, "swap")))
+      if ((ISINST (pl->line, "push")
+        || ISINST (pl->line, "swap")) &&
+        pl->line[5] == 'a')
           return TRUE;
 
       if ((ISINST (pl->line, "ld") || ISINST (pl->line, "ldf")) && argCont (strchr (pl->line, ','), 'a'))
@@ -790,8 +791,7 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
         || ISINST (pl->line, "xor"))
           return TRUE;
 
-      if (pl->line[4] == 'a' &&
-        (ISINST (pl->line, "add")
+      if ((ISINST (pl->line, "add")
         || ISINST (pl->line, "clr")
         || ISINST (pl->line, "cpl")
         || ISINST (pl->line, "dec")
@@ -806,13 +806,14 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
         || ISINST (pl->line, "sra")
         || ISINST (pl->line, "srl")
         || ISINST (pl->line, "ldf")
-        || ISINST (pl->line, "sub")))
+        || ISINST (pl->line, "sub")) &&
+        pl->line[4] == 'a')
           return TRUE;
 
-      if (pl->line[5] == 'a' && ISINST (pl->line, "swap"))
+      if (ISINST (pl->line, "swap") && pl->line[5] == 'a')
         return TRUE;
 
-      if (pl->line[3] == 'a' && ISINST (pl->line, "ld"))
+      if (ISINST (pl->line, "ld") && pl->line[3] == 'a')
         return TRUE;
     }
   else

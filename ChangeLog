@@ -2,6 +2,8 @@
 
 	* support/regression/tests/bug-2746.c:
 	  Test for bug #2746.
+	* src/stm8/peep.c:
+	  Fix reads from unallocated memory.
 
 2018-04-25 Philipp Klaus Krause <pkk AT spth.de>
 

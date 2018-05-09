@@ -3,6 +3,10 @@
 	* src/stm8/gen.c,
 	  src/SDCCval.c:
 	  Fix use of undefined behaviour (left shift by negative amount).
+	* support/regression/tests/bug-2749.c:
+	  Test for bug #2749.
+	* src/SDCCglue.c:
+	  Codecleanup.
 
 2018-05-08 Philipp Klaus Krause <pkk AT spth.de>
 

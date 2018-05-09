@@ -662,11 +662,6 @@ void
 printChar16 (struct dbuf_s *oBuf, const TYPE_TARGET_UINT *s, int plen)
 {
   int pplen = 0;
-  int strEnd = plen - 1;
-
-  if (s)
-    while (s[strEnd] != 0)
-      strEnd--;
 
   while (pplen < plen)
     {
@@ -692,11 +687,6 @@ void
 printChar32 (struct dbuf_s *oBuf, const TYPE_TARGET_ULONG *s, int plen)
 {
   int pplen = 0;
-  int strEnd = plen - 1;
-
-  if (s)
-    while (s[strEnd] != 0)
-      strEnd--;
 
   while (pplen < plen)
     {

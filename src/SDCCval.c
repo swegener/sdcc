@@ -1908,6 +1908,8 @@ byteOfVal (value * val, int offset)
   unsigned char *p;
   int shift = 8*offset;
 
+  wassert (offset >= 0);
+
   if (!val)
     return 0;
 

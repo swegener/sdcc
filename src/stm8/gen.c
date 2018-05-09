@@ -2185,7 +2185,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             }
           i += 2;
         }
-      else if (i + 1 < size && source->type == AOP_LIT && aopIsLitVal (source, soffset + i, 2, byteOfVal (source->aopu.aop_lit, soffset + i - 2) + byteOfVal (source->aopu.aop_lit, soffset + i - 1) * 256) &&
+      else if (i + 1 < size && i >= 2 && source->type == AOP_LIT && aopIsLitVal (source, soffset + i, 2, byteOfVal (source->aopu.aop_lit, soffset + i - 2) + byteOfVal (source->aopu.aop_lit, soffset + i - 1) * 256) &&
         (aopInReg (result, roffset + i, X_IDX) && aopInReg (result, roffset + i - 2, Y_IDX) || aopInReg (result, roffset + i, Y_IDX) && aopInReg (result, roffset + i - 2, X_IDX)))
         {
           emit2 ("ldw", "%s, %s", aopGet2 (result, roffset + i), aopGet2 (result, roffset + i - 2));

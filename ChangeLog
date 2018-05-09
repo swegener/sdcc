@@ -1,5 +1,11 @@
 2018-05-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  src/SDCCval.c:
+	  Fix use of undefined behaviour (left shift by negative amount).
+
+2018-05-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/bug-2746.c:
 	  Test for bug #2746.
 	* src/stm8/peep.c:

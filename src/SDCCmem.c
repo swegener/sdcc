@@ -86,7 +86,7 @@ allocMap (char rspace,          /* sfr space                   */
       exit (1);
     }
 
-  memset (map, ZERO, sizeof (memmap));
+  memset (map, 0, sizeof (memmap));
   map->regsp = rspace;
   map->fmap = farmap;
   map->paged = paged;

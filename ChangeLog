@@ -6,7 +6,14 @@
 	* support/regression/tests/bug-2749.c:
 	  Test for bug #2749.
 	* src/SDCCglue.c:
-	  Codecleanup.
+	  Code cleanup.
+	* src/SDCCglobl.h,
+	  src/SDCCmem.c,
+	  src/SDCCutil.c,
+	  src/pic14/genarith.c,
+	  src/pic16/genarith.c,
+	  src/stm8/peep.c:
+	  Code cleanup by relying on ISO C99 support.
 
 2018-05-08 Philipp Klaus Krause <pkk AT spth.de>
 

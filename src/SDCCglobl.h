@@ -26,34 +26,16 @@
 #include <setjmp.h>
 #include <stdio.h>
 
-#ifndef __cplusplus
-# ifndef _MSC_VER
-#   include <stdbool.h>
-#   ifndef TRUE
-#     define TRUE   true
-#   endif
-#   ifndef FALSE
-#     define FALSE  false
-#   endif
-# else
-    typedef unsigned char bool;
-#   define true     1
-#   define false    0
-#   ifndef TRUE
-#     define TRUE   1
-#   endif
-#   ifndef FALSE
-#     define FALSE  0
-#   endif
+# ifndef __cplusplus
+#  include <stdbool.h>
 # endif
-#else
+
 # ifndef TRUE
 #   define TRUE     true
 # endif
 # ifndef FALSE
 #   define FALSE    false
 # endif
-#endif
 
 #include "SDCCset.h"
 
@@ -112,7 +94,6 @@
 #include "SDCCerr.h"
 
 #define SPACE ' '
-#define ZERO  0
 
 #include <limits.h>             /* PATH_MAX                  */
 #if !defined(PATH_MAX) || (PATH_MAX < 2048)
@@ -140,7 +121,7 @@
 # define THROW_BOTH  3
 #endif
 
-/* size's in bytes  */
+/* sizes in bytes  */
 #define BOOLSIZE      port->s.char_size
 #define CHARSIZE      port->s.char_size
 #define SHORTSIZE     port->s.short_size
@@ -155,10 +136,6 @@
 #define BITSIZE       port->s.bit_size
 #define FLOATSIZE     port->s.float_size
 
-#define  SMALL_MODEL  0
-#define  LARGE_MODEL  1
-
-#define MAX_TVAR      6
 #define INITIAL_INLINEASM (4 * 1024)
 #define DEFPOOLSTACK(type,size)     \
     type       *type##Pool        ; \
@@ -185,12 +162,6 @@
         typedef type t_##stack;                                     \
         t_##stack stack[size];                                      \
         t_##stack (*p_##stack) = stack - 1;
-
-/* define extern stack */
-#define EXTERN_STACK_DCL(stack, type, size)                         \
-        typedef type t_##stack;                                     \
-        extern t_##stack stack[size];                               \
-        extern t_##stack *p_##stack;
 
 #define STACK_EMPTY(stack)     ((p_##stack) < stack)
 #define STACK_FULL(stack)      ((p_##stack) >= (stack +             \

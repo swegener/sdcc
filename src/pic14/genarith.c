@@ -29,10 +29,6 @@
       Made everything static
 -------------------------------------------------------------------------*/
 
-#if defined(_MSC_VER) && (_MSC_VER < 1300)
-#define __FUNCTION__    __FILE__
-#endif
-
 #include "common.h"
 #include "newalloc.h"
 //#include "SDCCglobl.h"

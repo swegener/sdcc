@@ -11,12 +11,6 @@
 #define EQUALS(l, i) (!strcmp((l), (i)))
 #define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1))
 
-// This function should behave just like C99 isblank(). Remove it, once MSVC supports isblank().
-static int _isblank(int c)
-{
-  return (c == ' ' || c == '\t');
-}
-
 typedef enum
 {
   S4O_CONDJMP,
@@ -487,13 +481,13 @@ static bool argCont(const char *arg, char what)
   if (arg == NULL || strlen (arg) == 0 || !(what == 'a' || what == 'x' || what == 'y'))
     return FALSE;
 
-  while (_isblank ((unsigned char)(arg[0])))
+  while (isblank ((unsigned char)(arg[0])))
     arg++;
 
   if (arg[0] == ',')
     arg++;
 
-  while (_isblank ((unsigned char)(arg[0])))
+  while (isblank ((unsigned char)(arg[0])))
     arg++;
 
   if (arg[0] == '#')

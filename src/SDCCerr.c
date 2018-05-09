@@ -545,6 +545,10 @@ struct
     "mutiple interrupt numbers for '%s'", 0},
   { W_INCOMPAT_PTYPES, ERROR_LEVEL_WARNING,
      "pointer types incompatible ", 0 },
+  { E_STATIC_ASSERTION_C2X, ERROR_LEVEL_ERROR,
+    "static assertion with one argument requires C2X or later", 0 },
+  { W_STATIC_ASSERTION_2, ERROR_LEVEL_WARNING,
+    "static assertion failed", 0 },
 };
 
 /* -------------------------------------------------------------------------------

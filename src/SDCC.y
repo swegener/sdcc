@@ -1942,6 +1942,16 @@ static_assert_declaration
                                        else if (!ulFromVal(val))
                                          werror (W_STATIC_ASSERTION, $5);
                                     }
+   | STATIC_ASSERT '(' constant_expr ')'
+                                    {
+                                       value *val = constExprValue ($3, TRUE);
+                                       if (!options.std_c2x)
+                                         werror (E_STATIC_ASSERTION_C2X);
+                                       if (!val)
+                                         werror (E_CONST_EXPECTED);
+                                       else if (!ulFromVal(val))
+                                         werror (W_STATIC_ASSERTION_2);
+                                    }
    ;
 
 statement

@@ -271,6 +271,8 @@ enum {
   E_STATIC_ARRAY_PARAM_C99      = 242, /* static in array parameters requires ISO C99 or later */
   E_INT_MULTIPLE                = 243, /* mutiple interrupt numbers */
   W_INCOMPAT_PTYPES             = 244, /* incompatible pointer assignment (not allowed by the standard, but allowed in SDCC) */
+  E_STATIC_ASSERTION_C2X        = 245, /* static assertion with one argument requires C2X or later */
+  W_STATIC_ASSERTION_2          = 246, /* static assertion failed */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -1,5 +1,14 @@
 2018-05-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCglobl.h,
+	  src/SDCCmain.c:
+	  Support for C2X static_assert variant.
+
+2018-05-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/gen.c,
 	  src/SDCCval.c:
 	  Fix use of undefined behaviour (left shift by negative amount).

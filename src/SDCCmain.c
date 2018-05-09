@@ -136,9 +136,11 @@ char buffer[PATH_MAX * 2];
 #define OPTION_STD_C95              "--std-c95"
 #define OPTION_STD_C99              "--std-c99"
 #define OPTION_STD_C11              "--std-c11"
+#define OPTION_STD_C2X              "--std-c2x"
 #define OPTION_STD_SDCC89           "--std-sdcc89"
 #define OPTION_STD_SDCC99           "--std-sdcc99"
 #define OPTION_STD_SDCC11           "--std-sdcc11"
+#define OPTION_STD_SDCC2X           "--std-sdcc2x"
 #define OPTION_CODE_SEG             "--codeseg"
 #define OPTION_CONST_SEG            "--constseg"
 #define OPTION_DATA_SEG             "--dataseg"
@@ -190,6 +192,8 @@ static const OPTION optionsTable[] = {
   {0,   OPTION_STD_SDCC99, NULL, "Use ISO C99 standard with SDCC extensions"},
   {0,   OPTION_STD_C11, NULL, "Use ISO C11 standard (incomplete)"},
   {0,   OPTION_STD_SDCC11, NULL, "Use ISO C11 standard with SDCC extensions (default)"},
+  {0,   OPTION_STD_C2X, NULL, "Use ISO C2X standard (incomplete)"},
+  {0,   OPTION_STD_SDCC2X, NULL, "Use ISO C2X standard with SDCC extensions"},
   {0,   OPTION_DOLLARS_IN_IDENT, &options.dollars_in_ident, "Permit '$' as an identifier character"},
   {0,   OPTION_SIGNED_CHAR, &options.signed_char, "Make \"char\" signed by default"},
   {0,   OPTION_USE_NON_FREE, &options.use_non_free, "Search / include non-free licensed libraries and header files"},
@@ -612,6 +616,7 @@ setDefaultOptions (void)
   options.std_c95 = 1;
   options.std_c99 = 1;
   options.std_c11 = 1;          /* default to C11 (we want inline by default, so we need at least C99, and support for C11 is more complete than C99) */
+  options.std_c2x = 0;
   options.code_seg = CODE_NAME ? Safe_strdup (CODE_NAME) : NULL;        /* default to CSEG for generated code */
   options.const_seg = CONST_NAME ? Safe_strdup (CONST_NAME) : NULL;     /* default to CONST for generated code */
   options.data_seg = DATA_NAME ? Safe_strdup (DATA_NAME) : NULL;        /* default to DATA for non-initialized data */
@@ -1143,6 +1148,7 @@ parseCmdLine (int argc, char **argv)
               options.std_c95 = 0;
               options.std_c99 = 0;
               options.std_c11 = 0;
+              options.std_c2x = 0;
               options.std_sdcc = 0;
               continue;
             }
@@ -1152,6 +1158,7 @@ parseCmdLine (int argc, char **argv)
               options.std_c95 = 1;
               options.std_c99 = 0;
               options.std_c11 = 0;
+              options.std_c2x = 0;
               options.std_sdcc = 0;
               continue;
             }
@@ -1161,6 +1168,7 @@ parseCmdLine (int argc, char **argv)
               options.std_c95 = 1;
               options.std_c99 = 1;
               options.std_c11 = 0;
+              options.std_c2x = 0;
               options.std_sdcc = 0;
               continue;
             }
@@ -1170,6 +1178,17 @@ parseCmdLine (int argc, char **argv)
               options.std_c95 = 1;
               options.std_c99 = 1;
               options.std_c11 = 1;
+              options.std_c2x = 0;
+              options.std_sdcc = 0;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_STD_C2X) == 0)
+            {
+              options.std_c95 = 1;
+              options.std_c99 = 1;
+              options.std_c11 = 1;
+              options.std_c2x = 1;
               options.std_sdcc = 0;
               continue;
             }
@@ -1179,6 +1198,7 @@ parseCmdLine (int argc, char **argv)
               options.std_c95 = 0;
               options.std_c99 = 0;
               options.std_c11 = 0;
+              options.std_c2x = 0;
               options.std_sdcc = 1;
               continue;
             }
@@ -1188,6 +1208,7 @@ parseCmdLine (int argc, char **argv)
               options.std_c95 = 1;
               options.std_c99 = 1;
               options.std_c11 = 0;
+              options.std_c2x = 0;
               options.std_sdcc = 1;
               continue;
             }
@@ -1197,6 +1218,17 @@ parseCmdLine (int argc, char **argv)
               options.std_c95 = 1;
               options.std_c99 = 1;
               options.std_c11 = 1;
+              options.std_c2x = 0;
+              options.std_sdcc = 1;
+              continue;
+            }
+
+          if (strcmp (argv[i], OPTION_STD_SDCC2X) == 0)
+            {
+              options.std_c95 = 1;
+              options.std_c99 = 1;
+              options.std_c11 = 1;
+              options.std_c2x = 1;
               options.std_sdcc = 1;
               continue;
             }

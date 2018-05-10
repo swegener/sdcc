@@ -384,7 +384,7 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
     return 0;
 
   /* if the result is on stack or iaccess then it must be
-     the same atleast one of the operands */
+     the same as at least one of the operands */
   if (OP_SYMBOL (IC_RESULT (ic))->onStack || OP_SYMBOL (IC_RESULT (ic))->iaccess)
     {
       /* the operation has only one symbol
@@ -477,9 +477,7 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
       if (IS_OP_VOLATILE (IC_LEFT (nic)) ||
           IS_OP_VOLATILE (IC_RIGHT (nic)) ||
           isOperandGlobal (IC_RESULT (nic)))
-        {
-          return 0;
-        }
+        return 0;
     }
 
   /* Optimize out the assignment */
@@ -575,7 +573,8 @@ packRegisters (eBBlock * ebp)
 
       /* In some cases redundant moves can be eliminated */
       if (ic->op == GET_VALUE_AT_ADDRESS || ic->op == SET_VALUE_AT_ADDRESS ||
-        ic->op == IFX && operandSize (IC_COND (ic)) == 1)
+        ic->op == IFX && operandSize (IC_COND (ic)) == 1 ||
+        ic->op == IPUSH && operandSize (IC_LEFT (ic)) == 1)
         packRegsForOneuse (ic, &(IC_LEFT (ic)), ebp);
     }
 }

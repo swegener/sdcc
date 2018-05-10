@@ -57,6 +57,14 @@ replace restart {
 } if notVolatile(%1)
 
 replace restart {
+	exgw	x, y
+	ldw	x, y
+} by {
+	; peephole 5a removed redundant exgw.
+	ldw	y, x
+}
+
+replace restart {
 	pop	%1
 	push	%1
 } by {
@@ -86,6 +94,14 @@ replace restart {
 	; peephole 9 moved addition of offset into storage instruction
 	ld	a, %4
 	ld	(%2, %1), a
+} if notUsed(%1)
+
+replace restart {
+	addw	%1, #%2
+	clr	(%1)
+} by {
+	; peephole 9a moved addition of offset into clear instruction
+	clr	(%2, %1)
 } if notUsed(%1)
 
 replace restart {
@@ -144,6 +160,26 @@ replace restart {
 	ldw	(%1, sp), x
 	; peephole 14a loaded (%1, sp) directly from x instead of going through y.
 } if notUsed('y')
+
+replace restart {
+	ldw	y, x
+	ld	a, %1
+	ld	(%2, y), a
+} by {
+	; peephole 14b used y directly instead of going through x.
+	ld	a, %1
+	ld	(%2, x), a
+} if notUsed('y')
+
+replace restart {
+	ldw	x, y
+	ld	a, %1
+	ld	(%2, x), a
+} by {
+	; peephole 14c used y directly instead of going through x.
+	ld	a, %1
+	ld	(%2, y), a
+} if notUsed('x')
 
 replace restart {
 	ldw	(%1, sp), y

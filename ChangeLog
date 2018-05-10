@@ -1,4 +1,11 @@
-2018-05-08 Philipp Klaus Krause <pkk AT spth.de>
+2018-05-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.lex,
+	  support/regression/tests/assert.c,
+	  support/valdiag/tests/static_assert.c:
+	  Add pragma for C2X, fix pragma for C99.
+
+2018-05-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.y,
 	  src/SDCCerr.c,
@@ -7,7 +14,7 @@
 	  src/SDCCmain.c:
 	  Support for C2X static_assert variant.
 
-2018-05-08 Philipp Klaus Krause <pkk AT spth.de>
+2018-05-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,
 	  src/SDCCval.c:

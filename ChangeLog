@@ -4,9 +4,10 @@
 	  support/regression/tests/assert.c,
 	  support/valdiag/tests/static_assert.c:
 	  Add pragma for C2X, fix pragma for C99.
-	* src/stm8/peeph.def,
-	  src/stm8/ralloc.c:
-	  Optimize writing struct members, improve code for pushing globals.
+	* src/stm8/peeph.def:
+	  Various optimizations that help in stdcbench.
+	* src/stm8/ralloc.c:
+	  Improve code for pushing globals.
 
 2018-05-09 Philipp Klaus Krause <pkk AT spth.de>
 

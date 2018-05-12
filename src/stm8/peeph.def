@@ -1235,3 +1235,102 @@ replace {
 %2:
 } if labelRefCount(%1 1), labelRefCountChange(%2 -1)
 
+replace {
+	jra	%5
+%2:
+	ldw	x, y
+%5:
+} by {
+	.byte 0x21
+	; peephole jrf5 used jump-on-false opcode to shorten jump over 1-byte instruction.
+	%2:
+	ldw	x, y
+	%5:
+} if labelRefCountChange(%5 -1)
+
+// We don't have an explicit instruction to jump over 2 bytes. But when flags are not used, we can use cp a, longmen instead.
+
+replace {
+	jra	%5
+%1:
+	ld	a, #%2
+%5:
+} by {
+	.byte 0xc1
+	; peephole jrf6 used cp opcode to jump over 2-byte instruction.
+%1:
+	ld	a, #%2
+%5:
+} if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
+
+replace {
+	jra	%5
+%1:
+	clr	(%2, sp)
+%5:
+} by {
+	.byte 0xc1
+	; peephole jrf7 used cp opcode to jump over 2-byte instruction.
+%1:
+	clr	(%2, sp)
+%5:
+} if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
+
+replace {
+	jra	%5
+%1:
+	clrw	x
+	incw	x
+%5:
+} by {
+	.byte 0xc1
+	; peephole jrf8 used cp opcode to jump over 2-byte instruction sequence.
+%1:
+	clrw	x
+	incw	x
+%5:
+} if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
+
+replace {
+	jra	%5
+%1:
+	ldw	x, (%2, sp)
+%5:
+} by {
+	.byte 0xc1
+	; peephole jrf9 used cp opcode to jump over 2-byte instruction.
+%1:
+	ldw	x, (%2, sp)
+%5:
+} if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
+
+// We don't have an explicit instruction to jump over 3 bytes. But when flags and a are not used, we can use ldf a, extmem instead.
+
+replace {
+	jra	%5
+%1:
+	ldw	x, #%2
+%5:
+} by {
+	.byte 0xbc
+	; peephole jrf10 used ldf opcode to jump over 3-byte instruction.
+%1:
+	ldw	x, #%2
+%5:
+} if labelRefCountChange(%5 -1), notUsed('a'), notUsed('n'), notUsed('z')
+
+replace {
+	jra	%5
+%1:
+	clrw	x
+	ldw	(%2, sp), x
+%5:
+} by {
+	.byte 0xbc
+	; peephole jrf11 used ldf opcode to jump over 3-byte instruction.
+%1:
+	clrw	x
+	ldw	(%2, sp), x
+%5:
+} if labelRefCountChange(%5 -1), notUsed('a'), notUsed('n'), notUsed('z')
+

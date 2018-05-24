@@ -1,3 +1,8 @@
+2018-05-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/stm8/peeph.def:
+	  Improve documentation for jump-on-false-style optimization.
+
 2018-05-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

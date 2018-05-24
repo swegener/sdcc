@@ -1250,6 +1250,7 @@ replace {
 
 // We don't have an explicit instruction to jump over 2 bytes. But when flags are not used, we can use cp a, longmen instead.
 
+// Jumping over ld a, #0xmm cp does a read from a memory location at 0xa6mm - which for all current STM8 is in Flash or unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
@@ -1263,6 +1264,7 @@ replace {
 %5:
 } if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
 
+// Jumping over clr (mm, sp) cp does a read from a memory location at 0x0fmm - which for all current STM8 is in RAM or unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
@@ -1276,6 +1278,7 @@ replace {
 %5:
 } if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
 
+// Jumping over clrw x; incwx cp does a read from a memory location at 0x5f5c - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
@@ -1291,6 +1294,7 @@ replace {
 %5:
 } if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
 
+// Jumping over ldw x, (mm, sp) cp does a read from a memory location at 0x1emm - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
@@ -1306,6 +1310,7 @@ replace {
 
 // We don't have an explicit instruction to jump over 3 bytes. But when flags and a are not used, we can use ldf a, extmem instead.
 
+// Jumping over ldw x, #mmmm ldf does a read from a memory location at 0xaemmmm - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
@@ -1319,6 +1324,7 @@ replace {
 %5:
 } if labelRefCountChange(%5 -1), notUsed('a'), notUsed('n'), notUsed('z')
 
+// Jumping over clrw x; ldw (mm, sp), x ldf does a read from a memory location at 0x5f1fmm - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:

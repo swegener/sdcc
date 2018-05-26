@@ -671,11 +671,11 @@ FBYNAME (labelRefCountChange)
 ** not found, or var was a indirect/pointer addressing mode.
 */
 static bool
-notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
+notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
 {
   char symname[SDCC_NAME_MAX + 1];
   char *p = symname;
-  char *vp = var;
+  const char *vp = var;
   lineNode *cl;
   operand *op;
   iCode *last_ic;
@@ -686,38 +686,46 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
   if (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
     {
       if (*var=='@')
-        return FALSE;
+        return false;
     }
   if (TARGET_Z80_LIKE)
     {
+      if (var[0] == '#')
+        return true;
+      if (var[0] == '(')
+        return false;
       if (strstr (var, "(bc)"))
-        return FALSE;
+        return false;
       if (strstr (var, "(de)"))
-        return FALSE;
+        return false;
       if (strstr (var, "(hl)"))
-        return FALSE;
+        return false;
       if (strstr (var, "(ix"))
-        return FALSE;
+        return false;
       if (strstr (var, "(iy"))
-        return FALSE;
+        return false;
     }
 
   if (TARGET_IS_STM8)
     {
+      if (var[0] == '#')
+        return true;
+      if (var[0] == '(')
+        return false;
       if (strstr (var, "(x)"))
-        return FALSE;
+        return false;
       if (strstr (var, "(y)"))
-        return FALSE;
+        return false;
       if (strstr (var, ", x)"))
-        return FALSE;
+        return false;
       if (strstr (var, ", y)"))
-        return FALSE;
+        return false;
       if (strstr (var, ", sp)"))
-        return FALSE;
+        return false;
       if (strchr (var, '[') && strchr (var, ']'))
-        return FALSE;
+        return false;
       if (strstr(var, "0x") || strstr(var, "0X") || isdigit(var[0]))
-        return FALSE;
+        return false;
     }
 
   /* Extract a symbol name from the variable */
@@ -732,7 +740,7 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
       /* Nothing resembling a symbol name was found, so it can't
          be volatile
       */
-      return TRUE;
+      return true;
     }
 
   last_ic = NULL;
@@ -796,7 +804,7 @@ notVolatileVariable(char *var, lineNode *currPl, lineNode *endPl)
   }
 
   /* Couldn't find the symbol for some reason. Assume volatile. */
-  return FALSE;
+  return false;
 }
 
 /*  notVolatile:

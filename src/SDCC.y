@@ -300,7 +300,8 @@ function_attributes
 
                             if (!port->getRegByName || ((regnum = port->getRegByName(regsym->name)) < 0))
                               werror (W_UNKNOWN_REG, regsym->name);
-                            $$->funcAttrs.preserved_regs[regnum] = TRUE;
+                            else
+                              $$->funcAttrs.preserved_regs[regnum] = TRUE;
                           }
                      }
    ;

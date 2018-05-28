@@ -1,3 +1,9 @@
+2018-05-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.y,
+	  src/SDCCerr.c:
+	  Improve behaviour on unknown register specifications.
+
 2018-05-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2752.c:

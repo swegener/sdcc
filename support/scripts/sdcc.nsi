@@ -594,7 +594,7 @@ ${Section} "SDCC PIC14 library" SEC22
   File "${DEV_ROOT}\non-free\lib\pic14\*.lib"
 ${SectionEnd}
 
-${Section} "SDCC STM8 library" SEC23
+${Section} "SDCC STM8 small model library" SEC23
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\stm8"
   File "${DEV_ROOT}\lib\stm8\*.*"
@@ -815,6 +815,13 @@ ${Section} "SDCC library sources" SEC25
   File "${DEV_ROOT}\lib\src\*.c"
 ${SectionEnd}
 
+${Section} "SDCC STM8 large model library" SEC26
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\stm8-large"
+  File "${DEV_ROOT}\lib\stm8-large\*.*"
+${SectionEnd}
+
+
 ;--------------------------------
 ;Descriptions
 
@@ -841,9 +848,10 @@ LangString DESC_SEC19 ${LANG_ENGLISH} "SDCC HC08 library"
 LangString DESC_SEC20 ${LANG_ENGLISH} "SDCC S08 library"
 LangString DESC_SEC21 ${LANG_ENGLISH} "SDCC PIC16 library"
 LangString DESC_SEC22 ${LANG_ENGLISH} "SDCC PIC14 library"
-LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC STM8 library"
+LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC STM8 small library"
 LangString DESC_SEC24 ${LANG_ENGLISH} "SDCC TLCS90 library"
 LangString DESC_SEC25 ${LANG_ENGLISH} "SDCC library sources"
+LangString DESC_SEC26 ${LANG_ENGLISH} "SDCC STM8 large model library"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -870,6 +878,7 @@ LangString DESC_SEC25 ${LANG_ENGLISH} "SDCC library sources"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC21} $(DESC_SEC21)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC22} $(DESC_SEC22)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC23} $(DESC_SEC23)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC26} $(DESC_SEC26)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC24} $(DESC_SEC24)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC25} $(DESC_SEC25)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
@@ -970,6 +979,9 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\stm8\stm8.lib"
   Delete "$INSTDIR\lib\src\stm8\Makefile"
 
+  Delete "$INSTDIR\lib\src\stm8-large\stm8.lib"
+  Delete "$INSTDIR\lib\src\stm8-large\Makefile"
+
   Delete "$INSTDIR\lib\src\z80\*.s"
   Delete "$INSTDIR\lib\src\z80\z80.lib"
   Delete "$INSTDIR\lib\src\z80\README"
@@ -1016,6 +1028,8 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\s08\*.lib"
 
   Delete "$INSTDIR\lib\stm8\*.lib"
+
+  Delete "$INSTDIR\lib\stm8-large\*.lib"
 
   Delete "$INSTDIR\lib\z80\*.rel"
   Delete "$INSTDIR\lib\z80\*.lib"
@@ -1139,6 +1153,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\hc08"
   RMDir "$INSTDIR\lib\src\s08"
   RMDir "$INSTDIR\lib\src\stm8"
+  RMDir "$INSTDIR\lib\src\stm8-large"
   RMDir "$INSTDIR\lib\src"
   RMDir "$INSTDIR\non-free\lib\src"
 
@@ -1161,6 +1176,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\hc08"
   RMDir "$INSTDIR\lib\s08"
   RMDir "$INSTDIR\lib\stm8"
+  RMDir "$INSTDIR\lib\stm8-large"
   RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\non-free\lib"
 

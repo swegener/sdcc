@@ -1,6 +1,7 @@
 2018-06-01 Erik Petrich
 
 	* support/scripts/sdcc.nsi: mingw-w64 needs libwinpthread-1.dll
+	* support/scripts/sdcc.nsi: add stm8-large library to setup.exe package
 
 2018-05-28 Philipp Klaus Krause <pkk AT spth.de>
 

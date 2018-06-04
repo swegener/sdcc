@@ -1,4 +1,9 @@
-2018-06-01 Erik Petrich
+2018-06-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (expandInlineFuncs): fix bug #2752
+	* support/regression/tests/bug-2752.c: enable test
+
+2018-06-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: mingw-w64 needs libwinpthread-1.dll
 	* support/scripts/sdcc.nsi: add stm8-large library to setup.exe package

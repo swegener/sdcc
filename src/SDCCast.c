@@ -7325,6 +7325,7 @@ expandInlineFuncs (ast * tree, ast * block)
               assigntree = newNode ('=', newAst_VALUE (symbolVal (parm)), newAst_VALUE (symbolVal (temparg)));
               assigntree->initMode = 1; // tell that assignment is initializer
               inlinetree2->right = newNode (NULLOP, assigntree, inlinetree2->right);
+              parm->onStack = 0; // stack usage will be recomputed later
 
               args = args->next;
               argIndex++;

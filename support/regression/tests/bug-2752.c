@@ -22,10 +22,8 @@ void call(void) /* Unbalanced stack pointer in this function */
 	
 void testBug(void)
 {
-//#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) // Bug #2752
 	dat1 = 0x5a;
 	call();
 	ASSERT (dat2 == 0x5a);
-//#endif
 }
 

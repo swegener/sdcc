@@ -232,6 +232,11 @@ struct  adsym   R16X[] = {
     {   "",     0000    }
 };
 
+struct  adsym   RX[] = {
+    {   "x",    X|0400 },      /* for ZXN pop x */
+    {   "",     0000   }
+};
+
 /*
  * Conditional definitions
  */

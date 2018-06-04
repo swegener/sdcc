@@ -29,7 +29,7 @@
 #include "asxxxx.h"
 #include "z80.h"
 
-char    *cpu    = "Zilog Z80 / Hitachi HD64180";
+char    *cpu    = "Zilog Z80 / Hitachi HD64180 / ZX-Next";
 char    *dsft   = "asm";
 
 char    imtab[3] = { 0x46, 0x56, 0x5E };
@@ -368,6 +368,162 @@ static char *hd64Page[7] = {
 };
 
 /*
+ * Z80-ZXN Opcode Cycle Pages
+ */
+
+static char  zxnpg1[256] = {
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   4,10, 7, 6, 4, 4, 7, 4, 4,11, 7, 6, 4, 4, 7, 4,
+/*10*/  13,10, 7, 6, 4, 4, 7, 4,12,11, 7, 6, 4, 4, 7, 4,
+/*20*/  12,10,16, 6, 4, 4, 7, 4,12,11,16, 6, 4, 4, 7, 4,
+/*30*/  12,10,13, 6,11,11,10, 4,12,11,13, 6, 4, 4, 7, 4,
+/*40*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*50*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*60*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*70*/   7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
+/*80*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*90*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*A0*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*B0*/   4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
+/*C0*/  11,10,10,10,17,11, 7,11,11,10,10,P2,17,17, 7,11,
+/*D0*/  11,10,10,11,17,11, 7,11,11, 4,10,11,17,P3, 7,11,
+/*E0*/  11,10,10,19,17,11, 7,11,11, 4,10, 4,17,P4, 7,11,
+/*F0*/  11,10,10, 4,17,11, 7,11,11, 6,10, 4,17,P5, 7,11
+};
+
+static char  zxnpg2[256] = {  /* P2 == CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*10*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*20*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN, 8, 8, 8, 8, 8, 8,15, 8,
+/*40*/   8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+/*50*/   8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+/*60*/   8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+/*70*/   8, 8, 8, 8, 8, 8,12, 8, 8, 8, 8, 8, 8, 8,12, 8,
+/*80*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*90*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*A0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*B0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*C0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*D0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*E0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8,
+/*F0*/   8, 8, 8, 8, 8, 8,15, 8, 8, 8, 8, 8, 8, 8,15, 8
+};
+
+static char  zxnpg3[256] = {  /* P3 == DD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,14,20,10,UN,UN,UN,UN,UN,15,20,10,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,23,23,19,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*70*/  19,19,19,19,19,19,UN,19,UN,UN,UN,UN,UN,UN,19,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,P6,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,14,UN,23,UN,15,UN,UN,UN, 8,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN
+};
+
+static char  zxnpg4[256] = {  /* P4 == ED */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,UN,UN, 8, 8,UN, 8,11,UN,UN,UN,UN,UN,UN,UN,UN,
+/*30*/   8, 4, 4, 4,12,12,12,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*40*/  12,12,15,20, 8,14, 8, 9,12,12,15,20,UN,14,UN, 9,
+/*50*/  12,12,15,20,UN,UN, 8, 9,12,12,15,20,UN,UN, 8, 9,
+/*60*/  12,12,15,20,UN,UN,UN,18,12,12,15,20,UN,UN,UN,18,
+/*70*/  UN,UN,15,20,UN,UN,UN,UN,12,12,15,20,UN,UN,UN,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,22, 8,UN,UN,UN,UN,
+/*90*/  16,16,12, 8, 8, 8,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*A0*/  16,16,16,16,16,UN,UN,UN,16,16,16,16,16,UN,UN,UN,
+/*B0*/  21,21,21,21,21,UN,21,12,21,21,21,21,21,UN,UN,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN
+};
+
+static char  zxnpg5[256] = {  /* P5 == FD */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*20*/  UN,14,20,10,UN,UN,UN,UN,UN,15,20,10,UN,UN,UN,UN,
+/*30*/  UN,UN,UN,UN,23,23,19,UN,UN,15,UN,UN,UN,UN,UN,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*70*/  19,19,19,19,19,19,UN,19,UN,UN,UN,UN,UN,UN,19,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,19,UN,UN,UN,UN,UN,UN,UN,19,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,P7,UN,UN,UN,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,
+/*E0*/  UN,14,UN,23,UN,15,UN,UN,UN, 8,UN,UN,UN,UN,UN,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,10,UN,UN,UN,UN,UN,UN
+};
+
+static char  zxnpg6[256] = {  /* P6 == DD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN
+};
+
+static char  zxnpg7[256] = {  /* P7 == FD CB */
+/*--*--* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
+/*--*--* -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - */
+/*00*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*10*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*20*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*30*/  UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*40*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*50*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*60*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*70*/  UN,UN,UN,UN,UN,UN,20,UN,UN,UN,UN,UN,UN,UN,20,UN,
+/*80*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*90*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*A0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*B0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*C0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*D0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*E0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN,
+/*F0*/  UN,UN,UN,UN,UN,UN,23,UN,UN,UN,UN,UN,UN,UN,23,UN
+};
+
+static char *zxnPage[7] = {
+    zxnpg1, zxnpg2, zxnpg3, zxnpg4,
+    zxnpg5, zxnpg6, zxnpg7
+};
+
+/*
  * Process a machine op.
  */
 VOID
@@ -382,8 +538,24 @@ struct mne *mp;
         clrexpr(&e2);
         op = (int) mp->m_valu;
         rf = mp->m_type;
-        if (!mchtyp && rf>S_CPU)
+
+        switch (mchtyp) {
+        case X_Z80:
+                if (rf > S_CPU)
+                        rf = 0;
+                break;
+        case X_HD64:
+                if (rf > X_TSTIO)
+                        rf = 0;
+                break;
+        case X_ZXN:
+                if (rf > S_CPU && rf < X_ZXN_INH2 && rf != X_TST)
+                        rf = 0;
+                break;
+        default:
                 rf = 0;
+        }
+
         switch (rf) {
 
         case S_INH1:
@@ -418,6 +590,20 @@ struct mne *mp;
                                 break;
                         }
                         outab(op | (v1<<4));
+                        break;
+                }
+                if (mchtyp == X_ZXN && op == 0xC5 && (t1 = addr(&e1)) == S_IMMED) {
+                        int old_hilo = (int)hilo;
+                        hilo = !hilo;                   // ZXN push is big-endian
+                        outab(0xED);
+                        outab(0x8A);
+                        outrw(&e1, R_MSB);
+                        hilo = old_hilo;
+                        break;
+                }
+                if (mchtyp == X_ZXN && op == 0xC1 && (v1 = admode(RX)) != 0 && (v1 &= 0xFF) == X) {
+                        outab(0xED);
+                        outab(0x8B);
                         break;
                 }
                 aerr();
@@ -568,6 +754,41 @@ struct mne *mp;
                                         v2 = HL;
                                 outab(0xFD);
                                 outab(op | (v2<<4));
+                                break;
+                        }
+                }
+                if (mchtyp == X_ZXN && rf == S_ADD && t1 == S_R16) {
+                        if (e1.e_addr == HL && t2 == S_R8 && e2.e_addr == A) {
+                                outab(0xED);
+                                outab(0x31);
+                                break;
+                        }
+                        if (e1.e_addr == DE && t2 == S_R8 && e2.e_addr == A) {
+                                outab(0xED);
+                                outab(0x32);
+                                break;
+                        }
+                        if (e1.e_addr == BC && t2 == S_R8 && e2.e_addr == A) {
+                                outab(0xED);
+                                outab(0x33);
+                                break;
+                        }
+                        if (e1.e_addr == HL && t2 == S_IMMED) {
+                                outab(0xED);
+                                outab(0x34);
+                                outrw(&e2, 0);
+                                break;
+                        }
+                        if (e1.e_addr == DE && t2 == S_IMMED) {
+                                outab(0xED);
+                                outab(0x35);
+                                outrw(&e2, 0);
+                                break;
+                        }
+                        if (e1.e_addr == BC && t2 == S_IMMED) {
+                                outab(0xED);
+                                outab(0x36);
+                                outrw(&e2, 0);
                                 break;
                         }
                 }
@@ -914,19 +1135,24 @@ struct mne *mp;
                     clrexpr(&e2);
                     t2 = addr(&e2);
                   }
-                if (t2 == S_R8) {
+                if (mchtyp == X_HD64 && t2 == S_R8) {
                         outab(0xED);
-                        outab(op | (e2.e_addr<<3));
+                        outab(op | (e2.e_addr << 3));
                         break;
                 }
-                if (t2 == S_IDHL) {
+                if (mchtyp == X_HD64 && t2 == S_IDHL) {
                         outab(0xED);
                         outab(0x34);
                         break;
                 }
                 if (t2 == S_IMMED) {
                         outab(0xED);
-                        outab(0x64);
+                        if (mchtyp == X_HD64)
+                                outab(0x64);
+                        else if (mchtyp == X_ZXN)
+                                outab(0x27);
+                        else
+                                aerr();
                         outrb(&e2, 0);
                         break;
                 }
@@ -944,6 +1170,133 @@ struct mne *mp;
                 aerr();
                 break;
 
+        case X_ZXN_INH2:
+                outab(0xED);
+                outab(op);
+                break;
+
+        case X_ZXN_MUL:
+                if ((t1 = addr(&e1)) == S_R8 && e1.e_addr == D &&
+                        more() && comma(1) &&
+                        (t2 = addr(&e2)) == S_R8 && e2.e_addr == E
+                        ) {
+                        outab(0xED);
+                        outab(op);
+                        break;
+                }
+                aerr();
+                break;
+
+        case X_ZXN_MIRROR:
+                t1 = addr(&e1);
+                if (t1 == S_R8 && e1.e_addr == A) {
+                        outab(0xED);
+                        outab(0x24);
+                        break;
+                }
+                if (t1 == S_R16 && e1.e_addr == DE) {
+                        outab(0xED);
+                        outab(0x26);
+                        break;
+                }
+                aerr();
+                break;
+
+        case X_ZXN_NEXTREG:
+                t1 = addr(&e1);
+                t2 = 0;
+                if (more()) {
+                        comma(1);
+                        t2 = addr(&e2);
+                }
+                if (t1 == S_IMMED && t2 == S_IMMED) {
+                        outab(0xED);
+                        outab(0x91);
+                        outrb(&e1, 0);
+                        outrb(&e2, 0);
+                        break;
+                }
+                if (t1 == S_IMMED && t2 == S_R8 && e2.e_addr == A) {
+                        outab(0xED);
+                        outab(0x92);
+                        outrb(&e1, 0);
+                        break;
+                }
+                aerr();
+                break;
+
+        case X_ZXN_MMU:
+                t1 = addr(&e1);
+                if (t1 == S_IMMED) {
+                        outab(0xED);
+                        outab(0x91);
+                        outab(op);
+                        outrb(&e1, 0);
+                        break;
+                }
+                if (t1 == S_R8 && e1.e_addr == A) {
+                        outab(0xED);
+                        outab(0x92);
+                        outab(op);
+                        break;
+                }
+                aerr();
+                break;
+
+        case X_ZXN_CU_WAIT:
+                t1 = addr(&e1);
+                t2 = 0;
+                if (more()) {
+                        comma(1);
+                        t2 = addr(&e2);
+                }
+                if (t1 == S_IMMED && t2 == S_IMMED) {
+                        if (e1.e_addr > 311 || e2.e_addr > 55) {
+                                aerr();
+                                break;
+                        }
+                        v1 = 0x8000 + (e2.e_addr << 9) + (e1.e_addr);
+                        outab(v1 >> 8);
+                        outab(v1 & 0xFF);
+                        opcycles = OPCY_ERR;
+                        break;
+                }
+                aerr();
+                break;
+
+        case X_ZXN_CU_MOVE:
+                t1 = addr(&e1);
+                t2 = 0;
+                if (more()) {
+                        comma(1);
+                        t2 = addr(&e2);
+                }
+                if (t1 == S_IMMED && t2 == S_IMMED) {
+                        if (e1.e_addr > 127 || e2.e_addr > 255) {
+                                aerr();
+                                break;
+                        }
+                        v1 = (e1.e_addr << 8) + (e2.e_addr);
+                        outab(v1 >> 8);
+                        outab(v1 & 0xFF);
+                        opcycles = OPCY_ERR;
+                        break;
+                }
+                aerr();
+                break;
+
+        case X_ZXN_CU_STOP:
+                outab(0xFF);
+                outab(0xFF);
+                opcycles = OPCY_ERR;
+                break;
+
+        case X_ZXN_CU_NOP:
+                outab(0x00);
+                outab(0x00);
+                opcycles = OPCY_ERR;
+                break;
+
         default:
                 opcycles = OPCY_ERR;
                 err('o');
@@ -951,7 +1304,8 @@ struct mne *mp;
         }
 
         if (opcycles == OPCY_NONE) {
-                if (mchtyp) {
+                switch (mchtyp) {
+                case X_HD64:
                         opcycles = hd64pg1[cb[0] & 0xFF];
                         while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
                                 switch (opcycles) {
@@ -970,7 +1324,8 @@ struct mne *mp;
                                         break;
                                 }
                         }
-                } else {
+                        break;
+                case X_Z80:
                         opcycles = z80pg1[cb[0] & 0xFF];
                         while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
                                 switch (opcycles) {
@@ -989,6 +1344,29 @@ struct mne *mp;
                                         break;
                                 }
                         }
+                        break;
+                case X_ZXN:
+                        opcycles = zxnpg1[cb[0] & 0xFF];
+                        while ((opcycles & OPCY_NONE) && (opcycles & OPCY_MASK)) {
+                                switch (opcycles) {
+                                case P2:        /* CB xx        */
+                                case P3:        /* DD xx        */
+                                case P4:        /* ED xx        */
+                                case P5:        /* FD xx        */
+                                        opcycles = zxnPage[opcycles & OPCY_MASK][cb[1] & 0xFF];
+                                        break;
+                                case P6:        /* DD CB -- xx  */
+                                case P7:        /* FD CB -- xx  */
+                                        opcycles = zxnPage[opcycles & OPCY_MASK][cb[3] & 0xFF];
+                                        break;
+                                default:
+                                        opcycles = OPCY_NONE;
+                                        break;
+                                }
+                        }
+                        break;
+                default:
+                        break;
                 }
         }
 }

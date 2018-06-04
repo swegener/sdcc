@@ -69,6 +69,8 @@
 #define I	0107
 #define R	0117
 
+#define X       8       /* for ZXN pop x */
+
 #define BC	0
 #define DE	1
 #define HL	2
@@ -156,6 +158,7 @@
  */
 #define	X_Z80	0
 #define	X_HD64	1
+#define	X_ZXN	2
 
 /*
  * HD64180 Instructions
@@ -166,6 +169,19 @@
 #define	X_MLT	93
 #define	X_TST	94
 #define	X_TSTIO	95
+
+/*
+ * Z80-ZX Next Instructions
+ */
+#define X_ZXN_INH2	100
+#define X_ZXN_MUL	101
+#define X_ZXN_MIRROR	102
+#define X_ZXN_NEXTREG   103
+#define X_ZXN_MMU       104
+#define X_ZXN_CU_WAIT   105
+#define X_ZXN_CU_MOVE   106
+#define X_ZXN_CU_STOP   107
+#define X_ZXN_CU_NOP    108
 
 struct adsym
 {
@@ -180,6 +196,7 @@ extern	struct	adsym	R8U2[];
 
 extern	struct	adsym	R16[];
 extern	struct	adsym	R16X[];
+extern	struct	adsym	RX[];
 extern	struct	adsym	CND[];
 
 	/* machine dependent functions */

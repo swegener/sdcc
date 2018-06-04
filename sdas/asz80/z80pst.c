@@ -139,8 +139,9 @@ struct  mne     mne[] = {
     {   NULL,   ".z80",         S_CPU,          0,      X_Z80   },
     {   NULL,   ".hd64",        S_CPU,          0,      X_HD64  },
     {   NULL,   ".z180",        S_CPU,          0,      X_HD64  },
+    {   NULL,   ".zxn",         S_CPU,          0,      X_ZXN   },
 
-        /* z80 / hd64180 */
+	/* z80 / hd64180 */
 
     {   NULL,   "ld",           S_LD,           0,      0x40    },
 
@@ -240,5 +241,35 @@ struct  mne     mne[] = {
     {   NULL,   "mlt",          X_MLT,          0,      0x4C    },
 
     {   NULL,   "tst",          X_TST,          0,      0x04    },
-    {   NULL,   "tstio",        X_TSTIO,        S_EOL,  0x74    }
+    {   NULL,   "test",         X_TST,          0,      0x04    },
+    {   NULL,   "tstio",        X_TSTIO,        0,      0x74    },
+
+	/* z80-zxn */
+
+    {   NULL,   "swapnib",      X_ZXN_INH2,     0,      0x23    },
+    {   NULL,   "mul",          X_ZXN_MUL,      0,      0x30    },
+    {   NULL,   "outinb",       X_ZXN_INH2,     0,      0x90    },
+    {   NULL,   "ldix",         X_ZXN_INH2,     0,      0xA4    },
+    {   NULL,   "ldirx",        X_ZXN_INH2,     0,      0xB4    },
+    {   NULL,   "lddx",         X_ZXN_INH2,     0,      0xAC    },
+    {   NULL,   "lddrx",        X_ZXN_INH2,     0,      0xBC    },
+    {   NULL,   "ldirscale",    X_ZXN_INH2,     0,      0xB6    },
+    {   NULL,   "ldpirx",       X_ZXN_INH2,     0,      0xB7    },
+    {   NULL,   "mirror",       X_ZXN_MIRROR,   0,      0       },
+    {   NULL,   "nextreg",      X_ZXN_NEXTREG,  0,      0       },
+    {   NULL,   "pixeldn",      X_ZXN_INH2,     0,      0x93    },
+    {   NULL,   "pixelad",      X_ZXN_INH2,     0,      0x94    },
+    {   NULL,   "setae",        X_ZXN_INH2,     0,      0x95    },
+    {   NULL,   "mmu0",         X_ZXN_MMU,      0,      0x50    },
+    {   NULL,   "mmu1",         X_ZXN_MMU,      0,      0x51    },
+    {   NULL,   "mmu2",         X_ZXN_MMU,      0,      0x52    },
+    {   NULL,   "mmu3",         X_ZXN_MMU,      0,      0x53    },
+    {   NULL,   "mmu4",         X_ZXN_MMU,      0,      0x54    },
+    {   NULL,   "mmu5",         X_ZXN_MMU,      0,      0x55    },
+    {   NULL,   "mmu6",         X_ZXN_MMU,      0,      0x56    },
+    {   NULL,   "mmu7",         X_ZXN_MMU,      0,      0x57    },
+    {   NULL,   "cu.wait",      X_ZXN_CU_WAIT,  0,      0       },
+    {   NULL,   "cu.move",      X_ZXN_CU_MOVE,  0,      0       },
+    {   NULL,   "cu.stop",      X_ZXN_CU_STOP,  0,      0       },
+    {   NULL,   "cu.nop",       X_ZXN_CU_NOP,   S_EOL,  0       },
 };

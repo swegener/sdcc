@@ -1,3 +1,8 @@
+2018-06-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/z80/peeph-z80.def: fixed peephole rule 153 (possibly fix for
+	  bug #2754)
+
 2018-06-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/asz80/z80.h,

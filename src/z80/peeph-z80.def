@@ -1606,7 +1606,7 @@ replace {
 }
 
 replace {
-	jp	%5146
+	jp	%5
 	ld	sp,ix
 	pop	ix
 	ret

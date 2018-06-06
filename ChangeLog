@@ -1,3 +1,8 @@
+2018-06-06 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sim/ucsim/config.guess:
+	  updated to the newest version. (timestamp='2018-05-19')
+
 2018-06-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/peeph-z80.def: fixed peephole rule 153 (possibly fix for

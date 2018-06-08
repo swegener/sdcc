@@ -1,3 +1,8 @@
+2018-06-08 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/bitwise.c:
+	  Improved for aarch64.
+
 2018-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/ralloc.c,

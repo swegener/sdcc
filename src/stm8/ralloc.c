@@ -503,47 +503,6 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
   return 1;
 }
 
-/** Will read fewer bytes to eliminate a downcast.
- */
-static int
-packRegsForCast (iCode *ic, operand **opp, eBBlock *ebp)
-{
-  iCode *dic;
-  operand *op = *opp;
-
-  if (ic->op != CAST || !IS_ITEMP (op))
-    return 0;
-
-  if (bitVectnBitsOn (OP_USES (op)) != 1 || bitVectnBitsOn (OP_DEFS (op)) != 1)
-    return 0;
-
-  /* get the definition */
-  if (!(dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (op)))))
-    return 0;
-
-  /* found the definition now check if it is local */
-  if (dic->seq < ebp->fSeq || dic->seq > ebp->lSeq)
-    return 0;
-
-  /* for now handle pointer reads only */
-  if (dic->op != GET_VALUE_AT_ADDRESS || IS_VOLATILE (operandType (IC_LEFT (dic))->next))
-    return 0;
-
-  sym_link *resulttype = operandType (IC_RESULT (ic));
-  sym_link *righttype = operandType (IC_RIGHT (ic));
-
-  if (IS_BOOL (resulttype) || getSize (resulttype) >= getSize (righttype))
-    return 0;
-
-  /* Narrow read, accounting for big-endianness */
-  int offset = getSize (righttype) - getSize (resulttype);
-  IC_RIGHT (dic) = operandFromLit (operandLitValue (IC_RIGHT (dic)) + offset);
-  OP_SYMBOL (IC_RESULT (dic))->type = resulttype;
-  ic->op = '=';
-
-  return 1;
-}
-
 /** Does some transformations to reduce register pressure.
  */
 static void
@@ -618,10 +577,6 @@ packRegisters (eBBlock * ebp)
         ic->op == IFX && operandSize (IC_COND (ic)) == 1 ||
         ic->op == IPUSH && operandSize (IC_LEFT (ic)) == 1)
         packRegsForOneuse (ic, &(IC_LEFT (ic)), ebp);
-
-      /* Some operations followed by downcasts can be narrowed. */
-      if (ic->op == CAST)
-        packRegsForCast (ic, &(IC_RIGHT (ic)), ebp);
     }
 }
 
@@ -795,10 +750,10 @@ void stm8_init_asmops (void);
 /* assignRegisters - assigns registers to each live range as need  */
 /*-----------------------------------------------------------------*/
 void
-stm8_assignRegisters (ebbIndex * ebbi)
+stm8_assignRegisters (ebbIndex *ebbi)
 {
   eBBlock **ebbs = ebbi->bbOrder;
-  int i, count = ebbi->count;
+  int count = ebbi->count;
   iCode *ic;
 
   stm8_init_asmops();
@@ -807,7 +762,7 @@ stm8_assignRegisters (ebbIndex * ebbi)
 
   /* change assignments this will remove some
      live ranges reducing some register pressure */
-  for (i = 0; i < count; i++)
+  for (int i = 0; i < count; i++)
     packRegisters (ebbs[i]);
 
   /* liveranges probably changed by register packing

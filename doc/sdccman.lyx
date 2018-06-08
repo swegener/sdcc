@@ -16069,9 +16069,9 @@ stack
 
 \end_inset
 
- is placed after the data segment.
- Using this option the stack can be placed anywhere in the internal memory
- space of the 8051.
+ is placed after the data segment for mcs51.
+ By using this option the stack can be placed anywhere in the internal memory
+ space of the mcs51.
  The value entered can be in Hexadecimal or Decimal format, e.g.
  -
 \begin_inset ERT
@@ -16197,6 +16197,16 @@ status collapsed
  option if you need to manually place the stack.
 \end_layout
 
+\begin_deeper
+\begin_layout Standard
+For stm8, by default the stack is placed at the device-specific reset value.
+ By using this option, the stack can be placed anywhere in the lower 16-bits
+ of the stm8 memory space.
+ This is particularly useful for working around the stack roll-over antifeature
+ present in some stm8 devices.
+\end_layout
+
+\end_deeper
 \begin_layout Labeling
 \labelwidthstring 00.00.0000
 

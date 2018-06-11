@@ -399,19 +399,33 @@ int
 bitVectEqual (bitVect * bvp1, bitVect * bvp2)
 {
   int i;
-
+  int elements;
+  
   if (!bvp1 || !bvp2)
     return 0;
 
   if (bvp1 == bvp2)
     return 1;
 
-  if (bvp1->allocSize != bvp2->allocSize)
-    return 0;
-
-  for (i = 0; i < bvp1->allocSize; i++)
+  /* elements common to both allocations must match */
+  elements = min (bvp1->allocSize, bvp2->allocSize);
+  for (i = 0; i < elements; i++)
     if (bvp1->vect[i] != bvp2->vect[i])
       return 0;
+
+  /* any extra elements allocated must be 0 */
+  if (bvp1->allocSize > elements)
+    {
+      for (i = elements; i < bvp1->allocSize; i++)
+        if (bvp1->vect[i])
+          return 0;
+    }
+  if (bvp2->allocSize > elements)
+    {
+      for (i = elements; i < bvp2->allocSize; i++)
+        if (bvp2->vect[i])
+          return 0;
+    }
 
   return 1;
 }

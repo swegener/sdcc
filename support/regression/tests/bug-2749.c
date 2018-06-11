@@ -15,11 +15,9 @@ const char array4[2] = "\\t";
 
 void testBug(void)
 {
-#ifndef __SDCC
 	ASSERT(array1[0] == '\"');
 	ASSERT(array2[0] == '\\');
 	ASSERT(array3[0] == '\"');
 	ASSERT(array4[0] == '\\');
-#endif
 }
 

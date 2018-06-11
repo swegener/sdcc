@@ -608,13 +608,8 @@ printChar (struct dbuf_s *oBuf, const char *s, int plen)
   int pplen = 0;
   char buf[100];
   char *p = buf;
-  int strEnd = plen - 1;
 
-  if (s)
-    while (s[strEnd] != 0)
-      strEnd--;
-
-  while (len && pplen < plen)
+  while (pplen < plen)
     {
       i = 60;
       while (i && pplen < plen)
@@ -624,34 +619,26 @@ printChar (struct dbuf_s *oBuf, const char *s, int plen)
               *p = '\0';
               if (p != buf)
                 dbuf_tprintf (oBuf, "\t!ascii\n", buf);
-              dbuf_tprintf (oBuf, "\t!db !constbyte\n", pplen < strEnd ? ((unsigned char) *s) : 0x00);
+              dbuf_tprintf (oBuf, "\t!db !constbyte\n", (unsigned char) *s);
               p = buf;
+              i = 60;
             }
           else
             {
               *p = *s;
               p++;
+              i--;
             }
           s++;
           pplen++;
-          i--;
         }
       if (p != buf)
         {
           *p = '\0';
           dbuf_tprintf (oBuf, "\t!ascii\n", buf);
           p = buf;
+          i = 60;
         }
-
-      if (len > 60)
-        len -= 60;
-      else
-        len = 0;
-    }
-  while (pplen < plen)
-    {
-      dbuf_tprintf (oBuf, "\t!db !constbyte\n", 0);
-      pplen++;
     }
 }
 

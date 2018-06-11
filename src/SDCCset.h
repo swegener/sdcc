@@ -55,6 +55,7 @@ void *getSet (set **);
 void deleteSetItem (set **, void *);
 void replaceSetItem (set *, void *olditem, void *newitem);
 void deleteItemIf (set **, int (*cond) (void *, va_list),...);
+void destructItemIf (set **, void (*destructor)(void *), int (*cond) (void *, va_list),...);
 int isinSet (const set *, const void *);
 typedef int (* insetwithFunc) (void *, void *);
 int isinSetWith (set *, void *, insetwithFunc cfunc);

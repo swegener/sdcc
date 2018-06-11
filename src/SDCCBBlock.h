@@ -108,5 +108,6 @@ void replaceLabel (eBBlock *, symbol *, symbol *);
 void dumpEbbsToFileExt (int, ebbIndex *);
 void dumpLiveRanges (int, hTab * liveRanges);
 void closeDumpFiles ();
+void freeeBBlockData(ebbIndex *);
 
 #endif

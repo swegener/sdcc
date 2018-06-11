@@ -25,7 +25,7 @@
 #include "common.h"
 #include "newalloc.h"
 #include "dbuf_string.h"
-
+#include <malloc.h>
 
 /*-----------------------------------------------------------------*/
 /* newCseDef - new cseDef                                          */
@@ -42,7 +42,7 @@ newCseDef (operand * sym, iCode * ic)
   cdp->sym = sym;
   cdp->diCode = ic;
   cdp->key = sym->key;
-  cdp->ancestors = newBitVect(iCodeKey);
+  cdp->ancestors = newBitVect(operandKey);
   cdp->fromGlobal = 0;
   cdp->fromAddrTaken = 0;
 
@@ -76,6 +76,21 @@ newCseDef (operand * sym, iCode * ic)
 }
 
 void
+freeLocalCseDef (void *item)
+{
+  cseDef * cse = (cseDef *)item;
+
+  /* If this CSE definition being deleted is not visible outside */
+  /* its defining eBBlock, we can safely deallocate it completely */
+  if (!cse->nonLocalCSE)
+    {
+      freeBitVect(cse->ancestors);
+      Safe_free(cse);
+    }
+}
+
+
+void
 updateCseDefAncestors(cseDef *cdp, set * cseSet)
 {
   cseDef *loop;
@@ -92,7 +107,7 @@ updateCseDefAncestors(cseDef *cdp, set * cseSet)
               loop = sl->item;
               if (loop->sym->key == IC_LEFT (ic)->key)
                 {
-                  cdp->ancestors = bitVectUnion (cdp->ancestors, loop->ancestors);
+                  cdp->ancestors = bitVectInplaceUnion (cdp->ancestors, loop->ancestors);
                   cdp->fromGlobal |= loop->fromGlobal;
                   cdp->fromAddrTaken |= loop->fromAddrTaken;
                   break;
@@ -107,7 +122,7 @@ updateCseDefAncestors(cseDef *cdp, set * cseSet)
               loop = sl->item;
               if (loop->sym->key == IC_RIGHT (ic)->key)
                 {
-                  cdp->ancestors = bitVectUnion (cdp->ancestors, loop->ancestors);
+                  cdp->ancestors = bitVectInplaceUnion (cdp->ancestors, loop->ancestors);
                   cdp->fromGlobal |= loop->fromGlobal;
                   cdp->fromAddrTaken |= loop->fromAddrTaken;
                   break;
@@ -1602,13 +1617,17 @@ setUsesDefs (operand * op, bitVect * bdefs,
 
   /* of these definitions find the ones that are */
   /* for this operand */
-  adefs = bitVectIntersect (adefs, OP_DEFS (op));
+  adefs = bitVectInplaceIntersect (adefs, OP_DEFS (op));
 
   /* these are the definitions that this operand can use */
-  op->usesDefs = adefs;
+  /* Nothing uses op->usesDefs, so why? EEP - 2018-06-10 */
+  //op->usesDefs = adefs;
 
   /* the out defs is an union */
-  *oud = bitVectUnion (*oud, adefs);
+  *oud = bitVectInplaceUnion (*oud, adefs);
+  
+  /* If not assigning op->usesDefs, we can safely free adefs */
+  freeBitVect(adefs);
 }
 
 /*-----------------------------------------------------------------*/
@@ -1985,6 +2004,7 @@ deleteGetPointers (set ** cseSet, set ** pss, operand * op, eBBlock * ebb)
       deleteItemIf (cseSet, ifDefSymIsX, cop);
       deleteItemIf (pss, ifPointerSet, cop);
     }
+  deleteSet (&compItems);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2114,6 +2134,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
   eBBlock ** ebbs = ebbi->bbOrder;
   int count = ebbi->count;
   set *cseSet;
+  set *setnode;
   iCode *ic;
   int change = 0;
   int i;
@@ -2126,17 +2147,23 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
   if (ebb->noPath)
     return 0;
 
+  /* Mark incoming subexpressions as non-local */
+  for (setnode = ebb->inExprs; setnode; setnode = setnode->next)
+    {
+      expr = (cseDef *)setnode->item;
+      expr->nonLocalCSE = 1;
+    }
   /* set of common subexpressions */
   cseSet = setFromSet (ebb->inExprs);
+ 
 
   /* these will be computed by this routine */
-  setToNull ((void *) &ebb->outDefs);
-  setToNull ((void *) &ebb->defSet);
-  setToNull ((void *) &ebb->usesDefs);
-  setToNull ((void *) &ebb->ptrsSet);
-  setToNull ((void *) &ebb->addrOf);
-  setToNull ((void *) &ebb->ldefs);
-
+  freeBitVect(ebb->outDefs); ebb->outDefs = NULL;
+  freeBitVect(ebb->defSet); ebb->defSet = NULL;
+  freeBitVect(ebb->usesDefs); ebb->usesDefs = NULL;
+  freeBitVect(ebb->ptrsSet); ebb->ptrsSet = NULL;
+  deleteSet(&ebb->addrOf);
+  freeBitVect(ebb->ldefs); ebb->ldefs = NULL;
   ebb->outDefs = bitVectCopy (ebb->inDefs);
   bitVectDefault = iCodeKey;
   ebb->defSet = newBitVect (iCodeKey);
@@ -2178,19 +2205,19 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
           setUsesDefs (IC_RESULT (ic), ebb->defSet, ebb->outDefs, &ebb->usesDefs);
           /* delete global variables from the cseSet
              since they can be modified by the function call */
-          deleteItemIf (&cseSet, ifDefGlobal);
+          destructItemIf (&cseSet, freeLocalCseDef, ifDefGlobal);
 
           /* and also iTemps derived from globals */
-          deleteItemIf (&cseSet, ifFromGlobal);
+          destructItemIf (&cseSet, freeLocalCseDef, ifFromGlobal);
 
           /* Delete iTemps derived from symbols whose address */
           /* has been taken */
-          deleteItemIf (&cseSet, ifFromAddrTaken);
+          destructItemIf (&cseSet, freeLocalCseDef, ifFromAddrTaken);
 
           /* delete all getpointer iCodes from cseSet, this should
              be done only for global arrays & pointers but at this
              point we don't know if globals, so to be safe do all */
-          deleteItemIf (&cseSet, ifAnyGetPointer);
+          destructItemIf (&cseSet, freeLocalCseDef, ifAnyGetPointer);
 
           /* can't cache pointer set/get operations across a call */
           deleteSet (&ptrSetSet);
@@ -2469,7 +2496,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       if (!(POINTER_SET (ic)) && IC_RESULT (ic))
         {
           cseDef *csed;
-          deleteItemIf (&cseSet, ifDefSymIsX, IC_RESULT (ic));
+          destructItemIf (&cseSet, freeLocalCseDef, ifDefSymIsX, IC_RESULT (ic));
           csed = newCseDef (IC_RESULT (ic), ic);
           updateCseDefAncestors (csed, cseSet);
           addSetHead (&cseSet, csed);
@@ -2511,7 +2538,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       /* except in case of pointer access         */
       if (!(POINTER_SET (ic)) && IS_SYMOP (IC_RESULT (ic)))
         {
-          deleteItemIf (&cseSet, ifOperandsHave, IC_RESULT (ic));
+          destructItemIf (&cseSet, freeLocalCseDef, ifOperandsHave, IC_RESULT (ic));
           deleteItemIf (&ptrSetSet, ifOperandsHave, IC_RESULT (ic));
           /* delete any previous definitions */
           ebb->defSet = bitVectCplAnd (ebb->defSet, OP_DEFS (IC_RESULT (ic)));
@@ -2521,7 +2548,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
          if (isOperandGlobal (IC_RESULT (ic)))
            {
              memmap *map = SPEC_OCLS (getSpec (operandType (IC_RESULT (ic))));
-             deleteItemIf (&cseSet, ifAnyUnrestrictedGetPointer, map->ptrType);
+             destructItemIf (&cseSet, freeLocalCseDef, ifAnyUnrestrictedGetPointer, map->ptrType);
              deleteItemIf (&ptrSetSet, ifAnyUnrestrictedSetPointer, map->ptrType);
            }
         }
@@ -2572,14 +2599,14 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
           /* and any derived symbols from cseSet. */
           if (!IS_PTR_RESTRICT (ptype))
             {
-              deleteItemIf (&cseSet, ifDefGlobalAliasableByPtr);
-              deleteItemIf (&cseSet, ifFromGlobalAliasableByPtr, DCL_TYPE(ptype));
+              destructItemIf (&cseSet, freeLocalCseDef, ifDefGlobalAliasableByPtr);
+              destructItemIf (&cseSet, freeLocalCseDef, ifFromGlobalAliasableByPtr, DCL_TYPE(ptype));
             }
 
           /* This could be made more specific for better optimization, but */
           /* for safety, delete anything this write may have modified. */
-          deleteItemIf (&cseSet, ifFromAddrTaken);
-          deleteItemIf (&cseSet, ifAnyGetPointer);
+          destructItemIf (&cseSet, freeLocalCseDef, ifFromAddrTaken);
+          destructItemIf (&cseSet, freeLocalCseDef, ifAnyGetPointer);
         }
       else
         {
@@ -2600,7 +2627,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       if (defic->op == ADDRESS_OF)
         {
           addSetHead (&ebb->addrOf, IC_LEFT (ic));
-          deleteItemIf (&cseSet, ifDefSymIsX, IC_LEFT (ic));
+          destructItemIf (&cseSet, freeLocalCseDef, ifDefSymIsX, IC_LEFT (ic));
         }
 
       /* If this was previously in the out expressions in the  */
@@ -2617,10 +2644,18 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
       {
         addSetHead (&ebb->killedExprs, expr);
       }
-  setToNull ((void *) &ebb->outExprs);
+
+  deleteSet (&ptrSetSet);
+  deleteSet (&ebb->outExprs);
   ebb->outExprs = cseSet;
-  ebb->outDefs = bitVectUnion (ebb->outDefs, ebb->defSet);
-  ebb->ptrsSet = bitVectUnion (ebb->ptrsSet, ebb->inPtrsSet);
+  ebb->outDefs = bitVectInplaceUnion (ebb->outDefs, ebb->defSet);
+  ebb->ptrsSet = bitVectInplaceUnion (ebb->ptrsSet, ebb->inPtrsSet);
+
+  for (setnode = ebb->outExprs; setnode; setnode = setnode->next)
+    {
+      expr = (cseDef *)setnode->item;
+      expr->nonLocalCSE = 1;
+    }
 
   if (recomputeDataFlow)
     computeDataFlow (ebbi);
@@ -2647,3 +2682,41 @@ cseAllBlocks (ebbIndex * ebbi, int computeOnly)
   return change;
 }
 
+
+/*------------------------------------------------------------------*/
+/* freeCSEdata - free data created by cseBBlock                     */
+/*------------------------------------------------------------------*/
+void
+freeCSEdata (eBBlock * ebb)
+{
+  set * s;
+
+  /* We should really free the cseDefs too, but I haven't */
+  /* found a good way to do this yet. For the moment, at */
+  /* least free up the associated bitVects - EEP */
+  for (s = ebb->outExprs; s; s = s->next)
+    {
+      cseDef *cdp = s->item;
+      if (!cdp) continue;
+      if (cdp->ancestors)
+        {
+          freeBitVect (cdp->ancestors);
+          cdp->ancestors = NULL;
+        }
+    }
+  
+  deleteSet (&ebb->inExprs);
+  deleteSet (&ebb->outExprs);
+  deleteSet (&ebb->killedExprs);
+
+  freeBitVect (ebb->inDefs);
+  freeBitVect (ebb->outDefs);
+  freeBitVect (ebb->defSet);
+  freeBitVect (ebb->ldefs);
+  freeBitVect (ebb->usesDefs);
+  freeBitVect (ebb->ptrsSet);
+  freeBitVect (ebb->inPtrsSet);
+  freeBitVect (ebb->ndompset);
+  deleteSet (&ebb->addrOf);
+
+}

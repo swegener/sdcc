@@ -811,7 +811,7 @@ iCodeFromeBBlock (eBBlock ** ebbs, int count)
       lic = ebbs[i]->ech;
 
     }
-
+  
   return ric;
 }
 
@@ -861,3 +861,27 @@ otherPathsPresent (eBBlock ** ebbs, eBBlock * this)
   else
     return 1;
 }
+
+
+/*-----------------------------------------------------------------*/
+/* freeBBlockData - Deallocate data structures associated with     */
+/*      the current blocks. They will all be recomputed if the     */
+/*      iCode chain is divided into blocks again later.            */
+/*-----------------------------------------------------------------*/
+void
+freeeBBlockData(ebbIndex * ebbi)
+{
+  int i;
+  eBBlock ** ebbs = ebbi->bbOrder;
+  
+  for (i=0; i < ebbi->count; i++)
+    {
+      deleteSet (&ebbs[i]->succList);
+      deleteSet (&ebbs[i]->predList);
+      freeBitVect (ebbs[i]->succVect);
+      freeBitVect (ebbs[i]->domVect);
+      
+      freeCSEdata(ebbs[i]);
+    }
+}
+

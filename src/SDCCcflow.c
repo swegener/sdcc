@@ -269,7 +269,7 @@ computeDominance (ebbIndex * ebbi)
 	       pred;
 	       pred = setNextItem (ebbs[i]->predList))
 	    {
-	      cDomVect = bitVectIntersect (cDomVect, pred->domVect);
+	      cDomVect = bitVectInplaceIntersect (cDomVect, pred->domVect);
 	    }
 	  if (!cDomVect)
 	    cDomVect = newBitVect (count);
@@ -279,6 +279,7 @@ computeDominance (ebbIndex * ebbi)
 
 	  if (!bitVectEqual (cDomVect, ebbs[i]->domVect))
 	    {
+        freeBitVect (ebbs[i]->domVect);
 	      ebbs[i]->domVect = cDomVect;
 	      change = 1;
 	    }
@@ -410,10 +411,10 @@ computeControlFlow (ebbIndex * ebbi)
 
   for (i = 0; i < ebbi->count; i++)
     {
-      setToNull ((void *) &ebbs[i]->predList);
-      setToNull ((void *) &ebbs[i]->domVect);
-      setToNull ((void *) &ebbs[i]->succList);
-      setToNull ((void *) &ebbs[i]->succVect);
+      deleteSet (&ebbs[i]->predList);
+      freeBitVect (ebbs[i]->domVect); ebbs[i]->domVect = NULL;
+      deleteSet (&ebbs[i]->succList);
+      freeBitVect (ebbs[i]->succVect); ebbs[i]->succVect = NULL;
       ebbs[i]->visited = 0;
       ebbs[i]->dfnum = 0;
     }

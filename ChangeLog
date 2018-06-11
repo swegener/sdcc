@@ -1,3 +1,19 @@
+2018-06-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCbitv.c,
+	* src/SDCCbitv.h: simplify to only access bit vector as unsigned
+	  int, add functions for in-place intersection and union operations
+	* src/SDCCset.c,
+	* src/SDCCset.h: new function destructItemIf calls a destructor
+	  function before deleting a set item
+	* src/SDCCBBlock.c,
+	* src/SDCCBBlock.h,
+	* src/SDCCopt.c: free some eBBlock data when switching to iCode chain
+	* src/SDCCcflow.c: free code flow data when not needed
+	* src/SDCCdflow.c,
+	* src/SDCCcse.c,
+	* src/SDCCcse.h: free data flow and CSE data when not needed
+
 2018-06-08 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/bitwise.c:

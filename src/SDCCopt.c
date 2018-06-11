@@ -3133,6 +3133,7 @@ eBBlockFromiCode (iCode *ic)
         dumpEbbsToFileExt (DUMP_LOSPRE, ebbi);
 
       /* GCSE, lospre and maybe other optimizations sometimes create temporaries that have non-connected live ranges, which is bad. Split them. */
+      freeeBBlockData (ebbi);
       ebbi = iCodeBreakDown (ic);
       computeControlFlow (ebbi);
       loops = createLoopRegions (ebbi);
@@ -3144,6 +3145,7 @@ eBBlockFromiCode (iCode *ic)
     }
 
   /* Break down again and redo some steps to not confuse live range analysis later. */
+  freeeBBlockData (ebbi);
   ebbi = iCodeBreakDown (ic);
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
@@ -3170,6 +3172,7 @@ eBBlockFromiCode (iCode *ic)
     switchAddressSpaces (ic); /* Fallback. Very unlikely to be triggered, unless --max-allocs-per-node is set to very small values or very weird control-flow graphs */
 
   /* Break down again and redo some steps to not confuse live range analysis. */
+  freeeBBlockData (ebbi);
   ebbi = iCodeBreakDown (ic);
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
@@ -3218,6 +3221,7 @@ eBBlockFromiCode (iCode *ic)
     adjustIChain (ebbi->bbOrder, ebbi->count);
     ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
     separateLiveRanges (ic, ebbi);
+    freeeBBlockData (ebbi);
     ebbi = iCodeBreakDown (ic);
     computeControlFlow (ebbi);
     loops = createLoopRegions (ebbi);
@@ -3242,6 +3246,7 @@ eBBlockFromiCode (iCode *ic)
 
   /* throw away blocks */
   setToNull ((void *) &graphEdges);
+  freeeBBlockData (ebbi);
 
   return NULL;
 }

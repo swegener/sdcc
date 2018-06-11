@@ -32,12 +32,14 @@ typedef struct cseDef
   {
 
     int key;
-    operand *sym;		/* defining symbol */
-    iCode *diCode;		/* defining instruction */
+    operand *sym;         /* defining symbol */
+    iCode *diCode;        /* defining instruction */
     bitVect *ancestors;		/* keys of the symbol's ancestors */
-    int fromGlobal;		/* defining symbol's value computed from a global */
+    int fromGlobal;       /* defining symbol's value computed from a global */
     int fromAddrTaken:1;	/* defining symbol's value computed from a */
-				/*   symbol whose address was taken */
+                          /*   symbol whose address was taken */
+    int nonLocalCSE:1;    /* CSE def visible outside of originating */
+                          /*   basic block */
   }
 cseDef;
 
@@ -60,4 +62,6 @@ void setUsesDefs (operand *, bitVect *, bitVect *, bitVect **);
 void replaceAllSymBySym (iCode *, operand *, operand *, bitVect **);
 iCode *findBackwardDef(operand *,iCode *);
 void ReplaceOpWithCheaperOp(operand **op, operand *cop);
+void freeCSEdata (eBBlock *);
+
 #endif

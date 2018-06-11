@@ -209,6 +209,39 @@ deleteItemIf (set ** sset, int (*cond) (void *, va_list),...)
     }
 }
 
+/*-------------------------------------------------------------------*/
+/* destructItemIf - will delete from set if cond function returns 1, */
+/*                  upon deletion, item's destructor is also called  */
+/*-------------------------------------------------------------------*/
+void
+destructItemIf (set ** sset, void (*destructor)(void * item), int (*cond) (void *, va_list),...)
+{
+  set *sp = *sset;
+  va_list ap;
+
+  while (sp)
+    {
+      /*
+       * On the x86 va_list is just a pointer, so due to pass by value
+       * ap is not mofified by the called function.  On the PPC va_list
+       * is a pointer to a structure, so ap is modified.  Re-init each time.
+       */
+      va_start (ap, cond);
+
+      if ((*cond) (sp->item, ap))
+        {
+          destructor (sp->item);
+          deleteSetItem (sset, sp->item);
+          sp = *sset;
+          continue;
+        }
+
+      va_end(ap);
+      sp = sp->next;
+    }
+}
+
+
 /*-----------------------------------------------------------------*/
 /* deleteSetItem - will delete a given item from the list          */
 /*-----------------------------------------------------------------*/

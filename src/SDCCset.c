@@ -355,9 +355,23 @@ unionSets (set * list1, set * list2, int throw)
   set *un = NULL;
   set *lp;
 
-  /* add all elements in the first list */
-  for (lp = list1; lp; lp = lp->next)
-    addSet (&un, lp->item);
+  /* If we were going to throw away the destination list */
+  /* anyway, save memory and time by using it as the */
+  /* starting point for the new list. */
+  if (throw == THROW_DEST || throw == THROW_BOTH)
+    {
+      un = list1;
+      if (throw == THROW_BOTH)
+        throw = THROW_SRC;
+      else
+        throw = THROW_NONE;
+    }
+  else
+    {
+      /* add all elements in the first list */
+      for (lp = list1; lp; lp = lp->next)
+        addSet (&un, lp->item);
+    }
 
   /* now for all those in list2 which does not */
   /* already exist in the list add             */

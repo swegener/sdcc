@@ -1,3 +1,7 @@
+2018-06-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCset.c: reduce memory use of unionSets()
+
 2018-06-12 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/bug-2756.c:

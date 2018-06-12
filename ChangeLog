@@ -1,3 +1,9 @@
+2018-06-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCralloc.hpp,
+	  support/regression/tests/bug-2756.c:
+	  Fix main issue in bug #2756.
+
 2018-06-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c: fix bug #2737

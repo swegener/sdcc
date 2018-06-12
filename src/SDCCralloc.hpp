@@ -291,7 +291,7 @@ static bool liverange_connected(cfg_t &cfg, var_t i)
 }
 #else
 // A not very elegant, but faster check
-static inline int component_size_impl(const cfg_t &cfg, var_t v, int i, std::vector<bool>& visited)
+static inline int component_size_impl(const cfg_t &cfg, const std::vector<bool> &life, var_t v, int i, std::vector<bool>& visited)
 {
   typename boost::graph_traits<cfg_t>::in_edge_iterator in, in_end;
   typename boost::graph_traits<cfg_t>::out_edge_iterator out, out_end;
@@ -300,21 +300,21 @@ static inline int component_size_impl(const cfg_t &cfg, var_t v, int i, std::vec
   visited[i] = true;
 
   for(boost::tie(in, in_end) = boost::in_edges(i, cfg); in != in_end; ++in)
-    if(!visited[boost::source(*in, cfg)])
-      size += component_size_impl(cfg, v, boost::source(*in, cfg), visited);
+    if(life[boost::source(*in, cfg)] && !visited[boost::source(*in, cfg)])
+      size += component_size_impl(cfg, life, v, boost::source(*in, cfg), visited);
 
   for(boost::tie(out, out_end) = boost::out_edges(i, cfg); out != out_end; ++out)
-    if(!visited[boost::target(*out, cfg)])
-      size += component_size_impl(cfg, v, boost::target(*out, cfg), visited);
+    if(life[boost::target(*out, cfg)] && !visited[boost::target(*out, cfg)])
+      size += component_size_impl(cfg, life, v, boost::target(*out, cfg), visited);
 
   return(size);
 }
 
-static inline int component_size(const cfg_t &cfg, var_t v, int i)
+static inline int component_size(const cfg_t &cfg, const std::vector<bool> &life, var_t v, int i)
 {
   std::vector<bool> visited(boost::num_vertices(cfg));
 
-  return(component_size_impl(cfg, v, i, visited));
+  return(component_size_impl(cfg, life, v, i, visited));
 }
 
 static bool liverange_connected(const cfg_t &cfg, var_t v)
@@ -334,7 +334,7 @@ static bool liverange_connected(const cfg_t &cfg, var_t v)
   if(!num_life)
     return(true);
 
-  return(component_size(cfg, v, last_life) >= num_life);
+  return(component_size(cfg, life, v, last_life) >= num_life);
 }
 #endif
 

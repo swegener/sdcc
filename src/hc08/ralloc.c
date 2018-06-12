@@ -765,66 +765,6 @@ createRegMask (eBBlock ** ebbs, int count)
     }
 }
 
-/*-----------------------------------------------------------------*/
-/* rematStr - returns the rematerialized string for a remat var    */
-/*-----------------------------------------------------------------*/
-static char *
-rematStr (symbol * sym, int offset)
-{
-  iCode *ic = sym->rematiCode;
-
-  while (1)
-    {
-      /* if plus adjust offset to right hand side */
-      if (ic->op == '+')
-        {
-          offset += (int) operandLitValue (IC_RIGHT (ic));
-          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
-          continue;
-        }
-
-      /* if minus adjust offset to right hand side */
-      if (ic->op == '-')
-        {
-          offset -= (int) operandLitValue (IC_RIGHT (ic));
-          ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
-          continue;
-        }
-
-      /* cast then continue */
-      if (IS_CAST_ICODE(ic))
-        {
-          ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
-          continue;
-        }
-      /* we reached the end */
-      break;
-    }
-
-  if (ic->op == ADDRESS_OF)
-    {
-      if (offset)
-        {
-          SNPRINTF (buffer, sizeof(buffer),
-                    "(%s %c 0x%04x)",
-                    OP_SYMBOL (IC_LEFT (ic))->rname,
-                    offset >= 0 ? '+' : '-',
-                    abs (offset) & 0xffff);
-        }
-      else
-        {
-          strncpyz (buffer, OP_SYMBOL (IC_LEFT (ic))->rname, sizeof(buffer));
-        }
-    }
-  else if (ic->op == '=')
-    {
-      offset += (int) operandLitValue (IC_RIGHT (ic));
-      SNPRINTF (buffer, sizeof(buffer),
-                "0x%04x",
-                offset & 0xffff);
-    }
-  return buffer;
-}
 
 /*-----------------------------------------------------------------*/
 /* regTypeNum - computes the type & number of registers required   */
@@ -834,7 +774,6 @@ regTypeNum (eBBlock *ebbs)
 {
   symbol *sym;
   int k;
-  iCode *ic;
 
   /* for each live range do */
   for (sym = hTabFirstItem (liveRanges, &k); sym;
@@ -858,27 +797,6 @@ regTypeNum (eBBlock *ebbs)
               if (IS_AGGREGATE (sym->type) || sym->isptr)
                 sym->type = aggrToPtr (sym->type, FALSE);
               continue;
-            }
-
-          /* if the symbol has only one definition &
-             that definition is a get_pointer */
-          if (bitVectnBitsOn (sym->defs) == 1 &&
-              (ic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym->defs))) &&
-              POINTER_GET (ic) &&
-              !IS_BITVAR (sym->etype) &&
-              (aggrToPtrDclType (operandType (IC_LEFT (ic)), FALSE) == POINTER))
-            {
-              if (ptrPseudoSymSafe (sym, ic))
-                {
-                  int rightval = 0;
-                  if (IC_RIGHT (ic))
-                    rightval = (int)operandLitValue (IC_RIGHT (ic));
-                  ptrPseudoSymConvert (sym, ic, rematStr (OP_SYMBOL (IC_LEFT (ic)), rightval));
-                  continue;
-                }
-
-              /* if in data space or idata space then try to
-                 allocate pointer register */
             }
 
           /* if not then we require registers */

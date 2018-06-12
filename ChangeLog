@@ -1,3 +1,7 @@
+2018-06-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/ralloc.c: fix bug #2737
+
 2018-06-11 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCbitv.c: fix bug #2759

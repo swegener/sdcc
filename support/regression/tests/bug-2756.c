@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __SDCC
+
 struct _bstdio_file {int i;};
 typedef struct _bstdio_file FILE;
 
@@ -283,6 +285,8 @@ int m(int argc, char *argv[])
 #endif
 	return 0;
 }
+
+#endif // __SDCC
 
 void testBug(void)
 {

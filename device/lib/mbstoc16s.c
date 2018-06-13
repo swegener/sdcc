@@ -39,7 +39,8 @@
 #error Encoding for wchar_t strings must be UCS-4
 #endif
 
-// This implementation assumes that mbtowc() does not keep internal state.
+// This implementation assumes that mbtowc() does not keep internal state
+// and that mbtowc() does not read beyond a terminating 0.
 size_t __mbstoc16s(char16_t *restrict c16s, const char *restrict s, size_t n)
 {
 	size_t m = 0;

@@ -65,7 +65,7 @@ void testBug(void)
 {
 	uint8_t c;
 	cp = &c;
-#ifndef __SDCC
+
 	c = 0xaa;
 	f1();
 	ASSERT(c == 0x55);
@@ -85,6 +85,5 @@ void testBug(void)
 	c = 0xaa;
 	f5();
 	ASSERT(c == 0x55);
-#endif
 }
 

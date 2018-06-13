@@ -644,6 +644,8 @@ DEFSETFUNC (ifFromAddrTaken)
 {
   cseDef *cdp = item;
 
+  if (OP_SYMBOL(cdp->sym)->addrtaken)
+    return 1;
   return cdp->fromAddrTaken;
 }
 
@@ -2599,7 +2601,7 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
           /* and any derived symbols from cseSet. */
           if (!IS_PTR_RESTRICT (ptype))
             {
-              destructItemIf (&cseSet, freeLocalCseDef, ifDefGlobalAliasableByPtr);
+              destructItemIf (&cseSet, freeLocalCseDef, ifDefGlobalAliasableByPtr, DCL_TYPE(ptype));
               destructItemIf (&cseSet, freeLocalCseDef, ifFromGlobalAliasableByPtr, DCL_TYPE(ptype));
             }
 

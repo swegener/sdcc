@@ -13,13 +13,11 @@ int x,*p=&x;
 void
 testTortureExecute (void)
 {
-#if 0
   int i=0;
   x=1;
   *p=2;
   if (x != 2)
     ASSERT (0);
   return;
-#endif
 }
 

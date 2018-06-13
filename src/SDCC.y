@@ -1994,7 +1994,7 @@ labeled_statement
        werror(W_LABEL_WITHOUT_STATEMENT);
        $$ = $1;
        yychar = '}';
-     };
+     }
     ;
 
 label

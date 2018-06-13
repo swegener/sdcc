@@ -1,4 +1,4 @@
-2018-06-13 Philipp Klaus Krause <pkk AT spth.de>
+2018-06-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCglobl.h,
 	  src/SDCCBBlock.c:
@@ -9,6 +9,12 @@
 	  src/SDCClrange.c,
 	  src/SDCCopt.c:
 	  Fix secondary issue in bug #2756.
+	* device/include/uchar.h,
+	  device/lib/incl.mk,
+	  device/lib/mbstoc16s.c,
+	  device/lib/c16stombs.c,
+	  support/regression/tests/new_wide.c
+	  Functions for converting between UTF-8 and UTF-16 strings.
 
 2018-06-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

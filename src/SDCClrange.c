@@ -1102,10 +1102,10 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
                         bitVectUnSetBit (sym->defs, ic->key);
                     }
                   bitVectUnSetBit (sym->uses, ic->key);
-                }
 
-              skip_uses = true;
-              num_separated++;
+                  skip_uses = true;
+                  num_separated++;
+                }
             }
           else if (!skip_uses)
             {      
@@ -1122,6 +1122,10 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
                       prev->next = next;
                       next->prev = prev;
                     }
+
+                  bitVectUnSetBit (sym->uses, ic->key);
+                  if (IS_SYMOP (IC_RESULT (ic)))
+                    bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
                 }
 
               deleteSet (&undefined_uses);

@@ -108,6 +108,8 @@ COMMON_SDCC = \
   c16rtomb.c \
   mbrtoc32.c \
   c32rtomb.c \
+  mbstoc16s.c \
+  c16stombs.c \
   wcscmp.c \
   wcslen.c \
   btowc.c \

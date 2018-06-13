@@ -3215,18 +3215,22 @@ eBBlockFromiCode (iCode *ic)
   miscOpt (ebbi->bbOrder, ebbi->count);
 
   /* Split any live-ranges that became non-connected in dead code elimination. */
-  if(!TARGET_IS_DS390) /* Splitting live-ranges causes some regressions for ds390, probably by exposing other pre-existing bugs. */
+  change = 0;
+  do
   {
+    if(TARGET_IS_DS390) /* Splitting live-ranges causes some regressions for ds390, probably by exposing other pre-existing bugs. */
+      break;
     recomputeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
     adjustIChain (ebbi->bbOrder, ebbi->count);
     ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
-    separateLiveRanges (ic, ebbi);
+    change = separateLiveRanges (ic, ebbi);
     freeeBBlockData (ebbi);
     ebbi = iCodeBreakDown (ic);
     computeControlFlow (ebbi);
     loops = createLoopRegions (ebbi);
     computeDataFlow (ebbi);
   }
+  while (change);
 
   /* compute the live ranges */
   recomputeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);

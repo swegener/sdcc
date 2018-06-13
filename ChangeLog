@@ -1,3 +1,15 @@
+2018-06-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCglobl.h,
+	  src/SDCCBBlock.c:
+	  Infrastructure for custom iCode dump point.
+	* src/SDCClospre.hpp:
+	  Fix handling of use vector in lospre.
+	* src/SDCClrange.h,
+	  src/SDCClrange.c,
+	  src/SDCCopt.c:
+	  Fix secondary issue in bug #2756.
+
 2018-06-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c: fix bugs #2709 and #1951

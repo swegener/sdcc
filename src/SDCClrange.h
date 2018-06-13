@@ -40,6 +40,7 @@ void hashiCodeKeys (eBBlock **, int);
 
 void adjustIChain (eBBlock ** ebbs, int count);
 
-void separateLiveRanges (iCode *sic, ebbIndex *ebbi); /* Split iTemps that have non-connected live-ranges. */
+int separateLiveRanges (iCode *sic, ebbIndex *ebbi); /* Split iTemps that have non-connected live-ranges. */
 
 #endif
+

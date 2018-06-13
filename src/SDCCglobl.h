@@ -390,7 +390,8 @@ enum {
   DUMP_PACK,
   DUMP_RASSGN,
   DUMP_LRANGE,
-  DUMP_LOSPRE
+  DUMP_LOSPRE,
+  DUMP_CUSTOM /* For temporary dump points */
 };
 
 struct _dumpFiles {

@@ -940,6 +940,9 @@ dumpIcRlive (eBBlock ** ebbs, int count)
 }
 #endif
 
+/*-----------------------------------------------------------------*/
+/* Visit all iCodes reachable from ic                              */
+/*-----------------------------------------------------------------*/
 static void visit (set **visited, iCode *ic, const int key)
 {
   symbol *lbl;
@@ -980,16 +983,16 @@ static void visit (set **visited, iCode *ic, const int key)
 /* Such temporaries can result from GCSE and losrpe,               */
 /* And can confuse register allocation and rematerialization.      */
 /*-----------------------------------------------------------------*/
-void
+int
 separateLiveRanges (iCode *sic, ebbIndex *ebbi)
 {
-  iCode *ic;
   set *candidates = 0;
   symbol *sym;
+  int num_separated = 0;
 
   // printf("separateLiveRanges()\n");
 
-  for (ic = sic; ic; ic = ic->next)
+  for (iCode *ic = sic; ic; ic = ic->next)
     {
       if (ic->op == IFX || ic->op == GOTO || ic->op == JUMPTABLE || !IC_RESULT (ic) || !IS_ITEMP (IC_RESULT (ic)) || bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) <= 1 || isinSet (candidates, OP_SYMBOL (IC_RESULT (ic))))
         continue;
@@ -998,28 +1001,38 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
     }
 
   if (!candidates)
-    return;
+    return (0);
 
   for(sym = setFirstItem (candidates); sym; sym = setNextItem (candidates))
     {
       // printf("Looking at %s, %d definitions\n", sym->name, bitVectnBitsOn (sym->defs));
 
-      int i;
       set *defs = 0;
+      set *uses = 0;
+      bool skip_uses = false;
 
-      for (i = 0; i < sym->defs->size; i++)
-        if (bitVectBitValue (sym->defs, i))
-          {
-            iCode *dic;
-            if(dic = hTabItemWithKey (iCodehTab, i))
-              addSet (&defs, hTabItemWithKey (iCodehTab, i));
-            else
-              {
-                werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Definition not found");
-                return;
-              }
-          }
-
+      for (int i = 0; i < sym->defs->size; i++)
+        {
+          if (bitVectBitValue (sym->defs, i))
+            {
+              iCode *dic;
+              if(dic = hTabItemWithKey (iCodehTab, i))
+                addSet (&defs, dic);
+              else
+                {
+                  werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Definition not found");
+                  return (num_separated);
+                }
+            }
+          if (bitVectBitValue (sym->uses, i))
+            {
+              iCode *uic;
+              if(uic = hTabItemWithKey (iCodehTab, i))
+                addSet (&uses, uic);
+              else
+                skip_uses = true; // werror (W_INTERNAL_ERROR, __FILE__, __LINE__, "Use not found"); // return (num_separated); seems too harsh.
+            }
+        }
       do
         {
           set *visited = 0;
@@ -1043,8 +1056,8 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
           do
             {
               oldsize = elementsInSet(visited);
-              ic = setFirstItem (defs);
-              for(ic = setNextItem (defs); ic; ic = setNextItem (defs))
+              setFirstItem (defs);
+              for(iCode *ic = setNextItem (defs); ic; ic = setNextItem (defs))
                 {
                   // printf("Looking at other def at %d now\n", ic->key);
                   set *visited2 = 0;
@@ -1071,7 +1084,7 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
 
               // printf("Splitting %s from %s, using def at %d, op %d\n", OP_SYMBOL_CONST(tmpop)->name, sym->name, ((iCode *)(setFirstItem (newdefs)))->key, ((iCode *)(setFirstItem (newdefs)))->op);
 
-              for (ic = setFirstItem (visited); ic; ic = setNextItem (visited))
+              for (iCode *ic = setFirstItem (visited); ic; ic = setNextItem (visited))
                 {
                   if (IC_LEFT (ic) && IS_ITEMP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic)) == sym)
                     IC_LEFT (ic) = operandFromOperand (tmpop);
@@ -1090,15 +1103,41 @@ separateLiveRanges (iCode *sic, ebbIndex *ebbi)
                     }
                   bitVectUnSetBit (sym->uses, ic->key);
                 }
+
+              skip_uses = true;
+              num_separated++;
             }
+          else if (!skip_uses)
+            {      
+              set *undefined_uses = 0;
+              undefined_uses = subtractFromSet (uses, visited, THROW_NONE);
+
+              // Eliminate uses of undefined variables.
+              for (iCode *ic = setFirstItem (undefined_uses); ic; ic = setNextItem (undefined_uses))
+                {
+                  iCode *prev = ic->prev;
+                  iCode *next = ic->next;
+                  if (prev && next)
+                    {
+                      prev->next = next;
+                      next->prev = prev;
+                    }
+                }
+
+              deleteSet (&undefined_uses);
+            }
+
           deleteSet (&newdefs);
           deleteSet (&visited);
         }
       while (elementsInSet(defs) > 1);
 
       deleteSet (&defs);
+      deleteSet (&uses);
     }
 
   deleteSet (&candidates);
+
+  return (num_separated);
 }
 

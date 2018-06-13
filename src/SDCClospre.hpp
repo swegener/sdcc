@@ -724,10 +724,11 @@ static int implement_lospre_assignment(const assignment_lospre a, T_t &T, G_t &G
       substituted++;
 
       iCode *ic = G[*v].ic;
-      //if (IC_LEFT (ic) && IS_ITEMP (IC_LEFT (ic)))
-      //  bitVectUnSetBit (OP_SYMBOL (IC_LEFT (ic))->uses, ic->key);
-      //if (IC_RIGHT (ic) && IS_ITEMP (IC_RIGHT (ic)))
-       // bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
+
+      if (IS_SYMOP (IC_LEFT (ic)))
+        bitVectUnSetBit (OP_SYMBOL (IC_LEFT (ic))->uses, ic->key);
+      if (IS_SYMOP (IC_RIGHT (ic)))
+        bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
       IC_RIGHT(ic) = tmpop;
       //bitVectSetBit (OP_SYMBOL (IC_RIGHT(ic))->uses, ic->key);
       if (!POINTER_SET (ic))

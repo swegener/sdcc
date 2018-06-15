@@ -610,7 +610,7 @@ static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>:
 #ifdef DEBUG_LOSPRE
           std::cout << "Forward substituted left operand " << OP_SYMBOL_CONST(IC_LEFT(nic))->name << " at " << nic->key << "\n";
 #endif
-          //bitVectUnSetBit (OP_SYMBOL (IC_LEFT (nic))->uses, nic->key);
+          bitVectUnSetBit (OP_SYMBOL (IC_LEFT (nic))->uses, nic->key);
           IC_LEFT(nic) = operandFromOperand (tmpop);
           //bitVectSetBit (OP_SYMBOL (IC_LEFT (nic))->uses, nic->key);
           IC_LEFT (nic)->isaddr = isaddr;
@@ -620,7 +620,7 @@ static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>:
 #ifdef DEBUG_LOSPRE
           std::cout << "Forward substituted right operand " << OP_SYMBOL_CONST(IC_RIGHT(nic))->name << " at " << nic->key << "\n";
 #endif
-          //bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (nic))->uses, nic->key);
+          bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (nic))->uses, nic->key);
           IC_RIGHT(nic) = operandFromOperand (tmpop);
           //bitVectSetBit (OP_SYMBOL (IC_RIGHT (nic))->uses, nic->key);
         }
@@ -629,7 +629,7 @@ static void forward_lospre_assignment(G_t &G, typename boost::graph_traits<G_t>:
 #ifdef DEBUG_LOSPRE
           std::cout << "Forward substituted result operand " << OP_SYMBOL_CONST(IC_RESULT(nic))->name << " at " << nic->key << "\n";
 #endif
-          //bitVectUnSetBit (OP_SYMBOL (IC_RESULT (nic))->uses, nic->key);
+          bitVectUnSetBit (OP_SYMBOL (IC_RESULT (nic))->uses, nic->key);
           IC_RESULT(nic) = operandFromOperand (tmpop);
           IC_RESULT(nic)->isaddr = true;
           //bitVectSetBit (OP_SYMBOL (IC_RESULT (nic))->uses, nic->key);

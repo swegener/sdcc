@@ -2174,7 +2174,8 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType)
      followed by right shift */
   if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
-      !IS_FIXED (letype) && !IS_UNSIGNED (letype) && ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0) &&
+      !IS_FIXED (letype) && !IS_UNSIGNED (letype) &&
+      ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0) &&
       (TARGET_Z80_LIKE || TARGET_HC08_LIKE))
     {
       operand *tmp;
@@ -2193,10 +2194,10 @@ geniCodeDivision (operand *left, operand *right, RESULT_TYPE resultType)
   /* if the right is a literal & power of 2
      and left is unsigned then make it a
      right shift */
-  else
-       if (IS_LITERAL (retype) &&
+  else if (IS_LITERAL (retype) &&
       !IS_FLOAT (letype) &&
-      !IS_FIXED (letype) && IS_UNSIGNED (letype) && ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0))
+      !IS_FIXED (letype) && IS_UNSIGNED (letype) &&
+      ((p2 = powof2 ((TYPE_TARGET_ULONG) ulFromVal (OP_VALUE (right)))) > 0))
     {
       ic = newiCode (RIGHT_OP, left, operandFromLit (p2));      /* right shift */
     }

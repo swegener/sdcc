@@ -5,6 +5,8 @@
 	  Fix bug #2761.
 	* src/SDCCicode.c:
 	  Optimize division from pointer subtraction.
+	* src/stm8/gen.c:
+	  Improve ^.
 
 2018-06-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

@@ -4970,7 +4970,8 @@ genXor (const iCode *ic)
 {
   operand *left, *right, *result;
   int size, i, j, omitbyte = -1;
-  bool pushed_a = FALSE;
+  bool result_in_a = false;
+  bool pushed_a = false;
 
   D (emit2 ("; genXor", ""));
 
@@ -4994,14 +4995,14 @@ genXor (const iCode *ic)
   if (!regDead (A_IDX, ic))
     {
       push (ASMOP_A, 0, 1);
-      pushed_a = TRUE;
+      pushed_a = true;
     }
 
   // Byte in a needs to be handled first.
   for (i = 0; i < size; i++)
     if (aopInReg (left->aop, i, A_IDX) || aopInReg (right->aop, i, A_IDX))
       {
-        const asmop *other_stacked = NULL;
+        const asmop *other_stacked = 0;
         int other_offset;
         asmop *other = (aopInReg (left->aop, i, A_IDX) ? right : left)->aop;
 
@@ -5024,10 +5025,7 @@ genXor (const iCode *ic)
           pop (other_stacked, 0, 2);
 
         if (aopInReg (result->aop, i, A_IDX) && size > 1)
-          {
-            push (ASMOP_A, 0, 1);
-            pushed_a = TRUE;
-          }
+          result_in_a = true;
         else
           {
             // Avoid overwriting operand.
@@ -5047,14 +5045,14 @@ genXor (const iCode *ic)
                     }
                 }
 
-            cheapMove (result->aop, i, ASMOP_A, 0, FALSE);
+            cheapMove (result->aop, i, ASMOP_A, 0, false);
           }
         break;
       }
 
   for (i = 0; i < size; i++)
     {
-      const asmop *right_stacked = NULL;
+      const asmop *right_stacked = 0;
       int right_offset;
 
       if (omitbyte == i)
@@ -5062,12 +5060,9 @@ genXor (const iCode *ic)
 
       if (aopIsLitVal (right->aop, i, 1, 0))
         {
-          cheapMove (result->aop, i, left->aop, i, FALSE);
-          if (aopInReg (result->aop, i, A_IDX) && i != size - 1)
-            {
-              push (ASMOP_A, 0, 1);
-              pushed_a = TRUE;
-            }
+          cheapMove (result->aop, i, left->aop, i, result_in_a);
+          if (aopInReg (result->aop, i, A_IDX))
+            result_in_a = true;
           continue;
         }
 
@@ -5080,7 +5075,14 @@ genXor (const iCode *ic)
 
       right_stacked = stack_aop (right->aop, i, &right_offset);
 
-      cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
+      if (result_in_a)
+        {
+          push (ASMOP_A, 0, 1);
+          pushed_a = true;
+          result_in_a = false;
+        }
+
+      cheapMove (ASMOP_A, 0, left->aop, i, false);
 
       if (aopIsLitVal (right->aop, i, 1, 0xff))
         emit3 (A_CPL, ASMOP_A, 0);
@@ -5095,13 +5097,10 @@ genXor (const iCode *ic)
       if (right_stacked)
         pop (right_stacked, 0, 2);
 
-      if (!aopInReg (result->aop, i, A_IDX) || i == size - 1)
-        cheapMove (result->aop, i, ASMOP_A, 0, FALSE);
+      if (!aopInReg (result->aop, i, A_IDX))
+        cheapMove (result->aop, i, ASMOP_A, 0, false);
       else
-        {
-          push (ASMOP_A, 0, 1);
-          pushed_a = TRUE;
-        }
+        result_in_a = true;
     }
 
   if (pushed_a)
@@ -5271,10 +5270,11 @@ genOr (const iCode *ic)
         }
       else
         {
-          if (result_in_a && !pushed_a)
+          if (result_in_a)
             {
               push (ASMOP_A, 0, 1);
-              pushed_a = TRUE;
+              pushed_a = true;
+              result_in_a = false;
             }
 
           right_stacked = stack_aop (right->aop, i, &right_offset);

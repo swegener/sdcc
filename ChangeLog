@@ -3,6 +3,8 @@
 	* src/SDCClospre.hpp,
 	  support/regression/tests/bug-2761.c:
 	  Fix bug #2761.
+	* src/SDCCicode.c:
+	  Optimize division from pointer subtraction.
 
 2018-06-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

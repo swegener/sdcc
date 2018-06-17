@@ -20,6 +20,8 @@
 	  support/regression/tests/declafterstmt.c,
 	  support/valdiag/tests/declafterstmt.c:
 	  Support for C99 intermingling of declaration and statements, patch by Benedikt Freisen.
+	* doc/sdccman.lyx:
+	  Update documentation on standard support.
 
 2018-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

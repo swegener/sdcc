@@ -9562,10 +9562,6 @@ In addition to what is mentioned in the section above, the following features
 \end_layout
 
 \begin_layout Itemize
-Declarations after expressions.
-\end_layout
-
-\begin_layout Itemize
 Compound literals.
  
 \end_layout
@@ -9635,6 +9631,58 @@ status collapsed
 
 \begin_layout Standard
 Except for the issues mentioned in the section above, this standard is supported.
+\end_layout
+
+\begin_layout Subsection
+ISO C2X
+\end_layout
+
+\begin_layout Standard
+Use 
+\series bold
+-
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2x
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2x
+\end_layout
+
+\end_inset
+
+
+\series default
+ to compile in this mode.
+\end_layout
+
+\begin_layout Standard
+Standard and support are still quite incomplete.
 \end_layout
 
 \begin_layout Subsection

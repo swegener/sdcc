@@ -224,9 +224,10 @@ dumpEbbsToFileExt (int id, ebbIndex * ebbi)
   for (i = 0; i < count; i++)
     {
       fprintf (of, "\n----------------------------------------------------------------\n");
-      fprintf (of, "Basic Block %s (df:%d bb:%d lvl:%d): loopDepth=%d%s%s%s\n",
+      fprintf (of, "Basic Block %s (df:%d bb:%d lvl:%ld:%ld): loopDepth=%d%s%s%s\n",
                ebbs[i]->entryLabel->name,
-               ebbs[i]->dfnum, ebbs[i]->bbnum, ebbs[i]->entryLabel->level,
+               ebbs[i]->dfnum, ebbs[i]->bbnum,
+               ebbs[i]->entryLabel->level / LEVEL_UNIT, ebbs[i]->entryLabel->level % LEVEL_UNIT,
                ebbs[i]->depth,
                ebbs[i]->noPath ? " noPath" : "",
                ebbs[i]->partOfLoop ? " partOfLoop" : "", ebbs[i]->isLastInLoop ? " isLastInLoop" : "");

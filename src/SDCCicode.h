@@ -137,7 +137,7 @@ typedef struct iCode
   int seq;                      /* sequence number within routine */
   int seqPoint;                 /* sequence point */
   short depth;                  /* loop depth of this iCode */
-  short level;                  /* scope level */
+  long level;                   /* scope level */
   short block;                  /* sequential block number */
   unsigned nosupdate:1;         /* don't update spillocation with this */
   unsigned generated:1;         /* code generated for this one */

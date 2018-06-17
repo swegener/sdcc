@@ -40,7 +40,7 @@
 
 extern int yyerror (char *);
 extern FILE     *yyin;
-int NestLevel = 0;      /* current NestLevel       */
+long NestLevel = 0;     /* current NestLevel       */
 int stackPtr  = 1;      /* stack pointer           */
 int xstackPtr = 0;      /* xstack pointer          */
 int reentrant = 0;
@@ -114,6 +114,7 @@ bool uselessDecl = TRUE;
 %type <sym> struct_declarator_list struct_declaration struct_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
 %type <sym> declaration_list identifier_list
+%type <sym> declaration_after_statement
 %type <sym> declarator2_function_attributes while do for critical
 %type <sym> addressmod
 %type <lnk> pointer type_specifier_list type_specifier_list_ type_specifier type_qualifier_list type_qualifier type_name
@@ -134,6 +135,7 @@ bool uselessDecl = TRUE;
 %type <asts> jump_statement function_body else_statement string_literal_val
 %type <asts> critical_statement asm_statement label
 %type <asts> generic_selection generic_assoc_list generic_association
+%type <asts> implicit_block statements_and_implicit block_item_list
 %type <dsgn> designator designator_list designation designation_opt
 %type <ilist> initializer initializer_list
 %type <yyint> unary_operator assignment_operator struct_or_union
@@ -1630,7 +1632,7 @@ function_declarator2
         }
    | declarator2 '('
         {
-          NestLevel++;
+          NestLevel += LEVEL_UNIT;
           STACK_PUSH(blockNum, currBlockno);
           btree_add_child(currBlockno, ++blockNo);
           currBlockno = blockNo;
@@ -1652,13 +1654,13 @@ function_declarator2
           FUNC_ARGS(funcType) = reverseVal($4);
 
           /* nest level was incremented to take care of the parms  */
-          NestLevel--;
+          NestLevel -= LEVEL_UNIT;
           currBlockno = STACK_POP(blockNum);
           seqPointNo++; /* not a true sequence point, but helps resolve scope */
 
           // if this was a pointer (to a function)
           if (!IS_FUNC($1->type))
-              cleanUpLevel(SymbolTab, NestLevel + 1);
+              cleanUpLevel(SymbolTab, NestLevel + LEVEL_UNIT);
 
           $$ = $1;
         }
@@ -1887,7 +1889,7 @@ abstract_declarator2
    }
    | abstract_declarator2 '('
         {
-          NestLevel++;
+          NestLevel += LEVEL_UNIT;
           STACK_PUSH(blockNum, currBlockno);
           btree_add_child(currBlockno, ++blockNo);
           currBlockno = blockNo;
@@ -1901,7 +1903,7 @@ abstract_declarator2
           FUNC_ARGS(p) = reverseVal($4);
 
           /* nest level was incremented to take care of the parms  */
-          NestLevel--;
+          NestLevel -= LEVEL_UNIT;
           currBlockno = STACK_POP(blockNum);
           if (!$1)
             {
@@ -2019,7 +2021,7 @@ label
 start_block
    : '{'
         {
-          NestLevel++;
+          NestLevel += LEVEL_UNIT;
           STACK_PUSH(blockNum, currBlockno);
           btree_add_child(currBlockno, ++blockNo);
           currBlockno = blockNo;
@@ -2030,27 +2032,63 @@ start_block
 end_block
    : '}'
         {
-          NestLevel--;
+          NestLevel -= LEVEL_UNIT;
           currBlockno = STACK_POP(blockNum);
         }
    ;
 
 compound_statement
    : start_block end_block                    { $$ = createBlock(NULL, NULL); }
-   | start_block statement_list end_block     { $$ = createBlock(NULL, $2); }
-   | start_block declaration_list end_block
+   | start_block block_item_list end_block
      {
-       $$ = createBlock($2, NULL); 
-       cleanUpLevel(StructTab, NestLevel + 1);
-     }
-   | start_block
-          declaration_list statement_list
-     end_block
-     {
-       $$ = createBlock($2, $3); 
-       cleanUpLevel(StructTab, NestLevel + 1);
+       $$ = $2;
+       cleanUpLevel(StructTab, NestLevel + LEVEL_UNIT);
      }
    | error ';'                                { $$ = NULL; }
+   ;
+
+block_item_list
+   : statements_and_implicit                  { $$ = createBlock(NULL, $1); }
+   | declaration_list                         { $$ = createBlock($1, NULL); }
+   | declaration_list statements_and_implicit { $$ = createBlock($1, $2); }
+   ;
+
+statements_and_implicit
+   : statement_list
+   | statement_list implicit_block
+     {
+       $$ = newNode(NULLOP, $1, $2);
+       if (!options.std_c99)
+         werror(E_DECL_AFTER_STATEMENT_C99);
+     }
+   ;
+
+declaration_after_statement
+   : {
+       NestLevel += SUBLEVEL_UNIT;
+       STACK_PUSH(blockNum, currBlockno);
+       btree_add_child(currBlockno, ++blockNo);
+       currBlockno = blockNo;
+       ignoreTypedefType = 0;
+     }
+     declaration_list                         { $$ = $2; }
+   ;
+
+implicit_block
+   : declaration_after_statement statements_and_implicit
+     {
+       NestLevel -= SUBLEVEL_UNIT;
+       currBlockno = STACK_POP(blockNum);
+       $$ = createBlock($1, $2);
+       cleanUpLevel(StructTab, NestLevel + SUBLEVEL_UNIT);
+     }
+   | declaration_after_statement
+     {
+       NestLevel -= SUBLEVEL_UNIT;
+       currBlockno = STACK_POP(blockNum);
+       $$ = createBlock($1, NULL);
+       cleanUpLevel(StructTab, NestLevel + SUBLEVEL_UNIT);
+     }
    ;
 
 declaration_list
@@ -2174,7 +2212,7 @@ do : DO {  /* create and push the continue , break & body Labels */
 for : FOR { /* create & push continue, break & body labels */
             static int Lblnum = 0;
 
-           NestLevel++;
+           NestLevel += LEVEL_UNIT;
            STACK_PUSH(blockNum, currBlockno);
            btree_add_child(currBlockno, ++blockNo);
            currBlockno = blockNo;
@@ -2237,7 +2275,7 @@ iteration_statement
                           $$ = newNode(NULLOP,$$,createLabel(AST_FOR($$,falseLabel),NULL));
                           noLineno--;
 
-                          NestLevel--;
+                          NestLevel -= LEVEL_UNIT;
                           currBlockno = STACK_POP(blockNum);
                         }
 	| for '(' declaration expr_opt ';' expr_opt ')'
@@ -2271,10 +2309,10 @@ iteration_statement
                           if (AST_FOR($$,continueLabel)->isref)
                             $$->right = createLabel(AST_FOR($$,continueLabel),NULL);
                           $$ = createBlock($3, newNode(NULLOP,$$,createLabel(AST_FOR($$,falseLabel),NULL)));
-                          cleanUpLevel(StructTab, NestLevel + 1);
+                          cleanUpLevel(StructTab, NestLevel + LEVEL_UNIT);
                           noLineno--;
 
-                          NestLevel--;
+                          NestLevel -= LEVEL_UNIT;
                           currBlockno = STACK_POP(blockNum);
                         }
 ;

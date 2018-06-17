@@ -549,6 +549,8 @@ struct
     "static assertion with one argument requires C2X or later", 0 },
   { W_STATIC_ASSERTION_2, ERROR_LEVEL_WARNING,
     "static assertion failed", 0 },
+  { E_DECL_AFTER_STATEMENT_C99, ERROR_LEVEL_ERROR,
+    "declaration after statement requires ISO C99 or later", 0 },
 };
 
 /* -------------------------------------------------------------------------------

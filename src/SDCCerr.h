@@ -273,6 +273,7 @@ enum {
   W_INCOMPAT_PTYPES             = 244, /* incompatible pointer assignment (not allowed by the standard, but allowed in SDCC) */
   E_STATIC_ASSERTION_C2X        = 245, /* static assertion with one argument requires C2X or later */
   W_STATIC_ASSERTION_2          = 246, /* static assertion failed */
+  E_DECL_AFTER_STATEMENT_C99    = 247, /* declaration after statement requires ISO C99 or later */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

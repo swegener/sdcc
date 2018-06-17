@@ -82,7 +82,7 @@ typedef struct bucket
 {
   void *sym;                    /* pointer to the object      */
   char name[SDCC_NAME_MAX + 1]; /* name of this symbol        */
-  int level;                    /* nest level for this symbol */
+  long level;                   /* nest level for this symbol */
   int block;                    /* belongs to which block     */
   struct bucket *prev;          /* ptr 2 previous bucket      */
   struct bucket *next;          /* ptr 2 next bucket          */
@@ -92,7 +92,7 @@ bucket;
 typedef struct structdef
 {
   char tag[SDCC_NAME_MAX + 1];  /* tag part of structure      */
-  unsigned char level;          /* Nesting level              */
+  long level;                   /* Nesting level              */
   int block;                    /* belongs to which block     */
   struct symbol *fields;        /* pointer to fields          */
   unsigned size;                /* sizeof the table in bytes  */
@@ -292,7 +292,7 @@ typedef struct symbol
   char name[SDCC_SYMNAME_MAX + 1];  /* Input Variable Name     */
   char rname[SDCC_NAME_MAX + 1];    /* internal name           */
 
-  short level;                      /* declaration lev,fld offset */
+  long level;                       /* declaration lev,fld offset */
   short block;                      /* sequential block # of definition */
   int seqPoint;                     /* sequence point defined or, if unbound, used */
   int key;
@@ -644,7 +644,7 @@ typedef enum
 
 /* forward definitions for the symbol table related functions */
 void initSymt ();
-symbol *newSymbol (const char *, int);
+symbol *newSymbol (const char *, long);
 sym_link *newLink (SYM_LINK_CLASS);
 sym_link *newFloatLink ();
 structdef *newStruct (const char *);
@@ -658,7 +658,7 @@ symbol *copySymbol (const symbol *);
 symbol *copySymbolChain (const symbol *);
 void printSymChain (symbol *, int);
 void printStruct (structdef *, int);
-char *genSymName (int);
+char *genSymName (long);
 sym_link *getSpec (sym_link *);
 int compStructSize (int, structdef *);
 sym_link *copyLinkChain (const sym_link *);
@@ -676,10 +676,10 @@ sym_link *newLongLink ();
 sym_link *newBoolLink ();
 sym_link *newVoidLink ();
 int compareType (sym_link *, sym_link *);
-int compareTypeExact (sym_link *, sym_link *, int);
+int compareTypeExact (sym_link *, sym_link *, long);
 int compareTypeInexact (sym_link *, sym_link *);
 int checkFunction (symbol *, symbol *);
-void cleanUpLevel (bucket **, int);
+void cleanUpLevel (bucket **, long);
 void cleanUpBlock (bucket **, int);
 symbol *getAddrspace (sym_link *type);
 int funcInChain (sym_link *);
@@ -700,11 +700,11 @@ void pointerTypes (sym_link *, sym_link *);
 void cdbStructBlock (int);
 void initHashT ();
 bucket *newBucket ();
-void addSym (bucket **, void *, char *, int, int, int checkType);
+void addSym (bucket **, void *, char *, long, int, int checkType);
 void deleteSym (bucket **, void *, const char *);
 void *findSym (bucket **, void *, const char *);
 void *findSymWithLevel (bucket **, struct symbol *);
-void *findSymWithBlock (bucket **, struct symbol *, int, int);
+void *findSymWithBlock (bucket **, struct symbol *, int, long);
 void changePointer (sym_link * p);
 void checkTypeSanity (sym_link * etype, const char *name);
 sym_link *typeFromStr (const char *);

@@ -50,7 +50,7 @@ typedef struct ast
   unsigned lvalue:1;
   unsigned initMode:1;
   unsigned reversed:1;
-  int level;                    /* level for expr */
+  long level;                   /* level for expr */
   int block;                    /* block number   */
   int seqPoint;                 /* sequence point */
   /* union of values expression can have */

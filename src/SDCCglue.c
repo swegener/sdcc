@@ -131,7 +131,7 @@ emitDebugSym (struct dbuf_s *oBuf, symbol * sym)
     {
       dbuf_printf (oBuf, "G$");
     }
-  dbuf_printf (oBuf, "%s$%d$%d", sym->name, sym->level, sym->block);
+  dbuf_printf (oBuf, "%s$%ld_%ld$%d", sym->name, sym->level / LEVEL_UNIT, sym->level % LEVEL_UNIT, sym->block);
 }
 
 /*-----------------------------------------------------------------*/

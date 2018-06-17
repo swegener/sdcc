@@ -31,7 +31,7 @@
 #include "newalloc.h"
 #include "dbuf_string.h"
 
-int cNestLevel;
+long cNestLevel;
 
 
 /*-----------------------------------------------------------------*/

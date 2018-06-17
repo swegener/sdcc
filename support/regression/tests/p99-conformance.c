@@ -51,7 +51,6 @@
 # define SKIP_NON_EVALUATED_COMMA_ASSIGN /* bug #2525 */
 # define SKIP_LONG_DOUBLE /* long double not yet supported */
 # define SKIP_UNIVERSAL
-# define SKIP_MIXED /* mixing of declaration and other statements (C99 feature) not yet supported */
 # define SKIP_COMPOUND /* compound literals not yet supported */
 # define SKIP_VLA /* variable-length arrays not supported */
 # define SKIP_INLINE /* bug #1900 */

@@ -76,7 +76,7 @@ int dwAbbrevNum = 0;
 hTab * dwTypeTagTable;
 int dwRefNum = 0;
 int dwScopeBlock = 0;
-int dwScopeLevel = 0;
+long dwScopeLevel = 0;
 int dwDebugSymbol = 0;
 dwcfins * dwCIEins = NULL;
 dwlocregion * dwFrameLastLoc = NULL;

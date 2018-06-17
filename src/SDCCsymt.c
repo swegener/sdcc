@@ -136,7 +136,7 @@ hashKey (const char *s)
 /* addSym - adds a symbol to the hash Table                        */
 /*-----------------------------------------------------------------*/
 void
-addSym (bucket ** stab, void *sym, char *sname, int level, int block, int checkType)
+addSym (bucket ** stab, void *sym, char *sname, long level, int block, int checkType)
 {
   int i;                        /* index into the hash Table */
   bucket *bp;                   /* temp bucket    *          */
@@ -297,7 +297,7 @@ findSymWithLevel (bucket ** stab, symbol * sym)
 /* findSymWithBlock - finds a symbol with name in a block          */
 /*-----------------------------------------------------------------*/
 void *
-findSymWithBlock (bucket ** stab, symbol * sym, int block, int level)
+findSymWithBlock (bucket ** stab, symbol * sym, int block, long level)
 {
   bucket *bp;
 
@@ -319,7 +319,7 @@ findSymWithBlock (bucket ** stab, symbol * sym, int block, int level)
 /* newSymbol () - returns a new pointer to a symbol                 */
 /*------------------------------------------------------------------*/
 symbol *
-newSymbol (const char *name, int scope)
+newSymbol (const char *name, long scope)
 {
   symbol *sym;
 
@@ -900,7 +900,7 @@ mergeDeclSpec (sym_link * dest, sym_link * src, const char *name)
 /* genSymName - generates and returns a name used for anonymous vars */
 /*-------------------------------------------------------------------*/
 char *
-genSymName (int level)
+genSymName (long level)
 {
   static int gCount = 0;
   static char gname[SDCC_NAME_MAX + 1];
@@ -1344,8 +1344,8 @@ addSymChain (symbol ** symHead)
             elemsFromIval = DCL_ELEM (sym->type) = getNelements (sym->type, sym->ival);
         }
 
-      /* if already exists in the symbol table on the same level */
-      if ((csym = findSymWithLevel (SymbolTab, sym)) && csym->level == sym->level)
+      /* if already exists in the symbol table on the same level, ignoring sublevels */
+      if ((csym = findSymWithLevel (SymbolTab, sym)) && csym->level / LEVEL_UNIT == sym->level / LEVEL_UNIT)
         {
           /* if not formal parameter and not in file scope
              then show symbol redefined error
@@ -2057,7 +2057,7 @@ cleanUpBlock (bucket ** table, int block)
 /*                symbols in the given level                        */
 /*------------------------------------------------------------------*/
 void
-cleanUpLevel (bucket ** table, int level)
+cleanUpLevel (bucket ** table, long level)
 {
   int i;
   bucket *chain;
@@ -2662,7 +2662,7 @@ compareType (sym_link *dest, sym_link *src)
 /* compareTypeExact - will do type check return 1 if match exactly    */
 /*--------------------------------------------------------------------*/
 int
-compareTypeExact (sym_link * dest, sym_link * src, int level)
+compareTypeExact (sym_link * dest, sym_link * src, long level)
 {
   STORAGE_CLASS srcScls, destScls;
 
@@ -2826,7 +2826,7 @@ compareTypeExact (sym_link * dest, sym_link * src, int level)
   if (srcScls != destScls)
     {
 #if 0
-      printf ("level = %d\n", level);
+      printf ("level = %ld:%ld\n", level / LEVEL_UNIT, level % LEVEL_UNIT);
       printf ("SPEC_SCLS (src) = %d, SPEC_SCLS (dest) = %d\n", SPEC_SCLS (src), SPEC_SCLS (dest));
       printf ("srcScls = %d, destScls = %d\n", srcScls, destScls);
 #endif

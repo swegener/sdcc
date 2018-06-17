@@ -966,7 +966,7 @@ allocVariables (symbol * symChain)
   symbol *sym;
   symbol *csym;
   int stack = 0;
-  int saveLevel = 0;
+  long saveLevel = 0;
 
   /* go thru the symbol chain   */
   for (sym = symChain; sym; sym = sym->next)

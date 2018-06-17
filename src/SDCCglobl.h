@@ -189,6 +189,10 @@
                                          ? "overflow"               \
                                          : "empty"))
 
+/* for semantically partitioned nest level values */
+#define LEVEL_UNIT      65536
+#define SUBLEVEL_UNIT   1
+
 /* optimization options */
 struct optimize
   {
@@ -342,7 +346,7 @@ extern int seqPointNo;          /* current sequence point */
 extern FILE *yyin;              /* */
 extern FILE *asmFile;           /* assembly output file */
 extern FILE *cdbFile;           /* debugger symbol file */
-extern int NestLevel;           /* NestLevel                 SDCC.y */
+extern long NestLevel;          /* NestLevel                 SDCC.y */
 extern int stackPtr;            /* stack pointer             SDCC.y */
 extern int xstackPtr;           /* external stack pointer    SDCC.y */
 extern int reentrant;           /* /X flag has been sent     SDCC.y */
@@ -351,7 +355,7 @@ extern int currRegBank;         /* register bank being used  SDCCgens.c */
 extern int RegBankUsed[4];      /* JCF: register banks used  SDCCmain.c */
 extern int BitBankUsed;         /* MB: overlayable bit bank  SDCCmain.c */
 extern struct symbol *currFunc; /* current function    SDCCgens.c */
-extern int cNestLevel;          /* block nest level  SDCCval.c */
+extern long cNestLevel;         /* block nest level  SDCCval.c */
 extern int blockNo;             /* maximum sequential block number */
 extern int currBlockno;         /* sequential block number */
 extern struct optimize optimize;

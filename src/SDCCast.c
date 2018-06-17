@@ -5955,7 +5955,7 @@ createBlock (symbol * decl, ast * body)
   ex = newNode (BLOCK, NULL, body);
   ex->values.sym = decl;
 
-  ex->level++;
+  ex->level += LEVEL_UNIT;
   ex->filename = NULL;
   ex->lineno = 0;
   if (body)
@@ -6921,14 +6921,14 @@ copyAstLoc (ast * dest, ast * src)
   dest->seqPoint = src->seqPoint;
 }
 
-static void fixupInline (ast * tree, int level);
+static void fixupInline (ast * tree, long level);
 
 /*-----------------------------------------------------------------*/
 /* fixupInlineInDeclarators - recursively perform various fixups   */
 /*                            on an inline function tree           */
 /*-----------------------------------------------------------------*/
 static void
-fixupInlineInDeclarators (struct initList *ival, int level)
+fixupInlineInDeclarators (struct initList *ival, long level)
 {
   for (; ival; ival = ival->next)
     {
@@ -6950,7 +6950,7 @@ fixupInlineInDeclarators (struct initList *ival, int level)
 /*               stand-alone function.                             */
 /*-----------------------------------------------------------------*/
 static void
-fixupInline (ast * tree, int level)
+fixupInline (ast * tree, long level)
 {
   int savedBlockno = currBlockno;
 
@@ -6963,7 +6963,7 @@ fixupInline (ast * tree, int level)
       btree_add_child(currBlockno, ++blockNo);
       thisBlockBlockno = blockNo;
 
-      level++;
+      level += LEVEL_UNIT;
 
       /* Add any declared variables back into the symbol table */
       for (decls = tree->values.sym; decls; decls = decls->next)
@@ -7077,7 +7077,7 @@ fixupInline (ast * tree, int level)
 
   if (IS_AST_OP (tree) && (tree->opval.op == BLOCK))
     {
-      level--;
+      level -= LEVEL_UNIT;
       currBlockno = savedBlockno;
     }
 }
@@ -7124,7 +7124,7 @@ inlineAddDecl (symbol * sym, ast * block, int addSymTab, int toFront)
 /* inlineTempVar - create a temporary variable for inlining        */
 /*-----------------------------------------------------------------*/
 static symbol *
-inlineTempVar (sym_link * type, int level)
+inlineTempVar (sym_link * type, long level)
 {
   symbol *sym;
 
@@ -7234,7 +7234,7 @@ expandInlineFuncs (ast * tree, ast * block)
 
           /* Generate a label for the inlined function to branch to */
           /* in case it contains a return statement */
-          retlab = newSymbol (genSymName (tree->level + 1), tree->level + 1);
+          retlab = newSymbol (genSymName (tree->level + LEVEL_UNIT), tree->level + LEVEL_UNIT);
           retlab->isitmp = 1;
           retlab->islbl = 1;
           inlineState.retlab = retlab;
@@ -7253,7 +7253,7 @@ expandInlineFuncs (ast * tree, ast * block)
           temptree = newNode (BLOCK, NULL, temptree);
           copyAstLoc (temptree, tree);
           inlinetree2 = temptree;
-          inlinetree2->level += 2;
+          inlinetree2->level += 2 * LEVEL_UNIT;
           inlinetree2->block = blockNo+2;
 
           /* Handle the return type */
@@ -7275,7 +7275,7 @@ expandInlineFuncs (ast * tree, ast * block)
 
           inlinetree = newNode (BLOCK, NULL, inlinetree2);
           copyAstLoc (inlinetree, tree);
-          inlinetree2->level += 1;
+          inlinetree2->level += LEVEL_UNIT;
           inlinetree2->block = blockNo+1;
 
           /* To pass parameters to the inlined function, we need some  */
@@ -7311,7 +7311,7 @@ expandInlineFuncs (ast * tree, ast * block)
                   break;
                 }
 
-              temparg = inlineTempVar (args->sym->type, tree->level + 1);
+              temparg = inlineTempVar (args->sym->type, tree->level + LEVEL_UNIT);
               inlineAddDecl (copySymbol (temparg), inlinetree, FALSE, FALSE);
 
               assigntree = newNode ('=', newAst_VALUE (symbolVal (temparg)), passedarg);
@@ -7682,11 +7682,12 @@ ast_print (ast * tree, FILE * outfile, int indent)
     {
       symbol *decls = tree->values.sym;
       INDENT (indent, outfile);
-      fprintf (outfile, "{ L%d B%d\n", tree->level, tree->block);
+      fprintf (outfile, "{ L%ld:%ld B%d\n", tree->level / LEVEL_UNIT, tree->level % LEVEL_UNIT, tree->block);
       while (decls)
         {
           INDENT (indent + 2, outfile);
-          fprintf (outfile, "DECLARE SYMBOL (L%d B%d %s=%p) type (", decls->level, decls->block, decls->name, decls);
+          fprintf (outfile, "DECLARE SYMBOL (L%ld:%ld B%d %s=%p) type (",
+                   decls->level / LEVEL_UNIT, decls->level % LEVEL_UNIT, decls->block, decls->name, decls);
           printTypeChain (decls->type, outfile);
           fprintf (outfile, ")");
           if (decls->ival)
@@ -7768,9 +7769,9 @@ ast_print (ast * tree, FILE * outfile, int indent)
             {
               fprintf (outfile, "SYMBOL ");
             }
-          fprintf (outfile, "(L%d B%d %s=%p @ %p)",
-                   tree->opval.val->sym->level, tree->opval.val->sym->block,
-                   tree->opval.val->sym->name, tree, tree->opval.val->sym);
+          fprintf (outfile, "(L%ld:%ld B%d %s=%p @ %p)",
+                   tree->opval.val->sym->level / LEVEL_UNIT, tree->opval.val->sym->level % LEVEL_UNIT,
+                   tree->opval.val->sym->block, tree->opval.val->sym->name, tree, tree->opval.val->sym);
         }
       if (tree->ftype)
         {

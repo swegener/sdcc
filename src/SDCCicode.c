@@ -38,7 +38,7 @@ int iCodeKey = 0;
 char *filename;                 /* current file name */
 int lineno = 1;                 /* current line number */
 int block;
-int scopeLevel;
+long scopeLevel;
 int seqPoint;
 int inCriticalPair = 0;
 

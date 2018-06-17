@@ -1,3 +1,26 @@
+2018-06-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCC.y,
+	  src/SDCCBBlock.c,
+	  src/SDCCast.c,
+	  src/SDCCast.h,
+	  src/SDCCdwarf2.c,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCglobl.h,
+	  src/SDCCglue.c,
+	  src/SDCCicode.c,
+	  src/SDCCicode.h,
+	  src/SDCCmem.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/SDCCval.c,
+	  src/cdbFile.c,
+	  support/regression/tests/p99-conformance.c,
+	  support/regression/tests/declafterstmt.c,
+	  support/valdiag/tests/declafterstmt.c:
+	  Support for C99 intermingling of declaration and statements, patch by Benedikt Freisen.
+
 2018-06-15 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCClospre.hpp,

@@ -3945,7 +3945,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           IS_INTEGRAL (RTYPE (tree)) &&
           resultType == RESULT_TYPE_BOOL &&
           tree->opval.op == '^')   /* the same source is used by 'bitwise or' */
-        {printf("type %d\n", LTYPE (tree)->select.s.noun);
+        {
           unsigned long litval = AST_ULONG_VALUE (tree->right);
           if (litval == 0 || litval == 1)
             {

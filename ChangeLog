@@ -2,6 +2,8 @@
 
 	* sdas/asxxsrc/asdbg.c:
 	  Fix an assembler issue, alternative fix to patch #286.
+	* support/regression/tests/bug-2750.c:
+	  Regression test for bug #2750.
 
 2018-06-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

@@ -25,7 +25,6 @@
 #include "common.h"
 #include "newalloc.h"
 #include "dbuf_string.h"
-#include <malloc.h>
 
 /*-----------------------------------------------------------------*/
 /* newCseDef - new cseDef                                          */

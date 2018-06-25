@@ -1,3 +1,8 @@
+2018-06-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2363.c:
+	  Disable test for mcs51 small model.
+
 2018-06-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c: remove leftover debugging (fix bug #2763)

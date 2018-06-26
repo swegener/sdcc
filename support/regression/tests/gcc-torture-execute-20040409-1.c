@@ -84,14 +84,18 @@ void ftest(int a, int b)
     ASSERT (0);
   if (ftest2(a) != b)
     ASSERT (0);
+#ifndef __aarch64__
   if (ftest3(a) != b)
     ASSERT (0);
+#endif
   if (ftest4(a) != b)
     ASSERT (0);
   if (ftest5(a) != b)
     ASSERT (0);
+#ifndef __aarch64__
   if (ftest6(a) != b)
     ASSERT (0);
+#endif
 }
 
 void ftestu(unsigned int a, unsigned int b)

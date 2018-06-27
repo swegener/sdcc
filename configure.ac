@@ -79,7 +79,6 @@ AC_LANG_C
 
 AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h stdalign.h)
 AC_LANG_PUSH([C++])
-AC_CHECK_HEADERS(stx/btree_set.h stx/btree_map.h,,AC_MSG_WARN([[STX library missing, using STL instead.]]))
 AC_CHECK_HEADERS(treedec/combinations.hpp,,AC_MSG_WARN([[treedec library missing, falling back to Thorup.]]))
 AC_CHECK_HEADERS(gala/graph.h)
 AC_CHECK_HEADERS(boost/graph/adjacency_list.hpp,,AC_MSG_ERROR([[boost library not found (boost/graph/adjacency_list.hpp).]]))

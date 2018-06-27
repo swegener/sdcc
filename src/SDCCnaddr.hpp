@@ -54,17 +54,9 @@ extern "C"
 #include "SDCCy.h"
 }
 
-#ifdef HAVE_STX_BTREE_SET_H
-#include <stx/btree_set.h>
-#endif
-
 typedef short int naddrspace_t; // Named address spaces. -1: Undefined, Others: see map.
 
-#ifdef HAVE_STX_BTREE_SET_H
-typedef stx::btree_set<unsigned short int> naddrspaceset_t; // Faster than std::set
-#else
 typedef std::set<unsigned short int> naddrspaceset_t;
-#endif
 
 struct assignment_naddr
 {

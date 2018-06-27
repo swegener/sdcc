@@ -35,18 +35,26 @@
 	jp	init
 
 	.org	0x08
+	ei
 	reti
+	ei
 	.org	0x10
+	ei
 	reti
 	.org	0x18
+	ei
 	reti
 	.org	0x20
+	ei
 	reti
 	.org	0x28
+	ei
 	reti
 	.org	0x30
+	ei
 	reti
 	.org	0x38
+	ei
 	reti
 
 	.org	0x100

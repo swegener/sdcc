@@ -2,6 +2,9 @@
 
 	* src/mcs51/peep.c:
 	  Fix bug #2108.
+	* device/lib/z80/crt0.s,
+	  device/lib/z180/crt0.s:
+	  Implement ei for RFE #519.
 
 2018-06-26 Ben Shi <powerstudio1st AT 163 DOT com>
 

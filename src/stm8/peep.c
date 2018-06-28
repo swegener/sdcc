@@ -441,12 +441,16 @@ findLabel (const lineNode *pl)
 
   /* 1. extract label in opcode */
 
-  /* In each mcs51 jumping opcode the label is at the end of the opcode */
+  /* In each jump the label is at the end */
   p = strlen (pl->line) - 1 + pl->line;
 
-  /* scan backward until ',' or '\t' */
+  /* Skip trailing whitespace */
+  while(isspace(*p))
+    p--;
+
+  /* scan backward until space or ',' */
   for (; p > pl->line; p--)
-    if (*p == ',' || *p == '\t')
+    if (isspace(*p) || *p == ',')
       break;
 
   /* sanity check */

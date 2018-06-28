@@ -46,7 +46,6 @@ ee_u16 core_bench_matrix(mat_params *p, ee_s16 seed, ee_u16 crc)
 
 ee_s16 calc_func(ee_s16 *pdata, core_results *res)
 {
-#ifndef __SDCC_stm8
 	ee_s16 data=*pdata;
 	ee_s16 retval;
 	ee_u8 optype=(data>>7) & 1;
@@ -70,16 +69,13 @@ ee_s16 calc_func(ee_s16 *pdata, core_results *res)
 		}
 		return retval;
 	}
-#endif
 }
 
 void testBug(void)
 {
-#ifndef __SDCC_stm8
 	ee_s16 data = 0;
 	core_results res = {0};
 	ASSERT(calc_func(&data, &res) == 0xaa55);
 	ASSERT(res.crcstate ==  0xaa55);
-#endif
 }
 

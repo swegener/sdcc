@@ -1100,26 +1100,26 @@ replace restart {
 
 
 replace restart {
-	ldw     x, (%1, sp)
-	cpw     x, #%2
-	jrsge   %3
-	ldw     x, #%2
+	ldw	x, (%1, sp)
+	cpw	x, #%2
+	jrsge	%3
+	ldw	x, #%2
 } by {
-	ldw     x, #%2
-	cpw     x, (%1, sp)
-	jrslt   %3
+	ldw	x, #%2
+	cpw	x, (%1, sp)
+	jrslt	%3
 	; peephole j31 removed load by inverting jump condition.
 } if notUsedFrom(%3 'x')
 
 replace restart {
-	ldw     x, (%1, sp)
-	cpw     x, #%2
-	jrsle   %3
-	ldw     x, #%2
+	ldw	x, (%1, sp)
+	cpw	x, #%2
+	jrsle	%3
+	ldw	x, #%2
 } by {
-	ldw     x, #%2
-	cpw     x, (%1, sp)
-	jrsgt   %3
+	ldw	x, #%2
+	cpw	x, (%1, sp)
+	jrsgt	%3
 	; peephole j32 removed load by inverting jump condition.
 } if notUsedFrom(%3 'x')
 

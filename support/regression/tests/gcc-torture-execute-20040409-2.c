@@ -168,9 +168,9 @@ void ftest(int a, int b)
 #ifndef __aarch64__
   if (ftest5(a) != b)
     ASSERT (0);
-#endif
   if (ftest6(a) != b)
     ASSERT (0);
+#endif
   if (ftest7(a) != b)
     ASSERT (0);
   if (ftest8(a) != b)
@@ -182,9 +182,9 @@ void ftest(int a, int b)
 #ifndef __aarch64__
   if (ftest11(a) != b)
     ASSERT (0);
-#endif
   if (ftest12(a) != b)
     ASSERT (0);
+#endif
 }
 
 void ftestu(unsigned int a, unsigned int b)

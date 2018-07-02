@@ -29,19 +29,9 @@ typedef struct RESULTS_S {
 
 #pragma disable_warning 85
 
-ee_u16 crcu16(ee_u16 newval, ee_u16 crc)
-{
-	return 0;
-}
-
 ee_u16 core_bench_state(ee_u32 blksize, ee_u8 *memblock, ee_s16 seed1, ee_s16 seed2, ee_s16 step, ee_u16 crc)
 {
-	return 0xaa55;
-}
-
-ee_u16 core_bench_matrix(mat_params *p, ee_s16 seed, ee_u16 crc)
-{
-	return 0;
+	return 0x0a55;
 }
 
 ee_s16 calc_func(ee_s16 *pdata, core_results *res)
@@ -75,7 +65,7 @@ void testBug(void)
 {
 	ee_s16 data = 0;
 	core_results res = {0};
-	ASSERT(calc_func(&data, &res) == 0xaa55);
-	ASSERT(res.crcstate ==  0xaa55);
+	ASSERT(calc_func(&data, &res) == 0x0a55);
+	ASSERT(res.crcstate ==  0x0a55);
 }
 

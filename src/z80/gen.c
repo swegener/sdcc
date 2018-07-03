@@ -4245,7 +4245,7 @@ emitCall (const iCode *ic, bool ispcall)
                         OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (IC_RESULT (ic));
 
   /* adjust the stack for parameters if required */
-  if ((ic->parmBytes || bigreturn) && (IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type) || z88dk_callee))
+  if ((ic->parmBytes || bigreturn) && (IFFUNC_ISNORETURN (ftype) || z88dk_callee))
     {
       if (!regalloc_dry_run)
         {

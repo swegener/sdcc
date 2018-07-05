@@ -604,7 +604,6 @@ void
 printChar (struct dbuf_s *oBuf, const char *s, int plen)
 {
   int i;
-  int len = plen;
   int pplen = 0;
   char buf[100];
   char *p = buf;

@@ -368,7 +368,7 @@ typedef struct symbol
   }
   usl;
   signed char bitVar;               /* if bitVar != 0: this is a bit variable, bitVar is the size in bits */
-  char bitUnnamed:1;                /* unnamed bit variable */
+  unsigned bitUnnamed:1;            /* unnamed bit variable */
   unsigned offset;                  /* offset from top if struct */
 
   int lineDef;                      /* defined line number        */

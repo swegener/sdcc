@@ -2,6 +2,13 @@
 
 	* src/SDCClospre.hpp:
 	  Fix bug #2748.
+	* src/SDCCcse.h,
+	  src/SDCCdebug.c,
+	  src/SDCCglue.c,
+	  src/SDCCpeeph.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h:
+	  Improve code quality fixing a few gcc -pedantic warnings.
 
 2018-07-03 Philipp Klaus Krause <pkk AT spth.de>
 

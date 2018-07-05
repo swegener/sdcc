@@ -493,7 +493,7 @@ addDecl (symbol * sym, int type, sym_link * p)
   sym_link *t;
 
   if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
-    fprintf (stderr, "SDCCsymt.c:addDecl(%s,%d,%p)\n", sym->name, type, p);
+    fprintf (stderr, "SDCCsymt.c:addDecl(%s,%d,%p)\n", sym->name, type, (void *)p);
 
   if (empty == NULL)
     empty = newLink (SPECIFIER);
@@ -572,7 +572,7 @@ addDecl (symbol * sym, int type, sym_link * p)
   unsigned float uf;
   ------------------------------------------------------------------*/
 void
-checkTypeSanity (sym_link * etype, const char *name)
+checkTypeSanity (sym_link *etype, const char *name)
 {
   char *noun;
 
@@ -598,7 +598,7 @@ checkTypeSanity (sym_link * etype, const char *name)
 
   if (getenv ("DEBUG_SANITY"))
     {
-      fprintf (stderr, "checking sanity for %s %p\n", name, etype);
+      fprintf (stderr, "checking sanity for %s %p\n", name, (void *)etype);
     }
 
   if ((SPEC_NOUN (etype) == V_BOOL ||

@@ -1,3 +1,8 @@
+2018-07-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp:
+	  Fix bug #2748.
+
 2018-07-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

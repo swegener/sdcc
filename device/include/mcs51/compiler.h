@@ -44,6 +44,9 @@
   * or written.
   * SFR16X and SFR32X for 16 bit and 32 bit xdata registers are not defined
   * to avoid portability issues because of compiler endianness.
+  * SFR16LEX is provided for 16 bit little endian xdata registers. It is usable
+  * on little endian compilers only; on big endian compilers, these registers
+  * will not be defined.
   * This file is to be included in every microcontroller specific header file.
   * Example:
   *
@@ -78,6 +81,7 @@
 # define SFRX(name, addr)       __xdata volatile unsigned char __at(addr) name
 # define SFR16(name, addr)      __sfr16 __at(((addr+1U)<<8) | addr)       name
 # define SFR16E(name, fulladdr) __sfr16 __at(fulladdr)                    name
+# define SFR16LEX(name, addr)   __xdata volatile unsigned short __at(addr) name
 # define SFR32(name, addr)      __sfr32 __at(((addr+3UL)<<24) | ((addr+2UL)<<16) | ((addr+1UL)<<8) | addr) name
 # define SFR32E(name, fulladdr) __sfr32 __at(fulladdr)                    name
 
@@ -96,6 +100,7 @@
 # define SFRX(name, addr)       volatile unsigned char xdata name _at_ addr
 # define SFR16(name, addr)      sfr16 name = addr
 # define SFR16E(name, fulladdr) /* not supported */
+# define SFR16LEX(name, addr)   /* not supported */
 # define SFR32(name, fulladdr)  /* not supported */
 # define SFR32E(name, fulladdr) /* not supported */
 
@@ -115,6 +120,7 @@ extern void _nop_ (void);
 # define SFRX(name, addr)       xdata at addr volatile unsigned char name
 # define SFR16(name, addr)      sfr16 at addr                        name
 # define SFR16E(name, fulladdr) /* not supported */
+# define SFR16LEX(name, addr)   /* not supported */
 # define SFR32(name, fulladdr)  /* not supported */
 # define SFR32E(name, fulladdr) /* not supported */
 
@@ -133,6 +139,7 @@ extern void _nop_ (void);
 # define SFRX(name, addr)       __xdata __no_init volatile unsigned char name @ addr
 # define SFR16(name, addr)      __sfr __no_init volatile unsigned int  name @ addr
 # define SFR16E(name, fulladdr) /* not supported */
+# define SFR16LEX(name, addr)   /* not supported */
 # define SFR32(name, fulladdr)  __sfr __no_init volatile unsigned long name @ addr
 # define SFR32E(name, fulladdr) /* not supported */
 
@@ -158,6 +165,7 @@ extern __intrinsic void __no_operation (void);
 # define SFR16(name, addr)      /* not supported */
 #endif
 # define SFR16E(name, fulladdr) /* not supported */
+# define SFR16LEX(name, addr)   /* not supported */
 # define SFR32(name, fulladdr)  /* not supported */
 # define SFR32E(name, fulladdr) /* not supported */
 
@@ -177,6 +185,7 @@ extern void _nop (void);
 # define SFRX(name, addr)       volatile far unsigned char name @ addr
 # define SFR16(name, addr)      /* not supported */
 # define SFR16E(name, fulladdr) /* not supported */
+# define SFR16LEX(name, addr)   /* not supported */
 # define SFR32(name, fulladdr)  /* not supported */
 # define SFR32E(name, fulladdr) /* not supported */
 
@@ -195,6 +204,7 @@ extern void _nop (void);
 # define SFRX(name, addr)       volatile unsigned char _xdata name _at addr
 # define SFR16(name, addr)      _sfrword name = addr
 # define SFR16E(name, fulladdr) /* not supported */
+# define SFR16LEX(name, addr)   /* not supported */
 # define SFR32(name, fulladdr)  /* not supported */
 # define SFR32E(name, fulladdr) /* not supported */
 
@@ -207,6 +217,7 @@ extern void _nop (void);
 # define SFRX(name, addr)       xdata volatile unsigned char name @ addr
 # define SFR16(name, addr)      /* not supported */
 # define SFR16E(name, fulladdr) /* not supported */
+# define SFR16LEX(name, addr)   /* not supported */
 # define SFR32(name, fulladdr)  /* not supported */
 # define SFR32E(name, fulladdr) /* not supported */
 
@@ -220,6 +231,7 @@ extern void _nop (void);
 # define SFRX(name, addr)       volatile unsigned char  name
 # define SFR16(name, addr)      volatile unsigned short name
 # define SFR16E(name, fulladdr) volatile unsigned short name
+# define SFR16LEX(name, addr)   volatile unsigned short name
 # define SFR32(name, fulladdr)  volatile unsigned long  name
 # define SFR32E(name, fulladdr) volatile unsigned long  name
 

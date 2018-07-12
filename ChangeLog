@@ -3,6 +3,13 @@
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2770.c:
 	  Fix bug #2770.
+	* device/include/mcs51/ax8052.h,
+	  device/include/mcs51/ax8052f131.h,
+	  device/include/mcs51/ax8052f142.h,
+	  device/include/mcs51/ax8052f143.h,
+	  device/include/mcs51/ax8052f151.h,
+	  device/include/mcs51/compiler.h:
+	  Headers for Axsem 8052, patch #166 by Thomas Sailer.
 
 2018-07-05 Philipp Klaus Krause <pkk AT spth.de>
 

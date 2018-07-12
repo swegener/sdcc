@@ -8042,20 +8042,13 @@ genXor (const iCode * ic, iCode * ifx)
     }
 
   /* if result = right then exchange them */
-  if (sameRegs (AOP (result), AOP (right)))
+  if (sameRegs (AOP (result), AOP (right)) && !AOP_NEEDSACC (left))
     {
       operand *tmp = right;
       right = left;
       left = tmp;
     }
 
-  /* if right is bit then exchange them */
-  if (AOP_TYPE (right) == AOP_CRY && AOP_TYPE (left) != AOP_CRY)
-    {
-      operand *tmp = right;
-      right = left;
-      left = tmp;
-    }
   if (AOP_TYPE (right) == AOP_LIT)
     lit = ullFromVal (AOP (right)->aopu.aop_lit);
 
@@ -8070,6 +8063,7 @@ genXor (const iCode * ic, iCode * ifx)
   /* Make sure A is on the left to not overwrite it. */
   if (aopInReg (right->aop, 0, A_IDX))
     {
+      wassert (!AOP_NEEDSACC (left));
       operand *tmp = right;
       right = left;
       left = tmp;

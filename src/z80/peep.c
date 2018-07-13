@@ -394,8 +394,7 @@ z80MightRead(const lineNode *pl, const char *what)
     ISINST(pl->line, "nop"))
     return(false);
 
-  if(strncmp(pl->line, "jp", 3) == 0 ||
-     strncmp(pl->line, "jr", 3) == 0)
+  if(ISINST(pl->line, "jp") || ISINST(pl->line, "jr"))
     return(false);
 
   if(ISINST(pl->line, "djnz"))

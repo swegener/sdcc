@@ -43,9 +43,6 @@ extern "C"
 
 typedef std::set<unsigned short int> lospreset_t;
 
-// #define DEBUG_LOSPRE
-// #define DEBUG_LOSPRE_ASS
-
 struct assignment_lospre
 {
   boost::tuple<float, float> s; // First entry: Calculation costs, second entry: Lifetime costs.

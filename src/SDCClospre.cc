@@ -19,7 +19,8 @@
 //
 // Lifetime-optimal speculative partial redundancy elimination.
 
-#define DEBUG_LOSPRE // Uncomment to get debug messages while doing lospre.
+//#define DEBUG_LOSPRE // Uncomment to get debug messages while doing lospre.
+//#define DEBUG_LOSPRE_ASS // Uncomment to get debug messages on considered assignmentd while doing lospre.
 
 #include "SDCClospre.hpp"
 
@@ -257,9 +258,8 @@ void dump_cfg_lospre (const cfg_lospre_t &cfg)
   delete[] name;
 }
 
-#if 0
 // Dump tree decomposition.
-static void dump_tree_decomposition(const tree_dec_t &tree_dec)
+static void dump_dec_lospre(const tree_dec_t &tree_dec)
 {
   std::ofstream dump_file((std::string(dstFileName) + ".dumplospredec" + currFunc->rname + ".dot").c_str());
 
@@ -280,7 +280,6 @@ static void dump_tree_decomposition(const tree_dec_t &tree_dec)
   boost::write_graphviz(dump_file, tree_dec, boost::make_label_writer(name));
   delete[] name;
 }
-#endif
 
 void
 lospre (iCode *sic, ebbIndex *ebbi)
@@ -301,6 +300,9 @@ lospre (iCode *sic, ebbIndex *ebbi)
     dump_cfg_lospre(control_flow_graph);
 
   get_nice_tree_decomposition (tree_decomposition, control_flow_graph);
+
+  if(options.dump_graphs)
+    dump_dec_lospre(tree_decomposition);
 
   int lkey = operandKey;
 

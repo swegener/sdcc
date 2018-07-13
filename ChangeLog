@@ -1,3 +1,11 @@
+2018-07-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/peep.c,
+	  support/regression/tests/bug-2771.c:
+	  Fix bug #2771.
+	* src/SDCClospre.cc:
+	  Improve lospre debug output.
+
 2018-07-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

@@ -421,7 +421,7 @@ void tree_dec_safety_forget(T_t &T, typename boost::graph_traits<T_t>::vertex_de
         bool ok;
 
         for (ok = false, boost::tie(n, n_end) = boost::out_edges(i, G);  !ok && n != n_end; ++n)
-          if (ai->global[boost::target(*n, G)] || G[boost::target(*n, G)].invalidates)
+          if (ai->global[boost::target(*n, G)] || G[boost::target(*n, G)].invalidates && !G[boost::target(*n, G)].uses)
             ok = true;
 
         if(!ok)
@@ -809,7 +809,7 @@ static int tree_dec_safety (tree_dec_t/*T_t*/ &T, cfg_lospre_t/*G_t*/ &G, const 
   implement_safety(winner, G);
 
 #ifdef DEBUG_LOSPRE
-  std::cout << "Winner (safety): ";
+  std::cout << "Winner (safety) (I' \\ I): ";
   print_assignment(winner, G);
 #endif
 

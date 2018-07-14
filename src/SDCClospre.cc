@@ -19,8 +19,8 @@
 //
 // Lifetime-optimal speculative partial redundancy elimination.
 
-//#define DEBUG_LOSPRE // Uncomment to get debug messages while doing lospre.
-//#define DEBUG_LOSPRE_ASS // Uncomment to get debug messages on considered assignmentd while doing lospre.
+// #define DEBUG_LOSPRE // Uncomment to get debug messages while doing lospre.
+// #define DEBUG_LOSPRE_ASS // Uncomment to get debug messages on considered assignmentd while doing lospre.
 
 #include "SDCClospre.hpp"
 
@@ -105,12 +105,6 @@ candidate_expression (const iCode *const ic, int lkey)
   // Todo: Allow literal right operand once backends can rematerialize literals!
   if(ic->op == '=' && IS_OP_LITERAL (right))
     return (false);
-
-  //if(IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
-  //  return (false);
-
-  //if(POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
-  //  return (false);
 
   // Todo: Allow more operands!
   if (ic->op != CAST && left && !(IS_SYMOP (left) || IS_OP_LITERAL (left)) ||
@@ -210,6 +204,9 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   if (optimize.codeSpeed)
     safety_required = true;
 
+#ifdef DEBUG_LOSPRE
+  std::cout << "Invalidation set I: ";
+#endif
   for (vertex_t i = 0; i < boost::num_vertices (*cfg); i++)
     {
        const iCode *const ic = (*cfg)[i].ic;
@@ -226,13 +223,21 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
          (*cfg)[i].invalidates = true;
        if ((uses_global || uses_volatile) && (ic->op == CALL || ic->op == PCALL))
          (*cfg)[i].invalidates = true;
-       if (uses_volatile && !(*cfg)[i].uses && (POINTER_GET (ic) && IS_VOLATILE (operandType (left)->next)) || IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
+       if (uses_volatile && (POINTER_GET (ic) && IS_VOLATILE (operandType (left)->next)) || IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
          (*cfg)[i].invalidates = true;
        if (uses_global && POINTER_SET (ic)) // TODO: More accuracy here!
          (*cfg)[i].invalidates = true;
 
        (*cfg)[i].forward = std::pair<int, int>(-1, -1);
+
+#ifdef DEBUG_LOSPRE
+       if ((*cfg)[i].invalidates)
+         std::cout << i << ", ";
+#endif
     }
+#ifdef DEBUG_LOSPRE
+  std::cout << "\n";
+#endif
 
   return (safety_required);
 }

@@ -1,3 +1,8 @@
+2018-07-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pic14/glue.c:
+	  Fix an issue introduced with support for C99 intermingling of declarations and statements.
+
 2018-07-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClospre.cc,

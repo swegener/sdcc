@@ -427,7 +427,7 @@ pic14emitOverlay (struct dbuf_s * aBuf)
                                         /* symbol is local */
                                         dbuf_printf (aBuf, "L%s_",
                                         (sym->localof ? sym->localof->name : "-null-"));
-                                dbuf_printf (aBuf, "%s_%d_%d", sym->name, sym->level, sym->block);
+                                dbuf_printf (aBuf, "%s_%ld_%d", sym->name, sym->level, sym->block);
                         }
 
                         /* if is has an absolute address then generate

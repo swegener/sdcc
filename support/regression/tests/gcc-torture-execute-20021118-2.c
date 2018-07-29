@@ -6,6 +6,7 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#pragma disable_warning 93
 #endif
 
 /* Since these tests use function pointers with multiple parameters */

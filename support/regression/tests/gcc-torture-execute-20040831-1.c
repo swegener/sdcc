@@ -6,6 +6,7 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#pragma disable_warning 93
 #endif
 
 /* This testcase was being miscompiled, because operand_equal_p

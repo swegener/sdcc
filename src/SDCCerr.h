@@ -56,8 +56,8 @@ enum {
   E_PTR_REQD                    =  27, /* pointer required     */
   E_UNARY_OP                    =  28, /* unary operator bad op*/
   E_CONV_ERR                    =  29, /* conversion error     */
-  E_INT_REQD                    =  30, /* bit field must be int*/
-  E_BITFLD_SIZE                 =  31, /* bit field size > 16  */
+  E_INT_REQD                    =  30, /* bit-field must be int*/
+  E_BITFLD_SIZE                 =  31, /* bit-field size > 16  */
   W_TRUNCATION                  =  32, /* high order trucation */
   E_CODE_WRITE                  =  33, /* trying 2 write to code */
   E_LVALUE_CONST                =  34, /* lvalue is a const   */

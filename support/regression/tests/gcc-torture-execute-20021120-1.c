@@ -6,6 +6,7 @@
 
 #ifdef __SDCC
 #pragma std_c99
+#pragma disable_warning 93
 #endif
 
 /* This generates too much code for a pic14 */

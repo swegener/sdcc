@@ -1,3 +1,10 @@
+2018-07-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.?:
+	  Fix typos.
+	  support/regression/tests/gcc-torture-execute-*.c:
+	  Disable some warnings.
+
 2018-07-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pic14/glue.c:

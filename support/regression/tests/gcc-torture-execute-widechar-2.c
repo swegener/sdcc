@@ -6,7 +6,7 @@ widechar-2.c from the execute part of the gcc torture tests.
 
 #include <stddef.h>
 
-#if 0 // SDCC bug in handling wide string literals in initialization
+#if 0 // SDCC bug #2791 in handling wide string literals in initialization
 const wchar_t ws[] = L"foo";
 #endif
 

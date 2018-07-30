@@ -7,7 +7,7 @@ wchar_t-1.c from the execute part of the gcc torture tests.
 #include <wchar.h>
 
 /* { dg-options "-finput-charset=utf-8" } */
-#if 0 // SDCC bug in handling wide string literals in initialization
+#if 0 // SDCC bug #2791 in handling wide string literals in initialization
 wchar_t x[] = L"Ä";
 wchar_t y = L'Ä';
 #endif

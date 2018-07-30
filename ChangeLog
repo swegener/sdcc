@@ -1,5 +1,12 @@
 2018-07-30 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCglue.c,
+	  support/regression/tests/gcc-torture-execute-wchar_t-1.c,
+	  support/regression/tests/gcc-torture-execute-widechar-2.c:
+	  Fix bug #2791.
+
+2018-07-30 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/gcc-torture-execute-*.c:
 	  Add tests from GCC 8.2.
 

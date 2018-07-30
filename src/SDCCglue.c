@@ -1244,7 +1244,7 @@ printIvalChar32 (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s 
     {
       val = list2val (ilist, TRUE);
       /* if the value is a character string  */
-      if (IS_ARRAY (val->type) && IS_INT (val->etype) && IS_UNSIGNED (val->etype) && !IS_LONG (val->etype))
+      if (IS_ARRAY (val->type) && IS_INT (val->etype) && IS_UNSIGNED (val->etype) && IS_LONG (val->etype))
         {
           if (!size)
             {

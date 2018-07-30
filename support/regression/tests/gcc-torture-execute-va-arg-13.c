@@ -40,7 +40,7 @@ void test (int fmt, ...)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390
+#ifndef __SDCC_ds390 // Bug #2779
   test (456, 1234);
   return;
 #endif

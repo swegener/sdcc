@@ -208,7 +208,7 @@ constant_shift(unsigned long long x, int i)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390
+#ifndef __SDCC_ds390 // Bug #2780
   int i;
 
   for (i = 0; i < BITS; ++i)

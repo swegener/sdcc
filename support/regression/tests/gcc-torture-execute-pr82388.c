@@ -17,7 +17,7 @@ foo (void)
 }
 #endif
 void
-testTortureExecute ()
+testTortureExecute (void)
 {
 #if 0
   e = foo ();

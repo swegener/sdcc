@@ -8,7 +8,7 @@ pr83298.c from the execute part of the gcc torture tests.
 int a, b, c = 1;
 
 void
-testTortureExecute ()
+testTortureExecute (void)
 {
   for (; b < 1; b++)
     ;

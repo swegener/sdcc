@@ -1,7 +1,7 @@
 2018-07-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-*.c:
-	  Add some tests from GCC 8.2.
+	  Add tests from GCC 8.2.
 
 2018-07-29 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -13,8 +13,8 @@ f (long long x)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
-#ifndef __SDCC_ds390
+#ifndef __SDCC_mcs51 // Bug #2778
+#ifndef __SDCC_ds390 // Bug #2777
   if (f (10000000000LL) != 1 || f (100000000000LL) != 10)
     ASSERT (0);
   return;

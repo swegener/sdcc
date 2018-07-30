@@ -16,10 +16,8 @@ testTortureExecute (void)
 {
   if (sizeof (x) / sizeof (wchar_t) != 2)
     ASSERT (0);
-#if 0
   if (x[0] != L'Ä' || x[1] != L'\0')
     ASSERT (0);
-#endif
   if (y != L'Ä')
     ASSERT (0);
   return;

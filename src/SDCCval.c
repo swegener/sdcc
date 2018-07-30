@@ -1737,7 +1737,13 @@ charVal (const char *s)
         }
     }
   else                          /* not a backslash */
-    return constCharacterVal (*s, type);
+    {
+      size_t ulen;
+      const TYPE_UDWORD *ustr = utf_32_from_utf_8 (&ulen, s, strlen(s) - 1);
+      value *val = constCharacterVal (*ustr, type);
+      free ((void *)ustr);
+      return (val);
+    }
 }
 
 /*------------------------------------------------------------------*/

@@ -380,7 +380,9 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
      operands are 8-bit, so the most benefit is in 8-bit
      operations. On the other hand, supporting wider
      operations well in codegen is also more effort. */
-  if (bitsForType (operandType (IC_RESULT (dic))) > 8)
+  if (bitsForType (operandType (IC_RESULT (dic))) > 8 &&
+    !((dic->op == LEFT_OP || dic->op == RIGHT_OP) && IS_OP_LITERAL (IC_RIGHT (dic)) && operandLitValue (IC_RIGHT (dic))  == 1 && // Can do wide shift by 1 in place.
+      IS_SYMOP (IC_LEFT (dic)) && IS_SYMOP (IC_RESULT (ic)) && OP_SYMBOL (IC_LEFT (dic)) == OP_SYMBOL (IC_RESULT (ic))))
     return 0;
 
   /* if the result is on stack or iaccess then it must be

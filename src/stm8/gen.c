@@ -2159,6 +2159,9 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       return;
     }
 
+  if (result->type == AOP_DIR && source->type == AOP_DIR && roffset == soffset && !strcmp(result->aopu.aop_dir, source->aopu.aop_dir))
+    return;
+
   for (i = 0; i < size;)
     {
       const bool x_dead = x_dead_global &&

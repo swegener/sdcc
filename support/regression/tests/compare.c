@@ -105,6 +105,38 @@ testUnsignedCompare(void)
 void (*fptr)(void);
 int *volatile iptr;
 
+signed {type} s;
+unsigned {type} u;
+
+void set ({type} v)
+{
+	s = v;
+	u = v;
+}
+
+/* Test optimization for eliminating redundant loads in range tests. s and u should not be volatile. */
+void testRange(void)
+{
+    set (17);
+
+    ASSERT (s >= 17 && s <= 20);
+    ASSERT (u >= 17 && u <= 20);
+
+    set (21);
+
+    ASSERT (!(s >= 17 && s <= 20));
+    ASSERT (!(u >= 17 && u <= 20));
+
+    set (18);
+
+    ASSERT (s > 17 && s < 20);
+    ASSERT (u > 17 && u < 20);
+
+    set (20);
+
+    ASSERT (!(s > 17 && s < 20));
+    ASSERT (!(u > 17 && u < 20));
+}
 
 void testPointerCompare(void)
 {
@@ -114,6 +146,8 @@ void testPointerCompare(void)
 	ASSERT(iptr == &i);
 	ASSERT(fptr == &testPointerCompare);
 }
+
+
 
 /*
                 Common cases:

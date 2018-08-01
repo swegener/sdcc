@@ -1,3 +1,11 @@
+2018-08-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def,
+	  support/regression/tests/compare.c:
+	  Improve range checks on 8- and 16-bit variables.
+	* support/regression/tests/gcc-torture-execute-vrp-7.c:
+	  Disable test which fails for z80-related for tlcs90, also.
+
 2018-07-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/ralloc.c,

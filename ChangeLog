@@ -2,6 +2,8 @@
 
 	* support/regression/tests/gcc-torture-execute-va-arg-5.c:
 	  Disable a test for older GCC.
+	* support/regression/ports/uc*/spec.mk:
+	  Harmonize simulation timeouts for z80-related.
 
 2018-08-01 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -34,7 +34,7 @@
 
 #if defined(__SDCC_hc08) || defined(__SDCC_s08) || defined(__SDCC_stm8) // Big-endian
 
-unsigned long long _rlulonglong(unsigned long long l, signed char s)
+unsigned long long _rlulonglong(unsigned long long l, char s)
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 0);
 	uint16_t *const middle = (uint16_t *)((char *)(&l) + 4);
@@ -58,7 +58,7 @@ unsigned long long _rlulonglong(unsigned long long l, signed char s)
 
 #else // Little-endian
 
-unsigned long long _rlulonglong(unsigned long long l, signed char s)
+unsigned long long _rlulonglong(unsigned long long l, char s)
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
 	uint16_t *const middle = (uint16_t *)((char *)(&l) + 2);

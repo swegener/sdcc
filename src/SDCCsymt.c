@@ -3967,7 +3967,8 @@ _mangleFunctionName (const char *in)
 /*                      'q' - fixed16x16                           */
 /*                      'v' - void                                 */
 /*                      '*' - pointer - default (GPOINTER)         */
-/* modifiers -          'u' - unsigned                             */
+/* modifiers -          'S' - signed                               */
+/*                      'U' - unsigned                             */
 /*                      'C' - const                                */
 /* pointer modifiers -  'g' - generic                              */
 /*                      'x' - xdata                                */
@@ -3976,12 +3977,14 @@ _mangleFunctionName (const char *in)
 /*                      'F' - function                             */
 /* examples : "ig*" - generic int *                                */
 /*            "cx*" - char xdata *                                 */
-/*            "ui" -  unsigned int                                 */
+/*            "Ui" -  unsigned int                                 */
+/*            "Sc" -  signed char                                  */
 /*-----------------------------------------------------------------*/
 sym_link *
 typeFromStr (const char *s)
 {
   sym_link *r = newLink (DECLARATOR);
+  int sign = 0;
   int usign = 0;
   int constant = 0;
 
@@ -3990,13 +3993,14 @@ typeFromStr (const char *s)
       sym_link *nr;
       switch (*s)
         {
+        case 'S':
+          sign = 1;
+          break;
+        case 'U':
+          usign = 1;
+          break;
         case 'C':
           constant = 1;
-          break;
-        case 'u':
-          usign = 1;
-          s++;
-          continue;
           break;
         case 'b':
           r->xclass = SPECIFIER;
@@ -4005,6 +4009,13 @@ typeFromStr (const char *s)
         case 'c':
           r->xclass = SPECIFIER;
           SPEC_NOUN (r) = V_CHAR;
+          if (usign)
+            {
+              SPEC_USIGN (r) = 1;
+              usign = 0;
+            }
+          else if (!sign && !options.signed_char)
+            SPEC_USIGN (r) = 1;
           break;
         case 's':
         case 'i':
@@ -4073,6 +4084,8 @@ typeFromStr (const char *s)
           werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "typeFromStr: unknown type");
           break;
         }
+      if (usign && sign)
+        werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "typeFromStr: unknown type");
       if (IS_SPEC (r) && usign)
         {
           SPEC_USIGN (r) = 1;
@@ -4113,7 +4126,7 @@ initCSupport (void)
   /* type as character codes for typeFromStr() */
   const char *sbwdCodes[] = {
     "c",  "i",  "l",  "L",
-    "uc", "ui", "ul", "uL"
+    "Uc", "Ui", "Ul", "UL"
   };
 
   int bwd, su, muldivmod, tofrom, slsr;
@@ -4345,7 +4358,7 @@ initCSupport (void)
     const char *iparams[] = {"i", "i"};
     const char *uiparams[] = {"ui", "ui"};
     muls16tos32[0] = port->support.has_mulint2long ? funcOfTypeVarg ("__mulsint2slong", "l", 2, iparams) : 0;
-    muls16tos32[1] = port->support.has_mulint2long ? funcOfTypeVarg ("__muluint2ulong", "ul", 2, uiparams) : 0;
+    muls16tos32[1] = port->support.has_mulint2long ? funcOfTypeVarg ("__muluint2ulong", "Ul", 2, uiparams) : 0;
   }
 }
 

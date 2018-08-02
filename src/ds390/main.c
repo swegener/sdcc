@@ -91,7 +91,7 @@ static builtins __ds390_builtins[] = {
     { "__builtin_inp","v",3,{"cx*","cx*","i"}},        /* void __builtin_inp        (xdata char *,xdata char *,int) */
     /* __builtin_inp - used to write to a memory mapped port, increment first pointer */
     { "__builtin_outp","v",3,{"cx*","cx*","i"}},       /* void __builtin_outp       (xdata char *,xdata char *,int) */
-    { "__builtin_swapw","us",1,{"us"}},                /* unsigned short __builtin_swapw (unsigned short) */
+    { "__builtin_swapw","Us",1,{"Us"}},                /* unsigned short __builtin_swapw (unsigned short) */
     { "__builtin_memcmp_x2x","c",3,{"cx*","cx*","i"}}, /* void __builtin_memcmp_x2x (xdata char *,xdata char *,int) */
     { "__builtin_memcmp_c2x","c",3,{"cx*","cp*","i"}}, /* void __builtin_memcmp_c2x (xdata char *,code  char *,int) */
     { NULL , NULL,0, {NULL}}                           /* mark end of table */

@@ -2376,9 +2376,9 @@ dwTagFromType (sym_link * type, dwtag * parent)
                                                     ((blen+7) & ~7)
                                                     - (blen+bstr)));
                       if (blen < 8)
-                        type = typeFromStr ("uc");
+                        type = typeFromStr ("Uc");
                       else
-                        type = typeFromStr ("ui");
+                        type = typeFromStr ("Ui");
                       subtp = dwTagFromType (type, tp);
                       dwAddTagAttr (memtp, dwNewAttrTagRef (DW_AT_type, subtp));
                     }

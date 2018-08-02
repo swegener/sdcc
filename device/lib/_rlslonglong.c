@@ -32,7 +32,7 @@
 
 #ifdef __SDCC_LONGLONG
 
-long long _rlslonglong(long long l, signed char s)
+long long _rlslonglong(long long l, char s)
 {
 	return((unsigned long long)(l) << s);
 }

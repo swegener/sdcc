@@ -4,6 +4,15 @@
 	  Disable a test for older GCC.
 	* support/regression/ports/uc*/spec.mk:
 	  Harmonize simulation timeouts for z80-related.
+	* src/SDCCsymt.c,
+	  src/SDCCdwarf2.c,
+	  src/z80/main.c,
+	  src/ds390/main.c,
+	  device/lib/_rrulonglong.c,
+	  device/lib/_rlulonglong.c,
+	  device/lib/_rrslonglong.c,
+	  device/lib/_rlslonglong.c:
+	  Fix bug #2665.
 
 2018-08-01 Philipp Klaus Krause <pkk AT spth.de>
 

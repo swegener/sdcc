@@ -159,11 +159,11 @@ extern PORT gbz80_port;
 #include "mappings.i"
 
 static builtins _z80_builtins[] = {
-  {"__builtin_memcpy", "vg*", 3, {"vg*", "Cvg*", "ui"}},
+  {"__builtin_memcpy", "vg*", 3, {"vg*", "Cvg*", "Ui"}},
   {"__builtin_strcpy", "cg*", 2, {"cg*", "Ccg*"}},
-  {"__builtin_strncpy", "cg*", 3, {"cg*", "Ccg*", "ui"}},
+  {"__builtin_strncpy", "cg*", 3, {"cg*", "Ccg*", "Ui"}},
   {"__builtin_strchr", "cg*", 2, {"Ccg*", "i"}},
-  {"__builtin_memset", "vg*", 3, {"vg*", "i", "ui"}},
+  {"__builtin_memset", "vg*", 3, {"vg*", "i", "Ui"}},
   {NULL, NULL, 0, {NULL}}
 };
 

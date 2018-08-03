@@ -2,6 +2,9 @@
 
 	* src/SDCCsymt.c:
 	  Fix an issue introduced in the bugfix for #2665.
+	* src/stm8/peep.c,
+	  src/stm8/peeph.def:
+	  Minor improvements in STM8 peephole optimization.
 
 2018-08-02 Philipp Klaus Krause <pkk AT spth.de>
 

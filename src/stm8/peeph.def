@@ -742,112 +742,119 @@ replace restart {
 	cp	a, %2
 	jrc	%3
 	ld	a, %1
-	cp	a, %4
 } by {
 	ld	a, %1
 	cp	a, %2
 	jrc	%3
 	; peephole 42 removed redundant load of a from %1.
-	cp	a, %4
-} if notVolatile(%1)
+} if notVolatile(%1), notUsed('c')
 
 replace restart {
 	ld	a, %1
 	cp	a, %2
 	jrslt	%3
 	ld	a, %1
-	cp	a, %4
 } by {
 	ld	a, %1
 	cp	a, %2
 	jrslt	%3
 	; peephole 43 removed redundant load of a from %1.
-	cp	a, %4
-} if notVolatile(%1)
+} if notVolatile(%1), notUsed('c')
 
 replace restart {
 	ld	a, %1
 	cp	a, %2
 	jrsle	%3
 	ld	a, %1
-	cp	a, %4
 } by {
 	ld	a, %1
 	cp	a, %2
 	jrsle	%3
 	; peephole 44 removed redundant load of a from %1.
-	cp	a, %4
-} if notVolatile(%1)
+} if notVolatile(%1), notUsed('c')
 
 replace restart {
 	ld	a, %1
 	cp	a, %2
 	jrule	%3
 	ld	a, %1
-	cp	a, %4
 } by {
 	ld	a, %1
 	cp	a, %2
 	jrule	%3
 	; peephole 45 removed redundant load of a from %1.
-	cp	a, %4
-} if notVolatile(%1)
+} if notVolatile(%1), notUsed('c')
 
 replace restart {
 	ldw	x, %1
 	cpw	x, %2
 	jrc	%3
 	ldw	x, %1
-	cpw	x, %4
 } by {
 	ldw	x, %1
 	cpw	x, %2
 	jrc	%3
 	; peephole 46 removed redundant load of a from %1.
-	cpw	x, %4
-} if notVolatile(%1)
+} if notVolatile(%1), notUsed('c')
 
 replace restart {
 	ldw	x, %1
 	cpw	x, %2
 	jrslt	%3
 	ldw	x, %1
-	cpw	x, %4
 } by {
 	ldw	x, %1
 	cpw	x, %2
 	jrslt	%3
 	; peephole 47 removed redundant load of a from %1.
-	cpw	x, %4
-} if notVolatile(%1)
+} if notVolatile(%1), notUsed('c')
 
 replace restart {
 	ldw	x, %1
 	cpw	x, %2
 	jrsle	%3
 	ldw	x, %1
-	cpw	x, %4
 } by {
 	ldw	x, %1
 	cpw	x, %2
 	jrsle	%3
 	; peephole 48 removed redundant load of a from %1.
-	cpw	x, %4
-} if notVolatile(%1)
+} if notVolatile(%1), notUsed('c')
 
 replace restart {
 	ldw	x, %1
 	cpw	x, %2
 	jrule	%3
 	ldw	x, %1
-	cpw	x, %4
 } by {
 	ldw	x, %1
 	cpw	x, %2
 	jrule	%3
 	; peephole 49 removed redundant load of a from %1.
-	cpw	x, %4
+} if notVolatile(%1), notUsed('c')
+
+replace restart {
+	ldw	x, %1
+	cpw	x, %2
+	jrnc	%3
+	ldw	x, %1
+} by {
+	ldw	x, %1
+	cpw	x, %2
+	jrnc	%3
+	; peephole 50 removed redundant load of a from %1.
 } if notVolatile(%1)
+
+replace restart {
+	cp	a, %1
+	jrne	%2
+	ld	a, #0x01
+} by {
+	sub	a, %1
+	jrne	%2
+	inc	a
+	; peephole 51 used inc to get #1 into a.
+} if notUsedFrom(%2 'a')
 
 replace restart {
 	jp	%5
@@ -1234,7 +1241,6 @@ replace restart {
 	jrsgt	%3
 	; peephole j32 removed load by inverting jump condition.
 } if notUsedFrom(%3 'x')
-
 
 // Barrier, since notUsed() is better at dealing with ret than with jp to unknown location.
 barrier

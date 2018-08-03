@@ -5,7 +5,7 @@
 
 #define NOTUSEDERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");} while(0)
 
-//#define D(_s) { printf _s; fflush(stdout); }
+// #define D(_s) { printf _s; fflush(stdout); }
 #define D(_s)
 
 #define EQUALS(l, i) (!strcmp((l), (i)))
@@ -503,6 +503,9 @@ static bool argCont(const char *arg, char what)
   if (strlen(arg) == 0)
     return FALSE;
 
+  if (arg[0] == '_' && what == 'a') // The STM8 has no a-relative addressing modes.
+    return FALSE;
+
   return (strchr(arg, what) != NULL);
 }
 
@@ -575,6 +578,11 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
 
   if (!strcmp (what, "z"))
     return (ISINST (pl->line, "jreq") || ISINST (pl->line, "jrne") || ISINST (pl->line, "jrsgte") || ISINST (pl->line, "jrsle"));
+
+  if (!strcmp (what, "c"))
+    return (ISINST (pl->line, "jrc") || ISINST (pl->line, "jrnc") || ISINST (pl->line, "jruge") || ISINST (pl->line, "jrugt") || ISINST (pl->line, "jrule") || ISINST (pl->line, "jrult") ||
+      ISINST (pl->line, "adc") || ISINST (pl->line, "sbc") ||
+      ISINST (pl->line, "ccf") || ISINST (pl->line, "rlc") || ISINST (pl->line, "rlcw") || ISINST (pl->line, "rrc") || ISINST (pl->line, "rrcw"));
 
   return TRUE;
 }

@@ -4082,10 +4082,11 @@ typeFromStr (const char *s)
           break;
         default:
           werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "typeFromStr: unknown type");
+          fprintf(stderr, "unknown: %s\n", s);
           break;
         }
       if (usign && sign)
-        werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "typeFromStr: unknown type");
+        werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "typeFromStr: both signed and unsigned specified");
       if (IS_SPEC (r) && usign)
         {
           SPEC_USIGN (r) = 1;
@@ -4356,7 +4357,7 @@ initCSupport (void)
 
   {
     const char *iparams[] = {"i", "i"};
-    const char *uiparams[] = {"ui", "ui"};
+    const char *uiparams[] = {"Ui", "Ui"};
     muls16tos32[0] = port->support.has_mulint2long ? funcOfTypeVarg ("__mulsint2slong", "l", 2, iparams) : 0;
     muls16tos32[1] = port->support.has_mulint2long ? funcOfTypeVarg ("__muluint2ulong", "Ul", 2, uiparams) : 0;
   }

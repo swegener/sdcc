@@ -1,3 +1,8 @@
+2018-08-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c:
+	  Fix an issue introduced in the bugfix for #2665.
+
 2018-08-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-va-arg-5.c:

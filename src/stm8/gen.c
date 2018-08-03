@@ -2558,7 +2558,6 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           emit3w (A_NEGW, x ? ASMOP_X : ASMOP_Y, 0);
 
           started = TRUE;
-
           i += 2;
         }
       else if (!started &&
@@ -2600,6 +2599,15 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
               cost ((x || aopOnStack (right_aop, 0, 2)) ? 3 : 4, 2);
               started = TRUE;
             }
+          i += 2;
+        }
+      else if (!started && i == size - 2 && aopInReg (right_aop, i, X_IDX) && aopInReg (result_aop, i, X_IDX) &&
+        (left_aop->type == AOP_DIR || aopOnStackNotExt (left_aop, i, 2)))
+        {
+          emit3w (A_NEGW, ASMOP_X, 0);
+          emit2 ("addw", "x, %s", aopGet2 (left_aop, i));
+          cost (4, 2);
+          started = TRUE;
           i += 2;
         }
       else if (!started && aopIsLitVal (left_aop, i, 1, 0x00) &&

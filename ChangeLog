@@ -5,6 +5,8 @@
 	* src/stm8/peep.c,
 	  src/stm8/peeph.def:
 	  Minor improvements in STM8 peephole optimization.
+	* src/stm8/gen.c:
+	  Minor improvement in STM8 subtraction codegen.
 
 2018-08-02 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -4506,7 +4506,7 @@ genEndFunction (iCode * ic)
   bool is_nmi = (IS_Z80 || IS_Z180) && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC; 
 
   wassert (!regalloc_dry_run);
-  wassert (!_G.stack.pushed);
+  wassertl (!_G.stack.pushed, "Unbalanced stack.");
 
   if (IFFUNC_ISNAKED (sym->type) || IFFUNC_ISNORETURN (sym->type))
     {

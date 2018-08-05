@@ -18,6 +18,7 @@ static void mem_set (void* dst, int val, UINT cnt)
 	ASSERT (cnt == 1);
 }
 
+#if 0 // Enable when bug #27903 is fixed.
 void f_mkfs (
 	void* work,
 	UINT len
@@ -55,6 +56,7 @@ void f_mkfs (
 
 	}
 }
+#endif
 
 void testBug(void)
 {

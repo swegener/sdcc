@@ -21,6 +21,7 @@ foo (signed char i, int j)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && (__GNUC__ < 8))
   signed char k = -83;
   if (!d)
     goto L;
@@ -31,4 +32,5 @@ L:
   if (c != 1)
     ASSERT (0);
   return;
+#endif
 }

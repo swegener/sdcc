@@ -1,3 +1,8 @@
+2018-08-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-pr85529-1.c:
+	  Disable a test for older GCC.
+
 2018-08-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

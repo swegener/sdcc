@@ -419,11 +419,10 @@ DEFSETFUNC (hasNonPtrUse)
 /* loopInvariants - takes loop invariants out of region            */
 /*-----------------------------------------------------------------*/
 static int
-loopInvariants (region * theLoop, ebbIndex * ebbi)
+loopInvariants (region *theLoop, ebbIndex *ebbi)
 {
   eBBlock **ebbs = ebbi->dfOrder;
   int count = ebbi->count;
-  eBBlock *lBlock;
   set *lInvars = NULL;
 
   int change = 0;
@@ -436,11 +435,10 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
 
   /* we will do the elimination for those blocks       */
   /* in the loop that dominate all exits from the loop */
-  for (lBlock = setFirstItem (theLoop->regBlocks); lBlock; lBlock = setNextItem (theLoop->regBlocks))
+  for (eBBlock *lBlock = setFirstItem (theLoop->regBlocks); lBlock; lBlock = setNextItem (theLoop->regBlocks))
     {
       iCode *ic;
       int domsAllExits;
-      int i;
 
       /* mark the dominates all exits flag */
       domsAllExits = (applyToSet (theLoop->exits, dominatedBy, lBlock) == elementsInSet (theLoop->exits));
@@ -505,6 +503,9 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
               (IC_RIGHT (ic) && isOperandVolatile (IC_RIGHT (ic), TRUE)))
             continue;
 
+          if (POINTER_GET (ic) && IS_VOLATILE (operandType (IC_LEFT (ic))->next))
+            continue;
+
           lin = rin = 0;
 
           /* special case */
@@ -557,7 +558,7 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
                   /* for successors for all exits */
                   for (sBlock = setFirstItem (theLoop->exits); sBlock; sBlock = setNextItem (theLoop->exits))
                     {
-                      for (i = 0; i < count; ebbs[i++]->visited = 0);
+                      for (int i = 0; i < count; ebbs[i++]->visited = 0);
                       lBlock->visited = 1;
                       if (applyToSet (sBlock->succList, isDefAlive, ic))
                         break;
@@ -656,10 +657,9 @@ loopInvariants (region * theLoop, ebbIndex * ebbi)
     {
       eBBlock *preHdr = theLoop->entry->preHeader;
       iCode *icFirst = NULL, *icLast = NULL;
-      cseDef *cdp;
 
       /* create an iCode chain from it */
-      for (cdp = setFirstItem (lInvars); cdp; cdp = setNextItem (lInvars))
+      for (cseDef *cdp = setFirstItem (lInvars); cdp; cdp = setNextItem (lInvars))
         {
           /* maintain data flow .. add it to the */
           /* ldefs defSet & outExprs of the preheader  */

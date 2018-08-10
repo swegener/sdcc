@@ -3,7 +3,10 @@
 #include <testfwk.h>
 
 #include <string.h>
+
+#ifndef PORT_HOST
 #include <uchar.h>
+#endif
 
 #define BUF_MAX 40
 

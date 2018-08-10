@@ -23,9 +23,11 @@ foo (int x)
 void
 testTortureExecute (void)
 {
+#if !(defined (__GNUC__) && (__GNUC__ < 8))
   int i;
   for (i = 0; i < 63; i++)
     if (foo (i) != 1)
       ASSERT (0);
   return;
+#endif
 }

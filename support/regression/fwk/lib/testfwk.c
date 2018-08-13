@@ -88,7 +88,7 @@ __printd (int n)
           n = -n;
           neg = 1;
         }
-  
+
       while (0 != n)
         {
           *--p = '0' + __mod (n, 10);
@@ -115,7 +115,7 @@ __printu (unsigned int n)
       char MEMSPACE_BUF *p = &buf[sizeof (buf) - 1];
 
       buf[sizeof(buf) - 1] = '\0';
-  
+
       while (0 != n)
         {
           *--p = '0' + __mod (n, 10);

@@ -3117,6 +3117,7 @@ genSend (set * sendSet)
             {
               if (AOP_TYPE (IC_LEFT (sic)) != AOP_DPTR)
                 {
+                  bool pushedA = FALSE;
                   while (size--)
                     {
                       const char *l = aopGet (IC_LEFT (sic), offset, FALSE, FALSE);
@@ -3125,8 +3126,15 @@ genSend (set * sendSet)
                           emitcode ("mov", "a%s,%s", fReturn[offset], l); // use register's direct address instead of name
                         else
                           emitcode ("mov", "%s,%s", fReturn[offset], l);
+                      else if (EQ (l, "a") && size != 0)
+                        {
+                          emitpush ("acc");
+                          pushedA = TRUE;
+                        }
                       offset++;
                     }
+                  if (pushedA)
+                    emitpop ("acc");
                 }
               else /* need to load dpl, dph, etc from @dptr */
                 {

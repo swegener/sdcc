@@ -46,7 +46,8 @@ void __printf(const char *szFormat, ...);
 
 void __fail (__code const char *szMsg, __code const char *szCond, __code const char *szFile, int line);
 void __prints (const char *s);
-void __printn (int n);
+void __printd (int n);
+void __printu (unsigned int n);
 __code const char *__getSuiteName (void);
 void __runSuite (void);
 

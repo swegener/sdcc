@@ -20,7 +20,7 @@ __code struct {
   char :0;
   int s:1;
   int t:7;
-} noPad = {1, 120, 1, 127};
+} noPad = {1, 20, 1, 127};
 
 __code struct {
   char  :0;
@@ -34,14 +34,19 @@ testBitfield (void)
   ASSERT (sizeof (pad) == 2);
   ASSERT (sizeof (noPad) == 2);
   ASSERT (sizeof (initialNoPad[0]) == 1);
-#if 0
-  ASSERT (pad.x == 1);
-  ASSERT (pad.d == 2);
+
+  ASSERT (pad.x == -1 || pad.x == 1);
+  ASSERT (pad.d == -2 || pad.d == 2);
   ASSERT (pad.b == 1);
-  ASSERT (noPad.p == 1);
-  ASSERT (noPad.q == 120);
-  ASSERT (noPad.s == 1);
-  ASSERT (noPad.t == 127);
+  ASSERT (noPad.p == -1 || noPad.p == 1);
+  ASSERT (noPad.q == 20);
+  ASSERT (noPad.s == -1 || noPad.s == 1);
+  ASSERT (noPad.t == -1 || noPad.t == 127);
+#if 0
+  __printd(initialNoPad[0].b);
+  __prints("\n");
+  __printd(initialNoPad[1].b);
+  __prints("\n");
   ASSERT (initialNoPad[0].b == 2);
   ASSERT (initialNoPad[1].b == 4);
 #endif

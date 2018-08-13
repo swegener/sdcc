@@ -6,6 +6,8 @@ va-arg-14.c from the execute part of the gcc torture tests.
 
 #include <stdarg.h>
 
+#pragma disable_warning 84	// suppress 'auto' variable may be used before initialization
+
 va_list global;
 
 void vat(va_list param, ...)
@@ -15,38 +17,31 @@ void vat(va_list param, ...)
   va_start (local, param);
   va_copy (global, local);
   va_copy (param, local);
-  if (va_arg (local, int) != 1)
-    ASSERT(0);
+  ASSERT (va_arg (local, int) == 1);
   va_end (local);
-  if (va_arg (global, int) != 1)
-    ASSERT(0);
+  ASSERT (va_arg (global, int) == 1);
   va_end (global);
-  if (va_arg (param, int) != 1)
-    ASSERT(0);
+  ASSERT (va_arg (param, int) == 1);
   va_end (param);
 
   va_start (param, param);
   va_start (global, param);
   va_copy (local, param);
-  if (va_arg (local, int) != 1)
-    ASSERT(0);
+  ASSERT (va_arg (local, int) == 1);
   va_end (local);
   va_copy (local, global);
-  if (va_arg (local, int) != 1)
-    ASSERT(0);
+  ASSERT (va_arg (local, int) == 1);
   va_end (local);
-  if (va_arg (global, int) != 1)
-    ASSERT(0);
+  ASSERT (va_arg (global, int) == 1);
   va_end (global);
-  if (va_arg (param, int) != 1)
-    ASSERT(0);
+  ASSERT (va_arg (param, int) == 1);
   va_end (param);
 }
 
 void
 testTortureExecute (void)
 {
-  va_list t;
+  va_list t; /* since the va_list type is undefined in C, 't' cannot be initialized */
   vat (t, 1);
   return;
 }

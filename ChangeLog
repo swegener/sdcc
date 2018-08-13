@@ -1,3 +1,12 @@
+2018-08-13 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/mcs51/gen.c (genSend): fixed bug #2778
+	* support/regression/tests/gcc-torture-execute-divconst-3.c: enabled test
+	* support/regression/fwk/include/testfwk.h: added __printu, fixed __printd
+	* support/regression/tests/bug-1981238.c: enabled more tests
+	* support/regression/tests/gcc-torture-execute-pr86231.c: fixed warnings
+	* support/regression/tests/gcc-torture-execute-va-arg-14.c: suppress warning
+
 2018-08-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/gcc-torture-execute-pr85529-2.c:

@@ -29,16 +29,16 @@ random_bitstring ()
       tot_bits += n_bits;
 
       if (n_bits == 0)
-	return x;
+        return x;
       else
-	{
-	  x <<= n_bits;
-	  if (ran & 1)
-	    x |= (1 << n_bits) - 1;
+        {
+          x <<= n_bits;
+          if (ran & 1)
+            x |= (1 << n_bits) - 1;
 
-	  if (tot_bits > 8 * sizeof (long) + 6)
-	    return x;
-	}
+          if (tot_bits > 8 * sizeof (long) + 6)
+            return x;
+        }
     }
 }
 
@@ -49,71 +49,71 @@ testTortureExecute (void)
 {
   long int i;
 
-  for (i = 0; i < 1000; i++)
+  for (i = 0; i < 100; i++) // MB: Why 1000 iterations?
     {
       unsigned long x, y;
       x = random_bitstring ();
       y = random_bitstring ();
 
       if (sizeof (int) == sizeof (long))
-	goto save_time;
+        goto save_time;
 
       { unsigned long xx = x, yy = y, r1, r2;
-	if (yy == 0) continue;
-	r1 = xx / yy;
-	r2 = xx % yy;
-	if (r2 >= yy || r1 * yy + r2 != xx)
-	  ASSERT (0);
+        if (yy == 0) continue;
+        r1 = xx / yy;
+        r2 = xx % yy;
+        ASSERT (r2 < yy);
+        ASSERT (r1 * yy + r2 == xx);
       }
       { signed long xx = x, yy = y, r1, r2;
-	if ((unsigned long) xx << 1 == 0 && yy == -1)
-	  continue;
-	r1 = xx / yy;
-	r2 = xx % yy;
-	if (ABS (r2) >= (unsigned long) ABS (yy) || (signed long) (r1 * yy + r2) != xx)
-	  ASSERT (0);
+        if ((unsigned long) xx << 1 == 0 && yy == -1)
+          continue;
+        r1 = xx / yy;
+        r2 = xx % yy;
+        ASSERT (ABS (r2) < (unsigned long) ABS (yy));
+        ASSERT ((signed long) (r1 * yy + r2) == xx);
       }
     save_time:
       { unsigned int xx = x, yy = y, r1, r2;
-	if (yy == 0) continue;
-	r1 = xx / yy;
-	r2 = xx % yy;
-	if (r2 >= yy || r1 * yy + r2 != xx)
-	  ASSERT (0);
+        if (yy == 0) continue;
+        r1 = xx / yy;
+        r2 = xx % yy;
+        ASSERT (r2 < yy);
+        ASSERT (r1 * yy + r2 == xx);
       }
       { signed int xx = x, yy = y, r1, r2;
-	if ((unsigned int) xx << 1 == 0 && yy == -1)
-	  continue;
-	r1 = xx / yy;
-	r2 = xx % yy;
-	if (ABS (r2) >= (unsigned int) ABS (yy) || (signed int) (r1 * yy + r2) != xx)
-	  ASSERT (0);
+        if ((unsigned int) xx << 1 == 0 && yy == -1)
+          continue;
+        r1 = xx / yy;
+        r2 = xx % yy;
+        ASSERT (ABS (r2) < (unsigned int) ABS (yy));
+        ASSERT ((signed int) (r1 * yy + r2) == xx);
       }
       { unsigned short xx = x, yy = y, r1, r2;
-	if (yy == 0) continue;
-	r1 = xx / yy;
-	r2 = xx % yy;
-	if (r2 >= yy || r1 * yy + r2 != xx)
-	  ASSERT (0);
+        if (yy == 0) continue;
+        r1 = xx / yy;
+        r2 = xx % yy;
+        ASSERT (r2 < yy);
+        ASSERT (r1 * yy + r2 == xx);
       }
       { signed short xx = x, yy = y, r1, r2;
-	r1 = xx / yy;
-	r2 = xx % yy;
-	if (ABS (r2) >= (unsigned short) ABS (yy) || (signed short) (r1 * yy + r2) != xx)
-	  ASSERT (0);
+        r1 = xx / yy;
+        r2 = xx % yy;
+        ASSERT (ABS (r2) < (unsigned short) ABS (yy));
+        ASSERT ((signed short) (r1 * yy + r2) == xx);
       }
       { unsigned char xx = x, yy = y, r1, r2;
-	if (yy == 0) continue;
-	r1 = xx / yy;
-	r2 = xx % yy;
-	if (r2 >= yy || r1 * yy + r2 != xx)
-	  ASSERT (0);
+        if (yy == 0) continue;
+        r1 = xx / yy;
+        r2 = xx % yy;
+        ASSERT (r2 < yy);
+        ASSERT (r1 * yy + r2 == xx);
       }
       { signed char xx = x, yy = y, r1, r2;
-	r1 = xx / yy;
-	r2 = xx % yy;
-	if (ABS (r2) >= (unsigned char) ABS (yy) || (signed char) (r1 * yy + r2) != xx)
-	  ASSERT (0);
+        r1 = xx / yy;
+        r2 = xx % yy;
+        ASSERT (ABS (r2) < (unsigned char) ABS (yy));
+        ASSERT ((signed char) (r1 * yy + r2) == xx);
       }
     }
 

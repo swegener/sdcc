@@ -23,10 +23,7 @@ long long c = ((0x1234567876543210LL + 0x2345678765432101LL) << 32) >> 32;
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_MEDIUM)) // Bug #2736
-  if (f (a, b) != c)
-    ASSERT (0);
+  ASSERT (f (a, b) == c);
   return;
-#endif
 }
 

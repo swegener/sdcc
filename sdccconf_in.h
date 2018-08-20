@@ -55,9 +55,6 @@
 /* Define to 1 if you have the `setrlimit' function. */
 #undef HAVE_SETRLIMIT
 
-/* Define to 1 if you have the <stdalign.h> header file. */
-#undef HAVE_STDALIGN_H
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
@@ -75,12 +72,6 @@
 
 /* Define to 1 if you have the `strndup' function. */
 #undef HAVE_STRNDUP
-
-/* Define to 1 if you have the <stx/btree_map.h> header file. */
-#undef HAVE_STX_BTREE_MAP_H
-
-/* Define to 1 if you have the <stx/btree_set.h> header file. */
-#undef HAVE_STX_BTREE_SET_H
 
 /* Define to 1 if you have the <sys/endian.h> header file. */
 #undef HAVE_SYS_ENDIAN_H
@@ -297,9 +288,6 @@
 
 /* XXX */
 #undef TYPE_WORD
-
-/* Define to 1 if c supports tags in unnamed struct. */
-#undef UNNAMED_STRUCT_TAG
 
 /* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
    significant byte first (like Motorola and SPARC, unlike Intel). */

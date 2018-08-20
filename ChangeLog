@@ -1,3 +1,9 @@
+2018-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdcc/sdccconf_in.h,
+	  sdcc/doc/sdccman.lyx:
+	  Remove infrastructure for STX support.
+
 2018-08-14 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/gcc-torture-execute-20060110-2.c: enabled test

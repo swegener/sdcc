@@ -1244,25 +1244,6 @@ http://www.boost.org/
 ; Boost Software License 1.0 (BSL-1.0)
 \end_layout
 
-\begin_layout Itemize
-STX B+ Tree C++ Template Classes:
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://idlebox.net/2007/stx-btree/
-\end_layout
-
-\end_inset
-
-; LGPLv2.1
-\end_layout
-
 \end_deeper
 \begin_layout Standard
 Links to licenses:

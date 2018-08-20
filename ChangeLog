@@ -1,5 +1,10 @@
 2018-08-20 Philipp Klaus Krause <pkk AT spth.de>
 
+	* sdcc/doc/sdccman.lyx:
+	  Update documentation on library memory models.
+
+2018-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
 	* sdcc/sdccconf_in.h,
 	  sdcc/doc/sdccman.lyx:
 	  Remove infrastructure for STX support.

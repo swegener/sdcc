@@ -36337,7 +36337,9 @@ huge
 never
 \emph default
  be combined together or the results would be unpredictable.
- The library routines supplied with the compiler are compiled for all models.
+ The library routines supplied with the compiler are compiled for all models
+ (however, the libraries for –stack-auto are compiled for the small and
+ large models only).
  The compiled library modules are contained in separate directories as small,
  medium, large and huge so that you can link to the appropriate set.
 \end_layout
@@ -36763,8 +36765,7 @@ large
 never
 \emph default
  be combined together.
- The library routines supplied with the compiler are compiled for the medium
- memory model.
+ The library routines supplied with the compiler are compiled for all models.
 \end_layout
 
 \begin_layout Standard

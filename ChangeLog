@@ -1,3 +1,12 @@
+2018-08-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/ports/hc08/spec.mk,
+	  support/regression/ports/s08/spec.mk,
+	  support/regression/tests/gcc-torture-execute-arith-rand.c,
+	  support/regression/tests/gcc-torture-execute-strcmp-1.c,
+	  support/regression/tests/gcc-torture-execute-strncmp-1.c:
+	  Reduce risk of timeouts due to long tests.
+
 2018-08-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdcc/doc/sdccman.lyx:

@@ -49,7 +49,7 @@ testTortureExecute (void)
 {
   long int i;
 
-  for (i = 0; i < 100; i++) // MB: Why 1000 iterations?
+  for (i = 0; i < 40 /* Was 1000 in GCC, reduced to speed up regression testing */; i++)
     {
       unsigned long x, y;
       x = random_bitstring ();

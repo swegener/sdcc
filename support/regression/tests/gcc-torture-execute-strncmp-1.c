@@ -20,7 +20,7 @@ strncmp-1.c from the execute part of the gcc torture tests.
 #endif
 
 #ifndef MAX_TEST
-#define MAX_TEST (8 * sizeof (long long))
+#define MAX_TEST (2 * sizeof (long long)) /* Was (8 * sizeof (long long)) in GCC, reduced to speed up regression testing */
 #endif
 
 #ifndef MAX_EXTRA

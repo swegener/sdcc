@@ -6,6 +6,8 @@
 	  support/regression/tests/gcc-torture-execute-strcmp-1.c,
 	  support/regression/tests/gcc-torture-execute-strncmp-1.c:
 	  Reduce risk of timeouts due to long tests.
+	* support/regression/tests/rand.c:
+	  Disable a test on the broken OpenBSD.
 
 2018-08-20 Philipp Klaus Krause <pkk AT spth.de>
 

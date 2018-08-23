@@ -1690,7 +1690,7 @@ cl_stm8::exec_inst(void)
                break;
             case 0xA0: // CALLR
              {
-               char c = (char) fetch1();
+               signed char c = (signed char) fetch1();
                push2(PC);
                PC += c;
                return(resGO);

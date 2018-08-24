@@ -32,7 +32,7 @@ strcmp-1.c from the execute part of the gcc torture tests.
 static union {
   unsigned char buf[MAX_LENGTH];
   long long align_int;
-#if 0 // TODO: Emable when SDCC suports long double!
+#if 0 // TODO: Enable when SDCC suports long double!
   long double align_fp;
 #endif
 } u1, u2;

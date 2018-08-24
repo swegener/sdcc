@@ -16,7 +16,7 @@ strcpy-1.c from the execute part of the gcc torture tests.
 #endif
 
 #ifndef MAX_COPY
-#define MAX_COPY (10 * sizeof (long long))
+#define MAX_COPY (3 * sizeof (long long)) /* Was (10 * sizeof (long long)) in GCC, reduced to speed up regression testing */
 #endif
 
 #ifndef MAX_EXTRA

@@ -1,3 +1,8 @@
+2018-08-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-strcpy-1.c:
+	  Reduce risk of timeout due to long test.
+
 2018-08-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/stm8.src/stm8.cc:

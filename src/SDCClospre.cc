@@ -245,7 +245,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
 // Dump cfg, with numbered nodes.
 void dump_cfg_lospre (const cfg_lospre_t &cfg)
 {
-  if(!currFunc)
+  if (!currFunc)
     return;
 
   std::ofstream dump_file((std::string(dstFileName) + ".dumplosprecfg" + currFunc->rname + ".dot").c_str());
@@ -266,6 +266,8 @@ void dump_cfg_lospre (const cfg_lospre_t &cfg)
 // Dump tree decomposition.
 static void dump_dec_lospre(const tree_dec_t &tree_dec)
 {
+  wassert (currFunc);
+
   std::ofstream dump_file((std::string(dstFileName) + ".dumplospredec" + currFunc->rname + ".dot").c_str());
 
   unsigned int w = 0;

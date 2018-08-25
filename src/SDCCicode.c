@@ -1135,22 +1135,22 @@ isiCodeInFunctionCall (iCode * ic)
 /* operandLitValueUll - unsigned long long value of an operand     */
 /*-----------------------------------------------------------------*/
 unsigned long long
-operandLitValueUll (operand * op)
+operandLitValueUll (const operand * op)
 {
   assert (isOperandLiteral (op));
 
-  return ullFromVal (OP_VALUE (op));
+  return ullFromVal (OP_VALUE_CONST (op));
 }
 
 /*-----------------------------------------------------------------*/
 /* operandLitValue - literal value of an operand                   */
 /*-----------------------------------------------------------------*/
 double
-operandLitValue (operand * op)
+operandLitValue (const operand * op)
 {
   assert (isOperandLiteral (op));
 
-  return floatFromVal (OP_VALUE (op));
+  return floatFromVal (OP_VALUE_CONST (op));
 }
 
 extern bool regalloc_dry_run;
@@ -1498,7 +1498,9 @@ isOperandEqual (const operand * left, const operand * right)
       return isSymbolEqual (left->svt.symOperand, right->svt.symOperand);
     case VALUE:
       return (compareType (left->svt.valOperand->type, right->svt.valOperand->type) &&
-              (floatFromVal (left->svt.valOperand) == floatFromVal (right->svt.valOperand)));
+        (!IS_FLOAT (getSpec (left->svt.valOperand->type)) ?
+          (operandLitValueUll (left) == operandLitValueUll (right)) :
+          (operandLitValue (left) == operandLitValue (right))));
     case TYPE:
       if (compareType (left->svt.typeOperand, right->svt.typeOperand) == 1)
         return 1;

@@ -856,6 +856,23 @@ replace restart {
 	; peephole 51 used inc to get #1 into a.
 } if notUsedFrom(%2 'a')
 
+replace {
+	jp	%5
+	ret
+} by {
+	jp	%5
+	; peephole 52 removed unused ret.
+}
+
+replace {
+	jp	%5
+	addw	sp, %1
+	ret
+} by {
+	jp	%5
+	; peephole 53 removed unused ret.
+}
+
 replace restart {
 	jp	%5
 } by {

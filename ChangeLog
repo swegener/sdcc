@@ -1,3 +1,9 @@
+2018-08-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pic14/*,
+	  device/lib/pic16/*:
+	  Regenerate files to fix bug #2806.
+
 2018-08-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.h,
@@ -7,7 +13,7 @@
 	* src/stm8/peeph.def:
 	  Remove redundant ret.
 	* src/SDCClospre.cc:
-	  Trigger assertion failure before SIGSEV when dumping graph for non-exisitng function.
+	  Trigger assertion failure before SIGSEV when dumping graph of non-existing function.
 
 2018-08-24 Philipp Klaus Krause <pkk AT spth.de>
 

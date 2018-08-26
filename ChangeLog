@@ -3,6 +3,8 @@
 	* device/lib/pic14/*,
 	  device/lib/pic16/*:
 	  Regenerate files to fix bug #2806.
+	* src/SDCClospre.cc:
+	  Minor lospre code refactoring.
 
 2018-08-25 Philipp Klaus Krause <pkk AT spth.de>
 

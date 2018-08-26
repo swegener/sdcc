@@ -158,13 +158,36 @@ get_candidate_set(std::set<int> *c, const iCode *const sic, int lkey)
 }
 
 static bool
-setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
+invalidates_expression(const iCode *const eic, const iCode *const iic)
 {
-  typedef boost::graph_traits<cfg_lospre_t>::vertex_descriptor vertex_t;
   const operand *const eleft = IC_LEFT (eic);
   const operand *const eright = IC_RIGHT (eic);
   const bool uses_global = (eic->op == GET_VALUE_AT_ADDRESS || isOperandGlobal (eleft) || isOperandGlobal (eright) || IS_SYMOP (eleft) && OP_SYMBOL_CONST (eleft)->addrtaken || IS_SYMOP (eright) && OP_SYMBOL_CONST (eright)->addrtaken);
   const bool uses_volatile = POINTER_GET (eic) && IS_VOLATILE (operandType (eleft)->next) || IS_OP_VOLATILE (eleft) || IS_OP_VOLATILE (eright);
+
+  const operand *const left = IC_LEFT (iic);
+  const operand *const right = IC_RIGHT (iic);
+  const operand *const result = IC_RESULT (iic);
+
+  if (IC_RESULT (iic) && !IS_OP_LITERAL (result) && !POINTER_SET(iic) &&
+    (eleft && isOperandEqual (eleft, result) || eright && isOperandEqual (eright, result)))
+    return(true);
+  if (iic->op == FUNCTION || iic->op == ENDFUNCTION || iic->op == RECEIVE)
+    return(true);
+  if ((uses_global || uses_volatile) && (iic->op == CALL || iic->op == PCALL))
+    return(true);
+  if (uses_volatile && (POINTER_GET (iic) && IS_VOLATILE (operandType (left)->next)) || IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
+    return(true);
+  if (uses_global && POINTER_SET (iic)) // TODO: More accuracy here!
+    return(true);
+
+  return(false);
+}
+
+static bool
+setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
+{
+  typedef boost::graph_traits<cfg_lospre_t>::vertex_descriptor vertex_t;
   bool safety_required = false;
 
   // In redundancy elimination, safety means not doing a computation on any path were it was not done before.
@@ -187,7 +210,7 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
     safety_required = true;
 
   // volatile requires safety.
-  if (uses_volatile)
+  if (POINTER_GET (eic) && IS_VOLATILE (operandType (IC_LEFT (eic))->next) || IS_OP_VOLATILE (IC_LEFT (eic)) || IS_OP_VOLATILE (IC_RIGHT (eic)))
     safety_required = true;
 
   // Reading from an invalid address might be dangerous, since there could be memory-mapped I/O.
@@ -210,23 +233,9 @@ setup_cfg_for_expression (cfg_lospre_t *const cfg, const iCode *const eic)
   for (vertex_t i = 0; i < boost::num_vertices (*cfg); i++)
     {
        const iCode *const ic = (*cfg)[i].ic;
-       const operand *const left = IC_LEFT (ic);
-       const operand *const right = IC_RIGHT (ic);
-       const operand *const result = IC_RESULT (ic);
 
        (*cfg)[i].uses = same_expression (eic, ic);
-       (*cfg)[i].invalidates = false;
-       if (IC_RESULT (ic) && !IS_OP_LITERAL (result) && !POINTER_SET(ic) &&
-         (eleft && isOperandEqual (eleft, result) || eright && isOperandEqual (eright, result)))
-         (*cfg)[i].invalidates = true;
-       if (ic->op == FUNCTION || ic->op == ENDFUNCTION || ic->op == RECEIVE)
-         (*cfg)[i].invalidates = true;
-       if ((uses_global || uses_volatile) && (ic->op == CALL || ic->op == PCALL))
-         (*cfg)[i].invalidates = true;
-       if (uses_volatile && (POINTER_GET (ic) && IS_VOLATILE (operandType (left)->next)) || IS_OP_VOLATILE (left) || IS_OP_VOLATILE (right))
-         (*cfg)[i].invalidates = true;
-       if (uses_global && POINTER_SET (ic)) // TODO: More accuracy here!
-         (*cfg)[i].invalidates = true;
+       (*cfg)[i].invalidates = invalidates_expression (eic, ic);
 
        (*cfg)[i].forward = std::pair<int, int>(-1, -1);
 

@@ -1,3 +1,10 @@
+2018-08-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c:
+	  Make default segment ordering suitable for large memory model.
+	* support/regression/tests/gcc-torture-execute-func-ptr-1.c:
+	  Enable test that now passes for stm8 large memory model.
+
 2018-08-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/pic14/*,

@@ -1,6 +1,13 @@
+2018-09-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2807.c:
+	  Fix bug #2807.
+
 2018-08-30 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/stm8/main.c:
+	* src/stm8/main.c,
+	  .version:
 	  Make default segment ordering suitable for large memory model.
 	* support/regression/tests/gcc-torture-execute-func-ptr-1.c:
 	  Enable test that now passes for stm8 large memory model.

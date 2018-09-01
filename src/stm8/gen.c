@@ -4234,8 +4234,23 @@ genDivMod1 (const iCode *ic)
   if (!regDead (A_IDX, ic))
     push (ASMOP_A, 0, 1);
 
-  genMove_o (use_y ? ASMOP_Y : ASMOP_X, 0, left->aop, 0, 2, right->aop->regs[A_IDX] < 0, FALSE, FALSE);
-  cheapMove (ASMOP_A, 0, right->aop, 0, TRUE);
+  if (!use_y && aopInReg (right->aop, 0, XL_IDX) && aopOnStack (left->aop, 0, 1))
+    {
+      cheapMove (ASMOP_X, 1, ASMOP_ZERO, 0, false);
+      cheapMove (ASMOP_A, 0, left->aop, 0, false);
+      emit2 ("exg", "a, xl");
+      cost (1, 1);
+    }
+  else if (aopInReg (right->aop, 0, use_y ? YL_IDX : XL_IDX) || aopInReg (right->aop, 0, use_y ? YH_IDX : XH_IDX))
+    {
+      cheapMove (ASMOP_A, 0, right->aop, 0, false);
+      genMove_o (use_y ? ASMOP_Y : ASMOP_X, 0, left->aop, 0, 2, false, false, false);
+    }
+  else
+    {
+      genMove_o (use_y ? ASMOP_Y : ASMOP_X, 0, left->aop, 0, 2, right->aop->regs[A_IDX] < 0, false, false);
+      cheapMove (ASMOP_A, 0, right->aop, 0, false);
+    }
 
   emit2 ("div", use_y ? "y, a" : "x, a");
   cost (1 + use_y, 17);

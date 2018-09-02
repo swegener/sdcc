@@ -158,7 +158,7 @@ INCLUDES = -I$(srcdir) -I$(LIBCPP_DIR) -I$(LIBCPP_DIR)/include -I$(LIBIBERTY_DIR
 
 # Always use -I$(srcdir)/config when compiling.
 .c.o:
-	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $< $(OUTPUT_OPTION)
+	$(CC) -c $(ALL_CFLAGS) $(INCLUDES) $(ALL_CPPFLAGS) $< $(OUTPUT_OPTION)
 
 # cstamp-h.in controls rebuilding of config.in.
 # It is named cstamp-h.in and not stamp-h.in so the mostlyclean rule doesn't

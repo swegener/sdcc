@@ -49,6 +49,16 @@ replace restart {
 } if notVolatile(%1), notVolatile(%2)
 
 replace restart {
+	ld	%1, %2
+	ld	%3, %1
+	ld	%1, %2
+} by {
+	ld	%1, %2
+	ld	%3, %1
+	; peephole 4a removed redundant load from %2 into %1.
+} if notVolatile(%1), notVolatile(%2)
+
+replace restart {
 	ld	%1, a
 	exg	a, %1
 } by {
@@ -57,12 +67,23 @@ replace restart {
 } if notVolatile(%1)
 
 replace restart {
-	exgw	x, y
-	ldw	x, y
+	ld	xl, a
+	srl	a
+	srlw	x
 } by {
-	; peephole 5a removed redundant exgw.
-	ldw	y, x
-}
+	srl	a
+	; peephole 5a removed redundant srlw x.
+} if notUsed('x')
+
+replace restart {
+	ld	%1, %2
+	ld	%3, %1
+	ld	%1, %2
+} by {
+	ld	%1, %2
+	ld	%3, %1
+	; peephole 5a removed redundant rght shift of .
+} if notVolatile(%1), notVolatile(%2)
 
 replace restart {
 	pop	%1

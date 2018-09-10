@@ -1,3 +1,8 @@
+2018-09-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def:
+	  Minor stm8 peephole improvement.
+
 2018-09-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/cpp/Makefile.in: move current directory earlier in

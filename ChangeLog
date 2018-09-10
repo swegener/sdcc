@@ -2,6 +2,9 @@
 
 	* src/stm8/peeph.def:
 	  Minor stm8 peephole improvement.
+	* src/stm8/gen.c,
+	  support/regression/tests/gcc-torture-execute-991112-1.c:
+	  Fix a bug in function pointer handling.
 
 2018-09-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

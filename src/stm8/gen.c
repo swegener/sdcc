@@ -3044,14 +3044,20 @@ genCall (const iCode *ic)
 
           if (aopInReg (left->aop, 0, X_IDX) || aopInReg (left->aop, 0, Y_IDX))
             push (left->aop, 0, 2);
+          else if (aopOnStackNotExt (left->aop, 0, 2) && !(aopInReg (left->aop, 2, XL_IDX) || aopInReg (left->aop, 2, XH_IDX)) ||
+            aopInReg (left->aop, 2, A_IDX))
+            {
+              genMove (ASMOP_X, left->aop, !aopInReg (left->aop, 2, A_IDX), true, false);
+              push (ASMOP_X, 0, 2);
+            }
           else
             {
-              cheapMove (ASMOP_A, 0, left->aop, 0, FALSE);
+              cheapMove (ASMOP_A, 0, left->aop, 0, false);
               push (ASMOP_A, 0, 1);
-              cheapMove (ASMOP_A, 0, left->aop, 1, FALSE);
+              cheapMove (ASMOP_A, 0, left->aop, 1, false);
               push (ASMOP_A, 0, 1);
             }
-          cheapMove (ASMOP_A, 0, left->aop, 2, FALSE);
+          cheapMove (ASMOP_A, 0, left->aop, 2, false);
           push (ASMOP_A, 0, 1);
           emit2("retf", "");
           cost (1, 5);

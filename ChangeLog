@@ -1,3 +1,9 @@
+2018-09-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCval.c,
+	  support/regression/tests/iso-8859-1.c:
+	  Fix bug #2812.
+
 2018-09-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

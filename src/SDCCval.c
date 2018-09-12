@@ -1736,7 +1736,7 @@ charVal (const char *s)
           return constCharacterVal (*s, type);
         }
     }
-  else                          /* not a backslash */
+  else if (type) // Wide character constant
     {
       size_t ulen;
       const TYPE_UDWORD *ustr = utf_32_from_utf_8 (&ulen, s, strlen(s) - 1);
@@ -1744,6 +1744,8 @@ charVal (const char *s)
       free ((void *)ustr);
       return (val);
     }
+  else // Character constant that is not wide - compability with legacy encodings.
+    return constCharacterVal (*s, 0);
 }
 
 /*------------------------------------------------------------------*/

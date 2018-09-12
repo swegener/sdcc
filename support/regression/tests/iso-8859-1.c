@@ -8,6 +8,7 @@
 /** tests for multibyte character sets
  * related to bug #3506236
 */
+#ifndef PORT_HOST
 static void
 do_multibyte (void)
 {
@@ -17,9 +18,50 @@ do_multibyte (void)
   ASSERT (str[1] == '\xc2');
 }
 
-static void
-teststr (void)
+// Test character constants - bug #2812.
+void lcdWriteData (unsigned char LcdData)
 {
-  do_multibyte ();
+  const unsigned char output[] = {'a', 0xe1, 'u', 0xf5, 0};
+
+  static int i;
+
+  ASSERT (LcdData == output[i++]);
 }
+
+void lcdWriteText (char *pcText)
+{
+  unsigned char i = 0;
+
+  while (pcText[i] != '\0') {
+    switch (pcText[i]) {
+      case 'ä' : lcdWriteData (0xE1);
+        break;
+      case 'ü' : lcdWriteData (0xF5);
+        break;
+      case 'ö' : lcdWriteData (0xEF);
+        break;
+      case 'ß' : lcdWriteData (0xE2);
+        break;
+      default : lcdWriteData (pcText[i]);
+        break;
+    }
+    i++;
+  }
+}
+#endif
+
+void testStr (void)
+{
+#ifndef PORT_HOST
+  do_multibyte ();
+#endif
+}
+
+void testCharconst (void)
+{
+#ifndef PORT_HOST
+  lcdWriteText ("aäuü");
+#endif
+}
+
 

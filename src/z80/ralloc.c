@@ -2809,7 +2809,7 @@ packRegisters (eBBlock * ebp)
 static iCode *
 joinPushes (iCode * lic)
 {
-  iCode *ic, *uic;
+  iCode *ic, *uic, *fic;
 
   for (ic = lic; ic; ic = ic->next)
     {
@@ -2821,19 +2821,27 @@ joinPushes (iCode * lic)
 
       /* Anything past this? */
       if (uic == NULL)
-        {
-          continue;
-        }
+        continue;
+
       /* This and the next pushes? */
       if (ic->op != IPUSH || uic->op != IPUSH)
-        {
+        continue;
+
+      /* Find call */
+      for(fic = uic; fic->op == IPUSH; fic = fic->next);
+      if (ic->op != CALL && fic->op != PCALL)
+        continue;
+      {
+        sym_link *dtype = operandType (IC_LEFT (fic));
+        sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
+        if (IFFUNC_ISSMALLC (ftype)) /* SmallC calling convention pushes 8-bit values as 16 bit */
           continue;
-        }
+      }
+
       /* Both literals? */
       if (!IS_OP_LITERAL (IC_LEFT (ic)) || !IS_OP_LITERAL (IC_LEFT (uic)))
-        {
-          continue;
-        }
+        continue;
+
       /* Both characters? */
       if (getSize (operandType (IC_LEFT (ic))) != 1 || getSize (operandType (IC_LEFT (uic))) != 1)
         {

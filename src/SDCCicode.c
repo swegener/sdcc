@@ -3446,6 +3446,8 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
           ic->parmPush = 1;
           /* update the stack adjustment */
           *stack += getSize (IS_AGGREGATE (p) ? aggrToPtr (p, FALSE) : p);
+          if (IFFUNC_ISSMALLC (ftype) && !IS_AGGREGATE (p) && getSize (p) == 1) /* SmallC calling convention passes 8-bit paramters as 16-bit values */
+            (*stack)++;
           ADDTOCHAIN (ic);
         }
     }

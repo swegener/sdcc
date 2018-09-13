@@ -613,13 +613,13 @@ allocParms (value *val, bool smallc)
   int pNum = 1;
   int stackParamSizeAdjust = 0;
 
-  if (IFFUNC_ISSMALLC (currFunc->type))
+  if (smallc)
     {
       for (lval = val; lval; lval = lval->next)
       {
         if (IS_REGPARM (lval->etype))
           continue;
-        stackParamSizeAdjust += getSize (lval->type);
+        stackParamSizeAdjust += getSize (lval->type) + (getSize (lval->type) == 1);
       }
     }
   stackPtr += stackParamSizeAdjust;
@@ -642,6 +642,8 @@ allocParms (value *val, bool smallc)
       /* if automatic variables r 2b stacked */
       if (options.stackAuto || IFFUNC_ISREENT (currFunc->type))
         {
+          int paramsize = getSize (lval->type) + (getSize (lval->type) == 1 && smallc);
+
           if (lval->sym)
             lval->sym->onStack = 1;
 
@@ -652,19 +654,20 @@ allocParms (value *val, bool smallc)
               wassertl (!smallc, "SmallC calling convention not yet supported for xstack callee");
               SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = xstack;
               SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
-                xstackPtr - getSize (lval->type);
-              xstackPtr -= getSize (lval->type);
+                xstackPtr - paramsize;
+              xstackPtr -= paramsize;
             }
           else                      /* use internal stack   */
             {
+              
               SPEC_OCLS (lval->etype) = SPEC_OCLS (lval->sym->etype) = istack;
-              if ((port->stack.direction > 0) != (IFFUNC_ISSMALLC (currFunc->type)))
+              if ((port->stack.direction > 0) != smallc)
                 {
                   SPEC_STAK (lval->etype) = SPEC_STAK (lval->sym->etype) = lval->sym->stack =
                     stackPtr - (FUNC_REGBANK (currFunc->type) ? port->stack.bank_overhead : 0) -
-                    getSize (lval->type) -
+                    paramsize -
                     (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0);
-                  stackPtr -= getSize (lval->type);
+                  stackPtr -= paramsize;
                 }
               else
                 {
@@ -674,7 +677,7 @@ allocParms (value *val, bool smallc)
                     stackPtr +
                     (FUNC_ISISR (currFunc->type) ? port->stack.isr_overhead : 0) +
                     0;
-                  stackPtr += getSize (lval->type);
+                  stackPtr += paramsize;
                 }
             }
           allocIntoSeg (lval->sym);

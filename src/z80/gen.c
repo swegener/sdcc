@@ -3767,7 +3767,7 @@ _saveRegsForCall (const iCode * ic, bool dontsaveIY)
 /* genIpush - genrate code for pushing this gets a little complex  */
 /*-----------------------------------------------------------------*/
 static void
-genIpush (const iCode * ic)
+genIpush (const iCode *ic)
 {
   int size, offset = 0;
 
@@ -3778,36 +3778,27 @@ genIpush (const iCode * ic)
       wassertl (0, "Encountered an unsupported spill push.");
       return;
     }
+      
+  /* Scan ahead until we find the function that we are pushing parameters to.
+     Count the number of addSets on the way to figure out what registers
+     are used in the send set.
+   */
+  int nAddSets = 0;
+  iCode *walk = ic->next;
 
-  if (_G.saves.saved == FALSE && !regalloc_dry_run /* Cost is counted at CALL or PCALL instead */ )
+  while (walk)
     {
-      /* Caller saves, and this is the first iPush. */
-      /* Scan ahead until we find the function that we are pushing parameters to.
-         Count the number of addSets on the way to figure out what registers
-         are used in the send set.
-       */
-      int nAddSets = 0;
-      iCode *walk = ic->next;
+      if (walk->op == SEND && !_G.saves.saved && !regalloc_dry_run)
+        nAddSets++;
+      else if (walk->op == CALL || walk->op == PCALL)
+        break; // Found it.
 
-      while (walk)
-        {
-          if (walk->op == SEND)
-            {
-              nAddSets++;
-            }
-          else if (walk->op == CALL || walk->op == PCALL)
-            {
-              /* Found it. */
-              break;
-            }
-          else
-            {
-              /* Keep looking. */
-            }
-          walk = walk->next;
-        }
-      _saveRegsForCall (walk, FALSE);
+      walk = walk->next; // Keep looking.
     }
+  if (!regalloc_dry_run && !_G.saves.saved && !regalloc_dry_run) /* Cost is counted at CALL or PCALL instead */
+    _saveRegsForCall (walk, false); /* Caller saves, and this is the first iPush. */
+
+  const bool smallc = IFFUNC_ISSMALLC (operandType (IC_LEFT (walk)));
 
   /* then do the push */
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
@@ -3825,7 +3816,36 @@ genIpush (const iCode * ic)
     }
   else
     {
-      if (size == 2)
+      if (size == 1 && smallc) /* The SmallC calling convention pushes 8-bit parameters as 16-bit values. */
+        {
+          if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[2]->rIdx == C_IDX)
+            {
+              emit2 ("push bc");
+              regalloc_dry_run_cost += 1;
+            }
+          else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[2]->rIdx == E_IDX)
+            {
+              emit2 ("push de");
+              regalloc_dry_run_cost += 1;
+            }
+          else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[2]->rIdx == L_IDX)
+            {
+              emit2 ("push hl");
+              regalloc_dry_run_cost += 1;
+            }
+          else
+            {
+              emit2 ("dec sp");
+              cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), 0);
+              emit2 ("push af");
+              emit2 ("inc sp");
+              regalloc_dry_run_cost += 3;
+            }
+          if (!regalloc_dry_run)
+            _G.stack.pushed += 2;
+          goto release;
+        }
+      else if (size == 2)
         {
           PAIR_ID pair = getDeadPairId (ic);
           if (pair == PAIR_INVALID || isPairDead (PAIR_HL, ic))

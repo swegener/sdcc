@@ -1,5 +1,13 @@
 2018-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCicode.c,
+	  src/SDCCmem.c,
+	  src/z80/gen.c,
+	  src/z80/ralloc.c:
+	  Fix bug #2811.
+
+2018-09-12 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCval.c,
 	  support/regression/tests/iso-8859-1.c:
 	  Fix bug #2812.

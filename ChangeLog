@@ -1,3 +1,11 @@
+2018-09-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  support/regression/tests/smallc.c,
+	  support/regression/tests/bug-2590.c,
+	  support/regression/tests/z88dk.c:
+	  Disable __smallc for stm8.
+
 2018-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c,

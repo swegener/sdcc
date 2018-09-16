@@ -1,3 +1,10 @@
+2018-09-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* .version,
+	  doc/INSTALL.txt,
+	  sdcc.spec:
+	  Bump version number preparing for 3.8.0 release.
+
 2018-09-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/main.c,
@@ -6,7 +13,7 @@
 	  support/regression/tests/z88dk.c:
 	  Disable __smallc for stm8.
 
-2018-09-12 Philipp Klaus Krause <pkk AT spth.de>
+2018-09-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c,
 	  src/SDCCmem.c,

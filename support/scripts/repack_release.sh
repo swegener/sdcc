@@ -71,13 +71,14 @@ function download()
     fatal_error "Cannot cd to dl!"
   else
     ( \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/sdcc-src/sdcc-src-${date}-${revision}.tar.bz2 && \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/docs/sdcc-doc-${date}-${revision}.tar.bz2 && \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/docs/sdcc-doc-${date}-${revision}.zip && \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i386-unknown-linux2.5/sdcc-snapshot-i386-unknown-linux2.5-${date}-${revision}.tar.bz2 && \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i586-mingw32msvc/sdcc-snapshot-i586-mingw32msvc-${date}-${revision}.zip && \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/x86_64-w64-mingw32/sdcc-snapshot-x86_64-w64-mingw32-${date}-${revision}.zip && \
-    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/universal-apple-macosx/sdcc-snapshot-universal-apple-macosx-${date}-${revision}.tar.bz2 \
+    wget https://sourceforge.net/projects/sdcc/files/snapshot_builds/sdcc-src/sdcc-src-${date}-${revision}.tar.bz2 && \
+    wget https://sourceforge.net/projects/sdcc/files/snapshot_builds/docs/sdcc-doc-${date}-${revision}.tar.bz2 && \
+    wget https://sourceforge.net/projects/sdcc/files/snapshot_builds/docs/sdcc-doc-${date}-${revision}.zip && \
+#    wget http://sourceforge.net/projects/sdcc/files/snapshot_builds/i386-unknown-linux2.5/sdcc-snapshot-i386-unknown-linux2.5-${date}-${revision}.tar.bz2 && \
+    wget https://sourceforge.net/projects/sdcc/files/snapshot_builds/amd64-unknown-linux2.5/sdcc-snapshot-amd64-unknown-linux2.5-${date}-${revision}.tar.bz2 && \
+    wget https://sourceforge.net/projects/sdcc/files/snapshot_builds/i586-mingw32msvc/sdcc-snapshot-i586-mingw32msvc-${date}-${revision}.zip && \
+    wget https://sourceforge.net/projects/sdcc/files/snapshot_builds/x86_64-w64-mingw32/sdcc-snapshot-x86_64-w64-mingw32-${date}-${revision}.zip && \
+    wget https://sourceforge.net/projects/sdcc/files/snapshot_builds/x86_64-apple-macosx/sdcc-snapshot-x86_64-apple-macosx-${date}-${revision}.tar.bz2 \
     ) || fatal_error "Cannot download snapshot build packages!"
 
 #    a rename is required when another snapshot is taken as the source for the release
@@ -228,11 +229,14 @@ function upload()
   echo uploading ul/sdcc-${ver}-x64-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win64/${raw_ver}/
   rsync -v --progress -e ssh ul/sdcc-${ver}-x64-setup.exe ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-win64/${raw_ver}/
 
-  echo uploading ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}/
-  rsync -v --progress -e ssh ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}/
+#  echo uploading ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}/
+#  rsync -v --progress -e ssh ul/sdcc-${ver}-i386-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-x86/${raw_ver}/
 
-  echo uploading ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}/
-  rsync -v --progress -e ssh ul/sdcc-${ver}-universal-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx/${raw_ver}/
+  echo uploading ul/sdcc-${ver}-amd64-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-amd64/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-${ver}-amd64-unknown-linux2.5.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-linux-amd64/${raw_ver}/
+
+  echo uploading ul/sdcc-${ver}-x86_64-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx-amd64/${raw_ver}/
+  rsync -v --progress -e ssh ul/sdcc-${ver}-x86_64-apple-macosx.tar.bz2 ${user}@web.sourceforge.net:/home/pfs/project/sdcc/sdcc-macosx-amd64/${raw_ver}/
 }
 
 
@@ -277,7 +281,7 @@ function upload()
     cp dl/sdcc-doc-${date}-${revision}.zip ul/sdcc-doc-${ver}.zip
 
     # repack the *nix-like binaries
-    for arch in i386-unknown-linux2.5 universal-apple-macosx
+    for arch in amd64-unknown-linux2.5 x86_64-apple-macosx
     do
       unpack dl/sdcc-snapshot-${arch}-${date}-${revision}.tar.bz2 dl/sdcc-doc-${date}-${revision}.tar.bz2
       pack ${arch} ${ver}

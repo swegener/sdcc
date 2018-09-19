@@ -1,3 +1,8 @@
+2018-09-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/scripts/repack_release.sh:
+	  Update script for 3.8.0 release.
+
 2018-09-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* .version,

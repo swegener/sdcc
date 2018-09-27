@@ -1476,7 +1476,9 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
           assigned[i] = TRUE;
           (*size)--;
           i++;
+          continue;
         }
+
       // Could transfer two bytes at a time now.
       if (i + 1 < n &&
         !assigned[i] && !assigned[i + 1] &&
@@ -5700,13 +5702,16 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
 
   for (i = 0; i < size;)
     {
+      bool same_2_stack = aopOnStack (left, 0, 2) && aopOnStack (result, 0, 2) && left->aopu.bytes[i].byteu.stk == result->aopu.bytes[i].byteu.stk;
+      bool same_1_stack = aopOnStack (left, 0, 1) && aopOnStack (result, 0, 1) && left->aopu.bytes[i].byteu.stk == result->aopu.bytes[i].byteu.stk;
+
       if (!a_needed_for_count && aopInReg (left, i, A_IDX) && regDead (A_IDX, ic) && result->regs[A_IDX] == -1 && (size <= 1 || shCount >= 2))
         {
           shiftop->aopu.bytes[i] = left->aopu.bytes[i];
           shiftop->regs[A_IDX] = i;
           i++;
         }
-      else if (aopInReg (left, i, X_IDX) && regDead (X_IDX, ic) && result->regs[XL_IDX] == -1 && result->regs[XH_IDX] == -1)
+      else if (aopInReg (left, i, X_IDX) && regDead (X_IDX, ic) && result->regs[XL_IDX] == -1 && result->regs[XH_IDX] == -1 && right->regs[XL_IDX] == -1 && right->regs[XH_IDX] == -1)
         {
           shiftop->aopu.bytes[i] = left->aopu.bytes[i];
           shiftop->aopu.bytes[i + 1] = left->aopu.bytes[i + 1];
@@ -5723,9 +5728,9 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
           i += 2;
         }
       // Try to shift in x instead of on stack.
-      else if (aopOnStack (left, 0, 2) && aopOnStack (result, 0, 2) && regDead (X_IDX, ic) &&
+      else if (aopOnStack (left, 0, 2) && aopOnStack (result, 0, 2) && !same_2_stack && regDead (X_IDX, ic) &&
         shiftop->regs[XL_IDX] == -1 && shiftop->regs[XH_IDX] == -1 &&
-        left->regs[XL_IDX] == -1 && left->regs[XH_IDX] == -1 && result->regs[XL_IDX] == -1 && result->regs[XH_IDX] == -1)
+        left->regs[XL_IDX] == -1 && left->regs[XH_IDX] == -1 && result->regs[XL_IDX] == -1 && result->regs[XH_IDX] == -1 && right->regs[XL_IDX] == -1 && right->regs[XH_IDX] == -1)
         {
           shiftop->aopu.bytes[i] = ASMOP_X->aopu.bytes[0];
           shiftop->aopu.bytes[i + 1] = ASMOP_X->aopu.bytes[1];
@@ -5734,7 +5739,7 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
           i += 2;
         }
       // Try to shift in y instead of on stack.
-      else if (size == 2 && aopOnStack (left, 0, 2) && aopOnStack (result, 0, 2) && regDead (Y_IDX, ic) &&
+      else if (size == 2 && aopOnStack (left, 0, 2) && aopOnStack (result, 0, 2) && !same_2_stack && regDead (Y_IDX, ic) &&
         shiftop->regs[YL_IDX] == -1 && shiftop->regs[YH_IDX] == -1 &&
         left->regs[YL_IDX] == -1 && left->regs[YH_IDX] == -1 && result->regs[YL_IDX] == -1 && result->regs[YH_IDX] == -1)
         {
@@ -5744,7 +5749,7 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
           shiftop->regs[YH_IDX] = i + 1;
           i += 2;
         }
-      else if (!a_needed_for_count && size == 1 && aopOnStack (left, 0, 1) && aopOnStack (result, 0, 1) && regDead (A_IDX, ic) && shiftop->regs[A_IDX] == -1 && result->regs[A_IDX] == -1 && left->regs[A_IDX] == -1) // TODO: More cases.
+      else if (!a_needed_for_count && size == 1 && aopOnStack (left, 0, 1) && aopOnStack (result, 0, 1) && !same_1_stack && regDead (A_IDX, ic) && shiftop->regs[A_IDX] == -1 && result->regs[A_IDX] == -1 && left->regs[A_IDX] == -1) // TODO: More cases.
         {
           shiftop->aopu.bytes[i] = ASMOP_A->aopu.bytes[0];
           shiftop->regs[A_IDX] = i;
@@ -5953,6 +5958,7 @@ genLeftShift (const iCode *ic)
   bool pushed_a = FALSE;
   symbol *tlbl1, *tlbl2;
   unsigned int iterations;
+  int skip_bytes = 0;
 
   struct asmop shiftop_impl;
   struct asmop *shiftop;
@@ -5983,18 +5989,28 @@ genLeftShift (const iCode *ic)
   if (!regDead (A_IDX, ic))
     {
       push (ASMOP_A, 0, 1);
-      pushed_a = TRUE;
+      pushed_a = true;
     }
 
   if (aopRS (left->aop) && aopRS (result->aop))
     {
       shiftop = &shiftop_impl;
-      init_shiftop (shiftop, result->aop, left->aop, right->aop, ic, FALSE);
+      init_shiftop (shiftop, result->aop, left->aop, right->aop, ic, false);
     }
   else
     shiftop = result->aop;
 
-  genMove (shiftop, left->aop, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0,  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
+  iterations = (right->aop->type == AOP_LIT ? byteOfVal (right->aop->aopu.aop_lit, 0) : 2);
+
+  if (right->aop->type == AOP_LIT)
+    {
+      skip_bytes = iterations / 16 * 2;
+      genMove_o (shiftop, skip_bytes, left->aop, 0, shiftop->size - skip_bytes, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0, regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
+      genMove_o (shiftop, 0, ASMOP_ZERO, 0, skip_bytes, true, regDead (X_IDX, ic) && shiftop->regs[XL_IDX] < 0 && shiftop->regs[XH_IDX] < 0, regDead (Y_IDX, ic) && shiftop->regs[YL_IDX] < 0 && shiftop->regs[YH_IDX] < 0);
+      iterations %= 16;
+    }
+  else
+    genMove (shiftop, left->aop, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0,  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
 
   size = result->aop->size;
 
@@ -6005,19 +6021,28 @@ genLeftShift (const iCode *ic)
         {
           if (!regalloc_dry_run)
             wassertl (0, "Overwriting shift count");
-          cost (180, 180);
+          cost (380, 380);
         }
       if (aopInReg (shiftop, i, A_IDX) && !pushed_a)
         {
           push (ASMOP_A, 0, 1);
-          pushed_a = TRUE;
+          pushed_a = true;
         }
     }
 
-  tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-  tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-  cheapMove (ASMOP_A, 0, right->aop, 0, FALSE);
-  iterations = (right->aop->type == AOP_LIT ? byteOfVal (right->aop->aopu.aop_lit, 0) : 2);
+  tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (0));
+  tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (0));
+
+  // Get shift count into a.
+  if (right->aop->type == AOP_LIT)
+    {
+      if (!iterations)
+        goto postshift;
+      emit2 ("ld", "a, #0x%02x", iterations);
+      cost (2, 1);
+    }
+  else
+    cheapMove (ASMOP_A, 0, right->aop, 0, false);
 
   if (right->aop->type != AOP_LIT || aopIsLitVal (right->aop, 0, 1, 0))
     {
@@ -6031,20 +6056,20 @@ genLeftShift (const iCode *ic)
   emitLabel (tlbl1);
 
   regalloc_dry_run_cycle_scale = iterations;
-  for (i = 0; i < size;)
+  for (i = skip_bytes; i < size;)
      {
         int swapidx = -1;
 
         if (aopInReg (shiftop, i, X_IDX) || aopInReg (shiftop, i, Y_IDX))
           {
-            emit3w_o (i ? A_RLCW : A_SLLW, shiftop, i, 0, 0);
+            emit3w_o (i - skip_bytes ? A_RLCW : A_SLLW, shiftop, i, 0, 0);
             i += 2;
             continue;
           }
 
         if (aopInReg (shiftop, i, A_IDX))
           {
-            emit2 (i ? "rlc" : "sll", "(1, sp)");
+            emit2 (i - skip_bytes ? "rlc" : "sll", "(1, sp)");
             cost (2, 1);
             i++;
             continue;
@@ -6054,11 +6079,11 @@ genLeftShift (const iCode *ic)
           swapidx = shiftop->aopu.bytes[i].byteu.reg->rIdx;
 
         if (swapidx == -1)
-          emit3_o (i ? A_RLC : A_SLL, shiftop, i, 0, 0);
+          emit3_o (i - skip_bytes ? A_RLC : A_SLL, shiftop, i, 0, 0);
         else
           {
             swap_to_a (swapidx);
-            emit3 (i ? A_RLC : A_SLL, ASMOP_A, 0);
+            emit3 (i - skip_bytes ? A_RLC : A_SLL, ASMOP_A, 0);
             swap_from_a (swapidx);
           }
         i++;
@@ -6071,6 +6096,7 @@ genLeftShift (const iCode *ic)
   cost (2, (iterations - 1) * 2 + 1);
   emitLabel (tlbl2);
 
+postshift:
   if(!regDead (A_IDX, ic))
     {
       genMove (result->aop, shiftop, regDead (A_IDX, ic) || pushed_a, regDead (X_IDX, ic), regDead (Y_IDX, ic));
@@ -6081,9 +6107,8 @@ genLeftShift (const iCode *ic)
     {
       if (pushed_a)
         pop (ASMOP_A, 0, 1);
-      genMove (result->aop, shiftop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
-    }
-  
+      genMove (result->aop, shiftop, false, regDead (X_IDX, ic), regDead (Y_IDX, ic));
+    } 
 
   freeAsmop (left);
   freeAsmop (result);
@@ -6094,7 +6119,7 @@ genLeftShift (const iCode *ic)
 /* genGetABit - get a bit                                           */
 /*------------------------------------------------------------------*/
 static void
-genGetABit (const iCode *ic)
+genGetABit (const iCode *ic, iCode *ifx)
 {
   operand *left, *right, *result;
   int shCount, leftcost, rightcost;
@@ -6110,6 +6135,34 @@ genGetABit (const iCode *ic)
   aopOp (result, ic);
 
   shCount = (int) ulFromVal ((right->aop)->aopu.aop_lit);
+
+  if (ifx && result->aop->type == AOP_CND)
+    {
+      wassert (shCount % 8 == 7);
+
+      symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (NULL);
+
+      if (aopInReg (left->aop, shCount / 8, XH_IDX))
+        emit3w (A_TNZW, ASMOP_X, 0);
+      else if (aopInReg (left->aop, shCount / 8, YH_IDX))
+        emit3w (A_TNZW, ASMOP_Y, 0);
+      else if (aopInReg (left->aop, shCount / 8, XL_IDX) || aopInReg (left->aop, shCount / 8, YL_IDX))
+        {
+          wassert (regalloc_dry_run);
+          cost (200, 200);
+        }
+      else
+        emit3_o (A_TNZ, left->aop, shCount / 8, 0, 0);
+
+      if (!regalloc_dry_run)
+        emit2 (IC_TRUE (ifx) ? "jrpl" : "jrmi", "!tlabel", labelKey2num (tlbl->key));
+      cost (2, 2); // Hmm. Cycle cost overestimate.
+
+      emitJP (IC_TRUE (ifx) ? IC_TRUE (ifx) : IC_FALSE (ifx), 1.0f); // Hmm. Cycle cost overestimate.
+      emitLabel (tlbl);
+
+      goto release;
+    }
 
   if (!regDead (A_IDX, ic))
     push (ASMOP_A, 0, 1);
@@ -6150,6 +6203,7 @@ genGetABit (const iCode *ic)
   if (!regDead (A_IDX, ic))
     pop (ASMOP_A, 0, 1);
 
+release:
   freeAsmop (right);
   freeAsmop (left);
   freeAsmop (result);
@@ -6191,7 +6245,8 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       goto release;
     }
 
-  wassertl (size <= 2 || shCount % 8 <= 1 + (size <= 4) || size == 4 && shCount <= 10, "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
+  wassertl (size <= 2 || shCount % 8 <= 1 + (size <= 4) || size == 4 && (shCount <= 10 || shCount >= 16),
+    "Shifting of longs and long longs by non-trivial values should be handled by generic function.");
 
   if ((shCount < 8 || sign) && aopRS (left->aop) && aopRS (result->aop))
     {
@@ -6346,10 +6401,11 @@ genRightShift (const iCode *ic)
 {
   operand *left, *right, *result;
   int i, size;
-  bool pushed_a = FALSE;
+  bool pushed_a = false;
   symbol *tlbl1, *tlbl2;
   bool sign;
   unsigned int iterations;
+  int skip_bytes = 0;
 
   struct asmop shiftop_impl;
   struct asmop *shiftop;
@@ -6364,11 +6420,12 @@ genRightShift (const iCode *ic)
 
   /* if the shift count is known then do it
      as efficiently as possible */
-  if ( right->aop->type == AOP_LIT &&
-       ( (getSize (operandType (result)) <= 2) ||
-         (!sign && ulFromVal (right->aop->aopu.aop_lit) % 8 <= (getSize (operandType (result)) <= 4 ? 2UL : 1UL)) ||
-         (getSize (operandType (result)) <= 4 && ulFromVal (right->aop->aopu.aop_lit) <= 10) ||
-         (!sign && ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8) ) )
+  if (right->aop->type == AOP_LIT &&
+    ((getSize (operandType (result)) <= 2) ||
+      (!sign && ulFromVal (right->aop->aopu.aop_lit) % 8 <= (getSize (operandType (result)) <= 4 ? 2ul : 1ul)) ||
+      (getSize (operandType (result)) <= 4 && ulFromVal (right->aop->aopu.aop_lit) <= 10) ||
+      (getSize (operandType (result)) <= 4 && ulFromVal (right->aop->aopu.aop_lit) >= 16) ||
+      (!sign && ulFromVal (right->aop->aopu.aop_lit) >= getSize (operandType (result)) * 8) ) )
     {
       genRightShiftLiteral (left, right, result, ic);
       freeAsmop (right);
@@ -6383,18 +6440,27 @@ genRightShift (const iCode *ic)
   if (!regDead (A_IDX, ic))
     {
       push (ASMOP_A, 0, 1);
-      pushed_a = TRUE;
+      pushed_a = true;
     }
 
   if (aopRS (left->aop) && aopRS (result->aop))
     {
       shiftop = &shiftop_impl;
-      init_shiftop (shiftop, result->aop, left->aop, right->aop, ic, FALSE);
+      init_shiftop (shiftop, result->aop, left->aop, right->aop, ic, false);
     }
   else
     shiftop = result->aop;
 
-  genMove (shiftop, left->aop, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0,  regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
+  iterations = (right->aop->type == AOP_LIT ? byteOfVal (right->aop->aopu.aop_lit, 0) : 2);
+
+  if (right->aop->type == AOP_LIT && !sign)
+    {
+      skip_bytes = iterations / 16 * 2;
+      genMove_o (shiftop, 0, left->aop, skip_bytes, shiftop->size, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0, regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
+      iterations %= 16;
+    }
+  else
+    genMove (shiftop, left->aop, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0, regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
 
   size = shiftop->size;
 
@@ -6405,20 +6471,28 @@ genRightShift (const iCode *ic)
         {
           if (!regalloc_dry_run)
             wassertl (0, "Overwriting shift count");
-          cost (180, 180);
+          cost (380, 380);
         }
       if (aopInReg (shiftop, i, A_IDX) && !pushed_a)
         {
           push (ASMOP_A, 0, 1);
-          pushed_a = TRUE;
+          pushed_a = true;
         }
     }
 
-  tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-  tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-  cheapMove (ASMOP_A, 0, right->aop, 0, FALSE);
+  tlbl1 = (regalloc_dry_run ? 0 : newiTempLabel (0));
+  tlbl2 = (regalloc_dry_run ? 0 : newiTempLabel (0));
 
-  iterations = (right->aop->type == AOP_LIT ? byteOfVal (right->aop->aopu.aop_lit, 0) : 2);
+  // Get shift count into a.
+  if (right->aop->type == AOP_LIT)
+    {
+      if (!iterations)
+        goto postshift;
+      emit2 ("ld", "a, #0x%02x", iterations);
+      cost (2, 1);
+    }
+  else
+    cheapMove (ASMOP_A, 0, right->aop, 0, false);
 
   if (right->aop->type != AOP_LIT || aopIsLitVal (right->aop, 0, 1, 0))
     {
@@ -6432,19 +6506,19 @@ genRightShift (const iCode *ic)
   emitLabel (tlbl1);
 
   regalloc_dry_run_cycle_scale = iterations;
-  for (i = size - 1; i >= 0;)
+  for (i = size - 1 - skip_bytes; i >= 0;)
      {
         int swapidx = -1;
 
         if (i > 0 && (aopInReg (shiftop, i - 1, X_IDX) || aopInReg (shiftop, i - 1, Y_IDX)))
           {
-            emit3w_o ((i != size - 1) ? A_RRCW : (sign ? A_SRAW : A_SRLW), shiftop, i - 1, 0, 0);
+            emit3w_o ((i != size - 1 - skip_bytes) ? A_RRCW : (sign ? A_SRAW : A_SRLW), shiftop, i - 1, 0, 0);
             i -= 2;
             continue;
           }
         else if (aopInReg (shiftop, i, A_IDX))
           {
-            emit2 ((i != size - 1) ? "rrc" : (sign ? "sra" : "srl"), "(1, sp)");
+            emit2 ((i != size - 1 - skip_bytes) ? "rrc" : (sign ? "sra" : "srl"), "(1, sp)");
             cost (2, 1);
             i--;
             continue;
@@ -6454,11 +6528,11 @@ genRightShift (const iCode *ic)
           swapidx = shiftop->aopu.bytes[i].byteu.reg->rIdx;
 
         if (swapidx == -1)
-          emit3_o ((i != size - 1) ? A_RRC : (sign ? A_SRA : A_SRL), shiftop, i, 0, 0);
+          emit3_o ((i != size - 1 - skip_bytes) ? A_RRC : (sign ? A_SRA : A_SRL), shiftop, i, 0, 0);
         else
           {
             swap_to_a (swapidx);
-            emit3 ((i != size - 1) ? A_RRC : (sign ? A_SRA : A_SRL), ASMOP_A, 0);
+            emit3 ((i != size - 1 - skip_bytes) ? A_RRC : (sign ? A_SRA : A_SRL), ASMOP_A, 0);
             swap_from_a (swapidx);
           }
         i--;
@@ -6471,6 +6545,7 @@ genRightShift (const iCode *ic)
   cost (2, (iterations - 1) * 2 + 1);
   emitLabel (tlbl2);
 
+postshift:
   if(!regDead (A_IDX, ic))
     {
       genMove (result->aop, shiftop, regDead (A_IDX, ic) || pushed_a, regDead (X_IDX, ic), regDead (Y_IDX, ic));
@@ -6481,7 +6556,7 @@ genRightShift (const iCode *ic)
     {
       if (pushed_a)
         pop (ASMOP_A, 0, 1);
-      genMove (result->aop, shiftop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      genMove (result->aop, shiftop, false, regDead (X_IDX, ic), regDead (Y_IDX, ic));
     }
 
   freeAsmop (left);
@@ -6600,7 +6675,8 @@ genPointerGet (const iCode *ic)
           i++, blen -= 8;
           continue;
         }
-      else if (!bit_field && aopInReg (result->aop, i, Y_IDX) && !use_y)
+      else if (!bit_field && !use_y &&
+        (aopInReg (result->aop, i, Y_IDX) || aopOnStackNotExt (result->aop, i, 2) && regDead (Y_IDX, ic) && result->aop->regs[YL_IDX] < 0 && result->aop->regs[YH_IDX] < 0 && i + 3 < size && !optimize.codeSpeed))
         {
           o--;
 
@@ -6610,6 +6686,7 @@ genPointerGet (const iCode *ic)
           else
             emit2 ("ldw", "y, (0x%x, y)", o);
           cost (4 + (o > 0) + (o > 256), 3);
+          genMove_o (result->aop, i, ASMOP_Y, 0, 2, pushed_a, false, true);
 
           i++, blen -= 8;
           continue;
@@ -7693,7 +7770,7 @@ genSTM8iCode (iCode *ic)
       break;
 
     case GETABIT:
-      genGetABit (ic);
+      genGetABit (ic, ifxForOp (IC_RESULT (ic), ic));
       break;
 
     case LEFT_OP:

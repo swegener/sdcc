@@ -9,7 +9,7 @@
 #define D(_s)
 
 #define EQUALS(l, i) (!strcmp((l), (i)))
-#define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1))
+#define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1) && (!(l)[sizeof(i) - 1] || isspace((unsigned char)((l)[sizeof(i) - 1]))))
 
 typedef enum
 {
@@ -171,52 +171,52 @@ stm8instructionSize(const lineNode *pl)
   //printf("line=%s operand=%s op1start=%s op2start=%s\n", pl->line, operand, op1start, op2start);
 
   /* Operations that always costs 1 byte */
-  if (EQUALS(operand, "ccf")
-    || EQUALS(operand, "divw")
-    || EQUALS(operand, "exgw")
-    || EQUALS(operand, "iret")
-    || EQUALS(operand, "nop")
-    || EQUALS(operand, "rcf")
-    || EQUALS(operand, "ret")
-    || EQUALS(operand, "retf")
-    || EQUALS(operand, "rvf")
-    || EQUALS(operand, "break")
-    || EQUALS(operand, "halt")
-    || EQUALS(operand, "rim")
-    || EQUALS(operand, "trap")
-    || EQUALS(operand, "wfi")
-    || EQUALS(operand, "sim")
-    || EQUALS(operand, "scf"))
+  if (ISINST(operand, "ccf")
+    || ISINST(operand, "divw")
+    || ISINST(operand, "exgw")
+    || ISINST(operand, "iret")
+    || ISINST(operand, "nop")
+    || ISINST(operand, "rcf")
+    || ISINST(operand, "ret")
+    || ISINST(operand, "retf")
+    || ISINST(operand, "rvf")
+    || ISINST(operand, "break")
+    || ISINST(operand, "halt")
+    || ISINST(operand, "rim")
+    || ISINST(operand, "trap")
+    || ISINST(operand, "wfi")
+    || ISINST(operand, "sim")
+    || ISINST(operand, "scf"))
       return 1;
 
   /* Operations that always costs 3 byte */
-  if(EQUALS(operand, "jrh")
-    || EQUALS(operand, "jrnh")
-    || EQUALS(operand, "jril")
-    || EQUALS(operand, "jrih")
-    || EQUALS(operand, "jrm")
-    || EQUALS(operand, "jrnm"))
+  if(ISINST(operand, "jrh")
+    || ISINST(operand, "jrnh")
+    || ISINST(operand, "jril")
+    || ISINST(operand, "jrih")
+    || ISINST(operand, "jrm")
+    || ISINST(operand, "jrnm"))
       return 3;
 
   /* Operations that always costs 2 byte */
-  if(ISINST(operand, "jr")
-    || EQUALS(operand, "callr")
-    || EQUALS(operand, "wfe"))
+  if(!strncmp(operand, "jr", 2)
+    || ISINST(operand, "callr")
+    || ISINST(operand, "wfe"))
       return 2;
 
   /* Operations that always costs 4 byte */
-  if(EQUALS(operand, "bccm")
-    || EQUALS(operand, "bcpl")
-    || EQUALS(operand, "bres")
-    || EQUALS(operand, "bset")
-    || EQUALS(operand, "callf")
-    || EQUALS(operand, "int")
-    || EQUALS(operand, "jpf"))
+  if(ISINST(operand, "bccm")
+    || ISINST(operand, "bcpl")
+    || ISINST(operand, "bres")
+    || ISINST(operand, "bset")
+    || ISINST(operand, "callf")
+    || ISINST(operand, "int")
+    || ISINST(operand, "jpf"))
       return 4;
 
   /* Operations that always costs 5 byte */
-  if(EQUALS(operand, "btjf")
-    || EQUALS(operand, "btjt"))
+  if(ISINST(operand, "btjf")
+    || ISINST(operand, "btjt"))
       return 5;
 
   if (EQUALS(operand, "push")
@@ -294,7 +294,7 @@ stm8instructionSize(const lineNode *pl)
     return(4);
   }
 
-  if(EQUALS(operand, "cplw"))
+  if(ISINST(operand, "cplw"))
   {
     assert (op1start != NULL);
     if(op1start[0] == 'y')
@@ -303,7 +303,7 @@ stm8instructionSize(const lineNode *pl)
       return(1);
   }
 
-  if(EQUALS(operand, "ldf"))
+  if(ISINST(operand, "ldf"))
   {
     assert (op1start != NULL);
     if(isRelativeAddr(op1start, "y") || isRelativeAddr(op2start, "y"))
@@ -313,8 +313,8 @@ stm8instructionSize(const lineNode *pl)
   }
 
   /* Operations that costs 2 or 3 bytes for immediate */
-  if(ISINST(operand, "ld")
-                || ISINST(operand, "cp")
+  if(!strncmp(operand, "ld", 2)
+                || !strncmp(operand, "cp", 2)
                 || EQUALS(operand, "adc")
                 || EQUALS(operand, "add")
                 || EQUALS(operand, "and")
@@ -368,7 +368,7 @@ stm8instructionSize(const lineNode *pl)
   }
 
   /* mov costs 3, 4 or 5 bytes depending on its addressing mode */
-  if(EQUALS(operand, "mov")) {
+  if(ISINST(operand, "mov")) {
     assert (op1start != NULL && op2start != NULL);
     if(isImmediate(op2start))
       return(4);
@@ -570,6 +570,9 @@ isReturned(const char *what)
 static bool
 stm8MightReadFlag(const lineNode *pl, const char *what)
 {
+  if (strcmp (what, "c") && strcmp (what, "n") && strcmp (what, "z"))
+    return true;
+
   if (ISINST (pl->line, "push"))
      return (pl->line[5] == 'c');
 
@@ -584,7 +587,7 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
       ISINST (pl->line, "adc") || ISINST (pl->line, "sbc") ||
       ISINST (pl->line, "ccf") || ISINST (pl->line, "rlc") || ISINST (pl->line, "rlcw") || ISINST (pl->line, "rrc") || ISINST (pl->line, "rrcw"));
 
-  return TRUE;
+  return true;
 }
 
 static bool
@@ -676,37 +679,38 @@ stm8MightRead(const lineNode *pl, const char *what)
       if (ISINST (pl->line, "cpw") && pl->line[4] == extra)
         return TRUE;
 
-      if ((strchr (pl->line, ',') ? argCont (strchr (pl->line, ','), extra) : argCont (strchr (pl->line, '('), extra)) && (ISINST (pl->line, "adc")
-        || (ISINST (pl->line, "add") && !ISINST (pl->line, "addw"))
+      if ((strchr (pl->line, ',') ? argCont (strchr (pl->line, ','), extra) : argCont (strchr (pl->line, '('), extra)) &&
+        (ISINST (pl->line, "adc")
+        || ISINST (pl->line, "add")
         || ISINST (pl->line, "and")
         || ISINST (pl->line, "bcp")
         || ISINST (pl->line, "call")
-        || (ISINST (pl->line, "clr") && !ISINST (pl->line, "clrw"))
-        || (ISINST (pl->line, "cp") && !ISINST (pl->line, "cpw"))
+        || ISINST (pl->line, "clr")
+        || ISINST (pl->line, "cp")
         || ISINST (pl->line, "cpl")
-        || (ISINST (pl->line, "dec") && !ISINST (pl->line, "decw"))
-        || (ISINST (pl->line, "inc") && !ISINST (pl->line, "incw"))
+        || ISINST (pl->line, "dec")
+        || ISINST (pl->line, "inc")
         || ISINST (pl->line, "jp")
-        || (ISINST (pl->line, "neg") && !ISINST (pl->line, "negw"))
+        || ISINST (pl->line, "neg")
         || ISINST (pl->line, "or")
-        || (ISINST (pl->line, "rlc") && !ISINST (pl->line, "rlcw"))
-        || (ISINST (pl->line, "rrc") && !ISINST (pl->line, "rrcw"))
+        || ISINST (pl->line, "rlc")
+        || ISINST (pl->line, "rrc")
         || ISINST (pl->line, "sbc")
-        || (ISINST (pl->line, "sll") && !ISINST (pl->line, "sllw"))
-        || (ISINST (pl->line, "sla") && !ISINST (pl->line, "slaw"))
-        || (ISINST (pl->line, "sra") && !ISINST (pl->line, "sraw"))
-        || (ISINST (pl->line, "srl") && !ISINST (pl->line, "srlw"))
-        || (ISINST (pl->line, "sub") && !ISINST (pl->line, "subw"))
-        || (ISINST (pl->line, "swap") && !ISINST (pl->line, "swapw"))
-        || (ISINST (pl->line, "tnz") && !ISINST (pl->line, "tnzw"))
+        || ISINST (pl->line, "sll")
+        || ISINST (pl->line, "sla")
+        || ISINST (pl->line, "sra")
+        || ISINST (pl->line, "srl")
+        || ISINST (pl->line, "sub")
+        || ISINST (pl->line, "swap")
+        || ISINST (pl->line, "tnz")
         || ISINST (pl->line, "cpw")
         || ISINST (pl->line, "ldf")
         || ISINST (pl->line, "ldw")
-        || (ISINST (pl->line, "ld") && !ISINST (pl->line, "ldw"))
+        || ISINST (pl->line, "ld")
         || ISINST (pl->line, "xor")))
           return TRUE;
 
-      if (ISINST (pl->line, "ld"))
+      if (ISINST (pl->line, "ld") || ISINST (pl->line, "ldw"))
         {
           char buf[64], *p;
           strcpy (buf, pl->line);
@@ -726,14 +730,14 @@ stm8MightRead(const lineNode *pl, const char *what)
 static bool
 stm8UncondJump(const lineNode *pl)
 {
-  return (ISINST(pl->line, "jp\t") || ISINST(pl->line, "jra\t") || ISINST(pl->line, "jrt\t") || ISINST(pl->line, "jpf\t"));
+  return (ISINST(pl->line, "jp") || ISINST(pl->line, "jra") || ISINST(pl->line, "jrt") || ISINST(pl->line, "jpf"));
 }
 
 static bool
 stm8CondJump(const lineNode *pl)
 {
-  return (!stm8UncondJump(pl) && ISINST(pl->line, "jr") ||
-    ISINST(pl->line, "btjt\t") || ISINST(pl->line, "btjf\t"));
+  return (!stm8UncondJump(pl) && !strncmp(pl->line, "jr", 2) ||
+    ISINST(pl->line, "btjt") || ISINST(pl->line, "btjf"));
 }
 
 static bool
@@ -857,7 +861,7 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
       if (ISINST (pl->line, "swapw") && pl->line[6] == extra)
         return TRUE;
 
-      if ((ISINST (pl->line, "ld") && !ISINST (pl->line, "ldw") && !ISINST (pl->line, "ldf"))
+      if (ISINST (pl->line, "ld")
         && strncmp (pl->line + 3, what, strlen (what)) == 0)
         return TRUE;
 
@@ -923,7 +927,7 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
          e.g. isLabel doesn't work there */
       if ((*pl)->isInline)
         {
-          D(("S4O_RD_OP: Inline asm\n"));
+          D(("S4O_ABORT at inline asm\n"));
           return S4O_ABORT;
         }
 
@@ -946,7 +950,7 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
           *pl = findLabel (*pl);
             if (!*pl)
               {
-                D(("S4O_ABORT\n"));
+                D(("S4O_ABORT at unconditional jump\n"));
                 return S4O_ABORT;
               }
         }
@@ -955,7 +959,7 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
           *plCond = findLabel (*pl);
           if (!*plCond)
             {
-              D(("S4O_ABORT\n"));
+              D(("S4O_ABORT at conditional jump\n"));
               return S4O_ABORT;
             }
           D(("S4O_CONDJMP\n"));

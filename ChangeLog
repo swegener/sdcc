@@ -1,7 +1,55 @@
+2018-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge next branch.
+
+2018-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp:
+	  Cherry-pick a minor performance improvement from lospre-vs-mcpre branch.
+
+2018-09-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp,
+	  src/SDCClospre.hpp,
+	  src/SDCClospre.cc:
+	  Remove hard dependencies on std::set to allow future transition to other containers.
+
+2018-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.y,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/valdiag/tests/struct.c,
+	  support/valdiag/tests/structflexiblearray.c:
+	  Fix bugs #2774, 2775.
+
+2018-09-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClospre.hpp,
+	  src/SDCCralloc.hpp:
+	  Speed and memory usage improvements for tree-decomposition based algorithms.
+
+2018-09-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-r2k.def,
+	  src/z80/peeph-tlcs90.def,
+	  src/z80/peeph-z80.def:
+	  Fix bug #2814.
+
 2018-09-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/scripts/repack_release.sh:
 	  Update script for 3.8.0 release.
+
+2018-09-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/README.txt:
+	  List TLCS-90 as supported target.
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Minor z80 peephole improvement.
 
 2018-09-16 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -31,6 +79,51 @@
 	* src/SDCCval.c,
 	  support/regression/tests/iso-8859-1.c:
 	  Fix bug #2812.
+
+2018-09-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Improve wide right shift.
+
+2018-09-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc2.cc,
+	  src/stm8/gen.c:
+	  Improve jump on sign bit.
+
+2018-09-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/structassign.c:
+	  Test more struct sizes.
+	* src/SDCCopt.c:
+	  Narrow |.
+	* src/stm8/peeph.def:
+	  Minor stm8 peephole improvement.
+	* src/stm8/gen.c:
+	  Improve wide pointer reads and shifts.
+	* src/stm8/peep.c:
+	  Improve notUsed() accuracy.
+
+2018-09-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/string.h,
+	  device/lib/_memcpy.c,
+	  device/lib/stm8/memcpy.s,
+	  doc/sdccman.lyx,
+	  src/SDCCast.c,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCopt.c,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  support/regression/tests/gcc-torture-execute-20011008-3.c,
+	  support/regression/tests/gcc-torture-execute-20050826-2.c,
+	  support/regression/tests/gcc-torture-execute-lto-tbaa-1.c,
+	  support/regression/tests/gcc-torture-execute-pr39339.c,
+	  support/regression/tests/gcc-torture-execute-pr70127.c,
+	  support/regression/tests/gcc-torture-execute-struct-cpy-1.c,
+	  support/regression/tests/structassign.c:
+	  Support for struct / union assignment, patch by Benedikt Freisen (roybaer).
 
 2018-09-10 Philipp Klaus Krause <pkk AT spth.de>
 

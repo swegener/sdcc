@@ -49,13 +49,21 @@ replace restart {
 } if notVolatile(%1), notVolatile(%2)
 
 replace restart {
+	ld	(%1, sp), %2
+	ld	%2, (%1, sp)
+} by {
+	ld	(%1, sp), %2
+	; peephole 4a removed redundant load from (%1, sp) into %2.
+}
+
+replace restart {
 	ld	%1, %2
 	ld	%3, %1
 	ld	%1, %2
 } by {
 	ld	%1, %2
 	ld	%3, %1
-	; peephole 4a removed redundant load from %2 into %1.
+	; peephole 4b removed redundant load from %2 into %1.
 } if notVolatile(%1), notVolatile(%2)
 
 replace restart {

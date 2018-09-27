@@ -56,8 +56,8 @@ enum {
   E_PTR_REQD                    =  27, /* pointer required     */
   E_UNARY_OP                    =  28, /* unary operator bad op*/
   E_CONV_ERR                    =  29, /* conversion error     */
-  E_INT_REQD                    =  30, /* bit-field must be int*/
-  E_BITFLD_SIZE                 =  31, /* bit-field size > 16  */
+  E_BITFLD_TYPE                 =  30, /* invalid type for bit-field */
+  E_BITFLD_SIZE                 =  31, /* bit-field too wide for type */
   W_TRUNCATION                  =  32, /* high order trucation */
   E_CODE_WRITE                  =  33, /* trying 2 write to code */
   E_LVALUE_CONST                =  34, /* lvalue is a const   */
@@ -74,7 +74,7 @@ enum {
   E_BITWISE_OP                  =  45, /* bit op invalid op   */
   E_ANDOR_OP                    =  46, /* && || op invalid    */
   E_TYPE_MISMATCH               =  47, /* type mismatch       */
-  E_AGGR_ASSIGN                 =  48, /* aggr assign         */
+  E_ARRAY_ASSIGN                =  48, /* array assign        */
   E_ARRAY_DIRECT                =  49, /* array indexing in   */
   E_BIT_ARRAY                   =  50, /* bit array not allowed  */
   E_DUPLICATE_TYPEDEF           =  51, /* typedef name duplicate */

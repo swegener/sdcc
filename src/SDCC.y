@@ -1212,11 +1212,6 @@ struct_declarator
           unsigned int bitsize;
           $$ = newSymbol (genSymName(NestLevel), NestLevel);
           bitsize = (unsigned int) ulFromVal(constExprValue($2, TRUE));
-          if (bitsize > (port->s.int_size * 8))
-            {
-              bitsize = port->s.int_size * 8;
-              werror(E_BITFLD_SIZE, bitsize);
-            }
           if (!bitsize)
               bitsize = BITVAR_PAD;
           $$->bitVar = bitsize;
@@ -1226,11 +1221,7 @@ struct_declarator
         {
           unsigned int bitsize;
           bitsize = (unsigned int) ulFromVal(constExprValue($3, TRUE));
-          if (bitsize > (port->s.int_size * 8))
-            {
-              bitsize = port->s.int_size * 8;
-              werror(E_BITFLD_SIZE, bitsize);
-            }
+
           if (!bitsize)
             {
               $$ = newSymbol (genSymName(NestLevel), NestLevel);

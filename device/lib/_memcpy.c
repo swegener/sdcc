@@ -31,9 +31,7 @@
 
 #if !_SDCC_PORT_PROVIDES_MEMCPY
 
-#undef memcpy /* Avoid conflict with builtin memcpy() in Z80 and some related ports */
-
-void * memcpy (void * dst, const void * src, size_t acount)
+void * __memcpy (void * dst, const void * src, size_t acount)
 {
 	void * ret = dst;
 	char * d = dst;
@@ -47,5 +45,12 @@ void * memcpy (void * dst, const void * src, size_t acount)
 	}
 
 	return(ret);
+}
+
+#undef memcpy /* Avoid conflict with wrapper macro of the same name */
+
+void * memcpy (void * dst, const void * src, size_t acount)
+{
+	return __memcpy (dst, src, acount);
 }
 #endif

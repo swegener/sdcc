@@ -31,10 +31,12 @@
 
 ; void *memcpy(void *dest, const void *src, size_t n);
 
+	.globl ___memcpy
 	.globl _memcpy
 
 	.area CODE
 
+___memcpy:
 _memcpy:
 	ldw	y, (3, sp)
 	ldw	x, (5, sp)

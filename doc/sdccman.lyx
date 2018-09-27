@@ -9085,7 +9085,7 @@ union
 \end_inset
 
  cannot be assigned values directly, cannot be passed as function parameters
- or assigned to each other and cannot be a return value
+ and cannot be a return value
 \begin_inset Index idx
 status collapsed
 
@@ -9108,82 +9108,6 @@ return value
 \family typewriter
 struct s { ...
  };
-\begin_inset Newline newline
-\end_inset
-
-struct s s1, s2;
-\begin_inset Newline newline
-\end_inset
-
-foo()
-\begin_inset Newline newline
-\end_inset
-
-{
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-s1 = s2 ; /* is invalid in SDCC although allowed in ANSI */
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset space ~
-\end_inset
-
-...
-\begin_inset Newline newline
-\end_inset
-
-}
 \begin_inset Newline newline
 \end_inset
 

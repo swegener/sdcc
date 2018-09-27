@@ -130,6 +130,9 @@ extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;
 #define strncpy(dst, src, n) __builtin_strncpy(dst, src, n)
 #define strchr(s, c) __builtin_strchr(s, c)
 #define memset(dst, c, n) __builtin_memset(dst, c, n)
+#else
+extern void *__memcpy (void * /*restrict */ dest, const void * /*restrict*/ src, size_t n);
+#define memcpy(dst, src, n) __memcpy(dst, src, n)
 #endif
 
 #endif

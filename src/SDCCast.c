@@ -79,6 +79,7 @@ ast *optimizeGetAbit (ast *, RESULT_TYPE);
 ast *optimizeGetByte (ast *, RESULT_TYPE);
 ast *optimizeGetWord (ast *, RESULT_TYPE);
 static ast *backPatchLabels (ast *, symbol *, symbol *);
+static void copyAstLoc (ast *, ast *);
 void PA (ast * t);
 int inInitMode = 0;
 memmap *GcurMemmap = NULL;      /* points to the memmap that's currently active */
@@ -3318,6 +3319,54 @@ rewriteAstNodeVal (ast *tree, value *val)
   rewriteAstJoinSideEffects (tree, oLeft, oRight);
 }
 
+/*-----------------------------------------------------------*/
+/* rewrite struct assignment "a = b" to something similar to */
+/* "__builtin_memcpy (&a, &b, sizeof (a)), a"   or, if a has */
+/* side effects, "*(__builtin_memcpy (&a, &b, sizeof (a)))"  */
+/*-----------------------------------------------------------*/
+ast *
+rewriteStructAssignment (ast *tree)
+{
+  /* prepare pointer to destination */
+  ast *dest = newNode ('&', tree->left, NULL);
+  copyAstLoc (dest, tree->left);
+
+  /* prepare remaining arguments */
+  ast *src = newNode ('&', tree->right, NULL);
+  copyAstLoc (src, tree->right);
+  ast *size = newNode (SIZEOF, NULL, tree->left);
+  copyAstLoc (size, tree->left);
+  ast *srcsize = newNode (PARAM, src, size);
+  copyAstLoc (srcsize, tree);
+  ast *params = newNode (PARAM, dest, srcsize);
+  copyAstLoc (params, tree);
+
+  /* create call to the appropriate memcpy function */
+  ast *memcpy_ast = newAst_VALUE (symbolVal (memcpy_builtin));
+  copyAstLoc (memcpy_ast, tree);
+  ast *call = newNode (CALL, memcpy_ast, params);
+  copyAstLoc (call, tree);
+
+  /* assemble the result expression depending on side effects */
+  ast *newTree;
+  if (hasSEFcalls (dest))
+    {
+      /* memcpy returns the dest pointer -> dereference it */
+      newTree = newNode ('*', call, NULL);
+    }
+  else
+    {
+      /* no side effects -> dereference dest pointer itself */
+      ast *destderef = newNode ('*', dest, NULL);
+      copyAstLoc (destderef, dest);
+      newTree = newNode (',', call, destderef);
+    }
+
+  /* copy source location and return decorated result */
+  copyAstLoc (newTree, tree);
+  return decorateType (newTree, RESULT_TYPE_OTHER);
+}
+
 /*--------------------------------------------------------------------*/
 /* decorateType - compute type for this tree, also does type checking.*/
 /* This is done bottom up, since type has to flow upwards.            */
@@ -5539,10 +5588,10 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /*      straight assignemnt   */
       /*----------------------------*/
     case '=':
-      /* cannot be an aggregate */
-      if (IS_AGGREGATE (LTYPE (tree)))
+      /* cannot be an array */
+      if (IS_ARRAY (LTYPE (tree)))
         {
-          werrorfl (tree->filename, tree->lineno, E_AGGR_ASSIGN);
+          werrorfl (tree->filename, tree->lineno, E_ARRAY_ASSIGN);
           goto errorTreeReturn;
         }
 
@@ -5571,8 +5620,13 @@ decorateType (ast *tree, RESULT_TYPE resultType)
         }
 
       TETYPE (tree) = getSpec (TTYPE (tree) = LTYPE (tree));
-      RRVAL (tree) = 1;
-      LLVAL (tree) = 1;
+      if (IS_STRUCT (LTYPE (tree)))
+        tree = rewriteStructAssignment (tree);
+      else
+        {
+          RRVAL (tree) = 1;
+          LLVAL (tree) = 1;
+        }
       if (!tree->initMode)
         {
           if (IS_CONSTANT (LTYPE (tree)))

@@ -182,11 +182,11 @@ void thorup_elimination_ordering(l_t &l, const G_t &G)
 }
 
 // Finds a (the newest) bag that contains all vertices in X in the tree decomposition T.
-template <class T_t>
-typename boost::graph_traits<T_t>::vertex_iterator find_bag(const std::set<unsigned int> &X, const T_t &T)
+template <class X_t, class T_t>
+typename boost::graph_traits<T_t>::vertex_iterator find_bag(const X_t &X, const T_t &T)
 {
   typedef typename boost::graph_traits<T_t>::vertex_iterator T_vertex_iter_t;
-  typedef typename std::set<unsigned int>::const_iterator vertex_index_iter_t;
+  typedef typename X_t::const_iterator vertex_index_iter_t;
 
   T_vertex_iter_t t, t_end, t_found;
   vertex_index_iter_t v;
@@ -211,10 +211,10 @@ typename boost::graph_traits<T_t>::vertex_iterator find_bag(const std::set<unsig
 }
 
 // Add edges to make the vertices in X a clique in G.
-template <class G_t>
-void make_clique(const std::set<unsigned int> &X , G_t &G)
+template <class X_t, class G_t>
+void make_clique(const X_t &X , G_t &G)
 {
-  std::set<unsigned int>::const_iterator n1, n2;
+  typename X_t::const_iterator n1, n2;
   for (n1 = X.begin(); n1 != X.end(); n1++)
     for (n2 = n1, ++n2; n2 != X.end(); ++n2)
       add_edge(*n1, *n2, G);
@@ -238,7 +238,7 @@ void add_vertices_to_tree_decomposition(T_t &T, const v_t v, const v_t v_end, G_
 
   // Get the neigbours
   adjacency_iter_t n, n_end;
-  std::set<unsigned int> neighbours;
+  decltype(T[0].bag) neighbours;
   for (boost::tie(n, n_end) = boost::adjacent_vertices(*v, G); n != n_end; ++n)
     if (active[index[*n]])
       neighbours.insert(index[*n]);
@@ -463,7 +463,7 @@ void nicify_diffs_more(T_t &T, typename boost::graph_traits<T_t>::vertex_descrip
   boost::add_edge(d, c0, T);
   boost::remove_edge(t, c0, T);
   T[d].bag = T[t_size > c0_size ? t : c0].bag;
-  std::set<unsigned int>::iterator i;
+  typename decltype(T[d].bag)::iterator i;
   for (i = T[d].bag.begin(); T[t_size < c0_size ? t : c0].bag.find(*i) != T[t_size < c0_size ? t : c0].bag.end(); ++i);
   T[d].bag.erase(i);
   boost::add_edge(t, d, T);
@@ -616,7 +616,7 @@ void get_nice_tree_decomposition(T_t &tree_dec, const G_t &cfg)
 #ifdef HAVE_TREEDEC_COMBINATIONS_HPP
 
 #ifdef USE_THORUP
-  treedec::thorup<G_t> a(cfg);
+  treedec::thorup<G_t> a2(cfg);
 #else
   typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS> cfg2_t;
   cfg2_t cfg2;
@@ -640,7 +640,7 @@ void get_nice_tree_decomposition(T_t &tree_dec, const G_t &cfg)
   wassert(treedec::is_valid_treedecomposition(cfg, tree_dec2));
 
   if (treedec::get_width(tree_dec2) < treedec::get_width(tree_dec))
-    tree_dec = tree_dec2;
+    std::swap(tree_dec, tree_dec2);
 #endif
 
   nicify(tree_dec);

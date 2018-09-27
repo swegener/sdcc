@@ -16,12 +16,23 @@ struct tag {
 } badstruct;
 #endif
 
-
-#ifdef TEST3
+#ifdef TEST3a
 struct tag {
   int good1;
   int bad:255;	/* ERROR */
   int good2;
+} badstruct;
+#endif
+
+#ifdef TEST3b
+struct tag {
+  int good1;
+  float badtype1 : 5; /* ERROR */
+  int good2;
+  _Bool badwidth2 : 2; /* ERROR */
+  int good3;
+  int badwidth2 : 17; /* ERROR */
+  int good4;
 } badstruct;
 #endif
 

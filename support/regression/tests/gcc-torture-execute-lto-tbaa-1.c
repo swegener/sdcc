@@ -39,7 +39,6 @@ int **ptr = &b2.b;
 void
 testTortureExecute (void)
 {
-#if 0 // TODO: Enable when SDCC can assign struct
   a= (void *)0;
   b.b=&e;
   ptr =retme ( &b.b);
@@ -49,5 +48,4 @@ testTortureExecute (void)
   ASSERT (0);
   c= (void *)0;
   return;
-#endif
 }

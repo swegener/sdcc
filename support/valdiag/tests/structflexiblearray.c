@@ -2,15 +2,15 @@
 #ifdef TEST1
 struct tag {
   int good1;
-  int flex[];		/* ERROR(GCC) */
+  int flex[];		/* ERROR */
   int good2;
-} badstruct;		/* ERROR(SDCC) */
+} badstruct;
 #endif
 
 #ifdef TEST2
 struct tag {
-  int flex[];		/* ERROR(GCC) */
-} badstruct;		/* ERROR(SDCC) */
+  int flex[];		/* ERROR */
+} badstruct;
 #endif
 
 #ifdef TEST3
@@ -19,6 +19,6 @@ struct tag {
   struct tag2 {
     int good2;
     int flex[];
-  } nestedstruct;	/* IGNORE(SDCC) */
-} badstruct;		/* ERROR(SDCC) */
+  } nestedstruct;	/* ERROR(SDCC) */
+} badstruct;
 #endif

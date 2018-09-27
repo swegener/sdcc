@@ -55,19 +55,16 @@ void foo (struct E *screen, unsigned int c, int columns, struct B *row)
   long col;
   int i;
   col = screen->col;
-  /*attr = screen->defaults.attr; struct assignment not yet supported by sdcc */
-  memcpy (&attr, &(screen->defaults.attr), sizeof (struct D));
+  attr = screen->defaults.attr;
   attr.columns = columns;
   row->cells->data[col].c = c;
-  /*row->cells->data[col].attr = attr; struct assignment not yet supported by sdcc */
-  memcpy (&(row->cells->data[col].attr), &attr, sizeof (struct D));
+  row->cells->data[col].attr = attr;
   col++;
   attr.fragment = 1;
   for (i = 1; i < columns; i++)
     {
       row->cells->data[col].c = c;
-      /*row->cells->data[col].attr = attr; struct assignment not yet supported by sdcc */
-      memcpy (&(row->cells->data[col].attr), &attr, sizeof (struct D));
+      row->cells->data[col].attr = attr;
       col++;
     }
 }
@@ -83,8 +80,7 @@ testTortureExecute (void)
   struct D d;
   memset (&c, 0, sizeof c);
   foo (&e, 65, 2, &b);
-  /*d = e.defaults.attr; struct assignment not yet supported by sdcc */
-  memcpy (&d, &(e.defaults.attr), sizeof (struct D));
+  d = e.defaults.attr;
   d.columns = 2;
   if (memcmp (&d, &c[0].attr, sizeof d))
     ASSERT (0);

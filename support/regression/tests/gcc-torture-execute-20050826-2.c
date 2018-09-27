@@ -39,7 +39,6 @@ int inet_check_attr (void *r, struct rtattr **rta)
 void
 testTortureExecute (void)
 {
-#if 0 // TODO: Enable when struct can be assigned!
   struct rtattr rt[2];
   struct rtattr *rta[14];
   int i;
@@ -69,5 +68,4 @@ testTortureExecute (void)
     else if (i > 5 && rta[i] != &rt[0])
       ASSERT (0);
   return;
-#endif
 }

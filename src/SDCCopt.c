@@ -975,7 +975,7 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
       /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
       /* For now just convert back to call to make sure any volatiles are read. */
 
-      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "_memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));
+      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "___memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));
       goto convert;
     }
 
@@ -985,7 +985,7 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
       if (bitVectIsZero (OP_USES (IC_RESULT (icc))) && IS_OP_LITERAL (IC_LEFT (lastparam)))
         return;
       
-      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "_memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));
+      strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "___memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));
       goto convert;
     }
   
@@ -2296,7 +2296,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == BITWISEAND || ic->op == CAST) &&
+          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == BITWISEAND || ic->op == '|' || ic->op == CAST) &&
             IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
             {
               sym_link *resulttype = operandType (IC_RESULT (ic));

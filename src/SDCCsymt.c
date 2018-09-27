@@ -1541,6 +1541,7 @@ compStructSize (int su, structdef * sdef)
   int sum = 0, usum = 0;
   int bitOffset = 0;
   symbol *loop;
+  const int oldlineno = lineno;
 
   if (!sdef->fields)
     {
@@ -1551,6 +1552,8 @@ compStructSize (int su, structdef * sdef)
   loop = sdef->fields;
   while (loop)
     {
+      lineno = loop->lineDef;
+
       /* create the internal name for this variable */
       SNPRINTF (loop->rname, sizeof (loop->rname), "_%s", loop->name);
       if (su == UNION)
@@ -1566,7 +1569,27 @@ compStructSize (int su, structdef * sdef)
           SPEC_BUNNAMED (loop->etype) = loop->bitUnnamed;
 
           /* change it to a unsigned bit */
-          SPEC_NOUN (loop->etype) = SPEC_NOUN(loop->etype) == V_BOOL ? V_BBITFIELD : V_BITFIELD;
+          switch (SPEC_NOUN (loop->etype))
+            {
+            case V_BOOL:
+              SPEC_NOUN( loop->etype) = V_BBITFIELD;
+              if (loop->bitVar > 1)
+                werror (E_BITFLD_SIZE, 1);
+              break;
+            case V_CHAR:
+              SPEC_NOUN (loop->etype) = V_BITFIELD;
+              if (loop->bitVar > 8)
+                werror (E_BITFLD_SIZE , 8);
+              break;
+            case V_INT:
+              SPEC_NOUN (loop->etype) = V_BITFIELD;
+              if (loop->bitVar > port->s.int_size * 8)
+                werror (E_BITFLD_SIZE , port->s.int_size * 8);
+              break;
+            default:
+              werror (E_BITFLD_TYPE);
+            }
+
           /* ISO/IEC 9899 J.3.9 implementation defined behaviour: */
           /* a "plain" int bitfield is unsigned */
           if (!loop->etype->select.s.b_signed)
@@ -1689,6 +1712,8 @@ compStructSize (int su, structdef * sdef)
   /* For STRUCT, round up after all fields processed */
   if (su != UNION)
     sum += ((bitOffset + 7) / 8);
+
+  lineno = oldlineno;
 
   return (su == UNION ? usum : sum);
 }
@@ -3942,6 +3967,8 @@ sym_link *charType;
 sym_link *floatType;
 sym_link *fixed16x16Type;
 
+symbol *memcpy_builtin;
+
 static const char *
 _mangleFunctionName (const char *in)
 {
@@ -4372,15 +4399,26 @@ initBuiltIns ()
   int i;
   symbol *sym;
 
-  if (!port->builtintable)
-    return;
-
-  for (i = 0; port->builtintable[i].name; i++)
+  if (port->builtintable)
     {
-      sym = funcOfTypeVarg (port->builtintable[i].name, port->builtintable[i].rtype,
-                            port->builtintable[i].nParms, (const char **)port->builtintable[i].parm_types);
-      FUNC_ISBUILTIN (sym->type) = 1;
-      FUNC_ISREENT (sym->type) = 0;     /* can never be reentrant */
+      for (i = 0; port->builtintable[i].name; i++)
+        {
+          sym = funcOfTypeVarg (port->builtintable[i].name, port->builtintable[i].rtype,
+                                port->builtintable[i].nParms, (const char **)port->builtintable[i].parm_types);
+          FUNC_ISBUILTIN (sym->type) = 1;
+          FUNC_ISREENT (sym->type) = 0;     /* can never be reentrant */
+        }
+    }
+
+  /* initialize memcpy symbol for struct assignment */
+  memcpy_builtin = findSym (SymbolTab, NULL, "__builtin_memcpy");
+  /* if there is no __builtin_memcpy, use __memcpy instead of an actual builtin */
+  if (!memcpy_builtin)
+    {
+      const char *argTypeStrs[] = {"vg*", "Cvg*", "Ui"};
+      memcpy_builtin = funcOfTypeVarg ("__memcpy", "vg*", 3, argTypeStrs);
+      FUNC_ISBUILTIN (memcpy_builtin->type) = 0;
+      FUNC_ISREENT (memcpy_builtin->type) = options.stackAuto;
     }
 }
 

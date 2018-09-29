@@ -287,7 +287,7 @@ static void dump_dec_lospre(const tree_dec_t &tree_dec)
       if (tree_dec[i].bag.size() > w)
         w = tree_dec[i].bag.size();
       std::ostringstream os;
-      lospreset_t::const_iterator v1;
+      typename decltype(tree_dec[0].bag)::const_iterator v1;
        os << i << " | ";
       for (v1 = tree_dec[i].bag.begin(); v1 != tree_dec[i].bag.end(); ++v1)
         os << *v1 << " ";

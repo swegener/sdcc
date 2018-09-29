@@ -48,9 +48,9 @@ void
 testSimpleUnionAssignment(void)
 {
   u1.b = 0.0f;
-  u2.b = 0.1f;
+  u2.b = -1.5f;
   u1 = u2;
-  ASSERT(u1.b == 0.1f);
+  ASSERT(u1.b == -1.5f);
 }
 
 /* union: transitive assignment */
@@ -59,10 +59,10 @@ testTransitiveUnionAssignment(void)
 {
   u1.b = 0.0f;
   u2.b = 0.1f;
-  u3.b = 0.2f;
+  u3.b = -1.5f;
   u1 = u2 = u3;
-  ASSERT(u1.b == 0.2f);
-  ASSERT(u2.b == 0.2f);
+  ASSERT(u1.b == -1.5f);
+  ASSERT(u2.b == -1.5f);
 }
 
 /* test for unintended double evaluation */

@@ -3866,6 +3866,28 @@ genPlus (const iCode *ic)
           started = TRUE;
           i++;
         }
+      else if (started && i == size - 2 && (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)) &&
+        (aopOnStackNotExt (leftop, i, 2) || leftop->type == AOP_DIR) &&
+        (aopOnStackNotExt (rightop, i, 2) || rightop->type == AOP_LIT || rightop->type == AOP_IMMD || rightop->type == AOP_DIR))
+        {
+          bool x = aopInReg (result->aop, i, X_IDX);
+          symbol *skiplbl = 0;
+          if (!regalloc_dry_run)
+            skiplbl =  newiTempLabel (NULL);
+          genMove_o (result->aop, i, leftop, i, 2, a_free, TRUE, FALSE);
+          if (skiplbl)
+            emit2 ("jrnc", "!tlabel", labelKey2num (skiplbl->key));
+          cost (2, 1); // Cycle cost 1: jump, incw together take 2 cycles.
+          emit3w_o (A_INCW, result->aop, i, 0, 0);
+          if (skiplbl)
+            emitLabel (skiplbl);
+          if (!aopIsLitVal (rightop, i, 2, 0))
+            {
+              emit2 ("addw", x ? "x, %s" : "y, %s", aopGet2 (rightop, i));
+              cost ((x || aopOnStack (rightop, i, 2)) ? 3 : 4, 2);
+            }
+          i += 2;
+        }
       else if (rightop->type == AOP_REG || rightop->type == AOP_REGSTK && !aopOnStack (rightop, i, 1)) //todo: Implement handling of right operands that can't be directly added to a.
         {
           if (!regalloc_dry_run){

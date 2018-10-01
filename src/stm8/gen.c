@@ -6358,6 +6358,27 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
         }
     }
 
+  // Shifting right by 8, then shifting left a bit can be cheaper than shifting right all the way.
+  if (size == 4 && !sign && (shCount == 7 || shCount == 6) &&
+    (aopInReg (shiftop, 0, X_IDX) || aopInReg (shiftop, 0, Y_IDX)) &&
+    (aopInReg (shiftop, 2, X_IDX) || aopInReg (shiftop, 2, Y_IDX)))
+    {
+      if (!regDead (A_IDX, ic))
+        push (ASMOP_A, 0, 1);
+      emit3 (A_CLR, ASMOP_A, 0);
+      emit3w_o (A_RRWA, shiftop, 2, 0, 0);
+      emit3w_o (A_RRWA, shiftop, 0, 0, 0);
+      for (; shCount < 8; shCount++)
+        {
+          emit3 (A_SLL, ASMOP_A, 0);
+          emit3w_o (A_RLCW, shiftop, 0, 0, 0);
+          emit3w_o (A_RLCW, shiftop, 2, 0, 0);
+        }
+      if (!regDead (A_IDX, ic))
+        pop (ASMOP_A, 0, 1);
+      shCount = 0;
+    }
+
   while (shCount--)
     for (i = size - 1; i >= 0;)
       {

@@ -1,5 +1,10 @@
 2018-10-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/stm8/gen.c:
+	  Improve 32-bit right shift by 6 to 7.
+
+2018-10-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/SDCCopt.c:
 	  Port an operand narrowing optimization to UNARYMINUS.
 	* src/stm8/gen.c:

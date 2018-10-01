@@ -978,9 +978,8 @@ static asmop *
 aopForRemat (symbol *sym)
 {
   iCode *ic = sym->rematiCode;
-  asmop *aop = newAsmop (AOP_IMMD);
+  asmop *aop;
   int val = 0;
-  struct dbuf_s dbuf;
 
   wassert(ic);
 
@@ -1014,18 +1013,20 @@ aopForRemat (symbol *sym)
           break;
         }
       else
-        break;
+        wassert(0);
     }
 
-  dbuf_init (&dbuf, 128);
-
-  if (val)
+  if (OP_SYMBOL (IC_LEFT (ic))->onStack)
     {
-      wassert(0);
-      //dbuf_printf (&dbuf, "(%s %c 0x%04x)", OP_SYMBOL (IC_LEFT (ic))->rname, val >= 0 ? '+' : '-', abs (val) & 0xffff);
+      aop = newAsmop (AOP_STL);
+      aop->aopu.stk_off = (long)(OP_SYMBOL (IC_LEFT (ic))->stack) + 1 + val;
     }
   else
-    aop->aopu.aop_immd = OP_SYMBOL (IC_LEFT (ic))->rname;
+    {
+      wassert (!val);
+      aop = newAsmop (AOP_IMMD);
+      aop->aopu.aop_immd = OP_SYMBOL (IC_LEFT (ic))->rname;
+    }
 
   aop->size = getSize (sym->type);
 
@@ -2047,7 +2048,6 @@ skip_byte:
       else if (i < n - 1 && aopInReg (result, roffset + i, X_IDX) && aopOnStack (source, soffset + i, 2))
         {
           long int eoffset = (long int)(source->aopu.bytes[soffset + i + 1].byteu.stk) + G.stack.size - 256l;
-
           wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
           wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
 
@@ -3311,7 +3311,7 @@ genFunction (iCode *ic)
     {
       D (emit2 (";", "Reset bit 6 of reg CC. Hardware bug workaround."));
 #if 0
-      // The workaorund recommended by STM. 6 bytes, 7 cycles (5 nominally, two more due to pipeline stalls)
+      // The workaround recommended by STM. 6 bytes, 7 cycles (5 nominally, two more due to pipeline stalls)
       emit2 ("push", "cc");
       emit2 ("pop", "a");
       emit2 ("and", "a, #0xbf");
@@ -6617,6 +6617,27 @@ postshift:
   freeAsmop (right);
 }
 
+/*------------------------------------------------------------------*/
+/* init_stackop - initalize asmop for stack location                */
+/*------------------------------------------------------------------*/
+static void init_stackop (asmop *stackop, int size, long int stk_off)
+{
+  stackop->size = size;
+  stackop->regs[A_IDX] = -1;
+  stackop->regs[XL_IDX] = -1;
+  stackop->regs[XH_IDX] = -1;
+  stackop->regs[YL_IDX] = -1;
+  stackop->regs[YH_IDX] = -1;
+
+  for (int i = 0; i < size; i++)
+    {
+      stackop->aopu.bytes[i].in_reg = false;
+      stackop->aopu.bytes[i].byteu.stk = stk_off + stackop->size - i - 1;
+    }
+
+  stackop->type = AOP_STK;
+}
+
 /*-----------------------------------------------------------------*/
 /* genPointerGet - generate code for pointer get                   */
 /*-----------------------------------------------------------------*/
@@ -6657,9 +6678,17 @@ genPointerGet (const iCode *ic)
   // Long pointer indirect long addressing mode is useful only in one very specific case:
   if (!bit_field && size == 1 && !offset && left->aop->type == AOP_DIR && !regDead (X_IDX, ic) && regDead (A_IDX, ic))
     {
-      emit2("ld", "a, [%s]", aopGet2(left->aop, 0));
+      emit2 ("ld", "a, [%s]", aopGet2(left->aop, 0));
       cost (4, 4);
-      cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
+      cheapMove (result->aop, 0, ASMOP_A, 0, false);
+      goto release;
+    }
+  // Special case for remat pointer to on-stack object.
+  else if (!bit_field && left->aop->type == AOP_STL)
+    {
+      struct asmop stackop_impl;
+      init_stackop (&stackop_impl, result->aop->size, left->aop->aopu.stk_off + (long)offset);
+      genMove(result->aop, &stackop_impl, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
       goto release;
     }
   // Special case for efficient handling of 8-bit I/O and rematerialized pointers
@@ -6700,7 +6729,15 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 
-  genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  if (left->aop->type == AOP_STL)
+    {
+      emit2 ("ldw", "x, sp");
+      emit2 ("addw", "x, #%ld", (long)(left->aop->aopu.stk_off) + G.stack.pushed );
+      cost (4, 3);
+    }
+  else
+    genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
+
   if (floatFromVal (right->aop->aopu.aop_lit) < 0.0)
     {
       emit2 ("addw", use_y ? "y, #0x%x" : "x, #0x%x", offset);
@@ -6866,7 +6903,7 @@ genAssign (const iCode *ic)
 /* genPointerSet - stores the value into a pointer location        */
 /*-----------------------------------------------------------------*/
 static void
-genPointerSet (iCode * ic)
+genPointerSet (iCode *ic)
 {
   operand *left = IC_LEFT (ic);
   operand *right = IC_RIGHT (ic);
@@ -6888,7 +6925,7 @@ genPointerSet (iCode * ic)
   size = right->aop->size;
 
   // In some cases a sequence of mov instructions is more efficient.
-  if (!bit_field && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && (right->aop->type == AOP_DIR || right->aop->type == AOP_LIT|| right->aop->type == AOP_IMMD))
+  if (!bit_field && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && (right->aop->type == AOP_DIR || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
     {
       // First, make an estimate to find out if it is worth it (estimate not exact, could be improved a bit, probably not worth it since left type is uncommon)
       const int mov_size = size * (right->aop->type == AOP_DIR ? 3 : 4);
@@ -6969,6 +7006,15 @@ genPointerSet (iCode * ic)
       goto release;
     }
 
+  // Rematerialized pointer to on-stack object.
+  if (!bit_field && left->aop->type == AOP_STL)
+    {
+      struct asmop stackop_impl;
+      init_stackop (&stackop_impl, size, left->aop->aopu.stk_off);
+      genMove(&stackop_impl, right->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      goto release;
+    }
+
   // todo: Handle this more gracefully, save x instead of using y, when doing so is more efficient.
   use_y = (aopInReg (left->aop, 0, Y_IDX) && size <= 1 + aopInReg (right->aop, 0, X_IDX)) || regDead (Y_IDX, ic) && (!(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX)) || right->aop->regs[XL_IDX] >= 0 || right->aop->regs[XH_IDX] >= 0);
 
@@ -6981,7 +7027,14 @@ genPointerSet (iCode * ic)
       goto release;
     }
 
-  genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, regDead (A_IDX, ic) && !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  if (left->aop->type == AOP_STL)
+    {
+      emit2 ("ldw", "x, sp");
+      emit2 ("addw", "x, #%ld", (long)(left->aop->aopu.stk_off) + G.stack.pushed );
+      cost (4, 3);
+    }
+  else
+    genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, regDead (A_IDX, ic) && !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {
@@ -7670,7 +7723,7 @@ genDummyRead (const iCode *ic)
 /* resultRemat - result is to be rematerialized                    */
 /*-----------------------------------------------------------------*/
 static bool
-resultRemat (const iCode * ic)
+resultRemat (const iCode *ic)
 {
   if (SKIP_IC (ic) || ic->op == IFX)
     return 0;
@@ -7686,6 +7739,7 @@ resultRemat (const iCode * ic)
       for (unsigned int i = 0; i < getSize (sym->type); i++)
         if (sym->regs[i])
           completely_spilt = FALSE;
+
       if (completely_spilt)
         return(true);
     }

@@ -472,7 +472,7 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
       if (nic->op == GET_VALUE_AT_ADDRESS || nic->op == SET_VALUE_AT_ADDRESS)
         return 0;
 
-      /* if address of & the result is remat the okay */
+      /* if address of & the result is remat, then okay */
       if (nic->op == ADDRESS_OF && OP_SYMBOL (IC_RESULT (nic))->remat)
         continue;
 
@@ -540,12 +540,38 @@ packRegisters (eBBlock * ebp)
       /* if this is an itemp & result of a address of a true sym
          then mark this as rematerialisable   */
       if (ic->op == ADDRESS_OF && !operandLitValue (IC_RIGHT (ic)) /* STM8 codegen cannot handle non-zero right operand in rematerialization yet */ && 
-          IS_ITEMP (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) /* The receiving of the paramter isnot accounted for in DEFS */ &&
-          IS_TRUE_SYMOP (IC_LEFT (ic)) && !OP_SYMBOL (IC_LEFT (ic))->onStack)
+        IS_ITEMP (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) /* The receiving of the paramter is not accounted for in DEFS */ &&
+        IS_TRUE_SYMOP (IC_LEFT (ic)) && !OP_SYMBOL (IC_LEFT (ic))->onStack)
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = 1;
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
           OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+        }
+
+      if (ic->op == ADDRESS_OF && IS_ITEMP (IC_RESULT (ic)) && bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 && !IS_PARM (IC_RESULT (ic)) && /* Can remat stack locations, but they can currently only be used for pointer read / write */
+        IS_TRUE_SYMOP (IC_LEFT (ic)) && OP_SYMBOL (IC_LEFT (ic))->onStack)
+        {
+          bool ok = true;
+          bitVect *uses = bitVectCopy (OP_USES (IC_RESULT (ic)));
+          for (int bit = bitVectFirstBit (uses); bitVectnBitsOn (uses); bitVectUnSetBit (uses, bit), bit = bitVectFirstBit (uses))
+            {
+              const iCode *uic = hTabItemWithKey (iCodehTab, bit);
+              wassert (uic);
+              if (uic->op != SET_VALUE_AT_ADDRESS && uic->op != GET_VALUE_AT_ADDRESS)
+                {
+                  ok = false;
+                  break;
+                }
+            }
+
+          if (ok)
+            {
+              OP_SYMBOL (IC_RESULT (ic))->remat = 1;
+              OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;
+              OP_SYMBOL (IC_RESULT (ic))->usl.spillLoc = NULL;
+            }
+
+          freeBitVect (uses);
         }
 
       /* Safe: just propagates the remat flag */

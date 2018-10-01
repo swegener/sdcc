@@ -32,6 +32,8 @@ typedef enum
   AOP_REGSTK,
   /* Is on the stack */
   AOP_STK,
+  /* Is a stack location */
+  AOP_STL,
   /* Is an immediate value */
   AOP_IMMD,
   /* Is in direct space */
@@ -65,6 +67,7 @@ typedef struct asmop
   {
     value *aop_lit;
     char *aop_immd;
+    int stk_off;
     char *aop_dir;
     asmop_byte bytes[8];
   } aopu;

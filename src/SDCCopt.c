@@ -2296,14 +2296,14 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
     {
       for (ic = ebbs[i]->sch; ic; ic = ic->next)
         {
-          if ((ic->op == '+' || ic->op == '-' || ic->op == '*' || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == BITWISEAND || ic->op == '|' || ic->op == CAST) &&
+          if ((ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS || ic->op == '*' || ic->op == LEFT_OP || ic->op == RIGHT_OP || ic->op == BITWISEAND || ic->op == '|' || ic->op == CAST) &&
             IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)))
             {
               sym_link *resulttype = operandType (IC_RESULT (ic));
 
               if (!IS_INTEGRAL (resulttype) ||
                 ic->op != CAST && !(IS_SYMOP (IC_LEFT (ic)) || IS_OP_LITERAL (IC_LEFT (ic))) ||
-                !(IS_SYMOP (IC_RIGHT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic))))
+                !(IS_SYMOP (IC_RIGHT (ic)) || IS_OP_LITERAL (IC_RIGHT (ic)) || ic->op == UNARYMINUS))
                 continue;
 
               resultsize = bitsForType (resulttype);
@@ -2452,7 +2452,7 @@ optimize:
                       newic->lineno = ic->lineno;
                       addiCodeToeBBlock (ebbs[i], newic, ic);
                     }
-                  else if (ic->op != LEFT_OP)
+                  else if (ic->op != LEFT_OP && ic->op != UNARYMINUS)
                     {
                       wassert (IS_OP_LITERAL (IC_RIGHT (ic)));
                       IC_RIGHT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));

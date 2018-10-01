@@ -4660,7 +4660,8 @@ genCmp (const iCode *ic, iCode *ifx)
     }
   else
     {
-      bool pushed_a = FALSE;
+      bool pushed_a = false;
+      bool started = false;
 
       for (i = 0; i < size; i++)
         if (i && aopInReg (left->aop, i, A_IDX) || aopInReg (right->aop, i, A_IDX))
@@ -4670,28 +4671,36 @@ genCmp (const iCode *ic, iCode *ifx)
             break;
           }
 
-      for (i = 0; i < size; i++)
+      for (i = 0, started = false; i < size; i++)
         {
           const asmop *right_stacked = NULL;
           int right_offset;
 
-          if (!i && (aopInReg (left->aop, i, X_IDX) || aopInReg (left->aop, i, Y_IDX) && !aopOnStack(right->aop, 0, 2)) &&
-            (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack(right->aop, 0, 2)))
+          if (!started && aopIsLitVal (right->aop, i, 2, 0) && (i + 1 < size)) // Skip over trailing 0x0000.
             {
-              bool x = aopInReg (left->aop, i, X_IDX);
-              emit2 ("cpw", x ? "x, %s" : "y, %s", aopGet2 (right->aop, 0));
-              cost ((x ? 3 : 4) - aopOnStack(right->aop, 0, 2), 2);
               i++;
               continue;
             }
-          else if (!i && i + 1 < size && regDead (X_IDX, ic) && left->aop->regs[XL_IDX] < i && left->aop->regs[XH_IDX] < i && right->aop->regs[XL_IDX] < i && right->aop->regs[XH_IDX] < i &&
-            (left->aop->type == AOP_LIT || left->aop->type == AOP_DIR || aopOnStack(left->aop, 0, 2)) &&
-            (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack(right->aop, 0, 2)))
+
+          if (!started && (aopInReg (left->aop, i, X_IDX) || aopInReg (left->aop, i, Y_IDX) && !aopOnStack(right->aop, i, 2)) &&
+            (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack(right->aop, i, 2)))
             {
-              genMove (ASMOP_X, left->aop, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] < i, TRUE, FALSE);
-              emit2 ("cpw", "x, %s", aopGet2 (right->aop, 0));
-              cost (3 - aopOnStack(right->aop, 0, 2), 2);
+              bool x = aopInReg (left->aop, i, X_IDX);
+              emit2 ("cpw", x ? "x, %s" : "y, %s", aopGet2 (right->aop, i));
+              cost ((x ? 3 : 4) - aopOnStack(right->aop, i, 2), 2);
               i++;
+              started = true;
+              continue;
+            }
+          else if (!started && i + 1 < size && regDead (X_IDX, ic) && left->aop->regs[XL_IDX] < i && left->aop->regs[XH_IDX] < i && right->aop->regs[XL_IDX] < i && right->aop->regs[XH_IDX] < i &&
+            (left->aop->type == AOP_LIT || left->aop->type == AOP_DIR || aopOnStack(left->aop, i, 2)) &&
+            (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopOnStack(right->aop, i, 2)))
+            {
+              genMove_o (ASMOP_X, 0, left->aop, i, 2, regDead (A_IDX, ic) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] < i, TRUE, FALSE);
+              emit2 ("cpw", "x, %s", aopGet2 (right->aop, i));
+              cost (3 - aopOnStack(right->aop, i, 2), 2);
+              i++;
+              started = true;
               continue;
             }
 
@@ -4718,11 +4727,12 @@ genCmp (const iCode *ic, iCode *ifx)
           
           if (right_stacked || aopInReg (right->aop, i, A_IDX))
             {
-              emit2 (i ? "sbc" : "cp", "a, (%d, sp)", right_stacked ? right_offset : 1);
+              emit2 (started ? "sbc" : "cp", "a, (%d, sp)", right_stacked ? right_offset : 1);
               cost (2, 1);
             }
           else
-            emit3_o (i ? A_SBC : A_CP, ASMOP_A, 0, right->aop, i);
+            emit3_o (started ? A_SBC : A_CP, ASMOP_A, 0, right->aop, i);
+          started = true;
 
           if (right_stacked)
             pop (right_stacked, 0, 2);

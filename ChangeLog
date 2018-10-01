@@ -2,6 +2,8 @@
 
 	* src/SDCCopt.c:
 	  Port an operand narrowing optimization to UNARYMINUS.
+	* src/stm8/gen.c:
+	  Improve handling of trailing 0 in wide comparison.
 
 2018-09-29 Philipp Klaus Krause <pkk AT spth.de>
 

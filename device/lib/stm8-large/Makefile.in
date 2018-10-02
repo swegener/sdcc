@@ -46,7 +46,6 @@ STM8_SDCC = $(COMMON_SDCC) \
   _strcmp.c \
   _strcpy.c \
   _strlen.c \
-  _memcpy.c \
   _memmove.c \
   sprintf.c \
   vprintf.c
@@ -54,7 +53,7 @@ STM8_SDCC = $(COMMON_SDCC) \
 STM8SOURCES = $(addprefix ../,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 STM8OBJECTS = $(patsubst %.c,%.rel,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 
-OBJ = setjmp.rel __mulsint2slong.rel heap.rel
+OBJ = setjmp.rel __mulsint2slong.rel heap.rel memcpy.rel
 
 LIB = stm8.lib
 CC = $(SCC)

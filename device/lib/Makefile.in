@@ -122,7 +122,8 @@ SOURCES_SDCC = $(COMMON_SDCC) \
   _startup.c \
   _strcmp.c \
   _strlen.c \
-  _memcpy.c \
+  __memcpy.c \
+  memcpy.c \
   _memmove.c \
   _strcpy.c \
   _heap.c \

@@ -1,5 +1,5 @@
 /*-------------------------------------------------------------------------
-   _memcpy.c - part of string library functions
+   memcpy.c - part of string library functions
 
    Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
 
@@ -27,30 +27,13 @@
 -------------------------------------------------------------------------*/
 
 #include <string.h>
-#include <sdcc-lib.h>
-
-#if !_SDCC_PORT_PROVIDES_MEMCPY
-
-void * __memcpy (void * dst, const void * src, size_t acount)
-{
-	void * ret = dst;
-	char * d = dst;
-	const char * s = src;
-
-	/*
-	 * copy from lower addresses to higher addresses
-	 */
-	while (acount--) {
-		*d++ = *s++;
-	}
-
-	return(ret);
-}
 
 #undef memcpy /* Avoid conflict with wrapper macro of the same name */
 
-void * memcpy (void * dst, const void * src, size_t acount)
+void * __memcpy (void *dst, const void *src, size_t n);
+
+void *memcpy (void *dst, const void *src, size_t n)
 {
-	return __memcpy (dst, src, acount);
+	return __memcpy (dst, src, n);
 }
-#endif
+

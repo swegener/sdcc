@@ -4,6 +4,15 @@
 	  Fix an issue that resulted in overestimation of remat costs.
 	* src/stm8/peeph.def:
 	  Optimize out dead loads from stack.
+	* device/include/asm/*/features.h,
+	  device/lib/Makefile.in,
+	  device/lib/_memmove.c,
+	  device/lib/clean.mk,
+	  device/lib/__memcpy.c,
+	  device/lib/memcpy.c,
+	  device/lib/stm8-large/memcpy.s,
+	  device/lib/*/Makefile.in:
+	  Library memcpy() cleanup.
 
 2018-10-02 Philipp Klaus Krause <pkk AT spth.de>
 

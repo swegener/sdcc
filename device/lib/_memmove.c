@@ -31,12 +31,6 @@
 #include <stdint.h>
 #include <sdcc-lib.h>
 
-#ifndef _SDCC_PORT_PROVIDES_MEMMOVE
-#define _SDCC_PORT_PROVIDES_MEMMOVE 0
-#endif
-
-#if !_SDCC_PORT_PROVIDES_MEMMOVE
-
 void * memmove (void * dst, const void * src, size_t acount)
 {
 	void * ret = dst;
@@ -66,4 +60,4 @@ void * memmove (void * dst, const void * src, size_t acount)
 
 	return(ret);
 }
-#endif
+

@@ -2,6 +2,8 @@
 
 	* src/stm8/gen.c:
 	  Fix an issue that resulted in overestimation of remat costs.
+	* src/stm8/peeph.def:
+	  Optimize out dead loads from stack.
 
 2018-10-02 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -3879,8 +3879,7 @@ genPlus (const iCode *ic)
             emit2 ("jrnc", "!tlabel", labelKey2num (skiplbl->key));
           cost (2, 1); // Cycle cost 1: jump, incw together take 2 cycles.
           emit3w_o (A_INCW, result->aop, i, 0, 0);
-          if (skiplbl)
-            emitLabel (skiplbl);
+          emitLabel (skiplbl);
           if (!aopIsLitVal (rightop, i, 2, 0))
             {
               emit2 ("addw", x ? "x, %s" : "y, %s", aopGet2 (rightop, i));
@@ -6356,28 +6355,52 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
     }
 
   // Testing and rlwa is cheaper than 8 times sraw
-  if (sign && shCount >= 8 && size >= 2 && (aopInReg (shiftop, size - 2, X_IDX) || aopInReg (shiftop, size - 2, Y_IDX)) &&
-    (size == 2 || size == 3 && aopInReg (shiftop, 0, A_IDX) || size == 4 && (aopInReg (shiftop, 0, X_IDX) || aopInReg (shiftop, 0, Y_IDX))))
-    { 
+  if (sign && shCount >= (7 - regDead (A_IDX, ic)) && size >= 2 && (aopInReg (shiftop, size - 2, X_IDX) || aopInReg (shiftop, size - 2, Y_IDX)) &&
+    (size == 2 || size == 3 && shCount >= 8 && aopInReg (shiftop, 0, A_IDX) || size == 4 && (aopInReg (shiftop, 0, X_IDX) || aopInReg (shiftop, 0, Y_IDX))))
+    {
+      bool pushed_sign = false;
+
       if (!regDead (A_IDX, ic))
         push (ASMOP_A, 0, 1);
-      while (shCount >= 8)
+
+      symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+      emit3 (A_CLR, ASMOP_A, 0);
+      emit3w_o (A_TNZW, shiftop, size - 2, 0, 0);
+      if (tlbl)
+        emit2 ("jrpl", "!tlabel", labelKey2num (tlbl->key));
+      emit3 (A_DEC, ASMOP_A, 0);
+      cost (2, 0);
+      emitLabel (tlbl);
+
+      if (shCount >= 8 + 6)
         {
-          symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-          emit3 (A_CLR, ASMOP_A, 0);
-          emit3w_o (A_TNZW, shiftop, size - 2, 0, 0);
-          if (tlbl)
-            emit2 ("jrpl", "!tlabel", labelKey2num (tlbl->key));
-          emit3 (A_DEC, ASMOP_A, 0);
-          cost (2, 0);
-            emitLabel (tlbl);
+          push (ASMOP_A, 0, 1);
+          pushed_sign = true;
+        }
+      while (shCount >= 6)
+        {
           emit3w_o (A_RRWA, shiftop, size - 2, 0, 0);
           if (size >= 4)
             emit3w_o (A_RRWA, shiftop, 0, 0, 0);
-          if (!regDead (A_IDX, ic))
-            pop (ASMOP_A, 0, 1);
           shCount -= 8;
+          if (shCount >= 6)
+            {
+              emit2 ("ld", "a, (1, sp)");
+              cost (2, 1);
+            }
         }
+      for (; shCount < 0; shCount++)
+        {
+          emit3 (A_SLL, ASMOP_A, 0);
+          emit3w_o (A_RLCW, shiftop, 0, 0, 0);
+          if (size >= 4)
+            emit3w_o (A_RLCW, shiftop, 2, 0, 0);
+        }
+      if (pushed_sign)
+        pop (ASMOP_A, 0, 1);
+        
+      if (!regDead (A_IDX, ic))
+        pop (ASMOP_A, 0, 1);
     }
 
   // Shifting right by 8, then shifting left a bit can be cheaper than shifting right all the way.
@@ -6390,7 +6413,8 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
       emit3 (A_CLR, ASMOP_A, 0);
       emit3w_o (A_RRWA, shiftop, 2, 0, 0);
       emit3w_o (A_RRWA, shiftop, 0, 0, 0);
-      for (; shCount < 8; shCount++)
+      shCount -= 8;
+      for (; shCount < 0; shCount++)
         {
           emit3 (A_SLL, ASMOP_A, 0);
           emit3w_o (A_RLCW, shiftop, 0, 0, 0);
@@ -6398,7 +6422,6 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
         }
       if (!regDead (A_IDX, ic))
         pop (ASMOP_A, 0, 1);
-      shCount = 0;
     }
 
   while (shCount--)

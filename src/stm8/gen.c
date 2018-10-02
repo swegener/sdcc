@@ -1068,7 +1068,7 @@ aopOp (operand *op, const iCode *ic)
     }
 
   /* Rematerialize symbols where all bytes are spilt. */
-  if (sym->remat && sym->isspilt)
+  if (sym->remat && (sym->isspilt || regalloc_dry_run))
     {
       bool completely_spilt = TRUE;
       for (i = 0; i < getSize (sym->type); i++)
@@ -7755,7 +7755,7 @@ resultRemat (const iCode *ic)
     {
       const symbol *sym = OP_SYMBOL_CONST (IC_RESULT (ic));
 
-      if (!sym->remat || POINTER_SET (ic))
+      if (!sym->remat)
         return(false);
 
       bool completely_spilt = TRUE;

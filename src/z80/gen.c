@@ -55,7 +55,7 @@ enum
   DISABLE_DEBUG = 0
 };
 
-//#define DEBUG_DRY_COST
+// #define DEBUG_DRY_COST
 
 static char *_z80_return[] = { "l", "h", "e", "d" };
 static char *_gbz80_return[] = { "e", "d", "l", "h" };
@@ -3959,10 +3959,14 @@ genIpush (const iCode *ic)
                       if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT && byteOfVal (AOP (IC_LEFT (ic))->aopu.aop_lit, offset) == 0x00)
                         emit3 (A_XOR, ASMOP_A, ASMOP_A);
                       else
-                        cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
+                        {
+                          cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset);
+                          if (!aopInReg (IC_LEFT (ic)->aop, 0, A_IDX))
+                            regalloc_dry_run_cost += ld_cost (ASMOP_A, AOP (IC_LEFT (ic)));
+                        }
                       emit2 ("push af");
+                      regalloc_dry_run_cost += 1;
                     }
-                  regalloc_dry_run_cost += (ld_cost (ASMOP_A, AOP (IC_LEFT (ic))) + 1);
                 }
             }
           if (!regalloc_dry_run)
@@ -4864,10 +4868,11 @@ genPlusIncr (const iCode * ic)
       return TRUE;
     }
 
-  /* if the literal value of the right hand side
-     is greater than 4 then it is not worth it */
-  if (icount > 4)
-    return FALSE;
+  if (icount > 4) // Not worth it if the sequence of inc gets too long.
+    return false;
+
+  if (icount > 1 && size == 1 && aopInReg (IC_LEFT (ic)->aop, 0, A_IDX)) // add a, #n is cheaper than sequence of inc a.
+    return false;
 
   if (size == 2 && getPairId (AOP (IC_LEFT (ic))) != PAIR_INVALID && icount <= 3 && isPairDead (getPairId (AOP (IC_LEFT (ic))), ic))
     {
@@ -12445,8 +12450,9 @@ genZ80Code (iCode * lic)
         }
       regalloc_dry_run_cost = 0;
       genZ80iCode (ic);
-    }
 
+      emit2 ("; iCode %d total cost: %d\n", ic->key, regalloc_dry_run_cost);
+    }
 
   /* now we are ready to call the
      peep hole optimizer */

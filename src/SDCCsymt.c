@@ -3382,7 +3382,7 @@ processFuncArgs (symbol * func)
 /* isSymbolEqual - compares two symbols return 1 if they match     */
 /*-----------------------------------------------------------------*/
 int
-isSymbolEqual (symbol * dest, symbol * src)
+isSymbolEqual (const symbol * dest, const symbol * src)
 {
   /* if pointers match then equal */
   if (dest == src)

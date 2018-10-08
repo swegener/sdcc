@@ -1634,6 +1634,24 @@ replace restart {
 	; peephole 155a removed inc hl / dec hl pair.
 }
 
+replace restart {
+	dec	hl
+	inc	bc
+	inc	hl
+} by {
+	inc	bc
+	; peephole 155b removed inc hl / dec hl pair.
+}
+
+replace restart {
+	dec	hl
+	inc	de
+	inc	hl
+} by {
+	inc	de
+	; peephole 155v removed inc hl / dec hl pair.
+}
+
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 barrier
 

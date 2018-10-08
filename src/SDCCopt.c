@@ -3080,7 +3080,6 @@ eBBlockFromiCode (iCode *ic)
       assert(cseAllBlocks (ebbi, TRUE)==0);
     }
 
-
   /* kill dead code */
   kchange = killDeadCode (ebbi);
 
@@ -3125,6 +3124,7 @@ eBBlockFromiCode (iCode *ic)
   computeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
   adjustIChain (ebbi->bbOrder, ebbi->count);
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
+  shortenLiveRanges (ic, ebbi);
   guessCounts (ic, ebbi);
   if (optimize.lospre && (TARGET_Z80_LIKE || TARGET_HC08_LIKE || TARGET_IS_STM8)) /* For mcs51, we get a code size regression with lospre enabled, since the backend can't deal well with the added temporaries */
     {

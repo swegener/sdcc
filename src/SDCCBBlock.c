@@ -397,7 +397,7 @@ iCode2eBBlock (iCode * ic)
 /* eBBWithEntryLabel - finds the basic block with the entry label  */
 /*-----------------------------------------------------------------*/
 eBBlock *
-eBBWithEntryLabel (ebbIndex * ebbi, symbol * eLabel)
+eBBWithEntryLabel (ebbIndex* ebbi, const symbol *eLabel)
 {
   eBBlock **ebbs = ebbi->bbOrder;
   int count = ebbi->count;

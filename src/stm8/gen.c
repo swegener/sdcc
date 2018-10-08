@@ -7343,12 +7343,12 @@ genIfx (const iCode *ic)
   if (inv)
     {
       emitLabel (tlbl);
-      emitJP(IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic), 0.0f);
+      emitJP (IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic), 0.0f);
       emitLabel (tlbl2);
     }
   else
     {
-      emitJP(IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic), 0.0f);
+      emitJP (IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic), 0.0f);
       emitLabel (tlbl);
     }
 

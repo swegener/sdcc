@@ -42,5 +42,7 @@ void adjustIChain (eBBlock ** ebbs, int count);
 
 int separateLiveRanges (iCode *sic, ebbIndex *ebbi); /* Split iTemps that have non-connected live-ranges. */
 
+int shortenLiveRanges (iCode *sic, ebbIndex *ebbi); /* Do some optimizations that shorten live ranges. */
+
 #endif
 

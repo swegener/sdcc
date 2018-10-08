@@ -95,7 +95,7 @@ extern set *graphEdges;
 DEFSETFUNC (printEntryLabel);
 eBBlock *neweBBlock ();
 edge *newEdge (eBBlock *, eBBlock *);
-eBBlock *eBBWithEntryLabel (ebbIndex *, symbol *);
+eBBlock *eBBWithEntryLabel (ebbIndex *, const symbol *);
 DEFSETFUNC (ifFromIs);
 set *edgesTo (eBBlock *);
 void remiCodeFromeBBlock (eBBlock *, iCode *);

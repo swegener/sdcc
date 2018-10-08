@@ -1028,6 +1028,24 @@ replace restart {
 	; peephole 102 removed redundant or after xor.
 }
 
+replace restart {
+	dec	a
+	or	a, a
+} by {
+	dec	a
+	; peephole 102a removed redundant or after dec.
+}
+
+replace restart {
+	dec	%1
+	ld	a, %1
+	or	a, a
+} by {
+	dec	%1
+	ld	a, %1
+	; peephole 102b removed redundant or after dec.
+}
+
 replace {
 	ld	%1,%2
 	ld	a,%2

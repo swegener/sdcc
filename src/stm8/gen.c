@@ -7005,6 +7005,18 @@ genPointerSet (iCode *ic)
         }
     }
 
+  // Use bset / bres.
+  if (bit_field && blen == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && right->aop->type == AOP_LIT)
+    {
+      const char *inst = (byteOfVal (right->aop->aopu.aop_lit, 0) & 1) ? "bset" : "bres";
+      if (left->aop->type == AOP_LIT)
+        emit2 (inst, "0x%02x%02x, #%u", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), bstr);
+      else
+        emit2 (inst, "%s, #%u", left->aop->aopu.aop_immd, bstr);
+      cost (4, 1);
+      goto release;
+    }
+
   if (!bit_field && size == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && aopInReg(right->aop, 0, A_IDX))
     {
       if (left->aop->type == AOP_LIT)

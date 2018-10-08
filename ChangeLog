@@ -1,5 +1,12 @@
 2018-10-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/peeph-z80.def:
+	  Optimizations for 8-bit loop counters (RFE #431).
+	* src/stm8/gen.c:
+	  Use bit set / reset instructions for bitfields (part of RFE #446).
+
+2018-10-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Improve code generation for 8-bit integers (addition of small constants, paramter passing) (RFE #583).
 	* rc/SDCCBBlock.c,
@@ -12,7 +19,7 @@
 	  src/SDCCopt.c,
 	  src/stm8/gen.c,
 	  src/z80/peeph-z80.def:
-	  Optimize postincrement (RFE #581)
+	  Optimize postincrement (RFE #581).
 
 2018-10-02 Philipp Klaus Krause <pkk AT spth.de>
 

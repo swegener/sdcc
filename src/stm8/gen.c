@@ -7016,6 +7016,19 @@ genPointerSet (iCode *ic)
       cost (4, 1);
       goto release;
     }
+  // Use bccm
+  if (bit_field && blen == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD))
+    {
+      if (!regDead (A_IDX, ic))
+        push (ASMOP_A, 0, 1);
+      cheapMove (ASMOP_A, 0, right->aop, 0, false);
+      emit3(A_SRL, ASMOP_A, 0);
+      if (!regDead (A_IDX, ic))
+        pop (ASMOP_A, 0, 1);
+      emit2 ("bccm", "%s, #%u", left->aop->aopu.aop_immd, bstr);
+      cost (4, 1);
+      goto release;
+    }
 
   if (!bit_field && size == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && aopInReg(right->aop, 0, A_IDX))
     {

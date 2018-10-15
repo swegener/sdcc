@@ -1,3 +1,9 @@
+2018-10-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  support/regression/tests/bug-2822.c:
+	  Fix bug #2822.
+
 2018-10-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

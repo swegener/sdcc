@@ -1,4 +1,4 @@
-/* bug-2793.c
+/* bug-2807.c
    Overwritten operand in code generation for division.
  */
 

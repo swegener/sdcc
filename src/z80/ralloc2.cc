@@ -817,6 +817,11 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if((IS_GB || IY_RESERVED) && IS_TRUE_SYMOP(result) && getSize(operandType(IC_RESULT(ic))) > 2)
     return(false);
 
+  // __z88dk_fastcall passes paramter in hl
+  if(ic->op == PCALL && ic->prev && ic->prev->op == SEND && input_in_HL && IFFUNC_ISZ88DK_FASTCALL(operandType(IC_LEFT(ic))->next))
+    return(false);
+
+  // HL overwritten by result.
   if(result_only_HL && ic->op == PCALL)
     return(true);
 
@@ -941,10 +946,6 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
 
   if(ic->op == CALL)
-    return(true);
-
-  // HL overwritten by result.
-  if(result_only_HL && ic->op == PCALL)
     return(true);
 
   if(POINTER_GET(ic) && getSize(operandType(IC_RESULT(ic))) == 1 && !IS_BITVAR(getSpec(operandType(result))) &&

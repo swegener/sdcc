@@ -3,6 +3,9 @@
 	* src/z80/ralloc2.cc,
 	  support/regression/tests/bug-2822.c:
 	  Fix bug #2822.
+	* src/SDCClospre.cc,
+	  support/regression/tests/bug-2820.c:
+	  Fix bug #2820.
 
 2018-10-09 Philipp Klaus Krause <pkk AT spth.de>
 

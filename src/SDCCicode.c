@@ -1271,20 +1271,19 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
         retval = operandFromValue (valCastLiteral (type, operandLitValue (left) * operandLitValue (right), operandLitValueUll (left) * operandLitValueUll (right)));
       break;
     case '/':
+      if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0 && operandLitValueUll (right) == 0)
+        {
+          werror (E_DIVIDE_BY_ZERO);
+          retval = right;
+          break;
+        }
       if (IS_UNSIGNED (type))
         {
-          if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0)
-            {
-              werror (E_DIVIDE_BY_ZERO);
-              retval = right;
-              break;
-            }
           SPEC_USIGN (let) = 1;
           SPEC_USIGN (ret) = 1;
           if (IS_LONGLONG (type))
             retval = operandFromValue (valCastLiteral (type,
-                                                       operandLitValue (left) /
-                                                       operandLitValue (right),
+                                                       0.0,
                                                        operandLitValueUll (left) /
                                                        operandLitValueUll (right)));
           else
@@ -1295,18 +1294,10 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
                                                        (TYPE_TARGET_ULONG) double2ul (operandLitValue (right))));
         }
       else
-        {
-          if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0)
-            {
-              werror (E_DIVIDE_BY_ZERO);
-              retval = right;
-              break;
-            }
-          retval = operandFromValue (valCastLiteral (type, operandLitValue (left) / operandLitValue (right), operandLitValueUll (left) / operandLitValueUll (right)));
-        }
+        retval = operandFromValue (valCastLiteral (type, operandLitValue (left) / operandLitValue (right), operandLitValueUll (left) / operandLitValueUll (right)));
       break;
     case '%':
-      if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0)
+      if ((TYPE_TARGET_ULONG) double2ul (operandLitValue (right)) == 0 && operandLitValueUll (right) == 0)
         {
           werror (E_DIVIDE_BY_ZERO);
           retval = right;
@@ -1314,8 +1305,15 @@ operandOperation (operand * left, operand * right, int op, sym_link * type)
       else
         {
           if (IS_UNSIGNED (type))
-            retval = operandFromLit ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) %
-                                     (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)));
+            {
+              if (IS_LONGLONG (type))
+                retval = operandFromValue (valCastLiteral (type,
+                                                       0.0,
+                                                       operandLitValueUll (left) %
+                                                       operandLitValueUll (right)));
+              else
+                retval = operandFromLit ((TYPE_TARGET_ULONG) double2ul (operandLitValue (left)) % (TYPE_TARGET_ULONG) double2ul (operandLitValue (right)));
+            }
           else
             retval = operandFromLit ((TYPE_TARGET_LONG) operandLitValue (left) % (TYPE_TARGET_LONG) operandLitValue (right));
         }

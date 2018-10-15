@@ -296,7 +296,7 @@ struct
   { I_CYCLOMATIC, ERROR_LEVEL_INFO,
      "function '%s', # edges %d , # nodes %d , cyclomatic complexity %d", 0 },
   { E_DIVIDE_BY_ZERO, ERROR_LEVEL_WARNING,
-     "dividing by ZERO", 0 },
+     "dividing by 0", 0 },
   { E_FUNC_BIT, ERROR_LEVEL_ERROR,
      "function cannot return 'bit'", 0 },
   { E_CAST_ZERO, ERROR_LEVEL_ERROR,
@@ -413,7 +413,7 @@ struct
      "size of void is zero", 0 },
   { W_POSSBUG2, ERROR_LEVEL_WARNING,
      "possible code generation error at %s line %d,\n"
-     " please report problem and send source code at SDCC-USER list on SF.Net"},
+     " please report problem and send source code at sdcc-user list on sourceforge.net"},
   { W_COMPLEMENT, ERROR_LEVEL_WARNING,
      "using ~ on bit/bool/unsigned char variables can give unexpected results due to promotion to int", 0 },
   { E_SHADOWREGS_NO_ISR, ERROR_LEVEL_ERROR,

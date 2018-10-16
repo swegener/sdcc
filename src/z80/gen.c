@@ -4677,11 +4677,26 @@ genRet (const iCode *ic)
         }
       else
         {
-          while (size--)
+          bool skipbytes[4] = {false, false, false, false}; // Take care to not overwrite hl.
+          for (offset = 0; offset < size; offset++)
             {
+              if (requiresHL (AOP (IC_LEFT (ic))) && (_fReturn3[offset]->aopu.aop_reg[0]->rIdx == H_IDX || _fReturn3[offset]->aopu.aop_reg[0]->rIdx == L_IDX))
+                {
+                  skipbytes[offset] = true;
+                  continue;
+                }
               cheapMove (_fReturn3[offset], 0, AOP (IC_LEFT (ic)), offset);
-              offset++;
             }
+          for (offset = 0; offset < size; offset++)
+            if (skipbytes[offset] && offset + 1 < size && _fReturn3[offset]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[offset + 1]->aopu.aop_reg[0]->rIdx == H_IDX)
+              {
+                fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, offset);
+                break;
+              }
+            else if (skipbytes[offset])
+              {
+                cheapMove (_fReturn3[offset], 0, AOP (IC_LEFT (ic)), offset);
+              }
         }
     }
   else if (AOP_TYPE (IC_LEFT (ic)) == AOP_LIT)

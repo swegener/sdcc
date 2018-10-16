@@ -2,6 +2,8 @@
 
 	* src/stm8/peeph.def:
 	  Minor stm8 peephole improvement, RFE #584.
+	* src/z80/gen.c:
+	  Fix bug #2801, #2674.
 
 2018-10-15 Philipp Klaus Krause <pkk AT spth.de>
 

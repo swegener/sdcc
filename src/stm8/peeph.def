@@ -699,6 +699,14 @@ replace restart {
 }
 
 replace restart {
+	ld	(%1, %2), a
+	tnz	a
+} by {
+	ld	(%1, %2), a
+	; peephole 31b removed redundant tnz.
+}
+
+replace restart {
 	rlc	a
 	tnz	a
 } by {

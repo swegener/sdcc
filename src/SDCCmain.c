@@ -2162,7 +2162,7 @@ preProcess (char **envp)
         since its name makes it non-compliant.
         It got removed a few times, but keeps coming back.
         This time it got added back for the 3.7.0 release
-        to support the old SiLabs */
+        to support the old SiLabs IDE */
       if (TARGET_IS_MCS51 && options.std_sdcc)
         {
           struct dbuf_s dbuf;
@@ -2190,7 +2190,7 @@ preProcess (char **envp)
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_ATOMICS__=1"));
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_NO_VLA__=1"));
 
-      /* Character encoding */
+      /* Character encoding  - these need to be set in device/lib/Makefile.in for $CPP, too */
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_ISO_10646__=201409L")); // wchar_t is UTF-32
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_16__=1")); // char16_t is UTF-16
       addSet (&preArgvSet, Safe_strdup ("-D__STDC_UTF_32__=1")); // char32_t is UTF-32

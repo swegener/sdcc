@@ -29,7 +29,8 @@ PORTINCDIR      = $(INCDIR)/mcs51
 endif
 
 CC              = $(top_builddir)/bin/sdcc
-CPP             = $(top_builddir)/bin/sdcpp
+# The predefined macros reflect what SDCC predefines (so we don't get any errors when generating Makefile.dep).
+CPP             = $(top_builddir)/bin/sdcpp -D__STDC_ISO_10646__=201409L -D__STDC_UTF_16__=1 -D__STDC_UTF_32__=1
 
 prefix          = @prefix@
 exec_prefix     = @exec_prefix@

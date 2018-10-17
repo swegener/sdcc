@@ -2,6 +2,9 @@
 
 	* support/regression/tests/bug-2822.c:
 	  Make test work for hc08.
+	* device/lib/Makefile.in,
+	  src/SDCCmain.c:
+	  Fix bug #2823.
 
 2018-10-16 Philipp Klaus Krause <pkk AT spth.de>
 

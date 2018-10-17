@@ -12,7 +12,7 @@
 
 struct wibble
 {
-    int (*wobble)(uint8_t *x) __z88dk_fastcall;
+    int (*wobble)(uint8_t *x) __z88dk_fastcall __reentrant;
 } w;
 
 struct wibble *wubble = &w;
@@ -33,7 +33,7 @@ void foo(uint8_t minor)
 
 uint8_t called;
 
-int f(uint8_t *x) __z88dk_fastcall
+int f(uint8_t *x) __z88dk_fastcall __reentrant
 {
     ASSERT(*x == 0x5a);
     called++;
@@ -42,7 +42,7 @@ int f(uint8_t *x) __z88dk_fastcall
 
 struct wibble2
 {
-    int (*wobble2)(uint32_t) __z88dk_fastcall;
+    int (*wobble2)(uint32_t) __z88dk_fastcall __reentrant;
 } w2;
 
 struct wibble2 *wubble2 = &w2;
@@ -63,7 +63,7 @@ void foo2(uint8_t minor)
 
 uint8_t called2;
 
-int f2(uint32_t x) __z88dk_fastcall
+int f2(uint32_t x) __z88dk_fastcall __reentrant
 {
     ASSERT(x == 0x1155aa88);
     called2++;

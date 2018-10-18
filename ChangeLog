@@ -1,5 +1,10 @@
 2018-10-18 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c:
+	  Improve ==, !=.
+
+2018-10-18 Philipp Klaus Krause <pkk AT spth.de>
+
 	* SDCClrange.c,
 	  src/SDCCpeeph.c,
 	  src/SDCCralloc.hpp,

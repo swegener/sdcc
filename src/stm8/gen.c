@@ -4861,7 +4861,8 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
       /* Prefer literal operand on right */
       if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD ||
         right->aop->type != AOP_LIT && right->aop->type != AOP_IMMD && left->aop->type == AOP_DIR ||
-        (aopInReg (right->aop, 0, A_IDX) || aopInReg (right->aop, 0, X_IDX) || aopInReg (right->aop, 0, Y_IDX)) && aopOnStack (right->aop, i, 1))
+        aopInReg (right->aop, i, A_IDX) && aopOnStack (left->aop, i, 1) ||
+        (aopInReg (right->aop, i, X_IDX) || aopInReg (right->aop, i, Y_IDX)) && aopOnStack (left->aop, i, 2))
         {
           operand *temp = left;
           left = right;

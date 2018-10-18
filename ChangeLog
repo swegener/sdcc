@@ -1,6 +1,11 @@
 2018-10-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
+	  Improve 16-bit pointer write, completes RFE #521.
+
+2018-10-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
 	  Improve ==, !=.
 
 2018-10-18 Philipp Klaus Krause <pkk AT spth.de>

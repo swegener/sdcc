@@ -7041,6 +7041,15 @@ genPointerSet (iCode *ic)
       cost (3, 1);
       goto release;
     }
+  if (!bit_field && size == 2 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && (aopInReg(right->aop, 0, X_IDX) || aopInReg(right->aop, 0, Y_IDX)))
+    {
+      if (left->aop->type == AOP_LIT)
+        emit2 ("ldw", "0x%02x%02x, %s", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), aopGet2 (right->aop, 0));
+      else
+        emit2 ("ldw", "%s, %s", left->aop->aopu.aop_immd, aopGet2 (right->aop, 0));
+      cost (3 + aopInReg(right->aop, 0, Y_IDX), 2);
+      goto release;
+    }
 
   // Long pointer indirect long addressing mode is useful only in two very specific cases:
   if (!bit_field && size == 1 && left->aop->type == AOP_DIR && !regDead (X_IDX, ic) && (aopInReg(right->aop, 0, A_IDX) || regDead (A_IDX, ic)))

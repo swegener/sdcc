@@ -1,3 +1,14 @@
+2018-10-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* SDCClrange.c,
+	  src/SDCCpeeph.c,
+	  src/SDCCralloc.hpp,
+	  src/SDCCsymt.c,
+	  src/SDCCsymt.h,
+	  src/stm8/gen.c,
+	  src/stm8/peeph.def:
+	  Improve volatile handling in peepholes, fix a bug and implement RFE #585.
+
 2018-10-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2822.c:

@@ -338,7 +338,8 @@ typedef struct symbol
   unsigned spildir:1;               /* spilt in direct space */
   unsigned ptrreg:1;                /* this symbol assigned to a ptr reg */
   unsigned noSpilLoc:1;             /* cannot be assigned a spil location */
-  unsigned div_flag_safe:1;         /* we know this function is safe to call with undocumented stm8 flag bit 6 set*/
+  bool funcDivFlagSafe:1;           /* we know this function is safe to call with undocumented stm8 flag bit 6 set*/
+  bool funcUsesVolatile:1;          /* The function accesses a volatile variable */
   unsigned isstrlit;                /* is a string literal and it's usage count  */
   unsigned accuse;                  /* can be left in the accumulator
                                        On the Z80 accuse is divided into

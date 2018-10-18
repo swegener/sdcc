@@ -680,30 +680,32 @@ notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
   operand *op;
   iCode *last_ic;
 
+  const bool global_not_volatile = currFunc ? !currFunc->funcUsesVolatile : false;
+
   /* Can't tell if indirect accesses are volatile or not, so
-  ** assume they are, just to be safe.
+  ** assume they are (if there is a volatile access in the function at all), just to be safe.
   */
   if (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
     {
       if (*var=='@')
-        return false;
+        return global_not_volatile;
     }
   if (TARGET_Z80_LIKE)
     {
       if (var[0] == '#')
         return true;
       if (var[0] == '(')
-        return false;
+        return global_not_volatile;
       if (strstr (var, "(bc)"))
-        return false;
+        return global_not_volatile;
       if (strstr (var, "(de)"))
-        return false;
+        return global_not_volatile;
       if (strstr (var, "(hl)"))
-        return false;
+        return global_not_volatile;
       if (strstr (var, "(ix"))
-        return false;
+        return global_not_volatile;
       if (strstr (var, "(iy"))
-        return false;
+        return global_not_volatile;
     }
 
   if (TARGET_IS_STM8)
@@ -711,21 +713,21 @@ notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
       if (var[0] == '#')
         return true;
       if (var[0] == '(')
-        return false;
+        return global_not_volatile;
       if (strstr (var, "(x)"))
-        return false;
+        return global_not_volatile;
       if (strstr (var, "(y)"))
-        return false;
+        return global_not_volatile;
       if (strstr (var, ", x)"))
-        return false;
+        return global_not_volatile;
       if (strstr (var, ", y)"))
-        return false;
+        return global_not_volatile;
       if (strstr (var, ", sp)"))
-        return false;
+        return global_not_volatile;
       if (strchr (var, '[') && strchr (var, ']'))
-        return false;
+        return global_not_volatile;
       if (strstr(var, "0x") || strstr(var, "0X") || isdigit(var[0]))
-        return false;
+        return global_not_volatile;
     }
 
   /* Extract a symbol name from the variable */
@@ -804,7 +806,7 @@ notVolatileVariable(const char *var, lineNode *currPl, lineNode *endPl)
   }
 
   /* Couldn't find the symbol for some reason. Assume volatile. */
-  return false;
+  return global_not_volatile;
 }
 
 /*  notVolatile:
@@ -825,7 +827,6 @@ FBYNAME (notVolatile)
 {
   int varNumber;
   char *var;
-  bool notvol;
   char *digitend;
   lineNode *cl;
   operand *op;
@@ -882,9 +883,8 @@ FBYNAME (notVolatile)
 
       if (var)
         {
-          notvol = notVolatileVariable (var, currPl, endPl);
-          if (!notvol)
-            return FALSE;
+          if (!notVolatileVariable (var, currPl, endPl))
+            return false;
         }
       else
         {

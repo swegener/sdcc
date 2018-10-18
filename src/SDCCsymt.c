@@ -334,7 +334,8 @@ newSymbol (const char *name, long scope)
   sym->for_newralloc = 0;
   sym->isinscope = 1;
   sym->usl.spillLoc = 0;
-  sym->div_flag_safe = 0;
+  sym->funcDivFlagSafe = 0;
+  sym->funcUsesVolatile = 1;
 
   return sym;
 }

@@ -350,7 +350,7 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
   std::map<std::pair<int, reg_t>, var_t> sym_to_index;
 
   if(currFunc)
-    currFunc->div_flag_safe = 1;
+    currFunc->funcDivFlagSafe = 1;
 
   start_ic = iCodeLabelOptimize(iCodeFromeBBlock (ebbs, ebbi->count));
   {
@@ -360,8 +360,8 @@ create_cfg(cfg_t &cfg, con_t &con, ebbIndex *ebbi)
     for (ic = start_ic, i = 0, j = 0; ic; ic = ic->next, i++)
       {
         if (currFunc)
-          currFunc->div_flag_safe &= !(ic->op == INLINEASM || ic->op == '/' || ic->op == '%' || ic->op == PCALL ||
-            ic->op == CALL && (IS_OP_LITERAL (IC_LEFT (ic)) || !OP_SYMBOL(IC_LEFT (ic))->div_flag_safe) ||
+          currFunc->funcDivFlagSafe &= !(ic->op == INLINEASM || ic->op == '/' || ic->op == '%' || ic->op == PCALL ||
+            ic->op == CALL && (IS_OP_LITERAL (IC_LEFT (ic)) || !OP_SYMBOL(IC_LEFT (ic))->funcDivFlagSafe) ||
             ic->op == RIGHT_OP && IS_OP_LITERAL (IC_RIGHT (ic))); // Right shift might be implemented using division.
 
 #ifdef DEBUG_SEGV

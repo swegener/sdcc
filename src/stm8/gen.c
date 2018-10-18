@@ -6728,7 +6728,7 @@ genPointerGet (const iCode *ic)
     }
   // Special case for efficient handling of 16-bit I/O and rematerialized pointers
   else if (!bit_field && size == 2 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) &&
-    (aopInReg (result->aop, 0, X_IDX) || aopInReg (result->aop, 0, Y_IDX)))
+    (aopInReg (result->aop, 0, X_IDX) || aopInReg (result->aop, 0, Y_IDX) || aopOnStack (result->aop, 0, 2) && regDead (X_IDX, ic)))
     {
       bool use_y = aopInReg (result->aop, 0, Y_IDX);
       if (left->aop->type == AOP_LIT)
@@ -6736,6 +6736,7 @@ genPointerGet (const iCode *ic)
       else
         emit2("ldw", offset ? "%s, %s+%d" : "%s, %s", use_y ? "y" : "x", left->aop->aopu.aop_immd, offset);
       cost (3 + use_y, 2);
+      genMove (result->aop, use_y ? ASMOP_Y : ASMOP_X, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
       goto release;
     }
 

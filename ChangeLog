@@ -4,7 +4,9 @@
 	  support/regression/tests/bug-2826.c:
 	  Fix bug #2826 in preincrement optimization.
 	* .version:
-	  Bump version for completion of machine-independnet preincrement opt.
+	  Bump version for completion of machine-independent preincrement opt.
+	* src/z80/gen.c:
+	  Improve code generation for 16-bit increment of global variables.
 
 2018-10-18 Philipp Klaus Krause <pkk AT spth.de>
 

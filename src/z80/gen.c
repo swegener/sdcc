@@ -4895,7 +4895,17 @@ genPlusIncr (const iCode * ic)
       while (icount--)
         emit2 ("inc %s", _pairs[pair].name);
       commitPair (AOP (IC_RESULT (ic)), pair, ic, FALSE);
-      return TRUE;
+      return true;
+    }
+
+  if (size == 2 && icount <= 2 && isPairDead (PAIR_HL, ic) &&
+    (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY))
+    {
+      fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+      emit2 ("inc hl");
+      regalloc_dry_run_cost++;
+      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
+      return true;
     }
 
   /* if increment 16 bits in register */

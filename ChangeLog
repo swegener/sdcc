@@ -7,6 +7,9 @@
 	  Bump version for completion of machine-independent preincrement opt.
 	* src/z80/gen.c:
 	  Improve code generation for 16-bit increment of global variables.
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Optimize reuse of hl.
 
 2018-10-18 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -1,3 +1,11 @@
+2018-10-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClrange.c,
+	  support/regression/tests/bug-2826.c:
+	  Fix bug #2826 in preincrement optimization.
+	* .version:
+	  Bump version for completion of machine-independnet preincrement opt.
+
 2018-10-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

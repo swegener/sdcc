@@ -1,3 +1,8 @@
+2018-10-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  Fix bug #2830, patch by Tom Li.
+
 2018-10-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClrange.c,

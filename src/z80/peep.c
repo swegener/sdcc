@@ -1086,6 +1086,13 @@ int z80instructionSize(lineNode *pl)
       return(i);
     }
 
+  if(ISINST(pl->line, ".dw"))
+    {
+      int i, j;
+      for(i = 1, j = 0; pl->line[j]; i += pl->line[j] == ',', j++);
+      return(i * 2);
+    }
+
   /* If the instruction is unrecognized, we shouldn't try to optimize.  */
   /* For all we know it might be some .ds or similar possibly long line */
   /* Return a large value to discourage optimization.                   */

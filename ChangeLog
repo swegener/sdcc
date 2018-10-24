@@ -1,5 +1,10 @@
 2018-10-24 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/peep.c:
+	  Improve distance estimation for direct long addressing mode for jp and call.
+
+2018-10-24 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/peep.c,
 	  src/stm8/peep.c:
 	  Generalize the fix for #2830 to improve some peephole optimizations.

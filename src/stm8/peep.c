@@ -261,6 +261,8 @@ stm8instructionSize(const lineNode *pl)
       op1start++;
     if(strstr(op1start, ",y)"))
       i++; // costs extra byte for operating with y
+    if ((ISINST(operand, "jp") || ISINST(operand, "call")) && *op1start != '(' && *op1start != '[') // jp and call are 3 bytes for direct long addressing mode.
+      return(3);
     if(isLabel(op1start))
       return(4);
     if(readint(op1start) <= 0xFF)

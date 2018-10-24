@@ -266,7 +266,7 @@ stm8instructionSize(const lineNode *pl)
     if(readint(op1start) <= 0xFF)
       return(2+i);
     /* op1 > 0xFF */
-    if((EQUALS(operand, "jp") || EQUALS(operand, "call")) && !strchr(op1start, 'y'))
+    if((ISINST(operand, "jp") || ISINST(operand, "call")) && !strchr(op1start, 'y'))
       return(3);
     return(4);
   }
@@ -407,6 +407,20 @@ stm8instructionSize(const lineNode *pl)
     else
       return(1);
   }
+
+  if(ISINST(pl->line, ".db") || ISINST(pl->line, ".byte"))
+    {
+      int i, j;
+      for(i = 1, j = 0; pl->line[j]; i += pl->line[j] == ',', j++);
+      return(i);
+    }
+
+  if(ISINST(pl->line, ".dw") || ISINST(pl->line, ".word"))
+    {
+      int i, j;
+      for(i = 1, j = 0; pl->line[j]; i += pl->line[j] == ',', j++);
+      return(i * 2);
+    }
 
   return(5); // Maximum instruction size, e.g. btjt.
 }

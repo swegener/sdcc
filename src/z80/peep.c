@@ -1079,14 +1079,14 @@ int z80instructionSize(lineNode *pl)
   if(IS_RAB && ISINST(pl->line, "bool"))
     return(!STRNCASECMP(op1start, "hl", 2) ? 1 : 2);
   
-  if(ISINST(pl->line, ".db"))
+  if(ISINST(pl->line, ".db") || ISINST(pl->line, ".byte"))
     {
       int i, j;
       for(i = 1, j = 0; pl->line[j]; i += pl->line[j] == ',', j++);
       return(i);
     }
 
-  if(ISINST(pl->line, ".dw"))
+  if(ISINST(pl->line, ".dw") || ISINST(pl->line, ".word"))
     {
       int i, j;
       for(i = 1, j = 0; pl->line[j]; i += pl->line[j] == ',', j++);

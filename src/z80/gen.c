@@ -2956,7 +2956,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
     }
 
   /* PENDING: Verify this. */
-  else if (id == PAIR_HL && requiresHL (aop) && (IS_GB || IY_RESERVED))
+  else if (id == PAIR_HL && requiresHL (aop) && (IS_GB || IY_RESERVED && aop->type != AOP_HL && aop->type != AOP_IY))
     {
       if (bitVectBitValue (ic->rSurv, D_IDX))
         _push (PAIR_DE);
@@ -2974,7 +2974,7 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
   else
     {
       /* Special cases */
-      if (aop->type == AOP_IY && aop->size == 2)
+      if ((aop->type == AOP_IY || aop->type == AOP_HL) && !IS_GB && aop->size == 2)
         {
           if (!regalloc_dry_run)
             {
@@ -4095,6 +4095,11 @@ static void genSend (const iCode *ic)
       if (_fReturn3[0]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[1]->aopu.aop_reg[0]->rIdx == H_IDX &&
         _fReturn3[2]->aopu.aop_reg[0]->rIdx == E_IDX && _fReturn3[3]->aopu.aop_reg[0]->rIdx == D_IDX)
         {
+          if (!isPairDead (PAIR_DE, ic))
+            {
+              regalloc_dry_run_cost += 100;
+              wassertl (regalloc_dry_run, "Register parameter overwrites value that is still needed");
+            }
           fetchPairLong (PAIR_DE, AOP (IC_LEFT (ic)), ic, 2);
           z80_regs_used_as_parms_in_calls_from_current_function[E_IDX] = true;
           z80_regs_used_as_parms_in_calls_from_current_function[D_IDX] = true;
@@ -4207,12 +4212,17 @@ emitCall (const iCode *ic, bool ispcall)
       else if (!IS_GB && !IY_RESERVED)
         {
           spillPair (PAIR_IY);
-          fetchPairLong (PAIR_IY, AOP (IC_LEFT (ic)), ic, 0);
+          fetchPairLong (PAIR_IY, IC_LEFT (ic)->aop, ic, 0);
           emit2 ("call ___sdcc_call_iy");
         }
       else // Use bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
         {
           wassert (IY_RESERVED); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
+          if (aopInReg (IC_LEFT (ic)->aop, 0, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 0, C_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, C_IDX))
+            {
+              regalloc_dry_run_cost += 100;
+              wassertl (regalloc_dry_run, "Unimplemented function pointer in bc");
+            }
           symbol *tlbl = 0;
           if (!regalloc_dry_run)
             {
@@ -4221,7 +4231,7 @@ emitCall (const iCode *ic, bool ispcall)
               emit2 ("push bc");
               regalloc_dry_run_cost += 4;
             }
-          fetchPairLong (PAIR_BC, AOP (IC_LEFT (ic)), ic, 0);
+          fetchPairLong (PAIR_BC, IC_LEFT (ic)->aop, 0, 0);
           emit2 ("push bc");
           emit2 ("ret");
           regalloc_dry_run_cost += 2;
@@ -4898,7 +4908,7 @@ genPlusIncr (const iCode * ic)
       return true;
     }
 
-  if (size == 2 && icount <= 2 && isPairDead (PAIR_HL, ic) &&
+  if (size == 2 && icount <= 2 && isPairDead (PAIR_HL, ic) && !IS_GB &&
     (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY))
     {
       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
@@ -12476,7 +12486,7 @@ genZ80Code (iCode * lic)
       regalloc_dry_run_cost = 0;
       genZ80iCode (ic);
 
-      emit2 ("; iCode %d total cost: %d\n", ic->key, regalloc_dry_run_cost);
+      // emit2 ("; iCode %d total cost: %d\n", ic->key, regalloc_dry_run_cost);
     }
 
   /* now we are ready to call the

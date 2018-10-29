@@ -1024,10 +1024,9 @@ aopForRemat (symbol *sym)
     }
   else
     {
-      wassert (!val);
       aop = newAsmop (AOP_IMMD);
       aop->aopu.immd = OP_SYMBOL (IC_LEFT (ic))->rname;
-      aop->aopu.immd_off = 0;
+      aop->aopu.immd_off = val;
     }
 
   aop->size = getSize (sym->type);
@@ -6724,7 +6723,7 @@ genPointerGet (const iCode *ic)
       if (left->aop->type == AOP_LIT)
         emit2("ld", offset ? "a, 0x%02x%02x+%d" : "a, 0x%02x%02x",  byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);
       else
-        emit2("ld", offset ? "a, %s+%d" : "a, %s", left->aop->aopu.immd, left->aop->aopu.immd_off + offset);
+        emit2("ld", offset ? "a, %s+%d" : "a, %s+%d", left->aop->aopu.immd, left->aop->aopu.immd_off + offset);
       cost (3, 1);
       cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
       goto release;
@@ -6737,7 +6736,7 @@ genPointerGet (const iCode *ic)
       if (left->aop->type == AOP_LIT)
         emit2("ldw", offset ? "%s, 0x%02x%02x+%d" : "%s, 0x%02x%02x", use_y ? "y" : "x", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);
       else
-        emit2("ldw", offset ? "%s, %s+%d" : "%s, %s", use_y ? "y" : "x", left->aop->aopu.immd, left->aop->aopu.immd_off + offset);
+        emit2("ldw", offset ? "%s, %s+%d" : "%s, %s+%d", use_y ? "y" : "x", left->aop->aopu.immd, left->aop->aopu.immd_off + offset);
       cost (3 + use_y, 2);
       genMove (result->aop, use_y ? ASMOP_Y : ASMOP_X, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
       goto release;

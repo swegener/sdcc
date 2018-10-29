@@ -45,7 +45,7 @@ typedef enum
 }
 AOP_TYPE;
 
-/* asmop_byte: A y type for the space a single byte
+/* asmop_byte: A type for the location a single byte
    of an operand can be in */
 typedef struct asmop_byte
 {
@@ -66,7 +66,11 @@ typedef struct asmop
   union
   {
     value *aop_lit;
-    char *aop_immd;
+    struct
+      {
+        char *immd;
+        int immd_off;
+      };
     int stk_off;
     char *aop_dir;
     asmop_byte bytes[8];

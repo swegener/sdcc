@@ -1,3 +1,10 @@
+2018-10-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.h,
+	  src/stm8/gen.c,
+	  src/stm8/peep.c:
+	  Infrastructure for handling offsets from symbols in rematerialization (part of RFE #446).
+
 2018-10-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/mcs51/peeph.def:

@@ -435,9 +435,9 @@ aopGet(const asmop *aop, int offset)
     {
       wassertl (offset < (2 + (options.model == MODEL_LARGE)), "Immediate operand out of range");
       if (offset == 0)
-        SNPRINTF (buffer, sizeof(buffer), "#<%s", aop->aopu.aop_immd);
+        SNPRINTF (buffer, sizeof(buffer), "#<(%s + %d)", aop->aopu.immd, aop->aopu.immd_off);
       else
-        SNPRINTF (buffer, sizeof(buffer), "#(%s >> %d)", aop->aopu.aop_immd, offset * 8);
+        SNPRINTF (buffer, sizeof(buffer), "#((%s + %d) >> %d)", aop->aopu.immd, aop->aopu.immd_off, offset * 8);
       return (buffer);
     }
 
@@ -478,9 +478,9 @@ aopGet2(const asmop *aop, int offset)
   else if (aop->type == AOP_IMMD)
     {
       if (offset)
-        SNPRINTF (buffer, sizeof(buffer), "#(%s >> %d)", aop->aopu.aop_immd, offset * 8);
+        SNPRINTF (buffer, sizeof(buffer), "#((%s + %d) >> %d)", aop->aopu.immd, aop->aopu.immd_off, offset * 8);
       else
-        SNPRINTF (buffer, sizeof(buffer), "#%s", aop->aopu.aop_immd);
+        SNPRINTF (buffer, sizeof(buffer), "#(%s + %d)", aop->aopu.immd, aop->aopu.immd_off);
       return (buffer);
     }
 
@@ -944,7 +944,8 @@ aopForSym (const iCode *ic, symbol *sym)
   if (IS_FUNC (sym->type))
     {
       aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd = sym->rname;
+      aop->aopu.immd = sym->rname;
+      aop->aopu.immd_off = 0;
       aop->size = getSize (sym->type);
     }
   /* Assign depending on the storage class */
@@ -1025,7 +1026,8 @@ aopForRemat (symbol *sym)
     {
       wassert (!val);
       aop = newAsmop (AOP_IMMD);
-      aop->aopu.aop_immd = OP_SYMBOL (IC_LEFT (ic))->rname;
+      aop->aopu.immd = OP_SYMBOL (IC_LEFT (ic))->rname;
+      aop->aopu.immd_off = 0;
     }
 
   aop->size = getSize (sym->type);
@@ -6722,7 +6724,7 @@ genPointerGet (const iCode *ic)
       if (left->aop->type == AOP_LIT)
         emit2("ld", offset ? "a, 0x%02x%02x+%d" : "a, 0x%02x%02x",  byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);
       else
-        emit2("ld", offset ? "a, %s+%d" : "a, %s", left->aop->aopu.aop_immd, offset);
+        emit2("ld", offset ? "a, %s+%d" : "a, %s", left->aop->aopu.immd, left->aop->aopu.immd_off + offset);
       cost (3, 1);
       cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
       goto release;
@@ -6735,7 +6737,7 @@ genPointerGet (const iCode *ic)
       if (left->aop->type == AOP_LIT)
         emit2("ldw", offset ? "%s, 0x%02x%02x+%d" : "%s, 0x%02x%02x", use_y ? "y" : "x", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);
       else
-        emit2("ldw", offset ? "%s, %s+%d" : "%s, %s", use_y ? "y" : "x", left->aop->aopu.aop_immd, offset);
+        emit2("ldw", offset ? "%s, %s+%d" : "%s, %s", use_y ? "y" : "x", left->aop->aopu.immd, left->aop->aopu.immd_off + offset);
       cost (3 + use_y, 2);
       genMove (result->aop, use_y ? ASMOP_Y : ASMOP_X, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
       goto release;
@@ -7000,7 +7002,7 @@ genPointerSet (iCode *ic)
               if (left->aop->type == AOP_LIT)
                 emit2 ("mov", "0x%02x%02x+%d, %s", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), size - i - 1, aopGet (right->aop, i));
               else
-                emit2 ("mov", "%s+%d, %s", left->aop->aopu.aop_immd, size - i - 1, aopGet (right->aop, i));
+                emit2 ("mov", "%s+%d, %s", left->aop->aopu.immd, left->aop->aopu.immd_off + size - i - 1, aopGet (right->aop, i));
               cost (right->aop->type == AOP_DIR ? 3 : 4, 1);
             }
           goto release;
@@ -7014,7 +7016,7 @@ genPointerSet (iCode *ic)
       if (left->aop->type == AOP_LIT)
         emit2 (inst, "0x%02x%02x, #%u", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), bstr);
       else
-        emit2 (inst, "%s, #%u", left->aop->aopu.aop_immd, bstr);
+        emit2 (inst, "%s+%d, #%u", left->aop->aopu.immd, left->aop->aopu.immd_off, bstr);
       cost (4, 1);
       goto release;
     }
@@ -7027,7 +7029,7 @@ genPointerSet (iCode *ic)
       emit3(A_SRL, ASMOP_A, 0);
       if (!regDead (A_IDX, ic))
         pop (ASMOP_A, 0, 1);
-      emit2 ("bccm", "%s, #%u", left->aop->aopu.aop_immd, bstr);
+      emit2 ("bccm", "%s+%d, #%u", left->aop->aopu.immd, left->aop->aopu.immd_off, bstr);
       cost (4, 1);
       goto release;
     }
@@ -7037,7 +7039,7 @@ genPointerSet (iCode *ic)
       if (left->aop->type == AOP_LIT)
         emit2 ("ld", "0x%02x%02x, %s", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), aopGet (right->aop, 0));
       else
-        emit2 ("ld", "%s, %s", left->aop->aopu.aop_immd, aopGet (right->aop, 0));
+        emit2 ("ld", "%s+%d, %s", left->aop->aopu.immd, left->aop->aopu.immd_off, aopGet (right->aop, 0));
       cost (3, 1);
       goto release;
     }
@@ -7046,7 +7048,7 @@ genPointerSet (iCode *ic)
       if (left->aop->type == AOP_LIT)
         emit2 ("ldw", "0x%02x%02x, %s", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), aopGet2 (right->aop, 0));
       else
-        emit2 ("ldw", "%s, %s", left->aop->aopu.aop_immd, aopGet2 (right->aop, 0));
+        emit2 ("ldw", "%s+%d, %s", left->aop->aopu.immd, left->aop->aopu.immd_off, aopGet2 (right->aop, 0));
       cost (3 + aopInReg(right->aop, 0, Y_IDX), 2);
       goto release;
     }

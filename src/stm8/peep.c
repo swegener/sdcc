@@ -50,7 +50,8 @@ readint(const char *str)
     return(ret);
   if(!sscanf(str, "%d", &ret))
     {
-      wassertl (0, "readint() got non-integer argument.");
+      wassertl (0, "readint() got non-integer argument:");
+      fprintf (stderr, "%s\n", str);
       ret = -1;
     }
   return(ret);
@@ -115,10 +116,13 @@ isRelativeAddr(const char *what, const char *mode)
 static int
 isLabel(const char *what)
 {
-  const char *end;    
+  const char *end;
+
   end = strchr(what, '+');
   if(!end)
     end = what + strlen(what);
+  if(what[0] == '(' && !strchr(what, ','))
+    what++;
   if(what[0] == '#')
     return (what[1] == '_' || what[1] == '<' || what[1] == '>');
   return(what[0] == '_' || *(end-1) == '$');

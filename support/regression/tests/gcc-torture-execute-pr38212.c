@@ -25,11 +25,9 @@ foo (int *restrict p, int i)
 void
 testTortureExecute (void)
 {
-#if 0
   int i = 0;
   if (foo (&i, 1) != 1)
     ASSERT (0);
   return;
-#endif
 }
 

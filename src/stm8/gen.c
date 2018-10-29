@@ -6912,10 +6912,19 @@ genAssign (const iCode *ic)
     {
       int i;
       D (emit2 ("; Dummy read", ""));
-      push (ASMOP_A, 0, 1);
-      for (i = 0; i < right->aop->size; i++)
-        cheapMove (ASMOP_A, 0, right->aop, i, FALSE);
-      pop (ASMOP_A, 0, 1);
+
+      if (!regDead(A_IDX, ic) && right->aop->type == AOP_DIR)
+        for (i = 0; i < right->aop->size; i++)
+          emit3_o (A_TNZ, right->aop, i, 0, 0);
+      else
+        {
+          if (!regDead(A_IDX, ic))
+            push (ASMOP_A, 0, 1);
+          for (i = 0; i < right->aop->size; i++)
+            cheapMove (ASMOP_A, 0, right->aop, i, FALSE);
+          if (!regDead(A_IDX, ic))
+            pop (ASMOP_A, 0, 1);
+        }
     }
   else
     genMove(result->aop, right->aop, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
@@ -7748,14 +7757,18 @@ genDummyRead (const iCode *ic)
 
       D (emit2 ("; genDummyRead", ""));
 
-      if (!regDead (A_IDX, ic))
-        push (ASMOP_A, 0 ,1);
-
-      for (i = 0; i < op->aop->size; i++)
-        cheapMove (ASMOP_A, 0, op->aop, i, FALSE);
-
-      if (!regDead (A_IDX, ic))
-        pop (ASMOP_A, 0, 1);
+      if (!regDead(A_IDX, ic) && op->aop->type == AOP_DIR)
+        for (i = 0; i < op->aop->size; i++)
+          emit3_o (A_TNZ, op->aop, i, 0, 0);
+      else
+        {
+          if (!regDead (A_IDX, ic))
+            push (ASMOP_A, 0 ,1);
+          for (i = 0; i < op->aop->size; i++)
+            cheapMove (ASMOP_A, 0, op->aop, i, FALSE);
+          if (!regDead (A_IDX, ic))
+            pop (ASMOP_A, 0, 1);
+        }
 
       freeAsmop (op);
     }
@@ -7766,14 +7779,18 @@ genDummyRead (const iCode *ic)
 
       D (emit2 ("; genDummyRead", ""));
 
-      if (!regDead (A_IDX, ic))
-        push (ASMOP_A, 0 ,1);
-
-      for (i = 0; i < op->aop->size; i++)
-        cheapMove (ASMOP_A, 0, op->aop, i, FALSE);
-
-      if (!regDead (A_IDX, ic))
-        pop (ASMOP_A, 0, 1);
+      if (!regDead(A_IDX, ic) && op->aop->type == AOP_DIR)
+        for (i = 0; i < op->aop->size; i++)
+          emit3_o (A_TNZ, op->aop, i, 0, 0);
+      else
+        {
+          if (!regDead (A_IDX, ic))
+            push (ASMOP_A, 0 ,1);
+          for (i = 0; i < op->aop->size; i++)
+            cheapMove (ASMOP_A, 0, op->aop, i, FALSE);
+          if (!regDead (A_IDX, ic))
+            pop (ASMOP_A, 0, 1);
+        }
 
       freeAsmop (op);
     }

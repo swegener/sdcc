@@ -2,8 +2,9 @@
 
 	* src/stm8/gen.c:
 	  Improve code for dummy read.
-	* support/regression/tests/gcc-torture-execute-pr38212.c:
-	  Enable a test that no longer fails.
+	* support/regression/tests/gcc-torture-execute-pr38212.c,
+	  support/regression/tests/cse.c:
+	  Enable tests that no longer fail.
 
 2018-10-29 Philipp Klaus Krause <pkk AT spth.de>
 

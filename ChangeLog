@@ -4,6 +4,7 @@
 	  sim/ucsim/sim.src/hw.cc,
 	  sim/ucsim/sim.src/serial_hw.cc,
 	  sim/ucsim/sim.src/simifcl.h,
+	  sdas/linksrc/lklibr.c,
 	  src/SDCCerr.c,
 	  src/SDCCerr.h:
 	  Cherry-pick a few spelling fixes from Debian.

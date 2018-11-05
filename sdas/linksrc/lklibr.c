@@ -124,7 +124,7 @@ addpath (void)
 
 /*)Function VOID    addlib()
  *
- *  The function addlib() tests for the existance of a
+ *  The function addlib() tests for the existence of a
  *  library path structure to determine the method of
  *  adding this library file to the library search structure.
  *

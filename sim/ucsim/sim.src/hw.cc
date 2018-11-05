@@ -338,7 +338,7 @@ cl_hw::handle_input(int c)
       break;
     case 't'-'a'+1:
       uc->reset();
-      io->dd_printf("CPU reseted.");
+      io->dd_printf("CPU reset.");
       break;
     case 'q'-'a'+1:
       uc->sim->state|= SIM_QUIT;

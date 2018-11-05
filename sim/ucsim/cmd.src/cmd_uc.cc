@@ -77,7 +77,7 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
   con->dd_printf("Max value of stack pointer= 0x%06x, avg= 0x%06x\n",
 		 uc->sp_max, uc->sp_avg);
   con->dd_printf("Simulation: %s\n",
-		 (uc->sim->state & SIM_GO)?"runnig":"stopped");
+		 (uc->sim->state & SIM_GO)?"running":"stopped");
   return(0);
 }
 

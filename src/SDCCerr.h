@@ -269,7 +269,7 @@ enum {
   E_QUALIFIED_ARRAY_PARAM_C99   = 240, /* qualifiers in array parameters require ISO C99 or later */
   E_QUALIFIED_ARRAY_NOPARAM     = 241, /* qualifier or static in array declarator that is not a parameter */
   E_STATIC_ARRAY_PARAM_C99      = 242, /* static in array parameters requires ISO C99 or later */
-  E_INT_MULTIPLE                = 243, /* mutiple interrupt numbers */
+  E_INT_MULTIPLE                = 243, /* multiple interrupt numbers */
   W_INCOMPAT_PTYPES             = 244, /* incompatible pointer assignment (not allowed by the standard, but allowed in SDCC) */
   E_STATIC_ASSERTION_C2X        = 245, /* static assertion with one argument requires C2X or later */
   W_STATIC_ASSERTION_2          = 246, /* static assertion failed */

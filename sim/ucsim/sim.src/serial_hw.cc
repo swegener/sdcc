@@ -317,7 +317,7 @@ cl_serial_hw::proc_input(void)
 		case 'T':
 		  uc->reset();
 		  menu= 0;
-		  io->dd_printf("CPU reseted.\n");
+		  io->dd_printf("CPU reset.\n");
 		  break;
 		case 'q': case 'Q': case 'q'-'a'+1:
 		  // kill

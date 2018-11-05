@@ -174,7 +174,7 @@ class cl_sif_detect: public cl_sif_command
 public:
   cl_sif_detect(class cl_simulator_interface *the_sif):
     cl_sif_command(SIFCM_DETECT, "if_detect",
-		   "Detect existance of interface",
+		   "Detect existence of interface",
 		   SIFAT_BYTE, 0, the_sif)
   {}
   virtual void produce_answer(void) { set_answer(t_mem(DETECT_SIGN)); }

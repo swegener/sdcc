@@ -1,3 +1,13 @@
+2018-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* sim/ucsim/cmd.src/cmd_uc.cc,
+	  sim/ucsim/sim.src/hw.cc,
+	  sim/ucsim/sim.src/serial_hw.cc,
+	  sim/ucsim/sim.src/simifcl.h,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h:
+	  Cherry-pick a few spelling fixes from Debian.
+
 2018-10-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

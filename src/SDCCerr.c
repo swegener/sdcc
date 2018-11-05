@@ -542,7 +542,7 @@ struct
   { E_STATIC_ARRAY_PARAM_C99, ERROR_LEVEL_ERROR,
     "static in array parameters requires ISO C99 or later", 0},
   { E_INT_MULTIPLE, ERROR_LEVEL_ERROR,
-    "mutiple interrupt numbers for '%s'", 0},
+    "multiple interrupt numbers for '%s'", 0},
   { W_INCOMPAT_PTYPES, ERROR_LEVEL_WARNING,
      "pointer types incompatible ", 0 },
   { E_STATIC_ASSERTION_C2X, ERROR_LEVEL_ERROR,

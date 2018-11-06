@@ -1,3 +1,8 @@
+2018-11-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCopt.c:
+	  Apply % to & optimization in a few more cases.
+
 2018-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* sim/ucsim/cmd.src/cmd_uc.cc,

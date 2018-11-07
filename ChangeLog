@@ -1,3 +1,11 @@
+2018-11-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/stm8/gen.c:
+	  Improve code generation for some multiplications.
+	* sim/ucsim/stm8.src/stm8.cc,
+	  sim/ucsim/stm8.src/inst.cc:
+	  Improve accuracy of timing in stm8 simulator.
+
 2018-11-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCCopt.c:

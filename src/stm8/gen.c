@@ -3981,7 +3981,7 @@ genMultLit (const iCode *ic)
   if(!regDead (X_IDX, ic))
     push (ASMOP_X, 0, 2);
   genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
-  if (!add_aop)
+  if (!add_aop && isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, 0)) < 0)
     push (ASMOP_X, 0, 2);
 
   /* Generate a sequence of shifts, additions and subtractions based on the canonical signed digit representation of the literal operand */
@@ -4010,7 +4010,7 @@ genMultLit (const iCode *ic)
       }
   }
 
-  if (!add_aop)
+  if (!add_aop && isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, 0)) < 0)
     adjustStack (2, regDead (A_IDX, ic), FALSE, regDead (Y_IDX, ic));
   genMove (result->aop, ASMOP_X, regDead (A_IDX, ic), TRUE, regDead (Y_IDX, ic));
   if (regDead (XL_IDX, ic) ^ regDead (XH_IDX, ic))
@@ -4044,7 +4044,11 @@ genMult (const iCode *ic)
   aopOp (IC_RIGHT (ic), ic);
   aopOp (IC_RESULT (ic), ic);
 
-  if ((left->aop->size == 2 || right->aop->size == 2) && result->aop->size == 2 && (left->aop->type == AOP_LIT || right->aop->type == AOP_LIT))
+  if ((left->aop->size == 2 || right->aop->size == 2) && result->aop->size == 2 && (left->aop->type == AOP_LIT || right->aop->type == AOP_LIT) ||
+    // Some multiplications by powers of two originating from pointer additions reach here and are more efficiently done by genMultLit().
+      (aopInReg (result->aop, 0, X_IDX) || (optimize.codeSpeed || !regDead (A_IDX, ic)) && aopInReg (result->aop, 0, Y_IDX)) &&
+        result->aop->size == 2 && left->aop->size == 1 && right->aop->type == AOP_LIT &&
+        (aopIsLitVal (right->aop, 0, 1, 4) || (optimize.codeSpeed || !regDead (A_IDX, ic)) && aopIsLitVal (right->aop, 0, 1, 8)))
     {
       freeAsmop (right);
       freeAsmop (left);

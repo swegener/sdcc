@@ -1205,7 +1205,8 @@ cl_stm8::exec_inst(void)
                pop1(tempi);
                store1(opaddr, tempi);
                return(resGO);
-            case 0x40: //mul
+            case 0x40: // mul
+               tick(3);
                if(cprefix==0x90) {
                   regs.Y = (regs.Y&0xff) * regs.A;
                } else if(cprefix==0x00) {

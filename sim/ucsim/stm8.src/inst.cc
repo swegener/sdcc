@@ -795,7 +795,10 @@ cl_stm8::inst_jr(t_mem code, unsigned char prefix)
 
   ofs = fetch();
   if (taken)
-    PC += ofs;
+    {
+      PC += ofs;
+      tick(1);
+    }
   return(resGO);
 }
 
@@ -826,6 +829,9 @@ cl_stm8::inst_ldxy(t_mem code, unsigned char prefix)
 {
   unsigned int operand;
   u16_t *dest_ptr;
+
+  tick(1);
+
   dest_ptr = (prefix == 0x90) ? &regs.Y : &regs.X;
   if((prefix == 0x00 && code == 0x16) || (prefix == 0x91 && code == 0xce) || (prefix == 0x91 && code == 0xde)) dest_ptr = &regs.Y;
 
@@ -903,6 +909,8 @@ cl_stm8::inst_ldxydst(t_mem code, unsigned char prefix)
 {
   /* ldw dst, REG */
   unsigned int opaddr, operand;
+
+  tick(1);
 
   switch ((((code & 0xf0) | (prefix << 8)) >> 4) & 0xfff)
     {

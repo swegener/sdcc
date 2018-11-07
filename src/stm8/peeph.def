@@ -77,6 +77,18 @@ replace restart {
 } if notVolatile(%1), notVolatile(%2)
 
 replace restart {
+	ldw	(%1, sp), %2
+	ld	a, (%2)
+	%3	a
+	ldw	%2, (%1, sp)
+} by {
+	ldw	(%1, sp), %2
+	ld	a, (%2)
+	%3	a
+	; peephole 4c removed redundant load from (%1, sp) into %2.
+}
+
+replace restart {
 	ld	%1, a
 	exg	a, %1
 } by {

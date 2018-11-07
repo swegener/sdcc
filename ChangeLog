@@ -5,6 +5,8 @@
 	* sim/ucsim/stm8.src/stm8.cc,
 	  sim/ucsim/stm8.src/inst.cc:
 	  Improve accuracy of timing in stm8 simulator.
+	* src/stm8/peeph.def:
+	  Peephole rule to improve shifting via spilled pointers.
 
 2018-11-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

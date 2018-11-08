@@ -4,6 +4,7 @@
 
 #include <testfwk.h>
 
+#if 0
 float cast1 (float a)
 {
   return !(int)a;
@@ -13,6 +14,7 @@ float cast2 (_Bool b)
 {
   return b;
 }
+#endif
 
 const float b0 = 0.0f;
 const float b1 = 1.0f;

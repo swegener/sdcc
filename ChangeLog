@@ -1,4 +1,9 @@
-2018-11-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2018-11-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/bug-2833.c:
+	  Test for bug #2833.
+
+2018-11-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
 	  Improve code generation for some multiplications.
@@ -8,7 +13,7 @@
 	* src/stm8/peeph.def:
 	  Peephole rule to improve shifting via spilled pointers.
 
-2018-11-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2018-11-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:
 	  Apply % to & optimization in a few more cases.

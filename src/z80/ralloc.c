@@ -2970,8 +2970,8 @@ serialRegMark (eBBlock ** ebbs, int count)
     }
 }
 
-static void
-RegFix (eBBlock ** ebbs, int count)
+void
+Z80RegFix (eBBlock ** ebbs, int count)
 {
   int i;
 
@@ -3167,31 +3167,11 @@ z80_ralloc (ebbIndex *ebbi)
   /* The new register allocator invokes its magic */
   ic = z80_ralloc2_cc (ebbi);
 
-  RegFix (ebbs, count);
-
-  /* if stack was extended then tell the user */
-  if (_G.stackExtend)
-    {
-/*      werror(W_TOOMANY_SPILS,"stack", */
-/*             _G.stackExtend,currFunc->name,""); */
-      _G.stackExtend = 0;
-    }
-
-  if (_G.dataExtend)
-    {
-/*      werror(W_TOOMANY_SPILS,"data space", */
-/*             _G.dataExtend,currFunc->name,""); */
-      _G.dataExtend = 0;
-    }
-
   if (options.dump_i_code)
     {
       dumpEbbsToFileExt (DUMP_RASSGN, ebbi);
       dumpLiveRanges (DUMP_LRANGE, liveRanges);
     }
-
-  /* redo that offsets for stacked automatic variables */
-  redoStackOffsets ();
 
   genZ80Code (ic);
 

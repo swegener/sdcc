@@ -1602,7 +1602,7 @@ static bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
             sym->regs[i] = 0;
           sym->accuse = 0;
           sym->nRegs = I[v].size;
-          //spillThis(sym); Leave it to regFix, which can do some spillocation compaction. Todo: Use Thorup instead.
+          //spillThis(sym); Leave it to Z80RegFix, which can do some spillocation compaction. Todo: Use Thorup instead.
           sym->isspilt = false;
         }
     }
@@ -1665,6 +1665,8 @@ void move_parms(void)
 
 iCode *z80_ralloc2_cc(ebbIndex *ebbi)
 {
+  eBBlock **const ebbs = ebbi->bbOrder;
+  const int count = ebbi->count;
   iCode *ic;
 
 #ifdef DEBUG_RALLOC_DEC
@@ -1702,6 +1704,14 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
   guessCounts (ic, ebbi);
 
   z80_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
+
+  Z80RegFix (ebbs, count);
+
+  //_G.stackExtend = 0;
+  //_G.dataExtend = 0;
+
+  /* redo that offsets for stacked automatic variables */
+  redoStackOffsets ();
 
   return(ic);
 }

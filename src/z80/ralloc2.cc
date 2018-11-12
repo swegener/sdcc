@@ -22,6 +22,7 @@
 // #define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (much more verbose than the one above).
 
 #include "SDCCralloc.hpp"
+#include "SDCCsalloc.hpp"
 
 extern "C"
 {
@@ -181,7 +182,7 @@ assign_cost(const assignment &a, unsigned short int i, const G_t &G, const I_t &
   if(!right || !IS_SYMOP(right) || !result || !IS_SYMOP(result) || POINTER_GET(ic) || POINTER_SET(ic))
     return(default_instruction_cost(a, i, G, I));
 
-  reg_t byteregs[4] = {-1, -1, -1, -1}; // Todo: Change this when sdcc supports variables larger than 4 bytes.
+  reg_t byteregs[4] = {-1, -1, -1, -1}; // Todo: Change this when sdcc supports variables larger than 4 bytes in register allocation for z80.
 
   operand_map_t::const_iterator oi, oi_end;
 
@@ -1535,8 +1536,8 @@ static void extra_ic_generated(iCode *ic)
     }
 }
 
-template <class T_t, class G_t, class I_t>
-static bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
+template <class T_t, class G_t, class I_t, class SI_t>
+bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
 {
   bool assignment_optimal;
 
@@ -1602,13 +1603,18 @@ static bool tree_dec_ralloc(T_t &T, const G_t &G, const I_t &I)
             sym->regs[i] = 0;
           sym->accuse = 0;
           sym->nRegs = I[v].size;
-          //spillThis(sym); Leave it to Z80RegFix, which can do some spillocation compaction. Todo: Use Thorup instead.
-          sym->isspilt = false;
+          if (USE_OLDSALLOC)
+            sym->isspilt = false; // Leave it to Z80RegFix, which can do some spillocation compaction.
+          else
+            spillThis(sym);
         }
     }
 
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
     set_surviving_regs(winner, i, G, I);
+
+  if (!USE_OLDSALLOC)
+    set_spilt(G, I, SI);
 
   return(!assignment_optimal);
 }
@@ -1703,15 +1709,19 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
 
   guessCounts (ic, ebbi);
 
-  z80_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
+  scon_t stack_conflict_graph;
+
+  z80_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph, stack_conflict_graph);
 
   Z80RegFix (ebbs, count);
 
-  //_G.stackExtend = 0;
-  //_G.dataExtend = 0;
+  if (USE_OLDSALLOC)
+    redoStackOffsets ();
+  else
+    chaitin_salloc(stack_conflict_graph); // new Chaitin-style stack allocator
 
-  /* redo that offsets for stacked automatic variables */
-  redoStackOffsets ();
+  if(options.dump_graphs && !USE_OLDSALLOC)
+    dump_scon(stack_conflict_graph);
 
   return(ic);
 }

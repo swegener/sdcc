@@ -74,6 +74,8 @@ enum
   D_PACK_HLUSE3 = 0
 };
 
+// #define D_ALLOC 1
+
 #if 1
 #define D(_a, _s)       if (_a)  { printf _s; fflush(stdout); }
 #else
@@ -447,11 +449,11 @@ createStackSpil (symbol * sym)
   symbol *sloc = NULL;
   struct dbuf_s dbuf;
 
-  D (D_ALLOC, ("createStackSpil: for sym %p\n", sym));
+  D (D_ALLOC, ("createStackSpil: for sym %p (%s)\n", sym, sym->name));
 
   /* first go try and find a free one that is already
      existing on the stack */
-  if (applyToSet (_G.stackSpil, isFree, &sloc, sym))
+  if (applyToSet (_G.stackSpil, isFree, &sloc, sym) && USE_OLDSALLOC)
     {
       /* found a free one : just update & return */
       sym->usl.spillLoc = sloc;
@@ -506,7 +508,7 @@ createStackSpil (symbol * sym)
      of the spill location */
   addSetHead (&sloc->usl.itmpStack, sym);
 
-  D (D_ALLOC, ("createStackSpil: created new\n"));
+  D (D_ALLOC, ("createStackSpil: created new %s for %s\n", sloc->name, sym->name));
   return sym;
 }
 
@@ -518,17 +520,15 @@ spillThis (symbol * sym)
 {
   int i;
 
-  D (D_ALLOC, ("spillThis: spilling %p\n", sym));
-
-  sym->for_newralloc = 0;
+  D (D_ALLOC, ("spillThis: spilling %p (%s)\n", sym, sym->name));
 
   /* if this is rematerializable or has a spillLocation
      we are okay, else we need to create a spillLocation
      for it */
   if (!(sym->remat || sym->usl.spillLoc) || (sym->usl.spillLoc && !sym->usl.spillLoc->onStack)) // z80 port currently only supports on-stack spill locations in code generation.
-    {
-      createStackSpil (sym);
-    }
+    createStackSpil (sym);
+  else
+    D (D_ALLOC, ("Already has spilllocation %p, %s\n", sym->usl.spillLoc, sym->usl.spillLoc->name));
 
   /* mark it as spilt & put it in the spilt set */
   sym->isspilt = sym->spillA = 1;
@@ -1037,7 +1037,7 @@ tryAllocatingRegPair (symbol * sym)
 /* the operand in a valid state.                                    */
 /*------------------------------------------------------------------*/
 static void
-verifyRegsAssigned (operand * op, iCode * ic)
+verifyRegsAssigned (operand *op, iCode *ic)
 {
   symbol *sym;
 
@@ -1054,7 +1054,7 @@ verifyRegsAssigned (operand * op, iCode * ic)
   if (sym->regs[0])
     return;
 
-  // Don't warn for new allocator, since this is not used by default (until Thoruop is implemented for spillocation compaction).
+  // Don't warn for new allocator, since this is now used by default.
   if (options.oldralloc)
     werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT, sym->prereqv ? sym->prereqv->name : sym->name);
   spillThis (sym);
@@ -1656,7 +1656,7 @@ regTypeNum (void)
 
           if (sym->nRegs > 8)
             {
-              fprintf (stderr, "allocated more than 8 egisters for type ");
+              fprintf (stderr, "allocated more than 8 registers for type ");
               printTypeChain (sym->type, stderr);
               fprintf (stderr, "\n");
             }
@@ -2923,7 +2923,7 @@ serialRegMark (eBBlock ** ebbs, int count)
             {
               symbol *sym = OP_SYMBOL (IC_RESULT (ic));
 
-              D (D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
+              D (D_ALLOC, ("serialRegAssign: in loop on result %p (%s)\n", sym, sym->name));
 
               /* Make sure any spill location is definately allocated */
               if (sym->isspilt && !sym->remat && sym->usl.spillLoc && !sym->usl.spillLoc->allocreq)
@@ -2947,12 +2947,21 @@ serialRegMark (eBBlock ** ebbs, int count)
               if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq)
                 {
                   D (D_ALLOC, ("serialRegAssign: \"spilling to be safe.\"\n"));
+                  sym->for_newralloc = 0;
                   spillThis (sym);
                   continue;
                 }
 
+              if (sym->usl.spillLoc && !sym->usl.spillLoc->_isparm && !USE_OLDSALLOC) // I have no idea where these spill locations come from. Sometime two symbols even have the same spill location, whic tends to mess up stack allocation. THose that come from previous iterations in this loop would be okay, but those from outside are a problem.
+                {
+                  sym->usl.spillLoc = 0;
+                  sym->isspilt = false;
+                }
+
               if (sym->nRegs > 4) /* TODO. Change this once we can allocate bigger variables (but still spill when its a big return value). */
                 {
+                  D (D_ALLOC, ("Spilling %s (too large)\n", sym->name));
+                  sym->for_newralloc = 0;
                   spillThis (sym);
                 }
               else if (max_alloc_bytes >= sym->nRegs)
@@ -3023,7 +3032,7 @@ z80_oldralloc (ebbIndex * ebbi)
   iCode *ic;
   int i;
 
-  D (D_ALLOC, ("\n-> z80_assignRegisters: entered.\n"));
+  D (D_ALLOC, ("\n-> z80_oldralloc: entered for %s.\n", currFunc ? currFunc->name : "[no function]"));
 
   setToNull ((void *) &_G.funcrUsed);
   setToNull ((void *) &_G.totRegAssigned);
@@ -3123,7 +3132,7 @@ z80_ralloc (ebbIndex *ebbi)
   iCode *ic;
   int i;
 
-  D (D_ALLOC, ("\n-> z80_assignRegisters: entered.\n"));
+  D (D_ALLOC, ("\n-> z80_ralloc: entered for %s.\n", currFunc ? currFunc->name : "[no function]"));
 
   setToNull ((void *) &_G.funcrUsed);
   setToNull ((void *) &_G.totRegAssigned);

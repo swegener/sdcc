@@ -1033,6 +1033,25 @@ allocVariables (symbol * symChain)
   return stack;
 }
 
+void
+clearStackOffsets (void)
+{
+  const symbol *sym;
+  
+  for (sym = setFirstItem (istack->syms); sym;
+       sym = setNextItem (istack->syms))
+    {
+      const int size = getSize (sym->type);
+      
+      /* nothing to do with parameters so continue */
+      if ((sym->_isparm && !IS_REGPARM (sym->etype)))
+        continue;
+        
+      currFunc->stack -= size;
+      SPEC_STAK (currFunc->etype) -= size;
+    }
+}
+
 #define BTREE_STACK 1
 
 /*-----------------------------------------------------------------*/

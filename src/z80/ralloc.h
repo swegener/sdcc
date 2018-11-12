@@ -29,6 +29,8 @@
 
 #define DEBUG_FAKE_EXTRA_REGS 	0
 
+#define USE_OLDSALLOC 0 // Change to 1 to use old stack allocator
+
 enum
 {
   A_IDX = 0,

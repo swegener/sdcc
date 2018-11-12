@@ -7,6 +7,14 @@
 	  Fix bug #2833 (patch by Noam Preil).
 	* src/z80/gen.c:
 	  Minor improvements in handling on-stack variables.
+	* src/SDCCsalloc.hpp,
+	  src/SDCCmem.c,
+	  src/SDCCmem.h,
+	  src/SDCCralloc.hpp,
+	  src/z80/ralloc.c,
+	  src/z80/ralloc.h,
+	  src/z80/ralloc2.cc:
+	  New default stack allocator for z80 and related: aligned Chaitin.
 
 2018-11-11 Philipp Klaus Krause <pkk AT spth.de>
 

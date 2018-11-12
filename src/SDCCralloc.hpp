@@ -196,6 +196,8 @@ struct cfg_node
   cfg_alive_t alive;
   cfg_dying_t dying;
 
+  std::set<var_t> stack_alive;
+
 #ifdef DEBUG_SEGV
   cfg_node(void);
 #endif

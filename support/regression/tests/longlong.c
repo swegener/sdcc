@@ -267,7 +267,7 @@ testLongLong (void)
   ASSERT (bitNotULL (y) == (~0x69aaaaaaaaaa55aaull));
 #endif
 
-  c(); // Unused long long return value require special handling in register allocation.
+  c(); // Unused long long return value requires special handling in register allocation.
 #endif
 }
 

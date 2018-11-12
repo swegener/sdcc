@@ -296,6 +296,13 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
       goto found;
     }
 
+  if (IS_BOOLEAN (type))
+    {
+      wassert(multypes[0][1] == UCHARTYPE);
+      func = conv[0][0][1];
+      goto found;
+    }
+
   assert (0);
 found:
 

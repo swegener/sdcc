@@ -21,6 +21,8 @@
 	  src/z80/ralloc.h,
 	  src/z80/ralloc2.cc:
 	  Prepare for new stack allocator for stm8.
+	* src/stm8/gen.c:
+	  Fix an issue in code generation for comparisons.
 
 2018-11-11 Philipp Klaus Krause <pkk AT spth.de>
 

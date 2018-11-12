@@ -15,6 +15,12 @@
 	  src/z80/ralloc.h,
 	  src/z80/ralloc2.cc:
 	  New default stack allocator for z80 and related: aligned Chaitin.
+	* src/stm8/ralloc.c,
+	  src/stm8/ralloc.h,
+	  src/stm8/ralloc2.cc,
+	  src/z80/ralloc.h,
+	  src/z80/ralloc2.cc:
+	  Prepare for new stack allocator for stm8.
 
 2018-11-11 Philipp Klaus Krause <pkk AT spth.de>
 

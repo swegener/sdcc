@@ -22,6 +22,7 @@
 // #define DEBUG_RALLOC_DEC_ASS // Uncomment to get debug messages about assignments while doing register allocation on the tree decomposition (much more verbose than the one above).
 
 #include "SDCCralloc.hpp"
+#include "SDCCsalloc.hpp"
 
 extern "C"
 {
@@ -488,7 +489,7 @@ static void extra_ic_generated(iCode *ic)
 }
 
 template <class T_t, class G_t, class I_t>
-static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
+bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
 {
   bool assignment_optimal;
 
@@ -548,7 +549,8 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
 
 iCode *stm8_ralloc2_cc(ebbIndex *ebbi)
 {
-  iCode *ic;
+  eBBlock **const ebbs = ebbi->bbOrder;
+  const int count = ebbi->count;
 
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Processing " << currFunc->name << " from " << dstFileName << "\n"; std::cout.flush();
@@ -558,7 +560,7 @@ iCode *stm8_ralloc2_cc(ebbIndex *ebbi)
 
   con_t conflict_graph;
 
-  ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
+  iCode *ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
 
   if(options.dump_graphs)
     dump_cfg(control_flow_graph);
@@ -581,7 +583,14 @@ iCode *stm8_ralloc2_cc(ebbIndex *ebbi)
 
   guessCounts (ic, ebbi);
 
+  scon_t stack_conflict_graph;
+
   stm8_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
+
+  stm8RegFix (ebbs, count);
+
+  if(options.dump_graphs)
+    dump_scon(stack_conflict_graph);
 
   return(ic);
 }

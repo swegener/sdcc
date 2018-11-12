@@ -1673,7 +1673,6 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
 {
   eBBlock **const ebbs = ebbi->bbOrder;
   const int count = ebbi->count;
-  iCode *ic;
 
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Processing " << currFunc->name << " from " << dstFileName << "\n"; std::cout.flush();
@@ -1683,7 +1682,7 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
 
   con_t conflict_graph;
 
-  ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
+    iCode *ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
 
   should_omit_frame_ptr = omit_frame_ptr(control_flow_graph);
   move_parms();

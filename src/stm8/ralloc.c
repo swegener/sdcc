@@ -735,8 +735,8 @@ verifyRegsAssigned (operand * op, iCode * ic)
   spillThis (sym, FALSE);
 }
 
-static void
-RegFix (eBBlock ** ebbs, int count)
+void
+stm8RegFix (eBBlock ** ebbs, int count)
 {
   int i;
 
@@ -812,9 +812,6 @@ stm8_assignRegisters (ebbIndex *ebbi)
   /* Invoke optimal register allocator */
   ic = stm8_ralloc2_cc (ebbi);
 
-  /* Get spilllocs for all variables that have not been placed completely in regs */
-  RegFix (ebbs, count);
-
   /* redo the offsets for stacked automatic variables */
   if (currFunc)
     {
@@ -834,9 +831,6 @@ stm8_assignRegisters (ebbIndex *ebbi)
 
           /* Invoke optimal register allocator */
           ic = stm8_ralloc2_cc (ebbi);
-
-          /* Get spilllocs for all variables that have not been placed completely in regs */
-          RegFix (ebbs, count);
 
           redoStackOffsets ();
         }

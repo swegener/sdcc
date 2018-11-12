@@ -90,6 +90,5 @@ bitVect *z80_rUmaskForOp (const operand * op);
 void spillThis (symbol *);
 iCode *z80_ralloc2_cc(ebbIndex *ebbi);
 
-void
-Z80RegFix (eBBlock ** ebbs, int count);
+void Z80RegFix (eBBlock ** ebbs, int count);
 #endif

@@ -64,5 +64,6 @@ void stm8_assignRegisters (ebbIndex *);
 
 iCode *stm8_ralloc2_cc(ebbIndex *ebbi);
 
+void stm8RegFix (eBBlock ** ebbs, int count);
 #endif
 

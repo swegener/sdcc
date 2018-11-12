@@ -1447,6 +1447,11 @@ sameRegs (asmop * aop1, asmop * aop2)
   if (aop1 == aop2)
     return TRUE;
 
+  if (! regalloc_dry_run && // Todo: Check if always enabling this even for dry runs tends to result in better code.
+    (aop1->type == AOP_STK && aop2->type == AOP_STK ||
+    aop1->type == AOP_EXSTK && aop2->type == AOP_EXSTK))
+    return (aop1->aopu.aop_stk == aop2->aopu.aop_stk);
+
   if (aop1->type != AOP_REG || aop2->type != AOP_REG)
     return FALSE;
 
@@ -4289,7 +4294,7 @@ emitCall (const iCode *ic, bool ispcall)
     }
   else if ((ic->parmBytes || bigreturn))
     {
-      adjustStack (ic->parmBytes + bigreturn * 2, !IS_TLCS90, TRUE, !SomethingReturned, !IY_RESERVED);
+      adjustStack (ic->parmBytes + bigreturn * 2, !IS_TLCS90, TRUE, !SomethingReturned || bigreturn, !IY_RESERVED);
 
       if (regalloc_dry_run)
         _G.stack.pushed += ic->parmBytes + bigreturn * 2;
@@ -10513,7 +10518,7 @@ genAssign (const iCode * ic)
   /* if they are the same registers */
   if (sameRegs (AOP (right), AOP (result)))
     {
-      emitDebug ("; (registers are the same)");
+      emitDebug ("; (locations are the same)");
       goto release;
     }
 

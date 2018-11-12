@@ -5,6 +5,8 @@
 	* src/SDCCopt.c,
 	  support/regression/tests/bug-2833.c:
 	  Fix bug #2833 (patch by Noam Preil).
+	* src/z80/gen.c:
+	  Minor improvements in handling on-stack variables.
 
 2018-11-11 Philipp Klaus Krause <pkk AT spth.de>
 

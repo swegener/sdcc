@@ -165,12 +165,12 @@ createStackSpil (symbol * sym)
 /*-----------------------------------------------------------------*/
 /* spillThis - spils a specific operand                            */
 /*-----------------------------------------------------------------*/
-static void
-spillThis (symbol *sym, bool force_spill)
+void
+stm8SpillThis (symbol *sym, bool force_spill)
 {
   int i;
 
-  D (D_ALLOC, ("spillThis: spilling %p (%s)\n", sym, sym->name));
+  D (D_ALLOC, ("stm8SpillThis: spilling %p (%s)\n", sym, sym->name));
 
   sym->for_newralloc = 0;
 
@@ -680,7 +680,8 @@ serialRegMark (eBBlock ** ebbs, int count)
 
               if (sym->nRegs > 4 && ic->op == CALL)
                 {
-                  spillThis (sym, TRUE);
+                  sym->for_newralloc = 0;
+                  stm8SpillThis (sym, TRUE);
                 }
               else if (max_alloc_bytes >= sym->nRegs)
                 {
@@ -689,7 +690,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                 }
               else if (!sym->for_newralloc)
                 {
-                  spillThis (sym, TRUE);
+                  stm8SpillThis (sym, TRUE);
                   printf ("Spilt %s due to byte limit.\n", sym->name);
                 }
             }
@@ -732,7 +733,7 @@ verifyRegsAssigned (operand * op, iCode * ic)
   if (completely_in_regs)
     return;
 
-  spillThis (sym, FALSE);
+  stm8SpillThis (sym, FALSE);
 }
 
 void

@@ -488,8 +488,8 @@ static void extra_ic_generated(iCode *ic)
     }
 }
 
-template <class T_t, class G_t, class I_t>
-bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
+template <class T_t, class G_t, class I_t, class SI_t>
+static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
 {
   bool assignment_optimal;
 
@@ -532,11 +532,18 @@ bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I)
   for(unsigned int v = 0; v < boost::num_vertices(I); v++)
     {
       symbol *sym = (symbol *)(hTabItemWithKey(liveRanges, I[v].v));
+      bool spilt = false;
 
       if(winner.global[v] >= 0)
         sym->regs[I[v].byte] = stm8_regs + winner.global[v];   
       else
-        sym->regs[I[v].byte] = 0;
+        {
+          sym->regs[I[v].byte] = 0;
+          spilt = true;
+        }
+
+      if(spilt)
+        stm8SpillThis(sym, true);
 
       sym->nRegs = I[v].size;
     }
@@ -585,7 +592,7 @@ iCode *stm8_ralloc2_cc(ebbIndex *ebbi)
 
   scon_t stack_conflict_graph;
 
-  stm8_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph);
+  stm8_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph, stack_conflict_graph);
 
   stm8RegFix (ebbs, count);
 

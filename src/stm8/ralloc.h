@@ -62,6 +62,7 @@ extern reg_info stm8_regs[];
 
 void stm8_assignRegisters (ebbIndex *);
 
+void stm8SpillThis (symbol *sym, bool force_spill);
 iCode *stm8_ralloc2_cc(ebbIndex *ebbi);
 
 void stm8RegFix (eBBlock ** ebbs, int count);

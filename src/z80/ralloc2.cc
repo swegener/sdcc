@@ -1537,7 +1537,7 @@ static void extra_ic_generated(iCode *ic)
 }
 
 template <class T_t, class G_t, class I_t, class SI_t>
-bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
+static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
 {
   bool assignment_optimal;
 
@@ -1606,7 +1606,7 @@ bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
           if (USE_OLDSALLOC)
             sym->isspilt = false; // Leave it to Z80RegFix, which can do some spillocation compaction.
           else
-            spillThis(sym);
+            z80SpillThis(sym);
         }
     }
 

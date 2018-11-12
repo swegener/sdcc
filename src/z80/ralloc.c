@@ -134,7 +134,7 @@ reg_info *regsZ80;
 #define Z80_MAX_REGS ((sizeof(_z80_regs)/sizeof(_z80_regs[0]))-1)
 #define GBZ80_MAX_REGS ((sizeof(_gbz80_regs)/sizeof(_gbz80_regs[0]))-1)
 
-void spillThis (symbol *);
+void z80SpillThis (symbol *);
 static void freeAllRegs ();
 
 #ifdef OLDRALLOC
@@ -516,11 +516,11 @@ createStackSpil (symbol * sym)
 /* spillThis - spils a specific operand                            */
 /*-----------------------------------------------------------------*/
 void
-spillThis (symbol * sym)
+z80SpillThis (symbol * sym)
 {
   int i;
 
-  D (D_ALLOC, ("spillThis: spilling %p (%s)\n", sym, sym->name));
+  D (D_ALLOC, ("z80SpillThis: spilling %p (%s)\n", sym, sym->name));
 
   /* if this is rematerializable or has a spillLocation
      we are okay, else we need to create a spillLocation
@@ -657,8 +657,8 @@ selectSpil (iCode * ic, eBBlock * ebp, symbol * forSym)
 
   /* this is an extreme situation we will spill
      this one : happens very rarely but it does happen */
-  D (D_ALLOC, ("selectSpil: using spillThis.\n"));
-  spillThis (forSym);
+  D (D_ALLOC, ("selectSpil: using z80SpillThis.\n"));
+  z80SpillThis (forSym);
   return forSym;
 
 }
@@ -1057,7 +1057,7 @@ verifyRegsAssigned (operand *op, iCode *ic)
   // Don't warn for new allocator, since this is now used by default.
   if (options.oldralloc)
     werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT, sym->prereqv ? sym->prereqv->name : sym->name);
-  spillThis (sym);
+  z80SpillThis (sym);
 }
 
 #ifdef OLDRALLOC
@@ -1137,7 +1137,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
               if (_G.blockSpil && sym->liveTo > ebbs[i]->lSeq)
                 {
                   D (D_ALLOC, ("serialRegAssign: \"spilling to be safe.\"\n"));
-                  spillThis (sym);
+                  z80SpillThis (sym);
                   continue;
                 }
               /* if trying to allocate this will cause
@@ -1150,7 +1150,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                 {
 
                   D (D_ALLOC, ("serialRegAssign: \"remat spill\"\n"));
-                  spillThis (sym);
+                  z80SpillThis (sym);
                   continue;
 
                 }
@@ -1162,7 +1162,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                  symbol instead and let fillGaps handle the allocation. */
               if (sym->liveFrom < ic->seq)
                 {
-                  spillThis (sym);
+                  z80SpillThis (sym);
                   continue;
                 }
 
@@ -1176,7 +1176,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                                                                        allLRs, ebbs[i], ic));
                       if (leastUsed && leastUsed->used > sym->used)
                         {
-                          spillThis (sym);
+                          z80SpillThis (sym);
                           continue;
                         }
                     }
@@ -1189,7 +1189,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
                           /* if this is local to this block then we might find a block spil */
                           if (!(sym->liveFrom >= ebbs[i]->fSeq && sym->liveTo <= ebbs[i]->lSeq))
                             {
-                              spillThis (sym);
+                              z80SpillThis (sym);
                               continue;
                             }
                         }
@@ -2948,7 +2948,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                 {
                   D (D_ALLOC, ("serialRegAssign: \"spilling to be safe.\"\n"));
                   sym->for_newralloc = 0;
-                  spillThis (sym);
+                  z80SpillThis (sym);
                   continue;
                 }
 
@@ -2962,7 +2962,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                 {
                   D (D_ALLOC, ("Spilling %s (too large)\n", sym->name));
                   sym->for_newralloc = 0;
-                  spillThis (sym);
+                  z80SpillThis (sym);
                 }
               else if (max_alloc_bytes >= sym->nRegs)
                 {
@@ -2971,7 +2971,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                 }
               else if (!sym->for_newralloc)
                 {
-                  spillThis (sym);
+                  z80SpillThis (sym);
                   printf ("Spilt %s due to byte limit.\n", sym->name);
                 }
             }

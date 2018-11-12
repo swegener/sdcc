@@ -87,7 +87,7 @@ reg_info *regWithIdx (int);
 void z80_assignRegisters (ebbIndex *);
 bitVect *z80_rUmaskForOp (const operand * op);
 
-void spillThis (symbol *);
+void z80SpillThis (symbol *);
 iCode *z80_ralloc2_cc(ebbIndex *ebbi);
 
 void Z80RegFix (eBBlock ** ebbs, int count);

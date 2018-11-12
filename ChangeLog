@@ -1,3 +1,8 @@
+2018-11-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2834.c:
+	  Test for bug #2834.
+
 2018-11-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc.h,

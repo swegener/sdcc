@@ -6700,7 +6700,8 @@ genPointerGet (const iCode *ic)
   int size, i;
   unsigned offset;
   bool use_y;
-  bool pushed_a = FALSE;
+  bool pushed_x = false;
+  bool pushed_a = false;
   int blen, bstr;
   bool bit_field = IS_BITVAR (getSpec (operandType (result)));
   symbol *const tlbl = ((regalloc_dry_run || !bit_field) ? 0 : newiTempLabel (NULL));
@@ -6772,12 +6773,22 @@ genPointerGet (const iCode *ic)
     !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX)) ||
     !bit_field && size == 2 && aopInReg (result->aop, 0, Y_IDX) && aopInReg (left->aop, 0, X_IDX) && !regDead (X_IDX, ic);
 
-  if (use_y ? !(regDead (Y_IDX, ic) || aopInReg (left->aop, 0, Y_IDX)) : !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX)))
+  if (use_y ? !(regDead (Y_IDX, ic) || aopInReg (left->aop, 0, Y_IDX)) : !(regDead (X_IDX, ic) || aopInReg (left->aop, 0, X_IDX))) // Preferred index register is not free.
     {
-      if (!regalloc_dry_run)
-        wassertl (0, "No free reg for pointer.");
-      cost (180, 180);
-      goto release;
+      // Try to free an index register.
+      if (result->aop->regs[XL_IDX] < 0 && result->aop->regs[XH_IDX] < 0) 
+        {
+          push (ASMOP_X, 0, 2);
+          pushed_x = true;
+          use_y = false;
+        }
+      else
+        {
+          if (!regalloc_dry_run)
+            wassertl (0, use_y ? "No free reg y for pointer." : "No free reg x for pointer.");
+          cost (180, 180);
+          goto release;
+        }
     }
 
   if (left->aop->type == AOP_STL)
@@ -6903,6 +6914,9 @@ genPointerGet (const iCode *ic)
     }
 
 release:
+  if (pushed_x)
+    pop (ASMOP_X, 0, 2);
+
   freeAsmop (right);
   freeAsmop (left);
   freeAsmop (result);

@@ -13,6 +13,8 @@
 	  Improve float multiplication routine a bit.
 	* support/regression/tests/bug-2833.c:
 	  Disable a new test for ds390 (where it fails).
+	* src/stm8/gen.c:
+	  More flexible handling of register x in read from pointer.
 
 2018-11-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

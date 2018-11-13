@@ -939,7 +939,7 @@ aopForSym (const iCode *ic, symbol *sym)
   wassert (sym);
   wassert (sym->etype);
 
-  // Unlike other ports we really free asmops; to avoid a double-free, we need to support multiple asmops for the same symbol.
+  // Unlike other backends we really free asmops; to avoid a double-free, we need to support multiple asmops for the same symbol.
 
   if (IS_FUNC (sym->type))
     {
@@ -1550,7 +1550,7 @@ static void
 genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool a_dead, bool x_dead, bool y_dead)
 {
   int i, regsize, size, n = (sizex < source->size - soffset) ? sizex : (source->size - soffset);
-  bool assigned[8] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
+  bool assigned[8] = {false, false, false, false, false, false, false, false};
   bool a_free, x_free, y_free, xl_dead, xh_dead , yl_dead, yh_dead;
 
 #if 0
@@ -1577,7 +1577,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   for (i = 0; i < n; i++)
     if (result->aopu.bytes[roffset + i].in_reg && source->aopu.bytes[soffset + i].in_reg && result->aopu.bytes[roffset + i].byteu.reg == source->aopu.bytes[soffset + i].byteu.reg)
       {
-        assigned[i] = TRUE;
+        assigned[i] = true;
         regsize--;
         size--;
       }
@@ -1597,9 +1597,30 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       if (in_y ? y_free : x_free)
         {
           emit3w_o (A_CLRW, result, roffset + n - 1, 0, 0);
-          assigned[n] = TRUE;
+          assigned[n] = true;
         }
     }
+
+  // Handle stack locations that would be overwritten by data from registers
+  if (result->type == AOP_STK || result->type == AOP_REGSTK)
+    for (i = 0; i < n; i++)
+      {
+        if (assigned[i] || !aopOnStack (source, soffset + i, 1))
+          continue;
+        for (int j = i + 1; j < n; j++)
+          {
+            if (!source->aopu.bytes[soffset + j].in_reg)
+              continue;
+            if (!aopOnStack (result, roffset + j, 1))
+              continue;
+            if (result->aopu.bytes[roffset + j].byteu.stk != source->aopu.bytes[soffset + i].byteu.stk)
+              continue;
+
+            cheapMove (result, roffset + i, source, soffset + i, false);
+            assigned[i] = true;
+            size--;
+          }
+      }
 
   // Move everything from registers to the stack.
   for (i = 0; i < n;)
@@ -1661,7 +1682,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       else if (aopInReg (operand, offset, YL_IDX) || aopInReg (operand, offset, YH_IDX))
         y_free = FALSE;
     }
-  genCopyStack (result, roffset, source, soffset, n, assigned, &size, a_free, x_free, y_free, FALSE);
+  genCopyStack (result, roffset, source, soffset, n, assigned, &size, a_free, x_free, y_free, false);
 
   // Now do the register shuffling.
 

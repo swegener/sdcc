@@ -1,4 +1,10 @@
-2018-11-12 Philipp Klaus Krause <pkk AT spth.de>
+2018-11-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/oldfmul.c:
+	  Fix an issue in code generation for shifts found while experimenting with stack allocation.
+
+2018-11-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/bug-2834.c:
 	  Test for bug #2834.

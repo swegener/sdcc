@@ -85,7 +85,7 @@ enum
 #define DISABLE_PACKREGSFORSUPPORT      1
 #define DISABLE_PACKREGSFORACCUSE       1
 
-// Build the old allocator. It can be used by command-line options
+// Build the old register allocator. It can be used by command-line options
 #define OLDRALLOC 1
 
 extern void genZ80Code (iCode *);
@@ -444,7 +444,7 @@ DEFSETFUNC (isFree)
 /* createStackSpil - create a location on the stack to spil        */
 /*-----------------------------------------------------------------*/
 static symbol *
-createStackSpil (symbol * sym)
+createStackSpil (symbol *sym)
 {
   symbol *sloc = NULL;
   struct dbuf_s dbuf;
@@ -1114,7 +1114,7 @@ serialRegAssign (eBBlock ** ebbs, int count)
               int willCS;
               int j;
 
-              D (D_ALLOC, ("serialRegAssign: in loop on result %p\n", sym));
+              D (D_ALLOC, ("serialRegAssign: in loop on result %p %s\n", sym, sym->name));
 
               /* Make sure any spill location is definately allocated */
               if (sym->isspilt && !sym->remat && sym->usl.spillLoc && !sym->usl.spillLoc->allocreq)
@@ -1692,6 +1692,7 @@ freeAllRegs ()
 /*-----------------------------------------------------------------*/
 /* deallocStackSpil - this will set the stack pointer back         */
 /*-----------------------------------------------------------------*/
+static
 DEFSETFUNC (deallocStackSpil)
 {
   symbol *sym = item;
@@ -2935,7 +2936,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                  or is already assigned to registers (or marked for the new allocator)
                  or will not live beyond this instructions */
               if (!sym->nRegs ||
-                  sym->isspilt || bitVectBitValue (_G.regAssigned, sym->key) || sym->for_newralloc || (sym->liveTo <= ic->seq && (sym->nRegs <= 4 || ic->op != CALL)))
+                  sym->isspilt || bitVectBitValue (_G.regAssigned, sym->key) || sym->for_newralloc || (sym->liveTo <= ic->seq && (sym->nRegs <= 4 || ic->op != CALL && ic->op != PCALL)))
                 {
                   D (D_ALLOC, ("serialRegAssign: won't live long enough.\n"));
                   continue;

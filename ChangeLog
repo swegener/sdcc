@@ -3,6 +3,12 @@
 	* src/stm8/gen.c,
 	  support/regression/tests/oldfmul.c:
 	  Fix an issue in code generation for shifts found while experimenting with stack allocation.
+	* src/SDCCmem.c,
+	  src/SDCCsalloc.hpp,
+	  src/stm8/ralloc.c,
+	  src/stm8/ralloc2.cc,
+	  src/z80/ralloc.c:
+	  New stack allocator for stm8: aligned Chaitin.
 
 2018-11-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

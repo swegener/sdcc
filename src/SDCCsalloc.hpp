@@ -79,7 +79,9 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
     {
       if(sym->_isparm)
         continue;
-        
+
+      // std::cout << "set_spilt() 1: Considering " << sym->name << "\n";
+
       if(/*!(IS_AGGREGATE(sym->type) || sym->allocreq && (sym->addrtaken || isVolatile(sym->type)))*/sym->for_newralloc)
         continue;
 
@@ -90,7 +92,8 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
             if (!s->for_newralloc)
               {
 #ifdef DEBUG_SALLOC  
-                std::cout << "Adding " << sym->name << " for " << s->name << " to be allocated to stack. (" << s->for_newralloc << ")\n",
+                std::cout << "Adding " << sym->name << " for " << s->name << " to be allocated to stack. (" << s->for_newralloc << ")\n";
+		std::cout.flush();
 #endif
                 covered = false;
                 break;
@@ -140,7 +143,9 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
 
           symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
 
-          if (sym->regs[0] || sym->accuse || sym->remat || !sym->nRegs || sym->usl.spillLoc && sym->usl.spillLoc->_isparm)
+          // std::cout << "set_spilt() 2: Considering " << sym->name << "\n";
+
+          if ((sym->regs[0] && !sym->isspilt) || sym->accuse || sym->remat || !sym->nRegs || sym->usl.spillLoc && sym->usl.spillLoc->_isparm)
             continue;
 
           if (symbol_to_sindex.find(I[*v].v) == symbol_to_sindex.end())
@@ -216,16 +221,17 @@ void color_stack_var(const var_t v, SI_t &SI, int start, int *ssize)
   
   SI[v].color = start;
 
-  if(sym->isspilt && sym->usl.spillLoc)
-    SPEC_STAK(sym->usl.spillLoc->etype) = sym->usl.spillLoc->stack = (port->stack.direction > 0) ? start + 1 : -start - size;
-  else
-    SPEC_STAK(sym->etype) = sym->stack = (port->stack.direction > 0) ? start + 1 : -start - size;
+  const int sloc = (port->stack.direction > 0) ? start + 1 : -start - size ;
+  symbol *const ssym = (sym->isspilt && sym->usl.spillLoc) ? sym->usl.spillLoc : sym;
+
+  SPEC_STAK(ssym->etype) = ssym->stack = sloc;
     
   if(ssize)
     *ssize = (start + size > *ssize) ? start + size : *ssize;
 
 #ifdef DEBUG_SALLOC    
-  std::cout << "Placing " << sym->name << " at [" << start << ", " << (start + size - 1) << "]\n";
+  std::cout << "Placing " << sym->name << " (really " << ssym->name << ") at [" << start << ", " << (start + size - 1) << "]\n";
+  std::cout.flush();
 #endif
     
   // Mark stack location as used for all conflicting variables.
@@ -317,6 +323,9 @@ void chaitin_salloc(SI_t &SI)
   
   if(currFunc)
     {
+#ifdef DEBUG_SALLOC
+      std::cout << "currFunc->stack: old " << currFunc->stack << ", new " << (currFunc->stack + ssize) << "\n";
+#endif  
       currFunc->stack += ssize;
       SPEC_STAK (currFunc->etype) += ssize;
     }

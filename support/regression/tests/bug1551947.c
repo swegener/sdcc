@@ -13,3 +13,4 @@ testBug (void)
   z = x * x;
   ASSERT (z == 1.0);
 }
+

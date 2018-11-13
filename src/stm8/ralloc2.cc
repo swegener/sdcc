@@ -551,6 +551,8 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
     set_surviving_regs(winner, i, G, I);
 
+  set_spilt(G, I, SI);
+
   return(!assignment_optimal);
 }
 
@@ -595,6 +597,8 @@ iCode *stm8_ralloc2_cc(ebbIndex *ebbi)
   stm8_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph, stack_conflict_graph);
 
   stm8RegFix (ebbs, count);
+
+  chaitin_salloc(stack_conflict_graph);
 
   if(options.dump_graphs)
     dump_scon(stack_conflict_graph);

@@ -99,24 +99,7 @@ createStackSpil (symbol * sym)
   symbol *sloc = NULL;
   struct dbuf_s dbuf;
 
-  D (D_ALLOC, ("createStackSpil: for sym %p %s\n", sym, sym->name));
-
-  /* first go try and find a free one that is already
-     existing on the stack */
-  if (applyToSet (_G.stackSpil, isFreeSTM8, &sloc, sym))
-    {
-      /* found a free one : just update & return */
-      sym->usl.spillLoc = sloc;
-      sym->stackSpil = 1;
-      sloc->isFree = 0;
-      addSetHead (&sloc->usl.itmpStack, sym);
-      D (D_ALLOC, ("createStackSpil: found existing\n"));
-      return sym;
-    }
-
-  /* could not then have to create one , this is the hard part
-     we need to allocate this on the stack : this is really a
-     hack!! but cannot think of anything better at this time */
+  D (D_ALLOC, ("createStackSpil: for sym %p %s (old currFunc->stack %ld)\n", sym, sym->name, (long)(currFunc->stack)));
 
   dbuf_init (&dbuf, 128);
   dbuf_printf (&dbuf, "sloc%d", _G.slocNum++);
@@ -158,7 +141,7 @@ createStackSpil (symbol * sym)
      of the spill location */
   addSetHead (&sloc->usl.itmpStack, sym);
 
-  D (D_ALLOC, ("createStackSpil: created new\n"));
+  D (D_ALLOC, ("createStackSpil: created new %s\n", sloc->name));
   return sym;
 }
 
@@ -171,8 +154,6 @@ stm8SpillThis (symbol *sym, bool force_spill)
   int i;
 
   D (D_ALLOC, ("stm8SpillThis: spilling %p (%s)\n", sym, sym->name));
-
-  sym->for_newralloc = 0;
 
   /* if this is rematerializable or has a spillLocation
      we are okay, else we need to create a spillLocation
@@ -283,6 +264,7 @@ transformPointerSet (eBBlock **ebbs, int count)
           }
     }
 }
+
 
 /** Register reduction for assignment.
  */
@@ -619,6 +601,8 @@ serialRegMark (eBBlock ** ebbs, int count)
 
   stm8_call_stack_size = 2; // Saving of register to stack temporarily.
 
+  D (D_ALLOC, ("serialRegMark for %s, currFunc->stack %d\n", currFunc->name, currFunc->stack));
+
   /* for all blocks */
   for (i = 0; i < count; i++)
     {
@@ -656,7 +640,7 @@ serialRegMark (eBBlock ** ebbs, int count)
             {
               symbol *sym = OP_SYMBOL (IC_RESULT (ic));
 
-              D (D_ALLOC, ("serialRegMark: in loop on result %p\n", sym));
+              D (D_ALLOC, ("serialRegAssign: in loop on result %p %s\n", sym, sym->name));
 
               if (sym->isspilt && sym->usl.spillLoc) // todo: Remove once remat is supported!
                 {
@@ -672,10 +656,16 @@ serialRegMark (eBBlock ** ebbs, int count)
                  or is already marked for the new allocator
                  or will not live beyond this instructions */
               if (!sym->nRegs ||
-                  sym->isspilt || sym->for_newralloc || sym->liveTo <= ic->seq)
+                  sym->isspilt || sym->for_newralloc || sym->liveTo <= ic->seq && (sym->nRegs <= 4 || ic->op != CALL && ic->op != PCALL))
                 {
                   D (D_ALLOC, ("serialRegMark: won't live long enough.\n"));
                   continue;
+                }
+
+              if (sym->usl.spillLoc && !sym->usl.spillLoc->_isparm) // I have no idea where these spill locations come from. Sometime two symbols even have the same spill location, whic tends to mess up stack allocation. THose that come from previous iterations in this loop would be okay, but those from outside are a problem.
+                {
+                  sym->usl.spillLoc = 0;
+                  sym->isspilt = false;
                 }
 
               if (sym->nRegs > 4 && ic->op == CALL)
@@ -814,27 +804,19 @@ stm8_assignRegisters (ebbIndex *ebbi)
   ic = stm8_ralloc2_cc (ebbi);
 
   /* redo the offsets for stacked automatic variables */
-  if (currFunc)
+  if (currFunc && !stm8_extend_stack && currFunc->stack + stm8_call_stack_size > 255)
     {
-      long b = currFunc->stack;
+      _G.slocNum = 0;
 
-      redoStackOffsets ();
+      /* Mark variables for assignment by the new allocator */
+      serialRegMark (ebbs, count);
 
-      /* Try again, using an extended stack this time. */
-      if (!stm8_extend_stack && currFunc->stack + stm8_call_stack_size > 255)
-        {
-          currFunc->stack = b;
+      stm8_extend_stack = TRUE;
 
-          /* Mark variables for assignment by the new allocator */
-          serialRegMark (ebbs, count);
+      /* Invoke optimal register allocator */
+      ic = stm8_ralloc2_cc (ebbi);
 
-          stm8_extend_stack = TRUE;
-
-          /* Invoke optimal register allocator */
-          ic = stm8_ralloc2_cc (ebbi);
-
-          redoStackOffsets ();
-        }
+      //redoStackOffsets ();
     }
 
   if (options.dump_i_code)
@@ -844,5 +826,7 @@ stm8_assignRegisters (ebbIndex *ebbi)
     }
 
   genSTM8Code (ic);
+
+  _G.slocNum = 0;
 }
 

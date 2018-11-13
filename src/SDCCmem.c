@@ -1037,7 +1037,7 @@ void
 clearStackOffsets (void)
 {
   const symbol *sym;
-  
+
   for (sym = setFirstItem (istack->syms); sym;
        sym = setNextItem (istack->syms))
     {
@@ -1046,9 +1046,15 @@ clearStackOffsets (void)
       /* nothing to do with parameters so continue */
       if ((sym->_isparm && !IS_REGPARM (sym->etype)))
         continue;
-        
+
       currFunc->stack -= size;
       SPEC_STAK (currFunc->etype) -= size;
+    }
+
+  if (currFunc)
+    {
+      //wassert(!(currFunc->stack)); // Sometimes some local variable was included in istack->sams.
+      currFunc->stack = 0;
     }
 }
 

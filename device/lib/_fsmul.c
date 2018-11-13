@@ -258,7 +258,7 @@ float __fsmul (float a1, float a2) {
   fl1.l = MANT (fl1.l);
   fl2.l = MANT (fl2.l);
 
-  /* the multiply is done as one 16x16 multiply and two 16x8 multiples */
+  /* the multiply is done as one 16x16 multiply and two 16x8 multiplies */
   result = (unsigned long)((unsigned short)(fl1.l >> 8)) * (unsigned short)(fl2.l >> 8);
   result += ((unsigned long)((unsigned short)(fl1.l & 0xff)) * (unsigned short)(fl2.l >> 8)) >> 8;
   result += ((unsigned long)((unsigned short)(fl2.l & 0xff)) * (unsigned short)(fl1.l >> 8)) >> 8;

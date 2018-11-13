@@ -19,10 +19,12 @@ const float b1 = 1.0f;
 
 void testBug(void)
 {
+#ifndef __SDCC_ds390
   ASSERT (cast1 (1.0f) == b0);
   ASSERT (cast1 (0.0f) == b1);
 
   ASSERT (cast2 (0.0f) == b0);
   ASSERT (cast2 (1.0f) == b1);
+#endif
 }
 

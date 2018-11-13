@@ -9,6 +9,8 @@
 	  src/stm8/ralloc2.cc,
 	  src/z80/ralloc.c:
 	  New stack allocator for stm8: aligned Chaitin.
+	* device/lib/_fsmul.c:
+	  Improve float multiplication routine a bit.
 
 2018-11-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

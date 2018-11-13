@@ -241,7 +241,7 @@ union float_long
 float __fsmul (float a1, float a2) {
   volatile union float_long fl1, fl2;
   volatile unsigned long result;
-  volatile int exp;
+  int exp;
   char sign;
 
   fl1.f = a1;
@@ -259,9 +259,9 @@ float __fsmul (float a1, float a2) {
   fl2.l = MANT (fl2.l);
 
   /* the multiply is done as one 16x16 multiply and two 16x8 multiples */
-  result = (fl1.l >> 8) * (fl2.l >> 8);
-  result += ((fl1.l & (unsigned long) 0xFF) * (fl2.l >> 8)) >> 8;
-  result += ((fl2.l & (unsigned long) 0xFF) * (fl1.l >> 8)) >> 8;
+  result = (unsigned long)((unsigned short)(fl1.l >> 8)) * (unsigned short)(fl2.l >> 8);
+  result += ((unsigned long)((unsigned short)(fl1.l & 0xff)) * (unsigned short)(fl2.l >> 8)) >> 8;
+  result += ((unsigned long)((unsigned short)(fl2.l & 0xff)) * (unsigned short)(fl1.l >> 8)) >> 8;
 
   /* round, phase 1 */
   result += 0x40;

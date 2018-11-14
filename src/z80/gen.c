@@ -1172,6 +1172,7 @@ genMovePairPair (PAIR_ID srcPair, PAIR_ID dstPair)
           emit2 ("ld %s, %s", _pairs[dstPair].h, _pairs[srcPair].h);
           regalloc_dry_run_cost += 2;
         }
+      break;
     default:
       wassertl (0, "Tried to move a nonphysical pair");
     }
@@ -2231,7 +2232,7 @@ setupPairFromSP (PAIR_ID id, int offset)
       offset += 2;
     }
 
-  if (id == PAIR_DE)
+  if (id == PAIR_DE && !IS_GB) // TODO: Could hl be in use for gbz80, so it needs to be saved and restored?
     {
       emit2 ("ex de, hl");
       regalloc_dry_run_cost++;
@@ -2240,23 +2241,30 @@ setupPairFromSP (PAIR_ID id, int offset)
   if (offset < INT8MIN || offset > INT8MAX || id == PAIR_IY)
     {
       struct dbuf_s dbuf;
-      dbuf_init (&dbuf, 128);
+      PAIR_ID lid = (id == PAIR_DE) ? PAIR_HL : id;
+      dbuf_init (&dbuf, sizeof(int) * 3 + 1);
       dbuf_printf (&dbuf, "%d", offset);
-      emit2 ("ld %s, !hashedstr", _pairs[id].name, dbuf_c_str (&dbuf));
+      emit2 ("ld %s, !hashedstr", _pairs[lid].name, dbuf_c_str (&dbuf));
       dbuf_destroy (&dbuf);
-      emit2 ("add %s, sp", _pairs[id].name);
+      emit2 ("add %s, sp", _pairs[lid].name);
       regalloc_dry_run_cost += 4 + (id == PAIR_IY) * 2;
     }
   else
     {
+      wassert (id == PAIR_DE || id == PAIR_HL);
       emit2 ("!ldahlsp", offset);
       regalloc_dry_run_cost += 4 - IS_GB * 2;
     }
 
-  if (id == PAIR_DE)
+  if (id == PAIR_DE && !IS_GB)
     {
       emit2 ("ex de, hl");
       regalloc_dry_run_cost++;
+    }
+  else if (id == PAIR_DE)
+    {
+      genMovePairPair (PAIR_HL, PAIR_DE);
+      spillPair (PAIR_HL);
     }
 
   if (_G.preserveCarry)
@@ -2266,6 +2274,9 @@ setupPairFromSP (PAIR_ID id, int offset)
       offset -= 2;
     }
 }
+
+static void
+shiftIntoPair (PAIR_ID id, asmop *aop);
 
 /*-----------------------------------------------------------------*/
 /* pointPairToAop() make a register pair point to a byte of an aop */
@@ -2278,7 +2289,6 @@ static void pointPairToAop (PAIR_ID pairId, const asmop *aop, int offset)
       wassertl (!IS_GB, "The GBZ80 doesn't have an extended stack");
 
     case AOP_STK:
-
       ; int abso = aop->aopu.aop_stk + offset + _G.stack.offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
 
       if ((_G.pairs[pairId].last_type == AOP_STK || _G.pairs[pairId].last_type == AOP_EXSTK) && abs (_G.pairs[pairId].offset - abso) < 3)
@@ -2287,6 +2297,18 @@ static void pointPairToAop (PAIR_ID pairId, const asmop *aop, int offset)
         setupPairFromSP (pairId, abso + _G.stack.pushed);
 
       _G.pairs[pairId].offset = abso;
+
+      break;
+
+    case AOP_HL: // Legacy.
+      fetchLitPair (pairId, (asmop *) aop, offset);
+      _G.pairs[pairId].offset = offset;
+      break;
+
+    case AOP_PAIRPTR:
+      wassert (!offset);
+      
+      shiftIntoPair (pairId, (asmop *) aop); // Legacy. Todo eliminate uses of shiftIntoPair() ?
 
       break;
 
@@ -6680,19 +6702,13 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
         }
 
       // On the Gameboy we can't afford to adjust HL as it may trash the carry.
-      if (size > 1 && (IS_GB || IY_RESERVED) && (requiresHL (AOP (right)) && requiresHL (AOP (left))))
+      if (size > 1 && (IS_GB || IY_RESERVED) && left->aop->type != AOP_REG && right->aop->type != AOP_REG && (requiresHL (AOP (right)) && requiresHL (AOP (left))))
         {
           if (!isPairDead (PAIR_DE, ic))
             _push (PAIR_DE);
 
-          // Pull left into DE and right into HL
-          if (!regalloc_dry_run)
-            {
-              aopGet (AOP (left), LSB, FALSE);
-              emit2 ("ld d, h");
-              emit2 ("ld e, l");
-              aopGet (AOP (right), LSB, FALSE);
-            }
+          pointPairToAop (PAIR_DE, left->aop, 0);
+          pointPairToAop (PAIR_HL, right->aop, 0);
 
           while (size--)
             {
@@ -6717,6 +6733,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               regalloc_dry_run_cost += 3;
             }
 
+          spillPair (PAIR_DE);
           if (!isPairDead (PAIR_DE, ic))
             _pop (PAIR_DE);
 

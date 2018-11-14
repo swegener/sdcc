@@ -58,8 +58,8 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
 		"ld a, (hl)\n"
 		"inc\thl" },
     { "ldahlsp", 
-		"ld hl,#%d\n"
-		"add\thl,sp" },
+		"ld hl, #%d\n"
+		"add\thl, sp" },
     { "ldaspsp", 
 		"ld iy,#%d\n"
 		"add\tiy,sp\n"
@@ -112,8 +112,8 @@ static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
 		"ld a, (hl)\n"
 		"inc\thl" },
     { "ldahlsp", 
-		"ld hl,#%d\n"
-		"add\thl,sp" },
+		"ld hl, #%d\n"
+		"add\thl, sp" },
     { "ldaspsp", 
 		"ld iy,#%d\n"
 		"add\tiy,sp\n"
@@ -390,12 +390,12 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
 		"ld a, (hl)\n"
 		"inc\thl" },
     { "ldahlsp", 
-		"ld hl,%d\n"
-		"add\thl,sp" },
+		"ld hl, %d\n"
+		"add\thl, sp" },
     { "ldaspsp", 
-		"ld iy,%d\n"
-		"add\tiy,sp\n"
-		"ld\tsp,iy" },
+		"ld iy, %d\n"
+		"add\tiy, sp\n"
+		"ld\tsp, iy" },
     { "*pair", "(%s)" },
     { "enter", 
 		"push\tix\n"

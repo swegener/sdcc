@@ -1,3 +1,10 @@
+2018-11-14 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Fix issues in z80 code generation.
+	* src/z80/mappings.i:
+	  Consistently use space after comma in asm output.
+
 2018-11-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

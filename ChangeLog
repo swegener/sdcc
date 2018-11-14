@@ -1,3 +1,9 @@
+2018-11-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsalloc.hpp,
+	  .version:
+	  A bit of fine-tuning in the aligned Chaitin stack allocator to avoid some inefficiencies from alignment.
+
 2018-11-14 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/gen.c:

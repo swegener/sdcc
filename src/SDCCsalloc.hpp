@@ -265,6 +265,26 @@ void color_stack_var_greedily(const var_t v, SI_t &SI, int alignment, int *ssize
   color_stack_var(v, SI, start, ssize);
 }
 
+static
+int get_alignment(sym_link *type)
+{
+  for (; IS_ARRAY (type); type = type->next);
+
+  switch (getSize(type))
+    {
+    case 0: // ?
+    case 1:
+      return(1);
+    case 2:
+      return(2);
+    case 3:
+    case 4:
+      return(4);
+    default:
+      return(8);
+    }
+}
+
 template <class SI_t>
 void chaitin_ordering(const SI_t &SI, std::list<var_t> &ordering)
 {
@@ -285,7 +305,7 @@ void chaitin_ordering(const SI_t &SI, std::list<var_t> &ordering)
           for(boost::tie(n, n_end) = boost::adjacent_vertices(i, SI), d = 0; n != n_end; ++n)
              d += !marked[*n];
              
-          if(d < mind)
+          if(d < mind || d == mind && get_alignment(SI[i].sym->type) < get_alignment(SI[minn].sym->type)) // Coloring aligned variables first tends to keep gaps from alignment small.
             {
               mind = d;
               minn = i;
@@ -319,7 +339,10 @@ void chaitin_salloc(SI_t &SI)
   
   std::list<var_t>::const_iterator i, i_end;
   for(i = ordering.begin(), i_end = ordering.end(); i != i_end; ++i)
-    color_stack_var_greedily(*i, SI, (getSize(SI[*i].sym->type) == 2 || getSize(SI[*i].sym->type) == 4 || getSize(SI[*i].sym->type) == 8) ? getSize(SI[*i].sym->type) : 1, &ssize); // Todo: Allow unaligned - need to implement better handling of coalescing first (including conditional conflicts on assignment) for Z80: Allowing unaligned on long long possible (i.e. eliminating == 8 from list above) if genAssign can use lddr in placec of ldir.
+    {
+      // Alignment, even when not required by the hardware helps avoid artially overlapping stack operands (which are not supported by code generation in some backends).
+      color_stack_var_greedily(*i, SI, get_alignment (SI[*i].sym->type), &ssize);
+    }
   
   if(currFunc)
     {

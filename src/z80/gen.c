@@ -9478,8 +9478,9 @@ finish:
 
 static void
 _moveFrom_tpair_ (asmop * aop, int offset, PAIR_ID pair)
-{emitDebug ("; _moveFrom_tpair_()");
-  if (!IS_GB && aop->type == AOP_REG)
+{
+  emitDebug ("; _moveFrom_tpair_()");
+  if (pair == PAIR_HL && aop->type == AOP_REG)
     {
       if (!regalloc_dry_run)
         aopPut (aop, "!*hl", offset);
@@ -9551,7 +9552,9 @@ genPointerGet (const iCode *ic)
   if (IS_GB)
     wassert (!rightval);
 
-  if (IS_GB || IY_RESERVED && requiresHL (AOP (result)) && size > 1 && AOP_TYPE (result) != AOP_REG)
+  if (IS_GB && left->aop->type == AOP_STK) // Try to avoid (hl) to hl copy, which requires 3 instructions and free a.
+    pair = PAIR_DE;
+  if ((IS_GB || IY_RESERVED) && requiresHL (AOP (result)) && size > 1 && AOP_TYPE (result) != AOP_REG)
     pair = PAIR_DE;
 
   if (AOP_TYPE (left) == AOP_IMMD && size == 1 && aopInReg (result->aop, 0, A_IDX) && !IS_BITVAR (retype))
@@ -9696,6 +9699,7 @@ genPointerGet (const iCode *ic)
       if (AOP_TYPE(left) == AOP_IMMD)
         {
           emit2 ("ld %s, %s", _pairs[pair].name, aopGetLitWordLong (AOP (left), rightval, TRUE));
+          spillPair (pair);
           regalloc_dry_run_cost += 3;
           rightval = 0;
         }
@@ -9877,7 +9881,7 @@ genPointerGet (const iCode *ic)
             _push (PAIR_AF), pushed_a = TRUE;
 
           /* PENDING: make this better */
-          if (!IS_GB && (AOP_TYPE (result) == AOP_REG || AOP_TYPE (result) == AOP_HLREG))
+          if ((pair == PAIR_HL) && (AOP_TYPE (result) == AOP_REG || AOP_TYPE (result) == AOP_HLREG))
             {
               if (!regalloc_dry_run)
                 aopPut (AOP (result), "!*hl", offset++);

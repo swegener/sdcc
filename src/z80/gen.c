@@ -311,7 +311,7 @@ z80_init_asmops (void)
 }
 
 static bool regalloc_dry_run;
-static unsigned char regalloc_dry_run_cost;
+static unsigned int regalloc_dry_run_cost;
 
 static void
 cost(unsigned int bytes, unsigned int cycles)
@@ -5239,7 +5239,19 @@ genPlus (iCode * ic)
         }
     }
 
-  if (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY &&
+  // Handle AOP_EXSTK conflcit with hl here, since setupToPreserveCarry() would cause problems otherwise.
+  if (IC_RESULT (ic)->aop->type == AOP_EXSTK && (getPairId (IC_LEFT (ic)->aop) == PAIR_HL || getPairId (IC_RIGHT (ic)->aop) == PAIR_HL) &&
+    (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) && isPairDead (PAIR_HL, ic))
+    {
+      PAIR_ID extrapair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
+      fetchPair (extrapair, getPairId (IC_LEFT (ic)->aop) == PAIR_HL ? IC_RIGHT (ic)->aop : IC_LEFT (ic)->aop);
+      emit2 ("add hl, %s", _pairs[extrapair].name);
+      regalloc_dry_run_cost += 1;
+      spillPair (PAIR_HL);
+      commitPair (IC_RESULT (ic)->aop, PAIR_HL, ic, FALSE);
+      goto release;
+    }
+  else if (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY &&
     (getPairId (AOP (IC_LEFT (ic))) == PAIR_HL && isPair (AOP (IC_RIGHT (ic))) && getPairId (AOP (IC_RIGHT (ic))) != PAIR_IY || getPairId (AOP (IC_RIGHT (ic))) == PAIR_HL && isPair (AOP (IC_LEFT (ic))) && getPairId (AOP (IC_LEFT (ic))) != PAIR_IY) &&
     isPairDead (PAIR_HL, ic))
     {
@@ -5674,6 +5686,14 @@ genPlus (iCode * ic)
           else
             premoved = FALSE;
 
+          // Can't handle overwritten operand in hl.
+          if (started && (IC_RESULT (ic)->aop->type == AOP_EXSTK ||  IC_RESULT (ic)->aop->type == AOP_PAIRPTR) && requiresHL (IC_RESULT (ic)->aop) &&
+            (aopInReg (leftop, i, L_IDX) || aopInReg (leftop, i, H_IDX) || aopInReg (rightop, i, L_IDX) || aopInReg (rightop, i, H_IDX)))
+            {
+              wassert (regalloc_dry_run);
+              regalloc_dry_run_cost += 1000;
+            }
+
           if (!started && aopIsLitVal (rightop, i, 1, 0))
             ; // Skip over this byte.
           // We can use inc / dec only for the only, top non-zero byte, since it neither takes into account an existing carry nor does it update the carry.
@@ -5710,7 +5730,7 @@ genPlus (iCode * ic)
   if (tlbl)
     emitLabel (tlbl);
 
-  for (size = 0; size < 2; size++)
+  for (size = 1; size >= 0; size--)
     if (cached[size] != -1)
       {
         _pop (PAIR_AF);

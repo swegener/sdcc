@@ -2580,7 +2580,6 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           bool x = aopInReg (result_aop, i, half ? XL_IDX : X_IDX);
           genMove_o (x ? ASMOP_X : ASMOP_Y, 0, right_aop, i, 2 - half, a_free, x, !x);
           emit3w (A_NEGW, x ? ASMOP_X : ASMOP_Y, 0);
-
           started = TRUE;
           i += 2;
         }
@@ -2609,6 +2608,21 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
             emit3w (A_DECW, x ? ASMOP_X : ASMOP_Y, 0);
           cost (x ? 1 : 2, 1);
           started = TRUE;
+          i += 2;
+        }
+       // In some cases we gain so much by using decw that it is worth handling the carry explictly.
+       else if (started && i == size - 2 && (aopInReg (result_aop, i, X_IDX) || aopInReg (result_aop, i, Y_IDX)) && aopIsLitVal (left_aop, i, 2, 0x0000) &&
+        (aopOnStack (right_aop, i, 2) || right_aop->type == AOP_DIR))
+        {
+          bool x = aopInReg (result_aop, i, X_IDX);
+          genMove_o (x ? ASMOP_X : ASMOP_Y, 0, right_aop, i, 2, a_free, x_free, y_free);
+          symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+          if (!regalloc_dry_run)
+            emit2 ("jrnc", "!tlabel", labelKey2num (tlbl->key));
+          cost (2, 1);
+          emit3w_o (A_INCW, result_aop, i, 0, 0);
+          emitLabel (tlbl);
+          emit3w_o (A_NEGW, result_aop, i, 0, 0);
           i += 2;
         }
       else if (!started &&
@@ -6225,6 +6239,14 @@ genGetABit (const iCode *ic, iCode *ifx)
   if (!regDead (A_IDX, ic))
     push (ASMOP_A, 0, 1);
 
+  if ((shCount % 8) == 7 &&
+    (aopInReg (left->aop, shCount / 8, XH_IDX) && regDead (X_IDX, ic) || aopInReg (left->aop, shCount / 8, YH_IDX) && regDead (Y_IDX, ic)))
+    {
+      bool x = aopInReg (left->aop, shCount / 8, XH_IDX);
+      emit3w (A_SLLW, x ? ASMOP_X : ASMOP_Y, 0);
+      goto write_to_a;
+    }
+
   genMove_o (ASMOP_A, 0, left->aop, shCount / 8, 1, TRUE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
   shCount %= 8;
 
@@ -6252,6 +6274,7 @@ genGetABit (const iCode *ic, iCode *ifx)
         }
       while (shCount++ < 8)
         emit3 (A_SLL, ASMOP_A, 0);
+write_to_a:
       emit3 (A_CLR, ASMOP_A, 0);
       emit3 (A_RLC, ASMOP_A, 0);
     }

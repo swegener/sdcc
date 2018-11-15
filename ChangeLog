@@ -2,6 +2,8 @@
 
 	* support/regression/Makefile.in:
 	  Include stm8-large in default target for regression tests.
+	* src/stm8/gen.c:
+	  Improve code generation for wide negation.
 
 2018-11-14 Philipp Klaus Krause <pkk AT spth.de>
 

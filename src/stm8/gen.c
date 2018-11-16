@@ -5800,7 +5800,7 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
           i += 2;
         }
       // Try to shift in x instead of on stack.
-      else if (aopOnStack (left, 0, 2) && aopOnStack (result, 0, 2) && !same_2_stack && regDead (X_IDX, ic) &&
+      else if ((aopOnStack (left, 0, 2) || left->type == AOP_LIT) && aopOnStack (result, 0, 2) && !same_2_stack && regDead (X_IDX, ic) &&
         shiftop->regs[XL_IDX] == -1 && shiftop->regs[XH_IDX] == -1 &&
         left->regs[XL_IDX] == -1 && left->regs[XH_IDX] == -1 && result->regs[XL_IDX] == -1 && result->regs[XH_IDX] == -1 && right->regs[XL_IDX] == -1 && right->regs[XH_IDX] == -1)
         {
@@ -5811,7 +5811,7 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
           i += 2;
         }
       // Try to shift in y instead of on stack.
-      else if (size == 2 && aopOnStack (left, 0, 2) && aopOnStack (result, 0, 2) && !same_2_stack && regDead (Y_IDX, ic) &&
+      else if (size == 2 && (aopOnStack (left, 0, 2) || left->type == AOP_LIT) && aopOnStack (result, 0, 2) && !same_2_stack && regDead (Y_IDX, ic) &&
         shiftop->regs[YL_IDX] == -1 && shiftop->regs[YH_IDX] == -1 &&
         left->regs[YL_IDX] == -1 && left->regs[YH_IDX] == -1 && result->regs[YL_IDX] == -1 && result->regs[YH_IDX] == -1)
         {
@@ -6569,7 +6569,7 @@ genRightShift (const iCode *ic)
       pushed_a = true;
     }
 
-  if (aopRS (left->aop) && aopRS (result->aop))
+  if ((aopRS (left->aop) || left->aop->type == AOP_LIT) && aopRS (result->aop))
     {
       shiftop = &shiftop_impl;
       init_shiftop (shiftop, result->aop, left->aop, right->aop, ic, false);
@@ -6585,7 +6585,7 @@ genRightShift (const iCode *ic)
       genMove_o (shiftop, 0, left->aop, skip_bytes, shiftop->size, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0, regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
       iterations %= 16;
     }
-  else
+  else // TODO: What if shiftop and right operand overlap on stack?
     genMove (shiftop, left->aop, right->aop->regs[A_IDX] < 0, regDead (X_IDX, ic) && right->aop->regs[XL_IDX] < 0 && right->aop->regs[XH_IDX] < 0, regDead (Y_IDX, ic) && right->aop->regs[YL_IDX] < 0 && right->aop->regs[YH_IDX] < 0);
 
   size = shiftop->size;

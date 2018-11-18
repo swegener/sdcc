@@ -357,7 +357,7 @@ aopSame (const asmop *aop1, int offset1, const asmop *aop2, int offset2, int siz
 static bool
 aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
 {
-  wassert (size <= sizeof (unsigned long long int)); // Make sure we are not testing outside of argument val.
+  wassert_bt (size <= sizeof (unsigned long long int)); // Make sure we are not testing outside of argument val.
 
   for(; size; size--, offset++)
     {
@@ -421,8 +421,8 @@ aopGet(const asmop *aop, int offset)
         {
           long int eoffset = (long int)(aop->aopu.bytes[offset].byteu.stk) + G.stack.size - 256l;
 
-          wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
-          wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
+          wassertl_bt (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
+          wassertl_bt (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
 
           SNPRINTF (buffer, sizeof(buffer), "(0x%x, y)", (unsigned)eoffset);
         }
@@ -433,7 +433,7 @@ aopGet(const asmop *aop, int offset)
 
   if (aop->type == AOP_IMMD)
     {
-      wassertl (offset < (2 + (options.model == MODEL_LARGE)), "Immediate operand out of range");
+      wassertl_bt (offset < (2 + (options.model == MODEL_LARGE)), "Immediate operand out of range");
       if (offset == 0)
         SNPRINTF (buffer, sizeof(buffer), "#<(%s + %d)", aop->aopu.immd, aop->aopu.immd_off);
       else
@@ -447,7 +447,7 @@ aopGet(const asmop *aop, int offset)
       return (buffer);
     }
 
-  wassert (0);
+  wassert_bt (0);
   return ("dummy");
 }
 
@@ -468,7 +468,7 @@ aopGet2(const asmop *aop, int offset)
   if (aopInReg (aop, offset, Y_IDX))
     return("y");
 
-  wassert (aop->type == AOP_LIT || aopOnStack (aop, offset, 2) || aop->type == AOP_IMMD || aop->type == AOP_DIR);
+  wassert_bt (aop->type == AOP_LIT || aopOnStack (aop, offset, 2) || aop->type == AOP_IMMD || aop->type == AOP_DIR);
 
   if (aop->type == AOP_LIT)
     {
@@ -518,7 +518,7 @@ op8_cost (const asmop *op2, int offset2)
     }
 error:
   fprintf(stderr, "op2 type: %d, offset %d, rIdx %d\n", op2type, offset2, r2Idx);
-  wassert (0);
+  wassert_bt (0);
   cost (8, 4 * 8);
 }
 
@@ -529,7 +529,7 @@ op_cost (const asmop *op1, int offset1)
   AOP_TYPE op1type;
   int r1Idx;
 
-  wassert (op1);
+  wassert_bt (op1);
 
   op1type = op1->type;
   r1Idx = ((aopRS (op1) && op1->aopu.bytes[offset1].in_reg)) ? op1->aopu.bytes[offset1].byteu.reg->rIdx : -1;
@@ -556,7 +556,7 @@ op_cost (const asmop *op1, int offset1)
     }
 error:
   fprintf(stderr, "op1 type: %d, offset %d, rIdx %d\n", op1type, offset1, r1Idx);
-  wassert (0);
+  wassert_bt (0);
   cost (8, 4 * 8);
 }
 
@@ -564,7 +564,7 @@ error:
 static void
 opw_cost (const asmop *op1, int offset1)
 {
-  wassert (op1);
+  wassert_bt (op1);
 
   if (aopInReg (op1, offset1, XL_IDX))
     {
@@ -577,7 +577,7 @@ opw_cost (const asmop *op1, int offset1)
       return;
     }
 
-  wassert (0);
+  wassert_bt (0);
   cost (8, 4 * 8);
 }
 
@@ -585,7 +585,7 @@ opw_cost (const asmop *op1, int offset1)
 static void
 opw_cost2 (const asmop *op1, int offset1)
 {
-  wassert (op1);
+  wassert_bt (op1);
 
   if (aopInReg (op1, offset1, XL_IDX))
     {
@@ -598,7 +598,7 @@ opw_cost2 (const asmop *op1, int offset1)
       return;
     }
 
-  wassert (0);
+  wassert_bt (0);
   cost (8, 4 * 8);
 }
 
@@ -695,7 +695,7 @@ ld_cost (const asmop *op1, int offset1, const asmop *op2, int offset2)
 error:
   fprintf(stderr, "op1 type: %d, offset %d, rIdx %d\n", op1type, offset1, r1Idx);
   fprintf(stderr, "op2 type: %d, offset %d, rIdx %d\n", op2type, offset2, r2Idx);
-  wassert (0);
+  wassert_bt (0);
   cost (8, 4 * 8);
 }
 
@@ -767,7 +767,7 @@ emit3cost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, i
     op8_cost (op2, offset2);
     break;
   default:
-    wassertl (0, "Tried to get cost for unknown 8-bit instruction");
+    wassertl_bt (0, "Tried to get cost for unknown 8-bit instruction");
   }
 }
 
@@ -806,7 +806,7 @@ emit3wcost (enum asminst inst, const asmop *op1, int offset1, const asmop *op2, 
     opw_cost2 (op1, offset1);
     break;
   default:
-    wassertl (0, "Tried to get cost for unknown 16-bit instruction");
+    wassertl_bt (0, "Tried to get cost for unknown 16-bit instruction");
   }
 }
 
@@ -913,7 +913,7 @@ freeAsmop (operand *op)
 {
   asmop *aop;
 
-  wassert (op);
+  wassert_bt (op);
 
   aop = op->aop;
 
@@ -935,9 +935,9 @@ aopForSym (const iCode *ic, symbol *sym)
 {
   asmop *aop;
 
-  wassert (ic);
-  wassert (sym);
-  wassert (sym->etype);
+  wassert_bt (ic);
+  wassert_bt (sym);
+  wassert_bt (sym->etype);
 
   // Unlike other backends we really free asmops; to avoid a double-free, we need to support multiple asmops for the same symbol.
 
@@ -982,7 +982,7 @@ aopForRemat (symbol *sym)
   asmop *aop;
   int val = 0;
 
-  wassert(ic);
+  wassert_bt (ic);
 
   for (;;)
     {
@@ -1014,7 +1014,7 @@ aopForRemat (symbol *sym)
           break;
         }
       else
-        wassert(0);
+        wassert_bt (0);
     }
 
   if (OP_SYMBOL (IC_LEFT (ic))->onStack)
@@ -1043,7 +1043,7 @@ aopOp (operand *op, const iCode *ic)
   symbol *sym;
   unsigned int i;
 
-  wassert (op);
+  wassert_bt (op);
 
   /* if already has an asmop */
   if (op->aop)
@@ -1120,7 +1120,7 @@ aopOp (operand *op, const iCode *ic)
                 if (sym->usl.spillLoc->stack + aop->size - (int)(i) <= -G.stack.pushed)
                   {
                     fprintf (stderr, "%s %d %d %d %d at ic %d\n", sym->name, (int)(sym->usl.spillLoc->stack), (int)(aop->size), (int)(i), (int)(G.stack.pushed), ic->key);
-                    wassertl (0, "Invalid stack offset.");
+                    wassertl_bt (0, "Invalid stack offset.");
                   }
               }
             else
@@ -1147,7 +1147,7 @@ aopOp (operand *op, const iCode *ic)
         if (!completely_in_regs && (!currFunc || GcurMemmap == statsg))
           {
             if (!regalloc_dry_run)
-              wassertl (0, "Stack asmop outside of function.");
+              wassertl_bt (0, "Stack asmop outside of function.");
             cost (180, 180);
           }
       }
@@ -1176,7 +1176,7 @@ push (const asmop *op, int offset, int size)
       else if (op->type == AOP_DIR)
         cost (3, 1);
       else
-        wassertl (0, "Invalid aop type for size 1 for push");
+        wassertl_bt (0, "Invalid aop type for size 1 for push");
     }
   else if (size == 2)
     {
@@ -1191,10 +1191,10 @@ push (const asmop *op, int offset, int size)
           cost (2, 2);
         }
       else
-        wassertl (0, "Invalid aop type for size 2 for pushw");
+        wassertl_bt (0, "Invalid aop type for size 2 for pushw");
     }
   else
-    wassertl (0, "Invalid size for push/pushw");
+    wassertl_bt (0, "Invalid size for push/pushw");
 
   G.stack.pushed += size;
   updateCFA ();
@@ -1211,7 +1211,7 @@ pop (const asmop *op, int offset, int size)
       else if (op->type == AOP_DIR)
         cost (3, 1);
       else
-        wassertl (0, "Invalid aop type for size 1 for pop");
+        wassertl_bt (0, "Invalid aop type for size 1 for pop");
     }
   else if (size == 2)
     {
@@ -1226,10 +1226,10 @@ pop (const asmop *op, int offset, int size)
           cost (2, 2);
         }
       else
-        wassertl (0, "Invalid aop type for size 2 for popw");
+        wassertl_bt (0, "Invalid aop type for size 2 for popw");
     }
   else
-    wassertl (0, "Invalid size for pop/popw");
+    wassertl_bt (0, "Invalid size for pop/popw");
 
   G.stack.pushed -= size;
   updateCFA ();
@@ -1256,7 +1256,7 @@ void swap_to_a(int idx)
       emit3w (A_RLWA, ASMOP_Y, 0);
       break;
     default:
-      wassert (0);
+      wassert_bt (0);
     }
 }
 
@@ -1281,7 +1281,7 @@ void swap_from_a(int idx)
       emit3w (A_RRWA, ASMOP_Y, 0);
       break;
     default:
-      wassert (0);
+      wassert_bt (0);
     }
 }
 
@@ -1316,7 +1316,7 @@ const asmop *stack_aop (const asmop *aop, int i, int *offset)
           *offset = 1;
         }
       else
-        wassert (0);
+        wassert_bt (0);
       push (stacked, 0, 2);
     }
 
@@ -1473,7 +1473,7 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
       if (!assigned[i] &&
         result->aopu.bytes[roffset + i].byteu.stk == source->aopu.bytes[soffset + i].byteu.stk)
         {
-          wassert (*size >= 1);
+          wassert_bt (*size >= 1);
 
           assigned[i] = TRUE;
           (*size)--;
@@ -1486,7 +1486,7 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
         !assigned[i] && !assigned[i + 1] &&
         aopOnStackNotExt (result, roffset + i, 2) && aopOnStackNotExt (source, soffset + i, 2))
         {
-          wassert(*size >= 2);
+          wassert_bt (*size >= 2);
 
           // Using ldw results in substancially shorter, but somewhat slower code.
           if (!x_free && !y_free && really_do_it_now && (optimize.codeSize || !a_free && !optimize.codeSpeed))
@@ -1530,7 +1530,7 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
       if ((a_free || really_do_it_now) && !assigned[i] &&
         (i + 1 >= n || assigned[i + 1] || really_do_it_now))
         {
-          wassert(*size >= 1);
+          wassert_bt (*size >= 1);
           cheapMove (result, roffset + i, source, soffset + i, !a_free);
           assigned[i] = TRUE;
           (*size)--;
@@ -1540,7 +1540,7 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
   if (pushed_x)
     pop (ASMOP_X, 0, 2);
 
-  wassertl (*size >= 0, "genCopyStack() copied more than there is to be copied.");
+  wassertl_bt (*size >= 0, "genCopyStack() copied more than there is to be copied.");
 }
 
 /*-----------------------------------------------------------------*/
@@ -1557,9 +1557,9 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   D (emit2(";  genCopy", "%d %d %d", a_dead, x_dead, y_dead));
 #endif
 
-  wassertl (n <= 8, "Invalid size for genCopy().");
-  wassertl (aopRS (source), "Invalid source type.");
-  wassertl (aopRS (result), "Invalid result type.");
+  wassertl_bt (n <= 8, "Invalid size for genCopy().");
+  wassertl_bt (aopRS (source), "Invalid source type.");
+  wassertl_bt (aopRS (result), "Invalid result type.");
 
   size = n;
   for (i = 0, regsize = 0; i < n; i++)
@@ -1627,7 +1627,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
     {
       if (i < n - 1 && (aopInReg (source, soffset + i, X_IDX) || aopInReg (source, soffset + i, Y_IDX)) && aopOnStack (result, roffset + i, 2))
         {
-          wassert (size >= 2);
+          wassert_bt (size >= 2);
 
           emit2 ("ldw", aopInReg (source, soffset + i, X_IDX) ? "%s, x" : "%s, y", aopGet2 (result, roffset + i));
           cost (2, 2);
@@ -1639,7 +1639,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
         }
       else if (aopRS (source) && !aopOnStack (source, soffset + i, 1) && aopOnStack (result, roffset + i, 1))
         {
-          wassert (size >= 1);
+          wassert_bt (size >= 1);
 
           if (!aopInReg (source, soffset + i, A_IDX))
             swap_to_a (source->aopu.bytes[soffset + i].byteu.reg->rIdx);
@@ -2030,7 +2030,7 @@ skip_byte:
 
       // No byte can be assigned safely (i.e. the assignment is a permutation).
       if (!regalloc_dry_run)
-        wassertl (0, "Unimplemented.");
+        wassertl_bt (0, "Unimplemented.");
       cost (180, 180);
       return;
     }  
@@ -2057,7 +2057,7 @@ skip_byte:
     {
       if (i < n - 1 && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && aopOnStackNotExt (source, soffset + i, 2))
         {
-          wassert (size >= 2);
+          wassert_bt (size >= 2);
           emit2 ("ldw", aopInReg (result, roffset + i, X_IDX) ? "x, %s" : "y, %s", aopGet2 (source, soffset + i));
           cost (2, 2);
           assigned[i] = TRUE;
@@ -2070,8 +2070,8 @@ skip_byte:
       else if (i < n - 1 && aopInReg (result, roffset + i, X_IDX) && aopOnStack (source, soffset + i, 2))
         {
           long int eoffset = (long int)(source->aopu.bytes[soffset + i + 1].byteu.stk) + G.stack.size - 256l;
-          wassertl (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
-          wassertl (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
+          wassertl_bt (regalloc_dry_run || stm8_extend_stack, "Extended stack access, but y not prepared for extended stack access.");
+          wassertl_bt (regalloc_dry_run || eoffset >= 0l && eoffset <= 0xffffl, "Stack access out of extended stack range."); // Stack > 64K.
 
           emit2 ("ldw", "x, y");
           cost (1, 1);
@@ -2084,7 +2084,7 @@ skip_byte:
       // todo: Try to use ldw to load xl, xh, yl, yh when the other half is not in use.
       else if (aopRS (result) && !aopOnStack (result, roffset + i, 1) && aopOnStack (source, soffset + i, 1))
         {
-          wassert (size >= 1);
+          wassert_bt (size >= 1);
           cheapMove (result, roffset + i, source, soffset + i, !a_free);
           assigned[i] = TRUE;
           if (aopInReg (result, roffset + i, A_IDX))
@@ -2109,7 +2109,7 @@ skip_byte:
         pop (ASMOP_A, 0, 1);
     }
 
-  wassertl (size >= 0, "genCopy() copied more than there is to be copied.");
+  wassertl_bt (size >= 0, "genCopy() copied more than there is to be copied.");
 
   a_free = a_dead && (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= roffset + source->size);
 
@@ -2149,7 +2149,7 @@ skip_byte:
     {
       if (!regalloc_dry_run)
         {
-          wassertl (0, "genCopy failed to completely copy operands.");
+          wassertl_bt (0, "genCopy failed to completely copy operands.");
           fprintf (stderr, "%d bytes left.\n", size);
           fprintf (stderr, "left type %d source type %d\n", result->type, source->type);
           for (i = 0; i < n ; i++)
@@ -2169,9 +2169,9 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 
   bool clr_x = FALSE, clr_y = FALSE;
 
-  wassertl (result->type != AOP_LIT, "Trying to write to literal.");
-  wassertl (result->type != AOP_IMMD, "Trying to write to immediate.");
-  wassertl (roffset + size <= result->size, "Trying to write beyond end of operand");
+  wassertl_bt (result->type != AOP_LIT, "Trying to write to literal.");
+  wassertl_bt (result->type != AOP_IMMD, "Trying to write to immediate.");
+  wassertl_bt (roffset + size <= result->size, "Trying to write beyond end of operand");
 
 #if 0
   D (emit2(";  genMove_o", "offset %d %d, size %d, deadness %d %d %d", roffset, soffset, size, a_dead_global, x_dead_global, y_dead_global));
@@ -3925,8 +3925,8 @@ genPlus (const iCode *ic)
         }
       else if (rightop->type == AOP_REG || rightop->type == AOP_REGSTK && !aopOnStack (rightop, i, 1)) //todo: Implement handling of right operands that can't be directly added to a.
         {
-          if (!regalloc_dry_run){
-            wassertl (0, "Unimplemented addition operand.");printf("left %d right %d\n", leftop->type, rightop->type);}
+          if (!regalloc_dry_run)
+            wassertl (0, "Unimplemented addition operand.");
           cost (180, 180);
           i++;
         }

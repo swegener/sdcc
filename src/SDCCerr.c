@@ -19,6 +19,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "sdccconf.h"
+#ifdef HAVE_BACKTRACE_SYMBOLS_FD
+#include <unistd.h>
+#include <execinfo.h>
+#endif
+
 #include "SDCCerr.h"
 
 #define NELEM(x) (sizeof (x) / sizeof *(x))
@@ -670,6 +676,29 @@ werror (int errNum, ...)
   va_start (marker, errNum);
   ret = vwerror (errNum, marker);
   va_end (marker);
+  return ret;
+}
+
+/* -------------------------------------------------------------------------------
+werror_bt - like werror(), but als provide a backtrace
+ * -------------------------------------------------------------------------------
+ */
+int
+werror_bt (int errNum, ...)
+{
+#ifdef HAVE_BACKTRACE_SYMBOLS_FD
+  void *callstack[16];
+  int frames = backtrace (callstack, 16);
+  fprintf (stderr, "Backtrace:\n");
+  backtrace_symbols_fd (callstack, frames, STDERR_FILENO);
+#endif
+
+  int ret;
+  va_list marker;
+  va_start (marker, errNum);
+  ret = vwerror (errNum, marker);
+  va_end (marker);
+
   return ret;
 }
 

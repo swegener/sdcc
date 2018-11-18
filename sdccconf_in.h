@@ -24,6 +24,9 @@
 /* XXX */
 #undef EXEC_PREFIX
 
+/* Define to 1 if you have the `backtrace_symbols_fd' function. */
+#undef HAVE_BACKTRACE_SYMBOLS_FD
+
 /* Define to 1 if you have the <boost/graph/adjacency_list.hpp> header file.
    */
 #undef HAVE_BOOST_GRAPH_ADJACENCY_LIST_HPP

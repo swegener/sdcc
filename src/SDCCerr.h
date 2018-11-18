@@ -289,6 +289,11 @@ enum {
 # define assert(expr) ((expr) ? (void)0 : fatal (1, E_INTERNAL_ERROR, __FILE__, __LINE__, #expr))
 #endif
 
+#define wassertl_bt(a,s)   (void)((a) ? 0 : \
+        (werror_bt (E_INTERNAL_ERROR, __FILE__, __LINE__, s), 0))
+
+#define wassert_bt(a) wassertl_bt(a, "code generator internal error")
+
 /** Describes the maximum error level that will be logged.  Any level
  *  includes all of the levels listed after it.
  *
@@ -352,6 +357,15 @@ werror - Output a standard eror message with variable number of arguements
 */
 
 int werror (int errNum, ... );
+
+/*
+-------------------------------------------------------------------------------
+werror_bt - like werror(), but als provide a backtrace
+
+-------------------------------------------------------------------------------
+*/
+
+int werror_bt (int errNum, ... );
 
 /*
 -------------------------------------------------------------------------------

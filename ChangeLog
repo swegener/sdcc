@@ -1,7 +1,11 @@
-2018-11-19 Philipp Klaus Krause <pkk AT spth.de>
+2018-11-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
 	  Improvements for previous commit
+	* src/SDCCsalloc.hpp,
+	  src/stm8/ralloc2.cc,
+	  src/z80/ralloc2.cc:
+	  Prepare for more fine-grained handling of relative alignment requirements.
 
 2018-11-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

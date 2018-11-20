@@ -1536,8 +1536,8 @@ static void extra_ic_generated(iCode *ic)
     }
 }
 
-template <class T_t, class G_t, class I_t, class SI_t>
-static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
+template <class T_t, class G_t, class I_t, class SI_t, class SAI_t>
+static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI, SAI_t &SAI)
 {
   bool assignment_optimal;
 
@@ -1614,7 +1614,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
     set_surviving_regs(winner, i, G, I);
 
   if (!USE_OLDSALLOC)
-    set_spilt(G, I, SI);
+    set_spilt(G, I, SI, SAI);
 
   return(!assignment_optimal);
 }
@@ -1682,7 +1682,7 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
 
   con_t conflict_graph;
 
-    iCode *ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
+  iCode *ic = create_cfg(control_flow_graph, conflict_graph, ebbi);
 
   should_omit_frame_ptr = omit_frame_ptr(control_flow_graph);
   move_parms();
@@ -1709,15 +1709,16 @@ iCode *z80_ralloc2_cc(ebbIndex *ebbi)
   guessCounts (ic, ebbi);
 
   scon_t stack_conflict_graph;
+  sacon_t stack_alignment_conflict_graph;
 
-  z80_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph, stack_conflict_graph);
+  z80_assignment_optimal = !tree_dec_ralloc(tree_decomposition, control_flow_graph, conflict_graph, stack_conflict_graph, stack_alignment_conflict_graph);
 
   Z80RegFix (ebbs, count);
 
   if (USE_OLDSALLOC)
     redoStackOffsets ();
   else
-    chaitin_salloc(stack_conflict_graph); // new Chaitin-style stack allocator
+    chaitin_salloc(stack_conflict_graph, stack_alignment_conflict_graph); // new Chaitin-style stack allocator
 
   if(options.dump_graphs && !USE_OLDSALLOC)
     dump_scon(stack_conflict_graph);

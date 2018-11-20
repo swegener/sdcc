@@ -42,7 +42,14 @@ struct scon_node
   boost::icl::interval_set<int> free_stack;
 };
 
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, scon_node> scon_t;
+struct sacon_node
+{
+  symbol *sym;
+  boost::icl::interval_set<int> free_stack;
+};
+
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, scon_node> scon_t; // Conflict graph for on-stack variables
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, sacon_node> sacon_t; // Alignment conflict graph for on-stack variables
 
 static bool clash (const symbol *s1, const symbol *s2)
 {
@@ -67,8 +74,8 @@ static bool clash (const symbol *s1, const symbol *s2)
   return(bitVectBitValue (s1->clashes, s2->key));
 }
 
-template<class G_t, class I_t, class SI_t>
-static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
+template<class G_t, class I_t, class SI_t, class SAI_t>
+static void set_spilt(G_t &G, const I_t &I, SI_t &scon, SAI_t& sacon)
 {
   std::map<int, var_t> symbol_to_sindex;
   symbol *sym;
@@ -323,8 +330,8 @@ void chaitin_ordering(const SI_t &SI, std::list<var_t> &ordering)
     }
 }
 
-template <class SI_t>
-void chaitin_salloc(SI_t &SI)
+template <class SI_t, class SAI_t>
+void chaitin_salloc(SI_t &SI, SAI_t &SAI)
 {
   std::list<var_t> ordering;
   

@@ -469,7 +469,7 @@ aopGet2(const asmop *aop, int offset)
     return("y");
 
   if (aop->type != AOP_LIT && !aopOnStack (aop, offset, 2) && aop->type != AOP_IMMD && aop->type != AOP_DIR)
-    fprintf (stderr, "Invalid aop for aopGet2. aop->type %d\n", aop->type);
+    fprintf (stderr, "Invalid aop for aopGet2. aop->type %d. aop->size %d.\n", aop->type, aop->size);
   wassert_bt (aop->type == AOP_LIT || aopOnStack (aop, offset, 2) || aop->type == AOP_IMMD || aop->type == AOP_DIR);
 
   if (aop->type == AOP_LIT)
@@ -6443,11 +6443,14 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
         }
       for (; shCount < 0; shCount++)
         {
-          wassert (size == 4);
+          wassert (aopInReg (shiftop, 0, X_IDX) || aopInReg (shiftop, 0, Y_IDX));
           emit3 (A_SLL, ASMOP_A, 0);
           emit3w_o (A_RLCW, shiftop, 0, 0, 0);
           if (size >= 4)
-            emit3w_o (A_RLCW, shiftop, 2, 0, 0);
+            {
+              wassert (aopInReg (shiftop, 2, X_IDX) || aopInReg (shiftop, 2, Y_IDX));
+              emit3w_o (A_RLCW, shiftop, 2, 0, 0);
+            }
         }
       if (pushed_sign)
         pop (ASMOP_A, 0, 1);

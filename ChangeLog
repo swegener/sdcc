@@ -1,6 +1,11 @@
 2018-11-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:
+	  Improvements for previous commit
+
+2018-11-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/stm8/gen.c:
 	  Slightly more verbose error reporting.
 
 2018-11-18 Philipp Klaus Krause <pkk AT spth.de>

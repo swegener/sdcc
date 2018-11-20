@@ -35,21 +35,20 @@ extern "C"
 
 // #define DEBUG_SALLOC
 
-struct scon_node
+struct scon_node_t
 {
   symbol *sym;
   int color;
   boost::icl::interval_set<int> free_stack;
+  std::set<boost::icl::discrete_interval<int> > alignment_conflicts;
 };
 
-struct sacon_node
+struct scon_edge_t
 {
-  symbol *sym;
-  boost::icl::interval_set<int> free_stack;
+  bool alignment_conflict_only;
 };
 
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, scon_node> scon_t; // Conflict graph for on-stack variables
-typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, sacon_node> sacon_t; // Alignment conflict graph for on-stack variables
+typedef boost::adjacency_list<boost::setS, boost::vecS, boost::undirectedS, scon_node_t, scon_edge_t> scon_t; // Conflict graph for on-stack variables
 
 static bool clash (const symbol *s1, const symbol *s2)
 {
@@ -74,10 +73,22 @@ static bool clash (const symbol *s1, const symbol *s2)
   return(bitVectBitValue (s1->clashes, s2->key));
 }
 
-template<class G_t, class I_t, class SI_t, class SAI_t>
-static void set_spilt(G_t &G, const I_t &I, SI_t &scon, SAI_t& sacon)
+static var_t var_from_operand(const std::map<const symbol *, var_t>& symbol_to_sindex, const operand *const op)
 {
-  std::map<int, var_t> symbol_to_sindex;
+  if(!op || !IS_SYMOP(op))
+    return(-1);
+  std::map<const symbol *, var_t>::const_iterator si = symbol_to_sindex.find(OP_SYMBOL_CONST(op));
+  if (si == symbol_to_sindex.end())
+    return(-1);
+
+  return(si->second);
+}
+
+template<class G_t, class I_t, class SI_t>
+static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
+{
+  std::map<const symbol *, var_t> symbol_to_sindex;
+  std::map<int, var_t> iindex_to_sindex;
   symbol *sym;
   var_t j, j_mark;
 
@@ -99,10 +110,11 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon, SAI_t& sacon)
             if (!s->for_newralloc)
               {
 #ifdef DEBUG_SALLOC  
-                std::cout << "Adding " << sym->name << " for " << s->name << " to be allocated to stack. (" << s->for_newralloc << ")\n";
+                std::cout << "Adding " << sym->name << " for " << s->name << "(" << s << ") to be allocated to stack. (" << s->for_newralloc << ")\n";
 		std::cout.flush();
 #endif
                 covered = false;
+                symbol_to_sindex[s] = j;
                 break;
               }
           if(covered)
@@ -110,14 +122,13 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon, SAI_t& sacon)
         }
       
       boost::add_vertex(scon);
+      symbol_to_sindex[sym] = j;
       scon[j].sym = sym;
       scon[j].color = -1;
       j++;
-
-      // std::cout << "Symbol " << sym->name << " needs stack space.\n";
     }
   j_mark = j;
-  
+
   // Add edges due to scope (see C99 standard, verse 1233, which requires things to have different addresses, not allowing us to allocate them to the same location, even if we otherwise could).
   for(unsigned int i = 0; i < boost::num_vertices(scon); i++)
      for(unsigned int j = i + 1; j < boost::num_vertices(scon); j++)
@@ -150,22 +161,21 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon, SAI_t& sacon)
 
           symbol *const sym = (symbol *)(hTabItemWithKey(liveRanges, I[*v].v));
 
-          // std::cout << "set_spilt() 2: Considering " << sym->name << "\n";
-
           if ((sym->regs[0] && !sym->isspilt) || sym->accuse || sym->remat || !sym->nRegs || sym->usl.spillLoc && sym->usl.spillLoc->_isparm)
             continue;
 
-          if (symbol_to_sindex.find(I[*v].v) == symbol_to_sindex.end())
+          if (iindex_to_sindex.find(I[*v].v) == iindex_to_sindex.end())
             {
-              boost::add_vertex(scon);
+              wassert(boost::add_vertex(scon) == j);
               scon[j].sym = sym;
               scon[j].color = -1;
-              symbol_to_sindex[I[*v].v] = j;
+              iindex_to_sindex[I[*v].v] = j;
+              symbol_to_sindex[sym] = j;
               j++;
             }
 
-          vs = symbol_to_sindex[I[*v].v];
-        
+          vs = iindex_to_sindex[I[*v].v];
+
           G[i].stack_alive.insert(vs); // Needs to be allocated on the stack.
         }
     }
@@ -174,10 +184,10 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon, SAI_t& sacon)
   typename boost::graph_traits<I_t>::edge_iterator e, e_end;
   for (boost::tie(e, e_end) = boost::edges(I); e != e_end; ++e)
     {
-      if (I[boost::source(*e, I)].v == I[boost::target(*e, I)].v || symbol_to_sindex.find(I[boost::source(*e, I)].v) == symbol_to_sindex.end() || symbol_to_sindex.find(I[boost::target(*e, I)].v) == symbol_to_sindex.end())
+      if (I[boost::source(*e, I)].v == I[boost::target(*e, I)].v || iindex_to_sindex.find(I[boost::source(*e, I)].v) == iindex_to_sindex.end() || iindex_to_sindex.find(I[boost::target(*e, I)].v) == iindex_to_sindex.end())
         continue;
-        
-      boost::add_edge(symbol_to_sindex[I[boost::source(*e, I)].v], symbol_to_sindex[I[boost::target(*e, I)].v], scon);
+
+      boost::add_edge(iindex_to_sindex[I[boost::source(*e, I)].v], iindex_to_sindex[I[boost::target(*e, I)].v], scon);
     }
     
   // Add conflicts between variables that had their address taken and those that have been spilt by register allocation.
@@ -218,6 +228,26 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon, SAI_t& sacon)
 
       j++;
     }
+
+  // Edges for aligment conflict
+  typename SI_t::edge_iterator ei, ei_end;
+  for(boost::tie(ei, ei_end) = boost::edges(scon); ei != ei_end; ++ei)
+    scon[*ei].alignment_conflict_only = false;
+  for(unsigned int i = 0; i < boost::num_vertices(G); i++)
+    {
+      const var_t result = var_from_operand (symbol_to_sindex, IC_RESULT(G[i].ic));
+
+      if(result < 0)
+        continue;
+
+      const var_t left = var_from_operand (symbol_to_sindex, IC_LEFT(G[i].ic));
+      const var_t right = var_from_operand (symbol_to_sindex, IC_RIGHT(G[i].ic));
+
+      if(left >= 0 && !boost::edge (result, left, scon).second)
+        scon[(boost::add_edge(result, left, scon)).first].alignment_conflict_only = true;
+      if(right >= 0 && !boost::edge (result, right, scon).second)
+        scon[(boost::add_edge(result, right, scon)).first].alignment_conflict_only = true;
+    }
 }
 
 template <class SI_t>
@@ -244,7 +274,10 @@ void color_stack_var(const var_t v, SI_t &SI, int start, int *ssize)
   // Mark stack location as used for all conflicting variables.
   typename boost::graph_traits<SI_t>::adjacency_iterator n, n_end;
   for(boost::tie(n, n_end) = boost::adjacent_vertices(v, SI); n != n_end; ++n)
-    SI[*n].free_stack -= boost::icl::discrete_interval<int>::type(start, start + size);
+    if (!SI[boost::edge(v, *n, SI).first].alignment_conflict_only)
+      SI[*n].free_stack -= boost::icl::discrete_interval<int>::type(start, start + size);
+    else
+      SI[*n].alignment_conflicts.insert(boost::icl::discrete_interval<int>::type(start, start + size));
 }
 
 // Place a single variable on the stack greedily.
@@ -260,11 +293,33 @@ void color_stack_var_greedily(const var_t v, SI_t &SI, int alignment, int *ssize
   for(si = SI[v].free_stack.begin();; ++si)
     {
        start = boost::icl::first(*si);
-       
-       // Adjust start address for alignment
-       if(start % alignment)
-         start = start + alignment - start % alignment;
-                    
+
+       bool alignment_issue;
+       do
+         {
+           // Adjust start address for alignment conflict
+           std::set<boost::icl::discrete_interval<int> >::const_iterator ai, ai_end;
+           for(ai = SI[v].alignment_conflicts.begin(), ai_end = SI[v].alignment_conflicts.end(); ai != ai_end; ++ai)
+             {
+               if(ai->upper() < start || ai->lower() > start + size - 1)
+                 continue;
+               if(ai->lower() == start)
+                 continue;
+
+#ifdef DEBUG_SALLOC   
+               std::cerr << "Resolving alignment conflict at " << SI[v].sym->name << "\n";
+#endif
+
+               start = ai->upper() + 1; // Resolve conflict.
+             }
+
+           // Adjust start address for alignment
+           alignment_issue = start % alignment;
+           if(start % alignment)
+             start = start + alignment - start % alignment;
+         }
+       while (alignment_issue);
+   
        if(boost::icl::last(*si) >= start + size - 1)
          break; // Found one.
     }
@@ -275,9 +330,12 @@ void color_stack_var_greedily(const var_t v, SI_t &SI, int alignment, int *ssize
 static
 int get_alignment(sym_link *type)
 {
-  for (; IS_ARRAY (type); type = type->next);
+#if 1
+  return(1);
+#else
+  for(; IS_ARRAY (type); type = type->next);
 
-  switch (getSize(type))
+  switch(getSize(type))
     {
     case 0: // ?
     case 1:
@@ -290,6 +348,7 @@ int get_alignment(sym_link *type)
     default:
       return(8);
     }
+#endif
 }
 
 template <class SI_t>
@@ -330,8 +389,8 @@ void chaitin_ordering(const SI_t &SI, std::list<var_t> &ordering)
     }
 }
 
-template <class SI_t, class SAI_t>
-void chaitin_salloc(SI_t &SI, SAI_t &SAI)
+template <class SI_t>
+void chaitin_salloc(SI_t &SI)
 {
   std::list<var_t> ordering;
   

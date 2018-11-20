@@ -2,10 +2,8 @@
 
 	* src/stm8/gen.c:
 	  Improvements for previous commit
-	* src/SDCCsalloc.hpp,
-	  src/stm8/ralloc2.cc,
-	  src/z80/ralloc2.cc:
-	  Prepare for more fine-grained handling of relative alignment requirements.
+	* src/SDCCsalloc.hpp:
+	  New stack allocator: unaligned Chaitin.
 
 2018-11-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

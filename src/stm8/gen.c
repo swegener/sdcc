@@ -2758,11 +2758,19 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           started = TRUE;
           i++;
         }
-      else if (aopInReg (right_aop, i, A_IDX)) // todo: Be more flexible and handle this.
+      else if (aopInReg (right_aop, i, A_IDX)) // Needs special handling as generic code below would overwrite a.
         {
-          if (!regalloc_dry_run)
-            wassertl (0, "Unimplemented subtraction operand.");
-          cost (180, 180);
+          push (ASMOP_A, 0, 1);
+          cheapMove (ASMOP_A, 0, left_aop, i, false);
+          emit2 (started ? "sbc" : "sub", "a, (1, sp)");
+          cost (2, 1);
+          if (aopInReg (result_aop, i, A_IDX))
+            adjustStack (1, false, false, false);
+          else
+            {
+              cheapMove (result_aop, i, ASMOP_A, 0, false);
+              pop (ASMOP_A, 0, 1);
+            }
           i++;
         }
       else

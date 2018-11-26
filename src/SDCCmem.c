@@ -980,7 +980,8 @@ allocVariables (symbol * symChain)
         {
           /* check if the typedef already exists    */
           csym = findSym (TypedefTab, NULL, sym->name);
-          if (csym && csym->level == sym->level)
+          if (csym && csym->level == sym->level &&
+            !(options.std_c11 && compareTypeExact (sym->type, csym->type, -1))) /* typedef to same type not allowed before ISO C11 */
             werror (E_DUPLICATE_TYPEDEF, sym->name);
 
           SPEC_EXTR (sym->etype) = 0;

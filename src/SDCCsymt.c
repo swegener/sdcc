@@ -2863,7 +2863,7 @@ compareTypeExact (sym_link * dest, sym_link * src, long level)
 }
 
 /*---------------------------------------------------------------------------*/
-/* compareTypeExact - will do type check return 1 if representation is same. */
+/* compareTypeInexact - will do type check return 1 if representation is same. */
 /* Useful for redundancy elimination.                                        */
 /*---------------------------------------------------------------------------*/
 int

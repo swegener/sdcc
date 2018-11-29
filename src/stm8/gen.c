@@ -3044,7 +3044,7 @@ genCall (const iCode *ic)
   saveRegsForCall (ic);
 
   /* Return value of big type or returning struct or union. */
-  bigreturn = (getSize (ftype->next) > 4);
+  bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);
   if (bigreturn)
     {
       wassertl (IC_RESULT (ic), "Unused return value in call to function returning large type.");

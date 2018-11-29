@@ -1,6 +1,11 @@
 2018-11-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/stm8/gen.c:
+	  Fix an issue in call to function returning struct / union.
+
+2018-11-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/stm8/gen.c:
 	  Fix an issue in code generation for subtraction.
 
 2018-11-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

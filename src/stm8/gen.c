@@ -5814,7 +5814,7 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
           i += 2;
         }
       // Try to shift in x instead of on stack.
-      else if ((aopOnStack (left, 0, 2) || left->type == AOP_LIT) && aopOnStack (result, 0, 2) && !same_2_stack && regDead (X_IDX, ic) &&
+      else if ((aopOnStack (left, i, 2) || left->type == AOP_LIT) && aopOnStack (result, i, 2) && !same_2_stack && regDead (X_IDX, ic) &&
         shiftop->regs[XL_IDX] == -1 && shiftop->regs[XH_IDX] == -1 &&
         left->regs[XL_IDX] == -1 && left->regs[XH_IDX] == -1 && result->regs[XL_IDX] == -1 && result->regs[XH_IDX] == -1 && right->regs[XL_IDX] == -1 && right->regs[XH_IDX] == -1)
         {
@@ -5825,7 +5825,7 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
           i += 2;
         }
       // Try to shift in y instead of on stack.
-      else if (size == 2 && (aopOnStack (left, 0, 2) || left->type == AOP_LIT) && aopOnStack (result, 0, 2) && !same_2_stack && regDead (Y_IDX, ic) &&
+      else if (size == 2 && (aopOnStack (left, i, 2) || left->type == AOP_LIT) && aopOnStack (result, i, 2) && !same_2_stack && regDead (Y_IDX, ic) &&
         shiftop->regs[YL_IDX] == -1 && shiftop->regs[YH_IDX] == -1 &&
         left->regs[YL_IDX] == -1 && left->regs[YH_IDX] == -1 && result->regs[YL_IDX] == -1 && result->regs[YH_IDX] == -1)
         {
@@ -5835,7 +5835,7 @@ static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left,
           shiftop->regs[YH_IDX] = i + 1;
           i += 2;
         }
-      else if (!a_needed_for_count && size == 1 && aopOnStack (left, 0, 1) && aopOnStack (result, 0, 1) && !same_1_stack && regDead (A_IDX, ic) && shiftop->regs[A_IDX] == -1 && result->regs[A_IDX] == -1 && left->regs[A_IDX] == -1) // TODO: More cases.
+      else if (!a_needed_for_count && size == 1 && aopOnStack (left, i, 1) && aopOnStack (result, i, 1) && !same_1_stack && regDead (A_IDX, ic) && shiftop->regs[A_IDX] == -1 && result->regs[A_IDX] == -1 && left->regs[A_IDX] == -1) // TODO: More cases.
         {
           shiftop->aopu.bytes[i] = ASMOP_A->aopu.bytes[0];
           shiftop->regs[A_IDX] = i;

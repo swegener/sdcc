@@ -1,3 +1,8 @@
+2018-11-30 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/stm8/gen.c:
+	  Fix an issue in shift of large on-stack operands (part of bug #2844).
+
 2018-11-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/stm8/gen.c:
@@ -6,7 +11,7 @@
 2018-11-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/stm8/gen.c:
-	  Fix an issue in code generation for subtraction.
+	  Fix an issue in code generation for subtraction (part of bug #2844).
 
 2018-11-26 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

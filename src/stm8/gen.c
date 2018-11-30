@@ -2376,40 +2376,52 @@ genNot (const iCode *ic)
   operand *result = IC_RESULT (ic);
   operand *left = IC_LEFT (ic);
   int i;
-  int pushed_a = FALSE;
+  int pushed_a = false;
 
   D (emit2 ("; genNot", ""));
 
   aopOp (left, ic);
   aopOp (result, ic);
 
-  if (left->aop->size == 2 && aopInReg (left->aop, 0, X_IDX) && regDead (X_IDX, ic))
-    {
-      emit2 ("subw", "x, #1");
-      cost (3, 2);
-    }
-  else if (left->aop->size == 2 && aopInReg (left->aop, 0, Y_IDX) && regDead (Y_IDX, ic))
-    {
-      emit2 ("subw", "y, #1");
-      cost (4, 2);
-    }
-  else
-    {
-      for (i = 1; i < left->aop->size; i++)
-        if (aopInReg (left->aop, i, A_IDX))
-          {
-            push (ASMOP_A, 0, 1);
-            pushed_a = TRUE;
-            break;
-          }
+  for (i = 1; i < left->aop->size; i++)
+    if (aopInReg (left->aop, i, A_IDX))
+      {
+        push (ASMOP_A, 0, 1);
+        pushed_a = true;
+        break;
+      }
 
-      if (!regDead (A_IDX, ic) && !pushed_a)
+  if (!regDead (A_IDX, ic) && !pushed_a)
+    {
+      push (ASMOP_A, 0, 1);
+      pushed_a = true;
+    }
+  for (i = 0; i < left->aop->size;)
+    {
+      if (i == 0 && !IS_FLOAT (operandType (left)) &&
+        (aopInReg (left->aop, i, X_IDX) || aopInReg (left->aop, i, Y_IDX) && regDead (Y_IDX, ic)))
         {
-          push (ASMOP_A, 0, 1);
-          pushed_a = TRUE;
+          if (aopInReg (left->aop, i, Y_IDX))
+            {
+              emit2 ("subw", "y, #0x0001");
+              cost (4, 2);
+            }
+          else
+            {
+              emit2 ("cpw", "x, #0x0001");
+              cost (3, 2);
+            }
+          i += 2;
         }
-
-      for (i = 0; i < left->aop->size; i++)
+      else if (i == 0 && i + 1 < left->aop->size && !IS_FLOAT (operandType (left)) && regDead (X_IDX, ic) &&
+        (aopOnStack (left->aop, i, 2) && left->aop->regs[XL_IDX] < 0 && left->aop->regs[XH_IDX] < 0 || left->aop->type == AOP_DIR))
+        {
+          genMove_o (ASMOP_X, 0, left->aop, i, 2, true, true, false);
+          emit2 ("subw", "x, #0x0001");
+          cost (3, 2);
+          i += 2;
+        }
+      else
         {
           if (i && aopInReg (left->aop, i, A_IDX))
             {
@@ -2417,34 +2429,41 @@ genNot (const iCode *ic)
               cost (2, 1);
             }
           else
-            cheapMove (ASMOP_A, 0, left->aop, i, FALSE);
-
-          if (IS_FLOAT (operandType (left)) && i == left->aop->size - 1)
+            cheapMove (ASMOP_A, 0, left->aop, i, false);
+           if (IS_FLOAT (operandType (left)) && i == left->aop->size - 1)
             {
               emit2 ("and", "a, #0x7f");
               cost (2, 1);
             }
-
-          if(!i)
+           if (!i)
             emit3 (A_SUB, ASMOP_A, ASMOP_ONE);
           else
             emit3 (A_SBC, ASMOP_A, ASMOP_ZERO);
+          i++;
         }
     }
 
-  emit3 (A_CLR, ASMOP_A, 0);
-  emit3 (A_RLC, ASMOP_A, 0);
-
-  cheapMove (result->aop, 0, ASMOP_A, 0, FALSE);
-
-  for (i = 1; i < result->aop->size; i++)
-    cheapMove (result->aop, 0, ASMOP_ZERO, 0, TRUE);
+  if (result->aop->size == 2 && (aopInReg (result->aop, i, X_IDX) || aopInReg (result->aop, i, Y_IDX)))
+    {
+      emit3 (A_CLRW, result->aop, 0);
+      emit3 (A_RLCW, result->aop, 0);
+    }
+  else
+    {
+      emit3 (A_CLR, ASMOP_A, 0);
+      emit3 (A_RLC, ASMOP_A, 0);
+    
+      cheapMove (result->aop, 0, ASMOP_A, 0, false);
+    
+      for (i = 1; i < result->aop->size; i++)
+        cheapMove (result->aop, 0, ASMOP_ZERO, 0, true);
+    }
 
   if (pushed_a)
     if (!regDead (A_IDX, ic) || result->aop->regs[A_IDX] < 0)
       pop (ASMOP_A, 0, 1);
     else
-      adjustStack (1, FALSE, FALSE, FALSE);
+      adjustStack (1, false, false, false);
 
   freeAsmop (left);
   freeAsmop (result);

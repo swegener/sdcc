@@ -10464,75 +10464,36 @@ static void
 genAddrOf (const iCode * ic)
 {
   symbol *sym;
+  PAIR_ID pair;
   operand *right = IC_RIGHT (ic);
   wassert (IS_TRUE_SYMOP (IC_LEFT (ic)));
   wassert (right && IS_OP_LITERAL (IC_RIGHT (ic)));
   sym = OP_SYMBOL (IC_LEFT (ic));
-
   aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
 
-  /* if the operand is on the stack then we
-     need to get the stack offset of this
-     variable */
-  if (IS_GB)
+  if (sym->onStack)
     {
-      if (sym->onStack)
-        {
-          spillPair (PAIR_HL);
-          if (sym->stack <= 0)
-            {
-              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + (int)operandLitValue (right));
-            }
-          else
-            {
-              setupPairFromSP (PAIR_HL, sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset + (int)operandLitValue (right));
-            }
-          commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
-        }
-      else
-        {
-          emit2 ("ld de, !hashedstr+%ld", sym->rname, (long)(operandLitValue (right)));
-          regalloc_dry_run_cost += 3;
-          commitPair (AOP (IC_RESULT (ic)), PAIR_DE, ic, FALSE);
-        }
+      int fp_offset = sym->stack + (sym->stack > 0 ? _G.stack.param_offset : 0) + (int)operandLitValue (right);
+      int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
+
+      pair = (getPairId (IC_RESULT (ic)->aop) == PAIR_IY) ? PAIR_IY : PAIR_HL;
+      spillPair (pair);
+      setupPairFromSP (pair, sp_offset);
     }
-  else
+  else 
     {
-      PAIR_ID pair;
-
-      if (sym->onStack)
+      pair = getPairId (IC_RESULT (ic)->aop);
+      if (pair == PAIR_INVALID)
         {
-          if (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY)
-            pair = PAIR_IY;
-          else
-            {
-              pair = PAIR_HL;
-              spillPair (PAIR_HL);
-            }
-
-          /* if it has an offset  then we need to compute it */
-          if (sym->stack > 0)
-            emit2 ("ld %s, !immedword", _pairs[pair].name,
-                   (int)(sym->stack + _G.stack.pushed + _G.stack.offset + _G.stack.param_offset + operandLitValue (right)));
-          else
-            emit2 ("ld %s, !immedword", _pairs[pair].name, (int)(sym->stack + _G.stack.pushed + _G.stack.offset + operandLitValue (right)));
-          regalloc_dry_run_cost += (pair == PAIR_IY ? 4 : 3);
-          emit2 ("add %s, sp", _pairs[pair].name);
-          regalloc_dry_run_cost += (pair == PAIR_IY ? 2 : 1);
+          pair = IS_GB ? PAIR_DE : PAIR_HL;
+          spillPair (pair);
         }
-      else
-        {
-          pair = getPairId (AOP (IC_RESULT (ic)));
-          if (pair == PAIR_INVALID)
-            {
-              pair = PAIR_HL;
-              spillPair (PAIR_HL);
-            }
-          emit2 ("ld %s, !hashedstr+%ld", _pairs[pair].name, sym->rname, (long)(operandLitValue (right)));
-          regalloc_dry_run_cost += (pair == PAIR_IY ? 4 : 3);
-        }
-      commitPair (AOP (IC_RESULT (ic)), pair, ic, FALSE);
+      emit2 ("ld %s, !hashedstr+%ld", _pairs[pair].name, sym->rname, (long)(operandLitValue (right)));
+      regalloc_dry_run_cost += (pair == PAIR_IY ? 4 : 3);
     }
+
+  commitPair (IC_RESULT (ic)->aop, pair, ic, FALSE);
+
   freeAsmop (IC_RESULT (ic), NULL);
 }
 

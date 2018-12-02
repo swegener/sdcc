@@ -1230,6 +1230,40 @@ FBYNAME (notSame)
 }
 
 /*-----------------------------------------------------------------*/
+/* same - Check if first operand matches any of the remaining      */
+/*-----------------------------------------------------------------*/
+FBYNAME (same)
+{
+    set *operands;
+    const char *match, *op;
+
+    operands = setFromConditionArgs(cmdLine, vars);
+
+    if (!operands)
+    {
+        fprintf(stderr,
+            "*** internal error: same peephole restriction"
+            " malformed: %s\n", cmdLine);
+        return FALSE;
+    }
+
+    operands = reverseSet(operands);
+
+    match = setFirstItem(operands);
+    for (op = setNextItem(operands); op; op = setNextItem(operands))
+    {
+        if (strcmp(match, op) == 0)
+        {
+            deleteSet(&operands);
+            return TRUE;
+        }
+    }
+
+    deleteSet(&operands);
+    return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
 /* operandsLiteral - returns true if the condition's operands are  */
 /* literals.                                                       */
 /*-----------------------------------------------------------------*/
@@ -1416,6 +1450,48 @@ FBYNAME (immdInRange)
     }
 }
 
+/*-----------------------------------------------------------------*/
+/* inSequence - Check that numerical constants are in sequence     */
+/*-----------------------------------------------------------------*/
+FBYNAME (inSequence)
+{
+  set *operands;
+  const char *op;
+  long seq, val, stride;
+
+  if ((operands = setFromConditionArgs(cmdLine, vars)) == NULL)
+    {
+      fprintf (stderr,
+               "*** internal error: inSequence peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  operands = reverseSet(operands);
+
+  op = setFirstItem(operands);
+  if ((immdGet(op, &stride) == NULL) || ((op = setNextItem(operands)) == NULL))
+    {
+      fprintf (stderr,
+               "*** internal error: inSequence peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  for (seq = LONG_MIN; op; op = setNextItem(operands))
+    {
+      if ((immdGet(op, &val) == NULL) || ((seq != LONG_MIN) && (val != seq+stride)))
+        {
+          deleteSet(&operands);
+          return FALSE;
+        }
+      seq = val;
+    }
+
+  deleteSet(&operands);
+  return TRUE;
+}
+
 static const struct ftab
 {
   char *fname;
@@ -1445,6 +1521,9 @@ ftab[] =                                            // sorted on the number of t
     "operandsNotRelated", operandsNotRelated        // 28
   },
   {
+    "same", same                                    // z88dk z80
+  },
+  {
     "labelJTInRange", labelJTInRange                // 13
   },
   {
@@ -1452,6 +1531,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "canAssign", canAssign                          // 8
+  },
+  {
+    "inSequence", inSequence                        // z88dk z80
   },
   {
     "optimizeReturn", optimizeReturn                // ? just a guess
@@ -1783,8 +1865,11 @@ top:
   getPeepLine (&replace, &bp);
 
   /* look for a 'if' */
-  while ((ISCHARSPACE (*bp) || *bp == '\n') && *bp)
-    bp++;
+  while ((ISCHARSPACE (*bp) || *bp == '\n' || (*bp == '/' && *(bp+1) == '/')) && *bp)
+    {
+      ++bp;
+      if (*bp == '/') while (*bp && *bp != '\n') ++bp;
+    }
 
   if (strncmp (bp, "if", 2) == 0)
     {
@@ -1926,6 +2011,12 @@ matchLine (char *s, const char *d, hTab ** vars)
 
   while (*s && *d)
     {
+      /* skip white space in both */
+      while (ISCHARSPACE(*s))
+          s++;
+      while (ISCHARSPACE(*d))
+          d++;
+
       /* if the destination is a var */
       if (*d == '%' && ISCHARDIGIT (*(d + 1)) && vars)
         {

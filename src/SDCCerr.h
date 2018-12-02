@@ -274,6 +274,7 @@ enum {
   E_STATIC_ASSERTION_C2X        = 245, /* static assertion with one argument requires C2X or later */
   W_STATIC_ASSERTION_2          = 246, /* static assertion failed */
   E_DECL_AFTER_STATEMENT_C99    = 247, /* declaration after statement requires ISO C99 or later */
+  E_SHORTCALL_INVALID_VALUE     = 248, /* Invalid value for a __z88dk_shortcall specifier */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

@@ -123,6 +123,8 @@ static char *_keywords[] = {
   "z88dk_fastcall",
   "z88dk_callee",
   "smallc",
+  "z88dk_shortcall",
+  "z88dk_params_offset",
   NULL
 };
 

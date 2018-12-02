@@ -104,7 +104,7 @@ bool uselessDecl = TRUE;
 %token BITWISEAND UNARYMINUS IPUSH IPOP PCALL  ENDFUNCTION JUMPTABLE
 %token RRC RLC
 %token CAST CALL PARAM NULLOP BLOCK LABEL RECEIVE SEND ARRAYINIT
-%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS
+%token DUMMY_READ_VOLATILE ENDCRITICAL SWAP INLINE NORETURN RESTRICT SMALLC PRESERVES_REGS Z88DK_FASTCALL Z88DK_CALLEE ALIGNAS Z88DK_SHORTCALL Z88DK_PARAMS_OFFSET
 %token GENERIC GENERIC_ASSOC_LIST GENERIC_ASSOCIATION
 %token ASM
 
@@ -290,6 +290,39 @@ function_attributes
                      }
    |  Z88DK_CALLEE   {  $$ = newLink (SPECIFIER);
                         FUNC_ISZ88DK_CALLEE($$) = 1;
+                     }
+   |  Z88DK_PARAMS_OFFSET '(' constant_expr ')' 
+                     {
+                        value *offset_v = constExprValue ($3, TRUE);
+                        int    offset = 0;
+                        $$ = newLink(SPECIFIER);
+                        if  ( offset_v ) 
+                          offset = ulFromVal(offset_v);
+                        $$->funcAttrs.z88dk_params_offset = offset;
+                     } 
+   |  Z88DK_SHORTCALL '(' constant_expr ',' constant_expr ')'
+                     {
+                        value *rst_v = constExprValue ($3, TRUE);
+                        value *value_v = constExprValue ($5, TRUE);
+                        int rst = -1, value = -1;
+                        $$ = newLink(SPECIFIER);
+
+                        if  ( rst_v ) 
+                          rst = ulFromVal(rst_v);
+                        if  ( value_v ) 
+                          value = ulFromVal(value_v);
+          
+                        if ( rst < 0 || rst > 56 || ( rst % 8 ) )
+                          {
+                            werror(E_SHORTCALL_INVALID_VALUE, "rst", rst);
+                          }
+                        if ( value < 0 || value > 0xfff )
+                          {
+                            werror(E_SHORTCALL_INVALID_VALUE, "value", value);
+                          }
+                        $$->funcAttrs.z88dk_shortcall_rst = rst;
+                        $$->funcAttrs.z88dk_shortcall_val = value;
+                        FUNC_ISZ88DK_SHORTCALL($$) = 1;
                      }
    |  PRESERVES_REGS '(' identifier_list ')'
                      {

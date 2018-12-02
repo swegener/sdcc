@@ -274,6 +274,8 @@ typedef struct sym_link
     unsigned smallc:1;              /* Parameters on stack are passed in reverse order */
     unsigned z88dk_fastcall:1;      /* For the z80-related ports: Function has a single paramter of at most 32 bits that is passed in dehl */
     unsigned z88dk_callee:1;        /* Stack pointer adjustment for parameters passed on the stack is done by the callee */
+    unsigned z88dk_shortcall:1;     /* Short call available via rst (see values later) (Z80 only) */
+    unsigned z88dk_has_params_offset:1;     /* Has a parameter offset (Z80 only) */
     unsigned intno;                 /* Number of interrupt for interrupt service routine */
     short regbank;                  /* register bank 2b used                */
     unsigned builtin;               /* is a builtin function                */
@@ -281,6 +283,9 @@ typedef struct sym_link
     unsigned overlay;               /* force parameters & locals into overlay segment */
     unsigned hasStackParms;         /* function has parameters on stack     */
     bool preserved_regs[9];         /* Registers preserved by the function - may be an underestimate */
+    unsigned char z88dk_shortcall_rst;  /* Rst for a short call */
+    unsigned short z88dk_shortcall_val; /* Value for a short call */
+    unsigned short z88dk_params_offset;  /* Additional offset from for arguments */
   } funcAttrs;
 
   struct sym_link *next;            /* next element on the chain  */
@@ -456,6 +461,8 @@ extern sym_link *validateLink (sym_link * l,
 #define IFFUNC_ISZ88DK_FASTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_FASTCALL(x))
 #define FUNC_ISZ88DK_CALLEE(x) (x->funcAttrs.z88dk_callee)
 #define IFFUNC_ISZ88DK_CALLEE(x) (IS_FUNC(x) && FUNC_ISZ88DK_CALLEE(x))
+#define FUNC_ISZ88DK_SHORTCALL(x) (x->funcAttrs.z88dk_shortcall)
+#define IFFUNC_ISZ88DK_SHORTCALL(x) (IS_FUNC(x) && FUNC_ISZ88DK_SHORTCALL(x))
 
 #define BANKED_FUNCTIONS        ( options.model == MODEL_HUGE || \
                                   ( (options.model == MODEL_LARGE || options.model == MODEL_MEDIUM) && \

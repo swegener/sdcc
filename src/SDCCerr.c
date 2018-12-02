@@ -557,6 +557,8 @@ struct
     "static assertion failed", 0 },
   { E_DECL_AFTER_STATEMENT_C99, ERROR_LEVEL_ERROR,
     "declaration after statement requires ISO C99 or later", 0 },
+  { E_SHORTCALL_INVALID_VALUE, ERROR_LEVEL_ERROR,
+    "invalid value for __z88dk_shortcall %s parameter: %x", 0},
 };
 
 /* -------------------------------------------------------------------------------

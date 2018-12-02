@@ -4223,6 +4223,10 @@ emitCall (const iCode *ic, bool ispcall)
         {
           werror (W_INDIR_BANKED);
         }
+      else if (IFFUNC_ISZ88DK_SHORTCALL (ftype)) 
+       {
+          wassertl(0, "__z88dk_short_call via function pointer not implemented");
+       }
       aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
 
       if (isLitWord (AOP (IC_LEFT (ic))))
@@ -4284,6 +4288,17 @@ emitCall (const iCode *ic, bool ispcall)
           if (IS_LITERAL (etype))
             {
               emit2 ("call 0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+              regalloc_dry_run_cost += 3;
+            }
+          else if ( IFFUNC_ISZ88DK_SHORTCALL(ftype) ) 
+            {
+              int rst = ftype->funcAttrs.z88dk_shortcall_rst;
+              int value = ftype->funcAttrs.z88dk_shortcall_val;
+              emit2 ("rst 0x%02x", rst);
+              if ( value < 256 ) 
+                emit2 ("defb 0x%02x\n",value);
+              else
+                emit2 ("defw 0x%04x\n",value);
               regalloc_dry_run_cost += 3;
             }
           else
@@ -4400,7 +4415,7 @@ genFunction (const iCode * ic)
      doesn't seem to get reset anywhere else.
    */
   _G.receiveOffset = 0;
-  _G.stack.param_offset = 0;
+  _G.stack.param_offset = sym->type->funcAttrs.z88dk_params_offset;
 
   /* Record the last function name for debugging. */
   _G.lastFunctionName = sym->rname;

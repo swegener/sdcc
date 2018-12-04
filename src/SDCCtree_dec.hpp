@@ -384,10 +384,10 @@ void nicify_diffs(T_t &T, typename boost::graph_traits<T_t>::vertex_descriptor t
       T[c0].bag.clear();
       boost::remove_edge(t, c0, T);
       adjacency_iter_t c, c_end;
-      for(boost::tie(c, c_end) = adjacent_vertices(c0, T); c != c_end; ++c)
+      for(boost::tie(c, c_end) = adjacent_vertices(c0, T); c != c_end; boost::tie(c, c_end) = adjacent_vertices(c0, T)) // Do not reuse c from previous loop iteration.
         {
           boost::add_edge(t, *c, T);
-          boost::remove_edge(c0, *c, T);
+          boost::remove_edge(c0, *c, T); // This removal of an edge invalidates edge iterators. The implementation of the vertex iterator adjacency_iter_t internally uses an edge iterator, thus further use of c is undefined behaviour.
         }
     }
 

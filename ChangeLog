@@ -1,3 +1,8 @@
+2018-12-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCtree_dec.hpp:
+	  Fix bug #1847.
+
 2018-12-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* SDCCerr.c: replaced include sdccconf.h by SDCCglobl.h, required for MSVC

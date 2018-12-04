@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sdccconf.h"
+#include "SDCCglobl.h"
 #ifdef HAVE_BACKTRACE_SYMBOLS_FD
 #include <unistd.h>
 #include <execinfo.h>

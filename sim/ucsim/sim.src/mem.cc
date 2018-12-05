@@ -1249,7 +1249,9 @@ cl_address_space::cl_address_space(const char *id,
   int i;
   for (i= 0; i < size; i++)
     {
-      memcpy(&(cella[i]), cell, sizeof(c));
+      void *p1= &(cella[i]);
+      void *p2= cell;
+      memcpy(p1, p2, sizeof(c));
       cella[i].init();
     }
   dummy= new cl_dummy_cell(awidth);

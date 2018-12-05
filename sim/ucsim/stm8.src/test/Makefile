@@ -1,4 +1,4 @@
-PROJECTS	= a s0 s1 s2 s3 t1 t2 t3 t4 xtest \
+PROJECTS	= s0 s1 s2 s3 t1 t2 t3 t4 xtest \
 		  sl ss lled sled ltim stim sertest \
 		  getbl \
 		  monitor

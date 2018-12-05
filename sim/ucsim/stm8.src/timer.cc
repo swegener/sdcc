@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: timer.cc 677 2017-03-07 08:16:02Z drdani $ */
+/* $Id$ */
 
 #include "itsrccl.h"
 
@@ -381,7 +381,7 @@ cl_tim::update_event(void)
 	  set_counter(ar);
 	}
     }
-  regs[idx.sr1]->set_bit1(uif);
+  regs[idx.sr1]->write_bit1(uif);
 }
 
 // true: UP, false: down

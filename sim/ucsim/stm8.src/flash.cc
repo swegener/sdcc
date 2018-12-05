@@ -68,7 +68,8 @@ cl_flash_as::cl_flash_as(const char *id, t_addr astart, t_addr asize):
   int i;
   for (i= 0; i < size; i++)
     {
-      memcpy(&(cella[i]), cell, sizeof(class cl_memory_cell));
+      void *p= &(cella[i]);
+      memcpy(p, cell, sizeof(class cl_memory_cell));
       cella[i].init();
     }
   dummy= new cl_dummy_cell(8);

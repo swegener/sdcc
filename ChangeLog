@@ -1,3 +1,28 @@
+2018-12-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merged ez80_z80 branch to trunk.
+
+2018-12-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/math.h,
+	  device/include/sdcc-lib.h:
+	  Fixes for ez80_z80 library.
+	* support/regression/ports/ez80-z80/spec.mk,
+	  support/regression/ports/ucz180/spec.mk:
+	  Preparation for ez80_z80 regression testing.
+
+2018-12-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asz80/z80mch.c:
+	  Improve eZ80 support in assembler, patch by Hynek Sladký.
+	* configure,
+	  configure.ac,
+	  device/lib/Makefile.in,
+	  device/lib/ez80_z80/Makefile.in,
+	  src/z80/main.c,
+	  device/lib/ez80_z80:
+	  ez80_z80 library.
+
 2018-12-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCtree_dec.hpp:
@@ -24,7 +49,37 @@
 2018-12-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Use lea for ez80_z80.
+	* sdas/asz80/z80.h,
+	  sdas/asz80/z80adr.c,
+	  sdas/asz80/z80mch.c,
+	  sdas/asz80/z80pst.c:
+	  eZ80 support in assembler, patch by Hynek Sladký.
+	* src/SDCCglue.c:
+	  Use assembler ez80 mode for ez80_z80 backend.
+
+2018-12-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  genAddrOf refactoring.
+
+2018-11-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure,
+	  configure.ac,
+	  sdccconf_in.h,
+	  src/SDCCmain.c,
+	  src/port.h,
+	  src/z80/main.c,
+	  src/z80/z80.h,
+	  src/z80/peep.c,
+	  support/regression/ports/ez80-z80,
+	  device/include/setjmp.h,
+	  device/include/stdarg.h,
+	  device/include/stdlib.h,
+	  device/include/string.h,
+	  support/regression/fwk/include/testfwk.h:
+	  Basic ez80_z80 backend.
 
 2018-11-30 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

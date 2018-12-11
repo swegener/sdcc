@@ -598,7 +598,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(true);
 
   // The Z180 has a non-destructive testing and.
-  if(IS_Z180 && ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) &&
+  if((IS_Z180 || IS_EZ80_Z80)&& ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) &&
     (getSize(operandType(left)) == 1 && operand_in_reg(left, REG_A, ia, i, G) && (IS_OP_LITERAL(right) /*|| operand_in_reg(right, ia, i, G) && !operand_in_reg(right, REG_IYL, ia, i, G) && !operand_in_reg(right, REG_IYH, ia, i, G)*/) ||
     getSize(operandType(right)) == 1 && operand_in_reg(right, REG_A, ia, i, G) && (IS_OP_LITERAL(left) /*|| operand_in_reg(left, ia, i, G) && !operand_in_reg(left, REG_IYL, ia, i, G) && !operand_in_reg(left, REG_IYH, ia, i, G)*/)))
     return(true);

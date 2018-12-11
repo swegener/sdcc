@@ -119,6 +119,9 @@
 #undef OPT_DISABLE_DS400
 
 /* XXX */
+#undef OPT_DISABLE_EZ80_Z80
+
+/* XXX */
 #undef OPT_DISABLE_GBZ80
 
 /* XXX */

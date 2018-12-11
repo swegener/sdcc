@@ -763,21 +763,22 @@ AC_DEFUN([AC_DO_PORT_ENABLER], [
 rm -f ports.all ports.build
 
 # Supported targets
-AC_DO_PORT(mcs51,  mcs51,  MCS51,  [Excludes the Intel mcs51 port])
-AC_DO_PORT(z80,    z80,    Z80,    [Excludes the Z80 port])
-AC_DO_PORT(z180,   z80,    Z180,   [Excludes the Z180 port])
-AC_DO_PORT(r2k,    z80,    R2K,    [Excludes the Rabbit 2000 port])
-AC_DO_PORT(r3ka,   z80,    R3KA,   [Excludes the Rabbit 3000A port])
-AC_DO_PORT(gbz80,  z80,    GBZ80,  [Excludes the Gameboy gbz80 port])
-AC_DO_PORT(tlcs90, z80,    TLCS90, [Excludes the TLCS-90 port])
-AC_DO_PORT(ds390,  ds390,  DS390,  [Excludes the DS390 port])
+AC_DO_PORT(mcs51,    mcs51,  MCS51,    [Excludes the Intel mcs51 port])
+AC_DO_PORT(z80,      z80,    Z80,      [Excludes the Z80 port])
+AC_DO_PORT(z180,     z80,    Z180,     [Excludes the Z180 port])
+AC_DO_PORT(r2k,      z80,    R2K,      [Excludes the Rabbit 2000 port])
+AC_DO_PORT(r3ka,     z80,    R3KA,     [Excludes the Rabbit 3000A port])
+AC_DO_PORT(gbz80,    z80,    GBZ80,    [Excludes the Gameboy gbz80 port])
+AC_DO_PORT(tlcs90,   z80,    TLCS90,   [Excludes the TLCS-90 port])
+AC_DO_PORT(ez80_z80, z80,    EZ80_Z80, [Excludes the TLCS-90 port])
+AC_DO_PORT(ds390,    ds390,  DS390,    [Excludes the EZ80-Z80 port])
 AC_DEFINE_UNQUOTED(OPT_DISABLE_TININative, $OPT_DISABLE_DS390, [XXX])
-AC_DO_PORT(ds400,  ds390,  DS400,  [Excludes the DS400 port])
-AC_DO_PORT(pic14,  pic14,  PIC14,  [Excludes the PIC14 port])
-AC_DO_PORT(pic16,  pic16,  PIC16,  [Excludes the PIC16 port])
-AC_DO_PORT(hc08,   hc08,   HC08,   [Excludes the HC08 port])
-AC_DO_PORT(s08,    hc08,   S08,    [Excludes the S08 port])
-AC_DO_PORT(stm8,   stm8,   STM8,   [Excludes the STM8 port])
+AC_DO_PORT(ds400,    ds390,  DS400,    [Excludes the DS400 port])
+AC_DO_PORT(pic14,    pic14,  PIC14,    [Excludes the PIC14 port])
+AC_DO_PORT(pic16,    pic16,  PIC16,    [Excludes the PIC16 port])
+AC_DO_PORT(hc08,     hc08,   HC08,     [Excludes the HC08 port])
+AC_DO_PORT(s08,      hc08,   S08,      [Excludes the S08 port])
+AC_DO_PORT(stm8,     stm8,   STM8,     [Excludes the STM8 port])
 
 # Unsupported targets
 ####AC_DO_PORT_ENABLER(avr,   avr,   AVR,   [Includes the AVR port (disabled by default)])
@@ -873,14 +874,15 @@ if test $OPT_DISABLE_PIC16 = 0 && test $OPT_DISABLE_NON_FREE = 0; then
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/non-free/lib/pic16)
 fi
 
-if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0; then
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0; then
   AC_CONFIG_FILES([src/z80/Makefile])
 fi
 
-if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0; then
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0; then
   AC_CONFIG_FILES([sdas/asz80/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/z80/Makefile
-                                                       device/lib/z180/Makefile])
+                                                       device/lib/z180/Makefile
+                                                       device/lib/ez80_z80/Makefile])
 fi
 
 if test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0; then
@@ -982,6 +984,7 @@ sdcc ${VERSION} is now configured for
     r3ka                ${enable_r3ka_port}
     gbz80               ${enable_gbz80_port}
     tlcs90              ${enable_tlcs90_port}
+    ez80_z80            ${enable_ez80_z80_port}
     stm8                ${enable_stm8_port}
 
   Disable non-free lib: ${OPT_DISABLE_NON_FREE}

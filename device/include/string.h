@@ -69,7 +69,7 @@ extern void *memmove (void *dest, const void *src, size_t n) __preserves_regs(iy
 #else
 extern void *memmove (void *dest, const void *src, size_t n);
 #endif
-#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90)
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined (__SDCC_ez80_z80)
 extern char *strcpy (char * /*restrict*/ dest, const char * /*restrict*/ src) __preserves_regs(iyl, iyh);
 #else
 extern char *strcpy (char * /*restrict*/ dest, const char * /*restrict*/ src);
@@ -114,7 +114,7 @@ extern void *memset (void *s, int c, size_t n);
 #endif
 
 /* extern char *strerror(int errnum); */
-#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_tlcs90)
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_tlcs90) || defined (__SDCC_ez80_z80)
 extern size_t strlen (const char *s) __preserves_regs(d, e, iyl, iyh);
 #else
 extern size_t strlen (const char *s);
@@ -124,7 +124,7 @@ extern size_t strlen (const char *s);
 extern void __xdata * memcpyx(void __xdata *, void __xdata *, int) __naked;
 #endif
 
-#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka)
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined (__SDCC_ez80_z80)
 #define memcpy(dst, src, n) __builtin_memcpy(dst, src, n)
 #define strcpy(dst, src) __builtin_strcpy(dst, src)
 #define strncpy(dst, src, n) __builtin_strncpy(dst, src, n)

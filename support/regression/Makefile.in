@@ -201,6 +201,11 @@ test-tlcs90:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=tlcs90
 
+# Helper rule for testing the tlcs90 port only(use uCsim simulator)
+test-ez80-z80:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=ez80-z80
+
 ### Helper rule for testing the host cc only
 test-host:
 	$(MAKE) test-common

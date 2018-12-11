@@ -99,6 +99,9 @@ struct expr *esp;
                 } else
                 if ((indx = admode(R16X)) != 0) {
                         mode = S_R16X;
+                } else
+                if ((indx = admode(R8MB)) != 0) {
+                        mode = S_R8MB;
                 } else {
                         mode = S_USER;
                         expr(esp, 0);
@@ -229,6 +232,11 @@ struct  adsym   R16[] = {
 struct  adsym   R16X[] = {
     {   "af'",  AF|0400 },      /* af' must be first !!! */
     {   "af",   AF|0400 },
+    {   "",     0000    }
+};
+
+struct  adsym   R8MB[] = {
+    {   "mb",   MB|0400 },
     {   "",     0000    }
 };
 

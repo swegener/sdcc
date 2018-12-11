@@ -413,10 +413,10 @@ z80MightRead(const lineNode *pl, const char *what)
     ISINST(pl->line, "outi") || ISINST(pl->line, "outd") || ISINST(pl->line, "otir") || ISINST(pl->line, "otdr")))
     return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "h") || !strcmp(what, "l"));
 
-  if(IS_Z180 && ISINST(pl->line, "mlt"))
+  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "mlt"))
     return(argCont(pl->line + 4, what));
 
-  if(IS_Z180 && ISINST(pl->line, "tst"))
+  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tst"))
     return(argCont(pl->line + 4, what));
 
   if(IS_RAB && ISINST(pl->line, "mul"))
@@ -505,7 +505,7 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if(strcmp(pl->line, "ld\tiy")  == 0 && strncmp(what, "iy", 2) == 0)
     return true;
 
-  if (IS_Z180)
+  if (IS_Z180 || IS_EZ80_Z80)
     {
       if (ISINST(pl->line, "mlt"))
         return(strchr(pl->line + 4, *what) != 0);
@@ -893,10 +893,20 @@ int z80instructionSize(lineNode *pl)
          STRNCASECMP(op1start, "hl", 2)   && STRNCASECMP(op1start, "a", 1))
         return(4);
 
+      /* Rabbit 16-bit pointer load */
       if(IS_RAB && !STRNCASECMP(op1start, "hl", 2) && (argCont(op2start, "(hl)") || argCont(op2start, "(iy)")))
         return(4);
       if(IS_RAB && !STRNCASECMP(op1start, "hl", 2) && (argCont(op2start, "(sp)") || argCont(op2start, "(ix)")))
         return(3);
+
+      if(IS_EZ80_Z80 && /* eZ80 16-bit pointer load */
+        (!STRNCASECMP(op1start, "bc", 2) || !STRNCASECMP(op1start, "de", 2) || !STRNCASECMP(op1start, "hl", 2) || !STRNCASECMP(op1start, "ix", 2) || !STRNCASECMP(op1start, "iy", 2)))
+        {
+          if (!STRNCASECMP(op2start, "(hl)", 4))
+            return(2);
+          if (argCont(op2start, "(ix)") || argCont(op2start, "(iy)"))
+            return(3);
+        }
 
       /* These 4 are the only remaining cases of 3 byte long ld instructions. */
       if(argCont(op2start, "(ix)") || argCont(op2start, "(iy)"))
@@ -1055,10 +1065,10 @@ int z80instructionSize(lineNode *pl)
   if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
     return(1);
 
-  if(IS_Z180 && ISINST(pl->line, "mlt"))
+  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "mlt"))
     return(2);
 
-  if(IS_Z180 && ISINST(pl->line, "tst"))
+  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tst"))
     return((op1start[0] == '#' || op2start && op1start[0] == '#') ? 3 : 2);
   
   if(IS_RAB && ISINST(pl->line, "mul"))

@@ -1,4 +1,4 @@
-# Regression test specification for the z180 target running with uCsim
+# Regression test specification for the ez80_z80 target running with uCsim
 
 # simulation timeout in seconds
 SIM_TIMEOUT = 40
@@ -30,7 +30,7 @@ ifdef CROSSCOMPILING
   SDCCFLAGS += -I$(top_srcdir)
 endif
 
-SDCCFLAGS += -mz180 --less-pedantic --profile
+SDCCFLAGS += -mez80_z80 --less-pedantic --profile
 LINKFLAGS += z180.lib
 
 OBJEXT = .rel

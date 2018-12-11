@@ -2243,6 +2243,8 @@ glue (void)
     fprintf (asmFile, "\t.hd64\n");
   else if (TARGET_IS_R3KA)
     fprintf (asmFile, "\t.r3k\n");
+  else if (TARGET_IS_EZ80_Z80)
+    fprintf (asmFile, "\t.ez80\n");
 
   /* print module name */
   tfprintf (asmFile, "\t!module\n", moduleName);
@@ -2305,7 +2307,7 @@ glue (void)
   if (port->assembler.externGlobal)
     printExterns (asmFile);
 
-  if ((mcs51_like) || (TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_Z180 || TARGET_IS_RABBIT))  /*.p.t.20030924 need to output SFR table for Z80 as well */
+  if ((mcs51_like) || (TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_Z180 || TARGET_IS_RABBIT || TARGET_IS_EZ80_Z80))  /*.p.t.20030924 need to output SFR table for Z80 as well */
     {
       /* copy the sfr segment */
       fprintf (asmFile, "%s", iComments2);

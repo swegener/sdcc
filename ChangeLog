@@ -2,6 +2,8 @@
 
 	* sdas/asz80/z80mch.c:
 	  Fix handling of tst for eZ80, patch by Hynek Sladký.
+	* src/z80/gen.c:
+	  Fix an issue in 8-bit parameters to __z88dk_fastcall related to bug #2852.
 
 2018-12-11 Philipp Klaus Krause <pkk AT spth.de>
 

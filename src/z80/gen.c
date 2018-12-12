@@ -4135,7 +4135,7 @@ static void genSend (const iCode *ic)
     }
   else if (size <= 4)
     {
-      if (_fReturn3[0]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[1]->aopu.aop_reg[0]->rIdx == H_IDX &&
+      if (size == 4 && _fReturn3[0]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[1]->aopu.aop_reg[0]->rIdx == H_IDX &&
         _fReturn3[2]->aopu.aop_reg[0]->rIdx == E_IDX && _fReturn3[3]->aopu.aop_reg[0]->rIdx == D_IDX)
         {
           if (!isPairDead (PAIR_DE, ic))

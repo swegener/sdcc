@@ -1,18 +1,16 @@
 2018-12-12 Philipp Klaus Krause <pkk AT spth.de>
 
+	* sdas/asz80/z80mch.c:
+	  Fix handling of tst for eZ80, patch by Hynek Sladký.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2854.c:
+	  Fix an issue in 8-bit parameters to __z88dk_fastcall, bugs #2852 and #2854.
+	* src/hc08/ralloc2.cc:
+	  Fix bug #2215.
 	* src/stm8/ralloc.c,
 	  src/z80/ralloc.c,
 	  support/regression/tests/bug-2501.c:
 	  Fix bug #2501.
-
-2018-12-12 Philipp Klaus Krause <pkk AT spth.de>
-
-	* sdas/asz80/z80mch.c:
-	  Fix handling of tst for eZ80, patch by Hynek Sladký.
-	* src/z80/gen.c:
-	  Fix an issue in 8-bit parameters to __z88dk_fastcall related to bug #2852.
-	* src/hc08/ralloc2.cc:
-	  Fix bug #2215.
 
 2018-12-11 Philipp Klaus Krause <pkk AT spth.de>
 

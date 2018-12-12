@@ -193,6 +193,12 @@ regTypeNum (void)
       /* if used zero times then no registers needed. Exception: Variables larger than 4 bytes - these might need a spill location when they are return values */
       if ((sym->liveTo - sym->liveFrom) == 0 && getSize (sym->type) <= 4)
         continue;
+      else if ((sym->liveTo - sym->liveFrom) == 0 && bitVectnBitsOn (sym->defs) <= 1)
+        {
+          iCode *dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym->defs));
+          if (!dic || dic->op != CALL && dic->op != PCALL)
+            continue;
+        }
 
       D (D_ALLOC, ("regTypeNum: loop on sym %p\n", sym));
 
@@ -668,7 +674,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                   sym->isspilt = false;
                 }
 
-              if (sym->nRegs > 4 && ic->op == CALL)
+              if (sym->nRegs > 4 && ic->op == CALL) // To be allocated to stack due to the way long long return values are handled via a hidden pointer.
                 {
                   sym->for_newralloc = 0;
                   stm8SpillThis (sym, TRUE);

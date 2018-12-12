@@ -1625,6 +1625,12 @@ regTypeNum (void)
       /* if used zero times then no registers needed */
       if ((sym->liveTo - sym->liveFrom) == 0 && getSize (sym->type) <= 4)
         continue;
+      else if ((sym->liveTo - sym->liveFrom) == 0 && bitVectnBitsOn (sym->defs) <= 1)
+        {
+          iCode *dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (sym->defs));
+          if (!dic || dic->op != CALL && dic->op != PCALL)
+            continue;
+        }
 
       D (D_ALLOC, ("regTypeNum: loop on sym %p\n", sym));
 

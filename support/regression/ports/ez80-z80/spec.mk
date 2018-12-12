@@ -22,7 +22,7 @@ else
 
 ifndef CROSSCOMPILING
   SDCCFLAGS += --nostdinc -I$(top_srcdir)
-  LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/z180
+  LINKFLAGS += --nostdlib -L$(top_builddir)/device/lib/build/ez80_z80
 endif
 endif
 
@@ -31,7 +31,7 @@ ifdef CROSSCOMPILING
 endif
 
 SDCCFLAGS += -mez80_z80 --less-pedantic --profile
-LINKFLAGS += z180.lib
+LINKFLAGS += ez80_z80.lib
 
 OBJEXT = .rel
 BINEXT = .ihx

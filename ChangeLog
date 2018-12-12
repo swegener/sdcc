@@ -1,3 +1,8 @@
+2018-12-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asz80/z80mch.c:
+	  Fix handling of tst for eZ80, patch by Hynek Sladký.
+
 2018-12-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merged ez80_z80 branch to trunk.

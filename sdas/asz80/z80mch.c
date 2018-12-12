@@ -1772,7 +1772,7 @@ struct mne *mp;
 		/*
 		 * tst  (hl)
 		 */
-                if (mchtyp == X_HD64 && t2 == S_IDHL) {
+                if ((mchtyp == X_HD64 || mchtyp == X_EZ80) && t2 == S_IDHL) {
                         outab(0xED);
                         outab(0x34);
                         break;
@@ -1780,7 +1780,7 @@ struct mne *mp;
 		/*
 		 * tst  r
 		 */
-                if (mchtyp == X_HD64 && t2 == S_R8) {
+                if ((mchtyp == X_HD64 || mchtyp == X_EZ80) && t2 == S_R8) {
                         outab(0xED);
                         outab(op | (e2.e_addr << 3));
                         break;
@@ -1790,7 +1790,7 @@ struct mne *mp;
 		 */
                 if (t2 == S_IMMED) {
                         outab(0xED);
-                        if (mchtyp == X_HD64)
+                        if (mchtyp == X_HD64 || mchtyp == X_EZ80)
                                 outab(0x64);
                         else if (mchtyp == X_ZXN)
                                 outab(0x27);

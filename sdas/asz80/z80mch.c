@@ -2125,7 +2125,7 @@ struct mne *mp;
 				  }
 			  }
 			}
-#warning "ToDo: ASXX has 'Cycle Adjustment' here..."
+// ToDo: ASXX has 'Cycle Adjustment' here...
                         break;
                 default:
                         break;
@@ -2211,56 +2211,16 @@ int sfx;
 struct expr *esp;
 {
 
-#warning "Pokus napsat zapis parametru 16/24-bit 'jinak'..."
+// Pokus napsat zapis parametru 16/24-bit 'jinak'...
 	if (ez80_adl && !(sfx & M_IS)) {
 		outr3b(esp, R_ADL);
 	} else {
 		outrw(esp, 0);
-#warning "Proc je pro Z80 defaultni funkce outrwm()...?"
+// warning "Proc je pro Z80 defaultni funkce outrwm()...?
 // funkce - viz asxxsrc/asout.c
 // zrejme se musim podivat do ASxx zdrojaku, jak se zpracovavaji priznaky R_ADL, R_Z80, R_PAGX1...
 //		outrwm(esp, R_Z80|R_PAGX1, 0);
 	}
-
-
-
-#warning "ToDo: remove copied code..."
-#if 0
-	switch(mode) {
-	case MM_ADL:
-		switch(sfx) {
-		case M_IS:
-		case M_SIS:
-			outrw(esp, 0);
-			break;
-		case M_IL:
-		case M_LIL:
-			aerr();
-			break;
-		default:
-			outr3b(esp, R_ADL);
-			break;
-		}
-		break;
-	case MM_Z80:
-		switch(sfx) {
-		case M_IS:
-		case M_SIS:
-			aerr();
-			break;
-		case M_IL:
-		case M_LIL:
-			outr3b(esp, R_ADL);
-			break;
-		default:
-			outrwm(esp, R_Z80|R_PAGX1, 0);
-			break;
-		}
-		break;
-	default:
-		break;
-	}
-#endif
 }
 
 /*

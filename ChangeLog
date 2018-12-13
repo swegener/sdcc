@@ -8,6 +8,8 @@
 	  Remove dist target, fix bug #2679.
 	* src/SDCCtree_dec.hpp:
 	  Improve fix for #1874.
+	* sdas/asz80/z80mch.c:
+	  Turn a few eZ80-related warning into comments.
 
 2018-12-12 Philipp Klaus Krause <pkk AT spth.de>
 

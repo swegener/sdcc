@@ -3,6 +3,9 @@
 	* src/SDCCicode.c,
 	  support/regression/tests/bug-2710.c:
 	  Fix bug #2710.
+	* Makefile.in,
+	  sim/ucsim/Makefile.in:
+	  Remove dist target, fix bug #2679.
 
 2018-12-12 Philipp Klaus Krause <pkk AT spth.de>
 

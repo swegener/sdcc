@@ -110,16 +110,6 @@ realclean: distclean
 	done
 
 
-# Creating distribution
-# ---------------------
-dist: distclean
-	@if [ -f devel ]; then\
-	  rm -f devel; mkdist; touch devel;\
-	else\
-	  mkdist;\
-	fi
-
-
 # Performing self-test
 # --------------------
 check:

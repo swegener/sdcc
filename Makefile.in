@@ -243,15 +243,6 @@ realclean: distclean
 	  $(MAKE) -C $$pkg PORTS="$(PORTS)" EXEEXT=$(EXEEXT) realclean ;\
 	done
 
-# Creating distribution
-# ---------------------
-dist: distclean
-	@if [ -f devel ]; then\
-	  rm -f devel; mkdist sdcc; touch devel;\
-	else\
-	  mkdist sdcc;\
-	fi
-
 # Performing self-test
 # --------------------
 check:

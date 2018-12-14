@@ -78,6 +78,7 @@ typedef struct asmop
     int aop_pairId;             /* The pair ID */
   }
   aopu;
+  signed char regs[9]; // Byte of this aop that is in the register. -1 if no byte of this aop is in the reg.
 }
 asmop;
 

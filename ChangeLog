@@ -1,3 +1,8 @@
+2018-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Refactor handling of return values.
+
 2018-12-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.c,

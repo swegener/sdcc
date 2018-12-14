@@ -60,9 +60,6 @@ enum
 static char *_z80_return[] = { "l", "h", "e", "d" };
 static char *_gbz80_return[] = { "e", "d", "l", "h" };
 
-static char **_fReturn;
-static char **_fTmp;
-
 extern struct dbuf_s *codeOutBuf;
 
 enum
@@ -248,7 +245,7 @@ bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_zero, asmop_one;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_zero, asmop_one, asmop_return;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_B = &asmop_b;
 static struct asmop *const ASMOP_C = &asmop_c;
@@ -260,13 +257,9 @@ static struct asmop *const ASMOP_IYH = &asmop_iyh;
 static struct asmop *const ASMOP_IYL = &asmop_iyl;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
-
-static asmop *_z80_return3[] = { &asmop_l, &asmop_h, &asmop_e, &asmop_d };
-static asmop *_gbz80_return3[] = { &asmop_e, &asmop_d, &asmop_l, &asmop_h };
+static struct asmop *const ASMOP_RETURN = &asmop_return;
 
 static asmop *asmopregs[] = { &asmop_a, &asmop_c, &asmop_b, &asmop_e, &asmop_d, &asmop_l, &asmop_h, &asmop_iyl, &asmop_iyh };
-
-static asmop **_fReturn3;
 
 void
 z80_init_asmops (void)
@@ -307,7 +300,22 @@ z80_init_asmops (void)
   asmop_one.aopu.aop_lit = constVal ("1");
   asmop_one.size = 1;
 
-  _fReturn3 = IS_GB ? _gbz80_return3 : _z80_return3;
+  asmop_return.type = AOP_REG;
+  asmop_return.size = 4;
+  if (IS_GB)
+    {
+      asmop_return.aopu.aop_reg[0] = regsZ80 + E_IDX;
+      asmop_return.aopu.aop_reg[1] = regsZ80 + D_IDX;
+      asmop_return.aopu.aop_reg[2] = regsZ80 + L_IDX;
+      asmop_return.aopu.aop_reg[3] = regsZ80 + H_IDX;
+    }
+  else
+    {
+      asmop_return.aopu.aop_reg[0] = regsZ80 + L_IDX;
+      asmop_return.aopu.aop_reg[1] = regsZ80 + H_IDX;
+      asmop_return.aopu.aop_reg[2] = regsZ80 + E_IDX;
+      asmop_return.aopu.aop_reg[3] = regsZ80 + D_IDX;
+    }
 }
 
 static bool regalloc_dry_run;
@@ -1545,7 +1553,7 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
           aop = op->aop = sym->aop = newAsmop (AOP_STR);
           aop->size = getSize (sym->type);
           for (i = 0; i < 4; i++)
-            aop->aopu.aop_str[i] = _fReturn[i];
+            aop->aopu.aop_str[i] = ASMOP_RETURN->aopu.aop_reg[i]->name;
           return;
         }
 
@@ -3081,6 +3089,41 @@ commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
 }
 
 /*-----------------------------------------------------------------*/
+/* genCopy - Copy the value from one reg/stk asmop to another      */
+/*-----------------------------------------------------------------*/
+static void
+genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool a_dead)
+{
+  for (unsigned int i = 0; i < sizex; i++)
+    cheapMove (result, roffset + i, source, soffset + i);
+}
+
+/*-----------------------------------------------------------------*/
+/* genMove_o - Copy part of one asmop to another                   */
+/*-----------------------------------------------------------------*/
+static void
+genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, bool a_dead_global)
+{
+  if ((result->type == AOP_REG || !IS_GB && result->type == AOP_STK) && (source->type == AOP_REG || !IS_GB && source->type == AOP_STK))
+    {
+      genCopy (result, roffset, source, soffset, size, a_dead_global);
+      return;
+    }
+
+  for (unsigned int i = 0; i < size; i++)
+    cheapMove (result, roffset + i, source, soffset + i);
+}
+
+/*-----------------------------------------------------------------*/
+/* genMove - Copy the value from one asmop to another              */
+/*-----------------------------------------------------------------*/
+static void
+genMove (asmop *result, asmop *source, bool a_dead)
+{
+  genMove_o (result, 0, source, 0, result->size, a_dead);
+}
+
+/*-----------------------------------------------------------------*/
 /* getDataSize - get the operand data size                         */
 /*-----------------------------------------------------------------*/
 static int
@@ -3582,11 +3625,11 @@ assignResultValue (operand * oper)
     {
       /* We do it the hard way here. */
       _push (PAIR_HL);
-      cheapMove (AOP (oper), 0, _fReturn3[0], 0);
-      cheapMove (AOP (oper), 1, _fReturn3[1], 0);
+      cheapMove (oper->aop, 0, ASMOP_RETURN, 0);
+      cheapMove (oper->aop, 1, ASMOP_RETURN, 1);
       _pop (PAIR_DE);
-      cheapMove (AOP (oper), 2, _fReturn3[0], 0);
-      cheapMove (AOP (oper), 3, _fReturn3[1], 0);
+      cheapMove (oper->aop, 2, ASMOP_RETURN, 2);
+      cheapMove (oper->aop, 3, ASMOP_RETURN, 3);
     }
   else
     {
@@ -3597,7 +3640,7 @@ assignResultValue (operand * oper)
 
           for (i = 0; i < size; i++)
             {
-              retarray[i] = _fReturn3[i]->aopu.aop_reg[0]->rIdx;
+              retarray[i] = ASMOP_RETURN->aopu.aop_reg[i]->rIdx;
               oparray[i] = AOP (oper)->aopu.aop_reg[i]->rIdx;
             }
 
@@ -3605,7 +3648,7 @@ assignResultValue (operand * oper)
         }
       else
         while (size--)
-          cheapMove (AOP (oper), size, _fReturn3[size], 0);
+          cheapMove (AOP (oper), size, ASMOP_RETURN, size);
     }
 }
 
@@ -4135,8 +4178,8 @@ static void genSend (const iCode *ic)
     }
   else if (size <= 4)
     {
-      if (size == 4 && _fReturn3[0]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[1]->aopu.aop_reg[0]->rIdx == H_IDX &&
-        _fReturn3[2]->aopu.aop_reg[0]->rIdx == E_IDX && _fReturn3[3]->aopu.aop_reg[0]->rIdx == D_IDX)
+      if (size == 4 && ASMOP_RETURN->aopu.aop_reg[0]->rIdx == L_IDX && ASMOP_RETURN->aopu.aop_reg[1]->rIdx == H_IDX &&
+        ASMOP_RETURN->aopu.aop_reg[2]->rIdx == E_IDX && ASMOP_RETURN->aopu.aop_reg[3]->rIdx == D_IDX)
         {
           if (!isPairDead (PAIR_DE, ic))
             {
@@ -4157,9 +4200,9 @@ static void genSend (const iCode *ic)
 
           for (i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
             {
-              retarray[i] = _fReturn3[i]->aopu.aop_reg[0]->rIdx;
+              retarray[i] = ASMOP_RETURN->aopu.aop_reg[i]->rIdx;
               if (!regalloc_dry_run)
-                z80_regs_used_as_parms_in_calls_from_current_function[_fReturn3[i]->aopu.aop_reg[0]->rIdx] = true;
+                z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_RETURN->aopu.aop_reg[i]->rIdx] = true;
               oparray[i] = AOP (IC_LEFT (ic))->aopu.aop_reg[i]->rIdx;
             }
 
@@ -4170,9 +4213,9 @@ static void genSend (const iCode *ic)
           int offset = 0;
           while (size--)
             {
-              cheapMove (_fReturn3[offset], 0, AOP (IC_LEFT (ic)), offset);
+              cheapMove (ASMOP_RETURN, offset, IC_LEFT (ic)->aop, offset);
               if (!regalloc_dry_run)
-                z80_regs_used_as_parms_in_calls_from_current_function[_fReturn3[offset]->aopu.aop_reg[0]->rIdx] = true;
+                z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_RETURN->aopu.aop_reg[offset]->rIdx] = true;
               offset++;
             }
         }
@@ -4744,7 +4787,7 @@ genRet (const iCode *ic)
 
           for (i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
             {
-              retarray[i] = _fReturn3[i]->aopu.aop_reg[0]->rIdx;
+              retarray[i] = ASMOP_RETURN->aopu.aop_reg[i]->rIdx;
               oparray[i] = AOP (IC_LEFT (ic))->aopu.aop_reg[i]->rIdx;
             }
 
@@ -4755,22 +4798,22 @@ genRet (const iCode *ic)
           bool skipbytes[4] = {false, false, false, false}; // Take care to not overwrite hl.
           for (offset = 0; offset < size; offset++)
             {
-              if (requiresHL (AOP (IC_LEFT (ic))) && (_fReturn3[offset]->aopu.aop_reg[0]->rIdx == H_IDX || _fReturn3[offset]->aopu.aop_reg[0]->rIdx == L_IDX))
+              if (requiresHL (AOP (IC_LEFT (ic))) && (ASMOP_RETURN->aopu.aop_reg[offset]->rIdx == H_IDX || ASMOP_RETURN->aopu.aop_reg[offset]->rIdx == L_IDX))
                 {
                   skipbytes[offset] = true;
                   continue;
                 }
-              cheapMove (_fReturn3[offset], 0, AOP (IC_LEFT (ic)), offset);
+              cheapMove (ASMOP_RETURN, offset, IC_LEFT (ic)->aop, offset);
             }
           for (offset = 0; offset < size; offset++)
-            if (skipbytes[offset] && offset + 1 < size && _fReturn3[offset]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[offset + 1]->aopu.aop_reg[0]->rIdx == H_IDX)
+            if (skipbytes[offset] && offset + 1 < size && ASMOP_RETURN->aopu.aop_reg[offset]->rIdx == L_IDX && ASMOP_RETURN->aopu.aop_reg[offset + 1]->rIdx == H_IDX)
               {
-                fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, offset);
+                fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, offset);
                 break;
               }
             else if (skipbytes[offset])
               {
-                cheapMove (_fReturn3[offset], 0, AOP (IC_LEFT (ic)), offset);
+                cheapMove (ASMOP_RETURN, offset, IC_LEFT (ic)->aop, offset);
               }
         }
     }
@@ -6061,13 +6104,10 @@ genMinus (const iCode * ic)
 static void
 genUminusFloat (operand *op, operand *result)
 {
-  int size, offset = 0;
-
   emitDebug ("; genUminusFloat");
 
   /* for this we just need to flip the
      first bit then copy the rest in place */
-  size = AOP_SIZE (op) - 1;
 
   cheapMove (ASMOP_A, 0, AOP (op), MSB32);
 
@@ -6078,11 +6118,7 @@ genUminusFloat (operand *op, operand *result)
   if (operandsEqu (result, op))
     return;
 
-  while (size--)
-    {
-      cheapMove (AOP (result), offset, AOP (op), offset);
-      offset++;
-    }
+  genMove_o (result->aop, 0, op->aop, 0, AOP_SIZE (op) - 1, !aopInReg(result->aop, MSB32, A_IDX));
 }
 
 /*-----------------------------------------------------------------*/
@@ -11178,24 +11214,24 @@ genReceive (const iCode * ic)
   for (unsigned int i = 0; i < size;)
     {
        if (size - i >= 2 && (result->aop->type == AOP_HL || result->aop->type == AOP_IY) &&
-         (_fReturn3[i]->aopu.aop_reg[0]->rIdx == L_IDX && _fReturn3[i + 1]->aopu.aop_reg[0]->rIdx == H_IDX || _fReturn3[i]->aopu.aop_reg[0]->rIdx == E_IDX && _fReturn3[i + 1]->aopu.aop_reg[0]->rIdx == D_IDX))
+         (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX && ASMOP_RETURN->aopu.aop_reg[i + 1]->rIdx == H_IDX || ASMOP_RETURN->aopu.aop_reg[i]->rIdx == E_IDX && ASMOP_RETURN->aopu.aop_reg[i + 1]->rIdx == D_IDX))
          {
-           emit2 ("ld (%s), %s", aopGetLitWordLong (result->aop, i, FALSE), _fReturn3[i]->aopu.aop_reg[0]->rIdx == L_IDX ?  "hl" : "de");
-           regalloc_dry_run_cost += 3 + (_fReturn3[i]->aopu.aop_reg[0]->rIdx != L_IDX);
+           emit2 ("ld (%s), %s", aopGetLitWordLong (result->aop, i, FALSE), ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX ?  "hl" : "de");
+           regalloc_dry_run_cost += 3 + (ASMOP_RETURN->aopu.aop_reg[i]->rIdx != L_IDX);
            i += 2;
            continue;
          }
 
-       if (requiresHL (result->aop) && (_fReturn3[i]->aopu.aop_reg[0]->rIdx == L_IDX || _fReturn3[i]->aopu.aop_reg[0]->rIdx == H_IDX))
+       if (requiresHL (result->aop) && (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX || ASMOP_RETURN->aopu.aop_reg[i]->rIdx == H_IDX))
          {
-           emit2 (_fReturn3[i]->aopu.aop_reg[0]->rIdx == L_IDX ? "ld a, l" : "ld a, h");
+           emit2 (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX ? "ld a, l" : "ld a, h");
            emit2 ("ld (%s), a", aopGetLitWordLong (result->aop, i, FALSE));
            regalloc_dry_run_cost += 4;
            i++;
            continue;
          }
 
-       cheapMove (result->aop, i, _fReturn3[i], 0);
+       cheapMove (result->aop, i, ASMOP_RETURN, i);
        i++;
     }
 
@@ -12535,18 +12571,6 @@ dryZ80iCode (iCode * ic)
   regalloc_dry_run = TRUE;
   regalloc_dry_run_cost = 0;
 
-  /* Hack */
-  if (IS_GB)
-    {
-      _fReturn = _gbz80_return;
-      _fTmp = _gbz80_return;
-    }
-  else
-    {
-      _fReturn = _z80_return;
-      _fTmp = _z80_return;
-    }
-
   initGenLineElement ();
   _G.omitFramePtr = should_omit_frame_ptr;
 
@@ -12589,18 +12613,6 @@ genZ80Code (iCode * lic)
   iCode *ic;
   int cln = 0;
   regalloc_dry_run = FALSE;
-
-  /* Hack */
-  if (IS_GB)
-    {
-      _fReturn = _gbz80_return;
-      _fTmp = _gbz80_return;
-    }
-  else
-    {
-      _fReturn = _z80_return;
-      _fTmp = _z80_return;
-    }
 
   initGenLineElement ();
 

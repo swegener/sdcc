@@ -1333,8 +1333,8 @@ simple_object_elf_copy_lto_debug_sections (simple_object_read *sobj,
 					   strsz, &errmsg, err);
 	      /* Find gnu_lto_ in strings.  */
 	      char *gnu_lto = strings;
-	      while ((gnu_lto = memchr (gnu_lto, 'g',
-					strings + strsz - gnu_lto)))
+	      while ((gnu_lto = (char *)memchr (gnu_lto, 'g',
+						strings + strsz - gnu_lto)))
 		if (strncmp (gnu_lto, "gnu_lto_v1",
 			     strings + strsz - gnu_lto) == 0)
 		  break;

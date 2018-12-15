@@ -1179,7 +1179,7 @@ _cpp_init_files (cpp_reader *pfile)
 						    nonexistent_file_hash_eq,
 						    NULL, xcalloc, free);
   _obstack_begin (&pfile->nonexistent_file_ob, 0, 0,
-		  (void *(*) (long)) xmalloc,
+		  (void *(*) (size_t)) xmalloc,
 		  (void (*) (void *)) free);
 }
 

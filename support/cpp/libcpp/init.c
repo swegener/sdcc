@@ -229,7 +229,7 @@ cpp_create_reader (enum c_lang lang, hash_table *table,
 
   /* Initialize the buffer obstack.  */
   _obstack_begin (&pfile->buffer_ob, 0, 0,
-		  (void *(*) (long)) xmalloc,
+		  (void *(*) (size_t)) xmalloc,
 		  (void (*) (void *)) free);
 
   _cpp_init_files (pfile);

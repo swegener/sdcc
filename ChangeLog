@@ -1,3 +1,20 @@
+2018-12-15 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* configure, configure.ac: changed warning into notice
+	* sdas/asz80/z80mch.c: cosmetic
+	* src/sdcc.vcxproj,
+	* src/sdcc.vcxproj.filters: added missing SDCC.lex & SDCC.y
+	* support/cpp/libcpp/files.c,
+	* support/cpp/libcpp/identifiers.c,
+	* support/cpp/libcpp/init.c,
+	* support/cpp/libcpp/symtab.c: fixed warnings for unsigned size_t
+	* support/regression/tests/bitopcse.c: only use idata for mcs51
+	* support/regression/tests/gcc-torture-execute-20021120-1.c: disabled for
+	  hc08 & s08, uses way too much spillocs in DSEG
+	* support/regression/tests/longlong.c: split the test in 3 parts
+	* support/sdbinutils/bfd/targets.c: added "ASXXXX"
+	* support/sdbinutils/libiberty/simple-object-elf.c: fixed warning
+
 2018-12-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

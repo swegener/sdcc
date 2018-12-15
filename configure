@@ -5005,8 +5005,8 @@ if test "x$ac_cv_header_treedec_combinations_hpp" = xyes; then :
 _ACEOF
 
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: treedec library missing, falling back to Thorup." >&5
-$as_echo "$as_me: WARNING: treedec library missing, falling back to Thorup." >&2;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: NOTICE: treedec library missing, falling back to Thorup." >&5
+$as_echo "$as_me: NOTICE: treedec library missing, falling back to Thorup." >&2;}
 fi
 
 done

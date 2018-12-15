@@ -21,10 +21,10 @@
 #  define UNSIGNED unsigned
 #endif
 
-#if defined(TYPE_bool)
-#  define _data
-#else
+#if defined(__SDCC_MODEL_SMALL)
 #  define _data __idata
+#else
+#  define _data
 #endif
 
 #if defined(TYPE_bool) && defined(__bool_true_false_are_defined)
@@ -94,8 +94,8 @@ testcse(void)
   ua3   = MASK | ub;
   ua4   = MASK | uv;
 
-   a12  =   b | b;
-   a13  =   v | v;
+   a12  =    b | b;
+   a13  =    v | v;
 
    a14 |= 0;
    v   |= 0;
@@ -103,7 +103,6 @@ testcse(void)
    v   |= MASK;
   ua5  |= MASK;
   uv   |= MASK;
-
 
    a16  = 0 ^ b;
    a17  = 0 ^ v;
@@ -133,24 +132,24 @@ testcse(void)
    ASSERT(ua0  == ub);
    ASSERT( a4  ==  b);
    ASSERT( a6  ==  0);
-   // ASSERT( a7 == );
-   // ASSERT(ua2 == );
+   // ASSERT( a7 == 0);
+   // ASSERT(ua2 == 0);
    ASSERT( a8  ==  b);
    ASSERT( a9  ==  0);
    ASSERT( a10 == ({type}) MASK);
-   ASSERT( a11	== ({type}) MASK);
+   ASSERT( a11 == ({type}) MASK);
    ASSERT(ua3  == MASK);
    ASSERT(ua4  == MASK);
    ASSERT( a12 ==  b);
    ASSERT( a13 ==  0);
-   // ASSERT( a14 == );
+   // ASSERT( a14 == 0);
    ASSERT( a15 == ({type}) MASK);
-   ASSERT(ua5 == MASK);
+   ASSERT(ua5  == MASK);
    ASSERT( a16 == b);
    ASSERT( a17 == ({type}) MASK);
    ASSERT( a18 == 0);
    ASSERT( a19 == 0);
-   // ASSERT( a20 == );
+   // ASSERT( a20 == 0);
    ASSERT( v   == ({type}) MASK);
    ASSERT(uv   == MASK);
 }

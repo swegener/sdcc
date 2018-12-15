@@ -172,6 +172,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\support\scripts\sdcc.ico" />
+    <None Include="SDCC.lex">
+      <Filter>Custom Build</Filter>
+    </None>
+    <None Include="SDCC.y">
+      <Filter>Custom Build</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h">

@@ -56,7 +56,7 @@ _cpp_init_hashtable (cpp_reader *pfile, hash_table *table)
       table->alloc_node = alloc_node;
 
       _obstack_begin (&pfile->hash_ob, 0, 0,
-		      (void *(*) (long)) xmalloc,
+		      (void *(*) (size_t)) xmalloc,
 		      (void (*) (void *)) free);
     }
 

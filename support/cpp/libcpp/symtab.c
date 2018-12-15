@@ -63,7 +63,7 @@ ht_create (unsigned int order)
 
   /* Strings need no alignment.  */
   _obstack_begin (&table->stack, 0, 0,
-		  (void *(*) (long)) xmalloc,
+		  (void *(*) (size_t)) xmalloc,
 		  (void (*) (void *)) free);
 
   obstack_alignment_mask (&table->stack) = 0;

@@ -436,6 +436,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\support\scripts\sdcc.ico" />
+    <None Include="SDCC.lex" />
+    <None Include="SDCC.y" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />

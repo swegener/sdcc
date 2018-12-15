@@ -1,18 +1,21 @@
 /** Simple long long tests.
+ test: mul, div, bit
 
  */
 #include <testfwk.h>
 
 #ifdef __SDCC
 #pragma std_sdcc99
-#pragma disable_warning 85
-#pragma disable_warning 212
 #endif
 
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#define TEST_{test}
+
+#if !(defined(__SDCC_mcs51) && !defined(__SDCC_STACK_AUTO) && defined(__SDCC_MODEL_SMALL) ) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
 long long x;
 unsigned long long y;
 int i;
+
+#if defined(TEST_mul)
 
 long long g(void)
 {
@@ -42,84 +45,11 @@ static unsigned long long mulLL(unsigned long long a, unsigned long long b)
   return a * b;
 }
 
-static long long divLL(long long a, long long b)
-{
-  return a / b;
-}
-
-static unsigned long long divULL(unsigned long long a, unsigned long long b)
-{
-  return a / b;
-}
-
-static unsigned long long modULL(unsigned long long a, unsigned long long b)
-{
-  return a % b;
-}
-
-static long long modLL(long long a, long long b)
-{
-  return a % b;
-}
-
-static int compareLL(unsigned long long a, unsigned long long b)
-{
-  if (a > b)
-    return 1;
-  else if (a < b)
-    return -1;
-  else
-    return 0;
-}
-
-static long long leftShiftLL(long long a)
-{
-  return a << 8;
-}
- 
-static long long rightShiftLL(long long a)
-{
-  return a >> 8;
-}
-
-static unsigned long long rightShiftULL(unsigned long long a)
-{
-  return a >> 8;
-}
-
-static unsigned long long leftShiftULL(unsigned long long a)
-{
-  return a << 8;
-}
-
-static unsigned long long bitAndULL(unsigned long long a, unsigned long long b)
-{
-  return a & b;
-}
-
-static unsigned long long bitOrULL(unsigned long long a, unsigned long long b)
-{
-  return a | b;
-}
-
-static unsigned long long bitXorULL(unsigned long long a, unsigned long long b)
-{
-  return a ^ b;
-}
-
-static unsigned long long bitNotULL(unsigned long long a)
-{
-  return ~a;
-}
-
-#endif
-
 void
-testLongLong (void)
+LongLong_mul (void)
 {
   volatile unsigned long tmp;
 
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
   i = 42;
   ASSERT (g() == 43);
   i = 23;
@@ -218,7 +148,37 @@ testLongLong (void)
   x = 0x2ll;
   ASSERT (y * x == 0x1122334455667700ull * 0x2ll); // this test is optimized by constant propagation
   ASSERT (mulLL (y, x) == 0x1122334455667700ull * 0x2ll); // this test is not
+#endif
 
+  c(); // Unused long long return value requires special handling in register allocation.
+}
+
+#elif defined(TEST_div)
+
+static unsigned long long divULL(unsigned long long a, unsigned long long b)
+{
+  return a / b;
+}
+
+static unsigned long long modULL(unsigned long long a, unsigned long long b)
+{
+  return a % b;
+}
+
+static long long divLL(long long a, long long b)
+{
+  return a / b;
+}
+
+static long long modLL(long long a, long long b)
+{
+  return a % b;
+}
+
+void
+LongLong_div (void)
+{
+#ifndef __SDCC_ds390
   y = 0x1122334455667700ull;
   x = 0x7ll;
   ASSERT (y / x == 0x1122334455667700ull / 0x7ll); // this test is optimized by constant propagation
@@ -232,6 +192,65 @@ testLongLong (void)
   ASSERT (x % 0x7ll == 0x1122334455667700ll % 0x7ll); // this test is optimized by constant propagation
   ASSERT (modLL (x, 0x7ll) == 0x1122334455667700ll % 0x7ll); // this test is not
 #endif
+#endif
+}
+
+#elif defined(TEST_bit)
+
+static int compareLL(unsigned long long a, unsigned long long b)
+{
+  if (a > b)
+    return 1;
+  else if (a < b)
+    return -1;
+  else
+    return 0;
+}
+
+static long long leftShiftLL(long long a)
+{
+  return a << 8;
+}
+ 
+static long long rightShiftLL(long long a)
+{
+  return a >> 8;
+}
+
+static unsigned long long rightShiftULL(unsigned long long a)
+{
+  return a >> 8;
+}
+
+static unsigned long long leftShiftULL(unsigned long long a)
+{
+  return a << 8;
+}
+
+static unsigned long long bitAndULL(unsigned long long a, unsigned long long b)
+{
+  return a & b;
+}
+
+static unsigned long long bitOrULL(unsigned long long a, unsigned long long b)
+{
+  return a | b;
+}
+
+static unsigned long long bitXorULL(unsigned long long a, unsigned long long b)
+{
+  return a ^ b;
+}
+
+static unsigned long long bitNotULL(unsigned long long a)
+{
+  return ~a;
+}
+
+void
+LongLong_bit (void)
+{
+#ifndef __SDCC_ds390
   y = 0x44556677aabbccddull;
   x = 0x7766554433221100ull;
   ASSERT (y < x);
@@ -266,8 +285,17 @@ testLongLong (void)
   ASSERT ((~y) == (~0x69aaaaaaaaaa55aaull));
   ASSERT (bitNotULL (y) == (~0x69aaaaaaaaaa55aaull));
 #endif
+}
 
-  c(); // Unused long long return value requires special handling in register allocation.
+#endif //TEST_mul/div/bit
+
+#endif //!mcs51-small
+
+void
+testLongLong (void)
+{
+#if !(defined(__SDCC_mcs51) && !defined(__SDCC_STACK_AUTO) && defined(__SDCC_MODEL_SMALL) ) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+  LongLong_{test}();
 #endif
 }
 

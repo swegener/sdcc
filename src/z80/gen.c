@@ -3156,7 +3156,10 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
   for (int i = 0; i < n;)
     {
       if (assigned[i])
-        continue;
+        {
+          i++;
+          continue;
+        }
 
       if (!aopOnStack (result, roffset + i, 1) || !aopOnStack (source, soffset + i, 1))
         {

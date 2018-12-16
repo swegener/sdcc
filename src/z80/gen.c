@@ -10278,7 +10278,7 @@ genPointerGet (const iCode *ic)
               regalloc_dry_run_cost += 1;
               cheapMove (result->aop, offset++, ASMOP_A, 0, true);
             }
-          if (offset + 1 < size)
+          if (offset < size)
             {
               emit2 ("inc %s", _pairs[pair].name);
               regalloc_dry_run_cost += 1;

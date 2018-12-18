@@ -294,6 +294,7 @@ struct  mne     mne[] = {
     {	NULL,	"jp.sis",	S_JP,		M_SIS,	0xC2	},
 
     {	NULL,	"ret.l",	S_RET,		M_L,	0xC0	},
+    {	NULL,	"ret.s",	S_RET,		M_S,	0xC0	},
 
     {	NULL,	"bit.l",	S_BIT,		M_L,	0x40	},
     {	NULL,	"bit.s",	S_BIT,		M_S,	0x40	},
@@ -444,7 +445,9 @@ struct  mne     mne[] = {
     {	NULL,	"otimr.l",	X_INH2,		M_L,	0x93	},
     {	NULL,	"otimr.s",	X_INH2,		M_S,	0x93	},
     {	NULL,	"reti.l",	S_INH2,		M_L,	0x4D	},
+    {	NULL,	"reti.s",	S_INH2,		M_S,	0x4D	},
     {	NULL,	"retn.l",	S_INH2,		M_L,	0x45	},
+    {	NULL,	"retn.s",	S_INH2,		M_S,	0x45	},
 
     {	NULL,	"mlt.l",	X_MLT,		M_L,	0x4C	},
     {	NULL,	"mlt.s",	X_MLT,		M_S,	0x4C	},

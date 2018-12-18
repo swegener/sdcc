@@ -1707,6 +1707,8 @@ struct mne *mp;
                 mchtyp = op;
                 sym[2].s_addr = op;
                 lmode = SLIST;
+		if (mchtyp == X_EZ80)
+		  allow_undoc = 1;
                 break;
 
         case X_INH2:

@@ -1,6 +1,7 @@
 PRJ		= test_mdu517 test_mdu88x \
 		  stn stp strr sts stt stxr stxrw stxw \
-		  stt_small stt_large
+		  stt_small stt_large \
+		  monitor
 
 all:
 	for p in $(PRJ); do \

@@ -18,6 +18,8 @@
 #define LED_MASK 0x80
 #endif
 
+volatile unsigned char *sif= (unsigned char *)0x7fff;
+
 void
 print_bl()
 {
@@ -122,7 +124,7 @@ proc_cmd(char *cmd)
 	  printf("no uid\n");
 #endif
 	}
-      else if (strcmp(w, "dump") == 0)
+      else if (strstr(w, "dump") == w)
 	{
 	  s= strtok(NULL, DELIM);
 	  if (s)
@@ -192,12 +194,12 @@ proc_cmd(char *cmd)
 	  dump(addr, 64);
 	  LED_PORT->odr&= ~LED_MASK;
 	}
-      else if (strcmp(w, "test") == 0)
+      else if (strstr(w, "test") == w)
 	{
 	  printf("%d\n", sizeof(flash_erase));
 	}
       else
-	printf("Unknown command\n");
+	printf("Unknown command: \"%s\"\n", w);
     }
   else
     printf("What?\n");

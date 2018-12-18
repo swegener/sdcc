@@ -3,6 +3,8 @@
 
 #include "stm8.h"
 
+#define UART_BUF_SIZE 8
+
 extern void isr_rx(void) __interrupt(USART_RX_IRQ);
 
 extern char serial_received();

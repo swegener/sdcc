@@ -18,6 +18,7 @@ extern void beallitas(void);
 extern unsigned char serial_send(unsigned char c);
 extern unsigned char serial_received(void);
 extern unsigned char serial_receive(void);
+extern unsigned char serial_nuof_received();
 
 #define kikuld(c) serial_send(c)
 #define vetel_volt() serial_received()

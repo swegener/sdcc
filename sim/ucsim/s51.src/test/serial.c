@@ -9,11 +9,22 @@
 
 #include "serial.h"
 
+extern __xdata char *simif;
 
 volatile unsigned char serial_buffer[SERIAL_BUFFER_SIZE];
 volatile unsigned char first_occupied, first_free;
 volatile bit serial_sent;
 
+unsigned char
+serial_nuof_received()
+{
+  if (first_free == first_occupied)
+    return 0;
+  else if (first_free > first_occupied)
+    return first_free - first_occupied;
+  else
+    return SERIAL_BUFFER_SIZE - (first_occupied - first_free);
+}
 
 /* Serial line ISR puts received chars into a ring buffer */
 
@@ -27,13 +38,29 @@ interrupt void SCON_int(void)
 {
   if (RI)
     {
-      unsigned char new= first_free+1;
+      unsigned char c;
+      unsigned char new, nr;
+      c= SBUF;
+      new= first_free+1;
       new= new % SERIAL_BUFFER_SIZE;
+      *simif= 'p';*simif= '|';
+      *simif= 'p';*simif= c;
+      *simif= 'p';*simif= '|';
       if (new != first_occupied)
 	{
-	  serial_buffer[first_free]= SBUF;
+	  serial_buffer[first_free]= c;
 	  first_free= new;
 	}
+      else
+	{
+	  *simif= 'p';*simif= '*';
+	  *simif= 'p';*simif= c;
+	  *simif= 'p';*simif= '*';
+	}
+      nr= serial_nuof_received();
+      *simif= 'p';*simif= '/';
+      *simif= 'p';*simif= nr+'0';
+      *simif= 'p';*simif= '/';
       RI= 0;
     }
   else if (TI)
@@ -151,12 +178,16 @@ serial_received(void)
 unsigned char
 serial_receive(void)
 {
-  unsigned char c;
+  unsigned char c, nr;
   
   while (!serial_received()) ;
   ES= 0;
   c= serial_buffer[first_occupied++];
   first_occupied%= SERIAL_BUFFER_SIZE;
+  nr= serial_nuof_received();
+  *simif= 'p';*simif= '@';
+  *simif= 'p';*simif= nr+'0';
+  *simif= 'p';*simif= '@';
   ES= 1;
   return c;
 }

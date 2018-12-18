@@ -370,7 +370,10 @@ cl_f::put(int c)
 {
   int n= (first_free + 1) % 1024;
   if (n == last_used)
-    return -1;
+    {
+      printf("put: %d FULL!\n",c);
+      return -1;
+    }
   buffer[first_free]= c;
   first_free= n;
   return 0;

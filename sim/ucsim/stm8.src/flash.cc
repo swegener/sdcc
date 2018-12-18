@@ -116,7 +116,7 @@ cl_flash::tick(int cycles)
 	  (elapsed > tprog/2.0))
 	{
 	  int i;
-	  printf("FLASH zeroing %06lx .. %d\n", wbuf_start, wbuf_size);
+	  uc->sim->app->debug("FLASH zeroing %06lx .. %d\n", wbuf_start, wbuf_size);
 	  for (i= 0; i < wbuf_size; i++)
 	    {
 	      class cl_memory_cell *c= uc->rom->get_cell(wbuf_start + i);
@@ -124,26 +124,26 @@ cl_flash::tick(int cycles)
 	    }
 	  if (mode == fm_erase)
 	    {
-	      printf("FLASH end of erase, finish\n");
+	      uc->sim->app->debug("FLASH end of erase, finish\n");
 	      finish_program(true);
 	    }
 	  else
 	    {
-	      printf("FLASH end of erase, cont program\n");
+	      uc->sim->app->debug("FLASH end of erase, cont program\n");
 	      state= fs_program;
 	    }
 	}
       else if (elapsed > tprog)
 	{
 	  int i;
-	  printf("FLASH dl-ing %06lx .. %d\n", wbuf_start, wbuf_size);
+	  uc->sim->app->debug("FLASH dl-ing %06lx .. %d\n", wbuf_start, wbuf_size);
 	  for (i= 0; i < wbuf_size; i++)
 	    {
 	      class cl_memory_cell *c= uc->rom->get_cell(wbuf_start + i);
 	      t_mem org= c->get();
 	      c->download(org | wbuf[i]);
 	    }
-	  printf("FLASH end of program\n");
+	  uc->sim->app->debug("FLASH end of program\n");
 	  finish_program(true);
 	}
     }
@@ -163,7 +163,7 @@ cl_flash::finish_program(bool ok)
 void
 cl_flash::reset(void)
 {
-  printf("FLASH reset\n");
+  uc->sim->app->debug("FLASH reset\n");
   puk1st= false;
   duk1st= false;
   p_unlocked= false;
@@ -199,7 +199,7 @@ cl_flash::read(class cl_memory_cell *cell)
 	v|= 0x08;
       // read clears EOP and WR_PG_DIS bits
       cell->set(v & ~0x05);
-      if (v & 0x05) printf("FLASH read iapsr5 %02x\n",v);	
+      if (v & 0x05) uc->sim->app->debug("FLASH read iapsr5 %02x\n",v);	
     }
   return v;
 }
@@ -215,7 +215,7 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
   
   if (cell == pukr)
     {
-      printf("FLASH write-pukr %02x\n",*val);
+      uc->sim->app->debug("FLASH write-pukr %02x\n",*val);
       if (p_failed)
 	;
       else if (!puk1st)
@@ -236,7 +236,7 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
     }
   else if (cell == dukr)
     {
-      printf("FLASH write-dukr %02x\n",*val);
+      uc->sim->app->debug("FLASH write-dukr %02x\n",*val);
       if (d_failed)
 	;
       else if (!duk1st)
@@ -257,7 +257,7 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
     }
   else if (cell == iapsr)
     {
-      printf("FLASH write-iapsr %02x\n",*val);
+      uc->sim->app->debug("FLASH write-iapsr %02x\n",*val);
       t_mem org= iapsr->get();
       // PUL, DUL
       if (!(*val & 0x02))
@@ -278,7 +278,7 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
     }
   else if (cell == cr2r)
     {
-      printf("FLASH write-cr2r %02x\n",*val);
+      uc->sim->app->debug("FLASH write-cr2r %02x\n",*val);
       *val&= ~0x0e;
       if (state & fs_busy)
 	{
@@ -292,7 +292,7 @@ cl_flash::write(class cl_memory_cell *cell, t_mem *val)
   else if ((ncr2r != NULL) &&
 	   (cell == ncr2r))
     {
-      printf("FLASH write-ncr2r %02x\n",*val);
+      uc->sim->app->debug("FLASH write-ncr2r %02x\n",*val);
       *val|= 0x0e;
       if (state & fs_busy)
 	{
@@ -329,44 +329,44 @@ cl_flash::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 void
 cl_flash::flash_write(t_addr a, t_mem val)
 {
-  printf("FLASH wr(%06lx,%02x)\n",a,val);
+  uc->sim->app->debug("FLASH wr(%06lx,%02x)\n",a,val);
   if (!uc)
     {
-      printf("  no uc\n");
+      uc->sim->app->debug("  no uc\n");
       return;
     }
   if (uc->rom == NULL)
     {
-      printf("  no rom\n");
+      uc->sim->app->debug("  no rom\n");
       return;
     }
   if ((a >= 0x8000) &&
       !p_unlocked)
     {
-      printf("  plocked\n");
+      uc->sim->app->debug("  plocked\n");
       return;
     }
   if ((a < 0x8000) &&
       !d_unlocked)
     {
-      printf("  dlocked\n");
+      uc->sim->app->debug("  dlocked\n");
       return;
     }
   if (state & fs_busy)
     {
-      printf("  busy %d\n",state);
+      uc->sim->app->debug("  busy %d\n",state);
       return;
     }
 
-  printf("  wbuf_start=%06lx\n",wbuf_start);
+  uc->sim->app->debug("  wbuf_start=%06lx\n",wbuf_start);
   if (wbuf_start == 0)
     {
-      printf("  calling start_wbuf(%06lx)\n",a);
+      uc->sim->app->debug("  calling start_wbuf(%06lx)\n",a);
       start_wbuf(a);
     }
   
   int offset= a - wbuf_start;
-  printf("  offset=%d\n",offset);
+  uc->sim->app->debug("  offset=%d\n",offset);
   if (mode == fm_byte)
     {
       // fixup tprog
@@ -388,7 +388,7 @@ cl_flash::flash_write(t_addr a, t_mem val)
     }
   else if (mode == fm_erase)
     {
-      printf("  romwrite in erase mode\n");
+      uc->sim->app->debug("  romwrite in erase mode\n");
       wbuf[offset]= val;
       wbuf_writes++;
       if ((wbuf_writes == 4) &&
@@ -401,7 +401,7 @@ cl_flash::flash_write(t_addr a, t_mem val)
 	  v|= wbuf[3];
 	  if (v == 0)
 	    {
-	      printf("  starting erase\n");
+	      uc->sim->app->debug("  starting erase\n");
 	      start_program(fs_pre_erase);
 	    }
 	}
@@ -432,7 +432,7 @@ cl_flash::set_flash_mode(t_mem cr2val)
 {
   bool fix= cr1r->get() & 0x01; /* FIX */
 
-  printf("FLASH set_mode %02x\n", cr2val);
+  uc->sim->app->debug("FLASH set_mode %02x\n", cr2val);
   if (cr2val & 0x40 /* WPRG */ )
     {
       mode= fm_word;
@@ -476,13 +476,13 @@ cl_flash::start_wbuf(t_addr addr)
   wbuf_writes= 0;
   for (i= 0; i < 256; i++)
     wbuf[i]= 0;
-  printf("FLASH start_wbuf %06lx (wbuf_start=%06lx,size=%d)\n", addr, wbuf_start, wbuf_size);
+  uc->sim->app->debug("FLASH start_wbuf %06lx (wbuf_start=%06lx,size=%d)\n", addr, wbuf_start, wbuf_size);
 }
 
 void
 cl_flash::start_program(enum stm8_flash_state start_state)
 {
-  printf("FLASH start prg %d\n", start_state);
+  uc->sim->app->debug("FLASH start prg %d\n", start_state);
   state= start_state;
   start_time= uc->get_rtime();
 }

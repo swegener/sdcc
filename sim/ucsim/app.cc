@@ -236,7 +236,7 @@ print_help(char *name)
      "  -g           Go, start simulation\n"
      "  -G           Go, start simulation, quit on stop\n"
      "  -a nr        Specify size of variable space (default=256)\n"
-     "  -w           Writable flash"
+     "  -w           Writable flash\n"
      "  -V           Verbose mode\n"
      "  -v           Print out version number and quit\n"
      "  -H           Print out types of known CPUs and quit\n"

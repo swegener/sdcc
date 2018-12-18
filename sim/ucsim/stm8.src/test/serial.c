@@ -4,6 +4,8 @@
 
 #include "serial.h"
 
+extern volatile unsigned char *sif;
+
 int
 putchar(int c)
 {
@@ -13,9 +15,20 @@ putchar(int c)
   return c;
 }
 
-volatile uint8_t rx_buf[8];
+volatile uint8_t rx_buf[UART_BUF_SIZE];
 volatile uint8_t first_free= 0;
 volatile uint8_t last_used= 0;
+
+unsigned char
+serial_nuof_received()
+{
+  if (first_free == last_used)
+    return 0;
+  else if (first_free > last_used)
+    return first_free - last_used;
+  else
+    return UART_BUF_SIZE - (last_used - first_free);
+}
 
 void isr_rx(void) __interrupt(USART_RX_IRQ)
 {
@@ -24,12 +37,25 @@ void isr_rx(void) __interrupt(USART_RX_IRQ)
     {
       uint8_t n;
       d= USART->dr;
-      n= (first_free+1)%8;
+      n= (first_free+1)%UART_BUF_SIZE;
+      *sif= 'p';*sif= '|';
+      *sif= 'p';*sif= d;
+      *sif= 'p';*sif= '|';
       if (n != last_used)
 	{
 	  rx_buf[first_free]= d;
 	  first_free= n;
 	}
+      else
+	{
+	  *sif= 'p';*sif= '*';
+	  *sif= 'p';*sif= d;
+	  *sif= 'p';*sif= '*';
+	}
+      d= serial_nuof_received();
+      *sif= 'p';*sif= '/';
+      *sif= 'p';*sif= d+'0';
+      *sif= 'p';*sif= '/';
     }
 }
 
@@ -42,12 +68,17 @@ serial_received()
 
 char getchar()
 {
-  uint8_t o;
+  uint8_t o, nr;
   while (!serial_received())
     ;
   o= last_used;
-  last_used= (last_used+1)%8;
-  return rx_buf[o];
+  last_used= (last_used+1)%UART_BUF_SIZE;
+  o= rx_buf[o];
+  nr= serial_nuof_received();
+  *sif= 'p';*sif= '@';
+  *sif= 'p';*sif= nr+'0';
+  *sif= 'p';*sif= '@';
+  return o;
 }
 
 void

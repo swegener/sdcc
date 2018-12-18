@@ -6,6 +6,8 @@
 
 #include "serial.h"
 
+volatile unsigned char *sif= (unsigned char *)0x7fff;
+
 void
 print_bl()
 {

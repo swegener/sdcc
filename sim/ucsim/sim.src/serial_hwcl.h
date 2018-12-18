@@ -40,7 +40,10 @@ enum serial_cfg {
   serconf_check_often	= 1,
   serconf_escape	= 2,
   serconf_common	= 3,
-  serconf_nr		= 3
+  serconf_received	= 4,
+  serconf_flowctrl	= 5,
+  serconf_able_receive	= 6,
+  serconf_nr		= 6
 };
 
 
@@ -77,6 +80,8 @@ class cl_serial_hw: public cl_hw
   virtual bool proc_input(void);
   virtual void refresh_display(bool force) {}
   virtual void draw_display(void) {}
+
+  virtual void reset(void);
 };
 
 

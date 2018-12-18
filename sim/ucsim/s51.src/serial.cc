@@ -131,7 +131,10 @@ t_mem
 cl_serial::read(class cl_memory_cell *cell)
 {
   if (cell == sbuf)
-    return(s_in);
+    {
+      cfg_set(serconf_able_receive, 1);
+      return(s_in);
+    }
   conf(cell, NULL);
   return(cell->get());
 }
@@ -322,6 +325,8 @@ cl_serial::tick(int cycles)
       //if (fin->read(&c, 1) == 1)
 	{
 	  c= input;
+	  uc->sim->app->debug("UART%d received %d,%c\n", id,
+			      c,isprint(c)?c:' ');
 	  input_avail= false;
 	  s_in= c;
 	  sbuf->set(s_in);

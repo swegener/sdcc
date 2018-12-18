@@ -94,7 +94,7 @@ installdirs:
 
 # Creating dependencies
 # ---------------------
-dep: Makefile.dep
+dep: $(LOCAL_SOURCES) Makefile.dep
 
 Makefile.dep: $(SOURCES) $(LOCAL_SOURCES) $(srcdir)/*.h cmdpars.hh cmdpars.cc
 	$(MAKEDEP) $(CPPFLAGS) $(SOURCES) $(LOCAL_SOURCES) >Makefile.dep

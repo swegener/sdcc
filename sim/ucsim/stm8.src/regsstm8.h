@@ -27,8 +27,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: regsstm8.h 496 2016-11-11 12:48:27Z drdani $ */
-
 #ifndef REGSTM8_HEADER
 #define REGSTM8_HEADER
 

@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_arith.cc 549 2016-12-13 11:15:58Z drdani $ */
-
 #include "tlcscl.h"
 
 

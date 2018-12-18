@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_block.cc 517 2016-11-22 19:12:14Z drdani $ */
-
 #include "tlcscl.h"
 
 

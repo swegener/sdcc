@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stm8cl.h 770 2017-07-03 21:35:13Z drdani $ */
-
 #ifndef STM8CL_HEADER
 #define STM8CL_HEADER
 

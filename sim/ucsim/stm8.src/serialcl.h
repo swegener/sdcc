@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: serialcl.h 623 2017-02-03 18:09:49Z drdani $ */
-
 #ifndef STM8_SERIALCL_HEADER
 #define STM8_SERIALCL_HEADER
 

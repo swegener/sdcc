@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simif.cc 762 2017-06-18 19:42:07Z drdani $ */
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>

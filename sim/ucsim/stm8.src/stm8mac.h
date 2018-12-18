@@ -1,5 +1,5 @@
 /*
- * Simulator of microcontrollers (z80mac.h)
+ * Simulator of microcontrollers (stm8mac.h)
  *
  * some z80 code base from Karl Bongers karl@turbobit.com
  *
@@ -8,8 +8,6 @@
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
  */
-
-/* $Id: stm8mac.h 519 2016-11-23 14:21:44Z drdani $ */
 
 // shift positions
 #define BITPOS_C 0  // 1

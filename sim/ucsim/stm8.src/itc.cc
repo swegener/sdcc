@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: itc.cc 644 2017-02-15 12:33:31Z drdani $ */
-
 // prj
 
 #include <stdarg.h>

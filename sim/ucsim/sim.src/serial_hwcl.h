@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id$ */
-
 #ifndef SERIAL_HWCL_HEADER
 #define SERIAL_HWCL_HEADER
 
@@ -43,7 +41,7 @@ enum serial_cfg {
   serconf_received	= 4,
   serconf_flowctrl	= 5,
   serconf_able_receive	= 6,
-  serconf_nr		= 6
+  serconf_nr		= 7
 };
 
 

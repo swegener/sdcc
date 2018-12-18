@@ -1,6 +1,5 @@
 # tlcs.src/clean.mk
 #
-# $Id: clean.mk 214 2016-06-18 08:00:47Z  $
 #
 
 # Deleting all files created by building the program

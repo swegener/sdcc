@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: glob.cc 776 2017-07-09 11:45:22Z drdani $ */
-
 #include <stdio.h>
 
 #include "stypes.h"

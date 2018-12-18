@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: simstm8.cc 607 2017-01-19 11:11:44Z drdani $ */
-
 // prj
 #include "globals.h"
 

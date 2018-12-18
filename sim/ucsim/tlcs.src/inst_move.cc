@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: inst_move.cc 224 2016-06-20 14:10:34Z  $ */
-
 #include "tlcscl.h"
 
 

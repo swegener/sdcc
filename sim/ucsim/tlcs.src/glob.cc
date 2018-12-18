@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: glob.cc 358 2016-07-12 12:48:59Z  $ */
-
 #include <stdio.h>
 
 #include "glob.h"

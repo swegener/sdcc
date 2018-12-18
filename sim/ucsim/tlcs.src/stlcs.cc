@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: stlcs.cc 569 2017-01-03 14:48:13Z drdani $ */
-
 #include <stdio.h>
 
 // prj

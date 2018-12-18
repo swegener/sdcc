@@ -1,4 +1,3 @@
-/* $Id: instcl.h 519 2016-11-23 14:21:44Z drdani $ */
 
 /* stm8.src/instcl.h */
 

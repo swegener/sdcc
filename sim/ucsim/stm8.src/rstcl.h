@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: rstcl.h 614 2017-01-27 08:39:01Z drdani $ */
-
 #ifndef STM8_RSTCL_HEADER
 #define STM8_RSTCL_HEADER
 

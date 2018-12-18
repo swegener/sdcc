@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: glob.h 215 2016-06-18 08:01:48Z  $ */
-
 #ifndef TLCS_GLOB_HEADER
 #define TLCS_GLOB_HEADER
 

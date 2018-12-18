@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-/* $Id: timercl.h 621 2017-02-03 10:13:54Z drdani $ */
-
 #ifndef STM8_TIMERCL_HEADER
 #define STM8_TIMERCL_HEADER
 

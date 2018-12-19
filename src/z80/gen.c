@@ -2490,7 +2490,7 @@ aopGet (asmop *aop, int offset, bool bit16)
 {
   static struct dbuf_s dbuf = { 0 };
 
-  wassert (!regalloc_dry_run);
+  wassert_bt (!regalloc_dry_run);
 
   if (dbuf_is_initialized (&dbuf))
     {
@@ -2728,7 +2728,7 @@ aopPut (asmop *aop, const char *s, int offset)
 
   if (aop->size && offset > (aop->size - 1))
     {
-      werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopPut got offset > aop->size");
+      werror_bt (E_INTERNAL_ERROR, __FILE__, __LINE__, "aopPut got offset > aop->size");
       exit (0);
     }
 
@@ -3171,6 +3171,7 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
         {
           cheapMove (result, roffset + i, source, soffset + i, a_free);
           assigned[i] = true;
+          (*size)--;
           i++;
         }
     }
@@ -3210,7 +3211,20 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   // Move everything from registers to the stack.
   for (i = 0; i < n;)
     {
-      if (aopRS (source) && !aopOnStack (source, soffset + i, 1) && aopOnStack (result, roffset + i, 1))
+      if (i + 1 < n && result->type == AOP_STK &&
+        (aopInReg (source, soffset + i, HL_IDX) && IS_RAB ||
+        (aopInReg (source, soffset + i, BC_IDX) || aopInReg (source, soffset + i, DE_IDX) || aopInReg (source, soffset + i, HL_IDX) || aopInReg (source, soffset + i, IY_IDX)) && (IS_EZ80_Z80 || IS_TLCS90)))
+        {
+          if (!regalloc_dry_run)
+            emit2 ("ld %s, %s", aopGet (result, roffset + i, false), _pairs[getPairId_o (source, soffset + i)].name);
+          cost2 (3 - IS_RAB, 0, 0, 11, 0, 12, 5);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          regsize -= 2;
+          size -= 2;
+          i += 2;
+        }
+      else if (aopRS (source) && !aopOnStack (source, soffset + i, 1) && aopOnStack (result, roffset + i, 1))
         {
           cheapMove (result, roffset + i, source, soffset + i, true);
           assigned[i] = true;
@@ -3247,7 +3261,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
   // Now do the register shuffling.
 
-    // Try to use ex de, hl. TODO: Also do so when only some bytes are used, while others are dead (useful e.g. for emulating ld de, hl or ld hl, de).
+  // Try to use ex de, hl. TODO: Also do so when only some bytes are used, while others are dead (useful e.g. for emulating ld de, hl or ld hl, de).
   if (regsize >= 4)
     {
       int ex[4] = {-2, -2, -2, -2};
@@ -3283,6 +3297,8 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           size -= exsum;
         }
     }
+
+  // TODO: Use push iy / pop rr, push rr / pop iy, lea rr, ix
 
   while (regsize && result->type == AOP_REG && source->type == AOP_REG)
     {
@@ -3356,11 +3372,22 @@ skip_byte:
   // Last, move everything from stack to registers.
   for (i = 0; i < n;)
     {
-      if (aopRS (result) && aopOnStack (source, soffset + i, 1) && !aopOnStack (result, roffset + i, 1))
+      if (i + 1 < n && source->type == AOP_STK &&
+        (aopInReg (result, roffset + i, HL_IDX) && IS_RAB ||
+        (aopInReg (result, roffset + i, BC_IDX) || aopInReg (result, roffset + i, DE_IDX) || aopInReg (result, roffset + i, HL_IDX) || aopInReg (result, roffset + i, IY_IDX)) && (IS_EZ80_Z80 || IS_TLCS90)))
+        {
+          if (!regalloc_dry_run)
+            emit2 ("ld %s, %s", _pairs[getPairId_o (result, roffset + i)].name, aopGet (source, soffset + i, false));
+          cost2 (3 - IS_RAB, 0, 0, 11, 0, 9, 5);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          size -= 2;
+          i += 2;
+        }
+      else if (aopRS (result) && aopOnStack (source, soffset + i, 1) && !aopOnStack (result, roffset + i, 1))
         {
           cheapMove (result, roffset + i, source, soffset + i, true);
           assigned[i] = true;
-          regsize--;
           size--;
           i++;
         }
@@ -3569,16 +3596,12 @@ movLeft2Result (operand *left, int offl, operand *result, int offr, int sign)
 static void
 outAcc (operand * result)
 {
-  int size, offset;
-  size = getDataSize (result);
+  int size = getDataSize (result);
   if (size)
     {
       cheapMove (AOP (result), 0, ASMOP_A, 0, true);
       size--;
-      offset = 1;
-      /* unsigned or positive */
-      while (size--)
-        aopPut3 (AOP (result), offset++, ASMOP_ZERO, 0, true);
+      genMove_o (result->aop, 1, ASMOP_ZERO, 0, size, true);
     }
 }
 
@@ -9081,10 +9104,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, const iC
   wassert (getSize (operandType (left)) >= size);
 
   if (shCount >= (size * 8))
-    {
-      while (size--)
-        aopPut3 (AOP (result), size, ASMOP_ZERO, 0, true);
-    }
+    genMove (result->aop, ASMOP_ZERO, true);
   else
     {
       switch (size)
@@ -9180,10 +9200,7 @@ genLeftShift (const iCode * ic)
 
       genMove_o (result->aop, byteshift, left->aop, 0, size <= lsize ? size : lsize, true);
 
-      int doffset = 0;
-      size = byteshift;
-      while (size--)
-        cheapMove (result->aop, doffset++, ASMOP_ZERO, 0, true);
+      genMove_o (result->aop, 0, ASMOP_ZERO, 0, byteshift, true);
 
       if (save_a)
         _pop (PAIR_AF);
@@ -9412,20 +9429,16 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, const i
 
   if (shCount >= (size * 8))
     {
-      asmop *s;
       if (!SPEC_USIGN (getSpec (operandType (left))))
         {
           cheapMove (ASMOP_A, 0, left->aop, 0, true);
           emit3 (A_RLC, ASMOP_A, 0);
           emit3 (A_SBC, ASMOP_A, ASMOP_A);
-          s = ASMOP_A;
+          while (size--)
+            cheapMove (result->aop, size, ASMOP_A, 0, true);
         }
       else
-        {
-          s = ASMOP_ZERO;
-        }
-      while (size--)
-        cheapMove (result->aop, size, s, 0, true);
+        genMove (result->aop, ASMOP_ZERO, true);
     }
   else
     {
@@ -9539,10 +9552,7 @@ genRightShift (const iCode * ic)
 
       genMove_o (result->aop, 0, left->aop, soffset, size, true);
 
-      size = byteoffset;
-      int doffset = AOP_SIZE (result) - byteoffset;
-      while (size--)
-        cheapMove (AOP (result), doffset++, ASMOP_ZERO, 0, true);
+      genMove_o (result->aop, result->aop->size - byteoffset, ASMOP_ZERO, 0, byteoffset, true);
 
       if (save_a)
         _pop (PAIR_AF);
@@ -11360,24 +11370,17 @@ genCast (const iCode *ic)
 
   /* So we now know that the size of destination is greater
      than the size of the source */
-  /* we move to result for the size of source - 1*/
-  size = AOP_SIZE (right);
-  offset = 0;
-  while (--size)
-    {
-      cheapMove (AOP (result), offset, AOP (right), offset, true);
-      offset++;
-    }
+  genMove_o (result->aop, 0, right->aop, 0, right->aop->size - 1, true);
 
   /* now depending on the sign of the destination */
-  size = AOP_SIZE (result) - AOP_SIZE (right);
-  /* Unsigned or not an integral type - right fill with zeros */
+  size = result->aop->size - right->aop->size;
+  offset = right->aop->size - 1;
+  /* Unsigned or not an integral type - fill with zeros */
   if (IS_BOOL (rtype) || !IS_SPEC (rtype) || SPEC_USIGN (rtype) || AOP_TYPE (right) == AOP_CRY)
     {
-      cheapMove (AOP (result), offset, AOP (right), offset, true);
+      cheapMove (result->aop, offset, right->aop, offset, true);
       offset++;
-      while (size--)
-        aopPut3 (AOP (result), offset++, ASMOP_ZERO, 0, true);
+      genMove_o (result->aop, offset, ASMOP_ZERO, 0, size, true);
     }
   else
     {
@@ -12011,7 +12014,7 @@ setupForMemset (const iCode *ic, const operand *dst, const operand *c, bool dire
         {
           if (requiresHL (AOP (c)))
             _push (PAIR_HL);
-	      cheapMove (ASMOP_A, 0, AOP (c), 0, true);
+          cheapMove (ASMOP_A, 0, AOP (c), 0, true);
           if (requiresHL (AOP (c)))
             _pop (PAIR_HL);
         }

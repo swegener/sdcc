@@ -1,3 +1,8 @@
+2018-12-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix a recently-introduced bug in handling of 32-bit return values for gbz80.
+
 2018-12-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/asz80/z80mch.c,

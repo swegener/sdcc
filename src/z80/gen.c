@@ -3861,8 +3861,8 @@ assignResultValue (operand * oper)
       cheapMove (oper->aop, 0, ASMOP_RETURN, 0, true);
       cheapMove (oper->aop, 1, ASMOP_RETURN, 1, true);
       _pop (PAIR_DE);
-      cheapMove (oper->aop, 2, ASMOP_RETURN, 2, true);
-      cheapMove (oper->aop, 3, ASMOP_RETURN, 3, true);
+      cheapMove (oper->aop, 2, ASMOP_E, 0, true);
+      cheapMove (oper->aop, 3, ASMOP_D, 0, true);
     }
   else
     {

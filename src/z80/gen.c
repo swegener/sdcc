@@ -3187,6 +3187,8 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   int i, regsize, size, n = (sizex < source->size - soffset) ? sizex : (source->size - soffset);
   bool assigned[8] = {false, false, false, false, false, false, false, false};
   bool a_free;
+  int cached_byte = -1;
+  bool pushed_a = false;
 
   wassertl_bt (n <= 8, "Invalid size for genCopy().");
   wassertl_bt (aopRS (source), "Invalid source type.");
@@ -3245,7 +3247,42 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
   // Now do the register shuffling.
 
-  // TODO: Do this better to replace regMove()!
+    // Try to use ex de, hl. TODO: Also do so when only some bytes are used, while others are dead (useful e.g. for emulating ld de, hl or ld hl, de).
+  if (regsize >= 4)
+    {
+      int ex[4] = {-2, -2, -2, -2};
+
+      // Find L and check that it is exchanged with E, find H and check that it is exchanged with D.
+      for (i = 0; i < n; i++)
+        {
+          if (!assigned[i] && aopInReg (result, roffset + i, L_IDX) && aopInReg (source, soffset + i, E_IDX))
+            ex[0] = i;
+          if (!assigned[i] && aopInReg (result, roffset + i, E_IDX) && aopInReg (source, soffset + i, L_IDX))
+            ex[1] = i;
+          if (!assigned[i] && aopInReg (result, roffset + i, H_IDX) && aopInReg (source, soffset + i, D_IDX))
+            ex[2] = i;
+          if (!assigned[i] && aopInReg (result, roffset + i, D_IDX) && aopInReg (source, soffset + i, H_IDX))
+            ex[3] = i;
+        }
+
+      int exsum = (ex[0] >= 0) + (ex[1] >= 0) + (ex[2] >= 0) + (ex[3] >= 0);
+
+      if (exsum == 4)
+        {
+          emit2 ("ex de, hl");
+          regalloc_dry_run_cost += 1; // TODO: Use cost() to enable better optimization for speed.
+          if(ex[0] >= 0)
+            assigned[ex[0]] = TRUE;
+          if(ex[1] >= 0)
+            assigned[ex[1]] = TRUE;
+          if(ex[2] >= 0)
+            assigned[ex[2]] = TRUE;
+          if(ex[3] >= 0)
+            assigned[ex[3]] = TRUE;
+          regsize -= exsum;
+          size -= exsum;
+        }
+    }
 
   while (regsize && result->type == AOP_REG && source->type == AOP_REG)
     {
@@ -3278,11 +3315,31 @@ skip_byte:
           continue;
         }
 
-      // No byte can be assigned safely (i.e. the assignment is a permutation).
-      if (!regalloc_dry_run)
-        wassertl_bt (0, "Unimplemented.");
-      cost (180, 180);
-      return;
+      // No byte can be assigned safely (i.e. the assignment is a permutation). Cache one in the accumulator.
+
+      if (cached_byte != -1)
+        {
+          // Already one cached. Can happen when the assignment is a permutation consisting of multiple cycles.
+          cheapMove (result, roffset + cached_byte, ASMOP_A, 0, true);
+          cached_byte = -1;
+          continue;
+        }
+
+      for (i = 0; i < n; i++)
+        if (!assigned[i])
+          break;
+
+      wassertl_bt (i != n, "genCopy error: Trying to cache non-existant byte in accumulator.");
+      if (a_free && !pushed_a)
+        {
+          _push (PAIR_AF);
+          pushed_a = TRUE;
+        }
+      cheapMove (ASMOP_A, 0, source, soffset + i, true);
+      regsize--;
+      size--;
+      assigned[i] = TRUE;
+      cached_byte = i;
     }
 
   // Copy (stack-to-stack) what we can with whatever free regs we have now.
@@ -3329,6 +3386,12 @@ skip_byte:
   // Place leading zeroes.
 
   // todo
+
+  if (cached_byte != -1)
+    cheapMove (result, roffset + cached_byte, ASMOP_A, 0, true);
+
+  if (pushed_a)
+    _pop (PAIR_AF);
 }
 
 /*-----------------------------------------------------------------*/
@@ -3850,7 +3913,7 @@ _gbz80_emitAddSubLong (const iCode * ic, bool isAdd)
 static void
 assignResultValue (operand * oper)
 {
-  int size = AOP_SIZE (oper);
+  int size = oper->aop->size;
 
   wassertl (size <= 4, "Got a result that is bigger than four bytes");
 
@@ -3865,24 +3928,7 @@ assignResultValue (operand * oper)
       cheapMove (oper->aop, 3, ASMOP_D, 0, true);
     }
   else
-    {
-      if (AOP_TYPE (oper) == AOP_REG)
-        {
-          int i;
-          short retarray[4], oparray[4];
-
-          for (i = 0; i < size; i++)
-            {
-              retarray[i] = ASMOP_RETURN->aopu.aop_reg[i]->rIdx;
-              oparray[i] = AOP (oper)->aopu.aop_reg[i]->rIdx;
-            }
-
-          regMove (oparray, retarray, size, FALSE);
-        }
-      else
-        while (size--)
-          cheapMove (AOP (oper), size, ASMOP_RETURN, size, true);
-    }
+    genMove (oper->aop, ASMOP_RETURN, true);
 }
 
 /* Pop saved regs from stack, taking care not to destroy result */
@@ -4426,31 +4472,13 @@ static void genSend (const iCode *ic)
           z80_regs_used_as_parms_in_calls_from_current_function[L_IDX] = true;
           z80_regs_used_as_parms_in_calls_from_current_function[H_IDX] = true;
         }
-      else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
-        {
-          int i;
-          short retarray[4], oparray[4];
-
-          for (i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
-            {
-              retarray[i] = ASMOP_RETURN->aopu.aop_reg[i]->rIdx;
-              if (!regalloc_dry_run)
-                z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_RETURN->aopu.aop_reg[i]->rIdx] = true;
-              oparray[i] = AOP (IC_LEFT (ic))->aopu.aop_reg[i]->rIdx;
-            }
-
-          regMove (retarray, oparray, AOP_SIZE (IC_LEFT (ic)), FALSE);
-        }
       else
         {
-          int offset = 0;
-          while (size--)
-            {
-              cheapMove (ASMOP_RETURN, offset, IC_LEFT (ic)->aop, offset, true);
-              if (!regalloc_dry_run)
-                z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_RETURN->aopu.aop_reg[offset]->rIdx] = true;
-              offset++;
-            }
+          for (int i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
+            if (!regalloc_dry_run)
+              z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_RETURN->aopu.aop_reg[i]->rIdx] = true;
+
+          genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, true);
         }
     }
 
@@ -5014,18 +5042,7 @@ genRet (const iCode *ic)
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, 2);
         }
       else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
-        {
-          int i;
-          short retarray[4], oparray[4];
-
-          for (i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
-            {
-              retarray[i] = ASMOP_RETURN->aopu.aop_reg[i]->rIdx;
-              oparray[i] = AOP (IC_LEFT (ic))->aopu.aop_reg[i]->rIdx;
-            }
-
-          regMove (retarray, oparray, AOP_SIZE (IC_LEFT (ic)), FALSE);
-        }
+        genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, true);
       else
         {
           bool skipbytes[4] = {false, false, false, false}; // Take care to not overwrite hl.
@@ -5565,7 +5582,7 @@ genPlus (iCode * ic)
         }
     }
 
-  // Handle AOP_EXSTK conflcit with hl here, since setupToPreserveCarry() would cause problems otherwise.
+  // Handle AOP_EXSTK conflict with hl here, since setupToPreserveCarry() would cause problems otherwise.
   if (IC_RESULT (ic)->aop->type == AOP_EXSTK && (getPairId (IC_LEFT (ic)->aop) == PAIR_HL || getPairId (IC_RIGHT (ic)->aop) == PAIR_HL) &&
     (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) && isPairDead (PAIR_HL, ic))
     {
@@ -9150,8 +9167,6 @@ genLeftShift (const iCode * ic)
      same */
   if (!sameRegs (AOP (left), AOP (result)))
     {
-      int soffset, doffset;
-
       if (save_a)
         _push (PAIR_AF);
 
@@ -9162,35 +9177,10 @@ genLeftShift (const iCode * ic)
       }
       size = AOP_SIZE (result) - byteshift;
       int lsize = AOP_SIZE (left) - byteshift;
-      soffset = 0;
-      doffset = byteshift;
-      if (AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) == AOP_REG)
-        {
-          short src[8], dst[8];
-          while (size && lsize)
-            {
-              src[soffset] = AOP (left)->aopu.aop_reg[soffset]->rIdx;
-              dst[soffset] = AOP (result)->aopu.aop_reg[doffset]->rIdx;
-              soffset++;
-              doffset++;
-              size--, lsize--;
-            }
-          regMove (dst, src, (AOP_SIZE (result) <= AOP_SIZE (left) ? AOP_SIZE (result) : AOP_SIZE (left)) - byteshift, TRUE);
-        }
-      else
-        {
-          while (size && lsize)
-            {
-              cheapMove (result->aop, doffset, left->aop, soffset, true);
-              soffset++;
-              doffset++;
-              size--, lsize--;
-            }
-        }
-      while (lsize--)
-        cheapMove (result->aop, doffset++, ASMOP_ZERO, 0, true);
 
-      doffset = 0;
+      genMove_o (result->aop, byteshift, left->aop, 0, size <= lsize ? size : lsize, true);
+
+      int doffset = 0;
       size = byteshift;
       while (size--)
         cheapMove (result->aop, doffset++, ASMOP_ZERO, 0, true);
@@ -9534,7 +9524,6 @@ genRightShift (const iCode * ic)
   if (!sameRegs (AOP (left), AOP (result)))
     {
       int soffset = 0;
-      int doffset = 0;
       size = AOP_SIZE (result);
 
       if (!is_signed && shift_by_lit)
@@ -9548,29 +9537,10 @@ genRightShift (const iCode * ic)
       if (save_a)
         _push (PAIR_AF);
 
-      if (AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) == AOP_REG)
-        {
-          short src[8], dst[8];
-          while (size--)
-            {
-              src[doffset] = AOP (left)->aopu.aop_reg[soffset]->rIdx;
-              dst[doffset] = AOP (result)->aopu.aop_reg[doffset]->rIdx;
-              soffset++;
-              doffset++;
-            }
-          regMove (dst, src, AOP_SIZE (result) - byteoffset, TRUE);
-        }
-      else
-        {
-          while (size--)
-            {
-              cheapMove (AOP (result), doffset, AOP (left), soffset, true);
-              soffset++;
-              doffset++;
-            }
-        }
+      genMove_o (result->aop, 0, left->aop, soffset, size, true);
+
       size = byteoffset;
-      doffset = AOP_SIZE (result) - byteoffset;
+      int doffset = AOP_SIZE (result) - byteoffset;
       while (size--)
         cheapMove (AOP (result), doffset++, ASMOP_ZERO, 0, true);
 

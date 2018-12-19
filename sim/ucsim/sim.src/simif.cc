@@ -608,6 +608,12 @@ cl_simulator_interface::init(void)
   uc->vars->add(v= new cl_var(cchars("PC"), cfg, simif_pc,
 			      "RW: PC register"));
   v->init();
+  uc->vars->add(v= new cl_var(cchars("sim_print"), cfg, simif_print,
+			      "W: print char on stdout"));
+  v->init();
+  uc->vars->add(v= new cl_var(cchars("sim_write"), cfg, simif_write,
+			      "W: write char to simif output"));
+  v->init();
 
   return(0);
 }
@@ -837,6 +843,21 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 	  uc->PC= addr;
 	}
       cell->set(uc->PC);
+      break;
+    case simif_print:
+      if (val)
+	{
+	  printf("%c", (char)(*val&0xff));
+	  fflush(stdout);
+	}
+      break;
+    case simif_write:
+      if (val)
+	{
+	  char c= *val & 0xff;
+	  if (fout)
+	    fout->write(&c, 1);
+	}
       break;
     case simif_nuof:
       break;

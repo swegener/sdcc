@@ -346,6 +346,7 @@ void
 cl_serial::received(int c)
 {
   scon->set_bit1(bmRI);
+  cfg_write(serconf_received, c);
 }
 
 void

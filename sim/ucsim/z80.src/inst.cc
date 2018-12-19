@@ -1283,9 +1283,9 @@ cl_z80::inst_exx(t_mem code)
   regs.aDE = regs.DE;
   regs.DE = tempw;
 
-  tempw = regs.aDE;
-  regs.aDE = regs.DE;
-  regs.DE = tempw;
+  tempw = regs.aBC;
+  regs.aBC = regs.BC;
+  regs.BC = tempw;
 
   return(resGO);
 }

@@ -1,3 +1,8 @@
+2018-12-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve use of eZ80, Rabbit, TLCS-90 16-bit load.
+
 2018-12-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

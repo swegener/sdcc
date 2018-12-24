@@ -1441,8 +1441,8 @@ Optional Features:
   --disable-r3ka-port     Excludes the Rabbit 3000A port
   --disable-gbz80-port    Excludes the Gameboy gbz80 port
   --disable-tlcs90-port   Excludes the TLCS-90 port
-  --disable-ez80_z80-port Excludes the TLCS-90 port
-  --disable-ds390-port    Excludes the EZ80-Z80 port
+  --disable-ez80_z80-port Excludes the EZ80-Z80 port
+  --disable-ds390-port    Excludes the DS390 port
   --disable-ds400-port    Excludes the DS400 port
   --disable-pic14-port    Excludes the PIC14 port
   --disable-pic16-port    Excludes the PIC16 port

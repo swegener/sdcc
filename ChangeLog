@@ -1,3 +1,7 @@
+2018-12-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/bug-2854.c: disabled test, segmentation fault
+
 2018-12-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

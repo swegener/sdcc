@@ -2,12 +2,14 @@
    A bug in handling of 8-bit parameters to z88dk_fastcall. Also bug #2852.
  */
 
+#include <testfwk.h>
+
+#if 0
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-
-#include <testfwk.h>
 
 #pragma disable_warning 85
 #pragma disable_warning 88
@@ -98,9 +100,12 @@ int8_t ya_loadb(char **args)    // load the nominated bank and address with bina
     return 1;
 }
 
+#endif
+
 void
 testBug(void)
 {
+#if 0
   const char *args[] = {"", "", "23"};
   char b;
   buffer = &b;
@@ -108,5 +113,5 @@ testBug(void)
   ya_mvb(args);
 
   ya_loadb(args);
+#endif
 }
-

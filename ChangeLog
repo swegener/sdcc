@@ -1,3 +1,8 @@
+2018-12-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2854.c:
+	  Fix read from uninitialized memory.
+
 2018-12-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* support/regression/tests/bug-2854.c: disabled test, segmentation fault

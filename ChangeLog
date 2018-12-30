@@ -2,6 +2,8 @@
 
 	* support/regression/tests/bug-2854.c:
 	  Fix read from uninitialized memory.
+	* src/z80/peep.c:
+	  Handle eZ80 lea, pea in peephole size calculation.
 
 2018-12-24 Maarten Brock <sourceforge.brock AT dse.nl>
 

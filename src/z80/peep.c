@@ -1088,7 +1088,10 @@ int z80instructionSize(lineNode *pl)
 
   if(IS_RAB && ISINST(pl->line, "bool"))
     return(!STRNCASECMP(op1start, "hl", 2) ? 1 : 2);
-  
+
+  if(IS_EZ80_Z80 && (ISINST(pl->line, "lea") || ISINST(pl->line, "pea")))
+    return(3);
+
   if(ISINST(pl->line, ".db") || ISINST(pl->line, ".byte"))
     {
       int i, j;

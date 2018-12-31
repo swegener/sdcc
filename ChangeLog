@@ -11,6 +11,9 @@
 	  src/hc08/main.c,
 	  src/stm8/main.c:
 	  Fix bug #2809.
+	* src/SDCClospre.hpp,
+	  support/regression/tests/bug-2558.c:
+	  Fix bug #2558.
 
 2018-12-30 Philipp Klaus Krause <pkk AT spth.de>
 

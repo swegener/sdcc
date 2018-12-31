@@ -16,6 +16,9 @@
 	  Fix bug #2558.
 	* src/SDCCast.c:
 	  Fix bug #2535.
+	* device/lib/printf_large.c,
+	  support/regression/tests/bug-2732.c:
+	  Fix bug #2732.
 
 2018-12-30 Philipp Klaus Krause <pkk AT spth.de>
 

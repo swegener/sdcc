@@ -449,9 +449,9 @@ _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap)
   bool   lsd;
 
   unsigned char radix;
-  unsigned char  width;
-  signed char decimals;
-  unsigned char  length;
+  size_t  width;
+  int decimals;
+  size_t  length;
   char           c;
 
 #ifdef __SDCC_STACK_AUTO

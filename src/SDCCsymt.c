@@ -1866,7 +1866,7 @@ checkSClass (symbol *sym, int isProto)
     }
   else if (TARGET_Z80_LIKE && IS_ABSOLUTE (sym->etype) && SPEC_SCLS (sym->etype) == S_SFR)
     {
-      if (SPEC_ADDR (sym->etype) > 0xff && !FUNC_REGBANK (sym->type))
+      if (SPEC_ADDR (sym->etype) > (FUNC_REGBANK (sym->type) ? 0xffff : 0xff))
         werror (W_SFR_ABSRANGE, sym->name);
     }
 

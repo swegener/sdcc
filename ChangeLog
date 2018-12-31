@@ -2,6 +2,8 @@
 
 	* doc/sdccman.lyx:
 	  Document default calling convention for z80, z180, r2k, r3ka, ez80_z80, tlcs90, stm8.
+	* src/SDCCast.c:
+	  Fix bug #2850.
 
 2018-12-30 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -3595,8 +3595,10 @@ decorateType (ast *tree, RESULT_TYPE resultType)
         }
 
       RRVAL (tree) = 1;
-      COPYTYPE (TTYPE (tree), TETYPE (tree), LTYPE (tree)->next);
-      if (IS_PTR (LTYPE (tree)) && !IS_LITERAL (TETYPE (tree)))
+      TTYPE (tree) = copyLinkChain (LTYPE (tree)->next);
+      TETYPE (tree) = getSpec (TTYPE (tree));
+
+      if (IS_PTR (LTYPE (tree)) /* && !IS_LITERAL (TETYPE (tree)) caused bug #2850 */)
         {
           SPEC_SCLS (TETYPE (tree)) = sclsFromPtr (LTYPE (tree));
         }
@@ -4143,36 +4145,9 @@ decorateType (ast *tree, RESULT_TYPE resultType)
           TTYPE (tree) = copyLinkChain (LTYPE (tree)->next);
           TETYPE (tree) = getSpec (TTYPE (tree));
           /* adjust the storage class */
-          switch (DCL_TYPE (tree->left->ftype))
-            {
-            case POINTER:
-              SPEC_SCLS (TETYPE (tree)) = S_DATA;
-              break;
-            case FPOINTER:
-              SPEC_SCLS (TETYPE (tree)) = S_XDATA;
-              break;
-            case CPOINTER:
-              SPEC_SCLS (TETYPE (tree)) = S_CODE;
-              break;
-            case GPOINTER:
-              SPEC_SCLS (TETYPE (tree)) = 0;
-              break;
-            case PPOINTER:
-              SPEC_SCLS (TETYPE (tree)) = S_XSTACK;
-              break;
-            case IPOINTER:
-              SPEC_SCLS (TETYPE (tree)) = S_IDATA;
-              break;
-            case EEPPOINTER:
-              SPEC_SCLS (TETYPE (tree)) = S_EEPROM;
-              break;
-            case UPOINTER:
-              SPEC_SCLS (TETYPE (tree)) = 0;
-              break;
-            case ARRAY:
-            case FUNCTION:
-              break;
-            }
+          if (DCL_TYPE (tree->left->ftype) != ARRAY && DCL_TYPE (tree->left->ftype) != FUNCTION)
+            SPEC_SCLS (TETYPE (tree)) = sclsFromPtr (tree->left->ftype);
+
           return tree;
         }
 

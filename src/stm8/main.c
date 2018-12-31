@@ -30,6 +30,8 @@
 #include "dbuf_string.h"
 #include "peep.h"
 
+#define OPTION_MEDIUM_MODEL         "--model-medium"
+#define OPTION_LARGE_MODEL          "--model-large"
 #define OPTION_CODE_SEG        "--codeseg"
 #define OPTION_CONST_SEG       "--constseg"
 #define OPTION_ELF             "--out-fmt-elf"
@@ -38,6 +40,8 @@ extern DEBUGFILE dwarf2DebugFile;
 extern int dwarf2FinalizeFile(FILE *);
 
 static OPTION stm8_options[] = {
+  {0, OPTION_MEDIUM_MODEL, NULL, "16-bit address space for both data and code (default)"},
+  {0, OPTION_LARGE_MODEL, NULL, "16-bit address space for data, 24-bit for code"},
   {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
   {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
   {0, OPTION_ELF,             NULL, "Output executable in ELF format"},

@@ -6,6 +6,11 @@
 	  Fix bug #2850.
 	* src/SDCCsymt.c:
 	  Fix bug #2797.
+	* src/SDCCmain.c,
+	  src/mcs51/main.c,
+	  src/hc08/main.c,
+	  src/stm8/main.c:
+	  Fix bug #2809.
 
 2018-12-30 Philipp Klaus Krause <pkk AT spth.de>
 

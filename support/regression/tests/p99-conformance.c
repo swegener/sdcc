@@ -48,7 +48,6 @@
 # endif
 #else /* SDCC issues */
 # define SKIP_HEXDOUBLE /* bug #2536 */
-# define SKIP_NON_EVALUATED_COMMA_ASSIGN /* bug #2525 */
 # define SKIP_LONG_DOUBLE /* long double not yet supported */
 # define SKIP_UNIVERSAL
 # define SKIP_COMPOUND /* compound literals not yet supported */

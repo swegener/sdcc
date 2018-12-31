@@ -14,6 +14,8 @@
 	* src/SDCClospre.hpp,
 	  support/regression/tests/bug-2558.c:
 	  Fix bug #2558.
+	* src/SDCCast.c:
+	  Fix bug #2535.
 
 2018-12-30 Philipp Klaus Krause <pkk AT spth.de>
 

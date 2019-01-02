@@ -5,6 +5,8 @@
 	  src/SDCCerr.c,
 	  support/valdiag/tests/bug-2773.c:
 	  Fix bug #2773.
+	* src/ds390/main.c:
+	  Change the name of a hackish predefined macro for standard-compliance.
 
 2018-12-31 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -1499,7 +1499,7 @@ _ds400_finaliseOptions (void)
     }
 
   // hackhack: we're a superset of the 390.
-  addSet(&preArgvSet, Safe_strdup("-DSDCC_ds390"));
+  addSet(&preArgvSet, Safe_strdup("-D__SDCC_ds390"));
   addSet(&preArgvSet, Safe_strdup("-D__ds390"));
 
   /* Hack-o-matic: if we are using the flat24 model,

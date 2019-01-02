@@ -559,6 +559,8 @@ struct
     "declaration after statement requires ISO C99 or later", 0 },
   { E_SHORTCALL_INVALID_VALUE, ERROR_LEVEL_ERROR,
     "invalid value for __z88dk_shortcall %s parameter: %x", 0},
+  { E_DUPLICATE_PARAMTER_NAME, ERROR_LEVEL_ERROR,
+    "duplicate parameter name %s for function %s", 0},
 };
 
 /* -------------------------------------------------------------------------------

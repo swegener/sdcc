@@ -14,15 +14,18 @@ print ""
 FS="[ \t.]"
 }
 
-/Revision/ { printf "#define SDCC_BUILD_NUMBER   \"%s\"\n", $2 }
-/Revision/ { printf "#define SDCC_BUILD_NR       %s\n", $2 }
-
-END {
-print ""
-print "#ifndef SDCC_BUILD_NUMBER"
+/Revision/ {
+if ($2) {
+printf "#define SDCC_BUILD_NUMBER   \"%s\"\n", $2
+printf "#define SDCC_BUILD_NR       %s\n", $2
+}
+else {
 print "#define SDCC_BUILD_NUMBER    \"0\""
 print "#define SDCC_BUILD_NR        0"
-print "#endif"
+}
+}
+
+END {
 print ""
 print "#endif"
 }

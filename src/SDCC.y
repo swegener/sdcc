@@ -185,6 +185,8 @@ external_definition
           cleanUpLevel (SymbolTab, 1);
         }
    | addressmod
+        {
+        }
    ;
 
 function_definition

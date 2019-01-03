@@ -3,7 +3,7 @@
 	* src/version.awk:
 	  Fix bug #2818.
 
-2018-01-02 Philipp Klaus Krause <pkk AT spth.de>
+2019-01-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c,
 	  src/SDCCerr.h,

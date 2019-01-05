@@ -1,3 +1,8 @@
+2019-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmem.c:
+	  Improve error handling on missing output storage class.
+
 2019-01-03 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/version.awk:

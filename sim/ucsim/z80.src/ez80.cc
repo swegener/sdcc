@@ -62,6 +62,32 @@ struct dis_entry disass_ez80_dd[]=
    { 0x0007, 0x00ff, ' ', 2, "LD BC,(IX+%d)" },
    { 0x0017, 0x00ff, ' ', 2, "LD DE,(IX+%d)" },
    { 0x0027, 0x00ff, ' ', 2, "LD HL,(IX+%d)" },
+   { 0x0064, 0x00ff, ' ', 1, "LD IXH,IXH" },
+   { 0x0065, 0x00ff, ' ', 1, "LD IXH,IXL" },
+   { 0x006c, 0x00ff, ' ', 1, "LD IXL,IXH" },
+   { 0x006d, 0x00ff, ' ', 1, "LD IXL,IXL" },
+   { 0x0026, 0x00ff, ' ', 2, "LD IXH,%d" },
+   { 0x002e, 0x00ff, ' ', 2, "LD IXL,%d" },
+   { 0x0067, 0x00ff, ' ', 1, "LD IXH,A" },
+   { 0x0060, 0x00ff, ' ', 1, "LD IXH,B" },
+   { 0x0061, 0x00ff, ' ', 1, "LD IXH,C" },
+   { 0x0062, 0x00ff, ' ', 1, "LD IXH,D" },
+   { 0x0063, 0x00ff, ' ', 1, "LD IXH,E" },
+   { 0x006f, 0x00ff, ' ', 1, "LD IXL,A" },
+   { 0x0068, 0x00ff, ' ', 1, "LD IXL,B" },
+   { 0x0069, 0x00ff, ' ', 1, "LD IXL,C" },
+   { 0x006a, 0x00ff, ' ', 1, "LD IXL,D" },
+   { 0x006b, 0x00ff, ' ', 1, "LD IXL,E" },
+   { 0x007c, 0x00ff, ' ', 1, "LD A,IXH" },
+   { 0x007d, 0x00ff, ' ', 1, "LD A,IXL" },
+   { 0x0044, 0x00ff, ' ', 1, "LD B,IXH" },
+   { 0x0045, 0x00ff, ' ', 1, "LD B,IXL" },
+   { 0x004c, 0x00ff, ' ', 1, "LD C,IXH" },
+   { 0x004d, 0x00ff, ' ', 1, "LD C,IXL" },
+   { 0x0054, 0x00ff, ' ', 1, "LD D,IXH" },
+   { 0x0055, 0x00ff, ' ', 1, "LD D,IXL" },
+   { 0x005c, 0x00ff, ' ', 1, "LD E,IXH" },
+   { 0x005d, 0x00ff, ' ', 1, "LD E,IXL" },
    { 0, 0, 0, 0, NULL }
   };
 
@@ -77,6 +103,32 @@ struct dis_entry disass_ez80_fd[]=
    { 0x0007, 0x00ff, ' ', 2, "LD BC,(IY+%d)" },
    { 0x0017, 0x00ff, ' ', 2, "LD DE,(IY+%d)" },
    { 0x0027, 0x00ff, ' ', 2, "LD HL,(IY+%d)" },
+   { 0x0064, 0x00ff, ' ', 1, "LD IYH,IYH" },
+   { 0x0065, 0x00ff, ' ', 1, "LD IYH,IYL" },
+   { 0x006c, 0x00ff, ' ', 1, "LD IYL,IYH" },
+   { 0x006d, 0x00ff, ' ', 1, "LD IYL,IYL" },
+   { 0x0026, 0x00ff, ' ', 2, "LD IYH,%d" },
+   { 0x002e, 0x00ff, ' ', 2, "LD IYL,%d" },
+   { 0x0067, 0x00ff, ' ', 1, "LD IYH,A" },
+   { 0x0060, 0x00ff, ' ', 1, "LD IYH,B" },
+   { 0x0061, 0x00ff, ' ', 1, "LD IYH,C" },
+   { 0x0062, 0x00ff, ' ', 1, "LD IYH,D" },
+   { 0x0063, 0x00ff, ' ', 1, "LD IYH,E" },
+   { 0x006f, 0x00ff, ' ', 1, "LD IYL,A" },
+   { 0x0068, 0x00ff, ' ', 1, "LD IYL,B" },
+   { 0x0069, 0x00ff, ' ', 1, "LD IYL,C" },
+   { 0x006a, 0x00ff, ' ', 1, "LD IYL,D" },
+   { 0x006b, 0x00ff, ' ', 1, "LD IYL,E" },
+   { 0x007c, 0x00ff, ' ', 1, "LD A,IYH" },
+   { 0x007d, 0x00ff, ' ', 1, "LD A,IYL" },
+   { 0x0044, 0x00ff, ' ', 1, "LD B,IYH" },
+   { 0x0045, 0x00ff, ' ', 1, "LD B,IYL" },
+   { 0x004c, 0x00ff, ' ', 1, "LD C,IYH" },
+   { 0x004d, 0x00ff, ' ', 1, "LD C,IYL" },
+   { 0x0054, 0x00ff, ' ', 1, "LD D,IYH" },
+   { 0x0055, 0x00ff, ' ', 1, "LD D,IYL" },
+   { 0x005c, 0x00ff, ' ', 1, "LD E,IYH" },
+   { 0x005d, 0x00ff, ' ', 1, "LD E,IYL" },
    { 0, 0, 0, 0, NULL }
   };
 
@@ -156,6 +208,7 @@ cl_ez80::get_disasm_info(t_addr addr,
 	case 0x37: case 0x31:
 	case 0x0f: case 0x1f: case 0x2f:
 	case 0x07: case 0x17: case 0x27:
+	case 0x26: case 0x2e:
 	  immed_n= 2;
 	  break;
 	}
@@ -178,6 +231,7 @@ cl_ez80::get_disasm_info(t_addr addr,
 	case 0x31: case 0x37:
 	case 0x0f: case 0x1f: case 0x2f:
 	case 0x07: case 0x17: case 0x27:
+	case 0x26: case 0x2e:
 	  immed_n= 2;
 	  break;
 	}
@@ -306,6 +360,7 @@ cl_ez80::inst_dd_spec(t_mem code)
   
   switch (code)
     {
+      // DD
     case 0x3f: // LD (IX+d),IX
       d= fetch1();
       store2(regs.IX+d, regs.IX);
@@ -314,7 +369,8 @@ cl_ez80::inst_dd_spec(t_mem code)
       d= fetch1();
       store2(regs.IX+d, regs.IY);
       return resGO;
-      
+
+      // DD
     case 0x37: // LD IX,(IX+d)
       d= fetch1();
       regs.IX= get2(regs.IX+d);
@@ -324,6 +380,7 @@ cl_ez80::inst_dd_spec(t_mem code)
       regs.IY= get2(regs.IX+d);
       return resGO;
 
+      // DD
     case 0x0f: // LD (IX+d),BC
       d= fetch1();
       store2(regs.IX+d, regs.BC);
@@ -337,6 +394,7 @@ cl_ez80::inst_dd_spec(t_mem code)
       store2(regs.IX+d, regs.HL);
       return resGO;
 
+      // DD
     case 0x07: // LD BC,(IX+d)
       d= fetch1();
       regs.BC= get2(regs.IX+d);
@@ -349,6 +407,95 @@ cl_ez80::inst_dd_spec(t_mem code)
       d= fetch1();
       regs.HL= get2(regs.IX+d);
       return resGO;
+
+      // DD
+    case 0x64: // LD IXH,IXH
+      return resGO;      
+    case 0x65: // LD IXH,IXL
+      regs.ix.h= regs.ix.l;
+      return resGO;      
+    case 0x6c: // LD IXL,IXH
+      regs.ix.l= regs.ix.h;
+      return resGO;      
+    case 0x6d: // LD IXL,IXL
+      return resGO;
+
+      // DD
+    case 0x26: // LD IXH,n
+      d= fetch1();
+      regs.ix.h= d;
+      return resGO;
+    case 0x2e: // LD IXL,n
+      d= fetch1();
+      regs.ix.l= d;
+      return resGO;
+
+      // DD
+    case 0x67: // LD,IXH,A
+      regs.ix.h= regs.raf.A;
+      return resGO;
+    case 0x60: // LD,IXH,B
+      regs.ix.h= regs.bc.h;
+      return resGO;
+    case 0x61: // LD,IXH,C
+      regs.ix.h= regs.bc.l;
+      return resGO;
+    case 0x62: // LD,IXH,D
+      regs.ix.h= regs.de.h;
+      return resGO;
+    case 0x63: // LD,IXH,E
+      regs.ix.h= regs.de.l;
+      return resGO;
+
+      // DD
+    case 0x6f: // LD,IXL,A
+      regs.ix.l= regs.raf.A;
+      return resGO;
+    case 0x68: // LD,IXL,B
+      regs.ix.l= regs.bc.h;
+      return resGO;
+    case 0x69: // LD,IXL,C
+      regs.ix.l= regs.bc.l;
+      return resGO;
+    case 0x6a: // LD,IXL,D
+      regs.ix.l= regs.de.h;
+      return resGO;
+    case 0x6b: // LD,IXL,E
+      regs.ix.l= regs.de.l;
+      return resGO;
+
+      // DD
+    case 0x7c: // LD A,IXH
+      regs.raf.A= regs.ix.h;
+      return resGO;
+    case 0x7d: // LD A,IXL
+      regs.raf.A= regs.ix.l;
+      return resGO;
+    case 0x44: // LD B,IXH
+      regs.bc.h= regs.ix.h;
+      return resGO;
+    case 0x45: // LD B,IXL
+      regs.bc.h= regs.ix.l;
+      return resGO;
+    case 0x4c: // LD C,IXH
+      regs.bc.l= regs.ix.h;
+      return resGO;
+    case 0x4d: // LD C,IXL
+      regs.bc.l= regs.ix.l;
+      return resGO;
+    case 0x54: // LD D,IXH
+      regs.de.h= regs.ix.h;
+      return resGO;
+    case 0x55: // LD D,IXL
+      regs.de.h= regs.ix.l;
+      return resGO;
+    case 0x5c: // LD E,IXH
+      regs.de.l= regs.ix.h;
+      return resGO;
+    case 0x5d: // LD E,IXL
+      regs.de.l= regs.ix.l;
+      return resGO;
+      
     }
   
   return -1;
@@ -361,6 +508,7 @@ cl_ez80::inst_fd_spec(t_mem code)
   
   switch (code)
     {
+      // FD
     case 0x3e: // LD (IY+d),IX
       d= fetch1();
       store2(regs.IY+d, regs.IX);
@@ -370,6 +518,7 @@ cl_ez80::inst_fd_spec(t_mem code)
       store2(regs.IY+d, regs.IY);
       return resGO;
 
+      // FD
     case 0x31: // LD IX,(IY+d)
       d= fetch1();
       regs.IX= get2(regs.IY+d);
@@ -379,6 +528,7 @@ cl_ez80::inst_fd_spec(t_mem code)
       regs.IY= get2(regs.IY+d);
       return resGO;
 
+      // FD
     case 0x0f: // LD (IY+d),BC
       d= fetch1();
       store2(regs.IY+d, regs.BC);
@@ -392,6 +542,7 @@ cl_ez80::inst_fd_spec(t_mem code)
       store2(regs.IY+d, regs.HL);
       return resGO;
 
+      // FD
     case 0x07: // LD BC,(IY+d)
       d= fetch1();
       regs.BC= get2(regs.IY+d);
@@ -405,6 +556,93 @@ cl_ez80::inst_fd_spec(t_mem code)
       regs.HL= get2(regs.IY+d);
       return resGO;
 
+      // FD
+    case 0x64: // LD IYH,IYH
+      return resGO;      
+    case 0x65: // LD IYH,IYL
+      regs.iy.h= regs.iy.l;
+      return resGO;      
+    case 0x6c: // LD IYL,IYH
+      regs.iy.l= regs.iy.h;
+      return resGO;      
+    case 0x6d: // LD IYL,IYL
+      return resGO;      
+
+      // FD
+    case 0x26: // LD IYH,n
+      d= fetch1();
+      regs.iy.h= d;
+      return resGO;
+    case 0x2e: // LD IYL,n
+      d= fetch1();
+      regs.iy.l= d;
+      return resGO;
+
+      // FD
+    case 0x67: // LD,IYH,A
+      regs.iy.h= regs.raf.A;
+      return resGO;
+    case 0x60: // LD,IYH,B
+      regs.iy.h= regs.bc.h;
+      return resGO;
+    case 0x61: // LD,IYH,C
+      regs.iy.h= regs.bc.l;
+      return resGO;
+    case 0x62: // LD,IYH,D
+      regs.iy.h= regs.de.h;
+      return resGO;
+    case 0x63: // LD,IYH,E
+      regs.iy.h= regs.de.l;
+      return resGO;
+
+      // FD
+    case 0x6f: // LD,IYL,A
+      regs.iy.l= regs.raf.A;
+      return resGO;
+    case 0x68: // LD,IYL,B
+      regs.iy.l= regs.bc.h;
+      return resGO;
+    case 0x69: // LD,IYL,C
+      regs.iy.l= regs.bc.l;
+      return resGO;
+    case 0x6a: // LD,IYL,D
+      regs.iy.l= regs.de.h;
+      return resGO;
+    case 0x6b: // LD,IYL,E
+      regs.iy.l= regs.de.l;
+      return resGO;
+
+      // FD
+    case 0x7c: // LD A,IYH
+      regs.raf.A= regs.iy.h;
+      return resGO;
+    case 0x7d: // LD A,IYL
+      regs.raf.A= regs.iy.l;
+      return resGO;
+    case 0x44: // LD B,IYH
+      regs.bc.h= regs.iy.h;
+      return resGO;
+    case 0x45: // LD B,IYL
+      regs.bc.h= regs.iy.l;
+      return resGO;
+    case 0x4c: // LD C,IYH
+      regs.bc.l= regs.iy.h;
+      return resGO;
+    case 0x4d: // LD C,IYL
+      regs.bc.l= regs.iy.l;
+      return resGO;
+    case 0x54: // LD D,IYH
+      regs.de.h= regs.iy.h;
+      return resGO;
+    case 0x55: // LD D,IYL
+      regs.de.h= regs.iy.l;
+      return resGO;
+    case 0x5c: // LD E,IYH
+      regs.de.l= regs.iy.h;
+      return resGO;
+    case 0x5d: // LD E,IYL
+      regs.de.l= regs.iy.l;
+      return resGO;
     }
 
   return -1;

@@ -1,4 +1,5 @@
 #include <string.h>
+#include "hw.h"
 
 #include "serial.h"
 #include "print.h"
@@ -41,6 +42,7 @@ void main(void)
   serial_init(9600);
   cmd[ptr=0]= 0;
   print("Hello World!\n");
+  P1= 0;
   while (1)
     {
       if (serial_received())

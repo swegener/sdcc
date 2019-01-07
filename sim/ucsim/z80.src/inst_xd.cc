@@ -416,13 +416,24 @@ cl_z80::inst_Xd_misc(t_mem code)
 }
 
 int
-cl_z80::inst_Xd(void)
+cl_z80::inst_Xd(t_mem prefix)
 {
   t_mem code;
-
+  int i;
+  
   if (fetch(&code))
     return(resBREAKPOINT);
 
+  switch (prefix)
+    {
+    case 0xdd:
+      if ((i= inst_dd_spec(code)) >= 0)
+	return i;
+    case 0xfd:
+      if ((i= inst_fd_spec(code)) >= 0)
+	return i;
+    }
+  
   switch (code)
     {
       case 0x21: // LD IX,nnnn

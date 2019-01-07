@@ -56,12 +56,14 @@ interrupt void SCON_int(void)
 	  *simif= 'p';*simif= '*';
 	  *simif= 'p';*simif= c;
 	  *simif= 'p';*simif= '*';
+	  P1++;
 	}
       nr= serial_nuof_received();
       *simif= 'p';*simif= '/';
       *simif= 'p';*simif= nr+'0';
       *simif= 'p';*simif= '/';
       RI= 0;
+      P0= first_free<<4 + first_occupied;
     }
   else if (TI)
     {

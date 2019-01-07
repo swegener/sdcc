@@ -2081,7 +2081,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
         {
           /* Do nothing */
         }
-      else if (IS_EZ80_Z80 && aop->type == AOP_STK)
+      else if (IS_EZ80_Z80 && aop->size - offset >= 2 && aop->type == AOP_STK)
         {
           int fp_offset = aop->aopu.aop_stk + offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
           emit2 ("ld %s, %d (ix)", _pairs[pairId].name, fp_offset);

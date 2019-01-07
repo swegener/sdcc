@@ -2,6 +2,8 @@
 
 	* support/regression/ports/ez80-z80/spec.mk:
 	  Use new eZ80 uCsim in ez80_z80 regression tests.
+	* src/z80/gen.c:
+	  Do not use of eZ80 lea for stack frame setup when not using frame pointer.
 
 2019-01-05 Philipp Klaus Krause <pkk AT spth.de>
 

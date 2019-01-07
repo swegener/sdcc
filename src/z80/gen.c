@@ -4925,7 +4925,7 @@ genFunction (const iCode * ic)
     {
       if (!_G.omitFramePtr)
         emit2 ((optimize.codeSize && !IFFUNC_ISZ88DK_FASTCALL (ftype)) ? "!enters" : "!enter");
-      if (IS_EZ80_Z80 && -sym->stack > -128)
+      if (IS_EZ80_Z80 && !_G.omitFramePtr && -sym->stack > -128)
         {
           emit2 ("lea hl, ix, #%d", -sym->stack);
           emit2 ("ld sp, hl");

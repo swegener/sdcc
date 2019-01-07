@@ -145,8 +145,8 @@ replace restart {
 } by {
 	; peephole 13 loaded %2 into %3 (%4) directly instead of going through %1.
 	ld	%3 (%4), %2
-} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1), canAssign('a' %2)
-// canAssign ('a' %2) checks that %2 is an 8-bit value
+} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1), canAssign('a' %1)
+// canAssign ('a' %1) checks that %1 is an 8-bit value
 
 replace restart {
 	ld	%1, %2 (%3)
@@ -1239,7 +1239,7 @@ replace restart {
 	inc	%2 (%3)
 	ld	%1, %2 (%3)
 	; peephole 116 incremented in %2 (%3) instead of going through %1.
-}
+} if canAssign('a' %1)
 
 // TODO: Check for volatile?
 replace restart {
@@ -1250,7 +1250,7 @@ replace restart {
 	dec	%2 (%3)
 	ld	%1, %2 (%3)
 	; peephole 117 decremented in %2 (%3) instead of going through %1.
-}
+} if canAssign('a' %1)
 
 replace restart {
 	ld	%1,a

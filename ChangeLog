@@ -2,6 +2,10 @@
 
 	* src/z80/gen.c:
 	  ez80_z80 fixes.
+	* src/z80/gen.c:
+	  Only use eZ80 lea for stack frame setup when doing so provides a code size advantage.
+	* .version:
+	  Bump version for stable ez80_z80 backend.
 
 2019-01-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

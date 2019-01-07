@@ -137,7 +137,8 @@ replace restart {
 } by {
 	; peephole 13 loaded %2 into %3 (%4) directly instead of going through %1.
 	ld	%3 (%4), %2
-} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1), notSame(%1 'hl')
+} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1), notSame(%1 'hl'), canAssign ('a' %2)
+// canAssign ('a' %2) checks that %2 is an 8-bit value (as e.g. on eZ80 there is a 16-bit ix-relative ld for register pairs)
 
 replace restart {
 	ld	%1, %2 (%3)

@@ -6,6 +6,8 @@
 	  Only use eZ80 lea for stack frame setup when doing so provides a code size advantage.
 	* .version:
 	  Bump version for stable ez80_z80 backend.
+	* support/regression/Makefile.in:
+	  Include ez80_z80 backend in test-z80 target.
 
 2019-01-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0 // TODO: Enable when struct is supported!
+#if 0 // TODO: Enable when struct passing is supported!
 struct s { int f[4]; };
 
 int foo (struct s s, int x1, int x2, int x3, int x4, int x5, int x6, int x7)

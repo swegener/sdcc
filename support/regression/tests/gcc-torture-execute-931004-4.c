@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// Todo: Enable when sdcc supports struct!
+// Todo: Enable when sdcc supports struct passing!
 #if 0
 #include <stdarg.h>
 

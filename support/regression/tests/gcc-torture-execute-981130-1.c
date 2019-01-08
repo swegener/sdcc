@@ -8,8 +8,6 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports struct!
-#if 0
 struct s { int a; int b;};
 struct s s1;
 struct s s2 = { 1, 2, };
@@ -22,12 +20,10 @@ check (int a, int b)
   else
     ASSERT (0);
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#if 0
   int * p;
   int x;
   
@@ -37,6 +33,5 @@ testTortureExecute (void)
   x    = * p;
   
   check (x, 1);
-#endif
 }
 

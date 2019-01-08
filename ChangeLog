@@ -2,6 +2,8 @@
 
 	* src/stm8/peeph.def:
 	  Fixes and improvements for stm8 peephole rules, patch by Visenri.
+	* support/regression/tests/*.c:
+	  Enable some regression tests that need struct assignment support.
 
 2019-01-07 Philipp Klaus Krause <pkk AT spth.de>
 

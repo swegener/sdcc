@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// Todo: Enable shen sdcc supports struct!
+// Todo: Enable shen sdcc supports struct passing!
 #if 0
 struct tiny
 {

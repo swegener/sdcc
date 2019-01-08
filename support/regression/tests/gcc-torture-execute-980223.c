@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports struct!
+// TODO: Enable when sdcc can return struct!
 #if 0
 typedef struct { char *addr; long type; } object;
 

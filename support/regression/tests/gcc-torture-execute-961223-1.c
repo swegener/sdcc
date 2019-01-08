@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when sdcc supports struct!
+// TODO: Enable when sdcc can pass struct!
 #if 0
 struct s {
   double d;

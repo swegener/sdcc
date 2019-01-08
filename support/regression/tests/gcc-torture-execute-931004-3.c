@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-// Todo: enable when sdcc supports struct!
+// Todo: enable when sdcc supports struct passing!
 #if 0
 struct tiny
 {

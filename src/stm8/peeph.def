@@ -1444,35 +1444,35 @@ replace {
 
 // We don't have an explicit instruction to jump over 2 bytes. But when flags are not used, we can use cp a, longmen instead.
 
-// Jumping over ld a, #0xmm cp does a read from a memory location at 0xa6mm - which for all current STM8 is in Flash or unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
+// Jumping over ld a, #0xmm bcp does a read from a memory location at 0xa6mm - which for all current STM8 is in Flash or unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
 	ld	a, #%2
 %5:
 } by {
-	.byte 0xc1
-	; peephole jrf6 used cp opcode to jump over 2-byte instruction.
+	.byte 0xc5
+	; peephole jrf6 used bcp opcode to jump over 2-byte instruction.
 %1:
 	ld	a, #%2
 %5:
-} if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
+} if notUsed('n'), notUsed('z'), labelRefCountChange(%5 -1)
 
-// Jumping over clr (mm, sp) cp does a read from a memory location at 0x0fmm - which for all current STM8 is in RAM or unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
+// Jumping over clr (mm, sp) bcp does a read from a memory location at 0x0fmm - which for all current STM8 is in RAM or unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
 	clr	(%2, sp)
 %5:
 } by {
-	.byte 0xc1
-	; peephole jrf7 used cp opcode to jump over 2-byte instruction.
+	.byte 0xc5
+	; peephole jrf7 used bcp opcode to jump over 2-byte instruction.
 %1:
 	clr	(%2, sp)
 %5:
-} if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
+} if notUsed('n'), notUsed('z'), labelRefCountChange(%5 -1)
 
-// Jumping over clrw x; incwx cp does a read from a memory location at 0x5f5c - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
+// Jumping over clrw x; incwx bcp does a read from a memory location at 0x5f5c - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
@@ -1480,27 +1480,27 @@ replace {
 	incw	x
 %5:
 } by {
-	.byte 0xc1
-	; peephole jrf8 used cp opcode to jump over 2-byte instruction sequence.
+	.byte 0xc5
+	; peephole jrf8 used bcp opcode to jump over 2-byte instruction sequence.
 %1:
 	clrw	x
 	incw	x
 %5:
-} if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
+} if notUsed('n'), notUsed('z'), labelRefCountChange(%5 -1)
 
-// Jumping over ldw x, (mm, sp) cp does a read from a memory location at 0x1emm - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
+// Jumping over ldw x, (mm, sp) bcp does a read from a memory location at 0x1emm - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
 	jra	%5
 %1:
 	ldw	x, (%2, sp)
 %5:
 } by {
-	.byte 0xc1
-	; peephole jrf9 used cp opcode to jump over 2-byte instruction.
+	.byte 0xc5
+	; peephole jrf9 used bcp opcode to jump over 2-byte instruction.
 %1:
 	ldw	x, (%2, sp)
 %5:
-} if labelRefCountChange(%5 -1), notUsed('n'), notUsed('z')
+} if notUsed('n'), notUsed('z'), labelRefCountChange(%5 -1)
 
 // We don't have an explicit instruction to jump over 3 bytes. But when flags and a are not used, we can use ldf a, extmem instead.
 
@@ -1516,7 +1516,7 @@ replace {
 %1:
 	ldw	x, #%2
 %5:
-} if labelRefCountChange(%5 -1), notUsed('a'), notUsed('n'), notUsed('z')
+} if notUsed('a'), notUsed('n'), notUsed('z'), labelRefCountChange(%5 -1)
 
 // Jumping over clrw x; ldw (mm, sp), x ldf does a read from a memory location at 0x5f1fmm - which for all current STM8 is unused. If a future STM8 places memory-mapped I/O there, we're in trouble.
 replace {
@@ -1532,5 +1532,5 @@ replace {
 	clrw	x
 	ldw	(%2, sp), x
 %5:
-} if labelRefCountChange(%5 -1), notUsed('a'), notUsed('n'), notUsed('z')
+} if notUsed('a'), notUsed('n'), notUsed('z'), labelRefCountChange(%5 -1)
 

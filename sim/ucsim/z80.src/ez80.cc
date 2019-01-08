@@ -25,111 +25,167 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include "z80mac.h"
+
 #include "ez80cl.h"
 
 struct dis_entry disass_ez80_ed[]=
   {
-   { 0x000f, 0x00ff, ' ', 1, "LD (HL),BC" },
-   { 0x001f, 0x00ff, ' ', 1, "LD (HL),DE" },
-   { 0x002f, 0x00ff, ' ', 1, "LD (HL),HL" },
-   { 0x0037, 0x00ff, ' ', 1, "LD IX,(HL)" },
-   { 0x0031, 0x00ff, ' ', 1, "LD IY,(HL)" },
-   { 0x0007, 0x00ff, ' ', 1, "LD BC,(HL)" },
-   { 0x0017, 0x00ff, ' ', 1, "LD DE,(HL)" },
-   { 0x0027, 0x00ff, ' ', 1, "LD HL,(HL)" },
-   { 0x0032, 0x00ff, ' ', 2, "LEA IX,IX+%d" },
-   { 0x0055, 0x00ff, ' ', 2, "LEA IY,IX+%d" },
-   { 0x0054, 0x00ff, ' ', 2, "LEA IX,IY+%d" },
-   { 0x0033, 0x00ff, ' ', 2, "LEA IY,IY+%d" },
-   { 0x0002, 0x00ff, ' ', 2, "LEA BC,IX+%d" },
-   { 0x0012, 0x00ff, ' ', 2, "LEA DE,IX+%d" },
-   { 0x0022, 0x00ff, ' ', 2, "LEA HL,IX+%d" },
-   { 0x0003, 0x00ff, ' ', 2, "LEA BC,IY+%d" },
-   { 0x0013, 0x00ff, ' ', 2, "LEA DE,IY+%d" },
-   { 0x0023, 0x00ff, ' ', 2, "LEA HL,IY+%d" },
-   { 0, 0, 0, 0, NULL }
+    // ED
+    { 0x000f, 0x00ff, ' ', 1, "LD (HL),BC" },
+    { 0x001f, 0x00ff, ' ', 1, "LD (HL),DE" },
+    { 0x002f, 0x00ff, ' ', 1, "LD (HL),HL" },
+    { 0x0037, 0x00ff, ' ', 1, "LD IX,(HL)" },
+    { 0x0031, 0x00ff, ' ', 1, "LD IY,(HL)" },
+    { 0x0007, 0x00ff, ' ', 1, "LD BC,(HL)" },
+    { 0x0017, 0x00ff, ' ', 1, "LD DE,(HL)" },
+    { 0x0027, 0x00ff, ' ', 1, "LD HL,(HL)" },
+    // ED
+    { 0x0032, 0x00ff, ' ', 2, "LEA IX,IX+%d" },
+    { 0x0055, 0x00ff, ' ', 2, "LEA IY,IX+%d" },
+    { 0x0054, 0x00ff, ' ', 2, "LEA IX,IY+%d" },
+    { 0x0033, 0x00ff, ' ', 2, "LEA IY,IY+%d" },
+    { 0x0002, 0x00ff, ' ', 2, "LEA BC,IX+%d" },
+    { 0x0012, 0x00ff, ' ', 2, "LEA DE,IX+%d" },
+    { 0x0022, 0x00ff, ' ', 2, "LEA HL,IX+%d" },
+    { 0x0003, 0x00ff, ' ', 2, "LEA BC,IY+%d" },
+    { 0x0013, 0x00ff, ' ', 2, "LEA DE,IY+%d" },
+    { 0x0023, 0x00ff, ' ', 2, "LEA HL,IY+%d" },
+    // ED
+    { 0x0065, 0x00ff, ' ', 2, "PEA IX+%d" },
+    { 0x0066, 0x00ff, ' ', 2, "PEA IY+%d" },
+    { 0, 0, 0, 0, NULL }
   };
 
 struct dis_entry disass_ez80_dd[]=
   {
-   { 0x003f, 0x00ff, ' ', 2, "LD (IX+%d),IX" },
-   { 0x003E, 0x00ff, ' ', 2, "LD (IX+%d),IY" },
-   { 0x0037, 0x00ff, ' ', 2, "LD IX,(IX+%d)" },
-   { 0x0031, 0x00ff, ' ', 2, "LD IY,(IX+%d)" },
-   { 0x000f, 0x00ff, ' ', 2, "LD (IX+%d),BC" },
-   { 0x001f, 0x00ff, ' ', 2, "LD (IX+%d),DE" },
-   { 0x002f, 0x00ff, ' ', 2, "LD (IX+%d),HL" },
-   { 0x0007, 0x00ff, ' ', 2, "LD BC,(IX+%d)" },
-   { 0x0017, 0x00ff, ' ', 2, "LD DE,(IX+%d)" },
-   { 0x0027, 0x00ff, ' ', 2, "LD HL,(IX+%d)" },
-   { 0x0064, 0x00ff, ' ', 1, "LD IXH,IXH" },
-   { 0x0065, 0x00ff, ' ', 1, "LD IXH,IXL" },
-   { 0x006c, 0x00ff, ' ', 1, "LD IXL,IXH" },
-   { 0x006d, 0x00ff, ' ', 1, "LD IXL,IXL" },
-   { 0x0026, 0x00ff, ' ', 2, "LD IXH,%d" },
-   { 0x002e, 0x00ff, ' ', 2, "LD IXL,%d" },
-   { 0x0067, 0x00ff, ' ', 1, "LD IXH,A" },
-   { 0x0060, 0x00ff, ' ', 1, "LD IXH,B" },
-   { 0x0061, 0x00ff, ' ', 1, "LD IXH,C" },
-   { 0x0062, 0x00ff, ' ', 1, "LD IXH,D" },
-   { 0x0063, 0x00ff, ' ', 1, "LD IXH,E" },
-   { 0x006f, 0x00ff, ' ', 1, "LD IXL,A" },
-   { 0x0068, 0x00ff, ' ', 1, "LD IXL,B" },
-   { 0x0069, 0x00ff, ' ', 1, "LD IXL,C" },
-   { 0x006a, 0x00ff, ' ', 1, "LD IXL,D" },
-   { 0x006b, 0x00ff, ' ', 1, "LD IXL,E" },
-   { 0x007c, 0x00ff, ' ', 1, "LD A,IXH" },
-   { 0x007d, 0x00ff, ' ', 1, "LD A,IXL" },
-   { 0x0044, 0x00ff, ' ', 1, "LD B,IXH" },
-   { 0x0045, 0x00ff, ' ', 1, "LD B,IXL" },
-   { 0x004c, 0x00ff, ' ', 1, "LD C,IXH" },
-   { 0x004d, 0x00ff, ' ', 1, "LD C,IXL" },
-   { 0x0054, 0x00ff, ' ', 1, "LD D,IXH" },
-   { 0x0055, 0x00ff, ' ', 1, "LD D,IXL" },
-   { 0x005c, 0x00ff, ' ', 1, "LD E,IXH" },
-   { 0x005d, 0x00ff, ' ', 1, "LD E,IXL" },
-   { 0, 0, 0, 0, NULL }
+    // DD
+    { 0x003f, 0x00ff, ' ', 2, "LD (IX+%d),IX" },
+    { 0x003E, 0x00ff, ' ', 2, "LD (IX+%d),IY" },
+    { 0x0037, 0x00ff, ' ', 2, "LD IX,(IX+%d)" },
+    { 0x0031, 0x00ff, ' ', 2, "LD IY,(IX+%d)" },
+    { 0x000f, 0x00ff, ' ', 2, "LD (IX+%d),BC" },
+    { 0x001f, 0x00ff, ' ', 2, "LD (IX+%d),DE" },
+    { 0x002f, 0x00ff, ' ', 2, "LD (IX+%d),HL" },
+    { 0x0007, 0x00ff, ' ', 2, "LD BC,(IX+%d)" },
+    { 0x0017, 0x00ff, ' ', 2, "LD DE,(IX+%d)" },
+    { 0x0027, 0x00ff, ' ', 2, "LD HL,(IX+%d)" },
+    // DD
+    { 0x0064, 0x00ff, ' ', 1, "LD IXH,IXH" },
+    { 0x0065, 0x00ff, ' ', 1, "LD IXH,IXL" },
+    { 0x006c, 0x00ff, ' ', 1, "LD IXL,IXH" },
+    { 0x006d, 0x00ff, ' ', 1, "LD IXL,IXL" },
+    { 0x0026, 0x00ff, ' ', 2, "LD IXH,%d" },
+    { 0x002e, 0x00ff, ' ', 2, "LD IXL,%d" },
+    // DD
+    { 0x0067, 0x00ff, ' ', 1, "LD IXH,A" },
+    { 0x0060, 0x00ff, ' ', 1, "LD IXH,B" },
+    { 0x0061, 0x00ff, ' ', 1, "LD IXH,C" },
+    { 0x0062, 0x00ff, ' ', 1, "LD IXH,D" },
+    { 0x0063, 0x00ff, ' ', 1, "LD IXH,E" },
+    { 0x006f, 0x00ff, ' ', 1, "LD IXL,A" },
+    { 0x0068, 0x00ff, ' ', 1, "LD IXL,B" },
+    { 0x0069, 0x00ff, ' ', 1, "LD IXL,C" },
+    { 0x006a, 0x00ff, ' ', 1, "LD IXL,D" },
+    { 0x006b, 0x00ff, ' ', 1, "LD IXL,E" },
+    { 0x007c, 0x00ff, ' ', 1, "LD A,IXH" },
+    { 0x007d, 0x00ff, ' ', 1, "LD A,IXL" },
+    { 0x0044, 0x00ff, ' ', 1, "LD B,IXH" },
+    { 0x0045, 0x00ff, ' ', 1, "LD B,IXL" },
+    { 0x004c, 0x00ff, ' ', 1, "LD C,IXH" },
+    { 0x004d, 0x00ff, ' ', 1, "LD C,IXL" },
+    { 0x0054, 0x00ff, ' ', 1, "LD D,IXH" },
+    { 0x0055, 0x00ff, ' ', 1, "LD D,IXL" },
+    { 0x005c, 0x00ff, ' ', 1, "LD E,IXH" },
+    { 0x005d, 0x00ff, ' ', 1, "LD E,IXL" },
+    // DD
+    { 0x0084, 0x00ff, ' ', 1, "ADD A,IXH" },
+    { 0x0085, 0x00ff, ' ', 1, "ADD A,IXL" },
+    { 0x008c, 0x00ff, ' ', 1, "ADC A,IXH" },
+    { 0x008d, 0x00ff, ' ', 1, "ADC A,IXL" },
+    // DD
+    { 0x0094, 0x00ff, ' ', 1, "SUB A,IXH" },
+    { 0x0095, 0x00ff, ' ', 1, "SUB A,IXL" },
+    { 0x009c, 0x00ff, ' ', 1, "SBC A,IXH" },
+    { 0x009d, 0x00ff, ' ', 1, "SBC A,IXL" },
+    { 0x00bc, 0x00ff, ' ', 1, "CP A,IXH" },
+    { 0x00bd, 0x00ff, ' ', 1, "CP A,IXL" },
+    // DD
+    { 0x0025, 0x00ff, ' ', 1, "DEC IXH" },
+    { 0x002d, 0x00ff, ' ', 1, "DEC IXL" },
+    { 0x0024, 0x00ff, ' ', 1, "INC IXH" },
+    { 0x002c, 0x00ff, ' ', 1, "INC IXL" },
+    // DD
+    { 0x00a4, 0x00ff, ' ', 1, "AND A,IXH" },
+    { 0x00a5, 0x00ff, ' ', 1, "AND A,IXL" },
+    { 0x00b4, 0x00ff, ' ', 1, "OR A,IXH" },
+    { 0x00b5, 0x00ff, ' ', 1, "OR A,IXL" },
+    { 0x00ac, 0x00ff, ' ', 1, "XOR A,IXH" },
+    { 0x00ad, 0x00ff, ' ', 1, "XOR A,IXL" },
+    { 0, 0, 0, 0, NULL }
   };
 
 struct dis_entry disass_ez80_fd[]=
   {
-   { 0x003e, 0x00ff, ' ', 2, "LD (IY+%d),IX" },
-   { 0x003f, 0x00ff, ' ', 2, "LD (IY+%d),IY" },
-   { 0x0031, 0x00ff, ' ', 2, "LD IX,(IY+%d)" },
-   { 0x003f, 0x00ff, ' ', 2, "LD IY,(IY+%d)" },
-   { 0x000f, 0x00ff, ' ', 2, "LD (IY+%d),BC" },
-   { 0x001f, 0x00ff, ' ', 2, "LD (IY+%d),DE" },
-   { 0x002f, 0x00ff, ' ', 2, "LD (IY+%d),HL" },
-   { 0x0007, 0x00ff, ' ', 2, "LD BC,(IY+%d)" },
-   { 0x0017, 0x00ff, ' ', 2, "LD DE,(IY+%d)" },
-   { 0x0027, 0x00ff, ' ', 2, "LD HL,(IY+%d)" },
-   { 0x0064, 0x00ff, ' ', 1, "LD IYH,IYH" },
-   { 0x0065, 0x00ff, ' ', 1, "LD IYH,IYL" },
-   { 0x006c, 0x00ff, ' ', 1, "LD IYL,IYH" },
-   { 0x006d, 0x00ff, ' ', 1, "LD IYL,IYL" },
-   { 0x0026, 0x00ff, ' ', 2, "LD IYH,%d" },
-   { 0x002e, 0x00ff, ' ', 2, "LD IYL,%d" },
-   { 0x0067, 0x00ff, ' ', 1, "LD IYH,A" },
-   { 0x0060, 0x00ff, ' ', 1, "LD IYH,B" },
-   { 0x0061, 0x00ff, ' ', 1, "LD IYH,C" },
-   { 0x0062, 0x00ff, ' ', 1, "LD IYH,D" },
-   { 0x0063, 0x00ff, ' ', 1, "LD IYH,E" },
-   { 0x006f, 0x00ff, ' ', 1, "LD IYL,A" },
-   { 0x0068, 0x00ff, ' ', 1, "LD IYL,B" },
-   { 0x0069, 0x00ff, ' ', 1, "LD IYL,C" },
-   { 0x006a, 0x00ff, ' ', 1, "LD IYL,D" },
-   { 0x006b, 0x00ff, ' ', 1, "LD IYL,E" },
-   { 0x007c, 0x00ff, ' ', 1, "LD A,IYH" },
-   { 0x007d, 0x00ff, ' ', 1, "LD A,IYL" },
-   { 0x0044, 0x00ff, ' ', 1, "LD B,IYH" },
-   { 0x0045, 0x00ff, ' ', 1, "LD B,IYL" },
-   { 0x004c, 0x00ff, ' ', 1, "LD C,IYH" },
-   { 0x004d, 0x00ff, ' ', 1, "LD C,IYL" },
-   { 0x0054, 0x00ff, ' ', 1, "LD D,IYH" },
-   { 0x0055, 0x00ff, ' ', 1, "LD D,IYL" },
-   { 0x005c, 0x00ff, ' ', 1, "LD E,IYH" },
-   { 0x005d, 0x00ff, ' ', 1, "LD E,IYL" },
-   { 0, 0, 0, 0, NULL }
+    // FD
+    { 0x003e, 0x00ff, ' ', 2, "LD (IY+%d),IX" },
+    { 0x003f, 0x00ff, ' ', 2, "LD (IY+%d),IY" },
+    { 0x0031, 0x00ff, ' ', 2, "LD IX,(IY+%d)" },
+    { 0x003f, 0x00ff, ' ', 2, "LD IY,(IY+%d)" },
+    { 0x000f, 0x00ff, ' ', 2, "LD (IY+%d),BC" },
+    { 0x001f, 0x00ff, ' ', 2, "LD (IY+%d),DE" },
+    { 0x002f, 0x00ff, ' ', 2, "LD (IY+%d),HL" },
+    { 0x0007, 0x00ff, ' ', 2, "LD BC,(IY+%d)" },
+    { 0x0017, 0x00ff, ' ', 2, "LD DE,(IY+%d)" },
+    { 0x0027, 0x00ff, ' ', 2, "LD HL,(IY+%d)" },
+    // FD
+    { 0x0064, 0x00ff, ' ', 1, "LD IYH,IYH" },
+    { 0x0065, 0x00ff, ' ', 1, "LD IYH,IYL" },
+    { 0x006c, 0x00ff, ' ', 1, "LD IYL,IYH" },
+    { 0x006d, 0x00ff, ' ', 1, "LD IYL,IYL" },
+    { 0x0026, 0x00ff, ' ', 2, "LD IYH,%d" },
+    { 0x002e, 0x00ff, ' ', 2, "LD IYL,%d" },
+    // FD
+    { 0x0067, 0x00ff, ' ', 1, "LD IYH,A" },
+    { 0x0060, 0x00ff, ' ', 1, "LD IYH,B" },
+    { 0x0061, 0x00ff, ' ', 1, "LD IYH,C" },
+    { 0x0062, 0x00ff, ' ', 1, "LD IYH,D" },
+    { 0x0063, 0x00ff, ' ', 1, "LD IYH,E" },
+    { 0x006f, 0x00ff, ' ', 1, "LD IYL,A" },
+    { 0x0068, 0x00ff, ' ', 1, "LD IYL,B" },
+    { 0x0069, 0x00ff, ' ', 1, "LD IYL,C" },
+    { 0x006a, 0x00ff, ' ', 1, "LD IYL,D" },
+    { 0x006b, 0x00ff, ' ', 1, "LD IYL,E" },
+    { 0x007c, 0x00ff, ' ', 1, "LD A,IYH" },
+    { 0x007d, 0x00ff, ' ', 1, "LD A,IYL" },
+    { 0x0044, 0x00ff, ' ', 1, "LD B,IYH" },
+    { 0x0045, 0x00ff, ' ', 1, "LD B,IYL" },
+    { 0x004c, 0x00ff, ' ', 1, "LD C,IYH" },
+    { 0x004d, 0x00ff, ' ', 1, "LD C,IYL" },
+    { 0x0054, 0x00ff, ' ', 1, "LD D,IYH" },
+    { 0x0055, 0x00ff, ' ', 1, "LD D,IYL" },
+    { 0x005c, 0x00ff, ' ', 1, "LD E,IYH" },
+    { 0x005d, 0x00ff, ' ', 1, "LD E,IYL" },
+    // FD
+    { 0x0094, 0x00ff, ' ', 1, "SUB A,IYH" },
+    { 0x0095, 0x00ff, ' ', 1, "SUB A,IYL" },
+    { 0x009c, 0x00ff, ' ', 1, "SBC A,IYH" },
+    { 0x009d, 0x00ff, ' ', 1, "SBC A,IYL" },
+    { 0x00bc, 0x00ff, ' ', 1, "CP A,IYH" },
+    { 0x00bd, 0x00ff, ' ', 1, "CP A,IYL" },
+    // FD
+    { 0x0025, 0x00ff, ' ', 1, "DEC IYH" },
+    { 0x002d, 0x00ff, ' ', 1, "DEC IYL" },
+    { 0x0024, 0x00ff, ' ', 1, "INC IYH" },
+    { 0x002c, 0x00ff, ' ', 1, "INC IYL" },
+    // FD
+    { 0x00a4, 0x00ff, ' ', 1, "AND A,IYH" },
+    { 0x00a5, 0x00ff, ' ', 1, "AND A,IYL" },
+    { 0x00b4, 0x00ff, ' ', 1, "OR A,IYH" },
+    { 0x00b5, 0x00ff, ' ', 1, "OR A,IYL" },
+    { 0x00ac, 0x00ff, ' ', 1, "XOR A,IYH" },
+    { 0x00ad, 0x00ff, ' ', 1, "XOR A,IYL" },
+    { 0, 0, 0, 0, NULL }
   };
 
 cl_ez80::cl_ez80(struct cpu_entry *Itype, class cl_sim *asim):
@@ -269,6 +325,7 @@ cl_ez80::inst_ed_ez80(t_mem code)
   
   switch (code)
     {
+      // ED
     case 0x0f: // LD (HL),BC
       store2(regs.HL, regs.BC);
       return resGO;
@@ -294,6 +351,7 @@ cl_ez80::inst_ed_ez80(t_mem code)
       regs.HL= get2(regs.HL);
       return resGO;
 
+      // ED
     case 0x32: // LEA IX,IX+d
       d= fetch1();
       regs.IX= regs.IX + d;
@@ -311,6 +369,7 @@ cl_ez80::inst_ed_ez80(t_mem code)
       regs.IY= regs.IY + d;
       return resGO;
 
+      // ED
     case 0x02: // LEA BC,IX+d
       d= fetch1();
       regs.BC= regs.IX + d;
@@ -323,7 +382,8 @@ cl_ez80::inst_ed_ez80(t_mem code)
       d= fetch1();
       regs.HL= regs.IX + d;
       return resGO;
-      
+
+      // ED
     case 0x03: // LEA BC,IY+d
       d= fetch1();
       regs.BC= regs.IY + d;
@@ -335,6 +395,18 @@ cl_ez80::inst_ed_ez80(t_mem code)
     case 0x23: // LEA HL,IY+d
       d= fetch1();
       regs.HL= regs.IY + d;
+      return resGO;
+
+      // ED
+    case 0x65: // PEA IX+d
+      d= fetch1();
+      push2(regs.IX + d);
+      vc.wr+= 2;
+      return resGO;
+    case 0x66: // PEA IY+d
+      d= fetch1();
+      push2(regs.IY + d);
+      vc.wr+= 2;
       return resGO;
       
     default: // fall back to original Z80
@@ -495,7 +567,75 @@ cl_ez80::inst_dd_spec(t_mem code)
     case 0x5d: // LD E,IXL
       regs.de.l= regs.ix.l;
       return resGO;
-      
+
+      // DD
+    case 0x84: // ADD A,IXH
+      add_A_bytereg(regs.ix.h);
+      return resGO;
+    case 0x85: // ADD A,IXL
+      add_A_bytereg(regs.ix.l);
+      return resGO;
+    case 0x8c: // ADC A,IXH
+      adc_A_bytereg(regs.ix.h);
+      return resGO;
+    case 0x8d: // ADC A,IXL
+      adc_A_bytereg(regs.ix.l);
+      return resGO;
+
+      // DD
+    case 0x94: // SUB A,IXH
+      sub_A_bytereg(regs.ix.h);
+      return resGO;
+    case 0x95: // SUB A,IXL
+      sub_A_bytereg(regs.ix.l);
+      return resGO;
+    case 0x9c: // SBC A,IXH
+      sbc_A_bytereg(regs.ix.h);
+      return resGO;
+    case 0x9d: // SBC A,IXL
+      sbc_A_bytereg(regs.ix.l);
+      return resGO;
+    case 0xbc: // SUB A,IXH
+      cp_bytereg(regs.ix.h);
+      return resGO;
+    case 0xbd: // SUB A,IXL
+      cp_bytereg(regs.ix.l);
+      return resGO;
+
+      // DD
+    case 0x25: // DEC IXH
+      dec(regs.ix.h);
+      return resGO;
+    case 0x2d: // DEC IXL
+      dec(regs.ix.l);
+      return resGO;
+    case 0x24: // INC IXH
+      inc(regs.ix.h);
+      return resGO;
+    case 0x2c: // INC IXL
+      inc(regs.ix.l);
+      return resGO;
+
+      // DD
+    case 0xa4: // AND A,IXH
+      and_A_bytereg(regs.ix.h);
+      return resGO;
+    case 0xa5: // AND A,IXL
+      and_A_bytereg(regs.ix.l);
+      return resGO;
+    case 0xb4: // OR A,IXH
+      or_A_bytereg(regs.ix.h);
+      return resGO;
+    case 0xb5: // OR A,IXL
+      or_A_bytereg(regs.ix.l);
+      return resGO;
+    case 0xac: // XOR A,IXH
+      xor_A_bytereg(regs.ix.h);
+      return resGO;
+    case 0xad: // XOR A,IXL
+      xor_A_bytereg(regs.ix.l);
+      return resGO;
+
     }
   
   return -1;
@@ -643,6 +783,75 @@ cl_ez80::inst_fd_spec(t_mem code)
     case 0x5d: // LD E,IYL
       regs.de.l= regs.iy.l;
       return resGO;
+
+      // FD
+    case 0x84: // ADD A,IYH
+      add_A_bytereg(regs.iy.h);
+      return resGO;
+    case 0x85: // ADD A,IYL
+      add_A_bytereg(regs.iy.l);
+      return resGO;
+    case 0x8c: // ADC A,IYH
+      adc_A_bytereg(regs.iy.h);
+      return resGO;
+    case 0x8d: // ADC A,IYL
+      adc_A_bytereg(regs.iy.l);
+      return resGO;
+
+      // FD
+    case 0x94: // SUB A,IYH
+      sub_A_bytereg(regs.iy.h);
+      return resGO;
+    case 0x95: // SUB A,IYL
+      sub_A_bytereg(regs.iy.l);
+      return resGO;
+    case 0x9c: // SBC A,IYH
+      sbc_A_bytereg(regs.iy.h);
+      return resGO;
+    case 0x9d: // SBC A,IYL
+      sbc_A_bytereg(regs.iy.l);
+      return resGO;
+    case 0xbc: // SUB A,IYH
+      cp_bytereg(regs.iy.h);
+      return resGO;
+    case 0xbd: // SUB A,IYL
+      cp_bytereg(regs.iy.l);
+      return resGO;
+
+      // FD
+    case 0x25: // DEC IYH
+      dec(regs.iy.h);
+      return resGO;
+    case 0x2d: // DEC IYL
+      dec(regs.iy.l);
+      return resGO;
+    case 0x24: // INC IYH
+      inc(regs.iy.h);
+      return resGO;
+    case 0x2c: // INC IYL
+      inc(regs.iy.l);
+      return resGO;
+
+      // DD
+    case 0xa4: // AND A,IYH
+      and_A_bytereg(regs.iy.h);
+      return resGO;
+    case 0xa5: // AND A,IYL
+      and_A_bytereg(regs.iy.l);
+      return resGO;
+    case 0xb4: // OR A,IYH
+      or_A_bytereg(regs.iy.h);
+      return resGO;
+    case 0xb5: // OR A,IYL
+      or_A_bytereg(regs.iy.l);
+      return resGO;
+    case 0xac: // XOR A,IYH
+      xor_A_bytereg(regs.iy.h);
+      return resGO;
+    case 0xad: // XOR A,IYL
+      xor_A_bytereg(regs.iy.l);
+      return resGO;
+
     }
 
   return -1;

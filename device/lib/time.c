@@ -60,12 +60,12 @@ time_t time(time_t *timeptr) {
   return t;
 }
 
-static _CODE char monthDays[]={31,28,31,30,31,30,31,31,30,31,30,31};
+static const char monthDays[]={31,28,31,30,31,30,31,31,30,31,30,31};
 
-_CODE const char * _CODE __month[]={"Jan","Feb","Mar","Apr","May","Jun",
+const const char *const __month[]={"Jan","Feb","Mar","Apr","May","Jun",
                                     "Jul","Aug","Sep","Oct","Nov","Dec"};
 
-_CODE const char * _CODE __day[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+const const char *const __day[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
 static char ascTimeBuffer[32];
 

@@ -5568,6 +5568,7 @@ genPlus (iCode * ic)
          {
            emit2 ("lea %s, iy, #%d", _pairs[getPairId (IC_RESULT (ic)->aop)].name, lit);
            regalloc_dry_run_cost += 3;
+           spillPair (getPairId (IC_RESULT (ic)->aop));
            goto release;
          }
     }
@@ -5682,6 +5683,7 @@ genPlus (iCode * ic)
         _push (pair);
       fetchPair (pair, AOP (IC_RIGHT (ic)));
       emit2 ("add iy, %s", _pairs[pair].name);
+      spillPair (PAIR_IY);
       regalloc_dry_run_cost += 2;
       if (save_pair)
         _pop (pair);

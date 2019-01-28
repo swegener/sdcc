@@ -1,3 +1,8 @@
+2019-01-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.y:
+	  Document bug #2858 workaround.
+
 2019-01-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

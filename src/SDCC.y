@@ -186,6 +186,7 @@ external_definition
         }
    | addressmod
         {
+          /* These empty braces here are apparently required by some version of GNU bison on MS Windows. See bug #2858. */
         }
    ;
 

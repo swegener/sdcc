@@ -15681,10 +15681,6 @@ Linker options
 \labelwidthstring 00.00.0000
 
 \series bold
--L
-\begin_inset space ~
-\end_inset
-
 -
 \series default
 
@@ -15726,16 +15722,6 @@ status collapsed
 \end_inset
 
 
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--L <path>
-\end_layout
-
-\end_inset
-
-
 \series default
 
 \begin_inset space ~
@@ -15756,6 +15742,33 @@ Libraries
  The path name must be absolute.
  Additional library files may be specified in the command line.
  See section Compiling programs for more details.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-L
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-L <path>
+\end_layout
+
+\end_inset
+
+
+\series default
+
+\begin_inset space ~
+\end_inset
+
+<absolute path to additional libraries> Same as above.
 \end_layout
 
 \begin_layout Labeling

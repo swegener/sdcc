@@ -455,6 +455,8 @@ ${Section} "SDCC include files" SEC05
   File "${DEV_ROOT}\include\asm\r2k\features.h"
   SetOutPath "$INSTDIR\include\asm\r3ka"
   File "${DEV_ROOT}\include\asm\r3ka\features.h"
+  SetOutPath "$INSTDIR\include\asm\ez80_z80"
+  File "${DEV_ROOT}\include\asm\ez80_z80\features.h"
   SetOutPath "$INSTDIR\include\asm\stm8"
   File "${DEV_ROOT}\include\asm\stm8\features.h"
 
@@ -821,6 +823,12 @@ ${Section} "SDCC STM8 large model library" SEC26
   File "${DEV_ROOT}\lib\stm8-large\*.*"
 ${SectionEnd}
 
+${Section} "SDCC EZ80_Z80 library" SEC27
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\ez80_z80"
+  File "${DEV_ROOT}\lib\ez80_z80\*.*"
+${SectionEnd}
+
 
 ;--------------------------------
 ;Descriptions
@@ -852,6 +860,7 @@ LangString DESC_SEC23 ${LANG_ENGLISH} "SDCC STM8 small library"
 LangString DESC_SEC24 ${LANG_ENGLISH} "SDCC TLCS90 library"
 LangString DESC_SEC25 ${LANG_ENGLISH} "SDCC library sources"
 LangString DESC_SEC26 ${LANG_ENGLISH} "SDCC STM8 large model library"
+LangString DESC_SEC27 ${LANG_ENGLISH} "SDCC EZ80_Z80 library"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -867,6 +876,7 @@ LangString DESC_SEC26 ${LANG_ENGLISH} "SDCC STM8 large model library"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC10} $(DESC_SEC10)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC11} $(DESC_SEC11)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC12} $(DESC_SEC12)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC27} $(DESC_SEC27)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC13} $(DESC_SEC13)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC14} $(DESC_SEC14)
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC15} $(DESC_SEC15)
@@ -1001,6 +1011,11 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\src\r3ka\*.s"
 
+  Delete "$INSTDIR\lib\src\ez80_z80\*.s"
+  Delete "$INSTDIR\lib\src\ez80_z80\z80.lib"
+  Delete "$INSTDIR\lib\src\ez80_z80\README"
+  Delete "$INSTDIR\lib\src\ez80_z80\Makefile"
+
   Delete "$INSTDIR\lib\src\ds390\*.c"
   Delete "$INSTDIR\lib\src\ds390\libds390.lib"
   Delete "$INSTDIR\lib\src\ds390\Makefile.dep"
@@ -1043,6 +1058,9 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\r3ka\*.rel"
   Delete "$INSTDIR\lib\r3ka\*.lib"
 
+  Delete "$INSTDIR\lib\ez80_z80\*.rel"
+  Delete "$INSTDIR\lib\ez80_z80\*.lib"
+
   Delete "$INSTDIR\lib\small\*.lib"
 
   Delete "$INSTDIR\lib\medium\*.lib"
@@ -1063,6 +1081,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\include\asm\z180\*.h"
   Delete "$INSTDIR\include\asm\r2k\*.h"
   Delete "$INSTDIR\include\asm\r3ka\*.h"
+  Delete "$INSTDIR\include\asm\ez80_z80\*.h"
   Delete "$INSTDIR\include\asm\pic16\*.h"
   Delete "$INSTDIR\include\asm\pic14\*.h"
   Delete "$INSTDIR\include\asm\mcs51\*.h"
@@ -1147,6 +1166,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\gbz80"
   RMDir "$INSTDIR\lib\src\r2k"
   RMDir "$INSTDIR\lib\src\r3ka"
+  RMDir "$INSTDIR\lib\src\ez80_z80"
   RMDir "$INSTDIR\lib\src\ds390\examples"
   RMDir "$INSTDIR\lib\src\ds390"
   RMDir "$INSTDIR\lib\src\ds400"
@@ -1165,6 +1185,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\z180"
   RMDir "$INSTDIR\lib\r2k"
   RMDir "$INSTDIR\lib\r3ka"
+  RMDir "$INSTDIR\lib\ez80_z80"
   RMDir "$INSTDIR\lib\small"
   RMDir "$INSTDIR\lib\medium"
   RMDir "$INSTDIR\lib\large"
@@ -1184,6 +1205,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\include\asm\z180"
   RMDir "$INSTDIR\include\asm\r2k"
   RMDir "$INSTDIR\include\asm\r3ka"
+  RMDir "$INSTDIR\include\asm\ez80_z80"
   RMDir "$INSTDIR\include\asm\pic16"
   RMDir "$INSTDIR\non-free\include\asm\pic16"
   RMDir "$INSTDIR\include\asm\pic14"

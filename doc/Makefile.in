@@ -57,7 +57,7 @@ $(MANUAL).html/index.html: $(MANUAL).tex $(MANUAL).aux ;#$(MANUAL).ind $(MANUAL)
 	fi
 	$(LYX) -e text $(notdir $<);
 
-%.pdf: %.tex %.dvi %.ind
+%.pdf %.aux: %.tex %.dvi %.ind
 	which $(PDFLATEX) > /dev/null && $(PDFLATEX) $* || $(DVIPDFM) $*
 
 #%.ps:  %.pdf

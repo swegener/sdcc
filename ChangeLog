@@ -1,3 +1,8 @@
+2019-02-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/Makefile.in:
+	  Fix dependencies.
+
 2019-02-1 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: add support for ez80_z80

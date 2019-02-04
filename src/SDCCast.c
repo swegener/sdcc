@@ -1693,6 +1693,7 @@ stringToSymbol (value *val)
     }
   else
     {
+      defaultOClass (sym);
       addSet (&strSym, sym);
       addSet (&statsg->syms, sym);
     }
@@ -5426,10 +5427,12 @@ decorateType (ast *tree, RESULT_TYPE resultType)
 
     case ':':
       if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) && (compareType (RTYPE (tree), LTYPE (tree)) == 0))
-        if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)))
-          DCL_TYPE (LTYPE(tree)) = GPOINTER;
-        if (IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))
-          DCL_TYPE (RTYPE(tree)) = GPOINTER;
+        {
+          if (IS_PTR (LTYPE (tree)) && !IS_GENPTR (LTYPE (tree)))
+            DCL_TYPE (LTYPE(tree)) = GPOINTER;
+          if (IS_PTR (RTYPE (tree)) && !IS_GENPTR (RTYPE (tree)))
+            DCL_TYPE (RTYPE(tree)) = GPOINTER;
+        }
 
       if ((compareType (LTYPE (tree), RTYPE (tree)) == 0) &&
         (compareType (RTYPE (tree), LTYPE (tree)) == 0) &&

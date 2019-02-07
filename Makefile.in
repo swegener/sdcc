@@ -21,10 +21,7 @@ SDCC_DOC        = doc
 SDCC_EXTRA      = support/regression support/valdiag
 
 SDCC_PACKIHX    = support/packihx
-SDCC_LIBRARIAN  = support/librarian
 SDCC_SDBINUTILS = support/sdbinutils
-
-TARGETS         = sdcc-librarian
 
 ifneq ($(OPT_DISABLE_HC08)$(OPT_DISABLE_S08), 11)
 SDCC_AS        += sdas/as6808
@@ -108,7 +105,7 @@ PKGS           += $(SDCC_LIBS) src device/include
 ifeq ($(OPT_DISABLE_NON_FREE), 0)
 PKGS           += device/non-free/include
 endif
-PKGS           += $(SDCC_AS) sdas/linksrc $(SDCC_LIBRARIAN) $(SDCC_SCRIPTS)
+PKGS           += $(SDCC_AS) sdas/linksrc $(SDCC_SCRIPTS)
 
 PORTS           = $(shell cat ports.build)
 ALLPORTS        = $(shell cat ports.all)
@@ -139,9 +136,6 @@ sdcc-scripts:
 
 sdcc-packihx:
 	$(MAKE) -C $(SDCC_PACKIHX)
-
-sdcc-librarian:
-	$(MAKE) -C $(SDCC_LIBRARIAN)
 
 sdcc-sdbinutils:
 	$(MAKE) -C $(SDCC_SDBINUTILS)
@@ -179,7 +173,7 @@ sdcc-doc:
 
 sdcc: $(TARGETS)
 
-sdcc-tini: sdcc-librarian sdcc-cc sdcc-as sdcc-ld sdcc-device-tini sdcc-packihx
+sdcc-tini: sdcc-cc sdcc-as sdcc-ld sdcc-device-tini sdcc-packihx
 	$(MAKE) -f main.mk all
 
 # Some interesting sub rules

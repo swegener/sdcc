@@ -1,3 +1,12 @@
+2019-02-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* .version,
+	  Makefile.in,
+	  configure,
+	  configure.ac,
+	  doc/sdccman.lyx:
+	  Remove sdcclib.
+
 2019-02-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c: fix bug #2863

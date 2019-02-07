@@ -915,7 +915,6 @@ AC_CONFIG_FILES([main.mk:main_in.mk
 src/Makefile
 device/include/Makefile
 sdas/linksrc/Makefile
-support/librarian/Makefile
 support/makebin/Makefile
 support/regression/Makefile
 support/valdiag/Makefile

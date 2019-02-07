@@ -6,6 +6,11 @@
 	  configure.ac,
 	  doc/sdccman.lyx:
 	  Remove sdcclib.
+	* sim/ucsim/sim.src/var.cc,
+	  sim/ucsim/sim.src/varcl.h,
+	  sim/ucsim/stm8.src/glob.cc,
+	  sim/ucsim/stm8.src/stm8.cc:
+	  stm8 simulator fixes, patches by Mike Jagdis.
 
 2019-02-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

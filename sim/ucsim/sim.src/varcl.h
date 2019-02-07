@@ -48,7 +48,7 @@ class cl_var: public cl_base
  protected:
   class cl_memory_cell *cell;
  public:
-  cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, chars adesc, int ibitnr= -1);
+  cl_var(const char *iname, class cl_address_space *ias, t_addr iaddr, chars adesc, int ibitnr= -1);
   virtual int init(void);
   virtual class cl_memory_cell *get_cell(void) { return cell; }
   

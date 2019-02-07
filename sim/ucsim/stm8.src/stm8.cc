@@ -1589,6 +1589,8 @@ cl_stm8::exec_inst(void)
                FLAG_NZ(regs.A);
                return(resGO);
                break;
+            case 0x80: // BREAK
+               return(resSTOP);
             case 0x90: // SIM - disable INT
                FLAG_SET(BIT_I0);
                FLAG_SET(BIT_I1);

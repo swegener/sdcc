@@ -30,7 +30,7 @@
 #include "varcl.h"
 
 
-cl_var::cl_var(char *iname, class cl_address_space *ias, t_addr iaddr, chars adesc, int ibitnr):
+cl_var::cl_var(const char *iname, class cl_address_space *ias, t_addr iaddr, chars adesc, int ibitnr):
   cl_base()
 {
   as= ias;

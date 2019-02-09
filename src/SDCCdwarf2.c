@@ -2665,7 +2665,11 @@ dwWriteSymbolInternal (symbol *sym)
             }
           functp = functp->siblings;
         }
-      assert (functp);
+
+      /* There might be no function found if it was only inlined and */
+      /* not generated as a stand-alone function. In that case,      */
+      /* dwWriteSymbolInternal will be called again later in another */
+      /* context where the function will be found. */
       if (!functp)
         return 0;
         

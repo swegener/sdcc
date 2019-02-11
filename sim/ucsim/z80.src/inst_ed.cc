@@ -213,10 +213,12 @@ int  cl_z80::inst_ed_(t_mem code)
       tst_A_bytereg(ubtmp);
       return(resGO);
 
-#if 0
     case 0x67: // RRD
+      ubtmp = get1(regs.HL);
+      store1(regs.HL, (ubtmp >> 4) | (regs.raf.A << 4));
+      regs.raf.A = (regs.raf.A & 0xf0) | (ubtmp & 0x0f);
       return(resGO);
-#endif
+
     case 0x68: // IN L,(C)
       vc.rd++;
       return(resGO);
@@ -237,11 +239,12 @@ int  cl_z80::inst_ed_(t_mem code)
         return(resINV_INST);
       regs.HL = (unsigned long)(regs.hl.h) * (unsigned long)(regs.hl.l);
       return(resGO);
-#if 0
+
     case 0x6F: // RLD
-      /* rotate 1 bcd digit left between ACC and memory location */
+      ubtmp = get1(regs.HL);
+      store1(regs.HL, (ubtmp << 4) | (regs.raf.A & 0x0f));
+      regs.raf.A = (regs.raf.A & 0xf0) | (ubtmp >> 4);
       return(resGO);
-#endif
 
     case 0x70: // IN (C)  set flags only (TSTI)
       vc.rd++;

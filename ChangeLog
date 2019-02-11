@@ -1,3 +1,9 @@
+2019-02-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* sdas/asrab/rabadr.c,
+	  src/z80/gen.c:
+	  Fix bug #2869.
+
 2019-02-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCdwarf2.c: fix bug #2762

@@ -7378,7 +7378,7 @@ fix:
               if (!regalloc_dry_run)
                 {
                   symbol *tlbl = newiTempLabel (NULL);
-                  emit2 ("jp PO, !tlabel", labelKey2num (tlbl->key));
+                  emit2 (IS_RAB ? "jp LZ, !tlabel": "jp PO, !tlabel", labelKey2num (tlbl->key));
                   emit2 ("xor a, !immedbyte", 0x80);
                   emitLabelSpill (tlbl);
                 }
@@ -12356,12 +12356,12 @@ genBuiltInStrncpy (const iCode *ic, int nparams, operand **pparams)
       emitLabel (tlbl2);
       emit2 ("cp a, (hl)");
       emit2 ("ldi");
-      emit2 ("jp PO, !tlabel", labelKey2num (tlbl1->key));
+      emit2 (IS_RAB ? "jp LZ, !tlabel" : "jp PO, !tlabel", labelKey2num (tlbl1->key));
       emit2 ("jr NZ, !tlabel", labelKey2num (tlbl2->key));
       emitLabel (tlbl3);
       emit2 ("dec hl");
       emit2 ("ldi");
-      emit2 ("jp PE, !tlabel", labelKey2num (tlbl3->key));
+      emit2 (IS_RAB ? "jp LO, !tlabel" : "jp PE, !tlabel", labelKey2num (tlbl3->key));
       emitLabel (tlbl1);
     }
   regalloc_dry_run_cost += 14;

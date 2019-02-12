@@ -2602,6 +2602,7 @@ geniCodePostInc (operand * op)
   operand *rv = (IS_ITEMP (op) ? geniCodeRValue (op, (!op->aggr2ptr && IS_PTR (optype)) ? TRUE : FALSE) : op);
   sym_link *rvtype = operandType (rv);
   int size = 0;
+  operand *srcOp = rv;
 
   /* if this is not an address we have trouble */
   if (!op->isaddr)
@@ -2618,17 +2619,23 @@ geniCodePostInc (operand * op)
 
   geniCodeAssign (rOp, rv, 0, 0);
 
+  /* If rv is volatile, we can only read it once, and we've just */
+  /* done that, so use the copy in rOp instead to avoid reading  */
+  /* it again. */
+  if (isOperandVolatile (rv, FALSE))
+    srcOp = rOp;
+
   size = (IS_PTR (rvtype) ? getSize (rvtype->next) : 1);
   if (size == 0)
     werror (W_SIZEOF_VOID);
   if (IS_FLOAT (rvtype))
-    ic = newiCode ('+', rv, operandFromValue (constFloatVal ("1.0")));
+    ic = newiCode ('+', srcOp, operandFromValue (constFloatVal ("1.0")));
   else if (IS_FIXED16X16 (rvtype))
-    ic = newiCode ('+', rv, operandFromValue (constFixed16x16Val ("1.0")));
+    ic = newiCode ('+', srcOp, operandFromValue (constFixed16x16Val ("1.0")));
   else if (IS_BOOL (rvtype))
     ic = newiCode ('=', NULL, operandFromLit (1));
   else
-    ic = newiCode ('+', rv, operandFromLit (size));
+    ic = newiCode ('+', srcOp, operandFromLit (size));
 
   IC_RESULT (ic) = result = newiTempOperand (rvtype, 0);
   ADDTOCHAIN (ic);
@@ -2673,7 +2680,7 @@ geniCodePreInc (operand * op, bool lvalue)
   ADDTOCHAIN (ic);
 
   (void) geniCodeAssign (op, result, 0, 0);
-  if (lvalue || IS_TRUE_SYMOP (op) || IS_BITVAR (optype))
+  if (lvalue || (IS_TRUE_SYMOP (op) && !isOperandVolatile (op, FALSE)) || IS_BITVAR (optype))
     return op;
   else
     return result;
@@ -2692,6 +2699,7 @@ geniCodePostDec (operand * op)
   operand *rv = (IS_ITEMP (op) ? geniCodeRValue (op, ((!op->aggr2ptr && IS_PTR (optype)) ? TRUE : FALSE)) : op);
   sym_link *rvtype = operandType (rv);
   int size = 0;
+  operand *srcOp = rv;
 
   /* if this is not an address we have trouble */
   if (!op->isaddr)
@@ -2708,17 +2716,23 @@ geniCodePostDec (operand * op)
 
   geniCodeAssign (rOp, rv, 0, 0);
 
+  /* If rv is volatile, we can only read it once, and we've just */
+  /* done that, so use the copy in rOp instead to avoid reading  */
+  /* it again. */
+  if (isOperandVolatile (rv, FALSE))
+    srcOp = rOp;
+
   size = (IS_PTR (rvtype) ? getSize (rvtype->next) : 1);
   if (size == 0)
     werror (W_SIZEOF_VOID);
   if (IS_FLOAT (rvtype))
-    ic = newiCode ('-', rv, operandFromValue (constFloatVal ("1.0")));
+    ic = newiCode ('-', srcOp, operandFromValue (constFloatVal ("1.0")));
   else if (IS_FIXED16X16 (rvtype))
-    ic = newiCode ('-', rv, operandFromValue (constFixed16x16Val ("1.0")));
+    ic = newiCode ('-', srcOp, operandFromValue (constFixed16x16Val ("1.0")));
   else if (IS_BOOL (rvtype))
-    ic = newiCode ('!', rv, 0);
+    ic = newiCode ('!', srcOp, 0);
   else
-    ic = newiCode ('-', rv, operandFromLit (size));
+    ic = newiCode ('-', srcOp, operandFromLit (size));
 
   IC_RESULT (ic) = result = newiTempOperand (rvtype, 0);
   ADDTOCHAIN (ic);
@@ -2763,7 +2777,7 @@ geniCodePreDec (operand * op, bool lvalue)
   ADDTOCHAIN (ic);
 
   (void) geniCodeAssign (op, result, 0, 0);
-  if (lvalue || IS_TRUE_SYMOP (op) || IS_BITVAR (optype))
+  if (lvalue || (IS_TRUE_SYMOP (op) && !isOperandVolatile (op, FALSE)) || IS_BITVAR (optype))
     return op;
   else
     return result;

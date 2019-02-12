@@ -1,3 +1,7 @@
+2019-02-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c: fix bug #2829
+
 2019-02-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* sim/ucsim/z80.src/inst_ed.c:

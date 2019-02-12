@@ -2527,7 +2527,8 @@ aopGet (asmop *aop, int offset, bool bit16)
               switch (offset)
                 {
                 case 2:
-                  dbuf_tprintf (&dbuf, "!bankimmeds", aop->aopu.aop_immd);
+                  // dbuf_tprintf (&dbuf, "!bankimmeds", aop->aopu.aop_immd); Bank support not fully implemented yet.
+                  dbuf_tprintf (&dbuf, "#0x00");
                   break;
 
                 case 1:
@@ -2539,7 +2540,7 @@ aopGet (asmop *aop, int offset, bool bit16)
                   break;
 
                 default:
-                  wassertl (0, "Fetching from beyond the limits of an immediate value.");
+                  dbuf_tprintf (&dbuf, "#0x00");
                 }
             }
           break;

@@ -20,9 +20,7 @@ unsigned char gc = (unsigned char) &gv;
 struct bugtest gs = {
   (unsigned int) &gv,
   (unsigned char) &gv,
-#ifndef __SDCC_gbz80
   (unsigned long) &gv,
-#endif // __SDCC_gbz80
 };
 #endif // __SDCC
 
@@ -42,9 +40,7 @@ void testBug(void)
 
   ASSERT (gs.i == (unsigned int) gp);
   ASSERT (gs.c == (unsigned char) gp);
-#ifndef __SDCC_gbz80
   ASSERT (gs.l == (unsigned long) gp);
-#endif // __SDCC_gbz80
   
   ASSERT (lc == (unsigned char) lp);
   ASSERT (li == (unsigned int) lp);

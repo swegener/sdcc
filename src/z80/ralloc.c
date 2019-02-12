@@ -2724,7 +2724,7 @@ packRegisters (eBBlock * ebp)
         {
           sym_link *to_type = operandType (IC_LEFT (ic));
           sym_link *from_type = operandType (IC_RIGHT (ic));
-          if (IS_GENPTR (to_type) && IS_PTR (from_type))
+          if ((IS_PTR (to_type) || IS_INT (to_type)) && IS_PTR (from_type))
             {
               OP_SYMBOL (IC_RESULT (ic))->remat = 1;
               OP_SYMBOL (IC_RESULT (ic))->rematiCode = ic;

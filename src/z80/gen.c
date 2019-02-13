@@ -2815,7 +2815,9 @@ aopPut (asmop *aop, const char *s, int offset)
       break;
 
     case AOP_REG:
-      if (!strcmp (s, "!*hl"))
+      if (!strcmp (aop->aopu.aop_reg[offset]->name, s))
+        ;
+      else if (!strcmp (s, "!*hl"))
         emit2 ("ld %s,!*hl", aop->aopu.aop_reg[offset]->name);
       else
         emit2 ("ld %s, %s", aop->aopu.aop_reg[offset]->name, s);
@@ -8048,7 +8050,7 @@ genAnd (const iCode * ic, iCode * ifx)
               offset++;
               continue;
             }
-          
+
           /* Testing for the border bits of the accumulator destructively is cheap. */
           if ((isLiteralBit (bytelit) == 0 || isLiteralBit (bytelit) == 7) && aopInReg (left->aop, 0, A_IDX) && !bitVectBitValue (ic->rSurv, A_IDX))
             {
@@ -8167,6 +8169,11 @@ genAnd (const iCode * ic, iCode * ifx)
           /* Generic case, loading into accumulator and testing there. */
           else
             {
+              if (bitVectBitValue (ic->rSurv, A_IDX))
+                {
+                  regalloc_dry_run_cost += 1000;
+                  wassert (regalloc_dry_run);
+                }
               cheapMove (ASMOP_A, 0, left->aop, offset, true);
               if (isLiteralBit (bytelit) == 0 || isLiteralBit (bytelit) == 7)
                 {

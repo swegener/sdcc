@@ -2089,7 +2089,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
             continue;
 
           // Only try to narrow wide counters.
-          if (!IS_INTEGRAL(oldcountertype) || bitsForType (oldcountertype) <= 16 || TARGET_IS_DS390 || TARGET_IS_DS400 || (!SPEC_USIGN (oldcountertype))) // TODO: Handle signed types as well, maybe even transform int to unsigned int?
+          if (!IS_INTEGRAL(oldcountertype) || bitsForType (oldcountertype) <= 8 || TARGET_IS_DS390 || TARGET_IS_DS400 || (!SPEC_USIGN (oldcountertype))) // TODO: Handle signed types as well, maybe even transform int to unsigned int?
             continue;
 
           ifx = ifxForOp (IC_RESULT (ic), ic);
@@ -2177,6 +2177,8 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
           /* All backends (except ds390 / ds400) have an array size limit smaller than 2^16. Thus if the loop counter ever goes outside
              the range of a 16-bit type, the array access would result in undefined behaviour. We can thus replace the loop
              counter by a 16-bit type. If we found a squaring multiplication, we can even use an 8-bit type*/
+          if (bitsForType (oldcountertype) <= 16 && !mul)
+            continue;
 
           newcountertype = mul ? newCharLink () : newIntLink ();
           SPEC_USIGN (newcountertype) = 1;
@@ -2338,7 +2340,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                 continue;
 
               /* Skip over assignment */
-              if(uic->op == '=' &&
+              if(uic->op == '=' && IS_ITEMP (IC_RESULT (uic)) &&
                 bitVectnBitsOn (OP_DEFS (IC_RESULT (uic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (uic))) == 1 &&
                 compareType (operandType (IC_RESULT (ic)), operandType (IC_RESULT (uic))) == 1)
                 uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (uic))));
@@ -3196,6 +3198,8 @@ eBBlockFromiCode (iCode *ic)
   ebbi = iCodeBreakDown (ic);
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
+  while (optimizeOpWidth (ebbi->bbOrder, ebbi->count)) /* Do it again here, as some opportunities might be have been missed above due to code that later turned out to be dead. */
+    optimizeCastCast (ebbi->bbOrder, ebbi->count);
   computeDataFlow (ebbi);
 
   if (!options.lessPedantic)

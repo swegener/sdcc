@@ -2997,7 +2997,7 @@ checkFunction (symbol * sym, symbol * csym)
 
   if (!IS_FUNC (sym->type))
     {
-      werror (E_SYNTAX_ERROR, sym->name);
+      werrorfl (sym->fileDef, sym->lineDef, E_SYNTAX_ERROR, sym->name);
       return 0;
     }
 
@@ -3027,7 +3027,7 @@ checkFunction (symbol * sym, symbol * csym)
   /* function cannot return aggregate */
   if (IS_AGGREGATE (sym->type->next))
     {
-      werror (E_FUNC_AGGR, sym->name);
+      werrorfl (sym->fileDef, sym->lineDef, E_FUNC_AGGR, sym->name);
       return 0;
     }
 
@@ -3041,14 +3041,14 @@ checkFunction (symbol * sym, symbol * csym)
     {
       if (!IS_VOID (FUNC_ARGS (sym->type)->type))
         {
-          werror (E_INT_ARGS, sym->name);
+          werrorfl (sym->fileDef, sym->lineDef, E_INT_ARGS, sym->name);
           FUNC_ARGS (sym->type) = NULL;
         }
     }
 
   if (IFFUNC_ISSHADOWREGS (sym->type) && !FUNC_ISISR (sym->type))
     {
-      werror (E_SHADOWREGS_NO_ISR, sym->name);
+      werrorfl (sym->fileDef, sym->lineDef, E_SHADOWREGS_NO_ISR, sym->name);
     }
 
   for (argCnt = 1, acargs = FUNC_ARGS (sym->type); acargs; acargs = acargs->next, argCnt++)
@@ -3056,7 +3056,7 @@ checkFunction (symbol * sym, symbol * csym)
       if (!acargs->sym)
         {
           // this can happen for reentrant functions
-          werror (E_PARAM_NAME_OMITTED, sym->name, argCnt);
+          werrorfl (sym->fileDef, sym->lineDef, E_PARAM_NAME_OMITTED, sym->name, argCnt);
           // the show must go on: synthesize a name and symbol
           SNPRINTF (acargs->name, sizeof (acargs->name), "_%s_PARM_%d", sym->name, argCnt);
           acargs->sym = newSymbol (acargs->name, 1);
@@ -3069,7 +3069,7 @@ checkFunction (symbol * sym, symbol * csym)
       else if (strcmp (acargs->sym->name, acargs->sym->rname) == 0)
         {
           // synthesized name
-          werror (E_PARAM_NAME_OMITTED, sym->name, argCnt);
+          werrorfl (sym->fileDef, sym->lineDef, E_PARAM_NAME_OMITTED, sym->name, argCnt);
         }
     }
   argCnt--;
@@ -3083,25 +3083,25 @@ checkFunction (symbol * sym, symbol * csym)
   /* check if body already present */
   if (csym && IFFUNC_HASBODY (csym->type))
     {
-      werror (E_FUNC_BODY, sym->name);
+      werrorfl (sym->fileDef, sym->lineDef, E_FUNC_BODY, sym->name);
       return 0;
     }
 
   /* check the return value type   */
   if (compareType (csym->type, sym->type) <= 0)
     {
-      werror (E_PREV_DECL_CONFLICT, csym->name, "type", csym->fileDef, csym->lineDef);
+      werrorfl (sym->fileDef, sym->lineDef, E_PREV_DECL_CONFLICT, csym->name, "type", csym->fileDef, csym->lineDef);
       printFromToType (csym->type, sym->type);
       return 0;
     }
 
   if (FUNC_ISISR (csym->type) != FUNC_ISISR (sym->type))
-    werror (E_PREV_DECL_CONFLICT, csym->name, "interrupt", csym->fileDef, csym->lineDef);
+    werrorfl (sym->fileDef, sym->lineDef, E_PREV_DECL_CONFLICT, csym->name, "interrupt", csym->fileDef, csym->lineDef);
 
   /* I don't think this is necessary for interrupts. An isr is a  */
   /* root in the calling tree.                                    */
   if ((FUNC_REGBANK (csym->type) != FUNC_REGBANK (sym->type)) && (!FUNC_ISISR (sym->type)))
-    werror (E_PREV_DECL_CONFLICT, csym->name, "using", csym->fileDef, csym->lineDef);
+    werrorfl (sym->fileDef, sym->lineDef, E_PREV_DECL_CONFLICT, csym->name, "using", csym->fileDef, csym->lineDef);
 
   if (IFFUNC_ISNAKED (csym->type) != IFFUNC_ISNAKED (sym->type))
     {
@@ -3114,7 +3114,7 @@ checkFunction (symbol * sym, symbol * csym)
     {
       if (FUNC_NONBANKED (csym->type) || FUNC_NONBANKED (sym->type))
         {
-          werror (W_BANKED_WITH_NONBANKED);
+          werrorfl (sym->fileDef, sym->lineDef, W_BANKED_WITH_NONBANKED);
           FUNC_BANKED (sym->type) = 0;
           FUNC_NONBANKED (sym->type) = 1;
         }
@@ -3138,14 +3138,14 @@ checkFunction (symbol * sym, symbol * csym)
   if (IFFUNC_ISREENT (csym->type) != IFFUNC_ISREENT (sym->type) && argCnt > 1)
     {
       //printf("argCnt = %d\n",argCnt);
-      werror (E_PREV_DECL_CONFLICT, csym->name, "reentrant", csym->fileDef, csym->lineDef);
+      werrorfl (sym->fileDef, sym->lineDef, E_PREV_DECL_CONFLICT, csym->name, "reentrant", csym->fileDef, csym->lineDef);
     }
 
   if (IFFUNC_ISWPARAM (csym->type) != IFFUNC_ISWPARAM (sym->type))
-    werror (E_PREV_DECL_CONFLICT, csym->name, "wparam", csym->fileDef, csym->lineDef);
+    werrorfl (sym->fileDef, sym->lineDef, E_PREV_DECL_CONFLICT, csym->name, "wparam", csym->fileDef, csym->lineDef);
 
   if (IFFUNC_ISSHADOWREGS (csym->type) != IFFUNC_ISSHADOWREGS (sym->type))
-    werror (E_PREV_DECL_CONFLICT, csym->name, "shadowregs", csym->fileDef, csym->lineDef);
+    werrorfl (sym->fileDef, sym->lineDef, E_PREV_DECL_CONFLICT, csym->name, "shadowregs", csym->fileDef, csym->lineDef);
 
   /* compare expected args with actual args */
   exargs = FUNC_ARGS (csym->type);
@@ -3201,7 +3201,7 @@ checkFunction (symbol * sym, symbol * csym)
   SPEC_STAT (sym->etype) |= SPEC_STAT (csym->etype);
   if (SPEC_STAT (sym->etype) && SPEC_EXTR (sym->etype))
     {
-      werror (E_TWO_OR_MORE_STORAGE_CLASSES, sym->name);
+      werrorfl (sym->fileDef, sym->lineDef, E_TWO_OR_MORE_STORAGE_CLASSES, sym->name);
     }
 
   return 1;

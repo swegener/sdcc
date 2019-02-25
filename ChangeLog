@@ -1,3 +1,7 @@
+2019-02-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCsymt.c: fix bug #2861
+
 2019-02-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:

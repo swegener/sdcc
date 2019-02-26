@@ -58,7 +58,10 @@ public:
   virtual void start_parse(void) { start_parse(0); }
   virtual void start_parse(int at) { pars_pos= at; }
   virtual chars token(chars delims);
-  
+  // search
+  bool starts_with(char *x);
+  bool starts_with(const char *x);
+  bool starts_with(chars x);
 public:
   // Operators
 
@@ -82,7 +85,7 @@ public:
   bool operator==(chars &cs);
   bool operator!=(char *s);
   bool operator!=(const char *s);
-  bool operator!=(chars &cs);
+  bool operator!=(chars &cs);  
 };
 
 extern chars operator+(char s, const chars &cs);

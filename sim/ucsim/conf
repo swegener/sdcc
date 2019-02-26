@@ -48,7 +48,6 @@ case $TARGET in
 	    export PREFIX='/usr/local'
 	fi
 	./configure --prefix=${PREFIX} \
-	    --enable-ucsim \
 	    --disable-dlso \
 	    --enable-serio \
 	    --enable-avr-port \
@@ -57,6 +56,7 @@ case $TARGET in
 	    --enable-stm8-port \
 	    --enable-st7-port \
 	    "$@"
+	#--enable-ucsim
 	;;
     mingw|win|w)
 	if [ -d	/usr/local/cross-tools/mingw32 ] ; then
@@ -72,7 +72,6 @@ case $TARGET in
 	fi
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
-	    --enable-ucsim \
 	    --disable-dlso \
 	    --disable-serio \
 	    --enable-avr-port \
@@ -81,6 +80,7 @@ case $TARGET in
 	    --enable-stm8-port \
 	    --enable-st7-port \
 	    $HOST_OPT "$@"
+	#--enable-ucsim
 	;;
     w64)
 	export CC=x86_64-w64-mingw32-gcc
@@ -90,7 +90,6 @@ case $TARGET in
 	export PREFIX='/usr/local'
 	echo CC=$CC CXX=$CXX HOST=$HOST_OPT
 	./configure --prefix=${PREFIX} \
-	    --enable-ucsim \
 	    --disable-dlso \
 	    --disable-serio \
 	    --enable-avr-port \
@@ -99,6 +98,7 @@ case $TARGET in
 	    --enable-stm8-port \
 	    --enable-st7-port \
 	    $HOST_OPT "$@"
+	#--enable-ucsim
 	;;
     *)
 	echo >&2 "Do not know how to configure!"

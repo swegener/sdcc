@@ -162,6 +162,32 @@ chars::token(chars delims)
   return c;
 }
 
+
+bool
+chars::starts_with(char *x)
+{
+  if (empty() ||
+      !x ||
+      !*x)
+    return false;
+  if (strstr(chars_string, x) == chars_string)
+    return true;
+  return false;
+}
+
+bool
+chars::starts_with(const char *x)
+{
+  return starts_with((char*)x);
+}
+
+bool
+chars::starts_with(chars x)
+{
+  return starts_with((char*)x);
+}
+
+
 chars &
 chars::append(char *s)
 {

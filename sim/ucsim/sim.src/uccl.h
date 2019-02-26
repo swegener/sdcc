@@ -85,6 +85,55 @@ struct vcounter_t {
   t_mem wr;
 };
 
+class cl_time_measurer: public cl_base
+{
+public:
+  unsigned long to_reach;
+  class cl_uc *uc;
+public:
+  cl_time_measurer(class cl_uc *the_uc);
+  virtual void set_reach(unsigned long val);
+  virtual void from_now(unsigned long val);
+  virtual bool reached();
+  virtual unsigned long now();
+};
+
+class cl_time_clk: public cl_time_measurer
+{
+public:
+  cl_time_clk(class cl_uc *the_uc): cl_time_measurer(the_uc) { set_name("clk"); }
+  virtual unsigned long now();
+};
+  
+class cl_time_vclk: public cl_time_measurer
+{
+public:
+  cl_time_vclk(class cl_uc *the_uc): cl_time_measurer(the_uc) { set_name("vclk"); }
+  virtual unsigned long now();
+};
+
+class cl_time_fclk: public cl_time_measurer
+{
+public:
+  cl_time_fclk(class cl_uc *the_uc): cl_time_measurer(the_uc) { set_name("fclk"); }
+  virtual unsigned long now();
+};
+
+class cl_time_rclk: public cl_time_measurer
+{
+public:
+  cl_time_rclk(class cl_uc *the_uc): cl_time_measurer(the_uc) { set_name("rclk"); }
+  virtual unsigned long now();
+};
+
+class cl_time_wclk: public cl_time_measurer
+{
+public:
+  cl_time_wclk(class cl_uc *the_uc): cl_time_measurer(the_uc) { set_name("wclk"); }
+  virtual unsigned long now();
+};
+
+
 class cl_omf_rec: public cl_base
 {
  protected:
@@ -162,6 +211,7 @@ public:
   class brk_coll *ebrk;		// Collection of EVENT breakpoints
   class cl_sim *sim;
   //class cl_list *mems;
+  class cl_time_measurer *stop_at_time;
  public:
   class cl_hw *cpu;
   class cl_hws *hws;
@@ -247,6 +297,7 @@ public:
   virtual void del_counter(int nr);
   virtual void del_counter(const char *nam);
   virtual double get_rtime(void);
+  virtual unsigned long clocks_of_time(double t);
   virtual int clock_per_cycle(void);
   virtual void touch(void);
   
@@ -285,7 +336,8 @@ public:
 				   class cl_address_space *mem,
 				   char op, t_addr addr, int hit);
   virtual void check_events(void);
-
+  virtual void stop_when(class cl_time_measurer *t);
+  
   // disassembling and symbol recognition
   virtual char *disass(t_addr addr, const char *sep);
   virtual struct dis_entry *dis_tbl(void);

@@ -34,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // sim.src
 #include "simcl.h"
+#include "uccl.h"
 
 // local, cmd.src
 #include "cmd_execcl.h"
@@ -130,10 +131,91 @@ COMMAND_DO_WORK_SIM(cl_stop_cmd)
 //		     class cl_cmdline *cmdline, class cl_console *con)
 COMMAND_DO_WORK_SIM(cl_step_cmd)
 {
-  class cl_cmd_arg *parm= cmdline->param(0);
+  class cl_cmd_arg *params[2];
+  params[0]= cmdline->param(0);
+  params[1]= cmdline->param(1);
   int instrs= 1;
-  if (parm != NULL)
-    instrs= parm->i_value;
+  if (params[0] != NULL)
+    {
+      instrs= params[0]->i_value;
+    }
+  class cl_uc *uc= sim->get_uc();
+  if (uc && (params[1] != NULL))
+    {
+      chars s= params[1]->get_svalue();
+      unsigned long do_clk;
+      class cl_time_measurer *tm= NULL;
+      do_clk= instrs;
+      if (s == "clk")
+	{
+	  tm= new cl_time_clk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else if ((s == "s") || (s == "sec"))
+	{
+	  do_clk= uc->clocks_of_time(instrs);
+	  tm= new cl_time_clk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else if ((s == "ms") || (s == "msec"))
+	{
+	  do_clk= uc->clocks_of_time(instrs/1000.0);
+	  tm= new cl_time_clk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else if ((s == "us") || (s == "usec"))
+	{
+	  do_clk= uc->clocks_of_time(instrs/1000000.0);
+	  tm= new cl_time_clk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else if ((s == "ns") || (s == "nsec"))
+	{
+	  do_clk= uc->clocks_of_time(instrs/1000000000.0);
+	  tm= new cl_time_clk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else if (s == "vclk")
+	{
+	  tm= new cl_time_vclk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else if ((s == "fclk") || (s == "fetch"))
+	{
+	  tm= new cl_time_fclk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else if ((s == "rclk") || (s == "read"))
+	{
+	  tm= new cl_time_rclk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else if ((s == "wclk") || (s == "write"))
+	{
+	  tm= new cl_time_wclk(uc);
+	  tm->init();
+	  tm->from_now(do_clk);
+	}
+      else
+	{
+	  con->dd_printf("Unknown unit.\n");
+	  return 0;
+	}
+      if (tm)
+	{
+	  uc->stop_when(tm);
+	  sim->start(con, 0);
+	}
+      return 0;
+    }
   if (instrs <= 0)
     instrs= 1;
   sim->start(con, instrs);

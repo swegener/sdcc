@@ -37,12 +37,15 @@ fi
 AC_SUBST(docdir)
 
 AC_ARG_ENABLE(ucsim,
-[  --enable-ucsim          compile ucsim frontend],
+[  --enable-ucsim          obsolete, ignored],
 if test $enable_ucsim != "no"; then
     enable_ucsim="yes"
 fi,
 #default
 enable_ucsim="no")
+# ignore setting, always use NO
+enable_ucsim="no"
+
 AC_ARG_ENABLE(dlso,
 [  --enable-dlso           compile dynamically loadable shared libraries],
 if test $enable_dlso != "no"; then

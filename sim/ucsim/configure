@@ -1430,7 +1430,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-ucsim          compile ucsim frontend
+  --enable-ucsim          obsolete, ignored
   --enable-dlso           compile dynamically loadable shared libraries
   --disable-mcs51-port    do not compile simulator for mcs51
   --disable-ds390-port    do not compile simulator for ds390
@@ -2793,6 +2793,9 @@ else
   #default
 enable_ucsim="no"
 fi
+
+# ignore setting, always use NO
+enable_ucsim="no"
 
 # Check whether --enable-dlso was given.
 if test "${enable_dlso+set}" = set; then :

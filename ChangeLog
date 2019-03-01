@@ -1,3 +1,8 @@
+2019-03-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c:
+	  Fix bug #2876.
+
 2019-03-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c: fix bug #2873

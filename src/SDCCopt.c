@@ -3255,6 +3255,7 @@ eBBlockFromiCode (iCode *ic)
     computeDataFlow (ebbi);
   }
   while (change);
+  killDeadCode (ebbi); /* iCodeLabelOptimize() above might result in dead code, when both branches of an ifx go to the same destination. */
 
   /* compute the live ranges */
   recomputeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);

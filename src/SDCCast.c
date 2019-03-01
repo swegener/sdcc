@@ -5310,24 +5310,24 @@ decorateType (ast *tree, RESULT_TYPE resultType)
          this can save generating unused const strings. */
       if (IS_LITERAL (LTYPE (tree)))
         {
+          ast * heir;
+          
           ++noAlloc;
           tree->right = decorateType (tree->right, resultTypeProp);
           --noAlloc;
 
           if (((int) ulFromVal (valFromType (LETYPE (tree)))) != 0)
-            {
-              decorateType (tree->right->left, resultTypeProp);
-              TTYPE (tree->right->left) = TTYPE (tree->right);
-              TETYPE (tree->right->left) = getSpec (TTYPE (tree->right->left));
-              return tree->right->left;
-            }
+            heir = tree->right->left;
           else
-            {
-              decorateType (tree->right->right, resultTypeProp);
-              TTYPE (tree->right->right) = TTYPE (tree->right);
-              TETYPE (tree->right->right) = getSpec (TTYPE (tree->right->right));
-              return tree->right->right;
-            }
+            heir = tree->right->right;
+            
+          heir = decorateType (heir, resultTypeProp);
+          if (IS_LITERAL (TETYPE (heir)))
+            TTYPE (heir) = valRecastLitVal (TTYPE (tree->right), valFromType (TETYPE (heir)))->type;
+          else
+            TTYPE (heir) = TTYPE (tree->right);
+          TETYPE (heir) = getSpec (TTYPE (heir));
+          return heir;
         }
 
       tree->right = decorateType (tree->right, resultTypeProp);

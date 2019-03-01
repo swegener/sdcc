@@ -1,3 +1,9 @@
+2019-03-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c: fix bug #2873
+	* support/regression/tests/literalop.c: add casts to fix
+	  integer promotion of hexadeciaml constants in ?: operator.
+
 2019-02-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c: fix bug #2861

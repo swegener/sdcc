@@ -11158,7 +11158,9 @@ genPointerSet (iCode * ic, iCode * pi)
     }
 
   /* special case when cast remat */
-  while (IS_SYMOP (result) && OP_SYMBOL (result)->remat && IS_CAST_ICODE (OP_SYMBOL (result)->rematiCode))
+  while (IS_SYMOP (result) && OP_SYMBOL (result)->remat &&
+         IS_CAST_ICODE (OP_SYMBOL (result)->rematiCode) &&
+         !IS_BITFIELD (getSpec (operandType (result))))
     {
       result = IC_RIGHT (OP_SYMBOL (result)->rematiCode);
       type = operandType (result);

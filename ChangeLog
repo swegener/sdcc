@@ -1,3 +1,8 @@
+2019-03-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+        * src/mcs51/gen.c: fix bug #2729
+        * support/regression/tests/bool.c: reenable test
+
 2019-03-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c:

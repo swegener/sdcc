@@ -100,12 +100,10 @@ testBool(void)
 	E = true;
 	E--;     ASSERT(!E); // sets E to 1-E
 
-#ifndef __SDCC_mcs51
 	ASSERT(!s2.b1);
 	s2.b = true;
 	fieldassign();
 	ASSERT(s2.b1);
-#endif
 #endif
 }
 

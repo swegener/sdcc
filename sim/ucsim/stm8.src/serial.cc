@@ -246,7 +246,8 @@ cl_serial::tick(int cycles)
       (s_tr_bit >= bits))
     {
       s_sending= false;
-      io->dd_printf("%c", s_out);
+      //io->dd_printf("%c", s_out);
+      io->write((char*)&s_out, 1);
       s_tr_bit-= bits;
       if (s_tx_written)
 	restart_send();

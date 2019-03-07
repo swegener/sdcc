@@ -144,6 +144,7 @@ class cl_console_base: public cl_base
   
   virtual void print_prompt(void);
   virtual int dd_printf(const char *format, ...);
+  virtual int write(char *buf, int count);
   virtual int debug(const char *format, ...);
   virtual void print_bin(long data, int bits);
   virtual void print_char_octal(char c);

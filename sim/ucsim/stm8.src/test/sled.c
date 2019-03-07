@@ -12,8 +12,11 @@ unsigned int clock(void)
   return((unsigned int)(h) << 8 | l);
 }
 
+unsigned int last= 0;
+
 void main(void)
 {
+  unsigned int now;
   CLK->ckdivr = 0x00; // Set the frequency to 16 MHz
 
   // Configure timer
@@ -27,8 +30,15 @@ void main(void)
   PD->cr1 = 0x01;
 
   for(;;)
-    if (clock() % 1000 < 500)
-      PD->odr|= 1;
-    else
-      PD->odr&= ~1;
+    {
+      now= clock();
+      if (now - last > 500)
+	{
+	  if (PD->odr & 1)
+	    PD->odr&= ~1;
+	  else
+	    PD->odr|= 1;
+	  last= now;
+	}
+    }
 }

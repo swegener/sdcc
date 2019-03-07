@@ -286,6 +286,29 @@ cl_console_base::cmd_do_print(const char *format, va_list ap)
     return 0;
 }
 
+int
+cl_console_base::write(char *buf, int count)
+{
+  int ret;
+  class cl_f *fo= get_fout(), *fi= get_fin();
+  
+  if (fo)
+    {
+      if (fi &&
+	  fi->eof() &&
+	  (fi->id() == fo->id()))
+	{
+	  //deb("do not attempt to write on console, where input is at file_end\n");
+	  return 0;
+	}
+      ret= fo->write(buf, count);
+      //fo->flush();
+      return ret;
+    }
+  else
+    return 0;
+}
+
 void
 cl_console_base::tu_cls(void)
 {

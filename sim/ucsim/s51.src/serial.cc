@@ -299,7 +299,8 @@ cl_serial::tick(int cycles)
       //if (io->fout)
 	{
 	  //io->fout->write((char*)(&s_out), 1);
-	  io->dd_printf("%c", s_out);
+	  //io->dd_printf("%c", s_out);
+	  io->write((char*)(&s_out), 1);
 	}
       s_tr_bit-= _bits;
     }

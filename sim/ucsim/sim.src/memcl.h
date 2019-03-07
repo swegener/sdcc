@@ -567,6 +567,7 @@ class cl_bander: public cl_address_decoder
   virtual bool is_bander() { return true; }
 
   virtual bool activate(class cl_console_base *con);
+  virtual void print_info(chars pre, class cl_console_base *con);
 };
 
 

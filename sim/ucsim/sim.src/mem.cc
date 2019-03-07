@@ -2424,6 +2424,36 @@ cl_bander::activate(class cl_console_base *con)
   return activated= true;
 }
 
+void
+cl_bander::print_info(chars pre, class cl_console_base *con)
+{
+  if (address_space &&
+      address_space->hidden)
+    return;
+  if (memchip &&
+      memchip->hidden)
+    return;
+  con->dd_printf(pre);
+  if (address_space)
+    {
+      con->dd_printf("%s ", address_space->get_name("unknown"));
+      con->dd_printf(address_space->addr_format, as_begin);
+      con->dd_printf(" ");
+      con->dd_printf(address_space->addr_format, as_end);
+    }
+  else
+    con->dd_printf("x");
+  con->dd_printf(" -> bander(%d/%d) ", bpc, distance);
+  if (memchip)
+    {
+      con->dd_printf("%s ", memchip->get_name("unknown"));
+      con->dd_printf(memchip->addr_format, chip_begin);
+    }
+  else
+    con->dd_printf("x");
+  con->dd_printf(" %s\n", (activated)?"activated":"inactive");
+}
+
 
 /*
  * List of address decoders

@@ -1,3 +1,8 @@
+2019-03-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c: fix bugs #2750 and #2867 (same root cause)
+	* support/regression/tests/bug-2750.c: enable test
+
 2019-03-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: sdcclib.exe is not built

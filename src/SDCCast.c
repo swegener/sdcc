@@ -2638,8 +2638,13 @@ getResultTypeFromType (sym_link * type)
     {
       unsigned blen = SPEC_BLEN (type);
 
+/*    BOOL and single bit BITFIELD are not interchangeable!
+ *    There must be a cast to do this safely, in which case
+ *    the previous IS_BOOLEAN test will handle it. 
+      
       if (blen <= 1)
         return RESULT_TYPE_BOOL;
+*/
       if (blen <= 8)
         return RESULT_TYPE_CHAR;
       return RESULT_TYPE_INT;

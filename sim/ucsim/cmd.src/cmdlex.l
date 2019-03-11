@@ -83,7 +83,8 @@ void
 uc_yy_set_string_to_parse(const char *str)
 {
   string_to_parse = strdup(str);
-  YY_FLUSH_BUFFER;
+  //YY_FLUSH_BUFFER;
+  yy_flush_buffer(YY_CURRENT_BUFFER);
 }
 
 static const char *string_ptr = NULL;

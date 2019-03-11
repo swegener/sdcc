@@ -296,12 +296,7 @@ cl_serial::tick(int cycles)
     {
       s_sending= false;
       scon->set_bit1(bmTI);
-      //if (io->fout)
-	{
-	  //io->fout->write((char*)(&s_out), 1);
-	  //io->dd_printf("%c", s_out);
-	  io->write((char*)(&s_out), 1);
-	}
+      io->write((char*)(&s_out), 1);
       s_tr_bit-= _bits;
     }
   if ((_bmREN) &&

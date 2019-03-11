@@ -1,4 +1,4 @@
-#include <reg51.h>
+#include "hw.h"
 
 #define BUFSIZE 16
 #define T0H 0xfc
@@ -9,7 +9,7 @@ unsigned char first_free= 0, last_occupied= 0;
 bit transmitting, overflow;
 volatile int t0cnt;
 
-void ser_it(void) interrupt 4
+void ser_it(void) __interrupt (4)
 {
   unsigned char temp;
   if (RI) {
@@ -27,7 +27,7 @@ void ser_it(void) interrupt 4
   }
 }
 
-void t0_it(void) interrupt 1
+void t0_it(void) __interrupt (1)
 {
   TL0= T0L;
   TH0= T0H;

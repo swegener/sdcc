@@ -283,7 +283,6 @@ cl_serial_hw::proc_input(void)
 	    {
 	      if (fin->read(&c, 1))
 		{
-		  //printf("ser: %d,%c\n",c,isprint(c)?c:' ');
 		  input= c;
 		  input_avail= true;
 		  cfg_set(serconf_able_receive, 0);

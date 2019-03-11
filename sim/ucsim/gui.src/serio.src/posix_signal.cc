@@ -35,72 +35,72 @@ SigHandler::~SigHandler()
 /* set a signal */
 int SigHandler::SetSignal(int SIGNAL, SIG_PF ACTION)
 {
-	struct sigaction act;
+  struct sigaction act;
 
-	/* declare what is going to be called when */
-	act.sa_handler = ACTION;
+  /* declare what is going to be called when */
+  act.sa_handler = ACTION;
 
-	/* clear the structure's mask */
-	sigemptyset(&act.sa_mask);
+  /* clear the structure's mask */
+  sigemptyset(&act.sa_mask);
 
-	/* set up some flags */
-	if(SIGNAL == SIGCHLD) {
-		act.sa_flags = SA_NOCLDSTOP;
-	}
-
-	/* set the signal handler */
-	if(sigaction(SIGNAL, &act, NULL) < 0)
-	{
-		std::cerr << "sigaction(): " << strerror(errno) << "\n";
-		exit(-1);
-	}
-
-	/* all ok */
-	return(0);
+  /* set up some flags */
+  if(SIGNAL == SIGCHLD) {
+    act.sa_flags = SA_NOCLDSTOP;
+  }
+  
+  /* set the signal handler */
+  if(sigaction(SIGNAL, &act, NULL) < 0)
+    {
+      std::cerr << "sigaction(): " << strerror(errno) << "\n";
+      exit(-1);
+    }
+  
+  /* all ok */
+  return(0);
 }
 
 
 /* block a signal */
 int SigHandler::BlockSignal(int SIGNAL)
 {
-	sigset_t set;
+  sigset_t set;
 
-	/* initalise */
-	sigemptyset(&set);
-
-	/* add the SIGNAL to the set */
-	sigaddset(&set, SIGNAL);
-
-	/* block it */
-	if(sigprocmask(SIG_BLOCK, &set, NULL) < 0)
-	{
-		std::cerr << "sigprocmask(): " << strerror(errno) << "\n";
-		exit(-1);
-	}
-
-	/* done */
-	return(0);
+  /* initalise */
+  sigemptyset(&set);
+  
+  /* add the SIGNAL to the set */
+  sigaddset(&set, SIGNAL);
+  
+  /* block it */
+  if(sigprocmask(SIG_BLOCK, &set, NULL) < 0)
+    {
+      std::cerr << "sigprocmask(): " << strerror(errno) << "\n";
+      exit(-1);
+    }
+  
+  /* done */
+  return(0);
 }
 
 
 /* unblock a signal */
 int SigHandler::UnBlockSignal(int SIGNAL)
 {
-	sigset_t set;
-
-	/* initalise */
-	sigemptyset(&set);
-
-	/* add the SIGNAL to the set */
-	sigaddset(&set, SIGNAL);
-
-	/* block it */
-	if(sigprocmask(SIG_UNBLOCK, &set, NULL) < 0)
-	{
-		std::cerr << "sigprocmask(): " << strerror(errno) << "\n";
-		exit(-1);
-	}
-
-	/* done */
-	return(0);
+  sigset_t set;
+  
+  /* initalise */
+  sigemptyset(&set);
+  
+  /* add the SIGNAL to the set */
+  sigaddset(&set, SIGNAL);
+  
+  /* block it */
+  if(sigprocmask(SIG_UNBLOCK, &set, NULL) < 0)
+    {
+      std::cerr << "sigprocmask(): " << strerror(errno) << "\n";
+      exit(-1);
+    }
+  
+  /* done */
+  return(0);
 }

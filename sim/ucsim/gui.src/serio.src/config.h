@@ -2,6 +2,8 @@
  * to emulate the serial input and output of an 8051 controller               *
  * config.h - general defintions                                              *
  ******************************************************************************/
+#ifndef CONFIG_HEADER
+#define CONFIG_HEADER
 
 #ifndef DEF_INFILE
 // the processors serial output
@@ -14,3 +16,5 @@
 #endif
 
 #define MAX_SIZ 1024
+
+#endif

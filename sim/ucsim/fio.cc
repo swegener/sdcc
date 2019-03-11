@@ -386,9 +386,7 @@ cl_f::get(void)
     {
       return -1;
     }
-  int c= buffer[last_used];
-  //if (c == 3 /* ^C */)
-  //return -2;
+  int c= buffer[last_used] & 0xff;
   last_used= (last_used + 1) % 1024;
   return c;
 }
@@ -463,7 +461,7 @@ cl_f::process_csi(void)
 	  int y= (esc_buffer[5] - 0x20) & 0xff;
 	  ret|= x << 16;
 	  ret|= y << 8;
-	  fprintf(stderr, "Mouse: 0x%0x (f=%d,0x%x)\n", ret, f, f);
+	  //fprintf(stderr, "Mouse: 0x%0x (f=%d,0x%x)\n", ret, f, f);
 	  return finish_esc(ret);
 	}
       return 0;
@@ -940,8 +938,6 @@ cl_f::read_dev(int *buf, int max)
   while (i < max)
     {
       c= get();
-      //if (c == -2) // ^C
-	  //return i;
       if (c == -1)
 	{
 	  if (i>0)

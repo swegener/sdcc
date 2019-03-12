@@ -47,14 +47,13 @@ for line in lines:
         try:
             (summary, data, rest) = re.split(r':', line)
             (nfailures, ntests, ncases) = re.split(r'/', data)
+            failures = failures + int(nfailures)
+            tests = tests + int(ntests)
+            cases = cases + int(ncases)
         except ValueError:
+            print("Parsing error at ", name)
             print("Bad summary line: ", line)
             nfailures = '1'
-            ntests = '0'
-            ncases = '0'
-        failures = failures + int(nfailures)
-        tests = tests + int(ntests)
-        cases = cases + int(ncases)
         if (int(nfailures)):
             messagelog.append("Failure: %s" % name)
         flag = 1 

@@ -637,7 +637,8 @@ t_mem
 cl_write_operator::write(t_mem val)
 {
   //printf("write event at 0x%x bp=%p\n",address,bp);
-  uc->events->add(bp);
+  if (bp->do_hit())
+    uc->events->add(bp);
   if (next_operator)
     return(next_operator->write(val));
   else if (cell)
@@ -662,7 +663,8 @@ t_mem
 cl_read_operator::read(void)
 {
   //printf("read event at 0x%x bp=%p\n",address,bp);
-  uc->events->add(bp);
+  if (bp->do_hit())
+    uc->events->add(bp);
   if (next_operator)
     return(next_operator->read());
   else if (cell)

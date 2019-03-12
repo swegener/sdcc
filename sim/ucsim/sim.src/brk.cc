@@ -62,7 +62,9 @@ cl_brk::condition(void)
 {
   if (cond.empty())
     return true;
-  long l= application->eval(cond);
+  long l;
+  l= application->eval(cond);
+  //fprintf(stderr,"BP[%d]EVAL: %s =%ld\n", nr, (char*)cond, l);
   return l!=0;
 }
 

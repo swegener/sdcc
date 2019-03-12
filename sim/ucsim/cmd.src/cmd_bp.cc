@@ -53,7 +53,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
   int hit= 1;
   char op;
   chars cond= "";
-  char *s;
+  chars s;
   class cl_address_space *mem;
   class cl_cmd_arg *params[6]= { cmdline->param(0),
 				 cmdline->param(1),
@@ -127,11 +127,31 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
 	do_event(uc, mem, 'w', addr, hit, cond, con);
       }
   }
+  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER STRING STRING)) {
+    mem= params[0]->value.memory.address_space;
+    op= *(params[1]->get_svalue());
+    addr= params[2]->value.address;
+    hit= params[3]->value.number;
+    s= params[4]->get_svalue();
+    if (s && *s && (s=="if"))
+      cond= params[5]->get_svalue();
+    do_event(uc, mem, op, addr, hit, cond, con);
+  }
   else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS NUMBER)) {
     mem= params[0]->value.memory.address_space;
     op= *(params[1]->get_svalue());
     addr= params[2]->value.address;
     hit= params[3]->value.number;
+    do_event(uc, mem, op, addr, hit, cond, con);
+  }
+  else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS STRING STRING)) {
+    mem= params[0]->value.memory.address_space;
+    op= *(params[1]->get_svalue());
+    addr= params[2]->value.address;
+    hit= 1;
+    s= params[3]->get_svalue();
+    if (s && *s && (s=="if"))
+      cond= params[4]->get_svalue();
     do_event(uc, mem, op, addr, hit, cond, con);
   }
   else if (cmdline->syntax_match(uc, MEMORY STRING ADDRESS)) {
@@ -141,9 +161,25 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
     hit= 1;
     do_event(uc, mem, op, addr, hit, cond, con);
   }
+  else if (cmdline->syntax_match(uc, ADDRESS NUMBER STRING STRING)) {
+    addr= params[0]->value.address;
+    hit= params[1]->value.number;
+    s= params[2]->get_svalue();
+    if (s && *s && (s=="if"))
+      cond= params[3]->get_svalue();
+    do_fetch(uc, addr, hit, cond, con);
+  }
   else if (cmdline->syntax_match(uc, ADDRESS NUMBER)) {
     addr= params[0]->value.address;
     hit= params[1]->value.number;
+    do_fetch(uc, addr, hit, cond, con);
+  }
+  else if (cmdline->syntax_match(uc, ADDRESS STRING STRING)) {
+    addr= params[0]->value.address;
+    hit= 1;
+    s= params[1]->get_svalue();
+    if (s && *s && (s=="if"))
+      cond= params[2]->get_svalue();
     do_fetch(uc, addr, hit, cond, con);
   }
   else if (cmdline->syntax_match(uc, ADDRESS)) {
@@ -181,7 +217,7 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
       b->cond= cond;
       uc->fbrk->add_bp(b);
       const char *s= uc->disass(addr, NULL);
-      con->dd_printf("Breakpoint %d at 0x%06x: %s\n", b->nr, addr, s);
+      con->dd_printf("Breakpoint %d at 0x%06x: %s (cond=\"%s\")\n", b->nr, addr, s, (char*)cond);
       free((char *)s);
     }
 }

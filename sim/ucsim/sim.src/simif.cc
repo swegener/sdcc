@@ -761,7 +761,9 @@ cl_simulator_interface::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       if (val)
 	{
 	  if (*val)
-	    uc->sim->start(0, 0), *val= 1;
+	    {
+	      uc->sim->start(0, 0), *val= 1;
+	    }
 	  else
 	    uc->sim->stop(resSIMIF), *val= 0;
 	}

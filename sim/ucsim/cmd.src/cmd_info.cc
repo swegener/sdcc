@@ -42,6 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 {
   int i;
+  bool extra;
 
   con->dd_printf("Num Type       Disp Hit   Cnt   Address  Cond  What\n");
   for (i= 0; i < uc->fbrk->count; i++)
@@ -53,9 +54,13 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
                      fb->hit, fb->cnt, fb->addr,
 		     fb->condition()?"true":"false",
 		     s);
+      extra= false;
+      if (!(fb->cond.empty()))
+	con->dd_printf("     cond=\"%s\"", (char*)(fb->cond)), extra= true;
       if (!(fb->commands.empty()))
-	con->dd_printf("     %s\n", (char*)(fb->commands));
+	con->dd_printf("     cmd=\"%s\"", (char*)(fb->commands)), extra= true;
       free((char *)s);
+      if (extra) con->dd_printf("\n");
     }
   for (i= 0; i < uc->ebrk->count; i++)
     {
@@ -64,8 +69,12 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 		     "event", (eb->perm==brkFIX)?"keep":"del ",
 		     eb->hit, eb->cnt,
 		     eb->addr, eb->id);
+      extra= false;
+      if (!(eb->cond.empty()))
+	con->dd_printf("     cond=\"%s\"", (char*)(eb->cond)), extra= true;
       if (!(eb->commands.empty()))
-	con->dd_printf("     %s\n", (char*)(eb->commands));
+	con->dd_printf("     cmd=\"%s\"", (char*)(eb->commands)), extra= true;
+      if (extra) con->dd_printf("\n");
     }
   return(0);
 }

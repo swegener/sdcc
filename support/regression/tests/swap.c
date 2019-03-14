@@ -30,6 +30,7 @@ static void testSwap_4(void)
     ASSERT( tt == SWAP_4(TEST_VECT_8));
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory -see RFE #611
 
 #define SWAP_8(x) ((((x)<<8)|((x)>>8)) & 0xffff)
 
@@ -129,14 +130,16 @@ static void testSwap_16_ptr(void)
     ASSERT( tt == SWAP_16(TEST_VECT_32));
 #endif
 }
-
+#endif
 
 static void
 testSwap(void)
 {
    testSwap_4();
+#ifndef __SDCC_pdk14 // Lack of memory -see RFE #611
    testSwap_8();
    testSwap_16();
    testSwap_16_ptr();
+#endif
 }
 

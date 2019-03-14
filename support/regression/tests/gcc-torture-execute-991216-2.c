@@ -43,7 +43,7 @@ test (int n, ...)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14)
   test (1, VALUE, AFTER);
   test (2, 2, VALUE, AFTER);
   test (3, 2, 3, VALUE, AFTER);

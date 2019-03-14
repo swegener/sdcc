@@ -1,5 +1,13 @@
 2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/cse.c,
+	  support/regression/tests/gcc-torture-execute-991216-2.c,
+	  support/regression/tests/gcc-torture-execute-pr70005.c,
+	  support/regression/tests/swap.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+
+2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
+
 	* Merged pdk branch to trunk.
 
 2019-03-14 Philipp Klaus Krause <pkk AT spth.de>

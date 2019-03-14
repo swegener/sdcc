@@ -338,6 +338,7 @@ test_Struct4(void)
 void
 test_Struct5(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #605
   packet_t  *pp1;
   packet_t  *pp2;
   unsigned char lx;
@@ -365,11 +366,13 @@ test_Struct5(void)
   ASSERT(a1 == 1);
   ASSERT(a2 == 2);
   ASSERT(a3 == 3);
+#endif
 }
 
 void
 test_Global1(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #605
   unsigned char lx;
   unsigned char *px;
 
@@ -387,6 +390,7 @@ test_Global1(void)
   
   ASSERT(a1 == 0);
   ASSERT(a2 == 2);
+#endif
 }
 
 /* Hide taking the address of gx by defining this function last */

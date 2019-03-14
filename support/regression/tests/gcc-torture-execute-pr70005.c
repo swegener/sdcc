@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #615.
 unsigned char a = 6;
 int b, c;
 
@@ -25,10 +26,13 @@ fn1 ()
   if (i != 1) 
     ASSERT (0); 
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #615.
   fn1 ();
   return; 
+#endif
 }

@@ -25,7 +25,7 @@ char buf [24];
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pic16
+#if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
   const char *const foo = "hello world";
   char dst [64];
 

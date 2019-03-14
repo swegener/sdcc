@@ -6,7 +6,7 @@
 
 #include <testfwk.h>
 
-#ifndef __SDCC_mcs51 // Not enough memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Not enough memory
 unsigned char testArr255[255];  // Fails
 unsigned char testArr256[256];  // Succeeds
 
@@ -30,7 +30,7 @@ void f(void)
 
 void testBug(void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Not enough memory
 	for(unsigned int i = 0; i < 250; i++)
 		testArr255[i] = i;
 	for(unsigned int i = 0; i < 250; i++)

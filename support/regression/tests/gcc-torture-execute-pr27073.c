@@ -9,6 +9,7 @@
 #pragma disable_warning 85
 #endif
 
+#if !defined (__SDCC_pdk14) // Lack of memory
 void
 foo (int *p, int d1, int d2, int d3,
      short count, int s1, int s2, int s3, int s4, int s5)
@@ -23,10 +24,12 @@ foo (int *p, int d1, int d2, int d3,
       *p++ = s5;
     }
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined (__SDCC_pdk14) // Lack of memory
   int x[10], i;
 
   foo (x, 0, 0, 0, 2, 100, 200, 300, 400, 500);
@@ -34,5 +37,6 @@ testTortureExecute (void)
     if (x[i] != (i % 5 + 1) * 100)
       ASSERT (0);
   return;
+#endif
 }
 

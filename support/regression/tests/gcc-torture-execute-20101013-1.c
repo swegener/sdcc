@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14)
 
 /* PR rtl-optimization/45912 */
 
@@ -40,7 +40,7 @@ build_ref_for_offset (void *base, long long offset)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14)
   void *ret = build_ref_for_offset ((void *)0, 32);
   if (ret != (void *)0)
     ASSERT (0);

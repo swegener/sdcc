@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-
+#ifndef __SDCC_pdk14 // Lack of memory
 float simplified_atof(const char * s)
 {
     float value, fraction;
@@ -50,9 +50,12 @@ float simplified_atof(const char * s)
 
     return (value);
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT(simplified_atof("0.0f") == 0.0f);
+#endif
 }
 

@@ -32,8 +32,6 @@
 #include "gen.h"
 #include "dbuf_string.h"
 
-char *aopLiteral (value * val, int offset);
-char *aopLiteralLong (value * val, int offset, int size);
 extern int allocInfo;
 
 /* this is the down and dirty file with all kinds of

@@ -9,6 +9,7 @@
 #pragma std_c99
 #endif
 
+#ifndef __SDCC_pdk14 // Lack of memory
 inline
 void f (int x)
 {
@@ -29,12 +30,15 @@ void f (int x)
   ASSERT (m[4] == 0x3333);
   ASSERT (m[9] == -23456);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   f (4);
   return;
+#endif
 }
 
 extern inline void f (int x);

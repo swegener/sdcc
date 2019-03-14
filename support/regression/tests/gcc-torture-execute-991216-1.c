@@ -9,10 +9,8 @@
 #pragma disable_warning 184
 #endif
 
-// Some ports do not support long long yet.
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-// Not enough memory
-#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL))
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) // Some ports do not support long long yet.
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Not enough memory
 
 #define VALUE 0x123456789abcdefLL
 #define AFTER 0x55
@@ -123,7 +121,7 @@ void
 testTortureExecute (void)
 {
 #if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
-#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL))
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Not enough memory
   test1 (1, VALUE, AFTER);
   test2 (1, 2, VALUE, AFTER);
   test3 (1, 2, 3, VALUE, AFTER);

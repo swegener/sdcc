@@ -6,6 +6,7 @@
 
 void testfrexpf(void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   int e;
   int *p = &e;
 
@@ -14,5 +15,6 @@ void testfrexpf(void)
   ASSERT (frexpf (0.75 * 4, p) == 0.75);
 
   ASSERT (frexpf (0.75 * 16, p) == 0.75);
+#endif
 }
 

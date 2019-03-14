@@ -26,6 +26,10 @@
 #define TARGET_ID_STM8     16
 #define TARGET_ID_TLCS90   17
 #define TARGET_ID_EZ80_Z80 18
+#define TARGET_ID_PDK13    19
+#define TARGET_ID_PDK14    20
+#define TARGET_ID_PDK15    21
+#define TARGET_ID_PDK16    22
 
 /* Macro to test the target we are compiling for.
    Can only be used after SDCCmain has defined the port
@@ -46,12 +50,18 @@
 #define TARGET_IS_HC08     (port->id == TARGET_ID_HC08)
 #define TARGET_IS_S08      (port->id == TARGET_ID_S08)
 #define TARGET_IS_STM8     (port->id == TARGET_ID_STM8)
+#define TARGET_IS_PDK13    (port->id == TARGET_ID_PDK13)
+#define TARGET_IS_PDK14    (port->id == TARGET_ID_PDK14)
+#define TARGET_IS_PDK15    (port->id == TARGET_ID_PDK15)
+#define TARGET_IS_PDK16    (port->id == TARGET_ID_PDK16)
 
 #define TARGET_MCS51_LIKE  (TARGET_IS_MCS51 || TARGET_IS_DS390 || TARGET_IS_DS400)
 #define TARGET_Z80_LIKE    (TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_GBZ80 || TARGET_IS_R2K || TARGET_IS_R3KA || TARGET_IS_TLCS90 || TARGET_IS_EZ80_Z80)
 #define TARGET_IS_RABBIT   (TARGET_IS_R2K || TARGET_IS_R3KA)
 #define TARGET_HC08_LIKE   (TARGET_IS_HC08 || TARGET_IS_S08)
 #define TARGET_PIC_LIKE    (TARGET_IS_PIC14 || TARGET_IS_PIC16)
+#define TARGET_PDK_LIKE    (TARGET_IS_PDK13 || TARGET_IS_PDK14 || TARGET_IS_PDK15 || TARGET_IS_PDK16)
+
 /* is using sdas / sdld assembler / linker */
 #define IS_SDASLD          (TARGET_Z80_LIKE || TARGET_MCS51_LIKE || TARGET_HC08_LIKE)
 
@@ -460,6 +470,15 @@ extern PORT s08_port;
 #endif
 #if !OPT_DISABLE_STM8
 extern PORT stm8_port;
+#endif
+#if !OPT_DISABLE_PDK13
+extern PORT pdk13_port;
+#endif
+#if !OPT_DISABLE_PDK14
+extern PORT pdk14_port;
+#endif
+#if !OPT_DISABLE_PDK15
+extern PORT pdk15_port;
 #endif
 
 #endif /* PORT_INCLUDE */

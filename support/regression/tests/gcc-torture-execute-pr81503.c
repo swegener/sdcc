@@ -6,6 +6,7 @@ pr81503.c from the execute part of the gcc torture tests.
 
 #include <stdint.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 unsigned short a = 41461;
 unsigned short b = 3419;
 #if __SIZEOF_INT__ >= 4
@@ -23,11 +24,14 @@ void foo() {
     c = -~(b * ~((int32_t)(0 != 5))) + 2147483647;
 }
 #endif
+#endif
 
 void
 testTortureExecute (void) {
+#if !defined(__SDCC_pdk14) // Lack of memory
   foo();
   if (c != 2147476810)
     ASSERT (0);
   return;
+#endif
 }

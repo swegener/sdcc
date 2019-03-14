@@ -10,6 +10,7 @@ typedef  unsigned short u16;
 #define  TCB_STATE_RUN  0
 #define  NR_TASKS  16
 
+#ifndef __SDCC_pdk14 // Not enough RAM
 __xdata struct tcb {
   u8 state;
   u8 thread_id;
@@ -41,9 +42,11 @@ void  buggy_dequeue( void ) {
   
   delaying_task_head = next_head;
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Not enough RAM
   delay_tick_cnts[ 0] = 0x7FFF;
   delay_tick_cnts[ 7] = 0x0020;
   delay_tick_cnts[ 8] = 0x0290;
@@ -61,5 +64,6 @@ void testBug(void)
   ASSERT( delay_next[ 7] == NULL_IDX );
   ASSERT( delay_next[10] == 8 );
   ASSERT( delay_next[ 8] == NULL_IDX );
+#endif
 }
 

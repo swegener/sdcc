@@ -11,6 +11,7 @@
 /* Extracted from gas.  Incorrectly generated non-pic code at -O0 for
    IA-64, which produces linker errors on some operating systems.  */
 
+#ifndef __SDCC_pdk14 // Lack of memory
 struct
 {
   int offset;
@@ -28,6 +29,7 @@ x ()
   int r = s.slot[0].field[!toggle];
   return r;
 }
+#endif
 
 void
 testTortureExecute (void)

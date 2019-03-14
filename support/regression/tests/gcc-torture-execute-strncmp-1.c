@@ -29,7 +29,7 @@ strncmp-1.c from the execute part of the gcc torture tests.
 
 #define MAX_LENGTH (MAX_OFFSET + MAX_TEST + MAX_EXTRA)
 
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) // Lack of memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Lack of memory
 static union {
   unsigned char buf[MAX_LENGTH];
   long long align_int;
@@ -55,7 +55,7 @@ test (const unsigned char *s1, const unsigned char *s2, size_t len, int expected
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) // Lack of memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Lack of memory
   size_t off1, off2, len, i;
   unsigned char *buf1, *buf2;
   unsigned char *mod1, *mod2;

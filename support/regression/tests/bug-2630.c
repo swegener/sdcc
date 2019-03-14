@@ -23,6 +23,7 @@ unsigned int crcu32(unsigned long newval, unsigned int crc)
 	return (newval>>16)+crc;
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 unsigned int core_bench_state(unsigned long blksize, unsigned char *memblock, int seed2, int step, unsigned int crc) 
 {
 	unsigned long final_counts[NUM_CORE_STATES];
@@ -55,10 +56,13 @@ unsigned int core_bench_state(unsigned long blksize, unsigned char *memblock, in
 
 	return crc;
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
 	unsigned char c = 1;
 	ASSERT(core_bench_state(0, &c, 0x5a0a, 0x5a0a, 0) == 6);
+#endif
 }
 

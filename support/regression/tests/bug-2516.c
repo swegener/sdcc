@@ -6,6 +6,7 @@
 
 #pragma disable_warning 122
 
+#ifndef __SDCC_pdk14 // Not enough RAM
 float gfa = 1.0 / 0.0;
 float gfb = (-1.0) / 0.0;
 float gfc = 0.0 / 0.0;
@@ -20,10 +21,12 @@ static float divTest(float a, float b)
 {
   return a / b;
 }
+#endif
 
 void
 testBug (void)
 { 
+#ifndef __SDCC_pdk14 // Not enough RAM
   float lfa = 1.0 / 0.0;
   float lfb = (-1.0) / 0.0;
   float lfc = 0.0 / 0.0;
@@ -58,4 +61,5 @@ testBug (void)
 
   ASSERT (!isnan (divTest (1e38, 1e-38)));
   ASSERT (isinf (divTest (1e38, 1e-38)));
+#endif
 }

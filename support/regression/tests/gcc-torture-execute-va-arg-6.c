@@ -40,6 +40,8 @@ f (int n, ...)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   f (4, 10, 10000000000LL, 11, 3.14L, 12, 13, 20000000000LL, 14, 2.72);
   return;
+#endif
 }

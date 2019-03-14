@@ -60,6 +60,16 @@
 # endif
 #endif
 
+#ifdef __SDCC_pdk14 // Lack of memory
+#define SKIP_INITIALIZERS
+#define SKIP_COMPOUND
+#define SKIP_EXPANDS
+#define SKIP_FLEXIBLE
+#define SKIP_LONG_LONG
+#define SKIP_DIGRAPH
+#define SKIP_TRIGRAPH
+#endif
+
 #ifndef SKIP_VA_ARGS_MACRO
 # define FIRST(X, ...) X
 # if FIRST(0, something)

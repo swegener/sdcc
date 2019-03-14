@@ -39,8 +39,6 @@
 #include "gen.h"
 #include "dbuf_string.h"
 
-char *aopLiteral (value * val, int offset);
-char *aopLiteralLong (value * val, int offset, int size);
 extern int allocInfo;
 static int pushReg (reg_info * reg, bool freereg);
 static void pullReg (reg_info * reg);
@@ -75,7 +73,7 @@ extern struct dbuf_s *codeOutBuf;
 static bool operandsEqu (operand * op1, operand * op2);
 static void loadRegFromConst (reg_info * reg, int c);
 static asmop *newAsmop (short type);
-static char *aopAdrStr (asmop * aop, int loffset, bool bit16);
+static const char *aopAdrStr (asmop * aop, int loffset, bool bit16);
 static void updateiTempRegisterUse (operand * op);
 #define RESULTONSTACK(x) \
                          (IC_RESULT(x) && IC_RESULT(x)->aop && \
@@ -651,7 +649,7 @@ forceload:
             }
           else
             {
-              char *l = aopAdrStr (aop, loffset, FALSE);
+              const char *l = aopAdrStr (aop, loffset, FALSE);
               emitcode ("lda", "%s", l);
               regalloc_dry_run_cost += ((aop->type == AOP_DIR || aop->type == AOP_IMMD || aop->type == AOP_LIT) ? 2 : 3);
               hc08_dirtyReg (reg, FALSE);
@@ -674,7 +672,7 @@ forceload:
             }
           else
             {
-              char *l = aopAdrStr (aop, loffset, FALSE);
+              const char *l = aopAdrStr (aop, loffset, FALSE);
               emitcode ("ldx", "%s", l);
               regalloc_dry_run_cost += ((aop->type == AOP_DIR || aop->type == AOP_IMMD || aop->type == AOP_LIT) ? 2 : 3);
               hc08_dirtyReg (reg, FALSE);
@@ -1617,7 +1615,7 @@ transferAopAop (asmop *srcaop, int srcofs, asmop *dstaop, int dstofs)
     
   if ((dstaop->type == AOP_DIR) && (srcaop->type == AOP_DIR))
     {
-      char *src = aopAdrStr (srcaop, srcofs, FALSE);
+      const char *src = aopAdrStr (srcaop, srcofs, FALSE);
       /* mov src,dst : 3 bytes, 5 cycles */
       emitcode ("mov", "%s,%s", src, aopAdrStr (dstaop, dstofs, FALSE));
       regalloc_dry_run_cost += 3;
@@ -2797,7 +2795,7 @@ aopOpExtToIdx(asmop * result, asmop *left, asmop *right)
 /* aopAdrStr - for referencing the address of the aop              */
 /*-----------------------------------------------------------------*/
 /* loffset seems to have a weird meaning here. It seems to be nonzero in some places where one would expect an offset to be zero */
-static char *
+static const char *
 aopAdrStr (asmop * aop, int loffset, bool bit16)
 {
   char *s = buffer;
@@ -6733,7 +6731,7 @@ expand_symbols (iCode * ic, const char *inlin)
               else
                 {
                   asmop *aop = aopForSym (ic, sym, FALSE);
-                  char *l = aopAdrStr (aop, aop->size - 1, TRUE);
+                  const char *l = aopAdrStr (aop, aop->size - 1, TRUE);
 
                   if ('#' == *l)
                     l++;

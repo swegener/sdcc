@@ -10,8 +10,7 @@
 
 #define NULL ((void *) 0)
 
-// Todo: Enable when long long comes to these ports!
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
 
 /* extracted from gdb sources */
 
@@ -84,7 +83,7 @@ struct blockvector *blockvector_for_pc_sect(register CORE_ADDR pc,
 
 void testTortureExecute(void)
 {
-#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) // Not enough memory
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Not enough memory
 #if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) // No long long
   struct block a = { 0, 0x10000, 0, 0, 1, 20 };
   struct block b = { 0x10000, 0x20000, 0, 0, 1, 20 };

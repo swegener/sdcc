@@ -30,6 +30,7 @@ void t(unsigned int i)
 	return(v);
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 /* Try to get lower 16 bits allocated to register y on stm8*/
 {type} g({type} p)
 {
@@ -64,6 +65,7 @@ void t(unsigned int i)
 
 	return(v);
 }
+#endif
 
 #endif
 
@@ -72,6 +74,7 @@ void testBug(void)
 #ifndef __SDCC_ds390
 	ASSERT(f(0x55aa55aa) == 0x55aa55aa);
 	ASSERT(f(0x0000ffff) == 0x0000ffff);
+#ifndef __SDCC_pdk14 // Lack of memory
 	ASSERT(f(0xffff0001) == 0xffff0001);
 
 	ASSERT(g(0x55aa55aa) == 0x55aa55aa);
@@ -81,6 +84,7 @@ void testBug(void)
 	ASSERT(h(0x55aa55aa) == 0x55aa55aa);
 	ASSERT(h(0x0000ffff) == 0x0000ffff);
 	ASSERT(h(0xffff0001) == 0xffff00ab);
+#endif
 #endif
 }
 

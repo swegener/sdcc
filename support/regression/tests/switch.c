@@ -48,12 +48,15 @@ testSparseSwitch(void)
   ASSERT(sparseSwitch(6) == 14);
   ASSERT(sparseSwitch(12) == 14);
   ASSERT(sparseSwitch(13) == 19);
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT(sparseSwitch(14) == 19);
   ASSERT(sparseSwitch(15) == 19);
   ASSERT(sparseSwitch(19) == 30);
   ASSERT(sparseSwitch(0) == 30);
+#endif
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 {sign} {type}
 denseSwitch({sign} {type} val)
 {
@@ -84,10 +87,12 @@ denseSwitch({sign} {type} val)
 
   return ret;
 }
+#endif
 
 void
 testDenseSwitch(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT(denseSwitch(0) == 1);
   ASSERT(denseSwitch(1) == 14);
   ASSERT(denseSwitch(2) == 15);
@@ -95,11 +100,13 @@ testDenseSwitch(void)
   ASSERT(denseSwitch(4) == 17);
   ASSERT(denseSwitch(5) == 12);
   ASSERT(denseSwitch(100) == 12);
+#endif
 }
 
 void
 testDenseIntSwitch(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   volatile int val = 1000;
   volatile int ret = 0;
 
@@ -143,4 +150,5 @@ testDenseIntSwitch(void)
   }
 
   ASSERT(ret == 8);
+#endif
 }

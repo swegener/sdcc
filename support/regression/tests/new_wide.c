@@ -13,7 +13,7 @@
 void testW(void)
 {
 #ifndef PORT_HOST
-#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) // Not enough memory
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Not enough memory
 	char mb_buffer[BUF_MAX + 1];
 	char16_t c16_buffer[BUF_MAX + 1];
 

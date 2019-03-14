@@ -13,6 +13,7 @@
 
 /* PR rtl-optimization/63843 */
 
+#ifndef __SDCC_pdk14 // Bug #2874
 static inline
 unsigned short foo (unsigned short v)
 {
@@ -30,10 +31,12 @@ bar (unsigned char *x)
   memcpy (&b, &x[2], sizeof (b));
   return foo (b);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Bug #2874
   unsigned char x[8] = { 0x01, 0x01, 0x01, 0x01 };
   if (CHAR_BIT == 8
       && sizeof (short) == 2
@@ -41,4 +44,5 @@ testTortureExecute (void)
       && bar (x) != 0x8181U)
     ASSERT (0);
   return;
+#endif
 }

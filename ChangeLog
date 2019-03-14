@@ -1,27 +1,422 @@
+2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merged pdk branch to trunk.
+
+2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20000412-2.c,
+	  support/regression/tests/gcc-torture-execute-20180112-1.c,
+	  support/regression/tests/gcc-torture-execute-920922-1.c,
+	  support/regression/tests/gcc-torture-execute-arith-rand.c,
+	  support/regression/tests/gcc-torture-execute-ashldi-1.c,
+	  support/regression/tests/gcc-torture-execute-divconst-3.c,
+	  support/regression/tests/gcc-torture-execute-divmod-1.c,
+	  support/regression/tests/gcc-torture-execute-index-1.c,
+	  support/regression/tests/gcc-torture-execute-loop-15.c,
+	  support/regression/tests/gcc-torture-execute-multdi-1.c,
+	  support/regression/tests/gcc-torture-execute-pr39100.c,
+	  support/regression/tests/gcc-torture-execute-pr49419.c,
+	  support/regression/tests/gcc-torture-execute-pr60454.c,
+	  support/regression/tests/gcc-torture-execute-pr61306-1.c,
+	  support/regression/tests/gcc-torture-execute-pr61306-2.c,
+	  support/regression/tests/gcc-torture-execute-pr64979.c,
+	  support/regression/tests/gcc-torture-execute-pr78378.c,
+	  support/regression/tests/gcc-torture-execute-pr79121.c,
+	  support/regression/tests/onebyte.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-1.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-12.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-15.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-16.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-18.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-26.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-5.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-6.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-9.c,
+	  support/regression/tests/gcc-torture-execute-loop-8.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+	* src/pdk/gen.c:
+	  Fix non-dead-register bugs, fix a carry issue.
+
+2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pdk14/Makefile.in,
+	  device/lib/pdk14/__gptrget.s,
+	  device/lib/pdk15/Makefile.in,
+	  device/lib/pdk15/__gptrget.s,
+	  src/pdk/gen.c,
+	  src/pdk/ralloc2.cc:
+	  Improve read of 16-bit value via pointer.
+	* support/regression/tests/gcc-torture-execute-pure-1.c,
+	  support/regression/tests/gcc-torture-execute-string-opt-18.c,
+	  support/regression/tests/io.c,
+	  support/regression/tests/key.c,
+	  support/regression/tests/string.c,
+	  support/regression/tests/switch.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+	* src/SDCCglue.c:
+	  Fix UTF-16 and UTF-16 string literals for pdk.
+
+2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx,
+	  src/SDCCast.c,
+	  support/regression/tests/vaargs.c:
+	  Disable omission of integer promotion of varargs for pdk.
+	* device/include/stdarg.h:
+	  Fix variable arguments for pdk.
+	  src/pdk/gen.c:
+	  Fix stack adjustment for reentrant function returning 16-bit value.
+	* support/regression/tests/bug2084206.c,
+	  support/regression/tests/gcc-torture-execute-920721-1.c,
+	  support/regression/tests/gcc-torture-execute-920829-1.c,
+	  support/regression/tests/gcc-torture-execute-921013-1.c,
+	  support/regression/tests/gcc-torture-execute-921124-1.c,
+	  support/regression/tests/gcc-torture-execute-980604-1.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+
 2019-03-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c: fix bug in optimized 2 byte swap
 	* support/regression/tests/bool.c: pass all ds390 tests now
+
+2019-03-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-pr39339.c,
+	  support/regression/tests/gcc-torture-execute-pr41750.c,
+	  support/regression/tests/gcc-torture-execute-pr42833.c,
+	  support/regression/tests/gcc-torture-execute-pr43236.c,
+	  support/regression/tests/gcc-torture-execute-pr44575.c,
+	  support/regression/tests/gcc-torture-execute-20030717-1.c,
+	  support/regression/tests/gcc-torture-execute-20031204-1.c,
+	  support/regression/tests/gcc-torture-execute-20040409-2.c,
+	  support/regression/tests/gcc-torture-execute-20050218-1.c,
+	  support/regression/tests/gcc-torture-execute-20050502-1.c,
+	  support/regression/tests/gcc-torture-execute-20050826-1.c,
+	  support/regression/tests/gcc-torture-execute-20060110-2.c,
+	  support/regression/tests/gcc-torture-execute-20090207-1.c_
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+	* src/pdk/gen.c:
+	  Fix read from signed bit-field, fix +/- lower result byte in a, fix xor operand upper byte in a.
+
+2019-03-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/tests/bug-2630.c,
+	  support/regression/tests/bug-2822.c,
+	  support/regression/tests/bug-441448.c,
+	  support/regression/tests/bug-460010.c,
+          support/regression/tests/bug-2712.c,
+          support/regression/tests/bug1665511.c,
+	  support/regression/tests/bug1757671.c,
+	  support/regression/tests/bug1928022.c,
+	  support/regression/tests/bug2729218.c,
+	  support/regression/tests/bug2817646.c,
+	  support/regression/tests/bug2862650.c,
+	  support/regression/tests/bug2935162.c,
+	  support/regression/tests/bug3027957.c,
+	  support/regression/tests/bug3183823.c,
+	  support/regression/tests/bug3381400.c,
+	  support/regression/tests/bug3424150.c,
+	  support/regression/tests/bug3564104.c,
+	  support/regression/tests/bugs-1596270-1736867.c,
+	  support/regression/tests/gcc-torture-execute-postmod-1.c,
+	  support/regression/tests/gcc-torture-execute-pr15262.c,
+	  support/regression/tests/gcc-torture-execute-pr15296.c,
+	  support/regression/tests/gcc-torture-execute-pr19606.c,
+	  support/regression/tests/gcc-torture-execute-pr20527-1.c,
+	  support/regression/tests/gcc-torture-execute-pr20601-1.c,
+	  support/regression/tests/gcc-torture-execute-pr27073.c,
+	  support/regression/tests/gcc-torture-execute-pr27260.c,
+	  support/regression/tests/gcc-torture-execute-pr27285.c,
+	  support/regression/tests/gcc-torture-execute-pr28982a.c,
+	  support/regression/tests/condopptr.c,
+	  support/regression/tests/constantRange.c,
+	  support/regression/tests/frexpf.c,
+	  support/regression/tests/gcc-torture-execute-20000603-1.c,
+	  support/regression/tests/gcc-torture-execute-20000717-4.c,
+	  support/regression/tests/gcc-torture-execute-20000731-1.c,
+	  support/regression/tests/gcc-torture-execute-20001024-1.c,
+	  support/regression/tests/gcc-torture-execute-20010910-1.c,
+	  support/regression/tests/gcc-torture-execute-20010915-1.c,
+	  support/regression/tests/gcc-torture-execute-20020129-1.c,
+	  support/regression/tests/gcc-torture-execute-20020402-3.c,
+	  support/regression/tests/gcc-torture-execute-20020508-2.c,
+	  support/regression/tests/gcc-torture-execute-20020615-1.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+	* src/pdk/gen.h,
+	  src/pdk/gen.c:
+	  Fix arithmetic right shift, jump on &, static function pointer initalization, zeroing of bit-fields, ==, bit-field write from register p, bit-field write with non-dead register p, ^, immediate in -.
+	* src/SDCCglue.c:
+	  Fix pdk pointer initalization corner case.
+	* sim/ucsim/pdk.src/inst.cc:
+	  Fix ov.
+
+2019-03-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2854.c,
+	  support/regression/tests/gcc-torture-execute-arith-rand-ll.c,
+	  support/regression/tests/bug-2222.c,
+	  support/regression/tests/bug-2231.c,
+	  support/regression/tests/bug-2427.c,
+	  support/regression/tests/bug-2611.c,
+	  support/regression/tests/bug-2890326.c,
+	  support/regression/tests/bug3474855.c,
+	  support/regression/tests/bug3475630.c,
+	  support/regression/tests/gcc-torture-execute-20021120-1.c,
+	  support/regression/tests/gcc-torture-execute-20030916-1.c,
+	  support/regression/tests/gcc-torture-execute-20121108-1.c,
+	  support/regression/tests/qsort.c,
+	  support/regression/tests/bug-2188.c,
+	  support/regression/tests/bug-2304.c,
+	  support/regression/tests/bug-2501.c,
+	  support/regression/tests/bug-2568.c,
+	  support/regression/tests/bug-2621.c,
+	  support/regression/tests/bug-2764.c,
+	  support/regression/tests/gcc-torture-execute-pr39501.c,
+	  support/regression/tests/gcc-torture-execute-pr78586.c,
+	  support/regression/tests/bug1723128.c,
+	  support/regression/tests/bug3410878.c,
+	  support/regression/tests/ctype.c,
+	  support/regression/tests/gcc-torture-execute-20030313-1.c,
+	  support/regression/tests/p99-conformance.c,
+	  support/regression/tests/scott-compare3.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+	* support/regression/tests/gcc-torture-execute-divcmp-2.c,
+	  support/regression/tests/staticinit.c:
+	  Disable tests that fail in annoying ways.
+	* src/SDCCglue.c:
+	  Pointer initialization fix.
+	* src/pdk/gen.c:
+	  Shift fix, pointer read fix, jump table fix, negation fix, address offset fix, big return fix.
+	* src/pdk/ralloc2.cc:
+	  Improve register use at pointer read.
+	* sim/ucsim/pdk.src/inst.cc:
+	  Simulator fixes, patches by Nicolas Lesser.
+	* src/pdk/ralloc2.cc,
+	  src/pdk/gen.c:
+	  Improve jump on &.
 
 2019-03-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/collate-results.py:
 	  Improve error handling in regression test result parsing, fix bug #2675.
 
+2019-03-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk14/pdk14mch.c,
+	  sdas/asxxsrc/asdata.c,
+	  sdas/asxxsrc/asexpr.c,
+	  sdas/asxxsrc/asxxxx.h:
+	  Fix handling of offsets to word addresses, patch by Nicolas Lesser.
+	* src/pdk/gen.c:
+	  Remove workarounds for word address offset handling issue.
+	* support/regression/tests/*:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+
+2019-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Codegen fixes.
+	* sim/ucsim/pdk.src/pdk.cc,
+	  sdas/linksrc/lkmain.c:
+	  Memory limit diagnostics, patch by Nicolas Lesser.
+	* support/regression/tests/bug-2208.c,
+	  support/regression/tests/bug-2253.c,
+	  support/regression/tests/bug-2357.c,
+	  support/regression/tests/bug-2516.c,
+	  support/regression/tests/bug-2625.c,
+	  support/regression/tests/bug-2254.c,
+	  support/regression/tests/bug-2403.c,
+	  support/regression/tests/bug-2516.c,
+	  support/regression/tests/bug-2820.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+
+2019-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/SDCCglue.c:
+	  Pointer handling fixes.
+	* support/regression/tests/bp.c,
+	  support/regression/tests/bug-1805702.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+
+2019-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/ralloc2.cc,
+	  src/pdk/gen.c:
+	  Improve register use.
+	* sim/ucsim/pdk.src/inst.cc,
+	  sim/ucsim/pdk.src/instcl.h:
+	  Fix flag handling, patch by Nicolas Lesser.
+
+2019-03-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Fix arithmetic right shift, assembler issue workaround for variables in ROM.
+	* src/pdk/ralloc2.cc:
+	  Try to save abit more RAM.
+	* support/regression/tests/and_survive.c,
+	  support/regression/tests/ato.c,
+	  support/regression/tests/bitopcse.c,
+	  support/regression/tests/bug-2031.c,
+	  support/regression/tests/bug-1953.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+
+2019-03-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc2.cc:
+	  Improve register allocation, small code generation fixes.
+	* support/regression/tests/absolute.c,
+	  support/regression/tests/addsub.c,
+	  support/regression/tests/args.c,
+	  support/regression/tests/array.c,
+	  support/regression/tests/bug-221100.c,
+	  support/regression/tests/bug-221168.c,
+	  support/regression/tests/bug1477149.c,
+	  support/regression/tests/bug3401973.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+	* sim/ucsim/pdk.src/inst.cc:
+	  Carry bug workaround.
+
 2019-03-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c: fix bugs #2750 and #2867 (same root cause)
 	* support/regression/tests/bug-2750.c: enable test
+
+2019-03-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+
+2019-03-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Workaround for lack of support for offset at call in assembler.
+	* sim/ucsim/pdk.src/inst.cc:
+	  Carry bug workaround.
+	* src/pdk/ralloc2.cc,
+	  src/pdk/ralloc.c,
+	  src/pdk/main.c:
+	  Enable local variable overlay for leaf functions.
+	* configure.ac,
+	  configure:
+	  Fix display of pdk13 enable.
+
+2019-03-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/pdk.src/inst.cc:
+	  Carry workaround.
+	* src/pdk/gen.c:
+	  Comparison fix.
+	* sim/ucsim/pdk.src/glob.cc:
+	  dzsn / izsn debug output fix, patch by Nicolas Lesser.
+	* sdas/asxxsrc/asout.c,
+	  sdas/linksrc/lkrloc3.c:
+	  Fix handling of addresses of variables in RAM, patch by Nicolas Lesser.
 
 2019-03-06 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: sdcclib.exe is not built
 	  anymore, so don't try to include it in the installer
 
+2019-03-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Improve pointer handling and subtraction.
+	* sim/ucsim/pdk.src/inst.cc:
+	  Fix idxm.
+	* src/pdk/gen.c:
+	  Comparison fix.
+
+2019-03-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asxxsrc/asout.c:
+	  Address handling fix, patch by Nicolas Lesser.
+	* sim/ucsim/pdk.src/glob.cc,
+	  sim/ucsim/pdk.src/pdk.cc:
+	  State output fix, patch by Nicolas Lesser.
+	* src/pdk/gen.c:
+	  Comparison fix.
+	* sim/ucsim/pdk.src/inst.cc:
+	  Fix src, slc.
+
+2019-03-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pdk14/__gptrget.s,
+	  device/lib/pdk15/__gptrget.s:
+	  Fix generic pointer read.
+	* sim/ucsim/pdk.src/inst.cc:
+	  Fix push af / pop af simulation.
+
+2019-03-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/ports/pdk14/support.c:
+	  Fix regression-test _putchar for pdk14.
+	* device/lib/pdk14/__gptrget.s,
+	  device/lib/pdk15/__gptrget.s:
+	  Fix generic pointer read.
+	* sim/ucsim/pdk.src/glob.cc,
+	  sim/ucsim/pdk.src/inst.cc:
+	  pdk14 bit instruction fix, patch by Nicolas Lesser.
+
+2019-03-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2363.c,
+	  support/regression/tests/bug-2756.c,
+	  support/regression/tests/gcc-torture-execute-20011008-3.c,
+	  support/regression/tests/gcc-torture-execute-20020402-3.c,
+	  support/regression/tests/gcc-torture-execute-20100430-1.c,
+	  support/regression/tests/gcc-torture-execute-cmpdi-1.c,
+	  support/regression/tests/gcc-torture-execute-longlong.c,
+	  support/regression/tests/gcc-torture-execute-memcpy-bi.c,
+	  support/regression/tests/gcc-torture-execute-mode-dependent-address.c,
+	  support/regression/tests/gcc-torture-execute-p18298.c,
+	  support/regression/tests/gcc-torture-execute-strcmp-1.c,
+	  support/regression/tests/gcc-torture-execute-strcpy-1.c,
+	  support/regression/tests/gcc-torture-execute-strncmp-1.c,
+	  support/regression/tests/gcc-torture-execute-struct-cpy-1.c,
+	  support/regression/tests/new_wide.c,
+	  support/regression/tests/wchar.c
+	  support/regression/tests/bug-2684.c,
+	  support/regression/tests/bug-2732.c,
+	  support/regression/tests/dhrystone.c,
+	  support/regression/tests/gcc-torture-execute-20050826-1.c,
+	  support/regression/tests/gcc-torture-execute-991216-1.c,
+	  support/regression/tests/gcc-torture-execute-pr47538.c,
+	  support/regression/tests/gcc-torture-execute-pr68532.c,
+	  support/regression/tests/qsort.c:
+	  Disable tests that won't work for pdk14 due to lack of memory.
+	* sdas/asxxsrc/asout.c,
+	  sdas/linksrc/lkrloc3.c,
+	  sim/ucsim/pdk.src/pdk.cc,
+	  sim/ucsim/pdk.src/inst.cc:
+	  pdk14 fixes, patch by Nicolas Lesser.
+
+2019-03-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asxxsrc/asout.c:
+	  Assembler fix, patch by Nicolas Lesser.
+	* sim/ucsim/Makefile.in,
+	  sim/ucsim/configure,
+	  sim/ucsim/configure.ac,
+	  sim/ucsim/globals.cc,
+	  sim/ucsim/globals.h,
+	  sim/ucsim/packages_in.mk,
+	  sim/ucsim/stypes.h,
+	  support/regression/ports/pdk14/spec.mk,
+	  support/regression/ports/pdk14/support.c:
+	  pdk14 simulator, patch by Nicolas Lesser.
+
 2019-03-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
         * src/mcs51/gen.c: fix bug #2729
         * support/regression/tests/bool.c: reenable test
+
+2019-03-01 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/ralloc.c:
+	  Dump debug info after register assignment.
+	* support/regression/tests/gcc-torture-execute-20000314-3.c:
+	  Disable failing test, where solution is not clear yet (bug #2878).
 
 2019-03-01 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -34,6 +429,26 @@
 	* support/regression/tests/literalop.c: add casts to fix
 	  integer promotion of hexadeciaml constants in ?: operator.
 
+2019-02-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-960116-1.c
+	  support/regression/tests/gcc-torture-execute-cvt-1.c
+	  support/regression/tests/gcc-torture-execute-loop-2c.c
+	  support/regression/tests/gcc-torture-execute-pr20601-1.c
+	  support/regression/tests/gcc-torture-execute-pr33870-1.c
+	  support/regression/tests/gcc-torture-execute-pr33870.c
+	  support/regression/tests/gcc-torture-execute-pr37125.c
+	  support/regression/tests/gcc-torture-execute-pr63843.c
+	  support/regression/tests/gcc-torture-execute-pr65215-1.c
+	  support/regression/tests/gcc-torture-execute-pr65215-2.c
+	  support/regression/tests/gcc-torture-execute-pr68841.c
+	  support/regression/tests/gcc-torture-execute-stdarg-5.c
+	  support/regression/tests/gcc-torture-execute-unroll-1.c
+	  support/regression/tests/inline.c
+	  Disable tests that are unlikely to compile for pdk14 anytime soon.
+	* src/pdk/gen.c:
+	  Fix an issue in handling aop for spilt variables.
+
 2019-02-25 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCsymt.c: fix bug #2861
@@ -43,6 +458,53 @@
 	* src/SDCCopt.c:
 	  Generalize loop narrowing (part of RFE #530).
 
+2019-02-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Do not emit set0, set1 with memory operand fpr pdk13, as assembler support for these likely won't be ready for SDCC 3.9.0.
+	* device/lib/pdk13:
+	  Infrastructure for pdk13 library.
+
+2019-02-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asxxsrc/asout.c,
+	  sdas/linksrc/lkrloc3.c:
+	  Fix relocation of addresses in ROM, patches by Nicolas Lesser.
+	* sdas/aspdk/pdkmch.c:
+	  Fix handling of literals, patch by Nicolas Lesser.
+
+2019-02-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Disable use of idxm, ldtabl, stt16, ldt16 on direct operands, since we can't handle alignment requirements yet.
+	* sdas/aspdk/pdkmch.c,
+	  sdas/aspdk14/pdk14mch.c,
+	  sdas/aspdk15/pdk15mch.c,
+	  sdas/asxxsrc/asout.c,
+	  sdas/asxxsrc/asxxxx.h,
+	  sdas/linksrc/lkrloc3.c:
+	  pdk assembler fixes, patch by Nicolas Lesser.
+
+2019-02-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20030714-1.c,
+	  support/regression/tests/gcc-torture-execute-921208-1.c,
+	  support/regression/tests/gcc-torture-execute-930702-1.c,
+	  support/regression/tests/gcc-torture-execute-991112-1.c,
+	  support/regression/tests/gcc-torture-execute-func-ptr-1.c,
+	  support/regression/tests/gcc-torture-execute-pr34456.c,
+	  support/regression/tests/z88dk.c,
+	  support/regression/tests/gcc-torture-execute-20010409-1.c,
+	  support/regression/tests/gcc-torture-execute-pr60003.c,
+	  support/regression/tests/setjmp.c,
+	  support/regression/tests/loop.c:
+	  Disable tests that are unlikely to compile for pdk14 anytime soon.
+	* src/z80/gen.c:
+	  Fix wide comparison with immediate, fix a corner case of & with one stack operand, fix comparison with stack operand, fix multiplication by negative literal.
+	* src/pdk/main.c,
+	  src/stm8/main.c:
+	  Fix extended alignment.
+
 2019-02-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
@@ -50,13 +512,80 @@
 
 2019-02-12 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/pdk/gen.c,
+	  src/pdk/ralloc2.cc:
+	  Fix subtraction by immediate, &^| with both operands on stack, left shift of on-stack operand.
+	* device/lib/pdk14/Makefile.in,
+	  device/lib/pdk15/Makefile.in:
+	  Enable missing support functions.
+	* support/regression/tests/bug-2551.c,
+	  support/regression/tests/bug-2554.c,
+	  support/regression/tests/bug-2558.c,
+	  support/regression/tests/bug-2559.c,
+	  support/regression/tests/gcc-torture-execute-920721-3.c,
+	  support/regression/tests/gcc-torture-execute-20050106-1.c,
+	  support/regression/tests/gcc-torture-execute-20060930-2.c:
+	  Disable tests that fail to compile due to bug #2874.
+	* support/regression/tests/bug-2663.c,
+	  support/regression/tests/bug-2767.c,
+	  support/regression/tests/bug-716242.c,
+	  support/regression/tests/bug1908493.c,
+	  support/regression/tests/bug2077267.c,
+	  support/regression/tests/bug3379723.c:
+	  Disable tests that are unlikely to compile for pdk14 anytime soon.
+	* device/lib/pdk14/heap.s,
+	  device/lib/pdk14/heap.s:
+	  Default heap of 64 Bytes for pdk14, pdk15.
+	* src/pdk/main.c:
+	  Report lack of code generation support for division by constant.
+
+2019-02-12 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc.c,
 	  support/regression/tests/bug-2031.c:
 	  Allow rematerialization of pointer-to-integer cast, fixes a gbz80 initialization bug.
 
+2019-02-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc.c:
+	  Fix various pdk issues.
+	* support/regression/tests/bug-1918.c,
+	  support/regression/tests/bug-2124.c,
+	  support/regression/tests/bug-2271.c,
+	  support/regression/tests/bug-2274.c,
+	  support/regression/tests/bug-2305.c,
+	  support/regression/tests/bug-2349.c,
+	  support/regression/tests/bug-2373.c,
+	  support/regression/tests/bug-2455.c,
+	  support/regression/tests/bug-2497.c:
+	  Disable tests that are unlikely to compile for pdk14 anytime soon.
+
+2019-02-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Use ltabl for pdk15, improve shifts.
+	* src/SDCCglue.c:
+	  Fix initialization of bit-fields in code space for pdk.
+
 2019-02-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c: fix bug #2829
+
+2019-02-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/ports/pdk14/support.c:
+	  Make regression tests compile, even before simulator is ready.
+	* device/lib/pdk14/Makefile.in,
+	  device/lib/pdk15/Makefile.in:
+	  Enable a missing support function.
+	* src/pdk/gen.c:
+	  Improve bit-field access.
+
+2019-02-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Fix handling of wide return values.
 
 2019-02-11 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
@@ -72,9 +601,54 @@
 	  src/z80/gen.c:
 	  Fix bug #2869.
 
+2019-02-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c
+	  src/pdk/ralloc2.cc:
+	  Various pdk improvements.
+
 2019-02-09 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCdwarf2.c: fix bug #2762
+
+2019-02-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/main.c,
+	  src/pdk/ralloc2.cc:
+	  Various pdk improvements.
+	* device/lib/calloc.c,
+	  device/lib/free.c,
+	  device/lib/malloc.c,
+	  device/lib/realloc.c:
+	  Improve dynamic memory management for pdk.
+	* device/lib/_memchr.c:
+	  Improve comparison.
+
+2019-02-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* configure,
+	  configure.ac,
+	  device/include/stdlib.h,
+	  device/lib/Makefile.in,
+	  device/lib/clean.mk,
+	  device/lib/pdk15/Makefile.in,
+	  device/lib/pdk15:
+	  pdk15 library.
+	* src/pdk/main.c,
+	  src/pdk/gen.c:
+	  Improve read from pointer.
+
+2019-02-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Makefile.common.in,
+	  Makefile.in,
+	  configure,
+	  configure.ac,
+	  sdccconf_in.h,
+	  src/pdk/main.c,
+	  sdas/aspdk15:
+	  pdk15 assembler, patch by Nicolas Lesser.
 
 2019-02-07 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -90,18 +664,101 @@
 	  sim/ucsim/stm8.src/stm8.cc:
 	  stm8 simulator fixes, patches by Mike Jagdis.
 
+2019-02-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk14,
+	  sdas/aspdk,
+	  device/lib/pdk14/Makefile.in:
+	  Assembler refactoring, patch by Nicolas Lesser.
+
+2019-02-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/gen.h,
+	  src/pdk/ralloc.c,
+	  src/pdk/ralloc2.cc,
+	  src/pdk/gen.c:
+	  Various improvements in register allocation.
+	* sdas/linksrc/lkrloc3.c:
+	  Fix a linker issue, patch by Nicolas Lesser.
+	* device/lib/pdk14/__gptrget.s:
+	  Fix an issue in read from pointer to ROM.
+
+2019-02-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/ralloc.c,
+	  src/pdk/gen.c:
+	  Rematerialization.
+
+2019-02-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Fix direct read from variable in code space.
+
+2019-02-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Implement write of non-literal to bit-field.
+
+2019-02-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Implement read from bit-field, literal write to bit-field.
+	* src/pdk/ralloc2.cc:
+	  Improve handling of p wrt. pointer read / write in register allocation.
+
+2019-02-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fix signed comparison by 0.
+	* Makefile.in,
+	  configure,
+	  configure.ac,
+	  src/pdk/main.c,
+	  sdas/aspdk,
+	  sdas/aspdk14:
+	  Assembler rename, based on patch by Nicolas Lesser.
+
 2019-02-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c: fix bug #2863
 
 2019-02-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/pdk/gen.c:
+	  Fix early return from interrupt.
+
+2019-02-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* doc/Makefile.in:
 	  Fix dependencies.
+
+2019-02-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCglue.c:
+	  Fix a pointer initalization issue.
+	* src/pdk/main.c:
+	  Save a word in stack-pointer setup.
+
+2019-02-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCglue.c,
+	  src/SDCCglue.h,
+	  src/ds390/gen.c,
+	  src/hc08/gen.c,
+	  src/mcs51/gen.c:
+	  Use ret k for constant data.
 
 2019-02-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/scripts/sdcc.nsi: add support for ez80_z80
+
+2019-01-31 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCasm.c,
+	  src/SDCCasm.h,
+	  src/pdk/main.c:
+	  Use ret k for constant data bytes.
 
 2019-01-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
@@ -117,23 +774,204 @@
 	* src/SDCC.y:
 	  Document bug #2858 workaround.
 
+2019-01-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk/pdkmch.c:
+	  Fix idxm, patch by Tim (cpldcpu).
+	* device/lib/pdk14/Makefile.in:
+	  Use generic memcpy(), unsigned 8 x 8 -> 16 multiplication and unsigned division for pdk14.
+	* src/pdk/main.c:
+	  Fix int x int -> long multiplication.
+	* src/pdk/main.c,
+	  src/pdk/gen.c:
+	  Code generation for 8 x 8 (lit) -> 8 multiplication.
+	* configure,
+	  configure.ac,
+	  src/SDCCmain.c,
+	  src/pdk/main.c,
+	  src/pdk/ralloc2.cc,
+	  src/port.h:
+	  Infrastructure for pdk13, pdk15.
+
+2019-01-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* aspdk/pdkmch.c,
+	  asxxsrc/asout.c,
+	  asxxsrc/asxxxx.h,
+	  asxxsrc/sdas.c,
+	  asxxsrc/sdas.h,
+	  linksrc/lkrloc3.c:
+	  Linker and assembler fixes for pdk14, patch by Nicolas Lesser.
+	* src/pdk/gen.c:
+	  Fix code generation for unary float minus and calls to functions returning more than a word.
+	* device/lib/pdk14/__gptrget.s:
+	  Asm syntax fix.
+
 2019-01-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2866.c:
 	  Fix bug #2866.
 
+2019-01-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk/pdkmch.c:
+	  Fix shifts, patch by Tim (cpldcpu).
+	* src/pdk/gen.c:
+	  Fix signed comparison, fix pointer write with integer literal cast to pointer.
+
+2019-01-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fix !.
+
+2019-01-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c:
+	  Switch default code location for bytewise addressing in ROM.
+
+2019-01-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk/pdk.h,
+	  sdas/aspdk/pdkadr.c,
+	  sdas/aspdk/pdkmch.c,
+	  sdas/aspdk/pdkpst.c:
+	  Assembler fixes, patch by Nicolas Lesser.
+	* src/pdk/main.c:
+	  Switch .org use to bytewise addressing in ROM.
+
+2019-01-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c:
+	  Use sensible default for --code-loc.
+
+2019-01-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c:
+	  Various glue code for program startup.
+
 2019-01-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/time.c:
 	  Make some variables const so save RAM on targets that do not have __code.
+	* src/pdk/gen.c:
+	  Fix a segfault in code generation for &.
+	* sdas/aspdk/pdk.h,
+	  sdas/aspdk/pdkadr.c,
+	  sdas/aspdk/pdkmch.c:
+	  Assembler fixes and syntax change, patch by Nicolas Lesser.
+	* src/pdk/gen.c,
+	  device/lib/pdk14/__gptrget.s:
+	  Update for assembler syntax change.
+	* src/SDCCsymt.c,
+	  device/lib/Makefile.in,
+	  Enable build of pdk14 library.
+
+2019-01-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pdk14/Makefile.in:
+	  Use sdaspdk to build pdk14 library.
+	* src/pdk/main.c,
+	  src/pdk/gen.c:
+	  Fix generation of invalid asm in a few places.
+	* sdas/aspdk/pdkmch.c,
+	  sdas/aspdk/pdkpst.c:
+	  Assembler fixes, patch by Nicolas Lesser.
+	* support/regression/ports/pdk14/spec.mk:
+	  Prepare for future pdk14 regression testing.
+
+2019-01-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk,
+	  Makefile.common.in,
+	  Makefile.in,
+	  configure,
+	  configure.ac,
+	  sdas/linksrc/Makefile.in,
+	  sdas/linksrc/sdld.c,
+	  sdas/linksrc/sdld.h,
+	  src/pdk/main.c:
+	  Assembler for pdk14, patch by Nicolas Lesser.
+
+2019-01-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c:
+	  Work around lack of link-time arithmetic.
+
+2019-01-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  device/lib/pdk14/__gptrget.s:
+	  Use knowledge on byte order for push af.
+
+2019-01-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c:
+	  Fix invalid use of .dw for variables in ROM.
+	* src/pdk/gen.c:
+	  Fix various issues in code generation.
+
+2019-01-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  device/lib/pdk14/__gptrget.s:
+	  Support variables in ROM.
+
+2019-01-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc2.cc:
+	  Minor fixes.
+	* src/SDCCast.c:
+	  Enable standard library call optimization for pdk14.
+
+2019-01-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc2.cc:
+	  Optimize conditional jump on bit test.
+
+2019-01-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Fixes for subtraction.
+	* src/SDCCglue.c:
+	  Fix output of __sfr locations.
+
+2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Generate better code for ^, |, &.
+
+2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Slightly improve __sfr16 handling, fix pseudoregister saving in interrupt routine.
+	* src/pdk/main.c:
+	  Fix zero-initialization of upper byte of pseudo-register p.
+
+2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/*.c:
+	  Enable some regression tests that need struct assignment support.
+
+2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  device/lib/pdk14/Makefile.in:
+	  Implement unary float minus, enable build of most of the float library.
+
+2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fix handling of non-stack temporary operands in cost function.
+	* device/lib/pdk14/Makefile.in:
+	  Enable build of more library functions.
 
 2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:
 	  Fixes and improvements for stm8 peephole rules, patch by Visenri.
-	* support/regression/tests/*.c:
-	  Enable some regression tests that need struct assignment support.
 
 2019-01-07 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -153,15 +991,106 @@
 	* src/z80/gen.c:
 	  ez80_z80 fixes.
 
+2019-01-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc.c:
+	  Support for return values wider than 16 bit.
+	* src/SDCCmem.c:
+	  Fix handling of 1-byte stack parameters.
+
+2019-01-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Fixes for reentrant functions.
+
+2019-01-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Fix handling of stack adjustment on early return for on-stack variables.
+	  src/pdk/main.c:
+	  Initialize upper byte of pseudo-register p.
+
+2019-01-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc.c,
+	  src/SDCCbtree.cc:
+	  Improve support for reentrant functions.
+	* support/regression/ports/pdk14,
+	  support/regression/Makefile.in,
+	  support/regression/fwk/include/testfwk.h:
+	  Basic infrastructure for future pdk14 regression testing.
+
+2019-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c:
+	  Initialization of global / static variables.
+
+2019-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pdk14/Makefile.in:
+	  Don't try to compile library functions that will not work anytime soon.
+	* src/SDCCglue.c:
+	  Emit sfr locations for pdk14.
+	* device/include/stdlib.h:
+	  Mark bsearch(), qsort() function pointers as __reentrant for pdk14.
+	* src/pdk/main.c:
+	  Properly announce lack of support for extended bit operations.
+	* src/pdk/gen.c:
+	  Fix some cases of pointer read / write.
+	* src/SDCCicode.c:
+	  Pass 8-bit arguments as 16 bit on stack on pdk14 to satisfy alignment requirements.
+
 2019-01-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmem.c:
 	  Improve error handling on missing output storage class.
 
+2019-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Implement & for stack objects.
+	* device/lib/pdk14/Makefile.in:
+	  Don't try to compile library functions that will not work anytime soon.
+
+2019-01-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c,
+	  src/pdk/gen.c,
+	  src/pdk/ralloc2.cc:
+	  Better unsigned char comparisons.
+	* device/lib/pdk14,
+	  configure.ac,
+	  configure:
+	  Infrastructure for pdk14 library.
+
+2019-01-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.h,
+	  src/pdk/gen.c:
+	  Rudimentary support for arguments on the stack.
+
+2019-01-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c,
+	  src/pdk/gen.c,
+	  src/SDCCsymt.c:
+	  Implement basic I/O support (__sfr, __sfr16).
+	* src/port.h,
+	  src/SDCCsymt.c:
+	  Prepare for future pdk13, pdk15 and pdk16 backends.
+
 2019-01-03 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/version.awk:
 	  Fix bug #2818.
+
+2019-01-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc2.cc:
+	  Implement support for dummy read from volatile in direct space.
 
 2019-01-02 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -314,6 +1243,18 @@
 	  device/lib/ez80_z80:
 	  ez80_z80 library.
 
+2018-12-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/ralloc2.cc,
+	  src/pdk/gen.c:
+	  Improve code for shifts.
+
+2018-12-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/ralloc2.cc,
+	  src/pdk/gen.c:
+	  Improve use of pseudoregister p.
+
 2018-12-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCtree_dec.hpp:
@@ -322,6 +1263,65 @@
 2018-12-04 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* SDCCerr.c: replaced include sdccconf.h by SDCCglobl.h, required for MSVC
+
+2018-12-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Basic support for function pointers.
+
+2018-12-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Improve code generation for jump on comparison.
+
+2018-12-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fix an issue in code generation for pointer read.
+
+2018-12-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/ralloc.c,
+	  src/pdk/ralloc.h,
+	  src/pdk/ralloc2.cc,
+	  src/pdk/gen.c,
+	  src/pdk/gen.h,
+	  src/pdk/main.c:
+	  Basic register allocation.
+
+2018-12-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/ralloc.c,
+	  src/pdk/gen.c:
+	  Allow return of up to 2 bytes.
+
+2018-12-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/main.c:
+	  Report lack of hardware multiplication.
+
+2018-12-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/main.c,
+	  src/pdk/ralloc.c:
+	  Implement basic support for pointers.
+
+2018-12-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Implement comparison.
+
+2018-12-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/main.c,
+	  src/pdk/gen.c:
+	  Switch to little-endian to ease pointer-integer casts, fix addition.
+
+2018-12-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Implement shifts, complement, negation.
 
 2018-12-02 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -336,6 +1336,20 @@
 	  src/z80/gen.c,
 	  src/z80/main.c:
 	  More z88dk-specific calling conventions, patch from zsdcc fork diff by Phillip Stevens.
+
+2018-12-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure,
+	  configure.ac,
+	  sdccconf_in.h,
+	  src/SDCCmain.c,
+	  src/port.h,
+	  src/pdk,
+	  src/pdk/Makefile.in,
+	  src/pdk/main.c,
+	  src/pdk/ralloc.c,
+	  src/pdk/ralloc.h:
+	  Basic infrastructure for pdk14 backend.
 
 2018-12-01 Philipp Klaus Krause <pkk AT spth.de>
 

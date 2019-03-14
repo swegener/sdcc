@@ -16,8 +16,10 @@ long long c=2863311530LL,c3=2863311530LL*3;
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory.
   if(c*3!=c3)
     ASSERT(0);
   return;
+#endif
 }
 

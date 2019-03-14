@@ -20,7 +20,7 @@ struct T
   char **t3;
 };
 
-#if defined (__SDCC) && !defined (__SDCC_mcs51)
+#if defined (__SDCC) && !defined (__SDCC_mcs51) && !defined (__SDCC_pdk14) // Lack of memory
 int a[5];
 int b;
 const char **c;
@@ -42,6 +42,7 @@ bar (char *x, unsigned int y)
   return 0;
 }
 
+#ifndef __SDCC_pdk14 // Bug #2874
 static inline char *
 baz (char *x, unsigned int y)
 {
@@ -118,11 +119,12 @@ setup2 (void)
   return j;
 }
 #endif
+#endif
 
 void
 testTortureExecute (void)
 {
-#if defined (__SDCC) && !defined (__SDCC_mcs51)
+#if defined (__SDCC) && !defined (__SDCC_mcs51) && !defined(__SDCC_pdk14)
   int x;
   c = g;
   b = 4;

@@ -23074,7 +23074,8 @@ status open
 \end_layout
 
 \begin_layout Subsection
-Omitting promotion on arguments of vararg function
+Omitting promotion on arguments of vararg function (does not apply to pdk13,
+ pdk14, pdk15)
 \end_layout
 
 \begin_layout Standard

@@ -35,6 +35,7 @@ inttostr (long i, char buf[N])
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   char buf[N], *p;
 
   p = inttostr (-1, buf);
@@ -45,4 +46,5 @@ testTortureExecute (void)
   ASSERT(p == buf + (N-1) - 2);
 
   return;
+#endif
 }

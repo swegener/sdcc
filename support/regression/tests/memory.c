@@ -60,7 +60,7 @@ void testmemory(void)
   /* Test memcmp() */
   memcpy(destination, source, 4);
   ASSERT(memcmp(destination, source, 4) == 0);
-
+#ifndef __SDCC_pdk14 // Lack of memory
   /* Test memmove() */
   memcpy(destination, source, 4);
   memmove(destination, destination + 1, 3);
@@ -83,6 +83,7 @@ void testmemory(void)
   ASSERT(strlen("test") == 4);
   ASSERT(strlen("t") == 1);
   ASSERT(strlen("") == 0);
+#endif
 }
 
 #ifdef TEST_LARGE

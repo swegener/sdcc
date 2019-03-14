@@ -77,7 +77,7 @@ static int prtfld(FILE * op, size_t maxlen, size_t ct, unsigned char *buf, int l
 	return 0;
 }
 
-#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL))
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) && !defined (__SDCC_pdk14)
 int _vfnprintf(FILE * op, size_t maxlen, const char *fmt, va_list ap)
 {
 	register int i, ljustf, lval, preci, dpoint, width, radix, cnt = 0;

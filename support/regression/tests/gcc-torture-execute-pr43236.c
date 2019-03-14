@@ -13,6 +13,7 @@
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   char A[30], B[30], C[30];
   int i;
 
@@ -35,6 +36,7 @@ testTortureExecute (void)
 
   /* compare results */
   if (memcmp(A, C, 30) || memcmp(B, C, 30)) ASSERT(0);
+#endif
 
   return;
 }

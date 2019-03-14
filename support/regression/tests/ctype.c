@@ -50,6 +50,7 @@ void testCtype (void)
   ASSERT (isxdigit ('F'));
   ASSERT (!isxdigit ('Z'));
 
+#ifndef __SDCC_pdk14 // Lack of memory
   c = 'A';
   d = '0';
 
@@ -59,5 +60,6 @@ void testCtype (void)
 
   ASSERT (tolower (EOF) == EOF);
   ASSERT (toupper (EOF) == EOF);
+#endif
 }
 

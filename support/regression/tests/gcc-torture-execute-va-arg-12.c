@@ -30,6 +30,8 @@ void f (L p0, L p1, L p2, L p3, L p4, L p5, L p6, L p7, L p8, ...)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   f (1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 0.);
   return;
+#endif
 }

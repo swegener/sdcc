@@ -48,6 +48,7 @@ testOffsetOf(void)
   int z;
 
   check (struct st, first);
+#ifndef __SDCC_pdk14 // Lack of memory
   check (struct st, b);
   check (struct st, a);
   check (struct st, a[9]);
@@ -69,6 +70,7 @@ testOffsetOf(void)
   check (struct st, abla_arr[1].ax);
   check (struct st, abla_arr[1].ax.fil);
   check (struct st, abla_arr[1].ax.fil[1]);
+#endif
 
   z = 7; check (struct st, a[z*3+1]);
   z = 3; check (struct st, arr[z].x);

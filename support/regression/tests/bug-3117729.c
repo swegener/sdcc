@@ -22,6 +22,7 @@ UCHAR mod_16x8(USHORT s16, UCHAR i8)
 	return (0);
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 __xdata UCHAR state[256];
 UCHAR x, y;
 
@@ -50,6 +51,7 @@ void RC4Init(PCHAR pKey, UCHAR iKeyLen)
 	x = 0;
 	y = 0;
 }
+#endif
 
 void
 testBug(void)

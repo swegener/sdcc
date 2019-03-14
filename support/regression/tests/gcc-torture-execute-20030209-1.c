@@ -9,14 +9,14 @@
 #pragma disable_warning 93
 #endif
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
 double x[10][10]; /* Was [100][100] originally, while the 9 below was 99, but that was too big for sdcc targets. */
 #endif
 
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
   int i;
 
   i = 9;

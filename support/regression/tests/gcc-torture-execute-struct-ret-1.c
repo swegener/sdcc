@@ -7,6 +7,7 @@ struct-ret-1.c from the execute part of the gcc torture tests.
 #include <stdio.h>
 #include <string.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 char out[100];
 #if 0 // TODO: Eable when SDCC can pass and return struct!
 typedef struct { double d; int i[3]; } B;
@@ -47,6 +48,8 @@ X f (B a, char b, double c, B d)
 
 X (*fp) (B, char, double, B) = &f;
 #endif
+#endif
+
 void
 testTortureExecute (void)
 {

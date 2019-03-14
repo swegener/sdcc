@@ -7,9 +7,9 @@
 
 #define ARRAY_SIZE  130
 
-#ifdef __SDCC_pic16
-/* not enough pic16 data space, so put the array into the code memory */
-__code static unsigned int
+#if defined(__SDCC_pic16) || defined(__SDCC_pdk14)
+/* not enough pic16 / pdk14 data space, so put the array into the code memory */
+const static unsigned int
 testArray[ARRAY_SIZE] = {
     0,   1,   2,   3,   4,   5,   6,   7,   8,   9,
    10,  11,  12,  13,  14,  15,  16,  17,  18,  19,
@@ -43,7 +43,7 @@ fetch (void)
 static void
 testUnsignedCharIndex (void)
 {
-#ifndef __SDCC_pic16
+#if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14)
   int i;
   for (i = 0; i < 130; i++) {
     testArray[i] = i;

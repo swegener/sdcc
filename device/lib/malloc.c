@@ -30,12 +30,14 @@
 #include <stddef.h>
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
-#define XDATA __xdata
+#define HEAPSPACE __xdata
+#elif defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+#define HEAPSPACE __near
 #else
-#define XDATA
+#define HEAPSPACE
 #endif
 
-typedef struct header XDATA header_t;
+typedef struct header HEAPSPACE header_t;
 
 struct header
 {
@@ -43,7 +45,7 @@ struct header
 	header_t *next_free; // Next free block. Used in free blocks only. Overlaps with user data in non-free blocks. Linked list of free blocks, 0-terminated.
 };
 
-header_t *XDATA __sdcc_heap_free; // First free block, 0 if no free blocks.
+header_t *HEAPSPACE __sdcc_heap_free; // First free block, 0 if no free blocks.
 
 extern header_t __sdcc_heap;
 #define HEAP_START &__sdcc_heap
@@ -51,7 +53,7 @@ extern header_t __sdcc_heap;
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_hc08) || defined(__SDCC_s08)
 
 extern const unsigned int __sdcc_heap_size;
-#define HEAP_END (struct header XDATA *)((char XDATA *)&__sdcc_heap + (__sdcc_heap_size - 1)) // -1 To be sure that HEAP_END is bigger than HEAP_START.
+#define HEAP_END (struct header HEAPSPACE *)((char HEAPSPACE *)&__sdcc_heap + (__sdcc_heap_size - 1)) // -1 To be sure that HEAP_END is bigger than HEAP_START.
 
 #else
 
@@ -67,10 +69,14 @@ void __sdcc_heap_init(void)
 	__sdcc_heap_free->next_free = 0;
 }
 
-void XDATA *malloc(size_t size)
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
+void HEAPSPACE *malloc(size_t size)
+#else
+void *malloc(size_t size)
+#endif
 {
 	header_t *h;
-	header_t *XDATA *f;
+	header_t *HEAPSPACE *f;
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_hc08) || defined(__SDCC_s08)
 	if(!__sdcc_heap_free)
@@ -85,12 +91,12 @@ void XDATA *malloc(size_t size)
 
 	for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h; f = &(h->next_free), h = h->next_free)
 	{
-		size_t blocksize = (char XDATA *)(h->next) - (char XDATA *)h;
+		size_t blocksize = (char HEAPSPACE *)(h->next) - (char HEAPSPACE *)h;
 		if(blocksize >= size) // Found free block of sufficient size.
 		{
 			if(blocksize >= size + sizeof(struct header)) // It is worth creating a new free block
 			{
-				header_t *const newheader = (header_t *const)((char XDATA*)h + size);
+				header_t *const newheader = (header_t *const)((char HEAPSPACE *)h + size);
 				newheader->next = h->next;
 				newheader->next_free = h->next_free;
 				*f = newheader;

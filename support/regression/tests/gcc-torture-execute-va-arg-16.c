@@ -10,6 +10,7 @@ va-arg-16.c from the execute part of the gcc torture tests.
 
 #include <stdarg.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 typedef double TYPE;
 
 void vafunction (TYPE dummy1, TYPE dummy2, ...)
@@ -41,11 +42,13 @@ void vafunction (TYPE dummy1, TYPE dummy2, ...)
     ASSERT(0);
   va_end(ap);
 }
-
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   vafunction( 888., 999., 1., 2., 3., 4., 5., 6., 7., 8., 9. );
   return;
+#endif
 }

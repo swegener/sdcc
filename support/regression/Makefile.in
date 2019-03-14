@@ -206,6 +206,11 @@ test-ez80-z80:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ez80-z80
 
+# Helper rule for testing the pdk14 port only(use uCsim simulator)
+test-pdk14:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=pdk14
+
 ### Helper rule for testing the host cc only
 test-host:
 	$(MAKE) test-common

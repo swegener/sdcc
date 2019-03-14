@@ -8,6 +8,7 @@
 #define SZ_SIZE 90
 #endif
 
+#ifndef __SDCC_pdk14 // Lack of memory
 typedef struct _Foo
 {
   char sz[SZ_SIZE];
@@ -22,10 +23,12 @@ char *getOffset(Foo *pFoo, Bar *pBar)
 {
   return pFoo->sz + pBar->uLen;
 }
+#endif
 
 void
 testOffset(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   Foo foo = {
     "Foo"
   };
@@ -35,4 +38,5 @@ testOffset(void)
 
   ASSERT(getOffset(&foo, &bar) 
 	 == (((char *)&foo) + 3));
+#endif
 }

@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+#ifndef __SDCC_pdk14 // Bug #2874
 static inline unsigned int
 mod_rhs(int rhs)
 {
@@ -22,11 +23,14 @@ void func_44 (unsigned int p_45)
       ASSERT (0);
   }
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Bug #2874
   func_44 (2);
   return;
+#endif
 }
 

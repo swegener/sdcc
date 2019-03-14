@@ -33,6 +33,7 @@ uint16_t assemble(uint8_t i, uint8_t j)
 	return(j | ((uint16_t)i << 8));
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 // Sequence of function calls with stack parameters close to stack end.
 void callsequencestack(uint16_t i, uint16_t j, uint8_t k)
 {
@@ -72,6 +73,7 @@ void callsequencelit(void)
 	callsequencestack(assemble(0x55,0xaa), assemble(0xaa,0x55), 0x5a);
 	callsequencestack3(0, 0x55, 0xaa, 0x5a, 0);
 }
+#endif
 
 struct flags
 {
@@ -111,7 +113,9 @@ void pointerbit(void)
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
 	callsequencelit();
+#endif
 	pointerbit();
 }
 

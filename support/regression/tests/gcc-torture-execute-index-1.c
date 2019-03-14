@@ -4,6 +4,7 @@ index-1.c from the execute part of the gcc torture tests.
 
 #include <testfwk.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 int a[] =
 {
   0,  1,  2,  3,  4,  5,  6,  7,  8,  9,
@@ -17,11 +18,14 @@ f (long n)
 {
   return a[n - 100000];
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   if (f (100030L) != 30)
     ASSERT(0);
   return;
+#endif
 }

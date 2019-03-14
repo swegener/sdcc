@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #605.
+
 /* force alignment on sparc machines with gcc compiler */
 #if defined(PORT_HOST) && defined(__sparc) && defined(__GNUC__)
 # define LONG_ALIGNED __attribute__ ((aligned (4)))
@@ -62,10 +64,13 @@ SocketHandle Accept(SocketHandle handle, PIP_V4 ip, PPort port)
 
   return RetCode;
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory.
   IP_V4 ip = {{1, 2, 3, 4}};
   Port port = {{5, 6}};
   ASSERT(Accept(1, &ip, &port) == 0x1234);
+#endif
 }

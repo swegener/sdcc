@@ -23,6 +23,7 @@ struct s static s1 = { .b = 3, .d = {2} };
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   struct s s2 = { .b = 3, .d = {2} };
   static struct s s3 = { .b = 3, .d = {2} };
 
@@ -32,5 +33,6 @@ testTortureExecute (void)
   ASSERT (s3.a == 0 && s3.b == 3 && s3.c == 0 && s3.d[0] == 2 && s3.d[1] == 0 && s3.d[2] == 0 && s3.e == 0);
  
   return;
+#endif
 }
 

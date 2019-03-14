@@ -18,6 +18,7 @@ const char string6[] = "-0x23test";
 void
 testStrto(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   char *e;
 
   ASSERT(strtoul("", 0, 10) == 0);
@@ -77,5 +78,6 @@ testStrto(void)
   ASSERT(strtol(string6, &e, 0) == -0x23);
   ASSERT(errno != ERANGE);
   ASSERT(e == string6 + 5);
+#endif
 }
 

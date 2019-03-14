@@ -17,19 +17,23 @@ struct s1 { double d; };
 struct s2 { double d; };
 union u { struct s1 x; struct s2 y; };
 
+#ifndef __SDCC_pdk14 // Lack of memory
 double f(struct s1 *a, struct s2 *b)
 {
   a->d = 1.0;
   return b->d + 1.0;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   union u a;
   a.x.d = 0.0;
   if (f (&a.x, &a.y) != 2.0)
     ASSERT (0);
   return;
+#endif
 }
 

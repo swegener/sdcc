@@ -415,6 +415,32 @@ main(int argc, char *argv[])
 
                         if ((iram_size) && (!packflag))
                                 iramcheck();
+
+                        if (TARGET_IS_PDK) {
+                                unsigned ram = 0;
+                                unsigned rom = 0;
+                                for (struct area *it = areap; it; it = it->a_ap) {
+                                        if (!strcmp(it->a_id, "DATA")) {
+                                                ram += it->a_size;
+                                        } else if (!strcmp(it->a_id, "CODE") || 
+                                                   !strcmp(it->a_id, "CONST")) {
+                                                rom += it->a_size;
+                                        }
+                                }
+
+                                if (ram > 128) {
+                                        fprintf(stderr,
+                                                "?ASlink-Warning-"
+                                                "RAM value %u too large "
+                                                "(128B max)\n", ram);
+                                }
+                                if (rom > 4096) {
+                                        fprintf(stderr,
+                                                "?ASlink-Warning-"
+                                                "ROM value %u too large "
+                                                "(2048W max)\n", rom / 2);
+                                }
+                        }
                         /* end sdld specific */
 
                         /*

@@ -39,7 +39,7 @@ const float a[] =
 
 void testBug (void)
 {
-#ifndef __SDCC_pic16
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pdk14) // Lack of memory
     volatile int right;
 
     right = -120;

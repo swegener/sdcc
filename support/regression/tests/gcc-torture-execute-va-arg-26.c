@@ -24,7 +24,9 @@ double f (float f1, float f2, float f3, float f4,
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   if (f (1, 2, 3, 4, 5, 6, 7.0) != 7.0)
     ASSERT (0);
   return;
+#endif
 }

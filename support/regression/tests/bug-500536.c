@@ -8,6 +8,7 @@ float z1(void)
   return 5;
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 float fun( void ) 
 { 
   unsigned long i; 
@@ -17,12 +18,14 @@ float fun( void )
   if (i & 1) 
     f += 1.0; 
   return f; 
-} 
+}
+#endif
 
 /* Tests to check basic conversion */
 void
 testfs2long(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   volatile float f;
   volatile unsigned long ul;
   volatile long l;
@@ -49,4 +52,5 @@ testfs2long(void)
   ul = 9995;
   f = ul;
   ASSERT(f == 9995.0);
+#endif
 }

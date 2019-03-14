@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #609
 struct a;
 
 extern int baz (struct a *restrict x);
@@ -39,11 +40,14 @@ void foo(void)
   x.d = x.c;
   bar(0, &x, ((void *)0));
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #609
   foo();
   return;
+#endif
 }
 

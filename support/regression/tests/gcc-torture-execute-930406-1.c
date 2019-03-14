@@ -12,7 +12,7 @@
 void f()
 {
   int x = 1;
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   char big[2048];
 #else
   char big[2];

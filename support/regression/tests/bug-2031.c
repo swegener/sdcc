@@ -10,9 +10,9 @@ struct bugtest {
   unsigned long l;
 };
 
-#ifdef __SDCC
 unsigned long gv;
 unsigned long *gp = &gv;
+#ifdef __SDCC
 unsigned int gi = (unsigned int) &gv;
 unsigned long gl = (unsigned long) &gv;
 unsigned char gc = (unsigned char) &gv;
@@ -32,7 +32,9 @@ void testBug(void)
   unsigned char lc = (unsigned char) &lv;
   unsigned int li = (unsigned int) &lv;
   unsigned long ll = (unsigned long) &lv;
+#ifndef __SDCC_pdk14 // Not enough RAM
   struct bugtest ls = {(unsigned int) &lv, (unsigned char) &lv, (unsigned long) &lv};
+#endif
 
   ASSERT (gc == (unsigned char) gp);
   ASSERT (gi == (unsigned int) gp);
@@ -46,8 +48,10 @@ void testBug(void)
   ASSERT (li == (unsigned int) lp);
   ASSERT (ll == (unsigned long) lp);  
 
+#ifndef __SDCC_pdk14 // Not enough RAM
   ASSERT (ls.i == (unsigned int) lp);
   ASSERT (ls.c == (unsigned char) lp);
   ASSERT (ls.l == (unsigned long) lp);
+#endif
 #endif // __SDCC
 }

@@ -12,7 +12,11 @@ struct position
 	uint_fast8_t flags;
 };
 
+#ifdef __SDCC_pdk14 // Lack of RAM
+#define MAX_VEHICLES 2
+#else
 #define MAX_VEHICLES 9
+#endif
 
 struct vehicle
 {

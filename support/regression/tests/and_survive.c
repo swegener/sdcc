@@ -121,7 +121,9 @@ void testAndSurvive (void)
 
   ASSERT (regchar (0x77u - 1, 0x00u - 1) == 0);
   ASSERT (regchar (0x88u - 1, 0x08u - 1) == 1);
+#ifndef __SDCC_pdk14 // Those tests would pass, we just don't have enough space in code memory to fit them in together with the others.
   ASSERT (regchar (0x80u - 1, 0x88u - 1) == 1);
   ASSERT (regchar (0x80u - 1, 0x08u - 1) == 3);
+#endif
 }
 

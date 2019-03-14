@@ -11,6 +11,7 @@
 
 /* A reminder to process ops in generate_expr_as_of_bb exactly once.  */
 
+#ifndef __SDCC_pdk14 // Lack of memory
 long
 foo (long ct, long cf, _Bool p1, _Bool p2, _Bool p3)
 {
@@ -36,12 +37,15 @@ foo (long ct, long cf, _Bool p1, _Bool p2, _Bool p3)
 
   ASSERT (0);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   if (foo(2, 3, 1, 1, 1) == 0)
     ASSERT (0);
   return;
+#endif
 }
 

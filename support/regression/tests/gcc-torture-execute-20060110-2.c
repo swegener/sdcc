@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
 long long 
 f (long long a, long long b) 
 { 
@@ -23,7 +23,9 @@ long long c = ((0x1234567876543210LL + 0x2345678765432101LL) << 32) >> 32;
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
   ASSERT (f (a, b) == c);
   return;
+#endif
 }
 

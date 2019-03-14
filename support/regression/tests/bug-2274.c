@@ -28,11 +28,13 @@ int func_3 (char i)
 
 void uninitialized (void) __reentrant
 {
+#ifndef __SDCC_pdk14
   /* SDCC should not crash, but only print warning messages. */
   char a = func_0 (a);
   char b = func_1 (b);
   int c = func_2 (c);
   int d = func_3 (d);
+#endif
 }
 
 void testBug (void)

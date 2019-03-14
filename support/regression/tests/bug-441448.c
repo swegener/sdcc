@@ -6,8 +6,12 @@
 #define DATA
 
 typedef struct 
-{ 
+{
+#ifdef __SDCC_pdk14 // Lack of memory
+    unsigned char buffer[0x08];
+#else
     unsigned char buffer[0x18];
+#endif
     unsigned char OutPtr, InPtr; 
     unsigned char Count; 
 } Fifo; 

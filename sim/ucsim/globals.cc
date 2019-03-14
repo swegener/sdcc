@@ -549,4 +549,11 @@ struct cpu_entry cpus_stm8[]=
     {NULL, CPU_NONE, 0, "", ""}
   };
 
+struct cpu_entry cpus_pdk[]=
+  {
+    {"PDK14"   , CPU_PDK14, 0			, ""		, ""},
+    
+    {NULL, CPU_NONE, 0, "", ""}
+  };
+
 /* End of globals.cc */

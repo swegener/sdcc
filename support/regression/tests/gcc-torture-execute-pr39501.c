@@ -22,6 +22,7 @@
     return n(a, b);						\
   }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 F(float,min1)
 F(float,min2)
 F(float,max1)
@@ -31,24 +32,26 @@ F(double,min1)
 F(double,min2)
 F(double,max1)
 F(double,max2)
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   if (float_min1(0.f, -1.f) != -1.f) ASSERT (0);
   if (float_min1(-1.f, 0.f) != -1.f) ASSERT (0);
   if (float_min1(0.f, 1.f)  != 0.f)  ASSERT (0);
   if (float_min1(1.f, 0.f)  != 0.f)  ASSERT (0);
   if (float_min1(-1.f, 1.f) != -1.f) ASSERT (0);
   if (float_min1(1.f, -1.f) != -1.f) ASSERT (0);
-  
+
   if (float_max1(0.f, -1.f) != 0.f)  ASSERT (0);
   if (float_max1(-1.f, 0.f) != 0.f)  ASSERT (0);
   if (float_max1(0.f, 1.f)  != 1.f)  ASSERT (0);
   if (float_max1(1.f, 0.f)  != 1.f)  ASSERT (0);
   if (float_max1(-1.f, 1.f) != 1.f)  ASSERT (0);
   if (float_max1(1.f, -1.f) != 1.f)  ASSERT (0);
-  
+
   if (float_min2(0.f, -1.f) != -1.f) ASSERT (0);
   if (float_min2(-1.f, 0.f) != -1.f) ASSERT (0);
   if (float_min2(0.f, 1.f)  != 0.f)  ASSERT (0);
@@ -90,7 +93,7 @@ testTortureExecute (void)
   if (double_max2(1., 0.)  != 1.)  ASSERT (0);
   if (double_max2(-1., 1.) != 1.)  ASSERT (0);
   if (double_max2(1., -1.) != 1.)  ASSERT (0);
-  
+#endif
   return;
 }
 

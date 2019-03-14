@@ -70,9 +70,11 @@ int abfd;
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #612
   link_info.hash = &hash;
   if (elf64_ia64_check_relocs (&abfd, &link_info) != &abfd)
     ASSERT (0);
   return;
+#endif
 }
 

@@ -18,11 +18,14 @@ int dst[10];
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
    if (foo (dst, src, 10) != 0)
      ASSERT (0);
    return;
+#endif
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 int foo (void *a, void *b, unsigned int c)
 {
   if (c == 0)
@@ -31,4 +34,4 @@ int foo (void *a, void *b, unsigned int c)
   memcpy (a, b, c);
   return 0;
 }
-
+#endif

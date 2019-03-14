@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
 /* PR 6534 */
 /* GCSE unified the two i<0 tests, but if-conversion to ui=abs(i) 
    insertted the code at the wrong place corrupting the i<0 test.  */
@@ -33,7 +33,7 @@ inttostr (long i, char buf[128])
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
   char buf[128], *p;
 
   p = inttostr (-1, buf);

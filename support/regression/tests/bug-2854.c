@@ -13,6 +13,8 @@
 #pragma disable_warning 88
 #pragma disable_warning 127
 
+#ifndef __SDCC_pdk14 // Lack of memory
+
 void lock_give_fastcall(uint8_t * mutex)
 #ifdef __SDCC_z80
 __preserves_regs(b,c,d,e,iyh,iyl) __z88dk_fastcall
@@ -81,10 +83,12 @@ int8_t ya_loadb(char **args)
     }
     return 1;
 }
+#endif
 
 void
 testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   const char *args[] = {"", "", "23", 0};
   char b;
   buffer = &b;
@@ -92,5 +96,6 @@ testBug(void)
   ya_mvb(args);
 
   ya_loadb(args);
+#endif
 }
 

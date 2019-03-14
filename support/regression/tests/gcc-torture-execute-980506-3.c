@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
 #include <string.h>
 
 unsigned char lookup_table [257];
@@ -28,7 +28,7 @@ build_lookup (unsigned char * pattern)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
   if (build_lookup ("bind") != 4)
     ASSERT (0);
   else

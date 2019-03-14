@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 
+#ifndef __SDCC_pdk14
 int debug (void) { return 1; }
 int errors;
 
@@ -31,12 +32,12 @@ compare (const void *x, const void *y)
 
 int bad_compare (int x) { return -x; }
 struct s array[2] = { { 1, bad_compare }, { -1, bad_compare } };
+#endif
 
 void
 testTortureExecute (void)
 {
-#if 0
-TODO: Enable when sdcc supports qsort.
+#ifndef __SDCC_pdk14
   qsort (array, 2, sizeof (struct s), compare);
   ASSERT (!(errors == 0));
 #endif

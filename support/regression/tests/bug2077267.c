@@ -7,6 +7,9 @@
 #ifndef __SDCC
 #define __critical
 #endif
+#ifdef __SDCC_pdk14
+#define __critical // __critical not implemented for pdk14
+#endif
 
 void bug(char* x)
 {

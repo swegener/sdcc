@@ -19,6 +19,7 @@ movegt(int x, int y, long long a)
   return ret;
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 struct test
 {
   long long val;
@@ -30,10 +31,12 @@ struct test
   { 0x0000000000000000LL, -1 },
   { 0x8000000000000000LL, 1 },
 };
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   int i;
   for (i = 0; i < sizeof (tests) / sizeof (tests[0]); i++)
     {
@@ -41,4 +44,5 @@ testTortureExecute (void)
 	ASSERT (0);
     }
   return;
+#endif
 }

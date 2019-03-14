@@ -15,6 +15,8 @@
 
 long x, y;
 
+#ifndef __SDCC_pdk14 // Bug #2874
+
 #define INLINED_{inlined}
 
 #ifdef INLINED_yes
@@ -128,11 +130,12 @@ f4 (int i, ...)
   f1i (ap);
   va_end (ap);
 }
-
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Bug #2874
 #if defined(__SDCC_pic16)
   //broken, skip
 #elif defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO) && !defined(__SDCC_USE_XSTACK) && defined(INLINED_yes)
@@ -156,6 +159,7 @@ testTortureExecute (void)
 // Failed on z80 and related
   ASSERT (x == 144L);
   ASSERT (y == 28L);
+#endif
 #endif
   return;
 }

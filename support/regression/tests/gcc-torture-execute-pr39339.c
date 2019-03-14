@@ -49,6 +49,7 @@ struct E
   struct C defaults;
 };
 
+#ifndef __SDCC_pdk14 // Lack of memory
 void foo (struct E *screen, unsigned int c, int columns, struct B *row)
 {
   struct D attr;
@@ -68,10 +69,12 @@ void foo (struct E *screen, unsigned int c, int columns, struct B *row)
       col++;
     }
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   struct E e = {.row = 5,.col = 0,.defaults =
       {6, {-1, -1, -1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}} };
   struct C c[4];
@@ -88,6 +91,7 @@ testTortureExecute (void)
   if (memcmp (&d, &c[1].attr, sizeof d))
     ASSERT (0);
   return;
+#endif
 }
 
 

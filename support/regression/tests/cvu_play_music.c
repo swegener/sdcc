@@ -64,6 +64,7 @@ void cvu_init_music(struct cvu_music *music)
 	music->notes = &CVU_EMPTY_MUSIC;
 }
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 bool cvu_play_music(struct cvu_music *restrict music)
 {
 	if(music->note_ticks_remaining >= music->sixteenth_notes_per_second)
@@ -140,11 +141,14 @@ bool cvu_play_music(struct cvu_music *restrict music)
 	}
 	return(true);
 }
+#endif
 
 void testBug(void)
 {
 	struct cvu_music music;
 	cvu_init_music(&music);
+#if !defined(__SDCC_pdk14) // Lack of memory
 	cvu_play_music(&music);
+#endif
 }
 

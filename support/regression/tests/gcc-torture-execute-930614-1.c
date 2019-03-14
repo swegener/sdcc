@@ -18,6 +18,7 @@ void f (double *ty)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   double foo[6];
   double tx = 0.0, ty, d;
 
@@ -29,5 +30,6 @@ testTortureExecute (void)
   if (ty != d)
     ASSERT (0);
   return;
+#endif
 }
 

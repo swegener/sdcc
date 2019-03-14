@@ -8,6 +8,7 @@
 
 #include <stdarg.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 long x, y;
 
 void
@@ -115,12 +116,12 @@ f4 (int i, ...)
   f1i (ap);
   va_end (ap);
 }
-
+#endif
 
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pic16
+#if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14)
   f1 (3, 16.0, 128L, 32.0);
   ASSERT (x == 176L);
   f2 (6, 5, 7L, 18.0, 19.0, 17L, 64.0);

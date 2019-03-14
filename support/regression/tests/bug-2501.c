@@ -25,14 +25,18 @@ union u64_s
    struct long_s b;
 };
 
+#ifndef __SDCC_pdk14 // Lack of memory
 char buff[10];
 
 union u64_s z = {0xaa55};
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
    z.a = x_llabs(z.a);
    x_lltoa(z.a, buff, 10);
+#endif
 }
 
 l_t x_llabs(l_t i)

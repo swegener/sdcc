@@ -10,7 +10,7 @@
 
 /* PR tree-optimization/36008 */
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
 int g[48][3][3];
 
 void
@@ -36,7 +36,7 @@ foo (int x[][3][3])
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
   foo (g);
   return;
 #endif

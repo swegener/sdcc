@@ -34,7 +34,10 @@ void f(struct S *s)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   struct S s;
   f (&s);
   return;
+#endif
+
 }

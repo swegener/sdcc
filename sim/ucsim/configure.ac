@@ -130,6 +130,12 @@ if test $enable_stm8_port != "no"; then
     enable_stm8_port="yes"
 fi,
 enable_stm8_port="yes")
+AC_ARG_ENABLE(pdk-port,
+[  --disable-pdk-port      do not compile simulator for pdk],
+if test $enable_pdk_port != "no"; then
+    enable_pdk_port="yes"
+fi,
+enable_pdk_port="yes")
 AC_ARG_ENABLE(st7-port,
 [  --enable-st7-port       compile simulator for st7],
 if test $enable_st7_port  != "no"; then
@@ -158,6 +164,7 @@ AC_SUBST(enable_s08_port)
 AC_SUBST(enable_xa_port)
 AC_SUBST(enable_stm8_port)
 AC_SUBST(enable_st7_port)
+AC_SUBST(enable_pdk_port)
 AC_SUBST(enable_serio)
 
 AC_ARG_ENABLE(statistic,
@@ -664,6 +671,7 @@ tlcs.src/Makefile
 hc08.src/Makefile
 xa.src/Makefile
 stm8.src/Makefile
+pdk.src/Makefile
 st7.src/Makefile
 gui.src/Makefile
 gui.src/serio.src/Makefile

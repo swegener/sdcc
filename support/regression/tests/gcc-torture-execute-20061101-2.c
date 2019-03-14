@@ -19,6 +19,7 @@ int tar (long i)
   return -1;
 }
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 void bug(int q, long bcount)
 {
   int j = 0;
@@ -32,9 +33,12 @@ void bug(int q, long bcount)
       j = tar (outgo*bcount);
     }
 }
+#endif
 
 void testTortureExecute(void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   bug(5, 36863);
   return;
+#endif
 }

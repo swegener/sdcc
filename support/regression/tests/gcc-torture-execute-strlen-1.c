@@ -14,6 +14,7 @@ strlen-1.c from the execute part of the gcc torture tests.
 #include <string.h>
 #include <stddef.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 #ifndef MAX_OFFSET
 #define MAX_OFFSET (sizeof (long long))
 #endif
@@ -35,10 +36,12 @@ static union {
   long double align_fp;
 #endif
 } u;
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   size_t off, len, len2, i;
   char *p;
 
@@ -63,4 +66,5 @@ testTortureExecute (void)
       }
 
   return;
+#endif
 }

@@ -44,7 +44,7 @@ int test7(int x)
 {
   return x/-10  <= 2;
 }
-
+#ifndef __SDCC_pdk14 // Lack of memory
 int test8(int x)
 {
   return x/-10 <= 0;
@@ -69,7 +69,7 @@ int test12(int x)
 {
   return x/-10 >= 0;
 }
-
+#endif
 void
 testTortureExecute (void)
 {
@@ -147,7 +147,7 @@ testTortureExecute (void)
     ASSERT (0);
   if (test7(-19) != 1)
     ASSERT (0);
-
+#ifndef __SDCC_pdk14 // Lack of memory
   if (test8(0) != 1)
     ASSERT (0);
   if (test8(9) != 1)
@@ -204,7 +204,7 @@ testTortureExecute (void)
     ASSERT (0);
   if (test12(-10) != 1)
     ASSERT (0);
-
+#endif
   return;
 }
 

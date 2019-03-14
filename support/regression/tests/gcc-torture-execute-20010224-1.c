@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 int16_t logadd (int16_t *a, int16_t *b);
 void ba_compute_psd (int16_t start);
 
@@ -34,6 +35,7 @@ void ba_compute_psd (int16_t start)
     j++; 
   } 
 }
+#endif
 
 int16_t logadd (int16_t *a, int16_t *b)
 {
@@ -43,11 +45,13 @@ int16_t logadd (int16_t *a, int16_t *b)
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   int i;
 
   ba_compute_psd (0);
 
   if (bndpsd[1] != 140) ASSERT (0);
   return;
+#endif
 }
 

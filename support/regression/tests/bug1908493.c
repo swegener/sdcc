@@ -7,6 +7,8 @@
 
 #include <testfwk.h>
 
+#ifndef __SDCC_pdk14
+
 #define Q_REENTRANT __reentrant
 #define Q_ASSERT
 #define Q_SIG(me_) (((QFsm *)(me_))->evt.sig)
@@ -121,14 +123,17 @@ QHsm_dispatch (QHsm *me) Q_REENTRANT
         t = path[0];                            /* target of the transition */
     }
 }
+#endif
 
 void
 testBug (void)
 {
+#ifndef __SDCC_pdk14
     AO_derived.super.state = (QHsmState)state_2;
     AO_derived.super.evt.sig = 2;
 
     QHsm_dispatch ((QHsm *)&AO_derived);
 
     ASSERT (1);     /*if we don't get here the regression test will timeout */
+#endif
 }

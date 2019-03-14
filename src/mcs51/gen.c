@@ -38,8 +38,6 @@
 #include "gen.h"
 #include "dbuf_string.h"
 
-char *aopLiteral (value * val, int offset);
-char *aopLiteralLong (value * val, int offset, int size);
 char *aopLiteralGptr (const char *name, value * val);
 extern int allocInfo;
 

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdint.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 typedef uint32_t u32;
 
 u32 in_aton(const char* x)
@@ -50,13 +51,16 @@ u32 root_nfs_parse_addr(char *name)
 
  return addr;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   static char addr[] = "10.11.12.13:/hello";
   u32 result = root_nfs_parse_addr(addr);
   if (result != 0x0a0b0c0d) { ASSERT(0); }
   return;
+#endif
 }
 

@@ -10,6 +10,7 @@
 
 #pragma disable_warning 93 // Using float for double.
 
+#ifndef __SDCC_pdk14 // Lackof memory
 double a[3] = { 0.0, 1.0, 2.0 };
 
 void bar (int x, double *y)
@@ -17,10 +18,12 @@ void bar (int x, double *y)
   if (x || *y != 1.0)
     ASSERT (0);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lackof memory
   double c;
   int d;
   for (d = 0; d < 3; d++)
@@ -33,4 +36,5 @@ testTortureExecute (void)
 e:
   bar(0, &c);
   return;
+#endif
 }

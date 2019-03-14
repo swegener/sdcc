@@ -20,6 +20,7 @@ int test1u(unsigned int x)
   return x/10U == 2;
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 int test2(int x)
 {
   return x/10 == 0;
@@ -119,7 +120,7 @@ int test12(int x)
 {
   return x/10 >= 0;
 }
-
+#endif
 
 void
 testTortureExecute (void)
@@ -142,6 +143,7 @@ testTortureExecute (void)
   if (test1u(30) != 0)
     ASSERT (0);
 
+#ifndef __SDCC_pdk14 // Lack of memory
   if (test2(0) != 1)
     ASSERT (0);
   if (test2(9) != 1)
@@ -363,5 +365,6 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 }
 

@@ -4,6 +4,8 @@
 
 #include <testfwk.h>
 
+#pragma disable_warning 85
+
 long subchar(void *pa, void *pb)
 {
   return *((char *) pa) - *((char *) pb);
@@ -38,6 +40,7 @@ typedef long (*subfunc_t)(void *pa, void *pb);
 
 subfunc_t dosub(subfunc_t f)
 {
+#ifndef __SDCC_pdk14
   if (f == subchar)
     return subint;
   else if (f == subint)
@@ -48,13 +51,16 @@ subfunc_t dosub(subfunc_t f)
     return addlong;
   else
     return NULL;
+#endif
 }
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14
   ASSERT (dosub(subchar) == subint);
   ASSERT (dosub(subint) == sublong);
   ASSERT (dosub(sublong) == subchar);
   ASSERT (dosub(addlong) == NULL);
   ASSERT (dosub(NULL) == addlong);
+#endif
 }

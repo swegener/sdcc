@@ -12,6 +12,7 @@
 
 #include <stdarg.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 int fails = 0;
 struct S { float a[3]; };
 struct S a[5];
@@ -49,6 +50,8 @@ check (int z, ...)
   va_end (ap);
 }
 #endif
+#endif
+
 void
 testTortureExecute (void)
 {

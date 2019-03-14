@@ -39,6 +39,7 @@ void bar(struct baz *p, unsigned int c, unsigned int d)
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   struct baz p;
   foo(&p, 71, 18);
   if (p.c != 71 || p.d != 18)
@@ -47,5 +48,6 @@ testTortureExecute (void)
   if (p.c != 59 || p.d != 26)
     ASSERT (0);
   return;
+#endif
 }
 

@@ -28,9 +28,8 @@
 #define SDCCGLUE_H 1
 
 void glue (void);
-/* drdani Jan 30 2000
-   This is needed in gen.c of z80 port */
-char *aopLiteral (value *, int);
+const char *aopLiteral (value *, int offset);
+const char *aopLiteralLong (value *val, int offset, int size);
 void flushStatics (void);
 int printIvalCharPtr (symbol *, sym_link *, value *, struct dbuf_s *);
 

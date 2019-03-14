@@ -12,7 +12,7 @@
 /* { dg-additional-options "-fno-common" { target hppa*-*-hpux* } } */
 
 #define SIZE 128
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Array too big for mcs51 small and medium model.
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Array too big to fit in memory.
 unsigned short _Alignas (/*16 - not supported in SDCC*/0) in[SIZE];
 #endif
 
@@ -27,7 +27,7 @@ test (unsigned short sum, unsigned short *in, int x)
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM)))
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   for (int i = 0; i < SIZE; i++)
     in[i] = i;
 

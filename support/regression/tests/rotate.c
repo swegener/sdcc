@@ -9,6 +9,8 @@
 #include <stdint.h>
 #endif
 
+#ifndef __SDCC_pdk14 // Lack of memory
+
 #define SIZE ({size})
 #define MSB ({msb})
 
@@ -69,10 +71,12 @@ TYPE rol25(TYPE s){ return (s<<25) | (s>>(SIZE-25)); }
 TYPE rol30(TYPE s){ return (s<<30) | (s>>(SIZE-30)); }
 TYPE rol31(TYPE s){ return (s<<31) | (s>>(SIZE-31)); }
 #endif
+#endif
 
 static void
 testRol(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     volatile TYPE t = TEST_VECT;
     TYPE u;
 
@@ -107,5 +111,6 @@ testRol(void)
 
     ASSERT( rol30(u) == (TYPE)((TEST_VECT<<30) | (TEST_VECT>>(SIZE-30))) );
     ASSERT( rol31(u) == (TYPE)((TEST_VECT<<31) | (TEST_VECT>>(SIZE-31))) );
+#endif
 #endif
 }

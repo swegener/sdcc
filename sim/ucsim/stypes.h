@@ -201,6 +201,8 @@ enum cpu_type {
   // technology
   CPU_CMOS	= 0x0001,
   CPU_HMOS	= 0x0002,
+
+  CPU_PDK14 = 0x0001,
 };
 
 

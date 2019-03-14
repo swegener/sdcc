@@ -7,6 +7,8 @@
  */
 #include <testfwk.h>
 
+#define TYPE3_{type3}
+
 static {type1}
 returnFirstArg({type1} arg1, {type2} arg2, {type3} arg3)
 {
@@ -34,6 +36,7 @@ returnThirdArg({type1} arg1, {type2} arg2, {type3} arg3)
 static void
 testArgs(void)
 {
+#if !(defined(__SDCC_pdk14) && defined(TYPE3_long)) // Not enough RAM
     ASSERT(returnFirstArg(123, 45, 67) == ({type1})123);
     ASSERT(returnFirstArg(-123, 45, 67) == ({type1})-123);
 
@@ -42,4 +45,6 @@ testArgs(void)
 
     ASSERT(returnThirdArg(-33, -34, -35) == ({type3})-35);
     ASSERT(returnThirdArg(-33, -34, 35) == ({type3})35);
+#endif
 }
+

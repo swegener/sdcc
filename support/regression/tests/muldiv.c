@@ -9,6 +9,7 @@
 void
 testUnsignedModDiv(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     {attr} {storage} unsigned {type} i;
     unsigned {type} result;
 
@@ -25,11 +26,13 @@ testUnsignedModDiv(void)
 
     result = i%34;
     ASSERT(result == 32);
+#endif
 }
 
 void
 testUnsignedMul(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     {attr} {storage} unsigned {type} i;
     unsigned {type} result;
 
@@ -41,11 +44,13 @@ testUnsignedMul(void)
 
     result = i*12;
     ASSERT(result == ((unsigned {type})444));
+#endif
 }
 
 void
 testMul(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     {attr} {storage} signed {type} i;
     signed {type} result;
 
@@ -63,6 +68,7 @@ testMul(void)
     LOG(("i*-3 == 30 = %d\n", (int)(i*-3)));
     ASSERT(i*-3 == 30);
 #endif
+#endif
 }
 
 void mark(void)
@@ -72,6 +78,7 @@ void mark(void)
 void
 testDiv(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     {attr} {storage} signed {type} i;
 
     i = 100;
@@ -88,11 +95,13 @@ testDiv(void)
     ASSERT(i/-12 == 4);
     //power of 2
     ASSERT(i/4 == -12);
+#endif
 }
 
 void 
 test16to32(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
    {attr} {storage} int i, j;
    {attr} {storage} unsigned int ui, uj;
 
@@ -121,11 +130,13 @@ test16to32(void)
    ui = 0xffff;
    uj = 0x8000;
    ASSERT((unsigned long)ui * (unsigned long)uj == 0xfffful * 0x8000ul);
+#endif
 }
 
 void
 testMod(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     {attr} {storage} signed {type} i;
 
     // Disabled the LOG functions due to a bug in sdcc involving
@@ -146,4 +157,5 @@ testMod(void)
     ASSERT(i%-5 == -4);
     //power of 2
     ASSERT(i%4 == -1);
+#endif
 }

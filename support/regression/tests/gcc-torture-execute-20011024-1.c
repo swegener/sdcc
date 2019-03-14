@@ -13,7 +13,11 @@
 
 #include <string.h>
 
+#if defined(__SDCC_pdk14)
+char buf[10];
+#else
 char buf[50];
+#endif
 
 static void foo (void)
 {

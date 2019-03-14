@@ -17,6 +17,7 @@ struct cvu_huffman_state
 	unsigned char current;	/* Currently processed node */
 };
 
+#ifndef __SDCC_pdk14 // Lack of memory
 const unsigned char HUFFMAN_ROOT = 124;
 const unsigned char HUFFMAN_LS = 125, HUFFMAN_BS = 127, HUFFMAN_RS = 253;
 const struct cvu_huffman_node huffman_tree[255] = {
@@ -291,7 +292,9 @@ unsigned char get_data2(void)
   static int i;
   return(data[i++]);
 }
+#endif
 
+#ifndef __SDCC_pdk14 // Lack of memory
 unsigned char huffman_recursive(struct cvu_huffman_state *state)
 {
 	unsigned char direction;
@@ -377,6 +380,7 @@ unsigned char huffman_iterative(struct cvu_huffman_state *state)
 	
 	return(ret);
 }
+#endif
 
 void init_huffman(struct cvu_huffman_state *state, unsigned char (*input)(void), const struct cvu_huffman_node *tree, unsigned char root, unsigned char ls, unsigned char bs, unsigned char rs)
 {
@@ -392,6 +396,7 @@ void init_huffman(struct cvu_huffman_state *state, unsigned char (*input)(void),
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   unsigned char i;
   struct cvu_huffman_state state;
 
@@ -404,5 +409,6 @@ void testBug(void)
 
   for(i = 0; i < 15; i++)
     ASSERT(huffman_iterative(&state) == udata[i]);
+#endif
 }
 

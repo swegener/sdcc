@@ -1760,3 +1760,120 @@ outr3bm(struct expr * esp, int r, a_uint v)
         }
         dot.s_addr += 3;
 }
+
+/*
+ * PDK: Output relocatable 11 bit goto/call
+ *
+ * This function is derived from outrw(), adding the parameter for the
+ * 11 bit address.  This form of address is used only on the pdk.
+ */
+/*)Function     VOID    outrwp(esp, op, mask, jump)
+ *
+ *              expr *      esp             pointer to expr structure
+ *              a_uint      op              opcode
+ *              a_uint      mask            address mask
+ *              int         jump            call/goto relocation data
+ *
+ *      The function outrwp() processes a word of generated code
+ *      in either absolute or relocatable format dependent upon
+ *      the data contained in the expr structure esp.  If the
+ *      .REL output is enabled then the appropriate information
+ *      is loaded into the txt and rel buffers.  The code is output
+ *      in a special format to the linker to allow relocation and
+ *      merging of the opcode.
+ *
+ *      This function based on code by
+ *              John L. Hartman
+ *              jhartman@compuserve.com
+ *
+ *      local variables:
+ *              int     n               symbol/area reference number
+ *              int     r               relocation information
+ *
+ *      global variables:
+ *              sym     dot             defined as sym[0]
+ *              int     oflag           -o, generate relocatable output flag
+ *              int     pass            assembler pass number
+ *              char *  relp            Pointer to R Line Values
+ *              char *  txtp            Pointer to T Line Values
+ *              
+ *      functions called:
+ *              VOID    outchk()        asout.c
+ *              VOID    out_lw()        asout.c
+ *              VOID    out_rw()        asout.c
+ *              VOID    out_txb()       asout.c
+ *
+ *      side effects:
+ *              The current assembly address is incremented by 2.
+ */
+VOID
+outrwp(struct expr *esp, a_uint op, a_uint mask, int jump)
+{
+        int n, r = R_J11;
+
+        if (pass == 2) {
+                if (esp->e_flag==0 && esp->e_base.e_ap==NULL) {
+                        /*
+                         * Absolute Destination
+                         *
+                         * Use the global symbol '.__.ABS.'
+                         * of value zero and force the assembler
+                         * to use this absolute constant as the
+                         * base value for the relocation.
+                         */
+                        esp->e_flag = 1;
+                        esp->e_base.e_sp = &sym[1];
+                }
+
+                /* We need to select either the MSB or LSB of the address.
+                 * Reset relocation marker so that the linker knows what to do
+                 * with it.
+                 */
+                if (esp->e_rlcf & R_BYTX) {
+                        r |= R_BYTE;
+                        /* We might select the MSB/LSB of an address in RAM. In
+                         * that case the linker should not convert the address
+                         * to words.
+                         */
+                        if (!esp->e_flag && !memcmp(esp->e_base.e_ap->a_id, "DATA", 4)) {
+                                r |= R_USGN;
+                        }
+                } else {
+                        r |= R_WORD;
+                }
+
+                /* Some (address) marker bits might have been shifted out of
+                 * range. Revert this and put them back where they belong.
+                 */
+                if (esp->e_addr & ~0xFFFF) {
+                        int marker = esp->e_addr & 0x18000;
+                        esp->e_addr &= ~0x18000;
+                        esp->e_addr |= marker >> 1;
+                }
+
+                /*
+                 * Relocatable Destination.  Build FOUR 
+                 * byte output: relocatable word, followed
+                 * by op-code.  Linker will combine them.
+                 */
+                r |= esp->e_rlcf;
+                n =  op | (esp->e_addr & mask);
+                out_lw(n,r|R_RELOC);
+                if (oflag) {
+                        outchk(4, 4);
+                        out_txb(2, esp->e_addr);
+                        out_txb(2, op);
+
+                        if (esp->e_flag) {
+                                n = esp->e_base.e_sp->s_ref;
+                                r |= R_SYM;
+                        } else {
+                                n = esp->e_base.e_ap->a_ref;
+                        }
+                        *relp++ = r;
+                        *relp++ = txtp - txt - 4;
+                        out_rw(n);
+                }
+        }
+        dot.s_addr += 2;
+}

@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 unsigned int foo (char *c, unsigned int x, unsigned int y)
 {
   register unsigned int z;
@@ -18,13 +19,16 @@ unsigned int foo (char *c, unsigned int x, unsigned int y)
   z = x + 1;
   return z / (y + 1);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   char c[16];
 
   if (foo (c, ~1U, 4) != (~0U / 5))
     ASSERT (0);
   return;
+#endif
 }

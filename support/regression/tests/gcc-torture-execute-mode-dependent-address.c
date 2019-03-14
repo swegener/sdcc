@@ -10,7 +10,7 @@ mode-dependent-address.c from the execute part of the gcc torture tests.
 #include <string.h>
 #include <stdlib.h>
 
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Lack of memory
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 void f883b (int8_t * result,
     int16_t * restrict arg1,
     uint32_t * restrict arg2,
@@ -36,7 +36,7 @@ uint8_t arg4[96];
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Lack of memory
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   int i;
   int correct[] = {0x0,0x1,0x2,0x3,0x0,0x1,0x2,0x3,0x8,0x9,0xa,0xb,0x8,0x9,
                    0xa,0xb,0x10,0x11,0x12,0x13,0x10,0x11,0x12,0x13,

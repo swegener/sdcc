@@ -55,12 +55,14 @@ void errx(int _beval, const char *_bfmt, ...)
 {
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 char *argv0;
 int all = 0;
 int wday;
 int advance;
 char CurLine[64];
 char *CurLinep;
+#endif
 
 enum {NONE, DAY, WEEK, MONTH} mflag;
 
@@ -116,7 +118,7 @@ void doall(void)
 
 int m(int argc, char *argv[])
 {
-#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) // Not enough memory
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Not enough memory
 #if !(defined (__SDCC_mcs51) && (defined (__SDCC_MODEL_LARGE) || defined (__SDCC_MODEL_HUGE))) // build failure
 	int arg = 1;
 	char *cp;

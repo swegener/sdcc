@@ -408,7 +408,13 @@ term(struct expr *esp)
                 return;
         }
         if (c == '>' || c == '<') {
+                if (is_sdas_target_pdk()) {
+                        waddrmode = 1;
+                }
                 expr(esp, 100);
+                if (is_sdas_target_pdk()) {
+                        waddrmode = 0;
+                }
                 if (is_abs (esp)) {
                         /*
                          * evaluate byte selection directly
@@ -493,6 +499,9 @@ term(struct expr *esp)
                         c = get();
                 }
                 unget(c);
+                if (is_sdas_target_pdk() && waddrmode) {
+                        n *= 2;
+                }
                 esp->e_addr = rngchk(n);
                 return;
         }

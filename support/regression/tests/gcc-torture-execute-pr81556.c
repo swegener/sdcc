@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 /* PR tree-optimization/81556 */
 unsigned long long int b = 0xb82ff73c5c020599ULL;
 unsigned long long int c = 0xd4e8188733a29d8eULL;
@@ -21,12 +22,15 @@ foo (void)
   g = f % ((d > 1) << 9);
   h = a & (e & (a & b & c));
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   foo ();
   if (g != 1 || h != 0)
     ASSERT (0);
   return;
+#endif
 }

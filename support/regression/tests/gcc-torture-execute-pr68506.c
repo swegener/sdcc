@@ -30,6 +30,7 @@ fn2 (unsigned char p1, int p2)
   return p2 >= 2 ? p1 : p1 >> p2;
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 static short
 fn3 ()
 {
@@ -62,10 +63,13 @@ fn3 ()
     }
   return x;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   fn3 ();
   return;
+#endif
 }

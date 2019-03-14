@@ -14,6 +14,7 @@
 
 /* { dg-require-effective-target int32plus } */
 
+#ifndef __SDCC_pdk14 // Lack of memory
 extern void abort (void);
 
 #define N 4
@@ -120,10 +121,12 @@ f12 (void)
     }
 }
 #endif
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   int i;
   for (i = 0; i < N; i++)
     {
@@ -169,5 +172,6 @@ testTortureExecute (void)
   for (i = 0; i < N; i++)
     if (c[i] != a[i] / 19 || d[i] != b[i] / 19)
       ASSERT (0);
+#endif
 #endif
 }

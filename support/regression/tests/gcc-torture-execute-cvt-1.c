@@ -8,6 +8,7 @@ cvt-1.c from the execute part of the gcc torture tests.
 #pragma disable_warning 93
 #endif
 
+#ifndef __SDCC_pdk14 // Bug #2874
 static inline long
 g1 (double x)
 {
@@ -27,6 +28,7 @@ f (long i)
     ASSERT (0);
   return g2 (i);
 }
+#endif
 
 void
 testTortureExecute (void)

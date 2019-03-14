@@ -30,7 +30,7 @@ void f (unsigned int *x)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   unsigned int x[256];
   int i;
 

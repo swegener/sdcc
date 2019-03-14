@@ -5,6 +5,7 @@
 #include <testfwk.h>
 #include <stddef.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #607.
 typedef struct dlnode_good {
   struct dlnode_good __xdata * nxt;
   struct dlnode_good __xdata * prv;
@@ -72,10 +73,12 @@ f7 (dlnode_bad __xdata * __xdata * obj)
 {
   return (*obj) ? (*obj)->nxt : 0;
 }
+#endif
 
 void
 testBug (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #607.
   ASSERT (f0(&gl) == &good);
   ASSERT (f1(&gl) == &good);
   ASSERT (f2(&gl) == &good);
@@ -85,4 +88,5 @@ testBug (void)
   ASSERT (f5(&bl) == &bad);
   ASSERT (f6(&bl) == &bad);
   ASSERT (f7(&bl) == &bad);
+#endif
 }

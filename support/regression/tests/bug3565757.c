@@ -22,6 +22,7 @@ struct edge_t
 	bool in_stix;
 };
 
+#ifndef __SDCC_pdk14 // Lack of memory
 struct edge_t edges[4];
 
 void init_edges(void)
@@ -58,12 +59,15 @@ void init_geometry(void)
 		set_edge(i, &edge_cache);
 	}
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
 	init_geometry();
 
 	ASSERT(edges[0].prev = 3);
 	ASSERT(edges[3].prev = 2);
+#endif
 }
 

@@ -10,6 +10,8 @@
 
 #include <string.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
+
 /* PR tree-optimization/19828 */
 
 const char *a[16] = { "a", "bc", "de", "fgh" };
@@ -28,11 +30,14 @@ foo (char *x, const char *y, size_t n)
     }
   return 0;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   if (foo ("abcde", (const char *) 0, 3) != 0)
     ASSERT (0);
   return;
+#endif
 }

@@ -31,14 +31,20 @@
 #include <stdint.h>
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
-#define XDATA __xdata
+#define HEAPSPACE __xdata
+#elif defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+#define HEAPSPACE __near
 #else
-#define XDATA
+#define HEAPSPACE
 #endif
 
-void XDATA *calloc (size_t nmemb, size_t size)
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
+void HEAPSPACE *calloc (size_t nmemb, size_t size)
+#else
+void *calloc (size_t nmemb, size_t size)
+#endif
 {
-	void XDATA *ptr;
+	void HEAPSPACE *ptr;
 
 	unsigned long msize = (unsigned long)nmemb * (unsigned long)size;
 

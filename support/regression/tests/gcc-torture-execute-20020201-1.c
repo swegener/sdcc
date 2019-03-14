@@ -19,6 +19,7 @@ unsigned long long Lx = 35;
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   unsigned char cy;
   unsigned short sy;
   unsigned int iy;
@@ -39,4 +40,5 @@ testTortureExecute (void)
 
   Ly = Lx / 6; ASSERT (Ly == 5);
   Ly = Lx % 6; ASSERT (Ly == 5);
+#endif
 }

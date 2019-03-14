@@ -129,7 +129,7 @@ static void btree_alloc_subtree(btree_t::vertex_descriptor v, int sPtr, int cssi
 
       if(port->stack.direction > 0)
         {
-          SPEC_STAK (sym->etype) = sym->stack = (sPtr + 1);
+          SPEC_STAK (sym->etype) = sym->stack = (sPtr + !TARGET_PDK_LIKE);
           sPtr += size;
         }
       else
@@ -157,9 +157,14 @@ void btree_alloc(void)
     return;
 
   btree_alloc_subtree(0, 0, 0, &ssize);
-  
+
   if(currFunc)
     {
+#ifdef BTREE_DEBUG
+      std::cout << "btree stack allocation used total of " << ssize << " bytes\n";
+#endif
+      if (TARGET_PDK_LIKE) // Stack pointer needs to be aligned to multiple of 2
+        if (ssize & 1) ssize++;
       currFunc->stack += ssize;
       SPEC_STAK (currFunc->etype) += ssize;
     }

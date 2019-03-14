@@ -10,6 +10,8 @@
 #pragma disable_warning 85
 #endif
 
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #607 for details.
+
 /* PR optimization/15296.  The delayed-branch scheduler caused code that
    SEGV:d for CRIS; a register was set to -1 in a delay-slot for the
    fall-through code, while that register held a pointer used in code at
@@ -74,10 +76,12 @@ l4:;
 }
 
 void g (void *a, char *b) { ASSERT(0); }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #607 for details.
 #ifndef __SDCC_pic16
   union u0 uv[] = {{ .i = 111 }, { .i = 222 }, { .i = 333 }, { .i = 444 }};
   struct s1 s = { 0, {{ .i = 555 }, { .i = 0 }, { .i = 999 }, { .i = 777 }}};
@@ -87,6 +91,7 @@ testTortureExecute (void)
       || uv[2].i != 0 || uv[3].i != 444)
     ASSERT (0);
   return;
+#endif
 #endif
 }
 

@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_pdk14) // Lack of memory
 long long
 signed_poly (long long sum, long x)
 {
@@ -27,6 +27,7 @@ unsigned_poly (unsigned long long sum, unsigned long x)
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   if (signed_poly (2LL, -3) != -4LL)
     ASSERT (0);
   
@@ -34,5 +35,6 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 }
 

@@ -2,6 +2,7 @@
  */
 #include <testfwk.h>
 
+#ifndef __SDCC_pdk14
 char func(char a)
 {
   return a-1;
@@ -15,10 +16,12 @@ static struct
 } s;
 
 static char (* __xdata func_ptr) (char);
+#endif
 
 void
 testFptr(void)
 {
+#ifndef __SDCC_pdk14
   char b = 10;
   a      = 10;
   s.c    = 10;
@@ -31,4 +34,6 @@ testFptr(void)
   
   // error passing s.c to func
   ASSERT(func_ptr(s.c) == 9);
+#endif
 }
+

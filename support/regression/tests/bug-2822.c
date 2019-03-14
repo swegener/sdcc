@@ -10,6 +10,7 @@
 #define __z88dk_fastcall
 #endif
 
+#ifndef __SDCC_pdk14 // Lack of memory
 struct wibble
 {
     int (*wobble)(uint8_t *x) __z88dk_fastcall __reentrant;
@@ -69,9 +70,11 @@ int f2(uint32_t x) __z88dk_fastcall __reentrant
     called2++;
     return(1);
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     wubble->wobble = &f;
     xp[1] = 0x5a;
     foo(1);
@@ -81,5 +84,6 @@ void testBug(void)
     xp2[1] = 0x1155aa88;
     foo2(1);
     ASSERT(called2 == 8);
+#endif
 }
 

@@ -35,6 +35,7 @@ test1ShiftClasses(void)
 void
 test2ShiftRight(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     {attr} {storage} signed {type} i, result;
 
     i = -120;
@@ -49,6 +50,7 @@ test2ShiftRight(void)
     result = i;
     result >>= 3;
     ASSERT(result == -15);
+#endif
 }
 
 void
@@ -70,6 +72,7 @@ test3ShiftByteMultiples(void)
 void
 test4ShiftOne(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     {attr} {storage} {sign} {type} i;
     {sign} {type} result;
 
@@ -88,8 +91,10 @@ test4ShiftOne(void)
     result = i;
     result <<= 1;
     ASSERT(result == ({type})(({type}){vals} << 1));
+#endif
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 static {type} ShiftLeftByParam ({type} count)
 {
     {attr} {storage} {type} i;
@@ -103,11 +108,14 @@ static {type} ShiftRightByParam ({type} count)
     i = ({type}){vals};
     return (i >> count);
 }
+#endif
 
 void
 testShiftByParam(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     ASSERT(ShiftLeftByParam(2)  == ({type})({vals} << 2));
     ASSERT(ShiftRightByParam(2) == ({type})({vals} >> 2));
+#endif
 }
 

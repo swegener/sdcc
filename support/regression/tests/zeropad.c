@@ -23,6 +23,8 @@
 #include <testfwk.h>
 #include <stddef.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
+
 #if defined (STORAGE_auto)
   void Zeropad(void)
   {
@@ -140,13 +142,16 @@ Zeropad (void)
   teststruct[4].b[9] = 1;
 #endif //STORAGE_auto
 }
+#endif
 
 void
 testZeropad (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   Zeropad ();
 
 #if defined (STORAGE_auto)
   Zeropad (); //test reinitialization
 #endif //STORAGE_auto
+#endif
 }

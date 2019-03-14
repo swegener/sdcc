@@ -11,6 +11,7 @@
 /* PR opt/7130 */
 #define TYPE long
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 void
 scale (TYPE *alpha, TYPE *x, int n)
 {
@@ -26,10 +27,12 @@ scale (TYPE *alpha, TYPE *x, int n)
 	x[ix + 1] = tmpi;
       }
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   int i;
   TYPE x[10];
   TYPE alpha = 2;
@@ -43,4 +46,5 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 }

@@ -5,6 +5,7 @@
 #include <testfwk.h>
 #include <stdint.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 struct c
 {
 	float r;
@@ -25,9 +26,11 @@ char cmplong(int32_t x, int32_t y)
 		return 1;
 	return 0;
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
 //	volatile char x = 0xBF;//800000; //-1.0
 //	volatile char y = 0x3F;//800000; //+1.0
 //	volatile char z = 0x43;//700000; //+240.0
@@ -41,4 +44,5 @@ void testBug(void)
 	ASSERT (cmplong(x, y));
 	ASSERT (x < z);
 	ASSERT (cmplong(x, z));
+#endif
 }

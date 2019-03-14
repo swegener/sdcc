@@ -34,6 +34,7 @@ unsigned short int bar2 (int x)
 
 volatile unsigned long l2 = (unsigned short int) -4;
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 static signed char foo3 (int x)
 {
   return x;
@@ -81,6 +82,7 @@ signed char bar6 (int x)
 }
 
 volatile unsigned long l6 = (signed char) -4;
+#endif
 
 void
 testTortureExecute (void)
@@ -89,6 +91,7 @@ testTortureExecute (void)
     ASSERT (0);
   if (bar2 (-10) != l2)
     ASSERT (0);
+#if !defined(__SDCC_pdk14) // Lack of memory
   if (bar3 (-10) != l3)
     ASSERT (0);
   if (bar4 (-10) != l4)
@@ -97,6 +100,7 @@ testTortureExecute (void)
     ASSERT (0);
   if (bar6 (-10) != l6)
     ASSERT (0);
+#endif
   return;
 }
 

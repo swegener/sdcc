@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#ifndef __SDCC_pdk14 // Bug #2874
 uint16_t x;
 
 static inline uint16_t llvm_srem_u16(int16_t a, int16_t b) {
@@ -22,11 +23,14 @@ void foo(void)
 {
   x=llvm_srem_u16(x,returnx());
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Bug #2874
   x = (unsigned)(-1);
   foo();
   ASSERT (x == (unsigned)(-23) % (unsigned)(-23));
+#endif
 }
 

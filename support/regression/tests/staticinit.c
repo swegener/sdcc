@@ -6,6 +6,7 @@
 
 #include <testfwk.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 /*--------------------------------------------------
    regression test for #1864582:
    multiple definition of char cons w. --model-large
@@ -16,20 +17,25 @@ const char *c = (const char *) "Booting";
 static {type} smallDense[] = {
   1, 2, 3, 4, 5, 6
 };
+#endif
 
 static void
 testSmallDense (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT (smallDense[0] == 1);
   ASSERT (smallDense[1] == 2);
   ASSERT (smallDense[2] == 3);
   ASSERT (smallDense[3] == 4);
   ASSERT (smallDense[4] == 5);
   ASSERT (smallDense[5] == 6);
+#endif
 }
 
 #ifdef __SDCC_mcs51
 __idata
+#elif __SDCC_pdk14
+const
 #endif
 static {type} smallSparse[] = {
   1, 1, 1, 1, 1, 1, 1, 1, 1
@@ -38,6 +44,7 @@ static {type} smallSparse[] = {
 static void
 testSmallSparse (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT (smallSparse[0] == 1);
   ASSERT (smallSparse[1] == 1);
   ASSERT (smallSparse[2] == 1);
@@ -47,10 +54,13 @@ testSmallSparse (void)
   ASSERT (smallSparse[6] == 1);
   ASSERT (smallSparse[7] == 1);
   ASSERT (smallSparse[8] == 1);
+#endif
 }
 
 #ifdef __SDCC_mcs51
 __idata
+#elif __SDCC_pdk14
+const
 #endif
 static {type} smallSparseZero[] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -63,6 +73,7 @@ static {type} smallSparseZeroTail[] = {
 static void
 testSmallSparseZero (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT (smallSparseZero[0] == 0);
   ASSERT (smallSparseZero[1] == 0);
   ASSERT (smallSparseZero[2] == 0);
@@ -74,12 +85,16 @@ testSmallSparseZero (void)
   ASSERT (smallSparseZero[8] == 0);
   // Make the compiler happy
   ASSERT (smallSparseZeroTail[0] == 1);
+#endif
 }
 
+#ifndef __SDCC_pdk14 // TODO Bug ?
 #ifdef __SDCC_mcs51
 __xdata
 #elif __SDCC_pic16
 __code
+#elif __SDCC_pdk14
+const
 #endif
 static {type} largeMixed[] = {
   1, 2, 3, 4, 5, 6, 7,	/* 0-6 */
@@ -118,10 +133,12 @@ static {type} largeMixed[] = {
   3, 4, 5, 6, 3, 4, 5, 6,
   3, 4, 5, 6, 3, 4, 5, 6
 };
+#endif
 
 static void
 testLargeMixed (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT (largeMixed[0] == 1);
   ASSERT (largeMixed[1] == 2);
   ASSERT (largeMixed[7] == 1);
@@ -132,4 +149,5 @@ testLargeMixed (void)
   ASSERT (largeMixed[143+1] == 4);
   ASSERT (largeMixed[143+8+1] == 4);
   ASSERT (largeMixed[143+16+1] == 4);
+#endif
 }

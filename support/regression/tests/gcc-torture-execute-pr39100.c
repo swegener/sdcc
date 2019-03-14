@@ -24,6 +24,7 @@ typedef struct C
   short cn, cp; 
 } *CP;
 
+#ifndef __SDCC_pdk14 // Lack of memory
 CP
 foo (CP h, EP x)
 {
@@ -53,10 +54,12 @@ foo (CP h, EP x)
   h->x = pl;
   return h;
 }
+#endif
 
 void
 testTortureExecute (void)
 {  
+#ifndef __SDCC_pdk14 // Lack of memory
   struct C c = { 0, 0, 0 };
   struct E e[2] = { { 0, &e[1] }, { 1, 0 } };
   EP p;
@@ -71,6 +74,7 @@ testTortureExecute (void)
   if (e[0].n)
     ASSERT (0);
   return;  
+#endif
 }
 
 

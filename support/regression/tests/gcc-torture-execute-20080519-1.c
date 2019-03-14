@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+#if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
 typedef unsigned long HARD_REG_SET[2];
 HARD_REG_SET reg_class_contents[2];
 
@@ -52,10 +53,12 @@ regrename_optimize (struct du_chain *this)
 
   merge_overlapping_regs (&this_unavailable);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
   struct du_chain du1 = { 0, 0 };
   struct du_chain du0 = { &du1, 1 };
   reg_class_contents[0][0] = -1;
@@ -64,5 +67,6 @@ testTortureExecute (void)
   reg_class_contents[1][1] = 0;
   regrename_optimize (&du0);
   return;
+#endif
 }
 

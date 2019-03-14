@@ -29,7 +29,7 @@ strcpy-1.c from the execute part of the gcc torture tests.
    likely to detect when words are mixed up.  */
 #define SEQUENCE_LENGTH 31
 
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) // Lack of memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Lack of memory
 static union {
   char buf[MAX_LENGTH];
   long long align_int;
@@ -42,7 +42,7 @@ static union {
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) // Lack of memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Lack of memory
   int off1, off2, len, i;
   char *p, *q, c;
 

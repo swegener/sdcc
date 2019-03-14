@@ -17,6 +17,7 @@
 
 /* Testcase copied from gcc.target/i386/loop-3.c */
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 typedef struct
 {
         unsigned char colormod;
@@ -73,10 +74,11 @@ int CalcPing (client_t *cl)
 
         return ping * 1000;
 }
+#endif
 
 void testTortureExecute(void)
 {
-#if !defined(__SDCC_mcs51)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
    client_t cl;
 
    memset(&cl, 0, sizeof(cl));

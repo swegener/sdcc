@@ -34,6 +34,7 @@ void correct(void)
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // No RAM above 0x7f.
 #ifdef __SDCC
 	REG_1 = 0x40;
 	incorrect();
@@ -42,4 +43,5 @@ void testBug(void)
 	REG_2 = 0x50;
 	correct();
 	ASSERT (REG_2 == 0x53);
+#endif
 }

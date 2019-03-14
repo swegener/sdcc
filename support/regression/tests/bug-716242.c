@@ -9,6 +9,7 @@
 
 #pragma disable_warning 244
 
+#ifndef __SDCC_pdk14
 const void *p;
 int ret;
 
@@ -88,12 +89,15 @@ f6 ()
 }
 
 /****************************/
+#endif
 
 static void
 testFuncPtr (void)
 {
+#ifndef __SDCC_pdk14
 #if !((defined __SDCC_stm8) && defined (__SDCC_MODEL_LARGE)) // STM8 large model has sizeof(void *) != size of function pointers.
   f1 ();
   ASSERT (ret == 4);
+#endif
 #endif
 }

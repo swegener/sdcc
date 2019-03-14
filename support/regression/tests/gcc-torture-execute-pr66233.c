@@ -8,6 +8,7 @@
 
 unsigned int v[8];
 
+#ifndef __SDCC_pdk14 // Lack of memory
 void
 foo (void)
 {
@@ -15,14 +16,17 @@ foo (void)
   for (i = 0; i < 8; i++)
     v[i] = (float) i;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   unsigned int i;
   foo ();
   for (i = 0; i < 8; i++)
     if (v[i] != i)
       ASSERT (0);
   return;
+#endif
 }

@@ -30,12 +30,14 @@
 #include <stddef.h>
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
-#define XDATA __xdata
+#define HEAPSPACE __xdata
+#elif defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+#define HEAPSPACE __near
 #else
-#define XDATA
+#define HEAPSPACE
 #endif
 
-typedef struct header XDATA header_t;
+typedef struct header HEAPSPACE header_t;
 
 struct header
 {
@@ -43,12 +45,12 @@ struct header
 	header_t *next_free;
 };
 
-extern header_t *XDATA __sdcc_heap_free;
+extern header_t *HEAPSPACE __sdcc_heap_free;
 
 void free(void *ptr)
 {
 	header_t *h, *next_free, *prev_free;
-	header_t *XDATA *f;
+	header_t *HEAPSPACE *f;
 
 	if(!ptr)
 		return;
@@ -57,7 +59,7 @@ void free(void *ptr)
 	for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h && h < ptr; prev_free = h, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
 	next_free = h;
 
-	h = (void XDATA *)((char XDATA *)(ptr) - offsetof(struct header, next_free));
+	h = (void HEAPSPACE *)((char HEAPSPACE *)(ptr) - offsetof(struct header, next_free));
 
 	// Insert into free list.
 	h->next_free = next_free;

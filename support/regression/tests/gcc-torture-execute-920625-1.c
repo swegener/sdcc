@@ -10,6 +10,7 @@
 
 #include <stdarg.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 typedef struct{double x,y;}point;
 point pts[]={{1.0,2.0},{3.0,4.0},{5.0,6.0},{7.0,8.0}};
 static int va1(int nargs,...)
@@ -39,6 +40,7 @@ static int va2(int nargs,...)
   }
   va_end(args);
 }
+#endif
 
 void
 testTortureExecute (void)

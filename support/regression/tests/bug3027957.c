@@ -23,9 +23,11 @@ char * correct(void)
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // I have no idea yet, how integers cast to pointers should behave here on pdk14
 #ifdef __SDCC
   foo();
   ASSERT (*(unsigned char __xdata *)(ADDRESS + 0x64) == 0x12);
+#endif
 #endif
 }
 

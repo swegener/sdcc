@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
    _memchr.c - part of string library functions
 
-   Copyright (C) 2009, Philipp Klaus Krause . pkk@spth.de
+   Copyright (C) 2009-2019, Philipp Klaus Krause . pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -33,7 +33,8 @@ void *memchr(const void *s, int c, size_t n)
 	unsigned char *p = (unsigned char *)s;
 	unsigned char *end = p + n;
 	for(; p != end; p++)
-		if(*p == c)
+		if(*p == (unsigned char)c)
 			return((void *)p);
 	return(0);
 }
+

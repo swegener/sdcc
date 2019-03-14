@@ -10,7 +10,7 @@
 
 #define TEST_{test}
 
-#if !(defined(__SDCC_mcs51) && !defined(__SDCC_STACK_AUTO) && defined(__SDCC_MODEL_SMALL) ) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !(defined(__SDCC_mcs51) && !defined(__SDCC_STACK_AUTO) && defined(__SDCC_MODEL_SMALL) ) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
 long long x;
 unsigned long long y;
 int i;
@@ -294,7 +294,7 @@ LongLong_bit (void)
 void
 testLongLong (void)
 {
-#if !(defined(__SDCC_mcs51) && !defined(__SDCC_STACK_AUTO) && defined(__SDCC_MODEL_SMALL) ) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !(defined(__SDCC_mcs51) && !defined(__SDCC_STACK_AUTO) && defined(__SDCC_MODEL_SMALL) ) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
   LongLong_{test}();
 #endif
 }

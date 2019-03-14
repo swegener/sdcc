@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 int ops[13] =
 {
   11, 12, 46, 3, 2, 2, 3, 2, 1, 3, 2, 1, 2
@@ -17,12 +18,14 @@ int correct[13] =
 {
   46, 12, 11, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1
 };
+#endif
 
 int num = 13;
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   int i;
 
   for (i = 0; i < num; i++)
@@ -46,5 +49,6 @@ testTortureExecute (void)
       ASSERT (0);
 
   return;
+#endif
 }
 

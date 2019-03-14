@@ -9,7 +9,6 @@ struct s {
   unsigned char array[512-3*sizeof(int)];
 };
 
-
 int check_ptr(unsigned char *p, struct s *sp)
 {
   if (p > sp->array + 400) /* Converting the array to its address for the add  */
@@ -18,13 +17,16 @@ int check_ptr(unsigned char *p, struct s *sp)
     return 0;
 }
 
-
+#ifndef __SDCC_pdk14 // Not enough RAM
 __xdata struct s teststruct;
+#endif
 
 void testBug (void)
 {
+#ifndef __SDCC_pdk14 // Not enough RAM
   struct s * sp = &teststruct;
   
   ASSERT (check_ptr(&(sp->array[400]),sp) == 0);
   ASSERT (check_ptr(&(sp->array[401]),sp) == 1);
+#endif
 }

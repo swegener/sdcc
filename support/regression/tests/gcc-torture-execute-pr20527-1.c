@@ -67,6 +67,7 @@
   For more information on these sources, see the manual.
 --*/
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 void f (long *limit, long *base, long minLen, long maxLen);
 void f (long *limit, long *base, long minLen, long maxLen)
 {
@@ -80,14 +81,17 @@ void f (long *limit, long *base, long minLen, long maxLen)
 }
 
 long b[] = {1, 5, 11, 23};
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   long l[3];
   f (l, b, 0, 2);
   if (l[0] != 3 || l[1] != 9 || l[2] != 21)
     ASSERT (0);
   return;
+#endif
 }
 

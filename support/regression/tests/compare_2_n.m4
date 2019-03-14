@@ -23,6 +23,7 @@ lwr_`'int_right (unsigned left)
 void
 test_lwr_`'int_right (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   ASSERT (lwr_if_`'int_right (int_right - 1));
   ASSERT (!lwr_if_`'int_right (int_right));
   ASSERT (!lwr_if_`'int_right (int_right + 1));
@@ -30,10 +31,12 @@ test_lwr_`'int_right (void)
   ASSERT (lwr_`'int_right (int_right - 1));
   ASSERT (!lwr_`'int_right (int_right));
   ASSERT (!lwr_`'int_right (int_right + 1));
+#endif
 }
 ')dnl
 
 foreach(`int_right', (0x007f, 0x00ff, 0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff), `
+#if !defined(__SDCC_pdk14) // Lack of memory
 int
 gtr_if_`'int_right (unsigned left)
 {
@@ -45,10 +48,12 @@ gtr_`'int_right (unsigned left)
 {
   return left > int_right;
 }
+#endif
 
 void
 test_gtr_`'int_right (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   ASSERT (gtr_if_`'int_right (int_right + 1));
   ASSERT (!gtr_if_`'int_right (int_right));
   ASSERT (!gtr_if_`'int_right (int_right - 1));
@@ -56,9 +61,11 @@ test_gtr_`'int_right (void)
   ASSERT (gtr_`'int_right (int_right + 1));
   ASSERT (!gtr_`'int_right (int_right));
   ASSERT (!gtr_`'int_right (int_right - 1));
+#endif
 }
 ')dnl
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 /* special case for 0x0000 */
 lwr_if_0x0000 (unsigned left)
 {
@@ -73,10 +80,12 @@ lwr_0x0000 (unsigned left)
 {
   return left < 0x0000;
 }
+#endif
 
 void
 test_lwr_0x0000 (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   ASSERT (!lwr_if_0x0000 (0x0000 - 1));
   ASSERT (!lwr_if_0x0000 (0x0000));
   ASSERT (!lwr_if_0x0000 (0x0000 + 1));
@@ -84,8 +93,10 @@ test_lwr_0x0000 (void)
   ASSERT (!lwr_0x0000 (0x0000 - 1));
   ASSERT (!lwr_0x0000 (0x0000));
   ASSERT (!lwr_0x0000 (0x0000 + 1));
+#endif
 }
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 #if !defined(PORT_HOST)
 /* special case for 0xffff */
 int
@@ -100,10 +111,12 @@ gtr_0xffff (unsigned left)
   return left > 0xffff;
 }
 #endif
+#endif
 
 void
 test_gtr_0xffff (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
 #if !defined(PORT_HOST)
   ASSERT (!gtr_if_0xffff (0xffff + 1));
   ASSERT (!gtr_if_0xffff (0xffff));
@@ -113,8 +126,10 @@ test_gtr_0xffff (void)
   ASSERT (!gtr_0xffff (0xffff));
   ASSERT (!gtr_0xffff (0xffff - 1));
 #endif
+#endif
 }
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 /* unsigned long test cases */
 #define LONG_RIGHT_LWR 0x80000000
 int
@@ -132,10 +147,12 @@ long_gtr (unsigned long left)
   else
     return 0;
 }
+#endif
 
 void
 test_lwr_gtr (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   ASSERT (long_lwr (LONG_RIGHT_LWR - 1));
   ASSERT (!long_lwr (LONG_RIGHT_LWR));
   ASSERT (!long_lwr (LONG_RIGHT_LWR + 1));
@@ -143,6 +160,7 @@ test_lwr_gtr (void)
   ASSERT (long_gtr (LONG_RIGHT_GTR + 1));
   ASSERT (!long_gtr (LONG_RIGHT_GTR));
   ASSERT (!long_gtr (LONG_RIGHT_GTR - 1));
+#endif
 }
 
 /* Test for bug #2165 Broken comparison */

@@ -37,6 +37,7 @@ testReverse(void)
 void
 testAddFunc(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   char buf[5];
   unsigned char count = 0;
 
@@ -44,4 +45,5 @@ testAddFunc(void)
   ASSERT(count == 1 &&
          buf[0] == '5' &&
          buf[1] == '\0');
+#endif
 }

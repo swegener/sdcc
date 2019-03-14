@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 
+#ifndef __SDCC_pdk14 // Bug #2874
 static inline uint16_t shl_u16(uint16_t a, uint16_t b) {
   uint16_t r = a << b;
   return r;
@@ -18,8 +19,10 @@ static inline uint16_t or_u16(uint16_t a, uint16_t b) {
   uint16_t r = a | b;
   return r;
 }
+#endif
 
 void testSwap_4(void) {
+#ifndef __SDCC_pdk14 // Bug #2874
   uint8_t tt;
   volatile uint8_t llvm_cbe_tmp__1;
   uint8_t llvm_cbe_tmp__2;
@@ -32,5 +35,6 @@ void testSwap_4(void) {
   tt = (((uint8_t)(or_u16((((uint16_t)(uint8_t)(((uint8_t)(shl_u16((((uint16_t)(uint8_t)llvm_cbe_tmp__2)), 4)))))), (((uint16_t)(uint8_t)(((uint8_t)(ashr_u16((((uint16_t)(uint8_t)llvm_cbe_tmp__3)), 4))))))))));
 
   ASSERT(tt == 33);
+#endif
 }
 

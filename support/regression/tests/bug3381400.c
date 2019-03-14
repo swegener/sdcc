@@ -6,6 +6,8 @@
 
 #pragma disable_warning  85 //no warning about unreferenced variables (W_NO_REFERENCE)
 
+#ifndef __SDCC_pdk14 // Lack of memory
+
 #define UCHAR	unsigned char
 #define USHORT	unsigned short
 #define PCHAR	unsigned char *
@@ -55,12 +57,16 @@ void _DspLoadFile(DSP_PAGE * pDspPage, USHORT sDMOffset)
 	rSRAM_Page = DEFAULT_MEMORY_PAGE;
 #endif
 }
+#endif
 
 void testBug(void)
 {
+
+#ifndef __SDCC_pdk14 // Lack of memory
 	DSP_PAGE p;
 	p.iPage = 23;
 	Sys_iSystemPage = 42 - 23;
 	_DspLoadFile(&p, 0);
+#endif
 }
 

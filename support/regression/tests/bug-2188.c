@@ -37,6 +37,7 @@ int32_t notinlined_ptr_fnc(int32_t *pval)
 void
 testBug (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   int32_t var32 = notinlined_fnc(inline_fnc(0));
   ASSERT(var32 == glob_var32_a);
   var32 = notinlined_fnc(inline_fnc(1));
@@ -46,6 +47,7 @@ testBug (void)
   ASSERT(var32 == glob_var32_a);
   var32 = notinlined_ptr_fnc(inline_ptr_fnc(1));
   ASSERT(var32 == glob_var32_b);
+#endif
 }
 
 extern inline

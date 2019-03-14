@@ -10,6 +10,7 @@
 
 #define NG   0x100L
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 unsigned long flg = 0;
 
 long sub (int n) __reentrant
@@ -35,10 +36,12 @@ long sub (int n) __reentrant
   else 
     return (long) n;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   if (sub (30) != 832040L)
     flg |= NG;
 
@@ -46,5 +49,6 @@ testTortureExecute (void)
     ASSERT (0);
   
   return;
+#endif
 }
 

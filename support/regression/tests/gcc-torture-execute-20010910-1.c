@@ -18,6 +18,7 @@
    ep.skbuff[4] == 5      (it should be 0)
 */
 
+#ifndef __SDCC_pdk14 // Lack of memory
 extern void abort(void);
 
 struct epic_rx_desc 
@@ -44,10 +45,12 @@ static void epic_init_ring(struct epic_private *ep)
 }
 
 static int check_rx_ring[5] = { 12,14,16,18,10 };
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   struct epic_private ep;
   struct epic_rx_desc rx_ring[5];
   int i;
@@ -67,5 +70,6 @@ testTortureExecute (void)
     if ( ep.rx_skbuff[i] != 0 ) ASSERT(0);
   }
   return;
+#endif
 }
 

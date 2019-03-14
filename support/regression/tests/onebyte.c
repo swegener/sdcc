@@ -8,6 +8,7 @@
 void
 testMul (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   {attrL}    signed  char  cL;
   {attrL}  unsigned  char ucL;
   {attrR}    signed  char  cR;
@@ -37,11 +38,13 @@ testMul (void)
   ucL =  254;  cR = -1; r16 = ucL *  cR; ASSERT (r16 == -254);
    cL = -128;  cR = -1; r16 =  cL *  cR; ASSERT (r16 ==  128);
 #endif
+#endif
 }
 
 void
 testDiv (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
   {attrR}    signed char  cR;
@@ -83,11 +86,13 @@ testDiv (void)
 
   ucL =  254;  cR =   -1; r16 = ucL /  cR; ASSERT (r16 == -254);
    cL = -128;  cR =   -1; r16 =  cL /  cR; ASSERT (r16 ==  128);
+#endif
 }
 
 void
 testMod (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
   {attrR}    signed char  cR;
@@ -116,11 +121,13 @@ testMod (void)
    cL = -128;  cR =   -5; r16 =  cL %  cR; ASSERT (r16 == -3);
    r16 = 0;
    cL = -128; ucR =    5; r16 =  cL % ucR; ASSERT (r16 == -3);
+#endif
 }
 
 void
 testOr (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
   {attrR}    signed char  cR;
@@ -130,11 +137,13 @@ testOr (void)
    cL = 0x00;  cR = 0x80; r16 =  cL |  cR; r16b =  cR |  cL; ASSERT (r16 == (short) 0xff80); ASSERT (r16b == (short) 0xff80);
   ucL = 0x80;  cR = 0x00; r16 = ucL |  cR; r16b =  cR | ucL; ASSERT (r16 ==           0x80); ASSERT (r16b ==           0x80);
   ucL = 0x80; ucR = 0x80; r16 = ucL | ucR; r16b = ucR | ucL; ASSERT (r16 ==           0x80); ASSERT (r16b ==           0x80);
+#endif
 }
 
 void
 testXor (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
   {attrR}    signed char  cR;
@@ -150,11 +159,13 @@ testXor (void)
 
   ucL = 0x80; ucR = 0x80; r16 = ucL ^ ucR; r16b = ucR ^ ucL; ASSERT (r16 ==      0); ASSERT (r16b ==      0);
   ucL =    0; ucR = 0x80; r16 = ucL ^ ucR; r16b = ucR ^ ucL; ASSERT (r16 ==   0x80); ASSERT (r16b ==   0x80);
+#endif
 }
 
 void
 testAnd (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
   {attrR}    signed char  cR;
@@ -164,6 +175,7 @@ testAnd (void)
    cL = 0x80;  cR = 0x80; r16 =  cL &  cR; r16b =  cR &  cL; ASSERT (r16 == (short) 0xff80); ASSERT (r16b == (short) 0xff80);
   ucL = 0x80;  cR = 0x80; r16 = ucL &  cR; r16b =  cR & ucL; ASSERT (r16 ==           0x80); ASSERT (r16b ==           0x80);
   ucL = 0x80; ucR = 0x80; r16 = ucL & ucR; r16b = ucR & ucL; ASSERT (r16 ==           0x80); ASSERT (r16b ==           0x80);
+#endif
 }
 
 void
@@ -191,6 +203,7 @@ testComplement (void)
 void
 testCompare (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   {attrL}   signed char  c;
   {attrR} unsigned char uc;
 
@@ -203,11 +216,13 @@ testCompare (void)
   ASSERT (  c <= uc );
   ASSERT (!(c >  uc));
   ASSERT (!(c >= uc));
+#endif
 }
 
 void
 testUMinus (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     signed char  {attrL} sc;
   unsigned char  {attrL} uc;
     signed int   {attrL} si;
@@ -236,11 +251,13 @@ testUMinus (void)
   ASSERT (-(-128 ) ==  128);
   sc = -128;
   ASSERT (-sc == 128);
+#endif
 }
 
 void
 testBug1571231 (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   unsigned char  {attrL} uc;
 
   /* bug-1571231 */
@@ -249,4 +266,5 @@ testBug1571231 (void)
     ASSERT (1);
   else
     ASSERT (0);
+#endif
 }

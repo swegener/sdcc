@@ -10,15 +10,19 @@
 
 #include <stdio.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 char buf[40];
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   int i = 0;
   int l = sprintf (buf, "%s", i++ ? "string" : "other string");
   if (l != sizeof ("other string") - 1 || i != 1)
     ASSERT (0);
   return;
+#endif
 }
 

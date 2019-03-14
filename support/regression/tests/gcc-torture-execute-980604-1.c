@@ -18,6 +18,7 @@ int d = 0;
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   double e;
   double f;
   double g;
@@ -28,5 +29,6 @@ testTortureExecute (void)
   if (e)
     ASSERT (0);
   return;
+#endif
 }
 

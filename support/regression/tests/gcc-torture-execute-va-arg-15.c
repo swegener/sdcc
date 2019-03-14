@@ -8,6 +8,7 @@ va-arg-15.c from the execute part of the gcc torture tests.
 
 #include <stdarg.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 void vafunction (char *dummy, ...)
 {
   double darg;
@@ -34,10 +35,12 @@ void vafunction (char *dummy, ...)
     }
     va_end(ap);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   vafunction( "", 
 	1, 2., 
 	3, 4., 
@@ -49,4 +52,5 @@ testTortureExecute (void)
 	15, 16.,
 	17, 18. );
   return;
+#endif
 }

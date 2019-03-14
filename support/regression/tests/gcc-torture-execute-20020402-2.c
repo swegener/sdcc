@@ -10,7 +10,7 @@
 
 #pragma disable_warning 85
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
 /* PR 3967
 
    local-alloc screwed up consideration of high+lo_sum and created
@@ -239,7 +239,7 @@ InitCache (int sessionId)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
   InitCache (5);
   return;
 #endif

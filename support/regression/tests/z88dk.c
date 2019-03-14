@@ -3,6 +3,7 @@
 #include <testfwk.h>
 #include <stdlib.h>
 
+#ifndef __SDCC_pdk14
 #if !defined(__SDCC_z80) && !defined(__SDCC_z180) && !defined(__SDCC_r2k) && !defined(__SDCC_r3ka) && !defined(__SDCC_tlcs90)
 #define __z88dk_fastcall
 #define __z88dk_callee
@@ -47,10 +48,12 @@ void s1(int x, int y) __smallc;
 void s2(int x, int y) __z88dk_callee;
 
 void s3(int x, int y) __smallc __z88dk_callee;
+#endif
 
 void
 testZ88dk(void)
 {
+#ifndef __SDCC_pdk14
   ASSERT (f1 (23) == 24);
   ASSERT (f2 (23) == 24);
   ASSERT (f4 (23) == 24);
@@ -62,5 +65,6 @@ testZ88dk(void)
   ASSERT ((*p1) (23) == 24);
   ASSERT ((*p2) (23) == 24);
   ASSERT ((*p4) (23) == 24);
+#endif
 }
 

@@ -17,6 +17,7 @@ struct foo {
   char a, b, c, d, e, f, g, h, i, j;
 };
 
+#ifndef __SDCC_pdk14 // Lack of memory
 int test1 ()
 {
   const char X[8] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' };
@@ -57,11 +58,14 @@ int test4 ()
     ASSERT (0);
   return 0;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   test1 (); test2 (); test4 ();
   return;
+#endif
 }
 

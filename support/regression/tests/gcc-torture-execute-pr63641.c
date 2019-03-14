@@ -42,16 +42,19 @@ lab:
   return 1;
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 char tab1[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1 };
 char tab2[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1,
 		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1 };
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   int i;
 
   for (i = 0; i < 256; i++)
@@ -61,4 +64,5 @@ testTortureExecute (void)
     if (bar (i) != (i < 64 ? tab2[i] : 0))
       ASSERT (0);
   return;
+#endif
 }

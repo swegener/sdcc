@@ -26,6 +26,7 @@ enum sdas_target_e {
   TARGET_ID_DS390,
   TARGET_ID_6808,
   TARGET_ID_STM8,
+  TARGET_ID_PDK,
 };
 
 void sdas_init (char *path);
@@ -34,5 +35,6 @@ enum sdas_target_e get_sdas_target(void);
 int is_sdas_target_z80_like(void);
 int is_sdas_target_8051_like(void);
 int is_sdas_target_stm8(void);
+int is_sdas_target_pdk(void);
 
 #endif  /* __SDAS_H */

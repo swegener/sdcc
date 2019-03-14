@@ -9,7 +9,7 @@
 #endif
 
 #if defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM) || \
-    (defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO))
+    (defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) || defined (__SDCC_pdk14)
 #define SKIP
 #endif
 

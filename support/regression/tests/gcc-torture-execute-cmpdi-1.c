@@ -7,7 +7,7 @@ cmpdi-1.c from the execute part of the gcc torture tests.
 #define F 140
 #define T 13
 
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Lack of memory
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 
 #if 0 // Enable when SDCC support K&R-style
 feq (x, y)

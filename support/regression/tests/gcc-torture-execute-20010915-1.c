@@ -27,12 +27,15 @@ int o = 0;
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #610
   const char *args[] = {"a", "b", "c", "d", "e"};
   if (x (5, args) != 0 || check != 2 || o != 5)
     ASSERT (0);
   return;
+#endif
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #610
 int x (int argc, const char **argv)
 {
   int opt = 0;
@@ -83,4 +86,5 @@ int r (const char *f)
   cnt++;
   return 1;
 }
+#endif
 

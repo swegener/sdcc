@@ -39,6 +39,7 @@ int inet_check_attr (void *r, struct rtattr **rta)
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   struct rtattr rt[2];
   struct rtattr *rta[14];
   int i;
@@ -68,4 +69,5 @@ testTortureExecute (void)
     else if (i > 5 && rta[i] != &rt[0])
       ASSERT (0);
   return;
+#endif
 }

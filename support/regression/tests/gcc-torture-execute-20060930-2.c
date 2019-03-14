@@ -10,6 +10,7 @@
 
 #include <string.h>
 
+#ifndef __SDCC_pdk14 // Bug #2874
 /* PR middle-end/29272 */
 
 struct S { struct S *s; } s;
@@ -29,12 +30,15 @@ bar (void *p, struct S *q)
   foo (p);
   return q->s;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Bug #2874
   t.t = &t;
   if (bar (&s, &s) != (void *) &t)
     ASSERT (0);
   return;
+#endif
 }

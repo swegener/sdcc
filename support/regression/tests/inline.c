@@ -7,6 +7,7 @@
 #pragma std_sdcc99
 #endif
 
+#ifndef __SDCC_pdk14 // Bug #2874
 /*--------------
     bug 2591
     inline definition with parameters not in registers
@@ -263,10 +264,12 @@ bug_2295 (void)
 }
 
 /*--------------*/
+#endif
 
 void
 testInline (void)
 {
+#ifndef __SDCC_pdk14 // Bug #2874
 #ifndef SKIP_EXTERNAL
   char x = inlined_function(); /* can use the inlined or the external implementation */
   ASSERT (x == 1 || x == 2);
@@ -278,6 +281,7 @@ testInline (void)
   bug_3564755 ();
 #ifndef SKIP_EXTERNAL
   bug_2295 ();
+#endif
 #endif
 }
 

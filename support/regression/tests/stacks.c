@@ -20,7 +20,7 @@ testStack(void)
 {
   volatile char above;
   volatile char above2;
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14)
   volatile char ac[{size}];
 #else
   volatile char ac[{size} - 100];

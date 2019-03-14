@@ -14,6 +14,7 @@
    epilogue delay-slot set the return-value register with the testcase
    below.  Derived from ghostscript-6.52 (GPL) by hp@axis.com.  */
 
+#ifndef __SDCC_pdk14 // Lack of memory
 typedef struct font_hints_s {
   int axes_swapped;
   int x_inverted, y_inverted;
@@ -55,9 +56,11 @@ line_hints(const font_hints *fh, const gs_fixed_point *p0,
     hints = 0;
   return hints;
 }
+#endif
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   static font_hints fh[] = {{0, 1, 0}, {0, 0, 1}, {0, 0, 0}};
   static gs_fixed_point gsf[]
     = {{0x30000, 0x13958}, {0x30000, 0x18189},
@@ -67,4 +70,5 @@ testTortureExecute (void)
       || line_hints (fh + 2, gsf + 2, gsf + 3) != 4)
     ASSERT (0);
   return;
+#endif
 }

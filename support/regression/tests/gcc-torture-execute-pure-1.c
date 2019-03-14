@@ -27,6 +27,7 @@ static int func7 (int a) { return a + func3(a); } /* const */
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   int i[10], r;
 
   i[0] = 0;
@@ -70,6 +71,7 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 }
 
 int func0 (int a) { return a - i; } /* pure */

@@ -4,6 +4,7 @@
 
 #include <testfwk.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 unsigned char _pInputBuf[80];
 unsigned char _iInputPos;
 
@@ -15,6 +16,7 @@ void OnEditCancel()
 	}
 	_pInputBuf[_iInputPos] = 0;
 }
+#endif
 
 void
 testBug(void)

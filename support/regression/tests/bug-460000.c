@@ -1,4 +1,5 @@
 /* bug 460000
+   Right shift of negative values is implementation-defined by SDCC to arithmetic right shift.
  */
 #include <testfwk.h>
 

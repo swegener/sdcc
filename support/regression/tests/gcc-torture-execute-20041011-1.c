@@ -8,8 +8,7 @@
 #pragma std_c99
 #endif
 
-// TODO: Enable when these ports support long long!
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
 
 typedef unsigned long long ull;
 volatile int gvol[32];
@@ -66,7 +65,7 @@ ull neg (ull x) { return -x; }
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
   gull = 100;
   DO_TESTS (RUN_TEST)
   if (neg (gull) != -100ULL)

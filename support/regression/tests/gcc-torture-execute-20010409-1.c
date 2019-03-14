@@ -12,6 +12,7 @@
 #include <string.h>
 #include <setjmp.h>
 
+#ifndef __SDCC_pdk14
 jmp_buf try;
 
 typedef struct A {
@@ -47,15 +48,18 @@ void test (const char *x, int *y)
   if (y)
     d->a[d->b]->b = *y;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14
   if (setjmp(try) == 0)
   {
     d->b = 0;
     d->a = &a;
     test ("", 0);
   }
+#endif
 }
 

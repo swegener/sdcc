@@ -6,10 +6,11 @@
 #include <limits.h>
 #include <setjmp.h>
 
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14)
 unsigned char array[300];
 #endif
 
+#ifndef __SDCC_pdk14
 /* A loop where the counter should be narrowed to an 8-bit unsigned type. */
 void loop8(unsigned char *a, {type} n)
 {
@@ -82,10 +83,11 @@ void jump(unsigned char *a)
 
 	a[0] = 13;
 }
+#endif
 
 void testLoop(void)
 {
-#ifndef __SDCC_mcs51
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14)
 	loop8 (array, 3);
 	ASSERT (array[0] == 8);
 	ASSERT (array[3] == 8);

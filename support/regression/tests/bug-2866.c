@@ -10,6 +10,7 @@ typedef int int16;
 #define COL_MAX_HEIGHT 64
 #define COL_TEX_HEIGHT 32
 
+#ifndef __SDCC_pdk14 // Lack of memory
 uint8 single_column[COL_MAX_HEIGHT];
 
 void initSingleColumn(int16 height)
@@ -49,14 +50,17 @@ void initSingleColumn(int16 height)
         v+=dv;
     }
 }
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     initSingleColumn (0);
 
     ASSERT (single_column[0x00] == 0x80);
     ASSERT (single_column[0x1f] == 0x80);
     ASSERT (single_column[0x20] == 0x40);
     ASSERT (single_column[0x3f] == 0x40);
+#endif
 }
 

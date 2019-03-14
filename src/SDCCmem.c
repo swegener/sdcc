@@ -647,7 +647,7 @@ allocParms (value *val, bool smallc)
       /* if automatic variables r 2b stacked */
       if (options.stackAuto || IFFUNC_ISREENT (currFunc->type))
         {
-          int paramsize = getSize (lval->type) + (getSize (lval->type) == 1 && smallc);
+          int paramsize = getSize (lval->type) + (getSize (lval->type) == 1 && (smallc || TARGET_PDK_LIKE));
 
           if (lval->sym)
             lval->sym->onStack = 1;

@@ -13,12 +13,17 @@ static char foo (char a)
   return a + 1;
 }
 
+#ifndef __SDCC_pdk14 // Lack of memory
 static char b1[15] = "A\000B\000C";
 static char c1[15] = {'A', 0, 'B', 0, 'C', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+#endif
 
 void testBug (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT (memcmp (b0, c0, sizeof (c0)) == 0);
   ASSERT (memcmp (b1, c1, sizeof (c1)) == 0);
   ASSERT (foo ('a') == 'b');
+#endif
 }
+

@@ -22,6 +22,7 @@ foo (unsigned long *start, unsigned long *end)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   unsigned long a[5];
   int start, end, k;
 
@@ -45,6 +46,6 @@ testTortureExecute (void)
 	  if (a[k] != k)
 	    ASSERT (0);
       }
-
+#endif
   return;
 }

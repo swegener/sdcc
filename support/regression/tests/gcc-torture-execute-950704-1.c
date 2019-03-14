@@ -37,6 +37,7 @@ f (long long x, long long y)
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   f (0, 0);
   if (errflag)
     ASSERT (0);
@@ -70,5 +71,6 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 }
 

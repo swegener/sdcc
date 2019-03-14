@@ -29,6 +29,16 @@ void __printf(const char *szFormat, ...);
 # define __reentrant
 #endif
 
+#if defined(__SDCC_pdk14)
+# define __data
+# define __idata
+# define __pdata
+# define __xdata
+# define __code // TODO: __code will be supported in the future.
+# define __near
+# define __far
+#endif
+
 #if defined(PORT_HOST)
 # define __at(x)
 #endif

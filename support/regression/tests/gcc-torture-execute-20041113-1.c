@@ -13,6 +13,7 @@
 
 #include <stdarg.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 void test (int x, ...)
 {
     va_list ap;
@@ -29,9 +30,12 @@ void test (int x, ...)
 }
 
 double a = 40.0;
+#endif
 
 void testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
     test(0, 1, 2, 3, (int)(a / 10.0));
     return;
+#endif
 }

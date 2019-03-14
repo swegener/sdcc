@@ -10,6 +10,7 @@
 
 #pragma disable_warning 85
 
+#ifndef __SDCC_pdk14 // Lack of memory
 long
 f (long x)
 {
@@ -36,10 +37,12 @@ long nums[] =
 {
   -1L, 0x7fffffffL, -0x7fffffffL - 1L
 };
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   int i;
 
   for (i = 0;
@@ -47,6 +50,6 @@ testTortureExecute (void)
        i++)
     if (std_eqn (nums[i], -0x7fffffffL - 1L, f (nums[i]), r (nums[i])) == 0)
       ASSERT (0);
-
+#endif
   return;
 }

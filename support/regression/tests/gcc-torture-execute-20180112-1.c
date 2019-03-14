@@ -31,9 +31,11 @@ u32 bug (u32 * result)
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   u32 l;
   u32 off = bug(&l);
   if (off != 0x7fffffff)
     ASSERT (0);
   return;
+#endif
 }

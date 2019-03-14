@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+#ifndef __SDCC_pdk14 // Lack of memory
 int foo(int i)
 {
   int a[32];
@@ -16,13 +17,16 @@ int foo(int i)
   a[i] = 2;
   return a[0];
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   if (foo (0) != 2
       || foo (1) != 1)
     ASSERT (0);
   return;
+#endif
 }
 

@@ -31,12 +31,14 @@
 #include <string.h>
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
-#define XDATA __xdata
+#define HEAPSPACE __xdata
+#elif defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
+#define HEAPSPACE __near
 #else
-#define XDATA
+#define HEAPSPACE
 #endif
 
-typedef struct header XDATA header_t;
+typedef struct header HEAPSPACE header_t;
 
 struct header
 {
@@ -44,15 +46,19 @@ struct header
 	header_t *next_free;
 };
 
-extern header_t *XDATA __sdcc_heap_free;
+extern header_t *HEAPSPACE __sdcc_heap_free;
 
 void __sdcc_heap_init(void);
 
-void XDATA *realloc(void *ptr, size_t size)
+#if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400)
+void HEAPSPACE *realloc(void *ptr, size_t size)
+#else
+void *realloc(void *ptr, size_t size)
+#endif
 {
-	void XDATA *ret;
+	void HEAPSPACE *ret;
 	header_t *h, *next_free, *prev_free;
-	header_t *XDATA *f, *XDATA *pf;
+	header_t *HEAPSPACE *f, *HEAPSPACE *pf;
 	size_t blocksize, oldblocksize, maxblocksize;
 
 #if defined(__SDCC_mcs51) || defined(__SDCC_ds390) || defined(__SDCC_ds400) || defined(__SDCC_hc08) || defined(__SDCC_s08)
@@ -79,14 +85,14 @@ void XDATA *realloc(void *ptr, size_t size)
 	if(blocksize < sizeof(struct header)) // Requiring a minimum size makes it easier to implement free(), and avoid memory leaks.
 		blocksize = sizeof(struct header);
 
-	h = (void XDATA *)((char XDATA *)(ptr) - offsetof(struct header, next_free));
-	oldblocksize = (char XDATA *)(h->next) - (char XDATA *)h;
+	h = (void HEAPSPACE *)((char HEAPSPACE *)(ptr) - offsetof(struct header, next_free));
+	oldblocksize = (char HEAPSPACE *)(h->next) - (char HEAPSPACE *)h;
 
 	maxblocksize = oldblocksize;
 	if(prev_free && prev_free->next == h) // Can merge with previous block
-		maxblocksize += (char XDATA *)h - (char XDATA *)prev_free;
+		maxblocksize += (char HEAPSPACE *)h - (char HEAPSPACE *)prev_free;
 	if(next_free == h->next) // Can merge with next block
-		maxblocksize += (char XDATA *)(next_free->next) - (char XDATA *)next_free;
+		maxblocksize += (char HEAPSPACE *)(next_free->next) - (char HEAPSPACE *)next_free;
 
 	if(blocksize <= maxblocksize) // Can resize in place.
 	{
@@ -106,7 +112,7 @@ void XDATA *realloc(void *ptr, size_t size)
 
 		if(maxblocksize >= blocksize + sizeof(struct header)) // Create new block from free space
 		{
-			header_t *const newheader = (header_t *const)((char XDATA *)h + blocksize);
+			header_t *const newheader = (header_t *const)((char HEAPSPACE *)h + blocksize);
 			newheader->next = h->next;
 			newheader->next_free = *f;
 			*f = newheader;

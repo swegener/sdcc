@@ -4,6 +4,7 @@ arith-rand-ll.c from the execute part of the gcc torture tests.
 
 #include <testfwk.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 long long
 simple_rand ()
 {
@@ -41,6 +42,7 @@ random_bitstring ()
 	}
     }
 }
+#endif
 
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
 

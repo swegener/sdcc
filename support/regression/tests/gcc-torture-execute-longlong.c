@@ -9,7 +9,7 @@ longlong.c from the execute part of the gcc torture tests.
 typedef unsigned long long uint64;
 unsigned long pars;
 
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Lack of memory
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 uint64 b[32];
 uint64 *r = b;
 
@@ -31,7 +31,7 @@ void alpha_ep_extbl_i_eq_0()
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) // Lack of memory
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   if (sizeof (uint64) == 8)
     {
       b[17] = 0x0000000000303882ULL; /* rb */

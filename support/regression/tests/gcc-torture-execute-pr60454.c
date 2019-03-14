@@ -22,17 +22,21 @@
    happen. This test aims at catching such wrong detection to avoid
    regressions.  */
 
+#ifndef __SDCC_pdk14 // Lack of memory
 uint32_t
 fake_swap32 (uint32_t in)
 {
   return fake_const_swab32 (in);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   if (sizeof (uint32_t) * CHAR_BIT != 32)
     return;
   if (fake_swap32 (0x12345678UL) != 0x78567E12UL)
     ASSERT (0);
+#endif
 }

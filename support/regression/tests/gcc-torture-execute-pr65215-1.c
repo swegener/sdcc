@@ -12,6 +12,7 @@
 
 /* PR tree-optimization/65215 */
 
+#ifndef __SDCC_pdk14 // Bug #2874
 static inline unsigned int
 foo (unsigned int x)
 {
@@ -23,11 +24,12 @@ bar (unsigned long long *x)
 {
   return foo (*x);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
-#if 0 // Enable when SDCC supports intermingling of declarations and statements
+#ifndef __SDCC_pdk14 // Bug #2874
   if (CHAR_BIT != 8 || sizeof (unsigned int) != 4 || sizeof (unsigned long long) != 8)
     return;
 

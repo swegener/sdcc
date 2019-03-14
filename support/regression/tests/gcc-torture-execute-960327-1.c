@@ -16,6 +16,7 @@ g ()
 
 void f ()
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   char s[] = "abcedfg012345";
   char *sp = s + 12;
 
@@ -31,6 +32,7 @@ void f ()
 
   if (s[12] != 'X')
     ASSERT (0);
+#endif
 }
 
 void

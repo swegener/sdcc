@@ -18,6 +18,7 @@ void foo (A *v, int w, int x, int *y, int *z)
 {
 }
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 void
 bar (A *v, int x, int y, int w, int h)
 {
@@ -38,14 +39,17 @@ bar (A *v, int x, int y, int w, int h)
     v->d = h;
   }
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   A w = { 100, 110, 20, 30, -1, -1 };
   bar (&w,400,420,50,70);
   if (w.d != 70)
     ASSERT(0);
   return;
+#endif
 }
 

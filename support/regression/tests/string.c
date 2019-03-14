@@ -15,6 +15,7 @@
 static void 
 do_teststrcmp (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   int result = strcmp ("", "");
   ASSERT (result == 0);
   
@@ -29,6 +30,7 @@ do_teststrcmp (void)
 
   result = strcmp ("aa", "ab");
   ASSERT (result < 0);
+#endif
 }
 
 /** tests for strcpy
@@ -36,6 +38,7 @@ do_teststrcmp (void)
 static void 
 do_teststrcpy (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   static char empty[] = "";
   static char string[] = "\1\2\0\3";
   char buf[40] = "abcdefghijklmnopqrstuvwxyz";
@@ -50,6 +53,7 @@ do_teststrcpy (void)
   ASSERT (buf[0] == '\1');
   ASSERT (buf[1] == '\2');
   ASSERT (buf[3] == 'd');
+#endif
 }
 
 /** tests for strncmp
@@ -57,6 +61,7 @@ do_teststrcpy (void)
 static void 
 do_teststrncmp (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT (strncmp ("", "", 0) == 0);
   ASSERT (strncmp ("ab", "ab", 0) == 0);
   ASSERT (strncmp ("a", "a", 2) == 0);
@@ -64,6 +69,7 @@ do_teststrncmp (void)
   ASSERT (strncmp ("aa", "ab", 2) < 0);
   ASSERT (strncmp ("abc", "abd", 2) == 0);
   ASSERT (strncmp ("abc", "abc", 3) == 0);
+#endif
 }
 
 /** tests for strpbrk
@@ -72,6 +78,7 @@ do_teststrncmp (void)
 static void
 do_teststrpbrk (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   const char *a = "test";
 
   ASSERT (strpbrk (a, "e")  == &a[1] );
@@ -81,6 +88,7 @@ do_teststrpbrk (void)
   ASSERT (strpbrk (a, "")   == NULL );
   ASSERT (strpbrk ("", "e") == NULL );
   ASSERT (*strpbrk ("test2", "s") == 's' );
+#endif
 }
 
 /** tests for strrchr
@@ -88,11 +96,13 @@ do_teststrpbrk (void)
 static void
 do_teststrrchr (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   const char *test = "test";
 
   ASSERT (strrchr (test, 0) == test + 4);
   ASSERT (strrchr (test, 't') == test + 3);
   ASSERT (strrchr (test, 'e') == test + 1);
+#endif
 }
 
 /** tests for strstr
@@ -100,6 +110,7 @@ do_teststrrchr (void)
 static void 
 do_teststrstr (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   const char *a = "aabbcd";
   ASSERT (strstr (a, "\0\1") == a);
   ASSERT (strstr (a, "") == a);
@@ -109,6 +120,7 @@ do_teststrstr (void)
   ASSERT (strstr ("", "abbc") == NULL);
 /* ASSERT (strstr ("", "") == a); should work, but it doesn't */
   ASSERT (strstr (a, "cd") == &a[4]);
+#endif
 }
 
 /** tests for strspn
@@ -116,6 +128,7 @@ do_teststrstr (void)
 static void 
 do_teststrspn (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   ASSERT (strspn("aabbcd", "ab") == 4);
   ASSERT (strspn("abbacd", "") == 0);
   ASSERT (strspn("abbacd", "ac") == 1);
@@ -123,6 +136,7 @@ do_teststrspn (void)
   ASSERT (strspn("abbacd", "c") == 0);
   ASSERT (strspn("abbacd", "cba") == 5);
   ASSERT (strspn("abbacd", "cdba") == 6);
+#endif
 }
 
 /** tests for strtok
@@ -130,6 +144,7 @@ do_teststrspn (void)
 static void
 do_teststrtok (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
   static char str[] = "?a???b,,,#c";
   char str2[] = "axaaba";
   char *token = strtok (str, "?"); // 'token' points to the token "a"
@@ -150,6 +165,7 @@ do_teststrtok (void)
   token = strtok (NULL, "a");
   ASSERT (token == NULL);
 #endif
+#endif
 }
 
 #if !defined (__APPLE__) // uchar.h/char16_t/char32_t are not supported on MacOS/Clang
@@ -158,6 +174,7 @@ do_teststrtok (void)
 static void
 do_utf_8 (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
 #if defined(__STDC_VERSION) && __STDC_VERSION >= 201112L
   const char *str1 = u8"Ä ä";
   const char *str2 = u8"\u00c4 ä";
@@ -172,6 +189,7 @@ do_utf_8 (void)
   ASSERT (!strcmp (str1, str4));
   ASSERT (!strcmp (str1, str5));
 #endif
+#endif
 }
 
 // Test SDCC implementation-defined UTF-8 behaviour
@@ -179,6 +197,7 @@ do_utf_8 (void)
 static void
 do_utf_8_sdcc (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
 #ifdef __SDCC
   const char *str1 = "Ä ä";
   const char *str2 = "\u00c4 ä";
@@ -197,6 +216,7 @@ do_utf_8_sdcc (void)
   ASSERT (mblen(str1, 3) == 2);
   ASSERT (mblen("test", 3) == 1);
   ASSERT (mblen("", 3) == 0);
+#endif
 #endif
 }
 
@@ -224,6 +244,7 @@ do_utf_16 (void)
 static void
 do_utf_32_c95 (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
 #ifdef __STDC_ISO_10646__
   const wchar_t *str1 = L"Ä ä";
   const wchar_t *str2 = L"\u00c4 ä";
@@ -238,6 +259,7 @@ do_utf_32_c95 (void)
   ASSERT (!memcmp (str1, str3, 4 * sizeof(wchar_t)));
   ASSERT (!memcmp (str1, str4, 4 * sizeof(wchar_t)));
   ASSERT (!memcmp (str1, str5, 4 * sizeof(wchar_t)));
+#endif
 #endif
 }
 

@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 typedef struct { void* super; int name; int size; } t;
 
 t* f(t*clas, int size)
@@ -23,14 +24,17 @@ t* f(t*clas, int size)
   child->size=size;
   return child;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   t foo, *bar;
   memset(&foo, 37, sizeof(t));
   foo.size=sizeof(t);
   bar=f(&foo,sizeof(t));
   ASSERTFALSE (bar->super!=&foo||bar->name!=0||bar->size!=sizeof(t));
   return;
+#endif
 }

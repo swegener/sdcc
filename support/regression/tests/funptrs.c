@@ -96,6 +96,7 @@ callViaPtr3Ansi(void (*fptr)(void))
 void
 testFunPtr(void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   fafp = f6;
 
   ASSERT(count == 0);
@@ -108,11 +109,13 @@ testFunPtr(void)
   ASSERT((*fafp)(1, 0x55, 0x12345678, 0x9abcdef0) == 0x55);
   ASSERT((*fafp)(2, 0x55, 0x12345678, 0x9abcdef0) == 0x12345678);
   ASSERT((*fafp)(3, 0x55, 0x12345678, 0x9abcdef0) == 0x9abcdef0);
+#endif
 }
 
 void
 testFunPtrAnsi(void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   fafp = f6;
 
   count = 0;
@@ -125,16 +128,19 @@ testFunPtrAnsi(void)
   ASSERT(fafp(1, 0x55, 0x12345678, 0x9abcdef0) == 0x55);
   ASSERT(fafp(2, 0x55, 0x12345678, 0x9abcdef0) == 0x12345678);
   ASSERT(fafp(3, 0x55, 0x12345678, 0x9abcdef0) == 0x9abcdef0);
+#endif
 }
 
 void
 testFunPtrReturn(void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   tfp = f_ret;
 
   ASSERT(tfp(0, 0) == 0);
   ASSERT(tfp(0, 1) == 1);
   ASSERT(tfp(1, 0) == 0);
   ASSERT(tfp(1, 1) == 0);
+#endif
 }
 

@@ -3,7 +3,7 @@
 #include <testfwk.h>
 
 #ifdef __SDCC
-#ifdef __SDCC_pic16
+#if defined(__SDCC_pic16) || defined(__SDCC_pdk14)
 #define ADDRESS 0x0070
 #else
 #define ADDRESS 0xa000

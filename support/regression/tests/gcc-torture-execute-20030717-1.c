@@ -17,6 +17,7 @@
    analysis, while the program used uninitialized pseudos created by
    convert_modes.  */
 
+#ifndef __SDCC_pdk14 // lack of memory
 struct A
 {
   unsigned short a1;
@@ -63,10 +64,12 @@ int bar (struct C *x, struct A *y)
   x->c1[a].b4 = c + b;
   return a;
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_pdk14 // lack of memory
   struct A a;
   struct C b;
   int c;
@@ -78,5 +81,6 @@ testTortureExecute (void)
   b.c2 = 1;
   c = bar (&b, &a);
   return;
+#endif
 }
 

@@ -4,6 +4,7 @@
 
 #include <testfwk.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
 unsigned int  adc_samples[8];
 unsigned char sample_count = 8;
 
@@ -63,10 +64,13 @@ void mix_columns(unsigned char *dbuf)
 }
 
 unsigned char buf[20];
+#endif
 
 void testBug(void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
     mix_columns(buf);
     average();
+#endif
     ASSERT(1);
 }

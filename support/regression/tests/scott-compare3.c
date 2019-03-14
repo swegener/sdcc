@@ -131,6 +131,7 @@ void c_a500(void)
 // achar0  == 0xa5
 // aint0  == 0xabcd
 
+#ifndef __SDCC_pdk14 // Lack of memory
 void c_abcd(void)
 {
 
@@ -145,11 +146,12 @@ void c_abcd(void)
   ASSERT(aint0 == (unsigned short int)0x1234abcdU);
 
 }
+#endif
 
 void
 testCompare3 (void)
 {
-
+#ifndef __SDCC_pdk14 // Lack of memory
   aint1 = 1;
   achar1 = 1;
   c_0();
@@ -169,4 +171,5 @@ testCompare3 (void)
 
   aint0 = 0xabcd;
   c_abcd();
+#endif
 }

@@ -46,22 +46,27 @@
 #  warning Unknown type
 #endif
 
+#if !(defined(__SDCC_pdk14) && defined(TYPE_long)) // Not enough RAM
 /* the variable 'mask' is only defined to see if MASK is correctly set up */
 const unsigned long mask = MASK;
 
       volatile          {type}  v;
       volatile UNSIGNED {type} uv;
 /* an array would be nicer, but an array of bits isn't possible */
-_data                   {type}  a0 , a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 ,
-                                a10, a11, a12, a13, a14, a15, a16, a17, a18, a19,
-                                a20;
+_data                   {type}  a0, a1, a2, a3, a4, a5, a6, a7, a8, a9                            
+#if !(defined(__SDCC_pdk14) && defined(TYPE_short)) // Not enough RAM
+                                , a10, a11, a15 , a12, a13, a14, a16, a17, a18, a19, a20
+#endif
+;
 _data          UNSIGNED {type} ua0, ua1, ua2, ua3, ua4, ua5, ua6;
 _data                   {type}  b;
 _data volatile UNSIGNED {type} ub = 0xbe;
+#endif
 
 void
 testcse(void)
 {
+#if !(defined(__SDCC_pdk14) && defined(TYPE_long)) // Not enough RAM
    b = 0xeb;
   ub = 0xbe;
    v = 0x33;
@@ -89,21 +94,25 @@ testcse(void)
    a8   =    0 | b;
    a9   =    0 | v;
 
+#if !(defined(__SDCC_pdk14) && defined(TYPE_short)) // Not enough RAM
    a10  = MASK |  b;
    a11  = MASK |  v;
   ua3   = MASK | ub;
   ua4   = MASK | uv;
-
    a12  =    b | b;
    a13  =    v | v;
 
    a14 |= 0;
+#endif
    v   |= 0;
+#if !(defined(__SDCC_pdk14) && defined(TYPE_short)) // Not enough RAM
    a15 |= MASK;
+#endif
    v   |= MASK;
   ua5  |= MASK;
   uv   |= MASK;
 
+#if !(defined(__SDCC_pdk14) && defined(TYPE_short)) // Not enough RAM
    a16  = 0 ^ b;
    a17  = 0 ^ v;
 
@@ -111,6 +120,7 @@ testcse(void)
    a19  = v ^ v;
 
    a20 ^= 0;
+#endif
    v   ^= 0;
 
    ASSERT( a0  ==  0);
@@ -136,6 +146,7 @@ testcse(void)
    // ASSERT(ua2 == 0);
    ASSERT( a8  ==  b);
    ASSERT( a9  ==  0);
+#if !(defined(__SDCC_pdk14) && defined(TYPE_short)) // Not enough RAM
    ASSERT( a10 == ({type}) MASK);
    ASSERT( a11 == ({type}) MASK);
    ASSERT(ua3  == MASK);
@@ -150,7 +161,9 @@ testcse(void)
    ASSERT( a18 == 0);
    ASSERT( a19 == 0);
    // ASSERT( a20 == 0);
+#endif
    ASSERT( v   == ({type}) MASK);
    ASSERT(uv   == MASK);
+#endif
 }
 

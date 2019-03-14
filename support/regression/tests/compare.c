@@ -17,7 +17,7 @@ testCmpAroundZero(void)
     ASSERT(i > 0);
     ASSERT(0 <= i);
     ASSERT(i >= 0);
-    
+#if !defined(__SDCC_pdk14) // Lack of memory
     i = -33;
     ASSERT(0 > i);
     ASSERT(i < 0);
@@ -28,6 +28,7 @@ testCmpAroundZero(void)
     ASSERT(0 == i);
     ASSERT(0 <= i);
     ASSERT(0 >= i);
+#endif
 }
 
 static void
@@ -39,16 +40,19 @@ testCompareConstants(void)
     ASSERT(i < 23);
     ASSERT(i > 3);
     ASSERT(i > -14);
+#if !defined(__SDCC_pdk14) // Lack of memory
     ASSERT(i <= 23);
     ASSERT(i >= 3);
     ASSERT(i >= -14);
     ASSERT(i <= 12);
     ASSERT(i >= 12);
     ASSERT(i == 12);
+#endif
 
     i = -34;
     ASSERT(i > -126);
     ASSERT(i < -3);
+#if !defined(__SDCC_pdk14) // Lack of memory
     ASSERT(i < 47);
     ASSERT(i >= -126);
     ASSERT(i <= -3);
@@ -56,6 +60,7 @@ testCompareConstants(void)
     ASSERT(i <= -34);
     ASSERT(i >= -34);
     ASSERT(i == -34);
+#endif
 }
 
 static void
@@ -75,7 +80,7 @@ testCompareVariables(void)
     ASSERT(left >= right);
     ASSERT(right < left);
     ASSERT(right <= left);
-
+#if !defined(__SDCC_pdk14) // Lack of memory
     right = 0;
     ASSERT(left > right);
     ASSERT(left >= right);
@@ -86,6 +91,7 @@ testCompareVariables(void)
     ASSERT(left == right);
     ASSERT(left <= right);
     ASSERT(left >= right);
+#endif
 }
 
 static void
@@ -105,6 +111,7 @@ testUnsignedCompare(void)
 void (*fptr)(void);
 int *volatile iptr;
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 signed {type} s;
 unsigned {type} u;
 
@@ -113,10 +120,12 @@ void set ({type} v)
 	s = v;
 	u = v;
 }
+#endif
 
 /* Test optimization for eliminating redundant loads in range tests. s and u should not be volatile. */
 void testRange(void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
     set (17);
 
     ASSERT (s >= 17 && s <= 20);
@@ -136,6 +145,7 @@ void testRange(void)
 
     ASSERT (!(s > 17 && s < 20));
     ASSERT (!(u > 17 && u < 20));
+#endif
 }
 
 void testPointerCompare(void)

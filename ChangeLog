@@ -1,3 +1,8 @@
+2019-03-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c: fix bug in optimized 2 byte swap
+	* support/regression/tests/bool.c: pass all ds390 tests now
+
 2019-03-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/collate-results.py:

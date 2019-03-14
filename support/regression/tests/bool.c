@@ -75,17 +75,13 @@ testBool(void)
 
 	E = true;
 	ASSERT((E ? 1 : 0) == (!(!E)));
-#ifndef __SDCC_ds390
 	ASSERT((E += 2) == 1);
-#endif
 	ASSERT((--E, --E, E) == E);
 
 	E = false;
-#ifndef __SDCC_ds390
 	ASSERT((E ? 1 : 0) == (!(!E)));
 	ASSERT((E += 2) == 1);
 	ASSERT((--E, --E, E) == E);
-#endif
 
 	E = 0;   ASSERT(!E); // sets E to 0
 	E = 1;   ASSERT(E);  // sets E to 1

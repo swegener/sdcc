@@ -7163,10 +7163,10 @@ genSwap (iCode * ic)
         break;
       if (AOP_TYPE (result) == AOP_REG && AOP_TYPE (left) == AOP_REG)
         {
-          if (AOP (result)->aopu.aop_reg[1] != AOP (left)->aopu.aop_reg[0]);
+          if (AOP (result)->aopu.aop_reg[1] != AOP (left)->aopu.aop_reg[0])
             pushReg (AOP (left)->aopu.aop_reg[0], TRUE);
           storeRegToAop (AOP (left)->aopu.aop_reg[1], AOP (result), 0);
-          if (AOP (result)->aopu.aop_reg[1] != AOP (left)->aopu.aop_reg[0]);
+          if (AOP (result)->aopu.aop_reg[1] != AOP (left)->aopu.aop_reg[0])
             pullReg (AOP (result)->aopu.aop_reg[1]);
         }
       else if (operandsEqu (left, result) || sameRegs (AOP (left), AOP (result)))
@@ -9818,6 +9818,7 @@ genAssignLit (operand * result, operand * right)
   for (offset=0; offset<size; offset++)
     {
       assigned[offset] = 0;
+      dup[offset] = 0;
       value[offset] = byteOfVal (AOP (right)->aopu.aop_lit, offset);
     }
 

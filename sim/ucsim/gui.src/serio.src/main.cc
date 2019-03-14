@@ -41,6 +41,7 @@ void PrintUsage(char *progname)
   std::cout << "-o <filename>\t<filename> is the pipe to the controllers' serial output\n";
   std::cout << "-I \t\thexa filter on input\n";
   std::cout << "-O \t\thexa filter on output\n";
+  std::cout << "-L n\tSet line length of hex dump in output panel (def=8)\n";
   std::cout << "-h\t\tshow the help\n";
   std::cout << "\nTim Hurman - t.hurman@virgin.net\n";
   exit(0);
@@ -102,20 +103,35 @@ int main(int argc, char **argv)
   sig->SetSignal(SIGINT, HandleSig);
   
   // set the timeout for waiting for a char
+  fd_set s;
   while(doloop)
     {
-      int ret= view->GetChInWin(&string[0]);
-      if (ret > 0)
-	{
-	  fobj->SendByte(string[0]);
-	}
-      else if (ret < 0)
-	break;
+      int ret, i;
+      FD_ZERO(&s);
+      FD_SET(fileno(stdin), &s);
+      FD_SET(fobj->infile_id(), &s);
 
-      if (fobj->RecvByte(string) > 0)
-	view->AddChOutWin(string[0]);
-      
-      usleep(5000);
+      i= select(FD_SETSIZE, &s, NULL, NULL, NULL);
+      if (i >= 0)
+	{
+	  if (FD_ISSET(fileno(stdin), &s))
+	    {
+	      ret= view->GetChInWin(&string[0]);
+	      if (ret > 0)
+		{
+		  fobj->SendByte(string[0]);
+		}
+	      else if (ret < 0)
+		break;
+	    }
+
+	  if (FD_ISSET(fobj->infile_id(), &s))
+	    {
+	      if (fobj->RecvByte(string) > 0)
+		view->AddChOutWin(string[0]);
+	    }
+	}
+      //usleep(5000);
     }
   
   delete fobj;

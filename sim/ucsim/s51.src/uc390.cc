@@ -1268,6 +1268,7 @@ cl_uc390::print_regs (class cl_console_base *con)
     }
   start = sfr->get (PSW) & 0x18;
   iram->dump (start, start + 7, 8, con->get_fout());
+  con->dd_printf("     R0 R1 R2 R3 R4 R5 R6 R7\n");
   data = iram->get (iram->get (start));
   con->dd_printf ("@R0 %02x %c", data, isprint (data) ? data : '.');
   con->dd_printf ("  ACC= 0x%02x %3d %c  B= 0x%02x",

@@ -18,6 +18,8 @@ public:
   virtual int RecvByte(char *b);
   virtual int SendStr(char *str);
   virtual int RecvStr(char *str);
+
+  virtual int infile_id() { return fdin; }
   
 private:
   int fdin;

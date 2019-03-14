@@ -36,6 +36,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "serial_hwcl.h"
 
 
+bool
+cl_serial_io::input_avail(void)
+{
+  return cl_hw_io::input_avail();
+}
+
+
 cl_serial_hw::cl_serial_hw(class cl_uc *auc, int aid, chars aid_string):
   cl_hw(auc, HW_UART, aid, (const char *)aid_string)
 {

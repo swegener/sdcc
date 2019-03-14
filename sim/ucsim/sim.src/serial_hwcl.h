@@ -52,6 +52,7 @@ class cl_serial_io: public cl_hw_io
   cl_hw_io(ihw)
   {}
   //virtual bool prevent_quit(void) { return true; }
+  virtual bool input_avail(void);
 };
 
 class cl_serial_hw: public cl_hw

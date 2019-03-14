@@ -431,7 +431,7 @@ cl_f::process_csi(void)
   int l= strlen(esc_buffer);
   if (l < 3)
     return 0;
-  int f, ret= 0;
+  int /*f,*/ ret= 0;
   char c= esc_buffer[l-1];
   
   switch (esc_buffer[2])
@@ -455,7 +455,7 @@ cl_f::process_csi(void)
 	    case 'p': ret= TU_CSUP; break;
 	    case 'q': ret= TU_CSDOWN; break;
 	    }
-	  f= ret;
+	  //f= ret;
 	  ret&= ~0xffff00;
 	  int x= (esc_buffer[4] - 0x20) & 0xff;
 	  int y= (esc_buffer[5] - 0x20) & 0xff;

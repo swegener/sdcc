@@ -35,6 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 #include <ctype.h>
 #include <errno.h>
+#include <signal.h>
 #include "i_string.h"
 
 // prj
@@ -82,6 +83,10 @@ cl_app::~cl_app(void)
 int
 cl_app::init(int argc, char *argv[])
 {
+  struct sigaction sa;
+  sa.sa_handler= SIG_IGN;
+  sigaction(SIGPIPE, &sa, NULL);
+
   cl_base::init();
   set_name(cchars("application"));
   mk_options();

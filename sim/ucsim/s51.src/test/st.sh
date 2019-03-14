@@ -105,3 +105,4 @@ echo "st${TEST},${VER},${E},${S}"|tee $CSV
 
 echo $E >st${TEST}${VER}_e.txt
 echo $ST >st${TEST}${VER}_st.txt
+echo $S >st${TEST}${VER}_s.txt

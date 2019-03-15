@@ -26,7 +26,7 @@
 
 static bool regalloc_dry_run;
 static unsigned int regalloc_dry_run_cost_words;
-static unsigned int regalloc_dry_run_cost_cycles;
+static float regalloc_dry_run_cost_cycles;
 static unsigned int regalloc_dry_run_cycle_scale = 1;
 
 static struct
@@ -113,7 +113,7 @@ emit2 (const char *inst, const char *fmt, ...)
 }
 
 static void
-cost(unsigned int words, unsigned int cycles)
+cost(unsigned int words, float cycles)
 {
   regalloc_dry_run_cost_words += words;
   regalloc_dry_run_cost_cycles += cycles * regalloc_dry_run_cycle_scale;
@@ -2456,7 +2456,7 @@ genLeftShift (const iCode *ic)
           cost (2, 2);
         }
 
-      regalloc_dry_run_cycle_scale = 0;
+      regalloc_dry_run_cycle_scale = 1;
     }
   else
     {
@@ -2607,7 +2607,7 @@ genRightShift (const iCode *ic)
           cost (2, 2);
         }
 
-      regalloc_dry_run_cycle_scale = 0;
+      regalloc_dry_run_cycle_scale = 1;
     }
   else
     {

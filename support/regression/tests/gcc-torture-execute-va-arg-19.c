@@ -13,6 +13,7 @@ void vafunction (char *dummy, ...)
   va_list ap;
 
   va_start(ap, dummy);
+#ifndef __SDCC_pdk14 // Lack of memory - see RFE #616
   if (va_arg (ap, TYPE) != 1)
     ASSERT(0);
   if (va_arg (ap, TYPE) != 2)
@@ -31,6 +32,7 @@ void vafunction (char *dummy, ...)
     ASSERT(0);
   if (va_arg (ap, TYPE) != 9)
     ASSERT(0);
+#endif
   va_end(ap);
 }
 

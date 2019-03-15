@@ -1,3 +1,10 @@
+2019-03-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fix calculation of cycle cost.
+	* support/regression/tests/gcc-torture-execute-va-arg-19.c:
+	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
+
 2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/cse.c,

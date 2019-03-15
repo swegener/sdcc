@@ -16,6 +16,7 @@ typedef unsigned {type} utype;
 
 volatile char is8 = 8;
 
+#if !defined(__SDCC_pdk14) // Lack of memory
 signed char  sc;
 signed short ss;
 signed LONG  sl;
@@ -34,6 +35,7 @@ utype u;
 volatile utype vu;
 
 unsigned LONG t1, t2;
+#endif
 
 int
 mulWrapper (int a, int b)
@@ -44,6 +46,7 @@ mulWrapper (int a, int b)
 void
 testOpOp (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory
   /* mul signedness: usualBinaryConversions() */
   vsc = 0x7f;
   vuc = 0xfe;
@@ -223,5 +226,6 @@ testOpOp (void)
   ASSERT ( 80  +  80  == 160);
   ASSERT (150  + 150  == 300);
   ASSERT (160u + 160u == 320);
+#endif
 }
 

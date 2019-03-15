@@ -13,11 +13,11 @@ void testGet(void)
     ASSERT (((global >>  8) & 0xFF) == 0x56);               // getByte 1
     ASSERT (((global >> 16) & 0xFF) == 0x34);               // getByte 2
     ASSERT (((global >> 24) & 0xFF) == 0x12);               // getByte 3
-
+#if !defined(__SDCC_pdk14) // Lack of memory - see RFE #617.
     ASSERT (((global >>  0) & 0xFFFF) == 0x5678);           // getWord 0
     ASSERT (((global >>  8) & 0xFFFF) == 0x3456);           // getWord 1
     ASSERT (((global >> 16) & 0xFFFF) == 0x1234);           // getWord 2
-#if !defined(__SDCC_pdk14) // Lack of memory
+
     ASSERT ((uint8_t)(global >>  0) == (uint8_t)0x78);      // getByte 0
     ASSERT ((uint8_t)(global >>  8) == (uint8_t)0x56);      // getByte 1
     ASSERT ((uint8_t)(global >> 16) == (uint8_t)0x34);      // getByte 2

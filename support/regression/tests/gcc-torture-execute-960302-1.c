@@ -10,6 +10,7 @@
 
 long a = 1;
 
+#if !defined(__SDCC_pdk14) // Lack of memory - see RFE #364.
 foo ()
 {
   switch (a % 2 % 2 % 2 % 2 % 2 % 2 % 2 % 2)
@@ -22,12 +23,15 @@ foo ()
       return -1;
     }
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pdk14) // Lack of memory - see RFE #364.
   if (foo () != 1)
     ASSERT (0);
   return;
+#endif
 }
 

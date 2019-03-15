@@ -46,7 +46,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 struct dis_entry disass_pdk_14[]= {
   { 0x0000, ~0x0000, ' ', 2, "nop" },
   { 0x007A, ~0x0000, ' ', 2, "ret" },
-  { 0x0200, ~0x007F, ' ', 2, "ret %k" },
+  { 0x0200, ~0x00FF, ' ', 2, "ret %k" },
   { 0x007B, ~0x0000, ' ', 2, "reti" },
   { 0x2F00, ~0x00FF, ' ', 2, "mov a, %k" },
   { 0x0180, ~0x003F, ' ', 2, "mov %i, a" },

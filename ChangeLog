@@ -2,8 +2,9 @@
 
 	* src/pdk/gen.c:
 	  Cheaper adjustment of pointer in p.
-	* support/regression/tests/bug-2885.c:
-	  Test for bug #2885.
+	* device/include/limits.h,
+	  support/regression/tests/bug-2885.c:
+	  Fix bug #2885.
 
 2019-03-15 Philipp Klaus Krause <pkk AT spth.de>
 

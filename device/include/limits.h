@@ -46,7 +46,7 @@
 #define MB_LEN_MAX  4
 #endif
 
-#define INT_MIN    -32768
+#define INT_MIN     (-32767 - 1)
 #define INT_MAX     32767
 #define SHRT_MAX    INT_MAX
 #define SHRT_MIN    INT_MIN

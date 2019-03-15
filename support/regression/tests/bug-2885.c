@@ -9,13 +9,14 @@
 
 void testBug (void)
 {
-#if 0 // Bug
   ASSERT(sizeof(INT_MIN) == sizeof(int));
-#endif
   ASSERT(sizeof(INT_MAX) == sizeof(int));
   ASSERT(sizeof(UINT_MAX) == sizeof(unsigned int));
   ASSERT(sizeof(LONG_MIN) == sizeof(long));
   ASSERT(sizeof(LONG_MAX) == sizeof(long));
   ASSERT(sizeof(ULONG_MAX) == sizeof(unsigned long));
+  ASSERT(sizeof(LLONG_MIN) == sizeof(long long));
+  ASSERT(sizeof(LLONG_MAX) == sizeof(long long));
+  ASSERT(sizeof(ULLONG_MAX) == sizeof(unsigned long long));
 }
 

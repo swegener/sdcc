@@ -18,6 +18,8 @@
 	* src/pdk/ralloc2.cc,
 	  support/regression/tests/bug2817646.c:
 	  Improve register allocation for pointer read and some arithmetic operations.
+	* support/regression/tests/gcc-torture-execute-20051110-2.c:
+	  Disable test that fails due to bug #2884.
 
 2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
 

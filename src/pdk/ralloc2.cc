@@ -45,11 +45,7 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
 
   // Todo: More fine-grained control for these.
   if (!(ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS && !IS_FLOAT (operandType (left)) || ic->op == '~' ||
-    ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND ||
-    ic->op == GET_VALUE_AT_ADDRESS))
-    return;
-
-  if (ic->op == GET_VALUE_AT_ADDRESS && getSize(operandType(IC_RESULT(ic))) == 1)
+    ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND))
     return;
 
   operand_map_t::const_iterator oir, oir_end, oirs; 
@@ -193,7 +189,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   // For most operations only allow lower byte in a for now (upper byte for result).
   if (left_in_A && !operand_byte_in_reg(left, 0, REG_A, a, i, G) || right_in_A && !operand_byte_in_reg(right, 0, REG_A, a, i, G) ||
-    result_in_A && !operand_byte_in_reg(result, getSize(operandType(result)) - 1, REG_A, a, i, G))
+    ic->op != '+' && ic->op != '-' && ic->op != UNARYMINUS && result_in_A && !operand_byte_in_reg(result, getSize(operandType(result)) - 1, REG_A, a, i, G))
     return(false);
 
   if ((ic->op == GET_VALUE_AT_ADDRESS || ic->op == SET_VALUE_AT_ADDRESS) && (left_in_A || right_in_A))

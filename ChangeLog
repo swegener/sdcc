@@ -13,6 +13,8 @@
 	  Disable a test for ds390, where it fails (bug #2883).
 	* sim/ucsim/pdk.src/glob.cc:
 	  Fix ret k debug output, patch by Nicolas Lesser.
+	* src/SDCCglue.c:
+	  Fix initalization of const pointers to non-const char for pdk.
 
 2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
 

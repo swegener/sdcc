@@ -581,7 +581,7 @@ static void popAF (void)
 static void pointPStack (int s, bool a_dead, bool f_dead)
 {
   // Try to adjust p when doing so is cheaper.
-  if (G.p.type == AOP_STK && abs(G.p.offset - s) <= 3 + !(a_dead && f_dead) * 2)
+  if (G.p.type == AOP_STK)
     {
       if (G.p.offset == s)
         return;
@@ -589,19 +589,29 @@ static void pointPStack (int s, bool a_dead, bool f_dead)
       if (!f_dead)
         pushAF();
 
-      while (G.p.offset < s)
+      if (abs(G.p.offset - s) <= 3)
         {
-          emit2 ("inc", "p");
-          cost (1, 1);
-          G.p.offset++;
-        }
+          while (G.p.offset < s)
+            {
+              emit2 ("inc", "p");
+              cost (1, 1);
+              G.p.offset++;
+            }
 
-      while (G.p.offset > s)
-        {
-          emit2 ("dec", "p");
-          cost (1, 1);
-          G.p.offset--;
-        }
+          while (G.p.offset > s)
+            {
+              emit2 ("dec", "p");
+              cost (1, 1);
+              G.p.offset--;
+            }
+       }
+     else
+       {
+         emit2 ("xch", "a, p");
+         emit2 ("add", "a, #%d", s - G.p.offset);
+         emit2 ("xch", "a, p");
+         G.p.offset = s;
+       }
 
      if (!f_dead)
         popAF();
@@ -2873,12 +2883,22 @@ genPointerGet (const iCode *ic)
             }
 
           genMove (ASMOP_PA, left->aop, true);
-          for (int j = 0; j < i; j++)
+          if (i > 2)
             {
-              emit2 ("inc", "p");
+              emit2 ("xch", "a, p");
+              emit2 ("add", "a, #%d", i);
+              emit2 ("xch", "a, p");
               emit2 ("addc", "a");
-              cost (2, 2);
+              cost (4, 4);
             }
+          else
+            for (int j = 0; j < i; j++)
+              {
+                emit2 ("inc", "p");
+                emit2 ("addc", "a");
+                cost (2, 2);
+              }
+
           emit2 ("call", "__gptrget");
           cost (1, (ptype == CPOINTER) ? 16 : 8);
 
@@ -2972,11 +2992,19 @@ genPointerSet (iCode *ic)
         {
           cheapMove (ASMOP_A, 0, right->aop, i, true, true);
           cheapMove (ASMOP_P, 0, left->aop, 0, false, true);
-          for (int j = 0; j < i; j++)
+          if (i > 3)
             {
-              emit2 ("inc", "p");
-              cost (1, 1);
+              emit2 ("xch", "a, p");
+              emit2 ("add", "a, #%d", i);
+              emit2 ("xch", "a, p");
+              cost (3, 3);
             }
+          else
+            for (int j = 0; j < i; j++)
+              {
+                emit2 ("inc", "p");
+                cost (1, 1);
+              }
           emit2 ("idxm", "p, a");
           cost (1, 2);
         }

@@ -1,6 +1,11 @@
 2019-03-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:
+	  Cheaper adjustment of pointer in p.
+
+2019-03-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
 	  Fix calculation of cycle cost.
 	* support/regression/tests/gcc-torture-execute-va-arg-19.c,
 	  support/regression/tests/gcc-torture-execute-960302-1.c,

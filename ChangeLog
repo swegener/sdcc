@@ -20,6 +20,8 @@
 	  Improve register allocation for pointer read and some arithmetic operations.
 	* support/regression/tests/gcc-torture-execute-20051110-2.c:
 	  Disable test that fails due to bug #2884.
+	* src/SDCCopt.c:
+	  Move width optimization so that it gets proper information from ic sequencing.
 
 2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
 

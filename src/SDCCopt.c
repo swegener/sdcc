@@ -3144,6 +3144,8 @@ eBBlockFromiCode (iCode *ic)
   loops = createLoopRegions (ebbi);
   computeDataFlow (ebbi);
   computeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
+  while (optimizeOpWidth (ebbi->bbOrder, ebbi->count))
+    optimizeCastCast (ebbi->bbOrder, ebbi->count);
   adjustIChain (ebbi->bbOrder, ebbi->count);
   ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));
   shortenLiveRanges (ic, ebbi);
@@ -3198,8 +3200,6 @@ eBBlockFromiCode (iCode *ic)
   ebbi = iCodeBreakDown (ic);
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
-  while (optimizeOpWidth (ebbi->bbOrder, ebbi->count)) /* Do it again here, as some opportunities might be have been missed above due to code that later turned out to be dead. */
-    optimizeCastCast (ebbi->bbOrder, ebbi->count);
   computeDataFlow (ebbi);
 
   if (!options.lessPedantic)

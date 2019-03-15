@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 
-#ifndef __SDCC_pdk14
+#ifndef __SDCC_pdk14 // Reentrancy
 int debug (void) { return 1; }
 int errors;
 
@@ -37,9 +37,11 @@ struct s array[2] = { { 1, bad_compare }, { -1, bad_compare } };
 void
 testTortureExecute (void)
 {
+#ifndef __SDCC_ds390 // Bug #2883
 #ifndef __SDCC_pdk14
   qsort (array, 2, sizeof (struct s), compare);
   ASSERT (!(errors == 0));
+#endif
 #endif
 }
 

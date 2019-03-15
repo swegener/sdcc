@@ -9,6 +9,8 @@
 	  Disable some tests for pdk14 (on which they won't work anytime soon due to lack of memory).
 	* support/regression/tests/gcc-torture-execute-20041011-1.c:
 	  Redisable test for ds390 that got enabled accientially.
+	* support/regression/tests/gcc-torture-execute-pr34456.c:
+	  Disable a test for ds390, where it fails (bug #2883).
 
 2019-03-14 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -15,7 +15,8 @@
 	  Fix ret k debug output, patch by Nicolas Lesser.
 	* src/SDCCglue.c:
 	  Fix initalization of const pointers to non-const char for pdk.
-	* src/pdk/ralloc2.cc:
+	* src/pdk/ralloc2.cc,
+	  support/regression/tests/bug2817646.c:
 	  Improve register allocation for pointer read and some arithmetic operations.
 
 2019-03-14 Philipp Klaus Krause <pkk AT spth.de>

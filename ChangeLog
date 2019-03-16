@@ -1,3 +1,9 @@
+2019-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sim/ucsim/aclocal.m4,
+	* sim/ucsim/configure.ac,
+	* sim/ucsim/configure: request c++11 dialect
+
 2019-03-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:

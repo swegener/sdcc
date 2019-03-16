@@ -3255,6 +3255,33 @@ genIfx (const iCode *ic)
 
   aopOp (cond, ic);
 
+  if ((aopInReg (cond->aop, 0, A_IDX) && aopInReg (cond->aop, 1, P_IDX) ||
+    aopInReg (cond->aop, 0, P_IDX) && aopInReg (cond->aop, 1, A_IDX)) &&
+    !regDead (A_IDX, ic))
+    {
+      if (IC_TRUE (ic))
+        {
+          emit2 ("ceqsn", "a, #0");
+          cost (1, 1.5f);
+          emitJP (IC_TRUE (ic), 0.5f);
+          emit2 ("ceqsn", "a, p");
+          cost (1, 0.75f);
+          emitJP (IC_TRUE (ic), 0.375f);
+        }
+      else
+        {
+          symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
+          emit2 ("ceqsn", "a, #0");
+          if (!regalloc_dry_run) emit2 ("goto", "#!tlabel", labelKey2num (tlbl->key));
+          emit2 ("cneqsn", "a, p");
+          cost (3, 3.25f);
+          emitJP (IC_FALSE (ic), 0.375f);
+          emitLabel (tlbl);
+        }
+
+      goto release;
+    }
+
   int skip_byte;
   if (aopInReg (cond->aop, 1, A_IDX))
     {
@@ -3290,6 +3317,7 @@ genIfx (const iCode *ic)
   cost (1, 1); 
   emitJP (IC_FALSE (ic) ? IC_FALSE (ic) : IC_TRUE (ic), 0.0f);
 
+release:
   freeAsmop (cond);
 }
 

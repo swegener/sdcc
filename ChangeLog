@@ -1,5 +1,11 @@
 2019-03-16 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/pdk/ralloc2.cc,
+	  src/pdk/gen.c:
+	  Better register allocation for surviving ifx operands, RFE #610.
+
+2019-03-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/gcc-torture-execute-divcmp-2.c:
 	  Enable passing test for pdk14.
 	* src/z80/gen.c,

@@ -2,6 +2,10 @@
 
 	* support/regression/tests/gcc-torture-execute-divcmp-2.c:
 	  Enable passing test for pdk14.
+	* src/z80/gen.c,
+	  support/regression/tests/z88dk.c,
+	  support/regression/tests/bug-2881.c:
+	  Fix bug #2881.
 
 2019-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

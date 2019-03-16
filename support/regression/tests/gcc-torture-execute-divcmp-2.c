@@ -41,7 +41,6 @@ int test6(int x)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // TODO Bug ?
   if (test1(19) != 0)
     ASSERT (0);
   if (test1(20) != 1)
@@ -97,6 +96,5 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 }
 

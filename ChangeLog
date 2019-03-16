@@ -1,3 +1,8 @@
+2019-03-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-divcmp-2.c:
+	  Enable passing test for pdk14.
+
 2019-03-16 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sim/ucsim/aclocal.m4,

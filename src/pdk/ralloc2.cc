@@ -139,8 +139,16 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   bool left_dir = IS_TRUE_SYMOP (left) || IS_ITEMP (left) && !(options.stackAuto || reentrant) && !left_in_A;
   bool right_dir = IS_TRUE_SYMOP (right) || IS_ITEMP (right) && !(options.stackAuto || reentrant) && !right_in_A;
 
+  if(result && IS_ITEMP(result) && OP_SYMBOL_CONST(result)->remat && !operand_in_reg(result, REG_A, ia, i, G) && !operand_in_reg(result, REG_P, ia, i, G))
+    return(true);
+
   if (ic->op == DUMMY_READ_VOLATILE || ic->op == '=')
     return(true);
+
+  if ((ic->op == EQ_OP || ic->op == NE_OP) && dying_A &&
+    (left_in_A && (right_dir || IS_OP_LITERAL(right) || IS_ITEMP(right) && OP_SYMBOL_CONST(right)->remat) ||
+    right_in_A && (left_dir || IS_OP_LITERAL(left) || IS_ITEMP(left) && OP_SYMBOL_CONST(left)->remat)))
+    return (true);
 
   if ((ic->op == EQ_OP || ic->op == NE_OP || (ic->op == '>' || ic->op == '<') && SPEC_USIGN(getSpec(operandType(left)))) && // Non-destructive comparison.
     (left_in_A && getSize(operandType(left)) == 1 && (IS_OP_LITERAL(right) || right_dir) || right_in_A && getSize(operandType(right)) == 1 && (IS_OP_LITERAL(left) || left_dir)))
@@ -227,6 +235,9 @@ static bool Pinst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   bool left_stack = IS_ITEMP (left) && (options.stackAuto || reentrant) && !left_in_A && !left_in_P;
   bool right_stack = IS_ITEMP (right) && (options.stackAuto || reentrant) && !right_in_A && !right_in_P;
+
+  if(result && IS_ITEMP(result) && OP_SYMBOL_CONST(result)->remat && !operand_in_reg(result, REG_A, ia, i, G) && !operand_in_reg(result, REG_P, ia, i, G))
+    return(true);
 
   // Arithmetic uses p internally for literal operands with multiple nonzero bytes.
   if ((ic->op == '+' || ic->op == '-' || ic->op == '!' || ic->op == '<' || ic->op == '>') && (IS_OP_LITERAL(left) || IS_OP_LITERAL(right)))
@@ -445,7 +456,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
       set_surviving_regs(a, i, G, I);
       c = dryPdkiCode(ic);
 
-      if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT (ic)) && !OP_SYMBOL(IC_RESULT(ic))->remat && // Nudge towards saving RAM space. TODO: Do this in a better way, so it works for all backends!
+      if (IC_RESULT (ic) && IS_ITEMP (IC_RESULT(ic)) && !OP_SYMBOL_CONST(IC_RESULT(ic))->remat && // Nudge towards saving RAM space. TODO: Do this in a better way, so it works for all backends!
         !operand_in_reg(IC_RESULT(ic), REG_A, a.i_assignment, i, G) && !operand_in_reg(IC_RESULT(ic), REG_P, a.i_assignment, i, G)) 
         c += 0.0001;
 
@@ -555,7 +566,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
   assignment_optimal = true;
   tree_dec_ralloc_nodes(T, find_root(T), G, I2, ac, &assignment_optimal);
 
-  const assignment &winner = *(T[find_root(T)].assignments.begin());
+  /*const*/ assignment &winner = *(T[find_root(T)].assignments.begin());
 
 #ifdef DEBUG_RALLOC_DEC
   std::cout << "Winner: ";

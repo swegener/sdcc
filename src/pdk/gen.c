@@ -2013,41 +2013,62 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
 
   int size = max (left->aop->size, right->aop->size);
 
-  for (int i = 0; i < size; i++)
+  if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX) || aopInReg (right->aop, 1, A_IDX))
     {
-      /* Prefer literal operand on right */
-      if (left->aop->type == AOP_LIT || aopInReg (right->aop, i, A_IDX))
-        {
-          operand *temp = left;
-          left = right;
-          right = temp;
-        }
+      operand *temp = left;
+      left = right;
+      right = temp;
+    }
 
-      cheapMove (ASMOP_A, 0, left->aop, i, true, true);
+  if (aopInReg (left->aop, 1, A_IDX) && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || right->aop->type == AOP_IMMD))
+    {
+      wassert (regDead (A_IDX, ic));
 
-      if (right->aop->type == AOP_STK)
+      emit2 ("ceqsn", "a, %s", aopGet (right->aop, 1));
+      cost (1, 1);
+      emitJP (lbl_ne, 0.0f);
+      cheapMove (ASMOP_A, 0, left->aop, 0, true, true);
+      if (ifx && ((ic->op == EQ_OP) ^ (bool)(IC_FALSE(ifx))))
         {
-          if (!regDead (P_IDX, ic))
-            {
-              cost (1000, 1000);
-              wassert (regalloc_dry_run);
-            }
-          cheapMove (ASMOP_P, 0, right->aop, i, false, true);
-        }
-
-      if (ifx && i + 1 == size && ((ic->op == EQ_OP) ^ (bool)(IC_FALSE(ifx))))
-        {
-          emit2 ("cneqsn", "a, %s", right->aop->type == AOP_STK ? "p" : aopGet (right->aop, i));
+          emit2 ("cneqsn", "a, %s", aopGet (right->aop, 0));
           cost (1, 1);
           emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.0f);
         }
       else
         {
-          emit2 ("ceqsn", "a, %s", right->aop->type == AOP_STK ? "p" : aopGet (right->aop, i));
+          emit2 ("ceqsn", "a, %s", aopGet (right->aop, 0));
           cost (1, 1);
-          emitJP(lbl_ne, 0.0f);
+          emitJP (lbl_ne, 0.0f);
         }
     }
+  else
+    for (int i = 0; i < size; i++)
+      {
+        cheapMove (ASMOP_A, 0, left->aop, i, true, true);
+  
+        if (right->aop->type == AOP_STK)
+          {
+            if (!regDead (P_IDX, ic))
+              {
+                cost (1000, 1000);
+                wassert (regalloc_dry_run);
+              }
+            cheapMove (ASMOP_P, 0, right->aop, i, false, true);
+          }
+  
+        if (ifx && i + 1 == size && ((ic->op == EQ_OP) ^ (bool)(IC_FALSE(ifx))))
+          {
+            emit2 ("cneqsn", "a, %s", right->aop->type == AOP_STK ? "p" : aopGet (right->aop, i));
+            cost (1, 1);
+            emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.0f);
+          }
+        else
+          {
+            emit2 ("ceqsn", "a, %s", right->aop->type == AOP_STK ? "p" : aopGet (right->aop, i));
+            cost (1, 1);
+            emitJP(lbl_ne, 0.0f);
+          }
+      }
 
   if (ifx) // Jump condition only.
     {

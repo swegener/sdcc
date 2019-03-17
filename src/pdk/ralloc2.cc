@@ -139,7 +139,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   bool left_dir = IS_TRUE_SYMOP (left) || IS_ITEMP (left) && !(options.stackAuto || reentrant) && !left_in_A;
   bool right_dir = IS_TRUE_SYMOP (right) || IS_ITEMP (right) && !(options.stackAuto || reentrant) && !right_in_A;
 
-  if (ic->op == DUMMY_READ_VOLATILE)
+  if (ic->op == DUMMY_READ_VOLATILE || ic->op == '=')
     return(true);
 
   if ((ic->op == EQ_OP || ic->op == NE_OP || (ic->op == '>' || ic->op == '<') && SPEC_USIGN(getSpec(operandType(left)))) && // Non-destructive comparison.
@@ -169,12 +169,12 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   if (ic->op == GET_VALUE_AT_ADDRESS && !left_in_A)
     return(true);
 
-  if ((ic->op == '=' || ic->op == CAST) &&
+  if (ic->op == CAST &&
     (getSize(operandType(result)) == 1 || getSize(operandType(result)) == 2 && SPEC_USIGN (getSpec(operandType(right))) && operand_byte_in_reg(result, 1, REG_P, a, i, G)) &&
     right_in_A && (result_dir || dying_A))
     return (true);
 
-  if ((ic->op == '=' || ic->op == CAST && (getSize(operandType(result)) <= getSize(operandType(right)) || SPEC_USIGN (getSpec(operandType(right))))) &&
+  if ((ic->op == CAST && (getSize(operandType(result)) <= getSize(operandType(right)) || SPEC_USIGN (getSpec(operandType(right))))) &&
     getSize(operandType(result)) <= 2 &&
     (result_dir && dying_A || result_in_A && right_dir || result_in_A && right_in_A))
     return (true);

@@ -796,6 +796,7 @@ push (const asmop *op, int offset, int size)
   // Save old stack pointer
   emit2 ("mov", "a, sp");
   emit2 ("mov", "p, a");
+  G.p.type = AOP_INVALID;
   cost (2, 2);
 
   adjustStack (size, true, false);
@@ -812,6 +813,7 @@ push (const asmop *op, int offset, int size)
           cost (1, 1);
         }
     }
+  G.p.type = AOP_INVALID;
 }
 
 /*-----------------------------------------------------------------*/
@@ -868,12 +870,34 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       cheapMove (result, roffset + 0, source, soffset + 0, false, true);
       return;
     }
+  else if (size == 2 && result->type == AOP_DIR && !a_dead_global && // Using xch cheaper than push / pop.
+    aopInReg (source, soffset, A_IDX) && aopInReg (source, soffset + 1, P_IDX))
+    {
+      cheapMove (result, roffset + 0, ASMOP_A, 0, false, true);
+      emit2 ("xch", "a, p");
+      cost (1, 1);
+      cheapMove (result, roffset + 1, ASMOP_A, 0, false, true);
+      emit2 ("xch", "a, p");
+      cost (1, 1);
+      return;
+    }
+  else if (size == 2 && result->type == AOP_DIR && !a_dead_global && // Using xch cheaper than push / pop.
+    aopInReg (source, soffset, P_IDX) && aopInReg (source, soffset + 1, A_IDX))
+    {
+      cheapMove (result, roffset + 1, ASMOP_A, 0, false, true);
+      emit2 ("xch", "a, p");
+      cost (1, 1);
+      cheapMove (result, roffset + 0, ASMOP_A, 0, false, true);
+      emit2 ("xch", "a, p");
+      cost (1, 1);
+      return;
+    }
   else if (size == 2 && // Assign upper byte first to avoid overwriting a.
     (aopInReg (result, roffset, A_IDX) && aopInReg (result, roffset + 1, P_IDX) && source->type == AOP_DIR ||
     aopInReg (source, soffset, P_IDX) && aopInReg (source, soffset + 1, A_IDX) && result->type == AOP_DIR))
     {
-      cheapMove (result, roffset + 1, source, soffset + 1, true, true);
-      cheapMove (result, roffset + 0, source, soffset + 0, true, true);
+      cheapMove (result, roffset + 1, source, soffset + 1, a_dead_global, true);
+      cheapMove (result, roffset + 0, source, soffset + 0, a_dead_global, true);
       return;
     }
   else if (size == 2 &&
@@ -1606,6 +1630,11 @@ genPlus (const iCode *ic)
         }
       else if (started && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD) && !aopIsLitVal (right->aop, i, 1, 0x00))
         {
+          if (!regDead (P_IDX, ic) || i > 0 && aopInReg (result->aop, i - 1, P_IDX))
+            {
+              cost (100, 100);
+              wassert (regalloc_dry_run);
+            }
           cheapMove (ASMOP_P, 0, right->aop, i, !aopInReg (left->aop, i, A_IDX), false);
           cheapMove (ASMOP_A, 0, left->aop, i, true, false);
           emit2 ("addc", "a, p");
@@ -2779,6 +2808,12 @@ genPointerGet (const iCode *ic)
     {
       for (int i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
         {
+          if (!regDead (A_IDX, ic) && !pushed_a)
+            {
+              pushAF();
+              pushed_a = true;
+            }
+
           if (ptype == POINTER)
             {
               emit2 ("mov", "a, %s+%d", left->aop->aopu.immd, left->aop->aopu.immd_off + i);
@@ -2795,6 +2830,7 @@ genPointerGet (const iCode *ic)
 
           if (aopInReg (result->aop, i, A_IDX) && (!bit_field ? i + 1 < size : blen - 8 > 0))
             {
+              wassert (!pushed_a);
               pushAF();
               pushed_a = true;
             }
@@ -3436,6 +3472,8 @@ genCast (const iCode *ic)
   resulttype = operandType (result);
   righttype = operandType (right);
 
+  bool pushed_a = false;
+
   if ((getSize (resulttype) <= getSize (righttype) || !IS_SPEC (righttype) || (SPEC_USIGN (righttype) || IS_BOOLEAN (righttype))) &&
     (!IS_BOOLEAN (resulttype) || IS_BOOLEAN (righttype)))
     {
@@ -3445,6 +3483,12 @@ genCast (const iCode *ic)
 
   aopOp (right, ic);
   aopOp (result, ic);
+
+  if (!regDead (A_IDX, ic))
+    {
+      pushAF ();
+      pushed_a = true;
+    }
 
   if (IS_BOOL (resulttype))
     {
@@ -3489,6 +3533,9 @@ genCast (const iCode *ic)
       while (size--)
         cheapMove (result->aop, offset++, ASMOP_A, 0, true, true);
     }
+
+  if (pushed_a)
+    popAF ();
 
   freeAsmop (right);
   freeAsmop (result);

@@ -1,3 +1,10 @@
+2019-03-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/ralloc2.cc,
+	  src/pdk/gen.c,
+	  support/regression/tests/gcc-torture-execute-pr70005.c:
+	  Better register allocation for assignment, RFE #615, fix some bugs in code generation.
+
 2019-03-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/ralloc2.cc,

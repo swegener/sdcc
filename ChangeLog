@@ -4,7 +4,7 @@
 	  src/pdk/gen.c,
 	  support/regression/tests/gcc-torture-execute-20020508-2.c,
 	  support/regression/tests/gcc-torture-execute-pr41750.c:
-	  Improve register allocation, RFE #611, RFE #612.
+	  Improve register allocation, RFE #611, RFE #612, RFE #606.
 
 2019-03-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

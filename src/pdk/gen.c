@@ -3066,13 +3066,31 @@ genPointerSet (iCode *ic)
           cost (1, 2);
         }
     }
+  else if (aopInReg (right->aop, 0, P_IDX) && aopInReg (right->aop, 1, A_IDX) && left->aop->type == AOP_IMMD)
+    {
+      emit2 ("mov", "%s+1, a", left->aop->aopu.immd);
+      cost (1, 1);
+      if (regDead (A_IDX, ic))
+        {
+          emit2 ("mov", "a, p");
+          emit2 ("mov", "%s+0, a", left->aop->aopu.immd);
+          cost (2, 2);
+        }
+      else
+        {
+          emit2 ("xch", "a, p");
+          emit2 ("mov", "%s+0, a", left->aop->aopu.immd);
+          emit2 ("xch", "a, p");
+          cost (3, 3);
+        }
+    }
   else
     {
       const asmop *ptr_aop;
       bool swapped = false;
 
       if (left->aop->type == AOP_IMMD)
-        ptr_aop = 0;
+          ptr_aop = 0;
 #if 0 // TODO: Implement alignment requirements - idxm needs 16-bit-aligned operand
       else if (left->aop->type == AOP_DIR && size == 1 || aopInReg (left->aop, 0, P_IDX))
         ptr_aop = left->aop;
@@ -3134,6 +3152,12 @@ genPointerSet (iCode *ic)
                 }
               else if (bit_field && blen == 1)
                 {
+                  if (!regDead (A_IDX, ic))
+                    {
+                      cost (200, 200);
+                      wassert (regalloc_dry_run);
+                    }
+
                   cheapMove (ASMOP_A, 0, right->aop, i, true, true);
                   emit2 ("sr", "a");
                   cost (1, 1);
@@ -3154,7 +3178,7 @@ genPointerSet (iCode *ic)
                 }
               else
                 {
-                  if (aopInReg (right->aop, i, A_IDX))
+                  if (aopInReg (right->aop, i, A_IDX) || !regDead (A_IDX, ic))
                     {
                       cost (100, 100);
                       wassert (regalloc_dry_run);
@@ -3208,7 +3232,14 @@ genPointerSet (iCode *ic)
                 }
             }
           else if (!swapped)
-            cheapMove (ASMOP_A, 0, right->aop, i, true, true);
+            {
+              if (!aopInReg (right->aop, i, A_IDX) && !regDead (A_IDX, ic))
+                {
+                  cost (100, 100);
+                  wassert (regalloc_dry_run);
+                }
+              cheapMove (ASMOP_A, 0, right->aop, i, true, true);
+            }
 
           if (!ptr_aop)
             {

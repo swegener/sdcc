@@ -163,6 +163,8 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   if (ic->op == SET_VALUE_AT_ADDRESS && getSize(operandType(right)) == 1 && left_dir && right_in_A)
     return (true);
+  if (ic->op == SET_VALUE_AT_ADDRESS && IS_ITEMP(left) && OP_SYMBOL_CONST(left)->remat && !operand_in_reg(left, REG_A, ia, i, G))
+    return (true);
 
   if ((ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS) && (!left_in_A && !right_in_A || getSize(operandType(result)) == 1))
     return (true);

@@ -162,6 +162,10 @@ testmodes = {
         "compiler":sdcc,
         "port":"stm8"
     },
+    "pdk14":{
+        "compiler":sdcc,
+        "port":"pdk14"
+    },
     "pic14":{
         "compiler":sdcc,
         "port":"pic14"

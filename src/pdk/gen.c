@@ -2128,7 +2128,20 @@ genXorByte (const asmop *result_aop, const asmop *left_aop, const asmop *right_a
           pushAF();
           *pushed_a = true;
         }
-      if (right_aop->type == AOP_STK)
+
+      if ((left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)) && aopSame (left_aop, i, result_aop, i, 1))
+        {
+          cheapMove (ASMOP_A, 0, right_aop, i, true, true);
+          emit2 ("xor", "%s, a", aopGet (left_aop, i));
+          cost (1, 1);
+        }
+      else if ((right_aop->type == AOP_DIR || aopInReg (right_aop, i, P_IDX)) && aopSame (right_aop, i, result_aop, i, 1))
+        {
+          cheapMove (ASMOP_A, 0, left_aop, i, true, true);
+          emit2 ("xor", "%s, a", aopGet (right_aop, i));
+          cost (1, 1);
+        }
+      else if (right_aop->type == AOP_STK)
         {
           if (!p_dead || aopInReg (left_aop, i, P_IDX))
             {
@@ -2240,14 +2253,26 @@ genOr (const iCode *ic)
     {
       int bit = right->aop->type == AOP_LIT ? isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)) : -1;
 
-      if ((left->aop->type == AOP_SFR || aopInReg (left->aop, i, P_IDX) && !TARGET_IS_PDK13 /* set1 has weird encoding on pdk13, and is not yet supported by the assembler */) && aopSame (left->aop, i, result->aop, i, 1) && bit >= 0)
+      if (aopIsLitVal (right->aop, i, 1, 0x00))
+        {
+          cheapMove (result->aop, i, left->aop, i, true, true);
+        }
+      else if ((left->aop->type == AOP_SFR || aopInReg (left->aop, i, P_IDX) && !TARGET_IS_PDK13 /* set1 has weird encoding on pdk13, and is not yet supported by the assembler */) && aopSame (left->aop, i, result->aop, i, 1) && bit >= 0)
         {
           emit2 ("set1", "%s, #%d", aopGet (left->aop, i), bit);
           cost (1, 1);
         }
-      else if (aopIsLitVal (right->aop, i, 1, 0x00))
+      else if ((left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopSame (left->aop, i, result->aop, i, 1))
         {
-          cheapMove (result->aop, i, left->aop, i, true, true);
+          cheapMove (ASMOP_A, 0, right->aop, i, true, true);
+          emit2 ("or", "%s, a", aopGet (left->aop, i));
+          cost (1, 1);
+        }
+      else if ((right->aop->type == AOP_DIR || aopInReg (right->aop, i, P_IDX)) && aopSame (right->aop, i, result->aop, i, 1))
+        {
+          cheapMove (ASMOP_A, 0, left->aop, i, true, true);
+          emit2 ("or", "%s, a", aopGet (right->aop, i));
+          cost (1, 1);
         }
       else if (right->aop->type == AOP_STK)
         {
@@ -2402,15 +2427,27 @@ genAnd (const iCode *ic, iCode *ifx)
 
       int bit = right->aop->type == AOP_LIT ? isLiteralBit (~byteOfVal (right->aop->aopu.aop_lit, i) & 0xff) : -1;
 
-      if ((left->aop->type == AOP_SFR || aopInReg (left->aop, i, P_IDX) /* set1 has weird encoding on pdk13, and is not yet supported by the assembler */) && aopSame (left->aop, i, result->aop, i, 1) && bit >= 0)
+      if (aopIsLitVal (right->aop, i, 1, 0xff))
+        cheapMove (result->aop, i, left->aop, i, true, true);
+      else if (aopIsLitVal (right->aop, i, 1, 0x00))
+        cheapMove (result->aop, i, ASMOP_ZERO, 0, true, true);
+      else if ((left->aop->type == AOP_SFR || aopInReg (left->aop, i, P_IDX) /* set1 has weird encoding on pdk13, and is not yet supported by the assembler */) && aopSame (left->aop, i, result->aop, i, 1) && bit >= 0)
         {
           emit2 ("set0", "%s, #%d", aopGet (left->aop, i), bit);
           cost (1, 1);
         }
-      else if (aopIsLitVal (right->aop, i, 1, 0xff))
-        cheapMove (result->aop, i, left->aop, i, true, true);
-      else if (aopIsLitVal (right->aop, i, 1, 0x00))
-        cheapMove (result->aop, i, ASMOP_ZERO, 0, true, true);
+      else if ((left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopSame (left->aop, i, result->aop, i, 1))
+        {
+          cheapMove (ASMOP_A, 0, right->aop, i, true, true);
+          emit2 ("and", "%s, a", aopGet (left->aop, i));
+          cost (1, 1);
+        }
+      else if ((right->aop->type == AOP_DIR || aopInReg (right->aop, i, P_IDX)) && aopSame (right->aop, i, result->aop, i, 1))
+        {
+          cheapMove (ASMOP_A, 0, left->aop, i, true, true);
+          emit2 ("and", "%s, a", aopGet (right->aop, i));
+          cost (1, 1);
+        }
       else if (right->aop->type == AOP_STK)
         {
           if (!regDead (P_IDX, ic) || aopInReg (left->aop, i, P_IDX))

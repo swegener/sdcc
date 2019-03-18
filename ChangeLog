@@ -1,5 +1,10 @@
 2019-03-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/pdk/gen.c:
+	  Improve |=, &=, ^=.
+
+2019-03-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/pdk/gen.c,
 	  src/pdk/ralloc2.cc,
 	  support/regression/tests/bug3564104.c:

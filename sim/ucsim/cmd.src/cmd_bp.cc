@@ -322,7 +322,7 @@ COMMAND_DO_WORK_UC(cl_delete_cmd)
 
 COMMAND_DO_WORK_UC(cl_commands_cmd)
 {
-  long nr= -1;
+  int nr= -1;
   
   cmdline->shift();
   chars s= chars(cmdline->cmd);
@@ -335,12 +335,12 @@ COMMAND_DO_WORK_UC(cl_commands_cmd)
     {
       if (isdigit(((char*)s)[0]))
 	{
-	  class cl_cmd_arg *p= cmdline->param(0);
-	  if (p)
+	  char *p0= (char*)s;
+	  if (p0 && *p0)
 	    {
-	      long l;
-	      if (p->get_ivalue(&l))
-		nr= l;
+	      long l=-2;
+	      l= strtol(p0, 0, 0);
+	      nr= l;
 	    }
 	  cmdline->shift();
 	  s= chars(cmdline->cmd);
@@ -355,7 +355,9 @@ COMMAND_DO_WORK_UC(cl_commands_cmd)
     return con->dd_printf("command missing\n"), false;
 
   if (nr < 0)
-    nr= uc->brk_counter;
+    {
+      nr= uc->brk_counter;
+    }
   if (nr == 0)
     return con->dd_printf("breakpoint (%d) not found\n", nr), false;
   
@@ -364,7 +366,9 @@ COMMAND_DO_WORK_UC(cl_commands_cmd)
     return con->dd_printf("no breakpoint (%d)\n", nr), false;
 
   if (!s.empty())
-    b->commands= s;
+    {
+      b->commands= s;
+    }
   else
     b->commands= chars("");
   cmdline->rest= NULL;

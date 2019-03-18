@@ -9,7 +9,7 @@ clean:
 # -----------------------------------------------------------------
 distclean: clean
 	rm -f config.cache config.log config.status
-	rm -f ddconfig.h main.mk Makefile *.dep
+	rm -f ddconfig.h main.mk Makefile *.dep packages.mk
 	rm -rf autom4te.cache
 	rm -f GPATH GRTAGS GSYMS GTAGS
 

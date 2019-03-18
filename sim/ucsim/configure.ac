@@ -656,8 +656,6 @@ fi
 AC_DEFINE_UNQUOTED(_A_, "${A}", [XXX])
 AC_DEFINE_UNQUOTED(_M_, "${M}", [XXX])
 
-AX_CXX_COMPILE_STDCXX_11
-
 # Generating output files
 # ===========================================================================
 

@@ -29,23 +29,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "regspdk.h"
 
 unsigned char cl_pdk::add_to(unsigned char initial, int value, bool carry) {
-  store_flag(flag::z, initial + value + carry == 0);
-  store_flag(flag::c, initial + value + carry > 0xFF);
-  store_flag(flag::ac, (initial & 0xF) + (value & 0xF) + carry > 0xF);
+  store_flag(/*flag::*/flag_z, initial + value + carry == 0);
+  store_flag(/*flag::*/flag_c, initial + value + carry > 0xFF);
+  store_flag(/*flag::*/flag_ac, (initial & 0xF) + (value & 0xF) + carry > 0xF);
   store_flag(
-      flag::ov,
-      get_flag(flag::c) ^ ((initial & 0x7F) + (value & 0x7F) + carry > 0x7F));
+      /*flag::*/flag_ov,
+      get_flag(/*flag::*/flag_c) ^ ((initial & 0x7F) + (value & 0x7F) + carry > 0x7F));
 
   return initial + value + carry;
 }
 
 unsigned char cl_pdk::sub_to(unsigned char initial, int value, bool carry) {
-  store_flag(flag::z, initial - value - carry == 0);
-  store_flag(flag::c, initial < value + carry);
-  store_flag(flag::ac, (value & 0xF) > (initial & 0xF) - carry);
+  store_flag(/*flag::*/flag_z, initial - value - carry == 0);
+  store_flag(/*flag::*/flag_c, initial < value + carry);
+  store_flag(/*flag::*/flag_ac, (value & 0xF) > (initial & 0xF) - carry);
   store_flag(
-      flag::ov,
-      get_flag(flag::c) ^ ((initial & 0x7F) - (value & 0x7F) - carry < 0));
+      /*flag::*/flag_ov,
+      get_flag(/*flag::*/flag_c) ^ ((initial & 0x7F) - (value & 0x7F) - carry < 0));
 
   return initial - value - carry;
 }
@@ -174,23 +174,23 @@ void cl_pdk::store_io(t_addr addr, unsigned char value) {
   }
 }
 
-bool cl_pdk::get_flag(flag n) {
+/*bool*/int cl_pdk::get_flag(flag n) {
   switch (n) {
-  case flag::z: return regs.flag & BIT_Z;
-  case flag::c: return (regs.flag & BIT_C) >> 1;
-  case flag::ac: return (regs.flag & BIT_AC) >> 2;
-  case flag::ov: return (regs.flag & BIT_OV) >> 3;
+  case /*flag::*/flag_z: return regs.flag & BIT_Z;
+  case /*flag::*/flag_c: return (regs.flag & BIT_C) >> 1;
+  case /*flag::*/flag_ac: return (regs.flag & BIT_AC) >> 2;
+  case /*flag::*/flag_ov: return (regs.flag & BIT_OV) >> 3;
   default:
     assert(!"invalid bit access to FLAG");
   }
 }
 
-void cl_pdk::store_flag(flag n, bool value) {
+void cl_pdk::store_flag(flag n, /*bool*/int value) {
   switch (n) {
-  case flag::z: regs.flag = (regs.flag & ~1) | value; break;
-  case flag::c: regs.flag = (regs.flag & ~2) | (value << 1); break;
-  case flag::ac: regs.flag = (regs.flag & ~4) | (value << 2); break;
-  case flag::ov: regs.flag = (regs.flag & ~8) | (value << 3); break;
+  case /*flag::*/flag_z: regs.flag = (regs.flag & ~1) | value; break;
+  case /*flag::*/flag_c: regs.flag = (regs.flag & ~2) | (value << 1); break;
+  case /*flag::*/flag_ac: regs.flag = (regs.flag & ~4) | (value << 2); break;
+  case /*flag::*/flag_ov: regs.flag = (regs.flag & ~8) | (value << 3); break;
   default:
     assert(!"invalid bit store to FLAG");
   }
@@ -272,38 +272,38 @@ int cl_pdk::execute(unsigned int code) {
     ram->write(addr, sub_to(get_mem(addr), regs.a));
   } else if (CODE_MASK(0x2800, 0xFF)) {
     // addc a, k
-    regs.a = add_to(regs.a, code & 0xFF, get_flag(flag::c));
+    regs.a = add_to(regs.a, code & 0xFF, get_flag(/*flag::*/flag_c));
   } else if (CODE_MASK(0x0D00, 0x7F)) {
     // addc a, m
-    regs.a = add_to(regs.a, get_mem(code & 0x7F), get_flag(flag::c));
+    regs.a = add_to(regs.a, get_mem(code & 0x7F), get_flag(/*flag::*/flag_c));
   } else if (CODE_MASK(0x0800, 0x7F)) {
     // addc m, a
     int addr = code & 0x7F;
-    ram->write(addr, add_to(regs.a, get_mem(addr), get_flag(flag::c)));
+    ram->write(addr, add_to(regs.a, get_mem(addr), get_flag(/*flag::*/flag_c)));
   } else if (code == 0x0060) {
     // addc a
-    regs.a = add_to(regs.a, get_flag(flag::c));
+    regs.a = add_to(regs.a, get_flag(/*flag::*/flag_c));
   } else if (CODE_MASK(0x1000, 0x7F)) {
     // addc m
     int addr = code & 0x7F;
-    ram->write(addr, add_to(get_mem(addr), get_flag(flag::c)));
+    ram->write(addr, add_to(get_mem(addr), get_flag(/*flag::*/flag_c)));
   } else if (CODE_MASK(0x2900, 0xFF)) {
     // subc a, k
-    regs.a = sub_to(regs.a, code & 0xFF, get_flag(flag::c));
+    regs.a = sub_to(regs.a, code & 0xFF, get_flag(/*flag::*/flag_c));
   } else if (CODE_MASK(0x0D80, 0x7F)) {
     // subc a, m
-    regs.a = sub_to(regs.a, get_mem(code & 0x7F), get_flag(flag::c));
+    regs.a = sub_to(regs.a, get_mem(code & 0x7F), get_flag(/*flag::*/flag_c));
   } else if (CODE_MASK(0x0880, 0x7F)) {
     // subc m, a
     int addr = code & 0x7F;
-    ram->write(addr, sub_to(get_mem(addr), regs.a, get_flag(flag::c)));
+    ram->write(addr, sub_to(get_mem(addr), regs.a, get_flag(/*flag::*/flag_c)));
   } else if (code == 0x0061) {
     // subc a
-    regs.a = sub_to(regs.a, get_flag(flag::c));
+    regs.a = sub_to(regs.a, get_flag(/*flag::*/flag_c));
   } else if (CODE_MASK(0x1080, 0x7F)) {
     // subc m
     int addr = code & 0x7F;
-    ram->write(addr, sub_to(get_mem(addr), get_flag(flag::c)));
+    ram->write(addr, sub_to(get_mem(addr), get_flag(/*flag::*/flag_c)));
   } else if (CODE_MASK(0x1200, 0x7F)) {
     // inc m
     int addr = code & 0x7F;
@@ -317,84 +317,84 @@ int cl_pdk::execute(unsigned int code) {
     ram->write(code & 0x7F, 0);
   } else if (code == 0x006A) {
     // sr a
-    store_flag(flag::c, regs.a & 1);
+    store_flag(/*flag::*/flag_c, regs.a & 1);
     regs.a >>= 1;
   } else if (CODE_MASK(0x1500, 0x7F)) {
     // sr m
     int value = get_mem(code & 0x7F);
-    store_flag(flag::c, value & 1);
+    store_flag(/*flag::*/flag_c, value & 1);
     ram->write(code & 0x7F, value >> 1);
   } else if (code == 0x006B) {
     // sl a
-    store_flag(flag::c, (regs.a & 0x80) >> 7);
+    store_flag(/*flag::*/flag_c, (regs.a & 0x80) >> 7);
     regs.a <<= 1;
   } else if (CODE_MASK(0x1580, 0x7F)) {
     // sl m
     int value = get_mem(code & 0x7F);
-    store_flag(flag::c, (value & 0x80) >> 7);
+    store_flag(/*flag::*/flag_c, (value & 0x80) >> 7);
     ram->write(code & 0x7F, value << 1);
   } else if (code == 0x006C) {
     // src a
     int c = regs.a & 1;
     regs.a >>= 1;
-    regs.a |= get_flag(flag::c) << 7;
-    store_flag(flag::c, c);
+    regs.a |= get_flag(/*flag::*/flag_c) << 7;
+    store_flag(/*flag::*/flag_c, c);
   } else if (CODE_MASK(0x1600, 0x7F)) {
     // src m
     int value = get_mem(code & 0x7F);
     int c = value & 1;
-    ram->write(code & 0x7F, (value >> 1) | (get_flag(flag::c) << 7));
-    store_flag(flag::c, c);
+    ram->write(code & 0x7F, (value >> 1) | (get_flag(/*flag::*/flag_c) << 7));
+    store_flag(/*flag::*/flag_c, c);
   } else if (code == 0x006D) {
     // slc a
     int c = (regs.a & 0x80) >> 7;
     regs.a <<= 1;
-    regs.a |= get_flag(flag::c);
-    store_flag(flag::c, c);
+    regs.a |= get_flag(/*flag::*/flag_c);
+    store_flag(/*flag::*/flag_c, c);
   } else if (CODE_MASK(0x1680, 0x7F)) {
     // slc m
     int value = get_mem(code & 0x7F);
     int c = (value & 0x80) >> 7;
-    ram->write(code & 0x7F, (value << 1) | get_flag(flag::c));
-    store_flag(flag::c, c);
+    ram->write(code & 0x7F, (value << 1) | get_flag(/*flag::*/flag_c));
+    store_flag(/*flag::*/flag_c, c);
   } else if (CODE_MASK(0x2C00, 0xFF)) {
     // and a, k
     regs.a &= code & 0xFF;
-    store_flag(flag::z, !regs.a);
+    store_flag(/*flag::*/flag_z, !regs.a);
   } else if (CODE_MASK(0x0E00, 0x7F)) {
     // and a, m
     regs.a &= get_mem(code & 0x7F);
-    store_flag(flag::z, !regs.a);
+    store_flag(/*flag::*/flag_z, !regs.a);
   } else if (CODE_MASK(0x0A00, 0x7F)) {
     // and m, a
     int store = regs.a & get_mem(code & 0x7F);
-    store_flag(flag::z, !store);
+    store_flag(/*flag::*/flag_z, !store);
     ram->write(code & 0x7F, store);
   } else if (CODE_MASK(0x2D00, 0xFF)) {
     // or a, k
     regs.a |= code & 0xFF;
-    store_flag(flag::z, !regs.a);
+    store_flag(/*flag::*/flag_z, !regs.a);
   } else if (CODE_MASK(0x0E80, 0x7F)) {
     // or a, m
     regs.a |= get_mem(code & 0x7F);
-    store_flag(flag::z, !regs.a);
+    store_flag(/*flag::*/flag_z, !regs.a);
   } else if (CODE_MASK(0x0A80, 0x7F)) {
     // or m, a
     int store = regs.a | get_mem(code & 0x7F);
-    store_flag(flag::z, !store);
+    store_flag(/*flag::*/flag_z, !store);
     ram->write(code & 0x7F, store);
   } else if (CODE_MASK(0x2E00, 0xFF)) {
     // xor a, k
     regs.a ^= code & 0xFF;
-    store_flag(flag::z, !regs.a);
+    store_flag(/*flag::*/flag_z, !regs.a);
   } else if (CODE_MASK(0x0F00, 0x7F)) {
     // xor a, m
     regs.a ^= get_mem(code & 0x7F);
-    store_flag(flag::z, !regs.a);
+    store_flag(/*flag::*/flag_z, !regs.a);
   } else if (CODE_MASK(0x0B00, 0x7F)) {
     // xor m, a
     int store = regs.a ^ get_mem(code & 0x7F);
-    store_flag(flag::z, !store);
+    store_flag(/*flag::*/flag_z, !store);
     ram->write(code & 0x7F, store);
   } else if (CODE_MASK(0x00C0, 0x3F)) {
     // xor io, a

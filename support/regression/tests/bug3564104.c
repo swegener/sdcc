@@ -36,7 +36,6 @@ void f2(uintptr_t base, const char *message)
 
 void testBug(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory - see RFE #608.
 	char a[] = {10, 20, 30, 40, 0};
 
 	i = 0;
@@ -54,6 +53,5 @@ void testBug(void)
 	ASSERT(array[1] == 20 * 8);
 	ASSERT(array[2] == 30 * 8);
 	ASSERT(array[3] == 40 * 8);
-#endif
 }
 

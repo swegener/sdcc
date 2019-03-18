@@ -1,3 +1,10 @@
+2019-03-18 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/ralloc2.cc,
+	  support/regression/tests/bug3564104.c:
+	  Improve register allocation for shift and addition, RFE #608.
+
 2019-03-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/ralloc2.cc,

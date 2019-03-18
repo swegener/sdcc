@@ -44,7 +44,7 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
     return;
 
   // Todo: More fine-grained control for these.
-  if (!(ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS && !IS_FLOAT (operandType (left)) || ic->op == '~' ||
+  if (!(ic->op == '-' || ic->op == UNARYMINUS && !IS_FLOAT (operandType (left)) || ic->op == '~' ||
     ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND))
     return;
 
@@ -184,13 +184,13 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     right_in_A && (result_dir || dying_A))
     return (true);
 
-  if ((ic->op == CAST && (getSize(operandType(result)) <= getSize(operandType(right)) || SPEC_USIGN (getSpec(operandType(right))))) &&
+  if ((ic->op == CAST && (getSize(operandType(result)) <= getSize(operandType(right)) || SPEC_USIGN(getSpec(operandType(right))))) &&
     getSize(operandType(result)) <= 2 &&
     (result_dir && dying_A || result_in_A && right_dir || result_in_A && right_in_A))
     return (true);
 
   if ((ic->op == LEFT_OP || ic->op == RIGHT_OP))
-    return(IS_OP_LITERAL(right) && (ullFromVal(OP_VALUE_CONST (right)) <= 2 + optimize.codeSpeed || getSize(operandType(result)) == 1) || right_in_A && !result_in_A);
+    return(IS_OP_LITERAL(right) || right_in_A && !result_in_A);
 
   if (ic->op == '^' &&
     (operand_byte_in_reg(result, 0, REG_A, a, i, G) && (operand_byte_in_reg(left, 0, REG_A, a, i, G) || operand_byte_in_reg(right, 0, REG_A, a, i, G)) ||

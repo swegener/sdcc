@@ -1575,29 +1575,31 @@ genPlus (const iCode *ic)
 
   bool started = false;
   bool pushed_a = false;
+  bool moved_to_a = false;
+
   for (int i = 0; i < size; i++)
     {
-       if (!started && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0x01) && aopSame (left->aop, i, result->aop, i, 1))
+       if (!started && !moved_to_a && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0x01) && aopSame (left->aop, i, result->aop, i, 1))
         {
           emit2 ("inc", "%s", aopGet (left->aop, i));
           cost (1, 1);
           started = true;
           continue;
         }
-       else if (!started && i + 1 == size && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0xff) && aopSame (left->aop, i, result->aop, i, 1))
+       else if (!started && !moved_to_a && i + 1 == size && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0xff) && aopSame (left->aop, i, result->aop, i, 1))
         {
           emit2 ("dec", "%s", aopGet (left->aop, i));
           cost (1, 1);
           started = true;
           continue;
         }
-      else if (started && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0x00) && aopSame (left->aop, i, result->aop, i, 1))
+      else if (started && !moved_to_a && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && aopIsLitVal (right->aop, i, 1, 0x00) && aopSame (left->aop, i, result->aop, i, 1))
         {
           emit2 ("addc", "%s", aopGet (left->aop, i));
           cost (1, 1);
           continue;
         }
-      else if (!started && right->aop->type == AOP_LIT && aopIsLitVal (right->aop, i, 1, 0x00))
+      else if (!started && !moved_to_a && right->aop->type == AOP_LIT && aopIsLitVal (right->aop, i, 1, 0x00))
         {
           cheapMove (result->aop, i, left->aop, i, regDead (A_IDX, ic), true);
           if (aopInReg (result->aop, i, A_IDX) && i + 1 < size)
@@ -1616,13 +1618,14 @@ genPlus (const iCode *ic)
 
       if (right->aop->type == AOP_STK)
         {
-          cheapMove (ASMOP_A, 0, left->aop, i, true, !started);
+          if (!moved_to_a)
+            cheapMove (ASMOP_A, 0, left->aop, i, true, !started);
           cheapMove (ASMOP_P, 0, right->aop, i, false, !started);
           emit2 (started ? "addc" : "add", "a, p");
           cost (1, 1);
           started = true;
         }
-      else if (aopInReg (left->aop, i, P_IDX))
+      else if (!moved_to_a && aopInReg (left->aop, i, P_IDX))
         {
           cheapMove (ASMOP_A, 0, right->aop, i, true, !started);
           emit2 (started ? "addc" : "add", "a, p");
@@ -1635,14 +1638,15 @@ genPlus (const iCode *ic)
               cost (100, 100);
               wassert (regalloc_dry_run);
             }
-          cheapMove (ASMOP_P, 0, right->aop, i, !aopInReg (left->aop, i, A_IDX), false);
+          cheapMove (ASMOP_P, 0, right->aop, i, !aopInReg (left->aop, i, A_IDX) && !moved_to_a, false);
           cheapMove (ASMOP_A, 0, left->aop, i, true, false);
           emit2 ("addc", "a, p");
           cost (1, 1);
         }
       else
         {
-          cheapMove (ASMOP_A, 0, left->aop, i, true, !started);
+          if (!moved_to_a)
+            cheapMove (ASMOP_A, 0, left->aop, i, true, !started);
           if (started || !aopIsLitVal (right->aop, i, 1, 0x00))
             {
               if (started && aopIsLitVal (right->aop, i, 1, 0x00))
@@ -1663,6 +1667,12 @@ genPlus (const iCode *ic)
         {
           pushAF();
           pushed_a = true;
+        }
+      else if (aopInReg (result->aop, i, P_IDX) && regDead (P_IDX, ic) && aopInReg (left->aop, i + 1, P_IDX))
+        {
+          emit2 ("xch", "a, p");
+          cost (1, 1);
+          moved_to_a = true;
         }
       else
         cheapMove (result->aop, i, ASMOP_A, 0, true, i + 1 == size);
@@ -2464,7 +2474,8 @@ genLeftShift (const iCode *ic)
       if (!shCount)
         goto release;
 
-      bool loop = (shCount > 2 + ((size - offset) <= 1) * 2 + optimize.codeSpeed) && !(size == 1 && aopInReg (result->aop, 0, A_IDX));
+      bool loop = (shCount > 2 + ((size - offset) <= 1) * 2 + optimize.codeSpeed) && !(size == 1 && aopInReg (result->aop, 0, A_IDX)) &&
+        regDead (A_IDX, ic) && !aopInReg (result->aop, 0, A_IDX) && !aopInReg (result->aop, 1, A_IDX);
       symbol *tlbl = (!loop || regalloc_dry_run) ? 0 : newiTempLabel (0);
 
       if (loop)
@@ -2588,7 +2599,9 @@ genRightShift (const iCode *ic)
       if (!shCount)
         goto release;
 
-      bool loop = (shCount > 2 + (size == 1) * 2 + optimize.codeSpeed) && !(size == 1 && aopInReg (result->aop, 0, A_IDX));
+      bool loop = (shCount > 2 + (size == 1) * 2 + optimize.codeSpeed) && !(size == 1 && aopInReg (result->aop, 0, A_IDX)) &&
+        regDead (A_IDX, ic) && !aopInReg (result->aop, 0, A_IDX) && !aopInReg (result->aop, 1, A_IDX);
+
       symbol *tlbl = (!loop || regalloc_dry_run) ? 0 : newiTempLabel (0);
 
       if (loop)

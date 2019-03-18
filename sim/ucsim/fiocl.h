@@ -232,6 +232,7 @@ extern void msleep(int msec);
 extern void loop_delay();
 
 extern chars fio_type_name(enum file_type t);
+extern void  sigpipe_off();
 
 
 #endif

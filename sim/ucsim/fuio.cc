@@ -8,6 +8,7 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 #endif
+#include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -401,5 +402,13 @@ loop_delay()
   msleep(100);
 }
 
+
+void
+sigpipe_off()
+{
+  struct sigaction sa;
+  sa.sa_handler= SIG_IGN;
+  sigaction(SIGPIPE, &sa, NULL);
+}
 
 /* End of fuio.cc */

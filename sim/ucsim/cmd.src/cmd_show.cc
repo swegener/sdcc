@@ -192,6 +192,30 @@ COMMAND_DO_WORK_APP(cl_show_error_cmd)
  * Command: show console
  *----------------------------------------------------------------------------
  */
+
+static void
+print_fio_info(class cl_console_base *con, class cl_f *ff)
+{
+  if (ff)
+    {
+      char *n= ff->get_file_name();
+      chars t= fio_type_name(ff->type);
+      con->dd_printf("\"%s\",%s,", n, (char*)t);
+      con->dd_printf("%d,%d,", ff->file_id, ff->server_port);
+      con->dd_printf("%s,%s",
+		     ff->tty?"tty":"non-tty",
+		     ff->get_cooking()?"cooked":"raw");
+      class cl_f *e= ff->get_echo_to();
+      if (e)
+	con->dd_printf("(echo>%d)", e->file_id);
+      if (ff->get_telnet())
+	con->dd_printf(",telnet");
+      if (ff->get_escape())
+	con->dd_printf(",esc");
+    }
+  con->dd_printf("\n");
+}
+
 COMMAND_DO_WORK_APP(cl_show_console)
 {
   class cl_commander_base *cm= app->get_commander();
@@ -213,33 +237,10 @@ COMMAND_DO_WORK_APP(cl_show_console)
       con->dd_printf("\n");
       class cl_f *ff= cn->get_fin();
       con->dd_printf(" <");
-      if (ff)
-	{
-	  char *n= ff->get_file_name();
-	  chars t= fio_type_name(ff->type);
-	  con->dd_printf("\"%s\",%s,", n, (char*)t);
-	  con->dd_printf("%d,%d,", ff->file_id, ff->server_port);
-	  con->dd_printf("%c%c",
-			 ff->tty?'T':'t',
-			 ff->get_cooking()?'c':'r');
-	  class cl_f *e= ff->get_echo_to();
-	  if (e)
-	    con->dd_printf("(>%d)", e->file_id);
-	}
-      con->dd_printf("\n");
+      print_fio_info(con, ff);
       ff= cn->get_fout();
       con->dd_printf(" >");
-      if (ff)
-	{
-	  char *n= ff->get_file_name();
-	  chars t= fio_type_name(ff->type);
-	  con->dd_printf("\"%s\",%s,", n, (char*)t);
-	  con->dd_printf("%d,", ff->file_id);
-	  con->dd_printf("%c%c",
-			 ff->tty?'T':'t',
-			 ff->get_cooking()?'c':'r');
-	}
-      con->dd_printf("\n");
+      print_fio_info(con, ff);
     }
   return false;
 }

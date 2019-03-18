@@ -595,4 +595,10 @@ loop_delay()
 }
 
 
+void
+sigpipe_off()
+{
+}
+
+
 /* End of fwio.cc */

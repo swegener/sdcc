@@ -1,3 +1,9 @@
+2019-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/_modslonglong.c: fix bug #2790
+	* support/regression/tests/gcc-torture-execute-arith-rand-ll.c:
+	  re-enable tests
+
 2019-03-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/pdk.src/inst.cc:

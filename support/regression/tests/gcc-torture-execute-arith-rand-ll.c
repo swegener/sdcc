@@ -49,7 +49,7 @@ random_bitstring ()
 void
 testTortureExecute (void)
 {
-#if 0 // Bugs #278, 2789, 2790
+#ifndef __SDCC_pdk14  // Lack of memory
 #ifndef __SDCC_mcs51 // Not enough internal RAM for area OSEG.
   long long int i;
 

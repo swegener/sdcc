@@ -46,7 +46,7 @@ _modslonglong (long long numerator, long long denominator)
 
   r = (unsigned long long)numerator % (unsigned long long)denominator;
 
-  return ((numeratorneg ^ denominatorneg) ? -r : r);
+  return (numeratorneg ? -r : r);
 }
 #endif
 

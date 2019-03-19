@@ -210,7 +210,6 @@ constant_shift(unsigned long long x, int i)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390 // Bug #2780
 #ifndef __SDCC_pdk14 // Lack of memory
   int i;
 
@@ -226,7 +225,6 @@ testTortureExecute (void)
       if (y != data[i])
 	ASSERT (0);
     }
-#endif
 #endif
   return;
 }

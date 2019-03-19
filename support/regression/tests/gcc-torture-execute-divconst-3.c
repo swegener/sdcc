@@ -16,10 +16,8 @@ void
 testTortureExecute (void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
-#ifndef __SDCC_ds390 // Bug #2777
   ASSERT (f (10000000000LL) == 1);
   ASSERT (f (100000000000LL) == 10);
   return;
-#endif
 #endif
 }

@@ -3926,7 +3926,7 @@ dryPdkiCode (iCode *ic)
 
   const unsigned int word_cost_weight = 2 << (optimize.codeSize * 3 + !optimize.codeSpeed * 3);
 
-  return ((float)regalloc_dry_run_cost_words * word_cost_weight + (float)regalloc_dry_run_cost_cycles * ic->count);
+  return (regalloc_dry_run_cost_words * word_cost_weight + regalloc_dry_run_cost_cycles * ic->count);
 }
 
 /*---------------------------------------------------------------------*/
@@ -3977,7 +3977,7 @@ genPdkCode (iCode *lic)
       genPdkiCode(ic);
 
 #if 0
-      D (emit2 (";", "Cost for generated ic %d : (%d, %d)", ic->key, regalloc_dry_run_cost_words, regalloc_dry_run_cost_cycles));
+      D (emit2 (";", "Cost for generated ic %d : (%d, %f)", ic->key, regalloc_dry_run_cost_words, regalloc_dry_run_cost_cycles));
 #endif
     }
 

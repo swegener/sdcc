@@ -56,8 +56,8 @@ machine(struct mne *mp)
         switch (mp->m_type) {
 
         case S_MOV: {
-                struct inst ioa = {0x0080, 0xFC};
-                struct inst aio = {0x00C0, 0xFC};
+                struct inst ioa = {0x0100, 0x7F};
+                struct inst aio = {0x0180, 0x7F};
                 struct inst ma = {0x1700, 0xFF};
                 struct inst am = {0x1F00, 0xFF};
                 emov(def, ioa, aio, ma, am);

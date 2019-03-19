@@ -411,13 +411,23 @@ int cl_pdk::execute(unsigned int code) {
   } else if (CODE_MASK(0x1480, 0x7F)) {
     // neg m
     ram->write(code & 0x7F, -get_mem(code & 0x7F));
+  } else if (CODE_MASK(0x1C00, 0x1FF)) {
+    // set0 io, k
+    const u8_t bit = 0x1C0 >> 6;
+    const u8_t addr = code & 0x3F;
+    store_io(addr, get_io(addr) & ~(1 << bit));
   } else if (CODE_MASK(0x2400, 0x1FF)) {
-    // set0 m, n
+    // set0 m, k
     const u8_t bit = 0x1C0 >> 6;
     const u8_t addr = code & 0x3F;
     ram->write(addr, get_mem(addr) & ~(1 << bit));
-  } else if (CODE_MASK(0x2400, 0x1FF)) {
-    // set1 m, n
+  } else if (CODE_MASK(0x1E00, 0x1FF)) {
+    // set1 io, k
+    const u8_t bit = 0x1C0 >> 6;
+    const u8_t addr = code & 0x3F;
+    store_io(addr, get_io(addr) | (1 << bit));
+  } else if (CODE_MASK(0x2600, 0x1FF)) {
+    // set1 m, k
     const u8_t bit = 0x1C0 >> 6;
     const u8_t addr = code & 0x3F;
     ram->write(addr, get_mem(addr) | (1 << bit));
@@ -480,7 +490,7 @@ int cl_pdk::execute(unsigned int code) {
     regs.a = sub_to(regs.a, 1);
     if (!regs.a)
       ++PC;
-  } else if (CODE_MASK(0x1100, 0x7F)) {
+  } else if (CODE_MASK(0x1180, 0x7F)) {
     // dzsn m
     const int addr = code & 0x7F;
     int result = sub_to(get_mem(addr), 1);

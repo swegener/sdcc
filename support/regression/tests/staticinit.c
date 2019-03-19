@@ -88,7 +88,6 @@ testSmallSparseZero (void)
 #endif
 }
 
-#ifndef __SDCC_pdk14 // TODO Bug ?
 #ifdef __SDCC_mcs51
 __xdata
 #elif __SDCC_pic16
@@ -133,7 +132,6 @@ static {type} largeMixed[] = {
   3, 4, 5, 6, 3, 4, 5, 6,
   3, 4, 5, 6, 3, 4, 5, 6
 };
-#endif
 
 static void
 testLargeMixed (void)

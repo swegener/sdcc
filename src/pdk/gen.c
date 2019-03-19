@@ -1690,7 +1690,7 @@ genPlus (const iCode *ic)
 /* genMinus - generates code for minus                             */
 /*-----------------------------------------------------------------*/
 static void
-genMinus (const iCode *ic)
+genMinus (const iCode *ic, const iCode *ifx)
 {
   operand *result = IC_RESULT (ic);
   operand *left = IC_LEFT (ic);
@@ -1702,7 +1702,26 @@ genMinus (const iCode *ic)
   aopOp (right, ic);
   aopOp (result, ic);
 
-  genSub (ic, result->aop, left->aop, right->aop);
+  if (ifx && ifx->generated)
+    {
+      wassert (IC_TRUE (ifx));
+      wassert (left->aop->type == AOP_REG || left->aop->type == AOP_DIR);
+      wassert (aopIsLitVal (right->aop, 0, 2, 1));
+
+      emit2 ("dzsn", aopGet (left->aop, 0));
+      cost (1, 1.8f);
+      emitJP (IC_TRUE (ifx), 0.2f);
+
+      for(int i = 1; i < left->aop->size; i++)
+        {
+          emit2 ("subc", aopGet (left->aop, i));
+          emit2 ("t1sn", "f, z");
+          cost (2, 2.8f);
+          emitJP (IC_TRUE (ifx), 0.2f);
+        }
+    }
+  else
+    genSub (ic, result->aop, left->aop, right->aop);
 
   freeAsmop (right);
   freeAsmop (left);
@@ -3790,7 +3809,7 @@ genPdkiCode (iCode *ic)
       break;
 
     case '-':
-      genMinus (ic);
+      genMinus (ic, ic->next && ic->next->op == IFX ? ic->next : 0);
       break;
 
     case '*':

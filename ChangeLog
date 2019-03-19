@@ -3,7 +3,11 @@
 	* sim/ucsim/pdk.src/inst.cc:
 	  Simulator fixes, patches by Nicolas Lesser.
 	* sdas/aspdk15/pdk15mch.c:
-	  Assembler fix, patch by Nicolas Lesser.
+	  Assembler fix, patch by Nicolas Lesser
+	* support/regression/tests/staticinit.c,
+	  src/pdk/gen.c,
+	  src/pdk/ralloc2.cc:
+	  Implement RFE #614.
 
 2019-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

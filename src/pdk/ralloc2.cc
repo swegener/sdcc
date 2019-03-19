@@ -517,12 +517,38 @@ static float rough_cost_estimate(const assignment &a, unsigned short int i, cons
 // Code for another ic is generated when generating this one. Mark the other as generated.
 static void extra_ic_generated(iCode *ic)
 {
+  iCode *ifx;
+
+  // - can only jump on nonzero result for decrement of register / direct variable.
+  if(ic->op == '-' && ic->next && ic->next->op == IFX && IC_TRUE(ic->next) && IC_COND (ic->next)->key == IC_RESULT(ic)->key)
+    {
+      ifx = ic->next;
+
+      if ((!IS_ITEMP(IC_LEFT (ic)) || options.stackAuto || reentrant) && !isOperandGlobal (IC_LEFT (ic)))
+        return;
+
+      if (!IS_OP_LITERAL(IC_RIGHT(ic)))
+        return;
+
+      if (ullFromVal(OP_VALUE(IC_RIGHT(ic))) != 1)
+        return;
+
+      if (!isOperandEqual (IC_RESULT(ic), IC_LEFT(ic)))
+        return;
+
+      if (getSize(operandType(IC_RESULT(ic))) > 2)
+        return;
+
+      ifx->generated = true;
+      return;
+    }
+
   if(ic->op != EQ_OP && ic->op != NE_OP && ic->op != '<' && ic->op != '>' && ic->op != BITWISEAND)
     return;
 
-  iCode *ifx = ifxForOp(IC_RESULT(ic), ic);
+  ifx = ifxForOp(IC_RESULT(ic), ic);
 
-  if (!ifx)
+  if(!ifx)
     return;
 
   // Bitwise and code generation can only do the jump if there is at most one nonzero byte.
@@ -535,13 +561,14 @@ static void extra_ic_generated(iCode *ic)
         return;
 
       for(unsigned int i = 0; i < getSize(operandType(IC_LEFT (ic))) && i < getSize(operandType(IC_RIGHT(ic))) && i < getSize(operandType(IC_RESULT(ic))); i++)
-        if(byteOfVal (OP_VALUE(litop), i))
+        if(byteOfVal(OP_VALUE(litop), i))
           nonzero++;
 
       if(nonzero > 1 && IC_FALSE (ifx))
         return;
     }
 
+cnd:
   OP_SYMBOL(IC_RESULT(ic))->for_newralloc = false;
   OP_SYMBOL(IC_RESULT(ic))->regType = REG_CND;
   ifx->generated = true;

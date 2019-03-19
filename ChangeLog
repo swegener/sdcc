@@ -1,3 +1,8 @@
+2019-03-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/scripts/sdcc.nsi:
+	  Include pdk binaries in Windows installer.
+
 2019-03-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/lib/_modslonglong.c: fix bug #2790

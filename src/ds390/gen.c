@@ -2697,34 +2697,31 @@ assignResultValue (operand * oper, operand * func)
       return FALSE;
     }
 
-  if (size == fReturnSizeDS390)
+  if (AOP_NEEDSACC (oper))
     {
-      /* I don't think this case can ever happen... */
-      /* ACC is the last part of this. If writing the result
-       * uses ACC, we must preserve it.
-       */
-      if (AOP_NEEDSACC (oper))
+      int i;
+      for (i=0; i<size; i++)
         {
-          emitcode (";", "assignResultValue special case for ACC.");
-          emitpush ("acc");
-          pushedA = TRUE;
-          size--;
+          if (strcmp(fReturn[i],"a")==0)
+            {
+              emitcode (";", "assignResultValue special case for ACC.");
+              emitpush ("acc");
+              pushedA = TRUE;
+              break;
+            }
         }
     }
-
+              
   _startLazyDPSEvaluation ();
   while (size--)
     {
+      if (pushedA && strcmp(fReturn[offset],"a")==0)
+        emitpop ("acc");
       accuse |= aopPut (oper, fReturn[offset], offset);
       offset++;
     }
   _endLazyDPSEvaluation ();
 
-  if (pushedA)
-    {
-      emitpop ("acc");
-      accuse |= aopPut (oper, "a", offset);
-    }
   return accuse;
 }
 
@@ -3122,6 +3119,7 @@ genSend (set * sendSet)
           D (emitcode (";", "genSend argreg = %d, size = %d ", sic->argreg, size));
           if (sendCount == 0)
             {
+              bool pushedA = FALSE;
               /* first parameter */
               // we know that dpl(hxb) is the result, so
               rb1_count = 0;
@@ -3142,7 +3140,17 @@ genSend (set * sendSet)
                       emitcode ("mov", "a%s,%s", fReturn[offset], l); // use register's direct address instead of name
                     else
                       emitcode ("mov", "%s,%s", fReturn[offset], l);
+                    if (size && (strcmp(fReturn[offset],"a")==0) && AOP_NEEDSACC( IC_LEFT (sic)))
+                      {
+                        emitpush ("acc");
+                        pushedA = TRUE;
+                      }
                   offset++;
+                }
+              if (pushedA)
+                {
+                  emitpop ("acc");
+                  pushedA = FALSE;
                 }
               _endLazyDPSEvaluation ();
               freeAsmop (IC_LEFT (sic), NULL, sic, TRUE);

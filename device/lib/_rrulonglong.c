@@ -51,7 +51,7 @@ unsigned long long _rrulonglong(unsigned long long l, char s)
 	}
 
 	(*bottom) >>= s;
-	(*middle) |= (((*middle) >> s) & 0x0000fffful);
+	(*middle) |= (((*middle & 0xffff0000ul) >> s) & 0x0000fffful);
 	(*top) >>= s;
 
 	return(l);
@@ -62,7 +62,7 @@ unsigned long long _rrulonglong(unsigned long long l, char s)
 unsigned long long _rrulonglong(unsigned long long l, char s)
 {
 	uint32_t *const top = (uint32_t *)((char *)(&l) + 4);
-	uint16_t *const middle = (uint16_t *)((char *)(&l) + 3);
+	uint16_t *const middle = (uint16_t *)((char *)(&l) + 4);
 	uint32_t *const bottom = (uint32_t *)(&l);
 	uint16_t *const b = (uint16_t *)(&l);
 
@@ -75,7 +75,7 @@ unsigned long long _rrulonglong(unsigned long long l, char s)
 	}
 
 	(*bottom) >>= s;
-	(*middle) |= (((*middle) & 0xffff0000ul) >> s);
+	(*middle) |= (uint16_t)(((uint32_t)(*middle) << 16) >> s);
 	(*top) |= (((*middle) & 0xffff0000ul) >> s);
 
 	return(l);

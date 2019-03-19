@@ -1,5 +1,5 @@
 /** Simple long long tests.
- test: mul, div, bit
+ test: mul, div, bit, shift
 
  */
 #include <testfwk.h>
@@ -107,13 +107,9 @@ LongLong_mul (void)
   x = 42ll << 23;
   ASSERT (x + y == (42ll << 23) + 42);
   ASSERT (x - y == (42ll << 23) - 42);
-#ifndef __SDCC_ds390
   ASSERT (x * y == (42ll << 23) * 42);
   ASSERT (x / tmp == (42ll << 23) / 42);
-#endif
-#if !defined __SDCC_hc08 && !defined __SDCC_s08 // hc08 / s08-specific bug
   ASSERT (x % tmp == (42ll << 23) % 42);
-#endif
 
   x = 0x1122334455667788ll;
   y = 0x9988776655443322ull;
@@ -124,7 +120,6 @@ LongLong_mul (void)
 
   y = 0x55667788ull;
   ASSERT (y * y == 0x55667788ull * 0x55667788ull); // this test is optimized by constant propagation
-#ifndef __SDCC_ds390
   ASSERT (mulLL (y, y) == 0x55667788ull * 0x55667788ull); // this test is not
   y = 0x55667788ull;
   x = 0x55667788ll;
@@ -148,7 +143,6 @@ LongLong_mul (void)
   x = 0x2ll;
   ASSERT (y * x == 0x1122334455667700ull * 0x2ll); // this test is optimized by constant propagation
   ASSERT (mulLL (y, x) == 0x1122334455667700ull * 0x2ll); // this test is not
-#endif
 
   c(); // Unused long long return value requires special handling in register allocation.
 }
@@ -178,12 +172,10 @@ static long long modLL(long long a, long long b)
 void
 LongLong_div (void)
 {
-#ifndef __SDCC_ds390
   y = 0x1122334455667700ull;
   x = 0x7ll;
   ASSERT (y / x == 0x1122334455667700ull / 0x7ll); // this test is optimized by constant propagation
   ASSERT (divULL (y, x) == 0x1122334455667700ull / 0x7ll); // this test is not
-#if !defined __SDCC_hc08 && !defined __SDCC_s08 // hc08 / s08-specific bugs
   ASSERT (y % x == 0x1122334455667700ull % 0x7ll); // this test is optimized by constant propagation
   ASSERT (modULL (y, x) == 0x1122334455667700ull % 0x7ll); // this test is not
   x = 0x1122334455667700ll;
@@ -191,8 +183,6 @@ LongLong_div (void)
   ASSERT (divLL (x, 0x7ll) == 0x1122334455667700ll / 0x7ll); // this test is not
   ASSERT (x % 0x7ll == 0x1122334455667700ll % 0x7ll); // this test is optimized by constant propagation
   ASSERT (modLL (x, 0x7ll) == 0x1122334455667700ll % 0x7ll); // this test is not
-#endif
-#endif
 }
 
 #elif defined(TEST_bit)
@@ -250,7 +240,6 @@ static unsigned long long bitNotULL(unsigned long long a)
 void
 LongLong_bit (void)
 {
-#ifndef __SDCC_ds390
   y = 0x44556677aabbccddull;
   x = 0x7766554433221100ull;
   ASSERT (y < x);
@@ -284,10 +273,53 @@ LongLong_bit (void)
   ASSERT (bitXorULL (y, x) == (0x69aaaaaaaaaa55aaull ^ 0x69555555555555aall));
   ASSERT ((~y) == (~0x69aaaaaaaaaa55aaull));
   ASSERT (bitNotULL (y) == (~0x69aaaaaaaaaa55aaull));
-#endif
 }
 
-#endif //TEST_mul/div/bit
+#elif defined(TEST_shift)
+
+void
+LongLong_shift (void)
+{
+  unsigned char i,j,expected,match;
+  for (i=0;i<64;i++) {
+    y = 1ull << i;
+    match=0;
+    for (j=0;j<64;j++) {
+      expected = (j==i);
+      if ((unsigned char)(y & 1) == expected)
+        match++;
+      y >>= 1;
+    }
+    ASSERT (match==64);
+  }
+
+  for (i=0;i<64;i++) {
+    y = 0x8000000000000000ull >> i;
+    match=0;
+    for (j=0;j<64;j++) {
+      expected = (j==i);
+      if ((y & 0x8000000000000000ull) ? expected : !expected)
+        match++;
+      y <<= 1;
+    }
+    ASSERT (match==64);
+  }
+
+  for (i=0;i<64;i++) {
+    x = (signed long long)0x8000000000000000ll >> i;
+    match=0;
+    for (j=0;j<64;j++) {
+      expected = (j<=i);
+      if ((x & 0x8000000000000000ll) ? expected : !expected)
+        match++;
+      x <<= 1;
+    }
+    ASSERT (match==64);
+  }
+ 
+}
+
+#endif //TEST_mul/div/bit/shift
 
 #endif //!mcs51-small
 

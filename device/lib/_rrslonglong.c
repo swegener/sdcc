@@ -51,7 +51,7 @@ long long _rrslonglong(long long l, char s)
 	}
 
 	(*bottom) >>= s;
-	(*middle) |= (((*middle) >> s) & 0x0000fffful);
+	(*middle) |= (((*middle & 0xffff0000ul) >> s) & 0x0000fffful);
 	(*top) >>= s;
 
 	return(l);

@@ -806,7 +806,7 @@ PORT hc08_port =
     1, 2, 2, 4, 8, 2, 2, 2, 2, 0, 1, 4
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+  { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */
   {
     "XSEG",
     "STACK",
@@ -951,7 +951,7 @@ PORT s08_port =
     1, 2, 2, 4, 8, 2, 2, 2, 2, 0, 1, 4
   },
   /* tags for generic pointers */
-  { 0x00, 0x40, 0x60, 0x80 },           /* far, near, xstack, code */
+  { 0x00, 0x00, 0x00, 0x00 },           /* far, near, xstack, code */
   {
     "XSEG",
     "STACK",

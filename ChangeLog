@@ -1,3 +1,8 @@
+2019-03-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/main.c: fix bug #2713
+	* support/regression/tests/bug2783061.c: bug #2713 tested
+
 2019-03-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/scripts/sdcc.nsi:

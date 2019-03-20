@@ -3,6 +3,8 @@
 	* device/lib/_ulong2fs.c: fix bug #2787
 	* support/regression/tests/gcc-torture-execute-floatunsisf-1.c:
 	  re-enable test
+	* src/ds390/gen.c: fix bug #2835
+	* support/regression/tests/bug-2833.c: re-enable tests
 
 2019-03-19 Philipp Klaus Krause <pkk AT spth.de>
 

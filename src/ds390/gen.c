@@ -11878,7 +11878,15 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
       /* DP2 = result, DP1 = right, DP1 is current. */
       while (size)
         {
-          emitcode ("movx", "a,@dptr");
+          if (AOP (right)->code)
+            {
+              emitcode ("clr", "a");
+              emitcode ("movc", "a,@a+dptr");
+            }
+          else
+            {
+              emitcode ("movx", "a,@dptr");
+            }
           emitcode ("movx", "@dptr,a");
           if (--size)
             {

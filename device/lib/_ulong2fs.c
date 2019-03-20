@@ -82,7 +82,7 @@ union float_long
 
 float __ulong2fs (unsigned long a )
 {
-  int exp = 24 + EXCESS;
+  unsigned char exp = 24 + EXCESS;
   volatile union float_long fl;
 
   if (!a)
@@ -90,26 +90,21 @@ float __ulong2fs (unsigned long a )
       return 0.0;
     }
 
-  while (a & NORM) 
-    {
-      // we lose accuracy here
-      a >>= 1;
-      exp++;
-    }
-  
   while (a < HIDDEN)
     {
       a <<= 1;
       exp--;
     }
 
-#if 1
-  if ((a&0x7fffff)==0x7fffff) {
-    a=0;
-    exp++;
-  }
-#endif
-
+  while (a & NORM) 
+    {
+      // we lose accuracy here
+      if (a & 1)
+        a += 2;
+      a >>= 1;
+      exp++;
+    }
+  
   a &= ~HIDDEN ;
   /* pack up and go home */
   fl.l = PACK(0,(unsigned long)exp, a);

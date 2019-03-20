@@ -17,7 +17,7 @@ volatile float f1, f2;
 void
 testTortureExecute (void)
 {
-#if 0 // Bug #2787
+#ifndef __SDCC_pdk14
   f1 = (float) u;
   f2 = (float) 0x80000081;
   if (f1 != f2)

@@ -1,3 +1,9 @@
+2019-03-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/_ulong2fs.c: fix bug #2787
+	* support/regression/tests/gcc-torture-execute-floatunsisf-1.c:
+	  re-enable test
+
 2019-03-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/scripts/sdcc.nsi:

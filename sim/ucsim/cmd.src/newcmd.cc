@@ -478,9 +478,9 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
           class cl_cmd *cm = 0;
           if (get_flag(CONS_ECHO))
             dd_printf("%s\n", cmdstr);
-          cmdline= new cl_cmdline(app, cmdstr, this);
 	  do
 	    {
+	      cmdline= new cl_cmdline(app, cmdstr, this);
 	      cmdline->init();
 	      if (cmdline->repeat() &&
 		  is_interactive() &&
@@ -511,15 +511,17 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
 		      dd_printf("%ld\n", l);
 		    }
 		}
+	      lbuf= cmdline->rest;
+	      cmdstr= lbuf;
+	      delete cmdline;
 	    }
-	  while (cmdline->restart_at_rest());
-	  delete cmdline;
+	  while (!lbuf.empty());
         }
     }
   if (!is_frozen())
     un_redirect();
   if (!retval &&
-      cmdstr &&
+      //cmdstr &&
       do_print_prompt &&
       !get_flag(CONS_REDIRECTED))
     {

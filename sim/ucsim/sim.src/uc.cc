@@ -1012,7 +1012,8 @@ cl_uc::memory(const char *id)
     return(0);
   for (i= 0; i < address_spaces->count; i++)
     {
-      class cl_memory *m= (cl_memory *)(address_spaces->at(i));
+      class cl_base *b= address_spaces->object_at(i);
+      class cl_memory *m= dynamic_cast<cl_memory *>(b);
       if (!m ||
 	  !m->have_real_name())
 	continue;

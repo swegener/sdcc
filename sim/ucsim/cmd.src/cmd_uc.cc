@@ -270,34 +270,34 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
     }
   
   enum dump_format df= (enum dump_format)fmt;
-  if (!params[0] ||
-      !params[0]->as_memory(uc))
+  if ((cmdline->param(0)==NULL) ||
+      (!(cmdline->param(0)->as_memory(uc))))
     {
       con->dd_printf("No memory specified. Use \"info memory\" for available memories\n");
       return(false);
     }
   if (cmdline->syntax_match(uc, MEMORY))
     {
-      mem= params[0]->value.memory.memory;
+      mem= cmdline->param(0)->value.memory.memory;
       mem->dump(df, -1, -1, bpl, con->get_fout());
     }
   else if (cmdline->syntax_match(uc, MEMORY ADDRESS)) {
-    mem  = params[0]->value.memory.memory;
-    start= params[1]->value.address;
+    mem  = cmdline->param(0)->value.memory.memory;
+    start= cmdline->param(1)->value.address;
     end  = start+10*8-1;
     mem->dump(df, start, end, bpl, con->get_fout());
   }
   else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS)) {
-    mem  = params[0]->value.memory.memory;
-    start= params[1]->value.address;
-    end  = params[2]->value.address;
+    mem  = cmdline->param(0)->value.memory.memory;
+    start= cmdline->param(1)->value.address;
+    end  = cmdline->param(2)->value.address;
     mem->dump(df, start, end, bpl, con->get_fout());
   }
   else if (cmdline->syntax_match(uc, MEMORY ADDRESS ADDRESS NUMBER)) {
-    mem  = params[0]->value.memory.memory;
-    start= params[1]->value.address;
-    end  = params[2]->value.address;
-    bpl  = params[3]->value.number;
+    mem  = cmdline->param(0)->value.memory.memory;
+    start= cmdline->param(1)->value.address;
+    end  = cmdline->param(2)->value.address;
+    bpl  = cmdline->param(3)->value.number;
     mem->dump(df, start, end, bpl, con->get_fout());
   }
   else

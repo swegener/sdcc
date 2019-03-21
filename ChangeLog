@@ -2,6 +2,8 @@
 
 	* src/SDCCopt.c: fix bug #2793
 	* support/regression/tests/bug-2793: re-enable test
+	* support/regression/tests/gcc-torture-execute-20120817-1.c:
+	  re-enable test
 
 2019-03-20 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

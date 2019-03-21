@@ -21,7 +21,7 @@ u64 f() {
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_hc08) && !defined(__SDCC_s08) && !defined(__SDCC_pdk14)
+#if !defined(__SDCC_pdk14)
   if (f () != 16)
     ASSERT (0);
 #endif

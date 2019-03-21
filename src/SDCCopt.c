@@ -2059,7 +2059,7 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
   int i;
   int change = 0;
   iCode *ic, *newic;
-  iCode *uic;
+  iCode *uic, *skipuic;
   sym_link *nextresulttype;
   symbol *sym;
   int resultsize, nextresultsize;
@@ -2340,10 +2340,14 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
                 continue;
 
               /* Skip over assignment */
+              skipuic = NULL;
               if(uic->op == '=' && IS_ITEMP (IC_RESULT (uic)) &&
                 bitVectnBitsOn (OP_DEFS (IC_RESULT (uic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1 && bitVectnBitsOn (OP_USES (IC_RESULT (uic))) == 1 &&
                 compareType (operandType (IC_RESULT (ic)), operandType (IC_RESULT (uic))) == 1)
-                uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (uic))));
+                {
+                  skipuic = uic;
+                  uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (uic))));
+                }
 
               /* Try to handle a few cases where the result has multiple uses */
               else if(ic->op == '*' && bitsForType (operandType (IC_RESULT (ic))) > 16 && uic->op == '=' &&
@@ -2481,7 +2485,15 @@ optimize:
                     }
                 }
               if (uic->op == CAST && ic->op != RIGHT_OP)
-                uic->op = '=';
+                {
+                  uic->op = '=';
+                  if (skipuic)
+                    {
+                      bitVectUnSetBit (OP_USES (IC_RIGHT (uic)), uic->key);
+                      IC_RIGHT (uic) = IC_RIGHT (skipuic);
+                      OP_USES (IC_RIGHT (uic)) = bitVectSetBit (OP_USES (IC_RIGHT (uic)), uic->key);
+                    }
+                }
               change++;
             }
         }

@@ -50,7 +50,7 @@ CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I$(srcdir)/../../include -I. --std-c99
+CFLAGS = -I$(srcdir)/../../include -I. --std-c11
 
 all: $(PORTDIR)/$(LIB)
 

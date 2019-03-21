@@ -24,7 +24,7 @@ CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I$(top_srcdir)/include --std-c89
+CFLAGS = -I$(top_srcdir)/include --std-c11
 
 all: $(PORTDIR)/$(LIB)
 

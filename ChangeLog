@@ -2,6 +2,11 @@
 
 	* support/regression/tests/gcc-torture-execute-20051110-2.c:
 	  Enable a test (bug got fixed a few days ago via patch by Nicolas).
+	* device/lib/Makefile.in,
+	  device/lib/*/Makefile.in,
+	  support/regression/tests/wchar.c,
+	  support/regression/tests/bug-2855.c:
+	  Fix bug #2855.
 
 2019-03-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

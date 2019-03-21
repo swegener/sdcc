@@ -17,8 +17,10 @@
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 #include <stdint.h>
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#ifdef __SDCC
 _Static_assert(!WCHAR_MIN, "nonzero WCHAR_MIN");
 _Static_assert(WEOF <= WINT_MAX, "WEOF out of wint_t range");
+#endif
 #endif
 #endif
 
@@ -130,11 +132,14 @@ testchar16restart(void)
 	errno = 0;
 	ASSERT(c16rtomb(c, u'\0', 0) == 1);    // Converting a 0 character resets internal state.
 
+#ifdef __SDCC // The stadnard was defective (fixed in C2X). SDCC always behaves according to the fixed standard.
 	ASSERT(c16rtomb(c, 0xd800, 0) == 0);
 	ASSERT(c16rtomb(c, 0xd800, 0) == -1);  // Invalid: Unpaired UTF-16 surrogate.
+
 	ASSERT(errno == EILSEQ);
 	errno = 0;
 	ASSERT(c16rtomb(c, u'\0', 0) == 1);    // Converting a 0 character resets internal state.
+#endif
 #endif
 #endif
 #endif

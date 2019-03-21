@@ -1,3 +1,8 @@
+2019-03-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/gcc-torture-execute-20051110-2.c:
+	  Enable a test (bug got fixed a few days ago via patch by Nicolas).
+
 2019-03-21 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c: fix bug #2793

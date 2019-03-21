@@ -41,10 +41,8 @@ a:
 
 void testTortureExecute(void)
 {
-#ifndef __SDCC_pdk14 // Bug #2884
   add_unwind_adjustsp (4132);
   if (bytes[0] != 0x88 || bytes[1] != 0x07)
     ASSERT (0);
   return;
-#endif
 }

@@ -59,7 +59,7 @@ PDK15_SDCC = $(COMMON_SDCC) \
 PDK15SOURCES = $(addprefix ../,$(PDK15_FLOAT) $(PDK15_INT) $(PDK15_LONG) $(PDK15_LONGLONG) $(PDK15_SDCC))
 PDK15OBJECTS = $(patsubst %.c,%.rel,$(PDK15_FLOAT) $(PDK15_INT) $(PDK15_LONG) $(PDK15_LONGLONG) $(PDK15_SDCC))
 
-OBJ = __gptrget.rel __gptrget2.rel heap.rel
+OBJ = __gptrget.rel __gptrget2.rel heap.rel __setjmp.rel
 
 LIB = pdk15.lib
 CC = $(SCC)

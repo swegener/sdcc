@@ -10,7 +10,6 @@
 
 #include <setjmp.h>
 
-#ifndef __SDCC_pdk14
 /* PR tree-optimization/60003 */
 /* { dg-require-effective-target indirect_jumps } */
 
@@ -49,14 +48,11 @@ foo (int x)
 	return x;
     }
 }
-#endif
 
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14
   if (foo (1) == 0)
     ASSERT (0);
-#endif
 }
 

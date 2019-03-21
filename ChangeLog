@@ -1,5 +1,16 @@
 2019-03-21 Philipp Klaus Krause <pkk AT spth.de>
 
+	* device/lib/pdk14/__setjmp.s,
+	  device/lib/pdk15/__setjmp.s,
+	  device/lib/pdk14/Makefile.in,
+	  device/lib/pdk15/Makefile.in,
+	  support/regression/tests/setjmp.c,
+	  support/regression/tests/gcc-torture-execute-20010409-1.c,
+	  support/regression/tests/gcc-torture-execute-pr60003.c:
+	  setjmp() / longjmp() for pdk.
+
+2019-03-21 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/gcc-torture-execute-20051110-2.c:
 	  Enable a test (bug got fixed a few days ago via patch by Nicolas).
 	* device/lib/Makefile.in,

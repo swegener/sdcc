@@ -17,7 +17,7 @@ T2_isr (void) __interrupt 5 //no using
 }
 #endif
 
-#if defined(__SDCC_pic14) || defined(__SDCC_pdk14)
+#if defined(__SDCC_pic14)
 #define SKIP
 #endif
 

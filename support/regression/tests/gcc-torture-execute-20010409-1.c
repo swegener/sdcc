@@ -12,7 +12,7 @@
 #include <string.h>
 #include <setjmp.h>
 
-#ifndef __SDCC_pdk14
+#ifndef __SDCC_pdk14 // Lack of memory
 jmp_buf try;
 
 typedef struct A {
@@ -53,7 +53,7 @@ void test (const char *x, int *y)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14
+#ifndef __SDCC_pdk14 // Lack of memory
   if (setjmp(try) == 0)
   {
     d->b = 0;

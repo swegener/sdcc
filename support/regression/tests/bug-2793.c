@@ -54,7 +54,6 @@ void f_mkfs (
 		}
 	}
 }
-#endif
 
 void testBug(void)
 {

@@ -1170,7 +1170,7 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
       if (!iloop && (!AST_SYMBOL (rootValue)->islocal || SPEC_STAT (etype)))
         break;
 
-      if (aggregateIsAutoVar)
+      if (aggregateIsAutoVar && (SPEC_STRUCT (type)->type != UNION))
         for (ps = old_sflds; ps != sflds && ps != NULL; ps = ps->next)
           {
             ps->implicit = 1;
@@ -1185,6 +1185,10 @@ createIvalStruct (ast * sym, sym_link * type, initList * ilist, ast * rootValue)
       lAst = decorateType (resolveSymbols (lAst), RESULT_TYPE_NONE);
       rast = decorateType (resolveSymbols (createIval (lAst, sflds->type, iloop, rast, rootValue, 1)), RESULT_TYPE_NONE);
       iloop = iloop ? iloop->next : NULL;
+
+      /* Unions can only initialize a single field */
+      if (SPEC_STRUCT (type)->type == UNION)
+        break;
     }
 
   if (iloop)

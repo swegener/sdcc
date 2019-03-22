@@ -17,18 +17,14 @@ _Bool check(union u *u)
 
 void testBug1(void)
 {
-#if 0
 	union u u = {23};
 	ASSERT (check(&u));
-#endif
 }
 
 void testBug2(void)
 {
-#if 0
 	union u u = {.i = 23};
 	ASSERT (check(&u));
-#endif
 }
 
 void testBug3(void)

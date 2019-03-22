@@ -244,8 +244,9 @@ C
 \emph on
 C
 \emph default
-ompiler) is free open source, retargettable, optimizing standard (ISO C90,
- ISO C99, ISO C11) C compiler suite by 
+ompiler) is free open source, retargettable, optimizing standard (ANSI C89
+ / ISO C90, ISO C99, ISO C11 / ISO C17) C compiler suite originally written
+ by 
 \series bold
 Sandeep Dutta
 \series default
@@ -273,7 +274,7 @@ Z80, Z180, GBZ80, Rabbit 2000/3000, Rabbit 3000A CPU
 
 \end_inset
 
-) and STMicroelectronics STM8 
+), Toshiba TLCS-90, Zilog eZ80 in Z80 mode, STMicroelectronics STM8 
 \begin_inset Index idx
 status collapsed
 
@@ -283,9 +284,9 @@ STM8
 
 \end_inset
 
-.
+ and Padauk PDK14.
  It can be retargeted for other microprocessors, support for Microchip PIC
- and Toshiba TLCS-90 is under development.
+ and Padauk PDK15 is under development.
  The entire source code for the compiler is distributed under GPL.
  SDCC uses a modified version of ASXXXX
 \begin_inset Index idx
@@ -693,7 +694,7 @@ long long
 status open
 
 \begin_layout Plain Layout
-Incomplete support in the ds390, ds400, pic14 and pic16 backends.
+Incomplete support in the pic14 and pic16 backends.
 \end_layout
 
 \end_inset
@@ -9076,8 +9077,7 @@ union
 
 \end_inset
 
- cannot be assigned values directly, cannot be passed as function parameters
- and cannot be a return value
+ cannot be passed as function parameters and cannot be a return value
 \begin_inset Index idx
 status collapsed
 
@@ -9479,7 +9479,7 @@ There is no support for data types long long, unsigned long long, int_fast64_t,
 \end_layout
 
 \begin_layout Subsection
-ISO C11
+ISO C11 and ISO C17
 \end_layout
 
 \begin_layout Standard
@@ -11038,6 +11038,44 @@ gbz80 (GameBoy Z80)
 \labelwidthstring 00.00.0000
 
 \series bold
+-mtlcs90
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-mtlcs90
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the Toshiba TLCS-90 processor.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-mez80_z80
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-mez80_z80
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for the Zilog eZ80 processor in Z80 mode.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
 -mstm8
 \begin_inset Index idx
 status collapsed
@@ -11051,6 +11089,44 @@ status collapsed
 
 \series default
  Generate code for the STMicroelectronics STM8 family of processors.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-mpdk14
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-mpdk14
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for Padauk processors with 14 bit wide program memory.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-mpdk15
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-mpdk15
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for Padauk processors with 15 bit wide program memory.
 \end_layout
 
 \begin_layout Labeling
@@ -17513,7 +17589,8 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-Options common to all z80-related ports (z80, z180, r2k, r3ka, gbz80)
+Options common to all z80-related ports (z80, z180, r2k, r3ka, gbz80, tlcs90,
+ ez80_z80)
 \end_layout
 
 \begin_layout Labeling
@@ -17730,7 +17807,7 @@ Z80
 
 \end_inset
 
- (apply to z80, z180, r2k and r3ka port)
+ (apply to z80, z180, r2k, r3ka, tlcs90, ez80_z80)
 \end_layout
 
 \begin_layout Labeling
@@ -17935,9 +18012,9 @@ status collapsed
  
 \size default
 Use old register allocator.
- The old register allocator typically is faster than the current one, but
- the current one generates better code.
- This differences are the strongest, when a high value for -
+ The old register allocator is typically is faster than the current one,
+ but the current one generates better code.
+ This differences are the most noticeable, when a high value for -
 \begin_inset ERT
 status collapsed
 
@@ -18281,7 +18358,7 @@ status collapsed
 \size default
 Will dump internal representations as graphviz .dot files.
  Depending on other options, this can include the control-flow graph at
- lospre, insertion of bank selection instructions or register allcoation
+ lospre, insertion of bank selection instructions or register allocation
  and the conflict graph and tree-decomposition at register allocation.
 \end_layout
 
@@ -21151,7 +21228,7 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
-Z80/Z180 intrinsic named address spaces
+Z80/Z180/eZ80 intrinsic named address spaces
 \end_layout
 
 \begin_layout Subsubsection
@@ -21725,7 +21802,119 @@ xdata (hc08 named address space)
 \begin_layout Standard
 Variables in the address space__xdata can reside anywhere in memory.
  This is the default (generic address space).
- 
+\end_layout
+
+\begin_layout Subsection
+PDK14/PDK15 intrinsic named address spaces
+\end_layout
+
+\begin_layout Subsubsection
+__sfr
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+sfr
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Padauk family has separate address spaces for memory and 
+\emph on
+i
+\emph default
+nput/
+\emph on
+o
+\emph default
+utput memory.
+ I/O memory is accessed with special instructions, e.g.:
+\end_layout
+
+\begin_layout Verse
+
+\family typewriter
+__sfr __at 0x18 gpcc;
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+/* define a var in I/O space at 18h called gpcc */
+\end_layout
+
+\begin_layout Subsubsection
+__sfr16
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+sfr16
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The Padauk family has a 16-bit timer accessed with special instructions.
 \end_layout
 
 \begin_layout Subsection
@@ -23074,8 +23263,8 @@ status open
 \end_layout
 
 \begin_layout Subsection
-Omitting promotion on arguments of vararg function (does not apply to pdk13,
- pdk14, pdk15)
+Omitting promotion on arguments of vararg function (does not apply to pdk14,
+ pdk15)
 \end_layout
 
 \begin_layout Standard

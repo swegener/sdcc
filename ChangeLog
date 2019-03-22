@@ -1,3 +1,8 @@
+2019-03-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update manual.
+
 2019-03-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c: fix bug #2834

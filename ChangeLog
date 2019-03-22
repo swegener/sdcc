@@ -2,6 +2,9 @@
 
 	* src/SDCCast.c: fix bug #2834
 	* support/regression/tests/bug-2834.c: re-enable test
+	* src/ds390/ralloc.c: fix bug #2603
+	* support/regression/tests/gcc-torture-execute-20021120-1.c:
+	  re-enable test
 
 2019-03-21 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+extern void set_show_help(class cl_cmd *cmd);
+
 // SHOW COPYING
 COMMAND(cl_show_copying_cmd);
 

@@ -104,6 +104,10 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
   return(false);
 }
 
+CMDHELP(cl_run_cmd,
+	"run [start [stop]]",
+	"Go",
+	"long help of run")
 
 /*
  * Command: stop
@@ -120,6 +124,10 @@ COMMAND_DO_WORK_SIM(cl_stop_cmd)
   return(false);
 }
 
+CMDHELP(cl_stop_cmd,
+	"stop",
+	"Stop",
+	"long help of stop")
 
 /*
  * Command: step
@@ -222,7 +230,10 @@ COMMAND_DO_WORK_SIM(cl_step_cmd)
   return(0);
 }
 
-
+CMDHELP(cl_step_cmd,
+	"step [number [unit]]",
+	"Step",
+	"long help of step")
 /*
  * Command: next
  *----------------------------------------------------------------------------
@@ -286,6 +297,10 @@ COMMAND_DO_WORK_SIM(cl_next_cmd)
   return(false);
 }
 
+CMDHELP(cl_next_cmd,
+	"next",
+	"Next",
+	"long help of next")
 
 /*
  * Command: help
@@ -310,10 +325,11 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
     for (i= 0; i < cmdset->count; i++)
       {
 	class cl_cmd *c= (class cl_cmd *)(cmdset->at(i));
-	if (c->short_help)
-	  con->dd_printf("%s\n", c->short_help);
+	/*if (c->short_help.nempty())
+	  con->dd_printf("%s\n", (char*)c->short_help);
 	else
-	  con->dd_printf("%s\n", (char*)(c->names->at(0)));
+	con->dd_printf("%s\n", (char*)(c->names->at(0)));*/
+	c->print_short(con);
       }
   }
   else
@@ -338,11 +354,12 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
 		{
 		  class cl_cmd *c=
 		    dynamic_cast<class cl_cmd *>(subset->object_at(i));
-		  con->dd_printf("%s\n", c->short_help);
+		  //con->dd_printf("%s\n", (char*)c->short_help);
+		  c->print_short(con);
 		}
 	    }
-	  if (cmd_found->long_help)
-	    con->dd_printf("%s\n", cmd_found->long_help);
+	  if (cmd_found->long_help.nempty())
+	    con->dd_printf("%s\n", (char*)cmd_found->long_help);
 	}
       if (!matches ||
 	  !cmd_found)
@@ -350,6 +367,11 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
     }
   return(false);
 }
+
+CMDHELP(cl_help_cmd,
+	"help [command [subcommand]]",
+	"List of known commands, or description of specified command",
+	"Long help of help command")
 
 bool
 cl_help_cmd::do_set(class cl_cmdline *cmdline, int pari,
@@ -374,10 +396,11 @@ cl_help_cmd::do_set(class cl_cmdline *cmdline, int pari,
 	    {
 	      matches++;
 	      cmd_found= cmd;
-	      if (cmd->short_help)
-		con->dd_printf("%s\n", cmd->short_help);
+	      /*if (cmd->short_help.nempty())
+		con->dd_printf("%s\n", (char*)cmd->short_help);
 	      else
-		con->dd_printf("%s\n", (char*)(cmd->names->at(0)));
+	      con->dd_printf("%s\n", (char*)(cmd->names->at(0)));*/
+	      cmd->print_short(con);
 	      //continue;
 	    }
 	  else
@@ -402,6 +425,10 @@ COMMAND_DO_WORK(cl_quit_cmd)
   return(1);
 }
 
+CMDHELP(cl_quit_cmd,
+	"quit",
+	"Quit",
+	"long help of quit")
 
 /*
  * Command: kill
@@ -419,6 +446,10 @@ COMMAND_DO_WORK_APP(cl_kill_cmd)
   return(1);
 }
 
+CMDHELP(cl_kill_cmd,
+	"kill",
+	"Shutdown simulator",
+	"long help of kill")
 
 /*
  * EXEC file
@@ -434,7 +465,8 @@ COMMAND_DO_WORK_APP(cl_exec_cmd)
   }
   if (!fn || !*fn)
     {
-      con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+      //con->dd_printf("%s\n", (short_help.nempty())?(char*)short_help:"Error: wrong syntax\n");
+      print_short(con);
       return (false);
     }
 
@@ -444,6 +476,10 @@ COMMAND_DO_WORK_APP(cl_exec_cmd)
   return(false);
 }
 
+CMDHELP(cl_exec_cmd,
+	"exec \"file\"",
+	"Execute commands from file",
+	"long help of exec")
 
 /*
  * expression expression
@@ -499,5 +535,9 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
   return(false);
 }
 
+CMDHELP(cl_expression_cmd,
+	"expression expr",
+	"Evaluate the expression",
+	"long help of expression ")
 
 /* End of cmd.src/cmd_exec.cc */

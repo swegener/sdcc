@@ -44,6 +44,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "cmdutil.h"
 
 
+void
+set_get_help(class cl_cmd *cmd)
+{
+  cmd->set_help("get subcommand",
+		"Get value of differend objects",
+		"Long of get");
+}
+
 /*
  * Command: get sfr
  *----------------------------------------------------------------------------
@@ -78,6 +86,10 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
   return(false);;
 }
 
+CMDHELP(cl_get_sfr_cmd,
+	"get sfr address...",
+	"Get value of addressed SFRs",
+	"long help of get sfr")
 
 /*
  * Command: get option
@@ -127,5 +139,9 @@ COMMAND_DO_WORK_APP(cl_get_option_cmd)
   return(false);;
 }
 
+CMDHELP(cl_get_option_cmd,
+	"get option name",
+	"Get value of an option",
+	"long help of get option")
 
 /* End of cmd.src/cmd_get.cc */

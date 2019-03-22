@@ -304,49 +304,37 @@ void
 cl_sim::build_cmdset(class cl_cmdset *cmdset)
 {
   class cl_cmd *cmd;
-  class cl_cmdset *cset;
+  //class cl_cmdset *cset;
 
-  cmdset->add(cmd= new cl_run_cmd("run", 0,
-"run [start [stop]] Go",
-"long help of run"));
+  cmdset->add(cmd= new cl_run_cmd("run", 0));
   cmd->init();
   cmd->add_name("go");
   cmd->add_name("r");
   cmd->add_name("continue");
   
-  cmdset->add(cmd= new cl_stop_cmd("stop", 0,
-"stop               Stop",
-"long help of stop"));
+  cmdset->add(cmd= new cl_stop_cmd("stop", 0));
   cmd->init();
 
-  cmdset->add(cmd= new cl_step_cmd("step", true,
-"step               Step",
-"long help of step"));
+  cmdset->add(cmd= new cl_step_cmd("step", true));
   cmd->init();
   cmd->add_name("s");
 
-  cmdset->add(cmd= new cl_next_cmd("next", true,
-"next               Next",
-"long help of next"));
+  cmdset->add(cmd= new cl_next_cmd("next", true));
   cmd->init();
   cmd->add_name("n");
 
-  {
+  /*{
     cset= new cl_cmdset();
     cset->init();
-    cset->add(cmd= new cl_gui_start_cmd("start", 0, 
-"gui start          Start interfacing with GUI tool",
-"long help of gui start"));
+    cset->add(cmd= new cl_gui_start_cmd("start", 0));
     cmd->init();
-    cset->add(cmd= new cl_gui_stop_cmd("stop", 0, 
-"gui stop           Stop interfacing with GUI tool",
-"long help of gui stop"));
+    cset->add(cmd= new cl_gui_stop_cmd("stop", 0));
     cmd->init();
   }
-  cmdset->add(cmd= new cl_super_cmd("gui", 0,
-"gui subcommand     Operations to support GUI tools",
-"long help of gui", cset));
+  cmdset->add(cmd= new cl_super_cmd("gui", 0, cset));
   cmd->init();
+  set_gui_help();
+  */
 }
 
 

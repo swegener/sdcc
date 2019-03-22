@@ -31,13 +31,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+extern void set_timer_help(class cl_cmd *cmd);
 
 COMMAND_HEAD(cl_timer_cmd)
 public:
   class cl_ticker *ticker;
   bool as_nr;
   int id_nr;
-  const char *id_str;
+  chars id_str;
 COMMAND_METHODS_ON(uc,cl_timer_cmd)
   void set_ticker(class cl_uc *uc,
 		  class cl_cmd_arg *param);

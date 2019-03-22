@@ -53,6 +53,7 @@ public:
   virtual chars &append(const char *format, ...);
   virtual chars &format(const char *format, ...);
   virtual bool empty();
+  virtual bool nempty() { return !empty(); }
   virtual bool is_null();
   virtual int len() { return chars_length; }
   virtual void start_parse(void) { start_parse(0); }

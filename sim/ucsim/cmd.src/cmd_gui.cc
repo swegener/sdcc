@@ -37,6 +37,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "cmd_guicl.h"
 
 
+void
+set_gui_help(class cl_cmd *cmd)
+{
+  cmd->set_help("gui subcommand",
+		"Operations to support GUI tools",
+		"Long of gui");
+}
+
 /*
  * Command: gui start
  *----------------------------------------------------------------------------
@@ -60,6 +68,10 @@ COMMAND_DO_WORK_UC(cl_gui_start_cmd)
   return(false);;
 }
 
+CMDHELP(cl_gui_start_cmd,
+	"gui start",
+	"Start interfacing with GUI tool",
+	"long help of gui start")
 
 /*
  * Command: gui stop
@@ -74,5 +86,9 @@ COMMAND_DO_WORK_UC(cl_gui_stop_cmd)
   return(false);;
 }
 
+CMDHELP(cl_gui_stop_cmd,
+	"gui stop",
+	"Stop interfacing with GUI tool",
+	"long help of gui stop")
 
 /* End of cmd.src/cmd_gui.cc */

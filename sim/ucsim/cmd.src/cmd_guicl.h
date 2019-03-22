@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+extern void set_gui_help(class cl_cmd *cmd);
+
 // GUI START
 COMMAND_ON(uc,cl_gui_start_cmd);
 

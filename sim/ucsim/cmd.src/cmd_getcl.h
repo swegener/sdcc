@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+extern void set_get_help(class cl_cmd *cmd);
+
 // GET SFR
 /*class cl_get_sfr_cmd: public cl_cmd
 {

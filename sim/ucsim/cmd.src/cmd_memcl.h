@@ -31,6 +31,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+extern void set_memory_help(class cl_cmd *cmd);
+extern void set_memory_create_help(class cl_cmd *cmd);
+
 // MEMORY CREATE CHIP
 COMMAND_ON(uc,cl_memory_create_chip_cmd);
 

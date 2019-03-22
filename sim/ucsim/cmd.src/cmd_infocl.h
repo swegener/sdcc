@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+extern void set_info_help(class cl_cmd *cmd);
+
 // INFO BP
 COMMAND_ON(uc,cl_info_bp_cmd);
 
@@ -41,7 +43,7 @@ COMMAND_ON(uc,cl_info_reg_cmd);
 COMMAND_ON(uc,cl_info_hw_cmd);
 
 // INFO STACK
-COMMAND_ON(uc,cl_info_stack_cmd);
+//COMMAND_ON(uc,cl_info_stack_cmd);
 
 // INFO MEMORY
 COMMAND_ON(uc,cl_info_memory_cmd);

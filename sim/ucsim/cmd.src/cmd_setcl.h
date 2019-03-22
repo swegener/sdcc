@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "newcmdcl.h"
 
 
+extern void set_set_help(class cl_cmd *cmd);
+
 // SET MEMORY
 COMMAND_ON(uc,cl_set_mem_cmd);
 

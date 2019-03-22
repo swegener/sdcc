@@ -1,7 +1,7 @@
 <html>
   <head>
-    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
-    <title>&#181;Csim: Invokation</title>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
+    <title>&#956;Csim: Invokation</title>
   </head>
   <body style=" background-color: white;">
     <h1>Starting the simulator</h1>
@@ -13,13 +13,18 @@
       HC08 processor is simulated by <b>shc08</b> <br>
       ST7 family is simulated by <b>sst7</b> <br>
       STM8 family is simulated by <b>sstm8</b> <br>
-      TLCS90 family is simulated by <b>stlcs</b> </p>
+      TLCS90 family is simulated by <b>stlcs<br>
+      </b>Padauk family is simulated by <b>spdk</b></p>
     <p>The simulator can be started in the following way: </p>
-    <p><tt><font color="blue">$</font> s51 [-hHVvPg] [-p prompt] [-t CPU] [-X
+    <p><tt><font color="blue">$</font> s51 [-hHVvPgGw] [-p prompt] [-t CPU] [-X
         freq[k|M]] [-C cfg_file] [-c file] [-s file] [-S optionlist] [-a nr] [-Z
         portnum] [-k portnum] [files...]</tt> </p>
     <p>Specified files must be names of Intel hex files. Simulator loads them in
-      the specified order into the ROM of the simulated system. </p>
+      the specified order into the ROM of the simulated system.If the file is
+      specified without extension, the simulator will try to find intel hex file
+      (filename extended with .hex), omf file (with .omf) and cdb file (with
+      .cdb extension). Simulator can interpret content of these SDCC output
+      files and reads information from them.</p>
     <p>Options: </p>
     <dl>
       <dt><tt><b>-t CPU</b></tt> </dt>
@@ -41,14 +46,16 @@
         used to specify frequency in kHZ or MHz. Space is not allowed between
         the number and the <b>k</b> or <b>M</b>. Default value is 11059200 Hz.
         <a name="coption"></a></dd>
+      <dt><span style="font-family: monospace;"><b>-C cfg_file</b></span></dt>
+      <dd>Read and execute initial commands from specified file.</dd>
       <dt><a name="coption"><tt><b>-c file</b></tt></a> </dt>
       <dd>Open command console on <b>file</b>. Command consoles are on standard
         input and output by default. Using this option the console can be opened
         on any file for example on the serial interface of the computer. <a name="Zoption"></a></dd>
       <dt><a name="Zoption"><tt><b>-Z portnum</b></tt></a> </dt>
       <dd>Listen for incoming connections on port <b>portnum</b>. Using this
-        option <i>&#181;Csim</i> can serve multiple consoles. You can get a console
-        by simply telnet into machine running <i>&#181;Csim</i> to port <b>portnumber</b>.
+        option <i>&#956;Csim</i> can serve multiple consoles. You can get a console
+        by simply telnet into machine running <i>&#956;Csim</i> to port <b>portnumber</b>.
         This option is not available on platforms which doesn't support BSD
         networking. <br>
         See <a href="mulcons.html">how to use multiple consoles</a>. </dd>
@@ -66,9 +73,15 @@
         specify a terminal with -s option. </dd>
       <dt><tt><b>-S uart=nr,in=file,out=file,port=nr</b></tt> </dt>
       <dd>Using this option you can specify different files for input and output
-        streams that <i>&#181;Csim</i> uses to simulate microprocessor's serial
+        streams that <i>&#956;Csim</i> uses to simulate microprocessor's serial
         interface. <br>
         See <a href="serial.html">more about serial interface simulation</a>. </dd>
+      <dt><span style="font-family: monospace;"><b>-I
+            if=memory[address],in=file,out=file</b></span></dt>
+      <dd>Specify options (as comma separated list) for the simulator interface.
+        <b>if</b> option turns on the interface and specifies address space and
+        location for use by the interface. <b>in</b> and <b>out</b> can be
+        used to specify file names to use for file IO.</dd>
       <dt><tt><b>-p prompt</b></tt> </dt>
       <dd>Using this option you can specify any string to be the prompt of
         command interpreter, for example:
@@ -77,15 +90,20 @@
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
-s51&gt; </font></pre>
+0s51&gt; </font></pre>
       </dd>
       <dt><tt><b>-P</b></tt> </dt>
       <dd>Prompt will be a null ('\0') character. This feature can be useful for
         programs which controls simulator through a pipe. </dd>
       <dt><span style="font-family: monospace;"><b>-g</b></span></dt>
       <dd>Go, start simulation when the program is loaded.</dd>
+      <dt><span style="font-family: monospace;"><b>-G</b></span></dt>
+      <dd>Start simulation when the program is loaded and terminate the
+        simulator when the simulation stops (maybe on breakpoint).</dd>
       <dt><span style="font-family: monospace;"><b>-a nr</b></span></dt>
       <dd>Set size of variable space. Default is 256.</dd>
+      <dt><span style="font-family: monospace;"><b>-w</b></span></dt>
+      <dd>Writable flash.</dd>
       <dt><tt><b>-V</b></tt> </dt>
       <dd>Verbose mode. The simulator notifies you about some kind of internal
         actions for example interrupts. Messages are printed on command console.

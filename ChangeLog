@@ -1,3 +1,9 @@
+2019-03-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCcse.c: fix bug #2099
+	* support/regression/tests/gcc-torture-execute-20041019-1.c:
+	  re-enable test
+
 2019-03-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

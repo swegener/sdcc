@@ -49,7 +49,6 @@ ftest_store_copy_prop (int i)
 void
 testTortureExecute (void)
 {
-#if 0 // Looks like a pointer bug in sdcc
   int x;
   
   x = ftest_store_ccp (10);
@@ -61,5 +60,4 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 }

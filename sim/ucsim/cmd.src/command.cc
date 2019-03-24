@@ -753,6 +753,18 @@ cl_cmd::print_short(class cl_console_base *con)
   con->dd_printf("\n");
 }
   
+void
+cl_cmd::syntax_error(class cl_console_base *con)
+{
+  if (con)
+    {
+      if (short_help.nempty())
+	print_short(con);
+      else
+	con->dd_printf("Error: wrong syntax\n");
+    }
+}
+
 /*
  * Set of commands
  *____________________________________________________________________________

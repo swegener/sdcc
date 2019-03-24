@@ -93,7 +93,7 @@ COMMAND_DO_WORK_UC(cl_set_mem_cmd)
       }
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
   
   return(false);;
 }
@@ -132,7 +132,7 @@ COMMAND_DO_WORK_UC(cl_set_bit_cmd)
     mem->dump(mem_addr, mem_addr, 1, con->get_fout());
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
 
   return(false);;
 }
@@ -166,7 +166,7 @@ COMMAND_DO_WORK_UC(cl_set_hw_cmd)
     hw= uc->get_hw(HW_PORT, pn, 0);
     }*/
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
   /*if (pn < 0 ||
       pn > 3)
     con->dd_printf("Error: wrong port\n");
@@ -250,7 +250,7 @@ COMMAND_DO_WORK_APP(cl_set_option_cmd)
       option= app->options->get_option(id);
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
   if (!option)
     {
       con->dd_printf("Option does not exist\n");
@@ -288,7 +288,7 @@ COMMAND_DO_WORK_APP(cl_set_error_cmd)
     value= params[1]->value.string.string;
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
 
   class cl_list *registered_errors = cl_error_registry::get_list();
   if (error_name &&
@@ -388,7 +388,7 @@ COMMAND_DO_WORK_APP(cl_set_console_cmd)
       con->set_cooked(true);
     }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
   
   return false;
 }

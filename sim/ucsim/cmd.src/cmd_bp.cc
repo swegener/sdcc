@@ -67,8 +67,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
     hit= params[1]->value.number;
     mem= uc->address_space(params[0]->value.cell, &addr);
     if (!mem)
-      return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
-	false;
+      return syntax_error(con),	false;
     s= params[2]->get_svalue();
     if (s && *s &&
 	(strcmp(s, "if") == 0))
@@ -85,8 +84,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
     hit= 1;
     mem= uc->address_space(params[0]->value.cell, &addr);
     if (!mem)
-      return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
-	false;
+      return syntax_error(con),	false;
     s= params[1]->get_svalue();
     if (s && *s &&
 	(strcmp(s, "if") == 0))
@@ -103,8 +101,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
     hit= params[1]->value.number;
     mem= uc->address_space(params[0]->value.cell, &addr);
     if (!mem)
-      return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
-	false;
+      return syntax_error(con),	false;
     if (mem == uc->rom)
       do_fetch(uc, addr, hit, cond, con);
     else
@@ -117,8 +114,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
     hit= 1;
     mem= uc->address_space(params[0]->value.cell, &addr);
     if (!mem)
-      return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
-	false;
+      return syntax_error(con),	false;
     if (mem == uc->rom)
       do_fetch(uc, addr, hit, cond, con);
     else
@@ -189,7 +185,7 @@ COMMAND_DO_WORK_UC(cl_break_cmd)
   }
   else
     {
-      con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+      syntax_error(con);
       return(false);
     }
   return(false);

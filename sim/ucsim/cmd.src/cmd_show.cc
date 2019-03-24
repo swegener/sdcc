@@ -103,7 +103,7 @@ COMMAND_DO_WORK_APP(cl_show_option_cmd)
     s= parm->value.string.string;
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
 
   int i;
   for (i= 0; i < app->options->count; i++)
@@ -192,7 +192,7 @@ COMMAND_DO_WORK_APP(cl_show_error_cmd)
     s= parm->value.string.string;
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+  syntax_error(con);
   */
   class cl_list *registered_errors = cl_error_registry::get_list();
   int i;

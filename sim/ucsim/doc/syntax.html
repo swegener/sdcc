@@ -1,7 +1,7 @@
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
-    <title>Command syntax of &#956;Csim</title>
+    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
+    <title>Command syntax of &mu;Csim</title>
   </head>
   <body style="    background-color: white;"> Content:
     <ul>
@@ -9,16 +9,16 @@
       <li><a href="#expr">Expressions</a> </li>
       <li><a href="#redir">Redirection</a> </li>
     </ul>
-    <h2><a name="syntax">Command syntax of <i>&#956;Csim</i></a></h2>
-    <i>&#956;Csim</i> uses a very simple command interpreter. Command can be entered
-    after <i>&#956;Csim</i> displays the prompt and interpreted when ENTER key is
+    <h2><a name="syntax">Command syntax of <i>&mu;Csim</i></a></h2>
+    <i>&mu;Csim</i> uses a very simple command interpreter. Command can be entered
+    after <i>&mu;Csim</i> displays the prompt and interpreted when ENTER key is
     pressed. Commands must start with the name of the command following
     parameters. Name of the command can be abbreviated if abbreviation is
     unique. Some commands have more than one names.
     <p>Syntactically parameters can be a string, bit name, array, number or
       symbol. Interpretation of these syntactical elements depends on actual
       command. </p>
-    <p>If the command line can not be recognized as a known command, <i>&#956;Csim</i>
+    <p>If the command line can not be recognized as a known command, <i>&mu;Csim</i>
       tries to evaluate the command line as an <i>expression</i>. <a href="#expr">See
         below</a> for information about operands and operators which can be used
       in expressions. </p>
@@ -213,61 +213,27 @@ Port0 11111111 0xff 255 . (Value on the port pins)
         </tr>
         <tr>
           <td>Primary</td>
-          <td><span style="font-family: monospace;">( )</span></td>
+          <td>( )</td>
           <td>Group of sub-expressions</td>
         </tr>
         <tr>
           <td>One operand</td>
-          <td><span style="font-family: monospace;">+ - &amp; ~ !</span></td>
-          <td>Unary plus, minus, address of, bit negate, logical not</td>
+          <td>- &amp;</td>
+          <td>Unary minus, address of</td>
         </tr>
         <tr>
-          <td rowspan="3" colspan="1">Arithmetic</td>
-          <td><span style="font-family: monospace;">* / %</span></td>
-          <td>Multiply, divide, modulo</td>
+          <td rowspan="2">Arithmetic</td>
+          <td>* /</td>
+          <td>Multiply, divide</td>
         </tr>
         <tr>
-          <td><span style="font-family: monospace;">+ -</span></td>
+          <td>+ -</td>
           <td>Add, substract</td>
         </tr>
         <tr>
-          <td><span style="font-family: monospace;">&lt;&lt; &gt;&gt;</span></td>
-          <td>shift left, right</td>
-        </tr>
-        <tr>
-          <td rowspan="2" colspan="1">Logical</td>
-          <td><span style="font-family: monospace;">&lt; &gt; &lt;= &gt;= == !=</span></td>
-          <td>Comparision of two values</td>
-        </tr>
-        <tr>
-          <td><span style="font-family: monospace;">&amp;&amp; || ^^</span></td>
-          <td>Logical and, or, xor</td>
-        </tr>
-        <tr>
-          <td>Bitwise</td>
-          <td><span style="font-family: monospace;">&amp; | ^</span></td>
-          <td>Bitwise and, or, xor</td>
-        </tr>
-        <tr>
           <td>Assignment</td>
-          <td><span style="font-family: monospace;">= *= /= %= += -= &lt;&lt;=
-              &gt;&gt;= &amp;= |= ^=</span></td>
+          <td>=</td>
           <td>Assign to</td>
-        </tr>
-        <tr>
-          <td>Increment, decrement</td>
-          <td><span style="font-family: monospace;">++ --</span></td>
-          <td>Can be used in prefix or postfix style</td>
-        </tr>
-        <tr>
-          <td>Conditional</td>
-          <td><span style="font-family: monospace;">?:</span></td>
-          <td>Works as in C</td>
-        </tr>
-        <tr>
-          <td>Comma</td>
-          <td><span style="font-family: monospace;">,</span></td>
-          <td>Evaluates expression in order, results last</td>
         </tr>
       </tbody>
     </table>
@@ -327,7 +293,7 @@ Port0 00010110 0x16  22 . (Value on the port pins)
     <hr>
     <h2><a name="redir">Redirection</a></h2>
     Output of any command can be redirected to a file. Same syntax can be used
-    for this as for UNIX shell. The only difference is that <i>&#956;Csim</i>
+    for this as for UNIX shell. The only difference is that <i>&mu;Csim</i>
     doesn't allow to put redirection at the beginning of the command!
     <pre>$ <font color="#118811">s51 remo.hex</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.

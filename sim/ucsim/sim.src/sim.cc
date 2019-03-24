@@ -166,8 +166,13 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
     {
       if (!(b->commands.empty()))
 	{
-	  application->exec(b->commands);
-	  steps_done= 0;
+	  class cl_option *o= app->options->get_option("echo_script");
+	  bool e= false;
+	  if (o) o->get_value(&e);
+	  if (e)
+	    cmd->dd_printf("%s\n", (char*)(b->commands));
+		  application->exec(b->commands);
+		  steps_done= 0;
 	}
     }
   
@@ -205,7 +210,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 					     eb->id, m?(m->get_name()):"mem?", (int)eb->addr,
 					     (int)uc->instPC,
 					     uc->disass(uc->instPC, " "));
-	    }
+    	    }
 	  break;
 	case resINTERRUPT:
 	  cmd->frozen_console->dd_printf("Interrupt\n");

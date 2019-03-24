@@ -241,7 +241,7 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 	  params[0]= cmdline->param(i);
 	}
       if (params[0])
-	con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+	syntax_error(con);
       return false;
     }
   if (params[0] &&
@@ -321,13 +321,13 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
     mem->dump(df, start, end, bpl, con->get_fout());
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
 
   return(false);;
 }
 
 CMDHELP(cl_dump_cmd,
-	"dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...",
+	"dump memory_type [start [stop [bytes_per_line]]] | dump bit...",
 	"Dump memory of specified type or bit(s)",
 	"long help of dump")
 
@@ -497,7 +497,7 @@ COMMAND_DO_WORK_UC(cl_disassemble_cmd)
   }
   else
     {
-      con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+      syntax_error(con);
       return(false);
     }
 
@@ -582,7 +582,7 @@ COMMAND_DO_WORK_UC(cl_fill_cmd)
       }
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
 
   return(false);;
 }
@@ -625,7 +625,7 @@ cl_where_cmd::do_real_work(class cl_uc *uc,
       }
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
 
   return(false);
 }
@@ -686,8 +686,7 @@ COMMAND_DO_WORK_UC(cl_var_cmd)
     {
     }
   else
-    return con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n"),
-      false;
+    return syntax_error(con), false;
 
   if (!valid_sym_name(params[0]->value.string.string))
     return con->dd_printf("name is invalid\n"),

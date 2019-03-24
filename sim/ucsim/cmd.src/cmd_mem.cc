@@ -80,7 +80,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_chip_cmd)
     width= params[2]->value.number;
   }
   else
-    con->dd_printf("Syntax error.\n");
+    syntax_error(con);
 
   if (!memid ||
       !*memid)
@@ -139,7 +139,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_addressspace_cmd)
     width= params[3]->value.number;
   }
   else
-    con->dd_printf("Syntax error.\n");
+    syntax_error(con);
 
   if (!memid ||
       !*memid)
@@ -222,7 +222,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_addressdecoder_cmd)
     chip_begin= params[4]->value.number;
   }
   else
-    con->dd_printf("Syntax error.\n");
+    syntax_error(con);
 
   if (!as->is_address_space())
     con->dd_printf("%s is not an address space\n", as->get_name("unknown"));
@@ -279,7 +279,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_banker_cmd)
     ase= params[5]->value.number;
   }
   else
-    return con->dd_printf("Syntax error.\n"), false;
+    return syntax_error(con), false;
 
   if (!banker_as->is_address_space())
     con->dd_printf("%s is not an address space\n", banker_as->get_name("unknown"));
@@ -352,7 +352,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_bander_cmd)
       bpc= params[5]->value.number;
     }
   else
-    return con->dd_printf("Syntax error.\n"), false;
+    return syntax_error(con), false;
 
   if (!as->is_address_space())
     con->dd_printf("%s is not an address space\n", as->get_name("unknown"));
@@ -415,7 +415,7 @@ COMMAND_DO_WORK_UC(cl_memory_create_bank_cmd)
     chip= params[3]->value.memory.memory;
   }
   else
-    return con->dd_printf("Syntax error.\n"), false;
+    return syntax_error(con), false;
 
   if (!as->is_address_space())
     con->dd_printf("%s is not an address space\n", as->get_name("unknown"));
@@ -474,7 +474,7 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
 	as= (cl_address_space *)m;
     }
   if (m == 0)
-    return con->dd_printf("Syntax error.\n"), false;
+    return syntax_error(con), false;
 
   if (!c)
     c= as->get_cell(a);

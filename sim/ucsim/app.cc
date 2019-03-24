@@ -912,7 +912,10 @@ cl_app::mk_options(void)
 					      "Name of output file for simulator interface (-I)"));
   o->init();
   o->hide();
-  
+
+  options->new_option(o= new cl_bool_option(this, "echo_script",
+					    "Print breakpoint script before execute"));
+  o->init();
 }
 
 

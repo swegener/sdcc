@@ -61,10 +61,7 @@ COMMAND_DO_WORK_UC(cl_gui_start_cmd)
     end= params[2]->value.address;*/
   }
   else
-    {
-      con->dd_printf("Error: wrong syntax\n"
-		     "%s\n", short_help?short_help:"no help");
-    }
+    syntax_error(con);
   return(false);;
 }
 

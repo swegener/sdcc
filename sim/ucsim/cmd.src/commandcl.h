@@ -127,6 +127,7 @@ public:
   virtual int do_work(class cl_uc *uc,
 		      class cl_cmdline *cmdline, class cl_console_base *con);
   virtual void print_short(class cl_console_base *con);
+  virtual void syntax_error(class cl_console_base *con);
 };
 
 #define COMMAND_HEAD(CLASS_NAME) \

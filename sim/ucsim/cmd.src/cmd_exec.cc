@@ -465,8 +465,7 @@ COMMAND_DO_WORK_APP(cl_exec_cmd)
   }
   if (!fn || !*fn)
     {
-      //con->dd_printf("%s\n", (short_help.nempty())?(char*)short_help:"Error: wrong syntax\n");
-      print_short(con);
+      syntax_error(con);
       return (false);
     }
 

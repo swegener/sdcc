@@ -126,7 +126,7 @@ COMMAND_DO_WORK_UC(cl_info_hw_cmd)
     hw->print_info(con);
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
 
   return(false);
 }

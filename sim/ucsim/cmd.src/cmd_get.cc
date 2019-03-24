@@ -110,7 +110,7 @@ COMMAND_DO_WORK_APP(cl_get_option_cmd)
     s= parm->value.string.string;
   }
   else
-    con->dd_printf("%s\n", short_help?short_help:"Error: wrong syntax\n");
+    syntax_error(con);
 
   int i;
   for (i= 0; i < app->options->count; i++)

@@ -120,6 +120,11 @@ get_sdas_target(void)
   return target;
 }
 
+void
+set_sdas_target(enum sdas_target_e newtarget)
+{
+  target = newtarget;
+}
 
 int
 is_sdas_target_z80_like(void)

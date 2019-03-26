@@ -31,6 +31,7 @@
  *  Fixed bugs in relative address with "."
  */
 
+#include "sdas.h"
 #include "asxxxx.h"
 #include "pdk.h"
 
@@ -45,6 +46,11 @@ machine(struct mne *mp)
 {
         a_uint op;
         int combine;
+
+        /* Set the target in case it was not automatically
+         * configured from the executable filename.
+         */
+        set_sdas_target (TARGET_ID_PDK);
 
         op = mp->m_valu;
         combine = 0;

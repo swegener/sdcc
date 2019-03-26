@@ -66,6 +66,7 @@ installcheck:
 # ---------------------------------
 installdirs:
 	test -d $(DESTDIR)$(docdir) || $(INSTALL) -d $(DESTDIR)$(docdir)
+	test -d $(DESTDIR)$(man1dir) || $(INSTALL) -d $(DESTDIR)$(man1dir)
 
 
 # Creating dependencies

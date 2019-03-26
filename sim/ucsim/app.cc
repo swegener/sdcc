@@ -231,7 +231,7 @@ print_help(char *name)
      "               simulator interface. Known options are:\n"
      "                 if=memory[address]  turn on interface on given memory location\n"
      "                 in=file             specify input file for IO\n"
-     "                 out=file            specify output file forr IO\n"
+     "                 out=file            specify output file for IO\n"
      "  -p prompt    Specify string for prompt\n"
      "  -P           Prompt is a null ('\\0') character\n"
      "  -g           Go, start simulation\n"

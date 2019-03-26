@@ -113,7 +113,7 @@ COMMAND_DO_WORK_UC(cl_timer_add_cmd)
   if (ticker)
     {
       if (!as_nr)
-	con->dd_printf("Error: Timer \"%s\" already exists\n", id_str);
+	con->dd_printf("Error: Timer \"%s\" already exists\n", (char*)id_str);
       else
 	con->dd_printf("Error: Timer %d already exists\n", id_nr);
       return(false);
@@ -163,7 +163,7 @@ COMMAND_DO_WORK_UC(cl_timer_delete_cmd)
   if (!ticker)
     {
       if (!as_nr)
-	con->dd_printf("Timer \"%s\" does not exist\n", id_str);
+	con->dd_printf("Timer \"%s\" does not exist\n", (char*)id_str);
       else
 	con->dd_printf("Timer %d does not exist\n", id_nr);
       return(false);
@@ -234,7 +234,7 @@ COMMAND_DO_WORK_UC(cl_timer_run_cmd)
   if (!ticker)
     {
       if (!as_nr)
-	con->dd_printf("Timer %d does not exist\n", id_str);
+	con->dd_printf("Timer %d does not exist\n", (char*)id_str);
       else
 	con->dd_printf("Timer %d does not exist\n", id_nr);
       return(0);
@@ -264,7 +264,7 @@ COMMAND_DO_WORK_UC(cl_timer_stop_cmd)
   if (!ticker)
     {
       if (!as_nr)
-	con->dd_printf("Timer %d does not exist\n", id_str);
+	con->dd_printf("Timer %d does not exist\n", (char*)id_str);
       else
 	con->dd_printf("Timer %d does not exist\n", id_nr);
       return(false);
@@ -298,7 +298,7 @@ COMMAND_DO_WORK_UC(cl_timer_value_cmd)
   if (!ticker)
     {
       if (!as_nr)
-	con->dd_printf("Error: Timer %d does not exist\n", id_str);
+	con->dd_printf("Error: Timer %d does not exist\n", (char*)id_str);
       else
 	con->dd_printf("Error: Timer %d does not exist\n", id_nr);
       return(false);

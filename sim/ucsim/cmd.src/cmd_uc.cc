@@ -327,7 +327,7 @@ COMMAND_DO_WORK_UC(cl_dump_cmd)
 }
 
 CMDHELP(cl_dump_cmd,
-	"dump memory_type [start [stop [bytes_per_line]]] | dump bit...",
+	"dump [/format] memory_type [start [stop [bytes_per_line]]] | dump bit...",
 	"Dump memory of specified type or bit(s)",
 	"long help of dump")
 

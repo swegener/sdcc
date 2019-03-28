@@ -44,6 +44,9 @@ char    *dsft   = "asm";
 
 char    imtab[3] = { 0x46, 0x56, 0x5E };
 
+static const unsigned char ipset[4] = { 0x46, 0x56, 0x4E, 0x5E };
+
+
 int     r3k_mode;
 int     r4k_mode;
 /* when set, generate op-code for Rabbit-4000 instead of Rabbit 2000/3000 */
@@ -77,6 +80,7 @@ VOID  machine(struct mne * mp)
         int op, t1, t2;
         struct expr e1, e2;
         int rf, v1, v2;
+        struct expr *ep;
 
         clrexpr(&e1);
         clrexpr(&e2);
@@ -170,20 +174,18 @@ VOID  machine(struct mne * mp)
                 outab(op|v1);
                 break;
 
-#if 0
-        /* IM x set interrupt mode on Z-80 */
         /* Rabbit processor use the opcode to set interrupt level */
         case S_IM:
+                /* ipset 0-3 */
                 expr(&e1, 0);
                 abscheck(&e1);
-                if (e1.e_addr > 2) {
+                if (e1.e_addr > 3) {
                         aerr();
                         e1.e_addr = 0;
                 }
                 outab(op);
-                outab(imtab[(int) e1.e_addr]);
+                outab(ipset[e1.e_addr]);
                 break;
-#endif
 
         case S_BIT:
                 expr(&e1, 0);
@@ -275,18 +277,21 @@ VOID  machine(struct mne * mp)
         case S_SUB:  /* sub */
         case S_SBC:  /* sbc */
                 t1 = addr(&e1);
-#if 0
+
                 if (!(more())) {
                         /* handle case for implicit target of 'A' register */
-                        /* TODO */
-                        aerr( );
+                        t2 = t1;
+                        t1 = S_R8;
+                        v1 = A;
+                        v2 = (int) e1.e_addr;
+                        ep = &e1;
+                } else {
+                        comma(1);
+                        t2 = addr(&e2);
+                        v1 = (int) e1.e_addr;
+                        v2 = (int) e2.e_addr;
+                        ep = &e2;
                 }
-#endif
-                comma(1);
-                t2 = addr(&e2);
-
-                v1 = (int) e1.e_addr;
-                v2 = (int) e2.e_addr;
 
                 if ((t1 == S_R8) && (v1 == A)) {
                         if ( ((t2 == S_R8) && (v2 == A)) &&
@@ -312,11 +317,11 @@ VOID  machine(struct mne * mp)
                                  * do not need 0x7F prefix byte
                                  */
                                 outab(op|0x46);  /* 0xA0 | 0x46 => 0xE6, etc */
-                                outrb(&e2, 0);
+                                outrb(ep, 0);
                         } else
 #endif
 
-                        if (genop(0, op, &e2, 1))
+                        if (genop(0, op, ep, 1))
                                 aerr();
                         break;
                 }
@@ -1010,7 +1015,7 @@ VOID  machine(struct mne * mp)
                 }
                 aerr();
                 break;
-      
+
         case X_LJP:
         case X_LCALL:
                 /* bank jump or call for rabbit processor */

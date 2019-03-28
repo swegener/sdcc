@@ -2,6 +2,9 @@
 
 	* src/SDCCglue.c:
 	  Fix bug #2837, patch by Alan Cox.
+	* sdas/asrab/rabmch.c,
+	  sdas/asrab/rabpst.c:
+	  Support standard ipset syntax, patch by Alan Cox.
 
 2019-03-26 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

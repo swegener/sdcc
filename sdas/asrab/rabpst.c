@@ -206,6 +206,7 @@ struct  mne     mne[] = {
 /*  {   NULL,   "daa",          S_INH1,         0,      0x27    }, */
 /*  {   NULL,   "di",           S_INH1,         0,      0xF3    }, */
 /*  {   NULL,   "ei",           S_INH1,         0,      0xFB    }, */
+    {   NULL,   "ipset",	S_IM,		0,	0xED	},
     {   NULL,   "ipset0",       S_INH2,         0,      0x46    },
     {   NULL,   "ipset1",       S_INH2,         0,      0x56    },
     {   NULL,   "ipset2",       S_INH2,         0,      0x4E    },

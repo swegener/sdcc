@@ -5319,7 +5319,8 @@ genPlusIncr (const iCode * ic)
     (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY))
     {
       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
-      emit2 ("inc hl");
+      while (icount--)
+        emit2 ("inc hl");
       regalloc_dry_run_cost++;
       commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
       return true;

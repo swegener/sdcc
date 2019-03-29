@@ -7,6 +7,11 @@
 	  support/regression/tests/bug-2751.c,
 	  support/regression/tests/generic.c:
 	  Fix bug #2751.
+	* sdas/aspdk/pdk.h,
+	  sdas/aspdk/pdkmch.c,
+	  sdas/aspdk14/pdk14mch.c,
+	  sdas/aspdk15/pdk15mch.c:
+	  Bit instruction fix, patch by Nicolas Lesser.
 
 2019-03-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

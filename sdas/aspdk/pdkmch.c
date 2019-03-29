@@ -218,7 +218,7 @@ VOID enot(struct inst def, struct inst m) {
                 aerr();
 }
 
-VOID ebitn(struct inst io, struct inst m) {
+VOID ebitn(struct inst io, struct inst m, int offset) {
         struct expr e, e1;
         clrexpr(&e);
         clrexpr(&e1);
@@ -228,7 +228,7 @@ VOID ebitn(struct inst io, struct inst m) {
         if (pdkbit(&e1) != S_K)
                 aerr();
 
-        const a_uint bitn = (e1.e_addr & 0x7) << 6;
+        const a_uint bitn = (e1.e_addr & 0x7) << offset;
         if (t == S_IO) {
                 io.op |= bitn;
                 outpdkaw(io, e);
@@ -320,19 +320,19 @@ VOID eopta(struct inst def) {
         outpdka(def);
 }
 
-VOID eswapc(struct inst iok) {
+VOID eswapc(struct inst iok, int offset) {
         struct expr e, e1;
         clrexpr(&e);
         clrexpr(&e1);
 
         int t = addr(&e);
         comma(1);
-        int t1 = addr(&e1);
+        int t1 = pdkbit(&e1);
 
         if (t != S_IO || t1 != S_K)
                 aerr();
 
-        iok.op |= (e1.e_addr & 0x7) << 6;
+        iok.op |= (e1.e_addr & 0x7) << offset;
         outpdkaw(iok, e);
 }
 

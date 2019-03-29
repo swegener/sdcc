@@ -125,7 +125,7 @@ extern VOID earithc(struct inst ma, struct inst am, struct inst m, struct inst a
 extern VOID eshift(struct inst a, struct inst m);
 extern VOID ebit(struct inst def, struct inst ma, struct inst am, struct inst *ioa);
 extern VOID enot(struct inst def, struct inst m);
-extern VOID ebitn(struct inst io, struct inst m);
+extern VOID ebitn(struct inst io, struct inst m, int offset);
 extern VOID eskip(struct inst def, struct inst m);
 extern VOID ezsn(struct inst def, struct inst m);
 extern VOID eret(struct inst def, struct inst k);
@@ -133,7 +133,7 @@ extern VOID eone(struct inst m);
 extern VOID exch(struct inst m);
 extern VOID epupo(struct inst def);
 extern VOID eopta(struct inst def);
-extern VOID eswapc(struct inst iok);
+extern VOID eswapc(struct inst iok, int offset);
 extern VOID espec(struct inst am, struct inst ma);
 
 extern int addr(struct expr *esp);

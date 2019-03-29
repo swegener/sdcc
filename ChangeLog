@@ -1,3 +1,7 @@
+2019-03-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCopt.c: fix bug #2892
+
 2019-03-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCglue.c:

@@ -1,3 +1,13 @@
+2019-03-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/SDCCast.c,
+	  src/SDCCsymt.h,
+	  src/SDCCsymt.c,
+	  src/SDCCval.c,
+	  support/regression/tests/bug-2751.c,
+	  support/regression/tests/generic.c:
+	  Fix bug #2751.
+
 2019-03-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c: fix bug #2892

@@ -5404,7 +5404,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
                 assoc_type = assoc->left->opval.lnk;
                 checkTypeSanity (assoc_type, "_Generic");
 
-                if (compareType (type, assoc->left->opval.lnk) > 0)
+                if (compareType (type, assoc->left->opval.lnk) > 0 && !(SPEC_NOUN (type) == V_CHAR && type->select.s.b_implicit_sign != assoc->left->opval.lnk->select.s.b_implicit_sign))
                   {
                     if (found_expr)
                       {

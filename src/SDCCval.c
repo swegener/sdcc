@@ -1521,6 +1521,7 @@ strVal (const char *s)
     {
       SPEC_NOUN (val->etype) = V_CHAR;
       SPEC_USIGN (val->etype) = !options.signed_char;
+      val->etype->select.s.b_implicit_sign = true;
       SPEC_CVAL (val->etype).v_char = utf_8;
       DCL_ELEM (val->type) = utf_8_size;
     }
@@ -1578,6 +1579,7 @@ rawStrVal (const char *s, size_t size)
 
   SPEC_NOUN (val->etype) = V_CHAR;
   SPEC_USIGN (val->etype) = !options.signed_char;
+  val->etype->select.s.b_implicit_sign = true;
   SPEC_CVAL (val->etype).v_char = dbuf_detach (&dbuf);
   DCL_ELEM (val->type) = size;
 

@@ -663,13 +663,13 @@ checkTypeSanity (sym_link *etype, const char *name)
 sym_link *
 finalizeSpec (sym_link * lnk)
 {
-  if (!options.signed_char)
+  sym_link *p = lnk;
+  while (p && !IS_SPEC (p))
+    p = p->next;
+  if (SPEC_NOUN (p) == V_CHAR && !SPEC_USIGN (p) && !p->select.s.b_signed)
     {
-      sym_link *p = lnk;
-      while (p && !IS_SPEC (p))
-        p = p->next;
-      if (SPEC_NOUN (p) == V_CHAR && !SPEC_USIGN (p) && !p->select.s.b_signed)
-        SPEC_USIGN (p) = 1;
+      SPEC_USIGN (p) = !options.signed_char;
+      p->select.s.b_implicit_sign = true;
     }
   return lnk;
 }
@@ -4068,6 +4068,8 @@ typeFromStr (const char *s)
         case 'c':
           r->xclass = SPECIFIER;
           SPEC_NOUN (r) = V_CHAR;
+          if (!sign && !usign)
+            r->select.s.b_implicit_sign = true;
           if (usign)
             {
               SPEC_USIGN (r) = 1;

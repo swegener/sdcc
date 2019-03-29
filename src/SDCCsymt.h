@@ -163,6 +163,7 @@ typedef struct specifier
   unsigned b_short:1;               /* 1=short int                */
   unsigned b_unsigned:1;            /* 1=unsigned, 0=signed       */
   unsigned b_signed:1;              /* just for sanity checks only*/
+  bool     b_implicit_sign:1;       /* signedness not explicitly specified - needed to keep char a separate type from signed char and unsigned char. */
   unsigned b_static:1;              /* 1=static keyword found     */
   unsigned b_extern:1;              /* 1=extern found             */
   unsigned b_inline:1;              /* inline function requested  */

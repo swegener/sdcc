@@ -12,7 +12,7 @@ t c;
 
 void testGeneric(void)
 {
-#ifndef PORT_HOST // Too many old host compilers out there
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
   ASSERT (_Generic(i, default : 0, int : 1, long : 2) == 1);
   ASSERT (_Generic(l, default : 0, int : 1, long int : 2) == 2);
   ASSERT (_Generic(l, default : 0, int : 1, char : 2) == 0);

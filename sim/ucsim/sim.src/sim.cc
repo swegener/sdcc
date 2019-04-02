@@ -183,7 +183,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  cmd->frozen_console->input_avail())
 	cmd->frozen_console->read_line();
       cmd->frozen_console->un_redirect();
-      cmd->frozen_console->dd_printf("Stop at 0x%06x: (%d) ", uc->PC, reason);
+      cmd->frozen_console->dd_printf("Stop at 0x%06x: (%d) ", AU(uc->PC), reason);
       switch (reason)
 	{
 	case resHALT:
@@ -207,8 +207,9 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	      class cl_ev_brk *eb= (cl_ev_brk*)b;
 	      class cl_address_space *m= eb->get_mem();
 	      cmd->frozen_console->dd_printf("Event `%s' at %s[0x%x]: 0x%x %s\n",
-					     eb->id, m?(m->get_name()):"mem?", (int)eb->addr,
-					     (int)uc->instPC,
+					     eb->id, m?(m->get_name()):"mem?",
+					     AU(eb->addr),
+					     AU(uc->instPC),
 					     uc->disass(uc->instPC, " "));
     	    }
 	  break;
@@ -226,7 +227,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	    cmd->frozen_console->dd_printf("Invalid instruction");
 	    if (uc->rom)
 	      cmd->frozen_console->dd_printf(" 0x%04x\n",
-					     uc->rom->get(uc->PC));
+					     MU32(uc->rom->get(uc->PC)));
 	  }
          break;
 	case resSTEP:
@@ -243,7 +244,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  cmd->frozen_console->dd_printf("Unknown reason\n");
 	  break;
 	}
-      cmd->frozen_console->dd_printf("F 0x%06x\n", uc->PC); // for sdcdb
+      cmd->frozen_console->dd_printf("F 0x%06x\n", AU(uc->PC)); // for sdcdb
       unsigned long dt= uc?(uc->ticks->ticks - start_tick):0;
       if ((reason != resSTEP) ||
 	  (steps_done > 1))

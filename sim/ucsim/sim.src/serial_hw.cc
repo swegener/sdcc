@@ -76,25 +76,72 @@ cl_serial_hw::init(void)
   serial_out_file_option->init();
   serial_out_file_option->use(s);
   free(s);
+
   s= format_string("serial%d_port", id);
   serial_port_option= new cl_optref(this);
   serial_port_option->init();
   class cl_option *o= serial_port_option->use(s);
   free(s);
+
   int port= -1;
   if (o)
     {
       port= serial_port_option->get_value((long)0);
       if (port < 0)
-	;//port= 5560+id;
+	;
     }
-  //else port= 5560+id;
   if (port > 0)
     {
-      listener= new cl_serial_listener(port, application, this);
+      listener= new cl_serial_listener(port, application, this, sl_io);
+      listener->init();
       class cl_commander_base *c= application->get_commander();
       c->add_console(listener);
     }
+
+  o= NULL;
+  s= format_string("serial%d_iport", id);
+  serial_iport_option= new cl_optref(this);
+  serial_iport_option->init();
+  o= serial_iport_option->use(s);
+  free(s);
+
+  port= -1;
+  if (o)
+    {
+      port= serial_iport_option->get_value((long)0);
+      if (port < 0)
+	;
+    }
+  if (port > 0)
+    {
+      listener= new cl_serial_listener(port, application, this, sl_i);
+      listener->init();
+      class cl_commander_base *c= application->get_commander();
+      c->add_console(listener);
+    }
+
+  o= NULL;
+  s= format_string("serial%d_oport", id);
+  serial_oport_option= new cl_optref(this);
+  serial_oport_option->init();
+  o= serial_oport_option->use(s);
+  free(s);
+
+  port= -1;
+  if (o)
+    {
+      port= serial_oport_option->get_value((long)0);
+      if (port < 0)
+	;
+    }
+  if (port > 0)
+    {
+      listener= new cl_serial_listener(port, application, this, sl_o);
+      listener->init();
+      class cl_commander_base *c= application->get_commander();
+      c->add_console(listener);
+    }
+
   char *f_serial_in = (char*)serial_in_file_option->get_value((char*)0);
   char *f_serial_out= (char*)serial_out_file_option->get_value((char*)0);
   class cl_f *fi, *fo;
@@ -142,29 +189,52 @@ cl_serial_hw::init(void)
   chars pn(id_string);
   pn.append("%d_", id);
   uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serconf_on,
-			      "WR: turn on/off, RD: check state"));
+			      cfg_help(serconf_on)));
   v->init();
   uc->vars->add(v= new cl_var(pn+chars("check_often"), cfg, serconf_check_often,
-			      "When true, serial IO checked at every instruction"));
+			      cfg_help(serconf_check_often)));
   v->init();
   uc->vars->add(v= new cl_var(pn+chars("esc_char"), cfg, serconf_escape,
-			      "Escape character on serial IO screen"));
+			      cfg_help(serconf_escape)));
   v->init();
 
   uc->vars->add(v= new cl_var(pn+chars("received_char"), cfg, serconf_received,
-			      "Received character"));
+			      cfg_help(serconf_received)));
   v->init();
 		
   uc->vars->add(v= new cl_var(pn+chars("flowctrl"), cfg, serconf_flowctrl,
-			      "Simulate flow control"));
+			      cfg_help(serconf_flowctrl)));
   v->init();
 
   uc->vars->add(v= new cl_var(pn+chars("able_receive"), cfg, serconf_able_receive,
-			      "Receiver is able to receive (when flow ctrl)"));
+			      cfg_help(serconf_able_receive)));
   v->init();
 
   cfg_set(serconf_able_receive, 1);
   return 0;
+}
+
+char *
+cl_serial_hw::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case serconf_on:
+      return (char*)"Turn simulation of UART on or off (bool, RW)";
+    case serconf_check_often:
+      return (char*)"Check input file at every cycle (bool, RW)";
+    case serconf_escape:
+      return (char*)"Escape char on display (int, RW)";
+    case serconf_common:
+      return (char*)"Not used";
+    case serconf_received:
+      return (char*)"Received char written by simulator (int, R)";
+    case serconf_flowctrl:
+      return (char*)"Flow-control simulation on/off (bool, RW)";
+    case serconf_able_receive:
+      return (char*)"UART enabled to receive by flow-control (bool, RW)";
+    }
+  return (char*)"Not used";
 }
 
 t_mem
@@ -312,7 +382,7 @@ cl_serial_hw::proc_input(void)
 		  if (run && !input_avail)
 		    {
 		      input= esc, input_avail= true;
-		      io->dd_printf("^%c interted.\n", 'a'+esc-1);
+		      io->dd_printf("^%c enterted.\n", 'a'+esc-1);
 		    }
 		  else
 		    io->dd_printf("Control menu exited.\n");
@@ -391,10 +461,12 @@ cl_serial_hw::reset(void)
 }
 
 cl_serial_listener::cl_serial_listener(int serverport, class cl_app *the_app,
-				       class cl_serial_hw *the_serial):
+				       class cl_serial_hw *the_serial,
+				       enum ser_listener_for slf):
   cl_listen_console(serverport, the_app)
 {
   serial_hw= the_serial;
+  sl_for= slf;
 }
 
 int
@@ -410,9 +482,23 @@ cl_serial_listener::proc_input(class cl_cmdset *cmdset)
 {
   class cl_f *i, *o;
 
-  srv_accept(fin, &i, &o);
-  i->set_telnet(true);
-  serial_hw->new_io(i, o);
+  switch (sl_for)
+    {
+    case sl_io:
+      srv_accept(fin, &i, &o);
+      i->set_telnet(true);
+      serial_hw->new_io(i, o);
+      break;
+    case sl_i:
+      srv_accept(fin, &i, NULL);
+      i->set_telnet(true);
+      serial_hw->new_i(i);
+      break;
+    case sl_o:
+      srv_accept(fin, NULL, &o);
+      serial_hw->new_o(o);
+      break;
+    }
   return 0;
 }
 

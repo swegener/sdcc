@@ -97,6 +97,7 @@ class cl_hw: public cl_guiobj
   virtual void cfg_write(t_addr addr, t_mem val);
   virtual t_mem cfg_get(t_addr addr);
   virtual t_mem cfg_read(t_addr addr);
+  virtual char *cfg_help(t_addr addr);
   
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual class cl_memory_cell *register_cell(class cl_address_space *mem,
@@ -113,6 +114,8 @@ class cl_hw: public cl_guiobj
   
   virtual void make_io(void);
   virtual void new_io(class cl_f *f_in, class cl_f *f_out);
+  virtual void new_i(class cl_f *f_in);
+  virtual void new_o(class cl_f *f_out);
   virtual cl_hw_io *get_io(void);
   virtual bool proc_input(void);
   virtual bool handle_input(int c);
@@ -121,6 +124,7 @@ class cl_hw: public cl_guiobj
   virtual cl_hw *next_displayer(void);
   
   virtual void print_info(class cl_console_base *con);
+  virtual void print_cfg_info(class cl_console_base *con);
 };
 
 class cl_hws: public cl_list

@@ -413,11 +413,13 @@ cl_st7::disass(t_addr addr, const char *sep)
               ++immed_offset;
               break;
             case 'p': // b    byte index offset
-              sprintf(temp, "0x%04lx",
-		      (long int)(addr+immed_offset+1
-				 +(char)rom->get(addr+immed_offset)));
-              ++immed_offset;
-              break;
+	      {
+		int i= (int)(addr+immed_offset+1
+			     +(char)rom->get(addr+immed_offset)); 
+		sprintf(temp, "0x%04x", i&0xffff);
+		++immed_offset;
+		break;
+	      }
             default:
               strcpy(temp, "?");
               break;

@@ -184,6 +184,12 @@ cl_hw::cfg_read(t_addr addr)
   return cfg->read(addr);
 }
 
+char *
+cl_hw::cfg_help(t_addr addr)
+{
+  return (char*)"N/A";
+}
+
 void
 cl_hw::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 {
@@ -263,13 +269,6 @@ cl_hw::new_io(class cl_f *f_in, class cl_f *f_out)
   make_io();
   if (!io)
     return ;
-  /*if (io->fin)
-    delete io->fin;
-  if (io->fout)
-  delete io->fout;*/
-  //io->close_files();
-  /*io->fin= f_in;
-    io->fout= f_out;*/
   io->tu_reset();
   io->replace_files(true, f_in, f_out);
   if (f_in)
@@ -280,6 +279,34 @@ cl_hw::new_io(class cl_f *f_in, class cl_f *f_out)
     }
   draw_display();
   //application->get_commander()->update_active();
+}
+
+void
+cl_hw::new_i(class cl_f *f_in)
+{
+  make_io();
+  if (!io)
+    return ;
+  io->tu_reset();
+  io->replace_files(true, f_in, io->get_fout());
+  if (f_in)
+    {
+      f_in->interactive(NULL);
+      f_in->raw();
+      f_in->echo(NULL);
+    }
+  draw_display();
+}
+
+void
+cl_hw::new_o(class cl_f *f_out)
+{
+  make_io();
+  if (!io)
+    return ;
+  io->tu_reset();
+  io->replace_files(true, io->get_fin(), f_out);
+  draw_display();
 }
 
 class cl_hw_io *
@@ -387,7 +414,7 @@ cl_hw::refresh_display(bool force)
       io->dd_printf("%4s", n?"Run":"Stop");
       cache_run= n;
     }
-  unsigned int t= uc->get_rtime() * 1000;
+  unsigned int t= (unsigned int)(uc->get_rtime()) * 1000;
   if ((t != cache_time) ||
       force)
     {
@@ -425,8 +452,33 @@ void
 cl_hw::print_info(class cl_console_base *con)
 {
   con->dd_printf("%s[%d]\n", id_string, id);
+  print_cfg_info(con);
 }
 
+void
+cl_hw::print_cfg_info(class cl_console_base *con)
+{
+  t_mem v;
+  t_addr a, s, e;
+  con->dd_printf("Configuration memory of %s\n", get_name());
+  if (cfg)
+    {      
+      s= cfg->get_start_address();
+      e= s + cfg->get_size();
+      for (a= s; a <= e; a++)
+	{
+	  v= cfg->read(a);
+	  con->dd_printf("0x%02x ", AU(a));
+	  con->dd_printf("%08x ",v);
+	  if ((v < 128) &&
+	      isprint((int)v))
+	    con->dd_printf("%c", v);
+	  else
+	    con->dd_printf(".");
+	  con->dd_printf(" %s\n", cfg_help(a));
+	}
+    }
+}
 
 /*
  * List of hw

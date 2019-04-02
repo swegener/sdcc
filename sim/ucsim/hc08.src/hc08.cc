@@ -364,22 +364,26 @@ cl_hc08::disass(t_addr addr, const char *sep)
 	      ++immed_offset;
 	      break;
 	    case '2': // 2    word index offset
-	      sprintf(temp, "0x%04x",
-	         (uint)((rom->get(addr+immed_offset)<<8) |
-	                (rom->get(addr+immed_offset+1))) );
-	      ++immed_offset;
-	      ++immed_offset;
-	      break;
+	      {
+		int i= (uint)((rom->get(addr+immed_offset)<<8) |
+			      (rom->get(addr+immed_offset+1)));
+		sprintf(temp, "0x%04x", i & 0xffff);
+		++immed_offset;
+		++immed_offset;
+		break;
+	      }		
 	    case '1': // b    byte index offset
               sprintf(temp, "0x%02x", (uint)rom->get(addr+immed_offset));
 	      ++immed_offset;
 	      break;
 	    case 'p': // b    byte index offset
-              sprintf(temp, "0x%04lx",
-		      (long int)(addr+immed_offset+1
-				 +(char)rom->get(addr+immed_offset)));
-	      ++immed_offset;
-	      break;
+	      {
+		int i= addr+immed_offset+1
+		  +(char)rom->get(addr+immed_offset);
+		sprintf(temp, "0x%04x", i & 0xffff);
+		++immed_offset;
+		break;
+	      }
 	    default:
 	      strcpy(temp, "?");
 	      break;

@@ -19,6 +19,7 @@ void t0_it(void) __interrupt (1)
     t0cnt--;
 }
 
+char min='a', max='z';
 
 void process(void)
 {
@@ -26,7 +27,18 @@ void process(void)
   c= serial_receive();
   if ((c >= 'a' && c <= 'z') ||
       (c >= 'A' && c <= 'Z'))
-    c^= 0x20;
+    {
+      c^= 0x20;
+      min= 'a';
+      max= 'z';
+      P1= 1;
+    }
+  if ((c >= '0') && (c <= '9'))
+    {
+      min= '0';
+      max= '9';
+      P1= 2;
+    }
   print_c(c);
 }
 
@@ -53,8 +65,8 @@ void main(void)
       if (!t0cnt)
 	{
 	  print_c(c);
-	  if (++c > 'z')
-	    c= 'a';
+	  if (++c > max)
+	    c= min;
 	  t0cnt= 10;
 	}
     }

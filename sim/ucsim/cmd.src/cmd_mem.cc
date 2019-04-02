@@ -485,9 +485,9 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
 
   con->dd_printf("cell data=%p/%d mask=%x flags=%x\n",
 		 c->get_data(),
-		 c->get_width(),
-		 c->get_mask(),
-		 c->get_flags());
+		 MU(c->get_width()),
+		 MU(c->get_mask()),
+		 MU(c->get_flags()));
 
   int i;
   for (i= 0; i < uc->memchips->count; i++)
@@ -496,8 +496,8 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
       t_addr ad;
       if ((ad= ch->is_slot(c->get_data())) >= 0)
 	{
-	  con->dd_printf("  decoded to %s[%d]\n",
-			 ch->get_name(), ad);
+	  con->dd_printf("  decoded to %s[%u]\n",
+			 ch->get_name(), AU(ad));
 	  break;
 	}
     }

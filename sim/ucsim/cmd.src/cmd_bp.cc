@@ -208,7 +208,7 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
       return;
     }
   if (uc->fbrk->bp_at(addr))
-    con->dd_printf("Breakpoint at 0x%06x is already set.\n", addr);
+    con->dd_printf("Breakpoint at 0x%06x is already set.\n", AI(addr));
   else
     {
       class cl_brk *b= new cl_fetch_brk(uc->rom/*address_space(MEM_ROM_ID)*/,
@@ -218,7 +218,7 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
       b->cond= cond;
       uc->fbrk->add_bp(b);
       const char *s= uc->disass(addr, NULL);
-      con->dd_printf("Breakpoint %d at 0x%06x: %s (cond=\"%s\")\n", b->nr, addr, s, (char*)cond);
+      con->dd_printf("Breakpoint %d at 0x%06x: %s (cond=\"%s\")\n", b->nr, AI(addr), s, (char*)cond);
       free((char *)s);
     }
 }

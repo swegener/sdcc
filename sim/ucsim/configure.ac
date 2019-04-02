@@ -611,23 +611,64 @@ type_name()
     echo "long long"
 }
 
+specifier_name()
+{
+    if expr "$ac_cv_sizeof_char" '>=' "$1" >/dev/null; then
+        echo "\"\""
+        exit
+    fi
+    if expr "$ac_cv_sizeof_short" '>=' "$1" >/dev/null; then
+        echo "\"h\""
+        exit
+    fi
+    if expr "$ac_cv_sizeof_int" '>=' "$1" >/dev/null; then
+        echo "\"\""
+        exit
+    fi
+    if expr "$ac_cv_sizeof_long" '>=' "$1" >/dev/null; then
+        echo "\"l\""
+        exit
+    fi
+    if expr "$ac_cv_sizeof_long_long" '>=' "$1" >/dev/null; then
+        echo "\"L\""
+        exit
+    fi
+    echo "\"L\""
+}
+
 AC_MSG_CHECKING(type name for byte)
 TYPE_BYTE=`type_name 1`
 AC_MSG_RESULT($TYPE_BYTE)
+AC_MSG_CHECKING(specifier for byte)
+SPEC_BYTE=`specifier_name 1`
+AC_MSG_RESULT($SPEC_BYTE)
 AC_MSG_CHECKING(type name for word)
 TYPE_WORD=`type_name 2`
 AC_MSG_RESULT($TYPE_WORD)
+AC_MSG_CHECKING(specifier for word)
+SPEC_WORD=`specifier_name 2`
+AC_MSG_RESULT($SPEC_WORD)
 AC_MSG_CHECKING(type name for dword)
 TYPE_DWORD=`type_name 4`
 AC_MSG_RESULT($TYPE_DWORD)
+AC_MSG_CHECKING(specifier for dword)
+SPEC_DWORD=`specifier_name 4`
+AC_MSG_RESULT($SPEC_DWORD)
 AC_MSG_CHECKING(type name for qword)
 TYPE_QWORD=`type_name 8`
 AC_MSG_RESULT($TYPE_QWORD)
+AC_MSG_CHECKING(specifier for qword)
+SPEC_QWORD=`specifier_name 8`
+AC_MSG_RESULT($SPEC_QWORD)
 
 AC_DEFINE_UNQUOTED(TYPE_BYTE, [$TYPE_BYTE], [XXX])
+AC_DEFINE_UNQUOTED(SPEC_BYTE, [$SPEC_BYTE], [XXX])
 AC_DEFINE_UNQUOTED(TYPE_WORD, [$TYPE_WORD], [XXX])
+AC_DEFINE_UNQUOTED(SPEC_WORD, [$SPEC_WORD], [XXX])
 AC_DEFINE_UNQUOTED(TYPE_DWORD, [$TYPE_DWORD], [XXX])
+AC_DEFINE_UNQUOTED(SPEC_DWORD, [$SPEC_DWORD], [XXX])
 AC_DEFINE_UNQUOTED(TYPE_QWORD, [$TYPE_QWORD], [XXX])
+AC_DEFINE_UNQUOTED(SPEC_QWORD, [$SPEC_QWORD], [XXX])
 #AC_DEFINE_UNQUOTED(TYPE_UBYTE, [unsigned $TYPE_BYTE], [XXX])
 #AC_DEFINE_UNQUOTED(TYPE_UWORD, [unsigned $TYPE_WORD], [XXX])
 #AC_DEFINE_UNQUOTED(TYPE_UDWORD, [unsigned $TYPE_DWORD], [XXX])

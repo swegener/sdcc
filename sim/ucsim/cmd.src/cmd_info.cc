@@ -58,7 +58,7 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
       const char *s= uc->disass(fb->addr, NULL);
       con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %-5s %s\n", fb->nr,
                      "fetch", (fb->perm==brkFIX)?"keep":"del ",
-                     fb->hit, fb->cnt, fb->addr,
+                     fb->hit, fb->cnt, AU(fb->addr),
 		     fb->condition()?"true":"false",
 		     s);
       extra= false;
@@ -75,7 +75,7 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
       con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %s\n", eb->nr,
 		     "event", (eb->perm==brkFIX)?"keep":"del ",
 		     eb->hit, eb->cnt,
-		     eb->addr, eb->id);
+		     AU(eb->addr), eb->id);
       extra= false;
       if (!(eb->cond.empty()))
 	con->dd_printf("     cond=\"%s\"", (char*)(eb->cond)), extra= true;
@@ -125,6 +125,15 @@ COMMAND_DO_WORK_UC(cl_info_hw_cmd)
     hw= params[0]->value.hw;
     hw->print_info(con);
   }
+  else if (cmdline->syntax_match(uc, STRING))
+    {
+      char *s= params[0]->get_svalue();
+      if (s && *s && (strcmp("cpu", s)==0))
+	{
+	  if (uc->cpu)
+	    uc->cpu->print_info(con);
+	}
+    }
   else
     syntax_error(con);
 

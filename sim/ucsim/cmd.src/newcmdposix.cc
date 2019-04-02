@@ -136,19 +136,28 @@ cl_console::drop_files(void) // do not close, just ignore
 }
 
 void
-cl_console::close_files(void)
+cl_console::close_files(bool close_in, bool close_out)
 {
   if (frout)
     delete frout;
-  if (fout)
+  if (close_out)
     {
-      if (fout->tty)
-	tu_reset();
-      delete fout;
+      if (fout)
+	{
+	  if (fout->tty)
+	    tu_reset();
+	  delete fout;
+	}
+      fout= 0;
     }
-  if (fin)
-    delete fin;
-  drop_files();
+  if (close_in)
+    {
+      if (fin)
+	delete fin;
+      fin= 0;
+      application->get_commander()->update_active();
+    }
+  //drop_files();
 }
 
 void
@@ -158,7 +167,7 @@ cl_console::replace_files(bool close_old, cl_f *new_in, cl_f *new_out)
     delete frout;
   frout= 0;
   if (close_old)
-    close_files();
+    close_files(fin != new_in, fout != new_out);
   fin= new_in;
   fout= new_out;
   application->get_commander()->update_active();

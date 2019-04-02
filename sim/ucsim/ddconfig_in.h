@@ -185,15 +185,19 @@
 
 /* XXX */
 #undef TYPE_BYTE
+#undef SPEC_BYTE
 
 /* XXX */
 #undef TYPE_DWORD
+#undef SPEC_DWORD
 
 /* XXX */
 #undef TYPE_QWORD
+#undef SPEC_QWORD
 
 /* XXX */
 #undef TYPE_WORD
+#undef SPEC_WORD
 
 /* XXX */
 #undef UCSOCKET_T

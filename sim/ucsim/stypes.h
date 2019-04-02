@@ -54,6 +54,25 @@ typedef i64_t		t_addr;		/* 64 bit max */
 typedef u32_t		t_mem;		/* 32 bit max */
 typedef i32_t		t_smem;		/* signed 32 bit memory */
 
+#define SPECA SPEC_QWORD
+#define SPECM SPEC_DWORD
+
+#define AI(addr)   ((int)(addr))
+#define AU(addr)   ((unsigned int)(addr))
+#define AI8(addr)  (AI((addr)&0xff))
+#define AU8(addr)  (AU((addr)&0xff))
+#define AI16(addr) (AI((addr)&0xffff))
+#define AU16(addr) (AU((addr)&0xffff))
+#define AI32(addr) (AI((addr)&0xffffffff))
+#define AU32(addr) (AU((addr)&0xffffffff))
+
+#define MI(v)      ((int)(v))
+#define MU(v)      ((unsigned int)(v))
+#define MI8(v)     (MI((v)&0xff))
+#define MU8(v)     (MU((v)&0xff))
+#define MI32(v)    (MI((v)&0xffffffff))
+#define MU32(v)    (MU((v)&0xffffffff))
+
 enum {
   max_mem_size= 0x40000000		/* 1 GB */
 };
@@ -317,7 +336,8 @@ enum hw_cath {
   HW_RESET	= 0x0100,
   HW_CLOCK	= 0x0200,
   HW_CALC	= 0x0400,
-  HW_FLASH	= 0x0800
+  HW_FLASH	= 0x0800,
+  HW_CPU	= 0x1000
 };
 
 // Events that can happen in peripherals

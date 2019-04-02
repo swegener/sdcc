@@ -134,7 +134,7 @@ class cl_console_base: public cl_base
   virtual class cl_f *get_fout(void)= 0;
   virtual class cl_f *get_fin(void)= 0;
   virtual void drop_files(void)= 0; // do not close, just ignore
-  virtual void close_files(void)= 0;
+  virtual void close_files(bool close_in, bool close_out)= 0;
   virtual void replace_files(bool close_old, cl_f *new_in, cl_f *new_out)= 0;
   
   virtual int init(void);
@@ -205,7 +205,7 @@ class cl_console_dummy: public cl_console_base
   virtual class cl_f *get_fout(void) { return NULL; }
   virtual class cl_f *get_fin(void) { return NULL; }
   virtual void drop_files(void) {}
-  virtual void close_files(void) {}
+  virtual void close_files(bool close_in, bool close_out) {}
   virtual void replace_files(bool close_old, cl_f *new_in, cl_f *new_out) {}
 };
 

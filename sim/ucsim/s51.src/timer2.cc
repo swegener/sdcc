@@ -396,13 +396,14 @@ cl_timer2::print_info(class cl_console_base *con)
   else
     con->dd_printf(" %s", (CP_RL2)?"capture":"reload");
   con->dd_printf(" 0x%04x",
-		 256*cell_rcap2h->get()+cell_rcap2l->get());
+		 256*MU8(cell_rcap2h->get())+MU8(cell_rcap2l->get()));
   con->dd_printf(" %s", (C_T)?"counter":"timer");
   con->dd_printf(" %s", (TR)?"ON":"OFF");
   con->dd_printf(" irq=%c", (t2con&bmTF2)?'1':'0');
   con->dd_printf(" %s", sfr?"?":((sfr->get(IE)&bmET2)?"en":"dis"));
   con->dd_printf(" prio=%d", uc->priority_of(bmPT2));
   con->dd_printf("\n");
+  print_cfg_info(con);
 }
 
 

@@ -18025,30 +18025,80 @@ type_name()
     echo "long long"
 }
 
+specifier_name()
+{
+    if expr "$ac_cv_sizeof_char" '>=' "$1" >/dev/null; then
+        echo "\"\""
+        exit
+    fi
+    if expr "$ac_cv_sizeof_short" '>=' "$1" >/dev/null; then
+        echo "\"h\""
+        exit
+    fi
+    if expr "$ac_cv_sizeof_int" '>=' "$1" >/dev/null; then
+        echo "\"\""
+        exit
+    fi
+    if expr "$ac_cv_sizeof_long" '>=' "$1" >/dev/null; then
+        echo "\"l\""
+        exit
+    fi
+    if expr "$ac_cv_sizeof_long_long" '>=' "$1" >/dev/null; then
+        echo "\"L\""
+        exit
+    fi
+    echo "\"L\""
+}
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking type name for byte" >&5
 $as_echo_n "checking type name for byte... " >&6; }
 TYPE_BYTE=`type_name 1`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $TYPE_BYTE" >&5
 $as_echo "$TYPE_BYTE" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking specifier for byte" >&5
+$as_echo_n "checking specifier for byte... " >&6; }
+SPEC_BYTE=`specifier_name 1`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SPEC_BYTE" >&5
+$as_echo "$SPEC_BYTE" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking type name for word" >&5
 $as_echo_n "checking type name for word... " >&6; }
 TYPE_WORD=`type_name 2`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $TYPE_WORD" >&5
 $as_echo "$TYPE_WORD" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking specifier for word" >&5
+$as_echo_n "checking specifier for word... " >&6; }
+SPEC_WORD=`specifier_name 2`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SPEC_WORD" >&5
+$as_echo "$SPEC_WORD" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking type name for dword" >&5
 $as_echo_n "checking type name for dword... " >&6; }
 TYPE_DWORD=`type_name 4`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $TYPE_DWORD" >&5
 $as_echo "$TYPE_DWORD" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking specifier for dword" >&5
+$as_echo_n "checking specifier for dword... " >&6; }
+SPEC_DWORD=`specifier_name 4`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SPEC_DWORD" >&5
+$as_echo "$SPEC_DWORD" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking type name for qword" >&5
 $as_echo_n "checking type name for qword... " >&6; }
 TYPE_QWORD=`type_name 8`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $TYPE_QWORD" >&5
 $as_echo "$TYPE_QWORD" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking specifier for qword" >&5
+$as_echo_n "checking specifier for qword... " >&6; }
+SPEC_QWORD=`specifier_name 8`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $SPEC_QWORD" >&5
+$as_echo "$SPEC_QWORD" >&6; }
 
 
 cat >>confdefs.h <<_ACEOF
 #define TYPE_BYTE $TYPE_BYTE
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define SPEC_BYTE $SPEC_BYTE
 _ACEOF
 
 
@@ -18058,12 +18108,27 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
+#define SPEC_WORD $SPEC_WORD
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
 #define TYPE_DWORD $TYPE_DWORD
 _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
+#define SPEC_DWORD $SPEC_DWORD
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
 #define TYPE_QWORD $TYPE_QWORD
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define SPEC_QWORD $SPEC_QWORD
 _ACEOF
 
 #AC_DEFINE_UNQUOTED(TYPE_UBYTE, [unsigned $TYPE_BYTE], [XXX])

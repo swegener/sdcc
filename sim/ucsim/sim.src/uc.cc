@@ -2291,7 +2291,7 @@ cl_uc::get_rtime(void)
 unsigned long
 cl_uc::clocks_of_time(double t)
 {
-  return t * xtal;
+  return (unsigned long)(t * xtal);
 }
 
 int
@@ -2599,7 +2599,7 @@ cl_error_unknown_code::print(class cl_commander_base *c)
       /*cmd_fprintf(f,*/c->dd_printf(")");
     }
   else
-    /*cmd_fprintf(f,*/c->dd_printf("0x%06x", PC);
+    /*cmd_fprintf(f,*/c->dd_printf("0x%06x", AU(PC));
   /*cmd_fprintf(f,*/c->dd_printf("\n");
 }
 

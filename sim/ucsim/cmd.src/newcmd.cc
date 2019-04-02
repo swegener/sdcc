@@ -623,7 +623,8 @@ cl_commander_base::consoles_prevent_quit(void)
   for (i= 0; i < cons->count; i++)
     {
       class cl_console_base *c= (class cl_console_base*)(cons->at(i));
-      if (c->prevent_quit())
+      bool p= c->prevent_quit();
+      if (p)
 	r++;
     }
   return r;

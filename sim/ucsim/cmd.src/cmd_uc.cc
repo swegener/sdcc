@@ -50,7 +50,7 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
 {
   con->dd_printf("CPU state= %s PC= 0x%06x XTAL= %g\n",
 		 get_id_string(cpu_states, uc->state),
-		 uc->PC, 
+		 AU(uc->PC), 
 		 uc->xtal);
   con->dd_printf("Operation since last reset= (%lu vclks)\n",
 		 (unsigned long)(uc->vc.fetch) +
@@ -61,7 +61,7 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
   con->dd_printf("Read= %lu ", (unsigned long)(uc->vc.rd));
   con->dd_printf("Write= %lu\n", (unsigned long)(uc->vc.wr));
   con->dd_printf("Total time since last reset= %g sec (%lu clks)\n",
-		 uc->get_rtime(), uc->ticks->ticks);
+		 uc->get_rtime(), (unsigned long)(uc->ticks->ticks));
   con->dd_printf("Time in isr = %g sec (%lu clks) %3.2g%%\n",
 		 uc->isr_ticks->get_rtime(uc->xtal),
 		 uc->isr_ticks->ticks,
@@ -75,7 +75,7 @@ COMMAND_DO_WORK_UC(cl_state_cmd)
 		 (100.0*((double)(uc->idle_ticks->ticks)/
 			 (double)(uc->ticks->ticks))));
   con->dd_printf("Max value of stack pointer= 0x%06x, avg= 0x%06x\n",
-		 uc->sp_max, uc->sp_avg);
+		 AU(uc->sp_max), AU(uc->sp_avg));
   con->dd_printf("Simulation: %s\n",
 		 (uc->sim->state & SIM_GO)?"running":"stopped");
   return(0);
@@ -167,7 +167,7 @@ COMMAND_DO_WORK_UC(cl_pc_cmd)
 	    addr= rom->highest_valid_address();
 	}
       if (!uc->inst_at(addr))
-	con->dd_printf("Warning: maybe not instruction at 0x%06x\n", addr);
+	con->dd_printf("Warning: maybe not instruction at 0x%06x\n", AU(addr));
       uc->PC= addr;
     }
   uc->print_disass(uc->PC, con);

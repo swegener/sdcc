@@ -1929,7 +1929,7 @@ cl_51core::instruction_c4/*inst_swap*/(t_mem/*uchar*/ code)
  */
 
 cl_uc51_cpu::cl_uc51_cpu(class cl_uc *auc):
-  cl_hw(auc, HW_DUMMY, 0, "cpu")
+  cl_hw(auc, HW_CPU/*DUMMY*/, 0, "cpu")
 {
 }
 
@@ -1952,25 +1952,46 @@ cl_uc51_cpu::init(void)
 
   cl_var *v;
   uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps"), cfg, uc51cpu_aof_mdps,
-			      "Address of multi_DPTR_sfr selector (WR selects this style of multi_DPTR)"));
+			      cfg_help(uc51cpu_aof_mdps)));
   v->init();
   uc->vars->add(v= new cl_var(cchars("cpu_mask_mdps"), cfg, uc51cpu_mask_mdps,
-			      "Mask in multi_DPTR_srf selector"));
+			      cfg_help(uc51cpu_mask_mdps)));
   v->init();
   uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps1l"), cfg, uc51cpu_aof_mdps1l,
-			      "Address of multi_DPTR_sfr DPL1"));
+			      cfg_help(uc51cpu_aof_mdps1l)));
   v->init();
   uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps1h"), cfg, uc51cpu_aof_mdps1h,
-			      "Address of multi_DPTR_sfr DPH1"));
+			      cfg_help(uc51cpu_aof_mdps1h)));
   v->init();
   uc->vars->add(v= new cl_var(cchars("cpu_aof_mdpc"), cfg, uc51cpu_aof_mdpc,
-			      "Address of multi_DPTR_chip selector (WR selects this stlye of multi_DPTR)"));
+			      cfg_help(uc51cpu_aof_mdpc)));
   v->init();
   uc->vars->add(v= new cl_var(cchars("cpu_mask_mdpc"), cfg, uc51cpu_mask_mdpc,
-			      "Mask in multi_DPTR_chip selector"));
+			      cfg_help(uc51cpu_mask_mdpc)));
   v->init();
   
   return(0);
+}
+
+char *
+cl_uc51_cpu::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case uc51cpu_aof_mdps:
+      return (char*)"Address of multi_DPTR_sfr selector, WR selects this style of multi_DPTR (int, RW)";
+    case uc51cpu_mask_mdps:
+      return (char*)"Mask in multi_DPTR_srf selector (int, RW)";
+    case uc51cpu_aof_mdps1l:
+      return (char*)"Address of multi_DPTR_sfr DPL1 (int, RW)";
+    case uc51cpu_aof_mdps1h:
+      return (char*)"Address of multi_DPTR_sfr DPH1 (int, RW)";
+    case uc51cpu_aof_mdpc:
+      return (char*)"Address of multi_DPTR_chip selector, WR selects this stlye of multi_DPTR (int, RW)";
+    case uc51cpu_mask_mdpc:
+      return (char*)"Mask in multi_DPTR_chip selector (int, RW)";
+    }
+  return (char*)"Not used";
 }
 
 void

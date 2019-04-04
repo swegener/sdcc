@@ -1062,6 +1062,9 @@ int z80instructionSize(lineNode *pl)
   if(ISINST(pl->line, "in") || ISINST(pl->line, "out") || ISINST(pl->line, "ot"))
     return(2);
 
+  if((IS_Z180 || IS_EZ80_Z80) && (ISINST(pl->line, "in0") || ISINST(pl->line, "out0")))
+    return(3);
+
   if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
     return(1);
 

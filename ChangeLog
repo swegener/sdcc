@@ -1,3 +1,8 @@
+2019-04-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/peep.c:
+	  Fix bug #2898.
+
 2019-04-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* sdas/aspdk15/Makefile:

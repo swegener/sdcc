@@ -1,3 +1,10 @@
+2019-04-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* .version,
+	  doc/INSTALL.txt,
+	  sdcc.spec:
+	  Bump version in preparation of 3.9.0 release.
+
 2019-04-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/peep.c:

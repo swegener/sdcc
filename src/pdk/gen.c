@@ -1861,14 +1861,15 @@ genCmp (const iCode *ic, iCode *ifx)
           emit2 ("ceqsn", "a, #0x%02x", byteOfVal (right->aop->aopu.aop_lit, 0) + 1);
           if (IC_TRUE (ifx))
             {
-              emit2 ("nop", "");
               emit2 ("t1sn", "f, c");
-              cost (3, 3.5);
+              cost (2, 2.5);
             }
           else
             {
+              
+              emit2 ("nop", "");
               emit2 ("t0sn", "f, c");
-              cost (2, 2.5);
+              cost (3, 3.5);
             }
           emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.5f);
           goto release;

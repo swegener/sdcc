@@ -5,10 +5,30 @@
 	  sdcc.spec:
 	  Bump version in preparation of 3.9.0 release.
 
+2019-04-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk15/pdk15mch.c,
+	  sdas/asxxsrc/asout.c,
+	  sdas/linksrc/lkrloc3.c:
+	  Assembler fix, patch by Nicolas Lesser.
+
 2019-04-04 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/peep.c:
 	  Fix bug #2898.
+
+2019-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  support/regression/tests/bug-2897.c:
+	  Fix bug #2897.
+	* sdas/aspdk14/pdk14mch.c,
+	  sdas/aspdk15/pdk15mch.c,
+	  sdas/asxxsrc/asout.c,
+	  sdas/asxxsrc/sdas.c,
+	  sdas/asxxsrc/sdas.h,
+	  sdas/linksrc/lkrloc3.c:
+	  Fix bug #2900, patch by Nicolas Lesser.
 
 2019-04-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

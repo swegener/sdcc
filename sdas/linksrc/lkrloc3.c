@@ -398,15 +398,29 @@ relr3(void)
                         /* pdk addresses in words, not in bytes,
                          * for goto/call instructions and byte selections.
                          */
-                        int jump = rtval[rtp + 3] & 0x38;
+                        int jump = 1, mask = 0;
+                        if (rtval[rtp + 4] == 15) {
+                                jump = rtval[rtp + 3] & 0x70;
+                                mask = 0x40;
+                        } else if (rtval[rtp + 4] == 14) {
+                                jump = rtval[rtp + 3] & 0x38;
+                                mask = 0x20;
+                        } else if (rtval[rtp + 4] == 13) {
+                                jump = rtval[rtp + 3] & 0x1C;
+                                mask = 0x10;
+                        }
+
+                        const int icall =
+                            (mask >> 0) | (mask >> 1) | (mask >> 2);
+                        const int igoto = (mask >> 0) | (mask >> 1);
                         if (((mode & R3_BYTE) && !(mode & R3_USGN)) ||
-                            jump == 0x38 || jump == 0x30) {
-                                /* Addresses cannot be bigger than N - 2 bits.
+                            jump == icall || jump == igoto) {
+                                /* Addresses cannot be bigger than N - 1 bits.
                                  * Any bits that are set past that point are
                                  * marker bits that should be not shifted.
                                  */
-                                int marker = rtval[rtp + 1] & 0xC0;
-                                rtval[rtp + 1] &= ~0xC0;
+                                int marker = rtval[rtp + 1] & 0x80;
+                                rtval[rtp + 1] &= ~0x80;
 
                                 rtval[rtp] /= 2;
                                 rtval[rtp] |= (rtval[rtp + 1] & 1) << 7;
@@ -429,7 +443,8 @@ relr3(void)
                         mode &= ~R3_USGN;
                         rtflg[rtp] = 0;
                         rtflg[rtp + 1] = 0;
-                        rtofst += 2;
+                        rtflg[rtp + 4] = 0;
+                        rtofst += 3;
                 }
 
                 /*

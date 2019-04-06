@@ -47,11 +47,6 @@ machine(struct mne *mp)
         a_uint op;
         int combine;
 
-        /* Set the target in case it was not automatically
-         * configured from the executable filename.
-         */
-        set_sdas_target (TARGET_ID_PDK);
-
         op = mp->m_valu;
         combine = 0;
 
@@ -200,7 +195,9 @@ machine(struct mne *mp)
         case S_GOTO: {
                 struct expr e;
                 clrexpr(&e);
+                waddrmode = 1;
                 expr(&e, 0);
+                waddrmode = 0;
                 outrwp(&e, op, 0xFFF, /*jump=*/1);
                 break;
         }
@@ -265,5 +262,10 @@ minit(void)
          * Address Space
          */
         exprmasks(3);
+
+        /* Set the target in case it was not automatically
+         * configured from the executable filename.
+         */
+        set_sdas_target(TARGET_ID_PDK15);
 }
 

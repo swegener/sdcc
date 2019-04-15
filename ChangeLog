@@ -1,3 +1,7 @@
+2019-04-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merged post-3.9 branch to trunk.
+
 2019-04-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* .version,
@@ -29,6 +33,19 @@
 	  sdas/asxxsrc/sdas.h,
 	  sdas/linksrc/lkrloc3.c:
 	  Fix bug #2900, patch by Nicolas Lesser.
+
+2019-04-03 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/include/signal.h,
+	  device/include/stdint.h:
+	  Support sig_atomic_t.
+	* src/stm8/peep.c,
+	  src/stm8/peeph.def:
+	  Peephole improvements, picked from patch #290 by Visenri.
+	* src/z80/peeph-gbz80.def,
+	  src/z80/peeph-r2k.def,
+	  src/z80/peeph-z80.def:
+	  Peephole rule improvements, patch by b-s-a.
 
 2019-04-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

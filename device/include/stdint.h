@@ -227,6 +227,10 @@ typedef unsigned long long int  uintmax_t;
 #define PTRDIFF_MAX           (32767)
 #endif
 
+/* */
+#define SIG_ATOMIC_MIN        (0)
+#define SIG_ATOMIC_MAX        (255)
+
 /* Limit of `size_t' type.  */
 #define SIZE_MAX               (65535u)
 

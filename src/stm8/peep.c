@@ -8,8 +8,8 @@
 // #define D(_s) { printf _s; fflush(stdout); }
 #define D(_s)
 
-#define EQUALS(l, i) (!strcmp((l), (i)))
-#define ISINST(l, i) (!strncmp((l), (i), sizeof(i) - 1) && (!(l)[sizeof(i) - 1] || isspace((unsigned char)((l)[sizeof(i) - 1]))))
+#define EQUALS(l, i) (!STRCASECMP((l), (i)))
+#define ISINST(l, i) (!STRNCASECMP((l), (i), sizeof(i) - 1) && (!(l)[sizeof(i) - 1] || isspace((unsigned char)((l)[sizeof(i) - 1]))))
 
 typedef enum
 {
@@ -31,7 +31,7 @@ static bool
 isInt(const char *str)
 {
   int ret;
-  while(str[0] == '#' || str[0] == '(')
+  while(str[0] == '#' || str[0] == '(' || str[0] == '[' || isspace ((unsigned char)str[0]))
     str++;
   if(sscanf(str, "0x%x", &ret))
     return(ret);
@@ -44,7 +44,7 @@ static int
 readint(const char *str)
 {
   int ret;
-  while(str[0] == '#' || str[0] == '(')
+  while(str[0] == '#' || str[0] == '(' || str[0] == '[' || isspace ((unsigned char)str[0]))
     str++;
   if(sscanf(str, "0x%x", &ret))
     return(ret);
@@ -63,10 +63,10 @@ isReg(const char *what)
   if(what[0] == '(')
     what++;
   if(what[0] == 'a' || what[0] == 'x' || what[0] == 'y')
-    return(TRUE);
+    return(true);
   if(!strcmp(what, "sp"))
-    return(TRUE);
-  return(FALSE);
+    return(true);
+  return(false);
 }
 
 static char *
@@ -104,7 +104,7 @@ nextToken(char *p)
   return(ret);
 }
 
-static int
+static bool
 isRelativeAddr(const char *what, const char *mode)
 {
   char buf[4];
@@ -113,7 +113,7 @@ isRelativeAddr(const char *what, const char *mode)
   return(what[0] == '(' && strstr(what, buf));
 }
 
-static int
+static bool
 isLabel(const char *what)
 {
   const char *end;
@@ -128,31 +128,31 @@ isLabel(const char *what)
   return(what[0] == '_' || *(end-1) == '$');
 }
 
-static int
+static bool
 isImmediate(const char *what)
 {
   return(what[0] == '#');
 }
 
-static int
+static bool
 isShortoff(const char *what, const char *mode)
 {
   return(isRelativeAddr(what, mode) && isInt(what) && readint(what) <= 0xff);
 }
 
-static int
+static bool
 isLongoff(const char *what, const char *mode)
 {
   return(isRelativeAddr(what, mode) && (!isInt(what) || readint(what) > 0xff));
 }
 
-static int
+static bool
 isPtr(const char *what)
 {
   return(what[0] == '[' || what[0] == '(' && (what[1] == '[' || what[1] == '('));
 }
 
-static int
+static bool
 isSpIndexed(const char *what)
 {
   return isRelativeAddr(what, "sp");
@@ -626,7 +626,7 @@ stm8MightRead(const lineNode *pl, const char *what)
     {
       if (ISINST (pl->line, "adc")
         || ISINST (pl->line, "and")
-        || ISINST (pl->line, "bcp") && !ISINST (pl->line, "bcpl")
+        || ISINST (pl->line, "bcp")
         || ISINST (pl->line, "cp")
         || ISINST (pl->line, "div")
         || ISINST (pl->line, "mul")
@@ -668,11 +668,11 @@ stm8MightRead(const lineNode *pl, const char *what)
       if (ISINST (pl->line, "divw") || ISINST (pl->line, "exgw") || ISINST (pl->line, "trap"))
         return TRUE;
  
-      if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strstr (strchr(pl->line, ','), what))
-        return TRUE;
+      if (ISINST (pl->line, "exg") && strstr (strchr(pl->line, ','), what))
+        return true;
 
-      if (((ISINST (pl->line, "div") || ISINST (pl->line, "mul")) && !ISINST (pl->line, "divw")) && pl->line[4] == extra)
-        return TRUE;
+      if ((ISINST (pl->line, "div") || ISINST (pl->line, "mul")) && pl->line[4] == extra)
+        return true;
 
       if ((ISINST (pl->line, "addw")
         || ISINST (pl->line, "cplw")
@@ -853,7 +853,7 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
         || ISINST (pl->line, "iret"))
           return TRUE;
 
-      if (((ISINST (pl->line, "div") && !ISINST (pl->line, "divw"))
+      if ((ISINST (pl->line, "div")
         || ISINST (pl->line, "ldw")
         || ISINST (pl->line, "mul"))
         && pl->line[4] == extra)
@@ -885,11 +885,11 @@ stm8SurelyWrites(const lineNode *pl, const char *what)
         && strncmp (pl->line + 3, what, strlen (what)) == 0)
         return TRUE;
 
-      if ((ISINST (pl->line, "exg") && !ISINST (pl->line, "exgw")) && strstr (strstr (pl->line, ","), what))
-        return TRUE;
+      if (ISINST (pl->line, "exg") && strstr (strstr (pl->line, ","), what))
+        return true;
     }
 
-  return FALSE;
+  return false;
 }
 
 static bool
@@ -965,6 +965,13 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
           return S4O_RD_OP;
         }
 
+      // Check writes before conditional jumps, some jumps (btjf, btjt) write 'c'
+      if(stm8SurelyWrites(*pl, what))
+        {
+          D(("S4O_WR_OP\n"));
+          return S4O_WR_OP;
+        }
+
       if(stm8UncondJump(*pl))
         {
           *pl = findLabel (*pl);
@@ -984,12 +991,6 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
             }
           D(("S4O_CONDJMP\n"));
           return S4O_CONDJMP;
-        }
-
-      if(stm8SurelyWrites(*pl, what))
-        {
-          D(("S4O_WR_OP\n"));
-          return S4O_WR_OP;
         }
 
       /* Don't need to check for de, hl since stm8MightRead() does that */

@@ -1693,6 +1693,166 @@ replace restart {
 	; peephole 155v removed inc hl / dec hl pair.
 }
 
+replace restart {
+	jp	Z, %2
+	ld	a, #%3
+	jp	%1
+%2:
+	ld	a, #%4
+%1:
+} by {
+	ld	a, #%3
+	jp	NZ, %1
+%2:
+	ld	a, #%4
+	; peephole 168z used double assignment in case of Z condition.
+%1:
+} if labelRefCountChange(%2 -1) 
+
+replace restart {
+	jp	NZ, %2
+	ld	a, #%3
+	jp	%1
+%2:
+	ld	a, #%4
+%1:
+} by {
+	ld	a, #%3
+	jp	Z, %1
+%2:
+	ld	a, #%4
+	; peephole 168nz used double assignment in case of NZ condition.
+%1:
+} if labelRefCountChange(%2 -1) 
+
+replace restart {
+	jp	Z, %2
+	ld	a, #%3
+	jp	%1
+%2:
+	xor	a, a
+%1:
+} by {
+	ld	a, #%3
+	jp	NZ, %1
+	; peephole 169xz used double assignment in case of Z condition.
+%2:
+	xor	a, a
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	NZ, %2
+	ld	a, #%3
+	jp	%1
+%2:
+	xor	a, a
+%1:
+} by {
+	ld	a, #%3
+	jp	Z, %1
+	; peephole 169xnz used double assignment in case of NZ condition.
+%2:
+	xor	a, a
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	Z, %2
+	ld	c, #%3
+	jp	%1
+%2:
+	ld	c, #%4
+%1:
+} by {
+	ld	c, #%3
+	jp	NZ, %1
+%2:
+	ld	c, #%4
+	; peephole 170z used double assignment in case of Z condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	NZ, %2
+	ld	c, #%3
+	jp	%1
+%2:
+	ld	c, #%4
+%1:
+} by {
+	ld	c, #%3
+	jp	Z, %1
+%2:
+	ld	c, #%4
+	; peephole 170nz used double assignment in case of NZ condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	Z, %2
+	ld	e, #%3
+	jp	%1
+%2:
+	ld	e, #%4
+%1:
+} by {
+	ld	e, #%3
+	jp	NZ, %1
+%2:
+	ld	e, #%4
+	; peephole 171z used double assignment in case of Z condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	NZ, %2
+	ld	e, #%3
+	jp	%1
+%2:
+	ld	e, #%4
+%1:
+} by {
+	ld	e, #%3
+	jp	Z, %1
+%2:
+	ld	e, #%4
+	; peephole 171nz used double assignment in case of NZ condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	Z, %2
+	ld	l, #%3
+	jp	%1
+%2:
+	ld	l, #%4
+%1:
+} by {
+	ld	l, #%3
+	jp	NZ, %1
+%2:
+	ld	l, #%4
+	; peephole 172z used double assignment in case of Z condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	NZ, %2
+	ld	l, #%3
+	jp	%1
+%2:
+	ld	l, #%4
+%1:
+} by {
+	ld	l, #%3
+	jp	Z, %1
+%2:
+	ld	l, #%4
+	; peephole 172nz used double assignment in case of NZ condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 barrier
 
@@ -2019,176 +2179,3 @@ replace {
 }
 
 barrier
-
-// To weird to let any other peephole rules see the result of the rules below
-
-replace {
-	jr	Z, %2
-	ld	a, #%3
-	jr	%1
-%2:
-	ld	a, #%4
-%1:
-} by {
-	jr	Z, %2
-	ld	a, #%3
-	.db	#0xca
-	; peephole 168z used jp Z opcode to jump over 2-byte instruction.
-%2:
-	ld	a, #%4
-%1:
-}
-
-replace {
-	jr	NZ, %2
-	ld	a, #%3
-	jr	%1
-%2:
-	ld	a, #%4
-%1:
-} by {
-	jr	NZ, %2
-	ld	a, #%3
-	.db	#0xc2
-	; peephole 168nz used jp NZ opcode to jump over 2-byte instruction.
-%2:
-	ld	a, #%4
-%1:
-}
-
-replace {
-	jr	Z, %2
-	ld	a, #%3
-	jr	%1
-%2:
-	xor	a, a
-%1:
-} by {
-	jr	Z, %2
-	ld	a, #%3
-	.db	#0x28
-	; peephole 169xz used jr Z opcode to jump over 1-byte instruction.
-%2:
-	xor	a, a
-%1:
-}
-
-replace {
-	jr	NZ, %2
-	ld	a, #%3
-	jr	%1
-%2:
-	xor	a, a
-%1:
-} by {
-	jr	NZ, %2
-	ld	a, #%3
-	.db	#0x20
-	; peephole 169xnz used jr NZ opcode to jump over 1-byte instruction.
-%2:
-	xor	a, a
-%1:
-}
-
-replace {
-	jr	Z, %2
-	ld	c, #%3
-	jr	%1
-%2:
-	ld	c, #%4
-%1:
-} by {
-	jr	Z, %2
-	ld	c, #%3
-	.db	#0xca
-	; peephole 170z used jp Z opcode to jump over 2-byte instruction.
-%2:
-	ld	c, #%4
-%1:
-}
-
-replace {
-	jr	NZ, %2
-	ld	c, #%3
-	jr	%1
-%2:
-	ld	c, #%4
-%1:
-} by {
-	jr	NZ, %2
-	ld	c, #%3
-	.db	#0xc2
-	; peephole 170nz used jp NZ opcode to jump over 2-byte instruction.
-%2:
-	ld	c, #%4
-%1:
-}
-
-replace {
-	jr	Z, %2
-	ld	e, #%3
-	jr	%1
-%2:
-	ld	e, #%4
-%1:
-} by {
-	jr	Z, %2
-	ld	e, #%3
-	.db	#0xca
-	; peephole 171z used jp Z opcode to jump over 2-byte instruction.
-%2:
-	ld	e, #%4
-%1:
-}
-
-replace {
-	jr	NZ, %2
-	ld	e, #%3
-	jr	%1
-%2:
-	ld	e, #%4
-%1:
-} by {
-	jr	NZ, %2
-	ld	e, #%3
-	.db	#0xc2
-	; peephole 171nz used jp NZ opcode to jump over 2-byte instruction.
-%2:
-	ld	e, #%4
-%1:
-}
-
-replace {
-	jr	Z, %2
-	ld	l, #%3
-	jr	%1
-%2:
-	ld	l, #%4
-%1:
-} by {
-	jr	Z, %2
-	ld	l, #%3
-	.db	#0xca
-	; peephole 172z used jp Z opcode to jump over 2-byte instruction.
-%2:
-	ld	l, #%4
-%1:
-}
-
-replace {
-	jr	NZ, %2
-	ld	l, #%3
-	jr	%1
-%2:
-	ld	l, #%4
-%1:
-} by {
-	jr	NZ, %2
-	ld	l, #%3
-	.db	#0xc2
-	; peephole 172nz used jp NZ opcode to jump over 2-byte instruction.
-%2:
-	ld	l, #%4
-%1:
-}
-

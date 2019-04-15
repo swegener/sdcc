@@ -806,7 +806,7 @@ replace restart {
 	cp	a, %2
 	jrc	%3
 	; peephole 42 removed redundant load of a from %1.
-} if notVolatile(%1), notUsed('c')
+} if notVolatile(%1), notUsed('c'), notUsed('z')
 
 replace restart {
 	ld	a, %1
@@ -818,7 +818,7 @@ replace restart {
 	cp	a, %2
 	jrslt	%3
 	; peephole 43 removed redundant load of a from %1.
-} if notVolatile(%1), notUsed('c')
+} if notVolatile(%1), notUsed('c'), notUsed('z')
 
 replace restart {
 	ld	a, %1
@@ -830,7 +830,7 @@ replace restart {
 	cp	a, %2
 	jrsle	%3
 	; peephole 44 removed redundant load of a from %1.
-} if notVolatile(%1), notUsed('c')
+} if notVolatile(%1), notUsed('c'), notUsed('z')
 
 replace restart {
 	ld	a, %1
@@ -842,7 +842,7 @@ replace restart {
 	cp	a, %2
 	jrule	%3
 	; peephole 45 removed redundant load of a from %1.
-} if notVolatile(%1), notUsed('c')
+} if notVolatile(%1), notUsed('c'), notUsed('z')
 
 replace restart {
 	ldw	x, %1
@@ -854,7 +854,7 @@ replace restart {
 	cpw	x, %2
 	jrc	%3
 	; peephole 46 removed redundant load of a from %1.
-} if notVolatile(%1), notUsed('c')
+} if notVolatile(%1), notUsed('c'), notUsed('z')
 
 replace restart {
 	ldw	x, %1
@@ -866,7 +866,7 @@ replace restart {
 	cpw	x, %2
 	jrslt	%3
 	; peephole 47 removed redundant load of a from %1.
-} if notVolatile(%1), notUsed('c')
+} if notVolatile(%1), notUsed('c'), notUsed('z')
 
 replace restart {
 	ldw	x, %1
@@ -878,7 +878,7 @@ replace restart {
 	cpw	x, %2
 	jrsle	%3
 	; peephole 48 removed redundant load of a from %1.
-} if notVolatile(%1), notUsed('c')
+} if notVolatile(%1), notUsed('c'), notUsed('z')
 
 replace restart {
 	ldw	x, %1
@@ -890,7 +890,7 @@ replace restart {
 	cpw	x, %2
 	jrule	%3
 	; peephole 49 removed redundant load of a from %1.
-} if notVolatile(%1), notUsed('c')
+} if notVolatile(%1), notUsed('c'), notUsed('z')
 
 replace restart {
 	ldw	x, %1
@@ -902,6 +902,26 @@ replace restart {
 	cpw	x, %2
 	jrnc	%3
 	; peephole 50 removed redundant load of a from %1.
+} if notVolatile(%1), notUsed('z')
+
+replace restart {
+	ldw	x, %1
+	jreq	%3
+	ldw	x, %1
+} by {
+	ldw	x, %1
+	jreq	%3
+	; peephole 50eq removed redundant load of x from %1.
+} if notVolatile(%1)
+
+replace restart {
+	ldw	x, %1
+	jrne	%3
+	ldw	x, %1
+} by {
+	ldw	x, %1
+	jrne	%3
+	; peephole 50ne removed redundant load of x from %1.
 } if notVolatile(%1)
 
 replace restart {
@@ -1022,6 +1042,22 @@ replace restart {
 	; peephole j2d removed unreachable jump to %2.
 } if labelRefCountChange(%2 -1)
 
+replace restart {
+	jreq	%1
+	jreq	%2
+} by {
+	jreq	%1
+	; peephole j2d-eq removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jrne	%1
+	jrne	%2
+} by {
+	jrne	%1
+	; peephole j2d-ne removed unreachable jump to %2.
+} if labelRefCountChange(%2 -1)
+
 // Ensure jump-to-jump optimiation of absolute jumps above is done before other jump-related optimizations.
 barrier
 
@@ -1093,6 +1129,26 @@ replace restart {
 	jrne	%5
 	; peephole j7 removed jra by using inverse jump logic
 %1:
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jreq	%1
+	jrne	%2
+%1:
+} by {
+    jrne	%2
+    ; peephole j7-eq-ne replaced jreq-jrne by jrne
+%1:	
+} if labelRefCountChange(%1 -1)
+
+replace restart {
+	jrne	%1
+	jreq	%2
+%1:
+} by {
+    jreq	%2
+    ; peephole j7-ne-eq replaced jrne-jreq by jreq
+%1:	
 } if labelRefCountChange(%1 -1)
 
 replace restart {

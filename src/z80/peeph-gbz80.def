@@ -320,6 +320,166 @@ replace restart {
 	; peephole 31 replaced call at end of function by jump.
 }
 
+replace restart {
+	jp	Z, %2
+	ld	a, #%3
+	jp	%1
+%2:
+	ld	a, #%4
+%1:
+} by {
+	ld	a, #%3
+	jp	NZ, %1
+%2:
+	ld	a, #%4
+	; peephole 168z used double assignment in case of Z condition.
+%1:
+} if labelRefCountChange(%2 -1) 
+
+replace restart {
+	jp	NZ, %2
+	ld	a, #%3
+	jp	%1
+%2:
+	ld	a, #%4
+%1:
+} by {
+	ld	a, #%3
+	jp	Z, %1
+%2:
+	ld	a, #%4
+	; peephole 168nz used double assignment in case of NZ condition.
+%1:
+} if labelRefCountChange(%2 -1) 
+
+replace restart {
+	jp	Z, %2
+	ld	a, #%3
+	jp	%1
+%2:
+	xor	a, a
+%1:
+} by {
+	ld	a, #%3
+	jp	NZ, %1
+	; peephole 169xz used double assignment in case of Z condition.
+%2:
+	xor	a, a
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	NZ, %2
+	ld	a, #%3
+	jp	%1
+%2:
+	xor	a, a
+%1:
+} by {
+	ld	a, #%3
+	jp	Z, %1
+	; peephole 169xnz used double assignment in case of NZ condition.
+%2:
+	xor	a, a
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	Z, %2
+	ld	c, #%3
+	jp	%1
+%2:
+	ld	c, #%4
+%1:
+} by {
+	ld	c, #%3
+	jp	NZ, %1
+%2:
+	ld	c, #%4
+	; peephole 170z used double assignment in case of Z condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	NZ, %2
+	ld	c, #%3
+	jp	%1
+%2:
+	ld	c, #%4
+%1:
+} by {
+	ld	c, #%3
+	jp	Z, %1
+%2:
+	ld	c, #%4
+	; peephole 170nz used double assignment in case of NZ condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	Z, %2
+	ld	e, #%3
+	jp	%1
+%2:
+	ld	e, #%4
+%1:
+} by {
+	ld	e, #%3
+	jp	NZ, %1
+%2:
+	ld	e, #%4
+	; peephole 171z used double assignment in case of Z condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	NZ, %2
+	ld	e, #%3
+	jp	%1
+%2:
+	ld	e, #%4
+%1:
+} by {
+	ld	e, #%3
+	jp	Z, %1
+%2:
+	ld	e, #%4
+	; peephole 171nz used double assignment in case of NZ condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	Z, %2
+	ld	l, #%3
+	jp	%1
+%2:
+	ld	l, #%4
+%1:
+} by {
+	ld	l, #%3
+	jp	NZ, %1
+%2:
+	ld	l, #%4
+	; peephole 172z used double assignment in case of Z condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
+replace restart {
+	jp	NZ, %2
+	ld	l, #%3
+	jp	%1
+%2:
+	ld	l, #%4
+%1:
+} by {
+	ld	l, #%3
+	jp	Z, %1
+%2:
+	ld	l, #%4
+	; peephole 172nz used double assignment in case of NZ condition.
+%1:
+} if labelRefCountChange(%2 -1)
+
 barrier
 
 // Should be one of the last ones. Opens the code to further peephole optimization.

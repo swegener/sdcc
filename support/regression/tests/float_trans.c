@@ -13,7 +13,7 @@
 void
 testTrans(void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 #ifdef SQRTF
     ASSERT(fabsf (sqrtf (5.0)     -   2.23606801) < 0.00001);
 #endif

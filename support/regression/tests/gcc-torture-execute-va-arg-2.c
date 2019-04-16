@@ -28,7 +28,7 @@ to_hex (unsigned int a)
   return hex[a];
 }
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 void
 f0 (char* format, ...)
 {
@@ -283,7 +283,7 @@ f15 (int a1, int a2, int a3, int a4, int a5,
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   char *f = "0123456789abcdef";
 
   f0 (f+0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);

@@ -18,7 +18,7 @@ struct _RenderInfo
 
 static void bar(void) { }
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 static int
 render_image_rgb_a (RenderInfo * info)
 {
@@ -49,7 +49,7 @@ render_image_rgb_a (RenderInfo * info)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
     RenderInfo info;
 
     info.y = 0;

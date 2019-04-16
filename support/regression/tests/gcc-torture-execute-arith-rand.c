@@ -4,7 +4,7 @@ arith-rand.c from the execute part of the gcc torture tests.
 
 #include <testfwk.h>
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 long
 simple_rand ()
 {
@@ -49,7 +49,7 @@ random_bitstring ()
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
   long int i;
 
   for (i = 0; i < 40 /* Was 1000 in GCC, reduced to speed up regression testing */; i++)

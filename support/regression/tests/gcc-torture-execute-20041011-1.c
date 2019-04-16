@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15) // Lack of memory
 
 typedef unsigned long long ull;
 volatile int gvol[32];
@@ -66,7 +66,7 @@ void
 testTortureExecute (void)
 {
 #ifndef __SDCC_ds390
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15) // Lack of memory
   gull = 100;
   DO_TESTS (RUN_TEST)
   if (neg (gull) != -100ULL)

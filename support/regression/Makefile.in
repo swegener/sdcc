@@ -211,6 +211,11 @@ test-pdk14:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=pdk14
 
+# Helper rule for testing the pdk15 port only(use uCsim simulator)
+test-pdk15:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=pdk15
+
 ### Helper rule for testing the host cc only
 test-host:
 	$(MAKE) test-common

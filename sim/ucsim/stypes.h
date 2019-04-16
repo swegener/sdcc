@@ -221,7 +221,9 @@ enum cpu_type {
   CPU_CMOS	= 0x0001,
   CPU_HMOS	= 0x0002,
 
-  CPU_PDK14 = 0x0001,
+  CPU_PDK13 = 0x0001,
+  CPU_PDK14 = 0x0002,
+  CPU_PDK15 = 0x0003,
 };
 
 

@@ -60,7 +60,9 @@ cl_simpdk::mk_controller(void)
     }
   switch (cpus_pdk[i].type)
     {
+    case CPU_PDK13:
     case CPU_PDK14:
+    case CPU_PDK15:
       return(new cl_pdk(&cpus_pdk[i], this));
     default:
       fprintf(stderr, "Unknown processor type\n");

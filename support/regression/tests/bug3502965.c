@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 #pragma disable_warning 85
 
 #define UCHAR	unsigned char
@@ -61,7 +61,7 @@ void TcpRun(PACKET_LIST * p)
 
 void testBug(void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   PACKET_LIST pl;
   pl.sLen = 0xff;
   (Adapter_pReceivePacket)[TCP_OFFSET] = 0x00;

@@ -10,7 +10,7 @@
 
 #define NUM_ELEM 20
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 {type} unsorted[NUM_ELEM] = {120, 110, 90, 100, 190, 190, 190, 130, 125, 80, 132, -8, 20, 40, 60, -10, 20, 30, 40, 50};
 
 const {type} sorted[NUM_ELEM] = {-10, -8, 20, 20, 30, 40, 40, 50, 60, 80, 90, 100, 110, 120, 125, 130, 132, 190, 190, 190};
@@ -31,7 +31,7 @@ int cmp(const void *lp, const void *rp) __reentrant
 
 void testSort(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 	qsort(unsorted, NUM_ELEM, sizeof({type}), &cmp);
 
 	ASSERT(!memcmp(unsorted, sorted, sizeof({type}) * NUM_ELEM));

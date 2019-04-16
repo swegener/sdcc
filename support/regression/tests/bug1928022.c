@@ -39,7 +39,7 @@ cmp (void *a, void *b)
 void
 testBug (void)
 {
-#ifndef __SDCC_pdk14 // I have no idea yet, how integers cast to pointers should behave here on pdk14.
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // I have no idea yet, how integers cast to pointers should behave here on pdk14.
   ASSERT (cmp(Ptr_a1, (char __xdata *) 0x1235));
   ASSERT (cmp(Ptr_a2, (char __xdata *) 0x1236));
   ASSERT (cmp(Ptr_c1, (char __xdata *) 0x1237));

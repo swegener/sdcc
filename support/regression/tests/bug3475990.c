@@ -6,7 +6,7 @@ void set_b(void)
 {
 }
 
-#if defined(__SDCC)
+#if defined(__SDCC) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Weird issue in pdk14 / pdk15
 __addressmod set_b b;
 #else
 #define b

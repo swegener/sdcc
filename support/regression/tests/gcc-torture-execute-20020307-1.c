@@ -20,6 +20,7 @@ FUNC(5)
 FUNC(6)
 FUNC(7)
 FUNC(8)
+#ifndef __SDCC_pdk15 // Lack of memory
 FUNC(9)
 FUNC(10)
 FUNC(11)
@@ -44,6 +45,7 @@ FUNC(29)
 FUNC(30)
 FUNC(31)
 #endif
+#endif
 
 void
 testTortureExecute (void)
@@ -55,6 +57,7 @@ testTortureExecute (void)
   f6(0);
   f7(0);
   f8(0);
+#ifndef __SDCC_pdk15 // Lack of memory
   f9(0);
   f10(0);
   f11(0);
@@ -78,6 +81,7 @@ testTortureExecute (void)
   f29(0);
   f30(0);
   f31(0);
+#endif
 #endif
   return;
 }

@@ -6,7 +6,7 @@
 
 void testBug(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
   volatile unsigned char c;
   volatile unsigned short x = 383;
 

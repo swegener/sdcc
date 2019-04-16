@@ -88,7 +88,7 @@ machine(struct mne *mp)
         case S_ADDC: {
                 struct inst ma = {0x1200 | combine, 0xFF};
                 struct inst am = {0x1A00 | combine, 0xFF};
-                struct inst m = {0x2000 | combine, 0x7F};
+                struct inst m = {0x2000 | combine, 0xFF};
                 struct inst a = {0x0060 + (combine ? 1 : 0), 0x00};
                 earithc(ma, am, m, a);
                 break;
@@ -119,9 +119,9 @@ machine(struct mne *mp)
                         combine = 0x200;
                 }
 
-                struct inst ma = {0x1500 | combine, 0xFF};
+                struct inst ma = {0x1400 | combine, 0xFF};
                 struct inst am = {0x1C00 | combine, 0xFF};
-                struct inst ioa = {0x0040, 0x3F};
+                struct inst ioa = {0x0080, 0x7F};
                 ebit(def, ma, am, mp->m_type == S_XOR ? &ioa : NULL);
                 break;
         }
@@ -168,7 +168,7 @@ machine(struct mne *mp)
                 combine = 0x100;
                 /* fallthrough */
         case S_IZSN: {
-                struct inst m = {0x2300 | combine, 0xFF};
+                struct inst m = {0x2200 | combine, 0xFF};
                 ezsn(def, m);
                 break;
         }

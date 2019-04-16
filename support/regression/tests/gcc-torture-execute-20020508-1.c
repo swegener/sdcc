@@ -50,7 +50,7 @@ testTortureExecute (void)
 
   if (ROR (us, SHIFT1) != ROR (SHORT_VALUE, SHIFT1))
     ASSERT (0);
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   if (ROR (ui, shift1) != ROR (INT_VALUE, SHIFT1))
     ASSERT (0);
 

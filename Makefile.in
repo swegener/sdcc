@@ -62,6 +62,11 @@ SDCC_AS        += sdas/asgb
 SDCC_LD        += sdcc-ldgb
 endif
 
+ifeq ($(OPT_DISABLE_PDK13), 0)
+SDCC_AS        += sdas/aspdk13
+SDCC_LD        += sdcc-ldpdk
+endif
+
 ifeq ($(OPT_DISABLE_PDK14), 0)
 SDCC_AS        += sdas/aspdk14
 SDCC_LD        += sdcc-ldpdk

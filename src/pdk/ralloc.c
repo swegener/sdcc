@@ -248,6 +248,10 @@ packRegsForAssign (iCode *ic, eBBlock *ebp)
   if (!dic)
     return 0;                   /* did not find */
 
+  /* Avoid having a result in a sfr for shifts. */
+  if (IS_SYMOP (IC_RESULT (ic)) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (IC_RESULT (ic))->etype)) && (dic->op == LEFT_OP || dic->op == RIGHT_OP))
+    return 0;
+
   /* if assignment then check that right is not a bit */
   if (ic->op == '=')
     {

@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifndef __SDCC_pdk14
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
 typedef int (*funcType) (int);
 
 int foo0 (int a)
@@ -31,7 +31,7 @@ struct
 
 void testBug (void)
 {
-#ifndef __SDCC_pdk14
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
   ASSERT (testS.fpa[0] (5) == 7);
   ASSERT (testS.fpa[1] (9) == 3);
   ASSERT (testS.fpb (5) == 10);

@@ -9,7 +9,7 @@
 #pragma disable_warning 93
 #endif
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 double test (const double le, const double ri)
 {
 	double val = ( ri - le ) / ( ri * ( le + 1.0 ) );
@@ -20,7 +20,7 @@ double test (const double le, const double ri)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
         double retval;
 
 	retval = test(1.0,2.0);

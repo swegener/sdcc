@@ -12,7 +12,7 @@
 
 #include <stdarg.h>
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 int foo_arg, bar_arg;
 long x;
 double d;
@@ -131,7 +131,7 @@ f8 (int i, ...)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 //  struct S1 a1, a3;
 //  struct S2 a2, a4;
 

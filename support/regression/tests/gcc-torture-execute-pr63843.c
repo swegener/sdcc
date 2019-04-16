@@ -13,7 +13,7 @@
 
 /* PR rtl-optimization/63843 */
 
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
 static inline
 unsigned short foo (unsigned short v)
 {
@@ -36,7 +36,7 @@ bar (unsigned char *x)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
   unsigned char x[8] = { 0x01, 0x01, 0x01, 0x01 };
   if (CHAR_BIT == 8
       && sizeof (short) == 2

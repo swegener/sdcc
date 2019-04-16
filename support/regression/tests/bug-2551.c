@@ -5,7 +5,7 @@
 #include <testfwk.h>
 #include <stdint.h>
 
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Bug #2874
 volatile uint8_t ff = 0xff;
 
 static inline uint16_t and(uint16_t a, uint16_t b) {
@@ -15,7 +15,7 @@ static inline uint16_t and(uint16_t a, uint16_t b) {
 #endif
 
 void testBug(void) {
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Bug #2874
   goto cond;
 
 cond:

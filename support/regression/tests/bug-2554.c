@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Bug #2874
 uint16_t numTests;
 
 void fail(void)
@@ -26,7 +26,7 @@ static inline uint16_t llvm_or_u16(uint16_t a, uint16_t b) {
 #endif
 
 void testOr(void) {
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Bug #2874
   uint8_t llvm_cbe_res;
   uint16_t llvm_cbe_a;
   uint16_t llvm_cbe_tmp__88;

@@ -45,7 +45,7 @@ neg (float a)
 
 typedef float (*float_test_func)(float) __reentrant;
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 
 /* the table with functions, their argument, expected result, tolerance.
    For most 8-bitters each testpoint uses 14 bytes so we could have a few:) */
@@ -226,7 +226,7 @@ static const testpoint[] =
 void
 testFloat (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   unsigned char i;
   float result, rel_error;
 

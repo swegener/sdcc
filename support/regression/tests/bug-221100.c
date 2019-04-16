@@ -7,7 +7,7 @@
 
 #define ARRAY_SIZE  130
 
-#if defined(__SDCC_pic16) || defined(__SDCC_pdk14)
+#if defined(__SDCC_pic16) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
 /* not enough pic16 / pdk14 data space, so put the array into the code memory */
 const static unsigned int
 testArray[ARRAY_SIZE] = {
@@ -43,7 +43,7 @@ fetch (void)
 static void
 testUnsignedCharIndex (void)
 {
-#if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14)
+#if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   int i;
   for (i = 0; i < 130; i++) {
     testArray[i] = i;

@@ -68,7 +68,7 @@ testTortureExecute (void)
 
   if (ROR (ull, SHIFT1) != ROR (LL_VALUE, SHIFT1))
     ASSERT (0);
-
+#ifndef __SDCC_pdk15 // Lack of memory
   if (ROR (ull, shift2) != ROR (LL_VALUE, SHIFT2))
     ASSERT (0);
 
@@ -110,6 +110,7 @@ testTortureExecute (void)
 
   if (ROL (ull, SHIFT2) != ROL (LL_VALUE, SHIFT2))
     ASSERT (0);
+#endif
 #endif
   return;
 }

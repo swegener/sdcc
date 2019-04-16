@@ -30,6 +30,11 @@
 extern DEBUGFILE dwarf2DebugFile;
 extern int dwarf2FinalizeFile(FILE *);
 
+static char pdk_defaultRules[] = {
+#include "peeph.rul"
+  ""
+};
+
 static char *pdk_keywords[] = {
   "at",
   "code",
@@ -247,7 +252,7 @@ PORT pdk13_port =
     _libs_pdk13,                /* libs */
   },
   {                             /* Peephole optimizer */
-    0,
+    pdk_defaultRules,
     0,
     0,
     0,
@@ -413,7 +418,7 @@ PORT pdk14_port =
     _libs_pdk14,                /* libs */
   },
   {                             /* Peephole optimizer */
-    0,
+    pdk_defaultRules,
     0,
     0,
     0,
@@ -579,7 +584,7 @@ PORT pdk15_port =
     _libs_pdk15,                /* libs */
   },
   {                             /* Peephole optimizer */
-    0,
+    pdk_defaultRules,
     0,
     0,
     0,

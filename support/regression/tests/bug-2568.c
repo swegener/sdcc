@@ -12,7 +12,7 @@
 #define ADDR 0x0100
 #elif defined(__SDCC_stm8)
 #define ADDR 0x1000
-#elif defined(__SDCC_pdk14)
+#elif defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
 #define ADDR 0x70
 #else
 #define ADDR 0xca00

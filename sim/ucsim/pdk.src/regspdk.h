@@ -31,55 +31,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 
+const int io_size = 64;
 struct t_regs
 {
   u8_t a;
 
-  u8_t flag;
-  u8_t sp;
-  u8_t clkmd;
-  u8_t inten;
-  u8_t intrq;
-  u8_t t16m;
-  u8_t eoscr;
-  u8_t integs;
-  u8_t padier;
-  u8_t pbdier;
-  u8_t pa;
-  u8_t pac;
-  u8_t paph;
-  u8_t pb;
-  u8_t pbc;
-  u8_t pbph;
-  u8_t misc;
-  u8_t tm2c;
-  u8_t tm2ct;
-  u8_t tm2s;
-  u8_t tm2b;
-  u8_t tm3c;
-  u8_t tm3ct;
-  u8_t tm3s;
-  u8_t tm3b;
-  u8_t gpcc;
-  u8_t gpcs;
-  u8_t pwmg0c;
-  u8_t pwmg0s;
-  u8_t pwmg0cubh;
-  u8_t pwmg0cubl;
-  u8_t pwmg0dth;
-  u8_t pwmg0dtl;
-  u8_t pwmg1c;
-  u8_t pwmg1s;
-  u8_t pwmg1cubh;
-  u8_t pwmg1cubl;
-  u8_t pwmg1dth;
-  u8_t pwmg1dtl;
-  u8_t pwmg2c;
-  u8_t pwmg2s;
-  u8_t pwmg2cubh;
-  u8_t pwmg2cubl;
-  u8_t pwmg2dth;
-  u8_t pwmg2dtl;
+  u8_t regs[io_size];
 };
 
 #define BIT_Z	0x01  // zero status, 1=zero, 0=nonzero

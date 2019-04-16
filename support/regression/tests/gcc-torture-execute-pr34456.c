@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 
-#ifndef __SDCC_pdk14 // Reentrancy
+#if !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15) // Reentrancy
 int debug (void) { return 1; }
 int errors;
 
@@ -38,7 +38,7 @@ void
 testTortureExecute (void)
 {
 #ifndef __SDCC_ds390 // Bug #2883
-#ifndef __SDCC_pdk14
+#if !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15)
   qsort (array, 2, sizeof (struct s), compare);
   ASSERT (!(errors == 0));
 #endif

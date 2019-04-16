@@ -85,7 +85,7 @@ testwcharstringnorestart(void)
 static void
 testwcharrestart(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL))
 	static mbstate_t ps;
 	wchar_t w;
@@ -111,7 +111,7 @@ testwcharrestart(void)
 static void
 testchar16restart(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL))
 	static mbstate_t ps;
 	char16_t c16[2];
@@ -148,7 +148,7 @@ testchar16restart(void)
 static void
 testchar32restart(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL))
 	static mbstate_t ps;
 	char32_t c32[2];

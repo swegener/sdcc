@@ -12,7 +12,7 @@
 
 /* PR tree-optimization/78586 */
 
-#ifndef __SDCC_pdk14 // Lackof memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lackof memory
 void
 foo (unsigned long x)
 {
@@ -26,7 +26,7 @@ foo (unsigned long x)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lackof memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lackof memory
   foo (1000);
   return;
 #endif

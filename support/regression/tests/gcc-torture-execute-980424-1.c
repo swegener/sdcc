@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 int i, a[99];
 
 void f (int one)
@@ -27,7 +27,7 @@ g ()
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   a[0] = 1;
   i = 0x40;
   g ();

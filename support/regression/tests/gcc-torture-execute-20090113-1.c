@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 typedef struct descriptor_dimension
 {
   int stride;
@@ -64,7 +64,7 @@ msum_i4 (gfc_array_i4 * const retarray,
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   int rdata[3];
   int adata[9];
   gfc_array_i4 retarray = { rdata, 265, { { 1, 1, 3 } } };

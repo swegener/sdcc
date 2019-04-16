@@ -1285,6 +1285,7 @@ extern  VOID            relr3(void);
 extern  VOID            relp3(void);
 extern  VOID            relerr3(char *str);
 extern  VOID            relerp3(char *str);
+extern  int             vpdkinst(int inst, int addr, int ver);
 
 /* lklibr.c */
 extern  int             addfile(char *path, char *libfil);

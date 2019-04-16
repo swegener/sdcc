@@ -17,7 +17,7 @@ double g()
   return 1.0;
 }
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 f()
 {
   char dummy[DUMMY_SIZE];
@@ -32,7 +32,7 @@ f()
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   if (f() != 3.0)
     ASSERT(0);
   return;

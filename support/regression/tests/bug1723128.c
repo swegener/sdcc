@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 #ifdef __bool_true_false_are_defined
 
 union USUINT {
@@ -103,7 +103,7 @@ NotZero (unsigned int t)
 void
 testBug (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 #ifdef __bool_true_false_are_defined
     rx_index = 1;
     ASSERT (VerifyCRC ());

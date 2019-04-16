@@ -23,7 +23,7 @@ struct PgHdr {
   unsigned int notUsed;
 };
 
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15) // Bug #2874
 #ifndef __SDCC_mcs51
 static inline PgHdr *merge_pagelist(PgHdr *pA, PgHdr *pB)
 {
@@ -85,7 +85,7 @@ PgHdr *sort_pagelist(PgHdr *pIn)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15) // Bug #2874
 #ifndef __SDCC_mcs51
   PgHdr a[5];
   PgHdr *p;

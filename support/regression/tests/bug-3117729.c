@@ -22,7 +22,7 @@ UCHAR mod_16x8(USHORT s16, UCHAR i8)
 	return (0);
 }
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 __xdata UCHAR state[256];
 UCHAR x, y;
 

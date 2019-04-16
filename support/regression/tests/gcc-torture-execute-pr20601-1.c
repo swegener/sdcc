@@ -20,7 +20,7 @@ struct T
   char **t3;
 };
 
-#if defined (__SDCC) && !defined (__SDCC_mcs51) && !defined (__SDCC_pdk14) // Lack of memory
+#if defined (__SDCC) && !defined (__SDCC_mcs51) && !defined (__SDCC_pdk14) && !defined (__SDCC_pdk15) // Lack of memory
 int a[5];
 int b;
 const char **c;
@@ -124,7 +124,7 @@ setup2 (void)
 void
 testTortureExecute (void)
 {
-#if defined (__SDCC) && !defined (__SDCC_mcs51) && !defined(__SDCC_pdk14)
+#if defined (__SDCC) && !defined (__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15)
   int x;
   c = g;
   b = 4;

@@ -53,7 +53,7 @@ void s3(int x, int y) __smallc __z88dk_callee;
 void
 testZ88dk(void)
 {
-#ifndef __SDCC_pdk14
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   ASSERT (f1 (23) == 24);
   ASSERT (f2 (23) == 24);
   ASSERT (f4 (23) == 24);

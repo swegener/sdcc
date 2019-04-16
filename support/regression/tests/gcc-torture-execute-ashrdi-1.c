@@ -310,7 +310,7 @@ constant_shift(long long x, int i)
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM) || defined(__SDCC_MODEL_LARGE) && defined(__SDCC_STACK_AUTO))) && !defined(__SDCC_pdk14) // Lack of memory// Lack of memory
+#if !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM) || defined(__SDCC_MODEL_LARGE) && defined(__SDCC_STACK_AUTO))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory// Lack of memory
   int i;
 
   for (i = 0; i < BITS; ++i)

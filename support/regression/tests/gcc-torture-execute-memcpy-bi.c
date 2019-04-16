@@ -8,7 +8,7 @@ memcpy-bi.c from the execute part of the gcc torture tests.
 #pragma disable_warning 85
 #endif
 
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 /* Test builtin-memcpy (which may emit different code for different N).  */
 #include <string.h>
 
@@ -36,7 +36,7 @@ TN ((n) + 3)
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   int i,j;
 
   for (i = 0; i < sizeof (src); ++i)

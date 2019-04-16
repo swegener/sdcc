@@ -74,7 +74,7 @@ mullong_wrapper (TYPE_TARGET_LONG a, TYPE_TARGET_LONG b)
 void
 testlibmullong(void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   ASSERT(mullong (         0,          0) ==          0);
   ASSERT(mullong (     0x100,      0x100) ==    0x10000);
   ASSERT(mullong (0x01020304,          3) == 0x0306090c);

@@ -17,13 +17,13 @@ int check_ptr(unsigned char *p, struct s *sp)
     return 0;
 }
 
-#ifndef __SDCC_pdk14 // Not enough RAM
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 __xdata struct s teststruct;
 #endif
 
 void testBug (void)
 {
-#ifndef __SDCC_pdk14 // Not enough RAM
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
   struct s * sp = &teststruct;
   
   ASSERT (check_ptr(&(sp->array[400]),sp) == 0);

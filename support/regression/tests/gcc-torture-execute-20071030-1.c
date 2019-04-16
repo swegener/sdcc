@@ -17,7 +17,7 @@
 
 /* Testcase copied from gcc.target/i386/loop-3.c */
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 typedef struct
 {
         unsigned char colormod;
@@ -78,7 +78,7 @@ int CalcPing (client_t *cl)
 
 void testTortureExecute(void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
    client_t cl;
 
    memset(&cl, 0, sizeof(cl));

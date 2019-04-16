@@ -1,0 +1,17 @@
+// peeph.def - PDK peephole rules
+
+replace restart {
+	mov	%1, a
+	mov	a, %1
+} by {
+	mov	%1, a
+	; peephole 1 removed redundant load from %1 into a.
+} if notVolatile(%1)
+
+replace restart {
+	xch	a, %1
+	xch	a, %1
+} by {
+	; peephole 2 removed redundant double exchange between a and %1.
+} if notVolatile(%1)
+

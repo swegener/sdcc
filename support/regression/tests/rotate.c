@@ -76,7 +76,7 @@ TYPE rol31(TYPE s){ return (s<<31) | (s>>(SIZE-31)); }
 static void
 testRol(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
     volatile TYPE t = TEST_VECT;
     TYPE u;
 

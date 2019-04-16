@@ -8,7 +8,7 @@
 #pragma std_c89
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 
 #define DECLARE_ARRAY(A) array##A[0x10]
 #define DECLARE_COUNTER(A) counter##A = 0
@@ -66,7 +66,7 @@ void
 testTortureExecute (void)
 {
   int exit_code = 0;
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   MANY (INIT_ARRAY);
   foo (1);
   MANY (CHECK_ARRAY);

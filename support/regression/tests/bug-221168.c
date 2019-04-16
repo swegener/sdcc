@@ -2,7 +2,7 @@
  */
 #include <testfwk.h>
 
-#ifndef __SDCC_pdk14 // Not enough RAM
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
 __xdata static char x[10][20];
 
 __xdata char *
@@ -15,7 +15,7 @@ getAddrOfCell (unsigned char y, unsigned char z)
 static void
 testMultiDimensionalAddress (void)
 {
-#ifndef __SDCC_pdk14 // Not enough RAM
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
   ASSERT (getAddrOfCell (5, 6) == (char __xdata *)x + 106);
 #endif
 }

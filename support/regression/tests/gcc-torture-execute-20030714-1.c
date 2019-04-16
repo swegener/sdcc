@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#ifndef __SDCC_pdk14
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
 #if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
 /* derived from PR optimization/11440  */
 
@@ -184,7 +184,7 @@ void
 testTortureExecute (void)
 {
 #ifndef __SDCC_pic16
-#ifndef __SDCC_pdk14
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
 #if !(defined (__GNUC__) && defined (__GNUC_MINOR__) && (__GNUC__ < 5))
   g_this.m_relPositioned = false;
   g_this.m_positioned = false;

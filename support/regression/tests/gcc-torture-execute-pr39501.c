@@ -37,7 +37,7 @@ F(double,max2)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15) // Lack of memory
   if (float_min1(0.f, -1.f) != -1.f) ASSERT (0);
   if (float_min1(-1.f, 0.f) != -1.f) ASSERT (0);
   if (float_min1(0.f, 1.f)  != 0.f)  ASSERT (0);

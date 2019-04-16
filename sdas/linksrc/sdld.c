@@ -116,6 +116,13 @@ is_sdld(void)
 }
 
 
+void
+set_sdld_target(enum sdld_target_e trgt)
+{
+  target = trgt;
+}
+
+
 enum sdld_target_e
 get_sdld_target(void)
 {

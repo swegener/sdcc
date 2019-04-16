@@ -416,31 +416,6 @@ main(int argc, char *argv[])
                         if ((iram_size) && (!packflag))
                                 iramcheck();
 
-                        if (TARGET_IS_PDK) {
-                                unsigned ram = 0;
-                                unsigned rom = 0;
-                                for (struct area *it = areap; it; it = it->a_ap) {
-                                        if (!strcmp(it->a_id, "DATA")) {
-                                                ram += it->a_size;
-                                        } else if (!strcmp(it->a_id, "CODE") || 
-                                                   !strcmp(it->a_id, "CONST")) {
-                                                rom += it->a_size;
-                                        }
-                                }
-
-                                if (ram > 128) {
-                                        fprintf(stderr,
-                                                "?ASlink-Warning-"
-                                                "RAM value %u too large "
-                                                "(128B max)\n", ram);
-                                }
-                                if (rom > 4096) {
-                                        fprintf(stderr,
-                                                "?ASlink-Warning-"
-                                                "ROM value %u too large "
-                                                "(2048W max)\n", rom / 2);
-                                }
-                        }
                         /* end sdld specific */
 
                         /*
@@ -456,6 +431,44 @@ main(int argc, char *argv[])
                          * Complete Processing
                          */
                         reloc('E');
+                }
+        }
+
+        if (TARGET_IS_PDK && get_sdld_target() != TARGET_ID_PDK) {
+                unsigned ram = 0;
+                unsigned rom = 0;
+                for (struct area *it = areap; it; it = it->a_ap) {
+                        if (!strcmp(it->a_id, "DATA") ||
+                            !strcmp(it->a_id, "OSEG")) {
+                                if (it->a_addr + it->a_size > ram) {
+                                        ram = it->a_addr + it->a_size;
+                                }
+                        } else if (!strcmp(it->a_id, "CODE") || 
+                                   !strcmp(it->a_id, "CONST")) {
+                                if (it->a_addr + it->a_size > rom) {
+                                        rom = it->a_addr + it->a_size;
+                                }
+                        }
+                }
+
+                enum sdld_target_e target = get_sdld_target();
+                const unsigned max_ram =
+                    target == TARGET_ID_PDK13 ? 64 :
+                    target == TARGET_ID_PDK14 ? 128 : 256;
+                const unsigned max_rom =
+                    target == TARGET_ID_PDK13 ? 2048 :
+                    target == TARGET_ID_PDK14 ? 4096 : 8192;
+                if (ram > max_ram) {
+                        fprintf(stderr,
+                                "?ASlink-Warning-"
+                                "RAM value %u too large "
+                                "(%uB max)\n", ram, max_ram);
+                }
+                if (rom > max_rom) {
+                        fprintf(stderr,
+                                "?ASlink-Warning-"
+                                "ROM value %u too large "
+                                "(%uW max)\n", rom / 2, max_rom / 2);
                 }
         }
         if (TARGET_IS_8051) {

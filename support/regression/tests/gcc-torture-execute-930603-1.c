@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 float fx (float x)
 {
   return 1.0 + 3.0 / (2.302585093 * x);
@@ -22,7 +22,7 @@ void f ();
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   float a, b, c;
   a = inita ();
   c = initc ();

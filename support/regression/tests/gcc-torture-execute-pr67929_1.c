@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 int
 foo (float a)
 {
@@ -15,7 +15,7 @@ foo (float a)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   if (foo (10.0f) != 49)
     ASSERT (0);
 #endif

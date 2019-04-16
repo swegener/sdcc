@@ -6,7 +6,7 @@
 
 #include <testfwk.h>
 
-#ifndef __SDCC_pdk14 // Not enough RAM
+#if !defined( __SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 static {type} {type}_1 = 2;
 
 static {type} s_get_{type}_1(void)
@@ -33,7 +33,7 @@ char get_indexed(char index, char *msg);
 
 void testBug(void)
 {
-#ifndef __SDCC_pdk14 // Not enough RAM
+#if !defined( __SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 	ASSERT (s_get_{type}_1() == 12);
 	ASSERT (get_{type}_1() == 6);
 	ASSERT (s_get_indexed(1, "One") == 'e');

@@ -15,7 +15,7 @@
 # define ADDRESS(x) (0xCA ## x)
 #endif
 
-#if !defined(__SDCC_pdk14) // TODO: Make test suitable for pdk14
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // TODO: Make test suitable for pdk
 typedef struct
 {
   int a, b;
@@ -44,7 +44,7 @@ char z = 'z';
 void
 testAbsolute(void)
 {
-#if !defined(__SDCC_pdk14) // TODO: Make test suitable for pdk14
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // TODO: Make test suitable for pdk
 #if !defined(PORT_HOST)
   static {mem} __at(ADDRESS(B6)) char s = 's';
   char {mem} *pC = (char {mem} *)(ADDRESS(B0));

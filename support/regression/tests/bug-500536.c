@@ -8,7 +8,7 @@ float z1(void)
   return 5;
 }
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 float fun( void ) 
 { 
   unsigned long i; 
@@ -25,7 +25,7 @@ float fun( void )
 void
 testfs2long(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   volatile float f;
   volatile unsigned long ul;
   volatile long l;

@@ -19,7 +19,7 @@ attr_rtx (char *varg0, char *varg1)
   return;
 }
 
-#ifndef __SDCC_pdk14 // Bug #2878
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2878
 static void
 attr_eq (char *name, char *value)
 {
@@ -36,7 +36,7 @@ attr_string (char *str)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   attr_eq (arg0, arg1);
   return;
 #endif

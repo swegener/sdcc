@@ -43,15 +43,17 @@ test (int n, ...)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) // Lack of memory.
   test (1, VALUE, AFTER);
   test (2, 2, VALUE, AFTER);
   test (3, 2, 3, VALUE, AFTER);
+#if !defined(__SDCC_pdk15) // Lack of memory.
   test (4, 2, 3, 4, VALUE, AFTER);
   test (5, 2, 3, 4, 5, VALUE, AFTER);
   test (6, 2, 3, 4, 5, 6, VALUE, AFTER);
   test (7, 2, 3, 4, 5, 6, 7, VALUE, AFTER);
   test (8, 2, 3, 4, 5, 6, 7, 8, VALUE, AFTER);
+#endif
   return;
 #endif
 }

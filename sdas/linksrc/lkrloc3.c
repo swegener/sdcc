@@ -402,12 +402,36 @@ relr3(void)
                         if (rtval[rtp + 4] == 15) {
                                 jump = rtval[rtp + 3] & 0x70;
                                 mask = 0x40;
+                                if (get_sdld_target() == TARGET_ID_PDK) {
+                                        set_sdld_target(TARGET_ID_PDK15);
+                                } else if (get_sdld_target() != TARGET_ID_PDK15) {
+                                        error = 12;
+                                }
                         } else if (rtval[rtp + 4] == 14) {
                                 jump = rtval[rtp + 3] & 0x38;
                                 mask = 0x20;
+                                if (get_sdld_target() == TARGET_ID_PDK) {
+                                        set_sdld_target(TARGET_ID_PDK14);
+                                } else if (get_sdld_target() != TARGET_ID_PDK14) {
+                                        error = 13;
+                                }
                         } else if (rtval[rtp + 4] == 13) {
                                 jump = rtval[rtp + 3] & 0x1C;
                                 mask = 0x10;
+                                if (get_sdld_target() == TARGET_ID_PDK) {
+                                        set_sdld_target(TARGET_ID_PDK13);
+                                } else if (get_sdld_target() != TARGET_ID_PDK13) {
+                                        error = 14;
+                                }
+
+                                /* T*SN and SET* instructions for PDK13 needed to
+                                 * be handled specially since their address is
+                                 * in between the opcode.
+                                 */
+                                if ((rtval[rtp + 3] & 0x1F00) == 0x300 ||
+                                    (rtval[rtp + 3] & 0x1F00) == 0x200) {
+                                        rtval[rtp] <<= 1;
+                                }
                         }
 
                         const int icall =
@@ -428,6 +452,8 @@ relr3(void)
                                 rtval[rtp + 1] |= marker;
                         }
 
+                        const int inst = (rtval[rtp + 3] << 8) | rtval[rtp + 2];
+
                         /* Do the actual opcode fusion and ignore the two 
                          * bytes taken for the opcode by the assembler.
                          */
@@ -436,8 +462,22 @@ relr3(void)
                                 rtval[rtp + 3] |= rtval[rtp + 1];
                         } else if (mode & R3_MSB) {
                                 rtval[rtp + 2] |= rtval[rtp + 1];
+                                rtval[rtp] = rtval[rtp + 1];
+                                rtval[rtp + 1] = 0;
                         } else {
                                 rtval[rtp + 2] |= rtval[rtp];
+                                rtval[rtp + 1] = 0;
+                        }
+
+                        const int addr = (rtval[rtp + 1] << 8) | rtval[rtp];
+                        static int errorCount = 0;
+                        if (vpdkinst(inst, addr, rtval[rtp + 4])) {
+                                if (errorCount < 3) {
+                                        error = 11;
+                                } else if (errorCount == 3) {
+                                        puts("?ASlink-Warning-More instruction address errors omitted");
+                                }
+                                ++errorCount;
                         }
 
                         mode &= ~R3_USGN;
@@ -647,7 +687,11 @@ char *errmsg3[] = {
 /* 8 */ "",
 /* 9 */ "",
 /* sdld specific */
-/* 10 */        "Bit-addressable relocation error"
+/* 10 */        "Bit-addressable relocation error",
+/* 11 */        "Invalid address for instruction",
+/* 12 */        "mismatched pdk targets; expected pdk15",
+/* 13 */        "mismatched pdk targets; expected pdk14",
+/* 14 */        "mismatched pdk targets; expected pdk13"
 /* end sdld specific */
 };
 
@@ -1357,6 +1401,181 @@ int i;
         rtflg[i+1] = 0;
 
         return (j);
+}
+
+/*)Function VOID              vpdkinst(inst, addr, ver)
+ *
+ *              int inst        instruction
+ *              int addr        address
+ *              int ver         PDK version
+ *
+ *      The function vpdkinst() tests whether the address
+ *      does not exceed the allowed maximum size of the
+ *      instruction.
+ *
+ *      local variable:
+ *              a_uint  j               temporary evaluation variable
+ *
+ *      global variables:
+ *              hilo                    byte ordering parameter
+ *
+ *      called functions:
+ *              none
+ *
+ *      side effects:
+ *              The value of rtval[] is changed.
+ *              The rtflg[] value corresponding to the
+ *              MSB & middle byte  of the word value is cleared to
+ *              reflect the fact that the LSB is the selected byte.
+ *
+ */
+
+int
+vpdkinst(inst, addr, ver)
+int inst;
+int addr;
+int ver;
+{
+        switch (ver) {
+        case 13: /* PDK 13 */
+                switch (inst & 0x1C00) {
+                case 0x1800:
+                case 0x1C00:
+                        if (addr > 0x3FF) {
+                                return 1;
+                        }
+                        break;
+                case 0x1000:
+                case 0x1400:
+                        if (addr > 0xFF) {
+                                return 1;
+                        }
+                        break;
+                case 0x0C00:
+                case 0x2000:
+                        if (addr > 0x1F) {
+                                return 1;
+                        }
+                        break;
+                case 0x800:
+                case 0x400:
+                        if (addr > 0x3F) {
+                                return 1;
+                        }
+                        break;
+                case 0x0:
+                        if (inst & 0x200) {
+                                /* Address was right shifted to fit into the
+                                 * opcode.
+                                 */
+                                if ((addr >> 1) > 0xF) {
+                                        return 1;
+                                }
+                        } else if (inst & 0x100) {
+                                if (addr > 0xFF) {
+                                        return 1;
+                                }
+                        } else if (addr > 0x1F) {
+                                return 1;
+                        }
+                        break;
+                }
+                break;
+        case 14: /* PDK 14 */
+                switch (inst & 0x3800) {
+                case 0x3000:
+                case 0x3800:
+                        if (addr > 0x7FF) {
+                                return 1;
+                        }
+                        break;
+                case 0x2800:
+                        if (addr > 0xFF) {
+                                return 1;
+                        }
+                        break;
+                case 0x1800:
+                case 0x2000:
+                        if (addr > 0x3F) {
+                                return 1;
+                        }
+                        break;
+                case 0x800:
+                case 0x1000:
+                        if (addr > 0x7F) {
+                                return 1;
+                        }
+                        break;
+                case 0x0:
+                        if (inst & 0x400) {
+                                if (addr > 0x3F) {
+                                        return 1;
+                                }
+                        } else if ((inst & 0x300) == 0x300) {
+                                if (addr & 0x1) {
+                                        return 1;
+                                }
+                        } else if ((inst & 0x300) == 0x200 && addr > 0xFF) {
+                                return 1;
+                        } else if ((inst & 0x300) == 0x100 && addr > 0x3F) {
+                                return 1;
+                        }
+                        break;
+                }
+                break;
+        case 15: /* PDK 15 */
+                switch (inst & 0x7000) {
+                case 0x6000:
+                case 0x7000:
+                        if (addr > 0xFFF) {
+                                return 1;
+                        }
+                        break;
+                case 0x5000:
+                        if (inst & 0x800) {
+                                if (addr > 0x7F) {
+                                        return 1;
+                                }
+                                break;
+                        }
+                case 0x1000:
+                case 0x2000:
+                        if (addr > 0xFF) {
+                                return 1;
+                        }
+                        break;
+                case 0x3000:
+                case 0x4000:
+                        if (addr > 0x7F) {
+                                return 1;
+                        }
+                        break;
+                case 0x0:
+                        switch (inst & 0xC00) {
+                        case 0xC00:
+                                if (addr > 0xFF) {
+                                        return 1;
+                                }
+                                break;
+                        case 0x400:
+                                if (addr > 0xFF || (addr & 0x1)) {
+                                        return 1;
+                                }
+                                break;
+                        case 0x0:
+                                if ((inst & 0x200) && addr > 0xFF) {
+                                        return 1;
+                                } else if (!(inst & 0x200) && addr > 0x7F) {
+                                        return 1;
+                                }
+                                break;
+                        }
+                        break;
+                }
+                break;
+        }
+        return 0;
+#undef MASK
 }
 
 /* end sdld specific */

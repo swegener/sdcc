@@ -12,7 +12,7 @@ typedef union
     float f;
 } intflt;
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 void sum(int8_t tp, intflt *if1, intflt *if2)
 {
     if(tp)
@@ -32,7 +32,7 @@ void sum2(int8_t tp, intflt *if1, intflt *if2)
 
 void testBug(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 	intflt data;
 
 	data.i = -23;

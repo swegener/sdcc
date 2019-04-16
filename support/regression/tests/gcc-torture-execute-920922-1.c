@@ -19,7 +19,7 @@ void
 testTortureExecute (void)
 {
 // Incrementing pointers that far past the object is undefined behaviour and mcs51 indeed does the addition differently here (where it knows &x points to the stack) than in f.
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) && !defined(__SDCC_pdk14)
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
   unsigned long x = 0x80000000UL;
   if (f(&x) != &x + 0x81)
     ASSERT(0);

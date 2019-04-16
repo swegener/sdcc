@@ -15,7 +15,7 @@ char buf[10];
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   int l = sprintf (buf, "foo\0bar");
   if (l != 3)
     ASSERT (0);

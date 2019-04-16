@@ -551,7 +551,9 @@ struct cpu_entry cpus_stm8[]=
 
 struct cpu_entry cpus_pdk[]=
   {
+    {"PDK13"   , CPU_PDK13, 0			, ""		, ""},
     {"PDK14"   , CPU_PDK14, 0			, ""		, ""},
+    {"PDK15"   , CPU_PDK15, 0			, ""		, ""},
     
     {NULL, CPU_NONE, 0, "", ""}
   };

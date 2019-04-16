@@ -9,7 +9,7 @@
 #pragma disable_warning 93
 #endif
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 int
 foo (int x, int y, int i, int j)
 {
@@ -23,7 +23,7 @@ foo (int x, int y, int i, int j)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   if (foo (2, 24, 3, 4) == 0)
     ASSERT (0);
   return;

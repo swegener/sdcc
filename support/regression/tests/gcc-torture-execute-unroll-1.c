@@ -8,7 +8,7 @@
 #pragma std_c99
 #endif
 
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
 static
 inline int
 f (int x)
@@ -20,7 +20,7 @@ f (int x)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
   int a = 0 ;
  
   while ( (f(f(f(f(f(f(f(f(f(f(1))))))))))) + a < 12 )

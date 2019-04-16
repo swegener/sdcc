@@ -78,7 +78,7 @@ void mark(void)
 void
 testDiv(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
     {attr} {storage} signed {type} i;
 
     i = 100;
@@ -101,7 +101,7 @@ testDiv(void)
 void 
 test16to32(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
    {attr} {storage} int i, j;
    {attr} {storage} unsigned int ui, uj;
 
@@ -136,7 +136,7 @@ test16to32(void)
 void
 testMod(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
     {attr} {storage} signed {type} i;
 
     // Disabled the LOG functions due to a bug in sdcc involving

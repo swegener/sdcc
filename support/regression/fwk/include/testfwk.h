@@ -29,7 +29,7 @@ void __printf(const char *szFormat, ...);
 # define __reentrant
 #endif
 
-#if defined(__SDCC_pdk14)
+#if defined(__SDCC_pdk13) || defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
 # define __data
 # define __idata
 # define __pdata

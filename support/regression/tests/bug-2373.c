@@ -21,7 +21,7 @@ static char (* __xdata func_ptr) (char);
 void
 testFptr(void)
 {
-#ifndef __SDCC_pdk14
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
   char b = 10;
   a      = 10;
   s.c    = 10;

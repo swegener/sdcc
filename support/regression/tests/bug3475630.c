@@ -82,7 +82,7 @@ char* my_strncpy ( char *dst, const char *src, size_t n, char terminator )
     return(0);
 }
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 
 /*
  * Read raw directory data and transform into FS_MZDIR *dir.
@@ -125,7 +125,7 @@ __xdata FS_MZDIR dir;
 
 void testBug(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
     unsigned char i;
 
     fs_read_directory_block(&dir, 0);

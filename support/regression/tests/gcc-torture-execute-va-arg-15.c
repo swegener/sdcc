@@ -40,7 +40,7 @@ void vafunction (char *dummy, ...)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   vafunction( "", 
 	1, 2., 
 	3, 4., 

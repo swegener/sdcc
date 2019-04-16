@@ -14,7 +14,7 @@
 #define F 140
 #define T 13
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 feq (float x, float y)
 {
   if (x == y)
@@ -150,7 +150,7 @@ int correct_results[] =
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   int i, j, *res = correct_results;
 
   for (i = 0; i < 8; i++)

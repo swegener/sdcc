@@ -10,14 +10,14 @@
 
 #include <stdio.h>
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 char buf[40];
 #endif
 
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   int i = 0;
   int l = sprintf (buf, "%s", i++ ? "string" : "other string");
   if (l != sizeof ("other string") - 1 || i != 1)

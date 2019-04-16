@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#ifndef __SDCC_pdk14
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
 typedef int func_t (int a);
 typedef int (*func_p_t)(int a);
 
@@ -24,7 +24,7 @@ func_p_t pb[2] = {fb, fa};
 
 void testBug (void)
 {
-#ifndef __SDCC_pdk14
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15)
   ASSERT (pa[0](5) == 6);
   ASSERT (pa[1](5) == 15);
   ASSERT (pb[0](15) == 25);

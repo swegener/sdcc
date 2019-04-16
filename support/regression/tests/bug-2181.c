@@ -6,7 +6,7 @@
 
 #include <string.h>
 
-#if !defined( __SDCC_mcs51)
+#if !defined( __SDCC_mcs51) && !defined( __SDCC_pdk15)
 #define SROWLENGTH 36
 #else
 #define SROWLENGTH 6

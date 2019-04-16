@@ -7,7 +7,7 @@
 void
 testBug(void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   unsigned char buff[176];
   unsigned char i;
   for(i = 0; i < 22*8; ++i)

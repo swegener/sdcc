@@ -46,7 +46,7 @@ mulWrapper (int a, int b)
 void
 testOpOp (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Lack of memory
   /* mul signedness: usualBinaryConversions() */
   vsc = 0x7f;
   vuc = 0xfe;

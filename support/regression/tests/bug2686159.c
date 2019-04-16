@@ -34,7 +34,7 @@ void correct(void)
 
 void testBug(void)
 {
-#ifndef __SDCC_pdk14 // No RAM above 0x7f.
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // No RAM above 0x7f / 0xff.
 #ifdef __SDCC
 	REG_1 = 0x40;
 	incorrect();

@@ -6,7 +6,7 @@
 
 #include <testfwk.h>
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) // Lack of memory
 /*--------------------------------------------------
    regression test for #1864582:
    multiple definition of char cons w. --model-large
@@ -22,7 +22,7 @@ static {type} smallDense[] = {
 static void
 testSmallDense (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) // Lack of memory
   ASSERT (smallDense[0] == 1);
   ASSERT (smallDense[1] == 2);
   ASSERT (smallDense[2] == 3);
@@ -34,7 +34,7 @@ testSmallDense (void)
 
 #ifdef __SDCC_mcs51
 __idata
-#elif __SDCC_pdk14
+#elif defined(__SDCC_pdk14)
 const
 #endif
 static {type} smallSparse[] = {
@@ -44,7 +44,7 @@ static {type} smallSparse[] = {
 static void
 testSmallSparse (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) // Lack of memory
   ASSERT (smallSparse[0] == 1);
   ASSERT (smallSparse[1] == 1);
   ASSERT (smallSparse[2] == 1);
@@ -59,7 +59,7 @@ testSmallSparse (void)
 
 #ifdef __SDCC_mcs51
 __idata
-#elif __SDCC_pdk14
+#elif defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
 const
 #endif
 static {type} smallSparseZero[] = {
@@ -73,7 +73,7 @@ static {type} smallSparseZeroTail[] = {
 static void
 testSmallSparseZero (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   ASSERT (smallSparseZero[0] == 0);
   ASSERT (smallSparseZero[1] == 0);
   ASSERT (smallSparseZero[2] == 0);
@@ -92,7 +92,7 @@ testSmallSparseZero (void)
 __xdata
 #elif __SDCC_pic16
 __code
-#elif __SDCC_pdk14
+#elif defined(__SDCC_pdk14) || defined(__SDCC_pdk15)
 const
 #endif
 static {type} largeMixed[] = {
@@ -136,7 +136,7 @@ static {type} largeMixed[] = {
 static void
 testLargeMixed (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   ASSERT (largeMixed[0] == 1);
   ASSERT (largeMixed[1] == 2);
   ASSERT (largeMixed[7] == 1);

@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Bug #2874
 static inline uint16_t shl_u16(uint16_t a, uint16_t b) {
   uint16_t r = a << b;
   return r;
@@ -22,7 +22,7 @@ static inline uint16_t or_u16(uint16_t a, uint16_t b) {
 #endif
 
 void testSwap_4(void) {
-#ifndef __SDCC_pdk14 // Bug #2874
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // Bug #2874
   uint8_t tt;
   volatile uint8_t llvm_cbe_tmp__1;
   uint8_t llvm_cbe_tmp__2;

@@ -5,8 +5,8 @@
 	* src/SDCCpeeph.c,
 	  src/pdk/peeph.def:
 	  Remove untargeted labels.
-	* support/regression/tests/bug2084206.c:
-	  Disable test that won't work anytime soon on pkd15.
+	* support/regression/tests/*.c:
+	  Disable tests that won't work anytime soon on pkd15.
 
 2019-04-16 Philipp Klaus Krause <pkk AT spth.de>
 

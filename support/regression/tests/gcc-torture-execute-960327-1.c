@@ -16,7 +16,7 @@ g ()
 
 void f ()
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   char s[] = "abcedfg012345";
   char *sp = s + 12;
 

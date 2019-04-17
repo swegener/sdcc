@@ -15,7 +15,7 @@ void f (int (*fp)(char *, const char *, ...))
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
   f (&sprintf);
   ASSERT ((buf[0] == '<' && buf[1] == 'N') ||   // "<NO FLOAT>""
           (buf[0] == '5' && buf[1] == 0));      // "5"

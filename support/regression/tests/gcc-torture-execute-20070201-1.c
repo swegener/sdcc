@@ -12,7 +12,7 @@
 
 /* PR middle-end/30473 */
 
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 char *
 foo (char *buf, char *p)
 {
@@ -24,7 +24,7 @@ foo (char *buf, char *p)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
 #if !(defined (__GNUC__) && (__GNUC__ < 5))
   char buf[6];
   if (foo (buf, &buf[2]) != &buf[3])

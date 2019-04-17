@@ -1,3 +1,8 @@
+2019-04-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sim/ucsim/pdk.src/pdk.cc:
+	  Fix register dump, patch by Nicolas Lesser.
+
 2019-04-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c:
@@ -7,6 +12,8 @@
 	  Remove untargeted labels.
 	* support/regression/tests/*.c:
 	  Disable tests that won't work anytime soon on pkd15.
+	* sim/ucsim/globals.cc:
+	  More verbose pdk subtype output.
 
 2019-04-16 Philipp Klaus Krause <pkk AT spth.de>
 

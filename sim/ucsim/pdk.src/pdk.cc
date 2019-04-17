@@ -163,18 +163,15 @@ void cl_pdk::make_memories(void) {
 
   regs8 = new cl_address_space("regs8", 0, io_size + 1, 8);
   regs8->init();
-  regs8->get_cell(0)->decode((t_mem *)&regs.a);
   for (size_t i = 0; i < io_size; ++i) {
-    regs8->get_cell(i + 1)->decode((t_mem *)(regs.regs + i));
+    regs8->get_cell(i)->decode((t_mem *)(regs.regs + i));
   }
   address_spaces->add(regs8);
 
   class cl_var *v;
-  vars->add(v = new cl_var(cchars("a"), regs8, 0, ""));
+  vars->add(v = new cl_var(cchars("flag"), regs8, 0, ""));
   v->init();
-  vars->add(v = new cl_var(cchars("flag"), regs8, 1, ""));
-  v->init();
-  vars->add(v = new cl_var(cchars("sp"), regs8, 2, ""));
+  vars->add(v = new cl_var(cchars("sp"), regs8, 1, ""));
   v->init();
 }
 

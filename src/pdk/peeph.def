@@ -15,3 +15,9 @@ replace restart {
 	; peephole 2 removed redundant double exchange between a and %1.
 } if notVolatile(%1)
 
+replace restart {
+%1:
+} by {
+	; peephole j0 removed unused label %1.
+} if labelRefCount(%1 0)
+

@@ -1,7 +1,10 @@
 2019-04-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c:
-	  Fix a bug in wide subtraction from pseudoregister with stack result.
+	  Various fixes and improvements.
+	* src/SDCCpeeph.c,
+	  src/pdk/peeph.def:
+	  Remove untargeted labels.
 
 2019-04-16 Philipp Klaus Krause <pkk AT spth.de>
 

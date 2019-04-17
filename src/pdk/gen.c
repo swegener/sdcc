@@ -744,24 +744,20 @@ adjustStack (int n, bool a_free, bool p_free)
 {
   wassertl_bt (!(n % 2), "Unsupported odd stack adjustment"); // The datasheets seem to require the stack pointer to be aligned to a 2-byte boundary. 
 
-  if (n >= 0 && (!a_free || n <= 4))
+  if (n >= 0 && (!(p_free || a_free) || n <= 4))
     for (int i = 0; i < n; i += 2)
       {
         emit2 ("push", "af");
         cost (1, 1);
       }
-  else if (!a_free && p_free && n < 0)
+  else if (!a_free && p_free)
     {
-      pushAF();
-
-      moveStackStack (G.stack.pushed - 2 + n, G.stack.pushed - 2, 2, true);
-      
+      emit2 ("xch", "a, p");
       emit2 ("mov", "a, sp");
       emit2 ("add", "a, #%d", n);
       emit2 ("mov", "sp, a");
-      cost (3, 3);
-
-      popAF();
+      emit2 ("xch", "a, p");
+      cost (5, 5);
     }
   else if (!a_free && !p_free && n < 0)
     {
@@ -782,6 +778,7 @@ adjustStack (int n, bool a_free, bool p_free)
     }
   else // Can't use pop af, since it might affect reserved flag bits.
     {
+      wassert (a_free);
       emit2 ("mov", "a, sp");
       emit2 ("add", "a, #%d", n);
       emit2 ("mov", "sp, a");
@@ -1290,6 +1287,12 @@ genCall (const iCode *ic)
           cost (1, 1);
         }
       pushAF ();
+    }
+
+  if (!regDead (A_IDX, ic) || !regDead (P_IDX, ic))
+    {
+      cost (700, 700);
+      wassertl (regalloc_dry_run, "Register saving across call not yet implemented");
     }
 
   if (ic->op == PCALL)
@@ -3422,7 +3425,7 @@ genAssign (const iCode *ic)
 
   wassert (result->aop->type != AOP_DUMMY || right->aop->type != AOP_DUMMY);
 
-  if (result->aop->type == AOP_STK && !regDead (P_IDX, ic))
+  if ((result->aop->type == AOP_STK || right->aop->type == AOP_STK)&& !regDead (P_IDX, ic))
     {
       cost (100, 100); // Todo: Implement!
       wassert (regalloc_dry_run);

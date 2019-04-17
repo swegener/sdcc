@@ -421,6 +421,10 @@ FBYNAME (labelIsUncondJump)
       jpInst = (options.model == MODEL_LARGE ? "jpf" : "jp");
       jpInst2 = "jra";
     }
+  else if (TARGET_PDK_LIKE)
+    {
+      jpInst = "goto";
+    }
   len = strlen(jpInst);
   if (strncmp(p, jpInst, len))
     {

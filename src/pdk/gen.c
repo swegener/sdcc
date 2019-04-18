@@ -1651,7 +1651,6 @@ genPlus (const iCode *ic)
           pushed_a = true;
         }
 
-#if 0
       if (!moved_to_a && (left->aop->type == AOP_DIR || aopInReg (left->aop, i, P_IDX)) && right->aop->type != AOP_STK && aopSame (left->aop, i, result->aop, i, 1))
         {
           cheapMove (ASMOP_A, 0, right->aop, i, true, true);
@@ -1660,9 +1659,7 @@ genPlus (const iCode *ic)
           started = true;
           continue;
         }
-      else
-#endif
-      if (right->aop->type == AOP_STK)
+      else if (right->aop->type == AOP_STK)
         {
           if (!moved_to_a)
             cheapMove (ASMOP_A, 0, left->aop, i, true, !started);

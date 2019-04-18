@@ -2132,7 +2132,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
   
         if (right->aop->type == AOP_STK)
           {
-            if (!regDead (P_IDX, ic))
+            if (!regDead (P_IDX, ic) || i + 1 < size && aopInReg(left->aop, i + 1, P_IDX))
               {
                 cost (1000, 1000);
                 wassert (regalloc_dry_run);

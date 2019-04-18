@@ -4,7 +4,7 @@
 	  Fix addc m, a, patch by Nicolas Lesser,
 	  fix subs m, a.
 	* src/pdk/gen.c:
-	  +=, -= optimization.
+	  +=, -= optimization; fix wide == between stack and register operand.
 
 2019-04-17 Philipp Klaus Krause <pkk AT spth.de>
 

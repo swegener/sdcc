@@ -47,8 +47,8 @@ testTortureExecute (void)
   test (1, VALUE, AFTER);
   test (2, 2, VALUE, AFTER);
   test (3, 2, 3, VALUE, AFTER);
-#if !defined(__SDCC_pdk15) // Lack of memory.
   test (4, 2, 3, 4, VALUE, AFTER);
+#if !defined(__SDCC_pdk15) // Lack of memory.
   test (5, 2, 3, 4, 5, VALUE, AFTER);
   test (6, 2, 3, 4, 5, 6, VALUE, AFTER);
   test (7, 2, 3, 4, 5, 6, 7, VALUE, AFTER);

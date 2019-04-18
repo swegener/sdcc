@@ -1114,7 +1114,15 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           pushed_a = true;
         }
 
-      if (!started && i + 1 == size && aopIsLitVal (left_aop, i, 1, 0x00))
+      if ((left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)) && right_aop->type != AOP_STK && aopSame (left_aop, i, result_aop, i, 1))
+        {
+          cheapMove (ASMOP_A, 0, right_aop, i, true, true);
+          emit2 (started ? "subc" : "sub", "%s, a", aopGet (left_aop, i));
+          cost (1, 1);
+          started = true;
+          continue;
+        }
+      else if (!started && i + 1 == size && aopIsLitVal (left_aop, i, 1, 0x00))
         {
           cheapMove (ASMOP_A, 0, right_aop, i, true, true);
           emit2 ("neg", "a");

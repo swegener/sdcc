@@ -192,7 +192,7 @@ int cl_pdk::execute_pdk14(unsigned int code) {
   } else if (CODE_MASK(0x0D80, 0x7F)) {
     // subc a, m
     regs.a = sub_to(regs.a, get_mem(code & 0x7F), get_flag(flag_c));
-  } else if (CODE_MASK(0x0880, 0x7F)) {
+  } else if (CODE_MASK(0x0980, 0x7F)) {
     // subc m, a
     int addr = code & 0x7F;
     ram->write(addr, sub_to(get_mem(addr), regs.a, get_flag(flag_c)));

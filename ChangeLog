@@ -2,6 +2,8 @@
 
 	* src/pdk/gen.c:
 	  Fix bug #2904.
+	* src/z80/gen.c:
+	  Implement RFE #623.
 
 2019-04-18 Philipp Klaus Krause <pkk AT spth.de>
 

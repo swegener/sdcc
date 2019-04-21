@@ -10058,7 +10058,7 @@ genPointerGet (const iCode *ic)
     pair = getPairId (AOP (left));
   else
     {
-      if (!isPairDead (pair, ic) && size > 1)
+      if (!isPairDead (pair, ic) && size > 1 && (getPairId (AOP (left)) != pair || rightval || IS_BITVAR (retype) || size > 2)) // For simple cases, restoring via dec is cheaper than push / pop.
         _push (pair), pushed_pair = TRUE;
       if (AOP_TYPE(left) == AOP_IMMD)
         {
@@ -10082,7 +10082,13 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 
- if (getPairId (AOP (result)) == PAIR_HL || size == 2 && (aopInReg (result->aop, 0, L_IDX) || aopInReg (result->aop, 0, H_IDX)))
+ if (isPair (AOP (result)) && IS_EZ80_Z80 && getPairId (AOP (left)) == PAIR_HL && !IS_BITVAR (retype))
+   {
+     emit2 ("ld %s, (hl)", _pairs[getPairId (AOP (result))].name);
+     regalloc_dry_run_cost += 2;
+     goto release;
+   }
+ else if (getPairId (AOP (result)) == PAIR_HL || size == 2 && (aopInReg (result->aop, 0, L_IDX) || aopInReg (result->aop, 0, H_IDX)))
     {
       wassertl (size == 2, "HL must be of size 2");
       if (IS_RAB && getPairId (AOP (result)) == PAIR_HL && rightval_in_range)

@@ -1168,7 +1168,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           cost (1000, 1000);
         else
           wassertl (0, "Unimplemented p result in subtraction with stack operand");
-      if (i + 1 < size && result_aop->type == AOP_STK && (aopInReg (left_aop, i + 1, P_IDX) || aopInReg (right_aop + 1, i, P_IDX)))
+      if (i + 1 < size && result_aop->type == AOP_STK && (aopInReg (left_aop, i + 1, P_IDX) || aopInReg (right_aop, i + 1, P_IDX)))
         if (regalloc_dry_run)
           cost (1000, 1000);
         else

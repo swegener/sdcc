@@ -1,3 +1,8 @@
+2019-04-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Fix note on endianness.
+
 2019-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:

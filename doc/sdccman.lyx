@@ -63823,7 +63823,8 @@ Endianness
 \end_inset
 
  format (i.e.
- lowest order first).
+ lowest order first) for most backends.
+ However, the hc08, s08 and stm8 backends are big-endian.
 \end_layout
 
 \begin_layout Subsection

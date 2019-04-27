@@ -1,5 +1,11 @@
 2019-04-27 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/pdk/ralloc.c,
+	  src/pdk/gen.c:
+	  Improve register packing.
+
+2019-04-27 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/pdk/gen.c,
 	  src/pdk/peeph.def:
 	  Improve workaround for missing addc/subc a, k; improve shifts by 7, 15, etc; fix handling of non-dead a in wide right shifty by literal.

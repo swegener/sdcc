@@ -341,8 +341,13 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
     return 0;                /* non-local */
 
   /* for now handle results from assignments from globals only */
-  if (dic->op != '=' || !isOperandGlobal (IC_RIGHT (dic)))
+  if (!(dic->op == '=' || dic->op == CAST && SPEC_USIGN (getSpec (operandType (IC_RIGHT (dic)))) && operandSize (op) > operandSize (IC_RIGHT (dic)))
+    || !isOperandGlobal (IC_RIGHT (dic)))
     return 0;
+
+  if (IS_OP_VOLATILE (IC_RESULT (ic)) && IS_OP_VOLATILE (IC_RIGHT (dic)))
+    return 0;
+
   /* also make sure the intervenening instructions
      don't have any thing in far space */
   for (iCode *nic = dic->next; nic && nic != ic; nic = nic->next)
@@ -473,10 +478,53 @@ packRegisters (eBBlock * ebp)
 
       /* In some cases redundant moves can be eliminated */
       if (ic->op == GET_VALUE_AT_ADDRESS || ic->op == SET_VALUE_AT_ADDRESS ||
-        ic->op == '+' || ic->op == '-' ||
+        ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS ||
+        ic->op == '|' || ic->op == '&' || ic->op == '^' ||
+        ic->op == EQ_OP || ic->op == NE_OP ||
         ic->op == IFX && operandSize (IC_COND (ic)) == 1 ||
-        ic->op == IPUSH && operandSize (IC_LEFT (ic)) == 1)
+        ic->op == IPUSH && operandSize (IC_LEFT (ic)) == 1 ||
+        ic->op == LEFT_OP || ic->op == RIGHT_OP)
         packRegsForOneuse (ic, &(IC_LEFT (ic)), ebp);
+      if (ic->op == '+' || ic->op == '-' ||
+        ic->op == '|' || ic->op == '&' || ic->op == '^' ||
+        ic->op == EQ_OP || ic->op == NE_OP ||
+        ic->op == LEFT_OP || ic->op == RIGHT_OP)
+        packRegsForOneuse (ic, &(IC_RIGHT (ic)), ebp);
+
+      // Optimize out some unsigned upcasts.
+      if (ic->op == CAST && IS_ITEMP (IC_RESULT (ic)) && !IS_OP_VOLATILE (IC_RIGHT (ic)) &&
+        bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1 && hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (ic)))) == ic->next &&
+        SPEC_USIGN (getSpec (operandType (IC_RIGHT (ic)))) && operandSize (IC_RESULT (ic)) >= operandSize (IC_RIGHT (ic)) && !IS_BOOL (operandType (IC_RESULT (ic))))
+        {
+          iCode *use = ic->next;
+          operand *op = IC_RESULT (ic);
+          if ((use->op == LEFT_OP || use->op == '+' || use->op == '-' || use->op == UNARYMINUS ||
+            use->op == '&' || use->op == '|' || use->op == '^') &&
+            IC_LEFT (use)->key == op->key && (!IC_RIGHT(use) || IC_RIGHT (use)->key != op->key))
+            {
+              bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
+              bitVectSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, use->key);
+              IC_LEFT (use) = operandFromOperand (IC_RIGHT(ic));
+              remiCodeFromeBBlock (ebp, ic);
+              hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
+              if(ic->prev)
+                ic = ic->prev;
+            }
+          else if (((use->op == SET_VALUE_AT_ADDRESS && !IS_BITVAR (getSpec (operandType (IC_LEFT (use)))) && !IS_BITVAR (getSpec (operandType (IC_RIGHT (use))))) ||
+            use->op == CAST && (SPEC_USIGN (getSpec (operandType (IC_RIGHT (use)))) || operandSize (IC_RESULT (use)) <= operandSize (IC_RIGHT (use))) ||
+            use->op == LEFT_OP || use->op == RIGHT_OP || use->op == '+' || use->op == '-' ||
+            use->op == '&' || use->op == '|' || use->op == '^') &&
+            IC_RIGHT (use)->key == op->key && (!IC_LEFT(use) || IC_LEFT (use)->key != op->key))
+            {
+              bitVectUnSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, ic->key);
+              bitVectSetBit (OP_SYMBOL (IC_RIGHT (ic))->uses, use->key);
+              IC_RIGHT (use) = operandFromOperand (IC_RIGHT(ic));
+              remiCodeFromeBBlock (ebp, ic);
+              hTabDeleteItem (&iCodehTab, ic->key, ic, DELETE_ITEM, NULL);
+              if(ic->prev)
+                ic = ic->prev;
+            }
+        }
     }
 }
 

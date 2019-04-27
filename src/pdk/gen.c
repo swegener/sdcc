@@ -2112,7 +2112,8 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
 
   int size = max (left->aop->size, right->aop->size);
 
-  if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX) || aopInReg (right->aop, 1, A_IDX))
+  if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX) || aopInReg (right->aop, 1, A_IDX) ||
+     !aopInReg (left->aop, 0, A_IDX) && right->aop->type == AOP_CODE)
     {
       operand *temp = left;
       left = right;
@@ -2145,7 +2146,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
       {
         cheapMove (ASMOP_A, 0, left->aop, i, true, true);
   
-        if (right->aop->type == AOP_STK)
+        if (right->aop->type == AOP_STK || right->aop->type == AOP_CODE)
           {
             if (!regDead (P_IDX, ic) || i + 1 < size && aopInReg(left->aop, i + 1, P_IDX))
               {
@@ -2157,13 +2158,13 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
   
         if (ifx && i + 1 == size && ((ic->op == EQ_OP) ^ (bool)(IC_FALSE(ifx))))
           {
-            emit2 ("cneqsn", "a, %s", right->aop->type == AOP_STK ? "p" : aopGet (right->aop, i));
+            emit2 ("cneqsn", "a, %s", (right->aop->type == AOP_STK || right->aop->type == AOP_CODE) ? "p" : aopGet (right->aop, i));
             cost (1, 1);
             emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.0f);
           }
         else
           {
-            emit2 ("ceqsn", "a, %s", right->aop->type == AOP_STK ? "p" : aopGet (right->aop, i));
+            emit2 ("ceqsn", "a, %s", (right->aop->type == AOP_STK || right->aop->type == AOP_CODE) ? "p" : aopGet (right->aop, i));
             cost (1, 1);
             emitJP(lbl_ne, 0.0f);
           }

@@ -1137,6 +1137,13 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           cost (1, 1);
           started = true;
         }
+     else if (started && (right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD) && !aopIsLitVal (right_aop, i, 1, 0x00) && i + 1 == size)
+        {
+          cheapMove (ASMOP_A, 0, left_aop, i, true, true);
+          emit2 ("subc", "a");
+          emit2 ("sub", "a, %s", aopGet (right_aop, i));
+          cost (2, 2);
+        }
       else if (started && (right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD) && !aopIsLitVal (right_aop, i, 1, 0x00))
         {
           cheapMove (ASMOP_P, 0, right_aop, i, !aopInReg (left_aop, i, A_IDX), false);
@@ -1681,6 +1688,14 @@ genPlus (const iCode *ic)
           cheapMove (ASMOP_A, 0, right->aop, i, true, !started);
           emit2 (started ? "addc" : "add", "a, p");
           cost (1, 1);
+        }
+      else if (started && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD) && !aopIsLitVal (right->aop, i, 1, 0x00) && i + 1 == size)
+        {
+          if (!moved_to_a)
+            cheapMove (ASMOP_A, 0, left->aop, i, true, true);
+          emit2 ("addc", "a");
+          emit2 ("add", "a, %s", aopGet (right->aop, i));
+          cost (2, 2);
         }
       else if (started && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD) && !aopIsLitVal (right->aop, i, 1, 0x00))
         {
@@ -2602,7 +2617,18 @@ genLeftShift (const iCode *ic)
 
       while (shCount)
         {
-          if (shCount >= 4 && (size - offset) == 1 && aopInReg (result->aop, offset, A_IDX))
+          if (shCount == 7 && (size - offset) == 1 && (result->aop->type == AOP_REG || result->aop->type == AOP_DIR))
+            {
+              emit2 ("sr", "%s", aopGet (result->aop, offset));
+              if (aopInReg (result->aop, 0, A_IDX))
+                emit2("mov", "a, #0x00");
+              else
+                emit2 ("clear", "%s", aopGet (result->aop, offset));
+              emit2 ("src", "%s", aopGet (result->aop, offset));
+              shCount = 0;
+              continue;
+            }
+          else if (shCount >= 4 && (size - offset) == 1 && aopInReg (result->aop, offset, A_IDX))
             {
               emit2 ("swap", "a");
               emit2 ("and", "a, #0xf0");
@@ -2701,7 +2727,7 @@ genRightShift (const iCode *ic)
 
       if (SPEC_USIGN (getSpec (operandType (left))))
         {
-          genMove_o (result->aop, 0, left->aop, shCount / 8, result->aop->size, true);
+          genMove_o (result->aop, 0, left->aop, shCount / 8, result->aop->size, regDead (A_IDX, ic));
           size -= shCount / 8;
           shCount %= 8;
         }
@@ -2727,7 +2753,18 @@ genRightShift (const iCode *ic)
 
       while (shCount)
         {
-          if (SPEC_USIGN (getSpec (operandType (left))) && shCount >= 4 && size == 1 && aopInReg (result->aop, 0, A_IDX))
+          if (SPEC_USIGN (getSpec (operandType (left))) && shCount == 7 && size == 1 && (result->aop->type == AOP_REG || result->aop->type == AOP_DIR))
+            {
+              emit2 ("sl", "%s", aopGet (result->aop, 0));
+              if (aopInReg (result->aop, 0, A_IDX))
+                emit2("mov", "a, #0x00");
+              else
+                emit2 ("clear", "%s", aopGet (result->aop, 0));
+              emit2 ("slc", "%s", aopGet (result->aop, 0));
+              shCount = 0;
+              continue;
+            }
+          else if (SPEC_USIGN (getSpec (operandType (left))) && shCount >= 4 && size == 1 && aopInReg (result->aop, 0, A_IDX))
             {
               emit2 ("swap", "a");
               emit2 ("and", "a, #0x0f");

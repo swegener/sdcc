@@ -16,6 +16,16 @@ replace restart {
 } if notVolatile(%1)
 
 replace restart {
+	mov	a, #0x00
+	slc	a
+	and	a, #0x01
+} by {
+	mov	a, #0x00
+	slc	a
+	; peephole 3 removed redundant and.
+}
+
+replace restart {
 %1:
 } by {
 	; peephole j0 removed unused label %1.

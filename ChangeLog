@@ -1,3 +1,11 @@
+2019-05-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/include/string.h,
+	  device/lib/incl.mk,
+	  device/lib/memccpy.c,
+	  support/regression/tests/memory.c:
+	  Implement C2X memccpy().
+
 2019-04-27 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/ralloc.c,

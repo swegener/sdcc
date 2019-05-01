@@ -91,6 +91,7 @@ COMMON_SDCC = \
   _strspn.c \
   _strstr.c \
   _strtok.c \
+  memccpy.c \
   _memchr.c \
   _memcmp.c \
   _memset.c \

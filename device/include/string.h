@@ -63,6 +63,7 @@ typedef int errno_t;
 /* Todo: fix the "restrict" stuff for C99 compliance. */
 
 /* Copying functions: */
+void *memccpy (void */*restrict*/ dst, const void */*restict*/ src, int c, size_t n);
 extern void *memcpy (void * /*restrict */ dest, const void * /*restrict*/ src, size_t n);
 #if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka)
 extern void *memmove (void *dest, const void *src, size_t n) __preserves_regs(iyl, iyh);

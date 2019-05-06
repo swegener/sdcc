@@ -111,7 +111,8 @@ class cl_console_base: public cl_base
   class cl_cmd *last_command;
   //class cl_cmdline *last_cmdline;
   chars last_cmd;
-
+  chars startup_command;
+  
   char nl;
   chars lbuf;
 

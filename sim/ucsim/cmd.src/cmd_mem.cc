@@ -473,7 +473,7 @@ COMMAND_DO_WORK_UC(cl_memory_cell_cmd)
       if (m->is_address_space())
 	as= (cl_address_space *)m;
     }
-  if (m == 0)
+  if (as == 0)
     return syntax_error(con), false;
 
   if (!c)

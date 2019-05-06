@@ -6,6 +6,7 @@ uCsim \- Micro\-controller simulator
 .BR \-t type
 .BR \-X freq[k|M]
 .BR \-C file
+.BR \-e command
 .BR \-c file
 .BR \-Z portnum
 .BR \-s file
@@ -44,6 +45,12 @@ suffix to specify frequency in kHz or MHz.
 Read initial commands from
 .I file
 and execute them.
+.PP
+.TP
+.B \-e command
+Execute
+.I command
+at program startup (before config file).
 .PP
 .TP
 .B \-c file

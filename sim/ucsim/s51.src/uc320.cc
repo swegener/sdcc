@@ -219,6 +219,8 @@ cl_uc320::exec_inst(void)
   int res;
   t_mem code;
 
+  instPC= PC;
+
   code= rom->read(PC);
   res= cl_uc521::exec_inst();
 

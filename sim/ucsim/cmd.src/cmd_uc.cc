@@ -619,7 +619,8 @@ cl_where_cmd::do_real_work(class cl_uc *uc,
     bool found= mem->search_next(case_sensitive, array, len, &addr);
     while (found)
       {
-	mem->dump(addr, addr+len-1, 8, con->get_fout());
+	if (con->get_fout())
+	  mem->dump(addr, addr+len-1, 8, con->get_fout());
 	addr++;
 	found= mem->search_next(case_sensitive, array, len, &addr);
       }

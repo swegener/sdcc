@@ -563,6 +563,8 @@ cl_z80::exec_inst(void)
 {
   t_mem code;
 
+  instPC= PC;
+
   if (fetch(&code))
     return(resBREAKPOINT);
   tick(1);

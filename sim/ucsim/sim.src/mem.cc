@@ -187,6 +187,9 @@ cl_memory::dump(t_addr start, t_addr stop, int bpl, class cl_f *f)
   t_addr lva= lowest_valid_address();
   t_addr hva= highest_valid_address();
 
+  if (!f)
+    return dump_finished;
+  
   if (start < lva)
     start= lva;
   if (start > hva)
@@ -414,6 +417,8 @@ cl_memory::dump_i(t_addr start, t_addr stop, int bpl, class cl_f *f)
 t_addr
 cl_memory::dump(class cl_f *f)
 {
+  if (!f)
+    return dump_finished;
   return(dump(dump_finished, dump_finished+10*8-1, 8, f));
 }
 
@@ -425,6 +430,8 @@ cl_memory::dump(enum dump_format fmt,
   t_addr lva= lowest_valid_address();
   t_addr hva= highest_valid_address();
 
+  if (!f)
+    return dump_finished;
   if (start < 0)
     start= dump_finished;
   if (stop < 0)

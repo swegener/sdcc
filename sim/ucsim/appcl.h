@@ -91,6 +91,7 @@ public:
   class cl_options *options;
   int going;
   long expr_result;
+  chars startup_command;
   
 public:
   cl_app(void);

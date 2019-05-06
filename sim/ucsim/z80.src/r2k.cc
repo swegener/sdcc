@@ -551,6 +551,7 @@ cl_r2k::exec_inst(void)
   t_mem code;
   
   ins_start = PC;
+  instPC = PC;
   
   if (fetch(&code))
     return(resBREAKPOINT);

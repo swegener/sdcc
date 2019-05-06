@@ -464,6 +464,8 @@ cl_hc08::exec_inst(void)
     return(resGO);
   }
 
+  instPC= PC;
+
   if (fetch(&code))
     return(resBREAKPOINT);
   tick(1);

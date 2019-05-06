@@ -993,6 +993,8 @@ int cl_xa::exec_inst(void)
   int i;
   int operands;
 
+  instPC= PC;
+
   if (fetch(&code1))
     return(resBREAKPOINT);
   tick(1);

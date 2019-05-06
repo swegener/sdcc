@@ -512,9 +512,10 @@ int
 cl_tlcs::exec_inst(void)
 {
   t_mem c1, c2, c3, c4;//, c5, c6;
-  //t_addr instPC= PC;
   int res= resGO;
-  
+
+  instPC= PC;
+
   if (fetch(&c1))
     return resBREAKPOINT;
   tick(1);

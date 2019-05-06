@@ -998,6 +998,9 @@ cl_stm8::exec_inst(void)
 	}
   }
   */
+
+  instPC= PC;
+
   if (fetch(&code)) {
     //printf("******************** break \n");
 	  return(resBREAKPOINT);

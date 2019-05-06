@@ -484,13 +484,14 @@ cl_lr35902::print_regs(class cl_console_base *con)
 
 int
 cl_lr35902::exec_inst(void)
-{
-  t_mem code;
-
-  if (fetch(&code))
-    return(resBREAKPOINT);
-  tick(1);
-  
+{
+  t_mem code;
+
+  instPC= PC;
+
+  if (fetch(&code))
+    return(resBREAKPOINT);
+  tick(1);
   switch (code)
     {
     case 0x00: return(inst_nop(code));

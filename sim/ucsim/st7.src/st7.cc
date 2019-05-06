@@ -499,6 +499,7 @@ cl_st7::exec_inst(void)
 		return(resGO);
 	}
 
+  instPC= PC;
 
   if (fetch(&code)) {
     //printf("******************** break \n");

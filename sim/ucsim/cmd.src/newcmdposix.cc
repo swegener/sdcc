@@ -285,7 +285,17 @@ cl_console::read_line(void)
   int b[2]= { 0, 0 };
 
   do {
-    i= fin->read(b, 1);
+    if (startup_command.nempty())
+      {
+	char *s= startup_command;
+	b[0]= s[0];
+	startup_command= &s[1];
+	i= 1;
+      }
+    else
+      {
+	i= fin->read(b, 1);
+      }
     if (i < -1)
       {
 	return -1;

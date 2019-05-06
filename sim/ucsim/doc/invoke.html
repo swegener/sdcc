@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
-    <title>&mu;Csim: Invokation</title>
+    <title>&#956;Csim: Invokation</title>
   </head>
   <body style=" background-color: white;">
     <h1>Starting the simulator</h1>
@@ -17,8 +17,8 @@
       </b>Padauk family is simulated by <b>spdk</b></p>
     <p>The simulator can be started in the following way: </p>
     <p><tt><font color="blue">$</font> s51 [-hHVvPgGw] [-p prompt] [-t CPU] [-X
-        freq[k|M]] [-C cfg_file] [-c file] [-s file] [-S optionlist] [-a nr] [-Z
-        portnum] [-k portnum] [files...]</tt> </p>
+        freq[k|M]] [-C cfg_file] [-e command] [-c file] [-s file] [-S
+        optionlist] [-a nr] [-Z portnum] [-k portnum] [files...]</tt> </p>
     <p>Specified files must be names of Intel hex files. Simulator loads them in
       the specified order into the ROM of the simulated system.If the file is
       specified without extension, the simulator will try to find intel hex file
@@ -48,14 +48,16 @@
         <a name="coption"></a></dd>
       <dt><span style="font-family: monospace;"><b>-C cfg_file</b></span></dt>
       <dd>Read and execute initial commands from specified file.</dd>
+      <dt><b><span style="font-family: monospace;">-e command</span></b></dt>
+      <dd>Execute command at program startup (before config file).</dd>
       <dt><a name="coption"><tt><b>-c file</b></tt></a> </dt>
       <dd>Open command console on <b>file</b>. Command consoles are on standard
         input and output by default. Using this option the console can be opened
         on any file for example on the serial interface of the computer. <a name="Zoption"></a></dd>
       <dt><a name="Zoption"><tt><b>-Z portnum</b></tt></a> </dt>
       <dd>Listen for incoming connections on port <b>portnum</b>. Using this
-        option <i>&mu;Csim</i> can serve multiple consoles. You can get a console
-        by simply telnet into machine running <i>&mu;Csim</i> to port <b>portnumber</b>.
+        option <i>&#956;Csim</i> can serve multiple consoles. You can get a console
+        by simply telnet into machine running <i>&#956;Csim</i> to port <b>portnumber</b>.
         This option is not available on platforms which doesn't support BSD
         networking. <br>
         See <a href="mulcons.html">how to use multiple consoles</a>. </dd>
@@ -71,9 +73,10 @@
         nowhere and it will never receive anything. If you are going to
         communicate with serial interface interactively the best idea is to
         specify a terminal with -s option. </dd>
-      <dt><tt><b>-S uart=nr,in=file,out=file,port=nr,iport=nr,oport=nr</b></tt> </dt>
+      <dt><tt><b>-S uart=nr,in=file,out=file,port=nr,iport=nr,oport=nr</b></tt>
+      </dt>
       <dd>Using this option you can specify different files for input and output
-        streams that <i>&mu;Csim</i> uses to simulate microprocessor's serial
+        streams that <i>&#956;Csim</i> uses to simulate microprocessor's serial
         interface. <br>
         See <a href="serial.html">more about serial interface simulation</a>. </dd>
       <dt><span style="font-family: monospace;"><b>-I

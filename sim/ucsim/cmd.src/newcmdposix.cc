@@ -238,6 +238,8 @@ bool
 cl_console::input_avail(void)
 {
   bool ret= false;
+  if (startup_command.nempty())
+    return true;
   if (input_active())
     {
       ret= fin->input_avail();
@@ -507,6 +509,10 @@ cl_commander::init(void)
 	  in->interactive(out);
 	  add_console(con= new cl_console(in, out, app));
 	  config_console= exec_on(con, Config);
+	  if (config_console)
+	    config_console->set_startup(app->startup_command);
+	  else
+	    con->set_startup(app->startup_command);
 	  need_config= false;
 	  if (in->tty)
 	    con->set_flag(CONS_INTERACTIVE, true);
@@ -526,21 +532,32 @@ cl_commander::init(void)
       in->interactive(out);
       add_console(con= new cl_console(in, out, app));
       config_console= exec_on(con, Config);
+      if (config_console)
+	config_console->set_startup(app->startup_command);
+      else
+	con->set_startup(app->startup_command);
       need_config= false;
       if (in->tty)
 	con->set_flag(CONS_INTERACTIVE, true);
     }
-  if (need_config &&
-      Config &&
-      *Config)
+  if (
+      need_config &&
+      (
+       (Config && *Config)
+       ||
+       app->startup_command.nempty()
+       )
+      )
     {
-      class cl_f *i, *o;
-      i= mk_io(Config, "r");
+      class cl_f *i= NULL, *o;
+      if (Config && *Config)
+	i= mk_io(Config, "r");
       o= cp_io(fileno(stderr), "w");
       con= new cl_console(/*fc*/i, /*stderr*/o, app);
       con->set_flag(CONS_NOWELCOME|CONS_ECHO, true);
       //exec_on(con, Config);
       config_console= con;
+      con->set_startup(app->startup_command);
       add_console(con);
     }
   return(0);
@@ -603,6 +620,16 @@ cl_commander::input_avail(void)
   bool ret= check_inputs(active_inputs, avail);
   avail->disconn_all();
   delete avail;
+  if (!ret)
+    for (int j = 0; j < cons->count; j++)
+    {
+      class cl_console *c = dynamic_cast<class cl_console*>((class cl_console_base*)(cons->at(j)));
+      chars *s= c->get_startup();
+      if (s->nempty())
+	{
+	  return true;
+	}
+    }
   return ret;
 }
 
@@ -631,9 +658,9 @@ cl_commander::proc_input(void)
       if (config_console &&
 	  (config_console != c))
 	continue;
-      
+
       if (c->input_active() &&
-	  f)
+	  (f || c->has_startup()))
         {
 	  if (c->input_avail())
             {

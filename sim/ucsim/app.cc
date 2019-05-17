@@ -336,7 +336,8 @@ cl_app::proc_arguments(int argc, char *argv[])
 		  "parameter of -C as config file\n");
 	break;
       case 'e':
-	startup_command= optarg;
+	startup_command+= optarg;
+	startup_command+= chars("\n");
 	break;
 #ifdef SOCKET_AVAIL
       case 'Z': case 'r':

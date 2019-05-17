@@ -21,6 +21,8 @@
 
 - Variables
 
+- New option: "-e command" to specify startup command
+
 
 0.5
 

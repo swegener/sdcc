@@ -229,14 +229,11 @@ cast_expr
 	  $$= $4.memory->read($4.address);
 	  if ($2 == PTOK_INT)
 	    {
-	      u32_t smask;
-	      smask= 1 << ($4.memory->width - 1);
+	      // If the highest bit for the memory width is set
+	      // sign extend by setting all the bits above that.
+	      long smask= 1U << ($4.memory->width - 1);
 	      if ($$ & smask)
-		{
-		  u32_t mask;
-		  mask= -1 & ~($4.memory->data_mask);
-		  $$= $$ | mask;
-		}
+	        $$ |= ~(smask - 1);
 	    }
 	}
 ;

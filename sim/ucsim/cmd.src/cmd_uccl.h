@@ -52,7 +52,8 @@ COMMAND_METHODS_ON(uc,cl_where_cmd)
 COMMAND_TAIL;
 COMMAND_DATA_ANCESTOR_ON(uc,cl_Where_cmd,cl_where_cmd,int last);
 
-  COMMAND_ON(uc,cl_var_cmd);
+COMMAND_ON(uc,cl_hole_cmd);
+COMMAND_ON(uc,cl_var_cmd);
   
 #endif
 

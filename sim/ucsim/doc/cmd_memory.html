@@ -98,7 +98,7 @@ under certain conditions; type `show c' for details.
     </p>
     <p>Search is done in whole memory and all matches are dumped out.
     </p>
-    <pre>$ <font color="#118811">/s51</font>
+    <pre>$ <font color="#118811">s51</font>
 ucsim 0.2.38-pre2, Copyright (C) 1997 Daniel Drotos, Talker Bt.
 ucsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
@@ -115,6 +115,42 @@ under certain conditions; type `show c' for details.
 &gt; <font color="#118811">Where xram "d ani"</font>
 0x0019 64 20 61 6e 69          d ani
 &gt; </pre>
+    <hr>
+    <a name="hole">
+      <h3>hole <i>[memory [length [value]]]</i></h3>
+    </a>
+    <p>Searching for a memory area where all locations are filled with
+    value. By default this command searches rom but any memory can be
+    specified. Areas shorter than specified length (default is 100)
+    will not be listed. Searched value is 0 (zero) by default but
+    other can be sepcified as the last patrameter.
+    </p>
+    <pre>$ <font color="#118811">s51</font>
+uCsim 0.6-pre55, Copyright (C) 1997 Daniel Drotos.
+uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
+0&gt; hole
+0x0000 65535
+0&gt; <font color="#118811">hole xram</font>
+0&gt; <font color="#118811">fill xram 0x100 0x1ff 11</font>
+0&gt; <font color="#118811">hole xram 50 11</font>
+0x0100 255
+0&gt; <font color="#118811">fill xram 0x500 0x600 11</font>
+0&ht; <font color="#118811">hole xram 50 11</font>    
+0x0100 255
+0x0500 256
+0&gt; <font color="#118811">rom[0x200]=1</font>
+1
+0&gt; <font color="#118811">hole</font>
+0x0000 511
+0x0201 65022
+0&gt; </pre>
+    <p>
+      Data of found areas are listed in two columns. First column is
+      the start address of the area in hexadecimal and the second
+      column is area lenght (in decimal).
+    </p>
     <hr>
     <a name="memory">
       <h3>memory</h3>

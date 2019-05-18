@@ -657,6 +657,110 @@ CMDHELP(cl_Where_cmd,
 	"Case sensitive search for data",
 	"long help of Where")
 
+
+/*
+ * Command: hole
+ *----------------------------------------------------------------------------
+ */
+
+COMMAND_DO_WORK_UC(cl_hole_cmd)
+{
+  class cl_cmd_arg *params[4]= { cmdline->param(0),
+				 cmdline->param(1),
+				 cmdline->param(2) };
+  class cl_memory *m= uc->rom;
+  
+  if (m)
+    {
+      t_mem v, a;
+      if (cmdline->syntax_match(uc, MEMORY NUMBER NUMBER))
+	{
+	  m= params[0]->value.memory.memory;
+	  a= params[1]->value.number;
+	  v= params[2]->value.number;
+	}
+      else if (cmdline->syntax_match(uc, MEMORY NUMBER))
+	{
+	  m= params[0]->value.memory.memory;
+	  a= params[1]->value.number;
+	  v= 0;
+	}
+      else if (cmdline->syntax_match(uc, MEMORY))
+	{
+	  m= params[0]->value.memory.memory;
+	  a= 100;
+	  v= 0;
+	}
+      else if (cmdline->syntax_match(uc, NUMBER NUMBER))
+	{
+	  a= params[0]->value.number;
+	  v= params[1]->value.number;
+	}
+      else if (cmdline->syntax_match(uc, NUMBER))
+	{
+	  a= params[0]->value.number;
+	  v= 0;
+	}
+      else
+	{
+	  a= 100;
+	  v= 0;
+	}
+      t_addr ad, l, h, sa= 0, len= 0;
+      t_mem mv;
+      bool in= false;
+      l= m->lowest_valid_address();
+      h= m->highest_valid_address();
+      //con->dd_printf("%s[0x%x-0x%0x] len=%d val=%d\n", m->get_name("mem"),
+      //	     l, h, a, v);
+      for (ad= l; ad <= h; ad++)
+	{
+	  mv= m->read(ad);
+	  if (!in && (mv==v))
+	    {
+	      // found start
+	      sa= ad;
+	      in= true;
+	      len= 0;
+	    }
+	  else if (in && (mv==v))
+	    {
+	      // still inside
+	      len++;
+	    }
+	  else if (in && (mv!=v))
+	    {
+	      // found end
+	      if (len >= a)
+		{
+		  con->dd_printf(m->addr_format, sa);
+		  con->dd_printf(" %u\n", AU(len));
+		}
+	      in= false;
+	    }
+	}
+      if (in &&
+	  len >= a)
+	{
+	  // found end after highest reached
+	  con->dd_printf(m->addr_format, sa);
+	  con->dd_printf(" %u\n", AU(len));
+	}
+    }
+  return false;
+}
+
+CMDHELP(cl_hole_cmd,
+	"hole [memory [length [value]]]",
+	"search area in memory (min length), filled with value",
+	"long help of hole")
+
+
+/*
+ * Command: var
+ *----------------------------------------------------------------------------
+ */
+
 COMMAND_DO_WORK_UC(cl_var_cmd)
 {
   class cl_cmd_arg *params[4]= { cmdline->param(0),

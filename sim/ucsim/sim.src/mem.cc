@@ -289,9 +289,32 @@ cl_memory::dump_s(t_addr start, t_addr stop, int bpl, class cl_f *f)
 	 (a <= hva))
     {
       char c= d;
+      int i= d;
+      chars s;
       if (a >= lva)
 	{
-	  f->write(&c, 1);
+	  switch (c)
+	    { // ' " ? \ a b f n r t v
+	    case '\'': s= (char*)"\\\'"; f->write((char*)s, s.len()); break;
+	    case '\"': s= (char*)"\\\""; f->write((char*)s, s.len()); break;
+	    case '\?': s= (char*)"\\\?"; f->write((char*)s, s.len()); break;
+	    case '\\': s= (char*)"\\\\"; f->write((char*)s, s.len()); break;
+	    case '\a': s= (char*)"\\a"; f->write((char*)s, s.len()); break;
+	    case '\b': s= (char*)"\\b"; f->write((char*)s, s.len()); break;
+	    case '\f': s= (char*)"\\f"; f->write((char*)s, s.len()); break;
+	    case '\n': s= (char*)"\\n"; f->write((char*)s, s.len()); break;
+	    case '\r': s= (char*)"\\r"; f->write((char*)s, s.len()); break;
+	    case '\t': s= (char*)"\\t"; f->write((char*)s, s.len()); break;
+	    case '\v': s= (char*)"\\v"; f->write((char*)s, s.len()); break;
+	    default:
+	      if (isprint(i))
+		f->write(&c, 1);
+	      else
+		{
+		  s.format("\\%03o", i);
+		  f->write((char*)s, s.len());
+		}
+	    }
 	  last= c;
 	}
       d= read(++a);

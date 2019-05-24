@@ -37,9 +37,12 @@ class cl_uc320: public cl_uc521
   void clear_sfr(void);
 
   virtual int clock_per_cycle(void) { return(4); }
+  virtual int tick(int cycles);
   virtual int tick_hw(int cycles);
 
  protected:
+  int pending_ticks;
+
   virtual int exec_inst(void);
 
   virtual int instruction_e0/*inst_movx_a_Sdptr*/(t_mem/*uchar*/ code); /* e0 */

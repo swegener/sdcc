@@ -844,8 +844,8 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
     }
     cset->add(cmd= new cl_get_option_cmd("option", 0));
     cmd->init();
-    cset->add(cmd= new cl_show_error_cmd("error", 0));
-    cmd->init();
+    /*cset->add(cmd= new cl_show_error_cmd("error", 0));
+      cmd->init();*/
   }
   if (!super_cmd)
     {

@@ -1020,16 +1020,6 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
     }
 
   /* found the definition */
-  /* replace the result with the result of */
-  /* this assignment and remove this assignment */
-  bitVectUnSetBit (OP_SYMBOL (IC_RESULT (dic))->defs, dic->key);
-  ReplaceOpWithCheaperOp (&IC_RESULT (dic), IC_RESULT (ic));
-
-  if (IS_ITEMP (IC_RESULT (dic)) && OP_SYMBOL (IC_RESULT (dic))->liveFrom > dic->seq)
-    {
-      OP_SYMBOL (IC_RESULT (dic))->liveFrom = dic->seq;
-    }
-  // TODO: and the otherway around?
 
   /* delete from liverange table also
      delete from all the points inbetween and the new
@@ -1040,6 +1030,17 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
       if (IS_ITEMP (IC_RESULT (dic)))
         bitVectSetBit (sic->rlive, IC_RESULT (dic)->key);
     }
+
+  /* replace the result with the result of */
+  /* this assignment and remove this assignment */
+  bitVectUnSetBit (OP_SYMBOL (IC_RESULT (dic))->defs, dic->key);
+  ReplaceOpWithCheaperOp (&IC_RESULT (dic), IC_RESULT (ic));
+
+  if (IS_ITEMP (IC_RESULT (dic)) && OP_SYMBOL (IC_RESULT (dic))->liveFrom > dic->seq)
+    {
+      OP_SYMBOL (IC_RESULT (dic))->liveFrom = dic->seq;
+    }
+  // TODO: and the otherway around?
 
   remiCodeFromeBBlock (ebp, ic);
   bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);

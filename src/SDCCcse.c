@@ -1638,7 +1638,11 @@ void
 unsetDefsAndUses (iCode * ic)
 {
   if (ic->op == JUMPTABLE)
-    return;
+    {
+      if (IS_SYMOP (IC_JTCOND (ic)))
+        bitVectUnSetBit (OP_USES (IC_JTCOND (ic)), ic->key);
+      return;
+    }
 
   /* take away this definition from the def chain of the */
   /* result & take away from use set of the operands */
@@ -1660,8 +1664,9 @@ unsetDefsAndUses (iCode * ic)
         bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
     }
   else
-    /* must be ifx turn off the use */ if (IS_SYMOP (IC_COND (ic)))
-    bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
+    /* must be ifx turn off the use */
+    if (IS_SYMOP (IC_COND (ic)))
+      bitVectUnSetBit (OP_USES (IC_COND (ic)), ic->key);
 }
 
 /*-----------------------------------------------------------------*/
@@ -2146,7 +2151,12 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
 
   /* if this block is not reachable */
   if (ebb->noPath)
-    return 0;
+    {
+      for (ic = ebb->sch; ic; ic = ic->next)
+        if (!SKIP_IC2 (ic))
+          unsetDefsAndUses (ic);
+      return 0;
+    }
 
   /* Mark incoming subexpressions as non-local */
   for (setnode = ebb->inExprs; setnode; setnode = setnode->next)
@@ -2443,6 +2453,9 @@ cseBBlock (eBBlock * ebb, int computeOnly, ebbIndex * ebbi)
          then delete it and continue */
       if (ASSIGNMENT_TO_SELF (ic) && !isOperandVolatile (IC_RIGHT(ic), FALSE))
         {
+          bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
+          if (IS_SYMOP (IC_RIGHT (ic)))
+            bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
           remiCodeFromeBBlock (ebb, ic);
           continue;
         }

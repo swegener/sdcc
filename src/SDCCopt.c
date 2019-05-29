@@ -1584,6 +1584,38 @@ isLocalWithoutDef (symbol * sym)
   return !sym->defs;
 }
 
+static void
+replaceRegEqvOperand (iCode * ic, operand ** opp, int force_isaddr, int new_isaddr)
+{
+  operand * op = *opp;
+  symbol * sym = OP_SYMBOL (op);
+  
+  if (isLocalWithoutDef (sym))
+    {
+      werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT, sym->name);
+      OP_REQV (op) = NULL;
+      sym->allocreq = 1;
+    }
+  else if (OP_REQV (op))
+    {
+      operand * nop;
+
+      nop = operandFromOperand (OP_REQV (op));
+
+      /* Copy def/use info from true symbol to register equivalent */
+      /* but only if this hasn't been done already. */
+      if (!OP_DEFS (nop))
+        OP_DEFS (nop) = bitVectCopy (OP_DEFS (op));
+      if (!OP_USES (nop))
+        OP_USES (nop) = bitVectCopy (OP_USES (op));
+
+      if (force_isaddr)
+        nop->isaddr = new_isaddr;
+
+      *opp = nop; /* Replace true sym operand with reg equiv */
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* replaceRegEqv - replace all local variables with their reqv     */
 /*-----------------------------------------------------------------*/
@@ -1593,6 +1625,60 @@ replaceRegEqv (ebbIndex * ebbi)
   eBBlock ** ebbs = ebbi->bbOrder;
   int count = ebbi->count;
   int i;
+
+  /* Reset all the def/use info (Otherwise there may be stale def/use */
+  /* info if a variable is also used in a previous functions) */
+  for (i = 0; i < count; i++)
+    {
+      iCode *ic;
+      
+      if (ebbs[i]->noPath)
+        continue;
+
+      for (ic = ebbs[i]->sch; ic; ic = ic->next)
+        {
+          if (SKIP_IC2 (ic))
+            continue;
+
+          if (ic->op == IFX)
+            {
+              if (IS_TRUE_SYMOP (IC_COND (ic)))
+                {
+                  OP_DEFS (IC_COND (ic)) = NULL;
+                  OP_USES (IC_COND (ic)) = NULL;
+                }
+              continue;
+            }
+
+          if (ic->op == JUMPTABLE)
+            {
+              if (IS_TRUE_SYMOP (IC_JTCOND (ic)))
+                {
+                  OP_DEFS (IC_JTCOND (ic)) = NULL;
+                  OP_USES (IC_JTCOND (ic)) = NULL;
+                }
+              continue;
+            }
+          
+          if (IS_TRUE_SYMOP (IC_RESULT (ic)))
+            {
+              OP_DEFS (IC_RESULT (ic)) = NULL;
+              OP_USES (IC_RESULT (ic)) = NULL;
+            }
+
+          if (IS_TRUE_SYMOP (IC_RIGHT (ic)))
+            {
+              OP_DEFS (IC_RIGHT (ic)) = NULL;
+              OP_USES (IC_RIGHT (ic)) = NULL;
+            }
+
+          if (IS_TRUE_SYMOP (IC_LEFT (ic)))
+            {
+              OP_DEFS (IC_LEFT (ic)) = NULL;
+              OP_USES (IC_LEFT (ic)) = NULL;
+            }
+        }
+    }
 
   /* Update the symbols' def bitvector so we know if there is   */
   /* a defining iCode or not. Only replace a local variable     */
@@ -1614,41 +1700,15 @@ replaceRegEqv (ebbIndex * ebbi)
 
           if (ic->op == IFX)
             {
-              if (IC_COND (ic) &&
-                  IS_TRUE_SYMOP (IC_COND (ic)) &&
-                  isLocalWithoutDef (OP_SYMBOL (IC_COND (ic))))
-                {
-                  werrorfl (ic->filename, ic->lineno,
-                          W_LOCAL_NOINIT,
-                          OP_SYMBOL (IC_COND (ic))->name);
-                  OP_REQV (IC_COND (ic)) = NULL;
-                  OP_SYMBOL (IC_COND (ic))->allocreq = 1;
-                }
-
-              if (IS_TRUE_SYMOP (IC_COND (ic)) && OP_REQV (IC_COND (ic)))
-                IC_COND (ic) = opFromOpWithDU (OP_REQV (IC_COND (ic)),
-                                               OP_DEFS (IC_COND (ic)),
-                                               OP_USES (IC_COND (ic)));
+              if (IS_TRUE_SYMOP (IC_COND (ic)))
+                replaceRegEqvOperand (ic, &IC_COND (ic), 0, 0);
               continue;
             }
 
           if (ic->op == JUMPTABLE)
             {
-              if (IC_JTCOND (ic) &&
-                  IS_TRUE_SYMOP (IC_JTCOND (ic)) &&
-                  isLocalWithoutDef (OP_SYMBOL (IC_JTCOND (ic))))
-                {
-                  werrorfl (ic->filename, ic->lineno,
-                          W_LOCAL_NOINIT,
-                          OP_SYMBOL (IC_JTCOND (ic))->name);
-                  OP_REQV (IC_JTCOND (ic)) = NULL;
-                  OP_SYMBOL (IC_JTCOND (ic))->allocreq = 1;
-                }
-
-              if (IS_TRUE_SYMOP (IC_JTCOND (ic)) && OP_REQV (IC_JTCOND (ic)))
-                IC_JTCOND (ic) = opFromOpWithDU (OP_REQV (IC_JTCOND (ic)),
-                                                 OP_DEFS (IC_JTCOND (ic)),
-                                                 OP_USES (IC_JTCOND (ic)));
+              if (IS_TRUE_SYMOP (IC_JTCOND (ic)))
+                replaceRegEqvOperand (ic, &IC_JTCOND (ic), 0, 0);
               continue;
             }
 
@@ -1659,66 +1719,17 @@ replaceRegEqv (ebbIndex * ebbi)
             }
 
           /* general case */
-          if (IC_RESULT (ic) &&
-              IS_TRUE_SYMOP (IC_RESULT (ic)) &&
-              OP_REQV (IC_RESULT (ic)))
+          if (IS_TRUE_SYMOP (IC_RESULT (ic)))
             {
               if (POINTER_SET (ic))
-                {
-                  IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
-                                                   OP_DEFS (IC_RESULT (ic)),
-                                                   OP_USES (IC_RESULT (ic)));
-                  IC_RESULT (ic)->isaddr = 1;
-                }
+                replaceRegEqvOperand (ic, &IC_RESULT (ic), 1, 1);
               else
-                {
-                  IC_RESULT (ic) = opFromOpWithDU (OP_REQV (IC_RESULT (ic)),
-                                                   OP_DEFS (IC_RESULT (ic)),
-                                                   OP_USES (IC_RESULT (ic)));
-                }
+                replaceRegEqvOperand (ic, &IC_RESULT (ic), 0, 0);
             }
-
-          if (IC_RIGHT (ic) &&
-              IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
-              isLocalWithoutDef (OP_SYMBOL (IC_RIGHT (ic))))
-            {
-              werrorfl (ic->filename, ic->lineno,
-                        W_LOCAL_NOINIT,
-                        OP_SYMBOL (IC_RIGHT (ic))->name);
-              OP_REQV (IC_RIGHT (ic)) = NULL;
-              OP_SYMBOL (IC_RIGHT (ic))->allocreq = 1;
-            }
-
-          if (IC_RIGHT (ic) &&
-              IS_TRUE_SYMOP (IC_RIGHT (ic)) &&
-              OP_REQV (IC_RIGHT (ic)))
-            {
-              IC_RIGHT (ic) = opFromOpWithDU (OP_REQV (IC_RIGHT (ic)),
-                                              OP_DEFS (IC_RIGHT (ic)),
-                                              OP_USES (IC_RIGHT (ic)));
-              IC_RIGHT (ic)->isaddr = 0;
-            }
-
-          if (IC_LEFT (ic) &&
-              IS_TRUE_SYMOP (IC_LEFT (ic)) &&
-              isLocalWithoutDef (OP_SYMBOL (IC_LEFT (ic))))
-            {
-              werrorfl (ic->filename, ic->lineno,
-                        W_LOCAL_NOINIT,
-                        OP_SYMBOL (IC_LEFT (ic))->name);
-              OP_REQV (IC_LEFT (ic)) = NULL;
-              OP_SYMBOL (IC_LEFT (ic))->allocreq = 1;
-            }
-
-          if (IC_LEFT (ic) &&
-              IS_TRUE_SYMOP (IC_LEFT (ic)) &&
-              OP_REQV (IC_LEFT (ic)))
-            {
-              IC_LEFT (ic) = opFromOpWithDU (OP_REQV (IC_LEFT (ic)),
-                                             OP_DEFS (IC_LEFT (ic)),
-                                             OP_USES (IC_LEFT (ic)));
-              IC_LEFT (ic)->isaddr = 0;
-            }
+          if (IS_TRUE_SYMOP (IC_RIGHT (ic)))
+            replaceRegEqvOperand (ic, &IC_RIGHT (ic), 1, 0);
+          if (IS_TRUE_SYMOP (IC_LEFT (ic)))
+            replaceRegEqvOperand (ic, &IC_LEFT (ic), 1, 0);
         }
     }
 }
@@ -1938,6 +1949,8 @@ killDeadCode (ebbIndex * ebbi)
                     }
 
                   /* delete the result */
+                  if (IC_RESULT (ic))
+                    bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
                   IC_RESULT (ic) = NULL;
 
                   if (volLeft || volRight)
@@ -3277,8 +3290,6 @@ eBBlockFromiCode (iCode *ic)
   change = 0;
   do
   {
-    if(TARGET_IS_DS390) /* Splitting live-ranges causes some regressions for ds390, probably by exposing other pre-existing bugs. */
-      break;
     recomputeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
     adjustIChain (ebbi->bbOrder, ebbi->count);
     ic = iCodeLabelOptimize (iCodeFromeBBlock (ebbi->bbOrder, ebbi->count));

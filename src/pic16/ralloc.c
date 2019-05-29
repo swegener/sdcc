@@ -3155,6 +3155,17 @@ pack:
   debugLog ("  packing. removing %s\n", OP_SYMBOL (IC_RIGHT (ic))->rname);
   debugLog ("  replacing with %s\n", OP_SYMBOL (IC_RESULT (dic))->rname);
   /* found the definition */
+
+  /* delete from liverange table also
+     delete from all the points inbetween and the new
+     one */
+    for (sic = dic; sic != ic; sic = sic->next)
+      {
+        bitVectUnSetBit (sic->rlive, IC_RESULT (ic)->key);
+        if (IS_ITEMP (IC_RESULT (dic)))
+          bitVectSetBit (sic->rlive, IC_RESULT (dic)->key);
+      }
+
   /* replace the result with the result of */
   /* this assignment and remove this assignment */
 
@@ -3165,15 +3176,6 @@ pack:
     if (IS_ITEMP (IC_RESULT (dic)) && OP_SYMBOL (IC_RESULT (dic))->liveFrom > dic->seq)
       {
         OP_SYMBOL (IC_RESULT (dic))->liveFrom = dic->seq;
-      }
-    /* delete from liverange table also
-       delete from all the points inbetween and the new
-       one */
-    for (sic = dic; sic != ic; sic = sic->next)
-      {
-        bitVectUnSetBit (sic->rlive, IC_RESULT (ic)->key);
-        if (IS_ITEMP (IC_RESULT (dic)))
-          bitVectSetBit (sic->rlive, IC_RESULT (dic)->key);
       }
 
     remiCodeFromeBBlock (ebp, ic);

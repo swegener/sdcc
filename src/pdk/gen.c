@@ -2784,18 +2784,35 @@ genRightShift (const iCode *ic)
           // So we need this emulation sequence here.
           if (!SPEC_USIGN (getSpec (operandType (left))))
             {
-              if (aopInReg (result->aop, size - 1, A_IDX) || aopInReg (result->aop, 0, A_IDX))
+              if (aopInReg (result->aop, size - 1, A_IDX) &&
+                regDead (P_IDX, ic) && (size == 1 || !aopInReg (result->aop, 0, P_IDX)))
                 {
-                  wassert (regalloc_dry_run);
-                  cost (500, 500);
+                  cheapMove (ASMOP_P, 0, ASMOP_A, 0, true, true);
+                  emit2 ("sl", "p");
+                  emit2 ("src", "a");
+                  cost (2, 2);
                 }
-              emit2 ("mov", "a, #0x01");
-              emit2 ("sl", aopGet (result->aop, size - 1));
-              emit2 ("t0sn", "f, c");
-              emit2 ("or", "%s, a", aopGet (result->aop, size - 1));
-              emit2 ("src", aopGet (result->aop, size - 1));
-              emit2 ("src", aopGet (result->aop, size - 1));
-              cost (6, 6);
+              else if (aopInReg (result->aop, size - 1, A_IDX))
+                {
+                   emit2 ("sl", "a");
+                   emit2 ("t0sn", "f, c");
+                   emit2 ("or", "a, #0x01", aopGet (result->aop, size - 1));
+                   emit2 ("src", "a");
+                   emit2 ("src", "a");
+                   cost (5, 5);
+                }
+              else
+                {
+                  if (size > 1 && aopInReg (result->aop, 0, A_IDX) || !regDead (A_IDX, ic))
+                    {
+                      wassert (regalloc_dry_run);
+                      cost (500, 500);
+                    }
+                   cheapMove (ASMOP_A, 0, result->aop, size - 1, true, true);
+                   emit2 ("sl", "a");
+                   emit2 ("src", aopGet (result->aop, size - 1));
+                   cost (2, 2);
+                }
             }
           else
             {

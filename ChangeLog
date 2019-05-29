@@ -2,6 +2,8 @@
 
 	* src/pdk/gen.c:
 	  Improve arithmetic right shift.
+	* src/hc08/gen.c:
+	  Minor improvements suggested by Tony Papadimitriou.
 
 2019-05-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

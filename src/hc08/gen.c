@@ -2981,7 +2981,10 @@ asmopToBool (asmop *aop, bool resultInA)
             {
               emitcode ("pshh", "");
               emitcode ("tst", "1,s");
-              emitcode ("ais", "#1");
+              if (IS_S08 && optimize.codeSpeed)
+                emitcode ("ais", "#1"); // 2 Bytes, 2 cycles.
+              else
+                emitcode ("pulh", ""); // 1 Byte, 2 (hc08) / 3 (s08) cycles.
               regalloc_dry_run_cost += 6;
             }
         }
@@ -4812,16 +4815,8 @@ genMultOneByte (operand * left, operand * right, operand * result)
       signed char val = (signed char) ulFromVal (AOP (right)->aopu.aop_lit);
 
       loadRegFromAop (hc08_reg_a, AOP (left), 0);
-      if (val < 0)
-        {
-          emitcode ("ldx", "#0x%02x", -val);
-          regalloc_dry_run_cost += 2;
-        }
-      else
-        {
-          emitcode ("ldx", "#0x%02x", val);
-          regalloc_dry_run_cost += 2;
-        }
+      emitcode ("ldx", "#0x%02x", val < 0 ? -val : val);
+      regalloc_dry_run_cost += 2;
       hc08_dirtyReg (hc08_reg_x, FALSE);
 
       emitcode ("mul", "");

@@ -4,12 +4,15 @@
 	  Improve arithmetic right shift.
 	* src/hc08/gen.c:
 	  Minor improvements suggested by Tony Papadimitriou.
+	* src/stm8/gen.c,
+	  support/regression/tests/gcc-torture-execute-stdarg-5.c:
+	  Improve addition flexibility wrt. register assignment.
 
 2019-05-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCcse.c,
 	  src/SDCCopt.c: fix some def/use bugs
-	* support/regression/tests/gcc-tortue-execute-stdarg-5.c:
+	* support/regression/tests/gcc-torture-execute-stdarg-5.c:
 	  disable test for stm8, unimplemented addition op
 	* src/mcs51/ralloc.c,
 	  src/ds390/ralloc.c,

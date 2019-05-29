@@ -3956,7 +3956,7 @@ genPlus (const iCode *ic)
             }
           i += 2;
         }
-      else if (rightop->type == AOP_REG || rightop->type == AOP_REGSTK && !aopOnStack (rightop, i, 1)) //todo: Implement handling of right operands that can't be directly added to a.
+      else if (aopInReg (rightop, i, A_IDX)) //todo: Implement handling of right operands that can't be directly added to a.
         {
           if (!regalloc_dry_run)
             wassertl (0, "Unimplemented addition operand.");
@@ -3991,12 +3991,21 @@ genPlus (const iCode *ic)
           else if (!started && i == size - 1 && (aopIsLitVal (rightop, i, 1, 1) || aopIsLitVal (rightop, i, 1, 255)))
             {
               emit3 (aopIsLitVal (rightop, i, 1, 1) ? A_INC : A_DEC, ASMOP_A, 0);
-              started = TRUE;
+              started = true;
+            }
+          else if (aopInReg (rightop, i, XL_IDX) || aopInReg (rightop, i, XH_IDX) || aopInReg (rightop, i, YL_IDX) || aopInReg (rightop, i, YH_IDX))
+            {
+              int right_offset;
+              const asmop *right_stacked;
+              wassert(right_stacked = stack_aop (rightop, i, &right_offset));
+              emit2 (started ? "adc" : "add", "a, (%d, sp)", right_offset);
+              pop (right_stacked, 0, 2);
+              started = true;
             }
           else
             {
               emit3_o (started ? A_ADC : A_ADD, ASMOP_A, 0, i < rightop->size ? rightop : ASMOP_ZERO, i);
-              started = TRUE;
+              started = true;
             }
 
           cheapMove (result->aop, i, ASMOP_A, 0, FALSE);

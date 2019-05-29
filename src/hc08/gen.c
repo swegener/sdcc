@@ -2981,11 +2981,18 @@ asmopToBool (asmop *aop, bool resultInA)
             {
               emitcode ("pshh", "");
               emitcode ("tst", "1,s");
+              regalloc_dry_run_cost += 4;
               if (IS_S08 && optimize.codeSpeed)
-                emitcode ("ais", "#1"); // 2 Bytes, 2 cycles.
+                {
+                  emitcode ("ais", "#1"); // 2 Bytes, 2 cycles.
+                  regalloc_dry_run_cost += 2;
+                }
               else
-                emitcode ("pulh", ""); // 1 Byte, 2 (hc08) / 3 (s08) cycles.
-              regalloc_dry_run_cost += 6;
+                {
+                  emitcode ("pulh", ""); // 1 Byte, 2 (hc08) / 3 (s08) cycles.
+                  regalloc_dry_run_cost += 1;
+                }
+              
             }
         }
       else if (IS_AOP_HX (aop))

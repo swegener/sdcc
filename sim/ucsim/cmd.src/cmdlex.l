@@ -64,6 +64,13 @@ static int uc_yy_input(char *buf, int max_size);
   return PTOK_NUMBER;
 }
 
+0b[01]+ {
+  yylval.number = 0;
+  for (int i= 2; yytext[i]; i++)
+    yylval.number = (yylval.number << 1) | (yytext[i] == '0' ? 0 : 1);
+  return PTOK_NUMBER;
+}
+
 [a-zA-Z_][0-9a-zA-Z_]*	return(uc_yy_check_id(yytext));
 
 .			return(yytext[0]);

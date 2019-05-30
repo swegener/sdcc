@@ -161,6 +161,14 @@ cl_cmdline::split(void)
 	    split_out_bit(dot, param_str);
 	  else if ((dot= strchr(param_str, '[')) != NULL)
 	    split_out_array(dot, param_str);
+	  else if (param_str[0] == '0' && param_str[1] == 'b')
+            {
+              long n= 0;
+	      for (int i= 2; param_str[i] == '0' || param_str[i] == '1'; i++)
+                n = (n << 1) | (param_str[i] == '0' ? 0 : 1);
+	      params->add(arg= new cl_cmd_int_arg(n));
+	      arg->init();
+            }
 	  else if (strchr("0123456789-+", *param_str) != NULL)
 	    {
 	      // number

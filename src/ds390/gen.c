@@ -11868,7 +11868,7 @@ genFarFarAssign (operand * result, operand * right, iCode * ic)
         }
     }
 
-  if (size > 1 && rSym && rSym->rname && !rSym->onStack)
+  if (size > 1 && rSym && rSym->rname && !rSym->onStack && !IS_OP_RUONLY (right))
     {
       /* We can use the '390 auto-toggle feature to good effect here. */
 
@@ -11964,7 +11964,7 @@ genAssign (iCode * ic)
   emitcode (";", "genAssign: resultIsFar = %s", isOperandInFarSpace (result) ? "TRUE" : "FALSE");
 
   /* special case both in far space */
-  if ((AOP_TYPE (right) == AOP_DPTR || AOP_TYPE (right) == AOP_DPTR2) &&
+  if ((AOP_TYPE (right) == AOP_DPTR || AOP_TYPE (right) == AOP_DPTR2 || IS_OP_RUONLY (right)) &&
       /* IS_TRUE_SYMOP(result)       && */
       isOperandInFarSpace (result))
     {

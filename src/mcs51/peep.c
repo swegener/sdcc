@@ -563,6 +563,7 @@ doPushScan (lineNode **pl, const char *pReg)
             /* this is what we're looking for */
             return TRUE;
           case S4O_VISITED:
+#if 0
             if (!pushPl)
               {
                 DEADMOVEERROR();
@@ -571,6 +572,9 @@ doPushScan (lineNode **pl, const char *pReg)
             *pl = pushPl;
             /* already checked */
             return TRUE;
+#else
+            return FALSE;
+#endif
           case S4O_CONDJMP:
 #if 0
             /* two possible destinations: recurse */

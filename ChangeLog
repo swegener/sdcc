@@ -1,6 +1,7 @@
 2019-05-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/ds390/gen.c: fix assignment into far space from dph/dpl
+	* src/mcs51/peep.c: fix bug #2909
 
 2019-05-29 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

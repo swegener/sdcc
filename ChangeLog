@@ -1,3 +1,8 @@
+2019-06-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bugs-1596270-1736867.c:
+	  re-enable test for ds390; it passes now
+
 2019-05-31 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/ds390/gen.c: fix assignment into far space from dph/dpl

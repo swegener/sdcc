@@ -40,10 +40,8 @@ testBug156270(void)
   s_Games_SI_BlockInit(b, 0, 1, 1);
   ASSERT(b[1].x == 1); /* 1596270 */
   ASSERT(b[1].y == 0); /* 1596270 */
-#ifndef __SDCC_ds390
   ASSERT(b[2].x == 2); /* 1596270 */
   ASSERT(b[2].y == 0); /* 1736867 */
-#endif
 #endif
 }
 

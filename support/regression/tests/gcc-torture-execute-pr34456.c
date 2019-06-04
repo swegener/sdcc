@@ -17,7 +17,7 @@ int errors;
 struct s { int elt; int (*compare) (int); };
 
 static int
-compare (const void *x, const void *y)
+compare (const void *x, const void *y) __reentrant
 {
   const struct s *s1 = x, *s2 = y;
   int (*compare1) (int);
@@ -37,11 +37,9 @@ struct s array[2] = { { 1, bad_compare }, { -1, bad_compare } };
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_ds390 // Bug #2883
 #if !defined(__SDCC_pdk14) && !defined (__SDCC_pdk15)
   qsort (array, 2, sizeof (struct s), compare);
   ASSERT (!(errors == 0));
-#endif
 #endif
 }
 

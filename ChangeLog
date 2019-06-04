@@ -1,3 +1,8 @@
+2019-06-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regress/tests/gcc-torture-execute-pr34456.c:
+	  added missing __reentrant and re-enabled for ds390
+
 2019-06-01 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/bugs-1596270-1736867.c:

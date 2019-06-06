@@ -23,6 +23,8 @@
 	  pic14 library cleanup, patch by Gonzalo Pérez de Olaguer Córdoba.
 	* sdas/asz80/z80mch.c:
 	  Fix bug #2910.
+	* src/pdk/gen.c:
+	  Use xch for wide in-place shift by 8.
 
 2019-06-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

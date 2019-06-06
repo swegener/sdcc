@@ -936,10 +936,34 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       cost (1, 1);
       return;
     }
-  else if (size >= 2 && result->type == AOP_DIR && source->type == AOP_DIR && !strcmp (result->aopu.aop_dir, source->aopu.aop_dir) && soffset < roffset) // Copy high-to-low to avoid overwriting of still-needed bytes.
+  else if (size >= 2 && result->type == AOP_DIR && source->type == AOP_DIR && !strcmp (result->aopu.aop_dir, source->aopu.aop_dir) && soffset < roffset)
     {
-      for (int i = size - 1; i >= 0; i--)
-        cheapMove (result, roffset + i, source, soffset + i, a_dead_global, true);
+      if (!a_dead_global)
+        pushAF();
+      if (soffset + 1 == roffset) // Use xch via a.
+        {
+          emit2 ("mov", "a, %s", aopGet (source, soffset));
+          for (int i = 0; i < size - 1; i++)
+            emit2 ("xch", "a, %s", aopGet (result, roffset + i));
+          emit2 ("mov", "%s, a", aopGet (result, roffset + size - 1));
+          cost (size + 1, size + 1);
+        }
+      else // Copy high-to-low to avoid overwriting of still-needed bytes.
+        {
+          for (int i = size - 1; i >= 0; i--)
+            cheapMove (result, roffset + i, source, soffset + i, true, true);
+        }
+      if (!a_dead_global)
+        popAF();
+      return;
+    }
+  else if (size >= 2 && result->type == AOP_DIR && source->type == AOP_DIR && !strcmp (result->aopu.aop_dir, source->aopu.aop_dir) && soffset > roffset && roffset + 1 == soffset && a_dead_global) // Use xch via a.
+    {
+      emit2 ("mov", "a, %s", aopGet (source, soffset + size - 1));
+      for (int i = size - 1; i > 0; i--)
+        emit2 ("xch", "a, %s", aopGet (result, roffset + i));
+      emit2 ("mov", "%s, a", aopGet (result, roffset));
+      cost (size + 1, size + 1);
       return;
     }
 

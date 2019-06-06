@@ -1157,7 +1157,7 @@ struct mne *mp;
                  * ld  ix,(hl)
                  * ld  iy,(hl)
                  */
-                if ((t1 == S_R16) && (t2 == S_IDHL)) {
+                if (mchtyp == X_EZ80 && (t1 == S_R16) && (t2 == S_IDHL)) {
                         if (v1 == SP) {
                                 aerr();
                                 break;
@@ -1181,7 +1181,7 @@ struct mne *mp;
                  * ld  (hl),ix
                  * ld  (hl),iy
                  */
-                if ((t2 == S_R16) && (t1 == S_IDHL)) {
+                if (mchtyp == X_EZ80 && (t2 == S_R16) && (t1 == S_IDHL)) {
                         if (v2 == SP) {
                                 aerr();
                                 break;
@@ -1205,7 +1205,7 @@ struct mne *mp;
                  * ld  ix,(ix+d)        ld  ix,(iy+d)
                  * ld  iy,(ix+d)        ld  iy,(iy+d)
                  */
-                if ((t1 == S_R16) && ((t2 == S_IDIX) || (t2 == S_IDIY))) {
+                if (mchtyp == X_EZ80 && (t1 == S_R16) && ((t2 == S_IDIX) || (t2 == S_IDIY))) {
                         if (v1 == SP) {
                                 aerr();
                                 break;
@@ -1240,7 +1240,7 @@ struct mne *mp;
                  * ld  (ix+d),ix        ld  (iy+d),ix
                  * ld  (ix+d),iy        ld  (iy+d),iy
                  */
-                if ((t2 == S_R16) && ((t1 == S_IDIX) || (t1 == S_IDIY))) {
+                if (mchtyp == X_EZ80 && (t2 == S_R16) && ((t1 == S_IDIX) || (t1 == S_IDIY))) {
                         if (v2 == SP) {
                                 aerr();
                                 break;

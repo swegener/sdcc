@@ -1,8 +1,10 @@
 /*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+   putchar.c - putchar dummy function
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+   Copyright (C) 2005, Vangelis Rokas <vrokas AT otenet.gr>
+
+   Modifications for PIC14 by
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -27,14 +29,12 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#include <stdio.h>
 
-#define _REENTRANT
+/* This is a dummy function so that sources compile,
+ * even when user doesn't give a putchar() function. */
 
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
-
-#endif	/* __PIC14_ASM_FEATURES_H */
+int getchar (void)
+{
+  return EOF;
+}

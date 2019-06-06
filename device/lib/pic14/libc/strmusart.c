@@ -1,8 +1,10 @@
 /*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+   strmusart.c - usart stream putchar
 
    Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+
+   Modifications for PIC14 by
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -27,14 +29,20 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#include <stdio.h>
+#include <pic16regs.h>
 
-#define _REENTRANT
+/* note that USART should already been initialized */
+static int
+__stream_usart_out (char c, FILE *stream)
+{
+  (void)stream;
+  while (!TXIF);
+  TXREG = c;
+  /* wait until the transmit buffer is empty */
+  while (!TRMT);
+  return 0;
+}
 
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
-
-#endif	/* __PIC14_ASM_FEATURES_H */
+static FILE f = __stream_usart_out;
+FILE *usart_out = &f;

@@ -1,8 +1,7 @@
-/*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+/*---------------------------------------------------------------------
+   qsort() - sort an array
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+   Copyright (C) 2018, Philipp Klaus Krause . krauseph@informatik.uni-freiburg.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -11,7 +10,7 @@
 
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License 
@@ -27,14 +26,38 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#include <stdlib.h>
 
-#define _REENTRANT
+// Despite the name, this is an insertion sort, since it tends to be smaller in code size.
 
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
+#if !(defined(__SDCC_pic14) && !defined(__SDCC_PIC14_HAS_PCALL))
+static void swap(void *restrict dst, void *restrict src, size_t n)
+{
+	unsigned char *restrict d = dst;
+	unsigned char *restrict s = src;
 
-#endif	/* __PIC14_ASM_FEATURES_H */
+	while(n--)
+	{
+		unsigned char tmp = *d;
+		*d = *s;
+		*s = tmp;
+		d++;
+		s++;
+	}
+}
+
+void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant)
+{
+	unsigned char *b = base;
+
+	if(nmemb <= 1)
+		return;
+
+	for(unsigned char *i = base; i < b + nmemb * size; i += size)
+	{
+		for(unsigned char *j = i; (j > b) && (*compar)(j, j - size) < 0; j -= size)
+			swap(j, j - size, size);
+	}
+}
+#endif
+

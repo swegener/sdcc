@@ -1,8 +1,10 @@
 /*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+   memfree.c - return size of all unallocated heap
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+   Copyright (C) 2005, Vangelis Rokas <vrokas at otenet.gr>
+
+   Modifications for PIC14 by
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -27,14 +29,26 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#include <pic14_malloc.h>
 
-#define _REENTRANT
-
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
-
-#endif	/* __PIC14_ASM_FEATURES_H */
+size_t memfree (void)
+{
+    _malloc_rec __data *head;
+    size_t size = 0;
+    size_t len;
+ 
+    if (_malloc_heap == NULL)
+      return 0;
+ 
+    head = _malloc_heap;
+ 
+    while ((len = head->bits.count) != 0)
+    {
+        if (!head->bits.alloc)
+            size += len - 1;
+  
+        head = NEXTREC(head);
+    }
+ 
+    return size;
+}

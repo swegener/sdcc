@@ -33,20 +33,48 @@ libm_a_SOURCES += tancotf.c
 libm_a_SOURCES += tanf.c
 libm_a_SOURCES += tanhf.c
 
-libm_a_CFLAGS = -p$(ARCH) $(AM_CFLAGS)
+libm_a_CFLAGS = $(AM_CFLAGS)
 
 if ENABLE_ENHANCED_PICS
 noinst_LIBRARIES += libme.a
-endif ENABLE_ENHANCED_PICS
 libme_a_SOURCES = $(libm_a_SOURCES)
-libme_a_CFLAGS = -p$(EARCH) $(AM_CFLAGS)
-if !ENABLE_EXTENDED_INSTRUCTIONS
-libme_a_CFLAGS += --no-extended-instructions
-endif !ENABLE_EXTENDED_INSTRUCTIONS
+libme_a_CFLAGS = $(AM_CFLAGS_E)
+endif ENABLE_ENHANCED_PICS
 
-# Use the generic code where possible.
-%.c: ../../%.c
-	test -e $(<D)/pic16/libm/$(@F) || ln -s $^ $@
-	test -e $@ || ln -s $(<D)/pic16/libm/$(@F) $@
+if ENABLE_NOOPTS
+noinst_LIBRARIES += libmo.a
+libmo_a_SOURCES = $(libm_a_SOURCES)
+libmo_a_CFLAGS = $(AM_CFLAGS_O)
+if ENABLE_ENHANCED_PICS
+noinst_LIBRARIES += libmeo.a
+libmeo_a_SOURCES = $(libm_a_SOURCES)
+libmeo_a_CFLAGS = $(AM_CFLAGS_EO)
+endif ENABLE_ENHANCED_PICS
+endif ENABLE_NOOPTS
 
+if ENABLE_EXPERIMENTAL
+noinst_LIBRARIES += libmx.a
+libmx_a_SOURCES = $(libm_a_SOURCES)
+libmx_a_CFLAGS = $(AM_CFLAGS_X)
+if ENABLE_ENHANCED_PICS
+noinst_LIBRARIES += libmex.a
+libmex_a_SOURCES = $(libm_a_SOURCES)
+libmex_a_CFLAGS = $(AM_CFLAGS_EX)
+endif ENABLE_ENHANCED_PICS
+endif ENABLE_EXPERIMENTAL
+
+if ENABLE_NOOPTS
+if ENABLE_EXPERIMENTAL
+noinst_LIBRARIES += libmox.a
+libmox_a_SOURCES = $(libm_a_SOURCES)
+libmox_a_CFLAGS = $(AM_CFLAGS_OX)
+if ENABLE_ENHANCED_PICS
+noinst_LIBRARIES += libmeox.a
+libmeox_a_SOURCES = $(libm_a_SOURCES)
+libmeox_a_CFLAGS = $(AM_CFLAGS_EOX)
+endif ENABLE_ENHANCED_PICS
+endif ENABLE_EXPERIMENTAL
+endif ENABLE_NOOPTS
+
+SOURCE_DIRS = $(srcdir)
 include $(top_srcdir)/Makefile.common

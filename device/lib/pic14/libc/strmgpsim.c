@@ -1,8 +1,10 @@
 /*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+   strmgpsim.c - gpsim stream putchar
 
    Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+
+   Modifications for PIC14 by
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -27,14 +29,22 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#include <stdio.h>
 
-#define _REENTRANT
+/* FIXME: ¿where does this come from?
+ *        It doesn't work for me and I see nothing about it in the gpsim sources.
+ */
 
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
+extern __sfr __at(0x0F7F) GPSIM_DEBUG;
 
-#endif	/* __PIC14_ASM_FEATURES_H */
+static int
+__stream_gpsim_out (char c, FILE *stream)
+{
+  (void)stream;
+  GPSIM_DEBUG = c;
+  return 0;
+}
+
+static FILE f = __stream_gpsim_out;
+FILE *gpsim_out = &f;
+

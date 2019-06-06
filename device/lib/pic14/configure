@@ -587,6 +587,12 @@ PACKAGE_URL=''
 ac_unique_file="libsdcc/idata.c"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+ENABLE_EXPERIMENTAL_FALSE
+ENABLE_EXPERIMENTAL_TRUE
+ENABLE_NOOPTS_FALSE
+ENABLE_NOOPTS_TRUE
+ENABLE_DEBUG_FALSE
+ENABLE_DEBUG_TRUE
 ENABLE_EXTENDED_INSTRUCTIONS_FALSE
 ENABLE_EXTENDED_INSTRUCTIONS_TRUE
 ENABLE_ENHANCED_PICS_FALSE
@@ -2386,7 +2392,9 @@ libdir=$libdir/pic14
 # the desired device (16fxxx).
 ARCH=${ARCH:-16f877}
 
-EARCH=${EARCH:-16f1934}
+# Previous default setting for EARCH was 16f1934, but gpsim doesn't support it.
+# It should be used the device with larger ROM and RAM sizes.
+EARCH=${EARCH:-16f1788}
 
 
 # We cannot use AC_PROG_CC(sdcc) as sdcc might not be built at configure-time...
@@ -2905,6 +2913,41 @@ else
 fi
 
 
+# default values for the following conditions
+: ${DEBUG:=0}
+: ${NOOPTS:=1}
+: ${EXPERIMENTAL:=1}
+
+# generate debug info during the build process
+ if  test x$DEBUG = x1 ; then
+  ENABLE_DEBUG_TRUE=
+  ENABLE_DEBUG_FALSE='#'
+else
+  ENABLE_DEBUG_TRUE='#'
+  ENABLE_DEBUG_FALSE=
+fi
+
+
+# build libraries with optimizations disabled
+ if  test x$NOOPTS = x1 ; then
+  ENABLE_NOOPTS_TRUE=
+  ENABLE_NOOPTS_FALSE='#'
+else
+  ENABLE_NOOPTS_TRUE='#'
+  ENABLE_NOOPTS_FALSE=
+fi
+
+
+# build libraries with experimental code enabled
+ if  test x$EXPERIMENTAL = x1 ; then
+  ENABLE_EXPERIMENTAL_TRUE=
+  ENABLE_EXPERIMENTAL_FALSE='#'
+else
+  ENABLE_EXPERIMENTAL_TRUE='#'
+  ENABLE_EXPERIMENTAL_FALSE=
+fi
+
+
 # Checks for libraries.
 
 # Checks for header files.
@@ -2913,7 +2956,7 @@ fi
 
 # Checks for library functions.
 
-ac_config_files="$ac_config_files Makefile libsdcc/enhanced/Makefile libsdcc/enhanced-no-xinst/Makefile libsdcc/regular/Makefile libm/Makefile"
+ac_config_files="$ac_config_files Makefile libsdcc/enhanced/Makefile libsdcc/enhanced-no-xinst/Makefile libsdcc/regular/Makefile libc/Makefile libm/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3051,6 +3094,18 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_EXTENDED_INSTRUCTIONS_TRUE}" && test -z "${ENABLE_EXTENDED_INSTRUCTIONS_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_EXTENDED_INSTRUCTIONS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_DEBUG_TRUE}" && test -z "${ENABLE_DEBUG_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_DEBUG\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_NOOPTS_TRUE}" && test -z "${ENABLE_NOOPTS_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_NOOPTS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_EXPERIMENTAL_TRUE}" && test -z "${ENABLE_EXPERIMENTAL_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_EXPERIMENTAL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -3651,6 +3706,7 @@ do
     "libsdcc/enhanced/Makefile") CONFIG_FILES="$CONFIG_FILES libsdcc/enhanced/Makefile" ;;
     "libsdcc/enhanced-no-xinst/Makefile") CONFIG_FILES="$CONFIG_FILES libsdcc/enhanced-no-xinst/Makefile" ;;
     "libsdcc/regular/Makefile") CONFIG_FILES="$CONFIG_FILES libsdcc/regular/Makefile" ;;
+    "libc/Makefile") CONFIG_FILES="$CONFIG_FILES libc/Makefile" ;;
     "libm/Makefile") CONFIG_FILES="$CONFIG_FILES libm/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

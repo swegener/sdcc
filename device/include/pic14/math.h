@@ -1,9 +1,7 @@
 /*-------------------------------------------------------------------------
-   math.h - Floating point math function declarations
+   math.h: Floating point math function declarations
 
-   Copyright (C) 2001, Jesus Calvino-Fraga <jesusc AT ieee.org>
-   Ported to PIC16 port by Vangelis Rokas, 2004 <vrokas AT otenet.gr>
-   Adopted for the PIC14 port 2006 by Raphael Neider <rneider AT web.de>
+   Copyright (C) 2001, Jesus Calvino-Fraga, jesusc@ieee.org
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -28,10 +26,12 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_MATH_H
-#define __PIC14_MATH_H	1
+/* Version 1.0 - Initial release */
 
-#include <sdcc-lib.h>
+#ifndef _INC_MATH
+#define _INC_MATH
+
+#define HUGE_VALF   3.402823466e+38
 
 #define PI          3.1415926536
 #define TWO_PI      6.2831853071
@@ -41,12 +41,11 @@
 #define iTWO_PI     0.1591549431
 #define TWO_O_PI    0.6366197724
 
-// EPS=B**(-t/2), where B is the radix of the floating-point representation
-// and there are t base-B digits in the significand.  Therefore, for floats
-// EPS=2**(-12).  Also define EPS2=EPS*EPS.
+/* EPS=B**(-t/2), where B is the radix of the floating-point representation
+   and there are t base-B digits in the significand.  Therefore, for floats
+   EPS=2**(-12).  Also define EPS2=EPS*EPS. */
 #define EPS 244.14062E-6
 #define EPS2 59.6046E-9
-#define XMAX 3.402823466E+38
 
 union float_long
 {
@@ -54,40 +53,56 @@ union float_long
     long l;
 };
 
+#if defined(__SDCC_MATH_LIB) && defined(__SDCC_mcs51) && !defined(__SDCC_USE_XSTACK) && !defined(__SDCC_STACK_AUTO) && !defined(_SDCC_NO_ASM_LIB_FUNCS)
+/* Compile the mcs51 assembly version only when all these
+   conditions are met.  Since not all the functions are
+   reentrant, do not compile with --stack-auto is used. */
+#define MATH_ASM_MCS51
+#endif
+
+
+/* Functions on the z80 & gbz80 are always reentrant and so the "reentrant" */
+/* keyword is not defined. */
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined(__SDCC_gbz80) || defined(__SDCC_ez80_z80) || defined(__SDCC_stm8) || defined(__SDCC_pic14)
+#define _FLOAT_FUNC_REENTRANT
+#else
+#define _FLOAT_FUNC_REENTRANT __reentrant
+#endif
+
 /**********************************************
  * Prototypes for float ANSI C math functions *
  **********************************************/
 
 /* Trigonometric functions */
-float sinf(float x) _MATH_REENTRANT;
-float cosf(float x) _MATH_REENTRANT;
-float tanf(float x) _MATH_REENTRANT;
-float cotf(float x) _MATH_REENTRANT;
-float asinf(float x) _MATH_REENTRANT;
-float acosf(float x) _MATH_REENTRANT;
-float atanf(float x) _MATH_REENTRANT;
+float sinf(float x) _FLOAT_FUNC_REENTRANT;
+float cosf(float x) _FLOAT_FUNC_REENTRANT;
+float tanf(float x) _FLOAT_FUNC_REENTRANT;
+float cotf(float x) _FLOAT_FUNC_REENTRANT;
+float asinf(float x) _FLOAT_FUNC_REENTRANT;
+float acosf(float x) _FLOAT_FUNC_REENTRANT;
+float atanf(float x) _FLOAT_FUNC_REENTRANT;
 float atan2f(float x, float y);
 
 /* Hyperbolic functions */
-float sinhf(float x) _MATH_REENTRANT;
-float coshf(float x) _MATH_REENTRANT;
-float tanhf(float x) _MATH_REENTRANT;
+float sinhf(float x) _FLOAT_FUNC_REENTRANT;
+float coshf(float x) _FLOAT_FUNC_REENTRANT;
+float tanhf(float x) _FLOAT_FUNC_REENTRANT;
 
 /* Exponential, logarithmic and power functions */
-float expf(float x);
-float logf(float x) _MATH_REENTRANT;
-float log10f(float x) _MATH_REENTRANT;
+float expf(float x) _FLOAT_FUNC_REENTRANT;
+float logf(float x) _FLOAT_FUNC_REENTRANT;
+float log10f(float x) _FLOAT_FUNC_REENTRANT;
 float powf(float x, float y);
-float sqrtf(float a) _MATH_REENTRANT;
+float sqrtf(float a) _FLOAT_FUNC_REENTRANT;
 
 /* Nearest integer, absolute value, and remainder functions */
-float fabsf(float x) _MATH_REENTRANT;
+float fabsf(float x) _FLOAT_FUNC_REENTRANT;
 float frexpf(float x, int *pw2);
 float ldexpf(float x, int pw2);
-float ceilf(float x) _MATH_REENTRANT;
-float floorf(float x) _MATH_REENTRANT;
+float ceilf(float x) _FLOAT_FUNC_REENTRANT;
+float floorf(float x) _FLOAT_FUNC_REENTRANT;
 float modff(float x, float * y);
 
 int isnan(float f);
 int isinf(float f);
-#endif  /* __PIC14_MATH_H */
+#endif  /* _INC_MATH */

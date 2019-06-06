@@ -13,6 +13,14 @@
 	* src/pic14/glue.c,
 	  src/pic14/main.c:
 	  Predefined macros for pic14 variants, patch by Gonzalo Pérez de Olaguer Córdoba.
+	* device/lib/clean.mk:
+	  Cleanup pdk13 library files.
+	* device/include/asm/pic14/features.h,
+	  device/include/pic14,
+	  device/lib/pic14,
+	  src/SDCCsymt.c,
+	  src/pic14/main.c:
+	  Predefined pic14 library cleanup, patch by Gonzalo Pérez de Olaguer Córdoba.
 
 2019-06-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

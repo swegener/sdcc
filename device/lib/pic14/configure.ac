@@ -10,6 +10,9 @@
 # Adopted for the SDCC/pic14 library by
 #	Raphael Neider <rneider AT web.de>
 #
+# Added libc and DEBUG/NOOPTS/EXPERIMENTAL conditionals by
+#       Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
+#
 # $Id$
 #
 
@@ -42,7 +45,9 @@ libdir=$libdir/pic14
 # configure time by setting the environment variables ARCH and/or EARCH to
 # the desired device (16fxxx).
 AC_SUBST(ARCH,  [${ARCH:-16f877}])
-AC_SUBST(EARCH, [${EARCH:-16f1934}])
+# Previous default setting for EARCH was 16f1934, but gpsim doesn't support it.
+# It should be used the device with larger ROM and RAM sizes.
+AC_SUBST(EARCH, [${EARCH:-16f1788}])
 
 # We cannot use AC_PROG_CC(sdcc) as sdcc might not be built at configure-time...
 AC_SUBST(CC, [\'$abs_top_builddir/../../../bin/sdcc\'])
@@ -95,6 +100,20 @@ fi;
 AC_MSG_RESULT([$ENABLE_EXTENDED_INSTRUCTIONS])
 AM_CONDITIONAL([ENABLE_EXTENDED_INSTRUCTIONS], [ test x$ENABLE_EXTENDED_INSTRUCTIONS = xyes ])
 
+# default values for the following conditions
+: ${DEBUG:=0}
+: ${NOOPTS:=1}
+: ${EXPERIMENTAL:=1}
+
+# generate debug info during the build process
+AM_CONDITIONAL([ENABLE_DEBUG], [ test x$DEBUG = x1 ])
+
+# build libraries with optimizations disabled
+AM_CONDITIONAL([ENABLE_NOOPTS], [ test x$NOOPTS = x1 ])
+
+# build libraries with experimental code enabled
+AM_CONDITIONAL([ENABLE_EXPERIMENTAL], [ test x$EXPERIMENTAL = x1 ])
+
 # Checks for libraries.
 
 # Checks for header files.
@@ -107,5 +126,6 @@ AC_CONFIG_FILES([Makefile
                  libsdcc/enhanced/Makefile
                  libsdcc/enhanced-no-xinst/Makefile
                  libsdcc/regular/Makefile
-		 libm/Makefile])
+                 libc/Makefile
+                 libm/Makefile])
 AC_OUTPUT

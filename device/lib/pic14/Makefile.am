@@ -1,6 +1,6 @@
 ## Process this file with Automake to create Makefile.in
 
-SUBDIRS = libm libsdcc/regular
+SUBDIRS = libc libm libsdcc/regular
 
 if ENABLE_ENHANCED_PICS
 if ENABLE_EXTENDED_INSTRUCTIONS
@@ -12,7 +12,7 @@ endif ENABLE_ENHANCED_PICS
 
 include $(top_srcdir)/Makefile.common
 
-DISTCLEANFILES = a.cod a.hex ./.checkdevices/*
+DISTCLEANFILES = a.lst a.cod a.hex ./.checkdevices/*
 
 distclean-local:
 	rm -rf ./.checkdevices ./autom4te.cache

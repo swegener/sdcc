@@ -1,8 +1,7 @@
 /*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+   assert.c
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+   Copyright (C) 2000, Michael Hope
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -11,7 +10,7 @@
 
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License 
@@ -27,14 +26,15 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#include <stdio.h>
+#include <stdlib.h>
 
-#define _REENTRANT
+#if !(defined(__SDCC_pic14) && !defined(__SDCC_PIC14_HAS_VARARGS))
+void __assert(const char *expression, const char *functionname, const char *filename, unsigned int linenumber)
+{
+	printf("Assert(%s) failed in function %s at line %u in file %s.\n",
+		expression, functionname, linenumber, filename);
+	for(;;);
+}
+#endif
 
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
-
-#endif	/* __PIC14_ASM_FEATURES_H */

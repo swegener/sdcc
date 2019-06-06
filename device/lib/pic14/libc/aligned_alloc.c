@@ -1,8 +1,9 @@
 /*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+   aligned_alloc.c
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+   Philipp Klaus Krause, philipp@informatik.uni-frankfurt.de 2013
+
+   (c) 2015 Goethe-Universität Frankfurt
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -11,7 +12,7 @@
 
    This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License 
@@ -27,14 +28,18 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#pragma std_c11
 
-#define _REENTRANT
+#include <stddef.h>
 
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
+/* it is important to declare this function extern before including
+   the inline definition to give it external linkage */
 
-#endif	/* __PIC14_ASM_FEATURES_H */
+#if defined(__SDCC_pic14)
+extern void __data *aligned_alloc(size_t alignment, size_t size);
+#else
+extern void *aligned_alloc(size_t alignment, size_t size);
+#endif
+
+#include <stdlib.h>
+

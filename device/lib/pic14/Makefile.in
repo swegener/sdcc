@@ -87,6 +87,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 @ENABLE_ENHANCED_PICS_TRUE@@ENABLE_EXTENDED_INSTRUCTIONS_TRUE@am__append_1 = libsdcc/enhanced
 @ENABLE_ENHANCED_PICS_TRUE@@ENABLE_EXTENDED_INSTRUCTIONS_FALSE@am__append_2 = libsdcc/enhanced-no-xinst
+@ENABLE_EXTENDED_INSTRUCTIONS_FALSE@am__append_3 = --no-extended-instructions
+
+# extra flags when DEBUG is enabled
+@ENABLE_DEBUG_TRUE@am__append_4 = --debug --debug-xtra --debug-ralloc  --debug-glue
+@ENABLE_DEBUG_TRUE@am__append_5 = --debug-variadics
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -158,7 +163,7 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = libm libsdcc/regular libsdcc/enhanced \
+DIST_SUBDIRS = libc libm libsdcc/regular libsdcc/enhanced \
 	libsdcc/enhanced-no-xinst
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/Makefile.common NEWS README depcomp install-sh \
@@ -296,29 +301,77 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = libm libsdcc/regular $(am__append_1) $(am__append_2)
-AM_CPPFLAGS = -I. -I$(top_srcdir)/../../include/pic14 \
-	-I$(top_srcdir)/../../non-free/include/pic14
-#AM_CFLAGS += --asm="$(CCAS)"
+SUBDIRS = libc libm libsdcc/regular $(am__append_1) $(am__append_2)
 
-#AM_CFLAGS += --debug-ralloc
-#AM_CFLAGS += --debug-xtra
-#AM_CFLAGS += --pcode-verbose
-AM_CFLAGS = -mpic14 -p$(ARCH) --no-warn-non-free --std-c11 \
-	--i-code-in-asm
+############################################################
+# common source files for all variants of the sdcc library
+############################################################
+LIBSDCC_SOURCES_COMMON = ../_divschar.c ../_divsint.c ../_divslong.c \
+	../_divuchar.c ../_divuint.c ../_divulong.c ../_modschar.c \
+	../_modsint.c ../_modslong.c ../_moduchar.c ../_moduint.c \
+	../_modulong.c ../_mulschar.c ../_muluchar.c ../_mulint.c \
+	../_mullong.c ../_fs2schar.c ../_fs2sint.c ../_fs2slong.c \
+	../_fs2uchar.c ../_fs2uint.c ../_fs2ulong.c ../_fsadd.c \
+	../_fsdiv.c ../_fseq.c ../_fslt.c ../_fsmul.c ../_fsneq.c \
+	../_fssub.c ../_schar2fs.c ../_sint2fs.c ../_slong2fs.c \
+	../_uchar2fs.c ../_uint2fs.c ../_ulong2fs.c ../idata.c
 
-#AM_CFLAGS += --no-pcode-opt
+############################################################
+# Directories when building from the sdcc sources
+############################################################
 
-#AM_CFLAGS += --nooverlay
-#AM_CFLAGS += --nogcse
-#AM_CFLAGS += --nolabelopt
-#AM_CFLAGS += --noinvariant
-#AM_CFLAGS += --noinduction
-#AM_CFLAGS += --nojtbound
-#AM_CFLAGS += --noloopreverse
-AM_CCASFLAGS = -p$(ARCH) -I$(top_srcdir)/../../include/pic14 \
-	-I$(top_srcdir)/../../non-free/include/pic14 -I$(srcdir)
-DISTCLEANFILES = a.cod a.hex ./.checkdevices/*
+# the directory where sdcc device files can be found
+DEVICE_TOP_DIR = $(top_srcdir)/../..
+
+# the directory where generic device lib sources can be found
+GENERIC_SRC_DIR = $(DEVICE_TOP_DIR)/lib
+
+# If compiling from the installed device sources, use these directories
+#DEVICE_TOP_DIR = $(top_srcdir)/../../..
+#GENERIC_SRC_DIR = $(DEVICE_TOP_DIR)/lib/src
+GENERIC_SRC_DIR_ABS = $(abspath $(GENERIC_SRC_DIR))
+
+############################################################
+# C preprocessor flags
+############################################################
+AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(DEVICE_TOP_DIR)/include/pic14 \
+	-I$(DEVICE_TOP_DIR)/non-free/include/pic14 \
+	-I$(DEVICE_TOP_DIR)/include
+
+############################################################
+# C compiler flags
+############################################################
+SDCC_FLAGS = -mpic14 --less-pedantic --no-warn-non-free \
+	--i-code-in-asm --fverbose-asm --std-c11 $(am__append_4)
+
+# extra flags for enhanced cores
+SDCC_FLAGS_ENHANCED = $(am__append_3)
+
+# extra flags to disable optimizations
+SDCC_FLAGS_NOOPT = --no-pcode-opt --no-peep
+
+# extra flags to enable experimental support
+SDCC_FLAGS_EXP = --experimental-pcall-all \
+	--experimental-pcall-enhanced --experimental-variadics \
+	--experimental-ralloc $(am__append_5)
+AM_CFLAGS = -p$(ARCH) $(SDCC_FLAGS)
+AM_CFLAGS_O = -p$(ARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_NOOPT)
+AM_CFLAGS_X = -p$(ARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_EXP)
+AM_CFLAGS_OX = -p$(ARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_NOOPT) $(SDCC_FLAGS_EXP)
+AM_CFLAGS_E = -p$(EARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_ENHANCED)
+AM_CFLAGS_EO = -p$(EARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_ENHANCED) $(SDCC_FLAGS_NOOPT)
+AM_CFLAGS_EX = -p$(EARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_ENHANCED) $(SDCC_FLAGS_EXP)
+AM_CFLAGS_EOX = -p$(EARCH) $(SDCC_FLAGS) $(SDCC_FLAGS_ENHANCED) $(SDCC_FLAGS_NOOPT) $(SDCC_FLAGS_EXP)
+
+############################################################
+# Assembler flags
+############################################################
+AM_CCASFLAGS = -p$(ARCH) -I$(srcdir) -I$(DEVICE_TOP_DIR)/include/pic14 \
+	-I$(DEVICE_TOP_DIR)/non-free/include/pic14
+
+# extensions generated by the build process
+CLEAN_EXTENSIONS = .asm .lst .sym .d .p .g .v .adb
+DISTCLEANFILES = a.lst a.cod a.hex ./.checkdevices/*
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -796,18 +849,57 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
+
 ARCH  ?= @ARCH@
 EARCH ?= @EARCH@
 
-clean-local:
-	$(RM) *.asm;
-	$(RM) *.lst;
+############################################################
+# Common actions
+############################################################
 
-clean-intermediate: clean-local
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  echo "Making $@ in $$subdir"; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@); \
-	done
+# link missing source files to the generic sdcc ones
+# NOTE: last empty line required because foreach concatenates several copies of this text
+define link-generic-files
+$(1)/%.c: $$(GENERIC_SRC_DIR_ABS)/%.c
+	test -e $$@ || ln -s $$< $$@
+
+endef
+
+# create links to generic source files in the source directories
+$(foreach SOURCE_DIR,$(SOURCE_DIRS),$(eval $(call link-generic-files,$(SOURCE_DIR))))
+
+# remove links to generic source files
+# NOTE: last semicolon required because foreach concatenates several copies of this text
+define remove-generic-links
+	list='$(wildcard $(SOURCE_DIR)/*.c)' ; \
+	for file in $$list ; do \
+	  if test -L $$file ; then rm $$file ; fi \
+	done ;
+endef
+
+# remove intermediate files generated by the build process
+# NOTE: last semicolon required because foreach concatenates several copies of this text
+define remove-intermediate-files
+	list='$(wildcard $(addprefix $(SOURCE_DIR)/*,$(CLEAN_EXTENSIONS)))' ; \
+	if test -n "$$list" ; then rm -rf $$list ; fi ;
+endef
+
+# clean-up (remove intermediate files and links to missing source files)
+clean-local:
+	$(foreach SOURCE_DIR,$(SOURCE_DIRS),$(remove-generic-links))
+	$(foreach SOURCE_DIR,$(SOURCE_DIRS),$(remove-intermediate-files))
+
+# do not remove intermediate files when DEBUG is enabled
+@ENABLE_DEBUG_TRUE@clean-intermediate:
+@ENABLE_DEBUG_TRUE@	list='$(SUBDIRS)'; for subdir in $$list; do \
+@ENABLE_DEBUG_TRUE@	  echo "Making $@ in $$subdir"; \
+@ENABLE_DEBUG_TRUE@	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@); \
+@ENABLE_DEBUG_TRUE@	done
+@ENABLE_DEBUG_FALSE@clean-intermediate: clean-local
+@ENABLE_DEBUG_FALSE@	list='$(SUBDIRS)'; for subdir in $$list; do \
+@ENABLE_DEBUG_FALSE@	  echo "Making $@ in $$subdir"; \
+@ENABLE_DEBUG_FALSE@	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $@); \
+@ENABLE_DEBUG_FALSE@	done
 
 distclean-local:
 	rm -rf ./.checkdevices ./autom4te.cache

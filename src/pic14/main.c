@@ -228,6 +228,7 @@ _pic14_genIVT (struct dbuf_s * oBuf, symbol ** interrupts, int maxInterrupts)
 static bool
 _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
 {
+#if 0
   if ( ic->op != '*')
   {
     return FALSE;
@@ -236,6 +237,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   /* multiply chars in-place */
   if (getSize(left) == 1 && getSize(right) == 1)
     return TRUE;
+#endif
 
   /* use library functions for more complex maths */
   return FALSE;

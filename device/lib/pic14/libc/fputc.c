@@ -1,8 +1,10 @@
 /*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+   fputc.c - write a character to a stream
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+   Copyright (C) 2005, Vangelis Rokas <vrokas AT otenet.gr>
+
+   Modifications for PIC14 by
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -27,14 +29,31 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#include <stdio.h>
 
-#define _REENTRANT
+int fputc (char c, FILE *stream)
+{
+  char *p;
+  unsigned char tag;
 
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
+  /* if stream is NULL use putchar */
+  if (!stream)
+  	return putchar (c);
 
-#endif	/* __PIC14_ASM_FEATURES_H */
+  p = *stream;
+  tag = ((char*)&p)[2];
+
+  /* this is a __code pointer */
+  if (tag)
+#if !(defined(__SDCC_pic14) && !defined(__SDCC_PIC14_HAS_PCALL))
+  	return ((_stream_out_handler*)p) (c, stream);
+#else
+	return EOF;
+#endif
+
+  /* this is a __data pointer */
+  *p = c;
+  *(char **)stream = p+1;
+
+  return (unsigned char)c;
+}

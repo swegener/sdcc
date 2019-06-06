@@ -1,8 +1,10 @@
 /*-------------------------------------------------------------------------
-   features.h - PIC16 port features.
+   memfreemax.c - return size of maximum unallocated heap block
 
-   Copyright (C) 2004, Vangelis Rokas <vrokas AT otenet.gr>
-   Adopted for pic14 port library by Raphael Neider <rneider at web.de> (2006)
+   Copyright (C) 2005, Vangelis Rokas <vrokas at otenet.gr>
+
+   Modifications for PIC14 by
+   Copyright (C) 2019 Gonzalo Pérez de Olaguer Córdoba <salo@gpoc.es>
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -27,14 +29,27 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
-#ifndef __PIC14_ASM_FEATURES_H
-#define __PIC14_ASM_FEATURES_H   1
+#include <pic14_malloc.h>
 
-#define _REENTRANT
-
-#define _CODE	__code
-#define _DATA	__data
-#define _AUTOMEM
-#define _STATMEM
-
-#endif	/* __PIC14_ASM_FEATURES_H */
+size_t memfreemax (void)
+{
+    _malloc_rec __data *head;
+    size_t size = 1;
+    size_t len;
+ 
+    if (_malloc_heap == NULL)
+        return 0;
+ 
+      head = _malloc_heap;
+      
+      while ((len = head->bits.count) != 0)
+      {
+          if (!head->bits.alloc && (len > size))
+                size = len;
+          
+          head = NEXTREC(head);
+      }
+ 
+    /* do not count the block header */
+    return size - 1;
+}

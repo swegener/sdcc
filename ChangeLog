@@ -10,6 +10,9 @@
 	  support/regression/tests/nullstring.c,
 	  support/regression/tests/snprintf.c:
 	  Library and test improvements, from patch by Gonzalo Pérez de Olaguer Córdoba.
+	* src/pic14/glue.c,
+	  src/pic14/main.c:
+	  Predefined macros for pic14 variants, patch by Gonzalo Pérez de Olaguer Córdoba.
 
 2019-06-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

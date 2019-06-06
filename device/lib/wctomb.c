@@ -30,8 +30,6 @@
 
 int wctomb(char *s, wchar_t wc)
 {
-	unsigned char n = 0;
-
 	if(!s)
 		return(0);
 

@@ -85,7 +85,7 @@ testConstantRange (void)
   ASSERT (  (UINT16_MAX + 1L >  u16));
   ASSERT (  (UINT16_MAX      >= u16));
 
-  ASSERT (UINTMAX_C(4294967296) <= UINTMAX_MAX);
+  ASSERT (UINTMAX_C(4294967295) <= UINTMAX_MAX);
 
 #if defined(PORT_HOST)
 /* on 32bit host: -1 is presented as 32 bit int, 16 bit unsigned short is promoted to 32 bit int */

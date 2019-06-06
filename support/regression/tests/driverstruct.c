@@ -47,5 +47,5 @@ initProxy (devsw_t *pdrv)
 void
 testDriverStruct (void)
 {
-  initProxy(&_sillyDriver);
+  ASSERT (initProxy(&_sillyDriver) == 5);
 }

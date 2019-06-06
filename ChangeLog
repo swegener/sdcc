@@ -1,3 +1,16 @@
+2019-06-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/include/wchar.h,
+	  device/lib/mbrtowc.c,
+	  device/lib/mbtowc.c,
+	  device/lib/wctomb.c,
+	  support/regression/tests/constantRange.c,
+	  support/regression/tests/driverstruct.c,
+	  support/regression/tests/float.c,
+	  support/regression/tests/nullstring.c,
+	  support/regression/tests/snprintf.c:
+	  Library and test improvements, from patch by Gonzalo Pérez de Olaguer Córdoba.
+
 2019-06-04 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regress/tests/gcc-torture-execute-pr34456.c:

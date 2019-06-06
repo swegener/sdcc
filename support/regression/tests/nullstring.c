@@ -36,5 +36,10 @@ testStringConst (void)
   const char * constStr2 = "a\0b\0c";
 
   ASSERT (constStr1[0] == 0);
+  ASSERT (constStr2[0] == 'a');
+  ASSERT (constStr2[1] == 0);
+  ASSERT (constStr2[2] == 'b');
+  ASSERT (constStr2[3] == 0);
+  ASSERT (constStr2[4] == 'c');
   ASSERT (constStr2[5] == 0);
 }

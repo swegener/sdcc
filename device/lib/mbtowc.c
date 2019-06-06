@@ -66,7 +66,8 @@ int mbtowc(wchar_t *pwc, const char *restrict s, size_t n)
 	if(codepoint >= 0xd800 && codepoint <= 0xdfff) // UTF-16 surrogate.
 		return(-1);
 
-	*pwc = codepoint;
+	if(pwc)
+		*pwc = codepoint;
 	return(codepoint ? seqlen : 0);
 }
 

@@ -100,6 +100,7 @@ testFloatMath (void)
 
   for (i = 0; i < t; i++)
     {
+      DEBUG (printf ("Case %d ", i));
       #ifdef ADD
         // add
         result = cases[i].left + cases[i].right;

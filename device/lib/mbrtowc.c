@@ -92,7 +92,8 @@ size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_
 	if(codepoint >= 0xd800 && codepoint <= 0xdfff) // UTF-16 surrogate.
 		return(-1);
 
-	*pwc = codepoint;
+	if(pwc)
+		*pwc = codepoint;
 	return(n);
 
 eilseq:

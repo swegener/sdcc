@@ -126,7 +126,7 @@ test_snprintf (void)
     {
       sprintf (buf, cases[i].fmt, cases[i].arg);
       DEBUG (__prints ("Test"));
-      DEBUG (__printn (i));
+      DEBUG (__printd (i));
       DEBUG (__prints (" should be: '"));
       DEBUG (__prints (cases[i].result));
       DEBUG (__prints ("' is: '"));

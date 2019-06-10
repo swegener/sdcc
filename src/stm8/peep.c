@@ -3,6 +3,8 @@
 #include "SDCCglobl.h"
 #include "SDCCgen.h"
 
+#include "peep.h"
+
 #define NOTUSEDERROR() do {werror(E_INTERNAL_ERROR, __FILE__, __LINE__, "error in notUsed()");} while(0)
 
 // #define D(_s) { printf _s; fflush(stdout); }
@@ -160,7 +162,7 @@ isSpIndexed(const char *what)
 
 
 int
-stm8instructionSize(const lineNode *pl)
+stm8instructionSize(lineNode *pl)
 { // this function is quite rough, it makes all indirect addressing cases to the longest.
   char *operand;
   char *op1start;
@@ -1021,21 +1023,21 @@ doTermScan (lineNode **pl, const char *what)
           case S4O_VISITED:
           case S4O_WR_OP:
             /* all these are terminating conditions */
-            return TRUE;
+            return true;
           case S4O_CONDJMP:
             /* two possible destinations: recurse */
               {
                 lineNode *pl2 = plConditional;
                 D(("CONDJMP trying other branch first\n"));
                 if (!doTermScan (&pl2, what))
-                  return FALSE;
+                  return false;
                 D(("Other branch OK.\n"));
               }
             continue;
           case S4O_RD_OP:
           default:
             /* no go */
-            return FALSE;
+            return false;
         }
     }
 }
@@ -1047,7 +1049,7 @@ static void
 unvisitLines (lineNode *pl)
 {
   for (; pl; pl = pl->next)
-    pl->visited = FALSE;
+    pl->visited = false;
 }
 
 bool
@@ -1072,7 +1074,7 @@ stm8notUsedFrom (const char *what, const char *label, lineNode *head)
 {
   lineNode *cpl;
 
-  for (cpl = _G.head; cpl; cpl = cpl->next)
+  for (cpl = head; cpl; cpl = cpl->next)
     if (cpl->isLabel && !strncmp (label, cpl->line, strlen(label)))
       return (stm8notUsed (what, cpl, head));
 

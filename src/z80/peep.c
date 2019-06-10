@@ -772,7 +772,7 @@ z80notUsedFrom (const char *what, const char *label, lineNode *head)
 {
   lineNode *cpl;
 
-  for (cpl = _G.head; cpl; cpl = cpl->next)
+  for (cpl = head; cpl; cpl = cpl->next)
     {
       if (cpl->isLabel && !strncmp (label, cpl->line, strlen(label)))
         {
@@ -780,7 +780,7 @@ z80notUsedFrom (const char *what, const char *label, lineNode *head)
         }
     }
 
-  return FALSE;
+  return false;
 }
 
 bool

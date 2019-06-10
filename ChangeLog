@@ -1,5 +1,13 @@
 2019-06-10 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCpeeph.c,
+	  src/pdk/gen.c,
+	  src/pdk/peep.c,
+	  src/pdk/peeph.def:
+	  pdk peephole improvements.
+
+2019-06-10 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/pdk/main.c,
 	  src/pdk/peep.h,
 	  src/pdk/peep.c,	

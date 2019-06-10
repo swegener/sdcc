@@ -3804,6 +3804,11 @@ genCast (const iCode *ic)
 
       emit2 ("ceqsn", "a, #0x00");
       emit2 ("mov", "a, #0x01");
+      if (!regalloc_dry_run) // Dummy label as target for ceqsn to prevent peephole optimizer from optimizing out mov.
+        {
+          symbol *tlbl = newiTempLabel (0);
+          emitLabel (tlbl);
+        }
       cost (2, 2);
 
       cheapMove (result->aop, 0, ASMOP_A, 0, true, true);

@@ -280,8 +280,8 @@ stm8SurelyWritesFlag(const lineNode *pl, const char *what)
     ISINST (pl->line, "xor"))
       return !strcmp(what, "z");
 
-  // mov writes z when the destination is a only.
-  if (ISINST (pl->line, "mov") && !strcmp(what, "z") && pl->line[4] == 'a' && pl->line[5] == ',')
+  // mov writes z when the destination is a and hte source not an immediate only.
+  if (ISINST (pl->line, "mov") && !strcmp(what, "z") && pl->line[4] == 'a' && pl->line[5] == ',' && !strchr(pl->line, '#'))
     return true;
 
   return false;

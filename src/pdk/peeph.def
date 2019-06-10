@@ -14,11 +14,20 @@ replace restart {
 	; peephole 1 removed redundant load from %1 into a.
 } if notVolatile(%1)
 
+
+replace restart {
+	mov	a, #%1
+	ret
+} by {
+	; peephole 2 moved load to ret.
+	ret	#%1
+}
+
 replace restart {
 	xch	a, %1
 	xch	a, %1
 } by {
-	; peephole 2 removed redundant double exchange between a and %1.
+	; peephole 3 removed redundant double exchange between a and %1.
 } if notVolatile(%1)
 
 replace restart {
@@ -28,7 +37,7 @@ replace restart {
 } by {
 	mov	a, #0x00
 	slc	a
-	; peephole 3 removed redundant and.
+	; peephole 4 removed redundant and.
 }
 
 replace restart {

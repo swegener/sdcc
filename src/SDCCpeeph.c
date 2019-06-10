@@ -581,7 +581,6 @@ FBYNAME (labelRefCount)
                    " in peephole labelRefCount rule.\n",
                    varNumber);
         }
-
     }
   else
     {
@@ -2497,7 +2496,7 @@ bool
 isLabelReference (const char *line, const char **start, int *len)
 {
   const char *s, *e;
-  if (!TARGET_Z80_LIKE && !TARGET_IS_STM8)
+  if (!TARGET_Z80_LIKE && !TARGET_IS_STM8 && !TARGET_PDK_LIKE)
     return FALSE;
 
   s = line;
@@ -2548,7 +2547,7 @@ hashSymbolName (const char *name)
  * and how many times they are referenced.
  */
 static void
-buildLabelRefCountHash (lineNode * head)
+buildLabelRefCountHash (lineNode *head)
 {
   lineNode *line;
   const char *label;
@@ -2601,6 +2600,27 @@ buildLabelRefCountHash (lineNode * head)
     {
       if (line->isComment)
         continue;
+
+      /* Padauk skip instructions */
+      if (TARGET_PDK_LIKE &&
+        (!strncmp(line->line, "ceqsn", 5) || !strncmp(line->line, "cneqsn", 6) ||
+        !strncmp(line->line, "t0sn", 4) || !strncmp(line->line, "t1sn", 4) ||
+        !strncmp(line->line, "izsn", 4) || !strncmp(line->line, "dzsn", 4)))
+        {
+          const lineNode *const l = line->next->next;
+          wassert (l);
+          if (l->isLabel && isLabelDefinition (l->line, &label, &labelLen, false))
+            {
+              char name[SDCC_NAME_MAX];
+              strcpy(name, label);
+              name[labelLen] = 0;
+
+              labelHashEntry *e = hTabFirstItemWK (labelHash, hashSymbolName (name));
+              if (e)
+                e->refCount++;
+            }
+        }
+        
         
       for (i = 0; i < HTAB_SIZE; i++)
         {

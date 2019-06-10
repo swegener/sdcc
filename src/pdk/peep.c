@@ -26,6 +26,62 @@ static struct
   lineNode *head;
 } _G;
 
+static bool
+isReturned(const char *what)
+{
+  symbol *sym;
+  sym_link *sym_lnk;
+  int size;
+  lineNode *l;
+
+  l = _G.head;
+  do
+  {
+    l = l->next;
+  } while(l->isComment || l->ic == NULL || l->ic->op != FUNCTION);
+
+  sym = OP_SYMBOL(IC_LEFT(l->ic));
+
+  if(sym && IS_DECL(sym->type))
+    {
+      // Find size of return value.
+      specifier *spec;
+      if(sym->type->select.d.dcl_type != FUNCTION)
+        NOTUSEDERROR();
+      spec = &(sym->etype->select.s);
+      if(spec->noun == V_VOID)
+        size = 0;
+      else if(spec->noun == V_CHAR || spec->noun == V_BOOL)
+        size = 1;
+      else if(spec->noun == V_INT && !(spec->b_long))
+        size = 2;
+      else
+        size = 4;
+
+      // Check for returned pointer.
+      sym_lnk = sym->type;
+      while (sym_lnk && !IS_PTR (sym_lnk))
+        sym_lnk = sym_lnk->next;
+      if(IS_PTR(sym_lnk))
+        size = 2;
+    }
+  else
+    {
+      NOTUSEDERROR();
+      return TRUE;
+    }
+
+  switch(*what)
+    {
+    case 'a':
+      return(size == 1 || size == 2);
+    case 'p':
+      return(size == 2);
+    default:
+      return false;
+    }
+}
+
 /*-----------------------------------------------------------------*/
 /* incLabelJmpToCount - increment counter "jmpToCount" in entry    */
 /* of the list labelHash                                           */
@@ -95,7 +151,7 @@ findLabel (const lineNode *pl)
 }
 
 /* Check if reading arg implies reading what. */
-static bool argCont(const char *arg, const char *what)
+static bool argIs(const char *arg, const char *what)
 {
   if (arg == NULL || strlen (arg) == 0)
     return false;
@@ -109,17 +165,18 @@ static bool argCont(const char *arg, const char *what)
   while (isblank ((unsigned char)(arg[0])))
     arg++;
 
-  return (!strcmp(arg, what));
+  return !strncmp(arg, what, strlen(what)) &&
+    (!arg[strlen(what)] || isspace((unsigned char)(arg[strlen(what)])) || arg[strlen(what)] == ',');
 }
 
 static bool
 stm8MightReadFlag(const lineNode *pl, const char *what)
 {
-  if (ISINST (pl->line, "push") && argCont (pl->line + 4, "af") || ISINST (pl->line, "pushaf"))
+  if (ISINST (pl->line, "push") && argIs (pl->line + 4, "af") || ISINST (pl->line, "pushaf"))
     return true;
 
   if (ISINST (pl->line, "t0sn") || ISINST (pl->line, "t1sn"))
-    return argCont(strchr (pl->line, ','), what);
+    return argIs(strchr (pl->line, ','), what);
 
   if(ISINST (pl->line, "addc") ||
     ISINST (pl->line, "subc"))
@@ -131,10 +188,60 @@ stm8MightReadFlag(const lineNode *pl, const char *what)
 static bool
 pdkMightRead(const lineNode *pl, const char *what)
 {
+//printf("pdkMightRead() for |%s|%s|\n", pl->line, what);
   if (!strcmp(what, "z") || !strcmp(what, "c") || !strcmp(what, "ac") || !strcmp(what, "ov"))
     return (stm8MightReadFlag(pl, what));
   else if (strcmp(what, "a") && strcmp(what, "p"))
-    return true; 
+    return true;
+
+  // Instructions that never read anything.
+  if (ISINST(pl->line, "engint") ||
+    ISINST(pl->line, "disgint") ||
+    ISINST(pl->line, "nop") ||
+    ISINST(pl->line, "pop") || ISINST(pl->line, "popaf") ||
+    ISINST(pl->line, "stopsys") ||
+    ISINST(pl->line, "wdreset"))
+    return false;
+
+  if (ISINST(pl->line, "ret") && strchr(pl->line + 2, '#') && !strcmp(what, "a"))
+    return false;
+  if (ISINST(pl->line, "ret"))
+    return isReturned(what);
+
+  if (ISINST(pl->line, "mov"))
+    return argIs (strchr (pl->line, ','), what);
+
+  if (ISINST (pl->line, "push") && argIs (pl->line + 4, "af") || ISINST (pl->line, "pushaf"))
+    return !strcmp(what, "a");
+
+  // Two-operand instructions that read both operands
+  if (ISINST (pl->line, "add") ||
+    ISINST (pl->line, "and") ||
+    ISINST (pl->line, "or") ||
+    ISINST (pl->line, "sub") ||
+    ISINST (pl->line, "xor"))
+    return argIs (pl->line + 3, what) || argIs (strchr (pl->line, ','), what);
+  if (ISINST(pl->line, "idxm"))
+    return argIs (pl->line + 4, what) || argIs (strchr (pl->line, ','), what);
+  if (ISINST (pl->line, "ceqsn") ||
+    ISINST (pl->line, "cneqsn"))
+    return argIs (pl->line + 6, what) || argIs (strchr (pl->line, ','), what);
+
+  // One-operand instructions
+  if (ISINST (pl->line, "neg") ||
+    ISINST (pl->line, "not") ||
+    ISINST (pl->line, "sl") ||
+    ISINST (pl->line, "slc") ||
+    ISINST (pl->line, "sr") ||
+    ISINST (pl->line, "src"))
+    return argIs (pl->line + 3, what);
+  if (ISINST (pl->line, "dzsn") ||
+    ISINST (pl->line, "izsn") ||
+    ISINST (pl->line, "pcadd") ||
+    ISINST (pl->line, "stt16"))
+    return argIs (pl->line + 5, what);
+
+  // Todo: addc, subc, xch
 
   return true;
 }
@@ -142,7 +249,7 @@ pdkMightRead(const lineNode *pl, const char *what)
 static bool
 stm8SurelyWritesFlag(const lineNode *pl, const char *what)
 {
-  if (ISINST (pl->line, "pop") && argCont (pl->line + 4, "af") || ISINST (pl->line, "popaf"))
+  if (ISINST (pl->line, "pop") && argIs (pl->line + 4, "af") || ISINST (pl->line, "popaf"))
     return true;
 
   // Instructions that write all flags
@@ -186,6 +293,27 @@ pdkSurelyWrites(const lineNode *pl, const char *what)
   if (!strcmp(what, "z") || !strcmp(what, "c") || !strcmp(what, "ac") || !strcmp(what, "ov"))
     return (stm8SurelyWritesFlag(pl, what));
 
+  if (ISINST(pl->line, "mov") || ISINST(pl->line, "idxm"))
+    return argIs (pl->line + 4, what);
+
+  if (ISINST (pl->line, "pop") && argIs (pl->line + 4, "af") || ISINST (pl->line, "popaf"))
+    return !strcmp(what, "a");
+
+  // TODO: Other instructions
+
+  // One-operand instructions that write their argument
+  if (ISINST (pl->line, "neg") ||
+    ISINST (pl->line, "not") ||
+    ISINST (pl->line, "sl") ||
+    ISINST (pl->line, "slc") ||
+    ISINST (pl->line, "sr") ||
+    ISINST (pl->line, "src"))
+    return argIs (pl->line + 3, what);
+  if (ISINST (pl->line, "dzsn") ||
+    ISINST (pl->line, "izsn") ||
+    ISINST (pl->line, "ldt16"))
+    return argIs (pl->line + 5, what);
+
   return false;
 }
 
@@ -193,7 +321,7 @@ pdkSurelyWrites(const lineNode *pl, const char *what)
 static bool
 pdkUncondJump(const lineNode *pl)
 {
-  return (ISINST(pl->line, "goto"));
+  return (ISINST(pl->line, "goto") || ISINST(pl->line, "pcadd"));
 }
 
 static bool
@@ -347,7 +475,6 @@ doTermScan (lineNode **pl, const char *what)
           case S4O_RD_OP:
           default:
             /* no go */
-            return false;
             return false;
         }
     }

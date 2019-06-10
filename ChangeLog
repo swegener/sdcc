@@ -3,7 +3,7 @@
 	* src/pdk/main.c,
 	  src/pdk/peep.h,
 	  src/pdk/peep.c:
-	  Prepare for notUsed() and notUsedFrom().
+	  notUsed() and notUsedFrom() for flags.
 	* src/stm8/peep.c,
 	  src/z80/peep.c:
 	  Fixes for notUsedFrom().

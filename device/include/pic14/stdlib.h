@@ -106,13 +106,13 @@ void __data *_calloc (size_t size);
 void __data *malloc (size_t size);
 void __data *realloc (void __data *ptr, size_t size);
 #if __STDC_VERSION__ >= 201112L
-inline void __data *aligned_alloc(size_t alignment, size_t size)
+#if 0 // Won't compile on pic14 TODO: Fix this!
+inline void *aligned_alloc(size_t alignment, size_t size)
 {
   (void)alignment;
   return malloc(size);
 }
-#else
-extern void __data *aligned_alloc(size_t alignment, size_t size);
+#endif
 #endif
 void free (void __data * ptr);
 size_t memfree (void);
@@ -130,11 +130,13 @@ void *malloc (size_t size);
 void *realloc (void *ptr, size_t size);
 #endif
 #if __STDC_VERSION__ >= 201112L
+#if 0 // Won't compile on pic14 TODO: Fix this!
 inline void *aligned_alloc(size_t alignment, size_t size)
 {
   (void)alignment;
   return malloc(size);
 }
+#endif
 #endif
 extern void free (void * ptr);
 

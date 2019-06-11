@@ -46,7 +46,7 @@ extern int tolower (int c);
 extern int toupper (int c);
 
 /* Provide inline versions for the most used functions for efficiency */
-#if __STDC_VERSION__ >= 199901L
+#if __STDC_VERSION__ >= 199901L && !defined(__SDCC_pic14) // Why doesn't this work on pic14? TODO: Make it work!
 
 inline int isblank (int c)
 {

@@ -1,3 +1,9 @@
+2019-06-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/ctype.h,
+	  device/include/pic14/stdlib.h:
+	  Work around some pic14 inlining issue.
+
 2019-06-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c,

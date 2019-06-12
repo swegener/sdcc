@@ -38,5 +38,5 @@ libsdcceox_a_CFLAGS = $(AM_CFLAGS_EOX)
 endif ENABLE_EXPERIMENTAL
 endif ENABLE_NOOPTS
 
-SOURCE_DIRS = $(srcdir) $(srcdir)/..
+SOURCE_DIRS = . ..
 include $(top_srcdir)/Makefile.common

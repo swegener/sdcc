@@ -844,7 +844,7 @@ libc_a_CFLAGS = $(AM_CFLAGS)
 @ENABLE_EXPERIMENTAL_TRUE@@ENABLE_NOOPTS_TRUE@libcox_a_CFLAGS = $(AM_CFLAGS_OX)
 @ENABLE_ENHANCED_PICS_TRUE@@ENABLE_EXPERIMENTAL_TRUE@@ENABLE_NOOPTS_TRUE@libceox_a_SOURCES = $(libc_a_SOURCES)
 @ENABLE_ENHANCED_PICS_TRUE@@ENABLE_EXPERIMENTAL_TRUE@@ENABLE_NOOPTS_TRUE@libceox_a_CFLAGS = $(AM_CFLAGS_EOX)
-SOURCE_DIRS = $(srcdir)
+SOURCE_DIRS = .
 
 ############################################################
 # common source files for all variants of the sdcc library
@@ -5732,7 +5732,7 @@ EARCH ?= @EARCH@
 # NOTE: last empty line required because foreach concatenates several copies of this text
 define link-generic-files
 $(1)/%.c: $$(GENERIC_SRC_DIR_ABS)/%.c
-	test -e $$@ || ln -s $$< $$@
+	test -e $$(srcdir)/$$@ || ln -s $$< $$@
 
 endef
 

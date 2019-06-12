@@ -123,7 +123,7 @@ AM_CCASFLAGS += -I$(DEVICE_TOP_DIR)/include/pic14 -I$(DEVICE_TOP_DIR)/non-free/i
 # NOTE: last empty line required because foreach concatenates several copies of this text
 define link-generic-files
 $(1)/%.c: $$(GENERIC_SRC_DIR_ABS)/%.c
-	test -e $$@ || ln -s $$< $$@
+	test -e $$(srcdir)/$$@ || ln -s $$< $$@
 
 endef
 

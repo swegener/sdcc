@@ -1,8 +1,70 @@
+2019-06-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge pic14 branch.
+
+2019-06-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* device/lib/pic14/Makefile.common,
+	  device/lib/pic14/Makefile.in,
+	  device/lib/pic14/libc/Makefile.in,
+	  device/lib/pic14/libm/Makefile.in,
+	  device/lib/pic14/libsdcc/enhanced/Makefile.in,
+	  device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.in,
+	  device/lib/pic14/libsdcc/regular/Makefile.in:
+	  Fix another pic14 out-of-tree-build issue.
+
 2019-06-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/ctype.h,
 	  device/include/pic14/stdlib.h:
 	  Work around some pic14 inlining issue.
+	* sdcc/aclocal.m4,
+	  sdcc/config.guess,
+	  sdcc/config.sub,
+	  sdcc/device/lib/pic14/install-sh,
+	  sdcc/device/lib/pic14/libc/Makefile.am,
+	  sdcc/device/lib/pic14/libc/Makefile.in,
+	  sdcc/device/lib/pic14/libm/Makefile.am,
+	  sdcc/device/lib/pic14/libm/Makefile.in,
+	  sdcc/device/lib/pic14/libsdcc/enhanced/Makefile.am,
+	  sdcc/device/lib/pic14/libsdcc/enhanced/Makefile.in,
+	  sdcc/device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.am,
+	  sdcc/device/lib/pic14/libsdcc/enhanced-no-xinst/Makefile.in,
+	  sdcc/device/lib/pic14/libsdcc/regular/Makefile.am,
+	  sdcc/device/lib/pic14/libsdcc/regular/Makefile.in,
+	  sdcc/device/lib/pic14/missing,
+	  sdcc/install-sh,
+	  sdcc/sim/ucsim/ddconfig_in.h,
+	  sdcc/support/sdbinutils/bfd/doc/bfdver.texi:
+	  Fix pic14 library out-of-tree build.
+	* device/lib/pic14/configure.ac,
+	  device/lib/pic14/configure:
+	  Disable default build of extra libary flavors.
+
+2019-06-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/ctype.h,
+	  device/include/pic14/stdlib.h:
+	  Work around some pic14 inlining issue.
+
+2019-06-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c,
+	  src/pdk/gen.c,
+	  src/pdk/peep.c,
+	  src/pdk/peeph.def:
+	  pdk peephole improvements.
+
+2019-06-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c,
+	  src/pdk/peep.h,
+	  src/pdk/peep.c,	
+	  src/pdk/peeph.def:
+	  notUsed() and notUsedFrom().
+	* src/stm8/peep.c,
+	  src/z80/peep.c:
+	  Fixes for notUsedFrom().
 
 2019-06-10 Philipp Klaus Krause <pkk AT spth.de>
 

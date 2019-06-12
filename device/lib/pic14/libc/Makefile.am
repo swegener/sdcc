@@ -163,5 +163,5 @@ endif ENABLE_ENHANCED_PICS
 endif ENABLE_EXPERIMENTAL
 endif ENABLE_NOOPTS
 
-SOURCE_DIRS = $(srcdir)
+SOURCE_DIRS = .
 include $(top_srcdir)/Makefile.common

@@ -2915,8 +2915,8 @@ fi
 
 # default values for the following conditions
 : ${DEBUG:=0}
-: ${NOOPTS:=1}
-: ${EXPERIMENTAL:=1}
+: ${NOOPTS:=0}
+: ${EXPERIMENTAL:=0}
 
 # generate debug info during the build process
  if  test x$DEBUG = x1 ; then

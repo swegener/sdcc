@@ -102,8 +102,8 @@ AM_CONDITIONAL([ENABLE_EXTENDED_INSTRUCTIONS], [ test x$ENABLE_EXTENDED_INSTRUCT
 
 # default values for the following conditions
 : ${DEBUG:=0}
-: ${NOOPTS:=1}
-: ${EXPERIMENTAL:=1}
+: ${NOOPTS:=0}
+: ${EXPERIMENTAL:=0}
 
 # generate debug info during the build process
 AM_CONDITIONAL([ENABLE_DEBUG], [ test x$DEBUG = x1 ])

@@ -1,3 +1,9 @@
+2019-06-14 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-2912.c:
+	  Fix bug #2912.
+
 2019-06-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merge pic14 branch.

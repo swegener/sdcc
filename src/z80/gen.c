@@ -11477,12 +11477,15 @@ release:
 /* genReceive - generate code for a receive iCode                  */
 /*-----------------------------------------------------------------*/
 static void
-genReceive (const iCode * ic)
+genReceive (const iCode *ic)
 {
   int size = 0;
   operand *result = IC_RESULT (ic);
   aopOp (result, ic, FALSE, FALSE);
-  size = AOP_SIZE (result);
+  
+  genMove (result->aop, ASMOP_RETURN, true, isPairDead (PAIR_HL, ic));
+
+  /*size = AOP_SIZE (result);
 
   for (unsigned int i = 0; i < size;)
     {
@@ -11495,7 +11498,7 @@ genReceive (const iCode * ic)
            continue;
          }
 
-       if (requiresHL (result->aop) && (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX || ASMOP_RETURN->aopu.aop_reg[i]->rIdx == H_IDX))
+       if (requiresHL (result->aop) && result->aop->type != AOP_REG && (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX || ASMOP_RETURN->aopu.aop_reg[i]->rIdx == H_IDX))
          {
            emit2 (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX ? "ld a, l" : "ld a, h");
            emit2 ("ld (%s), a", aopGetLitWordLong (result->aop, i, FALSE));
@@ -11506,7 +11509,7 @@ genReceive (const iCode * ic)
 
        cheapMove (result->aop, i, ASMOP_RETURN, i, true);
        i++;
-    }
+    }*/
 
   freeAsmop (IC_RESULT (ic), NULL);
 }

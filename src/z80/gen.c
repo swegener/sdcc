@@ -11485,32 +11485,6 @@ genReceive (const iCode *ic)
   
   genMove (result->aop, ASMOP_RETURN, true, isPairDead (PAIR_HL, ic));
 
-  /*size = AOP_SIZE (result);
-
-  for (unsigned int i = 0; i < size;)
-    {
-       if (size - i >= 2 && (result->aop->type == AOP_HL || result->aop->type == AOP_IY) &&
-         (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX && ASMOP_RETURN->aopu.aop_reg[i + 1]->rIdx == H_IDX || ASMOP_RETURN->aopu.aop_reg[i]->rIdx == E_IDX && ASMOP_RETURN->aopu.aop_reg[i + 1]->rIdx == D_IDX))
-         {
-           emit2 ("ld (%s), %s", aopGetLitWordLong (result->aop, i, FALSE), ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX ?  "hl" : "de");
-           regalloc_dry_run_cost += 3 + (ASMOP_RETURN->aopu.aop_reg[i]->rIdx != L_IDX);
-           i += 2;
-           continue;
-         }
-
-       if (requiresHL (result->aop) && result->aop->type != AOP_REG && (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX || ASMOP_RETURN->aopu.aop_reg[i]->rIdx == H_IDX))
-         {
-           emit2 (ASMOP_RETURN->aopu.aop_reg[i]->rIdx == L_IDX ? "ld a, l" : "ld a, h");
-           emit2 ("ld (%s), a", aopGetLitWordLong (result->aop, i, FALSE));
-           regalloc_dry_run_cost += 4;
-           i++;
-           continue;
-         }
-
-       cheapMove (result->aop, i, ASMOP_RETURN, i, true);
-       i++;
-    }*/
-
   freeAsmop (IC_RESULT (ic), NULL);
 }
 

@@ -11479,7 +11479,6 @@ release:
 static void
 genReceive (const iCode *ic)
 {
-  int size = 0;
   operand *result = IC_RESULT (ic);
   aopOp (result, ic, FALSE, FALSE);
   

@@ -679,7 +679,7 @@ getPairId_o (const asmop *aop, int offset)
               return PAIR_IY;
             }
         }
-      else if (aop->type == AOP_STR || aop->type == AOP_HLREG)
+      else if (aop->type == AOP_STR)
         {
           int i;
           for (i = 0; i < NUM_PAIRS; i++)
@@ -714,7 +714,7 @@ z80_emitDebuggerSymbol (const char *debugSym)
   genLine.lineElement.isDebug = 0;
 }
 
-// Todo: Handle IY (when used as AOP_HLREG or AOP_REG) correctly.
+// Todo: Handle IY correctly.
 static unsigned char
 ld_cost (const asmop *op1, const asmop *op2)
 {
@@ -722,7 +722,7 @@ ld_cost (const asmop *op1, const asmop *op2)
   AOP_TYPE op2type = op2->type;
 
   /* Costs are symmetric */
-  if (op2type == AOP_REG || op2type == AOP_HLREG || op2type == AOP_DUMMY)
+  if (op2type == AOP_REG || op2type == AOP_DUMMY)
     {
       const asmop *tmp = op1;
       op1 = op2;
@@ -734,12 +734,10 @@ ld_cost (const asmop *op1, const asmop *op2)
   switch (op1type)
     {
     case AOP_REG:
-    case AOP_HLREG:
     case AOP_DUMMY:
       switch (op2type)
         {
         case AOP_REG:
-        case AOP_HLREG:
         case AOP_DUMMY:
           return (1);
         case AOP_IMMD:
@@ -769,7 +767,6 @@ ld_cost (const asmop *op1, const asmop *op2)
       switch (op2type)
         {
         case AOP_REG:
-        case AOP_HLREG:
         case AOP_DUMMY:
           return (2);
         case AOP_IMMD:
@@ -835,7 +832,6 @@ ld_cost (const asmop *op1, const asmop *op2)
       switch (op2type)
         {
         case AOP_REG:
-        case AOP_HLREG:
         case AOP_DUMMY:
           return (4);
         case AOP_IMMD:
@@ -870,7 +866,6 @@ op8_cost (const asmop * op2)
   switch (op2->type)
     {
     case AOP_REG:
-    case AOP_HLREG:
     case AOP_DUMMY:
       return (1);
     case AOP_IMMD:
@@ -901,7 +896,6 @@ bit8_cost (const asmop * op1)
   switch (op1->type)
     {
     case AOP_REG:
-    case AOP_HLREG:
     case AOP_DUMMY:
       return (2);
     case AOP_STK:
@@ -1036,7 +1030,6 @@ static const char *aopNames[] =
   "AOP_CRY",
   "AOP_IY",
   "AOP_HL",
-  "AOP_HLREG",
   "AOP_EXSTK",
   "AOP_PAIRPT",
   "AOP_DUMMY"
@@ -1106,7 +1099,7 @@ getPairName (asmop *aop)
           break;
         }
     }
-  else if (aop->type == AOP_STR || aop->type == AOP_HLREG)
+  else if (aop->type == AOP_STR)
     {
       int i;
       for (i = 0; i < NUM_PAIRS; i++)
@@ -1620,13 +1613,13 @@ aopOp (operand *op, const iCode *ic, bool result, bool requires_a)
               wassertl (aop->size == 1, "Internal error: Caching in A, but too big to fit in A");
               aop->aopu.aop_reg[0] = regsZ80 + A_IDX;
             }
-          else if (sym->accuse == ACCUSE_IY)
+          else if (sym->accuse == ACCUSE_IY) /* For compability with old register allocator only */
             {
-              aop = op->aop = sym->aop = newAsmop (AOP_HLREG);
+              sym->aop = op->aop = aop = newAsmop (AOP_REG);
               aop->size = getSize (sym->type);
               wassertl (aop->size <= 2, "Internal error: Caching in IY, but too big to fit in IY");
-              aop->aopu.aop_str[0] = _pairs[PAIR_IY].l;
-              aop->aopu.aop_str[1] = _pairs[PAIR_IY].h;
+              aop->aopu.aop_reg[0] = regsZ80 + IYL_IDX;
+              aop->aopu.aop_reg[0] = regsZ80 + IYH_IDX;
             }
           else
             {
@@ -1824,7 +1817,6 @@ aopGetLitWordLong (const asmop *aop, int offset, bool with_hash)
     }
     break;
 
-    case AOP_HLREG:
     case AOP_REG:
     case AOP_STK:
     case AOP_DIR:
@@ -1890,7 +1882,6 @@ requiresHL (const asmop * aop)
       return FALSE;
     case AOP_HL:
     case AOP_EXSTK:
-    case AOP_HLREG:
       return TRUE;
     case AOP_STK:
       return (IS_GB || _G.omitFramePtr);
@@ -2644,11 +2635,6 @@ aopGet (asmop *aop, int offset, bool bit16)
           wassertl (0, "Tried to fetch from a bit variable");
           break;
 
-
-        case AOP_HLREG:
-          dbuf_append_str (&dbuf, aop->aopu.aop_str[offset]);
-          break;
-
         case AOP_LIT:
           dbuf_append_str (&dbuf, aopLiteral (aop->aopu.aop_lit, offset));
           break;
@@ -2713,7 +2699,7 @@ canAssignToPtr (const char *s)
 static bool
 canAssignToPtr3 (const asmop *aop)
 {
-  if (aop->type == AOP_REG || aop->type == AOP_HLREG)
+  if (aop->type == AOP_REG)
     return (TRUE);
   if (aop->type == AOP_IMMD || aop->type == AOP_LIT)
     return (TRUE);
@@ -2957,12 +2943,6 @@ aopPut (asmop *aop, const char *s, int offset)
       break;
 #endif
 
-    case AOP_HLREG:
-      wassert (offset < 2);
-      emit2 ("ld %s, %s", aop->aopu.aop_str[offset], s);
-      spillPairReg (aop->aopu.aop_str[offset]);
-      break;
-
     case AOP_PAIRPTR:
       setupPair (aop->aopu.aop_pairId, aop, offset);
       if (aop->aopu.aop_pairId == PAIR_IX)
@@ -3018,9 +2998,6 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
 {
   /* Todo: Longer list of moves that can be optimized out. */
   if (to->type == AOP_REG && from->type == AOP_REG && to->aopu.aop_reg[to_offset] == from->aopu.aop_reg[from_offset])
-    return;
-  if (to->type == AOP_HLREG && from->type == AOP_HLREG
-      && !strcmp (to->aopu.aop_str[to_offset], from->aopu.aop_str[from_offset]))
     return;
   if (aopInReg (to, to_offset, A_IDX))
     a_dead = true;
@@ -10314,7 +10291,7 @@ genPointerGet (const iCode *ic)
             _push (PAIR_AF), pushed_a = TRUE;
 
           /* PENDING: make this better */
-          if ((pair == PAIR_HL) && (AOP_TYPE (result) == AOP_REG || AOP_TYPE (result) == AOP_HLREG))
+          if ((pair == PAIR_HL) && AOP_TYPE (result) == AOP_REG)
             {
               if (!regalloc_dry_run)
                 aopPut (AOP (result), "!*hl", offset++);
@@ -10350,9 +10327,9 @@ release:
 static bool
 isRegOrLit (asmop * aop)
 {
-  if (aop->type == AOP_REG || aop->type == AOP_LIT || aop->type == AOP_IMMD || aop->type == AOP_HLREG)
-    return TRUE;
-  return FALSE;
+  if (aop->type == AOP_REG || aop->type == AOP_LIT || aop->type == AOP_IMMD)
+    return true;
+  return false;
 }
 
 

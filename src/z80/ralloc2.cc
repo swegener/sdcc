@@ -1387,14 +1387,6 @@ static bool assignment_hopeless(const assignment &a, unsigned short int i, const
 
   const i_assignment_t &ia = a.i_assignment;
 
-  // Code generator cannot handle variables that are only partially in IY.
-  if(OPTRALLOC_IY &&
-    (ia.registers[REG_IYL][1] >= 0 && (I[ia.registers[REG_IYL][1]].size != 2 || I[ia.registers[REG_IYL][1]].byte != 0) ||
-    ia.registers[REG_IYH][1] >= 0 && (I[ia.registers[REG_IYH][1]].size != 2 || I[ia.registers[REG_IYH][1]].byte != 1) ||
-    ia.registers[REG_IYL][0] >= 0 && (I[ia.registers[REG_IYL][0]].size != 2 || I[ia.registers[REG_IYL][0]].byte != 0) ||
-    ia.registers[REG_IYH][0] >= 0 && (I[ia.registers[REG_IYH][0]].size != 2 || I[ia.registers[REG_IYH][0]].byte != 1)))
-    return(true);
-
   // Can only check for HLinst_ok() in some cases.
   if(OPTRALLOC_HL &&
       (ia.registers[REG_L][1] >= 0 && ia.registers[REG_H][1] >= 0) &&
@@ -1404,8 +1396,7 @@ static bool assignment_hopeless(const assignment &a, unsigned short int i, const
 
   // Can only check for IYinst_ok() in some cases.
   if(OPTRALLOC_IY &&
-      (ia.registers[REG_IYL][1] >= 0 && ia.registers[REG_IYH][1] >= 0) &&
-      !((ia.registers[REG_IYL][0] >= 0) ^ (ia.registers[REG_IYH][0] >= 0)) &&
+      (ia.registers[REG_IYL][1] >= 0 || ia.registers[REG_IYH][1] >= 0) &&
       !IYinst_ok(a, i, G, I))
     return(true);
 

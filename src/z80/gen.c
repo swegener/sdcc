@@ -1101,6 +1101,9 @@ getPairName (asmop *aop)
         case L_IDX:
           return "hl";
           break;
+        case IYL_IDX:
+          return "iy";
+          break;
         }
     }
   else if (aop->type == AOP_STR || aop->type == AOP_HLREG)
@@ -3204,7 +3207,7 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
 static void
 genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool a_dead, bool hl_dead)
 {
-  int i, regsize, size, n = (sizex < source->size - soffset) ? sizex : (source->size - soffset);
+  int regsize, size, n = (sizex < source->size - soffset) ? sizex : (source->size - soffset);
   bool assigned[8] = {false, false, false, false, false, false, false, false};
   bool a_free, hl_free;
   int cached_byte = -1;
@@ -3215,7 +3218,8 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   wassertl_bt (aopRS (result), "Invalid result type.");
 
   size = n;
-  for (i = 0, regsize = 0; i < n; i++)
+  regsize = 0;
+  for (int i = 0; i < n; i++)
     regsize += (source->type == AOP_REG);
 
   // Do nothing for coalesced bytes.
@@ -3228,7 +3232,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       }
 
   // Move everything from registers to the stack.
-  for (i = 0; i < n;)
+  for (int i = 0; i < n;)
     {
       if (i + 1 < n && result->type == AOP_STK &&
         (aopInReg (source, soffset + i, HL_IDX) && IS_RAB ||
@@ -3258,7 +3262,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   // Copy (stack-to-stack) what we can with whatever free regs we have.
   a_free = a_dead;
   hl_free = hl_dead;
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     {
       asmop *operand;
       int offset;
@@ -3289,7 +3293,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       int ex[4] = {-2, -2, -2, -2};
 
       // Find L and check that it is exchanged with E, find H and check that it is exchanged with D.
-      for (i = 0; i < n; i++)
+      for (int i = 0; i < n; i++)
         {
           if (!assigned[i] && aopInReg (result, roffset + i, L_IDX) && aopInReg (source, soffset + i, E_IDX))
             ex[0] = i;
@@ -3320,19 +3324,44 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
         }
     }
 
-  // TODO: Use push iy / pop rr, push rr / pop iy, lea rr, ix
+  // Try to use push rr / pop iy.
+  for (int i = 0; i + 1< n; i++)
+    {
+      if (assigned[i] || assigned[i + 1])
+        continue;
+
+      for (int j = 0; j + 1 < n; j++)
+        {
+          if (!assigned[j] && i != j && i + 1 != j && (result->aopu.aop_reg[roffset + i] == source->aopu.aop_reg[soffset + j] || result->aopu.aop_reg[roffset + i + 1] == source->aopu.aop_reg[soffset + j]))
+            goto skip_byte; // We can't write this one without overwriting the source.
+        }
+
+      if (aopInReg (result, roffset + i, IY_IDX) && getPairId_o (source, soffset + i) != PAIR_INVALID ||
+        getPairId_o (result, roffset + i) != PAIR_INVALID && aopInReg (source, soffset + i, IY_IDX))
+        {
+          emit2 ("push %s", _pairs[getPairId_o (source, soffset + i)].name);
+          emit2 ("pop %s", _pairs[getPairId_o (result, roffset + i)].name);
+          regalloc_dry_run_cost += 3;
+          regsize -= 2;
+          size -= 2;
+          assigned[i] = true;
+          assigned[i + 1] = true;
+        }
+    }
+
+  // TODO: Try to use push iy / pop rr, lea rr, ix
 
   while (regsize && result->type == AOP_REG && source->type == AOP_REG)
     {
+      int i;
+
       // Find lowest byte that can be assigned and needs to be assigned.
       for (i = 0; i < n; i++)
         {
-          int j;
-
           if (assigned[i])
             continue;
 
-          for (j = 0; j < n; j++)
+          for (int j = 0; j < n; j++)
             {
               if (!assigned[j] && i != j && result->aopu.aop_reg[roffset + i] == source->aopu.aop_reg[soffset + j])
                 goto skip_byte; // We can't write this one without overwriting the source.
@@ -3383,7 +3412,7 @@ skip_byte:
   // Copy (stack-to-stack) what we can with whatever free regs we have now.
   a_free = a_dead;
   hl_free = hl_dead;
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     {
       if (!assigned[i])
         continue;
@@ -3395,7 +3424,7 @@ skip_byte:
   genCopyStack (result, roffset, source, soffset, n, assigned, &size, a_free, hl_free, false);
 
   // Last, move everything from stack to registers.
-  for (i = 0; i < n;)
+  for (int i = 0; i < n;)
     {
       if (i + 1 < n && source->type == AOP_STK &&
         (aopInReg (result, roffset + i, HL_IDX) && IS_RAB ||

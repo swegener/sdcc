@@ -1036,10 +1036,28 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(unused_IYL && unused_IYH)
     return(true); // Register IY not in use.
 
+  if(SKIP_IC2(ic))
+    return(true);
+
   if(exstk && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G))) // Todo: Make this more accurate to get better code when using --fomit-frame-pointer
     return(false);
 
-  // Code generator cannot handle variables that are only partially in IY.
+  if(ic->op == CALL)
+    return(true);
+
+  if(!result_in_IY && !input_in_IY &&
+    !(IC_RESULT(ic) && isOperandInDirSpace(IC_RESULT(ic))) &&
+    !(IC_RIGHT(ic) && IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
+    !(IC_LEFT(ic) && IS_TRUE_SYMOP(IC_LEFT(ic))))
+    return(true);
+
+  // variables partially in IY can be pushed.
+  if(ic->op == IPUSH &&
+    operand_in_reg(left, REG_IYL, ia, i, G) && operand_in_reg(left, REG_IYH, ia, i, G) &&
+    (I[ia.registers[REG_IYL][1]].byte == 0 && I[ia.registers[REG_IYH][1]].byte == 1 || I[ia.registers[REG_IYL][1]].byte == 2 && I[ia.registers[REG_IYH][1]].byte == 3))
+    return(true);
+
+  // Code generator mostly cannot handle variables that are only partially in IY.
   if(unused_IYL ^ unused_IYH)
     return(false);
   if(!unused_IYL && I[ia.registers[REG_IYL][1]].size != 2 || !unused_IYH && I[ia.registers[REG_IYH][1]].size != 2 ||
@@ -1091,15 +1109,6 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
       std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
     }
 #endif
-
-  if(SKIP_IC2(ic))
-    return(true);
-
-  if(!result_in_IY && !input_in_IY &&
-    !(IC_RESULT(ic) && isOperandInDirSpace(IC_RESULT(ic))) &&
-    !(IC_RIGHT(ic) && IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
-    !(IC_LEFT(ic) && IS_TRUE_SYMOP(IC_LEFT(ic))))
-    return(true);
 
   if(!result_in_IY && !input_in_IY &&
     (ic->op == '=' || ic->op == CAST && getSize(operandType(IC_RIGHT (ic))) >= 2 && (getSize(operandType(IC_RESULT (ic))) <= getSize(operandType(IC_RIGHT (ic))) || !IS_SPEC(operandType(IC_RIGHT (ic))) || SPEC_USIGN(operandType(IC_RIGHT(ic))))) &&
@@ -1209,20 +1218,10 @@ static void assign_operand_for_cost(operand *o, const assignment &a, unsigned sh
       var_t v = oi->second;
       if(a.global[v] >= 0)
         { 
-          if(a.global[v] != REG_IYL && a.global[v] != REG_IYH || !OPTRALLOC_IY)
-            {
-              sym->regs[I[v].byte] = regsZ80 + a.global[v];
-              sym->accuse = 0;
-              sym->isspilt = false;
-              sym->nRegs = I[v].size;
-            }
-          else
-            {
-              sym->accuse = ACCUSE_IY;
-              sym->isspilt = false;
-              sym->nRegs = 0;
-              sym->regs[I[v].byte] = 0;
-            }
+          sym->regs[I[v].byte] = regsZ80 + a.global[v];
+          sym->accuse = 0;
+          sym->isspilt = false;
+          sym->nRegs = I[v].size;
         }
       else
         {
@@ -1587,20 +1586,11 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
       symbol *sym = (symbol *)(hTabItemWithKey(liveRanges, I[v].v));
       if(winner.global[v] >= 0)
         {
-          if(winner.global[v] != REG_IYL && winner.global[v] != REG_IYH || !OPTRALLOC_IY)
-            {
-              sym->regs[I[v].byte] = regsZ80 + winner.global[v];
-              sym->accuse = 0;
-              sym->isspilt = false;
-              sym->nRegs = I[v].size;
-            }
-          else
-            {
-              sym->accuse = ACCUSE_IY;
-              sym->isspilt = false;
-              sym->nRegs = 0;
-              sym->regs[I[v].byte] = 0;
-            }
+         
+          sym->regs[I[v].byte] = regsZ80 + winner.global[v];
+          sym->accuse = 0;
+          sym->isspilt = false;
+          sym->nRegs = I[v].size;
         }
       else
         {

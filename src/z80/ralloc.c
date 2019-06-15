@@ -125,6 +125,8 @@ static reg_info _z80_regs[] = {
   {REG_GPR, D_IDX, "d", 1},
   {REG_GPR, L_IDX, "l", 1},
   {REG_GPR, H_IDX, "h", 1},
+  {REG_GPR, IYL_IDX, "iyl", 1},
+  {REG_GPR, IYH_IDX, "iyh", 1},
   {REG_CND, CND_IDX, "c", 1}
 };
 

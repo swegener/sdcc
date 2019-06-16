@@ -3310,7 +3310,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       for (int j = 0; j + 1 < n; j++)
         {
           if (!assigned[j] && i != j && i + 1 != j && (result->aopu.aop_reg[roffset + i] == source->aopu.aop_reg[soffset + j] || result->aopu.aop_reg[roffset + i + 1] == source->aopu.aop_reg[soffset + j]))
-            continue; // We can't write this one without overwriting the source.
+            goto skip_byte_push_iy; // We can't write this one without overwriting the source.
         }
 
       if (aopInReg (result, roffset + i, IY_IDX) && getPairId_o (source, soffset + i) != PAIR_INVALID ||
@@ -3324,6 +3324,9 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           assigned[i] = true;
           assigned[i + 1] = true;
         }
+
+skip_byte_push_iy:
+        ;
     }
 
   // TODO: Try to use push iy / pop rr, lea rr, ix

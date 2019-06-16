@@ -549,7 +549,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   bool exstk = (should_omit_frame_ptr || (currFunc && currFunc->stack > 127) || IS_GB);
 
-  //std::cout << "Ainst_ok: A = (" << ia.registers[REG_A][0] << ", " << ia.registers[REG_A][1] << "), inst " << i << ", " << ic->key << "\n";
+  //std::cout << "Ainst_ok at " << G[i].ic->key << ": A = (" << ia.registers[REG_A][0] << ", " << ia.registers[REG_A][1] << "), inst " << i << ", " << ic->key << "\n";
 
   // Check if the result of this instruction is placed in A.
   bool result_in_A = operand_in_reg(IC_RESULT(ic), REG_A, ia, i, G);
@@ -598,7 +598,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(true);
 
   // The Z180 has a non-destructive testing and.
-  if((IS_Z180 || IS_EZ80_Z80)&& ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) &&
+  if((IS_Z180 || IS_EZ80_Z80) && ic->op == BITWISEAND && ifxForOp (result, ic) &&
     (getSize(operandType(left)) == 1 && operand_in_reg(left, REG_A, ia, i, G) && (IS_OP_LITERAL(right) /*|| operand_in_reg(right, ia, i, G) && !operand_in_reg(right, REG_IYL, ia, i, G) && !operand_in_reg(right, REG_IYH, ia, i, G)*/) ||
     getSize(operandType(right)) == 1 && operand_in_reg(right, REG_A, ia, i, G) && (IS_OP_LITERAL(left) /*|| operand_in_reg(left, ia, i, G) && !operand_in_reg(left, REG_IYL, ia, i, G) && !operand_in_reg(left, REG_IYH, ia, i, G)*/)))
     return(true);
@@ -621,6 +621,34 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
         (operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G) || !result_in_A))
         return(true);
     }
+
+  if ((ic->op == '|' || ic->op == '^') && // OK if the only byte actually changed is in A
+    IS_ITEMP(result) &&
+    (IS_ITEMP(left) && IS_OP_LITERAL(right) || IS_OP_LITERAL(left) && IS_ITEMP(right)))
+    {
+      operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
+      operand *const regop = IS_OP_LITERAL(left) ? IC_RIGHT(ic) : IC_LEFT(ic);
+      unsigned char litbyte = 0;
+      for(unsigned int j = 0; j < getSize(operandType(result)); j++)
+        {
+          unsigned char byte = byteOfVal (OP_VALUE (litop), j);
+
+          if (byte && litbyte)
+            goto nobyte;
+          litbyte = byte;
+          if (litbyte && (operand_byte_in_reg(result, j, REG_A, a, i, G) || operand_byte_in_reg(regop, j, REG_A, a, i, G)))
+            continue;
+          if (!operand_byte_in_reg(result, j, REG_B, a, i, G) && !operand_byte_in_reg(result, j, REG_C, a, i, G))
+            goto nobyte;
+          if (operand_byte_in_reg(result, j, REG_B, a, i, G) && !operand_byte_in_reg(regop, j, REG_B, a, i, G) ||
+            operand_byte_in_reg(result, j, REG_C, a, i, G) && !operand_byte_in_reg(regop, j, REG_C, a, i, G))
+            goto nobyte;
+        }
+      return(true);
+  nobyte:
+      ;
+    }
+
 
   // First two bytes of input may be in A.
   if(ic->op == IFX && dying_A && (getSize(operandType(left)) >= 1 &&
@@ -647,15 +675,24 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     (getSize(operandType(IC_RESULT(ic))) == 2 && operand_is_pair(IC_RESULT(ic), a, i, G) || getSize(operandType(IC_RESULT(ic))) == 1 && operand_in_reg(result, ia, i, G) && operand_in_reg(result, ia, i, G)))
     return(true);
 
+  if(ic->op == GET_VALUE_AT_ADDRESS) // Any register can be assigned from (hl) and (iy), so we don't need to go through a then.
+    return(!IS_BITVAR(getSpec(operandType(result))) &&
+    (getSize(operandType(right)) == 1 || operand_is_pair(right, a, i, G) && (operand_in_reg(right, REG_L, ia, i, G) || operand_in_reg(right, REG_IYL, ia, i, G))));
+
+  if(ic->op == '=' && POINTER_SET (ic) && // Any register can be assigned to (hl) and (iy), so we don't need to go through a then.
+    !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))) &&
+    (getSize(operandType(right)) == 1 || operand_is_pair(result, a, i, G) && (operand_in_reg(result, REG_L, ia, i, G) || operand_in_reg(result, REG_IYL, ia, i, G))))
+    return(true);
+
   // Code generator mostly cannot handle variables that are only partially in A.
-  if(I[ia.registers[REG_A][1]].size > 1 || (ia.registers[REG_A][0] >= 0 && I[ia.registers[REG_A][0]].size > 1))
+  if(operand_in_reg(left, REG_A, ia, i, G) && getSize(operandType(left)) != 1 ||
+    operand_in_reg(right, REG_A, ia, i, G) && getSize(operandType(right)) != 1 ||
+    operand_in_reg(result, REG_A, ia, i, G) && getSize(operandType(result)) != 1)
     return(false);
 
   if(ic->op == '!' && getSize(operandType(left)) <= 2 && dying_A)
     return(true);
 
-  if(ic->op == GET_VALUE_AT_ADDRESS)
-    return(!IS_BITVAR(getSpec(operandType(result))));
   if(ic->op == '=' && POINTER_SET (ic))
     return(dying_A || !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))));
 

@@ -1,5 +1,13 @@
 2019-06-16 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc2.cc,
+	  src/SDCCgen.h,
+	  src/SDCCgen.c,
+	  src/z80/gen.c:
+	  Improve handling of a.
+
+2019-06-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Fix an issue in iy shuffling.
 

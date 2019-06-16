@@ -3677,32 +3677,38 @@ _toBoolean (const operand *oper, bool needflag)
 {
   int size = AOP_SIZE (oper);
   sym_link *type = operandType (oper);
-  int offset = size - 1;
+  int skipbyte;
 
   if (size == 1 && needflag)
     {
-      cheapMove (ASMOP_A, 0, AOP (oper), 0, true);
+      cheapMove (ASMOP_A, 0, oper->aop, 0, true);
       emit3 (A_OR, ASMOP_A, ASMOP_A);
       return;
     }
 
   // Special handling to not overwrite a.
-  if (size >= 2 && !IS_FLOAT (type) && aopInReg (AOP (oper), 1, A_IDX))
-    {
-      emit3_o (A_OR, ASMOP_A, 0, AOP (oper), 0);
-      offset--;
-      size--;
-    }
+  if (oper->aop->regs[A_IDX] >= 0)
+    skipbyte = oper->aop->regs[A_IDX];
   else
-    cheapMove (ASMOP_A, 0, AOP (oper), offset--, true);
+    {
+      cheapMove (ASMOP_A, 0, oper->aop, size - 1, true);
+      skipbyte = size - 1;
+    }
 
   if (IS_FLOAT (type))
     {
+      if (skipbyte != size - 1)
+        {
+          wassert (regalloc_dry_run);
+          regalloc_dry_run_cost += 120;
+        }
       emit2 ("res 7, a");   //clear sign bit
       regalloc_dry_run_cost += 2;
+      skipbyte = size - 1;
     }
-  while (--size)
-    emit3_o (A_OR, ASMOP_A, 0, AOP (oper), offset--);
+  while (size--)
+    if (size != skipbyte)
+      emit3_o (A_OR, ASMOP_A, 0, oper->aop, size);
 }
 
 /*-----------------------------------------------------------------*/

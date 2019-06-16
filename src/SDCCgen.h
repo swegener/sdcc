@@ -96,7 +96,7 @@ void emitcode (const char *inst, const char *fmt, ...);
 void emitLabel (symbol * tlbl);
 void genInline (iCode * ic);
 void printLine (lineNode *, struct dbuf_s *);
-iCode *ifxForOp (operand *op, const iCode *ic);
+iCode *ifxForOp (const operand *op, const iCode *ic);
 
 #ifdef __cplusplus
 }

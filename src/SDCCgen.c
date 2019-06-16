@@ -330,7 +330,7 @@ printLine (lineNode * head, struct dbuf_s *oBuf)
 /* ifxForOp - returns the icode containing the ifx for operand     */
 /*-----------------------------------------------------------------*/
 iCode *
-ifxForOp (operand * op, const iCode * ic)
+ifxForOp (const operand *op, const iCode *ic)
 {
   iCode *ifxIc;
 
@@ -346,8 +346,8 @@ ifxForOp (operand * op, const iCode * ic)
 
       if (ifxIc && ifxIc->op == IFX &&
         IC_COND (ifxIc)->key == op->key &&
-        OP_SYMBOL (op)->liveFrom >= ic->seq &&
-        OP_SYMBOL (op)->liveTo <= ifxIc->seq)
+        OP_SYMBOL_CONST (op)->liveFrom >= ic->seq &&
+        OP_SYMBOL_CONST (op)->liveTo <= ifxIc->seq)
         return ifxIc;
     }
 

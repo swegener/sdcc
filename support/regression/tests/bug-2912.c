@@ -8,7 +8,7 @@
 #define __z88dk_fastcall
 #endif
 
-#if !defined(SDCC_pdk14) && !defined(SDCC_pdk15) // lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // lack of memory
 float y, z;
 
 float m32_sinf (float x) __z88dk_fastcall
@@ -29,7 +29,7 @@ float m32_tanf (float x) __z88dk_fastcall
 
 void testBug(void)
 {
-#if !defined(SDCC_pdk14) && !defined(SDCC_pdk15) // lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // lack of memory
     volatile float x = 23.0f;
 
     m32_tanf(x);

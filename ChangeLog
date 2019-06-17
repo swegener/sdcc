@@ -2,6 +2,8 @@
 
 	* support/regression/tests/bug-2912.c:
 	  Fix a typo that resulted in a test being accidentially enabled for pdk.
+	* src/z80/gen.c:
+	  Fix handling of swapped register operand in 16-bit shift by literal.
 
 2019-06-16 Philipp Klaus Krause <pkk AT spth.de>
 

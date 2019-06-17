@@ -8788,10 +8788,7 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
   if (isPair (AOP (result)) && !offr)
     fetchPairLong (getPairId (AOP (result)), AOP(left), ic, offl);
   else
-    {
-      movLeft2Result (left, offl, result, offr, 0);
-      movLeft2Result (left, offl + 1, result, offr + 1, 0);
-    }
+    genMove_o (result->aop, offr, left->aop, offl, 2, true, isPairDead (PAIR_HL, ic));
 
   if (shCount == 0)
     return;
@@ -8883,11 +8880,7 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
   else if (isPair (AOP (result)) && !offr)
     fetchPairLong (getPairId (AOP (result)), AOP(left), ic, offl);
   else
-    {
-      /* Copy left into result */
-      movLeft2Result (left, offl, result, offr, 0);
-      movLeft2Result (left, offl + 1, result, offr + 1, 0);
-    }
+    genMove_o (result->aop, offr, left->aop, offl, 2, true, isPairDead (PAIR_HL, ic));
 
   if (shCount == 0)
     ;

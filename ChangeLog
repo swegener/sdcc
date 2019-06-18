@@ -1,3 +1,14 @@
+2019-06-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z88/ralloc2.cc,
+	  src/z80/gen.c:
+	  Improve handling of a in &.
+
+2019-06-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z88/ralloc2.cc:
+	  Fix an issue in register allocation for GET_VALUE_AT_ADRESS.
+
 2019-06-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* support/regression/tests/bug-2912.c:

@@ -8518,6 +8518,8 @@ genXor (const iCode * ic, iCode * ifx)
   operand *left, *right, *result;
   int size, offset = 0;
   unsigned long long lit = 0;
+  bool pushed_a = false;
+  bool a_free = !bitVectBitValue (ic->rSurv, A_IDX);
 
   aopOp ((left = IC_LEFT (ic)), ic, FALSE, FALSE);
   aopOp ((right = IC_RIGHT (ic)), ic, FALSE, FALSE);
@@ -8573,6 +8575,12 @@ genXor (const iCode * ic, iCode * ifx)
           /* PENDING: Test case for this. */
           wassertl (0, "Tried to XOR left against a literal with the result going into a bit");
         }
+      if (!a_free)
+        {
+          _push (PAIR_AF);
+          a_free = true;
+          pushed_a = true;
+        }
       while (sizel--)
         {
           cheapMove (ASMOP_A, 0, left->aop, offset, true);
@@ -8594,69 +8602,47 @@ genXor (const iCode * ic, iCode * ifx)
       goto release;
     }
 
-  /* if left is same as result */
-  if (sameRegs (AOP (result), AOP (left)))
-    {
-      for (; size--; offset++)
+    // left & result in different registers
+    if (AOP_TYPE (result) == AOP_CRY)
+      {
+        wassertl (0, "Result of XOR is in a bit");
+      }
+    else
+      for (; (size--); offset++)
         {
+          // normal case
+          // result = left & right
           if (AOP_TYPE (right) == AOP_LIT)
             {
               if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
-                continue;
-              else
                 {
-                  cheapMove (ASMOP_A, 0, left->aop, offset, true);
-                  emit3_o (A_XOR, ASMOP_A, 0, right->aop, offset);
-                  cheapMove (result->aop, offset, ASMOP_A, 0, true);
+                  cheapMove (result->aop, offset, left->aop, offset, a_free);
+                  continue;
                 }
             }
+          // faster than result <- left, anl result,right
+          // and better if result is SFR
+          if (!a_free)
+            {
+              _push (PAIR_AF);
+              a_free = true;
+              pushed_a = true;
+            }
+          if (aopInReg (right->aop, offset, A_IDX))
+            emit3_o (A_XOR, ASMOP_A, 0, left->aop, offset);
           else
             {
-              if (aopInReg (left->aop, 0, A_IDX))
-                emit3_o (A_XOR, ASMOP_A, 0, AOP (right), offset);
-              else
-                {
-                  cheapMove (ASMOP_A, 0, left->aop, offset, true);
-                  emit3_o (A_XOR, ASMOP_A, 0, right->aop, offset);
-                  cheapMove (result->aop, offset, ASMOP_A, 0, true);
-                }
+              cheapMove (ASMOP_A, 0, left->aop, offset, true);
+              emit3_o (A_XOR, ASMOP_A, 0, right->aop, offset);
             }
+          cheapMove (result->aop, offset, ASMOP_A, 0, true);
+          if (aopInReg (result->aop, offset, A_IDX))
+            a_free = false;
         }
-    }
-  else
-    {
-      // left & result in different registers
-      if (AOP_TYPE (result) == AOP_CRY)
-        {
-          wassertl (0, "Result of XOR is in a bit");
-        }
-      else
-        for (; (size--); offset++)
-          {
-            // normal case
-            // result = left & right
-            if (AOP_TYPE (right) == AOP_LIT)
-              {
-                if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
-                  {
-                    cheapMove (result->aop, offset, left->aop, offset, true);
-                    continue;
-                  }
-              }
-            // faster than result <- left, anl result,right
-            // and better if result is SFR
-            if (aopInReg (left->aop, 0, A_IDX))
-              emit3_o (A_XOR, ASMOP_A, 0, AOP (right), offset);
-            else
-              {
-                cheapMove (ASMOP_A, 0, left->aop, offset, true);
-                emit3_o (A_XOR, ASMOP_A, 0, right->aop, offset);
-              }
-            cheapMove (result->aop, offset, ASMOP_A, 0, true);
-          }
-    }
 
 release:
+  if (pushed_a)
+     _pop (PAIR_AF);
   freeAsmop (left, NULL);
   freeAsmop (right, NULL);
   freeAsmop (result, NULL);

@@ -575,6 +575,9 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     IS_TRUE_SYMOP (right) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (right)->etype))))
     return(false);
 
+  //if (ic->op == '^') // ^ codegen can handle it all.
+  //   return(true);
+
   // bit instructions do not disturb a.
   if(ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) &&
     (IS_OP_LITERAL(left) && (!(IS_GB && IS_TRUE_SYMOP (right) || exstk && operand_on_stack(right, a, i, G)) || operand_in_reg(right, ia, i, G) && !operand_in_reg(right, REG_IYL, ia, i, G) && !operand_in_reg(right, REG_IYH, ia, i, G)) ||
@@ -622,7 +625,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
         return(true);
     }
 
-  if ((ic->op == '|' || ic->op == '^') && // OK if the only byte actually changed is in A
+  if ((ic->op == '^' || ic->op == BITWISEAND || ic->op == '|') && // OK if the only byte actually changed in A is in A anyway.
     IS_ITEMP(result) &&
     (IS_ITEMP(left) && IS_OP_LITERAL(right) || IS_OP_LITERAL(left) && IS_ITEMP(right)))
     {
@@ -632,16 +635,31 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       for(unsigned int j = 0; j < getSize(operandType(result)); j++)
         {
           unsigned char byte = byteOfVal (OP_VALUE (litop), j);
-
-          if (byte && litbyte)
+          if (ic->op == BITWISEAND)
+            byte = ~byte & 0xff;
+          bool singlebit = false;
+          if ((ic->op == BITWISEAND || ic->op == '|') && // We have res and set, but no equivalent for xor on a single bit.
+            (byte == 0x01 || byte == 0x02 || byte == 0x04 || byte == 0x08 || byte == 0x10 || byte == 0x20 || byte == 0x40 || byte == 0x80))
+            singlebit = true;
+          if (byte && litbyte && !singlebit)
             goto nobyte;
-          litbyte = byte;
-          if (litbyte && (operand_byte_in_reg(result, j, REG_A, a, i, G) || operand_byte_in_reg(regop, j, REG_A, a, i, G)))
+          if(!singlebit)
+            litbyte = byte;
+          if (byte && (operand_byte_in_reg(result, j, REG_A, a, i, G) || operand_byte_in_reg(regop, j, REG_A, a, i, G) && dying_A))
             continue;
-          if (!operand_byte_in_reg(result, j, REG_B, a, i, G) && !operand_byte_in_reg(result, j, REG_C, a, i, G))
+          if (!operand_byte_in_reg(result, j, REG_B, a, i, G) && !operand_byte_in_reg(result, j, REG_C, a, i, G) &&
+            !operand_byte_in_reg(result, j, REG_H, a, i, G) && !operand_byte_in_reg(result, j, REG_L, a, i, G) &&
+            !operand_byte_in_reg(result, j, REG_D, a, i, G) && !operand_byte_in_reg(result, j, REG_E, a, i, G) &&
+            !operand_byte_in_reg(result, j, REG_IYL, a, i, G) && !operand_byte_in_reg(result, j, REG_IYH, a, i, G))
             goto nobyte;
           if (operand_byte_in_reg(result, j, REG_B, a, i, G) && !operand_byte_in_reg(regop, j, REG_B, a, i, G) ||
-            operand_byte_in_reg(result, j, REG_C, a, i, G) && !operand_byte_in_reg(regop, j, REG_C, a, i, G))
+            operand_byte_in_reg(result, j, REG_C, a, i, G) && !operand_byte_in_reg(regop, j, REG_C, a, i, G) ||
+            operand_byte_in_reg(result, j, REG_H, a, i, G) && !operand_byte_in_reg(regop, j, REG_H, a, i, G) ||
+            operand_byte_in_reg(result, j, REG_L, a, i, G) && !operand_byte_in_reg(regop, j, REG_L, a, i, G) ||
+            operand_byte_in_reg(result, j, REG_D, a, i, G) && !operand_byte_in_reg(regop, j, REG_D, a, i, G) ||
+            operand_byte_in_reg(result, j, REG_E, a, i, G) && !operand_byte_in_reg(regop, j, REG_E, a, i, G) ||
+            operand_byte_in_reg(result, j, REG_IYH, a, i, G) && !operand_byte_in_reg(regop, j, REG_IYH, a, i, G) ||
+            operand_byte_in_reg(result, j, REG_IYL, a, i, G) && !operand_byte_in_reg(regop, j, REG_IYL, a, i, G))
             goto nobyte;
         }
       return(true);
@@ -677,7 +695,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   if(ic->op == GET_VALUE_AT_ADDRESS) // Any register can be assigned from (hl) and (iy), so we don't need to go through a then.
     return(!IS_BITVAR(getSpec(operandType(result))) &&
-    (getSize(operandType(right)) == 1 || operand_is_pair(right, a, i, G) && (operand_in_reg(right, REG_L, ia, i, G) || operand_in_reg(right, REG_IYL, ia, i, G))));
+    (getSize(operandType(result)) == 1 || operand_is_pair(left, a, i, G) && (operand_in_reg(left, REG_L, ia, i, G) && !ulFromVal (OP_VALUE (IC_RIGHT(ic))) || operand_in_reg(left, REG_IYL, ia, i, G) && ulFromVal (OP_VALUE (IC_RIGHT(ic))) <= 127)));
 
   if(ic->op == '=' && POINTER_SET (ic) && // Any register can be assigned to (hl) and (iy), so we don't need to go through a then.
     !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))) &&

@@ -701,7 +701,7 @@ ${Section} "SDCC library sources" SEC25
 #  File "${DEV_ROOT}\non-free\lib\src\pic14\libdev\Makefile"
 
   SetOutPath "$INSTDIR\lib\src\pic14\libm"
-  File "${DEV_ROOT}\lib\src\pic14\libm\*.c"
+#  File "${DEV_ROOT}\lib\src\pic14\libm\*.c"
 
   SetOutPath "$INSTDIR\lib\src\pic16"
 #  File "${DEV_ROOT}\lib\src\pic16\configure"

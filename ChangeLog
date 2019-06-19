@@ -1,3 +1,8 @@
+2019-06-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/scripts/sdcc.nsi: pic14/libm no longer has *.c files
+	  to install
+
 2019-06-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z88/ralloc2.cc,

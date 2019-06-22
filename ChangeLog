@@ -3,6 +3,8 @@
 	* src/z88/ralloc2.cc,
 	  src/z80/gen.c:
 	  Improve handling of a in bitwise operations.
+	* src/pdk/main.c:
+	  Fix bug #2916.
 
 2019-06-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

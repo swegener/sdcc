@@ -217,7 +217,7 @@ static const char *_linkCmd[] =
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *pdk13AsmCmd[] =
 {
-  "sdaspdk14", "$l", "$3", "\"$1.asm\"", NULL
+  "sdaspdk13", "$l", "$3", "\"$1.asm\"", NULL
 };
 
 static const char *const _libs_pdk13[] = { "pdk13", NULL, };

@@ -5,6 +5,8 @@
 	  Improve handling of a in bitwise operations.
 	* src/pdk/main.c:
 	  Fix bug #2916.
+	* src/z80/peeph-z80.def:
+	  Fix bug #2914.
 
 2019-06-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -575,35 +575,13 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     IS_TRUE_SYMOP (right) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (right)->etype))))
     return(false);
 
-  //if (ic->op == '^') // ^ codegen can handle it all.
-  //   return(true);
-
-  // bit instructions do not disturb a.
-  if(ic->op == BITWISEAND && ifxForOp (IC_RESULT(ic), ic) &&
-    (IS_OP_LITERAL(left) && (!(IS_GB && IS_TRUE_SYMOP (right) || exstk && operand_on_stack(right, a, i, G)) || operand_in_reg(right, ia, i, G) && !operand_in_reg(right, REG_IYL, ia, i, G) && !operand_in_reg(right, REG_IYH, ia, i, G)) ||
-    IS_OP_LITERAL(right) && (!(IS_GB && IS_TRUE_SYMOP (left) || exstk && operand_on_stack(left, a, i, G)) || operand_in_reg(left, ia, i, G) && !operand_in_reg(left, REG_IYL, ia, i, G) && !operand_in_reg(left, REG_IYH, ia, i, G))))
-    {
-      operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
-      for(unsigned int i = 0; i < getSize(operandType(result)); i++)
-        {
-          unsigned char byte = byteOfVal (OP_VALUE (litop), i);
-          if (byte != 0x00 && byte != 0x01 && byte != 0x02 && byte != 0x04 && byte != 0x08 && byte != 0x10 && byte != 0x20 && byte != 0x40 && byte != 0x80)
-            goto nobit;
-        }
-      return(true);
-    }
-  nobit:
+  if (ic->op == '^' || ic->op == BITWISEAND || ic->op == '|') // Codegen can handle it all.
+     return(true);
 
   // Can use non-destructive cp on == and < (> might swap operands).
   if((ic->op == EQ_OP || ic->op == '<' && SPEC_USIGN(getSpec(operandType(left))) && SPEC_USIGN(getSpec(operandType(right)))) &&
     getSize(operandType(IC_LEFT(ic))) == 1 && ifxForOp (IC_RESULT(ic), ic) && operand_in_reg(left, REG_A, ia, i, G) &&
     (IS_OP_LITERAL (right) || operand_in_reg(right, REG_C, ia, i, G) || operand_in_reg(right, REG_B, ia, i, G) || operand_in_reg(right, REG_E, ia, i, G) || operand_in_reg(right, REG_D, ia, i, G) || operand_in_reg(right, REG_H, ia, i, G) || operand_in_reg(right, REG_L, ia, i, G)))
-    return(true);
-
-  // The Z180 has a non-destructive testing and.
-  if((IS_Z180 || IS_EZ80_Z80) && ic->op == BITWISEAND && ifxForOp (result, ic) &&
-    (getSize(operandType(left)) == 1 && operand_in_reg(left, REG_A, ia, i, G) && (IS_OP_LITERAL(right) /*|| operand_in_reg(right, ia, i, G) && !operand_in_reg(right, REG_IYL, ia, i, G) && !operand_in_reg(right, REG_IYH, ia, i, G)*/) ||
-    getSize(operandType(right)) == 1 && operand_in_reg(right, REG_A, ia, i, G) && (IS_OP_LITERAL(left) /*|| operand_in_reg(left, ia, i, G) && !operand_in_reg(left, REG_IYL, ia, i, G) && !operand_in_reg(left, REG_IYH, ia, i, G)*/)))
     return(true);
 
   const cfg_dying_t &dying = G[i].dying;
@@ -613,7 +591,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     getSize(operandType(IC_RESULT(ic))) == 1 && dying_A)
     return(true);
 
-  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_GB || ic->op == BITWISEAND || ic->op == '|' || ic->op == '^' || ic->op == '~') && // First byte of input and last byte of output may be in A.
+  if((ic->op == '+' || ic->op == '-' && !operand_in_reg(right, REG_A, ia, i, G) || ic->op == UNARYMINUS && !IS_GB || ic->op == '~') && // First byte of input and last byte of output may be in A.
     IS_ITEMP(result) && dying_A &&
     (IS_ITEMP(left) || IS_OP_LITERAL(left) || operand_on_stack(left, a, i, G)) &&
     (!right || IS_ITEMP(right) || IS_OP_LITERAL(right) || operand_on_stack(right, a, i, G)))
@@ -624,49 +602,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
         (operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G) || !result_in_A))
         return(true);
     }
-
-  if ((ic->op == '^' || ic->op == BITWISEAND || ic->op == '|') && // OK if the only byte actually changed in A is in A anyway.
-    IS_ITEMP(result) &&
-    (IS_ITEMP(left) && IS_OP_LITERAL(right) || IS_OP_LITERAL(left) && IS_ITEMP(right)))
-    {
-      operand *const litop = IS_OP_LITERAL(left) ? IC_LEFT(ic) : IC_RIGHT(ic);
-      operand *const regop = IS_OP_LITERAL(left) ? IC_RIGHT(ic) : IC_LEFT(ic);
-      unsigned char litbyte = 0;
-      for(unsigned int j = 0; j < getSize(operandType(result)); j++)
-        {
-          unsigned char byte = byteOfVal (OP_VALUE (litop), j);
-          if (ic->op == BITWISEAND)
-            byte = ~byte & 0xff;
-          bool singlebit = false;
-          if ((ic->op == BITWISEAND || ic->op == '|') && // We have res and set, but no equivalent for xor on a single bit.
-            (byte == 0x01 || byte == 0x02 || byte == 0x04 || byte == 0x08 || byte == 0x10 || byte == 0x20 || byte == 0x40 || byte == 0x80))
-            singlebit = true;
-          if (byte && litbyte && !singlebit)
-            goto nobyte;
-          if(!singlebit)
-            litbyte = byte;
-          if (byte && (operand_byte_in_reg(result, j, REG_A, a, i, G) || operand_byte_in_reg(regop, j, REG_A, a, i, G) && dying_A))
-            continue;
-          if (!operand_byte_in_reg(result, j, REG_B, a, i, G) && !operand_byte_in_reg(result, j, REG_C, a, i, G) &&
-            !operand_byte_in_reg(result, j, REG_H, a, i, G) && !operand_byte_in_reg(result, j, REG_L, a, i, G) &&
-            !operand_byte_in_reg(result, j, REG_D, a, i, G) && !operand_byte_in_reg(result, j, REG_E, a, i, G) &&
-            !operand_byte_in_reg(result, j, REG_IYL, a, i, G) && !operand_byte_in_reg(result, j, REG_IYH, a, i, G))
-            goto nobyte;
-          if (operand_byte_in_reg(result, j, REG_B, a, i, G) && !operand_byte_in_reg(regop, j, REG_B, a, i, G) ||
-            operand_byte_in_reg(result, j, REG_C, a, i, G) && !operand_byte_in_reg(regop, j, REG_C, a, i, G) ||
-            operand_byte_in_reg(result, j, REG_H, a, i, G) && !operand_byte_in_reg(regop, j, REG_H, a, i, G) ||
-            operand_byte_in_reg(result, j, REG_L, a, i, G) && !operand_byte_in_reg(regop, j, REG_L, a, i, G) ||
-            operand_byte_in_reg(result, j, REG_D, a, i, G) && !operand_byte_in_reg(regop, j, REG_D, a, i, G) ||
-            operand_byte_in_reg(result, j, REG_E, a, i, G) && !operand_byte_in_reg(regop, j, REG_E, a, i, G) ||
-            operand_byte_in_reg(result, j, REG_IYH, a, i, G) && !operand_byte_in_reg(regop, j, REG_IYH, a, i, G) ||
-            operand_byte_in_reg(result, j, REG_IYL, a, i, G) && !operand_byte_in_reg(regop, j, REG_IYL, a, i, G))
-            goto nobyte;
-        }
-      return(true);
-  nobyte:
-      ;
-    }
-
 
   // First two bytes of input may be in A.
   if(ic->op == IFX && dying_A && (getSize(operandType(left)) >= 1 &&

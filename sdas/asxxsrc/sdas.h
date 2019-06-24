@@ -29,6 +29,7 @@ enum sdas_target_e {
   TARGET_ID_PDK13 = 13,
   TARGET_ID_PDK14 = 14,
   TARGET_ID_PDK15 = 15,
+  TARGET_ID_PDK16 = 16,
 };
 
 void sdas_init (char *path);

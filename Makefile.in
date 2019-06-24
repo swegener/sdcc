@@ -77,6 +77,12 @@ SDCC_AS        += sdas/aspdk15
 SDCC_LD        += sdcc-ldpdk
 endif
 
+ifeq ($(OPT_DISABLE_PDK16), 0)
+SDCC_AS        += sdas/aspdk16
+SDCC_LD        += sdcc-ldpdk
+endif
+
+
 ifeq ($(OPT_DISABLE_UCSIM), 0)
 TARGETS        += sdcc-misc
 SDCC_MISC      += sim/ucsim

@@ -73,6 +73,7 @@ sdas_init (char *path)
     { "pdk13", TARGET_ID_PDK13 },
     { "pdk14", TARGET_ID_PDK14 },
     { "pdk15", TARGET_ID_PDK15 },
+    { "pdk16", TARGET_ID_PDK16 },
   };
   int i = NELEM (tgt);
 

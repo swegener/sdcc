@@ -35,7 +35,7 @@
 #include "asxxxx.h"
 #include "pdk.h"
 
-char    *cpu    = "Padauk 13";
+char    *cpu    = "Padauk 16";
 char    *dsft   = "asm";
 
 /*
@@ -50,7 +50,7 @@ machine(struct mne *mp)
         /* Set the target in case it was not automatically
          * configured from the executable filename.
          */
-        set_sdas_target (TARGET_ID_PDK13);
+        set_sdas_target (TARGET_ID_PDK16);
 
         op = mp->m_valu;
         combine = 0;
@@ -62,8 +62,8 @@ machine(struct mne *mp)
         switch (mp->m_type) {
 
         case S_MOV: {
-                struct inst ioa = {0x0080, 0x1F};
-                struct inst aio = {0x00A0, 0x1F};
+                struct inst ioa = {0x0080, 0x3F};
+                struct inst aio = {0x00C0, 0x3F};
                 struct inst ma = {0x05C0, 0x3F};
                 struct inst am = {0x07C0, 0x3F};
                 emov(def, ioa, aio, ma, am);
@@ -109,7 +109,7 @@ machine(struct mne *mp)
                         combine += 1;
 
                 struct inst a = {0x001A + combine, 0x00};
-                struct inst m = {0x0A80 + (combine << 6), 0x3F};
+                struct inst m = {0x0A00 + (combine << 6), 0x3F};
                 eshift(a, m);
                 break;
         }

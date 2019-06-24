@@ -1,3 +1,16 @@
+2019-06-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* Merge pdk branch to trunk.
+
+2019-06-24 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* sdas/aspdk13/pdk13pst.c,
+	  sdas/aspdk13/pdk13mch.c:
+	  Fix bug #2915 via suggestion by Free-PDK.
+	* configure.ac,
+	  configure:
+	  Disable pdk16 port by default.
+
 2019-06-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z88/ralloc2.cc,
@@ -15,13 +28,13 @@
 
 2019-06-18 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z88/ralloc2.cc,
+	* src/z80/ralloc2.cc,
 	  src/z80/gen.c:
 	  Improve handling of a in &.
 
 2019-06-18 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z88/ralloc2.cc:
+	* src/z80/ralloc2.cc:
 	  Fix an issue in register allocation for GET_VALUE_AT_ADRESS.
 
 2019-06-17 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
@@ -274,6 +287,18 @@
 	  Disable tests that won't work anytime soon on pkd15.
 	* sim/ucsim/globals.cc:
 	  More verbose pdk subtype output.
+
+2019-04-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk16,
+	  Makefile.common.in,
+	  Makefile.in,
+	  configure,
+	  configure.ac,
+	  sdas/asxxsrc/sdas.c,
+	  sdas/asxxsrc/sdas.h:
+	  Infrastructure for pdk16 assembler, based on patch
+	  by Leo and Nicolas.
 
 2019-04-16 Philipp Klaus Krause <pkk AT spth.de>
 

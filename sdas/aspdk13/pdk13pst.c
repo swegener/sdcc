@@ -173,7 +173,7 @@ struct  mne     mne[] = {
     {   NULL,   "not",          S_NOT,          0,      0x0018    },
     {   NULL,   "neg",          S_NEG,          0,      0x0019    },
     {   NULL,   "set0",         S_SET0,         0,      0x0000    },
-    {   NULL,   "set1",         S_SET1,         0,      0x0000    },
+    {   NULL,   "set1",         S_SET1,         0,      0x0001    },
     {   NULL,   "ceqsn",        S_CEQSN,        0,      0x1200    },
     {   NULL,   "t0sn",         S_T0SN,         0,      0x0000    },
     {   NULL,   "t1sn",         S_T1SN,         0,      0x0001    },

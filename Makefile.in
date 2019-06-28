@@ -144,7 +144,7 @@ sdcc-cc: sdcc-libs
 	$(MAKE) -C src
 
 sdcc-as:
-	for as in $(SDCC_AS); do $(MAKE) -C $$as ; done
+	$(foreach as, $(SDCC_AS), $(MAKE) -C $(as) &&) echo "Assemblers built successfully."
 
 sdcc-ld:
 	$(MAKE) -C sdas/linksrc $(SDCC_LD)

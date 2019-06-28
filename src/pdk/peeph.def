@@ -46,3 +46,11 @@ replace restart {
 	; peephole j0 removed unused label %1.
 } if labelRefCount(%1 0)
 
+replace restart {
+	ret	%1
+	ret
+} by {
+	ret	%1
+	; peephole j1 removed redundant ret after ret k.
+}
+

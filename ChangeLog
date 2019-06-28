@@ -2,6 +2,8 @@
 
 	* src/pdk/peeph.def:
 	  Add a rule suggested by Free-PDK in RFE #630.
+	* sdas/aspdk13/pdk13mch.c:
+	  Fix curly brackets.
 
 2019-06-27 Philipp Klaus Krause <pkk AT spth.de>
 

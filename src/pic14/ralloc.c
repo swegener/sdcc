@@ -3519,7 +3519,6 @@ packRegisters (eBBlock * ebp)
                         bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1 &&
                         !isOperandGlobal (IC_RESULT (ic)) && 
                         !OP_SYMBOL (IC_RESULT (ic))->addrtaken)
-                        )
                 {
                         debugLog ("  %d - %s. straight rematerializable\n", __LINE__,__FUNCTION__);
 

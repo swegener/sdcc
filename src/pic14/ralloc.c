@@ -3516,7 +3516,10 @@ packRegisters (eBBlock * ebp)
                         !POINTER_SET (ic) &&
                         IS_SYMOP (IC_RIGHT (ic)) &&
                         OP_SYMBOL (IC_RIGHT (ic))->remat &&
-                        bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1)
+                        bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1 &&
+                        !isOperandGlobal (IC_RESULT (ic)) && 
+                        !OP_SYMBOL (IC_RESULT (ic))->addrtaken)
+                        )
                 {
                         debugLog ("  %d - %s. straight rematerializable\n", __LINE__,__FUNCTION__);
 

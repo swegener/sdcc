@@ -1954,7 +1954,7 @@ storeRegIndexed (reg_info * reg, int offset, char * rematOfs)
   /* force offset to signed 16-bit range */
   offset &= 0xffff;
   if (offset & 0x8000)
-    offset = 0x10000 - offset;
+    offset = offset - 0x10000;
 
   switch (reg->rIdx)
     {

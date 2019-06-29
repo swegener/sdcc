@@ -1904,7 +1904,9 @@ packRegisters (eBBlock ** ebpp, int blockno)
           IS_SYMOP (IC_RIGHT (ic)) &&
           OP_SYMBOL (IC_RIGHT (ic))->remat &&
           bitVectnBitsOn (OP_SYMBOL (IC_RESULT (ic))->defs) <= 1 &&
-          !OP_SYMBOL (IC_RESULT (ic))->_isparm)
+          !OP_SYMBOL (IC_RESULT (ic))->_isparm &&
+          !OP_SYMBOL (IC_RESULT (ic))->addrtaken &&
+          !isOperandGlobal (IC_RESULT (ic)))
         {
           OP_SYMBOL (IC_RESULT (ic))->remat = OP_SYMBOL (IC_RIGHT (ic))->remat;
           OP_SYMBOL (IC_RESULT (ic))->rematiCode = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
@@ -1916,7 +1918,9 @@ packRegisters (eBBlock ** ebpp, int blockno)
           IS_SYMOP(IC_RIGHT(ic)) &&
           OP_SYMBOL(IC_RIGHT(ic))->remat &&
           bitVectnBitsOn (OP_DEFS (IC_RESULT (ic))) == 1 &&
-          !OP_SYMBOL (IC_RESULT (ic))->_isparm)
+          !OP_SYMBOL (IC_RESULT (ic))->_isparm &&
+          !OP_SYMBOL (IC_RESULT (ic))->addrtaken &&
+          !isOperandGlobal (IC_RESULT (ic)))
         {
           sym_link *to_type = operandType(IC_LEFT(ic));
           sym_link *from_type = operandType(IC_RIGHT(ic));

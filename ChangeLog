@@ -1,3 +1,15 @@
+2019-06-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/z80/ralloc.c,
+	  src/hc08/ralloc.c,
+	  src/mcs51/ralloc.c,
+	  src/ds390/ralloc.c,
+	  src/stm8/ralloc.c,
+	  src/pdk/ralloc.c,
+	  src/pic14/ralloc.c,
+	  src/pic16/ralloc.c: fix bug #2920
+	* src/hc08/gen.c: fix bug with negative array index
+
 2019-06-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/peeph.def:

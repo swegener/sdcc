@@ -3758,7 +3758,14 @@ _toBoolean (const operand *oper, bool needflag)
     }
   while (size--)
     if (size != skipbyte)
-      emit3_o (A_OR, ASMOP_A, 0, oper->aop, size);
+      {
+        if (aopInReg (oper->aop, size, IYL_IDX) || aopInReg (oper->aop, size, IYH_IDX))
+          {
+            regalloc_dry_run_cost += 100;
+            wassert (regalloc_dry_run);
+          }
+        emit3_o (A_OR, ASMOP_A, 0, oper->aop, size);
+      }
 }
 
 /*-----------------------------------------------------------------*/
@@ -11574,6 +11581,14 @@ genCast (const iCode *ic)
     }
 
   /* casting to bool */
+  if (IS_BOOL (operandType (result)) && IS_RAB && right->aop->size == 2 && 
+    (aopInReg (right->aop, 0, HL_IDX) && isPairDead (PAIR_HL, ic)|| aopInReg (right->aop, 0, IY_IDX) && isPairDead (PAIR_IY, ic)))
+    {
+      bool iy = aopInReg (right->aop, 0, IY_IDX);
+      emit2 ("bool %s", _pairs[getPairId (right->aop)].name);
+      cheapMove (result->aop, 0, iy ? ASMOP_IYL : ASMOP_L, 0, !bitVectBitValue (ic->rSurv, A_IDX));
+      goto release;
+    }
   if (IS_BOOL (operandType (result)))
     {
       _castBoolean (right);

@@ -1,3 +1,9 @@
+2019-06-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/preserves_regs.c:
+	  Improve handling of iy, should fix bug #2918.
+
 2019-06-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/z80/ralloc.c,

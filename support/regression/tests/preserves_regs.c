@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k)|| defined(__SDCC_r3ka)
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined(__SDCC_ez80_z80)
 void write_bc(void) __preserves_regs(a, d, e, h, l, iyl, iyh) __naked
 {
 __asm

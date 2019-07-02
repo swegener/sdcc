@@ -126,6 +126,7 @@ protected:
 
 public: // output functions
   virtual int dd_printf(const char *format, ...);
+  virtual int dd_cprintf(const char *color_name, const char *format, ...);
   virtual int debug(const char *format, ...);
 };
 

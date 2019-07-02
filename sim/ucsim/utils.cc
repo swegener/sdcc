@@ -346,5 +346,249 @@ is_cdb_file(class cl_f *f)
   return false;
 }
 
+/*
+  option_name=col_opt:col_opt
+
+  option_name=
+	prompt prompt_console command answer
+  	dump_address dump_number dump_char
+
+  col_opt=
+	B bold
+	F faint
+	I italic
+	U underline
+	D double_underline
+	C crossedout
+	O overline
+	KL blink
+
+  col_opt=
+	black red green yellow blue magenta cyan white
+	bblack bred bgreen byellow bblue bmagenta bcyan bwhite
+	#RGB
+
+*/
+
+enum col_ctype_t
+  {
+   ct_none= 0,
+   ct_bold= 0x01,
+   ct_faint= 0x02,
+   ct_italic= 0x04,
+   ct_underl= 0x08,
+   ct_dunderl= 0x10,
+   ct_crossed= 0x20,
+   ct_overl= 0x40,
+   ct_blink= 0x80
+  };
+
+chars
+colopt2ansiseq(char *opt)
+{
+  bool fg_rgb= false, bg_rgb= false;
+  bool fg_bright= false, bg_bright= false;
+  chars r= "";
+  int fg= -1, bg= -1;
+  int ctype= ct_none;
+  chars o;
+  
+  if (!opt ||
+      !*opt)
+    return r;
+  o= opt;
+  char *s= strtok((char*)o, ":");
+  while (s)
+    {
+      if (strcmp(s, "black") == 0)
+	{
+	  if (fg<0)
+	    fg= 0;
+	  else
+	    bg= 0;
+	}
+      else if (strcmp(s, "bblack") == 0)
+	{
+	  if (fg<0)
+	    fg= 0, fg_bright= true;
+	  else
+	    bg= 0, bg_bright= true;
+	}
+      else if (strcmp(s, "red") == 0)
+	{
+	  if (fg<0)
+	    fg= 1;
+	  else
+	    bg= 1;
+	}
+      else if (strcmp(s, "bred") == 0)
+	{
+	  if (fg<0)
+	    fg= 1, fg_bright= true;
+	  else
+	    bg= 1, bg_bright= true;
+	}
+      else if (strcmp(s, "green") == 0)
+	{
+	  if (fg<0)
+	    fg= 2;
+	  else
+	    bg= 2;
+	}
+      else if (strcmp(s, "bgreen") == 0)
+	{
+	  if (fg<0)
+	    fg= 2, fg_bright= true;
+	  else
+	    bg= 2, bg_bright= true;
+	}
+      else if (strcmp(s, "yellow") == 0)
+	{
+	  if (fg<0)
+	    fg= 3;
+	  else
+	    bg= 3;
+	}
+      else if (strcmp(s, "byellow") == 0)
+	{
+	  if (fg<0)
+	    fg= 3, fg_bright= true;
+	  else
+	    bg= 3, bg_bright= true;
+	}
+      else if (strcmp(s, "blue") == 0)
+	{
+	  if (fg<0)
+	    fg= 4;
+	  else
+	    bg= 4;
+	}
+      else if (strcmp(s, "bblue") == 0)
+	{
+	  if (fg<0)
+	    fg= 4, fg_bright= true;
+	  else
+	    bg= 4, bg_bright= true;
+	}
+      else if (strcmp(s, "magenta") == 0)
+	{
+	  if (fg<0)
+	    fg= 5;
+	  else
+	    bg= 5;
+	}
+      else if (strcmp(s, "bmagenta") == 0)
+	{
+	  if (fg<0)
+	    fg= 5, fg_bright= true;
+	  else
+	    bg= 5, bg_bright= true;
+	}
+      else if (strcmp(s, "cyan") == 0)
+	{
+	  if (fg<0)
+	    fg= 6;
+	  else
+	    bg= 6;
+	}
+      else if (strcmp(s, "bcyan") == 0)
+	{
+	  if (fg<0)
+	    fg= 6, fg_bright= true;
+	  else
+	    bg= 6, bg_bright= true;
+	}
+      else if (strcmp(s, "white") == 0)
+	{
+	  if (fg<0)
+	    fg= 7;
+	  else
+	    bg= 7;
+	}
+      else if (strcmp(s, "bwhite") == 0)
+	{
+	  if (fg<0)
+	    fg= 7, fg_bright= true;
+	  else
+	    bg= 7, bg_bright= true;
+	}
+      else if (*s == '#')
+	{
+	  int c= strtol(&s[1], NULL, 16);
+	  if (fg<0)
+	    fg= c, fg_rgb= true;
+	  else
+	    bg= c, bg_rgb= true;
+	}
+      else if (strspn(s, "bBfFiIuUdDcCoOkKlL") > 0)
+	{
+	  int i;
+	  for (i=0; s[i]; i++)
+	    {
+	      switch (toupper(s[i]))
+		{
+		case 'B': ctype|= ct_bold; break;
+		case 'F': ctype|= ct_faint; break;
+		case 'I': ctype|= ct_italic; break;
+		case 'U': ctype|= ct_underl; break;
+		case 'D': ctype|= ct_dunderl; break;
+		case 'C': ctype|= ct_crossed; break;
+		case 'O': ctype|= ct_overl; break;
+		case 'K': ctype|= ct_blink; break;
+		case 'L': ctype|= ct_blink; break;
+		}
+	    }
+	}
+      s= strtok(NULL, ":");
+    }
+
+  /* set character rendering mode */
+  if (ctype != ct_none)
+    {
+      if (ctype & ct_bold) 	r.append("\033[1m");
+      if (ctype & ct_faint)	r.append("\033[2m");
+      if (ctype & ct_italic)	r.append("\033[3m");
+      if (ctype & ct_underl)	r.append("\033[4m");
+      if (ctype & ct_dunderl)	r.append("\033[21m");
+      if (ctype & ct_crossed)	r.append("\033[9m");
+      if (ctype & ct_overl)	r.append("\033[53m");
+      if (ctype & ct_blink)	r.append("\033[5m");
+    }
+
+  /* Background color */
+  if (bg >= 0)
+    {
+      if (bg_rgb)
+	{
+	  r.append("\033[48;2;%d;%d;%dm", (bg>>16)&0xff, (bg>>8)&0xff, bg&0xff);
+	}
+      else
+	{
+	  int i= 40+bg;
+	  if (bg_bright)
+	    i= 100+bg;
+	  r.append("\033[%dm", i);
+	}
+    }
+  
+  /* Foreground color */
+  if (fg >= 0)
+    {
+      if (fg_rgb)
+	{
+	  r.append("\033[38;2;%d;%d;%dm", (fg>>16)&0xff, (fg>>8)&0xff, fg&0xff);
+	}
+      else
+	{
+	  int i= 30+fg;
+	  if (fg_bright)
+	    i= 90+fg;
+	  r.append("\033[%dm", i);
+	}
+    }
+  
+  return r;
+}
+
 
 /* End of utils.cc */

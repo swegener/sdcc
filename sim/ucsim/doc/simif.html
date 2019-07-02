@@ -1,13 +1,429 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta content="text/html; charset=iso-8859-2" http-equiv="content-type">
-    <title>&mu;Csim: Simulator interface</title>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-2">
+    <title>&#956;Csim: Simulator interface</title>
+    <link rel="force-svg" href="http://berjon.com/blog/2009/07/force-svg.html">
+    <script type="application/javascript">(function()
+{
+  function ForceSVGInHTML()
+  {
+    window.removeEventListener("load", ForceSVGInHTML, true);
+    var svgs = document.getElementsByTagName("svg");
+    for (var i = 0; i < svgs.length; i++) {
+      var svg = svgs[i];
+      var div = document.createElement("div");
+      div.appendChild(svg.cloneNode(true));
+      var dom = (new DOMParser()).parseFromString(div.innerHTML, "application/xml");
+      svg.parentNode.replaceChild(document.importNode(dom.documentElement, true), svg);
+    }
+  }
+  window.addEventListener("load", ForceSVGInHTML, true);
+})();</script>
   </head>
   <body>
     <h1>Simulator interface</h1>
-    <p><br>
+    <p>Using the simulator interface the simulated program can control the
+      simulation, it can get information about the interface, stop simulation
+      and it can do console and file io.<br>
     </p>
+    <p> <img src="sif_work.svg" border="0"></p>
+    <p>Interface is available behind a memory location, which can be any data
+      memory location which is readable and writable by the program. Program can
+      send command to the interface by writing one character command code into
+      the memory location (although some of them needs parameter) and can read
+      back answer from the same location.</p>
+    <p>The interface must be turned on before use. It means that you must
+      specify the address of the memory location to use. It can be done in two
+      ways.</p>
+    <p><b>Using -I option of the simulator program</b></p>
+    <p>-I option accepts a list of settings in form: setting=value. Know
+      settings are:</p>
+    <dl>
+      <dt><span style="font-family: monospace;">if</span></dt>
+      <dd>this setting is used to turn on the interface. Its value must be a
+        memory name and the address, like:<br>
+        <code>s51 -I if=xram[0xffff]<br>
+        </code>memory name must be followed by the address in square brackets.
+        Address can be specified in decimal, octal or hexadecimal.</dd>
+      <dt><span style="font-family: monospace;">in</span></dt>
+      <dd>value specifies name of the file which will be used by READ command.</dd>
+      <dt><span style="font-family: monospace;">out</span></dt>
+      <dd>value specifies name of the file which will be used by WRITE command.</dd>
+    </dl>
+    <p><b>Configuring virtual simif peripheral</b></p>
+    <p>If you check hardware elements of simulated processor with <a href="cmd_general.html#conf">conf</a>
+      commmand, you will see one called <b>simif</b>. Setting of this
+      peripheral will setup the simulator interface:</p>
+    <pre>0&gt; <span style="color: #009900;">conf</span>
+ucsim version 0.6-pre56
+Type of microcontroller: C52 CMOS cmos
+Controller has 12 hardware element(s).
+   on <b>simif[0]</b>
+   on vcd[0]
+   on timer0[0]
+   on timer1[1]
+   on uart[0]
+   on dport[0]
+   on port[0]
+   on port[1]
+   on port[2]
+   on port[3]
+   on irq[0]
+   on timer2[2]
+0&gt; </pre>
+    <p>Using info command you can get state of the interface, known commands,
+      and other information:</p>
+    <pre>0&gt; <span style="color: #009900;">info hw simif</span>
+uCsim simulator interface, version 1, at (null)[0x0]
+Active command: none.
+Known commands:
+0x5f/_ if_detect: Detect existence of interface
+0x69/i commands: Get information about known commands
+0x76/v if_ver: Get version of simulator interface
+0x56/V sim_ver: Get version of simulator
+0x40/@ if_reset: Reset interface to default state
+0x49/I cmdinfo: Get information about a command
+0x68/h cmdhelp: Get help about a command
+0x73/s stop: Stop simulation
+0x70/p print: Print character
+0x78/x print_hex: Print character in hex
+0x66/f fin_check: Check input file if input available
+0x72/r read input file: Read character from input file
+0x77/w write to output file: Write character to output file
+Input file: 
+Output file: 
+...</pre>
+    <p>Use <a href="cmd_general.html#set_hardware">set hardware</a> command to
+      setup the interface:</p>
+    <pre>0&gt; <span style="color: #009900;">set hw simif</span>
+set hardware simif memory address
+set hardware simif fin "input_file_name"
+set hardware simif fout "output_file_name"
+0&gt; 
+</pre>
+    <p>To turn on the interface, use following command:</p>
+    <pre>0&gt; <span style="color: #009900;">set hw simif xram 0xffff</span>
+0&gt; <span style="color: #009900;">i h simif</span>
+uCsim simulator interface, version 1, at <b>xram[0xffff]</b><br>... </pre>
+    <p></p>
+    <p>following commands can be used to specify input and output files:</p>
+    <pre>0&gt; <span style="color: #009900;">set hw simif fin "infile.txt"</span>
+0&gt; <span style="color: #009900;">set hw simif fout "outfile.txt"</span>
+0&gt; <span style="color: #009900;">i h simif</span>
+...
+Input file: <b>infile.txt</b>
+Output file: <b>outfile.txt</b>
+...
+</pre>
+    <p></p>
+    <p><b>Access interface from simulated program</b></p>
+    <p>To access memory content, you have to use C variable. If address is
+      already known, you can setup a pointer with that address to access the
+      content:</p>
+    <pre>#define SIF_ADDRESS_SPACE_NAME	"xram"
+#define SIF_ADDRESS_SPACE	__xdata
+#define SIF_ADDRESS		0xffff
+
+unsigned char SIF_ADDRESS_SPACE * volatile sif;<br><br>void
+main(void)
+{
+  sif= (unsigned char SIF_ADDRESS_SPACE *) SIF_ADDRESS;
+... </pre>
+    <p></p>
+    <p>this example can be compiled with SDCC for MSC51 processor. Do not forget
+      the <b>volatile</b> keyword! You can define names for command characters:</p>
+    <pre>enum sif_command {
+  DETECT_SIGN	        = '!',	// answer to detect command
+  SIFCM_DETECT		= '_',	// command used to detect the interface
+  SIFCM_COMMANDS	= 'i',	// get info about commands
+  SIFCM_IFVER		= 'v',	// interface version
+  SIFCM_SIMVER		= 'V',	// simulator version
+  SIFCM_IFRESET		= '@',	// reset the interface
+  SIFCM_CMDINFO		= 'I',	// info about a command
+  SIFCM_CMDHELP		= 'h',	// help about a command
+  SIFCM_STOP		= 's',	// stop simulation
+  SIFCM_PRINT		= 'p',	// print character
+  SIFCM_FIN_CHECK	= 'f',	// check input file for input
+  SIFCM_READ		= 'r',	// read from input file
+  SIFCM_WRITE		= 'w',	// write to output file
+};
+</pre>
+    <p></p>
+    <p><b>Command: detect</b></p>
+    <p>Command character: _<br>
+      Answer: !</p>
+    <p>Following function can be used to detect if the interface is turned on or
+      not:</p>
+    <pre>char
+detect(void)
+{
+  *sif= SIFCM_DETECT;
+  return *sif == DETECT_SIGN;
+}
+</pre>
+    <p></p>
+    <p><b>Command: commands</b></p>
+    <p>Command character: i<br>
+      Answer: nuof_commands, command_char_1, command_char_2, ...</p>
+    <p>This command can be used to retrieve all know command characters. First
+      answer is the number of known commands, further reads will get command
+      characters. Following example will read all commands:</p>
+    <pre>int nuof_commands;
+unsigned char commands[100];
+
+void
+get_commands(void)
+{
+  int i;
+  *sif= SIFCM_COMMANDS;
+  nuof_commands= *sif;
+  for (i= 0; i &lt; nuof_commands; i++)
+    commands[i]= *sif;
+}
+</pre>
+    <p></p>
+    <p><b>Command: ifver</b></p>
+    <p>Command character: v<br>
+      Answer: 1 byte version number</p>
+    <p>Following simple example is a function which returns the interface
+      version:</p>
+    <pre>int
+get_ifversion(void)
+{
+  *sif= SIFCM_IFVER;
+  return(*sif);
+}
+</pre>
+    <p></p>
+    <p><b>Command: simver</b></p>
+    <p>Command character: V<br>
+      Answer: string</p>
+    <p>First byte of the string answer will be the length of the string, and
+      after the last character a zero byte will arrive. Following function can
+      be used to read string answer and store it (up to some limited length):</p>
+    <pre>unsigned char sim_version[15];
+
+void
+get_sim_version()
+{
+  unsigned char c, i, n;
+  
+  *sif= SIFCM_SIMVER;
+  sim_version[0]= 0;
+  n= *sif;
+  if (n)
+    {
+      i= 0;
+      c= *sif;
+      while (c &amp;&amp; (i&lt;14))
+	{
+	  sim_version[i++]= c;
+	  c= *sif;
+	}
+      while (c)
+	c= *sif;
+      sim_version[i]= 0;
+    }
+}
+</pre>
+    <p></p>
+    <p><b>Command: ifreset</b></p>
+    <p>Command character: @<br>
+      Answer: -</p>
+    <p>This command resets the interface to default state.</p>
+    <p><b>Command: cmdinfo</b></p>
+    <p>Command character: I followed by a command character (which you would
+      like to get info about)<br>
+      Answer: array</p>
+    <dl>
+      <dt>1st byte of the answer</dt>
+      <dd>full length of the answer</dd>
+      <dt>2nd byte of the answer</dt>
+      <dd>number of parameters that the command needs</dd>
+      <dt>3rd byte of the answer</dt>
+      <dd>type of the answer that the command replies<br>
+        <dl>
+          <dt>0</dt>
+          <dd>unknown</dd>
+          <dt>1</dt>
+          <dd>one byte</dd>
+          <dt>2</dt>
+          <dd>array (of bytes): length, followed by bytes</dd>
+          <dt>3</dt>
+          <dd>string: length, characters and one zero byte</dd>
+          <dt>4</dt>
+          <dd>no answer</dd>
+        </dl>
+      </dd>
+    </dl>
+    <div><b>Command: cmdhelp</b></div>
+    <div><br>
+    </div>
+    <div>Command character: h followed by a command character (which you would
+      like to get info about)<br>
+      Answer: string</div>
+    <div><br>
+    </div>
+    <div>Returns textual information about. Following function prints
+      information about all commands (retrieved by "i" command, see above):</div>
+    <div>
+      <pre>enum sif_answer_type {
+  SIFAT_UNKNOWN		= 0x00,	// we don't know...
+  SIFAT_BYTE		= 0x01,	// just a byte
+  SIFAT_ARRAY		= 0x02,	// array of some bytes
+  SIFAT_STRING		= 0x03,	// a string
+  SIFAT_NONE		= 0x04	// no answer at all
+};
+
+void
+print_cmd_infos(void)
+{
+  int i, j;
+  unsigned char inf[5];
+  for (i= 0; i &lt; nuof_commands; i++)
+    {
+      printf("Command '%c' info:\n", commands[i]);
+      *sif= SIFCM_CMDINFO;
+      *sif= commands[i];
+      inf[0]= *sif;
+      for (j= 0; j &lt; inf[0]; j++)
+	{
+	  inf[j+1]= *sif;
+	  //printf(" 0x%02x", inf[j+1]);
+	}
+      printf("  need %d params, answers as ", inf[1]);
+      switch (inf[2])
+	{
+	case SIFAT_UNKNOWN	: printf("unknown"); break;
+	case SIFAT_BYTE		: printf("byte"); break;
+	case SIFAT_ARRAY	: printf("array"); break;
+	case SIFAT_STRING	: printf("string"); break;
+	case SIFAT_NONE		: printf("none"); break;
+	}
+      printf(": ");
+      *sif= SIFCM_CMDHELP;
+      *sif= commands[i];
+      if (*sif)
+	{
+	  j= *sif;
+	  while (j)
+	    {
+	      putchar(j);
+	      j= *sif;
+	    }
+	}
+      printf("\n");
+    }
+  
+}
+</pre> </div>
+    <div><br>
+    </div>
+    <div><b>Command: stop</b></div>
+    <div><br>
+    </div>
+    <div>Command character: s<br>
+      Answer: -</div>
+    <div><br>
+    </div>
+    <div>Sending this command stops the simulation.</div>
+    <div><br>
+    </div>
+    <div><b>Command: print</b></div>
+    <div><br>
+    </div>
+    <div>Command character: p followed by a character to print<br>
+      Answer: -</div>
+    <div><br>
+    </div>
+    <div>This command can be used to print out a character on the simulator
+      console. Following functions can be used to print a character and a
+      string:</div>
+    <div>
+      <pre>void
+sif_putchar(char c)
+{
+  *sif= SIFCM_PRINT;
+  *sif= c;
+}
+
+void
+sif_print(char *s)
+{
+  while (*s)
+    sif_putchar(*s++);
+}
+</pre> </div>
+    <div><br>
+    </div>
+    <div><b>Command: fin_check</b></div>
+    <div><br>
+    </div>
+    <div>Command character: f</div>
+    <div>Answer: 0 (if input file is not readable), or 1 (if input file is
+      readable)</div>
+    <div><br>
+    </div>
+    <div>This command checks if the input file is readable or not.Here is a
+      simple function which can be used to check readability of the input file:</div>
+    <div>
+      <pre>char
+sif_fin_avail()
+{
+  return sif_get(SIFCM_FIN_CHECK);
+}
+</pre><br>
+    </div>
+    <div><b>Command: read</b></div>
+    <div><br>
+    </div>
+    <div>Commad character: r</div>
+    <div>Answer: next byte from input file</div>
+    <div><br>
+    </div>
+    <div>This command can be used to read next byte from the input file.
+      Remember, name of the input file must be set before use.</div>
+    <div><br>
+    </div>
+    <div>Following demonstration code prints out content of the input file:</div>
+    <div>
+      <pre>void
+fin_demo()
+{
+  char i, c;
+  printf("Reading input from SIMIF input file:\n");
+  while (i= sif_fin_avail())
+    {
+      c= sif_read();
+      if (c &gt; 31)
+	putchar(c);
+    }
+  printf("\nRead demo finished\n");
+}
+</pre></div>
+    <div><b>Command: write</b></div>
+    <div><br>
+    </div>
+    <div>Command character: w, followed by a byte to write to output file</div>
+    <div>Answer: -</div>
+    <div><br>
+    </div>
+    <div>Following function can be used to write a string to the output file:</div>
+    <div>
+      <pre>void
+fout_demo(char *s)
+{
+  while (*s)
+    {
+      *sif= SIFCM_WRITE;
+      *sif= *s++;
+    }
+}
+</pre>Do not forget to specify name of the output file via setting of the
+      simulator interface. Be careful, simulator will overwrite content of the
+      output file!<br>
+    </div>
     <hr>
   </body>
 </html>

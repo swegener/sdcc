@@ -111,29 +111,22 @@ unsigned char sim_version[15];
 void
 get_sim_version()
 {
-  unsigned char c;
-  unsigned char i;
+  unsigned char c, i, n;
   
   *sif= SIFCM_SIMVER;
   sim_version[0]= 0;
-  i= *sif;
-  //printf("read answer of len=%d\n", i);
-  if (i)
+  n= *sif;
+  if (n)
     {
       i= 0;
       c= *sif;
-      //printf("  ans[%d]= %02x,%c\n", i, c, c);
       while (c && (i<14))
 	{
 	  sim_version[i++]= c;
 	  c= *sif;
-	  //printf("  ans[%d]= %02x,%c\n", i, c, c);
 	}
       while (c)
-	{
-	  c= *sif;
-	  //printf("  ans[]= %02x,%c\n", c, c);
-	}
+	c= *sif;
       sim_version[i]= 0;
     }
 }
@@ -233,7 +226,7 @@ fin_demo()
 void
 main(void)
 {
-  sif= (unsigned char SIF_ADDRESS_SPACE *)0xffff;
+  sif= (unsigned char SIF_ADDRESS_SPACE *) SIF_ADDRESS;
   printf("Testing simulator interface at %s[0x%x]\n",
 	 SIF_ADDRESS_SPACE_NAME, SIF_ADDRESS);
   printf("%s", detect()?"Interface found.":"Interface not found");

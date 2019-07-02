@@ -140,6 +140,7 @@ cl_f::cl_f(void)
   server_port= -1;
   echo_of= NULL;
   echo_to= NULL;
+  echo_color= (char*)"";
   at_end= 0;
   last_used= first_free= 0;
   cooking= 0;
@@ -163,6 +164,7 @@ cl_f::cl_f(chars fn, chars mode):
   server_port= -1;
   echo_of= NULL;
   echo_to= NULL;
+  echo_color= (char*)"";
   at_end= 0;
   last_used= first_free= 0;
   cooking= 0;
@@ -184,6 +186,7 @@ cl_f::cl_f(int the_server_port)
   server_port= the_server_port;
   echo_of= NULL;
   echo_to= NULL;
+  echo_color= (char*)"";
   at_end= 0;
   last_used= first_free= 0;
   cooking= 0;
@@ -1101,6 +1104,8 @@ cl_f::echo_write(char *b, int l)
 {
   if (echo_to)
     {
+      if (echo_color.nempty())
+	echo_to->prntf("%s", (char*)echo_color);
       echo_to->write(b, l);
       //echo_to->flush();
     }
@@ -1111,6 +1116,8 @@ cl_f::echo_write_str(char *s)
 {
   if (echo_to)
     {
+      if (echo_color.nempty())
+	echo_to->prntf("%s", (char*)echo_color);
       echo_to->write_str(s);
       //echo_to->flush();
     }
@@ -1121,12 +1128,20 @@ cl_f::echo_write_str(const char *s)
 {
   if (echo_to)
     {
+      if (echo_color.nempty())
+	echo_to->prntf("%s", (char*)echo_color);
       echo_to->write_str(s);
       //echo_to->flush();
     }
 }
 
-  
+void
+cl_f::set_echo_color(chars col)
+{
+  echo_color= col;
+}
+
+
 /* Device handling */
 
 void

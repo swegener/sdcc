@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "hwcl.h"
 
 
-extern const char *keysets[7];
+extern const char *keysets[8];
 
 
 class cl_port_io: public cl_hw_io

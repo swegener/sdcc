@@ -114,7 +114,7 @@ cl_uid::print_info(class cl_console_base *con)
     con->dd_printf(" %02x", uc->rom->get(base+i));
   con->dd_printf("\n");
   */
-  uc->rom->dump(base, base+12, 16, con->get_fout());
+  uc->rom->dump(base, base+12, 16, con/*->get_fout()*/);
   print_cfg_info(con);
 }
 

@@ -414,5 +414,5 @@ bit:
 static void
 yyerror (const char *msg)
 {
-  application->dd_printf ("Parser error: %s\n", msg);
+  application->dd_cprintf ("error", "Parser error: %s\n", msg);
 }

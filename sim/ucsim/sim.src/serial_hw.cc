@@ -332,19 +332,24 @@ cl_serial_hw::proc_input(void)
 	      if (c == esc)
 		{
 		  menu= 'm';
-		  io->dd_printf("\n"
-				"Simulator control menu\n"
-				" %c      Insert ^%c\n"
-				" s,r,g  Start simulation\n"
-				" p      Stop simulation\n"
-				" T      Reset CPU\n"
-				" q      Quit simulator\n"
-				" o      Close serial terminal\n"
-				" e      Exit menu\n"
-				" n      Change display\n"
-				,
-				'a'+esc-1, 'a'+esc-1
-				);
+		  io->dd_printf("\n");
+		  io->dd_cprintf("ui_title", "Simulator control menu\n");
+		  io->dd_cprintf("ui_mkey", " %c      ", 'a'+esc-1);
+		  io->dd_cprintf("ui_mitem", "Insert ^%c\n", 'a'+esc-1);
+		  io->dd_cprintf("ui_mkey", " s,r,g  ");
+		  io->dd_cprintf("ui_mitem", "Start simulation\n");
+		  io->dd_cprintf("ui_mkey", " p      ");
+		  io->dd_cprintf("ui_mitem", "Stop simulation\n");
+		  io->dd_cprintf("ui_mkey", " T      ");
+		  io->dd_cprintf("ui_mitem", "Reset CPU\n");
+		  io->dd_cprintf("ui_mkey", " q      ");
+		  io->dd_cprintf("ui_mitem", "Quit simulator\n");
+		  io->dd_cprintf("ui_mkey", " o      ");
+		  io->dd_cprintf("ui_mitem", "Close serial terminal\n");
+		  io->dd_cprintf("ui_mkey", " e      ");
+		  io->dd_cprintf("ui_mitem", "Exit menu\n");
+		  io->dd_cprintf("ui_mkey", " n      ");
+		  io->dd_cprintf("ui_mitem", "Change display\n");
 		}
 	      else if (!input_avail)
 		{

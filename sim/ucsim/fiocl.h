@@ -119,6 +119,7 @@ class cl_f: public cl_base
   chars file_name, file_mode;
   bool cooking;
   class cl_f *echo_to, *echo_of;
+  chars echo_color;
   bool own;
   int at_end;
   char line[1024];
@@ -193,7 +194,9 @@ class cl_f: public cl_base
   virtual void echo_write(char *b, int l);
   virtual void echo_write_str(char *s);
   virtual void echo_write_str(const char *s);
-
+  virtual void set_echo_color(chars col);
+  virtual chars get_echo_color() { return echo_color; }
+  
   virtual void prepare_terminal();
   virtual void save_attributes();
   virtual void restore_attributes();

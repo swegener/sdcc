@@ -149,11 +149,15 @@ class cl_console_base: public cl_base
   
   virtual void print_prompt(void);
   virtual int dd_printf(const char *format, ...);
+  virtual int dd_cprintf(const char *color_name, const char *format, ...);
+  virtual chars get_color_ansiseq(const char *color_name, bool add_reset= false);
+  virtual void dd_color(const char *color_name);
   virtual int write(char *buf, int count);
   virtual int debug(const char *format, ...);
   virtual void print_bin(long data, int bits);
   virtual void print_char_octal(char c);
   virtual int cmd_do_print(const char *format, va_list ap);
+  virtual int cmd_do_cprint(const char *color_name, const char *format, va_list ap);
   //virtual void flush(void);
   virtual void tu_cls(void);
   virtual void tu_clc(void);
@@ -242,7 +246,9 @@ class cl_commander_base: public cl_base
   //void prompt(void);
   int all_printf(const char *format, ...);        // print to all consoles
   int dd_printf(const char *format, va_list ap);  // print to actual_console
+  int dd_cprintf(const char *color_name, const char *format, va_list ap);  // print to actual_console
   int dd_printf(const char *format, ...);         // print to actual_console
+  int dd_cprintf(const char *color_name, const char *format, ...);         // print to actual_console
   int debug(const char *format, ...);             // print consoles with debug flag set
   int debug(const char *format, va_list ap);      // print consoles with debug flag set
   int flag_printf(int iflags, const char *format, ...);

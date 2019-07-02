@@ -19,18 +19,18 @@
 |_|                           
   </font></tt></pre>
     <h1>Software simulator for microcontrollers</h1>
-    <b><i>&mu;Csim</i></b> can be used to simulate microcontrollers. It supports
+    <b><i>&#956;Csim</i></b> can be used to simulate microcontrollers. It supports
     MCS51 family, AVR core, Z80, HC08, ST7, STM8, TLCS90, XA51 and Paduk. It can
     run on Linux, Windows, OSX, BSD, and other systems.<br>
     <br>
     See <a href="news.html">what's new</a> in current version.<br>
     <h2><a name="download">Download</a></h2>
-    There are two places where you can download <i>&mu;Csim</i> from:<br>
+    There are two places where you can download <i>&#956;Csim</i> from:<br>
     <ol>
-      <li>SDCC homepage. <i>&mu;Csim</i> is part of the SDCC (Small Device C
+      <li>SDCC homepage. <i>&#956;Csim</i> is part of the SDCC (Small Device C
         Compiler) project. You can download source of SDCC and precompiled
         binaries from <a href="http://sdcc.sf.net">http://sdcc.sf.net</a>.</li>
-      <li><i>&mu;Csim</i> site. Standalone source package is available on the <i>&mu;Csim</i>
+      <li><i>&#956;Csim</i> site. Standalone source package is available on the <i>&#956;Csim</i>
         web site:<br>
         <a href="http://mazsola.iit.uni-miskolc.hu/ucsim/download">http://mazsola.iit.uni-miskolc.hu/ucsim/download</a>
       </li>
@@ -41,8 +41,11 @@
     <ol>
       <li>Get archive file, uncompress and untar it. These steps will produce a
         directory <b>ucsim-X.Y.Z</b> where X.Y.Z is the version number. </li>
+      <li>Make sure, that following packages are installed on your system: <b>make</b>,
+        <b>bison</b> (or yacc), <b>flex</b> (or lex), <b>libncurses-dev</b>.
+        You will need a C and a C++ compiler as well.</li>
       <li>Go to the directory and configure the package. Issue <tt><b>configure</b></tt>
-        command. It will determine your system and make <b>Makefile</b>.
+        command. It will determine your system and produce <b>Makefile</b>.
         Installation directory can be specified with <b><tt>--prefix=<i>dir</i></tt></b><!-- -- -->
         option to the <tt><b>configure</b></tt>. Default directory is <tt>/usr/local</tt>.
         Executable file will be placed in <tt>bin</tt> subdirectory. </li>
@@ -52,7 +55,7 @@
             install</b></tt> command which will place files in installation
         directory specified with <tt><b>--prefix=<i>dir</i></b><!-- --
 --></tt> option of <tt><b>configure</b></tt>. Note that you may have to have
-        special privilege to do this if installation directory is not writeable
+        special privilege to do this if installation directory is not writable
         by you. </li>
     </ol>
     <!-- USE -->
@@ -82,6 +85,10 @@
         This is a special interface which provides services for the simulated
         program. This services can be used to control the simulator (for example
         run/stop) and access some host features (print, file I/O).</li>
+      <li><a href="vcd.html">VCD file dumper</a>.<br>
+        This is a special virtual hardware peripheral which can monitor changes
+        of a memory location (or a bit in MCS51 where bit address space is
+        available) and write out changes to a VCD file.</li>
       <li><a href="syntax.html">Command syntax</a> and <a href="cmd.html">command
           reference</a>. <br>
         The simulator can be controlled via a command line interface. It accepts

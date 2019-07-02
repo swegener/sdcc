@@ -111,14 +111,14 @@ public:
   virtual void err_inv_addr(t_addr addr);
   virtual void err_non_decoded(t_addr addr);
 
-  virtual t_addr dump(t_addr start, t_addr stop, int bpl, class cl_f *f);
-  virtual t_addr dump_s(t_addr start, t_addr stop, int bpl, class cl_f *f);
-  virtual t_addr dump_b(t_addr start, t_addr stop, int bpl, class cl_f *f);
-  virtual t_addr dump_i(t_addr start, t_addr stop, int bpl, class cl_f *f);
-  virtual t_addr dump(class cl_f *f);
+  virtual t_addr dump(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con);
+  virtual t_addr dump_s(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con);
+  virtual t_addr dump_b(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con);
+  virtual t_addr dump_i(t_addr start, t_addr stop, int bpl, /*class cl_f *f*/class cl_console_base *con);
+  virtual t_addr dump(/*class cl_f *f*/class cl_console_base *con);
   virtual t_addr dump(enum dump_format fmt,
 		      t_addr start, t_addr stop, int bpl,
-		      class cl_f *f);
+		      /*class cl_f *f*/class cl_console_base *con);
   virtual bool search_next(bool case_sensitive,
 			   t_mem *array, int len, t_addr *addr);
 

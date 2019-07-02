@@ -1556,17 +1556,17 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con)
   b= fbrk_at(addr);
   dis= disass(addr, NULL);
   if (b)
-    con->dd_printf("%c", (b->perm == brkFIX)?'F':'D');
+    con->dd_cprintf("answer", "%c", (b->perm == brkFIX)?'F':'D');
   else
     con->dd_printf(" ");
-  con->dd_printf("%c ", inst_at(addr)?' ':'?');
-  con->dd_printf(rom->addr_format, addr); con->dd_printf(" ");
-  con->dd_printf(rom->data_format, code);
+  con->dd_cprintf("answer", "%c ", inst_at(addr)?' ':'?');
+  con->dd_cprintf("dump_address", rom->addr_format, addr); con->dd_printf(" ");
+  con->dd_cprintf("dump_number", rom->data_format, code);
   l= inst_length(addr);
   for (i= 1; i < l; i++)
     {
       con->dd_printf(" ");
-      con->dd_printf(rom->data_format, rom->get(addr+i));
+      con->dd_cprintf("dump_number", rom->data_format, rom->get(addr+i));
     }
   int li= longest_inst();
   while (i < li)
@@ -1577,7 +1577,7 @@ cl_uc::print_disass(t_addr addr, class cl_console_base *con)
 	con->dd_printf(" "), j--;
       i++;
     }
-  con->dd_printf(" %s\n", dis);
+  con->dd_cprintf("dump_char", " %s\n", dis);
   free((char *)dis);
 }
 

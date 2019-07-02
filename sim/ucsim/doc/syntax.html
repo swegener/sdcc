@@ -1,24 +1,24 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
-    <title>Command syntax of &mu;Csim</title>
+    <title>Command syntax of &#956;Csim</title>
   </head>
-  <body style="background-color: white;"> Content:
+  <body style=" background-color: white;"> Content:
     <ul>
       <li><a href="#syntax">Syntax</a> </li>
       <li><a href="#expr">Expressions</a> </li>
       <li><a href="#redir">Redirection</a> </li>
     </ul>
-    <h2><a name="syntax">Command syntax of <i>&mu;Csim</i></a></h2>
-    <i>&mu;Csim</i> uses a very simple command interpreter. Command can be entered
-    after <i>&mu;Csim</i> displays the prompt and interpreted when ENTER key is
+    <h2><a name="syntax">Command syntax of <i>&#956;Csim</i></a></h2>
+    <i>&#956;Csim</i> uses a very simple command interpreter. Command can be entered
+    after <i>&#956;Csim</i> displays the prompt and interpreted when ENTER key is
     pressed. Commands must start with the name of the command following
     parameters. Name of the command can be abbreviated if abbreviation is
     unique. Some commands have more than one names.
     <p>Syntactically parameters can be a string, bit name, array, number or
       symbol. Interpretation of these syntactical elements depends on actual
       command. </p>
-    <p>If the command line can not be recognized as a known command, <i>&mu;Csim</i>
+    <p>If the command line can not be recognized as a known command, <i>&#956;Csim</i>
       tries to evaluate the command line as an <i>expression</i>. <a href="#expr">See
         below</a> for information about operands and operators which can be used
       in expressions. </p>
@@ -84,9 +84,13 @@ Port0 11111111 0xff 255 . (Value on the port pins)
     <h4><a name="number_type">Number type</a></h4>
     Some commands accept parameters which in most cases can be numbers. Numbers
     can be entered in C-style form. If the number begins with <tt><b>0x</b></tt>
-    or <tt><b>0X</b></tt> it is interpreted as a hexadecimal number. If it
-    begins with <tt><b>0</b></tt> followed by digits it is interpreted as octal
-    number. In other cases it is interpreted as decimal number.
+    or <tt><b>0X</b></tt> it is interpreted as a <i>hexadecimal</i> number. As
+    extension to C-style, number can be started by <b><span style="font-family: monospace;">0b</span></b>,
+    followed by <b><span style="font-family: monospace;">0</span></b> and <b><span
+        style="font-family: monospace;">1</span></b> characters. In this case it
+    is interpreted as <i>binary</i> number. If it begins with <tt><b>0</b></tt>
+    followed by digits it is interpreted as <i>octal</i> number. In other cases
+    it is interpreted as <i>decimal</i> number.
     <h4><a name="symbol_type">Symbol type</a></h4>
     If a command parameter can not be classified in other ways (doesn't start
     with a digit or a quote, doesn't contain dot or [) then it will be treated
@@ -157,14 +161,17 @@ Port0 11111111 0xff 255 . (Value on the port pins)
     </ul>
     <h4>Number operands</h4>
     Numbers can be entered in decimal, octal (starting with 0 followed by a
-    number), or hexadecimal (started with 0x):
+    number), or hexadecimal (started with 0x), or binary (started with 0b):
     <pre>0&gt; <font color="green">12</font>
 12
 0&gt; <font color="green">012</font>
 10
 0&gt; <font color="green">0x12</font>
 18
+0&gt; <font color="green">0b010101</font>
+21
 0&gt; 
+
 </pre> Numbers must be integers (floating point is not supported) and not bigger
     than the value which can be stored as <b>long int</b>.
     <h4>Memory operands</h4>
@@ -271,8 +278,8 @@ Port0 11111111 0xff 255 . (Value on the port pins)
         </tr>
       </tbody>
     </table>
-    Arithmetic operators and parenthesises work as usual.
-    <p>Assigment operator can be used to modify memory cells and bits of the
+    Arithmetic operators and parenthesis work as usual.
+    <p>Assignment operator can be used to modify memory cells and bits of the
       cells. Result will be the assigned value. </p>
     <pre>0&gt; <font color="green">p0=23</font>
 23
@@ -327,7 +334,7 @@ Port0 00010110 0x16  22 . (Value on the port pins)
     <hr>
     <h2><a name="redir">Redirection</a></h2>
     Output of any command can be redirected to a file. Same syntax can be used
-    for this as for UNIX shell. The only difference is that <i>&mu;Csim</i>
+    for this as for UNIX shell. The only difference is that <i>&#956;Csim</i>
     doesn't allow to put redirection at the beginning of the command!
     <pre>$ <font color="#118811">s51 remo.hex</font>
 uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.

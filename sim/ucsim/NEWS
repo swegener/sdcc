@@ -23,6 +23,9 @@
 
 - New option: "-e command" to specify startup command
 
+- Colors. New program option "-o colspec" to specify color values and
+  -b to omit coloring. New options "color_XXX" to hold values.
+  
 
 0.5
 

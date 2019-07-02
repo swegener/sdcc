@@ -183,6 +183,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  cmd->frozen_console->input_avail())
 	cmd->frozen_console->read_line();
       cmd->frozen_console->un_redirect();
+      cmd->frozen_console->dd_color("debug");
       cmd->frozen_console->dd_printf("Stop at 0x%06x: (%d) ", AU(uc->PC), reason);
       switch (reason)
 	{
@@ -303,6 +304,15 @@ cl_sim::stop(class cl_ev_brk *brk)
     state|= SIM_QUIT;
 }
 */
+
+void
+cl_sim::change_run(int reason)
+{
+  if (state & SIM_GO)
+    stop(reason);
+  else
+    start(0, 0);
+}
 
 /*
  */

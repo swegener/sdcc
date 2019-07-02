@@ -32,14 +32,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "port_hwcl.h"
 
 
-const char *keysets[7]= {
+const char *keysets[8]= {
   "12345678",
   "qwertyui",
   "asdfghjk",
   "zxcvbnm,",
   "QWERTYUI",
   "ASDFGHJK",
-  "ZXCVBNM."
+  "ZXCVBNM,",
+  "9opl.OPL"
 };
 
 
@@ -128,7 +129,7 @@ cl_port_ui::handle_input(int c)
 
   if (i8 < 0)
     {
-      fprintf(stderr, "Port: spec key= %d\n", i8);
+      //fprintf(stderr, "Port: spec key= %d\n", i8);
     }
   else
     {
@@ -159,7 +160,7 @@ cl_port_ui::handle_input(int c)
   if (!ret)
     {
       u8_t u= c;
-      fprintf(stderr, "Unknown command: %c (%d,0x%x)\n", isprint(u)?u:'?', i8, c);
+      //fprintf(stderr, "Unknown command: %c (%d,0x%x)\n", isprint(u)?u:'?', i8, c);
     }
   return ret;
 }

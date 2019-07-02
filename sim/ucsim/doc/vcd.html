@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-2">
+    <title>&#956;Csim: VCD file dumper</title>
+  </head>
+  <body>
+    <h1>VCD file dumper</h1>
+    <p>1. specify output file:<br>
+      <br>
+      0&gt; set hw vcd[0] file "name.vcd"<br>
+      <br>
+      2. add locations to dump (sorry, I didn't remember correctly, bits can not
+      be dumped yet):<br>
+      <br>
+      0&gt; set hw vcd[0] add pc_odr<br>
+      0&gt; set hw vcd[0] add rom[0x500a]<br>
+      <br>
+      You can set the name of the module if you want (set hw vcd[0] module
+      name), it will be<br>
+      ucsim_vcd_0 by default.<br>
+      <br>
+      3. start recording:<br>
+      <br>
+      0&gt; set hw vcd[0] start<br>
+      <br>
+      4. run the program</p>
+    <p>5. you can suspend/resume recording:<br>
+      <br>
+      0&gt; set hw vcd[0] pause<br>
+      0&gt; set hw vcd[0] restart<br>
+      <br>
+      You can create an additional recorder with "set hw vcd[0] new id" and
+      setup it with "set<br>
+      hw vcd[id] ..." commands ("id" must be a number).<br>
+      <br>
+      6. stop recording and close the vcd file:<br>
+      <br>
+      0&gt; set hw vcd[0] stop<br>
+      <br>
+      After "stop", you have to specify a new file, because "start" overwrites
+      the old one!<br>
+      <br>
+      For examine, I use gtkwave on linux.<br>
+    </p>
+    <hr>
+  </body>
+</html>

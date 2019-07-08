@@ -1,3 +1,12 @@
+2019-07-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* sim/ucsim/pdk.src/inst.cc,
+	  sdas/aspdk13/pdk13pst.c,
+	  sdas/aspdk13/pdk13mch.c,
+	  src/pdk/main.c,
+	  src/pdk/gen.c:
+	  Remove cneqsn for pdk13 fixing bug #2923.
+
 2019-06-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

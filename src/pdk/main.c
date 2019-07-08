@@ -120,16 +120,16 @@ pdk_genInitStartup (FILE *of)
   /* Zeroing memory (required by standard for static & global variables) */
   fprintf (of, "\tmov\ta, #s_DATA\n");
   fprintf (of, "\tmov\tp, a\n");
-  fprintf (of, "00001$:\n");
-  fprintf (of, "\tmov\ta, #s_DATA\n");
-  fprintf (of, "\tadd\ta, #l_DATA\n");
-  fprintf (of, "\tcneqsn\ta, p\n");
   fprintf (of, "\tgoto\t00002$\n");
+  fprintf (of, "00001$:\n");
   fprintf (of, "\tmov\ta, #0x00\n");
   fprintf (of, "\tidxm\tp, a\n");
   fprintf (of, "\tinc\tp\n");
-  fprintf (of, "\tgoto\t00001$\n");
+  fprintf (of, "\tmov\ta, #s_DATA\n");
   fprintf (of, "00002$:\n");
+  fprintf (of, "\tadd\ta, #l_DATA\n");
+  fprintf (of, "\tceqsn\ta, p\n");
+  fprintf (of, "\tgoto\t00001$\n");
 }
 
 static void

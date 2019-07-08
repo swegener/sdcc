@@ -715,17 +715,6 @@ int cl_pdk::execute_pdk13(unsigned int code) {
     sub_to(regs.a, get_mem(addr));
     if (regs.a == get_mem(addr))
       ++PC;
-  } else if (CODE_MASK(0x1300, 0xFF)) {
-    // cneqsn a, k
-    sub_to(regs.a, code & 0xFF);
-    if (regs.a != (code & 0xFF))
-      ++PC;
-  } else if (CODE_MASK(0x0Bc0, 0x3F)) {
-    // cneqsn a, m
-    int addr = code & 0x3F;
-    sub_to(regs.a, get_mem(addr));
-    if (regs.a != get_mem(addr))
-      ++PC;
   } else if (code == 0x0012) {
     // izsn
     regs.a = add_to(regs.a, 1);

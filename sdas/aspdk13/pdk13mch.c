@@ -154,11 +154,8 @@ machine(struct mne *mp)
                 break;
         }
 
-        case S_CNEQSN:
-                combine = 0x40;
-                /* fallthrough */
         case S_CEQSN: {
-                struct inst m = {0x0B80 | combine, 0xFF};
+                struct inst m = {0x0B80, 0xFF};
                 def.op |= combine << 2;
                 eskip(def, m);
                 break;

@@ -1,3 +1,8 @@
+2019-07-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* .version:
+	  Reflect recent progress on pdk13 by bumping the version number.
+
 2019-07-08 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* sim/ucsim/pdk.src/inst.cc,

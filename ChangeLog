@@ -1,7 +1,12 @@
+2019-07-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Small improvements in handling of wide values.
+
 2019-07-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Improve aop moves (in particular wrt. 16-bit ld)
+	  Improve aop moves (in particular wrt. 16-bit ld).
 
 2019-07-11 Philipp Klaus Krause <pkk AT spth.de>
 

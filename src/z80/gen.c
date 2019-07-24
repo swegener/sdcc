@@ -307,6 +307,14 @@ z80_init_asmops (void)
   memset (asmop_iyl.regs, -1, 9);
   asmop_iyl.regs[IYL_IDX] = 0;
 
+  /*asmop_hl.type = AOP_REG;
+  asmop_hl.size = 2;
+  asmop_hl.aopu.aop_reg[0] = regsZ80 + L_IDX;
+  asmop_hl.aopu.aop_reg[1] = regsZ80 + H_IDX;
+  memset (asmop_hl.regs, -1, 9);
+  asmop_hl.regs[L_IDX] = 0;
+  asmop_hl.regs[H_IDX] = 1;*/
+
   asmop_zero.type = AOP_LIT;
   asmop_zero.aopu.aop_lit = constVal ("0");
   asmop_zero.size = 1;
@@ -3526,24 +3534,21 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
     }
 
   bool zeroed_a = false;
-  bool zeroed_hl = false;
+  long value_hl = -1;
   bool a_dead = a_dead_global;
   bool hl_dead = hl_dead_global;
   for (unsigned int i = 0; i < size;)
     {
-      if ((IS_EZ80_Z80 || IS_RAB || IS_TLCS90) && i + 1 < size && result->type == AOP_STK && aopIsLitVal (source, soffset + i, 2, 0x0000) && (zeroed_hl || hl_dead))
+      if ((IS_EZ80_Z80 || IS_RAB || IS_TLCS90) && i + 1 < size && result->type == AOP_STK &&
+        source->type == AOP_LIT && (value_hl >= 0 && aopIsLitVal (source, soffset + i, 2, value_hl) || hl_dead))
         {
-          if (!zeroed_hl)
-            {
-              emit2("or a, a");
-              emit2("sbc hl, hl");
-              regalloc_dry_run_cost += 3;
-            }
+          if (value_hl < 0 || !aopIsLitVal (source, soffset + i, 2, value_hl))
+            fetchLitPair (PAIR_HL, source, soffset + i);
           if (!regalloc_dry_run)
             emit2 ("ld %s, hl", aopGet (result, roffset + i, false));
           cost2 (3 - IS_RAB, 0, 0, 11, 0, 12, 5);
           regalloc_dry_run_cost += 3;
-          zeroed_hl = true;
+          value_hl = ullFromVal (source->aopu.aop_lit) >> ((soffset + i) * 8) & 0xffff;
           i += 2;
           continue;
         }
@@ -7478,9 +7483,12 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
       /* Subtract through, propagating the carry */
       while (size)
         {
-          if (!IS_GB && (!sign || size > 2) && getPartPairId (AOP (left), offset) == PAIR_HL && isPairDead (PAIR_HL, ic) &&
-            (getPartPairId (AOP (right), offset) == PAIR_DE || getPartPairId(AOP (right), offset) == PAIR_BC))
+          if (!IS_GB && (!sign || size > 2) &&
+            isPairDead (PAIR_HL, ic) &&
+            (getPartPairId (left->aop, offset) == PAIR_HL || left->aop->type == AOP_LIT && right->aop->regs[L_IDX] < offset && right->aop->regs[H_IDX] < offset) &&
+            (getPartPairId (right->aop, offset) == PAIR_DE || getPartPairId (right->aop, offset) == PAIR_BC))
             {
+              fetchPairLong (PAIR_HL, left->aop, 0, offset);
               emit2 ("sbc hl, %s", _pairs[getPartPairId (AOP (right), offset)].name);
               regalloc_dry_run_cost += 2;
               size -= 2;
@@ -7488,10 +7496,10 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
             }
           else
             {
-              if (!(AOP_TYPE (left) == AOP_LIT && byteOfVal (AOP (left)->aopu.aop_lit, offset) == a_always_byte))
-                cheapMove (ASMOP_A, 0, AOP (left), offset, true);
+              if (!(left->aop->type == AOP_LIT && byteOfVal (left->aop->aopu.aop_lit, offset) == a_always_byte))
+                cheapMove (ASMOP_A, 0, left->aop, offset, true);
               a_always_byte = -1;
-              emit3_o (A_SBC, ASMOP_A, 0, AOP (right), offset);
+              emit3_o (A_SBC, ASMOP_A, 0, right->aop, offset);
               size--;
               offset++;
             }
@@ -7724,6 +7732,20 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
               regalloc_dry_run_cost++;
               a_result = aopInReg (left->aop, 0, A_IDX);
             }
+          else if (!bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] < offset && size && byteOfVal (right->aop->aopu.aop_lit, offset) == 0xff &&
+            (left->aop->type == AOP_REG || left->aop->type == AOP_STK) &&
+            byteOfVal (right->aop->aopu.aop_lit, offset) == byteOfVal (right->aop->aopu.aop_lit, offset + 1))
+            {
+              cheapMove (ASMOP_A, 0, left->aop, offset, true);
+              while (byteOfVal (right->aop->aopu.aop_lit, offset + 1) == 0xff && size)
+                {
+                  emit3_o (A_AND, ASMOP_A, 0, left->aop, ++offset);
+                  size--;
+                }
+              emit3 (A_INC, ASMOP_A, 0);
+              next_zero = size && !byteOfVal (AOP (right)->aopu.aop_lit, offset + 1);
+              a_result = true;
+            }
           else if ((aopInReg (left->aop, 0, A_IDX) && !bitVectBitValue (ic->rSurv, A_IDX) ||
             AOP_TYPE (left) == AOP_REG && AOP (left)->aopu.aop_reg[offset]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[offset]->rIdx != IYH_IDX && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[offset]->rIdx)) &&
             byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0xff && !next_zero)
@@ -7735,25 +7757,19 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
             }
           else
             {
-              cheapMove (ASMOP_A, 0, AOP (left), offset, true);
+              cheapMove (ASMOP_A, 0, left->aop, offset, true);
 
-              if (byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0x01)
-                {
-                  emit2 ("dec a");
-                  regalloc_dry_run_cost++;
-                }
-              else if (byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0xff)
-                {
-                  emit2 ("inc a");
-                  regalloc_dry_run_cost++;
-                }
+              if (byteOfVal (right->aop->aopu.aop_lit, offset) == 0x01)
+                emit3 (A_DEC, ASMOP_A, 0);
+              else if (byteOfVal (right->aop->aopu.aop_lit, offset) == 0xff)
+                emit3 (A_INC, ASMOP_A, 0);
               else
-                emit3_o (A_SUB, ASMOP_A, 0, AOP (right), offset);
+                emit3_o (A_SUB, ASMOP_A, 0, right->aop, offset);
 
-              a_result = TRUE;
+              a_result = true;
             }
 
-          // Only emit jump now if there is not following test for 0 (which would just or to a current result in a)
+          // Only emit jump now if there is no following test for 0 (which would just or to a current result in a)
           if (!(next_zero && a_result))
             {
               if (!regalloc_dry_run)
@@ -11421,6 +11437,7 @@ genAssign (const iCode * ic)
                   emit2 ("ld hl, #%s", AOP (IC_RIGHT (ic))->aopu.aop_dir);
                   regalloc_dry_run_cost += 3;
                 }
+              spillPair (PAIR_HL);
 
               emit2 ("ld bc, #%d", size);
               emit2 ("ldir");

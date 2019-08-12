@@ -2,6 +2,8 @@
 
 	* sdas/aspdk13/pdk13mch.c:
 	  Bit instruction fixes by Free-PDK.
+	* device/lib/pdk13/__gptrget.s:
+	  Pointer read fix as suggested by Serge Rabyking (see path #305).
 
 2019-07-24 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -31,7 +31,7 @@
 
 __gptrget::
 	sub	a, #0x80
-	t0sn	f, c
+	t1sn	f, c
 	goto	code
 
 	; Pointer to RAM
@@ -41,11 +41,12 @@ __gptrget::
 	; Pointer to ROM
 code:
 	; Put pointer on stack
-	push	af
+	xch	a, p
+	push	af	; Put lower byte of pointer on stack.
 	mov	a, sp
 	add	a, #-1
 	xch	a, p
-	idxm	p, a
+	idxm	p, a	; Put upper byte of pointer on stack.
 
 	; Jump to it. ret there will return from the call to __gprtget
 	ret

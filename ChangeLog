@@ -1,5 +1,10 @@
 2019-08-14 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/peep.c:
+	  Improve notUsed() precision, alternative to patch from z88dk fork.
+
+2019-08-14 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/stm8/peep.c,
 	  src/stm8/peeph.def:
 	  stm8 peephole optimization improvements, mostly picked from patch #290.

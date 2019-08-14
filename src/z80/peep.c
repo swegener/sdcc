@@ -209,13 +209,23 @@ static bool argCont(const char *arg, const char *what)
   while(isspace (*arg) || *arg == ',')
     arg++;
 
+  if (arg[0] == '#')
+    return false;
+
   if(arg[0] == '(' && arg[1] && arg[2] && (arg[2] != ')' && arg[3] != ')'))
     return FALSE;
 
   if(*arg == '(')
     arg++;
 
-  return(arg[0] == '#') ? FALSE : StrStr(arg, what) != NULL;
+  // Get suitable end to avoid reading into further arguments.
+  const char *end = strchr(arg, ',');
+  if (!end)
+    end = arg + strlen(arg);
+
+  const char *found = StrStr(arg, what);
+
+  return(found && found < end);
 }
 
 static bool
@@ -324,16 +334,33 @@ z80MightRead(const lineNode *pl, const char *what)
             return(true);
           arg += 2;
         }
+      else if(!strncmp(arg, "hl", 2) && *(arg + 2) == ',')
+        {
+          if(!strcmp(what, "h") || !strcmp(what, "l"))
+            return(true);
+          arg += 3;
+        }
       return(argCont(arg, what));
     }
 
   if(ISINST(pl->line, "or") || ISINST(pl->line, "cp") )
     {
-      if(argCont(pl->line + 3, what))
-        return(true);
-      if(strcmp("a", what) == 0)
-        return(true);
-      return(false);
+      const char *arg = pl->line + 3;
+      while(isspace(*arg))
+        arg++;
+      if(*arg == 'a' && *(arg + 1) == ',')
+        {
+          if(!strcmp(what, "a"))
+            return(true);
+          arg += 2;
+        }
+      else if(!strncmp(arg, "hl", 2) && *(arg + 2) == ',')
+        {
+          if(!strcmp(what, "h") || !strcmp(what, "l"))
+            return(true);
+          arg += 3;
+        }
+      return(argCont(arg, what));
     }
 
   if(ISINST(pl->line, "neg"))
@@ -387,7 +414,7 @@ z80MightRead(const lineNode *pl, const char *what)
      ISINST(pl->line, "set") ||
      ISINST(pl->line, "res"))
     {
-      return(argCont(pl->line + 4, what));
+      return(argCont(strchr(pl->line + 4, ','), what));
     }
 
  if(ISINST(pl->line, "ccf") ||

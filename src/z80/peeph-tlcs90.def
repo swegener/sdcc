@@ -818,6 +818,14 @@ replace restart {
 // Maybe we can try this after 2.7.0 release
 
 replace restart {
+	ld	%2 (ix), %1
+	ld	%1, %2 (ix)
+} by {
+	ld	%2 (ix), %1
+	; peephole 84a removed redundant load of %1 from %2 (ix)
+}
+
+replace restart {
 	ld	%1,a
 	ld	a,%2
 	or	a,%1

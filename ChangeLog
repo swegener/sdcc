@@ -2,6 +2,10 @@
 
 	* src/z80/peep.c:
 	  Improve notUsed() precision, alternative to patch from z88dk fork.
+	* src/stm8/*.def:
+	  Add rule from patch #304.
+	* src/z80/gen.c:
+	  Improve load of hl.
 
 2019-08-14 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -995,14 +995,22 @@ replace {
 }
 
 replace restart {
-	ld	%1,a
-	ld	a,%1
+	ld	%1, a
+	ld	a, %1
 } by {
-	ld	%1,a
+	ld	%1, a
 	; peephole 98 removed redundant load from %1 into a.
 } if notVolatile(%1)
 // This gives many false negatives and without the test no problems are encountered in the regression tests
 // Maybe we can try this after 2.7.0 release
+
+replace restart {
+	ld	%2 (ix), %1
+	ld	%1, %2 (ix)
+} by {
+	ld	%2 (ix), %1
+	; peephole 98a removed redundant load of %1 from %2 (ix)
+}
 
 replace restart {
 	ld	%1,a

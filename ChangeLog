@@ -1,3 +1,9 @@
+2019-08-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peep.c,
+	  src/stm8/peeph.def:
+	  stm8 peephole optimization improvements, mostly picked from patch #290.
+
 2019-08-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/aspdk13/pdk13mch.c:

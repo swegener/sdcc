@@ -3,13 +3,15 @@
 	* src/stm8/peep.c,
 	  src/stm8/peeph.def:
 	  stm8 peephole optimization improvements, mostly picked from patch #290.
+	* sdas/asxxsrc/asmcro.c:
+	  Improve sdas behaviour on internal error, patch from bug #2626.
 
 2019-08-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/aspdk13/pdk13mch.c:
 	  Bit instruction fixes by Free-PDK.
 	* device/lib/pdk13/__gptrget.s:
-	  Pointer read fix as suggested by Serge Rabyking (see path #305).
+	  Pointer read fix as suggested by Serge Rabyking (see patch #305).
 
 2019-07-24 Philipp Klaus Krause <pkk AT spth.de>
 

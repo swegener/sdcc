@@ -992,6 +992,11 @@ FILE *fp;
         }
         ip = ptr;
 
+        if (fp == NULL) {
+                fprintf(stderr, "?ASxxxx-Internal-fgetm(fp)-Error srcline %d.\n\n", srcline);
+                asexit(ER_FATAL);
+        }
+
         nfp = (struct macrofp *) fp;
         np = nfp->np;
 

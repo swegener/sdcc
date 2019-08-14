@@ -5,6 +5,8 @@
 	  stm8 peephole optimization improvements, mostly picked from patch #290.
 	* sdas/asxxsrc/asmcro.c:
 	  Improve sdas behaviour on internal error, patch from bug #2626.
+	* src/z80/peep.c:
+	  Pick some peephole optimization improvements from z88dk fork.
 
 2019-08-12 Philipp Klaus Krause <pkk AT spth.de>
 

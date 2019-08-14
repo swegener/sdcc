@@ -285,7 +285,7 @@ z80MightRead(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "reti") || ISINST(pl->line, "retn"))
     return(false);
 
-  if(ISINST(pl->line, "ret")) // --reserev-regs-iy uses ret in code gen for calls through function pointers
+  if(ISINST(pl->line, "ret")) // --reserve-regs-iy uses ret in code gen for calls through function pointers
     return(IY_RESERVED ? isReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : isReturned(what));
 
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
@@ -400,8 +400,11 @@ z80MightRead(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "djnz"))
     return(strchr(what, 'b') != 0);
 
-  if(!IS_GB && ISINST(pl->line, "ldir"))
-    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e") || !strcmp(what, "h") || !strcmp(what, "l"));
+  if(!IS_GB && (ISINST(pl->line, "ldd") || ISINST(pl->line, "lddr") || ISINST(pl->line, "ldi") || ISINST(pl->line, "ldir")))
+    return(strchr("bcdehl", *what));
+
+  if(!IS_GB && !IS_RAB && (ISINST(pl->line, "cpd") || ISINST(pl->line, "cpdr") || ISINST(pl->line, "cpi") || ISINST(pl->line, "cpir")))
+    return(strchr("abchl", *what));
 
   if(!IS_GB && !IS_RAB && ISINST(pl->line, "out"))
     return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
@@ -411,13 +414,26 @@ z80MightRead(const lineNode *pl, const char *what)
   if(!IS_GB && !IS_RAB &&
     (ISINST(pl->line, "ini") || ISINST(pl->line, "ind") || ISINST(pl->line, "inir") || ISINST(pl->line, "indr") ||
     ISINST(pl->line, "outi") || ISINST(pl->line, "outd") || ISINST(pl->line, "otir") || ISINST(pl->line, "otdr")))
-    return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "h") || !strcmp(what, "l"));
+    return(strchr("bchl", *what));
+
+  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "in0"))
+    return(false);
 
   if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "mlt"))
     return(argCont(pl->line + 4, what));
 
+  if((IS_Z180 || IS_EZ80_Z80) &&
+    (ISINST(pl->line, "otim") || ISINST(pl->line, "otimr") || ISINST(pl->line, "otir") || ISINST(pl->line, "otirx")))
+    return(strchr("bchl", *what));
+
+  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "slp"))
+    return(false);
+
   if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tst"))
     return(argCont(pl->line + 4, what));
+
+  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tstio"))
+    return(!strcmp(what, "c"));
 
   if(IS_RAB && ISINST(pl->line, "mul"))
     return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e"));

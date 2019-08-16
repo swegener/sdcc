@@ -1329,18 +1329,6 @@ replace restart {
 }
 
 replace restart {
-	ld	(hl),#0x00
-	inc	hl
-	ld	(hl),#0x00
-} by {
-	xor	a, a
-	; peephole 106 cached zero in a.
-	ld	(hl), a
-	inc	hl
-	ld	(hl), a
-} if notUsed('a')
-
-replace restart {
 	ld	hl,#%1
 	add	hl,%2
 	inc	hl

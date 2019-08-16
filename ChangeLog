@@ -1,5 +1,13 @@
 2019-08-16 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  src/z80/peeph-z80.def,
+	  src/z80/peeph-tlcs90.def,
+	  src/z80/peeph-r2k.def:
+	  Improve caching of zero on pointer write.
+
+2019-08-16 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Improve assignment.
 	* device/include/string.h,

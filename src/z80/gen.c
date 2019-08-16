@@ -10803,7 +10803,7 @@ genPackBits (sym_link * etype, operand * right, int pair, const iCode * ic)
 /* genPointerSet - stores the value into a pointer location        */
 /*-----------------------------------------------------------------*/
 static void
-genPointerSet (iCode * ic)
+genPointerSet (iCode *ic)
 {
   int size, offset = 0;
   int last_offset = 0;
@@ -11026,6 +11026,8 @@ genPointerSet (iCode * ic)
     }
   else
     {
+      bool zero_a = false;
+
       for (offset = 0; offset < size;)
         {
           last_offset = offset;
@@ -11047,7 +11049,19 @@ genPointerSet (iCode * ic)
               continue;
             }
 
-          if (isRegOrLit (AOP (right)) && pairId == PAIR_HL)
+          if (!zero_a && offset + 1 < size && aopIsLitVal (right->aop, offset, 2, 0x0000) && !surviving_a)
+            {
+              emit2 ("xor a, a");
+              regalloc_dry_run_cost++;
+              zero_a = true;
+            }
+ 
+          if (aopIsLitVal (right->aop, offset, 1, 0x00) && zero_a)
+            {
+              emit2 ("ld !*pair, a", _pairs[pairId].name);
+              regalloc_dry_run_cost++;
+            }
+          else if (isRegOrLit (right->aop) && pairId == PAIR_HL)
             {
               if (!regalloc_dry_run)
                 emit2 ("ld !*pair, %s", _pairs[pairId].name, aopGet (AOP (right), offset, FALSE));
@@ -11058,6 +11072,7 @@ genPointerSet (iCode * ic)
               if (surviving_a && !pushed_a && (!aopInReg (right->aop, 0, A_IDX) || offset))
                 _push (PAIR_AF), pushed_a = TRUE;
               cheapMove (ASMOP_A, 0, AOP (right), offset, true);
+              zero_a = false;
               emit2 ("ld !*pair, a", _pairs[pairId].name);
               regalloc_dry_run_cost += 1;
             }

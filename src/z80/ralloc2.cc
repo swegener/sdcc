@@ -575,7 +575,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     IS_TRUE_SYMOP (right) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (right)->etype))))
     return(false);
 
-  if (ic->op == '^' || ic->op == BITWISEAND || ic->op == '|') // Codegen can handle it all.
+  if (ic->op == '^' || ic->op == BITWISEAND || ic->op == '|' || ic->op == '~') // Codegen can handle it all.
      return(true);
 
   // Can use non-destructive cp on == and < (> might swap operands).
@@ -614,7 +614,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(true);
 
   // Last byte of output may be in A.
-  if((ic->op == GET_VALUE_AT_ADDRESS || (ic->op == CAST) && !operand_in_reg(right, REG_A, ia, i, G)) && IS_ITEMP(result) && operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G))
+  if((ic->op == GET_VALUE_AT_ADDRESS || ic->op == CAST && !operand_in_reg(right, REG_A, ia, i, G)) && IS_ITEMP(result) && operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G))
     return(true);
 
   if (ic->op == LEFT_OP && getSize(operandType(IC_RESULT(ic))) == 2 && IS_OP_LITERAL(right) && byteOfVal (OP_VALUE (IC_RIGHT(ic)), 0) == 7)
@@ -861,6 +861,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(!exstk && !isOperandInDirSpace(IC_LEFT(ic)) && !isOperandInDirSpace(IC_RIGHT(ic)) && !isOperandInDirSpace(IC_RESULT(ic)) &&
     (ic->op == '-' ||
     ic->op == UNARYMINUS ||
+    ic->op == '~' ||
     ic->op == '<' ||
     ic->op == '>'))
     return(true);

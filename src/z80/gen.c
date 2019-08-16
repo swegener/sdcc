@@ -4015,34 +4015,55 @@ release:
 /* genCpl - generate code for complement                           */
 /*-----------------------------------------------------------------*/
 static void
-genCpl (const iCode * ic)
+genCpl (const iCode *ic)
 {
-  int offset = 0;
-  int size;
+  int skip_byte = -1;
 
+  bool a_dead = !bitVectBitValue (ic->rSurv, A_IDX);
+  bool pushed_a = false;
 
   /* assign asmOps to operand & result */
-  aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
-  aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
+  aopOp (IC_LEFT (ic), ic, false, false);
+  aopOp (IC_RESULT (ic), ic, true, false);
 
   /* if both are in bit space then
      a special case */
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY && AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
+    wassertl (0, "Left and the result are in bit space");
+
+  if (IC_LEFT (ic)->aop->regs[A_IDX] >= 0)
     {
-      wassertl (0, "Left and the result are in bit space");
+      emit3 (A_CPL, 0, 0);
+      cheapMove (IC_RESULT (ic)->aop, IC_LEFT (ic)->aop->regs[A_IDX], ASMOP_A, 0, true);
+      skip_byte = IC_LEFT (ic)->aop->regs[A_IDX];
     }
 
-  size = AOP_SIZE (IC_RESULT (ic));
-  while (size--)
+  int size = IC_RESULT (ic)->aop->size;
+  for (int i = 0; i < size; i++)
     {
-      cheapMove (ASMOP_A, 0, AOP (IC_LEFT (ic)), offset, true);
+      if (i == skip_byte)
+        continue;
+
+      if (!a_dead && !pushed_a)
+        {
+          _push (PAIR_AF);
+          pushed_a = true;
+        }
+
+      cheapMove (ASMOP_A, 0, IC_LEFT (ic)->aop, i, true);
       emit3 (A_CPL, 0, 0);
-      cheapMove (AOP (IC_RESULT (ic)), offset++, ASMOP_A, 0, true);
+      cheapMove (IC_RESULT (ic)->aop, i, ASMOP_A, 0, true);
+
+      if (aopInReg (IC_RESULT (ic)->aop, i, A_IDX))
+        a_dead = false;
     }
+
+  if (pushed_a)
+    _pop (PAIR_AF);
 
   /* release the aops */
-  freeAsmop (IC_LEFT (ic), NULL);
-  freeAsmop (IC_RESULT (ic), NULL);
+  freeAsmop (IC_LEFT (ic), 0);
+  freeAsmop (IC_RESULT (ic), 0);
 }
 
 static void
@@ -8723,7 +8744,7 @@ release:
 /* genXor - code for xclusive or                                   */
 /*-----------------------------------------------------------------*/
 static void
-genXor (const iCode * ic, iCode * ifx)
+genXor (const iCode *ic, iCode *ifx)
 {
   operand *left, *right, *result;
   int size, offset = 0;
@@ -8860,7 +8881,7 @@ genXor (const iCode * ic, iCode * ifx)
 
           // normal case
           // result = left & right
-          if (AOP_TYPE (right) == AOP_LIT)
+          if (right->aop->type == AOP_LIT)
             {
               if (((lit >> (offset * 8)) & 0x0FFL) == 0x00L)
                 {
@@ -8885,7 +8906,10 @@ genXor (const iCode * ic, iCode * ifx)
           else
             {
               cheapMove (ASMOP_A, 0, left->aop, offset, true);
-              emit3_o (A_XOR, ASMOP_A, 0, right->aop, offset);
+              if (right->aop->type == AOP_LIT && ((lit >> (offset * 8)) & 0xff) == 0xff)
+                emit3 (A_CPL, 0, 0);
+              else
+                emit3_o (A_XOR, ASMOP_A, 0, right->aop, offset);
             }
           cheapMove (result->aop, offset, ASMOP_A, 0, true);
           if (aopInReg (result->aop, offset, A_IDX))

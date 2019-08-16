@@ -2,6 +2,11 @@
 
 	* src/z80/gen.c:
 	  Improve assignment.
+	* device/include/string.h,
+	  device/lib/strdup.c,
+	  device/lib/strndup.c,
+	  device/lib/incl.mk:
+	  Implement C2X string duplication functions.
 
 2019-08-14 Philipp Klaus Krause <pkk AT spth.de>
 

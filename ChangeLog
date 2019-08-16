@@ -1,3 +1,8 @@
+2019-08-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve assignment.
+
 2019-08-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:

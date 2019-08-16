@@ -2422,10 +2422,8 @@ setupPair (PAIR_ID pairId, asmop *aop, int offset)
         if (aop->aopu.aop_stk >= 0)
           offset += _G.stack.param_offset;
 
-        if (_G.pairs[pairId].last_type == aop->type && _G.pairs[pairId].offset == offset)
-          {
-            /* Already setup */
-          }
+        if (_G.pairs[pairId].last_type == aop->type && abs(_G.pairs[pairId].offset - offset) <= 3)
+          adjustPair (_pairs[pairId].name, &_G.pairs[pairId].offset, offset);
         else
           {
             struct dbuf_s dbuf;
@@ -2970,36 +2968,6 @@ aopPut (asmop *aop, const char *s, int offset)
   dbuf_destroy (&dbuf);
 }
 
-static void
-aopPut3 (asmop *op1, int offset1, asmop *op2, int offset2, bool a_dead)
-{
-  unsigned char cost = regalloc_dry_run_cost;
-  int fp_offset=0;
-  int sp_offset=0;
-
-  if (!regalloc_dry_run)
-    {
-      if ((op1->type == AOP_STK || op1->type == AOP_EXSTK))
-        {
-          fp_offset = op1->aopu.aop_stk + offset1 + (op1->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
-          sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
-        }
-
-      if ((op1->type == AOP_STK || op1->type == AOP_EXSTK) && !sp_offset && _G.omitFramePtr && op1->size == 1 &&
-        (aopInReg (op2, offset2, A_IDX) || aopInReg (op2, offset2, B_IDX) || aopInReg (op2, offset2, D_IDX) || aopInReg (op2, offset2, H_IDX) || aopInReg (op2, offset2, IYH_IDX)))
-        {
-          emit2 ("inc sp");
-          emit2 ("push %s", aopInReg (op2, offset2, A_IDX) ? "af" : (aopInReg (op2, offset2, B_IDX) ? "bc" : (aopInReg (op2, offset2, D_IDX) ? "de" : (aopInReg (op2, offset2, H_IDX) ? "hl" : "iy"))));
-          emit2 ("inc sp");
-          regalloc_dry_run_cost += 4 + aopInReg (op2, offset2, IYH_IDX);
-        }
-      else
-        aopPut (op1, aopGet (op2, offset2, FALSE), offset1);
-    }
-
-  regalloc_dry_run_cost = cost + ld_cost (op1, offset2 < op2->size ? op2 : ASMOP_ZERO);
-}
-
 // Move, but try not to. Cannot use xor to zero, since xor resets the carry flag.
 static void
 cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
@@ -3022,30 +2990,68 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
           regalloc_dry_run_cost += 1 + (IS_TLCS90 + !a) + index;
           return;
         }
-      if (aopInReg (from, from_offset, IYL_IDX) && !to_index)
+      if (aopInReg (from, from_offset, IYL_IDX) && !to_index && a_dead)
         {
-          if (!a_dead)
-            _push (PAIR_AF);
           _push(PAIR_IY);
           _pop (PAIR_AF);
           cheapMove (to, to_offset, ASMOP_A, 0, true);
-          if (!a_dead)
-            _pop (PAIR_AF);
           return;
         }
-      // Can't do it (todo: implement something there - will be expensive though, probablky at least 7B of code).
+      if (from_index && !to_index && _G.stack.pushed + _G.stack.offset + 2 <= 127 && !_G.omitFramePtr)
+        {
+          _push(PAIR_IY);
+          if (!regalloc_dry_run)
+            emit2 ("ld %s, %d (ix)", aopGet (to, to_offset, false), _G.stack.pushed + _G.stack.offset);
+          regalloc_dry_run_cost += 3;
+          _pop(PAIR_IY);
+          return;
+        }
+
+      // Can't do it (todo: implement something there - will be expensive though, probably at least 7B of code).
       regalloc_dry_run_cost += 100;
       wassert (regalloc_dry_run);
     }
 
-  // TODO: Optimize out some moves that do not involve registers.
+  // Try to push to avoid setting up temporary stack pointer in hl or iy.
+  if ((to->type == AOP_STK || to->type == AOP_EXSTK) && _G.omitFramePtr &&
+    (aopInReg (to, to_offset, A_IDX) || aopInReg (to, to_offset, B_IDX) || aopInReg (to, to_offset, D_IDX) || aopInReg (to, to_offset, H_IDX) || aopInReg (to, to_offset, IYH_IDX)))
+    {
+      int fp_offset = to->aopu.aop_stk + to_offset + (to->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
 
-  bool uses_a = (from->type == AOP_DIR || from->type == AOP_SFR);
-  if (!a_dead && uses_a)
-    _push (PAIR_AF);
-  aopPut3 (to, to_offset, from, from_offset, a_dead);
-  if (!a_dead && uses_a)
-    _pop (PAIR_AF);
+      if (!sp_offset)
+        {
+          emit2 ("inc sp");
+          emit2 ("push %s", aopInReg (from, from_offset, A_IDX) ? "af" : (aopInReg (from, from_offset, B_IDX) ? "bc" : (aopInReg (from, from_offset, D_IDX) ? "de" : (aopInReg (from, from_offset, H_IDX) ? "hl" : "iy"))));
+          emit2 ("inc sp");
+          regalloc_dry_run_cost += 3 + aopInReg (from, from_offset, IYH_IDX);
+          return;
+        }
+    }
+
+  if (aopInReg (from, from_offset, A_IDX) && to->type == AOP_IY)
+    {
+      emit2 ("ld (%s+%d), a", to->aopu.aop_dir, to_offset);
+      regalloc_dry_run_cost += 3;
+    }
+  else if (!aopInReg (to, to_offset, A_IDX) && !aopInReg (from, from_offset, A_IDX) && (from->type == AOP_DIR || from->type == AOP_SFR || to->type == AOP_IY && from->type == AOP_EXSTK)) // Go through a.
+    {
+      if (!a_dead)
+        _push (PAIR_AF);
+
+      cheapMove (ASMOP_A, 0, from, from_offset, true);
+      cheapMove (to, to_offset, ASMOP_A, 0, true);
+
+      if (!a_dead)
+        _pop (PAIR_AF);
+    }
+  else
+    {
+      if (!regalloc_dry_run)
+        aopPut (to, aopGet (from, from_offset, false), to_offset);
+
+      regalloc_dry_run_cost += ld_cost (to, from_offset < from->size ? from : ASMOP_ZERO);
+    }
 }
 
 static void
@@ -9316,18 +9322,11 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
       if (size > 1)
         {
           if (shCount)
-            {
-              shiftL1Left2Result (left, LSB, result, MSB16, shCount);
-              aopPut3 (AOP (result), LSB, ASMOP_ZERO, 0, true);
-            }
+            shiftL1Left2Result (left, LSB, result, MSB16, shCount);
           else
-            {
-              movLeft2Result (left, LSB, result, MSB16, 0);
-              aopPut3 (AOP (result), 0, ASMOP_ZERO, 0, true);
-            }
+            movLeft2Result (left, LSB, result, MSB16, 0);
         }
-      else
-        aopPut3 (AOP (result), LSB, ASMOP_ZERO, 0, true);
+      cheapMove (result->aop, 0, ASMOP_ZERO, 0, true);
     }
   /*  0 <= shCount <= 7 */
   else
@@ -9666,10 +9665,10 @@ genrshTwo (const iCode * ic, operand * result, operand * left, int shCount, int 
           cheapMove (ASMOP_A, 0, result->aop, 0, true);
           emit3 (A_RLC, ASMOP_A, 0);
           emit3 (A_SBC, ASMOP_A, ASMOP_A);
-          cheapMove (result->aop, MSB16, ASMOP_A, 0, true);
+          cheapMove (result->aop, 1, ASMOP_A, 0, true);
         }
       else
-        aopPut3 (AOP (result), 1, ASMOP_ZERO, 0, true);
+        cheapMove (result->aop, 1, ASMOP_ZERO, 0, true);
     }
   /*  0 <= shCount <= 7 */
   else
@@ -11439,9 +11438,18 @@ genAssign (const iCode * ic)
                 }
               spillPair (PAIR_HL);
 
-              emit2 ("ld bc, #%d", size);
-              emit2 ("ldir");
-              regalloc_dry_run_cost += 5;
+              if (size <= 2 + optimize.codeSpeed)
+                for(int i = 0; i < size; i++)
+                  {
+                    emit2 ("ldi");
+                    regalloc_dry_run_cost += 2;
+                  }
+              else
+                {
+                  emit2 ("ld bc, #%d", size);
+                  emit2 ("ldir");
+                  regalloc_dry_run_cost += 5;
+                }
 
               if (bc_alive)
                 _pop (PAIR_BC);
@@ -11453,7 +11461,7 @@ genAssign (const iCode * ic)
               goto release;
             }
         }
-      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_LIT))
+      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_LIT))
         genMove (result->aop, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic));
       else
         while (size--)
@@ -11701,8 +11709,8 @@ genCritical (const iCode * ic)
     }
   else if (IC_RESULT (ic))
     {
-      aopOp (IC_RESULT (ic), ic, TRUE, FALSE);
-      aopPut3 (AOP (IC_RESULT (ic)), 0, ASMOP_ZERO, 0, true);
+      aopOp (IC_RESULT (ic), ic, true, false);
+      cheapMove (IC_RESULT (ic)->aop, 0, ASMOP_ZERO, 0, true);
       if (!regalloc_dry_run)
         {
           //get interrupt enable flag IFF2 into P/O
@@ -11714,7 +11722,7 @@ genCritical (const iCode * ic)
           emit2 ("jp PO, !tlabel", labelKey2num (tlbl->key));
         }
       regalloc_dry_run_cost += 5;
-      aopPut3 (AOP (IC_RESULT (ic)), 0, ASMOP_ONE, 0, true);
+      cheapMove (IC_RESULT (ic)->aop, 0, ASMOP_ONE, 0, true);
       if (!regalloc_dry_run)
         {
           emit2 ("!tlabeldef", labelKey2num ((tlbl->key)));

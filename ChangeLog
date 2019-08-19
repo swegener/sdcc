@@ -1,3 +1,10 @@
+2019-08-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc,
+	  support/regression/test/bug-2929.c:
+	  Fix bug #2929.
+
 2019-08-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/strdup.c:

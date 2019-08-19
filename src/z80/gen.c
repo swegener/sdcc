@@ -4031,14 +4031,30 @@ genCpl (const iCode *ic)
   if (AOP_TYPE (IC_RESULT (ic)) == AOP_CRY && AOP_TYPE (IC_LEFT (ic)) == AOP_CRY)
     wassertl (0, "Left and the result are in bit space");
 
-  if (IC_LEFT (ic)->aop->regs[A_IDX] >= 0)
+  int size = IC_RESULT (ic)->aop->size;
+
+  if (IC_LEFT (ic)->aop->regs[A_IDX] >= 0 && IC_LEFT (ic)->aop->regs[A_IDX] < size)
     {
+      int i = IC_LEFT (ic)->aop->regs[A_IDX];
       emit3 (A_CPL, 0, 0);
-      cheapMove (IC_RESULT (ic)->aop, IC_LEFT (ic)->aop->regs[A_IDX], ASMOP_A, 0, true);
-      skip_byte = IC_LEFT (ic)->aop->regs[A_IDX];
+      cheapMove (IC_RESULT (ic)->aop, i, ASMOP_A, 0, true);
+      skip_byte = i;
+
+      if (aopInReg (IC_RESULT (ic)->aop, i, A_IDX))
+        a_dead = false;
+
+      // Do not overwrite still-needed value
+      if (IC_RESULT (ic)->aop->type == AOP_REG && !aopInReg (IC_RESULT (ic)->aop, i, A_IDX))
+        {
+          int j = IC_LEFT (ic)->aop->regs[IC_RESULT (ic)->aop->aopu.aop_reg[i]->rIdx];
+          if (j >= 0 && j != skip_byte && j < size)
+            {
+              regalloc_dry_run_cost += 150;
+              wassert (regalloc_dry_run);
+            } 
+        }
     }
 
-  int size = IC_RESULT (ic)->aop->size;
   for (int i = 0; i < size; i++)
     {
       if (i == skip_byte)
@@ -4056,6 +4072,17 @@ genCpl (const iCode *ic)
 
       if (aopInReg (IC_RESULT (ic)->aop, i, A_IDX))
         a_dead = false;
+
+      // Do not overwrite still-needed value
+      if (IC_RESULT (ic)->aop->type == AOP_REG && !aopInReg (IC_RESULT (ic)->aop, i, A_IDX))
+        {
+          int j = IC_LEFT (ic)->aop->regs[IC_RESULT (ic)->aop->aopu.aop_reg[i]->rIdx];
+          if (j > i && j < size && j != skip_byte)
+            {
+              regalloc_dry_run_cost += 150;
+              wassert (regalloc_dry_run);
+            } 
+        }
     }
 
   if (pushed_a)

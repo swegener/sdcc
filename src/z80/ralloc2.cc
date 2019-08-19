@@ -399,7 +399,7 @@ static void add_operand_conflicts_in_node(const cfg_node &n, I_t &I)
   if(!result || !IS_SYMOP(result))
     return;
     
-  if(!(ic->op == '~' || ic->op == UNARYMINUS || ic->op == '+' || ic->op == '-' || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND)) 
+  if(!(ic->op == UNARYMINUS || ic->op == '+' || ic->op == '-' || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND)) 
     return; // Code generation can always handle all other operations. Todo: Handle ^, |, BITWISEAND and float UNARYMINUS there as well.
    
   operand_map_t::const_iterator oir, oir_end, oirs; 

@@ -1,3 +1,8 @@
+2019-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve wide ==, !=, part of RFE #641.
+
 2019-08-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

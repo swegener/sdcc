@@ -7845,6 +7845,34 @@ gencjneshort (operand *left, operand *right, symbol *lbl, const iCode *ic)
     {
       while (size--)
         {
+          if (aopInReg (right->aop, offset, A_IDX)  || aopInReg (right->aop, offset, HL_IDX) || aopInReg (left->aop, offset, BC_IDX) || aopInReg (left->aop, offset, DE_IDX))
+            {
+              operand *t = right;
+              right = left;
+              left = t;
+            }
+
+          if (!IS_GB && isPairDead (PAIR_HL, ic) &&
+            (aopInReg (left->aop, offset, HL_IDX) && (aopInReg (right->aop, offset, BC_IDX) || aopInReg (right->aop, offset, DE_IDX) || getFreePairId (ic) != PAIR_INVALID) ||
+            size == 1 && (aopInReg (right->aop, offset, BC_IDX) || aopInReg (right->aop, offset, DE_IDX))))
+            {
+              PAIR_ID pair = getPairId_o (right->aop, offset);
+              if (pair == PAIR_INVALID)
+                pair = getFreePairId (ic);
+
+              fetchPairLong (PAIR_HL, left->aop, ic, offset);
+              fetchPairLong (pair, right->aop, 0, offset);
+              emit3 (A_CP, ASMOP_A, ASMOP_A);
+              emit2 ("sbc hl, %s", _pairs[pair].name);
+              if (!regalloc_dry_run)
+                emit2 ("jp NZ,!tlabel", labelKey2num (lbl->key));
+              regalloc_dry_run_cost += 5;
+
+              offset += 2;
+              size--;
+              continue;
+            }
+
           cheapMove (ASMOP_A, 0, AOP (left), offset, true);
           if (AOP_TYPE (right) == AOP_LIT && byteOfVal (AOP (right)->aopu.aop_lit, offset) == 0)
             {

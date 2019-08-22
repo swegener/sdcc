@@ -1,5 +1,15 @@
 2019-08-20 Philipp Klaus Krause <pkk AT spth.de>
 
+	* sim/ucsim/pdk.src/glob.cc,
+	  sim/ucsim/pdk.src/inst.cc,
+	  sim/ucsim/pdk.src/instcl.h,
+	  sim/ucsim/pdk.src/pdk.cc,
+	  sim/ucsim/pdk.src/pdkcl.h,
+	  sim/ucsim/pdk.src/regspdk.h:
+	  pdk13 I/O fix (patch #305 by Serge Rabyking).
+
+2019-08-20 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Improve wide ==, !=, part of RFE #641.
 

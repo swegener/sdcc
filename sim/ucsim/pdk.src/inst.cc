@@ -58,21 +58,33 @@ int cl_pdk::get_mem(unsigned int addr) {
 }
 
 unsigned char cl_pdk::get_io(t_addr addr) {
-  return regs.regs[addr];
+  return regs8->get(addr);
 }
 
 void cl_pdk::store_io(t_addr addr, unsigned char value) {
-  regs.regs[addr] = value;
-  if (regs.regs[0x02] > sp_max)
-    sp_max = regs.regs[0x02];
+  regs8->set(addr, value);
+  if (get_SP() > sp_max)
+    sp_max = get_SP();
+}
+
+unsigned char cl_pdk::get_SP() {
+    return get_io(0x02);
+}
+
+unsigned char cl_pdk::get_flags() {
+    return get_io(0x00);
+}
+
+void cl_pdk::set_flags(unsigned char flags) {
+    return store_io(0x00, flags);
 }
 
 int cl_pdk::get_flag(flag n) {
   switch (n) {
-  case flag_z: return regs.regs[0x00] & BIT_Z;
-  case flag_c: return (regs.regs[0x00] & BIT_C) >> 1;
-  case flag_ac: return (regs.regs[0x00] & BIT_AC) >> 2;
-  case flag_ov: return (regs.regs[0x00] & BIT_OV) >> 3;
+  case flag_z: return get_flags() & BIT_Z;
+  case flag_c: return (get_flags() & BIT_C) >> 1;
+  case flag_ac: return (get_flags() & BIT_AC) >> 2;
+  case flag_ov: return (get_flags() & BIT_OV) >> 3;
   default:
     assert(!"invalid bit access to FLAG");
   }
@@ -81,10 +93,10 @@ int cl_pdk::get_flag(flag n) {
 
 void cl_pdk::store_flag(flag n, int value) {
   switch (n) {
-  case flag_z: regs.regs[0x00] = (regs.regs[0x00] & ~1) | value; break;
-  case flag_c: regs.regs[0x00] = (regs.regs[0x00] & ~2) | (value << 1); break;
-  case flag_ac: regs.regs[0x00] = (regs.regs[0x00] & ~4) | (value << 2); break;
-  case flag_ov: regs.regs[0x00] = (regs.regs[0x00] & ~8) | (value << 3); break;
+  case flag_z: set_flags((get_flags() & ~1) | value); break;
+  case flag_c: set_flags((get_flags() & ~2) | (value << 1)); break;
+  case flag_ac: set_flags((get_flags() & ~4) | (value << 2)); break;
+  case flag_ov: set_flags((get_flags() & ~8) | (value << 3)); break;
   default:
     assert(!"invalid bit store to FLAG");
   }
@@ -109,12 +121,12 @@ int cl_pdk::execute_pdk14(unsigned int code) {
   } else if (CODE_MASK(0x0200, 0xFF)) {
     // ret k
     regs.a = code & 0xFF;
-    store_io(0x2, regs.regs[0x02] - 2);
-    PC = get_mem(regs.regs[0x02]) | (get_mem(regs.regs[0x02] + 1) << 8);
+    store_io(0x2, get_SP() - 2);
+    PC = get_mem(get_SP()) | (get_mem(get_SP() + 1) << 8);
   } else if (code == 0x007A) {
     // ret
-    store_io(0x2, regs.regs[0x02] - 2);
-    PC = get_mem(regs.regs[0x02]) | (get_mem(regs.regs[0x02] + 1) << 8);
+    store_io(0x2, get_SP() - 2);
+    PC = get_mem(get_SP()) | (get_mem(get_SP() + 1) << 8);
   } else if (CODE_MASK(0x2F00, 0xFF)) {
     // mov a, k
     regs.a = code & 0xFF;
@@ -147,14 +159,14 @@ int cl_pdk::execute_pdk14(unsigned int code) {
     regs.a = mem;
   } else if (code == 0x0072) {
     // pushaf
-    ram->write(regs.regs[0x02], regs.a);
-    ram->write(regs.regs[0x02] + 1, regs.regs[0x00]);
-    store_io(0x2, regs.regs[0x02] + 2);
+    ram->write(get_SP(), regs.a);
+    ram->write(get_SP() + 1, get_flags());
+    store_io(0x2, get_SP() + 2);
   } else if (code == 0x0073) {
     // popaf
-    regs.regs[0x00] = get_mem(regs.regs[0x02] - 1);
-    regs.a = get_mem(regs.regs[0x02] - 2);
-    store_io(0x2, regs.regs[0x02] - 2);
+    set_flags(get_mem(get_SP() - 1));
+    regs.a = get_mem(get_SP() - 2);
+    store_io(0x2, get_SP() - 2);
   } else if (CODE_MASK(0x2800, 0xFF)) {
     // add a, k
     regs.a = add_to(regs.a, code & 0xFF);
@@ -312,22 +324,22 @@ int cl_pdk::execute_pdk14(unsigned int code) {
     ram->write(code & 0x7F, -get_mem(code & 0x7F));
   } else if (CODE_MASK(0x1C00, 0x1FF)) {
     // set0 io, k
-    const u8_t bit = 0x1C0 >> 6;
+    const u8_t bit = (code & 0x1C0) >> 6;
     const u8_t addr = code & 0x3F;
     store_io(addr, get_io(addr) & ~(1 << bit));
   } else if (CODE_MASK(0x2400, 0x1FF)) {
     // set0 m, k
-    const u8_t bit = 0x1C0 >> 6;
+    const u8_t bit = (code & 0x1C0) >> 6;
     const u8_t addr = code & 0x3F;
     ram->write(addr, get_mem(addr) & ~(1 << bit));
   } else if (CODE_MASK(0x1E00, 0x1FF)) {
     // set1 io, k
-    const u8_t bit = 0x1C0 >> 6;
+    const u8_t bit = (code & 0x1C0) >> 6;
     const u8_t addr = code & 0x3F;
     store_io(addr, get_io(addr) | (1 << bit));
   } else if (CODE_MASK(0x2600, 0x1FF)) {
     // set1 m, k
-    const u8_t bit = 0x1C0 >> 6;
+    const u8_t bit = (code & 0x1C0) >> 6;
     const u8_t addr = code & 0x3F;
     ram->write(addr, get_mem(addr) | (1 << bit));
   } else if (CODE_MASK(0x1800, 0x1FF)) {
@@ -398,10 +410,10 @@ int cl_pdk::execute_pdk14(unsigned int code) {
       ++PC;
   } else if (CODE_MASK(0x3800, 0x7FF)) {
     // call k
-    ram->write(regs.regs[0x02], PC);
-    ram->write(regs.regs[0x02] + 1, PC >> 8);
+    ram->write(get_SP(), PC);
+    ram->write(get_SP() + 1, PC >> 8);
     PC = code & 0x7FF;
-    store_io(0x2, regs.regs[0x02] + 2);
+    store_io(0x2, get_SP() + 2);
   } else if (CODE_MASK(0x3000, 0x7FF)) {
     // goto k
     PC = code & 0x7FF;
@@ -438,10 +450,10 @@ int cl_pdk::execute_pdk14(unsigned int code) {
   // TODO: swapc IO, k
   else if (code == 0x0006) {
     // ldsptl
-    regs.a = rom->get(regs.regs[0x02]) & 0xFF;
+    regs.a = rom->get(get_SP()) & 0xFF;
   } else if (code == 0x0007) {
     // ldspth
-    regs.a = (rom->get(regs.regs[0x02]) & 0xFF00) >> 8;
+    regs.a = (rom->get(get_SP()) & 0xFF00) >> 8;
   } else if (code == 0x007C) {
     // mul
     unsigned result = regs.a * get_io(0x08);
@@ -463,12 +475,12 @@ int cl_pdk::execute_pdk13(unsigned int code) {
   } else if (CODE_MASK(0x0100, 0xFF)) {
     // ret k
     regs.a = code & 0xFF;
-    store_io(0x2, regs.regs[0x02] - 2);
-    PC = get_mem(regs.regs[0x02]) | (get_mem(regs.regs[0x02] + 1) << 8);
+    store_io(0x2, get_SP() - 2);
+    PC = get_mem(get_SP()) | (get_mem(get_SP() + 1) << 8);
   } else if (code == 0x003A) {
     // ret
-    store_io(0x2, regs.regs[0x02] - 2);
-    PC = get_mem(regs.regs[0x02]) | (get_mem(regs.regs[0x02] + 1) << 8);
+    store_io(0x2, get_SP() - 2);
+    PC = get_mem(get_SP()) | (get_mem(get_SP() + 1) << 8);
   } else if (CODE_MASK(0x1700, 0xFF)) {
     // mov a, k
     regs.a = code & 0xFF;
@@ -480,7 +492,7 @@ int cl_pdk::execute_pdk13(unsigned int code) {
     regs.a = get_io(code & 0x1F);
   } else if (CODE_MASK(0x05C0, 0x3F)) {
     // mov m, a
-    ram->write(code & 0x5F, regs.a);
+    ram->write(code & 0x3F, regs.a);
   } else if (CODE_MASK(0x07C0, 0x3F)) {
     // mov a, m
     regs.a = get_mem(code & 0x3F);
@@ -501,14 +513,14 @@ int cl_pdk::execute_pdk13(unsigned int code) {
     regs.a = mem;
   } else if (code == 0x0032) {
     // pushaf
-    ram->write(regs.regs[0x02], regs.a);
-    ram->write(regs.regs[0x02] + 1, regs.regs[0x00]);
-    store_io(0x2, regs.regs[0x02] + 2);
+    ram->write(get_SP(), regs.a);
+    ram->write(get_SP() + 1, get_flags());
+    store_io(0x2, get_SP() + 2);
   } else if (code == 0x0033) {
     // popaf
-    regs.regs[0x00] = get_mem(regs.regs[0x02] - 1);
-    regs.a = get_mem(regs.regs[0x02] - 2);
-    store_io(0x2, regs.regs[0x02] - 2);
+    set_flags(get_mem(get_SP() - 1));
+    regs.a = get_mem(get_SP() - 2);
+    store_io(0x2, get_SP() - 2);
   } else if (CODE_MASK(0x1000, 0xFF)) {
     // add a, k
     regs.a = add_to(regs.a, code & 0xFF);
@@ -664,27 +676,27 @@ int cl_pdk::execute_pdk13(unsigned int code) {
   } else if (CODE_MASK(0x0A40, 0x3F)) {
     // neg m
     ram->write(code & 0x3F, -get_mem(code & 0x3F));
-  } else if (CODE_MASK(0x0E00, 0x1F)) {
+  } else if (CODE_MASK(0x0E00, 0xFF)) {
     // set0 io, k
-    const u8_t bit = 0xE0 >> 5;
+    const u8_t bit = (code & 0xE0) >> 5;
     const u8_t addr = code & 0x1F;
     store_io(addr, get_io(addr) & ~(1 << bit));
   } else if (CODE_MASK(0x0300, 0xFE)) {
     // set0 m, k
-    const u8_t bit = 0xE0 >> 5;
+    const u8_t bit = (code & 0xE0) >> 5;
     const u8_t addr = (code & 0xFE) >> 1;
     ram->write(addr, get_mem(addr) & ~(1 << bit));
-  } else if (CODE_MASK(0x0F00, 0x1F)) {
+  } else if (CODE_MASK(0x0F00, 0xFF)) {
     // set1 io, k
-    const u8_t bit = 0xE0 >> 5;
+    const u8_t bit = (code & 0xE0) >> 5;
     const u8_t addr = code & 0x1F;
     store_io(addr, get_io(addr) | (1 << bit));
   } else if (CODE_MASK(0x0301, 0xFE)) {
     // set1 m, k
-    const u8_t bit = 0xE0 >> 5;
+    const u8_t bit = (code & 0xE0) >> 5;
     const u8_t addr = (code & 0x1E) >> 1;
     ram->write(addr, get_mem(addr) | (1 << bit));
-  } else if (CODE_MASK(0x0C00, 0x1F)) {
+  } else if (CODE_MASK(0x0C00, 0xFF)) {
     // t0sn io, k
     int n = (code & 0xE0) >> 5;
     if (!(get_io(code & 0x1F) & (1 << n)))
@@ -694,7 +706,7 @@ int cl_pdk::execute_pdk13(unsigned int code) {
     int n = (code & 0xE0) >> 5;
     if (!(get_mem((code & 0xFE) >> 1) & (1 << n)))
       ++PC;
-  } else if (CODE_MASK(0x0D00, 0x1F)) {
+  } else if (CODE_MASK(0x0D00, 0xFF)) {
     // t1sn io, k
     int n = (code & 0xE0) >> 5;
     if (get_io(code & 0x1F) & (1 << n))
@@ -741,10 +753,10 @@ int cl_pdk::execute_pdk13(unsigned int code) {
       ++PC;
   } else if (CODE_MASK(0x1C00, 0x3FF)) {
     // call k
-    ram->write(regs.regs[0x02], PC);
-    ram->write(regs.regs[0x02] + 1, PC >> 8);
+    ram->write(get_SP(), PC);
+    ram->write(get_SP() + 1, PC >> 8);
     PC = code & 0x3FF;
-    store_io(0x2, regs.regs[0x02] + 2);
+    store_io(0x2, get_SP() + 2);
   } else if (CODE_MASK(0x1800, 0x3FF)) {
     // goto k
     PC = code & 0x3FF;
@@ -768,10 +780,10 @@ int cl_pdk::execute_pdk13(unsigned int code) {
   // TODO: swapc IO, k
   else if (code == 0x0006) {
     // ldsptl
-    regs.a = rom->get(regs.regs[0x02]) & 0xFF;
+    regs.a = rom->get(get_SP()) & 0xFF;
   } else if (code == 0x0007) {
     // ldregs[0x02]th
-    regs.a = (rom->get(regs.regs[0x02]) & 0xFF00) >> 8;
+    regs.a = (rom->get(get_SP()) & 0xFF00) >> 8;
   } else if (code == 0x003C) {
     // mul
     unsigned result = regs.a * get_io(0x08);
@@ -793,12 +805,12 @@ int cl_pdk::execute_pdk15(unsigned int code) {
   } else if (CODE_MASK(0x0200, 0xFF)) {
     // ret k
     regs.a = code & 0xFF;
-    store_io(0x2, regs.regs[0x02] - 2);
-    PC = get_mem(regs.regs[0x02]) | (get_mem(regs.regs[0x02] + 1) << 8);
+    store_io(0x2, get_SP() - 2);
+    PC = get_mem(get_SP()) | (get_mem(get_SP() + 1) << 8);
   } else if (code == 0x007A) {
     // ret
-    store_io(0x2, regs.regs[0x02] - 2);
-    PC = get_mem(regs.regs[0x02]) | (get_mem(regs.regs[0x02] + 1) << 8);
+    store_io(0x2, get_SP() - 2);
+    PC = get_mem(get_SP()) | (get_mem(get_SP() + 1) << 8);
   } else if (CODE_MASK(0x5700, 0xFF)) {
     // mov a, k
     regs.a = code & 0xFF;
@@ -831,14 +843,14 @@ int cl_pdk::execute_pdk15(unsigned int code) {
     regs.a = mem;
   } else if (code == 0x0072) {
     // pushaf
-    ram->write(regs.regs[0x02], regs.a);
-    ram->write(regs.regs[0x02] + 1, regs.regs[0x00]);
-    store_io(0x2, regs.regs[0x02] + 2);
+    ram->write(get_SP(), regs.a);
+    ram->write(get_SP() + 1, get_flags());
+    store_io(0x2, get_SP() + 2);
   } else if (code == 0x0073) {
     // popaf
-    regs.regs[0x00] = get_mem(regs.regs[0x02] - 1);
-    regs.a = get_mem(regs.regs[0x02] - 2);
-    store_io(0x2, regs.regs[0x02] - 2);
+    set_flags(get_mem(get_SP() - 1));
+    regs.a = get_mem(get_SP() - 2);
+    store_io(0x2, get_SP() - 2);
   } else if (CODE_MASK(0x5000, 0xFF)) {
     // add a, k
     regs.a = add_to(regs.a, code & 0xFF);
@@ -996,22 +1008,22 @@ int cl_pdk::execute_pdk15(unsigned int code) {
     ram->write(code & 0xFF, -get_mem(code & 0xFF));
   } else if (CODE_MASK(0x3800, 0x3FF)) {
     // set0 io, k
-    const u8_t bit = 0x380 >> 7;
+    const u8_t bit = (code & 0x380) >> 7;
     const u8_t addr = code & 0x7F;
     store_io(addr, get_io(addr) & ~(1 << bit));
   } else if (CODE_MASK(0x4800, 0x3FF)) {
     // set0 m, k
-    const u8_t bit = 0x380 >> 7;
+    const u8_t bit = (code & 0x380) >> 7;
     const u8_t addr = code & 0x7F;
     ram->write(addr, get_mem(addr) & ~(1 << bit));
   } else if (CODE_MASK(0x3C00, 0x3FF)) {
     // set1 io, k
-    const u8_t bit = 0x380 >> 7;
+    const u8_t bit = (code & 0x380) >> 7;
     const u8_t addr = code & 0x7F;
     store_io(addr, get_io(addr) | (1 << bit));
   } else if (CODE_MASK(0x4C00, 0x3FF)) {
     // set1 m, k
-    const u8_t bit = 0x380 >> 7;
+    const u8_t bit = (code & 0x380) >> 7;
     const u8_t addr = code & 0x7F;
     ram->write(addr, get_mem(addr) | (1 << bit));
   } else if (CODE_MASK(0x3000, 0x3FF)) {
@@ -1082,10 +1094,10 @@ int cl_pdk::execute_pdk15(unsigned int code) {
       ++PC;
   } else if (CODE_MASK(0x7000, 0xFFF)) {
     // call k
-    ram->write(regs.regs[0x02], PC);
-    ram->write(regs.regs[0x02] + 1, PC >> 8);
+    ram->write(get_SP(), PC);
+    ram->write(get_SP() + 1, PC >> 8);
     PC = code & 0xFFF;
-    store_io(0x2, regs.regs[0x02] + 2);
+    store_io(0x2, get_SP() + 2);
   } else if (CODE_MASK(0x6000, 0xFFF)) {
     // goto k
     PC = code & 0xFFF;
@@ -1122,10 +1134,10 @@ int cl_pdk::execute_pdk15(unsigned int code) {
   // TODO: swapc IO, k
   else if (code == 0x0006) {
     // ldsptl
-    regs.a = rom->get(regs.regs[0x02]) & 0xFF;
+    regs.a = rom->get(get_SP()) & 0xFF;
   } else if (code == 0x0007) {
     // ldspth
-    regs.a = (rom->get(regs.regs[0x02]) & 0xFF00) >> 8;
+    regs.a = (rom->get(get_SP()) & 0xFF00) >> 8;
   } else if (code == 0x007C) {
     // mul
     unsigned result = regs.a * get_io(0x08);

@@ -44,7 +44,7 @@ public:
   class cl_memory *ram;
   class cl_memory *rom;
   class cl_address_space *regs8;
-  struct t_regs regs;
+  union t_regs regs;
 public:
   cl_pdk(struct cpu_entry *IType, class cl_sim *asim);
   virtual int init(void);

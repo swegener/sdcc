@@ -1,4 +1,4 @@
-2019-08-20 Philipp Klaus Krause <pkk AT spth.de>
+2019-08-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/pdk.src/glob.cc,
 	  sim/ucsim/pdk.src/inst.cc,
@@ -9,6 +9,9 @@
 	  pdk13 I/O fix (patch #305 by Serge Rabyking).
 	  .version:
 	  Bump version for all the pdk13 fixes we got so far.
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Improve unsiged char right shift by literal (also part of RFE #639).
 
 2019-08-20 Philipp Klaus Krause <pkk AT spth.de>
 

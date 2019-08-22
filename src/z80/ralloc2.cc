@@ -576,7 +576,10 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(false);
 
   if (ic->op == '^' || ic->op == BITWISEAND || ic->op == '|' || ic->op == '~') // Codegen can handle it all.
-     return(true);
+    return(true);
+
+  if (ic->op == RIGHT_OP && getSize(operandType(result)) == 1 && IS_OP_LITERAL(right))
+    return(true);
 
   // Can use non-destructive cp on == and < (> might swap operands).
   if((ic->op == EQ_OP || ic->op == '<' && SPEC_USIGN(getSpec(operandType(left))) && SPEC_USIGN(getSpec(operandType(right)))) &&

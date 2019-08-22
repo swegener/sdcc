@@ -7,6 +7,8 @@
 	  sim/ucsim/pdk.src/pdkcl.h,
 	  sim/ucsim/pdk.src/regspdk.h:
 	  pdk13 I/O fix (patch #305 by Serge Rabyking).
+	  .version:
+	  Bump version for all the pdk13 fixes we got so far.
 
 2019-08-20 Philipp Klaus Krause <pkk AT spth.de>
 

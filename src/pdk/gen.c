@@ -1162,12 +1162,20 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           cost (1, 1);
           started = true;
         }
-      else if ((TARGET_IS_PDK15 || TARGET_IS_PDK16) &&
-        !started && i + 1 == size && aopInReg (right_aop, i, A_IDX) &&
+      else if (!started && i + 1 == size && aopInReg (right_aop, i, A_IDX) &&
         (left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)))
         {
-          emit2 ("nadd", "a, %s", aopGet (left_aop, i));
-          cost (1, 1);
+          if (TARGET_IS_PDK15 || TARGET_IS_PDK16)
+            {
+              emit2 ("nadd", "a, %s", aopGet (left_aop, i));
+              cost (1, 1);
+            }
+          else
+            {
+              emit2 ("neg", "a");
+              emit2 ("add", "a, %s", aopGet (left_aop, i));
+              cost (2, 2);
+            }
           started = true;
         }
       else if (right_aop->type == AOP_STK)

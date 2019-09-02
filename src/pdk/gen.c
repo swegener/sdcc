@@ -1109,6 +1109,15 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           started = true;
           continue;
         }
+      else if ((TARGET_IS_PDK15 || TARGET_IS_PDK16) &&
+        !started && i + 1 == size && aopInReg (left_aop, i, A_IDX) &&
+        (right_aop->type == AOP_DIR || aopInReg (right_aop, i, P_IDX)) && aopSame (right_aop, i, result_aop, i, 1))
+        {
+          emit2 ("nadd", "%s, a", aopGet (right_aop, i));
+          cost (1, 1);
+          started = true;
+          continue;
+        }
       else if (!started && aopIsLitVal (right_aop, i, 1, 0x01) &&
         (left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)) && aopSame (left_aop, i, result_aop, i, 1))
         {
@@ -1150,6 +1159,14 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         {
           cheapMove (ASMOP_A, 0, right_aop, i, true, true);
           emit2 ("neg", "a");
+          cost (1, 1);
+          started = true;
+        }
+      else if ((TARGET_IS_PDK15 || TARGET_IS_PDK16) &&
+        !started && i + 1 == size && aopInReg (right_aop, i, A_IDX) &&
+        (left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)))
+        {
+          emit2 ("nadd", "a, %s", aopGet (left_aop, i));
           cost (1, 1);
           started = true;
         }
@@ -1195,15 +1212,19 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
             }
         }
       if (i + 1 < size && aopInReg (result_aop, i, P_IDX) && (left_aop->type == AOP_STK || right_aop->type == AOP_STK))
-        if (regalloc_dry_run)
-          cost (1000, 1000);
-        else
-          wassertl (0, "Unimplemented p result in subtraction with stack operand");
+        {
+          if (regalloc_dry_run)
+            cost (1000, 1000);
+          else
+            wassertl (0, "Unimplemented p result in subtraction with stack operand");
+        }
       if (i + 1 < size && result_aop->type == AOP_STK && (aopInReg (left_aop, i + 1, P_IDX) || aopInReg (right_aop, i + 1, P_IDX)))
-        if (regalloc_dry_run)
-          cost (1000, 1000);
-        else
-          wassertl (0, "Unimplemented upper byte p operand in subtraction with stack result");
+        {
+          if (regalloc_dry_run)
+            cost (1000, 1000);
+          else
+            wassertl (0, "Unimplemented upper byte p operand in subtraction with stack result");
+        }
 
       if (aopInReg (result_aop, i, A_IDX) && i + 1 < size)
         {

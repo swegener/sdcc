@@ -7568,7 +7568,7 @@ fix:
               if (!regalloc_dry_run)
                 {
                   symbol *tlbl = newiTempLabel (NULL);
-                  emit2 (IS_RAB ? "jp LZ, !tlabel": "jp PO, !tlabel", labelKey2num (tlbl->key));
+                  emit2 (IS_RAB ? "jp LZ, !tlabel" : "jp PO, !tlabel", labelKey2num (tlbl->key));
                   emit2 ("xor a, !immedbyte", 0x80);
                   emitLabelSpill (tlbl);
                 }

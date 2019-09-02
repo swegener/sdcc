@@ -1,3 +1,9 @@
+2019-09-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  support/regression/tests/nadd.c:
+	  Use nadd in subtraction for pdk15.
+
 2019-08-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/pdk.src/glob.cc,
@@ -11,7 +17,7 @@
 	  Bump version for all the pdk13 fixes we got so far.
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
-	  Improve unsiged char right shift by literal (also part of RFE #639).
+	  Improve unsigned char right shift by literal (also part of RFE #639).
 
 2019-08-20 Philipp Klaus Krause <pkk AT spth.de>
 

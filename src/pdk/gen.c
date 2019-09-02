@@ -2767,8 +2767,18 @@ genLeftShift (const iCode *ic)
     
       for(int i = 0; i < size; i++)
         {
-          emit2(i ? "slc" : "sl", "%s", aopGet (result->aop, i));
-          cost (1, 1);
+          if (result->aop->type == AOP_STK)
+            {
+              cheapMove (ASMOP_A, 0, result->aop, i, true, !i);
+              emit2(i ? "slc" : "sl", "a");
+              cost (1, 1);
+              cheapMove (result->aop, i, ASMOP_A, 0, true, i + 1 == size);
+            }
+          else
+            {
+              emit2(i ? "slc" : "sl", "%s", aopGet (result->aop, i));
+              cost (1, 1);
+            }
         }
     
       if (!regalloc_dry_run)
@@ -2856,7 +2866,7 @@ genRightShift (const iCode *ic)
               continue;
             }
 
-          if (!SPEC_USIGN (getSpec (operandType (left))) && (loop || !regDead (A_IDX, ic)))
+          if ((!SPEC_USIGN (getSpec (operandType (left))) || result->aop->type == AOP_STK) && (loop || !regDead (A_IDX, ic)))
             {
               pushAF();
               pushed_a = true;
@@ -2895,6 +2905,13 @@ genRightShift (const iCode *ic)
                    emit2 ("src", aopGet (result->aop, size - 1));
                    cost (2, 2);
                 }
+            }
+          else if (result->aop->type == AOP_STK)
+            {
+              cheapMove (ASMOP_A, 0, result->aop, size - 1, true, true);
+              emit2("sr", "a");
+              cost (1, 1);
+              cheapMove (result->aop, size - 1, ASMOP_A, 0, true, size == 1);
             }
           else
             {

@@ -905,7 +905,7 @@ found:
           newic = newiCode (IPUSH, IC_RIGHT (ic), NULL);
           newic->parmPush = 1;
 
-          bytesPushed += getSize(operandType(IC_RIGHT(ic)));
+          bytesPushed += getSize(operandType(IC_RIGHT(ic))) + (getSize(operandType(IC_RIGHT(ic))) == 1 && TARGET_PDK_LIKE); // pdk requires stack to be even-aligned
         }
       hTabAddItem (&iCodehTab, newic->key, newic);
       addiCodeToeBBlock (ebp, newic, ip);
@@ -925,7 +925,7 @@ found:
           newic = newiCode (IPUSH, IC_LEFT (ic), NULL);
           newic->parmPush = 1;
 
-          bytesPushed += getSize(operandType(IC_LEFT(ic)));
+          bytesPushed += getSize(operandType(IC_LEFT(ic))) + (getSize(operandType(IC_LEFT(ic))) == 1 && TARGET_PDK_LIKE); // pdk requires stack to be even-aligned
         }
       hTabAddItem (&iCodehTab, newic->key, newic);
       addiCodeToeBBlock (ebp, newic, ip);

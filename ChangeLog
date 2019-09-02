@@ -1,6 +1,13 @@
 2019-09-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c,
+	  src/SDCCopt.c,
+	  support/regression/tests/bug-2931.c:
+	  Fix bug #2931.
+
+2019-09-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
 	  support/regression/tests/nadd.c:
 	  Use nadd in subtraction for pdk15.
 

@@ -5,6 +5,8 @@
 	  src/pdk/ralloc.c,
 	  support/regression/tests/gcc-torture-execute-va-arg-19.c:
 	  Use Chaitin-style allocator for stack variables.
+	* src/pdk/gen.c:
+	  Optimize out assignments between coalesced stack variables.
 
 2019-09-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

@@ -2,7 +2,8 @@
 
 	* src/pdk/ralloc2.cc,
 	  src/SDCCsalloc.hpp,
-	  src/pdk/ralloc.c:
+	  src/pdk/ralloc.c,
+	  support/regression/tests/gcc-torture-execute-va-arg-19.c:
 	  Use Chaitin-style allocator for stack variables.
 
 2019-09-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>

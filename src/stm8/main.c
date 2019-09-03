@@ -479,7 +479,7 @@ PORT stm8_port =
   },
   { stm8_genExtraArea, NULL },
   {                             /* stack information */
-    -1,                         /* direction */
+    -1,                         /* stack grows down */
      0,
      7,                         /* isr overhead */
      2,                         /* call overhead */

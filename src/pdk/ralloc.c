@@ -58,6 +58,8 @@ createStackSpil (symbol *sym)
   sym->usl.spillLoc = sloc;
   sym->stackSpil = 1;
 
+  addSetHead (&sloc->usl.itmpStack, sym);
+
   return sym;
 }
 
@@ -593,13 +595,13 @@ serialRegMark (eBBlock **ebbs, int count)
                   continue;
                 }
 
-              if (sym->usl.spillLoc && !sym->usl.spillLoc->_isparm) // I have no idea where these spill locations come from. Sometime two symbols even have the same spill location, whic tends to mess up stack allocation. THose that come from previous iterations in this loop would be okay, but those from outside are a problem.
+              if (sym->usl.spillLoc && !sym->usl.spillLoc->_isparm) // I have no idea where these spill locations come from. Sometime two symbols even have the same spill location, whic tends to mess up stack allocation. Those that come from previous iterations in this loop would be okay, but those from outside are a problem.
                 {
                   sym->usl.spillLoc = 0;
                   sym->isspilt = false;
                 }
 
-              if (sym->nRegs > 2 && ic->op == CALL)
+              if (sym->nRegs > 2 && ic->op == CALL) // To be allocated to stack due to the way (long) long return values are handled via a hidden pointer.
                 {
                   sym->for_newralloc = 0;
                   pdkSpillThis (sym);
@@ -729,12 +731,6 @@ pdk_assignRegisters (ebbIndex *ebbi)
 
   /* Invoke optimal register allocator */
   ic = pdk_ralloc2_cc (ebbi);
-
-  /* redo offsets for stacked automatic variables */
-  if (currFunc)
-    {
-      redoStackOffsets ();
-    }
 
   if (options.dump_i_code)
     {

@@ -685,7 +685,15 @@ iCode *pdk_ralloc2_cc(ebbIndex *ebbi)
 
   pdkRegFix (ebbs, count);
 
-  doOverlays (ebbs, count);
+  if (reentrant)
+    {
+      chaitin_salloc(spilt_conflict_graph);
+
+      if(options.dump_graphs)
+        dump_scon(spilt_conflict_graph);
+    }
+  else
+    doOverlays (ebbs, count);
 
   return(ic);
 }

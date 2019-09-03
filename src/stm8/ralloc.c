@@ -826,8 +826,6 @@ stm8_assignRegisters (ebbIndex *ebbi)
 
       /* Invoke optimal register allocator */
       ic = stm8_ralloc2_cc (ebbi);
-
-      //redoStackOffsets ();
     }
 
   if (options.dump_i_code)

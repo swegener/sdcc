@@ -98,7 +98,7 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
       if(sym->_isparm)
         continue;
 
-      // std::cout << "set_spilt() 1: Considering " << sym->name << "\n";
+      // std::cout << "set_spilt() 1: Considering " << sym->name << "[" << sym->isspilt << ", " << IS_AGGREGATE(sym->type) << ", " << sym->allocreq << ", " << sym->addrtaken << "]\n";
 
       if(/*!(IS_AGGREGATE(sym->type) || sym->allocreq && (sym->addrtaken || isVolatile(sym->type)))*/sym->for_newralloc)
         continue;
@@ -244,7 +244,8 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
       const var_t right = var_from_operand (symbol_to_sindex, IC_RIGHT(G[i].ic));
 
       if(left >= 0 && !boost::edge (result, left, scon).second)
-        scon[(boost::add_edge(result, left, scon)).first].alignment_conflict_only = true;
+        scon[(boost::add_edge(result, left, scon)).first].alignment_conflict_only =
+          !(TARGET_PDK_LIKE && G[i].ic->op == GET_VALUE_AT_ADDRESS && getSize(scon[result].sym->type) > 2); // Padauk still needs pointer read operand, since pointer read of more than 2 bytes is broken into multiple support routine calls.
       if(right >= 0 && !boost::edge (result, right, scon).second)
         scon[(boost::add_edge(result, right, scon)).first].alignment_conflict_only = true;
     }
@@ -258,7 +259,7 @@ void color_stack_var(const var_t v, SI_t &SI, int start, int *ssize)
   
   SI[v].color = start;
 
-  const int sloc = (port->stack.direction > 0) ? start + 1 : -start - size ;
+  const int sloc = (port->stack.direction > 0) ? start : -start - size ;
   symbol *const ssym = (sym->isspilt && sym->usl.spillLoc) ? sym->usl.spillLoc : sym;
 
   SPEC_STAK(ssym->etype) = ssym->stack = sloc;
@@ -406,15 +407,17 @@ void chaitin_salloc(SI_t &SI)
   std::list<var_t>::const_iterator i, i_end;
   for(i = ordering.begin(), i_end = ordering.end(); i != i_end; ++i)
     {
-      // Alignment, even when not required by the hardware helps avoid artially overlapping stack operands (which are not supported by code generation in some backends).
+      // Alignment, even when not required by the hardware helps avoid partially overlapping stack operands (which are not supported by code generation in some backends).
       color_stack_var_greedily(*i, SI, get_alignment (SI[*i].sym->type), &ssize);
     }
   
   if(currFunc)
     {
+      if (TARGET_PDK_LIKE && (ssize % 2)) // Padauk requires even stack alignment.
+        ssize++;
 #ifdef DEBUG_SALLOC
-      std::cout << "currFunc->stack: old " << currFunc->stack << ", new " << (currFunc->stack + ssize) << "\n";
-#endif  
+      std::cout << "Function " << currFunc->name << " currFunc->stack: old " << currFunc->stack << ", new " << (currFunc->stack + ssize) << "\n";
+#endif
       currFunc->stack += ssize;
       SPEC_STAK (currFunc->etype) += ssize;
     }

@@ -876,7 +876,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         else if (regalloc_dry_run)
           cost (1000, 1000);
         else
-          wassertl (0, "Unimplemenetd operand in __sfr16 access");
+          wassertl (0, "Unimplemented operand in __sfr16 access");
         return;
       default:
         wassertl (0, "Unknown __sfr size");
@@ -1196,24 +1196,27 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           emit2 ("sub", "a, %s", aopGet (right_aop, i));
           cost (2, 2);
         }
-      else if (started && (right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD) && !aopIsLitVal (right_aop, i, 1, 0x00))
+      else if ((started && (right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD) && !aopIsLitVal (right_aop, i, 1, 0x00) || aopInReg (right_aop, i, A_IDX)) &&
+        regDead (A_IDX, ic) && regDead (P_IDX, ic) && !aopInReg(left_aop, P_IDX, i + 1) && !aopInReg(right_aop, P_IDX, i + 1))
         {
-          cheapMove (ASMOP_P, 0, right_aop, i, !aopInReg (left_aop, i, A_IDX), false);
-          cheapMove (ASMOP_A, 0, left_aop, i, true, false);
-          emit2 ("subc", "a, p");
+          cheapMove (ASMOP_P, 0, right_aop, i, !aopInReg (left_aop, i, A_IDX), !started);
+          cheapMove (ASMOP_A, 0, left_aop, i, true, !started);
+          emit2 (started ? "subc" : "sub", "a, p");
           cost (1, 1);
+          started = true;
         }
       else
         {
+          if (aopInReg (right_aop, i, A_IDX))
+            {
+              cost (1000, 1000);
+              if (!regalloc_dry_run)
+                wassertl (0, "Unimplemented operand in subtraction");
+              continue;
+            }
           cheapMove (ASMOP_A, 0, left_aop, i, true, !started);
           if (started || !aopIsLitVal (right_aop, i, 1, 0x00))
             {
-              if (aopInReg (right_aop, i, A_IDX))
-                {
-                  cost (1000, 1000);
-                  if (!regalloc_dry_run)
-                    wassertl (0, "Unimplemented operand in subtraction");
-                }
               if (started && aopIsLitVal (right_aop, i, 1, 0x00))
                 emit2 ("subc", "a");
               else

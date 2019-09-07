@@ -1,5 +1,10 @@
 2019-09-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/pdk/gen.c:
+	  Improve subtraction flaxibility.
+
+2019-09-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/pdk/ralloc2.cc,
 	  src/SDCCsalloc.hpp,
 	  src/pdk/ralloc.c,

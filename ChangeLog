@@ -1,7 +1,7 @@
-2019-09-03 Philipp Klaus Krause <pkk AT spth.de>
+2019-09-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:
-	  Improve subtraction flaxibility.
+	  Improve subtraction flexibility.
 
 2019-09-03 Philipp Klaus Krause <pkk AT spth.de>
 

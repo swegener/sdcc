@@ -258,7 +258,7 @@ static bool Pinst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(false);
 
   if ((ic->op == '+' || ic->op == '-' || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND) &&
-    (left_stack || right_stack) && (!dying_P || left_stack || right_stack))
+    (left_stack || right_stack))
     return(false);
 
   return(true);

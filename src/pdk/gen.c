@@ -796,45 +796,15 @@ push (const asmop *op, int offset, int size)
 {
   wassertl (!(size % 2) && (op->type == AOP_DIR || op->type == AOP_LIT || op->type == AOP_IMMD || op->type == AOP_STK), "Unimplemented push operand");
 
-  if (op->type == AOP_STK)
-    {
-      int s = G.stack.pushed;
-      adjustStack (size, true, true);
-      moveStackStack (s, op->aopu.bytes[0].byteu.stk, size, true);
-      return;
-    }
-  else if (size == 2)
-    {
-      cheapMove (ASMOP_A, 0, op, 0, true, true);
-      pushAF ();
-      pointPStack (G.stack.pushed - 1, true, true);
-      cheapMove (ASMOP_A, 0, op, 1, true, true);
-      emit2 ("idxm", "p, a");
-      cost (1, 1);
-      return;
-    }
-
-  // Save old stack pointer
-  emit2 ("mov", "a, sp");
-  emit2 ("mov", "p, a");
-  G.p.type = AOP_INVALID;
-  cost (2, 2);
-
-  adjustStack (size, true, false);
-
-  // Write value onto stack
-  for (int i = offset; i < offset + size; i++)
+  for (int i = 0; i < size; i+= 2)
     {
       cheapMove (ASMOP_A, 0, op, i, true, true);
+      pushAF ();
+      pointPStack (G.stack.pushed - 1, true, true);
+      cheapMove (ASMOP_A, 0, op, i + 1, true, true);
       emit2 ("idxm", "p, a");
-      cost (1, 2);
-      if (i + 1 < offset + size)
-        {
-          emit2 ("inc", "p");
-          cost (1, 1);
-        }
+      cost (1, 1);
     }
-  G.p.type = AOP_INVALID;
 }
 
 /*-----------------------------------------------------------------*/

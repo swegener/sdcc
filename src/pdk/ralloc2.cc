@@ -248,7 +248,7 @@ static bool Pinst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       if ((ullFromVal(OP_VALUE_CONST (litop)) & 0x000000ffull) && (ullFromVal(OP_VALUE_CONST(litop)) & 0x0000ff00ull) && (ullFromVal(OP_VALUE_CONST (litop)) & 0x00ff0000ull) && (ullFromVal(OP_VALUE_CONST (litop)) & 0xff000000ull))
         return(false);
     }
-  if (ic->op == PCALL || ic->op == IPUSH)
+  if (ic->op == PCALL)
     return(false);
 
   if (ic->op == CALL && !dying_P)

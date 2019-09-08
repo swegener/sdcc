@@ -794,14 +794,36 @@ adjustStack (int n, bool a_free, bool p_free)
 static void
 push (const asmop *op, int offset, int size)
 {
-  wassertl (!(size % 2) && (op->type == AOP_DIR || op->type == AOP_LIT || op->type == AOP_IMMD || op->type == AOP_STK), "Unimplemented push operand");
+  wassertl (!(size % 2) && (op->type == AOP_DIR || op->type == AOP_REG || op->type == AOP_LIT || op->type == AOP_IMMD || op->type == AOP_STK), "Unimplemented push operand");
 
   for (int i = 0; i < size; i+= 2)
     {
+      if (aopInReg (op, i, P_IDX) && aopInReg (op, i + 1, A_IDX))
+        {
+          emit2 ("xch", "a, p");
+          cost (1, 1);
+          pushAF ();
+          emit2 ("xch", "a, p");
+          pointPStack (G.stack.pushed - 1, false, true);
+          emit2 ("idxm", "p, a");
+          cost (1, 1);
+          continue;
+        }
+
       cheapMove (ASMOP_A, 0, op, i, true, true);
       pushAF ();
-      pointPStack (G.stack.pushed - 1, true, true);
-      cheapMove (ASMOP_A, 0, op, i + 1, true, true);
+      if (aopInReg (op, i + 1, P_IDX))
+        {
+          emit2 ("xch", "a, p");
+          cost (1, 1);
+          pointPStack (G.stack.pushed - 1, false, true);
+          cost (1, 1);
+        }
+      else
+        {
+          pointPStack (G.stack.pushed - 1, true, true);
+          cheapMove (ASMOP_A, 0, op, i + 1, true, true);
+        }
       emit2 ("idxm", "p, a");
       cost (1, 1);
     }

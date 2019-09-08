@@ -817,7 +817,6 @@ push (const asmop *op, int offset, int size)
           emit2 ("xch", "a, p");
           cost (1, 1);
           pointPStack (G.stack.pushed - 1, false, true);
-          cost (1, 1);
         }
       else
         {
@@ -2908,8 +2907,18 @@ genRightShift (const iCode *ic)
                     }
                    cheapMove (ASMOP_A, 0, result->aop, size - 1, true, true);
                    emit2 ("sl", "a");
-                   emit2 ("src", aopGet (result->aop, size - 1));
-                   cost (2, 2);
+                   cost (1, 1);
+                   if (result->aop->type == AOP_STK)
+                     {
+                       cheapMove (ASMOP_A, 0, result->aop, size - 1, true, false);
+                       emit2 ("src", "a");
+                       cheapMove (result->aop, size - 1, ASMOP_A, 0, true, size > 1);
+                     }
+                   else
+                     {
+                       emit2 ("src", aopGet (result->aop, size - 1));
+                       cost (1, 1);
+                     }
                 }
             }
           else if (result->aop->type == AOP_STK)
@@ -2932,8 +2941,18 @@ genRightShift (const iCode *ic)
                   wassert (regalloc_dry_run);
                   cost (500, 500);
                 }
-              emit2 ("src", "%s", aopGet (result->aop, i));
-              cost (1, 1);
+              if (result->aop->type == AOP_STK)
+                {
+                  cheapMove (ASMOP_A, 0, result->aop, i, true, false);
+                  emit2("src", "a");
+                  cost (1, 1);
+                  cheapMove (result->aop, i, ASMOP_A, 0, true, i > 1);
+                }
+              else
+                {
+                  emit2 ("src", "%s", aopGet (result->aop, i));
+                  cost (1, 1);
+                }
             }
 
           shCount--;

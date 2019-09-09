@@ -2406,7 +2406,7 @@ genOr (const iCode *ic)
   int size = result->aop->size;
 
   /* Swap if left is literal or right is in A. */
-  if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX)  || right->aop->type == AOP_STK)
+  if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX)  || right->aop->type == AOP_STK && !aopInReg (left->aop, 0, A_IDX))
     {
       operand *t = right;
       right = left;
@@ -2989,7 +2989,7 @@ genRightShift (const iCode *ic)
         emit2 ("goto", "!tlabel", labelKey2num (tlbl2->key));
       cost (3, 3);
 
-      if (!SPEC_USIGN (getSpec (operandType (left))))
+      if (!SPEC_USIGN (getSpec (operandType (left))) || result->aop->type == AOP_STK)
         {
           pushAF();
           pushed_a = true;
@@ -2999,27 +2999,60 @@ genRightShift (const iCode *ic)
       // So we need this emulation sequence here.
       if (!SPEC_USIGN (getSpec (operandType (left))))
         {
-          emit2 ("mov", "a, #0x01");
-          emit2 ("sl", aopGet (result->aop, size - 1));
-          emit2 ("t0sn", "f, c");
-          emit2 ("or", "%s, a", aopGet (result->aop, size - 1));
-          emit2 ("src", aopGet (result->aop, size - 1));
-          emit2 ("src", aopGet (result->aop, size - 1));
-          cost (6, 6);
+          if (result->aop->type == AOP_STK)
+            {
+              cheapMove (ASMOP_P, 0, result->aop, size - 1, true, true);
+              emit2 ("mov", "a, #0x01");
+              emit2 ("sl", "p");
+              emit2 ("t0sn", "f, c");
+              emit2 ("or", "p, a");
+              emit2 ("src", "p");
+              emit2 ("src", "p");
+              cheapMove (result->aop, size - 1, ASMOP_P, 0, true, size == 1);
+            }
+          else
+            {
+              emit2 ("mov", "a, #0x01");
+              emit2 ("sl", aopGet (result->aop, size - 1));
+              emit2 ("t0sn", "f, c");
+              emit2 ("or", "%s, a", aopGet (result->aop, size - 1));
+              emit2 ("src", aopGet (result->aop, size - 1));
+              emit2 ("src", aopGet (result->aop, size - 1));
+              cost (6, 6);
+            }
         }
       else
         {
-          emit2("sr", aopGet (result->aop, size - 1));
-          cost (1, 1);
+          if (result->aop->type == AOP_STK)
+            {
+              cheapMove (ASMOP_P, 0, result->aop, size - 1, true, true);
+              emit2("sr", "p");
+              cost (1, 1);
+              cheapMove (result->aop, size - 1, ASMOP_P, 0, true, size == 1);
+            }
+          else
+            {
+              emit2("sr", aopGet (result->aop, size - 1));
+              cost (1, 1);
+            }
         }
     
       for(int i = size - 2; i >= 0; i--)
         {
-          emit2 ("src", "%s", aopGet (result->aop, i));
-          cost (1, 1);
+          if (result->aop->type == AOP_STK)
+            {
+              cheapMove (ASMOP_P, 0, result->aop, i, true, false);
+              emit2 ("src", "p");
+              cheapMove (result->aop, i, ASMOP_P, 0, true, i == 1);
+            }
+          else
+            {
+              emit2 ("src", "%s", aopGet (result->aop, i));
+              cost (1, 1);
+            }
         }
 
-      if (!SPEC_USIGN (getSpec (operandType (left))))
+      if (!SPEC_USIGN (getSpec (operandType (left))) || result->aop->type == AOP_STK)
         {
           popAF();
           pushed_a = false;

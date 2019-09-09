@@ -1223,12 +1223,14 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           else
             wassertl (0, "Unimplemented p result in subtraction with stack operand");
         }
-      if (i + 1 < size && result_aop->type == AOP_STK && (aopInReg (left_aop, i + 1, P_IDX) || aopInReg (right_aop, i + 1, P_IDX)))
+      if (i + 1 < size && result_aop->type == AOP_STK && (aopInReg (left_aop, i + 1, P_IDX) || aopInReg (right_aop, i + 1, P_IDX))) // Avoid overwriting still-needed p when storing onto stack.
         {
-          if (regalloc_dry_run)
-            cost (1000, 1000);
-          else
-            wassertl (0, "Unimplemented upper byte p operand in subtraction with stack result");
+          emit2 ("xch", "a, p");
+          pushAF();
+          cheapMove (result_aop, i, ASMOP_A, 0, true, i + 1 == size);
+          popAF();
+          emit2 ("xch", "a, p");
+          continue;
         }
 
       if (aopInReg (result_aop, i, A_IDX) && i + 1 < size)

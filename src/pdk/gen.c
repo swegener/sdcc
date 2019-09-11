@@ -796,6 +796,8 @@ push (const asmop *op, int offset, int size)
 {
   wassertl (!(size % 2) && (op->type == AOP_DIR || op->type == AOP_REG || op->type == AOP_LIT || op->type == AOP_IMMD || op->type == AOP_STK), "Unimplemented push operand");
 
+  int a_litval = -1;
+
   for (int i = 0; i < size; i+= 2)
     {
       if (aopInReg (op, i, P_IDX) && aopInReg (op, i + 1, A_IDX))
@@ -810,13 +812,23 @@ push (const asmop *op, int offset, int size)
           continue;
         }
 
-      cheapMove (ASMOP_A, 0, op, i, true, true);
+      if (a_litval < 0 || !aopIsLitVal (op, i, 1, a_litval))
+        {
+          cheapMove (ASMOP_A, 0, op, i, true, true);
+          if (op->type == AOP_LIT)
+            a_litval = byteOfVal (op->aopu.aop_lit, i);
+        }
+
       pushAF ();
       if (aopInReg (op, i + 1, P_IDX))
         {
           emit2 ("xch", "a, p");
           cost (1, 1);
           pointPStack (G.stack.pushed - 1, false, true);
+        }
+      else if (a_litval >= 0 && aopIsLitVal (op, i + 1, 1, a_litval) && i > 1) // Only try to reuse a for i > 1, as otherwise pointPStack preserving a is too expensive.
+        {
+           pointPStack (G.stack.pushed - 1, false, true);
         }
       else
         {
@@ -825,6 +837,10 @@ push (const asmop *op, int offset, int size)
         }
       emit2 ("idxm", "p, a");
       cost (1, 1);
+
+      
+      if (op->type == AOP_LIT)
+        a_litval = byteOfVal (op->aopu.aop_lit, i + 1);
     }
 }
 
@@ -1564,9 +1580,15 @@ genReturn (const iCode *ic)
           emit2 ("idxm", "a, p");
           emit2 ("mov", "p, a");
           cost (2, 3);
+          int a_litval = -1;
           for (int i = 0; i < left->aop->size; i++)
             {
-              cheapMove (ASMOP_A, 0, left->aop, i, true, true);
+              if (a_litval < 0 || !aopIsLitVal (left->aop, i, 1, a_litval))
+                {
+                  cheapMove (ASMOP_A, 0, left->aop, i, true, true);
+                  if (left->aop->type == AOP_LIT)
+                    a_litval = byteOfVal (left->aop->aopu.aop_lit, i);
+                }
               emit2 ("idxm", "p, a");
               cost (1, 2);
               if (i + 1 < left->aop->size)
@@ -2577,6 +2599,29 @@ genAnd (const iCode *ic, iCode *ifx)
               emit2 ("t1sn", "f, z");
               cost (2, 2.5);
             }
+          else if (left->aop->type == AOP_DIR && right->aop->type == AOP_LIT) // Try to combine multiple bytes with 0xff mask by or.
+            {
+              int j, k;
+              for(j = i; j + 1 < right->aop->size && (aopIsLitVal (right->aop, j, 1, 0xff) || aopIsLitVal (right->aop, j, 1, 0x00)); j++);
+              cheapMove (ASMOP_A, 0, left->aop, j, true, true);
+              if (!(aopIsLitVal (right->aop, j, 1, 0xff) || aopIsLitVal (right->aop, j, 1, 0x00)))
+                {
+                  emit2 ("and", "a, %s", aopGet (right->aop, j));
+                  cost (1, 1);
+                }
+              for (k = i; k < right->aop->size; k++)
+                {
+                  if (k == j || aopIsLitVal (right->aop, k, 1, 0x00))
+                    continue;
+                  if (!aopIsLitVal (right->aop, k, 1, 0xff))
+                    break;
+                  emit2 ("or", "a, %s", aopGet (left->aop, k));
+                  cost (1, 1);
+                }
+              i = k - 1;
+              emit2 ("ceqsn", "a, #0x00");
+              cost (1, 1.5);
+            }
           else
             {
               cheapMove (ASMOP_A, 0, left->aop, i, true, true);
@@ -3198,7 +3243,7 @@ genPointerGet (const iCode *ic)
             cheapMove (result->aop, i, ASMOP_A, 0, true, true);
         }
     }
-#if 0 // TODO: Implement alignment requirements - ldt16 needs 16-bit-aligned operand
+#if 0 // TODO: Implement alignment requirements - ldtabl needs 16-bit-aligned operand
   else if (TARGET_IS_PDK15 && ptype == CPOINTER && left->aop->type == AOP_DIR && size == 1) // pdk15 has ldtabl for efficient read from code space via a 12-bit address (top nibble of 16-bit value is ignored).
     {
       emit2 ("ldtabl", "a, %s", aopGet (left->aop, 0));
@@ -3261,15 +3306,6 @@ genPointerGet (const iCode *ic)
           pushed_a = true;
         }
 
-      if (!bit_field && size == 2)
-        {
-          genMove (ASMOP_PA, left->aop, true);
-          emit2 ("call", "__gptrget2");
-          cost (1, (ptype == CPOINTER) ? 32 : 13);
-          genMove (result->aop, ASMOP_AP, true);
-          goto release;
-        }
-
       for (int i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
         {
           if (i != 0 && (aopInReg (left->aop, 0, A_IDX) || aopInReg (left->aop, 1, A_IDX) || aopInReg (result->aop, i - 1, P_IDX))) // Would have been overwritten on previous byte.
@@ -3295,8 +3331,19 @@ genPointerGet (const iCode *ic)
                 cost (2, 2);
               }
 
+          if (i + 1 < size && !bit_field)
+            {
+              emit2 ("call", "__gptrget2");
+              cost (1, (ptype == CPOINTER) ? 32 : 13);
+              G.p.type = AOP_INVALID;
+              genMove_o (result->aop, i, ASMOP_AP, 0, 2, true);
+              i++;
+              continue;
+            }
+
           emit2 ("call", "__gptrget");
           cost (1, (ptype == CPOINTER) ? 16 : 8);
+          G.p.type = AOP_INVALID;
 
           if (bit_field && blen < 8)
             getBitFieldByte (blen, bstr, !SPEC_USIGN (getSpec (operandType (result))));

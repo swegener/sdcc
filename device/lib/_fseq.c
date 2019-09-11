@@ -89,7 +89,8 @@ __fseq (float a1, float a2)
 
   if (fl1.l == fl2.l)
     return (1);
-  if (((fl1.l | fl2.l) & 0x7FFFFFFF) == 0)
+  //if (((fl1.l | fl2.l) & 0x7FFFFFFF) == 0) // Slightly faster, but needs an additional temporary (4B of RAM)
+  if ((fl1.l & 0x7fffffff) == 0 && (fl2.l & 0x7fffffff) == 0)
     return (1);
   return (0);
 }

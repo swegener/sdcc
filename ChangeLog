@@ -1,7 +1,14 @@
 2019-09-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:
-	  IMprove handling of stack operands.
+	  Various improvements.
+	* device/lib/_fseq.c:
+	  Refactor to reduce RAM use.
+
+2019-09-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Improve handling of stack operands.
 
 2019-09-08 Philipp Klaus Krause <pkk AT spth.de>
 

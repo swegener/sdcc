@@ -579,6 +579,48 @@ static void popAF (void)
 }
 
 /*-----------------------------------------------------------------*/
+/* pushPF - push pf, adjusting stack tracking                      */
+/*-----------------------------------------------------------------*/
+static void pushPF (bool a_dead)
+{
+  if (!a_dead)
+    {
+      emit2 ("xch", "a, p");
+      cost (1, 1);
+      pushAF();
+      emit2 ("xch", "a, p");
+      cost (1, 1);
+    }
+  else
+    {
+      emit2 ("mov", "a, p");
+      cost (1, 1);
+      pushAF();
+    }
+}
+
+/*-----------------------------------------------------------------*/
+/* popPF - pop pf, adjusting stack tracking                      */
+/*-----------------------------------------------------------------*/
+static void popPF (bool a_dead)
+{
+  if (!a_dead)
+    {
+      emit2 ("xch", "a, p");
+      cost (1, 1);
+      popAF();
+      emit2 ("xch", "a, p");
+      cost (1, 1);
+    }
+  else
+    {
+      popAF();
+      emit2 ("mov", "p, a");
+      cost (1, 1);
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* pointPStack - Make pseudo-register p point to stack location    */
 /*-----------------------------------------------------------------*/
 static void pointPStack (int s, bool a_dead, bool f_dead)
@@ -820,6 +862,7 @@ push (const asmop *op, int offset, int size)
         }
 
       pushAF ();
+
       if (aopInReg (op, i + 1, P_IDX))
         {
           emit2 ("xch", "a, p");
@@ -829,6 +872,11 @@ push (const asmop *op, int offset, int size)
       else if (a_litval >= 0 && aopIsLitVal (op, i + 1, 1, a_litval) && i > 1) // Only try to reuse a for i > 1, as otherwise pointPStack preserving a is too expensive.
         {
            pointPStack (G.stack.pushed - 1, false, true);
+        }
+      else if (op->type == AOP_STK)
+        {
+          cheapMove (ASMOP_A, 0, op, i + 1, true, true);
+          pointPStack (G.stack.pushed - 1, false, true);
         }
       else
         {
@@ -1077,12 +1125,36 @@ genCpl (const iCode *ic)
 
   int size = result->aop->size;
 
-  genMove (result->aop, left->aop, true);
-
-  for(int i = 0; i < size; i++)
+  if (result->aop->type == AOP_STK)
     {
-      emit2("not", "%s", aopGet (result->aop, i));
-      cost (1, 1);
+      bool pushed_p = false;
+      for (int i = 0; i < size; i++)
+        {
+          if (aopInReg (left->aop, P_IDX, i) && pushed_p)
+            {
+              popAF ();
+              pushed_p = false;
+            }
+          else
+            cheapMove (ASMOP_A, 0, left->aop, i, true, true);
+          emit2 ("not", "a");
+          if (aopInReg (left->aop, P_IDX, i + 1))
+            {
+              pushPF (false);
+              pushed_p = true;
+            }
+          cheapMove (result->aop, i, ASMOP_A, 0, true, true);
+        }
+     }
+  else
+    {
+      genMove (result->aop, left->aop, true);
+
+      for (int i = 0; i < size; i++)
+        {
+          emit2 ("not", "%s", aopGet (result->aop, i));
+          cost (1, 1);
+        }
     }
 
   freeAsmop (left);
@@ -1099,6 +1171,13 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
 
   bool started = false;
   bool pushed_a = false;
+
+  if (!regDead(P_IDX, ic) &&
+    (left_aop->type == AOP_STK || right_aop->type == AOP_STK || result_aop->type == AOP_STK))
+    {
+      pushPF (regDead (A_IDX, ic) && left_aop->type != AOP_REG && right_aop->type != AOP_REG);
+    }
+
   for (int i = 0; i < size; i++)
     {
       if (!started && right_aop->type == AOP_LIT && aopIsLitVal (right_aop, i, 1, 0x00))
@@ -1106,7 +1185,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           cheapMove (result_aop, i, left_aop, i, regDead (A_IDX, ic), true);
           if (aopInReg (result_aop, i, A_IDX) && i + 1 < size)
             {
-              pushAF();
+              pushAF ();
               pushed_a = true;
             }
           continue;
@@ -1242,16 +1321,16 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
       if (i + 1 < size && result_aop->type == AOP_STK && (aopInReg (left_aop, i + 1, P_IDX) || aopInReg (right_aop, i + 1, P_IDX))) // Avoid overwriting still-needed p when storing onto stack.
         {
           emit2 ("xch", "a, p");
-          pushAF();
+          pushAF ();
           cheapMove (result_aop, i, ASMOP_A, 0, true, i + 1 == size);
-          popAF();
+          popAF ();
           emit2 ("xch", "a, p");
           continue;
         }
 
       if (aopInReg (result_aop, i, A_IDX) && i + 1 < size)
         {
-          pushAF();
+          pushAF ();
           pushed_a = true;
         }
       else
@@ -1260,6 +1339,12 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
 
   if (pushed_a)
     popAF();
+
+  if (!regDead(P_IDX, ic) &&
+    (left_aop->type == AOP_STK || right_aop->type == AOP_STK || result_aop->type == AOP_STK))
+    {
+      popPF (regDead (A_IDX, ic) && result_aop->type != AOP_REG);
+    }
 }
 
 /*-----------------------------------------------------------------*/
@@ -1687,6 +1772,12 @@ genPlus (const iCode *ic)
   aopOp (right, ic);
   aopOp (result, ic);
 
+  if (!regDead(P_IDX, ic) &&
+    (left->aop->type == AOP_STK || right->aop->type == AOP_STK || result->aop->type == AOP_STK))
+    {
+      pushPF (regDead (A_IDX, ic) && left->aop->type != AOP_REG && right->aop->type == AOP_REG);
+    }
+
   int size = result->aop->size;
 
   /* Swap if left is literal or right is in A. */
@@ -1820,6 +1911,12 @@ genPlus (const iCode *ic)
 
   if (pushed_a)
     popAF();
+
+  if (!regDead(P_IDX, ic) &&
+    (left->aop->type == AOP_STK || right->aop->type == AOP_STK || result->aop->type == AOP_STK))
+    {
+      popPF (regDead (A_IDX, ic) && result->aop->type != AOP_REG);
+    }
 
   freeAsmop (right);
   freeAsmop (left);
@@ -2102,6 +2199,11 @@ genCmp (const iCode *ic, iCode *ifx)
         }
       else if (right->aop->type == AOP_STK)
         {
+          if (!regDead (P_IDX, ic))
+            {
+              cost (100, 100);
+              wassert (regalloc_dry_run);
+            }
           cheapMove (ASMOP_A, 0, left->aop, i, true, !i);
           cheapMove (ASMOP_P, 0, right->aop, i, false, !i);
           emit2 (started ? "subc" : "sub", "a, p");
@@ -2819,12 +2921,21 @@ genLeftShift (const iCode *ic)
     
       for(int i = 0; i < size; i++)
         {
-          if (result->aop->type == AOP_STK)
+          if (result->aop->type == AOP_STK && size == 1)
             {
-              cheapMove (ASMOP_A, 0, result->aop, i, true, !i);
+              pushAF ();
+              cheapMove (ASMOP_A, 0, result->aop, i, true, true);
+              emit2("sl", "a");
+              cost (1, 1);
+              cheapMove (result->aop, i, ASMOP_A, 0, true, true);
+              popAF ();
+            }
+          else if (result->aop->type == AOP_STK)
+            {
+              cheapMove (ASMOP_P, 0, result->aop, i, false, !i);
               emit2(i ? "slc" : "sl", "a");
               cost (1, 1);
-              cheapMove (result->aop, i, ASMOP_A, 0, true, i + 1 == size);
+              cheapMove (result->aop, i, ASMOP_P, 0, false, i + 1 == size);
             }
           else
             {
@@ -3989,11 +4100,17 @@ genCast (const iCode *ic)
           skipbyte = 0;
         }
 
-      for(offset = 0; offset < size; offset++)
+      for (offset = 0; offset < size; offset++)
         {
           if (offset == skipbyte)
             continue;
-          emit2 ("or", "a, %s", aopGet (right->aop, offset));
+          if (right->aop->type == AOP_STK)
+            {
+              cheapMove (ASMOP_P, 0, right->aop, offset, false, true);
+              emit2 ("or", "a, p");
+            }
+          else
+            emit2 ("or", "a, %s", aopGet (right->aop, offset));
           cost (1, 1);
         }
 

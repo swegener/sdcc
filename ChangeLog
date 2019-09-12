@@ -1,3 +1,8 @@
+2019-09-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fixes for on-stack operands.
+
 2019-09-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:

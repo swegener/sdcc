@@ -10553,7 +10553,7 @@ genPointerGet (const iCode *ic)
                   emit2 ("dec %s", _pairs[pair].name);
                   regalloc_dry_run_cost += 1;
                 }
-              if (surviving_a && !pushed_a)
+              if ((surviving_a || result->aop->regs[A_IDX] >= 0 && result->aop->regs[A_IDX] < r) && !pushed_a)
                 _push (PAIR_AF), pushed_a = TRUE;
               _moveFrom_tpair_ (ASMOP_A, 0, pair);
 

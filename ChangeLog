@@ -1,3 +1,8 @@
+2019-09-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix wide load via pointer with register result in ahl.
+
 2019-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:

@@ -224,21 +224,23 @@ static bool Pinst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   const operand *right = IC_RIGHT(ic);
   const operand *result = IC_RESULT(ic);
 
-  bool result_in_P = operand_in_reg(result, REG_P, ia, i, G);
   bool left_in_P = operand_in_reg(left, REG_P, ia, i, G);
   bool right_in_P = operand_in_reg(right, REG_P, ia, i, G);
+  bool result_in_P = operand_in_reg(result, REG_P, ia, i, G);
 
   bool left_in_A = operand_in_reg(left, REG_A, ia, i, G);
   bool right_in_A = operand_in_reg(right, REG_A, ia, i, G);
+  bool result_in_A = operand_in_reg(result, REG_A, ia, i, G);
 
   const cfg_dying_t &dying = G[i].dying;
 
   bool dying_P = result_in_P || dying.find(ia.registers[REG_P][1]) != dying.end() || dying.find(ia.registers[REG_P][0]) != dying.end();
 
-  bool left_stack = IS_ITEMP (left) && (options.stackAuto || reentrant) && !left_in_A && !left_in_P;
-  bool right_stack = IS_ITEMP (right) && (options.stackAuto || reentrant) && !right_in_A && !right_in_P;
+  bool left_stack = (IS_ITEMP (left) || IS_PARM (left)) && (options.stackAuto || reentrant) && !left_in_A && !left_in_P;
+  bool right_stack = (IS_ITEMP (right) || IS_PARM (right)) && (options.stackAuto || reentrant) && !right_in_A && !right_in_P;
+  bool result_stack = (IS_ITEMP (result) || IS_PARM (result)) && (options.stackAuto || reentrant) && !result_in_A && !result_in_P;
 
-  if(result && IS_ITEMP(result) && OP_SYMBOL_CONST(result)->remat && !operand_in_reg(result, REG_A, ia, i, G) && !operand_in_reg(result, REG_P, ia, i, G))
+  if(result && IS_ITEMP(result) && OP_SYMBOL_CONST(result)->remat)
     return(true);
 
   if(ic->op == IPUSH && left_stack)
@@ -261,7 +263,7 @@ static bool Pinst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(false);
 
   if ((ic->op == '+' || ic->op == '-' || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND || ic->op == EQ_OP || ic->op == NE_OP) &&
-    (left_stack || right_stack))
+    (left_stack || right_stack || result_stack && !dying_P))
     return(false);
 
   return(true);

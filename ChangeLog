@@ -1,3 +1,11 @@
+2019-09-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c,
+	  src/pdk/gen.c,
+	  support/regression/ports/pdk14/support.c,
+	  support/regression/ports/pdk15/support.c:
+	  Fixes for on-stack operands.
+
 2019-09-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c,

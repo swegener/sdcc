@@ -7,6 +7,7 @@ ashldi-1.c from the execute part of the gcc torture tests.
 #include <limits.h>
 
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 extern void abort(void);
 extern void exit(int);
 
@@ -206,11 +207,13 @@ constant_shift(unsigned long long x, int i)
   return x;
 }
 #endif
+#endif
 
 void
 testTortureExecute (void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   int i;
 
   for (i = 0; i < BITS; ++i)
@@ -225,6 +228,7 @@ testTortureExecute (void)
       if (y != data[i])
 	ASSERT (0);
     }
+#endif
 #endif
   return;
 }

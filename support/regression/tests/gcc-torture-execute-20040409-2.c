@@ -70,6 +70,7 @@ unsigned int ftest6u(unsigned int x)
   return (x ^ 0x1234) - (unsigned int)INT_MIN;
 }
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 int ftest7(int x)
 {
   int y = INT_MIN;
@@ -154,6 +155,7 @@ unsigned int ftest12u(unsigned int x)
   return (x ^ y) - z;
 }
 #endif
+#endif
 
 void ftest(int a, int b)
 {
@@ -172,6 +174,7 @@ void ftest(int a, int b)
     ASSERT (0);
 #endif
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   if (ftest7(a) != b)
     ASSERT (0);
   if (ftest8(a) != b)
@@ -185,6 +188,7 @@ void ftest(int a, int b)
     ASSERT (0);
   if (ftest12(a) != b)
     ASSERT (0);
+#endif
 #endif
 #endif
 }
@@ -204,6 +208,7 @@ void ftestu(unsigned int a, unsigned int b)
   if (ftest6u(a) != b)
     ASSERT (0);
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   if (ftest7u(a) != b)
     ASSERT (0);
   if (ftest8u(a) != b)
@@ -216,6 +221,7 @@ void ftestu(unsigned int a, unsigned int b)
     ASSERT (0);
   if (ftest12u(a) != b)
     ASSERT (0);
+#endif
 #endif
 }
 

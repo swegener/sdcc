@@ -51,6 +51,7 @@ static void
 testShift(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     TESTSHIFT(0);
     TESTSHIFT(1);
     TESTSHIFT(2);
@@ -89,6 +90,7 @@ testShift(void)
     TESTSHIFT(29);
     TESTSHIFT(30);
     TESTSHIFT(31);
+#endif
 #endif
 #endif
 }

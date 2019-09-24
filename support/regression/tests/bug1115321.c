@@ -104,6 +104,7 @@
  */
 
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 unsigned char SDCC_SNPRINTF( char *buffer, const unsigned char size,
                              const char *format, ... )
 {
@@ -215,10 +216,12 @@ clean_and_bail:
     return (buffer - start);
 }
 #endif
+#endif
 
 void test_s( void )
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     char buffer[32];
     int ret;
     int i = 0;
@@ -252,6 +255,7 @@ void test_s( void )
 //    printf( "->|%s|<- %d \n", buffer, ret );
     ASSERT (strcmp(buffer, "Hello, wo") == 0);
     ASSERT (ret == 10);
+#endif
 #endif
 }
 

@@ -22,11 +22,13 @@ const float b1 = 1.0f;
 void testBug(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   ASSERT (cast1 (1.0f) == b0);
   ASSERT (cast1 (0.0f) == b1);
 
   ASSERT (cast2 (0.0f) == b0);
   ASSERT (cast2 (1.0f) == b1);
+#endif
 #endif
 }
 

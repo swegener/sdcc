@@ -61,6 +61,7 @@ void testmemory(void)
   memcpy(destination, source, 4);
   ASSERT(memcmp(destination, source, 4) == 0);
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   /* Test memmove() */
   memcpy(destination, source, 4);
   memmove(destination, destination + 1, 3);
@@ -91,7 +92,7 @@ void testmemory(void)
   ASSERT(destination[2] == 2);
   ASSERT(destination[3] == 0);
 #endif
-  
+#endif
 #endif
 }
 

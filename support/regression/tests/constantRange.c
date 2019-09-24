@@ -131,14 +131,9 @@ void
 testFoo1(void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 #ifdef __bool_true_false_are_defined
-
-#if !defined(__SDCC_WEIRD_BOOL)
-   volatile bool sb, ub;
-#else
-   volatile   signed bool sb;
-   volatile unsigned bool ub;
-#endif
+  volatile bool sb, ub;
 
   sb = 0;
   ub = 0;
@@ -185,12 +180,14 @@ testFoo1(void)
   ASSERT (  ( 0 >= ub));
 #endif //__bool_true_false_are_defined
 #endif
+#endif
 }
 
 void
 testFoo2(void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   volatile struct {
       signed sb1:1;
       signed sb3:3;
@@ -223,5 +220,6 @@ testFoo2(void)
   ASSERT (  ( 0 == str.ub3));
   ASSERT (! ( 7 == str.ub3));
   ASSERT (! ( 8 == str.ub3));
+#endif
 #endif
 }

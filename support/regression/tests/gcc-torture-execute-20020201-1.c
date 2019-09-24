@@ -34,11 +34,12 @@ testTortureExecute (void)
 
   iy = ix / 6; ASSERT (iy == 3);
   iy = ix % 6; ASSERT (iy == 3);
-
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   ly = lx / 6; ASSERT (ly == 4);
   ly = lx % 6; ASSERT (ly == 4);
 
   Ly = Lx / 6; ASSERT (Ly == 5);
   Ly = Lx % 6; ASSERT (Ly == 5);
+#endif
 #endif
 }

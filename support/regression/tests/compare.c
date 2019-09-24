@@ -18,6 +18,7 @@ testCmpAroundZero(void)
     ASSERT(0 <= i);
     ASSERT(i >= 0);
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     i = -33;
     ASSERT(0 > i);
     ASSERT(i < 0);
@@ -28,6 +29,7 @@ testCmpAroundZero(void)
     ASSERT(0 == i);
     ASSERT(0 <= i);
     ASSERT(0 >= i);
+#endif
 #endif
 }
 
@@ -41,6 +43,7 @@ testCompareConstants(void)
     ASSERT(i > 3);
     ASSERT(i > -14);
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     ASSERT(i <= 23);
     ASSERT(i >= 3);
     ASSERT(i >= -14);
@@ -48,11 +51,13 @@ testCompareConstants(void)
     ASSERT(i >= 12);
     ASSERT(i == 12);
 #endif
+#endif
 
     i = -34;
     ASSERT(i > -126);
     ASSERT(i < -3);
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     ASSERT(i < 47);
     ASSERT(i >= -126);
     ASSERT(i <= -3);
@@ -60,6 +65,7 @@ testCompareConstants(void)
     ASSERT(i <= -34);
     ASSERT(i >= -34);
     ASSERT(i == -34);
+#endif
 #endif
 }
 
@@ -81,6 +87,7 @@ testCompareVariables(void)
     ASSERT(right < left);
     ASSERT(right <= left);
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     right = 0;
     ASSERT(left > right);
     ASSERT(left >= right);
@@ -91,6 +98,7 @@ testCompareVariables(void)
     ASSERT(left == right);
     ASSERT(left <= right);
     ASSERT(left >= right);
+#endif
 #endif
 }
 
@@ -126,6 +134,7 @@ void set ({type} v)
 void testRange(void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     set (17);
 
     ASSERT (s >= 17 && s <= 20);
@@ -145,6 +154,7 @@ void testRange(void)
 
     ASSERT (!(s > 17 && s < 20));
     ASSERT (!(u > 17 && u < 20));
+#endif
 #endif
 }
 

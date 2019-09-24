@@ -20,6 +20,7 @@ testTwoOpBitwise(void)
   ASSERT(({type})(0x3df7 & right) == ({type})0x1E4);
 
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   ASSERT(({type})(left | right) == ({type})0xFDFF);
   ASSERT(({type})(right | left) == ({type})0xFDFF);
   ASSERT(({type})(left | 0xc1ec) == ({type})0xFDFF);
@@ -35,6 +36,7 @@ testTwoOpBitwise(void)
   ASSERT(({type})(~left) == ({type})0xFFFFFFFFFFFFC208);
 #else
   ASSERT(({type})(~left) == ({type})0xFFFFC208);
+#endif
 #endif
 #endif
 }
@@ -208,6 +210,7 @@ testOr(void)
     res = 0;
   ASSERT(res == 0);
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   if (a | 0x4321)
     res = 1;
   else
@@ -251,6 +254,7 @@ testOr(void)
     res = 0;
   ASSERT(res == 0);
 #endif
+#endif
 }
 
 void
@@ -275,6 +279,7 @@ testXor(void)
     res = 0;
   ASSERT(res == 1);
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   if (!(a ^ 0x4321))
     res = 1;
   else
@@ -313,6 +318,7 @@ testXor(void)
   else
     res = 0;
   ASSERT(res == 0);
+#endif
 #endif
 }
 

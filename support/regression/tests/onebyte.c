@@ -9,6 +9,7 @@ void
 testMul (void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   {attrL}    signed  char  cL;
   {attrL}  unsigned  char ucL;
   {attrR}    signed  char  cR;
@@ -39,12 +40,14 @@ testMul (void)
    cL = -128;  cR = -1; r16 =  cL *  cR; ASSERT (r16 ==  128);
 #endif
 #endif
+#endif
 }
 
 void
 testDiv (void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   {attrL}    signed char  cL;
   {attrL}  unsigned char ucL;
   {attrR}    signed char  cR;
@@ -86,6 +89,7 @@ testDiv (void)
 
   ucL =  254;  cR =   -1; r16 = ucL /  cR; ASSERT (r16 == -254);
    cL = -128;  cR =   -1; r16 =  cL /  cR; ASSERT (r16 ==  128);
+#endif
 #endif
 }
 

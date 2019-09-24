@@ -59,6 +59,7 @@ static void
 testLogicalAnd(void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     {type} true = alwaysTrue();
     {type} false = alwaysFalse();
 
@@ -84,6 +85,7 @@ testLogicalAnd(void)
     if (alwaysGetHere() && true && false) {
         ASSERT(hit == 1);
     }
+#endif
 #endif
 }
 

@@ -10,6 +10,7 @@
 #endif
 
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 
 #define SIZE ({size})
 #define MSB ({msb})
@@ -70,6 +71,7 @@ TYPE rol25(TYPE s){ return (s<<25) | (s>>(SIZE-25)); }
 
 TYPE rol30(TYPE s){ return (s<<30) | (s>>(SIZE-30)); }
 TYPE rol31(TYPE s){ return (s<<31) | (s>>(SIZE-31)); }
+#endif
 #endif
 #endif
 

@@ -9,6 +9,7 @@
 #endif
 
 #if !defined (__SDCC_pic14) && !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 /* PR c/19606
    The C front end used to shorten the type of a division to a type
    that does not preserve the semantics of the original computation.
@@ -28,10 +29,13 @@ bar (void)
   return ((unsigned int) (signed int) a) % 5LL;
 }
 #endif
+#endif
+
 void
 testTortureExecute (void)
 {
 #if !defined (__SDCC_pic14) && !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 #if !defined (PORT_HOST) // failed in test-host
   int r;
 
@@ -44,6 +48,7 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 #endif
 #endif
 }

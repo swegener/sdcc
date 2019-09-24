@@ -135,12 +135,14 @@ void
 testFunPtrReturn(void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   tfp = f_ret;
 
   ASSERT(tfp(0, 0) == 0);
   ASSERT(tfp(0, 1) == 1);
   ASSERT(tfp(1, 0) == 0);
   ASSERT(tfp(1, 1) == 0);
+#endif
 #endif
 }
 

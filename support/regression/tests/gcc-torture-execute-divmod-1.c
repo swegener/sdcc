@@ -49,6 +49,7 @@ mod4 (signed short x, signed short y)
 }
 
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 signed long
 mod5 (signed long x, signed long y)
 {
@@ -60,6 +61,7 @@ mod6 (unsigned long x, unsigned long y)
 {
   return x % y;
 }
+#endif
 #endif
      
 void
@@ -82,10 +84,12 @@ testTortureExecute (void)
   if (mod4 (-(1 << 15), -1) != 0)
     ASSERT (0);
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   if (mod5 (0x50000000, 2) != 0)
     ASSERT (0);
   if (mod6 (0x50000000, 2) != 0)
     ASSERT (0);
+#endif
 #endif
   
   return;

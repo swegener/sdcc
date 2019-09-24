@@ -165,7 +165,7 @@ fest4 (unsigned short s, int set)
   else
     if (!set) ASSERT (0);
 }
-
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 void
 fest5 (int i, int set)
 {
@@ -294,6 +294,7 @@ fest8 (unsigned long long l, int set)
     if (!set) ASSERT (0);
 }
 #endif
+#endif
 
 void
 testTortureExecute (void)
@@ -318,7 +319,7 @@ testTortureExecute (void)
   fest4 (SHRT_MAX, 0);
   fest4 (SHRT_MIN, 1);
   fest4 (USHRT_MAX, 1);
-
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   fest5 (0, 0);
   fest5 (INT_MAX, 0);
   fest5 (INT_MIN, 1);
@@ -340,6 +341,7 @@ testTortureExecute (void)
   fest8 (ULONG_LONG_MAX, 1);
 
   return;
+#endif
 #endif
 }
 

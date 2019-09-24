@@ -36,6 +36,7 @@ void
 test2ShiftRight(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     {attr} {storage} signed {type} i, result;
 
     i = -120;
@@ -50,6 +51,7 @@ test2ShiftRight(void)
     result = i;
     result >>= 3;
     ASSERT(result == -15);
+#endif
 #endif
 }
 
@@ -73,6 +75,7 @@ void
 test4ShiftOne(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     {attr} {storage} {sign} {type} i;
     {sign} {type} result;
 
@@ -92,9 +95,11 @@ test4ShiftOne(void)
     result <<= 1;
     ASSERT(result == ({type})(({type}){vals} << 1));
 #endif
+#endif
 }
 
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 static {type} ShiftLeftByParam ({type} count)
 {
     {attr} {storage} {type} i;
@@ -109,13 +114,16 @@ static {type} ShiftRightByParam ({type} count)
     return (i >> count);
 }
 #endif
+#endif
 
 void
 testShiftByParam(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     ASSERT(ShiftLeftByParam(2)  == ({type})({vals} << 2));
     ASSERT(ShiftRightByParam(2) == ({type})({vals} >> 2));
+#endif
 #endif
 }
 

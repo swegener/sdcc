@@ -39,6 +39,7 @@ void
 testCondOpPtrTypes1(void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   int *ip1;
   int *ip2;
   void *vp1;
@@ -88,12 +89,14 @@ testCondOpPtrTypes1(void)
   ASSERT (deref2 (cond ? testarray : vp1) == 3);
   ASSERT (deref2 (cond ? ip1 : vp1) == 7);
 #endif
+#endif
 }
 
 void
 testCondOpPtrTypes2(void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   int *ip1;
   int *ip2;
   void *vp1;
@@ -141,6 +144,7 @@ testCondOpPtrTypes2(void)
   /* the char * parameter */
   ASSERT (deref2 (cond ? vp1 : testarray) == 3);
   ASSERT (deref2 (cond ? vp1 : ip1) == 7);
+#endif
 #endif
 }
 

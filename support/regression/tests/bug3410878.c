@@ -47,6 +47,7 @@ volatile bool step;
 volatile struct cv_controller_state cs;
 
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 void mainx(void)
 {
 	uint16_t x, y;
@@ -160,6 +161,7 @@ void mainx(void)
 		}
 	}
 }
+#endif
 #endif
 
 void testBug(void)

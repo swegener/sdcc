@@ -10,6 +10,7 @@ void
 testUnsignedModDiv(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     {attr} {storage} unsigned {type} i;
     unsigned {type} result;
 
@@ -26,6 +27,7 @@ testUnsignedModDiv(void)
 
     result = i%34;
     ASSERT(result == 32);
+#endif
 #endif
 }
 
@@ -51,6 +53,7 @@ void
 testMul(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
     {attr} {storage} signed {type} i;
     signed {type} result;
 
@@ -67,6 +70,7 @@ testMul(void)
     ASSERT(i*12 == -120);
     LOG(("i*-3 == 30 = %d\n", (int)(i*-3)));
     ASSERT(i*-3 == 30);
+#endif
 #endif
 #endif
 }

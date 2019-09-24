@@ -45,6 +45,7 @@ static void
 testSmallSparse (void)
 {
 #if !defined(__SDCC_pdk14) // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   ASSERT (smallSparse[0] == 1);
   ASSERT (smallSparse[1] == 1);
   ASSERT (smallSparse[2] == 1);
@@ -54,6 +55,7 @@ testSmallSparse (void)
   ASSERT (smallSparse[6] == 1);
   ASSERT (smallSparse[7] == 1);
   ASSERT (smallSparse[8] == 1);
+#endif
 #endif
 }
 

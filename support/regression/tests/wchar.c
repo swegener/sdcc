@@ -28,6 +28,7 @@ static void
 testwcharnorestart(void)
 {
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L && !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) // Not enough memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 	wchar_t w;
 	char c[MB_LEN_MAX];
 
@@ -45,6 +46,7 @@ testwcharnorestart(void)
 	ASSERT(wctomb(c, 0x110000) == -1); // Invalid: Out of 21-bit Unicode range.
 	ASSERT(wctomb(c, 0xd800) == -1);   // Invalid: Unpaired UTF-16 surrogate.
 	ASSERT(wctomb(c, 0xdfff) == -1);   // Invalid: Unpaired UTF-16 surrogate.
+#endif
 #endif
 #endif
 }

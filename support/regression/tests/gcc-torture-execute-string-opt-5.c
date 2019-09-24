@@ -69,6 +69,7 @@ testTortureExecute (void)
     ASSERT (0);
   if (x != 6 || y != 0)
     ASSERT (0);
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   dst[5] = ' ';
   dst[6] = '\0';
   x = 5;
@@ -110,5 +111,6 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
+#endif
 #endif
 }

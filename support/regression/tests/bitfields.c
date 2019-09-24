@@ -147,6 +147,7 @@ void
 testBitfieldsSingleBitLiteral(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 #if !defined(__SDCC_pic16)
   size2b_bf.b0 = 0;
   size2b_bf.b1 = 0;
@@ -197,12 +198,14 @@ testBitfieldsSingleBitLiteral(void)
   ASSERT(size2b_bf.b9==1);
 #endif  /* !__SDCC_pic16 */
 #endif
+#endif
 }
 
 void
 testBitfieldsSingleBit(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 #if !defined(__SDCC_pic16)
   volatile unsigned char c;
 
@@ -257,6 +260,7 @@ testBitfieldsSingleBit(void)
   ASSERT(size2b_bf.b8==0);
   ASSERT(size2b_bf.b9==1);
 #endif  /* !__SDCC_pic16 */
+#endif
 #endif
 }
 

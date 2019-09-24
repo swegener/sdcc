@@ -133,6 +133,7 @@ void mallocfree(void)
 void
 testMalloc (void)
 {
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
 #ifndef __SDCC_pdk14
   void __xdata *p1, *p2, *p3;
   char *p;
@@ -217,6 +218,7 @@ testMalloc (void)
   free (p1);
   free (p3);
   mallocfree();
+#endif
 #endif
 }
 

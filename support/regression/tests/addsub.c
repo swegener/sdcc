@@ -60,6 +60,7 @@ testAdd(void)
 void 
 testSub(void)
 {
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   {storage} {attr} {type} left, right, result;
 
   left = 5;
@@ -88,4 +89,5 @@ testSub(void)
 
   result = left-(signed)0x1200;
   ASSERT(result == ({type})(-39-(signed)0x1200));
+#endif
 }

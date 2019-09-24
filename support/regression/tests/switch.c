@@ -107,6 +107,7 @@ void
 testDenseIntSwitch(void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   volatile int val = 1000;
   volatile int ret = 0;
 
@@ -150,5 +151,6 @@ testDenseIntSwitch(void)
   }
 
   ASSERT(ret == 8);
+#endif
 #endif
 }

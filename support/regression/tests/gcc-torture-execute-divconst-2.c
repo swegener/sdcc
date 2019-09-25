@@ -43,6 +43,7 @@ void
 testTortureExecute (void)
 {
 #ifndef __SDCC_pdk14 // Lack of memory
+#if !(defined (__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Lack of code memory
   int i;
 
   for (i = 0;
@@ -50,6 +51,7 @@ testTortureExecute (void)
        i++)
     if (std_eqn (nums[i], -0x7fffffffL - 1L, f (nums[i]), r (nums[i])) == 0)
       ASSERT (0);
+#endif
 #endif
   return;
 }

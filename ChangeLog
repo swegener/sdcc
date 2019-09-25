@@ -1,3 +1,11 @@
+2019-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  support/regression/tests/gcc-torture-execute-20020402-3.c,
+	  support/regression/tests/gcc-torture-execute-divconst-2.c,
+	  support/regression/tests/gcc-torture-execute-pr78791.c:
+	  Fixes for on-stack operands.
+
 2019-09-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/addsub.c,

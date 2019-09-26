@@ -1100,10 +1100,14 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
       return;
     }
 
-  bool a_dead = a_dead_global;
+  bool a_dead = a_dead_global && !aopInReg (source, soffset + 0, A_IDX) && !(aopInReg (source, soffset + 1, A_IDX) && size > 1);
   for (unsigned int i = 0; i < size; i++)
     {
+      if (a_dead_global && aopInReg (source, soffset, A_IDX))
+        a_dead = true;
+
       cheapMove (result, roffset + i, source, soffset + i, a_dead, true, true);
+
       if (aopInReg (result, roffset + i, A_IDX))
         a_dead = false;
     }
@@ -4312,6 +4316,9 @@ genCast (const iCode *ic)
       int size = result->aop->size - right->aop->size;
       offset = right->aop->size;
 
+      if (!regDead (A_IDX, ic) || aopInReg (result->aop, 0, A_IDX))
+        pushAF ();
+
       cheapMove (ASMOP_A, 0, result->aop, right->aop->size - 1, true, true, true);
       emit2 ("sl", "a");
       emit2 ("mov", "a, #0x00");
@@ -4320,6 +4327,9 @@ genCast (const iCode *ic)
 
       while (size--)
         cheapMove (result->aop, offset++, ASMOP_A, 0, true, true, true);
+
+      if (!regDead (A_IDX, ic) || aopInReg (result->aop, 0, A_IDX))
+        popAF ();
     }
 
   if (pushed_a)

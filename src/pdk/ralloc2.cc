@@ -262,7 +262,7 @@ static bool Pinst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   if (ic->op == GET_VALUE_AT_ADDRESS && !dying_P && !(left_in_P && getSize(operandType(result)) == 1))
     return(false);
 
-  if ((ic->op == '+' || ic->op == '-' || ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND || ic->op == EQ_OP || ic->op == NE_OP) &&
+  if ((ic->op == '^' || ic->op == '|' || ic->op == BITWISEAND || ic->op == EQ_OP || ic->op == NE_OP) &&
     (left_stack || right_stack || result_stack && !dying_P))
     return(false);
 

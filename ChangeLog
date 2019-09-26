@@ -1,3 +1,11 @@
+2019-09-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  src/pdk/gen.h,
+	  src/pdk/ralloc.c,
+	  src/pdk/ralloc2.cc:
+	  Rematerialize stack adresses, improve handling of on-stack operands.
+
 2019-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c,

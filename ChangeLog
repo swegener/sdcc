@@ -1,5 +1,15 @@
 2019-09-27 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/pdk/gen.c:
+	  Fixes for stack operands.
+
+2019-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fix tracking of pseudoregister in shifts.
+
+2019-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/pdk/ralloc.c:
 	  Fix a bug affecting rematerialized addresses cast to integers of multiple widths.
 

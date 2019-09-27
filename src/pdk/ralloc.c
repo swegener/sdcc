@@ -516,7 +516,7 @@ packRegisters (eBBlock * ebp)
               if(ic->prev)
                 ic = ic->prev;
             }
-          else if (((use->op == SET_VALUE_AT_ADDRESS && !IS_BITVAR (getSpec (operandType (IC_LEFT (use)))) && !IS_BITVAR (getSpec (operandType (IC_RIGHT (use))))) ||
+          else if ((/*(use->op == SET_VALUE_AT_ADDRESS && !IS_BITVAR (getSpec (operandType (IC_LEFT (use)))) && !IS_BITVAR (getSpec (operandType (IC_RIGHT (use))))) || - resulted in pointer writes toring too few bytes*/
             use->op == CAST && (SPEC_USIGN (getSpec (operandType (IC_RIGHT (use)))) || operandSize (IC_RESULT (use)) <= operandSize (IC_RIGHT (use))) ||
             use->op == LEFT_OP || use->op == RIGHT_OP || use->op == '+' || use->op == '-' ||
             use->op == '&' || use->op == '|' || use->op == '^') &&

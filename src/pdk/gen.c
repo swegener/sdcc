@@ -384,7 +384,7 @@ aopForRemat (symbol *sym)
           val -= (int) operandLitValue (IC_RIGHT (ic));
           ic = OP_SYMBOL (IC_LEFT (ic))->rematiCode;
         }
-      else if (IS_CAST_ICODE (ic))
+      else if (ic->op == CAST)
         {
           ic = OP_SYMBOL (IC_RIGHT (ic))->rematiCode;
         }

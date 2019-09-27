@@ -3473,6 +3473,7 @@ genPointerGet (const iCode *ic)
   wassertl (IS_OP_LITERAL (right), "GET_VALUE_AT_ADDRESS with non-literal right operand");
 
   bool pushed_a = false;
+  bool pushed_p = false;
 
   bool bit_field = IS_BITVAR (getSpec (operandType (result)));
   int size = result->aop->size;
@@ -3539,6 +3540,12 @@ genPointerGet (const iCode *ic)
     {
       const asmop *ptr_aop = (left->aop->type == AOP_DIR && TARGET_IS_PDK16) ? left->aop : ASMOP_P;
 
+      if (!regDead (A_IDX, ic))
+        {
+          pushAF ();
+          pushed_a = true;
+        }
+
       cheapMove (ptr_aop, 0, left->aop, 0, true, true, true);
 
       for (int i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
@@ -3585,8 +3592,13 @@ genPointerGet (const iCode *ic)
     {
       if (!regDead (A_IDX, ic))
         {
-          pushAF();
+          pushAF ();
           pushed_a = true;
+        }
+      if (!regDead (P_IDX, ic))
+        {
+          pushPF (!aopInReg (left->aop, 0, A_IDX) && !aopInReg (left->aop, 1, A_IDX));
+          pushed_p = true;
         }
 
       for (int i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
@@ -3650,8 +3662,10 @@ genPointerGet (const iCode *ic)
     }
 
 release:
+  if (pushed_p)
+    popPF (!aopInReg (result->aop, 0, A_IDX) && !aopInReg (result->aop, 1, A_IDX));
   if (pushed_a)
-    popAF();
+    popAF ();
 
   freeAsmop (right);
   freeAsmop (left);
@@ -3797,6 +3811,11 @@ genPointerSet (iCode *ic)
 #endif
       else if (aopInReg (right->aop, 0, P_IDX) && regDead (P_IDX, ic))
         {
+          if (!regDead (A_IDX, ic) || aopInReg (right->aop, 1, A_IDX))
+            {
+              cost (1000, 1000);
+              wassert (regalloc_dry_run);
+            }
           ptr_aop = ASMOP_P;
           cheapMove (ASMOP_A, 0, left->aop, 0, true, false, true);
           emit2 ("xch", "a, p");
@@ -3809,10 +3828,10 @@ genPointerSet (iCode *ic)
           ptr_aop = ASMOP_P;
           cheapMove (ptr_aop, 0, left->aop, 0, !aopInReg (right->aop, 0, A_IDX), true, true);
           G.p.type = AOP_INVALID;
-          if (!regDead (P_IDX, ic) || aopInReg (right->aop, 0, P_IDX))
+          if (!regDead (P_IDX, ic) || aopInReg (right->aop, 0, P_IDX) || aopInReg (right->aop, 1, P_IDX))
             {
-              wassert (regalloc_dry_run);
               cost (1000, 1000);
+              wassert (regalloc_dry_run);     
             }
         }
       

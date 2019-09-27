@@ -139,13 +139,10 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   bool left_dir = IS_TRUE_SYMOP (left) || IS_ITEMP (left) && !(options.stackAuto || reentrant) && !left_in_A;
   bool right_dir = IS_TRUE_SYMOP (right) || IS_ITEMP (right) && !(options.stackAuto || reentrant) && !right_in_A;
 
-  if (ic->op == '=' || ic->op == CAST)
+  if (ic->op == '=' || ic->op == DUMMY_READ_VOLATILE || ic->op == CAST || ic->op == GET_VALUE_AT_ADDRESS || ic->op == SET_VALUE_AT_ADDRESS)
     return(true);
 
   if(result && IS_ITEMP(result) && OP_SYMBOL_CONST(result)->remat && !operand_in_reg(result, REG_A, ia, i, G) && !operand_in_reg(result, REG_P, ia, i, G))
-    return(true);
-
-  if (ic->op == DUMMY_READ_VOLATILE || ic->op == '=')
     return(true);
 
   if ((ic->op == EQ_OP || ic->op == NE_OP) && dying_A &&
@@ -203,9 +200,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   // For most operations only allow lower byte in a for now (upper byte for result).
   if (left_in_A && !operand_byte_in_reg(left, 0, REG_A, a, i, G) || right_in_A && !operand_byte_in_reg(right, 0, REG_A, a, i, G) ||
     ic->op != '+' && ic->op != '-' && ic->op != UNARYMINUS && result_in_A && !operand_byte_in_reg(result, getSize(operandType(result)) - 1, REG_A, a, i, G))
-    return(false);
-
-  if ((ic->op == GET_VALUE_AT_ADDRESS || ic->op == SET_VALUE_AT_ADDRESS) && (left_in_A || right_in_A))
     return(false);
 
   if(dying_A)

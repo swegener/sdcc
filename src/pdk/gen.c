@@ -3037,6 +3037,7 @@ genLeftShift (const iCode *ic)
           emit2 ("mov", "a, #%d", shCount);
           cost (1, 1);
           emitLabel (tlbl);
+          G.p.type = AOP_INVALID;
           regalloc_dry_run_cycle_scale = shCount;
           shCount = 1;
         }
@@ -3099,13 +3100,14 @@ genLeftShift (const iCode *ic)
     }
   else
     {
-      genMove (result->aop, left->aop, !aopInReg (right->aop, 0, A_IDX), true);
+      genMove (result->aop, left->aop, !aopInReg (right->aop, 0, A_IDX), p_dead && !aopInReg (right->aop, 0, P_IDX));
 
       symbol *tlbl1 = regalloc_dry_run ? 0 : newiTempLabel (0);
       symbol *tlbl2 = regalloc_dry_run ? 0 : newiTempLabel (0);
     
       cheapMove (ASMOP_A, 0, right->aop, 0, true, true, true);
       emitLabel (tlbl1);
+      G.p.type = AOP_INVALID;
       emit2 ("sub", "a, #1");
       emit2 ("t0sn", "f, c");
       if (!regalloc_dry_run)
@@ -3172,11 +3174,18 @@ genRightShift (const iCode *ic)
   aopOp (result, ic);
 
   bool pushed_a = false;
+  bool pushed_p = false;
 
   int size = result->aop->size;
 
-  if (result->aop->type == AOP_STK && !regDead (P_IDX, ic))
-    pushPF (regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX) && !aopInReg (right->aop, 0, A_IDX));
+  bool p_dead = regDead (P_IDX, ic);
+
+  if (result->aop->type == AOP_STK && !p_dead)
+    {
+      pushPF (regDead (A_IDX, ic) && !aopInReg (left->aop, 0, A_IDX) && !aopInReg (right->aop, 0, A_IDX));
+      pushed_p = true;
+      p_dead = true;
+    }
 
   if (right->aop->type == AOP_LIT)
     {
@@ -3204,6 +3213,7 @@ genRightShift (const iCode *ic)
           emit2 ("mov", "a, #%d", shCount);
           cost (1, 1);
           emitLabel (tlbl);
+          G.p.type = AOP_INVALID;
           regalloc_dry_run_cycle_scale = shCount;
           shCount = 1;
         }
@@ -3334,13 +3344,14 @@ genRightShift (const iCode *ic)
     }
   else
     {
-      genMove (result->aop, left->aop, !aopInReg (right->aop, 0, A_IDX), true);
+      genMove (result->aop, left->aop, !aopInReg (right->aop, 0, A_IDX), !aopInReg (right->aop, 0, P_IDX));
 
       symbol *tlbl1 = regalloc_dry_run ? 0 : newiTempLabel (0);
       symbol *tlbl2 = regalloc_dry_run ? 0 : newiTempLabel (0);
     
-      cheapMove (ASMOP_A, 0, right->aop, 0, true, true, true);
+      cheapMove (ASMOP_A, 0, right->aop, 0, true, p_dead && !aopInReg (result->aop, 0, P_IDX), true);
       emitLabel (tlbl1);
+      G.p.type = AOP_INVALID;
 
       emit2 ("sub", "a, #1");
       emit2 ("t0sn", "f, c");
@@ -3428,7 +3439,7 @@ genRightShift (const iCode *ic)
   if (pushed_a)
     popAF();
 
-  if (result->aop->type == AOP_STK && !regDead (P_IDX, ic))
+  if (pushed_p)
     popPF (regDead (A_IDX, ic));
 
 release:
@@ -3873,6 +3884,11 @@ genPointerSet (iCode *ic)
         }
       else
         {
+          if (!regDead (A_IDX, ic))
+            {
+              pushAF ();
+              pushed_a = true;
+            }
           ptr_aop = ASMOP_P;
           cheapMove (ptr_aop, 0, left->aop, 0, !aopInReg (right->aop, 0, A_IDX), true, true);
           G.p.type = AOP_INVALID;

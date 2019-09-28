@@ -1,3 +1,8 @@
+2019-09-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fixes for stack operands and rematerialized stack locations.
+
 2019-09-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:

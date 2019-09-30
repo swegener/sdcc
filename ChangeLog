@@ -2,6 +2,15 @@
 
 	* src/pdk/gen.c:
 	  Fixes and improvements for stack operands.
+	* configure,
+	  configure.ac,
+	  device/lib/Makefile.in,
+	  device/lib/clean.mk,
+	  device/lib/pdk15-stack-auto,
+	  src/pdk/main.c,
+	  support/regression/Makefile.in,
+	  support/regression/ports/pdk15-stack-auto:
+	  Infrastructure for -mpdk15 --stack-auto regression testing.
 
 2019-09-28 Philipp Klaus Krause <pkk AT spth.de>
 

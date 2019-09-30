@@ -203,6 +203,12 @@ hasExtBitOp (int op, int size)
   return (false);
 }
 
+static const char *
+get_model (void)
+{
+    return(options.stackAuto ? "pdk15-stack-auto" : "pdk15");
+}
+
 /** $1 is always the basename.
     $2 is always the output file.
     $3 varies
@@ -565,7 +571,7 @@ PORT pdk15_port =
     true,
     NO_MODEL,
     NO_MODEL,
-    0,                          /* model == target */
+    &get_model,
   },
   {                             /* Assembler */
     pdk15AsmCmd,

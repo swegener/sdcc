@@ -248,6 +248,7 @@ endif
 
 ifeq ($(OPT_DISABLE_PDK15), 0)
 TARGETS        += model-pdk15
+TARGETS        += model-pdk15-stack-auto
 endif
 
 # Compiling entire program or any subproject
@@ -407,11 +408,6 @@ model-stm8-large:
 	  $(MAKE) MODELFLAGS="-mstm8 --model-large" PORT=stm8-large objects-stm8; \
 	fi
 
-objects-stm8-large:
-	$(MAKE) build-dir
-	$(MAKE) port-specific-objects
-	$(MAKE) clean_intermediate
-
 model-pdk13:
 	if grep '^pdk$$' $(top_builddir)/ports.build > /dev/null; then \
 	  $(MAKE) MODELFLAGS="-mpdk13" PORT=pdk13 objects-pdk13; \
@@ -441,6 +437,11 @@ objects-pdk15:
 	$(MAKE) build-dir
 	$(MAKE) port-specific-objects
 	$(MAKE) clean_intermediate
+
+model-pdk15-stack-auto:
+	if grep '^pdk$$' $(top_builddir)/ports.build > /dev/null; then \
+	  $(MAKE) MODELFLAGS="-mpdk15 --stack-auto" PORT=pdk15-stack-auto objects-pdk15; \
+	fi
 
 model-pic16:
 	if grep '^pic16$$' $(top_builddir)/ports.build > /dev/null; then \

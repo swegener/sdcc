@@ -1,3 +1,8 @@
+2019-09-30 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c:
+	  Fixes and improvements for stack operands.
+
 2019-09-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:

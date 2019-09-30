@@ -605,13 +605,13 @@ static void popPF (bool a_dead)
     {
       emit2 ("xch", "a, p");
       cost (1, 1);
-      popAF();
+      popAF ();
       emit2 ("xch", "a, p");
       cost (1, 1);
     }
   else
     {
-      popAF();
+      popAF ();
       emit2 ("mov", "p, a");
       cost (1, 1);
     }
@@ -894,6 +894,21 @@ adjustStack (int n, bool a_free, bool p_free)
     }
 
   G.stack.pushed += n;
+}
+
+/*-----------------------------------------------------------------*/
+/* popP - pop p (preserving f), adjusting stack tracking           */
+/*-----------------------------------------------------------------*/
+static void popP (bool a_dead)
+{
+  pushAF ();
+  pointPStack (G.stack.pushed - 3, false, true);
+  emit2 ("idxm", "a, p");
+  emit2 ("mov", "p, a");
+  cost (2, 3);
+  popAF ();
+  adjustStack (-2, a_dead, false);
+  G.p.type = AOP_INVALID;
 }
 
 static void
@@ -1397,10 +1412,14 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         }
       else if (right_aop->type == AOP_STK || right_aop->type == AOP_STL && !i)
         {
+          if (i + 1 < size && aopInReg (left_aop, i + 1, P_IDX))
+            pushPF (!aopInReg (left_aop, i, A_IDX));
           cheapMove (ASMOP_A, 0, left_aop, i, true, true, !started);
           cheapMove (ASMOP_P, 0, right_aop, i, false, true, !started);
           emit2 (started ? "subc" : "sub", "a, p");
           cost (1, 1);
+          if (i + 1 < size && aopInReg (left_aop, i + 1, P_IDX))
+            popP (false);
           started = true;
         }
      else if (started && (right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD) && !aopIsLitVal (right_aop, i, 1, 0x00) && i + 1 == size)
@@ -1989,12 +2008,17 @@ genPlus (const iCode *ic)
         }
       else if (right->aop->type == AOP_STK || right->aop->type == AOP_STL && !i)
         {
-          if (!p_dead && i + 1 < size)
+          if (!regDead (P_IDX, ic))
             {
-              cost (250, 250);
-              wassert (regalloc_dry_run);
+              if (pushed_a)
+                {
+                  cost (200, 200);
+                  wassert (regalloc_dry_run);
+                }
+              pushPF (!moved_to_a && !aopInReg (left->aop, i, A_IDX));
+              pushed_p = true;
             }
-          else if (!p_dead)
+          if (!p_dead)
             pushPF (!moved_to_a && !aopInReg (left->aop, i, A_IDX));
           if (!moved_to_a)
             cheapMove (ASMOP_A, 0, left->aop, i, true, true, !started);
@@ -2002,7 +2026,9 @@ genPlus (const iCode *ic)
           emit2 (started ? "addc" : "add", "a, p");
           cost (1, 1);
           started = true;
-          if (!p_dead)
+          if (!p_dead && i + 1 < size)
+            popP (false);
+          else if (!p_dead)
             popPF (false);
         }
       else if (!moved_to_a && aopInReg (left->aop, i, P_IDX))
@@ -2021,15 +2047,26 @@ genPlus (const iCode *ic)
         }
       else if (started && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD) && !aopIsLitVal (right->aop, i, 1, 0x00))
         {
-          if (!regDead (P_IDX, ic) || i > 0 && aopInReg (result->aop, i - 1, P_IDX))
+          if (!regDead (P_IDX, ic))
             {
-              cost (100, 100);
-              wassert (regalloc_dry_run);
+              if (pushed_a)
+                {
+                  cost (200, 200);
+                  wassert (regalloc_dry_run);
+                }
+              pushPF (!aopInReg (left->aop, i, A_IDX) && !aopInReg (right->aop, i, A_IDX) && !moved_to_a);
+              pushed_p = true;
             }
+          if (!p_dead)
+            pushPF (!aopInReg (left->aop, i, A_IDX) && !aopInReg (right->aop, i, A_IDX) && !moved_to_a);
           cheapMove (ASMOP_P, 0, right->aop, i, !aopInReg (left->aop, i, A_IDX) && !moved_to_a, true, false);
           cheapMove (ASMOP_A, 0, left->aop, i, true, false, false);
           emit2 ("addc", "a, p");
           cost (1, 1);
+          if (!p_dead && i + 1 < size)
+            popP (false);
+          else if (!p_dead)
+            popPF (false);
         }
       else
         {
@@ -2070,7 +2107,9 @@ genPlus (const iCode *ic)
           moved_to_a = true;
         }
       else
-        cheapMove (result->aop, i, ASMOP_A, 0, true, !(i + 1 < size && (aopInReg (left->aop, i + 1, P_IDX) || aopInReg (right->aop, i + 1, P_IDX))), i + 1 == size);
+        cheapMove (result->aop, i, ASMOP_A, 0, true, p_dead, i + 1 == size);
+      if (aopInReg (result->aop, i, P_IDX))
+        p_dead = false;
     }
 
   if (pushed_a)

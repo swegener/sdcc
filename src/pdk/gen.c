@@ -615,6 +615,7 @@ static void popPF (bool a_dead)
       emit2 ("mov", "p, a");
       cost (1, 1);
     }
+  G.p.type = AOP_INVALID;
 }
 
 /*-----------------------------------------------------------------*/
@@ -789,10 +790,7 @@ cheapMove (const asmop *result, int roffset, const asmop *source, int soffset, b
       emit2 ("idxm", "a, p");
       cost (1, 2);
       if (!p_dead)
-        {
-          popPF (false);
-          G.p.type = AOP_INVALID;
-        }
+        popPF (false);
     }
   else if (result->type == AOP_STK && aopInReg (source, soffset, A_IDX))
     {
@@ -802,10 +800,7 @@ cheapMove (const asmop *result, int roffset, const asmop *source, int soffset, b
       emit2 ("idxm", "p, a");
       cost (1, 2);
       if (!p_dead)
-        {
-          popPF (a_dead);
-          G.p.type = AOP_INVALID;
-        }
+        popPF (a_dead);
     }
   else if (aopInReg (result, roffset, A_IDX))
     {
@@ -2082,10 +2077,7 @@ genPlus (const iCode *ic)
     popAF();
 
   if (pushed_p)
-    {
-      popPF (regDead (A_IDX, ic) && result->aop->type != AOP_REG);
-      G.p.type = AOP_INVALID;
-    }
+    popPF (regDead (A_IDX, ic) && result->aop->type != AOP_REG);
 
   freeAsmop (right);
   freeAsmop (left);
@@ -3687,7 +3679,7 @@ genPointerGet (const iCode *ic)
           if (i + 1 != size)
             {
               emit2 ("inc", "%s", aopGet (ptr_aop, 0));
-              if (ptr_aop == ASMOP_P)
+              if (aopInReg (ptr_aop, 0, P_IDX))
                 G.p.type = AOP_INVALID;
               cost (1, 1);
             }
@@ -3696,6 +3688,8 @@ genPointerGet (const iCode *ic)
         for (int i = 1; i < size; i++)
           {
             emit2 ("dec", "%s", aopGet (ptr_aop, 0));
+            if (aopInReg (ptr_aop, 0, P_IDX))
+              G.p.type = AOP_INVALID;
             cost (1, 1);
           }
       goto release;
@@ -3844,6 +3838,10 @@ genPointerSet (iCode *ic)
               emit2 ("inc", "p");
               emit2 ("xch", "a, p");
               cost (2, 2);
+              if (G.p.type == AOP_STL)
+                G.p.offset++;
+              else
+                G.p.type = AOP_INVALID;
             }
         }
     }
@@ -3879,12 +3877,20 @@ genPointerSet (iCode *ic)
                   {
                     emit2 ("inc", "p");
                     cost (1, 1);
+                    if (G.p.type == AOP_STL)
+                      G.p.offset++;
+                    else
+                      G.p.type = AOP_INVALID;
                   }
             }
           else if (i)
             {
               emit2 ("inc", "p");
               cost (1, 1);
+              if (G.p.type == AOP_STL)
+                G.p.offset++;
+              else
+                G.p.type = AOP_INVALID;
             }
 
           emit2 ("idxm", "p, a");
@@ -3896,6 +3902,7 @@ genPointerSet (iCode *ic)
           {
             emit2 ("dec", "p");
             cost (1, 1);
+            G.p.type = AOP_INVALID;
           }
     }
   else if (aopInReg (right->aop, 0, P_IDX) && aopInReg (right->aop, 1, A_IDX) && left->aop->type == AOP_IMMD)
@@ -4121,6 +4128,10 @@ genPointerSet (iCode *ic)
           if (i + 1 != size && ptr_aop)
             {
               emit2 ("inc", "%s", aopGet (ptr_aop, 0));
+              if (G.p.type == AOP_STL)
+                G.p.offset++;
+              else
+                G.p.type = AOP_INVALID;
               cost (1, 1);
             }
         }

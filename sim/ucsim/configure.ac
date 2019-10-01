@@ -371,7 +371,7 @@ AC_SUBST(curses_ok)
 AC_SUBST(CURSES_LIBS)
 
 AC_CHECK_FUNCS(vasprintf)
-AC_CHECK_FUNCS(strerror strdup)
+AC_CHECK_FUNCS(strdup)
 dnl AC_CHECK_FUNCS(getline)
 dnl AC_CHECK_FUNCS(getdelim)
 AC_CHECK_FUNCS(yylex)

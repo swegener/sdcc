@@ -96,7 +96,7 @@ esac
 
 # Checking for functions
 # ===========================================================================
-AC_CHECK_FUNCS(strerror mkstemp strndup setrlimit backtrace_symbols_fd)
+AC_CHECK_FUNCS(mkstemp strndup setrlimit backtrace_symbols_fd)
 
 
 # Macro definitions

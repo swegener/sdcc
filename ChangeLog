@@ -2,6 +2,13 @@
 
 	* src/pdk/gen.c:
 	  Fixes and improvements for stack operands.
+	* .version:
+	  Bump version for advances in -mpdk15 --stack-auto.
+	* configure.ac,
+	  configure,
+	  sim/ucsim/configure.ac,
+	  sim/ucsim/configure:
+	  Remove check for strerror(), which is part of C89 and used unconditionally in SDCC anyway.
 
 2019-09-30 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

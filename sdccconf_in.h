@@ -64,9 +64,6 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
-/* Define to 1 if you have the `strerror' function. */
-#undef HAVE_STRERROR
-
 /* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
 
@@ -144,6 +141,9 @@
 
 /* XXX */
 #undef OPT_DISABLE_PDK15
+
+/* XXX */
+#undef OPT_DISABLE_PDK16
 
 /* XXX */
 #undef OPT_DISABLE_PIC14

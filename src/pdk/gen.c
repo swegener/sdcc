@@ -870,18 +870,21 @@ adjustStack (int n, bool a_free, bool p_free)
   else if (!a_free && !p_free && n < 0)
     {
       pushAF();
-      cheapMove (ASMOP_A, 0, ASMOP_P, 0, true, false, true);
+      cheapMove (ASMOP_A, 0, ASMOP_P, 0, true, true, true);
       pushAF();
 
-      moveStackStack (G.stack.pushed - 4 + n, G.stack.pushed - 4, 4, true);
-      
+      moveStackStack (G.stack.pushed + n - 4, G.stack.pushed - 4, 2, true);
+      pointPStack (G.stack.pushed - 2, true, true);
+      emit2 ("idxm", "a, p");
+      emit2 ("mov", "p, a");
+      cost (2, 3);
+
       emit2 ("mov", "a, sp");
-      emit2 ("add", "a, #%d", n);
+      emit2 ("add", "a, #%d", n - 2);
       emit2 ("mov", "sp, a");
       cost (3, 3);
+      G.stack.pushed -= 2;
 
-      popAF();
-      cheapMove (ASMOP_P, 0, ASMOP_A, 0, true, false, true);
       popAF();
     }
   else // Can't use pop af, since it might affect reserved flag bits.

@@ -3170,7 +3170,7 @@ genLeftShift (const iCode *ic)
             }
           else if ((size - offset) == 1 && result->aop->type == AOP_STK)
             {
-              cheapMove (ASMOP_A, 0, result->aop, offset, true, p_dead, false);
+              cheapMove (ASMOP_A, 0, result->aop, offset, true, p_dead, true);
               if (shCount >= 4)
                 {
                   emit2 ("swap", "a");
@@ -3183,7 +3183,7 @@ genLeftShift (const iCode *ic)
                   emit2 ("sl", "a");
                   cost (1, 1);
                 }
-              cheapMove (result->aop, offset, ASMOP_A, 0, true, p_dead, false);
+              cheapMove (result->aop, offset, ASMOP_A, 0, true, p_dead, true);
               continue;
             }
 
@@ -3364,6 +3364,25 @@ genRightShift (const iCode *ic)
             {
               pushAF();
               pushed_a = true;
+            }
+
+          if (SPEC_USIGN (getSpec (operandType (left))) && size == 1 && result->aop->type == AOP_STK)
+            {
+              cheapMove (ASMOP_A, 0, result->aop, 0, true, p_dead, true);
+              if (shCount >= 4)
+                {
+                  emit2 ("swap", "a");
+                  emit2 ("and", "a, #0x0f");
+                  cost (2, 2);
+                  shCount -= 4;
+                }
+              for (;shCount; shCount--)
+                {
+                  emit2 ("sr", "a");
+                  cost (1, 1);
+                }
+              cheapMove (result->aop, 0, ASMOP_A, 0, true, p_dead, true);
+              continue;
             }
 
           // Padauk has no arithmetic right shift instructions.

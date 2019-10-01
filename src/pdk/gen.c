@@ -1374,7 +1374,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
 
       if ((left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)) && right_aop->type != AOP_STK && aopSame (left_aop, i, result_aop, i, 1))
         {
-          cheapMove (ASMOP_A, 0, right_aop, i, true, true, true);
+          cheapMove (ASMOP_A, 0, right_aop, i, true, !aopInReg (left_aop, i, P_IDX), !started);
           emit2 (started ? "subc" : "sub", "%s, a", aopGet (left_aop, i));
           cost (1, 1);
           started = true;
@@ -1382,7 +1382,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         }
       else if (aopInReg (right_aop, P_IDX, i) && left_aop->type == AOP_STK)
         {
-          cheapMove (ASMOP_A, 0, left_aop, i, true, false, true);
+          cheapMove (ASMOP_A, 0, left_aop, i, true, false, !started);
           emit2 (started ? "subc" : "sub", "a, p");
           started = true;
           continue;
@@ -1395,9 +1395,9 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           started = true;
         }
       else if (!started && i + 1 == size && aopInReg (right_aop, i, A_IDX) &&
-        (left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)))
+        (left_aop->type == AOP_LIT || left_aop->type == AOP_IMMD || left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)))
         {
-          if (TARGET_IS_PDK15 || TARGET_IS_PDK16)
+          if ((TARGET_IS_PDK15 || TARGET_IS_PDK16) && (left_aop->type == AOP_IMMD || aopInReg (left_aop, i, P_IDX)))
             {
               emit2 ("nadd", "a, %s", aopGet (left_aop, i));
               cost (1, 1);
@@ -1424,7 +1424,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
         }
      else if (started && (right_aop->type == AOP_LIT || right_aop->type == AOP_IMMD) && !aopIsLitVal (right_aop, i, 1, 0x00) && i + 1 == size)
         {
-          cheapMove (ASMOP_A, 0, left_aop, i, true, true, true);
+          cheapMove (ASMOP_A, 0, left_aop, i, true, true, false);
           emit2 ("subc", "a");
           emit2 ("sub", "a, %s", aopGet (right_aop, i));
           cost (2, 2);
@@ -1438,15 +1438,37 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
           cost (1, 1);
           started = true;
         }
+      else if (aopInReg (right_aop, i, A_IDX))
+        {
+          if (i + 1 < size && aopInReg (right_aop, i + 1, P_IDX) || !regDead (P_IDX, ic) && !pushed_p)
+            pushPF (false);
+          if (aopInReg (left_aop, i, P_IDX))
+            {
+              emit2 ("xch", "a, p");
+              cost (1, 1);
+              G.p.type = AOP_INVALID;
+            }
+          else
+            {
+              cheapMove (ASMOP_P, 0, right_aop, i, true, !aopInReg (left_aop, i, P_IDX), !started);
+              cheapMove (ASMOP_A, 0, left_aop, i, true, false, !started);
+            }
+          emit2 (started ? "subc" : "sub", "a, p");
+          cost (1, 1);
+          started = true;
+          if (i + 1 < size && aopInReg (right_aop, i + 1, P_IDX) || !regDead (P_IDX, ic) && !pushed_p)
+            {
+              if (!pushed_a && !regDead (P_IDX, ic) && !pushed_p)
+                pushed_p = true;
+              else if (i + 1 < size)
+                popP (false);
+              else
+                popPF (false);
+            }
+        }
       else
         {
-          if (aopInReg (right_aop, i, A_IDX))
-            {
-              cost (1000, 1000);
-              if (!regalloc_dry_run)
-                wassertl (0, "Unimplemented operand in subtraction");
-              continue;
-            }
+          wassert (!aopInReg (right_aop, i, A_IDX));
           cheapMove (ASMOP_A, 0, left_aop, i, true, !aopInReg (right_aop, i, P_IDX), !started);
           if (started || !aopIsLitVal (right_aop, i, 1, 0x00))
             {
@@ -2008,7 +2030,7 @@ genPlus (const iCode *ic)
         }
       else if (right->aop->type == AOP_STK || right->aop->type == AOP_STL && !i)
         {
-          if (!regDead (P_IDX, ic))
+          if (!regDead (P_IDX, ic) && !pushed_p)
             {
               if (pushed_a)
                 {
@@ -2047,7 +2069,7 @@ genPlus (const iCode *ic)
         }
       else if (started && (right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD) && !aopIsLitVal (right->aop, i, 1, 0x00))
         {
-          if (!regDead (P_IDX, ic))
+          if (!regDead (P_IDX, ic) && !pushed_p)
             {
               if (pushed_a)
                 {

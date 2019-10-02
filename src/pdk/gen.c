@@ -2432,20 +2432,20 @@ genCmp (const iCode *ic, iCode *ifx)
         }
       else if (right->aop->type == AOP_STK)
         {
-          if (!regDead (P_IDX, ic) && i + 1 < size || aopInReg (left->aop, i + 1, P_IDX))
-            {
-              cost (100, 100);
-              wassert (regalloc_dry_run);
-            }
-          else if (!regDead (P_IDX, ic))
+          if (!regDead (P_IDX, ic) || aopInReg (left->aop, i + 1, P_IDX))
             pushPF (!aopInReg (left->aop, i, A_IDX));
           cheapMove (ASMOP_A, 0, left->aop, i, true, true, !i);
           cheapMove (ASMOP_P, 0, right->aop, i, false, true, !i);
           emit2 (started ? "subc" : "sub", "a, p");
           cost (1, 1);
           started = true;
-          if (!regDead (P_IDX, ic))
-            popPF (false);
+          if (!regDead (P_IDX, ic) || aopInReg (left->aop, i + 1, P_IDX))
+            {
+              if (i + 1 == size)
+                popPF (false);
+              else
+                popP (false);
+            }
         }
       else
         {

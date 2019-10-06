@@ -1,3 +1,8 @@
+2019-09-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/aspdk15/pdk15pst.c:
+	  Fix swapc bug #2935.
+
 2019-10-02 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/pdk/gen.c:

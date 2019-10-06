@@ -188,7 +188,7 @@ struct  mne     mne[] = {
     {   NULL,   "stopexe",      S_STOPEXE,      0,      0x0077    },
     {   NULL,   "reset",        S_RESET,        0,      0x0075    },
     {   NULL,   "wdreset",      S_WDRESET,      0,      0x0070    },
-    {   NULL,   "swapc",        S_SWAPC,        0,      0x0400    },
+    {   NULL,   "swapc",        S_SWAPC,        0,      0x5c00    },
     {   NULL,   "cneqsn",       S_CNEQSN,       0,      0x5300    },
     {   NULL,   "comp",         S_COMP,         0,      0x0C00    },
     {   NULL,   "nadd",         S_NADD,         0,      0x0E00    },

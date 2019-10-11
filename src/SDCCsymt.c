@@ -4510,7 +4510,7 @@ newEnumType (symbol * enumlist)
   else if (min >= -128 && max <= 127)
     {
       SPEC_NOUN (type) = V_CHAR;
-	  SPEC_SIGN (type) = 1;
+      SPEC_SIGN (type) = 1;
     }
   else if (min >= 0 && max <= 65535)
     {

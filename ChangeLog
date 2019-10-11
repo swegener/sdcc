@@ -1,3 +1,10 @@
+2019-09-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.h:
+	  Fix error message, patch #307 by RvS.
+	* src/SDCCsymt.c:
+	  Indentation fix.
+
 2019-09-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/aspdk15/pdk15pst.c:

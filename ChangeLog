@@ -4,7 +4,8 @@
 	  src/SDCCicode.c,
 	  src/SDCCsalloc.hpp,
 	  src/stm8/gen.c,
-	  src/z80/gen.c:
+	  src/z80/gen.c,
+	  src/pdk/gen.c:
 	  Improve tail call optimization.
 
 2019-09-11 Philipp Klaus Krause <pkk AT spth.de>

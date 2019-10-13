@@ -1610,9 +1610,20 @@ genCall (const iCode *ic)
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
-  bool bigreturn = (getSize (ftype->next) > 2) || IS_STRUCT (ftype->next);
+  bool tailjump = false;
+
+  operand *left = IC_LEFT (ic);
+
+  const bool bigreturn = (getSize (ftype->next) > 2) || IS_STRUCT (ftype->next);
+  const bool SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
+                       (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir))
+                       || IS_TRUE_SYMOP (IC_RESULT (ic));
 
   D (emit2 ("; genCall", ""));  
+
+  aopOp (left, ic);
+  if (SomethingReturned && !bigreturn)
+    aopOp (IC_RESULT (ic), ic);
 
   if (bigreturn)
     {
@@ -1634,6 +1645,50 @@ genCall (const iCode *ic)
         }
       pushAF ();
     }
+  // Check if we can do tail call optimization.
+  else if ((!SomethingReturned || IC_RESULT (ic)->aop->size == 1 && aopInReg (IC_RESULT (ic)->aop, 0, A_IDX) || IC_RESULT (ic)->aop->size == 2 && aopInReg (IC_RESULT (ic)->aop, 0, A_IDX) && aopInReg (IC_RESULT (ic)->aop, 1, P_IDX)) &&
+    !ic->parmBytes && !ic->localEscapeAlive)
+    {
+      int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.
+
+      for (const iCode *nic = ic->next; nic && --limit;)
+        {
+          const symbol *targetlabel = 0;
+
+          if (nic->op == LABEL)
+            ;
+          else if (nic->op == GOTO) // We dont have ebbi here, so we cant jsut use eBBWithEntryLabel (ebbi, ic->label). Search manually.
+            targetlabel = IC_LABEL (nic);
+          else if (nic->op == RETURN && (!IC_LEFT (nic) || SomethingReturned && IC_RESULT (ic)->key == IC_LEFT (nic)->key))
+            targetlabel = returnLabel;
+          else if (nic->op == ENDFUNCTION)
+            {
+              if (OP_SYMBOL (IC_LEFT (nic))->stack == 0)
+                tailjump = true;
+              break;
+            }
+          else
+            break;
+
+          if (targetlabel)
+            {
+              const iCode *nnic = 0;
+              for (nnic = nic->next; nnic; nnic = nnic->next)
+                if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
+                  break;
+              if (!nnic)
+                for (nnic = nic->prev; nnic; nnic = nnic->prev)
+                  if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
+                    break;
+              if (!nnic)
+                break;
+
+              nic = nnic;
+            }
+          else
+            nic = nic->next;
+        }
+    }
 
   if (!regDead (A_IDX, ic) && ic->parmBytes || !regDead (P_IDX, ic))
     {
@@ -1644,46 +1699,45 @@ genCall (const iCode *ic)
   if (!regDead (A_IDX, ic))
     pushAF ();
 
+  bool jump = tailjump || !ic->parmBytes && IFFUNC_ISNORETURN (ftype);
+
   if (ic->op == PCALL)
     {
-      operand *left = IC_LEFT (ic);
-
-      aopOp (left, ic);
-
       // Push return address
       symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
 
-      if (!regalloc_dry_run)
+      if (!jump)
         {
-          emit2 ("mov", "a, #<(!tlabel)", labelKey2num (tlbl->key));
-          emit2 ("push", "af");
-          emit2 ("mov", "a, sp");
-          emit2 ("mov", "p, a");
-          emit2 ("dec", "p");
-          emit2 ("mov", "a, #>(!tlabel)", labelKey2num (tlbl->key));
-          emit2 ("idxm", "p, a");
-          G.p.type = AOP_INVALID;
+          if (!regalloc_dry_run)
+            {
+              emit2 ("mov", "a, #<(!tlabel)", labelKey2num (tlbl->key));
+              emit2 ("push", "af");
+              emit2 ("mov", "a, sp");
+              emit2 ("mov", "p, a");
+              emit2 ("dec", "p");
+              emit2 ("mov", "a, #>(!tlabel)", labelKey2num (tlbl->key));
+              emit2 ("idxm", "p, a");
+              G.p.type = AOP_INVALID;
+            }
+          G.stack.pushed += 2;
+          cost (7, 8);
         }
-      G.stack.pushed += 2;
-      cost (7, 8);
 
       // Jump to function
       push (left->aop, 0, 2);
       emit2 ("ret", "");
-      G.stack.pushed -= 4;
+      G.stack.pushed -= 4 - jump * 2;
       cost (2, 1);
 
-      emitLabel (tlbl);
-
-      freeAsmop (left);
+      if (!jump)
+        emitLabel (tlbl);
     }
   else
     {
       if (IS_LITERAL (etype))
-        emit2 ("call", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+        emit2 (jump ? "goto" : "call", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
       else
         {
-          bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
           emit2 (jump ? "goto" : "call", "%s",
                  (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
         }
@@ -1691,16 +1745,12 @@ genCall (const iCode *ic)
     }
   G.p.type = AOP_INVALID;
 
-  bool SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
-                       (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir))
-                       || IS_TRUE_SYMOP (IC_RESULT (ic));
+  freeAsmop (left);
 
   if (!SomethingReturned || bigreturn)
     adjustStack (-ic->parmBytes - bigreturn * 2, true, true);
   else
     {
-      aopOp (IC_RESULT (ic), ic);
-
       genMove (IC_RESULT (ic)->aop, ASMOP_AP, true, true);
 
       adjustStack (-ic->parmBytes, !(aopInReg (IC_RESULT (ic)->aop, 0, A_IDX) || aopInReg (IC_RESULT (ic)->aop, 1, A_IDX)), !(aopInReg (IC_RESULT (ic)->aop, 0, P_IDX) || aopInReg (IC_RESULT (ic)->aop, 1, P_IDX)));

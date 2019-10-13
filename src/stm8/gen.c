@@ -3065,8 +3065,7 @@ genCall (const iCode *ic)
 
   operand *left = IC_LEFT (ic);
 
-  /* Return value of big type or returning struct or union. */
-  const bool bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);
+  const bool bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);   // Return value of big type or returning struct or union.
   const bool SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
                        (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir))
                        || IS_TRUE_SYMOP (IC_RESULT (ic));
@@ -3141,9 +3140,9 @@ genCall (const iCode *ic)
           else
             nic = nic->next;
         }
-    }  
+    }
 
-  const bool jump = tailjump || !ic->parmBytes && !bigreturn && !IS_LITERAL (etype) && IFFUNC_ISNORETURN (OP_SYMBOL (left)->type);
+  const bool jump = tailjump || !ic->parmBytes && !bigreturn && IFFUNC_ISNORETURN (OP_SYMBOL (left)->type);
 
   if (ic->op == PCALL)
     {

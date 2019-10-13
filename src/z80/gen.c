@@ -4722,21 +4722,30 @@ static void genSend (const iCode *ic)
 static void
 genCall (const iCode *ic)
 {
-  bool SomethingReturned, bigreturn, z88dk_callee;
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
   int i;
+  int prestackadjust = 0;
+  bool tailjump = false;
 
-  z88dk_callee = IFFUNC_ISZ88DK_CALLEE (ftype);
+  const bool z88dk_callee = IFFUNC_ISZ88DK_CALLEE (ftype);
 
   for (i = 0; i < IYH_IDX + 1; i++)
     z80_regs_preserved_in_calls_from_current_function[i] |= ftype->funcAttrs.preserved_regs[i];
 
   _saveRegsForCall (ic, FALSE);
 
-  /* Return value of big type or returning struct or union. */
-  bigreturn = (getSize (ftype->next) > 4);
+  const bool bigreturn = (getSize (ftype->next) > 4); // Return value of big type or returning struct or union.
+  const bool SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
+                       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
+                        OP_SYMBOL (IC_RESULT (ic))->spildir ||
+                        OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (IC_RESULT (ic));
+
+  aopOp (IC_LEFT (ic), ic, false, false);
+  if (SomethingReturned && !bigreturn)
+    aopOp (IC_RESULT (ic), ic, false, false);
+
   if (bigreturn)
     {
       PAIR_ID pair;
@@ -4768,6 +4777,56 @@ genCall (const iCode *ic)
         _G.stack.pushed += 2;
       freeAsmop (IC_RESULT (ic), NULL);
     }
+  // Check if we can do tail call optimization.
+  else if ((!SomethingReturned || IC_RESULT (ic)->aop->size == 1 && aopInReg (IC_RESULT (ic)->aop, 0, IS_GB ? E_IDX : L_IDX) || IC_RESULT (ic)->aop->size == 2 && aopInReg (IC_RESULT (ic)->aop, 0, IS_GB ? DE_IDX : HL_IDX)) &&
+    !ic->parmBytes && !ic->localEscapeAlive && !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL (ftype) && _G.omitFramePtr &&
+    (ic->op != PCALL || !IFFUNC_ISZ88DK_FASTCALL (ftype)))
+    {
+      int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.
+
+      for (const iCode *nic = ic->next; nic && --limit;)
+        {
+          const symbol *targetlabel = 0;
+
+          if (nic->op == LABEL)
+            ;
+          else if (nic->op == GOTO) // We dont have ebbi here, so we cant jsut use eBBWithEntryLabel (ebbi, ic->label). Search manually.
+            targetlabel = IC_LABEL (nic);
+          else if (nic->op == RETURN && (!IC_LEFT (nic) || SomethingReturned && IC_RESULT (ic)->key == IC_LEFT (nic)->key))
+            targetlabel = returnLabel;
+          else if (nic->op == ENDFUNCTION)
+            {
+              if (OP_SYMBOL (IC_LEFT (nic))->stack <= (ic->op == PCALL ? 1 : (optimize.codeSize ? 1 : 2)) + IS_RAB * 120)
+                {
+                  prestackadjust = OP_SYMBOL (IC_LEFT (nic))->stack;
+                  tailjump = true;
+                }
+              break;
+            }
+          else
+            break;
+
+          if (targetlabel)
+            {
+              const iCode *nnic = 0;
+              for (nnic = nic->next; nnic; nnic = nnic->next)
+                if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
+                  break;
+              if (!nnic)
+                for (nnic = nic->prev; nnic; nnic = nnic->prev)
+                  if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
+                    break;
+              if (!nnic)
+                break;
+
+              nic = nnic;
+            }
+          else
+            nic = nic->next;
+        }
+    }
+
+  const bool jump = tailjump || !ic->parmBytes && !bigreturn && ic->op != PCALL && !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL(ftype) && IFFUNC_ISNORETURN (ftype);
 
   if (ic->op == PCALL)
     {
@@ -4779,27 +4838,32 @@ genCall (const iCode *ic)
        {
           wassertl(0, "__z88dk_short_call via function pointer not implemented");
        }
-      aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
 
       if (isLitWord (AOP (IC_LEFT (ic))))
         {
-          emit2 ("call %s", aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
+          adjustStack (prestackadjust, false, false, false, false);
+          emit2 (jump ? "jp %s" : "call %s", aopGetLitWordLong (AOP (IC_LEFT (ic)), 0, FALSE));
           regalloc_dry_run_cost += 3;
         }
       else if (getPairId (AOP (IC_LEFT (ic))) != PAIR_IY && !IFFUNC_ISZ88DK_FASTCALL (ftype))
         {
           spillPair (PAIR_HL);
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
-          emit2 ("call ___sdcc_call_hl");
+          adjustStack (prestackadjust, false, false, false, false);
+          emit2 (jump ? "jp (hl)" : "call ___sdcc_call_hl");
+          regalloc_dry_run_cost += 3;
         }
       else if (!IS_GB && !IY_RESERVED)
         {
           spillPair (PAIR_IY);
           fetchPairLong (PAIR_IY, IC_LEFT (ic)->aop, ic, 0);
-          emit2 ("call ___sdcc_call_iy");
+          adjustStack (prestackadjust, false, false, false, false);
+          emit2 (jump ? "jp (iy)" : "call ___sdcc_call_iy");
+          regalloc_dry_run_cost += 3;
         }
       else // Use bc, since it is the only 16-bit register guarateed to be free even for __z88dk_fastcall with --reserve-regs-iy
         {
+          wassert (!prestackadjust);
           wassert (IY_RESERVED); // The peephole optimizer handles ret for purposes other than returning only for --reserve-regs-iy
           if (aopInReg (IC_LEFT (ic)->aop, 0, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 0, C_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, B_IDX) || aopInReg (IC_LEFT (ic)->aop, 1, C_IDX))
             {
@@ -4821,14 +4885,14 @@ genCall (const iCode *ic)
           if (tlbl)
             emit2 ("!tlabeldef", labelKey2num (tlbl->key));
         }
-
-      freeAsmop (IC_LEFT (ic), NULL);
     }
   else
     {
       /* make the call */
       if (IFFUNC_ISBANKEDCALL (dtype))
         {
+          wassert (!prestackadjust);
+
           char *name = OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name;
           emit2 ("call banked_call");
           emit2 ("!dws", name);
@@ -4837,12 +4901,14 @@ genCall (const iCode *ic)
         }
       else
         {
+          adjustStack (prestackadjust, false, false, false, false);
+
           if (IS_LITERAL (etype))
             {
-              emit2 ("call 0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
+              emit2 (jump ? "jp 0x%04X" : "call 0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
               regalloc_dry_run_cost += 3;
             }
-          else if ( IFFUNC_ISZ88DK_SHORTCALL(ftype) ) 
+          else if (IFFUNC_ISZ88DK_SHORTCALL(ftype)) 
             {
               int rst = ftype->funcAttrs.z88dk_shortcall_rst;
               int value = ftype->funcAttrs.z88dk_shortcall_val;
@@ -4855,7 +4921,6 @@ genCall (const iCode *ic)
             }
           else
             {
-              bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (ftype));
               emit2 ("%s %s", jump ? "jp" : "call",
                 (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
               regalloc_dry_run_cost += 3;
@@ -4864,13 +4929,12 @@ genCall (const iCode *ic)
     }
   spillCached ();
 
+  freeAsmop (IC_LEFT (ic), 0);
+
+  _G.stack.pushed += prestackadjust;
+
   /* Mark the registers as restored. */
   _G.saves.saved = FALSE;
-
-  SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
-                       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
-                        OP_SYMBOL (IC_RESULT (ic))->spildir ||
-                        OP_SYMBOL (IC_RESULT (ic))->accuse == ACCUSE_A)) || IS_TRUE_SYMOP (IC_RESULT (ic));
 
   /* adjust the stack for parameters if required */
   if ((ic->parmBytes || bigreturn) && (IFFUNC_ISNORETURN (ftype) || z88dk_callee))
@@ -4892,8 +4956,6 @@ genCall (const iCode *ic)
   /* if we need assign a result value */
   if (SomethingReturned && !bigreturn)
     {
-      aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
-
       assignResultValue (IC_RESULT (ic));
 
       freeAsmop (IC_RESULT (ic), NULL);

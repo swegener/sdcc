@@ -147,6 +147,7 @@ typedef struct iCode
   unsigned regsSaved:1;         /* registers have been saved */
   unsigned bankSaved:1;         /* register bank has been saved */
   unsigned builtinSEND:1;       /* SEND for parameter of builtin function */
+  bool localEscapeAlive:1;      /* At this iCode, a local variable, a pointer to which has escaped (e.g. by having been stored in a global variable, cast to integer, passed to function) might be alive. */
 
   struct iCode *next;           /* next in chain */
   struct iCode *prev;           /* previous in chain */

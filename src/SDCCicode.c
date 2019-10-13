@@ -557,7 +557,7 @@ newOperand ()
 /* newiCode - create and return a new iCode entry initialised      */
 /*-----------------------------------------------------------------*/
 iCode *
-newiCode (int op, operand * left, operand * right)
+newiCode (int op, operand *left, operand *right)
 {
   iCode *ic;
 
@@ -572,6 +572,9 @@ newiCode (int op, operand * left, operand * right)
   ic->key = iCodeKey++;
   IC_LEFT (ic) = left;
   IC_RIGHT (ic) = right;
+
+  // Err on the save side for now, settign this to false later is up to later analysis.
+  ic->localEscapeAlive = true;
 
   return ic;
 }

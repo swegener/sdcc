@@ -3053,17 +3053,28 @@ genIpush (const iCode * ic)
 static void
 genCall (const iCode *ic)
 {
-  bool SomethingReturned, bigreturn, half;
   sym_link *dtype = operandType (IC_LEFT (ic));
   sym_link *etype = getSpec (dtype);
   sym_link *ftype = IS_FUNCPTR (dtype) ? dtype->next : dtype;
+  int prestackadjust = 0;
+  bool tailjump = false;
 
   D (emit2 ("; genCall", ""));
 
   saveRegsForCall (ic);
 
+  operand *left = IC_LEFT (ic);
+
   /* Return value of big type or returning struct or union. */
-  bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);
+  const bool bigreturn = (getSize (ftype->next) > 4) || IS_STRUCT (ftype->next);
+  const bool SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
+                       (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir))
+                       || IS_TRUE_SYMOP (IC_RESULT (ic));
+
+  aopOp (left, ic);
+  if (SomethingReturned && !bigreturn)
+    aopOp (IC_RESULT (ic), ic);
+
   if (bigreturn)
     {
       wassertl (IC_RESULT (ic), "Unused return value in call to function returning large type.");
@@ -3084,33 +3095,85 @@ genCall (const iCode *ic)
 
       freeAsmop (IC_RESULT (ic));
     }
+  // Check if we can do tail call optimization.
+  else if ((!SomethingReturned || IC_RESULT (ic)->aop->size == 1 && aopInReg (IC_RESULT (ic)->aop, 0, A_IDX) || IC_RESULT (ic)->aop->size == 2 && aopInReg (IC_RESULT (ic)->aop, 0, X_IDX)) &&
+    !ic->parmBytes && !ic->localEscapeAlive)
+    {
+      int limit = 16; // Avoid endless loops in the code putting us into an endless loop here.
+
+      for (const iCode *nic = ic->next; nic && --limit;)
+        {
+          const symbol *targetlabel = 0;
+
+          if (nic->op == LABEL)
+            ;
+          else if (nic->op == GOTO) // We dont have ebbi here, so we cant jsut use eBBWithEntryLabel (ebbi, ic->label). Search manually.
+            targetlabel = IC_LABEL (nic);
+          else if (nic->op == RETURN && (!IC_LEFT (nic) || SomethingReturned && IC_RESULT (ic)->key == IC_LEFT (nic)->key))
+            targetlabel = returnLabel;
+          else if (nic->op == ENDFUNCTION)
+            {
+              if (OP_SYMBOL (IC_LEFT (nic))->stack <= (optimize.codeSize ? 250 : 510))
+                {
+                  prestackadjust = OP_SYMBOL (IC_LEFT (nic))->stack;
+                  tailjump = true;
+                }
+              break;
+            }
+          else
+            break;
+
+          if (targetlabel)
+            {
+              const iCode *nnic = 0;
+              for (nnic = nic->next; nnic; nnic = nnic->next)
+                if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
+                  break;
+              if (!nnic)
+                for (nnic = nic->prev; nnic; nnic = nnic->prev)
+                  if (nnic->op == LABEL && IC_LABEL (nnic)->key == targetlabel->key)
+                    break;
+              if (!nnic)
+                break;
+
+              nic = nnic;
+            }
+          else
+            nic = nic->next;
+        }
+    }  
+
+  const bool jump = tailjump || !ic->parmBytes && !bigreturn && !IS_LITERAL (etype) && IFFUNC_ISNORETURN (OP_SYMBOL (left)->type);
 
   if (ic->op == PCALL)
     {
-      operand *left = IC_LEFT (ic);
-
-      aopOp (left, ic);
-
       if (options.model == MODEL_LARGE && left->aop->type == AOP_DIR)
         {
           wassertl (left->aop->size == 3, "Functions pointers should be 24 bits in large memory model.");
 
-          emit2 ("callf", "[%s]", left->aop->aopu.aop_dir);
-          cost (4, 8);
+          adjustStack (prestackadjust, true, true, true);
+
+          emit2 (jump ? "jpf" : "callf", "[%s]", left->aop->aopu.aop_dir);
+          cost (4, jump ? 6 : 8);
         }
       else if (options.model == MODEL_LARGE)
         {
           wassertl (left->aop->size == 3, "Functions pointers should be 24 bits in large memory model.");
 
+          adjustStack (prestackadjust, left->aop->regs[A_IDX] < 0, left->aop->regs[XL_IDX] < 0 && left->aop->regs[XH_IDX] < 0, left->aop->regs[YL_IDX] < 0 && left->aop->regs[YH_IDX] < 0);
+
           symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
 
-          if (!regalloc_dry_run)
+          if (!jump)
             {
-              emit2("push", "#(!tlabel)", labelKey2num (tlbl->key));
-              emit2("push", "#(!tlabel >> 8)", labelKey2num (tlbl->key));
-              emit2("push", "#(!tlabel >> 16)", labelKey2num (tlbl->key));
-              cost (6, 3);
+              if (!regalloc_dry_run)
+                {
+                  emit2("push", "#(!tlabel)", labelKey2num (tlbl->key));
+                  emit2("push", "#(!tlabel >> 8)", labelKey2num (tlbl->key));
+                  emit2("push", "#(!tlabel >> 16)", labelKey2num (tlbl->key));
+                }
               G.stack.pushed += 3;
+              cost (6, 3);
             }
 
           if (aopInReg (left->aop, 0, X_IDX) || aopInReg (left->aop, 0, Y_IDX))
@@ -3133,9 +3196,10 @@ genCall (const iCode *ic)
           emit2("retf", "");
           cost (1, 5);
 
-          G.stack.pushed -= 6;
+          G.stack.pushed -= 3 * (2 - jump);
 
-          emitLabel (tlbl);
+          if (!jump)
+            emitLabel (tlbl);
         }
       else
         {
@@ -3143,66 +3207,60 @@ genCall (const iCode *ic)
 
           if (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
             {
-              emit2 ("call", "%s", aopGet2 (left->aop, 0));
-              cost (3, 4);
+              adjustStack (prestackadjust, true, true, true);
+
+              emit2 (jump ? "jp" : "call", "%s", aopGet2 (left->aop, 0));
+              cost (3, jump ? 1 : 4);
             }
           else if (aopInReg (left->aop, 0, Y_IDX)) // Faster than going through x.
             {
-              emit2 ("call", "(y)");
-              cost (2, 4);
+              adjustStack (prestackadjust, true, true, false);
+
+              emit2 (jump ? "jp" : "call", "(y)");
+              cost (2,jump ? 1 : 4);
             }
           else
             {
-              genMove (ASMOP_X, left->aop, TRUE, TRUE, TRUE);
+              genMove (ASMOP_X, left->aop, true, true, true);
+
+              adjustStack (prestackadjust, true, false, true);
           
-              emit2 ("call", "(x)");
-              cost (1, 4);
+              emit2 (jump ? "jp" : "call", "(x)");
+              cost (1, jump ? 1 : 4);
             }
         }
-      freeAsmop (left);
     }
   else
     {
+      adjustStack (prestackadjust, true, true, true);
+
       if (options.model == MODEL_LARGE)
         {
           if (IS_LITERAL (etype))
-            {
-              emit2 ("callf", "0x%06X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
-              cost (4, 5);
-            }
+            emit2 (jump ? "jpf" : "callf", "0x%06X", ulFromVal (OP_VALUE (left)));
           else
-            {
-              bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
-              emit2 (jump ? "jpf" : "callf", "%s",
-                (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
-              cost (4, jump ? 2 : 5);
-            }
+            emit2 (jump ? "jpf" : "callf", "%s",
+              (OP_SYMBOL (left)->rname[0] ? OP_SYMBOL (left)->rname : OP_SYMBOL (left)->name));
+          cost (4, jump ? 2 : 5);
         }
       else
         {
           if (IS_LITERAL (etype))
-            {
-              emit2 ("call", "0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
-              cost (3, 4);
-            }
+            emit2 (jump ? "jp" : "call", "0x%04X", ulFromVal (OP_VALUE (left)));
           else
-            {
-              bool jump = (!ic->parmBytes && IFFUNC_ISNORETURN (OP_SYMBOL (IC_LEFT (ic))->type));
-              emit2 (jump ? "jp" : "call", "%s",
-                (OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name));
-              cost (3, jump ? 1 : 4);
-            }
+            emit2 (jump ? "jp" : "call", "%s",
+              (OP_SYMBOL (left)->rname[0] ? OP_SYMBOL (left)->rname : OP_SYMBOL (left)->name));
+          cost (3, jump ? 1 : 4);
         }
     }
 
-  SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
-                       (OP_SYMBOL (IC_RESULT (ic))->nRegs || OP_SYMBOL (IC_RESULT (ic))->spildir))
-                       || IS_TRUE_SYMOP (IC_RESULT (ic));
+  freeAsmop (left);
+  G.stack.pushed += prestackadjust;
 
   if (ic->parmBytes || bigreturn)
     adjustStack (ic->parmBytes + bigreturn * 2, !(SomethingReturned && getSize (ftype->next) == 1), !(SomethingReturned && (getSize (ftype->next) == 2 || getSize (ftype->next) == 4)), !(SomethingReturned && getSize (ftype->next) == 4));
 
-  half = stm8_extend_stack && SomethingReturned && getSize (ftype->next) == 4;
+  const bool half = stm8_extend_stack && SomethingReturned && getSize (ftype->next) == 4;
 
   /* Todo: More efficient handling of long return value for function with extendeds stack when the result value does not use the extended stack. */
 
@@ -3212,7 +3270,6 @@ genCall (const iCode *ic)
       asmop *result;
       int save_a = 0;
 
-      aopOp (IC_RESULT (ic), ic);
       result = IC_RESULT (ic)->aop;
 
       push (ASMOP_Y, 0, 2);
@@ -3252,8 +3309,6 @@ genCall (const iCode *ic)
           wassert (regalloc_dry_run);
           cost (180, 180);
         }
-
-      freeAsmop (IC_RESULT (ic));
     }
   else if (stm8_extend_stack)
     pop (ASMOP_Y, 0, 2);
@@ -3262,8 +3317,6 @@ genCall (const iCode *ic)
   if (SomethingReturned && !bigreturn)
     {
       int size;
-
-      aopOp (IC_RESULT (ic), ic);
 
       size = !half ? IC_RESULT (ic)->aop->size : (IC_RESULT (ic)->aop->size > 2 ? 2 : IC_RESULT (ic)->aop->size);   
 

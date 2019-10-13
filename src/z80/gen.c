@@ -4720,7 +4720,7 @@ static void genSend (const iCode *ic)
 /** Emit the code for a call statement
  */
 static void
-emitCall (const iCode *ic, bool ispcall)
+genCall (const iCode *ic)
 {
   bool SomethingReturned, bigreturn, z88dk_callee;
   sym_link *dtype = operandType (IC_LEFT (ic));
@@ -4742,7 +4742,7 @@ emitCall (const iCode *ic, bool ispcall)
       PAIR_ID pair;
       int fp_offset, sp_offset;
 
-      if (ispcall && IS_GB)
+      if (ic->op == PCALL && IS_GB)
         _push (PAIR_HL);
       aopOp (IC_RESULT (ic), ic, FALSE, FALSE);
       wassert (AOP_TYPE (IC_RESULT (ic)) == AOP_STK || AOP_TYPE (IC_RESULT (ic)) == AOP_EXSTK);
@@ -4750,11 +4750,11 @@ emitCall (const iCode *ic, bool ispcall)
         AOP (IC_RESULT (ic))->aopu.aop_stk + (AOP (IC_RESULT (ic))->aopu.aop_stk >
             0 ? _G.stack.param_offset : 0);
       sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
-      pair = (ispcall && !IS_GB && !IY_RESERVED) ? PAIR_IY : PAIR_HL;
+      pair = (ic->op == PCALL && !IS_GB && !IY_RESERVED) ? PAIR_IY : PAIR_HL;
       emit2 ("ld %s, !immedword", _pairs[pair].name, sp_offset);
       emit2 ("add %s, sp", _pairs[pair].name);
       regalloc_dry_run_cost += (pair == PAIR_IY ? 6 : 4);
-      if (ispcall && IS_GB)
+      if (ic->op == PCALL && IS_GB)
         {
           emit2 ("ld e, l");
           emit2 ("ld d, h");
@@ -4769,7 +4769,7 @@ emitCall (const iCode *ic, bool ispcall)
       freeAsmop (IC_RESULT (ic), NULL);
     }
 
-  if (ispcall)
+  if (ic->op == PCALL)
     {
       if (IFFUNC_ISBANKEDCALL (dtype))
         {
@@ -4906,24 +4906,6 @@ emitCall (const iCode *ic, bool ispcall)
   _G.stack.pushedDE = FALSE;
   _G.stack.pushedBC = FALSE;
   _G.stack.pushedHL = FALSE;
-}
-
-/*-----------------------------------------------------------------*/
-/* genCall - generates a call statement                            */
-/*-----------------------------------------------------------------*/
-static void
-genCall (const iCode * ic)
-{
-  emitCall (ic, FALSE);
-}
-
-/*-----------------------------------------------------------------*/
-/* genPcall - generates a call by pointer statement                */
-/*-----------------------------------------------------------------*/
-static void
-genPcall (const iCode * ic)
-{
-  emitCall (ic, TRUE);
 }
 
 /*-----------------------------------------------------------------*/
@@ -12863,13 +12845,9 @@ genZ80iCode (iCode * ic)
       break;
 
     case CALL:
+    case PCALL:
       emitDebug ("; genCall");
       genCall (ic);
-      break;
-
-    case PCALL:
-      emitDebug ("; genPcall");
-      genPcall (ic);
       break;
 
     case FUNCTION:

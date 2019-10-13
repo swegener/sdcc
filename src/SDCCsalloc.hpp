@@ -143,11 +143,17 @@ static void set_spilt(G_t &G, const I_t &I, SI_t &scon)
   // Set stack live ranges
   for(unsigned int i = 0; i < boost::num_vertices(G); i++)
     {
+      G[i].ic->localEscapeAlive = false;
+
       for(unsigned int j = 0; j < boost::num_vertices(scon); j++)
         {
           short p = btree_lowest_common_ancestor(G[i].ic->block, scon[j].sym->block);
           if(p == G[i].ic->block || p == scon[j].sym->block)
-            G[i].stack_alive.insert(j);
+            {
+              G[i].stack_alive.insert(j);
+              if (scon[j].sym->addrtaken || IS_AGGREGATE(scon[j].sym->type) ) // TODO: More accurate analysis.
+                G[i].ic->localEscapeAlive = true;
+            }
         }
     }
 

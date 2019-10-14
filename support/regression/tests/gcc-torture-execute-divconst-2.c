@@ -23,6 +23,7 @@ r (long x)
   return x % (-0x7fffffffL - 1L);
 }
 
+#if !(defined(__SDCC_pic14) && !defined(__SDCC_PIC14_ENHANCED)) // Pseudo-stack size limit
 /* Since we have a negative divisor, this equation must hold for the
    results of / and %; no specific results are guaranteed.  */
 long
@@ -32,6 +33,7 @@ std_eqn (long num, long denom, long quot, long rem)
      but causes trouble on 32-bit machines and isn't worthwhile.  */
   return quot * (-0x7fffffffL - 1L) + rem == num;
 }
+#endif
 
 long nums[] =
 {
@@ -49,8 +51,10 @@ testTortureExecute (void)
   for (i = 0;
        i < sizeof (nums) / sizeof (nums[0]);
        i++)
+#if !(defined(__SDCC_pic14) && !defined(__SDCC_PIC14_ENHANCED)) // Pseudo-stack size limit
     if (std_eqn (nums[i], -0x7fffffffL - 1L, f (nums[i]), r (nums[i])) == 0)
       ASSERT (0);
+#endif
 #endif
 #endif
   return;

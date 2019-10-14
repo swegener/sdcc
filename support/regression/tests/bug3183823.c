@@ -11,7 +11,7 @@ float neg (float x)
 
 void testNeg (void)
 {
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pic16) && !defined(__SDCC_pdk14) // Lack of memory
 	float x, y;
 	char a, b;
 

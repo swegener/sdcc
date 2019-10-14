@@ -1394,7 +1394,7 @@ int pCodeSearchCondition(pCode *pc, unsigned int cond, int contIfSkip)
 *-----------------------------------------------------------------*/
 static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
 {
-  char b[50], *n2;
+  char b[200], *n2;
 
   if(!pcops || !pcopd)
     return 0;
@@ -1420,7 +1420,7 @@ static int pCodeOpCompare(pCodeOp *pcops, pCodeOp *pcopd)
   }
 
   b[0]=0;
-  get_op(pcops,b,50);
+  get_op(pcops,b,sizeof(b));
 
   n2 = get_op(pcopd,NULL,0);
 

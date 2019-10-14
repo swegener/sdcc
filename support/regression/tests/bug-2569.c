@@ -36,7 +36,7 @@ struct arp_entry {
   u8_t time;
 };
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pic14) // Lack of memory
 static struct arp_entry arp_table[UIP_ARPTAB_SIZE];
 
 static u8_t i;

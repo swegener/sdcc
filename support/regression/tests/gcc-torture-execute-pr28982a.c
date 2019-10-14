@@ -8,8 +8,9 @@
 #pragma std_c99
 #endif
 
+// Lack of memory
 #if defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM) || \
-    (defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) || defined (__SDCC_pdk14) || defined (__SDCC_pdk15)
+    (defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) || defined (__SDCC_pdk14) || defined (__SDCC_pdk15) || defined (__SDCC_pic14)
 #define SKIP
 #endif
 

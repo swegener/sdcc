@@ -24,6 +24,8 @@
 #include "pcodeflow.h"
 #include "ralloc.h"
 
+#define ASSERT(x) assert(x)
+
 /****************************************************************/
 /****************************************************************/
 
@@ -2153,7 +2155,7 @@ void pcode_test(void)
 
 		pBlock *pb;
 		FILE *pFile;
-		char buffer[100];
+		char buffer[200];
 
 		/* create the file name */
                 SNPRINTF(buffer, sizeof(buffer), "%s.p", dstFileName);
@@ -2489,7 +2491,7 @@ pCode *newpCodeAsmDir(const char *asdir, const char *argfmt, ...)
 
   memset(buffer, 0, sizeof(buffer));
   if(argfmt && *argfmt)
-    vsprintf(buffer, argfmt, ap);
+    vsnprintf(buffer, sizeof(buffer), argfmt, ap);
 
   va_end(ap);
 
@@ -3282,7 +3284,7 @@ void pCodeDeleteChain(pCode *f,pCode *t)
 char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 {
 	reg_info *r;
-	static char b[50];
+	static char b[200];
 	char *s;
 	int use_buffer = 1;    // copy the string to the passed buffer pointer
 
@@ -3292,10 +3294,12 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 		use_buffer = 0;     // Don't bother copying the string to the buffer.
 	} 
 
+	ASSERT(pcop);
 	if(pcop) {
 		switch(pcop->type) {
 		case PO_INDF:
 		case PO_FSR:
+			ASSERT(PCOR(pcop)->r && PCOR(pcop)->r->name && 0 == strcmp(pcop->name,PCOR(pcop)->r->name));
 			if(use_buffer) {
 				SNPRINTF(buffer,size,"%s",PCOR(pcop)->r->name);
 				return buffer;
@@ -3303,11 +3307,13 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 			return pcop->name;
 			break;
 		case PO_GPR_TEMP:
+			ASSERT(PCOR(pcop)->r);
 			if (PCOR(pcop)->r->type == REG_STK)
 				r = typeRegWithIdx(PCOR(pcop)->r->rIdx,REG_STK,1);
 			else
 				r = pic14_regWithIdx(PCOR(pcop)->r->rIdx);
 
+			ASSERT(r && r->name);
 			if(use_buffer) {
 				SNPRINTF(buffer,size,"%s",r->name);
 				return buffer;
@@ -3318,6 +3324,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 
 		case PO_IMMEDIATE:
 			s = buffer;
+			ASSERT(pcop->name && PCOI(pcop)->offset >= 0 && PCOI(pcop)->offset <= 2 && PCOI(pcop)->index >= 0);
 			if(PCOI(pcop)->_const) {
 
 				if( PCOI(pcop)->offset >= 0 && PCOI(pcop)->offset<4) {
@@ -3370,6 +3377,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 
 		case PO_DIR:
 			s = buffer;
+			ASSERT(pcop->name && PCOR(pcop)->instance >= 0);
 			if( PCOR(pcop)->instance) {
 				SNPRINTF(s,size,"(%s + %d)",
 					pcop->name,
@@ -3381,6 +3389,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 
 		case PO_LABEL:
 			s = buffer;
+			ASSERT(pcop->name && PCOLAB(pcop)->offset >= 0 && PCOLAB(pcop)->offset <= 1);
 			if  (pcop->name) {
 				if(PCOLAB(pcop)->offset == 1)
 					SNPRINTF(s,size,"HIGH(%s)",pcop->name);
@@ -3391,6 +3400,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 			break;
 
 		case PO_GPR_BIT:
+			ASSERT(PCOR(pcop)->r && PCOR(pcop)->r->name);
 			if(PCOR(pcop)->r) {
 				if(use_buffer) {
 					SNPRINTF(buffer,size,"%s",PCOR(pcop)->r->name);
@@ -3401,6 +3411,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 			/* fall through to the default case */
 
 		default:
+			ASSERT(pcop->name);
 			if(pcop->name) {
 				if(use_buffer) {
 					SNPRINTF(buffer,size,"%s",pcop->name);
@@ -3422,6 +3433,7 @@ char *get_op(pCodeOp *pcop,char *buffer, size_t size)
 /*-----------------------------------------------------------------*/
 static char *get_op_from_instruction( pCodeInstruction *pcc)
 {
+	ASSERT(pcc != NULL);
 	if(pcc)
 		return get_op(pcc->pcop,NULL,0);
 
@@ -3446,6 +3458,7 @@ char *pCode2str(char *str, size_t size, pCode *pc)
 
         case PC_OPCODE:
 
+            ASSERT(PCI(pc)->mnemonic);
             SNPRINTF(s,size, "\t%s\t", PCI(pc)->mnemonic);
             size -= strlen(s);
             s += strlen(s);
@@ -3456,6 +3469,7 @@ char *pCode2str(char *str, size_t size, pCode *pc)
                         char *name = PCI(pc)->pcop->name;
                         if (!name)
                             name = PCOR(PCI(pc)->pcop)->r->name;
+                        ASSERT(name);
                         if( (((pCodeOpRegBit *)(PCI(pc)->pcop))->inBitSpace) )
                             SNPRINTF(s,size,"(%s >> 3), (%s & 7)", name, name);
                         else
@@ -4533,7 +4547,7 @@ static void addpCodeComment(pCode *pc, const char *fmt, ...)
     if (options.verbose || debug_verbose) {
 	buffer[0] = ';';
 	buffer[1] = ' ';
-	vsprintf(&buffer[2], fmt, ap);
+	vsnprintf(&buffer[2], sizeof(buffer)-2, fmt, ap);
 
 	newpc = newpCodeCharP(&buffer[0]); // strdup's the string
 	pCodeInsertAfter(pc, newpc);

@@ -4,6 +4,8 @@
 // regression testing program for comparing literals to variables
 //
 
+#pragma disable_warning 94     // comparison is always true/false due to limited range of data type
+#pragma disable_warning 126    // unreachable code
 
 unsigned char failures = 0;
 

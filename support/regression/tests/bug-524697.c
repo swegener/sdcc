@@ -8,7 +8,7 @@
 #define SZ_SIZE 90
 #endif
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pic14) // Lack of memory
 typedef struct _Foo
 {
   char sz[SZ_SIZE];
@@ -28,7 +28,7 @@ char *getOffset(Foo *pFoo, Bar *pBar)
 void
 testOffset(void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pic14) // Lack of memory
   Foo foo = {
     "Foo"
   };

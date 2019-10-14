@@ -1,6 +1,8 @@
 #include "gpsim_assert.h"
 // Shift ints left and right
 
+#pragma disable_warning 158    // overflow in implicit constant conversion
+
 unsigned char failures=0;
 
 signed int aint0 = 0;

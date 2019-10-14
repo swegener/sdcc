@@ -1,6 +1,8 @@
 /** setjmp/longjmp tests.
 */
 #include <testfwk.h>
+
+#if !defined(__SDCC_pic14) // Unimplemented setjmp
 #include <setjmp.h>
 
 unsigned int global_int = 0;
@@ -16,12 +18,6 @@ T2_isr (void) __interrupt 5 //no using
   (*gpInt)++;
 }
 #endif
-
-#if defined(__SDCC_pic14)
-#define SKIP
-#endif
-
-#ifndef SKIP
 
 void
 try_fun (jmp_buf catch, int except)
@@ -49,14 +45,12 @@ void f1(void)
 		g();
 }
 
-#else
-#warning Skipped setjmp/longjmp test
 #endif
 
 void
 testJmp (void)
 {
-#ifndef SKIP
+#if !defined(__SDCC_pic14) // Unimplemented setjmp
   jmp_buf catch;
   int exception;
 

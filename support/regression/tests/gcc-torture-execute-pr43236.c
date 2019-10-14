@@ -13,7 +13,7 @@
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pic14) // Lack of memory
   char A[30], B[30], C[30];
   int i;
 

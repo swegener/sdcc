@@ -47,7 +47,7 @@ foo (const char **w, char *x, _Bool y, _Bool z)
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pic14) // Lack of memory
   char buf[64];
   const char *p;
   p = "abcde'fgh";

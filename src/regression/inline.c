@@ -35,21 +35,12 @@ void main(void)
 {
   TRISA = 0x0f;
 
-#if defined(__pic14)
-  __asm
-    BSF   STATUS,RP0
-    MOVF  TRISA,W
-    BCF   STATUS,RP0
-    MOVWF _test_tris
-  __endasm;
-#else   // !defined(__pic14)
   __asm
     BANKSEL _TRISA
     MOVF    _TRISA,W
     BANKSEL _test_tris
     MOVWF   _test_tris
   __endasm;
-#endif  // !defined(__pic14)
 
   if(test_tris != 0x0f)
     failures++;

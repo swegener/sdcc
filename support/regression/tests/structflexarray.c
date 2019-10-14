@@ -28,7 +28,7 @@ testFlexibleArray1(void)
   /* test sizeof */
   ASSERT(sizeof(s11) == 1);
   /* test allocation size */
-#if !defined(PORT_HOST)
+#if !defined(PORT_HOST) && !defined(__SDCC_pic14) // Linker changes data order
    ASSERT((char *) &s12 - (char *) &s11 == 1 + 4);
 #endif
 #endif
@@ -59,7 +59,7 @@ testFlexibleArray2(void)
   /* test sizeof */
   ASSERT(sizeof(s21) == 2);
   /* test allocation size */
-#if !defined(PORT_HOST)
+#if !defined(PORT_HOST) && !defined(__SDCC_pic14) // Linker changes data order
    ASSERT((char *) &s22 - (char *) &s21 == 2 + 5);
 #endif
 #endif

@@ -1,5 +1,8 @@
 #include "gpsim_assert.h"
 
+#pragma disable_warning 110    // conditional flow changed by optimizer: so said EVELYN the modified DOG
+#pragma disable_warning 126    // unreachable code
+
 unsigned char failures=0;
 
 unsigned int uint0 = 0;
@@ -34,7 +37,7 @@ void for2(void)
   for(i=0; i<10; i++)
     uchar0++;
 
-  j = (volatile)i;
+  j = (volatile unsigned char)i;
 
   if(j != 10)
     failures++;

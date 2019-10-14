@@ -20,7 +20,8 @@ testStack(void)
 {
   volatile char above;
   volatile char above2;
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14)
+/* pic14: Bank size limit */
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pic14)
   volatile char ac[{size}];
 #else
   volatile char ac[{size} - 100];

@@ -18,6 +18,10 @@ typedef struct
   unsigned LATC7                : 1;
   } LATCbits_t;
 
+#if defined(__SDCC_pic14) // pic14: LATCbits may actually exist in the device
+#  define LATCbits fake_LATCbits
+#endif
+
 volatile LATCbits_t LATCbits;
 
 unsigned short mask;

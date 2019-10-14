@@ -28,7 +28,7 @@ enum CORE_STATE core_state_transition(uint8_t **instr , uint32_t *transition_cou
 	return 0;
 }
 
-#ifndef __SDCC_pdk14 // Lack of memory
+#if !defined(__SDCC_pdk14) && !defined(__SDCC_pic14) // Lack of memory
 void core_bench_state(uint32_t blksize, uint8_t *memblock, 
 		int16_t seed1, int16_t step) 
 {

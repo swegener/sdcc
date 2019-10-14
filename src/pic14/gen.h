@@ -160,6 +160,7 @@ void pic14_outAcc(operand *result);
 void aopOp (operand *op, iCode *ic, bool result);
 void freeAsmop (operand *op, asmop *aaop, iCode *ic, bool pop);
 void mov2w (asmop *aop, int offset);
+void mov2w_op (operand * op, int offset);
 int op_isLitLike (operand *op);
 
 /*

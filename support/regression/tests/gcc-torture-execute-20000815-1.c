@@ -9,7 +9,7 @@
 #pragma disable_warning 85
 #endif
 
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pic14) // Lack of memory
 #include <string.h>
 
 struct table_elt
@@ -68,7 +68,7 @@ void remove_from_table(struct table_elt *x, int y) { ASSERT (0); }
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) // Lack of memory
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_pdk14) && !defined(__SDCC_pic14) // Lack of memory
   struct write_data writes;
   struct table_elt elt;
 

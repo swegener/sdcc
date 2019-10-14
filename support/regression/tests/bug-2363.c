@@ -12,7 +12,7 @@ typedef	struct Durak_Card { signed char suit, rank; } Durak_Card;
 
 typedef Durak_Card Durak_Cards[37];
 
-#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Not enough memory
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) // Not enough memory
 static Durak_Cards Durak_hand[2];
 static Durak_Card Durak_desk[13];
 static signed char Durak_deskN, Durak_trump, Durak_badSuit;

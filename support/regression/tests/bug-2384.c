@@ -14,9 +14,11 @@ void testBug (void)
 {
 #if defined (__SDCC)
   const char *pa = a, *pb = b, *pc = c;
+#if !defined(__SDCC_pic14) // Linker changes data order
   ASSERT (pa[4] == '5');
   ASSERT (pb[-1] == '4');
   ASSERT (pb[4] == 'a');
   ASSERT (pc[-1] == '8');
+#endif
 #endif
 }

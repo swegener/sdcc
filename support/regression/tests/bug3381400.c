@@ -25,7 +25,12 @@ void ReadFlashData(USHORT sDstAddr, USHORT sSrcAddr, USHORT sLen, UCHAR iPage);
 
 UCHAR Sys_iSystemPage;
 
+
+#if defined(__SDCC_pic14) // Bank size limit
+#define DSP_INFO_LEN	0x20
+#else
 #define DSP_INFO_LEN	0x40
+#endif
 #define DM_START_POS	0x0e
 
 #define PAGE_EDGE	(FILE_FLAG_PAGE_SIZE >> 1)

@@ -4,6 +4,8 @@
 // regression testing program for comparing signed chars and ints
 //
 
+#pragma disable_warning 158    // overflow in implicit constant conversion
+
 //#define  COMPARE_OUT_OF_RANGE 1
 
 unsigned char failures = 0;

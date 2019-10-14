@@ -22,7 +22,11 @@ testTortureExecute (void)
 {
   short i;
   for (i = 6; i >= 0; i--)
+#if defined(__SDCC_pic14) // FIXME: maybe a bug in sdcc
+    foo (i);
+#else
     foo ((void *) (long) i);
+#endif
   return;
 }
 

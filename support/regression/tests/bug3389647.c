@@ -29,6 +29,10 @@ void testBug(void)
     unsigned char* DATAPTR4 = (         unsigned char*)&HIDREPORTDESC;
 
     ASSERT(DATAPTR1 == DATAPTR2);
+/* FIXME: maybe a bug in gpsim */
+#define MEMORY_{memory} 1
+#if !(defined(__SDCC_pic14) && defined(__SDCC_PIC14_ENHANCED) && defined(MEMORY___code))
     ASSERT(DATAPTR2 == DATAPTR3);
+#endif
     ASSERT(DATAPTR3 == DATAPTR4);
 }

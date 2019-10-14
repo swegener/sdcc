@@ -67,6 +67,7 @@ extern char *__ultostr(unsigned long value, int __radix)
 	return ("");
 }
 
+#if !defined(__SDCC_pic14) // Pseudo-stack size limit
 /*
  * Output the given field in the manner specified by the arguments. Return
  * the number of characters output.
@@ -261,6 +262,7 @@ int _vfnprintf(FILE * op, size_t maxlen, const char *fmt, va_list ap)
 		op->bufwrite = op->bufstart;
 	return (cnt);
 }
+#endif
 #endif
 
 void testBug(void)

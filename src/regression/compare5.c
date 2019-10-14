@@ -4,6 +4,9 @@
 // regression testing program for comparing longs
 //
 
+#pragma disable_warning 94     // comparison is always true/false due to limited range of data type
+#pragma disable_warning 126    // unreachable code
+
 #define  COMPARE_OUT_OF_RANGE 1
 
 unsigned char failures = 0;

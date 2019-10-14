@@ -8,6 +8,7 @@
 #pragma std_c99
 #endif
 
+#if !defined(__SDCC_pic14) // Unimplemented setjmp
 #include <setjmp.h>
 
 /* PR tree-optimization/60003 */
@@ -48,11 +49,14 @@ foo (int x)
 	return x;
     }
 }
+#endif
 
 void
 testTortureExecute (void)
 {
+#if !defined(__SDCC_pic14) // Unimplemented setjmp
   if (foo (1) == 0)
     ASSERT (0);
+#endif
 }
 

@@ -1532,13 +1532,13 @@ gatherAutoInit (symbol * autoChain)
         resolveIvalSym (sym->ival, sym->type);
 
 #if 1
-      /* if we are PIC16 port,
+      /* if we are PIC14 or PIC16 port,
        * and this is a static,
        * and have initial value,
        * and not S_CODE, don't emit in gs segment,
        * but allow glue.c:pic16emitRegularMap to put symbol
        * in idata section */
-      if (TARGET_IS_PIC16 && IS_STATIC (sym->etype) && sym->ival && SPEC_SCLS (sym->etype) != S_CODE)
+      if (TARGET_PIC_LIKE && IS_STATIC (sym->etype) && sym->ival && SPEC_SCLS (sym->etype) != S_CODE)
         {
           SPEC_SCLS (sym->etype) = S_DATA;
           continue;

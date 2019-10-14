@@ -113,7 +113,7 @@ debugLog (const char *fmt,...)
         }
 
         va_start (ap, fmt);
-        vsprintf (buffer, fmt, ap);
+        vsnprintf (buffer, sizeof(buffer), fmt, ap);
         va_end (ap);
 
         fprintf (debugF, "%s", buffer);
@@ -752,7 +752,8 @@ allocRegByName (const char *name, int size)
         reg_info *reg;
 
         if(!name) {
-                fprintf(stderr, "%s - allocating a NULL register\n",__FUNCTION__);
+                //fprintf(stderr, "%s - allocating a NULL register\n",__FUNCTION__);
+                werror (E_INTERNAL_ERROR, __FILE__, __LINE__, "trying to allocate a register with NULL name");
                 exit(1);
         }
 
@@ -852,7 +853,8 @@ typeRegWithIdx (int idx, int type, int fixed)
                 else {
                   werror (E_STACK_OUT, "Register");
                   /* return an existing register just to avoid the SDCC crash */
-                  return regWithIdx ( dynStackRegs, 0x7f, 0);
+                  //return regWithIdx ( dynStackRegs, 0x7f, 0);
+                  exit (1);
                 }
                 break;
         case REG_SFR:
@@ -1836,7 +1838,6 @@ deassignLRs (iCode * ic, eBBlock * ebp)
                                 result->liveTo <= ebp->lSeq &&  /* does not go beyond this block */
                                 result->liveFrom == ic->seq &&    /* does not start before here */
                                 result->regType == sym->regType &&      /* same register types */
-                                result->regType == sym->regType &&      /* same register types */
                                 result->nRegs &&        /* which needs registers */
                                 !result->isspilt &&     /* and does not already have them */
                                 !result->remat &&
@@ -2335,7 +2336,7 @@ createRegMask (eBBlock ** ebbs, int count)
                                 {
                                         werror (E_INTERNAL_ERROR, __FILE__, __LINE__,
                                                 "createRegMask cannot find live range");
-                                        exit (0);
+                                        exit (1);
                                 }
 
                                 /* if no register assigned to it */
@@ -2440,11 +2441,12 @@ regTypeNum (void)
                                 getSize (sym->type = aggrToPtr (sym->type, FALSE)) :
                         getSize (sym->type));
 
-
+#if 0
                         if(IS_PTR_CONST (sym->type)) {
                                 debugLog ("  %d const pointer type requires %d registers, changing to 2\n",__LINE__,sym->nRegs);
                                 sym->nRegs = 2;
                         }
+#endif
 
                         if (sym->nRegs > 4) {
                                 fprintf (stderr, "allocated more than 4 or 0 registers for type ");
@@ -2601,7 +2603,7 @@ packRegsForAssign (iCode * ic, eBBlock * ebp)
                 debugLog ("  %d - not packing - right is not temp\n", __LINE__);
 
                 /* only pack if this is not a function pointer */
-                if (!IS_REF (IC_RIGHT (ic)))
+                if (IS_SYMOP(IC_RIGHT(ic)) && !IS_REF (IC_RIGHT (ic)))
                         allocDirReg(IC_RIGHT (ic));
                 return FALSE;
         }
@@ -2731,9 +2733,9 @@ pack:
         one */
         for (sic = dic; sic != ic; sic = sic->next)
         {
-                bitVectUnSetBit (sic->rlive, IC_RESULT (ic)->key);
+                bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
                 if (IS_ITEMP (IC_RESULT (dic)))
-                        bitVectSetBit (sic->rlive, IC_RESULT (dic)->key);
+                        sic->rlive = bitVectSetBit (sic->rlive, IC_RESULT (dic)->key);
         }
         /* replace the result with the result of */
         /* this assignment and remove this assignment */
@@ -2778,7 +2780,14 @@ findAssignToSym (operand * op, iCode * ic)
                         /* if assigned to a non-symbol then return
                         true */
                         if (!IS_SYMOP (IC_RIGHT (dic)))
-                                break;
+                                return NULL;
+
+  /* if the symbol is volatile then we should not */
+  if (isOperandVolatile (IC_RIGHT (dic), TRUE))
+    return NULL;
+  /* XXX TODO --- should we be passing FALSE to isOperandVolatile()?
+     What does it mean for an iTemp to be volatile, anyway? Passing
+     TRUE is more cautious but may prevent possible optimizations */
 
                                 /* if the symbol is in far space then
                         we should not */
@@ -2829,6 +2838,46 @@ findAssignToSym (operand * op, iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* reassignAliasedSym - used by packRegsForSupport to replace      */
+/*                      redundant iTemp with equivalent symbol     */
+/*-----------------------------------------------------------------*/
+static void
+reassignAliasedSym (eBBlock * ebp, iCode * assignment, iCode * use, operand * op)
+{
+  iCode *ic;
+  unsigned oldSymKey, newSymKey;
+
+  oldSymKey = op->key;
+  newSymKey = IC_RIGHT (assignment)->key;
+
+  /* only track live ranges of compiler-generated temporaries */
+  if (!IS_ITEMP (IC_RIGHT (assignment)))
+    newSymKey = 0;
+
+  /* update the live-value bitmaps */
+  for (ic = assignment; ic != use; ic = ic->next)
+    {
+      bitVectUnSetBit (ic->rlive, oldSymKey);
+      if (newSymKey != 0)
+        ic->rlive = bitVectSetBit (ic->rlive, newSymKey);
+    }
+
+  /* update the sym of the used operand */
+  OP_SYMBOL (op) = OP_SYMBOL (IC_RIGHT (assignment));
+  op->key = OP_SYMBOL (op)->key;
+  OP_SYMBOL (op)->accuse = 0;
+
+  /* update the sym's liverange */
+  if (OP_LIVETO (op) < ic->seq)
+    setToRange (op, ic->seq, FALSE);
+
+  /* remove the assignment iCode now that its result is unused */
+  remiCodeFromeBBlock (ebp, assignment);
+  bitVectUnSetBit (OP_SYMBOL (IC_RESULT (assignment))->defs, assignment->key);
+  hTabDeleteItem (&iCodehTab, assignment->key, assignment, DELETE_ITEM, NULL);
+}
+
+/*-----------------------------------------------------------------*/
 /* packRegsForSupport :- reduce some registers for support calls   */
 /*-----------------------------------------------------------------*/
 static int
@@ -2844,23 +2893,14 @@ packRegsForSupport (iCode * ic, eBBlock * ebp)
                 OP_SYMBOL (IC_LEFT (ic))->liveTo <= ic->seq)
         {
                 iCode *dic = findAssignToSym (IC_LEFT (ic), ic);
-                iCode *sic;
 
                 if (!dic)
                         goto right;
 
                 debugAopGet ("removing left:", IC_LEFT (ic));
 
-                /* found it we need to remove it from the
-                block */
-                for (sic = dic; sic != ic; sic = sic->next)
-                        bitVectUnSetBit (sic->rlive, IC_LEFT (ic)->key);
-
-                OP_SYMBOL (IC_LEFT (ic)) = OP_SYMBOL (IC_RIGHT (dic));
-                IC_LEFT (ic)->key = OP_KEY (IC_RIGHT (dic));
-                remiCodeFromeBBlock (ebp, dic);
-                bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-                hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+                /* found it we need to remove it from the block */
+                reassignAliasedSym (ebp, dic, ic, IC_LEFT (ic));
                 change++;
         }
 
@@ -2871,7 +2911,6 @@ right:
                 OP_SYMBOL (IC_RIGHT (ic))->liveTo <= ic->seq)
         {
                 iCode *dic = findAssignToSym (IC_RIGHT (ic), ic);
-                iCode *sic;
 
                 if (!dic)
                         return change;
@@ -2887,17 +2926,8 @@ right:
 
                 debugAopGet ("removing right:", IC_RIGHT (ic));
 
-                /* found it we need to remove it from the
-                block */
-                for (sic = dic; sic != ic; sic = sic->next)
-                        bitVectUnSetBit (sic->rlive, IC_RIGHT (ic)->key);
-
-                OP_SYMBOL (IC_RIGHT (ic)) = OP_SYMBOL (IC_RIGHT (dic));
-                IC_RIGHT (ic)->key = OP_KEY (IC_RIGHT (dic));
-
-                remiCodeFromeBBlock (ebp, dic);
-                bitVectUnSetBit(OP_SYMBOL(IC_RESULT(dic))->defs,dic->key);
-                hTabDeleteItem (&iCodehTab, dic->key, dic, DELETE_ITEM, NULL);
+                /* found it we need to remove it from the block */
+                reassignAliasedSym (ebp, dic, ic, IC_RIGHT (ic));
                 change++;
         }
 
@@ -3595,6 +3625,7 @@ packRegisters (eBBlock * ebp)
                         ic->op == '^') &&
                         isBitwiseOptimizable (ic))) &&
                         ic->next && ic->next->op == IFX &&
+                        bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1 &&
                         isOperandEqual (IC_RESULT (ic), IC_COND (ic->next)) &&
                         OP_SYMBOL (IC_RESULT (ic))->liveTo <= ic->next->seq)
                 {

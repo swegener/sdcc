@@ -1,4 +1,8 @@
-2019-09-13 Philipp Klaus Krause <pkk AT spth.de>
+2019-10-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Merge pic14 branch.
+
+2019-10-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCicode.h,
 	  src/SDCCicode.c,
@@ -8,14 +12,19 @@
 	  src/pdk/gen.c:
 	  Improve tail call optimization.
 
-2019-09-11 Philipp Klaus Krause <pkk AT spth.de>
+2019-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.h:
 	  Fix error message, patch #307 by RvS.
 	* src/SDCCsymt.c:
 	  Indentation fix.
 
-2019-09-06 Philipp Klaus Krause <pkk AT spth.de>
+2019-10-07 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pic14/glue.c:
+	  Improve compability with trunk, patches by Gonzalo Pérez de Olaguer Córdoba.
+
+2019-10-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/aspdk15/pdk15pst.c:
 	  Fix swapc bug #2935.
@@ -324,10 +333,27 @@
 	* src/z80/gen.c:
 	  Small improvements in handling of wide values.
 
+2019-07-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2363.c:
+	  Disabled a test that won't work on pic14 due to lack of memory.
+
 2019-07-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Improve aop moves (in particular wrt. 16-bit ld).
+
+2019-07-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/ctype.h,
+	  device/include/pic14/stdlib.h,
+	  support/regression/fwk/include/testfwk.h:
+	  Minor improvements towards pic14 regression testing suggested by Gonzalo Pérez de Olaguer Córdoba.
+
+2019-07-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdcc/device/lib/pic14/libsdcc/idata.c:
+	  Fix missing extern declaration of main.
 
 2019-07-11 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -342,6 +368,13 @@
 	  src/pdk/main.c,
 	  src/pdk/gen.c:
 	  Remove cneqsn for pdk13 fixing bug #2923.
+
+2019-07-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pic14/gen.c:
+	  Fixes for bit-fields, from patches by Gonzalo Pérez de Olaguer Córdoba.
+	* src/pic14/glue.c:
+	  Fixes from patches by Gonzalo Pérez de Olaguer Córdoba.
 
 2019-06-30 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -388,6 +421,20 @@
 	* configure.ac,
 	  configure:
 	  Disable pdk16 port by default.
+
+2019-06-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/*.c:
+	  Disable some tests for pic14 that won't work anytime soon.
+	  Partially picked from patch by Gonzalo Pérez de Olaguer Córdoba.
+	* src/SDCCast.c,
+	  src/pic14/gen.c,
+	  src/pic14/gen.h,
+	  src/pic14/genarith.c,
+	  src/pic14/pcode.c,
+	  src/pic14/pcodepeep.c,
+	  src/pic14/ralloc.c:
+	  Fixes from patch by Gonzalo Pérez de Olaguer Córdoba.
 
 2019-06-22 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -454,6 +501,11 @@
 	* src/z80/gen.c,
 	  support/regression/tests/bug-2912.c:
 	  Fix bug #2912.
+
+2019-06-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/regression/*:
+	  Update pic-specific rudimentary regression test framework.
 
 2019-06-12 Philipp Klaus Krause <pkk AT spth.de>
 

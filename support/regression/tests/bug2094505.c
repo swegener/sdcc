@@ -7,7 +7,7 @@
 void
 testBug(void)
 {
-#if !defined(__SDCC_mcs51) && !(defined(__SDCC_MODEL_LARGE) && !defined(__SDCC_STACK_AUTO)) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if !defined(__SDCC_mcs51) && !(defined(__SDCC_MODEL_LARGE) && !defined(__SDCC_STACK_AUTO)) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) // Lack of memory
     // varA has to be declared for the bug to manifest itself
     volatile char varA[256] = {0};
     volatile unsigned int varB = 0x1;

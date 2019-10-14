@@ -1,5 +1,5 @@
 #include "gpsim_assert.h"
-#include "picregs.h"
+
 // Signed comparisons of the form:  (variable>LIT)
 //
 // This regression test exercises all of the boundary
@@ -7,6 +7,10 @@
 // are numerous opportunities to optimize these comparison
 // and each one has an astonishing capability of failing
 // a boundary condition.
+
+#pragma disable_warning 94     // comparison is always true/false due to limited range of data type
+#pragma disable_warning 126    // unreachable code
+#pragma disable_warning 158    // overflow in implicit constant conversion
 
 unsigned char failures = 0;
 unsigned char result = 0;
@@ -25,10 +29,6 @@ char long1 = 0;
  * ~ 10,000,000 instruction cycles. (2.5 seconds on a 20Mhz PIC).
  * The WDT will reset the CPU if it's enabled. So disable it...
 */
-
-typedef unsigned int word;
-
-//word at 0x2007  CONFIG = wdt_off & pwrte_on;
 
 void
 done()
@@ -103,17 +103,19 @@ void char_compare(void)
   char0 = 0x80;
   c_char_gt_lit1(0x00);
 
+  __asm clrwdt __endasm;
 
   /* Now test entire range */
 
   for(char0=2; char0 != 0x7f; char0++)
     c_char_gt_lit1(0x0f);
 
+  __asm clrwdt __endasm;
 
   for(char0=-0x7e; char0 != -1; char0++)
     c_char_gt_lit1(0x01);
 
-
+  __asm clrwdt __endasm;
 }
 
 
@@ -196,17 +198,24 @@ void int_compare1(void)
   int0 = 0x7f00;
   c_int_gt_lit1(0xff);
 
+  __asm clrwdt __endasm;
+
   /* now check contiguous ranges */
 
   for(int0 = -0x7fff; int0 != -1; int0++)
     c_int_gt_lit1(0x00);
 
+  __asm clrwdt __endasm;
+
   for(int0 = 2; int0 != 0xff; int0++)
     c_int_gt_lit1(0x03);
+
+  __asm clrwdt __endasm;
 
   for(int0 = 0x202; int0 != 0x7fff; int0++)
     c_int_gt_lit1(0xff);
 
+  __asm clrwdt __endasm;
 }
 
 
@@ -292,17 +301,24 @@ void int_compare2(void)
   int0 = 0x7fff;
   c_int_gt_lit2(0xff);
 
+  __asm clrwdt __endasm;
+
   /* now check contiguous ranges */
 
   for(int0 = -0x7ffe; int0 != -0x7f01; int0++)
     c_int_gt_lit2(0x01);
 
+  __asm clrwdt __endasm;
+
   for(int0 = -0x7dff; int0 != -0x101; int0++)
     c_int_gt_lit2(0x0f);
+
+  __asm clrwdt __endasm;
 
   for(int0 = 0; int0 != 0x7fff; int0++)
     c_int_gt_lit2(0xff);
 
+  __asm clrwdt __endasm;
 }
 
 
@@ -312,11 +328,8 @@ void
 main (void)
 {
   char_compare();
-  __asm clrwdt __endasm;
   int_compare1();
-  __asm clrwdt __endasm;
   int_compare2();
-  __asm clrwdt __endasm;
 
   done ();
 }

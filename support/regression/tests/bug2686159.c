@@ -7,7 +7,7 @@
 #ifdef __SDCC_pic16
 # define ADDRESS(x) (0x02 ## x)
 #elif defined(__SDCC_pic14)
-# define ADDRESS(x) (0x01 ## x)
+# define ADDRESS(x) (0x01A0 + 0x ## x)
 #elif defined(__SDCC_stm8)
 # define ADDRESS(x) (0x10 ## x)
 #else

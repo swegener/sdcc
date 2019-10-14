@@ -6,7 +6,7 @@
 #include <testfwk.h>
 
 #if defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM) || \
-    (defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) || defined(__SDCC_pdk15)
+    (defined(__SDCC_mcs51) && defined(__SDCC_STACK_AUTO)) || defined(__SDCC_pdk15) || defined(__SDCC_pic14)
 #define N	32
 #else
 #define N	128

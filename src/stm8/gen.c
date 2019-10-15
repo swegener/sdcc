@@ -3142,7 +3142,7 @@ genCall (const iCode *ic)
         }
     }
 
-  const bool jump = tailjump || !ic->parmBytes && !bigreturn && IFFUNC_ISNORETURN (OP_SYMBOL (left)->type);
+  const bool jump = tailjump || !ic->parmBytes && !bigreturn && IFFUNC_ISNORETURN (ftype);
 
   if (ic->op == PCALL)
     {

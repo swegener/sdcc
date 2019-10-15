@@ -1,3 +1,8 @@
+2019-10-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Fix code generation for calls via function pointers.
+
 2019-10-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Merge pic14 branch.

@@ -2387,12 +2387,18 @@ genCmp (const iCode *ic, iCode *ifx)
           emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.5f);
           goto release;
         }
-      else if (ic->op == '<' && aopInReg (left->aop, 0, A_IDX) && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR) && (IC_TRUE (ifx) || !regDead (A_IDX, ic)))
+      else if (ic->op == '<' && aopInReg (left->aop, 0, A_IDX) && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || aopInReg (right->aop, 0, P_IDX)) && (IC_TRUE (ifx) || !regDead (A_IDX, ic)))
         {
           if (IC_FALSE (ifx))
             {
               emit2 ("ceqsn", "a, %s", aopGet (right->aop, 0));
               emit2 ("t1sn", "f, c");
+              cost (2, 2.5);
+            }
+          else if ((TARGET_IS_PDK15 || TARGET_IS_PDK16) && (right->aop->type == AOP_DIR || aopInReg (right->aop, 0, P_IDX)))
+            {
+              emit2 ("comp", "a, %s", aopGet (right->aop, 0));
+              emit2 ("t0sn", "f, c");
               cost (2, 2.5);
             }
           else
@@ -2496,6 +2502,13 @@ genCmp (const iCode *ic, iCode *ifx)
               else
                 popP (false);
             }
+        }
+      else if (!started && (!sign && ifx || i + 1 < size) &&
+        (TARGET_ID_PDK15 || TARGET_IS_PDK16) &&
+        aopInReg (right->aop, i, A_IDX) && (left->aop->type == AOP_IMMD || aopInReg (left->aop, i, P_IDX)))
+        {
+          emit2 ("comp", "%s, a", aopGet (left->aop, i));
+          cost (1, 1);
         }
       else
         {
@@ -4652,13 +4665,19 @@ genDummyRead (const iCode *ic)
 
   aopOp (op, ic);
 
-  if (!regDead(A_IDX, ic) && op->aop->type == AOP_DIR && op->aop->size <= 2)
-    for (int i = 0; i < op->aop->size; i++)
-      {
-         emit2 ("ceqsn", "a, %s", aopGet (op->aop, i));
-         emit2 ("nop", "");
-         cost (2, 2);
-      }
+  if (!regDead(A_IDX, ic) && op->aop->type == AOP_DIR && (op->aop->size <= 2 || TARGET_IS_PDK15 || TARGET_IS_PDK16))
+    for (int i = 0; i < op->aop->size; i++)  
+      if (TARGET_IS_PDK15 || TARGET_IS_PDK16)
+        {
+          emit2 ("comp", "a, %s", aopGet (op->aop, i));
+          cost (1, 1);
+        }
+      else
+        {
+          emit2 ("ceqsn", "a, %s", aopGet (op->aop, i));
+          emit2 ("nop", "");
+          cost (2, 2);
+        }
   else
     {
       if (!regDead(A_IDX, ic))

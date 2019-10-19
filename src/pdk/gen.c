@@ -2508,7 +2508,7 @@ genCmp (const iCode *ic, iCode *ifx)
             }
         }
       else if (!started && (!sign && ifx || i + 1 < size) &&
-        (TARGET_ID_PDK15 || TARGET_IS_PDK16) &&
+        (TARGET_IS_PDK15 || TARGET_IS_PDK16) &&
         aopInReg (right->aop, i, A_IDX) && (left->aop->type == AOP_IMMD || aopInReg (left->aop, i, P_IDX)))
         {
           emit2 ("comp", "%s, a", aopGet (left->aop, i));

@@ -2,6 +2,8 @@
 
 	* device/lib/pdk15-stack-auto/__setjmp.s:
 	  Fix bug #2934.
+	* src/pdk/gen.c:
+	  Fix 3 issues in handling of non-dead p.
 
 2019-10-16 Philipp Klaus Krause <pkk AT spth.de>
 

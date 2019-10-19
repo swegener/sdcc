@@ -26,17 +26,10 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-        .area DATA
-___setjmp_PARM_1::
-        .ds 2
-_longjmp_PARM_1::
-	.ds 2
-_longjmp_PARM_2::
-	.ds 2
-
 	.area   CODE
 
 ___setjmp::
+	; Get return address
 	mov	a, sp
 	add	a, #-1
 	mov	p, a
@@ -44,47 +37,97 @@ ___setjmp::
 	push	af
 	dec	p
 	idxm	a, p
+	push	af
 
-	xch	a, p
-	mov	a, ___setjmp_PARM_1+0
-	xch	a, p
+	; Get Parameter (buffer)
+	dec	p
+	dec	p
+	idxm	a, p
+	mov	p, a
 
+	; Store return address to buffer
+	pop	af
 	idxm	p, a
 	inc	p
 	pop	af
 	idxm	p, a
 
+	; Store stack pointer to buffer
 	inc	p
 	mov	a, sp
 	idxm	p, a
+
+	; Return 0
 	clear	p
 	ret	#0
 
 _longjmp::
-	mov	a, _longjmp_PARM_1+0
-	add	a, #2
+	; Push return value onto top of old stack (adding padding bytes)
+	mov	a, sp
+	add	a, #-6
 	mov	p, a
-	idxm	a, p
-	add	a, #-2
-	mov	sp, a
-
-	dec	p
-	dec	p
 	idxm	a, p
 	push	af
 	inc	p
 	idxm	a, p
+	push	af
 
-	xch	a, p
-	mov	a, sp
-	add	a, #-1
-	xch	a, p
+	; Get pointer to buffer
+	inc	p
+	idxm	a, p
+	mov	p, a
+
+	; Push return address onto top of old stack (adding padding bytes)
+	idxm	a, p
+	push	af
+	inc	p
+	idxm	a, p
+	push	af
+
+	; Get new stack pointer
+	inc	p
+	idxm	a, p
+	mov	p, a
+
+	; Store return address to new stack
+	pop	af
+	dec	p
+	idxm	p, a
+	pop	af
+	dec	p
 	idxm	p, a
 
-	mov	a, _longjmp_PARM_2+1
-	mov	p, a
-	mov	a, _longjmp_PARM_2+0
+	; Store return value to new stack
+	pop	af
+	inc	p
+	inc	p
+	idxm	p, a
+	pop	af
+	inc	p
+	idxm	p, a
 
+	; Switch to new stack
+	inc	p
+	mov	a, p
+	mov	sp, a
+
+	; Get return value from stack
+	mov	p, a
+	dec	p
+	idxm	a, p
+	push	af
+	inc	p
+	inc	p
+	idxm	a, p
+	dec	p
+	dec	p
+	idxm	p, a
+	pop	af
+	mov	p, a
+	pop	af
+	xch	a, p
+
+	; Return 1 if return value is 0
 	ceqsn	a, p
 	ret
 	ceqsn	a, #0

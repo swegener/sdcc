@@ -1,3 +1,8 @@
+2019-10-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c:
+	  Fix an issue in stack operands of shifts.
+
 2019-10-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:

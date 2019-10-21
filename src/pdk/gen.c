@@ -3287,12 +3287,24 @@ genLeftShift (const iCode *ic)
     }
   else
     {
+      bool pushed_counter = false;
+
+      // Avoid overwriting counter by result.
+      if (right->aop->type == AOP_STK && result->aop->type == AOP_STK && right->aop->aopu.stk_off >= result->aop->aopu.stk_off && right->aop->aopu.stk_off < result->aop->aopu.stk_off + result->aop->size)
+        {
+          cheapMove (ASMOP_A, 0, right->aop, 0, true, true, true);
+          pushAF ();
+          pushed_counter = true;
+        }
       genMove (result->aop, left->aop, !aopInReg (right->aop, 0, A_IDX), p_dead && !aopInReg (right->aop, 0, P_IDX));
 
       symbol *tlbl1 = regalloc_dry_run ? 0 : newiTempLabel (0);
       symbol *tlbl2 = regalloc_dry_run ? 0 : newiTempLabel (0);
-    
-      cheapMove (ASMOP_A, 0, right->aop, 0, true, true, true);
+
+      if (pushed_counter)
+        popAF ();
+      else
+        cheapMove (ASMOP_A, 0, right->aop, 0, true, true, true);
       emitLabel (tlbl1);
       G.p.type = AOP_INVALID;
       emit2 ("sub", "a, #1");
@@ -3550,12 +3562,25 @@ genRightShift (const iCode *ic)
     }
   else
     {
+      bool pushed_counter = false;
+
+      // Avoid overwriting counter by result.
+      if (right->aop->type == AOP_STK && result->aop->type == AOP_STK && right->aop->aopu.stk_off >= result->aop->aopu.stk_off && right->aop->aopu.stk_off < result->aop->aopu.stk_off + result->aop->size)
+        {
+          cheapMove (ASMOP_A, 0, right->aop, 0, true, true, true);
+          pushAF ();
+          pushed_counter = true;
+        }
+
       genMove (result->aop, left->aop, !aopInReg (right->aop, 0, A_IDX), !aopInReg (right->aop, 0, P_IDX));
 
       symbol *tlbl1 = regalloc_dry_run ? 0 : newiTempLabel (0);
       symbol *tlbl2 = regalloc_dry_run ? 0 : newiTempLabel (0);
-    
-      cheapMove (ASMOP_A, 0, right->aop, 0, true, p_dead && !aopInReg (result->aop, 0, P_IDX), true);
+
+      if (pushed_counter)
+        popAF ();
+      else
+        cheapMove (ASMOP_A, 0, right->aop, 0, true, p_dead && !aopInReg (result->aop, 0, P_IDX), true);
       emitLabel (tlbl1);
       G.p.type = AOP_INVALID;
 

@@ -190,12 +190,14 @@ helper_neon_rshl_s8 (uint32_t arg1, uint32_t arg2)
 void
 testTortureExecute (void)
 {
+#if !(defined(__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Bug #2939
 #ifndef __SDCC_pdk14 // Lack of memory
 #if !(defined (__GNUC__) && __GNUC__ < 5)
   uint32_t r = helper_neon_rshl_s8 (0x05050505, 0x01010101);
   if (r != 0x0a0a0a0a)
     ASSERT (0);
   return;
+#endif
 #endif
 #endif
 }

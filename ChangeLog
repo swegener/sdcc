@@ -2,6 +2,10 @@
 
 	* src/pdk/gen.c:
 	  Fix an issue in stack operands of shifts.
+	* support/regression/tests/gcc-torture-execute-20000113-1.c,
+	  support/regression/tests/gcc-torture-execute-950511-1.c,
+	  support/regression/tests/gcc-torture-execute-pr42833.c:
+	  Disable tests failing due to known bugs.
 
 2019-10-16 Philipp Klaus Krause <pkk AT spth.de>
 

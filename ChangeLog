@@ -1,3 +1,8 @@
+2019-10-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Register shuffling fix, small | improvement.
+
 2019-10-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c:

@@ -2383,6 +2383,21 @@ genNot (const iCode *ic)
   aopOp (left, ic);
   aopOp (result, ic);
 
+  if (IS_BOOL (operandType (left)) && left->aop->type == AOP_DIR && aopSame (left->aop, 0, result->aop, 0, 1))
+    {
+      emit2 ("bcpl", "%s, #0", aopGet (left->aop, 0));
+      cost (4, 1);
+      goto release;
+    }
+  else if (IS_BOOL (operandType (left)) && aopOnStack (left->aop, 0, 1) && aopSame (left->aop, 0, result->aop, 0, 1))
+    {
+      emit2 ("srl", "%s", aopGet (left->aop, 0));
+      emit2 ("ccf", "");
+      emit2 ("rlc", "%s", aopGet (left->aop, 0));
+      cost (5, 3);
+      goto release;
+    }
+
   for (i = 1; i < left->aop->size; i++)
     if (aopInReg (left->aop, i, A_IDX))
       {
@@ -2396,6 +2411,16 @@ genNot (const iCode *ic)
       push (ASMOP_A, 0, 1);
       pushed_a = true;
     }
+
+  if (IS_BOOL (operandType (left)))
+    {
+      cheapMove (ASMOP_A, 0, left->aop, 0, false);
+      emit2 ("xor", "a, #0x01");
+      cost (2, 1);
+      cheapMove (result->aop, 0, ASMOP_A, 0, true);
+      goto release;
+    }
+
   for (i = 0; i < left->aop->size;)
     {
       if (i == 0 && !IS_FLOAT (operandType (left)) &&
@@ -2458,6 +2483,8 @@ genNot (const iCode *ic)
       for (i = 1; i < result->aop->size; i++)
         cheapMove (result->aop, 0, ASMOP_ZERO, 0, true);
     }
+
+release:
 
   if (pushed_a)
     if (!regDead (A_IDX, ic) || result->aop->regs[A_IDX] < 0)
@@ -5270,6 +5297,7 @@ genXor (const iCode *ic)
         right->aop->type == AOP_LIT && isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)) >= 0)
         {
           emit2 ("bcpl", "%s, #%d", aopGet (left->aop, i), isLiteralBit (byteOfVal (right->aop->aopu.aop_lit, i)));
+          cost (4, 1);
           continue;
         }
 

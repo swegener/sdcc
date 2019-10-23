@@ -1,4 +1,10 @@
-2019-10-23 Philipp Klaus Krause <pkk AT spth.de>
+2019-10-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/stm8/gen.c,
+	  src/pdk/gen.c:
+	  Improve ! of bool.
+
+2019-10-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/stm8/gen.c:
 	  Register shuffling fix, small | improvement.

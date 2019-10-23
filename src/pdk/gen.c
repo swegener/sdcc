@@ -1223,27 +1223,48 @@ genNot (const iCode *ic)
   aopOp (left, ic);
   aopOp (result, ic);
 
-  cheapMove (ASMOP_A, 0, left->aop, 0, true, regDead (P_IDX, ic), true);
-  for (int i = 1; i < left->aop->size; i++)
+  if (IS_BOOL (operandType (left)))
     {
-      if (left->aop->type == AOP_STK)
+      if ((aopInReg (left->aop, 0, P_IDX) || left->aop->type == AOP_DIR) && aopSame (result->aop, 0, left->aop, 0, 1))
         {
-          if (!regDead (P_IDX, ic))
-            pushPF (true);
-          cheapMove (ASMOP_P, 0, left->aop, i, false, true, true);
-          emit2 ("or", "a, p");
-          if (!regDead (P_IDX, ic))
-            popPF (true);
+          emit2 ("mov", "a, #0x01");
+          emit2 ("xor", "%s, a", aopGet (left->aop, 0));
+          cost (2, 2);
         }
       else
-        emit2 ("or", "a, %s", aopGet (left->aop, i));
-      cost (1, 1);
+        {
+          cheapMove (ASMOP_A, 0, left->aop, 0, true, regDead (P_IDX, ic), true);
+          emit2 ("xor", "a, #0x01");
+          cost (1, 1);
+          cheapMove (result->aop, 0, ASMOP_A, 0, true, regDead (P_IDX, ic), true);
+        }
     }
-  emit2 ("sub", "a, #0x01");
-  emit2 ("mov", "a, #0x00");
-  emit2 ("slc", "a");
+  else
+    {
+      cheapMove (ASMOP_A, 0, left->aop, 0, true, regDead (P_IDX, ic), true);
 
-  cheapMove (result->aop, 0, ASMOP_A, 0, true, true, true);
+      for (int i = 1; i < left->aop->size; i++)
+        {
+          if (left->aop->type == AOP_STK)
+            {
+              if (!regDead (P_IDX, ic))
+                pushPF (true);
+              cheapMove (ASMOP_P, 0, left->aop, i, false, true, true);
+              emit2 ("or", "a, p");
+              if (!regDead (P_IDX, ic))
+                popPF (true);
+            }
+          else
+            emit2 ("or", "a, %s", aopGet (left->aop, i));
+          cost (1, 1);
+        }
+      emit2 ("sub", "a, #0x01");
+      emit2 ("mov", "a, #0x00");
+      emit2 ("slc", "a");
+
+      cheapMove (result->aop, 0, ASMOP_A, 0, true, true, true);
+    }
+
   genMove_o (result->aop, 1, ASMOP_ZERO, 0, result->aop->size - 1, true, true);
 
   freeAsmop (left);

@@ -1,3 +1,10 @@
+2019-10-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/peeph.def,
+	  src/stm8/gen.c,
+	  src/stm8/ralloc.c:
+	  Various small improvements.
+
 2019-10-23 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/stm8/gen.c,

@@ -97,6 +97,14 @@ replace restart {
 } if notVolatile(%1)
 
 replace restart {
+	exgw	x, y
+	ldw	x, y
+} by {
+	; peephole 5w replaced exgw-ldw by ldw.
+	ldw	y, x
+}
+
+replace restart {
 	ld	xl, a
 	srl	a
 	srlw	x
@@ -714,6 +722,14 @@ replace restart {
 } by {
 	ld	(%1, %2), a
 	; peephole 31b removed redundant tnz.
+}
+
+replace restart {
+	ldw	(%1, sp), x
+	tnz	(%1, sp)
+} by {
+	ldw	(%1, sp), x
+	; peephole 31c removed redundant tnz.
 }
 
 replace restart {

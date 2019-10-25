@@ -2198,7 +2198,16 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
         {
           bool y = aopInReg (result, roffset, Y_IDX);
           emit2 ("ldw", y ? "y, sp" : "x, sp");
-          emit2 ("addw", y ? "y, #%ld" : "x, #%ld", (long)(source->aopu.stk_off) + G.stack.pushed);
+          switch ((long)(source->aopu.stk_off) + G.stack.pushed)
+            {
+            case 2:
+              emit3w (A_INCW, y ? ASMOP_Y : ASMOP_X, 0);
+            case 1:
+              emit3w (A_INCW, y ? ASMOP_Y : ASMOP_X, 0);
+              break;
+            default:
+              emit2 ("addw", y ? "y, #%ld" : "x, #%ld", (long)(source->aopu.stk_off) + G.stack.pushed);
+            }
           cost (3 + 2 * y, 3);
           genMove_o (result, roffset, y ? ASMOP_Y : ASMOP_X, 0, size, a_dead_global, x_dead_global, y_dead_global);
         }
@@ -7032,7 +7041,7 @@ genPointerGet (const iCode *ic)
       cheapMove (result->aop, 0, ASMOP_A, 0, false);
       goto release;
     }
-  // Special case for remat pointer to on-stack object.
+  // Special case for rematerialized pointer to stack.
   else if (!bit_field && left->aop->type == AOP_STL)
     {
       struct asmop stackop_impl;
@@ -7091,9 +7100,10 @@ genPointerGet (const iCode *ic)
 
   if (left->aop->type == AOP_STL)
     {
-      emit2 ("ldw", "x, sp");
-      emit2 ("addw", "x, #%ld", (long)(left->aop->aopu.stk_off) + G.stack.pushed);
-      cost (4, 3);
+      emit2 ("ldw", use_y ? "y, sp" : "x, sp");
+      emit2 ("addw", use_y ? "y, #%ld" : "x, #%ld", (long)(left->aop->aopu.stk_off) + G.stack.pushed + offset);
+      cost (4 + 2 * use_y, 3);
+      offset = 0;
     }
   else
     genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, FALSE, regDead (X_IDX, ic), regDead (Y_IDX, ic));
@@ -7433,14 +7443,7 @@ genPointerSet (iCode *ic)
       goto release;
     }
 
-  if (left->aop->type == AOP_STL)
-    {
-      emit2 ("ldw", "x, sp");
-      emit2 ("addw", "x, #%ld", (long)(left->aop->aopu.stk_off) + G.stack.pushed );
-      cost (4, 3);
-    }
-  else
-    genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, regDead (A_IDX, ic) && !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+  genMove (use_y ? ASMOP_Y : ASMOP_X, left->aop, regDead (A_IDX, ic) && !aopInReg (right->aop, 0, A_IDX), regDead (X_IDX, ic), regDead (Y_IDX, ic));
 
   for (i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
     {

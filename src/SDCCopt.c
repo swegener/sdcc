@@ -269,7 +269,8 @@ cnvToFloatCast (iCode * ic, eBBlock * ebp)
 {
   iCode *ip, *newic;
   symbol *func = NULL;
-  sym_link *type = operandType (IC_RIGHT (ic));
+  sym_link *type = copyLinkChain (operandType (IC_RIGHT (ic)));
+  SPEC_SHORT (type) = 0;
   int linenno = ic->lineno;
   int bwd, su;
   int bytesPushed=0;
@@ -393,7 +394,8 @@ cnvToFixed16x16Cast (iCode * ic, eBBlock * ebp)
 {
   iCode *ip, *newic;
   symbol *func = NULL;
-  sym_link *type = operandType (IC_RIGHT (ic));
+  sym_link *type = copyLinkChain (operandType (IC_RIGHT (ic)));
+  SPEC_SHORT (type) = 0;
   int linenno = ic->lineno;
   int bwd, su;
   int bytesPushed=0;
@@ -503,7 +505,8 @@ cnvFromFloatCast (iCode * ic, eBBlock * ebp)
 {
   iCode *ip, *newic;
   symbol *func = NULL;
-  sym_link *type = operandType (IC_LEFT (ic));
+  sym_link *type = copyLinkChain (operandType (IC_LEFT (ic)));
+  SPEC_SHORT (type) = 0;
   char *filename = ic->filename;
   int lineno = ic->lineno;
   int bwd, su;
@@ -614,7 +617,8 @@ cnvFromFixed16x16Cast (iCode * ic, eBBlock * ebp)
 {
   iCode *ip, *newic;
   symbol *func = NULL;
-  sym_link *type = operandType (IC_LEFT (ic));
+  sym_link *type = copyLinkChain (operandType (IC_LEFT (ic)));
+  SPEC_SHORT (type) = 0;
   char *filename = ic->filename;
   int lineno = ic->lineno;
   int bwd, su;
@@ -743,8 +747,10 @@ convilong (iCode * ic, eBBlock * ebp)
   int bytesPushed=0;
   operand *left;
   operand *right;
-  sym_link *leftType = operandType (IC_LEFT (ic));
-  sym_link *rightType = operandType (IC_RIGHT (ic));
+  sym_link *leftType = copyLinkChain (operandType (IC_LEFT (ic)));
+  sym_link *rightType = copyLinkChain (operandType (IC_RIGHT (ic)));
+  SPEC_SHORT (leftType) = 0;
+  SPEC_SHORT (rightType) = 0;
 
   remiCodeFromeBBlock (ebp, ic);
 

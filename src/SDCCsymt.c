@@ -621,13 +621,6 @@ checkTypeSanity (sym_link *etype, const char *name)
       werror (E_SIGNED_OR_UNSIGNED_INVALID, noun, name);
     }
 
-  // special case for "short"
-  if (SPEC_SHORT (etype))
-    {
-      SPEC_NOUN (etype) = V_INT;
-      SPEC_SHORT (etype) = 0;
-    }
-
   /* if no noun e.g.
      "const a;" or "data b;" or "signed s" or "long l"
      assume an int */
@@ -2700,6 +2693,10 @@ compareType (sym_link *dest, sym_link *src)
       else
         return 1;
     }
+
+  if (SPEC_SHORT (dest) != SPEC_SHORT (src))
+    return -1;
+
   if (SPEC_LONG (dest) != SPEC_LONG (src))
     return -1;
 

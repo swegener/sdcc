@@ -43,7 +43,13 @@ am__skipyacc =
 # This is where we get zlib from.  zlibdir is -L../zlib and zlibinc is
 # -I../zlib, unless we were configured with --with-system-zlib, in which
 # case both are empty.
-ZLIB = @zlibdir@ -lz
+# Try to statically link libz when cross compiling to Windows so that we
+# don't need to package the dll
+ifeq ($(CROSSCOMPILING), 1)
+ ZLIB = @zlibdir@ -Wl,-Bstatic -lz -Wl,-Bdynamic
+else
+ ZLIB = @zlibdir@ -lz
+endif
 ZLIBINC = @zlibinc@
 
 WARN_CFLAGS = @WARN_CFLAGS@

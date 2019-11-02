@@ -382,6 +382,7 @@ ${Section} "SDCC application files" SEC01
   File "${SDCC_ROOT}\bin\sdas390.exe"
   File "${SDCC_ROOT}\bin\sdasrab.exe"
   File "${SDCC_ROOT}\bin\sdasstm8.exe"
+  File "${SDCC_ROOT}\bin\sdaspdk13.exe"
   File "${SDCC_ROOT}\bin\sdaspdk14.exe"
   File "${SDCC_ROOT}\bin\sdaspdk15.exe"
   File "${SDCC_ROOT}\bin\sdastlcs90.exe"
@@ -831,16 +832,28 @@ ${Section} "SDCC EZ80_Z80 library" SEC27
   File "${DEV_ROOT}\lib\ez80_z80\*.*"
 ${SectionEnd}
 
-${Section} "SDCC PDK14 library" SEC28
+${Section} "SDCC PDK13 library" SEC28
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\pdk13"
+  File "${DEV_ROOT}\lib\pdk13\*.*"
+${SectionEnd}
+
+${Section} "SDCC PDK14 library" SEC29
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pdk14"
   File "${DEV_ROOT}\lib\pdk14\*.*"
 ${SectionEnd}
 
-${Section} "SDCC PDK15 library" SEC29
+${Section} "SDCC PDK15 library" SEC30
   SectionIn 1 2
   SetOutPath "$INSTDIR\lib\pdk15"
   File "${DEV_ROOT}\lib\pdk15\*.*"
+${SectionEnd}
+
+${Section} "SDCC PDK15 stack-auto library" SEC31
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\pdk15-stack-auto"
+  File "${DEV_ROOT}\lib\pdk15-stack-auto\*.*"
 ${SectionEnd}
 
 
@@ -875,8 +888,10 @@ LangString DESC_SEC24 ${LANG_ENGLISH} "SDCC TLCS90 library"
 LangString DESC_SEC25 ${LANG_ENGLISH} "SDCC library sources"
 LangString DESC_SEC26 ${LANG_ENGLISH} "SDCC STM8 large model library"
 LangString DESC_SEC27 ${LANG_ENGLISH} "SDCC EZ80_Z80 library"
-LangString DESC_SEC28 ${LANG_ENGLISH} "SDCC PDK14 library"
-LangString DESC_SEC29 ${LANG_ENGLISH} "SDCC PDK15 library"
+LangString DESC_SEC28 ${LANG_ENGLISH} "SDCC PDK13 library"
+LangString DESC_SEC29 ${LANG_ENGLISH} "SDCC PDK14 library"
+LangString DESC_SEC30 ${LANG_ENGLISH} "SDCC PDK15 library"
+LangString DESC_SEC31 ${LANG_ENGLISH} "SDCC PDK15 stack-auto library"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -1043,11 +1058,17 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\ds400\Makefile.dep"
   Delete "$INSTDIR\lib\src\ds400\Makefile"
 
+  Delete "$INSTDIR\lib\src\pdk13\pdk13.lib"
+  Delete "$INSTDIR\lib\src\pdk13\Makefile"
+
   Delete "$INSTDIR\lib\src\pdk14\pdk14.lib"
   Delete "$INSTDIR\lib\src\pdk14\Makefile"
 
   Delete "$INSTDIR\lib\src\pdk15\pdk15.lib"
   Delete "$INSTDIR\lib\src\pdk15\Makefile"
+
+  Delete "$INSTDIR\lib\src\pdk15-stack-auto\pdk15.lib"
+  Delete "$INSTDIR\lib\src\pdk15-stack-auto\Makefile"
 
   Delete "$INSTDIR\lib\src\*.c"
 
@@ -1099,9 +1120,13 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\ds400\*.lib"
 
+  Delete "$INSTDIR\lib\pdk13\*.lib"
+
   Delete "$INSTDIR\lib\pdk14\*.lib"
 
   Delete "$INSTDIR\lib\pdk15\*.lib"
+
+  Delete "$INSTDIR\lib\pdk15-stack-auto\*.lib"
 
   Delete "$INSTDIR\include\asm\z80\*.h"
   Delete "$INSTDIR\include\asm\z180\*.h"
@@ -1141,6 +1166,7 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\bin\sdas390.exe"
   Delete "$INSTDIR\bin\sdasrab.exe"
   Delete "$INSTDIR\bin\sdasstm8.exe"
+  Delete "$INSTDIR\bin\sdaspdk13.exe"
   Delete "$INSTDIR\bin\sdaspdk14.exe"
   Delete "$INSTDIR\bin\sdaspdk15.exe"
   Delete "$INSTDIR\bin\sdastlcs90.exe"
@@ -1202,8 +1228,10 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\s08"
   RMDir "$INSTDIR\lib\src\stm8"
   RMDir "$INSTDIR\lib\src\stm8-large"
+  RMDir "$INSTDIR\lib\src\pdk13"
   RMDir "$INSTDIR\lib\src\pdk14"
   RMDir "$INSTDIR\lib\src\pdk15"
+  RMDir "$INSTDIR\lib\src\pdk15-stack-auto"
   RMDir "$INSTDIR\lib\src"
   RMDir "$INSTDIR\non-free\lib\src"
 
@@ -1228,8 +1256,10 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\s08"
   RMDir "$INSTDIR\lib\stm8"
   RMDir "$INSTDIR\lib\stm8-large"
+  RMDir "$INSTDIR\lib\pdk13"
   RMDir "$INSTDIR\lib\pdk14"
   RMDir "$INSTDIR\lib\pdk15"
+  RMDir "$INSTDIR\lib\pdk15-stack-auto"
   RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\non-free\lib"
 

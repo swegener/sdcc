@@ -1,3 +1,8 @@
+2019-11-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/scripts/sdcc.nsi:
+	  Fix Windows installation of pdk13 and pdk15-stack-auto files.
+
 2019-11-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/sdbinutils/binutils/Makefile.am,
@@ -11,7 +16,7 @@
 	  support/regression/tests/bug-2907.c:
 	  Fix bug #2907.
 	* support/regression/ports/pdk15-stack-auto/spec.mk:
-	  Increase timeout for regression testing on ARMv6. 
+	  Increase timeout for regression testing on ARMv6.
 
 2019-10-25 Philipp Klaus Krause <pkk AT spth.de>
 

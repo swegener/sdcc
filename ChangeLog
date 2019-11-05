@@ -1,3 +1,10 @@
+2019-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/pdk/gen.c,
+	  src/stm8/gen.c,
+	  src/z80/gen.c:
+	  Fix a bug in optimization of tail calls in interrupt handlers.
+
 2019-11-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/scripts/sdcc.nsi:

@@ -1196,7 +1196,7 @@ shortenLiveRanges (iCode *sic, ebbIndex *ebbi)
         (POINTER_GET (nic) || isOperandGlobal (IC_LEFT (nic)) || isOperandGlobal (IC_RIGHT (nic))) && (POINTER_SET (ic) || POINTER_SET (nic) && isOperandGlobal (IC_RESULT (ic))))
         continue;
 
-      if (isOperandGlobal (IC_RIGHT (pic))) // Might result in too many global operands per op for backend.
+      if (isOperandGlobal (IC_RIGHT (pic)) && !TARGET_IS_STM8 && !TARGET_PDK_LIKE) // Might result in too many global operands per op for backend.
         continue;
 
       if (ifx = ifxForOp (IC_RESULT (nic), nic))

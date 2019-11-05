@@ -1,5 +1,10 @@
 2019-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/SDCClrange.c:
+	  Allow more live-range shortening for stm8, pdk.
+
+2019-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/stm8/gen.c:
 	  Improve wide & by small constants and register result.
 	* src/SDCCsymt.c,

@@ -6004,7 +6004,6 @@ genAnd (const iCode *ic, iCode *ifx)
           emit3_o (A_AND, ASMOP_A, 0, right->aop, i);
           cheapMove (result->aop, i, ASMOP_A, 0, false);
           i += 2;
-          continue;
         }
       else
         {

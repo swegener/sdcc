@@ -276,6 +276,7 @@ enum {
   E_DECL_AFTER_STATEMENT_C99    = 247, /* declaration after statement requires ISO C99 or later */
   E_SHORTCALL_INVALID_VALUE     = 248, /* Invalid value for a __z88dk_shortcall specifier */
   E_DUPLICATE_PARAMTER_NAME     = 249, /* duplicate parameter name */
+  E_AUTO_FILE_SCOPE             = 250, /* auto in declaration at file scope */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

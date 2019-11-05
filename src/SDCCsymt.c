@@ -1794,6 +1794,12 @@ checkSClass (symbol *sym, int isProto)
       fprintf (stderr, "checkSClass: %s \n", sym->name);
     }
 
+  if (!sym->level && SPEC_SCLS (sym->etype) == S_AUTO)
+   {
+     werrorfl (sym->fileDef, sym->lineDef, E_AUTO_FILE_SCOPE);
+     SPEC_SCLS (sym->etype) = S_FIXED;
+   }
+
   /* type is literal can happen for enums change to auto */
   if (SPEC_SCLS (sym->etype) == S_LITERAL && !SPEC_ENUM (sym->etype))
     SPEC_SCLS (sym->etype) = S_AUTO;
@@ -1837,8 +1843,8 @@ checkSClass (symbol *sym, int isProto)
   if (!TARGET_PIC_LIKE)
 #endif
 
-    if (IS_ABSOLUTE (sym->etype))
-      SPEC_VOLATILE (sym->etype) = 1;
+  if (IS_ABSOLUTE (sym->etype))
+    SPEC_VOLATILE (sym->etype) = 1;
 
   if (TARGET_IS_MCS51 && IS_ABSOLUTE (sym->etype) && SPEC_SCLS (sym->etype) == S_SFR)
     {

@@ -561,6 +561,8 @@ struct
     "invalid value for __z88dk_shortcall %s parameter: %x", 0},
   { E_DUPLICATE_PARAMTER_NAME, ERROR_LEVEL_ERROR,
     "duplicate parameter name %s for function %s", 0},
+  { E_AUTO_FILE_SCOPE, ERROR_LEVEL_ERROR,
+    "auto in declaration at file scope", 0},
 };
 
 /* -------------------------------------------------------------------------------

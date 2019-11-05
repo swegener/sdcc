@@ -2,6 +2,11 @@
 
 	* src/stm8/gen.c:
 	  Improve wide & by small constants and register result.
+	* src/SDCCsymt.c,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  support/valdiag/tests/bug-2940.c:
+	  Fix bug #2940.
 
 2019-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

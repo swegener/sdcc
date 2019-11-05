@@ -1,5 +1,10 @@
 2019-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/stm8/gen.c:
+	  Improve wide & by small constants and register result.
+
+2019-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/pdk/gen.c,
 	  src/stm8/gen.c,
 	  src/z80/gen.c:

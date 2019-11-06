@@ -1,3 +1,8 @@
+2019-11-06 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* support/regression/ports/pdk15-stack-auto/spec.mk:
+	  Increase timeout for regression testing on ARMv6.
+
 2019-11-05 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCClrange.c:

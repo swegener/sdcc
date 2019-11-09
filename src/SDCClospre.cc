@@ -170,6 +170,8 @@ invalidates_expression(const iCode *const eic, const iCode *const iic)
   const operand *const right = IC_RIGHT (iic);
   const operand *const result = IC_RESULT (iic);
 
+  if (eic->op == GET_VALUE_AT_ADDRESS && (isOperandGlobal (IC_RESULT (iic)) || IS_SYMOP (IC_RESULT (iic)) && OP_SYMBOL_CONST (IC_RESULT (iic))->addrtaken))
+    return(true);
   if (IC_RESULT (iic) && !IS_OP_LITERAL (result) && !POINTER_SET(iic) &&
     (eleft && isOperandEqual (eleft, result) || eright && isOperandEqual (eright, result)))
     return(true);

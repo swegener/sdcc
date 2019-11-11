@@ -30,7 +30,7 @@ E       [Ee][+-]?{D}+
 BE      [Pp][+-]?{D}+
 FS      (f|F|l|L)
 IS      (u|U|l|L)*
-CP      (L|u|U)
+CP      (L|u|U|u8)
 HASH    (#|%:)
 
 %{

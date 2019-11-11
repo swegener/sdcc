@@ -277,6 +277,8 @@ enum {
   E_SHORTCALL_INVALID_VALUE     = 248, /* Invalid value for a __z88dk_shortcall specifier */
   E_DUPLICATE_PARAMTER_NAME     = 249, /* duplicate parameter name */
   E_AUTO_FILE_SCOPE             = 250, /* auto in declaration at file scope */
+  E_U8_CHAR_C2X                 = 251, /* u8 character constant requires ISO C2X or later */
+  E_U8_CHAR_INVALID             = 252, /* invalid u8 character constant */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

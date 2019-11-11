@@ -563,6 +563,10 @@ struct
     "duplicate parameter name %s for function %s", 0},
   { E_AUTO_FILE_SCOPE, ERROR_LEVEL_ERROR,
     "auto in declaration at file scope", 0},
+  { E_U8_CHAR_C2X, ERROR_LEVEL_ERROR,
+    "u8 character constant requires ISO C2X or later", 0},
+  { E_U8_CHAR_INVALID, ERROR_LEVEL_ERROR,
+    "invalid u8 character constant", 0},
 };
 
 /* -------------------------------------------------------------------------------

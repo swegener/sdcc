@@ -171,8 +171,8 @@ replace {
 } by {
 	ld	a,%2
 	ld	%1,a
-	; peephole 18 load value in a first and use it next
-} if notVolatile(%1 %2)
+	; peephole 18 loaded value in a first and used it next
+} if notVolatile(%1 %2), canAssign(%1 'a'), operandsNotRelated(%1 %2)
 
 replace restart {
 	ld	%1,%2

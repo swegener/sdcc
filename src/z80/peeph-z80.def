@@ -1084,7 +1084,7 @@ replace {
 	ld	a,%2
 	ld	%1,a
 	; peephole 103 loaded value in a first and used it next
-} if notVolatile(%1 %2), canAssign(%1 'a')
+} if notVolatile(%1 %2), canAssign(%1 'a'), operandsNotRelated(%1 %2)
 
 replace restart {
 	ld	%1,%2

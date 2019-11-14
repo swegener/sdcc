@@ -1,3 +1,11 @@
+2019-11-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-tlcs90.def,
+	  src/z80/peeph-r2k.def,
+	  src/z80/peeph-gbz80.def:
+	  Improve fix for bug #2914.
+
 2019-11-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.lex,

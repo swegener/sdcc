@@ -2026,11 +2026,27 @@ static_assert_declaration
 
 statement
    : labeled_statement
-   | compound_statement
    | expression_statement
+   | compound_statement
+   | attribute_specifier_sequence compound_statement
+     {
+       $$ = $2;
+     }
    | selection_statement
+   | attribute_specifier_sequence selection_statement
+     {
+       $$ = $2;
+     }
    | iteration_statement
+   | attribute_specifier_sequence iteration_statement
+     {
+       $$ = $2;
+     }
    | jump_statement
+   | attribute_specifier_sequence jump_statement
+     {
+       $$ = $2;
+     }
    | critical_statement
    | asm_statement
    ;
@@ -2057,6 +2073,7 @@ critical_statement
 
 labeled_statement
    : label statement  { if ($1) {$$ = $1; $1->right = $2;} else $$ = newNode (BLOCK, NULL, NULL); }
+   | attribute_specifier_sequence label statement  { if ($2) {$$ = $2; $2->right = $3;} else $$ = newNode (BLOCK, NULL, NULL); }
    | label '}'
      { /* Support a label without a statement at the end of a */
        /* compound statement as a SDCC extension. Include the */

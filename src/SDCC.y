@@ -181,12 +181,17 @@ attribute_list
 
 attribute
    : attribute_token
-/*   | attribute_token attribute_argument_clause TODO: Support attribute arguments */
+   | attribute_token attribute_argument_clause
    ;
 
 attribute_token
    : identifier
    | identifier ATTRIBCOLON identifier
+   ;
+
+attribute_argument_clause
+   : '(' ')'
+   /*| '(' balanced_token_sequence ')' TODO: Allow attribute arguments */
    ;
 
 external_declaration

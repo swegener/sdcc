@@ -89,6 +89,7 @@ bool uselessDecl = TRUE;
 %token SIZEOF ALIGNOF TYPEOF OFFSETOF
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP
+%token ATTRIBCOLON
 %token <yyint> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token <yyint> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token <yyint> XOR_ASSIGN OR_ASSIGN
@@ -109,7 +110,7 @@ bool uselessDecl = TRUE;
 %token ASM
 
 %type <yyint> Interrupt_storage
-%type <sym> identifier declarator declarator2 declarator3 enumerator_list enumerator
+%type <sym> identifier declarator declarator2 direct_declarator enumerator_list enumerator
 %type <sym> struct_declarator function_declarator function_declarator2
 %type <sym> struct_declarator_list struct_declaration struct_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
@@ -156,6 +157,36 @@ file
 program
    : external_definition
    | program external_definition
+   ;
+
+attribute_specifier_sequence
+   : attribute_specifier_sequence attribute_specifier
+   | attribute_specifier
+   ;
+
+attribute_specifier
+   : '[' '[' attribute_list ']' ']'
+     {
+       if (!options.std_c2x)
+         werror(E_ATTRIBUTE_C2X);
+     }
+   ;
+
+attribute_list
+   : /* empty */
+   | attribute
+   | attribute_list ','
+   | attribute_list ',' attribute
+   ;
+
+attribute
+   : attribute_token
+/*   | attribute_token attribute_argument_clause TODO: Support attribute arguments */
+   ;
+
+attribute_token
+   : identifier
+   | identifier ATTRIBCOLON identifier
    ;
 
 external_definition
@@ -683,10 +714,14 @@ declaration
          uselessDecl = TRUE;
          $$ = sym1;
       }
-    | static_assert_declaration ';'
+   | static_assert_declaration
       {
          $$ = NULL;
       }
+   /*| attribute_declaration
+      {
+         $$ = NULL;
+      } TODO: Enable, resolve conflicts*/
    ;
 
 declaration_specifiers : declaration_specifiers_ { $$ = finalizeSpec($1); };
@@ -1370,15 +1405,15 @@ opt_assign_expr
    ;
 
 declarator
-   : declarator3                        { $$ = $1; }
-   | pointer declarator3
+   : direct_declarator                        { $$ = $1; }
+   | pointer direct_declarator
          {
              addDecl ($2,0,reverseLink($1));
              $$ = $2;
          }
    ;
 
-declarator3
+direct_declarator
    : declarator2_function_attributes    { $$ = $1; }
    | declarator2                        { $$ = $1; }
    ;
@@ -1435,7 +1470,7 @@ declarator2_function_attributes
 declarator2
    : identifier
    | '(' declarator ')'     { $$ = $2; }
-   | declarator3 '[' ']'
+   | direct_declarator '[' ']'
          {
             sym_link   *p;
 
@@ -1444,7 +1479,7 @@ declarator2
             DCL_ELEM(p) = 0;
             addDecl($1,0,p);
          }
-   | declarator3 '[' type_qualifier_list ']'
+   | direct_declarator '[' type_qualifier_list ']'
          {
             sym_link *p, *n;
 
@@ -1463,7 +1498,7 @@ declarator2
             SPEC_NEEDSPAR(n) = 1;
             addDecl($1,0,n);
          }
-   | declarator3 '[' constant_expr ']'
+   | direct_declarator '[' constant_expr ']'
          {
             sym_link *p;
             value *tval;
@@ -1492,7 +1527,7 @@ declarator2
             DCL_ELEM(p) = size;
             addDecl($1, 0, p);
          }
-  | declarator3 '[' STATIC constant_expr ']'
+  | direct_declarator '[' STATIC constant_expr ']'
          {
             sym_link *p, *n;
             value *tval;
@@ -1527,7 +1562,7 @@ declarator2
             SPEC_NEEDSPAR(n) = 1;
             addDecl($1,0,n);
          }
-  | declarator3 '[' type_qualifier_list constant_expr ']'
+  | direct_declarator '[' type_qualifier_list constant_expr ']'
          {
             sym_link *p, *n;
             value *tval;
@@ -1566,7 +1601,7 @@ declarator2
             SPEC_NEEDSPAR(n) = 1;
             addDecl($1,0,n);
          }
-| declarator3 '[' STATIC type_qualifier_list constant_expr ']'
+| direct_declarator '[' STATIC type_qualifier_list constant_expr ']'
          {
             sym_link *p, *n;
             value *tval;
@@ -1608,7 +1643,7 @@ declarator2
             SPEC_NEEDSPAR(n) = 1;
             addDecl($1,0,n);
          }
-| declarator3 '[' type_qualifier_list STATIC constant_expr ']'
+| direct_declarator '[' type_qualifier_list STATIC constant_expr ']'
          {
             sym_link *p, *n;
             value *tval;
@@ -1961,7 +1996,7 @@ initializer_list
    ;
 
 static_assert_declaration
-   : STATIC_ASSERT '(' constant_expr ',' STRING_LITERAL ')'
+   : STATIC_ASSERT '(' constant_expr ',' STRING_LITERAL ')' ';'
                                     {
                                        value *val = constExprValue ($3, TRUE);
                                        if (!val)
@@ -1969,7 +2004,7 @@ static_assert_declaration
                                        else if (!ulFromVal(val))
                                          werror (W_STATIC_ASSERTION, $5);
                                     }
-   | STATIC_ASSERT '(' constant_expr ')'
+   | STATIC_ASSERT '(' constant_expr ')' ';'
                                     {
                                        value *val = constExprValue ($3, TRUE);
                                        if (!options.std_c2x)
@@ -1979,6 +2014,10 @@ static_assert_declaration
                                        else if (!ulFromVal(val))
                                          werror (W_STATIC_ASSERTION_2);
                                     }
+   ;
+
+/*attribute_declaration
+   : attribute_specifier_sequence ';' TODO: Enable and resolve conflicts */
    ;
 
 statement
@@ -2165,6 +2204,7 @@ statement_list
 expression_statement
    : ';'                { $$ = NULL;}
    | expr ';'           { $$ = $1; seqPointNo++;}
+   | attribute_specifier_sequence expr ';'           { $$ = $2; seqPointNo++;}
    ;
 
 else_statement

@@ -260,6 +260,7 @@ static void checkCurrFile (const char *s);
 "^"                     { count (); return '^'; }
 "|"                     { count (); return '|'; }
 "?"                     { count (); return '?'; }
+"::"                    { count (); return ATTRIBCOLON; }
 ^{HASH}pragma.*         { count (); process_pragma (yytext); }
 ^{HASH}.*               { count (); checkCurrFile (yytext); }
 

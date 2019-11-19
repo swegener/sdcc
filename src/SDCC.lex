@@ -49,10 +49,12 @@ HASH    (#|%:)
 # include <io.h>
 #endif
 
-#define TKEYWORD(token) return (isTargetKeyword(yytext) ? token :\
+#define TKEYWORD(token) return (isTargetKeyword(yytext) ? (token) :\
                                 check_type())
 
-#define TKEYWORD99(token) return (options.std_c99 ? token : check_type())
+#define TKEYWORD99(token) return (options.std_c99 ? (token) : check_type())
+
+#define TKEYWORD2X(token) return (options.std_c2x ? (token) : check_type())
 
 int column = 0;         /* current column */
 
@@ -101,6 +103,7 @@ static void checkCurrFile (const char *s);
 "__at"                  { count (); TKEYWORD (AT); }
 "auto"                  { count (); return AUTO; }
 "__bit"                 { count (); TKEYWORD (BIT); }
+"bool"                  { count (); TKEYWORD2X (SD_BOOL); }
 "_Bool"                 { count (); TKEYWORD99 (SD_BOOL); }
 "break"                 { count (); return BREAK; }
 "case"                  { count (); return CASE; }
@@ -145,6 +148,7 @@ static void checkCurrFile (const char *s);
 "short"                 { count (); return SD_SHORT; }
 "signed"                { count (); return SIGNED; }
 "sizeof"                { count (); return SIZEOF; }
+"alignof"               { count (); TKEYWORD2X (ALIGNOF); }
 "_Alignof"              { count (); return ALIGNOF; }
 "__builtin_offsetof"    { count (); return OFFSETOF; }
 "__sram"                { count (); TKEYWORD (XDATA); }
@@ -174,7 +178,9 @@ static void checkCurrFile (const char *s);
 "__z88dk_shortcall"     { count (); return Z88DK_SHORTCALL; }
 "__z88dk_params_offset" { count (); return Z88DK_PARAMS_OFFSET; }
 "__addressmod"          { count (); return ADDRESSMOD; }
+"static_assert"         { count (); TKEYWORD2X (STATIC_ASSERT); }
 "_Static_assert"        { count (); return STATIC_ASSERT; }
+"alignas"               { count (); TKEYWORD2X (ALIGNAS); }
 "_Alignas"              { count (); return ALIGNAS; }
 "_Generic"              { count (); return GENERIC; }
 {L}({L}|{D})*           {

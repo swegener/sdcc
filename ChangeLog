@@ -1,5 +1,11 @@
 2019-11-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/pdk/gen.c,
+	  support/regression/tests/gcc-torture-execute-20181120-1.c:
+	  Fix bug #2947.
+
+2019-11-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* support/regression/tests/gcc-torture-execute-*:
 	  Add more GCC tests, RFE #652.
 

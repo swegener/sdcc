@@ -1,5 +1,5 @@
 /*
-   20180921-1.c from the execute part of the gcc torture tests.
+   20181120-1.c from the execute part of the gcc torture tests.
  */
 
 #include <testfwk.h>
@@ -21,7 +21,6 @@ volatile union U1 u = { 0x4030201 };
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Bug
   for (c = 0; c <= 1; c++) {
     union U1 f = {0x4030201};
     if (c == 1)
@@ -33,5 +32,4 @@ testTortureExecute (void)
     ASSERT (0);
 
   return;
-#endif
 }

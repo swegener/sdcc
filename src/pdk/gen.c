@@ -3863,7 +3863,7 @@ genPointerGet (const iCode *ic)
           if (bit_field && blen < 8)
             getBitFieldByte (blen, bstr, !SPEC_USIGN (getSpec (operandType (result))));
 
-          if (aopInReg (result->aop, i, A_IDX) && (!bit_field ? i + 1 < size : blen - 8 <= 0))
+          if (aopInReg (result->aop, i, A_IDX) && (!bit_field ? i + 1 < size : blen - 8 > 0))
             {
               pushAF();
               pushed_a = true;
@@ -3946,12 +3946,12 @@ genPointerGet (const iCode *ic)
           if (bit_field && blen < 8)
             getBitFieldByte (blen, bstr, !SPEC_USIGN (getSpec (operandType (result))));
 
-          if (aopInReg (result->aop, i, P_IDX) && (!bit_field ? i + 1 < size : blen - 8 <= 0))
+          if (aopInReg (result->aop, i, P_IDX) && (!bit_field ? i + 1 < size : blen - 8 > 0))
             {
               wassert (regalloc_dry_run);
               cost (200, 200);
             }
-          else if (aopInReg (result->aop, i, A_IDX) && (!bit_field ? i + 1 < size : blen - 8 <= 0))
+          else if (aopInReg (result->aop, i, A_IDX) && (!bit_field ? i + 1 < size : blen - 8 > 0))
             {
               pushAF();
               pushed_a = true;

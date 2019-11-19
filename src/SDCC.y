@@ -151,12 +151,12 @@ file
         {
           werror(W_EMPTY_SOURCE_FILE);
         }
-   | program
+   | translation_unit
    ;
 
-program
-   : external_definition
-   | program external_definition
+translation_unit
+   : external_declaration
+   | translation_unit external_declaration
    ;
 
 attribute_specifier_sequence
@@ -189,7 +189,7 @@ attribute_token
    | identifier ATTRIBCOLON identifier
    ;
 
-external_definition
+external_declaration
    : function_definition
         {
           // blockNo = 0;
@@ -244,7 +244,7 @@ function_definition
             $2 = createFunctionDecl($2);
             if ($2 && FUNC_ISCRITICAL ($2->type))
                 inCriticalFunction = 1;
-            /* warn for loss of calling convention for inlined functions. */
+            // warn for loss of calling convention for inlined functions.
             if ($2 && FUNC_ISINLINE ($2->type) &&
                 ( FUNC_ISZ88DK_CALLEE ($2->type) || FUNC_ISZ88DK_FASTCALL ($2->type) ||
                   FUNC_BANKED ($2->type)         || FUNC_REGBANK ($2->type)          ||

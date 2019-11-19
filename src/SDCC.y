@@ -110,7 +110,7 @@ bool uselessDecl = TRUE;
 %token ASM
 
 %type <yyint> Interrupt_storage
-%type <sym> identifier declarator declarator2 direct_declarator enumerator_list enumerator
+%type <sym> identifier declarator declarator2 direct_declarator array_declarator enumerator_list enumerator
 %type <sym> struct_declarator function_declarator function_declarator2
 %type <sym> struct_declarator_list struct_declaration struct_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
@@ -1470,7 +1470,11 @@ declarator2_function_attributes
 declarator2
    : identifier
    | '(' declarator ')'     { $$ = $2; }
-   | direct_declarator '[' ']'
+   | array_declarator
+   ;
+
+array_declarator:
+   direct_declarator '[' ']'
          {
             sym_link   *p;
 

@@ -25,7 +25,7 @@ testTortureExecute (void)
       if (i)
 	break;
     }
-#if 0 // Enable when SDCC supports intermingled code/declarations
+
   char j = c, k = -1, l;
   l = g = j >> h;
   f = l == 0 ? k : k % l;
@@ -34,6 +34,6 @@ testTortureExecute (void)
 
   if (b != 255)
     ASSERT (0);
-#endif
+
   return;
 }

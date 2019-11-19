@@ -26,12 +26,12 @@ testTortureExecute (void)
   for (i = 0; i < 56; i++)
     for (; a; a--)
       ;
-#if 0 //Enabel when SDCC supports intermingling of statements and declarations
+
   int *c = &b;
   if (*c)
     *c = 1 % (unsigned int) *c | 5;
 
   foo (b);
-#endif
+
   return;
 }

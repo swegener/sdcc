@@ -31,7 +31,7 @@ foo (struct S *x, int set)
   p = x;
 }
 
-#if 0 // TODO: Enable when intermingeld declarations in code are supported!
+#if 0 // TODO: Enable when non-braced struct initialization is supported!
 void
 ftest1 (void)
 {

@@ -8,8 +8,7 @@
 #pragma std_c99
 #endif
 
-#if 0
-//TODO: Enable once sdcc supports C99's mixture of declarations and statements.
+#if !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
 /* PR tree-optimization/47148 */
 
 static inline unsigned
@@ -37,7 +36,7 @@ foo (unsigned char x, unsigned y)
 void
 testTortureExecute (void)
 {
-#if 0
+#if !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Bug #2874
   foo (1, 1);
   foo (-1, 1);
   if (b && ((unsigned char) -1) == 255)

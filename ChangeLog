@@ -6,6 +6,10 @@
 	* src/SDCC.lex,
 	  support/regression/tests/c2xkeywords.c:
 	  Support C2X keyword from N2457.
+	* support/regression/tests/gcc-torture-execute-pr47148.c,
+	  support/regression/tests/gcc-torture-execute-pr63659.c,
+	  support/regression/tests/gcc-torture-execute-pr64682.c:
+	  Enable some tests that depend on C99 features now supported by SDCC.
 
 2019-11-19 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

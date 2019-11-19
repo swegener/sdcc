@@ -3,21 +3,28 @@
  */
 
 #include <testfwk.h>
+
+/* { dg-additional-options "-Wl,-u,_printf_float" { target newlib_nano_io } } */
+
 #include <stdio.h>
+char buf[2];
 
-char buf[12];
-
-void f (int (*fp)(char *, const char *, ...))
+#if 0 // TODO: enable when SDCC support K&R-style
+f (fp)
+     int (*fp)(char *, const char *, ...);
 {
   (*fp)(buf, "%.0f", 5.0);
 }
+#endif
 
 void
 testTortureExecute (void)
 {
-#if !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Lack of memory
+#if 0
   f (&sprintf);
-  ASSERT ((buf[0] == '<' && buf[1] == 'N') ||   // "<NO FLOAT>""
-          (buf[0] == '5' && buf[1] == 0));      // "5"
+  if (buf[0] != '5' || buf[1] != 0)
+    ASSERT (0);
+  return;
 #endif
 }
+

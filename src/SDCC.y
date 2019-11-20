@@ -1285,7 +1285,7 @@ function_declarator
 
 pointer
    : unqualified_pointer { $$ = $1;}
-   | unqualified_pointer type_specifier_list
+   | unqualified_pointer type_qualifier_list
          {
              $$ = $1;
              if (IS_SPEC($2)) {
@@ -1304,7 +1304,7 @@ pointer
              $$->next = $2;
              DCL_TYPE($2)=port->unqualified_pointer;
          }
-   | unqualified_pointer type_specifier_list pointer
+   | unqualified_pointer type_qualifier_list pointer
          {
              $$ = $1;
              if (IS_SPEC($2) && DCL_TYPE($3) == UPOINTER) {

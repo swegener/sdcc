@@ -1,7 +1,7 @@
 2019-11-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/SDCC.y:
-	  Allow C2X attribute declarations.
+	  Allow C2X attribute declarations and attribute arguments.
 
 2019-11-20 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

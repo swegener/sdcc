@@ -122,7 +122,8 @@ bool uselessDecl = TRUE;
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier alignment_specifier
 %type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
 %type <lnk> function_attribute function_attributes enum_specifier
-%type <lnk> abstract_declarator direct_abstract_declarator unqualified_pointer
+%type <lnk> abstract_declarator direct_abstract_declarator array_abstract_declarator function_abstract_declarator
+%type <lnk> unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
 %type <sdef> stag opt_stag
 %type <asts> primary_expr
@@ -1410,7 +1411,12 @@ abstract_declarator
 
 direct_abstract_declarator
    : '(' abstract_declarator ')'    { $$ = $2; }
-   | '[' ']'                        {
+   | array_abstract_declarator
+   | function_abstract_declarator
+   ;
+
+array_abstract_declarator
+   : '[' ']'                        {
                                        $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY;
                                        DCL_ELEM($$) = 0;
@@ -1435,7 +1441,10 @@ direct_abstract_declarator
                                        DCL_ELEM($$) = (int) ulFromVal(val = constExprValue($3,TRUE));
                                        $$->next = $1;
                                     }
-   | '(' ')'                        { $$ = NULL;}
+   ;
+
+function_abstract_declarator
+   : '(' ')'                        { $$ = NULL;}
    | '(' parameter_type_list ')'    { $$ = NULL;}
    | direct_abstract_declarator '(' ')' {
      // $1 must be a pointer to a function
@@ -1593,7 +1602,17 @@ attribute_token
 
 attribute_argument_clause
    : '(' ')'
-   /*| '(' balanced_token_sequence ')' TODO: Allow attribute arguments */
+   | '(' balanced_token_sequence ')'
+   ;
+
+balanced_token_sequence
+   : balanced_token
+   | balanced_token_sequence balanced_token
+   ;
+
+balanced_token
+   : identifier
+   | STRING_LITERAL
    ;
 
    /* C2X A.2.3 Statements */

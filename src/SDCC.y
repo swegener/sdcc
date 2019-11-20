@@ -372,6 +372,11 @@ expr
    | expr ',' { seqPointNo++;} assignment_expr { $$ = newNode(',',$1,$4);}
    ;
 
+expr_opt
+   :                 { $$ = NULL; seqPointNo++; }
+   | expr            { $$ = $1; seqPointNo++; }
+   ;
+
 constant_expr
    : conditional_expr
    ;
@@ -1483,6 +1488,11 @@ attribute_specifier_sequence
    | attribute_specifier
    ;
 
+attribute_specifier_sequence_opt
+   : /* empty */
+   | attribute_specifier_sequence
+   ;
+
 attribute_specifier
    : '[' '[' attribute_list ']' ']'
      {
@@ -1518,23 +1528,19 @@ attribute_argument_clause
 statement
    : labeled_statement
    | expression_statement
-   | compound_statement
-   | attribute_specifier_sequence compound_statement
+   | attribute_specifier_sequence_opt compound_statement
      {
        $$ = $2;
      }
-   | selection_statement
-   | attribute_specifier_sequence selection_statement
+   | attribute_specifier_sequence_opt selection_statement
      {
        $$ = $2;
      }
-   | iteration_statement
-   | attribute_specifier_sequence iteration_statement
+   | attribute_specifier_sequence_opt iteration_statement
      {
        $$ = $2;
      }
-   | jump_statement
-   | attribute_specifier_sequence jump_statement
+   | attribute_specifier_sequence_opt jump_statement
      {
        $$ = $2;
      }
@@ -1612,8 +1618,7 @@ block_item_list
    ;
 
 expression_statement
-   : ';'                { $$ = NULL;}
-   | expr ';'           { $$ = $1; seqPointNo++;}
+   : expr_opt ';'
    | attribute_specifier_sequence expr ';'           { $$ = $2; seqPointNo++;}
    ;
 
@@ -1868,6 +1873,15 @@ function_definition
         }
    ;
 
+function_body
+   : compound_statement
+   | declaration_list compound_statement
+                     {
+                       werror (E_OLD_STYLE, ($1 ? $1->name: ""));
+                       exit (1);
+                     }
+   ;
+
    /* SDCC-specific stuff */
 
 file
@@ -1992,15 +2006,6 @@ function_attributes
                             else
                               $$->funcAttrs.preserved_regs[regnum] = TRUE;
                           }
-                     }
-   ;
-
-function_body
-   : compound_statement
-   | declaration_list compound_statement
-                     {
-                       werror (E_OLD_STYLE, ($1 ? $1->name: ""));
-                       exit (1);
                      }
    ;
 
@@ -2477,12 +2482,6 @@ for : FOR { /* create & push continue, break & body labels */
             STACK_PUSH(forStack,newSymbol(lbuff,NestLevel));
           }
    ;
-
-expr_opt
-        :                       { $$ = NULL; seqPointNo++; }
-        |       expr            { $$ = $1; seqPointNo++; }
-        ;
-
 
 asm_string_literal
    : STRING_LITERAL

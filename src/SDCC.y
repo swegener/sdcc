@@ -69,7 +69,7 @@ bool uselessDecl = TRUE;
 #define YYDEBUG 1
 
 %}
-%expect 6
+%expect 10
 
 %union {
     symbol     *sym;        /* symbol table pointer                   */
@@ -111,7 +111,7 @@ bool uselessDecl = TRUE;
 
 %type <yyint> Interrupt_storage
 %type <sym> identifier declarator declarator2 direct_declarator array_declarator enumerator_list enumerator
-%type <sym> member_declarator function_declarator function_declarator2
+%type <sym> member_declarator function_declarator
 %type <sym> member_declarator_list member_declaration member_declaration_list
 %type <sym> declaration init_declarator_list init_declarator
 %type <sym> declaration_list identifier_list
@@ -447,10 +447,10 @@ declaration
       {
          $$ = NULL;
       }
-   /*| attribute_declaration TODO: Enable, resolve conflicts
+   | attribute_declaration
       {
          $$ = NULL;
-      }*/
+      }
    ;
 
 declaration_specifiers : declaration_specifiers_ { $$ = finalizeSpec($1); };
@@ -492,9 +492,9 @@ init_declarator
    | declarator '=' initializer  { $1->ival = $3; seqPointNo++; }
    ;
 
-/*attribute_declaration
+attribute_declaration
    : attribute_specifier_sequence ';'
-   ;*/
+   ;
 
 storage_class_specifier
    : TYPEDEF   {
@@ -971,8 +971,16 @@ declarator
    ;
 
 direct_declarator
-   : declarator2_function_attributes    { $$ = $1; }
-   | declarator2                        { $$ = $1; }
+   : identifier
+   | '(' declarator ')'     { $$ = $2; }
+   | array_declarator
+   | declarator2_function_attributes
+   ;
+
+declarator2
+   : identifier
+   | '(' declarator ')'     { $$ = $2; }
+   | array_declarator
    ;
 
 array_declarator:
@@ -1193,20 +1201,85 @@ array_declarator:
          }
    ;
 
+declarator2_function_attributes
+   : function_declarator                 { $$ = $1; }
+   | function_declarator function_attribute  {
+           // copy the functionAttributes (not the args and hasVargs !!)
+           struct value *args;
+           unsigned hasVargs;
+           sym_link *funcType=$1->type;
+
+           while (funcType && !IS_FUNC(funcType))
+             funcType = funcType->next;
+
+           if (!funcType)
+             werror (E_FUNC_ATTR);
+           else
+             {
+               args=FUNC_ARGS(funcType);
+               hasVargs=FUNC_HASVARARGS(funcType);
+
+               memcpy (&funcType->funcAttrs, &$2->funcAttrs,
+                   sizeof($2->funcAttrs));
+
+               FUNC_ARGS(funcType)=args;
+               FUNC_HASVARARGS(funcType)=hasVargs;
+
+               // just to be sure
+               memset (&$2->funcAttrs, 0,
+                   sizeof($2->funcAttrs));
+
+               addDecl ($1,0,$2);
+             }
+   }
+   ;
+
 function_declarator
-   : declarator2_function_attributes
-         {
-             $$ = $1;
-             strncpy (function_name, $$->name, sizeof (function_name) - 4);
-             memset (function_name + sizeof (function_name) - 4, 0x00, 4);
-         }
-   | pointer declarator2_function_attributes
-         {
-             addDecl ($2,0,reverseLink($1));
-             $$ = $2;
-             strncpy (function_name, $$->name, sizeof (function_name) - 4);
-             memset (function_name + sizeof (function_name) - 4, 0x00, 4);
-         }
+   : declarator2 '('  ')'
+        {
+          addDecl ($1, FUNCTION, NULL);
+        }
+   | declarator2 '('
+        {
+          NestLevel += LEVEL_UNIT;
+          STACK_PUSH(blockNum, currBlockno);
+          btree_add_child(currBlockno, ++blockNo);
+          currBlockno = blockNo;
+          seqPointNo++; /* not a true sequence point, but helps resolve scope */
+        }
+     parameter_type_list ')'
+        {
+          sym_link *funcType;
+
+          addDecl ($1, FUNCTION, NULL);
+
+          funcType = $1->type;
+          while (funcType && !IS_FUNC(funcType))
+              funcType = funcType->next;
+
+          assert (funcType);
+
+          FUNC_HASVARARGS(funcType) = IS_VARG($4);
+          FUNC_ARGS(funcType) = reverseVal($4);
+
+          /* nest level was incremented to take care of the parms  */
+          NestLevel -= LEVEL_UNIT;
+          currBlockno = STACK_POP(blockNum);
+          seqPointNo++; /* not a true sequence point, but helps resolve scope */
+
+          // if this was a pointer (to a function)
+          if (!IS_FUNC($1->type))
+              cleanUpLevel(SymbolTab, NestLevel + LEVEL_UNIT);
+
+          $$ = $1;
+        }
+   | declarator2 '(' identifier_list ')'
+        {
+          werror(E_OLD_STYLE,$1->name);
+          /* assume it returns an int */
+          $1->type = $1->etype = newIntLink();
+          $$ = $1;
+        }
    ;
 
 pointer
@@ -1834,13 +1907,16 @@ external_declaration
    ;
 
 function_definition
-   : function_declarator 
+   : declarator
         {   /* function type not specified */
             /* assume it to be 'int'       */
             addDecl($1,0,newIntLink());
             $1 = createFunctionDecl($1);
             if ($1 && FUNC_ISCRITICAL ($1->type))
                 inCriticalFunction = 1;
+
+            strncpy (function_name, $1->name, sizeof (function_name) - 4);
+            memset (function_name + sizeof (function_name) - 4, 0x00, 4);
         }
    function_body
         {
@@ -1848,7 +1924,7 @@ function_definition
             if ($1 && FUNC_ISCRITICAL ($1->type))
                 inCriticalFunction = 0;
         }
-   | declaration_specifiers function_declarator
+   | declaration_specifiers declarator
         {
             sym_link *p = copyLinkChain($1);
             pointerTypes($2->type,p);
@@ -1864,6 +1940,8 @@ function_definition
               {
                 werror (W_INLINE_FUNCATTR, $2->name);
               }
+            strncpy (function_name, $2->name, sizeof (function_name) - 4);
+            memset (function_name + sizeof (function_name) - 4, 0x00, 4);
         }
    function_body
         {
@@ -2176,93 +2254,6 @@ opt_assign_expr
             {
               $$ = cenum = constCharVal(0);
             }
-        }
-   ;
-
-declarator2_function_attributes
-   : function_declarator2                 { $$ = $1; }
-   | function_declarator2 function_attribute  {
-           // copy the functionAttributes (not the args and hasVargs !!)
-           struct value *args;
-           unsigned hasVargs;
-           sym_link *funcType=$1->type;
-
-           while (funcType && !IS_FUNC(funcType))
-             funcType = funcType->next;
-
-           if (!funcType)
-             werror (E_FUNC_ATTR);
-           else
-             {
-               args=FUNC_ARGS(funcType);
-               hasVargs=FUNC_HASVARARGS(funcType);
-
-               memcpy (&funcType->funcAttrs, &$2->funcAttrs,
-                   sizeof($2->funcAttrs));
-
-               FUNC_ARGS(funcType)=args;
-               FUNC_HASVARARGS(funcType)=hasVargs;
-
-               // just to be sure
-               memset (&$2->funcAttrs, 0,
-                   sizeof($2->funcAttrs));
-
-               addDecl ($1,0,$2);
-             }
-   }
-   ;
-
-declarator2
-   : identifier
-   | '(' declarator ')'     { $$ = $2; }
-   | array_declarator
-   ;
-
-function_declarator2
-   : declarator2 '('  ')'
-        {
-          addDecl ($1, FUNCTION, NULL);
-        }
-   | declarator2 '('
-        {
-          NestLevel += LEVEL_UNIT;
-          STACK_PUSH(blockNum, currBlockno);
-          btree_add_child(currBlockno, ++blockNo);
-          currBlockno = blockNo;
-          seqPointNo++; /* not a true sequence point, but helps resolve scope */
-        }
-     parameter_type_list ')'
-        {
-          sym_link *funcType;
-
-          addDecl ($1, FUNCTION, NULL);
-
-          funcType = $1->type;
-          while (funcType && !IS_FUNC(funcType))
-              funcType = funcType->next;
-
-          assert (funcType);
-
-          FUNC_HASVARARGS(funcType) = IS_VARG($4);
-          FUNC_ARGS(funcType) = reverseVal($4);
-
-          /* nest level was incremented to take care of the parms  */
-          NestLevel -= LEVEL_UNIT;
-          currBlockno = STACK_POP(blockNum);
-          seqPointNo++; /* not a true sequence point, but helps resolve scope */
-
-          // if this was a pointer (to a function)
-          if (!IS_FUNC($1->type))
-              cleanUpLevel(SymbolTab, NestLevel + LEVEL_UNIT);
-
-          $$ = $1;
-        }
-   | declarator2 '(' identifier_list ')'
-        {
-          werror(E_OLD_STYLE,$1->name);
-          /* assume it returns an int */
-          $1->type = $1->etype = newIntLink();
-          $$ = $1;
         }
    ;
 

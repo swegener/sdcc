@@ -1931,11 +1931,13 @@ function_definition
             /* assume it to be 'int'       */
             addDecl($1,0,newIntLink());
             $1 = createFunctionDecl($1);
-            if ($1 && FUNC_ISCRITICAL ($1->type))
-                inCriticalFunction = 1;
-
-            strncpy (function_name, $1->name, sizeof (function_name) - 4);
-            memset (function_name + sizeof (function_name) - 4, 0x00, 4);
+            if ($1)
+                {
+                    if (FUNC_ISCRITICAL ($1->type))
+                        inCriticalFunction = 1;
+                    strncpy (function_name, $1->name, sizeof (function_name) - 4);
+                    memset (function_name + sizeof (function_name) - 4, 0x00, 4);
+                }
         }
    function_body
         {
@@ -1949,18 +1951,19 @@ function_definition
             pointerTypes($2->type,p);
             addDecl($2,0,p);
             $2 = createFunctionDecl($2);
-            if ($2 && FUNC_ISCRITICAL ($2->type))
-                inCriticalFunction = 1;
-            // warn for loss of calling convention for inlined functions.
-            if ($2 && FUNC_ISINLINE ($2->type) &&
-                ( FUNC_ISZ88DK_CALLEE ($2->type) || FUNC_ISZ88DK_FASTCALL ($2->type) ||
-                  FUNC_BANKED ($2->type)         || FUNC_REGBANK ($2->type)          ||
-                  FUNC_ISOVERLAY ($2->type)      || FUNC_ISISR ($2->type) ))
-              {
-                werror (W_INLINE_FUNCATTR, $2->name);
-              }
-            strncpy (function_name, $2->name, sizeof (function_name) - 4);
-            memset (function_name + sizeof (function_name) - 4, 0x00, 4);
+            if ($2)
+                {
+                    if (FUNC_ISCRITICAL ($2->type))
+                        inCriticalFunction = 1;
+                    // warn for loss of calling convention for inlined functions.
+                    if (FUNC_ISINLINE ($2->type) &&
+                        ( FUNC_ISZ88DK_CALLEE ($2->type) || FUNC_ISZ88DK_FASTCALL ($2->type) ||
+                          FUNC_BANKED ($2->type)         || FUNC_REGBANK ($2->type)          ||
+                          FUNC_ISOVERLAY ($2->type)      || FUNC_ISISR ($2->type) ))
+                        werror (W_INLINE_FUNCATTR, $2->name);
+                    strncpy (function_name, $2->name, sizeof (function_name) - 4);
+                    memset (function_name + sizeof (function_name) - 4, 0x00, 4);
+                }
         }
    function_body
         {

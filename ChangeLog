@@ -1,6 +1,11 @@
 2019-11-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.y:
+	  Fix bug #2953.
+
+2019-11-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.y:
 	  Fix bug #2954.
 
 2019-11-21 Philipp Klaus Krause <pkk AT spth.de>

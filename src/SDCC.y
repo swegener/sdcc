@@ -1285,7 +1285,17 @@ function_declarator
 
 pointer
    : unqualified_pointer { $$ = $1;}
-   | unqualified_pointer type_specifier_list
+   | unqualified_pointer AT constant_expr /* Special case to allow __at at the end */
+         {
+             sym_link *n = newLink(SPECIFIER);
+             /* add this to the storage class specifier  */
+             SPEC_ABSA(n) = 1;   /* set the absolute addr flag */
+             /* now get the abs addr from value */
+             SPEC_ADDR(n) = (unsigned int) ulFromVal(constExprValue($3,TRUE));
+             n->next = $1;
+             $$ = n;
+         }
+   | unqualified_pointer type_qualifier_list
          {
              $$ = $1;
              if (IS_SPEC($2)) {
@@ -1298,13 +1308,33 @@ pointer
              else
                  werror (W_PTR_TYPE_INVALID);
          }
+   | unqualified_pointer type_qualifier_list AT constant_expr /* Special case to allow __at at the end */
+         {
+             if (IS_SPEC($2)) {
+                 DCL_TSPEC($1) = $2;
+                 DCL_PTR_CONST($1) = SPEC_CONST($2);
+                 DCL_PTR_VOLATILE($1) = SPEC_VOLATILE($2);
+                 DCL_PTR_RESTRICT($1) = SPEC_RESTRICT($2);
+                 DCL_PTR_ADDRSPACE($1) = SPEC_ADDRSPACE($2);
+             }
+             else
+                 werror (W_PTR_TYPE_INVALID);
+
+             sym_link *n = newLink(SPECIFIER);
+             /* add this to the storage class specifier  */
+             SPEC_ABSA(n) = 1;   /* set the absolute addr flag */
+             /* now get the abs addr from value */
+             SPEC_ADDR(n) = (unsigned int) ulFromVal(constExprValue($4,TRUE));
+             n->next = $1;
+             $$ = n;
+         }
    | unqualified_pointer pointer
          {
              $$ = $1;
              $$->next = $2;
              DCL_TYPE($2)=port->unqualified_pointer;
          }
-   | unqualified_pointer type_specifier_list pointer
+   | unqualified_pointer type_qualifier_list pointer
          {
              $$ = $1;
              if (IS_SPEC($2) && DCL_TYPE($3) == UPOINTER) {

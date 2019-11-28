@@ -1,4 +1,10 @@
-2019-11-21 Philipp Klaus Krause <pkk AT spth.de>
+2019-11-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCClrange.c,
+	  support/regression/tests/bug-2956.c:
+	  Fix bug #2956.
+
+2019-11-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.y:
 	  Fix bug #2953.

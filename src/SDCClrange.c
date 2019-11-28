@@ -1174,7 +1174,7 @@ shortenLiveRanges (iCode *sic, ebbIndex *ebbi)
       if (ic->op == IFX || nic->op == IFX)
         continue;
 
-      if (nic->op == IPUSH || nic->op == SEND)
+      if (nic->op == IPUSH || nic->op == SEND || nic->op == RETURN)
         continue;
 
       if (pic->op != '=' || !IS_ITEMP (IC_RESULT (pic)) || bitVectnBitsOn (OP_DEFS (IC_RESULT (pic))) != 1)

@@ -232,7 +232,7 @@ do_utf_8_sdcc (void)
 static void
 do_utf_16 (void)
 {
-#ifdef __STDC_UTF_16__
+#if defined(__STDC_UTF_16__) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
   const char16_t *str1 = u"Ä ä";
   const char16_t *str2 = u"\u00c4 ä";
   const char16_t *str3 = u"Ä " "ä";
@@ -277,7 +277,7 @@ do_utf_32_c95 (void)
 static void
 do_utf_32_c11 (void)
 {
-#ifdef __STDC_UTF_32__
+#if defined(__STDC_UTF_32__) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
   const char32_t *str1 = U"Ä ä";
   const char32_t *str2 = U"\u00c4 ä";
   const char32_t *str3 = U"Ä " "ä";
@@ -296,22 +296,22 @@ do_utf_32_c11 (void)
 static void
 do_chinese (void)
 {
-#ifdef __STDC_UTF_32__
+#if defined(__STDC_UTF_32__) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
   const char32_t *p0 = U"史斌";
 #endif
 #ifdef __STDC_ISO_10646__
   const wchar_t *p1 = L"史庭芳";
 #endif
-#ifdef __STDC_UTF_16__
+#if defined(__STDC_UTF_16__) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
   const char16_t *p2 = u"天津";
 #endif
-#ifdef __STDC_UTF_32__
+#if defined(__STDC_UTF_32__) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
   ASSERT (p0[0] == 0x53f2);
 #endif
 #ifdef __STDC_ISO_10646__
   ASSERT (p1[2] == 0x82b3);
 #endif
-#ifdef __STDC_UTF_16__
+#if defined(__STDC_UTF_16__) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
   ASSERT (p2[1] == 0x6d25);
 #endif
 }

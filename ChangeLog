@@ -1,3 +1,8 @@
+2019-12-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/string.c:
+	  Make preprocessor guards compatible with default setting of clang-9.
+
 2019-11-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCClrange.c,

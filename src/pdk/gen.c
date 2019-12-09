@@ -2629,7 +2629,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
   int size = max (left->aop->size, right->aop->size);
 
   if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX) || aopInReg (right->aop, 1, A_IDX) ||
-     !aopInReg (left->aop, 0, A_IDX) && (right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL))
+     !aopInReg (left->aop, 0, A_IDX) && (right->aop->type == AOP_SFR || right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL))
     {
       operand *temp = left;
       left = right;
@@ -2690,7 +2690,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
                 wassert (regalloc_dry_run);
               }
             cheapMove (ASMOP_A, 0, left->aop, i, true, true, true);
-            if (right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i)
+            if (right->aop->type == AOP_SFR || right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i)
               {
                 if (!regDead (P_IDX, ic) || i + 1 < size && aopInReg(left->aop, i + 1, P_IDX))
                   {
@@ -2711,7 +2711,7 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
             if (TARGET_IS_PDK13)
               {
                 symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
-                emit2 ("ceqsn", "a, %s", (right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i) ? "p" : aopGet (right->aop, i));
+                emit2 ("ceqsn", "a, %s", (right->aop->type == AOP_SFR || right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i) ? "p" : aopGet (right->aop, i));
                 emitJP (tlbl, 0.0f);
                 cost (2, 3);
                 emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.0f);
@@ -2719,14 +2719,14 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
               }
             else
               {
-                emit2 ("cneqsn", "a, %s", (right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i) ? "p" : aopGet (right->aop, i));
+                emit2 ("cneqsn", "a, %s", (right->aop->type == AOP_SFR || right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i) ? "p" : aopGet (right->aop, i));
                 cost (1, 1);
                 emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.0f);
               }
           }
         else
           {
-            emit2 ("ceqsn", "a, %s", (right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i) ? "p" : aopGet (right->aop, i));
+            emit2 ("ceqsn", "a, %s", (right->aop->type == AOP_SFR || right->aop->type == AOP_STK || right->aop->type == AOP_CODE || right->aop->type == AOP_STL && !i) ? "p" : aopGet (right->aop, i));
             cost (1, 1);
             emitJP(lbl_ne, 0.0f);
           }

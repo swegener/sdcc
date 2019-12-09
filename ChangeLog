@@ -5,8 +5,9 @@
 	* support/regression/tests/bug-2957.c:
 	  Test for bug #2957.
 	* src/pdk/gen.c,
-	  support/regression/tests/bug-2959.c:
-	  Fix bug #2959.
+	  support/regression/tests/bug-2959.c,
+	  support/regression/tests/bug-2958.c:
+	  Fix bugs #2959, #2958.
 
 2019-12-02 Philipp Klaus Krause <pkk AT spth.de>
 

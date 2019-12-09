@@ -95,7 +95,8 @@ candidate_expression (const iCode *const ic, int lkey)
     ic->op != RIGHT_OP &&
     !(ic->op == '=' && !POINTER_SET(ic) && !(IS_ITEMP(IC_RIGHT(ic)) /*&& IC_RIGHT(ic)->key > lkey*/)) &&
     ic->op != GET_VALUE_AT_ADDRESS &&
-    ic->op != CAST)
+    ic->op != CAST /*&&
+    ic->op != ADDRESS_OF Apparently typically not worth the cost in code size*/)
     return (false);
 
   const operand *const left = IC_LEFT (ic);
@@ -170,12 +171,14 @@ invalidates_expression(const iCode *const eic, const iCode *const iic)
   const operand *const right = IC_RIGHT (iic);
   const operand *const result = IC_RESULT (iic);
 
+  if (iic->op == FUNCTION || iic->op == ENDFUNCTION || iic->op == RECEIVE)
+    return(true);
+  if (eic->op == ADDRESS_OF) // ADDRESS_OF does not really read its operand.
+    return(false);
   if (eic->op == GET_VALUE_AT_ADDRESS && (isOperandGlobal (IC_RESULT (iic)) || IS_SYMOP (IC_RESULT (iic)) && OP_SYMBOL_CONST (IC_RESULT (iic))->addrtaken))
     return(true);
   if (IC_RESULT (iic) && !IS_OP_LITERAL (result) && !POINTER_SET(iic) &&
     (eleft && isOperandEqual (eleft, result) || eright && isOperandEqual (eright, result)))
-    return(true);
-  if (iic->op == FUNCTION || iic->op == ENDFUNCTION || iic->op == RECEIVE)
     return(true);
   if ((uses_global || uses_volatile) && (iic->op == CALL || iic->op == PCALL))
     return(true);

@@ -4,6 +4,9 @@
 	  Improve handling of ADDRESS_OF.
 	* support/regression/tests/bug-2957.c:
 	  Test for bug #2957.
+	* src/pdk/gen.c,
+	  support/regression/tests/bug-2959.c:
+	  Fix bug #2959.
 
 2019-12-02 Philipp Klaus Krause <pkk AT spth.de>
 

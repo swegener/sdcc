@@ -981,22 +981,37 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 {
   // Handle I/O first.
   wassert_bt ((result->type == AOP_SFR) + (source->type == AOP_SFR) <= 1);
-  if (result->type == AOP_SFR || source->type == AOP_SFR)
-    switch (size)
-      {
-      case 1:
-        cheapMove (result, roffset, source, soffset, a_dead_global, p_dead_global, true);
-        return;
-      case 2:
+
+  if (source->type == AOP_SFR)
+    {
+      wassert (source->size == 1 || source->size == 2);
+      wassert (size >= source->size);
+
+      if (source->size == 1)
+        {
+          cheapMove (result, roffset, source, soffset, a_dead_global, p_dead_global, true);
+          genMove_o (result, roffset + 1, ASMOP_ZERO, 0, size - 1, a_dead_global, p_dead_global);
+        }
 #if 0 // TODO: Implement alignment requirements - ldt16 needs 16-bit-aligned operand
-        if (result->type == AOP_SFR && source->type == AOP_DIR)
-          {
-            emit2 ("stt16", "%s", aopGet (source, soffset));
-            cost (1, 1); // TODO: Really just 1 cycle? Other 16-bit-transfer instructions use 2.
-          }
-         else
+      else if (source->size == 2 && result->type == AOP_DIR && source->type == AOP_SFR)
+        {
+          emit2 ("ldt16", "%s", aopGet (result, roffset));
+          cost (1, 1); // TODO: Really just 1 cycle? Other 16-bit-transfer instructions use 2.
+        }
 #endif
-         if (result->type == AOP_SFR && source->type == AOP_LIT && aopIsLitVal (source, 1, 1, 0x00))
+      else
+        wassertl (0, "Unimplemented __sfr16 load");
+
+      return;
+    }
+  else if (result->type == AOP_SFR)
+    {
+      wassert (result->size == 1 || result->size == 2);
+      wassert (size == result->size);
+
+      if (size == 1)
+        cheapMove (result, roffset, source, soffset, a_dead_global, p_dead_global, true);
+      else if (size == 2 && result->type == AOP_SFR && source->type == AOP_LIT && aopIsLitVal (source, 1, 1, 0x00))
           {
             if (!p_dead_global)
               pushPF (a_dead_global && !aopInReg (source, 0, A_IDX));
@@ -1006,21 +1021,20 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
             if (!p_dead_global)
               popPF (a_dead_global);
           }
-#if 0 // TODO: Implement alignment requirements - ldt16 needs 16-bit-aligned operand
-        else if (result->type == AOP_DIR && source->type == AOP_SFR)
+#if 0 // TODO: Implement alignment requirements - stt16 needs 16-bit-aligned operand
+      else if (size == 2 && result->type == AOP_SFR && source->type == AOP_DIR)
           {
-            emit2 ("ldt16", "%s", aopGet (result, roffset));
+            emit2 ("stt16", "%s", aopGet (source, soffset));
             cost (1, 1); // TODO: Really just 1 cycle? Other 16-bit-transfer instructions use 2.
           }
 #endif
-        else if (regalloc_dry_run)
-          cost (1000, 1000);
-        else
-          wassertl (0, "Unimplemented operand in __sfr16 access");
-        return;
-      default:
-        wassertl (0, "Unknown __sfr size");
-      }
+      else if (regalloc_dry_run)
+        cost (1000, 1000);
+      else
+        wassertl (0, "Unimplemented __sfr16 store");
+
+      return;
+    }
 
   wassert_bt (result->type == AOP_DIR || result->type == AOP_REG || result->type == AOP_STK);
   wassert_bt (source->type == AOP_LIT || source->type == AOP_IMMD || source->type == AOP_DIR || source->type == AOP_REG || source->type == AOP_STK || source->type == AOP_CODE || source->type == AOP_STL);

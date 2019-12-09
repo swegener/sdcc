@@ -2965,7 +2965,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                   continue;
                 }
 
-              if (sym->usl.spillLoc && !sym->usl.spillLoc->_isparm && !USE_OLDSALLOC) // I have no idea where these spill locations come from. Sometime two symbols even have the same spill location, whic tends to mess up stack allocation. THose that come from previous iterations in this loop would be okay, but those from outside are a problem.
+              if (sym->usl.spillLoc && !sym->usl.spillLoc->_isparm && !USE_OLDSALLOC) // I have no idea where these spill locations come from. Sometime two symbols even have the same spill location, whic tends to mess up stack allocation. Those that come from previous iterations in this loop would be okay, but those from outside are a problem.
                 {
                   sym->usl.spillLoc = 0;
                   sym->isspilt = false;

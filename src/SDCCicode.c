@@ -3461,7 +3461,7 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
           ic->parmPush = 1;
           /* update the stack adjustment */
           *stack += getSize (IS_AGGREGATE (p) ? aggrToPtr (p, FALSE) : p);
-          if ((IFFUNC_ISSMALLC (ftype) || TARGET_PDK_LIKE) && !IS_AGGREGATE (p) && getSize (p) == 1) /* SmallC calling convention passes 8-bit paramters as 16-bit values. So does pdk due to stack alignment requirements */
+          if ((IFFUNC_ISSMALLC (ftype) || TARGET_PDK_LIKE) && !IS_AGGREGATE (p) && getSize (p) == 1) /* SmallC calling convention passes 8-bit parameters as 16-bit values. So does pdk due to stack alignment requirements */
             (*stack)++;
           ADDTOCHAIN (ic);
         }

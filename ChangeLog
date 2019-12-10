@@ -1,7 +1,7 @@
 2019-12-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/literalop.c:
-	  Workaround for clang bug.
+	  Avoid testing for undefined behaviour that happens to be implementation-defined in GCC, but not clang.
 
 2019-12-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 

@@ -1,8 +1,15 @@
 2019-12-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
+	  src/z80/ralloc2.cc,
+	  src/z80/main.c:
+	  Improve use of sbc hl, rr in comparisons, part of RFE #641.
+
+2019-12-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
-	  Improve <<, part of RFE #641.
+	  Improve <<, part of RFE #639.
 
 2019-12-10 Philipp Klaus Krause <pkk AT spth.de>
 

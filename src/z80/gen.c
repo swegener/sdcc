@@ -5492,7 +5492,7 @@ genPlusIncr (const iCode * ic)
             }
           else
             {
-              fetchPair (resultId, AOP (IC_RIGHT (ic)));
+              fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
               emit2 ("add hl, %s", getPairName (AOP (IC_LEFT (ic))));
               regalloc_dry_run_cost += 1;
               return TRUE;
@@ -7552,11 +7552,12 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
               goto release;
             }
         }
-
-      if (!IS_GB && (!sign || size > 2) && getPartPairId(AOP (left), offset) == PAIR_HL && isPairDead (PAIR_HL, ic) &&
-        (getPartPairId (AOP (right), offset) == PAIR_DE || getPartPairId(AOP (right), offset) == PAIR_BC))
+      if (!IS_GB && (!sign || size > 2) && (getPartPairId (left->aop, offset) == PAIR_HL || size == 2 && left->aop->type == AOP_IY) && isPairDead (PAIR_HL, ic) &&
+        (getPartPairId (right->aop, offset) == PAIR_DE || getPartPairId (right->aop, offset) == PAIR_BC))
         {
-          emit3 (A_CP, ASMOP_A, ASMOP_A); // Clear carry.
+          if (left->aop->type == AOP_DIR || left->aop->type == AOP_IY)
+            fetchPair (PAIR_HL, left->aop);
+          emit3 (A_XOR, ASMOP_A, ASMOP_A); // Clear carry.
           emit2 ("sbc hl, %s", _pairs[getPartPairId (AOP (right), offset)].name);
           regalloc_dry_run_cost += 2;
           size -= 2;

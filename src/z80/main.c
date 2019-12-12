@@ -1415,7 +1415,7 @@ PORT gbz80_port =
     NULL,
     NULL,
     NULL,
-    NULL,
+    z80canAssign,
     NULL,
     z80symmParmStack,
   },

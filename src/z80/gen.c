@@ -9409,7 +9409,7 @@ AccLsh (unsigned int shCount)
 /* shiftL1Left2Result - shift left one byte from left to result    */
 /*-----------------------------------------------------------------*/
 static void
-shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned int shCount)
+shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned int shCount, const iCode *ic)
 {
   /* If operand and result are the same we can shift in place.
      However shifting in acc using add is cheaper than shifting
@@ -9420,12 +9420,29 @@ shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned
       while (shCount--)
         emit3 (A_SLA, AOP (result), 0);
     }
+  else if ((IS_Z180 && !optimize.codeSpeed || IS_EZ80_Z80) && // Try to use mlt
+    (aopInReg (result->aop, offr, C_IDX) && isPairDead(PAIR_BC, ic) || aopInReg (result->aop, offr, E_IDX) && isPairDead(PAIR_DE, ic) || aopInReg (result->aop, offr, L_IDX) && isPairDead(PAIR_HL, ic)))
+    {
+      PAIR_ID pair = aopInReg (result->aop, offr, C_IDX) ? PAIR_BC : (aopInReg (result->aop, offr, E_IDX) ? PAIR_DE : PAIR_HL);
+
+      bool top = aopInReg (left->aop, offl, _pairs[pair].h_idx);
+      if (!top)
+        cheapMove (pair == PAIR_BC ? ASMOP_C : (pair == PAIR_DE ? ASMOP_E : ASMOP_L), 0, left->aop, offl, !bitVectBitValue (ic->rSurv, A_IDX));
+
+      emit2 ("ld %s, #%d", top ? _pairs[pair].l : _pairs[pair].h, 1 << shCount);
+      emit2 ("mlt %s", _pairs[pair].name);
+      regalloc_dry_run_cost += 4;
+    }
   else
     {
+      if (bitVectBitValue (ic->rSurv, A_IDX))
+        _push (PAIR_AF);
       cheapMove (ASMOP_A, 0, left->aop, offl, true);
       /* shift left accumulator */
       AccLsh (shCount);
       cheapMove (AOP (result), offr, ASMOP_A, 0, true);
+      if (bitVectBitValue (ic->rSurv, A_IDX))
+        _pop (PAIR_AF);
     }
 }
 
@@ -9446,7 +9463,7 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
       if (size > 1)
         {
           if (shCount)
-            shiftL1Left2Result (left, LSB, result, MSB16, shCount);
+            shiftL1Left2Result (left, 0, result, 1, shCount, ic);
           else
             movLeft2Result (left, LSB, result, MSB16, 0);
         }
@@ -9466,20 +9483,11 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
     }
 }
 
-/*-----------------------------------------------------------------*/
-/* genlshOne - left shift a one byte quantity by known count       */
-/*-----------------------------------------------------------------*/
-static void
-genlshOne (operand * result, operand * left, unsigned int shCount)
-{
-  shiftL1Left2Result (left, LSB, result, LSB, shCount);
-}
-
 /*------------------------------------------------------------------*/
 /* genLeftShiftLiteral - left shifting by known count for size <= 2 */
 /*------------------------------------------------------------------*/
 static void
-genLeftShiftLiteral (operand * left, operand * right, operand * result, const iCode *ic)
+genLeftShiftLiteral (operand *left, operand *right, operand *result, const iCode *ic)
 {
   unsigned int shCount = ulFromVal (AOP (right)->aopu.aop_lit);
   unsigned int size;
@@ -9495,13 +9503,13 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, const iC
   wassert (getSize (operandType (left)) >= size);
 
   if (shCount >= (size * 8))
-    genMove (result->aop, ASMOP_ZERO, !bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] != 0, isPairDead (PAIR_HL, ic) && left->aop->regs[H_IDX] < 0 && left->aop->regs[L_IDX] < 0);
+    genMove (result->aop, ASMOP_ZERO, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic) && left->aop->regs[H_IDX] < 0 && left->aop->regs[L_IDX] < 0);
   else
     {
       switch (size)
         {
         case 1:
-          genlshOne (result, left, shCount);
+          shiftL1Left2Result (left, 0, result, 0, shCount, ic);
           break;
         case 2:
           genlshTwo (result, left, shCount, ic);
@@ -9521,7 +9529,7 @@ genLeftShiftLiteral (operand * left, operand * right, operand * result, const iC
 /* genLeftShift - generates code for left shifting                 */
 /*-----------------------------------------------------------------*/
 static void
-genLeftShift (const iCode * ic)
+genLeftShift (const iCode *ic)
 {
   int size, offset;
   symbol *tlbl = 0, *tlbl1 = 0;
@@ -11354,7 +11362,7 @@ genAddrOf (const iCode * ic)
 /* genAssign - generate code for assignment                        */
 /*-----------------------------------------------------------------*/
 static void
-genAssign (const iCode * ic)
+genAssign (const iCode *ic)
 {
   operand *result, *right;
   int size, offset;

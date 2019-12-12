@@ -611,6 +611,12 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     operand_byte_in_reg(left, 0, REG_A, a, i, G) || getSize(operandType(left)) >= 2 && !IS_FLOAT (operandType(left)) && operand_byte_in_reg(left, 1, REG_A, a, i, G)))
     return(true);
 
+  // Plain assignment between registers
+  if(ic->op == CAST && getSize(operandType(IC_RESULT(ic))) == 1 &&
+    (operand_in_reg(result, REG_B, ia, i, G) || operand_in_reg(result, REG_C, ia, i, G) || operand_in_reg(result, REG_D, ia, i, G) || operand_in_reg(result, REG_E, ia, i, G) || operand_in_reg(result, REG_A, ia, i, G)) &&
+    (operand_in_reg(result, REG_B, ia, i, G) || operand_in_reg(result, REG_C, ia, i, G) || operand_in_reg(result, REG_D, ia, i, G) || operand_in_reg(result, REG_E, ia, i, G)))
+    return(true);
+
   // Any input byte in A is ok, when all operands are registers other than iy.
   if(ic->op == CAST && operand_in_reg(right, REG_A, ia, i, G) &&
     !operand_in_reg(result, REG_A, ia, i, G) && (operand_in_reg(result, REG_C, ia, i, G) || operand_in_reg(result, REG_E, ia, i, G) || operand_in_reg(result, REG_L, ia, i, G)))
@@ -625,6 +631,10 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       if(!operand_in_reg(left, REG_A, ia, i, G) || dying_A)
         return(true);
     }
+
+  // Left shift of 1 byte can always handle a.
+  if (ic->op == LEFT_OP && getSize(operandType(IC_RESULT(ic))) == 1 && IS_OP_LITERAL(right))
+    return(true);
 
   // inc / dec does not affect a.
   if ((ic->op == '+' || ic->op == '-') && IS_OP_LITERAL(right) && ulFromVal (OP_VALUE (IC_RIGHT(ic))) <= 2 &&

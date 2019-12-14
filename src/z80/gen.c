@@ -8305,12 +8305,6 @@ genAnd (const iCode * ic, iCode * ifx)
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
       int sizel;
 
-      if (!a_free) // Hard to handle pop with ifx
-        {
-           regalloc_dry_run_cost += 100;
-           wassert (regalloc_dry_run);
-        }
-
       sizel = AOP_SIZE (left);
       if (size)
         {
@@ -8447,6 +8441,12 @@ genAnd (const iCode * ic, iCode * ifx)
           /* Generic case, loading into accumulator and testing there. */
           else
             {
+              if (bitVectBitValue (ic->rSurv, A_IDX) || left->aop->regs[A_IDX] > offset || right->aop->regs[A_IDX] > offset)
+                {
+                  regalloc_dry_run_cost += 100;
+                  wassert (regalloc_dry_run);
+                }
+
               cheapMove (ASMOP_A, 0, left->aop, offset, true);
               if (isLiteralBit (bytelit) == 0 || isLiteralBit (bytelit) == 7)
                 {

@@ -1,5 +1,10 @@
 2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Revive non-destructive &.
+
+2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
 	* sdas/asrab/rabmch.c:
 	  Fix ex (sp), hl for Rabbits.
 	* src/z80/gen.c:

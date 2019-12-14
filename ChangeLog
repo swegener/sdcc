@@ -1,5 +1,11 @@
 2019-12-12 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCopt.c,
+	  support/regression/tests/bug-2932.c:
+	  Fix bug #2932.
+
+2019-12-12 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc,
 	  src/z80/main.c:

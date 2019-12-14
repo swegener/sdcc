@@ -1082,6 +1082,8 @@ convsmallc (iCode *ic, eBBlock *ebp)
     {
       if (icp)
         icp->next = icc->prev;
+      else
+        ebp->sch = icc->prev;
       icc->prev = ic;
     }
   for (; icc != icp; ico = icc, icc = icc->prev)

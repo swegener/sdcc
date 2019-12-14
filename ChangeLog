@@ -2,6 +2,8 @@
 
 	* sdas/asrab/rabmch.c:
 	  Fix ex (sp), hl for Rabbits.
+	* src/z80/gen.c:
+	  Fix an issue in eZ80 pointer read.
 
 2019-12-12 Philipp Klaus Krause <pkk AT spth.de>
 

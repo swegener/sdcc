@@ -10469,7 +10469,7 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 
- if (isPair (AOP (result)) && IS_EZ80_Z80 && getPairId (AOP (left)) == PAIR_HL && !IS_BITVAR (retype))
+ if (isPair (AOP (result)) && IS_EZ80_Z80 && getPairId (AOP (left)) == PAIR_HL && !IS_BITVAR (retype) && !rightval)
    {
      emit2 ("ld %s, (hl)", _pairs[getPairId (AOP (result))].name);
      regalloc_dry_run_cost += 2;

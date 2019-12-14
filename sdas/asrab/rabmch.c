@@ -806,11 +806,16 @@ VOID  machine(struct mne * mp)
                                 }
                         }
         
-                        if ((t1 == S_IDSP) && (v1 == 0) && (v2!=HL)) {
+                        if ((t1 == S_IDSP) && (v1 == 0)) {
                                 /* 0xE3 is EX DE',HL on rabbit 2000 
                                  * but DD/FD E3 "ex (sp),ix|iy" is valid
                                  */
-                                if (gixiy(v2) == HL) {
+                                if (v2 == HL) {
+                                        outab(0xED);
+                                        outab(0x54);
+                                        break;
+                                }
+                                else if (gixiy(v2) == HL) {
                                         outab(op);
                                         break;
                                 }

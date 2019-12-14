@@ -1,3 +1,8 @@
+2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asrab/rabmch.c:
+	  Fix ex (sp), hl for Rabbits.
+
 2019-12-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCopt.c,

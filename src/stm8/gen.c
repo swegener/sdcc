@@ -2143,6 +2143,11 @@ skip_byte:
             emit3w (A_CLRW, ASMOP_Y, 0);
           i += 2;
         }
+      else if(x_free && (aopInReg (result, roffset + i, XL_IDX) || aopInReg (result, roffset + i, XH_IDX)))
+        {
+          emit3w (A_CLRW, ASMOP_X, 0);
+          i++;
+        }
       else if (y_dead && aopIsLitVal (source, soffset + i + 1, 1, 0x00) &&
         (aopInReg (result, roffset + i, YL_IDX) && result->regs[YH_IDX] < 0 || aopInReg (result, roffset + i, YH_IDX) && result->regs[YL_IDX] < 0))
         {
@@ -2252,6 +2257,18 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
               clr_y = TRUE;
             }
           i += 2;
+        }
+      else if (x_dead && aopIsLitVal (source, soffset + i, 1, 0x00) && (aopInReg (result, roffset + i, XL_IDX) || aopInReg (result, roffset + i, XH_IDX)))
+        {
+          emit3w (A_CLRW, ASMOP_X, 0);
+          clr_x = true;
+          i++;
+        }
+      else if (y_dead && aopIsLitVal (source, soffset + i, 1, 0x00) && (aopInReg (result, roffset + i, YL_IDX) || aopInReg (result, roffset + i, YH_IDX)))
+        {
+          emit3w (A_CLRW, ASMOP_Y, 0);
+          clr_y = true;
+          i++;
         }
       else if (i + 1 < size && i >= 2 && source->type == AOP_LIT && aopIsLitVal (source, soffset + i, 2, byteOfVal (source->aopu.aop_lit, soffset + i - 2) + byteOfVal (source->aopu.aop_lit, soffset + i - 1) * 256) &&
         (aopInReg (result, roffset + i, X_IDX) && aopInReg (result, roffset + i - 2, Y_IDX) || aopInReg (result, roffset + i, Y_IDX) && aopInReg (result, roffset + i - 2, X_IDX)))
@@ -6616,7 +6633,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
 
   if (!sign && shCount >= (size * 8))
     {
-      genMove(result->aop, ASMOP_ZERO, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
+      genMove (result->aop, ASMOP_ZERO, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
       shiftop = result->aop;
       goto release;
     }

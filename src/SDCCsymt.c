@@ -1095,6 +1095,7 @@ getSize (sym_link * p)
     case EEPPOINTER:
     case FPOINTER:
     case CPOINTER:
+      return (FARPTRSIZE);
     case FUNCTION:
       return (IFFUNC_ISBANKEDCALL (p) ? BFUNCPTRSIZE : FUNCPTRSIZE);
     case GPOINTER:

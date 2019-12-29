@@ -2064,7 +2064,12 @@ skip_byte:
   // Last, move everything from stack to registers.
   for (i = 0; i < n;)
     {
-      if (i < n - 1 && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && aopOnStackNotExt (source, soffset + i, 2))
+      if (assigned[i]) // Stack location has been read early, to avoid overwriting it with data from registers in the register-to-stack copy above.
+        {
+          i++;
+          continue;
+        }
+      else if (i < n - 1 && (aopInReg (result, roffset + i, X_IDX) || aopInReg (result, roffset + i, Y_IDX)) && aopOnStackNotExt (source, soffset + i, 2))
         {
           wassert_bt (size >= 2);
           emit2 ("ldw", aopInReg (result, roffset + i, X_IDX) ? "x, %s" : "y, %s", aopGet2 (source, soffset + i));

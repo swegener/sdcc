@@ -1,3 +1,10 @@
+2019-12-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/ralloc2.cc,
+	  src/stm8/gen.c,
+	  src/SDCCsymt.c:
+	  Reenable partial register allocation for stm8, that was accidentially partially disabled when enabling the new stack allocator.
+
 2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

@@ -543,7 +543,7 @@ static bool tree_dec_ralloc(T_t &T, G_t &G, const I_t &I, SI_t &SI)
         }
 
       if(spilt)
-        stm8SpillThis(sym, true);
+        stm8SpillThis(sym, false);
 
       sym->nRegs = I[v].size;
     }

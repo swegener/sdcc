@@ -7633,20 +7633,20 @@ movLeft2Result (operand * left, int offl, operand * result, int offr, int sign)
 /* shiftL2Left2Result - shift left two bytes from left to result   */
 /*-----------------------------------------------------------------*/
 static void
-shiftL2Left2Result (operand * left, int offl, operand * result, int offr, int shCount)
+shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCount)
 {
   int i;
-  bool needpula = FALSE;
-  bool needpulx = FALSE;
+  bool needpula;
+  bool needpulx;
 
   if (!IS_AOP_XA (AOP (left)) && !IS_AOP_A (AOP (left)))
     needpula = pushRegIfUsed (hc08_reg_a);
   else
-    needpula = FALSE;
+    needpula = false;
   if (!IS_AOP_XA (AOP (left)))
     needpulx = pushRegIfUsed (hc08_reg_x);
   else
-    needpulx = FALSE;
+    needpulx = false;
 
   loadRegFromAop (hc08_reg_xa, AOP (left), offl);
 
@@ -7655,7 +7655,7 @@ shiftL2Left2Result (operand * left, int offl, operand * result, int offr, int sh
     case 7:
       rmwWithReg ("lsr", hc08_reg_x);
       rmwWithReg ("ror", hc08_reg_a);
-      transferRegReg (hc08_reg_a, hc08_reg_x, FALSE);
+      transferRegReg (hc08_reg_a, hc08_reg_x, false);
       rmwWithReg ("clr", hc08_reg_a);
       rmwWithReg ("ror", hc08_reg_a);
       break;
@@ -7670,7 +7670,6 @@ shiftL2Left2Result (operand * left, int offl, operand * result, int offr, int sh
 
   pullOrFreeReg (hc08_reg_x, needpulx);
   pullOrFreeReg (hc08_reg_a, needpula);
-
 }
 
 
@@ -7681,6 +7680,13 @@ shiftL2Left2Result (operand * left, int offl, operand * result, int offr, int sh
 static void
 shiftRLeftOrResult (operand * left, int offl, operand * result, int offr, int shCount)
 {
+  bool needpula;
+
+  if (!IS_AOP_XA (AOP (left)) && !IS_AOP_A (AOP (left)))
+    needpula = pushRegIfUsed (hc08_reg_a);
+  else
+    needpula = false;
+
   loadRegFromAop (hc08_reg_a, AOP (left), offl);
   /* shift left accumulator */
   AccRsh (shCount, FALSE);
@@ -7688,7 +7694,8 @@ shiftRLeftOrResult (operand * left, int offl, operand * result, int offr, int sh
   accopWithAop ("ora", AOP (result), offr);
   /* back to result */
   storeRegToAop (hc08_reg_a, AOP (result), offr);
-  hc08_freeReg (hc08_reg_a);
+
+  pullOrFreeReg (hc08_reg_a, needpula);
 }
 
 /*-----------------------------------------------------------------*/
@@ -7869,7 +7876,7 @@ genlshFour (operand * result, operand * left, int shCount)
         }
     }
 
-  /* 1 <= shCount <= 7 */
+  /* 1 <= shCount <= 2 */
   else if (shCount <= 2)
     {
       shiftLLong (left, result, LSB);

@@ -1,3 +1,9 @@
+2019-01-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/hc08/gen.c,
+	  support/regression/tests/bug-2825.c:
+	  Fix bug #2825.
+
 2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

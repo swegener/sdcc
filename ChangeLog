@@ -3,6 +3,10 @@
 	* src/hc08/gen.c,
 	  support/regression/tests/bug-2825.c:
 	  Fix bug #2825.
+	* support/regression/tests/gcc-torture-execute-20040409-1.c,
+	  support/regression/tests/gcc-torture-execute-20040409-2.c,
+	  support/regression/tests/gcc-torture-execute-20040409-3.c:
+	  Remove some tests that depend on older GCC implementation-defined behaviour on signed int overflow.
 
 2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
 

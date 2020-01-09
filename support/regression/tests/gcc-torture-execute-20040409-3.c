@@ -30,11 +30,6 @@ unsigned int ftest2u(unsigned int x)
   return ~(x + (unsigned int)INT_MIN);
 }
 
-int ftest3(int x)
-{
-  return ~(x - INT_MIN);
-}
-
 unsigned int ftest3u(unsigned int x)
 {
   return ~(x - (unsigned int)INT_MIN);
@@ -64,12 +59,6 @@ unsigned int ftest5u(unsigned int x)
   return ~(x + y);
 }
 
-int ftest6(int x)
-{
-  int y = INT_MIN;
-  return ~(x - y);
-}
-
 unsigned int ftest6u(unsigned int x)
 {
   unsigned int y = (unsigned int)INT_MIN;
@@ -84,18 +73,10 @@ void ftest(int a, int b)
     ASSERT (0);
   if (ftest2(a) != b)
     ASSERT (0);
-#ifndef __aarch64__
-  if (ftest3(a) != b)
-    ASSERT (0);
-#endif
   if (ftest4(a) != b)
     ASSERT (0);
   if (ftest5(a) != b)
     ASSERT (0);
-#ifndef __aarch64__
-  if (ftest6(a) != b)
-    ASSERT (0);
-#endif
 }
 
 void ftestu(unsigned int a, unsigned int b)

@@ -888,7 +888,7 @@ extern  char    rb[NINPUT];     /*      LST file text line being
                                  *      address relocated
                                  */
 extern  char    ctype[];        /*      array of character types, one per
-                                 *      ASCII character
+                                 *      ASCII/OEM character
                                  */
 
 /*

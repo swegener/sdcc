@@ -224,7 +224,7 @@ getfid(char *str, int c)
                 } while (c);
                 /* trim trailing spaces */
                 --p;
-                while (p >= str && ctype[*p & 0x007F] == SPACE)
+                while (p >= str && ctype[*p & 0x00FF] == SPACE)
                         --p;
                 /* terminate the string */
                 *(++p) = '\0';

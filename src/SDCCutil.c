@@ -866,7 +866,7 @@ universalEscape (const char **str, unsigned int n)
         }
       else if ((**str | 0x20) >= 'a' && (**str | 0x20) <= 'f')
         {
-          value = (value << 4) + (**str - 'a' + 10);
+          value = (value << 4) + ((**str | 0x20) - 'a' + 10);
           ++*str;
         }
       else

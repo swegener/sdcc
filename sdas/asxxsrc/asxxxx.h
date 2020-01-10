@@ -1074,10 +1074,10 @@ extern  FILE    *ofp;           /*      relocation output file handle
                                  */
 extern  FILE    *tfp;           /*      symbol table output file handle
                                  */
-extern  unsigned char ctype[128]; /*    array of character types, one per
-                                 *      ASCII character
+extern  unsigned char ctype[256]; /*    array of character types, one per
+                                 *      ASCII/OEM character
                                  */
-extern  char    ccase[128];     /*      an array of characters which
+extern  char    ccase[256];     /*      an array of characters which
                                  *      perform the case translation function
                                  */
 /*sdas specific */

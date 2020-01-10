@@ -1,4 +1,18 @@
-2019-01-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+2020-01-10 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* sdas/asxxsrc/asdata.c,
+	  sdas/asxxsrc/aslex.c,
+	  sdas/asxxsrc/asxxxx.h,
+	  sdas/linksrc/aslink.h,
+	  sdas/linksrc/lkdata.c,
+	  sdas/linksrc/lklex.c:
+	  Make the character input routines in sdas and sdld 8-bit-safe (bug #2961) and interpret all extended ASCII characters as letters.
+	* src/SDCC.lex,
+	  src/SDCCutil.c,
+	  support/regression/tests/idf_ucn_utf8.c:
+	  Add compiler support for UCNs and non-ASCII-utf8 in identifiers (patch #311) -- the internal representation is utf8.
+
+2020-01-09 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/hc08/gen.c,
 	  support/regression/tests/bug-2825.c:
@@ -8,7 +22,7 @@
 	  support/regression/tests/gcc-torture-execute-20040409-3.c:
 	  Remove some tests that depend on older GCC implementation-defined behaviour on signed int overflow.
 
-2019-01-08 Philipp Klaus Krause <pkk AT spth.de>
+2020-01-08 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,
 	  support/regression/tests/bug-2964.c:

@@ -78,6 +78,7 @@ SDCC_REQUIRE_PROG($LEX, flex)
 AC_LANG_C
 
 AC_CHECK_HEADERS(endian.h sys/endian.h machine/endian.h sys/isa_defs.h)
+AC_CHECK_HEADERS(uchar.h)
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS(treedec/combinations.hpp,,AC_MSG_NOTICE([[treedec library missing, falling back to Thorup.]]))
 AC_CHECK_HEADERS(gala/graph.h)

@@ -1,3 +1,9 @@
+2020-01-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* configure.ac,
+	  configure,
+	  src/SDCC.lex: Gracefully handle when uchar.h is missing
+
 2020-01-10 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* sdas/asxxsrc/asdata.c,

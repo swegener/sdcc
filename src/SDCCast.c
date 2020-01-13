@@ -4545,7 +4545,7 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /*----------------------------*/
     case '!':
       /* can be pointer */
-      if (!IS_ARITHMETIC (LTYPE (tree)) && !IS_PTR (LTYPE (tree)) && !IS_ARRAY (LTYPE (tree)))
+      if (!IS_ARITHMETIC (LTYPE (tree)) && !IS_PTR (LTYPE (tree)) && !IS_FUNC (LTYPE (tree)) && !IS_ARRAY (LTYPE (tree)))
         {
           werrorfl (tree->filename, tree->lineno, E_UNARY_OP, tree->opval.op);
           goto errorTreeReturn;
@@ -4986,7 +4986,11 @@ decorateType (ast *tree, RESULT_TYPE resultType)
       /* else they should be promotable to one another */
       else
         {
-          if (!((IS_PTR (LTYPE (tree)) && IS_LITERAL (RTYPE (tree))) || (IS_PTR (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))))
+          if (!((IS_PTR (LTYPE (tree)) && IS_LITERAL (RTYPE (tree)))
+                || (IS_PTR (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)))
+                || ((tree->opval.op == EQ_OP || tree->opval.op == NE_OP)
+                    && ((IS_FUNC (LTYPE (tree)) && IS_LITERAL (RTYPE (tree)) && !ullFromVal (valFromType (RTYPE (tree))))
+                        || (IS_FUNC (RTYPE (tree)) && IS_LITERAL (LTYPE (tree)) && !ullFromVal (valFromType (LTYPE (tree))))))))
 
             if (compareType (LTYPE (tree), RTYPE (tree)) == 0)
               {

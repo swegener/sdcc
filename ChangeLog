@@ -1,5 +1,12 @@
 2020-01-13 Benedikt Freisen <b.freisen AT gmx.net>
 
+	* src/SDCCast.c,
+	  support/regression/tests/bug-2859.c,
+	  support/valdiag/tests/bug-2859.c:
+	  Fix bug #2859 (Cannot compare function to 0)
+
+2020-01-13 Benedikt Freisen <b.freisen AT gmx.net>
+
 	* src/SDCC.y,
 	  src/SDCCerr.c,
 	  src/SDCCerr.h: Add parser rules and an error message for compound literals.

@@ -569,6 +569,8 @@ struct
     "invalid u8 character constant", 0},
   { E_ATTRIBUTE_C2X, ERROR_LEVEL_ERROR,
     "attribute requires C2X or later", 0},
+  { E_COMPOUND_LITERALS_C99, ERROR_LEVEL_ERROR,
+    "compound literals require ISO C99 or later and are not implemented", 0},
 };
 
 /* -------------------------------------------------------------------------------

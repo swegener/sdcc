@@ -280,6 +280,7 @@ enum {
   E_U8_CHAR_C2X                 = 251, /* u8 character constant requires ISO C2X or later */
   E_U8_CHAR_INVALID             = 252, /* invalid u8 character constant */
   E_ATTRIBUTE_C2X               = 253, /* attribute requires ISO C2X or later */
+  E_COMPOUND_LITERALS_C99       = 254, /* compound literals require ISO C99 or later */
 
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

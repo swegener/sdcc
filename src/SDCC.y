@@ -69,7 +69,7 @@ bool uselessDecl = TRUE;
 #define YYDEBUG 1
 
 %}
-%expect 10
+%expect 11
 
 %union {
     symbol     *sym;        /* symbol table pointer                   */
@@ -198,6 +198,20 @@ postfix_expr
                       { $$ = newNode(INC_OP,$1,NULL);}
    | postfix_expr DEC_OP
                       { $$ = newNode(DEC_OP,$1,NULL); }
+   | '(' type_name ')' '{' initializer_list '}'
+                      {
+                        /* if (!options.std_c99) */
+                          werror(E_COMPOUND_LITERALS_C99);
+
+                        /* TODO: implement compound literals (C99) */
+                      }
+   | '(' type_name ')' '{' initializer_list ',' '}'
+                      {
+                        /* if (!options.std_c99) */
+                          werror(E_COMPOUND_LITERALS_C99);
+
+                        /* TODO: implement compound literals (C99) */
+                      }
    ;
 
 argument_expr_list

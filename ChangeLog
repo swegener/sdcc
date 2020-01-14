@@ -1,3 +1,9 @@
+2020-01-14 Benedikt Freisen <b.freisen AT gmx.net>
+
+	* src/SDCCglue.c,
+	  support/regression/tests/fptr_cast_array_init.c:
+	  Implement feature request #598 (Cannot initialize arrays with type cast function pointers).
+
 2020-01-13 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCCast.c,

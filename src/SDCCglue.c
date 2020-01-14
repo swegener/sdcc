@@ -521,6 +521,12 @@ initValPointer (ast *expr)
       return valForStructElem (t, expr->right); 
     }
 
+  /* case 7. function name */
+  if (IS_AST_SYM_VALUE (expr) && IS_FUNC (expr->ftype))
+    {
+      return AST_VALUE (expr);
+    }
+
   return NULL;
 }
 

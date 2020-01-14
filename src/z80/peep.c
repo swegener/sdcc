@@ -1057,7 +1057,7 @@ int z80instructionSize(lineNode *pl)
   /* Bit */
   if(ISINST(pl->line, "bit") || ISINST(pl->line, "set") || ISINST(pl->line, "res"))
     {
-      if(argCont(op1start, "(ix)") || argCont(op1start, "(iy)"))
+      if(argCont(op2start, "(ix)") || argCont(op2start, "(iy)"))
         return(4);
       return(2);
     }

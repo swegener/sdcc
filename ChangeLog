@@ -1,3 +1,9 @@
+2020-01-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c,
+	  support/regression/tests/bug-2966.c:
+	  Fix bug #2966.
+
 2020-01-14 Benedikt Freisen <b.freisen AT gmx.net>
 
 	* src/SDCCglue.c,

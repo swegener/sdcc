@@ -263,8 +263,8 @@ status collapsed
 \end_inset
 
 , etc.), Dallas DS80C390 variants, Freescale (formerly Motorola) HC08 based
- (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, gbz80, Rabbit 2000/3000,
- Rabbit 3000A 
+ (hc08, s08), Zilog Z80 based MCUs (Z80, Z180, eZ90 in Z80 mode, gbz80,
+ Rabbit 2000/3000, Rabbit 3000A 
 \begin_inset Index idx
 status collapsed
 
@@ -284,9 +284,9 @@ STM8
 
 \end_inset
 
- and Padauk PDK14.
+, Padauk PDK14 and PDK15.
  It can be retargeted for other microprocessors, support for Microchip PIC
- and Padauk PDK15 is under development.
+ and Padauk PDK13 is under development.
  The entire source code for the compiler is distributed under GPL.
  SDCC uses a modified version of ASXXXX
 \begin_inset Index idx
@@ -1019,7 +1019,8 @@ sdcc compiler:
 \begin_inset Newline newline
 \end_inset
 
-sdcc compiler is licensed under the GPLv2.
+sdcc compiler is licensed under the GPLv2 (GPLv3 might apply depending on
+ the libraries used when building).
 \begin_inset Newline newline
 \end_inset
 
@@ -1085,11 +1086,12 @@ GPLv2+LE
 \begin_inset Newline newline
 \end_inset
 
-Exception are pic device libraries and header files which are derived from
- Microchip header (.inc) and linker script (.lkr) files.
+A possible exception are pic device libraries and header files which are
+ generated from Microchip header (.inc) and linker script (.lkr) files.
  Microchip requires that "The header files should state that they are only
  to be used with authentic Microchip devices" which makes them incompatible
- with the GPL.
+ with the GPL, if Microchip has any copyright in them (which might depend
+ on local copyright laws).
  Pic device libraries and header files are located at non-free/lib and non-free/
 include directories respectively.
  SDCC should be run with the 
@@ -1527,7 +1529,8 @@ arg
 
 \end_inset
 
- functions are casted to int unless explicitly casted and 
+ functions are casted to int unless explicitly casted and neither of the
+ 
 \series bold
 -
 \begin_inset ERT
@@ -1565,9 +1568,9 @@ status collapsed
 
 \end_inset
 
-
+,
 \series default
- and 
+ 
 \series bold
 -
 \begin_inset ERT
@@ -1605,9 +1608,85 @@ status collapsed
 
 \end_inset
 
+, -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c11
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c11
+\end_layout
+
+\end_inset
+
 
 \series default
- command line option are not defined, e.g.: 
+ or 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2x
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2x
+\end_layout
+
+\end_inset
+
+
+\series default
+ command line options is used, e.g.: 
 \begin_inset Newline newline
 \end_inset
 
@@ -1641,171 +1720,12 @@ n", a, (char)a);
 \begin_inset Newline newline
 \end_inset
 
- will push a as an int and as a char resp if 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\end_layout
-
-\end_inset
-
-
-\series default
- and 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\end_layout
-
-\end_inset
-
-
-\series default
- command line options are not defined,
+ will push a as an int and as a char resp if none of the above command line
+ options are not defined,
 \begin_inset Newline newline
 \end_inset
 
- will push a as two ints if 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c89
-\end_layout
-
-\end_inset
-
-
-\series default
- or 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--std-c99
-\end_layout
-
-\end_inset
-
-
-\series default
- command line option is defined.
+ will push a as two ints if none of the above command line option is defined.
 \end_layout
 
 \begin_layout Itemize
@@ -1833,7 +1753,7 @@ arg
 \end_inset
 
  functions are casted to generic pointers on Harvard architectures (e.g.
- mcs51, ds390) unless explicitly casted and 
+ mcs51, ds390) unless explicitly casted and neither of the 
 \series bold
 -
 \begin_inset ERT
@@ -1871,9 +1791,9 @@ status collapsed
 
 \end_inset
 
-
+,
 \series default
- and 
+ 
 \series bold
 -
 \begin_inset ERT
@@ -1911,9 +1831,85 @@ status collapsed
 
 \end_inset
 
+, -
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c11
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c11
+\end_layout
+
+\end_inset
+
 
 \series default
- command line option are not defined.
+ or 
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2x
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2x
+\end_layout
+
+\end_inset
+
+
+\series default
+ command line options is used.
 \end_layout
 
 \begin_layout Itemize
@@ -2982,6 +2978,24 @@ status collapsed
 \end_inset
 
 -disable-z180-port Excludes the z180 port
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-disable-ez80_z80-port Excludes the e80_z80 port
 \end_layout
 
 \begin_layout Labeling
@@ -9350,7 +9364,7 @@ stack-auto
 
 
 \series default
- is specified in the mcs51, ds390, hc08 and s08 ports.
+ is specified in the mcs51, ds390, hc08, s08, pdk13, pdk14 and pdk15 ports.
 \end_layout
 
 \begin_layout Subsection
@@ -11089,6 +11103,25 @@ status collapsed
 
 \series default
  Generate code for the STMicroelectronics STM8 family of processors.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-mpdk13
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-mpdk13
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for Padauk processors with 13 bit wide program memory.
 \end_layout
 
 \begin_layout Labeling
@@ -14777,6 +14810,97 @@ status collapsed
 
 \end_inset
 
+-std-sdcc2x
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc2x
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generally follow the ISO C2X standard, but allow some SDCC behaviour that
+ conflicts with the standard (default).
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-c2x
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-std-sdcc2x
+\end_layout
+
+\end_inset
+
+
+\series default
+ Follow the ISO C2X standard.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
 -codeseg
 \series default
 
@@ -18150,6 +18274,126 @@ GBZ80!Options!-ba <Num>
 \end_layout
 
 \begin_layout Subsection
+STM8 Options
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+Options STM8
+\end_layout
+
+\end_inset
+
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+STM8 options
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-medium
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-medium
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for Medium model programs, see section Memory Models for
+ more details.
+ This is the default model.
+\end_layout
+
+\begin_layout Labeling
+\labelwidthstring 00.00.0000
+
+\series bold
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-large
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-model-large
+\end_layout
+
+\end_inset
+
+
+\series default
+ Generate code for Large model programs, see section Memory Models for more
+ details.
+ If this option is used all source files in the project have to be compiled
+ with this option.
+ It must also be used when invoking the linker.
+\end_layout
+
+\begin_layout Subsection
 Intermediate Dump Options
 \begin_inset CommandInset label
 LatexCommand label
@@ -18838,7 +19082,7 @@ Search Paths
 \begin_layout Standard
 There are some more environment variables recognized by SDCC, but these
  are mainly used for debugging purposes.
- They can change or disappear very quickly, and will never be documented
+ They can change or disappear very quickly, and won't be documented
 \begin_inset Foot
 status collapsed
 
@@ -23263,8 +23507,8 @@ status open
 \end_layout
 
 \begin_layout Subsection
-Omitting promotion on arguments of vararg function (does not apply to pdk14,
- pdk15)
+Omitting promotion on arguments of vararg function (does not apply to pdk13,
+ pdk14, pdk15)
 \end_layout
 
 \begin_layout Standard
@@ -23349,8 +23593,8 @@ name "sec:Parameters-and-Local-Variables"
 \begin_layout Standard
 Automatic (local) variables and parameters to functions are placed on the
  stack for most targets.
- For MCS51/DS390/HC08/S08 they can either be placed on the stack or in data-spac
-e.
+ For MCS51/DS390/HC08/S08/PDK13/PDK14/PDK15 they can either be placed on
+ the stack or in data-space.
  The default action of the compiler is to place these variables in the internal
  RAM (for small model) or external RAM (for medium or large model).
  This in fact makes them similar to 
@@ -23519,7 +23763,8 @@ unsigned char foo(char i) __reentrant
 \end_layout
 
 \begin_layout Standard
-Since stack space on 8051 is limited, the 
+Since stack space on 8051 is limited, and accessing the stack is slow for
+ the Padauk, the 
 \emph on
 __reentrant
 \emph default
@@ -23541,8 +23786,12 @@ status collapsed
 -stack-auto
 \emph default
  option should be used sparingly.
- Note that the reentrant keyword just means that the parameters & local
- variables will be allocated to the stack, it 
+ Note that the 
+\emph on
+__reentrant
+\emph default
+ keyword just means that the parameters & local variables will be allocated
+ to the stack, it 
 \emph on
 does not
 \emph default
@@ -25161,7 +25410,7 @@ reference "subsec:MCS51-Startup-Code"
 \end_layout
 
 \begin_layout Subsection
-Z80 and Z180 Interrupt Service Routines
+Z80, Z180 and eZ80 Interrupt Service Routines
 \end_layout
 
 \begin_layout Standard
@@ -31529,8 +31778,8 @@ unsigned 32 bit modulus
 \end_layout
 
 \begin_layout Standard
-In the mcs51, ds390, hc08, s08, pic14 and pic16 backends they are by default
- compiled as 
+In the mcs51, ds390, hc08, s08, pdk13, pdk14, pdk15, pic14 and pic16 backends
+ they are by default compiled as 
 \emph on
 non-reentrant
 \emph default
@@ -43484,8 +43733,8 @@ Z80
 
 \end_inset
 
-, Z180, Rabbit 2000/3000, Rabbit 3000A and LR35902, the Nintendo GameBoy's
- Z80-like gbz80
+, Z180, eZ80 in Z80 mode, Rabbit 2000/3000, Rabbit 3000A and LR35902, the
+ Nintendo GameBoy's Z80-like gbz80
 \begin_inset Index idx
 status collapsed
 
@@ -63416,7 +63665,7 @@ mov
 \end_layout
 
 \begin_layout Standard
-In general SDCC will never setup a loop if the shift count is known.
+Typically, SDCC will not setup a loop if the shift count is known.
  Another example:
 \end_layout
 
@@ -66847,8 +67096,8 @@ Higher Order Word
 \begin_layout Standard
 It is also frequently required to obtain a higher order byte or word of
  a larger integral type (long, int or short types).
- SDCC recognizes the following expressions to yield the higher order byte
- or word and generates optimized code for it, e.g.:
+ For mcs51, SDCC recognizes the following expressions to yield the higher
+ order byte or word and generates optimized code for it, e.g.:
 \end_layout
 
 \begin_layout Verse
@@ -67927,7 +68176,9 @@ Register-Allocation
 SDCC currently has two register allocators.
  One of them is optimal when optimizing for code size.
  This register allocator is used by default on the hc08, s08, z80, z180,
- r2k, r3ka, gbz80 and stm8 ports.
+ ez80_z80, r2k, and r3ka ports.
+ For the gbz80, stm8,pdk13, pdk14 and pdk15 ports it is the only available
+ register allocator.
  Even though it runs in polynomial time, it can be quite slow; therefore
  the 
 \begin_inset Flex Code

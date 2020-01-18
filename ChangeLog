@@ -1,3 +1,8 @@
+2020-01-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Update manual.
+
 2020-01-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,

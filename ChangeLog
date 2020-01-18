@@ -2,6 +2,10 @@
 
 	* doc/sdccman.lyx:
 	  Update manual.
+	* .version,
+	  doc/INSTALL.txt,
+	  sdcc.spec:
+	  Bump version in preparation of 4.0.0 release.
 
 2020-01-14 Philipp Klaus Krause <pkk AT spth.de>
 

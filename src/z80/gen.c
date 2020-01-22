@@ -3326,7 +3326,8 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
 
       for (int j = 0; j + 1 < n; j++)
         {
-          if (!assigned[j] && i != j && i + 1 != j && (result->aopu.aop_reg[roffset + i] == source->aopu.aop_reg[soffset + j] || result->aopu.aop_reg[roffset + i + 1] == source->aopu.aop_reg[soffset + j]))
+          if (!assigned[j] && i != j && i + 1 != j && !aopOnStack(result, roffset + i, 2) && !aopOnStack(source, soffset + i, 1) &&
+            (result->aopu.aop_reg[roffset + i] == source->aopu.aop_reg[soffset + j] || result->aopu.aop_reg[roffset + i + 1] == source->aopu.aop_reg[soffset + j]))
             goto skip_byte_push_iy; // We can't write this one without overwriting the source.
         }
 

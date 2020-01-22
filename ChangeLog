@@ -1,3 +1,8 @@
+2020-01-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix bug #2967.
+
 2020-01-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

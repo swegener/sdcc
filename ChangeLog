@@ -1,3 +1,8 @@
+2020-01-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/linksrc/Makefile.in:
+	  Fix bug #2969.
+
 2020-01-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

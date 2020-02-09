@@ -1,3 +1,8 @@
+2020-02-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph-gbz80.def:
+	  Fix bug #2974.
+
 2020-01-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/linksrc/Makefile.in:

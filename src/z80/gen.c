@@ -3874,7 +3874,7 @@ regMove (const short *dst, const short *src, size_t n, bool preserve_a)
   size_t i;
   bool pushed_a = FALSE;
 
-  wassert (n < 6);
+  wassert (n <= 9);
 
   // Try to use ex de, hl
   if (size >= 4)
@@ -12222,19 +12222,56 @@ genArrayInit (iCode * ic)
 #endif
 
 static void
-setupForMemcpy (const iCode *ic, const operand *to, const operand *from)
+setupForMemcpy (const iCode *ic, const operand *to, const operand *from, const operand *count)
 {
   /* Both are in regs. Let regMove() do the shuffling. */
   if (AOP_TYPE (to) == AOP_REG && AOP_TYPE (from) == AOP_REG)
     {
-      const short larray[4] = {E_IDX, D_IDX, L_IDX, H_IDX};
-      short oparray[4];
-      oparray[0] = AOP (to)->aopu.aop_reg[0]->rIdx;
-      oparray[1] = AOP (to)->aopu.aop_reg[1]->rIdx;
-      oparray[2] = AOP (from)->aopu.aop_reg[0]->rIdx;
-      oparray[3] = AOP (from)->aopu.aop_reg[1]->rIdx;
+      const short larray[6] = {E_IDX, D_IDX, L_IDX, H_IDX, C_IDX, B_IDX};
+      short oparray[6];
+      oparray[0] = to->aop->aopu.aop_reg[0]->rIdx;
+      oparray[1] = to->aop->aopu.aop_reg[1]->rIdx;
+      oparray[2] = from->aop->aopu.aop_reg[0]->rIdx;
+      oparray[3] = from->aop->aopu.aop_reg[1]->rIdx;
+      if (count && count->aop->type == AOP_REG)
+        {
+          oparray[4] = count->aop->aopu.aop_reg[0]->rIdx;
+          oparray[5] = count->aop->aopu.aop_reg[1]->rIdx;
+        }
 
-      regMove (larray, oparray, 4, FALSE);
+      regMove (larray, oparray, 4 + (count && count->aop->type == AOP_REG) * 2, false);
+    }
+  else if (AOP_TYPE (to) == AOP_REG && count && AOP_TYPE (count) == AOP_REG)
+    {
+      const short larray[4] = {E_IDX, D_IDX, C_IDX, B_IDX};
+      short oparray[4];
+      oparray[0] = to->aop->aopu.aop_reg[0]->rIdx;
+      oparray[1] = to->aop->aopu.aop_reg[1]->rIdx;
+      oparray[2] = count->aop->aopu.aop_reg[0]->rIdx;
+      oparray[3] = count->aop->aopu.aop_reg[1]->rIdx;
+
+      regMove (larray, oparray, 4 , false);
+
+      fetchPair (PAIR_HL, from->aop);
+    }
+  else if (AOP_TYPE (from) == AOP_REG && count && AOP_TYPE (count) == AOP_REG)
+    {
+      const short larray[4] = {L_IDX, H_IDX, C_IDX, B_IDX};
+      short oparray[4];
+      oparray[0] = from->aop->aopu.aop_reg[0]->rIdx;
+      oparray[1] = from->aop->aopu.aop_reg[1]->rIdx;
+      oparray[2] = count->aop->aopu.aop_reg[0]->rIdx;
+      oparray[3] = count->aop->aopu.aop_reg[1]->rIdx;
+
+      regMove (larray, oparray, 4 , false);
+
+      fetchPair (PAIR_DE, to->aop);
+    }
+  else if (count && AOP_TYPE (count) == AOP_REG)
+    {
+      fetchPair (PAIR_BC, count->aop);
+      fetchPair (PAIR_DE, to->aop);
+      fetchPair (PAIR_HL, from->aop);
     }
   else
     {
@@ -12281,14 +12318,14 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
 
   wassertl (!IS_GB, "Built-in memcpy() not available on gbz80.");
   wassertl (nparams == 3, "Built-in memcpy() must have three parameters.");
-  /* Check for zero length copy. */
-  wassertl (AOP_TYPE (pparams[2]) == AOP_LIT, "Last parameter to builtin memcpy() must be literal.");
-
+  
   count = pparams[2];
   from = pparams[1];
   to = pparams[0];
 
-  if (!(n = (unsigned int) ulFromVal (AOP (pparams[2])->aopu.aop_lit)))
+  if (pparams[2]->aop->type != AOP_LIT)
+    n = UINT_MAX;
+  else if (!(n = (unsigned int) ulFromVal (AOP (pparams[2])->aopu.aop_lit))) /* Check for zero length copy. */
     goto done;
 
   if (!isPairDead (PAIR_HL, ic))
@@ -12307,7 +12344,7 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
       saved_BC = TRUE;
     }
 
- setupForMemcpy (ic, to, from);
+ setupForMemcpy (ic, to, from, count);
 
   if (n == 1)
     {
@@ -12329,9 +12366,20 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
     }
   else
     {
-      fetchPair (PAIR_BC, AOP (count));
+      symbol *tlbl = 0;
+      if (count->aop->type != AOP_REG) // If in reg: Has been fetched early by setupForMemcpy() above.
+        fetchPair (PAIR_BC, count->aop);
+      if (count->aop->type != AOP_LIT)
+        {
+          tlbl = newiTempLabel (0);
+          emit2 ("ld a, b");
+          emit2 ("or a, c");
+          emit2 ("jp Z, !tlabel", labelKey2num (tlbl->key));
+          regalloc_dry_run_cost += 5;
+        }
       emit2 ("ldir");
       regalloc_dry_run_cost += 2;
+      emitLabel (tlbl);
     }
 
   spillPair (PAIR_HL);
@@ -12604,7 +12652,7 @@ genBuiltInStrcpy (const iCode *ic, int nParams, operand **pparams)
       saved_DE = TRUE;
     }
 
-  setupForMemcpy (ic, dst, src);
+  setupForMemcpy (ic, dst, src, 0);
 
   emit3 (A_XOR, ASMOP_A, ASMOP_A);
   if (SomethingReturned)
@@ -12686,7 +12734,7 @@ genBuiltInStrncpy (const iCode *ic, int nparams, operand **pparams)
       saved_DE = TRUE;
     }
 
-  setupForMemcpy (ic, s1, s2);
+  setupForMemcpy (ic, s1, s2, 0);
 
   fetchPair (PAIR_BC, AOP (n));
 

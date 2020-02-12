@@ -1,5 +1,11 @@
 2020-02-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/SDCCopt.c,
+	  src/z80/gen.c:
+	  Allow non-literal third argument for ldir-memcpy().
+
+2020-02-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/z80/gen.c:
 	  Use macros for immediate data to improve assembler portability, patch #315 by b-s-a.
 

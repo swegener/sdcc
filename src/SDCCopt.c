@@ -1016,8 +1016,8 @@ convbuiltin (iCode *const ic, eBBlock *ebp)
 
   if ((TARGET_IS_Z80 || TARGET_IS_Z180 || TARGET_IS_RABBIT || TARGET_IS_EZ80_Z80) && (!strcmp (bif->name, "__builtin_memcpy") || !strcmp (bif->name, "__builtin_strncpy") || !strcmp (bif->name, "__builtin_memset")))
     {
-      /* Replace iff return value is used or last parameter is not an integer constant. */
-      if (bitVectIsZero (OP_USES (IC_RESULT (icc))) && IS_OP_LITERAL (IC_LEFT (lastparam)))
+      /* Replace iff return value is used or last parameter is not an integer constant (except for memcpy, where non-integers can be handled). */
+      if (bitVectIsZero (OP_USES (IC_RESULT (icc))) && (IS_OP_LITERAL (IC_LEFT (lastparam)) || !strcmp (bif->name, "__builtin_memcpy")))
         return;
       
       strcpy(OP_SYMBOL (IC_LEFT (icc))->rname, !strcmp (bif->name, "__builtin_memcpy") ? "___memcpy" : (!strcmp (bif->name, "__builtin_strncpy") ? "_strncpy" : "_memset"));

@@ -2785,7 +2785,7 @@ aopPut (asmop *aop, const char *s, int offset)
                   s = "a";
                 }
 
-              emit2 ("ld bc,#%s", aop->aopu.aop_dir);
+              emit2 ("ld bc, !hashedstr", aop->aopu.aop_dir);
               emit2 ("out (c),%s", s);
 
               if (aop->bcInUse)
@@ -3636,14 +3636,14 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
 
   if (IS_TLCS90 && abs(n) > (optimize.codeSize ? 2 + (af_free || bc_free || hl_free || iy_free || n < 0) * 2: 1))
     {
-      emit2 ("add sp, #%d", n);
+      emit2 ("add sp, !immed%d", n);
       cost (3, 6);
       n -= n;
     }
   else if (abs(n) > ((IS_RAB || IS_GB) ? 127 * 4 - 1 : (optimize.codeSize ? 8 : 5)) && hl_free)
     {
       spillCached ();
-      emit2 ("ld hl, #%d", n);
+      emit2 ("ld hl, !immed%d", n);
       emit2 ("add hl, sp");
       emit2 ("ld sp, hl");
       cost2 (5, 27, 20, 10, 28, 18, 4);
@@ -3653,7 +3653,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
   else if (!IS_GB && abs(n) > ((IS_RAB || IS_GB) ? 127 * 4 - 1 : 8) && iy_free)
     {
       spillCached ();
-      emit2 ("ld iy, #%d", n);
+      emit2 ("ld iy, !immed%d", n);
       emit2 ("add iy, sp");
       emit2 ("ld sp, iy");
       regalloc_dry_run_cost += 8;
@@ -3663,7 +3663,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
     {
       emit2 ("ld c, l");
       emit2 ("ld b, h");
-      emit2 ("ld hl, #%d", n);
+      emit2 ("ld hl, !immed%d", n);
       emit2 ("add hl, sp");
       emit2 ("ld sp, hl");
       emit2 ("ld l, c");
@@ -3683,7 +3683,7 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
             d = -128;
           else
             d = n;
-          emit2 ("add sp, #%d", d);
+          emit2 ("add sp, !immed%d", d);
           cost (2, IS_GB ? 16 : 4);
           n -= d;
         }
@@ -5159,7 +5159,7 @@ genFunction (const iCode * ic)
         emit2 ((optimize.codeSize && !IFFUNC_ISZ88DK_FASTCALL (ftype)) ? "!enters" : "!enter");
       if (IS_EZ80_Z80 && !_G.omitFramePtr && -sym->stack > -128 && -sym->stack <= -3 && !IFFUNC_ISZ88DK_FASTCALL (ftype))
         {
-          emit2 ("lea hl, ix, #%d", -sym->stack);
+          emit2 ("lea hl, ix, !immed%d", -sym->stack);
           emit2 ("ld sp, hl");
           regalloc_dry_run_cost += 4;
         }
@@ -5382,16 +5382,16 @@ genRet (const iCode *ic)
             AOP (IC_LEFT (ic))->aopu.aop_stk + (AOP (IC_LEFT (ic))->aopu.aop_stk >
                 0 ? _G.stack.param_offset : 0);
           sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
-          emit2 ("ld hl, #%d", sp_offset);
+          emit2 ("ld hl, !immed%d", sp_offset);
           emit2 ("add hl, sp");
           regalloc_dry_run_cost += 4;
         }
       else
         {
-          emit2 ("ld hl, #%s", AOP (IC_LEFT (ic))->aopu.aop_dir);
+          emit2 ("ld hl, !hashedstr", AOP (IC_LEFT (ic))->aopu.aop_dir);
           regalloc_dry_run_cost += 3;
         }
-      emit2 ("ld bc, #%d", size);
+      emit2 ("ld bc, !immed%d", size);
       emit2 ("ldir");
       regalloc_dry_run_cost += 5;
     }
@@ -5799,7 +5799,7 @@ genPlus (iCode * ic)
        int lit = (int) ulFromVal (AOP (IC_RIGHT (ic))->aopu.aop_lit);
        if (lit >= -128 && lit < 128)
          {
-           emit2 ("lea %s, iy, #%d", _pairs[getPairId (IC_RESULT (ic)->aop)].name, lit);
+           emit2 ("lea %s, iy, !immed%d", _pairs[getPairId (IC_RESULT (ic)->aop)].name, lit);
            regalloc_dry_run_cost += 3;
            spillPair (getPairId (IC_RESULT (ic)->aop));
            goto release;
@@ -9431,7 +9431,7 @@ shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned
       if (!top)
         cheapMove (pair == PAIR_BC ? ASMOP_C : (pair == PAIR_DE ? ASMOP_E : ASMOP_L), 0, left->aop, offl, !bitVectBitValue (ic->rSurv, A_IDX));
 
-      emit2 ("ld %s, #%d", top ? _pairs[pair].l : _pairs[pair].h, 1 << shCount);
+      emit2 ("ld %s, !immed%d", top ? _pairs[pair].l : _pairs[pair].h, 1 << shCount);
       emit2 ("mlt %s", _pairs[pair].name);
       regalloc_dry_run_cost += 4;
     }
@@ -9742,7 +9742,7 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed, const iCo
       if (!top)
         cheapMove (pair == PAIR_BC ? ASMOP_C : (pair == PAIR_DE ? ASMOP_E : ASMOP_L), 0, left->aop, 0, a_dead);
 
-      emit2 ("ld %s, #%d", top ? _pairs[pair].l : _pairs[pair].h, 1 << (8 - shCount));
+      emit2 ("ld %s, !immed%d", top ? _pairs[pair].l : _pairs[pair].h, 1 << (8 - shCount));
       emit2 ("mlt %s", _pairs[pair].name);
       regalloc_dry_run_cost += 4;
     }
@@ -11337,7 +11337,7 @@ genAddrOf (const iCode * ic)
       spillPair (pair);
       if (IS_EZ80_Z80 && in_fp_range)
         {
-          emit2 ("lea %s, ix, #%d", _pairs[pair].name, fp_offset);
+          emit2 ("lea %s, ix, !immed%d", _pairs[pair].name, fp_offset);
           regalloc_dry_run_cost += 3;
         }
       else
@@ -11580,14 +11580,14 @@ genAssign (const iCode *ic)
                     AOP (result)->aopu.aop_stk + offset + (AOP (result)->aopu.aop_stk >
                         0 ? _G.stack.param_offset : 0);
                   int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
-                  emit2 ("ld hl, #%d", sp_offset);
+                  emit2 ("ld hl, !immed%d", sp_offset);
                   emit2 ("add hl, sp");
                   emit2 ("ex de, hl");
                   regalloc_dry_run_cost += 5;
                 }
               else
                 {
-                  emit2 ("ld de, #%s", AOP (IC_RESULT (ic))->aopu.aop_dir);
+                  emit2 ("ld de, !hashedstr", AOP (IC_RESULT (ic))->aopu.aop_dir);
                   regalloc_dry_run_cost += 3;
                 }
 
@@ -11597,13 +11597,13 @@ genAssign (const iCode *ic)
                     AOP (right)->aopu.aop_stk + offset + (AOP (right)->aopu.aop_stk >
                         0 ? _G.stack.param_offset : 0);
                   int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
-                  emit2 ("ld hl, #%d", sp_offset);
+                  emit2 ("ld hl, !immed%d", sp_offset);
                   emit2 ("add hl, sp");
                   regalloc_dry_run_cost += 4;
                 }
               else
                 {
-                  emit2 ("ld hl, #%s", AOP (IC_RIGHT (ic))->aopu.aop_dir);
+                  emit2 ("ld hl, !hashedstr", AOP (IC_RIGHT (ic))->aopu.aop_dir);
                   regalloc_dry_run_cost += 3;
                 }
               spillPair (PAIR_HL);
@@ -11616,7 +11616,7 @@ genAssign (const iCode *ic)
                   }
               else
                 {
-                  emit2 ("ld bc, #%d", size);
+                  emit2 ("ld bc, !immed%d", size);
                   emit2 ("ldir");
                   regalloc_dry_run_cost += 5;
                 }
@@ -12520,7 +12520,7 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
 	  if (indirect_c)
 		{
 		  fetchPair (PAIR_DE, AOP (dst));
-		  emit2 ("ld hl, #%s", AOP (c)->aopu.aop_dir);
+		  emit2 ("ld hl, !hashedstr", AOP (c)->aopu.aop_dir);
 		  regalloc_dry_run_cost += 3;
 		}
 	  else

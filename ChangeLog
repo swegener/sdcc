@@ -1,3 +1,8 @@
+2020-02-12 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
+	* src/z80/gen.c:
+	  Use macros for immediate data to improve assembler portability, patch #315 by b-s-a.
+
 2020-02-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peeph-gbz80.def:

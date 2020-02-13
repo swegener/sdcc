@@ -189,7 +189,7 @@ replace restart {
 	ld	a,(hl)
 } by {
 	; peephole 18 loaded %2 into a directly instead of using hl.
-	ld	a,(#%1 + %2)
+	ld	a, (#%1 + %2)
 } if notUsed('hl')
 
 replace restart {
@@ -378,24 +378,13 @@ replace restart {
 } if notUsed('d'), notUsed('a')
 
 replace restart {
-	push	de
-	inc	sp
-	push	af
-	inc	sp
-} by {
-	; peephole 36 pushed de instead of pushing twice.
-	ld	e, a
-	push	de
-} if notUsed('e'), notUsed('a')
-
-replace restart {
 	push	af
 	inc	sp
 	ld	a,#%1
 	push	af
 	inc	sp
 } by {
-	; peephole 37 pushed de instead of pushing a twice.
+	; peephole 36 pushed de instead of pushing a twice.
 	ld	d,a
 	ld	e,#%1
 	push	de
@@ -408,7 +397,7 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	; peephole 38 pushed bc instead of pushing a twice.
+	; peephole 37 pushed bc instead of pushing a twice.
 	ld	b,a
 	ld	c,#%1
 	push	bc
@@ -421,7 +410,7 @@ replace restart {
 	inc	sp
 } by {
 	ld	l, d
-	; peephole 39 combined pushing of b and d.
+	; peephole 38 combined pushing of h and d.
 	push	hl
 } if notUsed('l')
 
@@ -432,7 +421,7 @@ replace restart {
 	inc	sp
 } by {
 	ld	c, d
-	; peephole 40 combined pushing of b and d.
+	; peephole 39 combined pushing of b and d.
 	push	bc
 } if notUsed('c')
 
@@ -941,7 +930,7 @@ replace restart {
 	ld	%1, #0x01
 	; peephole 89 removed impossible jump to %2.
 } if labelRefCountChange(%2 -1)
-	
+
 replace restart {
 	rlca
 	and	a, #0x01

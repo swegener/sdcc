@@ -90,13 +90,29 @@ replace restart {
 } by {
 	; peephole 9 loaded %3 from %2 directly instead of going through %1.
 	ld	%3, %2
-} if canAssign(%3 %2), notVolatile(%1), notUsed(%1)
+} if canAssign(%3 %2), notVolatile(%1), notUsed(%1), notSame(%3 '(hl)' '(de)' '(bc)')
+
+replace restart {
+	ld	%1, %2
+	ld	%3, %1
+} by {
+	; peephole 9a loaded %3 from %2 directly instead of going through %1.
+	ld	%3, %2
+} if canAssign(%3 %2), notVolatile(%1), notUsed(%1), canAssign('a' %1)
 
 replace restart {
 	ld	%1, hl
 	ld	hl, %1
 } by {
-	; peephole 9a reused value still in hl.
+	; peephole 9b reused value still in hl.
+	ld	%1, hl
+} if notVolatile(%1)
+
+replace restart {
+	ld	%1, hl
+	ld	hl, %1
+} by {
+	; peephole 9rab reused value still in hl.
 	ld	%1, hl
 } if notVolatile(%1)
 
@@ -112,10 +128,23 @@ replace restart {
 // Rule OK unless both %5 and %4 are volatile, but we can't express that directly.
 
 replace restart {
+	ld	%3 (ix), %1
+	ld	%4 (ix), %2
+	ld	%5, %3 (ix)
+	ld	%6, %4 (ix)
+} by {
+	ld	%3 (ix), %1
+	ld	%4 (ix), %2
+	; peephole 11 loaded %5%6 from %1%2 directly instead of going through %3 (ix) %4 (ix).
+	ld	%5, %1
+	ld	%6, %2
+} if canAssign(%5 %1), canAssign(%6 %2), notSame(%5 %2)
+
+replace restart {
 	ld	%1, %2 (%3)
 	ld	%4, %1
 } by {
-	; peephole 11 loaded %2 (%3) into %4 directly instead of going through %1.
+	; peephole 12 loaded %2 (%3) into %4 directly instead of going through %1.
 	ld	%4, %2 (%3)
 } if canAssign(%4 %2 %3), notVolatile(%1), notUsed(%1)
 
@@ -123,9 +152,10 @@ replace restart {
 	ld	%1, %2
 	ld	%3 (%4), %1
 } by {
-	; peephole 12 loaded %2 into %3 (%4) directly instead of going through %1.
+	; peephole 13 loaded %2 into %3 (%4) directly instead of going through %1.
 	ld	%3 (%4), %2
-} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1), notSame(%1 'hl')
+} if canAssign(%3 %4 %2), notVolatile(%1), notUsed(%1), canAssign('a' %1)
+// canAssign ('a' %1) checks that %1 is an 8-bit value
 
 replace restart {
 	ld	%1, %2 (%3)
@@ -133,7 +163,7 @@ replace restart {
 	ld	%7, %1
 } by {
 	ld	%7, %2 (%3)
-	; peephole 13 loaded %2 (%3) into %7 directly instead of going through %1.
+	; peephole 14 loaded %2 (%3) into %7 directly instead of going through %1.
 	ld	%4, %5 (%6)
 } if canAssign(%7 %2 %3), notVolatile(%1), notUsed(%1), notSame(%1 %4), notSame(%7 %4)
 
@@ -143,7 +173,7 @@ replace restart {
 	ld	%2 (%3), %1
 } by {
 	ld	%5 (%6), %4
-	; peephole 14 loaded %7 into %2 (%3) directly instead of going through %1.
+	; peephole 15rab loaded %7 into %2 (%3) directly instead of going through %1.
 	ld	%2 (%3), %7
 } if canAssign(%2 %3 %7), notVolatile(%1), notUsed(%1), notSame(%1 %4 %1 'hl')
 
@@ -166,10 +196,10 @@ replace restart {
 } if notUsed(%1)
 
 replace restart {
-	ld	hl,#%1
-	ld	a,(hl)
+	ld	hl, #%1
+	ld	a, (hl)
 } by {
-	ld	a,(#%1)
+	ld	a, (#%1)
 	; peephole 17 loaded a from (#%1) directly instead of using hl.
 } if notUsed('hl')
 
@@ -178,7 +208,7 @@ replace restart {
 	ld	a,(hl)
 } by {
 	; peephole 18 loaded %2 into a directly instead of using hl.
-	ld	a,(#%1 + %2)
+	ld	a, (#%1 + %2)
 } if notUsed('hl')
 
 replace restart {
@@ -241,6 +271,22 @@ replace restart {
 	; peephole 22 used (hl) in sub directly instead of going through %1.
 	sub	a,(hl)
 } if notVolatile(%1), notUsed(%1)
+
+replace restart {
+	ld	l,c
+	ld	h,b
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+} by {
+	ld	a,(bc)
+	ld	l,a
+	inc	bc
+	ld	a,(bc)
+	ld	h,a
+	; peephole 22a optimize 16-bit load from BC.
+} if notUsed('bc'), notUsed('a')
 
 replace restart {
 	inc	bc
@@ -318,7 +364,7 @@ replace restart {
 	ld	h,b
 	push	hl
 } by {
-	; peephole 30 pushed bc instead of hl removing a load.
+	; peephole 29a pushed bc instead of hl removing a load.
 	ld	c,%1
 	push	bc
 } if notUsed('hl'), notUsed('c')
@@ -329,7 +375,7 @@ replace restart {
 	push	%1
 	push	bc
 } by {
-	; peephole 31 pushed hl directly instead of going through bc.
+	; peephole 30 pushed hl directly instead of going through bc.
 	push	%1
 	push	hl
 } if notUsed('bc'), notSame(%1 'bc')
@@ -339,7 +385,7 @@ replace restart {
 	ld	l, e
 	ld	h, d
 } by {
-	; peephole 32 popped hl directly instead of going through de.
+	; peephole 31 popped hl directly instead of going through de.
 	pop	hl
 } if notUsed('de')
 
@@ -348,7 +394,7 @@ replace restart {
 	ld	l, c
 	ld	h, b
 } by {
-	; peephole 33 popped hl directly instead of going through bc.
+	; peephole 32 popped hl directly instead of going through bc.
 	pop	hl
 } if notUsed('bc')
 
@@ -356,7 +402,7 @@ replace restart {
 	ld	%1 (ix), %2
 	ld	%3, %1 (ix)
 } by {
-	; peephole 34 loaded %3 from %2 instead of going through %1 (ix).
+	; peephole 33 loaded %3 from %2 instead of going through %1 (ix).
 	ld	%1 (ix), %2
 	ld	%3, %2
 } if canAssign(%3 %2)
@@ -369,7 +415,7 @@ replace restart {
 } by {
 	ld	%1 (ix), a
 	push	de
-	; peephole 34a loaded %2 from a instead of %1 (ix)
+	; peephole 34 loaded %2 from a instead of %1 (ix)
 	ld	%2, a
 } if canAssign(%2 'a')
 
@@ -418,7 +464,7 @@ replace restart {
 	inc	sp
 } by {
 	ld	c, d
-	; peephole 37a combined pushing of b and d.
+	; peephole 39 combined pushing of b and d.
 	push	bc
 } if notUsed('c')
 
@@ -450,7 +496,7 @@ replace restart {
 	ld	a,#%1
 	ld	d,a
 } by {
-	; peephole 40 loaded #%1 into d directly instead of going through a.
+	; peephole 45 loaded #%1 into d directly instead of going through a.
 	ld	d,#%1
 } if notUsed('a')
 
@@ -458,21 +504,21 @@ replace restart {
 	ld	%1,a
 	ld	%2,%1
 } by {
-	; peephole 41 loaded %2 from a directly instead of going through %1.
+	; peephole 46 loaded %2 from a directly instead of going through %1.
 	ld	%2,a
 } if notUsed(%1)
 
 replace restart {
-	ld	a,%1 (ix)
+	ld	a, %1 (%3)
 	push	af
 	inc	sp
-	ld	a,%2 (ix)
+	ld	a, %2 (%3)
 	push	af
 	inc	sp
 } by {
-	; peephole 42 pushed %1 (ix), %2(ix) through hl instead of af.
-	ld	h,%1 (ix)
-	ld	l,%2 (ix)
+	; peephole 47 pushed %1 (%3), %2 (%3) through hl instead of af.
+	ld	h, %1 (%3)
+	ld	l, %2 (%3)
 	push	hl
 } if notUsed('a'), notUsed('hl')
 
@@ -481,22 +527,63 @@ replace restart {
 	ld	b, h
 	push	bc
 } by {
-	; peephole 43 pushed hl instead of bc.
+	; peephole 48 pushed hl instead of bc.
 	push	hl
 } if notUsed('bc')
+
+replace restart {
+	ld	a, (hl)
+	inc	hl
+	ld	h, (hl)
+	ld	l, a
+	push	hl
+} by {
+	; peephole 49 pushed bc instead of hl.
+	ld	c, (hl)
+	inc	hl
+	ld	b, (hl)
+	push	bc
+} if notUsed('bc'), notUsed('hl')
 
 replace restart {
 	pop	%1
 	push	%1
 } by {
-	; peephole 44 eleminated dead pop/push pair.
+	; peephole 50 eleminated dead pop/push pair.
 } if notUsed(%1)
+
+replace restart {
+	pop	%1
+	ld	%2 (ix), %3
+	push	%1
+} by {
+	; peephole 51 eleminated dead pop/push pair.
+	ld	%2 (ix), %3
+} if notUsed(%1), operandsNotRelated(%1 %3)
+
+replace restart {
+	push	hl
+	pop	bc
+} by {
+	ld	c, l
+	ld	b, h
+	; peephole 52 replaced push/pop pair by loads.
+} if notUsed('hl')
+
+replace restart {
+	push	hl
+	pop	de
+} by {
+	ld	e, l
+	ld	d, h
+	; peephole 53 replaced push/pop pair by loads.
+} if notUsed('hl')
 
 replace restart {
 	ld	iy,#%1
 	or	a,%2 (iy)
 } by {
-	; peephole 45 used hl instead of iy.
+	; peephole 54 used hl instead of iy.
 	ld	hl,#%1 + %2
 	or	a,(hl)
 } if notUsed('iy'), notUsed('hl')
@@ -505,7 +592,7 @@ replace restart {
 	ld	iy,#%1
 	ld	%2,%3 (iy)
 } by {
-	; peephole 46 used hl instead of iy.
+	; peephole 55 used hl instead of iy.
 	ld	hl,#%1 + %3
 	ld	%2, (hl)
 } if notUsed('iy'), notUsed('hl')
@@ -514,7 +601,7 @@ replace restart {
 	ld	iy,#%1
 	ld	h,%3 (iy)
 } by {
-	; peephole 46a used hl instead of iy.
+	; peephole 56 used hl instead of iy.
 	ld	hl,#%1 + %3
 	ld	h, (hl)
 } if notUsed('iy'), notUsed('l')
@@ -523,7 +610,7 @@ replace restart {
 	ld	iy,#%1
 	ld	%2 (iy), %3
 } by {
-	; peephole 46b used hl instead of iy.
+	; peephole 57 used hl instead of iy.
 	ld	hl,#%1 + %2
 	ld	(hl), %3
 } if notUsed('iy'), notUsed('hl'), notSame(%3 'h' 'l')
@@ -533,7 +620,7 @@ replace restart {
 	ld	%2,0 (iy)
 	ld	%3,1 (iy)
 } by {
-	; peephole 47 used hl instead of iy.
+	; peephole 58 used hl instead of iy.
 	ld	hl,#%1
 	ld	%2, (hl)
 	inc	hl
@@ -545,7 +632,7 @@ replace restart {
 	ld	%2 (iy),%3
 	ld	l,%2 (iy)
 } by {
-	; peephole 48 used hl instead of iy.
+	; peephole 59 used hl instead of iy.
 	ld	hl,#%1 + %2
 	ld	(hl),%3
 	ld	l,(hl)
@@ -555,7 +642,7 @@ replace restart {
 	ld	iy,#%1
 	ld	%2 (%3), %4
 } by {
-	; peephole 49 used hl instead of iy.
+	; peephole 60 used hl instead of iy.
 	ld	hl,#%1 + %2
 	ld	(hl), %4
 } if notUsed('iy'), notUsed('hl'), operandsNotRelated(%4 'hl')
@@ -564,7 +651,7 @@ replace restart {
 	ld	iy,#%1
 	bit	%2,%3 (iy)
 } by {
-	; peephole 49a used hl instead of iy.
+	; peephole 61 used hl instead of iy.
 	ld	hl,#%1+%3
 	bit	%2, (hl)
 } if notUsed('iy'), notUsed('hl')
@@ -574,7 +661,7 @@ replace restart {
 	add	iy, sp
 	ld	%2, %3 (iy)
 } by {
-	; peephole 49b used hl instead of iy.
+	; peephole 62 used hl instead of iy.
 	ld	hl, #%1+%3
 	add	hl, sp
 	ld	%2, (hl)
@@ -586,7 +673,7 @@ replace restart {
 	ld	%2, 0 (iy)
 	ld	%3, 1 (iy)
 } by {
-	; peephole 49c used hl instead of iy.
+	; peephole 63 used hl instead of iy.
 	ld	hl, #%1
 	add	hl, sp
 	ld	%2, (hl)
@@ -600,7 +687,7 @@ replace restart {
 	ld	l, 0 (iy)
 	ld	h, 1 (iy)
 } by {
-	; peephole 49d used hl instead of iy.
+	; peephole 64 used hl instead of iy.
 	ld	hl, #%1
 	add	hl, sp
 	ld	a, (hl)
@@ -615,7 +702,7 @@ replace restart {
 	ld	0 (iy), #%2
 	ld	1 (iy), #%3
 } by {
-	; peephole 49e used hl instead of iy.
+	; peephole 65 used hl instead of iy.
 	ld	hl, #%1
 	add	hl, sp
 	ld	(hl), #%2
@@ -632,7 +719,7 @@ replace restart {
 	ld	a, (hl)
 	inc	hl
 	or	a, (hl)
-	; peephole 49f used hl instead of iy.
+	; peephole 65rab used hl instead of iy.
 } if notUsed('iy'), notUsed('hl')
 
 replace restart {
@@ -641,12 +728,12 @@ replace restart {
 	ld	a, 1 (iy)
 	or	a, 0 (iy)
 } by {
-	ld	hl, #%1
+	ld	hl, #%1+1
 	add	hl, sp
 	ld	a, (hl)
-	inc	hl
+	dec	hl
 	or	a, (hl)
-	; peephole 49f' used hl instead of iy.
+	; peephole 66 used hl instead of iy.
 } if notUsed('iy'), notUsed('hl')
 
 replace restart {
@@ -657,7 +744,7 @@ replace restart {
 	ld	hl, #%1+%3
 	add	hl, sp
 	bit	%2, (hl)
-	; peephole 49g used hl instead of iy.
+	; peephole 67 used hl instead of iy.
 } if notUsed('iy'), notUsed('hl')
 
 replace restart {
@@ -668,7 +755,7 @@ replace restart {
 	ld	hl, #%1+%2
 	add	hl, sp
 	or	a, (hl)
-	; peephole 49h used hl instead of iy.
+	; peephole 68 used hl instead of iy.
 } if notUsed('iy'), notUsed('hl')
 
 replace restart {
@@ -676,7 +763,7 @@ replace restart {
 	or	a,%1
 } by {
 	or	a,(hl)
-	; peephole 50 used (hl) directly instead of going through %1.
+	; peephole 68rab used (hl) directly instead of going through %1.
 } if notUsed(%1), notSame(%1 'a')
 
 replace restart {
@@ -684,25 +771,51 @@ replace restart {
 	ld	b,h
 	inc	bc
 } by {
-	; peephole 51 incremented in hl instead of bc.
+	; peephole 69 incremented in hl instead of bc.
 	inc	hl
 	ld	c,l
 	ld	b,h
 } if notUsed('hl')
 
 replace restart {
+	ld	iy, #%1
+	inc	%2 (iy)
+} by {
+	; peephole 70 incremented in (hl) instead of %2 (iy).
+	ld	hl, #%1+%2
+	inc	(hl)
+} if notUsed('hl'), notUsed('iy')
+
+replace restart {
+	ld	iy, #%1
+	dec	%2 (iy)
+} by {
+	; peephole 71 decremented in (hl) instead of %2 (iy).
+	ld	hl, #%1+%2
+	dec	(hl)
+} if notUsed('hl'), notUsed('iy')
+
+replace restart {
 	ld	a,%1 (%2)
 	bit	%3,a
 } by {
-	; peephole 52 tested bit of %1 (%2) directly instead of going through a.
+	; peephole 72 tested bit %3 of %1 (%2) directly instead of going through a.
 	bit	%3,%1 (%2)
 } if notUsed('a')
+
+replace restart {
+	ld	%1, (hl)
+	bit	%2, %1
+} by {
+	; peephole 73 tested bit %2 of (hl) directly instead of going through %1.
+	bit	%2, (hl)
+} if notUsed(%1)
 
 replace restart {
 	ld	a,%1
 	bit	%2,a
 } by {
-	; peephole 53 tested bit %2 of %1 directly instead of going through a.
+	; peephole 74 tested bit %2 of %1 directly instead of going through a.
 	bit	%2,%1
 } if notUsed('a'), canAssign(%1 'b')
 
@@ -711,7 +824,7 @@ replace restart {
 	set	%2, a
 	ld	%1, a
 } by {
-	; peephole 54 set bit %2 of %1 directly instead of going through a.
+	; peephole 75 set bit %2 of %1 directly instead of going through a.
 	set	%2, %1
 	ld	a, %1
 } if canAssign(%1 'b')
@@ -722,7 +835,7 @@ replace restart {
 	set	%3, a
 	ld	%1 (%2), a
 } by {
-	; peephole 55 set bit %3 of %1 (%2) directly instead of going through a.
+	; peephole 76 set bit %3 of %1 (%2) directly instead of going through a.
 	set	%3, %1 (%2)
 	ld	a, %1 (%2)
 }
@@ -732,7 +845,7 @@ replace restart {
 	res	%2, a
 	ld	%1, a
 } by {
-	; peephole 56 reset bit %2 of %1 directly instead of going through a.
+	; peephole 77 reset bit %2 of %1 directly instead of going through a.
 	res	%2, %1
 	ld	a, %1
 } if canAssign(%1 'b')
@@ -743,7 +856,7 @@ replace restart {
 	res	%3, a
 	ld	%1 (%2), a
 } by {
-	; peephole 57 reset bit %3 of %1 (%2) directly instead of going through a.
+	; peephole 78 reset bit %3 of %1 (%2) directly instead of going through a.
 	res	%3, %1 (%2)
 	ld	a, %1 (%2)
 }
@@ -754,7 +867,7 @@ replace restart {
 	ld	l,c
 	ld	h,b
 } by {
-	; peephole 58 stored %1 (%2) %3 (%4) into hl directly instead of going through bc.
+	; peephole 78rab stored %1 (%2) %3 (%4) into hl directly instead of going through bc.
 	ld	l, %1 (%2)
 	ld	h, %3 (%4)
 } if notUsed('bc')
@@ -765,7 +878,7 @@ replace restart {
 	ld	l,c
 	ld	h,b
 } by {
-	; peephole 59 stored %2%1 into hl directly instead of going through bc.
+	; peephole 78rab' stored %2%1 into hl directly instead of going through bc.
 	ld	l, %1
 	ld	h, %2
 } if notUsed('bc'), operandsNotRelated(%2 'l')
@@ -776,7 +889,7 @@ replace restart {
 %1:
 } by {
 	jp	C,%2
-	; peephole 60 removed jp by using inverse jump logic
+	; peephole 79 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -786,7 +899,7 @@ replace restart {
 %1:
 } by {
 	jp	NC,%2
-	; peephole 61 removed jp by using inverse jump logic
+	; peephole 80 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -796,7 +909,7 @@ replace restart {
 %1:
 } by {
 	jp	Z,%2
-	; peephole 62 removed jp by using inverse jump logic
+	; peephole 81 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -806,7 +919,7 @@ replace restart {
 %1:
 } by {
 	jp	NZ,%2
-	; peephole 63 removed jp by using inverse jump logic
+	; peephole 82 removed jp by using inverse jump logic
 %1:
 } if labelRefCountChange(%1 -1)
 
@@ -814,14 +927,14 @@ replace restart {
 	jp	%5
 } by {
 	jp	%6
-	; peephole 64 jumped to %6 directly instead of via %5.
+	; peephole 83 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
 	jp	%1,%5
 } by {
 	jp	%1,%6
-	; peephole 65 jumped to %6 directly instead of via %5.
+	; peephole 84 jumped to %6 directly instead of via %5.
 } if labelIsUncondJump(), notSame(%5 %6), labelRefCountChange(%5 -1), labelRefCountChange(%6 +1)
 
 replace restart {
@@ -829,7 +942,7 @@ replace restart {
 %2:
 %1:
 } by {
-   ; peephole 65a eliminated jump.
+   ; peephole 85 eliminated jump.
 %2:
 %1:
 } if labelRefCountChange(%1 -1)
@@ -843,7 +956,7 @@ replace restart {
 } by {
 	ld	a,#0x00
 	jp	%3
-	; peephole 65a jumped directly to %3 instead of testing a first.
+	; peephole 86 jumped directly to %3 instead of testing a first.
 %1:
 	bit	%2,a
 	jp	Z,%3
@@ -856,7 +969,7 @@ replace restart {
 } by {
 	ld	%1, %2
 	jp	%3
-	; peephole 65b removed unreachable jump to %3.
+	; peephole 87 removed unreachable jump to %3.
 }
 
 replace restart {
@@ -866,7 +979,7 @@ replace restart {
 } by {
 	ld	%1, %2
 %3:
-	; peephole 65c removed redundant jump to %3.
+	; peephole 88 removed redundant jump to %3.
 } if labelRefCountChange(%3 -1)
 
 replace restart {
@@ -875,39 +988,67 @@ replace restart {
 	jp	Z, %2
 } by {
 	ld	%1, #0x01
-	; peephole 65d removed impossible jump to %2.
+	; peephole 89 removed impossible jump to %2.
 } if labelRefCountChange(%2 -1)
-	
+
 replace restart {
-	xor	a,a
-	ld	a,#0x00
+	rlca
+	and	a, #0x01
+	jp	Z, %1
 } by {
-	xor	a,a
-	; peephole 66 removed redundant load of 0 into a.
+	rlca
+	; peephole 90 removed and by changing jump condition.
+	jp	NC, %1
+} if notUsed('a'), notUsedFrom(%1 'a')
+
+replace restart {
+	rlca
+	and	a, #0x01
+	jp	NZ, %1
+} by {
+	rlca
+	; peephole 91 removed and by changing jump condition.
+	jp	C, %1
+} if notUsed('a'), notUsedFrom(%1 'a')
+
+replace {
+	ld	e, #0x%1
+	ld	d, #0x%2
+} by {
+	ld	de, #0x%2%1
+	; peephole 92 combined constant loads into register pair.
 }
 
 replace {
-	ld	e,#0x%1
-	ld	d,#0x%2
+	ld	d, #0x%1
+	ld	e, #0x%2
 } by {
-	ld	de,#0x%2%1
-	; peephole 67 combined constant loads into register pair.
+	ld	de, #0x%1%2
+	; peephole 93 combined constant loads into register pair.
 }
 
 replace {
-	ld	l,#0x%1
-	ld	h,#0x%2
+	ld	l, #0x%1
+	ld	h, #0x%2
 } by {
-	ld	hl,#0x%2%1
-	; peephole 68 combined constant loads into register pair.
+	ld	hl, #0x%2%1
+	; peephole 94 combined constant loads into register pair.
 }
 
 replace {
-	ld	c,#0x%1
-	ld	b,#0x%2
+	ld	h, #0x%1
+	ld	l, #0x%2
 } by {
-	ld	bc,#0x%2%1
-	; peephole 69 combined constant loads into register pair.
+	ld	hl, #0x%1%2
+	; peephole 95 combined constant loads into register pair.
+}
+
+replace {
+	ld	c, #0x%1
+	ld	b, #0x%2
+} by {
+	ld	bc, #0x%2%1
+	; peephole 96 combined constant loads into register pair.
 }
 
 replace restart {
@@ -1086,7 +1227,7 @@ replace restart {
 } by {
 	rlca
 	and	a,#0x01
-	; peephole 86 replaced zero load, rla by and since rlca writes the same value to carry bit and least significant bit.
+	; peephole 109 replaced zero load, rla by and since rlca writes the same value to carry bit and least significant bit.
 }
 
 replace restart {
@@ -1096,7 +1237,7 @@ replace restart {
 	ld	%1,%3
 } by {
 	ld	%4,%2
-	; peephole 87 moved %2 directly into de instead of going through %1.
+	; peephole 110 moved %2 directly into de instead of going through %1.
 	ld	%1,%3
 }
 
@@ -1106,7 +1247,7 @@ replace restart {
 	ld	a,%3
 	adc	a,%4
 } by {
-	; peephole 88 removed lower part of multibyte addition.
+	; peephole 111 removed lower part of multibyte addition.
 	ld	%2,a
 	ld	a,%3
 	add	a,%4
@@ -1122,7 +1263,7 @@ replace restart {
 } by {
 	ld	de, #0x%2%1
 	add	hl, de
-	; peephole 89 used 16-bit addition.
+	; peephole 112 used 16-bit addition.
 	ld	e, l
 	ld	d, h
 	ld	a, h
@@ -1138,7 +1279,7 @@ replace restart {
 } by {
 	ld	bc, #0x%2%1
 	add	hl,bc
-	; peephole 90 used 16-bit addition.
+	; peephole 113 used 16-bit addition.
 	ld	c, l
 	ld	b, h
 	ld	a, h
@@ -1196,7 +1337,7 @@ replace restart {
 	add	a,%1
 } by {
 	ld	%1, a
-	; peephole 94 removed load by exploiting commutativity of addition.
+	; peephole 118 removed load by exploiting commutativity of addition.
 	add	a,%2
 } if notSame(%2 '(bc)' '(de)'), canAssign('b' %2)
 // canAssign('b' %2) is true, iff add a,%2 is possible.
@@ -1207,7 +1348,7 @@ replace restart {
 	ld	hl,#%1
 	add	hl,bc
 } by {
-	; peephole 95 removed loads by exploiting commutativity of addition.
+	; peephole 119 removed loads by exploiting commutativity of addition.
 	ld	bc,#%1
 	add	hl,bc
 } if notUsed('bc')
@@ -1218,7 +1359,7 @@ replace restart {
 	ld	bc,#%4
 	add	hl,bc
 } by {
-	; peephole 96 removed loads by exploiting commutativity of addition.
+	; peephole 120 removed loads by exploiting commutativity of addition.
 	ld	hl,#%1 + %4
 	add	hl,%2
 } if notUsed('bc')
@@ -2332,14 +2473,14 @@ replace restart {
 	jp	%5
 } by {
 	ret
-	; peephole 151 replaced jump by return.
+	; peephole 160 replaced jump by return.
 } if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
 replace restart {
 	jp	%1,%5
 } by {
 	ret	%1
-	; peephole 152 replaced jump by return.
+	; peephole 161 replaced jump by return.
 } if labelIsReturnOnly(%5), labelRefCountChange(%5 -1)
 
 // Replace jp by ret before replacing jp by jr outside of jump tables, since using ret can reduce the number of references to jump labels.
@@ -2349,35 +2490,35 @@ replace {
 	jp	%5
 } by {
 	jr	%5
-	; peephole 153 changed absolute to relative unconditional jump.
+	; peephole 162 changed absolute to relative unconditional jump.
 } if labelInRange(%5)
 
 replace {
 	jp	Z,%5
 } by {
 	jr	Z,%5
-	; peephole 154 changed absolute to relative conditional jump.
+	; peephole 163 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
 replace {
 	jp	NZ,%5
 } by {
 	jr	NZ,%5
-	; peephole 155 changed absolute to relative conditional jump.
+	; peephole 164 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
 replace {
 	jp	C,%5
 } by {
 	jr	C,%5
-	; peephole 156 changed absolute to relative conditional jump.
+	; peephole 165 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
 replace {
 	jp	NC,%5
 } by {
 	jr	NC,%5
-	; peephole 157 changed absolute to relative conditional jump.
+	; peephole 166 changed absolute to relative conditional jump.
 } if labelInRange(%5)
 
 replace {
@@ -2385,6 +2526,6 @@ replace {
 	jr	NZ,	%5	
 } by {
 	djnz	%5
-	; peephole 158 used djnz
+	; peephole 167 used djnz
 }
 

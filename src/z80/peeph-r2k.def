@@ -3,7 +3,7 @@
 // Some of these peepholes could be potentially moved to peeph.def, but a
 // GBZ80 expert should have a look at them before.
 //
-// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2015
+// (c) Philipp Klaus Krause (pkk@spth.de, philipp@colecovision.eu) 2006 - 2020
 // *** modified by Leland Morrison for rabbit 2000 processor 2011
 //
 // This program is free software; you can redistribute it and/or modify it
@@ -2019,6 +2019,41 @@ replace restart {
 	; peephole 172nz used double assignment in case of NZ condition.
 %1:
 } if labelRefCountChange(%2 -1)
+
+replace restart {
+	ld	%1, c
+	ld	%2, b
+	push	%2%1
+} by {
+	push	bc
+	; peephole 173 eliminated assignment by pushing bc
+} if notUsed(%2), notUsed(%1)
+
+replace restart {
+	ld	%1, e
+	ld	%2, d
+	push	%2%1
+} by {
+	push	de
+	; peephole 174 eliminated assignment by pushing de
+} if notUsed(%2), notUsed(%1)
+
+replace restart {
+	ld	%1, l
+	ld	%2, h
+	push	%2%1
+} by {
+	push	hl
+	; peephole 175 eliminated assignment by pushing hl
+} if notUsed(%2), notUsed(%1)
+
+replace restart {
+	ld	%1,%2
+	ld	%2,%1
+} by {
+	ld	%1,%2
+	; peephole 176 remove unnecessary load back
+} if notVolatile(%1), notVolatile(%2)
 
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 barrier

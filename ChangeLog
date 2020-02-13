@@ -1,5 +1,11 @@
 2020-02-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
+	* src/z80/peeph-z80.def,
+	  src/z80/peeph-r2k.def:
+	  Improve flexibility of some peephole rules.
+
+2020-02-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
+
 	* src/z80/peeph-z80.def:
 	  Additional z80 peephole rules picked from patch #314 by b-s-a.
 

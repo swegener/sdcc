@@ -229,6 +229,22 @@ replace restart {
 } if notVolatile(%1), notUsed(%1)
 
 replace restart {
+	ld	l,c
+	ld	h,b
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+} by {
+	ld	a,(bc)
+	ld	l,a
+	inc	bc
+	ld	a,(bc)
+	ld	h,a
+	; peephole 22a optimize 16-bit load from BC.
+} if notUsed('bc'), notUsed('a')
+
+replace restart {
 	inc	bc
 	ld	l,c
 	ld	h,b
@@ -1832,6 +1848,23 @@ replace restart {
 	; peephole 172nz used double assignment in case of NZ condition.
 %1:
 } if labelRefCountChange(%2 -1)
+
+replace restart {
+	ld	c,e
+	ld	b,d
+	push	bc
+} by {
+	push	de
+	; peephole 174 remove unnecessary register pair assignment.
+} if notUsed('bc')
+
+replace restart {
+	ld	%1,%2
+	ld	%2,%1
+} by {
+	ld	%1,%2
+	; peephole 177 remove unnecessary load back
+} if notVolatile(%1), notVolatile(%2)
 
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 barrier

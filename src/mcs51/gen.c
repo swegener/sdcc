@@ -9041,7 +9041,7 @@ genlshFixed (operand *result, operand *left, int shCount)
     {
       shiftLLong (left, result, full_bytes);
     }
-  else if ((shCount == 2) && (full_bytes == 0))
+  else if ((shCount == 2) && (full_bytes == 0) && !isOperandVolatile (result, FALSE))
     {
       shiftLLong (left, result, full_bytes);
       shiftLLong (result, result, full_bytes);

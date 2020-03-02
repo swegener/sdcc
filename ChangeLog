@@ -1,3 +1,8 @@
+2020-03-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/mcs51/gen.c,
+	* src/ds390/gen.c: fixed bug #2980
+
 2020-02-13 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 
 	* src/z80/peeph-z80.def,

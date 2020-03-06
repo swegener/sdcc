@@ -1,3 +1,9 @@
+2020-03-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c,
+	  support/regression/tests/bug-2982.c:
+	  Fix bug #2982.
+
 2020-03-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/mcs51/gen.c,

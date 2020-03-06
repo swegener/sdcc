@@ -3,6 +3,8 @@
 	* src/z80/peep.c,
 	  support/regression/tests/bug-2982.c:
 	  Fix bug #2982.
+	* src/z80/gen.c:
+	  Improve code generation for 16-bit addition with literal.
 
 2020-03-02 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

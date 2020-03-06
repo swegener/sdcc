@@ -5861,6 +5861,15 @@ genPlus (iCode * ic)
           /* Can't do it */
         }
     }
+  else if (getPairId (IC_RESULT (ic)->aop) == PAIR_HL && (isPairDead (PAIR_DE, ic) || isPairDead (PAIR_BC, ic)) && IC_RIGHT (ic)->aop->type == AOP_LIT)
+    {
+      PAIR_ID extrapair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
+      fetchPair (PAIR_HL, IC_LEFT (ic)->aop);
+      fetchPair (extrapair, IC_RIGHT (ic)->aop);
+      emit2 ("add hl, %s", _pairs[extrapair].name);
+      regalloc_dry_run_cost += 1;
+      goto release;     
+    }
 
   // Handle AOP_EXSTK conflict with hl here, since setupToPreserveCarry() would cause problems otherwise.
   if (IC_RESULT (ic)->aop->type == AOP_EXSTK && (getPairId (IC_LEFT (ic)->aop) == PAIR_HL || getPairId (IC_RIGHT (ic)->aop) == PAIR_HL) &&

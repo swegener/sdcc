@@ -3,7 +3,7 @@
 
 typedef struct {unsigned char flag;} atomic_flag;
 
-#if defined(__SDCC_z80) || defined(__SDCC_gbz80) || defined(__SDCC_r2k) || defined(__SDCC_stm8) // || defined(__SDCC_hc08) || defined(__SDCC_s08)
+#if defined(__SDCC_z80) || defined(__SDCC_gbz80) || defined(__SDCC_r2k) || defined(__SDCC_stm8) || defined(__SDCC_hc08) || defined(__SDCC_s08)
 #define ATOMIC_FLAG_INIT {1}
 //#elif defined(__SDCC_mcs51)
 //#define ATOMIC_FLAG_INIT {0}

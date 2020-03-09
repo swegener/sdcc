@@ -35,6 +35,6 @@ _atomic_flag_test_and_set:
 	clr	a
 	srl	(x)
 	ccf
-	sll	a
+	rlc	a
 	ret
 

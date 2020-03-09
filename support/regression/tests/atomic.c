@@ -2,7 +2,8 @@
 */
 #include <testfwk.h>
 
-#if defined(PORT_HOST) || defined(__SDCC_z80) || defined(__SDCC_gbz80) || defined(__SDCC_r2k) || defined(__SDCC_stm8)
+// Some ports do not have atomic_flag yet.
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_tlcs90) && !defined(__SDCC_r3ka) && !defined(__SDCC_z180) && !defined(__SDCC_ez80_z80)
 
 #include <stdatomic.h>
 #include <stdbool.h>
@@ -14,7 +15,7 @@ atomic_flag f2;
 
 void testAtomic(void)
 {
-#if defined(PORT_HOST) || defined(__SDCC_z80) || defined(__SDCC_gbz80) || defined(__SDCC_r2k) || defined(__SDCC_stm8)
+#if !defined(__SDCC_mcs51) && !defined(__SDCC_ds390) && !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_tlcs90) && !defined(__SDCC_r3ka) && !defined(__SDCC_z180) && !defined(__SDCC_ez80_z80)
 	ASSERT(atomic_flag_test_and_set(&f1) == false);
 	ASSERT(atomic_flag_test_and_set(&f1) == true);
 	atomic_flag_clear(&f1);

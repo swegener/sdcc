@@ -1,4 +1,4 @@
-;--------------------------------------------------------------------------
+/*
 ;  atomic_flag_test_and_set.s
 ;
 ;  Copyright (C) 2020, Philipp Klaus Krause
@@ -24,17 +24,21 @@
 ;  be covered by the GNU General Public License. This exception does
 ;  not however invalidate any other reasons why the executable file
 ;   might be covered by the GNU General Public License.
-;--------------------------------------------------------------------------
+*/
 
-	.area   CODE
+#include <stdatomic.h>
 
-	.globl _atomic_flag_test_and_set
-
-_atomic_flag_test_and_set:
-	ldw	x, (0x04, sp)
-	clr	a
-	srl	(x)
-	ccf
-	rlc	a
-	retf
+_Bool atomic_flag_test_and_set(volatile atomic_flag *object) __naked
+{
+__asm
+	pshx
+	pulh
+	tax
+	clra
+	lsr	,x
+	rola
+	eor	#0x01
+	rts
+__endasm;
+}
 

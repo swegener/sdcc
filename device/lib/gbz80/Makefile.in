@@ -40,14 +40,15 @@ Z80_SDCC = $(COMMON_SDCC) \
   _strlen.c \
   __memcpy.c \
   memcpy.c \
-  _memmove.c
+  _memmove.c \
+  atomic_flag_clear.c
 
 Z80SOURCES = $(addprefix ../,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG) $(Z80_SDCC))
 Z8OBJECTS = $(patsubst %.c,%.rel,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG) $(Z80_SDCC))
 
 OBJ = div.rel mul.rel \
       crt0_rle.rel heap.rel __sdcc_call_hl.rel \
-      setjmp.rel
+      setjmp.rel atomic_flag_test_and_set.rel
 
 LIB = gbz80.lib
 CC = $(SCC)

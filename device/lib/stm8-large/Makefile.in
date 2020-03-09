@@ -48,12 +48,13 @@ STM8_SDCC = $(COMMON_SDCC) \
   _strlen.c \
   _memmove.c \
   sprintf.c \
-  vprintf.c
+  vprintf.c \
+  atomic_flag_clear.c
 
 STM8SOURCES = $(addprefix ../,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 STM8OBJECTS = $(patsubst %.c,%.rel,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 
-OBJ = setjmp.rel __mulsint2slong.rel heap.rel memcpy.rel
+OBJ = setjmp.rel __mulsint2slong.rel heap.rel memcpy.rel atomic_flag_test_and_set.rel
 
 LIB = stm8.lib
 CC = $(SCC)

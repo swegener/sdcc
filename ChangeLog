@@ -1,3 +1,12 @@
+2020-03-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdatomic.h,
+	  device/lib/atomic_flag_clear.c,
+	  device/lib/*/atomic_flag_test_and_set.s,
+	  device/lib/*/Makfeile.in,
+	  support/regression/tests/atomic.c:
+	  Basic atomic_flag support.
+
 2020-03-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,

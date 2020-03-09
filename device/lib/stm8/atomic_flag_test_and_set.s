@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  setjmp.s
+;  atomic_flag_test_and_set.s
 ;
-;  Copyright (C) 2011-2014, Philipp Klaus Krause
+;  Copyright (C) 2020, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -13,7 +13,7 @@
 ;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ;  GNU General Public License for more details.
 ;
-;  You should have received a copy of the GNU General Public License
+;  You should have received a copy of the GNU General Public License 
 ;  along with this library; see the file COPYING. If not, write to the
 ;  Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 ;   MA 02110-1301, USA.
@@ -26,78 +26,15 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.area   _CODE
+	.area   CODE
 
-	.globl ___setjmp
+	.globl _atomic_flag_test_and_set
 
-___setjmp:
-	pop	bc
-	pop	de
-	push	de
-	push	bc
-
-	; Store stack pointer.
-	ldhl	sp, #0
-	push	de
-	push	hl
-	pop	de
-	pop	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
-	inc	hl
-
-	; Store return address.
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-
-	; Return 0.
-	xor	a, a
-	ld	e, a
-	ld	d, a
-	ret
-
-.globl _longjmp
-
-_longjmp:
-	pop	af
-	pop	hl
-	pop	de
-
-	; Ensure that return value is non-zero.
-	ld	a, e
-	or	a, d
-	jr	NZ, 0001$
-	inc	de
-0001$:
-
-	; Get stack pointer.
-	ld	c, (hl)
-	inc	hl
-	ld	b, (hl)
-	inc	hl
-
-	; Adjust stack pointer.
-	push	hl
-	push	bc
-	pop	hl
-	pop	bc
-	ld	sp, hl
-	push	bc
-	pop	hl
-
-	; Get return address.
-	ld	c, (hl)
-	inc	hl
-	ld	b, (hl)
-
-	; Set return address.
-	pop	af
-	push	bc
-
-	; Return value is in de.
-
-	; Jump.
+_atomic_flag_test_and_set:
+	ldw	x, (0x03, sp)
+	clr	a
+	srl	(x)
+	ccf
+	sll	a
 	ret
 

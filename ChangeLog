@@ -1,3 +1,10 @@
+2020-03-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCsymt.c,
+	  support/regression/tests/bug-2817.c,
+	  support/regression/tests/bug-2973.c:
+	  Fix bugs #2817 and #2973, patches by Thomas.
+
 2020-03-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* device/lib/hc08/Makefile.in,

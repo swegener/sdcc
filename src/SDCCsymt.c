@@ -515,16 +515,18 @@ addDecl (symbol * sym, int type, sym_link * p)
       DCL_TYPE (head) = type;
     }
 
-  /* if this is the first entry   */
+  // no type yet: make p the type
   if (!sym->type)
     {
       sym->type = head;
       sym->etype = tail;
     }
+  // type ends in spec, p is single spec element: merge specs
   else if (IS_SPEC (sym->etype) && IS_SPEC (head) && head == tail)
     {
       sym->etype = mergeSpec (sym->etype, head, sym->name);
     }
+  // type ends in spec, p is single decl element: p goes before spec
   else if (IS_SPEC (sym->etype) && !IS_SPEC (head) && head == tail)
     {
       t = sym->type;
@@ -533,11 +535,31 @@ addDecl (symbol * sym, int type, sym_link * p)
       t->next = head;
       tail->next = sym->etype;
     }
+  // fixes bug #1253
   else if (IS_FUNC (sym->type) && IS_SPEC (sym->type->next) && !memcmp (sym->type->next, empty, sizeof (sym_link)))
     {
       sym->type->next = head;
       sym->etype = tail;
     }
+  // type ends in spec, p ends in spec: merge specs, p's decls go before spec
+  else if (IS_SPEC (sym->etype) && IS_SPEC (tail))
+    {
+      sym->etype = mergeSpec (sym->etype, tail, sym->name);
+
+      // cut off p's spec
+      t = head;
+      while (t->next != tail)
+          t = t->next;
+      tail = t;
+
+      // splice p's decls
+      t = sym->type;
+      while (t->next != sym->etype)
+          t = t->next;
+      t->next = head;
+      tail->next = sym->etype;
+    }
+  // append p to the type
   else
     {
       sym->etype->next = head;
@@ -545,7 +567,7 @@ addDecl (symbol * sym, int type, sym_link * p)
     }
 
   /* if the type is an unknown pointer and has
-     a tspec then take the storage class const & volatile
+     a tspec then take the storage class and address
      attribute from the tspec & make it those of this
      symbol */
   if (p && !IS_SPEC (p) &&
@@ -877,14 +899,23 @@ mergeDeclSpec (sym_link * dest, sym_link * src, const char *name)
         }
     }
 
-  DCL_PTR_CONST (decl) |= SPEC_CONST (spec);
-  DCL_PTR_VOLATILE (decl) |= SPEC_VOLATILE (spec);
-  DCL_PTR_RESTRICT (decl) |= SPEC_RESTRICT (spec);
-  if (DCL_PTR_ADDRSPACE (decl) && SPEC_ADDRSPACE (spec) &&
-    strcmp (DCL_PTR_ADDRSPACE (decl)->name, SPEC_ADDRSPACE (spec)->name))
-    werror (E_SYNTAX_ERROR, yytext);
-  if (SPEC_ADDRSPACE (spec))
-    DCL_PTR_ADDRSPACE (decl) = SPEC_ADDRSPACE (spec);
+  // for pointers, type qualifiers go in the declarator
+  if (DCL_TYPE (decl) != ARRAY && DCL_TYPE (decl) != FUNCTION)
+    {
+      DCL_PTR_CONST (decl) |= SPEC_CONST (spec);
+      DCL_PTR_VOLATILE (decl) |= SPEC_VOLATILE (spec);
+      DCL_PTR_RESTRICT (decl) |= SPEC_RESTRICT (spec);
+      if (DCL_PTR_ADDRSPACE (decl) && SPEC_ADDRSPACE (spec) &&
+        strcmp (DCL_PTR_ADDRSPACE (decl)->name, SPEC_ADDRSPACE (spec)->name))
+        werror (E_SYNTAX_ERROR, yytext);
+      if (SPEC_ADDRSPACE (spec))
+        DCL_PTR_ADDRSPACE (decl) = SPEC_ADDRSPACE (spec);
+
+      SPEC_CONST (spec) = 0;
+      SPEC_VOLATILE (spec) = 0;
+      SPEC_RESTRICT (spec) = 0;
+      SPEC_ADDRSPACE (spec) = 0;
+    }
 
   lnk = decl;
   while (lnk && !IS_SPEC (lnk->next))

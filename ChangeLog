@@ -1,3 +1,8 @@
+2020-03-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* device/lib/hc08/Makefile.in,
+	* device/lib/s08/Makefile.in: add atomic_flag_clear.c
+
 2020-03-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdatomic.h,

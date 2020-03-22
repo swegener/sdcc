@@ -1,5 +1,11 @@
 2020-03-22 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  support/regression/tests/gcc-torture-execute-strlen-4.c:
+	  Fix stm8-specific aspect of bug #2987.
+
+2020-03-22 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCast.c,
 	  support/valdiag/Makefile.in,
 	  support/valdiag/valdiag.py,

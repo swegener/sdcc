@@ -401,14 +401,14 @@ aopGet(const asmop *aop, int offset)
   if (regalloc_dry_run)
     return ("");
 
-  if (offset >= aop->size)
-    return ("#0x00");
-
   if (aop->type == AOP_LIT)
     {
       SNPRINTF (buffer, sizeof(buffer), "#0x%02x", byteOfVal (aop->aopu.aop_lit, offset));
       return (buffer);
     }
+
+  if (offset >= aop->size)
+    return ("#0x00");
 
   if (aopRS (aop) && aop->aopu.bytes[offset].in_reg)
     return (aop->aopu.bytes[offset].byteu.reg->name);

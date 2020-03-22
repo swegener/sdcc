@@ -1,3 +1,11 @@
+2020-03-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  support/valdiag/Makefile.in,
+	  support/valdiag/valdiag.py,
+	  support/valdiag/tests/bug-2984.c:
+	  Fix bug #2984, enable valdiag tests for pdk13 and pdk14.
+
 2020-03-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCsymt.c,

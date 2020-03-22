@@ -2224,7 +2224,7 @@ isConformingBody (ast * pbody, symbol * sym, ast * body)
     case NE_OP:
     case '?':
     case ':':
-    case SIZEOF:               /* evaluate wihout code generation */
+    case SIZEOF:               /* evaluate without code generation */
 
       if (IS_AST_SYM_VALUE (pbody->left) && isSymbolEqual (AST_SYMBOL (pbody->left), sym))
         return FALSE;
@@ -8565,17 +8565,17 @@ astErrors (ast * t)
  */
 
 static ast *
-offsetofOp_rec (sym_link * type, ast * snd, sym_link ** result_type)
+offsetofOp_rec (sym_link *type, ast *snd, sym_link **result_type)
 {
   /* make sure the type is complete and sane */
   checkTypeSanity (type, "(offsetofOp)");
 
   /* offsetof can only be applied to structs/unions */
-  if (!IS_STRUCT (type))
+  if (!IS_STRUCT (type) || !getSize (type))
     {
       werrorfl (snd->filename, snd->lineno, E_OFFSETOF_TYPE);
-      *result_type = NULL;
-      return NULL;
+      *result_type = 0;
+      return newAst_VALUE (valueFromLit (0));
     }
 
   /* offsetof(struct_type, symbol); */
@@ -8609,8 +8609,10 @@ offsetofOp_rec (sym_link * type, ast * snd, sym_link ** result_type)
 }
 
 ast *
-offsetofOp (sym_link * type, ast * snd)
+offsetofOp (sym_link *type, ast *snd)
 {
   sym_link *result_type;
+
   return offsetofOp_rec (type, snd, &result_type);
 }
+

@@ -5,6 +5,8 @@
 	  support/valdiag/valdiag.py,
 	  support/valdiag/tests/bug-2984.c:
 	  Fix bug #2984, enable valdiag tests for pdk13 and pdk14.
+	* support/regression/tests/gcc-torture-execute-strlen-4.c:
+	  Partially enable a test that now compiles.
 
 2020-03-12 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -172,12 +172,10 @@ void test_array_ptr (void)
 #endif
 }
 
-#if 0 // Bug #
 static const A3_28* const pa0 = &a[0];
 static const A3_28* const pa1 = &a[1];
 
 static const A3_28* const paa[] = { &a[0], &a[1] };
-#endif
 
 /* Verify that strlen() involving pointers and arrays of pointers
    to array arguments computes the correct result.  */

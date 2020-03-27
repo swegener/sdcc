@@ -49,7 +49,7 @@ char received()
   return first_free != last_used;
 }
 
-char getchar()
+int getchar()
 {
   uint8_t o;
   while (!received())

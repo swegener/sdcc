@@ -32,6 +32,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "regsz80.h"
 
+class cl_z80;
+class cl_sp_limit_opt;
+
 /*
  * Base type of Z80 microcontrollers
  */
@@ -46,6 +49,8 @@ public:
   class cl_address_space *regs16;
   class cl_address_space *inputs;
   class cl_address_space *outputs;
+  class cl_sp_limit_opt *sp_limit_opt;
+  t_addr sp_limit;
 public:
   cl_z80(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
@@ -70,7 +75,7 @@ public:
                                       int *immed_offset,
                                       struct dis_entry **dentry);
   virtual bool is_call(t_addr addr);
-
+  
   virtual void store1( u16_t addr, t_mem val );
   virtual void store2( u16_t addr, u16_t val );
 
@@ -87,6 +92,8 @@ public:
   //virtual t_mem fetch(void);
   virtual u8_t reg_g_read ( t_mem g );
   virtual void reg_g_store( t_mem g, u8_t new_val );
+
+  virtual void stack_check_overflow(class cl_stack_op *op);
 
   virtual int inst_nop(t_mem code);
   virtual int inst_ld(t_mem code);
@@ -189,6 +196,23 @@ public:
 
 unsigned   word_parity( u16_t  x );
 /* returns parity for a 16-bit value */
+
+enum z80cpu_confs
+  {
+   z80cpu_sp_limit	= 0,
+   z80cpu_nuof		= 1
+  };
+
+class cl_z80_cpu: public cl_hw
+{
+public:
+  cl_z80_cpu(class cl_uc *auc);
+  virtual int init(void);
+  virtual int cfg_size(void) { return z80cpu_nuof; }
+  virtual char *cfg_help(t_addr addr);
+
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+};
 
 #endif
 

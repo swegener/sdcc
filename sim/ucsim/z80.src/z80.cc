@@ -27,24 +27,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <stdarg.h> /* for va_list */
+//#include <stdarg.h> /* for va_list */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "i_string.h"
+#include <string.h>
 
 // prj
-#include "pobjcl.h"
+//#include "pobjcl.h"
+#include "globals.h"
 
 // sim
-#include "simcl.h"
+//#include "simcl.h"
 
 // local
 #include "z80cl.h"
 #include "glob.h"
-#include "regsz80.h"
+//#include "regsz80.h"
 
 #define uint32 t_addr
 #define uint8 unsigned char
@@ -76,7 +77,8 @@ cl_z80::init(void)
   for (int i=0x8000; i<0x10000; i++) {
     ram->set((t_addr) i, 0);
   }
-
+  sp_limit= 0xf000;
+  
   return(0);
 }
 
@@ -108,7 +110,11 @@ void
 cl_z80::mk_hw_elements(void)
 {
   //class cl_base *o;
+  class cl_hw *h;
   cl_uc::mk_hw_elements();
+
+  add_hw(h= new cl_z80_cpu(this));
+  h->init();
 }
 
 void
@@ -550,7 +556,8 @@ cl_z80::print_regs(class cl_console_base *con)
   con->dd_printf("SP= 0x%04x [SP]= %02x %3d %c\n",
                  regs.SP, ram->get(regs.SP), ram->get(regs.SP),
                  isprint(ram->get(regs.SP))?ram->get(regs.SP):'.');
-
+  con->dd_printf("SP limit= 0x%04x\n", AU(sp_limit));
+  
   print_disass(PC, con);
 }
 
@@ -839,5 +846,74 @@ void        cl_z80::reg_g_store( t_mem g, u8_t new_val )
     case 7:  regs.raf.A    = new_val;  break;  /* write to a */
     }
 }
+
+void
+cl_z80::stack_check_overflow(class cl_stack_op *op)
+{
+  if (op)
+    {
+      if (op->get_op() & stack_write_operation)
+	{
+	  t_addr a= op->get_after();
+	  if (a < sp_limit)
+	    {
+	      class cl_error_stack_overflow *e=
+		new cl_error_stack_overflow(op);
+	      e->init();
+	      error(e);
+	    }
+	}
+    }
+}
+
+
+cl_z80_cpu::cl_z80_cpu(class cl_uc *auc):
+  cl_hw(auc, HW_CPU, 0, "cpu")
+{
+}
+
+int
+cl_z80_cpu::init(void)
+{
+  cl_hw::init();
+
+  cl_var *v;
+  uc->vars->add(v= new cl_var(cchars("sp_limit"), cfg, z80cpu_sp_limit,
+			      cfg_help(z80cpu_sp_limit)));
+  v->init();
+
+  return 0;
+}
+
+char *
+cl_z80_cpu::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case z80cpu_sp_limit:
+      return (char*)"Stack overflows when SP is below this limit";
+    }
+  return (char*)"Not used";
+}
+
+t_mem
+cl_z80_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  class cl_z80 *u= (class cl_z80 *)uc;
+  if (val)
+    cell->set(*val);
+  switch ((enum z80cpu_confs)addr)
+    {
+    case z80cpu_sp_limit:
+      if (val)
+	u->sp_limit= *val & 0xffff;
+      else
+	cell->set(u->sp_limit);
+      break;
+    case z80cpu_nuof: break;
+    }
+  return cell->get();
+}
+
 
 /* End of z80.src/z80.cc */

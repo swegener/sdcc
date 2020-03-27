@@ -35,13 +35,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdlib.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include <sys/time.h>
-#include "i_string.h"
+#include <string.h>
 
   // prj
-#include "stypes.h"
-#include "pobjcl.h"
+//#include "stypes.h"
+//#include "pobjcl.h"
 
 #include "utils.h"
 

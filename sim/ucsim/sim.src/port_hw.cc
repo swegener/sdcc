@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <stdio.h>
 #include <ctype.h>
 
 #include "globals.h"
@@ -159,7 +160,7 @@ cl_port_ui::handle_input(int c)
   //pio->tu_cll();
   if (!ret)
     {
-      u8_t u= c;
+      //u8_t u= c;
       //fprintf(stderr, "Unknown command: %c (%d,0x%x)\n", isprint(u)?u:'?', i8, c);
     }
   return ret;

@@ -2,14 +2,16 @@
  * to emulate the serial input and output of an 8051 controller               *
  * main.cc - the main stuff                                                   *
  ******************************************************************************/
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <sys/types.h>
+#include <stdio.h>
+//#include <sys/types.h>
+#include <sys/time.h>
 #include <iostream>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
+//#include <sys/stat.h>
+//#include <fcntl.h>
+//#include <errno.h>
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>

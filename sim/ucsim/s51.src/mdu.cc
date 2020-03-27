@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <stdio.h>
+
 #include "uc51cl.h"
 
 #include "mducl.h"
@@ -392,8 +394,8 @@ cl_mdu88x::read(class cl_memory_cell *cell)
   else if (sfr->is_owned(cell, &a))
     {
       a-= 0xb2;
-      if ((a < 0) ||
-	  (a > 5))
+      if (((a < 0) ||
+	   (a > 5)))
 	{
 	  if (con->get() & 0x20)
 	    val= regs[a]->get();

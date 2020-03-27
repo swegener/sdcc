@@ -115,10 +115,13 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-avr.src: savr$(EXEEXT) shared_lib
+avr.src: savr$(EXEEXT) ucsim_avr$(EXEEXT) shared_lib
 
 savr$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
+
+ucsim_avr$(EXEEXT): savr$(EXEEXT)
+	cp $< $@
 
 ifeq ($(dlso_ok),yes)
 shared_lib: $(top_builddir)/savr.so

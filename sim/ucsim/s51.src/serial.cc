@@ -25,22 +25,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 #include <ctype.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/time.h>
-#include <strings.h>
+//#include <errno.h>
+//#include <fcntl.h>
+//#include <sys/time.h>
+//#include <strings.h>
 
 // prj
 #include "globals.h"
-#include "utils.h"
+//#include "utils.h"
 
 // cmd
-#include "cmdutil.h"
+//#include "cmdutil.h"
 
 // local
 #include "serialcl.h"
@@ -77,7 +77,7 @@ cl_serial::init(void)
     }
 
   class cl_hw *t2= uc->get_hw(HW_TIMER, 2, 0);
-  if ((there_is_t2= t2 != 0))
+  if (((there_is_t2= t2) != 0))
     {
       t_mem d= sfr->get(T2CON);
       t2_baud= d & (bmRCLK | bmTCLK);
@@ -425,11 +425,13 @@ cl_serial::print_info(class cl_console_base *con)
   con->dd_printf(" %s", (sc&bmREN)?"ON":"OFF");
   con->dd_printf(" RB8=%c", (sc&bmRB8)?'1':'0');
   con->dd_printf(" irq=%c", (sc&bmRI)?'1':'0');
+  con->dd_printf(" buf=0x%02x", s_in);
   con->dd_printf("\n");
 
   con->dd_printf("Transmitter");
   con->dd_printf(" TB8=%c", (sc&bmTB8)?'1':'0');
   con->dd_printf(" irq=%c", (sc&bmTI)?'1':'0');
+  con->dd_printf(" buf=0x%02x", s_out);
   con->dd_printf("\n");
   /*con->dd_printf("s_rec_t1=%d s_rec_bit=%d s_rec_tick=%d\n",
 		 s_rec_t1, s_rec_bit, s_rec_tick);

@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 
-#include <stdarg.h>
+//#include <stdarg.h>
 #include "utils.h"
 
 // sim

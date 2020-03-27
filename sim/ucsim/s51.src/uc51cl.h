@@ -132,6 +132,8 @@ public:
   virtual int  do_interrupt(void);
   virtual int  accept_it(class it_level *il);
   virtual bool it_enabled(void);
+
+  virtual void stack_check_overflow(class cl_stack_op *op);
   
 protected:
   virtual int  idle_pd(void);

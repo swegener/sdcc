@@ -29,16 +29,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *	relative<->absolute jump in "jmp @a+dptr"
  */
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 
 // local
 #include "uc51cl.h"
 #include "regs51.h"
-#include "types51.h"
-#include "interruptcl.h"
+//#include "types51.h"
+//#include "interruptcl.h"
 
 
 /*

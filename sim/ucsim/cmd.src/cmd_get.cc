@@ -25,23 +25,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <ctype.h>
-#include "i_string.h"
+//#include <ctype.h>
+#include <string.h>
 
-#include <stdarg.h>
+//#include "i_string.h"
+
+//#include <stdarg.h>
 // prj
 #include "utils.h"
 #include "appcl.h"
 
 // sim
-#include "simcl.h"
-#include "optioncl.h"
+//#include "simcl.h"
+//#include "optioncl.h"
 
 // local
 #include "cmd_getcl.h"
-#include "cmdutil.h"
+//#include "cmdutil.h"
 
 
 void

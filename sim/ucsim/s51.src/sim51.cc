@@ -25,33 +25,34 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <errno.h>
-#include "i_string.h"
+//#include <stdlib.h>
+//#include <ctype.h>
+//#include <errno.h>
+#include <strings.h>
+//#include "i_string.h"
 
 #include "globals.h"
-#include "utils.h"
-#include "cmdutil.h"
-#include "charscl.h"
+//#include "utils.h"
+//#include "cmdutil.h"
+//#include "charscl.h"
 
 #include "sim51cl.h"
 //#include "cmd51cl.h"
-#include "uc51cl.h"
-#include "uc52cl.h"
-#include "uc521cl.h"
+//#include "uc51cl.h"
+//#include "uc52cl.h"
+//#include "uc521cl.h"
 #include "uc517cl.h"
-#include "uc51rcl.h"
-#include "uc89c51rcl.h"
+//#include "uc51rcl.h"
+//#include "uc89c51rcl.h"
 #include "uc251cl.h"
 #include "uc390cl.h"
 #include "uc88xcl.h"
 #include "uc320cl.h"
 #include "uc380cl.h"
-#include "glob.h"
+//#include "glob.h"
 
 
 cl_sim51::cl_sim51(class cl_app *the_app):

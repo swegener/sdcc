@@ -25,10 +25,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <stdio.h>
+
 #include "timer0cl.h"
 #include "regs51.h"
 #include "types51.h"
-#include "uc51cl.h"
+//#include "uc51cl.h"
 
 
 cl_timer0::cl_timer0(class cl_uc *auc, int aid, const char *aid_string):

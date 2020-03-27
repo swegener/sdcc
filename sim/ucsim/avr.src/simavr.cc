@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <ctype.h>
 
 // sim.src
-#include "appcl.h"
+//#include "appcl.h"
 
 // local
 #include "simavrcl.h"

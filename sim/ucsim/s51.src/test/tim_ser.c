@@ -10,6 +10,7 @@
 
 unsigned int t0cnt;
 __xdata char *simif;
+volatile __bit dummy;
 
 void t0_it(void) __interrupt (1)
 {
@@ -69,5 +70,6 @@ void main(void)
 	    c= min;
 	  t0cnt= 10;
 	}
+      dummy= !dummy;
     }
 }

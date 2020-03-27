@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f sxa$(EXEEXT)
+	rm -f sxa$(EXEEXT) sxa.exe
 
 
 # Deleting all files created by configuring or building the program

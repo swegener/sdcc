@@ -26,14 +26,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /*@1@*/
 
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 
-#include "ddconfig.h"
-
-#include "stdlib.h"
+//#include "ddconfig.h"
 
 // sim
-#include "brkcl.h"
-#include "argcl.h"
+//#include "brkcl.h"
+//#include "argcl.h"
 #include "simcl.h"
 
 // cmd

@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f spdk$(EXEEXT)
+	rm -f spdk$(EXEEXT) spdk.exe
 
 
 # Deleting all files created by configuring or building the program

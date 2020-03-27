@@ -27,13 +27,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
-#include "stdio.h"
-#include <stdlib.h>
+//#include "ddconfig.h"
+
+#include <stdio.h>
+//#include <stdlib.h>
 
 // local
 #include "stm8cl.h"
-#include "regsstm8.h"
+//#include "regsstm8.h"
 #include "stm8mac.h"
 
 int

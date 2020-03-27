@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdio.h>
 
-#include "stypes.h"
+//#include "stypes.h"
 #include "glob.h"
 
 /* this needs to match enum definition in glob.h */

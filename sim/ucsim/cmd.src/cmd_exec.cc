@@ -24,21 +24,24 @@ along with UCSIM; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
-#include <stdarg.h>
-#include "ddconfig.h"
+
+//#include <stdarg.h>
+#include <string.h>
+
+//#include "ddconfig.h"
 
 // prj
-#include "i_string.h"
+//#include "i_string.h"
 #include "utils.h"
 #include "globals.h"
 
 // sim.src
-#include "simcl.h"
-#include "uccl.h"
+//#include "simcl.h"
+//#include "uccl.h"
 
 // local, cmd.src
 #include "cmd_execcl.h"
-#include "cmdutil.h"
+//#include "cmdutil.h"
 
 
 /*

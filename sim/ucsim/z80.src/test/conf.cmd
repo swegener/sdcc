@@ -1,1 +1,1 @@
-set hw simif nas 0xffff
+set hw simif rom 0x00ff

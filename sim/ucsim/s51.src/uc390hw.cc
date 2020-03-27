@@ -25,15 +25,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 
 // local
 #include "uc390hwcl.h"
 #include "regs51.h"
-#include "uc51cl.h"
+//#include "uc51cl.h"
 
 
 cl_uc390_hw::cl_uc390_hw (class cl_uc *auc):

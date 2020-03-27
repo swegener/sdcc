@@ -25,18 +25,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
 #include <stdlib.h>
-#include "i_string.h"
+#include <string.h>
+//#include "i_string.h"
 
 // prj
 #include "globals.h"
 #include "utils.h"
-#include "errorcl.h"
+//#include "errorcl.h"
 
 // sim
-#include "simcl.h"
+//#include "simcl.h"
 
 // local
 #include "cmd_showcl.h"
@@ -211,7 +212,7 @@ CMDHELP(cl_show_error_cmd,
 	"Show class of errors",
 	"long help of show error")
 
-#include "newcmdposixcl.h"
+//#include "newcmdposixcl.h"
 
 /*
  * Command: show console

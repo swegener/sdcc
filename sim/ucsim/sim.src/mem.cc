@@ -30,23 +30,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <stdarg.h>
-#include "i_string.h"
+//#include <stdarg.h>
+#include <string.h>
+//#include "i_string.h"
 
 // prj
-#include "utils.h"
+//#include "utils.h"
 #include "globals.h"
 
 // sim
-#include "simcl.h"
+//#include "simcl.h"
 
 // cmd
-#include "newcmdcl.h"
-#include "cmdutil.h"
+//#include "newcmdcl.h"
+//#include "cmdutil.h"
 
 // local
 #include "memcl.h"
-#include "hwcl.h"
+//#include "hwcl.h"
 
 
 static class cl_mem_error_registry mem_error_registry;

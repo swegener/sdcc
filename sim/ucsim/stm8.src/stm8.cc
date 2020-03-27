@@ -28,27 +28,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <stdarg.h> /* for va_list */
+//#include <stdarg.h> /* for va_list */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "i_string.h"
+#include <string.h>
 
 // prj
-#include "pobjcl.h"
+//#include "pobjcl.h"
 #include "globals.h"
 
 // sim
-#include "simcl.h"
+//#include "simcl.h"
 
 // local
 #include "stm8cl.h"
 #include "glob.h"
-#include "regsstm8.h"
+//#include "regsstm8.h"
 #include "stm8mac.h"
-#include "itccl.h"
+//#include "itccl.h"
 #include "serialcl.h"
 #include "rstcl.h"
 #include "timercl.h"
@@ -76,6 +76,7 @@ int
 cl_stm8::init(void)
 {
   cl_uc::init(); /* Memories now exist */
+  sp_limit= 0x1500;
 
   xtal = 8000000;
 
@@ -969,9 +970,10 @@ cl_stm8::print_regs(class cl_console_base *con)
                  regs.X, regs.X, isprint(regs.X)?regs.X:'.');
   con->dd_printf("Y= 0x%04x %3d %c\n",
                  regs.Y, regs.Y, isprint(regs.Y)?regs.Y:'.');
-  con->dd_printf("SP= 0x%04x [SP+1]= %02x %3d %c\n",
+  con->dd_printf("SP= 0x%04x [SP+1]= %02x %3d %c  Limit= 0x%04x\n",
                  regs.SP, ram->get(regs.SP+1), ram->get(regs.SP+1),
-                 isprint(ram->get(regs.SP+1))?ram->get(regs.SP+1):'.');
+                 isprint(ram->get(regs.SP+1))?ram->get(regs.SP+1):'.',
+		 AU(sp_limit));
 
   print_disass(PC, con);
 }
@@ -1573,11 +1575,18 @@ cl_stm8::exec_inst(void)
       case 0xb:
          switch ( code & 0xf0) {
             case 0x30: // push longmem
-               push1( get1(fetch2()));
-               return(resGO);
+	      {
+		t_addr a= fetch2();
+		t_mem v= get1(a);
+		push1( v /*get1(fetch2())*/);
+		return(resGO);
+	      }
             case 0x40: // push #byte
-               push1( fetch1());
-               return(resGO);
+	      {
+		t_mem v= fetch1();
+		push1(v);
+		return(resGO);
+	      }
             case 0x50: // addw sp,#val
                regs.SP += fetch1();
                return(resGO);
@@ -1911,6 +1920,24 @@ cl_stm8::it_enabled(void)
   return !(regs.CC & BIT_I0) || !(regs.CC & BIT_I1);
 }
 
+void
+cl_stm8::stack_check_overflow(class cl_stack_op *op)
+{
+  if (op)
+    {
+      if (op->get_op() & stack_write_operation)
+	{
+	  t_addr a= op->get_after();
+	  if (a < sp_limit)
+	    {
+	      class cl_error_stack_overflow *e=
+		new cl_error_stack_overflow(op);
+	      e->init();
+	      error(e);
+	    }
+	}
+    }
+}
 
 cl_stm8_cpu::cl_stm8_cpu(class cl_uc *auc):
   cl_hw(auc, HW_DUMMY, 0, "cpu")
@@ -1926,6 +1953,11 @@ cl_stm8_cpu::init(void)
     {
       regs[i]= register_cell(uc->rom, 0x7f00+i);
     }
+  cl_var *v;
+  uc->vars->add(v= new cl_var(chars("sp_limit"), cfg, cpuconf_sp_limit,
+			      cfg_help(cpuconf_sp_limit)));
+  v->init();
+  
   return 0;
 }
 
@@ -2045,10 +2077,30 @@ cl_stm8_cpu::read(class cl_memory_cell *cell)
 t_mem
 cl_stm8_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
 {
+  class cl_stm8 *u= (class cl_stm8 *)uc;
   if (val)
     cell->set(*val);
+  switch ((enum stm8_cpu_cfg)addr)
+    {
+    case cpuconf_sp_limit:
+      if (val)
+	u->sp_limit= *val & 0xffff;
+      else
+	cell->set(u->sp_limit);
+      break;
+    }
   return cell->get();
 }
 
+char *
+cl_stm8_cpu::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case cpuconf_sp_limit:
+      return (char*)"Stack overflows when SP is below this limit";
+    }
+  return (char*)"Not used";
+}
 
 /* End of stm8.src/stm8.cc */

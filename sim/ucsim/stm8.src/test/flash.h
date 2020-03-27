@@ -3,8 +3,6 @@
 #ifndef FLASH_HEADER
 #define FLASH_HEADER
 
-#include <stdbool.h>
-
 extern void flash_punlock(void);
 extern void flash_dunlock(void);
 extern void flash_plock(void);

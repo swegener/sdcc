@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /*@1@*/
 
 #include "avrcl.h"
-#include "regsavr.h"
+//#include "regsavr.h"
 
 
 /*

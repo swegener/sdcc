@@ -27,8 +27,24 @@
 #define get2(addr) get_2(addr)
 //#define fetch2() ((fetch() << 8) | fetch() )
 #define fetch1() fetch()
-#define push2(val) {store2(regs.SP-1,(val)); regs.SP-=2; }
-#define push1(val) {store1(regs.SP,(val)); regs.SP-=1; }
+#define push2(val) {							\
+    t_addr sp_before= regs.SP;						\
+    store2(regs.SP-1,(val));						\
+    regs.SP-=2;								\
+    class cl_stack_op *so=						\
+      new cl_stack_push(instPC,val,sp_before,regs.SP);			\
+    so->init();								\
+    stack_write(so);							\
+  }
+#define push1(val) {							\
+    t_addr sp_before= regs.SP;						\
+    store1(regs.SP,(val));						\
+    regs.SP-=1;								\
+    class cl_stack_op *so=						\
+      new cl_stack_push(instPC,val,sp_before,regs.SP);			\
+    so->init();								\
+    stack_write(so);							\
+  }
 #define pop2(var) {var=get2(regs.SP+1); regs.SP+=2;}
 #define pop1(var) {var=get1(regs.SP+1); regs.SP+=1;}
 #define add_u16_disp(_w, _d) (( (unsigned short)(_w) + (char)(_d) ) & 0xffff)

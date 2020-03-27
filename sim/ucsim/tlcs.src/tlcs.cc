@@ -25,20 +25,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
 #include <stdio.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <ctype.h>
-#include "i_string.h"
+#include <string.h>
 
 // prj
-#include "pobjcl.h"
+//#include "pobjcl.h"
 
 // sim
-#include "simcl.h"
-#include "memcl.h"
-#include "stackcl.h"
+//#include "simcl.h"
+//#include "memcl.h"
+//#include "stackcl.h"
 
 // local
 #include "tlcscl.h"
@@ -101,12 +101,13 @@ cl_tlcs::init(void)
   cl_uc::init(); /* Memories now exist */
   //ram= address_space(MEM_IRAM_ID);
   //rom= address_space(MEM_ROM_ID);
-
+  sp_limit= 0xf000;
+  
   // zero out ram(this is assumed in regression tests)
   for (int i=0x8000; i<0x10000; i++) {
     nas->set((t_addr) i, 0);
   }
-
+  
   vars->add(v= new cl_var(cchars("A"), regs8, 0, ""));
   v->init();
   vars->add(v= new cl_var(cchars("F"), regs8, 1, ""));
@@ -180,7 +181,11 @@ cl_tlcs::mk_hw_elements(void)
   //class cl_base *o;
   //hws->add(o= new cl_port(this));
   //o->init();
+  class cl_hw *h;
   cl_uc::mk_hw_elements();
+
+  add_hw(h= new cl_tlcs_cpu(this));
+  h->init();
 }
 
 
@@ -504,9 +509,31 @@ cl_tlcs::print_regs(class cl_console_base *con)
   con->dd_printf("SP= 0x%04x [SP]= %02x %3d %c\n",
                  reg.sp, nas->get(reg.sp), nas->get(reg.sp),
                  isprint(nas->get(reg.sp))?nas->get(reg.sp):'.');
+  con->dd_printf("SP limit= 0x%04x\n", AU(sp_limit));
 
   print_disass(PC, con);
 }
+
+
+void
+cl_tlcs::stack_check_overflow(class cl_stack_op *op)
+{
+  if (op)
+    {
+      if (op->get_op() & stack_write_operation)
+	{
+	  t_addr a= op->get_after();
+	  if (a < sp_limit)
+	    {
+	      class cl_error_stack_overflow *e=
+		new cl_error_stack_overflow(op);
+	      e->init();
+	      error(e);
+	    }
+	}
+    }
+}
+
 
 int
 cl_tlcs::exec_inst(void)
@@ -1823,5 +1850,53 @@ cl_tlcs::cc(u8_t cc)
   return false;
 }
 
+
+cl_tlcs_cpu::cl_tlcs_cpu(class cl_uc *auc):
+  cl_hw(auc, HW_CPU, 0, "cpu")
+{
+}
+
+int
+cl_tlcs_cpu::init(void)
+{
+  cl_hw::init();
+
+  cl_var *v;
+  uc->vars->add(v= new cl_var(cchars("sp_limit"), cfg, tlcscpu_sp_limit,
+			      cfg_help(tlcscpu_sp_limit)));
+  v->init();
+
+  return 0;
+}
+
+char *
+cl_tlcs_cpu::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case tlcscpu_sp_limit:
+      return (char*)"Stack overflows when SP is below this limit";
+    }
+  return (char*)"Not used";
+}
+
+t_mem
+cl_tlcs_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  class cl_tlcs *u= (class cl_tlcs *)uc;
+  if (val)
+    cell->set(*val);
+  switch ((enum tlcscpu_confs)addr)
+    {
+    case tlcscpu_sp_limit:
+      if (val)
+	u->sp_limit= *val & 0xffff;
+      else
+	cell->set(u->sp_limit);
+      break;
+    case tlcscpu_nuof: break;
+    }
+  return cell->get();
+}
 
 /* End of tlcs.src/tlcs.cc */

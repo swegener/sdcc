@@ -30,12 +30,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *	get register in "mov @ri,address"
  */
  
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <stdio.h>
+//#include <stdio.h>
 
 // sim
-#include "memcl.h"
+//#include "memcl.h"
 
 // local
 #include "uc51cl.h"

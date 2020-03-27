@@ -31,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "utils.h"
 #include "globals.h"
-#include "fiocl.h"
+//#include "fiocl.h"
 
 #include "serial_hwcl.h"
 

@@ -26,13 +26,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /*@1@*/
 
 #include <ctype.h>
+#include <string.h>
 
 // prj
 #include "globals.h"
 #include "utils.h"
 
 // sim.src
-#include "uccl.h"
+//#include "uccl.h"
 
 // local, cmd.src
 #include "cmd_uccl.h"

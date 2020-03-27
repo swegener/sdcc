@@ -25,27 +25,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
 #include <stdio.h>
-#include <stdarg.h>
+//#include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/time.h>
+//#include <fcntl.h>
+//#include <errno.h>
+//#include <sys/types.h>
+//#include <sys/time.h>
 //#if FD_HEADER_OK
 //# include HEADER_FD
 //#endif
-#include "i_string.h"
+#include <string.h>
+//#include "i_string.h"
 
 // prj
 #include "utils.h"
 #include "globals.h"
 
 // sim
-#include "optioncl.h"
+//#include "optioncl.h"
 #include "iwrap.h"
 
 //cmd.src
@@ -55,12 +56,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "uc51cl.h"
 #include "glob.h"
 #include "regs51.h"
-#include "timer0cl.h"
+//#include "timer0cl.h"
 #include "timer1cl.h"
 #include "serialcl.h"
 #include "portcl.h"
-#include "interruptcl.h"
-#include "types51.h"
+//#include "interruptcl.h"
+//#include "types51.h"
 
 
 
@@ -482,6 +483,7 @@ cl_irq_stop_option::init(void)
 {
   cl_optref::init();
   create(uc51, bool_opt, "irq_stop", "Stop when IRQ accepted");
+  
   return(0);
 }
 
@@ -1268,7 +1270,7 @@ cl_51core::disass(t_addr addr, const char *sep)
 void
 cl_51core::print_regs(class cl_console_base *con)
 {
-  t_addr start;
+  t_addr start, stop;
   t_mem data;
   t_mem dp;
   
@@ -1290,9 +1292,13 @@ cl_51core::print_regs(class cl_console_base *con)
               (data&bmCY)?'1':'0', (data&bmAC)?'1':'0',
               (data&bmOV)?'1':'0', (data&bmP)?'1':'0');
   /* show stack pointer */
-  start = sfr->get (SP);
-  con->dd_printf ("SP ", start);
-  iram->dump (start, start - 7, 8, con/*->get_fout()*/);
+  start= sfr->get (SP);
+  if (start >= 7)
+    stop = start-7;
+  else
+    stop= 0;
+  con->dd_printf ("SP ");
+  iram->dump (start, stop, 8, con/*->get_fout()*/);
   con->dd_color("answer");
   // show DPTR(s)
   if (dptr)
@@ -1570,7 +1576,8 @@ cl_51core::analyze(t_addr addr)
 {
   uint code;
   struct dis_entry *tabl;
-
+  t_addr a;
+  
   code= rom->get(addr);
   tabl= &(dis_tbl()[code]);
   while (!inst_at(addr) &&
@@ -1580,29 +1587,34 @@ cl_51core::analyze(t_addr addr)
       switch (tabl->branch)
 	{
 	case 'a': // acall
-	  analyze((addr & 0xf800)|
-		  ((rom->get(addr+1)&0x07)*256+
-		   rom->get(addr+2)));
-	  analyze(addr+tabl->length);
+	  a= (addr & 0xf800)|
+	    ((rom->get(addr+1)&0x07)*256+
+	     rom->get(addr+2));
+	  analyze(a);
+	  addr= addr+tabl->length;
 	  break;
 	case 'A': // ajmp
-	  addr= (addr & 0xf800)|
-	    ((rom->get(addr+1) & 0x07)*256 + rom->get(addr+2));
+	  a= (addr & 0xf800)|
+	    (((rom->get(addr)>>5) & 0x07)*256 + rom->get(addr+1));
+	  addr= a;
 	  break;
 	case 'l': // lcall
-	  analyze(rom->get(addr+1)*256 + rom->get(addr+2));
-	  analyze(addr+tabl->length);
+	  a= rom->get(addr+1)*256 + rom->get(addr+2);
+	  analyze(a);
+	  addr= addr+tabl->length;
 	  break;
 	case 'L': // ljmp
-	  addr= rom->get(addr+1)*256 + rom->get(addr+2);
+	  a= rom->get(addr+1)*256 + rom->get(addr+2);
+	  addr= a;
 	  break;
 	case 'r': // reljmp (2nd byte)
-	  analyze(rom->validate_address(addr+(signed char)(rom->get(addr+1))));
-	  analyze(addr+tabl->length);
+	  a= rom->validate_address(addr+2+(signed char)(rom->get(addr+1)));
+	  analyze(a);
+	  addr= addr+tabl->length;
 	  break;
 	case 'R': // reljmp (3rd byte)
-	  analyze(rom->validate_address(addr+(signed char)(rom->get(addr+2))));
-	  analyze(addr+tabl->length);
+	  analyze(rom->validate_address(addr+3+(signed char)(rom->get(addr+2))));
+	  addr= addr+tabl->length;
 	  break;
 	case 's': // sjmp
 	  {
@@ -1837,6 +1849,26 @@ bool
 cl_51core::it_enabled(void)
 {
   return sfr->get(IE) & bmEA;
+}
+
+
+/* 
+ * Check SP validity after stack (write) poeration
+ */
+
+void
+cl_51core::stack_check_overflow(class cl_stack_op *op)
+{
+  t_addr b, a;
+  b= op->get_before();
+  a= op->get_after();
+  if (a < b)
+    {
+      class cl_error_stack_overflow *e=
+	new cl_error_stack_overflow(op);
+      e->init();
+      error(e);
+    }
 }
 
 

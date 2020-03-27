@@ -25,27 +25,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <ctype.h>
-#include <stdarg.h> /* for va_list */
-#include <cassert>
+//#include <ctype.h>
+//#include <stdarg.h> /* for va_list */
+//#include <cassert>
 #include <stdio.h>
 #include <stdlib.h>
-#include "i_string.h"
+#include <string.h>
+//#include "i_string.h"
 
 // prj
 #include "globals.h"
-#include "pobjcl.h"
+//#include "pobjcl.h"
 
 // sim
-#include "simcl.h"
+//#include "simcl.h"
 
 // local
 #include "glob.h"
 #include "pdkcl.h"
-#include "portcl.h"
-#include "regspdk.h"
+//#include "portcl.h"
+//#include "regspdk.h"
 
 /*******************************************************************/
 
@@ -140,7 +141,7 @@ void cl_pdk::make_memories(void) {
     ram_storage = 0x100;
     break;
   default:
-    __builtin_unreachable();
+    return;//__builtin_unreachable();
   }
   rom = as = new cl_address_space("rom", 0, rom_storage, 16);
   as->init();
@@ -190,7 +191,7 @@ struct dis_entry *cl_pdk::dis_tbl(void) {
   case CPU_PDK15:
     return (disass_pdk_15);
   default:
-    __builtin_unreachable();
+    return NULL;//__builtin_unreachable();
   }
 }
 
@@ -251,7 +252,7 @@ const char *cl_pdk::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
         break;
 
       default:
-        __builtin_unreachable();
+        return (char*)"";//__builtin_unreachable();
   }
 
   uint code = rom->get(addr++);
@@ -327,7 +328,7 @@ char *cl_pdk::disass(t_addr addr, const char *sep) {
               code &= 0x7F;
               break;
             default:
-              __builtin_unreachable();
+              ;//__builtin_unreachable();
            }
 
             ++b;
@@ -347,7 +348,7 @@ char *cl_pdk::disass(t_addr addr, const char *sep) {
             n = (code & 0x380) >> 7;
             break;
           default:
-            __builtin_unreachable();
+            n= 0;//__builtin_unreachable();
           }
           sprintf(temp, "#%u", n);
           break;

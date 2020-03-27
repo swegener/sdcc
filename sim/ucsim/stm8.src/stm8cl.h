@@ -58,6 +58,7 @@ public:
   class cl_itc *itc;
   class cl_it_src *trap_src;
   class cl_flash *flash_ctrl;
+  t_addr sp_limit;
 public:
   cl_stm8(struct cpu_entry *IType, class cl_sim *asim);
   virtual int init(void);
@@ -92,9 +93,16 @@ public:
   virtual int  accept_it(class it_level *il);
   virtual bool it_enabled(void);
 
+  virtual void stack_check_overflow(class cl_stack_op *op);
+
 #include "instcl.h"
 };
 
+
+enum stm8_cpu_cfg
+  {
+   cpuconf_sp_limit	= 0,
+  };
 
 class cl_stm8_cpu: public cl_hw
 {
@@ -109,6 +117,7 @@ class cl_stm8_cpu: public cl_hw
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem read(class cl_memory_cell *cell);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+  virtual char *cfg_help(t_addr addr);
 };
 
 

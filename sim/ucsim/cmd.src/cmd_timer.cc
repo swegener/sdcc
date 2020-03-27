@@ -25,10 +25,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include <stdio.h>
 
-#include "stdio.h"
-#include "i_string.h"
+//#include "ddconfig.h"
+
+//#include "i_string.h"
 
 // sim
 #include "simcl.h"

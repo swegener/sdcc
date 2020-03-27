@@ -66,7 +66,7 @@ serial_received()
   return first_free != last_used;
 }
 
-char getchar()
+int getchar()
 {
   uint8_t o, nr;
   while (!serial_received())

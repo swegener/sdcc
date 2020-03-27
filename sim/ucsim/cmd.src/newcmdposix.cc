@@ -26,27 +26,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
 #include <stdio.h>
 #include <errno.h>
-#include <stdarg.h>
+//#include <stdarg.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include "i_string.h"
+//#include <sys/types.h>
+//#include <sys/time.h>
+#include <string.h>
+#include <unistd.h>
+
+//#include "i_string.h"
 
 // prj
 #include "globals.h"
-#include "utils.h"
+//#include "utils.h"
 
 // sim
-#include "simcl.h"
-#include "argcl.h"
-#include "appcl.h"
+//#include "simcl.h"
+//#include "argcl.h"
 
 // local
-#include "newcmdposixcl.h"
 
 
 /*

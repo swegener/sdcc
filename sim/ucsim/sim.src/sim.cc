@@ -25,12 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include "i_string.h"
+//#include <stdlib.h>
+//#include <unistd.h>
+#include <string.h>
+//#include "i_string.h"
 
 // prj
 #include "globals.h"
@@ -38,11 +39,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // cmd
 #include "cmd_execcl.h"
-#include "cmd_guicl.h"
+//#include "cmd_guicl.h"
 
 // local, sim.src
-#include "simcl.h"
-#include "appcl.h"
+//#include "simcl.h"
+//#include "appcl.h"
 #include "simifcl.h"
 
 
@@ -250,10 +251,14 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
       unsigned long dt= uc?(uc->ticks->ticks - start_tick):0;
       if ((reason != resSTEP) ||
 	  (steps_done > 1))
-	cmd->frozen_console->dd_printf("Simulated %lu ticks in %f sec, rate=%f\n",
-				       dt,
-				       stop_at - start_at,
-				       (dt*(1/uc->xtal)) / (stop_at - start_at));
+	{
+	  cmd->frozen_console->dd_printf("Simulated %lu ticks (%.3e sec)\n",
+					 dt,
+					 dt*(1/uc->xtal));
+	  cmd->frozen_console->dd_printf("Host usage: %f sec, rate=%f\n",
+					 stop_at - start_at,
+					 (dt*(1/uc->xtal)) / (stop_at - start_at));
+	}
       //if (cmd->actual_console != cmd->frozen_console)
       cmd->frozen_console->set_flag(CONS_FROZEN, false);
       //cmd->frozen_console->dd_printf("_s_");

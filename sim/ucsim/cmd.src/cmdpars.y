@@ -1,9 +1,11 @@
 %{
-
+#include <stdlib.h>
+#include <unistd.h>
+  
 #include "cmdlexcl.h"
-#include "memcl.h"
+  //#include "memcl.h"
 #include "globals.h"
-#include "stypes.h"
+  //#include "stypes.h"
 
 static void yyerror (const char *msg);
 %}

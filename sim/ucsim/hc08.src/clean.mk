@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f shc08$(EXEEXT)
+	rm -f shc08$(EXEEXT) shc08.exe
 
 
 # Deleting all files created by configuring or building the program

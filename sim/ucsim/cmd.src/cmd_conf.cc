@@ -27,10 +27,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // prj
 #include "globals.h"
-#include "utils.h"
+//#include "utils.h"
 
 // sim
-#include "simcl.h"
+//#include "simcl.h"
 
 // local
 #include "cmd_confcl.h"
@@ -126,6 +126,29 @@ CMDHELP(cl_conf_objects_cmd,
 	"conf objects",
 	"Show object tree",
 	"long help of conf objects")
+
+
+/*
+ * Command: ver
+ *----------------------------------------------------------------------------
+ */
+
+COMMAND_DO_WORK_APP(cl_ver_cmd)
+{
+  con->dd_printf("%s\n", VERSIONSTR);
+  return false;
+}
+
+CMDHELP(cl_ver_cmd,
+	"version",
+	"Version of the program",
+	"long help of ver command")
+
+
+/*
+ * Command: jaj
+ *----------------------------------------------------------------------------
+ */
 
 COMMAND_DO_WORK_APP(cl_jaj_cmd)
 {

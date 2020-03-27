@@ -25,10 +25,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#include <stdio.h>
 #include <stdlib.h>
 
 // cmd.src
-#include "newcmdcl.h"
+//#include "newcmdcl.h"
 
 // sim.src
 #include "uccl.h"
@@ -432,7 +433,25 @@ cl_stack_pop::match(class cl_stack_op *op)
 
 cl_error_stack::cl_error_stack(void)
 {
-classification = stack_error_registry.find("stack");
+  classification = stack_error_registry.find("stack");
+}
+
+/*
+ * Stack overflow error
+ */
+
+cl_error_stack_overflow::cl_error_stack_overflow(class cl_stack_op *op):
+  cl_error_stack()
+{
+  PC= op->get_pc();
+  SP_before= op->get_before();
+  SP_after= op->get_after();
+}
+
+void
+cl_error_stack_overflow::print(class cl_commander_base *c)
+{
+  c->dd_cprintf("error", "Stack overflow, PC=0x%x\n", AU(PC));
 }
 
 /* Stack Tracker Errors */
@@ -454,8 +473,9 @@ cl_error_stack_tracker_wrong_handle::cl_error_stack_tracker_wrong_handle(bool wr
 void
 cl_error_stack_tracker_wrong_handle::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s: wrong stack tracker handle called for %s operation\n",
-	       get_type_name(), write_operation?"write":"read");
+  c->dd_cprintf("error",
+		"%s: wrong stack tracker handle called for %s operation\n",
+		get_type_name(), write_operation?"write":"read");
 }
 
 /* Stack Tracker: operation on empty stack */
@@ -476,13 +496,14 @@ cl_error_stack_tracker_empty::~cl_error_stack_tracker_empty(void)
 void
 cl_error_stack_tracker_empty::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06x): %s on empty stack, PC="
-	       "0x06x, SP=0x%06x->0x%06x\n",
-	       get_type_name(), AU(operation->get_pc()),
-	       operation->get_op_name(),
-	       AU(operation->get_pc()),
-	       AU(operation->get_before()),
-	       AU(operation->get_after()));
+  c->dd_cprintf("error",
+		"%s(0x%06x): %s on empty stack, PC="
+		"0x06x, SP=0x%06x->0x%06x\n",
+		get_type_name(), AU(operation->get_pc()),
+		operation->get_op_name(),
+		AU(operation->get_pc()),
+		AU(operation->get_before()),
+		AU(operation->get_after()));
 }
 
 /* Stack Tracker: operation on empty stack */
@@ -517,12 +538,12 @@ cl_error_stack_tracker_unmatch::~cl_error_stack_tracker_unmatch(void)
 void
 cl_error_stack_tracker_unmatch::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06x): %s when %s expected, "
-	       "SP=0x%06x->0x%06x\n",
-	       get_type_name(), AU(operation->get_pc()),
-	       operation->get_op_name(), top->get_matching_name(),
-	       AU(operation->get_before()),
-	       AU(operation->get_after()));
+  c->dd_cprintf("error", "%s(0x%06x): %s when %s expected, "
+		"SP=0x%06x->0x%06x\n",
+		get_type_name(), AU(operation->get_pc()),
+		operation->get_op_name(), top->get_matching_name(),
+		AU(operation->get_before()),
+		AU(operation->get_after()));
 }
 
 /* Stack Tracker: stack is inconsistent */
@@ -544,7 +565,7 @@ cl_error_stack_tracker_inconsistent::~cl_error_stack_tracker_inconsistent(void)
 void
 cl_error_stack_tracker_inconsistent::print(class cl_commander_base *c)
 {
-  c->dd_printf("%s(0x%06x): %d byte(s) unread from the stack\n",
+  c->dd_cprintf("error",  "%s(0x%06x): %d byte(s) unread from the stack\n",
 	       get_type_name(), AU(operation->get_pc()),
 	       unread_data_size);
 }
@@ -552,12 +573,13 @@ cl_error_stack_tracker_inconsistent::print(class cl_commander_base *c)
 cl_stack_error_registry::cl_stack_error_registry(void)
 {
   class cl_error_class *prev = stack_error_registry.find("non-classified");
-  prev = register_error(new cl_error_class(err_error, "stack", prev, ERROR_OFF));
-  prev = register_error(new cl_error_class(err_error, "stack_tracker", prev));
-  prev = register_error(new cl_error_class(err_error, "stack_tracker_wrong_handle", prev));
-  prev = register_error(new cl_error_class(err_error, "operation_on_empty_stack", prev));
-  prev = register_error(new cl_error_class(err_warning, "stack_operation_unmatched_to_top_of_stack", prev));
-  prev = register_error(new cl_error_class(err_warning, "stack_looks_corrupted", prev));
+  prev = register_error(new cl_error_class(err_error, "stack", prev, ERROR_ON));
+  /*prev =*/register_error(new cl_error_class(err_error, "stack_overflow", prev));
+  //prev = register_error(new cl_error_class(err_error, "stack_tracker", prev));
+  //prev = register_error(new cl_error_class(err_error, "stack_tracker_wrong_handle", prev));
+  //prev = register_error(new cl_error_class(err_error, "operation_on_empty_stack", prev));
+  //prev = register_error(new cl_error_class(err_warning, "stack_operation_unmatched_to_top_of_stack", prev));
+  //prev = register_error(new cl_error_class(err_warning, "stack_looks_corrupted", prev));
 }
 
 

@@ -7,7 +7,7 @@
 clean:
 	rm -f *core *[%~] *.[oa] *.map
 	rm -f .[a-z]*~
-	rm -f stlcs$(EXEEXT)
+	rm -f stlcs$(EXEEXT) stlcs.exe
 
 
 # Deleting all files created by configuring or building the program

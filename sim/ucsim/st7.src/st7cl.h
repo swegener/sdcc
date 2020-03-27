@@ -44,6 +44,7 @@ public:
   class cl_memory *rom;
   class cl_address_space *regs8, *regs16;
   struct t_regs regs;
+  t_addr sp_limit;
 public:
   cl_st7(class cl_sim *asim);
   virtual int init(void);
@@ -62,6 +63,8 @@ public:
 
   virtual int exec_inst(void);
 
+  virtual void stack_check_overflow(class cl_stack_op *op);
+
   virtual const char *get_disasm_info(t_addr addr,
                                       int *ret_len,
                                       int *ret_branch,
@@ -76,6 +79,23 @@ public:
 #include "instcl.h"
 };
 
+
+enum st7cpu_confs
+  {
+   st7cpu_sp_limit	= 0,
+   st7cpu_nuof		= 1
+  };
+
+class cl_st7_cpu: public cl_hw
+{
+public:
+  cl_st7_cpu(class cl_uc *auc);
+  virtual int init(void);
+  virtual int cfg_size(void) { return st7cpu_nuof; }
+  virtual char *cfg_help(t_addr addr);
+
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+};
 
 #endif
 

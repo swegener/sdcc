@@ -297,7 +297,7 @@ cl_app::proc_arguments(int argc, char *argv[])
   bool /*s_done= DD_FALSE,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
-  strcpy(opts, "c:C:e:p:PX:vVt:s:S:I:a:whHgGJo:b_");
+  strcpy(opts, "c:C:e:p:PX:vVt:s:S:I:a:whHgGJo:bl_");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:k:");
 #endif
@@ -309,6 +309,12 @@ cl_app::proc_arguments(int argc, char *argv[])
 	  (strcmp(argv[i], "-args") == 0) ||
 	  (strcmp(argv[i], "-nx") == 0))
 	strcpy(argv[i], "-_");
+      if ((strcmp(argv[i], "-help")==0) ||
+	  (strcmp(argv[i], "--help")==0))
+	{
+	  print_help(cchars("s51"));
+	  exit(0);
+	}
     }
   
   while((c= getopt(argc, argv, opts)) != -1)
@@ -669,6 +675,25 @@ cl_app::proc_arguments(int argc, char *argv[])
 	    }
 	  break;
 	}
+      case 'l':
+	set_option_s("color_prompt", "green:bwhite");
+	set_option_s("color_prompt_console", "blue:bwhite");
+	set_option_s("color_command", "blue:bwhite");
+	set_option_s("color_answer", "black:bwhite");
+	set_option_s("color_result", "bblue:bwhite");
+	set_option_s("color_dump_address", "blue:bwhite");
+	set_option_s("color_dump_number", "bblack:bwhite");
+	set_option_s("color_dump_char", "black:bwhite");
+	set_option_s("color_error", "red:bwhite");
+	set_option_s("color_ui_mkey", "green:bwhite");
+	set_option_s("color_ui_mitem", "bblack:bwhite");
+	set_option_s("color_ui_label", "black:bwhite");
+	set_option_s("color_ui_time", "blue:bwhite");
+	set_option_s("color_ui_title", "magenta:bwhite");
+	set_option_s("color_ui_run", "black:green");
+	set_option_s("color_ui_stop", "white:red");
+	set_option_s("color_debug", "magenta:bwhite");
+	break;
       case 'h':
 	print_help(cchars("s51"));
 	exit(0);
@@ -815,6 +840,10 @@ cl_app::build_cmdset(class cl_cmdset *cmdset)
   cmdset->add(cmd= new cl_super_cmd("conf", 0, cset));
   cmd->init();
   set_conf_help(cmd);
+
+  cmd= new cl_ver_cmd("version", 0);
+  cmdset->add(cmd);
+  cmd->init();
   
   cmd= new cl_help_cmd("help", 0);
   cmdset->add(cmd);
@@ -1130,5 +1159,15 @@ cl_app::debug(const char *format, ...)
   return(i);
 }
 
+
+void
+cl_app::set_option_s(chars opt_name, chars new_value)
+{
+  class cl_option *o= options->get_option((char*)opt_name);
+  if (o)
+    {
+      o->set_value((char*)new_value);
+    }
+}
 
 /* End of app.cc */

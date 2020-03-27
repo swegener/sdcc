@@ -30,22 +30,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <stdarg.h> /* for va_list */
+//#include <stdarg.h> /* for va_list */
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "i_string.h"
+#include <string.h>
 
 // prj
-#include "pobjcl.h"
+//#include "pobjcl.h"
+#include "globals.h"
 
 // sim
-#include "simcl.h"
+//#include "simcl.h"
 
 // local
-#include "z80cl.h"
+//#include "z80cl.h"
 #include "r2kcl.h"
 #include "glob.h"
 
@@ -85,7 +86,12 @@ cl_r2k::init(void)
   for (int i=0x8000; i<0x10000; i++) {
     ram->set((t_addr) i, 0);
   }
-
+  /*
+  sp_limit_opt= new cl_sp_limit_opt(this);
+  sp_limit_opt->set_value((char*)"0xf000");
+  application->options->add(sp_limit_opt);
+  */
+  
   return(0);
 }
 
@@ -122,7 +128,11 @@ void
 cl_r2k::mk_hw_elements(void)
 {
   //class cl_base *o;
+  class cl_hw *h;
   cl_uc::mk_hw_elements();
+  
+  add_hw(h= new cl_z80_cpu(this));
+  h->init();
 }
 
 void
@@ -537,6 +547,7 @@ cl_r2k::print_regs(class cl_console_base *con)
   con->dd_printf("SP= 0x%04x [SP]= %02x %3d %c\n",
                  regs.SP, ram->get(regs.SP), ram->get(regs.SP),
                  isprint(ram->get(regs.SP))?ram->get(regs.SP):'.');
+  con->dd_printf("SP limit= 0x%04x\n", AU(sp_limit));
 
   print_disass(PC, con);
 }

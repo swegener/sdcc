@@ -28,14 +28,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 // local
 #include "glob.h"
 #include "xacl.h"
-#include "regsxa.h"
+//#include "regsxa.h"
 
 #define NOTDONE_ASSERT { printf("**********Instr not done at %d!\n", __LINE__); }
 

@@ -32,7 +32,7 @@ char received()
   return USART->sr & USART_SR_RXNE;
 }
 
-char getchar()
+int getchar()
 {
   while (!received())
     ;

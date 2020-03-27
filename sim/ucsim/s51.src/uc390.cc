@@ -35,22 +35,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // strcpy (mem(MEM_ROM) ->addr_format, "0x%06x");
 // strcpy (mem(MEM_XRAM)->addr_format, "0x%06x");
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "i_string.h"
+#include <string.h>
+//#include "i_string.h"
 
 #include "glob.h"
 #include "uc390cl.h"
 #include "regs51.h"
 #include "uc390hwcl.h"
 
-
-#include "uc52cl.h"
+//#include "uc52cl.h"
 #include "regs51.h"
-#include "timer2cl.h"
+//#include "timer2cl.h"
 
 /*
  * Names of instructions

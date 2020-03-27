@@ -1,12 +1,12 @@
 <html>
   <head>
-    <meta content="text/html; charset=ISO-8859-2" http-equiv="content-type">
-    <title>General commands of &mu;Csim</title>
+    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-2">
+    <title>General commands of ?Csim</title>
   </head>
   <body style="background-color: white;">
-    <h2>General commands of <i>&mu;Csim</i></h2>
+    <h2>General commands of <i>?Csim</i></h2>
     <h3><a name="conf">conf</a></h3>
-    Conf command can be used to display different kind of information about <i>&mu;Csim</i>.
+    Conf command can be used to display different kind of information about <i>?Csim</i>.
     It can be followed by a subcommand:
     <p><a href="#conf_">conf</a> <br>
       conf <a href="#conf_objects">objects</a> </p>
@@ -34,9 +34,16 @@ Controller has 9 hardware element(s).
       <h4><a name="conf_objects">conf <i>objects</i></a></h4>
       This command is for development only. </blockquote>
     <hr>
+    <h3><a name="version">version</a></h3>
+    Print out the version of the program.
+    <pre>0&gt; <font color="#118811">ver</font>
+0.6-pre58
+0&gt; 
+    </pre>
+    <hr>
     <h3><a name="h">?,help <i>[command]</i></a></h3>
     Help command. It prints out short description of the commands.
-    <p>If a command name is given as parameter then <i>&mu;Csim</i> prints out all
+    <p>If a command name is given as parameter then <i>?Csim</i> prints out all
       command that has similar names: </p>
     <pre>0&gt; <font color="#118811">? s</font>
 show subcommand    Generic command for showing things about the uCsim
@@ -464,8 +471,8 @@ under certain conditions; type `show c' for details.
     <p>info <a href="#info_breakpoints">breakpoints</a> <br>
       info <a href="#info_registers">registers</a> <br>
       info <a href="#info_hardware">hardware</a> <br>
-      <!-- info <a href="#info_stack">stack</a> <br>-->
-      info <a href="#info_memory">memory</a> <br>
+      <!-- info <a href="#info_stack">stack</a> <br>--> info <a href="#info_memory">memory</a>
+      <br>
       info <a href="#info_variables">variables</a> </p>
     <blockquote>
       <h4><a name="info_breakpoints">info breakpoints</a></h4>
@@ -663,38 +670,23 @@ timer0[0] 0x0000 13 bit timer OFF irq=0 dis prio=0
 timer2[2] 0x0000 reload 0x0000 timer OFF irq=0 dis prio=0
 0&gt; 
 </pre>
-<hr>
-<!-- 
-      <h4><a name="info_stack">info stack</a></h4>
-      This command prints out information about data stored in the CPU's stack
-      and operations which put them there.
-      <pre>$ <font color="#118811">s51 ~/remo.hex</font>
-uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.
-uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
-This is free software, and you are welcome to redistribute it
-under certain conditions; type `show c' for details.
-55470 words read from /home/staff/drdani/remo.hex
-0&gt; <font color="#118811">set opt irq_stop true</font>
-0&gt; <font color="#118811">r</font>
-Simulation started, PC=0x000000
-Stop at 0x000023: (2) Interrupt
-F 0x000023
-0&gt; <font color="#118811">i s</font>
-OP   SP before-after   L DATA/ADDR   INSTRUCTION
-call 0x000022-0x000024 2 0x002976    0x022a 12 29 76 LCALL 2976
-call 0x000024-0x000026 2 0x002379    0x2976 12 23 79 LCALL 2379
-call 0x000026-0x000028 2 0x003612    0x2517 12 36 12 LCALL 3612
-intr 0x000028-0x00002a 2 0x000023    0x366f 20 0c 02 JB    21.4,3674
-0&gt; 
-</pre> First column shows the operation which can be <b>call</b> or <b>push</b>
-      or <b>intr</b> (interrupt call). Next column contains value of the SP
-      register before and after the operation. Column "L" shows size of the
-      data, and the next column the data itself. Note, that for call operations
-      (call, and intr) the <b>called</b> address is printed, not the pushed
-      one! Last column is the instruction which has been executed when the
-      operation occurred.
-<hr>
--->
+      <hr>
+      <!-- 
+      <h4><a name="info_stack">info stack</a></h4>      This command prints out information about data stored in the CPU's stack
+      and operations which put them there.      <pre>$ <font color="#118811">s51 ~/remo.hex</font>
+uCsim 0.5.0-pre3, Copyright (C) 1997 Daniel Drotos, Talker Bt.uCsim comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute itunder certain conditions; type `show c' for details.
+55470 words read from /home/staff/drdani/remo.hex0&gt; <font color="#118811">set opt irq_stop true</font>
+0&gt; <font color="#118811">r</font>Simulation started, PC=0x000000
+Stop at 0x000023: (2) InterruptF 0x000023
+0&gt; <font color="#118811">i s</font>OP   SP before-after   L DATA/ADDR   INSTRUCTION
+call 0x000022-0x000024 2 0x002976    0x022a 12 29 76 LCALL 2976call 0x000024-0x000026 2 0x002379    0x2976 12 23 79 LCALL 2379
+call 0x000026-0x000028 2 0x003612    0x2517 12 36 12 LCALL 3612intr 0x000028-0x00002a 2 0x000023    0x366f 20 0c 02 JB    21.4,3674
+0&gt; </pre> First column shows the operation which can be <b>call</b> or <b>push</b>
+      or <b>intr</b> (interrupt call). Next column contains value of the SP      register before and after the operation. Column "L" shows size of the
+      data, and the next column the data itself. Note, that for call operations      (call, and intr) the <b>called</b> address is printed, not the pushed
+      one! Last column is the instruction which has been executed when the      operation occurred.
+<hr>-->
       <h4><a name="info_memory">info memory</a></h4>
       This command shows information about <a href="memory.html">memory system</a>:
       chips, address spaces and address decoders.

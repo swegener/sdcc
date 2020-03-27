@@ -27,6 +27,8 @@
 */
 /*@1@*/
 
+#include <string.h>
+
 #include "varcl.h"
 
 

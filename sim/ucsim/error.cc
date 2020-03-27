@@ -168,7 +168,7 @@ cl_error::is_on(void)
 void
 cl_error::print(class cl_commander_base *c)
 {
-  c->dd_printf(cchars("%s\n"), get_type_name());
+  c->dd_cprintf("error", cchars("%s\n"), get_type_name());
 }
 
 char *

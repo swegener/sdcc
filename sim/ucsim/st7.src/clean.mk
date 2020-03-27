@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f sst7$(EXEEXT)
+	rm -f sst7$(EXEEXT) sst7.exe
 
 
 # Deleting all files created by configuring or building the program

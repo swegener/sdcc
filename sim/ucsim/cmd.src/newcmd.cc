@@ -26,30 +26,33 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
 #include <stdio.h>
-#include <errno.h>
+//#include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "i_string.h"
+#include <unistd.h>
+#include <string.h>
+
+//#include "i_string.h"
 
 //#include "cmdlexcl.h"
 
 // prj
 #include "globals.h"
 #include "utils.h"
-#include "fiocl.h"
+//#include "fiocl.h"
 
 // sim
-#include "simcl.h"
-#include "argcl.h"
-#include "appcl.h"
+//#include "simcl.h"
+//#include "argcl.h"
+//#include "appcl.h"
 
 // local
 #include "newcmdcl.h"
-#include "cmdutil.h"
+//#include "cmdutil.h"
 
 
 /*
@@ -260,7 +263,7 @@ cl_console_base::get_color_ansiseq(const char *color_name, bool add_reset)
   chars cce= "";
   class cl_f *fo= get_fout();
   class cl_option *o= application->options->get_option("black_and_white");
-  if (o) o->get_value(&cc);
+  if (o) o->get_value(&bw);
 
   if (!fo ||
       (fo &&
@@ -921,7 +924,11 @@ cl_commander_base::input_avail_on_frozen(void)
 class cl_console_base *
 cl_commander_base::exec_on(class cl_console_base *cons, char *file_name)
 {
-  if (!cons || !file_name || !fopen(file_name, "r"))
+  FILE *dummy= fopen(file_name, "r");
+  bool oped= false;
+  if (dummy)
+    oped= true, fclose(dummy);
+  if (!cons || !file_name || !oped)
     return 0;
 
   class cl_console_base *subcon = cons->clone_for_exec(file_name);

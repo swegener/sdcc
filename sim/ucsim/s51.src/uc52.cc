@@ -25,16 +25,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-#include "ddconfig.h"
+//#include "ddconfig.h"
 
-#include <stdio.h>
+//#include <stdio.h>
 
 // local
 #include "uc52cl.h"
 #include "regs51.h"
 #include "timer2cl.h"
-#include "portcl.h"
-#include "mducl.h"
+//#include "portcl.h"
+//#include "mducl.h"
 
 
 /*

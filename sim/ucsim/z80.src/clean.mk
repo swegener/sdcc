@@ -3,7 +3,7 @@
 clean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f sz80$(EXEEXT)
+	rm -f sz80$(EXEEXT) sz80.exe
 
 
 # Deleting all files created by configuring or building the program

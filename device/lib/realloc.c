@@ -1,7 +1,11 @@
 /*-------------------------------------------------------------------------
    realloc.c - allocate memory.
+   
+   Always behaves according to C90 (i.e. does not take advantage of
+   undefined behaviour introduced in C2X or implementation-defined
+   behaviour introduced in C17.
 
-   Copyright (C) 2015, Philipp Klaus Krause, pkk@spth.de
+   Copyright (C) 2015-2020, Philipp Klaus Krause, pkk@spth.de
 
    This library is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -79,7 +83,7 @@ void *realloc(void *ptr, size_t size)
 	for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h && h < ptr; prev_free = h, pf = f, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
 	next_free = h;
 
-	if(!size || size + offsetof(struct header, next_free) < size)
+	if(size + offsetof(struct header, next_free) < size) // Handle overflow
 		return(0);
 	blocksize = size + offsetof(struct header, next_free);
 	if(blocksize < sizeof(struct header)) // Requiring a minimum size makes it easier to implement free(), and avoid memory leaks.

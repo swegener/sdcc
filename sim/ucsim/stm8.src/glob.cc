@@ -215,7 +215,7 @@ struct dis_entry disass_stm8[]= {
   { 0x0094, 0x00ff, ' ', 1, "ldw SP,X" },
   { 0x0096, 0x00ff, ' ', 1, "ldw X,SP" },
 
-  { 0x0035, 0x00ff, ' ', 4, "mov %b,%x" },
+  { 0x0035, 0x00ff, ' ', 4, "mov %x,%b" },
   { 0x0045, 0x00ff, ' ', 3, "mov %d,%d" },
   { 0x0055, 0x00ff, ' ', 5, "mov %x,%x" },
   { 0x0042, 0x00ff, ' ', 1, "mul X,A" },

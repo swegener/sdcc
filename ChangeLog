@@ -1,3 +1,8 @@
+2020-04-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/mm-pnvi-ae-udi-*:
+	  Memory model tests, RFE #672.
+
 2020-03-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/realloc.c:

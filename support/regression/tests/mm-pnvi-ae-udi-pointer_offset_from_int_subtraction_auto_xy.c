@@ -31,7 +31,7 @@ PERFORMANCE OF THIS SOFTWARE.
 void
 testMM(void)
 {
-#ifndef __SDCC_pdk15 // Bug: Invalid asm generated for --stack-auto
+#ifndef __SDCC_pdk15 // Bug #2990: Invalid asm generated for --stack-auto
   int x=1, y=2;
   uintptr_t ux = (uintptr_t)&x;
   uintptr_t uy = (uintptr_t)&y;

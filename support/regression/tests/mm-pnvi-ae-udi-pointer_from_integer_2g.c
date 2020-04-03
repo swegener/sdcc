@@ -25,25 +25,32 @@ PERFORMANCE OF THIS SOFTWARE.
 
 #pragma disable_warning 127
 
-#include <string.h> 
 #include <stdint.h>
+
+// Guess address of j.
+#if defined (__SDCC_pdk14)
+#define ADDRESS_PFI_2G 42
+#elif defined (__SDCC_pdk14)
+#define ADDRESS_PFI_2G 0x17fc
+#elif defined (__SDCC_gbz80)
+#define ADDRESS_PFI_2G 0xdff8
+#else
+#define ADDRESS_PFI_2G 0
+#endif
+
+void f() {
+  uintptr_t i=ADDRESS_PFI_2G;
+  int *p = (int*)i;
+  *p=7;
+}
 
 void
 testMM(void)
 {
-#ifndef __SDCC_pdk15 // Bug #2990: Invalid asm generated for --stack-auto
-  int y=2, x=1;
-  uintptr_t ux = (uintptr_t)&x;
-  uintptr_t uy = (uintptr_t)&y;
-  uintptr_t offset = uy - ux;
-
-  int *p = (int *)(ux + offset);
-  int *q = &y;
-  if (memcmp(&p, &q, sizeof(p)) == 0) {
-    *p = 11; // is this free of UB?
-    ASSERT (*p == *q);
-    ASSERT (*p == y);
+  int j=5;
+  if ((uintptr_t)&j == ADDRESS_PFI_2G) {
+    f();
+    ASSERT (j == 7);
   }
-#endif
 }
 

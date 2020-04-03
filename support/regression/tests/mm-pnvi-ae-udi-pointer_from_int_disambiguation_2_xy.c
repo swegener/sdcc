@@ -31,7 +31,7 @@ int x=1, y=2;
 void
 testMM(void)
 {
-#ifndef __SDCC // Bug: Assertion fails.
+#ifndef __SDCC // Bug #2991: Assertion fails.
   int *p = &x+1;
   int *q = &y;
   uintptr_t i = (uintptr_t)p;

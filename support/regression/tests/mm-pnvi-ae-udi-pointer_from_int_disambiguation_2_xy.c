@@ -31,7 +31,6 @@ int x=1, y=2;
 void
 testMM(void)
 {
-#ifndef __SDCC // Bug #2991: Assertion fails.
   int *p = &x+1;
   int *q = &y;
   uintptr_t i = (uintptr_t)p;
@@ -40,9 +39,9 @@ testMM(void)
     int *r = (int *)i;
     r=r-1;  // is this free of UB?
     *r=11;  // and this?    
-    ASSERT (*p == *r);
+    ASSERT (*p == *q);
+    ASSERT (x == *r);
     ASSERT (x == 11);
   }
-#endif
 }
 

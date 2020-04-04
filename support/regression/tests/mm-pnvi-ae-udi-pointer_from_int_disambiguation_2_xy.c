@@ -39,7 +39,6 @@ testMM(void)
     int *r = (int *)i;
     r=r-1;  // is this free of UB?
     *r=11;  // and this?    
-    ASSERT (*p == *q);
     ASSERT (x == *r);
     ASSERT (x == 11);
   }

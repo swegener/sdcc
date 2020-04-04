@@ -5280,6 +5280,16 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
 
           i++;
         }
+      else if (aopInReg (left->aop, i, X_IDX) && right->aop->type == AOP_STL || left->aop->type == AOP_STL && aopInReg (right->aop, i, X_IDX))
+        {
+          push (ASMOP_X, 0, 2);
+          genMove_o (ASMOP_X, 0, right->aop->type == AOP_STL ? right->aop : left->aop, i, 2, regDead (A_IDX, ic) || pushed_a, true, regDead (Y_IDX, ic));
+          emit2 ("cpw", "x, (1, sp)");
+          cost (2, 2);
+          pop (ASMOP_X, 0, 2);
+          
+          i += 2;
+        }
       else
         {
           if (!regalloc_dry_run)

@@ -30,7 +30,6 @@ PERFORMANCE OF THIS SOFTWARE.
 void
 testMM(void)
 {
-#ifndef __SDCC_stm8 // Bug #2989: Crash in codegen
 #ifndef __SDCC_pdk15 // Bug #2992: Invalid asm generated for --stack-auto
   int x=1, y=2;
   int *p = &x;
@@ -45,7 +44,6 @@ testMM(void)
   _Bool b = (r==q); 
   if (b)
     ASSERT (*r == y);
-#endif
 #endif
 }
 

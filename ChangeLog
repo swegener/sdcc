@@ -1,5 +1,11 @@
 2020-04-04 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/stm8/gen.c,
+	  support/regression/tests/mm-pnvi-ae-udi-pointer_offset_xor_auto.c:
+	  Fix bug #2989.
+
+2020-04-04 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/pdk/gen.c,
 	  support/regression/tests/mm-pnvi-ae-udi-pointer_offset_from_int_subtraction_auto_xy.c,
 	  support/regression/tests/mm-pnvi-ae-udi-pointer_offset_from_int_subtraction_auto_yx.c,

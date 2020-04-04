@@ -195,7 +195,7 @@ aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
       val >>= 8;
 
       // Leading zeroes
-      if (aop->size <= offset && !b)
+      if ((aop->size <= offset || aop->type == AOP_STL && offset) && !b)
         continue;
 
       if (aop->type == AOP_IMMD && offset > (aop->aopu.code ? 1 : 0) && !b)

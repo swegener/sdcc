@@ -2798,7 +2798,7 @@ genXorByte (const asmop *result_aop, const asmop *left_aop, const asmop *right_a
           emit2 ("xor", "%s, a", aopGet (right_aop, i));
           cost (1, 1);
         }
-      else if (right_aop->type == AOP_STK)
+      else if (right_aop->type == AOP_STK || right_aop->type == AOP_STL)
         {
           if (!p_dead || aopInReg (left_aop, i, P_IDX))
             {

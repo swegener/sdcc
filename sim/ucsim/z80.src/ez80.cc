@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-//#include <stdint.h>
-
 #include "z80mac.h"
 
 #include "ez80cl.h"
@@ -323,7 +321,7 @@ cl_ez80::get_disasm_info(t_addr addr,
 int
 cl_ez80::inst_ed_ez80(t_mem code)
 {
-  int8_t d;
+  i8_t d;
   
   switch (code)
     {
@@ -430,7 +428,7 @@ cl_ez80::inst_ed(t_mem prefix)
 int
 cl_ez80::inst_dd_spec(t_mem code)
 {
-  int8_t d;
+  i8_t d;
   
   switch (code)
     {
@@ -646,7 +644,7 @@ cl_ez80::inst_dd_spec(t_mem code)
 int
 cl_ez80::inst_fd_spec(t_mem code)
 {
-  int8_t d;
+  i8_t d;
   
   switch (code)
     {

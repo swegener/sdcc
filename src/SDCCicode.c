@@ -3365,7 +3365,7 @@ geniCodeDummyRead (operand * op)
 /* geniCodeSEParms - generate code for side effecting fcalls       */
 /*-----------------------------------------------------------------*/
 static void
-geniCodeSEParms (ast * parms, int lvl)
+geniCodeSEParms (ast *parms, int lvl)
 {
   if (!parms)
     return;
@@ -3460,7 +3460,7 @@ geniCodeParms (ast * parms, value * argVals, int *iArg, int *stack, sym_link * f
           ic = newiCode (IPUSH, pval, NULL);
           ic->parmPush = 1;
           /* update the stack adjustment */
-          *stack += getSize (IS_AGGREGATE (p) ? aggrToPtr (p, FALSE) : p);
+          *stack += getSize (IS_ARRAY (p) ? aggrToPtr (p, FALSE) : p);
           if ((IFFUNC_ISSMALLC (ftype) || TARGET_PDK_LIKE) && !IS_AGGREGATE (p) && getSize (p) == 1) /* SmallC calling convention passes 8-bit parameters as 16-bit values. So does pdk due to stack alignment requirements */
             (*stack)++;
           ADDTOCHAIN (ic);

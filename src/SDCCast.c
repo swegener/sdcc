@@ -991,18 +991,8 @@ processParms (ast * func, value * defParm, ast ** actParm, int *parmNumber,     
   /* the parameter type must be at least castable */
   if (compareType (defParm->type, (*actParm)->ftype) == 0)
     {
-      if (IS_STRUCT ((*actParm)->ftype))
-        {
-          if (IS_AST_VALUE (*actParm))
-            werrorfl ((*actParm)->filename, (*actParm)->lineno, E_STRUCT_AS_ARG, (*actParm)->opval.val->name);
-          else
-            werrorfl ((*actParm)->filename, (*actParm)->lineno, E_STRUCT_AS_ARG, "");
-        }
-      else
-        {
-          werror (E_INCOMPAT_TYPES);
-          printFromToType ((*actParm)->ftype, defParm->type);
-        }
+      werror (E_INCOMPAT_TYPES);
+      printFromToType ((*actParm)->ftype, defParm->type);
       return 1;
     }
 

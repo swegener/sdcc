@@ -2,6 +2,9 @@
 
 	* support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c:
 	  Disable test for clang, since older clang is known to fail it (resulting in false macOS regression test failures).
+	* src/SDCCast.c,
+	  src/SDCCicode.c:
+	  Simplify code removing obstacles for struct parameter support.
 
 2020-04-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

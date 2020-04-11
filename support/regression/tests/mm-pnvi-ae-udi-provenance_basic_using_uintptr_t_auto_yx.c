@@ -31,6 +31,7 @@ PERFORMANCE OF THIS SOFTWARE.
 void
 testMM(void)
 {
+#ifndef __clang__ // PNVI-ae-udi non-compliance in older clang.
   int y=2, x=1;
   uintptr_t ux = (uintptr_t)&x;
   uintptr_t uy = (uintptr_t)&y;
@@ -44,5 +45,6 @@ testMM(void)
     ASSERT (*p == *q);
     ASSERT (*p == y);
   }
+#endif
 }
 

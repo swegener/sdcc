@@ -1,3 +1,8 @@
+2020-04-11 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c:
+	  Disable test for clang, since older clang is known to fail it (resulting in false macOS regression test failures).
+
 2020-04-05 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sim/ucsim/z80.src/ez80.cc: change int8_t to i8_t

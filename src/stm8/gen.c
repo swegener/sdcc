@@ -392,6 +392,7 @@ void emitJP(const symbol *target, float probability)
   cost (3 + (options.model == MODEL_LARGE), (1 + (options.model == MODEL_LARGE)) * probability);
 }
 
+// Get aop at offset as 8-bit operand.
 static const char *
 aopGet(const asmop *aop, int offset)
 {
@@ -451,6 +452,7 @@ aopGet(const asmop *aop, int offset)
   return ("dummy");
 }
 
+// Get aop at offset as 16-bit operand.
 static const char *
 aopGet2(const asmop *aop, int offset)
 {
@@ -3363,7 +3365,10 @@ genCall (const iCode *ic)
             {
               adjustStack (prestackadjust, true, true, true);
 
-              emit2 (jump ? "jp" : "call", "%s", aopGet2 (left->aop, 0));
+              if (left->aop->type == AOP_LIT)
+                emit2 (jump ? "jp" : "call", "0x%02x%02x", byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0));
+              else
+                emit2 (jump ? "jp" : "call", "%s", left->aop->aopu.immd);
               cost (3, jump ? 1 : 4);
             }
           else if (aopInReg (left->aop, 0, Y_IDX)) // Faster than going through x.

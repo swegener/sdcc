@@ -1,3 +1,9 @@
+2020-04-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-2993.c:
+	  Fix bug #2993.
+
 2020-04-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c:

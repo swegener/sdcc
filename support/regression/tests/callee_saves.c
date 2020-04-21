@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if defined (__mcs51) && !defined (SDCC_MODEL_HUGE)
+#if defined (__SDCC_mcs51) && !defined (__SDCC_MODEL_HUGE)
 
 int x(int a, int b)
 {
@@ -31,7 +31,7 @@ int g = 100;
 
 void testBug(void)
 {
-#if defined (__mcs51) && !defined (SDCC_MODEL_HUGE)
+#if defined (__SDCC_mcs51) && !defined (__SDCC_MODEL_HUGE)
 	int a = g;
 	ASSERT (y(1, 2) == 3);
 	ASSERT (a == 100);

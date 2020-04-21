@@ -1,3 +1,10 @@
+2020-04-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2993.c:
+	  Disable test for mcs51-huge (bug #2994).
+	* support/regression/tests/callee_saves.c:
+	  Fix macro spelling to enable for mcs51.
+
 2020-04-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

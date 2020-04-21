@@ -20,7 +20,7 @@ typedef struct {
 void
 testBug(void)
 {  
-
+#if !(defined (__SDCC_mcs51) && defined (__SDCC_MODEL_HUGE)) // Bug #2994
     my_struct str1 = {0,func};
     my_struct str2 = {0,func};
     str1.setval(&str1,11);  
@@ -28,6 +28,7 @@ testBug(void)
     
     ASSERT (str1.val == 11);
     ASSERT (str2.val == 5);
+#endif
 }
 
 int func(void *var,int val) __reentrant

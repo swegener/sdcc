@@ -1,3 +1,8 @@
+2020-04-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c:
+	  Disable test for GCC on PPC instead of clang
+
 2020-04-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2993.c:

@@ -32,7 +32,7 @@ void
 testMM(void)
 {
 // PNVI-ae-udi non-compliance in PPC for at least GCC 4.9.2 and GCC 7.2.0
-#if !(defined(__GNUC__) && defined(__PPC__)) 
+#if !(defined(__GNUC__) && (defined(__PPC__) || defined(__POWERPC__))) 
   int y=2, x=1;
   uintptr_t ux = (uintptr_t)&x;
   uintptr_t uy = (uintptr_t)&y;

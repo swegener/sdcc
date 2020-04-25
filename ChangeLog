@@ -1,3 +1,13 @@
+2020-04-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* .version:
+	  Bump version post 4.0.0-release.
+	* src/SDCCsymt.c,
+	  src/SDCCopt.c,
+	  src/SDCCmem.c,
+	  support/regression/tests/bug-2995.c:
+	  Fix bug #2995.
+
 2020-04-24 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c:

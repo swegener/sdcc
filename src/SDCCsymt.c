@@ -2164,6 +2164,9 @@ cleanUpLevel (bucket ** table, long level)
 symbol *
 getAddrspace (sym_link *type)
 {
+  while(IS_ARRAY (type))
+    type = type->next;
+
   if (IS_DECL (type))
     return (DCL_PTR_ADDRSPACE (type));
   return (SPEC_ADDRSPACE (type));

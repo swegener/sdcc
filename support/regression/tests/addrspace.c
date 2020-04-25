@@ -1,7 +1,7 @@
-/** addrsapce.c
+/** addrspace.c
 */
+
 #include <testfwk.h>
-#include <stdlib.h>
 
 void set_a(void)
 {

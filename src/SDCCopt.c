@@ -1369,7 +1369,7 @@ separateAddressSpaces (eBBlock **ebbs, int count)
           
           /*printf ("Looking at ic %d, op %d\n", ic->key, (int)(ic->op));*/
           
-          if (left && IS_SYMOP (left))
+          if (left && ic->op != ADDRESS_OF && IS_SYMOP (left))
             {
               if (POINTER_GET (ic))
                 {
@@ -1479,7 +1479,7 @@ getAddrspaceiCode (const iCode *ic)
 
   /* Previous transformations in separateAddressSpaces() should
      ensure that at most one addressspace occours in each iCode. */
-  if (left && IS_SYMOP (left))
+  if (left && ic->op != ADDRESS_OF && IS_SYMOP (left))
     { 
       if (POINTER_GET (ic))
         {

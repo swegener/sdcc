@@ -1,3 +1,8 @@
+2020-04-26 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-2995.c:
+	  Disable test for mcs51, pdk until I find out how to place space_a segment in RAM in a regression test.
+
 2020-04-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* .version:

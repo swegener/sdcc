@@ -3801,6 +3801,8 @@ genPointerGet (const iCode *ic)
 
   if (left->aop->type == AOP_IMMD && ptype == GPOINTER && IS_SYMOP (left) && OP_SYMBOL (left)->remat)
     ptype = left->aop->aopu.code ? CPOINTER : POINTER;
+  else if (left->aop->type == AOP_STL)
+    ptype = POINTER;
 
   wassertl (aopIsLitVal (right->aop, 0, 2, 0x0000), "Unimplemented nonzero right operand in pointer read");
 

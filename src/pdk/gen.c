@@ -4067,7 +4067,11 @@ genPointerSet (iCode *ic)
             }
         }
     }
-  if (right->aop->type == AOP_STK && !bit_field && left->aop->type != AOP_IMMD)
+  if (right->aop->type == AOP_STK && !bit_field && left->aop->type == AOP_STL)
+    {
+      moveStackStack (left->aop->aopu.stk_off, right->aop->aopu.bytes[0].byteu.stk, size, regDead (A_IDX, ic));
+    }
+  else if (right->aop->type == AOP_STK && !bit_field && left->aop->type != AOP_IMMD)
     {
       if (!regDead (A_IDX, ic))
         {

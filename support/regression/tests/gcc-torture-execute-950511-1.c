@@ -11,7 +11,6 @@
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Bug #2938
 #if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk14)
 
   unsigned long long xx;
@@ -23,7 +22,6 @@ testTortureExecute (void)
     ASSERT (0);
   return;
 
-#endif
 #endif
 }
 

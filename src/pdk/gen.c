@@ -4093,6 +4093,10 @@ genPointerSet (iCode *ic)
                   emit2 ("add", "a, #%d", i);
                   emit2 ("xch", "a, p");
                   cost (3, 3);
+                  if (G.p.type == AOP_STL)
+                    G.p.offset += i;
+                  else
+                    G.p.type = AOP_INVALID;
                 }
               else
                 for (int j = 0; j < i; j++)

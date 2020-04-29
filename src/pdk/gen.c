@@ -3853,6 +3853,10 @@ genPointerGet (const iCode *ic)
       goto release;
     }
 #endif
+  else if (!bit_field && left->aop->type == AOP_STL && result->aop->type == AOP_STK) // Just a stack-to-stack copy
+    {
+      moveStackStack (result->aop->aopu.bytes[0].byteu.stk, left->aop->aopu.stk_off, size, regDead (A_IDX, ic));
+    }
   else if (ptype == POINTER) // Try to use efficient idxm when we know the source is in RAM.
     {
       const asmop *ptr_aop = (left->aop->type == AOP_DIR && TARGET_IS_PDK16) ? left->aop : ASMOP_P;

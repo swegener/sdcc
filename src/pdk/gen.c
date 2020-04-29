@@ -4247,7 +4247,8 @@ genPointerSet (iCode *ic)
                 }
               else if (bit_field && blen == 1)
                 {
-                  cheapMove (ASMOP_A, 0, right->aop, i, true, !ptr_aop || !aopInReg (ptr_aop, 0, P_IDX), true);
+                  if (!swapped)
+                    cheapMove (ASMOP_A, 0, right->aop, i, true, !ptr_aop || !aopInReg (ptr_aop, 0, P_IDX), true);
                   emit2 ("sr", "a");
                   cost (1, 1);
                   if (!ptr_aop)
@@ -4267,7 +4268,7 @@ genPointerSet (iCode *ic)
                 }
               else
                 {
-                  if (aopInReg (right->aop, i, A_IDX))
+                  if (aopInReg (right->aop, i, A_IDX) || aopInReg (right->aop, i, P_IDX) && swapped)
                     {
                       cost (100, 100);
                       wassert (regalloc_dry_run);
@@ -4295,7 +4296,11 @@ genPointerSet (iCode *ic)
                   if (ptr_aop && aopInReg (ptr_aop, 0, P_IDX))
                     pushAF ();
                   if (!aopInReg (right->aop, i, P_IDX)) // xch above would already have brought it into a.
-                    cheapMove (ASMOP_A, 0, right->aop, i, true, false, true);
+                    {
+                      if (right->aop->type == AOP_STK)
+                        G.p.type = AOP_INVALID;
+                      cheapMove (ASMOP_A, 0, right->aop, i, true, false, true);
+                    }
                   if (bstr >= 4)
                     {
                       emit2 ("swap", "a");

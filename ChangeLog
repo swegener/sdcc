@@ -1,3 +1,9 @@
+2020-04-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  support/regression/tests/gcc-torture-execute-20000113-1.c:
+	  Fix bug #2937.
+
 2020-04-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2995.c:

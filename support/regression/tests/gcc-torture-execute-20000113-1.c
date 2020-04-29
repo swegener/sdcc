@@ -29,8 +29,6 @@ void foobar (int x, int y, int z)
 void
 testTortureExecute (void)
 {
-#if !(defined(__SDCC_pdk15) && defined(__SDCC_STACK_AUTO)) // Bug #2937
   foobar (1, 2, 3);
-#endif
 }
 

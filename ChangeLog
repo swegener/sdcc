@@ -1,5 +1,11 @@
 2020-05-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Improve ifx on 8-bit value (remaining part of RFE #668).
+
+2020-05-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* Merge z80n branch.
 
 2020-05-02 Philipp Klaus Krause <pkk AT spth.de>

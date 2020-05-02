@@ -11270,24 +11270,31 @@ genIfx (iCode *ic, iCode *popIc)
 
   aopOp (cond, ic, FALSE, TRUE);
 
-  /* get the value into acc */
-  if (AOP_TYPE (cond) != AOP_CRY && !IS_BOOL (operandType (cond)))
-    _toBoolean (cond, !popIc);
   /* Special case: Condition is bool */
-  else if (IS_BOOL (operandType (cond)))
+  if (IS_BOOL (operandType (cond)) && !aopInReg (cond->aop, 0, A_IDX))
     {
       if (!regalloc_dry_run)
         {
-          emit2 ("bit 0, %s", aopGet (AOP (cond), 0, FALSE));
+          emit2 ("bit 0, %s", aopGet (cond->aop, 0, FALSE));
           emit2 ("jp %s, !tlabel", IC_TRUE (ic) ? "NZ" : "Z", labelKey2num ((IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key));
         }
       regalloc_dry_run_cost += (bit8_cost (AOP (cond)) + 3);
 
-      freeAsmop (cond, NULL);
-      if (!regalloc_dry_run)
-        ic->generated = 1;
-      return;
+      goto release;
     }
+  else if (cond->aop->size == 1 && bitVectBitValue (ic->rSurv, A_IDX) &&
+    (aopInReg (cond->aop, 0, B_IDX) || aopInReg (cond->aop, 0, C_IDX) || aopInReg (cond->aop, 0, D_IDX) || aopInReg (cond->aop, 0, E_IDX) || aopInReg (cond->aop, 0, H_IDX) || aopInReg (cond->aop, 0, L_IDX)))
+    {
+      emit3 (A_INC, cond->aop, 0);
+      emit3 (A_DEC, cond->aop, 0);
+      emit2 ("jp %s, !tlabel", IC_TRUE (ic) ? "NZ" : "Z", labelKey2num ((IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key));
+      regalloc_dry_run_cost += 3;
+      
+      goto release;
+    }
+  /* get the value into acc */
+  else if (AOP_TYPE (cond) != AOP_CRY)
+    _toBoolean (cond, !popIc);
   else
     isbit = 1;
   /* the result is now in the accumulator */
@@ -11307,6 +11314,16 @@ genIfx (iCode *ic, iCode *popIc)
 
   if (!regalloc_dry_run)
     ic->generated = 1;
+    
+  return;
+  
+release:
+
+  freeAsmop (cond, NULL);
+  if (!regalloc_dry_run)
+    ic->generated = 1;
+    
+  return;
 }
 
 /*-----------------------------------------------------------------*/

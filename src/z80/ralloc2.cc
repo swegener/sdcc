@@ -611,6 +611,11 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     operand_byte_in_reg(left, 0, REG_A, a, i, G) || getSize(operandType(left)) >= 2 && !IS_FLOAT (operandType(left)) && operand_byte_in_reg(left, 1, REG_A, a, i, G)))
     return(true);
 
+  // Can test register via inc / dec.
+  if(ic->op == IFX && getSize(operandType(left)) == 1 &&
+    (operand_byte_in_reg(left, 0, REG_B, a, i, G) || operand_byte_in_reg(left, 0, REG_C, a, i, G) || operand_byte_in_reg(left, 0, REG_D, a, i, G) || operand_byte_in_reg(left, 0, REG_E, a, i, G) || operand_byte_in_reg(left, 0, REG_H, a, i, G) || operand_byte_in_reg(left, 0, REG_L, a, i, G)))
+    return(true);
+
   // Plain assignment between registers
   if(ic->op == CAST && getSize(operandType(IC_RESULT(ic))) == 1 &&
     (operand_in_reg(result, REG_B, ia, i, G) || operand_in_reg(result, REG_C, ia, i, G) || operand_in_reg(result, REG_D, ia, i, G) || operand_in_reg(result, REG_E, ia, i, G) || operand_in_reg(result, REG_A, ia, i, G)) &&

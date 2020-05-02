@@ -36,7 +36,7 @@ foo (struct S *x, struct S *y, int *z, int w)
 void
 testTortureExecute (void)
 {
-#ifndef __SDCC_pdk14 // Bug
+#ifndef __SDCC_pdk14 // Lack of RAM
   int a[4] = { 8, 9, 10, 11 };
   struct S s = { 1, 2, 3, &a[0] };
   struct T u = { 0, 0, &a[3] };

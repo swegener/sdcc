@@ -1,5 +1,10 @@
 2020-05-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fix a bug in pushing on-stack-parameters on r2k.
+
+2020-05-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/ralloc2.cc:
 	  Improve ifx on 8-bit value (remaining part of RFE #668).

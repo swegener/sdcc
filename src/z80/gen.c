@@ -4493,7 +4493,9 @@ genIpush (const iCode *ic)
        else if (size >= 2 && !IS_GB)
          {
            emit2 ("push hl");
+           _G.stack.pushed += 2;
            fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, ic, size - 2);
+           _G.stack.pushed -= 2;
            emit2 ("ex (sp), hl");
            regalloc_dry_run_cost += 3;
            d = 2;

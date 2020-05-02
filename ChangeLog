@@ -1,5 +1,9 @@
 2020-05-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* Merge z80n branch.
+
+2020-05-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/tests/gcc-torture-execute-pr88714.c:
 	  Bug #2949 wasn't a bug, just lack of RAM resulting in a stack overflow.
 
@@ -280,6 +284,23 @@
 	  src/SDCCsymt.c:
 	  Reenable partial register allocation for stm8, that was accidentially partially disabled when enabling the new stack allocator.
 
+2019-12-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Use add dd, a for z80n.
+	* support/scripts/sdcc.nsi:
+	  Include z80n library in Windows installer.
+
+2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Enable use of rld and rrd for z80n.
+
+2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Use tst a, n for z80n.
+
 2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
@@ -287,10 +308,47 @@
 
 2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  src/z80/peep.c:
+	  Use add dd, nn for z80n.
+
+2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Use push nn for z80n.
+
+2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
 	* sdas/asrab/rabmch.c:
 	  Fix ex (sp), hl for Rabbits.
 	* src/z80/gen.c:
 	  Fix an issue in eZ80 pointer read.
+
+2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* configure,
+	  configure.ac,
+	  device/lib/Makefile.in,
+	  device/lib/clean.mk,
+	  device/lib/z80n/Makefile.in,
+	  sdcc.spec,
+	  src/SDCCgue.c,
+	  src/SDCCmain.c,
+	  src/SDCCopt.c,
+	  src/port.h,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/z80.h,
+	  device/include/*,
+	  device/lib/z80n:
+	  Infrastructure for z80n backend.
+
+2019-12-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCopt.c,
+	  support/regression/tests/bug-2932.c:
+	  Fix bug #2932.
 
 2019-12-12 Philipp Klaus Krause <pkk AT spth.de>
 

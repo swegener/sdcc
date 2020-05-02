@@ -1,4 +1,4 @@
-This is bfd.info, produced by makeinfo version 6.5 from bfd.texinfo.
+This is bfd.info, produced by makeinfo version 6.7 from bfd.texinfo.
 
 This file documents the BFD library.
 
@@ -14141,3 +14141,8 @@ Node: GNU Free Documentation License429189
 Node: BFD Index454253
 
 End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:

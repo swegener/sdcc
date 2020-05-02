@@ -51,7 +51,7 @@
 #define RET_SIZE	2
 #endif
 
-#if defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_r3ka) || defined (__SDCC_tlcs90) || defined (__SDCC_ez80_z80)
+#if defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_r3ka) || defined (__SDCC_tlcs90) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n)
 typedef unsigned char jmp_buf[6]; /* 2 for the stack pointer, 2 for the return address, 2 for the frame pointer. */
 #elif defined (__SDCC_ds390) || defined (__SDCC_stm8) && defined (__SDCC_MODEL_LARGE)
 typedef unsigned char jmp_buf[5]; /* 2 for the stack pointer, 3 for the return address. */

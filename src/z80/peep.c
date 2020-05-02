@@ -334,6 +334,18 @@ z80MightRead(const lineNode *pl, const char *what)
             return(true);
           arg += 2;
         }
+      else if(IS_Z80N && !strncmp(arg, "bc", 2) && *(arg + 2) == ',')
+        {
+          if(!strcmp(what, "b") || !strcmp(what, "c"))
+            return(true);
+          arg += 3;
+        }
+      else if(IS_Z80N && !strncmp(arg, "de", 2) && *(arg + 2) == ',')
+        {
+          if(!strcmp(what, "d") || !strcmp(what, "e"))
+            return(true);
+          arg += 3;
+        }
       else if(!strncmp(arg, "hl", 2) && arg[2] == ',') // add hl, rr
         {
           if(!strcmp(what, "h") || !strcmp(what, "l"))
@@ -462,7 +474,7 @@ z80MightRead(const lineNode *pl, const char *what)
   if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "slp"))
     return(false);
 
-  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tst"))
+  if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "tst"))
     return(argCont(pl->line + 4, what));
 
   if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tstio"))
@@ -998,6 +1010,8 @@ int z80instructionSize(lineNode *pl)
     }
 
   /* Push / pop */
+  if(ISINST(pl->line, "push")  && IS_Z80N && op1start[0] == '#')
+    return(4);
   if(ISINST(pl->line, "push") || ISINST(pl->line, "pop"))
     {
       if(!STRNCASECMP(op1start, "ix", 2) || !STRNCASECMP(op1start, "iy", 2))
@@ -1006,6 +1020,8 @@ int z80instructionSize(lineNode *pl)
     }
 
   /* 16 bit add / subtract / and */
+  if(IS_Z80N && ISINST(pl->line, "add") && (!STRNCASECMP(op1start, "bc", 2) || !STRNCASECMP(op1start, "de", 2) || !STRNCASECMP(op1start, "hl", 2)))
+    return(4);
   if((ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sbc") || IS_RAB && ISINST(pl->line, "and")) &&
      !STRNCASECMP(op1start, "hl", 2))
     {
@@ -1120,7 +1136,7 @@ int z80instructionSize(lineNode *pl)
   if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "mlt"))
     return(2);
 
-  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tst"))
+  if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "tst"))
     return((op1start[0] == '#' || op2start && op1start[0] == '#') ? 3 : 2);
   
   if(IS_RAB && ISINST(pl->line, "mul"))

@@ -681,13 +681,9 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
       if(ic->op == GOTO || ic->op == LABEL)
         return(true);
 
-      if(ic->op == IPUSH && getSize(operandType(IC_LEFT(ic))) <= 2 &&
-        (operand_in_reg(left, REG_A, ia, i, G) ||
-        operand_in_reg(left, REG_B, ia, i, G) && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0) ||
-        operand_in_reg(left, REG_D, ia, i, G) && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0) ||
-        operand_in_reg(left, REG_H, ia, i, G) && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_L, ia, i, G) && I[ia.registers[REG_L][1]].byte == 0) ||
-        operand_in_reg(left, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_IYH, ia, i, G))))
+      if(ic->op == IPUSH) // Can handle anything.
         return(true);
+
       if(!result_in_A && !input_in_A)
         return(false);
     }
@@ -907,24 +903,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
   if(SKIP_IC2(ic))
     return(true);
-  if(ic->op == IPUSH && input_in_H && (getSize(operandType(IC_LEFT(ic))) <= 2 || ia.registers[REG_L][1] > 0 && I[ia.registers[REG_L][1]].byte == 2 && ia.registers[REG_H][1] > 0 && I[ia.registers[REG_H][1]].byte == 3))
-    return(true);
-  if(ic->op == IPUSH && getSize(operandType(left)) == 1 && IS_OP_LITERAL(left) && ia.registers[REG_A][1] < 0) // Can be pushed in A.
-    return(true);
-  if(ic->op == IPUSH && ic->next && ic->next->op == CALL)
-    return(true);
-  if(ic->op == IPUSH && getSize(operandType(left)) == 2 &&
-    (ia.registers[REG_C][1] < 0 && ia.registers[REG_B][1] < 0 || ia.registers[REG_E][1] < 0 && ia.registers[REG_D][1] < 0)) // Can use pair other than HL.
-    return(true);
-  if(ic->op == IPUSH && getSize(operandType(left)) <= 2 &&
-    (operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_B, ia, i, G)) ||
-    operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_D, ia, i, G)) ||
-    operand_in_reg(left, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && (getSize(operandType(left)) < 2 || operand_in_reg(left, REG_IYH, ia, i, G))))
-    return(true);
-  if (ic->op == IPUSH && getSize(operandType(left)) == 4 &&
-    operand_in_reg(left, REG_L, ia, i, G) && I[ia.registers[REG_L][1]].byte == 0 && operand_in_reg(left, REG_H, ia, i, G) && I[ia.registers[REG_H][1]].byte == 1 &&
-    (operand_in_reg(left, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 2 && operand_in_reg(left, REG_B, ia, i, G) && I[ia.registers[REG_B][1]].byte == 3 ||
-    operand_in_reg(left, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 2 && operand_in_reg(left, REG_D, ia, i, G) && I[ia.registers[REG_D][1]].byte == 3))
+  if(ic->op == IPUSH) // Can handle anything.
     return(true);
   if(POINTER_GET(ic) && input_in_L && input_in_H && (getSize(operandType(IC_RESULT(ic))) == 1 || !result_in_HL))
     return(true);

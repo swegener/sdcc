@@ -1160,6 +1160,9 @@ int z80instructionSize(lineNode *pl)
 
   if(IS_EZ80_Z80 && (ISINST(pl->line, "lea") || ISINST(pl->line, "pea")))
     return(3);
+    
+  if(IS_GB || IS_Z80N && ISINST(pl->line, "swap"))
+    return(2);
 
   if(ISINST(pl->line, ".db") || ISINST(pl->line, ".byte"))
     {

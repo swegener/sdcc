@@ -9395,14 +9395,14 @@ AccRol (int shCount)
   switch (shCount)
     {
     case 4:
-      if (IS_GB)
+      if (IS_GB || IS_Z80N)
         {
           emit3 (A_SWAP, ASMOP_A, 0);
           break;
         }
       emit3 (A_RLCA, 0, 0);
     case 3:
-      if (IS_GB)
+      if (IS_GB || IS_Z80N)
         {
           emit3 (A_SWAP, ASMOP_A, 0);
           emit3 (A_RRCA, 0, 0);
@@ -9416,7 +9416,7 @@ AccRol (int shCount)
     case 0:
       break;
     case 5:
-      if (IS_GB)
+      if (IS_GB || IS_Z80N)
         {
           emit3 (A_SWAP, ASMOP_A, 0);
           emit3 (A_RLCA, 0, 0);

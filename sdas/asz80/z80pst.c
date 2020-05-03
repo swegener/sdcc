@@ -248,6 +248,7 @@ struct  mne     mne[] = {
 	/* z80-zxn */
 
     {   NULL,   "swapnib",      X_ZXN_INH2,     0,      0x23    },
+    {   NULL,   "swap",         X_ZXN_INH2,     0,      0x23    },
     {   NULL,   "mul",          X_ZXN_MUL,      0,      0x30    },
     {   NULL,   "outinb",       X_ZXN_INH2,     0,      0x90    },
     {   NULL,   "ldix",         X_ZXN_INH2,     0,      0xA4    },

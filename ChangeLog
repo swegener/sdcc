@@ -3,7 +3,7 @@
 	* sdas/asz80/z80mch.c,
 	  src/z80/gen.c,
 	  src/z80/peep.c:
-	  Support Z80N multiplication instruction.
+	  Support Z80N mlt and swap instructions, part of RFE #573, #656.
 
 2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
 

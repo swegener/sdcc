@@ -1821,6 +1821,11 @@ struct mne *mp;
                 break;
 
         case X_ZXN_INH2:
+                if (op == 0x23 && more()) { // Optional argument a on swap
+                        t1 = addr(&e1);
+                        if (t1 != S_R8 || e1.e_addr != A)
+                          aerr();
+                  }
                 outab(0xED);
                 outab(op);
                 break;

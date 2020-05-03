@@ -4500,7 +4500,7 @@ genIpush (const iCode *ic)
            regalloc_dry_run_cost += 3;
            d = 2;
          }
-       else if (a_free)
+       else if (a_free || aopInReg (IC_LEFT (ic)->aop, size - 1, A_IDX))
          {
            genMove_o (ASMOP_A, 0, IC_LEFT (ic)->aop, size - 1, 1, true, h_free && l_free);
            emit2 ("push af");
@@ -4515,21 +4515,21 @@ genIpush (const iCode *ic)
            regalloc_dry_run_cost += 5;
            d = 1;
          }
-       else if (h_free)
+       else if (h_free || aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX))
          {
            cheapMove (ASMOP_H, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push hl");
            emit2 ("inc sp");
            d = 1;
          }
-       else if (d_free)
+       else if (d_free || aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX))
          {
            cheapMove (ASMOP_D, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push de");
            emit2 ("inc sp");
            d = 1;
          }
-       else if (b_free)
+       else if (b_free || aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX))
          {
            cheapMove (ASMOP_B, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push bc");

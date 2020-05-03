@@ -4464,10 +4464,12 @@ genIpush (const iCode *ic)
         PAIR_ID pair = getFreePairId (ic);
 
         bool a_free = !bitVectBitValue (ic->rSurv, A_IDX) && IC_LEFT (ic)->aop->regs[A_IDX] < size - 1;
+        bool b_free = !bitVectBitValue (ic->rSurv, B_IDX) && IC_LEFT (ic)->aop->regs[B_IDX] < size - 1;
+        bool c_free = !bitVectBitValue (ic->rSurv, C_IDX) && IC_LEFT (ic)->aop->regs[C_IDX] < size - 1;
+        bool d_free = !bitVectBitValue (ic->rSurv, D_IDX) && IC_LEFT (ic)->aop->regs[D_IDX] < size - 1;
+        bool e_free = !bitVectBitValue (ic->rSurv, E_IDX) && IC_LEFT (ic)->aop->regs[E_IDX] < size - 1;
         bool h_free = !bitVectBitValue (ic->rSurv, H_IDX) && IC_LEFT (ic)->aop->regs[H_IDX] < size - 1;
         bool l_free = !bitVectBitValue (ic->rSurv, L_IDX) && IC_LEFT (ic)->aop->regs[L_IDX] < size - 1;
-        bool d_free = !bitVectBitValue (ic->rSurv, D_IDX) && IC_LEFT (ic)->aop->regs[D_IDX] < size - 1;
-        bool b_free = !bitVectBitValue (ic->rSurv, B_IDX) && IC_LEFT (ic)->aop->regs[B_IDX] < size - 1;
         bool hl_free = isPairDead (PAIR_HL, ic) && IC_LEFT (ic)->aop->regs[H_IDX] < size - 2 && IC_LEFT (ic)->aop->regs[L_IDX] < size - 2;
 
         if (getPairId_o (IC_LEFT (ic)->aop, size - 2) != PAIR_INVALID)
@@ -4476,10 +4478,17 @@ genIpush (const iCode *ic)
             regalloc_dry_run_cost += 1 + (getPairId_o (IC_LEFT (ic)->aop, 2) == PAIR_IY);
             d = 2;
           }
-        else if (size >= 2 && (hl_free || pair != PAIR_INVALID))
+        else if (size >= 2 &&
+          (hl_free || pair != PAIR_INVALID || aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free || aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX) && e_free || aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX) && l_free))
           {
             if (hl_free)
               pair = PAIR_HL;
+            if (aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free)
+              pair = PAIR_BC;
+            else if (aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX) && e_free)
+              pair = PAIR_BC;     
+            else if (aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX) && l_free)
+              pair = PAIR_BC;      
             fetchPairLong (pair, IC_LEFT (ic)->aop, ic, size - 2);
             emit2 ("push %s", _pairs[pair].name);
             d = 2;
@@ -4500,7 +4509,42 @@ genIpush (const iCode *ic)
            regalloc_dry_run_cost += 3;
            d = 2;
          }
-       else if (a_free || aopInReg (IC_LEFT (ic)->aop, size - 1, A_IDX))
+       else if (aopInReg (IC_LEFT (ic)->aop, size - 1, A_IDX))
+         {
+           emit2 ("push af");
+           emit2 ("inc sp");
+           regalloc_dry_run_cost += 2;
+           d = 1;
+         }
+       else if (aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX))
+         {
+           emit2 ("push bc");
+           emit2 ("inc sp");
+           regalloc_dry_run_cost += 2;
+           d = 1;
+         }
+       else if (aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX))
+         {
+           emit2 ("push de");
+           emit2 ("inc sp");
+           regalloc_dry_run_cost += 2;
+           d = 1;
+         }
+       else if (aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX))
+         {
+           emit2 ("push hl");
+           emit2 ("inc sp");
+           regalloc_dry_run_cost += 2;
+           d = 1;
+         }
+       else if (aopInReg (IC_LEFT (ic)->aop, size - 1, IYH_IDX))
+         {
+           emit2 ("push iy");
+           emit2 ("inc sp");
+           regalloc_dry_run_cost += 2;
+           d = 1;
+         }
+       else if (a_free)
          {
            genMove_o (ASMOP_A, 0, IC_LEFT (ic)->aop, size - 1, 1, true, h_free && l_free);
            emit2 ("push af");
@@ -4515,21 +4559,21 @@ genIpush (const iCode *ic)
            regalloc_dry_run_cost += 5;
            d = 1;
          }
-       else if (h_free || aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX))
+       else if (h_free)
          {
            cheapMove (ASMOP_H, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push hl");
            emit2 ("inc sp");
            d = 1;
          }
-       else if (d_free || aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX))
+       else if (d_free)
          {
            cheapMove (ASMOP_D, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push de");
            emit2 ("inc sp");
            d = 1;
          }
-       else if (b_free || aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX))
+       else if (b_free)
          {
            cheapMove (ASMOP_B, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push bc");

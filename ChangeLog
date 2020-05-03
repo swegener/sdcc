@@ -1,3 +1,8 @@
+2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve stack parameter pushing, overlaps with RFE #676.
+
 2020-05-02 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

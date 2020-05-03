@@ -1,5 +1,12 @@
 2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* sdas/asz80/z80mch.c,
+	  src/z80/gen.c,
+	  src/z80/peep.c:
+	  Support Z80N multiplication instruction.
+
+2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Improve stack parameter pushing, overlaps with RFE #676.
 

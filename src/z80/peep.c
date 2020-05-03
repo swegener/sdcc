@@ -464,7 +464,7 @@ z80MightRead(const lineNode *pl, const char *what)
   if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "in0"))
     return(false);
 
-  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "mlt"))
+  if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "mlt"))
     return(argCont(pl->line + 4, what));
 
   if((IS_Z180 || IS_EZ80_Z80) &&
@@ -566,11 +566,12 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if(strcmp(pl->line, "ld\tiy")  == 0 && strncmp(what, "iy", 2) == 0)
     return true;
 
+  if (IS_Z180 || IS_EZ80_Z80 || IS_Z80N)
+    if (ISINST(pl->line, "mlt"))
+      return(strchr(pl->line + 4, *what) != 0);
+        
   if (IS_Z180 || IS_EZ80_Z80)
     {
-      if (ISINST(pl->line, "mlt"))
-        return(strchr(pl->line + 4, *what) != 0);
-
       if (ISINST(pl->line, "otim") ||
         ISINST(pl->line, "otimr") ||
         ISINST(pl->line, "otdm") ||
@@ -1133,7 +1134,7 @@ int z80instructionSize(lineNode *pl)
   if(ISINST(pl->line, "di") || ISINST(pl->line, "ei"))
     return(1);
 
-  if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "mlt"))
+  if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "mlt"))
     return(2);
 
   if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "tst"))

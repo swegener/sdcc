@@ -715,7 +715,7 @@ struct mne *mp;
                         rf = 0;
                 break;
         case X_ZXN:
-                if (rf > S_CPU && rf < X_ZXN_INH2 && rf != X_TST)
+                if (rf > S_CPU && rf < X_ZXN_INH2 && rf != X_TST && rf != X_MLT)
                         rf = 0;
                 break;
         case X_EZ80:
@@ -1741,7 +1741,12 @@ struct mne *mp;
                  * mlt  bc/de/hl/sp
                  */
                 t1 = addr(&e1);
-                if ((t1 == S_R16) && ((v1 = (int) e1.e_addr) <= SP)) {
+                if (mchtyp == X_ZXN && (t1 == S_R16) && (int) e1.e_addr == DE) {
+                        outab(0xED);
+                        outab(0x30);
+                        break;
+                }
+                else if ((t1 == S_R16) && ((v1 = (int) e1.e_addr) <= SP)) {
                         outab(0xED);
                         outab(op | (v1<<4));
                         break;

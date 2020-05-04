@@ -1,7 +1,7 @@
 2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Fix an issue in IPUSH cost estimate, part of RFE #676.
+	  Implement more of RFE #676.
 
 2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
 

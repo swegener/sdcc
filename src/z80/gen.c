@@ -10459,22 +10459,39 @@ genPointerGet (const iCode *ic)
       if(!isPairDead (PAIR_BC, ic))
         _push (PAIR_BC);
 
-      if (!rightval)
-        fetchPair (PAIR_DE, AOP (left));
-      else
-        {
-          emit2 ("ld de, %s", aopGetLitWordLong (AOP (left), rightval, TRUE));
-          regalloc_dry_run_cost += 3;
-        }
-
       fp_offset = AOP (result)->aopu.aop_stk + (AOP (result)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
       sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
-      emit2 ("ld hl, !immedword", sp_offset);
-      emit2 ("add hl, sp");
-      emit2 ("ex de, hl");
+          
+      if (IS_EZ80_Z80 && !_G.omitFramePtr && fp_offset >= -128 && fp_offset < 128)
+        {
+          if (!rightval)
+            fetchPair (PAIR_HL, AOP (left));
+          else
+            {
+              emit2 ("ld hl, %s", aopGetLitWordLong (AOP (left), rightval, TRUE));
+              regalloc_dry_run_cost += 3;
+            }
+          emit2 ("lea de, ix, !immed%d", fp_offset);
+          regalloc_dry_run_cost += 3;
+        }
+      else
+        {
+          if (!rightval)
+            fetchPair (PAIR_DE, AOP (left));
+          else
+            {
+              emit2 ("ld de, %s", aopGetLitWordLong (AOP (left), rightval, TRUE));
+              regalloc_dry_run_cost += 3;
+            }
+          emit2 ("ld hl, !immedword", sp_offset);
+          emit2 ("add hl, sp");
+          emit2 ("ex de, hl");
+          regalloc_dry_run_cost += 5;
+        }
+      
       emit2 ("ld bc, !immedword", size);
       emit2 ("ldir");
-      regalloc_dry_run_cost += 10;
+      regalloc_dry_run_cost += 5;
       spillPair (PAIR_HL);
       spillPair (PAIR_DE);
       spillPair (PAIR_BC);
@@ -10505,6 +10522,13 @@ genPointerGet (const iCode *ic)
           emit2 ("ld %s, %s", _pairs[pair].name, aopGetLitWordLong (AOP (left), rightval, TRUE));
           spillPair (pair);
           regalloc_dry_run_cost += 3;
+          rightval = 0;
+        }
+      else if (pair == PAIR_HL && rightval > 2 && (getPairId (left->aop) == PAIR_BC || getPairId (left->aop) == PAIR_DE)) // Cheaper than moving to hl followed by offset adjustment.
+        {
+          emit2 ("ld hl, #%d", rightval);
+          emit2 ("add hl, %s", _pairs[getPairId (left->aop)].name);
+          regalloc_dry_run_cost += 4;
           rightval = 0;
         }
       else

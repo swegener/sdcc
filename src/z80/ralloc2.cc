@@ -1282,6 +1282,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
     case GOTO:
     case INLINEASM:
       return(0.0f);
+      
     // Exact cost:
     case '!':
     case '~':
@@ -1321,6 +1322,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
       c = dryZ80iCode(ic);
       ic->generated = false;
       return(c);
+      
     // Inexact cost:
     default:
       return(default_instruction_cost(a, i, G, I));

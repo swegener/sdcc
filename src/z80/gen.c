@@ -4491,6 +4491,7 @@ genIpush (const iCode *ic)
               pair = PAIR_BC;      
             fetchPairLong (pair, IC_LEFT (ic)->aop, ic, size - 2);
             emit2 ("push %s", _pairs[pair].name);
+            regalloc_dry_run_cost ++; 
             d = 2;
          }
        else if (size >= 2 && IS_Z80N && IC_LEFT (ic)->aop->type == AOP_LIT) // Same size, but slower (21 vs 23 cycles) than going through a register pair other than iy. Only worth it under high register pressure.
@@ -4564,6 +4565,7 @@ genIpush (const iCode *ic)
            cheapMove (ASMOP_H, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push hl");
            emit2 ("inc sp");
+           regalloc_dry_run_cost += 2;
            d = 1;
          }
        else if (d_free)
@@ -4571,6 +4573,7 @@ genIpush (const iCode *ic)
            cheapMove (ASMOP_D, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push de");
            emit2 ("inc sp");
+           regalloc_dry_run_cost += 2;
            d = 1;
          }
        else if (b_free)
@@ -4578,6 +4581,7 @@ genIpush (const iCode *ic)
            cheapMove (ASMOP_B, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("push bc");
            emit2 ("inc sp");
+           regalloc_dry_run_cost += 2;
            d = 1;
          }
        else if (!IS_GB)

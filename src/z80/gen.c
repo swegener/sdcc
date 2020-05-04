@@ -10448,7 +10448,7 @@ genPointerGet (const iCode *ic)
     }
 
   /* Using ldir is cheapest for large memory-to-memory transfers. */
-  if (!IS_GB && (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK) && size > 2 && (!rightval || AOP_TYPE (left) == AOP_IMMD))
+  if (!IS_GB && (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK) && size > 2)
     {
       int fp_offset, sp_offset;
 
@@ -10464,31 +10464,54 @@ genPointerGet (const iCode *ic)
           
       if (IS_EZ80_Z80 && !_G.omitFramePtr && fp_offset >= -128 && fp_offset < 128)
         {
-          if (!rightval)
-            fetchPair (PAIR_HL, AOP (left));
-          else
+          if (AOP_TYPE (left) == AOP_IMMD)
             {
               emit2 ("ld hl, %s", aopGetLitWordLong (AOP (left), rightval, TRUE));
               regalloc_dry_run_cost += 3;
             }
+          else
+            fetchPair (PAIR_HL, AOP (left));
           emit2 ("lea de, ix, !immed%d", fp_offset);
           regalloc_dry_run_cost += 3;
         }
       else
         {
-          if (!rightval)
-            fetchPair (PAIR_DE, AOP (left));
-          else
+          if (AOP_TYPE (left) == AOP_IMMD)
             {
               emit2 ("ld de, %s", aopGetLitWordLong (AOP (left), rightval, TRUE));
               regalloc_dry_run_cost += 3;
             }
+          else
+            fetchPair (PAIR_DE, AOP (left));
           emit2 ("ld hl, !immedword", sp_offset);
           emit2 ("add hl, sp");
           emit2 ("ex de, hl");
           regalloc_dry_run_cost += 5;
         }
       
+      if (rightval && left->aop->type != AOP_IMMD)
+
+          if (abs(rightval) < 4)
+            {
+              for(;rightval > 0; rightval--)
+                {
+                  emit2 ("inc hl");
+                  regalloc_dry_run_cost++;
+                }
+              for(;rightval < 0; rightval++)
+                {
+                  emit2 ("inc hl");
+                  regalloc_dry_run_cost++;
+                }
+             }
+          else
+            {
+              emit2 ("ld bc, !immedword", rightval);
+              emit2 ("add hl, bc");
+              rightval = 0;
+              regalloc_dry_run_cost += 4;
+            }
+
       emit2 ("ld bc, !immedword", size);
       emit2 ("ldir");
       regalloc_dry_run_cost += 5;
@@ -10508,7 +10531,7 @@ genPointerGet (const iCode *ic)
 
   extrapair = isPairDead (PAIR_DE, ic) ? PAIR_DE : PAIR_BC;
 
-  if (!surviving_a && (getPairId (left->aop) == PAIR_BC || getPairId (left->aop) == PAIR_DE) && isPairDead (getPairId (left->aop), ic) && abs(rightval) <= 2 && !IS_BITVAR (retype) && size < 2) // Use inc ss (size y 2 condition to avoid overwriting pair with result)
+  if (!surviving_a && (getPairId (left->aop) == PAIR_BC || getPairId (left->aop) == PAIR_DE) && isPairDead (getPairId (left->aop), ic) && abs(rightval) <= 2 && !IS_BITVAR (retype) && size < 2) // Use inc ss (size < 2 condition to avoid overwriting pair with result)
     pair = getPairId (left->aop);
 
   /* For now we always load into temp pair */

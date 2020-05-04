@@ -1,7 +1,7 @@
 2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Implement more of RFE #676.
+	  Implement RFE #676.
 
 2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
 

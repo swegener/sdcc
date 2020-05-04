@@ -485,6 +485,12 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if(IS_RAB && ISINST(pl->line, "bool"))
     return(argCont(pl->line + 5, what));
+    
+  if(IS_EZ80_Z80 && ISINST(pl->line, "lea"))
+    return(argCont(strchr(pl->line + 4, ','), what));
+    
+  if(IS_EZ80_Z80 && ISINST(pl->line, "pea"))
+    return(argCont(pl->line + 4, what));
 
   /* TODO: Can we know anything about rst? */
   if(ISINST(pl->line, "rst"))
@@ -581,6 +587,9 @@ z80SurelyWrites(const lineNode *pl, const char *what)
       if (ISINST(pl->line, "in0"))
         return(!strncmp(pl->line + 4, what, strlen(what)));
     }
+    
+  if (IS_EZ80_Z80 && ISINST(pl->line, "lea"))
+    return (strstr(pl->line + 4, what));
 
   return(false);
 }

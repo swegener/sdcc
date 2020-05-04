@@ -52,9 +52,11 @@
 		include		<p18fxxx.inc>
 		list
 
+		extern	cvt_dec_word
+		global	_g_ftoa
+
 		udata
 
-		extern	digits
 
 exp:		res	1
 man:		res	4
@@ -66,8 +68,6 @@ ctr:		res	1
 
 		code
 
-		extern	cvt_dec_word
-		global	_g_ftoa
 
 _g_ftoa:	movff	FSR2H,POSTDEC1
 		movff	FSR2L,POSTDEC1

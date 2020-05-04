@@ -66,6 +66,9 @@
 		include	<p18fxxx.inc>
 		list
 
+	
+		global	cvt_dec_word
+
 		udata
 
 		global	digits
@@ -74,7 +77,6 @@ digits:		res	6
 
 		code
 
-		global	cvt_dec_word
 
 ;--
 ;

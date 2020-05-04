@@ -1,8 +1,11 @@
-2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
+2020-05-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
 	  src/z80/peep.c:
 	  Implement RFE #676.
+	* device/lib/pic16/libc/stdlib/g_ftoa.S,
+	  device/lib/pic16/libc/utils/cvtdec.S:
+	  Fix bug #3000 (patch by Roy Rankin).
 
 2020-05-03 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -180,11 +180,10 @@
 #define X_ZXN_MUL	101
 #define X_ZXN_MIRROR	102
 #define X_ZXN_NEXTREG   103
-#define X_ZXN_MMU       104
-#define X_ZXN_CU_WAIT   105
-#define X_ZXN_CU_MOVE   106
-#define X_ZXN_CU_STOP   107
-#define X_ZXN_CU_NOP    108
+#define X_ZXN_CU_WAIT   104
+#define X_ZXN_CU_MOVE   105
+#define X_ZXN_CU_STOP   106
+#define X_ZXN_CU_NOP    107
 
 /*
  * eZ80 Instructions

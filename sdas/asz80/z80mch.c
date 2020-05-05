@@ -1880,24 +1880,6 @@ struct mne *mp;
                 aerr();
                 break;
 
-        case X_ZXN_MMU:
-                t1 = addr(&e1);
-                if (t1 == S_IMMED) {
-                        outab(0xED);
-                        outab(0x91);
-                        outab(op);
-                        outrb(&e1, 0);
-                        break;
-                }
-                if (t1 == S_R8 && e1.e_addr == A) {
-                        outab(0xED);
-                        outab(0x92);
-                        outab(op);
-                        break;
-                }
-                aerr();
-                break;
-
         case X_ZXN_CU_WAIT:
                 t1 = addr(&e1);
                 t2 = 0;

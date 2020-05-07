@@ -4463,14 +4463,14 @@ genIpush (const iCode *ic)
 
         PAIR_ID pair = getFreePairId (ic);
 
-        bool a_free = !bitVectBitValue (ic->rSurv, A_IDX) && IC_LEFT (ic)->aop->regs[A_IDX] < size - 1;
-        bool b_free = !bitVectBitValue (ic->rSurv, B_IDX) && IC_LEFT (ic)->aop->regs[B_IDX] < size - 1;
-        bool c_free = !bitVectBitValue (ic->rSurv, C_IDX) && IC_LEFT (ic)->aop->regs[C_IDX] < size - 1;
-        bool d_free = !bitVectBitValue (ic->rSurv, D_IDX) && IC_LEFT (ic)->aop->regs[D_IDX] < size - 1;
-        bool e_free = !bitVectBitValue (ic->rSurv, E_IDX) && IC_LEFT (ic)->aop->regs[E_IDX] < size - 1;
-        bool h_free = !bitVectBitValue (ic->rSurv, H_IDX) && IC_LEFT (ic)->aop->regs[H_IDX] < size - 1;
-        bool l_free = !bitVectBitValue (ic->rSurv, L_IDX) && IC_LEFT (ic)->aop->regs[L_IDX] < size - 1;
-        bool hl_free = isPairDead (PAIR_HL, ic) && IC_LEFT (ic)->aop->regs[H_IDX] < size - 2 && IC_LEFT (ic)->aop->regs[L_IDX] < size - 2;
+        bool a_free = !bitVectBitValue (ic->rSurv, A_IDX) && (IC_LEFT (ic)->aop->regs[A_IDX] < 0 || IC_LEFT (ic)->aop->regs[A_IDX] >= size - 1);
+        bool b_free = !bitVectBitValue (ic->rSurv, B_IDX) && (IC_LEFT (ic)->aop->regs[B_IDX] < 0 || IC_LEFT (ic)->aop->regs[B_IDX] >= size - 1);
+        bool c_free = !bitVectBitValue (ic->rSurv, C_IDX) && (IC_LEFT (ic)->aop->regs[C_IDX] < 0 || IC_LEFT (ic)->aop->regs[C_IDX] >= size - 1);
+        bool d_free = !bitVectBitValue (ic->rSurv, D_IDX) && (IC_LEFT (ic)->aop->regs[D_IDX] < 0 || IC_LEFT (ic)->aop->regs[D_IDX] >= size - 1);
+        bool e_free = !bitVectBitValue (ic->rSurv, E_IDX) && (IC_LEFT (ic)->aop->regs[E_IDX] < 0 || IC_LEFT (ic)->aop->regs[E_IDX] >= size - 1);
+        bool h_free = !bitVectBitValue (ic->rSurv, H_IDX) && (IC_LEFT (ic)->aop->regs[H_IDX] < 0 || IC_LEFT (ic)->aop->regs[H_IDX] >= size - 1);
+        bool l_free = !bitVectBitValue (ic->rSurv, L_IDX) && (IC_LEFT (ic)->aop->regs[L_IDX] < 0 || IC_LEFT (ic)->aop->regs[L_IDX] >= size - 1);
+        bool hl_free = isPairDead (PAIR_HL, ic) && (h_free || IC_LEFT (ic)->aop->regs[H_IDX] >= size - 2) && (l_free || IC_LEFT (ic)->aop->regs[L_IDX] >= size - 2);
 
         if (getPairId_o (IC_LEFT (ic)->aop, size - 2) != PAIR_INVALID)
           {

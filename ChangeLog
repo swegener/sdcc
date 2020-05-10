@@ -4,6 +4,8 @@
 	  Fix bug #2972 for tlcs90.
 	* support/valdiag/Makefile.in:
 	  Fix bug #2971.
+	* src/SDCC.y:
+	  Align grammar more closely with C2X draft N2479.
 
 2020-05-07 Philipp Klaus Krause <pkk AT spth.de>
 

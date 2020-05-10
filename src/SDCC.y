@@ -118,7 +118,7 @@ bool uselessDecl = TRUE;
 %type <sym> declaration_after_statement
 %type <sym> declarator2_function_attributes while do for critical
 %type <sym> addressmod
-%type <lnk> pointer type_specifier_list type_specifier_list_ type_specifier type_qualifier_list type_qualifier type_name
+%type <lnk> pointer specifier_qualifier_list type_specifier_list_ type_specifier_qualifier type_qualifier_list type_qualifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier alignment_specifier
 %type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
 %type <lnk> function_attribute function_attributes enum_specifier
@@ -324,7 +324,7 @@ conditional_expr
 
 assignment_expr
    : conditional_expr
-   | cast_expr assignment_operator assignment_expr
+   | unary_expr assignment_operator assignment_expr
                      {
 
                              switch ($2) {
@@ -477,11 +477,11 @@ declaration_specifiers_
      /* find the spec and replace it      */
      $$ = mergeDeclSpec($1, $2, "storage_class_specifier declaration_specifiers - skipped");
    }
-   | type_specifier                                 { $$ = $1; }
-   | type_specifier declaration_specifiers_         {
+   | type_specifier_qualifier                       { $$ = $1; }
+   | type_specifier_qualifier declaration_specifiers_ {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
-     $$ = mergeDeclSpec($1, $2, "type_specifier declaration_specifiers - skipped");
+     $$ = mergeDeclSpec($1, $2, "type_specifier_qualifier declaration_specifiers - skipped");
    }
    | function_specifier                             { $$ = $1; }
    | function_specifier declaration_specifiers_     {
@@ -534,7 +534,7 @@ storage_class_specifier
                }
    ;
 
-type_specifier
+type_specifier_qualifier
    : type_qualifier { $$ = $1; }
    | SD_BOOL   {
                   $$=newLink(SPECIFIER);
@@ -767,7 +767,7 @@ member_declaration_list
    ;
 
 member_declaration
-   : type_specifier_list member_declarator_list ';'
+   : specifier_qualifier_list member_declarator_list ';'
         {
           /* add this type to all the symbols */
           symbol *sym;
@@ -2323,12 +2323,12 @@ opt_assign_expr
         }
    ;
 
-type_specifier_list : type_specifier_list_ { $$ = finalizeSpec($1); };
+specifier_qualifier_list : type_specifier_list_ { $$ = finalizeSpec($1); };
 
 type_specifier_list_
-   : type_specifier
+   : type_specifier_qualifier
    //| type_specifier_list_ type_specifier         {  $$ = mergeSpec ($1,$2, "type_specifier_list"); }
-   | type_specifier_list_ type_specifier {
+   | type_specifier_list_ type_specifier_qualifier {
      /* if the decl $2 is not a specifier */
      /* find the spec and replace it      */
      $$ = mergeDeclSpec($1, $2, "type_specifier_list type_specifier skipped");

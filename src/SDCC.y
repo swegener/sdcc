@@ -122,7 +122,7 @@ bool uselessDecl = TRUE;
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier alignment_specifier
 %type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
 %type <lnk> function_attribute function_attributes enum_specifier
-%type <lnk> abstract_declarator direct_abstract_declarator array_abstract_declarator function_abstract_declarator
+%type <lnk> abstract_declarator direct_abstract_declarator direct_abstract_declarator_opt array_abstract_declarator function_abstract_declarator
 %type <lnk> unqualified_pointer
 %type <val> parameter_type_list parameter_list parameter_declaration opt_assign_expr
 %type <sdef> stag opt_stag
@@ -887,7 +887,7 @@ enumerator_list
    ;
 
 enumerator
-   : identifier opt_assign_expr
+   : identifier attribute_specifier_sequence_opt opt_assign_expr
         {
           symbol *sym;
 
@@ -897,7 +897,7 @@ enumerator
               werrorfl ($1->fileDef, $1->lineDef, E_DUPLICATE_MEMBER, "enum", $1->name);
               werrorfl (sym->fileDef, sym->lineDef, E_PREVIOUS_DEF);
             }
-          $1->type = copyLinkChain ($2->type);
+          $1->type = copyLinkChain ($3->type);
           $1->etype = getSpec ($1->type);
           SPEC_ENUM ($1->etype) = 1;
           $$ = $1;
@@ -1463,38 +1463,33 @@ direct_abstract_declarator
    | array_abstract_declarator
    | function_abstract_declarator
    ;
+   
+direct_abstract_declarator_opt
+   :                             { $$ = NULL; }
+   | direct_abstract_declarator
+   ;
 
 array_abstract_declarator
-   : '[' ']'                        {
+   : direct_abstract_declarator_opt '[' ']'   {
                                        $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY;
                                        DCL_ELEM($$) = 0;
+                                       if($1)
+                                         $$->next = $1;
                                     }
-   | '[' constant_expr ']'          {
-                                       value *val;
-                                       $$ = newLink (DECLARATOR);
-                                       DCL_TYPE($$) = ARRAY;
-                                       DCL_ELEM($$) = (int) ulFromVal(val = constExprValue($2,TRUE));
-                                    }
-   | direct_abstract_declarator '[' ']'   {
-                                       $$ = newLink (DECLARATOR);
-                                       DCL_TYPE($$) = ARRAY;
-                                       DCL_ELEM($$) = 0;
-                                       $$->next = $1;
-                                    }
-   | direct_abstract_declarator '[' constant_expr ']'
+   | direct_abstract_declarator_opt '[' constant_expr ']'
                                     {
                                        value *val;
                                        $$ = newLink (DECLARATOR);
                                        DCL_TYPE($$) = ARRAY;
                                        DCL_ELEM($$) = (int) ulFromVal(val = constExprValue($3,TRUE));
-                                       $$->next = $1;
+                                       if($1)
+                                         $$->next = $1;
                                     }
    ;
 
 function_abstract_declarator
    : '(' ')'                        { $$ = NULL;}
-   | '(' parameter_type_list ')'    { $$ = NULL;}
    | direct_abstract_declarator '(' ')' {
      // $1 must be a pointer to a function
      sym_link *p=newLink(DECLARATOR);
@@ -1507,6 +1502,7 @@ function_abstract_declarator
      }
      $1->next=p;
    }
+   | '(' parameter_type_list ')'    { $$ = NULL;}
    | direct_abstract_declarator '('
         {
           NestLevel += LEVEL_UNIT;

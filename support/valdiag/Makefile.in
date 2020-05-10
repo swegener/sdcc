@@ -41,7 +41,7 @@ clean-gen:
 clean-port:
 	rm -rf $(PORT_BUILD_DIR)
 
-$(PORT_RESULTS_DIR)/%.out: $(TESTS_DIR)/%.c
+$(PORT_RESULTS_DIR)/%.out: $(TESTS_DIR)/%.c port-dirs
 	$(PYTHON) $(srcdir)/valdiag.py $(PORT) $< $(PORT_BUILD_DIR)/$* $(srcdir)/../../device/include > $@
 	grep FAIL $@ ; true
 	cat $@ | $(PYTHON) $(srcdir)/../regression/compact-results.py

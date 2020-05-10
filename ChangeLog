@@ -2,6 +2,8 @@
 
 	* support/scripts/sdcc.nsi:
 	  Fix bug #2972 for tlcs90.
+	* support/valdiag/Makefile.in:
+	  Fix bug #2971.
 
 2020-05-07 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -87,3 +87,11 @@ enum tag
   third
 };
 #endif
+
+#ifdef TEST9
+enum comma
+{
+  first,
+  second,,	/* ERROR */
+}
+#endif

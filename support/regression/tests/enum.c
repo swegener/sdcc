@@ -35,6 +35,12 @@ enum _SignedEnum {
   SIGNED_NEG = -1
 } se;
 
+enum comma {
+  COMMA_ZERO,
+  COMMA_ONE,
+  COMMA_TWO, // Trailing comma after enumerator list is a C99 feature.
+}; 
+
 volatile enum _IntEnum {
   INT_256 = 256,
   INT_ZERO = 0

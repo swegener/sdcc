@@ -282,7 +282,8 @@ enum {
   E_ATTRIBUTE_C2X               = 253, /* attribute requires ISO C2X or later */
   E_COMPOUND_LITERALS_C99       = 254, /* compound literals require ISO C99 or later */
   E_THREAD_LOCAL                = 255, /* thread-local storage is not implemented */
-
+  E_ENUM_COMMA_C99              = 256, /* trailing comma after enumerator list requires ISO C99 or later */
+  
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */
 };

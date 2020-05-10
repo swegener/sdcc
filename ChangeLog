@@ -1,5 +1,14 @@
 2020-05-10 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCC.y,
+	  src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  support/valdiag/tests/enum.c,
+	  support/regression/tests/enum.c:
+	  Fix handling of trailing comma after enumerator list.
+
+2020-05-10 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/scripts/sdcc.nsi:
 	  Fix bug #2972 for tlcs90.
 	* support/valdiag/Makefile.in:

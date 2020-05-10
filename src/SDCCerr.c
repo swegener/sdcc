@@ -573,6 +573,8 @@ struct
     "compound literals require ISO C99 or later and are not implemented", 0},
   { E_THREAD_LOCAL, ERROR_LEVEL_ERROR,
     "thread-local storage is not implemented", 0},
+  { E_ENUM_COMMA_C99,  ERROR_LEVEL_ERROR,
+    "trailing comma after enumerator list requires ISO C99 or later", 0},
 };
 
 /* -------------------------------------------------------------------------------

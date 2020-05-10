@@ -833,15 +833,45 @@ member_declarator
         }
    | { $$ = newSymbol ("", NestLevel); }
    ;
-   
+
 enum_specifier
    : ENUM '{' enumerator_list '}'
         {
           $$ = newEnumType ($3);
           SPEC_SCLS(getSpec($$)) = 0;
         }
-   | ENUM identifier '{' enumerator_list '}'
+    | ENUM '{' enumerator_list ',' '}'
         {
+          if (!options.std_c99)
+            werror (E_ENUM_COMMA_C99);
+          $$ = newEnumType ($3);
+          SPEC_SCLS(getSpec($$)) = 0;
+        }
+    | ENUM identifier '{' enumerator_list '}'
+        {
+          symbol *csym;
+          sym_link *enumtype;
+
+          csym = findSymWithLevel(enumTab, $2);
+          if ((csym && csym->level == $2->level))
+            {
+              werrorfl($2->fileDef, $2->lineDef, E_DUPLICATE_TYPEDEF, csym->name);
+              werrorfl(csym->fileDef, csym->lineDef, E_PREVIOUS_DEF);
+            }
+
+          enumtype = newEnumType ($4);
+          SPEC_SCLS(getSpec(enumtype)) = 0;
+          $2->type = enumtype;
+
+          /* add this to the enumerator table */
+          if (!csym)
+              addSym (enumTab, $2, $2->name, $2->level, $2->block, 0);
+          $$ = copyLinkChain(enumtype);
+        }
+     | ENUM identifier '{' enumerator_list ',' '}'
+        {
+          if (!options.std_c99)
+            werror (E_ENUM_COMMA_C99);
           symbol *csym;
           sym_link *enumtype;
 
@@ -878,7 +908,6 @@ enum_specifier
 
 enumerator_list
    : enumerator
-   | enumerator_list ','
    | enumerator_list ',' enumerator
         {
           $3->next = $1;

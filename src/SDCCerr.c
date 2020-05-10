@@ -571,6 +571,8 @@ struct
     "attribute requires C2X or later", 0},
   { E_COMPOUND_LITERALS_C99, ERROR_LEVEL_ERROR,
     "compound literals require ISO C99 or later and are not implemented", 0},
+  { E_THREAD_LOCAL, ERROR_LEVEL_ERROR,
+    "thread-local storage is not implemented", 0},
 };
 
 /* -------------------------------------------------------------------------------

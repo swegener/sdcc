@@ -93,7 +93,7 @@ bool uselessDecl = TRUE;
 %token <yyint> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token <yyint> SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
 %token <yyint> XOR_ASSIGN OR_ASSIGN
-%token TYPEDEF EXTERN STATIC AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32 ADDRESSMOD STATIC_ASSERT
+%token TYPEDEF EXTERN STATIC THREAD_LOCAL AUTO REGISTER CODE EEPROM INTERRUPT SFR SFR16 SFR32 ADDRESSMOD STATIC_ASSERT
 %token AT SBIT REENTRANT USING  XDATA DATA IDATA PDATA VAR_ARGS CRITICAL
 %token NONBANKED BANKED SHADOWREGS SD_WPARAM
 %token SD_BOOL SD_CHAR SD_SHORT SD_INT SD_LONG SIGNED UNSIGNED SD_FLOAT DOUBLE FIXED16X16 SD_CONST VOLATILE SD_VOID BIT
@@ -118,7 +118,7 @@ bool uselessDecl = TRUE;
 %type <sym> declaration_after_statement
 %type <sym> declarator2_function_attributes while do for critical
 %type <sym> addressmod
-%type <lnk> pointer specifier_qualifier_list type_specifier_list_ type_specifier_qualifier type_qualifier_list type_qualifier type_name
+%type <lnk> pointer specifier_qualifier_list type_specifier_list_ type_specifier_qualifier type_specifier type_qualifier_list type_qualifier type_name
 %type <lnk> storage_class_specifier struct_or_union_specifier function_specifier alignment_specifier
 %type <lnk> declaration_specifiers declaration_specifiers_ sfr_reg_bit sfr_attributes
 %type <lnk> function_attribute function_attributes enum_specifier
@@ -489,12 +489,6 @@ declaration_specifiers_
      /* find the spec and replace it      */
      $$ = mergeDeclSpec($1, $2, "function_specifier declaration_specifiers - skipped");
    }
-   | alignment_specifier                            { $$ = $1; }
-   | alignment_specifier declaration_specifiers_    {
-     /* if the decl $2 is not a specifier */
-     /* find the spec and replace it      */
-     $$ = mergeDeclSpec($1, $2, "alignment_specifier declaration_specifiers - skipped");
-   }
    ;
 
 init_declarator_list
@@ -524,6 +518,11 @@ storage_class_specifier
                   $$ = newLink (SPECIFIER);
                   SPEC_STAT($$) = 1;
                }
+   | THREAD_LOCAL
+               {
+                  $$ = 0;
+                  werror(E_THREAD_LOCAL);
+               }
    | AUTO      {
                   $$ = newLink (SPECIFIER);
                   SPEC_SCLS($$) = S_AUTO;
@@ -534,11 +533,10 @@ storage_class_specifier
                }
    ;
 
-type_specifier_qualifier
-   : type_qualifier { $$ = $1; }
-   | SD_BOOL   {
+type_specifier
+   : SD_VOID   {
                   $$=newLink(SPECIFIER);
-                  SPEC_NOUN($$) = V_BOOL;
+                  SPEC_NOUN($$) = V_VOID;
                   ignoreTypedefType = 1;
                }
    | SD_CHAR   {
@@ -555,10 +553,15 @@ type_specifier_qualifier
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_INT;
                   ignoreTypedefType = 1;
-               }
+               }              
    | SD_LONG   {
                   $$=newLink(SPECIFIER);
                   SPEC_LONG($$) = 1;
+                  ignoreTypedefType = 1;
+               }
+   | SD_FLOAT  {
+                  $$=newLink(SPECIFIER);
+                  SPEC_NOUN($$) = V_FLOAT;
                   ignoreTypedefType = 1;
                }
    | SIGNED    {
@@ -571,16 +574,31 @@ type_specifier_qualifier
                   SPEC_USIGN($$) = 1;
                   ignoreTypedefType = 1;
                }
-   | SD_VOID   {
+   | SD_BOOL   {
                   $$=newLink(SPECIFIER);
-                  SPEC_NOUN($$) = V_VOID;
+                  SPEC_NOUN($$) = V_BOOL;
                   ignoreTypedefType = 1;
                }
-   | SD_FLOAT  {
-                  $$=newLink(SPECIFIER);
-                  SPEC_NOUN($$) = V_FLOAT;
-                  ignoreTypedefType = 1;
-               }
+   | struct_or_union_specifier  {
+                                   uselessDecl = FALSE;
+                                   $$ = $1;
+                                   ignoreTypedefType = 1;
+                                }
+   | enum_specifier     {
+                           cenum = NULL;
+                           uselessDecl = FALSE;
+                           ignoreTypedefType = 1;
+                           $$ = $1;
+                        }       
+   | TYPE_NAME
+         {
+            symbol *sym;
+            sym_link *p;
+            sym = findSym(TypedefTab,NULL,$1);
+            $$ = p = copyLinkChain(sym ? sym->type : NULL);
+            SPEC_TYPEDEF(getSpec(p)) = 0;
+            ignoreTypedefType = 1;
+         }            
    | FIXED16X16 {
                   $$=newLink(SPECIFIER);
                   SPEC_NOUN($$) = V_FIXED16X16;
@@ -601,28 +619,9 @@ type_specifier_qualifier
                   /* now get the abs addr from value */
                   SPEC_ADDR($$) = (unsigned int) ulFromVal(constExprValue($2,TRUE));
                }
-   | struct_or_union_specifier  {
-                                   uselessDecl = FALSE;
-                                   $$ = $1;
-                                   ignoreTypedefType = 1;
-                                }
-   | enum_specifier     {
-                           cenum = NULL;
-                           uselessDecl = FALSE;
-                           ignoreTypedefType = 1;
-                           $$ = $1;
-                        }
-   | TYPE_NAME
-         {
-            symbol *sym;
-            sym_link *p;
-            sym = findSym(TypedefTab,NULL,$1);
-            $$ = p = copyLinkChain(sym ? sym->type : NULL);
-            SPEC_TYPEDEF(getSpec(p)) = 0;
-            ignoreTypedefType = 1;
-         }
-   | sfr_reg_bit
-   ;
+
+
+   | sfr_reg_bit;
 
 struct_or_union_specifier
    : struct_or_union opt_stag
@@ -791,6 +790,12 @@ member_declaration
         }
    ;
 
+type_specifier_qualifier
+   : type_specifier      { $$ = $1; }
+   | type_qualifier      { $$ = $1; }
+   | alignment_specifier { $$ = $1; }
+   ;
+
 member_declarator_list
    : member_declarator
    | member_declarator_list ',' member_declarator
@@ -828,7 +833,7 @@ member_declarator
         }
    | { $$ = newSymbol ("", NestLevel); }
    ;
-
+   
 enum_specifier
    : ENUM '{' enumerator_list '}'
         {

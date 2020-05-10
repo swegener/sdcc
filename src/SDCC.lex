@@ -177,6 +177,7 @@ static void checkCurrFile (const char *s);
 "static"                { count (); return STATIC; }
 "struct"                { count (); return STRUCT; }
 "switch"                { count (); return SWITCH; }
+"_Thread_local"         { count (); return THREAD_LOCAL; }
 "typedef"               { count (); return TYPEDEF; }
 "union"                 { count (); return UNION; }
 "unsigned"              { count (); return UNSIGNED; }

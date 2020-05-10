@@ -624,18 +624,18 @@ type_specifier
    | sfr_reg_bit;
 
 struct_or_union_specifier
-   : struct_or_union opt_stag
+   : struct_or_union attribute_specifier_sequence_opt opt_stag
         {
           structdef *sdef;
 
-          if (! $2->tagsym)
+          if (! $3->tagsym)
             {
               /* no tag given, so new struct def for current scope */
-              addSym (StructTab, $2, $2->tag, $2->level, currBlockno, 0);
+              addSym (StructTab, $3, $3->tag, $3->level, currBlockno, 0);
             }
           else
             {
-              sdef = findSymWithBlock (StructTab, $2->tagsym, currBlockno, NestLevel);
+              sdef = findSymWithBlock (StructTab, $3->tagsym, currBlockno, NestLevel);
               if (sdef)
                 {
                   /* Error if a complete type already defined in this scope */
@@ -643,37 +643,37 @@ struct_or_union_specifier
                     {
                       if (sdef->fields)
                         {
-                          werror(E_STRUCT_REDEF, $2->tag);
+                          werror(E_STRUCT_REDEF, $3->tag);
                           werrorfl(sdef->tagsym->fileDef, sdef->tagsym->lineDef, E_PREVIOUS_DEF);
                         }
                       else
                         {
-                          $2 = sdef; /* We are completing an incomplete type */
+                          $3 = sdef; /* We are completing an incomplete type */
                         }
                     }
                   else
                     {
                       /* There is an existing struct def in an outer scope. */
                       /* Create new struct def for current scope */
-                      addSym (StructTab, $2, $2->tag, $2->level, currBlockno, 0);
+                      addSym (StructTab, $3, $3->tag, $3->level, currBlockno, 0);
                     }
                 }
               else
                {
                  /* There is no existing struct def at all. */
                  /* Create new struct def for current scope */
-                 addSym (StructTab, $2, $2->tag, $2->level, currBlockno, 0);
+                 addSym (StructTab, $3, $3->tag, $3->level, currBlockno, 0);
                }
             }
 
-          if (!$2->type)
+          if (!$3->type)
             {
-              $2->type = $1;
+              $3->type = $1;
             }
           else
             {
-              if ($2->type != $1)
-                  werror(E_BAD_TAG, $2->tag, $1==STRUCT ? "struct" : "union");
+              if ($3->type != $1)
+                  werror(E_BAD_TAG, $3->tag, $1==STRUCT ? "struct" : "union");
             }
         }
    '{' member_declaration_list '}'
@@ -682,7 +682,7 @@ struct_or_union_specifier
           symbol *sym, *dsym;
 
           // check for errors in structure members
-          for (sym=$5; sym; sym=sym->next)
+          for (sym=$6; sym; sym=sym->next)
             {
               if (IS_ABSOLUTE(sym->etype))
                 {
@@ -707,8 +707,8 @@ struct_or_union_specifier
             }
 
           /* Create a structdef   */
-          sdef = $2;
-          sdef->fields = reverseSyms($5);        /* link the fields */
+          sdef = $3;
+          sdef->fields = reverseSyms($6);        /* link the fields */
           sdef->size = compStructSize($1, sdef); /* update size of  */
           promoteAnonStructs ($1, sdef);
 
@@ -717,31 +717,31 @@ struct_or_union_specifier
           SPEC_NOUN($$) = V_STRUCT;
           SPEC_STRUCT($$)= sdef;
         }
-   | struct_or_union stag
+   | struct_or_union attribute_specifier_sequence_opt stag
         {
           structdef *sdef;
 
-          sdef = findSymWithBlock (StructTab, $2->tagsym, currBlockno, NestLevel);
+          sdef = findSymWithBlock (StructTab, $3->tagsym, currBlockno, NestLevel);
 
           if (sdef)
-            $2 = sdef;
+            $3 = sdef;
           else
             {
               /* new struct def for current scope */
-              addSym (StructTab, $2, $2->tag, $2->level, currBlockno, 0);
+              addSym (StructTab, $3, $3->tag, $3->level, currBlockno, 0);
             }
           $$ = newLink(SPECIFIER);
           SPEC_NOUN($$) = V_STRUCT;
-          SPEC_STRUCT($$) = $2;
+          SPEC_STRUCT($$) = $3;
 
-          if (!$2->type)
+          if (!$3->type)
             {
-              $2->type = $1;
+              $3->type = $1;
             }
           else
             {
-              if ($2->type != $1)
-                  werror(E_BAD_TAG, $2->tag, $1==STRUCT ? "struct" : "union");
+              if ($3->type != $1)
+                  werror(E_BAD_TAG, $3->tag, $1==STRUCT ? "struct" : "union");
             }
         }
    ;
@@ -766,13 +766,13 @@ member_declaration_list
    ;
 
 member_declaration
-   : specifier_qualifier_list member_declarator_list ';'
+   : attribute_specifier_sequence_opt specifier_qualifier_list member_declarator_list ';'
         {
           /* add this type to all the symbols */
           symbol *sym;
-          for ( sym = $2; sym != NULL; sym = sym->next )
+          for ( sym = $3; sym != NULL; sym = sym->next )
             {
-              sym_link *btype = copyLinkChain($1);
+              sym_link *btype = copyLinkChain($2);
 
               pointerTypes(sym->type, btype);
               if (!sym->type)
@@ -786,7 +786,7 @@ member_declaration
               checkTypeSanity(sym->etype, sym->name);
             }
           ignoreTypedefType = 0;
-          $$ = $2;
+          $$ = $3;
         }
    ;
 

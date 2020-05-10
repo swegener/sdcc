@@ -1,3 +1,8 @@
+2020-05-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/scripts/sdcc.nsi:
+	  Fix bug #2972 for tlcs90.
+
 2020-05-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

@@ -651,6 +651,10 @@ ${Section} "SDCC library sources" SEC25
   SetOutPath "$INSTDIR\lib\src\stm8"
 #  File "${DEV_ROOT}\lib\src\stm8\Makefile"
 
+  SetOutPath "$INSTDIR\lib\src\tlcs90"
+  File "${DEV_ROOT}\lib\src\tlcs90\*.s"
+#  File "${DEV_ROOT}\lib\src\tlcs90\Makefile"
+
   SetOutPath "$INSTDIR\lib\src\mcs51"
   File "${DEV_ROOT}\lib\src\mcs51\*.asm"
 #  File "${DEV_ROOT}\lib\src\mcs51\Makefile"
@@ -1079,6 +1083,11 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\pdk15-stack-auto\pdk15.lib"
   Delete "$INSTDIR\lib\src\pdk15-stack-auto\Makefile"
 
+  Delete "$INSTDIR\lib\src\tlcs90\*.s"
+  Delete "$INSTDIR\lib\src\tlcs90\tlcs90.lib"
+  Delete "$INSTDIR\lib\src\tlcs90\README"
+  Delete "$INSTDIR\lib\src\tlcs90\Makefile"
+  
   Delete "$INSTDIR\lib\src\z80n\*.s"
   Delete "$INSTDIR\lib\src\z80n\z80n.lib"
   Delete "$INSTDIR\lib\src\z80n\README"
@@ -1142,6 +1151,9 @@ ${Section} Uninstall SECUNINSTALL
 
   Delete "$INSTDIR\lib\pdk15-stack-auto\*.lib"
 
+  Delete "$INSTDIR\lib\tlcs90\*.rel"
+  Delete "$INSTDIR\lib\tlcs90\*.lib"
+  
   Delete "$INSTDIR\lib\z80n\*.rel"
   Delete "$INSTDIR\lib\z80n\*.lib"
 
@@ -1247,6 +1259,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\pdk14"
   RMDir "$INSTDIR\lib\src\pdk15"
   RMDir "$INSTDIR\lib\src\pdk15-stack-auto"
+  RMDir "$INSTDIR\lib\src\tlcs90"
   RMDir "$INSTDIR\lib\src\z80n"
   RMDir "$INSTDIR\lib\src"
   RMDir "$INSTDIR\non-free\lib\src"
@@ -1276,6 +1289,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\pdk14"
   RMDir "$INSTDIR\lib\pdk15"
   RMDir "$INSTDIR\lib\pdk15-stack-auto"
+  RMDir "$INSTDIR\lib\tlcs90"
   RMDir "$INSTDIR\lib\z80n"
   RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\non-free\lib"

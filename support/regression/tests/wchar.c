@@ -56,8 +56,8 @@ testwcharstringnorestart(void)
 {
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L && !(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_SMALL) || defined(__SDCC_MODEL_MEDIUM))) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) // Not enough memory
 	wchar_t wcs1[5] = L"Test";
-	wchar_t wcs2[6];
-	char mbs[6 * MB_LEN_MAX];
+	wchar_t wcs2[5];
+	char mbs[5 * MB_LEN_MAX];
 
 	// Test basic functionality
 	ASSERT(wcslen (wcs1) == 4);
@@ -67,10 +67,14 @@ testwcharstringnorestart(void)
 	ASSERT(wcs2[3] == L't');
 	ASSERT(!wcscmp(wcs1, wcs2));
 
+// glibc with _FORTIFY_SOURCE == 2 is not standard-compliant (and fails the tests below)
+// However, Ubuntu decided to make _FORTIFY_SOURCE = 2 the default for GCC.
+#if !(defined(__GNUC__) && _FORTIFY_SOURCE == 2)
 	// Test for 0-terminated strings
-	ASSERT(wcstombs(mbs, wcs1, sizeof(mbs)/sizeof(mbs[0])) > 0);
-	ASSERT(mbstowcs(wcs2, mbs, sizeof(wcs2)/sizeof(wcs2[0])) > 0);
+	ASSERT(wcstombs(mbs, wcs1, 1000) > 0);
+	ASSERT(mbstowcs(wcs2, mbs, 1000) > 0);
 	ASSERT(!wcscmp(wcs1, wcs2));
+#endif
 
 	// Test for unterminated strings
 	mbs[2] = 0;

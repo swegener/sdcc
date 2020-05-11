@@ -1,3 +1,7 @@
+2020-05-11 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* support/regression/tests/wchar.c: fix bug #2572
+
 2020-05-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.y,

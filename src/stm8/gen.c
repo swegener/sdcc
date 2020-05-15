@@ -6656,7 +6656,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
   int shCount = (int) ulFromVal (right->aop->aopu.aop_lit);
   int size, i;
   bool sign;
-  bool xh_zero, yh_zero, xl_free, yl_free;
+  bool xh_zero, yh_zero, xl_free, yl_free, a_free;
 
   struct asmop shiftop_impl;
   struct asmop *shiftop;
@@ -6714,6 +6714,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
   yh_zero = shiftop->regs[YH_IDX] >= size;
   xl_free = regDead (XL_IDX, ic) && shiftop->regs[XL_IDX] < 0;
   yl_free = regDead (YL_IDX, ic) && shiftop->regs[YL_IDX] < 0;
+  a_free = regDead (A_IDX, ic) && shiftop->regs[A_IDX] < 0;
 
   // Use swap a where beneficial.
   if (!sign && size == 1 && aopRS (shiftop) && !aopOnStack (shiftop, 0, 1) &&
@@ -6736,17 +6737,17 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
 
   // div can be cheaper than a sequence of shifts.
   if (!sign && shCount < 8 &&
-    (shCount > 3 + !regDead (A_IDX, ic) * 2 && (size == 2 && aopInReg (shiftop, 0, X_IDX) || size == 1 && aopInReg (shiftop, 0, XL_IDX) && xh_zero) ||
-    shCount * 2 > 4 + !regDead (A_IDX, ic) * 2 && (size == 2 && aopInReg (shiftop, 0, Y_IDX) || size == 1 && aopInReg (shiftop, 0, YL_IDX) && yh_zero)))
+    (shCount > 3 + !a_free * 2 && (size == 2 && aopInReg (shiftop, 0, X_IDX) || size == 1 && aopInReg (shiftop, 0, XL_IDX) && xh_zero) ||
+    shCount * 2 > 4 + !a_free * 2 && (size == 2 && aopInReg (shiftop, 0, Y_IDX) || size == 1 && aopInReg (shiftop, 0, YL_IDX) && yh_zero)))
     {
       const bool in_y = aopInReg (shiftop, 0, Y_IDX);
-      if (!regDead (A_IDX, ic))
+      if (!a_free)
         push (ASMOP_A, 0, 1);
       emit2 ("ld", "a, #0x%02x", 1 << shCount);
       cost (2, 1);
       emit2 ("div", in_y ? "y, a" : "x, a");
       cost (1 + in_y, 17); // TODO: Find out exact value, replace 17 by exact value, and accordingly choose this optimization depending on optimization goal.
-      if (!regDead (A_IDX, ic))
+      if (!a_free)
         pop (ASMOP_A, 0, 1);
       goto release;
     }
@@ -6819,7 +6820,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
     (aopInReg (shiftop, 0, X_IDX) || aopInReg (shiftop, 0, Y_IDX)) &&
     (aopInReg (shiftop, 2, X_IDX) || aopInReg (shiftop, 2, Y_IDX)))
     {
-      if (!regDead (A_IDX, ic))
+      if (!a_free)
         push (ASMOP_A, 0, 1);
       emit3 (A_CLR, ASMOP_A, 0);
       emit3w_o (A_RRWA, shiftop, 2, 0, 0);
@@ -6831,7 +6832,7 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
           emit3w_o (A_RLCW, shiftop, 0, 0, 0);
           emit3w_o (A_RLCW, shiftop, 2, 0, 0);
         }
-      if (!regDead (A_IDX, ic))
+      if (!a_free)
         pop (ASMOP_A, 0, 1);
     }
 

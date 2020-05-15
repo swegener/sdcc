@@ -1,3 +1,9 @@
+2020-05-15 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c,
+	  support/regression/tests/bug-3002.c:
+	  Fix bug #3002.
+
 2020-05-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/wchar.c:

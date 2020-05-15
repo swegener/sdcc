@@ -3,6 +3,8 @@
 	* src/stm8/gen.c,
 	  support/regression/tests/bug-3002.c:
 	  Fix bug #3002.
+	* device/lib/*/Makefile.in:
+	  Compile libraries with --max-allocs-per-node 25000 for more optimization.
 
 2020-05-11 Philipp Klaus Krause <pkk AT spth.de>
 

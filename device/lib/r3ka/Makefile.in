@@ -6,7 +6,7 @@ top_builddir = @top_builddir@
 
 LIB_TYPE     = @LIB_TYPE@
 
-SCC = $(top_builddir)/bin/sdcc -mr3ka
+SCC = $(top_builddir)/bin/sdcc -mr3ka --max-allocs-per-node 25000
 SAS = $(top_builddir)/bin/sdasrab
 
 # override PORTDIR defined by super (parent) makefile

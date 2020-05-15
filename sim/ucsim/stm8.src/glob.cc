@@ -745,6 +745,7 @@ struct dis_entry disass_stm8_92[]= {
   { 0x00d7, 0x00ff, ' ', 2, "ld ([%1.w],X),A" },
   { 0x00a7, 0x00ff, ' ', /*2*/3, "ldf ([%2.e],X),A" },
   { 0x00af, 0x00ff, ' ', /*2*/3, "ldf A,([%2.e],X)" },
+  { 0x00bc, 0x00ff, ' ', 2, "ldf A,[%1.e]" },
   { 0x00ce, 0x00ff, ' ', 2, "ldw X,[%1.w]" },
   { 0x00de, 0x00ff, ' ', 2, "ldw X,([%1.w],X)" },
   { 0x00cf, 0x00ff, ' ', 2, "ldw [%1.w],X" },

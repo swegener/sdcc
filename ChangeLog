@@ -1,3 +1,8 @@
+2020-05-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Fix link to wiki (was still pointing at previous, no-longer-existing wiki).
+
 2020-05-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c,

@@ -134,7 +134,7 @@ debugLog (const char *fmt,...)
 
       if (!(debugF = fopen (buffer, (append ? "a+" : "w"))))
         {
-          werror (E_FILE_OPEN_ERR, buffer);
+          werror (E_OUTPUT_FILE_OPEN_ERR, buffer, strerror (errno));
           exit (1);
         }
       append = 1;               // Next time debubLog is called, we'll append the debug info

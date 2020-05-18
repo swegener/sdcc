@@ -455,7 +455,7 @@ _gbz80_rgblink (void)
   dbuf_append_str (&lnkFileName, ".lk");
   if (!(lnkfile = fopen (dbuf_c_str (&lnkFileName), "w")))
     {
-      werror (E_FILE_OPEN_ERR, dbuf_c_str (&lnkFileName));
+      werror (E_OUTPUT_FILE_OPEN_ERR, dbuf_c_str (&lnkFileName), strerror (errno));
       dbuf_destroy (&lnkFileName);
       exit (1);
     }

@@ -3561,7 +3561,7 @@ void pic16_pcode_test(void)
     SNPRINTF(buffer, sizeof(buffer), "%s.p", dstFileName);
 
     if(!(pFile = fopen(buffer, "w" ))) {
-      werror(E_FILE_OPEN_ERR,buffer);
+      werror(E_OUTPUT_FILE_OPEN_ERR, buffer, strerror(errno));
       exit(1);
     }
 

@@ -1,3 +1,20 @@
+2020-05-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCBBlock.c,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/SDCCglobl.h,
+	  src/SDCCglue.c,
+	  src/SDCCmain.c,
+	  src/pic14/glue.c,
+	  src/pic14/pcode.c,
+	  src/pic14/ralloc.c,
+	  src/pic16/glue.c,
+	  src/pic16/pcode.c,
+	  src/pic16/ralloc.c,
+	  src/z80/main.c:
+	  Improve file open error messages (patch by jbit).
+
 2020-05-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

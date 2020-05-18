@@ -2158,10 +2158,10 @@ void pcode_test(void)
 		char buffer[200];
 
 		/* create the file name */
-                SNPRINTF(buffer, sizeof(buffer), "%s.p", dstFileName);
+		SNPRINTF(buffer, sizeof(buffer), "%s.p", dstFileName);
 
 		if( !(pFile = fopen(buffer, "w" ))) {
-			werror(E_FILE_OPEN_ERR,buffer);
+			werror(E_OUTPUT_FILE_OPEN_ERR, buffer, strerror(errno));
 			exit(1);
 		}
 
@@ -5275,7 +5275,7 @@ void AnalyzeBanking(void)
 	pBlock  *pb;
 
 	if(!picIsInitialized()) {
-		werror(E_FILE_OPEN_ERR, "no memory size is known for this processor");
+		werror(E_UNKNOWN_TARGET, "no memory size is known for this processor");
 		exit(1);
 	}
 	

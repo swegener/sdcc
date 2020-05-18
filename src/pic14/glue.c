@@ -743,7 +743,7 @@ picglue (void)
 
   if (!(asmFile = fopen (buffer, "w")))
     {
-      werror (E_FILE_OPEN_ERR, buffer);
+      werror (E_OUTPUT_FILE_OPEN_ERR, buffer, strerror (errno));
       exit (1);
     }
 

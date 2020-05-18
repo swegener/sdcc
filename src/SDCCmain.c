@@ -703,7 +703,7 @@ processFile (char *s)
       fullSrcFileName = s;
       if (!(srcFile = fopen (fullSrcFileName, "r")))
         {
-          werror (E_FILE_OPEN_ERR, s);
+          werror (E_INPUT_FILE_OPEN_ERR, fullSrcFileName, strerror (errno));
 
           dbuf_destroy (&path);
 
@@ -1603,7 +1603,7 @@ parseCmdLine (int argc, char **argv)
       if (debugFile->openFile (dbuf_c_str (&adbFile)))
         debugFile->writeModule (moduleName);
       else
-        werror (E_FILE_OPEN_ERR, dbuf_c_str (&adbFile));
+        werror (E_OUTPUT_FILE_OPEN_ERR, dbuf_c_str (&adbFile), strerror (errno));
 
       dbuf_destroy (&adbFile);
     }
@@ -1674,7 +1674,7 @@ linkEdit (char **envp)
       dbuf_printf (&linkerScriptFileName, "%s.lk", dstFileName);
       if (!(lnkfile = fopen (dbuf_c_str (&linkerScriptFileName), "w")))
         {
-          werror (E_FILE_OPEN_ERR, dbuf_c_str (&linkerScriptFileName));
+          werror (E_OUTPUT_FILE_OPEN_ERR, dbuf_c_str (&linkerScriptFileName), strerror (errno));
           exit (EXIT_FAILURE);
         }
 

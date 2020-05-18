@@ -575,6 +575,10 @@ struct
     "thread-local storage is not implemented", 0},
   { E_ENUM_COMMA_C99,  ERROR_LEVEL_ERROR,
     "trailing comma after enumerator list requires ISO C99 or later", 0},
+  { E_OUTPUT_FILE_OPEN_ERR, ERROR_LEVEL_ERROR,
+     "Failed to open output file '%s' (%s)", 0 },
+  { E_INPUT_FILE_OPEN_ERR, ERROR_LEVEL_ERROR,
+     "Failed to open input file '%s' (%s)", 0 },
 };
 
 /* -------------------------------------------------------------------------------

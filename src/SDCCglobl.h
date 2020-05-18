@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdio.h>
+#include <errno.h>
 
 # ifndef __cplusplus
 #  include <stdbool.h>

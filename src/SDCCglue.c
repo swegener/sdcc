@@ -2299,7 +2299,7 @@ glue (void)
 
   if (!(asmFile = fopen (dbuf_c_str (&asmFileName), "w")))
     {
-      werror (E_FILE_OPEN_ERR, dbuf_c_str (&asmFileName));
+      werror (E_OUTPUT_FILE_OPEN_ERR, dbuf_c_str (&asmFileName), strerror (errno));
       dbuf_destroy (&asmFileName);
       exit (EXIT_FAILURE);
     }

@@ -59,3 +59,11 @@ testNot(void)
 	ASSERT(true not_eq false);
 }
 
+static void
+testUnary(void)
+{
+  int i;
+  ASSERT(compl 0xaa55 == ~0xaa55);
+  ASSERT(bitand i == &i);
+}
+

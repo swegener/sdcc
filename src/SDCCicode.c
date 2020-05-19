@@ -2795,8 +2795,12 @@ geniCodeBitwise (operand * left, operand * right, int oper, sym_link * resType)
 {
   iCode *ic;
 
-  left = geniCodeCast (resType, left, TRUE);
-  right = geniCodeCast (resType, right, TRUE);
+  /* Signedness doesn't matter for bit ops, so omit */
+  /* possible cast if that is the only difference */
+  if (compareType (resType, operandType (left)) != -2)
+    left = geniCodeCast (resType, left, TRUE);
+  if (compareType (resType, operandType (right)) != -2)
+    right = geniCodeCast (resType, right, TRUE);
 
   ic = newiCode (oper, left, right);
   IC_RESULT (ic) = newiTempOperand (resType, 0);

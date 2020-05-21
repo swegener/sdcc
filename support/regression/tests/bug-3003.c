@@ -1,9 +1,9 @@
 /*
    bug-3003.c
 
-   The wrong location used for a local variable; observable effects vary by backend.
-   For stm8, this results in overwrting other local variables.
-   For z80, it results in use of locationbelow the stack.
+   The wrong location is used for a local variable; observable effects vary by backend.
+   For stm8, this results in overwriting other local variables.
+   For z80, it results in use of location below the stack.
 */
 
 #include <testfwk.h>

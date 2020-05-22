@@ -355,6 +355,9 @@ operand *newiTempOperand (sym_link *, char);
 operand *newiTempFromOp (operand *);
 iCode *getBuiltinParms (iCode *, int *, operand **);
 int isiCodeInFunctionCall (iCode *);
+operand *detachiCodeOperand (operand **, iCode *);
+void attachiCodeOperand (operand *, operand **, iCode *);
+
 /*-----------------------------------------------------------------*/
 /* declaration of exported variables                               */
 /*-----------------------------------------------------------------*/

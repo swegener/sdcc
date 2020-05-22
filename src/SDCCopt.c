@@ -1135,14 +1135,16 @@ convertToFcall (eBBlock ** ebbs, int count)
           if (ic->op == '%' && isOperandLiteral (IC_RIGHT(ic)))
             {
               bool us = IS_UNSIGNED (operandType (IC_LEFT(ic)));
+              bool upcast = FALSE;
+              iCode *dic = NULL;
 
               // Chek if left really is just an upcasted unsigned value.
               if (!us && IS_SYMOP (IC_LEFT(ic)) && bitVectnBitsOn (OP_DEFS (IC_LEFT (ic))) == 1)
                 {
-                  iCode *dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (IC_LEFT (ic))));
+                  dic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_DEFS (IC_LEFT (ic))));
 
                   if (dic && dic->op == CAST && IS_UNSIGNED (operandType (IC_RIGHT (dic))) && getSize (operandType (IC_RIGHT (dic))) < getSize (operandType (IC_RESULT (dic))))
-                    us = true;
+                    us = upcast = true;
                 }
 
               if (us)
@@ -1154,6 +1156,8 @@ convertToFcall (eBBlock ** ebbs, int count)
                     {
                       ic->op = '=';
                       IC_RIGHT (ic) = operandFromLit (0);
+                      if (IS_SYMOP (IC_LEFT (ic)))
+                        bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
                       IC_LEFT (ic) = NULL;
                       continue;
                     }
@@ -1172,7 +1176,33 @@ convertToFcall (eBBlock ** ebbs, int count)
                     {
                       ic->op = BITWISEAND;
                       IC_RIGHT(ic) = operandFromLit (operandLitValue (IC_RIGHT (ic)) - 1);
+                      if (upcast && IS_CHAR (operandType (IC_RIGHT (dic)))
+                          && bitVectnBitsOn (OP_USES (IC_LEFT (ic))) == 1)
+                        {
+                          // Use precasted value
+                          attachiCodeOperand (IC_RIGHT (dic), &IC_LEFT (ic), ic);
+                          // Change cast to assignmnent to self to avoid
+                          // reading IC_RIGHT (dic) twice in case it
+                          // was volatile
+                          attachiCodeOperand (IC_RESULT (dic), &IC_RIGHT (dic), dic);
+                          dic->op = '=';
+                          // If upcast from char, maybe there's a
+                          // corresponding downcast to char that could
+                          // be eliminated too
+                          if (bitVectnBitsOn (OP_USES (IC_RESULT (ic))) == 1)
+                            {
+                              iCode *uic;
+                              uic = hTabItemWithKey (iCodehTab, bitVectFirstBit (OP_USES (IC_RESULT (ic))));
+                              if (uic->op == CAST && IS_CHAR (operandType (IC_RESULT (uic))))\
+                                {
+                                  attachiCodeOperand (IC_RESULT (uic), &IC_RESULT (ic), ic);
+                                  attachiCodeOperand (IC_RESULT (uic), &IC_RIGHT (uic), uic);
+                                  uic->op = '=';
+                                }
+                            }
+                        }
                       continue;
+
                     }
                 }
             }

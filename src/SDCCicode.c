@@ -1085,6 +1085,76 @@ isOperandOnStack (operand * op)
   return FALSE;
 }
 
+
+/*-------------------------------------------------------------------*/
+/* detachiCodeOperand - remove a specific operand position (left,    */
+/*                      right, result, etc) from an iCode and update */
+/*                      the uses & defs as appropriate.              */
+/*-------------------------------------------------------------------*/
+operand *
+detachiCodeOperand (operand **opp, iCode *ic)
+{
+  operand * op = *opp;
+  
+  if (IS_SYMOP (op))
+    {
+      if ((ic->op == IFX) || (ic->op == JUMPTABLE))
+        {
+          *opp = NULL;
+          bitVectUnSetBit (OP_USES (op), ic->key);
+        }
+      else
+        {
+          int uses = 0;
+          bool ispointerset = POINTER_SET (ic);
+
+          if (!ispointerset && (opp == &IC_RESULT (ic)))
+            bitVectUnSetBit (OP_DEFS (op), ic->key);
+          *opp = NULL;
+          if (ispointerset && (op == IC_RESULT (ic)))
+            uses++;
+          if (op == IC_LEFT (ic))
+            uses++;
+          if (op == IC_RIGHT (ic))
+            uses++;
+          if (uses == 0)
+            bitVectUnSetBit (OP_USES (op), ic->key);
+        }
+    }
+  else
+    *opp = NULL;
+  return op;
+}
+
+/*-------------------------------------------------------------------*/
+/* attachiCodeOperand - insert an operand to a specific operand      */
+/*                      position (left, right, result, etc) in an    */
+/*                      iCode and update the uses & defs as          */
+/*                      appropriate. Any previously existing operand */
+/*                      in that position will be detached first.     */
+/*-------------------------------------------------------------------*/
+void
+attachiCodeOperand (operand *newop, operand **opp, iCode *ic)
+{
+  /* If there is already an operand here, detach it first */
+  if (*opp)
+    detachiCodeOperand (opp, ic);
+
+  /* Insert new operand */
+  *opp = newop;
+  
+  /* Update defs/uses for new operand */
+  if (IS_SYMOP (newop))
+    {
+      if (opp == &IC_RESULT (ic) && !POINTER_SET (ic))
+        OP_DEFS (newop) = bitVectSetBit (OP_DEFS (newop), ic->key);
+      else
+        OP_USES (newop) = bitVectSetBit (OP_USES (newop), ic->key);
+    }
+}
+
+
+
 /*-----------------------------------------------------------------*/
 /* isOclsExpensive - will return true if accesses to an output     */
 /*                   storage class are expensive                   */

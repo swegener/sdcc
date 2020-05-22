@@ -1,3 +1,10 @@
+2020-05-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c,
+	  src/SDCCicode.h: new support functions for updating operands
+	                   and their def/use
+	* src/SDCCopt.c: final fixes for bug #2828
+
 2020-05-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-3003.c:

@@ -2,6 +2,7 @@
 
 	* src/SDCCicode.c (operandFromSymbol),
 	  src/SDCCmem.c (allocLocal): fix bug #3003
+	* support/regression/tests/bug-3003.c: enable test
 
 2020-05-22 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

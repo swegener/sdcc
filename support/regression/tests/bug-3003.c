@@ -44,7 +44,6 @@ static volatile uint8_t* f(const uint8_t id)
 
 void testBug(void)
 {
-#if 0 // Todo enable when bug is fixed.
 	unsigned char buffer[BUFFERSIZE]; // Bug: Overwritten in f() on stm8.
 	
 	memset(buffer, 0xa5, BUFFERSIZE);
@@ -55,6 +54,5 @@ void testBug(void)
 
 	for(size_t i = 0; i < BUFFERSIZE; i++)
 		ASSERT (buffer[i] == 0xa5);
-#endif
 }
 

@@ -1742,7 +1742,7 @@ operandFromSymbol (symbol * sym)
       IS_AUTO (sym) &&                  /* is a local auto variable */
       !sym->addrtaken &&                /* whose address has not been taken */
       !sym->reqv &&                     /* does not already have a reg equivalence */
-      !IS_VOLATILE (sym->etype) &&      /* not declared as volatile */
+      !IS_VOLATILE (sym->type) &&       /* not declared as volatile */
       !sym->islbl &&                    /* not a label */
       !(TARGET_HC08_LIKE && (getSize (sym->type) > 2)) && /* will fit in regs */
       ok                                /* farspace check */

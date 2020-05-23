@@ -817,7 +817,7 @@ allocLocal (symbol * sym)
     }
 
   /* if volatile then */
-  if (IS_VOLATILE (sym->etype))
+  if (IS_VOLATILE (sym->type))
     sym->allocreq = 1;
 
   /* this is automatic           */

@@ -491,16 +491,12 @@ pointerTypes (sym_link * ptr, sym_link * type)
 void
 addDecl (symbol * sym, int type, sym_link * p)
 {
-  static sym_link *empty = NULL;
   sym_link *head;
   sym_link *tail;
   sym_link *t;
 
   if (getenv ("SDCC_DEBUG_FUNCTION_POINTERS"))
     fprintf (stderr, "SDCCsymt.c:addDecl(%s,%d,%p)\n", sym->name, type, (void *)p);
-
-  if (empty == NULL)
-    empty = newLink (SPECIFIER);
 
   /* if we are passed a link then set head & tail */
   if (p)
@@ -534,12 +530,6 @@ addDecl (symbol * sym, int type, sym_link * p)
         t = t->next;
       t->next = head;
       tail->next = sym->etype;
-    }
-  // fixes bug #1253
-  else if (IS_FUNC (sym->type) && IS_SPEC (sym->type->next) && !memcmp (sym->type->next, empty, sizeof (sym_link)))
-    {
-      sym->type->next = head;
-      sym->etype = tail;
     }
   // type ends in spec, p ends in spec: merge specs, p's decls go before spec
   else if (IS_SPEC (sym->etype) && IS_SPEC (tail))

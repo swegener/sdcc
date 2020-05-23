@@ -1,3 +1,8 @@
+2020-05-23 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCsymt.c (addDecl): removed fix for bug 1253, no longer required
+	* support/regression/tests/bug1253.c: new, added
+
 2020-05-23 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (operandFromSymbol),

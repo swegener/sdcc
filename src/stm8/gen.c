@@ -416,7 +416,9 @@ aopGet(const asmop *aop, int offset)
 
   if (aopRS (aop) && !aop->aopu.bytes[offset].in_reg)
     {
-      int soffset = aop->aopu.bytes[offset].byteu.stk + G.stack.pushed;
+      long int soffset = aop->aopu.bytes[offset].byteu.stk + G.stack.pushed;
+      
+      wassert (labs(soffset) <= (1 << 16));
 
       if (soffset > 255)
         {

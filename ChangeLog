@@ -9,7 +9,7 @@
 	  configure.ac,
 	  configure,
 	  sdccconf_in.h:
-	  Fix --disable-z80-port configure option.
+	  Fix --disable-z80n-port configure option.
 
 2020-05-23 Philipp Klaus Krause <pkk AT spth.de>
 

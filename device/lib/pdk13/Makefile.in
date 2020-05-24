@@ -59,7 +59,7 @@ PDK13_SDCC = $(COMMON_SDCC) \
 PDK13SOURCES = $(addprefix ../,$(PDK13_FLOAT) $(PDK13_INT) $(PDK13_LONG) $(PDK13_LONGLONG) $(PDK13_SDCC))
 PDK13OBJECTS = $(patsubst %.c,%.rel,$(PDK13_FLOAT) $(PDK13_INT) $(PDK13_LONG) $(PDK13_LONGLONG) $(PDK13_SDCC))
 
-OBJ = __gptrget.rel heap.rel
+OBJ = __gptrget.rel __gptrget2.rel heap.rel __setjmp.rel
 
 LIB = pdk13.lib
 CC = $(SCC)

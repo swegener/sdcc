@@ -1,3 +1,10 @@
+2020-05-24 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/pdk13/Makefile.in,
+	  device/lib/pdk13/__gptrget2.s,
+	  device/lib/pdk13/__setjmp.s:
+	  Fix missing asm support functions for pdk13.
+
 2020-05-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

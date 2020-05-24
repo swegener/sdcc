@@ -4,6 +4,12 @@
 	  device/lib/pdk13/__gptrget2.s,
 	  device/lib/pdk13/__setjmp.s:
 	  Fix missing asm support functions for pdk13.
+	* Makefile.common.in,
+	  Makefile.in,
+	  configure.ac,
+	  configure,
+	  sdccconf_in.h:
+	  Fix --disable-z80-port configure option.
 
 2020-05-23 Philipp Klaus Krause <pkk AT spth.de>
 

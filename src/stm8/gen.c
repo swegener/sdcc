@@ -418,7 +418,7 @@ aopGet(const asmop *aop, int offset)
     {
       long int soffset = aop->aopu.bytes[offset].byteu.stk + G.stack.pushed;
       
-      wassert (labs(soffset) <= (1 << 16));
+      wassert (soffset < (1 << 16) && soffset >= 0);
 
       if (soffset > 255)
         {

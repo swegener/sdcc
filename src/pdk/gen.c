@@ -2276,10 +2276,10 @@ genMinus (const iCode *ic, const iCode *ifx)
           else
             emit2 ("dec", aopGet (left->aop, 0));
           for (int i = 1; i < left->aop->size; i++)
-            emit2 ("subc", aopGet (left->aop, 0));
+            emit2 ("subc", aopGet (left->aop, i));
             
           emit2 ("ceqsn", "a, #0x00");
-          cost (3, 3.8f);
+          cost (1 + left->aop->size, left->aop->size + 1.8f);
           emitJP (IC_TRUE (ifx), 0.2f);
           
           for (int i = 0; i < left->aop->size; i++)

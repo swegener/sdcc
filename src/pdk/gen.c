@@ -2258,12 +2258,14 @@ genMinus (const iCode *ic, const iCode *ifx)
     {
       wassert (IC_TRUE (ifx));
       wassert (left->aop->type == AOP_REG || left->aop->type == AOP_DIR);
-      wassert (aopIsLitVal (right->aop, 0, 2, 1));
+      wassert (aopIsLitVal (right->aop, 0, left->aop->size, 1));
 
       emit2 ("dzsn", aopGet (left->aop, 0));
       cost (1, 1.8f);
       emitJP (IC_TRUE (ifx), 0.2f);
 
+      wassert (left->aop->size == 1);
+#if 0
       for(int i = 1; i < left->aop->size; i++)
         {
           emit2 ("subc", aopGet (left->aop, i));
@@ -2271,6 +2273,7 @@ genMinus (const iCode *ic, const iCode *ifx)
           cost (2, 2.8f);
           emitJP (IC_TRUE (ifx), 0.2f);
         }
+#endif
     }
   else
     genSub (ic, result->aop, left->aop, right->aop);

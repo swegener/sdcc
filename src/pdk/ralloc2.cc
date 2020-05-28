@@ -538,7 +538,7 @@ static void extra_ic_generated(iCode *ic)
       if (!isOperandEqual (IC_RESULT(ic), IC_LEFT(ic)))
         return;
 
-      if (getSize(operandType(IC_RESULT(ic))) > 2)
+      if (getSize(operandType(IC_RESULT(ic))) > 1)
         return;
 
       ifx->generated = true;

@@ -1030,6 +1030,7 @@ aopOp (operand * op, iCode * ic, bool result)
   if (sym->regType == REG_CND)
     {
       sym->aop = op->aop = aop = newAsmop (AOP_CRY);
+      aop->aopu.aop_dir = "c";
       aop->size = sym->ruonly ? 1 : 0;
       return;
     }
@@ -1522,7 +1523,7 @@ aopGet (operand * oper, int offset, bool bit16, bool dname)
           break;
 
         case AOP_CRY:
-          if (!IS_OP_RUONLY (oper))
+          if (!EQ (aop->aopu.aop_dir, "c"))
             emitcode ("mov", "c,%s", aop->aopu.aop_dir);
           emitcode ("clr", "a");
           emitcode ("rlc", "a");
@@ -1614,7 +1615,6 @@ aopPut (operand * result, const char *s, int offset)
   bool bvolatile = isOperandVolatile (result, FALSE);
   bool accuse = FALSE;
   asmop *aop = AOP (result);
-  const char *d = NULL;
   static struct dbuf_s dbuf = { 0 };
 
   if (dbuf_is_initialized (&dbuf))
@@ -1751,9 +1751,6 @@ aopPut (operand * result, const char *s, int offset)
       break;
 
     case AOP_CRY:
-      // destination is carry for return-use-only
-      d = (IS_OP_RUONLY (result)) ? "c" : aop->aopu.aop_dir;
-
       // source is no literal and not in carry
       if (!EQ (s, zero) && !EQ (s, one) && !EQ (s, "c"))
         {
@@ -1765,7 +1762,7 @@ aopPut (operand * result, const char *s, int offset)
       // now source is zero, one or carry
 
       /* if result no bit variable */
-      if (!d)
+      if (!aop->aopu.aop_dir)
         {
           if (EQ (s, "c"))
             {
@@ -1781,11 +1778,11 @@ aopPut (operand * result, const char *s, int offset)
             }
         }
       else if (EQ (s, zero))
-        emitcode ("clr", "%s", d);
+        emitcode ("clr", "%s", aop->aopu.aop_dir);
       else if (EQ (s, one))
-        emitcode ("setb", "%s", d);
-      else if (!EQ (s, d))
-        emitcode ("mov", "%s,c", d);
+        emitcode ("setb", "%s", aop->aopu.aop_dir);
+      else if (!EQ (s, aop->aopu.aop_dir))
+        emitcode ("mov", "%s,c", aop->aopu.aop_dir);
       break;
 
     case AOP_STR:
@@ -1952,8 +1949,7 @@ outBitC (operand * result)
   /* if the result is bit */
   if (AOP_TYPE (result) == AOP_CRY)
     {
-      if (!IS_OP_RUONLY (result) && !IS_OP_ACCUSE (result))
-        aopPut (result, "c", 0);
+      aopPut (result, "c", 0);
     }
   else if (AOP_TYPE (result) != AOP_DUMMY)
     {
@@ -2025,7 +2021,7 @@ toBoolean (operand * oper)
 /*-----------------------------------------------------------------*/
 static void
 toCarry (operand *oper)
-{ 
+{
   /* if the operand is a literal then
      we know what the value is */
   if (AOP_TYPE (oper) == AOP_LIT)
@@ -6214,7 +6210,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
                   if (!rightInB)
                     {
                       pushedB = pushB ();
-                      rightInB++;
+                      rightInB = TRUE;
                       MOVB (aopGet (right, offset, FALSE, FALSE));
                     }
                   emitcode ("xrl", "b,#0x80");

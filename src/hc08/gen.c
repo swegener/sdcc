@@ -9768,7 +9768,7 @@ genAddrOf (iCode * ic)
 
   while (size--)
     {
-      char s[SDCC_NAME_MAX + 10];
+      char s[SDCC_NAME_MAX + 18];
       switch (offset)
         {
         case 0:

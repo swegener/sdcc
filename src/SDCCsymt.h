@@ -667,8 +667,6 @@ symbol *reverseSyms (symbol *);
 sym_link *reverseLink (sym_link *);
 symbol *copySymbol (const symbol *);
 symbol *copySymbolChain (const symbol *);
-void printSymChain (symbol *, int);
-void printStruct (structdef *, int);
 char *genSymName (long);
 sym_link *getSpec (sym_link *);
 int compStructSize (int, structdef *);

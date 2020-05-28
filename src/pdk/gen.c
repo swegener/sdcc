@@ -2238,6 +2238,9 @@ genPlus (const iCode *ic)
   freeAsmop (result);
 }
 
+static void
+genIfx (const iCode *ic);
+
 /*-----------------------------------------------------------------*/
 /* genMinus - generates code for minus                             */
 /*-----------------------------------------------------------------*/
@@ -2260,20 +2263,39 @@ genMinus (const iCode *ic, const iCode *ifx)
       wassert (left->aop->type == AOP_REG || left->aop->type == AOP_DIR);
       wassert (aopIsLitVal (right->aop, 0, left->aop->size, 1));
 
-      emit2 ("dzsn", aopGet (left->aop, 0));
-      cost (1, 1.8f);
-      emitJP (IC_TRUE (ifx), 0.2f);
-
-      wassert (left->aop->size == 1);
-#if 0
-      for(int i = 1; i < left->aop->size; i++)
+      if (left->aop->size == 1)
         {
-          emit2 ("subc", aopGet (left->aop, i));
-          emit2 ("t1sn", "f, z");
-          cost (2, 2.8f);
+          emit2 ("dzsn", aopGet (left->aop, 0));
+          cost (1, 1.8f);
           emitJP (IC_TRUE (ifx), 0.2f);
         }
-#endif
+      else if (aopInReg (left->aop, 0, A_IDX) || aopInReg (left->aop, 1, A_IDX))
+        {
+          if (aopInReg (left->aop, 0, A_IDX))
+            emit2 ("sub", "a, #0x01");
+          else
+            emit2 ("dec", aopGet (left->aop, 0));
+          for (int i = 1; i < left->aop->size; i++)
+            emit2 ("subc", aopGet (left->aop, 0));
+            
+          emit2 ("ceqsn", "a, #0x00");
+          cost (3, 3.8f);
+          emitJP (IC_TRUE (ifx), 0.2f);
+          
+          for (int i = 0; i < left->aop->size; i++)
+            {
+              if (aopInReg (left->aop, i, A_IDX))
+                continue;
+              emit2 ("ceqsn", "a, %s", aopGet (left->aop, i));
+              cost (1, 1.8f);
+              emitJP (IC_TRUE (ifx), 0.2f);
+            }
+        }
+      else
+        {
+          genSub (ic, result->aop, left->aop, right->aop);
+          genIfx (ifx);
+        }
     }
   else
     genSub (ic, result->aop, left->aop, right->aop);

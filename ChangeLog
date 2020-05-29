@@ -1,4 +1,9 @@
-2020-05-25 Philipp Klaus Krause <pkk AT spth.de>
+2020-05-29 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/lib/hc08/atomic_flag_test_and_set.c: fix warning
+	* device/lib/s08/atomic_flag_test_and_set.c: fix warning
+
+2020-05-28 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/ralloc2.cc,
 	  src/pdk/gen.c,

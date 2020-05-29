@@ -2259,17 +2259,16 @@ genMinus (const iCode *ic, const iCode *ifx)
 
   if (ifx && ifx->generated)
     {
-      wassert (IC_TRUE (ifx));
       wassert (left->aop->type == AOP_REG || left->aop->type == AOP_DIR);
       wassert (aopIsLitVal (right->aop, 0, left->aop->size, 1));
 
-      if (left->aop->size == 1)
+      if (left->aop->size == 1 && IC_TRUE (ifx))
         {
           emit2 ("dzsn", aopGet (left->aop, 0));
           cost (1, 1.8f);
           emitJP (IC_TRUE (ifx), 0.2f);
         }
-      else if (aopInReg (left->aop, 0, A_IDX) || aopInReg (left->aop, 1, A_IDX))
+      else if (aopInReg (left->aop, 0, A_IDX) || aopInReg (left->aop, 1, A_IDX) && IC_TRUE (ifx))
         {
           if (aopInReg (left->aop, 0, A_IDX))
             emit2 ("sub", "a, #0x01");
@@ -2290,6 +2289,17 @@ genMinus (const iCode *ic, const iCode *ifx)
               cost (1, 1.8f);
               emitJP (IC_TRUE (ifx), 0.2f);
             }
+        }
+      else if (left->aop->size == 1 && IC_FALSE (ifx))
+        {
+          if (aopInReg (left->aop, 0, A_IDX))
+            emit2 ("sub", "a, #0x01");
+          else
+            emit2 ("dec", aopGet (left->aop, 0));
+            
+          emit2 ("t0sn", "f, z");
+          cost (2, 2.5f);
+          emitJP (IC_FALSE (ifx), 0.5f);
         }
       else
         {

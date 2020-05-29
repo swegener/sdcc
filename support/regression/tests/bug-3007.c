@@ -18,3 +18,19 @@ void testBug(void)
   ASSERT (a == ({type})300);
 }
 
+{type} a1, a2;
+
+void inc2(void)
+{
+  while(--a1)
+    a2++;
+}
+
+void testBug2(void)
+{
+  a1 = 31;
+  inc2();
+  ASSERT(a1 == 0);
+  ASSERT(a2 == 30);
+}
+

@@ -522,7 +522,7 @@ static void extra_ic_generated(iCode *ic)
   iCode *ifx;
 
   // - can only jump on nonzero result for decrement of register / direct variable.
-  if(ic->op == '-' && ic->next && ic->next->op == IFX && IC_TRUE(ic->next) && IC_COND (ic->next)->key == IC_RESULT(ic)->key)
+  if(ic->op == '-' && ic->next && ic->next->op == IFX && IC_COND (ic->next)->key == IC_RESULT(ic)->key)
     {
       ifx = ic->next;
 

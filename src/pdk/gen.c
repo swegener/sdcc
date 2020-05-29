@@ -2673,34 +2673,42 @@ genCmpEQorNE (const iCode *ic, iCode *ifx)
 
   if (aopInReg (left->aop, 1, A_IDX) && (right->aop->type == AOP_LIT || right->aop->type == AOP_DIR || right->aop->type == AOP_IMMD))
     {
-      wassert (regDead (A_IDX, ic));
-
       emit2 ("ceqsn", "a, %s", aopGet (right->aop, 1));
-      cost (1, 1);
-      emitJP (lbl_ne, 0.0f);
-      cheapMove (ASMOP_A, 0, left->aop, 0, true, true, true);
+      cost (1, 1.0f);
+      emitJP (lbl_ne, 1.0f);
+      
       if (ifx && ((ic->op == EQ_OP) ^ (bool)(IC_FALSE(ifx))))
         {
+          wassert (regDead (A_IDX, ic));
+          cheapMove (ASMOP_A, 0, left->aop, 0, true, true, true);
           if (TARGET_IS_PDK13) // pdk13 does not have cneqsn
             {
               symbol *tlbl = (regalloc_dry_run ? 0 : newiTempLabel (NULL));
               emit2 ("ceqsn", "a, %s", aopGet (right->aop, 0));
               emitJP (tlbl, 0.0f);
-              cost (2, 3);
+              cost (2, 0);
               emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.0f);
               emitLabel (tlbl);
             }
           else
             {
               emit2 ("cneqsn", "a, %s", aopGet (right->aop, 0));
-              cost (1, 1);
+              cost (1, 0);
               emitJP (IC_FALSE (ifx) ? IC_FALSE (ifx) : IC_TRUE (ifx), 0.0f);
             }
         }
+      else if (aopInReg (left->aop, 0, P_IDX) && regDead (P_IDX, ic) && aopIsLitVal (right->aop, 0, 1, 0xff))
+        {
+          emit2 ("izsn", "p");
+          cost (1, 0);
+          emitJP (lbl_ne, 0.0f);
+        }
       else
         {
+          wassert (regDead (A_IDX, ic));
+          cheapMove (ASMOP_A, 0, left->aop, 0, true, true, true);
           emit2 ("ceqsn", "a, %s", aopGet (right->aop, 0));
-          cost (1, 1);
+          cost (1, 0);
           emitJP (lbl_ne, 0.0f);
         }
     }

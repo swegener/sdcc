@@ -83,7 +83,7 @@ reg_info regs8051[] = {
   {REG_GPR, X10_IDX, REG_GPR, "x10", "x10", "xreg", 2, 1},
   {REG_GPR, X11_IDX, REG_GPR, "x11", "x11", "xreg", 3, 1},
   {REG_GPR, X12_IDX, REG_GPR, "x12", "x12", "xreg", 4, 1},
-  {REG_CND, CND_IDX, REG_CND, "C", "psw", "0xd0", 0, 1},
+  {REG_CND, CND_IDX, REG_CND, "C", "not_psw", "0xd0", 0, 1},
   {0, DPL_IDX, 0, "dpl", "dpl", "0x82", 0, 0},
   {0, DPH_IDX, 0, "dph", "dph", "0x83", 0, 0},
   {0, B_IDX, 0, "b", "b", "0xf0", 0, 0},
@@ -870,7 +870,7 @@ tryAgain:
 /* getRegBit - will try for Bit if not spill this                  */
 /*-----------------------------------------------------------------*/
 static reg_info *
-getRegBitTry (symbol * sym)
+getRegBit (symbol * sym)
 {
   reg_info *reg;
 
@@ -878,6 +878,7 @@ getRegBitTry (symbol * sym)
   if ((reg = allocReg (REG_BIT)))
     return reg;
 
+  spillThis(sym);
   return 0;
 }
 
@@ -931,7 +932,7 @@ getRegBitNoSpil ()
 {
   reg_info *reg;
 
-  /* try for a ptr type */
+  /* try for a bit type */
   if ((reg = allocReg (REG_BIT)))
     return reg;
 
@@ -1393,8 +1394,6 @@ serialRegAssign (eBBlock ** ebbs, int count)
                     sym->regs[j] = getRegPtr (ic, ebbs[i], sym);
                   else
                     {
-                      if (sym->regType == REG_BIT) /* Try to allocate to bit register if possible */
-                        sym->regs[j] = getRegBitTry (sym);
                       if (ic->op == CAST && IS_SYMOP (IC_RIGHT (ic)))
                         {
                           symbol *right = OP_SYMBOL (IC_RIGHT (ic));
@@ -1403,7 +1402,12 @@ serialRegAssign (eBBlock ** ebbs, int count)
                             sym->regs[j] = allocThisReg (right->regs[j]);
                         }
                       if (!sym->regs[j])
-                        sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
+                        {
+                          if (sym->regType == REG_BIT) /* Prefer spilling over a GPR */
+                            sym->regs[j] = getRegBit (sym);
+                          else
+                            sym->regs[j] = getRegGpr (ic, ebbs[i], sym);
+                        }
                     }
 
                   /* if the allocation failed which means
@@ -1574,7 +1578,7 @@ fillGaps (void)
                 {
                   symbol *right = OP_SYMBOL (IC_RIGHT (ic));
 
-                  if (right->regs[i])
+                  if (right->regs[i] && right->regs[i]->type != REG_BIT)
                     sym->regs[i] = allocThisReg (right->regs[i]);
                 }
               if (!sym->regs[i])

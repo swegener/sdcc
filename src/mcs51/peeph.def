@@ -5034,6 +5034,12 @@ replace {
 	;	Peephole 301	mov r%1,%2 removed
 } if notVolatile(%2), deadMove(%1)
 
+replace {
+	mov	ar%1,%2
+} by {
+	;	Peephole 302	mov ar%1,%2 removed
+} if notVolatile(%2), deadMove(%1)
+
 
 // applies to: void test( char c ) { if( c ) func1(); else func2(); }
 replace {

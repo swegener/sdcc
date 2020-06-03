@@ -6947,9 +6947,9 @@ fixupInlineLabel (symbol * sym)
 {
   struct dbuf_s dbuf;
 
-  dbuf_init (&dbuf, 128);
+  dbuf_init (&dbuf, SDCC_SYMNAME_MAX+1);
   dbuf_printf (&dbuf, "%s_%d", sym->name, inlineState.count);
-  strncpyz (sym->name, dbuf_c_str (&dbuf), SDCC_NAME_MAX);
+  strncpyz (sym->name, dbuf_c_str (&dbuf), SDCC_SYMNAME_MAX);
   dbuf_destroy (&dbuf);
 }
 

@@ -1,5 +1,10 @@
 2020-06-03 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/SDCCast.c:
+	  Fix bug #3006, patch by Roy Rankin.
+
+2020-06-03 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/SDCCmem.c,
 	  src/SDCCast.c,
 	  support/valdiag/tests/bug-3010.c:

@@ -4,6 +4,9 @@
 	  src/SDCCast.c,
 	  support/valdiag/tests/bug-3010.c:
 	  Fix bug #3010.
+	* src/SDCC.y,
+	  support/valdiag/tests/bug-3009.c:
+	  Fix bug #3009.
 
 2020-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
 

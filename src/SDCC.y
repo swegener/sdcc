@@ -2332,7 +2332,12 @@ opt_assign_expr
           value *val;
 
           val = constExprValue($2, TRUE);
-          if (!IS_INT(val->type) && !IS_CHAR(val->type) && !IS_BOOL(val->type))
+          if (!val) // Not a constant expression
+            {
+              werror (E_CONST_EXPECTED);
+              val = constIntVal("0");
+            }
+          else if (!IS_INT(val->type) && !IS_CHAR(val->type) && !IS_BOOL(val->type))
             {
               werror(E_ENUM_NON_INTEGER);
               SNPRINTF(lbuff, sizeof(lbuff), "%d", (int) ulFromVal(val));

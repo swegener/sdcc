@@ -7129,9 +7129,18 @@ genPointerGet (const iCode *ic)
       genMove(result->aop, &stackop_impl, regDead (A_IDX, ic), regDead (X_IDX, ic), regDead (Y_IDX, ic));
       goto release;
     }
+  // Special case for efficient handling of 8-bit I/O and rematerialized pointers when assigning to direct memory.
+  else if (!bit_field && size == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && result->aop->type == AOP_DIR)
+    {
+      if (left->aop->type == AOP_LIT)
+        emit2("mov", offset ? "%s, 0x%02x%02x+%d" : "%s, 0x%02x%02x", aopGet (result->aop, 0), byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);
+      else
+        emit2("mov", offset ? "%s, %s+%d" : "%s, %s+%d", aopGet (result->aop, 0), left->aop->aopu.immd, left->aop->aopu.immd_off + offset);
+      cost (5, 1);
+      goto release;
+    }
   // Special case for efficient handling of 8-bit I/O and rematerialized pointers
-  else if (!bit_field && size == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD)
-    && regDead (A_IDX, ic))
+  else if (!bit_field && size == 1 && (left->aop->type == AOP_LIT || left->aop->type == AOP_IMMD) && regDead (A_IDX, ic))
     {
       if (left->aop->type == AOP_LIT)
         emit2("ld", offset ? "a, 0x%02x%02x+%d" : "a, 0x%02x%02x",  byteOfVal (left->aop->aopu.aop_lit, 1), byteOfVal (left->aop->aopu.aop_lit, 0), offset);

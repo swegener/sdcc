@@ -7,6 +7,8 @@
 	* src/SDCC.y,
 	  support/valdiag/tests/bug-3009.c:
 	  Fix bug #3009.
+	* src/stm8/gen.c:
+	  Improve assignment from 8-bit I/O to file-scope and static objects.
 
 2020-06-02 Maarten Brock <sourceforge.brock AT dse.nl>
 

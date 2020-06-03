@@ -633,6 +633,12 @@ allocParms (value *val, bool smallc)
 
   for (lval = val; lval; lval = lval->next, pNum++)
     {
+      if (!lval->sym) // Can only happen if there was a syntax error in the declaration.
+        {
+          fatalError++;
+          return;
+        }
+        
       /* check the declaration */
       checkDecl (lval->sym, 0);
 
@@ -749,6 +755,9 @@ deallocParms (value * val)
 
   for (lval = val; lval; lval = lval->next)
     {
+      if (!lval->sym) /* Syntax error in declaration */
+        continue;
+
       /* unmark is myparm */
       lval->sym->ismyparm = 0;
 

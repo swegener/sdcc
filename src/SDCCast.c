@@ -6918,12 +6918,9 @@ addSymToBlock (symbol * sym, ast * tree)
 static void
 processRegParms (value * args, ast * body)
 {
-  while (args)
-    {
-      if (IS_REGPARM (args->etype))
-        addSymToBlock (args->sym, body);
-      args = args->next;
-    }
+  for (; args; args = args->next)
+    if (IS_REGPARM (args->etype) && args->sym)
+      addSymToBlock (args->sym, body);
 }
 
 /*-----------------------------------------------------------------*/

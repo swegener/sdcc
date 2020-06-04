@@ -1,3 +1,10 @@
+2020-06-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/peeph-gbz80.def:
+	  notUsed for gbz80, patch by Baŝto.
+
 2020-06-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c:

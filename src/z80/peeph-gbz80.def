@@ -21,11 +21,43 @@
 // along with this program; if not, write to the Free Software
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+replace{
+	ld	hl, #0xff%1
+	ld	a, (hl)
+} by {
+	; peephole GB0a used ldh instead of ld a, (hl).
+	ldh	a, (#0xff%1)
+} if notUsed('hl')
+
+replace{
+	ld	hl, #0xff%1
+	ld	(hl), a
+} by {
+	; peephole GB0b used ldh instead of ld (hl), a.
+	ldh	(#0xff%1), a
+} if notUsed('hl')
+
 replace restart {
 	ld	%1, %1
 } by {
-	; peephole 1 removed redundant load.
+	; peephole 1a removed redundant load.
 } if notVolatile(%1)
+
+replace restart {
+	ld	%1, %2
+} by {
+	; peephole 1b removed dead load from %2 into %1.
+	; based on Z80 peephole 1
+} if notVolatile(%1), notUsed(%1), notVolatile(%2), notSame(%2 '(hl+)' '(hl-)'), notSame(%1 '(hl+)' '(hl-)')
+
+replace restart {
+	ld	%2, %1
+	ld	%3, %2
+} by {
+	; peephole 1c loaded %3 from %1 directly instead of going through %2.
+	; based on z80 peephole 9
+	ld	%3, %1
+} if notVolatile(%2), notUsed(%2), canAssign(%3 %1), notSame(%2 '(hl+)' '(hl-)')
 
 replace restart {
 	ldhl	sp,#%1
@@ -260,31 +292,54 @@ replace restart {
 }
 
 replace restart {
-	ld	bc,#%1 + %2
-	inc	bc
-	inc	bc
-	inc	bc
+	ld	%1, (hl)
+	inc	%1
+	ld	(hl),%1
 } by {
-	ld	bc,#%1 + %2 + 3
-	; peephole 26 moved triple increment of bc to constant.
-}
+	inc	(hl)
+	; peephole 26 incremented in (hl) instead of going through %1.
+	; based on Z80 peephole 115
+} if notUsed(%1)
 
 replace restart {
-	ld	bc,#%1 + %2
-	inc	bc
-	inc	bc
+	ld	%4, %2
+	ld	%3, %1
+	push	%3%4
 } by {
-	ld	bc,#%1 + %2 + 2
-	; peephole 27 moved double increment of bc to constant.
-}
+	; peephole 27a pushed %1%2 directly instead of going through %3%4.
+	; based on Z80 peephole 29
+	push	%1%2
+} if canAssign(%1%2 '#0x0102'), notUsed(%3%4)
+
+replace {
+	ld	%1, %5
+	push	%1%2
+	inc	sp
+	ld	%3, %6
+	push	%3%4
+	inc	sp
+} by {
+	; peephole 27b pushed bc instead of %1%2 and %3%4.
+	ld c, %6
+	ld b, %5
+	push	bc
+} if notUsed('bc'), canAssign(%1 'b'), canAssign(%3 'b'), notUsed(%1), notUsed(%3), notSame(%5 'b' 'c' '(ld+)' '(ld-)'), notSame(%6 'b' 'c' '(ld+)' '(ld-)')
 
 replace restart {
-	ld	bc,#%1 + %2
-	inc	bc
+	ld	%4%5, #%1
+	inc	%4%5
 } by {
-	ld	bc,#%1 + %2 + 1
-	; peephole 28 moved increment of bc to constant.
-}
+	ld	%4%5, #%1 + 1
+	; peephole 28a moved increment of %4%5 to constant.
+} if canAssign(%4%5 '#0x0102')
+
+replace restart {
+	ld	%4%5, #%1 + %2
+	inc	%4%5
+} by {
+	ld	%4%5, #%1 + %3
+	; peephole 28b moved increment of %4%5 to constant.
+} if canAssign(%4%5 '#0x0102'), immdInRange(0x0000 0xffff 'add' %2 1 %3)
 
 replace restart {
 	ld	bc,#%1
@@ -763,32 +818,68 @@ replace {
 	inc	hl
 } by {
 	ld	a, (hl+)
-	; peephole GB1 used ldi to increment hl after load
+	; peephole GB1a used ldi to increment hl after load
 }
+
+replace {
+	ld	%1, (hl)
+	inc	hl
+} by {
+	ld	a, (hl+)
+	ld	%1, a
+	; peephole GB1b used ldi to increment hl after load
+} if notUsed('a')
 
 replace {
 	ld	a, (hl)
 	dec	hl
 } by {
 	ld	a, (hl-)
-	; peephole GB2 used ldd to decrement hl after load
+	; peephole GB2a used ldd to decrement hl after load
 }
+
+replace {
+	ld	%1, (hl)
+	dec	hl
+} by {
+	ld	a, (hl-)
+	ld	%1, a
+	; peephole GB2b used ldd to decrement hl after load
+} if notUsed('a')
 
 replace {
 	ld	(hl), a
 	inc	hl
 } by {
 	ld	(hl+), a
-	; peephole GB3 used ldi to increment hl after load
+	; peephole GB3a used ldi to increment hl after load
 }
+
+replace {
+	ld	(hl), %1
+	inc	hl
+} by {
+	ld	a, %1
+	ld	(hl+), a
+	; peephole GB3b used ldi to increment hl after load
+} if notUsed('a')
 
 replace {
 	ld	(hl), a
 	dec	hl
 } by {
 	ld	(hl-), a
-	; peephole GB4 used ldd to decrement hl after load
+	; peephole GB4a used ldd to decrement hl after load
 }
+
+replace {
+	ld	(hl), %1
+	dec	hl
+} by {
+	ld	a, %1
+	ld	(hl-), a
+	; peephole GB4b used ldd to decrement hl after load
+} if notUsed('a')
 
 replace {
 	inc hl

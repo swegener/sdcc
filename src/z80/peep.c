@@ -122,19 +122,38 @@ isReturned(const char *what)
       size = 4;
     }
 
-  switch(*what)
-    {
-    case 'd':
-      return(size >= 4);
-    case 'e':
-      return(size >= 3);
-    case 'h':
-      return(size >= 2);
-    case 'l':
-      return(size >= 1);
-    default:
-      return FALSE;
-    }
+  if(!IS_GB)
+  {
+    switch(*what)
+      {
+      case 'd':
+        return(size >= 4);
+      case 'e':
+        return(size >= 3);
+      case 'h':
+        return(size >= 2);
+      case 'l':
+        return(size >= 1);
+      default:
+        return FALSE;
+      }
+  }
+  else
+  {
+    switch(*what)
+      {
+      case 'h':
+        return(size >= 4);
+      case 'l':
+        return(size >= 3);
+      case 'd':
+        return(size >= 2);
+      case 'e':
+        return(size >= 1);
+      default:
+        return FALSE;
+      }
+  }
 }
 
 /*-----------------------------------------------------------------*/
@@ -212,7 +231,8 @@ static bool argCont(const char *arg, const char *what)
   if (arg[0] == '#')
     return false;
 
-  if(arg[0] == '(' && arg[1] && arg[2] && (arg[2] != ')' && arg[3] != ')'))
+  if(arg[0] == '(' && arg[1] && arg[2] && (arg[2] != ')' && arg[3] != ')')
+     && !(IS_GB && (arg[3] == '-' || arg[3] == '+') && arg[4] == ')'))
     return FALSE;
 
   if(*arg == '(')
@@ -406,7 +426,8 @@ z80MightRead(const lineNode *pl, const char *what)
   if(ISINST(pl->line, "rlca") ||
      ISINST(pl->line, "rla")  ||
      ISINST(pl->line, "rrca") ||
-     ISINST(pl->line, "rra"))
+     ISINST(pl->line, "rra")  ||
+     ISINST(pl->line, "daa"))
     {
       return(strcmp(what, "a") == 0);
     }
@@ -417,10 +438,15 @@ z80MightRead(const lineNode *pl, const char *what)
     }
   if(ISINST(pl->line, "rlc") ||
      ISINST(pl->line, "sla") ||
+     ISINST(pl->line, "rrc") ||
      ISINST(pl->line, "sra") ||
      ISINST(pl->line, "srl"))
     {
       return(argCont(pl->line + 4, what));
+    }
+  if(IS_GB && ISINST(pl->line, "swap"))
+    {
+      return(argCont(pl->line + 5, what));
     }
   if(!IS_GB && !IS_RAB &&
     (ISINST(pl->line, "rld") ||
@@ -435,8 +461,10 @@ z80MightRead(const lineNode *pl, const char *what)
       return(argCont(strchr(pl->line + 4, ','), what));
     }
 
- if(ISINST(pl->line, "ccf") ||
-    ISINST(pl->line, "nop"))
+ if(ISINST(pl->line, "ccf")  ||
+    ISINST(pl->line, "nop")  ||
+    ISINST(pl->line, "halt") ||
+    (IS_GB && ISINST(pl->line, "stop")))
     return(false);
 
   if(ISINST(pl->line, "jp") || ISINST(pl->line, "jr"))
@@ -447,6 +475,8 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if(!IS_GB && (ISINST(pl->line, "ldd") || ISINST(pl->line, "lddr") || ISINST(pl->line, "ldi") || ISINST(pl->line, "ldir")))
     return(strchr("bcdehl", *what));
+  if(IS_GB && (ISINST(pl->line, "ldd") || ISINST(pl->line, "ldi")))
+    return(strchr("hl", *what) || strstr(strchr(pl->line + 4, ','), what) != 0);
 
   if(!IS_GB && !IS_RAB && (ISINST(pl->line, "cpd") || ISINST(pl->line, "cpdr") || ISINST(pl->line, "cpi") || ISINST(pl->line, "cpir")))
     return(strchr("abchl", *what));
@@ -455,6 +485,9 @@ z80MightRead(const lineNode *pl, const char *what)
     return(strstr(strchr(pl->line + 4, ','), what) != 0 || strstr(pl->line + 4, "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
   if(!IS_GB && !IS_RAB && ISINST(pl->line, "in"))
     return(!strstr(strchr(pl->line + 4, ','), "(c)") && !strcmp(what, "a") || strstr(strchr(pl->line + 4, ','), "(c)") && (!strcmp(what, "b") || !strcmp(what, "c")));
+
+  if(IS_GB && (ISINST(pl->line, "out") || ISINST(pl->line, "ldh") || ISINST(pl->line, "in")))
+    return(strstr(strchr(pl->line + 3, ','), what) != 0 || (!strcmp(what, "c") && strstr(pl->line + 3, "(c)")));
 
   if(!IS_GB && !IS_RAB &&
     (ISINST(pl->line, "ini") || ISINST(pl->line, "ind") || ISINST(pl->line, "inir") || ISINST(pl->line, "indr") ||
@@ -495,7 +528,6 @@ z80MightRead(const lineNode *pl, const char *what)
   /* TODO: Can we know anything about rst? */
   if(ISINST(pl->line, "rst"))
     return(true);
-
   return(true);
 }
 
@@ -537,6 +569,10 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if((ISINST(pl->line, "ld") || ISINST(pl->line, "in"))
     && strncmp(pl->line + 3, what, strlen(what)) == 0 && pl->line[3 + strlen(what)] == ',')
     return(true);
+
+  if(IS_GB && (ISINST(pl->line, "ldd") || ISINST(pl->line, "ldi") || ISINST(pl->line, "ldh")))
+    return(strncmp(pl->line + 4, what, strlen(what)) == 0);
+
   if(ISINST(pl->line, "pop") && strstr(pl->line + 4, what))
     return(true);
   if(ISINST(pl->line, "call") && strchr(pl->line, ',') == 0)
@@ -590,6 +626,12 @@ z80SurelyWrites(const lineNode *pl, const char *what)
     
   if (IS_EZ80_Z80 && ISINST(pl->line, "lea"))
     return (strstr(pl->line + 4, what));
+
+  if (IS_GB && ISINST(pl->line, "lda") && strncmp(pl->line + 4, "hl", 2) == 0 && (what[0] == 'h' || what[0] == 'l'))
+    return(true);
+
+  if (IS_GB && ISINST(pl->line, "ldhl") && (what[0] == 'h' || what[0] == 'l'))
+    return(true);
 
   return(false);
 }

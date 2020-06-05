@@ -204,6 +204,7 @@ postfix_expr
                           werror(E_COMPOUND_LITERALS_C99);
 
                         /* TODO: implement compound literals (C99) */
+                        $$ = newAst_VALUE (valueFromLit (0));
                       }
    | '(' type_name ')' '{' initializer_list ',' '}'
                       {
@@ -211,6 +212,7 @@ postfix_expr
                           werror(E_COMPOUND_LITERALS_C99);
 
                         /* TODO: implement compound literals (C99) */
+                        $$ = newAst_VALUE (valueFromLit (0));
                       }
    ;
 

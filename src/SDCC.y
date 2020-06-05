@@ -1325,8 +1325,9 @@ function_declarator
    | declarator2 '(' identifier_list ')'
         {
           werror(E_OLD_STYLE,$1->name);
-          /* assume it returns an int */
-          $1->type = $1->etype = newIntLink();
+          
+          addDecl ($1, FUNCTION, NULL);
+          
           $$ = $1;
         }
    ;

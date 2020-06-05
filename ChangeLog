@@ -1,3 +1,9 @@
+2020-06-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCC.y,
+	  support/valdiag/tests/bug-3014.c:
+	  Fix bug #3014.
+
 2020-06-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c,

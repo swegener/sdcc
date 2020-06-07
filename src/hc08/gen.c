@@ -9719,12 +9719,15 @@ static void
 genAddrOf (iCode * ic)
 {
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
+  asmop *aopr;
   int size, offset;
   bool needpullx, needpullh;
-
+  struct dbuf_s dbuf;
+  
   D (emitcode (";     genAddrOf", ""));
 
   aopOp (IC_RESULT (ic), ic, FALSE);
+  aopr = AOP (IC_RESULT (ic));
 
   /* if the operand is on the stack then we
      need to get the stack offset of this
@@ -9762,25 +9765,37 @@ genAddrOf (iCode * ic)
       goto release;
     }
 
+  if (IS_AOP_HX (aopr) || aopr->type == AOP_DIR ||
+      (IS_S08 && aopr->type != AOP_REG))
+    {
+      needpullx = pushRegIfSurv (hc08_reg_x);
+      needpullh = pushRegIfSurv (hc08_reg_h);
+      loadRegFromImm (hc08_reg_hx, sym->rname);
+      storeRegToFullAop (hc08_reg_hx, AOP (IC_RESULT (ic)), FALSE);
+      pullOrFreeReg (hc08_reg_h, needpullh);
+      pullOrFreeReg (hc08_reg_x, needpullx);
+      goto release;
+    }
+  
   /* object not on stack then we need the name */
   size = AOP_SIZE (IC_RESULT (ic));
   offset = 0;
 
   while (size--)
     {
-      char s[SDCC_NAME_MAX + 18];
+      dbuf_init (&dbuf, 64);
       switch (offset)
         {
         case 0:
-          sprintf (s, "#%s", sym->rname);
+          dbuf_printf (&dbuf, "#%s", sym->rname);
           break;
         case 1:
-          sprintf (s, "#>%s", sym->rname);
+          dbuf_printf (&dbuf, "#>%s", sym->rname);
           break;
         default:
-          sprintf (s, "#(%s >> %d)", sym->rname, offset * 8);
+          dbuf_printf (&dbuf, "#0");
         }
-      storeImmToAop (s, AOP (IC_RESULT (ic)), offset++);
+      storeImmToAop (dbuf_detach_c_str (&dbuf), AOP (IC_RESULT (ic)), offset++);
     }
 
 release:

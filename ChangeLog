@@ -1,3 +1,7 @@
+2020-06-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/gen.c (genAddrOf): Make better use of HX
+
 2020-06-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCC.y,

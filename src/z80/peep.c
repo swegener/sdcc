@@ -335,7 +335,17 @@ z80MightRead(const lineNode *pl, const char *what)
       return(false);
     }
 
-  if(!strcmp(pl->line, "xor\ta, a") || !strcmp(pl->line, "xor\ta,a"))
+  //ld a, #0x00
+  if((ISINST(pl->line, "xor") || ISINST(pl->line, "sub")) &&
+     (!strcmp(pl->line+4, "a, a") || !strcmp(pl->line+4, "a,a") || (!strchr(pl->line, ',') && !strcmp(pl->line+4, "a"))))
+    return(false);
+
+  //ld a, #0x00
+  if(!strcmp(pl->line, "and\ta, #0x00") || !strcmp(pl->line, "and\ta,#0x00") || !strcmp(pl->line, "and\t#0x00"))
+    return(false);
+
+  //ld a, #0xff
+  if(!strcmp(pl->line, "or\ta, #0xff") || !strcmp(pl->line, "or\ta,#0xff") || !strcmp(pl->line, "or\t#0xff"))
     return(false);
 
   if(ISINST(pl->line, "adc") ||
@@ -461,7 +471,7 @@ z80MightRead(const lineNode *pl, const char *what)
       return(argCont(strchr(pl->line + 4, ','), what));
     }
 
- if(ISINST(pl->line, "ccf")  ||
+  if(ISINST(pl->line, "ccf")  ||
     ISINST(pl->line, "nop")  ||
     ISINST(pl->line, "halt") ||
     (IS_GB && ISINST(pl->line, "stop")))
@@ -558,8 +568,19 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
     what = "ix";
 
-  if(ISINST(pl->line, "xor") && strcmp(what, "a") == 0)
+  //ld a, #0x00
+  if((ISINST(pl->line, "xor") || ISINST(pl->line, "sub")) && !strcmp(what, "a") &&
+     (!strcmp(pl->line+4, "a, a") || !strcmp(pl->line+4, "a,a") || (!strchr(pl->line, ',') && !strcmp(pl->line+4, "a"))))
     return(true);
+
+  //ld a, #0x00
+  if(!strcmp(what, "a") && (!strcmp(pl->line, "and\ta, #0x00") || !strcmp(pl->line, "and\ta,#0x00") || !strcmp(pl->line, "and\t#0x00")))
+    return(true);
+
+  //ld a, #0xff
+  if(!strcmp(what, "a") && (!strcmp(pl->line, "or\ta, #0xff") || !strcmp(pl->line, "or\ta,#0xff") || !strcmp(pl->line, "or\t#0xff")))
+    return(true);
+
   if(ISINST(pl->line, "ld") && strncmp(pl->line + 3, "hl", 2) == 0 && (what[0] == 'h' || what[0] == 'l'))
     return(true);
   if(ISINST(pl->line, "ld") && strncmp(pl->line + 3, "de", 2) == 0 && (what[0] == 'd' || what[0] == 'e'))
@@ -828,8 +849,6 @@ isRegPair(const char *what)
     return TRUE;
   if(strcmp(what, "hl") == 0)
     return TRUE;
-  if(strcmp(what, "sp") == 0)
-    return TRUE;
   if(strcmp(what, "ix") == 0)
     return TRUE;
   if(strcmp(what, "iy") == 0)
@@ -932,23 +951,29 @@ z80canAssign (const char *op1, const char *op2, const char *exotic)
   if(!strcmp(dst, "(hl)") && isReg(src))
     return TRUE;
 
-  // Can assign between a and (bc), (de)
-  if(!strcmp(dst, "a") && (!strcmp(src, "(bc)") || ! strcmp(src, "(de)")))
+  // Can assign between a and (bc), (de), (hl+), (hl-)
+  if(!strcmp(dst, "a") &&
+     (!strcmp(src, "(bc)") || !strcmp(src, "(de)") || !strcmp(src, "(hl+)") || !strcmp(src, "(hl-)")))
     return TRUE;
-  if((!strcmp(dst, "(bc)") || ! strcmp(dst, "(de)")) && !strcmp(src, "a"))
+  if((!strcmp(dst, "(bc)") || !strcmp(dst, "(de)") || !strcmp(src, "(hl+)") || !strcmp(src, "(hl-)"))
+     && !strcmp(src, "a"))
     return TRUE;
 
   // Can load immediate values directly into registers and register pairs.
-  if((isReg(dst) || isRegPair(dst)) && src[0] == '#')
+  if((isReg(dst) || isRegPair(dst) || !strcmp(src, "sp")) && src[0] == '#')
     return TRUE;
 
-  if((!strcmp(dst, "a") || isRegPair(dst)) && !strncmp(src, "(#", 2))
+  if((!strcmp(dst, "a") || (!IS_GB && (isRegPair(dst) || !strcmp(src, "sp")))) && !strncmp(src, "(#", 2))
     return TRUE;
-  if(!strncmp(dst, "(#", 2) && (!strcmp(src, "a") || isRegPair(src)))
+  if(!strncmp(dst, "(#", 2) && (!strcmp(src, "a") || (!IS_GB && isRegPair(src)) || !strcmp(src, "sp")))
     return TRUE;
 
   // Can load immediate values directly into (hl).
   if(!strcmp(dst, "(hl)") && src[0] == '#')
+    return TRUE;
+
+  // Can load hl into sp
+  if(!strcmp(dst, "sp") && !strcmp(src, "hl"))
     return TRUE;
 
   return FALSE;

@@ -1,3 +1,9 @@
+2020-06-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c,
+	  src/z80/peeph-gbz80.def:
+	  improve z80 peephole functions, patch by Baŝto.
+
 2020-06-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/gen.c (genAddrOf): Make better use of HX

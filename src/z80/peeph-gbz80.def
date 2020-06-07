@@ -323,7 +323,7 @@ replace {
 	ld c, %6
 	ld b, %5
 	push	bc
-} if notUsed('bc'), canAssign(%1 'b'), canAssign(%3 'b'), notUsed(%1), notUsed(%3), notSame(%5 'b' 'c' '(ld+)' '(ld-)'), notSame(%6 'b' 'c' '(ld+)' '(ld-)')
+} if notUsed('bc'), canAssign('c' %6), canAssign('b' %5), canAssign(%1 'b'), canAssign(%3 'b'), notUsed(%1), notUsed(%3), notSame(%5 'b' 'c'), notSame(%6 'b' 'c')
 
 replace restart {
 	ld	%4%5, #%1

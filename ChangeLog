@@ -3,6 +3,8 @@
 	* src/z80/peep.c,
 	  src/z80/peeph-gbz80.def:
 	  improve z80 peephole functions, patch by Baŝto.
+	* device/include/mcs51/stc89.h:
+	  STC89 header, patch by Diego Elio Pettenò.
 
 2020-06-07 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

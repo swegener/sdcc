@@ -205,6 +205,11 @@ test-tlcs90:
 test-ez80-z80:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ez80-z80
+	
+# Helper rule for testing the z80n port only(use uCsim simulator)
+test-ucz80n:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=ucz80n
 
 # Helper rule for testing the pdk14 port only(use uCsim simulator)
 test-pdk14:

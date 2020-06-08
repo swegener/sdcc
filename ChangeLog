@@ -1,3 +1,10 @@
+2020-06-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/ports/ucz80n,
+	  support/regression/Makefile.in,
+	  support/regression/fwk/include/testfwk.h:
+	  z80n regression testing infrastructure.
+
 2020-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCopt.c (optimizeOpWidth),
@@ -8,7 +15,7 @@
 
 	* src/z80/peep.c,
 	  src/z80/peeph-gbz80.def:
-	  improve z80 peephole functions, patch by Baŝto.
+	  Improve z80 peephole functions, patch by Baŝto.
 	* device/include/mcs51/stc89.h:
 	  STC89 header, patch by Diego Elio Pettenò.
 

@@ -1096,6 +1096,7 @@ basicInduction (region * loopReg, ebbIndex * ebbi)
                  but it's a nice to see a clean dumploop now. */
               remiCodeFromeBBlock (lBlock, ic);
               /* clear the definition */
+              bitVectUnSetBit (OP_DEFS (IC_RESULT (ic)), ic->key);
               bitVectUnSetBit (lBlock->defSet, ic->key);
               ic = saveic;
             }

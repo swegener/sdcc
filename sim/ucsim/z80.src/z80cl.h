@@ -51,6 +51,7 @@ public:
   class cl_address_space *outputs;
   class cl_sp_limit_opt *sp_limit_opt;
   t_addr sp_limit;
+  bool IFF1, IFF2;
 public:
   cl_z80(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
@@ -191,6 +192,10 @@ public:
 
   virtual int inst_dd_spec(t_mem code) { return -1; }
   virtual int inst_fd_spec(t_mem code) { return -1; }
+
+  virtual bool inst_z80n(t_mem code, int *ret);
+  virtual int inst_ldix(t_mem code);
+  virtual int inst_lddx(t_mem code);
 };
 
 

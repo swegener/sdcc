@@ -76,6 +76,7 @@ struct t_regs
      that swap one for the other */
   //TYPE_UBYTE aA;
   //TYPE_UBYTE aF;
+
   union {
     u16_t aAF;
     struct {
@@ -93,6 +94,7 @@ struct t_regs
   DEF_REGPAIR(aHL, a_hl);
   
   u8_t/*TYPE_UBYTE*/ iv;  /* interrupt vector, see ed 47 ld A,IV.. */
+  u8_t R;
 };
 
 enum {

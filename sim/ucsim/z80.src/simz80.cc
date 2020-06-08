@@ -68,6 +68,7 @@ cl_simz80::mk_controller(void)
     {
     case CPU_Z80:
     case CPU_Z180:
+    case CPU_Z80N:
       return(new cl_z80(&cpus_z80[i], this));
     // Add Rabbits, etc here.
 

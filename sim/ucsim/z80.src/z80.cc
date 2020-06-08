@@ -46,6 +46,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "z80cl.h"
 #include "glob.h"
 //#include "regsz80.h"
+#include "z80mac.h"
 
 #define uint32 t_addr
 #define uint8 unsigned char
@@ -79,13 +80,24 @@ cl_z80::init(void)
   }
   sp_limit= 0xf000;
   
+  IFF1= false;
+  IFF2= false;
+
   return(0);
 }
 
 char *
 cl_z80::id_string(void)
 {
-  return((char*)"unspecified Z80");
+  switch (type->type)
+    {
+    case CPU_Z80: return (char*)"Z80";
+    case CPU_Z180: return (char*)"Z180";
+    case CPU_Z80N: return (char*)"Z80N";
+    default:
+      return((char*)"unspecified Z80");
+    }
+  return (char*)"Z80";
 }
 
 
@@ -347,6 +359,19 @@ cl_z80::get_disasm_info(t_addr addr,
 
     case 0xed: /* ESC code to about 80 opcodes of various lengths */
       code= rom->get(addr++);
+      if (type->type == CPU_Z80N)
+	{
+	  i= 0;
+	  while ((code & disass_z80n_ed[i].mask) != disass_z80n_ed[i].code &&
+		 disass_z80n_ed[i].mnemonic)
+	    i++;
+	  b= disass_z80n_ed[i].mnemonic;
+	  if (b != NULL)
+	    {
+	      len += (disass_z80n_ed[i].length + 1);
+	      break;
+	    }
+	}
       i= 0;
       while ((code & disass_z80_ed[i].mask) != disass_z80_ed[i].code &&
         disass_z80_ed[i].mnemonic)
@@ -470,18 +495,25 @@ cl_z80::disass(t_addr addr, const char *sep)
           b++;
           switch (*(b++))
             {
-            case 'd': // d    jump relative target, signed? byte immediate operand
+            case 'd': // jump relative target, signed? byte immediate operand
               sprintf(temp, "#%d", (signed char)(rom->get(addr+immed_offset)));
               ++immed_offset;
               break;
-            case 'w': // w    word immediate operand
+            case 'w': // word immediate operand, little endian
               sprintf(temp, "#0x%04x",
-                 (uint)((rom->get(addr+immed_offset)) |
-                        (rom->get(addr+immed_offset+1)<<8)) );
+		      (uint)((rom->get(addr+immed_offset)) |
+			     (rom->get(addr+immed_offset+1)<<8)) );
               ++immed_offset;
               ++immed_offset;
               break;
-            case 'b': // b    byte immediate operand
+            case 'W': // word immediate operand, big endian
+              sprintf(temp, "#0x%04x",
+		      (uint)((rom->get(addr+immed_offset)<<8) |
+			     (rom->get(addr+immed_offset+1))) );
+              ++immed_offset;
+              ++immed_offset;
+              break;
+            case 'b': // byte immediate operand
               sprintf(temp, "#0x%02x", (uint)rom->get(addr+immed_offset));
               ++immed_offset;
               break;
@@ -505,7 +537,7 @@ cl_z80::disass(t_addr addr, const char *sep)
       return(buf);
     }
   if (sep == NULL)
-    buf= (char *)malloc(6+strlen(p)+1);
+    buf= (char *)malloc(8+strlen(p)+1);
   else
     buf= (char *)malloc((p-work)+strlen(sep)+strlen(p)+1);
   for (p= work, t= buf; *p != ' '; p++, t++)
@@ -514,7 +546,7 @@ cl_z80::disass(t_addr addr, const char *sep)
   *t= '\0';
   if (sep == NULL)
     {
-      while (strlen(buf) < 6)
+      while (strlen(buf) < 8)
         strcat(buf, " ");
     }
   else
@@ -569,12 +601,13 @@ int
 cl_z80::exec_inst(void)
 {
   t_mem code;
-
+  
   instPC= PC;
 
   if (fetch(&code))
     return(resBREAKPOINT);
   tick(1);
+
   switch (code)
     {
     case 0x00: return(inst_nop(code));
@@ -763,6 +796,200 @@ cl_z80::exec_inst(void)
   return(resINV_INST);
 }
 
+bool cl_z80::inst_z80n(t_mem code, int *ret)
+{
+  int r= resGO;
+  switch (code)
+    {
+    case 0xa4: r= inst_ldix(code); break;
+    case 0xa5: // ldws
+      {
+	this->store1(regs.DE, this->get1(regs.HL));
+	vc.rd++;
+	vc.wr++;
+	inc(regs.hl.l);
+	inc(regs.de.h);
+      }
+    case 0xb4: do r= inst_ldix(code); while (regs.BC); break;
+    case 0xac: r= inst_lddx(code); break;
+    case 0xbc: do r= inst_lddx(code); while (regs.BC); break;
+    case 0xb7:  // ldpirx
+      {
+	u8_t t;
+	do {
+	  t= this->get1((regs.HL & 0xfff8)+(regs.de.l & 7));
+	  vc.rd++;
+	  if (t != regs.raf.A)
+	    {
+	      this->store1(regs.DE, t);
+	      vc.wr++;
+	    }
+	  regs.DE++;
+	  regs.BC--;
+	}
+	while (regs.BC);
+      }
+    case 0x90: // outinb
+      outputs->write(regs.BC, this->get1(regs.HL));
+      vc.wr++;
+      vc.rd++;
+      SET_Z(regs.bc.h);
+      regs.raf.F|= BIT_N;
+      regs.HL++;
+      break;
+    case 0x30: // mul
+      regs.DE= regs.de.h * regs.de.l;
+      break;
+    case 0x31: // add hl,a
+      regs.HL+= regs.raf.A;
+      break;
+    case 0x32: // add de,a
+      regs.DE+= regs.raf.A;
+      break;
+    case 0x33: // add bc,a
+      regs.BC+= regs.raf.A;
+      break;
+    case 0x34: // add hl,$nnnn
+      {
+	u16_t w= fetch2();
+	regs.HL+= w;
+	break;
+      }
+    case 0x35: // add de,$nnnn
+      {
+	u16_t w= fetch2();
+	regs.DE+= w;
+	break;
+      }
+
+    case 0x36: // add bc,$nnnn
+      {
+	u16_t w= fetch2();
+	regs.BC+= w;
+	break;
+      }
+    case 0x23: // swapnib
+      regs.raf.A= (regs.raf.A >> 4) | (regs.raf.A << 4);
+      break;
+    case 0x24: // mirror a
+      regs.raf.A=
+	((regs.raf.A&0x01)?0x80:0) |
+	((regs.raf.A&0x02)?0x40:0) |
+	((regs.raf.A&0x04)?0x20:0) |
+	((regs.raf.A&0x08)?0x10:0) |
+	((regs.raf.A&0x10)?0x08:0) |
+	((regs.raf.A&0x20)?0x04:0) |
+	((regs.raf.A&0x40)?0x02:0) |
+	((regs.raf.A&0x80)?0x01:0);
+      break;	
+    case 0x8a: // push $nnnn
+      {
+	u16_t w= fetch() * 256;
+	w+= fetch();
+	push2(w);
+	vc.wr+= 2;
+      }
+    case 0x91: // nextreg $rr,$nn
+      outputs->write(0x243b, fetch());
+      outputs->write(0x253b, fetch());
+      vc.wr+= 2;
+      break;
+    case 0x92: // nextreg $rr,a
+      outputs->write(0x243b, fetch());
+      outputs->write(0x253b, regs.raf.A);
+      vc.wr+= 2;
+      break;
+    case 0x93: // pixeldn
+      if (regs.HL!=0x0700)
+	regs.HL+= 256;
+      else if ((regs.HL&0xe0)!=0xe0)
+	regs.HL= (regs.HL&0xf800)+0x20;
+      else
+	regs.HL= (regs.HL&0xf81f)+0x0800;
+      break;
+    case 0x94: // pixelad
+      regs.HL= 0x4000 + ((regs.de.h&0xc0)<<5) + ((regs.de.h&0x07)<<8) +
+	((regs.de.h&0x38)<<2) + (regs.de.l>>3);
+      break;
+    case 0x95: // setae
+      regs.raf.A= 0x80 >> (regs.de.l & 0x7);
+      break;
+    case 0x27: // test $nn
+      {
+	u8_t d= fetch();
+	d&= regs.raf.A;
+	regs.raf.F &= ~(BIT_ALL);
+	SET_Z(d);
+	SET_S(d);
+	if (parity(d))
+	  regs.raf.F|= BIT_P;
+	break;
+      }
+      // core version 2.00.22+
+    case 0x28: // bsla de,b
+      regs.DE= regs.DE << (regs.bc.h&31);
+      break;
+    case 0x29: // bsra de,b
+      {
+	i16_t w= regs.DE;
+	w= w >> (regs.bc.h&31);
+	regs.DE= w;
+      }
+    case 0x2a: // bsrl de,b
+      regs.DE= regs.DE >> (regs.bc.h&31);
+      break;
+    case 0x2b: // bsrf de,b
+      regs.DE= ~(~regs.DE >> (regs.bc.h&31));
+      break;
+    case 0x2c: // brlc de,b
+      regs.DE= (regs.DE << (regs.bc.h&15)) | (regs.DE >> (16-(regs.bc.h&15)));
+      break;
+    case 0x98: // jp (c)
+      PC= (PC&0xc000) + (inputs->read(regs.BC)<<6);
+      break;
+    default: return false;
+    }
+  if (ret)
+    *ret= r;
+  return true;
+}
+
+int
+cl_z80::inst_ldix(t_mem code)
+{
+  // ldix, -, {if HL*!=A DE*:=HL*;} DE++; HL++; BC--
+  u8_t at_hl;
+  at_hl= this->get1(regs.HL);
+  vc.rd++;
+  if (at_hl == regs.raf.A)
+    {
+      this->store1(regs.DE, at_hl);
+      vc.wr++;
+    }
+  regs.DE++;
+  regs.HL++;
+  regs.BC--;
+  return resGO;
+}
+
+int
+cl_z80::inst_lddx(t_mem code)
+{
+  // lddx, -, {if HL*!=A DE*:=HL*;} DE++; HL--; BC--
+  u8_t at_hl;
+  at_hl= this->get1(regs.HL);
+  vc.rd++;
+  if (at_hl == regs.raf.A)
+    {
+      this->store1(regs.DE, at_hl);
+      vc.wr++;
+    }
+  regs.DE++;
+  regs.HL--;
+  regs.BC--;
+  return resGO;
+}
+
 void cl_z80::store1( u16_t addr, t_mem val ) {
   ram->write(addr, val);
 }
@@ -881,7 +1108,6 @@ cl_z80_cpu::init(void)
   uc->vars->add(v= new cl_var(cchars("sp_limit"), cfg, z80cpu_sp_limit,
 			      cfg_help(z80cpu_sp_limit)));
   v->init();
-
   return 0;
 }
 

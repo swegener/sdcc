@@ -48,6 +48,13 @@ int  cl_z80::inst_ed_(t_mem code)
 {
   unsigned short tw;
   u8_t     ubtmp;
+
+  if (type->type == CPU_Z80N)
+    {
+      int ret;
+      if (inst_z80n(code, &ret))
+	return ret;
+    }
   
   if (code < 0x40)
     {
@@ -78,12 +85,16 @@ int  cl_z80::inst_ed_(t_mem code)
   switch(code)
     {
 
-#if 0
     case 0x40: // IN B,(C)
+      regs.bc.h= inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l);
+      regs.raf.F&= ~(BIT_N|BIT_P); if (parity(regs.bc.h)) regs.raf.F|= BIT_P;
+      vc.rd++;
       return(resGO);
     case 0x41: // OUT (C),B
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, regs.bc.h);
+      vc.wr++;
       return(resGO);
-#endif
+
     case 0x42: // SBC HL,BC
       sbc_HL_wordreg(regs.BC);
       return(resGO);
@@ -106,19 +117,22 @@ int  cl_z80::inst_ed_(t_mem code)
       pop2(PC);
       vc.rd+= 2;
       return(resGO);
-#if 0
+
     case 0x46: // IM 0
       /* interrupt device puts opcode on data bus */
       return(resGO);
-#endif
+
     case 0x47: // LD IV,A
       regs.iv = regs.raf.A;
       return(resGO);
       
     case 0x48: // IN C,(C)
+      regs.bc.l= inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l);
+      regs.raf.F&= ~(BIT_N|BIT_P); if (parity(regs.bc.l)) regs.raf.F|= BIT_P;
       vc.rd++;
       return(resGO);
     case 0x49: // OUT (C),C
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, regs.bc.l);
       vc.wr++;
       return(resGO);
 
@@ -140,13 +154,16 @@ int  cl_z80::inst_ed_(t_mem code)
       vc.rd+= 2;
       return(resGO);
     case 0x4F: // LD R,A
-      /* Load "refresh" register(whats that?) */
+      regs.R= regs.raf.A;
       return(resGO);
 
     case 0x50: // IN D,(C)
+      regs.de.h= inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l);
+      regs.raf.F&= ~(BIT_N|BIT_P); if (parity(regs.de.h)) regs.raf.F|= BIT_P;
       vc.rd++;
       return(resGO);
     case 0x51: // OUT (C),D
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, regs.de.h);
       vc.wr++;
       return(resGO);
 
@@ -158,18 +175,25 @@ int  cl_z80::inst_ed_(t_mem code)
       store2(tw, regs.DE);
       vc.wr+= 2;
       return(resGO);
-#if 0
+
     case 0x56: // IM 1
       return(resGO);
-#endif
+
     case 0x57: // LD A,IV
       regs.raf.A = regs.iv;
+      SET_S(regs.iv);
+      SET_Z(regs.iv);
+      regs.raf.F&= ~(BIT_A|BIT_N|BIT_P);
+      if (IFF2) regs.raf.F|= BIT_P;
       return(resGO);
       
     case 0x58: // IN E,(C)
+      regs.de.l= inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l);
+      regs.raf.F&= ~(BIT_N|BIT_P); if (parity(regs.de.l)) regs.raf.F|= BIT_P;
       vc.rd++;
       return(resGO);
     case 0x59: // OUT (C),E
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, regs.de.l);
       vc.wr++;
       return(resGO);
 
@@ -186,18 +210,28 @@ int  cl_z80::inst_ed_(t_mem code)
         return(resINV_INST);
       regs.DE = (unsigned long)(regs.de.h) * (unsigned long)(regs.de.l);
       return(resGO);
-#if 0
+
     case 0x5E: // IM 2
       return(resGO);
+      
     case 0x5F: // LD A,R
+      regs.raf.A= regs.R;
+      SET_S(regs.R);
+      SET_Z(regs.R);
+      regs.raf.F&= ~(BIT_A|BIT_N|BIT_P);
+      if (IFF2) regs.raf.F|= BIT_P;
       return(resGO);
+
     case 0x60: // IN H,(C)
+      regs.hl.h= inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l);
+      regs.raf.F&= ~(BIT_N|BIT_P); if (parity(regs.hl.h)) regs.raf.F|= BIT_P;
       vc.rd++;
       return(resGO);
     case 0x61: // OUT (C),H
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, regs.hl.h);
       vc.wr++;
       return(resGO);
-#endif
+
     case 0x62: // SBC HL,HL
       sbc_HL_wordreg(regs.HL);
       return(resGO);
@@ -220,9 +254,12 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 
     case 0x68: // IN L,(C)
+      regs.hl.l= inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l);
+      regs.raf.F&= ~(BIT_N|BIT_P); if (parity(regs.hl.l)) regs.raf.F|= BIT_P;
       vc.rd++;
       return(resGO);
     case 0x69: // OUT (C),L
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, regs.hl.l);
       vc.wr++;
       return(resGO);
 
@@ -247,9 +284,14 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 
     case 0x70: // IN (C)  set flags only (TSTI)
-      vc.rd++;
-      return(resGO);
+      {
+	u8_t x= inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l);
+	regs.raf.F&= ~(BIT_N|BIT_P); if (parity(x)) regs.raf.F|= BIT_P;
+	vc.rd++;
+	return(resGO);
+      }
     case 0x71: //  OUT (C),0
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, 0);
       vc.wr++;
       return(resGO);
 
@@ -263,9 +305,12 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 
     case 0x78: // IN A,(C)
+      regs.raf.A= inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l);      
+      regs.raf.F&= ~(BIT_N|BIT_P); if (parity(regs.raf.A)) regs.raf.F|= BIT_P;
       vc.rd++;
       return(resGO);
     case 0x79: // OUT (C),A
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, regs.raf.A);
       vc.wr++;
       return(resGO);
 
@@ -283,6 +328,7 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resINV_INST);
       //regs.SP = (unsigned long)(regs.sp.h) * (unsigned long)(regs.sp.l);
       return(resGO);
+      
     case 0xA0: // LDI
       // BC - count, sourc=HL, dest=DE.  *DE++ = *HL++, --BC until zero
       regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
@@ -292,6 +338,7 @@ int  cl_z80::inst_ed_(t_mem code)
       --regs.BC;
       if (regs.BC != 0) regs.raf.F |= BIT_P;
       return(resGO);
+      
     case 0xA1: // CPI
       // compare acc with mem(HL), if ACC=0 set Z flag.  Incr HL, decr BC.
       {
@@ -305,8 +352,29 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 
     case 0xA2: // INI
+      this->store1(regs.HL, inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l));
+      vc.rd++;
+      vc.wr++;
+      if (type->type==CPU_Z80N)
+	regs.raf.F|= BIT_N;
+      else
+	regs.raf.F&= !(BIT_N);
+      regs.HL++;
+      regs.bc.h--;
+      SET_Z(regs.bc.h);
       return(resGO);
+      
     case 0xA3: // OUTI
+      regs.bc.h--;
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.h, this->get1(regs.HL));
+      vc.wr++;
+      vc.rd++;
+      SET_Z(regs.bc.h);
+      if (type->type==CPU_Z80N)
+	regs.raf.F|= BIT_N;
+      else
+	regs.raf.F&= !(BIT_N);
+      regs.HL++;
       return(resGO);
 
     case 0xA8: // LDD
@@ -335,8 +403,28 @@ int  cl_z80::inst_ed_(t_mem code)
       return(resGO);
 
     case 0xAA: // IND
+      this->store1(regs.HL, inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l));
+      vc.rd++;
+      vc.wr++;
+      if (type->type==CPU_Z80N)
+	regs.raf.F|= BIT_N;
+      else
+	regs.raf.F&= !(BIT_N);
+      regs.HL--;
+      regs.bc.h--;
+      SET_Z(regs.bc.h);
       return(resGO);
     case 0xAB: // OUTD
+      regs.bc.h--;
+      outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, this->get1(regs.HL));
+      vc.rd++;
+      vc.wr++;
+      if (type->type==CPU_Z80N)
+	regs.raf.F|= BIT_N;
+      else
+	regs.raf.F&= !(BIT_N);
+      regs.HL--;
+      SET_Z(regs.bc.h);
       return(resGO);
 
     case 0xB0: // LDIR
@@ -374,12 +462,38 @@ int  cl_z80::inst_ed_(t_mem code)
         regs.raf.F |= BIT_P;
 
       return(resGO);
-#if 0
+
     case 0xB2: // INIR
+      do {
+	this->store1(regs.HL, inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l));
+	vc.rd++;
+	vc.wr++;
+	if (type->type==CPU_Z80N)
+	  regs.raf.F|= BIT_N;
+	else
+	  regs.raf.F&= !(BIT_N);
+	regs.HL++;
+	regs.bc.h--;
+	SET_Z(regs.bc.h);
+      }
+      while (regs.BC);
       return(resGO);
     case 0xB3: // OTIR
+      do {
+	regs.bc.h--;
+	outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.h, this->get1(regs.HL));
+	vc.wr++;
+	vc.rd++;
+	SET_Z(regs.bc.h);
+	if (type->type==CPU_Z80N)
+	  regs.raf.F|= BIT_N;
+	else
+	  regs.raf.F&= !(BIT_N);
+	regs.HL++;
+      }
+      while (regs.BC);
       return(resGO);
-#endif
+
     case 0xB8: // LDDR
       // BC - count, source=HL, dest=DE.  *DE-- = *HL--, --BC until zero
       regs.raf.F &= ~(BIT_P | BIT_N | BIT_A);  /* clear these */
@@ -405,12 +519,37 @@ int  cl_z80::inst_ed_(t_mem code)
 	vc.rd++;
       } while (regs.BC != 0);
       return(resGO);
-#if 0
+
     case 0xBA: // INDR
+      do {
+	this->store1(regs.HL, inputs->read((type->type==CPU_Z80N)?regs.BC:regs.bc.l));
+	vc.rd++;
+	vc.wr++;
+	if (type->type==CPU_Z80N)
+	  regs.raf.F|= BIT_N;
+	else
+	  regs.raf.F&= !(BIT_N);
+	regs.HL--;
+	regs.bc.h--;
+	SET_Z(regs.bc.h);
+      }
+      while (regs.BC);
       return(resGO);
     case 0xBB: // OTDR
+      do {
+	regs.bc.h--;
+	outputs->write((type->type==CPU_Z80N)?regs.BC:regs.bc.l, this->get1(regs.HL));
+	vc.rd++;
+	vc.wr++;
+	if (type->type==CPU_Z80N)
+	  regs.raf.F|= BIT_N;
+	else
+	  regs.raf.F&= !(BIT_N);
+	regs.HL--;
+	SET_Z(regs.bc.h);
+      }
+      while (regs.BC);
       return(resGO);
-#endif
 
     default:
       return(resINV_INST);

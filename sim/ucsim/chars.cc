@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <ctype.h>
 
 #include "charscl.h"
 
@@ -160,6 +161,33 @@ chars::token(chars delims)
     }
   // not found more
   return c;
+}
+
+
+void
+chars::ltrim(void)
+{
+  char *p= chars_string;
+  if (!p)
+    return;
+  while (*p && isspace(*p))
+    p++;
+  allocate_string(p);
+}
+
+void
+chars::rtrim(void)
+{
+  char *p= chars_string;
+  if (!p)
+    return;
+  if (*p == 0)
+    return;
+  p= p+len()-1;
+  while ((p!=chars_string) && isspace(*p))
+    p--;
+  if (isspace(*p))
+    *p= 0;
 }
 
 
@@ -312,6 +340,15 @@ chars::operator=(char *s)
   allocate_string(s);
   return(*this);
 }
+
+/*
+chars &
+chars::operator=(const char *s)
+{
+  allocate_string((char*)s);
+  return(*this);
+}
+*/
 
 chars &
 chars::operator=(const chars &cs)

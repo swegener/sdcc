@@ -14,7 +14,8 @@ enable_hc08_port    = @enable_hc08_port@
 enable_s08_port     = @enable_s08_port@
 enable_stm8_port    = @enable_stm8_port@
 enable_st7_port     = @enable_st7_port@
-enable_pdk_port    =  @enable_pdk_port@
+enable_pdk_port     = @enable_pdk_port@
+enable_p1516_port   = @enable_p1516_port@
 
 ifeq ($(enable_mcs51_port),yes)
 S51		= s51.src
@@ -94,10 +95,16 @@ else
 PDKD   =
 endif
 
+ifeq ($(enable_p1516_port),yes)
+P1516      	= p1516.src
+else
+P1516      =
+endif
+
 PKGS		= $(S51) $(S390) \
 		  $(SAVR) $(SZ80) $(SZ180) $(SGBZ80) $(SR2K) $(SR3KA) \
 		  $(TLCS) \
-		  $(SHC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) doc
+		  $(SHC08) $(SS08) $(XA) $(STM8) $(ST7) $(PDK) $(P1516) doc
 
 PKGS_ALL	= cmd.src sim.src gui.src s51.src avr.src z80.src tlcs.src xa.src \
-		  hc08.src stm8.src st7.src pdk.src doc
+		  hc08.src stm8.src st7.src pdk.src p1516.src doc

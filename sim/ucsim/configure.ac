@@ -142,6 +142,12 @@ if test $enable_st7_port  != "no"; then
     enable_st7_port="yes"
 fi,
 enable_st7_port="no")
+AC_ARG_ENABLE(p1516-port,
+[  --enable-p1516-port     compile simulator for p1516],
+if test $enable_p1516_port  != "no"; then
+    enable_p1516_port="yes"
+fi,
+enable_p1516_port="yes")
 AC_ARG_ENABLE(serio,
 [  --enable-serio          compile serio GUI tool (needs curses)],
 if test $enable_serio != "no"; then
@@ -165,6 +171,7 @@ AC_SUBST(enable_xa_port)
 AC_SUBST(enable_stm8_port)
 AC_SUBST(enable_st7_port)
 AC_SUBST(enable_pdk_port)
+AC_SUBST(enable_p1516_port)
 AC_SUBST(enable_serio)
 
 AC_ARG_ENABLE(statistic,
@@ -714,6 +721,7 @@ xa.src/Makefile
 stm8.src/Makefile
 pdk.src/Makefile
 st7.src/Makefile
+p1516.src/Makefile
 gui.src/Makefile
 gui.src/serio.src/Makefile
 doc/Makefile

@@ -88,8 +88,8 @@ cl_io::close(void)
   //file_f= NULL;
   file_id= -1;
   own= false;
-  file_name= 0;
-  file_mode= 0;
+  file_name= "";
+  file_mode= "";
 
   changed();
   return i;

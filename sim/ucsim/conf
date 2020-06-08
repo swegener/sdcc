@@ -55,6 +55,7 @@ case $TARGET in
 	    --enable-xa-port \
 	    --enable-stm8-port \
 	    --enable-st7-port \
+	    --enable-p15160port \
 	    "$@"
 	#--enable-ucsim
 	;;
@@ -79,6 +80,7 @@ case $TARGET in
 	    --enable-xa-port \
 	    --enable-stm8-port \
 	    --enable-st7-port \
+	    --enable-p1516-port \
 	    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;
@@ -97,6 +99,7 @@ case $TARGET in
 	    --enable-xa-port \
 	    --enable-stm8-port \
 	    --enable-st7-port \
+	    --enable-p1516-port \
 	    $HOST_OPT "$@"
 	#--enable-ucsim
 	;;

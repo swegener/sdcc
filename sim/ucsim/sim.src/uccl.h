@@ -241,7 +241,8 @@ public:
   virtual int init(void);
   virtual char *id_string(void);
   virtual void reset(void);
-
+  virtual void set_PC(t_addr addr) { PC= addr; }
+  
   // making objects
   virtual void make_memories(void);
   virtual void make_variables(void);
@@ -265,6 +266,7 @@ public:
   virtual long read_hex_file(cl_console_base *con);
   virtual long read_hex_file(cl_f *f);
   virtual long read_omf_file(cl_f *f);
+  virtual long read_asc_file(cl_f *f);
   virtual long read_cdb_file(cl_f *f);
   virtual cl_f *find_loadable_file(chars nam);
   virtual long read_file(chars nam, class cl_console_base *con);

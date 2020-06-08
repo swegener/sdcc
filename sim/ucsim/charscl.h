@@ -59,6 +59,9 @@ public:
   virtual void start_parse(void) { start_parse(0); }
   virtual void start_parse(int at) { pars_pos= at; }
   virtual chars token(chars delims);
+  virtual void ltrim(void);
+  virtual void rtrim(void);
+  virtual void trim() { ltrim(); rtrim(); }
   // search
   bool starts_with(char *x);
   bool starts_with(const char *x);
@@ -71,6 +74,7 @@ public:
   operator char*(void) const { return(chars_string); };
   // Assignment
   chars &operator=(char *s);
+  //chars &operator=(const char *s);
   chars &operator=(const chars &cs);
   // Arithmetic
   chars operator+(char c);
@@ -78,6 +82,7 @@ public:
   chars operator+(const chars &cs);
   chars &operator+=(char c) { return(append(c)); }
   chars &operator+=(char *s) { return(append(s)); }
+  chars &operator+=(const char *s) { return(append((char*)s)); }
   chars &operator+=(const chars &cs) { return(append((char*)cs)); }
   // Boolean
   bool equal(char *);

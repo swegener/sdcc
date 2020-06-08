@@ -2380,7 +2380,7 @@ glue (void)
   if (port->assembler.externGlobal)
     printExterns (asmFile);
 
-  if ((mcs51_like) || (TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_Z180 || TARGET_IS_RABBIT || TARGET_IS_EZ80_Z80) || TARGET_PDK_LIKE)  /*.p.t.20030924 need to output SFR table for Z80 as well */
+  if ((mcs51_like) || (TARGET_IS_Z80 || TARGET_IS_GBZ80 || TARGET_IS_Z180 || TARGET_IS_RABBIT || TARGET_IS_EZ80_Z80 || TARGET_IS_Z80N) || TARGET_PDK_LIKE)  /*.p.t.20030924 need to output SFR table for Z80 as well */
     {
       /* copy the sfr segment */
       fprintf (asmFile, "%s", iComments2);

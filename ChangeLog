@@ -4,6 +4,10 @@
 	  support/regression/Makefile.in,
 	  support/regression/fwk/include/testfwk.h:
 	  z80n regression testing infrastructure.
+	* device/include/stdatomic.h,
+	  device/lib/atomic_flag_clear.c,
+	  device/lib/z80n/Makefile.in:
+	  atomic_flag for z80n.
 
 2020-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -4555,7 +4555,7 @@ genIpush (const iCode *ic)
          }
        else if (IS_Z80N && IC_LEFT (ic)->aop->type == AOP_LIT)
          {
-           emit2 ("push #%s", byteOfVal (IC_LEFT (ic)->aop->aopu.aop_lit, size - 1) << 8);
+           emit2 ("push !immedword", byteOfVal (IC_LEFT (ic)->aop->aopu.aop_lit, size - 1) << 8);
            emit2 ("inc sp");
            regalloc_dry_run_cost += 5;
            d = 1;

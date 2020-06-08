@@ -10,6 +10,8 @@
 	  atomic_flag for z80n.
 	* src/SDCCglue.c:
 	  Fix __sfr handling for z80n.
+	* src/z80/gen.c:
+	  Fix z80n immediate push.
 
 2020-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

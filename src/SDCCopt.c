@@ -2202,6 +2202,16 @@ optimizeOpWidth (eBBlock ** ebbs, int count)
               iCode *mul_candidate = 0;
               uic = hTabItemWithKey (iCodehTab, bit);
 
+              if (!uic)
+                {
+                  /* This iCode has been deleted but is still        */
+                  /* referenced. This shouldn't happen if everything */
+                  /* else is managing OP_USES properly, but better   */
+                  /* to ignore the problem than crash. */
+                  //printf ("%s used in iCode %d, but iCode missing\n",  OP_SYMBOL (IC_LEFT (ic))->name, bit);
+                  continue;
+                }
+
               if(uic->op == '+' && IS_OP_LITERAL (IC_RIGHT (uic)) && operandLitValue (IC_RIGHT (uic)) == 1 && isOperandEqual (IC_LEFT (uic), IC_LEFT (ic)))
                 {
                   inc = uic;

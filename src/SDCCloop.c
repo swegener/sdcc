@@ -1009,7 +1009,7 @@ basicInduction (region * loopReg, ebbIndex * ebbi)
           /* Only consider variables with integral type. */
           /* (2004/12/06 - EEP - ds390 fails regression tests unless */
           /* pointers are also considered for induction (due to some */
-          /* register alloctaion bugs). Remove !IS_PTR clause when */
+          /* register allocation bugs). Remove !IS_PTR clause when */
           /* that gets fixed) */
           optype = operandType (IC_RIGHT (ic));
           if (!IS_INTEGRAL (optype) && !IS_PTR (optype))
@@ -1215,6 +1215,7 @@ loopInduction (region * loopReg, ebbIndex * ebbi)
           ic->op = '=';
           IC_LEFT (ic) = NULL;
           IC_RIGHT (ic) = IC_RESULT (ic);
+          bitVectUnSetBit (OP_USES (aSym), ic->key);
 
           /* Insert an update of the induction variable just before */
           /* the update of the basic induction variable. */

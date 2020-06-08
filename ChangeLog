@@ -1,3 +1,9 @@
+2020-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCopt.c (optimizeOpWidth),
+	  src/SDCCloop.c (loopInduction): Fix bug #3027
+	* support/regression/tests/bug-3027: Add test
+
 2020-06-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,

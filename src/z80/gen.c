@@ -4494,12 +4494,14 @@ genIpush (const iCode *ic)
             regalloc_dry_run_cost ++; 
             d = 2;
          }
+#if 0 // Bug #3032
        else if (size >= 2 && IS_Z80N && IC_LEFT (ic)->aop->type == AOP_LIT) // Same size, but slower (21 vs 23 cycles) than going through a register pair other than iy. Only worth it under high register pressure.
          {
            emit2 ("push #%s", aopGetLitWordLong (IC_LEFT (ic)->aop, 0, false));
            regalloc_dry_run_cost += 4;
            d = 2;
          }
+#endif
        else if (size >= 2 && !IS_GB)
          {
            emit2 ("push hl");
@@ -4553,6 +4555,7 @@ genIpush (const iCode *ic)
            regalloc_dry_run_cost += 2;
            d = 1;
          }
+#if 0// Bug #3032
        else if (IS_Z80N && IC_LEFT (ic)->aop->type == AOP_LIT)
          {
            emit2 ("push !immedword", byteOfVal (IC_LEFT (ic)->aop->aopu.aop_lit, size - 1) << 8);
@@ -4560,6 +4563,7 @@ genIpush (const iCode *ic)
            regalloc_dry_run_cost += 5;
            d = 1;
          }
+#endif
        else if (h_free)
          {
            cheapMove (ASMOP_H, 0, IC_LEFT (ic)->aop, size - 1, false);

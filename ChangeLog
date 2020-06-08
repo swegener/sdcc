@@ -1,5 +1,10 @@
 2020-06-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Disable use of z80n push nn until bug #3032 is fixed.
+	  
+2020-06-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* support/regression/ports/ucz80n,
 	  support/regression/Makefile.in,
 	  support/regression/fwk/include/testfwk.h:

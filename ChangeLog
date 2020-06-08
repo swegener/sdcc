@@ -11,7 +11,7 @@
 	* src/SDCCglue.c:
 	  Fix __sfr handling for z80n.
 	* src/z80/gen.c:
-	  Fix z80n immediate push.
+	  Fix z80n immediate push, use pop / push for z80n like for z80.
 
 2020-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

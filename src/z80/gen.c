@@ -3688,25 +3688,25 @@ adjustStack (int n, bool af_free, bool bc_free, bool hl_free, bool iy_free)
           cost (2, IS_GB ? 16 : 4);
           n -= d;
         }
-      else if (n >= 2 && af_free && (IS_Z80 || optimize.codeSize))
+      else if (n >= 2 && af_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("pop af");
           cost2 (1, 10, 9, 7, 12, 10, 3);
           n -= 2;
         }
-      else if (n <= -2 && (IS_Z80 || optimize.codeSize))
+      else if (n <= -2 && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("push af");
           cost2 (1, 10, 11, 7, 12, 10, 3);
           n += 2;
         }
-      else if (n >= 2 && bc_free && (IS_Z80 || optimize.codeSize))
+      else if (n >= 2 && bc_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("pop bc");
           cost2 (1, 10, 9, 7, 12, 10, 3);
           n -= 2;
         }
-      else if (n >= 2 && hl_free && (IS_Z80 || optimize.codeSize))
+      else if (n >= 2 && hl_free && ((IS_Z80 || IS_Z80N) || optimize.codeSize))
         {
           emit2 ("pop hl");
           cost2 (1, 10, 9, 7, 12, 10, 3);

@@ -37,7 +37,6 @@
 	.org	0x08
 	ei
 	reti
-	ei
 	.org	0x10
 	ei
 	reti

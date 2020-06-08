@@ -2,6 +2,12 @@
 
 	* src/z80/gen.c:
 	  Disable use of z80n push nn until bug #3032 is fixed.
+	* device/lib/ez80_z80/README,
+	  device/lib/ez80_z80/crt0.s,
+	  device/lib/ez80_z80/setjmp.s,
+	  device/lib/z180/crt0.s,
+	  device/lib/z80/crt0.s:
+	  eZ80 setjmp/longjmp improvement, patch by b-s-a.
 	  
 2020-06-08 Philipp Klaus Krause <pkk AT spth.de>
 

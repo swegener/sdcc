@@ -25,6 +25,7 @@
 ;  not however invalidate any other reasons why the executable file
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
+	.ez80
 
 	.area   _CODE
 
@@ -37,22 +38,19 @@ ___setjmp:
 	push	hl
 
 	; Store return address.
-	ld	0(iy), l
-	ld	1(iy), h
+	ld	0(iy), hl
 
 	; Store stack pointer.
 	xor	a, a
 	ld	l, a
 	ld	h, a
 	add	hl, sp
-	ld	2(iy), l
-	ld	3(iy), h
+	ld	2(iy), hl
 
 	; Store frame pointer.
 	push	ix
 	pop	hl
-	ld	4(iy), l
-	ld	5(iy), h
+	ld	4(iy), hl
 
 	; Return 0.
 	ld	l, a
@@ -74,14 +72,12 @@ _longjmp:
 jump:
 
 	; Restore frame pointer.
-	ld	l, 4(iy)
-	ld	h, 5(iy)
+	ld	hl, 4(iy)
 	push	hl
 	pop	ix
 
 	; Adjust stack pointer.
-	ld	l, 2(iy)
-	ld	h, 3(iy)
+	ld	hl, 2(iy)
 	ld	sp, hl
 	pop	hl
 
@@ -89,7 +85,6 @@ jump:
 	ex	de, hl
 
 	; Jump.
-	ld	c, 0(iy)
-	ld	b, 1(iy)
+	ld	bc, 0(iy)
 	push	bc
 	ret

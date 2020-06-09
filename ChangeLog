@@ -1,3 +1,8 @@
+2020-06-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCmain.c:
+	  Fix bug #3033.
+
 2020-06-08 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCloop.c (basicInduction): Fix bug #3022

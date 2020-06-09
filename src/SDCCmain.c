@@ -164,7 +164,7 @@ static const OPTION optionsTable[] = {
   {'v', OPTION_VERSION, NULL, "Display sdcc's version"},
   {0,   "--verbose", &options.verbose, "Trace calls to the preprocessor, assembler, and linker"},
   {'V', NULL, &options.verboseExec, "Execute verbosely. Show sub commands as they are run"},
-  {'d', NULL, NULL, "Output list of mcaro definitions in effect. Use with -E"},
+  {'d', NULL, NULL, "Output list of macro definitions in effect. Use with -E"},
   {'D', NULL, NULL, "Define macro as in -Dmacro"},
   {'I', NULL, NULL, "Add to the include (*.h) path, as in -Ipath"},
   {'A', NULL, NULL, NULL},

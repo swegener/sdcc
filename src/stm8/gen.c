@@ -6674,6 +6674,8 @@ genRightShiftLiteral (operand *left, operand *right, operand *result, const iCod
 
   aopOp (left, ic);
   aopOp (result, ic);
+  
+  wassert (shCount >= 0);
 
   if (shCount > (size * 8))
     shCount = size * 8;

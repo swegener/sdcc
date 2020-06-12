@@ -3468,6 +3468,8 @@ genRightShift (const iCode *ic)
   if (right->aop->type == AOP_LIT)
     {
       int shCount = ulFromVal (right->aop->aopu.aop_lit);
+      
+      wassert (shCount >= 0);
 
       if (SPEC_USIGN (getSpec (operandType (left))))
         {

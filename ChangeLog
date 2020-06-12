@@ -1,3 +1,14 @@
+2020-06-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCast.c,
+	  src/SDCCerr.c,
+	  src/SDCCerr.h,
+	  src/pdk/gen.c,
+	  src/stm8/gen.c,
+	  support/regression/tests/bug-3043.c,
+	  support/valdiag/tests/bug-3043.c:
+	  Fix bug #3043.
+
 2020-06-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCmain.c:

@@ -285,6 +285,7 @@ enum {
   E_ENUM_COMMA_C99              = 256, /* trailing comma after enumerator list requires ISO C99 or later */
   E_OUTPUT_FILE_OPEN_ERR        = 257, /* Failed to open output file for writing (with error message) */
   E_INPUT_FILE_OPEN_ERR         = 258, /* Failed to open input file for readin (with error message) */
+  W_SHIFT_NEGATIVE              = 259, /* shift by negative amount */
   
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

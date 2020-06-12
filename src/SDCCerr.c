@@ -579,6 +579,8 @@ struct
      "Failed to open output file '%s' (%s)", 0 },
   { E_INPUT_FILE_OPEN_ERR, ERROR_LEVEL_ERROR,
      "Failed to open input file '%s' (%s)", 0 },
+  { W_SHIFT_NEGATIVE, ERROR_LEVEL_WARNING,
+     "%s shift by negative amount", 0 },
 };
 
 /* -------------------------------------------------------------------------------

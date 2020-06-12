@@ -4654,9 +4654,19 @@ decorateType (ast *tree, RESULT_TYPE resultType)
             SPEC_SCLS (TTYPE (tree)) &= ~S_LITERAL;
         }
 
+      if (IS_LITERAL (RTYPE (tree)) && floatFromVal (valFromType (RETYPE (tree))) < 0)
+        {
+          werrorfl (tree->filename, tree->lineno, W_SHIFT_NEGATIVE, (tree->opval.op == LEFT_OP ? "left" : "right"));
+          /* Change shift op to comma op and replace the right operand with 0. */
+          /* This preserves the left operand in case there were side-effects. */
+          tree->opval.op = ',';
+          tree->right->opval.val = constVal ("0");
+          TETYPE (tree) = TTYPE (tree) = tree->right->opval.val->type;
+          return tree;
+        }
       /* if only the right side is a literal & we are
          shifting more than size of the left operand then zero */
-      if (IS_LITERAL (RTYPE (tree)) &&
+      else if (IS_LITERAL (RTYPE (tree)) &&
           ((TYPE_TARGET_ULONG) ulFromVal (valFromType (RETYPE (tree)))) >= (getSize (TETYPE (tree)) * 8))
         {
           if (tree->opval.op == LEFT_OP || (tree->opval.op == RIGHT_OP && SPEC_USIGN (LETYPE (tree))))

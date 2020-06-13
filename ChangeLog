@@ -1,3 +1,8 @@
+2020-06-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c:
+	  isPort: Implement RFE #679 via patch #372 by Basil Hussain.
+
 2020-06-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCast.c,

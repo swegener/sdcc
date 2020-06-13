@@ -1503,6 +1503,37 @@ FBYNAME (inSequence)
   return TRUE;
 }
 
+/*-----------------------------------------------------------------*/
+/* isPort - return true if port name matches one of args           */
+/*-----------------------------------------------------------------*/
+FBYNAME (isPort)
+{
+  const char *name;
+  bool ret = false;
+
+  set *operands = setFromConditionArgs(cmdLine, vars);
+
+  if(!operands) {
+    fprintf(stderr,
+      "*** internal error: isPort peephole restriction"
+      " malformed: %s\n", cmdLine);
+    return false;
+  }
+
+  while(name = setFirstItem(operands)) {
+    deleteSetItem(&operands, (void *)name);
+
+    if(strcmp(port->target, name) == 0) {
+      ret = true;
+      break;
+    }
+  }
+
+  deleteSet(&operands);
+
+  return ret;
+}
+
 static const struct ftab
 {
   char *fname;
@@ -1584,6 +1615,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "symmParmStack", symmParmStack
+  },
+  {
+    "isPort", isPort
   },
 };
 

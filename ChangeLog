@@ -1,3 +1,9 @@
+2020-06-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCClrange.c,
+	  src/SDCCopt.c: Fix bug #3045 and #3046
+	* src/ds390/ralloc.c: Don't assume operand is symbol
+
 2020-06-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c:

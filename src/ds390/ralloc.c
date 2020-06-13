@@ -2991,6 +2991,9 @@ packForPush (iCode * ic, eBBlock ** ebpp, int blockno)
 
   if (IS_OP_VOLATILE (IC_RIGHT (dic)))
     return;
+    
+  if (!IS_SYMOP (IC_RIGHT (dic)))
+    return;
 
   if ((IS_SYMOP (IC_RIGHT (dic)) && OP_SYMBOL (IC_RIGHT (dic))->addrtaken) || isOperandGlobal (IC_RIGHT (dic)))
     disallowHiddenAssignment = 1;

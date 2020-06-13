@@ -442,11 +442,13 @@ findPrevUseSym  (eBBlock *ebp, iCode *ic, symbol * sym)
 /*                  - fix the life range, if the symbol is used in  */
 /*                    a loop                                        */
 /*------------------------------------------------------------------*/
-static void
+static int
 findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
              eBBlock ** ebbs, int count,
              bool emitWarnings)
 {
+  int change=0;
+
   unvisitBlocks (ebbs, count);
 
   if (op->isaddr)
@@ -463,10 +465,77 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
             {
               if (OP_SYMBOL (op)->prereqv)
                 {
+                  iCode *newic, *ip;
+                  value *val;
+                  bitVect * dom = NULL;
+                  bitVect * used;
+                  int i, blocknum;
                   werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
                             OP_SYMBOL (op)->prereqv->name);
-                  OP_SYMBOL (op)->prereqv->reqv = NULL;
-                  OP_SYMBOL (op)->prereqv->allocreq = 1;
+
+                  /* iTemps must have a valid initial value, otherwise */
+                  /* downstream algorithms will have problems. If      */
+                  /* there's a problem with the user program such that */
+                  /* something was left undefined, add an initializer  */
+                  /* to the last common dominator before defs/uses.    */
+                  /* First, find the common dominators of all defs/uses */
+                  unvisitBlocks (ebbs, count);
+                  used = newBitVect (count);
+                  for (i=0; i<iCodeKey; i++)
+                    {
+                      if (bitVectBitValue (OP_USES (op), i) ||
+                          bitVectBitValue (OP_DEFS (op), i))
+                        {
+                          bitVect * blockdomVect;
+                          iCode * usedic;
+                          usedic = hTabItemWithKey (iCodehTab, i);
+                          if (!usedic)
+                            continue;
+                          if (ebbs[usedic->eBBlockNum]->visited)
+                            continue;
+                          ebbs[usedic->eBBlockNum]->visited = 1;
+                          if (bitVectBitValue (OP_USES (op), i))
+                            used = bitVectSetBit (used, usedic->eBBlockNum);
+                          blockdomVect = ebbs[usedic->eBBlockNum]->domVect;
+                          if (dom)
+                            dom = bitVectInplaceIntersect (dom, blockdomVect);
+                          else
+                            dom = bitVectCopy (blockdomVect);
+                        }
+                    }
+                  /* Find the common dominator with highest block num */
+                  blocknum = 0;
+                  for (i=0; i<dom->size; i++)
+                    if (bitVectBitValue (dom, i) && !ebbs[i]->partOfLoop)
+                      blocknum = i;
+                  /* If there was a use in this block, set the insertion */
+                  /* point near the beginning of the block, otherwise */
+                  /* near the end */
+                  if (bitVectBitValue (used, blocknum))
+                    {
+                      ip = ebbs[blocknum]->sch;
+                      while (ip && (ip->op == LABEL || ip->op == FUNCTION || ip->op == RECEIVE))
+                        ip = ip->next;
+                    }
+                  else
+                    ip = NULL;
+                  /* Finally, create initializer and insert it*/
+                  val = valCastLiteral (operandType (op), 0.0, 0);
+                  newic = newiCode ('=', NULL, operandFromValue (val));
+                  IC_RESULT (newic) = operandFromOperand (op);
+                  IC_RESULT (newic)->isaddr = 0;
+                  OP_DEFS (IC_RESULT (newic)) = OP_DEFS (op) = bitVectSetBit (OP_DEFS (op), newic->key);
+                  addiCodeToeBBlock (ebbs[blocknum], newic, ip);
+                  newic->eBBlockNum = blocknum;
+                  if (!ip && newic->prev)
+                    {
+                      newic->filename = newic->prev->filename;
+                      newic->lineno = newic->prev->lineno;
+                    }
+                  ebbs[blocknum]->defSet = bitVectSetBit (ebbs[blocknum]->defSet, newic->key);
+                  freeBitVect (used);
+                  freeBitVect (dom);
+                  change++;
                 }
             }
           else
@@ -483,6 +552,7 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
           markWholeLoop (ebp, op->key);
         }
     }
+  return change;
 }
 
 /*-----------------------------------------------------------------*/
@@ -525,12 +595,13 @@ rliveClear (eBBlock **ebbs, int count)
 /* to find use of unitialized AUTOSYMs (an ITEMP is an AUTOSYM).   */
 /* also, update funcUsesVolatile flag for current function         */
 /*-----------------------------------------------------------------*/
-static void
+static int
 rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 {
   int i, key;
   eBBlock *succ;
   bitVect *alive;
+  int change = 0;
 
   bool uses_volatile = false;
 
@@ -550,7 +621,7 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 
 	  if (SKIP_IC2(ic))
 	    continue;
-
+      if (ebbs[i]->noPath) continue;
 	  if (ic->op == JUMPTABLE && IS_SYMOP(IC_JTCOND(ic)))
 	    {
 	      incUsed (ic, IC_JTCOND(ic));
@@ -558,7 +629,7 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	      if (!IS_AUTOSYM(IC_JTCOND(ic)))
 	        continue;
 
-	      findPrevUse (ebbs[i], ic, IC_JTCOND(ic), ebbs, count, emitWarnings);
+	      change += findPrevUse (ebbs[i], ic, IC_JTCOND(ic), ebbs, count, emitWarnings);
               if (IS_ITEMP(IC_JTCOND(ic)))
                 {
                   unvisitBlocks(ebbs, count);
@@ -576,7 +647,7 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	      if (!IS_AUTOSYM(IC_COND(ic)))
 	        continue;
 
-	      findPrevUse (ebbs[i], ic, IC_COND(ic), ebbs, count, emitWarnings);
+	      change += findPrevUse (ebbs[i], ic, IC_COND(ic), ebbs, count, emitWarnings);
               if (IS_ITEMP(IC_COND(ic)))
                 {
                   unvisitBlocks (ebbs, count);
@@ -593,7 +664,7 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	      if (IS_AUTOSYM(IC_LEFT(ic)) &&
 	          ic->op != ADDRESS_OF)
 	        {
-	          findPrevUse (ebbs[i], ic, IC_LEFT(ic), ebbs, count, emitWarnings);
+	          change += findPrevUse (ebbs[i], ic, IC_LEFT(ic), ebbs, count, emitWarnings);
                   if (IS_ITEMP(IC_LEFT(ic)))
                     {
                       unvisitBlocks(ebbs, count);
@@ -622,7 +693,7 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	      incUsed (ic, IC_RIGHT(ic));
               if (IS_AUTOSYM(IC_RIGHT(ic)))
 	        {
-	          findPrevUse (ebbs[i], ic, IC_RIGHT(ic), ebbs, count, emitWarnings);
+	          change += findPrevUse (ebbs[i], ic, IC_RIGHT(ic), ebbs, count, emitWarnings);
                   if (IS_ITEMP(IC_RIGHT(ic)))
                     {
                       unvisitBlocks(ebbs, count);
@@ -639,7 +710,7 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 	    {
 	      if (POINTER_SET(ic))
 	        {
-	          findPrevUse (ebbs[i], ic, IC_RESULT(ic), ebbs, count, emitWarnings);
+	          change += findPrevUse (ebbs[i], ic, IC_RESULT(ic), ebbs, count, emitWarnings);
 		}
               if (IS_ITEMP(IC_RESULT(ic)))
                 {
@@ -689,6 +760,7 @@ rlivePoint (eBBlock ** ebbs, int count, bool emitWarnings)
 
   if(currFunc)
     currFunc->funcUsesVolatile = uses_volatile;
+  return change;
 }
 
 /*-----------------------------------------------------------------*/
@@ -856,6 +928,7 @@ adjustIChain (eBBlock ** ebbs, int count)
 void
 computeLiveRanges (eBBlock **ebbs, int count, bool emitWarnings)
 {
+  int change;
   /* first look through all blocks and adjust the
      sch and ech pointers */
   adjustIChain (ebbs, count);
@@ -863,17 +936,22 @@ computeLiveRanges (eBBlock **ebbs, int count, bool emitWarnings)
   /* sequence the code the live ranges are computed
      in terms of this sequence additionally the
      routine will also create a hashtable of instructions */
-  iCodeSeq = 0;
-  setToNull ((void *) &iCodehTab);
-  iCodehTab = newHashTable (iCodeKey);
-  hashiCodeKeys (ebbs, count);
-  setToNull ((void *) &iCodeSeqhTab);
-  iCodeSeqhTab = newHashTable (iCodeKey);
-  sequenceiCode (ebbs, count);
+  do
+    {
+      iCodeSeq = 0;
+      setToNull ((void *) &iCodehTab);
+      iCodehTab = newHashTable (iCodeKey);
+      hashiCodeKeys (ebbs, count);
+      setToNull ((void *) &iCodeSeqhTab);
+      iCodeSeqhTab = newHashTable (iCodeKey);
+      sequenceiCode (ebbs, count);
 
-  /* mark the ranges live for each point */
-  setToNull ((void *) &liveRanges);
-  rlivePoint (ebbs, count, emitWarnings);
+      /* mark the ranges live for each point */
+      setToNull ((void *) &liveRanges);
+      change = rlivePoint (ebbs, count, emitWarnings);
+      emitWarnings = FALSE;
+    }
+  while (change);
 
   /* mark the from & to live ranges for variables used */
   markLiveRanges (ebbs, count);

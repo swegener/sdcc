@@ -3239,7 +3239,7 @@ eBBlockFromiCode (iCode *ic)
   computeControlFlow (ebbi);
   loops = createLoopRegions (ebbi);
   computeDataFlow (ebbi);
-  computeLiveRanges (ebbi->bbOrder, ebbi->count, FALSE);
+  computeLiveRanges (ebbi->bbOrder, ebbi->count, TRUE);
   while (optimizeOpWidth (ebbi->bbOrder, ebbi->count))
     optimizeCastCast (ebbi->bbOrder, ebbi->count);
   adjustIChain (ebbi->bbOrder, ebbi->count);

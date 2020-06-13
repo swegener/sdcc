@@ -234,8 +234,6 @@ stm8_genExtraArea (FILE *of, bool hasMain)
 static void
 stm8_genInitStartup (FILE *of)
 {
-  fprintf (of, "__sdcc_gs_init_startup:\n");
-
   if (options.stack_loc >= 0)
     {
       fprintf (of, "\tldw\tx, #0x%04x\n", options.stack_loc);

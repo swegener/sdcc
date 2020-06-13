@@ -1,3 +1,9 @@
+2020-06-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c,
+	  src/stm8/main.c:
+	  Fix bug #2944.
+
 2020-06-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClrange.c,

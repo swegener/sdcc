@@ -109,10 +109,9 @@ pdk_genInitStartup (FILE *of)
     }
 
   fprintf (of, "\tcall\t__sdcc_external_startup\n");
-  fprintf (of, "\tgoto\t__sdcc_gs_init_startup\n");
+  fprintf (of, "\tgoto\ts_GSINIT\n");
 
   tfprintf (of, "\t!area\n", STATIC_NAME);
-  fprintf (of, "__sdcc_gs_init_startup:\n");
 
   /* Init static & global variables */
   fprintf (of, "__sdcc_init_data:\n");

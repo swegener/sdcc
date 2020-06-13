@@ -162,6 +162,14 @@ cl_hw::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
   return cell->get();
 }
 
+class cl_memory_cell *
+cl_hw::cfg_cell(t_addr addr)
+{
+  if (addr >= cfg_size())
+    return 0;
+  return cfg->get_cell(addr);
+}
+
 void
 cl_hw::cfg_set(t_addr addr, t_mem val)
 {

@@ -84,7 +84,8 @@ cl_app::init(int argc, char *argv[])
 {
   sigpipe_off();
   cl_base::init();
-  set_name(cchars("application"));
+  if (!have_real_name())
+    set_name(cchars("application"));
   mk_options();
   proc_arguments(argc, argv);
   class cl_cmdset *cmdset= new cl_cmdset();
@@ -133,6 +134,7 @@ cl_app::run(void)
 		  if ((l= sim->uc->read_file(fname, NULL)) >= 0)
 		    {
 		      ///*commander->all_printf*/printf("%ld words read from %s\n", l, fname);
+		      sim->uc->reset();
 		    }
 		}
 	    }
@@ -242,6 +244,7 @@ print_help(char *name)
      "  -o colors    List of color specification: what=colspec,...\n"
      "               where colspec is : separated list of color options\n"
      "               e.g.: prompt=b:white:black (bold white on black)\n"
+     "  -l           Use default (builtin) colors\n"
      "  -b           Black & white (non-color) console\n"
      "  -g           Go, start simulation\n"
      "  -G           Go, start simulation, quit on stop\n"
@@ -312,7 +315,7 @@ cl_app::proc_arguments(int argc, char *argv[])
       if ((strcmp(argv[i], "-help")==0) ||
 	  (strcmp(argv[i], "--help")==0))
 	{
-	  print_help(cchars("s51"));
+	  print_help((char*)get_name());
 	  exit(0);
 	}
     }
@@ -692,10 +695,12 @@ cl_app::proc_arguments(int argc, char *argv[])
 	set_option_s("color_ui_title", "magenta:bwhite");
 	set_option_s("color_ui_run", "black:green");
 	set_option_s("color_ui_stop", "white:red");
+	set_option_s("color_ui_bit0", "white:black");
+	set_option_s("color_ui_bit1", "bred:black");
 	set_option_s("color_debug", "magenta:bwhite");
 	break;
       case 'h':
-	print_help(cchars("s51"));
+	print_help((char*)get_name());
 	exit(0);
 	break;
       case 'H':
@@ -1108,6 +1113,16 @@ cl_app::mk_options(void)
 					      "Run state color on UI display"));
   o->init();
   o->set_value((char*)"black:green");
+  
+  options->new_option(o= new cl_string_option(this, "color_ui_bit0",
+					      "Bit 0 color on UI display"));
+  o->init();
+  o->set_value((char*)"white:black");
+  
+  options->new_option(o= new cl_string_option(this, "color_ui_bit1",
+					      "Bit 1 color on UI display"));
+  o->init();
+  o->set_value((char*)"bred:black");
   
   options->new_option(o= new cl_string_option(this, "color_ui_stop",
 					      "Stop state color on UI display"));

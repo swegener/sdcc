@@ -1021,12 +1021,15 @@ cl_z80::inst_rst(t_mem code)
   switch(code)
     {
     case 0xC7: // RST 0
-      push2(PC+2);
+      push2(PC);
       PC = 0x0;
       vc.wr+= 2;
       break;
     case 0xCF: // RST 8
-      //PC = 0x08;
+      push2(PC);
+      vc.wr+= 2;
+      PC = 0x08;
+      break;
       switch (regs.raf.A)
 	{
 	case 0:
@@ -1042,32 +1045,32 @@ cl_z80::inst_rst(t_mem code)
 	}
       break;
     case 0xD7: // RST 10H
-      push2(PC+2);
+      push2(PC);
       PC = 0x10;
       vc.wr+= 2;
       break;
     case 0xDF: // RST 18H
-      push2(PC+2);
+      push2(PC);
       PC = 0x18;
       vc.wr+= 2;
       break;
     case 0xE7: // RST 20H
-      push2(PC+2);
+      push2(PC);
       PC = 0x20;
       vc.wr+= 2;
       break;
     case 0xEF: // RST 28H
-      push2(PC+2);
+      push2(PC);
       PC = 0x28;
       vc.wr+= 2;
       break;
     case 0xF7: // RST 30H
-      push2(PC+2);
+      push2(PC);
       PC = 0x30;
       vc.wr+= 2;
       break;
     case 0xFF: // RST 38H
-      push2(PC+2);
+      push2(PC);
       PC = 0x38;
       vc.wr+= 2;
       break;

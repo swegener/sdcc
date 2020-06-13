@@ -49,7 +49,7 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= simp1516.o p1516.o glob.o
+OBJECTS_SHARED	= simp1516.o p1516.o glob.o port.o
 
 OBJECTS_EXE	= sp1516.o
 OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)

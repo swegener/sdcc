@@ -93,6 +93,7 @@ class cl_hw: public cl_guiobj
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual bool conf(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+  virtual class cl_memory_cell *cfg_cell(t_addr add);
   virtual void cfg_set(t_addr addr, t_mem val);
   virtual void cfg_write(t_addr addr, t_mem val);
   virtual t_mem cfg_get(t_addr addr);

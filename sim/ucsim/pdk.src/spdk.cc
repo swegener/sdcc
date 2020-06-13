@@ -42,6 +42,7 @@ main(int argc, char *argv[])
 
   cpus= cpus_pdk;
   application= new cl_app();
+  application->set_name("spdk");
   application->init(argc, argv);
   sim= new cl_simpdk(application);
   if (sim->init())

@@ -41,6 +41,7 @@ main(int argc, char *argv[])
   class cl_sim *sim;
 
   application= new cl_app();
+  application->set_name("sxa");
   application->init(argc, argv);
   sim= new cl_simxa(application);
   if (sim->init())

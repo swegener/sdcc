@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 
 #include "glob.h"
+#include "portcl.h"
 
 #include "p1516cl.h"
 
@@ -45,6 +46,7 @@ cl_p1516::init(void)
   F= 0;
   for (i=0; i<16; i++)
     R[i]= 0;
+  xtal= 10000000;
   return 0;
 }
 
@@ -69,17 +71,96 @@ cl_p1516::set_PC(t_addr addr)
 void
 cl_p1516::mk_hw_elements(void)
 {
-  //class cl_hw *h;
   cl_uc::mk_hw_elements();
-  //add_hw(h= new cl_port(this));
-  //h->init();
+  add_hw(pa= new cl_porto(this, 0xf000, "pa"));
+  pa->init();
+  add_hw(pb= new cl_porto(this, 0xf001, "pb"));
+  pb->init();
+  add_hw(pc= new cl_porto(this, 0xf002, "pc"));
+  pc->init();
+  add_hw(pd= new cl_porto(this, 0xf003, "pd"));
+  pd->init();
+
+  add_hw(pi= new cl_porti(this, 0xe000, "pi"));
+  pi->init();
+  add_hw(pj= new cl_porti(this, 0xd000, "pj"));
+  pj->init();
+
+  class cl_port_ui *u= new cl_port_ui(this, 0, "dport");
+  u->init();
+  add_hw(u);
+  class cl_port_ui *uo= new cl_port_ui(this, 0, "oports");
+  uo->init();
+  add_hw(uo);
+  class cl_port_ui *ui= new cl_port_ui(this, 0, "iports");
+  ui->init();
+  add_hw(ui);
+
+  class cl_port_data d;
+  d.init();
+  d.cell_dir= NULL;
+
+  d.set_name("PA");
+  d.cell_p = pa->dr;
+  d.cell_in= pa->dr;
+  d.keyset = NULL;
+  d.basx   = 1;
+  d.basy   = 4;
+  u->add_port(&d, 0);
+  uo->add_port(&d, 0);
+  
+  d.set_name("PB");
+  d.cell_p = pb->dr;
+  d.cell_in= pb->dr;
+  d.keyset = NULL;
+  d.basx   = 1;
+  d.basy   = 9;
+  u->add_port(&d, 1);
+  uo->add_port(&d, 1);
+
+  d.set_name("PC");
+  d.cell_p = pc->dr;
+  d.cell_in= pc->dr;
+  d.keyset = NULL;
+  d.basx   = 1;
+  d.basy   = 14;
+  uo->add_port(&d, 2);
+
+  d.set_name("PD");
+  d.cell_p = pd->dr;
+  d.cell_in= pd->dr;
+  d.keyset = NULL;
+  d.basx   = 1;
+  d.basy   = 19;
+  uo->add_port(&d, 3);
+
+  d.set_name("PI");
+  d.cell_p = pi->dr;
+  d.cell_in= pi->cfg_cell(port_pin);
+  d.keyset = chars("                qwertyui12345678");
+  d.basx   = 1;
+  d.basy   = 14;
+  u->add_port(&d, 2);
+  d.basy   = 4;
+  ui->add_port(&d, 0);
+
+  d.set_name("PJ");
+  d.cell_p = pj->dr;
+  d.cell_in= pj->cfg_cell(port_pin);
+  d.keyset = chars("                asdfghjkzxcvbnm,");
+  d.basx   = 1;
+  d.basy   = 20;
+  u->add_port(&d, 3);
+  d.basy   = 10;
+  ui->add_port(&d, 1);
 }
 
 void
 cl_p1516::make_memories(void)
 {
   class cl_address_space *as;
-
+  int i;
+  
   rom= as= new cl_address_space("rom"/*MEM_ROM_ID*/, 0, 0x10000, 32);
   as->init();
   address_spaces->add(as);
@@ -87,14 +168,31 @@ cl_p1516::make_memories(void)
   class cl_address_decoder *ad;
   class cl_memory_chip *chip;
 
-  chip= new cl_memory_chip("rom_chip", 0x10000, 32);
+  chip= new cl_memory_chip("rom_chip", 0x4000, 32);
   chip->init();
   memchips->add(chip);
   ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
-			     chip, 0, 0xffff, 0);
+			     chip, 0, 0x3fff, 0);
   ad->init();
   as->decoders->add(ad);
   ad->activate(0);
+
+  regs= new cl_address_space("regs", 0, 16, 32);
+  regs->init();
+  for (i= 0; i<16; i++)
+    {
+      RC[i]= regs->get_cell(i);
+      RC[i]->decode((t_mem*)&R[i]);
+    }
+  address_spaces->add(regs);
+
+  class cl_var *v;
+  for (i=0; i<16; i++)
+    {
+      v= new cl_var(chars("", "R%d", i), regs, i, chars("", "CPU register %d",i));
+      v->init();
+      vars->add(v);
+    }
 }
 
 
@@ -269,64 +367,64 @@ cl_p1516::inst_alu(t_mem code)
   switch (Op)
     {
     case 0: // ADD
-      R[d]= inst_ad(R[a], R[b], 0);
+      RC[d]->W(inst_ad(RC[a]->R(), RC[b]->R(), 0));
       break;
     case 1: // ADC
-      R[d]= inst_ad(R[a], R[b], (F&C)?1:0);
+      RC[d]->W(inst_ad(RC[a]->R(), RC[b]->R(), (F&C)?1:0));
       break;
     case 2: // SUB
-      R[d]= inst_ad(R[a], ~R[b], 1);
+      RC[d]->W(inst_ad(RC[a]->R(), ~(RC[b]->R()), 1));
       break;
     case 3: // SBB
-      R[d]= inst_ad(R[a], ~R[b], (F&C)?1:0);
+      RC[d]->W(inst_ad(RC[a]->R(), ~(RC[b]->R()), (F&C)?1:0));
       break;
 
     case 4: // INC
-      R[d]= R[a]+1;
+      RC[d]->W(RC[a]->R()+1);
       break;
     case 5: // DEC
-      R[d]= R[a]=1;
+      RC[d]->W(RC[a]->R()-1);
       break;
 
     case 6: // AND
-      R[d]= R[a] & R[b];
+      RC[d]->W(RC[a]->R() & RC[b]->R());
       SET_Z(R[d]);
       break;
     case 7: // OR
-      R[d]= R[a] | R[b];
+      RC[d]->W(RC[a]->R() | RC[b]->R());
       SET_Z(R[d]);
       break;
     case 8: // XOR
-      R[d]= R[a] ^ R[b];
+      RC[d]->W(RC[a]->R() ^ RC[b]->R());
       SET_Z(R[d]);
       break;
 
     case 9: // SHL
       SET_C(R[a] & 0x80000000);
-      R[d]= R[a] << 1;
+      RC[d]->W(RC[a]->R() << 1);
       SET_Z(R[d]);
       break;
     case 10: // SHR
       SET_C(R[a] & 1);
-      R[d]= R[a] >> 1;
+      RC[d]->W(RC[a]->R() >> 1);
       SET_Z(R[d]);
       break;
     case 16: // SHA
       SET_C(R[a] & 1);
-      R[d]= ((i32_t)(R[a])) >> 1;
+      RC[d]->W(((i32_t)(RC[a]->R())) >> 1);
       SET_Z(R[d]);
       break;
     case 11: // ROL
       c1= (F&C)?1:0;
       c2= (R[a] & 0x80000000)?1:0;
-      R[d]= (R[a]<<1) + c1;
+      RC[d]->W((RC[a]->R()<<1) + c1);
       SET_C(c2);
       SET_Z(R[d]);
       break;
     case 12: // ROR
       c1= (F&C)?1:0;
       c2= R[a] & 1;
-      R[d]= R[a] >> 1;
+      RC[d]->W(RC[a]->R() >> 1);
       if (c1)
 	R[d]|= 0x80000000;
       SET_C(c2);
@@ -334,13 +432,13 @@ cl_p1516::inst_alu(t_mem code)
       break;
 
     case 13: // MUL
-      R[d]= R[a] * R[b];
+      RC[d]->W(RC[a]->R() * RC[b]->R());
       SET_Z(R[d]);
       SET_S(R[d] & 0x80000000);
       break;
     case 19: // MUH
-      big= R[a] * R[b];
-      R[d]= big >> 32;
+      big= RC[a]->R() * RC[b]->R();
+      RC[d]->W(big >> 32);
       SET_Z(R[d]);
       SET_S(R[d] & 0x80000000);
       break;
@@ -355,7 +453,7 @@ cl_p1516::inst_alu(t_mem code)
       break;
       
     case 15: // CMP
-      inst_ad(R[a], ~R[b], 1);
+      inst_ad(RC[a]->R(), ~(RC[b]->R()), 1);
       break;
     }
   
@@ -399,6 +497,9 @@ cl_p1516::exec_inst(void)
   if (code & 0x08000000)
     {
       // CALL
+      t_addr data= (code & 0x07ffffff);
+      RC[14]->W(R[15]);
+      RC[15]->W(PC= data);
       return resGO;
     }
 

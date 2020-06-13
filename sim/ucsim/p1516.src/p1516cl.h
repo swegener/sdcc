@@ -49,6 +49,10 @@ class cl_p1516: public cl_uc
 public:
   u8_t F;
   u32_t R[16];
+  cl_memory_cell *RC[16];
+  cl_address_space *regs;
+  class cl_porto *pa, *pb, *pc, *pd;
+  class cl_porti *pi, *pj;
 public:
   class cl_address_space *rom;
  public:
@@ -60,7 +64,8 @@ public:
 
   virtual void mk_hw_elements(void);
   virtual void make_memories(void);
-
+  virtual int clock_per_cycle(void) { return 4; }
+  
   virtual struct dis_entry *dis_tbl(void);
   virtual char *disass(t_addr addr, const char *sep);
   virtual void print_regs(class cl_console_base *con);

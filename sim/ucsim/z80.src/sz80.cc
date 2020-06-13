@@ -42,6 +42,7 @@ main(int argc, char *argv[])
 
   cpus= cpus_z80;
   application= new cl_app();
+  application->set_name("sz80");
   application->init(argc, argv);
   sim= new cl_simz80(application);
   if (sim->init())

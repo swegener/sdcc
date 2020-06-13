@@ -43,6 +43,7 @@ main(int argc, char *argv[])
   class cl_sim *sim;
   
   application= new cl_app();
+  application->set_name("stlcs");
   application->init(argc, argv);
   sim= new cl_simtlcs(application);
   if (sim->init())

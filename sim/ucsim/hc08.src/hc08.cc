@@ -101,6 +101,7 @@ cl_hc08::reset(void)
   regs.P = 0x60;
   regs.VECTOR = 1;
 
+  PC= rom->get(0xfffe)*256 + rom->get(0xffff);
 }
 
 
@@ -614,8 +615,13 @@ cl_hc08::exec_inst(void)
                 case 0x9: return(inst_adc(code, true));
                 case 0xa: return(inst_ora(code, true));
                 case 0xb: return(inst_add(code, true));
-		case 0xc: return(resHALT); // not real instruction: regression test hack to exit simulation
-		case 0xd: putchar(regs.A); fflush(stdout); return(resGO); // not real instruction: regression test hack to output results
+	      case 0xc: return(resINV_INST);
+		return(resHALT); // not real instruction: regression test hack to exit simulation
+	      case 0xd:
+		return(resINV_INST);
+		putchar(regs.A);
+		fflush(stdout);
+		return(resGO); // not real instruction: regression test hack to output results
                 case 0xe: return(inst_ldx(code, true));
                 case 0xf: return(inst_stx(code, true));
                 default: return(resHALT);

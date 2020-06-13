@@ -138,15 +138,16 @@ cl_port_ui::handle_input(int c)
 	{
 	  if (pd[i].cell_p == NULL)
 	    continue;
+	  int w= pd[i].cell_p->get_width();
 	  
 	  if (pd[i].keyset != NULL)
 	    {
-	      int bit;
-	      for (bit= 0; pd[i].keyset[bit]; bit++)
-		if (pd[i].keyset[bit] == c)
+	      int bit, l= strlen(pd[i].keyset);
+	      for (bit= 0; (bit < l) && pd[i].keyset[bit]; bit++)
+		if ((pd[i].keyset[bit]!=' ') && (pd[i].keyset[bit] == c))
 		  {
 		    t_mem m= pd[i].cell_in->read();
-		    pd[i].cell_in->write(m ^ (1<<(7-bit)));
+		    pd[i].cell_in->write(m ^ (1<<((w-1)-bit)));
 		    pio->tu_go(1,1);
 		    return true;
 		  }
@@ -173,13 +174,16 @@ cl_port_ui::refresh_display(bool force)
   if (!io)
     return;
 
-  int i, m;
+  int i, w;
+  t_mem m;
   bool pc= false, ic= false;
+  chars fmt= chars();
   pio->tu_hide();
   for (i= 0; i < NUOF_PORT_UIS; i++)
     {
       if (pd[i].cell_p == NULL)
 	continue;
+      w= pd[i].cell_p->get_width();
       // name
       pio->tu_go(pd[i].basx, pd[i].basy);
       pio->dd_printf("\033[%dm", (act_port == i)?7:0);
@@ -203,7 +207,7 @@ cl_port_ui::refresh_display(bool force)
 	  // Out
 	  pd[i].cache_p= pd[i].cell_p->get();
 	  pio->tu_go(pd[i].basx+4, pd[i].basy+1);
-	  m= 0x80;
+	  m= 1 << (w-1);
 	  for ( ; m; m>>= 1)
 	    {
 	      char v= (pd[i].cache_p&m)?'*':'-';
@@ -214,8 +218,9 @@ cl_port_ui::refresh_display(bool force)
 		}
 	      pio->dd_printf("%c", v);		
 	    }
-	  pio->tu_go(pd[i].basx+4+8+1, pd[i].basy+1);
-	  pio->dd_printf("%02x", pd[i].cache_p);
+	  pio->tu_go(pd[i].basx+4+w+1, pd[i].basy+1);
+	  fmt.format("%%0%dx", w/4);
+	  pio->dd_printf(fmt, pd[i].cache_p);
 	  pc= true;
 	}
       if (force ||
@@ -225,11 +230,12 @@ cl_port_ui::refresh_display(bool force)
 	  // In
 	  pd[i].cache_in= pd[i].cell_in->get();
 	  pio->tu_go(pd[i].basx+4, pd[i].basy+3);
-	  m= 0x80;
+	  m= 1 << (w-1);
 	  for ( ; m; m>>= 1)
 	    pio->dd_printf("%c", (pd[i].cache_in&m)?'*':'-');
-	  pio->tu_go(pd[i].basx+4+8+1, pd[i].basy+3);
-	  pio->dd_printf("%02x", pd[i].cache_in);
+	  pio->tu_go(pd[i].basx+4+w+1, pd[i].basy+3);
+	  fmt.format("%%0%dx", w/4);
+	  pio->dd_printf(fmt, pd[i].cache_in);
 	  ic= true;
 	}
       if (force ||
@@ -237,23 +243,25 @@ cl_port_ui::refresh_display(bool force)
 			pd[i].cell_dir == NULL*/))
 	{
 	  // port value on "Bits" line
-	  int b, val, pval= pd[i].cache_in;
+	  int disp, b, val, pval= pd[i].cache_in;
 	  pio->tu_go(pd[i].basx+4, pd[i].basy+2);
-	  for (b= 7; b>=0; b--)
+	  for (b= w-1; b>=0; b--)
 	    {
 	      m= 1<<b;
 	      val= pd[i].cache_in & m;
 	      if (pd[i].cell_dir == NULL)
 		val&= (pd[i].cache_p & m);
 	      //if (val)
-		pio->dd_printf("\033[%dm", val?7:0);
+	      disp= b%8;
+	      pio->dd_printf("\033[%dm", val?7:0);
 		//else
 		//pio->dd_printf("\033[0m");
-	      pio->dd_printf("%d", b);
+	      pio->dd_printf("%d", disp);
 	    }
 	  if (!pd[i].cell_dir)
 	    pval&= pd[i].cache_p;
-	  pio->dd_printf("\033[0m %02x", pval);
+	  fmt.format("%%0%dx", w/4);
+	  pio->dd_printf(chars("\033[0m ")+fmt, pval);
 	}
     }
   pio->tu_show();

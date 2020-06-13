@@ -276,9 +276,11 @@ class cl_memory_cell: public cl_cell_data
   virtual void decode(t_mem *data_ptr, t_mem bit_mask);
   
   virtual t_mem read(void);
+  virtual t_mem R(void) { return read(); }
   virtual t_mem read(enum hw_cath skip);
   virtual t_mem get(void);
   virtual t_mem write(t_mem val);
+  virtual t_mem W(t_mem val) { return write(val); }
   virtual t_mem set(t_mem val);
   virtual t_mem download(t_mem val);
   

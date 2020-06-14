@@ -3889,6 +3889,8 @@ geniCodeJumpTable (operand * cond, value * caseVals, ast * tree)
   max = (int) ulFromVal (vch);
   maxVal = vch;
 
+  if (max-min < 0)
+    return 0;
   /* Exit if the range is too large to handle with a jump table. */
   if (1 + max - min > port->jumptableCost.maxCount)
     return 0;

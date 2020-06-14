@@ -1,3 +1,7 @@
+2020-06-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCicode.c (geniCodeJumpTable): Fix bug #3034
+
 2020-06-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCClrange.c: Fix rest of bug #3045

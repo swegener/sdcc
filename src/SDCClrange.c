@@ -542,6 +542,8 @@ findPrevUse (eBBlock *ebp, iCode *ic, operand *op,
             {
               werrorfl (ic->filename, ic->lineno, W_LOCAL_NOINIT,
                         OP_SYMBOL (op)->name);
+              OP_SYMBOL (op)->allocreq=1;
+              OP_SYMBOL (op)->addrtaken=1; /* just to force allocation */
             }
         }
       /* is this block part of a loop? */

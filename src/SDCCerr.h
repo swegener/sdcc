@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include "SDCCset.h"
 
 /* ERROR Message Definition */
 
@@ -334,6 +335,7 @@ struct SDCCERRG {
   FILE *out;
   int style;                        /* 1=MSVC */
   int werror;                       /* treat the warnings as errors */
+  set *log;
 };
 
 extern struct SDCCERRG _SDCCERRG;

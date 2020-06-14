@@ -1,6 +1,8 @@
 2020-06-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeJumpTable): Fix bug #3034
+	* src/SDCCerr.c (vwerror),
+	  src/SDCCerr.h: Suppress duplicate diagnostic messages
 
 2020-06-13 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

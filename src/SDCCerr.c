@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include "SDCCglobl.h"
+#include "dbuf_string.h"
 #ifdef HAVE_BACKTRACE_SYMBOLS_FD
 #include <unistd.h>
 #include <execinfo.h>
@@ -612,6 +613,10 @@ void setErrorLogLevel (ERROR_LOG_LEVEL level)
 int
 vwerror (int errNum, va_list marker)
 {
+  struct dbuf_s dbuf;
+  char *errmsg;
+  char *oldmsg;
+
   if (_SDCCERRG.out == NULL)
     {
       _SDCCERRG.out = DEFAULT_ERROR_OUT;
@@ -630,6 +635,8 @@ vwerror (int errNum, va_list marker)
       return 0;
     }
 
+  dbuf_init(&dbuf, 200);
+  
   if ((ErrTab[errNum].errType >= _SDCCERRG.logLevel) && (!ErrTab[errNum].disabled))
     {
       if (ErrTab[errNum].errType >= ERROR_LEVEL_ERROR || _SDCCERRG.werror)
@@ -638,47 +645,55 @@ vwerror (int errNum, va_list marker)
       if (filename && lineno)
         {
           if (_SDCCERRG.style)
-            fprintf (_SDCCERRG.out, "%s(%d) : ", filename, lineno);
+            dbuf_printf (&dbuf, "%s(%d) : ", filename, lineno);
           else
-            fprintf (_SDCCERRG.out, "%s:%d: ", filename, lineno);
+            dbuf_printf (&dbuf, "%s:%d: ", filename, lineno);
         }
       else if (lineno)
         {
-          fprintf (_SDCCERRG.out, "at %d: ", lineno);
+          dbuf_printf (&dbuf, "at %d: ", lineno);
         }
       else
         {
-          fprintf (_SDCCERRG.out, "-:0: ");
+          dbuf_printf (&dbuf, "-:0: ");
         }
 
       switch (ErrTab[errNum].errType)
         {
         case ERROR_LEVEL_SYNTAX_ERROR:
-          fprintf (_SDCCERRG.out, "syntax error: ");
+          dbuf_printf (&dbuf, "syntax error: ");
           break;
 
         case ERROR_LEVEL_ERROR:
-          fprintf (_SDCCERRG.out, "error %d: ", errNum);
+          dbuf_printf (&dbuf, "error %d: ", errNum);
           break;
 
         case ERROR_LEVEL_WARNING:
         case ERROR_LEVEL_PEDANTIC:
           if (_SDCCERRG.werror)
-            fprintf (_SDCCERRG.out, "error %d: ", errNum);
+            dbuf_printf (&dbuf, "error %d: ", errNum);
           else
-            fprintf (_SDCCERRG.out, "warning %d: ", errNum);
+            dbuf_printf (&dbuf, "warning %d: ", errNum);
           break;
 
         case ERROR_LEVEL_INFO:
-          fprintf (_SDCCERRG.out, "info %d: ", errNum);
+          dbuf_printf (&dbuf, "info %d: ", errNum);
           break;
 
         default:
           break;
         }
 
-      vfprintf (_SDCCERRG.out, ErrTab[errNum].errText, marker);
-      fprintf (_SDCCERRG.out, "\n");
+      dbuf_vprintf (&dbuf, ErrTab[errNum].errText, marker);
+      errmsg = dbuf_detach_c_str (&dbuf);
+      for (oldmsg = setFirstItem (_SDCCERRG.log); oldmsg; oldmsg = setNextItem (_SDCCERRG.log))
+        if (strcmp (errmsg, oldmsg) == 0)
+          {
+            free(errmsg);
+            return 0;
+          }
+      addSetHead (&_SDCCERRG.log, errmsg);
+      fprintf (_SDCCERRG.out, "%s\n", errmsg);
       return 1;
     }
   else

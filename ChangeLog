@@ -1,3 +1,7 @@
+2020-06-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/hc08/ralloc.c: Fix bug #3061
+
 2020-06-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCicode.c (geniCodeJumpTable): Fix bug #3034

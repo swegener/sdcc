@@ -1029,7 +1029,7 @@ algebraicOpts (iCode * ic, eBBlock * ebp)
       /* if subtracting the same thing then zero     */
       if (IC_LEFT (ic)->key == IC_RIGHT (ic)->key &&
         !IS_OP_VOLATILE (IC_LEFT (ic)))
-        {printf("Sub. at %d\n", ic->key);
+        {
           ic->op = '=';
           IC_RIGHT (ic) = operandFromLit (0);
           IC_LEFT (ic) = NULL;

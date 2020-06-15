@@ -1,6 +1,7 @@
 2020-06-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/hc08/ralloc.c: Fix bug #3061
+	* src/SDCCcse.c (algebraicOpts): Fix bug #3062
 
 2020-06-14 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

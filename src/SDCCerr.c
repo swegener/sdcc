@@ -582,6 +582,8 @@ struct
      "Failed to open input file '%s' (%s)", 0 },
   { W_SHIFT_NEGATIVE, ERROR_LEVEL_WARNING,
      "%s shift by negative amount", 0 },
+  { W_INVALID_STACK_LOCATION, ERROR_LEVEL_WARNING,
+     "access to invalid stack location", 0 },
 };
 
 /* -------------------------------------------------------------------------------

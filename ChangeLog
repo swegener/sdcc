@@ -5,6 +5,10 @@
 	* src/z80/gen.c,
 	  src/z80/main.c:
 	  Fix bug #3055.
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/stm8/gen.c:
+	  Fix bug #3044.
 
 2020-06-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

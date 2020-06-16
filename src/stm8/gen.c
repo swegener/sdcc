@@ -958,12 +958,19 @@ aopForSym (const iCode *ic, symbol *sym)
   else if (sym->onStack || sym->iaccess)
     {
       int offset;
-      int base;
+      long int base;
 
       aop = newAsmop (AOP_STK);
       aop->size = getSize (sym->type);
 
       base = sym->stack + (sym->stack > 0 ? G.stack.param_offset : 0);
+
+      if (labs(base) > (1 << 15))
+      {
+        if (!regalloc_dry_run)
+          werror (W_INVALID_STACK_LOCATION);
+        base = 0;
+      }
 
       for(offset = 0; offset < aop->size; offset++)
         aop->aopu.bytes[offset].byteu.stk = base + aop->size - offset;
@@ -7067,6 +7074,13 @@ static void init_stackop (asmop *stackop, int size, long int stk_off)
   stackop->regs[XH_IDX] = -1;
   stackop->regs[YL_IDX] = -1;
   stackop->regs[YH_IDX] = -1;
+
+  if (labs(stk_off) > (1 << 15))
+  {
+    if (!regalloc_dry_run)
+      werror (W_INVALID_STACK_LOCATION);
+    stk_off = 0;
+  }
 
   for (int i = 0; i < size; i++)
     {

@@ -12589,8 +12589,9 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
   aopOp (dst, ic, FALSE, FALSE);
   aopOp (n, ic, FALSE, FALSE);
 
-  wassertl (AOP_TYPE (n) == AOP_LIT, "Last parameter to builtin memset() must be literal.");
-  if(!(size = ulFromVal (AOP (n)->aopu.aop_lit)))
+  wassertl (n->aop->type == AOP_LIT, "Last parameter to builtin memset() must be literal.");
+
+  if(n->aop->type != AOP_LIT || !(size = ulFromVal (n->aop->aopu.aop_lit)))
     goto done;
 
   direct_c = (AOP_TYPE (c) == AOP_LIT || AOP_TYPE (c) == AOP_REG && AOP (c)->aopu.aop_reg[0]->rIdx != H_IDX

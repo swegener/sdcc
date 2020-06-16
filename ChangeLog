@@ -2,6 +2,8 @@
 
 	* support/regression/tests/bug-2368.c:
 	  Fix bug #3063.
+	* src/z80/gen.c:
+	  Fix segfault in bug #3055.
 
 2020-06-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

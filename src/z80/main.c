@@ -1630,7 +1630,7 @@ PORT tlcs90_port =
   0,                            /* leave == */
   FALSE,                        /* Array initializer support. */
   0,                            /* no CSE cost estimation yet */
-  _z80_builtins,                /* builtin functions */
+  0,                            /* no builtin functions */
   GPOINTER,                     /* treat unqualified pointers as "generic" pointers */
   1,                            /* reset labelKey to 1 */
   1,                            /* globals & local statics allowed */

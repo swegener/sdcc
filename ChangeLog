@@ -1,3 +1,9 @@
+2020-06-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCmem.c,
+	  src/pic16/main.c: Fix bug #3056
+	* src/pic16/gen.c: Fix bug #3057
+
 2020-06-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-2368.c:

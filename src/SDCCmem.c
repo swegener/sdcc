@@ -863,7 +863,7 @@ allocLocal (symbol * sym)
   /* else depending on the storage class specified */
 
   /* if this is a function then assign code space    */
-  if (IS_FUNC (sym->type))
+  if (IS_FUNC (sym->type) && !sym->isitmp)
     {
       SPEC_OCLS (sym->etype) = code;
       return;

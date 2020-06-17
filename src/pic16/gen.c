@@ -1486,7 +1486,7 @@ pic16_popGetTempRegCond (bitVect * f, bitVect * v, int lock)
   cfunc = currFunc;
   currFunc = NULL;
 
-  i = bitVectFirstBit (f);
+  i = bitVectFirstBit (f) + 1;
   while (i < 128)
     {
 

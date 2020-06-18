@@ -1,3 +1,9 @@
+2020-06-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/bug-3056.c,
+	  src/SDCCsymt.c: Fix bug #3056 for pdk too
+	* src/SDCCsymt.c: Fix bugs #3059, #3049, #3047 (same cause)
+
 2020-06-17 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCmem.c,

@@ -2242,6 +2242,23 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
   /* Conditional operator has some special type conversion rules */
   if (op == ':')
     {
+      /* Function types are really pointers to functions */
+      if (IS_FUNC (type1))
+        {
+          sym_link *fptr;
+          fptr = newLink (DECLARATOR);
+          DCL_TYPE (fptr) = CPOINTER;
+          fptr->next = type1;
+          type1 = fptr;
+        }
+      if (IS_FUNC (type2))
+        {
+          sym_link *fptr;
+          fptr = newLink (DECLARATOR);
+          DCL_TYPE (fptr) = CPOINTER;
+          fptr->next = type2;
+          type2 = fptr;
+        }
       /* If either type is an array, convert to pointer */
       if (IS_ARRAY(type1))
         {
@@ -2360,7 +2377,7 @@ computeType (sym_link * type1, sym_link * type2, RESULT_TYPE resultType, int op)
     case RESULT_TYPE_BOOL:
       if (op == ':')
         {
-          SPEC_NOUN (reType) = V_BIT;
+          SPEC_NOUN (reType) = TARGET_MCS51_LIKE ? V_BIT : V_BOOL;
           return rType;
         }
       break;

@@ -1,3 +1,7 @@
+2020-06-20 Erik Petrich <epetrich AT ivorytower.normna.ok.us>
+
+	* src/pdk/gen.c (cheapMove, aopOp): Fix bug #3038
+
 2020-06-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/bug-3056.c,

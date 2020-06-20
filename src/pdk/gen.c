@@ -470,7 +470,7 @@ aopOp (operand *op, const iCode *ic)
     }
 
   /* None of the above, which only leaves temporaries. */
-  if ((sym->isspilt || sym->nRegs == 0) && !(regalloc_dry_run && (options.stackAuto || reentrant)))
+  if ((sym->isspilt || sym->nRegs == 0) && sym->usl.spillLoc && !(regalloc_dry_run && (options.stackAuto || reentrant)))
     {
       sym->aop = op->aop = aopForSym (ic, sym->usl.spillLoc);
       op->aop->size = getSize (sym->type);
@@ -804,13 +804,19 @@ cheapMove (const asmop *result, int roffset, const asmop *source, int soffset, b
     }
   else if (aopInReg (result, roffset, A_IDX))
     {
-      emit2 ("mov", "a, %s", aopGet (source, soffset));
-      cost (1, 1);
+      if (!dummy)
+        {
+          emit2 ("mov", "a, %s", aopGet (source, soffset));
+          cost (1, 1);
+        }
     }
   else if (aopInReg (source, soffset, A_IDX))
     {
-      emit2 ("mov", "%s, a", aopGet (result, roffset));
-      cost (1, 1);
+      if (!dummy)
+        {
+          emit2 ("mov", "%s, a", aopGet (result, roffset));
+          cost (1, 1);
+        }
     }
   else if (result->type == AOP_STK && (source->type == AOP_DIR || source->type == AOP_IMMD || source->type == AOP_LIT || source->type == AOP_SFR) && a_dead && p_dead)
     {

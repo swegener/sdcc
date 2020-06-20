@@ -1,6 +1,7 @@
 2020-06-20 Erik Petrich <epetrich AT ivorytower.normna.ok.us>
 
 	* src/pdk/gen.c (cheapMove, aopOp): Fix bug #3038
+	* src/SDCCast.c (expandInlineFuncs): Fix bug #3029
 
 2020-06-18 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -7354,7 +7354,7 @@ expandInlineFuncs (ast * tree, ast * block)
           args = FUNC_ARGS (func->type);
           argIndex = 0;
 
-          while (args)
+          for (; args; args = args->next, argIndex++)
             {
               symbol *temparg;
               ast *assigntree;
@@ -7366,6 +7366,9 @@ expandInlineFuncs (ast * tree, ast * block)
                   werror (E_TOO_FEW_PARMS);
                   break;
                 }
+
+              if (!args->sym) /* skip arg if it's missing a name */
+                continue;
 
               temparg = inlineTempVar (args->sym->type, tree->level + LEVEL_UNIT);
               inlineAddDecl (copySymbol (temparg), inlinetree, FALSE, FALSE);
@@ -7382,9 +7385,6 @@ expandInlineFuncs (ast * tree, ast * block)
               assigntree->initMode = 1; // tell that assignment is initializer
               inlinetree2->right = newNode (NULLOP, assigntree, inlinetree2->right);
               parm->onStack = 0; // stack usage will be recomputed later
-
-              args = args->next;
-              argIndex++;
             }
 
           if (inlineFindParm (tree->right, argIndex) && !IFFUNC_HASVARARGS (func->type))

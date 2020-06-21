@@ -11769,7 +11769,7 @@ genAssign (const iCode *ic)
                 spillPair (PAIR_HL);
               }
             else
-              cheapMove (AOP (result), offset, AOP (right), offset, true);
+              cheapMove (AOP (result), offset, AOP (right), offset, !bitVectBitValue (ic->rSurv, A_IDX));
             offset++;
           }
     }

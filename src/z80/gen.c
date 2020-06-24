@@ -10815,7 +10815,14 @@ genPointerGet (const iCode *ic)
               _G.pairs[pair].offset++;
             }
         }
-      if (rightval || AOP_SIZE (result))
+      if (!isPairDead (pair, ic))
+        while (offset --> 1)
+          {
+            emit2 ("dec %s", _pairs[pair].name);
+            regalloc_dry_run_cost += 1;
+            _G.pairs[pair].offset--;
+          }
+      else if (rightval || AOP_SIZE (result))
          spillPair (pair);
     }
 

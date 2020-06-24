@@ -2618,6 +2618,17 @@ aopGet (asmop *aop, int offset, bool bit16)
             }
 
         case AOP_STK:
+          if (IS_TLCS90) // Try to use (sp) addressing mode.
+            {
+              int sp_offset = aop->aopu.aop_stk + offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed + _G.stack.offset;
+              
+              if (!sp_offset)
+                {
+                  dbuf_tprintf (&dbuf, "(sp)");
+                  break;
+                }
+            }
+            
           if (IS_GB || aop->type == AOP_EXSTK)
             {
               pointPairToAop (PAIR_HL, aop, offset);

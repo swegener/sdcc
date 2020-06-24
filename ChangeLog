@@ -3,6 +3,8 @@
 	* src/z80/peep.c,
 	  src/z80/peeph-gbz80.def:
 	  Support for sp in notUsed for gbz80, patch by Basil Hussain.
+	* src/z80/gen.c:
+	  Use tlcs90 (sp) adressing mode.
 
 2020-06-24 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -1357,8 +1357,11 @@ FBYNAME (immdInRange)
   char r[64], operator[8];
   const char *op;
   long i, j, k, h, low, high, left_l, right_l, order;
-  const char *padd[] = {"+", "'+'", "\"+\"", "add", "'add'", "\"add\""};
-  const char *psub[] = {"-", "'-'", "\"-\"", "sub", "'sub'", "\"sub\""};
+  const char *padd[] =    {"+", "'+'", "\"+\""};
+  const char *psub[] =    {"-", "'-'", "\"-\""};
+  const char *pbitand[] = {"&", "'&'", "\"&\""};
+  const char *pxor[] =    {"^", "'^'", "\"^\""};
+  const char *pbitor[] =  {"|", "'|'", "\"|\""};
 
   for (i = order = 0; order < 6;)
     {
@@ -1417,7 +1420,7 @@ FBYNAME (immdInRange)
               return immdError ("bad right operand", r, cmdLine);
             break;
           case 5: // result
-            if (r[0] != '%' || !immdGet (r + 1, &h))
+            if (r[0] != '%' || !(immdGet (r + 1, &h) || (r[1] == 'x' && immdGet (r + 2, &h))))
               return immdError ("bad result container", r, cmdLine);
             break;
           default: // should not reach
@@ -1445,13 +1448,45 @@ FBYNAME (immdInRange)
           break;
         }
   if (!j)
+    for (k = 0; k < sizeof (pbitand) / sizeof (pbitand[0]); k++) // and
+      if (strcmp (operator, pbitand[k]) == 0)
+        {
+          i = left_l & right_l;
+          j = 1;
+          break;
+        }
+  if (!j)
+    for (k = 0; k < sizeof (pxor) / sizeof (pxor[0]); k++) // xor
+      if (strcmp (operator, pxor[k]) == 0)
+        {
+          i = left_l ^ right_l;
+          j = 1;
+          break;
+        }
+  if (!j)
+    for (k = 0; k < sizeof (pbitor) / sizeof (pbitor[0]); k++) // or
+      if (strcmp (operator, pbitor[k]) == 0)
+        {
+          i = left_l | right_l;
+          j = 1;
+          break;
+        }
+  if (!j)
     return immdError ("bad operator", operator, cmdLine);
 
   // bind the result
   if ((low <= i && i <= high) || (high <= i && i <= low))
     {
+      bool hex = false;
+      if(r[1] == 'x'){
+        hex = true;
+        r[1] = '0';
+      }
       char *p[] = {r, NULL};
-      sprintf (r, "%ld", i);
+      if(!hex)
+        sprintf (r, "%ld", i);
+      else
+        sprintf (r, "0x%lx", i);
       bindVar ((int) h, p, &vars);
       return TRUE;
     }

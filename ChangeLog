@@ -2,6 +2,8 @@
 
 	* src/z80/peeph-gbz80.def:
 	  Rename operation in immdInRange rule to prepare for further patches, patch by Baŝto.
+	* src/SDCCpeeph.c:
+	  Allow bitwise operation in immdInRange, patch by Baŝto.
 
 2020-06-21 Philipp Klaus Krause <pkk AT spth.de>
 

@@ -339,7 +339,7 @@ replace restart {
 } by {
 	ld	%4%5, #%1 + %3
 	; peephole 28b moved increment of %4%5 to constant.
-} if canAssign(%4%5 '#0x0102'), immdInRange(0x0000 0xffff 'add' %2 1 %3)
+} if canAssign(%4%5 '#0x0102'), immdInRange(0x0000 0xffff '+' %2 1 %3)
 
 replace restart {
 	ld	bc,#%1

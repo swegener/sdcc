@@ -3,6 +3,9 @@
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3066.c:
 	  Fix bug #3066.
+	* src/pdk/gen.c,
+	  support/regression/tests/bug-3065.c:
+	  Fix bug #3065.
 
 2020-06-24 Philipp Klaus Krause <pkk AT spth.de>
 

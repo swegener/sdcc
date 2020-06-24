@@ -3224,6 +3224,11 @@ genAnd (const iCode *ic, iCode *ifx)
           if (!p_dead)
             popPF (!aopInReg (result->aop, i, A_IDX));
         }
+      else if (right->aop->type == AOP_SFR)
+        {
+          wassert (regalloc_dry_run);
+          cost (100, 100);
+        }
       else
         {
           cheapMove (ASMOP_A, 0, left->aop, i, true, p_dead && !aopInReg (right->aop, i, P_IDX), true);

@@ -1424,7 +1424,7 @@ PORT gbz80_port =
     NULL,
     z80notUsed,
     z80canAssign,
-    NULL,
+    z80notUsedFrom,
     z80symmParmStack,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */

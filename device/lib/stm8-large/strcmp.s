@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  heap.s
+;  strcmp.s
 ;
-;  Copyright (C) 2014, Ben Shi
+;  Copyright (C) 2016, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -26,17 +26,52 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl ___sdcc_heap_init
-	.globl ___sdcc_heap
-	.globl ___sdcc_heap_end
+	.globl _strcmp
 
-	.area GSINIT
-	call ___sdcc_heap_init
+	.area CODE
 
-	.area DATA
-	; For now just allocate 1024 bytes for the heap.
-___sdcc_heap::
-	.ds 1023
-___sdcc_heap_end::
-	.ds 1
+_strcmp:
+
+	ldw	y, (4, sp)
+	ldw	x, (6, sp)
+
+loop:
+	ld	a, (y)
+	jreq	null
+	cp	a, (x)
+	jrne	diff
+
+	ld	a, (1, y)
+	jreq	null_1
+	cp	a, (1, x)
+	jrne	diff
+
+	ld	a, (2, y)
+	jreq	null_2
+	cp	a, (2, x)
+	jrne	diff
+
+	addw	y, #3
+	addw	x, #3
+
+	jra	loop
+
+null_2:
+	incw	x
+null_1:
+	incw	x
+null:
+	tnz	(x)
+	jrne	less
+	clrw	x
+	retf
+
+diff:
+	jrult less
+	ldw	x, #1
+	retf
+
+less:
+	ldw	x, #-1
+	retf
 

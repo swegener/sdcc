@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  heap.s
+;  strcpy.s
 ;
-;  Copyright (C) 2014, Ben Shi
+;  Copyright (C) 2016, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -26,17 +26,30 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl ___sdcc_heap_init
-	.globl ___sdcc_heap
-	.globl ___sdcc_heap_end
+	.globl _strcpy
 
-	.area GSINIT
-	call ___sdcc_heap_init
+	.area CODE
 
-	.area DATA
-	; For now just allocate 1024 bytes for the heap.
-___sdcc_heap::
-	.ds 1023
-___sdcc_heap_end::
-	.ds 1
+_strcpy:
+
+	ldw	y, (0x04, sp)
+	ldw	x, (0x06, sp)
+
+loop:
+	ld	a, (x)
+	ld	(y), a
+	jreq	end
+	ld	a, (1, x)
+	ld	(1, y), a
+	jreq	end
+	ld	a, (2, x)
+	ld	(2, y), a
+	jreq	end
+	addw	x, #3
+	addw	y, #3
+	jra	loop
+
+end:
+	ldw	x, (0x04, sp)
+	retf
 

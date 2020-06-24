@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  heap.s
+;  _divsint.s
 ;
-;  Copyright (C) 2014, Ben Shi
+;  Copyright (C) 2014, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -26,17 +26,26 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl ___sdcc_heap_init
-	.globl ___sdcc_heap
-	.globl ___sdcc_heap_end
+	.globl __divsint
 
-	.area GSINIT
-	call ___sdcc_heap_init
+	.area CODE
 
-	.area DATA
-	; For now just allocate 1024 bytes for the heap.
-___sdcc_heap::
-	.ds 1023
-___sdcc_heap_end::
-	.ds 1
+__divsint:
+	ldw	x, (#4, sp)
+	ld	a, xh
+	ldw	y, (#6, sp)
+	jrpl	y_nonnegative
+	cpl	a
+	negw	y
+y_nonnegative:
+	tnzw	x
+	jrpl	x_nonnegative
+	negw	x
+x_nonnegative:
+	divw	x, y
+	tnz	a
+	jrpl	return_nonnegative
+	negw	x
+return_nonnegative:
+	retf
 

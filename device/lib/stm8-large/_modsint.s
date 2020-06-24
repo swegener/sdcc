@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  heap.s
+;  _modsint.s
 ;
-;  Copyright (C) 2014, Ben Shi
+;  Copyright (C) 2014, Krzysztof Nikiel, Ben Shi
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -26,17 +26,24 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl ___sdcc_heap_init
-	.globl ___sdcc_heap
-	.globl ___sdcc_heap_end
+	.globl __modsint
 
-	.area GSINIT
-	call ___sdcc_heap_init
-
-	.area DATA
-	; For now just allocate 1024 bytes for the heap.
-___sdcc_heap::
-	.ds 1023
-___sdcc_heap_end::
-	.ds 1
-
+	.area CODE
+__modsint:
+	ldw	y, (#6, sp)
+	ldw	x, (#4, sp)
+	ld	a, xh
+	jrpl	__modsint_1
+	negw	x
+__modsint_1:
+	tnzw	y
+	jrpl	__modsint_2
+	negw	y
+__modsint_2:
+	divw	x, y
+	tnz	a
+	jrpl	__modsint_3
+	negw	y
+__modsint_3:
+	ldw	x, y
+	retf

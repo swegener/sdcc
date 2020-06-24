@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  heap.s
+;  _divslong.s
 ;
 ;  Copyright (C) 2014, Ben Shi
 ;
@@ -26,17 +26,32 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl ___sdcc_heap_init
-	.globl ___sdcc_heap
-	.globl ___sdcc_heap_end
+	.globl __divslong
 
-	.area GSINIT
-	call ___sdcc_heap_init
-
-	.area DATA
-	; For now just allocate 1024 bytes for the heap.
-___sdcc_heap::
-	.ds 1023
-___sdcc_heap_end::
-	.ds 1
-
+	.area CODE
+__divslong:
+	ldw x, (#0x0a, sp)
+	ldw y, (#0x08, sp)
+	jrpl __divslong_0
+	callf __fast_long_neg
+__divslong_0:
+	pushw x
+	pushw y
+__divslong_1:
+	ldw x, (#0x0a, sp)
+	ldw y, (#0x08, sp)
+	jrpl __divslong_2
+	callf __fast_long_neg
+__divslong_2:
+	pushw x
+	pushw y
+__divslong_3:
+	callf __divulong
+	addw sp, #0x08
+__divslong_4:
+	ld a, (#0x04, sp)
+	xor a, (#0x08, sp)
+	jrpl __divslong_5
+	callf __fast_long_neg
+__divslong_5:
+	retf

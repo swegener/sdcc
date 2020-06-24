@@ -4,6 +4,8 @@
 	  Rename operation in immdInRange rule to prepare for further patches, patch by Baŝto.
 	* src/SDCCpeeph.c:
 	  Allow bitwise operation in immdInRange, patch by Baŝto.
+	* device/lib/stm8-large/*
+	  Use optimized support routines for large memory model, patch by Basil Hussain.
 
 2020-06-21 Philipp Klaus Krause <pkk AT spth.de>
 

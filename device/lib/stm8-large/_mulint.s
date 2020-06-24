@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  heap.s
+;  _mulint.s
 ;
-;  Copyright (C) 2014, Ben Shi
+;  Copyright (C) 2014-2015, Krzysztof Nikiel, Ben Shi, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -26,17 +26,30 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl ___sdcc_heap_init
-	.globl ___sdcc_heap
-	.globl ___sdcc_heap_end
+.globl __mulint
 
-	.area GSINIT
-	call ___sdcc_heap_init
+.area CODE
 
-	.area DATA
-	; For now just allocate 1024 bytes for the heap.
-___sdcc_heap::
-	.ds 1023
-___sdcc_heap_end::
-	.ds 1
+__mulint:
+
+	ldw	x, (#4, sp)
+	ld	a, (#7, sp)
+	mul	x, a
+	pushw	x
+
+	ldw	x, (#5, sp)
+	mul	x, a
+	ld	a, xl
+	add	a, (#1, sp)
+	ld	(#1, sp), a
+
+	ldw	x, (#6, sp)
+	ld	a, (#8, sp)
+	mul	x, a
+	ld	a, xl
+	add	a, (#1, sp)
+	popw	x
+	ld	xh, a
+	
+	retf
 

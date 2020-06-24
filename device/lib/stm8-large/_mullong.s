@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  heap.s
+;  _mullong.s
 ;
 ;  Copyright (C) 2014, Ben Shi
 ;
@@ -26,17 +26,93 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl ___sdcc_heap_init
-	.globl ___sdcc_heap
-	.globl ___sdcc_heap_end
+	.globl __mullong
 
-	.area GSINIT
-	call ___sdcc_heap_init
+	.area CODE
+__mullong:
+	clrw	x
+	pushw	x
+	pushw	x
+__mullong_0:
+	ld	a, (#11, sp)
+	ld	xl, a
+	ld	a, (#15, sp)
+	mul	x, a
+	ldw	(#3, sp), x
+__mullong_1:
+	ld	a, (#10, sp)
+	ld	xl, a
+	ld	a, (#15, sp)
+	mul	x, a
+	addw	x, (#2, sp)
+	ldw	(#2, sp), x
+	clr	a
+	adc	a, #0
+	ld	(#1, sp), a
 
-	.area DATA
-	; For now just allocate 1024 bytes for the heap.
-___sdcc_heap::
-	.ds 1023
-___sdcc_heap_end::
-	.ds 1
+	ld	a, (#11, sp)
+	ld	xl, a
+	ld	a, (#14, sp)
+	mul	x, a
+	addw	x, (#2, sp)
+	ldw	(#2, sp), x
+	clr	a
+	adc	a, (#1, sp)
+	ld	(#1, sp), a
+__mullong_2:
+	ld	a, (#11, sp)
+	ld	xl, a
+	ld	a, (#13, sp)
+	mul	x, a
+	addw	x, (#1, sp)
+	ldw	(#1, sp), x
 
+	ld	a, (#10, sp)
+	ld	xl, a
+	ld	a, (#14, sp)
+	mul	x, a
+	addw	x, (#1, sp)
+	ldw	(#1, sp), x
+
+	ld	a, (#9, sp)
+	ld	xl, a
+	ld	a, (#15, sp)
+	mul	x, a
+	addw	x, (#1, sp)
+	ldw	(#1, sp), x
+__mullong_3:
+	ld	a, (#8, sp)
+	ld	xl, a
+	ld	a, (#15, sp)
+	mul	x, a
+	ld	a, xl
+	add	a, (#1, sp)
+	ld	(#1, sp), a
+
+	ld	a, (#11, sp)
+	ld	xl, a
+	ld	a, (#12, sp)
+	mul	x, a
+	ld	a, xl
+	add	a, (#1, sp)
+	ld	(#1, sp), a
+
+	ld	a, (#10, sp)
+	ld	xl, a
+	ld	a, (#13, sp)
+	mul	x, a
+	ld	a, xl
+	add	a, (#1, sp)
+	ld	(#1, sp), a
+
+	ld	a, (#9, sp)
+	ld	xl, a
+	ld	a, (#14, sp)
+	mul	x, a
+	ld	a, xl
+	add	a, (#1, sp)
+	ld	(#1, sp), a
+__mullong_4:
+	popw	y
+	popw	x
+	retf

@@ -16,17 +16,9 @@ include $(srcdir)/../incl.mk
 
 STM8_FLOAT = $(COMMON_FLOAT)
 
-STM8_INT = $(COMMON_INT) \
-  _mulint.c \
-  _divsint.c \
-  _modsint.c \
-  _mulschar.c \
-  _divschar.c \
-  _modschar.c
+STM8_INT = _mulschar.c _divschar.c _modschar.c
 
-STM8_LONG = $(COMMON_LONG) \
-  _divulong.c \
-  _mullong.c
+STM8_LONG =
 
 STM8_LONGLONG = $(COMMON_LONGLONG) \
   _rrulonglong.c \
@@ -43,8 +35,6 @@ STM8_SDCC = $(COMMON_SDCC) \
   _itoa.c \
   _ltoa.c \
   _startup.c \
-  _strcmp.c \
-  _strcpy.c \
   _strlen.c \
   _memmove.c \
   sprintf.c \
@@ -54,7 +44,7 @@ STM8_SDCC = $(COMMON_SDCC) \
 STM8SOURCES = $(addprefix ../,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 STM8OBJECTS = $(patsubst %.c,%.rel,$(STM8_FLOAT) $(STM8_INT) $(STM8_LONG) $(STM8_LONGLONG) $(STM8_SDCC))
 
-OBJ = setjmp.rel __mulsint2slong.rel heap.rel memcpy.rel atomic_flag_test_and_set.rel
+OBJ = setjmp.rel _mulint.rel __mulsint2slong.rel _divsint.rel _modsint.rel _mullong.rel _divulong.rel _modulong.rel _divslong.rel _modslong.rel _fast_long_neg.rel heap.rel strcpy.rel strcmp.rel memcpy.rel atomic_flag_test_and_set.rel
 
 LIB = stm8.lib
 CC = $(SCC)

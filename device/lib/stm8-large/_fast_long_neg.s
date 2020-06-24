@@ -1,5 +1,5 @@
 ;--------------------------------------------------------------------------
-;  heap.s
+;  _fast_long_neg.s
 ;
 ;  Copyright (C) 2014, Ben Shi
 ;
@@ -26,17 +26,16 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.globl ___sdcc_heap_init
-	.globl ___sdcc_heap
-	.globl ___sdcc_heap_end
+	.globl __fast_long_neg
 
-	.area GSINIT
-	call ___sdcc_heap_init
-
-	.area DATA
-	; For now just allocate 1024 bytes for the heap.
-___sdcc_heap::
-	.ds 1023
-___sdcc_heap_end::
-	.ds 1
-
+	.area CODE
+__fast_long_neg:
+	cplw y
+	tnzw x
+	jreq __fast_long_neg_0
+	cplw x
+	incw x
+	retf
+__fast_long_neg_0:
+	incw y
+	retf

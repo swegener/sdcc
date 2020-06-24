@@ -912,3 +912,60 @@ replace {
 	inc	bc
 }
 
+replace {
+	pop	%1
+	pop	%2
+	push	%2
+	push	%1
+} by {
+	; peephole sp0 allow stack rules
+	ldhl	sp, #0
+	pop	%1
+	pop	%2
+	push	%2
+	push	%1
+	ld	sp, hl
+} if notUsed('hl'), notSame(%1 %2)
+
+replace {
+	pop	%1
+	push	%1
+} by {
+	; peephole sp1 removed not needed push
+	pop	%1
+} if notUsed('sp')
+
+replace {
+	pop	%1
+	pop	%2
+	push	%2
+	push	%1
+} by {
+	; peephole sp2 removed not needed push
+	pop	%1
+	pop	%2
+} if notUsed('sp'), notSame(%1 %2)
+
+replace {
+	add	sp, %1
+} by {
+	; peephole sp3 removed not needed add sp
+} if notUsed('sp')
+
+replace {
+	inc	sp
+} by {
+	; peephole sp4 removed not needed inc sp
+} if notUsed('sp')
+
+replace {
+	dec	sp
+} by {
+	; peephole sp5 removed not needed dec sp
+} if notUsed('sp')
+
+replace {
+	pop	%1
+} by {
+	; peephole sp6 removed not needed pop
+} if notUsed(%1), notUsed('sp')

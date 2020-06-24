@@ -277,6 +277,9 @@ z80MightRead(const lineNode *pl, const char *what)
   if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
     what = "ix";
 
+  if(ISINST(pl->line, "call") && strcmp(what, "sp") == 0)
+    return TRUE;
+
   if(strcmp(pl->line, "call\t__initrleblock") == 0)
     return TRUE;
 
@@ -313,17 +316,17 @@ z80MightRead(const lineNode *pl, const char *what)
     }
 
   if(ISINST(pl->line, "reti") || ISINST(pl->line, "retn"))
-    return(false);
+    return(strcmp(what, "sp") == 0);
 
   if(ISINST(pl->line, "ret")) // --reserve-regs-iy uses ret in code gen for calls through function pointers
-    return(IY_RESERVED ? isReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : isReturned(what));
+    return(IY_RESERVED ? isReturned(what) || z80MightBeParmInCallFromCurrentFunction(what) : isReturned(what)) || strcmp(what, "sp") == 0;
 
   if(!strcmp(pl->line, "ex\t(sp), hl") || !strcmp(pl->line, "ex\t(sp),hl"))
-    return(!strcmp(what, "h") || !strcmp(what, "l"));
+    return(!strcmp(what, "h") || !strcmp(what, "l") || strcmp(what, "sp") == 0);
   if(!strcmp(pl->line, "ex\t(sp), ix") || !strcmp(pl->line, "ex\t(sp),ix"))
-    return(!!strstr(what, "ix"));
+    return(!!strstr(what, "ix") || strcmp(what, "sp") == 0);
   if(!strcmp(pl->line, "ex\t(sp), iy") || !strcmp(pl->line, "ex\t(sp),iy"))
-    return(!!strstr(what, "iy"));
+    return(!!strstr(what, "iy") || strcmp(what, "sp") == 0);
   if(!strcmp(pl->line, "ex\tde, hl") || !strcmp(pl->line, "ex\tde,hl"))
     return(!strcmp(what, "h") || !strcmp(what, "l") || !strcmp(what, "d") || !strcmp(what, "e"));
   if(ISINST(pl->line, "ld"))
@@ -382,6 +385,12 @@ z80MightRead(const lineNode *pl, const char *what)
             return(true);
           arg += 3;
         }
+      else if(!strncmp(arg, "sp", 2) && arg[2] == ',') // add sp, rr
+        {
+          if(!strcmp(what, "sp"))
+            return(true);
+          arg += 3;
+        }
       else if(arg[0] == 'i') // add ix/y, rr
         {
           if(!strncmp(arg, what, 2))
@@ -415,10 +424,10 @@ z80MightRead(const lineNode *pl, const char *what)
     return(strcmp(what, "a") == 0);
 
   if(ISINST(pl->line, "pop"))
-    return(false);
+    return(strcmp(what, "sp") == 0);
 
   if(ISINST(pl->line, "push"))
-    return(strstr(pl->line + 5, what) != 0);
+    return(strstr(pl->line + 5, what) != 0 || strcmp(what, "sp") == 0);
 
   if(ISINST(pl->line, "dec") ||
      ISINST(pl->line, "inc"))
@@ -533,10 +542,13 @@ z80MightRead(const lineNode *pl, const char *what)
     return(argCont(strchr(pl->line + 4, ','), what));
     
   if(IS_EZ80_Z80 && ISINST(pl->line, "pea"))
-    return(argCont(pl->line + 4, what));
+    return(argCont(pl->line + 4, what) || !strcmp(what, "sp"));
+
+  if (IS_GB && (ISINST(pl->line, "lda") || ISINST(pl->line, "ldhl")))
+    return(!strcmp(what, "sp"));
 
   /* TODO: Can we know anything about rst? */
-  if(ISINST(pl->line, "rst"))
+  if(ISINST(pl->line, "rst") && !strcmp(what, "sp"))
     return(true);
   return(true);
 }
@@ -885,7 +897,8 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
       return(z80notUsed(low, endPl, head) && z80notUsed(high, endPl, head));
     }
 
-  if(!isReg(what) && !isUReg(what))
+  // enable sp only for GBZ80
+  if(!isReg(what) && !isUReg(what) && !(IS_GB && !strcmp(what, "sp")))
     return FALSE;
 
   _G.head = head;

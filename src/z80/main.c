@@ -1418,7 +1418,7 @@ PORT gbz80_port =
   },
   {                             /* Peephole optimizer */
     _gbz80_defaultRules,
-    NULL,
+    z80instructionSize,
     NULL,
     NULL,
     NULL,

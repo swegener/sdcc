@@ -16,3 +16,8 @@ void f(void)
 }
 #endif
 
+void
+testBug(void)
+{
+}
+

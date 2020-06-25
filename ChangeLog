@@ -1,3 +1,9 @@
+2020-06-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c,
+	  src/z80/main.c:
+	  instructionSize peephole support for gbz80, patch by Baŝto.
+
 2020-06-24 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

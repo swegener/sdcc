@@ -1,3 +1,7 @@
+2020-06-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* sdas/asxxsrc/asdbg.c (BaseFileName): Possible fix for bug #3068
+
 2020-06-25 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c,

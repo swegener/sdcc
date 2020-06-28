@@ -222,7 +222,7 @@ BaseFileName (struct asmf * currFile, int spacesToUnderscores)
                 if ((p2 = strrchr(p1,   '/')) != NULL)  p1 = ++p2;
                 if ((p2 = strrchr(p1,   ':')) != NULL)  p1 = ++p2;
                 if ((p2 = strrchr(p1, FSEPX)) != NULL) *p2 = 0;
-                memmove(baseName, p1, strlen(p1)); /* Do not use strcpy(), since baseName and p1 may overlap */
+                memmove(baseName, p1, strlen(p1)+1); /* Do not use strcpy(), since baseName and p1 may overlap */
 
                 if (spacesToUnderscores) {
                         /* Convert spaces to underscores */

@@ -1,3 +1,8 @@
+2020-06-28 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c:
+	  Fix notSimilar(), patch #332 by Baŝto.
+
 2020-06-28 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* sdas/asxxsrc/asdbg.c (BaseFileName): Possible fix for bug #3068

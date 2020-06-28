@@ -1181,7 +1181,7 @@ FBYNAME (notSimilar)
 
       for (op2 = setFirstItem (operands); op2; op2 = setNextItem (operands))
         {
-          if ((strstr (op1, op2) || strstr (op2, op1)) && strcmp (op1, op2) == 0)
+          if (strstr (op1, op2) || strstr (op2, op1))
             {
               deleteSet (&operands);
               return FALSE;

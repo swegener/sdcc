@@ -63,6 +63,18 @@ static char _gbz80_defaultRules[] = {
 #include "peeph-gbz80.rul"
 };
 
+static char _ez80_z80_defaultRules[] = {
+#include "peeph.rul"
+#include "peeph-z80.rul"
+#include "peeph-ez80_z80.rul"
+};
+
+static char _z80n_defaultRules[] = {
+#include "peeph.rul"
+#include "peeph-z80.rul"
+#include "peeph-z80n.rul"
+};
+
 
 
 Z80_OPTS z80_opts;
@@ -1669,7 +1681,7 @@ PORT ez80_z80_port =
     _libs_ez80_z80,             /* libs */
   },
   {                             /* Peephole optimizer */
-    _z80_defaultRules,
+    _ez80_z80_defaultRules,
     z80instructionSize,
     NULL,
     NULL,
@@ -1795,7 +1807,7 @@ PORT z80n_port =
     _libs_z80n,                 /* libs */
   },
   {                             /* Peephole optimizer */
-    _z80_defaultRules,
+    _z80n_defaultRules,
     z80instructionSize,
     NULL,
     NULL,

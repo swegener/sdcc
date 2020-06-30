@@ -430,6 +430,7 @@ PORT stm8_port =
     stm8canAssign,
     stm8notUsedFrom,
     NULL,
+    NULL,
   },
   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
   {

@@ -1,8 +1,22 @@
+2020-06-30 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCpeeph.c
+	  src/ds390/main.c
+	  src/mcs51/main.c
+	  src/pdk/main.c
+	  src/port.h
+	  src/stm8/main.c
+	  src/z80/main.c
+	  src/z80/peep.c
+	  src/z80/peep.h
+	  src/z80/peeph-ez80_z80.def
+	  Partially implement RFE #683: Support canJoinRegs peephole constraint
+
 2020-06-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* debugger/mcs51/Makefile.in: include dependancy on dbuf*
 
-2020-06-29 Sergey Belyashov <sergey.belyashov@gmail.com
+2020-06-29 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/main.c
 	  src/z80/peeph-ez80_z80.def

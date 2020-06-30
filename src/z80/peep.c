@@ -1223,6 +1223,24 @@ z80canAssign (const char *op1, const char *op2, const char *exotic)
   return FALSE;
 }
 
+// canJoinRegs(reg_hi reg_lo [dst]) returns TRUE,
+bool z80canJoinRegs (set *regs, char dst[20])
+{
+  const char *regh = indexSet (regs, 0);
+  const char *regl = indexSet (regs, 1);
+  if (!regh || !regl || strlen (regh) > 3 || strlen (regl) > 3)
+    return FALSE;
+  strcpy (dst, regh);
+  strcat (dst, regl);
+  if (!strcmp (dst, "ixhixl") || !strcmp (dst, "iyhiyl"))
+    {
+      if (IS_GB)
+        return FALSE;
+      dst[2] = '\0';
+    }
+  return isRegPair (dst);
+}
+
 int z80instructionSize(lineNode *pl)
 {
   const char *op1start, *op2start;

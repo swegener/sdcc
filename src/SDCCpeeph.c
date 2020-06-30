@@ -1118,6 +1118,73 @@ FBYNAME (canAssign)
 }
 
 /*-----------------------------------------------------------------*/
+/* canJoinRegs - joins set of registers to combined one            */
+/*-----------------------------------------------------------------*/
+FBYNAME (canJoinRegs)
+{
+  // Must be specified at least 3 parameters: reg_hi reg_lo and dst
+  // If destination is not required, then %0 should be specified
+  bool result;
+
+  if (!port->peep.canJoinRegs)
+    {
+      fprintf (stderr, "Function canJoinRegs not supported by the port\n");
+      return FALSE;
+    }
+
+  int dstKey;
+  int i;
+  for (i = strlen (cmdLine);;)
+    {
+      --i;
+      if (i >= 0 && !ISCHARSPACE (cmdLine[i]))
+	continue;
+      if (i < 0 || cmdLine[i+1] != '%' || sscanf (&cmdLine[i+2], "%d", &dstKey) != 1 || dstKey < 0)
+	{
+	  fprintf (stderr,
+	       "*** internal error: canJoinRegs peephole restriction"
+	       " has bad result container: %s\n", &cmdLine[i+1]);
+	  return FALSE;
+	}
+      break;
+    }
+  cmdLine[i] = '\0';
+
+  set *operands;
+  result = ((operands = setFromConditionArgs (cmdLine, vars)) != NULL);
+  cmdLine[i] = ' ';
+  if (!result)
+    {
+      fprintf (stderr,
+               "*** internal error: canJoinRegs peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  int size = elementsInSet (operands);
+  if (size < 2)
+    {
+      fprintf (stderr,
+               "*** internal error: canJoinRegs peephole restriction"
+               " requires at least 3 operands: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  operands = reverseSet(operands);
+
+  char dst[20];
+  result = port->peep.canJoinRegs (operands, dst);
+  if (result && dstKey > 0)
+    {
+      char *s[] = { dst, NULL };
+      bindVar (dstKey, s, &vars);
+    }
+
+  deleteSet (&operands);
+  return result;
+}
+
+/*-----------------------------------------------------------------*/
 /* operandsNotRelated - returns true if the condition's operands   */
 /* are not related (taking into account register name aliases).    */
 /* N-way comparison performed between all operands.                */
@@ -1653,6 +1720,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "isPort", isPort
+  },
+  {
+    "canJoinRegs", canJoinRegs
   },
 };
 

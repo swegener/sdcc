@@ -1026,6 +1026,7 @@ PORT ds390_port =
     NULL,
     NULL,
     NULL,
+    NULL,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, bit, float */
   { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4 },

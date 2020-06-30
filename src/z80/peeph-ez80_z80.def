@@ -48,4 +48,32 @@ replace {
 	;peephole ez80-4: replace increment by incremented index of LEA instruction
 } if immdInRange(-128 127 '-' %3 1 %4)
 
+replace restart {
+	ld      %3, %4 (%1)
+	ld      %2, %5 (%1)
+} by {
+	;eZ80 peephole 5: replace 2 8-bit indirect loads to register pair by one 16-bit
+	ld      %6, %4 (%1)
+} if canJoinRegs(%2 %3 %6), immdInRange(-128 127 '+' %4 1 %7), same(%5 %7)
+
+replace restart {
+	ld	a, (hl)
+	inc	hl
+	ld	h, (hl)
+	ld	l, a
+} by {
+	;eZ80 peephole 6: replace Z80 style load to HL from memory addressed by HL itself
+	ld	hl, (hl)
+}
+
+replace restart {
+	ld	%2, (hl)
+	inc	hl
+	ld	%1, (hl)
+} by {
+	;eZ80 peephole 7: replace Z80 style load to register pair from memory addressed by HL
+	ld	%3, (hl)
+	inc	hl
+} if canJoinRegs(%1 %2 %3)
+
 barrier

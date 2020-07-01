@@ -1458,7 +1458,7 @@ genSub (const iCode *ic, asmop *result_aop, asmop *left_aop, asmop *right_aop)
             }
           started = true;
         }
-      else if (right_aop->type == AOP_STK || right_aop->type == AOP_STL && !i)
+      else if (right_aop->type == AOP_STK || right_aop->type == AOP_STL && !i || right_aop->type == AOP_CODE)
         {
           if (i + 1 < size && aopInReg (left_aop, i + 1, P_IDX))
             pushPF (!aopInReg (left_aop, i, A_IDX));
@@ -2127,7 +2127,7 @@ genPlus (const iCode *ic)
           started = true;
           continue;
         }
-      else if (right->aop->type == AOP_STK || right->aop->type == AOP_STL && !i)
+      else if (right->aop->type == AOP_STK || right->aop->type == AOP_STL && !i || right->aop->type == AOP_CODE)
         {
           if (!regDead (P_IDX, ic) && !pushed_p)
             {

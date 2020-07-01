@@ -71,6 +71,8 @@ private:
   virtual void split_out_output_redirection(char **_start, char **_end);
   virtual void split_out_bit(char *dot, char *param_str);
   virtual void split_out_array(char *dot, char *param_str);
+  virtual int token_length(char *start);
+  virtual chars get_token(char *start);
 public:
   virtual int split(void);
   virtual int shift(void);

@@ -428,7 +428,7 @@ cl_hw::refresh_display(bool force)
 	io->dd_cprintf("ui_stop", "%s", "Stop");
       cache_run= n;
     }
-  unsigned int t= (unsigned int)(uc->get_rtime()) * 500;
+  unsigned int t= (unsigned int)(uc->get_rtime()) * 1000;
   if ((t != cache_time) ||
       force)
     {

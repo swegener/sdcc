@@ -31,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ddconfig.h"
 
 
-const int io_size = 64;
+const t_addr io_size = 64;
 union t_regs
 {
   u8_t a;

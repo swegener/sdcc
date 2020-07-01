@@ -207,7 +207,7 @@ static void
 print_help(char *name)
 {
   printf("%s: %s\n", name, VERSIONSTR);
-  printf("Usage: %s [-hHVvPgGwb] [-p prompt] [-t CPU] [-X freq[k|M]]\n"
+  printf("Usage: %s [-hHVvPgGwbB] [-p prompt] [-t CPU] [-X freq[k|M]]\n"
 	 "       [-C cfg_file] [-c file] [-e command] [-s file] [-S optionlist]\n"
 	 "       [-I if_optionlist] [-o colorlist] [-a nr]\n"
 #ifdef SOCKET_AVAIL
@@ -246,6 +246,7 @@ print_help(char *name)
      "               e.g.: prompt=b:white:black (bold white on black)\n"
      "  -l           Use default (builtin) colors\n"
      "  -b           Black & white (non-color) console\n"
+     "  -B           Beep on breakpoints\n"
      "  -g           Go, start simulation\n"
      "  -G           Go, start simulation, quit on stop\n"
      "  -a nr        Specify size of variable space (default=256)\n"
@@ -300,7 +301,7 @@ cl_app::proc_arguments(int argc, char *argv[])
   bool /*s_done= DD_FALSE,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
-  strcpy(opts, "c:C:e:p:PX:vVt:s:S:I:a:whHgGJo:bl_");
+  strcpy(opts, "c:C:e:p:PX:vVt:s:S:I:a:whHgGJo:blB_");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:k:");
 #endif
@@ -699,6 +700,11 @@ cl_app::proc_arguments(int argc, char *argv[])
 	set_option_s("color_ui_bit1", "bred:black");
 	set_option_s("color_debug", "magenta:bwhite");
 	break;
+      case 'B':
+	if (!options->set_value("beep_break", this, (bool)true))
+	  fprintf(stderr, "Warning: No \"debug\" option found to set "
+		  "by -B parameter\n");	
+	break;
       case 'h':
 	print_help((char*)get_name());
 	exit(0);
@@ -779,6 +785,7 @@ cl_app::exec(chars line)
     }
   do
     {
+      c->un_redirect();
       class cl_cmdline *cmdline= new cl_cmdline(this, (char*)line, c);
       cmdline->init();
       class cl_cmd *cm= commander->cmdset->get_cmd(cmdline, false/*c->is_interactive()*/);
@@ -1034,6 +1041,11 @@ cl_app::mk_options(void)
 					    "Print breakpoint script before execute"));
   o->init();
 
+  options->new_option(o= new cl_bool_option(this, "beep_break",
+					    "Beep at breakpoint hit (-B)"));
+  o->init();
+  o->set_value((bool)false);
+  
   options->new_option(o= new cl_string_option(this, "color_prompt",
 					      "Prompt color"));
   o->init();

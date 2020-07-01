@@ -568,7 +568,7 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
 {
   int retval= 0, i, do_print_prompt= 1;
 
-  un_redirect();
+  //un_redirect();
   char *cmdstr;
   i= read_line();
   if (i < 0)
@@ -599,6 +599,7 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
             dd_printf("%s\n", cmdstr);
 	  do
 	    {
+	      un_redirect();
 	      cmdline= new cl_cmdline(app, cmdstr, this);
 	      cmdline->init();
 	      if (cmdline->repeat() &&

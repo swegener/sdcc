@@ -235,28 +235,25 @@ cl_cmdline::split_out_string(char **_start, char **_end)
 void
 cl_cmdline::split_out_output_redirection(char **_start, char **_end)
 {
-  char *start= *_start, *end/*= *_end*/;
-  int i;
+  char *start= *_start;
+  char *end;
+  int j;
   char mode[2];
 
   mode[0]= 'w';
   mode[1]= '\0';
   start++;
-  i= strcspn(start, " \t\v\r,");
-  end= start+i;
-  char *param_str= (char *)malloc(i+1);
-  char *n= param_str;
-  strncpy(param_str, start, i);
-  param_str[i]= '\0';
-  if (param_str &&
-      param_str[0] == '>')
+  if (*start=='>')
     {
-      n++;
       mode[0]= 'a';
+      start++;
     }
-  tokens->add(strdup(n));
+  j= token_length(start);
+  end= start+j;
+  chars cp= get_token(start);
+  char *n= (char*)cp;
+  //tokens->add(strdup(n));
   con->redirect(n, mode);
-  free(param_str);
   *_start= start;
   *_end= end;
 }
@@ -358,6 +355,80 @@ cl_cmdline::split_out_array(char *dot, char *param_str)
          arg->init();
        }
     }
+}
+
+int
+cl_cmdline::token_length(char *start)
+{
+  if (start==NULL ||
+      *start=='\0')
+    return 0;
+  if (*start == '\"')
+    {
+      int i;
+      char c;
+      for (i=1; start[i]!=0 && start[i]!='\"'; i++)
+	{
+	  c= start[i];
+	  if (c == '\\')
+	    i+= 2;
+	}
+      return i+1;
+    }
+  else
+    return strcspn(start, " \t\v\r,;");
+}
+
+chars
+cl_cmdline::get_token(char *start)
+{
+  int i;
+  char c;
+  chars cs= chars();
+  if (start==NULL ||
+      *start=='\0')
+    return cs;
+  if (*start == '\"')
+    {
+      for (i=1; start[i]!=0 && start[i]!='\"'; i++)
+	{
+	  c= start[i];
+	  if (c == '\\')
+	    {
+	      i++;
+	      if (start[i])
+		{
+		  switch (start[i])
+		    {
+		    case 'a': cs+= '\a'; break;
+		    case 'b': cs+= '\b'; break;
+		    case 'e': cs+= '\x1b'; break;
+		    case 'f': cs+= '\f'; break;
+		    case 'n': cs+= '\n'; break;
+		    case 'r': cs+= '\r'; break;
+		    case 't': cs+= '\t'; break;
+		    case 'v': cs+= '\v'; break;
+		    case '\'': cs+= '\''; break;
+		    case '\"': cs+= '\"'; break;
+		    default:
+		      cs+= start[i];
+		      break;
+		    }
+		}
+	      //i++;
+	    }
+	  else
+	    cs+= c;
+	}
+      return cs;
+    }
+  else
+    {
+      int l= strcspn(start, " \t\v\r,;");
+      for (i=0; i<l; i++)
+	cs+= start[i];
+    }
+  return cs;
 }
 
 int

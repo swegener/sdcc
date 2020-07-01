@@ -165,15 +165,22 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
     }
   if (b)
     {
+      class cl_option *o;
+      o= app->options->get_option("beep_break");
+      bool e= false;
+      if (o) o->get_value(&e);
+      if (e)
+	cmd->frozen_console->dd_printf("\007");
+    
       if (!(b->commands.empty()))
 	{
-	  class cl_option *o= app->options->get_option("echo_script");
-	  bool e= false;
+	  o= app->options->get_option("echo_script");
+	  e= false;
 	  if (o) o->get_value(&e);
 	  if (e)
 	    cmd->dd_printf("%s\n", (char*)(b->commands));
-		  application->exec(b->commands);
-		  steps_done= 0;
+	  application->exec(b->commands);
+	  steps_done= 0;
 	}
     }
   

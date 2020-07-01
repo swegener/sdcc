@@ -128,6 +128,12 @@ cl_cmd_arg::~cl_cmd_arg(void)
     }
 }
 
+int
+cl_cmd_arg::init(void)
+{
+  return 0;
+}
+
 bool
 cl_cmd_arg::as_address(class cl_uc *uc)
 {

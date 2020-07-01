@@ -523,7 +523,7 @@ disass - Disassemble an opcode.
 char *
 cl_xa::disass(t_addr addr, const char *sep)
 {
-  char work[256], parm_str[40];
+  char work[256], parm_str[140];
   char *buf, *p, *b;
   int code;
   int len = 0;

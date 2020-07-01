@@ -347,7 +347,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
     {
       con->dd_printf("set hardware vcd[id] [add] memory address\n");
       con->dd_printf("set hardware vcd[id] del[ete] memory address\n");
-      con->dd_printf("set hardware vcd[id] fout|file \"vcd_file_name\"|gtkwave\n");
+      con->dd_printf("set hardware vcd[id] fout|file \"vcd_file_name\"\n");
       con->dd_printf("set hardware vcd[id] mod[ule] module_name\n");
       con->dd_printf("set hardware vcd[id] start\n");
       con->dd_printf("set hardware vcd[id] pause\n");

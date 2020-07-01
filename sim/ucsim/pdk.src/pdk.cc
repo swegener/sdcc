@@ -81,7 +81,7 @@ void cl_pdk::reset(void) {
 
   PC = 0x0000;
   regs.a = 0;
-  for (size_t i = 0; i < io_size; ++i) {
+  for (t_addr i = 0; i < io_size; ++i) {
     store_io(i, 0);
   }
 }

@@ -619,7 +619,7 @@ cl_memory_operator::write(t_mem val)
   if (next_operator)
     return(next_operator->write(val));
   else if (cell)
-    return(/* *data=*/cell->set(val & mask));
+    return(/* *data=*/cell->set(val/* & mask*/));
   return val;
 }
 
@@ -640,7 +640,7 @@ cl_bank_switcher_operator::write(t_mem val)
 {
   if (next_operator)
     next_operator->write(val);
-  if (cell) /* *data=*/ cell->set(val & mask);
+  if (cell) /* *data=*/ cell->set(val /*& mask*/);
   banker->activate(NULL);
   if (cell)
     return cell->get();
@@ -727,7 +727,7 @@ cl_write_operator::write(t_mem val)
   if (next_operator)
     return(next_operator->write(val));
   else if (cell)
-    return(/* *data=*/cell->set(val & mask));
+    return(/* *data=*/cell->set(val /*& mask*/));
   return val;
 }
 

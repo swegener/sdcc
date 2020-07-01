@@ -106,7 +106,8 @@ public:
   cl_cmd_arg(const char *s): cl_arg(s)
   { interpreted_as_string= false; }
   virtual ~cl_cmd_arg(void);
-
+  virtual int init(void);
+  
   virtual int is_string(void) { return(false); }
   virtual bool get_address(class cl_uc *uc, t_addr *addr) { return(false); }
   virtual bool as_address(class cl_uc *uc);

@@ -18,7 +18,7 @@
 //#include <unistd.h>
 #include <string.h>
 //#include <strings.h>
-//#include <errno.h>
+#include <errno.h>
 
 #include "posix_signal.hh"
 

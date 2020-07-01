@@ -1,7 +1,8 @@
 PRJ		= test_mdu517 test_mdu88x \
 		  stn stp strr sts stt stxr stxrw stxw \
 		  stt_small stt_large \
-		  monitor test_ser tim_ser stck_ovf
+		  monitor test_ser tim_ser stck_ovf \
+		  oclk receiver
 
 all:
 	for p in $(PRJ); do \

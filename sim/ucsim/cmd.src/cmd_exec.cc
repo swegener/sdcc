@@ -492,10 +492,22 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
   char *s= cmdline->cmd;
   char *fmt= NULL;
   int fmt_len= 0;
+  int i;
+  chars cs= chars();
   if (!s ||
       !*s)
     return(false);
-  int i= strspn(s, " \t\v\n\r");
+
+  for (i=0;i<cmdline->tokens->get_count();i++)
+    {
+      //class cl_cmd_arg *p= (class cl_cmd_arg*)(cmdline->param(i));
+      char *p= (char*)(cmdline->tokens->at(i));
+      cs+= " ";
+      cs+= p;
+    }
+
+  s= (char*)cs;
+  i= strspn(s, " \t\v\n\r");
   s+= i;
   i= strspn(s, "abcdefghijklmnopqrstuvwxyz");
   s+= i;
@@ -514,7 +526,9 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
 	  s+= i;
 	}
       if (s && *s)
-	v= application->eval(s);
+	{
+	  v= application->eval(s);
+	}
       if (fmt)
 	{
 	  for (i= 0; i < fmt_len; i++)

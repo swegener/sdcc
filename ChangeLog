@@ -1,6 +1,7 @@
 2020-07-01 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/pdk/gen.c:
+	* src/pdk/gen.c,
+	  support/regression/tests/bug-3040.c:
 	  Fix code generation for pdk additive operators with two block-scope const static operands.
 
 2020-06-30 Sergey Belyashov <sergey.belyashov@gmail.com>

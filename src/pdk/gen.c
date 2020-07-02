@@ -3862,7 +3862,7 @@ genPointerGet (const iCode *ic)
 
   wassertl (aopIsLitVal (right->aop, 0, 2, 0x0000), "Unimplemented nonzero right operand in pointer read");
 
-  if (left->aop->type == AOP_IMMD && (ptype == POINTER || ptype == CPOINTER))
+  if (left->aop->type == AOP_IMMD && (ptype == POINTER || ptype == CPOINTER) || left->aop->type == AOP_LIT && operandLitValueUll(left) & 0x8000)
     {
       for (int i = 0; !bit_field ? i < size : blen > 0; i++, blen -= 8)
         {
@@ -3872,7 +3872,13 @@ genPointerGet (const iCode *ic)
               pushed_a = true;
             }
 
-          if (ptype == POINTER)
+          if (left->aop->type == AOP_LIT)
+            {
+              unsigned int litval = operandLitValueUll(left);
+              emit2 ("call", "#0x%04x", litval & (TARGET_IS_PDK13 ? 0x03ff : TARGET_IS_PDK14 ? 0x07ff : 0x0fff));
+              cost (1, 4);
+            }
+          else if (ptype == POINTER)
             {
               emit2 ("mov", "a, %s+%d", left->aop->aopu.immd, left->aop->aopu.immd_off + i);
               cost (1, 1);

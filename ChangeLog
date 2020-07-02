@@ -1,5 +1,11 @@
 2020-07-02 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/pdk/gen.c,
+	  src/pdk/ralloc.c:
+	  Improve __sfr ^ with literal.
+
+2020-07-02 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Use rlca instead of rlc a, RFE #686.
 	* src/pdk/gen.c:

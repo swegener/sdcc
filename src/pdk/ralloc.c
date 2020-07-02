@@ -349,9 +349,9 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
     || !isOperandGlobal (IC_RIGHT (dic)))
     return 0;
 
-  if (IS_OP_VOLATILE (IC_RESULT (ic)) && IS_OP_VOLATILE (IC_RIGHT (dic))) // Only case with two volatiles that we can optimize: Bitwise operation on __sfr.
+  if (IS_OP_VOLATILE (IC_RESULT (ic)) && IS_OP_VOLATILE (IC_RIGHT (dic))) // Only case with two volatiles that we can optimize: Some bitwise operation on __sfr.
     {
-      if (ic->op != BITWISEAND && ic->op != '|' || operandSize (IC_LEFT (ic)) != 1 || !IS_OP_LITERAL (IC_RIGHT (ic)))
+      if (ic->op != BITWISEAND && ic->op != '|' && ic->op != '^' || operandSize (IC_LEFT (ic)) != 1 || !IS_OP_LITERAL (IC_RIGHT (ic)))
         return 0;
 
       if (!OP_SYMBOL (IC_RESULT (ic)) || !IN_REGSP (SPEC_OCLS (OP_SYMBOL (IC_RESULT (ic))->etype)))
@@ -365,7 +365,7 @@ packRegsForOneuse (iCode *ic, operand **opp, eBBlock *ebp)
         val = ~val;
       val &= 0xff;
 
-      if(val != 0x01 && val != 0x02 && val != 0x04 && val != 0x08 && val != 0x10 && val != 0x20 && val != 0x40 && val != 0x80)
+      if(ic->op != '^' && val != 0x01 && val != 0x02 && val != 0x04 && val != 0x08 && val != 0x10 && val != 0x20 && val != 0x40 && val != 0x80)
         return 0;
     }
 

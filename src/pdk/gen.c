@@ -2835,13 +2835,13 @@ genXorByte (const asmop *result_aop, const asmop *left_aop, const asmop *right_a
           *pushed_a = true;
         }
 
-      if ((left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX)) && aopSame (left_aop, i, result_aop, i, 1))
+      if ((left_aop->type == AOP_DIR || aopInReg (left_aop, i, P_IDX) || TARGET_IS_PDK15 && left_aop->type == AOP_SFR) && aopSame (left_aop, i, result_aop, i, 1))
         {
           cheapMove (ASMOP_A, 0, right_aop, i, true, p_dead, true);
           emit2 ("xor", "%s, a", aopGet (left_aop, i));
           cost (1, 1);
         }
-      else if ((right_aop->type == AOP_DIR || aopInReg (right_aop, i, P_IDX)) && aopSame (right_aop, i, result_aop, i, 1))
+      else if ((right_aop->type == AOP_DIR || aopInReg (right_aop, i, P_IDX) || TARGET_IS_PDK15 && right_aop->type == AOP_SFR) && aopSame (right_aop, i, result_aop, i, 1))
         {
           cheapMove (ASMOP_A, 0, left_aop, i, true, true, true);
           emit2 ("xor", "%s, a", aopGet (right_aop, i));

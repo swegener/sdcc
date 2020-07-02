@@ -1,3 +1,8 @@
+2020-07-02 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Use rlca instead of rlc a, RFE #686.
+
 2020-07-01 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c,

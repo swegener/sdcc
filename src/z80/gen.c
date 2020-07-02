@@ -7132,10 +7132,10 @@ no_mlt:
     {
       cheapMove (pair == PAIR_BC ? ASMOP_C : ASMOP_E, 0, AOP (IC_LEFT (ic)), 0, true);
       emit2 ("ld a, %s", _pairs[pair].l);
-      emit2 ("rlc a");
+      emit2 ("rlca");
       emit2 ("sbc a, a");
       emit2 ("ld %s, a", _pairs[pair].h);
-      regalloc_dry_run_cost += 5;
+      regalloc_dry_run_cost += 4;
       emit2 ("ld l, %s", _pairs[pair].l);
       emit2 ("ld h, %s", _pairs[pair].h);
       regalloc_dry_run_cost += 2;
@@ -9134,7 +9134,7 @@ genGetHbit (const iCode * ic)
     }
   else
     {
-      emit3 (A_RLC, ASMOP_A, 0);
+      emit3 (A_RLCA, 0, 0);
       emit2 ("and a, !one");
       regalloc_dry_run_cost += 2;
       outAcc (result);
@@ -9885,7 +9885,7 @@ genrshTwo (const iCode * ic, operand * result, operand * left, int shCount, int 
         {
           /* Sign extend the result */
           cheapMove (ASMOP_A, 0, result->aop, 0, true);
-          emit3 (A_RLC, ASMOP_A, 0);
+          emit3 (A_RLCA, 0, 0);
           emit3 (A_SBC, ASMOP_A, ASMOP_A);
           cheapMove (result->aop, 1, ASMOP_A, 0, true);
         }
@@ -9921,7 +9921,7 @@ genRightShiftLiteral (operand * left, operand * right, operand * result, const i
       if (!SPEC_USIGN (getSpec (operandType (left))))
         {
           cheapMove (ASMOP_A, 0, left->aop, 0, true);
-          emit3 (A_RLC, ASMOP_A, 0);
+          emit3 (A_RLCA, 0, 0);
           emit3 (A_SBC, ASMOP_A, ASMOP_A);
           while (size--)
             cheapMove (result->aop, size, ASMOP_A, 0, true);

@@ -2529,12 +2529,17 @@ optimize:
               /* Insert casts on operands */
               if (ic->op != CAST)
                 {
+                  sym_link *clefttype = copyLinkChain (nextresulttype);
+                  SPEC_VOLATILE (clefttype) = IS_OP_VOLATILE (IC_LEFT (ic));
+                  sym_link *crighttype = copyLinkChain (nextresulttype);
+                  SPEC_VOLATILE (crighttype) = IS_OP_VOLATILE (IC_RIGHT (ic));
+
                   if (IS_SYMOP (IC_LEFT (ic)))
                     {
-                      newic = newiCode (CAST, operandFromLink (nextresulttype), IC_LEFT (ic));
+                      newic = newiCode (CAST, operandFromLink (clefttype), IC_LEFT (ic));
                       hTabAddItem (&iCodehTab, newic->key, newic);
                       bitVectSetBit (OP_USES (IC_LEFT (ic)), newic->key);
-                      IC_RESULT (newic) = newiTempOperand (nextresulttype, 0);
+                      IC_RESULT (newic) = newiTempOperand (clefttype, 0);
                       OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
                       bitVectUnSetBit (OP_USES (IC_LEFT (ic)), ic->key);
                       IC_LEFT (ic) = operandFromOperand (IC_RESULT (newic));
@@ -2546,14 +2551,14 @@ optimize:
                   else
                     {
                       wassert (IS_OP_LITERAL (IC_LEFT (ic)));
-                      IC_LEFT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))));
+                      IC_LEFT (ic) = operandFromValue (valCastLiteral (clefttype, operandLitValue (IC_LEFT (ic)), operandLitValue (IC_LEFT (ic))));
                     }
                   if (ic->op != LEFT_OP && IS_SYMOP (IC_RIGHT (ic)))
                     {
-                      newic = newiCode (CAST, operandFromLink (nextresulttype), IC_RIGHT (ic));
+                      newic = newiCode (CAST, operandFromLink (crighttype), IC_RIGHT (ic));
                       hTabAddItem (&iCodehTab, newic->key, newic);
                       bitVectSetBit (OP_USES (IC_RIGHT (ic)), newic->key);
-                      IC_RESULT (newic) = newiTempOperand (nextresulttype, 0);
+                      IC_RESULT (newic) = newiTempOperand (crighttype, 0);
                       OP_DEFS (IC_RESULT (newic)) = bitVectSetBit (OP_DEFS (IC_RESULT (newic)), newic->key);
                       bitVectUnSetBit (OP_USES (IC_RIGHT (ic)), ic->key);
                       IC_RIGHT (ic) = operandFromOperand (IC_RESULT (newic));
@@ -2565,7 +2570,7 @@ optimize:
                   else if (ic->op != LEFT_OP && ic->op != UNARYMINUS)
                     {
                       wassert (IS_OP_LITERAL (IC_RIGHT (ic)));
-                      IC_RIGHT (ic) = operandFromValue (valCastLiteral (nextresulttype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));
+                      IC_RIGHT (ic) = operandFromValue (valCastLiteral (crighttype, operandLitValue (IC_RIGHT (ic)), operandLitValue (IC_RIGHT (ic))));
                     }
                 }
               if (uic->op == CAST && ic->op != RIGHT_OP)

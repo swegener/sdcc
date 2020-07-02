@@ -17,6 +17,7 @@
 /* This produces incorrect code */
 #define REG_1 (*(__xdata unsigned char*)ADDRESS(00))
 
+#if !defined( __SDCC_pdk14) && !defined( __SDCC_pdk15) // No RAM above 0x7f / 0xff.
 void incorrect(void)
 {
 	REG_1 |= 1;
@@ -31,6 +32,7 @@ void correct(void)
 	REG_2 |= 1;
 	REG_2 |= 2;
 }
+#endif
 
 void testBug(void)
 {

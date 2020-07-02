@@ -2,6 +2,8 @@
 
 	* src/z80/gen.c:
 	  Use rlca instead of rlc a, RFE #686.
+	* src/pdk/gen.c:
+	  Improve read from literal pointer.
 
 2020-07-01 Philipp Klaus Krause <pkk AT spth.de>
 

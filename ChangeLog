@@ -6,6 +6,8 @@
 	  Improve read from literal pointer.
 	* src/SDCCopt.c:
 	  Fix bug #3075.
+	* src/pdk/ralloc.c:
+	  Improve bit set/reset for I/O.
 
 2020-07-01 Philipp Klaus Krause <pkk AT spth.de>
 

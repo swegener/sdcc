@@ -1224,14 +1224,17 @@ z80canAssign (const char *op1, const char *op2, const char *exotic)
 }
 
 // canJoinRegs(reg_hi reg_lo [dst]) returns TRUE,
-bool z80canJoinRegs (set *regs, char dst[20])
+bool z80canJoinRegs (const char **regs, char dst[20])
 {
-  const char *regh = indexSet (regs, 0);
-  const char *regl = indexSet (regs, 1);
-  if (!regh || !regl || strlen (regh) > 3 || strlen (regl) > 3)
+  //check for only 2 source registers
+  if (!regs[0] || !regs[1] || regs[2])
     return FALSE;
-  strcpy (dst, regh);
-  strcat (dst, regl);
+  size_t l1 = strlen (regs[0]);
+  size_t l2 = strlen (regs[1]);
+  if (l1 + l2 >= 20)
+    return FALSE;
+  memcpy (&dst[0], regs[0], l1);
+  memcpy (&dst[l1], regs[1], l2 + 1); //copy including \0
   if (!strcmp (dst, "ixhixl") || !strcmp (dst, "iyhiyl"))
     {
       if (IS_GB)

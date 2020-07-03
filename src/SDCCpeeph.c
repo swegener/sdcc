@@ -1118,14 +1118,16 @@ FBYNAME (canAssign)
 }
 
 /*-----------------------------------------------------------------*/
-/* canJoinRegs - joins set of registers to combined one            */
+/* canJoinRegs - joins set of registers to combined one, returns   */
+/* true, if result register is valid. First operand can be         */
+/* 'unordered' if order of registers is not sufficient. Last       */
+/* operand should be wildcard. If result is not required, then     */
+/* wildcard should be %0.                                          */
 /*-----------------------------------------------------------------*/
 FBYNAME (canJoinRegs)
 {
   // Must be specified at least 3 parameters: reg_hi reg_lo and dst
   // If destination is not required, then %0 should be specified
-  bool result;
-
   if (!port->peep.canJoinRegs)
     {
       fprintf (stderr, "Function canJoinRegs not supported by the port\n");
@@ -1148,17 +1150,25 @@ FBYNAME (canJoinRegs)
 	}
       break;
     }
+  //parse cmd line without last operand
   cmdLine[i] = '\0';
-
-  set *operands;
-  result = ((operands = setFromConditionArgs (cmdLine, vars)) != NULL);
+  set *operands = setFromConditionArgs (cmdLine, vars);
   cmdLine[i] = ' ';
-  if (!result)
+
+  if (operands == NULL)
     {
       fprintf (stderr,
                "*** internal error: canJoinRegs peephole restriction"
                " malformed: %s\n", cmdLine);
       return FALSE;
+    }
+
+  bool unordered = false;
+  const char *first = setFirstItem (operands);
+  if (first && !strcmp (first, "unordered"))
+    {
+      unordered = true;
+      deleteSetItem (&operands, (void*)first);
     }
 
   int size = elementsInSet (operands);
@@ -1170,10 +1180,55 @@ FBYNAME (canJoinRegs)
       return FALSE;
     }
 
-  operands = reverseSet(operands);
+  const char **regs = (const char**) Safe_alloc ( (size + 1) * sizeof (*regs));
+  i = size;
+  regs[size] = NULL; /* end of registers */
+  //fill regs reversing order (operands have reversed order)
+  for (set *it = operands; it; it = it->next)
+    regs[--i] = (const char*)it->item;
+
+  //if unordered specified, then sort elements by ascending order
+  if (unordered)
+    qsort (regs, size, sizeof (*regs), (int (*)(const void*,const void*))&strcmp);
 
   char dst[20];
-  result = port->peep.canJoinRegs (operands, dst);
+  bool result;
+  for (;;)
+    {
+      result = port->peep.canJoinRegs (regs, dst);
+      if (result || !unordered)
+	break;
+
+      //do next registers permutation
+      int i;
+      //find last regs[i] < regs[i+1]
+      for (i = size-2; i >= 0; --i)
+	  if (strcmp (regs[i+1], regs[i]) > 0)
+	    break;
+      if (i < 0)
+	break; /* was last permutation */
+
+      int j;
+      //find last regs[j] > regs[i], where j > i
+      for (j = size-1; j > i; --j)
+	if (strcmp (regs[j], regs[i]) > 0)
+	  break;
+
+      //swap regs[j] and regs[i]
+      const char *t = regs[i];
+      regs[i] = regs[j];
+      regs[j] = t;
+      //reverse order from j+1 to end
+      for (j = j+1, i = size - 1; j < i; ++j, --i)
+	{
+	  t = regs[j];
+	  regs[j] = regs[i];
+	  regs[i] = t;
+	}
+  }
+
+  Safe_free (regs);
+
   if (result && dstKey > 0)
     {
       char *s[] = { dst, NULL };

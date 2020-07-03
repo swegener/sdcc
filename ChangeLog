@@ -1,6 +1,14 @@
 2020-07-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCpeeph.c
+	  src/port.h
+	  src/z80/peep.c
+	  src/z80/peep.h
+	  Add 'unordered' support to canJoinRegs peephole constraint
+
+2020-07-03 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCpeeph.c
 	  src/z80/peeph-z80.def
 	  Implement RFE #684
 

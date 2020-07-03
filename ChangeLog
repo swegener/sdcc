@@ -1,6 +1,11 @@
 2020-07-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCpeeph.c
+	  Replace buildLabelRefCountHash() by getLabelRefCountHash()
+
+2020-07-03 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCpeeph.c
 	  src/port.h
 	  src/z80/peep.c
 	  src/z80/peep.h

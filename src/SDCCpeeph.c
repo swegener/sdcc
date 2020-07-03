@@ -1014,24 +1014,12 @@ operandBaseName (const char *op)
 }
 
 /*-----------------------------------------------------------------*/
-/* notUsed - Check, if value in register is not read again         */
+/* notUsed - Check, if values in all registers are not read again  */
 /*-----------------------------------------------------------------*/
 FBYNAME (notUsed)
 {
   const char *what;
   bool ret;
-
-  set *operands = setFromConditionArgs (cmdLine, vars);
-
-  if (!operands || elementsInSet(operands) != 1)
-  {
-    fprintf (stderr,
-             "*** internal error: notUsed peephole restriction"
-             " malformed: %s\n", cmdLine);
-    return FALSE;
-  }
-
-  what = setFirstItem (operands);
 
   if (!port->peep.notUsed)
     {
@@ -1039,7 +1027,19 @@ FBYNAME (notUsed)
       return FALSE;
     }
 
-  ret = port->peep.notUsed (what, endPl, head);
+  set *operands = setFromConditionArgs (cmdLine, vars);
+
+  if (!operands)
+  {
+    fprintf (stderr,
+             "*** internal error: notUsed peephole restriction"
+             " requires operand(s): %s\n", cmdLine);
+    return FALSE;
+  }
+
+  what = setFirstItem (operands);
+  for (ret = TRUE; ret && what != NULL; what = setNextItem (operands))
+    ret = port->peep.notUsed (what, endPl, head);
 
   deleteSet(&operands);
 

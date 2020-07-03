@@ -242,7 +242,7 @@ replace restart {
 	ld	a,(bc)
 	ld	h,a
 	; peephole 22a optimize 16-bit load from BC.
-} if notUsed('bc'), notUsed('a')
+} if notUsed('bc' 'a')
 
 replace restart {
 	inc	bc

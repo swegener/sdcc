@@ -31,6 +31,8 @@ static peepRule *currRule = NULL;
 
 #define HTAB_SIZE 53
 
+hTab *labelHash = NULL;
+
 static struct
 {
   allocTrace values;
@@ -38,7 +40,7 @@ static struct
 } _G;
 
 static int hashSymbolName (const char *name);
-static hTab *getLabelRefCountHash (lineNode *head);
+static void buildLabelRefCountHash (lineNode * head);
 static void bindVar (int key, char **s, hTab ** vtab);
 
 static bool matchLine (char *, const char *, hTab **);
@@ -518,7 +520,10 @@ getLabelRef (const char *label, lineNode *head)
   labelHashEntry *entry;
 
   /* If we don't have the label hash table yet, build it. */
-  hTab *labelHash = getLabelRefCountHash (head);
+  if (!labelHash)
+    {
+      buildLabelRefCountHash (head);
+    }
 
   entry = hTabFirstItemWK (labelHash, hashSymbolName (label));
 
@@ -602,7 +607,10 @@ FBYNAME (labelRefCountChange)
   bool rc = FALSE;
 
   /* If we don't have the label hash table yet, build it. */
-  hTab *labelHash = getLabelRefCountHash (head);
+  if (!labelHash)
+    {
+      buildLabelRefCountHash (head);
+    }
 
   if (sscanf (cmdLine, "%*[ \t%]%d %i", &varNumber, &RefCountDelta) == 2)
     {
@@ -2732,23 +2740,9 @@ hashSymbolName (const char *name)
 /* Build a hash of all labels in the passed set of lines
  * and how many times they are referenced.
  */
-static hTab *
-getLabelRefCountHash (lineNode *head)
+static void
+buildLabelRefCountHash (lineNode *head)
 {
-  static hTab *labelHash = NULL;
-  if (head == NULL)
-    {
-      if (labelHash != NULL)
-	{
-	  hTabDeleteAll (labelHash);
-	  freeTrace (&_G.labels);
-	  labelHash = NULL;
-	}
-      return NULL;
-    }
-  if (labelHash != NULL)
-    return labelHash;
-
   lineNode *line;
   const char *label;
   int labelLen;
@@ -2855,7 +2849,6 @@ getLabelRefCountHash (lineNode *head)
         }
     }
 #endif
-  return labelHash;
 }
 
 /* How does this work?
@@ -2889,6 +2882,8 @@ peepHole (lineNode ** pls)
   if (TARGET_PIC_LIKE)
     return;
 #endif
+
+  assert(labelHash == NULL);
 
   do
     {
@@ -2952,7 +2947,12 @@ peepHole (lineNode ** pls)
         }
     } while (restart == TRUE);
 
-  getLabelRefCountHash (NULL);
+  if (labelHash)
+    {
+      hTabDeleteAll (labelHash);
+      freeTrace (&_G.labels);
+    }
+  labelHash = NULL;
 }
 
 

@@ -666,6 +666,69 @@ FBYNAME (labelRefCountChange)
   return rc;
 }
 
+/* newLabel creates new dollar-label and returns it in the specified container.
+ * Optional second operand may specify initial reference count, by default 1.
+ * return TRUE if no errors detected
+ */
+FBYNAME (newLabel)
+{
+  int varNumber;
+  unsigned refCount;
+  switch (sscanf (cmdLine, " %%%d %u", &varNumber, &refCount))
+    {
+    case 1:
+      refCount = 1;
+      break;
+    case 2:
+      break;
+    default:
+      fprintf (stderr,
+               "*** internal error: newLabel peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  if (varNumber <= 0)
+    {
+      fprintf (stderr, "*** internal error: invalid container %%%d"
+               " in peephole %s rule.\n",
+               varNumber, __func__);
+      return FALSE;
+    }
+
+  if (labelHash == NULL)
+    buildLabelRefCountHash (head);
+
+  labelHashEntry *entry;
+  int key;
+  unsigned maxLabel = 100; // do not use labels below than 00100$
+  for (entry = hTabFirstItem (labelHash, &key); entry;
+       entry = hTabNextItem (labelHash, &key))
+    {
+      const char *name = entry->name;
+      if (!ISCHARDIGIT (name[0]))
+        continue;
+      if (name[strlen (name)-1] != '$')
+        continue;
+      unsigned n;
+      if (sscanf (name, "%u$", &n) != 1)
+        continue;
+      if (maxLabel < n)
+	maxLabel = n;
+    }
+  ++maxLabel;
+  entry = traceAlloc (&_G.labels, Safe_alloc (sizeof (*entry)));
+  int len = snprintf (entry->name, SDCC_NAME_MAX, "%05u$", maxLabel);
+  entry->name[len] = 0;
+  entry->refCount = refCount;
+  hTabAddItem (&labelHash, hashSymbolName (entry->name), entry);
+
+  char *value = traceAlloc (&_G.values, Safe_strdup(entry->name));
+  hTabAddItem (&vars, varNumber, value);
+
+  return TRUE;
+}
+
 /* Within the context of the lines currPl through endPl, determine
 ** if the variable var contains a symbol that is volatile. Returns
 ** TRUE only if it is certain that this was not volatile (the symbol
@@ -1779,6 +1842,9 @@ ftab[] =                                            // sorted on the number of t
   {
     "canJoinRegs", canJoinRegs
   },
+  {
+    "newLabel", newLabel
+  },
 };
 
 /*-----------------------------------------------------------------*/
@@ -2327,6 +2393,11 @@ matchRule (lineNode * pl,
       /* if this rule has additional conditions */
       if (pr->cond)
         {
+          /* constraints which uses variables as destination container
+             requires to vars table to be defined */
+          if (!pr->vars)
+            pr->vars = newHashTable (128);
+
           if (callFuncByName (pr->cond, pr->vars, pl, spl, head))
             {
               *mtail = spl;

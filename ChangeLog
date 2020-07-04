@@ -1,3 +1,7 @@
+2020-07-04 Sergey Belyashov <sergey.belyashov@gmail.com>
+	* src/SDCCpeeph.c
+	  Implement RFE #661: Add newLabel peephole optimizer constraint
+
 2020-07-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCpeeph.c

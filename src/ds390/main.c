@@ -1027,6 +1027,7 @@ PORT ds390_port =
     NULL,
     NULL,
     NULL,
+    NULL,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, bit, float */
   { 1, 2, 2, 4, 8, 1, 2, 3, 2, 3, 1, 4 },
@@ -1367,6 +1368,7 @@ PORT tininative_port =
     NULL,
     NULL,
     NULL,
+    NULL,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 1, 3, 3, 3, 3, 1, 4 },
@@ -1618,6 +1620,7 @@ PORT ds400_port =
     getInstructionSize,
     getRegsRead,
     getRegsWritten,
+    NULL,
     NULL,
     NULL,
     NULL,

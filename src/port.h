@@ -175,6 +175,7 @@ typedef struct
     bool (*notUsedFrom) (const char *reg, const char *label, lineNode *head);
     bool (*symmParmStack) (void);
     bool (*canJoinRegs) (const char **regs, char dst[20]);
+    bool (*canSplitReg) (const char *reg, char dst[][16], int nDst);
   }
   peep;
 

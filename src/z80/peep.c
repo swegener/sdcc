@@ -1223,6 +1223,24 @@ z80canAssign (const char *op1, const char *op2, const char *exotic)
   return FALSE;
 }
 
+static const char *
+registerBaseName (const char *op)
+{
+  if (!strcmp (op, "d") || !strcmp (op, "e") || !strcmp (op, "(de)"))
+    return "de";
+  if (!strcmp (op, "b") || !strcmp (op, "c") || !strcmp (op, "(bc)"))
+    return "bc";
+  if (!strcmp (op, "h") || !strcmp (op, "l") || !strcmp (op, "(hl)") || !strcmp (op, "(hl+)")  || !strcmp (op, "(hl-)"))
+    return "hl";
+  if (!strcmp (op, "iyh") || !strcmp (op, "iyl") || strstr (op, "iy"))
+    return "iy";
+  if (!strcmp (op, "ixh") || !strcmp (op, "ixl") || strstr (op, "ix"))
+    return "ix";
+  if (!strcmp (op, "a"))
+    return "af";
+  return op;
+}
+
 // canJoinRegs(reg_hi reg_lo [dst]) returns TRUE,
 bool z80canJoinRegs (const char **regs, char dst[20])
 {
@@ -1233,8 +1251,17 @@ bool z80canJoinRegs (const char **regs, char dst[20])
   size_t l2 = strlen (regs[1]);
   if (l1 + l2 >= 20)
     return FALSE;
-  memcpy (&dst[0], regs[0], l1);
-  memcpy (&dst[l1], regs[1], l2 + 1); //copy including \0
+  if (l1 == 0 || l2 == 0)
+    {
+      if (l1 == 0 && l2 == 0)
+        return FALSE;
+      strcpy (dst, registerBaseName (regs[l1 ? 0 : 1]));
+    }
+  else
+    {
+      memcpy (&dst[0], regs[0], l1);
+      memcpy (&dst[l1], regs[1], l2 + 1); //copy including \0
+    }
   if (!strcmp (dst, "ixhixl") || !strcmp (dst, "iyhiyl"))
     {
       if (IS_GB)
@@ -1242,6 +1269,35 @@ bool z80canJoinRegs (const char **regs, char dst[20])
       dst[2] = '\0';
     }
   return isRegPair (dst);
+}
+
+bool z80canSplitReg (const char *reg, char dst[][16], int nDst)
+{
+  int i;
+  if (nDst < 0 || nDst > 2)
+    return FALSE;
+  if (!strcmp (reg, "bc") || !strcmp (reg, "de") || !strcmp (reg, "hl"))
+    {
+      for (i = 0; i < nDst; ++i)
+        {
+          dst[i][0] = reg[i];
+          dst[i][1] = '\0';
+        }
+    }
+  else if (!IS_GB && (!strcmp (reg, "ix") || !strcmp (reg, "iy")))
+    {
+      for (i = 0; i < nDst; ++i)
+        {
+          dst[i][0] = reg[0];
+          dst[i][1] = reg[1];
+          dst[i][2] = "hl"[i];
+          dst[i][3] = '\0';
+        }
+    }
+  else
+    return FALSE;
+
+  return TRUE;
 }
 
 int z80instructionSize(lineNode *pl)

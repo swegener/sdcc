@@ -1185,7 +1185,8 @@ FBYNAME (canAssign)
 /* true, if result register is valid. First operand can be         */
 /* 'unordered' if order of registers is not sufficient. Last       */
 /* operand should be wildcard. If result is not required, then     */
-/* wildcard should be %0.                                          */
+/* wildcard should be %0. If some of source registers is not       */
+/* sufficient then empty string can be passed.                     */
 /*-----------------------------------------------------------------*/
 FBYNAME (canJoinRegs)
 {
@@ -1300,6 +1301,89 @@ FBYNAME (canJoinRegs)
 
   deleteSet (&operands);
   return result;
+}
+
+/*-----------------------------------------------------------------*/
+/* canSplitReg - returns true, if register can be splitted. First  */
+/* operand contains complex register name and is required. Other   */
+/* operands should be wildcards. If result is not sufficient then  */
+/* they can be omited.                                             */
+/*-----------------------------------------------------------------*/
+FBYNAME (canSplitReg)
+{
+  if (!port->peep.canSplitReg)
+    {
+      fprintf (stderr, "Function canSplitReg not supported by the port\n");
+      return FALSE;
+    }
+
+  int i;
+  //find start of first operand
+  for (i = 0; cmdLine[i] && ISCHARSPACE (cmdLine[i]); ++i)
+    ;
+  if (cmdLine[i] == '\0')
+    {
+      fprintf (stderr,
+               "*** internal error: canSplitReg peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  //find end of first operand
+  for (; cmdLine[i] && !ISCHARSPACE (cmdLine[i]); ++i)
+    ;
+
+  //parse first operand
+  char t = cmdLine[i];
+  cmdLine[i] = '\0';
+  set *operands = setFromConditionArgs (cmdLine, vars);
+  cmdLine[i] = t;
+  if (cmdLine[i] == '\0')
+    {
+      fprintf (stderr,
+               "*** internal error: canSplitReg peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  //scan remaining operands
+  int size = 2;
+  int *varIds = (int*)Safe_alloc (size * sizeof(*varIds));
+  const char *cl = &cmdLine[i+1];
+  for (i = 0;; ++i)
+    {
+      if (i >= size)
+        {
+	  size *= 2;
+          varIds = (int*)Safe_realloc (varIds, size * sizeof(*varIds));
+        }
+      int len;
+      if (sscanf (cl, " %%%d %n", &varIds[i], &len) != 1)
+        break;
+      if (varIds[i] < 0)
+        {
+          fprintf (stderr,
+                   "*** internal error: canSplitReg peephole restriction"
+                   " has invalid destination container: %s\n", cmdLine);
+          return FALSE;
+        }
+      cl += len;
+    }
+  size = i;
+  char (*dst)[16];
+  dst = Safe_alloc (size * sizeof (*dst));
+  bool ret = port->peep.canSplitReg ((char*)setFirstItem (operands), dst, size);
+  for (i = 0; ret && i < size; ++i)
+    {
+      if (varIds[i] <= 0)
+        continue;
+      char *s[] = { dst[i], NULL };
+      bindVar (varIds[i], s, &vars);
+    }
+  Safe_free (dst);
+  Safe_free (varIds);
+  deleteSet (&operands);
+  return ret;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1841,6 +1925,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "canJoinRegs", canJoinRegs
+  },
+  {
+    "canSplitReg", canSplitReg
   },
   {
     "newLabel", newLabel

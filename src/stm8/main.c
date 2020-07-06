@@ -431,6 +431,7 @@ PORT stm8_port =
     stm8notUsedFrom,
     NULL,
     NULL,
+    NULL,
   },
   /* Sizes: char, short, int, long, long long, ptr, fptr, gptr, bit, float, max */
   {

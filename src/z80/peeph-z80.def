@@ -1873,6 +1873,14 @@ replace restart {
 	; peephole 176 remove unnecessary load back
 } if notVolatile(%1), notVolatile(%2)
 
+replace restart {
+	ld	a, %1
+	push	af
+} by {
+	push	%2
+	; peephole 177 replace pushed register pair
+} if notUsed('a'), canJoinRegs(%1 '' %2), canSplitReg(%2 %3), same(%3 %1)
+
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 barrier
 

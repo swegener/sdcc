@@ -934,6 +934,7 @@ PORT z80_port =
     z80notUsedFrom,
     z80symmParmStack,
     z80canJoinRegs,
+    z80canSplitReg,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4 },
@@ -1061,6 +1062,7 @@ PORT z180_port =
     z80notUsedFrom,
     z80symmParmStack,
     z80canJoinRegs,
+    z80canSplitReg,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4 },
@@ -1187,6 +1189,7 @@ PORT r2k_port =
     z80notUsedFrom,
     z80symmParmStack,
     z80canJoinRegs,
+    z80canSplitReg,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4 },
@@ -1314,6 +1317,7 @@ PORT r3ka_port =
     z80notUsedFrom,
     z80symmParmStack,
     z80canJoinRegs,
+    z80canSplitReg,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4 },
@@ -1443,6 +1447,7 @@ PORT gbz80_port =
     z80notUsedFrom,
     z80symmParmStack,
     z80canJoinRegs,
+    z80canSplitReg,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4 },
@@ -1570,6 +1575,7 @@ PORT tlcs90_port =
     z80notUsedFrom,
     z80symmParmStack,
     z80canJoinRegs,
+    z80canSplitReg,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4 },
@@ -1697,6 +1703,7 @@ PORT ez80_z80_port =
     z80notUsedFrom,
     z80symmParmStack,
     z80canJoinRegs,
+    z80canSplitReg,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4 },
@@ -1824,6 +1831,7 @@ PORT z80n_port =
     z80notUsedFrom,
     z80symmParmStack,
     z80canJoinRegs,
+    z80canSplitReg,
   },
   /* Sizes: char, short, int, long, long long, near ptr, far ptr, gptr, func ptr, banked func ptr, bit, float */
   { 1, 2, 2, 4, 8, 2, 2, 2, 2, 2, 1, 4 },

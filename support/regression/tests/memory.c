@@ -14,6 +14,12 @@ unsigned char destination[9];
 const unsigned char source[9] = {0, 1, 2, 3};
 int c;
 
+// Some of these tests intentionally do not check the return value of functions:
+// Some backends use built-ins when the return value is not used, but fall back
+// to a library version otherwise. So we need tests with unused return value to
+// test the built-in. Similarly, code paths for built-ns are different depending
+// on the last parameter being a literal vs. not. So we need to test both with a
+// literal and a volatile variable.
 void testmemory(void)
 {
   volatile size_t zero = 0;

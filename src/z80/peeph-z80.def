@@ -1881,6 +1881,14 @@ replace restart {
 	; peephole 177 replace pushed register pair
 } if notUsed('a'), canJoinRegs(%1 '' %2), canSplitReg(%2 %3), same(%3 %1)
 
+replace restart {
+	xor	a, a
+	ld	%1 (%2), a
+} by {
+	ld	%1 (%2), #0
+	; peephole 178 direct load zero constant to memory addressed by index register
+} if notUsed('a'), canAssign(%1 %2 '#0')
+
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 barrier
 

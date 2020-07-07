@@ -1,3 +1,17 @@
+2020-07-06 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCpeeph.c
+	  src/ds390/main.c
+	  src/mcs51/main.c
+	  src/pdk/main.c
+	  src/stm8/main.c
+	  src/port.h
+	  src/z80/main.c
+	  src/z80/peep.c
+	  src/z80/peep.h
+	  src/z80/peeph-z80.def
+	  Implement RFE #683: Add canSplitReg peephole constraint
+
 2020-07-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/memory.c:

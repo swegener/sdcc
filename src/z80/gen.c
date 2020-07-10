@@ -4925,7 +4925,7 @@ genCall (const iCode *ic)
           emit2 ("ret");
           regalloc_dry_run_cost += 2;
           if (tlbl)
-            emit2 ("!tlabeldef", labelKey2num (tlbl->key));
+            emitLabel (tlbl);
         }
     }
   else

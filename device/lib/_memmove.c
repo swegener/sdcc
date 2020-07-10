@@ -31,33 +31,25 @@
 #include <stdint.h>
 #include <sdcc-lib.h>
 
-void * memmove (void * dst, const void * src, size_t acount)
+void *memmove (void *dst, const void *src, size_t size)
 {
-	void * ret = dst;
-	char * d;
-	const char * s;
+	size_t c = size;
+	if (c == 0)
+		return dst;
 
-	if ((uintptr_t)src < (uintptr_t)dst) {
-		/*
-		 * copy from higher addresses to lower addresses
-		 */
-		d = ((char *)dst)+acount-1;
-		s = ((char *)src)+acount-1;
-		while (acount--) {
-			*d-- = *s--;
-		}
-	}
-	else {
-		/*
-		 * copy from lower addresses to higher addresses
-		 */
-		d = dst;
-		s = src;
-		while (acount--) {
+	char *d = dst;
+	const char *s = src;
+	if (s < d) {
+		d += c;
+		s += c;
+		do {
+			*--d = *--s;
+		} while (--c);
+	} else {
+		do {
 			*d++ = *s++;
-		}
+		} while (--c);
 	}
 
-	return(ret);
+	return dst;
 }
-

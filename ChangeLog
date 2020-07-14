@@ -1,8 +1,14 @@
 2020-07-14 Sergey Belyashov <sergey.belyashov@gmail.com>
 
-	* support/regression/tests/itoa.c
-	  support/regression/tests/ltoa.c
-	  Split itoa/ltoa tests on 5 parts. Possible workaround for BUG #3082.
+	* device/lib/Makefile.in:
+	  Add lib file removing before creating new one to prevent merging
+	  Add device/lib/Makefile refreshing after changing Makefile.in
+
+2020-07-14 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* support/regression/tests/itoa.c,
+	  support/regression/tests/ltoa.c:
+	  Split itoa/ltoa tests on 5 parts. Possible workaround for Bug #3082.
 	  Add tests for uncommon radix.
 
 2020-07-10 Philipp Klaus Krause <pkk AT spth.de>
@@ -13,28 +19,28 @@
 
 2020-07-10 Sergey Belyashov <sergey.belyashov@gmail.com>
 
-	* device/lib/_memmove.c
+	* device/lib/_memmove.c:
 	  Small optimization of generic memmove() implementation
 
 2020-07-08 Sergey Belyashov <sergey.belyashov@gmail.com>
 
-	* support/regression/tests/itoa.c
+	* support/regression/tests/itoa.c:
 	  Add tests for _uitoa() and _itoa()
-	* support/regression/tests/ltoa.c
+	* support/regression/tests/ltoa.c:
 	  Add tests for _ultoa() and _ltoa()
 
 2020-07-06 Sergey Belyashov <sergey.belyashov@gmail.com>
 
-	* src/SDCCpeeph.c
-	  src/ds390/main.c
-	  src/mcs51/main.c
-	  src/pdk/main.c
-	  src/stm8/main.c
-	  src/port.h
-	  src/z80/main.c
-	  src/z80/peep.c
-	  src/z80/peep.h
-	  src/z80/peeph-z80.def
+	* src/SDCCpeeph.c,
+	  src/ds390/main.c,
+	  src/mcs51/main.c,
+	  src/pdk/main.c,
+	  src/stm8/main.c,
+	  src/port.h,
+	  src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/peep.h,
+	  src/z80/peeph-z80.def:
 	  Implement RFE #683: Add canSplitReg peephole constraint
 
 2020-07-06 Philipp Klaus Krause <pkk AT spth.de>
@@ -49,21 +55,21 @@
 	  Fix bug #3079.
 
 2020-07-04 Sergey Belyashov <sergey.belyashov@gmail.com>
-	* src/SDCCpeeph.c
+	* src/SDCCpeeph.c:
 	  Implement RFE #661: Add newLabel peephole optimizer constraint
 
 2020-07-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 
-	* src/SDCCpeeph.c
-	  src/port.h
-	  src/z80/peep.c
-	  src/z80/peep.h
+	* src/SDCCpeeph.c,
+	  src/port.h,
+	  src/z80/peep.c,
+	  src/z80/peep.h:
 	  Add 'unordered' support to canJoinRegs peephole constraint
 
 2020-07-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 
-	* src/SDCCpeeph.c
-	  src/z80/peeph-z80.def
+	* src/SDCCpeeph.c,
+	  src/z80/peeph-z80.def:
 	  Implement RFE #684
 
 2020-07-02 Philipp Klaus Krause <pkk AT spth.de>
@@ -91,16 +97,16 @@
 
 2020-06-30 Sergey Belyashov <sergey.belyashov@gmail.com>
 
-	* src/SDCCpeeph.c
-	  src/ds390/main.c
-	  src/mcs51/main.c
-	  src/pdk/main.c
-	  src/port.h
-	  src/stm8/main.c
-	  src/z80/main.c
-	  src/z80/peep.c
-	  src/z80/peep.h
-	  src/z80/peeph-ez80_z80.def
+	* src/SDCCpeeph.c,
+	  src/ds390/main.c,
+	  src/mcs51/main.c,
+	  src/pdk/main.c,
+	  src/port.h,
+	  src/stm8/main.c,
+	  src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/peep.h,
+	  src/z80/peeph-ez80_z80.def:
 	  Partially implement RFE #683: Support canJoinRegs peephole constraint
 
 2020-06-29 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
@@ -109,9 +115,9 @@
 
 2020-06-29 Sergey Belyashov <sergey.belyashov@gmail.com>
 
-	* src/z80/main.c
-	  src/z80/peeph-ez80_z80.def
-	  src/z80/peeph-z80n.def
+	* src/z80/main.c,
+	  src/z80/peeph-ez80_z80.def,
+	  src/z80/peeph-z80n.def:
 	  Implement RFE #632: Add separate peephole definition files for eZ80 and Z80N
 
 2020-06-28 Philipp Klaus Krause <pkk AT spth.de>

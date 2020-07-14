@@ -327,6 +327,7 @@ objects-xa51:
 	$(MAKE) port-specific-objects
 
 $(PORTDIR)/lib$(PORT).lib: $(XA51OBJECTS)
+	rm -f $(PORTDIR)/lib$(PORT).lib
 ifeq ($(LIB_TYPE), SDCCLIB)
 	$(top_builddir)/bin/sdcclib -a $(PORTDIR)/lib$(PORT).lib $(XA51OBJECTS)
 else
@@ -586,6 +587,9 @@ $(PORTDIR)/libsdcc.lib: $(OBJECTS_SDCC)
     endif
   endif
 endif
+
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/Makefile
 
 clean_intermediate:
 	rm -f $(PORTDIR)/*.lst $(PORTDIR)/*.sym

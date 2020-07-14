@@ -1,7 +1,7 @@
 /** Simple test for the _ltoa and _ultoa.
   test: ultoa, ltoa
+  part: 1, 2, 3, 4, 5
 */
-//  part: 1, 2, 3, 4
 
 #include <testfwk.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@ check_ul (unsigned long n, int b, const char *r)
 void test_ltoa (void)
 {
 #ifdef TEST_ltoa
-//#if {part} == 1
+#if {part} == 1
   ASSERT (LTOA (0, 2, "0"));
   ASSERT (LTOA (0, 8, "0"));
   ASSERT (LTOA (0, 10, "0"));
@@ -89,7 +89,7 @@ void test_ltoa (void)
   ASSERT (LTOA (12, 16, "C"));
   ASSERT (LTOA (13, 2, "1101"));
   ASSERT (LTOA (13, 8, "15"));
-//#elif {part} == 2
+#elif {part} == 2
   ASSERT (LTOA (13, 10, "13"));
   ASSERT (LTOA (13, 16, "D"));
   ASSERT (LTOA (14, 2, "1110"));
@@ -144,7 +144,7 @@ void test_ltoa (void)
   ASSERT (LTOA (-10, 8, "37777777766"));
   ASSERT (LTOA (-10, 10, "-10"));
   ASSERT (LTOA (-10, 16, "FFFFFFF6"));
-//#elif {part} == 3
+#elif {part} == 3
   ASSERT (LTOA (-11, 2, "11111111111111111111111111110101"));
   ASSERT (LTOA (-11, 8, "37777777765"));
   ASSERT (LTOA (-11, 10, "-11"));
@@ -199,7 +199,7 @@ void test_ltoa (void)
   ASSERT (LTOA (256, 16, "100"));
   ASSERT (LTOA (-256, 2, "11111111111111111111111100000000"));
   ASSERT (LTOA (-256, 8, "37777777400"));
-//#elif {part} == 4
+#elif {part} == 4
   ASSERT (LTOA (-256, 10, "-256"));
   ASSERT (LTOA (-256, 16, "FFFFFF00"));
   ASSERT (LTOA (0x12345678, 2, "10010001101000101011001111000"));
@@ -254,7 +254,11 @@ void test_ltoa (void)
   ASSERT (LTOA (-0x80000000, 8, "20000000000"));
   ASSERT (LTOA (-0x80000000, 10, "-2147483648"));
   ASSERT (LTOA (-0x80000000, 16, "80000000"));
-//#endif /* {part} */
+#elif {part} == 5
+  ASSERT (LTOA (1, 6, "1"));
+  ASSERT (LTOA (12, 6, "20"));
+  ASSERT (LTOA (123, 6, "323"));
+#endif /* {part} */
 #undef LTOA
 #endif /* TEST_ltoa */
 }
@@ -263,7 +267,7 @@ void test_ltoa (void)
 void test_ultoa (void)
 {
 #ifdef TEST_ultoa
-//#if {part} == 1
+#if {part} == 1
   ASSERT (ULTOA (0, 2, "0"));
   ASSERT (ULTOA (0, 8, "0"));
   ASSERT (ULTOA (0, 10, "0"));
@@ -292,7 +296,7 @@ void test_ultoa (void)
   ASSERT (ULTOA (6, 8, "6"));
   ASSERT (ULTOA (6, 10, "6"));
   ASSERT (ULTOA (6, 16, "6"));
-//#elif {part} == 2
+#elif {part} == 2
   ASSERT (ULTOA (7, 2, "111"));
   ASSERT (ULTOA (7, 8, "7"));
   ASSERT (ULTOA (7, 10, "7"));
@@ -321,7 +325,7 @@ void test_ultoa (void)
   ASSERT (ULTOA (13, 8, "15"));
   ASSERT (ULTOA (13, 10, "13"));
   ASSERT (ULTOA (13, 16, "D"));
-//#elif {part} == 3
+#elif {part} == 3
   ASSERT (ULTOA (14, 2, "1110"));
   ASSERT (ULTOA (14, 8, "16"));
   ASSERT (ULTOA (14, 10, "14"));
@@ -350,7 +354,7 @@ void test_ultoa (void)
   ASSERT (ULTOA (65536, 8, "200000"));
   ASSERT (ULTOA (65536, 10, "65536"));
   ASSERT (ULTOA (65536, 16, "10000"));
-//#elif {part} == 4
+#elif {part} == 4
   ASSERT (ULTOA (0xffffffff, 2, "11111111111111111111111111111111"));
   ASSERT (ULTOA (0xffffffff, 8, "37777777777"));
   ASSERT (ULTOA (0xffffffff, 10, "4294967295"));
@@ -383,7 +387,11 @@ void test_ultoa (void)
   ASSERT (ULTOA (0xffffffff, 8, "37777777777"));
   ASSERT (ULTOA (0xffffffff, 10, "4294967295"));
   ASSERT (ULTOA (0xffffffff, 16, "FFFFFFFF"));
-//#endif /* {part} */
+#elif {part} == 5
+  ASSERT (ULTOA (1, 6, "1"));
+  ASSERT (ULTOA (12, 6, "20"));
+  ASSERT (ULTOA (123, 6, "323"));
+#endif /* {part} */
 #undef ULTOA
 #endif /*TEST_ultoa */
 }

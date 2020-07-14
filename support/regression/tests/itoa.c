@@ -1,5 +1,6 @@
 /** Simple test for the _itoa and _uitoa.
   test: uitoa, itoa
+  part: 1, 2, 3, 4, 5
 */
 
 #include <testfwk.h>
@@ -34,6 +35,7 @@ check_ui (int n, int b, const char *r)
 void test_itoa (void)
 {
 #ifdef TEST_itoa
+#if {part} == 1
   ASSERT (ITOA (0, 2, "0"));
   ASSERT (ITOA (0, 8, "0"));
   ASSERT (ITOA (0, 10, "0"));
@@ -85,6 +87,7 @@ void test_itoa (void)
   ASSERT (ITOA (12, 2, "1100"));
   ASSERT (ITOA (12, 8, "14"));
   ASSERT (ITOA (12, 10, "12"));
+#elif {part} == 2
   ASSERT (ITOA (12, 16, "C"));
   ASSERT (ITOA (13, 2, "1101"));
   ASSERT (ITOA (13, 8, "15"));
@@ -135,6 +138,7 @@ void test_itoa (void)
   ASSERT (ITOA (-8, 10, "-8"));
   ASSERT (ITOA (-8, 16, "FFF8"));
   ASSERT (ITOA (-9, 2, "1111111111110111"));
+#elif {part} == 3
   ASSERT (ITOA (-9, 8, "177767"));
   ASSERT (ITOA (-9, 10, "-9"));
   ASSERT (ITOA (-9, 16, "FFF7"));
@@ -182,6 +186,7 @@ void test_itoa (void)
   ASSERT (ITOA (-128, 8, "177600"));
   ASSERT (ITOA (-128, 10, "-128"));
   ASSERT (ITOA (-128, 16, "FF80"));
+#elif {part} == 4
   ASSERT (ITOA (255, 2, "11111111"));
   ASSERT (ITOA (255, 8, "377"));
   ASSERT (ITOA (255, 10, "255"));
@@ -234,6 +239,11 @@ void test_itoa (void)
   ASSERT (ITOA (-32768, 8, "100000"));
   ASSERT (ITOA (-32768, 10, "-32768"));
   ASSERT (ITOA (-32768, 16, "8000"));
+#elif {part} == 5
+  ASSERT (ITOA (1, 6, "1"));
+  ASSERT (ITOA (12, 6, "20"));
+  ASSERT (ITOA (123, 6, "323"));
+#endif
 #undef ITOA
 #endif /* TEST_itoa */
 }
@@ -241,6 +251,7 @@ void test_itoa (void)
 void test_uitoa(void)
 {
 #ifdef TEST_uitoa
+#if {part} == 1
   ASSERT (UITOA (0, 2, "0"));
   ASSERT (UITOA (0, 8, "0"));
   ASSERT (UITOA (0, 10, "0"));
@@ -268,6 +279,7 @@ void test_uitoa(void)
   ASSERT (UITOA (6, 2, "110"));
   ASSERT (UITOA (6, 8, "6"));
   ASSERT (UITOA (6, 10, "6"));
+#elif {part} == 2
   ASSERT (UITOA (6, 16, "6"));
   ASSERT (UITOA (7, 2, "111"));
   ASSERT (UITOA (7, 8, "7"));
@@ -295,6 +307,7 @@ void test_uitoa(void)
   ASSERT (UITOA (12, 16, "C"));
   ASSERT (UITOA (13, 2, "1101"));
   ASSERT (UITOA (13, 8, "15"));
+#elif {part} == 3
   ASSERT (UITOA (13, 10, "13"));
   ASSERT (UITOA (13, 16, "D"));
   ASSERT (UITOA (14, 2, "1110"));
@@ -322,6 +335,7 @@ void test_uitoa(void)
   ASSERT (UITOA (0x1234, 10, "4660"));
   ASSERT (UITOA (0x1234, 16, "1234"));
   ASSERT (UITOA (0x5678, 2, "101011001111000"));
+#elif {part} == 4
   ASSERT (UITOA (0x5678, 8, "53170"));
   ASSERT (UITOA (0x5678, 10, "22136"));
   ASSERT (UITOA (0x5678, 16, "5678"));
@@ -349,6 +363,11 @@ void test_uitoa(void)
   ASSERT (UITOA (65535, 8, "177777"));
   ASSERT (UITOA (65535, 10, "65535"));
   ASSERT (UITOA (65535, 16, "FFFF"));
+#elif {part} == 5
+  ASSERT (UITOA (1, 6, "1"));
+  ASSERT (UITOA (12, 6, "20"));
+  ASSERT (UITOA (123, 6, "323"));
+#endif
 #undef UITOA
 #endif /* TEST_uitoa */
 }

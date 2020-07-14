@@ -1,3 +1,10 @@
+2020-07-14 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* support/regression/tests/itoa.c
+	  support/regression/tests/ltoa.c
+	  Split itoa/ltoa tests on 5 parts. Possible workaround for BUG #3082.
+	  Add tests for uncommon radix.
+
 2020-07-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

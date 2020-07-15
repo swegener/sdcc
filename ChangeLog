@@ -1,3 +1,16 @@
+2020-07-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+	* device/lib/z80/__uitobcd.s,
+	  device/lib/z80/__ultobcd.s,
+	  support/regression/tests/uitobcd.c,
+	  support/regression/tests/ultobcd.c:
+	  Add functions ___uitobcd() and ___ultobcd()
+	* device/lib/z80/__strreverse.s:
+	  Add function ___strreverse() to reverse order of string
+	* device/lib/z80/__itoa.s,
+	  device/lib/z80/__ltoa.s,
+	  device/lib/z80/Makefile.in:
+	  Fix Bug #3077 for Z80/Z80-resiy ports.
+
 2020-07-14 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* device/lib/z80/Makefile.in,

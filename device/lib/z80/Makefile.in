@@ -30,8 +30,6 @@ Z80_LONGLONG = $(COMMON_LONGLONG) \
   _modulonglong.c
 
 Z80_SDCC = $(COMMON_SDCC) \
-  _itoa.c \
-  _ltoa.c \
   _startup.c \
   sprintf.c \
   vprintf.c \
@@ -43,7 +41,8 @@ Z8OBJECTS = $(patsubst %.c,%.rel,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGL
 
 OBJ = divunsigned.rel divsigned.rel divmixed.rel modunsigned.rel modsigned.rel modmixed.rel mul.rel mulchar.rel \
       heap.rel memmove.rel strcpy.rel strlen.rel abs.rel __sdcc_call_hl.rel __sdcc_call_iy.rel crtenter.rel \
-      setjmp.rel atomic_flag_test_and_set.rel memcpy.rel
+      setjmp.rel atomic_flag_test_and_set.rel memcpy.rel __uitobcd.rel __ultobcd.rel __itoa.rel __ltoa.rel \
+      __strreverse.rel
 
 LIB = z80.lib
 CC = $(SCC)
@@ -61,8 +60,8 @@ Makefile: $(srcdir)/Makefile.in
 	cd $(top_builddir); ./config.status device/lib/z80/Makefile
 
 $(PORTDIR)/$(LIB): $(OBJ) $(Z8OBJECTS) Makefile
+	rm -f $@
 ifeq ($(LIB_TYPE), SDCCLIB)
-	rm -f $@; \
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(Z8OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
@@ -71,7 +70,6 @@ else
     ifeq ($(LIB_TYPE), RANLIB)
 	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(Z8OBJECTS)
     else
-	rm -f $@; \
 	for i in $(basename $(OBJ) $(Z8OBJECTS)); do echo $$i >>$@; done
 	cp $(OBJ) $(Z8OBJECTS) $(PORTDIR)
     endif

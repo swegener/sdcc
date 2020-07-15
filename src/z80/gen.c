@@ -4936,10 +4936,29 @@ genCall (const iCode *ic)
           wassert (!prestackadjust);
 
           char *name = OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name;
-          emit2 ("call banked_call");
-          emit2 ("!db !bankimmeds", name);
-          emit2 ("!dws", name);
-          regalloc_dry_run_cost += 6;
+          if (z80_opts.regBankedCall)
+            {
+              emit2 ("ld hl, %s", name);
+              if (!IS_GB)
+                {
+                  spillPairReg ("e");
+                  emit2 ("ld e, !bankimmeds", name);
+                }
+              else
+                {
+                  spillPairReg ("a");
+                  emit2 ("ld a, !bankimmeds", name);
+                }
+              emit2 ("call banked_call_reg");
+              regalloc_dry_run_cost += 8;
+            }
+          else
+            {
+              emit2 ("call banked_call");
+              emit2 ("!dws", name);
+              emit2 ("!dw !bankimmeds", name);
+              regalloc_dry_run_cost += 7;
+            }
         }
       else
         {

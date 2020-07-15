@@ -1,5 +1,12 @@
 2020-07-15 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/z80.h:
+	  Revert changes in banked_call parameters.
+
+2020-07-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/SDCCasm.c,
 	  src/SDCCglue.c,
 	  src/z80/gen.c,

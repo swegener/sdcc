@@ -28,6 +28,7 @@ typedef struct
     int port_back;
     int reserveIY;
     int noOmitFramePtr;
+    int regBankedCall;
   }
 Z80_OPTS;
 

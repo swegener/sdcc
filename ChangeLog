@@ -1,4 +1,9 @@
 2020-07-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+	* device/lib/z80/memcpy.s:
+	  Small optimization
+
+2020-07-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* device/lib/z80/__uitobcd.s,
 	  device/lib/z80/__ultobcd.s,
 	  support/regression/tests/uitobcd.c,

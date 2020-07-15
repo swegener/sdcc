@@ -35,18 +35,17 @@
 _memcpy:
 ___memcpy:
 	pop	af
-	pop	hl
 	pop	de
+	pop	hl
 	pop	bc
 	push	bc
-	push	de
 	push	hl
+	push	de
 	push	af
 	ld	a, c
 	or	a, b
 	ret	Z
-	push	hl
-	ex	de, hl
+	push	de
 	ldir
 	pop	hl
 	ret

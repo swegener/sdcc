@@ -4937,8 +4937,8 @@ genCall (const iCode *ic)
 
           char *name = OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name;
           emit2 ("call banked_call");
+          emit2 ("!db !bankimmeds", name);
           emit2 ("!dws", name);
-          emit2 ("!dw !bankimmeds", name);
           regalloc_dry_run_cost += 6;
         }
       else
@@ -5064,11 +5064,26 @@ genFunction (const iCode * ic)
   emitDebug (z80_assignment_optimal ? "; Register assignment is optimal." : "; Register assignment might be sub-optimal.");
   emitDebug ("; Stack space usage: %d bytes.", sym->stack);
 
+  if (IFFUNC_BANKED (sym->type))
+    {
+      int bank_number = 0;
+      for (int i  = strlen (options.code_seg)-1; i >= 0; i--)
+        {
+          if (!isdigit (options.code_seg[i]) && options.code_seg[i+1] != '\0')
+            {
+              bank_number = atoi (&options.code_seg[i+1]);
+              break;
+            }
+        }
+      //TODO: use templates
+      emit2("b%s !equ %i", sym->rname, bank_number);
+    }
+
   if (IS_STATIC (sym->etype))
     emit2 ("!functionlabeldef", sym->rname);
   else
     emit2 ("!globalfunctionlabeldef", sym->rname);
- 
+
   if (!regalloc_dry_run)
     genLine.lineCurr->isLabel = 1;
 

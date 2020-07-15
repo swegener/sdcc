@@ -2148,7 +2148,15 @@ printPublics (FILE * afile)
   fprintf (afile, "%s", iComments2);
 
   for (sym = setFirstItem (publics); sym; sym = setNextItem (publics))
-    tfprintf (afile, "\t!global\n", sym->rname);
+    {
+      if (IFFUNC_BANKED(sym->type))
+        {
+          /* TODO: use template for bank symbol generation */
+          sprintf (buffer, "b%s", sym->rname);
+          tfprintf (afile, "\t!global\n", buffer);
+        }
+      tfprintf (afile, "\t!global\n", sym->rname);
+    }
 }
 
 /*-----------------------------------------------------------------*/

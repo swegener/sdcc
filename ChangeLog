@@ -1,4 +1,14 @@
 2020-07-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCasm.c,
+	  src/SDCCglue.c,
+	  src/z80/gen.c,
+	  src/z80/main.c:
+	  Add generation of function bank symbol.
+	  Initial implementation of RFE #152
+
+2020-07-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* device/lib/z80/memcpy.s:
 	  Small optimization
 

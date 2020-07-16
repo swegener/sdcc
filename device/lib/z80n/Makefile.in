@@ -30,8 +30,8 @@ Z80_LONGLONG = $(COMMON_LONGLONG) \
   _modulonglong.c
 
 Z80_SDCC = $(COMMON_SDCC) \
-  _itoa.c \
-  _ltoa.c \
+  __itoa.c \
+  __ltoa.c \
   _startup.c \
   sprintf.c \
   vprintf.c \

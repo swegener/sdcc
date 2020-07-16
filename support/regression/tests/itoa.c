@@ -18,7 +18,7 @@ static char
 check_i (int n, int b, const char *r)
 {
   char buf[34];
-  _itoa(n, buf, b);
+  __itoa(n, buf, b);
   return !strcmp (buf, r);
 }
 
@@ -26,7 +26,7 @@ static char
 check_ui (int n, int b, const char *r)
 {
   char buf[34];
-  _uitoa(n, buf, b);
+  __uitoa(n, buf, b);
   return !strcmp (buf, r);
 }
 

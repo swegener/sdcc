@@ -45,7 +45,7 @@ PDK13_LONGLONG = $(COMMON_LONGLONG) \
   _modulonglong.c
 
 PDK13_SDCC = $(COMMON_SDCC) \
-  _itoa.c \
+  __itoa.c \
   _startup.c \
   _strcmp.c \
   _strcpy.c \

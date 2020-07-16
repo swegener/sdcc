@@ -1,3 +1,19 @@
+2020-07-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/include/stdlib.h,
+	  device/lib/__itoa.c,
+	  device/lib/__ltoa.c,
+	  device/lib/Makefile.in,
+	  device/lib/*/Makefile.in,
+	  device/lib/printfl.c,
+	  device/lib/z80/__itoa.s,
+	  device/lib/z80/__ltoa.s,
+	  doc/sdccman.lyx,
+	  support/regression/tests/itoa.c,
+	  support/regression/tests/ltoa.c,
+	  .version:
+	  Fix remaining part of bug #3077.
+
 2020-07-16 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peeph-gbz80.def,

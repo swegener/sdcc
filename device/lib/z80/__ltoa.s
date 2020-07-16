@@ -33,7 +33,6 @@
 ;
 ;void __itoa(long value, char *string, unsigned char radix);
 ;
-__ltoa::	.globl	__ltoa
 ___ltoa::
 	push	ix
 	ld	ix, #0
@@ -72,7 +71,6 @@ ___ltoa::
 ;
 ;void __uitoa(unsigned int value, char *string, unsigned char radix);
 ;
-__ultoa::	.globl	__ultoa
 ___ultoa::
 	push	ix
 	ld	ix, #0

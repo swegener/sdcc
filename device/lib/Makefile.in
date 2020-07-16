@@ -122,8 +122,8 @@ SOURCES_SDCC = $(COMMON_SDCC) \
   _ser.c \
   _setjmp.c \
   serial.c \
-  _itoa.c \
-  _ltoa.c \
+  __itoa.c \
+  __ltoa.c \
   _spx.c \
   _startup.c \
   _strcmp.c \

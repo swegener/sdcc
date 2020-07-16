@@ -26,18 +26,20 @@
    might be covered by the GNU General Public License.
 -------------------------------------------------------------------------*/
 
+#include <stdlib.h>
+
 /*-------------------------------------------------------------------------
  usage:
 
- _uitoa(unsigned int value, char* string, int radix)
- _itoa(int value, char* string, int radix)
+ __uitoa(unsigned int value, char* string, int radix)
+ __itoa(int value, char* string, int radix)
 
  value  ->  Number to be converted
  string ->  Result
  radix  ->  Base of value (e.g.: 2 for binary, 10 for decimal, 16 for hex)
 ---------------------------------------------------------------------------*/
 
-void _uitoa(unsigned int value, char* string, unsigned char radix)
+void __uitoa(unsigned int value, char* string, unsigned char radix)
 {
   signed char index = 0, i = 0;
 
@@ -63,11 +65,12 @@ void _uitoa(unsigned int value, char* string, unsigned char radix)
   }
 }
 
-void _itoa(int value, char* string, unsigned char radix)
+void __itoa(int value, char* string, unsigned char radix)
 {
   if (value < 0 && radix == 10) {
     *string++ = '-';
     value = -value;
   }
-  _uitoa(value, string, radix);
+  __uitoa(value, string, radix);
 }
+

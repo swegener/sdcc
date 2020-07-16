@@ -32,8 +32,8 @@ STM8_LONGLONG = $(COMMON_LONGLONG) \
   _modulonglong.c
 
 STM8_SDCC = $(COMMON_SDCC) \
-  _itoa.c \
-  _ltoa.c \
+  __itoa.c \
+  __ltoa.c \
   _startup.c \
   _strlen.c \
   _memmove.c \

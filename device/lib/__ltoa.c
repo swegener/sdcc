@@ -29,13 +29,15 @@
 /*-------------------------------------------------------------------------
  usage:
 
- _ultoa(unsigned long value, char* string, int radix)
- _ltoa(long value, char* string, int radix)
+ __ultoa(unsigned long value, char* string, int radix)
+ __ltoa(long value, char* string, int radix)
 
  value  ->  Number to be converted
  string ->  Result
  radix  ->  Base of value (e.g.: 2 for binary, 10 for decimal, 16 for hex)
 ---------------------------------------------------------------------------*/
+
+#include <stdlib.h>
 
 /* "11110000111100001111000011110000" base 2 */
 /* "37777777777" base 8 */
@@ -53,7 +55,7 @@
 # define MEMSPACE_BUFFER
 #endif
 
-void _ultoa(unsigned long value, char* string, unsigned char radix)
+void __ultoa(unsigned long value, char* string, unsigned char radix)
 {
   char MEMSPACE_BUFFER buffer[NUMBER_OF_DIGITS];  /* no space for '\0' */
   unsigned char index = NUMBER_OF_DIGITS;
@@ -73,12 +75,12 @@ void _ultoa(unsigned long value, char* string, unsigned char radix)
   *string = 0;  /* string terminator */
 }
 
-void _ltoa(long value, char* string, unsigned char radix)
+void __ltoa(long value, char* string, unsigned char radix)
 {
   if (value < 0 && radix == 10) {
     *string++ = '-';
     value = -value;
   }
-  _ultoa(value, string, radix);
+  __ultoa(value, string, radix);
 }
 

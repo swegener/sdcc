@@ -63,10 +63,10 @@ extern long int strtol(const char *nptr, char **endptr, int base);
 extern unsigned long int strtoul(const char *nptr, char **endptr, int base);
 
 /* SDCC extensions */
-extern void _uitoa(unsigned int, char*, unsigned char);
-extern void _itoa(int, char*, unsigned char);
-extern void _ultoa(unsigned long, char*, unsigned char);
-extern void _ltoa(long, char*, unsigned char);
+extern void __uitoa(unsigned int, char *, unsigned char);
+extern void __itoa(int, char *, unsigned char);
+extern void __ultoa(unsigned long, char *, unsigned char);
+extern void __ltoa(long, char *, unsigned char);
 
 /* Pseudo-random sequence generation functions (ISO C11 7.22.2) */
 int rand(void);

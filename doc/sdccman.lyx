@@ -2628,6 +2628,11 @@ In 3.7.0, the prototype for getchar() changed from char getchar(void) to int
 In 3.8.6, the deprecated sdcclib was removed.
 \end_layout
 
+\begin_layout Itemize
+In 4.0.3, _itoa, _uitoa, _ltoa, _ultoa were renamed to __itoa, __uitoa, __ltoa,
+ __ultoa.
+\end_layout
+
 \begin_layout Section
 System Requirements
 \end_layout

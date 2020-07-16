@@ -38,8 +38,8 @@ HC08_LONGLONG = $(COMMON_LONGLONG) \
   _modulonglong.c
 
 HC08_SDCC = $(COMMON_SDCC) \
-  _itoa.c \
-  _ltoa.c \
+  __itoa.c \
+  __ltoa.c \
   _spx.c \
   _startup.c \
   _strlen.c \

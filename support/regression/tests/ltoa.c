@@ -17,7 +17,7 @@ static char
 check_l (long n, int b, const char *r)
 {
   static char buf[66];
-  _ltoa(n, buf, b);
+  __ltoa(n, buf, b);
   return !strcmp (buf, r);
 }
 
@@ -25,7 +25,7 @@ static char
 check_ul (unsigned long n, int b, const char *r)
 {
   char buf[66];
-  _ultoa(n, buf, b);
+  __ultoa(n, buf, b);
   return !strcmp (buf, r);
 }
 

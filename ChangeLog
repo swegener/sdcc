@@ -13,6 +13,8 @@
 	  support/regression/tests/ltoa.c,
 	  .version:
 	  Fix remaining part of bug #3077.
+	* src/stm8/peeph.def:
+	  Bit testing jump inversion rules, picked from patch by Basil Hussain.
 
 2020-07-16 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

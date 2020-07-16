@@ -1390,6 +1390,26 @@ replace restart {
 	; peephole j32 removed load by inverting jump condition.
 } if notUsedFrom(%3 'x')
 
+replace restart {
+	btjt	%1, %2, %3
+	jra	%4
+%3:
+} by {
+	btjf	%1, %2, %4
+	; peephole j33 removed jra by using inverse bit-test-jump logic
+%3:
+} if labelRefCountChange(%3 -1)
+
+replace restart {
+	btjf	%1, %2, %3
+	jra	%4
+%3:
+} by {
+	btjt	%1, %2, %4
+	; peephole j34 removed jra by using inverse bit-test-jump logic
+%3:
+} if labelRefCountChange(%3 -1)
+
 // Barrier, since notUsed() is better at dealing with ret than with jp to unknown location.
 barrier
 
@@ -1398,7 +1418,7 @@ replace restart {
 	ret
 } by {
 	jp	%1
-	; peephole j31 replaced call at end of function by jump (tail call optimization).
+	; peephole j35 replaced call at end of function by jump (tail call optimization).
 }
 
 replace restart {
@@ -1406,7 +1426,7 @@ replace restart {
 	retf
 } by {
 	jpf	%1
-	; peephole j31a replaced call at end of function by jump (tail call optimization).
+	; peephole j36 replaced call at end of function by jump (tail call optimization).
 }
 
 replace restart {

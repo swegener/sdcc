@@ -754,10 +754,6 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 {
   const iCode *ic = G[i].ic;
 
-  // HL always unused on gbz80.
-  if(TARGET_IS_GBZ80)
-    return(true);
-
   bool exstk = (should_omit_frame_ptr || (currFunc && currFunc->stack > 127) || IS_GB);
 
   const i_assignment_t &ia = a.i_assignment;
@@ -816,6 +812,12 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     }
 #endif
 
+  if(IS_GB && ic->op == IPUSH && !operand_is_pair(left, a, i, G))
+    return(false);
+
+  if(IS_GB && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))
+    return(false);
+
   if(ic->op == RETURN || ic->op == SEND || ic->op == RECEIVE)
     return(true);
 
@@ -825,7 +827,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if((IS_GB || IY_RESERVED) && IS_TRUE_SYMOP(result) && getSize(operandType(IC_RESULT(ic))) > 2)
     return(false);
 
-  // __z88dk_fastcall passes paramter in hl
+  // __z88dk_fastcall passes parameter in hl
   if(ic->op == PCALL && ic->prev && ic->prev->op == SEND && input_in_HL && IFFUNC_ISZ88DK_FASTCALL(operandType(IC_LEFT(ic))->next))
     return(false);
 
@@ -835,7 +837,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   if(ic->op == '-' && getSize(operandType(result)) == 2 && !IS_GB && IS_TRUE_SYMOP (left) && IS_TRUE_SYMOP (right) && result_only_HL)
     return(true);
-
+    
   if(exstk &&
      (operand_on_stack(result, a, i, G) + operand_on_stack(left, a, i, G) + operand_on_stack(right, a, i, G) >= 2) &&
      (result && IS_SYMOP(result) && getSize(operandType(result)) >= 2 || !result_only_HL))
@@ -853,12 +855,12 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
      (operand_in_reg(result, REG_L, ia, i, G) && I[ia.registers[REG_L][1]].byte == 0 && operand_in_reg(result, REG_H, ia, i, G)))
     return(true); // Uses inc hl.
 
-  if(ic->op == '+' && getSize(operandType(result)) == 2 && !IS_TRUE_SYMOP (result) &&
+  if(!IS_GB && ic->op == '+' && getSize(operandType(result)) == 2 && !IS_TRUE_SYMOP (result) &&
     (result_only_HL || operand_in_reg(result, REG_IYL, ia, i, G) && operand_in_reg(result, REG_IYH, ia, i, G)) &&
     (ia.registers[REG_C][1] < 0 && ia.registers[REG_B][1] < 0 || ia.registers[REG_E][1] < 0 && ia.registers[REG_D][1] < 0)) // Can use ld rr, (nn) instead of (hl).
     return(true);
 
-  if(ic->op == '+' && getSize(operandType(result)) == 2 && IS_TRUE_SYMOP (left) && !IS_GB &&
+  if(!IS_GB && ic->op == '+' && getSize(operandType(result)) == 2 && IS_TRUE_SYMOP (left) && !IS_GB &&
     (IS_OP_LITERAL (right) && ulFromVal (OP_VALUE (IC_RIGHT(ic))) <= 3 || IS_OP_LITERAL (left) && ulFromVal (OP_VALUE (IC_LEFT(ic))) <= 3) &&
     (operand_in_reg(result, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && operand_in_reg(result, REG_B, ia, i, G) || operand_in_reg(result, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && operand_in_reg(result, REG_D, ia, i, G))) // Can use ld rr, (nn) followed by inc rr
     return(true);
@@ -1152,8 +1154,6 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   const operand *left = IC_LEFT(ic);
   const operand *right = IC_RIGHT(ic);
   const operand *result = IC_RESULT(ic);
-
-  //const std::set<var_t> &dying = G[i].dying;
 
   if(ic->op == PCALL)
     return(false);

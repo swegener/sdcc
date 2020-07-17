@@ -2080,7 +2080,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
     fetchLitPair (pairId, aop, offset);
   else
     {
-      if (getPairId (aop) == pairId)
+      if (getPairId_o (aop, offset) == pairId)
         {
           /* Do nothing */
         }
@@ -7501,7 +7501,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           result_in_carry = TRUE;
           goto fix;
         }
-      else if (size > 1 && IS_GB && (requiresHL (AOP (right)) && !requiresHL (AOP (left))))
+      else if (size > 1 && IS_GB && (requiresHL (right->aop) && right->aop->type != AOP_REG && !requiresHL (left->aop)))
         {
           if (!regalloc_dry_run)
             aopGet (AOP (right), LSB, FALSE);
@@ -7530,7 +7530,7 @@ genCmp (operand * left, operand * right, operand * result, iCode * ifx, int sign
           result_in_carry = TRUE;
           goto fix;
         }
-      else if (size > 1 && IS_GB && (!requiresHL (AOP (right)) && requiresHL (AOP (left))))
+      else if (size > 1 && IS_GB && (!requiresHL (right->aop) && requiresHL (left->aop) && left->aop->type != AOP_REG))
         {
           if (!regalloc_dry_run)
             aopGet (AOP (left), LSB, FALSE);

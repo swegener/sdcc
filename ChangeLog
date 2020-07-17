@@ -1,5 +1,10 @@
 2020-07-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/SDCCval.c:
+	  Revert unnecessary change.
+
+2020-07-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* device/lib/z80/Makefile.in,
 	  device/lib/z80/__sdcc_bcall.s,
 	  src/SDCCval.c,

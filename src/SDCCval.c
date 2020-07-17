@@ -3243,8 +3243,8 @@ valForStructElem (ast * structT, ast * elemT)
     {
       if (sast)
         SNPRINTF (val->name, sizeof (val->name), "(%s + (%d))", AST_SYMBOL (sast)->rname, ((int) sym->offset) + idxoff);
-      else { wassert(AST_SYMBOL (structT)->rname != NULL);
-        SNPRINTF (val->name, sizeof (val->name), "(%s + %d)", AST_SYMBOL (structT)->rname, (int) sym->offset);}
+      else
+        SNPRINTF (val->name, sizeof (val->name), "(%s + %d)", AST_SYMBOL (structT)->rname, (int) sym->offset);
 
       if (SPEC_SCLS (structT->etype) == S_CODE)
         DCL_TYPE (val->type) = CPOINTER;

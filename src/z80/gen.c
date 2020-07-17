@@ -5234,16 +5234,28 @@ genFunction (const iCode * ic)
     }
   else if (sym->stack)
     {
-      if (!_G.omitFramePtr)
-        emit2 ((optimize.codeSize && !IFFUNC_ISZ88DK_FASTCALL (ftype)) ? "!enters" : "!enter");
-      if (IS_EZ80_Z80 && !_G.omitFramePtr && -sym->stack > -128 && -sym->stack <= -3 && !IFFUNC_ISZ88DK_FASTCALL (ftype))
+      if (IS_EZ80_Z80 && !_G.omitFramePtr && -sym->stack > -128 && -sym->stack <= -3 && IFFUNC_ISZ88DK_FASTCALL (ftype))
         {
-          emit2 ("lea hl, ix, !immed%d", -sym->stack);
-          emit2 ("ld sp, hl");
-          regalloc_dry_run_cost += 4;
+          emit2 ("push ix");
+          emit2 ("ld ix, !immed%d", -sym->stack);
+          emit2 ("add ix, sp");
+          emit2 ("ld sp, ix");
+          emit2 ("lea ix, ix, !immed%d", sym->stack);
+          regalloc_dry_run_cost += 3;
         }
       else
-        adjustStack (-sym->stack, !IS_TLCS90, TRUE, !IFFUNC_ISZ88DK_FASTCALL (ftype), !IY_RESERVED);
+        {
+          if (!_G.omitFramePtr)
+            emit2 ((optimize.codeSize && !IFFUNC_ISZ88DK_FASTCALL (ftype)) ? "!enters" : "!enter");
+          if (IS_EZ80_Z80 && !_G.omitFramePtr && -sym->stack > -128 && -sym->stack <= -3 && !IFFUNC_ISZ88DK_FASTCALL (ftype))
+            {
+              emit2 ("lea hl, ix, !immed%d", -sym->stack);
+              emit2 ("ld sp, hl");
+              regalloc_dry_run_cost += 4;
+            }
+          else
+            adjustStack (-sym->stack, !IS_TLCS90, TRUE, !IFFUNC_ISZ88DK_FASTCALL (ftype), !IY_RESERVED);
+        }
       _G.stack.pushed = 0;
     }
   else if (!_G.omitFramePtr)

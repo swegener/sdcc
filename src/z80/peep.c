@@ -391,6 +391,10 @@ z80MightRead(const lineNode *pl, const char *what)
   if(strcmp(pl->line, "call\t___sdcc_call_iy") == 0 && strstr(what, "iy") != 0)
     return TRUE;
 
+  if(strncmp(pl->line, "call\t___sdcc_bcall_", 19) == 0)
+    if (strchr (what, pl->line[19]) != 0 || strchr (what, pl->line[20]) != 0 || strchr (what, pl->line[21]) != 0)
+      return TRUE;
+
   if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
     {
       const symbol *f = findSym (SymbolTab, 0, pl->line + 6);

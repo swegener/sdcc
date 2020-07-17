@@ -28,7 +28,7 @@ typedef struct
     int port_back;
     int reserveIY;
     int noOmitFramePtr;
-    int regBankedCall;
+    int legacyBanking;
   }
 Z80_OPTS;
 

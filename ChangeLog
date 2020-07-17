@@ -1,3 +1,14 @@
+2020-07-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* device/lib/z80/Makefile.in,
+	  device/lib/z80/__sdcc_bcall.s,
+	  src/SDCCval.c,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/peep.c,
+	  src/z80/z80.h:
+	  Initial implementation of RFE #152 for Z80 port.
+
 2020-07-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c,

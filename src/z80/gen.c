@@ -4936,28 +4936,33 @@ genCall (const iCode *ic)
           wassert (!prestackadjust);
 
           char *name = OP_SYMBOL (IC_LEFT (ic))->rname[0] ? OP_SYMBOL (IC_LEFT (ic))->rname : OP_SYMBOL (IC_LEFT (ic))->name;
-          if (z80_opts.regBankedCall)
+          /* there 3 types of banked call:
+               legacy - only if --legacy-banking is specified
+               a:bc - only for __z88dk_fastcall __banked functions
+               e:hl - default (may have optimal bank switch routine) */
+          if (z80_opts.legacyBanking)
             {
-              emit2 ("ld hl, %s", name);
-              if (!IS_GB)
-                {
-                  spillPairReg ("e");
-                  emit2 ("ld e, !bankimmeds", name);
-                }
-              else
-                {
-                  spillPairReg ("a");
-                  emit2 ("ld a, !bankimmeds", name);
-                }
-              emit2 ("call banked_call_reg");
+              emit2 ("call ___sdcc_bcall");
+              emit2 ("!dws", name);
+              emit2 ("!dw !bankimmeds", name);
+              regalloc_dry_run_cost += 7;
+            }
+          else if (IFFUNC_ISZ88DK_FASTCALL (ftype))
+            {
+              spillPair (PAIR_BC);
+              emit2 ("ld a, !bankimmeds", name);
+              emit2 ("ld bc, %s", name);
+              emit2 ("call ___sdcc_bcall_abc");
               regalloc_dry_run_cost += 8;
             }
           else
             {
-              emit2 ("call banked_call");
-              emit2 ("!dws", name);
-              emit2 ("!dw !bankimmeds", name);
-              regalloc_dry_run_cost += 7;
+              spillPair (PAIR_DE);
+              spillPair (PAIR_HL);
+              emit2 ("ld e, !bankimmeds", name);
+              emit2 ("ld hl, %s", name);
+              emit2 ("call ___sdcc_bcall_ehl");
+              regalloc_dry_run_cost += 8;
             }
         }
       else

@@ -1,3 +1,9 @@
+2020-07-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
+	  support/regression/tests/bug-3080.c:
+	  Fix bug #3080.
+
 2020-07-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/include/stdlib.h,

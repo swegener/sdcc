@@ -493,6 +493,9 @@ bool operand_on_stack(const operand *o, const assignment &a, unsigned short int 
 
   if(OP_SYMBOL_CONST(o)->_isparm && !IS_REGPARM (OP_SYMBOL_CONST(o)->etype))
     return(true);
+    
+  if(IS_TRUE_SYMOP(o) && OP_SYMBOL_CONST(o)->onStack)
+    return(true);
 
   operand_map_t::const_iterator oi, oi_end;
   for(boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key); oi != oi_end; ++oi)
@@ -1166,10 +1169,14 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
      (operand_on_stack(result, a, i, G) || operand_in_reg(result, REG_L, ia, i, G) || operand_in_reg(result, REG_H, ia, i, G)))
     return(false);
 
-  if(ic->op == '+' && getSize(operandType(result)) >= 2)
+  if((ic->op == '+' || ic->op == '-' || ic->op == UNARYMINUS) && getSize(operandType(result)) >= 4)
     return(false);
 
-  if(ic->op == UNARYMINUS || ic->op == '-' || ic->op == '*')
+  if((ic->op == '-' || ic->op == UNARYMINUS) && getSize(operandType(result)) >= 2 && // Stack access requires arithmetic that trashes carry.
+    (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))
+    return(false);
+
+  if(ic->op == '*')
     return(false);
 
   if(ic->op == '>' || ic->op == '<')
@@ -1210,7 +1217,7 @@ static void assign_operand_for_cost(operand *o, const assignment &a, unsigned sh
     {
       var_t v = oi->second;
       if(a.global[v] >= 0)
-        { 
+        {
           sym->regs[I[v].byte] = regsZ80 + a.global[v];
           sym->accuse = 0;
           sym->isspilt = false;

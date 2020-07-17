@@ -391,17 +391,17 @@ aopIsLitVal (const asmop *aop, int offset, int size, unsigned long long int val)
       val >>= 8;
 
       // Leading zeroes
-      if (aop->size <= offset && !b)
+      if (aop->size <= offset && !b && aop->type != AOP_LIT)
         continue;
 
       if (aop->type != AOP_LIT)
-        return (FALSE);
+        return (false);
 
       if (byteOfVal (aop->aopu.aop_lit, offset) != b)
-        return (FALSE);
+        return (false);
     }
 
-  return (TRUE);
+  return (true);
 }
 
 /*-----------------------------------------------------------------*/
@@ -6088,6 +6088,9 @@ genPlus (iCode * ic)
                 }
               else
                 {
+                  if (!isPairDead (PAIR_DE, ic))
+                    _push (PAIR_DE);
+                    
                   if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP_SIZE (IC_RIGHT (ic)) == 2 && AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_SIZE (IC_LEFT (ic)) == 2)
                     {
                       const short dst[4] = { E_IDX, L_IDX, D_IDX, H_IDX };
@@ -6125,6 +6128,9 @@ genPlus (iCode * ic)
                     }
                   emit2 ("add hl, de");
                   regalloc_dry_run_cost += 1;
+                  
+                  if (!isPairDead (PAIR_DE, ic))
+                    _pop (PAIR_DE);
                 }
               spillPair (PAIR_HL);
               commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
@@ -6411,7 +6417,6 @@ genPlus (iCode * ic)
         {
           if (!tlbl && !regalloc_dry_run)
             tlbl = newiTempLabel (0);
-
           if (!regalloc_dry_run)
             emit2 ("jp NC, !tlabel", labelKey2num (tlbl->key));
           regalloc_dry_run_cost += 2; // Use cost of jr as the peephole optimizer can typically optimize this jp into jr. Do not emit jr directly to still allow jump-to-jump optimization.
@@ -6595,7 +6600,7 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
   /* Same logic as genPlus */
   if (IS_GB)
     {
-      if (left->type == AOP_STK || right->type == AOP_STK || AOP_TYPE (IC_RESULT (ic)) == AOP_STK)
+      if (left->type == AOP_STK || right->type == AOP_STK || result->type == AOP_STK)
         {
           if ((left->size == 2 ||
                right->size == 2) && (left->size <= 2 && right->size <= 2))

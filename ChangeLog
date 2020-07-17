@@ -1,5 +1,17 @@
 2020-07-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/ez80_z80/memcpy.s,
+	  device/lib/ez80_z80/Makefile.in,
+	  device/lib/gbz80/memcpy.s,
+	  device/lib/gbz80/Makefile.in,
+	  device/lib/z180/memcpy.s,
+	  device/lib/z180/Makefile.in,
+	  device/lib/z80n/memcpy.s,
+	  device/lib/z80n/Makefile.in:
+	  Implement RFE #664 for ez80_z80, GBZ80, Z180 and Z80N ports
+
+2020-07-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/z80/gen.c:
 	  Implement RFE #636: optimize stack allocation for eZ80
 

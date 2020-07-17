@@ -2648,7 +2648,13 @@ genCmp (const iCode *ic, iCode *ifx)
         }
       else if (started && (right->aop->type == AOP_LIT && !aopIsLitVal (right->aop, i, 1, 0x00) || right->aop->type == AOP_IMMD)) // Work around lack of subc a, #nn.
         {
-          if (left->aop->type == AOP_STK)
+          if (aopInReg (left->aop, i, P_IDX))
+            {
+              cheapMove (ASMOP_A, 0, right->aop, i, true, false, !i);
+              emit2 ("xch", "a, p");
+              cost (1, 1);
+            }
+          else if (left->aop->type == AOP_STK)
             {
               cheapMove (ASMOP_A, 0, left->aop, i, true, true, !i);
               cheapMove (ASMOP_P, 0, right->aop, i, false, true, !i);

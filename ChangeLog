@@ -1,6 +1,12 @@
 2020-07-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c,
+	  support/regression/tests/bug-3085.c:
+	  Fix bug #3085.
+
+2020-07-17 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/gen.c,
 	  support/regression/tests/bug-3080.c:
 	  Fix bug #3080.
 

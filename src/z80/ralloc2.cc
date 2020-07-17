@@ -1179,7 +1179,7 @@ bool DEinst_ok(const assignment &a, unsigned short int i, const G_t &G, const I_
   if(ic->op == '*')
     return(false);
 
-  if(ic->op == '>' || ic->op == '<')
+  if((ic->op == '>' || ic->op == '<') && !SPEC_USIGN(getSpec(operandType(left))) && !SPEC_USIGN(getSpec(operandType(right))))
     return(false);
 
   return(true);

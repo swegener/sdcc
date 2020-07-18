@@ -3046,7 +3046,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
       emit2 ("ld (%s+%d), a", to->aopu.aop_dir, to_offset);
       regalloc_dry_run_cost += 3;
     }
-  else if (!aopInReg (to, to_offset, A_IDX) && !aopInReg (from, from_offset, A_IDX) && (from->type == AOP_DIR || from->type == AOP_SFR || to->type == AOP_IY && from->type == AOP_EXSTK)) // Go through a.
+  else if (!aopInReg (to, to_offset, A_IDX) && !aopInReg (from, from_offset, A_IDX) && (from->type == AOP_DIR || from->type == AOP_SFR || to->type == AOP_IY && (from->type == AOP_EXSTK || IS_GB && from->type == AOP_STK))) // Go through a.
     {
       if (!a_dead)
         _push (PAIR_AF);
@@ -10418,7 +10418,7 @@ genPointerGet (const iCode *ic)
 
   if (IS_GB && left->aop->type == AOP_STK) // Try to avoid (hl) to hl copy, which requires 3 instructions and free a.
     pair = PAIR_DE;
-  if ((IS_GB || IY_RESERVED) && requiresHL (AOP (result)) && size > 1 && AOP_TYPE (result) != AOP_REG)
+  if ((IS_GB || IY_RESERVED) && requiresHL (result->aop) && size > 1 && result->aop->type != AOP_REG)
     pair = PAIR_DE;
 
   if (AOP_TYPE (left) == AOP_IMMD && size == 1 && aopInReg (result->aop, 0, A_IDX) && !IS_BITVAR (retype))
@@ -10446,7 +10446,7 @@ genPointerGet (const iCode *ic)
       goto release;
    }
 
-  if (isPair (AOP (left)) && size == 1 && !IS_BITVAR (retype) && !rightval)
+  if (isPair (left->aop) && size == 1 && !IS_BITVAR (retype) && !rightval)
     {
       /* Just do it */
       if (isPtrPair (AOP (left)))
@@ -10629,7 +10629,7 @@ genPointerGet (const iCode *ic)
           rightval = 0;
         }
       else
-        fetchPair (pair, AOP (left));
+        fetchPair (pair, left->aop);
     }
 
   /* if bit then unpack */
@@ -10649,7 +10649,7 @@ genPointerGet (const iCode *ic)
      regalloc_dry_run_cost += 2;
      goto release;
    }
- else if (getPairId (AOP (result)) == PAIR_HL || size == 2 && (aopInReg (result->aop, 0, L_IDX) || aopInReg (result->aop, 0, H_IDX)))
+ else if (pair == PAIR_HL && (getPairId (AOP (result)) == PAIR_HL || size == 2 && (aopInReg (result->aop, 0, L_IDX) || aopInReg (result->aop, 0, H_IDX))))
     {
       wassertl (size == 2, "HL must be of size 2");
       if (IS_RAB && getPairId (AOP (result)) == PAIR_HL && rightval_in_range)
@@ -10860,7 +10860,7 @@ genPointerGet (const iCode *ic)
             }
           else
             {
-              emit2 ("ld a,!*pair", _pairs[pair].name);
+              emit2 ("ld a, !*pair", _pairs[pair].name);
               regalloc_dry_run_cost += 1;
               cheapMove (result->aop, offset++, ASMOP_A, 0, true);
             }
@@ -11693,7 +11693,7 @@ genAssign (const iCode *ic)
       cheapMove (AOP (result), 0, ASMOP_A, 0, true);
       cheapMove (AOP (result), 1, ASMOP_E, 0, true);
     }
-  else if (size == 4 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead (PAIR_DE, ic) && (IS_GB /*|| IY_RESERVED */ ))
+  else if (size == 4 && (requiresHL (right->aop) && right->aop->type != AOP_REG) && (requiresHL (result->aop) && result->aop->type != AOP_REG ) && isPairDead (PAIR_DE, ic) && (IS_GB || IY_RESERVED))
     {
       /* Special case - simple memcpy */
       if (!regalloc_dry_run)

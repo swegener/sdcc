@@ -1,3 +1,9 @@
+2020-07-18 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c:
+	  Enable use of hl in gbz80 register allocation.
+
 2020-07-17 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/main.c,

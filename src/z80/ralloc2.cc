@@ -815,9 +815,20 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(IS_GB && ic->op == IPUSH && !operand_is_pair(left, a, i, G))
     return(false);
 
-  if(IS_GB && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))
+  if(IS_GB && ic->op == GET_VALUE_AT_ADDRESS && !result_only_HL)
     return(false);
 
+  if(IS_GB &&
+    (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)) &&
+    (!result_only_HL || ic->op == RIGHT_OP || ic->op == LEFT_OP || ic->op == '=' || ic->op == '-' || ic->op == UNARYMINUS/*|| ic->op == '|' || ic->op == CAST doesn't seem to work*/))
+    return(false);
+  if(IS_GB && (ic->op == '|' || ic->op == BITWISEAND || ic->op == CAST)) // Workaround, see rule above.
+    return(false);
+  if(IS_GB && ic->op == GET_VALUE_AT_ADDRESS && !(result_only_HL || getSize(operandType(result)) == 1))
+    return(false);
+  if(IS_GB && POINTER_GET(ic) && !(result_only_HL || getSize(operandType(right)) == 1))
+    return(false);
+    
   if(ic->op == RETURN || ic->op == SEND || ic->op == RECEIVE)
     return(true);
 
@@ -835,7 +846,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(result_only_HL && ic->op == PCALL)
     return(true);
 
-  if(ic->op == '-' && getSize(operandType(result)) == 2 && !IS_GB && IS_TRUE_SYMOP (left) && IS_TRUE_SYMOP (right) && result_only_HL)
+  if(ic->op == '-' && getSize(operandType(result)) == 2 && IS_TRUE_SYMOP (left) && IS_TRUE_SYMOP (right) && result_only_HL)
     return(true);
     
   if(exstk &&
@@ -860,7 +871,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     (ia.registers[REG_C][1] < 0 && ia.registers[REG_B][1] < 0 || ia.registers[REG_E][1] < 0 && ia.registers[REG_D][1] < 0)) // Can use ld rr, (nn) instead of (hl).
     return(true);
 
-  if(!IS_GB && ic->op == '+' && getSize(operandType(result)) == 2 && IS_TRUE_SYMOP (left) && !IS_GB &&
+  if(!IS_GB && ic->op == '+' && getSize(operandType(result)) == 2 && IS_TRUE_SYMOP (left) &&
     (IS_OP_LITERAL (right) && ulFromVal (OP_VALUE (IC_RIGHT(ic))) <= 3 || IS_OP_LITERAL (left) && ulFromVal (OP_VALUE (IC_LEFT(ic))) <= 3) &&
     (operand_in_reg(result, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && operand_in_reg(result, REG_B, ia, i, G) || operand_in_reg(result, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && operand_in_reg(result, REG_D, ia, i, G))) // Can use ld rr, (nn) followed by inc rr
     return(true);
@@ -892,7 +903,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   if(ic->op == LEFT_OP && getSize(operandType(result)) <= 2 && IS_OP_LITERAL (right) && result_only_HL)
     return(true);
-  if((ic->op == LEFT_OP || ic->op == RIGHT_OP) && (getSize(operandType(result)) <= 1 || !IS_TRUE_SYMOP(result) || !IY_RESERVED) &&
+  if((ic->op == LEFT_OP || ic->op == RIGHT_OP) && (getSize(operandType(result)) <= 1 || !IS_TRUE_SYMOP(result) || !(IS_GB || IY_RESERVED)) &&
      (!exstk ||
       ((!operand_on_stack(left,  a, i, G) || !input_in_HL && result_only_HL) &&
        (!operand_on_stack(right, a, i, G) || !input_in_HL && result_only_HL) &&

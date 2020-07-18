@@ -1687,10 +1687,6 @@ linkEdit (char **envp)
           fprintf (lnkfile, "-muwx\n-%c %s\n", out_fmt, dbuf_c_str (&binFileName));
           if (TARGET_MCS51_LIKE)
             fprintf (lnkfile, "-M\n");
-          if (!options.no_pack_iram)
-            fprintf (lnkfile, "-Y\n");
-          else
-            werror (W_DEPRECATED_OPTION, "--no-pack-iram");
         }
 
       if (!TARGET_Z80_LIKE)   /* Not for the z80, gbz80 */
@@ -1765,6 +1761,8 @@ linkEdit (char **envp)
           if ((options.stack_loc) && (options.stack_loc < 0x100) && !TARGET_HC08_LIKE)
             {
               WRITE_SEG_LOC ("SSEG", options.stack_loc);
+              /* with the disappearance of --no-pack-iram I don't think this is ever valid anymore */
+              werror (W_DEPRECATED_OPTION, "--stack-loc");
             }
         }
       else                      /* For the z80, z180, gbz80 */
@@ -2126,6 +2124,12 @@ preProcess (char **envp)
           break;
         }
 
+      /* set macro for optimization level */
+      if (optimize.codeSpeed)
+        addSet (&preArgvSet, Safe_strdup ("-D__SDCC_OPTIMIZE_SPEED"));
+      if (optimize.codeSize)
+        addSet (&preArgvSet, Safe_strdup ("-D__SDCC_OPTIMIZE_SIZE"));
+
       /* set macro corresponding to compiler option */
       if (options.intlong_rent)
         addSet (&preArgvSet, Safe_strdup ("-D__SDCC_INT_LONG_REENT"));
@@ -2185,7 +2189,7 @@ preProcess (char **envp)
       {
         struct dbuf_s dbuf;
 
-        dbuf_init (&dbuf, 20);        
+        dbuf_init (&dbuf, 20);
         dbuf_printf (&dbuf, "-D__SDCC_REVISION=%s", getBuildNumber ());
         addSet (&preArgvSet, dbuf_detach_c_str (&dbuf));
       }

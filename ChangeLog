@@ -1,3 +1,15 @@
+2020-07-18 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* sdas/asgb/gbmch.c (minit),
+	* sdas/asz80/z80mch.c (minit): set address space to 24 bit
+	* sdas/linksrc/lkdata.c,
+	* sdas/linksrc/aslink.h: removed packflag
+	* sdas/linksrc/lkmain.c: removed packflag and warn on removed -Y option
+	* src/ds390/main.c,
+	* src/mcs51/main.c: removed --pack-iram, --no-pack-iram
+	* src/SDCCglobl.h,
+	* src/SDCCmain.c: removed options.no_pack_iram, no -Y output
+
 2020-07-18 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/ralloc2.cc,

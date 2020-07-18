@@ -286,7 +286,6 @@ struct options
     int protect_sp_update;      /* DS390 - will disable interrupts during ESP:SP updates */
     int parms_in_bank1;         /* DS390 - use reg bank1 to pass parameters */
     int stack_size;             /* MCS51/DS390 - Tells the linker to allocate this space for stack */
-    int no_pack_iram;           /* MCS51/DS390 - Deprecated: Tells the linker not to pack variables in internal ram */
     int acall_ajmp;             /* MCS51 - Use acall/ajmp instead of lcall/ljmp */
     int no_ret_without_call;    /* MCS51 - Do not use ret independent of acall/lcall */
     int use_non_free;           /* Search / include non-free licensed libraries and header files */

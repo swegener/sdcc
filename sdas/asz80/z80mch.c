@@ -2250,6 +2250,11 @@ minit()
          */
         hilo = 0;
 
+        /*
+         * Address Space
+         */
+        exprmasks(3);
+
         if (pass == 0) {
                 mchtyp = X_Z80;
                 sym[2].s_addr = X_Z80;

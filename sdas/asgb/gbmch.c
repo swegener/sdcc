@@ -558,4 +558,9 @@ minit()
          * Byte Order
          */
         hilo = 0;
+
+        /*
+         * Address Space
+         */
+        exprmasks(3);
 }

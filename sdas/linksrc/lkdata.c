@@ -150,8 +150,6 @@ char    *optsdcc;
 char    *optsdcc_module;
 int     sflag;          /*      JCF: Memory usage output flag
                          */
-int     packflag=0;     /*      JCF: Pack internal memory flag
-                         */
 int     stacksize=0;    /*      JCF: Stack size
                          */
 int     aflag;          /*      Overlapping area warning flag

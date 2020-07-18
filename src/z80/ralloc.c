@@ -2971,7 +2971,7 @@ serialRegMark (eBBlock ** ebbs, int count)
                   sym->isspilt = false;
                 }
 
-              if (sym->nRegs > 4) /* TODO. Change this once we can allocate bigger variables (but still spill when its a big return value). */
+              if (sym->nRegs > 4) /* TODO. Change this once we can allocate bigger variables (but still spill when its a big return value). Also change in ralloc2.cc, operand_on-stack in that case*/
                 {
                   D (D_ALLOC, ("Spilling %s (too large)\n", sym->name));
                   sym->for_newralloc = 0;
@@ -3051,17 +3051,8 @@ z80_oldralloc (ebbIndex * ebbi)
   setToNull ((void *) &_G.totRegAssigned);
   _G.stackExtend = _G.dataExtend = 0;
 
-  if (IS_GB)
-    {
-      /* DE is required for the code gen. */
-      _G.nRegs = 3;
-      regsZ80 = _gbz80_regs;
-    }
-  else
-    {
-      _G.nRegs = 5;
-      regsZ80 = _z80_regs;
-    }
+  _G.nRegs = 5;
+  regsZ80 = _z80_regs;
     
   z80_init_asmops ();
 
@@ -3153,7 +3144,6 @@ z80_ralloc (ebbIndex *ebbi)
 
   if (IS_GB)
     {
-      /* DE is required for the code gen. */
       _G.nRegs = GBZ80_MAX_REGS;
       regsZ80 = _gbz80_regs;
     }

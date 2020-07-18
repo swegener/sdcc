@@ -496,6 +496,9 @@ bool operand_on_stack(const operand *o, const assignment &a, unsigned short int 
     
   if(IS_TRUE_SYMOP(o) && OP_SYMBOL_CONST(o)->onStack)
     return(true);
+    
+  if(OP_SYMBOL_CONST(o)->nRegs > 4) // currently all variables > 4 Byte are spilt in ralloc.c.
+    return(true);
 
   operand_map_t::const_iterator oi, oi_end;
   for(boost::tie(oi, oi_end) = G[i].operands.equal_range(OP_SYMBOL_CONST(o)->key); oi != oi_end; ++oi)
@@ -812,7 +815,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     }
 #endif
 
-  // Due to lack of ex hl, (sp), the push code generation fallback doesn't work for gbz80, so we need to be able to use hl if we can't just push a pair or use a.
+  // Due to lack of ex hl, (sp), the generic push code generation fallback doesn't work for gbz80, so we need to be able to use hl if we can't just push a pair or use a.
   if(IS_GB && ic->op == IPUSH && !operand_is_pair(left, a, i, G) && ia.registers[REG_A][1] >= 0 &&
     !(getSize(operandType(left)) == 1 && (operand_in_reg(left, REG_A, ia, i, G) || operand_in_reg(left, REG_B, ia, i, G) || operand_in_reg(left, REG_D, ia, i, G) || operand_in_reg(left, REG_H, ia, i, G))))
     return(false);
@@ -820,12 +823,19 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(IS_GB && ic->op == GET_VALUE_AT_ADDRESS && !result_only_HL && (getSize(operandType(result)) >= 2 || !operand_is_pair(left, a, i, G)))
     return(false);
 
+  // For some operations, the gbz80 stack access using hl will trash the value there.
   if(IS_GB &&
-    (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)) &&
-    (!result_only_HL || ic->op == RIGHT_OP || ic->op == LEFT_OP || ic->op == '=' || ic->op == '-' || ic->op == UNARYMINUS/*|| ic->op == '|' || ic->op == CAST doesn't seem to work*/))
+    (ic->op == IPUSH && operand_on_stack(left, a, i, G) || ic->op == IFX && operand_on_stack(IC_COND(ic), a, i, G)))
     return(false);
-  if(IS_GB && (ic->op == '|' || ic->op == BITWISEAND || ic->op == CAST)) // Workaround, see rule above.
+
+  if(IS_GB &&
+    (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)) && 
+    (ic->op == RIGHT_OP || ic->op == LEFT_OP || ic->op == '=' || ic->op == CAST || ic->op == '-' || ic->op == UNARYMINUS || ic->op == BITWISEAND || ic->op == '|') &&
+    !(result_only_HL && getSize(operandType(result)) == 1)) // Size of result needs to be checked after checking ic->op to esnure that there is a result operand.
     return(false);
+
+  //if(IS_GB && (ic->op == '|' || ic->op == BITWISEAND || ic->op == CAST)) // Workaround, see rule above.
+  //  return(false);
   if(IS_GB && ic->op == GET_VALUE_AT_ADDRESS && !(result_only_HL || getSize(operandType(result)) == 1))
     return(false);
   if(IS_GB && POINTER_GET(ic) && !(result_only_HL || getSize(operandType(right)) == 1))

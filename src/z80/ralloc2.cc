@@ -815,7 +815,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(IS_GB && ic->op == IPUSH && !operand_is_pair(left, a, i, G))
     return(false);
 
-  if(IS_GB && ic->op == GET_VALUE_AT_ADDRESS && !result_only_HL)
+  if(IS_GB && ic->op == GET_VALUE_AT_ADDRESS && !result_only_HL && (getSize(operandType(result)) >= 2 || !operand_is_pair(left, a, i, G)))
     return(false);
 
   if(IS_GB &&

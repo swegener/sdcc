@@ -1144,21 +1144,6 @@ isUnsplitable (const asmop * aop)
   return FALSE;
 }
 
-static bool
-isPtrPair (const asmop * aop)
-{
-  PAIR_ID pairId = getPairId (aop);
-  switch (pairId)
-    {
-    case PAIR_HL:
-    case PAIR_IY:
-    case PAIR_IX:
-      return TRUE;
-    default:
-      return FALSE;
-    }
-}
-
 static void
 spillPair (PAIR_ID pairId)
 {
@@ -10449,7 +10434,7 @@ genPointerGet (const iCode *ic)
   if (isPair (left->aop) && size == 1 && !IS_BITVAR (retype) && !rightval)
     {
       /* Just do it */
-      if (isPtrPair (AOP (left)))
+      if ((getPairId (AOP (left)) == PAIR_HL || getPairId (AOP (left)) == PAIR_IY) && result->aop->type == AOP_REG)
         {
           if (!regalloc_dry_run)        // Todo: More exact cost.
             {

@@ -1,3 +1,10 @@
+2020-07-19 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/ralloc2.cc,
+	  src/z80/gen.c,
+	  src/z80/peeph-ez80_z80.def:
+	  Improve use of hl in z80 (and related) register allocation.
+
 2020-07-18 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* sdas/asgb/gbmch.c (minit),
@@ -21,6 +28,7 @@
 	* src/z80/main.c,
 	  src/z80/z80.h,
 	  src/z80/gen.c,
+	  src/z80/ralloc.c,
 	  src/z80/ralloc2.cc:
 	  Enable some use of hl in gbz80 register allocation.
 

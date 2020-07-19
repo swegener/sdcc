@@ -4443,6 +4443,7 @@ genIpush (const iCode *ic)
           emit2 ("push hl");
           cheapMove (ASMOP_L, 0, AOP (IC_LEFT (ic)), 0, false);
           emit2 ("ex (sp), hl");
+          spillPair (PAIR_HL);
           regalloc_dry_run_cost += 2;
         }
       else
@@ -4505,6 +4506,7 @@ genIpush (const iCode *ic)
            fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, ic, size - 2);
            _G.stack.pushed -= 2;
            emit2 ("ex (sp), hl");
+           spillPair (PAIR_HL);
            regalloc_dry_run_cost += 3;
            d = 2;
          }
@@ -4589,6 +4591,7 @@ genIpush (const iCode *ic)
            emit2 ("push hl");
            cheapMove (ASMOP_H, 0, IC_LEFT (ic)->aop, size - 1, false);
            emit2 ("ex (sp), hl");
+           spillPair (PAIR_HL);
            emit2 ("inc sp");
            regalloc_dry_run_cost += 3;
            d = 1;
@@ -5282,17 +5285,22 @@ genEndFunction (iCode * ic)
     adjustStack (_G.stack.offset, !IS_TLCS90, TRUE, retsize == 0 || retsize > 4, !IY_RESERVED);
 
   if(!IS_GB && !_G.omitFramePtr)
-    emit2 ("pop ix");
+    {
+      emit2 ("pop ix");
+      regalloc_dry_run_cost += 2;
+    }
 
   if (_G.calleeSaves.pushedDE)
     {
       emit2 ("pop de");
+      regalloc_dry_run_cost++;
       _G.calleeSaves.pushedDE = FALSE;
     }
 
   if (_G.calleeSaves.pushedBC)
     {
       emit2 ("pop bc");
+      regalloc_dry_run_cost++;
       _G.calleeSaves.pushedBC = FALSE;
     }
 
@@ -5304,7 +5312,10 @@ genEndFunction (iCode * ic)
   /* if this is an interrupt service routine
      then save all potentially used registers. */
   if (IFFUNC_ISISR (sym->type))
-    emit2 ("!popa");
+    {
+      emit2 ("!popa");
+      regalloc_dry_run_cost++;
+    }
   else
     {
       /* This is a non-ISR function.
@@ -5357,6 +5368,7 @@ genEndFunction (iCode * ic)
     {
       /* Both banked and non-banked just ret */
       emit2 ("ret");
+      regalloc_dry_run_cost++;
     }
 
   _G.flushStatics = 1;
@@ -6485,32 +6497,33 @@ genMinusDec (const iCode *ic, asmop *result, asmop *left, asmop *right)
   /* will try to generate a decrement */
   /* if the right side is not a literal we cannot */
   if (right->type != AOP_LIT)
-    return FALSE;
+    return false;
 
   /* if the literal value of the right hand side
      is greater than 4 then it is not worth it */
   if ((icount = (unsigned int) ulFromVal (right->aopu.aop_lit)) > 2)
-    return FALSE;
+    return false;
 
   size = getDataSize (IC_RESULT (ic));
 
   /* if decrement 16 bits in register */
   if (sameRegs (left, result) && (size > 1) && isPair (result))
     {
+      regalloc_dry_run_cost += icount * (1 + (getPairId (result) == PAIR_IY));
       while (icount--)
         emit2 ("dec %s", getPairName (result));
-      return TRUE;
+      return true;
     }
 
   /* If result is a pair */
   if (isPair (AOP (IC_RESULT (ic))))
     {
       fetchPair (getPairId (result), left);
+      regalloc_dry_run_cost += icount * (1 + (getPairId (result) == PAIR_IY));
       while (icount--)
         if (!regalloc_dry_run)
           emit2 ("dec %s", getPairName (result));
-      regalloc_dry_run_cost += 1;
-      return TRUE;
+      return true;
     }
 
   /* if decrement 16 bits in register */
@@ -6518,20 +6531,20 @@ genMinusDec (const iCode *ic, asmop *result, asmop *left, asmop *right)
     {
       fetchPair (_getTempPairId (), left);
 
+      regalloc_dry_run_cost += icount * (1 + (_getTempPairId () == PAIR_IY));
       while (icount--)
         if (!regalloc_dry_run)
           emit2 ("dec %s", _getTempPairName ());
-      regalloc_dry_run_cost += 1;
 
-      commitPair (result, _getTempPairId (), ic, FALSE);
+      commitPair (result, _getTempPairId (), ic, false);
 
-      return TRUE;
+      return true;
     }
 
 
   /* if the sizes are greater than 1 then we cannot */
   if (result->size > 1 || left->size > 1)
-    return FALSE;
+    return false;
 
   /* we can if the aops of the left & result match or if they are in
      registers and the registers are the same */
@@ -6539,7 +6552,7 @@ genMinusDec (const iCode *ic, asmop *result, asmop *left, asmop *right)
     {
       while (icount--)
         emit3 (A_DEC, result, 0);
-      return TRUE;
+      return true;
     }
 
   if (result->type == AOP_REG)
@@ -6547,10 +6560,10 @@ genMinusDec (const iCode *ic, asmop *result, asmop *left, asmop *right)
       cheapMove (result, 0, left, 0, true);
       while (icount--)
         emit3 (A_DEC, result, 0);
-      return TRUE;
+      return true;
     }
 
-  return FALSE;
+  return false;
 }
 
 /*-----------------------------------------------------------------*/

@@ -64,7 +64,7 @@ replace restart {
 } by {
 	;eZ80 peephole 6: replace Z80 style load to HL from memory addressed by HL itself
 	ld	hl, (hl)
-}
+} if notUsed('a')
 
 replace restart {
 	ld	%2, (hl)

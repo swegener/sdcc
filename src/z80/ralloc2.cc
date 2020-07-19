@@ -806,12 +806,12 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   bool result_only_HL = (result_in_L || unused_L || dying_L) && (result_in_H || unused_H || dying_H);
 
 #if 0
-  if (ic->key == 4)
+  if (ic->key == 6)
     {
-      std::cout << "Result in L: " << result_in_L << ", result in H: " << result_in_H << "\n";
-      std::cout << "Unsued L: " << unused_L << ", unused H: " << unused_H << "\n";
-      std::cout << "Dying L: " << dying_L << ", dying H: " << dying_H << "\n";
-      std::cout << "Result only HL: " << result_only_HL << "\n";
+      std::cout << "  Result in L: " << result_in_L << ", result in H: " << result_in_H << "\n";
+      std::cout << "  Unsued L: " << unused_L << ", unused H: " << unused_H << "\n";
+      std::cout << "  Dying L: " << dying_L << ", dying H: " << dying_H << "\n";
+      std::cout << "  Result only HL: " << result_only_HL << "\n";
     }
 #endif
 
@@ -827,20 +827,17 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(IS_GB &&
     (ic->op == IPUSH && operand_on_stack(left, a, i, G) || ic->op == IFX && operand_on_stack(IC_COND(ic), a, i, G)))
     return(false);
-
   if(IS_GB &&
     (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)) && 
     (ic->op == RIGHT_OP || ic->op == LEFT_OP || ic->op == '=' || ic->op == CAST || ic->op == '-' || ic->op == UNARYMINUS || ic->op == BITWISEAND || ic->op == '|') &&
     !(result_only_HL && getSize(operandType(result)) == 1)) // Size of result needs to be checked after checking ic->op to esnure that there is a result operand.
     return(false);
 
-  //if(IS_GB && (ic->op == '|' || ic->op == BITWISEAND || ic->op == CAST)) // Workaround, see rule above.
-  //  return(false);
   if(IS_GB && ic->op == GET_VALUE_AT_ADDRESS && !(result_only_HL || getSize(operandType(result)) == 1))
     return(false);
   if(IS_GB && POINTER_GET(ic) && !(result_only_HL || getSize(operandType(right)) == 1))
     return(false);
-    
+
   if(ic->op == RETURN || ic->op == SEND || ic->op == RECEIVE)
     return(true);
 
@@ -991,7 +988,7 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
 
 #if 0
-  if(ic->key == 4)
+  if(ic->key == 6)
     {
       std::cout << "HLinst_ok: L = (" << ia.registers[REG_L][0] << ", " << ia.registers[REG_L][1] << "), H = (" << ia.registers[REG_H][0] << ", " << ia.registers[REG_H][1] << ")inst " << i << ", " << ic->key << "\n";
       std::cout << "Result in L: " << result_in_L << ", result in H: " << result_in_H << "\n";
@@ -999,7 +996,13 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     }
 #endif
 
-  return(false);
+  // Replaces former default drop here.
+  if (ic->op == GET_VALUE_AT_ADDRESS || POINTER_SET(ic) || ic->op == ADDRESS_OF || ic->op == '*' || ic->op == JUMPTABLE) // Some operations always use hl. TODO: See if they can be changed to save / restore a hl in use or use hl only when free.
+    return(false);
+  if(exstk && (operand_on_stack(result, a, i, G) || IS_TRUE_SYMOP (result) || operand_on_stack(left, a, i, G) || IS_TRUE_SYMOP (left) || operand_on_stack(right, a, i, G) || IS_TRUE_SYMOP (right))) // hl used as pointer to operand.
+    return(false);
+
+  return(true);
 }
 
 template <class G_t, class I_t>
@@ -1352,7 +1355,7 @@ static float instruction_cost(const assignment &a, unsigned short int i, const G
       c = dryZ80iCode(ic);
       ic->generated = false;
       return(c);
-      
+
     // Inexact cost:
     default:
       return(default_instruction_cost(a, i, G, I));

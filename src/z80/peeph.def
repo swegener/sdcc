@@ -1881,6 +1881,141 @@ replace restart {
 	; common peephole 177 replace pushed register pair
 } if notUsed('a'), canJoinRegs(%1 '' %2), canSplitReg(%2 %3), same(%3 %1)
 
+barrier
+
+//next rules optimize code after the call
+//replaces lot of `inc sp` by `ld hl,#n; add hl,sp; ld sp,hl`
+replace restart {
+	inc	sp
+	pop	%1
+	ld	%2 (%3), %4
+} by {
+	inc	sp
+	; common peephole 178: move pop instruction after resister store
+	ld	%2 (%3), %4
+	pop	%1
+} if notSame(%1 %3 %4), operandsNotRelated(%1 %4)
+
+replace restart {
+	inc	sp
+	ld	%1 (%2), %3
+} by {
+	; common peephole 179a: move register store before stack restore
+	ld	%1 (%2), %3
+	inc	sp
+} if notSame(%2 'sp')
+
+replace restart {
+	inc	sp
+	pop	%1
+	ld	%2, %3
+} by {
+	; common peephole 179b: move register to register copy before SP increment
+	ld	%2, %3
+	inc	sp
+	pop	%1
+} if same(%3 'l' 'h'), notSame(%2 'l' 'h'), notUsed('hl'), operandsNotRelated(%1 %2 %3), notSame('sp' %2 %3)
+
+replace restart {
+	inc	sp
+	ld	%1, %2
+} by {
+	; common peephole 179c: move register store before stack restore
+	ld	%1, %2
+	inc	sp
+} if notUsed('hl'), same(%2 'h' 'l' 'sp'), notSame(%1 'h' 'l' 'sp')
+
+replace restart {
+	inc	sp
+	ld	%3, #%1
+	add	%3, sp
+	ld	sp, %3
+} by {
+	; common peephole 180: increase SP by addition
+	ld	%3, #%2
+	add	%3, sp
+	ld	sp, %3
+} if notUsed(%3), same(%3 'hl' 'ix' 'iy'), immdInRange(0 0x7fff '+' %1 1 %2)
+
+replace restart {
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+} by {
+	; common peephole 181: increase SP by addition
+	ld	hl, #5
+	add	hl, sp
+	ld	sp, hl
+} if notUsed('hl')
+
+barrier
+
+//next rules optimized some checks
+replace restart {
+	ld	a, %1
+	sub	a, #%7
+	ld	a, %2
+	sbc	a, #0x00
+	ld	a, %3
+	sbc	a, #0x00
+	ld	a, %4
+	sbc	a, #0x00
+	%5	C, %6
+} by {
+	; common peephole 182-1: symplify 32-bit compare for 8 bit values
+	ld	a, %2
+	or	a, %3
+	or	a, %4
+	jp	NZ, %9
+	ld	a, %1
+	cp	a, #%7
+	%5	C, %6
+%9:
+} if same(%5 'jr' 'jp' 'call'), notUsed('a'), newLabel(%9)
+
+replace restart {
+	ld	a, %1
+	sub	a, #%7
+	ld	a, %2
+	sbc	a, #%8
+	ld	a, %3
+	sbc	a, #0x00
+	ld	a, %4
+	sbc	a, #0x00
+	%5	C, %6
+} by {
+	; common peephole 182-2: symplify 32-bit compare for 16 bit values
+	ld	a, %3
+	or	a, %4
+	jp	NZ, %9
+	ld	a, %1
+	sub	a, #%7
+	ld	a, %2
+	sbc	a, #%8
+	%5	C, %6
+%9:
+} if same(%5 'jr' 'jp' 'call'), notUsed('a'), newLabel(%9)
+
+replace restart {
+	ld	a, #0xff
+	cp	a, %1
+	%2	NC, %3
+} by {
+	; common peephole 183-1: remove always true check
+} if same(%2 'jr' 'jp' 'call'), notUsed('a'), labelRefCountChange(%3 -1)
+
+replace restart {
+	ld	a, #0xff
+	sub	a, %1
+	ld	a, #0xff
+	sbc	a, %2
+	%3	NC, %4
+} by {
+	; common peephole 183-2: remove always true check
+} if same(%3 'jr' 'jp' 'call'), notUsed('a'), labelRefCountChange(%4 -1)
+
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().
 barrier
 

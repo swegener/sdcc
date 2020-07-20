@@ -76,4 +76,34 @@ replace restart {
 	inc	hl
 } if canJoinRegs(%1 %2 %3)
 
+replace restart {
+	ld	%4 (%1), %3
+	ld	%5 (%1), %2
+} by {
+	;eZ80 peephole 8: replace 2 8-bit indirect register pair stores by one 16-bit
+	ld	%4 (%1), %6
+} if canJoinRegs(%2 %3 %6), immdInRange(-128 127 '+' %4 1 %7), same(%5 %7)
+
+replace restart {
+	ld	a, %1 (%2)
+	ld	%3 (%4), a
+	ld	a, %5 (%2)
+	ld	%6 (%4), a
+} by {
+	;eZ80 peephole 9hl: replace byte copy by word copy
+	ld	hl, %1 (%2)
+	ld	%3 (%4), hl
+} if notUsed('hl'), immdInRange(-128 127 '+' %1 1 %7), same(%5 %7), immdInRange(-128 127 '+' %3 1 %8), same(%6 %8)
+
+replace restart {
+	ld	a, %1 (%2)
+	ld	%3 (%4), a
+	ld	a, %5 (%2)
+	ld	%6 (%4), a
+} by {
+	;eZ80 peephole 9de: replace byte copy by word copy
+	ld	de, %1 (%2)
+	ld	%3 (%4), de
+} if notUsed('de'), immdInRange(-128 127 '+' %1 1 %7), same(%5 %7), immdInRange(-128 127 '+' %3 1 %8), same(%6 %8)
+
 barrier

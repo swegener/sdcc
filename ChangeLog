@@ -1,3 +1,9 @@
+2020-07-20 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peeph-ez80_z80.def,
+	  src/z80/peeph.def:
+	  New useful peephole rules for Z80-like targets.
+
 2020-07-20 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* support/support/makebin.c:

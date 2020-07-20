@@ -284,6 +284,7 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size)
     {
       int nbytes;
       int addr;
+      int vaddr = 0; // virtual address part
       int checksum, sum = 0;
 
       if (getc (fin) != ':')
@@ -294,6 +295,31 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size)
       nbytes = getbyte (fin, &sum);
       addr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
       record_type = getbyte (fin, &sum);
+      // TODO: actually use the virtual address part
+      if(record_type == 4){
+        // 32 bit address => virtual address
+        vaddr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
+        checksum = getbyte (fin, &sum);
+        // move to the next record
+        if (0 != (sum & 0xff))
+        {
+          fprintf (stderr, "error: bad checksum: %02x.\n", checksum);
+          return 0;
+        }
+        while (isspace (sum = getc (fin)))  /* skip all kind of spaces */
+         ;
+        ungetc (sum, fin);
+        if (getc (fin) != ':')
+       {
+          fprintf (stderr, "error: invalid IHX line.\n");
+          return 0;
+        }
+        // parse real data part
+        checksum = sum = 0;
+        nbytes = getbyte (fin, &sum);
+        addr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
+        record_type = getbyte (fin, &sum);
+      }
       if (record_type > 1)
         {
           fprintf (stderr, "error: unsupported record type: %02x.\n", record_type);
@@ -322,7 +348,7 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size)
           return 0;
         }
 
-      while (isspace (sum = getc (fin)))  /* skip all kind of speces */
+      while (isspace (sum = getc (fin)))  /* skip all kind of spaces */
         ;
       ungetc (sum, fin);
     }

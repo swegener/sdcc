@@ -456,7 +456,8 @@ main (int argc, char **argv)
                   usage ();
                   return 1;
                 }
-              strncpy (gb_opt.cart_name, *argv, CART_NAME_LEN);
+              strncpy (gb_opt.cart_name, *argv, CART_NAME_LEN-1);
+              gb_opt.cart_name[CART_NAME_LEN-1] = '\0';
               break;
 
             case 'c':

@@ -87,7 +87,7 @@ usage (void)
            "Usage: makebin [options] [<in_file> [<out_file>]]\n"
            "Options:\n"
            "  -p             pack mode: the binary file size will be truncated to the last occupied byte\n"
-           "  -s romsize     size of the binary file (default: 32768)\n"
+           "  -s romsize     size of the binary file (default: rom banks * 16384)\n"
            "  -Z             genarate GameBoy format binary file\n"
            "GameBoy format options (applicable only with -Z option):\n"
            "  -yo n          number of rom banks (default: 2)\n"
@@ -276,7 +276,7 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
 }
 
 int
-read_ihx (FILE *fin, BYTE *rom, int size, int *real_size)
+read_ihx (FILE *fin, BYTE *rom, int size, int *real_size, int gb)
 {
   int record_type;
 
@@ -284,7 +284,6 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size)
     {
       int nbytes;
       int addr;
-      int vaddr = 0; // virtual address part
       int checksum, sum = 0;
 
       if (getc (fin) != ':')
@@ -295,10 +294,9 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size)
       nbytes = getbyte (fin, &sum);
       addr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
       record_type = getbyte (fin, &sum);
-      // TODO: actually use the virtual address part
       if(record_type == 4){
-        // 32 bit address => virtual address
-        vaddr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
+        addr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
+        addr <<= 16; // those are the upper 16 bits
         checksum = getbyte (fin, &sum);
         // move to the next record
         if (0 != (sum & 0xff))
@@ -317,9 +315,27 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size)
         // parse real data part
         checksum = sum = 0;
         nbytes = getbyte (fin, &sum);
-        addr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
+        // add lower 16 bits
+        addr |= getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
         record_type = getbyte (fin, &sum);
       }
+      // sizes of <= 0x8000 are considered non-banked to avoid fragmentation
+      if(gb && size > 0x8000 && (addr & 0xFFFF0000) == 0 && (addr + nbytes) > 0x4000)
+        {
+          fprintf (stderr, "error: overflow in bank 0: 0x%02x bytes.\n", (addr + nbytes));
+          return 0;
+        }
+      if(gb && (addr & 0xFFFF0000) != 0)
+        {
+          // translate virtual addresses
+          if(nbytes > 0x4000)
+            {
+              fprintf (stderr, "error: overflow in bank %d: 0x%02x bytes.\n", (addr >> 16), nbytes);
+              return 0;
+            }
+          // all banks are located at 0x4000, upper 16 bits are the bank
+          addr = (addr & 0xFFFF) - 0x4000 + ((addr >> 16) * 0x4000);
+        }
       if (record_type > 1)
         {
           fprintf (stderr, "error: unsupported record type: %02x.\n", record_type);
@@ -413,6 +429,7 @@ main (int argc, char **argv)
                   return 1;
                 }
               gb_opt.nb_rom_banks = atoi (*argv);
+              size = gb_opt.nb_rom_banks * 0x4000;
               break;
 
             case 'a':
@@ -480,12 +497,6 @@ main (int argc, char **argv)
       return 1;
     }
 
-  if (gb && size != 32768)
-    {
-      fprintf (stderr, "error: only length of 32768 bytes supported for GameBoy binary.\n");
-      return 1;
-    }
-
   rom = malloc (size);
   if (rom == NULL)
     {
@@ -495,7 +506,7 @@ main (int argc, char **argv)
     }
   memset (rom, FILL_BYTE, size);
 
-  ret = read_ihx (fin, rom, size, &real_size);
+  ret = read_ihx (fin, rom, size, &real_size, gb);
 
   fclose (fin);
 

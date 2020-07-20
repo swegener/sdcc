@@ -1,6 +1,13 @@
 2020-07-20 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* support/support/makebin.c:
+	  Add virtual address translation for gbz80 ROMs.
+	  This is a workaround for #115.
+
+
+2020-07-20 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* support/support/makebin.c:
 	  Support IHX record type 0x04 introduced in [r11746].
 	  This is needed for #115.
 

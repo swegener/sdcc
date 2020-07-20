@@ -1,5 +1,29 @@
 2020-07-20 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/ez80_z80/Makefile.in,
+	  device/lib/ez80_z80/__itoa.s,
+	  device/lib/ez80_z80/__ltoa.s,
+	  device/lib/ez80_z80/__strreverse.s,
+	  device/lib/ez80_z80/__uitobcd.s,
+	  device/lib/ez80_z80/__ultobcd.s:
+	  Fix Bug #3077 for eZ80_Z80 port
+	* device/lib/z180/Makefile.in,
+	  device/lib/z180/__itoa.s,
+	  device/lib/z180/__ltoa.s,
+	  device/lib/z180/__strreverse.s,
+	  device/lib/z180/__uitobcd.s,
+	  device/lib/z180/__ultobcd.s:
+	  Fix Bug #3077 for Z180 port
+	* device/lib/z80n/Makefile.in,
+	  device/lib/z80n/__itoa.s,
+	  device/lib/z80n/__ltoa.s,
+	  device/lib/z80n/__strreverse.s,
+	  device/lib/z80n/__uitobcd.s,
+	  device/lib/z80n/__ultobcd.s:
+	  Fix Bug #3077 for Z80N port
+
+2020-07-20 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/z80/peeph-ez80_z80.def:
 	  Fix ez80 peephole rules 9hl and 9de.
 

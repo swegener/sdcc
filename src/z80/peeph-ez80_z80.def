@@ -93,6 +93,7 @@ replace restart {
 	;eZ80 peephole 9hl: replace byte copy by word copy
 	ld	hl, %1 (%2)
 	ld	%3 (%4), hl
+	ld	a, h
 } if notUsed('hl'), immdInRange(-128 127 '+' %1 1 %7), same(%5 %7), immdInRange(-128 127 '+' %3 1 %8), same(%6 %8)
 
 replace restart {
@@ -104,6 +105,7 @@ replace restart {
 	;eZ80 peephole 9de: replace byte copy by word copy
 	ld	de, %1 (%2)
 	ld	%3 (%4), de
+	ld	a, d
 } if notUsed('de'), immdInRange(-128 127 '+' %1 1 %7), same(%5 %7), immdInRange(-128 127 '+' %3 1 %8), same(%6 %8)
 
 barrier

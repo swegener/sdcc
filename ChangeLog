@@ -1,5 +1,10 @@
 2020-07-20 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/z80/peeph-ez80_z80.def:
+	  Fix ez80 peephole rules 9hl and 9de.
+
+2020-07-20 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* support/makebin/makebin.c:
 	  Fix compiler warning.
 

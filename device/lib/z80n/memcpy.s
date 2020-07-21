@@ -35,17 +35,18 @@
 _memcpy:
 ___memcpy:
 	pop	af
+	pop	hl	;return value expected to be in HL, so pop dst to HL
 	pop	de
-	pop	hl
 	pop	bc
 	push	bc
-	push	hl
 	push	de
+	push	hl
 	push	af
 	ld	a, c
 	or	a, b
 	ret	Z
-	push	de
+	push	hl
+	ex	de, hl
 	ldir
 	pop	hl
 	ret

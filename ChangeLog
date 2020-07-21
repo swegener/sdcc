@@ -1,3 +1,12 @@
+2020-07-20 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* device/lib/ez80_z80/memcpy.s,
+	  device/lib/z180/memcpy.s,
+	  device/lib/z80/memcpy.s,
+	  device/lib/z80n/memcpy.s,
+	  support/regression/tests/memory.c:
+	  Fix invalid return value of memcpy implementation for Z80.
+
 2020-07-21 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCpeeph.c:

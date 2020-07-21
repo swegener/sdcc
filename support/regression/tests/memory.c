@@ -1,4 +1,5 @@
 /** memory function test
+ builtins: on, off
 */
 #include <testfwk.h>
 
@@ -8,6 +9,18 @@
 	(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_LARGE) || defined(__SDCC_MODEL_HUGE))) || \
     defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka)
 #define TEST_LARGE
+#endif
+
+
+#define BUILTINS_{builtins} 1
+#ifdef BUILTINS_off
+#undef memchr
+#undef memcmp
+#undef memcpy
+#undef memccpy
+#undef memmove
+#undef memset
+#undef strlen
 #endif
 
 unsigned char destination[9];
@@ -121,4 +134,20 @@ void testLarge(void)
   ASSERT(largedest[1024] == 2);
   ASSERT(largedest[1025] == 0);
 #endif
+}
+
+void testRetVal(void)
+{
+  volatile size_t one = 1;
+  volatile size_t zero = 0;
+  ASSERT(destination == memcpy(destination, source, sizeof(source)));
+  ASSERT(destination == memcpy(destination, source, 0));
+  ASSERT(destination == memcpy(destination, source, zero));
+  ASSERT(destination == memcpy(destination, source, one));
+  ASSERT(destination == memset(destination, (int)one, zero));
+  ASSERT(destination == memset(destination, (int)zero, 0));
+  ASSERT(destination == memset(destination, (int)zero, one));
+  ASSERT(destination == memset(destination, (int)one, sizeof(destination)));
+  ASSERT(&one == memset(&one, 0, sizeof(one)));
+  ASSERT(&zero == memcpy(&zero, &one, sizeof(one)));
 }

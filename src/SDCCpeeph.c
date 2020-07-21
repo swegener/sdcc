@@ -706,6 +706,7 @@ FBYNAME (newLabel)
        entry = hTabNextItem (labelHash, &key))
     {
       const char *name = entry->name;
+      wassert (name);
       if (!ISCHARDIGIT (name[0]))
         continue;
       if (name[strlen (name)-1] != '$')
@@ -1639,6 +1640,8 @@ FBYNAME (immdInRange)
       for (j = i; !ISCHARSPACE (cmdLine[j]) && cmdLine[j]; j++);
       if (!cmdLine[i]) // unexpected end
         return immdError ("no enough input", "", cmdLine);
+      else if(j >= 64)
+        return immdError ("buffer overflow", "", cmdLine);
       else
         {
           for (k = i; k < j; k++)

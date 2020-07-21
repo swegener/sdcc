@@ -1,3 +1,8 @@
+2020-07-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCpeeph.c:
+	  Sanity checks for sscanf arguments.
+
 2020-07-20 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* device/lib/ez80_z80/Makefile.in,

@@ -1201,19 +1201,16 @@ FBYNAME (canJoinRegs)
 
   int dstKey;
   int i;
-  for (i = strlen (cmdLine);;)
+  for (i = strlen (cmdLine)-1; i >= 0 && ISCHARSPACE (cmdLine[i]); --i)
+    ;
+  for (; i >= 0 && !ISCHARSPACE (cmdLine[i]); --i)
+    ;
+  if (i < 0 || cmdLine[i+1] != '%' || (cmdLine[i+1] && (sscanf (&cmdLine[i+2], "%d", &dstKey) != 1 || dstKey < 0)))
     {
-      --i;
-      if (i >= 0 && !ISCHARSPACE (cmdLine[i]))
-	continue;
-      if (i < 0 || cmdLine[i+1] != '%' || sscanf (&cmdLine[i+2], "%d", &dstKey) != 1 || dstKey < 0)
-	{
-	  fprintf (stderr,
-	       "*** internal error: canJoinRegs peephole restriction"
-	       " has bad result container: %s\n", &cmdLine[i+1]);
-	  return FALSE;
-	}
-      break;
+      fprintf (stderr,
+           "*** internal error: canJoinRegs peephole restriction"
+           " has bad result container: %s\n", &cmdLine[i+1]);
+      return FALSE;
     }
   //parse cmd line without last operand
   cmdLine[i] = '\0';

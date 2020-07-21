@@ -1,4 +1,9 @@
-2020-07-20 Philipp Klaus Krause <pkk AT spth.de>
+2020-07-21 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCpeeph.c:
+	  Fix possible ready beyond a buffer in canJoinRegs constraint.
+
+2020-07-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCpeeph.c:
 	  Sanity checks for sscanf arguments.

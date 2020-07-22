@@ -824,12 +824,17 @@ struct mne *mp;
                         break;
                 }
                 if (mchtyp == X_ZXN && op == 0xC5 && (t1 = addr(&e1)) == S_IMMED) {
-                        int old_hilo = (int)hilo;
-                        hilo = !hilo;                   // ZXN push is big-endian
+                        // ZXN push is big-endian
                         outab(0xED);
                         outab(0x8A);
-                        outrw(&e1, R_MSB);
-                        hilo = old_hilo;
+                        // ASXXXX do not check for R_MSB/R_LSB for constants!!!
+                        if (e1.e_flag==0 && e1.e_base.e_ap==NULL) {
+                                outab(hibyte(e1.e_addr));
+                                outab(lobyte(e1.e_addr));
+                        } else {
+                                outrb(&e1, R_MSB);
+                                outrb(&e1, R_LSB);
+                        }
                         break;
                 }
                 if (mchtyp == X_ZXN && op == 0xC1 && (v1 = admode(RX)) != 0 && (v1 &= 0xFF) == X) {

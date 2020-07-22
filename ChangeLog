@@ -5,8 +5,14 @@
 
 2020-07-22 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* sdas/asz80/z80mch.c,
+	  support/regression/tests/z80n-push-nn.c:
+	  Fix invalid relocation of Z80N PUSH immediate instruction.
+
+2020-07-22 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* support/regression/tests/memory.c:
-	  Fix test compilation on small systems
+	  Fix test compilation on small systems.
 
 2020-07-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

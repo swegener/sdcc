@@ -1,5 +1,6 @@
 /** memory function test
  builtins: on, off
+ part: 1, 2
 */
 #include <testfwk.h>
 
@@ -13,7 +14,7 @@
 
 
 #define BUILTINS_{builtins} 1
-#ifdef BUILTINS_off
+#if defined(BUILTINS_off) && !defined(__SDCC_pdk14)
 #undef memchr
 #undef memcmp
 #undef memcpy
@@ -35,6 +36,7 @@ int c;
 // literal and a volatile variable.
 void testmemory(void)
 {
+#if {part} == 1
   volatile size_t zero = 0;
   volatile size_t one = 1;
 
@@ -55,7 +57,6 @@ void testmemory(void)
   ASSERT(destination[0] == 23);
   ASSERT(destination[1] == 42);
   memset(destination, 42, 1);
-
   /* Test memcpy() */
   memcpy(destination, source, 0);
   ASSERT(destination[0] == 42);
@@ -75,7 +76,6 @@ void testmemory(void)
   memcpy(destination, source, 3);
   ASSERT(destination[2] == source[2]);
   ASSERT(destination[3] == 5);
-
   /* Test memcmp() */
   memcpy(destination, source, 4);
   ASSERT(memcmp(destination, source, 4) == 0);
@@ -113,6 +113,7 @@ void testmemory(void)
 #endif
 #endif
 #endif
+#endif
 }
 
 #ifdef TEST_LARGE
@@ -122,6 +123,7 @@ unsigned char largesource[1050];
 
 void testLarge(void)
 {
+#if {part} == 2
 #ifdef TEST_LARGE
   memset(largedest, 0, 1050);
   memset(largedest, 1, 4);
@@ -134,10 +136,12 @@ void testLarge(void)
   ASSERT(largedest[1024] == 2);
   ASSERT(largedest[1025] == 0);
 #endif
+#endif
 }
 
 void testRetVal(void)
 {
+#if {part} == 2
   volatile size_t one = 1;
   volatile size_t zero = 0;
   ASSERT(destination == memcpy(destination, source, sizeof(source)));
@@ -150,4 +154,5 @@ void testRetVal(void)
   ASSERT(destination == memset(destination, (int)one, sizeof(destination)));
   ASSERT(&one == memset(&one, 0, sizeof(one)));
   ASSERT(&zero == memcpy(&zero, &one, sizeof(one)));
+#endif
 }

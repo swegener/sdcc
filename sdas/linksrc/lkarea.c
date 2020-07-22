@@ -413,6 +413,16 @@ lnkarea(void)
 
         ap = areap;
         while (ap) {
+                if(TARGET_IS_GB && ap->a_addr == 0) {
+                        if(!strncmp(ap->a_id, "_CODE_", 6) && atoi(ap->a_id+6)!=0) {
+                                // set sane default values for rom banking
+                                ap->a_addr = (atoi(ap->a_id+6) << 16) + 0x4000;
+                        }
+                        if(!strncmp(ap->a_id, "_DATA_", 6)) {
+                                // set sane default values for ram banking
+                                ap->a_addr = (atoi(ap->a_id+6) << 16) + 0xA000;
+                        }
+                }
                 if (ap->a_flag & A3_ABS) {
                         /*
                          * Absolute sections

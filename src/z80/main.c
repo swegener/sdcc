@@ -60,8 +60,8 @@ static char _tlcs90_defaultRules[] = {
 };
 
 static char _gbz80_defaultRules[] = {
-#include "peeph.rul"
 #include "peeph-gbz80.rul"
+#include "peeph.rul"
 };
 
 static char _ez80_z80_defaultRules[] = {

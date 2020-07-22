@@ -1,4 +1,9 @@
-2020-07-20 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+2020-07-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/mappings.i:
+	  Unify emitted gbz80 asm and fix indentation.
+
+2020-07-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/main.c:
 	  Improve rule order for gbz80

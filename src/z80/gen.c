@@ -4938,7 +4938,7 @@ genCall (const iCode *ic)
           else if (IFFUNC_ISZ88DK_FASTCALL (ftype))
             {
               spillPair (PAIR_BC);
-              emit2 ("ld a, !bankimmeds", name);
+              emit2 ("ld a, !hashedbankimmeds", name);
               emit2 ("ld bc, !hashedstr", name);
               emit2 ("call ___sdcc_bcall_abc");
               regalloc_dry_run_cost += 8;
@@ -4947,7 +4947,7 @@ genCall (const iCode *ic)
             {
               spillPair (PAIR_DE);
               spillPair (PAIR_HL);
-              emit2 ("ld e, !bankimmeds", name);
+              emit2 ("ld e, !hashedbankimmeds", name);
               emit2 ("ld hl, !hashedstr", name);
               emit2 ("call ___sdcc_bcall_ehl");
               regalloc_dry_run_cost += 8;

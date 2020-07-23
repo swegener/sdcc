@@ -2,6 +2,13 @@
 
 	* src/SDCCasm.c,
 	  src/z80/gen.c,
+	  src/z80/mappings.i:
+	  Add new mapping !hashedbankimmeds.
+
+2020-07-23 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCasm.c,
+	  src/z80/gen.c,
 	  support/regression/tests/banked.c:
 	  Fix incorrect syntax of ASXXXX assembler code generated for banked calls.
 

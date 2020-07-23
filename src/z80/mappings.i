@@ -205,6 +205,7 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "lsbimmeds", "%s & $FF" },
     { "msbimmeds", "%s >> 8" },
     { "bankimmeds", "BANK(%s)" },
+    { "hashedbankimmeds", "BANK(%s)" },
     { "module", "; MODULE %s" },
     { NULL, NULL }
 };
@@ -292,6 +293,7 @@ static const ASM_MAPPING _isas_mapping[] = {
     { "lsbimmeds", "%s & 0xFF" },
     { "msbimmeds", "%s >> 8" },
     { "bankimmeds", "!%s" },
+    { "hashedbankimmeds", "!%s" },
     { "module", "; MODULE %s" },
     { NULL, NULL }
 };
@@ -371,6 +373,7 @@ static const ASM_MAPPING _z80asm_mapping[] = {
     { "msbimmeds", "%s / 256" },
 
     { "bankimmeds", "BANK(%s)" },
+    { "hashedbankimmeds", "BANK(%s)" },
     { "module", "MODULE %s" },
     { "area", "; Area  %s" },
     { "areadata", "; Aread BSS" },

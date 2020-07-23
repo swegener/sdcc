@@ -93,8 +93,13 @@ usage (void)
            "  -yo n          number of rom banks (default: 2)\n"
            "  -ya n          number of ram banks (default: 0)\n"
            "  -yt n          MBC type (default: no MBC)\n"
+           "  -yl n          old licensee code (default: 0x33)\n"
+           "  -yk cc         new licensee string (default: 00)\n"
            "  -yn name       cartridge name (default: none)\n"
-           "  -yc            GameBoy Color\n"
+           "  -yc            GameBoy Color compatible\n"
+           "  -yC            GameBoy Color only\n"
+           "  -ys            Super GameBoy\n"
+           "  -yj            set non-Japanese region flag\n"
            "Arguments:\n"
            "  <in_file>      optional IHX input file, '-' means stdin. (default: stdin)\n"
            "  <out_file>     optional output file, '-' means stdout. (default: stdout)\n");
@@ -105,10 +110,14 @@ usage (void)
 struct gb_opt_s
 {
   char cart_name[CART_NAME_LEN];  /* cartridge name buffer */
+  char licensee_str[2];           /* new licensee string */
   BYTE mbc_type;                  /* MBC type (default: no MBC) */
   short nb_rom_banks;             /* Number of rom banks (default: 2) */
   BYTE nb_ram_banks;              /* Number of ram banks (default: 0) */
-  BYTE is_gbc;                    /* True if GBC, false for all other*/
+  BYTE licensee_id;               /* old licensee code */
+  BYTE is_gbc;                    /* 1 if GBC compatible, 2 if GBC only, false for all other*/
+  BYTE is_sgb;                    /* True if SGB, false for all other*/
+  BYTE non_jp;                    /* True if non-Japanese region, false for all other*/
 };
 
 void
@@ -131,6 +140,9 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
 
   memcpy (&rom[0x104], gb_logo, sizeof (gb_logo));
 
+  rom[0x144] = o->licensee_str[0];
+  rom[0x145] = o->licensee_str[1];
+
   /*
    * 0134-0142: Title of the game in UPPER CASE ASCII. If it
    * is less than 16 characters then the
@@ -143,9 +155,19 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
       rom[0x134 + i] = toupper (o->cart_name[i]);
     }
 
-  if (o->is_gbc)
+  if (o->is_gbc == 1)
     {
       rom[0x143] = 0x80;
+    }
+
+  if (o->is_gbc == 2)
+    {
+      rom[0x143] = 0xC0;
+    }
+
+  if (o->is_sgb)
+    {
+      rom[0x146] = 0x03;
     }
 
   /*
@@ -255,6 +277,10 @@ gb_postproc (BYTE * rom, int size, int *real_size, struct gb_opt_s *o)
       rom[0x149] = 0;
       break;
     }
+
+  rom[0x14A] = o->non_jp;
+
+  rom[0x14B] = o->licensee_id;
 
   /* Update complement checksum */
   chk = 0;
@@ -369,7 +395,7 @@ main (int argc, char **argv)
   FILE *fin, *fout;
   int ret;
   int gb = 0;
-  struct gb_opt_s gb_opt = { "", 0, 2, 0 };
+  struct gb_opt_s gb_opt = { "", {'0', '0'}, 0, 2, 0, 0x33, 0, 0 };
 
 #if defined(_WIN32)
   setmode (fileno (stdout), O_BINARY);
@@ -385,7 +411,7 @@ main (int argc, char **argv)
               usage ();
               return 1;
             }
-          size = atoi (*argv);
+          size = strtoul (*argv, NULL, 0);
           break;
 
         case 'h':
@@ -416,7 +442,7 @@ main (int argc, char **argv)
                   usage ();
                   return 1;
                 }
-              gb_opt.nb_rom_banks = atoi (*argv);
+              gb_opt.nb_rom_banks = strtoul (*argv, NULL, 0);
               size = gb_opt.nb_rom_banks * 0x4000;
               break;
 
@@ -426,7 +452,7 @@ main (int argc, char **argv)
                   usage ();
                   return 1;
                 }
-              gb_opt.nb_ram_banks = atoi (*argv);
+              gb_opt.nb_ram_banks = strtoul (*argv, NULL, 0);
               break;
 
             case 't':
@@ -435,7 +461,7 @@ main (int argc, char **argv)
                   usage ();
                   return 1;
                 }
-              gb_opt.mbc_type = atoi (*argv);
+              gb_opt.mbc_type = strtoul (*argv, NULL, 0);
               break;
 
             case 'n':
@@ -448,8 +474,38 @@ main (int argc, char **argv)
               gb_opt.cart_name[CART_NAME_LEN-1] = '\0';
               break;
 
+            case 'k':
+              if (!*++argv)
+                {
+                  usage ();
+                  return 1;
+                }
+              strncpy (gb_opt.licensee_str, *argv, 2);
+              break;
+
+            case 'l':
+              if (!*++argv)
+                {
+                  usage ();
+                  return 1;
+                }
+              gb_opt.licensee_id = strtoul (*argv, NULL, 0);
+              break;
+
             case 'c':
               gb_opt.is_gbc = 1;
+              break;
+
+            case 'C':
+              gb_opt.is_gbc = 2;
+              break;
+
+            case 's':
+              gb_opt.is_sgb = 1;
+              break;
+
+            case 'j':
+              gb_opt.non_jp = 1;
               break;
 
             default:

@@ -1,6 +1,11 @@
 2020-07-23 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* support/makebin/makebin.c:
+	  Add ROM header options for gbz80.
+
+2020-07-23 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* support/makebin/makebin.c:
 	  Apply record type 04 32bit extension to all 00.
 
 2020-07-23 Sergey Belyashov <sergey.belyashov@gmail.com>

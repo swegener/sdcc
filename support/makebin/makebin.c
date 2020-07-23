@@ -280,6 +280,7 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size, int gb)
 {
   int record_type;
 
+  int extaddr = 0;
   do
     {
       int nbytes;
@@ -294,31 +295,34 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size, int gb)
       nbytes = getbyte (fin, &sum);
       addr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
       record_type = getbyte (fin, &sum);
-      if(record_type == 4){
-        addr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
-        addr <<= 16; // those are the upper 16 bits
-        checksum = getbyte (fin, &sum);
-        // move to the next record
-        if (0 != (sum & 0xff))
+      if(record_type == 4)
         {
-          fprintf (stderr, "error: bad checksum: %02x.\n", checksum);
-          return 0;
+          extaddr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
+          extaddr <<= 16; // those are the upper 16 bits
+          checksum = getbyte (fin, &sum);
+          // move to the next record
+          if (0 != (sum & 0xff))
+            {
+              fprintf (stderr, "error: bad checksum: %02x.\n", checksum);
+              return 0;
+            }
+          while (isspace (sum = getc (fin)))  /* skip all kind of spaces */
+            ;
+          ungetc (sum, fin);
+          if (getc (fin) != ':')
+            {
+              fprintf (stderr, "error: invalid IHX line.\n");
+              return 0;
+            }
+          // parse real data part
+          checksum = sum = 0;
+          nbytes = getbyte (fin, &sum);
+          // lower 16 bits
+          addr = getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
+          record_type = getbyte (fin, &sum);
         }
-        while (isspace (sum = getc (fin)))  /* skip all kind of spaces */
-         ;
-        ungetc (sum, fin);
-        if (getc (fin) != ':')
-       {
-          fprintf (stderr, "error: invalid IHX line.\n");
-          return 0;
-        }
-        // parse real data part
-        checksum = sum = 0;
-        nbytes = getbyte (fin, &sum);
-        // add lower 16 bits
-        addr |= getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
-        record_type = getbyte (fin, &sum);
-      }
+      // add linear address extension
+      addr |= extaddr;
       // TODO: warn for unreachable banks according to chosen MBC
       if (record_type > 1)
         {

@@ -1,3 +1,8 @@
+2020-07-23 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCpeeph.c:
+	  Fix bug #3089: sdcc hangs under Windows.
+
 2020-07-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sdas/linksrc/lkarea.c:

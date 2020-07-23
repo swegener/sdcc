@@ -1352,11 +1352,11 @@ FBYNAME (canSplitReg)
     {
       if (i >= size)
         {
-	  size *= 2;
+          size *= 2;
           varIds = (int*)Safe_realloc (varIds, size * sizeof(*varIds));
         }
       int len;
-      if (sscanf (cl, " %%%d %n", &varIds[i], &len) != 1)
+      if (sscanf (cl, " %%%d%n", &varIds[i], &len) != 1)
         break;
       if (varIds[i] < 0)
         {

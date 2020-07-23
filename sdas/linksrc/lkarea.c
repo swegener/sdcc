@@ -416,6 +416,7 @@ lnkarea(void)
                 if(TARGET_IS_GB && ap->a_addr == 0) {
                         if(!strncmp(ap->a_id, "_CODE_", 6) && atoi(ap->a_id+6)!=0) {
                                 // set sane default values for rom banking
+                                // 0x4000 is correct for MBC1,2,3,5,7
                                 ap->a_addr = (atoi(ap->a_id+6) << 16) + 0x4000;
                         }
                         if(!strncmp(ap->a_id, "_DATA_", 6)) {

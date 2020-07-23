@@ -1,18 +1,26 @@
+
+
+2020-07-23 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/linksrc/lkout.c,
+	  support/makebin/makebin.c:
+	  Translate virtual addresses to real addresses in ihx for gbz80.
+
 2020-07-23 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCpeeph.c:
 	  Fix bug #3089: sdcc hangs under Windows.
-
-2020-07-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
-
-	* sdas/linksrc/lkarea.c:
-	  Set sane default values for gbz80 banks.
 
 2020-07-22 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* sdas/asz80/z80mch.c,
 	  support/regression/tests/z80n-push-nn.c:
 	  Fix invalid relocation of Z80N PUSH immediate instruction.
+
+2020-07-22 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* sdas/linksrc/lkarea.c:
+	  Set sane default values for gbz80 banks.
 
 2020-07-22 Sergey Belyashov <sergey.belyashov@gmail.com>
 

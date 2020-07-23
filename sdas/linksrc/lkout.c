@@ -392,13 +392,23 @@ iflush()
 {
         int i, max, reclen;
         a_uint chksum, lo_addr, hi_addr;
+        // rom addresses, calculated based on the virtual ones
+        a_uint rrtadr0 = rtadr0;
+        a_uint rrtadr1 = rtadr1;
+        // translate virtual addresses for gameboy
+        if(TARGET_IS_GB){
+                if(rrtadr0 > 0x10000)
+                        rrtadr0 = (rrtadr0>>16) * 0x4000 + (rrtadr0&0xffff) - 0x4000;
+                if(rrtadr1 > 0x10000)
+                        rrtadr1 = (rrtadr1>>16) * 0x4000 + (rrtadr1&0xffff) - 0x4000;
+        }
 
-        max = (int) (rtadr1 - rtadr0);
+        max = (int) (rrtadr1 - rrtadr0);
         if (max) {
                 if (a_bytes > 2) {
                         static a_uint prev_hi_addr = 0;
 
-                        hi_addr = (rtadr0 >> 16) & 0xffff;
+                        hi_addr = (rrtadr0 >> 16) & 0xffff;
                         if ((hi_addr != prev_hi_addr) || rtaflg) {
                                 chksum =  0x02;
                                 chksum += 0x04;
@@ -418,7 +428,7 @@ iflush()
                  * from the checksum.  The record length includes
                  * only the data bytes.
                  */
-                lo_addr = rtadr0 & 0xffff;
+                lo_addr = rrtadr0 & 0xffff;
                 reclen = max;
                 chksum = reclen;
                 chksum += lo_addr;

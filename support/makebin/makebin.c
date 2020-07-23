@@ -319,23 +319,7 @@ read_ihx (FILE *fin, BYTE *rom, int size, int *real_size, int gb)
         addr |= getbyte (fin, &sum) << 8 | getbyte (fin, &sum);
         record_type = getbyte (fin, &sum);
       }
-      // sizes of <= 0x8000 are considered non-banked to avoid fragmentation
-      if(gb && size > 0x8000 && (addr & 0xFFFF0000) == 0 && (addr + nbytes) > 0x4000)
-        {
-          fprintf (stderr, "error: overflow in bank 0: 0x%02x bytes.\n", (addr + nbytes));
-          return 0;
-        }
-      if(gb && (addr & 0xFFFF0000) != 0)
-        {
-          // translate virtual addresses
-          if(nbytes > 0x4000)
-            {
-              fprintf (stderr, "error: overflow in bank %d: 0x%02x bytes.\n", (addr >> 16), nbytes);
-              return 0;
-            }
-          // all banks are located at 0x4000, upper 16 bits are the bank
-          addr = (addr & 0xFFFF) - 0x4000 + ((addr >> 16) * 0x4000);
-        }
+      // TODO: warn for unreachable banks according to chosen MBC
       if (record_type > 1)
         {
           fprintf (stderr, "error: unsupported record type: %02x.\n", record_type);

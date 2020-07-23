@@ -1,4 +1,9 @@
+2020-07-23 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/SDCCasm.c,
+	  src/z80/gen.c,
+	  support/regression/tests/banked.c:
+	  Fix incorrect syntax of ASXXXX assembler code generated for banked calls.
 
 2020-07-23 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

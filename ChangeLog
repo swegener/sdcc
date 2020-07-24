@@ -1,3 +1,11 @@
+2020-07-24 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* device/include/stdatomic.h: enable mcs51, atomic_flag must reside in data/idata
+	* device/lib/mcs51/Makefile.in: added atomic_flag_test_and_set.rel & atomic_flag_clear.rel,
+	  fixed include path
+	* support/regression/tests/atomic.c: enabled test for mcs51,
+	  added test for atomic_flag within struct
+
 2020-07-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/main.c:
@@ -142,7 +150,6 @@
 	* support/support/makebin.c:
 	  Support IHX record type 0x04 introduced in [r11746].
 	  This is needed for #115.
-
 
 2020-07-19 Philipp Klaus Krause <pkk AT spth.de>
 

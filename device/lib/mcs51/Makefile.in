@@ -16,7 +16,7 @@ override PORTDIR = ../build/$(PORT)
 OBJ = crtstart.rel crtxinit.rel crtxclear.rel crtclear.rel \
       crtpagesfr.rel crtbank.rel crtcall.rel \
       crtxstack.rel crtxpush.rel crtxpushr0.rel crtxpop.rel crtxpopr0.rel \
-      gptr_cmp.rel
+      gptr_cmp.rel atomic_flag_test_and_set.rel atomic_flag_clear.rel
 
 LIB = mcs51.lib
 
@@ -24,7 +24,7 @@ CC = $(SCC)
 AS = $(SAS)
 ASFLAGS = -plosgff
 
-CFLAGS = -I$(top_srcdir)/include --std-c11
+CFLAGS = -I$(top_srcdir)/device/include --std-c11
 
 all: $(PORTDIR)/$(LIB)
 

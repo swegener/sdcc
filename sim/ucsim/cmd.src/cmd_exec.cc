@@ -500,7 +500,6 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
 
   for (i=0;i<cmdline->tokens->get_count();i++)
     {
-      //class cl_cmd_arg *p= (class cl_cmd_arg*)(cmdline->param(i));
       char *p= (char*)(cmdline->tokens->at(i));
       cs+= " ";
       cs+= p;
@@ -508,10 +507,6 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
 
   s= (char*)cs;
   i= strspn(s, " \t\v\n\r");
-  s+= i;
-  i= strspn(s, "abcdefghijklmnopqrstuvwxyz");
-  s+= i;
-  i= strspn(s, " \t\v\n");
   s+= i;
   t_mem v= 0;
   if (s && *s)

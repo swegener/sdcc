@@ -1024,6 +1024,7 @@ cl_stm8::exec_inst(void)
 	int ch= fetch();
 	int cl= fetch();
 	PC= ce*0x10000 + ch*0x100 + cl;
+	tick(1);
 	return resGO;
       }
     case 0x8b: return resSTOP; // BREAK instruction
@@ -1098,6 +1099,7 @@ cl_stm8::exec_inst(void)
 		     delete il;
 		   }
 	       }
+	       tick(10);
                return(resGO);
             case 0x10: 
             case 0xA0:
@@ -1139,6 +1141,7 @@ cl_stm8::exec_inst(void)
                tempi = get1(opaddr);
                store1( opaddr, regs.A);
                regs.A = tempi;
+	       tick(2);
                return(resGO);
             case 0x40: // exg A,XL
                tempi = regs.X;
@@ -1166,6 +1169,7 @@ cl_stm8::exec_inst(void)
                }
             case 0x80: // ret
                pop2( PC);
+	       tick(3);
                return(resGO);
             case 0x10: 
             case 0xA0:
@@ -1208,7 +1212,7 @@ cl_stm8::exec_inst(void)
                pop1(tempi);
                store1(opaddr, tempi);
                return(resGO);
-            case 0x40: // mul
+            case 0x40: // MUL
                tick(3);
                if(cprefix==0x90) {
                   regs.Y = (regs.Y&0xff) * regs.A;
@@ -1253,6 +1257,7 @@ cl_stm8::exec_inst(void)
                return( inst_cpl( code, cprefix));
                break;
             case 0x80: // TRAP
+	      tick(8);
 	       {
 		 class it_level *il= new it_level(3, 0x8004, PC, trap_src);
 		 accept_it(il);
@@ -1342,7 +1347,8 @@ cl_stm8::exec_inst(void)
             case 0x60: // DIVW
                return( inst_div( code, cprefix));
                break;
-            case 0x80:
+	 case 0x80: // POPW
+	   tick(1);
                if(cprefix==0x90) {
                   pop2(regs.Y);
                } else if(cprefix==0x00) {
@@ -1436,6 +1442,7 @@ cl_stm8::exec_inst(void)
                pop1( tempi);
                pop2( PC);
                PC += (tempi <<16); //Add PCE to PC
+	       tick(5);
                return(resGO);
             case 0x90:
                if(cprefix==0x90) {
@@ -1447,12 +1454,14 @@ cl_stm8::exec_inst(void)
                }
                return(resGO);
                break;
-            case 0xA0:
+	 case 0xA0: // LDF
                opaddr = fetch2();
                if (cprefix == 0x92) {
                   store1(get3(opaddr)+regs.X,regs.A);
+		  tick(3);
                } else if(cprefix==0x91) {
-                  store1(get3(opaddr)+regs.Y,regs.A);
+		 store1(get3(opaddr)+regs.Y,regs.A);
+		 tick(3);
                } else if(cprefix==0x90) {
                   store1((opaddr << 8) + fetch() + regs.Y, regs.A);
                } else if(cprefix==0x00) {
@@ -1515,6 +1524,7 @@ cl_stm8::exec_inst(void)
                return( inst_rlc( code, cprefix));
                break;
             case 0x80: // PUSHW
+	      tick(1);
                if(cprefix==0x90) {
                   push2(regs.Y);
                } else if(cprefix==0x00) {
@@ -1645,8 +1655,10 @@ cl_stm8::exec_inst(void)
                opaddr = fetch2();
                if (cprefix == 0x92) {
                   PC = get3(opaddr);
+		  tick(5);
                } else {
                   PC = (opaddr << 8) + fetch();
+		  tick(1);
                }
                return(resGO);
                break;
@@ -1690,11 +1702,13 @@ cl_stm8::exec_inst(void)
                    push2(PC & 0xffff);
                    push1(PC >> 16);
                    PC = get3(opaddr);
+		   tick(7);
                } else {
                    unsigned char c = fetch();
                    push2(PC & 0xffff);
                    push1(PC >> 16);
                    PC = (opaddr << 8) + c;
+		   tick(4);
                }
                return(resGO);
                break;
@@ -1706,6 +1720,7 @@ cl_stm8::exec_inst(void)
                signed char c = (signed char) fetch1();
                push2(PC);
                PC += c;
+	       tick(3);
                return(resGO);
              }
                break;            
@@ -1713,6 +1728,7 @@ cl_stm8::exec_inst(void)
                opaddr = fetch2();
                if (cprefix == 0x92) {
                   store1(get3(opaddr),regs.A);
+		  tick(3);
                } else {
                   store1((opaddr << 8) + fetch(), regs.A);
                }
@@ -1742,6 +1758,7 @@ cl_stm8::exec_inst(void)
                break;
             case 0x80: 
 	      //printf("************* HALT instruction reached !!!!\n");
+	      tick(9);
                return(resHALT);
             case 0x90: // LD A, YH / XH
                if(cprefix==0x90) {
@@ -1783,6 +1800,7 @@ cl_stm8::exec_inst(void)
                break;
             case 0x80: 
 	      //printf("************* WFI/WFE instruction not implemented !!!!\n");
+	      tick(9);
                return(resINV_INST);
             case 0x90:
                if(cprefix==0x90) {
@@ -1797,8 +1815,10 @@ cl_stm8::exec_inst(void)
                opaddr = fetch2();
                if (cprefix == 0x92) {
                   regs.A = get1(get3(opaddr)+regs.X);
+		  tick(4);
                } else if(cprefix==0x91) {
                   regs.A = get1(get3(opaddr)+regs.Y);
+		  tick(4);
                } else if(cprefix==0x90) {
                   regs.A = get1((opaddr << 8) + fetch() + regs.Y);
                } else if(cprefix==0x00) {

@@ -533,6 +533,7 @@ _parseOptions (int *pargc, char **argv, int *i)
               dbuf_c_str (&buffer);
               /* ugly, see comment in src/port.h (borutr) */
               gbz80_port.mem.data_name = dbuf_detach (&buffer);
+              options.data_seg = (char *) gbz80_port.mem.data_name;
               return TRUE;
             }
         }

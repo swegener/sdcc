@@ -1,5 +1,10 @@
 2020-07-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
+	* src/z80/main.c:
+	  Fix initialization of data-seg when using -ba for bug #3088.
+
+2020-07-24 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
 	* sdas/linksrc/lkout.c:
 	  Fix address translation bug found by toxa.
 

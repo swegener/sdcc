@@ -334,10 +334,7 @@ do_pragma (int id, const char *name, const char *cp)
           }
 
         dbuf_c_str (&buffer);
-        /* ugly, see comment in src/port.h (borutr) */
-        gbz80_port.mem.code_name = dbuf_detach (&buffer);
-        code->sname = gbz80_port.mem.code_name;
-        options.code_seg = (char *) gbz80_port.mem.code_name;
+        options.code_seg = (char *) dbuf_detach (&buffer);
       }
       break;
 
@@ -517,9 +514,7 @@ _parseOptions (int *pargc, char **argv, int *i)
               dbuf_init (&buffer, 16);
               dbuf_printf (&buffer, "CODE_%u", bank);
               dbuf_c_str (&buffer);
-              /* ugly, see comment in src/port.h (borutr) */
-              gbz80_port.mem.code_name = dbuf_detach (&buffer);
-              options.code_seg = (char *) gbz80_port.mem.code_name;
+              options.code_seg = (char *) dbuf_detach (&buffer);
               return TRUE;
             }
           else if (!strncmp (argv[*i], OPTION_BA, sizeof (OPTION_BA) - 1))
@@ -531,9 +526,7 @@ _parseOptions (int *pargc, char **argv, int *i)
               dbuf_init (&buffer, 16);
               dbuf_printf (&buffer, "DATA_%u", bank);
               dbuf_c_str (&buffer);
-              /* ugly, see comment in src/port.h (borutr) */
-              gbz80_port.mem.data_name = dbuf_detach (&buffer);
-              options.data_seg = (char *) gbz80_port.mem.data_name;
+              options.data_seg = (char *) dbuf_detach (&buffer);
               return TRUE;
             }
         }

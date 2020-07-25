@@ -212,13 +212,8 @@ typedef struct
   {
     const char *const xstack_name;
     const char *const istack_name;
-    /*
-     * The following 2 items can't be const pointers
-     * due to ugly implementation in gbz80 target;
-     * this should be fixed in src/z80/main.c (borutr)
-     */
-    const char *code_name;
-    const char *data_name;
+    const char *const code_name;
+    const char *const data_name;
     const char *const idata_name;
     const char *const pdata_name;
     const char *const xdata_name;

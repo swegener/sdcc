@@ -643,10 +643,10 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if(IS_RAB && ISINST(pl->line, "bool"))
     return(argCont(pl->line + 5, what));
-    
+
   if(IS_EZ80_Z80 && ISINST(pl->line, "lea"))
     return(argCont(strchr(pl->line + 4, ','), what));
-    
+
   if(IS_EZ80_Z80 && ISINST(pl->line, "pea"))
     return(argCont(pl->line + 4, what) || !strcmp(what, "sp"));
 
@@ -831,7 +831,7 @@ z80SurelyWrites(const lineNode *pl, const char *what)
   if (IS_Z180 || IS_EZ80_Z80 || IS_Z80N)
     if (ISINST(pl->line, "mlt"))
       return(strchr(pl->line + 4, *what) != 0);
-        
+
   if (IS_Z180 || IS_EZ80_Z80)
     {
       if (ISINST(pl->line, "otim") ||
@@ -843,7 +843,7 @@ z80SurelyWrites(const lineNode *pl, const char *what)
       if (ISINST(pl->line, "in0"))
         return(!strncmp(pl->line + 4, what, strlen(what)));
     }
-    
+
   if (IS_EZ80_Z80 && ISINST(pl->line, "lea"))
     return (strstr(pl->line + 4, what));
 
@@ -1405,7 +1405,7 @@ int z80instructionSize(lineNode *pl)
   // load from/to 0xffXX addresses
   if(IS_GB && (ISINST(pl->line, "ldh")))
     {
-      if(STRNCASECMP(pl->line, "(c)", 3))
+      if(!STRNCASECMP(pl->line, "(c)", 3))
         return(1);
       return(2);
     }
@@ -1552,7 +1552,7 @@ int z80instructionSize(lineNode *pl)
 
   if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "tst"))
     return((op1start[0] == '#' || op2start && op1start[0] == '#') ? 3 : 2);
-  
+
   if(IS_RAB && ISINST(pl->line, "mul"))
     return(1);
 
@@ -1564,7 +1564,7 @@ int z80instructionSize(lineNode *pl)
      ISINST(pl->line, "lsdr")  || ISINST(pl->line, "lsir")  ||
      ISINST(pl->line, "lsddr") || ISINST(pl->line, "lsidr")))
     return(2);
-  
+
   if(IS_R3KA && (ISINST(pl->line, "uma") || ISINST(pl->line, "ums")))
     return(2);
 
@@ -1573,7 +1573,7 @@ int z80instructionSize(lineNode *pl)
 
   if(IS_EZ80_Z80 && (ISINST(pl->line, "lea") || ISINST(pl->line, "pea")))
     return(3);
-    
+
   if(IS_GB || IS_Z80N && ISINST(pl->line, "swap"))
     return(2);
 

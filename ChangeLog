@@ -1,3 +1,14 @@
+2020-07-25 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peep.c:
+	  Fix ldh size estimation for gbz80.
+
+2020-07-25 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/main.c,
+	  src/port.h:
+	  Change implementation of -ba and -bo.
+
 2020-07-24 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdatomic.h: enable mcs51, atomic_flag must reside in data/idata

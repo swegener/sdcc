@@ -1900,7 +1900,7 @@ requiresHL (const asmop * aop)
 /* strtoul_z80: a wrapper to strtoul, which can also handle */
 /* hex numbers with a $ prefix.                             */
 /*----------------------------------------------------------*/
-static unsigned long int 
+static unsigned long int
 strtoul_z80asm (const char *nptr, char **endptr, int base)
 {
   char *p = NULL;
@@ -2366,7 +2366,7 @@ static void pointPairToAop (PAIR_ID pairId, const asmop *aop, int offset)
 
     case AOP_PAIRPTR:
       wassert (!offset);
-      
+
       shiftIntoPair (pairId, (asmop *) aop); // Legacy. Todo eliminate uses of shiftIntoPair() ?
 
       break;
@@ -2606,14 +2606,14 @@ aopGet (asmop *aop, int offset, bool bit16)
           if (IS_TLCS90) // Try to use (sp) addressing mode.
             {
               int sp_offset = aop->aopu.aop_stk + offset + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0) + _G.stack.pushed + _G.stack.offset;
-              
+
               if (!sp_offset)
                 {
                   dbuf_tprintf (&dbuf, "(sp)");
                   break;
                 }
             }
-            
+
           if (IS_GB || aop->type == AOP_EXSTK)
             {
               pointPairToAop (PAIR_HL, aop, offset);
@@ -4049,7 +4049,7 @@ genCpl (const iCode *ic)
             {
               regalloc_dry_run_cost += 150;
               wassert (regalloc_dry_run);
-            } 
+            }
         }
     }
 
@@ -4079,7 +4079,7 @@ genCpl (const iCode *ic)
             {
               regalloc_dry_run_cost += 150;
               wassert (regalloc_dry_run);
-            } 
+            }
         }
     }
 
@@ -4386,7 +4386,7 @@ genIpush (const iCode *ic)
       wassertl (0, "Encountered an unsupported spill push.");
       return;
     }
-      
+
   /* Scan ahead until we find the function that we are pushing parameters to.
      Count the number of addSets on the way to figure out what registers
      are used in the send set.
@@ -4448,7 +4448,7 @@ genIpush (const iCode *ic)
         }
       else
         wassert (0);
-      
+
       if (!regalloc_dry_run)
         _G.stack.pushed += 2;
       goto release;
@@ -4483,12 +4483,12 @@ genIpush (const iCode *ic)
             if (aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free)
               pair = PAIR_BC;
             else if (aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX) && e_free)
-              pair = PAIR_BC;     
+              pair = PAIR_BC;
             else if (aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX) && l_free)
-              pair = PAIR_BC;      
+              pair = PAIR_BC;
             fetchPairLong (pair, IC_LEFT (ic)->aop, ic, size - 2);
             emit2 ("push %s", _pairs[pair].name);
-            regalloc_dry_run_cost ++; 
+            regalloc_dry_run_cost ++;
             d = 2;
          }
 #if 0 // Bug #3032
@@ -4864,7 +4864,7 @@ genCall (const iCode *ic)
         {
           werror (W_INDIR_BANKED);
         }
-      else if (IFFUNC_ISZ88DK_SHORTCALL (ftype)) 
+      else if (IFFUNC_ISZ88DK_SHORTCALL (ftype))
        {
           wassertl(0, "__z88dk_short_call via function pointer not implemented");
        }
@@ -4962,12 +4962,12 @@ genCall (const iCode *ic)
               emit2 (jump ? "jp 0x%04X" : "call 0x%04X", ulFromVal (OP_VALUE (IC_LEFT (ic))));
               regalloc_dry_run_cost += 3;
             }
-          else if (IFFUNC_ISZ88DK_SHORTCALL(ftype)) 
+          else if (IFFUNC_ISZ88DK_SHORTCALL(ftype))
             {
               int rst = ftype->funcAttrs.z88dk_shortcall_rst;
               int value = ftype->funcAttrs.z88dk_shortcall_val;
               emit2 ("rst 0x%02x", rst);
-              if ( value < 256 ) 
+              if ( value < 256 )
                 emit2 ("defb 0x%02x\n",value);
               else
                 emit2 ("defw 0x%04x\n",value);
@@ -5087,8 +5087,7 @@ genFunction (const iCode * ic)
               break;
             }
         }
-      //TODO: use templates
-      emit2("b%s !equ %i", sym->rname, bank_number);
+      emit2("!bequ", sym->rname, bank_number);
     }
 
   if (IS_STATIC (sym->etype))
@@ -5263,7 +5262,7 @@ genEndFunction (iCode * ic)
   symbol *sym = OP_SYMBOL (IC_LEFT (ic));
   int retsize = getSize (sym->type->next);
   /* __critical __interrupt without an interrupt number is the non-maskable interrupt */
-  bool is_nmi = (IS_Z80 || IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC; 
+  bool is_nmi = (IS_Z80 || IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && IFFUNC_ISCRITICAL (sym->type) && FUNC_INTNO (sym->type) == INTNO_UNSPEC;
 
   wassert (!regalloc_dry_run);
   wassertl (!_G.stack.pushed, "Unbalanced stack.");
@@ -5971,7 +5970,7 @@ genPlus (iCode * ic)
       fetchPair (extrapair, IC_RIGHT (ic)->aop);
       emit2 ("add hl, %s", _pairs[extrapair].name);
       regalloc_dry_run_cost += 1;
-      goto release;     
+      goto release;
     }
 
   // Handle AOP_EXSTK conflict with hl here, since setupToPreserveCarry() would cause problems otherwise.
@@ -6087,7 +6086,7 @@ genPlus (iCode * ic)
                 {
                   if (!isPairDead (PAIR_DE, ic))
                     _push (PAIR_DE);
-                    
+
                   if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP_SIZE (IC_RIGHT (ic)) == 2 && AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP_SIZE (IC_LEFT (ic)) == 2)
                     {
                       const short dst[4] = { E_IDX, L_IDX, D_IDX, H_IDX };
@@ -6125,7 +6124,7 @@ genPlus (iCode * ic)
                     }
                   emit2 ("add hl, de");
                   regalloc_dry_run_cost += 1;
-                  
+
                   if (!isPairDead (PAIR_DE, ic))
                     _pop (PAIR_DE);
                 }
@@ -6301,7 +6300,7 @@ genPlus (iCode * ic)
           regalloc_dry_run_cost += 1;
           i += 2;
         }
-       else if (!options.oldralloc && (!premoved || i) && !started && i == size - 2 && aopInReg (AOP (IC_RESULT (ic)), i, HL_IDX) && 
+       else if (!options.oldralloc && (!premoved || i) && !started && i == size - 2 && aopInReg (AOP (IC_RESULT (ic)), i, HL_IDX) &&
           aopInReg (leftop, i, E_IDX) && !bitVectBitValue (ic->rSurv, D_IDX))
         {
           if (aopInReg (leftop, i + 1, H_IDX) || aopInReg (leftop, i + 1, L_IDX))
@@ -6677,9 +6676,9 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
           _G.preserveCarry = !!size;
           continue;
         }
-      
+
       if (right->type != AOP_LIT)
-        {    
+        {
           if (!offset)
             {
               if (left->type == AOP_LIT && byteOfVal (left->aopu.aop_lit, offset) == 0x00 && aopInReg (right, offset, A_IDX))
@@ -6882,7 +6881,7 @@ genMultOneChar (const iCode * ic)
          cheapMove (ASMOP_E, 0, AOP (IC_LEFT (ic)), 0, true);
       else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == C_IDX)
          cheapMove (ASMOP_E, 0, AOP (IC_RIGHT (ic)), 0, true);
-      else 
+      else
         {
           cheapMove (ASMOP_C, 0, AOP (IC_LEFT (ic)), 0, true);
           cheapMove (ASMOP_E, 0, AOP (IC_RIGHT (ic)), 0, true);
@@ -7098,7 +7097,7 @@ genMult (iCode * ic)
 
       if (IS_Z80N && pair != PAIR_DE)
         goto no_mlt;
-        
+
       if (!isPairDead (pair, ic))
         _push (pair);
 
@@ -8823,7 +8822,7 @@ genOr (const iCode * ic, iCode * ifx)
 
           bytelit = (lit >> (offset * 8)) & 0x0FFull;
 
-          cheapMove (ASMOP_A, 0, left->aop, offset, true);  
+          cheapMove (ASMOP_A, 0, left->aop, offset, true);
 
           if (bytelit != 0)
             emit3_o (A_OR, ASMOP_A, 0, AOP (right), offset);
@@ -9777,7 +9776,7 @@ genLeftShift (const iCode *ic)
             emit2 ("rl de");
             regalloc_dry_run_cost++;
           }
-          
+
           started = true;
           size -= 2, offset += 2;
         }
@@ -9854,7 +9853,7 @@ genrshOne (operand *result, operand *left, int shCount, int is_signed, const iCo
   wassert (size == 1);
 
   bool a_dead = !bitVectBitValue (ic->rSurv, A_IDX);
-  
+
   if ((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && !is_signed && shCount >= 3 && shCount <= 6 + a_dead && // Try to use mlt.
     (!IS_Z80N && aopInReg (result->aop, 0, B_IDX) && isPairDead(PAIR_BC, ic) || aopInReg (result->aop, 0, D_IDX) && isPairDead(PAIR_DE, ic) || !IS_Z80N && aopInReg (result->aop, 0, H_IDX) && isPairDead(PAIR_HL, ic)))
     {
@@ -10134,7 +10133,7 @@ genRightShift (const iCode * ic)
     spillPair (PAIR_HL);
 
   while (size)
-    { 
+    {
       if (IS_RAB && !(is_signed && first) && size >= 2 && byteoffset < 2 && AOP_TYPE (result) == AOP_REG &&
         (getPartPairId (AOP (result), offset - 1) == PAIR_HL || getPartPairId (AOP (result), offset - 1) == PAIR_DE))
         {
@@ -10530,7 +10529,7 @@ genPointerGet (const iCode *ic)
 
       fp_offset = AOP (result)->aopu.aop_stk + (AOP (result)->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
       sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
-          
+
       if (IS_EZ80_Z80 && !_G.omitFramePtr && fp_offset >= -128 && fp_offset < 128)
         {
           if (AOP_TYPE (left) == AOP_IMMD)
@@ -10557,7 +10556,7 @@ genPointerGet (const iCode *ic)
           emit2 ("ex de, hl");
           regalloc_dry_run_cost += 5;
         }
-      
+
       if (rightval && left->aop->type != AOP_IMMD)
 
           if (abs(rightval) < 4)
@@ -11388,7 +11387,7 @@ genPointerSet (iCode *ic)
               regalloc_dry_run_cost++;
               zero_a = true;
             }
- 
+
           if (aopIsLitVal (right->aop, offset, 1, 0x00) && zero_a)
             {
               emit2 ("ld !*pair, a", _pairs[pairId].name);
@@ -11468,7 +11467,7 @@ genIfx (iCode *ic, iCode *popIc)
       emit3 (A_DEC, cond->aop, 0);
       emit2 ("jp %s, !tlabel", IC_TRUE (ic) ? "NZ" : "Z", labelKey2num ((IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key));
       regalloc_dry_run_cost += 3;
-      
+
       goto release;
     }
   /* get the value into acc */
@@ -11493,15 +11492,15 @@ genIfx (iCode *ic, iCode *popIc)
 
   if (!regalloc_dry_run)
     ic->generated = 1;
-    
+
   return;
-  
+
 release:
 
   freeAsmop (cond, NULL);
   if (!regalloc_dry_run)
     ic->generated = 1;
-    
+
   return;
 }
 
@@ -11538,7 +11537,7 @@ genAddrOf (const iCode * ic)
       else
         setupPairFromSP (pair, sp_offset);
     }
-  else 
+  else
     {
       pair = getPairId (IC_RESULT (ic)->aop);
       if (pair == PAIR_INVALID)
@@ -11901,7 +11900,7 @@ genJumpTab (const iCode *ic)
 
   if (!regalloc_dry_run)
     {
-      emit2 ("jp !*hl");
+      emit2 ("!jphl");
       emitLabelSpill (jtab);
     }
   regalloc_dry_run_cost += 1;
@@ -11939,7 +11938,7 @@ genCast (const iCode *ic)
     }
 
   /* casting to bool */
-  if (IS_BOOL (operandType (result)) && IS_RAB && right->aop->size == 2 && 
+  if (IS_BOOL (operandType (result)) && IS_RAB && right->aop->size == 2 &&
     (aopInReg (right->aop, 0, HL_IDX) && isPairDead (PAIR_HL, ic)|| aopInReg (right->aop, 0, IY_IDX) && isPairDead (PAIR_IY, ic)))
     {
       bool iy = aopInReg (right->aop, 0, IY_IDX);
@@ -12007,7 +12006,7 @@ genReceive (const iCode *ic)
 {
   operand *result = IC_RESULT (ic);
   aopOp (result, ic, FALSE, FALSE);
-  
+
   genMove (result->aop, ASMOP_RETURN, true, isPairDead (PAIR_HL, ic));
 
   freeAsmop (IC_RESULT (ic), NULL);
@@ -12513,7 +12512,7 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
 
   wassertl (!IS_GB, "Built-in memcpy() not available on gbz80.");
   wassertl (nparams == 3, "Built-in memcpy() must have three parameters.");
-  
+
   count = pparams[2];
   from = pparams[1];
   to = pparams[0];
@@ -12799,7 +12798,7 @@ done:
   freeAsmop (c, NULL);
   freeAsmop (dst, NULL);
 
-  
+
   if (saved_BC)
     _pop (PAIR_BC);
   if (saved_DE)
@@ -12817,7 +12816,7 @@ genBuiltInStrcpy (const iCode *ic, int nParams, operand **pparams)
   bool saved_BC = FALSE, saved_DE = FALSE, saved_HL = FALSE;
   int i;
   bool SomethingReturned;
-  
+
   SomethingReturned = (IS_ITEMP (IC_RESULT (ic)) &&
                       (OP_SYMBOL (IC_RESULT (ic))->nRegs ||
                       OP_SYMBOL (IC_RESULT (ic))->spildir ||

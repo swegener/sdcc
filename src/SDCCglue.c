@@ -150,12 +150,18 @@ emitRegularMap (memmap *map, bool addPublics, bool arFlag)
     {
       /* PENDING: special case here - should remove */
       if (!strcmp (map->sname, CODE_NAME))
-        dbuf_tprintf (&map->oBuf, "\t!areacode\n", map->sname);
+        {
+          if (options.code_seg && strcmp (CODE_NAME, options.code_seg))
+            dbuf_tprintf (&map->oBuf, "\t!areacode\n", options.code_seg);
+          else
+            dbuf_tprintf (&map->oBuf, "\t!areacode\n", map->sname);
+        }
       else if (!strcmp (map->sname, DATA_NAME))
         {
-          dbuf_tprintf (&map->oBuf, "\t!areadata\n", map->sname);
           if (options.data_seg && strcmp (DATA_NAME, options.data_seg))
-            dbuf_tprintf (&map->oBuf, "\t!area\n", options.data_seg);
+            dbuf_tprintf (&map->oBuf, "\t!areadata\n", options.data_seg);
+          else
+            dbuf_tprintf (&map->oBuf, "\t!areadata\n", map->sname);
         }
       else if (!strcmp (map->sname, HOME_NAME))
         dbuf_tprintf (&map->oBuf, "\t!areahome\n", map->sname);
@@ -518,7 +524,7 @@ initValPointer (ast *expr)
       while (t->left != NULL && t->opval.op != '[')
         t = t->left;
 
-      return valForStructElem (t, expr->right); 
+      return valForStructElem (t, expr->right);
     }
 
   /* case 7. function name */
@@ -860,7 +866,7 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
     {
       if (!!(val = initPointer (ilist, type, 0)))
         {
-          int i, size = getSize (type), le = port->little_endian, top = (options.model == MODEL_FLAT24) ? 3 : 2;;         
+          int i, size = getSize (type), le = port->little_endian, top = (options.model == MODEL_FLAT24) ? 3 : 2;;
           dbuf_printf (oBuf, "\t.byte ");
           for (i = (le ? 0 : size - 1); le ? (i < size) : (i > -1); i += (le ? 1 : -1))
             {
@@ -873,7 +879,7 @@ printIvalType (symbol * sym, sym_link * type, initList * ilist, struct dbuf_s *o
 			    if (val->name && strlen (val->name) > 0)
                   dbuf_printf (oBuf, "(%s >> %d)", val->name, i * 8);
 				else
-                  dbuf_printf (oBuf, "#0x00");				
+                  dbuf_printf (oBuf, "#0x00");
               else
                 dbuf_printf (oBuf, "#0x00");
               if (i == (le ? (size - 1) : 0))
@@ -2623,7 +2629,7 @@ glue (void)
   if (mainf && IFFUNC_HASBODY (mainf->type))
     {
       /* STM8 note: there is no need to call main().
-         Instead of that, it's address is specified in the 
+         Instead of that, it's address is specified in the
          interrupts table and always equals to 0x8080.
        */
 

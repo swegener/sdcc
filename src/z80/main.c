@@ -304,7 +304,7 @@ do_pragma (int id, const char *name, const char *cp)
                 break;
 
               case ASM_TYPE_RGBDS:
-                dbuf_printf (&buffer, "CODE,BANK[%d]", token.val.int_val);
+                dbuf_printf (&buffer, "ROMX,BANK[%d]", token.val.int_val);
                 break;
 
               case ASM_TYPE_ISAS:
@@ -512,7 +512,14 @@ _parseOptions (int *pargc, char **argv, int *i)
               struct dbuf_s buffer;
 
               dbuf_init (&buffer, 16);
-              dbuf_printf (&buffer, "CODE_%u", bank);
+              if (_G.asmType == ASM_TYPE_RGBDS)
+                {
+                  dbuf_printf (&buffer, "ROMX,BANK[%u]", bank);
+                }
+              else
+                {
+                  dbuf_printf (&buffer, "CODE_%u", bank);
+                }
               dbuf_c_str (&buffer);
               options.code_seg = (char *) dbuf_detach (&buffer);
               return TRUE;
@@ -524,7 +531,14 @@ _parseOptions (int *pargc, char **argv, int *i)
               struct dbuf_s buffer;
 
               dbuf_init (&buffer, 16);
-              dbuf_printf (&buffer, "DATA_%u", bank);
+              if (_G.asmType == ASM_TYPE_RGBDS)
+                {
+                  dbuf_printf (&buffer, "SRAM,BANK[%u]", bank);
+                }
+              else
+                {
+                  dbuf_printf (&buffer, "DATA_%u", bank);
+                }
               dbuf_c_str (&buffer);
               options.data_seg = (char *) dbuf_detach (&buffer);
               return TRUE;
@@ -538,9 +552,26 @@ _parseOptions (int *pargc, char **argv, int *i)
           if (!strcmp (asmblr, "rgbds"))
             {
               asm_addTree (&_rgbds_gb);
+              // rgbds doesn't understand that
+              options.noOptsdccInAsm = true;
+
               gbz80_port.assembler.cmd = _gbz80_rgbasmCmd;
               gbz80_port.linker.cmd = _gbz80_rgblinkCmd;
               gbz80_port.linker.do_link = _gbz80_rgblink;
+
+              if(!(options.code_seg && strcmp(options.code_seg, CODE_NAME)))
+                {
+                  if (options.code_seg)
+                    Safe_free (options.code_seg);
+                  options.code_seg = Safe_strdup ("ROMX");
+                }
+              if(!(options.data_seg && strcmp(options.data_seg, DATA_NAME)))
+                {
+                  if (options.data_seg)
+                    Safe_free (options.data_seg);
+                  options.data_seg = Safe_strdup ("WRAMX");
+                }
+
               _G.asmType = ASM_TYPE_RGBDS;
               return TRUE;
             }

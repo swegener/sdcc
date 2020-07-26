@@ -449,6 +449,7 @@ static const ASM_MAPPING _asxxxx_mapping[] = {
   {"hihil", "(%05d$ >> 16)"},
   {"hihihil", "(%05d$ >> 24)"},
   {"equ", "="},
+  {"bequ", "b%s = %i"},
   {"org", ".org 0x%04X"},
   {NULL, NULL}
 };

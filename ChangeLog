@@ -1,3 +1,12 @@
+2020-07-26 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/SDCCasm.c,
+	  src/SDCCglue.c,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/mappings.i:
+	  Fix rgdbs asm generation for gbz80.
+
 2020-07-25 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peep.c:

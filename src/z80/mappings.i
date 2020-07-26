@@ -7,6 +7,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "functionlabeldef", "%s:" },
     { "globalfunctionlabeldef", "%s::" },
     { "*hl", "(hl)" },
+    { "jphl", "jp (hl)" },
     { "di", "di" },
     { "ei", "ei" },
     { "ldahli", "ld\ta, (hl+)"},
@@ -51,6 +52,7 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
     { "*ixx", "%d (ix)" },
     { "*iyx", "%d (iy)" },
     { "*hl", "(hl)" },
+    { "jphl", "jp (hl)" },
     { "di", "di" },
     { "ei", "ei" },
     { "ldahli",
@@ -105,6 +107,7 @@ static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
     { "*ixx", "%d (ix)" },
     { "*iyx", "%d (iy)" },
     { "*hl", "(hl)" },
+    { "jphl", "jp (hl)" },
     { "di", "ipset3" },
     { "ei", "ipres" },
     { "ldahli",
@@ -151,31 +154,14 @@ static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
 };
 
 static const ASM_MAPPING _rgbds_mapping[] = {
-    { "global", "GLOBAL %s" },
-    { "extern", "GLOBAL %s" },
+    { "global", "EXPORT %s" },
+    { "extern", "" },
     { "slabeldef", "%s:" },
     { "labeldef", "%s:" },
     { "tlabeldef", ".l%05d:" },
     { "tlabel", ".l%05d" },
     { "fileprelude",
       "; Generated using the rgbds tokens.\n"
-      "\t; We have to define these here as sdcc doesn't make them global by default\n"
-      "\tGLOBAL __mulschar\n"
-      "\tGLOBAL __muluchar\n"
-      "\tGLOBAL __mulint\n"
-      "\tGLOBAL __divschar\n"
-      "\tGLOBAL __divuchar\n"
-      "\tGLOBAL __divsint\n"
-      "\tGLOBAL __divuint\n"
-      "\tGLOBAL __modschar\n"
-      "\tGLOBAL __moduchar\n"
-      "\tGLOBAL __modsint\n"
-      "\tGLOBAL __moduint\n"
-      "\tGLOBAL __mullong\n"
-      "\tGLOBAL __modslong\n"
-      "\tGLOBAL __divslong\n"
-      "\tGLOBAL banked_call\n"
-      "\tGLOBAL banked_ret\n"
     },
     { "functionheader",
       "; ---------------------------------\n"
@@ -186,10 +172,10 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "globalfunctionlabeldef", "%s::" },
     { "zero", "$00" },
     { "one", "$01" },
-    { "area", "SECTION \"%s\",CODE" },
-    { "areadata", "SECTION \"%F_%s\",BSS" },
-    { "areacode", "SECTION \"%F_CODE\",%s" },
-    { "areahome", "SECTION \"%F_HOME\",HOME" },
+    { "area", "SECTION FRAGMENT \"_%s\",ROM0" },
+    { "areadata", "SECTION FRAGMENT \"%F_DATA\",%s" },
+    { "areacode", "SECTION FRAGMENT \"%F_CODE\",%s" },
+    { "areahome", "SECTION FRAGMENT \"%F_HOME\",ROM0" },
     { "ascii", "DB \"%s\"" },
     { "ds", "DS %d" },
     { "db", "DB" },
@@ -207,6 +193,8 @@ static const ASM_MAPPING _rgbds_mapping[] = {
     { "bankimmeds", "BANK(%s)" },
     { "hashedbankimmeds", "BANK(%s)" },
     { "module", "; MODULE %s" },
+    { "equ", "EQU" },
+    { "bequ", "\rb%s EQU %i" },
     { NULL, NULL }
 };
 
@@ -228,9 +216,12 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
     { "adjustsp", "add sp, -%d" },
     { "enter", "" },
     { "enters", "" },
+    { "enterx",
+      "add sp, -%d" },
     { "ldahli", "ld a, [hl+]" },
     { "*hl", "[hl]" },
-    { "ldahlsp", "ld hl, [sp+%d]" },
+    { "jphl", "jp hl" },
+    { "ldahlsp", "ld hl, sp+%d" },
     { "ldaspsp", "add sp, %d" },
     { "*pair", "[%s]" },
     { NULL, NULL }
@@ -318,6 +309,7 @@ static const ASM_MAPPING _isas_gb_mapping[] = {
     { "enters", "" },
     { "ldahli", "ld a, (hli)" },
     { "*hl", "(hl)" },
+    { "jphl", "jp (hl)" },
     { "ldahlsp", "ldhl sp, %d" },
     { "ldaspsp", "add sp, %d" },
     { "*pair", "(%s)" },
@@ -386,6 +378,7 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
     { "*ixx", "(ix%+d)" },
     { "*iyx", "(iy%+d)" },
     { "*hl", "(hl)" },
+    { "jphl", "jp (hl)" },
     { "di", "di" },
     { "ei", "ei" },
     { "ldahli",

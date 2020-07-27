@@ -1758,7 +1758,7 @@ linkEdit (char **envp)
           WRITE_SEG_LOC (BIT_NAME, 0);
 
           /* stack start */
-          if ((options.stack_loc) && (options.stack_loc < 0x100) && !TARGET_HC08_LIKE)
+          if ((options.stack_loc) && (options.stack_loc < 0x100) && TARGET_MCS51_LIKE)
             {
               WRITE_SEG_LOC ("SSEG", options.stack_loc);
               /* with the disappearance of --no-pack-iram I don't think this is ever valid anymore */

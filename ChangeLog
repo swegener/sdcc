@@ -2,6 +2,8 @@
 
 	* Makefile.in:
 	  Fix bug #3078, fix by Free-PDK.
+	* src/SDCCmain.c:
+	  Disable --stack-loc deprecation warning for pdk and stm8.
 
 2020-07-27 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

@@ -1,3 +1,8 @@
+2020-07-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Makefile.in:
+	  Fix bug #3078, fix by Free-PDK.
+
 2020-07-27 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* sdas/linksrc/lkmain.c:

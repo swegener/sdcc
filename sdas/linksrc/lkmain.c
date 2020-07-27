@@ -423,7 +423,7 @@ main(int argc, char *argv[])
                                 if (it->a_addr + it->a_size > ram) {
                                         ram = it->a_addr + it->a_size;
                                 }
-                        } else if (!strcmp(it->a_id, "CODE") || 
+                        } else if (!strcmp(it->a_id, "CODE") ||
                                    !strcmp(it->a_id, "CONST")) {
                                 if (it->a_addr + it->a_size > rom) {
                                         rom = it->a_addr + it->a_size;
@@ -1840,6 +1840,10 @@ char *usetxt_z80_gb[] = {
         "Output:",
         "  -i   Intel Hex as (out)file[.ihx]",
         "  -s   Motorola S Record as (out)file[.s19]",
+#if NOICE
+        // can be converted into no$gmb compatible .sym
+        "  -j   NoICE Debug output as (out)file[.noi]",
+#endif
 #if SDCDB
         "  -y   SDCDB Debug output as (out)file[.cdb]",
 #endif

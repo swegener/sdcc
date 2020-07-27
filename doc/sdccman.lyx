@@ -1623,7 +1623,7 @@ status collapsed
 
 -std-c11
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -1663,7 +1663,7 @@ status collapsed
 
 -std-c2x
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -1846,7 +1846,7 @@ status collapsed
 
 -std-c11
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -1886,7 +1886,7 @@ status collapsed
 
 -std-c2x
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 -
@@ -1964,27 +1964,42 @@ status collapsed
 \end_layout
 
 \begin_layout Itemize
-bit
+__bit
 \begin_inset Index idx
 status collapsed
 
 \begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
 bit
 \end_layout
 
 \end_inset
 
- and sbit
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-sbit
-\end_layout
-
-\end_inset
-
-
+ and __sbit
 \begin_inset Index idx
 status collapsed
 
@@ -2066,7 +2081,7 @@ Bit toggling
 \begin_inset space ~
 \end_inset
 
-bit b;
+__bit b;
 \begin_inset Newline newline
 \end_inset
 
@@ -15691,20 +15706,7 @@ status collapsed
 \begin_inset space ~
 \end_inset
 
-<Value> By default the stack
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-stack
-\end_layout
-
-\end_inset
-
- is placed after the data segment for mcs51.
- By using this option the stack can be placed anywhere in the internal memory
- space of the mcs51.
- The value entered can be in Hexadecimal or Decimal format, e.g.
+<Value> The value entered can be in Hexadecimal or Decimal format, e.g.
  -
 \begin_inset ERT
 status collapsed
@@ -15732,101 +15734,6 @@ status collapsed
 \end_inset
 
 -stack-loc 32.
- Since the sp register is incremented before a push or call, the initial
- sp will be set to one byte prior the provided value.
- The provided value should not overlap any other memory areas such as used
- register banks or the data segment and with enough space for the current
- application.
- The 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--pack-iram
-\series default
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--pack-iram
-\end_layout
-
-\end_inset
-
- option (which is now a default setting) will override this setting, so
- you should also specify the 
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-pack-iram
-\series default
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-pack-iram
-\end_layout
-
-\end_inset
-
- option if you need to manually place the stack.
 \end_layout
 
 \begin_deeper
@@ -15897,7 +15804,7 @@ xstack
 
  is placed after the __pdata
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 \begin_inset ERT
@@ -15960,7 +15867,7 @@ status collapsed
 
 \end_inset
 
--stack-loc 32768.
+-xstack-loc 32768.
  The provided value should not overlap any other memory areas such as the
  pdata or xdata segment and with enough space for the current application.
 \end_layout
@@ -17031,121 +16938,6 @@ status collapsed
 \end_inset
 
  Causes the linker to check if there is at minimum <Value> bytes for stack.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--pack-iram
-\series default
-
-\begin_inset space ~
-\end_inset
-
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--pack-iram
-\end_layout
-
-\end_inset
-
- Causes the linker to use unused register banks for data variables and pack
- data, idata and stack together.
- This is the default and this option will probably be removed along with
- the removal of -
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-pack-iram.
-\end_layout
-
-\begin_layout Labeling
-\labelwidthstring 00.00.0000
-
-\series bold
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-pack-iram
-\series default
-
-\begin_inset space ~
-\end_inset
-
-(deprecated)
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
--
-\begin_inset ERT
-status collapsed
-
-\begin_layout Plain Layout
-
-
-\backslash
-/
-\end_layout
-
-\end_inset
-
--no-pack-iram
-\end_layout
-
-\end_inset
-
- Causes the linker to use old style for allocating memory areas.
- This option is now deprecated and will be removed in future versions.
 \end_layout
 
 \begin_layout Labeling
@@ -37421,7 +37213,7 @@ Defines created by the compiler
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="20" columns="2">
+<lyxtabular version="3" rows="22" columns="2">
 <features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="3in">
 <column alignment="left" valignment="top" width="3in">
@@ -38243,7 +38035,7 @@ Always defined.
 \begin_layout Plain Layout
 __SDCC_REVISION
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 SDCC!Defines!SDCC
@@ -38527,7 +38319,7 @@ status collapsed
 </cell>
 </row>
 <row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -38585,7 +38377,7 @@ REENT
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
@@ -38605,6 +38397,152 @@ status collapsed
 \end_inset
 
 -int-long-reent
+\emph default
+ is used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+__SDCC_OPTIMIZE_SPEED
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+SDCC!Defines!SDCC
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+OPTIMIZE
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+SPEED
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+when 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-opt-code-speed
+\emph default
+ is used
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+__SDCC_OPTIMIZE_SIZE
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+SDCC!Defines!SDCC
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+OPTIMIZE
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+_
+\end_layout
+
+\end_inset
+
+SIZE
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+when 
+\emph on
+-
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+/
+\end_layout
+
+\end_inset
+
+-opt-code-size
 \emph default
  is used
 \end_layout

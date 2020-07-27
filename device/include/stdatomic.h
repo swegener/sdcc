@@ -13,6 +13,13 @@ void atomic_flag_clear(volatile atomic_flag *object);
 #elif defined(__SDCC_mcs51)
 
 #define ATOMIC_FLAG_INIT {0}
+_Bool atomic_flag_test_and_set(volatile atomic_flag __idata *object) __nonbanked;
+
+void atomic_flag_clear(volatile atomic_flag __idata *object) __nonbanked;
+
+#elif defined(__SDCC_ds390)
+
+#define ATOMIC_FLAG_INIT {0}
 _Bool atomic_flag_test_and_set(volatile atomic_flag __idata *object);
 
 void atomic_flag_clear(volatile atomic_flag __idata *object);

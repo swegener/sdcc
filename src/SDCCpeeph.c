@@ -715,7 +715,7 @@ FBYNAME (newLabel)
       if (sscanf (name, "%u$", &n) != 1)
         continue;
       if (maxLabel < n)
-	maxLabel = n;
+        maxLabel = n;
     }
   ++maxLabel;
   entry = traceAlloc (&_G.labels, Safe_alloc (sizeof (*entry)));
@@ -1259,22 +1259,22 @@ FBYNAME (canJoinRegs)
     {
       result = port->peep.canJoinRegs (regs, dst);
       if (result || !unordered)
-	break;
+        break;
 
       //do next registers permutation
       int i;
       //find last regs[i] < regs[i+1]
       for (i = size-2; i >= 0; --i)
-	  if (strcmp (regs[i+1], regs[i]) > 0)
-	    break;
+        if (strcmp (regs[i+1], regs[i]) > 0)
+          break;
       if (i < 0)
-	break; /* was last permutation */
+        break; /* was last permutation */
 
       int j;
       //find last regs[j] > regs[i], where j > i
       for (j = size-1; j > i; --j)
-	if (strcmp (regs[j], regs[i]) > 0)
-	  break;
+        if (strcmp (regs[j], regs[i]) > 0)
+          break;
 
       //swap regs[j] and regs[i]
       const char *t = regs[i];
@@ -1282,12 +1282,12 @@ FBYNAME (canJoinRegs)
       regs[j] = t;
       //reverse order from j+1 to end
       for (j = j+1, i = size - 1; j < i; ++j, --i)
-	{
-	  t = regs[j];
-	  regs[j] = regs[i];
-	  regs[i] = t;
-	}
-  }
+        {
+          t = regs[j];
+          regs[j] = regs[i];
+          regs[i] = t;
+        }
+    }
 
   Safe_free (regs);
 
@@ -2179,8 +2179,7 @@ top:
     return;
 
   /* then look for either "restart" or '{' */
-  while (strncmp (bp, "restart", 7) &&
-         *bp != '{' && bp)
+  while (strncmp (bp, "restart", 7) && *bp != '{' && bp)
     bp++;
 
   /* not found */
@@ -2854,7 +2853,7 @@ isLabelReference (const char *line, const char **start, int *len)
   s = line;
   while (ISCHARSPACE (*s))
     ++s;
-  	
+
   if(strncmp(s, "call", 4))
     return FALSE;
   s += 4;
@@ -3220,26 +3219,26 @@ initPeepHole (void)
 /*-----------------------------------------------------------------*/
 const char * StrStr (const char * str1, const char * str2)
 {
-	const char * cp = str1;
-	const char * s1;
-	const char * s2;
+  const char * cp = str1;
+  const char * s1;
+  const char * s2;
 
-	if ( !*str2 )
-	    return str1;
+  if ( !*str2 )
+    return str1;
 
-	while (*cp)
-	{
-		s1 = cp;
-		s2 = str2;
+  while (*cp)
+    {
+      s1 = cp;
+      s2 = str2;
 
-		while ( *s1 && *s2 && !(tolower(*s1)-tolower(*s2)) )
-			s1++, s2++;
+      while ( *s1 && *s2 && !(tolower(*s1)-tolower(*s2)) )
+        s1++, s2++;
 
-		if (!*s2)
-			return( cp );
+      if (!*s2)
+        return( cp );
 
-		cp++;
-	}
+      cp++;
+    }
 
-	return (NULL) ;
+  return (NULL) ;
 }

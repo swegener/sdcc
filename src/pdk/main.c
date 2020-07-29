@@ -26,6 +26,7 @@
 #include "dbuf_string.h"
 
 #include "ralloc.h"
+#include "gen.h"
 #include "peep.h"
 
 extern DEBUGFILE dwarf2DebugFile;
@@ -325,7 +326,7 @@ PORT pdk13_port =
      1,                         /* sp points to next free stack location */
   },     
   { -1, false },                /* no int x int -> long multiplication support routine. */
-  { 0,
+  { pdk_emitDebuggerSymbol,
     {
       0,
       0,                        /* cfiSame */
@@ -491,7 +492,7 @@ PORT pdk14_port =
      1,                         /* sp points to next free stack location */
   },     
   { -1, false },                /* no int x int -> long multiplication support routine. */
-  { 0,
+  { pdk_emitDebuggerSymbol,
     {
       0,
       0,                        /* cfiSame */
@@ -657,7 +658,7 @@ PORT pdk15_port =
      1,                         /* sp points to next free stack location */
   },     
   { -1, false },                /* no int x int -> long multiplication support routine. */
-  { 0,
+  { pdk_emitDebuggerSymbol,
     {
       0,
       0,                        /* cfiSame */

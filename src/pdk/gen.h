@@ -85,6 +85,7 @@ typedef struct asmop
 asmop;
 
 void genPdkCode (iCode *);
+void pdk_emitDebuggerSymbol (const char *);
 
 extern bool pdk_assignment_optimal;
 void pdk_init_asmops (void);

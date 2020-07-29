@@ -140,6 +140,18 @@ regDead (int idx, const iCode *ic)
   return (!bitVectBitValue (ic->rSurv, idx));
 }
 
+/*---------------------------------------------------------------------*/
+/* pdk_emitDebuggerSymbol - associate the current code location        */
+/*   with a debugger symbol                                            */
+/*---------------------------------------------------------------------*/
+void
+pdk_emitDebuggerSymbol (const char *debugSym)
+{
+  G.debugLine = 1;
+  emit2 ("", "%s ==.", debugSym);
+  G.debugLine = 0;
+}
+
 /*-----------------------------------------------------------------*/
 /* aopInReg - asmop from offset in the register                    */
 /*-----------------------------------------------------------------*/
@@ -4881,9 +4893,9 @@ resultRemat (const iCode *ic)
   return (false);
 }
 
-/*---------------------------------------------------------------------*/
-/* genSTM8Code - generate code for STM8 for a single iCode instruction */
-/*---------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------*/
+/* genPdkiCode - generate code for PADAUK for a single iCode instruction */
+/*-----------------------------------------------------------------------*/
 static void
 genPdkiCode (iCode *ic)
 {
@@ -5104,6 +5116,13 @@ genPdkCode (iCode *lic)
   int cblock = 0;  
   int cln = 0;
   regalloc_dry_run = false;
+
+  /* if debug information required */
+  if (options.debug && currFunc && !regalloc_dry_run)
+    debugFile->writeFunction (currFunc, lic);
+  
+  if (options.debug && !regalloc_dry_run)
+    debugFile->writeFrameAddress (NULL, NULL, 0); /* have no idea where frame is now */
 
   for (iCode *ic = lic; ic; ic = ic->next)
     {

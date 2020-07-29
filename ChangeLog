@@ -1,3 +1,10 @@
+2020-07-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/pdk/main.c,
+	  src/pdk/gen.h,
+	  src/pdk/gen.c:
+	  Fix bug #3091, patch by Free-PDK.
+
 2020-07-27 Maarten Brock <sourceforge.brock AT dse.nl>
 
 	* device/include/stdatomic.h: enabled for ds390, force nonbanked for mcs51

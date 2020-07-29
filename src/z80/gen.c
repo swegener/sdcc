@@ -6069,7 +6069,7 @@ genPlus (iCode * ic)
           if ((AOP_SIZE (IC_LEFT (ic)) == 2 ||
                AOP_SIZE (IC_RIGHT (ic)) == 2) && (AOP_SIZE (IC_LEFT (ic)) <= 2 && AOP_SIZE (IC_RIGHT (ic)) <= 2 || size == 2))
             {
-              if (getPairId (AOP (IC_RIGHT (ic))) == PAIR_BC || getPairId (AOP (IC_RIGHT (ic))) == PAIR_DE)
+              if (getPairId (IC_RIGHT (ic)->aop) == PAIR_BC || getPairId (IC_RIGHT (ic)->aop) == PAIR_DE && getPairId (IC_LEFT (ic)->aop) != PAIR_BC)
                 {
                   /* Swap left and right */
                   operand *t = IC_RIGHT (ic);

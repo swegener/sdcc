@@ -4,6 +4,9 @@
 	  src/pdk/gen.h,
 	  src/pdk/gen.c:
 	  Fix bug #3091, patch by Free-PDK.
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3090.c:
+	  Fix bug #3090.
 
 2020-07-27 Maarten Brock <sourceforge.brock AT dse.nl>
 

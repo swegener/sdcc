@@ -4,6 +4,10 @@
 
 #include <testfwk.h>
 
+#ifndef PORT_HOST
+#pragma disable_warning 84
+#endif
+
 void Proc_2 (int *Int_Par_Ref)
 {
 	Int_Par_Ref;

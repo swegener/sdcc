@@ -907,8 +907,17 @@ replace restart {
 } by {
 	ld	%1, %2
 	jp	%3
-	; common peephole 87 removed unreachable jump to %3.
-}
+	; common peephole 87a removed unreachable jump to %4
+} if labelRefCountChange(%4 -1)
+
+replace restart {
+	jp	%1
+%2:
+	jp	%3
+} by {
+	; common peephole 88b removed unreachable jump to %3
+	jp	%1
+} if labelRefCount(%2 0), labelRefCountChange(%3 -1)
 
 replace restart {
 	ld	%1, %2

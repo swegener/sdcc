@@ -1,3 +1,9 @@
+2020-07-30 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peeph.def:
+	  Implement RFE #669: optimize out unnecessary JP instructions generated
+	  by switch statement.
+
 2020-07-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/main.c,

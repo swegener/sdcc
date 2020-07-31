@@ -77,13 +77,12 @@ static char _z80n_defaultRules[] = {
 };
 
 
-
 Z80_OPTS z80_opts;
 
 static OPTION _z80_options[] = {
   {0, OPTION_CALLEE_SAVES_BC, &z80_opts.calleeSavesBC, "Force a called function to always save BC"},
   {0, OPTION_PORTMODE,        NULL, "Determine PORT I/O mode (z80/z180)"},
-  {0, OPTION_ASM,             NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm)"},
+  {0, OPTION_ASM,             NULL, "Define assembler name (rgbds/asxxxx/isas/z80asm/gas)"},
   {0, OPTION_CODE_SEG,        &options.code_seg, "<name> use this name for the code segment", CLAT_STRING},
   {0, OPTION_CONST_SEG,       &options.const_seg, "<name> use this name for the const segment", CLAT_STRING},
   {0, OPTION_DATA_SEG,        &options.data_seg, "<name> use this name for the data segment", CLAT_STRING},
@@ -114,7 +113,8 @@ typedef enum
   ASM_TYPE_ASXXXX,
   ASM_TYPE_RGBDS,
   ASM_TYPE_ISAS,
-  ASM_TYPE_Z80ASM
+  ASM_TYPE_Z80ASM,
+  ASM_TYPE_GAS
 }
 ASM_TYPE;
 
@@ -188,14 +188,30 @@ static void
 _z80_init (void)
 {
   z80_opts.sub = SUB_Z80;
-  asm_addTree (&_asxxxx_z80);
+  switch (_G.asmType)
+    {
+    case ASM_TYPE_GAS:
+      asm_addTree (&_gas_z80);
+      break;
+    default:
+      asm_addTree (&_asxxxx_z80);
+      break;
+    }
 }
 
 static void
 _z180_init (void)
 {
   z80_opts.sub = SUB_Z180;
-  asm_addTree (&_asxxxx_z80);
+  switch (_G.asmType)
+    {
+    case ASM_TYPE_GAS:
+      asm_addTree (&_gas_z80);
+      break;
+    default:
+      asm_addTree (&_asxxxx_z80);
+      break;
+    }
 }
 
 static void
@@ -229,7 +245,15 @@ static void
 _ez80_z80_init (void)
 {
   z80_opts.sub = SUB_EZ80_Z80;
-  asm_addTree (&_asxxxx_z80);
+  switch (_G.asmType)
+    {
+    case ASM_TYPE_GAS:
+      asm_addTree (&_gas_z80);
+      break;
+    default:
+      asm_addTree (&_asxxxx_z80);
+      break;
+    }
 }
 
 static void
@@ -310,6 +334,10 @@ do_pragma (int id, const char *name, const char *cp)
               case ASM_TYPE_ISAS:
                 /* PENDING: what to use for ISAS? */
                 dbuf_printf (&buffer, "CODE,BANK(%d)", token.val.int_val);
+                break;
+
+              case ASM_TYPE_GAS:
+                dbuf_printf (&buffer, ".ovly%04x", token.val.int_val);
                 break;
 
               default:
@@ -595,6 +623,13 @@ _parseOptions (int *pargc, char **argv, int *i)
               _G.asmType = ASM_TYPE_ISAS;
               return TRUE;
             }
+          else if (!strcmp (asmblr, "gas"))
+            {
+              port->assembler.externGlobal = TRUE;
+              asm_addTree (&_gas_z80);
+              _G.asmType = ASM_TYPE_GAS;
+              return TRUE;
+            }
         }
       else if (!strncmp (argv[*i], OPTION_PORTMODE, sizeof (OPTION_PORTMODE) - 1))
         {
@@ -716,8 +751,20 @@ _finaliseOptions (void)
 {
   port->mem.default_local_map = data;
   port->mem.default_globl_map = data;
-  if (_G.asmType == ASM_TYPE_ASXXXX && IS_GB)
-    asm_addTree (&_asxxxx_gb);
+  if (IS_GB)
+    switch (_G.asmType)
+      {
+      case ASM_TYPE_ASXXXX:
+        asm_addTree (&_asxxxx_gb);
+        break;
+      case ASM_TYPE_GAS:
+        asm_addTree (&_gas_gb);
+        break;
+      case ASM_TYPE_ISAS:
+      case ASM_TYPE_RGBDS:
+      case ASM_TYPE_Z80ASM:
+        break;
+      }
 
   if (IY_RESERVED)
     port->num_regs -= 2;
@@ -892,7 +939,11 @@ static const char *_z80LinkCmd[] = {
 static const char *_gbLinkCmd[] = {
   "sdldgb", "-nf", "$1", NULL
 };
-
+/*
+static const char *_gnuLdCmd[] = {
+  "z80-elf-ld", "", "$1", NULL
+};
+*/
 /* $3 is replaced by assembler.debug_opts resp. port->assembler.plain_opts */
 static const char *_z80AsmCmd[] = {
   "sdasz80", "$l", "$3", "$2", "$1.asm", NULL
@@ -909,7 +960,11 @@ static const char *_gbAsmCmd[] = {
 static const char *_tlcs90AsmCmd[] = {
   "sdastlcs90", "$l", "$3", "$2", "$1.asm", NULL
 };
-
+/*
+static const char *_GnuAsmCmd[] = {
+  "z80-elf-as", "$l", "$3", "$2", "$1.asm", NULL
+};
+*/
 static const char *const _crt[] = { "crt0.rel", NULL, };
 static const char *const _libs_z80[] = { "z80", NULL, };
 static const char *const _libs_z180[] = { "z180", NULL, };

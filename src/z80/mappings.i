@@ -423,6 +423,111 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
     },
     { NULL, NULL }
 };
+static const ASM_MAPPING _gas_gb_mapping[] = {
+    { "immed", "#"},
+    { "zero", "#0x00"},
+    { "one", "#0x01"},
+    { "area", ".area\t%s" },
+    { "areacode", ".area\t%s"},
+    { "areadata", ".area\t%s"},
+    { "areahome", ".area\t%s"},
+    { "functionlabeldef", "%s:" },
+    { "globalfunctionlabeldef", "%s:" },
+    { "*hl", "(hl)" },
+    { "di", "di" },
+    { "ei", "ei" },
+    { "ldahli", "ldi\ta, (hl)" },
+    { "ldahlsp", "ldhl\tsp, #%d" },
+    { "ldaspsp", "add\tsp, #%d" },
+    { "*pair", "(%s)" },
+    { "enter", "" },
+    { "enters", "" },
+    { "enterx", "add\tsp, #-%d" },
+    { "pusha", 
+      "push\taf\n"
+      "push\tbc\n"
+      "push\tde\n"
+      "push\thl"
+    },
+    { "popa", 
+      "pop\thl\n"
+      "pop\tde\n"
+      "pop\tbc\n"
+      "pop\taf"
+    },
+    { "adjustsp", "lda\tsp, -%d (sp)" },
+    { "fileprelude", "" },
+    { "profileenter",
+                "ld\ta, #3\n"
+                "rst\t0x08"
+    },
+    { "profileexit",
+                "ld\ta, #4\n"
+                "rst\t0x08"
+    },
+    { NULL, NULL }
+};
+
+static const ASM_MAPPING _gas_z80_mapping[] = {
+    {"immed", "#"},
+    {"zero", "#0x00"},
+    {"one", "#0x01"},
+    {"area", ".area\t%s"},
+    {"areacode", ".area\t%s"},
+    {"areadata", ".area\t%s"},
+    {"areahome", ".area\t%s"},
+    {"constbyte", "0x%02x"},
+    {"constword", "0x%04x"},
+    {"immedword", "#0x%04x"},
+    {"immedbyte", "#0x%02x"},
+    {"hashedstr", "#%s"},
+    {"bankimmeds", "%s >> 16"},
+    { "*ixx", "%d (ix)" },
+    { "*iyx", "%d (iy)" },
+    { "*hl", "(hl)" },
+    { "di", "di" },
+    { "ei", "ei" },
+    { "ldahli", 
+		"ld\ta,(hl)\n"
+		"inc\thl" },
+    { "ldahlsp", 
+		"ld\thl, #%d\n"
+		"add\thl, sp" },
+    { "ldaspsp", 
+		"ld\tiy,#%d\n"
+		"add\tiy,sp\n"
+		"ld\tsp,iy" },
+    { "*pair", "(%s)" },
+    { "enter", 
+		"push\tix\n"
+		"ld\tix,#0\n"
+		"add\tix,sp" },
+    { "enters", "call\t___sdcc_enter_ix\n" },
+    { "pusha", 
+      		"push\taf\n"
+      		"push\tbc\n"
+      		"push\tde\n"
+      		"push\thl\n"
+		"push\tiy"
+    },
+    { "popa",
+		"pop\tiy\n"
+		"pop\thl\n"
+		"pop\tde\n"
+		"pop\tbc\n"
+		"pop\taf"
+    },
+    { "adjustsp", "lda\tsp,-%d (sp)" },
+    { "profileenter",
+                "ld\ta, #3\n"
+                "rst\t0x08"
+    },
+    { "profileexit",
+                "ld\ta, #4\n"
+                "rst\t0x08"
+    },
+    { NULL, NULL }
+};
 
 static const ASM_MAPPINGS _isas = {
     NULL,
@@ -467,4 +572,14 @@ const ASM_MAPPINGS _z80asm_z80 = {
 const ASM_MAPPINGS _asxxxx_r2k = {
     &asm_asxxxx_mapping,
     _asxxxx_r2k_mapping
+};
+
+const ASM_MAPPINGS _gas_gb = {
+    &asm_gas_mapping,
+    _gas_gb_mapping
+};
+
+const ASM_MAPPINGS _gas_z80 = {
+    &asm_gas_mapping,
+    _gas_z80_mapping
 };

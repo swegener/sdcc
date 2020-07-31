@@ -1,3 +1,11 @@
+2020-07-31 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCasm.c,
+	  src/SDCCasm.h,
+	  src/z80/main.c,
+	  src/z80/mappings.i:
+	  Apply patch #312: Initial support for GNU Assembler for Z80 port.
+
 2020-07-31 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/pdk/gen.c,

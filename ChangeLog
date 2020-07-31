@@ -1,3 +1,8 @@
+2020-07-31 Maarten Brock <sourceforge.brock AT dse.nl>
+
+	* src/SDCCpeeph.c: removed portIsDS390, fixed isPort() coding style
+	* src/ds390/peeph.def: replaced portIsDS390 by isPort('ds390' 'ds400')
+
 2020-07-30 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph.def:

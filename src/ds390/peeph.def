@@ -1082,7 +1082,7 @@ replace {
 } by {
         ; Peephole 182a   used 24 bit load of dptr
         mov	dptr,#0x%3%2%1
-} if 24bitMode(), portIsDS390
+} if 24bitMode(), isPort('ds390' 'ds400')
 
 // saves 2 bytes, ?? cycles.
 replace {
@@ -1092,7 +1092,7 @@ replace {
 } by {
         ; Peephole 182b   used 24 bit load of dptr
         mov  dptr,#((%3 << 16) + (%2 << 8) + %1)
-} if 24bitMode(), portIsDS390
+} if 24bitMode(), isPort('ds390' 'ds400')
 
 // saving 3 byte, 2 cycles, return(float_constant) profits here
 replace {
@@ -1696,7 +1696,7 @@ replace {
 	; Peephole 213.a inserted fix
 	mov  %1,#(%2 >> 8)
 	xrl  %1,#0x80
-} if portIsDS390
+} if isPort('ds390' 'ds400')
 
 replace {
 	mov  %1,#(( %2 >> 16 ) ^ 0x80)
@@ -1704,7 +1704,7 @@ replace {
 	; Peephole 213.b inserted fix
 	mov  %1,#(%2 >> 16)
 	xrl  %1,#0x80
-} if portIsDS390
+} if isPort('ds390' 'ds400')
 
 replace {
 	mov  %1,#(( %2 + %3 >> 8 ) ^ 0x80)
@@ -1712,7 +1712,7 @@ replace {
 	; Peephole 213.c inserted fix
 	mov  %1,#((%2 + %3) >> 8)
 	xrl  %1,#0x80
-} if portIsDS390
+} if isPort('ds390' 'ds400')
 
 replace  {
 	mov  %1,a

@@ -132,15 +132,6 @@ pcDistance (lineNode *cpos, char *lbl, bool back)
 }
 
 /*-----------------------------------------------------------------*/
-/* portIsDS390 - return true if port is DS390                      */
-/*-----------------------------------------------------------------*/
-FBYNAME (portIsDS390)
-{
-    return ((strcmp(port->target,"ds390") == 0) ||
-            (strcmp(port->target,"ds400") == 0));
-}
-
-/*-----------------------------------------------------------------*/
 /* flat24bitMode - will check to see if we are in flat24 mode      */
 /*-----------------------------------------------------------------*/
 FBYNAME (flat24bitMode)
@@ -1817,21 +1808,24 @@ FBYNAME (isPort)
 
   set *operands = setFromConditionArgs(cmdLine, vars);
 
-  if(!operands) {
-    fprintf(stderr,
-      "*** internal error: isPort peephole restriction"
-      " malformed: %s\n", cmdLine);
-    return false;
-  }
-
-  while(name = setFirstItem(operands)) {
-    deleteSetItem(&operands, (void *)name);
-
-    if(strcmp(port->target, name) == 0) {
-      ret = true;
-      break;
+  if (!operands)
+    {
+      fprintf(stderr,
+        "*** internal error: isPort peephole restriction"
+        " malformed: %s\n", cmdLine);
+      return false;
     }
-  }
+
+  while (name = setFirstItem(operands))
+    {
+      deleteSetItem(&operands, (void *)name);
+
+      if (strcmp(port->target, name) == 0)
+        {
+          ret = true;
+          break;
+        }
+    }
 
   deleteSet(&operands);
 
@@ -1892,9 +1886,6 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "operandsLiteral", operandsLiteral              // 6
-  },
-  {
-    "portIsDS390", portIsDS390                      // 5
   },
   {
     "labelIsUncondJump", labelIsUncondJump          // 4

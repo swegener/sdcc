@@ -2968,7 +2968,7 @@ genOr (const iCode *ic)
   int size = result->aop->size;
 
   /* Swap if left is literal or right is in A. */
-  if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX)  || right->aop->type == AOP_STK && !aopInReg (left->aop, 0, A_IDX))
+  if (left->aop->type == AOP_LIT || aopInReg (right->aop, 0, A_IDX)  || (right->aop->type == AOP_STK || right->aop->type == AOP_SFR) && !aopInReg (left->aop, 0, A_IDX))
     {
       operand *t = right;
       right = left;
@@ -3005,7 +3005,7 @@ genOr (const iCode *ic)
           emit2 ("or", "%s, a", aopGet (right->aop, i));
           cost (1, 1);
         }
-      else if (right->aop->type == AOP_STK)
+      else if (right->aop->type == AOP_STK || right->aop->type == AOP_SFR)
         {
           if (!p_free)
             pushPF (!aopInReg (right->aop, i, A_IDX));

@@ -445,7 +445,7 @@ cl_z80::inst_cb(void)
 
   if (fetch(&code))
     return(resBREAKPOINT);
-  tick(1);
+  tick(7);
   switch (code)
     {
     case 0x00: // RLC B

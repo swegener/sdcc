@@ -954,6 +954,7 @@ bool cl_z80::inst_z80n(t_mem code, int *ret)
   return true;
 }
 
+// Z80N
 int
 cl_z80::inst_ldix(t_mem code)
 {
@@ -972,6 +973,7 @@ cl_z80::inst_ldix(t_mem code)
   return resGO;
 }
 
+// Z80N
 int
 cl_z80::inst_lddx(t_mem code)
 {

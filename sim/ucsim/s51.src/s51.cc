@@ -35,6 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // local
 #include "sim51cl.h"
+#include "portcl.h"
 
 
 /*

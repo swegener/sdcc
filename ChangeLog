@@ -1,3 +1,8 @@
+2020-08-03 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peeph-z80n.def:
+	  New rules to replcase push nn by ld rr,nn / push rr
+
 2020-08-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/peeph.def:

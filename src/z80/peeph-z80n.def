@@ -16,4 +16,28 @@
 // along with this program; if not, write to the Free Software
 // Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+replace restart {
+	push	#%1
+} by {
+	;Z80N peephole 1-bc: replace push %1 by ld/push
+	ld	bc, #%1
+	push	bc
+} if notUsed('bc')
+
+replace restart {
+	push	#%1
+} by {
+	;Z80N peephole 1-de: replace push %1 by ld/push
+	ld	de, #%1
+	push	de
+} if notUsed('de')
+
+replace restart {
+	push	#%1
+} by {
+	;Z80N peephole 1-hl: replace push %1 by ld/push
+	ld	hl, #%1
+	push	hl
+} if notUsed('hl')
+
 barrier

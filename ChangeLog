@@ -1,3 +1,9 @@
+2020-08-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/main.c,
+	  src/stm8/gen.c:
+	  Optimize signed division by small powers of 2.
+
 2020-07-31 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCasm.c,

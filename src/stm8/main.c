@@ -311,6 +311,8 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   switch (ic->op)
     {
     case '/':
+      if (getSize (left) <= 2 && getSize (right) <= 2 && IS_LITERAL (right) && isPowerOf2 (ulFromVal (valFromType (right))) && ulFromVal (valFromType (right)) <= 32) // Using arithmetic right-shift is worth it for small divisors only.
+        return true;
     case '%':
       return (getSize (left) <= 2 && IS_UNSIGNED (left) && getSize (right) <= 2 && IS_UNSIGNED (right));
     case '*':

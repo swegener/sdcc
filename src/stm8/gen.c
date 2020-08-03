@@ -4454,6 +4454,92 @@ genMult (const iCode *ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genDivSign - generates code for signed division by power of 2   */
+/* any operands and results of up to 2 bytes                       */
+/*-----------------------------------------------------------------*/
+static void
+genDivSign (const iCode *ic)
+{
+  operand *result = IC_RESULT (ic);
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  
+  wassert (right->aop->type == AOP_LIT && !SPEC_USIGN (operandType (left)) && isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)) >= 0);
+  
+  symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
+
+  if (result->aop->size == 1)
+    {
+      if (!regDead (A_IDX, ic))
+        push (ASMOP_A, 0, 1);
+        
+      cheapMove (ASMOP_A, 0, left->aop, 0, false);
+      
+      emit3w (A_TNZ, ASMOP_X, 0);
+      if (!regalloc_dry_run)
+        emit2 ("jrpl", "!tlabel", labelKey2num (tlbl->key));
+      if (ulFromVal (right->aop->aopu.aop_lit) == 2)
+        emit3w (A_INC, ASMOP_A, 0);
+      else
+        {
+          emit2 ("add", "a, #0x%02x", ulFromVal (right->aop->aopu.aop_lit) - 1);
+          cost (3, 2);
+        }
+      emitLabel (tlbl);
+      for (unsigned int i = 0; i < isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)); i++)
+        emit3w (A_SRA, ASMOP_A, 0);
+        
+      cheapMove (result->aop, 0, ASMOP_A, 0, false);
+        
+      if (!regDead (A_IDX, ic))
+        pop (ASMOP_A, 0, 1);
+    }
+  else
+    {
+      if (!regDead (X_IDX, ic))
+        push (ASMOP_X, 0, 2);
+    
+      genMove (ASMOP_X, left->aop, regDead (A_IDX, ic), true, regDead (Y_IDX, ic));
+
+      emit3w (A_TNZW, ASMOP_X, 0);
+      if (!regalloc_dry_run)
+        emit2 ("jrpl", "!tlabel", labelKey2num (tlbl->key));
+      if (ulFromVal (right->aop->aopu.aop_lit) == 2)
+        emit3w (A_INCW, ASMOP_X, 0);
+      else
+        {
+          emit2 ("addw", "x, #0x%04x", ulFromVal (right->aop->aopu.aop_lit) - 1);
+          cost (3, 2);
+        }
+      emitLabel (tlbl);
+      for (unsigned int i = 0; i < isLiteralBit (ulFromVal (right->aop->aopu.aop_lit)); i++)
+        emit3w (A_SRAW, ASMOP_X, 0);
+          
+      genMove (result->aop, ASMOP_X, regDead (A_IDX, ic), true, regDead (Y_IDX, ic));
+      
+      if (!regDead (X_IDX, ic))
+        {
+          if (result->aop->regs[XH_IDX] >= 0)
+            {
+              adjustStack (1, FALSE, FALSE, FALSE);
+              swap_to_a (XL_IDX);
+              pop (ASMOP_A, 0, 1);
+              swap_from_a(XL_IDX);
+            }
+          else if (result->aop->regs[XL_IDX] >= 0)
+            {
+              swap_to_a (XH_IDX);
+              pop (ASMOP_A, 0, 1);
+              swap_from_a(XH_IDX);
+              adjustStack (1, FALSE, FALSE, FALSE);
+            }
+          else
+            pop (ASMOP_X, 0, 2);
+        }
+    }
+}
+
+/*-----------------------------------------------------------------*/
 /* genDivMod2 - generates code for unsigned division               */
 /* any operands and results of up to 2 bytes                       */
 /*-----------------------------------------------------------------*/
@@ -4673,7 +4759,9 @@ genDivMod (const iCode *ic)
   aopOp (IC_RIGHT (ic), ic);
   aopOp (IC_RESULT (ic), ic);
 
-  if (result->aop->size <= (ic->op == '/' ? 2 : 1) && left->aop->size <= 2 && right->aop->size <= 1)
+  if (ic->op == '/' && right->aop->type == AOP_LIT && !SPEC_USIGN (operandType (left)))
+    genDivSign(ic);
+  else if (result->aop->size <= (ic->op == '/' ? 2 : 1) && left->aop->size <= 2 && right->aop->size <= 1)
     genDivMod1(ic);
   else
     genDivMod2(ic);

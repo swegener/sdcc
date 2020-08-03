@@ -31,6 +31,7 @@ memcpy_p g(void) __naked
     __asm
 	push	#_memcpy
 	pop	hl
+	ret
     __endasm;
 }
 #else

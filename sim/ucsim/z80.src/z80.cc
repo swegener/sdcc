@@ -888,6 +888,7 @@ bool cl_z80::inst_z80n(t_mem code, int *ret)
 	w+= fetch();
 	push2(w);
 	vc.wr+= 2;
+	break;
       }
     case 0x91: // nextreg $rr,$nn
       outputs->write(0x243b, fetch());

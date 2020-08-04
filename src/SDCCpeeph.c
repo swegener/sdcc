@@ -1102,7 +1102,7 @@ FBYNAME (notUsed)
 }
 
 /*-----------------------------------------------------------------*/
-/* notUsed - Check, if value in register is not read again         */
+/* notUsedFrom - Check, if value in register is not read again     */
 /*           starting from label                                   */
 /*-----------------------------------------------------------------*/
 FBYNAME (notUsedFrom)
@@ -1126,6 +1126,49 @@ FBYNAME (notUsedFrom)
 
   fprintf (stderr, "Function notUsed not initialized in port structure\n");
   return FALSE;
+}
+
+/*-----------------------------------------------------------------*/
+/* unusedReg - find first unused register from specified list and  */
+/* assign to container specified as first argument. Fails if all   */
+/* of specified registers are accessed for reading.                */
+/*-----------------------------------------------------------------*/
+FBYNAME (unusedReg)
+{
+  int dst;
+  int n;
+  if (sscanf (cmdLine, " %%%d%n", &dst, &n) != 1 || dst <= 0)
+    {
+      fprintf (stderr,
+               "*** internal error: unusedReg() peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  set *operands = setFromConditionArgs (&cmdLine[n], vars);
+  if (!operands || elementsInSet (operands) < 2 || elementsInSet (operands) > 3)
+    {
+      fprintf (stderr,
+               "*** internal error: canAssign peephole restriction"
+               " malformed: %s\n", cmdLine);
+      return FALSE;
+    }
+
+  char *what = setFirstItem (operands);
+  for (; what != NULL; what = setNextItem (operands))
+    if (port->peep.notUsed (what, endPl, head))
+      break;
+
+  bool ret = (what != NULL);
+  if (ret)
+    {
+      char *s[] = {what, NULL};
+      bindVar (dst, s, &vars);
+    }
+
+  deleteSet (&operands);
+
+  return ret;
 }
 
 /*-----------------------------------------------------------------*/
@@ -1160,7 +1203,7 @@ FBYNAME (canAssign)
     }
 
   if (port->peep.canAssign)
-    {  
+    {
       bool ret = port->peep.canAssign (dst, src, exotic);
       deleteSet (&operands);
       return (ret);
@@ -1919,6 +1962,9 @@ ftab[] =                                            // sorted on the number of t
   },
   {
     "canSplitReg", canSplitReg
+  },
+  {
+    "unusedReg", unusedReg
   },
   {
     "newLabel", newLabel
@@ -2851,15 +2897,15 @@ isLabelReference (const char *line, const char **start, int *len)
 
   while (ISCHARSPACE (*s))
     ++s;
-  
+
   /* Skip condition in conditional call */
   if (strchr(s, ',')) 
     s = strchr(s, ',') + 1;
-    
+
   e = s, *len = 0;
   while(*e && !ISCHARSPACE (*e) && *e != ';')
     ++e, ++(*len);
-    
+
   *start = s;
 
   return TRUE;
@@ -2913,13 +2959,13 @@ buildLabelRefCountHash (lineNode *head)
           labelHashEntry *entry, *e;
 
           assert (labelLen <= SDCC_NAME_MAX);
-              
+
           entry = traceAlloc (&_G.labels, Safe_alloc(sizeof (labelHashEntry)));
 
           memcpy (entry->name, label, labelLen);
           entry->name[labelLen] = 0;
           entry->refCount = -1;
-     
+
           for (e = hTabFirstItemWK (labelHash, hashSymbolName (entry->name)); e; e = hTabNextItemWK (labelHash))
             if (!strcmp (entry->name, e->name))
               goto c;
@@ -2962,8 +3008,8 @@ buildLabelRefCountHash (lineNode *head)
                 e->refCount++;
             }
         }
-        
-        
+
+
       for (i = 0; i < HTAB_SIZE; i++)
         {
           labelHashEntry *thisEntry;

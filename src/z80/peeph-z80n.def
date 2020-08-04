@@ -19,25 +19,9 @@
 replace restart {
 	push	#%1
 } by {
-	;Z80N peephole 1-bc: replace push %1 by ld/push
-	ld	bc, #%1
-	push	bc
-} if notUsed('bc')
-
-replace restart {
-	push	#%1
-} by {
-	;Z80N peephole 1-de: replace push %1 by ld/push
-	ld	de, #%1
-	push	de
-} if notUsed('de')
-
-replace restart {
-	push	#%1
-} by {
-	;Z80N peephole 1-hl: replace push %1 by ld/push
-	ld	hl, #%1
-	push	hl
-} if notUsed('hl')
+	;Z80N peephole 1: replace push %1 by ld %2,#%1 / push %2
+	ld	%2, #%1
+	push	%2
+} if unusedReg(%2 'bc' 'de' 'hl')
 
 barrier

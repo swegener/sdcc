@@ -1,3 +1,9 @@
+2020-08-03 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCpeeph.c,
+	  src/z80/peeph-z80n.def:
+	  Implement RFE #678: new peephole constraint unusedRegs.
+
 2020-08-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
@@ -7,7 +13,7 @@
 2020-08-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph-z80n.def:
-	  New rules to replcase push nn by ld rr,nn / push rr
+	  New rules to replcase push nn by ld rr,nn / push rr.
 
 2020-08-03 Philipp Klaus Krause <pkk AT spth.de>
 
@@ -19,7 +25,7 @@
 	* sim/ucsim/z80.src/z80.cc,
 	  src/z80/gen.c,
 	  support/regression/tests/z80n-push-nn.c:
-	  Fix bug #3032: Something wrong with z80n push nn
+	  Fix bug #3032: Something wrong with z80n push nn.
 
 2020-08-03 Philipp Klaus Krause <pkk AT spth.de>
 

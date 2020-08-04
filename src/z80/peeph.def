@@ -526,6 +526,33 @@ replace restart {
 } if notUsed('bc'), notUsed('hl')
 
 replace restart {
+	ld	iy, %1
+	push	iy
+} by {
+	ld	hl, %1
+	push	hl
+	; common peephole 49a pushed hl instead of iy.
+} if notUsed('iy'), notUsed('hl')
+
+replace restart {
+	ld	iy, %1
+	push	iy
+} by {
+	ld	de, %1
+	push	de
+	; common peephole 49b pushed de instead of iy.
+} if notUsed('iy'), notUsed('de')
+
+replace restart {
+	ld	iy, %1
+	push	iy
+} by {
+	ld	bc, %1
+	push	bc
+	; common peephole 49c pushed bc instead of iy.
+} if notUsed('iy'), notUsed('bc')
+
+replace restart {
 	pop	%1
 	push	%1
 } by {

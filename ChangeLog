@@ -1,3 +1,9 @@
+2020-08-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  src/z80/peeph.def:
+	  Improve parameter pushing.
+
 2020-08-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph-z80n.def:

@@ -4458,8 +4458,6 @@ genIpush (const iCode *ic)
       {
         int d = 0;
 
-        PAIR_ID pair = getFreePairId (ic);
-
         bool a_free = !bitVectBitValue (ic->rSurv, A_IDX) && (IC_LEFT (ic)->aop->regs[A_IDX] < 0 || IC_LEFT (ic)->aop->regs[A_IDX] >= size - 1);
         bool b_free = !bitVectBitValue (ic->rSurv, B_IDX) && (IC_LEFT (ic)->aop->regs[B_IDX] < 0 || IC_LEFT (ic)->aop->regs[B_IDX] >= size - 1);
         bool c_free = !bitVectBitValue (ic->rSurv, C_IDX) && (IC_LEFT (ic)->aop->regs[C_IDX] < 0 || IC_LEFT (ic)->aop->regs[C_IDX] >= size - 1);
@@ -4468,6 +4466,8 @@ genIpush (const iCode *ic)
         bool h_free = !bitVectBitValue (ic->rSurv, H_IDX) && (IC_LEFT (ic)->aop->regs[H_IDX] < 0 || IC_LEFT (ic)->aop->regs[H_IDX] >= size - 1);
         bool l_free = !bitVectBitValue (ic->rSurv, L_IDX) && (IC_LEFT (ic)->aop->regs[L_IDX] < 0 || IC_LEFT (ic)->aop->regs[L_IDX] >= size - 1);
         bool hl_free = isPairDead (PAIR_HL, ic) && (h_free || IC_LEFT (ic)->aop->regs[H_IDX] >= size - 2) && (l_free || IC_LEFT (ic)->aop->regs[L_IDX] >= size - 2);
+        bool de_free = isPairDead (PAIR_DE, ic) && (d_free || IC_LEFT (ic)->aop->regs[D_IDX] >= size - 2) && (e_free || IC_LEFT (ic)->aop->regs[E_IDX] >= size - 2);
+        bool bc_free = isPairDead (PAIR_BC, ic) && (b_free || IC_LEFT (ic)->aop->regs[B_IDX] >= size - 2) && (c_free || IC_LEFT (ic)->aop->regs[C_IDX] >= size - 2);
 
         if (getPairId_o (IC_LEFT (ic)->aop, size - 2) != PAIR_INVALID)
           {
@@ -4476,25 +4476,43 @@ genIpush (const iCode *ic)
             d = 2;
           }
         else if (size >= 2 &&
-          (hl_free || pair != PAIR_INVALID || aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free || aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX) && e_free || aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX) && l_free))
+          (hl_free || de_free || bc_free ||
+          aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free || b_free && aopInReg (IC_LEFT (ic)->aop, size - 2, C_IDX) ||
+          aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX) && e_free || d_free && aopInReg (IC_LEFT (ic)->aop, size - 2, E_IDX) ||
+          aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX) && l_free || h_free && aopInReg (IC_LEFT (ic)->aop, size - 2, L_IDX)))
           {
+            PAIR_ID pair = PAIR_INVALID;
+            
             if (hl_free)
               pair = PAIR_HL;
-            if (aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free)
+            else if (de_free)
+              pair = PAIR_DE;
+            else if (bc_free)
               pair = PAIR_BC;
-            else if (aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX) && e_free)
+
+            if (aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX) && l_free || h_free && aopInReg (IC_LEFT (ic)->aop, size - 2, L_IDX))
+              pair = PAIR_HL;
+            else if (aopInReg (IC_LEFT (ic)->aop, size - 1, D_IDX) && e_free || d_free && aopInReg (IC_LEFT (ic)->aop, size - 2, E_IDX))
+              pair = PAIR_DE;
+            else if (aopInReg (IC_LEFT (ic)->aop, size - 1, B_IDX) && c_free || b_free && aopInReg (IC_LEFT (ic)->aop, size - 2, C_IDX))
               pair = PAIR_BC;
-            else if (aopInReg (IC_LEFT (ic)->aop, size - 1, H_IDX) && l_free)
-              pair = PAIR_BC;
+
             fetchPairLong (pair, IC_LEFT (ic)->aop, ic, size - 2);
             emit2 ("push %s", _pairs[pair].name);
-            regalloc_dry_run_cost ++;
+            regalloc_dry_run_cost++;
             d = 2;
          }
-       else if (size >= 2 && IS_Z80N && IC_LEFT (ic)->aop->type == AOP_LIT) // Same size, but slower (21 vs 23 cycles) than going through a register pair other than iy. Only worth it under high register pressure.
+       else if (size >= 2 && IS_Z80N && (IC_LEFT (ic)->aop->type == AOP_LIT || IC_LEFT (ic)->aop->type == AOP_IMMD)) // Same size, but slower (21 vs 23 cycles) than going through a register pair other than iy. Only worth it under high register pressure.
          {
            emit2 ("push !hashedstr", aopGetLitWordLong (IC_LEFT (ic)->aop, size - 2, false));
            regalloc_dry_run_cost += 4;
+           d = 2;
+         }
+       else if (size >= 2 && !IS_GB && !IY_RESERVED && isPairDead (PAIR_IY, ic) && (IC_LEFT (ic)->aop->type == AOP_LIT || IC_LEFT (ic)->aop->type == AOP_IMMD))
+         {
+           fetchPairLong (PAIR_IY, IC_LEFT (ic)->aop, ic, size - 2);
+           emit2 ("push iy");
+           regalloc_dry_run_cost += 2;
            d = 2;
          }
        else if (size >= 2 && !IS_GB)
@@ -4551,13 +4569,6 @@ genIpush (const iCode *ic)
            regalloc_dry_run_cost += 2;
            d = 1;
          }
-       else if (IS_Z80N && IC_LEFT (ic)->aop->type == AOP_LIT)
-         {
-           emit2 ("push !immedword", byteOfVal (IC_LEFT (ic)->aop->aopu.aop_lit, size - 1) << 8);
-           emit2 ("inc sp");
-           regalloc_dry_run_cost += 5;
-           d = 1;
-         }
        else if (h_free)
          {
            cheapMove (ASMOP_H, 0, IC_LEFT (ic)->aop, size - 1, false);
@@ -4580,6 +4591,13 @@ genIpush (const iCode *ic)
            emit2 ("push bc");
            emit2 ("inc sp");
            regalloc_dry_run_cost += 2;
+           d = 1;
+         }
+      else if (IS_Z80N && IC_LEFT (ic)->aop->type == AOP_LIT)
+         {
+           emit2 ("push !immedword", byteOfVal (IC_LEFT (ic)->aop->aopu.aop_lit, size - 1) << 8);
+           emit2 ("inc sp");
+           regalloc_dry_run_cost += 5;
            d = 1;
          }
        else if (!IS_GB)

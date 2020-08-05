@@ -328,8 +328,11 @@ z80MightReadFlag(const lineNode *pl, const char *what)
 
   if(IS_GB &&
      (ISINST(pl->line, "stop") ||
-      ISINST(pl->line, "swap") ||
       ISINST(pl->line, "ldh")))
+    return false;
+    
+  if((IS_GB || IS_Z80N) &&
+    ISINST(pl->line, "swap"))
     return false;
 
   if(ISINST(pl->line, "rl") ||
@@ -370,6 +373,9 @@ z80MightReadFlag(const lineNode *pl, const char *what)
     return true;
   if(ISINST(pl->line, "rst"))
     return true;
+    
+  if (IS_GB && ISINST(pl->line, "ldhl"))
+    return false;
 
   return true;
 }
@@ -398,7 +404,7 @@ z80MightRead(const lineNode *pl, const char *what)
     if (strchr (what, pl->line[19]) != 0 || strchr (what, pl->line[20]) != 0 || strchr (what, pl->line[21]) != 0)
       return TRUE;
 
-  if(strncmp(pl->line, "call\t", 5) == 0 && strchr(pl->line, ',') == 0)
+  if(ISINST(pl->line, "call") && strchr(pl->line, ',') == 0)
     {
       const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
       if (f)
@@ -572,7 +578,7 @@ z80MightRead(const lineNode *pl, const char *what)
     {
       return(argCont(pl->line + 4, what));
     }
-  if(IS_GB && ISINST(pl->line, "swap"))
+  if((IS_GB || IS_Z80N) && ISINST(pl->line, "swap"))
     {
       return(argCont(pl->line + 5, what));
     }
@@ -589,7 +595,8 @@ z80MightRead(const lineNode *pl, const char *what)
       return(argCont(strchr(pl->line + 4, ','), what));
     }
 
-  if(ISINST(pl->line, "ccf")  ||
+  if(ISINST(pl->line, "ccf") ||
+    ISINST(pl->line, "scf")  ||
     ISINST(pl->line, "nop")  ||
     ISINST(pl->line, "halt") ||
     (IS_GB && ISINST(pl->line, "stop")))
@@ -646,6 +653,9 @@ z80MightRead(const lineNode *pl, const char *what)
 
   if(IS_RAB && ISINST(pl->line, "bool"))
     return(argCont(pl->line + 5, what));
+    
+  if(IS_R3KA && ISINST(pl->line, "lsdr") || ISINST(pl->line, "lidr") || ISINST(pl->line, "lsddr") || ISINST(pl->line, "lsidr"))
+    return(strchr("bcdehl", *what));
 
   if(IS_EZ80_Z80 && ISINST(pl->line, "lea"))
     return(argCont(strchr(pl->line + 4, ','), what));
@@ -657,8 +667,9 @@ z80MightRead(const lineNode *pl, const char *what)
     return(!strcmp(what, "sp"));
 
   /* TODO: Can we know anything about rst? */
-  if(ISINST(pl->line, "rst") && !strcmp(what, "sp"))
+  if(ISINST(pl->line, "rst"))
     return(true);
+    
   return(true);
 }
 

@@ -134,7 +134,7 @@ test-ds390:
 	$(MAKE) test-port PORT=ds390
 
 # Helper rule for testing the z80 related ports only
-test-z80: test-ucz80 test-ucz80-resiy test-ucz180 test-ucgbz80 test-ucr2k test-ucr3ka test-ez80-z80 test-tlcs90
+test-z80: test-ucz80 test-ucz80-resiy test-ucz180 test-ucz80n test-ucgbz80 test-ucr2k test-ucr3ka test-ez80-z80 test-tlcs90
 
 # Helper rule for testing the z80 port only (use uCsim simulator)
 test-ucz80:

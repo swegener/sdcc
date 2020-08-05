@@ -1,7 +1,7 @@
 2020-08-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:
-	  Improve argCont precision.
+	  Improve notUsed precision.
 
 2020-08-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 

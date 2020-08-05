@@ -196,3 +196,65 @@ replace {
 } by {
 	; peephole sp6 removed not needed pop
 } if notUsed(%1), notUsed('sp')
+
+// Test for bug #3095
+
+replace {
+	xor	a, %1
+} by {
+	; peephole dead1 removed dead xor a
+} if notUsed('af')
+
+replace {
+	inc	%1
+} by {
+	; peephole dead2 removed dead inc %1
+} if notUsed(%1), notUsed('f'), notSame(%1 '(hl)')
+
+replace {
+	dec	%1
+} by {
+	; peephole dead3 removed dead dec %1
+} if notUsed(%1), notUsed('f'), notSame(%1 '(hl)')
+
+replace {
+	sub	a, %1
+} by {
+	; peephole dead4 removed dead sub a, %1
+} if notUsed('af')
+
+replace {
+	sbc	a, %1
+} by {
+	; peephole dead5 removed dead sbc a, %1
+} if notUsed('af')
+
+replace {
+	cp	a, %1
+} by {
+	; peephole dead6 removed dead cp a, %1
+} if  notUsed('f')
+
+replace {
+	and	a, %1
+} by {
+	; peephole dead7 removed dead and a, %1
+} if notUsed('af')
+
+replace {
+	or	a, %1
+} by {
+	; peephole dead8 removed dead and a, %1
+} if notUsed('af')
+
+replace {
+	add	a, %1
+} by {
+	; peephole dead9 removed dead add a, %1
+} if notUsed('af')
+
+replace {
+	adc	a, %1
+} by {
+	; peephole dead10 removed dead adc a, %1
+} if notUsed('af')

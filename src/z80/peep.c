@@ -272,6 +272,28 @@ z80MightBeParmInCallFromCurrentFunction(const char *what)
   return FALSE;
 }
 
+/* Check if the flag implies reading what. */
+static bool
+z80MightReadFlagCondition(const char *cond, const char *what){
+  while(isspace (*cond))
+    cond++;
+
+  if(!STRNCASECMP(cond, "po", 2) || !STRNCASECMP(cond, "pe", 2))
+    return !strcmp(what, "pf");
+  if(tolower(cond[0]) == 'm' || tolower(cond[0]) == 'p')
+    return !strcmp(what, "sf");
+
+  // skip inverted conditions
+  if(tolower(cond[0]) == 'n')
+    cond++;
+
+  if(tolower(cond[0]) == 'c')
+    return !strcmp(what, "cf");
+  if(tolower(cond[0]) == 'z')
+    return !strcmp(what, "zf");
+  return true;
+}
+
 // TODO: lacks ex support for z80 etc.
 static bool
 z80MightReadFlag(const lineNode *pl, const char *what)
@@ -352,25 +374,18 @@ z80MightReadFlag(const lineNode *pl, const char *what)
   // catch c, nc, z, nz, po, pe, p and m
   if(ISINST(pl->line, "jp") ||
      ISINST(pl->line, "jr"))
-    return (!strchr(pl->line, ',') ||
-            ((pl->line[3] == 'c' || pl->line[4] == 'c')           && !strcmp(what, "cf")) ||
-            ((pl->line[3] == 'z' || pl->line[4] == 'z')           && !strcmp(what, "zf")) ||
-            ((!strcmp(pl->line, "po") || !strcmp(pl->line, "pe")) && !strcmp(what, "pf")) ||
-            ((!strcmp(pl->line, "p")  || !strcmp(pl->line, "m") ) && !strcmp(what, "sf")) );
+    return (strchr(pl->line, ',') && z80MightReadFlagCondition(pl->line + 2, what));
 
   // flags don't matter according to calling convention
   if(ISINST(pl->line, "reti") ||
      ISINST(pl->line, "retn"))
     return false;
 
-  // --reserve-regs-iy uses ret in code gen for calls through function pointers
-  if(ISINST(pl->line, "ret") && !IY_RESERVED)
-    return false;
-
-  // not sure how to handle these properly
-  if(ISINST(pl->line, "call") ||
-     ISINST(pl->line, "ret"))
-    return true;
+  if(ISINST(pl->line, "call"))
+    return (strchr(pl->line, ',') && z80MightReadFlagCondition(pl->line + 4, what));
+  if(ISINST(pl->line, "ret"))
+    return (pl->line[4] != '\0' && z80MightReadFlagCondition(pl->line + 3, what));
+  // we don't know anything about this
   if(ISINST(pl->line, "rst"))
     return true;
     

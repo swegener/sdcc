@@ -238,6 +238,9 @@ static bool argCont(const char *arg, const char *what)
   if(*arg == '(')
     arg++;
 
+  if (arg[0] == '#' || arg[0] == '_')
+    return false;
+    
   // Get suitable end to avoid reading into further arguments.
   const char *end = strchr(arg, ',');
   if (!end)

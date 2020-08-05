@@ -1,5 +1,10 @@
 2020-08-05 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* support/regression/tests/bug-2363.c:
+	  Enable test because bug #2363 looks to be fixed.
+
+2020-08-05 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* device/lib/z80/Makefile.in,
 	  device/lib/z80/__sdcc_critical.s,
 	  src/z80/gen.c,
@@ -8,7 +13,7 @@
 	  support/regression/Makefile.in,
 	  support/regression/ports/ucz80-nmos,
 	  support/regression/ports/ucz80-nmos/spec.mk:
-	  Fix bug #2321: Z80 generates unsafe code for critcial function entry
+	  Fix bug #2321: Z80 generates unsafe code for critcial function entry.
 
 2020-08-05 Sergey Belyashov <sergey.belyashov@gmail.com>
 
@@ -19,7 +24,7 @@
 	  device/lib/z80n/Makefile.in,
 	  device/lib/z80n/__sdcc_bcall.s,
 	  support/regression/tests/banked.c:
-	  Implement RFE #152 for eZ80_Z80, Z180, Z80N
+	  Implement RFE #152 for eZ80_Z80, Z180, Z80N.
 
 2020-08-05 Philipp Klaus Krause <pkk AT spth.de>
 

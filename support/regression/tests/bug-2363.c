@@ -20,7 +20,6 @@ static signed char Durak_deskN, Durak_trump, Durak_badSuit;
 
 static void Durak_CpuMoves (void)
 {
-#ifndef __SDCC
 	signed char i, l;
 	signed int z;
 	signed char _for__14;
@@ -38,7 +37,6 @@ static void Durak_CpuMoves (void)
 			}
 		}
 	}
-#endif
 }
 
 void testBug(void)

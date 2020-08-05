@@ -42,7 +42,7 @@ Z8OBJECTS = $(patsubst %.c,%.rel,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGL
 OBJ = divunsigned.rel divsigned.rel divmixed.rel modunsigned.rel modsigned.rel modmixed.rel mul.rel mulchar.rel \
       heap.rel memmove.rel strcpy.rel strlen.rel abs.rel __sdcc_call_hl.rel __sdcc_call_iy.rel crtenter.rel \
       setjmp.rel atomic_flag_test_and_set.rel memcpy.rel __strreverse.rel __uitobcd.rel __ultobcd.rel __itoa.rel \
-      __ltoa.rel
+      __ltoa.rel __sdcc_bcall.rel
 
 LIB = z180.lib
 CC = $(SCC)

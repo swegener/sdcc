@@ -1,9 +1,20 @@
+2020-08-05 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* device/lib/ez80_z80/Makefile.in,
+	  device/lib/ez80_z80/__sdcc_bcall.s,
+	  device/lib/z180/Makefile.in,
+	  device/lib/z180/__sdcc_bcall.s,
+	  device/lib/z80n/Makefile.in,
+	  device/lib/z80n/__sdcc_bcall.s,
+	  support/regression/tests/banked.c:
+	  Implement RFE #152 for eZ80_Z80, Z180, Z80N
+
 2020-08-05 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:
 	  Improve notUsed precision.
 
-2020-08-03 Sergey Belyashov <sergey.belyashov@gmail.com>
+2020-08-04 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCpeeph.c,
 	  src/z80/peeph-z80n.def:
@@ -18,7 +29,7 @@
 2020-08-03 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peeph-z80n.def:
-	  New rules to replcase push nn by ld rr,nn / push rr.
+	  New rules to replace push nn by ld rr,nn / push rr.
 
 2020-08-03 Philipp Klaus Krause <pkk AT spth.de>
 

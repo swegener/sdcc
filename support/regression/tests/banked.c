@@ -2,7 +2,7 @@
 */
 #include <testfwk.h>
 
-#if defined(__SDCC_z80) //|| defined(__SDCC_z180) || defined(__SDCC_gbz80) || defined(__SDCC_ez80_z80)
+#if defined(__SDCC_z80) || defined(__SDCC_z80n) || defined(__SDCC_z180) /*|| defined(__SDCC_gbz80)*/ || defined(__SDCC_ez80_z80)
 #define DO_CHECK
 #endif
 

@@ -141,6 +141,11 @@ test-ucz80:
 	$(MAKE) test-common
 	$(MAKE) test-port PORT=ucz80
 
+# Helper rule for testing the z80 port with --nmos-z80 only (use uCsim simulator)
+test-ucz80-nmos:
+	$(MAKE) test-common
+	$(MAKE) test-port PORT=ucz80-nmos
+
 # Helper rule for testing the z80 port with --reserve-regs-iy only (use uCsim simulator)
 test-ucz80-resiy:
 	$(MAKE) test-common

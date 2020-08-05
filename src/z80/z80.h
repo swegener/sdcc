@@ -29,6 +29,7 @@ typedef struct
     int reserveIY;
     int noOmitFramePtr;
     int legacyBanking;
+    int nmosZ80;
   }
 Z80_OPTS;
 

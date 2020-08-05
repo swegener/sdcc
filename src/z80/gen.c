@@ -5143,9 +5143,15 @@ genFunction (const iCode * ic)
             }
           else
             {
-              //get interrupt enable flag IFF2 into P/O
-              emit2 ("ld a,i");
-              emit2 ("!di");
+              if (z80_opts.nmosZ80)
+                emit2 ("call ___sdcc_critical_enter");
+              else
+                {
+                  //get interrupt enable flag IFF2 into P/O
+                  emit2 ("ld a,i");
+                  //disable interrupts
+                  emit2 ("!di");
+                }
               //save P/O flag
               emit2 ("push af");
               _G.stack.param_offset += 2;
@@ -12091,11 +12097,17 @@ genCritical (const iCode * ic)
       cheapMove (IC_RESULT (ic)->aop, 0, ASMOP_ZERO, 0, true);
       if (!regalloc_dry_run)
         {
-          //get interrupt enable flag IFF2 into P/O
-          emit2 ("ld a,i");
-
-          //disable interrupt
-          emit2 ("!di");
+          if (z80_opts.nmosZ80)
+            {
+              emit2 ("call ___sdcc_critical_enter");
+            }
+          else
+            {
+              //get interrupt enable flag IFF2 into P/O
+              emit2 ("ld a,i");
+              //disable interrupt
+              emit2 ("!di");
+            }
           //parity odd <==> P/O=0 <==> interrupt enable flag IFF2=0
           emit2 ("jp PO, !tlabel", labelKey2num (tlbl->key));
         }
@@ -12110,12 +12122,16 @@ genCritical (const iCode * ic)
     }
   else
     {
-      //get interrupt enable flag IFF2 into P/O
-      emit2 ("ld a,i");
-
-      //disable interrupt
-      emit2 ("!di");
-      regalloc_dry_run_cost += 2;
+      if (z80_opts.nmosZ80)
+        emit2 ("call ___sdcc_critical_enter");
+      else
+        {
+          //get interrupt enable flag IFF2 into P/O
+          emit2 ("ld a,i");
+          //disable interrupt
+          emit2 ("!di");
+        }
+      regalloc_dry_run_cost += 3;
       //save P/O flag
       if (!regalloc_dry_run)    // _push unbalances _G.stack.pushed.
         _push (PAIR_AF);

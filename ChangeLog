@@ -1,5 +1,17 @@
 2020-08-05 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/z80/Makefile.in,
+	  device/lib/z80/__sdcc_critical.s,
+	  src/z80/gen.c,
+	  src/z80/main.c,
+	  src/z80/z80.h,
+	  support/regression/Makefile.in,
+	  support/regression/ports/ucz80-nmos,
+	  support/regression/ports/ucz80-nmos/spec.mk:
+	  Fix bug #2321: Z80 generates unsafe code for critcial function entry
+
+2020-08-05 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* device/lib/ez80_z80/Makefile.in,
 	  device/lib/ez80_z80/__sdcc_bcall.s,
 	  device/lib/z180/Makefile.in,

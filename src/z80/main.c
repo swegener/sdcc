@@ -43,6 +43,7 @@
 #define OPTION_FRAMEPOINTER    "--fno-omit-frame-pointer"
 #define OPTION_EMIT_EXTERNS    "--emit-externs"
 #define OPTION_LEGACY_BANKING  "--legacy-banking"
+#define OPTION_NMOS_Z80        "--nmos-z80"
 
 static char _z80_defaultRules[] = {
 #include "peeph.rul"
@@ -92,6 +93,7 @@ static OPTION _z80_options[] = {
   {0, OPTION_FRAMEPOINTER,    &z80_opts.noOmitFramePtr, "Do not omit frame pointer"},
   {0, OPTION_EMIT_EXTERNS,    NULL, "Emit externs list in generated asm"},
   {0, OPTION_LEGACY_BANKING,  &z80_opts.legacyBanking, "Use legacy method to call banked functions"},
+  {0, OPTION_NMOS_Z80,        &z80_opts.nmosZ80, "Generate workaround for NMOS Z80 when saving IFF2"},
   {0, NULL}
 };
 

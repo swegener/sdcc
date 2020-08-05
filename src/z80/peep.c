@@ -228,12 +228,12 @@ static bool argCont(const char *arg, const char *what)
   while(isspace (*arg) || *arg == ',')
     arg++;
 
-  if (arg[0] == '#')
+  if (arg[0] == '#' || arg[0] == '_')
     return false;
 
   if(arg[0] == '(' && arg[1] && arg[2] && (arg[2] != ')' && arg[3] != ')')
      && !(IS_GB && (arg[3] == '-' || arg[3] == '+') && arg[4] == ')'))
-    return FALSE;
+    return false;
 
   if(*arg == '(')
     arg++;

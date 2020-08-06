@@ -3,6 +3,8 @@
 	* src/SDCCutil.c,
 	  support/regression/tests/p99-conformance.c:
 	  Fix handling of digits 8 and 9 in universal character names.
+	* support/regression/tests/bug-2363.c:
+	  Redisable test for targets without enough memory.
 
 2020-08-05 'basxto' Riedel <sdcc@basxto.de>
 

@@ -20,6 +20,7 @@ static signed char Durak_deskN, Durak_trump, Durak_badSuit;
 
 static void Durak_CpuMoves (void)
 {
+#if !(defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL)) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_pic14) // Not enough memory
 	signed char i, l;
 	signed int z;
 	signed char _for__14;
@@ -37,6 +38,7 @@ static void Durak_CpuMoves (void)
 			}
 		}
 	}
+#endif
 }
 
 void testBug(void)

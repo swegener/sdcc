@@ -772,8 +772,9 @@ z80SurelyWritesFlag(const lineNode *pl, const char *what)
     return (!argCont(pl->line + 4, "sp") &&
             (!argCont(pl->line + 4, "hl") || !!strcmp(what, "zf") && !!strcmp(what, "sf") && !!strcmp(what, "pf")));
 
+  // pop af writes
   if(ISINST(pl->line, "pop"))
-    return (!argCont(pl->line + 4, "af"));
+    return (argCont(pl->line + 4, "af"));
 
   // according to calling convention caller has to save flags
   if(ISINST(pl->line, "ret") ||

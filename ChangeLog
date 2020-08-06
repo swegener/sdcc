@@ -1,7 +1,12 @@
+2020-08-06 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peep.c:
+	  Fix pop af handling for notUsed('f').
+
 2020-08-06 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peep.c:
-	  Enable "sp" and flags for notUsed peephole contraint for all Z80
+	  Enable "sp" and flags for notUsed peephole constraint for all Z80
 	  ports.
 
 2020-08-06 Philipp Klaus Krause <pkk AT spth.de>
@@ -12,7 +17,7 @@
 	* support/regression/tests/bug-2363.c:
 	  Redisable test for targets without enough memory.
 
-2020-08-05 'basxto' Riedel <sdcc@basxto.de>
+2020-08-05 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peep.c:
 	  Fix notUsed('f') for jr/jp (Bug #3095)
@@ -153,6 +158,7 @@
 	  src/z80/main.c,
 	  src/z80/mappings.i:
 	  Fix rgdbs asm generation for gbz80.
+	  Original fix by toxa.
 
 2020-07-25 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 

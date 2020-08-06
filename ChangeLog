@@ -1,3 +1,9 @@
+2020-08-06 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCutil.c,
+	  support/regression/tests/p99-conformance.c:
+	  Fix handling of digits 8 and 9 in universal character names.
+
 2020-08-05 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peep.c:

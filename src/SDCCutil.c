@@ -839,7 +839,7 @@ hexEscape (const char **src)
 
 /*------------------------------------------------------------------*/
 /* universalEscape - process an hex constant of exactly four digits */
-/* return the hex value, throw a warning for illegal octal          */
+/* return the hex value, throw an error warning for invalid hex     */
 /* adjust src to point at the last proccesed char                   */
 /*------------------------------------------------------------------*/
 
@@ -859,14 +859,14 @@ universalEscape (const char **str, unsigned int n)
 
   for (digits = 0; digits < n; ++digits)
     {
-      if (**str >= '0' && **str <= '7')
+      if (**str >= '0' && **str <= '9')
         {
           value = (value << 4) + (**str - '0');
           ++*str;
         }
-      else if ((**str | 0x20) >= 'a' && (**str | 0x20) <= 'f')
+      else if (tolower((unsigned char)(**str)) >= 'a' && (tolower((unsigned char)(**str)) <= 'f'))
         {
-          value = (value << 4) + ((**str | 0x20) - 'a' + 10);
+          value = (value << 4) + (tolower((unsigned char)(**str)) - 'a' + 10);
           ++*str;
         }
       else

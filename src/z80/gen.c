@@ -3496,7 +3496,7 @@ skip_byte:
   if (size)
     {
       a_free = a_dead && (result->regs[A_IDX] < 0 || result->regs[A_IDX] >= roffset + source->size);
-      hl_free = a_dead && (result->regs[L_IDX] < 0 || result->regs[L_IDX] >= roffset + source->size) && (result->regs[H_IDX] < 0 || result->regs[H_IDX] >= roffset + source->size);
+      hl_free = hl_dead && (result->regs[L_IDX] < 0 || result->regs[L_IDX] >= roffset + source->size) && (result->regs[H_IDX] < 0 || result->regs[H_IDX] >= roffset + source->size);
       if (!a_free)
         _push (PAIR_AF);
       genCopyStack (result, roffset, source, soffset, n, assigned, &size, true, hl_free, true);
@@ -11585,6 +11585,8 @@ genAssign (const iCode *ic)
 
   result = IC_RESULT (ic);
   right = IC_RIGHT (ic);
+  
+  const bool hl_dead = isPairDead (PAIR_HL, ic);
 
   /* Dont bother assigning if they are the same */
   if (operandsEqu (IC_RESULT (ic), IC_RIGHT (ic)))
@@ -11845,22 +11847,24 @@ genAssign (const iCode *ic)
               goto release;
             }
         }
-      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_LIT))
+      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
         genMove (result->aop, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic));
       else
         while (size--)
           {
-            /* PENDING: do this check better */
-            if ((IS_GB || IY_RESERVED) && requiresHL (AOP (right)) && requiresHL (AOP (result)))
+            const bool hl_free = hl_dead &&
+              (right->aop->regs[L_IDX] <= offset) && (right->aop->regs[H_IDX] <= offset) &&
+              (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= offset) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= offset);
+            const bool save_hl = !hl_free && ((IS_GB || IY_RESERVED) && (requiresHL (right->aop) || requiresHL (result->aop)));
+
+            if (save_hl)
+              _push (PAIR_HL);
+            cheapMove (result->aop, offset, right->aop, offset, !bitVectBitValue (ic->rSurv, A_IDX));
+            if (save_hl)
               {
-                _push (PAIR_HL);
-                cheapMove (ASMOP_A, 0, AOP (right), offset, true);
-                cheapMove (AOP (result), offset, ASMOP_A, 0, true);
                 _pop (PAIR_HL);
                 spillPair (PAIR_HL);
               }
-            else
-              cheapMove (AOP (result), offset, AOP (right), offset, !bitVectBitValue (ic->rSurv, A_IDX));
             offset++;
           }
     }

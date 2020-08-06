@@ -1199,12 +1199,12 @@ z80canAssign (const char *op1, const char *op2, const char *exotic)
   {
     if(!strcmp(exotic, "ix") || !strcmp(exotic, "iy"))
     {
-      if(isReg(op1))
+      if(isReg(op1) || (IS_EZ80_Z80 && isRegPair(op1)))
         return TRUE;
     }
     else if(!strcmp(op2, "ix") || !strcmp(op2, "iy"))
     {
-      if(isReg(exotic) || exotic[0] == '#')
+      if(isReg(exotic) || exotic[0] == '#' || (IS_EZ80_Z80 && isRegPair(exotic)))
         return TRUE;
     }
 
@@ -1220,9 +1220,9 @@ z80canAssign (const char *op1, const char *op2, const char *exotic)
     return TRUE;
 
   // Same if at most one of them is (hl).
-  if(isReg(dst) && !strcmp(src, "(hl)"))
+  if((isReg(dst) || (IS_EZ80_Z80 && isRegPair(dst))) && !strcmp(src, "(hl)"))
     return TRUE;
-  if(!strcmp(dst, "(hl)") && isReg(src))
+  if(!strcmp(dst, "(hl)") && (isReg(src) || (IS_EZ80_Z80 && isRegPair(src))))
     return TRUE;
 
   // Can assign between a and (bc), (de), (hl+), (hl-)

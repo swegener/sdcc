@@ -1,3 +1,9 @@
+2020-08-06 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peep.c:
+	  canAssign now return true for (IX)/(IY)/(HL) with any register
+	  pair for eZ80_Z80 port.
+
 2020-08-06 Sebastian 'basxto' Riedel <sdcc@basxto.de>
 
 	* src/z80/peep.c:

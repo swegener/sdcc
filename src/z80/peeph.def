@@ -1917,6 +1917,68 @@ replace restart {
 	; common peephole 177 replace pushed register pair
 } if notUsed('a'), canJoinRegs(%1 '' %2), canSplitReg(%2 %3), same(%3 %1)
 
+// Removing dead instructions that alter flags also test for bug #3095
+
+replace {
+	xor	a, %1
+} by {
+	; common peephole 180 removed dead xor a
+} if notUsed('af')
+
+replace {
+	inc	%1
+} by {
+	; common peephole 181 removed dead inc %1
+} if notUsed(%1), notUsed('f'), notSame(%1 '(hl)')
+
+replace {
+	dec	%1
+} by {
+	; common peephole 182 removed dead dec %1
+} if notUsed(%1), notUsed('f'), notSame(%1 '(hl)')
+
+replace {
+	sub	a, %1
+} by {
+	; common peephole 183 removed dead sub a, %1
+} if notUsed('af')
+
+replace {
+	sbc	a, %1
+} by {
+	; common peephole 184 removed dead sbc a, %1
+} if notUsed('af')
+
+replace {
+	cp	a, %1
+} by {
+	; common peephole 185 removed dead cp a, %1
+} if  notUsed('f')
+
+replace {
+	and	a, %1
+} by {
+	; common peephole 186 removed dead and a, %1
+} if notUsed('af')
+
+replace {
+	or	a, %1
+} by {
+	; common peephole 187 removed dead and a, %1
+} if notUsed('af')
+
+replace {
+	add	a, %1
+} by {
+	; common peephole 188 removed dead add a, %1
+} if notUsed('af')
+
+replace {
+	adc	a, %1
+} by {
+	; common peephole 189 removed dead adc a, %1
+} if notUsed('af')
+
 barrier
 
 //next rules optimize code after the call
@@ -1927,7 +1989,7 @@ replace restart {
 	ld	%2 (%3), %4
 } by {
 	inc	sp
-	; common peephole 178: move pop instruction after resister store
+	; common peephole 190: move pop instruction after resister store
 	ld	%2 (%3), %4
 	pop	%1
 } if notSame(%1 %3 %4), operandsNotRelated(%1 %4)
@@ -1936,7 +1998,7 @@ replace restart {
 	inc	sp
 	ld	%1 (%2), %3
 } by {
-	; common peephole 179a: move register store before stack restore
+	; common peephole 191a: move register store before stack restore
 	ld	%1 (%2), %3
 	inc	sp
 } if notSame(%2 'sp')
@@ -1946,7 +2008,7 @@ replace restart {
 	pop	%1
 	ld	%2, %3
 } by {
-	; common peephole 179b: move register to register copy before SP increment
+	; common peephole 191b: move register to register copy before SP increment
 	ld	%2, %3
 	inc	sp
 	pop	%1
@@ -1956,7 +2018,7 @@ replace restart {
 	inc	sp
 	ld	%1, %2
 } by {
-	; common peephole 179c: move register store before stack restore
+	; common peephole 191c: move register store before stack restore
 	ld	%1, %2
 	inc	sp
 } if notUsed('hl'), same(%2 'h' 'l' 'sp'), notSame(%1 'h' 'l' 'sp')
@@ -1967,7 +2029,7 @@ replace restart {
 	add	%3, sp
 	ld	sp, %3
 } by {
-	; common peephole 180: increase SP by addition
+	; common peephole 192: increase SP by addition
 	ld	%3, #%2
 	add	%3, sp
 	ld	sp, %3
@@ -1980,7 +2042,7 @@ replace restart {
 	inc	sp
 	inc	sp
 } by {
-	; common peephole 181: increase SP by addition
+	; common peephole 193: increase SP by addition
 	ld	hl, #5
 	add	hl, sp
 	ld	sp, hl
@@ -2000,7 +2062,7 @@ replace restart {
 	sbc	a, #0x00
 	%5	C, %6
 } by {
-	; common peephole 182-1: symplify 32-bit compare for 8 bit values
+	; common peephole 194-1: symplify 32-bit compare for 8 bit values
 	ld	a, %2
 	or	a, %3
 	or	a, %4
@@ -2022,7 +2084,7 @@ replace restart {
 	sbc	a, #0x00
 	%5	C, %6
 } by {
-	; common peephole 182-2: symplify 32-bit compare for 16 bit values
+	; common peephole 194-2: symplify 32-bit compare for 16 bit values
 	ld	a, %3
 	or	a, %4
 	jp	NZ, %9
@@ -2039,7 +2101,7 @@ replace restart {
 	cp	a, %1
 	%2	NC, %3
 } by {
-	; common peephole 183-1: remove always true check
+	; common peephole 195-1: remove always true check
 } if same(%2 'jr' 'jp' 'call'), notUsed('a'), labelRefCountChange(%3 -1)
 
 replace restart {
@@ -2049,7 +2111,7 @@ replace restart {
 	sbc	a, %2
 	%3	NC, %4
 } by {
-	; common peephole 183-2: remove always true check
+	; common peephole 195-2: remove always true check
 } if same(%3 'jr' 'jp' 'call'), notUsed('a'), labelRefCountChange(%4 -1)
 
 // These ex-generating rules should be among the last ones since ex counts as a read from both hl and de for notUsed().

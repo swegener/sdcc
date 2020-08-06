@@ -1,3 +1,9 @@
+2020-08-06 Sebastian 'basxto' Riedel <sdcc@basxto.de>
+
+	* src/z80/peeph-gbz80.def,
+	  src/z80/peeph.def:
+	  Use flag rules for all z80 ports.
+
 2020-08-06 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peep.c:

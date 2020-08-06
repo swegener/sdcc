@@ -1,3 +1,9 @@
+2020-08-06 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peep.c:
+	  Enable "sp" and flags for notUsed peephole contraint for all Z80
+	  ports.
+
 2020-08-06 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCutil.c,

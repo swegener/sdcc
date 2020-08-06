@@ -1132,11 +1132,7 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
           return(z80notUsed("iyl", endPl, head) && z80notUsed("iyh", endPl, head));
         }
       if(strcmp(what, "ix") == 0)
-        {
-          if(IY_RESERVED)
-            return FALSE;
-          return(z80notUsed("ixl", endPl, head) && z80notUsed("ixh", endPl, head));
-        }
+        return(z80notUsed("ixl", endPl, head) && z80notUsed("ixh", endPl, head));
       return(z80notUsed(low, endPl, head) && z80notUsed(high, endPl, head));
     }
 
@@ -1160,9 +1156,9 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
       return true;
     }
 
-  // enable sp and flags only for GBZ80
+  // enable sp and flags
   if(!isReg(what) && !isUReg(what) &&
-     !(IS_GB && (!strcmp(what, "sp") || !strcmp(what+1, "f"))))
+     !(!strcmp(what, "sp") || !strcmp(what+1, "f")))
     return FALSE;
 
   _G.head = head;

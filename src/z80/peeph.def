@@ -29,10 +29,10 @@ replace restart {
 } if notVolatile(%1), notUsed(%1), notVolatile(%2), notSame(%1 '(hl+)' '(hl-)'), notSame(%2 '(hl+)' '(hl-)')
 
 replace restart {
-	add	ix,sp
+	add	%1, sp
 } by {
 	; common peephole 2 removed dead frame pointer setup.
-} if notUsed('ix')
+} if notUsed(%1)
 
 replace restart {
 	ld	%1, %2 + %3
@@ -42,43 +42,59 @@ replace restart {
 // Should probably check for notVolatile(%2), too, but gives many false positives and no regression tests fail.
 
 replace restart {
-	ld	%1, (iy)
+	ld	%1, (%2)
 } by {
-	ld	%1, 0 (iy)
-	; common peephole 4 made 0 offset explicit.
-}
+	ld	%1, 0 (%2)
+	; common peephole 4a made 0 offset explicit.
+} if same(%2 'ix' 'iy')
 
 replace restart {
-	ld	(iy), %1
+	ld	(%1), %2
 } by {
-	ld	0 (iy), %1
-	; common peephole 5 made 0 offset explicit.
-}
+	ld	0 (%1), %2
+	; common peephole 4b made 0 offset explicit.
+} if same(%1 'ix' 'iy')
+
+//remove dead INC/DEC instructions on 16-bit registers
+replace restart {
+	%1	%2
+} by {
+	; common peephole 5 removed dead %1 %2.
+} if same(%1 'inc' 'dec'), same(%2 'bc' 'de' 'hl' 'sp' 'ix' 'iy'), notUsed(%2)
+
+//remove dead INC/DEC instructions on 8-bit registers
+replace restart {
+	%1	%2
+} by {
+	; common peephole 6a removed dead %1 %2
+} if same(%1 'inc' 'dec'), same(%2 'a' 'b' 'c' 'd' 'e' 'h' 'l' 'ixh' 'ixl' 'iyh' 'iyl'), notUsed(%2 'f')
+
+//remove dead ALU instructions on 8-bit register
+replace restart {
+	%1	a, %2
+} by {
+	; common peephole 6b removed dead %1 a, %2
+} if same(%1 'sub' 'sbc' 'add' 'adc' 'and' 'or' 'xor'), notUsed('af')
+
+//remove dead CP instructions
+replace restart {
+	cp	a, %1
+} by {
+	; common peephole 6c removed dead cp a, %1
+} if notUsed('f')
 
 replace restart {
-	inc	hl
+	%1	%2
 } by {
-	; common peephole 5a removed dead increment of hl.
-} if notUsed('hl')
+	; common peephole 6d removed dead %1 %2
+} if same(%1 'rlc' 'rl' 'rrc' 'rr' 'sla' 'sra' 'srl' 'sll' 'sli'), notVolatile(%2), notUsed(%2 'f')
 
 replace restart {
-	dec	hl
+	ld	%1, %2 (%3)
 } by {
-	; common peephole 6 removed dead decrement of hl.
-} if notUsed('hl')
-
-replace restart {
-	ld	%1, %2 (iy)
-} by {
-	; common peephole 7 removed dead load from %2 (iy) into %1.
-} if notUsed(%1)
+	; common peephole 7 removed dead load from %2 (%3) into %1.
+} if notUsed(%1), same(%3 'ix' 'iy')
 // Should probably check for notVolatile(), but gives many false positives and no regression tests fail.
-
-replace restart {
-	ld	%1, %2 (ix)
-} by {
-	; common peephole 8 removed dead load from %2 (ix) into %1.
-} if notUsed(%1)
 
 replace restart {
 	ld	%1, %2
@@ -208,73 +224,62 @@ replace restart {
 
 replace restart {
 	ld	a, %1 (%2)
-	srl	a
+	%3	a
 	ld	%1 (%2), a
 } by {
-	srl	%1 (%2)
+	%3	%1 (%2)
 	ld	a, %1 (%2)
 	; common peephole 21 shifted in (%2) instead of a.
-}
+} if same(%3 'srl' 'sla' 'rl' 'rr' 'rlc' 'rrc' 'sll')
 
 replace restart {
 	ld	%1,(hl)
 	ld	a,%2 (%3)
-	sub	a,%1
+	%4	a,%1
 } by {
 	ld	a,%2 (%3)
-	; common peephole 22 used (hl) in sub directly instead of going through %1.
-	sub	a,(hl)
-} if notVolatile(%1), notUsed(%1)
+	; common peephole 22 used (hl) in %4 directly instead of going through %1.
+	%4	a,(hl)
+} if notVolatile(%1), notUsed(%1), same(%4 'add' 'adc' 'sub' 'sbc' 'and' 'or' 'xor')
 
 replace restart {
-	ld	l,c
-	ld	h,b
-	ld	a,(hl)
+	ld	l, %1
+	ld	h, %2
+	ld	a, (hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
+	ld	h, (hl)
+	ld	l, a
 } by {
-	ld	a,(bc)
-	ld	l,a
-	inc	bc
-	ld	a,(bc)
-	ld	h,a
-	; common peephole 22a optimize 16-bit load from BC.
-} if notUsed('bc'), notUsed('a')
+	ld	a, (%3)
+	ld	l, a
+	inc	%3
+	ld	a, (%3)
+	ld	h, a
+	; common peephole 23 optimize 16-bit load from %3.
+} if canJoinRegs(%2 %1 %3), notUsed(%3 'a')
 
 replace restart {
-	inc	bc
-	ld	l,c
-	ld	h,b
+	inc	%1
+	ld	l, %2
+	ld	h, %3
 } by {
-	ld	l,c
-	ld	h,b
-	; common peephole 23 incremented in hl instead of bc.
+	ld	l, %2
+	ld	h, %3
+	; common peephole 24 incremented in hl instead of %1.
 	inc	hl
-} if notUsed('bc')
+} if canJoinRegs(%3 %2 %4), same(%1 %4), notUsed(%1)
 
 replace restart {
-	inc	de
-	ld	l,e
-	ld	h,d
+	ld	%1, l
+	ld	%2, h
+	ld	a, #%3
+	ld	(%4), a
 } by {
-	ld	l,e
-	ld	h,d
-	; common peephole 24 incremented in hl instead of de.
-	inc	hl
-} if notUsed('de')
-
-replace restart {
-	ld	c,l
-	ld	b,h
-	ld	a,#%1
-	ld	(bc),a
-} by {
-	ld	c,l
-	ld	b,h
-	ld	(hl),#%1
-	; common peephole 25 loaded #%1 into (hl) instead of (bc).
-} if notUsed('a')
+	ld	%1, l
+	ld	%2, h
+	ld	(hl), #%3
+	; common peephole 25 loaded #%1 into (hl) instead of (%4).
+} if canJoinRegs(%2 %1 %5), same(%4 %5), notUsed('a')
 
 replace restart {
 	ex	de, hl
@@ -282,7 +287,7 @@ replace restart {
 } by {
 	; common peephole 26 pushed hl directly instead of going through de.
 	push	hl
-} if notUsed('de'), notUsed('hl')
+} if notUsed('de' 'hl')
 
 replace restart {
 	ld	l,%1
@@ -292,76 +297,67 @@ replace restart {
 	; common peephole 27 pushed de instead of hl removing a load.
 	ld	e,%1
 	push	de
-} if notUsed('hl'), notUsed('e')
+} if notUsed('hl' 'e')
 
 replace restart {
 	ex	de, hl
-	push	bc
+	push	%1
 	push	de
 } by {
 	; common peephole 28 pushed hl directly instead of going through de.
-	push	bc
-	push	hl
-} if notUsed('de'), notUsed('hl')
-
-replace restart {
-	ld	l,c
-	ld	h,b
-	push	hl
-} by {
-	; common peephole 29 pushed bc directly instead of going through hl.
-	push	bc
-} if notUsed('hl')
-
-replace restart {
-	ld	c,l
-	ld	b,h
-	push	%1
-	push	bc
-} by {
-	; common peephole 30 pushed hl directly instead of going through bc.
 	push	%1
 	push	hl
-} if notUsed('bc'), notSame(%1 'bc')
+} if notSame(%1 'hl' 'de'), notUsed('de' 'hl')
 
 replace restart {
-	pop	de
-	ld	l, e
-	ld	h, d
+	ld	%4,%1
+	ld	%5,%2
+	push	%6
 } by {
-	; common peephole 31 popped hl directly instead of going through de.
-	pop	hl
-} if notUsed('de')
+	; common peephole 29 pushed %3 directly instead of going through hl.
+	push	%3
+} if canJoinRegs(%2 %1 %3), canJoinRegs(%5 %4 %7), same(%7 %6), notUsed(%6)
 
 replace restart {
-	pop	bc
-	ld	l, c
-	ld	h, b
+	ld	%2,%5
+	ld	%3,%6
+	push	%1
+	push	%4
 } by {
-	; common peephole 32 popped hl directly instead of going through bc.
-	pop	hl
-} if notUsed('bc')
+	; common peephole 30 pushed %7 directly instead of going through %4.
+	push	%1
+	push	%7
+} if canJoinRegs(%3 %2 %5), same(%5 %4), canJoinRegs(%6 %5 %7), notSame(%1 %4), notUsed(%4)
 
 replace restart {
-	ld	%1 (ix), %2
-	ld	%3, %1 (ix)
+	pop	%1
+	ld	%2, %3
+	ld	%4, %5
 } by {
-	; common peephole 33 loaded %3 from %2 instead of going through %1 (ix).
-	ld	%1 (ix), %2
+	; common peephole 31 popped %6 directly instead of going through %1.
+	pop	%6
+} if canJoinRegs(%4 %2 %6), canJoinRegs(%5 %3 %7), same(%7 %1), notUsed(%1)
+
+replace restart {
+	ld	%1 (%4), %2
+	ld	%3, %1 (%4)
+} by {
+	; common peephole 33 loaded %3 from %2 instead of going through %1 (%4).
+	ld	%1 (%4), %2
 	ld	%3, %2
-} if canAssign(%3 %2)
+} if same(%4 'ix' 'iy'), canAssign(%3 %2)
 // Don't need to check for volatile, since ix is used for the stack.
 
 replace restart {
-	ld	%1 (ix), a
-	push	de
-	ld	%2, %1 (ix)
+	ld	%1 (%3), a
+	push	%4
+	ld	%2, %1 (%3)
 } by {
-	ld	%1 (ix), a
-	push	de
-	; common peephole 34 loaded %2 from a instead of %1 (ix)
+	ld	%1 (%3), a
+	push	%4
+	; common peephole 34 loaded %2 from a instead of %1 (%3)
 	ld	%2, a
-} if canAssign(%2 'a')
+} if same(%3 'ix' 'iy'), canAssign(%2 'a')
 
 replace restart {
 	push	af
@@ -391,48 +387,26 @@ replace restart {
 replace restart {
 	push	af
 	inc	sp
-	ld	a,#%1
+	ld	a, #%1
 	push	af
 	inc	sp
 } by {
 	; common peephole 37 pushed bc instead of pushing a twice.
-	ld	b,a
-	ld	c,#%1
-	push	bc
-} if notUsed('bc')
+	ld	%2, a
+	ld	%3, #%1
+	push	%4
+} if unusedReg(%4 'bc' 'de' 'hl'), canSplitReg(%4 %2 %3)
 
 replace restart {
-	push	hl
+	push	%1
 	inc	sp
-	push	de
-	inc	sp
-} by {
-	ld	l, d
-	; common peephole 38 combined pushing of h and d.
-	push	hl
-} if notUsed('l')
-
-replace restart {
-	push	bc
-	inc	sp
-	push	de
+	push	%2
 	inc	sp
 } by {
-	ld	c, d
-	; common peephole 39 combined pushing of b and d.
-	push	bc
-} if notUsed('c')
-
-replace restart {
-	push	de
-	inc	sp
-	push	bc
-	inc	sp
-} by {
-	ld	e, b
-	; common peephole 41 combined pushing of d and b.
-	push	de
-} if notUsed('e')
+	ld	%4, %5
+	; common peephole 38 combined pushing of %3 and %5.
+	push	%1
+} if canSplitReg(%1 %3 %4), canSplitReg(%2 %5), notUsed(%4)
 
 replace restart {
 	push	af
@@ -447,46 +421,30 @@ replace restart {
 } if notUsed('b'), notUsed('a')
 
 replace restart {
-	push	de
+	push	%1
 	inc	sp
-	ld	a, c
+	ld	a, %2
 	push	af
 	inc	sp
 } by {
-	ld	e, c
-	; common peephole 43 combined pushing of d and c.
-	push	de
-} if notUsed('e'), notUsed('a')
+	ld	%4, %2
+	; common peephole 43 combined pushing of %3 and %2.
+	push	%1
+} if notSame(%1 'iy'), canSplitReg(%1 %3 %4), canAssign(%4 %2), notUsed(%4 'a')
 
 replace restart {
-	ld	a, e
+	ld	a, %1
 	push	af
 	inc	sp
-	ld	a, %2 (ix)
+	ld	a, %2 (%3)
 	push	af
 	inc	sp
 } by {
-	ld	d, e
-	ld	e, %2 (ix)
-	; common peephole 44 combined pushing of e and %2 (ix).
-	push	de
-} if notUsed('d'), notUsed('e'), notUsed('a')
-
-replace restart {
-	ld	a,#%1
-	ld	d,a
-} by {
-	; common peephole 45 loaded #%1 into d directly instead of going through a.
-	ld	d,#%1
-} if notUsed('a')
-
-replace restart {
-	ld	%1,a
-	ld	%2,%1
-} by {
-	; common peephole 46 loaded %2 from a directly instead of going through %1.
-	ld	%2,a
-} if notUsed(%1)
+	ld	%4, %1
+	ld	%5, %2 (%3)
+	; common peephole 44 combined pushing of %1 and %2 (%3).
+	push	%6
+} if unusedReg(%6 'bc' 'de' 'hl'), canSplitReg(%6 %4 %5), notUsed('a')
 
 replace restart {
 	ld	a, %1 (%3)
@@ -496,20 +454,20 @@ replace restart {
 	push	af
 	inc	sp
 } by {
-	; common peephole 47 pushed %1 (%3), %2 (%3) through hl instead of af.
-	ld	h, %1 (%3)
-	ld	l, %2 (%3)
-	push	hl
-} if notUsed('a'), notUsed('hl')
+	; common peephole 47 pushed %1 (%3), %2 (%3) through %6 instead of af.
+	ld	%4, %1 (%3)
+	ld	%5, %2 (%3)
+	push	%6
+} if unusedReg(%6 'bc' 'de' 'hl'), canSplitReg(%6 %4 %5), notUsed('a')
 
 replace restart {
-	ld	c, l
-	ld	b, h
-	push	bc
+	ld	%1, %4
+	ld	%2, %5
+	push	%3
 } by {
-	; common peephole 48 pushed hl instead of bc.
-	push	hl
-} if notUsed('bc')
+	; common peephole 48 pushed %6 instead of %3.
+	push	%6
+} if canJoinRegs(%2 %1 %7), same(%3 %7), canJoinRegs(%5 %4 %6), notUsed(%3)
 
 replace restart {
 	ld	a, (hl)
@@ -518,39 +476,21 @@ replace restart {
 	ld	l, a
 	push	hl
 } by {
-	; common peephole 49 pushed bc instead of hl.
-	ld	c, (hl)
+	; common peephole 49 pushed %3 instead of hl.
+	ld	%1, (hl)
 	inc	hl
-	ld	b, (hl)
-	push	bc
-} if notUsed('bc'), notUsed('hl')
+	ld	%2, (hl)
+	push	%3
+} if unusedReg(%3 'de' 'bc'), canSplitReg(%3 %2 %1), notUsed('hl')
 
 replace restart {
-	ld	iy, %1
-	push	iy
+	ld	%3, %1
+	push	%3
 } by {
-	ld	hl, %1
-	push	hl
-	; common peephole 49a pushed hl instead of iy.
-} if notUsed('iy'), notUsed('hl')
-
-replace restart {
-	ld	iy, %1
-	push	iy
-} by {
-	ld	de, %1
-	push	de
-	; common peephole 49b pushed de instead of iy.
-} if notUsed('iy'), notUsed('de')
-
-replace restart {
-	ld	iy, %1
-	push	iy
-} by {
-	ld	bc, %1
-	push	bc
-	; common peephole 49c pushed bc instead of iy.
-} if notUsed('iy'), notUsed('bc')
+	; common peephole 49a pushed %2 instead of %3.
+	ld	%2, %1
+	push	%2
+} if same(%3 'ix' 'iy'), notUsed(%3), unusedReg(%2 'bc' 'de' 'hl')
 
 replace restart {
 	pop	%1
@@ -569,30 +509,21 @@ replace restart {
 } if notUsed(%1), operandsNotRelated(%1 %3)
 
 replace restart {
-	push	hl
-	pop	bc
+	push	%1
+	pop	%2
 } by {
-	ld	c, l
-	ld	b, h
+	ld	%6, %4
+	ld	%5, %3
 	; common peephole 52 replaced push/pop pair by loads.
-} if notUsed('hl')
-
-replace restart {
-	push	hl
-	pop	de
-} by {
-	ld	e, l
-	ld	d, h
-	; common peephole 53 replaced push/pop pair by loads.
-} if notUsed('hl')
+} if canSplitReg(%1 %3 %4), canSplitReg(%2 %5 %6), notSame(%1 %2 'ix' 'iy'), notUsed(%1)
 
 replace restart {
 	ld	iy,#%1
-	or	a,%2 (iy)
+	%3	a, %2 (iy)
 } by {
 	; common peephole 54 used hl instead of iy.
 	ld	hl,#%1 + %2
-	or	a,(hl)
+	%3	a, (hl)
 } if notUsed('iy'), notUsed('hl')
 
 replace restart {
@@ -1916,68 +1847,6 @@ replace restart {
 	push	%2
 	; common peephole 177 replace pushed register pair
 } if notUsed('a'), canJoinRegs(%1 '' %2), canSplitReg(%2 %3), same(%3 %1)
-
-// Removing dead instructions that alter flags also test for bug #3095
-
-replace {
-	xor	a, %1
-} by {
-	; common peephole 180 removed dead xor a
-} if notUsed('af')
-
-replace {
-	inc	%1
-} by {
-	; common peephole 181 removed dead inc %1
-} if notUsed(%1), notUsed('f'), notSame(%1 '(hl)')
-
-replace {
-	dec	%1
-} by {
-	; common peephole 182 removed dead dec %1
-} if notUsed(%1), notUsed('f'), notSame(%1 '(hl)')
-
-replace {
-	sub	a, %1
-} by {
-	; common peephole 183 removed dead sub a, %1
-} if notUsed('af')
-
-replace {
-	sbc	a, %1
-} by {
-	; common peephole 184 removed dead sbc a, %1
-} if notUsed('af')
-
-replace {
-	cp	a, %1
-} by {
-	; common peephole 185 removed dead cp a, %1
-} if  notUsed('f')
-
-replace {
-	and	a, %1
-} by {
-	; common peephole 186 removed dead and a, %1
-} if notUsed('af')
-
-replace {
-	or	a, %1
-} by {
-	; common peephole 187 removed dead and a, %1
-} if notUsed('af')
-
-replace {
-	add	a, %1
-} by {
-	; common peephole 188 removed dead add a, %1
-} if notUsed('af')
-
-replace {
-	adc	a, %1
-} by {
-	; common peephole 189 removed dead adc a, %1
-} if notUsed('af')
 
 barrier
 

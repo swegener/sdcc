@@ -274,7 +274,8 @@ z80MightBeParmInCallFromCurrentFunction(const char *what)
 
 /* Check if the flag implies reading what. */
 static bool
-z80MightReadFlagCondition(const char *cond, const char *what){
+z80MightReadFlagCondition(const char *cond, const char *what)
+{
   while(isspace (*cond))
     cond++;
 
@@ -294,7 +295,6 @@ z80MightReadFlagCondition(const char *cond, const char *what){
   return true;
 }
 
-// TODO: lacks ex support for z80 etc.
 static bool
 z80MightReadFlag(const lineNode *pl, const char *what)
 {
@@ -352,24 +352,29 @@ z80MightReadFlag(const lineNode *pl, const char *what)
      (ISINST(pl->line, "stop") ||
       ISINST(pl->line, "ldh")))
     return false;
-    
+
   if((IS_GB || IS_Z80N) &&
-    ISINST(pl->line, "swap"))
+      ISINST(pl->line, "swap"))
     return false;
 
   if(ISINST(pl->line, "rl") ||
-     ISINST(pl->line, "rr"))
-    return !strcmp(what, "cf");
-  if(ISINST(pl->line, "rla") ||
+     ISINST(pl->line, "rr") ||
+     ISINST(pl->line, "rla") ||
      ISINST(pl->line, "rra") ||
      ISINST(pl->line, "sbc") ||
      ISINST(pl->line, "adc") ||
      ISINST(pl->line, "ccf"))
-    return !strcmp(what, "cf");
+    return (!strcmp(what, "cf"));
+
   if(ISINST(pl->line, "daa"))
-    return (!strcmp(what, "nf") || !strcmp(what, "hf") );
+    return (!strcmp(what, "cf") || !strcmp(what, "nf") ||
+            !strcmp(what, "hf"));
+
   if(ISINST(pl->line, "push"))
     return (argCont(pl->line + 4, "af"));
+
+  if(ISINST(pl->line, "ex"))
+    return (argCont(pl->line + 2, "af"));
 
   // catch c, nc, z, nz, po, pe, p and m
   if(ISINST(pl->line, "jp") ||
@@ -383,12 +388,14 @@ z80MightReadFlag(const lineNode *pl, const char *what)
 
   if(ISINST(pl->line, "call"))
     return (strchr(pl->line, ',') && z80MightReadFlagCondition(pl->line + 4, what));
+
   if(ISINST(pl->line, "ret"))
-    return (pl->line[4] != '\0' && z80MightReadFlagCondition(pl->line + 3, what));
+    return (pl->line[3] == '\t' && z80MightReadFlagCondition(pl->line + 3, what));
+
   // we don't know anything about this
   if(ISINST(pl->line, "rst"))
     return true;
-    
+
   if (IS_GB && ISINST(pl->line, "ldhl"))
     return false;
 
@@ -711,6 +718,20 @@ z80CondJump(const lineNode *pl)
 static bool
 z80SurelyWritesFlag(const lineNode *pl, const char *what)
 {
+  /* LD instruction is never change flags except LD A,I and LD A,R.
+    But it is most popular instruction so place it first */
+  if(ISINST(pl->line, "ld"))
+    {
+      if(IS_GB || IS_RAB || !!strcmp(what, "pf") ||
+          !argCont(pl->line+3, "a"))
+        return false;
+      const char *p = strchr(pl->line+4, ',');
+      if (p == NULL)
+        return false; /* unknown instruction */
+      ++p;
+      return argCont(p, "i") || argCont(p, "r");
+    }
+
   if(ISINST(pl->line, "rlca") ||
      ISINST(pl->line, "rrca") ||
      ISINST(pl->line, "rra")  ||
@@ -730,6 +751,7 @@ z80SurelyWritesFlag(const lineNode *pl, const char *what)
      ISINST(pl->line, "srl") ||
      ISINST(pl->line, "neg"))
     return true;
+
   if(ISINST(pl->line, "or") ||
      ISINST(pl->line, "cp") ||
      ISINST(pl->line, "rl") ||
@@ -743,6 +765,7 @@ z80SurelyWritesFlag(const lineNode *pl, const char *what)
      ISINST(pl->line, "ini") ||
      ISINST(pl->line, "rrd"))
     return (!!strcmp(what, "cf"));
+
   if(ISINST(pl->line, "cpdr") ||
      ISINST(pl->line, "cpir") ||
      ISINST(pl->line, "indr") ||
@@ -769,8 +792,8 @@ z80SurelyWritesFlag(const lineNode *pl, const char *what)
     return (!!strcmp(what, "cf"));
 
   if(ISINST(pl->line, "add"))
-    return (!argCont(pl->line + 4, "sp") &&
-            (!argCont(pl->line + 4, "hl") || !!strcmp(what, "zf") && !!strcmp(what, "sf") && !!strcmp(what, "pf")));
+    return (argCont(pl->line + 4, "a") ||
+           (!!strcmp(what, "zf") && !!strcmp(what, "sf") && !!strcmp(what, "pf")));
 
   // pop af writes
   if(ISINST(pl->line, "pop"))
@@ -786,6 +809,12 @@ z80SurelyWritesFlag(const lineNode *pl, const char *what)
       ISINST(pl->line, "ldhl") ||
       ISINST(pl->line, "lda")))
     return true;
+
+  /* handle IN0 r,(n) and IN r,(c) instructions */
+  if(ISINST(pl->line, "in0") || (!strncmp(pl->line, "in\t", 3) &&
+     (!strcmp(pl->line+5, "(c)") || !strcmp(pl->line+5, "(bc)"))))
+    return (!!strcmp(what, "cf"));
+
   return false;
 }
 
@@ -934,6 +963,7 @@ static S4O_RET
 scan4op (lineNode **pl, const char *what, const char *untilOp,
          lineNode **plCond)
 {
+  bool isFlag = (strlen(what) == 2 && what[1] == 'f');
   for (; *pl; *pl = (*pl)->next)
     {
       if (!(*pl)->line || (*pl)->isDebug || (*pl)->isComment || (*pl)->isLabel)
@@ -955,9 +985,7 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
 
       (*pl)->visited = TRUE;
 
-      if(!strcmp(what, "sf") || !strcmp(what, "zf") ||
-         !strcmp(what, "hf") || !strcmp(what, "pf") ||
-         !strcmp(what, "nf") || !strcmp(what, "cf"))
+      if(isFlag)
         {
         if(z80MightReadFlag(*pl, what))
           {
@@ -995,9 +1023,7 @@ scan4op (lineNode **pl, const char *what, const char *untilOp,
           return S4O_CONDJMP;
         }
 
-      if(!strcmp(what, "sf") || !strcmp(what, "zf") ||
-         !strcmp(what, "hf") || !strcmp(what, "pf") ||
-         !strcmp(what, "nf") || !strcmp(what, "cf"))
+      if(isFlag)
         {
         if(z80SurelyWritesFlag(*pl, what))
           {
@@ -1118,36 +1144,42 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
 {
   lineNode *pl;
   D(("Checking for %s\n", what));
-  // canAssign uses isRegPair too
-  if(isRegPair(what) || !strcmp(what, "af"))
+
+  if(strcmp(what, "af") == 0)
+    {
+      if(!z80notUsed("a", endPl, head))
+        return FALSE;
+      what++;
+    }
+
+  if(strcmp(what, "f") == 0)
+    return z80notUsed("zf", endPl, head) && z80notUsed("cf", endPl, head) &&
+           z80notUsed("sf", endPl, head) && z80notUsed("pf", endPl, head) &&
+           z80notUsed("nf", endPl, head) && z80notUsed("hf", endPl, head);
+
+  if(strcmp(what, "iy") == 0)
+    {
+      if(IY_RESERVED)
+        return FALSE;
+      return(z80notUsed("iyl", endPl, head) && z80notUsed("iyh", endPl, head));
+    }
+
+  if(strcmp(what, "ix") == 0)
+    return(z80notUsed("ixl", endPl, head) && z80notUsed("ixh", endPl, head));
+
+  if(isRegPair(what))
     {
       char low[2], high[2];
       low[0] = what[1];
       high[0] = what[0];
       low[1] = 0;
       high[1] = 0;
-      if(strcmp(what, "iy") == 0)
-        {
-          if(IY_RESERVED)
-            return FALSE;
-          return(z80notUsed("iyl", endPl, head) && z80notUsed("iyh", endPl, head));
-        }
-      if(strcmp(what, "ix") == 0)
-        return(z80notUsed("ixl", endPl, head) && z80notUsed("ixh", endPl, head));
       return(z80notUsed(low, endPl, head) && z80notUsed(high, endPl, head));
     }
 
-  if(!strcmp(what, "f"))
-    return(z80notUsed("sf", endPl, head) &&
-           z80notUsed("zf", endPl, head) &&
-           z80notUsed("hf", endPl, head) &&
-           z80notUsed("pf", endPl, head) &&
-           z80notUsed("nf", endPl, head) &&
-           z80notUsed("cf", endPl, head));
-
-  // P/V are the same flag
-  if(!strcmp(what, "vf"))
-    return(z80notUsed("pf", endPl, head));
+  // P/V and L/V (rarbbits) are the same flag
+  if(!strcmp(what, "vf") || !strcmp(what, "lf"))
+    what = "pf";
 
   // GBZ80 does not use what it does not have
   // but this allows to write rules for all Z80ies
@@ -1159,7 +1191,7 @@ z80notUsed (const char *what, lineNode *endPl, lineNode *head)
 
   // enable sp and flags
   if(!isReg(what) && !isUReg(what) &&
-     !(!strcmp(what, "sp") || !strcmp(what+1, "f")))
+     strcmp(what, "sp") && strcmp(what+1, "f"))
     return FALSE;
 
   _G.head = head;

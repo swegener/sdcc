@@ -1,3 +1,8 @@
+2020-08-10 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peep.c:
+	  Fix always false conditions in code.
+
 2020-08-10 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/ds390/gen.c (aopForRemat): fix regression test bug-2363

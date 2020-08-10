@@ -884,8 +884,6 @@ z80SurelyWrites(const lineNode *pl, const char *what)
     }
   if(strcmp(pl->line, "ret") == 0)
     return true;
-  if(strcmp(pl->line, "ld\tiy")  == 0 && strncmp(what, "iy", 2) == 0)
-    return true;
 
   if (IS_Z180 || IS_EZ80_Z80 || IS_Z80N)
     if (ISINST(pl->line, "mlt"))
@@ -918,7 +916,7 @@ z80SurelyWrites(const lineNode *pl, const char *what)
 static bool
 z80SurelyReturns(const lineNode *pl)
 {
-  if(strcmp(pl->line, "\tret") == 0)
+  if(strcmp(pl->line, "ret") == 0)
     return TRUE;
   return FALSE;
 }

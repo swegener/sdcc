@@ -862,20 +862,18 @@ aopForRemat (symbol * sym)
     }
 
   dbuf_init (&dbuf, 128);
-  if (val)
+  if (IS_ASSIGN_ICODE (ic) && isOperandLiteral (IC_RIGHT (ic)))
+    {
+      val = (val + (int) operandLitValue (IC_RIGHT (ic))) & 0xffffff;
+      dbuf_printf (&dbuf, "0x%06x", val);
+    }
+  else if (val)
     {
       dbuf_printf (&dbuf, "(%s %c 0x%06x)", OP_SYMBOL (IC_LEFT (ic))->rname, val >= 0 ? '+' : '-', abs (val) & 0xffffff);
     }
   else
     {
-      if (IS_ASSIGN_ICODE (ic) && isOperandLiteral (IC_RIGHT (ic)))
-        {
-          dbuf_printf (&dbuf, "0x%06x", (int) operandLitValue (IC_RIGHT (ic)));
-        }
-      else
-        {
-          dbuf_append_str (&dbuf, OP_SYMBOL (IC_LEFT (ic))->rname);
-        }
+      dbuf_append_str (&dbuf, OP_SYMBOL (IC_LEFT (ic))->rname);
     }
 
   aop->aopu.aop_immd.aop_immd1 = dbuf_detach_c_str (&dbuf);

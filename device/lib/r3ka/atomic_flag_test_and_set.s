@@ -31,10 +31,7 @@
 	.globl _atomic_flag_test_and_set
 
 _atomic_flag_test_and_set:
-	pop	de
-	pop	hl
-	push	hl
-	push	de
+	ld	hl, 2 (sp)
 	xor a, a
 	srl	(hl)
 	ccf

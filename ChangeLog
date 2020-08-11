@@ -1,5 +1,11 @@
 2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/r2k/atomic_flag_test_and_set.s,
+	  device/lib/r3ka/atomic_flag_test_and_set.s:
+	  Optimize atomic_flag_test_and_set() for r2k and r3ka.
+
+2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* device/lib/tlcs90/Makefile.in,
 	  device/lib/tlcs90/atomic_flag_test_and_set.s,
 	  device/include/stdatomic.h,

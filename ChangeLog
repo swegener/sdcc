@@ -1,3 +1,8 @@
+2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/peeph.def:
+	  Make some of Z80 common peephole rules more generic.
+
 2020-08-10 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/z80/peep.c:

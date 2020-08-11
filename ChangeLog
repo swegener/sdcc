@@ -1,5 +1,10 @@
 2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* support/regression/tests/bug-2645.c:
+	  Disable warning 154 in regression testsuit.
+
+2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/z80/peeph.def:
 	  Make some of Z80 common peephole rules more generic.
 

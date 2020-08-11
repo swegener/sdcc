@@ -31,12 +31,8 @@
 	.globl _strcpy
 
 _strcpy:
-	pop	bc
-	pop	de
-	pop	hl
-	push	hl
-	push	de
-	push	bc
+	ld	de, 2 (sp)
+	ld	hl, 4 (sp)
 	push	de
 	xor	a, a
 loop:

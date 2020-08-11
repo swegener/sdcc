@@ -33,10 +33,7 @@
 ; The Z80 has the cpir instruction, which is perfect for implementing strlen().
 
 _strlen:
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
+	ld	hl, 2 (sp)
 	xor	a, a
 	ld	b, a
 	ld	c, a

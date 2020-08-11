@@ -32,10 +32,7 @@
 
 ; 12B; 86T for nonnegative arguments, 78T for negative.
 _abs:
-	pop	hl
-	pop	de
-	push	de
-	push	hl
+	ld	de, 2 (sp)
 	xor	a, a
 	ld	l, a
 	ld	h, a

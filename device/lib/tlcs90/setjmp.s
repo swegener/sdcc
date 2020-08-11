@@ -31,66 +31,42 @@
 	.globl ___setjmp
 
 ___setjmp:
-	pop	hl
-	pop	iy
-	push	af
-	push	hl
+	ld	hl, 0 (sp)
+	ld	iy, 2 (sp)
 
 	; Store return address.
-	ld	0(iy), l
-	ld	1(iy), h
+	ld	0 (iy), hl
 
 	; Store stack pointer.
-	xor	a, a
-	ld	l, a
-	ld	h, a
-	add	hl, sp
-	ld	2(iy), l
-	ld	3(iy), h
+	ld	2 (iy), sp
 
 	; Store frame pointer.
-	push	ix
-	pop	hl
-	ld	4(iy), l
-	ld	5(iy), h
+	ld	4 (iy), ix
 
 	; Return 0.
-	ld	l, a
-	ld	h, a
+	sub	hl, hl
 	ret
 
 .globl _longjmp
 
 _longjmp:
-	pop	de
+	pop	hl
 	pop	iy
-	pop	de
+	pop	hl
 
 	; Ensure that return value is non-zero.
-	ld	a, e
-	or	a, d
+	or	hl, hl
 	jr	NZ, jump
-	inc	de
+	inc	hl
 jump:
 
 	; Restore frame pointer.
-	ld	l, 4(iy)
-	ld	h, 5(iy)
-	push	hl
-	pop	ix
+	ld	ix, 4 (iy)
 
 	; Adjust stack pointer.
-	ld	l, 2(iy)
-	ld	h, 3(iy)
-	ld	sp, hl
-	pop	hl
-
-	; Move return value into hl.
-	ex	de, hl
+	ld	sp, 2 (iy)
+	add	sp, #2
 
 	; Jump.
-	ld	c, 0(iy)
-	ld	b, 1(iy)
-	push	bc
-	ret
-
+	ld	bc, 0 (iy)
+	jp	(bc)

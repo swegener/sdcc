@@ -1,5 +1,16 @@
 2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/r2k/Makefile.in,
+	  device/lib/r2k/memcpy.s,
+	  device/lib/r3ka/Makefile.in,
+	  device/lib/r3ka/memcpy.s,
+	  device/lib/tlcs90/Makefile.in,
+	  device/lib/tlcs90/memcpy.s,
+	  device/lib/tlcs90/memmove.s:
+	  Implement RFE #664 for tlcs90, r2k and r3ka.
+
+2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* support/regression/tests/bug-2645.c:
 	  Disable warning 154 in regression testsuit.
 

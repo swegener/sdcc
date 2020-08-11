@@ -37,15 +37,13 @@ Z80_SDCC = $(COMMON_SDCC) \
   vprintf.c \
   _strlen.c \
   _strcmp.c \
-  __memcpy.c \
-  memcpy.c \
   atomic_flag_clear.c
 
 Z80SOURCES = $(addprefix ../,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG) $(Z80_SDCC))
 Z8OBJECTS = $(patsubst %.c,%.rel,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG) $(Z80_SDCC))
 
 OBJ = divunsigned.rel divsigned.rel divmixed.rel modunsigned.rel modsigned.rel modmixed.rel mul.rel mulchar.rel \
-      heap.rel memmove.rel strcpy.rel abs.rel __sdcc_call_hl.rel __sdcc_call_iy.rel crtenter.rel \
+      heap.rel memmove.rel strcpy.rel abs.rel __sdcc_call_hl.rel __sdcc_call_iy.rel crtenter.rel memcpy.rel \
       setjmp.rel atomic_flag_test_and_set.rel
 
 LIB = r3ka.lib
@@ -60,9 +58,12 @@ all: $(PORTDIR)/$(LIB) $(PORTDIR)/crt0.rel
 $(PORTDIR)/crt0.rel: crt0.rel
 	cp crt0.rel $(PORTDIR)/crt0.rel
 
+Makefile: $(srcdir)/Makefile.in
+	cd $(top_builddir); ./config.status device/lib/r3ka/Makefile
+
 $(PORTDIR)/$(LIB): $(OBJ) $(Z8OBJECTS) Makefile
+	rm -f $@
 ifeq ($(LIB_TYPE), SDCCLIB)
-	rm -f $@; \
 	$(top_builddir)/bin/sdcclib -a $@ $(OBJ) $(Z8OBJECTS)
 else
   ifeq ($(LIB_TYPE), AR)
@@ -71,7 +72,6 @@ else
     ifeq ($(LIB_TYPE), RANLIB)
 	$(top_builddir)/bin/sdar -rcD $@ $(OBJ) $(Z8OBJECTS)
     else
-	rm -f $@; \
 	for i in $(basename $(OBJ) $(Z8OBJECTS)); do echo $$i >>$@; done
 	cp $(OBJ) $(Z8OBJECTS) $(PORTDIR)
     endif

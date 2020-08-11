@@ -3,7 +3,7 @@
 #include <testfwk.h>
 
 // Some ports do not have atomic_flag yet.
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_tlcs90)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
 
 #include <stdatomic.h>
 #include <stdbool.h>
@@ -22,7 +22,7 @@ memory struct { int a; atomic_flag f; } s = {0, ATOMIC_FLAG_INIT};
 
 void testAtomic(void)
 {
-#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15) && !defined(__SDCC_tlcs90)
+#if !defined(__SDCC_pic14) && !defined(__SDCC_pic16) && !defined(__SDCC_pdk13) && !defined(__SDCC_pdk14) && !defined(__SDCC_pdk15)
 	ASSERT(atomic_flag_test_and_set(&f1) == false);
 	ASSERT(atomic_flag_test_and_set(&f1) == true);
 	atomic_flag_clear(&f1);

@@ -1,5 +1,14 @@
 2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/tlcs90/Makefile.in,
+	  device/lib/tlcs90/atomic_flag_test_and_set.s,
+	  device/include/stdatomic.h,
+	  device/lib/atomic_flag_clear.c,
+	  support/regression/tests/atomic.c:
+	  Basic implementation of RFE #649 for tlcs90.
+
+2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* device/lib/r2k/Makefile.in,
 	  device/lib/r2k/memcpy.s,
 	  device/lib/r3ka/Makefile.in,

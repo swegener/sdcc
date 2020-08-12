@@ -3031,7 +3031,11 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
       emit2 ("ld (%s+%d), a", to->aopu.aop_dir, to_offset);
       regalloc_dry_run_cost += 3;
     }
-  else if (!aopInReg (to, to_offset, A_IDX) && !aopInReg (from, from_offset, A_IDX) && (from->type == AOP_DIR || from->type == AOP_SFR || to->type == AOP_IY && (from->type == AOP_EXSTK || IS_GB && from->type == AOP_STK))) // Go through a.
+  else if (!aopInReg (to, to_offset, A_IDX) && !aopInReg (from, from_offset, A_IDX) && // Go through a.
+    (from->type == AOP_DIR ||
+    from->type == AOP_SFR ||
+    to->type == AOP_IY && (from->type == AOP_EXSTK || IS_GB && from->type == AOP_STK) ||
+    to->type == AOP_HL && (aopInReg(from, from_offset, L_IDX) || aopInReg(from, from_offset, H_IDX))))
     {
       if (!a_dead)
         _push (PAIR_AF);

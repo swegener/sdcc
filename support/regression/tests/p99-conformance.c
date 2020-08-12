@@ -69,6 +69,10 @@
 #define SKIP_TRIGRAPH
 #endif
 
+#if defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL) // Lack of memory
+#define SKIP_UNIVERSAL
+#endif
+
 #ifndef SKIP_VA_ARGS_MACRO
 # define FIRST(X, ...) X
 # if FIRST(0, something)

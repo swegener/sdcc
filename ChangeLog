@@ -1,3 +1,9 @@
+2020-08-12 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/p99-conformance.c: Disable a test for
+	  mcs51-small due to limited memory
+	* support/regression/tests/bug-2645.c: Disable warning 88 too
+
 2020-08-11 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* device/lib/tlcs90/abs.s,

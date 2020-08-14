@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "ddconfig.h"
 
 #include <stdio.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 //#include <unistd.h>
 #include <string.h>
 //#include "i_string.h"
@@ -216,11 +216,13 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	    {
 	      class cl_ev_brk *eb= (cl_ev_brk*)b;
 	      class cl_address_space *m= eb->get_mem();
+	      char *dis = uc->disass(uc->instPC, " ");
 	      cmd->frozen_console->dd_printf("Event `%s' at %s[0x%x]: 0x%x %s\n",
 					     eb->id, m?(m->get_name()):"mem?",
 					     AU(eb->addr),
 					     AU(uc->instPC),
-					     uc->disass(uc->instPC, " "));
+					     dis);
+	      free(dis);
     	    }
 	  break;
 	case resINTERRUPT:

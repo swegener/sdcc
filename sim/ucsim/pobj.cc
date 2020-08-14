@@ -837,7 +837,7 @@ cl_strings::compare(void *key1, void *key2)
 void
 cl_strings::free_item(void* item)
 {
-  delete (char*)item;
+  free((char*)item);
 }
 
 

@@ -1,3 +1,8 @@
+2020-08-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* support/regression/tests/p99-conformance.c: Disable another test
+	  for pdk14 to avoid RAM overflow
+
 2020-08-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,

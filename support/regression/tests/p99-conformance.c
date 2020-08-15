@@ -67,6 +67,7 @@
 #define SKIP_LONG_LONG
 #define SKIP_DIGRAPH
 #define SKIP_TRIGRAPH
+#define SKIP_UNIVERSAL
 #endif
 
 #if defined(__SDCC_mcs51) && defined(__SDCC_MODEL_SMALL) // Lack of memory

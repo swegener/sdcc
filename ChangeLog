@@ -441,7 +441,9 @@
 	* src/ds390/main.c,
 	* src/mcs51/main.c: removed --pack-iram, --no-pack-iram
 	* src/SDCCglobl.h,
-	* src/SDCCmain.c: removed options.no_pack_iram, no -Y output
+	* src/SDCCmain.c: removed options.no_pack_iram, no -Y output,
+	  auto-define __SDCC_OPTIMIZE_SPEED or __SDCC_OPTIMIZE_SIZE when appropriate
+	  (thanks Basil Hussain, RFE 675)
 
 2020-07-18 Philipp Klaus Krause <pkk AT spth.de>
 

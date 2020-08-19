@@ -1,3 +1,8 @@
+2020-08-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* support/regression/tests/bug-3093.c:
+	  Test for bug #3093.
+
 2020-08-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* src/SDCCast.c (resultTypePropagate): Fix bug #3093

@@ -9347,17 +9347,12 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
 /* shiftL2Left2Result - shift left two bytes from left to result   */
 /*-----------------------------------------------------------------*/
 static void
-shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCount, const iCode *ic)
+shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic)
 {
-  operand *shiftoperand = result;
-
-  if (sameRegs (AOP (result), AOP (left)) && ((offl + MSB16) == offr))
-    {
-      wassert (0);
-    }
+  asmop *shiftaop = result->aop;
 
   /* For a shift of 7 we can use cheaper right shifts */
-  else if (shCount == 7 && AOP_TYPE (left) == AOP_REG && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[0]->rIdx) && AOP_TYPE (result) == AOP_REG &&
+  if (shCount == 7 && AOP_TYPE (left) == AOP_REG && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[0]->rIdx) && AOP_TYPE (result) == AOP_REG &&
     AOP (left)->aopu.aop_reg[0]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[1]->rIdx != IYL_IDX && AOP (left)->aopu.aop_reg[0]->rIdx != IYH_IDX && AOP (left)->aopu.aop_reg[1]->rIdx != IYH_IDX &&
     AOP (result)->aopu.aop_reg[0]->rIdx != IYL_IDX && AOP (result)->aopu.aop_reg[1]->rIdx != IYL_IDX && AOP (result)->aopu.aop_reg[0]->rIdx != IYH_IDX && AOP (result)->aopu.aop_reg[1]->rIdx != IYH_IDX &&
     (optimize.codeSpeed || getPairId (AOP (result)) != PAIR_HL || getPairId (AOP (left)) != PAIR_HL)) /* but a sequence of add hl, hl might still be cheaper code-size wise */
@@ -9382,17 +9377,23 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
       return;
     }
 
-  if (AOP_TYPE (result) != AOP_REG && AOP_TYPE (left) == AOP_REG && AOP_SIZE (left) >= 2 && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[0]->rIdx) && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[1]->rIdx) ||
+  if ((result->aop->type == AOP_HL || result->aop->type == AOP_IY) && (left->aop->type == AOP_HL || left->aop->type == AOP_IY) && !IS_GB && isPairDead (PAIR_HL, ic) &&
+    (shCount > 1 || !sameRegs (result->aop, left->aop))) // Being able to use cheap add hl, hl is worth it in most cases.
+    {
+      shiftaop = ASMOP_HL;
+      fetchPairLong (PAIR_HL, left->aop, ic, 0);
+    }
+  else if (AOP_TYPE (result) != AOP_REG && AOP_TYPE (left) == AOP_REG && AOP_SIZE (left) >= 2 && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[0]->rIdx) && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[1]->rIdx) ||
     getPairId (AOP (left)) == PAIR_HL && isPairDead (PAIR_HL, ic))
-    shiftoperand = left;
-  else if (isPair (AOP (result)) && !offr)
-    fetchPairLong (getPairId (AOP (result)), AOP(left), ic, offl);
+    shiftaop = left->aop;
+  else if (isPair (AOP (result)))
+    fetchPairLong (getPairId (AOP (result)), AOP(left), ic, 0);
   else
-    genMove_o (result->aop, offr, left->aop, offl, 2, true, isPairDead (PAIR_HL, ic));
+    genMove_o (result->aop, 0, left->aop, 0, 2, true, isPairDead (PAIR_HL, ic));
 
   if (shCount == 0)
     ;
-  else if (getPairId (AOP (shiftoperand)) == PAIR_HL)
+  else if (getPairId (shiftaop) == PAIR_HL)
     {
       while (shCount--)
         {
@@ -9400,7 +9401,7 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
           regalloc_dry_run_cost += 1;
         }
     }
-  else if (getPairId (AOP (shiftoperand)) == PAIR_IY)
+  else if (getPairId (shiftaop) == PAIR_IY)
     {
       while (shCount--)
         {
@@ -9408,7 +9409,7 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
           regalloc_dry_run_cost += 2;
         }
     }
-  else if (IS_RAB && getPairId (AOP (shiftoperand)) == PAIR_DE)
+  else if (IS_RAB && getPairId (shiftaop) == PAIR_DE)
     {
       while (shCount--)
         {
@@ -9424,12 +9425,12 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
       symbol *tlbl1 = regalloc_dry_run ? 0 : newiTempLabel (0);
 
-      if (AOP (shiftoperand)->type == AOP_REG)
+      if (shiftaop->type == AOP_REG)
         {
           while (shCount--)
             {
               for (offset = 0; offset < size; offset++)
-                emit3_o (offset ? A_RL : A_SLA, AOP (shiftoperand), offset, 0, 0);
+                emit3_o (offset ? A_RL : A_SLA, shiftaop, offset, 0, 0);
             }
         }
       else
@@ -9448,7 +9449,7 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
 
           while (size--)
             {
-              emit3_o (offset ? A_RL : A_SLA, AOP (shiftoperand), offset, 0, 0);
+              emit3_o (offset ? A_RL : A_SLA, shiftaop, offset, 0, 0);
 
               offset++;
             }
@@ -9465,18 +9466,14 @@ shiftL2Left2Result (operand *left, int offl, operand *result, int offr, int shCo
         }
     }
 
-  if (shiftoperand != result)
+  if (shiftaop != result->aop)
     {
-      if (isPair (AOP (result)) && !offr)
-        fetchPairLong (getPairId (AOP (result)), AOP(shiftoperand), ic, offl);
-      else if (isPair (AOP (shiftoperand)))
-        commitPair (AOP (result), getPairId (AOP (shiftoperand)), ic, FALSE);
+      if (isPair (AOP (result)))
+        fetchPairLong (getPairId (AOP (result)), shiftaop, ic, 0);
+      else if (isPair (shiftaop))
+        commitPair (AOP (result), getPairId (shiftaop), ic, FALSE);
       else
-        {
-          /* Copy left into result */
-          movLeft2Result (shiftoperand, offl, result, offr, 0);
-          movLeft2Result (shiftoperand, offl + 1, result, offr + 1, 0);
-        }
+        genMove_o (result->aop, 0, shiftaop, 0, 2, true, isPairDead (PAIR_HL, ic));
     }
 }
 
@@ -9624,7 +9621,7 @@ genlshTwo (operand *result, operand *left, unsigned int shCount, const iCode *ic
         }
       else
         {
-          shiftL2Left2Result (left, LSB, result, LSB, shCount, ic);
+          shiftL2Left2Result (left, result, shCount, ic);
         }
     }
 }

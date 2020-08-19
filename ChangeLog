@@ -2,6 +2,8 @@
 
 	* support/regression/tests/bug-3093.c:
 	  Test for bug #3093.
+	* src/z80/gen.c:
+	  Improve left shift, RFE #465.
 
 2020-08-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 

@@ -2730,6 +2730,11 @@ addCast (ast * tree, RESULT_TYPE resultType, bool promote)
 static RESULT_TYPE
 resultTypePropagate (ast *tree, RESULT_TYPE resultType)
 {
+  /* In general, we don't want to propagate BOOL or IFX result types */
+  if (((resultType == RESULT_TYPE_BOOL) || (resultType == RESULT_TYPE_IFX))
+      && (tree->opval.op != '='))
+    resultType = RESULT_TYPE_NONE;
+
   switch (tree->opval.op)
     {
     case AND_OP:

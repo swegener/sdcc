@@ -1,3 +1,7 @@
+2020-08-19 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
+
+	* src/SDCCast.c (resultTypePropagate): Fix bug #3093
+
 2020-08-15 Erik Petrich <epetrich AT ivorytower.norman.ok.us>
 
 	* support/regression/tests/p99-conformance.c: Disable another test

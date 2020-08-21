@@ -9572,11 +9572,20 @@ AccLsh (unsigned int shCount)
 static void
 shiftL1Left2Result (operand *left, int offl, operand *result, int offr, unsigned int shCount, const iCode *ic)
 {
+  // add hl, hl is cheap in code size.
+  if (sameRegs (result->aop, left->aop) && aopInReg (result->aop, offr, L_IDX) && isPairDead(PAIR_HL, ic) && !optimize.codeSpeed && offr == offl)
+    {
+      while (shCount--)
+        {
+          emit2 ("add hl, hl");
+          regalloc_dry_run_cost++;
+        }
+    }
   /* If operand and result are the same we can shift in place.
      However shifting in acc using add is cheaper than shifting
      in place using sla; when shifting by more than 2 shifting in
      acc it is worth the additional effort for loading from / to acc. */
-  if (!aopInReg(result->aop, 0, A_IDX) && sameRegs (AOP (left), AOP (result)) && shCount <= 2 && offr == offl)
+  else if (!aopInReg(result->aop, 0, A_IDX) && sameRegs (AOP (left), AOP (result)) && shCount <= 2 && offr == offl)
     {
       while (shCount--)
         emit3 (A_SLA, AOP (result), 0);

@@ -5432,6 +5432,11 @@ genRet (const iCode *ic)
         }
       else if (IC_LEFT (ic)->aop->type == AOP_REG)
         genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, true, true);
+      else if (size == 4 && (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY)) // Use ld rr, (nn)
+        {
+          fetchPairLong (PAIR_DE, IC_LEFT (ic)->aop, 0, 2);
+          fetchPairLong (PAIR_HL, IC_LEFT (ic)->aop, 0, 0);
+        }
       else
         {
           bool skipbytes[4] = {false, false, false, false}; // Take care to not overwrite hl.

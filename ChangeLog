@@ -1,6 +1,11 @@
 2020-08-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Implement RFE #404.
+
+2020-08-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Small improvements for left-shift by constant expression.
 
 2020-08-19 Philipp Klaus Krause <pkk AT spth.de>

@@ -1,4 +1,9 @@
-2020-08-12 Philipp Klaus Krause <pkk AT spth.de>
+2020-08-21 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Small improvements for 16-bit left-shift.
+
+2020-08-19 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-3093.c:
 	  Test for bug #3093.

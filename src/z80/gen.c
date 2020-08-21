@@ -5430,7 +5430,7 @@ genRet (const iCode *ic)
           fetchPairLong (PAIR_DE, AOP (IC_LEFT (ic)), 0, 0);
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, 2);
         }
-      else if (AOP_TYPE (IC_LEFT (ic)) == AOP_REG)
+      else if (IC_LEFT (ic)->aop->type == AOP_REG)
         genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, true, true);
       else
         {
@@ -9422,8 +9422,11 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
     {
       int size = 2;
       int offset = 0;
+      
+      bool use_b = (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX)
+        && (shiftaop->type != AOP_REG || shiftaop->aopu.aop_reg[0]->rIdx != B_IDX && shiftaop->aopu.aop_reg[1]->rIdx != B_IDX));
+                         
       symbol *tlbl = regalloc_dry_run ? 0 : newiTempLabel (0);
-      symbol *tlbl1 = regalloc_dry_run ? 0 : newiTempLabel (0);
 
       if (shiftaop->type == AOP_REG)
         {
@@ -9440,11 +9443,10 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
             {
               if (!regalloc_dry_run)
                 {
-                  emit2 ("ld a, !immedbyte+1", shCount);
-                  emit2 ("jp !tlabel", labelKey2num (tlbl1->key));
+                  emit2 ("ld %s, !immedbyte", use_b ? "b" : "a", shCount);
                   emitLabel (tlbl);
                 }
-              regalloc_dry_run_cost += 4;
+              regalloc_dry_run_cost += 2;
             }
 
           while (size--)
@@ -9457,11 +9459,15 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
             {
               if (!regalloc_dry_run)
                 {
-                  emitLabel (tlbl1);
-                  emit2 ("dec a");
-                  emit2 ("jp NZ, !tlabel", labelKey2num (tlbl->key));
+                  if (use_b)
+                    emit2 ("djnz !tlabel", labelKey2num (tlbl->key));
+                  else
+                    {
+                      emit2 ("dec a");
+                      emit2 ("jp NZ, !tlabel", labelKey2num (tlbl->key));
+                    }
                 }
-              regalloc_dry_run_cost += 4;
+                regalloc_dry_run_cost += use_b ? 2 : 4;
             }
         }
     }

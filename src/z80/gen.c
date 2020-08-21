@@ -9409,7 +9409,7 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
           regalloc_dry_run_cost += 2;
         }
     }
-  else if (IS_RAB && getPairId (shiftaop) == PAIR_DE)
+  else if (IS_RAB && getPairId (shiftaop) == PAIR_DE && shCount <= 2 + optimize.codeSpeed)
     {
       while (shCount--)
         {
@@ -9417,6 +9417,18 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
           emit2 ("rl de");
           regalloc_dry_run_cost++;
         }
+    }
+  else if (!IS_GB && getPairId (shiftaop) == PAIR_DE)
+    {
+      emit2 ("ex de, hl");
+      regalloc_dry_run_cost++;
+      while (shCount--)
+        {
+          emit2 ("add hl, hl");
+          regalloc_dry_run_cost++;
+        }
+      emit2 ("ex de, hl");
+      regalloc_dry_run_cost++;
     }
   else
     {
@@ -9467,7 +9479,7 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
                       emit2 ("jp NZ, !tlabel", labelKey2num (tlbl->key));
                     }
                 }
-                regalloc_dry_run_cost += use_b ? 2 : 4;
+                regalloc_dry_run_cost += use_b ? 2 : 3;
             }
         }
     }

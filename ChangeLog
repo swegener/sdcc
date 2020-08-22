@@ -1,3 +1,8 @@
+2020-08-22 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix bug #3101.
+
 2020-08-21 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

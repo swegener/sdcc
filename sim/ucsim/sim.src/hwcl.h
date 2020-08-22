@@ -98,7 +98,7 @@ class cl_hw: public cl_guiobj
   virtual void cfg_write(t_addr addr, t_mem val);
   virtual t_mem cfg_get(t_addr addr);
   virtual t_mem cfg_read(t_addr addr);
-  virtual char *cfg_help(t_addr addr);
+  virtual const char *cfg_help(t_addr addr);
   
   virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
   virtual class cl_memory_cell *register_cell(class cl_address_space *mem,
@@ -131,7 +131,7 @@ class cl_hw: public cl_guiobj
 class cl_hws: public cl_list
 {
  public:
- cl_hws(void): cl_list(2, 2, cchars("hws")) {}
+ cl_hws(void): cl_list(2, 2, "hws") {}
   virtual t_index add(void *item);
   virtual cl_hw *next_displayer(class cl_hw *hw);
 };

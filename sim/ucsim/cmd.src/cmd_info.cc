@@ -57,7 +57,7 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
   for (i= 0; i < uc->fbrk->count; i++)
     {
       class cl_brk *fb= (class cl_brk *)(uc->fbrk->at(i));
-      const char *s= uc->disass(fb->addr, NULL);
+      char *s= uc->disass(fb->addr, NULL);
       con->dd_printf("%-3d %-10s %s %-5d %-5d 0x%06x %-5s %s\n", fb->nr,
                      "fetch", (fb->perm==brkFIX)?"keep":"del ",
                      fb->hit, fb->cnt, AU(fb->addr),
@@ -65,10 +65,10 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 		     s);
       extra= false;
       if (!(fb->cond.empty()))
-	con->dd_printf("     cond=\"%s\"", (char*)(fb->cond)), extra= true;
+	con->dd_printf("     cond=\"%s\"", fb->cond.c_str()), extra= true;
       if (!(fb->commands.empty()))
-	con->dd_printf("     cmd=\"%s\"", (char*)(fb->commands)), extra= true;
-      free((char *)s);
+	con->dd_printf("     cmd=\"%s\"", fb->commands.c_str()), extra= true;
+      free(s);
       if (extra) con->dd_printf("\n");
     }
   for (i= 0; i < uc->ebrk->count; i++)
@@ -80,9 +80,9 @@ COMMAND_DO_WORK_UC(cl_info_bp_cmd)
 		     AU(eb->addr), eb->id);
       extra= false;
       if (!(eb->cond.empty()))
-	con->dd_printf("     cond=\"%s\"", (char*)(eb->cond)), extra= true;
+	con->dd_printf("     cond=\"%s\"", eb->cond.c_str()), extra= true;
       if (!(eb->commands.empty()))
-	con->dd_printf("     cmd=\"%s\"", (char*)(eb->commands)), extra= true;
+	con->dd_printf("     cmd=\"%s\"", eb->commands.c_str()), extra= true;
       if (extra) con->dd_printf("\n");
     }
   return(0);

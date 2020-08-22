@@ -64,7 +64,7 @@ protected:
   virtual void print_info(class cl_console_base *con);
 public:
   virtual const char *get_op_name(void);
-  virtual const char *get_matching_name(void) { return(cchars("unknown")); }
+  virtual const char *get_matching_name(void) { return("unknown"); }
   virtual bool sp_increased(void);
   virtual int data_size(void);
   virtual bool match(class cl_stack_op *op);

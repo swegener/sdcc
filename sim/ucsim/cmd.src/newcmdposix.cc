@@ -61,12 +61,12 @@ cl_console::cl_console(const char *_fin, const char *_fout, class cl_app *the_ap
   fin= 0;
   if (_fin)
     {
-      fin= mk_io(_fin, cchars("r"));
+      fin= mk_io(_fin, "r");
     }
   fout= 0;
   if (_fout)
     {
-      fout= mk_io(_fout, cchars("w"));
+      fout= mk_io(_fout, "w");
     }
   prompt= 0;
   set_flag(~CONS_NONE, false);
@@ -215,7 +215,7 @@ cl_console::~cl_console(void)
  */
 
 void
-cl_console::redirect(char *fname, char *mode)
+cl_console::redirect(const char *fname, const char *mode)
 {
   frout= mk_io(fname, mode);
   set_flag(CONS_REDIRECTED, true);
@@ -290,7 +290,7 @@ cl_console::read_line(void)
   do {
     if (startup_command.nempty())
       {
-	char *s= startup_command;
+	const char *s= startup_command;
 	b[0]= s[0];
 	startup_command= &s[1];
 	i= 1;
@@ -505,8 +505,8 @@ cl_commander::init(void)
       if (strcmp(cn, "-") == 0)
 	{
 	  class cl_f *in, *out;
-	  in= cp_io(fileno(stdin), cchars("r"));
-	  out= cp_io(fileno(stdout), cchars("w"));
+	  in= cp_io(fileno(stdin), "r");
+	  out= cp_io(fileno(stdout), "w");
 	  in->interactive(out);
 	  add_console(con= new cl_console(in, out, app));
 	  config_console= exec_on(con, Config);
@@ -528,8 +528,8 @@ cl_commander::init(void)
   if (cons->get_count() == ccnt)
     {
       class cl_f *in, *out;
-      in= cp_io(fileno(stdin), cchars("r"));
-      out= cp_io(fileno(stdout), cchars("w"));
+      in= cp_io(fileno(stdin), "r");
+      out= cp_io(fileno(stdout), "w");
       in->interactive(out);
       add_console(con= new cl_console(in, out, app));
       config_console= exec_on(con, Config);

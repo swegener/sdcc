@@ -64,14 +64,14 @@ class cl_uc *
 cl_sim51::mk_controller(void)
 {
   int i;
-  char *typ= 0;
+  const char *typ= 0;
   class cl_optref type_option(this);
 
   type_option.init();
-  type_option.use(cchars("cpu_type"));
+  type_option.use("cpu_type");
   i= 0;
   if ((typ= type_option.get_value(typ)) == 0)
-    typ= cchars("C52");
+    typ= "C52";
   while ((cpus_51[i].type_str != NULL) &&
 	 (strcasecmp(typ, cpus_51[i].type_str) != 0))
     i++;

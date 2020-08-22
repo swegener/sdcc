@@ -61,7 +61,7 @@ public:
   void set_on(enum error_on_off val);
   bool is_on(void);
   enum error_type get_type(void);
-  char *get_type_name(void);
+  const char *get_type_name(void);
   //char *get_name(void);
 };
 
@@ -84,7 +84,7 @@ protected:
   class cl_error_class *register_error(class cl_error_class *error_class)
   {
     if (!registered_errors)
-      registered_errors= new cl_list(2, 2, /*cchars*/("registered errors"));
+      registered_errors= new cl_list(2, 2, "registered errors");
     registered_errors->add(error_class);
     return error_class;
   }
@@ -118,7 +118,7 @@ public:
   virtual class cl_error_class *get_class(void) { return(classification); }
 
   virtual void print(class cl_commander_base *c);
-  virtual char *get_type_name();
+  virtual const char *get_type_name(void);
 };
 
 

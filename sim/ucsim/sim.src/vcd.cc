@@ -222,7 +222,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 	{
 	  params[1]->as_number();
 	  int nid= params[1]->value.number;
-	  if (uc->get_hw((char*)id_string, nid, NULL) != NULL)
+	  if (uc->get_hw(id_string, nid, NULL) != NULL)
 	    {
 	      con->dd_printf("Already exists\n");
 	      return;
@@ -291,7 +291,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 		      fout->prntf("ucsim\n");
 		      fout->write_str("$end\n");
 		      fout->write_str("$timescale 1ns $end\n");
-		      fout->prntf("$scope module %s $end\n", (char*)modul);
+		      fout->prntf("$scope module %s $end\n", modul.c_str());
 		      int i;
 		      for (i= 0; i < locs->count; i++)
 			{
@@ -300,7 +300,7 @@ cl_vcd::set_cmd(class cl_cmdline *cmdline, class cl_console_base *con)
 			  chars n= uc->cell_name(c);
 			  fout->prntf("$var wire %d %c %s $end\n",
 				      c->get_width(), 33+i,
-				      (char*)n);
+				      n.c_str());
 			}
 		      fout->write_str("$upscope $end\n");
 		      fout->write_str("$enddefinitions $end\n");
@@ -392,10 +392,10 @@ cl_vcd::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
   return cell->get();
 }
 
-char *
+const char *
 cl_vcd::cfg_help(t_addr addr)
 {
-  return (char*)"Not used";
+  return "Not used";
 }
 
 void
@@ -411,8 +411,8 @@ cl_vcd::report(class cl_memory_cell *cell, int nr)
 	}
       else
 	{
-	  fout->write((char*)"b", 1);
-	  fout->prntf("%s %c\n", (char*)cbin(v, w), nr+33);
+	  fout->write("b", 1);
+	  fout->prntf("%s %c\n", cbin(v, w).c_str(), nr+33);
 	}
     }
   cell->def_data= v;
@@ -449,7 +449,7 @@ cl_vcd::print_info(class cl_console_base *con)
 		 started?"YES":"no",
 		 paused?"YES":"no");
   const char *fn= fout?(fout->get_file_name()):"(none)";
-  con->dd_printf("Modul: %s File: %s\n", (char*)modul, fn);
+  con->dd_printf("Modul: %s File: %s\n", modul.c_str(), fn);
   con->dd_printf("Memory cells:\n");
   for (i= 0; i < locs->count; i++)
     {
@@ -457,7 +457,7 @@ cl_vcd::print_info(class cl_console_base *con)
       cl_address_space *as;
       t_addr a= 0;
       as= uc->address_space(c, &a);
-      con->dd_printf("  %s[0x%x] %s\n", as?(as->get_name()):"?", AU(a), (char*)(uc->cell_name(c)));
+      con->dd_printf("  %s[0x%x] %s\n", as?(as->get_name()):"?", AU(a), uc->cell_name(c).c_str());
     }
   print_cfg_info(con);
 }

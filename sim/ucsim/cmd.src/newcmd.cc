@@ -240,11 +240,11 @@ cl_console_base::dd_cprintf(const char *color_name, const char *format, ...)
       )
     bw= true;
 
-  o= application->options->get_option((char*)chars("", "color_%s", color_name));
+  o= application->options->get_option(chars("", "color_%s", color_name));
   cc= NULL;
   if (o) o->get_value(&cc);
   cce= colopt2ansiseq(cc);
-  if (!bw) dd_printf("\033[0m%s", (char*)cce);
+  if (!bw) dd_printf("\033[0m%s", cce.c_str());
   
   va_start(ap, format);
   ret= cmd_do_print(format, ap);
@@ -272,7 +272,7 @@ cl_console_base::get_color_ansiseq(const char *color_name, bool add_reset)
       )
     return cce;
 
-  o= application->options->get_option((char*)chars("", "color_%s", color_name));
+  o= application->options->get_option(chars("", "color_%s", color_name));
   cc= NULL;
   if (o) o->get_value(&cc);
   if (add_reset)
@@ -286,7 +286,7 @@ cl_console_base::get_color_ansiseq(const char *color_name, bool add_reset)
 void
 cl_console_base::dd_color(const char *color_name)
 {
-  dd_printf("%s", (char*)(get_color_ansiseq(color_name, true)));
+  dd_printf("%s", get_color_ansiseq(color_name, true).c_str());
 }
 
 int
@@ -357,7 +357,7 @@ cl_console_base::cmd_do_print(const char *format, va_list ap)
 	{
 	  return 0;
 	}
-      ret= fo->vprintf((char*)format, ap);
+      ret= fo->vprintf(format, ap);
       //fo->flush();
       return ret;
     }
@@ -382,7 +382,7 @@ cl_console_base::cmd_do_cprint(const char *color_name, const char *format, va_li
       )
     bw= true;
 
-  o= application->options->get_option((char*)chars("", "color_%s", color_name));
+  o= application->options->get_option(chars("", "color_%s", color_name));
   cc= NULL;
   if (o) o->get_value(&cc);
   cce= colopt2ansiseq(cc);
@@ -395,8 +395,8 @@ cl_console_base::cmd_do_cprint(const char *color_name, const char *format, va_li
 	{
 	  return 0;
 	}
-      if (!bw) fo->prntf("\033[0m%s", (char*)cce);
-      ret= fo->vprintf((char*)format, ap);
+      if (!bw) fo->prntf("\033[0m%s", cce.c_str());
+      ret= fo->vprintf(format, ap);
       if (!bw) fo->prntf("\033[0m");
       //fo->flush();
       return ret;
@@ -569,7 +569,7 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
   int retval= 0, i, do_print_prompt= 1;
 
   //un_redirect();
-  char *cmdstr;
+  const char *cmdstr;
   i= read_line();
   if (i < 0)
     {
@@ -579,7 +579,7 @@ cl_console_base::proc_input(class cl_cmdset *cmdset)
     return 0;
   cmdstr= lbuf;
   if (cmdstr==NULL)
-    cmdstr= (char*)"";
+    cmdstr= "";
   if (is_frozen())
     {
       application->get_sim()->stop(resUSER);

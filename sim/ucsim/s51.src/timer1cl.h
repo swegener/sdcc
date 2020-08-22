@@ -41,7 +41,7 @@ class cl_timer1: public cl_timer0
 public:
   cl_timer1(class cl_uc *auc, int aid, const char *aid_string);
   //virtual int init(void);
-  //virtual char *cfg_help(t_addr addr);
+  //virtual const char *cfg_help(t_addr addr);
 
   //virtual void new_hw_added(class cl_hw *new_hw);
   //virtual ulong read(class cl_mem *mem, long addr);

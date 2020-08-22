@@ -199,10 +199,10 @@ cl_ez80::init(void)
   return cl_z80::init();
 }
 
-char *
+const char *
 cl_ez80::id_string(void)
 {
-  return ((char*)"EZ80");
+  return ("EZ80");
 }
 
 

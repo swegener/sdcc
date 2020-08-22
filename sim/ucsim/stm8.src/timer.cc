@@ -74,7 +74,7 @@ cl_tim::init(void)
 {
   int i;
   chars s("tim");
-  s.append("%d", id);
+  s.appendf("%d", id);
   set_name(s);
   id_string= strdup(s);
   cl_hw::init();
@@ -111,14 +111,14 @@ cl_tim::init(void)
   return 0;
 }
 
-char *
+const char *
 cl_tim::cfg_help(t_addr addr)
 {
   switch (addr)
     {
-    case stm8_tim_on: return (char*)"Turn simulation of timer on/off (bool, RW)";
+    case stm8_tim_on: return "Turn simulation of timer on/off (bool, RW)";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 int

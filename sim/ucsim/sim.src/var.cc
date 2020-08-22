@@ -83,24 +83,24 @@ cl_var::print_info(cl_console_base *con)
     }
   con->dd_printf("\n");
   if (!desc.empty())
-    con->dd_printf("  %s\n", (char*)desc);
+    con->dd_printf("  %s\n", desc.c_str());
 }
 
 
-void *
-cl_var_list::key_of(void *item)
+const void *
+cl_var_list::key_of(const void *item)
 {
   class cl_var *v= (class cl_var *)item;
   return (void*)v->get_name();
 }
 
 int
-cl_var_list::compare(void *key1, void *key2)
+cl_var_list::compare(const void *key1, const void *key2)
 {
-  char *k1, *k2;
+  const char *k1, *k2;
 
-  k1= (char*)key1;
-  k2= (char*)key2;
+  k1= (const char*)key1;
+  k2= (const char*)key2;
   if (k1 && k2)
     return strcmp(k1, k2);
   return 0;

@@ -49,7 +49,7 @@ class cl_port_data: public cl_base
  public:
   class cl_memory_cell *cell_p, *cell_in, *cell_dir;
   t_mem cache_p, cache_in, cache_dir, cache_value;
-  char *keyset;
+  const char *keyset;
   int basx, basy;
 };
 

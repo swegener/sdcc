@@ -36,7 +36,7 @@ class cl_ez80: public cl_z80
  public:
   cl_ez80(struct cpu_entry *Itype, class cl_sim *asim);
   virtual int init(void);
-  virtual char *id_string(void);
+  virtual const char *id_string(void);
   virtual const char *get_disasm_info(t_addr addr,
 				      int *ret_len,
 				      int *ret_branch,

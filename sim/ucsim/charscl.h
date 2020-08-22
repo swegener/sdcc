@@ -35,7 +35,7 @@ protected:
   char *chars_string;	// stores the value
   int chars_length;	// track of string length
   bool dynamic;
-  int pars_pos;
+  mutable int pars_pos;
 public:
   chars(void);
   chars(char *s);
@@ -44,77 +44,48 @@ public:
   chars(const char *, const char *fmt, ...);
   virtual ~chars(void);
 private:
-  virtual void allocate_string(char *s);
-  virtual void deallocate_string(void);
+  void allocate_string(const char *s);
+  void deallocate_string(void);
 
 public:
-  virtual chars &append(char *s);
-  virtual chars &append(char c);
-  virtual chars &append(const char *format, ...);
-  virtual chars &format(const char *format, ...);
-  virtual bool empty();
-  virtual bool nempty() { return !empty(); }
-  virtual bool is_null();
-  virtual int len() { return chars_length; }
-  virtual void start_parse(void) { start_parse(0); }
-  virtual void start_parse(int at) { pars_pos= at; }
-  virtual chars token(chars delims);
-  virtual void ltrim(void);
-  virtual void rtrim(void);
-  virtual void trim() { ltrim(); rtrim(); }
+  const char *c_str(void) const { return chars_string; }
+  chars &append(const char *s);
+  chars &append(char c);
+  chars &appendf(const char *format, ...);
+  chars &format(const char *format, ...);
+  bool empty() const { return chars_length == 0; }
+  bool nempty() const { return !empty(); }
+  bool is_null()const { return !chars_string; }
+  int len() const { return chars_length; }
+  void start_parse(void) const { start_parse(0); }
+  void start_parse(int at) const { pars_pos= at; }
+  chars token(const char *delims) const;
+  void ltrim(void);
+  void rtrim(void);
+  void trim() { ltrim(); rtrim(); }
   // search
-  bool starts_with(char *x);
-  bool starts_with(const char *x);
-  bool starts_with(chars x);
+  bool starts_with(const char *x) const;
 public:
   // Operators
 
   // Cast
-  operator char*(void) { return(chars_string); };
-  operator char*(void) const { return(chars_string); };
+  operator const char*(void) const { return(chars_string); };
   // Assignment
-  chars &operator=(char *s);
-  //chars &operator=(const char *s);
+  chars &operator=(const char *s);
   chars &operator=(const chars &cs);
   // Arithmetic
-  chars operator+(char c);
-  chars operator+(char *s);
-  chars operator+(const chars &cs);
+  chars operator+(char c) const;
+  chars operator+(const char *s) const;
   chars &operator+=(char c) { return(append(c)); }
-  chars &operator+=(char *s) { return(append(s)); }
-  chars &operator+=(const char *s) { return(append((char*)s)); }
-  chars &operator+=(const chars &cs) { return(append((char*)cs)); }
+  chars &operator+=(const char *s) { return(append(s)); }
   // Boolean
-  bool equal(char *);
-  bool operator==(char *s);
-  bool operator==(const char *s);
-  bool operator==(chars &cs);
-  bool operator!=(char *s);
-  bool operator!=(const char *s);
-  bool operator!=(chars &cs);  
+  bool equal(const char *) const;
+  bool operator==(const char *s) const;
+  bool operator!=(const char *s) const;
 };
 
 extern chars operator+(char s, const chars &cs);
-extern chars operator+(char *s, const chars &cs);
-extern bool operator==(char *s, const chars &cs);
-extern bool operator==(const char *s, const chars &cs);
-extern bool operator!=(char *s, const chars &cs);
-extern bool operator!=(const char *s, const chars &cs);
 
-/*
-class cchars: public chars
-{
- public:
-  //cchars(const char *s);
-  cchars(char const *s);
-  virtual ~cchars(void);
- private:
-  virtual void allocate_string(const char *s);
-  virtual void deallocate_string(void);
-};
-*/
-
-#define cchars chars
 
 #endif
 

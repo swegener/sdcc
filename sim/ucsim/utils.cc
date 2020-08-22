@@ -74,7 +74,7 @@ get_sub_opt(char **option, const char * const *tokens, char **valuep)
 }
 
 
-char *
+const char *
 get_id_string(struct id_element *ids, int id)
 {
   int i= 0;
@@ -82,13 +82,13 @@ get_id_string(struct id_element *ids, int id)
   while (ids[i].id_string &&
 	 id != ids[i].id)
     i++;
-  return(cchars(ids[i].id_string));
+  return(ids[i].id_string);
 }
 
-char *
-get_id_string(struct id_element *ids, int id, char *def)
+const char *
+get_id_string(struct id_element *ids, int id, const char *def)
 {
-  char *s= get_id_string(ids, id);
+  const char *s= get_id_string(ids, id);
 
   return(s?s:def);
 }
@@ -175,12 +175,12 @@ object_name(class cl_base *o)
   if (name &&
       *name)
     return(name);
-  return(cchars("(unknown)"));
+  return("(unknown)");
 }
 
 
 char *
-case_string(enum letter_case lcase, char *str)
+case_string(enum letter_case lcase, const char *str)
 {
   char *p= strdup(str);
   char *s= p;
@@ -225,18 +225,6 @@ cbin(long data, int bits)
   return c;
 }
 
-/*char *
-case_string(enum letter_case lcase, const char *str)
-{
-  char *p= NIL;
-
-  if (!str ||
-      !*str)
-    return(NIL);
-  p= strdup(str);
-  return case_string(lcase, p);
-}*/
-
 double
 dnow(void)
 {
@@ -259,14 +247,14 @@ strispn(char *s, char c)
 /* Return true if "serach_in" string ends with string "what" */
 
 bool
-strend(char *search_in, char *what)
+strend(const char *search_in, const char *what)
 {
   if (!search_in ||
       !what ||
       !*search_in ||
       !*what)
     return false;
-  char *start= strstr(search_in, what);
+  const char *start= strstr(search_in, what);
   if (start == NULL)
     return false;
   if (start[strlen(what)] == '\0')
@@ -296,7 +284,7 @@ valid_sym_name(char *s)
 bool
 is_hex_file(class cl_f *f)
 {
-  char *n;
+  const char *n;
   if (!f)
     return false;
   n= f->get_file_name();
@@ -304,9 +292,9 @@ is_hex_file(class cl_f *f)
       !*n)
     return false;
 
-  if (strend(n, cchars(".ihx")) ||
-      strend(n, cchars(".hex")) ||
-      strend(n, cchars(".ihex")))
+  if (strend(n, ".ihx") ||
+      strend(n, ".hex") ||
+      strend(n, ".ihex"))
     return true;
 
   return false;
@@ -315,7 +303,7 @@ is_hex_file(class cl_f *f)
 bool
 is_asc_file(class cl_f *f)
 {
-  char *n;
+  const char *n;
   if (!f)
     return false;
   n= f->get_file_name();
@@ -323,7 +311,7 @@ is_asc_file(class cl_f *f)
       !*n)
     return false;
 
-  if (strend(n, cchars(".asc")))
+  if (strend(n, ".asc"))
     return true;
 
   return false;
@@ -332,7 +320,7 @@ is_asc_file(class cl_f *f)
 bool
 is_omf_file(class cl_f *f)
 {
-  char *n;
+  const char *n;
   if (!f)
     return false;
   n= f->get_file_name();
@@ -340,7 +328,7 @@ is_omf_file(class cl_f *f)
       !*n)
     return false;
 
-  if (strend(n, cchars(".omf")))
+  if (strend(n, ".omf"))
     return true;
 
   return false;
@@ -349,7 +337,7 @@ is_omf_file(class cl_f *f)
 bool
 is_cdb_file(class cl_f *f)
 {
-  char *n;
+  const char *n;
   if (!f)
     return false;
   n= f->get_file_name();
@@ -357,7 +345,7 @@ is_cdb_file(class cl_f *f)
       !*n)
     return false;
 
-  if (strend(n, cchars(".cdb")))
+  if (strend(n, ".cdb"))
     return true;
 
   return false;
@@ -405,124 +393,126 @@ colopt2ansiseq(char *opt)
 {
   bool fg_rgb= false, bg_rgb= false;
   bool fg_bright= false, bg_bright= false;
+  const char *o, *s;
   chars r= "";
+  size_t l;
   int fg= -1, bg= -1;
   int ctype= ct_none;
-  chars o;
-  
+
   if (!opt ||
       !*opt)
     return r;
-  o= opt;
-  char *s= strtok((char*)o, ":");
+  s= opt;
+  o= strchr(s, ':');
+  l= o - s;
   while (s)
     {
-      if (strcmp(s, "black") == 0)
+      if (strncmp(s, "black", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 0;
 	  else
 	    bg= 0;
 	}
-      else if (strcmp(s, "bblack") == 0)
+      else if (strncmp(s, "bblack", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 0, fg_bright= true;
 	  else
 	    bg= 0, bg_bright= true;
 	}
-      else if (strcmp(s, "red") == 0)
+      else if (strncmp(s, "red", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 1;
 	  else
 	    bg= 1;
 	}
-      else if (strcmp(s, "bred") == 0)
+      else if (strncmp(s, "bred", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 1, fg_bright= true;
 	  else
 	    bg= 1, bg_bright= true;
 	}
-      else if (strcmp(s, "green") == 0)
+      else if (strncmp(s, "green", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 2;
 	  else
 	    bg= 2;
 	}
-      else if (strcmp(s, "bgreen") == 0)
+      else if (strncmp(s, "bgreen", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 2, fg_bright= true;
 	  else
 	    bg= 2, bg_bright= true;
 	}
-      else if (strcmp(s, "yellow") == 0)
+      else if (strncmp(s, "yellow", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 3;
 	  else
 	    bg= 3;
 	}
-      else if (strcmp(s, "byellow") == 0)
+      else if (strncmp(s, "byellow", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 3, fg_bright= true;
 	  else
 	    bg= 3, bg_bright= true;
 	}
-      else if (strcmp(s, "blue") == 0)
+      else if (strncmp(s, "blue", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 4;
 	  else
 	    bg= 4;
 	}
-      else if (strcmp(s, "bblue") == 0)
+      else if (strncmp(s, "bblue", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 4, fg_bright= true;
 	  else
 	    bg= 4, bg_bright= true;
 	}
-      else if (strcmp(s, "magenta") == 0)
+      else if (strncmp(s, "magenta", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 5;
 	  else
 	    bg= 5;
 	}
-      else if (strcmp(s, "bmagenta") == 0)
+      else if (strncmp(s, "bmagenta", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 5, fg_bright= true;
 	  else
 	    bg= 5, bg_bright= true;
 	}
-      else if (strcmp(s, "cyan") == 0)
+      else if (strncmp(s, "cyan", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 6;
 	  else
 	    bg= 6;
 	}
-      else if (strcmp(s, "bcyan") == 0)
+      else if (strncmp(s, "bcyan", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 6, fg_bright= true;
 	  else
 	    bg= 6, bg_bright= true;
 	}
-      else if (strcmp(s, "white") == 0)
+      else if (strncmp(s, "white", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 7;
 	  else
 	    bg= 7;
 	}
-      else if (strcmp(s, "bwhite") == 0)
+      else if (strncmp(s, "bwhite", l) == 0)
 	{
 	  if (fg<0)
 	    fg= 7, fg_bright= true;
@@ -556,7 +546,11 @@ colopt2ansiseq(char *opt)
 		}
 	    }
 	}
-      s= strtok(NULL, ":");
+      s= o;
+      if (s) {
+        o= strchr(++s, ':');
+        l= o - s;
+      }
     }
 
   /* set character rendering mode */
@@ -577,14 +571,14 @@ colopt2ansiseq(char *opt)
     {
       if (bg_rgb)
 	{
-	  r.append("\033[48;2;%d;%d;%dm", (bg>>16)&0xff, (bg>>8)&0xff, bg&0xff);
+	  r.appendf("\033[48;2;%d;%d;%dm", (bg>>16)&0xff, (bg>>8)&0xff, bg&0xff);
 	}
       else
 	{
 	  int i= 40+bg;
 	  if (bg_bright)
 	    i= 100+bg;
-	  r.append("\033[%dm", i);
+	  r.appendf("\033[%dm", i);
 	}
     }
   
@@ -593,14 +587,14 @@ colopt2ansiseq(char *opt)
     {
       if (fg_rgb)
 	{
-	  r.append("\033[38;2;%d;%d;%dm", (fg>>16)&0xff, (fg>>8)&0xff, fg&0xff);
+	  r.appendf("\033[38;2;%d;%d;%dm", (fg>>16)&0xff, (fg>>8)&0xff, fg&0xff);
 	}
       else
 	{
 	  int i= 30+fg;
 	  if (fg_bright)
 	    i= 90+fg;
-	  r.append("\033[%dm", i);
+	  r.appendf("\033[%dm", i);
 	}
     }
   

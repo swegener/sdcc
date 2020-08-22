@@ -48,7 +48,7 @@ public:
 public:
   cl_pdk(struct cpu_entry *IType, class cl_sim *asim);
   virtual int init(void);
-  virtual char *id_string(void);
+  virtual const char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
   //virtual void mk_port(t_addr base, chars n);

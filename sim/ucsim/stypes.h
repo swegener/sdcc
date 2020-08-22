@@ -251,10 +251,10 @@ enum mem_class
   MEM_TYPES
 };
 
-#define MEM_SFR_ID	cchars("sfr")
-#define MEM_XRAM_ID	cchars("xram")
-#define MEM_IXRAM_ID	cchars("ixram")
-#define MEM_IRAM_ID	cchars("iram")
+#define MEM_SFR_ID	"sfr"
+#define MEM_XRAM_ID	"xram"
+#define MEM_IXRAM_ID	"ixram"
+#define MEM_IRAM_ID	"iram"
 
 // States of simulator
 enum sim_state {

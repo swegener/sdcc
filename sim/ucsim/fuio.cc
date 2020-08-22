@@ -32,7 +32,7 @@ void deb(const char *format, ...)
   return;
   if (dd==NULL)
     {
-      dd= mk_io(/*cchars("/dev/pts/2"),cchars("w")*/"","");
+      dd= mk_io(/*"/dev/pts/2", "w"*/"", "");
       dd->file_id= open("/dev/pts/4", O_WRONLY);
       //dd->init();
     }
@@ -260,7 +260,7 @@ mk_srv_socket(int port)
 
   /* Give the socket a name. */
   i= 1;
-  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&i, sizeof(i)) < 0)
+  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void*)&i, sizeof(i)) < 0)
     {
       perror("setsockopt");
     }
@@ -278,11 +278,11 @@ mk_srv_socket(int port)
 
 
 class cl_f *
-mk_io(chars fn, chars mode)
+mk_io(const char *fn, const char *mode)
 {
   class cl_io *io;
 
-  if (fn.empty())
+  if (!fn || !*fn)
     {
       io= new cl_io();
       io->init();
@@ -301,7 +301,7 @@ mk_io(chars fn, chars mode)
 }
 
 class cl_f *
-cp_io(/*FILE *f*/int file_id, chars mode)
+cp_io(/*FILE *f*/int file_id, const char *mode)
 {
   class cl_io *io;
 
@@ -340,7 +340,7 @@ srv_accept(class cl_f *listen_io,
       io= new cl_io(listen_io->server_port);
       if (new_sock > 0)
 	{
-	  io->own_opened(new_sock, cchars("r"));
+	  io->own_opened(new_sock, "r");
 	}
       *fin= io;
     }
@@ -350,7 +350,7 @@ srv_accept(class cl_f *listen_io,
       io= new cl_io(listen_io->server_port);
       if (new_sock > 0)
 	{
-	  io->use_opened(new_sock, cchars("w"));
+	  io->use_opened(new_sock, "w");
 	}
       *fout= io;
     }

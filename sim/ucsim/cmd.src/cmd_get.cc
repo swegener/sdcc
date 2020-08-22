@@ -80,7 +80,7 @@ COMMAND_DO_WORK_UC(cl_get_sfr_cmd)
       if (!parm->as_address(uc) ||
 	  !mem->valid_address(parm->value.address))
 	con->dd_printf("Warning: Invalid address %s\n",
-		       (char*)cmdline->tokens->at(i));
+		       cmdline->tokens->at(i));
       else
 	mem->dump(parm->value.address, parm->value.address, 1, con/*->get_fout()*/);
     }

@@ -83,7 +83,7 @@ cl_hw::init(void)
   snprintf(s, 99, "%d", id);
   n+= '_';
   n+= s;
-  n+= cchars("_cfg");
+  n+= "_cfg";
 
   cfg= new cl_address_space(n, 0, cfg_size(), sizeof(t_mem)*8);
   cfg->init();
@@ -194,10 +194,10 @@ cl_hw::cfg_read(t_addr addr)
   return cfg->read(addr);
 }
 
-char *
+const char *
 cl_hw::cfg_help(t_addr addr)
 {
-  return (char*)"N/A";
+  return "N/A";
 }
 
 void
@@ -461,7 +461,7 @@ cl_hw::draw_display(void)
   io->dd_cprintf("ui_label", "Time: ");
   io->tu_go(66,2);
   chars s("", "%s[%d]", id_string, id);
-  io->dd_cprintf("ui_title", "%-13s", (char*)s);
+  io->dd_cprintf("ui_title", "%-13s", s.c_str());
 }
 
 class cl_hw *

@@ -394,7 +394,7 @@ cl_uc::init(void)
   make_variables();
   make_memories();
   if (rom == NULL)
-    rom= address_space(cchars("rom")/*MEM_ROM_ID*/);
+    rom= address_space("rom"/*MEM_ROM_ID*/);
   ebrk= new brk_coll(2, 2, rom);
   fbrk= new brk_coll(2, 2, rom);
   fbrk->Duplicates= false;
@@ -421,10 +421,10 @@ cl_uc::init(void)
   return(0);
 }
 
-char *
+const char *
 cl_uc::id_string(void)
 {
-  return((char*)"unknown microcontroller");
+  return("unknown microcontroller");
 }
 
 void
@@ -799,7 +799,7 @@ cl_uc::build_cmdset(class cl_cmdset *cmdset)
  */
 
 t_mem
-cl_uc::read_mem(char *id, t_addr addr)
+cl_uc::read_mem(const char *id, t_addr addr)
 {
   class cl_address_space *m= address_space(id);
 
@@ -807,7 +807,7 @@ cl_uc::read_mem(char *id, t_addr addr)
 }
 
 t_mem
-cl_uc::get_mem(char *id, t_addr addr)
+cl_uc::get_mem(const char *id, t_addr addr)
 {
   class cl_address_space *m= address_space(id);
 
@@ -815,7 +815,7 @@ cl_uc::get_mem(char *id, t_addr addr)
 }
 
 void
-cl_uc::write_mem(char *id, t_addr addr, t_mem val)
+cl_uc::write_mem(const char *id, t_addr addr, t_mem val)
 {
   class cl_address_space *m= address_space(id);
 
@@ -824,7 +824,7 @@ cl_uc::write_mem(char *id, t_addr addr, t_mem val)
 }
 
 void
-cl_uc::set_mem(char *id, t_addr addr, t_mem val)
+cl_uc::set_mem(const char *id, t_addr addr, t_mem val)
 {
   class cl_address_space *m= address_space(id);
 
@@ -1183,19 +1183,19 @@ cl_uc::read_asc_file(cl_f *f)
 	      in= false;
 	      {
 		chars word= chars();
-		char *s;
+		const char *s;
 		// process
 		line.trim();
 		line.start_parse();
 		word= line.token(" ");
-		s= (char*)word;
+		s= word.c_str();
 		if (isxdigit(*s))
 		  {
 		    t_mem d= strtoll(s, 0, 16);
 		    set_rom(addr, d);
 		    addr++;
 		  }
-		line= (char*)"";
+		line= "";
 	      }
 	    }
 	  else
@@ -1220,7 +1220,7 @@ cl_uc::read_cdb_file(cl_f *f)
 {
   class cl_cdb_recs *fns= new cl_cdb_recs();
   chars ln;
-  char *lc;
+  const char *lc;
   long cnt= 0;
   class cl_cdb_rec *r;
   class cl_var *v;
@@ -1228,8 +1228,8 @@ cl_uc::read_cdb_file(cl_f *f)
   ln= f->get_s();
   while (!ln.empty())
     {
-      //printf("CBD LN=%s\n",(char*)ln);
-      lc= (char*)ln;
+      //printf("CBD LN=%s\n",ln.c_str());
+      lc= ln.c_str();
       if (lc[0] == 'F')
 	{
 	  if (ln.len() > 5)
@@ -1262,7 +1262,7 @@ cl_uc::read_cdb_file(cl_f *f)
 		  chars n= ln.token("$");
 		  chars t= ln.token(":");
 		  t= ln.token(" ");
-		  t_addr a= strtol((char*)t, 0, 16);
+		  t_addr a= strtol(t.c_str(), 0, 16);
 		  if ((r= fns->rec(n)) != NULL)
 		    {
 		      fns->del(n);
@@ -1294,29 +1294,29 @@ cl_uc::find_loadable_file(chars nam)
   if (o)
     return f;
 
-  c= chars("", "%s.asc", (char*)nam);
-  f->open(c, chars("r"));
+  c= chars("", "%s.asc", nam.c_str());
+  f->open(c, "r");
   o= (f->opened());
   if (o)
     return f;
-  c= chars("", "%s.ihx", (char*)nam);
-  f->open(c, chars("r"));
+  c= chars("", "%s.ihx", nam.c_str());
+  f->open(c, "r");
   o= (f->opened());
   if (o)
     return f;
-  c= chars("", "%s.hex", (char*)nam);
-  f->open(c, chars("r"));
+  c= chars("", "%s.hex", nam.c_str());
+  f->open(c, "r");
   o= (f->opened());
   if (o)
     return f;
-  c= chars("", "%s.ihex", (char*)nam);
-  f->open(c, chars("r"));
+  c= chars("", "%s.ihex", nam.c_str());
+  f->open(c, "r");
   o= (f->opened());
   if (o)
     return f;
 
-  c= chars("", "%s.omf", (char*)nam);
-  f->open(c, chars("r"));
+  c= chars("", "%s.omf", nam.c_str());
+  f->open(c, "r");
   o= (f->opened());
   if (o)
     return f;
@@ -1360,7 +1360,7 @@ cl_uc::read_file(chars nam, class cl_console_base *con)
   if (strcmp(nam, f->get_fname()) != 0)
     {
       chars n= nam;
-      n+= (char*)".cdb";
+      n+= ".cdb";
       cl_f *c= mk_io(n, "r");
       if (c->opened())
 	{
@@ -1506,7 +1506,7 @@ cl_uc::get_hw(enum hw_cath cath, int *idx)
 }
 
 class cl_hw *
-cl_uc::get_hw(char *id_string, int *idx)
+cl_uc::get_hw(const char *id_string, int *idx)
 {
   class cl_hw *hw= 0;
   int i= 0;
@@ -1548,7 +1548,7 @@ cl_uc::get_hw(enum hw_cath cath, int hwid, int *idx)
 }
 
 class cl_hw *
-cl_uc::get_hw(char *id_string, int hwid, int *idx)
+cl_uc::get_hw(const char *id_string, int hwid, int *idx)
 {
   class cl_hw *hw;
   int i= 0;
@@ -1794,7 +1794,7 @@ cl_uc::symbolic_bit_name(t_addr bit_address,
       }*/
   /*sym_name= (char *)realloc(sym_name, strlen(sym_name)+2);
     strcat(sym_name, ".");*/
-  c+= cchars(".");
+  c+= ".";
   i= 0;
   while (bit_mask > 1)
     {
@@ -1804,8 +1804,8 @@ cl_uc::symbolic_bit_name(t_addr bit_address,
   //char bitnumstr[10];
   /*sprintf(bitnumstr, "%1d", i);
     strcat(sym_name, bitnumstr);*/
-  c.append("%d", i);
-  return(/*sym_name*/strdup((char*)c));
+  c.appendf("%d", i);
+  return(/*sym_name*/strdup(c.c_str()));
 }
 
 

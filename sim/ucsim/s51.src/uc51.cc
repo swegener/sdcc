@@ -716,7 +716,7 @@ cl_51core::init(void)
 
 static char id_string_51[100];
 
-char *
+const char *
 cl_51core::id_string(void)
 {
   int i;
@@ -776,7 +776,7 @@ cl_51core::mk_hw_elements(void)
   pd.set_name("P0");
   pd.cell_p  = p0->cell_p;
   pd.cell_in = p0->cell_in;
-  pd.keyset  = chars(keysets[0]);
+  pd.keyset  = keysets[0];
   pd.basx    = 1;
   pd.basy    = 4;
   d->add_port(&pd, 0);
@@ -784,7 +784,7 @@ cl_51core::mk_hw_elements(void)
   pd.set_name("P1");
   pd.cell_p  = p1->cell_p;
   pd.cell_in = p1->cell_in;
-  pd.keyset  = chars(keysets[1]);
+  pd.keyset  = keysets[1];
   pd.basx    = 20;
   pd.basy    = 4;
   d->add_port(&pd, 1);
@@ -792,7 +792,7 @@ cl_51core::mk_hw_elements(void)
   pd.set_name("P2");
   pd.cell_p  = p2->cell_p;
   pd.cell_in = p2->cell_in;
-  pd.keyset  = chars(keysets[2]);
+  pd.keyset  = keysets[2];
   pd.basx    = 40;
   pd.basy    = 4;
   d->add_port(&pd, 2);
@@ -800,7 +800,7 @@ cl_51core::mk_hw_elements(void)
   pd.set_name("P3");
   pd.cell_p  = p3->cell_p;
   pd.cell_in = p3->cell_in;
-  pd.keyset  = chars(keysets[3]);
+  pd.keyset  = keysets[3];
   pd.basx    = 60;
   pd.basy    = 4;
   d->add_port(&pd, 3);
@@ -1094,21 +1094,21 @@ cl_51core::make_vars(void)
 {
   cl_var *v;
 
-  vars->add(v= new cl_var(cchars("R0"), regs, 0, ""));
+  vars->add(v= new cl_var("R0", regs, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("R1"), regs, 1, ""));
+  vars->add(v= new cl_var("R1", regs, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("R2"), regs, 2, ""));
+  vars->add(v= new cl_var("R2", regs, 2, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("R3"), regs, 3, ""));
+  vars->add(v= new cl_var("R3", regs, 3, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("R4"), regs, 4, ""));
+  vars->add(v= new cl_var("R4", regs, 4, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("R5"), regs, 5, ""));
+  vars->add(v= new cl_var("R5", regs, 5, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("R6"), regs, 6, ""));
+  vars->add(v= new cl_var("R6", regs, 6, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("R7"), regs, 7, ""));
+  vars->add(v= new cl_var("R7", regs, 7, ""));
   v->init();
 
   int i;
@@ -1382,7 +1382,7 @@ cl_51core::print_regs(class cl_console_base *con)
 	  f.format("0x%%0%dx",a*2);
 	  data= xram->get(dp);
 	  con->dd_printf("   DPTR= ");
-	  con->dd_printf(/*xram->addr_format*/(char*)f, dp);
+	  con->dd_printf(/*xram->addr_format*/f.c_str(), dp);
 	  con->dd_printf(" @DPTR= 0x%02x %3d %c\n",
 			 data, data, isprint(data)?data:'.');
 	}
@@ -1507,7 +1507,7 @@ cl_51core::baddr_name(t_addr addr, char *buf)
     ma= addr&0xf8;
   daddr_name(ma, buf);
   chars c= chars("", "%s.%d", buf, (int)(addr & 7));
-  strcpy(buf, (char*)c);
+  strcpy(buf, c.c_str());
 }
 
 
@@ -1985,47 +1985,47 @@ cl_uc51_cpu::init(void)
     acc_bits[i]= register_cell(bas, ACC+i);
 
   cl_var *v;
-  uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps"), cfg, uc51cpu_aof_mdps,
+  uc->vars->add(v= new cl_var("cpu_aof_mdps", cfg, uc51cpu_aof_mdps,
 			      cfg_help(uc51cpu_aof_mdps)));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("cpu_mask_mdps"), cfg, uc51cpu_mask_mdps,
+  uc->vars->add(v= new cl_var("cpu_mask_mdps", cfg, uc51cpu_mask_mdps,
 			      cfg_help(uc51cpu_mask_mdps)));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps1l"), cfg, uc51cpu_aof_mdps1l,
+  uc->vars->add(v= new cl_var("cpu_aof_mdps1l", cfg, uc51cpu_aof_mdps1l,
 			      cfg_help(uc51cpu_aof_mdps1l)));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("cpu_aof_mdps1h"), cfg, uc51cpu_aof_mdps1h,
+  uc->vars->add(v= new cl_var("cpu_aof_mdps1h", cfg, uc51cpu_aof_mdps1h,
 			      cfg_help(uc51cpu_aof_mdps1h)));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("cpu_aof_mdpc"), cfg, uc51cpu_aof_mdpc,
+  uc->vars->add(v= new cl_var("cpu_aof_mdpc", cfg, uc51cpu_aof_mdpc,
 			      cfg_help(uc51cpu_aof_mdpc)));
   v->init();
-  uc->vars->add(v= new cl_var(cchars("cpu_mask_mdpc"), cfg, uc51cpu_mask_mdpc,
+  uc->vars->add(v= new cl_var("cpu_mask_mdpc", cfg, uc51cpu_mask_mdpc,
 			      cfg_help(uc51cpu_mask_mdpc)));
   v->init();
   
   return(0);
 }
 
-char *
+const char *
 cl_uc51_cpu::cfg_help(t_addr addr)
 {
   switch (addr)
     {
     case uc51cpu_aof_mdps:
-      return (char*)"Address of multi_DPTR_sfr selector, WR selects this style of multi_DPTR (int, RW)";
+      return "Address of multi_DPTR_sfr selector, WR selects this style of multi_DPTR (int, RW)";
     case uc51cpu_mask_mdps:
-      return (char*)"Mask in multi_DPTR_srf selector (int, RW)";
+      return "Mask in multi_DPTR_srf selector (int, RW)";
     case uc51cpu_aof_mdps1l:
-      return (char*)"Address of multi_DPTR_sfr DPL1 (int, RW)";
+      return "Address of multi_DPTR_sfr DPL1 (int, RW)";
     case uc51cpu_aof_mdps1h:
-      return (char*)"Address of multi_DPTR_sfr DPH1 (int, RW)";
+      return "Address of multi_DPTR_sfr DPH1 (int, RW)";
     case uc51cpu_aof_mdpc:
-      return (char*)"Address of multi_DPTR_chip selector, WR selects this stlye of multi_DPTR (int, RW)";
+      return "Address of multi_DPTR_chip selector, WR selects this stlye of multi_DPTR (int, RW)";
     case uc51cpu_mask_mdpc:
-      return (char*)"Mask in multi_DPTR_chip selector (int, RW)";
+      return "Mask in multi_DPTR_chip selector (int, RW)";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 void

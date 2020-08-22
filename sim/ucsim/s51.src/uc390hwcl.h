@@ -48,7 +48,7 @@ protected:
 public:
   cl_uc390_hw (class cl_uc *auc);
   virtual int init (void);
-  //virtual char *cfg_help(t_addr addr);
+  //virtual const char *cfg_help(t_addr addr);
 
   virtual t_mem read (class cl_memory_cell *cell);
   virtual void write (class cl_memory_cell *cell, t_mem *val);

@@ -165,7 +165,7 @@ class cl_tlcs: public cl_uc
  public:
   cl_tlcs(class cl_sim *asim);
   virtual int init(void);
-  virtual char *id_string(void);
+  virtual const char *id_string(void);
 
   //virtual t_addr get_mem_size(enum mem_class type);
   //virtual int get_mem_width(enum mem_class type);
@@ -375,7 +375,7 @@ public:
   cl_tlcs_cpu(class cl_uc *auc);
   virtual int init(void);
   virtual int cfg_size(void) { return tlcscpu_nuof; }
-  virtual char *cfg_help(t_addr addr);
+  virtual const char *cfg_help(t_addr addr);
 
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
 };

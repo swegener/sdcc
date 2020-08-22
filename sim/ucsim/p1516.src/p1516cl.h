@@ -58,7 +58,7 @@ public:
  public:
   cl_p1516(class cl_sim *asim);
   virtual int init(void);
-  virtual char *id_string(void);
+  virtual const char *id_string(void);
   virtual void reset(void);
   virtual void set_PC(t_addr addr);
 

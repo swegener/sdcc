@@ -49,10 +49,10 @@ cl_p1516::init(void)
   return 0;
 }
 
-char *
+const char *
 cl_p1516::id_string(void)
 {
-  return (char*)"P1516";
+  return "P1516";
 }
 
 void
@@ -205,7 +205,6 @@ char *
 cl_p1516::disass(t_addr addr, const char *sep)
 {
   chars work= chars(), temp= chars();
-  char *buf, *p;
   const char *b;
   t_mem code, data= 0;
   int i;
@@ -221,9 +220,7 @@ cl_p1516::disass(t_addr addr, const char *sep)
     i++;
   if (dis_tbl()[i].mnemonic == NULL)
     {
-      buf= (char*)malloc(40);
-      strcpy(buf, "-- UNKNOWN/INVALID");
-      return(buf);
+      return strdup("-- UNKNOWN/INVALID");
     }
   b= dis_tbl()[i].mnemonic;
 
@@ -297,9 +294,7 @@ cl_p1516::disass(t_addr addr, const char *sep)
     }
   //*p= '\0';
 
-  p= (char*)work;
-  buf= strdup(p);
-  return(buf);
+  return strdup(work.c_str());
 }
 
 void

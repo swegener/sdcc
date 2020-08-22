@@ -107,20 +107,11 @@ cl_base::set_name(const char *new_name)
 const char *
 cl_base::set_name(const char *new_name, const char *def_name)
 {
-  char *def;
+  if (new_name && *new_name)
+    name= chars(new_name);
+  else
+    name= chars(def_name ? def_name : "");
 
-  if (!def_name ||
-      *def_name == '\0')
-    def= /*strdup*/cchars("");
-  else
-    def= /*strdup*/cchars(def_name);
-  // if (name) free((void*)name);
-  if (!new_name)
-    name= def;
-  else if (*new_name)
-    name= /*strdup*/(new_name);
-  else
-    name= def;
   return(name);
 }
 
@@ -273,17 +264,6 @@ cl_event::~cl_event(void)
 /*
  * Initializing a collection
  */
-
-cl_list::cl_list(t_index alimit, t_index adelta, char *aname):
-  cl_base()
-{
-  count= 0;
-  Items= 0;
-  Limit= 0;
-  Delta= adelta;
-  set_limit(alimit);
-  set_name(aname, "unnamed list");
-}
 
 cl_list::cl_list(t_index alimit, t_index adelta, const char *aname):
   cl_base()
@@ -690,12 +670,6 @@ cl_list::set_limit(t_index alimit)
  * Initilizing the sorted collection
  */
 
-cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta, char *aname):
-  cl_list(alimit, adelta, aname)
-{
-  Duplicates= false;
-}
-
 cl_sorted_list::cl_sorted_list(t_index alimit, t_index adelta, const char *aname):
   cl_list(alimit, adelta, aname)
 {
@@ -710,8 +684,8 @@ cl_sorted_list::~cl_sorted_list(void) {}
  * Get the address of the key field in an item.
  */
 
-void *
-cl_sorted_list::key_of(void *item)
+const void *
+cl_sorted_list::key_of(const void *item)
 {
   return(item);
 }
@@ -765,7 +739,7 @@ cl_sorted_list::add(void *item)
  */
 
 bool
-cl_sorted_list::search(void *key, t_index &index)
+cl_sorted_list::search(const void *key, t_index &index)
 {
   t_index l  = 0;
   t_index h  = count - 1;
@@ -803,12 +777,6 @@ cl_sorted_list::search(void *key, t_index &index)
  * Initilizing the string collection
  */
 
-cl_strings::cl_strings(t_index alimit, t_index adelta, char *aname):
-  cl_sorted_list(alimit, adelta, aname)
-{
-  Duplicates= true;
-}
-
 cl_strings::cl_strings(t_index alimit, t_index adelta, const char *aname):
   cl_sorted_list(alimit, adelta, aname)
 {
@@ -820,13 +788,13 @@ cl_strings::~cl_strings(void) {}
 
 
 /*
- * Comapare two string from the collection
+ * Compare two string from the collection
  */
 
 int
-cl_strings::compare(void *key1, void *key2)
+cl_strings::compare(const void *key1, const void *key2)
 {
-  return(strcmp((char *)key1, (char *)key2));
+  return strcmp((const char *)key1, (const char *)key2);
 }
 
 
@@ -852,10 +820,6 @@ cl_strings::free_item(void* item)
  * Initilizing the unsorted string collection
  */
 
-cl_ustrings::cl_ustrings(t_index alimit, t_index adelta, char *aname):
-  cl_strings(alimit, adelta, aname)
-{}
-
 cl_ustrings::cl_ustrings(t_index alimit, t_index adelta, const char *aname):
   cl_strings(alimit, adelta, aname)
 {}
@@ -868,7 +832,7 @@ cl_ustrings::~cl_ustrings(void) {}
  */
 
 int
-cl_ustrings::compare(void *key1, void *key2)
+cl_ustrings::compare(const void *key1, const void *key2)
 {
   return(-1);
 }
@@ -879,11 +843,11 @@ cl_ustrings::compare(void *key1, void *key2)
  */
 
 bool
-cl_ustrings::search(void *key, t_index& index)
+cl_ustrings::search(const void *key, t_index& index)
 {
   t_index i    = 0;
   bool    found= false;
-  void    *Actual;
+  const void *Actual;
 
   if ((count) && key)
     {

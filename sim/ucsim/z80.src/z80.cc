@@ -86,18 +86,18 @@ cl_z80::init(void)
   return(0);
 }
 
-char *
+const char *
 cl_z80::id_string(void)
 {
   switch (type->type)
     {
-    case CPU_Z80: return (char*)"Z80";
-    case CPU_Z180: return (char*)"Z180";
-    case CPU_Z80N: return (char*)"Z80N";
+    case CPU_Z80: return "Z80";
+    case CPU_Z180: return "Z180";
+    case CPU_Z80N: return "Z80N";
     default:
-      return((char*)"unspecified Z80");
+      return "unspecified Z80";
     }
-  return (char*)"Z80";
+  return "Z80";
 }
 
 
@@ -207,61 +207,61 @@ cl_z80::make_memories(void)
   address_spaces->add(regs16);
 
   class cl_var *v;
-  vars->add(v= new cl_var(cchars("A"), regs8, 0, ""));
+  vars->add(v= new cl_var("A", regs8, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("F"), regs8, 1, ""));
+  vars->add(v= new cl_var("F", regs8, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("B"), regs8, 2, ""));
+  vars->add(v= new cl_var("B", regs8, 2, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("C"), regs8, 3, ""));
+  vars->add(v= new cl_var("C", regs8, 3, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("D"), regs8, 4, ""));
+  vars->add(v= new cl_var("D", regs8, 4, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("E"), regs8, 5, ""));
+  vars->add(v= new cl_var("E", regs8, 5, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("H"), regs8, 6, ""));
+  vars->add(v= new cl_var("H", regs8, 6, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("L"), regs8, 7, ""));
-  v->init();
-
-  vars->add(v= new cl_var(cchars("ALT_A"), regs8, 8, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_F"), regs8, 9, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_B"), regs8, 10, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_C"), regs8, 11, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_D"), regs8, 12, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_E"), regs8, 13, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_H"), regs8, 14, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_L"), regs8, 15, ""));
+  vars->add(v= new cl_var("L", regs8, 7, ""));
   v->init();
 
-  vars->add(v= new cl_var(cchars("AF"), regs16, 0, ""));
+  vars->add(v= new cl_var("ALT_A", regs8, 8, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("BC"), regs16, 1, ""));
+  vars->add(v= new cl_var("ALT_F", regs8, 9, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("DE"), regs16, 2, ""));
+  vars->add(v= new cl_var("ALT_B", regs8, 10, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("HL"), regs16, 3, ""));
+  vars->add(v= new cl_var("ALT_C", regs8, 11, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("IX"), regs16, 4, ""));
+  vars->add(v= new cl_var("ALT_D", regs8, 12, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("IY"), regs16, 5, ""));
+  vars->add(v= new cl_var("ALT_E", regs8, 13, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("SP"), regs16, 6, ""));
+  vars->add(v= new cl_var("ALT_H", regs8, 14, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_AF"), regs16, 7, ""));
+  vars->add(v= new cl_var("ALT_L", regs8, 15, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_BC"), regs16, 8, ""));
+
+  vars->add(v= new cl_var("AF", regs16, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_DE"), regs16, 9, ""));
+  vars->add(v= new cl_var("BC", regs16, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_HL"), regs16, 10, ""));
+  vars->add(v= new cl_var("DE", regs16, 2, ""));
+  v->init();
+  vars->add(v= new cl_var("HL", regs16, 3, ""));
+  v->init();
+  vars->add(v= new cl_var("IX", regs16, 4, ""));
+  v->init();
+  vars->add(v= new cl_var("IY", regs16, 5, ""));
+  v->init();
+  vars->add(v= new cl_var("SP", regs16, 6, ""));
+  v->init();
+  vars->add(v= new cl_var("ALT_AF", regs16, 7, ""));
+  v->init();
+  vars->add(v= new cl_var("ALT_BC", regs16, 8, ""));
+  v->init();
+  vars->add(v= new cl_var("ALT_DE", regs16, 9, ""));
+  v->init();
+  vars->add(v= new cl_var("ALT_HL", regs16, 10, ""));
   v->init();
 }
 
@@ -1108,21 +1108,21 @@ cl_z80_cpu::init(void)
   cl_hw::init();
 
   cl_var *v;
-  uc->vars->add(v= new cl_var(cchars("sp_limit"), cfg, z80cpu_sp_limit,
+  uc->vars->add(v= new cl_var("sp_limit", cfg, z80cpu_sp_limit,
 			      cfg_help(z80cpu_sp_limit)));
   v->init();
   return 0;
 }
 
-char *
+const char *
 cl_z80_cpu::cfg_help(t_addr addr)
 {
   switch (addr)
     {
     case z80cpu_sp_limit:
-      return (char*)"Stack overflows when SP is below this limit";
+      return "Stack overflows when SP is below this limit";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 t_mem

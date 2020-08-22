@@ -224,9 +224,9 @@ print_fio_info(class cl_console_base *con, class cl_f *ff)
 {
   if (ff)
     {
-      char *n= ff->get_file_name();
-      chars t= fio_type_name(ff->type);
-      con->dd_printf("\"%s\",%s,", n, (char*)t);
+      const char *n= ff->get_file_name();
+      const char *t= fio_type_name(ff->type);
+      con->dd_printf("\"%s\",%s,", n, t);
       con->dd_printf("%d,%d,", ff->file_id, ff->server_port);
       con->dd_printf("%s,%s",
 		     ff->tty?"tty":"non-tty",

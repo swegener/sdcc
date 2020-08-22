@@ -78,27 +78,27 @@ cl_history::~cl_history(void)
 {
 }
 
-char *
+const char *
 cl_history::up(chars line)
 {
   replace(line);
   if (nr > 0)
     nr--;
-  return (char*)(Items[nr]);
+  return (char*)Items[nr];
 }
 
-char *
+const char *
 cl_history::down(chars line)
 {
   replace(line);
   if (nr < count)
     nr++;
   if (nr < count)
-    return (char*)(Items[nr]);
+    return (char*)Items[nr];
   return NULL;
 }
 
-char *
+void
 cl_history::enter(chars line)
 {
   if (count > 1000)
@@ -112,7 +112,6 @@ cl_history::enter(chars line)
       add(strdup(line));
       nr= count;
     }
-  return NULL;
 }
 
 void
@@ -141,7 +140,7 @@ cl_f::cl_f(void)
   server_port= -1;
   echo_of= NULL;
   echo_to= NULL;
-  echo_color= (char*)"";
+  echo_color= "";
   at_end= 0;
   last_used= first_free= 0;
   cooking= 0;
@@ -165,7 +164,7 @@ cl_f::cl_f(chars fn, chars mode):
   server_port= -1;
   echo_of= NULL;
   echo_to= NULL;
-  echo_color= (char*)"";
+  echo_color= "";
   at_end= 0;
   last_used= first_free= 0;
   cooking= 0;
@@ -187,7 +186,7 @@ cl_f::cl_f(int the_server_port)
   server_port= the_server_port;
   echo_of= NULL;
   echo_to= NULL;
-  echo_color= (char*)"";
+  echo_color= "";
   at_end= 0;
   last_used= first_free= 0;
   cooking= 0;
@@ -202,13 +201,13 @@ cl_f::cl_f(int the_server_port)
 class cl_f *
 cl_f::copy(chars mode)
 {
-  class cl_f *io= mk_io(chars(""), chars(""));
+  class cl_f *io= mk_io("", "");
   io->use_opened(file_id, mode);
   return io;
 }
 
 static int
-open_flags(char *m)
+open_flags(const char *m)
 {
   if (strcmp(m, "r") == 0)
     return O_RDONLY;
@@ -239,7 +238,7 @@ cl_f::init(void)
   else if (!file_name.empty())
     {
       if (file_mode.empty())
-	file_mode= cchars("r+");
+	file_mode= "r+";
       if ((file_id= ::open(file_name, open_flags(file_mode), (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) >= 0)
 	{
 	  tty= isatty(file_id);
@@ -257,13 +256,13 @@ cl_f::init(void)
 }
 
 int
-cl_f::use_opened(int opened_file_id, char *mode)
+cl_f::use_opened(int opened_file_id, const char *mode)
 {
   close();
   if (mode)
     file_mode= mode;
   else
-    file_mode= cchars("r+");
+    file_mode= "r+";
   own= false;
   if (opened_file_id >= 0)
     {
@@ -275,7 +274,7 @@ cl_f::use_opened(int opened_file_id, char *mode)
 }
 
 int
-cl_f::own_opened(int opened_file_id, char *mode)
+cl_f::own_opened(int opened_file_id, const char *mode)
 {
   use_opened(opened_file_id, mode);
   own= true;
@@ -283,7 +282,7 @@ cl_f::own_opened(int opened_file_id, char *mode)
 }
 
 int
-cl_f::use_opened(FILE *f, chars mode)
+cl_f::use_opened(FILE *f, const char *mode)
 {
   close();
   if (f)
@@ -302,7 +301,7 @@ cl_f::use_opened(FILE *f, chars mode)
 }
 
 int
-cl_f::own_opened(FILE *f, chars mode)
+cl_f::own_opened(FILE *f, const char *mode)
 {
   use_opened(f, mode);
   own= true;
@@ -310,7 +309,7 @@ cl_f::own_opened(FILE *f, chars mode)
 }
 
 int
-cl_f::open(char *fn)
+cl_f::open(const char *fn)
 {
   close();
   if (fn)
@@ -319,7 +318,7 @@ cl_f::open(char *fn)
 }
 
 int
-cl_f::open(char *fn, char *mode)
+cl_f::open(const char *fn, const char *mode)
 {
   close();
   if (mode)
@@ -699,7 +698,7 @@ cl_f::process(char c)
   // HISTORY
   else if (k == TU_UP)
     {
-      char *s= hist->up(line);
+      const char *s= hist->up(line);
       if (cursor > 0)
 	echo_cursor_go_left(cursor);
       echo_cursor_save();
@@ -716,7 +715,7 @@ cl_f::process(char c)
     }
   else if (k == TU_DOWN)
     {
-      char *s= hist->down(line);
+      const char *s= hist->down(line);
       if (cursor > 0)
 	echo_cursor_go_left(cursor);
       echo_cursor_save();
@@ -965,7 +964,7 @@ cl_f::read_dev(int *buf, int max)
 
 
 int
-cl_f::write(char *buf, int count)
+cl_f::write(const char *buf, int count)
 {
   int i;
   if (file_id >= 0)
@@ -999,7 +998,7 @@ cl_f::write(char *buf, int count)
 
 
 int
-cl_f::write_str(char *s)
+cl_f::write_str(const char *s)
 {
   if (!s ||
       !*s)
@@ -1007,15 +1006,6 @@ cl_f::write_str(char *s)
   return write(s, strlen(s));
 }
 
-
-int
-cl_f::write_str(const char *s)
-{
-  if (!s ||
-      !*s)
-    return 0;
-  return write((char*)s, strlen((char*)s));
-}
 
 int
 cl_f::vprintf(const char *format, va_list ap)
@@ -1061,7 +1051,7 @@ cl_f::echo_cursor_save()
 {
   if (echo_to)
     {
-      echo_to->write(cchars("\033[s"), 3);
+      echo_to->write("\033[s", 3);
       //echo_to->flush();
     }
 }
@@ -1071,7 +1061,7 @@ cl_f::echo_cursor_restore()
 {
   if (echo_to)
     {
-      echo_to->write(cchars("\033[u"), 3);
+      echo_to->write("\033[u", 3);
       //echo_to->flush();
     }
 }
@@ -1101,25 +1091,13 @@ cl_f::echo_cursor_go_right(int n)
 }
 
 void
-cl_f::echo_write(char *b, int l)
+cl_f::echo_write(const char *b, int l)
 {
   if (echo_to)
     {
       if (echo_color.nempty())
-	echo_to->prntf("%s", (char*)echo_color);
+	echo_to->prntf("%s", echo_color.c_str());
       echo_to->write(b, l);
-      //echo_to->flush();
-    }
-}
-
-void
-cl_f::echo_write_str(char *s)
-{
-  if (echo_to)
-    {
-      if (echo_color.nempty())
-	echo_to->prntf("%s", (char*)echo_color);
-      echo_to->write_str(s);
       //echo_to->flush();
     }
 }
@@ -1130,7 +1108,7 @@ cl_f::echo_write_str(const char *s)
   if (echo_to)
     {
       if (echo_color.nempty())
-	echo_to->prntf("%s", (char*)echo_color);
+	echo_to->prntf("%s", echo_color.c_str());
       echo_to->write_str(s);
       //echo_to->flush();
     }
@@ -1234,7 +1212,7 @@ cl_f::set_escape(bool val)
 }
 
 
-chars
+const char *
 fio_type_name(enum file_type t)
 {
   switch (t)

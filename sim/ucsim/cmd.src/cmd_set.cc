@@ -248,7 +248,7 @@ COMMAND_DO_WORK_APP(cl_set_option_cmd)
     int n= app->options->nuof_options(id);
     if (n > 1)
       {
-	char *cr= (char*)con->get_name();
+	const char *cr= con->get_name();
 	n= app->options->nuof_options(id, cr);
 	if (n > 1)
 	  con->dd_printf("Ambiguous option name, use number instead\n");

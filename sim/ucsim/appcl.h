@@ -130,7 +130,7 @@ public: // output functions
   virtual int debug(const char *format, ...);
 
 public:
-  virtual void set_option_s(chars opt_name, chars new_value);
+  virtual void set_option_s(const char *opt_name, const char *new_value);
 };
 
 

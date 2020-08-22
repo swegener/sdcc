@@ -105,10 +105,10 @@ cl_hc08::reset(void)
 }
 
 
-char *
+const char *
 cl_hc08::id_string(void)
 {
-  return((char*)"unspecified HC08");
+  return("unspecified HC08");
 }
 
 
@@ -176,16 +176,16 @@ cl_hc08::make_memories(void)
   address_spaces->add(regs16);
 
   class cl_var *v;
-  vars->add(v= new cl_var(cchars("A"), regs8, 0, ""));
+  vars->add(v= new cl_var("A", regs8, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("P"), regs8, 1, ""));
+  vars->add(v= new cl_var("P", regs8, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("H"), regs8, 2, ""));
+  vars->add(v= new cl_var("H", regs8, 2, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("X"), regs8, 3, ""));
+  vars->add(v= new cl_var("X", regs8, 3, ""));
   v->init();
 
-  vars->add(v= new cl_var(cchars("SP"), regs16, 0, ""));
+  vars->add(v= new cl_var("SP", regs16, 0, ""));
   v->init();
 }
 
@@ -737,22 +737,22 @@ cl_hc08_cpu::init(void)
   cl_hw::init();
 
   cl_var *v;
-  uc->vars->add(v= new cl_var(cchars("sp_limit"), cfg, hc08cpu_sp_limit,
+  uc->vars->add(v= new cl_var("sp_limit", cfg, hc08cpu_sp_limit,
 			      cfg_help(hc08cpu_sp_limit)));
   v->init();
 
   return 0;
 }
 
-char *
+const char *
 cl_hc08_cpu::cfg_help(t_addr addr)
 {
   switch (addr)
     {
     case hc08cpu_sp_limit:
-      return (char*)"Stack overflows when SP is below this limit";
+      return "Stack overflows when SP is below this limit";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 t_mem

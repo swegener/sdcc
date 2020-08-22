@@ -134,7 +134,7 @@ public:
   virtual void set_bit1(t_addr addr, t_mem bits)=0;
   virtual void set_bit0(t_addr addr, t_mem bits)=0;
 
-  virtual void print_info(chars pre, class cl_console_base *con);
+  virtual void print_info(const char *pre, class cl_console_base *con);
 };
 
 
@@ -304,8 +304,8 @@ class cl_memory_cell: public cl_cell_data
   virtual void remove_hw(class cl_hw *hw);
   virtual class cl_event_handler *get_event_handler(void);
 
-  virtual void print_info(chars pre, class cl_console_base *con);
-  virtual void print_operators(cchars pre, class cl_console_base *con);
+  virtual void print_info(const char *pre, class cl_console_base *con);
+  virtual void print_operators(const char *pre, class cl_console_base *con);
 };
 
 class cl_bit_cell: public cl_memory_cell
@@ -420,7 +420,7 @@ class cl_address_space: public cl_memory
   virtual void set_nuof_writes(unsigned long value) {}
 #endif
 
-  virtual void print_info(chars pre, class cl_console_base *con);
+  virtual void print_info(const char *pre, class cl_console_base *con);
 };
 
 class cl_address_space_list: public cl_list
@@ -462,7 +462,7 @@ public:
   virtual void set_bit1(t_addr addr, t_mem bits);
   virtual void set_bit0(t_addr addr, t_mem bits);
 
-  virtual void print_info(chars pre, class cl_console_base *con);
+  virtual void print_info(const char *pre, class cl_console_base *con);
 };
 
   
@@ -495,7 +495,7 @@ public:
   virtual bool shrink_out_of(t_addr begin, t_addr end);
   virtual class cl_address_decoder *split(t_addr begin, t_addr end);
 
-  virtual void print_info(chars pre, class cl_console_base *con);
+  virtual void print_info(const char *pre, class cl_console_base *con);
 };
 
 
@@ -544,7 +544,7 @@ class cl_banker: public cl_address_decoder
   virtual bool activate(class cl_console_base *con);
   virtual bool switch_to(int bank_nr, class cl_console_base *con);
   
-  virtual void print_info(chars pre, class cl_console_base *con);
+  virtual void print_info(const char *pre, class cl_console_base *con);
 };
 
 
@@ -569,7 +569,7 @@ class cl_bander: public cl_address_decoder
   virtual bool is_bander() { return true; }
 
   virtual bool activate(class cl_console_base *con);
-  virtual void print_info(chars pre, class cl_console_base *con);
+  virtual void print_info(const char *pre, class cl_console_base *con);
 };
 
 
@@ -582,8 +582,8 @@ protected:
 public:
   cl_decoder_list(t_index alimit, t_index adelta, bool bychip);
 
-  virtual void *key_of(void *item);
-  virtual int compare(void *key1, void *key2);
+  virtual const void *key_of(const void *item);
+  virtual int compare(const void *key1, const void *key2);
 };
 
 

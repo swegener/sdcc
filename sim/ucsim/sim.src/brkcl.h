@@ -119,8 +119,8 @@ public:
   class cl_address_space/*rom*/ *rom;
 public:
   brk_coll(t_index alimit, t_index adelta, class cl_address_space/*rom*/*arom);
-  virtual void *key_of(void *item);
-  virtual int  compare(void *key1, void *key2);
+  virtual const void *key_of(const void *item);
+  virtual int  compare(const void *key1, const void *key2);
 
   virtual bool there_is_event(enum brk_event ev);
   //virtual int make_new_nr(void);

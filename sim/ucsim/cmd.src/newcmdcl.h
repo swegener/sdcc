@@ -126,7 +126,7 @@ class cl_console_base: public cl_base
   
   virtual class cl_console_base *clone_for_exec(char *fin) = 0;
 
-  virtual void redirect(char *fname, char *mode) = 0;
+  virtual void redirect(const char *fname, const char *mode) = 0;
   virtual void un_redirect(void) = 0;
   virtual bool is_tty(void) const = 0;
   virtual bool is_eof(void) const = 0;
@@ -205,7 +205,7 @@ class cl_console_dummy: public cl_console_base
 
   virtual class cl_console_base *clone_for_exec(char *fin) { return NULL; }
 
-  virtual void redirect(char *fname, char *mode) {}
+  virtual void redirect(const char *fname, const char *mode) {}
   virtual void un_redirect(void) {}
   virtual bool is_tty(void) const { return false; }
   virtual bool is_eof(void) const { return false; }

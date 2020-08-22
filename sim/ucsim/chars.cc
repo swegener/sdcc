@@ -58,19 +58,11 @@ chars::chars(const char *s)
   dynamic= false;
   pars_pos= 0;
 }
-/*
-chars::chars(const char *s)
-{
-  chars_string= 0;
-  chars_length= 0;
-  allocate_string((char*)s);
-}
-*/
 chars::chars(const chars &cs)
 {
   chars_string= 0;
   chars_length= 0;
-  allocate_string((char*)cs);
+  allocate_string(cs);
 }
 
 chars::chars(const char *, const char *fmt, ...)
@@ -95,7 +87,7 @@ chars::~chars(void)
 
 
 void
-chars::allocate_string(char *s)
+chars::allocate_string(const char *s)
 {
   char *n= NULL;
   int l= 0;
@@ -128,11 +120,11 @@ chars::deallocate_string(void)
 
 
 chars
-chars::token(chars delims)
+chars::token(const char *delims) const
 {
   chars c= (char*)NULL;
 
-  if (delims.len() < 1)
+  if (!delims || !*delims)
     return c;
   if (pars_pos >= chars_length)
     return c;
@@ -141,12 +133,12 @@ chars::token(chars delims)
 
   int l;
   // skip initial delims first;
-  l= strspn(&chars_string[pars_pos], (char*)delims);
+  l= strspn(&chars_string[pars_pos], delims);
   pars_pos+= l;
   if (pars_pos >= chars_length)
     return c;
   // skip chars not in delims: search token end
-  l= strcspn(&chars_string[pars_pos], (char*)delims);
+  l= strcspn(&chars_string[pars_pos], delims);
   if (l > 0)
     {
       // found
@@ -155,7 +147,7 @@ chars::token(chars delims)
 	c+= chars_string[i];
       pars_pos= i;
       // skip delims at end
-      l= strspn(&chars_string[pars_pos], (char*)delims);
+      l= strspn(&chars_string[pars_pos], delims);
       pars_pos+= l;
       return c;
     }
@@ -192,7 +184,7 @@ chars::rtrim(void)
 
 
 bool
-chars::starts_with(char *x)
+chars::starts_with(const char *x) const
 {
   if (empty() ||
       !x ||
@@ -203,21 +195,9 @@ chars::starts_with(char *x)
   return false;
 }
 
-bool
-chars::starts_with(const char *x)
-{
-  return starts_with((char*)x);
-}
-
-bool
-chars::starts_with(chars x)
-{
-  return starts_with((char*)x);
-}
-
 
 chars &
-chars::append(char *s)
+chars::append(const char *s)
 {
   if (!s)
     return(*this);
@@ -266,7 +246,7 @@ chars::append(char c)
 }
 
 chars &
-chars::append(const char *format, ...)
+chars::appendf(const char *format, ...)
 {
   va_list ap;
   char n[1000];
@@ -321,39 +301,19 @@ chars::format(const char *format, ...)
   return *this;
 }
 
-bool
-chars::empty()
-{
-  return chars_length == 0;
-}
-
-bool
-chars::is_null()
-{
-  return chars_string == NULL;
-}
-
 // Assignment operators
 chars &
-chars::operator=(char *s)
+chars::operator=(const char *s)
 {
   allocate_string(s);
   return(*this);
 }
 
-/*
-chars &
-chars::operator=(const char *s)
-{
-  allocate_string((char*)s);
-  return(*this);
-}
-*/
-
 chars &
 chars::operator=(const chars &cs)
 {
-  allocate_string((char*)cs);
+  if (this != &cs)
+    allocate_string(cs.chars_string);
   return(*this);
 }
 
@@ -361,7 +321,7 @@ chars::operator=(const chars &cs)
 // Arithmetic operators
 
 chars
-chars::operator+(char c)
+chars::operator+(char c) const
 {
   char b[2];
   b[0]= c;
@@ -371,17 +331,10 @@ chars::operator+(char c)
 }
 
 chars
-chars::operator+(char *s)
+chars::operator+(const char *s) const
 {
   chars temp(chars_string);
   return(temp.append(s));
-}
-
-chars
-chars::operator+(const chars &cs)
-{
-  chars temp(chars_string);
-  return(temp.append(cs));
 }
 
 chars
@@ -391,20 +344,13 @@ operator+(char c, const chars &cs)
   b[0]= c;
   b[1]= 0;
   chars temp(b);
-  return(temp.append((char*)cs));
-};
-
-chars
-operator+(char *s, const chars &cs)
-{
-  chars temp(s);
-  return(temp.append((char*)cs));
-};
+  return(temp.append(cs));
+}
 
 
 // Boolean operators
 bool
-chars::equal(char *s)
+chars::equal(const char *s) const
 {
   if ((chars_string &&
        !s) ||
@@ -418,95 +364,16 @@ chars::equal(char *s)
 }
 
 bool
-chars::operator==(char *s)
+chars::operator==(const char *s) const
 {
   return(equal(s));
 }
 
 bool
-chars::operator==(const char *s)
-{
-  return(equal((char*)s));
-}
-
-bool
-chars::operator==(chars &cs)
-{
-  return(*this == (char*)cs);
-}
-
-bool
-operator==(char *s, const chars &cs)
-{
-  return((chars(cs)).equal(s));
-}
-
-bool
-operator==(const char *s, const chars &cs)
-{
-  return((chars(cs)).equal((char*)s));
-}
-
-bool
-chars::operator!=(char *s)
+chars::operator!=(const char *s) const
 {
   return(!equal(s));
 }
 
-bool
-chars::operator!=(const char *s)
-{
-  return(!equal((char*)s));
-}
-
-bool
-chars::operator!=(chars &cs)
-{
-  return(*this != (char*)cs);
-}
-
-bool
-operator!=(char *s, const chars &cs)
-{
-  return(!(chars(cs)).equal(s));
-}
-
-bool
-operator!=(const char *s, const chars &cs)
-{
-  return(!(chars(cs)).equal((char*)s));
-}
-
-/*
-cchars::cchars(const char *s):
-chars(s)
-{
-}
-*/
-/*
-cchars::cchars(char const *s):
-chars(s)
-{
-}
-
-cchars::~cchars(void)
-{
-  deallocate_string();
-}
-
-void
-cchars::allocate_string(const char *s)
-{
-  deallocate_string();
-  allocate_string((char*)s);
-}
-
-void
-cchars::deallocate_string(void)
-{
-  chars_string= 0;
-  chars_length= 0;
-}
-*/
 
 /* End of chars.cc */

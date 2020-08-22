@@ -86,16 +86,16 @@ void cl_pdk::reset(void) {
   }
 }
 
-char *cl_pdk::id_string(void) {
+const char *cl_pdk::id_string(void) {
   switch (type->type) {
     case CPU_PDK13:
-      return((char *)"pdk13");
+      return("pdk13");
     case CPU_PDK14:
-      return((char *)"pdk14");
+      return("pdk14");
     case CPU_PDK15:
-      return((char *)"pdk15");
+      return("pdk15");
     default:
-      return((char*)"unknown pdk");
+      return("unknown pdk");
   }
 }
 
@@ -172,9 +172,9 @@ void cl_pdk::make_memories(void) {
   }
 
   class cl_var *v;
-  vars->add(v = new cl_var(cchars("flag"), regs8, 0, ""));
+  vars->add(v = new cl_var("flag", regs8, 0, ""));
   v->init();
-  vars->add(v = new cl_var(cchars("sp"), regs8, 1, ""));
+  vars->add(v = new cl_var("sp", regs8, 1, ""));
   v->init();
 }
 

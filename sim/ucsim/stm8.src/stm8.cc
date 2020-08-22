@@ -116,19 +116,19 @@ cl_stm8::reset(void)
 }
 
 
-char *
+const char *
 cl_stm8::id_string(void)
 {
   switch (type->type)
     {
     case CPU_STM8S:
-      return((char*)"STM8 S,AF");
+      return("STM8 S,AF");
     case CPU_STM8L:
-      return((char*)"STM8 AL,L");
+      return("STM8 AL,L");
     case CPU_STM8L101:
-      return((char*)"STM8 L101");
+      return("STM8 L101");
     default:
-      return((char*)"STM8");
+      return("STM8");
     }
 }
 
@@ -173,7 +173,7 @@ cl_stm8::mk_port(t_addr base, chars n)
   pd.cell_p  = p->cell_p;
   pd.cell_in = p->cell_in;
   pd.cell_dir= p->cell_dir;
-  pd.keyset  = chars(puiks);
+  pd.keyset  = puiks;
   pd.basx    = puix;
   pd.basy    = puiy;
   d->add_port(&pd, puis++);
@@ -626,16 +626,16 @@ cl_stm8::make_memories(void)
   address_spaces->add(regs16);
 
   class cl_var *v;
-  vars->add(v= new cl_var(cchars("A"), regs8, 0, ""));
+  vars->add(v= new cl_var("A", regs8, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("CC"), regs8, 1, ""));
+  vars->add(v= new cl_var("CC", regs8, 1, ""));
   v->init();
   
-  vars->add(v= new cl_var(cchars("X"), regs16, 0, ""));
+  vars->add(v= new cl_var("X", regs16, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("Y"), regs16, 1, ""));
+  vars->add(v= new cl_var("Y", regs16, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("SP"), regs16, 2, ""));
+  vars->add(v= new cl_var("SP", regs16, 2, ""));
   v->init();
 }
 
@@ -2112,15 +2112,15 @@ cl_stm8_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
   return cell->get();
 }
 
-char *
+const char *
 cl_stm8_cpu::cfg_help(t_addr addr)
 {
   switch (addr)
     {
     case cpuconf_sp_limit:
-      return (char*)"Stack overflows when SP is below this limit";
+      return "Stack overflows when SP is below this limit";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 /* End of stm8.src/stm8.cc */

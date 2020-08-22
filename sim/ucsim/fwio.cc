@@ -26,7 +26,7 @@ void deb(const char *format, ...)
   return;
   /*if (dd==NULL)
     {
-      dd= cp_io(stdout,cchars("w"));
+      dd= cp_io(stdout,"w");
       dd->init();
       }*/
   va_list ap;
@@ -455,11 +455,11 @@ mk_srv_socket(int port)
 
 
 class cl_f *
-mk_io(chars fn, chars mode)
+mk_io(const char *fn, const char *mode)
 {
   class cl_io *io;
 
-  if (fn.empty())
+  if (!fn || !*fn)
     {
       io= new cl_io();
       io->init();
@@ -482,7 +482,7 @@ mk_io(chars fn, chars mode)
 }
 
 class cl_f *
-cp_io(/*FILE *f*/int file_id, chars mode)
+cp_io(/*FILE *f*/int file_id, const char *mode)
 {
   class cl_io *io;
 
@@ -528,7 +528,7 @@ srv_accept(class cl_f *listen_io,
 	    {
 	      FILE *f= fdopen(fh, "r");
 	      //printf("fdopened f=%p for fh=%d as input\n", f, fh);
-	      io->own_opened(f, cchars("r"));
+	      io->own_opened(f, "r");
 	      io->type= F_SOCKET;
 	      io->server_port= listen_io->server_port;
 	    }
@@ -546,7 +546,7 @@ srv_accept(class cl_f *listen_io,
 	    {
 	      FILE *f= fdopen(fh, "w");
 	      //printf("fdopened f=%p for fh=%d as output\n", f, fh);
-	      io->use_opened(f, cchars("w"));
+	      io->use_opened(f, "w");
 	      io->type= F_SOCKET;
 	      io->server_port= listen_io->server_port;
 	    }

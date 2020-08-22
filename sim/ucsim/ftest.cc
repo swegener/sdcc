@@ -7,19 +7,19 @@
 
 
 void
-regular_ftest(char *fn)
+regular_ftest(const char *fn)
 {
   int i;
   class cl_f *f;
 
   printf("Testing regular file access: %s\n", fn);
   printf("Write test\n");
-  f= mk_io(fn, cchars("w"));
+  f= mk_io(fn, "w");
   f->init();
   f->write_str("proba\n");
 
   printf("Read test\n");
-  f->open(fn, cchars("r"));
+  f->open(fn, "r");
   while (f->input_avail())
     {
       char buf[100];
@@ -44,7 +44,7 @@ stdin_ftest()
   int i, p= 0, done= 0;
 
   printf("STDIN test\n");
-  f->use_opened(0, (char*)"r");
+  f->use_opened(0, "r");
   printf("istty= %d\n", f->tty);
   i= f->read(buf, 99);
   buf[i]= '\0';
@@ -76,12 +76,12 @@ stdin_ftest()
 int
 main(int argc, char *argv[])
 {
-  char *fn;
+  const char *fn;
 
   if (argc > 1)
     fn= argv[1];
   else
-    fn= (char*)"ftest.txt";
+    fn= "ftest.txt";
   regular_ftest(fn);
   stdin_ftest();
   

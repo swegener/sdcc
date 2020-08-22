@@ -95,16 +95,16 @@ cl_r2k::init(void)
   return(0);
 }
 
-char *
+const char *
 cl_r2k::id_string(void)
 {
-  return((char*)"rabbit 2000");
+  return("rabbit 2000");
 }
 
-char *
+const char *
 cl_r3ka::id_string(void)
 {
-  return((char*)"rabbit 3000A");
+  return("rabbit 3000A");
 }
 
 /*
@@ -196,65 +196,65 @@ cl_r2k::make_memories(void)
   address_spaces->add(regs16);
 
   class cl_var *v;
-  vars->add(v= new cl_var(cchars("A"), regs8, 0, ""));
+  vars->add(v= new cl_var("A", regs8, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("F"), regs8, 1, ""));
+  vars->add(v= new cl_var("F", regs8, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("B"), regs8, 2, ""));
+  vars->add(v= new cl_var("B", regs8, 2, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("C"), regs8, 3, ""));
+  vars->add(v= new cl_var("C", regs8, 3, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("D"), regs8, 4, ""));
+  vars->add(v= new cl_var("D", regs8, 4, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("E"), regs8, 5, ""));
+  vars->add(v= new cl_var("E", regs8, 5, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("H"), regs8, 6, ""));
+  vars->add(v= new cl_var("H", regs8, 6, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("L"), regs8, 7, ""));
+  vars->add(v= new cl_var("L", regs8, 7, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("IIR"), regs8, 8, ""));
+  vars->add(v= new cl_var("IIR", regs8, 8, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("EIR"), regs8, 9, ""));
-  v->init();
-
-  vars->add(v= new cl_var(cchars("ALT_A"), regs8, 10, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_F"), regs8, 11, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_B"), regs8, 12, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_C"), regs8, 13, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_D"), regs8, 14, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_E"), regs8, 15, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_H"), regs8, 16, ""));
-  v->init();
-  vars->add(v= new cl_var(cchars("ALT_L"), regs8, 17, ""));
+  vars->add(v= new cl_var("EIR", regs8, 9, ""));
   v->init();
 
-  vars->add(v= new cl_var(cchars("AF"), regs16, 0, ""));
+  vars->add(v= new cl_var("ALT_A", regs8, 10, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("BC"), regs16, 1, ""));
+  vars->add(v= new cl_var("ALT_F", regs8, 11, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("DE"), regs16, 2, ""));
+  vars->add(v= new cl_var("ALT_B", regs8, 12, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("HL"), regs16, 3, ""));
+  vars->add(v= new cl_var("ALT_C", regs8, 13, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("IX"), regs16, 4, ""));
+  vars->add(v= new cl_var("ALT_D", regs8, 14, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("IY"), regs16, 5, ""));
+  vars->add(v= new cl_var("ALT_E", regs8, 15, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("SP"), regs16, 6, ""));
+  vars->add(v= new cl_var("ALT_H", regs8, 16, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_AF"), regs16, 7, ""));
+  vars->add(v= new cl_var("ALT_L", regs8, 17, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_BC"), regs16, 8, ""));
+
+  vars->add(v= new cl_var("AF", regs16, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_DE"), regs16, 9, ""));
+  vars->add(v= new cl_var("BC", regs16, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("ALT_HL"), regs16, 10, ""));
+  vars->add(v= new cl_var("DE", regs16, 2, ""));
+  v->init();
+  vars->add(v= new cl_var("HL", regs16, 3, ""));
+  v->init();
+  vars->add(v= new cl_var("IX", regs16, 4, ""));
+  v->init();
+  vars->add(v= new cl_var("IY", regs16, 5, ""));
+  v->init();
+  vars->add(v= new cl_var("SP", regs16, 6, ""));
+  v->init();
+  vars->add(v= new cl_var("ALT_AF", regs16, 7, ""));
+  v->init();
+  vars->add(v= new cl_var("ALT_BC", regs16, 8, ""));
+  v->init();
+  vars->add(v= new cl_var("ALT_DE", regs16, 9, ""));
+  v->init();
+  vars->add(v= new cl_var("ALT_HL", regs16, 10, ""));
   v->init();
 }
 

@@ -52,7 +52,7 @@ class cl_vcd: public cl_hw
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
-  virtual char *cfg_help(t_addr addr);
+  virtual const char *cfg_help(t_addr addr);
   
   virtual void report(class cl_memory_cell *cell, int nr);
   virtual int tick(int cycles);

@@ -44,14 +44,14 @@ class cl_uc *
 cl_simstm8::mk_controller(void)
 {
   int i;
-  char *typ= 0;
+  const char *typ= 0;
   class cl_optref type_option(this);
 
   type_option.init();
-  type_option.use(cchars("cpu_type"));
+  type_option.use("cpu_type");
   i= 0;
   if ((typ= type_option.get_value(typ)) == 0)
-    typ= cchars("STM8S");
+    typ= "STM8S";
   while ((cpus_stm8[i].type_str != NULL) &&
 	 (strcasecmp(typ, cpus_stm8[i].type_str) != 0))
     i++;

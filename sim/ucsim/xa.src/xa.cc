@@ -286,10 +286,10 @@ cl_xa::init(void)
 }
 
 
-char *
+const char *
 cl_xa::id_string(void)
 {
-  return((char*)"unspecified XA");
+  return("unspecified XA");
 }
 
 

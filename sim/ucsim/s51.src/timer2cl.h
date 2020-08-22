@@ -65,7 +65,7 @@ protected:
 public:
   cl_timer2(class cl_uc *auc, int aid, const char *aid_string, int afeautres);
   virtual int init(void);
-  //virtual char *cfg_help(t_addr addr);
+  //virtual const char *cfg_help(t_addr addr);
 
   virtual void added_to_uc(void);
   //virtual void new_hw_added(class cl_hw *new_hw);

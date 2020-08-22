@@ -90,7 +90,7 @@ public:
   cl_51core(struct cpu_entry *Itype, class cl_sim *asim);
   virtual ~cl_51core(void);
   virtual int    init(void);
-  virtual char  *id_string(void);
+  virtual const char *id_string(void);
   virtual void make_cpu_hw(void);
   virtual void mk_hw_elements(void);
   virtual void build_cmdset(class cl_cmdset *cmdset);
@@ -280,7 +280,7 @@ class cl_uc51_cpu: public cl_hw
   cl_uc51_cpu(class cl_uc *auc);
   virtual int init(void);
   virtual int cfg_size(void) { return uc51cpu_nuof; }
-  virtual char *cfg_help(t_addr addr);
+  virtual const char *cfg_help(t_addr addr);
   
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);

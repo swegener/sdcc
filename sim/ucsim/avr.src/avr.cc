@@ -144,10 +144,10 @@ cl_avr::init(void)
   return(0);
 }
 
-char *
+const char *
 cl_avr::id_string(void)
 {
-  return((char*)"unspecified AVR");
+  return("unspecified AVR");
 }
 
 

@@ -105,9 +105,7 @@ cl_port::init(void)
   cfg->set(port_value, prev & cell_in->get());
   
   cl_var *v;
-  chars pn;
-  pn= cchars("port");
-  pn.append("%d_", id);
+  chars pn= chars("", "port%d_", id);
   uc->vars->add(v= new cl_var(pn+chars("on"), cfg, port_on,
 			      cfg_help(port_on)));
   v->init();
@@ -120,30 +118,30 @@ cl_port::init(void)
   uc->vars->add(v= new cl_var(pn+chars("value"), cfg, port_value,
 			      cfg_help(port_value)));
   v->init();
-  chars p= chars("pin");
-  p.append("%d", id);
-  uc->vars->add(v= new cl_var(p, cfg, port_pin,
+
+  pn= chars("", "pin%d", id);
+  uc->vars->add(v= new cl_var(pn, cfg, port_pin,
 			      cfg_help(port_pin)));
   v->init();
-  p= chars("pins");
-  p.append("%d", id);
-  uc->vars->add(v= new cl_var(p, cfg, port_pin,
+
+  pn= chars("", "pins%d", id);
+  uc->vars->add(v= new cl_var(pn, cfg, port_pin,
 			      cfg_help(port_pin)));
   v->init();
   
   return(0);
 }
 
-char *
+const char *
 cl_port::cfg_help(t_addr addr)
 {
   switch (addr)
     {
-    case port_on: return (char*)"Turn/get on/off state (bool, RW)";
-    case port_pin: return (char*)"Outside value of port pins (int, RW)";
-    case port_value: return (char*)"Value of the port (int, RO)";
+    case port_on: return "Turn/get on/off state (bool, RW)";
+    case port_pin: return "Outside value of port pins (int, RW)";
+    case port_value: return "Value of the port (int, RO)";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 t_mem

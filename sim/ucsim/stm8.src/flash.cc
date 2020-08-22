@@ -105,14 +105,14 @@ cl_flash::init(void)
   return 0;
 }
 
-char *
+const char *
 cl_flash::cfg_help(t_addr addr)
 {
   switch (addr)
     {
-    case stm8_flash_on: return (char*)"Turn simulation of flash on/off (bool, RW)";
+    case stm8_flash_on: return "Turn simulation of flash on/off (bool, RW)";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 int

@@ -51,7 +51,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 
 cl_cmdline::cl_cmdline(class cl_app *the_app,
-		       char *acmd, class cl_console_base *acon):
+		       const char *acmd, class cl_console_base *acon):
   cl_base()
 {
   app= the_app;
@@ -250,10 +250,7 @@ cl_cmdline::split_out_output_redirection(char **_start, char **_end)
     }
   j= token_length(start);
   end= start+j;
-  chars cp= get_token(start);
-  char *n= (char*)cp;
-  //tokens->add(strdup(n));
-  con->redirect(n, mode);
+  con->redirect(get_token(start).c_str(), mode);
   *_start= start;
   *_end= end;
 }
@@ -705,7 +702,7 @@ cl_cmd::name_match(const char *aname, int strict)
     {
       for (i= 0; i < names->count; i++)
 	{
-	  char *n= (char*)(names->at(i));
+	  const char *n= names->at(i);
 	  if (strcmp(aname, n) == 0)
 	    return(1);
 	}
@@ -714,7 +711,7 @@ cl_cmd::name_match(const char *aname, int strict)
     {
       for (i= 0; i < names->count; i++)
 	{
-	  char *n= (char*)(names->at(i));
+	  const char *n= names->at(i);
 	  if (strstr(n, aname) == n)
 	    return(1);
 	}
@@ -776,7 +773,7 @@ int
 cl_cmd::do_work(class cl_cmdline *cmdline, class cl_console_base *con)
 {
   con->dd_printf("Command \"%s\" does nothing.\n",
-		 (char*)(names->at(0)));
+		 names->at(0));
   return(0);
 }
 
@@ -785,7 +782,7 @@ cl_cmd::do_work(class cl_app *app,
 		class cl_cmdline *cmdline, class cl_console_base *con)
 {
   con->dd_printf("Command \"%s\" does nothing on application.\n",
-		 (char*)(names->at(0)));
+		 names->at(0));
   return(0);
 }
 
@@ -794,7 +791,7 @@ cl_cmd::do_work(class cl_sim *sim,
 		class cl_cmdline *cmdline, class cl_console_base *con)
 {
   con->dd_printf("Command \"%s\" does nothing on simulator.\n",
-		 (char*)(names->at(0)));
+		 names->at(0));
   return(0);
 }
 
@@ -803,7 +800,7 @@ cl_cmd::do_work(class cl_uc *uc,
 		class cl_cmdline *cmdline, class cl_console_base *con)
 {
   con->dd_printf("Command \"%s\" does nothing on microcontroller.\n",
-		 (char*)(names->at(0)));
+		 names->at(0));
   return(0);
 }
 
@@ -816,7 +813,7 @@ cl_cmd::print_short(class cl_console_base *con)
     return;
   
   if (usage_help.nempty())
-    con->dd_printf("%s", (char*)usage_help);
+    con->dd_printf("%s", usage_help.c_str());
   if (l > 19)
     {
       con->dd_printf("\n");
@@ -829,10 +826,10 @@ cl_cmd::print_short(class cl_console_base *con)
     }
   if (short_help.nempty())
     {
-	con->dd_printf("%s", (char*)short_help);
+	con->dd_printf("%s", short_help.c_str());
     }
   else
-    con->dd_printf("%s", (char*)(names->at(0)));
+    con->dd_printf("%s", names->at(0));
   con->dd_printf("\n");
 }
   
@@ -978,11 +975,11 @@ cl_super_cmd::work(class cl_app *app,
 	return(cmd->work(app, cmdline, con));
       int i;
       con->dd_printf("\"%s\" must be followed by the name of a subcommand\n"
-		     "List of subcommands:\n", (char*)(names->at(0)));
+		     "List of subcommands:\n", names->at(0));
       for (i= 0; i < commands->count; i++)
 	{
 	  cmd= (class cl_cmd *)(commands->at(i));
-	  //con->dd_printf("%s\n", (char*)cmd->short_help);
+	  //con->dd_printf("%s\n", cmd->short_help.c_str());
 	  cmd->print_short(con);
 	}
       return(0);
@@ -990,7 +987,7 @@ cl_super_cmd::work(class cl_app *app,
   if ((cmd= commands->get_cmd(cmdline, con->is_interactive())) == NULL)
     {
       con->dd_printf("Undefined subcommand: \"%s\". Try \"help %s\".\n",
-		     cmdline->get_name(), (char*)(names->at(0)));
+		     cmdline->get_name(), names->at(0));
       return(0);
     }
   return(cmd->work(app, cmdline, con));

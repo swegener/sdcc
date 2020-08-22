@@ -64,26 +64,26 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
   if (params[0])
     if (!(params[0]->get_address(sim->uc, &start)))
       {
-	con->dd_printf(cchars("Error: wrong start address\n"));
+	con->dd_printf("Error: wrong start address\n");
 	return(false);
       }
   if (params[1])
     if (!(params[1]->get_address(sim->uc, &end)))
       {
-	con->dd_printf(cchars("Error: wromg end address\n"));
+	con->dd_printf("Error: wromg end address\n");
 	return(false);
       }
   if (params[0])
     {
       if (!sim->uc->inst_at(start))
-	con->dd_printf(cchars("Warning: maybe not instruction at 0x%06x\n"),
+	con->dd_printf("Warning: maybe not instruction at 0x%06x\n",
 		       AI(start));
       sim->uc->PC= start;
       if (params[1])
 	{
 	  if (start == end)
 	    {
-	      con->dd_printf(cchars("Addresses must be different.\n"));
+	      con->dd_printf("Addresses must be different.\n");
 	      return(false);
 	    }
 	  if ((b= sim->uc->fbrk_at(end)))
@@ -98,7 +98,7 @@ COMMAND_DO_WORK_SIM(cl_run_cmd)
 	    }
 	}
     }
-  con->dd_printf(cchars("Simulation started, PC=0x%06x\n"), AI(sim->uc->PC));
+  con->dd_printf("Simulation started, PC=0x%06x\n"), AI(sim->uc->PC);
   /*
   if (sim->uc->fbrk_at(sim->uc->PC))
     sim->uc->do_inst(1);
@@ -329,9 +329,9 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
       {
 	class cl_cmd *c= (class cl_cmd *)(cmdset->at(i));
 	/*if (c->short_help.nempty())
-	  con->dd_printf("%s\n", (char*)c->short_help);
+	  con->dd_printf("%s\n", c->short_help.c_str());
 	else
-	con->dd_printf("%s\n", (char*)(c->names->at(0)));*/
+	con->dd_printf("%s\n", c->names->at(0).c_str());*/
 	c->print_short(con);
       }
   }
@@ -345,24 +345,24 @@ COMMAND_DO_WORK_APP(cl_help_cmd)
 	  int names;
 	  con->dd_printf("Names of command:");
 	  for (names= 0; names < cmd_found->names->count; names++)
-	    con->dd_printf(" %s", (char*)(cmd_found->names->at(names)));
+	    con->dd_printf(" %s", cmd_found->names->at(names));
 	  con->dd_printf("\n");
 	  class cl_cmdset *subset= cmd_found->get_subcommands();
 	  if (subset)
 	    {
 	      con->dd_printf("\"%s\" must be followed by the name of a "
 			     "subcommand\nList of subcommands:\n",
-			     (char*)(cmd_found->names->at(0)));
+			     cmd_found->names->at(0));
 	      for (i= 0; i < subset->count; i++)
 		{
 		  class cl_cmd *c=
 		    dynamic_cast<class cl_cmd *>(subset->object_at(i));
-		  //con->dd_printf("%s\n", (char*)c->short_help);
+		  //con->dd_printf("%s\n", c->short_help.c_str());
 		  c->print_short(con);
 		}
 	    }
 	  if (cmd_found->long_help.nempty())
-	    con->dd_printf("%s\n", (char*)cmd_found->long_help);
+	    con->dd_printf("%s\n", cmd_found->long_help.c_str());
 	}
       if (!matches ||
 	  !cmd_found)
@@ -400,9 +400,9 @@ cl_help_cmd::do_set(class cl_cmdline *cmdline, int pari,
 	      matches++;
 	      cmd_found= cmd;
 	      /*if (cmd->short_help.nempty())
-		con->dd_printf("%s\n", (char*)cmd->short_help);
+		con->dd_printf("%s\n", cmd->short_help.c_str());
 	      else
-	      con->dd_printf("%s\n", (char*)(cmd->names->at(0)));*/
+	      con->dd_printf("%s\n", cmd->names->at(0).c_str());*/
 	      cmd->print_short(con);
 	      //continue;
 	    }
@@ -489,8 +489,8 @@ CMDHELP(cl_exec_cmd,
 
 COMMAND_DO_WORK_APP(cl_expression_cmd)
 {
-  char *s= cmdline->cmd;
-  char *fmt= NULL;
+  const char *s= cmdline->cmd;
+  const char *fmt= NULL;
   int fmt_len= 0;
   int i;
   chars cs= chars();
@@ -500,12 +500,12 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
 
   for (i=0;i<cmdline->tokens->get_count();i++)
     {
-      char *p= (char*)(cmdline->tokens->at(i));
+      const char *p= (const char*)(cmdline->tokens->at(i));
       cs+= " ";
       cs+= p;
     }
 
-  s= (char*)cs;
+  s= cs.c_str();
   i= strspn(s, " \t\v\n\r");
   s+= i;
   t_mem v= 0;
@@ -536,7 +536,7 @@ COMMAND_DO_WORK_APP(cl_expression_cmd)
 		case 'd': con->dd_printf("%d\n", MI(v)); break;
 		case 'o': con->dd_printf("%o\n", MU(v)); break;
 		case 'u': con->dd_printf("%u\n", MU(v)); break;
-		case 'b': con->dd_printf("%s\n", (char*)cbin(v,8*sizeof(v))); break;
+		case 'b': con->dd_printf("%s\n", cbin(v,8*sizeof(v)).c_str()); break;
 		}
 	    }
 	}

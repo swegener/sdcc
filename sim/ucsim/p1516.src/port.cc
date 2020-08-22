@@ -226,14 +226,14 @@ cl_porti::init(void)
   return 0;
 }
 
-char *
+const char *
 cl_porti::cfg_help(t_addr addr)
 {
   switch (addr)
     {
-    case port_pin: return (char*)"Outside value of port pins (int, RW)";
+    case port_pin: return "Outside value of port pins (int, RW)";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 void

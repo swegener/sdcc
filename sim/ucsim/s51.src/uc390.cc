@@ -498,7 +498,7 @@ cl_uc390::clear_sfr(void)
 
 
 t_mem
-cl_uc390::read_mem(char *id/*enum mem_class type*/, t_addr addr)
+cl_uc390::read_mem(const char *id/*enum mem_class type*/, t_addr addr)
 {
 
   if (strcmp(/*type*/id,/* == */MEM_XRAM_ID)==0 &&
@@ -512,7 +512,7 @@ cl_uc390::read_mem(char *id/*enum mem_class type*/, t_addr addr)
 }
 
 t_mem
-cl_uc390::get_mem (char *id/*enum mem_class type*/, t_addr addr)
+cl_uc390::get_mem (const char *id/*enum mem_class type*/, t_addr addr)
 {
   if (strcmp(/*type*/id/* == */,MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
@@ -525,7 +525,7 @@ cl_uc390::get_mem (char *id/*enum mem_class type*/, t_addr addr)
 }
 
 void
-cl_uc390::write_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val)
+cl_uc390::write_mem (const char *id/*enum mem_class type*/, t_addr addr, t_mem val)
 {
   if (strcmp(/*type ==*/id, MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&
@@ -538,7 +538,7 @@ cl_uc390::write_mem (char *id/*enum mem_class type*/, t_addr addr, t_mem val)
 }
 
 void
-cl_uc390::set_mem (/*enum mem_class type*/char *id, t_addr addr, t_mem val)
+cl_uc390::set_mem (/*enum mem_class type*/const char *id, t_addr addr, t_mem val)
 {
   if (/*type == */strcmp(id,MEM_XRAM_ID)==0 &&
       addr >= 0x400000 &&

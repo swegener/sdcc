@@ -84,13 +84,13 @@ public:
   /*   019-0098 * 090409-L */
   
 
-public:
-  cl_r2k(struct cpu_entry *Itype, class cl_sim *asim);
-  virtual int init(void);
-  virtual char *id_string(void);
-  
-  //virtual t_addr get_mem_size(enum mem_class type);
-  virtual void mk_hw_elements(void);
+public:
+  cl_r2k(struct cpu_entry *Itype, class cl_sim *asim);
+  virtual int init(void);
+  virtual const char *id_string(void);
+  
+  //virtual t_addr get_mem_size(enum mem_class type);
+  virtual void mk_hw_elements(void);
   virtual void make_memories(void);
   
   virtual struct dis_entry *dis_tbl(void);
@@ -154,13 +154,13 @@ public:
 class cl_r3ka: public cl_r2k {
  public:
   
-  u8_t  SU;
-  
-  cl_r3ka(struct cpu_entry *Itype, class cl_sim *asim);
-  virtual char *id_string(void);
-  
-  virtual int exec_code(t_mem code);
-  
+  u8_t  SU;
+  
+  cl_r3ka(struct cpu_entry *Itype, class cl_sim *asim);
+  virtual const char *id_string(void);
+  
+  virtual int exec_code(t_mem code);
+  
   virtual int inst_ed_(t_mem code);
 };
 

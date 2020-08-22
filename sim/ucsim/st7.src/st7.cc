@@ -100,10 +100,10 @@ cl_st7::reset(void)
 }
 
 
-char *
+const char *
 cl_st7::id_string(void)
 {
-  return((char*)"unspecified ST7");
+  return("unspecified ST7");
 }
 
 
@@ -170,16 +170,16 @@ cl_st7::make_memories(void)
   address_spaces->add(regs16);
 
   class cl_var *v;
-  vars->add(v= new cl_var(cchars("A"), regs8, 0, ""));
+  vars->add(v= new cl_var("A", regs8, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("CC"), regs8, 1, ""));
+  vars->add(v= new cl_var("CC", regs8, 1, ""));
   v->init();
   
-  vars->add(v= new cl_var(cchars("X"), regs16, 0, ""));
+  vars->add(v= new cl_var("X", regs16, 0, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("Y"), regs16, 1, ""));
+  vars->add(v= new cl_var("Y", regs16, 1, ""));
   v->init();
-  vars->add(v= new cl_var(cchars("SP"), regs16, 2, ""));
+  vars->add(v= new cl_var("SP", regs16, 2, ""));
   v->init();
 }
 
@@ -1262,22 +1262,22 @@ cl_st7_cpu::init(void)
   cl_hw::init();
 
   cl_var *v;
-  uc->vars->add(v= new cl_var(cchars("sp_limit"), cfg, st7cpu_sp_limit,
+  uc->vars->add(v= new cl_var("sp_limit", cfg, st7cpu_sp_limit,
 			      cfg_help(st7cpu_sp_limit)));
   v->init();
 
   return 0;
 }
 
-char *
+const char *
 cl_st7_cpu::cfg_help(t_addr addr)
 {
   switch (addr)
     {
     case st7cpu_sp_limit:
-      return (char*)"Stack overflows when SP is below this limit";
+      return "Stack overflows when SP is below this limit";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 t_mem

@@ -142,22 +142,22 @@ cl_serial_hw::init(void)
       c->add_console(listener);
     }
 
-  char *f_serial_in = (char*)serial_in_file_option->get_value((char*)0);
-  char *f_serial_out= (char*)serial_out_file_option->get_value((char*)0);
+  const char *f_serial_in = serial_in_file_option->get_value("");
+  const char *f_serial_out= serial_out_file_option->get_value("");
   class cl_f *fi, *fo;
-  if (f_serial_in)
+  if (f_serial_in && *f_serial_in)
     {
       if (f_serial_in[0] == '\001')
 	fi= (class cl_f *)(strtoll(&f_serial_in[1], 0, 0));
       else
-	fi= mk_io(chars(f_serial_in), cchars("r"));
+	fi= mk_io(f_serial_in, "r");
       if (!fi->tty)
 	fprintf(stderr, "Warning: serial input interface connected to a "
 		"non-terminal file.\n");
     }
   else
     fi= 0;//mk_io(chars(""), chars(""));
-  if (f_serial_out)
+  if (f_serial_out && *f_serial_out)
     {
       if (f_serial_out[0] == '\001')
 	fo= (class cl_f *)(strtoll(&f_serial_out[1], 0, 0));
@@ -186,8 +186,7 @@ cl_serial_hw::init(void)
   cfg_set(serconf_escape, 'x'-'a'+1);
 
   cl_var *v;
-  chars pn(id_string);
-  pn.append("%d_", id);
+  chars pn= chars("", "%s%d_", id_string, id);
   uc->vars->add(v= new cl_var(pn+chars("on"), cfg, serconf_on,
 			      cfg_help(serconf_on)));
   v->init();
@@ -214,27 +213,27 @@ cl_serial_hw::init(void)
   return 0;
 }
 
-char *
+const char *
 cl_serial_hw::cfg_help(t_addr addr)
 {
   switch (addr)
     {
     case serconf_on:
-      return (char*)"Turn simulation of UART on or off (bool, RW)";
+      return "Turn simulation of UART on or off (bool, RW)";
     case serconf_check_often:
-      return (char*)"Check input file at every cycle (bool, RW)";
+      return "Check input file at every cycle (bool, RW)";
     case serconf_escape:
-      return (char*)"Escape char on display (int, RW)";
+      return "Escape char on display (int, RW)";
     case serconf_common:
-      return (char*)"Not used";
+      return "Not used";
     case serconf_received:
-      return (char*)"Received char written by simulator (int, R)";
+      return "Received char written by simulator (int, R)";
     case serconf_flowctrl:
-      return (char*)"Flow-control simulation on/off (bool, RW)";
+      return "Flow-control simulation on/off (bool, RW)";
     case serconf_able_receive:
-      return (char*)"UART enabled to receive by flow-control (bool, RW)";
+      return "UART enabled to receive by flow-control (bool, RW)";
     }
-  return (char*)"Not used";
+  return "Not used";
 }
 
 t_mem

@@ -100,9 +100,9 @@ class cl_history: public cl_ustrings
   virtual ~cl_history(void);
 
  public:
-  char *up(chars line);
-  char *down(chars line);
-  char *enter(chars line);
+  const char *up(chars line);
+  const char *down(chars line);
+  void enter(chars line);
   void replace(chars line);
 };
 
@@ -140,20 +140,20 @@ class cl_f: public cl_base
   virtual class cl_f *copy(chars mode);
   virtual int init(void);
   //virtual int open(void) { return init(); }
-  virtual int open(char *fn);
-  virtual int open(char *fn, char *mode);
-  virtual int use_opened(int opened_file_id, char *mode);
-  virtual int own_opened(int opened_file_id, char *mode);
-  virtual int use_opened(FILE *f, chars mode);
-  virtual int own_opened(FILE *f, chars mode);
+  virtual int open(const char *fn);
+  virtual int open(const char *fn, const char *mode);
+  virtual int use_opened(int opened_file_id, const char *mode);
+  virtual int own_opened(int opened_file_id, const char *mode);
+  virtual int use_opened(FILE *f, const char *mode);
+  virtual int own_opened(FILE *f, const char *mode);
   virtual enum file_type determine_type(void)= 0;
   virtual void changed(void);
   virtual int close(void);
   virtual int stop_use(void);
   virtual bool opened(void) { return file_id >= 0; }
   
-  virtual char *get_file_name() { return file_name; };
-  virtual char *get_fname() { return file_name; };
+  virtual const char *get_file_name() { return file_name; };
+  virtual const char *get_fname() { return file_name; };
   virtual class cl_f *get_echo_to() { return echo_to; }
  protected:
   virtual int put(int c);
@@ -179,8 +179,7 @@ class cl_f: public cl_base
 
   virtual int check_dev(void)= 0;
   virtual int read_dev(int *buf, int max);
-  virtual int write(char *buf, int count);
-  virtual int write_str(char *s);
+  virtual int write(const char *buf, int count);
   virtual int write_str(const char *s);
   virtual int vprintf(const char *format, va_list ap);
   virtual int prntf(const char *format, ...);
@@ -191,8 +190,7 @@ class cl_f: public cl_base
   virtual void echo_cursor_restore();
   virtual void echo_cursor_go_left(int n);
   virtual void echo_cursor_go_right(int n);
-  virtual void echo_write(char *b, int l);
-  virtual void echo_write_str(char *s);
+  virtual void echo_write(const char *b, int l);
   virtual void echo_write_str(const char *s);
   virtual void set_echo_color(chars col);
   virtual chars get_echo_color() { return echo_color; }
@@ -223,8 +221,8 @@ class cl_f: public cl_base
 
 extern int mk_srv_socket(int port);
 
-extern class cl_f *mk_io(chars fn, chars mode);
-extern class cl_f *cp_io(/*FILE *f*/int file_id, chars mode);
+extern class cl_f *mk_io(const char *fn, const char *mode);
+extern class cl_f *cp_io(/*FILE *f*/int file_id, const char *mode);
 extern class cl_f *mk_srv(int server_port);
 extern int srv_accept(class cl_f *listen_io,
 		      class cl_f **fin, class cl_f **fout);
@@ -234,7 +232,7 @@ extern bool check_inputs(class cl_list *active, class cl_list *avail);
 extern void msleep(int msec);
 extern void loop_delay();
 
-extern chars fio_type_name(enum file_type t);
+extern const char *fio_type_name(enum file_type t);
 extern void  sigpipe_off();
 
 

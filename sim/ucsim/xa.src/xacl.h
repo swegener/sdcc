@@ -57,7 +57,7 @@ public:
 public:
   cl_xa(class cl_sim *asim);
   virtual int init(void);
-  virtual char *id_string(void);
+  virtual const char *id_string(void);
 
   //virtual class cl_m *mk_mem(enum mem_class type, char *class_name);
   //virtual t_addr get_mem_size(enum mem_class type);

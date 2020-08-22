@@ -217,9 +217,9 @@ cl_break_cmd::do_fetch(class cl_uc *uc,
       b->init();
       b->cond= cond;
       uc->fbrk->add_bp(b);
-      const char *s= uc->disass(addr, NULL);
-      con->dd_printf("Breakpoint %d at 0x%06x: %s (cond=\"%s\")\n", b->nr, AI(addr), s, (char*)cond);
-      free((char *)s);
+      char *s= uc->disass(addr, NULL);
+      con->dd_printf("Breakpoint %d at 0x%06x: %s (cond=\"%s\")\n", b->nr, AI(addr), s, cond.c_str());
+      free(s);
     }
 }
 
@@ -342,9 +342,9 @@ COMMAND_DO_WORK_UC(cl_commands_cmd)
     }
   if (!s.empty())
     {
-      if (isdigit(((char*)s)[0]))
+      if (isdigit((s.c_str())[0]))
 	{
-	  char *p0= (char*)s;
+	  const char *p0= s;
 	  if (p0 && *p0)
 	    {
 	      long l=-2;

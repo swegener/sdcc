@@ -17,15 +17,15 @@
 
 #include "frontend.hh"
 
-char *
+static const char *
 flt_name(enum filter_t f)
 {
   switch (f)
     {
-    case flt_none	: return (char*)"none";
-    case flt_hex	: return (char*)"hex";
+    case flt_none	: return "none";
+    case flt_hex	: return "hex";
     }
-  return (char*)"unknown";
+  return "unknown";
 }
 
 Viewer::Viewer()

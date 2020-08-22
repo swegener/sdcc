@@ -70,7 +70,7 @@ cl_sim::init(void)
   if (!(uc= mk_controller()))
     return(1);
   uc->init();
-  simif= uc->get_hw(cchars("simif"), 0);
+  simif= uc->get_hw("simif", 0);
   return(0);
 }
 
@@ -178,7 +178,7 @@ cl_sim::stop(int reason, class cl_ev_brk *ebrk)
 	  e= false;
 	  if (o) o->get_value(&e);
 	  if (e)
-	    cmd->dd_printf("%s\n", (char*)(b->commands));
+	    cmd->dd_printf("%s\n", b->commands.c_str());
 	  application->exec(b->commands);
 	  steps_done= 0;
 	}

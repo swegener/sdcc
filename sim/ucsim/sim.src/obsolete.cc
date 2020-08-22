@@ -54,8 +54,8 @@ cl_memloc::write(class cl_mem *mem, t_addr addr, t_mem *val)
   Duplicates= DD_FALSE;
 }*/
 
-/*void *
-cl_memloc_coll::key_of(void *item)
+/*const void *
+cl_memloc_coll::key_of(const void *item)
 {
   return(&(((class cl_memloc *)item)->address));
 }*/
@@ -217,12 +217,12 @@ cl_mem::init(void)
   return(0);
 }
 
-char *
+const char *
 cl_mem::id_string(void)
 {
-  char *s= get_id_string(mem_ids, type);
+  const char *s= get_id_string(mem_ids, type);
 
-  return(s?s:(char*)"NONE");
+  return(s?s:"NONE");
 }
 
 t_mem
@@ -514,12 +514,12 @@ cl_m::init(void)
   return(0);
 }
 
-char *
+const char *
 cl_m::id_string(void)
 {
-  char *s= get_id_string(mem_ids, type);
+  const char *s= get_id_string(mem_ids, type);
 
-  return(s?s:(char*)"NONE");
+  return(s?s:"NONE");
 }
 
 /*void

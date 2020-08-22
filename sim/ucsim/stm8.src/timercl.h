@@ -103,7 +103,7 @@ class cl_tim: public cl_hw
   cl_tim(class cl_uc *auc, int aid, t_addr abase);
   virtual int init(void);
   virtual int cfg_size(void) { return stm8_tim_nuof_cfg; }
-  virtual char *cfg_help(t_addr addr);
+  virtual const char *cfg_help(t_addr addr);
  
   virtual int tick(int cycles);
   virtual void reset(void);

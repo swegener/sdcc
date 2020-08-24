@@ -1,3 +1,8 @@
+2020-08-24 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* sim/ucsim/app.cc:
+	  Fix unmatched right parentheses.
+
 2020-08-22 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

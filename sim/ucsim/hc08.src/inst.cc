@@ -987,6 +987,7 @@ cl_hc08::inst_condbranch(t_mem code, bool prefix)
         break;
       case 7: // BIL
         taken = 0; // TODO: should read simulated IRQ# pin
+	break;
       default:
         return(resHALT);
     } 

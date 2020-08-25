@@ -847,7 +847,7 @@ cl_f::pick(void)
       at_end= 1;
     }
   if (i < 0)
-    ;
+    {}
   return i;
 }
 
@@ -982,13 +982,13 @@ cl_f::write(const char *buf, int count)
 	    {
 	      j= ::write(file_id, "\r\n", 2);
 	      if (j != 2)
-		;
+	        {}
 	    }
 	  else
 	    {
 	      j= ::write(file_id, &buf[i], 1);
 	      if (j != 1)
-		;
+	        {}
 	    }
 	}
       return i;

@@ -1376,6 +1376,7 @@ cl_tlcs::exec_inst4_e3(u8_t c1, u8_t c2, u8_t c3, u8_t c4)
 	      write16(mn, *ar);
 	      vc.wr+= 2;
 	      *ar= temp;
+	      break;
 	    }
 	  case 0xa8: inst_bit(c, c4); break; // BIT b,(mn)
 	  case 0xb0: inst_res(c, c4); break; // RES b,(mn)

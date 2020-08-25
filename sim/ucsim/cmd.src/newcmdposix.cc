@@ -77,7 +77,7 @@ cl_console::cl_console(const char *_fin, const char *_fout, class cl_app *the_ap
       fin->cooked();
     }
   else
-    ;
+    {}
   frout= 0;
   id= 0;
   lines_printed= new cl_ustrings(100, 100, "console_cache");
@@ -97,7 +97,7 @@ cl_console::cl_console(cl_f *_fin, cl_f *_fout, class cl_app *the_app)
       fin->cooked();
     }
   else
-    ;
+    {}
   frout= 0;
   id= 0;
   lines_printed= new cl_ustrings(100, 100, "console_cache");
@@ -245,7 +245,7 @@ cl_console::input_avail(void)
     {
       ret= fin->input_avail();
       if (ret)
-	;
+        {}
     }
   return ret;
 }

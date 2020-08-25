@@ -80,7 +80,7 @@ cl_base::~cl_base(void)
 int cl_base::init(void) {return(0);}
 
 const char *
-cl_base::get_name(const char *def)
+cl_base::get_name(const char *def) const
 {
   if (!name)
     return(def);
@@ -116,7 +116,7 @@ cl_base::set_name(const char *new_name, const char *def_name)
 }
 
 bool
-cl_base::is_named(const char *the_name)
+cl_base::is_named(const char *the_name) const
 {
   /*
   if (!name ||
@@ -128,7 +128,7 @@ cl_base::is_named(const char *the_name)
 }
 
 bool
-cl_base::is_inamed(const char *the_name)
+cl_base::is_inamed(const char *the_name) const
 {
   if (/*!name ||
       !*name ||
@@ -452,7 +452,7 @@ cl_list::error(t_index code, t_index info)
  */
 
 void *
-cl_list::first_that(match_func test, void *arg)
+cl_list::first_that(match_func test, const void *arg)
 {
   for (t_index i= 0; i < count; i++)
     {
@@ -595,7 +595,7 @@ cl_list::push(void *item)
  */
 
 void *
-cl_list::last_that(match_func test, void *arg)
+cl_list::last_that(match_func test, const void *arg)
 {
   for(t_index i= count; i > 0; i--)
     if (test(Items[i-1], arg))

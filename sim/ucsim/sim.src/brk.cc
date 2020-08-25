@@ -179,7 +179,7 @@ brk_coll::brk_coll(t_index alimit, t_index adelta,
 const void *
 brk_coll::key_of(const void *item)
 {
-  return((void *)&(((class cl_brk *)(item))->nr));
+  return &(((const class cl_brk *)item)->nr);
 }
 
 

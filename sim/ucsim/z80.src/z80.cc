@@ -809,6 +809,7 @@ bool cl_z80::inst_z80n(t_mem code, int *ret)
 	vc.wr++;
 	inc(regs.hl.l);
 	inc(regs.de.h);
+	break;
       }
     case 0xb4: do r= inst_ldix(code); while (regs.BC); break;
     case 0xac: r= inst_lddx(code); break;
@@ -828,6 +829,7 @@ bool cl_z80::inst_z80n(t_mem code, int *ret)
 	  regs.BC--;
 	}
 	while (regs.BC);
+	break;
       }
     case 0x90: // outinb
       outputs->write(regs.BC, this->get1(regs.HL));
@@ -935,6 +937,7 @@ bool cl_z80::inst_z80n(t_mem code, int *ret)
 	i16_t w= regs.DE;
 	w= w >> (regs.bc.h&31);
 	regs.DE= w;
+	break;
       }
     case 0x2a: // bsrl de,b
       regs.DE= regs.DE >> (regs.bc.h&31);

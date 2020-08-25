@@ -182,7 +182,7 @@ cl_stm8::mk_port(t_addr base, chars n)
     {
       puix= 1;
       if ((puiy+= 7) > 20)
-	;
+        {}
     }
   if ((puik+= 1) > 7)
     puiks= NULL;

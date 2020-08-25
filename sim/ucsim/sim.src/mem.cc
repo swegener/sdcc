@@ -901,9 +901,10 @@ cl_memory_cell::cl_memory_cell(uchar awidth)//: cl_base()
 
 cl_memory_cell::~cl_memory_cell(void)
 {
-  if ((flags & CELL_NON_DECODED) &&
-      data)
-    ;//free(data);
+  if ((flags & CELL_NON_DECODED) && data)
+    {
+      //free(data);
+    }
 }
 
 int
@@ -966,7 +967,9 @@ void
 cl_memory_cell::decode(class cl_memory_chip *chip, t_addr addr)
 {
   if (flags & CELL_NON_DECODED)
-    ;//free(data);
+    {
+      //free(data);
+    }
   data= chip->get_slot(addr);
   if (!data)
     {
@@ -1694,7 +1697,9 @@ cl_address_space::register_hw(t_addr addr, class cl_hw *hw,
   class cl_memory_cell *cell= &cella[idx];
   cell->add_hw(hw/*, addr*/);
   if (announce)
-    ;//uc->sim->/*app->*/mem_cell_changed(this, addr);//FIXME
+    {
+      //uc->sim->/*app->*/mem_cell_changed(this, addr);//FIXME
+    }
   return(cell);
 }
 
@@ -2552,7 +2557,7 @@ cl_decoder_list::cl_decoder_list(t_index alimit, t_index adelta, bool bychip):
 const void *
 cl_decoder_list::key_of(const void *item)
 {
-  class cl_address_decoder *d= (class cl_address_decoder *)item;
+  const class cl_address_decoder *d= (const class cl_address_decoder *)item;
   if (by_chip)
     return(&(d->chip_begin));
   else

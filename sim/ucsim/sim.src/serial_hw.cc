@@ -88,7 +88,7 @@ cl_serial_hw::init(void)
     {
       port= serial_port_option->get_value((long)0);
       if (port < 0)
-	;
+        {}
     }
   if (port > 0)
     {
@@ -110,7 +110,7 @@ cl_serial_hw::init(void)
     {
       port= serial_iport_option->get_value((long)0);
       if (port < 0)
-	;
+        {}
     }
   if (port > 0)
     {
@@ -132,7 +132,7 @@ cl_serial_hw::init(void)
     {
       port= serial_oport_option->get_value((long)0);
       if (port < 0)
-	;
+        {}
     }
   if (port > 0)
     {

@@ -129,7 +129,7 @@ cl_app::run(void)
 	      int i;
 	      for (i= 0; i < in_files->count; i++)
 		{
-		  char *fname= (char *)(in_files->at(i));
+		  const char *fname= (const char *)(in_files->at(i));
 		  long l;
 		  if ((l= sim->uc->read_file(fname, NULL)) >= 0)
 		    {
@@ -316,7 +316,7 @@ cl_app::proc_arguments(int argc, char *argv[])
       if ((strcmp(argv[i], "-help")==0) ||
 	  (strcmp(argv[i], "--help")==0))
 	{
-	  print_help((char*)get_name());
+	  print_help(get_name());
 	  exit(0);
 	}
     }
@@ -471,10 +471,12 @@ cl_app::proc_arguments(int argc, char *argv[])
 	  if (!options->set_value("serial0_in_file", this, /*(void*)Ser_in*/s))
 	    fprintf(stderr, "Warning: No \"serial0_in_file\" option found to "
 		    "set parameter of -s as serial input file\n");
+	  free(s);
 	  s= format_string("\0010x%llx", (unsigned long long int)(fout));
 	  if (!options->set_value("serial0_out_file", this, /*Ser_out*/s))
 	    fprintf(stderr, "Warning: No \"serial0_out_file\" option found "
 		    "to set parameter of -s as serial output file\n");
+	  free(s);
 	  break;
 	}
 #endif
@@ -667,12 +669,11 @@ cl_app::proc_arguments(int argc, char *argv[])
 	  chars opt= s.token(",");
 	  while (opt.nempty())
 	    {
-	      printf("colspecopt=\"%s\"\n", opt.c_str());
-	      chars col_name, col_value;
+	      chars col_name, col_value, opt_name;
 	      col_name= opt.token("=");
 	      col_value=opt.token("=");
-	      printf("name=\"%s\" value=\"%s\"\n", col_name.c_str(), col_value.c_str());
-	      class cl_option *o= options->get_option(chars("", "color_%s", col_name.c_str()).c_str());
+	      opt_name.format("color_%s", col_name.c_str());
+	      class cl_option *o= options->get_option(opt_name);
 	      if (o)
 		o->set_value(col_value);
 	      opt= s.token(",");
@@ -1129,12 +1130,12 @@ cl_app::mk_options(void)
   options->new_option(o= new cl_string_option(this, "color_ui_bit0",
 					      "Bit 0 color on UI display"));
   o->init();
-  o->set_value((char*)"white:black");
+  o->set_value("white:black");
   
   options->new_option(o= new cl_string_option(this, "color_ui_bit1",
 					      "Bit 1 color on UI display"));
   o->init();
-  o->set_value((char*)"bred:black");
+  o->set_value("bred:black");
   
   options->new_option(o= new cl_string_option(this, "color_ui_stop",
 					      "Stop state color on UI display"));

@@ -167,7 +167,7 @@ class cl_cdb_recs: public cl_sorted_list
  public:
  cl_cdb_recs(): cl_sorted_list(2,2,"cdb_recs_list") {}
   virtual const void *key_of(const void *item)
-  { return (((cl_cdb_rec *)item)->fname); }
+  { return (((const cl_cdb_rec *)item)->fname); }
   virtual int compare(const void *k1, const void *k2) {
     return strcmp((const char*)k1,(const char*)k2);
   }

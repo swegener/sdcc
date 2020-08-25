@@ -105,7 +105,7 @@ class cl_options: public cl_sorted_list
  public:
  cl_options(void): cl_sorted_list(2, 2, "options")
     { Duplicates= true; }
-  virtual const void *key_of(const void *item);
+  virtual const void *key_of(const void *item) const;
   virtual int compare(const void *key1, const void *key2);
   virtual void new_option(class cl_option *opt);
   virtual void del_option(class cl_option *opt);

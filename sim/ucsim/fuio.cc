@@ -383,7 +383,9 @@ check_inputs(class cl_list *active, class cl_list *avail)
 	  ret= true;
 	}
       else
-	;//deb("no dev input on fid=%d\n", fio->file_id);
+        {
+          //deb("no dev input on fid=%d\n", fio->file_id);
+        }
     }
   return ret;
 }

@@ -192,7 +192,7 @@ cl_irqs::cl_irqs(t_index alimit, t_index adelta):
 const void *
 cl_irqs::key_of(const void *item)
 {
-  class cl_it_src *itsrc= (class cl_it_src *)item;
+  const class cl_it_src *itsrc= (const class cl_it_src *)item;
   return(&itsrc->poll_priority);
 }
 

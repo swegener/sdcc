@@ -120,14 +120,14 @@ cmd_vfprintf(FILE *f, char *format, va_list ap)
   char *msg= NULL;
   i= vasprintf(&msg, format, ap);
   if (i < 0)
-    ;
+    {}
   ret= fprintf(f, "%s", msg);
   free(msg);
 #else
   char msg[80*25];
   i= vsnprintf(msg, 80*25, format, ap);
   if (i < 0)
-    ;
+    {}
   ret= fprintf(f, "%s", msg);
 #endif
   fflush(f);

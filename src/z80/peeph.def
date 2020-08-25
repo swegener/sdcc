@@ -432,19 +432,20 @@ replace restart {
 	push	%1
 } if notSame(%1 'iy'), canSplitReg(%1 %3 %4), canAssign(%4 %2), notUsed(%4 'a')
 
-replace restart {
-	ld	a, %1
-	push	af
-	inc	sp
-	ld	a, %2 (%3)
-	push	af
-	inc	sp
-} by {
-	ld	%4, %1
-	ld	%5, %2 (%3)
-	; common peephole 44 combined pushing of %1 and %2 (%3).
-	push	%6
-} if unusedReg(%6 'bc' 'de' 'hl'), canSplitReg(%6 %4 %5), notUsed('a')
+// Bug #3102
+//replace restart {
+//	ld	a, %1
+//	push	af
+//	inc	sp
+//	ld	a, %2 (%3)
+//	push	af
+//	inc	sp
+//} by {
+//	ld	%4, %1
+//	ld	%5, %2 (%3)
+//	; common peephole 44 combined pushing of %1 and %2 (%3).
+//	push	%6
+//} if unusedReg(%6 'bc' 'de' 'hl'), canSplitReg(%6 %4 %5), notUsed('a')
 
 replace restart {
 	ld	a, %1 (%3)
@@ -779,12 +780,13 @@ replace {
 	ld	%1, #%2
 }
 
-replace {
-	ld	%1, (#%2 + 0)
-} by {
-	; common peephole 77b removed unnecessary +0 to immediate
-	ld	%1, (#%2)
-}
+// Bug #3102
+//replace {
+//	ld	%1, (#%2 + 0)
+//} by {
+//	; common peephole 77b removed unnecessary +0 to immediate
+//	ld	%1, (#%2)
+//}
 
 replace {
 	ld	(#%2 + 0), %1

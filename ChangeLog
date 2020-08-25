@@ -1,3 +1,9 @@
+2020-08-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peeph.def,
+	  support/regression/tests/bug-3102.c:
+	  Disable some peephole rules for bug #3102.
+
 2020-08-25 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* sim/ucsim/app.cc:

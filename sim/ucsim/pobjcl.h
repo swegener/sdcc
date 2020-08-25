@@ -61,14 +61,14 @@ public:
   virtual ~cl_base(void);
 
   virtual int init(void);
-  virtual const char *get_name(void) const { return(name); }
-  virtual const char *get_name(const char *def) const;
+  virtual const char *get_name(void) { return(name); }
+  virtual const char *get_name(const char *def);
   virtual bool have_name(void) { return/*(name != 0)*/ !name.is_null(); }
   virtual bool have_real_name(void) { return/*(name != 0 && *name != '\0')*/ !name.empty(); }
   const char *set_name(const char *new_name);
   const char *set_name(const char *new_name, const char *def_name);
-  bool is_named(const char *the_name) const;
-  bool is_inamed(const char *the_name) const;
+  bool is_named(const char *the_name);
+  bool is_inamed(const char *the_name);
 
   class cl_base *get_parent(void) { return(parent); }
   int nuof_children(void);
@@ -153,8 +153,8 @@ public:
   virtual t_index  add(class cl_base *item, class cl_base *parent);
   virtual void     push(void *item);
 
-	  void	   *first_that(match_func test, const void *arg);
-	  void	   *last_that(match_func test, const void *arg);
+	  void	   *first_that(match_func test, void *arg);
+	  void	   *last_that(match_func test, void *arg);
 	  void	   for_each(iterator_func action, void *arg);
 
 	  void	   error(t_index code, t_index info);

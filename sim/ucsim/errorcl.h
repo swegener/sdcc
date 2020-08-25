@@ -73,7 +73,7 @@ public:
   {
     if (0 == registered_errors)
       return 0;
-    return static_cast<class cl_error_class *>(registered_errors->first_that(compare, static_cast<const void *>(type_name)));
+    return static_cast<class cl_error_class *>(registered_errors->first_that(compare, static_cast<void *>((void*)type_name)));
   }
   static class cl_list *get_list(void)
   {
@@ -91,9 +91,9 @@ protected:
   
 private:
   static class cl_list *registered_errors;
-  static int compare(const void *obj1, const void *obj2)
+  static int compare(void *obj1, void *obj2)
   {
-    return (static_cast<const class cl_base *>(obj1))->is_named(static_cast<const char *>(obj2));
+    return (static_cast<class cl_base *>(obj1))->is_named(static_cast<char *>(obj2));
   }
 };
 

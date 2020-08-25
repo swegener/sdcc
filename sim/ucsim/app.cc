@@ -672,7 +672,7 @@ cl_app::proc_arguments(int argc, char *argv[])
 	      col_name= opt.token("=");
 	      col_value=opt.token("=");
 	      printf("name=\"%s\" value=\"%s\"\n", col_name.c_str(), col_value.c_str());
-	      class cl_option *o= options->get_option(chars("", "color_%s", col_name).c_str());
+	      class cl_option *o= options->get_option(chars("", "color_%s", col_name.c_str()).c_str());
 	      if (o)
 		o->set_value(col_value);
 	      opt= s.token(",");

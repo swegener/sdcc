@@ -638,7 +638,7 @@ cl_ez80::inst_dd_spec(t_mem code)
 
     }
   
-  return resINV_INST;
+  return -1;
 }
 
 int
@@ -854,7 +854,7 @@ cl_ez80::inst_fd_spec(t_mem code)
 
     }
 
-  return resINV_INST;
+  return -1;
 }
 
 

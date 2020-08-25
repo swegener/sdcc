@@ -498,6 +498,7 @@ int
 cl_z80::inst_Xd(t_mem prefix)
 {
   t_mem code;
+  int i;
   
   if (fetch(&code))
     return(resBREAKPOINT);
@@ -505,9 +506,11 @@ cl_z80::inst_Xd(t_mem prefix)
   switch (prefix)
     {
     case 0xdd:
-      return inst_dd_spec(code);
+      if ((i= inst_dd_spec(code)) >= 0)
+	return i;
     case 0xfd:
-      return inst_fd_spec(code);
+      if ((i= inst_fd_spec(code)) >= 0)
+	return i;
     }
   
   switch (code)

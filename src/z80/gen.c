@@ -12230,7 +12230,6 @@ genEndCritical (const iCode * ic)
     }
 }
 
-#if 0                           //Disabled since it doesn't work for arrays of float.
 enum
 {
   /** Maximum number of bytes to emit per line. */
@@ -12256,11 +12255,11 @@ _dbFlush (DBEMITCTX * self)
   if (self->pos > 0)
     {
       int i;
-      sprintf (line, ".db 0x%02X", self->buffer[0]);
+      sprintf (line, ".db !immed0x%02X", self->buffer[0]);
 
       for (i = 1; i < self->pos; i++)
         {
-          sprintf (line + strlen (line), ", 0x%02X", self->buffer[i]);
+          sprintf (line + strlen (line), ", !immed0x%02X", self->buffer[i]);
         }
       emit2 (line);
     }
@@ -12308,7 +12307,7 @@ _rleCommit (RLECTX * self)
       DBEMITCTX db;
       memset (&db, 0, sizeof (db));
 
-      emit2 (".db %u", self->pos);
+      emit2 (".db !immed%u", self->pos);
 
       for (i = 0; i < self->pos; i++)
         {
@@ -12356,7 +12355,7 @@ _rleAppend (RLECTX * self, unsigned c)
           /* Yes, worthwhile. */
           /* Commit whatever was in the buffer. */
           _rleCommit (self);
-          emit2 ("!db !immed-%u,!immedbyte", self->runLen, self->last);
+          emit2 ("!db !immed-%u, !immedbyte", self->runLen, self->last);
         }
       else
         {
@@ -12381,7 +12380,7 @@ _rleAppend (RLECTX * self, unsigned c)
           /* Commit whatever was in the buffer. */
           _rleCommit (self);
 
-          emit2 ("!db !immed-%u,!immedbyte", self->runLen, self->last);
+          emit2 ("!db !immed-%u, !immedbyte", self->runLen, self->last);
           self->runLen = 0;
         }
       self->runLen++;
@@ -12408,17 +12407,36 @@ genArrayInit (iCode * ic)
   literalList *iLoop;
   int ix;
   int elementSize = 0, eIndex, i;
-  unsigned val, lastVal;
+  unsigned val;
   sym_link *type;
   RLECTX rle;
+  bool isFloat = FALSE;
+  bool isBool = FALSE;
+  bool saved_BC = FALSE;
+  bool saved_DE = FALSE;
+  bool saved_HL = FALSE;
 
   memset (&rle, 0, sizeof (rle));
 
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
 
-  _saveRegsForCall (ic, 0);
+  if (!isPairDead (PAIR_HL, ic))
+    {
+      _push (PAIR_HL);
+      saved_HL = TRUE;
+    }
+  if (!isPairDead (PAIR_DE, ic))
+    {
+      _push (PAIR_DE);
+      saved_DE = TRUE;
+    }
+  if (!isPairDead (PAIR_BC, ic))
+    {
+      _push (PAIR_BC);
+      saved_BC = TRUE;
+    }
 
-  fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
+  fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
   emit2 ("call __initrleblock");
 
   type = operandType (IC_LEFT (ic));
@@ -12428,10 +12446,14 @@ genArrayInit (iCode * ic)
       if (IS_SPEC (type->next) || IS_PTR (type->next))
         {
           elementSize = getSize (type->next);
+          isFloat = IS_FLOAT (type->next);
+          isBool = !isFloat && IS_BOOL (type->next);
         }
       else if (IS_ARRAY (type->next) && type->next->next)
         {
           elementSize = getSize (type->next->next);
+          isFloat = IS_FLOAT (type->next->next);
+          isBool = !isFloat && IS_BOOL (type->next->next);
         }
       else
         {
@@ -12444,10 +12466,9 @@ genArrayInit (iCode * ic)
       wassertl (0, "Can't determine element size in genArrayInit.");
     }
 
-  wassertl ((elementSize > 0) && (elementSize <= 4), "Illegal element size in genArrayInit.");
+  wassertl ((elementSize > 0) && (elementSize <= 8), "Illegal element size in genArrayInit.");
 
   iLoop = IC_ARRAYILIST (ic);
-  lastVal = (unsigned) - 1;
 
   /* Feed all the bytes into the run length encoder which will handle
      the actual output.
@@ -12460,11 +12481,42 @@ genArrayInit (iCode * ic)
 
       for (i = 0; i < ix; i++)
         {
-          for (eIndex = 0; eIndex < elementSize; eIndex++)
+          union
             {
-              val = (((int) iLoop->literalValue) >> (eIndex * 8)) & 0xff;
-              _rleAppend (&rle, val);
+              float f;
+              short s;
+              int i;
+              long long l;
+              unsigned char c[8];
             }
+            buf;
+          switch (elementSize)
+            {
+            case 1:
+              if (isBool)
+                buf.c[0] = !!iLoop->literalValue;
+              else
+                buf.c[0] = (char)iLoop->literalValue;
+              break;
+            case 2:
+              buf.s = (short)iLoop->literalValue;
+              break;
+            case 4:
+              if (isFloat)
+                buf.f = (float)iLoop->literalValue;
+              else
+                buf.i = (int)iLoop->literalValue;
+              break;
+            default:
+              buf.l = (long long)iLoop->literalValue;
+              break;
+            }
+#ifdef WORDS_BIGENDIAN
+          for (eIndex = elementSize-1; eIndex >= 0; eIndex--)
+#else
+          for (eIndex = 0; eIndex < elementSize; eIndex++)
+#endif
+            _rleAppend (&rle, buf.c[eIndex]);
         }
 
       iLoop = iLoop->next;
@@ -12472,15 +12524,21 @@ genArrayInit (iCode * ic)
 
   _rleFlush (&rle);
   /* Mark the end of the run. */
-  emit2 (".db 0");
-
-  _restoreRegsAfterCall ();
+  emit2 (".db !immed0");
 
   spillCached ();
 
-  freeAsmop (IC_LEFT (ic), NULL, ic);
+  if (saved_BC)
+    _pop (PAIR_BC);
+
+  if (saved_DE)
+    _pop (PAIR_DE);
+
+  if (saved_HL)
+    _pop (PAIR_HL);
+
+  freeAsmop (IC_LEFT (ic), NULL);
 }
-#endif
 
 static void
 setupForMemcpy (const iCode *ic, const operand *to, const operand *from, const operand *count)
@@ -13424,12 +13482,10 @@ genZ80iCode (iCode * ic)
         }
       break;
 
-#if 0
     case ARRAYINIT:
       emitDebug ("; genArrayInit");
       genArrayInit (ic);
       break;
-#endif
 
     case DUMMY_READ_VOLATILE:
       emitDebug ("; genDummyRead");

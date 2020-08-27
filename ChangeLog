@@ -1,5 +1,17 @@
 2020-08-27 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/gbz80/Makefile.in,
+	  device/lib/gbz80/crt0_rle.s: crt0_rle.s renamed to __initrleblock.s
+	* src/z80/gen.c,
+	  src/z80/peep.c,
+	  device/lib/gbz80/__initrleblock.s:
+	  Prepare to implement RFE#670 and RFE#707. Not enabled in z80/main.c,
+	  because there are failed tests:
+	    gcc-torture-execute-921013-1
+	    gcc-torture-execute-pr83383
+
+2020-08-27 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/SDCCval.c:
 	  Fix possible bug in reorderIlist() when empty array is passed.
 

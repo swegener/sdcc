@@ -500,7 +500,11 @@ initList *reorderIlist (sym_link * type, initList * ilist)
 
   /* okay, allocate enough space */
   if (IS_ARRAY (type))
-    size = getNelements(type, ilist);
+    {
+      size = getNelements(type, ilist);
+      if (size == 0)
+        return NULL;
+    }
   else if (IS_STRUCT (type))
     {
       /* compute size from struct type. */

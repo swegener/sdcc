@@ -1,5 +1,10 @@
 2020-08-27 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/SDCCval.c:
+	  Fix possible bug in reorderIlist() when empty array is passed.
+
+2020-08-27 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/z80/peeph.def:
 	  New peephole rules, fixed and reenabled rule 44.
 

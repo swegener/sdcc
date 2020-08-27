@@ -96,6 +96,13 @@ replace restart {
 } if notUsed(%1), same(%3 'ix' 'iy')
 // Should probably check for notVolatile(), but gives many false positives and no regression tests fail.
 
+replace {
+	ex	de, hl
+	ex	de, hl
+} by {
+	; common peephole 8 removed double de/hl swap.
+}
+
 replace restart {
 	ld	%1, %2
 	ld	%3, %1
@@ -282,10 +289,37 @@ replace restart {
 } if canJoinRegs(%2 %1 %5), same(%4 %5), notUsed('a')
 
 replace restart {
+	push	de
+	ex	de, hl
+} by {
+	; common peephole 26a moved push after de/hl swap.
+	ex	de, hl
+	push	hl
+}
+
+replace restart {
+	push	hl
+	ex	de, hl
+} by {
+	; common peephole 26b moved push after de/hl swap.
+	ex	de, hl
+	push	de
+}
+
+replace restart {
+	ex	de, hl
+	push	%1
+} by {
+	; common peephole 26c moved push %1 before de/hl swap.
+	push	%1
+	ex	de, hl
+} if notSame(%1 'hl' 'de')
+
+replace restart {
 	ex	de, hl
 	push	de
 } by {
-	; common peephole 26 pushed hl directly instead of going through de.
+	; common peephole 26d pushed hl directly instead of going through de.
 	push	hl
 } if notUsed('de' 'hl')
 
@@ -299,6 +333,7 @@ replace restart {
 	push	de
 } if notUsed('hl' 'e')
 
+//TODO: remove if unused
 replace restart {
 	ex	de, hl
 	push	%1
@@ -314,7 +349,7 @@ replace restart {
 	ld	%5,%2
 	push	%6
 } by {
-	; common peephole 29 pushed %3 directly instead of going through hl.
+	; common peephole 29 pushed %3 directly instead of going through %6.
 	push	%3
 } if canJoinRegs(%2 %1 %3), canJoinRegs(%5 %4 %7), same(%7 %6), notUsed(%6)
 
@@ -337,6 +372,26 @@ replace restart {
 	; common peephole 31 popped %6 directly instead of going through %1.
 	pop	%6
 } if canJoinRegs(%4 %2 %6), canJoinRegs(%5 %3 %7), same(%7 %1), notUsed(%1)
+
+replace restart {
+	ex	de, hl
+	ld	e, l
+	ld	d, h
+} by {
+	; common peephole 32a removed de/hl swap.
+	ld	l, e
+	ld	h, d
+}
+
+replace restart {
+	ex	de, hl
+	ld	l, e
+	ld	h, d
+} by {
+	; common peephole 32b removed de/hl swap.
+	ld	e, l
+	ld	d, h
+}
 
 replace restart {
 	ld	%1 (%4), %2
@@ -432,20 +487,19 @@ replace restart {
 	push	%1
 } if notSame(%1 'iy'), canSplitReg(%1 %3 %4), canAssign(%4 %2), notUsed(%4 'a')
 
-// Bug #3102
-//replace restart {
-//	ld	a, %1
-//	push	af
-//	inc	sp
-//	ld	a, %2 (%3)
-//	push	af
-//	inc	sp
-//} by {
-//	ld	%4, %1
-//	ld	%5, %2 (%3)
-//	; common peephole 44 combined pushing of %1 and %2 (%3).
-//	push	%6
-//} if unusedReg(%6 'bc' 'de' 'hl'), canSplitReg(%6 %4 %5), notUsed('a')
+replace restart {
+	ld	a, %1
+	push	af
+	inc	sp
+	ld	a, %2 (%3)
+	push	af
+	inc	sp
+} by {
+	ld	%4, %1
+	ld	%5, %2 (%3)
+	; common peephole 44 combined pushing of %1 and %2 (%3).
+	push	%6
+} if unusedReg(%6 'bc' 'de' 'hl'), canSplitReg(%6 %4 %5), canAssign(%4 %1), notUsed('a')
 
 replace restart {
 	ld	a, %1 (%3)

@@ -1,5 +1,10 @@
 2020-08-28 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* support/regression/tests/memory.c:
+	  Apply patch #334: Enhanced regression testing for memmove()
+
+2020-08-28 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* sdas/asz80/z80mch.c,
 	  sdas/asz80/z80pst.c:
 	  Implement RFE#656: add barrel shifts and jp (c) instruction support.

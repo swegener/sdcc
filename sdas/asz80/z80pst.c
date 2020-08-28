@@ -266,6 +266,11 @@ struct  mne     mne[] = {
     {   NULL,   "cu.move",      X_ZXN_CU_MOVE,  0,      0       },
     {   NULL,   "cu.stop",      X_ZXN_CU_STOP,  0,      0       },
     {   NULL,   "cu.nop",       X_ZXN_CU_NOP,   0,      0       },
+    {   NULL,   "bsla",         X_ZXN_INH2,     0,      0x28    },
+    {   NULL,   "bsra",         X_ZXN_INH2,     0,      0x29    },
+    {   NULL,   "bsrl",         X_ZXN_INH2,     0,      0x2a    },
+    {   NULL,   "bsrf",         X_ZXN_INH2,     0,      0x2b    },
+    {   NULL,   "brlc",         X_ZXN_INH2,     0,      0x2c    },
 
 	/* eZ80 */
 

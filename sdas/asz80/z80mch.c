@@ -1700,6 +1700,14 @@ struct mne *mp;
                         outab(0xE9);
                         break;
                 }
+                /*
+                 * jp  (c)
+                 */
+                if (mchtyp == X_ZXN && t1 == S_IDC) {
+                        outab(0xED);
+                        outab(0x98);
+                        break;
+                }
                 aerr();
                 break;
 
@@ -1826,11 +1834,26 @@ struct mne *mp;
                 break;
 
         case X_ZXN_INH2:
-                if (op == 0x23 && more()) { // Optional argument a on swap
-                        t1 = addr(&e1);
-                        if (t1 != S_R8 || e1.e_addr != A)
-                          aerr();
-                  }
+                switch (op) {
+                case 0x23: //swap
+                        if (more()) { // Optional argument a on swap
+                                t1 = addr(&e1);
+                                if (t1 != S_R8 || e1.e_addr != A)
+                                        aerr();
+                         }
+                         break;
+                case 0x28: // BSLA DE,B
+                case 0x29: // BSRA DE,B
+                case 0x2a: // BSRL DE,B
+                case 0x2b: // BSRF DE,B
+                case 0x2c: // BRLC DE,B
+                         t1 = addr(&e1);
+                         comma(1);
+                         t2 = addr(&e2);
+                         if (t1 != S_R16 || e1.e_addr != DE || t2 != S_R8 || e2.e_addr != B)
+                                aerr();
+                         break;
+                }
                 outab(0xED);
                 outab(op);
                 break;

@@ -1,3 +1,9 @@
+2020-08-28 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* sdas/asz80/z80mch.c,
+	  sdas/asz80/z80pst.c:
+	  Implement RFE#656: add barrel shifts and jp (c) instruction support.
+
 2020-08-28 Ben Shi <powerstudio1st AT 163 DOT com>
 
 	* support/regression/tests/gcc-torture-execute-20040409-1.c:

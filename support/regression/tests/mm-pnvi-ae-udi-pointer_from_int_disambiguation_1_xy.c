@@ -33,6 +33,7 @@ int x=1, y=2;
 void
 testMM(void)
 {
+#if !(defined(__clang__) && __clang_major__ <= 6)
   int *p = &x+1;
   int *q = &y;
   uintptr_t i = (uintptr_t)p;
@@ -42,5 +43,6 @@ testMM(void)
     *r=11;  // is this free of UB?
     ASSERT (y == 11);
   }
+#endif // __clang__
 }
 

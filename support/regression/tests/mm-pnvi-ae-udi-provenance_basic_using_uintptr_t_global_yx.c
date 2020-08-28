@@ -34,6 +34,8 @@ void
 testMM(void)
 {
 #if !(defined (__GNUC__)) // As of GCC 9, GCC is not PNVI-ae-udi-compliant.
+#if !(defined (__clang__) && __clang_major__ <= 6)
+
   uintptr_t ux = (uintptr_t)&x;
   uintptr_t uy = (uintptr_t)&y;
   uintptr_t offset = sizeof(int);
@@ -45,6 +47,8 @@ testMM(void)
     ASSERT (*p == *q);
     ASSERT (*p == y); 
   }
+
+#endif // __clang__
 #endif
 }
 

@@ -1,3 +1,13 @@
+2020-08-28 Ben Shi <powerstudio1st AT 163 DOT com>
+
+	* support/regression/tests/gcc-torture-execute-20040409-1.c:
+	* support/regression/tests/gcc-torture-execute-20040409-2.c:
+	* support/regression/tests/gcc-torture-execute-20040409-3.c:
+	* support/regression/tests/mm-pnvi-ae-udi-pointer_from_int_disambiguation_1_xy.c:
+	* support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_auto_yx.c:
+	* support/regression/tests/mm-pnvi-ae-udi-provenance_basic_using_uintptr_t_global_yx.c:
+	  Disabled for clang-6.0 and below.
+
 2020-08-27 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* device/lib/gbz80/Makefile.in,

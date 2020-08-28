@@ -99,6 +99,8 @@ void ftestu(unsigned int a, unsigned int b)
 void
 testTortureExecute (void)
 {
+#if !(defined(__clang__) && __clang_major__ <= 6)
+
 #if INT_MAX == 2147483647
   ftest(0x00000000,0x7fffffff);
   ftest(0x80000000,0xffffffff);
@@ -132,5 +134,6 @@ testTortureExecute (void)
 #endif
 
   return;
-}
 
+#endif // __clang__
+}

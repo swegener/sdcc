@@ -25413,7 +25413,7 @@ Interrupt handler can be interrupted by NMI only
 \end_layout
 
 \begin_layout Subsection
-Rabbit 2000, 3000, 3000A and 4000 Interrupt Service Routines
+Rabbit 2000, 3000 and 3000A Interrupt Service Routines
 \end_layout
 
 \begin_layout Standard

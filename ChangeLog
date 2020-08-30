@@ -1,3 +1,8 @@
+2020-08-30 Philipp Klaus Krause <pkk AT spth.de>
+
+	* doc/sdccman.lyx:
+	  Remove mention of Rabbit 4000, since it is currently supported in Rabbit 300 compability mode only.
+	  
 2020-08-28 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* support/regression/tests/memory.c:

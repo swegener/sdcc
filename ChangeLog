@@ -2,6 +2,8 @@
 
 	* sdas/asstm8/clean.mk:
 	  Fix clean target for sdasstm8, patch #350 by Tim Stahlhut.
+	* src/Makefile.in:
+	  Fix C++ linker flags, patch by Mike Jagdis.
 
 2020-08-30 Philipp Klaus Krause <pkk AT spth.de>
 

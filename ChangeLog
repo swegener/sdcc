@@ -1,3 +1,8 @@
+2020-09-07 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdas/asstm8/clean.mk:
+	  Fix clean target for sdasstm8, patch #350 by Tim Stahlhut.
+
 2020-08-30 Philipp Klaus Krause <pkk AT spth.de>
 
 	* doc/sdccman.lyx:

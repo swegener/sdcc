@@ -17,7 +17,7 @@ distclean: clean
 mostlyclean:
 	rm -f *core *[%~] *.[oa]
 	rm -f .[a-z]*~
-	rm -f $(top_builddir)/bin/sdas6808$(EXEEXT)
+	rm -f $(top_builddir)/bin/sdasstm8$(EXEEXT)
 
 # Deleting everything that can reconstructed by this Makefile. It deletes
 # everything deleted by distclean plus files created by bison, etc.

@@ -3,8 +3,6 @@
 
 #include "dbuf_string.h"
 
-extern void genSTM08Code (iCode *);
-
 reg_info stm8_regs[] =
 {
   {REG_GPR, A_IDX,   "a"},

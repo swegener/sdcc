@@ -1,3 +1,8 @@
+2020-09-10 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve use of bool hl instruction for zeroing.
+
 2020-09-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdas/asstm8/clean.mk:

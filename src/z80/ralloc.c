@@ -88,8 +88,6 @@ enum
 // Build the old register allocator. It can be used by command-line options
 #define OLDRALLOC 1
 
-extern void genZ80Code (iCode *);
-
 /** Local static variables */
 static struct
 {

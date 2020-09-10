@@ -1992,8 +1992,24 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
           old_low = (v_old >> 0) & 0xff;
           old_high = (v_old >> 8) & 0xff;
 
+          if (IS_RAB && !new_high && (new_low == 1 && (old_high || old_low)))
+            {
+              emit2 ("bool hl");
+              regalloc_dry_run_cost++;
+              goto adjusted;
+            }
+          else if (new_high == old_high && new_low == old_high)
+            {
+              emit3_o (A_LD, ASMOP_L, 0, ASMOP_H, 0);
+              goto adjusted;
+            }
+          else if (new_low == old_low && new_high == old_low)
+            {
+              emit3_o (A_LD, ASMOP_H, 0, ASMOP_L, 0);
+              goto adjusted;
+            }
           /* Change lower byte only. */
-          if (new_high == old_high)
+          else if (new_high == old_high)
             {
               emit3_o (A_LD, ASMOP_L, 0, left, 0);
               goto adjusted;
@@ -2011,9 +2027,19 @@ fetchLitPair (PAIR_ID pairId, asmop *left, int offset)
       _G.pairs[pairId].base = traceAlloc (&_G.trace.aops, Safe_strdup (base));
       _G.pairs[pairId].offset = offset;
     }
+  
   /* Both a lit on the right and a true symbol on the left */
-  emit2 ("ld %s, !hashedstr", pair, l);
-  regalloc_dry_run_cost += (pairId == PAIR_IX || pairId == PAIR_IY) ? 4 : 3;
+  if (IS_RAB && pairId == PAIR_HL && left->type == AOP_LIT && !byteOfVal (left->aopu.aop_lit, offset + 1) && !byteOfVal (left->aopu.aop_lit, offset))
+  {
+    emit2 ("bool hl");
+    emit2 ("ld l, h");
+    regalloc_dry_run_cost += 2;
+  }
+  else
+  {
+    emit2 ("ld %s, !hashedstr", pair, l);
+    regalloc_dry_run_cost += (pairId == PAIR_IX || pairId == PAIR_IY) ? 4 : 3;
+  }
   Safe_free (base_str);
   Safe_free (l);
   return;

@@ -669,15 +669,17 @@ isReturned(const char *what)
         size = 1;
       else if(spec->noun == V_INT && !(spec->b_long))
         size = 2;
-      else
+      else if(spec->noun == V_INT && spec->b_long || spec->noun == V_FLOAT)
         size = 4;
+      else // long long is not returned in registers.
+        size = 0;
 
       // Check for returned pointer.
       sym_lnk = sym->type;
       while (sym_lnk && !IS_PTR (sym_lnk))
         sym_lnk = sym_lnk->next;
       if(IS_PTR(sym_lnk))
-        size = 2;
+        size = IS_FUNCPTR(sym_lnk) ? FUNCPTRSIZE : GPTRSIZE;
     }
   else
     {

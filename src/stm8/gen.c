@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
   gen.c - code generator for STM8.
 
-  Copyright (C) 2012 - 2013, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de)
+  Copyright (C) 2012 - 2020, Philipp Klaus Krause pkk@spth.de, philipp@informatik.uni-frankfurt.de, krauseph@informatik.uni-freiburg.de)
 
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU General Public License as published by the
@@ -196,12 +196,12 @@ stm8_init_asmops (void)
   asmop_xyl.aopu.bytes[1].byteu.reg = stm8_regs + XH_IDX;
   asmop_xyl.aopu.bytes[2].in_reg = TRUE;
   asmop_xyl.aopu.bytes[2].byteu.reg = stm8_regs + YL_IDX;
-  asmop_xy.regs[A_IDX] = -1;
-  asmop_xy.regs[XL_IDX] = 0;
-  asmop_xy.regs[XH_IDX] = 1;
-  asmop_xy.regs[YL_IDX] = 2;
-  asmop_xy.regs[YH_IDX] = -1;
-  asmop_xy.regs[C_IDX] = -1;
+  asmop_xyl.regs[A_IDX] = -1;
+  asmop_xyl.regs[XL_IDX] = 0;
+  asmop_xyl.regs[XH_IDX] = 1;
+  asmop_xyl.regs[YL_IDX] = 2;
+  asmop_xyl.regs[YH_IDX] = -1;
+  asmop_xyl.regs[C_IDX] = -1;
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.size = 1;
@@ -3732,7 +3732,7 @@ genReturn (const iCode *ic)
       genMove (ASMOP_XYL, left->aop, TRUE, TRUE, TRUE);
       break;
     case 4:
-      wassertl (regalloc_dry_run || !stm8_extend_stack, "Unimplemented long return in function with extended stack access.");
+      wassertl (regalloc_dry_run || !stm8_extend_stack, "Unimplemented long long return in function with extended stack access.");
       genMove (ASMOP_XY, left->aop, TRUE, TRUE, TRUE);
       break;
     default:

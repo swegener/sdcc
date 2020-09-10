@@ -2,6 +2,10 @@
 
 	* src/z80/gen.c:
 	  Improve use of bool hl instruction for zeroing.
+	* src/stm8/gen.c:
+	  Fix handling of 24-bit return values, patch by Tim Stahlhut.
+	* src/stm8/peep.c:
+	  Fix a bug in handling 24-bit return values in notUsed().
 
 2020-09-07 Philipp Klaus Krause <pkk AT spth.de>
 

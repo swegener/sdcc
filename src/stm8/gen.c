@@ -224,7 +224,8 @@ stm8_init_asmops (void)
   asmop_one.regs[C_IDX] = -1;
 }
 
-void emit2 (const char *inst, const char *fmt, ...)
+static void 
+emit2 (const char *inst, const char *fmt, ...)
 {
   if (!regalloc_dry_run)
     {
@@ -385,7 +386,8 @@ cost(unsigned int bytes, unsigned int cycles)
   regalloc_dry_run_cost_cycles += cycles * regalloc_dry_run_cycle_scale;
 }
 
-void emitJP(const symbol *target, float probability)
+static void 
+emitJP(const symbol *target, float probability)
 {
   if (!regalloc_dry_run)
      emit2 (options.model == MODEL_LARGE ? "jpf" : "jp", "%05d$", labelKey2num (target->key));
@@ -6182,7 +6184,8 @@ release:
 /*------------------------------------------------------------------*/
 /* init_shiftop - find a good place to shift in                     */
 /*------------------------------------------------------------------*/
-static void init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop *right, const iCode *ic, bool a_needed_for_count)
+static void 
+init_shiftop(asmop *shiftop, const asmop *result, const asmop *left, const asmop *right, const iCode *ic, bool a_needed_for_count)
 {
   int i;
   const int size = result->size;
@@ -7154,7 +7157,8 @@ postshift:
 /*------------------------------------------------------------------*/
 /* init_stackop - initalize asmop for stack location                */
 /*------------------------------------------------------------------*/
-static void init_stackop (asmop *stackop, int size, long int stk_off)
+static void 
+init_stackop (asmop *stackop, int size, long int stk_off)
 {
   stackop->size = size;
   stackop->regs[A_IDX] = -1;

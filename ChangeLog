@@ -1,3 +1,8 @@
+2020-09-12 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/stm8/gen.c:
+	  Minor code quality improvements, patch #353 by Tim Stahlhut.
+	  
 2020-09-10 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

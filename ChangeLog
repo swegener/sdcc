@@ -1,3 +1,8 @@
+2020-09-13 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.c:
+	  Fix missing include, patch #354 by Tim Stahlhut.
+
 2020-09-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/stm8/gen.c:

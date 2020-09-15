@@ -40,7 +40,12 @@ value;
 
 typedef struct literalList
 {
-  double literalValue;
+  bool isFloat;
+  union {
+    unsigned long long ull;
+    double f64;
+  }
+  value;
   unsigned count;
   struct literalList *next;
 } literalList;

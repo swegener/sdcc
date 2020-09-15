@@ -12433,11 +12433,8 @@ genArrayInit (iCode * ic)
   literalList *iLoop;
   int ix;
   int elementSize = 0, eIndex, i;
-  unsigned val;
   sym_link *type;
   RLECTX rle;
-  bool isFloat = FALSE;
-  bool isBool = FALSE;
   bool saved_BC = FALSE;
   bool saved_DE = FALSE;
   bool saved_HL = FALSE;
@@ -12472,14 +12469,10 @@ genArrayInit (iCode * ic)
       if (IS_SPEC (type->next) || IS_PTR (type->next))
         {
           elementSize = getSize (type->next);
-          isFloat = IS_FLOAT (type->next);
-          isBool = !isFloat && IS_BOOL (type->next);
         }
       else if (IS_ARRAY (type->next) && type->next->next)
         {
           elementSize = getSize (type->next->next);
-          isFloat = IS_FLOAT (type->next->next);
-          isBool = !isFloat && IS_BOOL (type->next->next);
         }
       else
         {
@@ -12509,34 +12502,15 @@ genArrayInit (iCode * ic)
         {
           union
             {
+              unsigned char c[sizeof(unsigned long long)];
               float f;
-              short s;
-              int i;
-              long long l;
-              unsigned char c[8];
+              unsigned long long ull;
             }
             buf;
-          switch (elementSize)
-            {
-            case 1:
-              if (isBool)
-                buf.c[0] = !!iLoop->literalValue;
-              else
-                buf.c[0] = (char)iLoop->literalValue;
-              break;
-            case 2:
-              buf.s = (short)iLoop->literalValue;
-              break;
-            case 4:
-              if (isFloat)
-                buf.f = (float)iLoop->literalValue;
-              else
-                buf.i = (int)iLoop->literalValue;
-              break;
-            default:
-              buf.l = (long long)iLoop->literalValue;
-              break;
-            }
+            if (!iLoop->isFloat)
+              buf.ull = iLoop->value.ull;
+            else
+              buf.f = iLoop->value.f64;
 #ifdef WORDS_BIGENDIAN
           for (eIndex = elementSize-1; eIndex >= 0; eIndex--)
 #else

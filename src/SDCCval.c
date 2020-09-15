@@ -146,16 +146,26 @@ convertIListToConstList (initList * src, literalList ** lList, int size)
   iLoop = src ? src->init.deep : NULL;
   while (size--)
     {
-      double val = iLoop ? AST_FLOAT_VALUE (iLoop->init.node) : 0;
+      literalList ll = {0};
+      value *val = iLoop ? AST_VALUE (iLoop->init.node) : NULL;
+      if (val)
+        {
+          ll.isFloat = IS_FLOAT(val->type);
+          if (ll.isFloat)
+            ll.value.f64 = floatFromVal(val);
+          else
+            ll.value.ull = ullFromVal(val);
+        }
 
-      if (last && last->literalValue == val)
+      if (last && ((!last->isFloat && last->value.ull == ll.value.ull) ||
+                   (last->isFloat && last->value.f64 == ll.value.f64)))
         {
           last->count++;
         }
       else
         {
           newL = Safe_alloc (sizeof (literalList));
-          newL->literalValue = val;
+          *newL = ll;
           newL->count = 1;
           newL->next = NULL;
 
@@ -192,7 +202,7 @@ copyLiteralList (literalList * src)
     {
       newL = Safe_alloc (sizeof (literalList));
 
-      newL->literalValue = src->literalValue;
+      *newL = *src;
       newL->count = src->count;
       newL->next = NULL;
 

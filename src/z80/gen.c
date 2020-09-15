@@ -12435,6 +12435,8 @@ genArrayInit (iCode * ic)
   int elementSize = 0, eIndex, i;
   sym_link *type;
   RLECTX rle;
+  bool isBool = FALSE;
+  bool isFloat = FALSE;
   bool saved_BC = FALSE;
   bool saved_DE = FALSE;
   bool saved_HL = FALSE;
@@ -12469,10 +12471,14 @@ genArrayInit (iCode * ic)
       if (IS_SPEC (type->next) || IS_PTR (type->next))
         {
           elementSize = getSize (type->next);
+          isBool = IS_BOOL (type->next);
+          isFloat = IS_FLOAT (type->next);
         }
       else if (IS_ARRAY (type->next) && type->next->next)
         {
           elementSize = getSize (type->next->next);
+          isBool = IS_BOOL (type->next->next);
+          isFloat = IS_FLOAT (type->next->next);
         }
       else
         {
@@ -12507,10 +12513,21 @@ genArrayInit (iCode * ic)
               unsigned long long ull;
             }
             buf;
-            if (!iLoop->isFloat)
-              buf.ull = iLoop->value.ull;
+            if (isFloat)
+              {
+                if (iLoop->isFloat)
+                  buf.f = iLoop->value.f64;
+                else
+                  buf.f = iLoop->value.ull;
+              }
             else
-              buf.f = iLoop->value.f64;
+              {
+                if (iLoop->isFloat)
+                  buf.ull = (isBool) ? !!iLoop->value.f64 : (unsigned long long)iLoop->value.f64;
+                else
+                  buf.ull = (isBool) ? !!iLoop->value.ull : iLoop->value.ull;
+              }
+            
 #ifdef WORDS_BIGENDIAN
           for (eIndex = elementSize-1; eIndex >= 0; eIndex--)
 #else

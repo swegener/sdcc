@@ -1,5 +1,10 @@
 2020-09-15 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* src/z80/gen.c:
+	  Fix regression introduced in previous change.
+
+2020-09-15 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* src/SDCCval.c,
 	  src/SDCCval.h,
 	  src/z80/gen.c:

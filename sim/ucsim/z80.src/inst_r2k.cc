@@ -41,15 +41,15 @@ u32_t  rabbit_mmu::logical_addr_to_phys( u16_t logical_addr ) {
   u32_t  phys_addr = logical_addr;
   unsigned     segnib = logical_addr >> 12;
   
-  if (segnib >= 0xE000)
+  if (segnib >= 0xe)
   {
     phys_addr += ((u32_t)xpc) << 12;
   }
-  else if (segnib >= ((segsize >> 4) & 0x0F))
+  else if (segnib >= ((segsize >> 4) & 0xf))
   {
     phys_addr += ((u32_t)stackseg) << 12;    
   }
-  else if (segnib >= (segsize & 0x0F))
+  else if (segnib >= (segsize & 0xf))
   {
     phys_addr += ((u32_t)dataseg) << 12;    
   }

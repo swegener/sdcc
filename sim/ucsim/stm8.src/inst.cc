@@ -819,13 +819,13 @@ cl_stm8::inst_jr(t_mem code, unsigned char prefix)
        break;
       case 6: // JRNM (2C) / JRM (2D)
         taken = !(regs.CC & (BIT_I1|BIT_I0));
-        break;
-      case 7: // JRIL (2E) / JRIH (2F), no means to test this ???
-        taken = 0;
-        break;
-      default:
-        return(resHALT);
-    }
+        break;
+      case 7: // JRIL (2E) / JRIH (2F), no means to test this ???
+        taken = 0;
+        break;
+      default:
+        return(resHALT);
+    }
   }
   else
     return(resHALT);

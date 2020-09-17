@@ -1,9 +1,12 @@
+# m6809.src/clean.mk
+
 # Deleting all files created by building the program
 # --------------------------------------------------
 clean:
-	rm -f *core *[%~] *.[oa]
+	rm -f *core *[%~] *.[oa] *.map
 	rm -f .[a-z]*~
-	rm -f sst7$(EXEEXT) sst7.exe
+	rm -f sm6809$(EXEEXT) sm6809.exe
+	rm -f ucsim_m6809$(EXEEXT) ucsim_m6809.exe
 
 
 # Deleting all files created by configuring or building the program
@@ -11,6 +14,7 @@ clean:
 distclean: clean
 	rm -f config.cache config.log config.status
 	rm -f Makefile *.dep
+	rm -f *.obj *.list *.lst *.hex
 
 
 # Like clean but some files may still exist
@@ -23,4 +27,4 @@ mostlyclean: clean
 # -----------------------------------------------------------------------
 realclean: distclean
 
-# End of st7.src/clean.mk
+# End of m6809.src/clean.mk

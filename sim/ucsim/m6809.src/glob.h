@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (simst7.cc)
+ * Simulator of microcontrollers (glob.h)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,21 +25,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
+#ifndef GLOB_HEADER
+#define GLOB_HEADER
 
-// local
-#include "simst7cl.h"
-#include "st7cl.h"
-
-
-cl_simst7::cl_simst7(class cl_app *the_app):
-  cl_sim(the_app)
-{}
-
-class cl_uc *
-cl_simst7::mk_controller(void)
-{
-  return(new cl_st7(this));
-}
+#include "stypes.h"
 
 
-/* End of st7.src/simst7.cc */
+extern struct dis_entry disass_m6809[];
+
+
+#endif
+
+/* End of m6809.src/glob.h */

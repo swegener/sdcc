@@ -53,7 +53,6 @@ u32_t  rabbit_mmu::logical_addr_to_phys( u16_t logical_addr ) {
   {
     phys_addr += ((u32_t)dataseg) << 12;    
   }
-  
   return phys_addr;
 }
 

@@ -523,13 +523,13 @@ cl_st7::inst_jr(t_mem code, unsigned char prefix)
         break;
       case 6: // JRNM / JRM
         taken = !(regs.CC & BIT_I);
-        break;
-      case 7: // JRIL - interrupt low - no means to test this ???
-        taken = 1; 
-        break;
-      default:
-        return(resHALT);
-    } 
+        break;
+      case 7: // JRIL - interrupt low - no means to test this ???
+        taken = 1; 
+        break;
+      default:
+        return(resHALT);
+    } 
   if (code & 1)
     taken = ! taken;
   

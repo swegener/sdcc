@@ -1,7 +1,7 @@
 /*
- * Simulator of microcontrollers (simst7.cc)
+ * Simulator of microcontrollers (simm6809.cc)
  *
- * Copyright (C) 1999,99 Drotos Daniel, Talker Bt.
+ * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
  * 
  * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
  *
@@ -25,21 +25,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA. */
 /*@1@*/
 
-
 // local
-#include "simst7cl.h"
-#include "st7cl.h"
+#include "simm6809cl.h"
+#include "m6809cl.h"
 
 
-cl_simst7::cl_simst7(class cl_app *the_app):
+cl_simm6809::cl_simm6809(class cl_app *the_app):
   cl_sim(the_app)
 {}
 
 class cl_uc *
-cl_simst7::mk_controller(void)
+cl_simm6809::mk_controller(void)
 {
-  return(new cl_st7(this));
+  return(new cl_m6809(this));
 }
 
 
-/* End of st7.src/simst7.cc */
+/* End of m6809.src/simm6809.cc */

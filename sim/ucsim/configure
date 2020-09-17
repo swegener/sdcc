@@ -696,6 +696,7 @@ LDFLAGS
 CXXFLAGS
 CXX
 enable_serio
+enable_m6809_port
 enable_p1516_port
 enable_pdk_port
 enable_st7_port
@@ -779,6 +780,7 @@ enable_stm8_port
 enable_pdk_port
 enable_st7_port
 enable_p1516_port
+enable_m6809_port
 enable_serio
 enable_statistic
 enable_shared
@@ -1452,6 +1454,7 @@ Optional Features:
   --disable-pdk-port      do not compile simulator for pdk
   --enable-st7-port       compile simulator for st7
   --enable-p1516-port     compile simulator for p1516
+  --enable-m6809-port     compile simulator for m6809
   --enable-serio          compile serio GUI tool (needs curses)
   --enable-statistic      compile statistical features (slower simulation)
   --enable-shared[=PKGS]  build shared libraries [default=yes]
@@ -2956,6 +2959,15 @@ else
   enable_p1516_port="yes"
 fi
 
+# Check whether --enable-m6809-port was given.
+if test "${enable_m6809_port+set}" = set; then :
+  enableval=$enable_m6809_port; if test $enable_m6809_port  != "no"; then
+    enable_m6809_port="yes"
+fi
+else
+  enable_m6809_port="yes"
+fi
+
 # Check whether --enable-serio was given.
 if test "${enable_serio+set}" = set; then :
   enableval=$enable_serio; if test $enable_serio != "no"; then
@@ -2964,6 +2976,7 @@ fi
 else
   enable_serio="no"
 fi
+
 
 
 
@@ -18199,7 +18212,7 @@ _ACEOF
 # Generating output files
 # ===========================================================================
 
-ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk sim.src/Makefile cmd.src/Makefile s51.src/Makefile avr.src/Makefile z80.src/Makefile tlcs.src/Makefile hc08.src/Makefile xa.src/Makefile stm8.src/Makefile pdk.src/Makefile st7.src/Makefile p1516.src/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
+ac_config_files="$ac_config_files Makefile main.mk:main_in.mk packages.mk:packages_in.mk sim.src/Makefile cmd.src/Makefile s51.src/Makefile avr.src/Makefile z80.src/Makefile tlcs.src/Makefile hc08.src/Makefile xa.src/Makefile stm8.src/Makefile pdk.src/Makefile st7.src/Makefile p1516.src/Makefile m6809.src/Makefile gui.src/Makefile gui.src/serio.src/Makefile doc/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -19299,6 +19312,7 @@ do
     "pdk.src/Makefile") CONFIG_FILES="$CONFIG_FILES pdk.src/Makefile" ;;
     "st7.src/Makefile") CONFIG_FILES="$CONFIG_FILES st7.src/Makefile" ;;
     "p1516.src/Makefile") CONFIG_FILES="$CONFIG_FILES p1516.src/Makefile" ;;
+    "m6809.src/Makefile") CONFIG_FILES="$CONFIG_FILES m6809.src/Makefile" ;;
     "gui.src/Makefile") CONFIG_FILES="$CONFIG_FILES gui.src/Makefile" ;;
     "gui.src/serio.src/Makefile") CONFIG_FILES="$CONFIG_FILES gui.src/serio.src/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;

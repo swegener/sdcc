@@ -1,5 +1,5 @@
 #
-# uCsim st7.src/Makefile
+# uCsim m6809.src/Makefile
 #
 # (c) Drotos Daniel, Talker Bt. 1997
 #
@@ -29,8 +29,7 @@ CXXFLAGS        = @CXXFLAGS@ @WALL_FLAG@
 LDFLAGS         = @LDFLAGS@
 PICOPT		= @PICOPT@
 SHAREDLIB	= @SHAREDLIB@
-
-EXEEXT          = @EXEEXT@
+EXEEXT		= @EXEEXT@
 
 LIBS		= -L$(top_builddir) -lsim -lucsimutil -lguiucsim -lcmd -lsim @LIBS@
 DL		= @DL@
@@ -50,43 +49,40 @@ infodir         = @infodir@
 srcdir          = @srcdir@
 VPATH           = @srcdir@
 
-OBJECTS_SHARED	= glob.o \
-		  inst.o \
-		  simst7.o st7.o
-OBJECTS_EXE	= sst7.o
-OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
+OBJECTS_SHARED	= simm6809.o m6809.o glob.o
 
-ST7ASM		= 
+OBJECTS_EXE	= sm6809.o
+OBJECTS		= $(OBJECTS_SHARED) $(OBJECTS_EXE)
 
 enable_dlso	= @enable_dlso@
 dlso_ok		= @dlso_ok@
 
-#TEST_OBJ	= test_bit.hex test_dis.hex test_mov.hex test_jmp.hex \
-#		  test_arith.hex
+M6809ASM	=
+TEST_OBJ	= 
+
 
 # Compiling entire program or any subproject
 # ------------------------------------------
-all: checkconf otherlibs st7.src tests
-
-tests: $(TEST_OBJ)
+all: checkconf otherlibs m6809.src
 
 
 # Compiling and installing everything and runing test
 # ---------------------------------------------------
 install: all installdirs
-	$(INSTALL) sst7$(EXEEXT) $(DESTDIR)$(bindir)/`echo sst7|sed '$(transform)'`$(EXEEXT)
-	$(STRIP) $(DESTDIR)$(bindir)/`echo sst7|sed '$(transform)'`$(EXEEXT)
+	$(INSTALL) sm6809$(EXEEXT) $(DESTDIR)$(bindir)/`echo sm6809|sed '$(transform)'`$(EXEEXT)
+	$(STRIP) $(DESTDIR)$(bindir)/`echo sm6809|sed '$(transform)'`$(EXEEXT)
 
 
 # Deleting all the installed files
 # --------------------------------
 uninstall:
-	rm -f $(DESTDIR)$(bindir)/`echo sst7|sed '$(transform)'`$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sm6809
+	rm -f $(DESTDIR)$(bindir)/`echo sm6809|sed '$(transform)'`$(EXEEXT)
 
 
 # Performing self-test
 # --------------------
-check: test
+check: $(TEST_OBJ)
 
 test:
 
@@ -116,21 +112,24 @@ include $(srcdir)/clean.mk
 # --------
 .SUFFIXES: .asm .hex
 
-st7.src: sst7$(EXEEXT)  shared_lib
+m6809.src: sm6809$(EXEEXT) ucsim_m6809$(EXEEXT) shared_lib
 
-sst7$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
+sm6809$(EXEEXT): $(OBJECTS) $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
 
+ucsim_m6809$(EXEEXT): sm6809$(EXEEXT)
+	cp $< $@
+
 ifeq ($(dlso_ok),yes)
-shared_lib: $(top_builddir)/sst7.so
+shared_lib: $(top_builddir)/sm6809.so
 else
 shared_lib:
-	@$(top_srcdir)/mkecho $(top_builddir) "No st7 shared lib made."
+	@$(top_srcdir)/mkecho $(top_builddir) "No M6809 shared lib made."
 	@$(top_srcdir)/mkecho $(top_builddir) "(SHAREDLIB="$(SHAREDLIB)",dl_ok="$(dl_ok)",enable_dlso="$(enable_dlso)")"
 endif
 
-$(top_builddir)/sst7.so: $(OBJECTS_SHARED)
-	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $(top_builddir)/sst7.so
+$(top_builddir)/sm6809.so: $(OBJECTS_SHARED)
+	$(CXX) -shared $(LDFLAGS) $(OBJECTS_SHARED) -o $@
 
 otherlibs: $(top_builddir)/libcmd.a $(top_builddir)/libguiucsim.a $(top_builddir)/libsim.a $(top_builddir)/libucsimutil.a
 
@@ -147,17 +146,17 @@ $(top_builddir)/libucsimutil.a:
 	$(MAKE) -C $(top_builddir) -f main.mk
 
 .cc.o:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
+	$(CXX) $(CXXFLAGS) $(PICOPT) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
 .asm.hex:
-	$(ST7ASM) -l $< -o $@ -e $<.lst
+	$(M6809ASM) -l $< -o $@ -e $<.lst
 
 
 # Remaking configuration
 # ----------------------
 checkconf:
 	@if [ -f $(top_builddir)/devel ]; then\
-	  $(MAKE) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
+	  $(MAKE) -C $(top_builddir) -f conf.mk srcdir="$(srcdir)" top_builddir="$(top_builddir)" freshconf;\
 	fi
 
-# End of st7.src/Makefile.in
+# End of m6809.src/Makefile.in

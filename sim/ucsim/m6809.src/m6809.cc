@@ -1,0 +1,1517 @@
+/*
+ * Simulator of microcontrollers (m6809.cc)
+ *
+ * Copyright (C) 2020,20 Drotos Daniel, Talker Bt.
+ * 
+ * To contact author send email to drdani@mazsola.iit.uni-miskolc.hu
+ *
+ */
+
+/* This file is part of microcontroller simulator: ucsim.
+
+UCSIM is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+UCSIM is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with UCSIM; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA. */
+/*@1@*/
+
+#include <stdlib.h>
+#include <ctype.h>
+
+#include "glob.h"
+
+#include "m6809cl.h"
+
+
+cl_m6809::cl_m6809(class cl_sim *asim):
+  cl_uc(asim)
+{
+}
+
+int
+cl_m6809::init(void)
+{
+  cl_uc::init();
+  reg.DP= 0;
+  PC= 0;
+
+  reg8_ptr[0]= &A;
+  reg8_ptr[1]= &B;
+  reg8_ptr[2]= &(reg.CC);
+  reg8_ptr[3]= &(reg.DP);
+  reg8_ptr[4]= &A;
+  reg8_ptr[5]= &A;
+  reg8_ptr[6]= &A;
+  reg8_ptr[7]= &A;
+
+  reg16_ptr[0]= &D;
+  reg16_ptr[1]= &(reg.X);
+  reg16_ptr[2]= &(reg.Y);
+  reg16_ptr[3]= &(reg.U);
+  reg16_ptr[4]= &(reg.S);
+  reg16_ptr[5]= NULL;
+  reg16_ptr[6]= &D;
+  reg16_ptr[7]= &D;
+  
+  return 0;
+}
+
+const char *
+cl_m6809::id_string(void)
+{
+  return "M6809";
+}
+
+void
+cl_m6809::reset(void)
+{
+  PC= 0;
+  reg.DP= 0;
+}
+  
+void
+cl_m6809::set_PC(t_addr addr)
+{
+  PC= addr;
+}
+
+void
+cl_m6809::mk_hw_elements(void)
+{
+  cl_uc::mk_hw_elements();
+}
+
+void
+cl_m6809::make_memories(void)
+{
+  class cl_address_space *as;
+  
+  rom= as= new cl_address_space("rom"/*MEM_ROM_ID*/, 0, 0x10000, 8);
+  as->init();
+  address_spaces->add(as);
+
+  class cl_address_decoder *ad;
+  class cl_memory_chip *chip;
+
+  chip= new cl_memory_chip("rom_chip", 0x10000, 8);
+  chip->init();
+  memchips->add(chip);
+  ad= new cl_address_decoder(as= rom/*address_space(MEM_ROM_ID)*/,
+			     chip, 0, 0xffff, 0);
+  ad->init();
+  as->decoders->add(ad);
+  ad->activate(0);
+
+  /*
+  regs= new cl_address_space("regs", 0, 16, 32);
+  regs->init();
+  for (i= 0; i<16; i++)
+    {
+      RC[i]= regs->get_cell(i);
+      RC[i]->decode((t_mem*)&R[i]);
+    }
+  address_spaces->add(regs);
+
+  class cl_var *v;
+  for (i=0; i<16; i++)
+    {
+      v= new cl_var(chars("", "R%d", i), regs, i, chars("", "CPU register %d",i));
+      v->init();
+      vars->add(v);
+    }
+  */
+}
+
+
+struct dis_entry *
+cl_m6809::dis_tbl(void)
+{
+  return(disass_m6809);
+}
+
+char *
+cl_m6809::disass(t_addr addr, const char *sep)
+{
+  chars work= chars(), temp= chars();
+  const char *b;
+  t_mem code;
+  int i;
+
+  //work= "";
+  //p= (char*)work;
+
+  code= rom->get(addr);
+  
+  i= 0;
+  while ((code & dis_tbl()[i].mask) != dis_tbl()[i].code &&
+	 dis_tbl()[i].mnemonic)
+    i++;
+  if (dis_tbl()[i].mnemonic == NULL)
+    {
+      return strdup("-- UNKNOWN/INVALID");
+    }
+  b= dis_tbl()[i].mnemonic;
+
+  work= b;
+  
+  return strdup(work.c_str());
+}
+
+void
+cl_m6809::print_regs(class cl_console_base *con)
+{
+  con->dd_color("answer");
+  con->dd_printf("A= 0x%02x %3d %+4d %c  ", A, A, (i8_t)A, isprint(A)?A:'.');
+  con->dd_printf("B= 0x%02x %3d %+4d %c  ", B, B, (i8_t)B, isprint(B)?B:'.');
+  con->dd_printf("D= 0x%04x %5d %+6d\n", D, D, (i16_t)D);
+  con->dd_printf("CC= "); con->print_bin(reg.CC, 8); con->dd_printf("\n");
+  con->dd_printf("    EFHINZVC\n");
+
+  con->dd_printf("X= ");
+  rom->dump(reg.X, reg.X+7, 8, con);
+  con->dd_color("answer");
+  
+  con->dd_printf("Y= ");
+  rom->dump(reg.Y, reg.Y+7, 8, con);
+  con->dd_color("answer");
+  
+  con->dd_printf("S= ");
+  rom->dump(reg.S, reg.S+7, 8, con);
+  con->dd_color("answer");
+  
+  con->dd_printf("U= ");
+  rom->dump(reg.U, reg.U+7, 8, con);
+  con->dd_color("answer");
+  
+  print_disass(PC, con);
+}
+
+
+int
+cl_m6809::index2ea(u8_t idx, t_addr *res_ea)
+{
+  u16_t iv;
+  i16_t off;
+  u16_t *ir= &reg.X;
+  t_addr ea;
+
+  switch (idx & 0x60)
+    {
+    case 0x00: ir= &reg.X; break;
+    case 0x20: ir= &reg.Y; break;
+    case 0x40: ir= &reg.U; break;
+    case 0x60: ir= &reg.S; break;
+    }
+  iv= *ir;
+  if (!(idx & 0x80))
+    {
+      idx&= 0x1f;
+      off= (idx & 0x10)? (0xffe0 | idx) : (idx);
+      ea= iv + off;
+    }
+  else
+    {
+      i8_t i8;
+      bool ind= true;
+      switch (idx & 0xf)
+	{
+	case 0x00:
+	  off= 0;
+	  ea= iv;
+	  (*ir)++;
+	  ind= false;
+	  if (idx & 0x10) return resINV_INST;
+	  break;
+	case 0x01:
+	  off= 0;
+	  ea= iv;
+	  (*ir)+= 2;
+	  break;
+	case 0x02:
+	  off= 0;
+	  (*ir)--;
+	  iv= *ir;
+	  ea= iv;
+	  ind= false;
+	  if (idx & 0x10) return resINV_INST;
+	  break;
+	case 0x03:
+	  off= 0;
+	  (*ir)-= 2;
+	  iv= *ir;
+	  ea= iv;
+	  break;
+	case 0x04:
+	  off= 0;
+	  ea= iv;
+	  break;
+	case 0x05:
+	  off= (i8_t)B;
+	  ea= iv + off;
+	  break;
+	case 0x06:
+	  off= (i8_t)A;
+	  ea= iv + off;
+	  break;
+	case 0x07:
+	  return resINV_INST;
+	  break;
+	case 0x08:
+	  i8= fetch();
+	  off= i8;
+	  ea= iv + off;
+	  break;
+	case 0x09:
+	  off= fetch()*256 + fetch();
+	  ea= iv + off;
+	  break;
+	case 0x0a:
+	  return resINV_INST;
+	  break;
+	case 0x0b:
+	  off= D;
+	  ea= iv + off;
+	  break;
+	case 0x0c:
+	  i8= fetch();
+	  off= i8;
+	  iv= PC;
+	  ea= iv + off;
+	  break;
+	case 0x0d:
+	  off= fetch()*256 + fetch();
+	  iv= PC;
+	  ea= iv + off;
+	  break;
+	case 0x0e:
+	  return resINV_INST;
+	  break;
+	case 0x0f:
+	  off= 0;
+	  iv= fetch()*256 + fetch();
+	  ea= iv;
+	  if ((idx & 0x10) == 0) return resINV_INST;
+	  if ((idx & 0x60) != 0) return resINV_INST;
+	  break;
+	}
+      if (ind && (idx & 0x10))
+	ea= rom->read(iv)*256 + rom->read(iv+1);
+    }
+
+  if (res_ea)
+    *res_ea= ea;
+  return resGO;
+}
+
+
+void
+cl_m6809::push_regs(bool do_cc)
+{
+  rom->write(--reg.S, PC&0xff);
+  rom->write(--reg.S, PC>>8);
+  if (reg.CC & E)
+    {
+      rom->write(--reg.S, reg.U&0xff);
+      rom->write(--reg.S, reg.U>>8);
+      rom->write(--reg.S, reg.Y&0xff);
+      rom->write(--reg.S, reg.Y>>8);
+      rom->write(--reg.S, reg.X&0xff);
+      rom->write(--reg.S, reg.X>>8);
+      rom->write(--reg.S, reg.DP);
+      rom->write(--reg.S, B);
+      rom->write(--reg.S, A);
+      if (do_cc)
+	rom->write(--reg.S, reg.CC);
+    }
+}
+
+void
+cl_m6809::pull_regs(bool do_cc)
+{
+  u8_t l,h;
+  if(do_cc)
+    reg.CC= rom->read(reg.S++);
+  if (reg.CC & E)
+    {
+      A= rom->read(reg.S++);
+      B= rom->read(reg.S++);
+      reg.DP= rom->read(reg.S++);
+      h= rom->read(reg.S++);
+      l= rom->read(reg.S++);
+      reg.X= h*256 + l;
+      h= rom->read(reg.S++);
+      l= rom->read(reg.S++);
+      reg.Y= h*256 + l;
+      h= rom->read(reg.S++);
+      l= rom->read(reg.S++);
+      reg.U= h*256 + l;
+    }
+  h= rom->read(reg.S++);
+  l= rom->read(reg.S++);
+  PC= h*256 + l;
+}
+
+int
+cl_m6809::inst_add8(t_mem code, u8_t *acc, u8_t op, int c, bool store)
+{
+  u8_t r;
+  unsigned int d= *acc;
+  unsigned int o= op;
+  signed int res= (signed char)d + (signed char)o;
+
+  if (c) { ++res, ++o; }
+  
+  reg.CC= ~(H|V|S|Z);
+  if ((d & 0xf) + (o & 0xf) > 0xf)  reg.CC|= H;
+  if ((res < -128) || (res > +127)) reg.CC|= V;
+  if (d + o > 0xff)                 reg.CC|= C;
+
+  r= res & 0xff;
+  if (r == 0)   reg.CC|= Z;
+  if (r & 0x80) reg.CC|= S;
+
+  if (store)
+    *acc= r;
+  
+  return resGO;
+}
+
+
+int
+cl_m6809::inst_add16(t_mem code, u16_t *acc, u16_t op, int c, bool store)
+{
+  u16_t r;
+  unsigned int d= *acc;
+  unsigned int o= op;
+  signed int res= (i16_t)d + (i16_t)o;
+
+  if (c) { ++res, ++o; }
+  
+  reg.CC= ~(V|S|Z);
+  if ((res < (int)(0x8000)) || (res > (int)(0x7fff)))
+    reg.CC|= V;
+  if (d + o > 0xffff)
+    reg.CC|= C;
+
+  r= res & 0xffff;
+  if (r == 0)     reg.CC|= Z;
+  if (r & 0x8000) reg.CC|= S;
+
+  if (store)
+    *acc= r;
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_bool(t_mem code, char bop, u8_t *acc, u8_t op, bool store)
+{
+  u8_t r;
+
+  switch (bop)
+    {
+    case '&': r= *acc & op; break;
+    case '|': r= *acc | op; break;
+    case '^': r= *acc ^ op; break;
+    default: r= *acc; break;
+    }
+
+  if (store)
+    *acc= r;
+
+  SET_O(0);
+  SET_Z(r);
+  SET_S(r&0x80);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_ld8(t_mem code, u8_t *acc, u8_t op)
+{
+  *acc= op;
+
+  SET_O(0);
+  SET_Z(op);
+  SET_S(op&0x80);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_ld16(t_mem code, u16_t *acc, u16_t op)
+{
+  *acc= op;
+
+  SET_O(0);
+  SET_Z(op);
+  SET_S(op&0x8000);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_st8(t_mem code, u8_t src, t_addr ea)
+{
+  rom->write(ea, src);
+
+  SET_O(0);
+  SET_Z(src);
+  SET_S(src & 0x80);
+
+  return resGO;
+}
+
+int
+cl_m6809::inst_st16(t_mem code, u16_t src, t_addr ea)
+{
+  rom->write(ea  , (src)>>8);
+  rom->write(ea+1, (src)&0xff);
+  
+  SET_O(0);
+  SET_Z(src);
+  SET_S(src & 0x8000);
+
+  return resGO;
+}
+
+int
+cl_m6809::inst_alu(t_mem code)
+{
+  u8_t *acc, op8, idx;
+  u16_t op16;
+  t_addr ea;
+  
+  if (code == 0x87 ||
+      code == 0xc7 ||
+      code == 0xcd ||
+      code == 0x8f ||
+      code == 0xcf)
+    return resINV_INST;
+  
+  acc= (code & 0x40)? (&B) : (&A);
+
+  switch (code & 0x30)
+    {
+    case 0x00: // immed
+      ea= PC;
+      op8= fetch();
+      break;
+    case 0x10: // direct
+      ea= reg.DP*256 + fetch();
+      op8= rom->read(ea);
+      break;
+    case 0x20: // index
+      {
+	int r;
+	idx= fetch();
+	if ((r= index2ea(idx, &ea)) != resGO)
+	  return r;
+	op8= rom->read(ea);
+	break;
+      }
+    case 0x30: // extend
+      ea= fetch()*256 + fetch();
+      op8= rom->read(ea);
+      break;
+    default: op8= 0; break;
+    }
+
+  switch (code & 0x0f)
+    {
+      //          8    9    A    B    C    D    E    F
+    case 0x00: // SUB  SUB  SUB  SUB  SUB  SUB  SUB  SUB
+      return inst_add8(code, acc, ~op8, 1, true);
+      break;
+    case 0x01: // CMP  CMP  CMP  CMP  CMP  CMP  CMP  CMP
+      return inst_add8(code, acc, ~op8, 1, false);
+      break;
+    case 0x02: // SBC  SBC  SBC  SBC  SBC  SBC  SBC  SBC
+      return inst_add8(code, acc, ~op8, (reg.CC&C)?1:0, true);
+      break;
+    case 0x03: // SUBD SUBD SUBD SUBD ADDD ADDD ADDD ADDD
+      {
+	int c= 0;
+	if ((code & 0x30) == 0)
+	  op16= op8*256 + fetch();
+	else
+	  op16= op8*256 + rom->read(ea+1);
+	if ((code & 0x40) == 0)
+	  op16= ~op16, c= 1;
+	return inst_add16(code, &D, op16, c, true);
+	break;
+      }
+    case 0x04: // AND  AND  AND  AND  AND  AND  AND  AND
+      return inst_bool(code, '&', acc, op8, true);
+      break;
+    case 0x05: // BIT  BIT  BIT  BIT  BIT  BIT  BIT  BIT
+      return inst_bool(code, '&', acc, op8, false);
+      break;
+    case 0x06: // LD   LD   LD   LD   LD   LD   LD   LD
+      return inst_ld8(code, acc, op8);
+      break;
+    case 0x07: // --   STA  STA  STA  --   STB  STB  STB
+      return inst_st8(code, *acc, ea);
+      break;
+    case 0x08: // EOR  EOR  EOR  EOR  EOR  EOR  EOR  EOR
+      return inst_bool(code, '^', acc, op8, true);
+      break;
+    case 0x09: // ADC  ADC  ADC  ADC  ADC  ADC  ADC  ADC
+      return inst_add8(code, acc, op8, (reg.CC&C)?1:0, true);
+      break;
+    case 0x0a: // OR   OR   OR   OR   OR   OR   OR   OR
+      return inst_bool(code, '|', acc, op8, true);
+      break;
+    case 0x0b: // ADD  ADD  ADD  ADD  ADD  ADD  ADD  ADD
+      return inst_add8(code, acc, op8, 0, true);
+      break;
+    case 0x0c: // CMPX CMPX CMPX CMPX LDD  LDD  LDD  LDD
+      if ((code & 0x30) == 0)
+	op16= op8*256 + fetch();
+      else
+	op16= op8*256 + rom->read(ea+1);
+      if ((code & 0x40) == 0)
+	return inst_add16(code, &(reg.X), ~op16, 1, false);
+      else
+	return inst_ld16(code, &D, op16);
+      break;
+    case 0x0d: // BSR  JSR  JSR  JSR  --   STD  STD  STD
+      if ((code & 0x40) == 0)
+	{
+	  if ((code & 0x30) == 0)
+	    { //BSR
+	      i8_t i8= op8;
+	      ea= (i16_t)PC + (i16_t)i8;
+	    }
+	  // else JSR
+	  rom->write(--reg.S, PC & 0xff);
+	  rom->write(--reg.S, (PC>>8)&0xff);
+	  PC= ea;
+	}
+      else
+	return inst_st16(code, D, ea);
+      break;
+    case 0x0e: // LDX  LDX  LDX  LDX  LDX  LDX  LDX  LDX
+      if ((code & 0x30) == 0)
+	op16= op8*256 + fetch();
+      else
+	op16= op8*256 + rom->read(ea+1);
+      return inst_ld16(code, &reg.X, op16);
+      break;
+    case 0x0f: // --   STX  STX  STX  --   STU  STU  STU
+      if ((code & 0x40) == 0)
+	return inst_st16(code, reg.X, ea);
+      else
+	return inst_st16(code, reg.U, ea);
+      break;
+    }
+  
+  return resGO;
+}
+
+
+int
+cl_m6809::inst_10(t_mem code)
+{
+  u8_t op8;
+    
+  switch (code & 0x0f)
+    {
+    case 0x00: // pg1
+      break;
+    case 0x01: // pg2
+      break;
+    case 0x02: // NOP
+      break;
+    case 0x03: // SYNC
+      break;
+    case 0x04: // --
+      break;
+    case 0x05: // --
+      break;
+    case 0x06: // LBRA
+      {
+	u16_t u= fetch()*256 + fetch();
+	i16_t i= u;
+	PC= PC + i;
+	break;
+      }
+    case 0x07: // LBSR
+      {
+	u16_t u= fetch()*256 + fetch();
+	i16_t i= u;
+	rom->write(--reg.S, PC & 0xff);
+	rom->write(--reg.S, (PC>>8)&0xff);
+	PC= PC + i;
+	break;
+      }
+    case 0x08: // --
+      break;
+    case 0x09: // DAA
+      {
+	u8_t cf= 0;
+	if ((reg.CC & C) || ((A&0x0f) > 9))
+	  cf|= 0x06;
+	if ((reg.CC & C) ||
+	    ((A&0xf0) > 0x90) ||
+	    (
+	     ((A&0xf0) > 0x80) &&
+	     ((A&0x0f) > 0x09)
+	     )
+	    )
+	  cf|= 0x60;
+	A= A + cf;
+	SET_Z(A);
+	SET_S(A & 0x80);
+	break;
+      }
+    case 0x0a: // ORCC
+      op8= fetch();
+      reg.CC|= op8;
+      break;
+    case 0x0b: // --
+      break;
+    case 0x0c: // ANDCC
+      op8= fetch();
+      reg.CC&= op8;
+      break;
+    case 0x0d: // SEX
+      A= (B & 0x80)?0xff:0;
+      SET_Z(D);
+      SET_S(A & 0x80);
+      break;
+    case 0x0e: // EXG
+      {
+	u8_t r1, r2;
+	op8= fetch();
+	r1= op8>>4;
+	r2= op8&0xf;
+	if (((r1^r2)&0x08)!=0)
+	  return resINV_INST;
+	if (r1>=8)
+	  {
+	    u16_t *R1= reg16_ptr[r1&7];
+	    u16_t *R2= reg16_ptr[r2&7];
+	    u16_t t;
+	    t= (R1)?*R1:PC;
+	    *R1= (R2)?*R2:PC;
+	    *R2= t;
+	  }
+	else
+	  {
+	    u8_t *R1= reg8_ptr[r1&7];
+	    u8_t *R2= reg8_ptr[r2&7];
+	    u8_t t;
+	    t= *R1;
+	    *R1= *R2;
+	    *R2= t;
+	  }
+	break;
+      }
+    case 0x0f: // TFR
+      {
+	op8= fetch();
+	u8_t rs= op8>>4;
+	u8_t rd= op8&0xf;
+	if (((rd^rs)&8)!=0)
+	  return resINV_INST;
+	if (rs>=8)
+	  {
+	    u16_t *RS= reg16_ptr[rs&7];
+	    u16_t *RD= reg16_ptr[rd&7];
+	    if (RD)
+	      *RD= (RS)?*RS:PC;
+	    else
+	      PC= (RS)?*RS:PC;
+	  }
+	else
+	  {
+	    u8_t *RS= reg8_ptr[rs&7];
+	    u8_t *RD= reg8_ptr[rd&7];
+	    *RD= *RS;
+	  }
+	break;
+      }
+    }
+
+  return resGO;
+}
+
+int
+cl_m6809::inst_branch(t_mem code, bool l)
+{
+  bool c= reg.CC & C;
+  bool z= reg.CC & Z;
+  bool n= reg.CC & N;
+  bool v= reg.CC & V;
+  bool t;
+  
+  switch (code & 0x0f)
+    {
+    case 0x00: // BRA 1
+      if (l)
+	return resINV_INST;
+      t= true;
+      break;
+    case 0x01: // BRN 0
+      t= false;
+      break;
+    case 0x02: // BHI ~C * ~Z
+      t= !c && !z;
+      break;
+    case 0x03: // BLS C + Z
+      t= c || z;
+      break;
+    case 0x04: // BHS ~C
+      t= !c;
+      break;
+    case 0x05: // BLO C
+      t= c;
+      break;
+    case 0x06: // BNE ~Z
+      t= !z;
+      break;
+    case 0x07: // BEQ Z
+      t= z;
+      break;
+    case 0x08: // BVC ~V
+      t= !v;
+      break;
+    case 0x09: // BVS V
+      t= v;
+      break;
+    case 0x0a: // BPL ~N
+      t= !n;
+      break;
+    case 0x0b: // BMI N
+      t= n;
+      break;
+    case 0x0c: // BGE N*V + ~N*~V
+      t= (n&&v) || (!n&&!v);
+      break;
+    case 0x0d: // BLT N*~V + ~N*V
+      t= (n&&!v) || (!n&&v);
+      break;
+    case 0x0e: // BGT N*V*~Z + ~N*~V*~Z
+      t= (n&&v&&!z) || (!n&&!v&&!z);
+      break;
+    case 0x0f: // BLE Z + N*~V + ~N*V
+      t= z || (n&&!v) || (!n&&v);
+      break;
+    }
+
+  if (t)
+    {
+      u16_t u= fetch();
+      if (l)
+	u= u*256 + fetch();
+      i16_t i= u;
+      PC= PC + i;
+    }
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_30(t_mem code)
+{
+  t_addr ea;
+  int r;
+  u8_t op8, l, h;    
+  
+  switch (code & 0x0f)
+    {
+    case 0x00: // LEAX
+      r= index2ea(fetch(), &ea);
+      if (r!=resGO)
+	return r;
+      reg.X= ea;
+      SET_Z(reg.X);
+      break;
+    case 0x01: // LEAY
+      r= index2ea(fetch(), &ea);
+      if (r!=resGO)
+	return r;
+      reg.Y= ea;
+      SET_Z(reg.Y);
+      break;
+    case 0x02: // LEAS
+      r= index2ea(fetch(), &ea);
+      if (r!=resGO)
+	return r;
+      reg.S= ea;
+      break;
+    case 0x03: // LEAU
+      r= index2ea(fetch(), &ea);
+      if (r!=resGO)
+	return r;
+      reg.U= ea;
+      break;
+    case 0x04: // PSHS
+      op8= fetch();
+      if (op8 & 0x80)
+	rom->write(--reg.S, PC&0xff),
+	  rom->write(--reg.S, PC>>8);
+      if (op8 & 0x40)
+	rom->write(--reg.S, reg.U&0xff),
+	  rom->write(--reg.S, reg.U>>8);
+      if (op8 & 0x20)
+	rom->write(--reg.S, reg.Y&0xff),
+	  rom->write(--reg.S, reg.Y>>8);
+      if (op8 & 0x10)
+	rom->write(--reg.S, reg.X&0xff),
+	  rom->write(--reg.S, reg.X>>8);
+      if (op8 & 0x08)
+	rom->write(--reg.S, reg.DP);
+      if (op8 & 0x04)
+	rom->write(--reg.S, B);
+      if (op8 & 0x02)
+	rom->write(--reg.S, A);
+      if (op8 & 0x01)
+	rom->write(--reg.S, reg.CC);
+      break;
+    case 0x05: // PULS
+      op8= fetch();
+      if(op8 & 0x01)
+	reg.CC= rom->read(reg.S++);
+      if (op8 & 0x02)
+	A= rom->read(reg.S++);
+      if (op8 & 0x04)
+	B= rom->read(reg.S++);
+      if (op8 & 0x08)
+	reg.DP= rom->read(reg.S++);
+      if (op8 & 0x10)
+	h= rom->read(reg.S++),
+	  l= rom->read(reg.S++),
+	  reg.X= h*256 + l;
+      if (op8 & 0x20)
+	h= rom->read(reg.S++),
+	  l= rom->read(reg.S++),
+	  reg.Y= h*256 + l;
+      if (op8 & 0x40)
+	h= rom->read(reg.S++),
+	  l= rom->read(reg.S++),
+	  reg.U= h*256 + l;
+      if (op8 & 0x80)
+	h= rom->read(reg.S++),
+	  l= rom->read(reg.S++),
+	  PC= h*256 + l;
+      break;
+    case 0x06: // PSHU
+      op8= fetch();
+      if (op8 & 0x80)
+	rom->write(--reg.U, PC&0xff),
+	  rom->write(--reg.U, PC>>8);
+      if (op8 & 0x40)
+	rom->write(--reg.U, reg.S&0xff),
+	  rom->write(--reg.U, reg.S>>8);
+      if (op8 & 0x20)
+	rom->write(--reg.U, reg.Y&0xff),
+	  rom->write(--reg.U, reg.Y>>8);
+      if (op8 & 0x10)
+	rom->write(--reg.U, reg.X&0xff),
+	  rom->write(--reg.U, reg.X>>8);
+      if (op8 & 0x08)
+	rom->write(--reg.U, reg.DP);
+      if (op8 & 0x04)
+	rom->write(--reg.U, B);
+      if (op8 & 0x02)
+	rom->write(--reg.U, A);
+      if (op8 & 0x01)
+	rom->write(--reg.U, reg.CC);
+      break;
+    case 0x07: // PULU
+      op8= fetch();
+      if(op8 & 0x01)
+	reg.CC= rom->read(reg.U++);
+      if (op8 & 0x02)
+	A= rom->read(reg.U++);
+      if (op8 & 0x04)
+	B= rom->read(reg.U++);
+      if (op8 & 0x08)
+	reg.DP= rom->read(reg.U++);
+      if (op8 & 0x10)
+	h= rom->read(reg.U++),
+	  l= rom->read(reg.U++),
+	  reg.X= h*256 + l;
+      if (op8 & 0x20)
+	h= rom->read(reg.U++),
+	  l= rom->read(reg.U++),
+	  reg.Y= h*256 + l;
+      if (op8 & 0x40)
+	h= rom->read(reg.U++),
+	  l= rom->read(reg.U++),
+	  reg.S= h*256 + l;
+      if (op8 & 0x80)
+	h= rom->read(reg.U++),
+	  l= rom->read(reg.U++),
+	  PC= h*256 + l;
+      break;
+    case 0x08: // --
+      break;
+    case 0x09: // RTS
+      ea= rom->read(reg.S++) * 256;
+      ea+= rom->read(reg.S++);
+      PC= ea;
+      break;
+    case 0x0a: // ABX
+      reg.X+= B;
+      break;
+    case 0x0b: // RTI
+      pull_regs(true);
+      break;
+    case 0x0c: // CWAI
+      break;
+    case 0x0d: // MUL
+      D= A * B;
+      SET_Z(D);
+      SET_C(B & 0x80);
+      break;
+    case 0x0e: // RESET
+      break;
+    case 0x0f: // SWI
+      reg.CC|= E;
+      push_regs(true);
+      reg.CC|= F|I;
+      PC= rom->read(0xfffa)*256 + rom->read(0xfffb);
+      break;
+    }
+
+  return resGO;
+}
+
+
+int
+cl_m6809::inst_neg(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  if (acc)
+    {
+      *acc= ~(*acc);
+      return inst_add8(code, acc, 0, 1, true);
+    }
+  op8= rom->read(ea);
+  u8_t t= A;
+  A= ~op8;
+  inst_add8(code, &A, 0, 1, true);
+  rom->write(ea, A);
+  A= t;
+  return resGO;
+}
+
+int
+cl_m6809::inst_com(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  if (acc)
+    {
+      op8= *acc= ~(*acc);
+    }
+  op8= ~(rom->read(ea));
+  rom->write(ea, op8);
+
+  SET_C(1);
+  SET_O(0);
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_lsr(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  if (acc)
+    {
+      SET_C(*acc & 1);
+      op8= *acc= (*acc) >> 1;
+    }
+  op8= rom->read(ea);
+  SET_C(op8 & 1);
+  op8>>= 1;
+  rom->write(ea, op8);
+
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_ror(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  u8_t oldc, newc;
+  
+  op8= (acc)?(*acc):(rom->read(ea));
+  oldc= reg.CC & C;
+  newc= op8 & 1;
+  
+  op8>>= 1;
+  if (oldc)
+    op8|= 0x80;
+
+  if (acc)
+    *acc= op8;
+  else
+    rom->write(ea, op8);
+  
+  SET_C(newc);
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_asr(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  u8_t old8, newc;
+  
+  op8= (acc)?(*acc):(rom->read(ea));
+  old8= op8 & 0x80;
+  newc= op8 & 1;
+  
+  op8>>= 1;
+  if (old8)
+    op8|= 0x80;
+
+  if (acc)
+    *acc= op8;
+  else
+    rom->write(ea, op8);
+  
+  SET_C(newc);
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_asl(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  u8_t newc;
+  
+  op8= (acc)?(*acc):(rom->read(ea));
+  newc= op8 & 0x80;
+  
+  op8<<= 1;
+
+  if (acc)
+    *acc= op8;
+  else
+    rom->write(ea, op8);
+  
+  SET_C(newc);
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_rol(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  u8_t oldc, newc;
+  
+  op8= (acc)?(*acc):(rom->read(ea));
+  oldc= reg.CC & C;
+  newc= op8 & 0x80;
+
+  SET_O( (op8&0x80) ^ ((op8<<1)&0x80) );
+  
+  op8<<= 1;
+  if (oldc)
+    op8|= 1;
+
+  if (acc)
+    *acc= op8;
+  else
+    rom->write(ea, op8);
+  
+  SET_C(newc);
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+  
+  return resGO;
+}
+
+int
+cl_m6809::inst_dec(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  op8= (acc)?(*acc):(rom->read(ea));
+  SET_O(op8==0x80);
+
+  op8--;
+  
+  if (acc)
+    *acc= op8;
+  else
+    rom->write(ea, op8);
+  
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+
+  return resGO;
+}
+
+int
+cl_m6809::inst_inc(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  op8= (acc)?(*acc):(rom->read(ea));
+  SET_O(op8==0x7f);
+
+  op8++;
+  
+  if (acc)
+    *acc= op8;
+  else
+    rom->write(ea, op8);
+  
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+
+  return resGO;
+}
+
+int
+cl_m6809::inst_tst(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  op8= (acc)?(*acc):(rom->read(ea));
+  SET_O(0);
+  
+  SET_Z(op8);
+  SET_S(op8 & 0x80);
+
+  return resGO;
+}
+
+int
+cl_m6809::inst_clr(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
+{
+  if (!acc)
+    {
+      volatile u8_t u= rom->read(ea);
+      op8= u;
+    }
+  
+  if (acc)
+    *acc= 0;
+  else
+    rom->write(ea, 0);
+  
+  SET_O(0);
+  SET_Z(1);
+  SET_S(0);
+  SET_C(0);
+
+  return resGO;
+}
+
+const u8_t low_illegals[]=
+  {
+   0x01, 0x41, 0x51, 0x61, 0x71,
+   0x02, 0x42, 0x52, 0x62, 0x72,
+   0x14,
+   0x05, 0x15, 0x45, 0x55, 0x65, 0x75,
+   0x18, 0x38,
+   0x0b, 0x1b, 0x4b, 0x5b, 0x6b, 0x7b,
+   0x4e, 0x5e,
+   0
+  };
+
+int
+cl_m6809::inst_low(t_mem code)
+{
+  t_addr ea= 0;
+  u8_t op8= 0, *acc, idx;
+  
+  for (idx= 0; low_illegals[idx]; idx++)
+    if (low_illegals[idx] == code)
+      return resINV_INST;
+
+  if ((code & 0xf0) == 0x10)
+    return inst_10(code);
+
+  if ((code & 0xf0) == 0x20)
+    return inst_branch(code, false);
+
+  if ((code & 0xf0) == 0x30)
+    return inst_30(code);
+  
+  switch (code & 0xf0)
+    {
+    case 0x00: // direct
+      ea= reg.DP*256 + fetch();
+      op8= rom->read(ea);
+      break;
+    case 0x60: // index
+      {
+	int r;
+	idx= fetch();
+	if ((r= index2ea(idx, &ea)) != resGO)
+	  return r;
+	op8= rom->read(ea);
+	break;
+      }
+    case 0x70: // extend
+      ea= fetch()*256 + fetch();
+      op8= rom->read(ea);
+      break;
+    }
+
+  if ((code & 0xf0) == 0x40)
+    acc= &A;
+  else if ((code & 0xf0) == 0x50)
+    acc= &B;
+  else
+    acc= NULL;
+  
+  switch (code & 0x0f)
+    {
+      //          0     1     2     3     4     5     6     7
+    case 0x00: // NEG   pg1   BRA   LEAX  NEGA  NEGB  NEG   NEG
+      return inst_neg(code, acc, ea, op8);
+      break;
+    case 0x01: // --    pg2   BRN   LEAY  --    --    --    --
+      break;
+    case 0x02: // --    NOP   BHI   LEAS  --    --    --    --
+      break;
+    case 0x03: // COM   SYNC  BLS   LEAU  COMA  COMB  COM   COM
+      return inst_com(code, acc, ea, op8);
+      break;
+    case 0x04: // LSR   --    BHS   PSHS  LSRA  LSRB  LSR   LSR
+      return inst_lsr(code, acc, ea, op8);
+      break;
+    case 0x05: // --    --    BLO   PULS  --    --    --    --
+      break;
+    case 0x06: // ROR   LBRA  BNE   PSHU  RORA  RORB  ROR   ROR
+      return inst_ror(code, acc, ea, op8);
+      break;
+    case 0x07: // ASR   LBSR  BEQ   PULU  ASRA  ASRB  ASR   ASR
+      return inst_asr(code, acc, ea, op8);
+      break;
+    case 0x08: // ASL   --    BVC   --    ASLA  ASLB  ASL   ASL
+      return inst_asl(code, acc, ea, op8);
+      break;
+    case 0x09: // ROL   DAA   BVS   RTS   ROLA  ROLB  ROL   ROL
+      return inst_rol(code, acc, ea, op8);
+      break;
+    case 0x0a: // DEC   ORCC  BPL   ABX   DECA  DECB  DEC   DEC
+      return inst_dec(code, acc, ea, op8);
+      break;
+    case 0x0b: // --    --    BMI   RTI   --    --    --    --
+      break;
+    case 0x0c: // INC   ANDCC BGE   CWAI  INCA  INCB  INC   INC
+      return inst_inc(code, acc, ea, op8);
+      break;
+    case 0x0d: // TST   SEX   BLT   MUL   TSTA  TSTB  TST   TST
+      return inst_tst(code, acc, ea, op8);
+      break;
+    case 0x0e: // JMP   EXG   BGT   RESET --    --    JMP   JMP
+      PC= ea;
+      break;
+    case 0x0f: // CLR   TFR   BLE   SWI   CLRA  CLRB  CLR   CLR
+      return inst_clr(code, acc, ea, op8);
+      break;
+    }
+  
+  return resGO;
+}
+
+
+int
+cl_m6809::inst_page1(t_mem code)
+{
+  t_addr ea;
+  u8_t op8, idx;
+  u16_t op16;
+  
+  if ((code & 0xf0) == 0x20)
+    return inst_branch(code, true);
+  if (code == 0x3f)
+    {
+      // SWI2
+      reg.CC|= E;
+      push_regs(true);
+      PC= rom->read(0xfff4)*256 + rom->read(0xfff5);
+    }
+  if ((code & 0x80) == 0)
+    return resINV_INST;
+  
+  /*
+    1000 immed   3 c e
+    1100             e
+
+    1001 direct  3 c e f
+    1101             e f
+
+    1010 index   3 c e f
+    1110             e f
+
+    1011 extend  3 c e f
+    1111             e f
+  */
+  u8_t cl= code & 0xf;
+  u8_t ch= code >> 4;
+  switch (code & 0x30)
+    {
+    case 0x00: // immed
+      if ((ch==8)&&(cl!=3)&&(cl!=12)&&(cl!=14)) return resINV_INST;
+      if ((ch==12)&&(cl!=14)) return resINV_INST;
+      ea= PC;
+      op8= fetch();
+      break;
+    case 0x10: // direct
+      if ((ch==9)&&(cl!=3)&&(cl!=12)&&(cl!=14)&&(cl!=15)) return resINV_INST;
+      if ((ch==13)&&(cl!=14)&&(cl!=15)) return resINV_INST;
+      ea= reg.DP*256 + fetch();
+      op8= rom->read(ea);
+      break;
+    case 0x20: // index
+      {
+	if ((ch==10)&&(cl!=3)&&(cl!=12)&&(cl!=14)&&(cl!=15)) return resINV_INST;
+	if ((ch==14)&&(cl!=14)&&(cl!=15)) return resINV_INST;
+	int r;
+	idx= fetch();
+	if ((r= index2ea(idx, &ea)) != resGO)
+	  return r;
+	op8= rom->read(ea);
+	break;
+      }
+    case 0x30: // extend
+      if ((ch==11)&&(cl!=3)&&(cl!=12)&&(cl!=14)&&(cl!=15)) return resINV_INST;
+      if ((ch==15)&&(cl!=14)&&(cl!=15)) return resINV_INST;
+      ea= fetch()*256 + fetch();
+      op8= rom->read(ea);
+      break;
+    default: op8= 0; break;
+    }
+
+  if ((code & 0x30) == 0)
+    op16= op8*256 + fetch();
+  else
+    op16= op8*256 + rom->read(ea+1);
+  
+  switch (cl)
+    {
+    case 3: // CMPD
+      inst_add16(code, &(D), ~op16, 1, false);
+      break;
+    case 0xc: // CMPY
+      inst_add16(code, &(reg.Y), ~op16, 1, false);
+      break;
+    case 0xe: // LDY, LDS
+      if ((code & 0x40) == 0)
+	  inst_ld16(code, &(reg.Y), op16);
+      else
+	  inst_ld16(code, &(reg.S), op16);
+      break;
+    case 0xf: // STY, STS
+      if (code & 0x40)
+	inst_st16(code, reg.Y, ea);
+      else
+	inst_st16(code, reg.S, ea);
+      break;
+    }
+  
+  return resGO;
+}
+
+
+int
+cl_m6809::inst_page2(t_mem code)
+{
+  t_addr ea;
+  u8_t op8, idx;
+  u16_t op16;
+  
+  if (code == 0x3f)
+    {
+      // SWI3
+      reg.CC|= E;
+      push_regs(true);
+      PC= rom->read(0xfff2)*256 + rom->read(0xfff3);
+    }
+  if ((code!=0x83)&&(code!=0x8c)&&
+      (code!=0x93)&&(code!=0x9c)&&
+      (code!=0xa3)&&(code!=0xac)&&
+      (code!=0xb3)&&(code!=0xbc))
+    return resINV_INST;
+
+  switch (code & 0xf0)
+    {
+    case 0x00: // direct
+      ea= reg.DP*256 + fetch();
+      op8= rom->read(ea);
+      break;
+    case 0x60: // index
+      {
+	int r;
+	idx= fetch();
+	if ((r= index2ea(idx, &ea)) != resGO)
+	  return r;
+	op8= rom->read(ea);
+	break;
+      }
+    case 0x70: // extend
+      ea= fetch()*256 + fetch();
+      op8= rom->read(ea);
+      break;
+    }
+
+  if ((code & 0x30) == 0)
+    op16= op8*256 + fetch();
+  else
+    op16= op8*256 + rom->read(ea+1);
+
+  if ((code & 0x0f) == 0x03)
+    {
+      // CMPU
+      inst_add16(code, &(reg.U), ~op16, 1, false);
+    }
+  if ((code & 0x0f) == 0x0c)
+    {
+      // CMPS
+      inst_add16(code, &(reg.S), ~op16, 1, false);
+    }
+
+  return resGO;
+}
+
+
+int
+cl_m6809::exec_inst(void)
+{
+  t_mem code;
+  bool fe;
+  
+  fe= fetch(&code);
+  tick(1);
+  if (fe)
+    return(resBREAKPOINT);
+
+  if (code & 0x80)
+    return inst_alu(code);
+  else
+    {
+      if (code == 0x10)
+	return inst_page1(fetch());
+      if (code == 0x11)
+	return inst_page2(fetch());
+      return inst_low(code);
+    }
+  
+  return resGO;
+}
+
+
+/* End of m6809.src/m6809.cc */

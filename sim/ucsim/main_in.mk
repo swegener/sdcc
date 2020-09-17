@@ -93,6 +93,7 @@ uninstall:
 	rm -f $(DESTDIR)$(bindir)/sstm8$(EXEEXT)
 	rm -f $(DESTDIR)$(bindir)/sst7$(EXEEXT)
 	rm -f $(DESTDIR)$(bindir)/sp1516$(EXEEXT)
+	rm -f $(DESTDIR)$(bindir)/sm6809$(EXEEXT)
 
 
 # Performing self-test

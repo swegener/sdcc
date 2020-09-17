@@ -1,5 +1,11 @@
 2020-09-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/gbz80/abs.s,
+	  device/lib/gbz80/strlen.s:
+	  Assembler optimized abs() and strlen() for GBZ80.
+
+2020-09-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* device/lib/_memset.c:
 	  More optimized memset implementation.
 

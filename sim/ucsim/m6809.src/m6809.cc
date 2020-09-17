@@ -226,11 +226,11 @@ cl_m6809::index2ea(u8_t idx, t_addr *res_ea)
       switch (idx & 0xf)
 	{
 	case 0x00:
+	  if (idx & 0x10) return resINV_INST;
 	  off= 0;
 	  ea= iv;
 	  (*ir)++;
 	  ind= false;
-	  if (idx & 0x10) return resINV_INST;
 	  break;
 	case 0x01:
 	  off= 0;
@@ -238,12 +238,12 @@ cl_m6809::index2ea(u8_t idx, t_addr *res_ea)
 	  (*ir)+= 2;
 	  break;
 	case 0x02:
+	  if (idx & 0x10) return resINV_INST;
 	  off= 0;
 	  (*ir)--;
 	  iv= *ir;
 	  ea= iv;
 	  ind= false;
-	  if (idx & 0x10) return resINV_INST;
 	  break;
 	case 0x03:
 	  off= 0;
@@ -297,11 +297,11 @@ cl_m6809::index2ea(u8_t idx, t_addr *res_ea)
 	  return resINV_INST;
 	  break;
 	case 0x0f:
+	  if ((idx & 0x10) == 0) return resINV_INST;
+	  if ((idx & 0x60) != 0) return resINV_INST;
 	  off= 0;
 	  iv= fetch()*256 + fetch();
 	  ea= iv;
-	  if ((idx & 0x10) == 0) return resINV_INST;
-	  if ((idx & 0x60) != 0) return resINV_INST;
 	  break;
 	}
       if (ind && (idx & 0x10))

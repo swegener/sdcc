@@ -99,8 +99,13 @@ public:
   virtual int clock_per_cycle(void) { return 1; }
   
   virtual struct dis_entry *dis_tbl(void);
+  virtual void disass_indexed(t_addr *addr, chars *work, int siz);
+  virtual void disass_immediate(t_addr *addr, chars *work, int siz);
   virtual char *disass(t_addr addr, const char *sep);
   virtual void print_regs(class cl_console_base *con);
+  virtual int indexed_length(t_addr addr);
+  virtual int inst_length(t_addr addr);
+  virtual int longest_inst(void) { return 4; }
 
   virtual int index2ea(u8_t idx, t_addr *res_ea);
   virtual void push_regs(bool do_cc);

@@ -61,14 +61,14 @@ public:
   virtual ~cl_base(void);
 
   virtual int init(void);
-  virtual const char *get_name(void) { return(name); }
-  virtual const char *get_name(const char *def);
+  virtual const char *get_name(void) const { return(name); }
+  virtual const char *get_name(const char *def) const;
   virtual bool have_name(void) { return/*(name != 0)*/ !name.is_null(); }
   virtual bool have_real_name(void) { return/*(name != 0 && *name != '\0')*/ !name.empty(); }
   const char *set_name(const char *new_name);
   const char *set_name(const char *new_name, const char *def_name);
-  bool is_named(const char *the_name);
-  bool is_inamed(const char *the_name);
+  bool is_named(const char *the_name) const;
+  bool is_inamed(const char *the_name) const;
 
   class cl_base *get_parent(void) { return(parent); }
   int nuof_children(void);
@@ -153,8 +153,8 @@ public:
   virtual t_index  add(class cl_base *item, class cl_base *parent);
   virtual void     push(void *item);
 
-	  void	   *first_that(match_func test, void *arg);
-	  void	   *last_that(match_func test, void *arg);
+	  void	   *first_that(match_func test, const void *arg);
+	  void	   *last_that(match_func test, const void *arg);
 	  void	   for_each(iterator_func action, void *arg);
 
 	  void	   error(t_index code, t_index info);
@@ -181,7 +181,7 @@ public:
   virtual bool	   search(const void *key, t_index& index);
   virtual t_index  index_of(void *item);
   virtual t_index  add(void *item);
-  virtual const void *key_of(const void *item);
+  virtual const void *key_of(const void *item) const;
 private:
   virtual int	   compare(const void *key1, const void *key2)= 0;
 };

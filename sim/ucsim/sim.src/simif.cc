@@ -473,7 +473,7 @@ cl_simulator_interface::cl_simulator_interface(class cl_uc *auc):
 cl_simulator_interface::~cl_simulator_interface(void)
 {
   if (as_name)
-    free((void*)as_name);
+    free(const_cast<char *>(as_name));
   delete commands;
 }
 
@@ -497,7 +497,7 @@ cl_simulator_interface::init(void)
 	  (strlen(oas_v) > 0))
 	{
 	  if (as_name)
-	    free((void*)as_name);
+	    free(const_cast<char *>(as_name));
 	  as_name= strdup(oas_v);
 	  addr= oa_v;
 	}

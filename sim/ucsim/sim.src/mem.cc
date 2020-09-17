@@ -2555,9 +2555,9 @@ cl_decoder_list::cl_decoder_list(t_index alimit, t_index adelta, bool bychip):
 }
 
 const void *
-cl_decoder_list::key_of(const void *item)
+cl_decoder_list::key_of(const void *item) const
 {
-  class cl_address_decoder *d= (class cl_address_decoder *)item;
+  const class cl_address_decoder *d= (const class cl_address_decoder *)item;
   if (by_chip)
     return(&(d->chip_begin));
   else

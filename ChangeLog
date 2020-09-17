@@ -1,3 +1,29 @@
+2020-09-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* sim/ucsim/app.cc,
+	  sim/ucsim/chars.cc,
+	  sim/ucsim/errorcl.h,
+	  sim/ucsim/option.cc,
+	  sim/ucsim/optioncl.h,
+	  sim/ucsim/p1516.src/p1516.cc,
+	  sim/ucsim/pdk.src/pdk.cc,
+	  sim/ucsim/pobj.cc,
+	  sim/ucsim/pobjcl.h,
+	  sim/ucsim/pobjt.h,
+	  sim/ucsim/sim.src/brk.cc,
+	  sim/ucsim/sim.src/brkcl.h,
+	  sim/ucsim/sim.src/hw.cc,
+	  sim/ucsim/sim.src/itsrc.cc,
+	  sim/ucsim/sim.src/itsrccl.h,
+	  sim/ucsim/sim.src/mem.cc,
+	  sim/ucsim/sim.src/memcl.h,
+	  sim/ucsim/sim.src/simif.cc,
+	  sim/ucsim/sim.src/uc.cc,
+	  sim/ucsim/sim.src/uccl.h,
+	  sim/ucsim/sim.src/var.cc,
+	  sim/ucsim/sim.src/varcl.h:
+	  Apply patch #343 and patch #347 from Mike Jagdis.
+
 2020-09-15 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sim/ucsim/z80.src/inst_r2k.cc:

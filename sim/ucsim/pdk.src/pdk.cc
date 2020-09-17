@@ -252,7 +252,7 @@ const char *cl_pdk::get_disasm_info(t_addr addr, int *ret_len, int *ret_branch,
         break;
 
       default:
-        return (char*)"";//__builtin_unreachable();
+        return "";//__builtin_unreachable();
   }
 
   uint code = rom->get(addr++);

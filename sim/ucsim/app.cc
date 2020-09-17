@@ -129,7 +129,7 @@ cl_app::run(void)
 	      int i;
 	      for (i= 0; i < in_files->count; i++)
 		{
-		  char *fname= (char *)(in_files->at(i));
+		  const char *fname= (const char *)(in_files->at(i));
 		  long l;
 		  if ((l= sim->uc->read_file(fname, NULL)) >= 0)
 		    {
@@ -316,7 +316,7 @@ cl_app::proc_arguments(int argc, char *argv[])
       if ((strcmp(argv[i], "-help")==0) ||
 	  (strcmp(argv[i], "--help")==0))
 	{
-	  print_help((char*)get_name());
+	  print_help(get_name());
 	  exit(0);
 	}
     }
@@ -1130,12 +1130,12 @@ cl_app::mk_options(void)
   options->new_option(o= new cl_string_option(this, "color_ui_bit0",
 					      "Bit 0 color on UI display"));
   o->init();
-  o->set_value((char*)"white:black");
+  o->set_value("white:black");
   
   options->new_option(o= new cl_string_option(this, "color_ui_bit1",
 					      "Bit 1 color on UI display"));
   o->init();
-  o->set_value((char*)"bred:black");
+  o->set_value("bred:black");
   
   options->new_option(o= new cl_string_option(this, "color_ui_stop",
 					      "Stop state color on UI display"));

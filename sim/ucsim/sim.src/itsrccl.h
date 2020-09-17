@@ -88,7 +88,7 @@ class cl_irqs: public cl_sorted_list
 {
 public:
   cl_irqs(t_index alimit, t_index adelta);
-  virtual const void *key_of(const void *item);
+  virtual const void *key_of(const void *item) const;
   virtual int compare(const void *key1, const void *key2);
 };
 

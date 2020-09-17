@@ -51,7 +51,7 @@ chars::chars(char *s)
 
 chars::chars(const char *s)
 {
-  if ((chars_string= (char*)s) != NULL)
+  if ((chars_string= const_cast<char *>(s)) != NULL)
     chars_length= strlen(s);
   else
     chars_length= 0;

@@ -410,7 +410,7 @@ cl_uc::init(void)
   return 0;
   for (i= 0; i < sim->app->in_files->count; i++)
     {
-      char *fname= (char *)(sim->app->in_files->at(i));
+      const char *fname= (const char *)(sim->app->in_files->at(i));
       long l;
       if ((l= read_hex_file(fname)) >= 0)
 	{
@@ -1599,11 +1599,7 @@ cl_uc::dis_tbl(void)
 char *
 cl_uc::disass(t_addr addr, const char *sep)
 {
-  char *buf;
-
-  buf= (char*)malloc(100);
-  strcpy(buf, "uc::disass() unimplemented\n");
-  return(buf);
+  return strdup("uc::disass() unimplemented\n");
 }
 
 void

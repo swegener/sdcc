@@ -582,7 +582,7 @@ protected:
 public:
   cl_decoder_list(t_index alimit, t_index adelta, bool bychip);
 
-  virtual const void *key_of(const void *item);
+  virtual const void *key_of(const void *item) const;
   virtual int compare(const void *key1, const void *key2);
 };
 

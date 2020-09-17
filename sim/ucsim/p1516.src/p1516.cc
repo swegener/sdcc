@@ -282,7 +282,7 @@ cl_p1516::disass(t_addr addr, const char *sep)
 	      temp.format("0x%x", data);
 	      break;
 	    default:
-	      temp= (char*)"?";
+	      temp= "?";
 	      break;
 	    }
 	  //t= temp;

@@ -88,10 +88,9 @@ cl_var::print_info(cl_console_base *con)
 
 
 const void *
-cl_var_list::key_of(const void *item)
+cl_var_list::key_of(const void *item) const
 {
-  class cl_var *v= (class cl_var *)item;
-  return (void*)v->get_name();
+  return ((const class cl_var *)item)->get_name();
 }
 
 int

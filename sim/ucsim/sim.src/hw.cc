@@ -67,7 +67,7 @@ cl_hw::cl_hw(class cl_uc *auc, enum hw_cath cath, int aid, const char *aid_strin
 
 cl_hw::~cl_hw(void)
 {
-  free((void*)id_string);
+  free(const_cast<char *>(id_string));
   delete partners;
 }
 

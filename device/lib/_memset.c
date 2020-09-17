@@ -2,6 +2,7 @@
    _memset.c - part of string library functions
 
    Copyright (C) 1999, Sandeep Dutta . sandeep.dutta@usa.net
+   Copyright (C) 2020, Sergey Belyashov sergey.belyashov@gmail.com
    mcs51 assembler by Frieder Ferlemann (2007)
 
    This library is free software; you can redistribute it and/or modify it
@@ -40,18 +41,105 @@ void *memset (void *s, unsigned char c, size_t n)
 #else
 void *memset (void *s, int c, size_t n)
 #endif
+
+#if !defined (_SDCC_NO_ASM_LIB_FUNCS) && (\
+              defined (__SDCC_z80) ||\
+              defined (__SDCC_ez80_z80) ||\
+              defined (__SDCC_z180) ||\
+              defined (__SDCC_z80n) ||\
+              defined (__SDCC_r2k) ||\
+              defined (__SDCC_z3ka))
+
+__naked
 {
- register unsigned char *ret = s;
-
- while (n--)
-   {
-      *(unsigned char *) ret = c;
-      ret = ((unsigned char *) ret) + 1;
-   }
-
-   return s;
+  (void)s;
+  (void)c;
+  (void)n;
+  __asm
+    pop   af
+    pop   hl
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
+    dec   sp
+#endif
+    pop   de
+    pop   bc
+    push  bc
+    push  de
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
+    inc   sp
+#endif
+    push  hl
+    push  af
+    ld    a, c
+    or    a, b
+    ret   Z
+#ifdef __SDCC_BROKEN_STRING_FUNCTIONS
+    ld    (hl), d
+#else
+    ld    (hl), e
+#endif
+    dec   bc
+    ld    a, c
+    or    a, b
+    ret   Z
+    push  hl
+    ld    e, l
+    ld    d, h
+    inc   de
+    ldir
+    pop   hl
+    ret
+  __endasm;
 }
-
+#elif !defined (_SDCC_NO_ASM_LIB_FUNCS) && defined(__SDCC_gbz80)
+__naked
+{
+  (void)s;
+  (void)c;
+  (void)n;
+  __asm
+    ldhl  sp,#2
+    ld    e, (hl)
+    inc   hl
+    ld    d, (hl)
+    inc   hl
+    ld    a, (hl)
+    inc   hl
+#ifndef __SDCC_BROKEN_STRING_FUNCTIONS
+    inc   hl
+#endif
+    ld    c, (hl)
+    inc   hl
+    ld    b, (hl)
+    ld    l, e
+    ld    h, d
+    inc   b
+    inc   c
+    jr    20$
+10$:
+    ld    (hl+),a
+20$:
+    dec   c
+    jr    NZ, 10$
+    dec   b
+    jr    NZ, 10$
+    ret
+  __endasm;
+}
+#else
+{
+  register size_t sz = n;
+  if (sz != 0)
+    {
+      register char *dst = s;
+      register char data = (char)c;
+      do {
+        *dst++ = data;
+      } while (--sz);
+    }
+  return s;
+}
+#endif
 #else
 
   /* assembler implementation for mcs51 */

@@ -1,5 +1,10 @@
 2020-09-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
+	* device/lib/_memset.c:
+	  More optimized memset implementation.
+
+2020-09-17 Sergey Belyashov <sergey.belyashov@gmail.com>
+
 	* sim/ucsim/app.cc,
 	  sim/ucsim/chars.cc,
 	  sim/ucsim/errorcl.h,

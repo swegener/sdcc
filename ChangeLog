@@ -1,3 +1,9 @@
+2020-09-18 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* sdcc/sim/ucsim/app.cc,
+	  sdcc/sim/ucsim/doc/ucsim.1:
+	  Apply part of patch #349: simulator rng seed option
+
 2020-09-17 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* device/lib/gbz80/abs.s,

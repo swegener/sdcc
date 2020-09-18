@@ -207,7 +207,7 @@ static void
 print_help(const char *name)
 {
   printf("%s: %s\n", name, VERSIONSTR);
-  printf("Usage: %s [-hHVvPgGwbB] [-p prompt] [-t CPU] [-X freq[k|M]]\n"
+  printf("Usage: %s [-hHVvPgGwbB] [-p prompt] [-t CPU] [-X freq[k|M]] [-R seed]\n"
 	 "       [-C cfg_file] [-c file] [-e command] [-s file] [-S optionlist]\n"
 	 "       [-I if_optionlist] [-o colorlist] [-a nr]\n"
 #ifdef SOCKET_AVAIL
@@ -220,6 +220,7 @@ print_help(const char *name)
      "Options:\n"
      "  -t CPU       Type of CPU: 51, C52, 251, etc.\n"
      "  -X freq[k|M] XTAL frequency\n"
+     "  -R seed      Set the random number generator seed value\n"
      "  -C cfg_file  Read initial commands from `cfg_file' and execute them\n"
      "  -e command   Execute command on startup\n"
      "  -c file      Open command console on `file' (use `-' for std in/out)\n"
@@ -301,7 +302,7 @@ cl_app::proc_arguments(int argc, char *argv[])
   bool /*s_done= DD_FALSE,*/ k_done= false;
   //bool S_i_done= false, S_o_done= false;
 
-  strcpy(opts, "c:C:e:p:PX:vVt:s:S:I:a:whHgGJo:blB_");
+  strcpy(opts, "c:C:e:p:PX:vVt:s:S:I:a:whHgGJo:blBR:_");
 #ifdef SOCKET_AVAIL
   strcat(opts, "Z:r:k:");
 #endif
@@ -353,6 +354,9 @@ cl_app::proc_arguments(int argc, char *argv[])
 	startup_command+= optarg;
 	startup_command+= chars("\n");
 	break;
+      case 'R':
+        srand(atoi(optarg));
+        break;
 #ifdef SOCKET_AVAIL
       case 'Z': case 'r':
 	{

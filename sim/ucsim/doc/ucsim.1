@@ -5,6 +5,7 @@ uCsim \- Micro\-controller simulator
 .B s51|sz80|savr|sxa|shc08|spdk|sst7|sstm8|stlc
 .BR \-t type
 .BR \-X freq[k|M]
+.BR \-R seed
 .BR \-C file
 .BR \-e command
 .BR \-c file
@@ -39,6 +40,10 @@ XTAL frequency in Hz, Use
 or
 .I M
 suffix to specify frequency in kHz or MHz.
+.PP
+.TP
+.B \-R seed
+Set the random number generator seed.
 .PP
 .TP
 .B \-C file

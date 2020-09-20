@@ -1,3 +1,8 @@
+2020-09-20 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix bug #3116.
+
 2020-09-18 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* sdcc/sim/ucsim/app.cc,

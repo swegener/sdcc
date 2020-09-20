@@ -5666,7 +5666,7 @@ genPlusIncr (const iCode * ic)
           if (icount > 3)
             return FALSE;
           if (!delayed_move)
-            fetchPair (getPairId (AOP (IC_RESULT (ic))), AOP (IC_LEFT (ic)));
+            fetchPairLong (getPairId (IC_RESULT (ic)->aop), IC_LEFT (ic)->aop, ic, 0);
         }
       while (icount--)
         {

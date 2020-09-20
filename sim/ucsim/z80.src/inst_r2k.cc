@@ -353,7 +353,7 @@ cl_r2k::inst_rst(t_mem code)
   switch(code) {
     case 0xC7: // RST 0
       push2(PC+2);
-      PC = 0x0;
+      PC = iir + 0x00 * 2;
       vc.wr+= 2;
     break;
     case 0xCF: // RST 8
@@ -361,17 +361,17 @@ cl_r2k::inst_rst(t_mem code)
     
     case 0xD7: // RST 10H
       push2(PC+2);
-      PC = 0x10;
+      PC = iir + 0x10 * 2;
       vc.wr+= 2;
     break;
     case 0xDF: // RST 18H
       push2(PC+2);
-      PC = 0x18;
+      PC = iir + 0x18 * 2;
       vc.wr+= 2;
     break;
     case 0xE7: // RST 20H
       push2(PC+2);
-      PC = 0x20;
+      PC = iir + 0x20 * 2;
       vc.wr+= 2;
     break;
     case 0xEF: // RST 28H
@@ -394,7 +394,7 @@ cl_r2k::inst_rst(t_mem code)
     break;
     case 0xFF: // RST 38H
       push2(PC+2);
-      PC = 0x38;
+      PC = iir + 0x38 * 2;
       vc.wr+= 2;
     break;
     default:

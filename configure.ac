@@ -496,6 +496,10 @@ AC_DEFINE_UNQUOTED(TYPE_UQWORD, unsigned $TYPE_QWORD, [XXX])
 case "${host}" in
   *x86_64*cygwin*)
     LDFLAGS="$LDFLAGS -Wl,--stack,4194304"
+  ;;
+  *x86_64*mingw*)
+    LDFLAGS="$LDFLAGS -Wl,--stack,4194304"
+  ;;
 esac
 
 # Checking whether byte ordering is bigendian

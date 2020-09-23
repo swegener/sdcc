@@ -1,3 +1,9 @@
+2020-09-23 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* configure,
+	  configure.ac:
+	  Apply patch #357 from Tim Stahlhut: fix bug #3114.
+
 2020-09-23 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/peep.c:

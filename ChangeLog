@@ -1,3 +1,8 @@
+2020-09-23 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/peep.c:
+	  Fix handling of ioi, ioe in peephole optimizer, including bug #3118.
+
 2020-09-20 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

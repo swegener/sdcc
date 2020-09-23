@@ -398,6 +398,9 @@ z80MightReadFlag(const lineNode *pl, const char *what)
 
   if (IS_GB && ISINST(pl->line, "ldhl"))
     return false;
+    
+  if(IS_RAB && (ISINST(pl->line, "ioi") || ISINST(pl->line, "ioe")))
+    return(false);
 
   return true;
 }
@@ -670,6 +673,9 @@ z80MightRead(const lineNode *pl, const char *what)
   if((IS_Z180 || IS_EZ80_Z80) && ISINST(pl->line, "tstio"))
     return(!strcmp(what, "c"));
 
+  if(IS_RAB && (ISINST(pl->line, "ioi") || ISINST(pl->line, "ioe")))
+    return(false);
+    
   if(IS_RAB && ISINST(pl->line, "mul"))
     return(!strcmp(what, "b") || !strcmp(what, "c") || !strcmp(what, "d") || !strcmp(what, "e"));
 
@@ -1609,6 +1615,9 @@ int z80instructionSize(lineNode *pl)
   if((IS_Z180 || IS_EZ80_Z80 || IS_Z80N) && ISINST(pl->line, "tst"))
     return((op1start[0] == '#' || op2start && op1start[0] == '#') ? 3 : 2);
 
+  if(IS_RAB && (ISINST(pl->line, "ioi") || ISINST(pl->line, "ioe")))
+    return(1);
+    
   if(IS_RAB && ISINST(pl->line, "mul"))
     return(1);
 

@@ -28,7 +28,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <ctype.h>
 
+#include "globals.h"
+
 #include "glob.h"
+#include "serialcl.h"
 
 #include "m6809cl.h"
 
@@ -75,6 +78,7 @@ cl_m6809::id_string(void)
 void
 cl_m6809::reset(void)
 {
+  cl_uc::reset();
   PC= rom->get(0xfffe)*256 + rom->get(0xffff);
   reg.DP= 0;
 }
@@ -88,7 +92,21 @@ cl_m6809::set_PC(t_addr addr)
 void
 cl_m6809::mk_hw_elements(void)
 {
+  class cl_hw *h;
+  class cl_option *o;
   cl_uc::mk_hw_elements();
+
+  if ((o= application->options->get_option("serial1_in_file")) == NULL)
+    {
+      o= new cl_string_option(this, "serial1_in_file",
+			      "Input file for serial line uart1 (-S)");
+      application->options->new_option(o);
+      o->init();
+      o->hide();
+    }
+
+  add_hw(h= new cl_serial(this, 0xc000));
+  h->init();
 }
 
 void
@@ -251,6 +269,26 @@ cl_m6809::disass_immediate(t_addr *addr, chars *work, int siz)
   *addr= a;
 }
 
+const char *reg_names[16]=
+  {
+   /* 0*/ "D",
+   /* 1*/ "X",
+   /* 2*/ "Y",
+   /* 3*/ "U",
+   /* 4*/ "S",
+   /* 5*/ "PC",
+   /* 6*/ "?",
+   /* 7*/ "?",
+   /* 8*/ "A",
+   /* 9*/ "B",
+   /*10*/ "CC",
+   /*11*/ "DP",
+   /*12*/ "?",
+   /*13*/ "?",
+   /*14*/ "?",
+   /*15*/ "?"
+  };
+   
 char *
 cl_m6809::disass(t_addr addr, const char *sep)
 {
@@ -385,6 +423,17 @@ cl_m6809::disass(t_addr addr, const char *sep)
 		if (op8 & 0x02) (r.nempty()?(r+=','):r),r+="A";
 		if (op8 & 0x01) (r.nempty()?(r+=','):r),r+="CC";
 		work.append(r);
+		break;
+	      }
+	    case 'r':
+	      {
+		op8= rom->get(addr++);
+		u8_t s= op8>>4;
+		u8_t d= op8&0xf;
+		work.appendf("%s,%s", reg_names[s], reg_names[d]);
+		if ((s^d)&0x8)
+		  work+= "-??";
+		break;
 	      }
 	    }
 	}

@@ -105,7 +105,7 @@ public:
   virtual void print_regs(class cl_console_base *con);
   virtual int indexed_length(t_addr addr);
   virtual int inst_length(t_addr addr);
-  virtual int longest_inst(void) { return 4; }
+  virtual int longest_inst(void) { return 5; }
 
   virtual int index2ea(u8_t idx, t_addr *res_ea);
   virtual void push_regs(bool do_cc);

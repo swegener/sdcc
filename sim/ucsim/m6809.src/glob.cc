@@ -102,6 +102,9 @@ struct dis_entry disass_m6809[]=
    { 0x1c, 0xff, ' ', 1, "ANDCC %i"	, 0, 0 },
    { 0x3c, 0xff, ' ', 1, "CWAI %i"	, 0, 0 },
    { 0x1a, 0xff, ' ', 1, "ORCC %i"	, 0, 0 },
+
+   { 0x1e, 0xff, ' ', 1, "XCG %r"	, 0, 0 },
+   { 0x1f, 0xff, ' ', 1, "TFR %r"	, 0, 0 },
    
    { 0x89, 0xcf, ' ', 1, "ADCA %u"	, 0, 0 },
    { 0xc9, 0xcf, ' ', 1, "ADCB %u"	, 0, 0 },

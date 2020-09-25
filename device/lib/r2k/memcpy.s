@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  memcpy.s
 ;
-;  Copyright (C) 2020, Sergey Belyashov
+;  Copyright (C) 2020, Sergey Belyashov, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -31,7 +31,7 @@
 	.globl _memcpy
 	.globl ___memcpy
 
-; The Z80 has the ldir instruction, which is perfect for implementing memcpy().
+; The Z80 has the ldir instruction, which is perfect for implementing memcpy(). Unfortunately, it is quite broken on early Rabbits, so we use ldi.
 _memcpy:
 ___memcpy:
 	pop	af
@@ -47,7 +47,9 @@ ___memcpy:
 	ret	Z
 	push	hl
 	ex	de, hl
-	ldir
+loop:
+	ldi
+	jp	LO, loop
 	pop	hl
 	ret
 

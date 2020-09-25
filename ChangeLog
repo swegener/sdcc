@@ -3,7 +3,9 @@
 	* src/z80/gen.c,
 	  device/lib/r2k/crt0.s,
 	  src/SDCCgen.h,
-	  src/SDCCgen.c:
+	  src/SDCCgen.c,
+	  device/lib/r2k/memcpy.s,
+	  device/lib/r2k/memmove.s:
 	  Work around Rabbit 2000 / 3000 ldir / lddr wait state bugs.
 	* src/z80/z80.h:
 	  Prepare for r2ka port.

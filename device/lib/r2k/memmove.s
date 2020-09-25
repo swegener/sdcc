@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  memmove.s
 ;
-;  Copyright (C) 2008-2009, Philipp Klaus Krause, Marco Bodrato
+;  Copyright (C) 2008-2020, Philipp Klaus Krause, Marco Bodrato
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -30,7 +30,7 @@
 
 	.globl _memmove
 
-; The Z80 has the ldir and lddr instructions, which are perfect for implementing memmove().
+; The Z80 has the ldir and lddr instructions, which are perfect for implementing memmove(). Unfortunately, it is broken on early Rabbits, so we use ldi and ldd.
 
 _memmove:
 	pop	af
@@ -54,12 +54,16 @@ memmove_down:
 	ex      de, hl
 	add	hl, bc
 	inc	bc
-	lddr
+loop_down:
+	ldd
+	jp	LO, loop_down
 	pop	hl
 	ret
 memmove_up:
 	ex      de, hl
-	ldir
+loop_up:
+	ldi
+	jp	LO, loop_up
 	pop	hl
 	ret
 

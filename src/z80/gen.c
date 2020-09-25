@@ -6921,7 +6921,7 @@ genMultOneChar (const iCode * ic)
         }
     }
 
-  if (IS_RAB && isPairDead (PAIR_HL, ic) && isPairDead (PAIR_BC, ic))
+  if (IS_RAB && !IS_R2K && isPairDead (PAIR_HL, ic) && isPairDead (PAIR_BC, ic)) // A wait state bug makes mul unuseable in most scenarios on the original Rabbit 2000.
     {
       const bool save_de = (resultsize > 1 && bitVectBitValue (ic->rSurv, D_IDX) ||
         bitVectBitValue (ic->rSurv, E_IDX) && !(AOP_TYPE (IC_LEFT (ic)) == AOP_REG && AOP (IC_LEFT (ic))->aopu.aop_reg[0]->rIdx == E_IDX) && !(AOP_TYPE (IC_RIGHT (ic)) == AOP_REG && AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX));
@@ -6994,7 +6994,7 @@ genMultOneChar (const iCode * ic)
       emit2 ("mlt hl");
       regalloc_dry_run_cost += 3;
     }
-  else if (IS_RAB)
+  else if (IS_RAB && !IS_R2K) // A wait state bug makes mul unuseable in most scenarios on the original Rabbit 2000.
     {
       emit2 ("ld c, h");
       emit2 ("ld d, !immedbyte", 0x00);

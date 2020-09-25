@@ -1,3 +1,8 @@
+2020-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix bug #3105.
+
 2020-09-23 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* configure,

@@ -2137,7 +2137,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
             }
         }
       /* we need to get it byte by byte */
-      else if (pairId == PAIR_HL && (IS_GB || (IY_RESERVED && (aop->type == AOP_HL || aop->type == AOP_EXSTK))) && requiresHL (aop))
+      else if (pairId == PAIR_HL && (IS_GB || IY_RESERVED) && (aop->type == AOP_HL || aop->type == AOP_EXSTK || IS_GB && aop->type == AOP_STK) && requiresHL (aop))
         {
           if (!regalloc_dry_run)        // TODO: Fix this to get correct cost!
             aopGet (aop, offset, FALSE);
@@ -3388,7 +3388,7 @@ skip_byte_push_iy:
     }
 
   // Try to use ex de, hl. TODO: Also do so when only some bytes are used, while others are dead (useful e.g. for emulating ld de, hl or ld hl, de).
-  if (regsize >= 4)
+  if (!IS_GB && regsize >= 4)
     {
       int ex[4] = {-2, -2, -2, -2};
 
@@ -5451,13 +5451,13 @@ genRet (const iCode *ic)
     }
   else if (size <= 4)
     {
-      if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))))
+      if (IC_LEFT (ic)->aop->type == AOP_REG)
+        genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, true, true);
+      else  if (IS_GB && size == 4 && requiresHL (AOP (IC_LEFT (ic))))
         {
           fetchPairLong (PAIR_DE, AOP (IC_LEFT (ic)), 0, 0);
           fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), 0, 2);
         }
-      else if (IC_LEFT (ic)->aop->type == AOP_REG)
-        genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, true, true);
       else if (size == 4 && (IC_LEFT (ic)->aop->type == AOP_HL || IC_LEFT (ic)->aop->type == AOP_IY)) // Use ld rr, (nn)
         {
           fetchPairLong (PAIR_DE, IC_LEFT (ic)->aop, 0, 2);

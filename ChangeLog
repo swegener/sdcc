@@ -1,5 +1,15 @@
 2020-09-25 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  device/lib/r2k/crt0.s,
+	  src/SDCCgen.h,
+	  src/SDCCgen.c:
+	  Work around Rabbit 2000 / 3000 ldir / lddr wait state bugs.
+	* src/z80/z80.h:
+	  Prepare for r2ka port.
+
+2020-09-25 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Work around Rabbit 2000 mul wait state bug.
 

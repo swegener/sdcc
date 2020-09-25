@@ -96,7 +96,9 @@ gsinit::
 	jr	Z, gsinit_next
 	ld	de, #s__INITIALIZED
 	ld	hl, #s__INITIALIZER
-	ldir
+copy_loop:
+	ldi	; Work around new ldir wait state bug.
+	jp	LO, copy_loop
 gsinit_next:
 
 	.area   _GSFINAL

@@ -5509,8 +5509,9 @@ genRet (const iCode *ic)
         }
       while (--size);
     }
+  // gbz80 doesn't have have ldir. r2k and r2ka have an ldir wait state bug that affects copies between different types of memory.
   else if (!IS_GB && AOP_TYPE (IC_LEFT (ic)) == AOP_STK || AOP_TYPE (IC_LEFT (ic)) == AOP_EXSTK
-           || AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_IY)
+           || (AOP_TYPE (IC_LEFT (ic)) == AOP_DIR || AOP_TYPE (IC_LEFT (ic)) == AOP_IY) && !(IS_R2K || IS_R2KA))
     {
       setupPairFromSP (PAIR_HL, _G.stack.offset + _G.stack.param_offset + _G.stack.pushed + (_G.omitFramePtr || IS_GB ? 0 : 2));
       emit2 ("ld e, (hl)");
@@ -11800,10 +11801,10 @@ genAssign (const iCode *ic)
     }
   else
     {
-      if (!IS_GB &&             /* gbz80 doesn't have ldir */
+      if (!IS_GB && // gbz80 doesn't have ldir, r2k and r2ka ldir is affected by a wait state bug when copying between different types of memory.
           (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK || AOP_TYPE (result) == AOP_DIR
            || AOP_TYPE (result) == AOP_IY) && (AOP_TYPE (right) == AOP_STK || AOP_TYPE (right) == AOP_EXSTK
-               || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) && size >= 2)
+               || AOP_TYPE (right) == AOP_DIR && !((IS_R2K || IS_R2KA) && size > 4) || AOP_TYPE (right) == AOP_IY) && size >= 2)
         {
           /* This estimation is only accurate, if neither operand is AOP_EXSTK, and we are optimizing for code size or targeting the z80 or z180. */
           int sizecost_n, sizecost_l, cyclecost_n, cyclecost_l;
@@ -11883,7 +11884,7 @@ genAssign (const iCode *ic)
                 }
               spillPair (PAIR_HL);
 
-              if (size <= 2 + optimize.codeSpeed)
+              if (size <= 2 + optimize.codeSpeed || IS_R2K || IS_R2KA)
                 for(int i = 0; i < size; i++)
                   {
                     emit2 ("ldi");
@@ -12707,14 +12708,31 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
         fetchPair (PAIR_BC, count->aop);
       if (count->aop->type != AOP_LIT)
         {
-          tlbl = newiTempLabel (0);
-          emit2 ("ld a, b");
-          emit2 ("or a, c");
-          emit2 ("jp Z, !tlabel", labelKey2num (tlbl->key));
+          if (!regalloc_dry_run)
+            {
+              tlbl = newiTempLabel (0);
+              emit2 ("ld a, b");
+              emit2 ("or a, c");
+              emit2 ("jp Z, !tlabel", labelKey2num (tlbl->key));
+            }
           regalloc_dry_run_cost += 5;
         }
-      emit2 ("ldir");
-      regalloc_dry_run_cost += 2;
+      if (IS_R2K || IS_R2KA) // Work around ldir wait state bug.
+        {
+          if (!regalloc_dry_run)
+            {
+              const symbol *tlbl2 = newiTempLabel (0);
+              emitLabel (tlbl2);
+              emit2("ldi");
+              emit2 ("jp LO, !tlabel", labelKey2num (tlbl2->key));
+            }
+          regalloc_dry_run_cost += 5;
+        }
+      else
+        {
+          emit2 ("ldir");
+          regalloc_dry_run_cost += 2;
+        }
       emitLabel (tlbl);
     }
 
@@ -12902,13 +12920,13 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
           _push (PAIR_BC);
           saved_BC = TRUE;
         }
-	  if (indirect_c)
-		{
-		  fetchPair (PAIR_DE, AOP (dst));
-		  emit2 ("ld hl, !hashedstr", AOP (c)->aopu.aop_dir);
-		  regalloc_dry_run_cost += 3;
-		}
-	  else
+      if (indirect_c)
+        {
+          fetchPair (PAIR_DE, AOP (dst));
+          emit2 ("ld hl, !hashedstr", AOP (c)->aopu.aop_dir);
+          regalloc_dry_run_cost += 3;
+        }
+      else
 		{
 		  setupForMemset (ic, dst, c, direct_c);
 
@@ -12928,9 +12946,24 @@ genBuiltInMemset (const iCode *ic, int nParams, operand **pparams)
 		      preinc = TRUE;
 		    }
 		}
-	  emit2 ("ld bc, !immedword", size - preinc);
-	  emit2 (IS_R3KA ? "lsidr" : "ldir");
-	  regalloc_dry_run_cost += 5;
+      emit2 ("ld bc, !immedword", size - preinc);
+      regalloc_dry_run_cost += 3;
+      if (IS_R2K || IS_R2KA) // Work around ldir wait state bug that affects copies between different types of memory.
+        {
+          if (!regalloc_dry_run)
+            {
+              const symbol *tlbl2 = newiTempLabel (0);
+              emitLabel (tlbl2);
+              emit2("ldi");
+              emit2 ("jp LO, !tlabel", labelKey2num (tlbl2->key));
+            }
+          regalloc_dry_run_cost += 5;
+        }
+      else
+        {
+          emit2 (IS_R3KA ? "lsidr" : "ldir");
+          regalloc_dry_run_cost += 2;
+        }
     }
 
 done:

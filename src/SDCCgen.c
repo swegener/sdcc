@@ -181,7 +181,7 @@ emitcode (const char *inst, const char *fmt, ...)
 }
 
 void
-emitLabel (symbol *tlbl)
+emitLabel (const symbol *tlbl)
 {
   if (!tlbl)
     return;

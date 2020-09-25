@@ -93,7 +93,7 @@ const char *format_opcode (const char *inst, const char *fmt, va_list ap);
 void emit_raw (const char *line);
 void va_emitcode (const char *inst, const char *fmt, va_list ap);
 void emitcode (const char *inst, const char *fmt, ...);
-void emitLabel (symbol * tlbl);
+void emitLabel (const symbol * tlbl);
 void genInline (iCode * ic);
 void printLine (lineNode *, struct dbuf_s *);
 iCode *ifxForOp (const operand *op, const iCode *ic);

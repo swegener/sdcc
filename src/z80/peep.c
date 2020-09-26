@@ -1497,13 +1497,13 @@ int z80instructionSize(lineNode *pl)
       return(1);
     }
 
-  /* 16 bit add / subtract / and */
+  /* 16 bit add / subtract / and / or */
   if(IS_Z80N && ISINST(pl->line, "add") && (!STRNCASECMP(op1start, "bc", 2) || !STRNCASECMP(op1start, "de", 2) || !STRNCASECMP(op1start, "hl", 2)))
     return(4);
-  if((ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sbc") || IS_RAB && ISINST(pl->line, "and")) &&
+  if((ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sbc") || IS_RAB && (ISINST(pl->line, "and") || ISINST(pl->line, "or"))) &&
      !STRNCASECMP(op1start, "hl", 2))
     {
-      if(ISINST(pl->line, "add") || ISINST(pl->line, "and"))
+      if(ISINST(pl->line, "add") || ISINST(pl->line, "and") || ISINST(pl->line, "or"))
         return(1);
       return(2);
     }
@@ -1519,7 +1519,7 @@ int z80instructionSize(lineNode *pl)
     return(3);
 
   /* 8 bit arithmetic, two operands */
-  if(op2start &&  op1start[0] == 'a' &&
+  if(op2start && op1start[0] == 'a' &&
      (ISINST(pl->line, "add") || ISINST(pl->line, "adc") || ISINST(pl->line, "sub") || ISINST(pl->line, "sbc") ||
       ISINST(pl->line, "cp")  || ISINST(pl->line, "and") || ISINST(pl->line, "or")  || ISINST(pl->line, "xor")))
     {

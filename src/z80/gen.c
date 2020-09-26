@@ -2243,7 +2243,7 @@ fetchPairLong (PAIR_ID pairId, asmop *aop, const iCode *ic, int offset)
                   && aop->type == AOP_STK
                   || abs (sp_offset) <= 127))
             {
-              if (pairId == PAIR_DE)
+              if (pairId == PAIR_DE && !(ic && isPairDead (PAIR_HL, ic)))
                 {
                   emit2 ("ex de, hl");
                   regalloc_dry_run_cost += 1;
@@ -3583,6 +3583,13 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           cost2 (3 - IS_RAB, 0, 0, 11, 0, 12, 5);
           regalloc_dry_run_cost += 3;
           value_hl = ullFromVal (source->aopu.aop_lit) >> ((soffset + i) * 8) & 0xffff;
+          i += 2;
+          continue;
+        }
+      else if (getPairId_o(source, soffset + i) != PAIR_INVALID && (result->type == AOP_IY || result->type == AOP_DIR))
+        {
+          emit2 ("ld (%s), %s", aopGetLitWordLong (result, roffset + i, false), _pairs[getPairId_o(source, soffset + i)].name);
+          regalloc_dry_run_cost += 3 + (getPairId_o(source, soffset + i) != PAIR_HL);
           i += 2;
           continue;
         }
@@ -6047,11 +6054,12 @@ genPlus (iCode * ic)
     {
       PAIR_ID pair = (getPairId (AOP (IC_LEFT (ic))) == PAIR_HL ? getPairId (AOP (IC_RIGHT (ic))) : getPairId (AOP (IC_LEFT (ic))));
       emit2 ("add hl, %s", _pairs[pair].name);
+      regalloc_dry_run_cost++;
       _push (PAIR_HL);
       _pop (PAIR_IY);
       goto release;
     }
-  else if (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY)
+  else if (getPairId (IC_RESULT (ic)->aop) == PAIR_IY)
     {
       bool save_pair = FALSE;
       PAIR_ID pair;
@@ -7343,6 +7351,7 @@ genIfxJump (iCode * ic, char *jval)
       if (!strcmp (jval, "a"))
         {
           emit3 (A_OR, ASMOP_A, ASMOP_A);
+          regalloc_dry_run_cost++;
           inst = "NZ";
         }
       else if (!strcmp (jval, "z"))
@@ -7392,6 +7401,7 @@ genIfxJump (iCode * ic, char *jval)
       if (!strcmp (jval, "a"))
         {
           emit3 (A_OR, ASMOP_A, ASMOP_A);
+          regalloc_dry_run_cost++;
           inst = "Z";
         }
       else if (!strcmp (jval, "z"))
@@ -8983,6 +8993,18 @@ genOr (const iCode * ic, iCode * ifx)
               emit2 ("or hl, de");
               regalloc_dry_run_cost++;
               i += (1 + next_byte);
+              continue;
+            }
+            
+          if (aopInReg (right->aop, i, DE_IDX) &&
+            (left->aop->type == AOP_STK || left->aop->type == AOP_DIR || left->aop->type == AOP_IY) &&
+            (aopInReg (result->aop, i, HL_IDX) || isPairDead(PAIR_HL, ic) && right->aop->regs[L_IDX] < i + 2 && right->aop->regs[H_IDX] < i + 2 && (result->aop->type == AOP_DIR || result->aop->type == AOP_IY || result->aop->type == AOP_STK)))
+            {
+              fetchPairLong (PAIR_HL, left->aop, ic, i);
+              emit2 ("or hl, de");
+              regalloc_dry_run_cost++;
+              genMove_o (result->aop, i, ASMOP_HL, 0, 2, a_free, true);
+              i += 2;
               continue;
             }
         }
@@ -11534,9 +11556,9 @@ genIfx (iCode *ic, iCode *popIc)
       if (!regalloc_dry_run)
         {
           emit2 ("bit 0, %s", aopGet (cond->aop, 0, FALSE));
-          emit2 ("jp %s, !tlabel", IC_TRUE (ic) ? "NZ" : "Z", labelKey2num ((IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key));
+          genIfxJump (ic, "nz");
         }
-      regalloc_dry_run_cost += (bit8_cost (AOP (cond)) + 3);
+      regalloc_dry_run_cost += bit8_cost (cond->aop);
 
       goto release;
     }
@@ -11545,9 +11567,17 @@ genIfx (iCode *ic, iCode *popIc)
     {
       emit3 (A_INC, cond->aop, 0);
       emit3 (A_DEC, cond->aop, 0);
-      emit2 ("jp %s, !tlabel", IC_TRUE (ic) ? "NZ" : "Z", labelKey2num ((IC_TRUE (ic) ? IC_TRUE (ic) : IC_FALSE (ic))->key));
-      regalloc_dry_run_cost += 3;
+      regalloc_dry_run_cost += 2;
+      genIfxJump (ic, "nz");
 
+      goto release;
+    }
+  else if (IS_RAB && (getPairId (cond->aop) == PAIR_HL || getPairId (cond->aop) == PAIR_IY) && isPairDead (getPairId (cond->aop), ic))
+    {
+      emit2 ("bool %s", _pairs[getPairId (cond->aop)].name);
+      regalloc_dry_run_cost += 1 + (getPairId (cond->aop) == PAIR_IY);
+      genIfxJump (ic, "nz");
+      
       goto release;
     }
   /* get the value into acc */

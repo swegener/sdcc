@@ -1,3 +1,8 @@
+2020-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Improve speed of r2k builtins.
+
 2020-09-26 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:

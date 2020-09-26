@@ -10618,7 +10618,7 @@ genPointerGet (const iCode *ic)
     }
 
   /* Using ldir is cheapest for large memory-to-memory transfers. */
-  if (!IS_GB && (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK) && size > 2)
+  if (!IS_GB && !IS_R2K && !IS_R2KA && (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK) && size > 2)
     {
       int fp_offset, sp_offset;
 
@@ -10660,7 +10660,6 @@ genPointerGet (const iCode *ic)
         }
 
       if (rightval && left->aop->type != AOP_IMMD)
-
           if (abs(rightval) < 4)
             {
               for(;rightval > 0; rightval--)
@@ -11295,7 +11294,7 @@ genPointerSet (iCode *ic)
     }
 
   /* Using ldir is cheapest for large memory-to-memory transfers. */
-  if (!IS_GB && (AOP_TYPE (right) == AOP_STK || AOP_TYPE (right) == AOP_EXSTK) && size > 2)
+  if (!IS_GB && !IS_R2K && !IS_R2KA && (AOP_TYPE (right) == AOP_STK || AOP_TYPE (right) == AOP_EXSTK) && size > 2)
     {
       int fp_offset, sp_offset;
 
@@ -11834,7 +11833,7 @@ genAssign (const iCode *ic)
       if (!IS_GB && // gbz80 doesn't have ldir, r2k and r2ka ldir is affected by a wait state bug when copying between different types of memory.
           (AOP_TYPE (result) == AOP_STK || AOP_TYPE (result) == AOP_EXSTK || AOP_TYPE (result) == AOP_DIR
            || AOP_TYPE (result) == AOP_IY) && (AOP_TYPE (right) == AOP_STK || AOP_TYPE (right) == AOP_EXSTK
-               || AOP_TYPE (right) == AOP_DIR && !((IS_R2K || IS_R2KA) && size > 4) || AOP_TYPE (right) == AOP_IY) && size >= 2)
+               || AOP_TYPE (right) == AOP_DIR || AOP_TYPE (right) == AOP_IY) && size >= 2)
         {
           /* This estimation is only accurate, if neither operand is AOP_EXSTK, and we are optimizing for code size or targeting the z80 or z180. */
           int sizecost_n, sizecost_l, cyclecost_n, cyclecost_l;
@@ -11914,7 +11913,8 @@ genAssign (const iCode *ic)
                 }
               spillPair (PAIR_HL);
 
-              if (size <= 2 + optimize.codeSpeed || IS_R2K || IS_R2KA)
+              if (size <= 2 + optimize.codeSpeed || // Early Rabbits have a wait state bug when ldir copies between different types of memory.
+                (IS_R2K || IS_R2KA) && !((right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK) && (result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK)))
                 for(int i = 0; i < size; i++)
                   {
                     emit2 ("ldi");
@@ -12731,6 +12731,12 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
           regalloc_dry_run_cost++;
         }
     }
+  else if (n <= 4 && IS_Z80 && optimize.codeSpeed || (IS_R2K || IS_R2KA) && n <= 5)
+    {
+      for(unsigned int i = 0; i < n; i++)
+        emit2 ("ldi");
+      regalloc_dry_run_cost += n * 2;
+    }
   else
     {
       symbol *tlbl = 0;
@@ -12747,7 +12753,25 @@ genBuiltInMemcpy (const iCode *ic, int nparams, operand **pparams)
             }
           regalloc_dry_run_cost += 5;
         }
-      if (IS_R2K || IS_R2KA) // Work around ldir wait state bug.
+      if ((IS_R2K || IS_R2KA) && optimize.codeSpeed && n != UINT_MAX) // Work around ldir wait state bug, but care for speed
+        {
+          wassert (n > 3);
+          if (n % 2)
+            {
+              emit2 ("ldi");
+              regalloc_dry_run_cost += 2;
+            }
+          if (!regalloc_dry_run)
+            {
+              const symbol *tlbl2 = newiTempLabel (0);
+              emitLabel (tlbl2);
+              emit2("ldi");
+              emit2("ldi");
+              emit2 ("jp LO, !tlabel", labelKey2num (tlbl2->key));
+            }
+          regalloc_dry_run_cost += 7;         
+        }
+      else if (IS_R2K || IS_R2KA) // Work around ldir wait state bug.
         {
           if (!regalloc_dry_run)
             {

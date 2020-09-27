@@ -37,6 +37,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include "newcmdposixcl.h"
 
+enum m6850_cfg
+  {
+   m6850conf_base	= serconf_nr+0
+  };
+
 class cl_serial_listener;
 
 class cl_serial: public cl_serial_hw
@@ -65,10 +70,12 @@ class cl_serial: public cl_serial_hw
   virtual ~cl_serial(void);
   virtual int init(void);
   virtual int cfg_size(void) { return 10; }
+  virtual const char *cfg_help(t_addr addr);
 
   virtual t_mem read(class cl_memory_cell *cell);
   virtual void write(class cl_memory_cell *cell, t_mem *val);
   virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+  virtual void set_cmd(class cl_cmdline *cmdline, class cl_console_base *con);
 
   virtual int tick(int cycles);
   virtual void start_send();

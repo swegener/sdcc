@@ -78,6 +78,8 @@ enum flags
 class cl_m6809: public cl_uc
 {
 public:
+  class cl_address_space *regs8;
+  class cl_address_space *regs16;
   struct reg_t reg;
   //cl_address_space *regs;
   class cl_porto *pa, *pb, *pc, *pd;

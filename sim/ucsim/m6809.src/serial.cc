@@ -27,6 +27,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ddconfig.h"
 
+// sim
+#include "argcl.h"
+
 // local
 #include "serialcl.h"
 
@@ -57,9 +60,7 @@ cl_serial::init(void)
   set_name("6850");
   cl_serial_hw::init();
   for (i= 0; i < 2; i++)
-    {
-      regs[i]= register_cell(uc->rom, base+i);
-    }
+    regs[i]= register_cell(uc->rom, base+i);
   regs[cr]->write(0x15);
   //pick_div();
   //pick_ctrl();
@@ -72,10 +73,23 @@ cl_serial::init(void)
   r_sr= 0;//regs[sr]->set(0);
   show_readable(false);
   show_writable(true);
-  
+
+  cl_var *v;
+  chars pn= chars("", "uart%d_base", id);
+  uc->vars->add(v= new cl_var(pn, cfg, m6850conf_base, cfg_help(m6850conf_base)));
   return(0);
 }
 
+const char *
+cl_serial::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case m6850conf_base:
+      return "Base address of UART registers (int, RW)";
+    }
+  return cl_serial_hw::cfg_help(addr);
+}
 
 t_mem
 cl_serial::read(class cl_memory_cell *cell)
@@ -127,39 +141,68 @@ cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
     return cl_serial_hw::conf_op(cell, addr, val);
   switch ((enum serial_cfg)addr)
     {
-      /*
-    case serial_:
+    case m6850conf_base:
       if (val)
 	{
-	  if (*val)
-	    on= true;
-	  else
-	    on= false;
+	  int i;
+	  if (!uc->rom->valid_address(*val))
+	    {
+	      for (i= 0; i < 2; i++)
+		unregister_cell(regs[i]);
+	      base= *val;
+	      init();
+	    }
 	}
       else
 	{
-	  cell->set(on?1:0);
+	  cell->set(base);
 	}
       break;
-      */
+
     default:
       break;
     }
   return cell->get();
 }
 
+void
+cl_serial::set_cmd(class cl_cmdline *cmdline,
+				class cl_console_base *con)
+{
+  class cl_cmd_arg *params[2]= {
+    cmdline->param(0),
+    cmdline->param(1)
+  };
 
+  if (cmdline->syntax_match(uc, NUMBER))
+    {
+      int i;
+      t_addr a= params[0]->value.number;
+      if (!uc->rom->valid_address(a))
+	{
+	  con->dd_printf("Address must be between 0x%x and 0x%x\n",
+			 AU(uc->rom->lowest_valid_address()),
+			 AU(uc->rom->highest_valid_address()));
+	  return;
+	}
+      for (i= 0; i < 2; i++)
+	unregister_cell(regs[i]);
+      base= a;
+      init();
+    }
+  else
+    con->dd_printf("set hardware uart[%d] address\n");
+}
 
 int
 cl_serial::tick(int cycles)
 {
   char c;
-  printf("S_Tick(%d) %d\n",cycles,on);
+
   if (!on)
     return 0;
 
   mcnt+= cycles;
-  printf(" mcnt=%d div=%d\n",mcnt,div);
   if (mcnt >= div)
     {
       mcnt-= div;

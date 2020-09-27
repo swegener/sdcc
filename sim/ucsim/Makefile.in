@@ -77,7 +77,7 @@ uninstall:
 clean:
 	$(MAKE) -f $(srcdir)/clean.mk clean EXEEXT=$(EXEEXT)
 	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f $(srcdir)/$$pkg/clean.mk clean EXEEXT=$(EXEEXT) ;\
+	  $(MAKE) -C $$pkg -f clean.mk clean EXEEXT=$(EXEEXT) ;\
 	done
 
 
@@ -86,7 +86,7 @@ clean:
 distclean: clean
 	$(MAKE) -f $(srcdir)/clean.mk distclean
 	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f $(srcdir)/$$pkg/clean.mk distclean ;\
+	  $(MAKE) -C $$pkg -f clean.mk distclean ;\
 	done
 	rm -rf doc/*~ doc/*.bak Makefile packages.mk libtool
 	$(MAKE) -C example clean
@@ -101,7 +101,7 @@ distclean: clean
 mostlyclean: clean
 	$(MAKE) -f clean.mk mostlyclean
 	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f $(srcdir)/$$pkg/clean.mk mostlyclean ;\
+	  $(MAKE) -C $$pkg -f clean.mk mostlyclean ;\
 	done
 
 
@@ -111,7 +111,7 @@ mostlyclean: clean
 realclean: distclean
 	$(MAKE) -f clean.mk realclean
 	@for pkg in $(PKGS_ALL); do\
-	  $(MAKE) -C $$pkg -f $(srcdir)/$$pkg/clean.mk realclean ;\
+	  $(MAKE) -C $$pkg -f clean.mk realclean ;\
 	done
 
 

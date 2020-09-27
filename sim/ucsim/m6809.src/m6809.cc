@@ -130,24 +130,43 @@ cl_m6809::make_memories(void)
   as->decoders->add(ad);
   ad->activate(0);
 
-  /*
-  regs= new cl_address_space("regs", 0, 16, 32);
-  regs->init();
-  for (i= 0; i<16; i++)
-    {
-      RC[i]= regs->get_cell(i);
-      RC[i]->decode((t_mem*)&R[i]);
-    }
-  address_spaces->add(regs);
+  regs8= new cl_address_space("regs8", 0, 4, 8);
+  regs8->init();
+  address_spaces->add(regs8);
+  regs8->get_cell(0)->decode((t_mem*)&(reg.acc.a8.rA));
+  regs8->get_cell(1)->decode((t_mem*)&(reg.acc.a8.rB));
+  regs8->get_cell(2)->decode((t_mem*)&(reg.DP));
+  regs8->get_cell(3)->decode((t_mem*)&(reg.CC));
 
   class cl_var *v;
-  for (i=0; i<16; i++)
-    {
-      v= new cl_var(chars("", "R%d", i), regs, i, chars("", "CPU register %d",i));
-      v->init();
-      vars->add(v);
-    }
-  */
+  vars->add(v= new cl_var("A", regs8, 0, "CPU register A"));
+  v->init();
+  vars->add(v= new cl_var("B", regs8, 1, "CPU register B"));
+  v->init();
+  vars->add(v= new cl_var("DP", regs8, 2, "CPU register DP"));
+  v->init();
+  vars->add(v= new cl_var("CC", regs8, 3, "CPU register CC"));
+  v->init();
+   
+  regs16= new cl_address_space("regs16", 0, 5, 16);
+  regs16->init();
+  address_spaces->add(regs16);
+  regs16->get_cell(0)->decode((t_mem*)&(reg.U));
+  regs16->get_cell(1)->decode((t_mem*)&(reg.S));
+  regs16->get_cell(2)->decode((t_mem*)&(reg.X));
+  regs16->get_cell(3)->decode((t_mem*)&(reg.Y));
+  regs16->get_cell(4)->decode((t_mem*)&(reg.acc.rD));
+
+  vars->add(v= new cl_var("U", regs16, 0, "CPU register U"));
+  v->init();
+  vars->add(v= new cl_var("S", regs16, 1, "CPU register S"));
+  v->init();
+  vars->add(v= new cl_var("X", regs16, 2, "CPU register X"));
+  v->init();
+  vars->add(v= new cl_var("Y", regs16, 3, "CPU register Y"));
+  v->init();
+  vars->add(v= new cl_var("D", regs16, 4, "CPU register D"));
+  v->init();
 }
 
 
@@ -504,7 +523,7 @@ cl_m6809::inst_length(t_addr addr)
       code= rom->get(addr+1);
       ch= code>>4;
       cl= code&0xf;
-      int aml;
+      int aml= 1;
       switch (code & 0x30)
 	{
 	case 0x00: aml= 1+1; break; // immed
@@ -518,7 +537,7 @@ cl_m6809::inst_length(t_addr addr)
     {
       ret= 2;
       if (code==0x3f) return ret;
-      int aml;
+      int aml= 1;
       switch (code & 0x30)
 	{
 	case 0x00: aml= 1+1; break; // immed

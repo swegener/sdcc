@@ -2,6 +2,10 @@
 
 	* src/z80/gen.c:
 	  Improve speed of r2k builtins.
+	* src/SDCCast.c:
+	  Optimize strcpy on Rabbits.
+	* src/port.h:
+	  Prepare for r2ka port.
 
 2020-09-26 Philipp Klaus Krause <pkk AT spth.de>
 

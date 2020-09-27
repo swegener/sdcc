@@ -3236,7 +3236,7 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
       func->opval.val->sym = puts_sym;
     }
   // Optimize strcpy() to memcpy().
-  else if (!strcmp(funcname, "strcpy") && nparms == 2)
+  else if ((!strcmp(funcname, "strcpy") || !strcmp(funcname, "__builtin_strcpy")) && nparms == 2)
     {
       ast *parm = parms->right;
 
@@ -3263,13 +3263,15 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
       size_t minlength; // Minimum string length for replacement.
       if (TARGET_IS_STM8)
         minlength = optimize.codeSize ? SIZE_MAX : 12;
+      else if (TARGET_IS_RABBIT)
+        minlength = optimize.codeSize ? SIZE_MAX : (optimize.codeSpeed ? 8 : 24);
       else // TODO:Check for other targets when memcpy() is a better choice than strcpy;
         minlength = SIZE_MAX;
 
       if (strlength < minlength)
         return;
 
-      symbol *memcpy_sym = findSym (SymbolTab, NULL, "memcpy");
+      symbol *memcpy_sym = findSym (SymbolTab, NULL, !strcmp(funcname, "__builtin_strcpy") ? "__builtin_memcpy" : "memcpy");
 
       if(!memcpy_sym)
         return;
@@ -3277,7 +3279,13 @@ optStdLibCall (ast *tree, RESULT_TYPE resulttype)
       ast *lengthparm = newAst_VALUE (valCastLiteral (newIntLink(), strlength, strlength));
       decorateType (lengthparm, RESULT_TYPE_NONE);
       ast *node = newAst_OP (PARAM);
-      node->left = parm;
+
+      node->left = newNode (CAST, newAst_LINK (copyLinkChain (FUNC_ARGS(memcpy_sym->type)->type)), parm);
+      node->left->values.cast.implicitCast = 1;
+      node->left->lineno = parm->lineno;
+      node->left->filename = node->left->left->filename = parm->filename;
+      node->left = decorateType (node->left, RESULT_TYPE_GPTR);
+      
       node->right = lengthparm;
       node->decorated = 1;
       parms->right = node;

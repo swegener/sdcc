@@ -242,7 +242,7 @@ bool z80_regs_preserved_in_calls_from_current_function[IYH_IDX + 1];
 
 static const char *aopGet (asmop *aop, int offset, bool bit16);
 
-static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_zero, asmop_one, asmop_return;
+static struct asmop asmop_a, asmop_b, asmop_c, asmop_d, asmop_e, asmop_h, asmop_l, asmop_iyh, asmop_iyl, asmop_hl, asmop_de, asmop_bc, asmop_zero, asmop_one, asmop_return;
 static struct asmop *const ASMOP_A = &asmop_a;
 static struct asmop *const ASMOP_B = &asmop_b;
 static struct asmop *const ASMOP_C = &asmop_c;
@@ -253,6 +253,8 @@ static struct asmop *const ASMOP_L = &asmop_l;
 static struct asmop *const ASMOP_IYH = &asmop_iyh;
 static struct asmop *const ASMOP_IYL = &asmop_iyl;
 static struct asmop *const ASMOP_HL = &asmop_hl;
+static struct asmop *const ASMOP_DE = &asmop_de;
+static struct asmop *const ASMOP_BC = &asmop_bc;
 static struct asmop *const ASMOP_ZERO = &asmop_zero;
 static struct asmop *const ASMOP_ONE = &asmop_one;
 static struct asmop *const ASMOP_RETURN = &asmop_return;
@@ -315,6 +317,22 @@ z80_init_asmops (void)
   memset (asmop_hl.regs, -1, 9);
   asmop_hl.regs[L_IDX] = 0;
   asmop_hl.regs[H_IDX] = 1;
+
+  asmop_de.type = AOP_REG;
+  asmop_de.size = 2;
+  asmop_de.aopu.aop_reg[0] = regsZ80 + E_IDX;
+  asmop_de.aopu.aop_reg[1] = regsZ80 + D_IDX;
+  memset (asmop_de.regs, -1, 9);
+  asmop_de.regs[E_IDX] = 0;
+  asmop_de.regs[D_IDX] = 1;
+
+  asmop_bc.type = AOP_REG;
+  asmop_bc.size = 2;
+  asmop_bc.aopu.aop_reg[0] = regsZ80 + C_IDX;
+  asmop_bc.aopu.aop_reg[1] = regsZ80 + B_IDX;
+  memset (asmop_bc.regs, -1, 9);
+  asmop_bc.regs[C_IDX] = 0;
+  asmop_bc.regs[B_IDX] = 1;
 
   asmop_zero.type = AOP_LIT;
   asmop_zero.aopu.aop_lit = constVal ("0");
@@ -6869,11 +6887,14 @@ static void
 genMultOneChar (const iCode * ic)
 {
   symbol *tlbl1, *tlbl2;
-  bool savedB = FALSE;
+  bool savedB = false;
 
-  asmop *result = AOP (IC_RESULT (ic));
-  int resultsize = AOP_SIZE (IC_RESULT (ic));
+  asmop *result = IC_RESULT (ic)->aop;
+  int resultsize = result->size;
 
+  if (IC_LEFT (ic)->aop->size > 1 || IC_RIGHT (ic)->aop->size > 2)
+    wassertl (0, "Large multiplication is handled through support function calls.");
+    
   if (IS_GB)
     {
       wassertl (0, "Multiplication is handled through support function calls on gbz80");
@@ -7080,17 +7101,66 @@ genMultOneChar (const iCode * ic)
 }
 
 /*-----------------------------------------------------------------*/
+/* genMultTwoChar - generates code for 16x16->16 multiplication    */
+/*-----------------------------------------------------------------*/
+static void
+genMultTwoChar (const iCode *ic)
+{
+  operand *left = IC_LEFT (ic);
+  operand *right = IC_RIGHT (ic);
+  wassert (IS_RAB && !IS_R2K); // mul instruction is broken on Rabbit 2000.
+  
+  bool save_bc = !isPairDead(PAIR_BC, ic);
+  bool save_de = !isPairDead(PAIR_DE, ic);
+
+  if (save_bc)
+    _push (PAIR_BC);
+  if (save_de)
+    _push (PAIR_DE);
+    
+  if (getPairId (left->aop) == PAIR_BC || getPairId (right->aop) == PAIR_DE)
+    {
+      if (right->aop->regs[C_IDX] >= 0 && right->aop->regs[B_IDX] >= 0)
+        {
+          wassert (regalloc_dry_run);
+          regalloc_dry_run_cost += 100;
+        }
+      genMove_o(ASMOP_BC, 0, left->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), right->aop->regs[L_IDX] < 0 && right->aop->regs[H_IDX] < 0);
+      genMove_o(ASMOP_DE, 0, right->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), true);
+    }
+  else
+    {
+      if (left->aop->regs[C_IDX] >= 0 && left->aop->regs[B_IDX] >= 0)
+        {
+          wassert (regalloc_dry_run);
+          regalloc_dry_run_cost += 100;
+        }
+      genMove_o(ASMOP_BC, 0, right->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), left->aop->regs[L_IDX] < 0 && left->aop->regs[H_IDX] < 0);
+      genMove_o(ASMOP_DE, 0, left->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), true);
+    }
+
+  emit2 ("mul");
+  regalloc_dry_run_cost++;
+  
+  commitPair (IC_RESULT (ic)->aop, PAIR_BC, ic, false);
+  
+  if (save_de)
+    _pop (PAIR_DE);
+  if (save_bc)
+    _pop (PAIR_BC);
+}
+
+/*-----------------------------------------------------------------*/
 /* genMult - generates code for multiplication                     */
 /*-----------------------------------------------------------------*/
 static void
-genMult (iCode * ic)
+genMult (iCode *ic)
 {
-  int val;
-  int count, i;
+  int val, i;
   /* If true then the final operation should be a subtract */
-  bool active = FALSE;
+  bool active = false;
   bool byteResult;
-  bool add_in_hl = FALSE;
+  bool add_in_hl = false;
   int a_cost = 0, l_cost = 0;
   PAIR_ID pair;
 
@@ -7112,7 +7182,12 @@ genMult (iCode * ic)
       IC_LEFT (ic) = t;
     }
 
-  if (AOP_TYPE (IC_RIGHT (ic)) != AOP_LIT)
+  if (IS_RAB && !IS_R2K && IC_RIGHT (ic)->aop->type != AOP_LIT && !byteResult && IC_LEFT (ic)->aop->size == 2 && IC_RIGHT (ic)->aop->size == 2)
+    {
+      genMultTwoChar (ic);
+      goto release;
+    }  
+  else if (IC_RIGHT (ic)->aop->type != AOP_LIT)
     {
       genMultOneChar (ic);
       goto release;
@@ -7211,6 +7286,40 @@ genMult (iCode * ic)
       goto release;
     }
 no_mlt:
+  
+  if (IS_RAB && !IS_R2KA && isPairDead(PAIR_DE, ic) && isPairDead(PAIR_BC, ic) && // mul might be cheaper than a series of additions. mul is broken on the original Rabbit 2000.
+    !byteResult && (IC_LEFT (ic)->aop->size > 1 || SPEC_USIGN (getSpec (operandType (IC_LEFT (ic))))))
+    {
+      int num_add = 0;
+      bool active = false;
+      i = val;
+      for (int count = 0; count < 16; count++)
+        {
+          if (count != 0 && active)
+            num_add++;
+          else if (i & 0x8000u)
+            {
+              active = true;
+              num_add += active;
+            }
+          i <<= 1;
+        }
+   
+      if(num_add > (optimize.codeSize ? 4 : 6))
+        {
+          if (getPairId (IC_LEFT (ic)->aop) == PAIR_BC)
+            fetchPair (PAIR_DE, IC_RIGHT (ic)->aop);
+          else
+            {
+              fetchPairLong (PAIR_DE, IC_LEFT(ic)->aop, ic, 0);
+              fetchPair (PAIR_BC, IC_RIGHT (ic)->aop);
+            }
+          emit2 ("mul");
+          regalloc_dry_run_cost++;
+          commitPair (IC_RESULT (ic)->aop, PAIR_BC, ic, false);
+          goto release;
+        }
+    }
 
   pair = PAIR_DE;
   if (getPairId (AOP (IC_LEFT (ic))) == PAIR_BC ||
@@ -7269,8 +7378,7 @@ no_mlt:
     }
 
   i = val;
-
-  for (count = 0; count < 16; count++)
+  for (int count = 0; count < 16; count++)
     {
       if (count != 0 && active)
         {
@@ -7280,7 +7388,7 @@ no_mlt:
             emit2 ("add hl, hl");
           regalloc_dry_run_cost += 1;
         }
-      if (i & 0x8000U)
+      if (i & 0x8000u)
         {
           if (active)
             {

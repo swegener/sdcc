@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
 ;  mulchar.s
 ;
-;  Copyright (c) 2017, Philipp Klaus Krause
+;  Copyright (c) 2017-2020, Philipp Klaus Krause
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -75,5 +75,10 @@ signexte:
         sbc     a,a
         ld      d,a
 
-        jp      __mul16
+        mul
+
+	ld	l, c
+	ld	h, b
+
+	ret
 

@@ -42,7 +42,7 @@ Z80_SDCC = $(COMMON_SDCC) \
 Z80SOURCES = $(addprefix ../,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG) $(Z80_SDCC))
 Z8OBJECTS = $(patsubst %.c,%.rel,$(Z80_FLOAT) $(Z80_INT) $(Z80_LONG) $(Z80_LONGLONG) $(Z80_SDCC))
 
-OBJ = divunsigned.rel divsigned.rel divmixed.rel modunsigned.rel modsigned.rel modmixed.rel mul.rel mulchar.rel \
+OBJ = divunsigned.rel divsigned.rel divmixed.rel modunsigned.rel modsigned.rel modmixed.rel mulchar.rel \
       heap.rel memmove.rel strcpy.rel abs.rel __sdcc_call_hl.rel __sdcc_call_iy.rel crtenter.rel memcpy.rel \
       setjmp.rel atomic_flag_test_and_set.rel
 

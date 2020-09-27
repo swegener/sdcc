@@ -869,9 +869,7 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   int result_size = IS_SYMOP (IC_RESULT(ic)) ? getSize (OP_SYM_TYPE (IC_RESULT(ic))) : 4;
 
   if (ic->op != '*')
-    {
-      return FALSE;
-    }
+    return(false);
 
   if (IS_LITERAL (left))
     test = left;
@@ -880,25 +878,19 @@ _hasNativeMulFor (iCode *ic, sym_link *left, sym_link *right)
   /* 8x8 unsigned multiplication code is shorter than
      call overhead for the multiplication routine. */
   else if (IS_CHAR (right) && IS_UNSIGNED (right) && IS_CHAR (left) && IS_UNSIGNED (left) && !IS_GB)
-    {
-      return TRUE;
-    }
+    return(true);
   /* Same for any multiplication with 8 bit result. */
   else if (result_size == 1 && !IS_GB)
-    {
-      return TRUE;
-    }
+    return(true);
+  else if (IS_RAB && !IS_R2K && result_size == 2 && getSize (left) == 2 && getSize(right) == 2)
+    return(true);
   else
-    {
-      return FALSE;
-    }
+    return(false);
 
   if (getSize (test) <= 2)
-    {
-      return TRUE;
-    }
+    return(true);
 
-  return FALSE;
+  return(false);
 }
 
 /* Indicate which extended bit operations this port supports */

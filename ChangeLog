@@ -1,5 +1,13 @@
 2020-09-27 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c,
+	  src/z80/main.c,
+	  device/lib/r3ka/mulchar.s,
+	  device/lib/r3ka/Makefile.in:
+	  Use mul for r3ka, RFE #372.
+
+2020-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/ralloc2.cc,
 	  src/z80/peeph.def,
 	  src/z80/peeph-r2k.def,

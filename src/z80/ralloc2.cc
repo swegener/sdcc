@@ -637,7 +637,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
   if((ic->op == GET_VALUE_AT_ADDRESS || ic->op == CAST && !operand_in_reg(right, REG_A, ia, i, G)) && IS_ITEMP(result) && operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G))
     return(true);
 
-  if (ic->op == LEFT_OP && getSize(operandType(IC_RESULT(ic))) == 2 && IS_OP_LITERAL(right) && byteOfVal (OP_VALUE (IC_RIGHT(ic)), 0) == 7)
+  if (ic->op == LEFT_OP && getSize(operandType(IC_RESULT(ic))) == 2 && IS_OP_LITERAL(right) && byteOfVal (OP_VALUE_CONST (right), 0) == 7)
     {
       if(!operand_in_reg(left, REG_A, ia, i, G) || dying_A)
         return(true);
@@ -648,13 +648,13 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     return(true);
 
   // inc / dec does not affect a.
-  if ((ic->op == '+' || ic->op == '-') && IS_OP_LITERAL(right) && ulFromVal (OP_VALUE (IC_RIGHT(ic))) <= 2 &&
+  if ((ic->op == '+' || ic->op == '-') && IS_OP_LITERAL(right) && ulFromVal (OP_VALUE_CONST (right)) <= 2 &&
     (getSize(operandType(IC_RESULT(ic))) == 2 && operand_is_pair(IC_RESULT(ic), a, i, G) || getSize(operandType(IC_RESULT(ic))) == 1 && operand_in_reg(result, ia, i, G) && operand_in_reg(result, ia, i, G)))
     return(true);
 
   if(ic->op == GET_VALUE_AT_ADDRESS) // Any register can be assigned from (hl) and (iy), so we don't need to go through a then.
     return(!IS_BITVAR(getSpec(operandType(result))) &&
-    (getSize(operandType(result)) == 1 || operand_is_pair(left, a, i, G) && (operand_in_reg(left, REG_L, ia, i, G) && !ulFromVal (OP_VALUE (IC_RIGHT(ic))) || operand_in_reg(left, REG_IYL, ia, i, G) && ulFromVal (OP_VALUE (IC_RIGHT(ic))) <= 127)));
+    (getSize(operandType(result)) == 1 || operand_is_pair(left, a, i, G) && (operand_in_reg(left, REG_L, ia, i, G) && !ulFromVal (OP_VALUE_CONST (right)) || operand_in_reg(left, REG_IYL, ia, i, G) && ulFromVal (OP_VALUE_CONST (right)) <= 127)));
 
   if(ic->op == '=' && POINTER_SET (ic) && // Any register can be assigned to (hl) and (iy), so we don't need to go through a then.
     !(IS_BITVAR(getSpec(operandType (result))) || IS_BITVAR(getSpec(operandType (right)))) &&
@@ -677,7 +677,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     {
       // Variable in A is not used by this instruction
       if(ic->op == '+' && IS_ITEMP (left) && IS_ITEMP (IC_RESULT(ic)) && IS_OP_LITERAL (right) &&
-          ulFromVal (OP_VALUE (IC_RIGHT(ic))) == 1 &&
+          ulFromVal (OP_VALUE_CONST (right)) == 1 &&
           OP_KEY (IC_RESULT(ic)) == OP_KEY (IC_LEFT(ic)))
         return(true);
 
@@ -973,9 +973,8 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
     return(true);
 
   if(POINTER_GET(ic) && getSize(operandType(IC_RESULT(ic))) == 1 && !IS_BITVAR(getSpec(operandType(result))) &&
-    (operand_in_reg(right, REG_C, ia, i, G) && I[ia.registers[REG_C][1]].byte == 0 && operand_in_reg(right, REG_B, ia, i, G) || // Uses ld a, (bc)
-    operand_in_reg(right, REG_E, ia, i, G) && I[ia.registers[REG_E][1]].byte == 0 && operand_in_reg(right, REG_D, ia, i, G) || // Uses ld a, (de)
-    operand_in_reg(right, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(right, REG_IYH, ia, i, G))) // Uses ld r, 0 (iy)
+    operand_is_pair(left, a, i, G) && // Use ld a, (dd) or ld r, 0 (iy).
+    IS_OP_LITERAL (right) && ulFromVal (OP_VALUE_CONST(right)) == 0) 
     return(true);
 
   if((ic->op == '=') && POINTER_SET(ic) && operand_in_reg(result, REG_IYL, ia, i, G) && I[ia.registers[REG_IYL][1]].byte == 0 && operand_in_reg(result, REG_IYH, ia, i, G)) // Uses ld 0 (iy), l etc

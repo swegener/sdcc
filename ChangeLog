@@ -1,5 +1,14 @@
 2020-09-27 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/ralloc2.cc,
+	  src/z80/peeph.def,
+	  src/z80/peeph-r2k.def,
+	  src/SDCCval.h,
+	  src/SDCCval.c:
+	  Small improvements for z80 and related.
+
+2020-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c:
 	  Improve speed of r2k builtins.
 	* src/SDCCast.c:

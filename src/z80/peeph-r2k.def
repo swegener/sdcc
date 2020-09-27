@@ -81,6 +81,28 @@ replace restart {
 }
 
 replace restart {
+	sbc	hl, %1
+	ld	a, h
+	or	a, l
+	jp	NZ, %2
+} by {
+	sbc	hl, %1
+	jp	NZ, %2
+	; common peephole 102c removed redundant or after sbc.
+}
+
+replace restart {
+	sbc	hl, %1
+	ld	a, h
+	or	a, l
+	jp	Z, %2
+} by {
+	sbc	hl, %1
+	jp	Z, %2
+	; common peephole 102d removed redundant or after sbc.
+}
+
+replace restart {
 	ld	%1, %2 (%3)
 	inc	%1
 	ld	%2 (%3), %1

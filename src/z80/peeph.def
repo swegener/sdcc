@@ -1117,6 +1117,28 @@ replace restart {
 	; common peephole 102b removed redundant or after dec.
 }
 
+replace restart {
+	sbc	hl, %1
+	ld	a, h
+	or	a, l
+	jp	NZ, %2
+} by {
+	sbc	hl, %1
+	jp	NZ, %2
+	; common peephole 102c removed redundant or after sbc.
+}
+
+replace restart {
+	sbc	hl, %1
+	ld	a, h
+	or	a, l
+	jp	Z, %2
+} by {
+	sbc	hl, %1
+	jp	Z, %2
+	; common peephole 102d removed redundant or after sbc.
+}
+
 replace {
 	ld	%1,%2
 	ld	a,%2

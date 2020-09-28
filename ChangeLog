@@ -15,7 +15,8 @@
 	  support/regression/Makefile.in,
 	  support/regression/fwk/include/testfwk.h,
 	  support/regression/ports/ucr2ka,
-	  support/regression/tests/*.c:
+	  support/regression/tests/*.c,
+	  doc/sdccman.lyx:
 	  r2ka port to better support Rabbit 2000A, 2000B, 2000C, 3000. RFE #709.
 
 2020-09-27 Philipp Klaus Krause <pkk AT spth.de>

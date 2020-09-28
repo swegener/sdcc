@@ -43662,7 +43662,8 @@ ftp://ftp.dalsemi.com/pub/tini/ds80c400/c_libraries/sdcc/index.html
 \end_layout
 
 \begin_layout Section
-The Z80, Z180, Rabbit 2000/3000, Rabbit 3000A, GBZ80, eZ80 and TLCS-90 ports
+The Z80, Z180, Rabbit 2000, Rabbit 2000A, Rabbit 3000A, GBZ80, eZ80 and
+ TLCS-90 ports
 \end_layout
 
 \begin_layout Standard
@@ -43676,8 +43677,8 @@ Z80
 
 \end_inset
 
-, Z180, eZ80 in Z80 mode, Rabbit 2000/3000, Rabbit 3000A and LR35902, the
- Nintendo GameBoy's Z80-like gbz80
+, Z180, eZ80 in Z80 mode, Rabbit 2000, Rabbit 2000A, Rabbit 3000A and LR35902,
+ the Nintendo GameBoy's Z80-like gbz80
 \begin_inset Index idx
 status collapsed
 
@@ -43816,6 +43817,59 @@ status collapsed
 \end_layout
 
 \begin_layout Subsection
+Rabbit ports
+\end_layout
+
+\begin_layout Standard
+SDCC has three rabbit-supporting ports: r2k for the Rabbit 2000, r2ka for
+ the Rabbit 2000A, 2000B, 2000C and 3000, r3ka for the Rabbit 3000A.
+ The instruction set of the Rabbit 2000 to Rabbit 3000 is the same, and
+ a subset of the Rabbit 3000A instruction set.
+ Code from the r2k backend will work on Rabbit 2000 to 3000A and code from
+ the r2ka backend will work on Rabbit 2000A to 3000A.
+ In some hardware confgurations (see below), code from the r2ka backend
+ will work on the Rabbit 2000.
+ Typically, code from the r3ka backend will be faster and smaller than code
+ from the r2ka backend, and code from the r2ka backend will be faster and
+ smaller than code from the r2k backend.
+\end_layout
+
+\begin_layout Subsection
+Rabbit wait states
+\end_layout
+
+\begin_layout Standard
+There are multiple wait state bugs present in some of the the Rabbits.
+ The difference between the r2k and r2ka port is in additional wait state
+ bug workarounds.
+ If all memory used has zero wait states, code from the r2ka backend can
+ be safely run on the original Rabbit 2000.
+\end_layout
+
+\begin_layout Standard
+Note that The r2k and r2ka port assume that the whole stack has the same
+ number of wait states (code from the r2k and r2ka ports can fail is the
+ stack spans memories with a different amount of wait states).
+\end_layout
+
+\begin_layout Standard
+The Rabbit 2000 has some wait state bugs that SDCC does not work around.
+ These bugs result in the number of wait states used being one less than
+ configured for some instructions.
+ The workaround has to be supplied by the user, by configuring all memories
+ that do use wait states to use on additional wait state.
+\end_layout
+
+\begin_layout Standard
+For all Rabbit ports, SDCC assumes that all data memory is at least as fast
+ (i.e.
+ does not need more wait states) as all code memory.
+ Code where this is not the case (e.g.
+ code in fast Flash writing into slow battery-backed SRAM) will have to
+ be written in assembler by hand.
+\end_layout
+
+\begin_layout Subsection
 Complex instructions
 \end_layout
 
@@ -43885,7 +43939,7 @@ Unsafe reads
 
 \begin_layout Standard
 Usually, Z80-based systems (except for the Gameboy) have separate I/O and
- memory spaces, and any memory location can be read without side-effects.
+ memory spaces, and any normal memory location can be read without side-effects.
  For such systems, the option –allow-unsafe-reads can be used to enable
  some extra optimizations.
 \end_layout

@@ -401,6 +401,26 @@ cl_m6809::disass(t_addr addr, const char *sep)
 		  }
 		break;
 	      }
+	    case 'j': case 'J':
+	      {
+		u8_t mode= code & 0x70;
+		switch (mode)
+		  {
+		  case 0x00: // direct
+		    op8= rom->get(addr++);
+		    work.appendf("DP:0x%02x", op8);
+		    break;
+		  case 0x60: // indexed
+		    disass_indexed(&addr, &work, 1/*siz*/);
+		    break;
+		  case 0x70: // extended
+		    op16= rom->get(addr++)*256;
+		    op16+= rom->get(addr++);
+		    work.appendf("0x%04x", op16);
+		    break;
+		  }
+		break;
+	      }
 	    case 'x': case 'X':
 	      {
 		siz= (islower(b[j]))?1:2;
@@ -474,6 +494,8 @@ cl_m6809::print_regs(class cl_console_base *con)
   con->dd_printf("D= 0x%04x %5d %+6d\n", D, D, (i16_t)D);
   con->dd_printf("CC= "); con->print_bin(reg.CC, 8); con->dd_printf("\n");
   con->dd_printf("    EFHINZVC\n");
+
+  con->dd_printf("DP= 0x%02x\n", reg.DP);
 
   con->dd_printf("X= ");
   rom->dump(reg.X, reg.X+7, 8, con);
@@ -995,12 +1017,15 @@ cl_m6809::inst_alu(t_mem code)
       else
 	return inst_st16(code, D, ea);
       break;
-    case 0x0e: // LDX  LDX  LDX  LDX  LDX  LDX  LDX  LDX
+    case 0x0e: // LDX  LDX  LDX  LDX  LDU  LDU  LDU  LDU
       if ((code & 0x30) == 0)
 	op16= op8*256 + fetch();
       else
 	op16= op8*256 + rom->read(ea+1);
-      return inst_ld16(code, &reg.X, op16);
+      if ((code & 0x40) == 0)
+	return inst_ld16(code, &reg.X, op16);
+      else
+	return inst_ld16(code, &reg.U, op16);
       break;
     case 0x0f: // --   STX  STX  STX  --   STU  STU  STU
       if ((code & 0x40) == 0)

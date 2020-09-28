@@ -79,6 +79,7 @@ struct dis_entry disass_m6809[]=
    { 0x2f, 0xff, ' ', 1, "BLE %b"	, 0, 0 },
 
    { 0x8d, 0xff, ' ', 1, "BSR %b"	, 0, 0 },
+   { 0xbd, 0xff, ' ', 1, "JSR %j"	, 0, 0 },
    { 0x8d, 0xcf, ' ', 1, "JSR %b"	, 0, 0 },
    
    { 0x16, 0xff, ' ', 1, "LBRA %B"	, 0, 0 },
@@ -103,6 +104,10 @@ struct dis_entry disass_m6809[]=
    { 0x3c, 0xff, ' ', 1, "CWAI %i"	, 0, 0 },
    { 0x1a, 0xff, ' ', 1, "ORCC %i"	, 0, 0 },
 
+   { 0x0e, 0xff, ' ', 1, "JMP %j"	, 0, 0 },
+   { 0x6e, 0xff, ' ', 1, "JMP %j"	, 0, 0 },
+   { 0x7e, 0xff, ' ', 1, "JMP %J"	, 0, 0 },
+   
    { 0x1e, 0xff, ' ', 1, "XCG %r"	, 0, 0 },
    { 0x1f, 0xff, ' ', 1, "TFR %r"	, 0, 0 },
    
@@ -138,13 +143,16 @@ struct dis_entry disass_m6809[]=
    
    { 0xcd, 0xcf, ' ', 1, "STD %N"	, 0, 0 },
    { 0x8f, 0xcf, ' ', 1, "STX %N"	, 0, 0 },
-
+   { 0xcf, 0xcf, ' ', 1, "STU %N"	, 0, 0 },
+   
    { 0x08, 0xcf, ' ', 1, "LSL %n"	, 0, 0 },
    { 0x04, 0xcf, ' ', 1, "LSR %n"	, 0, 0 },
    { 0x00, 0xcf, ' ', 1, "NEG %n"	, 0, 0 },
    { 0x09, 0xcf, ' ', 1, "ROL %n"	, 0, 0 },
    { 0x06, 0xcf, ' ', 1, "ROR %n"	, 0, 0 },
    { 0x0d, 0xcf, ' ', 1, "TST %n"	, 0, 0 },
+   { 0x0f, 0xcf, ' ', 1, "CLR %n"	, 0, 0 },
+   { 0x6f, 0x6f, ' ', 1, "CLR %n"	, 0, 0 },
 
    { 0, 0, 0, 0, 0, 0 }
   };

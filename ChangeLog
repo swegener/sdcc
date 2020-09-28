@@ -1,5 +1,20 @@
 2020-09-27 Philipp Klaus Krause <pkk AT spth.de>
 
+	* Makefile.in,
+	  configure,
+	  configure.ac,
+	  device/lib/Makefile.in,
+	  device/lib/r2ka,
+	  src/SDCCmain.c,
+	  src/port.h,
+	  src/z80/main.c,
+	  support/regression/Makefile.in,
+	  support/regression/fwk/include/testfwk.h,
+	  support/regression/ports/ucr2ka:
+	  r2ka port to better support Rabbit 2000A, 2000B, 2000C, 3000. RFE #709.
+
+2020-09-27 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  src/z80/main.c,
 	  device/lib/r3ka/mulchar.s,

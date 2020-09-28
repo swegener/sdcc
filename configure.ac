@@ -772,6 +772,7 @@ AC_DO_PORT(mcs51,    mcs51,  MCS51,    [Excludes the Intel mcs51 port])
 AC_DO_PORT(z80,      z80,    Z80,      [Excludes the Z80 port])
 AC_DO_PORT(z180,     z80,    Z180,     [Excludes the Z180 port])
 AC_DO_PORT(r2k,      z80,    R2K,      [Excludes the Rabbit 2000 port])
+AC_DO_PORT(r2ka,     z80,    R2KA,     [Excludes the Rabbit 2000A port])
 AC_DO_PORT(r3ka,     z80,    R3KA,     [Excludes the Rabbit 3000A port])
 AC_DO_PORT(gbz80,    z80,    GBZ80,    [Excludes the Gameboy gbz80 port])
 AC_DO_PORT(tlcs90,   z80,    TLCS90,   [Excludes the TLCS-90 port])
@@ -884,7 +885,7 @@ if test $OPT_DISABLE_PIC16 = 0 && test $OPT_DISABLE_NON_FREE = 0; then
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_SUBDIRS(device/non-free/lib/pic16)
 fi
 
-if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0 || test $OPT_DISABLE_Z80N = 0; then
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R2KA = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0 || test $OPT_DISABLE_Z80N = 0; then
   AC_CONFIG_FILES([src/z80/Makefile])
 fi
 
@@ -896,9 +897,10 @@ if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_
                                                        device/lib/z80n/Makefile])
 fi
 
-if test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0; then
+if test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R2KA = 0 || test $OPT_DISABLE_R3KA = 0; then
   AC_CONFIG_FILES([sdas/asrab/Makefile])
   test $OPT_DISABLE_DEVICE_LIB = 0 && AC_CONFIG_FILES([device/lib/r2k/Makefile
+                                                       device/lib/r2ka/Makefile
                                                        device/lib/r3ka/Makefile])
 fi
 
@@ -1016,6 +1018,7 @@ sdcc ${VERSION} is now configured for
     z80                 ${enable_z80_port}
     z180                ${enable_z180_port}
     r2k                 ${enable_r2k_port}
+    r2ka                ${enable_r2ka_port}
     r3ka                ${enable_r3ka_port}
     gbz80               ${enable_gbz80_port}
     tlcs90              ${enable_tlcs90_port}

@@ -656,6 +656,7 @@ OPT_DISABLE_EZ80_Z80
 OPT_DISABLE_TLCS90
 OPT_DISABLE_GBZ80
 OPT_DISABLE_R3KA
+OPT_DISABLE_R2KA
 OPT_DISABLE_R2K
 OPT_DISABLE_Z180
 OPT_DISABLE_Z80
@@ -761,6 +762,7 @@ enable_mcs51_port
 enable_z80_port
 enable_z180_port
 enable_r2k_port
+enable_r2ka_port
 enable_r3ka_port
 enable_gbz80_port
 enable_tlcs90_port
@@ -1448,6 +1450,7 @@ Optional Features:
   --disable-z80-port      Excludes the Z80 port
   --disable-z180-port     Excludes the Z180 port
   --disable-r2k-port      Excludes the Rabbit 2000 port
+  --disable-r2ka-port     Excludes the Rabbit 2000A port
   --disable-r3ka-port     Excludes the Rabbit 3000A port
   --disable-gbz80-port    Excludes the Gameboy gbz80 port
   --disable-tlcs90-port   Excludes the TLCS-90 port
@@ -7920,6 +7923,32 @@ _ACEOF
   fi
 
 
+  # Check whether --enable-r2ka-port was given.
+if test "${enable_r2ka_port+set}" = set; then :
+  enableval=$enable_r2ka_port;
+fi
+
+
+  if test "$enable_r2ka_port" = "no"; then
+    OPT_DISABLE_R2KA=1
+  else
+    enable_r2ka_port="yes"
+    OPT_DISABLE_R2KA=0
+  fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define OPT_DISABLE_R2KA $OPT_DISABLE_R2KA
+_ACEOF
+
+
+
+  echo z80 >>ports.all
+  if test $OPT_DISABLE_R2KA = 0; then
+    echo z80 >>ports.build
+  fi
+
+
   # Check whether --enable-r3ka-port was given.
 if test "${enable_r3ka_port+set}" = set; then :
   enableval=$enable_r3ka_port;
@@ -8916,7 +8945,7 @@ if test $OPT_DISABLE_PIC16 = 0 && test $OPT_DISABLE_NON_FREE = 0; then
 
 fi
 
-if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0 || test $OPT_DISABLE_Z80N = 0; then
+if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R2KA = 0 || test $OPT_DISABLE_R3KA = 0 || test $OPT_DISABLE_GBZ80 = 0 || test $OPT_DISABLE_TLCS90 = 0 || test $OPT_DISABLE_EZ80_Z80 = 0 || test $OPT_DISABLE_Z80N = 0; then
   ac_config_files="$ac_config_files src/z80/Makefile"
 
 fi
@@ -8928,10 +8957,10 @@ if test $OPT_DISABLE_Z80 = 0 || test $OPT_DISABLE_Z180 = 0 || test $OPT_DISABLE_
 
 fi
 
-if test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R3KA = 0; then
+if test $OPT_DISABLE_R2K = 0 || test $OPT_DISABLE_R2KA = 0 || test $OPT_DISABLE_R3KA = 0; then
   ac_config_files="$ac_config_files sdas/asrab/Makefile"
 
-  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/r2k/Makefile device/lib/r3ka/Makefile"
+  test $OPT_DISABLE_DEVICE_LIB = 0 && ac_config_files="$ac_config_files device/lib/r2k/Makefile device/lib/r2ka/Makefile device/lib/r3ka/Makefile"
 
 fi
 
@@ -9719,6 +9748,7 @@ do
     "device/lib/z80n/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/z80n/Makefile" ;;
     "sdas/asrab/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/asrab/Makefile" ;;
     "device/lib/r2k/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r2k/Makefile" ;;
+    "device/lib/r2ka/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r2ka/Makefile" ;;
     "device/lib/r3ka/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/r3ka/Makefile" ;;
     "sdas/astlcs90/Makefile") CONFIG_FILES="$CONFIG_FILES sdas/astlcs90/Makefile" ;;
     "device/lib/tlcs90/Makefile") CONFIG_FILES="$CONFIG_FILES device/lib/tlcs90/Makefile" ;;
@@ -10730,6 +10760,7 @@ sdcc ${VERSION} is now configured for
     z80                 ${enable_z80_port}
     z180                ${enable_z180_port}
     r2k                 ${enable_r2k_port}
+    r2ka                ${enable_r2ka_port}
     r3ka                ${enable_r3ka_port}
     gbz80               ${enable_gbz80_port}
     tlcs90              ${enable_tlcs90_port}
@@ -10806,6 +10837,7 @@ sdcc ${VERSION} is now configured for
     z80                 ${enable_z80_port}
     z180                ${enable_z180_port}
     r2k                 ${enable_r2k_port}
+    r2ka                ${enable_r2ka_port}
     r3ka                ${enable_r3ka_port}
     gbz80               ${enable_gbz80_port}
     tlcs90              ${enable_tlcs90_port}

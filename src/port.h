@@ -431,10 +431,13 @@ extern PORT z80_port;
 extern PORT z180_port;
 #endif
 #if !OPT_DISABLE_R2K
-extern PORT r2k_port;  /* Rabbit 2000/3000 */
+extern PORT r2k_port;  // Rabbit 2000
+#endif
+#if !OPT_DISABLE_R2KA
+extern PORT r2ka_port; // Rabbit 2000A, 2000C, 2000C, 3000
 #endif
 #if !OPT_DISABLE_R3KA
-extern PORT r3ka_port; /* Rabbit 3000A */
+extern PORT r3ka_port; // Rabbit 3000A
 #endif
 #if !OPT_DISABLE_GBZ80
 extern PORT gbz80_port;

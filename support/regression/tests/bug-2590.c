@@ -4,8 +4,6 @@
 
 #include <testfwk.h>
 
-#if (defined __SDCC_z80 || defined __SDCC_z180 || defined __SDCC_gbz80 || defined __SDCC_r2k || defined __SDCC_r3ka || defined __SDCC_tlcs90)
-
 #pragma disable_warning 85
 
 const unsigned char *letras_tiles01;
@@ -37,8 +35,6 @@ void poner_texto_tiles(unsigned char *texto, unsigned int size, unsigned int pos
             size--;
         }
 }
-
-#endif
 
 void testBug(void)
 {

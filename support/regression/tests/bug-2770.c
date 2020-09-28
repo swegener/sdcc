@@ -4,7 +4,7 @@
 
 #include <testfwk.h>
 
-#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_mcs51)
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_mcs51)
 __sfr __at 0xB0 rtc_secl;
 
 void fooX(void)

@@ -14,7 +14,8 @@
 	  src/z80/z80.h,
 	  support/regression/Makefile.in,
 	  support/regression/fwk/include/testfwk.h,
-	  support/regression/ports/ucr2ka:
+	  support/regression/ports/ucr2ka,
+	  support/regression/tests/*.c:
 	  r2ka port to better support Rabbit 2000A, 2000B, 2000C, 3000. RFE #709.
 
 2020-09-27 Philipp Klaus Krause <pkk AT spth.de>

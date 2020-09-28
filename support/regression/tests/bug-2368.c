@@ -9,7 +9,7 @@
 #pragma std_c99
 #endif
 
-#if defined (__SDCC_stm8) || defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k)
+#if defined (__SDCC_stm8) || defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_r2ka) || defined (__SDCC_r3ka)
 
 #define TEST_VAL 0x1234
 
@@ -35,7 +35,7 @@ void foo2 (void)
 
 void testBug (void)
 {
-#if defined (__SDCC_stm8) || defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k)
+#if defined (__SDCC_stm8) || defined (__SDCC_z80) || defined (__SDCC_z180) || defined (__SDCC_r2k) || defined (__SDCC_r2ka) || defined (__SDCC_r3ka)
   volatile uint16_t *q = loc;
 
   foo1 ();

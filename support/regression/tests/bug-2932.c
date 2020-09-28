@@ -13,10 +13,6 @@
 #pragma disable_warning 85
 #endif
 
-#if !(defined(__SDCC_z80) || defined(__SDCC_gbz80) || defined(__SDCC_z180) || defined(__SDCC_r2k))
-#define __smallc
-#endif
-
 int fg(void *fp)
 {
     volatile int i = 1;

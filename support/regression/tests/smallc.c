@@ -6,10 +6,6 @@
 #include <testfwk.h>
 #include <stdlib.h>
 
-#if !(defined __SDCC_z80 || defined __SDCC_z180 || defined __SDCC_gbz80 || defined __SDCC_r2k || defined __SDCC_r3ka || defined __SDCC_tlcs90)
-#define __smallc
-#endif
-
 unsigned char f1(unsigned char c) __smallc
 {
 	return c + 1;

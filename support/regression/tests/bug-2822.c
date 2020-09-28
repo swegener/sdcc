@@ -6,10 +6,6 @@
 
 #include <stdint.h>
 
-#if !defined(__SDCC_z80) && !defined(__SDCC_z180) && !defined(__SDCC_r2k) && !defined(__SDCC_r3ka) && !defined(__SDCC_tlcs90)
-#define __z88dk_fastcall
-#endif
-
 #ifndef __SDCC_pdk14 // Lack of memory
 struct wibble
 {

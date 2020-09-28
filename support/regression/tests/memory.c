@@ -8,7 +8,7 @@
 
 #if defined(__SDCC_stm8) || defined(PORT_HOST) || defined(__SDCC_ds390) || \
 	(defined(__SDCC_mcs51) && (defined(__SDCC_MODEL_LARGE) || defined(__SDCC_MODEL_HUGE))) || \
-    defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka)
+    defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka)
 #define TEST_LARGE
 #endif
 

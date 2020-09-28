@@ -5,9 +5,13 @@
 	  configure.ac,
 	  device/lib/Makefile.in,
 	  device/lib/r2ka,
+	  device/lib/atomic_flag_clear.c,
+	  device/include/Makefile.in,
+	  device/include/*.h
 	  src/SDCCmain.c,
 	  src/port.h,
 	  src/z80/main.c,
+	  src/z80/z80.h,
 	  support/regression/Makefile.in,
 	  support/regression/fwk/include/testfwk.h,
 	  support/regression/ports/ucr2ka:

@@ -33,7 +33,7 @@
 #if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n)
 #include <asm/z80/features.h>
 
-#elif defined(__SDCC_r2k)
+#elif defined(__SDCC_r2k) || defined(__SDCC_r2ka)
 #include <asm/r2k/features.h>
 
 #elif defined(__SDCC_r3ka)

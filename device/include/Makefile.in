@@ -60,10 +60,10 @@ install: all installdirs
 	    done; \
 	  fi; \
 	done;
-	# z80 family: z180, r2k, r3ka, gbz80, and tlcs90
+	# z80 family: z180, r2k, r2ka, r3ka, gbz80, and tlcs90
 	if [ "`grep z80 $(top_builddir)/ports.build`" = "z80" ]; \
 	then \
-	  for target in z180 r2k gbz80 r3ka tlcs90; \
+	  for target in z180 r2k r2ka r3ka gbz80 tlcs90; \
 	  do \
 	    for mask in '*.h' '*.inc' '*.txt'; \
 	    do \

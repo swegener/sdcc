@@ -96,7 +96,7 @@ extern void *bsearch(const void *key, const void *base, size_t nmemb, size_t siz
 extern void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant);
 
 /* Integer arithmetic functions (ISO C11 7.22.6) */
-#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n)
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_tlcs90) || defined (__SDCC_ez80_z80) || defined (__SDCC_z80n)
 int abs(int j) __preserves_regs(b, c, iyl, iyh);
 #else
 int abs(int j);

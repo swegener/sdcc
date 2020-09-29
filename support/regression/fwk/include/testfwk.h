@@ -18,7 +18,7 @@ void __printf(const char *szFormat, ...);
  #define _STATMEM
 #endif
 
-#ifdef __SDCC_stm8
+#if defined(__SDCC_stm8) ||defined(PORT_HOST)
 #define __data
 #define __idata
 #define __pdata
@@ -29,7 +29,7 @@ void __printf(const char *szFormat, ...);
 #define __reentrant
 #endif
 
-#if defined(PORT_HOST) || defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_gbz80) || defined(__SDCC_tlcs90) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n)
+#if defined(__SDCC_z80) || defined(__SDCC_z180) || defined(__SDCC_r2k) || defined(__SDCC_r2ka) || defined(__SDCC_r3ka) || defined(__SDCC_gbz80) || defined(__SDCC_tlcs90) || defined(__SDCC_ez80_z80) || defined(__SDCC_z80n)
 #define __data
 #define __idata
 #define __pdata

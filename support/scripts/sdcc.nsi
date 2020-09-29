@@ -862,6 +862,12 @@ ${Section} "SDCC Z80N library" SEC32
   File "${DEV_ROOT}\lib\z80n\*.*"
 ${SectionEnd}
 
+${Section} "SDCC Rabbit 2000A library" SEC33
+  SectionIn 1 2
+  SetOutPath "$INSTDIR\lib\r2ka"
+  File "${DEV_ROOT}\lib\r2ka\*.*"
+${SectionEnd}
+
 ;--------------------------------
 ;Descriptions
 
@@ -1052,6 +1058,8 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\src\gbz80\Makefile"
 
   Delete "$INSTDIR\lib\src\r2k\*.s"
+  
+  Delete "$INSTDIR\lib\src\r2ka\*.s"
 
   Delete "$INSTDIR\lib\src\r3ka\*.s"
 
@@ -1121,6 +1129,9 @@ ${Section} Uninstall SECUNINSTALL
   Delete "$INSTDIR\lib\r2k\*.rel"
   Delete "$INSTDIR\lib\r2k\*.lib"
 
+  Delete "$INSTDIR\lib\r2ka\*.rel"
+  Delete "$INSTDIR\lib\r2ka\*.lib"
+  
   Delete "$INSTDIR\lib\r3ka\*.rel"
   Delete "$INSTDIR\lib\r3ka\*.lib"
 
@@ -1246,6 +1257,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\src\z180"
   RMDir "$INSTDIR\lib\src\gbz80"
   RMDir "$INSTDIR\lib\src\r2k"
+  RMDir "$INSTDIR\lib\src\r2ka"
   RMDir "$INSTDIR\lib\src\r3ka"
   RMDir "$INSTDIR\lib\src\ez80_z80"
   RMDir "$INSTDIR\lib\src\ds390\examples"
@@ -1271,6 +1283,7 @@ ${Section} Uninstall SECUNINSTALL
   RMDir "$INSTDIR\lib\z80"
   RMDir "$INSTDIR\lib\z180"
   RMDir "$INSTDIR\lib\r2k"
+  RMDir "$INSTDIR\lib\r2ka"
   RMDir "$INSTDIR\lib\r3ka"
   RMDir "$INSTDIR\lib\ez80_z80"
   RMDir "$INSTDIR\lib\small"

@@ -7287,7 +7287,7 @@ genMult (iCode *ic)
     }
 no_mlt:
   
-  if (IS_RAB && !IS_R2KA && isPairDead(PAIR_DE, ic) && isPairDead(PAIR_BC, ic) && // mul might be cheaper than a series of additions. mul is broken on the original Rabbit 2000.
+  if (IS_RAB && !IS_R2K && isPairDead(PAIR_DE, ic) && isPairDead(PAIR_BC, ic) && // mul might be cheaper than a series of additions. mul is broken on the original Rabbit 2000.
     !byteResult && (IC_LEFT (ic)->aop->size > 1 || SPEC_USIGN (getSpec (operandType (IC_LEFT (ic))))))
     {
       int num_add = 0;

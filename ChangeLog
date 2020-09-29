@@ -1,3 +1,10 @@
+2020-09-29 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix use of mul for 16-bit multiplication by constant for z2k vs. r2ka.
+	* support/scripts/sdcc.nsi:
+	  Fix r2ka library Windows installation.
+
 2020-09-27 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Makefile.in,
@@ -16,7 +23,7 @@
 	  support/regression/fwk/include/testfwk.h,
 	  support/regression/ports/ucr2ka,
 	  support/regression/tests/*.c,
-	  doc/sdccman.lyx:
+	  doc/sdccman.lyx,
 	  r2ka port to better support Rabbit 2000A, 2000B, 2000C, 3000. RFE #709.
 
 2020-09-27 Philipp Klaus Krause <pkk AT spth.de>

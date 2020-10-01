@@ -248,6 +248,19 @@ int cl_r2k::inst_lcall(t_mem code) {
   return(resGO);
 }
 
+int cl_r2k::inst_lret(t_mem code)
+{
+  u16_t u16;
+  u8_t u8;
+
+  pop2(u16);
+  pop1(u8);
+  mmu.xpc= u8;
+  PC= u16;
+  
+  return resGO;
+}
+
 int cl_r2k::inst_bool(t_mem code) {
   regs.raf.F &= ~BIT_ALL;
   if (regs.HL)
@@ -413,6 +426,53 @@ int cl_r2k::inst_xd(t_mem prefix)
     return(resBREAKPOINT);
 
   switch (code) {
+
+  case 0x64: // LDP (Ix),HL
+    {
+      u16_t u16= *regs_IX_OR_IY;
+      t_addr al= ((regs.raf.A & 0xf) << 16) | u16;
+      t_addr ah= ((regs.raf.A & 0xf) << 16) | ((u16+1)&0xffff);
+      rom->write(al, regs.hl.l);
+      rom->write(ah, regs.hl.h);
+      vc.wr+= 2;
+      break;
+    }
+    
+  case 0x65: // LDP (mn),IX
+    {
+      u16_t ix= *regs_IX_OR_IY;
+      u16_t u16= fetch2();
+      t_addr al= ((regs.raf.A & 0xf) << 16) | u16;
+      t_addr ah= ((regs.raf.A & 0xf) << 16) | ((u16+1)&0xffff);
+      rom->write(al, ix&0xff);
+      rom->write(ah, ix>>8);
+      vc.wr+= 2;
+      break;
+    }
+    
+  case 0x6c: // LDP HL,(Ix)
+    {
+      u16_t u16= *regs_IX_OR_IY;
+      t_addr al= ((regs.raf.A & 0xf) << 16) | u16;
+      t_addr ah= ((regs.raf.A & 0xf) << 16) | ((u16+1)&0xffff);
+      regs.hl.l= rom->read(al);
+      regs.hl.h= rom->read(ah);
+      vc.rd+= 2;
+      break;
+    }
+    
+  case 0x6d: // LDP IX,(mn)
+    {
+      u8_t l,h;
+      u16_t u16= fetch2();
+      t_addr al= ((regs.raf.A & 0xf) << 16) | u16;
+      t_addr ah= ((regs.raf.A & 0xf) << 16) | ((u16+1)&0xffff);
+      l= rom->read(al);
+      h= rom->read(ah);
+      *regs_IX_OR_IY= h*256+l;
+      vc.rd+= 2;
+      break;
+    }
     
     // 0x06 LD A,(IX+A) is r4k+ instruction
   case 0x21: // LD IX,nnnn

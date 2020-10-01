@@ -138,6 +138,7 @@ public:
   
   virtual int inst_ljp(t_mem code);
   virtual int inst_lcall(t_mem code);
+  virtual int inst_lret(t_mem code);
   virtual int inst_mul(t_mem code);
   
   virtual int inst_rl_de(t_mem code);

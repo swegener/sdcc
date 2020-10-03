@@ -1,7 +1,12 @@
+2020-10-03 Philipp Klaus Krause <pkk AT spth.de>
+
+	* Makefile.common.in:
+	  Fix bug #3122.
+
 2020-09-29 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
-	  Fix use of mul for 16-bit multiplication by constant for z2k vs. r2ka.
+	  Fix use of mul for 16-bit multiplication by constant for r2k vs. r2ka.
 	* support/scripts/sdcc.nsi:
 	  Fix r2ka library Windows installation.
 

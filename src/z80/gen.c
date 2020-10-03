@@ -3239,6 +3239,16 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
           i++;
           continue;
         }
+        
+      int source_fp_offset = source->aopu.aop_stk + soffset + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+      int result_fp_offset = result->aopu.aop_stk + roffset + (result->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
+        
+      if (result_fp_offset == source_fp_offset)
+        {
+          assigned[i] = true;
+          i++;
+          continue;
+        }
 
       if (i + 1 < n && !assigned[i + 1] && hl_free && (IS_RAB || IS_EZ80_Z80 || IS_TLCS90))
         {
@@ -3318,6 +3328,20 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           regsize -= 2;
           size -= 2;
           i += 2;
+        }
+      else if (i + 1 < n && result->type == AOP_STK &&
+        aopInReg (source, soffset + i, DE_IDX) && IS_RAB)
+        {
+          emit2 ("ex de, hl");
+          if (!regalloc_dry_run)
+            emit2 ("ld %s, hl", aopGet (result, roffset + i, false));
+          emit2("ex de, hl");
+          cost2 (4, 0, 0, 15, 0, 0, 0);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          regsize -= 2;
+          size -= 2;
+          i += 2;      
         }
       else if (aopRS (source) && !aopOnStack (source, soffset + i, 1) && aopOnStack (result, roffset + i, 1))
         {
@@ -3528,6 +3552,21 @@ skip_byte:
           assigned[i + 1] = true;
           size -= 2;
           i += 2;
+        }
+     else if (i + 1 < n && source->type == AOP_STK &&
+        aopInReg (result, roffset + i, DE_IDX) && IS_RAB)
+        {
+          bool hl_free = hl_dead && (result->regs[L_IDX] < 0 || !assigned[result->regs[L_IDX] - roffset]) && (result->regs[H_IDX] < 0 || !assigned[result->regs[H_IDX] - roffset]);
+          if (!hl_free)
+            emit2 ("ex de, hl");
+          if (!regalloc_dry_run)
+            emit2 ("ld hl, %s", aopGet (source, soffset + i, false));
+          emit2("ex de, hl");
+          cost2 (3 + !hl_free, 0, 0, 13 + !hl_free * 2, 0, 0, 0);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          size -= 2;
+          i += 2;      
         }
       else if (aopRS (result) && aopOnStack (source, soffset + i, 1) && !aopOnStack (result, roffset + i, 1))
         {
@@ -6981,10 +7020,7 @@ genMultOneChar (const iCode * ic)
       emit2 ("mul");
       regalloc_dry_run_cost++;
 
-      if (resultsize > 1)
-        commitPair (result, PAIR_BC, ic, FALSE);
-      else
-        cheapMove (result, 0, ASMOP_C, 0, true);
+      genMove (result, resultsize > 1 ? ASMOP_BC : ASMOP_C, bitVectBitValue (ic->rSurv, A_IDX), true);
 
       if (save_de)
         _pop (PAIR_DE);
@@ -9538,12 +9574,13 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
         cheapMove (result->aop, 0, lowbyte, 0, true);
       return;
     }
-
-  if ((result->aop->type == AOP_HL || result->aop->type == AOP_IY) && (left->aop->type == AOP_HL || left->aop->type == AOP_IY) && !IS_GB && isPairDead (PAIR_HL, ic) &&
+  if ((result->aop->type == AOP_HL || result->aop->type == AOP_IY || IS_RAB && result->aop->type == AOP_STK) &&
+    (left->aop->type == AOP_HL || left->aop->type == AOP_IY || IS_RAB && left->aop->type == AOP_STK) &&
+    !IS_GB && isPairDead (PAIR_HL, ic) &&
     (shCount > 1 || !sameRegs (result->aop, left->aop))) // Being able to use cheap add hl, hl is worth it in most cases.
     {
       shiftaop = ASMOP_HL;
-      fetchPairLong (PAIR_HL, left->aop, ic, 0);
+      genMove (ASMOP_HL, left->aop, !bitVectBitValue (ic->rSurv, A_IDX), true);
     }
   else if (AOP_TYPE (result) != AOP_REG && AOP_TYPE (left) == AOP_REG && AOP_SIZE (left) >= 2 && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[0]->rIdx) && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[1]->rIdx) ||
     getPairId (AOP (left)) == PAIR_HL && isPairDead (PAIR_HL, ic))

@@ -2,6 +2,8 @@
 
 	* Makefile.common.in:
 	  Fix bug #3122.
+	* src/z80/gen.c:
+	  Improve use of ld d(ix), hl and ld hl, d(ix) for Rabbits.
 
 2020-09-29 Philipp Klaus Krause <pkk AT spth.de>
 

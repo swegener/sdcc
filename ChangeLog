@@ -1,3 +1,8 @@
+2020-10-04 Philipp Klaus Krause <pkk AT spth.de>
+
+	* sdccconf_in.h:
+	  Regenerated file via autoheader to pick up r2ka port.
+
 2020-10-03 Philipp Klaus Krause <pkk AT spth.de>
 
 	* Makefile.common.in:

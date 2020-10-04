@@ -158,6 +158,9 @@
 #undef OPT_DISABLE_R2K
 
 /* XXX */
+#undef OPT_DISABLE_R2KA
+
+/* XXX */
 #undef OPT_DISABLE_R3KA
 
 /* XXX */

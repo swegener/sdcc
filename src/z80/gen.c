@@ -3650,6 +3650,13 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
           i += 2;
           continue;
         }
+        
+      else if(i + 1 < size && getPairId_o(result, roffset + i) != PAIR_INVALID)
+        {
+          fetchPairLong (getPairId_o(result, roffset + i), source, 0, soffset + i);
+          i += 2;
+          continue;
+        }
 
       // Cache a copy of zero in a.
       if (result->type != AOP_REG && aopIsLitVal (source, soffset + i, 2, 0x0000) && !zeroed_a && a_dead)

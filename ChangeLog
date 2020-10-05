@@ -1,3 +1,8 @@
+2020-10-05 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
+	  Fix a z80 --reserve-regs-iy regression test failure.
+
 2020-10-04 Philipp Klaus Krause <pkk AT spth.de>
 
 	* sdccconf_in.h:

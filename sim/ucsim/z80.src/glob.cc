@@ -545,11 +545,14 @@ struct dis_entry disass_r2k_ed[]= {
   { 0x0061, 0x00ff, ' ', 1, "LD HL',DE" },
   { 0x0062, 0x00ff, ' ', 1, "SBC HL,HL" },
   { 0x0063, 0x00ff, ' ', 3, "LD (nnnn),HL" },
+  { 0x0064, 0x00ff, ' ', 1, "LDP (HL),HL" },
+  { 0x0065, 0x00ff, ' ', 3, "LDP (%w),HL" },
   { 0x0067, 0x00ff, ' ', 1, "LD XPC,A" },
   
   { 0x006A, 0x00ff, ' ', 1, "ADC HL,HL" },
   { 0x006B, 0x00ff, ' ', 3, "LD HL,(nnnn)" },
-  
+  { 0x006C, 0x00ff, ' ', 1, "LDP HL,(HL)" },
+  { 0x006D, 0x00ff, ' ', 3, "LDP HL,(%w)" },
   { 0x0072, 0x00ff, ' ', 1, "SBC HL,SP" },
   { 0x0073, 0x00ff, ' ', 3, "LD (nnnn),SP" },
   { 0x0076, 0x00ff, ' ', 1, "PUSH IP" },
@@ -864,15 +867,25 @@ struct dis_entry DISASS_NAME(_dd)[]= {
   { 0x0061, 0x00ff, ' ', 1, "LD HX,C" },
   { 0x0062, 0x00ff, ' ', 1, "LD HX,D" },
   { 0x0063, 0x00ff, ' ', 1, "LD HX,E" },
+#ifndef R2K
   { 0x0064, 0x00ff, ' ', 1, "LD HX,HX" },
+#else
+  { 0x0064, 0x00ff, ' ', 1, "LDP (IX),HL" },
+#endif
+  { 0x0065, 0x00ff, ' ', 3, "LDP (%w),IX" },
   { 0x0066, 0x00ff, ' ', 2, "LD H,(IX+%d)" },
   { 0x0067, 0x00ff, ' ', 1, "LD HX,A" },
   { 0x0068, 0x00ff, ' ', 1, "LD LX,B" },
   { 0x0069, 0x00ff, ' ', 1, "LD LX,C" },
   { 0x006A, 0x00ff, ' ', 1, "LD LX,D" },
   { 0x006B, 0x00ff, ' ', 1, "LD LX,E" },
+#ifndef R2K
   { 0x006C, 0x00ff, ' ', 1, "LD LX,HX" },
   { 0x006D, 0x00ff, ' ', 1, "LD LX,LX" },
+#else
+  { 0x006C, 0x00ff, ' ', 1, "LDP HL,(IX)" },
+  { 0x006D, 0x00ff, ' ', 3, "LDP IX,(%w)" },
+#endif
   { 0x006E, 0x00ff, ' ', 2, "LD L,(IX+%d)" },
   { 0x006F, 0x00ff, ' ', 1, "LD LX,A" },
   { 0x0070, 0x00ff, ' ', 2, "LD (IX+%d),B" },
@@ -963,15 +976,25 @@ struct dis_entry DISASS_NAME(_fd)[]= {
   { 0x0061, 0x00ff, ' ', 1, "LD HX,C" },
   { 0x0062, 0x00ff, ' ', 1, "LD HX,D" },
   { 0x0063, 0x00ff, ' ', 1, "LD HX,E" },
+#ifndef R2K
   { 0x0064, 0x00ff, ' ', 1, "LD HX,HX" },
+#else
+  { 0x0064, 0x00ff, ' ', 1, "LDP (IY),HL" },
+#endif
+  { 0x0065, 0x00ff, ' ', 3, "LDP (%w),IY" },
   { 0x0066, 0x00ff, ' ', 2, "LD H,(IY+%d)" },
   { 0x0067, 0x00ff, ' ', 1, "LD HX,A" },
   { 0x0068, 0x00ff, ' ', 1, "LD LX,B" },
   { 0x0069, 0x00ff, ' ', 1, "LD LX,C" },
   { 0x006A, 0x00ff, ' ', 1, "LD LX,D" },
   { 0x006B, 0x00ff, ' ', 1, "LD LX,E" },
+#ifndef R2K
   { 0x006C, 0x00ff, ' ', 1, "LD LX,HX" },
   { 0x006D, 0x00ff, ' ', 1, "LD LX,LX" },
+#else
+  { 0x006C, 0x00ff, ' ', 1, "LDP HL,(IY)" },
+  { 0x006D, 0x00ff, ' ', 3, "LDP IY,(%w)" },
+#endif
   { 0x006E, 0x00ff, ' ', 2, "LD L,(IY+%d)" },
   { 0x006F, 0x00ff, ' ', 1, "LD LX,A" },
   { 0x0070, 0x00ff, ' ', 2, "LD (IY+%d),B" },

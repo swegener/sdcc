@@ -5799,8 +5799,8 @@ genPlusIncr (const iCode * ic)
   if (!IS_GB && isLitWord (AOP (IC_LEFT (ic))) && size == 2 && isPairDead (PAIR_HL, ic))
     {
       fetchLitPair (PAIR_HL, AOP (IC_LEFT (ic)), icount);
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
-      return TRUE;
+      genMove (IC_RESULT (ic)->aop, ASMOP_HL, !bitVectBitValue (ic->rSurv, A_IDX), true, isPairDead (PAIR_DE, ic));
+      return true;
     }
 
   if (icount > 4) // Not worth it if the sequence of inc gets too long.
@@ -5825,7 +5825,7 @@ genPlusIncr (const iCode * ic)
       while (icount--)
         emit2 ("inc hl");
       regalloc_dry_run_cost++;
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
+      genMove (IC_RESULT (ic)->aop, ASMOP_HL, !bitVectBitValue (ic->rSurv, A_IDX), true, isPairDead (PAIR_DE, ic));
       return true;
     }
 
@@ -6154,7 +6154,7 @@ genPlus (iCode * ic)
       emit2 ("add hl, %s", _pairs[extrapair].name);
       regalloc_dry_run_cost += 1;
       spillPair (PAIR_HL);
-      commitPair (IC_RESULT (ic)->aop, PAIR_HL, ic, FALSE);
+      genMove (IC_RESULT (ic)->aop, ASMOP_HL, !bitVectBitValue (ic->rSurv, A_IDX), true, isPairDead (PAIR_DE, ic));
       goto release;
     }
   else if (getPairId (AOP (IC_RESULT (ic))) == PAIR_IY &&
@@ -6302,7 +6302,7 @@ genPlus (iCode * ic)
                     _pop (PAIR_DE);
                 }
               spillPair (PAIR_HL);
-              commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
+              genMove (IC_RESULT (ic)->aop, ASMOP_HL, !bitVectBitValue (ic->rSurv, A_IDX), true, isPairDead (PAIR_DE, ic));
               goto release;
             }
         }
@@ -7372,7 +7372,7 @@ no_mlt:
             }
           emit2 ("mul");
           regalloc_dry_run_cost++;
-          commitPair (IC_RESULT (ic)->aop, PAIR_BC, ic, false);
+          genMove (IC_RESULT (ic)->aop, ASMOP_BC, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
           goto release;
         }
     }
@@ -7467,10 +7467,7 @@ no_mlt:
       _G.stack.pushedDE = FALSE;
     }
 
-  if (byteResult)
-    cheapMove (AOP (IC_RESULT (ic)), 0, add_in_hl ? ASMOP_L : ASMOP_A, 0, true);
-  else
-    commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, FALSE);
+  genMove (IC_RESULT (ic)->aop, add_in_hl ? ASMOP_HL : ASMOP_A, true, add_in_hl || isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
 release:
   freeAsmop (IC_LEFT (ic), NULL);
@@ -9507,14 +9504,14 @@ shiftR2Left2Result (const iCode *ic, operand *left, int offl, operand *result, i
         }
       emit2 ("and hl, de");
       regalloc_dry_run_cost += 1;
-      commitPair (AOP (IC_RESULT (ic)), PAIR_HL, ic, TRUE);
+      genMove (IC_RESULT (ic)->aop, ASMOP_HL, true, true, isPairDead (PAIR_DE, ic));
       return;
     }
 
   if (isPair (AOP (result)) && !offr)
     fetchPairLong (getPairId (AOP (result)), AOP(left), ic, offl);
   else
-    genMove_o (result->aop, offr, left->aop, offl, 2, true, isPairDead (PAIR_HL, ic), false);
+    genMove_o (result->aop, offr, left->aop, offl, 2, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
   if (shCount == 0)
     return;
@@ -9707,10 +9704,8 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
     {
       if (isPair (AOP (result)))
         fetchPairLong (getPairId (AOP (result)), shiftaop, ic, 0);
-      else if (isPair (shiftaop))
-        commitPair (AOP (result), getPairId (shiftaop), ic, FALSE);
       else
-        genMove_o (result->aop, 0, shiftaop, 0, 2, true, isPairDead (PAIR_HL, ic), false);
+        genMove_o (result->aop, 0, shiftaop, 0, 2, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
     }
 }
 
@@ -11956,7 +11951,7 @@ genAssign (const iCode *ic)
             }
         }
     }
-  else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead (PAIR_DE, ic) && (IS_GB /*|| IY_RESERVED */ ))
+  else if (size == 2 && requiresHL (AOP (right)) && requiresHL (AOP (result)) && isPairDead (PAIR_DE, ic) && IS_GB)
     {
       /* Special case.  Load into a and d, then load out. */
       cheapMove (ASMOP_A, 0, AOP (right), 0, true);
@@ -12100,7 +12095,7 @@ genAssign (const iCode *ic)
               goto release;
             }
         }
-      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
+      if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_EXSTK || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
         genMove (result->aop, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
       else
         while (size--)

@@ -197,8 +197,8 @@ cl_r2k::inst_r2k_ld(t_mem code)
    *   FD F4 = ld (iy+d),hl
    */
   switch(code) {
-  case 0xC4:  regs.HL = get2( add_u16_disp(regs.SP, fetch()) ); vc.rd+= 2; break;
-  case 0xD4:  store2( add_u16_disp(regs.SP, fetch()), regs.HL ); vc.wr+= 2; break;
+  case 0xC4:  regs.HL = get2( add_u16_nisp(regs.SP, fetch()) ); vc.rd+= 2; break;
+  case 0xD4:  store2( add_u16_nisp(regs.SP, fetch()), regs.HL ); vc.wr+= 2; break;
   case 0xE4:  regs.HL = get2( add_u16_disp(regs.IX, fetch()) ); vc.rd+= 2; break;
   case 0xF4:  store2( add_u16_disp(regs.IX, fetch()), regs.HL ); vc.wr+= 2; break;
   default:
@@ -548,7 +548,7 @@ int cl_r2k::inst_xd(t_mem prefix)
       return(inst_fd_misc(code));
     
   case 0xC4: // LD IX,(SP+n)
-    *regs_IX_OR_IY = get2( add_u16_disp(regs.SP, fetch()) );
+    *regs_IX_OR_IY = get2( add_u16_nisp(regs.SP, fetch()) );
     vc.rd+= 2;
     return(resGO);
     
@@ -573,7 +573,7 @@ int cl_r2k::inst_xd(t_mem prefix)
     return(resGO);
     
   case 0xD4: // LD (SP+n),IX|IY
-    store2( add_u16_disp(regs.SP, fetch()), *regs_IX_OR_IY );
+    store2( add_u16_nisp(regs.SP, fetch()), *regs_IX_OR_IY );
     vc.wr+= 2;
     return(resGO);
     

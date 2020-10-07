@@ -45,7 +45,8 @@
 #define pop2(var) {var=get2(regs.SP),regs.SP+=2;}
 #define pop1(var) {var=get1(regs.SP),regs.SP++;}
 //#define pop1(var) {var=get1(regs.SP),regs.SP+=1;}
-#define add_u16_disp(_w, _d) (( (unsigned short)(_w) + (signed char)(_d) ) & 0xffff)
+#define add_u16_disp(_w, _d) (( (unsigned short)(_w) + (signed char)(_d) ) & 0xffff) // Signed displacement.
+#define add_u16_nisp(_w, _d) (( (unsigned short)(_w) + (unsigned char)(_d) ) & 0xffff) // Unsigned displacement.
 #define parity(val) ( ((val>>7)&1) ^ ((val>>6)&1) ^ ((val>>5)&1) ^ ((val>>4)&1) ^ ((val>>3)&1) ^ ((val>>2)&1) ^ ((val>>1)&1) ^ ((val>>0)&1) ^ 1 )
 #define SET_Z(val) (regs.raf.F= (regs.raf.F&(~BIT_Z)) | ((val==0)?BIT_Z:0))
 #define SET_S(val) (regs.raf.F= (regs.raf.F&(~BIT_S)) | ((((val)&0x80)==0)?0:BIT_S))

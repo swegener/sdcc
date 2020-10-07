@@ -3328,6 +3328,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
         {
           emit2("ex (sp), hl");
           cost2 (1 + IS_RAB, 19, 16, 15, 0, 14, 5);
+          spillPair (PAIR_HL);
           assigned[i] = true;
           assigned[i + 1] = true;
           regsize -= 2;
@@ -3380,6 +3381,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
             emit2 ("ld %d %s, hl", use_sp ? sp_offset : fp_offset, use_sp ? "(sp)" : "(ix)");
           emit2("ex de, hl");
           cost2 (4, 0, 0, 15, 0, 0, 0);
+          spillPair (PAIR_HL);
           assigned[i] = true;
           assigned[i + 1] = true;
           regsize -= 2;
@@ -3393,6 +3395,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
             _push (PAIR_DE);
           emit2 ("ex de, hl");
           cost2 (1, 4, 3, 2, 0, 2, 1);
+          spillPair (PAIR_HL);
           genCopy (result, roffset + i, ASMOP_DE, 0, 2, a_free, true, true);
           if (!de_free)
             _pop (PAIR_DE);
@@ -5814,7 +5817,7 @@ genPlusIncr (const iCode * ic)
       PAIR_ID pair = getPairId (AOP (IC_LEFT (ic)));
       while (icount--)
         emit2 ("inc %s", _pairs[pair].name);
-      commitPair (AOP (IC_RESULT (ic)), pair, ic, FALSE);
+      genMove (IC_RESULT (ic)->aop, IC_LEFT (ic)->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead(PAIR_HL, ic), isPairDead(PAIR_DE, ic));
       return true;
     }
 
@@ -11872,7 +11875,7 @@ genAssign (const iCode *ic)
     (IS_RAB || IS_TLCS90) && (AOP_TYPE(result) == AOP_STK || AOP_TYPE(result) == AOP_EXSTK) && (AOP_TYPE(right) == AOP_LIT || AOP_TYPE (right) == AOP_IMMD))) // Use ld d(sp), hl
     {
       fetchPair (PAIR_HL, AOP (right));
-      commitPair (AOP (result), PAIR_HL, ic, FALSE);
+      genMove (result->aop, ASMOP_HL, !bitVectBitValue (ic->rSurv, A_IDX), true, isPairDead (PAIR_DE, ic));
     }
   else if (size == 2 && getPairId (AOP (right)) != PAIR_INVALID && getPairId (AOP (right)) != PAIR_IY && AOP_TYPE (result) != AOP_REG)
     genMove (result->aop, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));

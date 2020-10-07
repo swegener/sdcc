@@ -3100,7 +3100,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
 }
 
 static void
-commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy)
+commitPair (asmop *aop, PAIR_ID id, const iCode *ic, bool dont_destroy) // Obsolete. Replace uses by genMove or genMove_o.
 {
   int fp_offset = aop->aopu.aop_stk + (aop->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
   int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
@@ -3324,7 +3324,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       int sp_offset = fp_offset + _G.stack.pushed + _G.stack.offset;
 
       if (!IS_GB && !IS_RAB && !(IS_TLCS90 && optimize.codeSpeed) && // The gbz80 doesn't have ex (sp), hl. The Rabbits and tlcs90 have it, but ld 0 (sp), hl is faster. For the Rabbits, they are also the same size.
-        i + 1 < n && aopOnStack (result, roffset + i, 2) && aopInReg (source, soffset + i, HL_IDX) && hl_dead && !sp_offset)
+        i + 1 < n && aopOnStack (result, roffset + i, 2) && aopInReg (source, soffset + i, HL_IDX) && hl_dead && !sp_offset && !regalloc_dry_run) // Stack positions will change, so do not assume this is possible in the cost function.
         {
           emit2("ex (sp), hl");
           cost2 (1 + IS_RAB, 19, 16, 15, 0, 14, 5);
@@ -3335,8 +3335,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           i += 2;        
         }
       else if (i + 1 < n && aopOnStack (result, roffset + i, 2) && (abs(fp_offset) <= 127 && !_G.omitFramePtr || IS_RAB && sp_offset <= 255 || IS_TLCS90 && sp_offset <= 127) &&
-        (aopInReg (source, soffset + i, HL_IDX) && IS_RAB ||
-        (aopInReg (source, soffset + i, BC_IDX) || aopInReg (source, soffset + i, DE_IDX) || aopInReg (source, soffset + i, HL_IDX) || aopInReg (source, soffset + i, IY_IDX)) && (IS_EZ80_Z80 || IS_TLCS90)))
+        (aopInReg (source, soffset + i, HL_IDX) && IS_RAB || (getPairId_o (source, soffset + i) != PAIR_INVALID && (IS_EZ80_Z80 || IS_TLCS90))))
         {
           bool use_sp = IS_RAB && sp_offset <= 255 || IS_TLCS90 && sp_offset <= 127;
           if (!regalloc_dry_run)
@@ -3358,6 +3357,19 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           regsize -= 2;
           size -= 2;
           i += 2;         
+        }
+      else if (i + 1 < n && aopOnStack (result, roffset + i, 2) && getPairId_o (source, soffset + i) != PAIR_INVALID && !sp_offset && !regalloc_dry_run) // Stack positions will change, so do not assume this is possible in the cost function.
+        {
+          bool iy = aopInReg (source, soffset + i, IY_IDX);
+          emit2 ("inc sp");
+          emit2 ("inc sp");
+          emit2 ("push %s", _pairs[getPairId_o (source, soffset + i)].name);
+          cost2 (3 + iy, 23 + 4 * iy, 19 + 3 * iy, 14 + 2 * iy, 32, 16, 5 + iy);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          regsize -= 2;
+          size -= 2;
+          i += 2;  
         }
       else if (IS_RAB && i + 1 < n && aopOnStack (result, roffset + i, 2) && aopInReg (source, soffset + i, DE_IDX) &&
         (sp_offset <= 255 || abs(fp_offset) <= 127 && !_G.omitFramePtr))
@@ -7141,39 +7153,7 @@ genMultOneChar (const iCode * ic)
       _G.stack.pushedDE = FALSE;
     }
 
-  if (result->type != AOP_HL)
-    {
-      if (resultsize == 1)
-        cheapMove (result, 0, ASMOP_L, 0, true);
-      else
-        commitPair (result, PAIR_HL, ic, FALSE);
-    }
-  else
-    {
-      if (resultsize == 1)
-        {
-          emit2 ("ld a, l");
-          regalloc_dry_run_cost += 1;
-          cheapMove (result, 0, ASMOP_A, 0, true);
-        }
-      else
-        {
-          if (!isPairDead (PAIR_DE, ic))
-            {
-              _push (PAIR_DE);
-              _G.stack.pushedDE = TRUE;
-            }
-          emit2 ("ld e, l");
-          emit2 ("ld d, h");
-          regalloc_dry_run_cost += 2;
-          commitPair (result, PAIR_DE, ic, FALSE);
-          if (!isPairDead (PAIR_DE, ic))
-            {
-              _pop (PAIR_DE);
-              _G.stack.pushedDE = FALSE;
-            }
-        }
-    }
+  genMove (result, ASMOP_HL, !bitVectBitValue (ic->rSurv, A_IDX), true, isPairDead (PAIR_DE, ic));
 }
 
 /*-----------------------------------------------------------------*/
@@ -7201,8 +7181,8 @@ genMultTwoChar (const iCode *ic)
           wassert (regalloc_dry_run);
           regalloc_dry_run_cost += 100;
         }
-      genMove_o(ASMOP_BC, 0, left->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), right->aop->regs[L_IDX] < 0 && right->aop->regs[H_IDX] < 0, right->aop->regs[E_IDX] < 0 && right->aop->regs[D_IDX] < 0);
-      genMove_o(ASMOP_DE, 0, right->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), true, true);
+      genMove (ASMOP_BC, left->aop, !bitVectBitValue (ic->rSurv, A_IDX), right->aop->regs[L_IDX] < 0 && right->aop->regs[H_IDX] < 0, right->aop->regs[E_IDX] < 0 && right->aop->regs[D_IDX] < 0);
+      genMove (ASMOP_DE, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), true, true);
     }
   else
     {
@@ -7211,14 +7191,14 @@ genMultTwoChar (const iCode *ic)
           wassert (regalloc_dry_run);
           regalloc_dry_run_cost += 100;
         }
-      genMove_o(ASMOP_BC, 0, right->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), left->aop->regs[L_IDX] < 0 && left->aop->regs[H_IDX] < 0, left->aop->regs[E_IDX] < 0 && left->aop->regs[D_IDX] < 0);
-      genMove_o(ASMOP_DE, 0, left->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), true, true);
+      genMove (ASMOP_BC, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), left->aop->regs[L_IDX] < 0 && left->aop->regs[H_IDX] < 0, left->aop->regs[E_IDX] < 0 && left->aop->regs[D_IDX] < 0);
+      genMove (ASMOP_DE, left->aop, !bitVectBitValue (ic->rSurv, A_IDX), true, true);
     }
 
   emit2 ("mul");
   regalloc_dry_run_cost++;
   
-  commitPair (IC_RESULT (ic)->aop, PAIR_BC, ic, false);
+  genMove (IC_RESULT (ic)->aop, ASMOP_BC, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), true);
   
   if (save_de)
     _pop (PAIR_DE);
@@ -11889,7 +11869,7 @@ genAssign (const iCode *ic)
   if (isPair (AOP (result)))
     fetchPairLong (getPairId (AOP (result)), AOP (right), ic, LSB);
   else if (isPair (AOP (right)) && AOP_TYPE (result) == AOP_IY && size == 2)
-    commitPair (AOP (result), getPairId (AOP (right)), ic, FALSE);
+    genMove (result->aop, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
   else if (size == 2 && isPairDead (PAIR_HL, ic) &&
     (!IS_GB && (AOP_TYPE (right) == AOP_STK && !_G.omitFramePtr || AOP_TYPE (right) == AOP_IY || AOP_TYPE (right) == AOP_LIT) && AOP_TYPE (result) == AOP_IY || // Use ld (nn), hl
     !IS_GB && AOP_TYPE (right) == AOP_IY && (AOP_TYPE (result) == AOP_STK && !_G.omitFramePtr || AOP_TYPE (result) == AOP_IY) || // Use ld hl, (nn)
@@ -11900,9 +11880,7 @@ genAssign (const iCode *ic)
       commitPair (AOP (result), PAIR_HL, ic, FALSE);
     }
   else if (size == 2 && getPairId (AOP (right)) != PAIR_INVALID && getPairId (AOP (right)) != PAIR_IY && AOP_TYPE (result) != AOP_REG)
-    {
-      commitPair (AOP (result), getPairId (AOP (right)), ic, TRUE);
-    }
+    genMove (result->aop, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
   else if (getPairId (AOP (right)) == PAIR_IY)
     {
       while (size--)
@@ -12123,7 +12101,7 @@ genAssign (const iCode *ic)
             }
         }
       if ((result->aop->type == AOP_REG || result->aop->type == AOP_STK || result->aop->type == AOP_EXSTK) && (right->aop->type == AOP_REG || right->aop->type == AOP_STK || right->aop->type == AOP_LIT || right->aop->type == AOP_IMMD))
-        genMove (result->aop, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), false);
+        genMove (result->aop, right->aop, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
       else
         while (size--)
           {

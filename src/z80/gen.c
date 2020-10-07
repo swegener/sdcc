@@ -381,7 +381,7 @@ cost(unsigned int bytes, unsigned int cycles)
 }
 
 static void
-cost2(unsigned int bytes, unsigned int cycles_z80, unsigned int cycles_z180, unsigned int cycles_r2k, unsigned int cycles_gbz80, unsigned int cycles_tlcs90, unsigned int cycles_ez80_z80)
+cost2(unsigned int bytes, unsigned int z80_states, unsigned int z180_states, unsigned int r2k_clocks, unsigned int cycles_gbz80, unsigned int tlcs90_states, unsigned int ez80_z80_cycles)
 {
   regalloc_dry_run_cost += bytes;
 }
@@ -3327,7 +3327,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
         i + 1 < n && aopOnStack (result, roffset + i, 2) && aopInReg (source, soffset + i, HL_IDX) && hl_dead && !sp_offset)
         {
           emit2("ex (sp), hl");
-          regalloc_dry_run_cost++;
+          cost2 (1 + IS_RAB, 19, 16, 15, 0, 14, 5);
           assigned[i] = true;
           assigned[i + 1] = true;
           regsize -= 2;
@@ -3348,13 +3348,24 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           size -= 2;
           i += 2;
         }
+      else if (IS_RAB && i + 1 < n && aopOnStack (result, roffset + i, 2) && aopInReg (source, soffset + i, IY_IDX) &&
+        sp_offset <= 255)
+        {
+          emit2 ("ld %d (sp), iy", sp_offset);
+          cost2 (3, 0, 0, 13, 0, 0, 0);
+          assigned[i] = true;
+          assigned[i + 1] = true;
+          regsize -= 2;
+          size -= 2;
+          i += 2;         
+        }
       else if (IS_RAB && i + 1 < n && aopOnStack (result, roffset + i, 2) && aopInReg (source, soffset + i, DE_IDX) &&
         (sp_offset <= 255 || abs(fp_offset) <= 127 && !_G.omitFramePtr))
         {
           bool use_sp = (sp_offset <= 255);
           emit2 ("ex de, hl");
           if (!regalloc_dry_run)
-            emit2 ("ld %d %s, hl", use_sp ? sp_offset : fp_offset, use_sp ? "(sp)" : "(ix)", aopGet (result, roffset + i, false));
+            emit2 ("ld %d %s, hl", use_sp ? sp_offset : fp_offset, use_sp ? "(sp)" : "(ix)");
           emit2("ex de, hl");
           cost2 (4, 0, 0, 15, 0, 0, 0);
           assigned[i] = true;
@@ -3369,7 +3380,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
           if (!de_free)
             _push (PAIR_DE);
           emit2 ("ex de, hl");
-          regalloc_dry_run_cost++;
+          cost2 (1, 4, 3, 2, 0, 2, 1);
           genCopy (result, roffset + i, ASMOP_DE, 0, 2, a_free, true, true);
           if (!de_free)
             _pop (PAIR_DE);
@@ -3660,7 +3671,7 @@ genMove_o (asmop *result, int roffset, asmop *source, int soffset, int size, boo
 {
   emitDebug ("; genMove_o");
 
-  if ((result->type == AOP_REG || result->type == AOP_STK || result->type == AOP_EXSTK) && (source->type == AOP_REG || source->type == AOP_STK)) // Todo: enable for source->type == AOP_STK once implemented in genCopy().
+  if ((result->type == AOP_REG || result->type == AOP_STK || result->type == AOP_EXSTK) && (source->type == AOP_REG || source->type == AOP_STK)) // Todo: enable for source->type == AOP_EXSTK once implemented in genCopy().
     {
       int csize = size > source->size - soffset ? source->size - soffset : size;
       genCopy (result, roffset, source, soffset, csize, a_dead_global, hl_dead_global, de_dead_global);

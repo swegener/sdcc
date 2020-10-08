@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 
 #include "globals.h"
+#include "utils.h"
 
 #include "glob.h"
 #include "serialcl.h"
@@ -78,9 +79,13 @@ cl_m6809::id_string(void)
 void
 cl_m6809::reset(void)
 {
+  reg.DP= 0;
+  en_nmi= false;
+  cwai= false;
+  reg.CC= flagI | flagF;
   cl_uc::reset();
   PC= rom->get(0xfffe)*256 + rom->get(0xffff);
-  reg.DP= 0;
+  irq= true;
 }
   
 void
@@ -107,6 +112,14 @@ cl_m6809::mk_hw_elements(void)
 
   add_hw(h= new cl_serial(this, 0xc000));
   h->init();
+}
+
+void
+cl_m6809::make_cpu_hw(void)
+{
+  cpu= new cl_m6809_cpu(this);
+  cpu->init();
+  add_hw(cpu);
 }
 
 void
@@ -138,16 +151,6 @@ cl_m6809::make_memories(void)
   regs8->get_cell(2)->decode((t_mem*)&(reg.DP));
   regs8->get_cell(3)->decode((t_mem*)&(reg.CC));
 
-  class cl_var *v;
-  vars->add(v= new cl_var("A", regs8, 0, "CPU register A"));
-  v->init();
-  vars->add(v= new cl_var("B", regs8, 1, "CPU register B"));
-  v->init();
-  vars->add(v= new cl_var("DP", regs8, 2, "CPU register DP"));
-  v->init();
-  vars->add(v= new cl_var("CC", regs8, 3, "CPU register CC"));
-  v->init();
-   
   regs16= new cl_address_space("regs16", 0, 5, 16);
   regs16->init();
   address_spaces->add(regs16);
@@ -156,6 +159,17 @@ cl_m6809::make_memories(void)
   regs16->get_cell(2)->decode((t_mem*)&(reg.X));
   regs16->get_cell(3)->decode((t_mem*)&(reg.Y));
   regs16->get_cell(4)->decode((t_mem*)&(reg.acc.rD));
+
+  class cl_var *v;
+  
+  vars->add(v= new cl_var("A", regs8, 0, "CPU register A"));
+  v->init();
+  vars->add(v= new cl_var("B", regs8, 1, "CPU register B"));
+  v->init();
+  vars->add(v= new cl_var("DP", regs8, 2, "CPU register DP"));
+  v->init();
+  vars->add(v= new cl_var("CC", regs8, 3, "CPU register CC"));
+  v->init();
 
   vars->add(v= new cl_var("U", regs16, 0, "CPU register U"));
   v->init();
@@ -733,7 +747,7 @@ cl_m6809::push_regs(bool do_cc)
 {
   rom->write(--reg.S, PC&0xff);
   rom->write(--reg.S, PC>>8);
-  if (reg.CC & E)
+  if (reg.CC & flagE)
     {
       rom->write(--reg.S, reg.U&0xff);
       rom->write(--reg.S, reg.U>>8);
@@ -755,7 +769,7 @@ cl_m6809::pull_regs(bool do_cc)
   u8_t l,h;
   if(do_cc)
     reg.CC= rom->read(reg.S++);
-  if (reg.CC & E)
+  if (reg.CC & flagE)
     {
       A= rom->read(reg.S++);
       B= rom->read(reg.S++);
@@ -785,14 +799,14 @@ cl_m6809::inst_add8(t_mem code, u8_t *acc, u8_t op, int c, bool store)
 
   if (c) { ++res, ++o; }
   
-  reg.CC= ~(H|V|S|Z);
-  if ((d & 0xf) + (o & 0xf) > 0xf)  reg.CC|= H;
-  if ((res < -128) || (res > +127)) reg.CC|= V;
-  if (d + o > 0xff)                 reg.CC|= C;
+  reg.CC= ~(flagH|flagV|flagS|flagZ);
+  if ((d & 0xf) + (o & 0xf) > 0xf)  reg.CC|= flagH;
+  if ((res < -128) || (res > +127)) reg.CC|= flagV;
+  if (d + o > 0xff)                 reg.CC|= flagC;
 
   r= res & 0xff;
-  if (r == 0)   reg.CC|= Z;
-  if (r & 0x80) reg.CC|= S;
+  if (r == 0)   reg.CC|= flagZ;
+  if (r & 0x80) reg.CC|= flagS;
 
   if (store)
     *acc= r;
@@ -811,18 +825,22 @@ cl_m6809::inst_add16(t_mem code, u16_t *acc, u16_t op, int c, bool store)
 
   if (c) { ++res, ++o; }
   
-  reg.CC= ~(V|S|Z);
+  reg.CC= ~(flagV|flagS|flagZ);
   if ((res < (int)(0x8000)) || (res > (int)(0x7fff)))
-    reg.CC|= V;
+    reg.CC|= flagV;
   if (d + o > 0xffff)
-    reg.CC|= C;
+    reg.CC|= flagC;
 
   r= res & 0xffff;
-  if (r == 0)     reg.CC|= Z;
-  if (r & 0x8000) reg.CC|= S;
+  if (r == 0)     reg.CC|= flagZ;
+  if (r & 0x8000) reg.CC|= flagS;
 
   if (store)
-    *acc= r;
+    {
+      *acc= r;
+      if (acc == &reg.S)
+	en_nmi= true;
+    }
   
   return resGO;
 }
@@ -870,6 +888,9 @@ cl_m6809::inst_ld16(t_mem code, u16_t *acc, u16_t op)
   SET_O(0);
   SET_Z(op);
   SET_S(op&0x8000);
+
+  if (acc == &reg.S)
+    en_nmi= true;
   
   return resGO;
 }
@@ -951,7 +972,7 @@ cl_m6809::inst_alu(t_mem code)
       return inst_add8(code, acc, ~op8, 1, false);
       break;
     case 0x02: // SBC  SBC  SBC  SBC  SBC  SBC  SBC  SBC
-      return inst_add8(code, acc, ~op8, (reg.CC&C)?1:0, true);
+      return inst_add8(code, acc, ~op8, (reg.CC&flagC)?1:0, true);
       break;
     case 0x03: // SUBD SUBD SUBD SUBD ADDD ADDD ADDD ADDD
       {
@@ -981,7 +1002,7 @@ cl_m6809::inst_alu(t_mem code)
       return inst_bool(code, '^', acc, op8, true);
       break;
     case 0x09: // ADC  ADC  ADC  ADC  ADC  ADC  ADC  ADC
-      return inst_add8(code, acc, op8, (reg.CC&C)?1:0, true);
+      return inst_add8(code, acc, op8, (reg.CC&flagC)?1:0, true);
       break;
     case 0x0a: // OR   OR   OR   OR   OR   OR   OR   OR
       return inst_bool(code, '|', acc, op8, true);
@@ -1079,9 +1100,9 @@ cl_m6809::inst_10(t_mem code)
     case 0x09: // DAA
       {
 	u8_t cf= 0;
-	if ((reg.CC & C) || ((A&0x0f) > 9))
+	if ((reg.CC & flagC) || ((A&0x0f) > 9))
 	  cf|= 0x06;
-	if ((reg.CC & C) ||
+	if ((reg.CC & flagC) ||
 	    ((A&0xf0) > 0x90) ||
 	    (
 	     ((A&0xf0) > 0x80) &&
@@ -1169,10 +1190,10 @@ cl_m6809::inst_10(t_mem code)
 int
 cl_m6809::inst_branch(t_mem code, bool l)
 {
-  bool c= reg.CC & C;
-  bool z= reg.CC & Z;
-  bool n= reg.CC & N;
-  bool v= reg.CC & V;
+  bool c= reg.CC & flagC;
+  bool z= reg.CC & flagZ;
+  bool n= reg.CC & flagN;
+  bool v= reg.CC & flagV;
   bool t;
   
   switch (code & 0x0f)
@@ -1389,6 +1410,10 @@ cl_m6809::inst_30(t_mem code)
       break;
     case 0x0c: // CWAI
       op8= fetch();
+      reg.CC&= op8;
+      reg.CC|= flagE;
+      push_regs(true);
+      cwai= true;
       // TODO
       break;
     case 0x0d: // MUL
@@ -1399,9 +1424,9 @@ cl_m6809::inst_30(t_mem code)
     case 0x0e: // RESET
       break;
     case 0x0f: // SWI
-      reg.CC|= E;
+      reg.CC|= flagE;
       push_regs(true);
-      reg.CC|= F|I;
+      reg.CC|= flagF|flagI;
       PC= rom->read(0xfffa)*256 + rom->read(0xfffb);
       break;
     }
@@ -1470,7 +1495,7 @@ cl_m6809::inst_ror(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
   u8_t oldc, newc;
   
   op8= (acc)?(*acc):(rom->read(ea));
-  oldc= reg.CC & C;
+  oldc= reg.CC & flagC;
   newc= op8 & 1;
   
   op8>>= 1;
@@ -1542,7 +1567,7 @@ cl_m6809::inst_rol(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
   u8_t oldc, newc;
   
   op8= (acc)?(*acc):(rom->read(ea));
-  oldc= reg.CC & C;
+  oldc= reg.CC & flagC;
   newc= op8 & 0x80;
 
   SET_O( (op8&0x80) ^ ((op8<<1)&0x80) );
@@ -1759,7 +1784,7 @@ cl_m6809::inst_page1(t_mem code)
   if (code == 0x3f)
     {
       // SWI2
-      reg.CC|= E;
+      reg.CC|= flagE;
       push_regs(true);
       PC= rom->read(0xfff4)*256 + rom->read(0xfff5);
     }
@@ -1856,7 +1881,7 @@ cl_m6809::inst_page2(t_mem code)
   if (code == 0x3f)
     {
       // SWI3
-      reg.CC|= E;
+      reg.CC|= flagE;
       push_regs(true);
       PC= rom->read(0xfff2)*256 + rom->read(0xfff3);
     }
@@ -1912,7 +1937,8 @@ cl_m6809::exec_inst(void)
 {
   t_mem code;
   bool fe;
-  
+
+  printf("irq=%d\n",irq);
   fe= fetch(&code);
   tick(1);
   if (fe)
@@ -1930,6 +1956,200 @@ cl_m6809::exec_inst(void)
     }
   
   return resGO;
+}
+
+int
+cl_m6809::accept_it(class it_level *il)
+{
+  class cl_m6809_nmi_src *is= (class cl_m6809_nmi_src *)(il->source);
+
+  reg.CC&= ~flagE;
+  reg.CC|= is->Evalue;
+
+  if (!cwai)
+    push_regs(true);
+  cwai= false;
+  
+  t_addr a= rom->get(is->addr) * 256 + rom->get(is->addr+1);
+  printf("accept ISR %x called\n",AU(a));
+  PC= a;
+
+  is->clear();
+  
+  it_levels->push(il);
+  return resGO;
+}
+
+
+/* CPU hardware */
+
+bool
+cl_m6809_it_src::enabled(void)
+{
+  if (!ie_cell)
+    return false;
+  t_mem e= ie_cell->get();
+  e&= ie_mask;
+  return e == 0;
+}
+
+cl_m6809_cpu::cl_m6809_cpu(class cl_uc *auc):
+  cl_hw(auc, HW_CPU, 0, "cpu")
+{
+  muc= (class cl_m6809 *)auc;
+}
+
+int
+cl_m6809_cpu::init()
+{
+  class cl_var *v;
+
+  cl_hw::init();
+  uc->vars->add(v= new cl_var("NMI", cfg, cpu_nmi, "NMI request/clear"));
+  v->init();
+  uc->vars->add(v= new cl_var("IRQ", cfg, cpu_irq, "IRQ request/clear"));
+  v->init();
+  uc->vars->add(v= new cl_var("FIRQ", cfg, cpu_firq, "FIRQ request/clear"));
+  v->init();
+  
+  class cl_it_src *is;
+
+  is= new cl_m6809_it_src(uc,
+			  irq_irq,
+			  muc->regs8->get_cell(3), flagI,
+			  cfg->get_cell(cpu_irq), 1,
+			  0xfff8,
+			  "Interrupt request",
+			  0,
+			  flagE);
+  is->init();
+  uc->it_sources->add(is);
+
+  is= new cl_m6809_it_src(uc,
+			  irq_firq,
+			  muc->regs8->get_cell(3), flagF,
+			  cfg->get_cell(cpu_firq), 1,
+			  0xfff6,
+			  "Fast interrupt request",
+			  0,
+			  0);
+  is->init();
+  uc->it_sources->add(is);
+
+  is= new cl_m6809_nmi_src(uc,
+			   irq_nmi,
+			   cfg->get_cell(cpu_nmi_en), 1,
+			   cfg->get_cell(cpu_nmi), 1,
+			   0xfffc,
+			   "Non-maskable interrupt request",
+			   0,
+			   flagE);
+  is->init();
+  uc->it_sources->add(is);
+  
+  return 0;
+}
+
+void
+cl_m6809_cpu::reset(void)
+{
+  cfg_set(cpu_nmi, 0);
+  cfg_set(cpu_irq, 0);
+  cfg_set(cpu_firq, 0);
+  cfg_read(cpu_nmi_en);
+  cfg_read(cpu_irq_en);
+  cfg_read(cpu_firq_en);
+}
+
+const char *
+cl_m6809_cpu::cfg_help(t_addr addr)
+{
+  switch (addr)
+    {
+    case cpu_nmi_en	: return "NMI enable (RO)";
+    case cpu_nmi	: return "NMI request/clear (RW)";
+    case cpu_irq_en	: return "IRQ enable (RO)";
+    case cpu_irq	: return "IRQ request/clear (RW)";
+    case cpu_firq_en	: return "FIRQ enable (RO)";
+    case cpu_firq	: return "FIRQ request (RW)";
+    }
+  return cl_hw::cfg_help(addr);
+}
+
+t_mem
+cl_m6809_cpu::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
+{
+  class cl_m6809 *muc= (class cl_m6809 *)uc;
+  switch ((enum cpu_cfg)addr)
+    {
+    case cpu_nmi_en:
+      cell->set(muc->en_nmi?1:0);
+      break;
+    case cpu_nmi:
+      if (val)
+	{
+	  if (*val)
+	    *val= 1;
+	}
+      break;
+    case cpu_irq_en:
+      cell->set((muc->reg.CC & flagI)?0:1);
+      break;
+    case cpu_irq:
+      if (val)
+	{
+	  if (*val)
+	    *val= 1;
+	}
+      break;
+    case cpu_firq_en:
+      cell->set((muc->reg.CC & flagF)?0:1);
+      break;
+    case cpu_firq:
+      if (val)
+	{
+	  if (*val)
+	    *val= 1;
+	}
+      break;
+    case cpu_nr: break;
+    }
+  return cell->get();
+}
+
+void
+cl_m6809_cpu::print_info(class cl_console_base *con)
+{
+  int i;
+  con->dd_printf("  Handler  ISR    En  Pr Req Act Name\n");
+  for (i= 0; i < uc->it_sources->count; i++)
+    {
+      class cl_it_src *is= (class cl_it_src *)(uc->it_sources->at(i));
+      t_addr a= uc->rom->get(is->addr) * 256 + uc->rom->get(is->addr+1);
+      con->dd_printf("  [0x%04x] 0x%04x", AU(is->addr), a);
+      con->dd_printf(" %-3s", (is->enabled())?"en":"dis");
+      con->dd_printf(" %2d", uc->priority_of(is->nuof));
+      con->dd_printf(" %-3s", (is->pending())?"YES":"no");
+      con->dd_printf(" %-3s", (is->active)?"act":"no");
+      con->dd_printf(" %s", object_name(is));
+      con->dd_printf("\n");
+    }
+  con->dd_printf("Active interrupt service(s):\n");
+  con->dd_printf("  Pr Handler  PC       Source\n");
+  for (i= 0; i < uc->it_levels->count; i++)
+    {
+      class it_level *il= (class it_level *)(uc->it_levels->at(i));
+      if (il->level >= 0)
+	{
+	  con->dd_printf("  %2d", il->level);
+	  con->dd_printf(" 0x%06x", AU(il->addr));
+	  con->dd_printf(" 0x%06x", AU(il->PC));
+	  con->dd_printf(" %s", (il->source)?(object_name(il->source)):
+			 "nothing");
+	  con->dd_printf("\n");
+	}
+    }
+  print_cfg_info(con);
 }
 
 

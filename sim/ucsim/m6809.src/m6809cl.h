@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "uccl.h"
 #include "memcl.h"
+#include "itsrccl.h"
 
 
 /*
@@ -63,16 +64,16 @@ struct reg_t {
 
 enum flags
   {
-   C= 1,
-   V= 2,
-   O= 2,
-   Z= 4,
-   N= 8,
-   S= 8,
-   I= 16,
-   H= 32,
-   F= 64,
-   E= 128
+   flagC= 1,
+   flagV= 2,
+   flagO= 2,
+   flagZ= 4,
+   flagN= 8,
+   flagS= 8,
+   flagI= 16,
+   flagH= 32,
+   flagF= 64,
+   flagE= 128
   };
 
 class cl_m6809: public cl_uc
@@ -81,9 +82,8 @@ public:
   class cl_address_space *regs8;
   class cl_address_space *regs16;
   struct reg_t reg;
-  //cl_address_space *regs;
-  class cl_porto *pa, *pb, *pc, *pd;
-  class cl_porti *pi, *pj;
+  bool en_nmi;
+  bool cwai;
 public:
   class cl_address_space *rom;
 protected:
@@ -97,7 +97,9 @@ public:
   virtual void set_PC(t_addr addr);
 
   virtual void mk_hw_elements(void);
+  virtual void make_cpu_hw(void);
   virtual void make_memories(void);
+
   virtual int clock_per_cycle(void) { return 1; }
   
   virtual struct dis_entry *dis_tbl(void);
@@ -146,14 +148,90 @@ public:
   virtual int inst_page2(t_mem code);
     
   virtual int exec_inst(void);
+  virtual int priority_of(uchar nuof_it) { return nuof_it; }
+  virtual int accept_it(class it_level *il);
+  virtual bool it_enabled(void) { return true; }
 };
 
-#define SET_C(v) ( (reg.CC)= ((reg.CC)&~C) | ((v)?C:0) )
-#define SET_Z(v) ( (reg.CC)= ((reg.CC)&~Z) | ((v==0)?Z:0) )
-#define SET_S(v) ( (reg.CC)= ((reg.CC)&~S) | ((v)?S:0) )
-#define SET_O(v) ( (reg.CC)= ((reg.CC)&~V) | ((v)?V:0) )
-#define SET_H(v) ( (reg.CC)= ((reg.CC)&~H) | ((v)?H:0) )
+#define SET_C(v) ( (reg.CC)= ((reg.CC)&~flagC) | ((v)?flagC:0) )
+#define SET_Z(v) ( (reg.CC)= ((reg.CC)&~flagZ) | ((v==0)?flagZ:0) )
+#define SET_S(v) ( (reg.CC)= ((reg.CC)&~flagS) | ((v)?flagS:0) )
+#define SET_O(v) ( (reg.CC)= ((reg.CC)&~flagV) | ((v)?flagV:0) )
+#define SET_H(v) ( (reg.CC)= ((reg.CC)&~flagH) | ((v)?flagH:0) )
 
+
+enum cpu_cfg
+  {
+   cpu_nmi_en	= 0,
+   cpu_nmi	= 1,
+   cpu_irq_en	= 2,
+   cpu_irq	= 3,
+   cpu_firq_en	= 4,
+   cpu_firq	= 5,
+   cpu_nr	= 6
+  };
+
+enum irq_nr {
+	     irq_nmi= 1,
+	     irq_firq= 2,
+	     irq_irq= 3
+};
+
+class cl_m6809_nmi_src: public cl_it_src
+{
+public:
+  u8_t Evalue;
+public:
+  cl_m6809_nmi_src(cl_uc  *Iuc,
+		   int    Inuof,
+		   class  cl_memory_cell *Iie_cell,
+		   t_mem  Iie_mask,
+		   class  cl_memory_cell *Isrc_cell,
+		   t_mem  Isrc_mask,
+		   t_addr Iaddr,
+		   const  char *Iname,
+		   int    apoll_priority,
+		   u8_t   aEvalue):
+    cl_it_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, false, true, Iname, apoll_priority)
+  {
+    Evalue= aEvalue;
+  }
+  virtual void clear(void) { src_cell->write(0); }
+};
+  
+class cl_m6809_it_src: public cl_m6809_nmi_src
+{
+public:
+  cl_m6809_it_src(cl_uc  *Iuc,
+		  int    Inuof,
+		  class  cl_memory_cell *Iie_cell,
+		  t_mem  Iie_mask,
+		  class  cl_memory_cell *Isrc_cell,
+		  t_mem  Isrc_mask,
+		  t_addr Iaddr,
+		  const  char *Iname,
+		  int    apoll_priority,
+		  u8_t   aEvalue):
+    cl_m6809_nmi_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, Iname, apoll_priority, aEvalue)
+  {}
+  virtual bool enabled(void);
+};
+
+class cl_m6809_cpu: public cl_hw
+{
+public:
+  class cl_m6809 *muc;
+public:
+  cl_m6809_cpu(class cl_uc *auc);
+  virtual int init(void);
+  virtual int cfg_size(void) { return cpu_nr; }
+  virtual const char *cfg_help(t_addr addr);
+  virtual void reset(void);
+  virtual t_mem conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val);
+  virtual void print_info(class cl_console_base *con);  
+};
+
+  
 #endif
 
 /* End of m6809.src/m6809.cc */

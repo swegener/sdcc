@@ -2209,7 +2209,7 @@ cl_uc::do_inst(int step)
       post_inst();
 
       if ((res == resGO) &&
-	  irq)
+	  1/*irq*/)
 	{
 	  //printf("DO INTERRUPT PC=%lx\n", PC);
 	  int r= do_interrupt();
@@ -2304,9 +2304,10 @@ cl_uc::do_interrupt(void)
   for (i= 0; i < it_sources->count; i++)
     {
       class cl_it_src *is= (class cl_it_src *)(it_sources->at(i));
-       if (is->is_active() &&
-	  is->enabled() &&
-	  is->pending())
+      bool A= is->is_active();
+      bool E= is->enabled();
+      bool P= is->pending();
+      if (A && E && P)
 	{
 	  int pr= priority_of(is->nuof);
 	  int ap;
@@ -2317,7 +2318,9 @@ cl_uc::do_interrupt(void)
 	  else
 	    ap= priority_main();
 	  if (ap >= pr)
-	    continue;
+	    {
+	      continue;
+	    }
 	  is->clear();
 	  sim->app->get_commander()->
 	    debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",

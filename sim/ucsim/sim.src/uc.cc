@@ -2196,18 +2196,31 @@ cl_uc::do_inst(int step)
   if (step < 0)
     step= 1;
   while (step-- &&
-         res == resGO)
+         res == resGO &&
+	 (
+	  (state == stGO) || (state == stIDLE)
+	  )
+	 )
     {
-      pre_inst();
-      PCsave = PC;
-      res= exec_inst();
+      if (state == stGO)
+	{
+	  pre_inst();
+	  PCsave = PC;
+	  res= exec_inst();
 
-      if (res == resINV_INST)
-	/* backup to start of instruction */
-	PC = PCsave;
+	  if (res == resINV_INST)
+	    /* backup to start of instruction */
+	    PC = PCsave;
+	  
+	  post_inst();
+	}
+      else
+	{
+	  inst_ticks= 1;
+	  post_inst();
+	  tick(1);
+	}
       
-      post_inst();
-
       if ((res == resGO) &&
 	  1/*irq*/)
 	{
@@ -2321,6 +2334,8 @@ cl_uc::do_interrupt(void)
 	    {
 	      continue;
 	    }
+	  if (state == stIDLE)
+	    state= stGO;
 	  is->clear();
 	  sim->app->get_commander()->
 	    debug("%g sec (%d clks): Accepting interrupt `%s' PC= 0x%06x\n",

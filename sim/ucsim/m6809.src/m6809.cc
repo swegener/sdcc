@@ -46,8 +46,6 @@ int
 cl_m6809::init(void)
 {
   cl_uc::init();
-  reg.DP= 0;
-  PC= 0;
 
   reg8_ptr[0]= &A;
   reg8_ptr[1]= &B;
@@ -79,13 +77,13 @@ cl_m6809::id_string(void)
 void
 cl_m6809::reset(void)
 {
+  cl_uc::reset();
+
   reg.DP= 0;
   en_nmi= false;
   cwai= false;
   reg.CC= flagI | flagF;
-  cl_uc::reset();
   PC= rom->get(0xfffe)*256 + rom->get(0xffff);
-  irq= true;
 }
   
 void
@@ -1074,6 +1072,7 @@ cl_m6809::inst_10(t_mem code)
     case 0x02: // NOP
       break;
     case 0x03: // SYNC
+      state= stIDLE;
       break;
     case 0x04: // --
       break;
@@ -1414,7 +1413,7 @@ cl_m6809::inst_30(t_mem code)
       reg.CC|= flagE;
       push_regs(true);
       cwai= true;
-      // TODO
+      state= stIDLE;
       break;
     case 0x0d: // MUL
       D= A * B;
@@ -1938,7 +1937,6 @@ cl_m6809::exec_inst(void)
   t_mem code;
   bool fe;
 
-  printf("irq=%d\n",irq);
   fe= fetch(&code);
   tick(1);
   if (fe)
@@ -1971,7 +1969,6 @@ cl_m6809::accept_it(class it_level *il)
   cwai= false;
   
   t_addr a= rom->get(is->addr) * 256 + rom->get(is->addr+1);
-  printf("accept ISR %x called\n",AU(a));
   PC= a;
 
   is->clear();

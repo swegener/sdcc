@@ -9594,13 +9594,14 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
         cheapMove (result->aop, 0, lowbyte, 0, true);
       return;
     }
-  if ((result->aop->type == AOP_HL || result->aop->type == AOP_IY || IS_RAB && result->aop->type == AOP_STK) &&
+  if ((result->aop->type == AOP_HL || result->aop->type == AOP_IY || IS_RAB && result->aop->type == AOP_STK) && // Being able to use cheap add hl, hl is worth it in most cases.
     (left->aop->type == AOP_HL || left->aop->type == AOP_IY || IS_RAB && left->aop->type == AOP_STK) &&
     !IS_GB && isPairDead (PAIR_HL, ic) &&
-    (shCount > 1 || !sameRegs (result->aop, left->aop))) // Being able to use cheap add hl, hl is worth it in most cases.
+    (shCount > 1 || !sameRegs (result->aop, left->aop)) ||
+    isPairDead (PAIR_HL, ic) && !IS_GB && getPairId (result->aop) == PAIR_DE && getPairId (left->aop) != PAIR_DE) // Shift in hl if we can cheaply move to de via ex later.
     {
       shiftaop = ASMOP_HL;
-      genMove (ASMOP_HL, left->aop, !bitVectBitValue (ic->rSurv, A_IDX), true, false);
+      genMove (ASMOP_HL, left->aop, !bitVectBitValue (ic->rSurv, A_IDX), true, isPairDead (PAIR_DE, ic));
     }
   else if (AOP_TYPE (result) != AOP_REG && AOP_TYPE (left) == AOP_REG && AOP_SIZE (left) >= 2 && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[0]->rIdx) && !bitVectBitValue (ic->rSurv, AOP (left)->aopu.aop_reg[1]->rIdx) ||
     getPairId (AOP (left)) == PAIR_HL && isPairDead (PAIR_HL, ic))

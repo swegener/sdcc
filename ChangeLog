@@ -1,5 +1,10 @@
 2020-10-08 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Improve 16-bit left shift.
+
+2020-10-08 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3126.c:
 	  Fix bug #3126.

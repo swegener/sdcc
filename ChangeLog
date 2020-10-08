@@ -1,4 +1,10 @@
-2020-10-05 Philipp Klaus Krause <pkk AT spth.de>
+2020-10-08 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c,
+	  support/regression/tests/bug-3126.c:
+	  Fix bug #3126.
+
+2020-10-07 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
 	  Improve register-to-stack copy.

@@ -10730,7 +10730,7 @@ genPointerGet (const iCode *ic)
             _push (PAIR_AF), pushed_a = TRUE;
           emit2 ("ld a, !*pair", getPairName (AOP (left)));
           regalloc_dry_run_cost += (getPairId (AOP (left)) == PAIR_IY ? 3 : 1);
-          cheapMove (AOP (result), 0, ASMOP_A, 0, true);
+          genMove(result->aop, ASMOP_A, true, isPairDead(PAIR_HL, ic), isPairDead(PAIR_DE, ic));
         }
 
       goto release;

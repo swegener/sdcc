@@ -581,7 +581,7 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
     IS_TRUE_SYMOP (right) && IN_REGSP (SPEC_OCLS (OP_SYMBOL (right)->etype))))
     return(false);
 
-  if (ic->op == '^' || ic->op == BITWISEAND || ic->op == '|' || ic->op == '~') // Codegen can handle it all.
+  if (ic->op == '^' || ic->op == BITWISEAND || ic->op == '|' || ic->op == '~' || ic->op == LEFT_OP) // Codegen can handle it all.
     return(true);
 
   if (ic->op == RIGHT_OP && getSize(operandType(result)) == 1 && IS_OP_LITERAL(right))
@@ -635,16 +635,6 @@ static bool Ainst_ok(const assignment &a, unsigned short int i, const G_t &G, co
 
   // Last byte of output may be in A.
   if((ic->op == GET_VALUE_AT_ADDRESS || ic->op == CAST && !operand_in_reg(right, REG_A, ia, i, G)) && IS_ITEMP(result) && operand_byte_in_reg(result, getSize(operandType(IC_RESULT(ic))) - 1, REG_A, a, i, G))
-    return(true);
-
-  if (ic->op == LEFT_OP && getSize(operandType(IC_RESULT(ic))) == 2 && IS_OP_LITERAL(right) && byteOfVal (OP_VALUE_CONST (right), 0) == 7)
-    {
-      if(!operand_in_reg(left, REG_A, ia, i, G) || dying_A)
-        return(true);
-    }
-
-  // Left shift of 1 byte can always handle a.
-  if (ic->op == LEFT_OP && getSize(operandType(IC_RESULT(ic))) == 1 && IS_OP_LITERAL(right))
     return(true);
 
   // inc / dec does not affect a.
@@ -1117,7 +1107,7 @@ static bool IYinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
 
   // Todo: Multiplication.
 
-  if(ic->op == LEFT_OP && result_in_IY && input_in_IY && IS_VALOP (IC_RIGHT (ic)) && operandLitValue (IC_RIGHT (ic)) < 8)
+  if(ic->op == LEFT_OP)
     return(true);
 
   if(ic->op == '-' && result_in_IY && input_in_IY && IS_VALOP (IC_RIGHT (ic)) && operandLitValue (IC_RIGHT (ic)) < 4)

@@ -4035,7 +4035,7 @@ _castBoolean (const operand *right)
 
 /* Shuffle src reg array into dst reg array. */
 static void
-regMove (const short *dst, const short *src, size_t n, bool preserve_a)
+regMove (const short *dst, const short *src, size_t n, bool preserve_a) // Todo: replace uses of this one by uses of genMove_o?
 {
   bool assigned[9] = { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE };
   int cached_byte = -1;
@@ -4077,7 +4077,7 @@ regMove (const short *dst, const short *src, size_t n, bool preserve_a)
 
   // We need to be able to handle any assignment here, ensuring not to overwrite any parts of the source that we still need.
   while (size)
-    {
+    {emit2(";size %d", (int)size);
       // Find lowest byte that can be assigned and needs to be assigned.
       for (i = 0; i < n; i++)
         {
@@ -6282,19 +6282,19 @@ genPlus (iCode * ic)
                           src[3] = AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx;
                           src[2] = AOP (IC_LEFT (ic))->aopu.aop_reg[1]->rIdx;
                         }
-                      regMove (dst, src, size, FALSE);
+                      regMove (dst, src, 4, FALSE);
                     }
                   else if (AOP_TYPE (IC_RIGHT (ic)) == AOP_REG &&
                            (AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == E_IDX
                             || AOP (IC_RIGHT (ic))->aopu.aop_reg[0]->rIdx == D_IDX || AOP_SIZE (IC_RIGHT (ic)) == 2
                             && (AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx == E_IDX
                                 || AOP (IC_RIGHT (ic))->aopu.aop_reg[1]->rIdx == D_IDX)))
-                    {
+                    {emit2(";b");
                       fetchPair (PAIR_DE, AOP (IC_RIGHT (ic)));
                       fetchPair (PAIR_HL, AOP (IC_LEFT (ic)));
                     }
                   else
-                    {
+                    {emit2(";c");
                       fetchPair (PAIR_DE, AOP (IC_LEFT (ic)));
                       fetchPair (PAIR_HL, AOP (IC_RIGHT (ic)));
                     }
@@ -9609,7 +9609,7 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
   else if (isPair (AOP (result)))
     fetchPairLong (getPairId (AOP (result)), AOP(left), ic, 0);
   else
-    genMove_o (result->aop, 0, left->aop, 0, 2, true, isPairDead (PAIR_HL, ic), false);
+    genMove_o (result->aop, 0, left->aop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
   if (shCount == 0)
     ;
@@ -9665,7 +9665,10 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
           while (shCount--)
             {
               for (offset = 0; offset < size; offset++)
-                emit3_o (offset ? A_RL : A_SLA, shiftaop, offset, 0, 0);
+                if (aopInReg (shiftaop, offset, A_IDX))
+                  emit3 (offset ? A_ADC : A_ADD, ASMOP_A, ASMOP_A);
+                else
+                  emit3_o (offset ? A_RL : A_SLA, shiftaop, offset, 0, 0);
             }
         }
       else
@@ -9680,6 +9683,9 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
                 }
               regalloc_dry_run_cost += 2;
             }
+
+          if (!use_b && bitVectBitValue (ic->rSurv, A_IDX))
+            _push (PAIR_AF);
 
           while (size--)
             {
@@ -9701,6 +9707,8 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
                 }
                 regalloc_dry_run_cost += use_b ? 2 : 3;
             }
+          if (!use_b && bitVectBitValue (ic->rSurv, A_IDX))
+            _pop (PAIR_AF);
         }
     }
 
@@ -9709,7 +9717,7 @@ shiftL2Left2Result (operand *left, operand *result, int shCount, const iCode *ic
       if (isPair (AOP (result)))
         fetchPairLong (getPairId (AOP (result)), shiftaop, ic, 0);
       else
-        genMove_o (result->aop, 0, shiftaop, 0, 2, true, isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+        genMove_o (result->aop, 0, shiftaop, 0, 2, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
     }
 }
 
@@ -9927,7 +9935,6 @@ genLeftShift (const iCode *ic)
   int shiftcount = 0;
   int byteshift = 0;
   bool started;
-  bool save_a;
 
   right = IC_RIGHT (ic);
   left = IC_LEFT (ic);
@@ -9960,13 +9967,28 @@ genLeftShift (const iCode *ic)
   else if (!IS_GB && !bitVectBitValue (ic->rSurv, B_IDX) && (sameRegs (AOP (left), AOP (result)) || AOP_TYPE (left) != AOP_REG || shift_by_lit) &&
     !aopInReg (AOP (result), 0, B_IDX) && !aopInReg (AOP (result), 1, B_IDX) && !aopInReg (AOP (result), 2, B_IDX) && !aopInReg (AOP (result), 3, B_IDX))
     countreg = B_IDX;
-  else
+  else if (result->aop->regs[A_IDX] < 0)
     countreg = A_IDX;
+  else if (!bitVectBitValue (ic->rSurv, B_IDX) && result->aop->regs[B_IDX] < 0 && left->aop->regs[B_IDX] < 0)
+    countreg = B_IDX;
+  else if (!bitVectBitValue (ic->rSurv, C_IDX) && result->aop->regs[C_IDX] < 0 && left->aop->regs[C_IDX] < 0)
+    countreg = C_IDX;
+  else
+    {
+      wassert (regalloc_dry_run);
+      regalloc_dry_run_cost += 100;
+      countreg = A_IDX;
+    }
 
+  bool save_a_outer = (bitVectBitValue (ic->rSurv, A_IDX) && countreg == A_IDX && !(shift_by_lit && shiftcount == 1));
+  
+  if(save_a_outer)
+      _push (PAIR_AF);
+    
   if (!shift_by_lit)
     cheapMove (asmopregs[countreg], 0, right->aop, 0, true);
 
-  save_a = (countreg == A_IDX && !shift_by_lit) &&
+  bool save_a_inner = (countreg == A_IDX && !shift_by_lit) &&
     !(AOP_TYPE (left) == AOP_REG && AOP_TYPE (result) != AOP_REG ||
     !IS_GB && (AOP_TYPE (left) == AOP_STK && canAssignToPtr3 (result->aop) || AOP_TYPE (result) == AOP_STK && canAssignToPtr3 (left->aop)));
 
@@ -9974,7 +9996,7 @@ genLeftShift (const iCode *ic)
      same */
   if (!sameRegs (AOP (left), AOP (result)))
     {
-      if (save_a)
+      if (save_a_inner)
         _push (PAIR_AF);
 
       if (shift_by_lit)
@@ -9985,11 +10007,11 @@ genLeftShift (const iCode *ic)
       size = AOP_SIZE (result) - byteshift;
       int lsize = AOP_SIZE (left) - byteshift;
 
-      genMove_o (result->aop, byteshift, left->aop, 0, size <= lsize ? size : lsize, save_a || countreg != A_IDX, false, false);
+      genMove_o (result->aop, byteshift, left->aop, 0, size <= lsize ? size : lsize, (save_a_inner || countreg != A_IDX) && (!bitVectBitValue (ic->rSurv, A_IDX) || save_a_outer), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
-      genMove_o (result->aop, 0, ASMOP_ZERO, 0, byteshift, save_a || countreg != A_IDX, false, false);
+      genMove_o (result->aop, 0, ASMOP_ZERO, 0, byteshift, (save_a_inner || countreg != A_IDX) && (!bitVectBitValue (ic->rSurv, A_IDX) || save_a_outer), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
 
-      if (save_a)
+      if (save_a_inner)
         _pop (PAIR_AF);
     }
 
@@ -10026,22 +10048,35 @@ genLeftShift (const iCode *ic)
   while (size)
     {
       if (size >= 2 && offset + 1 >= byteshift &&
-         AOP_TYPE (result) == AOP_REG &&
-        (getPartPairId (AOP (result), offset) == PAIR_HL ||
-         IS_RAB && getPartPairId (AOP (result), offset) == PAIR_DE))
+        result->aop->type == AOP_REG &&
+        (getPartPairId (result->aop, offset) == PAIR_HL ||
+        !started && getPartPairId (result->aop, offset) == PAIR_IY ||
+        (IS_RAB || optimize.codeSize && !started) && getPartPairId (result->aop, offset) == PAIR_DE))
         {
-          if (AOP (result)->aopu.aop_reg[offset]->rIdx == L_IDX)
-          {
-            emit2 (started ? "adc hl, hl" : "add hl, hl");
-            regalloc_dry_run_cost += 1 + started;
-          }
+          if (result->aop->aopu.aop_reg[offset]->rIdx == L_IDX)
+            {
+              emit2 (started ? "adc hl, hl" : "add hl, hl");
+              regalloc_dry_run_cost += 1 + started;
+            }
+          else if (result->aop->aopu.aop_reg[offset]->rIdx == IYL_IDX)
+            {
+              emit2 ("add iy, iy");
+              regalloc_dry_run_cost += 2;
+            }
+          else if (IS_RAB)
+            {
+              if (!started)
+                emit3 (A_CP, ASMOP_A, ASMOP_A);
+              emit2 ("rl de");
+              regalloc_dry_run_cost++;
+            }
           else
-          {
-            if (!started)
-              emit3 (A_CP, ASMOP_A, ASMOP_A);
-            emit2 ("rl de");
-            regalloc_dry_run_cost++;
-          }
+            {
+              emit2 ("ex de, hl");
+              emit2 (started ? "adc hl, hl" : "add hl, hl");
+              emit2 ("ex de, hl");
+              regalloc_dry_run_cost += 3 + started;
+            }
 
           started = true;
           size -= 2, offset += 2;
@@ -10050,10 +10085,10 @@ genLeftShift (const iCode *ic)
         {
           if (offset >= byteshift)
             {
-              if (aopInReg (AOP (result) , offset, A_IDX))
+              if (aopInReg (result->aop, offset, A_IDX))
                 emit3 (started ? A_ADC : A_ADD, ASMOP_A, ASMOP_A);
               else
-                emit3_o (started ? A_RL : A_SLA, AOP (result), offset, 0, 0);
+                emit3_o (started ? A_RL : A_SLA, result->aop, offset, 0, 0);
               started = true;
             }
           size--, offset++;
@@ -10072,7 +10107,7 @@ genLeftShift (const iCode *ic)
         }
       else
         {
-          emit2 ("dec %s", countreg == A_IDX ? "a" : regsZ80[countreg].name);
+          emit2 ("dec %s", regsZ80[countreg].name);
           if (!regalloc_dry_run)
             emit2 ("jr NZ,!tlabel", labelKey2num (tlbl->key));
           regalloc_dry_run_cost += 3;
@@ -10082,6 +10117,9 @@ genLeftShift (const iCode *ic)
 end:
   if (!shift_by_lit && requiresHL (AOP (result))) // Shift by 0 skips over hl adjustments.
     spillPair (PAIR_HL);
+    
+  if (save_a_outer)
+    _pop (PAIR_AF);
 
   freeAsmop (left, NULL);
   freeAsmop (right, NULL);

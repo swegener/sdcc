@@ -1,7 +1,8 @@
 2020-10-08 Philipp Klaus Krause <pkk AT spth.de>
 
-	* src/z80/gen.c:
-	  Improve 16-bit left shift.
+	* src/z80/gen.c,
+	  src/z80/ralloc2.cc:
+	  Improve left shift.
 
 2020-10-08 Philipp Klaus Krause <pkk AT spth.de>
 

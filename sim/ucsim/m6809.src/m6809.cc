@@ -357,7 +357,10 @@ cl_m6809::disass(t_addr addr, const char *sep)
   i= 0;
   while ((code & tt[i].mask) != tt[i].code &&
 	 tt[i].mnemonic)
-    i++;
+    {
+      //printf("code=%02x mask=%02x MSKED=%02x ? tt[code]=%02x\n",code,tt[i].mask,code&tt[i].mask,tt[i].code);
+      i++;
+    }
   if (tt[i].mnemonic == NULL)
     {
       return strdup("-- UNKNOWN/INVALID");
@@ -766,7 +769,7 @@ cl_m6809::pull_regs(bool do_cc)
 {
   u8_t l,h;
   if(do_cc)
-    reg.CC= rom->read(reg.S++);
+    reg.CC= rom->read(reg.S++), vc.rd++;
   if (reg.CC & flagE)
     {
       A= rom->read(reg.S++);
@@ -781,9 +784,11 @@ cl_m6809::pull_regs(bool do_cc)
       h= rom->read(reg.S++);
       l= rom->read(reg.S++);
       reg.U= h*256 + l;
+      vc.rd+= 9;
     }
   h= rom->read(reg.S++);
   l= rom->read(reg.S++);
+  vc.rd+= 2;
   PC= h*256 + l;
 }
 
@@ -897,7 +902,8 @@ int
 cl_m6809::inst_st8(t_mem code, u8_t src, t_addr ea)
 {
   rom->write(ea, src);
-
+  vc.wr++;
+  
   SET_O(0);
   SET_Z(src);
   SET_S(src & 0x80);
@@ -910,6 +916,7 @@ cl_m6809::inst_st16(t_mem code, u16_t src, t_addr ea)
 {
   rom->write(ea  , (src)>>8);
   rom->write(ea+1, (src)&0xff);
+  vc.wr+= 2;
   
   SET_O(0);
   SET_Z(src);
@@ -943,6 +950,7 @@ cl_m6809::inst_alu(t_mem code)
     case 0x10: // direct
       ea= reg.DP*256 + fetch();
       op8= rom->read(ea);
+      vc.rd++;
       break;
     case 0x20: // index
       {
@@ -951,11 +959,13 @@ cl_m6809::inst_alu(t_mem code)
 	if ((r= index2ea(idx, &ea)) != resGO)
 	  return r;
 	op8= rom->read(ea);
+	vc.rd++;
 	break;
       }
     case 0x30: // extend
       ea= fetch()*256 + fetch();
       op8= rom->read(ea);
+      vc.rd++;
       break;
     default: op8= 0; break;
     }
@@ -978,7 +988,10 @@ cl_m6809::inst_alu(t_mem code)
 	if ((code & 0x30) == 0)
 	  op16= op8*256 + fetch();
 	else
-	  op16= op8*256 + rom->read(ea+1);
+	  {
+	    op16= op8*256 + rom->read(ea+1);
+	    vc.rd++;
+	  }
 	if ((code & 0x40) == 0)
 	  op16= ~op16, c= 1;
 	return inst_add16(code, &D, op16, c, true);
@@ -1012,7 +1025,10 @@ cl_m6809::inst_alu(t_mem code)
       if ((code & 0x30) == 0)
 	op16= op8*256 + fetch();
       else
-	op16= op8*256 + rom->read(ea+1);
+	{
+	  op16= op8*256 + rom->read(ea+1);
+	  vc.rd++;
+	}
       if ((code & 0x40) == 0)
 	return inst_add16(code, &(reg.X), ~op16, 1, false);
       else
@@ -1027,10 +1043,15 @@ cl_m6809::inst_alu(t_mem code)
 	      ea= (u16_t)((i16_t)PC + (i16_t)i8);
 	      rom->write(--reg.S, PC&0xff);
 	      rom->write(--reg.S, (PC>>8)&0xff);
+	      vc.wr+= 2;
 	    }
-	  // else JSR
-	  rom->write(--reg.S, PC & 0xff);
-	  rom->write(--reg.S, (PC>>8)&0xff);
+	  else
+	    {
+	      //JSR
+	      rom->write(--reg.S, PC & 0xff);
+	      rom->write(--reg.S, (PC>>8)&0xff);
+	      vc.wr+= 2;
+	    }
 	  PC= ea;
 	}
       else
@@ -1040,7 +1061,10 @@ cl_m6809::inst_alu(t_mem code)
       if ((code & 0x30) == 0)
 	op16= op8*256 + fetch();
       else
-	op16= op8*256 + rom->read(ea+1);
+	{
+	  op16= op8*256 + rom->read(ea+1);
+	  vc.rd++;
+	}
       if ((code & 0x40) == 0)
 	return inst_ld16(code, &reg.X, op16);
       else
@@ -1091,6 +1115,7 @@ cl_m6809::inst_10(t_mem code)
 	i16_t i= u;
 	rom->write(--reg.S, PC & 0xff);
 	rom->write(--reg.S, (PC>>8)&0xff);
+	vc.wr+= 2;
 	PC= PC + i;
 	break;
       }
@@ -1164,7 +1189,7 @@ cl_m6809::inst_10(t_mem code)
 	u8_t rd= op8&0xf;
 	if (((rd^rs)&8)!=0)
 	  return resINV_INST;
-	if (rs>=8)
+	if (rs<8)
 	  {
 	    u16_t *RS= reg16_ptr[rs&7];
 	    u16_t *RD= reg16_ptr[rd&7];
@@ -1298,107 +1323,124 @@ cl_m6809::inst_30(t_mem code)
       op8= fetch();
       if (op8 & 0x80)
 	rom->write(--reg.S, PC&0xff),
-	  rom->write(--reg.S, PC>>8);
+	  rom->write(--reg.S, PC>>8),
+	  vc.wr+= 2;
       if (op8 & 0x40)
 	rom->write(--reg.S, reg.U&0xff),
-	  rom->write(--reg.S, reg.U>>8);
+	  rom->write(--reg.S, reg.U>>8),
+	  vc.wr+= 2;
       if (op8 & 0x20)
 	rom->write(--reg.S, reg.Y&0xff),
-	  rom->write(--reg.S, reg.Y>>8);
+	  rom->write(--reg.S, reg.Y>>8),
+	  vc.wr+= 2;
       if (op8 & 0x10)
 	rom->write(--reg.S, reg.X&0xff),
-	  rom->write(--reg.S, reg.X>>8);
+	  rom->write(--reg.S, reg.X>>8),
+	  vc.wr+= 2;
       if (op8 & 0x08)
-	rom->write(--reg.S, reg.DP);
+	rom->write(--reg.S, reg.DP), vc.wr++;
       if (op8 & 0x04)
-	rom->write(--reg.S, B);
+	rom->write(--reg.S, B), vc.wr++;
       if (op8 & 0x02)
-	rom->write(--reg.S, A);
+	rom->write(--reg.S, A), vc.wr++;
       if (op8 & 0x01)
-	rom->write(--reg.S, reg.CC);
+	rom->write(--reg.S, reg.CC), vc.wr++;
       break;
     case 0x05: // PULS
       op8= fetch();
       if(op8 & 0x01)
-	reg.CC= rom->read(reg.S++);
+	reg.CC= rom->read(reg.S++), vc.rd++;
       if (op8 & 0x02)
-	A= rom->read(reg.S++);
+	A= rom->read(reg.S++), vc.rd++;
       if (op8 & 0x04)
-	B= rom->read(reg.S++);
+	B= rom->read(reg.S++), vc.rd++;
       if (op8 & 0x08)
-	reg.DP= rom->read(reg.S++);
+	reg.DP= rom->read(reg.S++), vc.rd++;
       if (op8 & 0x10)
 	h= rom->read(reg.S++),
 	  l= rom->read(reg.S++),
-	  reg.X= h*256 + l;
+	  reg.X= h*256 + l,
+	  vc.rd+= 2;
       if (op8 & 0x20)
 	h= rom->read(reg.S++),
 	  l= rom->read(reg.S++),
-	  reg.Y= h*256 + l;
+	  reg.Y= h*256 + l,
+	  vc.rd+= 2;
       if (op8 & 0x40)
 	h= rom->read(reg.S++),
 	  l= rom->read(reg.S++),
-	  reg.U= h*256 + l;
+	  reg.U= h*256 + l,
+	  vc.rd+= 2;
       if (op8 & 0x80)
 	h= rom->read(reg.S++),
 	  l= rom->read(reg.S++),
-	  PC= h*256 + l;
+	  PC= h*256 + l,
+	  vc.rd+= 2;
       break;
     case 0x06: // PSHU
       op8= fetch();
       if (op8 & 0x80)
 	rom->write(--reg.U, PC&0xff),
-	  rom->write(--reg.U, PC>>8);
+	  rom->write(--reg.U, PC>>8),
+	  vc.wr+= 2;
       if (op8 & 0x40)
 	rom->write(--reg.U, reg.S&0xff),
-	  rom->write(--reg.U, reg.S>>8);
+	  rom->write(--reg.U, reg.S>>8),
+	  vc.wr+= 2;
       if (op8 & 0x20)
 	rom->write(--reg.U, reg.Y&0xff),
-	  rom->write(--reg.U, reg.Y>>8);
+	  rom->write(--reg.U, reg.Y>>8),
+	  vc.wr+= 2;
       if (op8 & 0x10)
 	rom->write(--reg.U, reg.X&0xff),
-	  rom->write(--reg.U, reg.X>>8);
+	  rom->write(--reg.U, reg.X>>8),
+	  vc.wr+= 2;
       if (op8 & 0x08)
-	rom->write(--reg.U, reg.DP);
+	rom->write(--reg.U, reg.DP), vc.wr++;
       if (op8 & 0x04)
-	rom->write(--reg.U, B);
+	rom->write(--reg.U, B), vc.wr++;
       if (op8 & 0x02)
-	rom->write(--reg.U, A);
+	rom->write(--reg.U, A), vc.wr++;
       if (op8 & 0x01)
-	rom->write(--reg.U, reg.CC);
+	rom->write(--reg.U, reg.CC), vc.wr++;
       break;
     case 0x07: // PULU
       op8= fetch();
       if(op8 & 0x01)
-	reg.CC= rom->read(reg.U++);
+	reg.CC= rom->read(reg.U++), vc.rd++;
       if (op8 & 0x02)
-	A= rom->read(reg.U++);
+	A= rom->read(reg.U++), vc.rd++;
       if (op8 & 0x04)
-	B= rom->read(reg.U++);
+	B= rom->read(reg.U++), vc.rd++;
       if (op8 & 0x08)
-	reg.DP= rom->read(reg.U++);
+	reg.DP= rom->read(reg.U++), vc.rd++;
       if (op8 & 0x10)
 	h= rom->read(reg.U++),
 	  l= rom->read(reg.U++),
-	  reg.X= h*256 + l;
+	  reg.X= h*256 + l,
+	  vc.rd+= 2;
       if (op8 & 0x20)
 	h= rom->read(reg.U++),
 	  l= rom->read(reg.U++),
-	  reg.Y= h*256 + l;
+	  reg.Y= h*256 + l,
+	  vc.rd+= 2;
       if (op8 & 0x40)
 	h= rom->read(reg.U++),
 	  l= rom->read(reg.U++),
-	  reg.S= h*256 + l;
+	  reg.S= h*256 + l,
+	  vc.rd+= 2;
       if (op8 & 0x80)
 	h= rom->read(reg.U++),
 	  l= rom->read(reg.U++),
-	  PC= h*256 + l;
+	  PC= h*256 + l,
+	  vc.rd+= 2;
       break;
     case 0x08: // --
       break;
     case 0x09: // RTS
       ea= rom->read(reg.S++) * 256;
       ea+= rom->read(reg.S++);
+      vc.rd+= 2;
       PC= ea;
       break;
     case 0x0a: // ABX
@@ -1443,10 +1485,12 @@ cl_m6809::inst_neg(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
       return inst_add8(code, acc, 0, 1, true);
     }
   op8= rom->read(ea);
+  vc.rd++;
   u8_t t= A;
   A= ~op8;
   inst_add8(code, &A, 0, 1, true);
   rom->write(ea, A);
+  vc.wr++;
   A= t;
   return resGO;
 }
@@ -1459,8 +1503,10 @@ cl_m6809::inst_com(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
       op8= *acc= ~(*acc);
     }
   op8= ~(rom->read(ea));
+  vc.rd++;
   rom->write(ea, op8);
-
+  vc.wr++;
+  
   SET_C(1);
   SET_O(0);
   SET_Z(op8);
@@ -1478,10 +1524,12 @@ cl_m6809::inst_lsr(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
       op8= *acc= (*acc) >> 1;
     }
   op8= rom->read(ea);
+  vc.rd++;
   SET_C(op8 & 1);
   op8>>= 1;
   rom->write(ea, op8);
-
+  vc.wr++;
+  
   SET_Z(op8);
   SET_S(op8 & 0x80);
   
@@ -1492,8 +1540,14 @@ int
 cl_m6809::inst_ror(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 {
   u8_t oldc, newc;
-  
-  op8= (acc)?(*acc):(rom->read(ea));
+
+  if (acc)
+    op8= *acc;
+  else
+    {
+      op8= rom->read(ea);
+      vc.rd++;
+    }
   oldc= reg.CC & flagC;
   newc= op8 & 1;
   
@@ -1504,7 +1558,7 @@ cl_m6809::inst_ror(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
   if (acc)
     *acc= op8;
   else
-    rom->write(ea, op8);
+    rom->write(ea, op8), vc.wr++;
   
   SET_C(newc);
   SET_Z(op8);
@@ -1517,8 +1571,14 @@ int
 cl_m6809::inst_asr(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 {
   u8_t old8, newc;
-  
-  op8= (acc)?(*acc):(rom->read(ea));
+
+  if (acc)
+    op8= *acc;
+  else
+    {
+      op8= rom->read(ea);
+      vc.rd++;
+    }
   old8= op8 & 0x80;
   newc= op8 & 1;
   
@@ -1529,7 +1589,7 @@ cl_m6809::inst_asr(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
   if (acc)
     *acc= op8;
   else
-    rom->write(ea, op8);
+    rom->write(ea, op8), vc.wr++;
   
   SET_C(newc);
   SET_Z(op8);
@@ -1543,7 +1603,7 @@ cl_m6809::inst_asl(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 {
   u8_t newc;
   
-  op8= (acc)?(*acc):(rom->read(ea));
+  op8= (acc)?(*acc):(vc.rd++, rom->read(ea));
   newc= op8 & 0x80;
   
   op8<<= 1;
@@ -1551,7 +1611,7 @@ cl_m6809::inst_asl(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
   if (acc)
     *acc= op8;
   else
-    rom->write(ea, op8);
+    rom->write(ea, op8), vc.wr++;
   
   SET_C(newc);
   SET_Z(op8);
@@ -1565,7 +1625,7 @@ cl_m6809::inst_rol(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 {
   u8_t oldc, newc;
   
-  op8= (acc)?(*acc):(rom->read(ea));
+  op8= (acc)?(*acc):(vc.rd++, rom->read(ea));
   oldc= reg.CC & flagC;
   newc= op8 & 0x80;
 
@@ -1578,7 +1638,7 @@ cl_m6809::inst_rol(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
   if (acc)
     *acc= op8;
   else
-    rom->write(ea, op8);
+    rom->write(ea, op8), vc.wr++;
   
   SET_C(newc);
   SET_Z(op8);
@@ -1590,7 +1650,7 @@ cl_m6809::inst_rol(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 int
 cl_m6809::inst_dec(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 {
-  op8= (acc)?(*acc):(rom->read(ea));
+  op8= (acc)?(*acc):(vc.rd++, rom->read(ea));
   SET_O(op8==0x80);
 
   op8--;
@@ -1598,7 +1658,7 @@ cl_m6809::inst_dec(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
   if (acc)
     *acc= op8;
   else
-    rom->write(ea, op8);
+    rom->write(ea, op8), vc.wr++;
   
   SET_Z(op8);
   SET_S(op8 & 0x80);
@@ -1609,7 +1669,7 @@ cl_m6809::inst_dec(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 int
 cl_m6809::inst_inc(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 {
-  op8= (acc)?(*acc):(rom->read(ea));
+  op8= (acc)?(*acc):(vc.rd++, rom->read(ea));
   SET_O(op8==0x7f);
 
   op8++;
@@ -1617,7 +1677,7 @@ cl_m6809::inst_inc(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
   if (acc)
     *acc= op8;
   else
-    rom->write(ea, op8);
+    rom->write(ea, op8), vc.wr++;
   
   SET_Z(op8);
   SET_S(op8 & 0x80);
@@ -1628,7 +1688,7 @@ cl_m6809::inst_inc(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 int
 cl_m6809::inst_tst(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
 {
-  op8= (acc)?(*acc):(rom->read(ea));
+  op8= (acc)?(*acc):(vc.rd++, rom->read(ea));
   SET_O(0);
   
   SET_Z(op8);
@@ -1644,12 +1704,13 @@ cl_m6809::inst_clr(t_mem code, u8_t *acc, t_addr ea, u8_t op8)
     {
       volatile u8_t u= rom->read(ea);
       op8= u;
+      vc.rd++;
     }
   
   if (acc)
     *acc= 0;
   else
-    rom->write(ea, 0);
+    rom->write(ea, 0), vc.wr++;
   
   SET_O(0);
   SET_Z(1);
@@ -1695,6 +1756,7 @@ cl_m6809::inst_low(t_mem code)
     case 0x00: // direct
       ea= reg.DP*256 + fetch();
       op8= rom->read(ea);
+      vc.rd++;
       break;
     case 0x60: // index
       {
@@ -1703,11 +1765,13 @@ cl_m6809::inst_low(t_mem code)
 	if ((r= index2ea(idx, &ea)) != resGO)
 	  return r;
 	op8= rom->read(ea);
+	vc.rd++;
 	break;
       }
     case 0x70: // extend
       ea= fetch()*256 + fetch();
       op8= rom->read(ea);
+      vc.rd++;
       break;
     }
 
@@ -1786,6 +1850,7 @@ cl_m6809::inst_page1(t_mem code)
       reg.CC|= flagE;
       push_regs(true);
       PC= rom->read(0xfff4)*256 + rom->read(0xfff5);
+      vc.rd+= 2;
     }
   if ((code & 0x80) == 0)
     return resINV_INST;
@@ -1818,6 +1883,7 @@ cl_m6809::inst_page1(t_mem code)
       if ((ch==13)&&(cl!=14)&&(cl!=15)) return resINV_INST;
       ea= reg.DP*256 + fetch();
       op8= rom->read(ea);
+      vc.rd++;
       break;
     case 0x20: // index
       {
@@ -1828,6 +1894,7 @@ cl_m6809::inst_page1(t_mem code)
 	if ((r= index2ea(idx, &ea)) != resGO)
 	  return r;
 	op8= rom->read(ea);
+	vc.rd++;
 	break;
       }
     case 0x30: // extend
@@ -1835,6 +1902,7 @@ cl_m6809::inst_page1(t_mem code)
       if ((ch==15)&&(cl!=14)&&(cl!=15)) return resINV_INST;
       ea= fetch()*256 + fetch();
       op8= rom->read(ea);
+      vc.rd++;
       break;
     default: op8= 0; break;
     }
@@ -1842,7 +1910,10 @@ cl_m6809::inst_page1(t_mem code)
   if ((code & 0x30) == 0)
     op16= op8*256 + fetch();
   else
-    op16= op8*256 + rom->read(ea+1);
+    {
+      op16= op8*256 + rom->read(ea+1);
+      vc.rd++;
+    }
   
   switch (cl)
     {
@@ -1883,6 +1954,7 @@ cl_m6809::inst_page2(t_mem code)
       reg.CC|= flagE;
       push_regs(true);
       PC= rom->read(0xfff2)*256 + rom->read(0xfff3);
+      vc.rd+= 2;
     }
   if ((code!=0x83)&&(code!=0x8c)&&
       (code!=0x93)&&(code!=0x9c)&&
@@ -1895,6 +1967,7 @@ cl_m6809::inst_page2(t_mem code)
     case 0x00: // direct
       ea= reg.DP*256 + fetch();
       op8= rom->read(ea);
+      vc.rd++;
       break;
     case 0x60: // index
       {
@@ -1903,19 +1976,24 @@ cl_m6809::inst_page2(t_mem code)
 	if ((r= index2ea(idx, &ea)) != resGO)
 	  return r;
 	op8= rom->read(ea);
+	vc.rd++;
 	break;
       }
     case 0x70: // extend
       ea= fetch()*256 + fetch();
       op8= rom->read(ea);
+      vc.rd++;
       break;
     }
 
   if ((code & 0x30) == 0)
     op16= op8*256 + fetch();
   else
-    op16= op8*256 + rom->read(ea+1);
-
+    {
+      op16= op8*256 + rom->read(ea+1);
+      vc.rd++;
+    }
+  
   if ((code & 0x0f) == 0x03)
     {
       // CMPU
@@ -1968,7 +2046,8 @@ cl_m6809::accept_it(class it_level *il)
     push_regs(true);
   cwai= false;
   
-  t_addr a= rom->get(is->addr) * 256 + rom->get(is->addr+1);
+  t_addr a= rom->read(is->addr) * 256 + rom->read(is->addr+1);
+  vc.rd+= 2;
   PC= a;
 
   is->clear();

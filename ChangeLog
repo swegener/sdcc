@@ -1,6 +1,11 @@
 2020-10-09 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c:
+	  Improve Rabbit negation.
+
+2020-10-09 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/z80/gen.c:
 	  Improve register shuffling.
 
 2020-10-08 Philipp Klaus Krause <pkk AT spth.de>

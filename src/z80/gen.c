@@ -4188,6 +4188,26 @@ genNot (const iCode * ic)
       cheapMove (AOP (result), 0, ASMOP_A, 0, true);
       goto release;
     }
+  else if (IS_RAB && left->aop->size == 2 && aopInReg (left->aop, 0, HL_IDX) && isPairDead (PAIR_HL, ic) && aopInReg (result->aop, 0, L_IDX))
+    {
+      emit2 ("bool hl");
+      emit2 ("rr hl");
+      emit2 ("ccf");
+      emit2 ("adc hl, hl");
+      cost (5, 10);
+      goto release;
+    }
+  else if (IS_RAB && left->aop->size == 2 && aopInReg (left->aop, 0, HL_IDX) && isPairDead (PAIR_HL, ic))
+    {
+      emit2 ("bool hl");
+      emit2 ("xor a, a");
+      emit2 ("rr hl");
+      emit2 ("ccf");
+      emit2 ("rla");
+      cost (5, 10);
+      cheapMove (result->aop, 0, ASMOP_A, 0, true);
+      goto release;
+    }
 
   _toBoolean (left, FALSE);
 

@@ -6869,8 +6869,8 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
   /* if literal right, add a, #-lit, else normal subb */
   while (size)
     {
-      if (!IS_GB &&
-        aopInReg (result, offset, HL_IDX) &&
+      if (!IS_GB && isPairDead (PAIR_HL, ic) && !(IS_RAB && offset && aopIsLitVal (left, offset, 2, 0x0000) /* Ugly workaround for fetchPairLong using bool hl, which destroys carry */) &&
+        (aopInReg (result, offset, HL_IDX) || aopInReg (result, offset, DE_IDX) && (result->regs[L_IDX] < 0 || result->regs[L_IDX] > offset) && (result->regs[H_IDX] < 0 || result->regs[H_IDX] > offset)) &&
         (aopInReg (left, offset, HL_IDX) || left->type == AOP_LIT || left->type == AOP_IY) &&
         (aopInReg (right, offset, BC_IDX) || aopInReg (right, offset, DE_IDX) || ((right->type == AOP_IY || right->type == AOP_HL) && getFreePairId (ic) != PAIR_INVALID)))
         {
@@ -6890,6 +6890,11 @@ genSub (const iCode *ic, asmop *result, asmop *left, asmop *right)
             emit3 (A_CP, ASMOP_A, ASMOP_A);
           emit2 ("sbc hl, %s", _pairs[rightpair].name);
           regalloc_dry_run_cost += 2;
+          if (aopInReg (result, offset, DE_IDX))
+            {
+              emit2 ("ex de, hl");
+              regalloc_dry_run_cost++;
+            }
           offset += 2;
           size -= 2;
           _G.preserveCarry = !!size;

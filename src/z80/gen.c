@@ -3298,6 +3298,10 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   wassertl_bt (n <= 8, "Invalid size for genCopy().");
   wassertl_bt (aopRS (source), "Invalid source type.");
   wassertl_bt (aopRS (result), "Invalid result type.");
+  
+  a_dead |= (result->regs[A_IDX] >= 0);
+  hl_dead |= (result->regs[L_IDX] >= 0 && result->regs[H_IDX] >= 0);
+  de_dead |= (result->regs[E_IDX] >= 0 && result->regs[D_IDX] >= 0);
 
   size = n;
   regsize = 0;
@@ -3456,6 +3460,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
   // Now do the register shuffling.
 
   // Try to use:
+  // Rabbits: ld hl, iy; ld iy, hl
   // TLCS-90 ld rr, rr
   // eZ80 lea rr, iy.
   // All: push rr / pop iy
@@ -3472,7 +3477,12 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
             goto skip_byte_push_iy; // We can't write this one without overwriting the source.
         }
 
-      if (IS_TLCS90 && getPairId_o (result, roffset + i) != PAIR_INVALID && getPairId_o (source, soffset + i) != PAIR_INVALID)
+      if (IS_RAB && (getPairId_o (result, roffset + i) == PAIR_HL || getPairId_o (result, roffset + i) == PAIR_IY) && (getPairId_o (source, soffset + i) == PAIR_HL || getPairId_o (source, soffset + i) == PAIR_IY))
+        {
+          emit2 ("ld %s, %s", _pairs[getPairId_o (result, roffset + i)].name, _pairs[getPairId_o (source, soffset + i)].name);
+          cost (2, 4);
+        }
+      else if (IS_TLCS90 && getPairId_o (result, roffset + i) != PAIR_INVALID && getPairId_o (source, soffset + i) != PAIR_INVALID)
         {
           emit2 ("ld %s, %s", _pairs[getPairId_o (result, roffset + i)].name, _pairs[getPairId_o (source, soffset + i)].name);
           regalloc_dry_run_cost += 1 + (!aopInReg (result, roffset + i, HL_IDX) && !aopInReg (source, soffset + i, HL_IDX));
@@ -3480,7 +3490,7 @@ genCopy (asmop *result, int roffset, asmop *source, int soffset, int sizex, bool
       else if (IS_EZ80_Z80 && getPairId_o (result, roffset + i) != PAIR_INVALID && aopInReg (source, soffset + i, IY_IDX))
         {
           emit2 ("lea %s, iy, #0", _pairs[getPairId_o (result, roffset + i)].name);
-          regalloc_dry_run_cost += 3;
+          cost (3, 3);
         }
       else if (aopInReg (result, roffset + i, IY_IDX) && getPairId_o (source, soffset + i) != PAIR_INVALID ||
         getPairId_o (result, roffset + i) != PAIR_INVALID && aopInReg (source, soffset + i, IY_IDX))
@@ -3501,30 +3511,42 @@ skip_byte_push_iy:
         ;
     }
 
-  // Try to use ex de, hl. TODO: Also do so when only some bytes are used, while others are dead (useful e.g. for emulating ld de, hl or ld hl, de).
-  if (!IS_GB && regsize >= 4)
+  if (!IS_GB)
     {
-      int ex[4] = {-2, -2, -2, -2};
+      int ex[4] = {-2, -2, -2, -2}; // Swapped bytes
+      bool no = false; // Still needed byte would be overwritten
 
       // Find L and check that it is exchanged with E, find H and check that it is exchanged with D.
       for (int i = 0; i < n; i++)
         {
-          if (!assigned[i] && aopInReg (result, roffset + i, L_IDX) && aopInReg (source, soffset + i, E_IDX))
-            ex[0] = i;
-          if (!assigned[i] && aopInReg (result, roffset + i, E_IDX) && aopInReg (source, soffset + i, L_IDX))
-            ex[1] = i;
-          if (!assigned[i] && aopInReg (result, roffset + i, H_IDX) && aopInReg (source, soffset + i, D_IDX))
-            ex[2] = i;
-          if (!assigned[i] && aopInReg (result, roffset + i, D_IDX) && aopInReg (source, soffset + i, H_IDX))
-            ex[3] = i;
+          if (!assigned[i] && aopInReg (source, soffset + i, E_IDX))
+            if (aopInReg (result, roffset + i, L_IDX))
+              ex[0] = i;
+            else
+              no = true;
+          if (!assigned[i] && aopInReg (source, soffset + i, L_IDX))
+            if (aopInReg (result, roffset + i, E_IDX))
+              ex[1] = i;
+            else
+              no = true;
+          if (!assigned[i] && aopInReg (source, soffset + i, D_IDX))
+            if (aopInReg (result, roffset + i, H_IDX))
+              ex[2] = i;
+            else
+              no = true;
+          if (!assigned[i] && aopInReg (source, soffset + i, H_IDX))
+            if (aopInReg (result, roffset + i, D_IDX))
+              ex[3] = i;
+            else
+              no = true;
         }
 
       int exsum = (ex[0] >= 0) + (ex[1] >= 0) + (ex[2] >= 0) + (ex[3] >= 0);
 
-      if (exsum == 4)
+      if (!no && exsum >= 2 && hl_dead && de_dead)
         {
           emit2 ("ex de, hl");
-          regalloc_dry_run_cost += 1; // TODO: Use cost() to enable better optimization for speed.
+          cost2 (1, 4, 3, 2, 0, 2, 1);
           if(ex[0] >= 0)
             assigned[ex[0]] = TRUE;
           if(ex[1] >= 0)
@@ -3635,6 +3657,7 @@ skip_byte:
             emit2 ("ld hl, %s", aopGet (source, soffset + i, false));
           emit2("ex de, hl");
           cost2 (3 + !hl_free, 0, 0, 13 + !hl_free * 2, 0, 0, 0);
+          spillPair (PAIR_HL);
           assigned[i] = true;
           assigned[i + 1] = true;
           size -= 2;

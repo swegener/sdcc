@@ -181,6 +181,7 @@ class cl_m6809_nmi_src: public cl_it_src
 {
 public:
   u8_t Evalue;
+  u8_t IFvalue;
 public:
   cl_m6809_nmi_src(cl_uc  *Iuc,
 		   int    Inuof,
@@ -191,10 +192,12 @@ public:
 		   t_addr Iaddr,
 		   const  char *Iname,
 		   int    apoll_priority,
-		   u8_t   aEvalue):
+		   u8_t   aEvalue,
+		   u8_t   aIFvalue):
     cl_it_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, false, true, Iname, apoll_priority)
   {
     Evalue= aEvalue;
+    IFvalue= aIFvalue;
   }
   virtual void clear(void) { src_cell->write(0); }
 };
@@ -211,8 +214,9 @@ public:
 		  t_addr Iaddr,
 		  const  char *Iname,
 		  int    apoll_priority,
-		  u8_t   aEvalue):
-    cl_m6809_nmi_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, Iname, apoll_priority, aEvalue)
+		  u8_t   aEvalue,
+		  u8_t   aIFvalue):
+    cl_m6809_nmi_src(Iuc, Inuof, Iie_cell, Iie_mask, Isrc_cell, Isrc_mask, Iaddr, Iname, apoll_priority, aEvalue, aIFvalue)
   {}
   virtual bool enabled(void);
 };

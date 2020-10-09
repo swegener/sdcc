@@ -2041,10 +2041,11 @@ cl_m6809::accept_it(class it_level *il)
 
   reg.CC&= ~flagE;
   reg.CC|= is->Evalue;
-
+  
   if (!cwai)
     push_regs(true);
   cwai= false;
+  reg.CC|= is->IFvalue;
   
   t_addr a= rom->read(is->addr) * 256 + rom->read(is->addr+1);
   vc.rd+= 2;
@@ -2097,7 +2098,8 @@ cl_m6809_cpu::init()
 			  0xfff8,
 			  "Interrupt request",
 			  0,
-			  flagE);
+			  flagE,
+			  flagI);
   is->init();
   uc->it_sources->add(is);
 
@@ -2108,7 +2110,8 @@ cl_m6809_cpu::init()
 			  0xfff6,
 			  "Fast interrupt request",
 			  0,
-			  0);
+			  0,
+			  flagI|flagF);
   is->init();
   uc->it_sources->add(is);
 
@@ -2119,7 +2122,8 @@ cl_m6809_cpu::init()
 			   0xfffc,
 			   "Non-maskable interrupt request",
 			   0,
-			   flagE);
+			   flagE,
+			   flagI|flagF);
   is->init();
   uc->it_sources->add(is);
   

@@ -6539,14 +6539,14 @@ genPlus (iCode * ic)
         }
       // When adding a literal, the 16 bit addition results in smaller, faster code than two 8-bit additions.
       else if ((!premoved || i) && aopInReg (AOP (IC_RESULT (ic)), i, HL_IDX) && aopInReg (leftop, i, HL_IDX) && (rightop->type == AOP_LIT && !aopIsLitVal (rightop, i, 1, 0) || rightop->type == AOP_IMMD))
-        {
+        {emit2(";A");
           PAIR_ID pair = getFreePairId (ic);
           bool pair_alive;
           if (pair == PAIR_INVALID)
             pair = PAIR_DE;
-          if (pair_alive = !isPairDead (pair, ic))
+          if (pair_alive = (!isPairDead (pair, ic) || IC_RESULT (ic)->aop->regs[_pairs[pair].l_idx] < i || IC_RESULT (ic)->aop->regs[_pairs[pair].h_idx] < i))
             _push (pair);
-          fetchPairLong (pair, AOP (IC_RIGHT (ic)), 0, i);
+          fetchPairLong (pair, IC_RIGHT (ic)->aop, 0, i);
           if (started)
             {
               emit2 ("adc hl, %s", _pairs[pair].name);

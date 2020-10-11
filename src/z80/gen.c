@@ -3078,6 +3078,7 @@ cheapMove (asmop *to, int to_offset, asmop *from, int from_offset, bool a_dead)
   else if (!aopInReg (to, to_offset, A_IDX) && !aopInReg (from, from_offset, A_IDX) && // Go through a.
     (from->type == AOP_DIR ||
     from->type == AOP_SFR ||
+    to->type == AOP_STK && from->type == AOP_STK ||
     to->type == AOP_IY && (from->type == AOP_EXSTK || IS_GB && from->type == AOP_STK) ||
     (to->type == AOP_HL || IS_GB && to->type == AOP_STK || to->type == AOP_EXSTK) && (aopInReg(from, from_offset, L_IDX) || aopInReg(from, from_offset, H_IDX))))
     {
@@ -8883,6 +8884,10 @@ genAnd (const iCode * ic, iCode * ifx)
 
   for (int i = 0; i < size;)
     {
+      const bool hl_free = isPairDead (PAIR_HL, ic) &&
+        (left->aop->regs[L_IDX] < i && left->aop->regs[H_IDX] < i & right->aop->regs[L_IDX] < i && right->aop->regs[H_IDX] < i) &&
+        (result->aop->regs[L_IDX] < 0 || result->aop->regs[L_IDX] >= i) && (result->aop->regs[H_IDX] < 0 || result->aop->regs[H_IDX] >= i);
+
       if (!bitVectBitValue (ic->rSurv, A_IDX) && left->aop->regs[A_IDX] <= i && right->aop->regs[A_IDX] <= i && (result->aop->regs[A_IDX] < 0 || result->aop->regs[A_IDX] >= i))
         a_free = true;
 
@@ -8899,20 +8904,14 @@ genAnd (const iCode * ic, iCode * ifx)
         {
           bytelit = byteOfVal (right->aop->aopu.aop_lit, i);
 
-          if (bytelit == 0x00)
+          if (bytelit == 0x00 || bytelit == 0xff)
             {
-              cheapMove (result->aop, i, ASMOP_ZERO, 0, a_free);
-              if (aopInReg (result->aop, i, A_IDX))
+              int end;
+              for(end = i; end < size && byteOfVal (right->aop->aopu.aop_lit, end) == bytelit; end++);
+              genMove_o (result->aop, i, bytelit == 0x00 ? ASMOP_ZERO : left->aop, i, end - i, a_free, hl_free, !isPairInUse (PAIR_DE, ic));
+              if (result->aop->regs[A_IDX] >= i && result->aop->regs[A_IDX] < end)
                 a_free = false;
-              i++;
-              continue;
-            }
-          else if (bytelit == 0xff)
-            {
-              cheapMove (result->aop, i, AOP (left), i, a_free);
-              if (aopInReg (result->aop, i, A_IDX))
-                a_free = false;
-              i++;
+              i = end;
               continue;
             }
           else if (isLiteralBit (~bytelit & 0xffu) >= 0 &&

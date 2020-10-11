@@ -1,8 +1,9 @@
 2020-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/z80/gen.c,
-	  support/regression/tests/bug-3127.c:
-	  Fix bugs #3127, #3128, part of #3129.
+	  support/regression/tests/bug-3127.c,
+	  support/regression/tests/bug-3129.c:
+	  Fix bugs #3127, #3128, #3129.
 
 2020-10-09 Philipp Klaus Krause <pkk AT spth.de>
 

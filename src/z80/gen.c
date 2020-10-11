@@ -6647,7 +6647,7 @@ genPlus (iCode * ic)
 
           _G.preserveCarry = (i != size - 1);
           if (size &&
-            (requiresHL (rightop) && rightop->type != AOP_REG || requiresHL (leftop)
+            (requiresHL (rightop) && rightop->size > i + 1 && rightop->type != AOP_REG || (requiresHL (leftop) && leftop->size > i + 1)
             && leftop->type != AOP_REG) && AOP_TYPE (IC_RESULT (ic)) == AOP_REG
             && (AOP (IC_RESULT (ic))->aopu.aop_reg[i]->rIdx == L_IDX
               || AOP (IC_RESULT (ic))->aopu.aop_reg[i]->rIdx == H_IDX))

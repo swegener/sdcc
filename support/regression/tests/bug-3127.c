@@ -7,6 +7,8 @@
 #include <limits.h>
 #include <stdarg.h>
 
+#ifndef __SDCC_pdk14 // Lack of memory
+
 #if ULONG_MAX == 0xffffffff
 typedef unsigned long UINT4;
 #elif UINT_MAX == 0xffffffff
@@ -47,13 +49,16 @@ void func(UINT4 *buf, UINT4 *in)
 
   check("%lx %lx %lx %lx\n",a,b,c,d);
 }
+#endif
 
 void
 testBug (void)
 {
+#ifndef __SDCC_pdk14 // Lack of memory
    UINT4 buf[] = {0x67452301,0xefcdab89,0x98badcfe,0x10325476};
    UINT4 in[] = {0x3ec3,0x0,0x3dc3,0x0,0x3ac3};
 
    func(buf, in);
+#endif
 }
 

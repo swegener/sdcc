@@ -3519,6 +3519,10 @@ skip_byte_push_iy:
       // Find L and check that it is exchanged with E, find H and check that it is exchanged with D.
       for (int i = 0; i < n; i++)
         {
+          if (assigned[i] &&
+            (aopInReg (result, roffset + i, E_IDX) || aopInReg (result, roffset + i, L_IDX) || aopInReg (result, roffset + i, D_IDX) || aopInReg (result, roffset + i, H_IDX)));
+            no = true;
+            
           if (!assigned[i] && aopInReg (source, soffset + i, E_IDX))
             if (aopInReg (result, roffset + i, L_IDX))
               ex[0] = i;

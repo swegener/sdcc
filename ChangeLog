@@ -1,5 +1,10 @@
 2020-10-11 Philipp Klaus Krause <pkk AT spth.de>
 
+	* src/z80/gen.c:
+	  Fix bug #3128.
+
+2020-10-11 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3127.c:
 	  Fix bug #3127.

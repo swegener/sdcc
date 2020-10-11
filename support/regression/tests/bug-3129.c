@@ -70,7 +70,7 @@ bool recolor(void);
 bool test(void);
 
 /* Add a new, colored node, connect it to a subset of existing colors. */
-bool add(void)
+bool add(void) __reentrant
 {
 	bool ret = false;
 	node_t sum, ref_sum;
@@ -186,7 +186,7 @@ tried:
 
 static node_t recolormap[MAX_K];
 
-bool do_recolor(void)
+bool do_recolor(void)  __reentrant
 {
 	bool ret = false;
 	node_t i;
@@ -235,7 +235,7 @@ tried:
 	return(ret);
 }
 
-bool maprecolor(node_t i)
+bool maprecolor(node_t i)  __reentrant
 {
 	node_t j;
 
@@ -252,7 +252,7 @@ bool maprecolor(node_t i)
 }
 
 /* Recolor nodes. */
-bool recolor(void)
+bool recolor(void)  __reentrant
 {
 	return(maprecolor(0));
 }

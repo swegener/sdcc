@@ -3,7 +3,7 @@
 	* src/z80/gen.c,
 	  support/regression/tests/bug-3127.c,
 	  support/regression/tests/bug-3129.c:
-	  Fix bugs #3127, #3128, #3129.
+	  Fix bugs #3127, #3128, #3129, #3130.
 
 2020-10-09 Philipp Klaus Krause <pkk AT spth.de>
 

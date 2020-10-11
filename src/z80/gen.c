@@ -3520,9 +3520,9 @@ skip_byte_push_iy:
       for (int i = 0; i < n; i++)
         {
           if (assigned[i] &&
-            (aopInReg (result, roffset + i, E_IDX) || aopInReg (result, roffset + i, L_IDX) || aopInReg (result, roffset + i, D_IDX) || aopInReg (result, roffset + i, H_IDX)));
+            (aopInReg (result, roffset + i, E_IDX) || aopInReg (result, roffset + i, L_IDX) || aopInReg (result, roffset + i, D_IDX) || aopInReg (result, roffset + i, H_IDX)))
             no = true;
-            
+       
           if (!assigned[i] && aopInReg (source, soffset + i, E_IDX))
             if (aopInReg (result, roffset + i, L_IDX))
               ex[0] = i;
@@ -3542,7 +3542,7 @@ skip_byte_push_iy:
             if (aopInReg (result, roffset + i, D_IDX))
               ex[3] = i;
             else
-              no = true;
+              no = true; 
         }
 
       int exsum = (ex[0] >= 0) + (ex[1] >= 0) + (ex[2] >= 0) + (ex[3] >= 0);
@@ -3610,7 +3610,7 @@ skip_byte:
           break;
 
       wassertl_bt (i != n, "genCopy error: Trying to cache non-existant byte in accumulator.");
-      if (a_free && !pushed_a)
+      if (!a_free && !pushed_a)
         {
           _push (PAIR_AF);
           pushed_a = TRUE;
@@ -4883,10 +4883,7 @@ isInHome (void)
  */
 static void genSend (const iCode *ic)
 {
-  int size;
-
   aopOp (IC_LEFT (ic), ic, FALSE, FALSE);
-  size = AOP_SIZE (IC_LEFT (ic));
 
   wassertl (ic->next->op == CALL || ic->next->op == PCALL, "Sending register parameter for missing call");
   wassertl (!IS_GB, "Register parameters are not supported in gbz80 port");
@@ -4920,38 +4917,12 @@ static void genSend (const iCode *ic)
         }
       _saveRegsForCall (walk, FALSE);
     }
-  if (size == 2)
-    {
-      fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
-      z80_regs_used_as_parms_in_calls_from_current_function[L_IDX] = true;
-      z80_regs_used_as_parms_in_calls_from_current_function[H_IDX] = true;
-    }
-  else if (size <= 4)
-    {
-      if (size == 4 && ASMOP_RETURN->aopu.aop_reg[0]->rIdx == L_IDX && ASMOP_RETURN->aopu.aop_reg[1]->rIdx == H_IDX &&
-        ASMOP_RETURN->aopu.aop_reg[2]->rIdx == E_IDX && ASMOP_RETURN->aopu.aop_reg[3]->rIdx == D_IDX)
-        {
-          if (!isPairDead (PAIR_DE, ic) && getPairId_o (AOP (IC_LEFT (ic)), 2) != PAIR_DE)
-            {
-              regalloc_dry_run_cost += 100;
-              wassertl (regalloc_dry_run, "Register parameter overwrites value that is still needed");
-            }
-          fetchPairLong (PAIR_DE, AOP (IC_LEFT (ic)), ic, 2);
-          z80_regs_used_as_parms_in_calls_from_current_function[E_IDX] = true;
-          z80_regs_used_as_parms_in_calls_from_current_function[D_IDX] = true;
-          fetchPairLong (PAIR_HL, AOP (IC_LEFT (ic)), ic, 0);
-          z80_regs_used_as_parms_in_calls_from_current_function[L_IDX] = true;
-          z80_regs_used_as_parms_in_calls_from_current_function[H_IDX] = true;
-        }
-      else
-        {
-          for (int i = 0; i < AOP_SIZE (IC_LEFT (ic)); i++)
-            if (!regalloc_dry_run)
-              z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_RETURN->aopu.aop_reg[i]->rIdx] = true;
 
-          genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, true, true, false);
-        }
-    }
+  genMove_o (ASMOP_RETURN, 0, IC_LEFT (ic)->aop, 0, IC_LEFT (ic)->aop->size, !bitVectBitValue (ic->rSurv, A_IDX), isPairDead (PAIR_HL, ic), isPairDead (PAIR_DE, ic));
+  
+  for (int i = 0; i < IC_LEFT (ic)->aop->size; i++)
+    if (!regalloc_dry_run)
+      z80_regs_used_as_parms_in_calls_from_current_function[ASMOP_RETURN->aopu.aop_reg[i]->rIdx] = true;
 
   freeAsmop (IC_LEFT (ic), NULL);
 }
@@ -6543,12 +6514,15 @@ genPlus (iCode * ic)
         }
       // When adding a literal, the 16 bit addition results in smaller, faster code than two 8-bit additions.
       else if ((!premoved || i) && aopInReg (AOP (IC_RESULT (ic)), i, HL_IDX) && aopInReg (leftop, i, HL_IDX) && (rightop->type == AOP_LIT && !aopIsLitVal (rightop, i, 1, 0) || rightop->type == AOP_IMMD))
-        {emit2(";A");
+        {
           PAIR_ID pair = getFreePairId (ic);
           bool pair_alive;
           if (pair == PAIR_INVALID)
             pair = PAIR_DE;
-          if (pair_alive = (!isPairDead (pair, ic) || IC_RESULT (ic)->aop->regs[_pairs[pair].l_idx] < i || IC_RESULT (ic)->aop->regs[_pairs[pair].h_idx] < i))
+          pair_alive = !isPairDead (pair, ic) ||
+            IC_RESULT (ic)->aop->regs[_pairs[pair].l_idx] < i || IC_RESULT (ic)->aop->regs[_pairs[pair].h_idx] < i ||
+            IC_LEFT (ic)->aop->regs[_pairs[pair].l_idx] >= i + 2 || IC_LEFT (ic)->aop->regs[_pairs[pair].h_idx] >= i + 2;
+          if (pair_alive)
             _push (pair);
           fetchPairLong (pair, IC_RIGHT (ic)->aop, 0, i);
           if (started)

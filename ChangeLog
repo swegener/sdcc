@@ -3,6 +3,8 @@
 	* src/pdk/gen.c,
 	  support/regression/tests/bug-3132.c:
 	  Fix bug #3132.c.
+	* src/z80/gen.c:
+	  Fix overoptimistic stack coalescing assumption in cost function, RFE #710.
 
 2020-10-11 Philipp Klaus Krause <pkk AT spth.de>
 

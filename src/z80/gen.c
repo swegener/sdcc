@@ -3240,11 +3240,11 @@ genCopyStack (asmop *result, int roffset, asmop *source, int soffset, int n, boo
           i++;
           continue;
         }
-        
+  
       int source_fp_offset = source->aopu.aop_stk + soffset + (source->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
       int result_fp_offset = result->aopu.aop_stk + roffset + (result->aopu.aop_stk > 0 ? _G.stack.param_offset : 0);
         
-      if (result_fp_offset == source_fp_offset)
+      if (result_fp_offset == source_fp_offset && !regalloc_dry_run) // Stack locations can change, so in dry run do not assume stack coalescing will happen.
         {
           assigned[i] = true;
           i++;
@@ -13864,7 +13864,7 @@ static void
 dryZ80Code (iCode * lic)
 {
   iCode *ic;
-
+last_dry_run = true;
   for (ic = lic; ic; ic = ic->next)
     if (ic->op != FUNCTION && ic->op != ENDFUNCTION && ic->op != LABEL && ic->op != GOTO && ic->op != INLINEASM)
       printf ("; iCode %d total cost: %d\n", ic->key, (int) (dryZ80iCode (ic)));

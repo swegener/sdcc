@@ -3147,7 +3147,9 @@ genAnd (const iCode *ic, iCode *ifx)
           else if (left->aop->type == AOP_DIR && right->aop->type == AOP_LIT) // Try to combine multiple bytes with 0xff mask by or.
             {
               int j, k;
-              for(j = i; j + 1 < right->aop->size && (aopIsLitVal (right->aop, j, 1, 0xff) || aopIsLitVal (right->aop, j, 1, 0x00)); j++);
+              for(j = i; j + 1 < right->aop->size && (aopIsLitVal (right->aop, j, 1, 0xff) || aopIsLitVal (right->aop, j, 1, 0x00)); j++); // Find a byte that does need an and-mask, and handle it first.
+              while(j > 0 && aopIsLitVal (right->aop, j, 1, 0x00)) // Avoid wrongly loading the last byte, if that one is to be ignored.
+                j--;
               cheapMove (ASMOP_A, 0, left->aop, j, true, true, true);
               if (!(aopIsLitVal (right->aop, j, 1, 0xff) || aopIsLitVal (right->aop, j, 1, 0x00)))
                 {

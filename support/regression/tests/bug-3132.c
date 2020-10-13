@@ -7,11 +7,6 @@
 
 #include <stdint.h>
 
-unsigned char _sdcc_external_startup(void)
-{
-  return 0;
-}
-
 volatile uint8_t block = 0;
 
 void f(void)

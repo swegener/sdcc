@@ -1,5 +1,12 @@
 2020-10-12 Philipp Klaus Krause <pkk AT spth.de>
 
+	* support/regression/tests/bug-3129.c:
+	  Disable test for ds390.
+	* support/regression/tests/bug-3132.c:
+	  Remove conflicting (for ds390) __sdcc_external_startup definition.
+
+2020-10-12 Philipp Klaus Krause <pkk AT spth.de>
+
 	* src/pdk/gen.c,
 	  support/regression/tests/bug-3132.c:
 	  Fix bug #3132.c.

@@ -1660,6 +1660,9 @@ FBYNAME (immdInRange)
   long i, j, k, h, low, high, left_l, right_l, order;
   const char *padd[] =    {"+", "'+'", "\"+\""};
   const char *psub[] =    {"-", "'-'", "\"-\""};
+  const char *pmul[] =    {"*", "'*'", "\"*\""};
+  const char *pdiv[] =    {"/", "'/'", "\"/\""};
+  const char *pmod[] =    {"%", "'%'", "\"%\""};
   const char *pbitand[] = {"&", "'&'", "\"&\""};
   const char *pxor[] =    {"^", "'^'", "\"^\""};
   const char *pbitor[] =  {"|", "'|'", "\"|\""};
@@ -1703,7 +1706,7 @@ FBYNAME (immdInRange)
                 if (!immdGet (r + 1, &k) || !(op = hTabItemWithKey (vars, (int) k)))
                   return immdError ("bad left operand", r, cmdLine);
                 else if (!immdGet (op, &left_l))
-                  return immdError ("bad left operand", op, r);
+                  return FALSE;
               }
             else
               return immdError ("bad left operand", r, cmdLine);
@@ -1747,6 +1750,34 @@ FBYNAME (immdInRange)
       if (strcmp (operator, psub[k]) == 0)
         {
           i = left_l - right_l;
+          j = 1;
+          break;
+        }
+  if (!j)
+    for (k = 0; k < sizeof (pmul) / sizeof (pmul[0]); k++) // mul
+      if (strcmp (operator, pmul[k]) == 0)
+        {
+          i = left_l * right_l;
+          j = 1;
+          break;
+        }
+  if (!j)
+    for (k = 0; k < sizeof (pdiv) / sizeof (pdiv[0]); k++) // div
+      if (strcmp (operator, pdiv[k]) == 0)
+        {
+          if (right_l == 0)
+            return immdError ("division by zero", "", cmdLine);
+          i = left_l / right_l;
+          j = 1;
+          break;
+        }
+  if (!j)
+    for (k = 0; k < sizeof (pmod) / sizeof (pmod[0]); k++) // mod
+      if (strcmp (operator, pmod[k]) == 0)
+        {
+          if (right_l == 0)
+            return immdError ("division by zero", "", cmdLine);
+          i = left_l % right_l;
           j = 1;
           break;
         }

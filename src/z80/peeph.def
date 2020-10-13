@@ -29,10 +29,16 @@ replace restart {
 } if notVolatile(%1), notUsed(%1), notVolatile(%2), notSame(%1 '(hl+)' '(hl-)'), notSame(%2 '(hl+)' '(hl-)')
 
 replace restart {
-	add	%1, sp
+	%1	hl, %2
 } by {
-	; common peephole 2 removed dead frame pointer setup.
-} if notUsed(%1)
+	; common peephole 2a removed %1 hl,%2 due to unused result.
+} if same(%1 'adc' 'add' 'sbc'), notUsed('hl' 'f')
+
+replace restart {
+	%1	%2
+} by {
+	; common peephole 2b removed %1 %2 due to unused result.
+} if same(%1 'dec' 'inc'), same(%2 'bc' 'de' 'hl' 'sp' 'ix' 'iy'), notUsed(%2)
 
 replace restart {
 	ld	%1, %2 + %3
@@ -464,6 +470,16 @@ replace restart {
 } if canSplitReg(%1 %3 %4), canSplitReg(%2 %5), notUsed(%4)
 
 replace restart {
+	ld	hl, #%1
+	add	hl, %2
+} by {
+	; common peephole 39 replaced 16-bit addition by 8-bit loads and 16-bit increment.
+	ld	l, %4
+	ld	h, %3
+	inc	hl
+} if canSplitReg(%2 %3 %4), immdInRange(1 1 '+' %1 0 %9)
+
+replace restart {
 	push	af
 	inc	sp
 	ld	a, c
@@ -500,6 +516,20 @@ replace restart {
 	; common peephole 44 combined pushing of %1 and %2 (%3).
 	push	%6
 } if unusedReg(%6 'bc' 'de' 'hl'), canSplitReg(%6 %4 %5), canAssign(%4 %1), notUsed('a')
+
+replace restart {
+	ld	%1, #%2
+} by {
+	; common peephole 45 replace 16-bit immediate load by 8-bit one.
+	ld	%3, #%4
+} if canSplitReg(%1 %5 %3), immdInRange(0x00 0xff '&' %2 0xff %4), canAssign(%3 %4), notUsed(%5)
+
+replace restart {
+	ld	%1, #%2
+} by {
+	; common peephole 46 replace 16-bit immediate load by 8-bit one.
+	ld	%3, #%4
+} if canSplitReg(%1 %3 %5), immdInRange(0x00 0xff '/' %2 256 %4), canAssign(%3 %4), notUsed(%5)
 
 replace restart {
 	ld	a, %1 (%3)
@@ -781,6 +811,16 @@ replace restart {
 	ld	hl, #%1 + %2
 	%3	(hl)
 } if same(%3 'inc' 'dec'), notUsed(%4 'hl')
+
+replace restart {
+	ld	%1, %2
+	push	%3
+	inc	sp
+} by {
+	; common peephole 71 eliminate unnecessary initialization of %1 register.
+	push	%3
+	inc	sp
+} if same(%1 'c' 'e' 'l' 'ixl' 'iyl'), canJoinRegs('' %1 %4), same(%3 %4), notUsed(%1)
 
 replace restart {
 	ld	a, %1 (%2)

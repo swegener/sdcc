@@ -1,3 +1,11 @@
+2020-10-13 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/SDCCpeeph.c:
+	  Peephole rule immdInRange now accepts mul, div, and mod operations.
+	  immdInRange silently fail in case of non-number (label) arguments.
+	* src/z80/peeph.def:
+	  Add new peephole rules.
+
 2020-10-12 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-3129.c:

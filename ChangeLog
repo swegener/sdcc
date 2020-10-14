@@ -1,3 +1,11 @@
+2020-10-14 Philipp Klaus Krause <pkk AT spth.de>
+
+	* device/lib/r2k/crt0.s,
+	  device/lib/r2ka/crt0.s,
+	  device/lib/r3ka/crt0.s,
+	  .version:
+	  Use a default crt0 that works well on typical Rabbit hardware.
+
 2020-10-13 Sergey Belyashov <sergey.belyashov@gmail.com>
 
 	* src/SDCCpeeph.c:
@@ -6,7 +14,7 @@
 	* src/z80/peeph.def:
 	  Add new peephole rules.
 
-2020-10-12 Philipp Klaus Krause <pkk AT spth.de>
+2020-10-13 Philipp Klaus Krause <pkk AT spth.de>
 
 	* support/regression/tests/bug-3129.c:
 	  Disable test for ds390.

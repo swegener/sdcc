@@ -226,10 +226,8 @@ static void checkCurrFile (const char *s);
   return check_type();
 }
 0[bB]{B}+{IS}?          {
-  if (!options.std_sdcc)
-    {
-      yyerror ("binary (0b) constants are not allowed in ISO C");
-    }
+  if (!options.std_sdcc && !options.std_c2x)
+    werror (W_BINARY_INTEGER_CONSTANT_C23);
   count ();
   yylval.val = constIntVal (yytext);
   return CONSTANT;

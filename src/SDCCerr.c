@@ -585,6 +585,8 @@ struct
      "%s shift by negative amount", 0 },
   { W_INVALID_STACK_LOCATION, ERROR_LEVEL_WARNING,
      "access to invalid stack location", 0 },
+  { W_BINARY_INTEGER_CONSTANT_C23, ERROR_LEVEL_WARNING,
+     "binary integer constant requires C23 or later", 0 },
 };
 
 /* -------------------------------------------------------------------------------

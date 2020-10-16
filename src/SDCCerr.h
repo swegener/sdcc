@@ -288,6 +288,7 @@ enum {
   E_INPUT_FILE_OPEN_ERR         = 258, /* Failed to open input file for readin (with error message) */
   W_SHIFT_NEGATIVE              = 259, /* shift by negative amount */
   W_INVALID_STACK_LOCATION      = 260, /* access to invalid stack location */
+  W_BINARY_INTEGER_CONSTANT_C23 = 261, /* binary integer constant requires ISO C23 or later */
   
   /* don't touch this! */
   NUMBER_OF_ERROR_MESSAGES             /* Number of error messages */

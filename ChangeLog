@@ -1,3 +1,10 @@
+2020-10-16 Philipp Klaus Krause <pkk AT spth.de>
+
+	* src/SDCCerr.h,
+	  src/SDCCerr.c,
+	  src/SDCC.lex:
+	  Improve diagnostics for binary integer literals.
+
 2020-10-14 Philipp Klaus Krause <pkk AT spth.de>
 
 	* device/lib/r2k/crt0.s,

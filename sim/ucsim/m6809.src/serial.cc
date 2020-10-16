@@ -145,7 +145,7 @@ cl_serial::conf_op(cl_memory_cell *cell, t_addr addr, t_mem *val)
       if (val)
 	{
 	  int i;
-	  if (!uc->rom->valid_address(*val))
+	  if (uc->rom->valid_address(*val))
 	    {
 	      for (i= 0; i < 2; i++)
 		unregister_cell(regs[i]);

@@ -1,3 +1,9 @@
+2020-10-21 Sergey Belyashov <sergey.belyashov@gmail.com>
+
+	* src/z80/gen.c,
+	* src/z80/mappings.i:
+	  Fix bug #3137.
+
 2020-10-16 Philipp Klaus Krause <pkk AT spth.de>
 
 	* src/SDCCerr.h,

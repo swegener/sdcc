@@ -13,7 +13,7 @@ static const ASM_MAPPING _asxxxx_gb_mapping[] = {
     { "ldahli", "ld\ta, (hl+)"},
     { "ldahlsp", "ldhl\tsp, #%d" },
     { "ldaspsp", "add sp, #%d" },
-    { "*pair", "(%s)" },
+    { "mems", "(%s)" },
     { "enter", "" },
     { "enters", "" },
     { "enterx",
@@ -65,7 +65,7 @@ static const ASM_MAPPING _asxxxx_z80_mapping[] = {
       "ld iy,#%d\n"
       "add\tiy,sp\n"
       "ld\tsp,iy" },
-    { "*pair", "(%s)" },
+    { "mems", "(%s)" },
     { "enter",
       "push\tix\n"
       "ld\tix,#0\n"
@@ -120,7 +120,7 @@ static const ASM_MAPPING _asxxxx_r2k_mapping[] = {
       "ld iy,#%d\n"
       "add\tiy,sp\n"
       "ld\tsp,iy" },
-    { "*pair", "(%s)" },
+    { "mems", "(%s)" },
     { "enter",
       "push\tix\n"
       "ld\tix,#0\n"
@@ -223,7 +223,7 @@ static const ASM_MAPPING _rgbds_gb_mapping[] = {
     { "jphl", "jp hl" },
     { "ldahlsp", "ld hl, sp+%d" },
     { "ldaspsp", "add sp, %d" },
-    { "*pair", "[%s]" },
+    { "mems", "[%s]" },
     { NULL, NULL }
 };
 
@@ -312,7 +312,7 @@ static const ASM_MAPPING _isas_gb_mapping[] = {
     { "jphl", "jp (hl)" },
     { "ldahlsp", "ldhl sp, %d" },
     { "ldaspsp", "add sp, %d" },
-    { "*pair", "(%s)" },
+    { "mems", "(%s)" },
     { NULL, NULL }
 };
 
@@ -391,7 +391,7 @@ static const ASM_MAPPING _z80asm_z80_mapping[] = {
       "ld iy, %d\n"
       "add\tiy, sp\n"
       "ld\tsp, iy" },
-    { "*pair", "(%s)" },
+    { "mems", "(%s)" },
     { "enter",
       "push\tix\n"
       "ld\tix,0\n"
@@ -439,7 +439,7 @@ static const ASM_MAPPING _gas_gb_mapping[] = {
     { "ldahli", "ldi\ta, (hl)" },
     { "ldahlsp", "ldhl\tsp, #%d" },
     { "ldaspsp", "add\tsp, #%d" },
-    { "*pair", "(%s)" },
+    { "mems", "(%s)" },
     { "enter", "" },
     { "enters", "" },
     { "enterx", "add\tsp, #-%d" },
@@ -497,7 +497,7 @@ static const ASM_MAPPING _gas_z80_mapping[] = {
 		"ld\tiy,#%d\n"
 		"add\tiy,sp\n"
 		"ld\tsp,iy" },
-    { "*pair", "(%s)" },
+    { "mems", "(%s)" },
     { "enter", 
 		"push\tix\n"
 		"ld\tix,#0\n"

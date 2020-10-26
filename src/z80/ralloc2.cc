@@ -809,6 +809,9 @@ static bool HLinst_ok(const assignment &a, unsigned short int i, const G_t &G, c
   if(IS_GB && ic->op == IPUSH && !operand_is_pair(left, a, i, G) && ia.registers[REG_A][1] >= 0 &&
     !(getSize(operandType(left)) == 1 && (operand_in_reg(left, REG_A, ia, i, G) || operand_in_reg(left, REG_B, ia, i, G) || operand_in_reg(left, REG_D, ia, i, G) || operand_in_reg(left, REG_H, ia, i, G))))
     return(false);
+    
+  if(IS_GB && !result_only_HL && (operand_on_stack(result, a, i, G) || operand_on_stack(left, a, i, G) || operand_on_stack(right, a, i, G)))
+    return(false);
 
   if(IS_GB && ic->op == GET_VALUE_AT_ADDRESS && !result_only_HL && (getSize(operandType(result)) >= 2 || !operand_is_pair(left, a, i, G)))
     return(false);

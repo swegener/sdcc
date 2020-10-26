@@ -1,7 +1,8 @@
 2020-10-26 Philipp Klaus Krause <pkk AT spth.de>
 
-	* support/regression/tests/bug-3135.c:
-	  Attempt to test for bug #3135 (which I haven't been able to reproduce so far).
+	* support/regression/tests/bug-3135.c,
+	  src/z80/ralloc2.cc:
+	  Attempt to fix bug #3135.
 
 2020-10-21 Sergey Belyashov <sergey.belyashov@gmail.com>
 
